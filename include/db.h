@@ -496,6 +496,7 @@ void		DBcommit();
 void		DBrollback();
 
 const ZBX_TABLE	*DBget_table(const char *tablename);
+const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 zbx_uint64_t	DBget_maxid(char *table, char *field);
 
 int	DBget_function_result(char **result,char *functionid);

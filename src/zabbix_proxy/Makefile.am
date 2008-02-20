@@ -9,11 +9,13 @@ SUBDIRS = \
 	../zabbix_server/pinger \
 	../zabbix_server/poller \
 	../zabbix_server/trapper \
-	../zabbix_server/nodewatcher
+	../zabbix_server/nodewatcher \
+	datasender
 
 sbin_PROGRAMS = zabbix_proxy
 
 zabbix_proxy_SOURCES = \
+	servercomms.c servercomms.h \
 	events.c events.h \
 	zlog.c \
 	proxy.c
@@ -28,6 +30,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
 	$(top_srcdir)/src/zabbix_server/trapper/libzbxtrapper.a \
 	$(top_srcdir)/src/zabbix_server/nodewatcher/libzbxnodewatcher.a \
+	datasender/libzbxdatasender.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \

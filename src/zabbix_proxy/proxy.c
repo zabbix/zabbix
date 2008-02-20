@@ -48,6 +48,7 @@
 #include "../zabbix_server/poller/poller.h"
 #include "../zabbix_server/trapper/trapper.h"
 #include "proxyconfig/proxyconfig.h"
+#include "datasender/datasender.h"
 
 /*
 #define       LISTENQ 1024
@@ -110,10 +111,10 @@ static char	shortopts[] =
 
 pid_t	*threads=NULL;
 
+int	CONFIG_DATASENDER_FORKS		= 1;
 int	CONFIG_DBSYNCER_FORKS		= 0;//1;
 int	CONFIG_DISCOVERER_FORKS		= 1;
 int	CONFIG_HOUSEKEEPER_FORKS	= 1;
-/*int	CONFIG_NODEWATCHER_FORKS	= 1;*/
 int	CONFIG_PINGER_FORKS		= 1;
 int	CONFIG_POLLER_FORKS		= 5;
 int	CONFIG_HTTPPOLLER_FORKS		= 5;
@@ -452,49 +453,54 @@ int MAIN_ZABBIX_ENTRY(void)
 		exit(FAIL);
 	}*/
 
-	threads = calloc(1+CONFIG_POLLER_FORKS+CONFIG_TRAPPERD_FORKS+CONFIG_PINGER_FORKS
-		+CONFIG_HOUSEKEEPER_FORKS+CONFIG_UNREACHABLE_POLLER_FORKS
-		+/*CONFIG_NODEWATCHER_FORKS+*/CONFIG_HTTPPOLLER_FORKS+CONFIG_DISCOVERER_FORKS,
-		sizeof(pid_t));
+	threads = calloc(1 + CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS
+			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
+			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS,
+			sizeof(pid_t));
 
-	if(CONFIG_TRAPPERD_FORKS > 0)
-	{
-		if( FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT) )
-		{
+	if (CONFIG_TRAPPERD_FORKS > 0) {
+		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT)) {
 			zabbix_log(LOG_LEVEL_CRIT, "Listener failed with error: %s.", zbx_tcp_strerror());
 			exit(1);
 		}
 	}
 
-	for(	i=1;
-		i<=CONFIG_POLLER_FORKS+CONFIG_TRAPPERD_FORKS+CONFIG_PINGER_FORKS+CONFIG_HOUSEKEEPER_FORKS+CONFIG_UNREACHABLE_POLLER_FORKS+/*CONFIG_NODEWATCHER_FORKS+*/CONFIG_HTTPPOLLER_FORKS+CONFIG_DISCOVERER_FORKS+CONFIG_DBSYNCER_FORKS; 
+	for (	i = 1;
+		i <= CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
+			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS
+			+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS; 
 		i++)
 	{
-		if((pid = zbx_fork()) == 0)
-		{
+		if ((pid = zbx_fork()) == 0) {
 			server_num = i;
 			break; 
-		}
-		else
-		{
-			threads[i]=pid;
-		}
+		} else
+			threads[i] = pid;
 	}
 
-/*	zabbix_log( LOG_LEVEL_WARNING, "zabbix_server #%d started",server_num); */
 	/* Main process */
-	if(server_num == 0)
-	{
+	if (server_num == 0) {
 		init_main_process();
+
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Configuration syncer]",
+				server_num);
+
 		main_proxyconfig_loop(server_num);
-/*		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Watchdog]",
-			server_num);
-		main_watchdog_loop();*/
-		for(;;)	zbx_sleep(3600);
+
+		for (;;)
+			zbx_sleep(3600);
 	}
 
 
-	if (server_num <= CONFIG_POLLER_FORKS) {
+	if (server_num <= CONFIG_DATASENDER_FORKS)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Datasender]",
+				server_num);
+
+		main_datasender_loop();
+	}
+	else if (server_num <= CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS)
+	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
 #endif /* HAVE_SNMP */
@@ -502,36 +508,34 @@ int MAIN_ZABBIX_ENTRY(void)
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:"SNMP_FEATURE_STATUS"]",
 				server_num);
 
-		main_poller_loop(ZBX_PROCESS_PROXY, ZBX_POLLER_TYPE_NORMAL, server_num);
+		main_poller_loop(ZBX_PROCESS_PROXY, ZBX_POLLER_TYPE_NORMAL, server_num - CONFIG_DATASENDER_FORKS);
 	}
-	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS)
+	else if (server_num <= CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Trapper]",
 				server_num);
 
-/* Run trapper processes then do housekeeping */
 		child_trapper_main(ZBX_PROCESS_PROXY, &listen_sock);
-
-/*		threads[i] = child_trapper_make(i, listenfd, addrlen); */
-/*		child_trapper_make(server_num, listenfd, addrlen); */
 	}
-	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS)
+	else if(server_num <= CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS
+			+ CONFIG_PINGER_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",
 				server_num);
 
-		main_pinger_loop(ZBX_PROCESS_PROXY, server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS));
+		main_pinger_loop(ZBX_PROCESS_PROXY, server_num - (CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS
+				+ CONFIG_TRAPPERD_FORKS));
 	}
-	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_HOUSEKEEPER_FORKS)
+	else if(server_num <= CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS
+			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Housekeeper]",
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Housekeeper]",
 				server_num);
 
 		main_housekeeper_loop();
 	}
-	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
-			+ CONFIG_UNREACHABLE_POLLER_FORKS)
+	else if(server_num <= CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS
+			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS)
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
@@ -540,34 +544,39 @@ int MAIN_ZABBIX_ENTRY(void)
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:"SNMP_FEATURE_STATUS"]",
 				server_num);
 
-		main_poller_loop(ZBX_PROCESS_PROXY, ZBX_POLLER_TYPE_UNREACHABLE, server_num - (CONFIG_POLLER_FORKS
-				       + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS));
+		main_poller_loop(ZBX_PROCESS_PROXY, ZBX_POLLER_TYPE_UNREACHABLE, server_num
+				- (CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS
+				+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS));
 	}
-	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
-			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS)
+	else if (server_num <= CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS
+			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
+			+ CONFIG_HTTPPOLLER_FORKS)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [HTTP Poller]",
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [HTTP Poller]",
 				server_num);
 
-		main_httppoller_loop(ZBX_PROCESS_PROXY, server_num - CONFIG_POLLER_FORKS - CONFIG_TRAPPERD_FORKS
-				- CONFIG_PINGER_FORKS - CONFIG_HOUSEKEEPER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS);
+		main_httppoller_loop(ZBX_PROCESS_PROXY, server_num - (CONFIG_DATASENDER_FORKS
+				+ CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS 
+				+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS));
 	}
-	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
-			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS)
+	else if (server_num <= CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS
+			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
+			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS)
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
 #endif /* HAVE_SNMP */
 
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Discoverer. SNMP:"SNMP_FEATURE_STATUS"]",
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Discoverer. SNMP:"SNMP_FEATURE_STATUS"]",
 				server_num);
 
-		main_discoverer_loop(server_num - CONFIG_POLLER_FORKS - CONFIG_TRAPPERD_FORKS - CONFIG_PINGER_FORKS
-				- CONFIG_HOUSEKEEPER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS - CONFIG_HTTPPOLLER_FORKS);
+		main_discoverer_loop(server_num - (CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS
+				+ CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
+				+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS));
 	}
-	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
-			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
-			+ CONFIG_DBSYNCER_FORKS)
+	else if (server_num <= CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS
+			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
+			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [DB Syncer]",
 				server_num);
@@ -584,12 +593,14 @@ void	zbx_on_exit()
 	
 	int i = 0;
 
-	if(threads != NULL)
-	{
-		for(i = 1; i <= CONFIG_POLLER_FORKS+CONFIG_TRAPPERD_FORKS+CONFIG_PINGER_FORKS+CONFIG_HOUSEKEEPER_FORKS+CONFIG_UNREACHABLE_POLLER_FORKS+/*CONFIG_NODEWATCHER_FORKS+*/CONFIG_HTTPPOLLER_FORKS+CONFIG_DISCOVERER_FORKS+CONFIG_DBSYNCER_FORKS; i++)
+	if (threads != NULL) {
+		for (	i = 1;
+			i <= CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
+				+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS
+				+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS; i ++)
 		{
-			if(threads[i]) {
-				kill(threads[i],SIGTERM);
+			if (threads[i]) {
+				kill(threads[i], SIGTERM);
 				threads[i] = (ZBX_THREAD_HANDLE)NULL;
 			}
 		}

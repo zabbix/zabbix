@@ -23,7 +23,7 @@
 #include "zbxjson.h"
 
 #include "proxyconfig.h"
-#include "servercomms.h"
+#include "../servercomms.h"
 
 /******************************************************************************
  *                                                                            *
@@ -302,7 +302,7 @@ static void	process_configuration_sync()
 	if (FAIL == connect_to_server(&sock))
 		return;
 
-	if (FAIL == get_data_from_server(&sock, "configuration data", "ZBX_PROXY_CONFIG", &data))
+	if (FAIL == get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &data))
 		goto exit;
 
 	if (FAIL == zbx_json_open(data, &jp))
@@ -331,34 +331,34 @@ exit:
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void	main_proxyconfig_loop(int server_num)
+void	main_proxyconfig_loop()
 {
-	int	start, end, sleeptime = 10;
+#define CONFIG_PROXYCONFIG_FREQUENCY 10
+	int	start, sleeptime;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_nodewatcher_loop()");
-
-	zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Configuration syncer]",
-			server_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_proxyconfig_loop()");
 
 	for (;;) {
 		start = time(NULL);
 
-		zbx_setproctitle("Configuration syncer [load configuration]");
+		zbx_setproctitle("configuration syncer [connecting to the database]]");
 
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		zbx_setproctitle("configuration syncer [load configuration]");
 
 		process_configuration_sync();
 
 		DBclose();
 
-		end = time(NULL);
+		sleeptime = CONFIG_PROXYCONFIG_FREQUENCY - (time(NULL) - start);
 
-		if (end - start < sleeptime) {
-			zbx_setproctitle("Configuration syncer [sleeping for %d seconds]",
-				sleeptime - (end - start));
+		if (sleeptime > 0) {
+			zbx_setproctitle("configuration syncer [sleeping for %d seconds]",
+					sleeptime);
 			zabbix_log (LOG_LEVEL_DEBUG, "Sleeping %d seconds",
-				sleeptime - (end - start));
-			sleep(sleeptime - (end - start));
+					sleeptime);
+			sleep(sleeptime);
 		}
 	}
 }

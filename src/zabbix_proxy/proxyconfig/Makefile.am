@@ -3,5 +3,4 @@
 noinst_LIBRARIES = libzbxproxyconfig.a
 
 libzbxproxyconfig_a_SOURCES = \
-	proxyconfig.c proxyconfig.h \
-	servercomms.c servercomms.h
+	proxyconfig.c proxyconfig.h

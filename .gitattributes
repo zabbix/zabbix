@@ -179,6 +179,9 @@ src/libs/zbxserver/Makefile.am -text
 src/libs/zbxsysinfo/freebsd/boottime.c -text
 src/libs/zbxsysinfo/openbsd/boottime.c -text
 src/zabbix_proxy/Makefile.am -text
+src/zabbix_proxy/datasender/Makefile.am -text
+src/zabbix_proxy/datasender/datasender.c -text
+src/zabbix_proxy/datasender/datasender.h -text
 src/zabbix_proxy/events.c -text
 src/zabbix_proxy/events.h -text
 src/zabbix_proxy/housekeeper/Makefile.am -text
@@ -188,8 +191,8 @@ src/zabbix_proxy/proxy.c -text
 src/zabbix_proxy/proxyconfig/Makefile.am -text
 src/zabbix_proxy/proxyconfig/proxyconfig.c -text
 src/zabbix_proxy/proxyconfig/proxyconfig.h -text
-src/zabbix_proxy/proxyconfig/servercomms.c -text
-src/zabbix_proxy/proxyconfig/servercomms.h -text
+src/zabbix_proxy/servercomms.c -text
+src/zabbix_proxy/servercomms.h -text
 src/zabbix_proxy/zlog.c -text
 src/zabbix_server/dbsyncer/Makefile.am -text
 src/zabbix_server/dbsyncer/dbsyncer.c -text

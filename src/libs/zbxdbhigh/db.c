@@ -1830,6 +1830,16 @@ const ZBX_TABLE *DBget_table(const char *tablename)
 	return NULL;
 }
 
+const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
+{
+	int	f;
+
+	for (f = 0; table->fields[f].name != 0; f++ )
+		if (0 == strcmp(table->fields[f].name, fieldname))
+			return &table->fields[f];
+	return NULL;
+}
+
 zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 {
 	DB_RESULT	result;
