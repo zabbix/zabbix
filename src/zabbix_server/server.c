@@ -145,7 +145,9 @@ int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 char	*CONFIG_FPING_LOCATION		= NULL;
+#ifdef HAVE_IPV6
 char	*CONFIG_FPING6_LOCATION		= NULL;
+#endif /* HAVE_IPV6 */
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBUSER			= NULL;
@@ -202,7 +204,9 @@ void	init_config(void)
 		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},
 		{"PingerFrequency",&CONFIG_PINGER_FREQUENCY,0,TYPE_INT,PARM_OPT,1,3600},
 		{"FpingLocation",&CONFIG_FPING_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
+#ifdef HAVE_IPV6
 		{"Fping6Location",&CONFIG_FPING6_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
+#endif /* HAVE_IPV6 */
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"TrapperTimeout",&CONFIG_TRAPPER_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"UnreachablePeriod",&CONFIG_UNREACHABLE_PERIOD,0,TYPE_INT,PARM_OPT,1,3600},
@@ -253,10 +257,12 @@ void	init_config(void)
 	{
 		CONFIG_FPING_LOCATION=strdup("/usr/sbin/fping");
 	}
+#ifdef HAVE_IPV6
 	if(CONFIG_FPING6_LOCATION == NULL)
 	{
 		CONFIG_FPING6_LOCATION=strdup("/usr/sbin/fping6");
 	}
+#endif /* HAVE_IPV6 */
 	if(CONFIG_EXTERNALSCRIPTS == NULL)
 	{
 		CONFIG_EXTERNALSCRIPTS=strdup("/etc/zabbix/externalscripts");

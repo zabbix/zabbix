@@ -25,7 +25,9 @@
 extern	int	CONFIG_PINGER_FORKS;
 extern	int	CONFIG_PINGER_FREQUENCY;
 extern	char	*CONFIG_FPING_LOCATION;
+#ifdef HAVE_IPV6
 extern	char	*CONFIG_FPING6_LOCATION;
+#endif /* HAVE_IPV6 */
 
 void	main_pinger_loop(zbx_process_t p, int num);
 
