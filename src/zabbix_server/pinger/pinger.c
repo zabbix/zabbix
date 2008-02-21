@@ -333,11 +333,11 @@ void main_pinger_loop(int num)
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_pinger_loop(num:%d)",
 			num);
 
-	hosts = zbx_malloc(hosts, hosts_allocated * sizeof(ZBX_FPING_HOST));
-
 	pinger_num = num;
 
-	for(;;) {
+	hosts = zbx_malloc(hosts, hosts_allocated * sizeof(ZBX_FPING_HOST));
+
+	for (;;) {
 		start = time(NULL);
 
 		zbx_setproctitle("connecting to the database");
