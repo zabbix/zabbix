@@ -350,7 +350,7 @@ void main_pinger_loop(zbx_process_t p, int num)
 
 	hosts = zbx_malloc(hosts, hosts_allocated * sizeof(ZBX_FPING_HOST));
 
-	for(;;) {
+	for (;;) {
 		start = time(NULL);
 
 		zbx_setproctitle("pinger [connecting to the database]");
