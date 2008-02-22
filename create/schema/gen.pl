@@ -40,7 +40,7 @@ local $output;
 	"t_time"	=>	"integer",
 # It does not work for MySQL 3.x and <4.x (4.11?)
 #	"t_serial"	=>	"serial",
-	"t_serial"	=>	"bigint unsigned not null auto_increment unique",
+	"t_serial"	=>	"bigint unsigned",
 	"t_double"	=>	"double(16,4)",
 	"t_percentage"	=>	"double(5,2)",
 	"t_varchar"	=>	"varchar",
@@ -158,7 +158,7 @@ static	ZBX_TABLE	tables[]={
 	"t_id"		=>	"bigint",
 	"t_integer"	=>	"integer",
 	"t_time"	=>	"integer",
-	"t_serial"	=>	"serial",
+	"t_serial"	=>	"integer",
 	"t_double"	=>	"double(16,4)",
 	"t_percentage"	=>	"double(5,2)",
 	"t_varchar"	=>	"varchar",
@@ -178,8 +178,8 @@ sub newstate
 	switch ($state)
 	{
 		case "field"	{
-			if($output{"type"} eq "sql" && $new eq "index") { print $pkey; }
-			if($output{"type"} eq "sql" && $new eq "table") { print $pkey; }
+			if($output{"type"} eq "sql" && $new eq "index") { print "$pkey\n)$output{'table_options'};\n"; }
+			if($output{"type"} eq "sql" && $new eq "table") { print "$pkey\n)$output{'table_options'};\n"; }
 			if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},\n"; }
 			if($new eq "field") { print ",\n" }
 		}
@@ -197,7 +197,6 @@ sub newstate
 sub process_table
 {
 	local $line=$_[0];
-	local $tmp;
 
 	newstate("table");
 	($table_name,$pkey,$flags)=split(/\|/, $line,4);
@@ -218,14 +217,12 @@ sub process_table
 	{
 		if($pkey ne "")
 		{
-			$pkey=",\n\tPRIMARY KEY ($pkey)\n)";
+			$pkey=",\n\tPRIMARY KEY ($pkey)";
 		}
 		else
 		{
-			$pkey="\n)";
+			$pkey="";
 		}
-		$tmp=$output{"table_options"};
-		$pkey="$pkey$tmp;\n";
 		print "CREATE TABLE $table_name (\n";
 	}
 }
@@ -266,7 +263,22 @@ sub process_field
 		#	$default="DEFAULT NULL";
 			$null="";
 		}
-		print "\t$name\t\t$type_2\t\t$default\t$null";
+
+		$row="\t$name\t\t$type_2\t\t$default\t$null";
+
+		if($type eq "t_serial")
+		{
+			if($output{"database"} eq "sqlite")
+			{
+				$row="$row\tPRIMARY KEY AUTOINCREMENT";
+				$pkey="";
+			}
+			elsif($output{"database"} eq "mysql")
+			{
+				$row="$row\tauto_increment unique";
+			}
+		}
+		print $row;
 	}
 }
 
