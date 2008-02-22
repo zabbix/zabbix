@@ -197,8 +197,6 @@ static ZBX_THREAD_ENTRY(send_value, args)
 {
 	ZBX_THREAD_SENDVAL_ARGS *sentdval_args;
 
-	char	*tosend = NULL;
-
 	zbx_sock_t	sock;
 
 	char	*answer = NULL;
@@ -217,15 +215,7 @@ static ZBX_THREAD_ENTRY(send_value, args)
 #endif /* NOT _WINDOWS */
 	
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, sentdval_args->server, sentdval_args->port, SENDER_TIMEOUT))) {
-/*		tosend = comms_create_request(sentdval_args->server, sentdval_args->server, sentdval_args->server,
-			NULL, NULL, NULL, NULL);
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Send data: '%s'", tosend);*/
-
-/*		tcp_ret = zbx_tcp_send(&sock, tosend); */
 		tcp_ret = zbx_tcp_send(&sock, sentdval_args->json.buffer);
-
-/*		zbx_free(tosend);*/
 
 		if( SUCCEED == tcp_ret )
 		{
