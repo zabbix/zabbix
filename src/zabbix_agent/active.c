@@ -27,6 +27,7 @@
 #include "eventlog.h"
 #include "comms.h"
 #include "threads.h"
+#include "zbxjson.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -117,7 +118,7 @@ static void	add_check(char *key, int refresh, long lastlogsize)
 {
 	int i;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In add_check('%s', %i, %li)", key, refresh, lastlogsize);
+	zabbix_log( LOG_LEVEL_WARNING, "In add_check('%s', %i, %li)", key, refresh, lastlogsize);
 
 	for(i=0; NULL != active_metrics[i].key; i++)
 	{
@@ -164,7 +165,7 @@ static void	add_check(char *key, int refresh, long lastlogsize)
  * Return value: returns SUCCEED on succesfull parsing,                       *
  *               FAIL on an incoorrect format of string                       *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Alexei Vladishev (new json protocol)             *
  *                                                                            *
  * Comments:                                                                  *
  *    String reprents as "ZBX_EOF" termination list                           *
@@ -175,58 +176,106 @@ static void	add_check(char *key, int refresh, long lastlogsize)
  ******************************************************************************/
 static int	parse_list_of_checks(char *str)
 {
-	char	*p, *pstrend, *refresh, *lastlogsize;
+	const char	*p;
+	char	key[MAX_STRING_LEN], delay[MAX_STRING_LEN], lastlogsize[MAX_STRING_LEN];
+	char	result[MAX_STRING_LEN];
+	int	ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In parse_list_of_checks() [%s]",
+	struct	zbx_json_parse jp;
+	struct	zbx_json_parse   jp_data, jp_row;
+
+	zabbix_log(LOG_LEVEL_WARNING, "In parse_list_of_checks() [%s]",
 		str);
 
 	disable_all_metrics();
 
-	while (NULL != str) {
-		if (NULL != (pstrend = strchr(str,'\n')))
-			*pstrend = '\0'; /* prepare line */
-
-		zabbix_log(LOG_LEVEL_DEBUG, "Parsed [%s]", str);
-
-		if (0 == strcmp(str, "ZBX_EOF"))
-			break;
-
-		refresh = NULL; 
-		lastlogsize = NULL;
-
-		/* parse string from end of line */
-		/* line format "key:refresh:lastlogsize" */
-
-		p = (NULL != pstrend) ? pstrend : str + strlen(str);
-
-		/* Lastlogsize */
-		for (; p != str; p--) {
-			if (*p == ':') {
-				*p = '\0';
-
-				lastlogsize = p + 1;
-				break;
-			}
-		}
-
-		/* Refresh */
-		for (; p != str; p--) {
-			if (*p == ':') {
-				*p = '\0';
-
-				refresh = p + 1;
-				break;
-			}
-		}
-
-		if (str && refresh && lastlogsize)
-			add_check(str, atoi(refresh), atoi(lastlogsize));
-
-		if (pstrend == NULL)
-			break;
-
-		str = pstrend + 1;
+	if(SUCCEED == ret && SUCCEED != zbx_json_open(str, &jp))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Can't open jason object");
+		ret = FAIL;
 	}
+	zabbix_log(LOG_LEVEL_WARNING, "A");
+
+	if(SUCCEED == ret && SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, result, sizeof(result)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s",
+			zbx_json_strerror());
+		ret = FAIL;
+	}
+	zabbix_log(LOG_LEVEL_WARNING, "B");
+
+	if(SUCCEED == ret && 0 != strcmp(result,ZBX_PROTO_VALUE_SUCCESS))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Unsucesfull response received from server");
+		ret = FAIL;
+	}
+	zabbix_log(LOG_LEVEL_WARNING, "C");
+
+	if(SUCCEED == ret && NULL == (p = zbx_json_pair_by_name(&jp, ZBX_PROTO_TAG_DATA)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Can't find \"%s\" tag",
+			ZBX_PROTO_TAG_DATA);
+		ret = FAIL;
+	}
+	zabbix_log(LOG_LEVEL_WARNING, "D");
+
+	if(SUCCEED == ret && FAIL == zbx_json_brackets_open(p, &jp_data))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Can't proceed jason request. %s",
+				zbx_json_strerror());
+		ret = FAIL;
+	}
+	zabbix_log(LOG_LEVEL_WARNING, "E");
+
+	if(SUCCEED == ret)
+	{
+	zabbix_log(LOG_LEVEL_WARNING, "F");
+	 	p = NULL;
+		while (SUCCEED == ret && NULL != (p = zbx_json_next(&jp_data, p)))
+		{
+	zabbix_log(LOG_LEVEL_WARNING, "G1");
+/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]} 
+ *                                      ^------------------------------^
+ */ 			if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "%s",
+					zbx_json_strerror());
+				ret = FAIL;
+				break;
+			}
+	zabbix_log(LOG_LEVEL_WARNING, "G2");
+
+			*delay = '\0';
+			*key = '\0';
+			*lastlogsize = '\0';
+
+			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, key, sizeof(key)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
+					ZBX_PROTO_TAG_KEY);
+				continue;
+			}
+
+			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DELAY, delay, sizeof(delay)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
+					ZBX_PROTO_TAG_DELAY);
+				continue;
+			}
+
+			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, lastlogsize, sizeof(lastlogsize)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
+					ZBX_PROTO_TAG_LOGLASTSIZE);
+				continue;
+			}
+	zabbix_log(LOG_LEVEL_WARNING, "H");
+
+			if (*key && *delay && *lastlogsize)
+				add_check(key, atoi(delay), atoi(lastlogsize));
+		}
+	}
+
 	return SUCCEED;
 }
 
@@ -242,7 +291,7 @@ static int	parse_list_of_checks(char *str)
  * Return value: returns SUCCEED on succesfull parsing,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Alexei Vladishev (new json protocol)             *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -255,24 +304,29 @@ static int	get_active_checks(
 
 	zbx_sock_t	s;
 
-	char
-		*buf,
-		packet[MAX_BUF_LEN];
+	char	*buf;
 
 	int	ret;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks('%s',%u)", host, port);
+	struct zbx_json json;
+
+	zabbix_log( LOG_LEVEL_WARNING, "get_active_checks('%s',%u)", host, port);
+
+	zbx_json_init(&json, 8*1024);
+
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, CONFIG_TIMEOUT))) {
-		zbx_snprintf(packet, sizeof(packet), "%s\n%s\n","ZBX_GET_ACTIVE_CHECKS", CONFIG_HOSTNAME);
-		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", packet);
+		zabbix_log(LOG_LEVEL_WARNING, "Sending [%s]", json.buffer);
 
-		if( SUCCEED == (ret = zbx_tcp_send(&s, packet)) )
+		if( SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)) )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Before read");
 
 			if( SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE)) )
 			{
+				zabbix_log(LOG_LEVEL_WARNING, "Got [%s]", buf);
 				parse_list_of_checks(buf);
 			}
 		}
@@ -282,10 +336,66 @@ static int	get_active_checks(
 	if( FAIL == ret )
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Get active checks error: %s", zbx_tcp_strerror());
-	}	
+	}
+
+	zbx_json_free(&json);
+
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_response                                                   *
+ *                                                                            *
+ * Purpose: Check if json response is SUCCEED                                 *
+ *                                                                            *
+ * Parameters: result SUCCEED or FAIL                                         *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occured                                     *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: zabbix_sender has exactly the same function!                     *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_response(char *response)
+{
+	struct 		zbx_json_parse jp;
+	const char 	*p;
+	char		value[MAX_STRING_LEN];
+	char		info[MAX_STRING_LEN];
+
+	int	ret = SUCCEED;
+
+	ret = zbx_json_open(response, &jp);
+
+	if(SUCCEED == ret)
+	{
+		if (NULL == (p = zbx_json_pair_by_name(&jp, ZBX_PROTO_TAG_RESPONSE))
+				|| NULL == zbx_json_decodevalue(p, value, sizeof(value)))
+		{
+			ret = FAIL;
+		}
+	}
+
+	if(SUCCEED == ret)
+	{
+		if(strcmp(value, ZBX_PROTO_VALUE_SUCCESS) != 0)
+		{
+			ret = FAIL;
+		}
+	}
+
+	if (NULL != (p = zbx_json_pair_by_name(&jp, ZBX_PROTO_TAG_INFO))
+			&& NULL != zbx_json_decodevalue(p, info, sizeof(info)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Info from server: %s",
+			info);
+	}
+
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -324,40 +434,53 @@ static int	send_value(
 	)
 {
 	zbx_sock_t	s;
-	char		*buf = NULL,
-			*request = NULL;
+	char		*buf = NULL;
 	int		ret;
+	struct zbx_json json;
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, CONFIG_TIMEOUT))) {
-		request = comms_create_request(hostname, key, value, lastlogsize, timestamp, source, severity);
+		zbx_json_init(&json, 8*1024);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "XML before sending [%s]",request);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 
-		ret = zbx_tcp_send(&s, request);
+		zbx_json_addobject(&json, NULL);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, hostname, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, value, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json);
 
-		zbx_free(request);
+		zabbix_log(LOG_LEVEL_WARNING, "JSON before sending [%s]",
+			json.buffer);
+
+		ret = zbx_tcp_send(&s, json.buffer);
 
 		if( SUCCEED == ret )
 		{
 			if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
 			{
-				/* !!! REMOVE '\n' AT THE AND (always must be present) !!! */
-				zbx_rtrim(buf, "\r\n\0");
-				if(strcmp(buf,"OK") == 0)
+				if( !buf || check_response(buf) != SUCCEED )
 				{
-					zabbix_log( LOG_LEVEL_DEBUG, "OK");
+					zabbix_log( LOG_LEVEL_WARNING, "NOT OK [%s:%s]",
+						hostname,
+						key);
 				}
 				else
 				{
-					zabbix_log( LOG_LEVEL_DEBUG, "NOT OK [%s:%s] [%s]", host, key, buf);
+					zabbix_log( LOG_LEVEL_WARNING, "OK [%s:%s]",
+						hostname,
+						key);
 				}
 			} else
 				zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [recv] %s", zbx_tcp_strerror());
 		} else
 			zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [send] %s", zbx_tcp_strerror());
+
+		zbx_json_free(&json);
 		zbx_tcp_close(&s);
 	} else
 		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [connect] %s", zbx_tcp_strerror());
+
 
 	return ret;
 }
