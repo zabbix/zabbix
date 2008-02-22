@@ -70,7 +70,7 @@ initialize: function(url){
 
 				var portColonIndex=host_less.indexOf(':');
 				if(portColonIndex>=0){
-					this.port=host_less.substring(portColonIndex);
+					this.port=host_less.substring(portColonIndex+1);
 					this.host=this.host.substring(0,host_ipv6);
 				}
 			}
@@ -78,7 +78,7 @@ initialize: function(url){
 		else{
 			var portColonIndex=this.host.indexOf(':');
 			if(portColonIndex>=0){
-				this.port=this.host.substring(portColonIndex);
+				this.port=this.host.substring(portColonIndex+1);
 				this.host=this.host.substring(0,portColonIndex);
 			}
 		}
@@ -138,6 +138,7 @@ getUrl: function(){
 	uri +=  encodeURI((this.username.length > 0)?(this.username):'');
 	uri +=  encodeURI((this.password.length > 0)?(':'+this.password):'');
 	uri +=  (this.host.length > 0)?(this.host):'';
+	uri +=  (this.port.length > 0)?(':'+this.port):'';
 	uri +=  encodeURI((this.path.length > 0)?(this.path):'');
 	uri +=  encodeURI((this.query.length > 0)?('?'+this.query):'');
 	uri +=  encodeURI((this.reference.length > 0)?('#'+this.reference):'');

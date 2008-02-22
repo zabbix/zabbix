@@ -913,7 +913,7 @@ COpt::profiling_start('prepare data');
 		while($row = DBfetch($result))
 		{
 			$row['host'] = get_node_name_by_elid($row['hostid']).$row['host'];
-			$hosts[$row['host']] = $row['host'];
+			$hosts[strtolower($row['host'])] = $row['host'];
 			$items[item_description($row["description"],$row["key_"])][$row['host']] = array(
 				'itemid'	=> $row['itemid'],
 				'value_type'	=> $row['value_type'],
@@ -931,7 +931,7 @@ COpt::profiling_start('prepare data');
 			return $table;
 		}
 
-		sort($hosts);
+		ksort($hosts);
 COpt::profiling_stop('prepare data');
 COpt::profiling_start('prepare table');
 

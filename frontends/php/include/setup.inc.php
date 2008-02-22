@@ -328,9 +328,9 @@
 				
 				$final_result = array(
 					new CSpan(S_FAIL,'fail'),
-					BR, BR,
+					BR(), BR(),
 					'Please correct all issuse and press "Retry" button',
-					BR, BR,
+					BR(), BR(),
 					new CButton('retry', S_RETRY)
 					);
 			}

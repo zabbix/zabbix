@@ -38,6 +38,7 @@ frontends/php/audio/trigger_on_warning.wav -text
 frontends/php/chart6.php -text
 frontends/php/chart7.php -text
 frontends/php/conf/maintenance.inc.php -text
+frontends/php/dashboard.php -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/bar/arrow_down.gif -text
 frontends/php/images/general/bar/arrow_l.gif -text
@@ -52,6 +53,13 @@ frontends/php/images/general/bar/bg.gif -text
 frontends/php/images/general/bar/cal.gif -text
 frontends/php/images/general/bar/left.gif -text
 frontends/php/images/general/bar/right.gif -text
+frontends/php/images/general/bttn/arrowdown.png -text
+frontends/php/images/general/bttn/arrowdown_bb.png -text
+frontends/php/images/general/bttn/arrowup.png -text
+frontends/php/images/general/bttn/arrowup_bb.png -text
+frontends/php/images/general/bttn/plus.png -text
+frontends/php/images/general/bttn/plus_bb.png -text
+frontends/php/images/general/chart.png -text
 frontends/php/images/general/closed.gif -text svneol=unset#unset
 frontends/php/images/general/error_small.gif -text
 frontends/php/images/general/help.gif -text svneol=unset#unset
@@ -76,6 +84,7 @@ frontends/php/images/general/tree/Y.gif -text
 frontends/php/images/general/tree/Yc.gif -text
 frontends/php/images/general/tree/point.gif -text
 frontends/php/images/general/trigg_dep.gif -text
+frontends/php/images/general/trigg_dep.png -text
 frontends/php/images/general/warning16r.gif -text
 frontends/php/images/general/warning_small.gif -text
 frontends/php/images/general/zabbix.ico -text
@@ -119,6 +128,7 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/blocks.inc.php -text
 frontends/php/include/classes/chart.inc.php -text
 frontends/php/include/classes/cscript.inc.php -text
 frontends/php/include/classes/pie.inc.php -text
@@ -130,8 +140,10 @@ frontends/php/include/scripts.inc.php -text
 frontends/php/js/blink.js -text
 frontends/php/js/common.js -text
 frontends/php/js/cookies.js -text
+frontends/php/js/dashboard.js -text
 frontends/php/js/gmenu.js -text
 frontends/php/js/graphs.js -text
+frontends/php/js/json.js -text
 frontends/php/js/menu.js -text
 frontends/php/js/prototype.js -text
 frontends/php/js/sbinit.js -text

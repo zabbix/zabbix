@@ -98,7 +98,7 @@ include_once "include/page_header.php";
 			$gitem["periods_cnt"]
 			);
 
-		unset($items[$id]);
+//		unset($items[$id]);
 	}
 	$graph->Draw();
 ?>

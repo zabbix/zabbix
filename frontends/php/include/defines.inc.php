@@ -41,9 +41,11 @@
 	define('XML_TAG_SCREEN_ELEMENT',	'screen_element');
 	define('XML_TAG_SCREEN_ELEMENTS',	'screen_elements');
 	
-	define('PAGE_TYPE_HTML',	0);
-	define('PAGE_TYPE_IMAGE',	1);
-	define('PAGE_TYPE_XML',		2);
+	define('PAGE_TYPE_HTML',		0);
+	define('PAGE_TYPE_IMAGE',		1);
+	define('PAGE_TYPE_XML',			2);
+	define('PAGE_TYPE_JS',			3);	//javascript
+	define('PAGE_TYPE_HTML_BLOCK',	4);	//simple block of html (as text)
 
 	define('T_ZBX_STR',			0);
 	define('T_ZBX_INT',			1);
@@ -488,6 +490,7 @@ if((ini_get('mbstring.func_overload') > 5)){
 	
 	define('ZBX_HISTORY_COUNT',5);
 	
+	define('ZBX_USER_ONLINE_TIME',600);		// 10min
 	define('ZBX_GUEST_USER','guest');
 	define('ZBX_DEFAULT_CSS','default.css');
 

@@ -120,7 +120,7 @@ include_once 'include/page_header.php';
 			update_profile('web.charts.graphid',0);
 			access_deny();
 		}
-		array_push($h1, new CLink($row['name'], '?graphid='.$_REQUEST['graphid'].(isset($_REQUEST['fullscreen']) ? '&fullscreen=1' : '')));
+		array_push($h1, new CLink($row['name'], '?graphid='.$_REQUEST['graphid'].(isset($_REQUEST['fullscreen']) ? '' : '&fullscreen=1')));
 	}
 	else
 	{
@@ -368,13 +368,15 @@ include_once 'include/page_header.php';
 		if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
 			$row = 	"\n".'<script language="javascript" type="text/javascript">
 				<!--
-				var ZBX_G_WIDTH;
-				if(window.innerWidth) ZBX_G_WIDTH=window.innerWidth; 
-				else ZBX_G_WIDTH=document.body.clientWidth;
+				A_SBOX["'.$dom_graph_id.'"] = new Object;
+				A_SBOX["'.$dom_graph_id.'"].shiftT = 17;
+				A_SBOX["'.$dom_graph_id.'"].shiftL = '.$shiftXleft.';
 
-				ZBX_G_WIDTH-='.($shiftXleft+$shiftXright+10).';
+				var ZBX_G_WIDTH = get_bodywidth();		
+				ZBX_G_WIDTH-= parseInt('.($shiftXleft+$shiftXright).'+parseInt((SF)?10:10));
+
 				document.write(\'<img id="'.$dom_graph_id.'" src="chart6.php?graphid='.$_REQUEST['graphid'].url_param('stime').
-				'&period='.$effectiveperiod.'&width=\'+ZBX_G_WIDTH+\'" /><br /><br />\');
+				'&period='.$effectiveperiod.'&width=\'+ZBX_G_WIDTH+\'" /><br />\');
 				-->
 				</script>'."\n";
 		}

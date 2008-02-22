@@ -504,8 +504,9 @@ class Chart extends Graph{
 	function calculateMinY($side){
 		if($this->yaxistype==GRAPH_YAXIS_TYPE_FIXED){
 			return $this->yaxismin;
-		}
-		else{
+		} else if  ($this->yaxistype==GRAPH_YAXIS_TYPE_CALCULATED_0_MIN) {
+			return 0;
+		} else{
 			unset($minY);
 			for($i=0;$i<$this->num;$i++){
 			

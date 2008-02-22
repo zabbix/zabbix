@@ -36,6 +36,39 @@ div.zabbix_logo{
 	background: #FFFFFF url('../images/general/zabbix.png') no-repeat;
 }
 
+div.menuplus{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/plus.png');
+	background-repeat:no-repeat;
+}
+
+div.menuplus:hover{
+	cursor:pointer;
+}
+
+div.arrowup{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/arrowup.png');
+	background-repeat:no-repeat;
+}
+
+div.arrowup:hover{
+	cursor:pointer;
+}
+
+div.arrowdown{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/arrowdown.png');
+	background-repeat:no-repeat;
+}
+
+div.arrowdown:hover{
+	cursor:pointer;
+}
+
 span.footer_sign{
 	padding-right: 5px;
 	padding-left: 5px;
@@ -53,16 +86,20 @@ span.ok{
 	color:		#00AA00;
 	font-weight:	bold;
 }
+
 span.fail{
 	color:		#AA0000;
 	font-weight:	bold;
 }
+
 span.green{
 	color:		#00AA00;
 }
+
 span.red{
 	color:		#AA0000;
 }
+
 span.orange{
 	color:		#EE6000;
 }
