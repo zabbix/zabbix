@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2008 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 ?>
 <?php
 	require_once "include/config.inc.php";
+	require_once "include/blocks.inc.php";
+	
 	$page["title"] = "S_STATUS_OF_ZABBIX";
 	$page["file"] = "report1.php";
 	$page['hist_arg'] = array();
@@ -35,35 +37,9 @@ include_once "include/page_header.php";
 ?>
 <?php
 	show_table_header(S_STATUS_OF_ZABBIX_BIG);
-
-	$table = new CTableInfo();
-
-	$table->SetHeader(array(S_PARAMETER,S_VALUE));
-
-	$status=get_status();
-
-	$table->AddRow(array(S_ZABBIX_SERVER_IS_RUNNING,new CSpan($status["zabbix_server"], ($status["zabbix_server"] == S_YES ? "off" : "on"))));
-//	$table->AddRow(array(S_VALUES_STORED,$status["history_count"]));
-//	$table->AddRow(array(S_TRENDS_STORED,$status["trends_count"]));
-	$table->AddRow(array(S_NUMBER_OF_HOSTS,array($status["hosts_count"]."(",
-		new CSpan($status["hosts_count_monitored"],"off"),"/",
-		new CSpan($status["hosts_count_not_monitored"],"on"),"/",
-		new CSpan($status["hosts_count_template"],"unknown"),"/",
-		$status["hosts_count_deleted"].")")));
-	$table->AddRow(array(S_NUMBER_OF_ITEMS,array($status["items_count"]."(",
-		new CSpan($status["items_count_monitored"],"off"),"/",
-		new CSpan($status["items_count_disabled"],"on"),"/",
-		new CSpan($status["items_count_not_supported"],"unknown"),
-		")[".$status["items_count_trapper"]."]")));
-	$table->AddRow(array(S_NUMBER_OF_TRIGGERS,array($status["triggers_count"].
-		"(".$status["triggers_count_enabled"]."/".$status["triggers_count_disabled"].")"."[",
-		new CSpan($status["triggers_count_on"],"on"),"/",
-		new CSpan($status["triggers_count_unknown"],"unknown"),"/",
-		new CSpan($status["triggers_count_off"],"off"),"]"
-		)));
-	$table->AddRow(array(S_NUMBER_OF_EVENTS,$status["events_count"]));
-	$table->AddRow(array(S_NUMBER_OF_ALERTS,$status["alerts_count"]));
-	$table->Show();
+	
+	$status = make_status_of_zbx();
+	$status->Show();
 ?>
 <?php
 

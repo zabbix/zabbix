@@ -382,6 +382,7 @@ include_once "include/page_header.php";
 						' AND h.hostid in ('.$available_hosts.') '.
 						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.
 						order_by('h.host,h.hostid,t.description,t.priority,t.lastchange');
+
 	$result = DBselect($sql);
 
 	while($row=DBfetch($result)){

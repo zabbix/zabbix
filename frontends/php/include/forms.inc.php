@@ -2545,7 +2545,9 @@
 
 			$cmbYType = new CComboBox("yaxistype",$yaxistype,"graphs.submit(this)");
 			$cmbYType->AddItem(GRAPH_YAXIS_TYPE_CALCULATED,S_CALCULATED);
+			$cmbYType->AddItem(GRAPH_YAXIS_TYPE_CALCULATED_0_MIN,S_CALCULATED_0_MIN);
 			$cmbYType->AddItem(GRAPH_YAXIS_TYPE_FIXED,S_FIXED);
+
 			$frmGraph->AddRow(S_YAXIS_TYPE,$cmbYType);
 
 			if($yaxistype == GRAPH_YAXIS_TYPE_FIXED){
@@ -5154,7 +5156,7 @@ include_once 'include/discovery.inc.php';
 			$message = "";
 		}
 		$frmResult->AddRow(S_RESULT,new CTextArea("message",$message,100,25,'yes'));
-		$frmResult->AddItemToBottomRow(new CButton('close',S_CLOSE,'close_window();'));
+		$frmResult->AddItemToBottomRow(new CButton('close',S_CLOSE,'window.close();'));
 
 		$frmResult->Show();
 	}

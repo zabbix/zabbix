@@ -91,6 +91,7 @@ FIELD		|macros		|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|agent		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|time		|t_double	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|error		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+INDEX		|httptest_1	|applicationid
 
 TABLE|httpstep|httpstepid|ZBX_SYNC
 FIELD		|httpstepid	|t_id		|'0'	|NOT NULL	|0

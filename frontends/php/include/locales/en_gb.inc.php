@@ -93,6 +93,7 @@
 	'S_IN_CHECK'=>				'In check',
 	'S_IDLE_TILL'=>				'Idle till',
 	'S_FAILED_ON'=>				'Failed on',
+	'S_FAILED'=>				'Failed',
 
 //	httpmon.php
 	'S_STATUS_OF_WEB_MONITORING'=>		'Status of Web monitoring',
@@ -555,6 +556,7 @@
 	'S_YAXIS_MIN_VALUE'=>			'Y axis MIN value',
 	'S_YAXIS_MAX_VALUE'=>			'Y axis MAX value',
 	'S_CALCULATED'=>			'Calculated',
+	'S_CALCULATED_0_MIN'=>			'Calculated [Min=0]',
 	'S_FIXED'=>				'Fixed',
 	'S_CREATE_GRAPH'=>			'Create Graph',
 	'S_SHOW_WORKING_TIME'=>			'Show working time',
@@ -924,6 +926,17 @@
 	'S_MENU_ITEMS'=>			'ITEMS',
 	'S_MENU_AUDIT'=>			'AUDIT',
 	'S_SWITCH_NODE'=>			'Switch node',
+
+//	dashbord.php
+	'S_DASHBOARD'=>					'Dashboard',
+	'S_DASHBOARD_BIG'=>				'PERSONAL DASHBOARD',
+	'S_SWITCH_VIEW'=>				'Switch view',
+	'S_AGE'=>						'Age',
+	'S_ISSUE'=>						'Issue',
+	'S_ISSUES'=>					'Issues',
+	'S_SYSTEM_STATUS'=>				'System status',
+	'S_LATEST_ISSUES'=>				'Latest issues',
+	'S_FAVORITE'=>					'Favorite',
 
 //	overview.php
 	'S_SELECT_GROUP_DOT_DOT_DOT'=>		'Select group ...',

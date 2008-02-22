@@ -181,20 +181,31 @@
 	 *     convert severity constant in to the CSS style name
 	 *     
 	 * Author: 
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *     Aly
 	 *
 	 * Comments:
 	 *
 	 */
-	function	get_severity_style($severity)
-	{
-		if($severity == TRIGGER_SEVERITY_INFORMATION)	return 'information';
-		elseif($severity == TRIGGER_SEVERITY_WARNING)	return 'warning';
-		elseif($severity == TRIGGER_SEVERITY_AVERAGE)	return 'average';
-		elseif($severity == TRIGGER_SEVERITY_HIGH)	return 'high';
-		elseif($severity == TRIGGER_SEVERITY_DISASTER)	return 'disaster';
-
-		return '';
+	function	get_severity_style($severity,$type=true){
+		switch($severity){
+			case TRIGGER_SEVERITY_DISASTER:
+				$style='disaster';
+				break;
+			case TRIGGER_SEVERITY_HIGH:
+				$style='high';
+				break;
+			case TRIGGER_SEVERITY_AVERAGE:
+				$style='average';
+				break;
+			case TRIGGER_SEVERITY_WARNING:
+				$style='warning';
+				break;
+			case TRIGGER_SEVERITY_INFORMATION:
+			default:
+				$style='information';
+		}
+		if(!$type) $style='normal';//$style.='_empty';
+	return $style;
 	}
 
 	/*
@@ -1780,7 +1791,7 @@
 			$row['host'] = get_node_name_by_elid($row['hostid']).$row['host'];
 			$row['description'] = expand_trigger_description_constants($row['description'], $row);
 
-			$hosts[$row['host']] = $row['host'];
+			$hosts[strtolower($row['host'])] = $row['host'];
 			$triggers[$row['description']][$row['host']] = array(
 				'hostid'	=> $row['hostid'], 
 				'triggerid'	=> $row['triggerid'], 
@@ -1792,7 +1803,8 @@
 		{
 			return $table;
 		}
-		sort($hosts);
+		ksort($hosts);
+		
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_TRIGGERS,'center'));
 			foreach($hosts as $hostname)

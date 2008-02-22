@@ -25,6 +25,7 @@
 
 	$page["title"] = "S_USER_PROFILE";
 	$page["file"] = "profile.php";
+	$page['hist_arg'] = array();
 
 include_once "include/page_header.php";
 
