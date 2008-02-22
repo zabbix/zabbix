@@ -337,7 +337,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
 	DB_ROW			row;
 	double			sec;
 	zbx_uint64_t		proxyid = 0;
-	time_t			now = 0;
+	time_t			now = time(NULL), hosttime = 0, itemtime;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_new_values(json:%.*s)",
 				json->end - json->start + 1,
@@ -356,7 +356,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
 	}
 
 	if (SUCCEED == zbx_json_value_by_name(json, ZBX_PROTO_TAG_CLOCK, clock, sizeof(clock)))
-		now = atoi(clock);
+		hosttime = atoi(clock);
 
 /* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]} 
  *                                     ^
@@ -396,9 +396,11 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
 		*timestamp = '\0';
 		*source = '\0';
 		*severity = '\0';
+		itemtime = now;
 		
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, clock, sizeof(clock)))
-			now = time(NULL) - (now - atoi(clock));
+		if (hosttime)
+			if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, clock, sizeof(clock)))
+				itemtime -= hosttime - atoi(clock);
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
 			continue;
@@ -418,7 +420,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
 		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGSEVERITY, severity, sizeof(severity));
 
 		DBbegin();
-		if(SUCCEED == process_data(sock, proxyid, now, host, key, value, lastlogsize, timestamp, source, severity))
+		if(SUCCEED == process_data(sock, proxyid, itemtime, host, key, value, lastlogsize, timestamp, source, severity))
 		{
 			processed_ok ++;
 		}

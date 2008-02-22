@@ -144,6 +144,7 @@ static int	get_proxyconfig_data(zbx_uint64_t proxyid, struct zbx_json *j)
 	};
 
 	static const struct proxytable_t pt[]={
+		{"proxies",	NULL,		NULL},
 		{"hosts",	NULL,		NULL},
 		{"items",	"hosts",	"hostid"},
 		{"drules",	NULL,		NULL},
