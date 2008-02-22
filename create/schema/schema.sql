@@ -178,7 +178,7 @@ FIELD		|value		|t_double	|'0.0000'|NOT NULL	|0
 INDEX		|1		|itemid,clock
 
 TABLE|history_sync|id|ZBX_HISTORY_SYNC
-FIELD		|id		|t_serial	|	|		|0
+FIELD		|id		|t_serial	|	|NOT NULL	|0
 FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|0
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
@@ -192,7 +192,7 @@ FIELD		|value		|t_bigint	|'0'	|NOT NULL	|0
 INDEX		|1		|itemid,clock
 
 TABLE|history_uint_sync|id|ZBX_HISTORY_SYNC
-FIELD		|id		|t_serial	|	|		|0
+FIELD		|id		|t_serial	|	|NOT NULL	|0
 FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|0
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
@@ -206,7 +206,7 @@ FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|itemid,clock
 
 TABLE|history_str_sync|id|ZBX_HISTORY_SYNC
-FIELD		|id		|t_serial	|	|		|0
+FIELD		|id		|t_serial	|	|NOT NULL	|0
 FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|0
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
@@ -384,6 +384,11 @@ TABLE|proxies|proxyid|ZBX_SYNC
 FIELD		|proxyid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|history_lastid	|t_bigint	|'0'	|NOT NULL	|0
+FIELD		|history_uint_lastid|t_bigint	|'0'	|NOT NULL	|0
+FIELD		|history_str_lastid|t_bigint	|'0'	|NOT NULL	|0
+FIELD		|history_text_lastid|t_bigint	|'0'	|NOT NULL	|0
+FIELD		|history_log_lastid|t_bigint	|'0'	|NOT NULL	|0
 INDEX		|1		|name
 
 TABLE|hosts|hostid|ZBX_SYNC
