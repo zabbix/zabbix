@@ -46,15 +46,8 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 {
 	int res=FAIL;
 
-	struct	sigaction phan;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_value(key:%s)",
 		item->key);
-
-	phan.sa_handler = &child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = 0;
-	sigaction(SIGALRM, &phan, NULL);
 
 	alarm(CONFIG_TIMEOUT);
 
