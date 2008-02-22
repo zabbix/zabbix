@@ -530,7 +530,6 @@ FIELD		|userid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|idx		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|valuetype	|t_integer	|0	|NOT NULL	|ZBX_SYNC
-UNIQUE		|1		|userid,idx
 
 TABLE|rights|rightid|ZBX_SYNC
 FIELD		|rightid	|t_id		|'0'	|NOT NULL	|0
