@@ -88,7 +88,7 @@ include_once "include/page_header.php";
 				$favcnt = (isset($_REQUEST['favcnt']))?$_REQUEST['favcnt']:0;
 				foreach($graphids as $key => $value){
 					if(($_REQUEST['favid'] == $value) && ($graph_rsrc[$key] == $_REQUEST['favobj'])){
-						if(0 == $favcnt){
+						if($favcnt < 1){
 							unset($graphids[$key]);
 							unset($graph_rsrc[$key]);
 							break;
@@ -126,7 +126,7 @@ include_once "include/page_header.php";
 				$favcnt = (isset($_REQUEST['favcnt']))?$_REQUEST['favcnt']:0;
 				foreach($sysmapids as $key => $value){
 					if($_REQUEST['favid'] == $value){
-						if(0 == $favcnt){
+						if($favcnt < 1){
 							unset($sysmapids[$key]);
 							break;
 						}
@@ -170,9 +170,9 @@ include_once "include/page_header.php";
 				$screen_rsrc = get_profile('web.favorite.screen_rsrc',array());
 				
 				$favcnt = (isset($_REQUEST['favcnt']))?$_REQUEST['favcnt']:0;
-				foreach($graphids as $key => $value){
-					if(($_REQUEST['favid'] == $value) && ($graph_rsrc[$key] == $_REQUEST['favobj'])){
-						if(0 == $favcnt){
+				foreach($screenids as $key => $value){
+					if(($_REQUEST['favid'] == $value) && ($screen_rsrc[$key] == $_REQUEST['favobj'])){
+						if($favcnt < 1){
 							unset($screenids[$key]);
 							unset($screen_rsrc[$key]);
 							break;
