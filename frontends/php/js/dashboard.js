@@ -54,7 +54,7 @@ function rm4favorites(favobj,favid,menu_rowid){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(resp){ },
+						'onSuccess': function(resp){ },//alert(resp.responseText);
 						'onFailure': function(){ document.location = 'dashboard.php?'+Object.toQueryString(params); }
 					}
 	);
