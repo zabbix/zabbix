@@ -544,9 +544,18 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 				{
 					send_proxyconfig(sock, &jp);
 				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA) && zbx_process == ZBX_PROCESS_SERVER)
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
 				{
 					ret = process_new_values(sock, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
+				{
+					ret = send_list_of_active_checks_json(sock, &jp);
+				}
+				else
+				{
+					zabbix_log( LOG_LEVEL_WARNING, "Unknow request received [%s]",
+						value);
 				}
 			}
 			return ret;
