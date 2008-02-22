@@ -21,6 +21,7 @@
 #include "comms.h"
 #include "db.h"
 #include "log.h"
+#include "daemon.h"
 #include "zbxjson.h"
 
 #include "datasender.h"
@@ -37,40 +38,41 @@ struct history_field_t {
 };
 
 struct history_table_t {
-	const char		*table;
+	const char		*table, *lastfieldname;
+/*	zbx_uint64_t		lastid;*/
 	ZBX_HISTORY_FIELD	fields[ZBX_MAX_FIELDS];
 };
 
-static const ZBX_HISTORY_TABLE ht[]={
-	{"history",
+ZBX_HISTORY_TABLE ht[]={
+	{"history_sync", "history_lastid",
 		{
 		{"clock",	ZBX_PROTO_TAG_CLOCK},
 		{"value",	ZBX_PROTO_TAG_VALUE},
 		{NULL}
 		}
 	},
-	{"history_uint",
+	{"history_uint_sync", "history_uint_lastid",
 		{
 		{"clock",	ZBX_PROTO_TAG_CLOCK},
 		{"value",	ZBX_PROTO_TAG_VALUE},
 		{NULL}
 		}
 	},
-	{"history_text",
+	{"history_str_sync", "history_str_lastid",
 		{
 		{"clock",	ZBX_PROTO_TAG_CLOCK},
 		{"value",	ZBX_PROTO_TAG_VALUE},
 		{NULL}
 		}
 	},
-	{"history_str",
+	{"history_text", "history_text_lastid",
 		{
 		{"clock",	ZBX_PROTO_TAG_CLOCK},
 		{"value",	ZBX_PROTO_TAG_VALUE},
 		{NULL}
 		}
 	},
-	{"history_log",
+	{"history_log", "history_log_lastid",
 		{
 		{"clock",	ZBX_PROTO_TAG_CLOCK},
 		{"timestamp",	ZBX_PROTO_TAG_LOGTIMESTAMP},
@@ -82,6 +84,37 @@ static const ZBX_HISTORY_TABLE ht[]={
 	},
 	{NULL}
 };
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_lastclock                                                    *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              * 
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments: never returns                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_lastid(const char *fieldname, zbx_uint64_t *lastid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	*lastid = 0;
+
+	result = DBselect("select %s from proxies",
+			fieldname);
+
+	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+		*lastid = zbx_atoui64(row[0]);
+
+	DBfree_result(result);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -98,7 +131,7 @@ static const ZBX_HISTORY_TABLE ht[]={
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, int min_clock)
+static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht)
 {
 	int		offset = 0, f, records = 0;
 	char		sql[MAX_STRING_LEN];
@@ -107,28 +140,35 @@ static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, int
 	const ZBX_FIELD	*field;
 	const ZBX_TABLE	*table;
 	zbx_json_type_t	jt;
+	zbx_uint64_t	lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_history_data() [table:%s]",
 			ht->table);
 
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select h.host,i.key_");
+	get_lastid(ht->lastfieldname, &lastid);
+
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select d.id,h.host,i.key_");
 
 	for (f = 0; ht->fields[f].field != NULL; f ++)
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",d.%s",
 				ht->fields[f].field);
 
-	result = DBselect("%s from hosts h,items i,%s d where h.hostid=i.hostid and i.itemid=d.itemid and d.clock<%d",
-			sql,
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from hosts h,items i,%s d"
+			" where h.hostid=i.hostid and i.itemid=d.itemid and d.id>" ZBX_FS_UI64 " order by d.id",
 			ht->table,
-			min_clock + 4 * CONFIG_DATASENDER_FREQUENCY);
+			lastid);
+
+	result = DBselectN(sql, 1000);
 
 	table = DBget_table(ht->table);
 
 	while (NULL != (row = DBfetch(result))) {
 		zbx_json_addobject(j, NULL);
 
-		zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, row[0], ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(j, ZBX_PROTO_TAG_KEY, row[1], ZBX_JSON_TYPE_STRING);
+		lastid = zbx_atoui64(row[0]);
+
+		zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, row[1], ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, ZBX_PROTO_TAG_KEY, row[2], ZBX_JSON_TYPE_STRING);
 		for (f = 0; ht->fields[f].field != NULL; f ++) {
 			field = DBget_field(table, ht->fields[f].field);
 
@@ -138,15 +178,12 @@ static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, int
 			case ZBX_TYPE_UINT:
 				jt = ZBX_JSON_TYPE_INT;
 				break;
-			case ZBX_TYPE_FLOAT:
-				jt = ZBX_JSON_TYPE_FLOAT;
-				break;
 			default :
 				jt = ZBX_JSON_TYPE_STRING;
 				break;
 			}
 
-			zbx_json_addstring(j, ht->fields[f].tag, row[f + 2], jt);
+			zbx_json_addstring(j, ht->fields[f].tag, row[f + 3], jt);
 		}
 
 		records++;
@@ -154,9 +191,52 @@ static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, int
 		zbx_json_close(j);
 	}
 
+	if (0 != records) {
+		DBexecute("update proxies set %s=" ZBX_FS_UI64,
+				ht->lastfieldname,
+				lastid);
+	}
+
 	return records;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_history_minclock                                             *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              * 
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments: never returns                                                    *
+ *                                                                            *
+ ******************************************************************************/
+/*static void	get_history_minclock(int *minclock, int lastclock)
+{
+	int		t, clock;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	*minclock = 0;
+
+	for (t = 0; ht[t].table != NULL; t ++) {
+		result = DBselect("select min(clock) from %s where clock>%d",
+				ht[t].table,
+				lastclock);
+
+		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0])) {
+			clock = atoi(row[0]);
+			if (*minclock == 0 || *minclock > clock)
+				*minclock = clock;
+		}
+		DBfree_result(result);
+	}
+}
+*/
 /******************************************************************************
  *                                                                            *
  * Function: main_datasender                                                  *
@@ -175,50 +255,40 @@ static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, int
 static int	main_datasender()
 {
 	struct zbx_json	j;
-	int		t, records = 0, clock, min_clock = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
+	int		t, records = 0/*, minclock, lastclock*/;
 	double		sec;
 	zbx_sock_t	sock;
 	char		*answer, buf[11]; /* strlen("4294967296") + 1 */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_datasender()");
 
-	if (FAIL == connect_to_server(&sock))
-		return FAIL;
-
 	sec = zbx_time();
 
-	for (t = 0; ht[t].table != NULL; t ++) {
-		result = DBselect("select min(clock) from %s",
-				ht[t].table);
-
-		if(NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0])) {
-			clock = atoi(row[0]);
-			if (min_clock == 0 || min_clock > clock)
-				min_clock = clock;
-		}
-		DBfree_result(result);
-	}
+	if (FAIL == connect_to_server(&sock, 60)) /* alarm */
+		return FAIL;
 
 	zbx_json_init(&j, 512*1024);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_PROXY, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
+	DBbegin();
+
 	for (t = 0; ht[t].table != NULL; t ++)
-		records += get_history_data(&j, &ht[t], min_clock);
+		records += get_history_data(&j, &ht[t]);
+
+	zbx_json_close(&j); /* array */
 
 	zbx_snprintf(buf, sizeof(buf), "%d", (int)time(NULL));
 
-	zbx_json_close(&j);
-
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_CLOCK, buf, ZBX_JSON_TYPE_INT);
 
-	if (SUCCEED == put_data_to_server(&sock, &j, &answer))
-		;
+	if (SUCCEED == put_data_to_server(&sock, &j, &answer)) {
+		DBcommit();
+	} else
+		DBrollback();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "----- [%d] [%d] [seconds:%f]\n%s", records, j.buffer_size, zbx_time() - sec, j.buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "----- [%d] [%d] [seconds:%f]", records, j.buffer_size, zbx_time() - sec);
 
 	zbx_json_free(&j);
 
@@ -244,9 +314,15 @@ static int	main_datasender()
  ******************************************************************************/
 int	main_datasender_loop()
 {
-	int	start, sleeptime;
+	struct sigaction	phan;
+	int			start, sleeptime;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_datasender_loop()");
+
+	phan.sa_handler = child_signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+	sigaction(SIGALRM, &phan, NULL);
 
 	for (;;) {
 		start = time(NULL);

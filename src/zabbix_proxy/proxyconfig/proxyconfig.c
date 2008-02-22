@@ -43,7 +43,7 @@
  ******************************************************************************/
 static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tablename, const char *p)
 {
-	int			t, f, field_count, insert, offset;
+	int			t, f, field_count, insert, offset, execute;
 	ZBX_TABLE		*table = NULL;
 	ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_obj, jp_data, jp_row;
@@ -154,12 +154,16 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update %s set ",
 					table->table);
 
+		execute = 0;
+
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *                                                   ^
  */		f = 1;
 		while (NULL != (pf = zbx_json_next(&jp_row, pf))) {
 			if (NULL == (pf = zbx_json_decodevalue(pf, buf, sizeof(buf))))
 				goto json_error;
+
+			execute = 1;
 
 			if (f == field_count) {
 				zabbix_log(LOG_LEVEL_WARNING, "Invalid number of fields \"%.*s\"",
@@ -196,7 +200,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 					table->recid,
 					recid);
 
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if ((insert || execute) && ZBX_DB_OK > DBexecute("%s", sql))
 			goto db_error;
 		if (ZBX_DB_OK > DBexecute("insert into %1$s_%2$s_tmp (%2$s) values (%3$s)",
 				table->table,
@@ -299,7 +303,7 @@ static void	process_configuration_sync()
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_configuration_sync()");
 
-	if (FAIL == connect_to_server(&sock))
+	if (FAIL == connect_to_server(&sock, 60)) /* alarm */
 		return;
 
 	if (FAIL == get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &data))
