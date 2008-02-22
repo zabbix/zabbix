@@ -27,7 +27,7 @@
 #include "comms.h"
 #include "servercomms.h"
 
-int	connect_to_server(zbx_sock_t *sock)
+int	connect_to_server(zbx_sock_t *sock, int timeout)
 {
 	int	res;
 
@@ -35,7 +35,7 @@ int	connect_to_server(zbx_sock_t *sock)
 		CONFIG_SERVER,
 		CONFIG_SERVER_PORT);
 
-	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SERVER, CONFIG_SERVER_PORT, 0)))
+	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout)))
 		zabbix_log(LOG_LEVEL_ERR, "Unable connect to the server [%s]:%d [%s]",
 			CONFIG_SERVER,
 			CONFIG_SERVER_PORT,

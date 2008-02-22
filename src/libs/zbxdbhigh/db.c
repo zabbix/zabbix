@@ -1993,7 +1993,12 @@ int	DBproxy_add_history(zbx_uint64_t itemid, double value, int clock)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history()");
 
-	DBexecute("insert into history (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
+/*	DBexecute("insert into history (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
+			clock,
+			itemid,
+			value);
+*/
+	DBexecute("insert into history_sync (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
 			clock,
 			itemid,
 			value);
@@ -2005,7 +2010,12 @@ int	DBproxy_add_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_uint()");
 
-	DBexecute("insert into history_uint (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+/*	DBexecute("insert into history_uint (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+			clock,
+			itemid,
+			value);
+*/
+	DBexecute("insert into history_uint_sync (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
 			clock,
 			itemid,
 			value);
@@ -2021,7 +2031,12 @@ int	DBproxy_add_history_str(zbx_uint64_t itemid, char *value, int clock)
 
 	DBescape_string(value, value_esc, MAX_STRING_LEN);
 
-	DBexecute("insert into history_str (clock,itemid,value) values (%d," ZBX_FS_UI64 ",'%s')",
+/*	DBexecute("insert into history_str (clock,itemid,value) values (%d," ZBX_FS_UI64 ",'%s')",
+			clock,
+			itemid,
+			value_esc);
+*/
+	DBexecute("insert into history_str_sync (clock,itemid,value) values (%d," ZBX_FS_UI64 ",'%s')",
 			clock,
 			itemid,
 			value_esc);

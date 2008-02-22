@@ -26,7 +26,7 @@ extern char	*CONFIG_HOSTNAME;
 
 #include "comms.h"
 
-int	connect_to_server(zbx_sock_t *sock);
+int	connect_to_server(zbx_sock_t *sock, int timeout);
 /*int	send_data_to_server(zbx_sock_t *sock, const char *data);
 int	recv_data_from_server(zbx_sock_t *sock, char **data);*/
 void	disconnect_server(zbx_sock_t *sock);
