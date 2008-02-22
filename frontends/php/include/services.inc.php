@@ -139,7 +139,7 @@
 	 *     retrive true status
 	 *     
 	 * Author: 
-	 *     Artem Suharev
+	 *     Aly
 	 *
 	 * Comments:
 	 *
@@ -208,7 +208,7 @@
 	 *     removes any links between trigger and service if service is not leaf (treenode)
 	 *     
 	 * Author: 
-	 *     Artem Suharev
+	 *     Aly
 	 *
 	 * Comments:
 	 *

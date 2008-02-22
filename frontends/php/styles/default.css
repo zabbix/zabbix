@@ -74,6 +74,7 @@ body{
 .img 		{	border-color:black;	border-width:1px;	}
 img.top		{	vertical-align:text-top		}
 img.bottom	{	vertical-align:text-bottom	}
+img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 
 .center{
 	width: 100%;

@@ -106,4 +106,44 @@
 	function BR(){
 		return new CTag('br','no');
 	}
+	
+	function create_hat($caption,$items,$addicons=null,$id=null,$state=1){
+	
+		if(is_null($id)){
+			list($usec, $sec) = explode(' ',microtime());	
+			$id = 'hat_'.((int)($sec % 10)).((int)($usec * 1000));
+		}
+
+		$td_l = new CCol(SPACE);
+		$td_l->AddOption('width','100%');
+
+		$icons_row = array($td_l);
+		if(!is_null($addicons)){
+			if(!is_array($addicons)) $addicons = array($addicons);
+			foreach($addicons as $value) $icons_row[] = $value;
+		}
+
+		$icon = new CDiv(SPACE,($state)?'arrowup':'arrowdown');
+		$icon->AddAction('onclick',new CScript("javascript: change_hat_state(this,'".$id."');"));
+
+		$icons_row[] = $icon;
+
+		$icon_tab = new CTable();
+		$icon_tab->AddOption('width','100%');
+		
+		$icon_tab->AddRow($icons_row);
+		
+		$table = new CTable();
+		$table->AddOption('width','100%');
+		$table->SetCellPadding(0);
+		$table->SetCellSpacing(0);
+		$table->AddRow(get_table_header($caption,$icon_tab));
+
+		$div = new CDiv($items);
+		$div->AddOption('id',$id);
+		if(!$state) $div->AddOption('style','display: none;');
+		
+		$table->AddRow($div);
+	return $table;
+	}
 ?>

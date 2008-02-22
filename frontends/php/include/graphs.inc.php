@@ -127,13 +127,13 @@
 		
 	}
 
-	function 	&get_graphs_by_hostid($hostid)
+	function 	get_graphs_by_hostid($hostid)
 	{
 		return DBselect("SELECT distinct g.* FROM graphs g, graphs_items gi, items i".
 			" WHERE g.graphid=gi.graphid and gi.itemid=i.itemid and i.hostid=$hostid");
 	}
 
-	function	&get_realhosts_by_graphid($graphid)
+	function	get_realhosts_by_graphid($graphid)
 	{
 		$graph = get_graph_by_graphid($graphid);
 		if($graph["templateid"] != 0)
@@ -142,13 +142,13 @@
 		return get_hosts_by_graphid($graphid);
 	}
 
-	function 	&get_hosts_by_graphid($graphid)
+	function 	get_hosts_by_graphid($graphid)
 	{
 		return DBselect("SELECT distinct h.* FROM graphs_items gi, items i, hosts h".
 			" WHERE h.hostid=i.hostid and gi.itemid=i.itemid and gi.graphid=$graphid");
 	}
 
-	function	&get_graphitems_by_graphid($graphid)
+	function	get_graphitems_by_graphid($graphid)
 	{
 		return DBselect("SELECT * FROM graphs_items WHERE graphid=$graphid".
 			" order by itemid,drawtype,sortorder,color,yaxisside"); 

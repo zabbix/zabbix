@@ -48,7 +48,7 @@ include_once "include/page_header.php";
 		"name"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save})'),
 		"width"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		"height"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
-		"yaxistype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"),		'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		"yaxistype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1,2"),		'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
 		"graphtype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1,2,3"),		'isset({save})'),
 		
 		"yaxismin"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
@@ -85,9 +85,9 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 	validate_sort_and_sortorder();
-	
-	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host","only_current_node"),
-		'web.last.conf.groupid', 'web.last.conf.hostid');
+
+	$options = array("allow_all_hosts","monitored_hosts","with_monitored_items","always_select_first_host","only_current_node");
+	validate_group_with_host(PERM_READ_WRITE,$options,'web.last.conf.groupid', 'web.last.conf.hostid');
 ?>
 <?php
 

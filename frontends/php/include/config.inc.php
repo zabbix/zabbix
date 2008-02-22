@@ -324,6 +324,23 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		include_once "include/page_footer.php";
 	}
 	
+	function detect_page_type($default=PAGE_TYPE_HTML){
+		if(isset($_REQUEST['output'])){
+			switch($_REQUEST['output']){
+				case 'ajax':
+					return PAGE_TYPE_JS;
+					break;
+				case 'json':
+					return PAGE_TYPE_JS;
+					break;
+				case 'html':
+					return PAGE_TYPE_HTML_BLOCK;
+					break;
+			}
+		}
+	return $default;
+	}
+	
 	function zbx_strlen(&$str){
 		if(!$strlen = strlen($str)) return $strlen;
 		
@@ -1087,9 +1104,14 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		}
 		
 		$table = new CTable(NULL,"header");
+//		$table->AddOption('border',1);
 		$table->SetCellSpacing(0);
 		$table->SetCellPadding(1);
-		$table->AddRow(array(new CCol($col1,"header_l"), new CCol($col2,"header_r")));
+		
+		$td_r = new CCol($col2,"header_r");
+		$td_r->AddOption('align','right');
+		
+		$table->AddRow(array(new CCol($col1,"header_l"), $td_r));
 	return $table;
 	}
 
@@ -1371,69 +1393,68 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	function	get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN){
 		global $USER_DETAILS;
 
-		$result = $default_value;
-		if($USER_DETAILS["alias"]!=ZBX_GUEST_USER)
-		{
-			$db_profiles = DBselect("select * from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx));
-			$profile=DBfetch($db_profiles);
+		$result = array();
+//		$result = $default_value;
 
-			if($profile)
-			{
-				if($type==PROFILE_TYPE_UNKNOWN)
-					$type = $profile["valuetype"];
+		if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
+			$db_profiles = DBselect('SELECT * FROM profiles WHERE userid='.$USER_DETAILS["userid"].' AND idx='.zbx_dbstr($idx));
 
-				$result = $profile["value"];
+			while($profile=DBfetch($db_profiles)){
+				if($type==PROFILE_TYPE_UNKNOWN) $type = $profile["valuetype"];
+
+				switch($type){
+					case PROFILE_TYPE_INT:		
+						$result[] = intval($profile["value"]);
+						break;
+					case PROFILE_TYPE_STR:
+					default:
+						$result[] = strval($profile["value"]);
+				}
 			}
 		}
-		switch($type)
-		{
-			case PROFILE_TYPE_ARRAY:	$result = explode(";", $result); break;
-			case PROFILE_TYPE_INT:		$result = intval($result); break;
-			case PROFILE_TYPE_STR:		$result = strval($result); break;
-		}
 
-		if(is_array($result))
-		{
-			$result = array_filter($result, "not_empty");
-		}
-		return $result;
+		$result = array_filter($result, "not_empty");
+		
+		if(isset($result[0]) && (PROFILE_TYPE_ARRAY != $type)) $result = $result[0];
+		if(empty($result)) $result = $default_value;
+		
+	return $result;
 	}
 
 //----------- ADD/EDIT USERPROFILE -------------
-	function	update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN)
-	{
-
+	function	update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN){
 		global $USER_DETAILS;
 
-		if($USER_DETAILS["alias"]==ZBX_GUEST_USER)
-		{
-			return;
+		if($USER_DETAILS["alias"]==ZBX_GUEST_USER){
+			return false;
 		}
-
+		
 		if($type==PROFILE_TYPE_UNKNOWN && is_array($value))	$type = PROFILE_TYPE_ARRAY;
 		if($type==PROFILE_TYPE_ARRAY && !is_array($value))	$value = array($value);
 
-		switch($type)
-		{
-			case PROFILE_TYPE_ARRAY:	$value = implode(";", $value); break;
-			default:			$value = strval($value);
+		$sql='DELETE FROM profiles WHERE userid='.$USER_DETAILS["userid"].' and idx='.zbx_dbstr($idx);
+		DBExecute($sql);
+
+		insert_profile($idx,$value,$type);
+		
+	return true;
+	}
+	
+	function insert_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN){
+		global $USER_DETAILS;
+		
+		if(is_array($value)){
+			foreach($value as $key => $val){
+				insert_profile($idx,$val,$type);		// recursion!!!
+			}
 		}
-
-		$row = DBfetch(DBselect("select value from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx)));
-
-		if(!$row)
-		{
+		else{
 			$profileid = get_dbid('profiles', 'profileid');
-			$sql="insert into profiles (profileid,userid,idx,value,valuetype)".
-				" values (".$profileid.",".$USER_DETAILS["userid"].",".zbx_dbstr($idx).",".zbx_dbstr($value).",".$type.")";
+			$sql='INSERT INTO profiles (profileid,userid,idx,value,valuetype)'.
+					' VALUES ('.$profileid.','.$USER_DETAILS["userid"].','.zbx_dbstr($idx).','.zbx_dbstr($value).','.$type.')';
 			DBexecute($sql);
 		}
-		else
-		{
-			$sql="update profiles set value=".zbx_dbstr($value).",valuetype=".$type.
-				" where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx);
-			DBexecute($sql);
-		}
+
 	}
 
 /***********************************/
@@ -1464,7 +1485,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		}
 		
 		$url = '';
-		foreach($page['hist_arg'] as $arg){
+		foreach($page['hist_arg'] as $key => $arg){
 			if(isset($_REQUEST[$arg]) && !empty($_REQUEST[$arg])){
 				$url.=((empty($url))?('?'):('&')).$arg.'='.$_REQUEST[$arg];
 			}
@@ -1776,6 +1797,33 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	function	zbx_date2str($format, $timestamp)
 	{
 		return ($timestamp==0)?S_NEVER:date($format,$timestamp);
+	}
+	
+	/* function:
+	 *      zbx_date2age
+	 *
+	 * description:
+	 *      Calculate and convert timestamp to string representation. 
+	 *
+	 * author: Aly
+	 */
+	function	zbx_date2age($start_date,$end_date=0){
+	
+		$start_date=date('U',$start_date);
+		if($end_date)
+			$end_date=date('U',$end_date);
+		else
+			$end_date = time();
+
+		$time = abs($end_date-$start_date);
+		
+//SDI($start_date.' - '.$end_date.' = '.$time);
+		
+		$days = (int) ($time / 86400);
+		$hours = (int) (($time - $days*86400) / 3600);
+		$minutes = (int) ((($time - $days*86400) - ($hours*3600)) / 60);
+		$str = (($days)?$days.'d ':'').(($hours)?$hours.'h ':'').$minutes.'m';
+	return $str;
 	}
 
 	function	encode_log($data)

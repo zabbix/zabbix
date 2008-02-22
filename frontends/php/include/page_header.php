@@ -52,6 +52,14 @@ COpt::profiling_start("page");
 			header('Content-Disposition: attachment; filename="'.$page['file'].'"');
 			define('ZBX_PAGE_NO_MENU', 1);
 			break;
+		case PAGE_TYPE_JS:
+			header('Content-Type: application/javascript; charset=UTF-8');
+			define('ZBX_PAGE_NO_MENU', 1);
+			break;
+		case PAGE_TYPE_HTML_BLOCK:
+			header('Content-Type: text/plain; charset=UTF-8');
+			define('ZBX_PAGE_NO_MENU', 1);
+			break;
 		case PAGE_TYPE_HTML:
 		default:
 			if(!isset($page['encoding'])) 
@@ -63,18 +71,17 @@ COpt::profiling_start("page");
 			
 			if(!isset($page['title'])) $page['title'] = 'ZABBIX';
 			
-			if(defined('ZBX_DISTRIBUTED'))
-			{
+			if(defined('ZBX_DISTRIBUTED')){
 				if($curr_node_data = DBfetch(DBselect('select * from nodes where nodeid='.get_current_nodeid(false))))
 					$page['title'] .= ' ('.$curr_node_data['name'].')';
 			}
-			if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"])
-			{
+			
+			if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"]){
 				$page['title'] .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
-				/* header('Refresh: '.$USER_DETAILS["refresh"]); */ /* is not part of the official HTTP specification */
 			}
-		break; /* case PAGE_TYPE_HTML */
-	} /* switch($page["type"]) */
+		break; 
+	} 
+	/* switch($page["type"]) */
 
 	/* NOTE - menu array format:
 		first level:
@@ -87,14 +94,15 @@ COpt::profiling_start("page");
 			'url'	= 	real url for this page
 			'label'	= 	submenu title, if missed menu skipped, but remmembed as last visited page.
 			'sub_pages'	= collection of pages for displaying but dont remember as last visited.
-			
 	*/
+	
 	$ZBX_MENU = array(
 		"view"=>array(
 				"label"			=> S_MONITORING,
 				"node_perm"		=> PERM_READ_LIST,
 				"default_page_id"	=> 0,
 				"pages"=>array(
+					array("url"=>"dashboard.php"	,"label"=>S_DASHBOARD	),
 					array("url"=>"overview.php"	,"label"=>S_OVERVIEW	),
 					array("url"=>"httpmon.php"	,"label"=>S_WEB	,
 						"sub_pages"=>array("httpdetails.php")

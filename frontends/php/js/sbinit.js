@@ -122,7 +122,7 @@ function graph_zoom_init(graph_id,stime,period,width,height){
 	
 	A_SBOX[graph_id].sbox = sbox_init(stime,period);
 	A_SBOX[graph_id].sbox.sbox_id = graph_id;
-
+	
 	var igraph = $(graph_id);
 	var posxy = getPosition(igraph);
 	
