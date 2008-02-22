@@ -24,7 +24,6 @@ PROXY_SUBDIRS = \
 	zbxdb \
 	zbxdbcache \
 	zbxdbhigh \
-	zbxjson \
 	zbxserver
 endif
 
@@ -35,7 +34,6 @@ SERVER_SUBDIRS = \
 	zbxdbhigh \
 	zbxemail \
 	zbxsms \
-	zbxjson \
 	zbxserver
 endif
 
@@ -53,6 +51,7 @@ SUBDIRS = \
 	zbxplugin \
 	zbxsys \
 	zbxcomms \
+	zbxjson \
 	$(JABBER_SUBDIRS) \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS)
