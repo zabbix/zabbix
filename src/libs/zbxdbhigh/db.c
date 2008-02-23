@@ -1873,35 +1873,43 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 		if(NULL == (row = DBfetch(result))) {
 			DBfree_result(result);
 
-			result = DBselect("select max(%3$s) from %4$s where %3$s>="ZBX_FS_UI64" and %3$s<="ZBX_FS_UI64,
-				min,
-				max,
-				fieldname,
-				tablename);
+			result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
+					fieldname,
+					tablename,
+					fieldname,
+					min,
+					max);
 
 			if(NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]) || !*row[0])
 				ret1 = min;
 			else {
 				ZBX_STR2UINT64(ret1, row[0]);
 				if(ret1 >= max) {
-					zabbix_log(LOG_LEVEL_CRIT, "DBget_maxid: Maximum number of id's was exceeded [table:%s, field:%s, id:"ZBX_FS_UI64"]", tablename, fieldname, ret1);
+					zabbix_log(LOG_LEVEL_CRIT, "DBget_maxid: Maximum number of id's was exceeded"
+							" [table:%s, field:%s, id:" ZBX_FS_UI64 "]",
+							tablename,
+							fieldname,
+							ret1);
+
 					exit(FAIL);
 				}
 			}
 			DBfree_result(result);
 
-			dbres = DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',"ZBX_FS_UI64")",
-				nodeid,
-				tablename,
-				fieldname,
-				ret1);
+			dbres = DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
+					" values (%d,'%s','%s'," ZBX_FS_UI64 ")",
+					nodeid,
+					tablename,
+					fieldname,
+					ret1);
 
 			if (dbres < ZBX_DB_OK) {
 				/* reshenie problemi nevidimosti novoj zapisi, sozdannoj v parallel'noj tranzakcii */
-				DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s' and field_name='%s'",
-					nodeid,
-					tablename,
-					fieldname);
+				DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s'"
+						" and field_name='%s'",
+						nodeid,
+						tablename,
+						fieldname);
 			}
 
 			DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',"ZBX_FS_UI64")",
