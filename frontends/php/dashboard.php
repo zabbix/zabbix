@@ -64,9 +64,43 @@ include_once "include/page_header.php";
 // ACTION /////////////////////////////////////////////////////////////////////////////
 
 	if(isset($_REQUEST['favobj'])){
-		if($_REQUEST['favobj'] == 'hat'){
+		if('hat' == $_REQUEST['favobj']){
 //			echo 'alert("'.$_REQUEST['favid'].' : '.$_REQUEST['state'].'");';
 			update_profile('web.dashboard.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state']);
+		}
+		if('refresh' == $_REQUEST['favobj']){
+//			echo 'alert("'.$_REQUEST['favid'].' : '.$_REQUEST['state'].'");';
+			switch($_REQUEST['favid']){
+				case 'hat_syssum':
+					$syssum = make_system_summary($available_hosts);
+					$syssum->show();
+					break;
+				case 'hat_stszbx':
+					$stszbx = make_status_of_zbx();
+					$stszbx->Show();
+					break;
+				case 'hat_lastiss':
+					$lastiss = make_latest_issues($available_hosts);
+					$lastiss->Show();
+					break;
+				case 'hat_webovr':
+					$webovr = make_webmon_overview();
+					$webovr->Show();
+					break;
+			}
+		}
+		if('set_rf_rate' == $_REQUEST['favobj']){
+			if(in_array($_REQUEST['favid'],array('hat_syssum','hat_stszbx','hat_lastiss','hat_webovr'))){
+				update_profile('web.dahsboard.rf_rate.'.$_REQUEST['favid'],$_REQUEST['favcnt']);
+				echo get_refresh_obj_script($_REQUEST['favid'],$_REQUEST['favcnt']);
+				
+				$menu = array();
+				$submenu = array();
+				
+				make_refresh_menu('hat_syssum',$_REQUEST['favcnt'],$menu,$submenu);
+				
+				echo 'dashboard_menu["menu_'.$_REQUEST['favid'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favid']]).';';
+			}
 		}
 //SDI()
 		if(in_array($_REQUEST['favobj'],array('simple_graph','graphs'))){
@@ -216,7 +250,9 @@ include_once "include/page_header.php";
 	}
 
 //	validate_group(PERM_READ_ONLY,array("allow_all_hosts","monitored_hosts","with_monitored_items"));
-	show_table_header(SPACE.S_DASHBOARD_BIG.SPACE.date("[H:i:s]",time()),SPACE);
+//	$time = new CSpan(date("[H:i:s]",time()));
+//	$time->AddOption('id','refreshed');
+	show_table_header(array(S_DASHBOARD_BIG,SPACE),SPACE);
 
 	$left_tab = new CTable();
 	$left_tab->SetCellPadding(5);
@@ -232,6 +268,11 @@ include_once "include/page_header.php";
 	make_sysmap_menu($menu,$submenu);
 	make_screen_menu($menu,$submenu);
 	
+	make_refresh_menu('hat_syssum',get_profile('web.dahsboard.rf_rate.hat_syssum',120),$menu,$submenu);
+	make_refresh_menu('hat_stszbx',get_profile('web.dahsboard.rf_rate.hat_stszbx',120),$menu,$submenu);
+	make_refresh_menu('hat_lastiss',get_profile('web.dahsboard.rf_rate.hat_lastiss',60),$menu,$submenu);
+	make_refresh_menu('hat_webovr',get_profile('web.dahsboard.rf_rate.hat_webovr',60),$menu,$submenu);
+	
 	insert_js('var dashboard_menu='.zbx_jsvalue($menu)."\n".
 			 'var dashboard_submenu='.zbx_jsvalue($submenu)."\n"
 		);
@@ -246,7 +287,7 @@ include_once "include/page_header.php";
 			make_favorite_graphs($available_hosts),
 			array($graph_menu),
 			'hat_favgrph',
-			get_profile('web.dashboard.hats.hat_favgrph.state')
+			get_profile('web.dashboard.hats.hat_favgrph.state',1)
 		));
 		
 	$sysmap_menu = new CDiv(SPACE,'menuplus');
@@ -257,7 +298,7 @@ include_once "include/page_header.php";
 			make_favorite_maps(),
 			array($sysmap_menu),
 			'hat_favmap',
-			get_profile('web.dashboard.hats.hat_favmap.state')
+			get_profile('web.dashboard.hats.hat_favmap.state',1)
 		));
 		
 	$screen_menu = new CDiv(SPACE,'menuplus');
@@ -268,7 +309,7 @@ include_once "include/page_header.php";
 			make_favorite_screens(),
 			array($screen_menu),
 			'hat_favscr',
-			get_profile('web.dashboard.hats.hat_favscr.state')
+			get_profile('web.dashboard.hats.hat_favscr.state',1)
 		));
 	$left_tab->AddRow(SPACE);
 	
@@ -278,35 +319,58 @@ include_once "include/page_header.php";
 
 	$right_tab->AddOption('border',0);
 
-//	$right_td_l = new CCol();
-//	$right_td_l->Addoption('valign','top');
+// Refresh tab
+
+	$refresh_tab = array(
+		'hat_syssum' => get_profile('web.dahsboard.rf_rate.hat_syssum',120),
+		'hat_stszbx' => get_profile('web.dahsboard.rf_rate.hat_stszbx',120),
+		'hat_lastiss' => get_profile('web.dahsboard.rf_rate.hat_lastiss',60),
+		'hat_webovr' => get_profile('web.dahsboard.rf_rate.hat_webovr',60)
+		);
+	add_refresh_objects($refresh_tab);
+
+	$refresh_menu = new CDiv(SPACE,'menuplus');
+	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_syssum");');
 
 	$right_tab->AddRow(create_hat(
 			S_SYSTEM_STATUS,
-			make_system_summary($available_hosts),
-			null,
+			null,//make_system_summary($available_hosts),
+			array($refresh_menu),
 			'hat_syssum',
-			get_profile('web.dashboard.hats.hat_syssum.state')
+			get_profile('web.dashboard.hats.hat_syssum.state',1)
 		));
+
+	$refresh_menu = new CDiv(SPACE,'menuplus');
+	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_stszbx");');
+
+		
 	$right_tab->AddRow(create_hat(
 			S_STATUS_OF_ZABBIX,
-			make_status_of_zbx(),
-			null,
+			null,//make_status_of_zbx(),
+			array($refresh_menu),
 			'hat_stszbx',
-			get_profile('web.dashboard.hats.hat_stszbx.state')
+			get_profile('web.dashboard.hats.hat_stszbx.state',1)
 		));
+		
+	$refresh_menu = new CDiv(SPACE,'menuplus');
+	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_lastiss");');
+		
 	$right_tab->AddRow(create_hat(S_LATEST_ISSUES,
-			make_latest_issues($available_hosts),
-			null,
+			null,//make_latest_issues($available_hosts),
+			array($refresh_menu),
 			'hat_lastiss',
-			get_profile('web.dashboard.hats.hat_lastiss.state')
+			get_profile('web.dashboard.hats.hat_lastiss.state',1)
 		));
+		
+	$refresh_menu = new CDiv(SPACE,'menuplus');
+	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_webovr");');
+
 	$right_tab->AddRow(create_hat(
 			S_WEB_MONITORING,
-			make_webmon_overview(),
-			null,
+			null,//make_webmon_overview(),
+			array($refresh_menu),
 			'hat_webovr',
-			get_profile('web.dashboard.hats.hat_webovr.state')
+			get_profile('web.dashboard.hats.hat_webovr.state',1)
 		));
 
 	$td_l = new CCol($left_tab);
