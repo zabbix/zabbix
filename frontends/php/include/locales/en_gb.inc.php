@@ -937,6 +937,8 @@
 	'S_SYSTEM_STATUS'=>				'System status',
 	'S_LATEST_ISSUES'=>				'Latest issues',
 	'S_FAVORITE'=>					'Favorite',
+	'S_EVERY'=>						'Every',
+	'S_REFRESHED'=>					'Refreshed',
 
 //	overview.php
 	'S_SELECT_GROUP_DOT_DOT_DOT'=>		'Select group ...',
@@ -958,6 +960,8 @@
 	'S_THE_QUEUE_IS_EMPTY'=>		'The queue is empty',
 	'S_TOTAL'=>				'Total',
 	'S_COUNT'=>				'Count',
+	'S_SECONDS_SMALL'=>				'seconds',
+	'S_MINUTES_SMALL'=>				'minutes',
 	'S_5_SECONDS'=>				'5 seconds',
 	'S_10_SECONDS'=>			'10 seconds',
 	'S_30_SECONDS'=>			'30 seconds',
