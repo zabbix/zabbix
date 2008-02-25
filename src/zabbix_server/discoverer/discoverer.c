@@ -459,7 +459,7 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 	char		key[MAX_STRING_LEN];
 	AGENT_RESULT 	value;
 	DB_ITEM		item;
-	struct	sigaction phan;
+/*	struct	sigaction phan;*/
 
 	assert(check);
 	assert(ip);
@@ -528,10 +528,10 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 
 	if(ret == SUCCEED)
 	{
-		phan.sa_handler = &child_signal_handler;
+/*		phan.sa_handler = &child_signal_handler;
 		sigemptyset(&phan.sa_mask);
 		phan.sa_flags = 0;
-		sigaction(SIGALRM, &phan, NULL);
+		sigaction(SIGALRM, &phan, NULL);*/
 		alarm(10);
 
 		switch(check->type) {
