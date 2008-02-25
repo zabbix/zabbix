@@ -27,8 +27,6 @@
 #include "datasender.h"
 #include "../servercomms.h"
 
-#define CONFIG_DATASENDER_FREQUENCY 3
-
 #define ZBX_HISTORY_FIELD struct history_field_t
 #define ZBX_HISTORY_TABLE struct history_table_t
 
@@ -256,13 +254,13 @@ static int	main_datasender()
 {
 	struct zbx_json	j;
 	int		t, records = 0/*, minclock, lastclock*/;
-	double		sec;
+/*	double		sec;*/
 	zbx_sock_t	sock;
 	char		*answer, buf[11]; /* strlen("4294967296") + 1 */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_datasender()");
 
-	sec = zbx_time();
+/*	sec = zbx_time();*/
 
 	if (FAIL == connect_to_server(&sock, 60)) /* alarm */
 		return FAIL;
@@ -288,7 +286,7 @@ static int	main_datasender()
 	} else
 		DBrollback();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "----- [%d] [%d] [seconds:%f]", records, j.buffer_size, zbx_time() - sec);
+/*	zabbix_log(LOG_LEVEL_DEBUG, "----- [%d] [%d] [seconds:%f]", records, j.buffer_size, zbx_time() - sec);*/
 
 	zbx_json_free(&j);
 
