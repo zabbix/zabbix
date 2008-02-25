@@ -408,14 +408,7 @@ static int	check_response(char *response)
  ******************************************************************************/
 static int	send_buffer(
 		const char		*host,
-		unsigned short	port,
-		const char		*hostname,
-		const char		*key,
-		const char		*value,
-		long			*lastlogsize,
-		unsigned long	*timestamp,
-		const char		*source, 
-		unsigned short	*severity
+		unsigned short	port
 	)
 {
 	zbx_sock_t	s;
@@ -424,17 +417,23 @@ static int	send_buffer(
 	struct zbx_json json;
 	int		i;
 	char		tmp[MAX_STRING_LEN];
+	static int	lastsent = 0;
+	int		now;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In send_buffer('%s','%s','%s')",
-		host, key, value);
+	zabbix_log( LOG_LEVEL_WARNING, "In send_buffer('%s','%d')",
+		host, port);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Values in the buffer %d Max %d",
 		buffer.count,
 		CONFIG_BUFFER_SIZE);
 
-	if(buffer.count < CONFIG_BUFFER_SIZE)
+	now = time(NULL);
+	if(buffer.count < CONFIG_BUFFER_SIZE && now-lastsent < CONFIG_BUFFER_SEND)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Will not send now.");
+		zabbix_log( LOG_LEVEL_DEBUG, "Will not send now. Now %d lastsent %d < %d",
+			now,
+			lastsent,
+			CONFIG_BUFFER_SEND);
 		return ret;
 	}
 
@@ -460,7 +459,7 @@ static int	send_buffer(
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, MIN(buffer.count*CONFIG_TIMEOUT, 60)))) {
 
-		zabbix_log(LOG_LEVEL_WARNING, "JSON before sending [%s]",
+		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]",
 			json.buffer);
 
 		ret = zbx_tcp_send(&s, json.buffer);
@@ -469,19 +468,15 @@ static int	send_buffer(
 		{
 			if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "JSON back [%s]",
+				zabbix_log( LOG_LEVEL_DEBUG, "JSON back [%s]",
 					buf);
 				if( !buf || check_response(buf) != SUCCEED )
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "NOT OK [%s:%s]",
-						hostname,
-						key);
+					zabbix_log( LOG_LEVEL_WARNING, "NOT OK");
 				}
 				else
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "OK [%s:%s]",
-						hostname,
-						key);
+					zabbix_log( LOG_LEVEL_WARNING, "OK");
 				}
 			} else
 				zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [recv] %s", zbx_tcp_strerror());
@@ -505,6 +500,8 @@ static int	send_buffer(
 		}
 		buffer.count = 0;
 	}
+
+	if(SUCCEED == ret)	lastsent = now;
 
 	return ret;
 }
@@ -548,10 +545,10 @@ static int	process_value(
 	int ret = SUCCEED;
 	int i;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In process_value('%s','%s','%s')",
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_value('%s','%s','%s')",
 		host, key, value);
 
-	send_buffer(server,port,host,key,value,lastlogsize,timestamp,source,severity);
+	send_buffer(server,port);
 
 	/* Called first time, allocate memory */
 	if(NULL == buffer.data)
@@ -588,10 +585,10 @@ static int	process_value(
 		buffer.data[CONFIG_BUFFER_SIZE-1].value = strdup(value);
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "BUFFER");
+	zabbix_log(LOG_LEVEL_DEBUG, "BUFFER");
 		for(i=0;i<buffer.count;i++)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, " Host %s Key %s Values %s", buffer.data[i].host, buffer.data[i].key, buffer.data[i].value);
+			zabbix_log(LOG_LEVEL_DEBUG, " Host %s Key %s Values %s", buffer.data[i].host, buffer.data[i].key, buffer.data[i].value);
 		}
 
 	return ret;
