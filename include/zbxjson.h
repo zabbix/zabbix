@@ -86,6 +86,7 @@ int	zbx_json_close(struct zbx_json *j);
 int		zbx_json_open(char *buffer, struct zbx_json_parse *jp);
 const char	*zbx_json_decodevalue(const char *p, char *string, size_t len);
 const char	*zbx_json_next(struct zbx_json_parse *jp, const char *p);
+const char	*zbx_json_next_value(struct zbx_json_parse *jp, const char *p, char *string, size_t len);
 const char	*zbx_json_pair_next(struct zbx_json_parse *jp, const char *p, char *name, size_t len);
 const char	*zbx_json_pair_by_name(struct zbx_json_parse *jp, const char *name);
 int		zbx_json_value_by_name(struct zbx_json_parse *jp, const char *name, char *string, size_t len);
