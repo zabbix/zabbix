@@ -460,14 +460,19 @@ lbl_exec:
 	{
 		if(ret == SQLITE_BUSY) goto lbl_exec; /* attention deadlock!!! */
 		
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
+		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed [%i]:%s", ret, error);
 		sqlite3_free(error);
-		if(!sqlite_transaction_started)
+/*		if(!sqlite_transaction_started)
 		{
 			php_sem_release(&sqlite_access);
-		}
-		ret = FAIL;
+		}*/
+		ret = ZBX_DB_FAIL;
+	}
+
+	if(ret == ZBX_DB_OK)
+	{
+		ret = sqlite3_changes(conn);
 	}
 
 	if(!sqlite_transaction_started)
