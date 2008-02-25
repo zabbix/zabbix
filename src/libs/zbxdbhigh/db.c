@@ -1534,7 +1534,7 @@ void	DBvacuum(void)
 void    DBescape_string(const char *str, char *to, int maxlen)
 {  /* NOTE: sync changes with 'DBdyn_escape_string' */
 	register int     i=0, ptr=0;
-#ifdef  HAVE_ORACLE
+#if defined(HAVE_ORACLE) || defined(HAVE_SQLITE3)
 #	define ZBX_DB_ESC_CH	'\''
 #else /* not HAVE_ORACLE */
 #	define ZBX_DB_ESC_CH	'\\'
@@ -1547,7 +1547,7 @@ void    DBescape_string(const char *str, char *to, int maxlen)
 		if( str[i] == '\r' ) continue;
 
 		if(	( str[i] == '\'' ) 
-#ifndef	HAVE_ORACLE
+#if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
 			|| ( str[i] == '\\' )
 #endif /* not HAVE_ORACLE */
 		)
