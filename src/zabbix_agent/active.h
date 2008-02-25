@@ -24,6 +24,7 @@
 
 extern char	*CONFIG_HOSTNAME;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
+extern int	CONFIG_BUFFER_SIZE;
 
 #define MAX_LINES_PER_SECOND	10
 
@@ -42,6 +43,23 @@ typedef struct active_ckeck_args
 	char		*host;
 	unsigned short	port;
 } ZBX_THREAD_ACTIVECHK_ARGS;
+
+typedef struct zbx_active_buffer_element_type
+{
+	char	*host;
+	char	*key;
+	char	*value;
+	int	timestamp;
+	int	source;
+	int	severity;
+	long	lastlogsize;
+} ZBX_ACTIVE_BUFFER_ELEMENT;
+
+typedef struct zbx_active_buffer_type
+{
+	ZBX_ACTIVE_BUFFER_ELEMENT	*data;
+	int	count;
+} ZBX_ACTIVE_BUFFER;
 
 ZBX_THREAD_ENTRY(active_checks_thread, args);
 

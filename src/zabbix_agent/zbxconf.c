@@ -54,6 +54,7 @@ char	*CONFIG_LISTEN_IP		= NULL;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_INFORMATION;
 char	CONFIG_LOG_UNRES_SYMB		= 0;
 
+int	CONFIG_BUFFER_SIZE		= 1024;
 
 void    load_config()
 {
@@ -63,6 +64,7 @@ void    load_config()
 */
 		{"Server",		&CONFIG_HOSTS_ALLOWED,	0,TYPE_STRING,	PARM_MAND,	0,0},
 		{"Hostname",		&CONFIG_HOSTNAME,	0,TYPE_STRING,	PARM_OPT,	0,0},
+		{"BufferSize",		&CONFIG_BUFFER_SIZE,	0,TYPE_INT,	PARM_OPT,	1,65535},
 
 #ifdef USE_PID_FILE
 		{"PidFile",		&APP_PID_FILE,		0,TYPE_STRING,	PARM_OPT,	0,0},
