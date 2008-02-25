@@ -24,6 +24,7 @@
 
 extern char	*CONFIG_HOSTNAME;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
+extern int	CONFIG_BUFFER_SEND;
 extern int	CONFIG_BUFFER_SIZE;
 
 #define MAX_LINES_PER_SECOND	10
