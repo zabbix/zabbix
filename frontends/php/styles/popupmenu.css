@@ -21,6 +21,20 @@
 }
 
 /* menu menu item with submenu */
+.pum_b_submenu{
+	font-family: sans-serif, Tahoma, Verdana, Geneva, Arial, Helvetica;
+	font-size: 12px;
+	text-decoration: none;
+	font-weight: bold;
+	background: #ECECFF;
+	border: black 1px solid;
+	margin: 0px;
+}
+.pum_b_submenu:hover {
+	text-decoration: none;
+	background-color: #FDFDFF;
+}
+
 .pum_o_submenu{
 	font-family: sans-serif, Tahoma, Verdana, Geneva, Arial, Helvetica;
 	font-size: 12px;

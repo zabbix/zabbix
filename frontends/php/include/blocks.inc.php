@@ -92,6 +92,7 @@ function make_system_summary($available_hosts=false){
 		}		
 		$table->AddRow($group_row);
 	}
+	$table->SetFooter(new CCol(S_REFRESHED.': '.date("[H:i:s]",time())));
 return $table;
 }
 
@@ -152,7 +153,7 @@ function make_status_of_zbx(){
 	}
 
 	$table->AddRow(array(S_NUMBER_OF_USERS,$usr_cnt,new CSpan($online_cnt,'green')));
-	
+	$table->SetFooter(new CCol(S_REFRESHED.': '.date("[H:i:s]",time())));
 return $table;
 }
 
@@ -295,7 +296,7 @@ function make_latest_issues($available_hosts=false){
 					' AND h.hostid in ('.$available_hosts.') '.
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND t.value='.TRIGGER_VALUE_TRUE.
-				'ORDER BY t.lastchange DESC';
+				' ORDER BY t.lastchange DESC';
 	$result = DBselect($sql);
 
 	while($row=DBfetch($result)){
@@ -354,6 +355,7 @@ function make_latest_issues($available_hosts=false){
 		}
 		unset($row,$description, $actions);
 	}
+	$table->SetFooter(new CCol(S_REFRESHED.': '.date("[H:i:s]",time())));
 return $table;
 }
 
@@ -430,6 +432,7 @@ function make_webmon_overview($available_hosts=false){
 			new CSpan($apps[HTTPTEST_STATE_UNKNOWN],'unknown')
 		));
 	}
+	$table->SetFooter(new CCol(S_REFRESHED.': '.date("[H:i:s]",time())));
 return $table;	
 }
 
@@ -715,5 +718,35 @@ function make_screen_submenu(){
 	}
 	
 return $screenids;
+}
+
+function add_refresh_objects($ref_tab){
+	$min = PHP_INT_MAX;
+	foreach($ref_tab as $id => $interval){
+		$min = ($min < $interval)?$min:$interval;
+		zbx_add_post_js(get_refresh_obj_script($id,$interval));
+	}
+	zbx_add_post_js('updater.interval = 10; updater.check4Update();');
+}
+
+function get_refresh_obj_script($id,$interval){
+	return 'updater.setObj4Update("'.$id.'","dashboard.php?output=html",{"favobj": "refresh", "favid": "'.$id.'"}, '.$interval.');';
+}
+
+function make_refresh_menu($id,$cur_interval,&$menu,&$submenu){
+
+	$menu['menu_'.$id][] = array(S_REFRESH, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
+	$intervals = array('10','30','60', '120','600','900');
+	
+	foreach($intervals as $key => $value){
+		$menu['menu_'.$id][] = array(
+					S_EVERY.SPACE.$value.SPACE.S_SECONDS_SMALL, 
+					'javascript: setRefreshRate("'.$id.'",'.$value.');'.
+					'void(0);',	
+					null, 
+					array('outer' => ($value == $cur_interval)?'pum_b_submenu':'pum_o_submenu', 'inner'=>array('pum_i_submenu')
+			));
+	}
+	$submenu['menu_'.$id][] = array();
 }
 ?>
