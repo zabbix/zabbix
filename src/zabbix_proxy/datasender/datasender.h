@@ -20,6 +20,8 @@
 #ifndef ZABBIX_DATASENDER_H
 #define ZABBIX_DATASENDER_H
 
+extern	int	CONFIG_DATASENDER_FREQUENCY;
+
 int	main_datasender_loop();
 
 #endif

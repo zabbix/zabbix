@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
+#include "daemon.h"
 #include "zbxjson.h"
 
 #include "proxyconfig.h"
@@ -131,7 +132,8 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
  */		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			goto json_error;
 
-		if (NULL == (pf = zbx_json_next(&jp_row, NULL)) || NULL == (pf = zbx_json_decodevalue(pf, recid, sizeof(recid))) )
+		pf = NULL;
+		if (NULL == (pf = zbx_json_next_value(&jp_row, pf, recid, sizeof(recid))))
 			goto json_error;
 
 		result = DBselect("select 0 from %s where %s=%s",
@@ -159,10 +161,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *                                                   ^
  */		f = 1;
-		while (NULL != (pf = zbx_json_next(&jp_row, pf))) {
-			if (NULL == (pf = zbx_json_decodevalue(pf, buf, sizeof(buf))))
-				goto json_error;
-
+		while (NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf)))) {
 			execute = 1;
 
 			if (f == field_count) {
@@ -337,10 +336,15 @@ exit:
  ******************************************************************************/
 void	main_proxyconfig_loop()
 {
-#define CONFIG_PROXYCONFIG_FREQUENCY 10
+	struct	sigaction phan;
 	int	start, sleeptime;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_proxyconfig_loop()");
+
+	phan.sa_handler = child_signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+	sigaction(SIGALRM, &phan, NULL);
 
 	for (;;) {
 		start = time(NULL);
@@ -360,7 +364,7 @@ void	main_proxyconfig_loop()
 		if (sleeptime > 0) {
 			zbx_setproctitle("configuration syncer [sleeping for %d seconds]",
 					sleeptime);
-			zabbix_log (LOG_LEVEL_DEBUG, "Sleeping %d seconds",
+			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
 					sleeptime);
 			sleep(sleeptime);
 		}
