@@ -97,7 +97,7 @@ include_once "include/page_header.php";
 				$menu = array();
 				$submenu = array();
 				
-				make_refresh_menu('hat_syssum',$_REQUEST['favcnt'],$menu,$submenu);
+				make_refresh_menu($_REQUEST['favid'],$_REQUEST['favcnt'],$menu,$submenu);
 				
 				echo 'dashboard_menu["menu_'.$_REQUEST['favid'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favid']]).';';
 			}
