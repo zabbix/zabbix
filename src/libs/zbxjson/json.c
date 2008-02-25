@@ -481,6 +481,17 @@ const char	*zbx_json_next(struct zbx_json_parse *jp, const char *p)
 	return NULL;
 }
 
+const char	*zbx_json_next_value(struct zbx_json_parse *jp, const char *p, char *string, size_t len)
+{
+	if (NULL == (p = zbx_json_next(jp, p)))
+		return NULL;
+
+	if (NULL == zbx_json_decodevalue(p, string, len))
+		return NULL;
+
+	return p;
+}
+
 static const char	*zbx_json_decodestring(const char *p, char *string, size_t len)
 {
 	int	state = 0; /* 0 - init; 1 - inside string */
