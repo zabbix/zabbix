@@ -1307,6 +1307,9 @@ int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clo
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_log()");
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_log(value:%s)", value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_log(source:%s)", source);
+
 	DBescape_string(value,value_esc,MAX_STRING_LEN);
 	DBescape_string(source,source_esc,MAX_STRING_LEN);
 
@@ -1322,6 +1325,8 @@ int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clo
 			value_esc,
 			source_esc,
 			severity);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of add_history_log()");
 
 	return SUCCEED;
 }

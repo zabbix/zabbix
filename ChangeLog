@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - [DEV-117] added support of BufferSize and BufferSend paramaters (Alexei)
  - [DEV-118] added dashboard screen to monitoring (Artem)
  - [DEV-117] support of data buffering on agent side (Alexei)
  - [DEV-115] enhanced sender to use only one TCP connection (Alexei)
