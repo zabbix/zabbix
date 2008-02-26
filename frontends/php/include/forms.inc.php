@@ -681,10 +681,10 @@
 	# Insert form for User
 	function	insert_user_form($userid,$profile=0){
 		global $ZBX_LOCALES;
-		
+		global $USER_DETAILS;
+
 		$frm_title = S_USER;
 		if(isset($userid)){
-			global $USER_DETAILS;
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
 
 			$user=get_user_by_userid($userid);
@@ -699,6 +699,7 @@
 			$password1	= null;
 			$password2	= null;
 			$url		= $user["url"];
+			$autologin	= $user["autologin"];
 			$autologout	= $user["autologout"];
 			$lang		= $user["lang"];
 			$theme 		= $user['theme'];
@@ -740,6 +741,7 @@
 			$password1 	= get_request("password1", null);
 			$password2 	= get_request("password2", null);
 			$url 		= get_request("url","");
+			$autologin	= get_request("autologin",0);
 			$autologout	= get_request("autologout",900);
 			$lang		= get_request("lang","en_gb");
 			$theme 		= get_request('theme','default.css');
@@ -886,7 +888,8 @@
 		
 		$frmUser->AddRow(S_THEME, $cmbTheme);
 
-		$frmUser->AddRow(S_AUTO_LOGOUT_IN_SEC,	new CNumericBox("autologout",$autologout,4));
+		$frmUser->AddRow(S_AUTO_LOGIN,	new CCheckBox("autologin",$autologin,null,1));
+		$frmUser->AddRow(S_AUTO_LOGOUT,	array(new CNumericBox("autologout",$autologout,4),S_SECONDS));
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
 

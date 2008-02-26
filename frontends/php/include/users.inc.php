@@ -33,7 +33,7 @@
 
 	# Add User definition
 
-	function	add_user($name,$surname,$alias,$passwd,$url,$autologout,$lang,$theme,$refresh,$user_type,$user_groups,$user_medias)
+	function	add_user($name,$surname,$alias,$passwd,$url,$autologin,$autologout,$lang,$theme,$refresh,$user_type,$user_groups,$user_medias)
 	{
 		global $USER_DETAILS;
 
@@ -50,9 +50,9 @@
 
 		$userid = get_dbid("users","userid");
 
-		$result =  DBexecute('insert into users (userid,name,surname,alias,passwd,url,autologout,lang,theme,refresh,type)'.
+		$result =  DBexecute('insert into users (userid,name,surname,alias,passwd,url,autologin,autologout,lang,theme,refresh,type)'.
 			' values ('.$userid.','.zbx_dbstr($name).','.zbx_dbstr($surname).','.zbx_dbstr($alias).','.
-			zbx_dbstr(md5($passwd)).','.zbx_dbstr($url).','.$autologout.','.zbx_dbstr($lang).','.zbx_dbstr($theme).','.$refresh.','.$user_type.')');
+			zbx_dbstr(md5($passwd)).','.zbx_dbstr($url).','.$autologin.','.$autologout.','.zbx_dbstr($lang).','.zbx_dbstr($theme).','.$refresh.','.$user_type.')');
 		
 		if($result)
 		{
@@ -86,34 +86,37 @@
 
 	# Update User definition
 
-	function	update_user($userid,$name,$surname,$alias,$passwd, $url,$autologout,$lang,$theme,$refresh,$user_type,$user_groups,$user_medias)
+	function	update_user($userid,$name,$surname,$alias,$passwd,$url,$autologin,$autologout,$lang,$theme,$refresh,$user_type,$user_groups,$user_medias)
 	{
-		if(DBfetch(DBselect("select * from users where alias=".zbx_dbstr($alias).
-			" and userid<>$userid and ".DBin_node('userid', get_current_nodeid(false)))))
-		{
+		if(DBfetch(DBselect("select * from users where alias=".zbx_dbstr($alias)." and userid<>$userid and ".DBin_node('userid', get_current_nodeid(false))))){
 			error("User '$alias' already exists");
 			return 0;
 		}
 
-		$result = DBexecute("update users set name=".zbx_dbstr($name).",surname=".zbx_dbstr($surname).","."alias=".zbx_dbstr($alias).
-				(isset($passwd) ? (',passwd='.zbx_dbstr(md5($passwd))) : '').
-				",url=".zbx_dbstr($url).","."autologout=$autologout,lang=".zbx_dbstr($lang).",theme=".zbx_dbstr($theme).",refresh=$refresh,".
-				"type=$user_type".
-			" where userid=$userid");
+		$result = DBexecute('UPDATE users SET '.
+						' name='.zbx_dbstr($name).
+						' ,surname='.zbx_dbstr($surname).
+						' ,alias='.zbx_dbstr($alias).
+						(isset($passwd) ? (',passwd='.zbx_dbstr(md5($passwd))) : '').
+						' ,url='.zbx_dbstr($url).
+						' ,autologin='.$autologin.
+						' ,autologout='.$autologout.
+						' ,lang='.zbx_dbstr($lang).
+						' ,theme='.zbx_dbstr($theme).
+						' ,refresh='.$refresh.
+						' ,type='.$user_type.
+					' WHERE userid='.$userid);
 
-		if($result)
-		{
+		if($result){
 			DBexecute('delete from users_groups where userid='.$userid);
-			foreach($user_groups as $groupid => $grou_pname)
-			{
+			foreach($user_groups as $groupid => $grou_pname){
 				$users_groups_id = get_dbid("users_groups","id");
 				$result = DBexecute('insert into users_groups (id,usrgrpid,userid)'.
 					'values('.$users_groups_id.','.$groupid.','.$userid.')');
 
 				if(!$result) break;
 			}
-			if($result)
-			{
+			if($result){
 				DBexecute('delete from media where userid='.$userid);
 				foreach($user_medias as $mediaid => $media_data)
 				{
@@ -134,7 +137,7 @@
 
 	# Update User definition
 
-	function	update_user_profile($userid,$passwd, $url,$autologout,$lang,$theme,$refresh)
+	function	update_user_profile($userid,$passwd,$url,$autologin,$autologout,$lang,$theme,$refresh)
 	{
 		global $USER_DETAILS;
 
@@ -143,9 +146,15 @@
 			access_deny();
 		}
 
-		return DBexecute("update users set url=".zbx_dbstr($url).",autologout=$autologout,lang=".zbx_dbstr($lang).",theme=".zbx_dbstr($theme).
-				(isset($passwd) ? (',passwd='.zbx_dbstr(md5($passwd))) : '').
-				",refresh=$refresh where userid=$userid");
+		return DBexecute('update users set '.
+						' url='.zbx_dbstr($url).
+						' ,autologin='.$autologin.
+						' ,autologout='.$autologout.
+						' ,lang='.zbx_dbstr($lang).
+						' ,theme='.zbx_dbstr($theme).
+						(isset($passwd) ? (' ,passwd='.zbx_dbstr(md5($passwd))) : '').
+						' ,refresh='.$refresh.
+					' where userid='.$userid);
 	}
 
 	# Delete User definition

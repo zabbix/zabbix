@@ -62,6 +62,7 @@ include_once "include/page_header.php";
 		'disable_media'=>array(T_ZBX_INT, O_OPT,null,	null,		null),
 		'lang'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
 		'theme'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
+		'autologin'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'autologout'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'(isset({config})&&({config}==0))&&isset({save})'),
 		'url'=>		array(T_ZBX_STR, O_OPT,	null,	null,		'(isset({config})&&({config}==0))&&isset({save})'),
 		'refresh'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'(isset({config})&&({config}==0))&&isset({save})'),
@@ -178,7 +179,7 @@ include_once "include/page_header.php";
 					$action = AUDIT_ACTION_UPDATE;
 					$result=update_user($_REQUEST["userid"],
 						$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],
-						$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],
+						$_REQUEST["password1"],$_REQUEST["url"],get_request("autologin",0),$_REQUEST["autologout"],
 						$_REQUEST["lang"],$_REQUEST['theme'],$_REQUEST["refresh"],$_REQUEST["user_type"],
 						$user_groups, $user_medias);
 
@@ -187,7 +188,7 @@ include_once "include/page_header.php";
 					$action = AUDIT_ACTION_ADD;
 					$result=add_user(
 						$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],
-						$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],
+						$_REQUEST["password1"],$_REQUEST["url"],get_request("autologin",0),$_REQUEST["autologout"],
 						$_REQUEST["lang"],$_REQUEST['theme'],$_REQUEST["refresh"],$_REQUEST["user_type"],
 						$user_groups, $user_medias);
 
