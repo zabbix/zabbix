@@ -135,7 +135,7 @@ objlist:		new Array(),			// list of objects
 optlist :		new Array(),			// object params, list
 interval:		10,						// update interval in sec
 
-setObj4Update: function(id,url,params,frequency){
+setObj4Update: function(id,frequency,url,params){
 	var obj = document.getElementById(id);
 	if(!isset(obj)) return false; 
 
@@ -175,6 +175,7 @@ update: function(obj4update,time){
 		{
 			method: 'post',
 			'parameters':	obj4update.params,
+			'evalScripts': true,
 			'onSuccess': function(resp){ obj4update.lastupdate = time;},
 			'onFailure': function(){ document.location = 'dashboard.php?'+Object.toQueryString(obj4update.params); }
 		});	
