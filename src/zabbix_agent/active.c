@@ -119,7 +119,7 @@ static void	add_check(char *key, int refresh, long lastlogsize)
 {
 	int i;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In add_check('%s', %i, %li)", key, refresh, lastlogsize);
+	zabbix_log( LOG_LEVEL_DEBUG, "In add_check('%s', %i, %li)", key, refresh, lastlogsize);
 
 	for(i=0; NULL != active_metrics[i].key; i++)
 	{
@@ -185,7 +185,7 @@ static int	parse_list_of_checks(char *str)
 	struct	zbx_json_parse jp;
 	struct	zbx_json_parse   jp_data, jp_row;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In parse_list_of_checks() [%s]",
+	zabbix_log(LOG_LEVEL_DEBUG, "In parse_list_of_checks() [%s]",
 		str);
 
 	disable_all_metrics();
@@ -273,7 +273,7 @@ static int	parse_list_of_checks(char *str)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_active_checks                                                *
+ * Function: refresh_active_checks                                            *
  *                                                                            *
  * Purpose: Retrive from ZABBIX server list of active checks                  *
  *                                                                            *
@@ -288,7 +288,7 @@ static int	parse_list_of_checks(char *str)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_active_checks(
+static int	refresh_active_checks(
 	const char		*host, 
 	unsigned short	port
 	)
@@ -302,7 +302,7 @@ static int	get_active_checks(
 
 	struct zbx_json json;
 
-	zabbix_log( LOG_LEVEL_WARNING, "get_active_checks('%s',%u)", host, port);
+	zabbix_log( LOG_LEVEL_DEBUG, "refresh_active_checks('%s',%u)", host, port);
 
 	zbx_json_init(&json, 8*1024);
 
@@ -420,7 +420,7 @@ static int	send_buffer(
 	static int	lastsent = 0;
 	int		now;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In send_buffer('%s','%d')",
+	zabbix_log( LOG_LEVEL_DEBUG, "In send_buffer('%s','%d')",
 		host, port);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Values in the buffer %d Max %d",
@@ -434,6 +434,11 @@ static int	send_buffer(
 			now,
 			lastsent,
 			CONFIG_BUFFER_SEND);
+		return ret;
+	}
+
+	if(buffer.count < 1)
+	{
 		return ret;
 	}
 
@@ -809,20 +814,6 @@ static void	process_active_checks(char *server, unsigned short port)
 	}
 }
 
-static void	refresh_metrics(char *server, unsigned short port)
-{
-	zabbix_log( LOG_LEVEL_DEBUG, "In refresh_metrics('%s',%u)",server, port);
-
-	while(get_active_checks(server, port) != SUCCEED)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Getting list of active checks failed. Will retry after 60 seconds");
-
-		zbx_setproctitle("poller [sleeping for %d seconds]", 60);
-
-		zbx_sleep(60);
-	}
-}
-
 ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
@@ -830,8 +821,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 #if defined(ZABBIX_DAEMON)
 	struct	sigaction phan;
 #endif /* ZABBIX_DAEMON */
-	int	sleeptime, nextcheck;
-	int	nextrefresh;
+	int	nextcheck = 0, nextrefresh = 0, nextsend = 0;
 	char	*p = NULL;
 
 #if defined(ZABBIX_DAEMON)
@@ -855,38 +845,39 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	init_active_metrics();
 
-	refresh_metrics(activechk_args.host, activechk_args.port);
-	nextrefresh = (int)time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
-
 	while(ZBX_IS_RUNNING)
 	{
 		zbx_setproctitle("processing active checks");
 
-		process_active_checks(activechk_args.host, activechk_args.port);
-
-		nextcheck = get_min_nextcheck();
-		if (FAIL == nextcheck)
-			sleeptime = 60;
-		else {
-			sleeptime = nextcheck - (int)time(NULL);
-			sleeptime = MAX(sleeptime, 0);
+		if(time(NULL) >= nextsend)
+		{
+			send_buffer(activechk_args.host, activechk_args.port);
+			nextsend = (int)time(NULL) + 1;
 		}
-
-		if (sleeptime > 0) {
-			sleeptime = MIN(sleeptime, 60);
-
-			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds", sleeptime );
-
-			zbx_setproctitle("poller [sleeping for %d seconds]", sleeptime);
-
-			zbx_sleep( sleeptime );
-		} else
-			zabbix_log(LOG_LEVEL_DEBUG, "No sleeping" );
 
 		if(time(NULL) >= nextrefresh)
 		{
-			refresh_metrics(activechk_args.host, activechk_args.port);
-			nextrefresh = (int)time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
+			if(FAIL == refresh_active_checks(activechk_args.host, activechk_args.port))
+			{
+				nextrefresh = (int)time(NULL) + 60;
+			}
+			else
+			{
+				nextrefresh = (int)time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
+			}
+		}
+
+		if(time(NULL) >= nextcheck)
+		{
+			process_active_checks(activechk_args.host, activechk_args.port);
+			nextcheck = get_min_nextcheck();
+			if(FAIL == nextcheck)	nextcheck = (int)time(NULL) + 60;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds", 1 );
+			zbx_setproctitle("poller [sleeping for %d seconds]", 1);
+			zbx_sleep(1);
 		}
 	}
 
