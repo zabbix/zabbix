@@ -663,6 +663,7 @@ FIELD		|name		|t_varchar(100)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|surname	|t_varchar(100)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|passwd		|t_char(32)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|autologin	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|autologout	|t_integer	|'900'	|NOT NULL	|ZBX_SYNC
 FIELD		|lang		|t_varchar(5)	|'en_gb'|NOT NULL	|ZBX_SYNC
 FIELD		|refresh	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC

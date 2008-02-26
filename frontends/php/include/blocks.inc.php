@@ -722,15 +722,18 @@ return $screenids;
 
 function add_refresh_objects($ref_tab){
 	$min = PHP_INT_MAX;
-	foreach($ref_tab as $id => $interval){
-		$min = ($min < $interval)?$min:$interval;
-		zbx_add_post_js(get_refresh_obj_script($id,$interval));
+	foreach($ref_tab as $id => $obj){
+		$obj['interval'] = (isset($obj['interval']))?$obj['interval']:60;
+		
+		$min = ($min < $obj['interval'])?$min:$obj['interval'];
+		zbx_add_post_js(get_refresh_obj_script($obj));
 	}
 	zbx_add_post_js('updater.interval = 10; updater.check4Update();');
 }
 
-function get_refresh_obj_script($id,$interval){
-	return 'updater.setObj4Update("'.$id.'","dashboard.php?output=html",{"favobj": "refresh", "favid": "'.$id.'"}, '.$interval.');';
+function get_refresh_obj_script($obj){
+	$obj['url'] = (isset($obj['url']))?$obj['url']:'dashboard.php?output=html';
+return 'updater.setObj4Update("'.$obj['id'].'",'.$obj['interval'].',"'.$obj['url'].'",{"favobj": "refresh", "favid": "'.$obj['id'].'"});';
 }
 
 function make_refresh_menu($id,$cur_interval,&$menu,&$submenu){

@@ -30,12 +30,7 @@ $page["file"] = "dashboard.php";
 $page['hist_arg'] = array();
 $page['scripts'] = array('prototype.js','json.js','dashboard.js');
 
-
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-
-if(PAGE_TYPE_HTML == $page['type'])
-	define('ZBX_PAGE_DO_REFRESH', 1);
-
 
 include_once "include/page_header.php";
 
@@ -92,6 +87,7 @@ include_once "include/page_header.php";
 		if('set_rf_rate' == $_REQUEST['favobj']){
 			if(in_array($_REQUEST['favid'],array('hat_syssum','hat_stszbx','hat_lastiss','hat_webovr'))){
 				update_profile('web.dahsboard.rf_rate.'.$_REQUEST['favid'],$_REQUEST['favcnt']);
+				$_REQUEST['favcnt'] = get_profile('web.dahsboard.rf_rate.'.$_REQUEST['favid'],60);
 				echo get_refresh_obj_script($_REQUEST['favid'],$_REQUEST['favcnt']);
 				
 				$menu = array();
@@ -268,8 +264,8 @@ include_once "include/page_header.php";
 	make_sysmap_menu($menu,$submenu);
 	make_screen_menu($menu,$submenu);
 	
-	make_refresh_menu('hat_syssum',get_profile('web.dahsboard.rf_rate.hat_syssum',120),$menu,$submenu);
-	make_refresh_menu('hat_stszbx',get_profile('web.dahsboard.rf_rate.hat_stszbx',120),$menu,$submenu);
+	make_refresh_menu('hat_syssum',get_profile('web.dahsboard.rf_rate.hat_syssum',60),$menu,$submenu);
+	make_refresh_menu('hat_stszbx',get_profile('web.dahsboard.rf_rate.hat_stszbx',60),$menu,$submenu);
 	make_refresh_menu('hat_lastiss',get_profile('web.dahsboard.rf_rate.hat_lastiss',60),$menu,$submenu);
 	make_refresh_menu('hat_webovr',get_profile('web.dahsboard.rf_rate.hat_webovr',60),$menu,$submenu);
 	
@@ -322,11 +318,23 @@ include_once "include/page_header.php";
 // Refresh tab
 
 	$refresh_tab = array(
-		'hat_syssum' => get_profile('web.dahsboard.rf_rate.hat_syssum',120),
-		'hat_stszbx' => get_profile('web.dahsboard.rf_rate.hat_stszbx',120),
-		'hat_lastiss' => get_profile('web.dahsboard.rf_rate.hat_lastiss',60),
-		'hat_webovr' => get_profile('web.dahsboard.rf_rate.hat_webovr',60)
-		);
+		array('id' => 'hat_syssum',
+				'interval' => get_profile('web.dahsboard.rf_rate.hat_syssum',120)
+			),
+		array('id' => 'hat_stszbx',
+				'interval' => get_profile('web.dahsboard.rf_rate.hat_stszbx',120)
+			),
+		array('id' => 'hat_lastiss',
+				'interval'  => get_profile('web.dahsboard.rf_rate.hat_lastiss',60)
+			),
+		array('id' => 'hat_webovr',
+				'interval'  => get_profile('web.dahsboard.rf_rate.hat_webovr',60)
+			)
+/*		array('id' => 'hat_custom',
+				'interval'  =>	get_profile('web.dahsboard.rf_rate.hat_custom',60),
+				'url'=>	'charts.php?groupid=4&hostid=10017&graphid=5&output=html&fullscreen=1'
+			)*/
+	);
 	add_refresh_objects($refresh_tab);
 
 	$refresh_menu = new CDiv(SPACE,'menuplus');
@@ -372,7 +380,15 @@ include_once "include/page_header.php";
 			'hat_webovr',
 			get_profile('web.dashboard.hats.hat_webovr.state',1)
 		));
-
+/*		
+	$right_tab->AddRow(create_hat(
+			S_GRAPH,
+			null,//make_webmon_overview(),
+			null,
+			'hat_custom',
+			get_profile('web.dashboard.hats.hat_custom.state',1)
+		));
+*/
 	$td_l = new CCol($left_tab);
 	$td_l->AddOption('valign','top');
 	

@@ -73,7 +73,7 @@
 		}
 
 		if($login){
-			zbx_setcookie("zbx_sessionid",$sessionid);
+			zbx_setcookie("zbx_sessionid",$sessionid,$USER_DETAILS['autologin']?(time()+86400*31):0);	//1 month
 			DBexecute("update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid));
 		}
 		else{
