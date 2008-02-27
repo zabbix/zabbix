@@ -312,7 +312,7 @@ int get_values(void)
 	int		res;
 	DB_ITEM		item;
 	AGENT_RESULT	agent;
-	int	stop=0;
+	int		stop = 0, items = 0;
 
 	char		*unreachable_hosts = NULL;
 	char		tmp[MAX_STRING_LEN];
@@ -419,12 +419,13 @@ int get_values(void)
 		}
 
 		init_result(&agent);
+
 		res = get_value(&item, &agent);
+
+		now = time(NULL);
 
 		DBbegin();
 		
-		now = time(NULL);
-
 		if(res == SUCCEED )
 		{
 			switch (zbx_process) {
@@ -558,20 +559,24 @@ int get_values(void)
 		}
 		free_result(&agent);
 		DBcommit();
+
+		items++;
 	}
 
 	zbx_free(unreachable_hosts);
 
 	DBfree_result(result);
 	zabbix_log( LOG_LEVEL_DEBUG, "End get_values()");
-	return SUCCEED;
+	return items;
 }
 
 void main_poller_loop(zbx_process_t p, int type, int num)
 {
 	struct	sigaction phan;
 	int	now;
-	int	nextcheck,sleeptime;
+	int	nextcheck, sleeptime;
+	int	items;
+	double	sec;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In main_poller_loop(type:%d,num:%d)",
 			type,
@@ -588,20 +593,22 @@ void main_poller_loop(zbx_process_t p, int type, int num)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for(;;)
-	{
+	for (;;) {
 		zbx_setproctitle("poller [getting values]");
 
-		now=time(NULL);
-		get_values();
+		now = time(NULL);
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds while updating values",
-			(int)time(NULL)-now );
+		sec = zbx_time();
+		items = get_values();
+		sec = zbx_time() - sec;
 
-		nextcheck=get_minnextcheck(now);
-		zabbix_log( LOG_LEVEL_DEBUG, "Nextcheck:%d Time:%d",
-			nextcheck,
-			(int)time(NULL) );
+		nextcheck = get_minnextcheck(now);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Poller spent %f seconds while updating %3d values. Nextcheck: %d Time: %d",
+				sec,
+				items,
+				nextcheck,
+				(int)time(NULL));
 
 		if( FAIL == nextcheck)
 		{
