@@ -202,6 +202,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	sqlite_transaction_started = 0;
 
+	DBexecute("PRAGMA synchronous=OFF");
+	DBexecute("PRAGMA temp_store=MEMORY");
+
 	return ret;
 #endif
 }
