@@ -90,7 +90,7 @@ static int	process_record(int nodeid, const char *record, int sender_nodetype)
 	tmp = zbx_malloc(tmp, tmp_allocated);
 
 	zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
-	strcpy(tablename, buffer);
+	zbx_strlcpy(tablename, buffer, sizeof(tablename));
 
 	zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 	ZBX_STR2UINT64(recid, buffer);
@@ -134,7 +134,7 @@ static int	process_record(int nodeid, const char *record, int sender_nodetype)
 	while(r != NULL)
 	{
 		zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
-		strcpy(fieldname, buffer);
+		zbx_strlcpy(fieldname, buffer, sizeof(fieldname));
 
 		zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 		valuetype=atoi(buffer);
