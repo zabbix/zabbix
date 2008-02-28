@@ -2722,14 +2722,12 @@ static int	DBadd_item(
 			delay_flex_esc			= DBdyn_escape_string(delay_flex);
 			params_esc			= DBdyn_escape_string(params);
 
-			DBexecute("insert into items"
-				" (itemid,description,key_,hostid,delay,history,nextcheck,status,type,"
-				"snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,"
-				"delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,"
-				"snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,delay_flex,params,templateid)"
-				" values (" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%i,%i,0,"
-				" %i,%i,'%s','%s',%i,'%s',%i,'%s',%i,%i,'%s',%i,'%s','%s','%s',%i,'%s'," ZBX_FS_UI64 ","
-				" '%s'," ZBX_FS_UI64 ")",
+			DBexecute("insert into items (itemid,description,key_,hostid,delay,history,status,type,"
+				"snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,"
+				"snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,"
+				"formula,trends,logtimefmt,valuemapid,delay_flex,params,templateid) values"
+				" (" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%i,%i,%i,%i,'%s','%s',%i,'%s',%i,'%s',%i,"
+				"%i,'%s',%i,'%s','%s','%s',%i,'%s'," ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ")",
 					itemid,
 					description_esc,
 					key_esc,
