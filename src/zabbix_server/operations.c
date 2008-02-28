@@ -493,19 +493,20 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 	DB_RESULT	result2;
 	DB_ROW		row;
 	DB_ROW		row2;
-	zbx_uint64_t	hostid = 0;
+	zbx_uint64_t	hostid = 0, proxyid;
 	char		*ip;
 	char		host[MAX_STRING_LEN], host_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_discovered_host(dhostid:" ZBX_FS_UI64 ")",
-		dhostid);
+			dhostid);
 
-	result = DBselect("select ip from dhosts where dhostid=" ZBX_FS_UI64,
-		dhostid);
-	row = DBfetch(result);
-	if(row && DBis_null(row[0]) != SUCCEED)
-	{
-		ip=row[0];
+	result = DBselect("select dr.proxyid,dh.ip from dhosts dh, drules dr"
+			" where dr.druleid=dh.druleid and dh.dhostid=" ZBX_FS_UI64,
+			dhostid);
+
+	if (NULL != (row = DBfetch(result)) && DBis_null(row[1]) != SUCCEED) {
+		proxyid	= zbx_atoui64(row[0]);
+		ip	= row[1];
 
 		alarm(CONFIG_TIMEOUT);
 		zbx_gethost_by_ip(ip, host, sizeof(host));
@@ -514,23 +515,21 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 		DBescape_string(host, host_esc, sizeof(host_esc));
 
 		result2 = DBselect("select hostid from hosts where ip='%s'" DB_NODE,
-			ip,
-			DBnode_local("hostid"));
-		row2 = DBfetch(result2);
-		if(!row2 || DBis_null(row2[0]) == SUCCEED)
-		{
-			hostid = DBget_maxid("hosts","hostid");
-			DBexecute("insert into hosts (hostid,host,useip,ip,dns) values (" ZBX_FS_UI64 ",'%s',1,'%s','%s')",
-				hostid,
-				(host[0] != '\0' ? host_esc : ip), /* Use host name if exists, IP otherwise */
 				ip,
-				host_esc);
-		}
-		else
-		{
+				DBnode_local("hostid"));
+
+		if (NULL == (row2 = DBfetch(result2)) || DBis_null(row2[0]) == SUCCEED) {
+			hostid = DBget_maxid("hosts","hostid");
+			DBexecute("insert into hosts (hostid,proxyid,host,useip,ip,dns)"
+					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',1,'%s','%s')",
+					hostid,
+					proxyid,
+					(host[0] != '\0' ? host_esc : ip), /* Use host name if exists, IP otherwise */
+					ip,
+					host_esc);
+		} else {
 			ZBX_STR2UINT64(hostid, row2[0]);
-			if(host_esc[0] != '\0')
-			{
+			if (host_esc[0] != '\0') {
 				DBexecute("update hosts set dns='%s' where hostid=" ZBX_FS_UI64,
 					host_esc,
 					hostid);
