@@ -385,7 +385,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
  */ 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
 
-		zabbix_log(LOG_LEVEL_WARNING, "Next \"%.*s\"",
+		zabbix_log(LOG_LEVEL_DEBUG, "Next \"%.*s\"",
 				jp_row.end - jp_row.start + 1,
 				jp_row.start);
 
