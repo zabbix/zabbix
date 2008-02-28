@@ -178,7 +178,7 @@
 		
 		if(isset($_REQUEST['druleid']) && $rule_data && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"])))
 		{
-
+			$proxyid	= $rule_data['proxyid'];
 			$name		= $rule_data['name'];
 			$iprange	= $rule_data['iprange'];
 			$delay		= $rule_data['delay'];
@@ -195,6 +195,7 @@
 		}
 		else
 		{
+			$proxyid	= get_request("proxyid",0);
 			$name		= get_request('name','');
 			$iprange	= get_request('iprange','192.168.0.1-255');
 			$delay		= get_request('delay',3600);
@@ -208,6 +209,16 @@
 		$new_check_snmp_community= get_request('new_check_snmp_community', '');
 
 		$form->AddRow(S_NAME, new CTextBox('name', $name, 40));
+//Proxy
+		$cmbProxy = new CComboBox("proxyid", $proxyid);
+
+		$cmbProxy->AddItem(0, S_NO_PROXY);
+		$db_proxies = DBselect('SELECT proxyid,name FROM proxies');
+		while ($db_proxy = DBfetch($db_proxies))
+			$cmbProxy->AddItem($db_proxy['proxyid'], $db_proxy['name']);
+
+		$form->AddRow(S_DISCOVERY_BY_PROXY,$cmbProxy);
+//----------
 		$form->AddRow(S_IP_RANGE, new CTextBox('iprange', $iprange, 27));
 		$form->AddRow(S_DELAY.' (seconds)', new CNumericBox('delay', $delay, 8));
 
@@ -4183,6 +4194,7 @@ include_once 'include/discovery.inc.php';
 		$newgroup	= get_request("newgroup","");
 
 		$host 	= get_request("host",	"");
+		$proxyid= get_request("proxyis","");
 		$port 	= get_request("port",	get_profile("HOST_PORT",10050));
 		$status	= get_request("status",	HOST_STATUS_MONITORED);
 		$useip	= get_request("useip",	0);
@@ -4327,7 +4339,6 @@ include_once 'include/discovery.inc.php';
 			$frmHost->AddRow(S_CONNECT_TO,$cmbConnectBy);
 		}
 
-
 		if($show_only_tmp)
 		{
 			$port = "10050";
@@ -4339,6 +4350,17 @@ include_once 'include/discovery.inc.php';
 		else
 		{
 			$frmHost->AddRow(S_PORT,new CNumericBox("port",$port,5));	
+
+//Proxy
+			$cmbProxy = new CComboBox("proxyid", $proxyid);
+
+			$cmbProxy->AddItem(0, S_NO_PROXY);
+			$db_proxies = DBselect('SELECT proxyid,name FROM proxies');
+			while ($db_proxy = DBfetch($db_proxies))
+				$cmbProxy->AddItem($db_proxy['proxyid'], $db_proxy['name']);
+
+			$frmHost->AddRow(S_MONITORED_BY_PROXY,$cmbProxy);
+//----------
 
 			$cmbStatus = new CComboBox("status",$status);
 			$cmbStatus->AddItem(HOST_STATUS_MONITORED,	S_MONITORED);

@@ -55,6 +55,8 @@
 	'S_DELETE_SELECTED_RULES_Q'=>		'Delete selected rules?',
 	'S_CREATE_RULE'=>			'Create rule',
 	'S_DELETE_RULE_Q'=>			'Delete rule?',
+	'S_DISCOVERY_BY_PROXY'=>		'Discovery by proxy',
+	'S_NO_PROXY'=>				'(no proxy)',
 
 	'S_EVENT_SOURCE'=>			'Event source',
 
@@ -721,6 +723,7 @@
 	'S_UNLINK_AND_CLEAR'=>			'Unlink and clear',
 	'S_UNLINKED_SMALL'=>			'unlinked',
 	'S_CLEANED_SMALL'=>			'cleaned',
+	'S_MONITORED_BY_PROXY'=>		'Monitored by proxy',
 
 //	items.php
 	'S_NO_ITEMS_DEFINED'=>			'No items defined',
