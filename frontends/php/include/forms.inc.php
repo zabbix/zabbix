@@ -4194,12 +4194,12 @@ include_once 'include/discovery.inc.php';
 		$newgroup	= get_request("newgroup","");
 
 		$host 	= get_request("host",	"");
-		$proxyid= get_request("proxyis","");
 		$port 	= get_request("port",	get_profile("HOST_PORT",10050));
 		$status	= get_request("status",	HOST_STATUS_MONITORED);
 		$useip	= get_request("useip",	0);
 		$dns	= get_request("dns",	"");
 		$ip	= get_request("ip",	"0.0.0.0");
+		$proxyid= get_request("proxyid","");
 
 		$useprofile = get_request("useprofile","no");
 
@@ -4234,13 +4234,13 @@ include_once 'include/discovery.inc.php';
 
 		if(isset($_REQUEST["hostid"]) && !isset($_REQUEST["form_refresh"]))
 		{
-
-			$host	= $db_host["host"];
-			$port	= $db_host["port"];
-			$status	= $db_host["status"];
-			$useip	= $db_host["useip"];
-			$dns	= $db_host["dns"];
-			$ip	= $db_host["ip"];
+			$proxyid	= $db_host["proxyid"];
+			$host		= $db_host["host"];
+			$port		= $db_host["port"];
+			$status		= $db_host["status"];
+			$useip		= $db_host["useip"];
+			$dns		= $db_host["dns"];
+			$ip		= $db_host["ip"];
 
 // add groups
 			$db_groups=DBselect("SELECT distinct groupid FROM hosts_groups WHERE hostid=".$_REQUEST["hostid"].
