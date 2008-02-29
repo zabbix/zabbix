@@ -402,6 +402,7 @@ FIELD		|history_uint_lastid|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|history_str_lastid|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|history_text_lastid|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|history_log_lastid|t_bigint	|'0'	|NOT NULL	|0
+FIELD		|dhistory_lastid|t_bigint	|'0'	|NOT NULL	|0
 INDEX		|1		|name
 
 TABLE|hosts|hostid|ZBX_SYNC
