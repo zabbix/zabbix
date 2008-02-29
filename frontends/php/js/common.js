@@ -30,10 +30,6 @@ function checkBrowser(){
 return 0;
 }
 
-function isset(obj){
-	return (typeof(obj) != 'undefined');
-}
-
 function empty(obj){
 	if(is_null(obj)) return true;
 	if(obj == false) return true;
@@ -129,6 +125,72 @@ function add_variable(o_el, s_name, x_value, s_formname, o_document)
         return true;
 }
 
+function add2favorites(favobj,favid){
+	if(typeof(Ajax) == 'undefined'){
+		throw("Prototype.js lib is required!");
+		return false;
+	}
+
+	if(typeof(favobj) == 'undefined'){
+		var fav_form = document.getElementById('fav_form');
+		if(!fav_form) throw "Object not found.";
+		
+		var favobj = fav_form.favobj.value;
+		var favid = fav_form.favid.value;
+	}
+	
+	if((typeof(favid) == 'undefined') || empty(favid)) return;
+	
+	var params = {
+		'favobj': 	favobj,
+		'favid': 	favid,
+		'action':	'add'
+	}
+	
+	var uri = new url(location.href);
+
+	new Ajax.Request(uri.getPath()+"?output=ajax",
+					{
+						'method': 'post',
+						'parameters':params,
+						'onSuccess': function(resp){ },//alert(resp.responseText);
+						'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(params); }
+					}
+	);
+//	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
+}
+
+function rm4favorites(favobj,favid,menu_rowid){
+//	alert(favobj+','+favid+','+menu_rowid);
+	if(typeof(Ajax) == 'undefined'){
+		throw("Prototype.js lib is required!");
+		return false;
+	}
+
+	if((typeof(favobj) == 'undefined') || (typeof(favid) == 'undefined')) 
+		throw "No agruments sent to function [rm4favorites()].";
+
+	var params = {
+		'favobj': 	favobj,
+		'favid': 	favid,
+		'favcnt':	menu_rowid,
+		'action':	'remove'
+	}
+
+	var uri = new url(location.href);
+	
+	new Ajax.Request(uri.getPath()+"?output=ajax",
+					{
+						'method': 'post',
+						'parameters':params,
+						'onSuccess': function(resp){ },//alert(resp.responseText);
+						'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(params); }
+					}
+	);
+
+//	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
+}
+
 function get_scroll_pos()
 {
 	var scrOfX = 0, scrOfY = 0;
@@ -202,7 +264,7 @@ function Confirm(msg){
 }
 
 function ShowHide(obj,style){
-	if(!isset(style))
+	if(typeof(style) == 'undefined')
 		var style = 'inline';
 	if(is_string(obj))
 		obj = document.getElementById(obj);
@@ -279,7 +341,7 @@ function openWinCentered(loc, winname, iwidth, iheight, params){
 
 function getPosition(obj){
 	var pos = {top: 0, left: 0};
-	if (isset(obj.offsetParent)) {
+	if ((typeof(obj.offsetParent) != 'undefined')) {
 		pos.left = obj.offsetLeft;
 		pos.top = obj.offsetTop;
 		while (obj = obj.offsetParent) {
@@ -347,7 +409,7 @@ function ScaleChartToParenElement(obj_name)
 }
 
 function insert_sizeable_graph(graph_id,url){
-	if(isset(ZBX_G_WIDTH)) url += "&amp;width="+ZBX_G_WIDTH;
+	if((typeof(ZBX_G_WIDTH) != 'undefined')) url += "&amp;width="+ZBX_G_WIDTH;
 
 	document.write('<img id="'+graph_id+'" src="'+url+'" alt="graph" /><br />');
 }

@@ -27,6 +27,8 @@
 	$page['file'] = 'charts.php';
 	$page['hist_arg'] = array('hostid','grouid','graphid','period','dec','inc','left','right','stime');
 	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbox.js','sbinit.js');
+	
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 ?>
 <?php
 	if(isset($_REQUEST['fullscreen']))
@@ -51,16 +53,53 @@ include_once 'include/page_header.php';
 		'from'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
 		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
-		'action'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go'"),NULL),
+		'action'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go','add','remove'"),NULL),
 		'reset'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
-		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1"),NULL)
+		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1"),NULL),
+		
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})')
+		
 	);
 
 	check_fields($fields);
 ?>
 <?php
-	if(isset($_REQUEST["graphid"]) && !isset($_REQUEST["hostid"]))
-	{
+
+	if(isset($_REQUEST['favobj'])){
+		if(in_array($_REQUEST['favobj'],array('simple_graph','graphs'))){
+			$result = false;
+			if('add' == $_REQUEST['action']){
+				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
+				if($result){
+					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVORITES.'";'."\n");
+					print('$("addrm_fav").onclick = function(){rm4favorites("graphs","'.$_REQUEST['favid'].'",0);}'."\n");
+				}
+			}
+			else if('remove' == $_REQUEST['action']){
+				while(infavorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj'])){
+					$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],0,$_REQUEST['favobj']);
+				}
+				
+				if($result){
+					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVORITES.'";'."\n");
+					print('$("addrm_fav").onclick = function(){ add2favorites("graphs","'.$_REQUEST['favid'].'");}'."\n");
+				}
+			}
+
+			if((PAGE_TYPE_JS == $page['type']) && $result){
+				print('switchElementsClass("addrm_fav","iconminus","iconplus");');
+			}
+		}
+	}	
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+	
+
+	if(isset($_REQUEST["graphid"]) && !isset($_REQUEST["hostid"])){
 		$_REQUEST["groupid"] = $_REQUEST["hostid"] = 0;
 	}
 
@@ -121,6 +160,23 @@ include_once 'include/page_header.php';
 			access_deny();
 		}
 		array_push($h1, new CLink($row['name'], '?graphid='.$_REQUEST['graphid'].(isset($_REQUEST['fullscreen']) ? '' : '&fullscreen=1')));
+
+		if(infavorites('web.favorite.graphids',$_REQUEST['graphid'],'graphs')){
+			$icon = new CDiv(SPACE,'iconminus');
+			$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
+			$icon->AddAction('onclick',new CScript("javascript: rm4favorites('graphs','".$_REQUEST['graphid']."',0);"));
+		}
+		else{
+			$icon = new CDiv(SPACE,'iconplus');
+			$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
+			$icon->AddAction('onclick',new CScript("javascript: add2favorites('graphs','".$_REQUEST['graphid']."');"));
+		}
+		$icon->AddOption('id','addrm_fav');
+
+		$icon_tab = new CTable();
+		$icon_tab->AddRow(array($icon,SPACE,$h1));
+		
+		$h1 = $icon_tab;
 	}
 	else
 	{

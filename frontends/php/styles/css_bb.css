@@ -29,8 +29,6 @@ a.highlight:link 	{ 	text-decoration: none;		color: #ffffff; }
 a.highlight:visited 	{	text-decoration: none;		color: #ffffff; }
 a.highlight:hover	{	text-decoration:none;	color: #0AF; }
 
-
-
 A.enabled:link		{	color:#0088FF;	text-decoration: none; }
 A.enabled:visited 	{	color:#0088FF;	text-decoration: none; }
 A.enabled:hover 	{	color:#0088FF;	text-decoration: underline; }
@@ -89,6 +87,12 @@ A.history:link		{	color:#28F;	text-decoration: none; font-size:10px;}
 A.history:visited 	{	color:#28F;	text-decoration: none; font-size:10px;}
 A.history:hover 	{	color:#2FF;	text-decoration: none; font-size:10px;}
 A.history:active 	{	color:#28F;	text-decoration: none; font-size:10px;}
+
+A.link:link		{	color:#EEE;	text-decoration: none; font-size:10px;}
+A.link:visited 	{	color:#EEE;	text-decoration: none; font-size:10px;}
+A.link:hover 	{	color:#0BF;	text-decoration: none; font-size:10px;}
+A.link:active 	{	color:#0BF;	text-decoration: none; font-size:10px;}
+
 
 /*////////////////	TABLES	////////////////////*/
 table.page_header tr td.page_header_r{
@@ -225,8 +229,16 @@ div.zabbix_logo{
 	background-repeat: no-repeat;
 }
 
-div.menuplus{
+div.iconminus{
+	background-image: url('../images/general/bttn/minus_bb.png');
+}
+
+div.iconplus{
 	background-image: url('../images/general/bttn/plus_bb.png');
+}
+
+div.iconmenu{
+	background-image: url('../images/general/bttn/menu2_bb.png');
 }
 
 div.arrowup{

@@ -201,7 +201,7 @@ gmenumouseout: function(){		// you may attach any functionto this
 },
 
 ongmload: function(e){
-	if(isset(e)){
+	if((typeof(e) != 'undefined')){
 		if(IE){
 			e.cancelBubble = true;
 			e.returnValue = false;
@@ -218,7 +218,7 @@ gmenuload: function(){			// bind any func to this
 },
 
 gmenuhide: function(e){
-	if(isset(e)){
+	if((typeof(e) != 'undefined')){
 		if(IE){
 			e.cancelBubble = true;
 			e.returnValue = false;
@@ -242,7 +242,7 @@ gmenushow: function(period, bstime){
 		this.gmenuhide();
 	}
 	else{
-		if(isset(period) && isset(bstime)){
+		if((typeof(period) != 'undefined') && (typeof(bstime) != 'undefined')){
 			this.initialize(period, bstime);
 			
 			this.syncBSDateByBSTime();
@@ -503,7 +503,7 @@ pvalueup: function(){
 },
 
 ptypeup: function(){
-	if(!isset(this.period_typename[this.period_type+1])){
+	if(typeof(this.period_typename[this.period_type+1]) == 'undefined'){
 		return;
 	}
 	var temp_period_value = this.period_value;
