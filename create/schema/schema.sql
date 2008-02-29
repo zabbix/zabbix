@@ -253,6 +253,7 @@ FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|object,objectid,eventid
 INDEX		|2		|clock
+INDEX		|3		|object,objectid,clock
 
 TABLE|trends|itemid,clock|ZBX_HISTORY_TRENDS
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0

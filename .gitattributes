@@ -217,3 +217,9 @@ src/zabbix_server/trapper/nodecommand.c -text
 src/zabbix_server/trapper/nodecommand.h -text
 src/zabbix_server/trapper/proxyconfig.c -text
 src/zabbix_server/trapper/proxyconfig.h -text
+test/env/standalone/conf/template_agent.conf -text
+test/env/standalone/conf/template_proxy.conf -text
+test/env/standalone/conf/template_server.conf -text
+test/env/standalone/create_test.sh -text
+test/env/standalone/data.sql -text
+test/env/standalone/dump_db.sh -text
