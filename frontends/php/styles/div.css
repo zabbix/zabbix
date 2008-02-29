@@ -36,14 +36,34 @@ div.zabbix_logo{
 	background: #FFFFFF url('../images/general/zabbix.png') no-repeat;
 }
 
-div.menuplus{
+div.iconminus{
 	height: 18px;
 	width: 18px;
-	background-image: url('../images/general/bttn/plus.png');
+	background-image: url('../images/general/bttn/minus_bb.png');
+	background-repeat:no-repeat;
+}
+div.iconminus:hover{
+	cursor:pointer;
+}
+
+div.iconplus{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/plus_bb.png');
+	background-repeat:no-repeat;
+}
+div.iconplus:hover{
+	cursor:pointer;
+}
+
+div.iconmenu{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/menu_bb.png');
 	background-repeat:no-repeat;
 }
 
-div.menuplus:hover{
+div.iconmenu:hover{
 	cursor:pointer;
 }
 

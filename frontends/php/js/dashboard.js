@@ -1,5 +1,10 @@
 // JavaScript Document
 function setRefreshRate(id,interval){
+	if(typeof(Ajax) == 'undefined'){
+		throw("Prototype.js lib is required!");
+		return false;
+	}
+
 	var params = {
 		'favobj': 	'set_rf_rate',
 		'favid': 	id,
@@ -17,70 +22,13 @@ function setRefreshRate(id,interval){
 
 }
 
-function add2favorites(){
-
-	var fav_form = document.getElementById('fav_form');
-	if(!fav_form) throw "Object not found.";
-	
-	var favobj = fav_form.favobj.value;
-	var favid = fav_form.favid.value;;
-
-	if(empty(favid)) return;
-	
-	var params = {
-		'favobj': 	favobj,
-		'favid': 	favid,
-		'action':	'add'
-	}
-
-	new Ajax.Request("dashboard.php?output=ajax",
-					{
-						'method': 'post',
-						'parameters':params,
-						'onSuccess': function(resp){ },//alert(resp.responseText);
-						'onFailure': function(){ document.location = 'dashboard.php?'+Object.toQueryString(params); }
-					}
-	);
-//	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
-}
-
-function rm4favorites(favobj,favid,menu_rowid){
-//	alert(favobj+','+favid+','+menu_rowid);
-
-	if(!isset(favobj) || !isset(favid)) throw "No agruments sent to function [rm4favorites()].";
-/*
-	var	id='menu_'+favobj;
-
-	var tmp_menu = new Array();
-	for(var i=0; i < dashboard_submenu[id].length; i++){
-		if(isset(dashboard_submenu[id][i]) && (i!=menu_rowid)){
-			tmp_menu.push(dashboard_submenu[id][i]);
-
-		}
-	}
-	dashboard_submenu[id] = tmp_menu;
-*/
-	var params = {
-		'favobj': 	favobj,
-		'favid': 	favid,
-		'favcnt':	menu_rowid,
-		'action':	'remove'
-	}
-
-	new Ajax.Request("dashboard.php?output=ajax",
-					{
-						'method': 'post',
-						'parameters':params,
-						'onSuccess': function(resp){ },//alert(resp.responseText);
-						'onFailure': function(){ document.location = 'dashboard.php?'+Object.toQueryString(params); }
-					}
-	);
-
-//	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
-}
-
 function change_hat_state(icon, divid){
-	if(!isset(icon) || !isset(divid)) throw "Function [change_hat_state()] awaits exactly 2 arguments.";
+	if((typeof(icon) == 'undefined') || (typeof(divid) == 'undefined')) throw "Function [change_hat_state()] awaits exactly 2 arguments.";
+
+	if(typeof(Ajax) == 'undefined'){
+		throw("Prototype.js lib is required!");
+		return false;
+	}
 
 	deselectAll(); 
 	var hat_state = ShowHide(divid); 
@@ -112,12 +60,12 @@ function create_menu(e,id){
 //to create a copy of array, but not references!!!!
 //alert(id+' : '+dashboard_menu[id]);
 	for(var i=0; i < dashboard_menu[id].length; i++){
-		if(isset(dashboard_menu[id][i]) && !empty(dashboard_menu[id][i]))
+		if((typeof(dashboard_menu[id][i]) != 'undefined') && !empty(dashboard_menu[id][i]))
 			dbrd_menu[i] = dashboard_menu[id][i].clone();
 	}
 
 	for(var i=0; i < dashboard_submenu[id].length; i++){
-		if(isset(dashboard_submenu[id][i]) && !empty(dashboard_submenu[id][i])){
+		if((typeof(dashboard_submenu[id][i]) != 'undefined') && !empty(dashboard_submenu[id][i])){
 			var row = dashboard_submenu[id][i];
 			var menu_row = new Array(row.name,"javascript: rm4favorites('"+row.favobj+"','"+row.favid+"','"+i+"');");
 			dbrd_menu[dbrd_menu.length-1].push(menu_row);
@@ -135,51 +83,51 @@ objlist:		new Array(),			// list of objects
 optlist :		new Array(),			// object params, list
 interval:		10,						// update interval in sec
 
-setObj4Update: function(id,frequency,url,params){
-	var obj = document.getElementById(id);
-	if(!isset(obj)) return false; 
-
-	var obj4update = {
-		'id': 		id,
-		'url': 		url,
-		'params': 	params,
-		'interval': frequency,
-		'lastupdate': 0
-	}
+	setObj4Update: function(id,frequency,url,params){
+		var obj = document.getElementById(id);
+		if((typeof(obj) == 'undefined')) return false; 
 	
-	if(!isset(this.optlist[id])){
-		this.objlist.push(id);
-	}
-	this.optlist[id] = obj4update;
-},
-
-check4Update: function(){
-	if(this.objlist.length > 0){
-		var dt = new Date();
-		var now = parseInt(dt.getTime()/1000);
+		var obj4update = {
+			'id': 		id,
+			'url': 		url,
+			'params': 	params,
+			'interval': frequency,
+			'lastupdate': 0
+		}
 		
-		for(var i=0; i < this.objlist.length; i++){
-			if(isset(this.optlist[this.objlist[i]]) && !empty(this.optlist[this.objlist[i]])){
-//				alert(Math.abs(now - this.optlist[this.objlist[i]].lastupdate));
-				if(this.optlist[this.objlist[i]].interval <= Math.abs(now - this.optlist[this.objlist[i]].lastupdate)){
-					this.update(this.optlist[this.objlist[i]],now);
+		if(typeof(this.optlist[id]) == 'undefined'){
+			this.objlist.push(id);
+		}
+		this.optlist[id] = obj4update;
+	},
+	
+	check4Update: function(){
+		if(this.objlist.length > 0){
+			var dt = new Date();
+			var now = parseInt(dt.getTime()/1000);
+			
+			for(var i=0; i < this.objlist.length; i++){
+				if((typeof(this.optlist[this.objlist[i]]) != 'undefined') && !empty(this.optlist[this.objlist[i]])){
+	//				alert(Math.abs(now - this.optlist[this.objlist[i]].lastupdate));
+					if(this.optlist[this.objlist[i]].interval <= Math.abs(now - this.optlist[this.objlist[i]].lastupdate)){
+						this.update(this.optlist[this.objlist[i]],now);
+					}
 				}
 			}
 		}
+		setTimeout('updater.check4Update();',(this.interval*1000));
+	},
+	
+	update: function(obj4update,time){
+		new Ajax.Updater(obj4update.id, obj4update.url,
+			{
+				method: 'post',
+				'parameters':	obj4update.params,
+				'evalScripts': true,
+				'onSuccess': function(resp){ obj4update.lastupdate = time;},
+				'onFailure': function(){ document.location = 'dashboard.php?'+Object.toQueryString(obj4update.params); }
+			});	
 	}
-	setTimeout('updater.check4Update();',(this.interval*1000));
-},
-
-update: function(obj4update,time){
-	new Ajax.Updater(obj4update.id, obj4update.url,
-		{
-			method: 'post',
-			'parameters':	obj4update.params,
-			'evalScripts': true,
-			'onSuccess': function(resp){ obj4update.lastupdate = time;},
-			'onFailure': function(){ document.location = 'dashboard.php?'+Object.toQueryString(obj4update.params); }
-		});	
-}
 }
 
 function getTimeFormated(timestamp){

@@ -122,6 +122,7 @@
 	}
 
 	$page["file"] = "popup.php";
+	$page['scripts'] = array('prototype.js');
 	
 	define('ZBX_PAGE_NO_MENU', 1);
 
@@ -344,7 +345,7 @@ include_once "include/page_header.php";
 			$btnEmpty = new CButton("empty",S_EMPTY,
 				get_window_opener($dstfrm, $dstfld1, 0).
 				get_window_opener($dstfrm, $dstfld2, '').
-				((isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard'))?"window.opener.add2favorites();":'').
+				((isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard'))?"window.opener.setTimeout('add2favorites();', 1000);":'').
 				" close_window(); return false;");
 
 			$frmTitle->AddItem(array(SPACE,$btnEmpty));
@@ -380,7 +381,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
@@ -545,7 +546,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -568,11 +569,11 @@ include_once "include/page_header.php";
 			$sql .= ',hosts_groups hg where hg.groupid='.$groupid.
 				' AND h.hostid=hg.hostid AND ';
 		else
-			$sql .= ' where ';
+			$sql .= ' WHERE ';
 
 		$sql .= DBin_node('h.hostid',$nodeid).' AND status='.HOST_STATUS_TEMPLATE.
 				' AND h.hostid in ('.$accessible_hosts.') '.
-				' order by h.host,h.hostid';
+				' ORDER BY h.host,h.hostid';
 		$db_hosts = DBselect($sql);
 		while($row = DBfetch($db_hosts))
 		{
@@ -580,7 +581,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -610,7 +611,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -639,7 +640,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -665,7 +666,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, html_entity_decode($row[$srcfld1])).
@@ -714,7 +715,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $exp_desc).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -844,7 +845,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -892,7 +893,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -919,7 +920,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -960,7 +961,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -1033,7 +1034,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -1073,7 +1074,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -1128,7 +1129,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -1164,7 +1165,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -1196,7 +1197,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -1237,7 +1238,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -1274,7 +1275,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.add2favorites();";
+					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -1313,7 +1314,7 @@ include_once "include/page_header.php";
 				if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 					$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 						get_window_opener($dstfrm, $dstfld2, create_id_by_nodeid(0,$nodeid)).
-						"window.opener.add2favorites();";
+						"window.opener.setTimeout('add2favorites();', 1000);";
 				}
 				else{
 					$action = get_window_opener($dstfrm, $dstfld1, create_id_by_nodeid(0,$nodeid)).
@@ -1333,7 +1334,7 @@ include_once "include/page_header.php";
 			$name->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-				((isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard'))?"window.opener.add2favorites();":'').
+				((isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard'))?"window.opener.setTimeout('add2favorites();', 1000);":'').
 				' return close_window();');
 
 			$table->AddRow($name);

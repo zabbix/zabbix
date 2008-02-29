@@ -27,6 +27,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	require_once 	"include/defines.inc.php";
 	require_once 	"include/html.inc.php";
 	require_once	"include/copt.lib.php";
+	require_once	"include/profiles.inc.php";
 	require_once	"conf/maintenance.inc.php";
 	
 // GLOBALS
@@ -115,7 +116,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	if(file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !isset($DENY_GUI)){
 		include $ZBX_CONFIGURATION_FILE;
-		require_once 	"include/db.inc.php";
+		require_once("include/db.inc.php");
 		
 		$error = '';
 		if(!DBconnect($error)){
@@ -157,7 +158,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	
 	if(!defined('ZBX_PAGE_NO_AUTHERIZATION')){
 		check_authorisation();
-		include_once "include/locales/".$USER_DETAILS["lang"].".inc.php";
+		include_once("include/locales/".$USER_DETAILS["lang"].".inc.php");
 		process_locales();
 	}
 	else{
@@ -183,16 +184,16 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	if(isset($DENY_GUI)){
 		unset($show_warning);
-		include_once "warning.php";
+		include_once("warning.php");
 	}
 
 	if(isset($show_setup)){
 		unset($show_setup);
-		include_once "setup.php";
+		include_once("setup.php");
 	}
 	else if(isset($show_warning)){
 		unset($show_warning);
-		include_once "warning.php";
+		include_once("warning.php");
 	}
 
 	/********** END INITIALIZATION ************/
@@ -207,8 +208,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 		$ZBX_CURRENT_SUBNODES = array();
 		$ZBX_NODES = array();
-		if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED)
-		{
+		if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED){
+		
 			$ZBX_CURRENT_NODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node
 			$ZBX_WITH_SUBNODES = get_cookie('zbx_with_subnodes', false); // Show elements from subnodes
 
@@ -221,35 +222,30 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				unset($node_data);
 			}
 
-			if(isset($_REQUEST['show_subnodes']))
-			{
+			if(isset($_REQUEST['show_subnodes'])){
 				$ZBX_WITH_SUBNODES = !empty($_REQUEST['show_subnodes']);
 			}
 
-			if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$ZBX_CURRENT_NODEID)))
-			{
+			if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$ZBX_CURRENT_NODEID))){
 				$ZBX_CURMASTERID = $node_data['masterid'];
 			}
 			
 			$ZBX_NODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, null, PERM_RES_DATA_ARRAY);
 
-			if ( !isset($ZBX_NODES[$ZBX_CURRENT_NODEID]) )
-			{
+			if ( !isset($ZBX_NODES[$ZBX_CURRENT_NODEID]) ){
 				$denyed_page_requested = true;
 				$ZBX_CURRENT_NODEID = $ZBX_LOCALNODEID;
 				$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
 			}
 
-			foreach ( $ZBX_NODES as $nodeid => $node_data )
-			{
+			foreach ( $ZBX_NODES as $nodeid => $node_data ){
 				for ( 	$curr_node = &$node_data;
 					$curr_node['masterid'] != 0 &&
 					(bccomp($curr_node['masterid'] , $ZBX_CURRENT_NODEID) != 0);
 					$curr_node = &$ZBX_NODES[$curr_node['masterid']]
 				);
 
-				if (bccomp($curr_node['masterid'],$ZBX_CURRENT_NODEID) == 0 )
-				{
+				if (bccomp($curr_node['masterid'],$ZBX_CURRENT_NODEID) == 0 ){
 					$ZBX_CURRENT_SUBNODES[$nodeid] = $nodeid;
 				}
 			}
@@ -257,8 +253,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			zbx_set_post_cookie('zbx_current_nodeid',$ZBX_CURRENT_NODEID);
 			zbx_set_post_cookie('zbx_with_subnodes',$ZBX_WITH_SUBNODES);
 		}
-		else
-		{
+		else{
 			$ZBX_CURRENT_NODEID = $ZBX_LOCALNODEID;
 			$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
 			$ZBX_WITH_SUBNODES = false;
@@ -286,8 +281,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	return $result;
 	}
 
-	function	get_node_name_by_elid($id_val, $forse_with_subnodes = null)
-	{
+	function	get_node_name_by_elid($id_val, $forse_with_subnodes = null){
 		global $ZBX_NODES;
 
 		if ( ! is_show_subnodes($forse_with_subnodes) )
@@ -301,13 +295,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return '['.$ZBX_NODES[$nodeid]['name'].'] ';
 	}
 
-	function	is_show_subnodes($forse_with_subnodes = null)
-	{
+	function	is_show_subnodes($forse_with_subnodes = null){
 		global	$ZBX_WITH_SUBNODES;
 
-		if ( is_null($forse_with_subnodes) )
-		{
-			if ( defined('ZBX_DISABLE_SUBNODES') )
+		if ( is_null($forse_with_subnodes)){
+			if ( defined('ZBX_DISABLE_SUBNODES'))
 				$forse_with_subnodes = false;
 			else
 				$forse_with_subnodes = $ZBX_WITH_SUBNODES;
@@ -315,12 +307,10 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return $forse_with_subnodes;
 	}
 
-	function	access_deny()
-	{
+	function	access_deny(){
+	
 		include_once "include/page_header.php";
-
 		show_error_message(S_NO_PERMISSIONS);
-
 		include_once "include/page_footer.php";
 	}
 	
@@ -1385,141 +1375,6 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	{
 		return ($var == "") ? null : $var;
 	}
-
-
-/********** USER PROFILE ***********/
-
-//---------- GET USER VALUE -------------
-	function	get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN){
-		global $USER_DETAILS;
-
-		$result = array();
-//		$result = $default_value;
-
-		if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
-			$db_profiles = DBselect('SELECT * FROM profiles WHERE userid='.$USER_DETAILS["userid"].' AND idx='.zbx_dbstr($idx));
-
-			while($profile=DBfetch($db_profiles)){
-				if($type==PROFILE_TYPE_UNKNOWN) $type = $profile["valuetype"];
-
-				switch($type){
-					case PROFILE_TYPE_INT:		
-						$result[] = intval($profile["value"]);
-						break;
-					case PROFILE_TYPE_STR:
-					default:
-						$result[] = strval($profile["value"]);
-				}
-			}
-		}
-
-		$result = array_filter($result, "not_empty");
-		
-		if(isset($result[0]) && (PROFILE_TYPE_ARRAY != $type)) $result = $result[0];
-		if(empty($result)) $result = $default_value;
-		
-	return $result;
-	}
-
-//----------- ADD/EDIT USERPROFILE -------------
-	function	update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN){
-		global $USER_DETAILS;
-
-		if($USER_DETAILS["alias"]==ZBX_GUEST_USER){
-			return false;
-		}
-		
-		if($type==PROFILE_TYPE_UNKNOWN && is_array($value))	$type = PROFILE_TYPE_ARRAY;
-		if($type==PROFILE_TYPE_ARRAY && !is_array($value))	$value = array($value);
-
-		$sql='DELETE FROM profiles WHERE userid='.$USER_DETAILS["userid"].' and idx='.zbx_dbstr($idx);
-		DBExecute($sql);
-
-		insert_profile($idx,$value,$type);
-		
-	return true;
-	}
-	
-	function insert_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN){
-		global $USER_DETAILS;
-		
-		if(is_array($value)){
-			foreach($value as $key => $val){
-				insert_profile($idx,$val,$type);		// recursion!!!
-			}
-		}
-		else{
-			$profileid = get_dbid('profiles', 'profileid');
-			$sql='INSERT INTO profiles (profileid,userid,idx,value,valuetype)'.
-					' VALUES ('.$profileid.','.$USER_DETAILS["userid"].','.zbx_dbstr($idx).','.zbx_dbstr($value).','.$type.')';
-			DBexecute($sql);
-		}
-
-	}
-
-/***********************************/
-
-/************ HISTORY **************/
-	function get_user_history(){
-		$history=array();
-		$delimiter = new CSpan('&raquo;','delimiter');
-		for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
-			if($rows = get_profile('web.history.'.$i,false)){
-				if($i>0){
-					array_push($history,$delimiter);
-				}
-				$url = new CLink($rows[0],$rows[1],'history');
-				array_push($history,array(SPACE,$url,SPACE));
-			}
-		}
-	return $history;
-	}
-
-	function add_user_history($page){
-	
-		$title = explode('[',$page['title']);
-		$title = $title[0];
-
-		if(!(isset($page['hist_arg']) && is_array($page['hist_arg']))){
-			return FALSE;
-		}
-		
-		$url = '';
-		foreach($page['hist_arg'] as $key => $arg){
-			if(isset($_REQUEST[$arg]) && !empty($_REQUEST[$arg])){
-				$url.=((empty($url))?('?'):('&')).$arg.'='.$_REQUEST[$arg];
-			}
-		}
-		$url = $page['file'].$url;
-
-		$curr = 0;
-		$profile = array();
-		for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
-			if($history = get_profile('web.history.'.$i,false)){
-				if($history[0] != $title){
-					$profile[$curr] = $history;
-					$curr++;
-				}
-			}
-		}
-				
-		$history = array($title,$url);
-		
-		if($curr < ZBX_HISTORY_COUNT){
-			for($i = 0; $i < $curr; $i++){
-				update_profile('web.history.'.$i,$profile[$i],PROFILE_TYPE_ARRAY);
-			}
-			$result = update_profile('web.history.'.$curr,$history,PROFILE_TYPE_ARRAY);
-		} else {
-			for($i = 1; $i < ZBX_HISTORY_COUNT; $i++){
-				update_profile('web.history.'.($i-1),$profile[$i],PROFILE_TYPE_ARRAY);
-			}
-			$result = update_profile('web.history.'.(ZBX_HISTORY_COUNT-1),$history,PROFILE_TYPE_ARRAY);
-		}
-
-	return $result;
-	}
-
 
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
 	if(function_exists("imagesetstyle"))
