@@ -136,7 +136,7 @@ function check_childs(form_name, chkMain, chkName){
 
 function display_element(name){
 	var elmnt = document.getElementById(name);
-	if(!isset(elmnt)){
+	if((typeof(elmnt) == 'undefined')){
 		return;
 	}
 	else if((elmnt.offsetWidth == 0) || (elmnt.style.display == 'none')){

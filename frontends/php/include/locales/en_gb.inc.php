@@ -489,6 +489,7 @@
 	'S_LATEST_VALUES'=>			'Latest values',
 	'S_NO_PERMISSIONS'=>			'No permissions !',
 	'S_LATEST_DATA_BIG'=>			'LATEST DATA',
+	'S_ALL'=>						'All',
 	'S_ALL_SMALL'=>					'all',
 	'S_ALL_BIG'=>					'ALL',
 	'S_MINUS_ALL_MINUS'=>			'- all -',
@@ -940,6 +941,7 @@
 	'S_SYSTEM_STATUS'=>				'System status',
 	'S_LATEST_ISSUES'=>				'Latest issues',
 	'S_FAVORITE'=>					'Favorite',
+	'S_FAVORITES'=>					'Favorites',
 	'S_EVERY'=>						'Every',
 	'S_REFRESHED'=>					'Refreshed',
 

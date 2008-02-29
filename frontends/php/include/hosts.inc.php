@@ -20,7 +20,6 @@
 ?>
 <?php
 require_once "include/graphs.inc.php";
-require_once "include/profiles.inc.php";
 require_once "include/triggers.inc.php";
 require_once "include/items.inc.php";
 
@@ -1287,5 +1286,33 @@ require_once "include/items.inc.php";
 				$status = 'unknown';	break;
 		}
 		return $status;
+	}
+	
+// Add Host Profile
+
+	function	add_host_profile($hostid,$devicetype,$name,$os,$serialno,$tag,$macaddress,$hardware,$software,$contact,$location,$notes){
+		
+		$result=DBselect("select * from hosts_profiles where hostid=$hostid");
+		if(DBfetch($result)){
+			error("Host profile already exists");
+			return 0;
+		}
+
+		$result=DBexecute("insert into hosts_profiles".
+			" (hostid,devicetype,name,os,serialno,tag,macaddress,hardware,software,contact,".
+			"location,notes) values ($hostid,".zbx_dbstr($devicetype).",".zbx_dbstr($name).",".
+			zbx_dbstr($os).",".zbx_dbstr($serialno).",".zbx_dbstr($tag).",".zbx_dbstr($macaddress).
+			",".zbx_dbstr($hardware).",".zbx_dbstr($software).",".zbx_dbstr($contact).",".
+			zbx_dbstr($location).",".zbx_dbstr($notes).")");
+		
+	return	$result;
+	}
+
+// Delete Host Profile
+
+	function	delete_host_profile($hostid){
+		$result=DBexecute("delete from hosts_profiles where hostid=$hostid");
+
+	return $result;
 	}
 ?>

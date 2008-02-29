@@ -36,7 +36,7 @@ function hidegraphmenu(pe){
 function showgraphmenu(obj_id){
 	
 	var obj = $(obj_id);
-	if(!isset(obj)) return false;
+	if((typeof(obj) == 'undefined')) return false;
 	
 	var pos = getPosition(obj);
 	pos.top+=obj.offsetHeight+18;
@@ -118,7 +118,7 @@ function gmenuload(){
 }
 
 function graph_zoom_init(graph_id,stime,period,width,height){
-	if(!isset(graph_id) || empty(graph_id)) return;
+	if((typeof(graph_id) == 'undefined') || empty(graph_id)) return;
 	
 	A_SBOX[graph_id].sbox = sbox_init(stime,period);
 	A_SBOX[graph_id].sbox.sbox_id = graph_id;

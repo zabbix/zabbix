@@ -102,7 +102,11 @@ COpt::profiling_start("page");
 				"node_perm"		=> PERM_READ_LIST,
 				"default_page_id"	=> 0,
 				"pages"=>array(
-					array("url"=>"dashboard.php"	,"label"=>S_DASHBOARD	),
+					array(
+							"url"=>"dashboard.php",
+							"label"=>S_DASHBOARD,
+							"sub_pages"=>array("chart2.php","charts.php","screens.php","maps.php","map.php")
+						),
 					array("url"=>"overview.php"	,"label"=>S_OVERVIEW	),
 					array("url"=>"httpmon.php"	,"label"=>S_WEB	,
 						"sub_pages"=>array("httpdetails.php")
@@ -117,13 +121,6 @@ COpt::profiling_start("page");
 					array("url"=>"queue.php"	,"label"=>S_QUEUE	),
 					array("url"=>"events.php"	,"label"=>S_EVENTS	),
 					array("url"=>"actions.php"	,"label"=>S_ACTIONS	),
-					array("url"=>"maps.php"		,"label"=>S_MAPS	,
-						"sub_pages"=>array("map.php")
-						),
-					array("url"=>"charts.php"	,"label"=>S_GRAPHS	,
-						"sub_pages"=>array("chart2.php")
-						),
-					array("url"=>"screens.php"	,"label"=>S_SCREENS	),
 					array("url"=>"discovery.php"	,"label"=>S_DISCOVERY	, "user_type"=>USER_TYPE_ZABBIX_ADMIN),
 					array("url"=>"srv_status.php"	,"label"=>S_IT_SERVICES	, 'forse_disable_subnodes' => true,
 						"sub_pages"=>array("report3.php","chart_sla.php","chart5.php")

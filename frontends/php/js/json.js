@@ -44,8 +44,8 @@ return (this.nextId-1);
 },
 
 buildScript: function(id){
-	if(isset(id)){
-		if(isset(this.scripts[id]) && !empty(this.scripts[id]) && (this.scripts[id].status == 1)){
+	if((typeof(id) != 'undefined')){
+		if((typeof(this.scripts[id]) != 'undefined') && !empty(this.scripts[id]) && (this.scripts[id].status == 1)){
 			var scriptObj = document.createElement("script");
 		
 			// Add script object attributes
@@ -69,8 +69,8 @@ buildAll: function() {
 },
 
 addScript: function(id){
-	if(isset(id)){
-		if(isset(this.scripts[id]) && !empty(this.scripts[id]) && (this.scripts[id].status == 2)){
+	if((typeof(id) != 'undefined')){
+		if((typeof(this.scripts[id]) != 'undefined') && !empty(this.scripts[id]) && (this.scripts[id].status == 2)){
 			this.head.appendChild(this.scripts[id].scriptObj);
 			this.scripts[id].status = 3;
 		}
@@ -84,8 +84,8 @@ addAll: function(){
 },
 
 removeScript: function(id){
-	if(isset(id)){
-		if(isset(this.scripts[id]) && !empty(this.scripts[id]) && (this.scripts[id].status == 3)){
+	if((typeof(id) != 'undefined')){
+		if((typeof(this.scripts[id]) != 'undefined') && !empty(this.scripts[id]) && (this.scripts[id].status == 3)){
 //SDI('remove:'+this.scripts[id].scriptId);
 		    this.head.removeChild(this.scripts[id].scriptObj);  
 			this.scripts[id] = null;			

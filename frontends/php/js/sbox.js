@@ -273,7 +273,7 @@ clear_params: function(){
 }
 
 function create_box_on_obj(obj_ref){
-	if(!isset(obj_ref)) throw('Reference Object is not defined');
+	if((typeof(obj_ref) == 'undefined')) throw('Reference Object is not defined');
 	
 	var div = document.createElement('div');
 	obj_ref.appendChild(div);

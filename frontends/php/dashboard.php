@@ -28,7 +28,7 @@ require_once "include/blocks.inc.php";
 $page["title"] = "S_DASHBOARD";
 $page["file"] = "dashboard.php";
 $page['hist_arg'] = array();
-$page['scripts'] = array('prototype.js','json.js','dashboard.js');
+$page['scripts'] = array('prototype.js','url.js','dashboard.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -47,7 +47,8 @@ include_once "include/page_header.php";
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,			null),
-		
+
+		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL),
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 		'state'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
 	);
@@ -55,7 +56,6 @@ include_once "include/page_header.php";
 	check_fields($fields);
 	
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
-	
 // ACTION /////////////////////////////////////////////////////////////////////////////
 
 	if(isset($_REQUEST['favobj'])){
@@ -88,7 +88,12 @@ include_once "include/page_header.php";
 			if(in_array($_REQUEST['favid'],array('hat_syssum','hat_stszbx','hat_lastiss','hat_webovr'))){
 				update_profile('web.dahsboard.rf_rate.'.$_REQUEST['favid'],$_REQUEST['favcnt']);
 				$_REQUEST['favcnt'] = get_profile('web.dahsboard.rf_rate.'.$_REQUEST['favid'],60);
-				echo get_refresh_obj_script($_REQUEST['favid'],$_REQUEST['favcnt']);
+
+				echo get_refresh_obj_script(
+						array(
+								'id'=>			$_REQUEST['favid'], 
+								'interval'=>	$_REQUEST['favcnt']
+						));
 				
 				$menu = array();
 				$submenu = array();
@@ -98,74 +103,35 @@ include_once "include/page_header.php";
 				echo 'dashboard_menu["menu_'.$_REQUEST['favid'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favid']]).';';
 			}
 		}
-//SDI()
+
 		if(in_array($_REQUEST['favobj'],array('simple_graph','graphs'))){
 			$result = false;
-			if($_REQUEST['action'] == 'add'){
-				$graphids = get_profile('web.favorite.graphids',array());
-				$graph_rsrc = get_profile('web.favorite.graph_rsrc',array());
-				
-				$graphids[] = $_REQUEST['favid'];
-				$graph_rsrc[] = ($_REQUEST['favobj'] == 'graphs')?'graphs':'simple_graph';
-				
-				$result = update_profile('web.favorite.graphids',$graphids);
-				$result &= update_profile('web.favorite.graph_rsrc',$graph_rsrc);
+			if('add' == $_REQUEST['action']){
+				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 			}
-			else if($_REQUEST['action'] == 'remove'){
-				$graphids = get_profile('web.favorite.graphids',array());
-				$graph_rsrc = get_profile('web.favorite.graph_rsrc',array());
-				
-				$favcnt = (isset($_REQUEST['favcnt']))?$_REQUEST['favcnt']:0;
-				foreach($graphids as $key => $value){
-					if(($_REQUEST['favid'] == $value) && ($graph_rsrc[$key] == $_REQUEST['favobj'])){
-						if($favcnt < 1){
-							unset($graphids[$key]);
-							unset($graph_rsrc[$key]);
-							break;
-						}
-					}
-					$favcnt--;
-				}
-				
-				$result = update_profile('web.favorite.graphids',$graphids);
-				$result &= update_profile('web.favorite.graph_rsrc',$graph_rsrc);
+			else if('remove' == $_REQUEST['action']){
+				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],get_request('favcnt',0),$_REQUEST['favobj']);
 			}
-			
-			
+
 			if((PAGE_TYPE_JS == $page['type']) && $result){
 				$innerHTML = make_favorite_graphs($available_hosts);
 				$innerHTML = $innerHTML->toString();
-				echo '$("hat_favgrph").update('.zbx_jsvalue($innerHTML).');';
+				print('$("hat_favgrph").update('.zbx_jsvalue($innerHTML).');');
 				
 				$menu = array();
 				$submenu = array();
-				echo 'dashboard_submenu["menu_graphs"] = '.zbx_jsvalue(make_graph_submenu()).';';
+				print('dashboard_submenu["menu_graphs"] = '.zbx_jsvalue(make_graph_submenu()).';');
 			}
 		}
+		
 		if('sysmaps' == $_REQUEST['favobj']){
 			$result = false;
-			if($_REQUEST['action'] == 'add'){
-				$sysmapids = get_profile('web.favorite.sysmapids',array());
-				$sysmapids[] = $_REQUEST['favid'];
-
-				$result = update_profile('web.favorite.sysmapids',$sysmapids);
+			if('add' == $_REQUEST['action']){
+				$result = add2favorites('web.favorite.sysmapids',$_REQUEST['favid'],$_REQUEST['favobj']);
 			}
-			else if($_REQUEST['action'] == 'remove'){
-				$sysmapids = get_profile('web.favorite.sysmapids',array());
-				
-				$favcnt = (isset($_REQUEST['favcnt']))?$_REQUEST['favcnt']:0;
-				foreach($sysmapids as $key => $value){
-					if($_REQUEST['favid'] == $value){
-						if($favcnt < 1){
-							unset($sysmapids[$key]);
-							break;
-						}
-					}
-					$favcnt--;
-				}
-				$result = update_profile('web.favorite.sysmapids',$sysmapids);
-			}
-			
+			else if('remove' == $_REQUEST['action']){
+				$result = rm4favorites('web.favorite.sysmapids',$_REQUEST['favid'],get_request('favcnt',0),$_REQUEST['favobj']);
+			}			
 			
 			if((PAGE_TYPE_JS == $page['type']) && $result){
 				$innerHTML = make_favorite_maps();
@@ -179,43 +145,20 @@ include_once "include/page_header.php";
 		}
 		if(in_array($_REQUEST['favobj'],array('screens','slides'))){
 			$result = false;
-			if($_REQUEST['action'] == 'add'){
+			if('add' == $_REQUEST['action']){
 				$perm = ('screens' == $_REQUEST['favobj'])?
 					screen_accessiable($_REQUEST['favid'], PERM_READ_ONLY):
 					slideshow_accessiable($_REQUEST['favid'], PERM_READ_ONLY);
 					
 				if($perm){
-					$screenids = get_profile('web.favorite.screenids',array());
-					$screen_rsrc = get_profile('web.favorite.screen_rsrc',array());
-
-					$screenids[] = $_REQUEST['favid'];
-					$screen_rsrc[] = $_REQUEST['favobj'];
-					
-					$result = update_profile('web.favorite.screenids',$screenids);
-					$result &= update_profile('web.favorite.screen_rsrc',$screen_rsrc);
+					$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
 				}
 			}
-			else if($_REQUEST['action'] == 'remove'){
-				$screenids = get_profile('web.favorite.screenids',array());
-				$screen_rsrc = get_profile('web.favorite.screen_rsrc',array());
-				
-				$favcnt = (isset($_REQUEST['favcnt']))?$_REQUEST['favcnt']:0;
-				foreach($screenids as $key => $value){
-					if(($_REQUEST['favid'] == $value) && ($screen_rsrc[$key] == $_REQUEST['favobj'])){
-						if($favcnt < 1){
-							unset($screenids[$key]);
-							unset($screen_rsrc[$key]);
-							break;
-						}
-					}
-					$favcnt--;
-				}
-								
-				$result = update_profile('web.favorite.screenids',$screenids);
-				$result &= update_profile('web.favorite.screen_rsrc',$screen_rsrc);
-			}
+			else if('remove' == $_REQUEST['action']){
+				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],get_request('favcnt',0),$_REQUEST['favobj']);
+			}			
 			
-			if(PAGE_TYPE_JS == $page['type']){
+			if(PAGE_TYPE_JS == $page['type'] && $result){
 				$innerHTML = make_favorite_screens();
 				$innerHTML = $innerHTML->toString();
 				echo '$("hat_favscr").update('.zbx_jsvalue($innerHTML).');';
@@ -275,7 +218,7 @@ include_once "include/page_header.php";
 	
 // --------------
 
-	$graph_menu = new CDiv(SPACE,'menuplus');
+	$graph_menu = new CDiv(SPACE,'iconmenu');
 	$graph_menu->AddAction('onclick','javascript: create_menu(event,"graphs");');
 	
 	$left_tab->AddRow(create_hat(
@@ -286,7 +229,7 @@ include_once "include/page_header.php";
 			get_profile('web.dashboard.hats.hat_favgrph.state',1)
 		));
 		
-	$sysmap_menu = new CDiv(SPACE,'menuplus');
+	$sysmap_menu = new CDiv(SPACE,'iconmenu');
 	$sysmap_menu->AddAction('onclick','javascript: create_menu(event,"sysmaps");');
 		
 	$left_tab->AddRow(create_hat(
@@ -297,7 +240,7 @@ include_once "include/page_header.php";
 			get_profile('web.dashboard.hats.hat_favmap.state',1)
 		));
 		
-	$screen_menu = new CDiv(SPACE,'menuplus');
+	$screen_menu = new CDiv(SPACE,'iconmenu');
 	$screen_menu->AddAction('onclick','javascript: create_menu(event,"screens");');
 
 	$left_tab->AddRow(create_hat(
@@ -337,7 +280,7 @@ include_once "include/page_header.php";
 	);
 	add_refresh_objects($refresh_tab);
 
-	$refresh_menu = new CDiv(SPACE,'menuplus');
+	$refresh_menu = new CDiv(SPACE,'iconmenu');
 	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_syssum");');
 
 	$right_tab->AddRow(create_hat(
@@ -348,7 +291,7 @@ include_once "include/page_header.php";
 			get_profile('web.dashboard.hats.hat_syssum.state',1)
 		));
 
-	$refresh_menu = new CDiv(SPACE,'menuplus');
+	$refresh_menu = new CDiv(SPACE,'iconmenu');
 	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_stszbx");');
 
 		
@@ -360,7 +303,7 @@ include_once "include/page_header.php";
 			get_profile('web.dashboard.hats.hat_stszbx.state',1)
 		));
 		
-	$refresh_menu = new CDiv(SPACE,'menuplus');
+	$refresh_menu = new CDiv(SPACE,'iconmenu');
 	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_lastiss");');
 		
 	$right_tab->AddRow(create_hat(S_LATEST_ISSUES,
@@ -370,7 +313,7 @@ include_once "include/page_header.php";
 			get_profile('web.dashboard.hats.hat_lastiss.state',1)
 		));
 		
-	$refresh_menu = new CDiv(SPACE,'menuplus');
+	$refresh_menu = new CDiv(SPACE,'iconmenu');
 	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_webovr");');
 
 	$right_tab->AddRow(create_hat(
