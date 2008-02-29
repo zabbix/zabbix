@@ -152,8 +152,8 @@ static	ZBX_TABLE	tables[]={
 
 %sqlite=("t_bigint"	=>	"bigint",
 	"database"	=>	"sqlite",
-	"before"	=>	"begin transaction;\n",
-	"after"		=>	"commit;\n",
+	"before"	=>	"BEGIN TRANSACTION;\n\n",
+	"after"		=>	"COMMIT;\n",
 	"type"		=>	"sql",
 	"t_id"		=>	"bigint",
 	"t_integer"	=>	"integer",
