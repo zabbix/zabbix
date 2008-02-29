@@ -177,6 +177,7 @@ include/zbxodbc.h -text
 m4/libiodbc.m4 -text
 m4/libunixodbc.m4 -text
 misc/clock/clock.fla -text
+misc/conf/zabbix_proxy.conf -text
 misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
