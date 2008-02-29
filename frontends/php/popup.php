@@ -1066,6 +1066,9 @@ include_once "include/page_header.php";
 
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
+		
+			if(!sysmap_accessiable($row["sysmapid"],PERM_READ_ONLY)) continue;
+			
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 			$name = $row['node_name'].$row['name'];
 

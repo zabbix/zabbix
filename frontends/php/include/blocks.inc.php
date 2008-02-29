@@ -166,7 +166,7 @@ function make_favorite_graphs($available_hosts=false){
 	}
 	
 	$table = new CTableInfo();
-	
+
 	$fav_graphs = get4favorites('web.favorite.graphids');
 	
 	foreach($fav_graphs['id'] as $key => $resourceid){
@@ -201,7 +201,11 @@ function make_favorite_graphs($available_hosts=false){
 			$capt)
 		));
 	}
-	$table->SetFooter(new CCol(new CLink(S_SHOW.SPACE.S_GRAPHS,'charts.php','link')));
+	$td = new CCol(array(new CButton(S_GRAPHS,S_GRAPHS,"javascript: location.href = 'charts.php'; return false;")));
+	$td->AddOption('style','text-align: right;');
+
+	$table->SetFooter($td);
+	
 return $table;
 }
 
@@ -236,7 +240,12 @@ function make_favorite_screens(){
 			$capt)
 		));
 	}
-	$table->SetFooter(new CCol(new CLink(S_SHOW.SPACE.S_SCREENS,'screens.php','link')));
+	
+	$td = new CCol(array(new CButton(S_SCREENS,S_SCREENS,"javascript: location.href = 'screens.php'; return false;")));
+	$td->AddOption('style','text-align: right;');
+
+	$table->SetFooter($td);
+
 return $table;
 }
 
@@ -261,7 +270,12 @@ function make_favorite_maps(){
 			$capt)
 		));
 	}
-	$table->SetFooter(new CCol(new CLink(S_SHOW.SPACE.S_MAPS,'maps.php','link')));
+	
+	$td = new CCol(array(new CButton(S_MAPS,S_MAPS,"javascript: location.href = 'maps.php'; return false;")));
+	$td->AddOption('style','text-align: right;');
+
+	$table->SetFooter($td);
+
 return $table;
 }
 
