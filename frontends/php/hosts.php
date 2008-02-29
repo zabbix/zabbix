@@ -197,7 +197,7 @@ include_once "include/page_header.php";
 
 			$result = update_host($_REQUEST["hostid"],
 				$_REQUEST["host"],$_REQUEST["port"],$_REQUEST["status"],$useip,$_REQUEST["dns"],
-				$_REQUEST["ip"],$templates,$_REQUEST["newgroup"],$groups);
+				$_REQUEST["ip"],$_REQUEST["proxyid"],$templates,$_REQUEST["newgroup"],$groups);
 
 			$msg_ok 	= S_HOST_UPDATED;
 			$msg_fail 	= S_CANNOT_UPDATE_HOST;
@@ -207,7 +207,7 @@ include_once "include/page_header.php";
 		} else {
 			$hostid = add_host(
 				$_REQUEST["host"],$_REQUEST["port"],$_REQUEST["status"],$useip,$_REQUEST["dns"],
-				$_REQUEST["ip"],$templates,$_REQUEST["newgroup"],$groups);
+				$_REQUEST["ip"],$_REQUEST["proxyid"],$templates,$_REQUEST["newgroup"],$groups);
 
 			$msg_ok 	= S_HOST_ADDED;
 			$msg_fail 	= S_CANNOT_ADD_HOST;
