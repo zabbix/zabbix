@@ -131,6 +131,7 @@
 							0, /* useip */
 							"", /* dns */
 							"", /* ip */
+							0,
 							array(),
 							null,
 							array());
@@ -193,9 +194,10 @@
 					if(!isset($data['useip']))	$data['useip'] = 0;
 					if(!isset($data['dns']))	$data['dns'] = "";
 					if(!isset($data['ip']))		$data['ip'] = "";
+					if(!isset($data['proxyid']))	$data['proxyid'] = "";
 
 					if(update_host($data['hostid'], $data['name'], $data['port'], $data['status'],
-						$data['useip'], $data['dns'], $data['ip'], $data['templates'], null, $data['groups']))
+						$data['useip'], $data['dns'], $data['ip'], $data['proxyid'], $data['templates'], null, $data['groups']))
 					{
 						info('Host ['.$data['name'].'] updated');
 					}
