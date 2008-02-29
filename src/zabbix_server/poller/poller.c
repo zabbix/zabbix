@@ -604,7 +604,7 @@ void main_poller_loop(zbx_process_t p, int type, int num)
 
 		nextcheck = get_minnextcheck(now);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Poller spent %f seconds while updating %3d values. Nextcheck: %d Time: %d",
+		zabbix_log(LOG_LEVEL_DEBUG, "Poller spent " ZBX_FS_DBL " seconds while updating %3d values. Nextcheck: %d Time: %d",
 				sec,
 				items,
 				nextcheck,

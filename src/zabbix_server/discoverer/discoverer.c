@@ -31,7 +31,10 @@
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
 
-int	discoverer_num;
+#define DISCOVERER_DELAY 600
+
+static zbx_process_t	zbx_process;
+int			discoverer_num;
 
 /******************************************************************************
  *                                                                            *
@@ -347,6 +350,28 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 	zabbix_log(LOG_LEVEL_DEBUG, "End register_host()");
 }
 
+static void proxy_resigter_dhistory(int now, zbx_uint64_t druleid, int type, const char *ip, int port, const char *key, const char *value, int status)
+{
+	char	ip_esc[MAX_STRING_LEN],
+		key_esc[MAX_STRING_LEN],
+		value_esc[MAX_STRING_LEN];
+
+	DBescape_string(ip, ip_esc, sizeof(ip_esc));
+	DBescape_string(key, key_esc, sizeof(key_esc));
+	DBescape_string(value, value_esc, sizeof(value_esc));
+
+	DBexecute("insert into proxy_dhistory (clock,druleid,type,ip,port,key_,value,status)"
+			"values (%d," ZBX_FS_UI64 ",%d,'%s',%d,'%s','%s',%d)",
+			now,
+			druleid,
+			type,
+			ip_esc,
+			port,
+			key_esc,
+			value_esc,	
+			status);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: update_service                                                   *
@@ -377,62 +402,75 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 		port,
 		(check->status==DOBJECT_STATUS_UP?"up":"down"));
 
-	service.dserviceid=0;
-
-	/* Register host if is not registered yet */
-	register_host(&host,check,rule->druleid,ip);
-
-	if(host.dhostid>0)
-	{
-		/* Register service if is not registered yet */
-/*		dserviceid = register_service(rule,check,host.dhostid,ip,port);*/
-		register_service(&service,rule,check,host.dhostid,ip,port);
-	}
-
-	if(service.dserviceid == 0)
-	{
-		/* Service wasn't registered because we do not add down service */
-		return;
-	}
-
 	now = time(NULL);
-	if(check->status == DOBJECT_STATUS_UP)
+
+	if (zbx_process == ZBX_PROCESS_SERVER)
 	{
-		/* Update host status */
-		if(host.status == DOBJECT_STATUS_DOWN || host.lastup==0)
+		service.dserviceid=0;
+
+		/* Register host if is not registered yet */
+		register_host(&host,check,rule->druleid,ip);
+
+		if(host.dhostid>0)
 		{
-			host.status=DOBJECT_STATUS_UP;
-			host.lastdown=0;
-			host.lastup=now;
-			update_dhost(&host);
+			/* Register service if is not registered yet */
+			/*dserviceid = register_service(rule,check,host.dhostid,ip,port);*/
+			register_service(&service,rule,check,host.dhostid,ip,port);
 		}
-		/* Update service status */
-		if(service.status == DOBJECT_STATUS_DOWN || service.lastup==0)
+
+		if(service.dserviceid == 0)
 		{
-			service.status=DOBJECT_STATUS_UP;
-			service.lastdown=0;
-			service.lastup=now;
-			update_dservice(&service);
+			/* Service wasn't registered because we do not add down service */
+			return;
+		}
+
+		if(check->status == DOBJECT_STATUS_UP)
+		{
+			/* Update host status */
+			if(host.status == DOBJECT_STATUS_DOWN || host.lastup==0)
+			{
+				host.status=DOBJECT_STATUS_UP;
+				host.lastdown=0;
+				host.lastup=now;
+				update_dhost(&host);
+			}
+			/* Update service status */
+			if(service.status == DOBJECT_STATUS_DOWN || service.lastup==0)
+			{
+				service.status=DOBJECT_STATUS_UP;
+				service.lastdown=0;
+				service.lastup=now;
+				update_dservice(&service);
+			}
+		}
+		/* DOBJECT_STATUS_DOWN */
+		else
+		{
+			if(host.status == DOBJECT_STATUS_UP || host.lastdown==0)
+			{
+				host.status=DOBJECT_STATUS_DOWN;
+				host.lastdown=now;
+				host.lastup=0;
+				update_dhost(&host);
+			}
+			/* Update service status */
+			if(service.status == DOBJECT_STATUS_UP || service.lastdown==0)
+			{
+				service.status=DOBJECT_STATUS_DOWN;
+				service.lastdown=now;
+				service.lastup=0;
+				update_dservice(&service);
+			}
 		}
 	}
-	/* DOBJECT_STATUS_DOWN */
+	else if (zbx_process == ZBX_PROCESS_PROXY)
+	{
+		proxy_resigter_dhistory(now, rule->druleid, check->type, ip, port, check->key_, check->value, check->status);
+	}
 	else
 	{
-		if(host.status == DOBJECT_STATUS_UP || host.lastdown==0)
-		{
-			host.status=DOBJECT_STATUS_DOWN;
-			host.lastdown=now;
-			host.lastup=0;
-			update_dhost(&host);
-		}
-		/* Update service status */
-		if(service.status == DOBJECT_STATUS_UP || service.lastdown==0)
-		{
-			service.status=DOBJECT_STATUS_DOWN;
-			service.lastdown=now;
-			service.lastup=0;
-			update_dservice(&service);
-		}
+		zabbix_log(LOG_LEVEL_CRIT, "Invalid process type");
+		exit(FAIL);
 	}
 
 	add_service_event(&service);
@@ -821,10 +859,11 @@ static void process_rule(DB_DRULE *rule)
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Discovery: process_rule() [IP:%s]", ip);
 
-			result = DBselect("select dcheckid,druleid,type,key_,snmp_community,ports from dchecks where druleid=" ZBX_FS_UI64,
-				rule->druleid);
-			while((row=DBfetch(result)))
-			{
+			result = DBselect("select dcheckid,druleid,type,key_,snmp_community,ports"
+					" from dchecks where druleid=" ZBX_FS_UI64,
+					rule->druleid);
+
+			while (NULL != (row = DBfetch(result))) {
 				memset(&check, 0, sizeof(DB_RESULT));
 
 				ZBX_STR2UINT64(check.dcheckid,row[0]);
@@ -838,11 +877,72 @@ static void process_rule(DB_DRULE *rule)
 			}
 			DBfree_result(result);
 
-			add_host_event(ip);
+			if (zbx_process == ZBX_PROCESS_SERVER) 
+				add_host_event(ip);
 		}
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End process_rule()");
+}
+
+static void process_discovery(int now)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_DRULE	rule;
+
+	result = DBselect("select druleid,iprange,delay,nextcheck,name,status from drules"
+			" where proxyid=0 and status=%d and (nextcheck<=%d or nextcheck>%d+delay)"
+			" and " ZBX_SQL_MOD(druleid,%d) "=%d" DB_NODE,
+			DRULE_STATUS_MONITORED,
+			now,
+			now,
+			CONFIG_DISCOVERER_FORKS,
+			discoverer_num - 1,
+			DBnode_local("druleid"));
+
+	while (NULL != (row = DBfetch(result))) {
+		memset(&rule, 0, sizeof(DB_DRULE));
+
+		ZBX_STR2UINT64(rule.druleid,row[0]);
+		rule.iprange 	= row[1];
+		rule.delay	= atoi(row[2]);
+		rule.nextcheck	= atoi(row[3]);
+		rule.name	= row[4];
+		rule.status	= atoi(row[5]);
+
+		process_rule(&rule);
+
+		DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64,
+				now + rule.delay,
+				rule.druleid);
+	}
+	DBfree_result(result);
+}
+
+static int get_minnextcheck(int now)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		res = FAIL;
+
+	result = DBselect("select count(*),min(nextcheck) from drules where proxyid=0 and status=%d"
+			" and " ZBX_SQL_MOD(druleid,%d) "=%d" DB_NODE,
+			DRULE_STATUS_MONITORED,
+			CONFIG_DISCOVERER_FORKS,
+			discoverer_num - 1,
+			DBnode_local("druleid"));
+
+	row = DBfetch(result);
+
+	if (NULL == row || DBis_null(row[0]) == SUCCEED || DBis_null(row[1]) == SUCCEED)
+		zabbix_log(LOG_LEVEL_DEBUG, "No items to update for minnextcheck.");
+	else if (0 != atoi(row[0]))
+		res = atoi(row[1]);
+
+	DBfree_result(result);
+
+	return res;
 }
 
 /******************************************************************************
@@ -860,13 +960,11 @@ static void process_rule(DB_DRULE *rule)
  * Comments: executes once per 30 seconds (hardcoded)                         *
  *                                                                            *
  ******************************************************************************/
-void main_discoverer_loop(int num)
+void main_discoverer_loop(zbx_process_t p, int num)
 {
 	struct		sigaction phan;
-	int		now;
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_DRULE	rule;
+	int		now, nextcheck, sleeptime;
+	double		sec;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In main_discoverer_loop(num:%d)",
 			num);
@@ -876,38 +974,44 @@ void main_discoverer_loop(int num)
 	phan.sa_flags = 0;
 	sigaction(SIGALRM, &phan, NULL);
 
-	discoverer_num = num;
+	zbx_process	= p;
+	discoverer_num	= num;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for(;;) {
 		now = time(NULL);
+		sec = zbx_time();
 
-		result = DBselect("select druleid,iprange,delay,nextcheck,name,status from drules"
-				" where proxyid=0 and status=%d and nextcheck<=%d"
-				" and " ZBX_SQL_MOD(druleid,%d) "=%d" DB_NODE,
-				DRULE_STATUS_MONITORED,
-				now,
-				CONFIG_DISCOVERER_FORKS,
-				discoverer_num - 1,
-				DBnode_local("druleid"));
+		process_discovery(now);
 
-		while (NULL != (row = DBfetch(result))) {
-			memset(&rule, 0, sizeof(DB_DRULE));
+		sec = zbx_time() - sec;
 
-			ZBX_STR2UINT64(rule.druleid,row[0]);
-			rule.iprange 	= row[1];
-			rule.delay	= atoi(row[2]);
-			rule.nextcheck	= atoi(row[3]);
-			rule.name	= row[4];
-			rule.status	= atoi(row[5]);
+		nextcheck = get_minnextcheck(now);
 
-			process_rule(&rule);
-		}
-		DBfree_result(result);
+		now = time(NULL);
+		zabbix_log(LOG_LEVEL_DEBUG, "Discoverer spent %f seconds while processing rules. Nextcheck: %d Time: %d",
+				sec,
+				nextcheck,
+				now);
 
-		zbx_setproctitle("sleeping for 30 sec");
+		if (FAIL == nextcheck)
+			sleeptime = DISCOVERER_DELAY;
+		else
+			sleeptime = nextcheck - now;
 
-		sleep(30);
+		if (sleeptime > 0) {
+			if (sleeptime > DISCOVERER_DELAY)
+				sleeptime = DISCOVERER_DELAY;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
+					sleeptime);
+
+			zbx_setproctitle("discoverer [sleeping for %d seconds]", 
+					sleeptime);
+
+			sleep( sleeptime );
+		} else
+			zabbix_log(LOG_LEVEL_DEBUG, "No sleeping" );
 	}
 }
