@@ -65,7 +65,7 @@ void	DCsync()
 	ZBX_DC_TREND	*trend;
 	char		value_esc[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_WARNING,"In DCsync(items %d pool:trends %d pool:history:%d)",
+	zabbix_log(LOG_LEVEL_DEBUG,"In DCsync(items %d pool:trends %d pool:history:%d)",
 		cache->items_count,
 		cache->pool.trends_count,
 		cache->pool.history_count);
