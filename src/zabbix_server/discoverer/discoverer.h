@@ -20,8 +20,10 @@
 #ifndef ZABBIX_DISCOVERER_H
 #define ZABBIX_DISCOVERER_H
 
+#include "common.h"
+
 extern	int	CONFIG_DISCOVERER_FORKS;
 
-void	main_discoverer_loop(int num);
+void	main_discoverer_loop(zbx_process_t p, int num);
 
 #endif
