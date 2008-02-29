@@ -231,6 +231,18 @@ FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_history_text	|''	|NOT NULL	|0
 INDEX		|1		|itemid,clock
 
+TABLE|proxy_dhistory|id|0
+FIELD		|id		|t_serial	|	|NOT NULL	|0
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|druleid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
+FIELD		|port		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|key_		|t_varchar(255)	|'0'	|NOT NULL	|0
+FIELD		|value		|t_varchar(255)	|'0'	|NOT NULL	|0
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|clock
+
 TABLE|events|eventid|ZBX_HISTORY
 FIELD		|eventid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|source		|t_integer	|'0'	|NOT NULL	|0
