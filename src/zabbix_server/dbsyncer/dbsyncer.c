@@ -44,30 +44,27 @@
 int main_dbsyncer_loop()
 {
 	int	now;
-	struct timeval from;
-	struct timeval to;
+	double	sec;
 
-	zbx_setproctitle("connecting to the database");
+	zbx_setproctitle("db syncer [connecting to the database]");
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for(;;)
-	{
-		now  = time(NULL);
+	for (;;) {
+		zabbix_log(LOG_LEVEL_DEBUG, "Syncing ...");
 
-		zabbix_log( LOG_LEVEL_WARNING, "Syncing ...");
-
-
-		gettimeofday(&from, NULL);
+		now = time(NULL);
+		sec = zbx_time();
 
 		DCsync();
 
-		gettimeofday(&to, NULL);
-		zabbix_log( LOG_LEVEL_WARNING, "Spent " ZBX_FS_DBL " sec",
-			time_diff(&from,&to));
+		zabbix_log(LOG_LEVEL_DEBUG, "Spent " ZBX_FS_DBL " sec",
+				zbx_time() - sec);
 
-		zbx_setproctitle("sender [sleeping for %d seconds]",
-			CONFIG_DBSYNCER_FREQUENCY);
+		zbx_setproctitle("db syncer [sleeping for %d seconds]",
+				CONFIG_DBSYNCER_FREQUENCY);
+		zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
+				CONFIG_DBSYNCER_FREQUENCY);
 
 		sleep(CONFIG_DBSYNCER_FREQUENCY);
 	}
