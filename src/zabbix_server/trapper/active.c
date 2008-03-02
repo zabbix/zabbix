@@ -140,14 +140,13 @@ int	send_list_of_active_checks(zbx_sock_t *sock, const char *host)
 int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *json)
 {
 	char	host[MAX_STRING_LEN];
-	char	s[MAX_STRING_LEN];
 	const	char *pf;
 	DB_RESULT result;
 	DB_ROW	row;
 
 	struct zbx_json response;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In send_list_of_active_checks()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In send_list_of_active_checks_json()");
 
 	if (NULL == (pf = zbx_json_pair_by_name(json, ZBX_PROTO_TAG_HOST)) ||
 			NULL == (pf = zbx_json_decodevalue(pf, host, sizeof(host))))
@@ -157,7 +156,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jso
 		return FAIL;
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "Host:%s", host);
+	zabbix_log( LOG_LEVEL_DEBUG, "Host:%s", host);
 
 	if (0 != CONFIG_REFRESH_UNSUPPORTED) {
 		result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h"
