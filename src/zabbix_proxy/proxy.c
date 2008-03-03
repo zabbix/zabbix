@@ -128,8 +128,8 @@ int	CONFIG_TRAPPER_TIMEOUT		= TRAPPER_TIMEOUT;
 /*int	CONFIG_NOTIMEWAIT		= 0;*/
 int	CONFIG_DISABLE_HOUSEKEEPING	= 0;
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1; /* h */
-int	CONFIG_PROXY_LOCAL_BUFFER	= 24; /* 24h */
-int	CONFIG_PROXY_OFFLINE_BUFFER	= 720; /* 720h */
+int	CONFIG_PROXY_LOCAL_BUFFER	= 0; /* 24h */
+int	CONFIG_PROXY_OFFLINE_BUFFER	= 1; /* 720h */
 
 int	CONFIG_PROXYCONFIG_FREQUENCY    = 120;
 
@@ -157,7 +157,7 @@ int	CONFIG_DBPORT			= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 
 char	*CONFIG_SERVER			= NULL;
-int	CONFIG_SERVER_PORT		= 10050;
+int	CONFIG_SERVER_PORT		= 10051;
 char	*CONFIG_HOSTNAME		= NULL;
 int	CONFIG_NODEID			= -1;
 int	CONFIG_MASTER_NODEID		= 0;
@@ -192,12 +192,15 @@ ZBX_MUTEX	node_sync_access;
  ******************************************************************************/
 void	init_config(void)
 {
+	AGENT_RESULT	result;
+	char		**value = NULL;
+
 	static struct cfg_line cfg[]=
 	{
 /*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
 		{"Server",&CONFIG_SERVER,0,TYPE_STRING,PARM_MAND,0,0},
-		{"ServerPort",&CONFIG_SERVER_PORT,0,TYPE_INT,PARM_MAND,1024,32768},
-		{"Hostname",&CONFIG_HOSTNAME,0,TYPE_STRING,PARM_MAND,0,0},
+		{"ServerPort",&CONFIG_SERVER_PORT,0,TYPE_INT,PARM_OPT,1024,32768},
+		{"Hostname",&CONFIG_HOSTNAME,0,TYPE_STRING,PARM_OPT,0,0},
 
 		{"StartDiscoverers",&CONFIG_DISCOVERER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
 		{"StartHTTPPollers",&CONFIG_HTTPPOLLER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
@@ -206,12 +209,13 @@ void	init_config(void)
 		{"StartPollersUnreachable",&CONFIG_UNREACHABLE_POLLER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
 		{"StartTrappers",&CONFIG_TRAPPERD_FORKS,0,TYPE_INT,PARM_OPT,0,255},
 
-		{"DisableHousekeeping",&CONFIG_DISABLE_HOUSEKEEPING,0,TYPE_INT,PARM_OPT,0,1},
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
-		{"ProxyLocalBuffer",&CONFIG_PROXY_LOCAL_BUFFER,0,TYPE_INT,PARM_OPT,1,720},
+		{"ProxyLocalBuffer",&CONFIG_PROXY_LOCAL_BUFFER,0,TYPE_INT,PARM_OPT,0,720},
 		{"ProxyOfflineBuffer",&CONFIG_PROXY_OFFLINE_BUFFER,0,TYPE_INT,PARM_OPT,1,720},
 
-		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},
+		{"DataSenderFrequency",&CONFIG_DATASENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,1,3600},
+
+/*		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},*/
 		{"PingerFrequency",&CONFIG_PINGER_FREQUENCY,0,TYPE_INT,PARM_OPT,1,3600},
 		{"FpingLocation",&CONFIG_FPING_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
 #ifdef HAVE_IPV6
@@ -230,7 +234,7 @@ void	init_config(void)
 		{"PidFile",&APP_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFileSize",&CONFIG_LOG_FILE_SIZE,0,TYPE_INT,PARM_OPT,0,1024},
-		{"AlertScriptsPath",&CONFIG_ALERT_SCRIPTS_PATH,0,TYPE_STRING,PARM_OPT,0,0},
+/*		{"AlertScriptsPath",&CONFIG_ALERT_SCRIPTS_PATH,0,TYPE_STRING,PARM_OPT,0,0},*/
 		{"ExternalScripts",&CONFIG_EXTERNALSCRIPTS,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBHost",&CONFIG_DBHOST,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBName",&CONFIG_DBNAME,0,TYPE_STRING,PARM_MAND,0,0},
@@ -243,9 +247,25 @@ void	init_config(void)
 
 	CONFIG_SERVER_STARTUP_TIME = time(NULL);
 
-
 	parse_cfg_file(CONFIG_FILE,cfg);
 
+	if(CONFIG_HOSTNAME == NULL)
+	{
+	  	if(SUCCEED == process("system.hostname", 0, &result))
+		{
+			if( NULL != (value = GET_STR_RESULT(&result)) )
+			{
+				CONFIG_HOSTNAME = strdup(*value);
+			}
+		}
+	        free_result(&result);
+
+		if(CONFIG_HOSTNAME == NULL)
+		{
+			zabbix_log( LOG_LEVEL_CRIT, "Hostname is not defined");
+			exit(1);
+		}
+	}
 	if(CONFIG_DBNAME == NULL)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "DBName not in config file");

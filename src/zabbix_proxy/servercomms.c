@@ -95,7 +95,7 @@ void	disconnect_server(zbx_sock_t *sock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_data_from_server(zbx_sock_t *sock, /*const char *name, */const char *request, char **data)
+int	get_data_from_server(zbx_sock_t *sock, const char *request, char **data)
 {
 	int		ret = FAIL;
 	struct zbx_json	j;
@@ -112,9 +112,6 @@ int	get_data_from_server(zbx_sock_t *sock, /*const char *name, */const char *req
 
 	if (FAIL == recv_data_from_server(sock, data))
 		goto exit;
-
-/*	zabbix_log (LOG_LEVEL_WARNING, "Received %s from server",
-		name);*/
 
 	ret = SUCCEED;
 exit:
@@ -139,9 +136,11 @@ exit:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	put_data_to_server(zbx_sock_t *sock, /*const char *name, */struct zbx_json *j, char **answer)
+int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j)
 {
-	int	ret = FAIL;
+	struct zbx_json_parse	jp;
+	int			ret = FAIL;
+	char			*answer, value[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In put_data_to_server() [datalen:%zd]",
 			j->buffer_size);
@@ -149,13 +148,22 @@ int	put_data_to_server(zbx_sock_t *sock, /*const char *name, */struct zbx_json *
 	if (FAIL == send_data_to_server(sock, j->buffer))
 		goto exit;
 
-	if (FAIL == recv_data_from_server(sock, answer))
+	if (FAIL == recv_data_from_server(sock, &answer))
 		goto exit;
 
-/*	zabbix_log(LOG_LEVEL_WARNING, "Received %s from server",
-			name);*/
+	if (FAIL == zbx_json_open(answer, &jp))
+		goto exit;
+
+	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)))
+		goto exit;
+
+	if (0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
+		goto exit;
 
 	ret = SUCCEED;
 exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of put_data_to_server():%s",
+			ret == SUCCEED ? "SUCCEED" : "FAIL");
+
 	return ret;
 }
