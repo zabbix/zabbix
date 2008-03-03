@@ -25,9 +25,7 @@
 #define ZBX_PROTO_TAG_CLOCK		"clock"
 #define ZBX_PROTO_TAG_DATA		"data"
 #define	ZBX_PROTO_TAG_DELAY		"delay"
-#define ZBX_PROTO_TAG_DISCOVERY_DATA	"discovery data"
 #define	ZBX_PROTO_TAG_DRULE		"drule"
-#define ZBX_PROTO_VALUE_HISTORY_DATA    "history data"
 #define ZBX_PROTO_TAG_HOST		"host"
 #define ZBX_PROTO_TAG_INFO		"info"
 #define ZBX_PROTO_TAG_IP		"ip"
@@ -49,6 +47,8 @@
 
 #define	ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS	"active checks"
 #define	ZBX_PROTO_VALUE_PROXY_CONFIG	"proxy config"
+#define ZBX_PROTO_VALUE_DISCOVERY_DATA	"discovery data"
+#define ZBX_PROTO_VALUE_HISTORY_DATA	"history data"
 #define	ZBX_PROTO_VALUE_SENDER_DATA	"sender data"
 
 typedef enum
