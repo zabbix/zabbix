@@ -36,7 +36,7 @@
 		define('ZBX_PAGE_NO_MENU', 1);
 	}
 
-	if(isset($_REQUEST['graphid']) && $_REQUEST['graphid'] > 0 && !isset($_REQUEST['period']) && !isset($_REQUEST['stime']))
+	if(isset($_REQUEST['graphid']) && $_REQUEST['graphid'] > 0 && !isset($_REQUEST['period']) && !isset($_REQUEST['stime']) && (PAGE_TYPE_HTML == $page['type']))
 	{
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}

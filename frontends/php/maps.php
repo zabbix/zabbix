@@ -24,13 +24,17 @@
 	$page["title"] = "S_NETWORK_MAPS";
 	$page["file"] = "maps.php";
 	$page['hist_arg'] = array('sysmapid');
-
-	if(isset($_REQUEST["fullscreen"]))
-	{
+	$page['scripts'] = array('prototype.js','url.js');
+	
+	if(isset($_REQUEST["fullscreen"])){
 		define('ZBX_PAGE_NO_MENU', 1);
 	}
 
-	define('ZBX_PAGE_DO_REFRESH', 1);
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+	
+	if(PAGE_TYPE_HTML == $page['type']){
+		define('ZBX_PAGE_DO_REFRESH', 1);
+	}
 	
 include_once "include/page_header.php";
 
@@ -39,13 +43,50 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"sysmapid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,		NULL),
-		"fullscreen"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1"),	NULL)
+		"fullscreen"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1"),	NULL),
+		
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+
+		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL)
 	);
 
 	check_fields($fields);
 
 ?>
 <?php
+	if(isset($_REQUEST['favobj'])){
+		if('sysmaps' == $_REQUEST['favobj']){
+			$result = false;
+			if('add' == $_REQUEST['action']){
+				$result = add2favorites('web.favorite.sysmapids',$_REQUEST['favid'],$_REQUEST['favobj']);
+				if($result){
+					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVORITES.'";'."\n");
+					print('$("addrm_fav").onclick = function(){rm4favorites("sysmaps","'.$_REQUEST['favid'].'",0);}'."\n");
+				}
+			}
+			else if('remove' == $_REQUEST['action']){
+				while(infavorites('web.favorite.sysmapids',$_REQUEST['favid'],$_REQUEST['favobj'])){
+					$result = rm4favorites('web.favorite.sysmapids',$_REQUEST['favid'],0,$_REQUEST['favobj']);
+				}
+				
+				if($result){
+					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVORITES.'";'."\n");
+					print('$("addrm_fav").onclick = function(){ add2favorites("sysmaps","'.$_REQUEST['favid'].'");}'."\n");
+				}
+			}
+			
+			if((PAGE_TYPE_JS == $page['type']) && $result){
+				print('switchElementsClass("addrm_fav","iconminus","iconplus");');
+			}
+		}
+	}	
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+	
 	$_REQUEST["sysmapid"] = get_request("sysmapid",get_profile("web.maps.sysmapid",0));
 
 	$all_maps = array();
@@ -86,8 +127,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$text = array(S_NETWORK_MAPS_BIG);
-	if(isset($_REQUEST["sysmapid"]))
-	{
+	if(isset($_REQUEST["sysmapid"])){
 		$sysmap = get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
 
 		$url = "maps.php?sysmapid=".$_REQUEST["sysmapid"];
@@ -95,6 +135,24 @@ include_once "include/page_header.php";
 			$url .= "&fullscreen=1";
 
 		array_push($text, nbsp(" / "), new CLink($all_maps[$_REQUEST["sysmapid"]],$url));
+		
+		if(infavorites('web.favorite.sysmapids',$_REQUEST['sysmapid'],'sysmaps')){
+			$icon = new CDiv(SPACE,'iconminus');
+			$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
+			$icon->AddAction('onclick',new CScript("javascript: rm4favorites('sysmaps','".$_REQUEST["sysmapid"]."',0);"));
+		}
+		else{
+			$icon = new CDiv(SPACE,'iconplus');
+			$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
+			$icon->AddAction('onclick',new CScript("javascript: add2favorites('sysmaps','".$_REQUEST["sysmapid"]."');"));
+		}
+		$icon->AddOption('id','addrm_fav');
+	
+		$icon_tab = new CTable();
+		$icon_tab->AddRow(array($icon,SPACE,$text));
+		
+		$text = $icon_tab;
+
 	}
 
 	$form = new CForm();

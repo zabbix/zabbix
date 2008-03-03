@@ -944,6 +944,7 @@
 	'S_FAVORITES'=>					'Favorites',
 	'S_EVERY'=>						'Every',
 	'S_REFRESHED'=>					'Refreshed',
+	'S_MENU'=>						'Menu',
 
 //	overview.php
 	'S_SELECT_GROUP_DOT_DOT_DOT'=>		'Select group ...',
