@@ -27,6 +27,7 @@
 #define	ZBX_PROTO_TAG_DELAY		"delay"
 #define ZBX_PROTO_TAG_DISCOVERY_DATA	"discovery data"
 #define	ZBX_PROTO_TAG_DRULE		"drule"
+#define ZBX_PROTO_VALUE_HISTORY_DATA    "history data"
 #define ZBX_PROTO_TAG_HOST		"host"
 #define ZBX_PROTO_TAG_INFO		"info"
 #define ZBX_PROTO_TAG_IP		"ip"
@@ -83,6 +84,7 @@ struct zbx_json_parse {
 char	*zbx_json_strerror(void);
 
 void	zbx_json_init(struct zbx_json *j, size_t allocate);
+void	zbx_json_clean(struct zbx_json *j);
 void	zbx_json_free(struct zbx_json *j);
 void	zbx_json_addobject(struct zbx_json *j, const char *name);
 void	zbx_json_addarray(struct zbx_json *j, const char *name);

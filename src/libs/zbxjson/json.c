@@ -79,6 +79,19 @@ void	zbx_json_init(struct zbx_json *j, size_t allocate)
 	zbx_json_addobject(j, NULL);
 }
 
+void	zbx_json_clean(struct zbx_json *j)
+{
+	assert(j);
+
+	j->buffer_offset = 0;
+	j->buffer_size = 0;
+	j->status = ZBX_JSON_EMPTY;
+	j->level = 0;
+	*j->buffer = '\0';
+
+	zbx_json_addobject(j, NULL);
+}
+
 void	zbx_json_free(struct zbx_json *j)
 {
 	assert(j);
