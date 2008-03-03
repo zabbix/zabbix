@@ -189,7 +189,6 @@ int	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
 	char		hostname[MAX_STRING_LEN],
 			host_esc[MAX_STRING_LEN];
-	const char	*p;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	proxyid;
@@ -198,10 +197,7 @@ int	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_proxyconfig()");
 
-	if (NULL == (p = zbx_json_pair_by_name(jp, "host")))
-		return res;
-
-	if (NULL == zbx_json_decodevalue(p, hostname, sizeof(hostname)))
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, hostname, sizeof(hostname)))
 		return res;
 
 	DBescape_string(hostname, host_esc, MAX_STRING_LEN);
@@ -224,7 +220,10 @@ int	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 						zbx_tcp_strerror());
 		}
 		zbx_json_free(&j);
+	} else {
+		zabbix_log(LOG_LEVEL_WARNING, "Unknown hostname \"%s\"", hostname);
 	}
+
 	DBfree_result(result);
 
 	return res;
