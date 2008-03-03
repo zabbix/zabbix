@@ -62,12 +62,10 @@ include_once "include/page_header.php";
 	$services = array();
 	$discovery_info = array();
 
-	while($drule_data = DBfetch($db_dhosts))
-	{
+	while($drule_data = DBfetch($db_dhosts)){
 		$class = 'enabled';
 		$time = 'lastup';
-		if(DHOST_STATUS_DISABLED == $drule_data['status'])
-		{
+		if(DHOST_STATUS_DISABLED == $drule_data['status']){
 			$class = 'disabled';
 			$time = 'lastdown';
 		}
@@ -77,13 +75,11 @@ include_once "include/page_header.php";
 		$db_dservices = DBselect('SELECT * FROM dservices '.
 								' WHERE dhostid='.$drule_data['dhostid'].
 								' order by status,type,port');
-		while($dservice_data = DBfetch($db_dservices))
-		{
+		while($dservice_data = DBfetch($db_dservices)){
 			$class = 'active';
 			$time = 'lastup';
 
-			if(DSVC_STATUS_DISABLED == $dservice_data['status'])
-			{
+			if(DSVC_STATUS_DISABLED == $dservice_data['status']){
 				$class = 'inactive';
 				$time = 'lastdown';
 			}

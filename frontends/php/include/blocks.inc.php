@@ -92,7 +92,7 @@ function make_system_summary($available_hosts=false){
 		}		
 		$table->AddRow($group_row);
 	}
-	$table->SetFooter(new CCol(S_REFRESHED.': '.date("[H:i:s]",time())));
+	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 return $table;
 }
 
@@ -153,8 +153,56 @@ function make_status_of_zbx(){
 	}
 
 	$table->AddRow(array(S_NUMBER_OF_USERS,$usr_cnt,new CSpan($online_cnt,'green')));
-	$table->SetFooter(new CCol(S_REFRESHED.': '.date("[H:i:s]",time())));
+	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 return $table;
+}
+
+function make_discovery_status(){
+	$drules = array();
+	
+	$db_drules = DBselect('select distinct * from drules where '.DBin_node('druleid').' order by name');
+	while($drule_data = DBfetch($db_drules)){
+		$drules[$drule_data['druleid']] = $drule_data;
+		$drules[$drule_data['druleid']]['up'] = 0;
+		$drules[$drule_data['druleid']]['down'] = 0;
+	}
+
+	$db_dhosts = DBselect('SELECT d.* '.
+					' FROM dhosts d '.
+					' ORDER BY d.dhostid,d.status,d.ip');
+
+	$services = array();
+	$discovery_info = array();
+
+	while($drule_data = DBfetch($db_dhosts)){
+		if(DHOST_STATUS_DISABLED == $drule_data['status']){
+			$drules[$drule_data['druleid']]['down']++;		}
+		else{
+			$drules[$drule_data['druleid']]['up']++;
+		}
+	}
+
+	$header = array(
+		is_show_subnodes() ? new CCol(S_NODE, 'center') : null,
+		new CCol(S_DISCOVERY_RULE, 'center'),
+		new CCol(S_UP),
+		new CCol(S_DOWN)
+		);
+
+	$table  = new CTableInfo();
+	$table->SetHeader($header,'vertical_header');
+
+	foreach($drules as $druleid => $drule){
+		$table->AddRow(array(
+			get_node_name_by_elid($druleid),
+			new CLink(get_node_name_by_elid($drule['druleid']).$drule['name'],'discovery.php?druleid='.$druleid),
+			new CSpan($drule['up'],'green'),
+			new CSpan($drule['down'],($drule['down'] > 0)?'red':'green')
+		));
+	}
+	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+
+return 	$table;
 }
 
 // Author: Aly
@@ -367,7 +415,7 @@ function make_latest_issues($available_hosts=false){
 		}
 		unset($row,$description, $actions);
 	}
-	$table->SetFooter(new CCol(S_REFRESHED.': '.date("[H:i:s]",time())));
+	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 return $table;
 }
 
@@ -444,7 +492,7 @@ function make_webmon_overview($available_hosts=false){
 			new CSpan($apps[HTTPTEST_STATE_UNKNOWN],'unknown')
 		));
 	}
-	$table->SetFooter(new CCol(S_REFRESHED.': '.date("[H:i:s]",time())));
+	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 return $table;	
 }
 
