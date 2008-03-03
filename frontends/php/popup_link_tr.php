@@ -55,13 +55,13 @@ include_once "include/page_header.php";
 <!--<![CDATA[
 function add_var_to_opener_obj(obj, name, value){
 		var parent = window.opener.document;
-		if(!isset(parent)){
+		if(typeof(parent) == 'undefined'){
 			close_window();
 			return false;	
 		}
 		
 		var dest = parent.getElementsByName(name);
-		if(is_array(dest) && isset(dest[0])){
+		if(is_array(dest) && (typeof(dest[0]) == 'undefined')){
 			dest[0].value = value;
 		}
 		else{

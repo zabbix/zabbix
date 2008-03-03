@@ -32,15 +32,17 @@
 
 	$_REQUEST["fullscreen"] = get_request("fullscreen", 0);
 
-	if($_REQUEST["fullscreen"])
-	{
+	if($_REQUEST["fullscreen"]){
 		define('ZBX_PAGE_NO_MENU', 1);
 	}
 
 	$_REQUEST['config'] = get_request('config',get_profile('web.screens.config',0));
 
-	if( 1 != $_REQUEST['config'])
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+	
+	if((1 != $_REQUEST['config']) && (PAGE_TYPE_HTML == $page['type'])){
 		define('ZBX_PAGE_DO_REFRESH', 1);
+	}
 	
 include_once "include/page_header.php";
 
@@ -59,21 +61,56 @@ include_once "include/page_header.php";
 		"from"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		"period"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
 		"stime"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
-		"action"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go'"),NULL),
+
 		"reset"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
-		"fullscreen"=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1,2"),		NULL)
+		"fullscreen"=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1,2"),		NULL),
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+
+		'action'=>		array(T_ZBX_STR, O_OPT, P_SYS, 	IN("'go','add','remove'"),NULL)
+
 	);
 
 	check_fields($fields);
 
+	if(isset($_REQUEST['favobj'])){
+		if(in_array($_REQUEST['favobj'],array('screens','slides'))){
+			$result = false;
+			if('add' == $_REQUEST['action']){
+				$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
+				if($result){
+					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVORITES.'";'."\n");
+					print('$("addrm_fav").onclick = function(){rm4favorites("'.$_REQUEST['favobj'].'","'.$_REQUEST['favid'].'",0);}'."\n");
+				}
+			}
+			else if('remove' == $_REQUEST['action']){
+				while(infavorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj'])){
+					$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],0,$_REQUEST['favobj']);
+				}
+				
+				if($result){
+					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVORITES.'";'."\n");
+					print('$("addrm_fav").onclick = function(){ add2favorites("'.$_REQUEST['favobj'].'","'.$_REQUEST['favid'].'");}'."\n");
+				}
+			}			
+
+			if((PAGE_TYPE_JS == $page['type']) && $result){
+				print('switchElementsClass("addrm_fav","iconminus","iconplus");');
+			}
+		}
+	}	
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+?>
+<?php
 	$config = $_REQUEST['config'] = get_request('config', 0);
 
 	if( 2 != $_REQUEST["fullscreen"] )
 		update_profile('web.screens.config', $_REQUEST['config']);
 
-?>
-
-<?php
 	$_REQUEST["elementid"] = get_request("elementid",get_profile("web.screens.elementid", null));
 	$_REQUEST["fullscreen"] = get_request("fullscreen", 0);
 
@@ -81,12 +118,10 @@ include_once "include/page_header.php";
 		update_profile("web.screens.elementid",$_REQUEST["elementid"]);
 
 	$_REQUEST["period"] = get_request('period',get_profile('web.screens'.$_REQUEST['elementid'].'.period', ZBX_PERIOD_DEFAULT));
-	if($_REQUEST["period"] >= ZBX_MIN_PERIOD)
-	{
+	if($_REQUEST["period"] >= ZBX_MIN_PERIOD){
 		update_profile('web.screens'.$_REQUEST['elementid'].'.period',$_REQUEST['period']);
 	}
 ?>
-
 <?php
 
 	$text = array(S_SCREENS_BIG);
@@ -166,6 +201,24 @@ include_once "include/page_header.php";
 			$url = "?elementid=".$elementid;
 			if($_REQUEST["fullscreen"]==0) $url .= "&fullscreen=1";
 			$text[] = array(nbsp(" / "),new CLink($element["name"], $url));
+			
+			if(infavorites('web.favorite.screenids',$elementid,(0 == $config)?'screens':'slides')){
+				$icon = new CDiv(SPACE,'iconminus');
+				$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
+				$icon->AddAction('onclick',new CScript("javascript: rm4favorites('".((0 == $config)?'screens':'slides')."','".$elementid."',0);"));
+			}
+			else{
+				$icon = new CDiv(SPACE,'iconplus');
+				$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
+				$icon->AddAction('onclick',new CScript("javascript: add2favorites('".((0 == $config)?'screens':'slides')."','".$elementid."');"));
+			}
+			
+			$icon->AddOption('id','addrm_fav');
+		
+			$icon_tab = new CTable();
+			$icon_tab->AddRow(array($icon,SPACE,$text));
+			
+			$text = $icon_tab;
 		}
 		else{
 			$elementid = null;
@@ -264,7 +317,7 @@ include_once "include/page_header.php";
 		}
 		else{
 			$element = get_slideshow($elementid, get_request('step', null), $effectiveperiod);
-			zbx_add_post_js('if(isset(parent)) parent.resizeiframe("iframe");
+			zbx_add_post_js('if(typeof(parent) != "undefined") parent.resizeiframe("iframe");
 							else resizeiframe("iframe");'."\n");
 		}
 		if($element){

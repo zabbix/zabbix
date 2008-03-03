@@ -146,13 +146,7 @@ include_once "include/page_header.php";
 		if(in_array($_REQUEST['favobj'],array('screens','slides'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
-				$perm = ('screens' == $_REQUEST['favobj'])?
-					screen_accessiable($_REQUEST['favid'], PERM_READ_ONLY):
-					slideshow_accessiable($_REQUEST['favid'], PERM_READ_ONLY);
-					
-				if($perm){
-					$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
-				}
+				$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
 			}
 			else if('remove' == $_REQUEST['action']){
 				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],get_request('favcnt',0),$_REQUEST['favobj']);
@@ -220,6 +214,7 @@ include_once "include/page_header.php";
 
 	$graph_menu = new CDiv(SPACE,'iconmenu');
 	$graph_menu->AddAction('onclick','javascript: create_menu(event,"graphs");');
+	$graph_menu->AddOption('title',S_MENU);
 	
 	$left_tab->AddRow(create_hat(
 			S_FAVORITE.SPACE.S_GRAPHS,
@@ -231,6 +226,7 @@ include_once "include/page_header.php";
 		
 	$sysmap_menu = new CDiv(SPACE,'iconmenu');
 	$sysmap_menu->AddAction('onclick','javascript: create_menu(event,"sysmaps");');
+	$sysmap_menu->AddOption('title',S_MENU);
 		
 	$left_tab->AddRow(create_hat(
 			S_FAVORITE.SPACE.S_MAPS,
@@ -242,6 +238,7 @@ include_once "include/page_header.php";
 		
 	$screen_menu = new CDiv(SPACE,'iconmenu');
 	$screen_menu->AddAction('onclick','javascript: create_menu(event,"screens");');
+	$screen_menu->AddOption('title',S_MENU);
 
 	$left_tab->AddRow(create_hat(
 			S_FAVORITE.SPACE.S_SCREENS,
@@ -282,7 +279,8 @@ include_once "include/page_header.php";
 
 	$refresh_menu = new CDiv(SPACE,'iconmenu');
 	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_syssum");');
-
+	$refresh_menu->AddOption('title',S_MENU);
+	
 	$right_tab->AddRow(create_hat(
 			S_SYSTEM_STATUS,
 			null,//make_system_summary($available_hosts),
@@ -293,7 +291,7 @@ include_once "include/page_header.php";
 
 	$refresh_menu = new CDiv(SPACE,'iconmenu');
 	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_stszbx");');
-
+	$refresh_menu->AddOption('title',S_MENU);
 		
 	$right_tab->AddRow(create_hat(
 			S_STATUS_OF_ZABBIX,
@@ -305,6 +303,7 @@ include_once "include/page_header.php";
 		
 	$refresh_menu = new CDiv(SPACE,'iconmenu');
 	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_lastiss");');
+	$refresh_menu->AddOption('title',S_MENU);
 		
 	$right_tab->AddRow(create_hat(S_LATEST_ISSUES,
 			null,//make_latest_issues($available_hosts),
@@ -315,6 +314,7 @@ include_once "include/page_header.php";
 		
 	$refresh_menu = new CDiv(SPACE,'iconmenu');
 	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_webovr");');
+	$refresh_menu->AddOption('title',S_MENU);
 
 	$right_tab->AddRow(create_hat(
 			S_WEB_MONITORING,

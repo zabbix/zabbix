@@ -27,13 +27,13 @@
 	$page["title"]	= "S_HISTORY";
 	$page['hist_arg'] = array('hostid','grouid','graphid','period','dec','inc','left','right','stime');
 	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbox.js','sbinit.js');
+	
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 		
-	if(isset($_REQUEST['plaintext']) || isset($_REQUEST['fullscreen']))
-	{
+	if(isset($_REQUEST['plaintext']) || isset($_REQUEST['fullscreen'])){
 		define('ZBX_PAGE_NO_MENU', 1);
 	}
-	else
-	{
+	else if(PAGE_TYPE_HTML == $page['type']){
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
 
@@ -43,7 +43,7 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"itemid"=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,	null),
+		"itemid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'!isset({favobj})'),
 		
 		"from"=>	array(T_ZBX_INT, O_OPT,	 null,	'{}>=0', null),
 		"period"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
@@ -61,7 +61,10 @@ include_once "include/page_header.php";
 		"cmbloglist"=>	array(T_ZBX_INT, O_OPT,	 null,	DB_ID, null),
 
 		"plaintext"=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
-		"action"=>	array(T_ZBX_STR, O_OPT,	 null,	IN('"showgraph","showvalues","showlatest"'), null),
+		"action"=>	array(T_ZBX_STR, O_OPT,	 null,	IN('"showgraph","showvalues","showlatest","add","remove"'), null),
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 
 /* actions */
 		"remove_log"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -77,6 +80,37 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
+	if(isset($_REQUEST['favobj'])){
+		if(in_array($_REQUEST['favobj'],array('simple_graph','graphs'))){
+			$result = false;
+			if('add' == $_REQUEST['action']){
+				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
+				if($result){
+					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVORITES.'";'."\n");
+					print('$("addrm_fav").onclick = function(){rm4favorites("simple_graph","'.$_REQUEST['favid'].'",0);}'."\n");
+				}
+			}
+			else if('remove' == $_REQUEST['action']){
+				while(infavorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj'])){
+					$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],0,$_REQUEST['favobj']);
+				}
+				
+				if($result){
+					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVORITES.'";'."\n");
+					print('$("addrm_fav").onclick = function(){ add2favorites("simple_graph","'.$_REQUEST['favid'].'");}'."\n");
+				}
+			}
+
+			if((PAGE_TYPE_JS == $page['type']) && $result){
+				print('switchElementsClass("addrm_fav","iconminus","iconplus");');
+			}
+		}
+	}	
+	
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+
 	$_REQUEST["action"] = get_request("action", "showgraph");
 
 /*** Prepare page header - start ***/
@@ -140,6 +174,25 @@ include_once "include/page_header.php";
 		
 		$l_header = array(new CLink($item_data['host'],"latest.php?hostid=".$item_data['hostid']),": ",
 			item_description($item_data["description"],$item_data["key_"]));
+			
+		if('showgraph' == $_REQUEST['action']){
+			if(infavorites('web.favorite.graphids',$_REQUEST['itemid'],'simple_graph')){
+				$icon = new CDiv(SPACE,'iconminus');
+				$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
+				$icon->AddAction('onclick',new CScript("javascript: rm4favorites('simple_graph','".$_REQUEST['itemid']."',0);"));
+			}
+			else{
+				$icon = new CDiv(SPACE,'iconplus');
+				$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
+				$icon->AddAction('onclick',new CScript("javascript: add2favorites('simple_graph','".$_REQUEST['itemid']."');"));
+			}
+			$icon->AddOption('id','addrm_fav');
+	
+			$icon_tab = new CTable();
+			$icon_tab->AddRow(array($icon,SPACE,$l_header));
+			
+			$l_header = $icon_tab;
+		}
 	}
 
 	$effectiveperiod = navigation_bar_calc();
@@ -148,10 +201,8 @@ include_once "include/page_header.php";
 
 	$to_save_request = null;
 
-	if( !isset($_REQUEST['plaintext']) && !isset($_REQUEST['fullscreen']) )
-	{
-		if($item_type == ITEM_VALUE_TYPE_LOG)
-		{
+	if( !isset($_REQUEST['plaintext']) && !isset($_REQUEST['fullscreen']) ){
+		if($item_type == ITEM_VALUE_TYPE_LOG){
 			$l_header = new CForm();
 			$l_header->SetName("loglist");
 			$l_header->AddVar("action",$_REQUEST["action"]);
@@ -278,8 +329,7 @@ include_once "include/page_header.php";
 					new CTextBox("filter",$filter,25),
 					$cmbFTask,SPACE));
 
-				if(str_in_array($filter_task,array(FILTER_TAST_MARK,FILTER_TAST_INVERT_MARK)))
-				{
+				if(str_in_array($filter_task,array(FILTER_TAST_MARK,FILTER_TAST_INVERT_MARK))){
 					$cmbColor = new CComboBox("mark_color",$mark_color);
 					$cmbColor->AddItem(MARK_COLOR_RED,S_AS_RED);
 					$cmbColor->AddItem(MARK_COLOR_GREEN,S_AS_GREEN);
@@ -288,18 +338,14 @@ include_once "include/page_header.php";
 				}
 				$r_header->AddItem(new CButton("select","Select"));
 			}
-			else
-			{
+			else{
 				$r_header = null;
 			}
 
-			if( ($l_header || $r_header) &&
-				!isset($_REQUEST['fullscreen'])
-				)
+			if(($l_header || $r_header) &&	!isset($_REQUEST['fullscreen']))
 					show_table_header($l_header,$r_header);
 		}
-		else
-		{
+		else{
 			$txt = new CTag('p','yes',$l_header);
 			$txt->Show();
 			echo "\n";
