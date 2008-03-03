@@ -361,7 +361,7 @@ static void proxy_resigter_dhistory(int now, zbx_uint64_t druleid, int type, con
 	DBescape_string(value, value_esc, sizeof(value_esc));
 
 	DBexecute("insert into proxy_dhistory (clock,druleid,type,ip,port,key_,value,status)"
-			"values (%d," ZBX_FS_UI64 ",%d,'%s',%d,'%s','%s',%d)",
+			" values (%d," ZBX_FS_UI64 ",%d,'%s',%d,'%s','%s',%d)",
 			now,
 			druleid,
 			type,
@@ -462,18 +462,12 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 				update_dservice(&service);
 			}
 		}
+		add_service_event(&service);
 	}
 	else if (zbx_process == ZBX_PROCESS_PROXY)
 	{
 		proxy_resigter_dhistory(now, rule->druleid, check->type, ip, port, check->key_, check->value, check->status);
 	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Invalid process type");
-		exit(FAIL);
-	}
-
-	add_service_event(&service);
 }
 
 /******************************************************************************
