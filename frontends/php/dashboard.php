@@ -22,6 +22,7 @@ require_once "include/config.inc.php";
 require_once "include/hosts.inc.php";
 require_once "include/triggers.inc.php";
 require_once "include/items.inc.php";
+require_once "include/discovery.inc.php";
 require_once "include/html.inc.php";
 require_once "include/blocks.inc.php";
 
@@ -82,10 +83,15 @@ include_once "include/page_header.php";
 					$webovr = make_webmon_overview();
 					$webovr->Show();
 					break;
+				case 'hat_dscvry':
+					$dscvry = make_discovery_status();
+					$dscvry->Show();
+					break;
 			}
 		}
 		if('set_rf_rate' == $_REQUEST['favobj']){
-			if(in_array($_REQUEST['favid'],array('hat_syssum','hat_stszbx','hat_lastiss','hat_webovr'))){
+			if(in_array($_REQUEST['favid'],array('hat_syssum','hat_stszbx','hat_lastiss','hat_webovr','hat_dscvry'))){
+			
 				update_profile('web.dahsboard.rf_rate.'.$_REQUEST['favid'],$_REQUEST['favcnt']);
 				$_REQUEST['favcnt'] = get_profile('web.dahsboard.rf_rate.'.$_REQUEST['favid'],60);
 
@@ -205,6 +211,7 @@ include_once "include/page_header.php";
 	make_refresh_menu('hat_stszbx',get_profile('web.dahsboard.rf_rate.hat_stszbx',60),$menu,$submenu);
 	make_refresh_menu('hat_lastiss',get_profile('web.dahsboard.rf_rate.hat_lastiss',60),$menu,$submenu);
 	make_refresh_menu('hat_webovr',get_profile('web.dahsboard.rf_rate.hat_webovr',60),$menu,$submenu);
+	make_refresh_menu('hat_dscvry',get_profile('web.dahsboard.rf_rate.hat_dscvry',60),$menu,$submenu);
 	
 	insert_js('var dashboard_menu='.zbx_jsvalue($menu)."\n".
 			 'var dashboard_submenu='.zbx_jsvalue($submenu)."\n"
@@ -275,7 +282,6 @@ include_once "include/page_header.php";
 				'url'=>	'charts.php?groupid=4&hostid=10017&graphid=5&output=html&fullscreen=1'
 			)*/
 	);
-	add_refresh_objects($refresh_tab);
 
 	$refresh_menu = new CDiv(SPACE,'iconmenu');
 	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_syssum");');
@@ -323,6 +329,27 @@ include_once "include/page_header.php";
 			'hat_webovr',
 			get_profile('web.dashboard.hats.hat_webovr.state',1)
 		));
+
+	$drules = DBfetch(DBselect('SELECT COUNT(druleid) as cnt FROM drules WHERE '.DBin_node('druleid')));
+	
+	if($drules['cnt'] > 0){
+	
+		$refresh_tab[] = array(	'id' => 'hat_dscvry','interval'  => get_profile('web.dahsboard.rf_rate.hat_dscvry',60));
+
+		$refresh_menu = new CDiv(SPACE,'iconmenu');
+		$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_dscvry");');
+		$refresh_menu->AddOption('title',S_MENU);
+	
+		$right_tab->AddRow(create_hat(
+				S_DISCOVERY_STATUS,
+				null,//make_discovery_status(),//
+				array($refresh_menu),
+				'hat_dscvry',
+				get_profile('web.dashboard.hats.hat_dscvry.state',1)
+			));
+	}
+	
+	add_refresh_objects($refresh_tab);
 /*		
 	$right_tab->AddRow(create_hat(
 			S_GRAPH,

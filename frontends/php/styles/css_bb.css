@@ -171,6 +171,11 @@ table.tableinfo{
 table.tableinfo tr td.normal			{	background-color: #AADDDD;	border: 1px #AADDDD solid; }
 table.tableinfo tr:hover td.normal		{	background-color: #AACCCC;	border: 1px #AAD9DD solid; }
 
+
+table.tableinfo tr td.active			{	background-color: #AACCDD;	border: 1px #AACCDD solid; }
+table.tableinfo tr:hover td.active		{	background-color: #AACCD9;	border: 1px #AACCD9 solid; }
+
+
 table.tableinfo tr.footer td {
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
