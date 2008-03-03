@@ -118,7 +118,6 @@ COpt::profiling_start("page");
 						"sub_pages"=>array("tr_events.php","acknow.php","tr_comments.php",
 								"chart4.php","scripts_exec.php")
 						),
-					array("url"=>"queue.php"	,"label"=>S_QUEUE	),
 					array("url"=>"events.php"	,"label"=>S_EVENTS	),
 					array("url"=>"actions.php"	,"label"=>S_ACTIONS	),
 					array("url"=>"discovery.php"	,"label"=>S_DISCOVERY	, "user_type"=>USER_TYPE_ZABBIX_ADMIN),
@@ -200,6 +199,7 @@ COpt::profiling_start("page");
 					array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
 					array("url"=>"scripts.php"	,"label"=>S_SCRIPTS),
 					array("url"=>"audit.php"	,"label"=>S_AUDIT		),
+					array("url"=>"queue.php"	,"label"=>S_QUEUE	),
 					array("url"=>"report4.php"	,"label"=>S_NOTIFICATIONS	),
 					array("url"=>"locales.php"	,"label"=>S_LOCALES	),
 					array("url"=>"instal.php"	,"label"=>S_INSTALLATION	,
