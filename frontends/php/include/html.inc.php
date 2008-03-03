@@ -125,6 +125,7 @@
 
 		$icon = new CDiv(SPACE,($state)?'arrowup':'arrowdown');
 		$icon->AddAction('onclick',new CScript("javascript: change_hat_state(this,'".$id."');"));
+		$icon->AddOption('title',S_SHOW.'/'.S_HIDE);
 
 		$icons_row[] = $icon;
 
