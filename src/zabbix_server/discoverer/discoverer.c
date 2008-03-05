@@ -51,7 +51,7 @@ int			discoverer_num;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void add_host_event(char *ip)
+void	add_host_event(const char *ip)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -106,7 +106,7 @@ static void add_host_event(char *ip)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void add_service_event(DB_DSERVICE *service)
+void	add_service_event(DB_DSERVICE *service)
 {
 	DB_EVENT	event;
 	int		now;
@@ -147,7 +147,7 @@ static void add_service_event(DB_DSERVICE *service)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void update_dservice(DB_DSERVICE *service)
+void	update_dservice(DB_DSERVICE *service)
 {
 	char	key_esc[MAX_STRING_LEN];
 
@@ -181,7 +181,7 @@ static void update_dservice(DB_DSERVICE *service)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void update_dhost(DB_DHOST *host)
+void	update_dhost(DB_DHOST *host)
 {
 	assert(host);
 
@@ -209,7 +209,7 @@ static void update_dhost(DB_DHOST *host)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *check,zbx_uint64_t dhostid,char *ip,int port)
+void	register_service(DB_DSERVICE *service, DB_DCHECK *check, zbx_uint64_t dhostid, const char *ip, int port)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -217,7 +217,6 @@ static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *chec
 	char		key_esc[MAX_STRING_LEN];
 
 	assert(service);
-	assert(rule);
 	assert(check);
 	assert(ip);
 
@@ -297,7 +296,7 @@ static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *chec
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid, char *ip)
+void	register_host(DB_DHOST *host, DB_DCHECK *check, const char *ip)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -310,7 +309,9 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 			ip);
 
 	host->dhostid=0;
-	result = DBselect("select dhostid,druleid,ip,status,lastup,lastdown from dhosts where ip='%s'" DB_NODE,
+	result = DBselect("select dhostid,ip,status,lastup,lastdown from dhosts"
+			" where druleid=" ZBX_FS_UI64 " and ip='%s'" DB_NODE,
+			check->druleid,
 			ip,
 			DBnode_local("dhostid"));
 
@@ -326,9 +327,9 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 			host->dhostid = DBget_maxid("dhosts","dhostid");
 			DBexecute("insert into dhosts (dhostid,druleid,ip) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')",
 				host->dhostid,
-				druleid,
+				check->druleid,
 				ip);
-			host->druleid	= druleid;
+			host->druleid	= check->druleid;
 			strscpy(host->ip,ip);
 			host->status	= 0;
 			host->lastup	= 0;
@@ -339,11 +340,11 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Host is already in database");
 		ZBX_STR2UINT64(host->dhostid,row[0]);
-		ZBX_STR2UINT64(host->druleid,row[1]);
-		strscpy(host->ip,	row[2]);
-		host->status		= atoi(row[3]);
-		host->lastup		= atoi(row[4]);
-		host->lastdown		= atoi(row[5]);
+		host->druleid		= check->druleid;
+		strscpy(host->ip,	row[1]);
+		host->status		= atoi(row[2]);
+		host->lastup		= atoi(row[3]);
+		host->lastdown		= atoi(row[4]);
 	}
 	DBfree_result(result);
 
@@ -409,13 +410,13 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 		service.dserviceid=0;
 
 		/* Register host if is not registered yet */
-		register_host(&host,check,rule->druleid,ip);
+		register_host(&host, check, ip);
 
 		if(host.dhostid>0)
 		{
 			/* Register service if is not registered yet */
 			/*dserviceid = register_service(rule,check,host.dhostid,ip,port);*/
-			register_service(&service,rule,check,host.dhostid,ip,port);
+			register_service(&service,check,host.dhostid,ip,port);
 		}
 
 		if(service.dserviceid == 0)
@@ -853,7 +854,7 @@ static void process_rule(DB_DRULE *rule)
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Discovery: process_rule() [IP:%s]", ip);
 
-			result = DBselect("select dcheckid,druleid,type,key_,snmp_community,ports"
+			result = DBselect("select dcheckid,type,key_,snmp_community,ports"
 					" from dchecks where druleid=" ZBX_FS_UI64,
 					rule->druleid);
 
@@ -861,11 +862,11 @@ static void process_rule(DB_DRULE *rule)
 				memset(&check, 0, sizeof(DB_RESULT));
 
 				ZBX_STR2UINT64(check.dcheckid,row[0]);
-				ZBX_STR2UINT64(check.druleid,row[1]);
-				check.type		= atoi(row[2]);
-				check.key_		= row[3];
-				check.snmp_community	= row[4];
-				check.ports		= row[5];
+				check.druleid		= rule->druleid;
+				check.type		= atoi(row[1]);
+				check.key_		= row[2];
+				check.snmp_community	= row[3];
+				check.ports		= row[4];
 		
 				process_check(rule, &check, ip);
 			}
