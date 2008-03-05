@@ -554,7 +554,7 @@ static const char	*zbx_json_decodeint(const char *p, char *string, size_t len)
 	char	*o = string;
 
 	while (*p != '\0') { /* this should never happen */
-		if (*p < '0' || *p > '9') {
+		if ((*p < '0' || *p > '9') && *p != '-') {
 			*o = '\0';
 			return p;
 		} else if (o - string < len - 1/*'\0'*/)
@@ -684,11 +684,40 @@ int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
 {
 	if (NULL == (jp->end = __zbx_json_rbracket(p))) {
 		zbx_set_json_strerror("Can't open JSON object or array \"%.64s\"",
-			p);
+				p);
 		return FAIL;
 	}
 
 	jp->start = p;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_json_brackets_by_name                                        *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: SUCCESS - processed succesfully                              * 
+ *               FAIL - an error occured                                      *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_json_brackets_by_name(struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out)
+{
+	const char	*p = NULL;
+
+	if (NULL == (p = zbx_json_pair_by_name(jp, name)))
+		return FAIL;
+
+	if (FAIL == zbx_json_brackets_open(p, out))
+		return FAIL;
 
 	return SUCCEED;
 }
@@ -712,7 +741,7 @@ zbx_json_type_t	zbx_json_type(const char *p)
 {
 	if (*p == '"')
 		return ZBX_JSON_TYPE_STRING;
-	if (*p >= '0' && *p <= '9')
+	if ((*p >= '0' && *p <= '9') || *p == '-')
 		return ZBX_JSON_TYPE_INT;
 	if (*p == '[')
 		return ZBX_JSON_TYPE_ARRAY;
