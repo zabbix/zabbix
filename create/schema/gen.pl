@@ -184,7 +184,7 @@ sub newstate
 			if($new eq "field") { print ",\n" }
 		}
 		case "index"	{
-			if($output{"type"} eq "sql" && $new eq "table") { print "\n"; }
+			if($output{"type"} eq "sql" && $new eq "table") { print ""; }
 			if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},\n"; }
 		}
 	 	case "table"	{
@@ -223,7 +223,14 @@ sub process_table
 		{
 			$pkey="";
 		}
-		print "CREATE TABLE $table_name (\n";
+
+		$ifexists = "";
+		if ($output{"database"} eq "sqlite")
+		{
+			$ifexists = "IF EXISTS ";
+		}
+
+		print "CREATE TABLE $ifexists$table_name (\n";
 	}
 }
 
@@ -295,13 +302,20 @@ sub process_index
 	}
 
 	($name,$fields)=split(/\|/, $line,2);
+
+	$ifexists = "";
+	if($output{"database"} eq "sqlite")
+	{
+		$ifexists = "IF EXISTS ";
+	}
+
 	if($unique == 1)
 	{
-		print "CREATE UNIQUE INDEX ${table_name}_$name\ on $table_name ($fields);\n";
+		print "CREATE UNIQUE INDEX $ifexists${table_name}_$name\ on $table_name ($fields);\n";
 	}
 	else
 	{
-		print "CREATE INDEX ${table_name}_$name\ on $table_name ($fields);\n";
+		print "CREATE INDEX $ifexists${table_name}_$name\ on $table_name ($fields);\n";
 	}
 }
 
