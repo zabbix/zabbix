@@ -1856,6 +1856,7 @@
 
 				unset($tr_ov_menu);
 				$ack = null;
+				unset($style);
 				if(isset($trhosts[$hostname]))
 				{
 					unset($ack_menu);
