@@ -167,7 +167,7 @@ FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|actionid
 INDEX		|2		|clock
-INDEX		|3		|triggerid
+INDEX		|3		|eventid
 INDEX		|4		|status,retries
 INDEX		|5		|mediatypeid
 INDEX		|6		|userid
