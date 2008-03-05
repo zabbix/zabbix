@@ -154,7 +154,7 @@ INDEX		|times_1	|serviceid,type,ts_from,ts_to
 TABLE|alerts|alertid|ZBX_HISTORY
 FIELD		|alertid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|actionid	|t_id		|'0'	|NOT NULL	|0
-FIELD		|triggerid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|eventid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|userid		|t_id		|'0'	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|mediatypeid	|t_id		|'0'	|NOT NULL	|0

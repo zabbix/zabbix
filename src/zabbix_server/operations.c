@@ -95,7 +95,7 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_OPERATION *operation, zbx_uin
 			continue;
 		}
 
-		DBadd_alert(operation->actionid, userid, event->objectid, media.mediatypeid,media.sendto,operation->shortdata,operation->longdata);
+		DBadd_alert(operation->actionid, userid, event->eventid, media.mediatypeid,media.sendto,operation->shortdata,operation->longdata);
 	}
 	DBfree_result(result);
 
