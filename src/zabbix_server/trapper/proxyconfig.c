@@ -206,7 +206,7 @@ int	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		DBnode_local("proxyid"));
 
 	if (NULL != (row = DBfetch(result))) {
-		ZBX_STR2UINT64(proxyid, row[0]);
+		proxyid = zbx_atoui64(row[0]);
 
 		zbx_json_init(&j, 512*1024);
 		if (SUCCEED == get_proxyconfig_data(proxyid, &j)) {

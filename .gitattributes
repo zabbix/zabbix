@@ -217,6 +217,8 @@ src/zabbix_server/trapper/nodecommand.c -text
 src/zabbix_server/trapper/nodecommand.h -text
 src/zabbix_server/trapper/proxyconfig.c -text
 src/zabbix_server/trapper/proxyconfig.h -text
+src/zabbix_server/trapper/proxydiscovery.c -text
+src/zabbix_server/trapper/proxydiscovery.h -text
 test/env/standalone/conf/template_agent.conf -text
 test/env/standalone/conf/template_proxy.conf -text
 test/env/standalone/conf/template_server.conf -text

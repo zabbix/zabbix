@@ -36,6 +36,7 @@
 #include "active.h"
 #include "nodecommand.h"
 #include "proxyconfig.h"
+#include "proxydiscovery.h"
 
 #include "daemon.h"
 
@@ -288,7 +289,7 @@ static int	process_data(zbx_sock_t *sock, zbx_uint64_t proxyid, time_t now, char
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	send_result(zbx_sock_t *sock, int result, char *info)
+int	send_result(zbx_sock_t *sock, int result, char *info)
 {
 	int	ret = SUCCEED;
 	struct	zbx_json json;
@@ -337,12 +338,13 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
 	DB_ROW			row;
 	double			sec;
 	zbx_uint64_t		proxyid = 0;
-	time_t			now = time(NULL), hosttime = 0, itemtime;
+	time_t			now, hosttime = 0, itemtime;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_new_values(json:%.*s)",
 				json->end - json->start + 1,
 				json->start);
 
+	now = time(NULL);
 	sec = zbx_time();
 
 	if (SUCCEED == zbx_json_value_by_name(json, ZBX_PROTO_TAG_PROXY, proxy, sizeof(proxy))) {
@@ -550,7 +552,7 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_DISCOVERY_DATA))
 				{
-/*					ret = process_new_values(sock, &jp);*/
+					ret = process_discovery_data(sock, &jp);
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 				{
@@ -649,17 +651,24 @@ void	process_trapper_child(zbx_sock_t *sock)
 
 void	child_trapper_main(zbx_process_t p, zbx_sock_t *s)
 {
+	struct	sigaction phan;
+
 	zabbix_log( LOG_LEVEL_DEBUG, "In child_trapper_main()");
+
+	phan.sa_handler = child_signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+	sigaction(SIGALRM, &phan, NULL);
 
 	zbx_process = p;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;) {
-		zbx_setproctitle("waiting for connection");
+		zbx_setproctitle("trapper [waiting for connection]");
 		zbx_tcp_accept(s);
 
-		zbx_setproctitle("processing data");
+		zbx_setproctitle("trapper [processing data]");
 		process_trapper_child(s);
 
 		zbx_tcp_unaccept(s);

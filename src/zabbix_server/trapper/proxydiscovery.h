@@ -17,13 +17,13 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_TRAPPER_H
-#define ZABBIX_TRAPPER_H
 
-#include "common.h"
+#ifndef ZABBIX_PROXYDISCOVERY_H
+#define ZABBIX_PROXYDISCOVERY_H
+
 #include "comms.h"
+#include "zbxjson.h"
 
-int	send_result(zbx_sock_t *sock, int result, char *info);
-void	child_trapper_main(zbx_process_t p, zbx_sock_t *s);
+int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp);
 
 #endif
