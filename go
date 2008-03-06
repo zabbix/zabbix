@@ -28,7 +28,16 @@ echo Configuring...
 #export CFLAGS="-Wall -Wuninitialized -O -DDEBUG"
 export CFLAGS="-Wall -Wuninitialized -O -g"
 cd create/schema
-./gen.pl c >../../include/dbsync.h
+./gen.pl c >../../src/libs/zbxdbhigh/dbschema.c
+echo -e "\n#ifdef HAVE_MYSQL\nconst char *db_schema= {\"\\">>../../src/libs/zbxdbhigh/dbschema.c
+./gen.pl mysql|sed -e 's/\t\t*/ /g' -e 's/$/\\/' >>../../src/libs/zbxdbhigh/dbschema.c
+echo -e "\"};\n#elif HAVE_POSTGRESQL\nconst char *db_schema = {\"\\">>../../src/libs/zbxdbhigh/dbschema.c
+./gen.pl postgresql|sed -e 's/\t\t*/ /g' -e 's/$/\\/' >>../../src/libs/zbxdbhigh/dbschema.c
+echo -e "\"};\n#elif HAVE_ORACLE\nconst char *db_schema = {\"\\">>../../src/libs/zbxdbhigh/dbschema.c
+./gen.pl oracle|sed -e 's/\t\t*/ /g' -e 's/$/\\/' >>../../src/libs/zbxdbhigh/dbschema.c
+echo -e "\"};\n#elif HAVE_SQLITE3\nconst char *db_schema = {\"\\" >>../../src/libs/zbxdbhigh/dbschema.c
+./gen.pl sqlite|sed -e 's/\t\t*/ /g' -e 's/$/\\/' >>../../src/libs/zbxdbhigh/dbschema.c
+echo -e "\"};\n#endif /* HAVE_SQLITE3 */\n" >>../../src/libs/zbxdbhigh/dbschema.c
 cd -
 #export CFLAGS="-Wall -pedantic"
 #for db in sqlite3 pgsql mysql; do

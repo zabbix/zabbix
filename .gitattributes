@@ -175,6 +175,7 @@ frontends/php/styles/table.css -text
 frontends/php/styles/ul.css -text
 frontends/php/warning.php -text
 include/dbcache.h -text
+include/dbschema.h -text
 include/zbxjson.h -text
 include/zbxodbc.h -text
 m4/libiodbc.m4 -text
