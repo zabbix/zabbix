@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 clear
 rm -f WARNINGS

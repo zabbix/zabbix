@@ -354,21 +354,18 @@ static int	refresh_active_checks(
 static int	check_response(char *response)
 {
 	struct 		zbx_json_parse jp;
-	const char 	*p;
 	char		value[MAX_STRING_LEN];
 	char		info[MAX_STRING_LEN];
 
 	int	ret = SUCCEED;
 
+	zabbix_log( LOG_LEVEL_DEBUG, "In check_response(%s)", response);
+
 	ret = zbx_json_open(response, &jp);
 
-	if(SUCCEED == ret)
+	if (SUCCEED == ret)
 	{
-		if (NULL == (p = zbx_json_pair_by_name(&jp, ZBX_PROTO_TAG_RESPONSE))
-				|| NULL == zbx_json_decodevalue(p, value, sizeof(value)))
-		{
-			ret = FAIL;
-		}
+		ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE,value, sizeof(value));
 	}
 
 	if(SUCCEED == ret)
@@ -379,11 +376,13 @@ static int	check_response(char *response)
 		}
 	}
 
-	if (NULL != (p = zbx_json_pair_by_name(&jp, ZBX_PROTO_TAG_INFO))
-			&& NULL != zbx_json_decodevalue(p, info, sizeof(info)))
+	if (SUCCEED == ret)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Info from server: %s",
-			info);
+		if(SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Info from server: %s",
+				info);
+		}
 	}
 
 	return ret;
@@ -444,7 +443,7 @@ static int	send_buffer(
 
 	zbx_json_init(&json, 8*1024);
 
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_AGENT_DATA, ZBX_JSON_TYPE_STRING);
 
 	zbx_snprintf(tmp, sizeof(tmp), "%d", (int)time(NULL));
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_CLOCK, tmp, ZBX_JSON_TYPE_INT);
