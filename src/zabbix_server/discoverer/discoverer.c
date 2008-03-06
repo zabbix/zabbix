@@ -824,7 +824,7 @@ static void process_rule(DB_DRULE *rule)
 				rule->druleid);
 			while((row=DBfetch(result)))
 			{
-				memset(&check, 0, sizeof(DB_RESULT));
+				memset(&check, 0, sizeof(check));
 
 				ZBX_STR2UINT64(check.dcheckid,row[0]);
 				ZBX_STR2UINT64(check.druleid,row[1]);
