@@ -471,13 +471,13 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 #endif /* HAVE_SQLITE3 */
 
-	DBconnect(ZBX_DB_CONNECT_EXIT);
+/*	DBconnect(ZBX_DB_CONNECT_EXIT);*/
 
 /* Need to set trigger status to UNKNOWN since last run */
 /* DBconnect() already made in init_config() */
 /*	DBconnect();*/
-	DBupdate_triggers_status_after_restart();
-	DBclose();
+/*	DBupdate_triggers_status_after_restart();
+	DBclose();*/
 
 /* To make sure that we can connect to the database before forking new processes */
 /*	DBconnect(ZBX_DB_CONNECT_EXIT);*/
@@ -488,6 +488,7 @@ int MAIN_ZABBIX_ENTRY(void)
 		zbx_error("Unable to create mutex for node syncs");
 		exit(FAIL);
 	}*/
+	DBinit();
 
 	threads = calloc(1 + CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS
 			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS

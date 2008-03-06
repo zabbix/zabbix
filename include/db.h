@@ -469,6 +469,7 @@ const char *DBnode(const char *fieldid, const int nodeid);
 int	DBping(void);
 
 void    DBconnect(int flag);
+void	DBinit();
 
 void    DBclose(void);
 void    DBvacuum(void);

@@ -113,6 +113,7 @@ void	PG_DBfree_result(DB_RESULT result);
 #endif
 
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbsocket, int port);
+void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbsocket, int port);
 
 void    zbx_db_close(void);
 void    zbx_db_vacuum(void);
