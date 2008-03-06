@@ -21,6 +21,7 @@ var OP = (agt.indexOf("opera") != -1) && window.opera;
 var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
 var SF = (agt.indexOf("safari") != -1);
 var KQ = (agt.indexOf("khtml") != -1) && (!SF);
+var GK = (agt.indexOf("gecko") != -1) && !KQ && !SF;
 
 function checkBrowser(){
 	if(OP) SDI('Opera');
@@ -80,7 +81,23 @@ if (!Array.prototype.forEach)
 }
 
 function SDI(msg){
-	alert("DEBUG INFO: " + msg);
+	var div_help = document.getElementById('div_help');
+
+	if((div_help == 'undefined') || empty(div_help)){
+		var div_help = document.createElement('div');
+		var doc_body = document.getElementsByTagName('body')[0];
+		doc_body.appendChild(div_help);
+		
+		div_help.setAttribute('id','div_help');
+		div_help.setAttribute('style','position: absolute; bottom: 10px; right: 10px; border: 1px red solid; width: 800px; height: 400px; background-color: white; overflow: auto;');
+	}
+	
+	div_help.appendChild(document.createTextNode("DEBUG INFO: "));
+	div_help.appendChild(document.createElement("br"));
+	div_help.appendChild(document.createTextNode(msg));
+	div_help.appendChild(document.createElement("br"));
+	div_help.appendChild(document.createElement("br"));
+	div_help.appendChild(document.createElement("br"));
 }
 
 function close_window()
@@ -211,6 +228,7 @@ function get_scroll_pos()
 	}
 	return [ scrOfX, scrOfY ];
 }
+
 function get_cursor_position(e)
 {
 	e = e || window.event;
@@ -341,7 +359,7 @@ function openWinCentered(loc, winname, iwidth, iheight, params){
 
 function getPosition(obj){
 	var pos = {top: 0, left: 0};
-	if ((typeof(obj.offsetParent) != 'undefined')) {
+	if(typeof(obj.offsetParent) != 'undefined') {
 		pos.left = obj.offsetLeft;
 		pos.top = obj.offsetTop;
 		while (obj = obj.offsetParent) {

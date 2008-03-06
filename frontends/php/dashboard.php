@@ -22,6 +22,7 @@ require_once "include/config.inc.php";
 require_once "include/hosts.inc.php";
 require_once "include/triggers.inc.php";
 require_once "include/items.inc.php";
+require_once "include/actions.inc.php";
 require_once "include/discovery.inc.php";
 require_once "include/html.inc.php";
 require_once "include/blocks.inc.php";
@@ -29,7 +30,7 @@ require_once "include/blocks.inc.php";
 $page["title"] = "S_DASHBOARD";
 $page["file"] = "dashboard.php";
 $page['hist_arg'] = array();
-$page['scripts'] = array('prototype.js','url.js','dashboard.js');
+$page['scripts'] = array('prototype.js','url.js','dashboard.js','showhint.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

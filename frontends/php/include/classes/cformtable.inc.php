@@ -126,13 +126,15 @@
 		function AddRow($item1, $item2=NULL, $class=NULL){
 			if(strtolower(get_class($item1)) == 'crow'){
 			
-			} elseif(strtolower(get_class($item1)) == 'ctable'){
+			} 
+			else if(strtolower(get_class($item1)) == 'ctable'){
 				$td = new CCol($item1,'form_row_c');
 				$td->SetColSpan(2);
 				
 				$item1 = new CRow($td);
-				
-			} else{
+			} 
+			else{
+				$tmp = $item1;
 				if(is_string($item1)){
 					$item1=nbsp($item1);
 				}
@@ -140,12 +142,14 @@
 				if(empty($item1)) $item1 = SPACE;
 				if(empty($item2)) $item2 = SPACE;
 				
-				$item1 = new CRow(array(
-										new CCol($item1,'form_row_l'),
-										new CCol($item2,'form_row_r')
-										),
-										$class);
+				$item1 = new CRow(
+								array(
+									new CCol($item1,'form_row_l'),
+									new CCol($item2,'form_row_r')
+								),
+								$class);
 			}
+
 			array_push($this->center_items, $item1);
 		}
 		
@@ -190,14 +194,15 @@
 			if(isset($this->help))			$col->AddItem($this->help);
 			if(isset($this->title))		 	$col->AddItem($this->title);
 			foreach($this->top_items as $item)	$col->AddItem($item);
-		        $tbl->SetHeader($col);
+			
+			$tbl->SetHeader($col);
 # add last row
-		        $tbl->SetFooter($this->bottom_items);
+			$tbl->SetFooter($this->bottom_items);
 # add center rows
-			foreach($this->center_items as $item)
-			        $tbl->AddRow($item);
-
-			return $tbl->ToString();
+			foreach($this->center_items as $item){
+				$tbl->AddRow($item);
+			}
+		return $tbl->ToString();
 		}
 	}
 ?>

@@ -22,190 +22,6 @@
 require_once "include/screens.inc.php";
 
 // Author: Aly
-function make_system_summary($available_hosts=false){
-	global $USER_DETAILS;
-	
-	if(!$available_hosts){
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
-	}
-		
-	$table = new CTableInfo();
-	$table->SetHeader(array(
-		is_show_subnodes() ? S_NODE : null,
-		S_HOST_GROUPS,
-		S_DISASTER,
-		S_HIGH,
-		S_AVERAGE,
-		S_WARNING,
-		S_INFORMATION,
-		S_NOT_CLASSIFIED
-	));
-
-	$gr_result=DBselect('SELECT DISTINCT g.groupid,g.name '.
-					' FROM groups g, hosts_groups hg, hosts h, items i, functions f, triggers t '.
-					' WHERE h.hostid in ('.$available_hosts.') '.
-						' AND hg.groupid=g.groupid '.
-						' AND h.status='.HOST_STATUS_MONITORED.
-						' AND h.hostid=i.hostid '.
-						' AND hg.hostid=h.hostid '.
-						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND i.itemid=f.itemid '.
-						' AND t.triggerid=f.triggerid '.
-						' AND t.status='.TRIGGER_STATUS_ENABLED.
-					' ORDER BY g.name');
-					
-	while($group = DBFetch($gr_result)){
-		$group_row = new CRow();
-		if(is_show_subnodes())
-			$group_row->AddItem(get_node_name_by_elid($group['groupid']));
-			
-		$group_row->AddItem($group['name']);
-		
-		$tab_priority[TRIGGER_SEVERITY_DISASTER] = 0;
-		$tab_priority[TRIGGER_SEVERITY_HIGH] = 0;
-		$tab_priority[TRIGGER_SEVERITY_AVERAGE] = 0;
-		$tab_priority[TRIGGER_SEVERITY_WARNING] = 0;
-		$tab_priority[TRIGGER_SEVERITY_INFORMATION] = 0;
-		$tab_priority[TRIGGER_SEVERITY_NOT_CLASSIFIED] = 0;
-
-		$sql='SELECT count(DISTINCT t.triggerid) as tr_cnt,t.priority '.
-			' FROM hosts h,items i,hosts_groups hg, functions f, triggers t '.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND h.hostid=i.hostid '.
-				' AND hg.groupid='.$group['groupid'].
-				' AND hg.hostid=h.hostid'.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND i.itemid=f.itemid '.
-				' AND t.triggerid=f.triggerid '.
-				' AND t.value='.TRIGGER_VALUE_TRUE.
-				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND h.hostid in ('.$available_hosts.') '.
-			' GROUP BY t.priority';
-					
-		$tr_result = DBSelect($sql);
-		while($group_stat = DBFetch($tr_result)){
-			$tab_priority[$group_stat['priority']] = $group_stat['tr_cnt'];
-		}
-
-		foreach($tab_priority as $key => $value){
-			$group_row->AddItem(new CCol($value,get_severity_style($key,$value)));
-		}		
-		$table->AddRow($group_row);
-	}
-	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
-return $table;
-}
-
-// Author: Aly
-function make_status_of_zbx(){
-	$table = new CTableInfo();
-
-	$table->SetHeader(array(
-		S_PARAMETER,
-		S_VALUE,
-		S_DETAILS
-	));
-
-	$status=get_status();
-
-	$table->AddRow(array(S_ZABBIX_SERVER_IS_RUNNING,new CSpan($status['zabbix_server'], ($status['zabbix_server'] == S_YES ? 'off' : 'on')),' - '));
-//	$table->AddRow(array(S_VALUES_STORED,$status['history_count']));$table->AddRow(array(S_TRENDS_STORED,$status['trends_count']));
-	$table->AddRow(array(S_NUMBER_OF_HOSTS,$status['hosts_count'],
-		array(
-			new CSpan($status['hosts_count_monitored'],'off'),' / ',
-			new CSpan($status['hosts_count_not_monitored'],'on'),' / ',
-			new CSpan($status['hosts_count_template'],'unknown'),' / ',
-			$status['hosts_count_deleted']
-		)
-	));
-	$table->AddRow(array(S_NUMBER_OF_ITEMS,$status['items_count'],
-		array(
-			new CSpan($status['items_count_monitored'],'off'),' / ',
-			new CSpan($status['items_count_disabled'],'on'),' / ',
-			new CSpan($status['items_count_not_supported'],'unknown'),
-			SPACE.SPACE.'['.$status['items_count_trapper'].']'
-		)
-	));
-	$table->AddRow(array(S_NUMBER_OF_TRIGGERS,$status['triggers_count'],
-		array(
-			$status['triggers_count_enabled'],' / ',
-			$status['triggers_count_disabled'].SPACE.SPACE.'[',
-			new CSpan($status['triggers_count_on'],'on'),' / ',
-			new CSpan($status['triggers_count_unknown'],'unknown'),' / ',
-			new CSpan($status['triggers_count_off'],'off'),']'
-		)
-	));
-	$table->AddRow(array(S_NUMBER_OF_EVENTS,$status['events_count'],' - '));
-	$table->AddRow(array(S_NUMBER_OF_ALERTS,$status['alerts_count'],' - '));
-
-//Log Out 10min	
-	$sql = 'SELECT DISTINCT u.userid, s.lastaccess, u.autologout '.
-			' FROM users u '.
-				' LEFT JOIN sessions s ON s.userid=u.userid';
-
-	$db_users = DBSelect($sql);
-	$usr_cnt = 0;
-	$online_cnt = 0;
-	while($user=DBFetch($db_users)){
-		$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout']))?ZBX_USER_ONLINE_TIME:$user['autologout'];
-		if(!is_null($user['lastaccess']) && (($user['lastaccess']+$online_time)>=time())) $online_cnt++;
-		$usr_cnt++;
-	}
-
-	$table->AddRow(array(S_NUMBER_OF_USERS,$usr_cnt,new CSpan($online_cnt,'green')));
-	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
-return $table;
-}
-
-function make_discovery_status(){
-	$drules = array();
-	
-	$db_drules = DBselect('select distinct * from drules where '.DBin_node('druleid').' order by name');
-	while($drule_data = DBfetch($db_drules)){
-		$drules[$drule_data['druleid']] = $drule_data;
-		$drules[$drule_data['druleid']]['up'] = 0;
-		$drules[$drule_data['druleid']]['down'] = 0;
-	}
-
-	$db_dhosts = DBselect('SELECT d.* '.
-					' FROM dhosts d '.
-					' ORDER BY d.dhostid,d.status,d.ip');
-
-	$services = array();
-	$discovery_info = array();
-
-	while($drule_data = DBfetch($db_dhosts)){
-		if(DHOST_STATUS_DISABLED == $drule_data['status']){
-			$drules[$drule_data['druleid']]['down']++;		}
-		else{
-			$drules[$drule_data['druleid']]['up']++;
-		}
-	}
-
-	$header = array(
-		is_show_subnodes() ? new CCol(S_NODE, 'center') : null,
-		new CCol(S_DISCOVERY_RULE, 'center'),
-		new CCol(S_UP),
-		new CCol(S_DOWN)
-		);
-
-	$table  = new CTableInfo();
-	$table->SetHeader($header,'vertical_header');
-
-	foreach($drules as $druleid => $drule){
-		$table->AddRow(array(
-			get_node_name_by_elid($druleid),
-			new CLink(get_node_name_by_elid($drule['druleid']).$drule['name'],'discovery.php?druleid='.$druleid),
-			new CSpan($drule['up'],'green'),
-			new CSpan($drule['down'],($drule['down'] > 0)?'red':'green')
-		));
-	}
-	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
-
-return 	$table;
-}
-
-// Author: Aly
 function make_favorite_graphs($available_hosts=false){
 	global $USER_DETAILS;
 	
@@ -327,6 +143,307 @@ function make_favorite_maps(){
 return $table;
 }
 
+// Author: Aly
+function make_system_summary($available_hosts=false){
+	global $USER_DETAILS;
+	$config=select_config();
+	
+	if(!$available_hosts){
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
+	}
+		
+	$table = new CTableInfo();
+	$table->SetHeader(array(
+		is_show_subnodes() ? S_NODE : null,
+		S_HOST_GROUPS,
+		S_DISASTER,
+		S_HIGH,
+		S_AVERAGE,
+		S_WARNING,
+		S_INFORMATION,
+		S_NOT_CLASSIFIED
+	));
+
+	$gr_result=DBselect('SELECT DISTINCT g.groupid,g.name '.
+					' FROM groups g, hosts_groups hg, hosts h, items i, functions f, triggers t '.
+					' WHERE h.hostid in ('.$available_hosts.') '.
+						' AND hg.groupid=g.groupid '.
+						' AND h.status='.HOST_STATUS_MONITORED.
+						' AND h.hostid=i.hostid '.
+						' AND hg.hostid=h.hostid '.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+						' AND i.itemid=f.itemid '.
+						' AND t.triggerid=f.triggerid '.
+						' AND t.status='.TRIGGER_STATUS_ENABLED.
+					' ORDER BY g.name');
+					
+	while($group = DBFetch($gr_result)){
+		$group_row = new CRow();
+		if(is_show_subnodes())
+			$group_row->AddItem(get_node_name_by_elid($group['groupid']));
+		
+		$name = new CLink($group['name'],'tr_status.php?groupid='.$group['groupid'].'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
+		$name->SetTarget('blank');
+		$group_row->AddItem($name);
+		
+		$tab_priority[TRIGGER_SEVERITY_DISASTER] = 0;
+		$tab_priority[TRIGGER_SEVERITY_HIGH] = 0;
+		$tab_priority[TRIGGER_SEVERITY_AVERAGE] = 0;
+		$tab_priority[TRIGGER_SEVERITY_WARNING] = 0;
+		$tab_priority[TRIGGER_SEVERITY_INFORMATION] = 0;
+		$tab_priority[TRIGGER_SEVERITY_NOT_CLASSIFIED] = 0;
+
+		$sql='SELECT count(DISTINCT t.triggerid) as tr_cnt,t.priority '.
+			' FROM hosts h,items i,hosts_groups hg, functions f, triggers t '.
+			' WHERE h.status='.HOST_STATUS_MONITORED.
+				' AND h.hostid=i.hostid '.
+				' AND hg.groupid='.$group['groupid'].
+				' AND hg.hostid=h.hostid'.
+				' AND i.status='.ITEM_STATUS_ACTIVE.
+				' AND i.itemid=f.itemid '.
+				' AND t.triggerid=f.triggerid '.
+				' AND t.value='.TRIGGER_VALUE_TRUE.
+				' AND t.status='.TRIGGER_STATUS_ENABLED.
+				' AND h.hostid in ('.$available_hosts.') '.
+			' GROUP BY t.priority';
+//SDI($sql);
+		$tr_result = DBSelect($sql);
+		while($group_stat = DBFetch($tr_result)){
+			$tab_priority[$group_stat['priority']] = $group_stat['tr_cnt'];
+		}
+
+		foreach($tab_priority as $key => $value){
+			$normal = $value;
+			if($value){
+//* trigger list
+				$table_inf  = new CTableInfo();
+				$table_inf->AddOption('style', 'width: 400px;');
+				$table_inf->SetHeader(array(
+					is_show_subnodes() ? S_NODE : null,
+					S_HOST,
+					S_ISSUE,
+					S_AGE,
+					($config['event_ack_enable'])? S_ACK : NULL,
+					S_ACTIONS
+					));
+				
+				$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, t.priority, t.lastchange,t.value,h.host,h.hostid '.
+							' FROM triggers t,hosts h,items i,functions f, hosts_groups hg '.
+							' WHERE f.itemid=i.itemid '.
+								' AND hg.groupid='.$group['groupid'].
+								' AND h.hostid=i.hostid '.
+								' AND hg.hostid=h.hostid '.
+								' AND t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
+								' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
+								' AND h.hostid in ('.$available_hosts.') '.
+								' AND h.status='.HOST_STATUS_MONITORED.
+								' AND t.value='.TRIGGER_VALUE_TRUE.
+								' AND t.priority='.$key.
+							' ORDER BY t.lastchange DESC';
+				$result = DBselect($sql);
+			
+				while($row_inf=DBfetch($result)){
+			// Check for dependencies
+					if(trigger_dependent($row_inf["triggerid"]))	continue;
+
+					$host = new CSpan($row_inf['host']);
+			
+					$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
+								' FROM events e, triggers t '.
+								' WHERE e.object=0 AND e.objectid='.$row_inf['triggerid'].
+									' AND t.triggerid=e.objectid '.
+									' AND e.value='.TRIGGER_VALUE_TRUE.
+								' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
+			
+					$res_events = DBSelect($event_sql,1);
+			
+					while($row_inf_event=DBfetch($res_events)){
+						if($config['event_ack_enable']){
+							if($row_inf_event['acknowledged'] == 1){
+								$ack=new CLink(S_YES,'acknow.php?eventid='.$row_inf_event['eventid'],'action');
+							}
+							else{
+								$ack= new CLink(S_NO,'acknow.php?eventid='.$row_inf_event['eventid'],'on');
+							}
+						}
+			
+						$description = expand_trigger_description_by_data(
+								array_merge($row_inf, array("clock"=>$row_inf_event["clock"])),
+								ZBX_FLAG_EVENT);
+//actions								
+						$actions= new CTable(' - ');
+
+						$sql='SELECT COUNT(a.alertid) as all'.
+								' FROM alerts a '.
+								' WHERE a.eventid='.$row_inf_event['eventid'];
+								
+						$alerts=DBfetch(DBselect($sql));
+
+						if(isset($alerts['all']) && ($alerts['all'] > 0)){
+							$sql='SELECT COUNT(a.alertid) as sent '.
+									' FROM alerts a '.
+									' WHERE a.eventid='.$row_inf_event['eventid'].
+										' AND a.status='.ALERT_STATUS_SENT;										
+							$alerts=DBfetch(DBselect($sql));
+
+							$tdl = new CCol(($alerts['done'])?(new CSpan($alerts['sent'],'green')):SPACE);
+							$tdl->AddOption('width','10');
+
+							$sql='SELECT COUNT(a.alertid) as inprogress '.
+									' FROM alerts a '.
+									' WHERE a.eventid='.$row_inf_event['eventid'].
+										' AND a.status='.ALERT_STATUS_NOT_SENT; 
+							$alerts=DBfetch(DBselect($sql));
+
+							$tdc = new CCol(($alerts['inprogress'])?(new CSpan($alerts['inprogress'],'orange')):SPACE);
+							$tdc->AddOption('width','10');
+
+							$sql='SELECT COUNT(a.alertid) as failed '.
+									' FROM alerts a '.
+									' WHERE a.eventid='.$row_inf_event['eventid'].
+										' AND a.status='.ALERT_STATUS_FAILED;
+							$alerts=DBfetch(DBselect($sql));
+							$tdr = new CCol(($alerts['failed'])?(new CSpan($alerts['failed'],'red')):SPACE);
+							$tdr->AddOption('width','10');
+							
+							$actions->AddRow(array($tdl,$tdc,$tdr));
+						}
+//--------					
+						$table_inf->AddRow(array(
+							get_node_name_by_elid($row_inf['triggerid']),
+							$host,
+							new CCol($description,get_severity_style($row_inf["priority"])),
+							zbx_date2age($row_inf_event['clock']),
+							($config['event_ack_enable'])?(new CCol($ack,"center")):NULL,
+							$actions
+						));			
+					}
+					unset($row_inf,$description,$actions);
+				}
+				
+				$value = new CSpan($value);
+				$value->SetHint($table_inf);
+				
+//-------------*/
+			}
+			$group_row->AddItem(new CCol($value,get_severity_style($key,$normal)));
+			unset($table_inf);
+		}		
+		$table->AddRow($group_row);
+	}
+	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+return $table;
+}
+
+// Author: Aly
+function make_status_of_zbx(){
+	$table = new CTableInfo();
+
+	$table->SetHeader(array(
+		S_PARAMETER,
+		S_VALUE,
+		S_DETAILS
+	));
+
+	$status=get_status();
+
+	$table->AddRow(array(S_ZABBIX_SERVER_IS_RUNNING,new CSpan($status['zabbix_server'], ($status['zabbix_server'] == S_YES ? 'off' : 'on')),' - '));
+//	$table->AddRow(array(S_VALUES_STORED,$status['history_count']));$table->AddRow(array(S_TRENDS_STORED,$status['trends_count']));
+	$table->AddRow(array(S_NUMBER_OF_HOSTS,$status['hosts_count'],
+		array(
+			new CSpan($status['hosts_count_monitored'],'off'),' / ',
+			new CSpan($status['hosts_count_not_monitored'],'on'),' / ',
+			new CSpan($status['hosts_count_template'],'unknown'),' / ',
+			$status['hosts_count_deleted']
+		)
+	));
+	$table->AddRow(array(S_NUMBER_OF_ITEMS,$status['items_count'],
+		array(
+			new CSpan($status['items_count_monitored'],'off'),' / ',
+			new CSpan($status['items_count_disabled'],'on'),' / ',
+			new CSpan($status['items_count_not_supported'],'unknown'),
+			SPACE.SPACE.'['.$status['items_count_trapper'].']'
+		)
+	));
+	$table->AddRow(array(S_NUMBER_OF_TRIGGERS,$status['triggers_count'],
+		array(
+			$status['triggers_count_enabled'],' / ',
+			$status['triggers_count_disabled'].SPACE.SPACE.'[',
+			new CSpan($status['triggers_count_on'],'on'),' / ',
+			new CSpan($status['triggers_count_unknown'],'unknown'),' / ',
+			new CSpan($status['triggers_count_off'],'off'),']'
+		)
+	));
+	$table->AddRow(array(S_NUMBER_OF_EVENTS,$status['events_count'],' - '));
+	$table->AddRow(array(S_NUMBER_OF_ALERTS,$status['alerts_count'],' - '));
+
+//Log Out 10min	
+	$sql = 'SELECT DISTINCT u.userid, s.lastaccess, u.autologout '.
+			' FROM users u '.
+				' LEFT JOIN sessions s ON s.userid=u.userid';
+
+	$db_users = DBSelect($sql);
+	$usr_cnt = 0;
+	$online_cnt = 0;
+	while($user=DBFetch($db_users)){
+		$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout']))?ZBX_USER_ONLINE_TIME:$user['autologout'];
+		if(!is_null($user['lastaccess']) && (($user['lastaccess']+$online_time)>=time())) $online_cnt++;
+		$usr_cnt++;
+	}
+
+	$table->AddRow(array(S_NUMBER_OF_USERS,$usr_cnt,new CSpan($online_cnt,'green')));
+	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+return $table;
+}
+
+function make_discovery_status(){
+	$drules = array();
+	
+	$db_drules = DBselect('select distinct * from drules where '.DBin_node('druleid').' order by name');
+	while($drule_data = DBfetch($db_drules)){
+		$drules[$drule_data['druleid']] = $drule_data;
+		$drules[$drule_data['druleid']]['up'] = 0;
+		$drules[$drule_data['druleid']]['down'] = 0;
+	}
+
+	$db_dhosts = DBselect('SELECT d.* '.
+					' FROM dhosts d '.
+					' ORDER BY d.dhostid,d.status,d.ip');
+
+	$services = array();
+	$discovery_info = array();
+
+	while($drule_data = DBfetch($db_dhosts)){
+		if(DHOST_STATUS_DISABLED == $drule_data['status']){
+			$drules[$drule_data['druleid']]['down']++;		}
+		else{
+			$drules[$drule_data['druleid']]['up']++;
+		}
+	}
+
+	$header = array(
+		is_show_subnodes() ? new CCol(S_NODE, 'center') : null,
+		new CCol(S_DISCOVERY_RULE, 'center'),
+		new CCol(S_UP),
+		new CCol(S_DOWN)
+		);
+
+	$table  = new CTableInfo();
+	$table->SetHeader($header,'vertical_header');
+
+	foreach($drules as $druleid => $drule){
+		$table->AddRow(array(
+			get_node_name_by_elid($druleid),
+			new CLink(get_node_name_by_elid($drule['druleid']).$drule['name'],'discovery.php?druleid='.$druleid),
+			new CSpan($drule['up'],'green'),
+			new CSpan($drule['down'],($drule['down'] > 0)?'red':'green')
+		));
+	}
+	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+
+return 	$table;
+}
+
 // author Aly
 function make_latest_issues($available_hosts=false){
 	global $USER_DETAILS;
@@ -345,11 +462,13 @@ function make_latest_issues($available_hosts=false){
 		S_LAST_CHANGE,
 		S_AGE,
 		($config['event_ack_enable'])? S_ACK : NULL,
+		S_ACTIONS
 		));
 	
 	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, t.priority, t.lastchange,t.value,h.host,h.hostid '.
 				' FROM triggers t,hosts h,items i,functions f, hosts_groups hg '.
-				' WHERE f.itemid=i.itemid AND h.hostid=i.hostid '.
+				' WHERE f.itemid=i.itemid '.
+					' AND h.hostid=i.hostid '.
 					' AND hg.hostid=h.hostid '.
 					' AND t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
 					' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
@@ -383,7 +502,8 @@ function make_latest_issues($available_hosts=false){
 
 		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
 					' FROM events e, triggers t '.
-					' WHERE e.object=0 AND e.objectid='.$row['triggerid'].
+					' WHERE e.object=0 '.
+						' AND e.objectid='.$row['triggerid'].
 						' AND t.triggerid=e.objectid '.
 						' AND e.value='.TRIGGER_VALUE_TRUE.
 					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
@@ -403,6 +523,79 @@ function make_latest_issues($available_hosts=false){
 			$description = expand_trigger_description_by_data(
 					array_merge($row, array("clock"=>$row_event["clock"])),
 					ZBX_FLAG_EVENT);
+					
+//actions								
+			$actions= new CTable(' - ');
+
+			$sql='SELECT COUNT(a.alertid) as all '.
+					' FROM alerts a,functions f,items i,events e'.
+					' WHERE a.eventid='.$row_event['eventid'].
+						' AND e.eventid = a.eventid'.
+						' AND f.triggerid=e.objectid '.
+						' AND i.itemid=f.itemid '.
+						' AND i.hostid IN ('.$available_hosts.') ';
+					
+			$alerts=DBfetch(DBselect($sql));
+
+			if(isset($alerts['all']) && ($alerts['all'] > 0)){
+				$sql='SELECT COUNT(a.alertid) as sent '.
+						' FROM alerts a,functions f,items i,events e'.
+						' WHERE a.eventid='.$row_event['eventid'].
+							' AND a.status='.ALERT_STATUS_SENT.
+							' AND e.eventid = a.eventid'.
+							' AND f.triggerid=e.objectid '.
+							' AND i.itemid=f.itemid '.
+							' AND i.hostid IN ('.$available_hosts.') ';
+				$alerts=DBfetch(DBselect($sql));
+
+				$alert_cnt = new CSpan($alerts['sent'],'green');
+				if($alerts['sent']){
+					$hint=get_actions_hint_by_eventid($row_event['eventid'],ALERT_STATUS_SENT);
+					$alert_cnt->SetHint($hint);
+				}
+				$tdl = new CCol(($alerts['sent'])?$alert_cnt:SPACE);
+				$tdl->AddOption('width','10');
+
+				$sql='SELECT COUNT(a.alertid) as inprogress '.
+						' FROM alerts a,functions f,items i,events e'.
+						' WHERE a.eventid='.$row_event['eventid'].
+							' AND a.status='.ALERT_STATUS_NOT_SENT.
+							' AND e.eventid = a.eventid'.
+							' AND f.triggerid=e.objectid '.
+							' AND i.itemid=f.itemid '.
+							' AND i.hostid IN ('.$available_hosts.') ';
+				$alerts=DBfetch(DBselect($sql));
+
+				$alert_cnt = new CSpan($alerts['inprogress'],'orange');
+				if($alerts['inprogress']){
+					$hint=get_actions_hint_by_eventid($row_event['eventid'],ALERT_STATUS_NOT_SENT);
+					$alert_cnt->SetHint($hint);
+				}
+				$tdc = new CCol(($alerts['inprogress'])?$alert_cnt:SPACE);
+				$tdc->AddOption('width','10');
+
+				$sql='SELECT COUNT(a.alertid) as failed '.
+						' FROM alerts a,functions f,items i,events e'.
+						' WHERE a.eventid='.$row_event['eventid'].
+							' AND a.status='.ALERT_STATUS_FAILED.
+							' AND e.eventid = a.eventid'.
+							' AND f.triggerid=e.objectid '.
+							' AND i.itemid=f.itemid '.
+							' AND i.hostid IN ('.$available_hosts.') ';
+				$alerts=DBfetch(DBselect($sql));
+
+				$alert_cnt = new CSpan($alerts['failed'],'red');
+				if($alerts['failed']){
+					$hint=get_actions_hint_by_eventid($row_event['eventid'],ALERT_STATUS_FAILED);
+					$alert_cnt->SetHint($hint);
+				}
+
+				$tdr = new CCol(($alerts['failed'])?$alert_cnt:SPACE);
+				$tdr->AddOption('width','10');
+				
+				$actions->AddRow(array($tdl,$tdc,$tdr));
+			}
+//--------			
 		
 			$table->AddRow(array(
 				get_node_name_by_elid($row['triggerid']),
@@ -411,9 +604,10 @@ function make_latest_issues($available_hosts=false){
 				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"tr_events.php?triggerid=".$row["triggerid"],"action"),					
 				zbx_date2age($row_event['clock']),
 				($config['event_ack_enable'])?(new CCol($ack,"center")):NULL,
+				$actions
 			));			
 		}
-		unset($row,$description, $actions);
+		unset($row,$description,$actions,$alerts,$hint);
 	}
 	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 return $table;

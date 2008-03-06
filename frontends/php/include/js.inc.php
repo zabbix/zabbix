@@ -109,9 +109,10 @@ return $result;
 }
 
 function insert_showhint_javascript(){
-	if(defined('SHOW_HINT_SCRIPT_INSERTTED')) return;
+	global $page;
+	if(defined('SHOW_HINT_SCRIPT_INSERTTED') || (PAGE_TYPE_HTML != $page['type'])) return;	
 	define('SHOW_HINT_SCRIPT_INSERTTED', 1);
-	
+
 	echo '<script type="text/javascript" src="js/showhint.js"></script>';	
 }
 

@@ -124,7 +124,7 @@ interval:		10,						// update interval in sec
 				method: 'post',
 				'parameters':	obj4update.params,
 				'evalScripts': true,
-				'onSuccess': function(resp){ obj4update.lastupdate = time;},
+				'onSuccess': function(resp){ obj4update.lastupdate = time;  },	//SDI(resp.responseText);
 				'onFailure': function(){ document.location = 'dashboard.php?'+Object.toQueryString(obj4update.params); }
 			});	
 	}
