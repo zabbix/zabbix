@@ -57,7 +57,6 @@ void	DBclose(void)
 	zbx_db_close();
 }
 
-
 /*
  * Connect to the database.
  * If fails, program terminates.
@@ -87,6 +86,26 @@ void    DBconnect(int flag)
 				exit(FAIL);
 		}
 	} while(ZBX_DB_OK != err);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBinit                                                           *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alksander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  * 
+ *                                                                            *
+ ******************************************************************************/
+void	DBinit()
+{
+	zbx_db_init(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
 }
 
 /******************************************************************************
@@ -2057,3 +2076,4 @@ int	DBproxy_add_history_str(zbx_uint64_t itemid, char *value, int clock)
 
 	return SUCCEED;
 }
+

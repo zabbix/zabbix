@@ -209,6 +209,30 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #endif
 }
 
+void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbsocket, int port)
+{
+#ifdef	HAVE_SQLITE3
+	int		ret;
+	struct stat	buf;
+#endif
+
+#ifdef	HAVE_SQLITE3
+	if (0 != stat(dbname, &buf)) {
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot open database file \"%s\": %s", dbname, strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "Creating database ...");
+
+		ret = sqlite3_open(dbname, &conn);
+		if (SQLITE_OK != ret) {
+			zabbix_log(LOG_LEVEL_ERR, "Can't create database \"%s\": %s", dbname, sqlite3_errmsg(conn));
+			exit(FAIL);
+		}
+
+		DBexecute("%s", db_schema);
+		DBclose();
+	}
+#endif
+}
+
 int __zbx_zbx_db_execute(const char *fmt, ...)
 {
 	va_list args;
