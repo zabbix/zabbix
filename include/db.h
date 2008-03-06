@@ -26,7 +26,7 @@
 
 #include "common.h"
 #include "zbxdb.h"
-#include "dbsync.h"
+#include "dbschema.h"
 
 extern	char	*CONFIG_DBHOST;
 extern	char	*CONFIG_DBNAME;

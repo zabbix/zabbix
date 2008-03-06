@@ -3,9 +3,9 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
+	src \
 	create \
 	misc \
-	src \
 	upgrades
 
 EXTRA_DIST = \
