@@ -546,7 +546,10 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 				{
 					send_proxyconfig(sock, &jp);
 				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_DATA))
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA) ||
+					0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA) ||
+					0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_DATA)
+				)
 				{
 					ret = process_new_values(sock, &jp);
 				}
@@ -560,7 +563,7 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 				}
 				else
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Unknow request received [%s]",
+					zabbix_log( LOG_LEVEL_WARNING, "Unknown request received [%s]",
 						value);
 				}
 			}
