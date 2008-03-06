@@ -419,7 +419,7 @@ typedef enum
 #define ACTION_STATUS_DISABLED	1
 
 /* Max number of retries for alerts */
-#define ACTION_MAX_RETRIES	3
+#define ALERT_MAX_RETRIES	3
 
 /* Operation types */
 #define OPERATION_TYPE_MESSAGE		0
