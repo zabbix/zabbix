@@ -65,7 +65,8 @@
 				foreach($item as $el){
                     if(strtolower(get_class($el))=='ccol') {
                 		parent::AddItem($el);
-					} elseif(!is_null($el)) {
+					} 
+					else if(!is_null($el)){
 						parent::AddItem(new CCol($el));
 					}
 				}

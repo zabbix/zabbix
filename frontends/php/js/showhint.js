@@ -19,16 +19,10 @@
 **
 */
 
-function GetPos(obj)
-{
-	var left = obj.offsetLeft;
-	var top  = obj.offsetTop;;
-	while (obj = obj.offsetParent)
-	{
-		left	+= obj.offsetLeft
-		top	+= obj.offsetTop
-	}
-	return [left,top];
+function GetPos(obj){	
+	var pos = getPosition(obj);
+	
+return [pos.left,pos.top];
 }
 
 var hint_box = null;
@@ -50,23 +44,32 @@ function show_hint_ext(obj, e, hint_text, width, class_name)
 {
 	if(!hint_box) return;
 
-	var cursor = get_cursor_position(e);
-	
-	if(class_name != "")
-	{
+	if(class_name != ""){
 		hint_text = "<span class=" + class_name + ">" + hint_text + "</"+"span>";
 	}
 
 	hint_box.innerHTML = hint_text;
 	hint_box.style.width = width;
 
+	var cursor = get_cursor_position(e);
 	var pos = GetPos(obj);
 
-	hint_box.x	= pos[0];
+	var body_width = get_bodywidth();
+
+	if(parseInt(cursor.x+10+hint_box.offsetWidth) > body_width){
+		cursor.x-=parseInt(hint_box.offsetWidth);
+		cursor.x-=10;
+		cursor.x=(cursor.x < 0)?0:cursor.x;
+	}
+	else{
+		cursor.x+=10;
+	}
+
+	hint_box.x	= cursor.x;
 	hint_box.y	= pos[1];
 
-	hint_box.style.left	= cursor.x + 10 + "px";
-	//hint_box.style.left	= hint_box.x + obj.offsetWidth + 10 + "px";
+	hint_box.style.left = cursor.x + "px";
+//	hint_box.style.left	= hint_box.x + obj.offsetWidth + 10 + "px";
 	hint_box.style.top	= hint_box.y + obj.offsetHeight + "px";
 
 	hint_box.style.visibility = "visible";
@@ -78,10 +81,21 @@ function update_hint(obj, e)
 	if(!hint_box) return;
 
 	var cursor = get_cursor_position(e);
-
 	var pos = GetPos(obj);
+	
+	var body_width = get_bodywidth();
 
-	hint_box.style.left     = cursor.x + 10 + "px";
+	if(parseInt(cursor.x+10+hint_box.offsetWidth) > body_width){
+		cursor.x-=parseInt(hint_box.offsetWidth);
+		cursor.x-=10;
+		cursor.x=(cursor.x < 0)?0:cursor.x;
+	}
+	else{
+		cursor.x+=10;
+	}
+
+	hint_box.style.left     = cursor.x + "px";
+//	hint_box.style.left		= hint_box.x + obj.offsetWidth + 10 + "px";
 	hint_box.style.top      = hint_box.y + obj.offsetHeight + "px";
 }
 

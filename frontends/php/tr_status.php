@@ -446,7 +446,7 @@ include_once "include/page_header.php";
 	
 		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.$row['triggerid'];
 		$dep_res = DBselect($sql_dep);
-		while($dep_row = Dbfetch($dep_res)){
+		while($dep_row = DBfetch($dep_res)){
 			$dep_table->AddRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_up']));
 			$dependency = true;
 		}

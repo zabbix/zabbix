@@ -510,6 +510,8 @@ table.tableinfo tr.footer td {
 	vertical-align: middle;
 	padding-right: 5px;
 	padding-left: 5px;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
 }
 table.tableinfo tr.odd_row td			{	background-color: #DDDDDD; border: 1px #DDDDDD solid; }
 table.tableinfo tr.odd_row:hover td		{	background-color: #DDDDEE; border: 1px #DDDDEE solid; }

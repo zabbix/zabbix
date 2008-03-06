@@ -103,6 +103,7 @@ span.divider{
 
 /********** REQUIREMENTS TABLE *************/
 span.ok{
+	white-space: normal;
 	color:		#00AA00;
 	font-weight:	bold;
 }
