@@ -226,3 +226,4 @@ test/env/standalone/conf/template_server.conf -text
 test/env/standalone/create_test.sh -text
 test/env/standalone/data.sql -text
 test/env/standalone/dump_db.sh -text
+upgrades/dbpatches/1.6/mysql/patch/alerts.sql -text

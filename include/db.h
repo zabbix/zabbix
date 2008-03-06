@@ -407,8 +407,8 @@ DB_ALERT
 	char	*subject;
 	char	*message;
 	zbx_alert_status_t	status;
-/*	int	retries;
-	int	delay;*/
+	int	retries;
+/*	int	delay;*/
 };
 
 DB_HOUSEKEEPER
