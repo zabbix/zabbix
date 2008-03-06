@@ -37,6 +37,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.5:
 
+ - [ZBX-322] fixed possible incorrect autodiscovery (Sasha)
  - [ZBX-315] fixed server irregulary stop on OpenBSD (Sasha)
  - [ZBX-182] fixed processing of icmpping if dns name cannot be resolved (Sasha)
  - [ZBX-290] fixed possible server crash if host dns name is unknown (Sasha)
