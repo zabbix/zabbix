@@ -7,7 +7,7 @@ PROXY_PORT=11000
 AGENT_PORT=12000
 SERVER_PORT=13000
 PROXY_NUM=2
-DEBUG=4
+DEBUG=3
 
 echo Killing all processes
 killall zabbix_agentd 2>/dev/null
@@ -27,14 +27,14 @@ mkdir $DEST/tmp 2>/dev/null
 
 echo Making binaries
 cd ../../..
-#./go
+./go
 cd -
 cp ../../../sbin/* $DEST/sbin
 
 echo Recreating database
-#echo "drop database trunk"|mysql -uroot
-#echo "create database trunk"|mysql -uroot
-#cat data.sql|mysql -uroot trunk
+echo "drop database trunk"|mysql -uroot
+echo "create database trunk"|mysql -uroot
+cat data.sql|mysql -uroot trunk
 
 for ((i=1; i <= $PROXY_NUM ; i++)); do
 	echo Processing proxy$i
