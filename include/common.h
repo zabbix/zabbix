@@ -326,7 +326,8 @@ typedef enum
 typedef enum
 {
 	ALERT_STATUS_NOT_SENT = 0,
-	ALERT_STATUS_SENT
+	ALERT_STATUS_SENT,
+	ALERT_STATUS_FAILED
 } zbx_alert_status_t;
 
 /* Item statuses */
@@ -416,6 +417,9 @@ typedef enum
 /* Action statuses */
 #define ACTION_STATUS_ACTIVE	0
 #define ACTION_STATUS_DISABLED	1
+
+/* Max number of retries for alerts */
+#define ACTION_MAX_RETRIES	3
 
 /* Operation types */
 #define OPERATION_TYPE_MESSAGE		0

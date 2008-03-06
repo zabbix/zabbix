@@ -3073,9 +3073,11 @@ static int	DBadd_event(
 
 		if(value == TRIGGER_VALUE_FALSE || value == TRIGGER_VALUE_TRUE)
 		{
-			DBexecute("update alerts set retries=3,error='Trigger changed its status. WIll not send repeats.'"
-				" where triggerid=" ZBX_FS_UI64 " and repeats>0 and status=%i",
-				triggerid, ALERT_STATUS_NOT_SENT);
+			DBexecute("update alerts set status=%d,error='Trigger changed its status. Will not send repeats.'"
+				" where eventid=" ZBX_FS_UI64 " and status=%d",
+				ALERT_STATUS_FAILED,
+				eventid,
+				ALERT_STATUS_NOT_SENT);
 		}
 	}
 
