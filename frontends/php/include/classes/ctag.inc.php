@@ -79,7 +79,9 @@
 			return $res;
 		}
 
-		function Show($destroy=true)	{	echo $this->ToString($destroy);			}
+		function Show($destroy=true){
+			echo $this->ToString($destroy);			
+		}
 
 		function Destroy()
 		{

@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - [DEV-127] improved system status widget in dashboard screen (Artem)
  - [DEV-125] added "Discovery status" widget (Artem)
  - [DEV-123] screen "queue" moved to administration section (Artem)
  - [DEV-126] moved graphs,maps,screens to dashboard, implemented quick add to favorites (Artem)

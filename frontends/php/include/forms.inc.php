@@ -474,13 +474,11 @@
 				url_param($s['status_codes'],false,'status_codes').
 				'");');
 			
-			if(strlen($s['url']) > 70)
-			{
+			if(strlen($s['url']) > 70){
 				$url = new CTag('span','yes', substr($s['url'],0,35).SPACE.'...'.SPACE.substr($s['url'],strlen($s['url'])-25,25));
 				$url->SetHint($s['url']);
 			}
-			else
-			{
+			else{
 				$url = $s['url'];
 			}
 
@@ -855,15 +853,12 @@
 			$frmUser->AddVar('user_medias', $user_medias);
 
 			$media_table = new CTable(S_NO_MEDIA_DEFINED);
-			foreach($user_medias as $id => $one_media)
-			{
-				if(!isset($one_media["active"]) || $one_media["active"]==0)
-				{
+			foreach($user_medias as $id => $one_media){
+				if(!isset($one_media["active"]) || $one_media["active"]==0){
 					$status = new CLink(S_ENABLED,'#','enabled');
 					$status->OnClick("return create_var('".$frmUser->GetName()."','disable_media',".$id.", true);");
 				}
-				else
-				{
+				else{
 					$status = new CLink(S_DISABLED,'#','disabled');
 					$status->OnClick("return create_var('".$frmUser->GetName()."','enable_media',".$id.", true);");
 				}
@@ -877,12 +872,14 @@
 					$status)
 				);
 			}
-			$frmUser->AddRow(S_MEDIA, array($media_table,
-				new CButton('add_media',S_ADD,
-						'return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'",550,400);'),
-				SPACE,
-				(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
-				));
+
+			$frmUser->AddRow(
+						S_MEDIA, 
+						array($media_table,
+							new CButton('add_media',S_ADD,'return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'",550,400);'),
+							SPACE,
+							(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
+						));
 		}
 
 		$cmbLang = new CComboBox('lang',$lang);

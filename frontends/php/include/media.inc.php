@@ -52,7 +52,7 @@
 			$result[$id]->SetHint(get_severity_description($id)." (".(isset($map['style']) ? "on" : "off").")");
 		}
 
-		return unpack_object($result);
+	return $result;
 	}
 
 	function	get_media_by_mediaid($mediaid)

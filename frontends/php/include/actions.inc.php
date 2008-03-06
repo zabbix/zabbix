@@ -36,13 +36,12 @@ include_once 'include/discovery.inc.php';
 			$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 			$denyed_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 			
-			$db_result = DBselect("select * from conditions where actionid=".$actionid);
+			$db_result = DBselect('SELECT * FROM conditions WHERE actionid='.$actionid);
 			while(($ac_data = DBfetch($db_result)) && $result)
 			{
 				if($ac_data['operator'] != 0) continue;
 
-				switch($ac_data['conditiontype'])
-				{
+				switch($ac_data['conditiontype']){
 					case CONDITION_TYPE_HOST_GROUP:
 						if(uint_in_array($ac_data['value'],explode(',',$denyed_groups)))
 						{
@@ -56,10 +55,13 @@ include_once 'include/discovery.inc.php';
 						}
 						break;
 					case CONDITION_TYPE_TRIGGER:
-						if(!DBfetch(DBselect("select distinct t.*".
-							" from triggers t,items i,functions f".
-							" where f.itemid=i.itemid and t.triggerid=f.triggerid".
-							" and i.hostid not in (".$denyed_hosts.") and t.triggerid=".$ac_data['value'])))
+						if(!DBfetch(DBselect('SELECT DISTINCT t.*'.
+							' FROM triggers t,items i,functions f,events e'.
+							' WHERE f.itemid=i.itemid '.
+								' AND t.triggerid=f.triggerid'.
+								' AND i.hostid NOT IN ('.$denyed_hosts.') '.
+								' AND e.eventid='.$ac_data['value'].
+								' AND t.triggerid=e.objectid')))
 						{
 							$result = false;
 						}
@@ -100,10 +102,13 @@ include_once 'include/discovery.inc.php';
 					}
 					break;
 				case CONDITION_TYPE_TRIGGER:
-					if(!DBfetch(DBselect("select distinct t.*".
-						" from triggers t,items i,functions f".
-						" where f.itemid=i.itemid and t.triggerid=f.triggerid".
-						" and i.hostid not in (".$denyed_hosts.") and t.triggerid=".$ac_data['value'])))
+					if(!DBfetch(DBselect('SELECT DISTINCT t.*'.
+						' FROM triggers t,items i,functions f,events e'.
+						' WHERE f.itemid=i.itemid '.
+							' AND t.triggerid=f.triggerid'.
+							' AND i.hostid NOT IN ('.$denyed_hosts.') '.
+							' AND e.eventid='.$ac_data['value'].
+							' AND t.triggerid=e.objectid')))
 					{
 						error(S_INCORRECT_TRIGGER);
 						$result = false;
@@ -115,22 +120,19 @@ include_once 'include/discovery.inc.php';
 		return $result;
 	}
 
-	function	get_action_by_actionid($actionid)
-	{
+	function	get_action_by_actionid($actionid){
 		$sql="select * from actions where actionid=$actionid"; 
 		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row)
-		{
+
+		if($row=DBfetch($result)){
 			return	$row;
 		}
-		else
-		{
+		else{
 			error("No action with actionid=[$actionid]");
 		}
-		return	$result;
+	return	$result;
 	}
-
+	
 	# Add Action's condition
 
 	function	add_action_condition($actionid, $condition)
@@ -797,12 +799,13 @@ include_once 'include/discovery.inc.php';
 				
 		
 		$result=DBselect('SELECT DISTINCT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
-				' FROM alerts a,media_type mt,functions f,items i '.
+				' FROM alerts a,media_type mt,functions f,items i,events e '.
 				' WHERE mt.mediatypeid=a.mediatypeid '.
-					' and a.triggerid=f.triggerid '.
-					' and f.itemid=i.itemid '.
-					' and i.hostid not in ('.$denyed_hosts.')'.
-					' and '.DBin_node('a.alertid').
+					' AND e.eventid = a.eventid'.
+					' AND e.objectid=f.triggerid '.
+					' AND f.itemid=i.itemid '.
+					' AND i.hostid not in ('.$denyed_hosts.')'.
+					' AND '.DBin_node('a.alertid').
 				order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries'),
 			10*$start+$num);
 			
@@ -817,20 +820,27 @@ include_once 'include/discovery.inc.php';
 			}
 			$time=date("Y.M.d H:i:s",$row["clock"]);
 
-			if($row["status"] == ALERT_STATUS_SENT)
-			{
-				$status=new CSpan(S_SENT,"off");
-				$retries=new CSpan(SPACE,"off");
+			if($row["status"] == ALERT_STATUS_SENT){
+				$status=new CSpan(S_SENT,"green");
+				$retries=new CSpan(SPACE,"green");
 			}
-			else
-			{
-				$status=new CSpan(S_NOT_SENT,"on");
-				$retries=new CSpan(3 - $row["retries"],"on");
+			else if($row["status"] == ALERT_STATUS_NOT_SENT){
+				$status=new CSpan(S_IN_PROGRESS,"orange");
+				$retries=new CSpan(ALERT_MAX_RETRIES - $row["retries"],"orange");
 			}
-			$sendto=htmlspecialchars($row["sendto"]);
+			else{
+				$status=new CSpan(S_NOT_SENT,"red");
+				$retries=new CSpan(0,"red");
+			}
+			$sendto=$row["sendto"];
 
-			$subject = empty($row["subject"]) ? '' : "<pre>".bold(S_SUBJECT.': ').htmlspecialchars($row["subject"])."</pre>";
-			$message = array($subject,"<pre>".htmlspecialchars($row["message"])."</pre>");
+			$pre = new CTag('pre','yes');
+			$pre->AddItem(array(bold(S_SUBJECT.': '),$row["subject"]));
+			$subject = empty($row["subject"]) ? '' : $pre;
+			
+			$pre = new CTag('pre','yes');
+			$pre->AddItem($row["message"]);
+			$message = array($subject, $pre);
 
 			if($row["error"] == "")
 			{
@@ -854,4 +864,59 @@ include_once 'include/discovery.inc.php';
 
 		return $table;
 	}
+
+function get_actions_hint_by_eventid($eventid,$status=NULL){
+	global $USER_DETAILS;
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
+	
+	$tab_hint = new CTableInfo(S_NO_ACTIONS_FOUND);
+	$tab_hint->AddOption('style', 'width: 300px;');
+	$tab_hint->SetHeader(array(
+			is_show_subnodes() ? S_NODES : null,
+			S_TYPE,
+			S_USER,
+			S_STATUS
+			));
+			
+	$sql_param = (is_null($status))?'':' AND a.status='.$status;
+	
+	$sql = 'SELECT DISTINCT a.alertid,mt.description,a.sendto,a.status,u.alias '.
+			' FROM alerts a,media_type mt,functions f,items i,events e, users u '.
+			' WHERE mt.mediatypeid=a.mediatypeid '.
+				' AND a.eventid='.$eventid.
+				$sql_param.
+				' AND e.eventid = a.eventid'.
+				' AND f.triggerid=e.objectid '.
+				' AND i.itemid=f.itemid '.
+				' AND i.hostid IN ('.$available_hosts.') '.
+				' AND '.DBin_node('a.alertid').
+				' AND u.userid=a.userid '.
+			' ORDER BY mt.description';
+	$result=DBselect($sql);
+		
+	while($row=DBfetch($result)){
+
+		if($row["status"] == ALERT_STATUS_SENT){
+			$status=new CSpan(S_SENT,"green");
+			$retries=new CSpan(SPACE,"green");
+		}
+		else if($row["status"] == ALERT_STATUS_NOT_SENT){
+			$status=new CSpan(S_IN_PROGRESS,"orange");
+			$retries=new CSpan(ALERT_MAX_RETRIES - $row["retries"],"orange");
+		}
+		else{
+			$status=new CSpan(S_NOT_SENT,"red");
+			$retries=new CSpan(0,"red");
+		}
+		
+		$tab_hint->AddRow(array(
+			get_node_name_by_elid($row['alertid']),
+			$row['description'],
+			$row['alias'],
+			$status
+		));
+	}
+
+return $tab_hint;
+}
 ?>
