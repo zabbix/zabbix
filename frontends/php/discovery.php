@@ -121,7 +121,11 @@ include_once "include/page_header.php";
 		}
 
 		if ($druleid == 0 && !empty($discovery_info)) {
-			$table->AddRow(array(get_node_name_by_elid($drule['druleid']),$drule['name'],'','',''));
+			$col = new CCol(array(bold($drule['name']),
+				SPACE."(".count($discovery_info).SPACE.S_ITEMS.")"));
+			$col->SetColSpan(count($services) + 2);
+
+			$table->AddRow(array(get_node_name_by_elid($drule['druleid']),$col));
 		}
 
 		foreach($discovery_info as $ip => $h_data)
