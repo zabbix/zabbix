@@ -274,41 +274,80 @@ function make_system_summary($available_hosts=false){
 						$actions= new CTable(' - ');
 
 						$sql='SELECT COUNT(a.alertid) as all'.
-								' FROM alerts a '.
-								' WHERE a.eventid='.$row_inf_event['eventid'];
-								
+								' FROM alerts a,functions f,items i,events e'.
+								' WHERE a.eventid='.$row_inf_event['eventid'].
+									' AND e.eventid = a.eventid'.
+									' AND f.triggerid=e.objectid '.
+									' AND i.itemid=f.itemid '.
+									' AND i.hostid IN ('.$available_hosts.') ';
+
 						$alerts=DBfetch(DBselect($sql));
-
+			
 						if(isset($alerts['all']) && ($alerts['all'] > 0)){
+							$mixed = 0;
+// Sent
 							$sql='SELECT COUNT(a.alertid) as sent '.
-									' FROM alerts a '.
+									' FROM alerts a,functions f,items i,events e'.
 									' WHERE a.eventid='.$row_inf_event['eventid'].
-										' AND a.status='.ALERT_STATUS_SENT;										
-							$alerts=DBfetch(DBselect($sql));
-
-							$tdl = new CCol(($alerts['done'])?(new CSpan($alerts['sent'],'green')):SPACE);
-							$tdl->AddOption('width','10');
-
+										' AND a.status='.ALERT_STATUS_SENT.
+										' AND e.eventid = a.eventid'.
+										' AND f.triggerid=e.objectid '.
+										' AND i.itemid=f.itemid '.
+										' AND i.hostid IN ('.$available_hosts.') ';
+			
+							$tmp=DBfetch(DBselect($sql));
+							$alerts['sent'] = $tmp['sent'];
+							$mixed+=($alerts['sent'])?ALERT_STATUS_SENT:0;
+// In progress
 							$sql='SELECT COUNT(a.alertid) as inprogress '.
-									' FROM alerts a '.
+									' FROM alerts a,functions f,items i,events e'.
 									' WHERE a.eventid='.$row_inf_event['eventid'].
-										' AND a.status='.ALERT_STATUS_NOT_SENT; 
-							$alerts=DBfetch(DBselect($sql));
-
-							$tdc = new CCol(($alerts['inprogress'])?(new CSpan($alerts['inprogress'],'orange')):SPACE);
-							$tdc->AddOption('width','10');
-
+										' AND a.status='.ALERT_STATUS_NOT_SENT.
+										' AND e.eventid = a.eventid'.
+										' AND f.triggerid=e.objectid '.
+										' AND i.itemid=f.itemid '.
+										' AND i.hostid IN ('.$available_hosts.') ';
+			
+							$tmp=DBfetch(DBselect($sql));
+							$alerts['inprogress'] = $tmp['inprogress'];
+// Failed
 							$sql='SELECT COUNT(a.alertid) as failed '.
-									' FROM alerts a '.
+									' FROM alerts a,functions f,items i,events e'.
 									' WHERE a.eventid='.$row_inf_event['eventid'].
-										' AND a.status='.ALERT_STATUS_FAILED;
-							$alerts=DBfetch(DBselect($sql));
-							$tdr = new CCol(($alerts['failed'])?(new CSpan($alerts['failed'],'red')):SPACE);
-							$tdr->AddOption('width','10');
-							
-							$actions->AddRow(array($tdl,$tdc,$tdr));
+										' AND a.status='.ALERT_STATUS_FAILED.
+										' AND e.eventid = a.eventid'.
+										' AND f.triggerid=e.objectid '.
+										' AND i.itemid=f.itemid '.
+										' AND i.hostid IN ('.$available_hosts.') ';
+			
+							$tmp=DBfetch(DBselect($sql));
+							$alerts['failed'] = $tmp['failed'];
+							$mixed+=($alerts['failed'])?ALERT_STATUS_FAILED:0;
+			
+			
+							if($alerts['inprogress']){
+								$status = new CSpan(S_IN_PROGRESS,'orange');
+							}
+							else if(ALERT_STATUS_SENT == $mixed){
+								$status = new CSpan(S_OK,'green');
+							}
+							else if(ALERT_STATUS_FAILED == $mixed){
+								$status = new CSpan(S_FAILED,'red');
+							}
+							else{
+								$tdl = new CCol(($alerts['sent'])?(new CSpan($alerts['sent'],'green')):SPACE);
+								$tdl->AddOption('width','10');
+								
+								$tdr = new CCol(($alerts['failed'])?(new CSpan($alerts['failed'],'red')):SPACE);
+								$tdr->AddOption('width','10');
+			
+								$status = new CRow(array($tdl,$tdr));
+							}
+			
+							$actions->AddRow($status);
 						}
-//--------					
+//--------		
+			
 						$table_inf->AddRow(array(
 							get_node_name_by_elid($row_inf['triggerid']),
 							$host,
