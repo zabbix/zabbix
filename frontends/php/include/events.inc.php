@@ -29,28 +29,25 @@
 		}
 	}
 
-	function	get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0)
-	{
+	function	get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 		global $USER_DETAILS;
+		$config = select_config();
 		
 		$show_unknown = get_profile('web.events.show_unknown',0);
 		
 		$sql_from = $sql_cond = "";
 
-	        $availiable_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
-	        $availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+		$availiable_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+		$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
 		
-		if($hostid > 0)
-		{
+		if($hostid > 0){
 			$sql_cond = " and h.hostid=".$hostid;
 		}
-		elseif($groupid > 0)
-		{
+		elseif($groupid > 0){
 			$sql_from = ", hosts_groups hg ";
 			$sql_cond = " and h.hostid=hg.hostid and hg.groupid=".$groupid;
 		}
-		else
-		{
+		else{
 			$sql_from = ", hosts_groups hg ";
 			$sql_cond = " and h.hostid in (".$availiable_hosts.") ";
 		}
@@ -60,10 +57,13 @@
 		$trigger_list = '';
 		
 		$sql = 'SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,t.type '.
-			' FROM triggers t, functions f, items i, hosts h '.$sql_from.
-			' WHERE '.DBin_node('t.triggerid').
-				' AND t.triggerid=f.triggerid and f.itemid=i.itemid '.
-				' AND i.hostid=h.hostid '.$sql_cond.' and h.status='.HOST_STATUS_MONITORED;
+				' FROM triggers t, functions f, items i, hosts h '.$sql_from.
+				' WHERE '.DBin_node('t.triggerid').
+					' AND t.triggerid=f.triggerid '.
+					' AND f.itemid=i.itemid '.
+					' AND i.hostid=h.hostid '.
+					' AND h.status='.HOST_STATUS_MONITORED.
+					$sql_cond;
 							
 		$rez = DBselect($sql);
 		while($rowz = DBfetch($rez)){
@@ -81,11 +81,14 @@
 				$hostid == 0 ? S_HOST : null,
 				S_DESCRIPTION,
 				S_VALUE,
-				S_SEVERITY
+				S_SEVERITY,
+				S_DURATION,
+				($config['event_ack_enable'])?S_ACK:NULL,
+				S_ACTIONS
 				));
 
 		if(!empty($triggers)){
-			$sql = 'SELECT e.eventid, e.objectid as triggerid,e.clock,e.value '.
+			$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.value, e.acknowledged '.
 					' FROM events e '.
 					' WHERE '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.
 					  ' AND e.objectid IN '.$trigger_list.
@@ -108,21 +111,110 @@
 				continue;
 			}
 		
-			if($row["value"] == 0)
-			{
+			if($row["value"] == TRIGGER_VALUE_FALSE){
 				$value=new CCol(S_OFF,"off");
 			}
-			elseif($row["value"] == 1)
-			{
+			elseif($row["value"] == TRIGGER_VALUE_TRUE){
 				$value=new CCol(S_ON,"on");
 			}
-			else
-			{
+			else{
 				$value=new CCol(S_UNKNOWN_BIG,"unknown");
 			}
 
 			$row = array_merge($triggers[$row['triggerid']],$row);
-			if(($show_unknown == 0) && (!event_initial_time($row,$show_unknown))) continue;
+			if((0 == $show_unknown) && (!event_initial_time($row,$show_unknown))) continue;
+			
+			$duration = zbx_date2age($row['clock']);
+			if($next_event = get_next_event($row,$show_unknown)){
+				$duration = zbx_date2age($row['clock'],$next_event['clock']);
+			}
+//actions								
+			$actions= new CTable(' - ');
+
+			$sql='SELECT COUNT(a.alertid) as all'.
+					' FROM alerts a,functions f,items i,events e'.
+					' WHERE a.eventid='.$row['eventid'].
+						' AND e.eventid = a.eventid'.
+						' AND f.triggerid=e.objectid '.
+						' AND i.itemid=f.itemid '.
+						' AND i.hostid IN ('.$available_hosts.') ';
+
+					
+			$alerts=DBfetch(DBselect($sql));
+
+			if(isset($alerts['all']) && ($alerts['all'] > 0)){
+				$mixed = 0;
+// Sent
+				$sql='SELECT COUNT(a.alertid) as sent '.
+						' FROM alerts a,functions f,items i,events e'.
+						' WHERE a.eventid='.$row['eventid'].
+							' AND a.status='.ALERT_STATUS_SENT.
+							' AND e.eventid = a.eventid'.
+							' AND f.triggerid=e.objectid '.
+							' AND i.itemid=f.itemid '.
+							' AND i.hostid IN ('.$available_hosts.') ';
+
+				$tmp=DBfetch(DBselect($sql));
+				$alerts['sent'] = $tmp['sent'];
+				$mixed+=($alerts['sent'])?ALERT_STATUS_SENT:0;
+// In progress
+				$sql='SELECT COUNT(a.alertid) as inprogress '.
+						' FROM alerts a,functions f,items i,events e'.
+						' WHERE a.eventid='.$row['eventid'].
+							' AND a.status='.ALERT_STATUS_NOT_SENT.
+							' AND e.eventid = a.eventid'.
+							' AND f.triggerid=e.objectid '.
+							' AND i.itemid=f.itemid '.
+							' AND i.hostid IN ('.$available_hosts.') ';
+
+				$tmp=DBfetch(DBselect($sql));
+				$alerts['inprogress'] = $tmp['inprogress'];
+// Failed
+				$sql='SELECT COUNT(a.alertid) as failed '.
+						' FROM alerts a,functions f,items i,events e'.
+						' WHERE a.eventid='.$row['eventid'].
+							' AND a.status='.ALERT_STATUS_FAILED.
+							' AND e.eventid = a.eventid'.
+							' AND f.triggerid=e.objectid '.
+							' AND i.itemid=f.itemid '.
+							' AND i.hostid IN ('.$available_hosts.') ';
+
+				$tmp=DBfetch(DBselect($sql));
+				$alerts['failed'] = $tmp['failed'];
+				$mixed+=($alerts['failed'])?ALERT_STATUS_FAILED:0;
+
+
+				if($alerts['inprogress']){
+					$status = new CSpan(S_IN_PROGRESS,'orange');
+				}
+				else if(ALERT_STATUS_SENT == $mixed){
+					$status = new CSpan(S_OK,'green');
+				}
+				else if(ALERT_STATUS_FAILED == $mixed){
+					$status = new CSpan(S_FAILED,'red');
+				}
+				else{
+					$tdl = new CCol(($alerts['sent'])?(new CSpan($alerts['sent'],'green')):SPACE);
+					$tdl->AddOption('width','10');
+					
+					$tdr = new CCol(($alerts['failed'])?(new CSpan($alerts['failed'],'red')):SPACE);
+					$tdr->AddOption('width','10');
+
+					$status = new CRow(array($tdl,$tdr));
+				}
+
+				$actions->AddRow($status);
+			}
+//--------		
+
+			if($config['event_ack_enable']){
+				if($row['acknowledged'] == 1){
+					$ack=new CLink(S_YES,'acknow.php?eventid='.$row['eventid'],'action');
+				}
+				else{
+					$ack= new CLink(S_NO,'acknow.php?eventid='.$row['eventid'],'on');
+				}
+			}
 
 			$table->AddRow(array(
 				date("Y.M.d H:i:s",$row["clock"]),
@@ -133,7 +225,12 @@
 					"tr_events.php?triggerid=".$row["triggerid"],"action"
 					),
 				$value,
-				new CCol(get_severity_description($row["priority"]), get_severity_style($row["priority"]))));
+				new CCol(get_severity_description($row["priority"]), get_severity_style($row["priority"])),
+				$duration,
+				($config['event_ack_enable'])?$ack:NULL,
+				$actions
+			));
+				
 			$col++;
 		}
 		return $table;
@@ -216,7 +313,7 @@ function event_initial_time($row,$show_unknown=0){
 	
 	if(!empty($events) && 
 		($events[0]['value'] == $row['value']) && 
-		($row['type'] == TRIGGER_MULT_EVENT_ENABLED) && 	
+		($row['type'] == TRIGGER_MULT_EVENT_ENABLED) &&
 		($row['value'] == TRIGGER_VALUE_TRUE))
 	{
 		return true;
@@ -249,7 +346,6 @@ function first_initial_eventid($row,$show_unknown=0){
 				' WHERE e.objectid='.$row['triggerid'].$sql_cond.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
 				' ORDER BY e.object, e.objectid, e.eventid';
-//				' ORDER BY e.eventid';
 		$res = DBselect($sql,1);
 		
 		if($rows = DBfetch($res)) return $rows['eventid'];
@@ -262,7 +358,6 @@ function first_initial_eventid($row,$show_unknown=0){
 					' AND e.objectid='.$row['triggerid'].$sql_cond.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
 				' ORDER BY e.object, e.objectid, e.eventid';
-//				' ORDER BY e.eventid';
 		$res = DBselect($sql,1);
 		
 		if($rows = DBfetch($res)){
@@ -271,7 +366,7 @@ function first_initial_eventid($row,$show_unknown=0){
 		
 		$row['eventid'] = $eventid;
 		$row['value'] = $events[0]['value'];
-		return first_initial_eventid($row,$show_unknown=0);
+		return first_initial_eventid($row,$show_unknown=0);			// recursion!!!
 	}
 	else if(!empty($events) && ($events[0]['value'] == $row['value'])){
 		$eventid = (count($events) > 1)?($events[1]['eventid']):(0);
@@ -283,7 +378,6 @@ function first_initial_eventid($row,$show_unknown=0){
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
 					' AND e.value='.$row['value'].
 				' ORDER BY e.object, e.objectid, e.eventid';
-//				' ORDER BY e.eventid';
 		$res = DBselect($sql,1);
 		$rows = DBfetch($res);
 
@@ -298,7 +392,6 @@ function get_latest_events($row,$show_unknown=0){
 	$events = array();
 
 // SQL's are optimized that's why it's splited that way	
-// func MOD is used on object for forcing MySQL use different Index!!!
 
 /*******************************************/
 // Check for optimization after changing!  */
@@ -341,5 +434,31 @@ function get_latest_events($row,$show_unknown=0){
 		$events[] = array('eventid'=>$value,'value'=>$key);
 	}
 return $events;
+}
+
+function get_next_event($row,$show_unknown=0){
+	$sql_cond=($show_unknown == 0)?' AND e.value<>'.TRIGGER_VALUE_UNKNOWN:'';
+	
+	if((TRIGGER_MULT_EVENT_ENABLED == $row['type']) && (TRIGGER_VALUE_TRUE == $row['value'])){
+		$sql = 'SELECT e.eventid, e.value '.
+			' FROM events e'.
+			' WHERE e.objectid='.$row['triggerid'].
+				' AND e.eventid > '.$row['eventid'].
+				' AND e.object='.EVENT_OBJECT_TRIGGER.
+				' AND e.value='.$row['value'].
+			' ORDER BY e.object, e.objectid, e.eventid';
+	}
+	else{
+		$sql = 'SELECT e.eventid, e.value, e.clock '.
+			' FROM events e'.
+			' WHERE e.objectid='.$row['triggerid'].
+				' AND e.eventid > '.$row['eventid'].
+				' AND e.object='.EVENT_OBJECT_TRIGGER.
+				' AND e.value<>'.$row['value'].
+				$sql_cond.
+			' ORDER BY e.object, e.objectid, e.eventid';
+	}
+	$rez = DBfetch(DBselect($sql,1));
+return $rez;
 }
 ?>
