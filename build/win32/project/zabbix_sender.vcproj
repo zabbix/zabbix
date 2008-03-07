@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1257"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="zabbix_sender"
 	ProjectGUID="{0DA34C05-B7CA-4915-8D8B-B2DB8F4D0478}"
 	>
@@ -1620,6 +1620,14 @@
 								PreprocessorDefinitions=""
 							/>
 						</FileConfiguration>
+					</File>
+				</Filter>
+				<Filter
+					Name="zbxjson"
+					>
+					<File
+						RelativePath="..\..\..\src\libs\zbxjson\json.c"
+						>
 					</File>
 				</Filter>
 			</Filter>

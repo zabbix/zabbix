@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1257"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="zabbix_agentd"
 	ProjectGUID="{7AF2898C-0CB8-4084-B814-88C2825D228B}"
 	>
@@ -15518,6 +15518,14 @@
 								ProgramDataBaseFileName="Debug/zbxcomms/"
 							/>
 						</FileConfiguration>
+					</File>
+				</Filter>
+				<Filter
+					Name="zbxjson"
+					>
+					<File
+						RelativePath="..\..\..\src\libs\zbxjson\json.c"
+						>
 					</File>
 				</Filter>
 			</Filter>
