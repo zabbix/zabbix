@@ -260,21 +260,7 @@
 
 		if(isset($_REQUEST['type_changed']))
 		{
-			switch($new_check_type)
-			{
-				case SVC_SSH:	$new_check_ports = 22;	break;
-				case SVC_LDAP:	$new_check_ports = 389;	break;
-				case SVC_SMTP:	$new_check_ports = 25;	break;
-				case SVC_FTP:	$new_check_ports = 21;	break;
-				case SVC_HTTP:	$new_check_ports = 80;	break;
-				case SVC_POP:	$new_check_ports = 110;	break;
-				case SVC_NNTP:	$new_check_ports = 119;	break;
-				case SVC_IMAP:	$new_check_ports = 143;	break;
-				case SVC_TCP:	$new_check_ports = 80;	break;
-				case SVC_AGENT:	$new_check_ports = 10050;	break;
-				case SVC_SNMPv1:$new_check_ports = 161;	break;
-				case SVC_SNMPv2:$new_check_ports = 161;	break;
-			}
+			$new_check_ports = svc_default_port($new_check_type);
 		}
 		$external_param = array();
 		switch($new_check_type)
