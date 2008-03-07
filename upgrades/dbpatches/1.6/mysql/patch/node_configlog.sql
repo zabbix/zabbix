@@ -1,1 +1,1 @@
-drop table node_configlog.sql;
+drop table node_configlog;
