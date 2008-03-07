@@ -55,12 +55,14 @@ include_once "include/page_header.php";
 
 	$services = array();
 
-	$db_dservices = DBselect('SELECT s.type,s.port FROM dservices s,dhosts h'.
+	$db_dservices = DBselect('SELECT s.type,s.port,s.key_ FROM dservices s,dhosts h'.
 			' WHERE '.DBin_node('s.dserviceid').
 			' AND s.dhostid=h.dhostid'.
 			($druleid > 0 ? ' AND h.druleid='.$druleid : ''));
 	while ($dservice = DBfetch($db_dservices)) {
-		$service_name = discovery_check_type2str($dservice['type']).':'.$dservice['port'];
+		$service_name = discovery_check_type2str($dservice['type']).
+				discovery_port2str($dservice['type'], $dservice['port']).
+				(empty($dservice['key_']) ? '' : ':'.$dservice['key_']);
 		$services[$service_name] = 1;
 	}
 
@@ -99,7 +101,7 @@ include_once "include/page_header.php";
 
 			$discovery_info[$dhost['ip']] = array('class' => $class, 'time' => $dhost[$time], 'druleid' => $dhost['druleid']);
 
-			$db_dservices = DBselect('SELECT type,port,status,lastup,lastdown FROM dservices '.
+			$db_dservices = DBselect('SELECT type,port,key_,status,lastup,lastdown FROM dservices '.
 					' WHERE dhostid='.$dhost['dhostid'].
 					' order by status,type,port');
 			while($dservice = DBfetch($db_dservices)){
@@ -111,7 +113,9 @@ include_once "include/page_header.php";
 					$time = 'lastdown';
 				}
 
-				$service_name = discovery_check_type2str($dservice['type']).':'.$dservice['port'];
+				$service_name = discovery_check_type2str($dservice['type']).
+						discovery_port2str($dservice['type'], $dservice['port']).
+						(empty($dservice['key_']) ? '' : ':'.$dservice['key_']);
 
 				$discovery_info
 					[$dhost['ip']]
