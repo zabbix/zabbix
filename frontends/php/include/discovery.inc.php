@@ -196,10 +196,26 @@
 
 	function	delete_discovery_rule($druleid)
 	{
-		if($result = DBexecute('delete from drules where druleid='.$druleid))
-		{
-			$result = DBexecute('delete from dchecks where druleid='.$druleid);
+		$result = true;
+
+		if ($result) {
+			$db_dhosts = DBselect('select dhostid from dhosts'.
+					' where druleid='.$druleid.' and '.DBin_node('dhostid'));
+
+			while ($result && ($db_dhost = DBfetch($db_dhosts)))
+				$result = DBexecute('delete from dservices where'.
+						' dhostid='.$db_dhost['dhostid']);
 		}
+
+		if ($result)
+			$result = DBexecute('delete from dhosts where druleid='.$druleid);
+
+		if ($result)
+			$result = DBexecute('delete from dchecks where druleid='.$druleid);
+
+		if ($result)
+			$result = DBexecute('delete from drules where druleid='.$druleid);
+
 		return $result;
 	}
 ?>
