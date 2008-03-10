@@ -1,8 +1,8 @@
 #echo "create database trunk"|mysql -uroot
 #cat data.sql|mysql -uroot trunk
 
-DEST=/home/zabbix/test
-TMP_DIR=\\/home\\/zabbix\\/test\\/tmp
+DEST=/home/alex/test
+TMP_DIR=\\/home\\/alex\\/test\\/tmp
 PROXY_PORT=11000
 AGENT_PORT=12000
 SERVER_PORT=13000
@@ -32,9 +32,9 @@ cd -
 cp ../../../sbin/* $DEST/sbin
 
 echo Recreating database
-echo "drop database trunk"|mysql -uroot
-echo "create database trunk"|mysql -uroot
-cat data.sql|mysql -uroot trunk
+#echo "drop database trunk"|mysql -uroot
+#echo "create database trunk"|mysql -uroot
+#cat data.sql|mysql -uroot trunk
 
 for ((i=1; i <= $PROXY_NUM ; i++)); do
 	echo Processing proxy$i
