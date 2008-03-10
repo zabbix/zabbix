@@ -22,7 +22,7 @@
 	function	get_last_event_by_triggerid($triggerid)
 	{
 		$event_data = DBfetch(DBselect('select * from events where objectid='.$triggerid.
-			' and object='.EVENT_OBJECT_TRIGGER.' order by clock desc', 1));
+			' and object='.EVENT_OBJECT_TRIGGER.' order by objectid desc, object desc, eventid desc', 1));
 		if(!$event_data)
 			return FALSE;
 		return $event_data;
