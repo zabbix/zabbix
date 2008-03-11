@@ -766,12 +766,12 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					$lst_error->AddItem($msg['message'], $msg['type']);
 //message scroll if needed
 				$msg_show = 6;
-				$msg_font_size = 8;
+				$msg_font_size = 7;
 				$msg_count = count($ZBX_MESSAGES);
 				
 				if($msg_count > $msg_show) $msg_count = $msg_show;
 					
-				$msg_count = ($msg_count * $msg_font_size *4) + 2;
+				$msg_count = ($msg_count * $msg_font_size * 4) + 2;
 				$lst_error->AddOption('style','font-size: '.$msg_font_size.'pt; height: '.$msg_count.'px;');
 //---
 				$lst_error->Show();
@@ -1053,64 +1053,6 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	return	DBexecute('update config set '.implode(',',$update).' where '.DBin_node('configid', get_current_nodeid(false)));
 	}
 	
-/* Function: 
- *	hide_form_items()
- *
- * Desc:
- *	Searches items/objects for Form tags like "<input"/Form classes like CForm, and makes it empty
- * 
- * Author: 
- *	Aly
- */
-	function hide_form_items(&$obj){
-		if(is_array($obj)){
-			foreach($obj as $id => $item){
-				hide_form_items($obj[$id]);			// Attention recursion;
-			}
-		}
-		else if(is_object($obj)){
-			if(str_in_array(strtolower(get_class($obj)),array('cform','ccheckbox','cselect','cbutton','cbuttonqmessage','cbuttondelete','cbuttoncancel'))){
-				$obj=SPACE;
-			}
-			if(isset($obj->items) && !empty($obj->items)){
-				foreach($obj->items as $id => $item){
-					hide_form_items($obj->items[$id]); 		// Recursion
-				}
-			}
-		}
-		else{
-			foreach(array('<form','<input','<select') as $item){
-				if(strpos($obj,$item) !== FALSE) $obj = SPACE;
-			}
-		}
-	}
-
-	function get_table_header($col1, $col2=SPACE){
-		if(isset($_REQUEST['print'])){
-			hide_form_items($col1);
-			hide_form_items($col2);
-		//if empty header than do not show it
-			if(($col1 == SPACE) && ($col2 == SPACE)) return new CScript('');
-		}
-		
-		$table = new CTable(NULL,"header");
-//		$table->AddOption('border',1);
-		$table->SetCellSpacing(0);
-		$table->SetCellPadding(1);
-		
-		$td_r = new CCol($col2,"header_r");
-		$td_r->AddOption('align','right');
-		
-		$table->AddRow(array(new CCol($col1,"header_l"), $td_r));
-	return $table;
-	}
-
-	function	show_table_header($col1, $col2=SPACE)
-	{
-		$table = get_table_header($col1, $col2);
-		$table->Show();
-	}
-
 	# Show History Graph
 
 	function	show_history($itemid,$from,$stime,$period){
@@ -1703,11 +1645,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *
 	 * author: Aly
 	 */
-	function validate_sort_and_sortorder(){
+	function validate_sort_and_sortorder($sort=NULL,$sortorder=ZBX_SORT_UP){
 		global $page;
 		
-		$_REQUEST['sort'] = get_request('sort',get_profile('web.'.$page["file"].'.sort',NULL));
-		$_REQUEST['sortorder'] = get_request('sortorder',get_profile('web.'.$page["file"].'.sortorder',ZBX_SORT_UP));
+		$_REQUEST['sort'] = get_request('sort',get_profile('web.'.$page["file"].'.sort',$sort));
+		$_REQUEST['sortorder'] = get_request('sortorder',get_profile('web.'.$page["file"].'.sortorder',$sortorder));
 		
 		if(!is_null($_REQUEST['sort'])){
 			$_REQUEST['sort'] = eregi_replace('[^a-z\.\_]','',$_REQUEST['sort']);

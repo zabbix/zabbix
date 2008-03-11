@@ -30,7 +30,7 @@ require_once "include/blocks.inc.php";
 $page["title"] = "S_DASHBOARD";
 $page["file"] = "dashboard.php";
 $page['hist_arg'] = array();
-$page['scripts'] = array('prototype.js','url.js','dashboard.js','showhint.js');
+$page['scripts'] = array('url.js','dashboard.js','showhint.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -51,22 +51,18 @@ include_once "include/page_header.php";
 		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,			null),
 
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL),
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'state'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
 	);
 
 	check_fields($fields);
 	
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
 // ACTION /////////////////////////////////////////////////////////////////////////////
-
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-//			echo 'alert("'.$_REQUEST['favid'].' : '.$_REQUEST['state'].'");';
 			update_profile('web.dashboard.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state']);
 		}
 		if('refresh' == $_REQUEST['favobj']){
-//			echo 'alert("'.$_REQUEST['favid'].' : '.$_REQUEST['state'].'");';
 			switch($_REQUEST['favid']){
 				case 'hat_syssum':
 					$syssum = make_system_summary($available_hosts);
@@ -299,7 +295,7 @@ include_once "include/page_header.php";
 	$refresh_menu = new CDiv(SPACE,'iconmenu');
 	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_stszbx");');
 	$refresh_menu->AddOption('title',S_MENU);
-		
+
 	$right_tab->AddRow(create_hat(
 			S_STATUS_OF_ZABBIX,
 			null,//make_status_of_zbx(),
@@ -331,9 +327,9 @@ include_once "include/page_header.php";
 			get_profile('web.dashboard.hats.hat_webovr.state',1)
 		));
 
-	$drules = DBfetch(DBselect('SELECT COUNT(druleid) as cnt FROM drules WHERE '.DBin_node('druleid')));
-	
-	if($drules['cnt'] > 0){
+	$drules = DBfetch(DBselect('SELECT COUNT(d.druleid) as cnt FROM drules d WHERE '.DBin_node('d.druleid').' AND d.status='.DRULE_STATUS_ACTIVE));
+
+	if(($drules['cnt'] > 0) && (USER_TYPE_ZABBIX_ADMIN <= $USER_DETAILS['type'])){
 	
 		$refresh_tab[] = array(	'id' => 'hat_dscvry','interval'  => get_profile('web.dahsboard.rf_rate.hat_dscvry',60));
 

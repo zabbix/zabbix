@@ -664,7 +664,7 @@ if(isset($_REQUEST['sform'])){
 	$row = new CRow(array(
 						new CCol(S_TRIGGER,'form_row_l'),
 						new CCol(array(
-									new CTextBox("trigger",$trigger,32,'yes'),
+									new CTextBox("trigger",$trigger,64,'yes'),
 									new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$frmService->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');",'T')
 								),'form_row_r')
 							));

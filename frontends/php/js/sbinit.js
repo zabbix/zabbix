@@ -45,8 +45,8 @@ function showgraphmenu(obj_id){
 	scrl.style.top = pos.top+"px";
 	scrl.style.left = 1+"px";
 	
-	G_MENU.gm_gmenu.style.top = (pos.top-108)+"px" // 110 = G_MENU height
-	G_MENU.gm_gmenu.style.left = 1+"px"
+	G_MENU.gm_gmenu.style.top = (pos.top-108)+"px"; // 110 = G_MENU height
+	G_MENU.gm_gmenu.style.left = 1+"px";
 	
 	SCROLL_BAR.onchange = function(){
 		if(is_null(_PE_SB)){
@@ -173,7 +173,7 @@ function graph_zoom_init(graph_id,stime,period,width,height){
 }
 
 function sboxload(){
-	var date = datetoarray(parseInt(this.stime));	// this becomes related to the object who ones that function!!
+	var date = datetoarray(parseInt(this.stime));	// `this` becomes related to the object who ownes that function!!
 //SDI(this.sbox_id);
 	var stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
 

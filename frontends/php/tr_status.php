@@ -505,7 +505,7 @@ include_once "include/page_header.php";
 					get_severity_style($row["priority"])
 					),
 				$value,
-				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"tr_events.php?triggerid=".$row["triggerid"],"action"),								
+				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"events.php?triggerid=".$row["triggerid"],"action"),								
 				get_node_name_by_elid($row['triggerid']),
 				$host,
 				$description,
@@ -567,7 +567,7 @@ include_once "include/page_header.php";
 						get_severity_style($row["priority"])
 						),
 					$value,
-					new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"tr_events.php?triggerid=".$row["triggerid"],"action"),					
+					new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"events.php?triggerid=".$row["triggerid"],"action"),					
 					get_node_name_by_elid($row['triggerid']),
 					$host,
 					$description,

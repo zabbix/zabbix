@@ -945,6 +945,7 @@
 	'S_EVERY'=>						'Every',
 	'S_REFRESHED'=>					'Refreshed',
 	'S_MENU'=>						'Menu',
+	'S_RESET'=>						'Reset',
 
 //	overview.php
 	'S_SELECT_GROUP_DOT_DOT_DOT'=>		'Select group ...',

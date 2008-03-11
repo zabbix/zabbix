@@ -232,13 +232,11 @@ include_once "include/page_header.php";
 	if($real_hosts)
 		array_push($validation_param, "real_hosts");
 		
-	if(str_in_array($srctbl,array("triggers","logitems","items")))
-	{
+	if(str_in_array($srctbl,array("graphs","screens","triggers","logitems","items"))){
 		array_push($validation_param, "always_select_first_host");
 		validate_group_with_host(PERM_READ_LIST,$validation_param);
 	}
-	elseif(str_in_array($srctbl,array('hosts','templates','host_templates')))
-	{
+	elseif(str_in_array($srctbl,array('hosts','templates','host_templates'))){
 		validate_group(PERM_READ_LIST,$validation_param);
 	}
 

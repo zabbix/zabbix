@@ -1889,7 +1889,7 @@
 				array(S_TRIGGER, null,  null, 
 					array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
 					),
-				array(S_EVENTS, 'tr_events.php?triggerid='.$trhosts[$hostname]['triggerid'], array('tw'=>'_blank'))
+				array(S_EVENTS, 'events.php?triggerid='.$trhosts[$hostname]['triggerid'], array('tw'=>'_blank'))
 				);
 
 			if(isset($ack_menu)) $tr_ov_menu[] = $ack_menu;

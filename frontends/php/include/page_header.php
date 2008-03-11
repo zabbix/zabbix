@@ -108,21 +108,32 @@ COpt::profiling_start("page");
 							"sub_pages"=>array("chart2.php","charts.php","screens.php","maps.php","map.php")
 						),
 					array("url"=>"overview.php"	,"label"=>S_OVERVIEW	),
-					array("url"=>"httpmon.php"	,"label"=>S_WEB	,
-						"sub_pages"=>array("httpdetails.php")
+					array(
+							"url"=>"httpmon.php",
+							"label"=>S_WEB,
+							"sub_pages"=>array("httpdetails.php")
 						),
 					array("url"=>"latest.php"	,"label"=>S_LATEST_DATA	,
 						"sub_pages"=>array("history.php","chart.php")
 						),
-					array("url"=>"tr_status.php"	,"label"=>S_TRIGGERS	,
-						"sub_pages"=>array("tr_events.php","acknow.php","tr_comments.php",
-								"chart4.php","scripts_exec.php")
+					array(
+							"url"=>"tr_status.php",
+							"label"=>S_TRIGGERS,
+							"sub_pages"=>array("acknow.php","tr_comments.php","chart4.php","scripts_exec.php")
 						),
 					array("url"=>"events.php"	,"label"=>S_EVENTS	),
-					array("url"=>"actions.php"	,"label"=>S_ACTIONS	),
-					array("url"=>"discovery.php"	,"label"=>S_DISCOVERY	, "user_type"=>USER_TYPE_ZABBIX_ADMIN),
-					array("url"=>"srv_status.php"	,"label"=>S_IT_SERVICES	, 'forse_disable_subnodes' => true,
-						"sub_pages"=>array("report3.php","chart_sla.php","chart5.php")
+					array(
+							"url"=>"actions.php",
+							"label"=>S_ACTIONS),
+					array(
+							"url"=>"discovery.php",
+							"label"=>S_DISCOVERY, 
+							"user_type"=>USER_TYPE_ZABBIX_ADMIN),
+					array(
+							"url"=>"srv_status.php",
+							"label"=>S_IT_SERVICES,
+							'forse_disable_subnodes' => true,
+							"sub_pages"=>array("report3.php","chart_sla.php","chart5.php")
 						),
 					array("url"=>"vtext.php"),
 					array("url"=>"chart3.php")
@@ -153,18 +164,26 @@ COpt::profiling_start("page");
 				"default_page_id"	=> 0,
 				"forse_disable_subnodes"=> true,
 				"pages"=>array(
-					array("url"=>"config.php"	,"label"=>S_GENERAL,
-						"sub_pages"=>array("image.php")
+					array(
+							"url"=>"config.php",
+							"label"=>S_GENERAL,
+							"sub_pages"=>array("image.php")
 						),
-					array("url"=>"httpconf.php"	,"label"=>S_WEB,
-						"sub_pages"=>array("popup_httpstep.php")
+					array(
+							"url"=>"httpconf.php",
+							"label"=>S_WEB,
+							"sub_pages"=>array("popup_httpstep.php")
 						),
 					array("url"=>"hosts.php"	,"label"=>S_HOSTS),
-					array("url"=>"items.php"	,"label"=>S_ITEMS,
-						"sub_pages"=>array("tr_logform.php")		
+					array(
+							"url"=>"items.php",
+							"label"=>S_ITEMS,
+							"sub_pages"=>array("tr_logform.php")		
 						),
-					array("url"=>"triggers.php"	,"label"=>S_TRIGGERS,
-						"sub_pages"=>array("popup_trexpr.php")
+					array(
+							"url"=>"triggers.php",
+							"label"=>S_TRIGGERS,
+							"sub_pages"=>array("popup_trexpr.php")
 						),
 					array("url"=>"actionconf.php"	,"label"=>S_ACTIONS),
 					array("url"=>"sysmaps.php"	,"label"=>S_MAPS,
@@ -394,6 +413,7 @@ COpt::profiling_start("page");
 ?>
 
     <script type="text/javascript" src="js/common.js"></script>
+	<script type="text/javascript" src="js/prototype.js"></script>
 <?php
 	if(isset($page['scripts']) && is_array($page['scripts'])){
 		foreach($page['scripts'] as $id => $script){

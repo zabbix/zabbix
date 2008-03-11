@@ -640,7 +640,7 @@ function make_latest_issues($available_hosts=false){
 				get_node_name_by_elid($row['triggerid']),
 				$host,
 				new CCol($description,get_severity_style($row["priority"])),
-				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"tr_events.php?triggerid=".$row["triggerid"],"action"),					
+				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"events.php?triggerid=".$row["triggerid"],"action"),					
 				zbx_date2age($row_event['clock']),
 				($config['event_ack_enable'])?(new CCol($ack,"center")):NULL,
 				$actions
@@ -839,7 +839,7 @@ function make_graph_menu(&$menu,&$submenu){
 					'dstfrm=fav_form&'.
 					'dstfld1=favobj&'.
 					'dstfld2=favid&'.
-					'srcfld1=description&'.
+					'srcfld1=name&'.
 					"srcfld2=graphid',800,450);".
 				"void(0);",
 				null, 
