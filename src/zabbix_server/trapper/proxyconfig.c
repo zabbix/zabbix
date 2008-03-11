@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
+#include "zlog.h"
 
 #include "proxyconfig.h"
 
@@ -39,15 +40,15 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_proxyconfig_table(zbx_uint64_t proxyid, struct zbx_json *j, ZBX_TABLE *table, const char *reltable, const char *relfield)
+static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, ZBX_TABLE *table, const char *reltable, const char *relfield)
 {
 	char		sql[MAX_STRING_LEN];
 	int		offset = 0, f, fld;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_proxyconfig_table() [proxyid:"ZBX_FS_UI64"] [table:%s]",
-			proxyid,
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_proxyconfig_table() [proxy_hostid:" ZBX_FS_UI64 "] [table:%s]",
+			proxy_hostid,
 			table->table);
 	
 	zbx_json_addobject(j, table->table);
@@ -74,13 +75,13 @@ static int	get_proxyconfig_table(zbx_uint64_t proxyid, struct zbx_json *j, ZBX_T
 			table->table);
 
 	if (NULL == reltable)
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " where t.proxyid="ZBX_FS_UI64,
-				proxyid);
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " where t.proxy_hostid=" ZBX_FS_UI64,
+				proxy_hostid);
 	else
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ", %1$s r where t.%2$s=r.%2$s and r.proxyid="ZBX_FS_UI64_NO(3),
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ", %1$s r where t.%2$s=r.%2$s and r.proxy_hostid="ZBX_FS_UI64_NO(3),
 				reltable,
 				relfield,
-				proxyid);
+				proxy_hostid);
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " order by t.%s",
 			table->recid);
@@ -135,7 +136,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxyid, struct zbx_json *j, ZBX_T
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_proxyconfig_data(zbx_uint64_t proxyid, struct zbx_json *j)
+static int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 {
 	struct proxytable_t {
 		const char	*table;
@@ -144,7 +145,6 @@ static int	get_proxyconfig_data(zbx_uint64_t proxyid, struct zbx_json *j)
 	};
 
 	static const struct proxytable_t pt[]={
-		{"proxies",	NULL,		NULL},
 		{"hosts",	NULL,		NULL},
 		{"items",	"hosts",	"hostid"},
 		{"drules",	NULL,		NULL},
@@ -153,15 +153,15 @@ static int	get_proxyconfig_data(zbx_uint64_t proxyid, struct zbx_json *j)
 	};
 	int	t, p, ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_proxyconfig_data() [proxyid:"ZBX_FS_UI64"]",
-			proxyid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_proxyconfig_data() [proxy_hostid:" ZBX_FS_UI64 "]",
+			proxy_hostid);
 
 	for (t = 0; tables[t].table != 0; t++) {
 		for (p = 0; pt[p].table != NULL; p++) {
 			if (0 != strcmp(tables[t].table, pt[p].table))
 				continue;
 
-			ret = get_proxyconfig_table(proxyid, j, &tables[t], pt[p].reltable, pt[p].relfield);
+			ret = get_proxyconfig_table(proxy_hostid, j, &tables[t], pt[p].reltable, pt[p].relfield);
 		}
 	}
 
@@ -171,9 +171,82 @@ static int	get_proxyconfig_data(zbx_uint64_t proxyid, struct zbx_json *j)
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_proxy_id                                                     *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occured                                     *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		host[HOST_HOST_LEN_MAX], host_esc[MAX_STRING_LEN];
+	int		res = FAIL;
+
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host))) {
+		DBescape_string(host, host_esc, sizeof(host_esc));
+
+		result = DBselect("select hostid from hosts where host='%s'"
+				" and status in (%d)" DB_NODE,
+				host_esc,
+				HOST_STATUS_PROXY,
+				DBnode_local("hostid"));
+
+		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0])) {
+			*hostid	= zbx_atoui64(row[0]);
+			res	= SUCCEED;
+		} else
+			zabbix_log(LOG_LEVEL_WARNING, "Unknown proxy \"%s\"",
+					host);
+
+		DBfree_result(result);
+	} else {
+		zabbix_log(LOG_LEVEL_WARNING, "Incorrect data. %s",
+				zbx_json_strerror());
+		zabbix_syslog("Incorrect data. %s",
+				zbx_json_strerror());
+	}
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: update_proxy_lastaccess                                          *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occured                                     *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	update_proxy_lastaccess(const zbx_uint64_t hostid)
+{
+	DBexecute("update hosts set lastaccess=%d where hostid=" ZBX_FS_UI64,
+			time(NULL),
+			hostid);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: send_proxyconfig                                                 *
  *                                                                            *
- * Purpose: send all configuration tables to the proxy                        *
+ * Purpose: send configuration tables to the proxy                            *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -187,45 +260,30 @@ static int	get_proxyconfig_data(zbx_uint64_t proxyid, struct zbx_json *j)
  ******************************************************************************/
 int	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
-	char		hostname[MAX_STRING_LEN],
-			host_esc[MAX_STRING_LEN];
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	proxyid;
+	zbx_uint64_t	proxy_hostid;
 	struct zbx_json	j;
 	int		res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_proxyconfig()");
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, hostname, sizeof(hostname)))
-		return res;
+	if (FAIL == get_proxy_id(jp, &proxy_hostid))
+		goto exit;
 
-	DBescape_string(hostname, host_esc, MAX_STRING_LEN);
-	result = DBselect("select proxyid from proxies where name='%s'" DB_NODE,
-		host_esc,
-		DBnode_local("proxyid"));
+	update_proxy_lastaccess(proxy_hostid);
+	
+	zbx_json_init(&j, 512*1024);
+	if (SUCCEED == (res = get_proxyconfig_data(proxy_hostid, &j))) {
+		zabbix_log(LOG_LEVEL_WARNING, "Sending configuration data to proxy. Datalen %d",
+				(int)j.buffer_size);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s",
+				j.buffer);
 
-	if (NULL != (row = DBfetch(result))) {
-		proxyid = zbx_atoui64(row[0]);
-
-		zbx_json_init(&j, 512*1024);
-		if (SUCCEED == get_proxyconfig_data(proxyid, &j)) {
-			zabbix_log(LOG_LEVEL_WARNING, "Sending configuration data to proxy \"%s\" datalen %zd",
-					hostname,
-					j.buffer_size);
-
-			if (FAIL == zbx_tcp_send(sock, j.buffer))
-				zabbix_log(LOG_LEVEL_WARNING, "Error while sending configuration to the \"%s\" [%s]",
-						hostname,
-						zbx_tcp_strerror());
-		}
-		zbx_json_free(&j);
-	} else {
-		zabbix_log(LOG_LEVEL_WARNING, "Unknown hostname \"%s\"", hostname);
+		if (FAIL == (res = zbx_tcp_send(sock, j.buffer)))
+			zabbix_log(LOG_LEVEL_WARNING, "Error while sending configuration. %s",
+					zbx_tcp_strerror());
 	}
-
-	DBfree_result(result);
-
+	zbx_json_free(&j);
+exit:
 	return res;
 }
 

@@ -116,7 +116,7 @@ static int get_minnextcheck(int now)
 		result = DBselect("select count(*),min(nextcheck) as nextcheck from items i,hosts h"
 				" where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d)"
 				" and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d"
-				" and h.errors_from!=0 and h.hostid=i.hostid and h.proxyid=0"
+				" and h.errors_from!=0 and h.hostid=i.hostid and h.proxy_hostid=0"
 				" and i.key_ not in ('%s','%s','%s','%s')" DB_NODE " order by nextcheck",
 			CONFIG_UNREACHABLE_POLLER_FORKS,
 			poller_num-1,
@@ -134,7 +134,7 @@ static int get_minnextcheck(int now)
 		{
 			result = DBselect("select count(*),min(nextcheck) from items i,hosts h"
 					" where h.status=%d and h.disable_until<%d and h.errors_from=0"
-					" and h.hostid=i.hostid and h.proxyid=0 and i.status in (%d,%d) and i.type not in (%d,%d,%d)"
+					" and h.hostid=i.hostid and h.proxy_hostid=0 and i.status in (%d,%d) and i.type not in (%d,%d,%d)"
 					" and " ZBX_SQL_MOD(i.itemid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')" DB_NODE,
 				HOST_STATUS_MONITORED,
 				now,
@@ -149,7 +149,7 @@ static int get_minnextcheck(int now)
 		{
 			result = DBselect("select count(*),min(nextcheck) from items i,hosts h"
 					" where h.status=%d and h.disable_until<%d and h.errors_from=0"
-					" and h.hostid=i.hostid and h.proxyid=0 and i.status in (%d) and i.type not in (%d,%d,%d)"
+					" and h.hostid=i.hostid and h.proxy_hostid=0 and i.status in (%d) and i.type not in (%d,%d,%d)"
 					" and " ZBX_SQL_MOD(i.itemid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')" DB_NODE,
 				HOST_STATUS_MONITORED,
 				now,
@@ -201,7 +201,7 @@ static void update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 		hostid,
 		host_status);
 
-	result = DBselect("select %s where h.hostid=i.hostid and h.proxyid=0 and h.hostid=" ZBX_FS_UI64 " and i.key_='%s'",
+	result = DBselect("select %s where h.hostid=i.hostid and h.proxy_hostid=0 and h.hostid=" ZBX_FS_UI64 " and i.key_='%s'",
 		ZBX_SQL_ITEM_SELECT,
 		hostid,
 		SERVER_STATUS_KEY);
@@ -330,7 +330,7 @@ int get_values(void)
 		result = DBselect("select h.hostid,min(i.itemid) from hosts h,items i"
 				" where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d)"
 				" and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d"
-				" and h.errors_from!=0 and h.hostid=i.hostid and h.proxyid=0"
+				" and h.errors_from!=0 and h.hostid=i.hostid and h.proxy_hostid=0"
 				" and i.key_ not in ('%s','%s','%s','%s')" DB_NODE " group by h.hostid",
 			CONFIG_UNREACHABLE_POLLER_FORKS,
 			poller_num-1,
@@ -348,7 +348,7 @@ int get_values(void)
 		{
 			result = DBselect("select %s where i.nextcheck<=%d and i.status in (%d,%d)"
 					" and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d"
-					" and h.errors_from=0 and h.hostid=i.hostid and h.proxyid=0"
+					" and h.errors_from=0 and h.hostid=i.hostid and h.proxy_hostid=0"
 					" and " ZBX_SQL_MOD(i.itemid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')"
 					DB_NODE " order by i.nextcheck",
 				ZBX_SQL_ITEM_SELECT,
@@ -366,7 +366,7 @@ int get_values(void)
 		{
 			result = DBselect("select %s where i.nextcheck<=%d and i.status in (%d)"
 					" and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d"
-					" and h.errors_from=0 and h.hostid=i.hostid and h.proxyid=0"
+					" and h.errors_from=0 and h.hostid=i.hostid and h.proxy_hostid=0"
 					" and " ZBX_SQL_MOD(i.itemid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')"
 					DB_NODE " order by i.nextcheck",
 				ZBX_SQL_ITEM_SELECT,
@@ -392,7 +392,7 @@ int get_values(void)
 		/* Poller for unreachable hosts */
 		if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
 		{
-			result2 = DBselect("select %s where h.hostid=i.hostid and h.proxyid=0 and i.itemid=%s" DB_NODE,
+			result2 = DBselect("select %s where h.hostid=i.hostid and h.proxy_hostid=0 and i.itemid=%s" DB_NODE,
 				ZBX_SQL_ITEM_SELECT,
 				row[1],
 				DBnode_local("h.hostid"));

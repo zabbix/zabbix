@@ -77,13 +77,13 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 		goto error;
 
 	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* table name */
-	strcpy(tablename, tmp);
+	zbx_strlcpy(tablename, tmp, sizeof(tablename));
 
 	if (NULL == r)
 		goto error;
 
 	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* field name */
-	strcpy(fieldname, tmp);
+	zbx_strlcpy(fieldname, tmp, sizeof(fieldname));
 
 	tmp_offset= 0;
 	zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 256, "select MAX(%s) "
@@ -173,7 +173,7 @@ int	send_trends_last_id(zbx_sock_t *sock, const char *data)
 		goto error;
 
 	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* table name */
-	strcpy(tablename, tmp);
+	zbx_strlcpy(tablename, tmp, sizeof(tablename));
 
 	tmp_offset= 0;
 	zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 256, "select itemid,clock "
@@ -351,9 +351,9 @@ static int	process_record(int sender_nodeid, int nodeid, const ZBX_TABLE *table,
 
 		if (lastrecord && 0 != (table->flags & ZBX_HISTORY_SYNC)) {
 			if (0 == strcmp(table->fields[f].name, "clock")) {
-				strcpy(lastclock, *tmp);
+				zbx_strlcpy(lastclock, *tmp, sizeof(lastclock));
 			} else if (0 == strcmp(table->fields[f].name, "value")) {
-				strcpy(lastvalue, *tmp);
+				zbx_strlcpy(lastvalue, *tmp, sizeof(lastvalue));
 				lastvalue_type = table->fields[f].type;
 			}
 		}

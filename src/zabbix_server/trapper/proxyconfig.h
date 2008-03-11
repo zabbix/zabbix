@@ -24,6 +24,8 @@
 #include "comms.h"
 #include "zbxjson.h"
 
+int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid);
+void	update_proxy_lastaccess(const zbx_uint64_t hostid);
 int	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp);
 
 #endif
