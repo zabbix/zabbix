@@ -687,6 +687,7 @@
 	'S_PROXY'=>				'Proxy',
 	'S_CREATE_PROXY'=>			'Create Proxy',
 	'S_PROXY_NAME'=>			'Proxy name',
+	'S_ACCESSED'=>				'Accessed',
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
 	'S_DEVICE_TYPE'=>			'Device type',
