@@ -25,31 +25,34 @@
 function	get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN){
 	global $USER_DETAILS;
 
-	$result = array();
-//		$result = $default_value;
+	$result = $default_value;
 
 	if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
 		$db_profiles = DBselect('SELECT * FROM profiles WHERE userid='.$USER_DETAILS["userid"].' AND idx='.zbx_dbstr($idx));
 
-		while($profile=DBfetch($db_profiles)){
-			if($type==PROFILE_TYPE_UNKNOWN) $type = $profile["valuetype"];
-
-			switch($type){
-				case PROFILE_TYPE_INT:		
-					$result[] = intval($profile["value"]);
-					break;
-				case PROFILE_TYPE_STR:
-				default:
-					$result[] = strval($profile["value"]);
+		if($profile=DBfetch($db_profiles)){
+		
+			if(PROFILE_TYPE_UNKNOWN == $type) $type = $profile["valuetype"];
+	
+			if(PROFILE_TYPE_ARRAY == $type){
+				$result[] = $profile['value'];
+				while($profile=DBfetch($db_profiles)){
+					$result[] = $profile['value'];
+				}
+			}
+			else{
+				switch($type){
+					case PROFILE_TYPE_INT:		
+						$result = intval($profile["value"]);
+						break;
+					case PROFILE_TYPE_STR:
+					default:
+						$result = strval($profile["value"]);
+				}
 			}
 		}
 	}
 
-	$result = array_filter($result, "not_empty");
-	
-	if(isset($result[0]) && (PROFILE_TYPE_ARRAY != $type)) $result = $result[0];
-	if(empty($result)) $result = $default_value;
-	
 return $result;
 }
 
@@ -145,6 +148,7 @@ function add_user_history($page){
 	$curr = 0;
 	$profile = array();
 	for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
+		$history = get_profile('web.history.'.$i,false);
 		if($history = get_profile('web.history.'.$i,false)){
 			if($history[0] != $title){
 				$profile[$curr] = $history;
@@ -154,7 +158,6 @@ function add_user_history($page){
 	}
 			
 	$history = array($title,$url);
-	
 	if($curr < ZBX_HISTORY_COUNT){
 		for($i = 0; $i < $curr; $i++){
 			update_profile('web.history.'.$i,$profile[$i],PROFILE_TYPE_ARRAY);

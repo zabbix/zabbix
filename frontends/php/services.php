@@ -101,6 +101,7 @@ if(isset($_REQUEST['msg']) && !empty($_REQUEST['msg'])){
 	$p = new Ctag('p','yes');
 	$p->AddOption('align','center');
 	$p->AddOption('id','message');
+	$p->AddOption('class','textcolorstyles');
 	$p->AddItem(bold($_REQUEST['msg']));
 	$p->Show();
 }

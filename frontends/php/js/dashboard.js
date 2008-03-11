@@ -33,7 +33,7 @@ function change_hat_state(icon, divid){
 	deselectAll(); 
 	var hat_state = ShowHide(divid); 
 	switchElementsClass(icon,"arrowup","arrowdown");
-	
+
 	if(false === hat_state) return false;
 	
 	var params = {
@@ -46,6 +46,7 @@ function change_hat_state(icon, divid){
 					{
 						'method': 'post',
 						'parameters':	params,
+						'onSuccess': function(resp){ },//alert(resp.responseText);
 						'onFailure': function(){	document.location = 'dashboard.php?'+Object.toQueryString(params);}
 					}
 	);

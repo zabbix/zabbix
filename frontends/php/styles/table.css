@@ -79,6 +79,7 @@ table.page_footer tr td.page_footer_r
 	height: 24px;
 	text-align: right;
 }
+
 /********** FORM TABLE *************/
 form {margin: 0px}
 
@@ -600,6 +601,43 @@ table.header a
 {
 	color: #FFFFFF;
 }
+
+/****** FILTER *********/
+table.filter{
+	width: 100%;
+	color: #FFFFFF;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	background-color: #6d88ad;
+	border-color: #000000;
+	border-width:0px;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	vertical-align:middle;
+}
+
+table.filter tr td.filter_l{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	text-align: left;
+	height: 16px;
+	padding-left: 4px;
+	line-height: 12px;
+}
+table.filter tr td.filter_r{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	text-align: right;
+	height: 16px;
+	padding-right: 4px;
+	line-height: 12px;
+}
+
+table.filter a{
+	color: #0BF;
+}
+
 /**************** Aknowledges ****************/
 
 table.ack_msgs

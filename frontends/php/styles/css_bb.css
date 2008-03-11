@@ -1,11 +1,24 @@
 /* CSS Document */
 /* Black and Blue Theme by Aly*/
 
-body{
-	background-color:#353535;
-} 
+@media print {
+	body{
+		background-color:#A5A5A5;
+	} 
+}
+
+@media screen {
+	body{
+		background-color:#353535;
+	} 
+}
+
 .delimiter{
 	color:#AAF;
+}
+
+.textcolorstyles{
+	color: #0088FF;
 }
 
 .pum_oheader { 
@@ -24,10 +37,10 @@ body{
 
 /*////////////////	LINKS	////////////////////*/
 
-a.highlight { font-family: Verdana, Arial, sans-serif;	font-size:10px; 	font-weight: bold; }
-a.highlight:link 	{ 	text-decoration: none;		color: #ffffff; }
-a.highlight:visited 	{	text-decoration: none;		color: #ffffff; }
-a.highlight:hover	{	text-decoration:none;	color: #0AF; }
+a.highlight 		{ 	font-family: Verdana, Arial, sans-serif;	font-size:10px; 	font-weight: bold; }
+a.highlight:link 	{ 	text-decoration: none;	color: #ffffff; }
+a.highlight:visited {	text-decoration: none;	color: #ffffff; }
+a.highlight:hover	{	text-decoration: none;	color: #0AF; }
 
 A.enabled:link		{	color:#0088FF;	text-decoration: none; }
 A.enabled:visited 	{	color:#0088FF;	text-decoration: none; }
@@ -58,7 +71,6 @@ A.on:link	{	color:#AA0000;	text-decoration: none; }
 A.on:visited 	{	color:#AA0000;	text-decoration: none; }
 A.on:hover 	{	color:#AA0000;	text-decoration: underline; }
 A.on:active 	{	color:#AA0000;	text-decoration: underline;}
-
 
 A.action:link		{	color:#3C3089;	text-decoration: none; }
 A.action:visited 	{	color:#3C3089;	text-decoration: none; }
@@ -92,6 +104,12 @@ A.link:link		{	color:#EEE;	text-decoration: none; font-size:10px;}
 A.link:visited 	{	color:#EEE;	text-decoration: none; font-size:10px;}
 A.link:hover 	{	color:#0BF;	text-decoration: none; font-size:10px;}
 A.link:active 	{	color:#0BF;	text-decoration: none; font-size:10px;}
+
+
+A.styled:link		{	color:#0BF;	 }
+A.styled:visited 	{	color:#0BF;	 }
+A.styled:hover 		{	color:#0BF;	 }
+A.styled:active 	{	color:#0BF;	 }
 
 
 /*////////////////	TABLES	////////////////////*/
@@ -184,6 +202,10 @@ table.header{
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
+table.filter{
+	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
+}
+
 table.ack_msgs tr.title {
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left; 
 }
@@ -243,7 +265,7 @@ div.iconplus{
 }
 
 div.iconmenu{
-	background-image: url('../images/general/bttn/menu2_bb.png');
+	background-image: url('../images/general/bttn/menu_bb.png');
 }
 
 div.arrowup{
