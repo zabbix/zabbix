@@ -493,20 +493,20 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 	DB_RESULT	result2;
 	DB_ROW		row;
 	DB_ROW		row2;
-	zbx_uint64_t	hostid = 0, proxyid;
+	zbx_uint64_t	hostid = 0, proxy_hostid;
 	char		*ip;
 	char		host[MAX_STRING_LEN], host_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_discovered_host(dhostid:" ZBX_FS_UI64 ")",
 			dhostid);
 
-	result = DBselect("select dr.proxyid,dh.ip from dhosts dh, drules dr"
+	result = DBselect("select dr.proxy_hostid,dh.ip from dhosts dh, drules dr"
 			" where dr.druleid=dh.druleid and dh.dhostid=" ZBX_FS_UI64,
 			dhostid);
 
 	if (NULL != (row = DBfetch(result)) && DBis_null(row[1]) != SUCCEED) {
-		proxyid	= zbx_atoui64(row[0]);
-		ip	= row[1];
+		proxy_hostid = zbx_atoui64(row[0]);
+		ip = row[1];
 
 		alarm(CONFIG_TIMEOUT);
 		zbx_gethost_by_ip(ip, host, sizeof(host));
@@ -520,10 +520,10 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 
 		if (NULL == (row2 = DBfetch(result2)) || DBis_null(row2[0]) == SUCCEED) {
 			hostid = DBget_maxid("hosts","hostid");
-			DBexecute("insert into hosts (hostid,proxyid,host,useip,ip,dns)"
+			DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,ip,dns)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',1,'%s','%s')",
 					hostid,
-					proxyid,
+					proxy_hostid,
 					(host[0] != '\0' ? host_esc : ip), /* Use host name if exists, IP otherwise */
 					ip,
 					host_esc);

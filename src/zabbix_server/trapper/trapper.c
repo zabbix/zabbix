@@ -136,7 +136,7 @@ static void	calc_timestamp(char *line,int *timestamp, char *format)
  * Comments: for trapper server process                                       *
  *                                                                            *
  ******************************************************************************/
-static int	process_data(zbx_sock_t *sock, zbx_uint64_t proxyid, time_t now, char *server, char *key, char *value,
+static int	process_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, time_t now, char *server, char *key, char *value,
 				char *lastlogsize, char *timestamp, char *source, char *severity)
 {
 	AGENT_RESULT	agent;
@@ -155,7 +155,7 @@ static int	process_data(zbx_sock_t *sock, zbx_uint64_t proxyid, time_t now, char
 	DBescape_string(server, server_esc, MAX_STRING_LEN);
 	DBescape_string(key, key_esc, MAX_STRING_LEN);
 
-	if (proxyid == 0) {
+	if (proxy_hostid == 0) {
 		zbx_snprintf(item_types, sizeof(item_types), "%d,%d",
 				ITEM_TYPE_TRAPPER,
 				ITEM_TYPE_ZABBIX_ACTIVE);
@@ -172,12 +172,12 @@ static int	process_data(zbx_sock_t *sock, zbx_uint64_t proxyid, time_t now, char
 				ITEM_TYPE_EXTERNAL);
 	}
 
-	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and h.proxyid=" ZBX_FS_UI64
+	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and h.proxy_hostid=" ZBX_FS_UI64
 			" and i.key_='%s' and i.status in (%d,%d) and i.type in (%s)" DB_NODE,
 			ZBX_SQL_ITEM_SELECT,
 			HOST_STATUS_MONITORED,
 			server_esc,
-			proxyid,
+			proxy_hostid,
 			key_esc,
 			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 			item_types,
@@ -324,45 +324,30 @@ int	send_result(zbx_sock_t *sock, int result, char *info)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
+static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const zbx_uint64_t proxy_hostid)
 {
 	struct zbx_json_parse   jp_data, jp_row;
 	const char		*p;
-	char			proxy[PROXY_NAME_LEN_MAX], host[HOST_HOST_LEN_MAX], key[ITEM_KEY_LEN_MAX],
+	char			host[HOST_HOST_LEN_MAX], key[ITEM_KEY_LEN_MAX],
 				value[MAX_STRING_LEN], info[MAX_STRING_LEN], lastlogsize[MAX_STRING_LEN],
 				timestamp[MAX_STRING_LEN], source[MAX_STRING_LEN], severity[MAX_STRING_LEN],
 				clock[MAX_STRING_LEN];
 	int			ret = SUCCEED;
 	int			processed_ok = 0, processed_fail = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
 	double			sec;
-	zbx_uint64_t		proxyid = 0;
 	time_t			now, hosttime = 0, itemtime;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_new_values(json:%.*s)",
-				json->end - json->start + 1,
-				json->start);
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_new_values()");
 
 	now = time(NULL);
 	sec = zbx_time();
 
-	if (SUCCEED == zbx_json_value_by_name(json, ZBX_PROTO_TAG_PROXY, proxy, sizeof(proxy))) {
-		result = DBselect("select proxyid from proxies where name='%s'",
-				proxy);
-
-		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
-			proxyid = zbx_atoui64(row[0]);
-		DBfree_result(result);
-
-	}
-
-	if (SUCCEED == zbx_json_value_by_name(json, ZBX_PROTO_TAG_CLOCK, clock, sizeof(clock)))
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, clock, sizeof(clock)))
 		hosttime = atoi(clock);
 
 /* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]} 
  *                                     ^
- */	if (NULL == (p = zbx_json_pair_by_name(json, ZBX_PROTO_TAG_DATA)))
+ */	if (NULL == (p = zbx_json_pair_by_name(jp, ZBX_PROTO_TAG_DATA)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Can't find \"data\" pair");
 		ret = FAIL;
@@ -422,7 +407,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
 		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGSEVERITY, severity, sizeof(severity));
 
 		DBbegin();
-		if(SUCCEED == process_data(sock, proxyid, itemtime, host, key, value, lastlogsize, timestamp, source, severity))
+		if(SUCCEED == process_data(sock, proxy_hostid, itemtime, host, key, value, lastlogsize, timestamp, source, severity))
 		{
 			processed_ok ++;
 		}
@@ -448,7 +433,35 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
 	return ret;
 }
 
-static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
+/******************************************************************************
+ *                                                                            *
+ * Function: process_proxy_values                                             *
+ *                                                                            *
+ * Purpose: process values sent by proxy servers                              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occured                                     *
+ *                                                                            *
+ * Author: Alksander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	process_proxy_values(zbx_sock_t *sock, struct zbx_json_parse *jp)
+{
+	zbx_uint64_t	proxy_hostid;
+
+	if (FAIL == get_proxy_id(jp, &proxy_hostid))
+		return FAIL;
+
+	update_proxy_lastaccess(proxy_hostid);
+
+	return process_new_values(sock, jp, proxy_hostid);
+}
+
+static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 {
 	char	*line,*host;
 	char	*server,*key,*value_string, *data;
@@ -547,13 +560,15 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 					send_proxyconfig(sock, &jp);
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA) ||
-					0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA) ||
-					0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_DATA)
-				)
+					0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
 				{
-					ret = process_new_values(sock, &jp);
+					ret = process_new_values(sock, &jp, 0);
 				}
-				else if (0 == strcmp(value, ZBX_PROTO_VALUE_DISCOVERY_DATA))
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_DATA) && zbx_process == ZBX_PROCESS_SERVER)
+				{
+					ret = process_proxy_values(sock, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_DISCOVERY_DATA) && zbx_process == ZBX_PROCESS_SERVER)
 				{
 					ret = process_discovery_data(sock, &jp);
 				}

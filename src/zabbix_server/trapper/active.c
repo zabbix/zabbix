@@ -71,7 +71,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, const char *host)
 	if (0 != CONFIG_REFRESH_UNSUPPORTED) {
 		result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h"
 			" where i.hostid=h.hostid and h.status=%d and i.type=%d and h.host='%s'"
-			" and h.proxyid=0 and (i.status=%d or (i.status=%d and i.nextcheck<=%d))" DB_NODE,
+			" and h.proxy_hostid=0 and (i.status=%d or (i.status=%d and i.nextcheck<=%d))" DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			host,
@@ -80,7 +80,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, const char *host)
 	} else {
 		result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h"
 			" where i.hostid=h.hostid and h.status=%d and i.type=%d and h.host='%s'"
-			" and h.proxyid=0 and i.status=%d" DB_NODE,
+			" and h.proxy_hostid=0 and i.status=%d" DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			host,
@@ -161,7 +161,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jso
 	if (0 != CONFIG_REFRESH_UNSUPPORTED) {
 		result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h"
 			" where i.hostid=h.hostid and h.status=%d and i.type=%d and h.host='%s'"
-			" and h.proxyid=0 and (i.status=%d or (i.status=%d and i.nextcheck<=%d))" DB_NODE,
+			" and h.proxy_hostid=0 and (i.status=%d or (i.status=%d and i.nextcheck<=%d))" DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			host,
@@ -170,7 +170,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jso
 	} else {
 		result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h"
 			" where i.hostid=h.hostid and h.status=%d and i.type=%d and h.host='%s'"
-			" and h.proxyid=0 and i.status=%d" DB_NODE,
+			" and h.proxy_hostid=0 and i.status=%d" DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			host,

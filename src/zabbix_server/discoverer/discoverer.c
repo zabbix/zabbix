@@ -887,7 +887,7 @@ static void process_discovery(int now)
 	DB_DRULE	rule;
 
 	result = DBselect("select druleid,iprange,delay,nextcheck,name,status from drules"
-			" where proxyid=0 and status=%d and (nextcheck<=%d or nextcheck>%d+delay)"
+			" where proxy_hostid=0 and status=%d and (nextcheck<=%d or nextcheck>%d+delay)"
 			" and " ZBX_SQL_MOD(druleid,%d) "=%d" DB_NODE,
 			DRULE_STATUS_MONITORED,
 			now,
@@ -921,7 +921,7 @@ static int get_minnextcheck(int now)
 	DB_ROW		row;
 	int		res = FAIL;
 
-	result = DBselect("select count(*),min(nextcheck) from drules where proxyid=0 and status=%d"
+	result = DBselect("select count(*),min(nextcheck) from drules where proxy_hostid=0 and status=%d"
 			" and " ZBX_SQL_MOD(druleid,%d) "=%d" DB_NODE,
 			DRULE_STATUS_MONITORED,
 			CONFIG_DISCOVERER_FORKS,

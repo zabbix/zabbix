@@ -245,9 +245,10 @@ char *get_config_data(int nodeid, int dest_nodetype)
 		}
 
 		if (DBis_null(row[4]) == FAIL)
-			strcpy(sync, row[4]);
+			zbx_strlcpy(sync, row[4], sizeof(sync));
 		else
 			memset(sync, ' ', sizeof(sync));
+
 		s = sync;
 
 		/* Special (simpler) processing for operation DELETE */
@@ -468,9 +469,10 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 		}
 
 		if (DBis_null(row[4]) == FAIL)
-			strcpy(sync, row[4]);
+			zbx_strlcpy(sync, row[4], sizeof(sync));
 		else
 			memset(sync, ' ', sizeof(sync));
+
 		s = sync;
 		ck = cksum;
 		*ck = '\0';
