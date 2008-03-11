@@ -606,8 +606,9 @@ require_once "include/items.inc.php";
 		{
 			update_trigger_value_to_unknown_by_hostid($hostid);
 			info("Updated status of host ".$row["host"]);
-			return	DBexecute("update hosts set status=$status".
-				" where hostid=$hostid and status!=".HOST_STATUS_DELETED);
+			return	DBexecute('update hosts set status='.$status.' where hostid='.$hostid.
+					' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
+					);
 		}
 		else
 		{

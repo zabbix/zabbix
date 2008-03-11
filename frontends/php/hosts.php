@@ -425,8 +425,8 @@ include_once "include/page_header.php";
 		$status = isset($_REQUEST["activate"]) ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 		$groups = get_request("groups",array());
 
-		$db_hosts=DBselect("select h.hostid, hg.groupid from hosts_groups hg, hosts h".
-			" where h.hostid=hg.hostid and h.status<>".HOST_STATUS_DELETED.
+		$db_hosts=DBselect('select h.hostid, hg.groupid from hosts_groups hg, hosts h'.
+			' where h.hostid=hg.hostid and h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 			' and '.DBin_node('h.hostid'));
 		while($db_host=DBfetch($db_hosts))
 		{
@@ -974,7 +974,8 @@ include_once "include/page_header.php";
 					$style = $db_host["status"]==HOST_STATUS_MONITORED ? NULL: ( 
 						$db_host["status"]==HOST_STATUS_TEMPLATE ? "unknown" :
 						"on");
-					array_push($hosts,empty($hosts)?'':',',new CSpan($db_host["host"],$style));
+
+					array_push($hosts, empty($hosts) ? '' : ', ', new CSpan($db_host["host"], $style));
 					$count++;
 				}
 
@@ -989,7 +990,6 @@ include_once "include/page_header.php";
 					),
 					$count,
 					$hosts
-//					implode(', ',$hosts)
 					));
 			}
 			$table->SetFooter(new CCol(array(
@@ -1024,24 +1024,19 @@ include_once "include/page_header.php";
 							' FROM hosts h, hosts_templates ht '.
 							' WHERE ht.templateid='.$template['hostid'].
 								' AND ht.hostid=h.hostid '.
-								' AND h.status not in ('.HOST_STATUS_TEMPLATE.') '.
+								' AND h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
 								' AND h.hostid in ('.$available_hosts.') '.
 							' ORDER BY host');
 			$host_list = array();
 			while($host = DBfetch($hosts))
 			{
-				if($host["status"] == HOST_STATUS_NOT_MONITORED)
-				{
-					array_push($host_list, unpack_object(new CSpan($host["host"],"on")));
-				}
-				else
-				{
-					array_push($host_list, $host["host"]);
-				}
+				$style = $host["status"] == HOST_STATUS_MONITORED ? NULL : 'on';
+
+				array_push($host_list, empty($host_list) ? '' : ', ', new CSpan($host["host"], $style));
 			}
 			$table->AddRow(array(
 				new CSpan($template["host"],"unknown"),
-				implode(', ',$host_list)
+				$host_list
 				));
 		}
 
@@ -1075,12 +1070,13 @@ include_once "include/page_header.php";
 				$sql="select distinct h.hostid,h.host from hosts h,hosts_groups hg".
 					" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid ".
 					" and h.hostid in (".$available_hosts.") ".
-					" and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
+					' and h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+					' group by h.hostid,h.host order by h.host';
 			}
 			else
 			{
 				$sql="select distinct h.hostid,h.host from hosts h ".
-					" where h.status<>".HOST_STATUS_DELETED.
+					' where h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 					" and h.hostid in (".$available_hosts.") ".
 					" group by h.hostid,h.host order by h.host";
 			}
@@ -1192,7 +1188,7 @@ include_once "include/page_header.php";
 						' FROM hosts'.
 						' WHERE proxy_hostid='.$db_proxy['hostid'].
 						' AND hostid in ('.$available_hosts.')'.
-						' AND status not in ('.HOST_STATUS_DELETED.') '.
+						' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 						' order by host'
 						);
 
