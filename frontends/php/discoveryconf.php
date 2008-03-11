@@ -35,7 +35,7 @@ include_once "include/page_header.php";
 	$fields=array(
 		"druleid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
 		"name"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
-		'proxyid'=>	array(T_ZBX_INT, O_OPT,	 null,	DB_ID,	'isset({save})'),
+		'proxy_hostid'=>array(T_ZBX_INT, O_OPT,	 null,	DB_ID,	'isset({save})'),
 		"iprange"=>	array(T_ZBX_IP_RANGE, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
 		"delay"=>	array(T_ZBX_INT, O_OPT,	 null,	null, 		'isset({save})'),
 		"status"=>	array(T_ZBX_INT, O_OPT,	 null,	IN("0,1"), 	'isset({save})'),
@@ -100,7 +100,7 @@ include_once "include/page_header.php";
 			$msg_ok = S_DISCOVERY_RULE_UPDATED;
 			$msg_fail = S_CANNOT_UPDATE_DISCOVERY_RULE;
 
-			$result = update_discovery_rule($_REQUEST["druleid"], $_REQUEST["proxyid"], $_REQUEST['name'], $_REQUEST['iprange'], 
+			$result = update_discovery_rule($_REQUEST["druleid"], $_REQUEST["proxy_hostid"], $_REQUEST['name'], $_REQUEST['iprange'], 
 				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks']);
 
 			$druleid = $_REQUEST["druleid"];
@@ -110,7 +110,7 @@ include_once "include/page_header.php";
 			$msg_ok = S_DISCOVERY_RULE_ADDED;
 			$msg_fail = S_CANNOT_ADD_DISCOVERY_RULE;
 
-			$druleid = add_discovery_rule($_REQUEST["proxyid"], $_REQUEST['name'], $_REQUEST['iprange'],
+			$druleid = add_discovery_rule($_REQUEST["proxy_hostid"], $_REQUEST['name'], $_REQUEST['iprange'],
 				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks']);
 
 			$result = $druleid;
@@ -233,9 +233,9 @@ include_once "include/page_header.php";
 
 			$description = array();
 
-			if ($rule_data["proxyid"]) {
-				$proxy = get_proxy_by_proxyid($rule_data["proxyid"]);
-				array_push($description, $proxy["name"], ":");
+			if ($rule_data["proxy_hostid"]) {
+				$proxy = get_host_by_hostid($rule_data["proxy_hostid"]);
+				array_push($description, $proxy["host"], ":");
 			}
 			
 			array_push($description,

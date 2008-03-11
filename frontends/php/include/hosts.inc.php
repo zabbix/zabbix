@@ -181,7 +181,7 @@ require_once "include/items.inc.php";
 	 *
 	 *     NOTE: templates = array(id => name, id2 => name2, ...)
 	 */
-	function	db_save_host($host,$port,$status,$useip,$dns,$ip,$proxyid,$templates,$hostid=null)
+	function	db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$hostid=null)
 	{
 		if( !eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host) )
 		{
@@ -210,8 +210,8 @@ require_once "include/items.inc.php";
 		{
 			$hostid = get_dbid("hosts","hostid");
 			$result = DBexecute("insert into hosts".
-				" (hostid,proxyid,host,port,status,useip,dns,ip,disable_until,available)".
-				" values ($hostid,$proxyid,".zbx_dbstr($host).",$port,$status,$useip,".zbx_dbstr($dns).",".zbx_dbstr($ip).",0,"
+				" (hostid,proxy_hostid,host,port,status,useip,dns,ip,disable_until,available)".
+				" values ($hostid,$proxy_hostid,".zbx_dbstr($host).",$port,$status,$useip,".zbx_dbstr($dns).",".zbx_dbstr($ip).",0,"
 				.HOST_AVAILABLE_UNKNOWN.")");
 		}
 		else
@@ -222,7 +222,7 @@ require_once "include/items.inc.php";
 				return false;
 			}
 
-			$result = DBexecute("update hosts set proxyid=$proxyid,host=".zbx_dbstr($host).",".
+			$result = DBexecute("update hosts set proxy_hostid=$proxy_hostid,host=".zbx_dbstr($host).",".
 				"port=$port,useip=$useip,dns=".zbx_dbstr($dns).",ip=".zbx_dbstr($ip)." where hostid=$hostid");
 
 			update_host_status($hostid, $status);
@@ -253,9 +253,9 @@ require_once "include/items.inc.php";
 	 *
 	 *     NOTE: templates = array(id => name, id2 => name2, ...)
 	 */
-	function	add_host($host,$port,$status,$useip,$dns,$ip,$proxyid,$templates,$newgroup,$groups)
+	function	add_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$newgroup,$groups)
 	{
-		$hostid = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxyid,$templates);
+		$hostid = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates);
 		if(!$hostid)
 			return $hostid;
 		else
@@ -285,7 +285,7 @@ require_once "include/items.inc.php";
 	 *
 	 *     NOTE: templates = array(id => name, id2 => name2, ...)
 	 */
-	function	update_host($hostid,$host,$port,$status,$useip,$dns,$ip,$proxyid,$templates,$newgroup,$groups)
+	function	update_host($hostid,$host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$newgroup,$groups)
 	{
 		$old_templates = get_templates_by_hostid($hostid);
 		$unlinked_templates = array_diff($old_templates, $templates);
@@ -298,7 +298,7 @@ require_once "include/items.inc.php";
 
 		$new_templates = array_diff($templates, $old_templates);
 
-		$result = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxyid,$new_templates,$hostid);
+		$result = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$new_templates,$hostid);
 		if(!$result)
 			return $result;
 
@@ -500,43 +500,45 @@ require_once "include/items.inc.php";
 		}
 	
 		if($proxyid==null)
-			$result = DBselect("select * from proxies where ".DBin_node('proxyid')." AND name=".zbx_dbstr($name));
+			$result = DBselect('select * from hosts where status in ('.HOST_STATUS_PROXY.')'.
+					' and '.DBin_node('hostid').' AND host='.zbx_dbstr($name));
 		else
-			$result = DBselect("select * from proxies where ".DBin_node('proxyid')." AND name=".zbx_dbstr($name).
-				" and proxyid<>$proxyid");
+			$result = DBselect('select * from hosts where status in ('.HOST_STATUS_PROXY.')'.
+					' and '.DBin_node('hostid').' AND host='.zbx_dbstr($name).
+					' and hostid<>'.$proxyid);
 		
 		if(DBfetch($result))
 		{
-			error("Group '$name' already exists");
+			error("Proxy '$name' already exists");
 			return false;
 		}
 		if($proxyid==null)
 		{
-			$proxyid=get_dbid("proxies","proxyid");
-			if(!DBexecute("insert into proxies (proxyid,name) values (".$proxyid.",".zbx_dbstr($name).")"))
+			$proxyid=get_dbid('hosts','hostid');
+			if(!DBexecute('insert into hosts (hostid,host,status)'.
+					' values ('.$proxyid.','.zbx_dbstr($name).','.HOST_STATUS_PROXY.')'))
 				return false;
 			return $proxyid;
-
 		}
 		else
-			return DBexecute("update proxies set name=".zbx_dbstr($name)." where proxyid=$proxyid");
+			return DBexecute('update hosts set host='.zbx_dbstr($name).' where hostid='.$proxyid);
 	}
 
 	function	delete_proxy($proxyid)
 	{
-		if(!DBexecute("update hosts set proxyid=0 where proxyid=$proxyid"))
+		if(!DBexecute("update hosts set proxy_hostid=0 where proxy_hostid=$proxyid"))
 			return false;
 
-		return DBexecute("delete from proxies where proxyid=$proxyid");
+		return DBexecute("delete from hosts where hostid=$proxyid");
 	}
 
 	function	update_hosts_by_proxyid($proxyid,$hosts=array())
 	{
-		DBexecute('update hosts set proxyid=0 where proxyid='.$proxyid);
+		DBexecute('update hosts set proxy_hostid=0 where proxy_hostid='.$proxyid);
 
 		foreach($hosts as $hostid)
 		{
-			DBexecute('update hosts set proxyid='.$proxyid.' where hostid='.$hostid);
+			DBexecute('update hosts set proxy_hostid='.$proxyid.' where hostid='.$hostid);
 		}
 	}
 
@@ -560,18 +562,6 @@ require_once "include/items.inc.php";
 		update_hosts_by_proxyid($proxyid,$hosts);
 
 		return $result;
-	}
-
-	function	get_proxy_by_proxyid($proxyid)
-	{
-		$result=DBselect("select * from proxies where proxyid=".$proxyid);
-		$row=DBfetch($result);
-		if($row)
-		{
-			return $row;
-		}
-		error("No proxies with proxyid=[$proxyid]");
-		return  false;
 	}
 
 	function get_host_by_itemid($itemid)

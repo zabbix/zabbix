@@ -178,7 +178,7 @@
 		
 		if(isset($_REQUEST['druleid']) && $rule_data && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"])))
 		{
-			$proxyid	= $rule_data['proxyid'];
+			$proxy_hostid	= $rule_data['proxy_hostid'];
 			$name		= $rule_data['name'];
 			$iprange	= $rule_data['iprange'];
 			$delay		= $rule_data['delay'];
@@ -195,7 +195,7 @@
 		}
 		else
 		{
-			$proxyid	= get_request("proxyid",0);
+			$proxy_hostid	= get_request("proxy_hostid",0);
 			$name		= get_request('name','');
 			$iprange	= get_request('iprange','192.168.0.1-255');
 			$delay		= get_request('delay',3600);
@@ -210,12 +210,13 @@
 
 		$form->AddRow(S_NAME, new CTextBox('name', $name, 40));
 //Proxy
-		$cmbProxy = new CComboBox("proxyid", $proxyid);
+		$cmbProxy = new CComboBox("proxy_hostid", $proxy_hostid);
 
 		$cmbProxy->AddItem(0, S_NO_PROXY);
-		$db_proxies = DBselect('SELECT proxyid,name FROM proxies');
+		$db_proxies = DBselect('select hostid,host from hosts'.
+				' where status in ('.HOST_STATUS_PROXY.') and '.DBin_node('hostid'));
 		while ($db_proxy = DBfetch($db_proxies))
-			$cmbProxy->AddItem($db_proxy['proxyid'], $db_proxy['name']);
+			$cmbProxy->AddItem($db_proxy['hostid'], $db_proxy['host']);
 
 		$form->AddRow(S_DISCOVERY_BY_PROXY,$cmbProxy);
 //----------
@@ -4176,13 +4177,13 @@ include_once 'include/discovery.inc.php';
 
 		$newgroup	= get_request("newgroup","");
 
-		$host 	= get_request("host",	"");
-		$port 	= get_request("port",	get_profile("HOST_PORT",10050));
-		$status	= get_request("status",	HOST_STATUS_MONITORED);
-		$useip	= get_request("useip",	0);
-		$dns	= get_request("dns",	"");
-		$ip	= get_request("ip",	"0.0.0.0");
-		$proxyid= get_request("proxyid","");
+		$host 		= get_request("host",	"");
+		$port 		= get_request("port",	get_profile("HOST_PORT",10050));
+		$status		= get_request("status",	HOST_STATUS_MONITORED);
+		$useip		= get_request("useip",	0);
+		$dns		= get_request("dns",	"");
+		$ip		= get_request("ip",	"0.0.0.0");
+		$proxy_hostid	= get_request("proxy_hostid","");
 
 		$useprofile = get_request("useprofile","no");
 
@@ -4217,7 +4218,7 @@ include_once 'include/discovery.inc.php';
 
 		if(isset($_REQUEST["hostid"]) && !isset($_REQUEST["form_refresh"]))
 		{
-			$proxyid	= $db_host["proxyid"];
+			$proxy_hostid	= $db_host["proxy_hostid"];
 			$host		= $db_host["host"];
 			$port		= $db_host["port"];
 			$status		= $db_host["status"];
@@ -4335,12 +4336,13 @@ include_once 'include/discovery.inc.php';
 			$frmHost->AddRow(S_PORT,new CNumericBox("port",$port,5));	
 
 //Proxy
-			$cmbProxy = new CComboBox("proxyid", $proxyid);
+			$cmbProxy = new CComboBox("proxy_hostid", $proxy_hostid);
 
 			$cmbProxy->AddItem(0, S_NO_PROXY);
-			$db_proxies = DBselect('SELECT proxyid,name FROM proxies');
+			$db_proxies = DBselect('SELECT hostid,host FROM hosts'.
+					' where status in ('.HOST_STATUS_PROXY.') and '.DBin_node('hostid'));
 			while ($db_proxy = DBfetch($db_proxies))
-				$cmbProxy->AddItem($db_proxy['proxyid'], $db_proxy['name']);
+				$cmbProxy->AddItem($db_proxy['hostid'], $db_proxy['host']);
 
 			$frmHost->AddRow(S_MONITORED_BY_PROXY,$cmbProxy);
 //----------
@@ -4459,11 +4461,10 @@ include_once 'include/discovery.inc.php';
 		if(isset($_REQUEST["groupid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$name=$group["name"];
-			$db_hosts=DBselect("SELECT distinct h.hostid,host FROM hosts h, hosts_groups hg".
-				" WHERE h.status<>".HOST_STATUS_DELETED.
-				" AND h.hostid=hg.hostid".
-				" AND hg.groupid=".$_REQUEST["groupid"].
-				" order by host");
+			$db_hosts=DBselect('SELECT distinct h.hostid,host FROM hosts h, hosts_groups hg'.
+					' WHERE h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
+					' AND h.hostid=hg.hostid AND hg.groupid='.$_REQUEST['groupid'].
+					' order by host');
 			while($db_host=DBfetch($db_hosts))
 			{
 				if(uint_in_array($db_host["hostid"],$hosts)) continue;
@@ -4485,10 +4486,10 @@ include_once 'include/discovery.inc.php';
 		$frmHostG->AddRow(S_GROUP_NAME,new CTextBox("gname",$name,30));
 
 		$cmbHosts = new CListBox("hosts[]",$hosts,10);
-		$db_hosts=DBselect("SELECT distinct hostid,host FROM hosts".
-			" WHERE status<>".HOST_STATUS_DELETED.
-			" AND hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).")".
-			" order by host");
+		$db_hosts=DBselect('SELECT distinct hostid,host FROM hosts'.
+				' WHERE status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
+				' AND hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).')'.
+				' order by host');
 		while($db_host=DBfetch($db_hosts))
 		{
 			$cmbHosts->AddItem(
@@ -4523,58 +4524,58 @@ include_once 'include/discovery.inc.php';
 
 		$hosts = array();
 		$frm_title = S_PROXY;
-		if(isset($_REQUEST["proxyid"]))
+		if(isset($_REQUEST["hostid"]))
 		{
-			$proxy = get_proxy_by_proxyid($_REQUEST["proxyid"]);
-			$frm_title = S_PROXY." \"".$proxy["name"]."\"";
+			$proxy = get_host_by_hostid($_REQUEST["hostid"]);
+			$frm_title = S_PROXY." \"".$proxy["host"]."\"";
 		}
-		if(isset($_REQUEST["proxyid"]) && !isset($_REQUEST["form_refresh"]))
+		if(isset($_REQUEST["hostid"]) && !isset($_REQUEST["form_refresh"]))
 		{
-			$name=$proxy["name"];
+			$name=$proxy["host"];
 			$db_hosts=DBselect("SELECT hostid FROM hosts".
 				" WHERE status not in (".HOST_STATUS_DELETED.") ".
-				" AND proxyid=".$_REQUEST["proxyid"]);
+				" AND proxy_hostid=".$_REQUEST["hostid"]);
 			while($db_host=DBfetch($db_hosts))
 				array_push($hosts, $db_host["hostid"]);
 		}
 		else
 		{
-			$name=get_request("pname","");
+			$name=get_request("host","");
 		}
 		$frmHostG = new CFormTable($frm_title,"hosts.php");
 		$frmHostG->SetHelp("web.proxy.php");
 		$frmHostG->AddVar("config",get_request("config",5));
-		if(isset($_REQUEST["proxyid"]))
+		if(isset($_REQUEST["hostid"]))
 		{
-			$frmHostG->AddVar("proxyid",$_REQUEST["proxyid"]);
+			$frmHostG->AddVar("hostid",$_REQUEST["hostid"]);
 		}
 
-		$frmHostG->AddRow(S_PROXY_NAME,new CTextBox("pname",$name,30));
+		$frmHostG->AddRow(S_PROXY_NAME,new CTextBox("host",$name,30));
 
 		$cmbHosts = new CListBox("hosts[]",$hosts,10);
-		$db_hosts=DBselect("SELECT hostid,proxyid,host FROM hosts".
-			" WHERE status not in (".HOST_STATUS_DELETED.") ".
-			" AND hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).")".
-			" order by host");
+		$db_hosts=DBselect('select hostid,proxy_hostid,host from hosts'.
+			' where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
+			' and hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).')'.
+			' order by host');
 		while($db_host=DBfetch($db_hosts))
 		{
 			$cmbHosts->AddItem(
 					$db_host["hostid"],
 					get_node_name_by_elid($db_host["hostid"]).$db_host["host"],
 					NULL,
-					$db_host["proxyid"] == 0 || (isset($_REQUEST["proxyid"]) && $db_host["proxyid"] == $_REQUEST["proxyid"]));
+					$db_host["proxy_hostid"] == 0 || (isset($_REQUEST["hostid"]) && $db_host["proxy_hostid"] == $_REQUEST["hostid"]));
 		}
 		$frmHostG->AddRow(S_HOSTS,$cmbHosts);
 
 		$frmHostG->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["proxyid"]))
+		if(isset($_REQUEST["hostid"]))
 		{
 			$frmHostG->AddItemToBottomRow(SPACE);
 			$frmHostG->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmHostG->AddItemToBottomRow(SPACE);
 			$frmHostG->AddItemToBottomRow(
 				new CButtonDelete("Delete selected proxy?",
-					url_param("form").url_param("config").url_param("proxyid")
+					url_param("form").url_param("config").url_param("hostid")
 				)
 			);
 		}

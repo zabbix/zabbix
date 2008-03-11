@@ -148,7 +148,7 @@
 		return $dcheckid;
 	}
 
-	function	add_discovery_rule($proxyid, $name, $iprange, $delay, $status, $dchecks)
+	function	add_discovery_rule($proxy_hostid, $name, $iprange, $delay, $status, $dchecks)
 	{
 		if( !validate_ip_range($iprange) )
 		{
@@ -158,8 +158,8 @@
 		}
 
 		$druleid = get_dbid('drules', 'druleid');
-		$result = DBexecute('insert into drules (druleid,proxyid,name,iprange,delay,status) '.
-			' values ('.$druleid.','.$proxyid.','.zbx_dbstr($name).','.zbx_dbstr($iprange).','.$delay.','.$status.')');
+		$result = DBexecute('insert into drules (druleid,proxy_hostid,name,iprange,delay,status) '.
+			' values ('.$druleid.','.$proxy_hostid.','.zbx_dbstr($name).','.zbx_dbstr($iprange).','.$delay.','.$status.')');
 
 		if($result)
 		{
@@ -173,7 +173,7 @@
 		return $result;
 	}
 
-	function	update_discovery_rule($druleid, $proxyid, $name, $iprange, $delay, $status, $dchecks)
+	function	update_discovery_rule($druleid, $proxy_hostid, $name, $iprange, $delay, $status, $dchecks)
 	{
 		if( !validate_ip_range($iprange) )
 		{
@@ -182,7 +182,7 @@
 		
 		}
 
-		$result = DBexecute('update drules set proxyid='.$proxyid.',name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.
+		$result = DBexecute('update drules set proxy_hostid='.$proxy_hostid.',name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.
 			'delay='.$delay.',status='.$status.' where druleid='.$druleid);
 
 		if($result)
