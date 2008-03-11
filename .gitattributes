@@ -250,3 +250,5 @@ upgrades/dbpatches/1.6/mysql/patch/trends_uint.sql -text
 upgrades/dbpatches/1.6/mysql/patch/triggers.sql -text
 upgrades/dbpatches/1.6/mysql/patch/users.sql -text
 upgrades/dbpatches/1.6/mysql/patch/usrgrp.sql -text
+upgrades/dbpatches/1.6/oracle/patch/alerts.sql -text
+upgrades/dbpatches/1.6/postgresql/patch/alerts.sql -text
