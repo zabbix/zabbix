@@ -41,7 +41,7 @@ struct history_table_t {
 };
 
 struct last_ids {
-	const char		*lastfieldname;
+	ZBX_HISTORY_TABLE	*ht;
 	zbx_uint64_t		lastid;
 };
 
@@ -108,7 +108,7 @@ static ZBX_HISTORY_TABLE dht[]={
 
 /******************************************************************************
  *                                                                            *
- * Function: get_lastclock                                                    *
+ * Function: get_lastid                                                       *
  *                                                                            *
  * Purpose:                                                                   *
  *                                                                            *
@@ -121,18 +121,73 @@ static ZBX_HISTORY_TABLE dht[]={
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-static void	get_lastid(const char *fieldname, zbx_uint64_t *lastid)
+static void	get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	*lastid = 0;
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_lastid() [%s.%s]",
+			ht->table,
+			ht->lastfieldname);
+	
+	result = DBselect("select nextid from ids where table_name='%s' and field_name='%s'",
+			ht->table,
+			ht->lastfieldname);
 
-	result = DBselect("select %s from proxies",
-			fieldname);
-
-	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+	if (NULL == (row = DBfetch(result)))
+		*lastid = 0;
+	else
 		*lastid = zbx_atoui64(row[0]);
+
+	DBfree_result(result);
+	
+	zabbix_log(LOG_LEVEL_DEBUG, "End of get_lastid() [%s.%s]:" ZBX_FS_UI64,
+			ht->table,
+			ht->lastfieldname,
+			*lastid);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: set_lastid                                                       *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              * 
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments: never returns                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	set_lastid(const ZBX_HISTORY_TABLE *ht, const zbx_uint64_t lastid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In set_lastid() [%s.%s:" ZBX_FS_UI64 "]",
+			ht->table,
+			ht->lastfieldname,
+			lastid);
+			
+	result = DBselect("select 1 from ids where table_name='%s' and field_name='%s'",
+			ht->table,
+			ht->lastfieldname);
+
+	if (NULL == (row = DBfetch(result)))
+		DBexecute("insert into ids (table_name,field_name,nextid)"
+				"values ('%s','%s'," ZBX_FS_UI64 ")",
+				ht->table,
+				ht->lastfieldname,
+				lastid);
+	else
+		DBexecute("update ids set nextid=" ZBX_FS_UI64
+				" where table_name='%s' and field_name='%s'",
+				lastid,
+				ht->table,
+				ht->lastfieldname);
 
 	DBfree_result(result);
 }
@@ -168,7 +223,7 @@ static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx
 
 	*lastid = 0;
 
-	get_lastid(ht->lastfieldname, &id);
+	get_lastid(ht, &id);
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select d.id,h.host,i.key_");
 
@@ -250,7 +305,7 @@ static int get_dhistory_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zb
 
 	*lastid = 0;
 
-	get_lastid(ht->lastfieldname, &id);
+	get_lastid(ht, &id);
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select id");
 
@@ -330,14 +385,14 @@ static int	history_sender(struct zbx_json *j)
 
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_HISTORY_DATA, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(j, ZBX_PROTO_TAG_PROXY, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
 	for (i = 0; ht[i].table != NULL; i ++) {
 		if (0 == (r = get_history_data(j, &ht[i], &lastid)))
 			continue;
 
-		li[li_no].lastfieldname = ht[i].lastfieldname;
+		li[li_no].ht = &ht[i];
 		li[li_no].lastid = lastid;
 		li_no++;
 
@@ -351,12 +406,8 @@ static int	history_sender(struct zbx_json *j)
 
 	if (SUCCEED == put_data_to_server(&sock, j)) {
 		DBbegin();
-
-		for (i = 0; i < li_no; i++) {
-			DBexecute("update proxies set %s=" ZBX_FS_UI64,
-					li[i].lastfieldname,
-					li[i].lastid);
-		}
+		for (i = 0; i < li_no; i++)
+			set_lastid(li[i].ht, li[i].lastid);
 		DBcommit();
 	}
 
@@ -396,14 +447,14 @@ static int	dhistory_sender(struct zbx_json *j)
 
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_DISCOVERY_DATA, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(j, ZBX_PROTO_TAG_PROXY, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
 	for (i = 0; dht[i].table != NULL; i ++) {
 		if (0 == (r = get_dhistory_data(j, &dht[i], &lastid)))
 			continue;
 
-		li[li_no].lastfieldname = dht[i].lastfieldname;
+		li[li_no].ht = &dht[i];
 		li[li_no].lastid = lastid;
 		li_no++;
 
@@ -417,12 +468,8 @@ static int	dhistory_sender(struct zbx_json *j)
 
 	if (SUCCEED == put_data_to_server(&sock, j)) {
 		DBbegin();
-
-		for (i = 0; i < li_no; i++) {
-			DBexecute("update proxies set %s=" ZBX_FS_UI64,
-					li[i].lastfieldname,
-					li[i].lastid);
-		}
+		for (i = 0; i < li_no; i++)
+			set_lastid(li[i].ht, li[i].lastid);
 		DBcommit();
 	}
 

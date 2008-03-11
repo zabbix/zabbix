@@ -52,7 +52,8 @@ static int delete_history(const char *table, const char *fieldname, int now)
 
 	DBbegin();
 
-	result = DBselect("select %s from proxies",
+	result = DBselect("select nextid from ids where table_name='%s' and field_name='%s'",
+			table,
 			fieldname);
 
 	if (NULL == (row = DBfetch(result)) || DBis_null(row[0]) == SUCCEED)
