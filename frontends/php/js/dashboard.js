@@ -93,7 +93,8 @@ interval:		10,						// update interval in sec
 			'url': 		url,
 			'params': 	params,
 			'interval': frequency,
-			'lastupdate': 0
+			'lastupdate': 0,
+			'ready': true
 		}
 		
 		if(typeof(this.optlist[id]) == 'undefined'){
@@ -110,7 +111,7 @@ interval:		10,						// update interval in sec
 			for(var i=0; i < this.objlist.length; i++){
 				if((typeof(this.optlist[this.objlist[i]]) != 'undefined') && !empty(this.optlist[this.objlist[i]])){
 	//				alert(Math.abs(now - this.optlist[this.objlist[i]].lastupdate));
-					if(this.optlist[this.objlist[i]].interval <= Math.abs(now - this.optlist[this.objlist[i]].lastupdate)){
+					if(this.optlist[this.objlist[i]].ready && (this.optlist[this.objlist[i]].interval <= Math.abs(now - this.optlist[this.objlist[i]].lastupdate))){
 						this.update(this.optlist[this.objlist[i]],now);
 					}
 				}
@@ -120,12 +121,14 @@ interval:		10,						// update interval in sec
 	},
 	
 	update: function(obj4update,time){
+		obj4update.ready = false;
+		
 		new Ajax.Updater(obj4update.id, obj4update.url,
 			{
 				method: 'post',
 				'parameters':	obj4update.params,
 				'evalScripts': true,
-				'onSuccess': function(resp){ obj4update.lastupdate = time;  },	//SDI(resp.responseText);
+				'onSuccess': function(resp){ obj4update.lastupdate = time; obj4update.ready = true; },	//SDI(resp.responseText);
 				'onFailure': function(){ document.location = 'dashboard.php?'+Object.toQueryString(obj4update.params); }
 			});	
 	}
