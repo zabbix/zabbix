@@ -708,10 +708,8 @@ require_once "include/items.inc.php";
 	 * Comments:
 	 *
 	 */
-	function get_correct_group_and_host($a_groupid=null, $a_hostid=null, $perm=PERM_READ_WRITE, $options = array())
-	{
-		if(!is_array($options))
-		{
+	function get_correct_group_and_host($a_groupid=null, $a_hostid=null, $perm=PERM_READ_WRITE, $options = array()){
+		if(!is_array($options)){
 			fatal_error("Incorrest options for get_correct_group_and_host");
 		}
 		
@@ -723,99 +721,98 @@ require_once "include/items.inc.php";
 		$always_select_first_host = str_in_array("always_select_first_host",$options) ? 1 : 0;
 		$only_current_node = str_in_array("only_current_node",$options) ? 1 : 0;
 
-		if(str_in_array("monitored_hosts",$options))
-			$with_host_status = " and h.status=".HOST_STATUS_MONITORED;
-		elseif(str_in_array('real_hosts',$options))
-			$with_host_status = " and h.status<>".HOST_STATUS_TEMPLATE;
-		elseif(str_in_array('templated_hosts',$options))
-			$with_host_status = " and h.status=".HOST_STATUS_TEMPLATE;
+		if(str_in_array('monitored_hosts',$options))
+			$with_host_status = ' AND h.status='.HOST_STATUS_MONITORED;
+		else if(str_in_array('real_hosts',$options))
+			$with_host_status = ' AND h.status<>'.HOST_STATUS_TEMPLATE;
+		else if(str_in_array('templated_hosts',$options))
+			$with_host_status = ' AND h.status='.HOST_STATUS_TEMPLATE;
 		else
-			$with_host_status = "";
+			$with_host_status = '';
 
-		if(str_in_array("with_monitored_items",$options)){
-			$item_table = ",items i";	$with_items = " and h.hostid=i.hostid and i.status=".ITEM_STATUS_ACTIVE;
-		}else if(str_in_array("with_items",$options)){
-			$item_table = ",items i";	$with_items = " and h.hostid=i.hostid";
-		} else {
-			$item_table = "";
-			$with_items = "";
+		if(str_in_array('with_monitored_items',$options)){
+			$item_table = ',items i';	$with_items = ' AND h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE;
+		}
+		else if(str_in_array("with_items",$options)){
+			$item_table = ',items i';	$with_items = ' AND h.hostid=i.hostid';
+		} 
+		else {
+			$item_table = '';
+			$with_items = '';
 		}
 
-		$with_node = "";
+		$with_node = '';
 
-		$accessed_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,null,null,get_current_nodeid(!$only_current_node));
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,null,null,get_current_nodeid(!$only_current_node));
 
-//SDI(get_current_nodeid(!$only_current_node));
-//SDI($accessed_hosts);
-
-		if(is_null($a_groupid))
-		{
+		if(is_null($a_groupid)){
 			$groupid = 0;
 		}
-		else
-		{
+		else{
 			$groupid = $a_groupid;
 
-			if($groupid > 0)
-			{
-				$with_node = " and ".DBin_node('g.groupid', get_current_nodeid(!$only_current_node));
+			if($groupid > 0){
+				$with_node = ' AND '.DBin_node('g.groupid', get_current_nodeid(!$only_current_node));
 
 				if(!DBfetch(DBselect('SELECT DISTINCT g.groupid '.
 								' FROM groups g, hosts_groups hg, hosts h'.$item_table.
 								' WHERE hg.groupid=g.groupid '.
 									' AND h.hostid=hg.hostid '.
-									' AND h.hostid in ('.$accessed_hosts.') '.
+									' AND h.hostid in ('.$available_hosts.') '.
 									' AND g.groupid='.$groupid.$with_host_status.$with_items.$with_node)))
 				{
 					$groupid = 0;
 				}
 			}
-
 		}
 
-		if(is_null($a_hostid))
-		{
+		if(is_null($a_hostid)){
 			$hostid = 0;
 		}
-		else
-		{
+		else{
 			$hostid = $a_hostid;
-			if(!($hostid == 0 && $allow_all_hosts == 1)) /* is not 'All' selected */
-			{
-				$group_table = "";
-				$witth_group = "";
+/* is not 'All' selected */
+			if(!($hostid == 0 && $allow_all_hosts == 1)) {
+				$group_table = '';
+				$witth_group = '';
 
-				if($groupid != 0)
-				{
-					$with_node = " and ".DBin_node('hg.hostid', get_current_nodeid(!$only_current_node));
+				if($groupid != 0){
+					$with_node = ' AND '.DBin_node('hg.hostid', get_current_nodeid(!$only_current_node));
 					
-					if(!DBfetch(DBselect("select hg.hostid from hosts_groups hg".
-						" where hg.groupid=".$groupid." and hg.hostid=".$hostid.$with_node)))
-					{
+					if(!DBfetch(DBselect('SELECT hg.hostid FROM hosts_groups hg'.
+						' WHERE hg.groupid='.$groupid.' AND hg.hostid='.$hostid.$with_node))){
 						$hostid = 0;
 					}
-					$group_table = " ,hosts_groups hg ";
-					$witth_group = " and hg.hostid=h.hostid and hg.groupid=".$groupid;
+					$group_table = ' ,hosts_groups hg ';
+					$witth_group = ' AND hg.hostid=h.hostid AND hg.groupid='.$groupid;
 				}
 
-				$with_node = " and ".DBin_node('h.hostid',get_current_nodeid(!$only_current_node));
+				$with_node = ' AND '.DBin_node('h.hostid',get_current_nodeid(!$only_current_node));
 //SDI('C: '.$a_groupid.' : '.$a_hostid);
 
-				if($db_host = DBfetch(DBselect("select distinct h.hostid,h.host from hosts h ".$item_table.$group_table.
-					" where h.hostid in (".$accessed_hosts.") "
-					.$with_host_status.$with_items.$witth_group.$with_node.
-					" order by h.host")))
+				if($db_host = DBfetch(DBselect('SELECT DISTINCT h.hostid,h.host FROM hosts h '.
+						$item_table.
+						$group_table.
+						' WHERE h.hostid IN ('.$available_hosts.') '.
+						$with_host_status.
+						$with_items.
+						$witth_group.
+						$with_node.
+						' ORDER BY h.host')))
 				{
 					$first_hostid_in_group = $db_host["hostid"];
 				}
 
-				if($first_hostid_in_group == 0)	$hostid = 0; /* no hosts in selected grpore */
+				if($first_hostid_in_group == 0)	$hostid = 0; /* no hosts in selected groupe */
 
-				if($hostid > 0)
-				{
-					if(!DBfetch(DBselect("select distinct h.hostid from hosts h".$item_table.
-						" where h.hostid=".$hostid.$with_host_status.$with_items.$with_node.
-						" and h.hostid in (".$accessed_hosts.") ")))
+				if($hostid > 0){
+					if(!DBfetch(DBselect('SELECT DISTINCT h.hostid '.
+							' FROM hosts h '.$item_table.
+							' WHERE h.hostid='.$hostid.
+								' AND h.hostid IN ('.$available_hosts.') '.
+								$with_host_status.
+								$with_items.
+								$with_node)))
 					{
 							$hostid = 0;
 					}
@@ -838,19 +835,19 @@ require_once "include/items.inc.php";
 			);
 	}
 
-	/*
-	 * Function: validate_group_with_host
-	 *
-	 * Description:
-	 *     Check available groups and host by user permission
-	 *     and check current group an host relations
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
+/*
+ * Function: validate_group_with_host
+ *
+ * Description:
+ *     Check available groups and host by user permission
+ *     and check current group an host relations
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ */
 	function	validate_group_with_host($perm, $options = array(),$group_var=null,$host_var=null)
 	{
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
@@ -859,20 +856,17 @@ require_once "include/items.inc.php";
 		$_REQUEST["groupid"]    = get_request("groupid", -1 );
 		$_REQUEST["hostid"]     = get_request("hostid", get_profile($host_var,0));
 
-		if($_REQUEST["groupid"] == -1)
-		{
+		if(-1 == $_REQUEST["groupid"]){
 			$_REQUEST["groupid"] = get_profile($group_var,0);
 			
 			if(!in_node($_REQUEST["groupid"])) $_REQUEST["groupid"] = 0;
 
-			if ($_REQUEST["hostid"] > 0 && !DBfetch(DBselect('select groupid from hosts_groups '.
-				' where hostid='.$_REQUEST["hostid"].' and groupid='.$_REQUEST["groupid"])))
-			{
-					$_REQUEST["groupid"] = 0;
+			if(($_REQUEST["hostid"] > 0) && !DBfetch(DBselect('SELECT groupid FROM hosts_groups WHERE hostid='.$_REQUEST["hostid"].' AND groupid='.$_REQUEST["groupid"]))){
+				$_REQUEST["groupid"] = 0;
 			}
 		}
 
-		if(uint_in_array("always_select_first_host",$options) && $_REQUEST["hostid"] == 0 && $_REQUEST["groupid"] != 0)
+		if(str_in_array("always_select_first_host",$options) && ($_REQUEST["hostid"] == 0) && ($_REQUEST["groupid"] != 0))
 			$_REQUEST["hostid"] = -1;
 
 		$result = get_correct_group_and_host($_REQUEST["groupid"],$_REQUEST["hostid"], $perm, $options);
@@ -884,20 +878,19 @@ require_once "include/items.inc.php";
 		update_profile($group_var,$_REQUEST["groupid"]);
 	}
 
-	/*
-	 * Function: validate_group
-	 *
-	 * Description:
-	 *     Check available groups by user permisions
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
-	function	validate_group($perm, $options = array(),$group_var=null)
-	{
+/*
+ * Function: validate_group
+ *
+ * Description:
+ *     Check available groups by user permisions
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ */
+	function	validate_group($perm, $options = array(),$group_var=null){
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
 		$_REQUEST["groupid"]    = get_request("groupid",get_profile($group_var,0));
 

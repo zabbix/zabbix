@@ -106,44 +106,8 @@ function close_window()
 	return false;
 }
 
-function add_variable(o_el, s_name, x_value, s_formname, o_document)
-{
-	var form;
-
-	if(!o_document)	o_document = document;
-
-	if(s_formname)
-	{
-		if( !(form = o_document.forms[s_formname]) )
-			 throw "Missed form with name '"+s_formname+"'.";
-	}
-	else if(o_el)
-	{
-		
-		if( !(form = o_el.form) )
-			throw "Missed form in 'o_el' object";
-	}
-	else
-	{
-		if( !(form = this.form) )
-			throw "Missed form in 'this' object";
-	}
-
-        var o_variable = o_document.createElement('input');
-
-	if( !o_variable )	throw "Can't create element";
-
-        o_variable.type = 'hidden';
-        o_variable.name = s_name;
-        o_variable.value = x_value;
-
-        form.appendChild(o_variable);
-
-        return true;
-}
-
 function add2favorites(favobj,favid){
-	if(typeof(Ajax) == 'undefined'){
+	if('undefined' == typeof(Ajax)){
 		throw("Prototype.js lib is required!");
 		return false;
 	}
@@ -179,7 +143,7 @@ function add2favorites(favobj,favid){
 
 function rm4favorites(favobj,favid,menu_rowid){
 //	alert(favobj+','+favid+','+menu_rowid);
-	if(typeof(Ajax) == 'undefined'){
+	if('undefined' == typeof(Ajax)){
 		throw("Prototype.js lib is required!");
 		return false;
 	}
@@ -251,27 +215,62 @@ function get_cursor_position(e)
 function Redirect(url) {
 	window.location = url;
 	return false;
-}	
+}
 
-function create_var(form_name, var_name, var_val, submit)
-{
+function add_variable(o_el, s_name, x_value, s_formname, o_document){
+	var form;
+	
+	if(!o_document)	o_document = document;
+	
+	if(s_formname){
+		if( !(form = o_document.forms[s_formname]) )
+			 throw "Missed form with name '"+s_formname+"'.";
+	}
+	else if(o_el){
+		if( !(form = o_el.form) )
+			throw "Missed form in 'o_el' object";
+	}
+	else{
+		if( !(form = this.form) )
+			throw "Missed form in 'this' object";
+	}
+	
+	var o_variable = o_document.createElement('input');
+	
+	if( !o_variable )	throw "Can't create element";
+	
+	o_variable.type = 'hidden';
+	o_variable.name = s_name;
+	o_variable.value = x_value;
+
+	form.appendChild(o_variable);
+	
+return true;
+}
+
+function create_var(form_name, var_name, var_val, subm){
 	var frmForm = document.forms[form_name];
-
 	if(!frmForm) return false;
 
-	var objVar = document.createElement('input');
+	var objVar = document.getElementsByName(var_name);
+	objVar=(objVar.length>0)?objVar[0]:null;
+	
+	if(is_null(objVar)){
+		objVar = document.createElement('input');
+		if(!objVar) return false;
 
-	if(!objVar) return false;
+		frmForm.appendChild(objVar);
+		
+		objVar.setAttribute('type', 	'hidden');
+		objVar.setAttribute('name', 	var_name);
+	}
+	
+	objVar.value = var_val;
 
-	objVar.setAttribute('type', 	'hidden');
-	objVar.setAttribute('name', 	var_name);
-	objVar.setAttribute('value', 	var_val);
-
-	frmForm.appendChild(objVar);
-	if(submit)
+	if(subm)
 		frmForm.submit();
 
-	return false;
+return false;
 }
 
 function Confirm(msg){
@@ -398,6 +397,37 @@ function deselectAll(){
 /************************************************************************************/
 /*										 Pages stuff								*/
 /************************************************************************************/
+function change_filter_state(icon, divid){
+	if((typeof(icon) == 'undefined') || (typeof(divid) == 'undefined')) throw "Function [change_filter_state()] awaits exactly 2 arguments.";
+
+	if('undefined' == typeof(Ajax)){
+		throw("Prototype.js lib is required!");
+		return false;
+	}
+
+	deselectAll(); 
+	var filter_state = ShowHide(divid); 
+	switchElementsClass(icon,"filteropened","filterclosed");
+	
+	if(false === filter_state) return false;
+
+	var params = {
+		'favobj': 	'filter',
+		'favid': 	divid,
+		'state':	filter_state
+	}
+	
+	var uri = new url(location.href);
+
+	new Ajax.Request(uri.getPath()+"?output=ajax",
+					{
+						'method': 'post',
+						'parameters':params,
+						'onSuccess': function(resp){ },//alert(resp.responseText);
+						'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(params); }
+					}
+	);
+}
 
 function GetSelectedText(obj){
 	if(IE){

@@ -107,8 +107,8 @@ include_once "include/page_header.php";
 		insert_login_form();
 	}
 	else{
-		$logoff = new CLink('here', '?reconnect=1');
-		echo '<div align="center">Press '.$logoff->ToString().' to disconnect/reconnect</div>';
+		$logoff = new CLink('here', '?reconnect=1', 'styled');
+		echo '<div align="center" class="textcolorstyles">Press '.$logoff->ToString().' to disconnect/reconnect</div>';
 	}	
 ?>
 <?php

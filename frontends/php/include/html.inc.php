@@ -147,4 +147,140 @@
 		$table->AddRow($div);
 	return $table;
 	}
+	
+	function create_filter($col_l,$col_r,$items,$id='zbx_filter',$state=1){
+
+		if(isset($_REQUEST['print'])) $state = 0;
+		
+		$table = new CTable();
+		$table->AddOption('width','100%');
+		$table->SetCellPadding(0);
+		$table->SetCellSpacing(0);
+		$table->AddOption('border',0);
+		
+		$icon = new CDiv(SPACE,($state)?'filteropened':'filterclosed');
+		$icon->AddAction('onclick',new CScript("javascript: change_filter_state(this,'".$id."');"));
+		$icon->AddOption('title',S_SHOW.'/'.S_HIDE.' '.S_FILTER);
+
+		$td_icon = new CCol($icon);
+		$td_icon->AddOption('valign','bottom');
+
+		$icons_row = array($td_icon,SPACE);
+		$icons_row[] = $col_l;
+
+		$icon_tab = new CTable();
+		$icon_tab->SetCellSpacing(0);
+		$icon_tab->SetCellPadding(0);
+		
+		$icon_tab->AddRow($icons_row);
+		
+		$table->AddRow(get_thin_table_header($icon_tab,$col_r));
+
+		$div = new CDiv($items);
+		$div->AddOption('id',$id);
+		if(!$state) $div->AddOption('style','display: none;');
+		
+		$tab = new CTable();
+		$tab->AddRow($div);
+		
+//		$table->AddRow($tab);
+		$table->AddRow($div);
+
+	return $table;
+	}
+	
+	function create_filter_hat($col_l,$col_r,$items,$id,$state=1){
+		
+		$table = new CTable(NULL,"filter");
+		$table->SetCellSpacing(0);
+		$table->SetCellPadding(1);
+
+
+
+		$td_l = new CCol($icon_tab,"filter_l");
+				
+		$td_r = new CCol($col_r,"filter_r");
+		$td_r->AddOption('align','right');
+				
+		$table->AddRow(array($td_l, $td_r));
+	return $table;
+	}
+	
+	
+/* Function: 
+ *	hide_form_items()
+ *
+ * Desc:
+ *	Searches items/objects for Form tags like "<input"/Form classes like CForm, and makes it empty
+ * 
+ * Author: 
+ *	Aly
+ */
+	function hide_form_items(&$obj){
+		if(is_array($obj)){
+			foreach($obj as $id => $item){
+				hide_form_items($obj[$id]);			// Attention recursion;
+			}
+		}
+		else if(is_object($obj)){
+			if(str_in_array(strtolower(get_class($obj)),array('cform','ccheckbox','cselect','cbutton','cbuttonqmessage','cbuttondelete','cbuttoncancel'))){
+				$obj=SPACE;
+			}
+			if(isset($obj->items) && !empty($obj->items)){
+				foreach($obj->items as $id => $item){
+					hide_form_items($obj->items[$id]); 		// Recursion
+				}
+			}
+		}
+		else{
+			foreach(array('<form','<input','<select') as $item){
+				if(strpos($obj,$item) !== FALSE) $obj = SPACE;
+			}
+		}
+	}
+	
+	function get_thin_table_header($col1, $col2=SPACE){
+		
+		$table = new CTable(NULL,"filter");
+//		$table->AddOption('border',1);
+		$table->SetCellSpacing(0);
+		$table->SetCellPadding(1);
+		
+		$td_r = new CCol($col2,"filter_r");
+		$td_r->AddOption('align','right');
+		
+		$table->AddRow(array(new CCol($col1,"filter_l"), $td_r));
+	return $table;
+	}
+
+	function	show_thin_table_header($col1, $col2=SPACE){
+		$table = get_thin_table_header($col1, $col2);
+		$table->Show();
+	}
+
+	function get_table_header($col1, $col2=SPACE){
+		if(isset($_REQUEST['print'])){
+			hide_form_items($col1);
+			hide_form_items($col2);
+		//if empty header than do not show it
+			if(($col1 == SPACE) && ($col2 == SPACE)) return new CScript('');
+		}
+		
+		$table = new CTable(NULL,"header");
+//		$table->AddOption('border',1);
+		$table->SetCellSpacing(0);
+		$table->SetCellPadding(1);
+		
+		$td_r = new CCol($col2,"header_r");
+		$td_r->AddOption('align','right');
+		
+		$table->AddRow(array(new CCol($col1,"header_l"), $td_r));
+	return $table;
+	}
+
+	function	show_table_header($col1, $col2=SPACE)
+	{
+		$table = get_table_header($col1, $col2);
+		$table->Show();
+	}
 ?>

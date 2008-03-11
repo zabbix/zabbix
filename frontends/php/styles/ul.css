@@ -28,11 +28,11 @@ ul.messages li
 ul.messages li.info
 {
 	color:#000000;
-	list-style: url('images/general/warning_small.gif') inside;
+	list-style: url("../images/general/warning_small.gif") inside;
 }
 
 ul.messages li.error
 {
 	color:#AA0000;
-	list-style: url('images/general/error_small.gif') inside;
+	list-style: url("../images/general/error_small.gif") inside;
 }

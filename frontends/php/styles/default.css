@@ -71,9 +71,9 @@ body{
 .unknown_trigger{	background-color: #BCBCBC;	}
 .normal		{	background-color: #AADDAA;	}
 
-.img 		{	border-color:black;	border-width:1px;	}
-img.top		{	vertical-align:text-top		}
-img.bottom	{	vertical-align:text-bottom	}
+.img 		{	border-color:black; border-width:1px;	}
+img.top		{	vertical-align:text-top;}
+img.bottom	{	vertical-align:text-bottom;}
 img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 
 .center{
@@ -102,6 +102,10 @@ img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 .delimiter{
 	font-weight:bold;
 	color:#000;
+}
+
+.textcolorstyles{
+	color: #000000;
 }
 
 /**************** HINT BOX *****************/

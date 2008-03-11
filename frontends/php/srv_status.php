@@ -110,7 +110,7 @@ include_once "include/page_header.php";
 			
 			if(isset($row["triggerid"]) && !empty($row["triggerid"])){
 
-				$url = new CLink(expand_trigger_description($row['triggerid']),'tr_events.php?triggerid='.$row['triggerid']);
+				$url = new CLink(expand_trigger_description($row['triggerid']),'events.php?triggerid='.$row['triggerid']);
 				$row['caption'] = array($row['caption'].' [',$url,']');
 
 			}
@@ -128,7 +128,7 @@ include_once "include/page_header.php";
 					if(does_service_depend_on_the_service($row["serviceid"],$row2["serviceid"])){
 						$row['reason']->AddItem(new CLink(
 							expand_trigger_description($row2["triggerid"]),
-							"tr_events.php?triggerid=".$row2["triggerid"]));
+							"events.php?triggerid=".$row2["triggerid"]));
 					}
 				}
 			}
