@@ -36,7 +36,7 @@ INDEX		|slides_1	|slideshowid
 
 TABLE|drules|druleid|ZBX_SYNC
 FIELD		|druleid	|t_id		|'0'	|NOT NULL	|0
-FIELD		|proxyid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|proxy_hostid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|iprange	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
@@ -185,6 +185,7 @@ FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 FIELD		|value		|t_double	|'0.0000'|NOT NULL	|ZBX_HISTORY_SYNC
 INDEX		|1		|nodeid,id
+INDEX		|2		|clock
 
 TABLE|history_uint||0
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0
@@ -199,6 +200,7 @@ FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 FIELD		|value		|t_bigint	|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 INDEX		|1		|nodeid,id
+INDEX		|2		|clock
 
 TABLE|history_str||0
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0
@@ -213,6 +215,7 @@ FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_HISTORY_SYNC
 INDEX		|1		|nodeid,id
+INDEX		|2		|clock
 
 TABLE|history_log|id|ZBX_HISTORY
 FIELD		|id		|t_id		|'0'	|NOT NULL	|0
@@ -223,6 +226,7 @@ FIELD		|source		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value		|t_history_log	|''	|NOT NULL	|0
 INDEX		|1		|itemid,clock
+INDEX		|2		|clock
 
 TABLE|history_text|id|ZBX_HISTORY
 FIELD		|id		|t_id		|'0'	|NOT NULL	|0
@@ -230,6 +234,7 @@ FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_history_text	|''	|NOT NULL	|0
 INDEX		|1		|itemid,clock
+INDEX		|2		|clock
 
 TABLE|proxy_dhistory|id|0
 FIELD		|id		|t_serial	|	|NOT NULL	|0
@@ -394,21 +399,9 @@ FIELD		|itemtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 
-TABLE|proxies|proxyid|ZBX_SYNC
-FIELD		|proxyid	|t_id		|'0'	|NOT NULL	|0
-FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|history_lastid	|t_bigint	|'0'	|NOT NULL	|0
-FIELD		|history_uint_lastid|t_bigint	|'0'	|NOT NULL	|0
-FIELD		|history_str_lastid|t_bigint	|'0'	|NOT NULL	|0
-FIELD		|history_text_lastid|t_bigint	|'0'	|NOT NULL	|0
-FIELD		|history_log_lastid|t_bigint	|'0'	|NOT NULL	|0
-FIELD		|dhistory_lastid|t_bigint	|'0'	|NOT NULL	|0
-INDEX		|1		|name
-
 TABLE|hosts|hostid|ZBX_SYNC
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|0
-FIELD		|proxyid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|proxy_hostid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
@@ -419,9 +412,12 @@ FIELD		|disable_until	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|inbytes	|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|outbytes	|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|host
 INDEX		|2		|status
-INDEX		|3		|proxyid
+INDEX		|3		|proxy_hostid
 
 TABLE|hosts_groups|hostgroupid|ZBX_SYNC
 FIELD		|hostgroupid	|t_id		|'0'	|NOT NULL	|0
