@@ -70,7 +70,7 @@ static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value, t
 			host->useip ? host->ip : host->dns);
 
 	result = DBselect("select %s where " ZBX_SQL_MOD(h.hostid,%d) "=%d and h.status=%d and h.hostid=i.hostid"
-			" and h.proxyid=0 and h.useip=%d and h.%s='%s' and i.key_='%s' and i.status=%d"
+			" and h.proxy_hostid=0 and h.useip=%d and h.%s='%s' and i.key_='%s' and i.status=%d"
 			" and i.type=%d" DB_NODE,
 			ZBX_SQL_ITEM_SELECT,
 			CONFIG_PINGER_FORKS,
@@ -130,7 +130,7 @@ static int get_pinger_hosts(ZBX_FPING_HOST **hosts, int *hosts_allocated, int *h
 
 	/* Select hosts monitored by IP */
 	result = DBselect("select distinct h.ip from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d"
-			" and i.hostid=h.hostid and h.proxyid=0 and h.status=%d and i.key_ in ('%s','%s')"
+			" and i.hostid=h.hostid and h.proxy_hostid=0 and h.status=%d and i.key_ in ('%s','%s')"
 			" and i.type=%d and i.status=%d and h.useip=1" DB_NODE, 
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,
@@ -161,7 +161,7 @@ static int get_pinger_hosts(ZBX_FPING_HOST **hosts, int *hosts_allocated, int *h
 
 	/* Select hosts monitored by hostname */
 	result = DBselect("select distinct h.dns from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d"
-			" and i.hostid=h.hostid and h.proxyid=0 and h.status=%d and i.key_ in ('%s','%s')"
+			" and i.hostid=h.hostid and h.proxy_hostid=0 and h.status=%d and i.key_ in ('%s','%s')"
 			" and i.type=%d and i.status=%d and h.useip=0" DB_NODE,
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,

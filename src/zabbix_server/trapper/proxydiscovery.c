@@ -23,6 +23,7 @@
 #include "zlog.h"
 
 #include "trapper.h"
+#include "proxyconfig.h"
 #include "proxydiscovery.h"
 #include "../discoverer/discoverer.h"
 
@@ -44,9 +45,7 @@
  ******************************************************************************/
 int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
-	char			tmp[MAX_STRING_LEN],
-				host_esc[MAX_STRING_LEN];
-	DB_RESULT		result;
+	char			tmp[MAX_STRING_LEN];
 	DB_DCHECK		check;
 	DB_DHOST		host;
 	DB_DSERVICE		service;
@@ -58,39 +57,19 @@ int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	char			ip[HOST_IP_LEN_MAX],
 				key_[ITEM_KEY_LEN_MAX];
 	time_t			now, hosttime, itemtime;
+	zbx_uint64_t		proxy_hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_discovery_data()");
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PROXY, tmp, sizeof(tmp))) {
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery data. %s",
-				zbx_json_strerror());
-		zabbix_syslog("Invalid discovery data. %s",
-				zbx_json_strerror());
-
+	if (FAIL == get_proxy_id(jp, &proxy_hostid)) {
 		res = FAIL;
 		goto exit;
 	}
+
+	update_proxy_lastaccess(proxy_hostid);
 
 	now = time(NULL);
 	
-	DBescape_string(tmp, host_esc, MAX_STRING_LEN);
-	result = DBselect("select proxyid from proxies where name='%s'" DB_NODE,
-		host_esc,
-		DBnode_local("proxyid"));
-
-	if (NULL == DBfetch(result)) {
-		zabbix_log(LOG_LEVEL_WARNING, "Hostname \"%s\" is unknown",
-				tmp);
-		zabbix_syslog("Hostname \"%s\" is unknown",
-				tmp);
-
-		res = FAIL;
-	}
-	DBfree_result(result);
-
-	if (FAIL == res)
-		goto exit;
-
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp))) {
 		res = FAIL;
 		goto exit;
