@@ -682,16 +682,18 @@ include_once "include/page_header.php";
 
 			if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0)
 			{
-				$sql="select distinct h.hostid,h.host from hosts h,hosts_groups hg".
-					" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid ".
-					" and h.hostid in (".$accessible_hosts.") ".
-					" and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
+				$sql='select distinct h.hostid,h.host from hosts h,hosts_groups hg'.
+					' where hg.groupid='.$_REQUEST['groupid'].' and hg.hostid=h.hostid '.
+					' and h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
+					' and h.hostid in ('.$accessible_hosts.') '.
+					' group by h.hostid,h.host order by h.host';
 			}
 			else
 			{
-				$sql="select distinct h.hostid,h.host from hosts h where h.status<>".HOST_STATUS_DELETED.
-					" and h.hostid in (".$accessible_hosts.") ".
-					" group by h.hostid,h.host order by h.host";
+				$sql='select distinct h.hostid,h.host from hosts h'.
+					' where h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
+					' and h.hostid in ('.$accessible_hosts.') '.
+					' group by h.hostid,h.host order by h.host';
 			}
 
 			$result=DBselect($sql);

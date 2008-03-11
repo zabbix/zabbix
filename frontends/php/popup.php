@@ -174,9 +174,17 @@ include_once "include/page_header.php";
 	$srcfld1	= get_request("srcfld1", '');	// source table field [can be different from fields of source table]
 	$srcfld2	= get_request("srcfld2", null);	// second source table field [can be different from fields of source table]
 	
-	$monitored_hosts = get_request("monitored_hosts", 0);
-	$real_hosts = get_request("real_hosts", 0);
-	$only_hostid	 = get_request("only_hostid", null);
+	$monitored_hosts	= get_request("monitored_hosts", 0);
+	$real_hosts		= get_request("real_hosts", 0);
+	$only_hostid		= get_request("only_hostid", null);
+
+	$host_status		= array();
+	if ($monitored_hosts)
+		array_push($host_status, HOST_STATUS_MONITORED);
+	else if ($real_hosts)
+		array_push($host_status, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+	else
+		array_push($host_status, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE);
 ?>
 <?php
 	global $USER_DETAILS;
@@ -275,15 +283,14 @@ include_once "include/page_header.php";
 		if(str_in_array($srctbl,array('hosts','templates','triggers','logitems','items','applications','host_templates','graphs','simple_graph','plain_text')))
 		{
 			$groupid = get_request('groupid',get_profile('web.popup.groupid',0));
-			
+
 			$cmbGroups = new CComboBox('groupid',$groupid,'submit()');
 			$cmbGroups->AddItem(0,S_ALL_SMALL);
 			$db_groups = DBselect('SELECT DISTINCT g.groupid,g.name from groups g, hosts_groups hg, hosts h '.
 				' where '.DBin_node('g.groupid', $nodeid).
-				' AND g.groupid=hg.groupid AND hg.hostid in ('.$accessible_hosts.') '.
-				' AND hg.hostid = h.hostid '.
-				($monitored_hosts ? ' AND h.status='.HOST_STATUS_MONITORED : '').
-				($real_hosts ? ' AND h.status<>'.HOST_STATUS_TEMPLATE : '').
+				' AND g.groupid=hg.groupid AND hg.hostid=h.hostid'.
+				' and h.hostid in ('.$accessible_hosts.')'.
+				' and h.status in ('.implode(',', $host_status).')'.
 				' order by name');
 			while($group = DBfetch($db_groups))
 			{
@@ -321,9 +328,8 @@ include_once "include/page_header.php";
 			}
 
 			$sql .= DBin_node('h.hostid', $nodeid).
-				" AND h.hostid in (".$accessible_hosts.")".
-				($monitored_hosts ? " AND h.status=".HOST_STATUS_MONITORED : "").
-				($real_hosts ? ' AND h.status<>'.HOST_STATUS_TEMPLATE : '').
+				' and h.hostid in ('.$accessible_hosts.')'.
+				' and h.status in ('.implode(',', $host_status).')'.
 				' order by host,h.hostid';
 
 			$db_hosts = DBselect($sql);
@@ -366,9 +372,8 @@ include_once "include/page_header.php";
 			$sql .= " where ";
 
 		$sql .= DBin_node('h.hostid', $nodeid).
-				" AND h.hostid in (".$accessible_hosts.") ".
-				($monitored_hosts ? " AND h.status=".HOST_STATUS_MONITORED : "").
-				($real_hosts ? " AND h.status<>".HOST_STATUS_TEMPLATE : "").
+				' and h.hostid in ('.$accessible_hosts.')'.
+				' and h.status in ('.implode(',', $host_status).')'.
 				" order by h.host,h.hostid";
 
 
@@ -569,7 +574,7 @@ include_once "include/page_header.php";
 		else
 			$sql .= ' WHERE ';
 
-		$sql .= DBin_node('h.hostid',$nodeid).' AND status='.HOST_STATUS_TEMPLATE.
+		$sql .= DBin_node('h.hostid',$nodeid).' AND h.status='.HOST_STATUS_TEMPLATE.
 				' AND h.hostid in ('.$accessible_hosts.') '.
 				' ORDER BY h.host,h.hostid';
 		$db_hosts = DBselect($sql);
@@ -688,16 +693,16 @@ include_once "include/page_header.php";
 			S_SEVERITY,
 			S_STATUS));
 
-
-		$sql = 'SELECT h.host,t.triggerid,t.description,t.expression,t.priority,t.status,count(d.triggerid_up) as dep_count '.
-				' FROM hosts h,items i,functions f, triggers t left join trigger_depends d on d.triggerid_down=t.triggerid '.
+		$sql = 'SELECT h.host,t.triggerid,t.description,t.expression,t.priority,t.status,'.
+				'count(d.triggerid_up) as dep_count '.
+				' FROM hosts h,items i,functions f, triggers t'.
+				' left join trigger_depends d on d.triggerid_down=t.triggerid '.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
 					' AND t.triggerid=f.triggerid'.
 					' AND '.DBin_node('t.triggerid', $nodeid).
-					' AND h.hostid in ('.$accessible_hosts.')'.
-					($monitored_hosts ? " AND h.status=".HOST_STATUS_MONITORED : "").
-					($real_hosts ? " AND h.status<>".HOST_STATUS_TEMPLATE : "");
+					' and h.hostid in ('.$accessible_hosts.')'.
+					' and h.status in ('.implode(',', $host_status).')';
 
 		if(isset($hostid)) 
 			$sql .= ' AND h.hostid='.$hostid;
@@ -779,9 +784,8 @@ include_once "include/page_header.php";
 			" where i.value_type=".ITEM_VALUE_TYPE_LOG." AND h.hostid=i.hostid".
 			' AND '.DBin_node('i.itemid', $nodeid).
 			(isset($hostid) ? " AND ".$hostid."=i.hostid " : "").
-			" AND i.hostid in (".$accessible_hosts.")".
-			($monitored_hosts ? " AND h.status=".HOST_STATUS_MONITORED : "").
-			($real_hosts ? " AND h.status<>".HOST_STATUS_TEMPLATE : "").
+			' and h.hostid in ('.$accessible_hosts.')'.
+			' and h.status in ('.implode(',', $host_status).')'.
 			" order by h.host,i.description, i.key_, i.itemid");
 
 		while($db_item = DBfetch($db_items))
@@ -822,9 +826,8 @@ include_once "include/page_header.php";
 		$sql = 'SELECT DISTINCT h.host,i.* from hosts h,items i '.
 				' WHERE h.hostid=i.hostid '.
 					' AND '.DBin_node('i.itemid', $nodeid).
-					' AND h.hostid IN ('.$accessible_hosts.')'.
-					($monitored_hosts ? " AND h.status=".HOST_STATUS_MONITORED : '').
-					($real_hosts ? " AND h.status<>".HOST_STATUS_TEMPLATE : '');
+					' and h.hostid in ('.$accessible_hosts.')'.
+					' and h.status in ('.implode(',', $host_status).')';
 
 		if(isset($hostid)) 
 			$sql .= ' AND h.hostid='.$hostid;
@@ -873,9 +876,8 @@ include_once "include/page_header.php";
 				' FROM hosts h,applications a '.
 				' WHERE h.hostid=a.hostid '.
 					' AND '.DBin_node('a.applicationid', $nodeid).
-					' AND h.hostid IN ('.$accessible_hosts.')'.
-					($monitored_hosts ? " AND h.status=".HOST_STATUS_MONITORED : "").
-					($real_hosts ? " AND h.status<>".HOST_STATUS_TEMPLATE : "");
+					' and h.hostid in ('.$accessible_hosts.')'.
+					' and h.status in ('.implode(',', $host_status).')';
 
 		if(isset($hostid)) 
 			$sql .= ' AND h.hostid='.$hostid;
@@ -1010,9 +1012,7 @@ include_once "include/page_header.php";
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					' AND '.DBin_node('i.itemid', $nodeid).
-					' AND h.hostid not in ('.$denyed_hosts.')'.
-					($monitored_hosts ? " AND h.status=".HOST_STATUS_MONITORED : '').
-					($real_hosts ? " AND h.status<>".HOST_STATUS_TEMPLATE : '');
+					' AND h.hostid not in ('.$denyed_hosts.')';
 
 		if(isset($hostid)) 
 			$sql .= ' AND h.hostid='.$hostid;
@@ -1108,9 +1108,7 @@ include_once "include/page_header.php";
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					' AND '.DBin_node('i.itemid', $nodeid).
-					' AND h.hostid not in ('.$denyed_hosts.')'.
-					($monitored_hosts ? " AND h.status=".HOST_STATUS_MONITORED : '').
-					($real_hosts ? " AND h.status<>".HOST_STATUS_TEMPLATE : '');
+					' AND h.hostid not in ('.$denyed_hosts.')';
 
 		if(isset($hostid)) 
 			$sql .= ' AND h.hostid='.$hostid;
