@@ -475,7 +475,7 @@ include_once "include/page_header.php";
 						new CSpan(' | ','divider'),
 						new CSpan(array($next,' &raquo;'),'textcolorstyles'));
 						
-	$filter = create_filter(S_FILTER,$navigation,$filterForm,'tr_filter',get_profile('web.events.filter.state',1));
+	$filter = create_filter(S_FILTER,$navigation,$filterForm,'tr_filter',get_profile('web.events.filter.state',0));
 	$filter->Show();
 //-------
 
