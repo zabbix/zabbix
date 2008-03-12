@@ -1023,7 +1023,6 @@ AC_SUBST(ARCH)
 AC_OUTPUT([
 	Makefile
 	create/Makefile
-	create/schema/Makefile
 	misc/Makefile
 	src/Makefile
 	src/libs/Makefile

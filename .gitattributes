@@ -28,7 +28,7 @@ create/data/images/UPS_small.png -text svneol=unset#unset
 create/data/images/Workstation.png -text svneol=unset#unset
 create/data/images/Workstation_small.png -text svneol=unset#unset
 create/data/recreate.sh -text
-docs/ZABBIX[!!-~]Manual[!!-~]v1.4[!!-~]rev[!!-~]7.pdf -text
+docs/ZABBIX[!!-~]Manual[!!-~]v1.6[!!-~]rev[!!-~]13.pdf -text
 frontends/php/audio/trigger_off.wav -text
 frontends/php/audio/trigger_on.wav -text
 frontends/php/audio/trigger_on_average.wav -text
