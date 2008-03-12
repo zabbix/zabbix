@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = schema
+#SUBDIRS = schema
 
 EXTRA_DIST = \
 	data/data.sql \
