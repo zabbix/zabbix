@@ -119,8 +119,10 @@ int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 			register_host(&host, &check, ip);
 
-			if (host.dhostid > 0)
-				register_service(&service, &check, host.dhostid, ip, port);
+			if (host.dhostid > 0) {
+				service.dhostid = host.dhostid;
+				register_service(&service, &check, ip, port);
+			}
 
 			if (service.dserviceid == 0)
 				continue;
@@ -153,7 +155,7 @@ int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 					update_dservice(&service);
 				}
 			}
-			add_service_event(&service);
+/*			add_service_event(&service);*/
 
 			continue;
 json_parse_error:
