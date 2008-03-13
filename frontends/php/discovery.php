@@ -137,7 +137,7 @@ include_once "include/page_header.php";
 			$table_row = array(
 				get_node_name_by_elid($h_data['druleid']),
 				new CSpan($ip, $h_data['class']),
-				new CSpan(convert_units(time() - $h_data['time'], 'uptime'), $h_data['class'])
+				new CSpan(($h_data['time'] == 0 ? '' : convert_units(time() - $h_data['time'], 'uptime')), $h_data['class'])
 				);
 			foreach($services as $name => $foo)
 			{
