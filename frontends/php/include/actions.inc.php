@@ -668,7 +668,7 @@ include_once 'include/discovery.inc.php';
 				}
 				break;
 			case CONDITION_TYPE_DSTATUS:
-				if( S_UNKNOWN == discovery_status2str($value) )
+				if( S_UNKNOWN == discovery_object_status2str($value) )
 				{
 					error(S_INCORRECT_DISCOVERY_STATUS);
 					return false;

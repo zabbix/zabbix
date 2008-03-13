@@ -3162,7 +3162,8 @@ include_once 'include/discovery.inc.php';
 					break;
 				case CONDITION_TYPE_DSTATUS:
 					$cmbCondVal = new CComboBox('new_condition[value]');
-					foreach(array(DOBJECT_STATUS_UP, DOBJECT_STATUS_DOWN) as $stat)
+					foreach(array(DOBJECT_STATUS_UP, DOBJECT_STATUS_DOWN, DOBJECT_STATUS_DISCOVER,
+							DOBJECT_STATUS_LOST) as $stat)
 						$cmbCondVal->AddItem($stat,discovery_object_status2str($stat));
 
 					$rowCondition[] = $cmbCondVal;
