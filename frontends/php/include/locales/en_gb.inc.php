@@ -83,6 +83,9 @@
 	'S_STATUS_OF_DISCOVERY_BIG'=>		'STATUS OF DISCOVERY',
 	'S_STATUS_OF_DISCOVERY'=>		'Status of discovery',
 
+	'S_DISCOVER'=>				'Discover',
+	'S_LOST'=>				'Lost',
+
 //	httpdetails.php
 	'S_DETAILS_OF_SCENARIO'=>		'Details of scenario',
 	'S_DETAILS_OF_SCENARIO_BIG'=>		'DETAILS OF SCENARIO',
