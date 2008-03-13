@@ -24,14 +24,11 @@
 
 extern	int	CONFIG_DISCOVERER_FORKS;
 
-void	add_host_event(const char *ip);
-void	add_service_event(DB_DSERVICE *service);
-
 void	update_dhost(DB_DHOST *host);
 void	update_dservice(DB_DSERVICE *service);
 
 void	register_host(DB_DHOST *host, DB_DCHECK *check, const char *ip);
-void	register_service(DB_DSERVICE *service, DB_DCHECK *check, zbx_uint64_t dhostid, const char *ip, int port);
+void	register_service(DB_DSERVICE *service, DB_DCHECK *check, const char *ip, int port);
 
 void	main_discoverer_loop(zbx_process_t p, int num);
 

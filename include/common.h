@@ -201,7 +201,9 @@ typedef enum
 typedef enum
 {
 	DOBJECT_STATUS_UP	= 0,
-	DOBJECT_STATUS_DOWN
+	DOBJECT_STATUS_DOWN,
+	DOBJECT_STATUS_DISCOVER,
+	DOBJECT_STATUS_LOST
 } zbx_dstatus_t;
 
 /* Item value types */
