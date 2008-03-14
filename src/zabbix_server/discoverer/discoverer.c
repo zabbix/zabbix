@@ -55,8 +55,6 @@ static void	add_event(int object, zbx_uint64_t objectid, int value)
 {
 	DB_EVENT	event;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_event()");
-
 	memset(&event, 0, sizeof(DB_EVENT));
 
 	event.eventid		= 0;
@@ -68,8 +66,6 @@ static void	add_event(int object, zbx_uint64_t objectid, int value)
 	event.acknowledged 	= 0;
 
 	process_event(&event);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End add_event()");
 }
 
 /******************************************************************************
@@ -87,7 +83,7 @@ static void	add_event(int object, zbx_uint64_t objectid, int value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	update_dservice(DB_DSERVICE *service)
+static void	update_dservice(DB_DSERVICE *service)
 {
 	char	value_esc[MAX_STRING_LEN];
 
@@ -133,7 +129,7 @@ static void	update_dservice_value(DB_DSERVICE *service)
 
 /******************************************************************************
  *                                                                            *
- * Function: update_host                                                      *
+ * Function: update_dhost                                                      *
  *                                                                            *
  * Purpose: update descovered host details                                    *
  *                                                                            *
@@ -146,7 +142,7 @@ static void	update_dservice_value(DB_DSERVICE *service)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	update_dhost(DB_DHOST *dhost)
+static void	update_dhost(DB_DHOST *dhost)
 {
 	assert(dhost);
 
@@ -172,48 +168,42 @@ void	update_dhost(DB_DHOST *dhost)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	register_service(DB_DSERVICE *service, DB_DCHECK *check, const char *ip, int port)
+static void	register_service(DB_DSERVICE *service, const char *ip, int port, int status)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		key_esc[MAX_STRING_LEN];
 
 	assert(service);
-	assert(check);
 	assert(ip);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In register_service(ip:%s,port:%d,key:%s)",
 			ip,
 			port,
-			check->key_);
+			service->key_);
 
-	DBescape_string(check->key_, key_esc, sizeof(key_esc));
+	DBescape_string(service->key_, key_esc, sizeof(key_esc));
 
-	result = DBselect("select dserviceid,status,lastup,lastdown,value,key_"
+	result = DBselect("select dserviceid,status,lastup,lastdown,value"
 			" from dservices where dhostid=" ZBX_FS_UI64 " and type=%d and port=%d and key_='%s'",
 			service->dhostid,
-			check->type,
+			service->type,
 			port,
 			key_esc);
 
 	if (NULL == (row = DBfetch(result)) || DBis_null(row[0]) == SUCCEED) {
 		/* Add host only if service is up */
-		if (check->status == DOBJECT_STATUS_UP) {
+		if (status == DOBJECT_STATUS_UP) {
 			zabbix_log(LOG_LEVEL_DEBUG, "New service discovered on port %d", port);
 
 			service->dserviceid	= DBget_maxid("dservices","dserviceid");
-			service->type		= check->type;
 			service->port		= port;
 			service->status		= DOBJECT_STATUS_DOWN;
-			service->lastup		= 0;
-			service->lastdown	= 0;
-			*service->value		= '\0';
-			strscpy(service->key_, check->key_);
 
 			DBexecute("insert into dservices (dhostid,dserviceid,type,port,status,key_) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s')",
 				service->dhostid,
 				service->dserviceid,
-				check->type,
+				service->type,
 				service->port,
 				service->status,
 				key_esc);
@@ -222,13 +212,11 @@ void	register_service(DB_DSERVICE *service, DB_DCHECK *check, const char *ip, in
 		zabbix_log(LOG_LEVEL_DEBUG, "Service is already in database");
 		
 		service->dserviceid	= zbx_atoui64(row[0]);
-		service->type		= check->type;
 		service->port		= port;
 		service->status		= atoi(row[1]);
 		service->lastup		= atoi(row[2]);
 		service->lastdown	= atoi(row[3]);
 		strscpy(service->value, row[4]);
-		strscpy(service->key_, row[5]);
 	}
 	DBfree_result(result);
 
@@ -250,14 +238,13 @@ void	register_service(DB_DSERVICE *service, DB_DCHECK *check, const char *ip, in
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	register_host(DB_DHOST *dhost, DB_DCHECK *check, const char *ip)
+void	register_host(DB_DHOST *dhost, const char *ip, int status)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		ip_esc[MAX_STRING_LEN];
 
 	assert(dhost);
-	assert(check);
 	assert(ip);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In register_host(ip:%s)",
@@ -267,18 +254,17 @@ void	register_host(DB_DHOST *dhost, DB_DCHECK *check, const char *ip)
 
 	result = DBselect("select dhostid,ip,status,lastup,lastdown from dhosts"
 			" where druleid=" ZBX_FS_UI64 " and ip='%s'" DB_NODE,
-			check->druleid,
+			dhost->druleid,
 			ip_esc,
 			DBnode_local("dhostid"));
 
 	if (NULL == (row = DBfetch(result)) || DBis_null(row[0]) == SUCCEED) {
 		/* Add host only if service is up */
-		if (check->status == DOBJECT_STATUS_UP) {
+		if (status == DOBJECT_STATUS_UP) {
 			zabbix_log(LOG_LEVEL_DEBUG, "New host discovered at %s",
 					ip);
 
 			dhost->dhostid	= DBget_maxid("dhosts", "dhostid");
-			dhost->druleid	= check->druleid;
 			dhost->status	= DOBJECT_STATUS_DOWN;
 			strscpy(dhost->ip, ip);
 
@@ -292,7 +278,6 @@ void	register_host(DB_DHOST *dhost, DB_DCHECK *check, const char *ip)
 				ip);
 
 		dhost->dhostid	= zbx_atoui64(row[0]);
-		dhost->druleid	= check->druleid;
 		dhost->status	= atoi(row[2]);
 		dhost->lastup	= atoi(row[3]);
 		dhost->lastdown	= atoi(row[4]);
@@ -303,26 +288,98 @@ void	register_host(DB_DHOST *dhost, DB_DCHECK *check, const char *ip)
 	zabbix_log(LOG_LEVEL_DEBUG, "End register_host()");
 }
 
-static void proxy_resigter_dhistory(int now, zbx_uint64_t druleid, int type, const char *ip, int port, const char *key, const char *value, int status)
+/******************************************************************************
+ *                                                                            *
+ * Function: update_service_status                                            *
+ *                                                                            *
+ * Purpose: process new service status                                        *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void update_service_status(DB_DSERVICE *service, DB_DCHECK *check, int now)
 {
-	char	ip_esc[MAX_STRING_LEN],
-		key_esc[MAX_STRING_LEN],
-		value_esc[MAX_STRING_LEN];
+	assert(service);
+	assert(check);
 
-	DBescape_string(ip, ip_esc, sizeof(ip_esc));
-	DBescape_string(key, key_esc, sizeof(key_esc));
-	DBescape_string(value, value_esc, sizeof(value_esc));
+	/* Update service status */
+	if (check->status == DOBJECT_STATUS_UP) {
+		if (service->status == DOBJECT_STATUS_DOWN || service->lastup == 0) {
+			service->status		= check->status;
+			service->lastdown	= 0;
+			service->lastup		= now;
+			strcpy(service->value, check->value);
 
-	DBexecute("insert into proxy_dhistory (clock,druleid,type,ip,port,key_,value,status)"
-			" values (%d," ZBX_FS_UI64 ",%d,'%s',%d,'%s','%s',%d)",
-			now,
-			druleid,
-			type,
-			ip_esc,
-			port,
-			key_esc,
-			value_esc,	
-			status);
+			update_dservice(service);
+
+			add_event(EVENT_OBJECT_DSERVICE, service->dserviceid, DOBJECT_STATUS_DISCOVER);
+		} else if (0 != strcmp(service->value, check->value)) {
+			strcpy(service->value, check->value);
+
+			update_dservice_value(service);
+		}
+	} else { /* DOBJECT_STATUS_DOWN */
+		if (service->status == DOBJECT_STATUS_UP || service->lastdown == 0) {
+			service->status		= check->status;
+			service->lastdown	= now;
+			service->lastup		= 0;
+
+			update_dservice(service);
+
+			add_event(EVENT_OBJECT_DSERVICE, service->dserviceid, DOBJECT_STATUS_LOST);
+		}
+	}
+	add_event(EVENT_OBJECT_DSERVICE, service->dserviceid, check->status);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: update_host_status                                               *
+ *                                                                            *
+ * Purpose: update new host status                                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void update_host_status(DB_DHOST *dhost, int status, int now)
+{
+	assert(dhost);
+
+	/* Update host status */
+	if (status == DOBJECT_STATUS_UP) {
+		if (dhost->status == DOBJECT_STATUS_DOWN || dhost->lastup == 0) {
+			dhost->status	= status;
+			dhost->lastdown	= 0;
+			dhost->lastup	= now;
+
+			update_dhost(dhost);
+
+			add_event(EVENT_OBJECT_DHOST, dhost->dhostid, DOBJECT_STATUS_DISCOVER);
+		}
+	} else { /* DOBJECT_STATUS_DOWN */
+		if (dhost->status == DOBJECT_STATUS_UP || dhost->lastdown == 0) {
+			dhost->status	= status;
+			dhost->lastdown	= now;
+			dhost->lastup	= 0;
+
+			update_dhost(dhost);
+
+			add_event(EVENT_OBJECT_DHOST, dhost->dhostid, DOBJECT_STATUS_LOST);
+		}
+	}
+	add_event(EVENT_OBJECT_DHOST, dhost->dhostid, status);
 }
 
 /******************************************************************************
@@ -340,14 +397,11 @@ static void proxy_resigter_dhistory(int now, zbx_uint64_t druleid, int type, con
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void update_service(DB_DRULE *rule, DB_DHOST *dhost, int *host_status, DB_DCHECK *check, char *ip, int port)
+void update_service(DB_DHOST *dhost, DB_DCHECK *check, char *ip, int port, int now)
 {
-	int		now;
 	DB_DSERVICE	service;
 
-	assert(rule);
 	assert(dhost);
-	assert(host_status);
 	assert(check);
 	assert(ip);
 
@@ -356,59 +410,98 @@ static void update_service(DB_DRULE *rule, DB_DHOST *dhost, int *host_status, DB
 			port,
 			(check->status == DOBJECT_STATUS_UP ? "up" : "down"));
 
-	now = time(NULL);
+	memset(&service, 0, sizeof(service));
 
-	if (zbx_process == ZBX_PROCESS_SERVER) {
-		memset(&service, 0, sizeof(service));
+	/* Register host if is not registered yet */
+	if (dhost->dhostid == 0)
+		register_host(dhost, ip, check->status);
 
-		/* Register host if is not registered yet */
-		if (dhost->dhostid == 0)
-			register_host(dhost, check, ip);
+	/* Register service if is not registered yet */
+	if (dhost->dhostid > 0) {
+		service.dhostid = dhost->dhostid;
+		service.type	= check->type;
+		strscpy(service.key_, check->key_);
+		register_service(&service, ip, port, check->status);
+	}
 
-		/* Register service if is not registered yet */
-		if (dhost->dhostid > 0) {
-			service.dhostid = dhost->dhostid;
-			register_service(&service, check, ip, port);
-		}
+	/* Service wasn't registered because we do not add down service */
+	if (service.dserviceid == 0)
+		return;
 
-		/* Service wasn't registered because we do not add down service */
-		if (service.dserviceid == 0)
-			return;
+	update_service_status(&service, check, now);
 
-		/* Update host status */
-		if (*host_status == -1 || check->status == DOBJECT_STATUS_UP)
-			*host_status = check->status;
+	zabbix_log(LOG_LEVEL_DEBUG, "End update_service()");
+}
 
-		/* Update service status */
-		if (check->status == DOBJECT_STATUS_UP) {
-			if (service.status == DOBJECT_STATUS_DOWN || service.lastup == 0) {
-				service.status		= DOBJECT_STATUS_UP;
-				service.lastdown	= 0;
-				service.lastup		= now;
-				strcpy(service.value, check->value);
+/******************************************************************************
+ *                                                                            *
+ * Function: proxy_update_service                                             *
+ *                                                                            *
+ * Purpose: process new service status                                        *
+ *                                                                            *
+ * Parameters: service - service info                                         *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void proxy_update_service(DB_DCHECK *check, char *ip, int port, int now)
+{
+	char	ip_esc[MAX_STRING_LEN],
+		key_esc[MAX_STRING_LEN],
+		value_esc[MAX_STRING_LEN];
 
-				update_dservice(&service);
+	assert(check);
+	assert(ip);
 
-				add_event(EVENT_OBJECT_DSERVICE, service.dserviceid, DOBJECT_STATUS_DISCOVER);
-			} else if (0 != strcmp(service.value, check->value)) {
-				strcpy(service.value, check->value);
+	DBescape_string(ip, ip_esc, sizeof(ip_esc));
+	DBescape_string(check->key_, key_esc, sizeof(key_esc));
+	DBescape_string(check->value, value_esc, sizeof(value_esc));
 
-				update_dservice_value(&service);
-			}
-		} else { /* DOBJECT_STATUS_DOWN */
-			if (service.status == DOBJECT_STATUS_UP || service.lastdown == 0) {
-				service.status		= DOBJECT_STATUS_DOWN;
-				service.lastdown	= now;
-				service.lastup		= 0;
+	DBexecute("insert into proxy_dhistory (clock,druleid,type,ip,port,key_,value,status)"
+			" values (%d," ZBX_FS_UI64 ",%d,'%s',%d,'%s','%s',%d)",
+			now,
+			check->druleid,
+			check->type,
+			ip_esc,
+			port,
+			key_esc,
+			value_esc,	
+			check->status);
+}
 
-				update_dservice(&service);
+/******************************************************************************
+ *                                                                            *
+ * Function: proxy_update_host                                                *
+ *                                                                            *
+ * Purpose: process new service status                                        *
+ *                                                                            *
+ * Parameters: service - service info                                         *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void proxy_update_host(zbx_uint64_t druleid, char *ip, int status, int now)
+{
+	char	ip_esc[MAX_STRING_LEN];
 
-				add_event(EVENT_OBJECT_DSERVICE, service.dserviceid, DOBJECT_STATUS_LOST);
-			}
-		}
-		add_event(EVENT_OBJECT_DSERVICE, service.dserviceid, check->status);
-	} else if (zbx_process == ZBX_PROCESS_PROXY)
-		proxy_resigter_dhistory(now, rule->druleid, check->type, ip, port, check->key_, check->value, check->status);
+	assert(ip);
+
+	DBescape_string(ip, ip_esc, sizeof(ip_esc));
+
+	DBexecute("insert into proxy_dhistory (clock,druleid,type,ip,status)"
+			" values (%d," ZBX_FS_UI64 ",-1,'%s',%d)",
+			now,
+			druleid,
+			ip_esc,
+			status);
 }
 
 /******************************************************************************
@@ -607,7 +700,8 @@ static void process_check(DB_DRULE *rule, DB_DHOST *dhost, int *host_status, DB_
 {
 	int	port,
 		first,
-		last;
+		last,
+		now;
 	char	*curr_range = NULL,
 		*next_range = NULL,
 		*last_port = NULL;
@@ -650,7 +744,21 @@ static void process_check(DB_DRULE *rule, DB_DHOST *dhost, int *host_status, DB_
 
 		for (port = first; port <= last; port++) {	
 			check->status = SUCCEED == discover_service(check, ip, port) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
-			update_service(rule, dhost, host_status, check, ip, port);
+
+			/* Update host status */
+			if (*host_status == -1 || check->status == DOBJECT_STATUS_UP)
+				*host_status = check->status;
+
+			now = time(NULL);
+
+			switch (zbx_process) {
+			case ZBX_PROCESS_SERVER	:
+				update_service(dhost, check, ip, port, now);
+				break;
+			case ZBX_PROCESS_PROXY	:
+				proxy_update_service(check, ip, port, now);
+				break;
+			}
 		}
 	}
 
@@ -812,30 +920,16 @@ static void process_rule(DB_DRULE *rule)
 			}
 			DBfree_result(result);
 
-			if (dhost.dhostid > 0) {
-				/* Update host status */
-				if (host_status == DOBJECT_STATUS_UP) {
-					if (dhost.status == DOBJECT_STATUS_DOWN || dhost.lastup == 0) {
-						dhost.status	= host_status;
-						dhost.lastdown	= 0;
-						dhost.lastup	= now;
+			switch (zbx_process) {
+			case ZBX_PROCESS_SERVER	:
+				if (dhost.dhostid == 0)
+					break;
 
-						update_dhost(&dhost);
-
-						add_event(EVENT_OBJECT_DHOST, dhost.dhostid, DOBJECT_STATUS_DISCOVER);
-					}
-				} else { /* DOBJECT_STATUS_DOWN */
-					if (dhost.status == DOBJECT_STATUS_UP || dhost.lastdown == 0) {
-						dhost.status	= host_status;
-						dhost.lastdown	= now;
-						dhost.lastup	= 0;
-
-						update_dhost(&dhost);
-
-						add_event(EVENT_OBJECT_DHOST, dhost.dhostid, DOBJECT_STATUS_LOST);
-					}
-				}
-				add_event(EVENT_OBJECT_DHOST, dhost.dhostid, host_status);
+				update_host_status(&dhost, host_status, now);
+				break;
+			case ZBX_PROCESS_PROXY	:
+				proxy_update_host(rule->druleid, ip, host_status, now);
+				break;
 			}
 		}
 	}

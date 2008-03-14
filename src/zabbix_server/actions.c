@@ -415,7 +415,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 			event->value,
 			condition->value);
 		value_int = atoi(condition->value);
-		if(event->object == EVENT_OBJECT_DHOST)
+/*		if(event->object == EVENT_OBJECT_DHOST)
 		{
 			result = DBselect("select status from dhosts where dhostid=" ZBX_FS_UI64,
 				event->objectid);
@@ -427,14 +427,16 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		row = DBfetch(result);
 		if(row && DBis_null(row[0]) != SUCCEED)
-		{
+		{*/
 			if(condition->operator == CONDITION_OPERATOR_EQUAL)
 			{
-				if(value_int == atoi(row[0]))	ret = SUCCEED;
+/*				if(value_int == atoi(row[0]))	ret = SUCCEED;*/
+				if(value_int == event->value)	ret = SUCCEED;
 			}
 			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 			{
-				if(atoi(row[0]) != value_int)	ret = SUCCEED;
+/*				if(atoi(row[0]) != value_int)	ret = SUCCEED;*/
+				if(value_int != event->value)	ret = SUCCEED;
 			}
 			else
 			{
@@ -442,8 +444,8 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 					condition->operator,
 					condition->conditionid);
 			}
-		}
-		DBfree_result(result);
+/*		}
+		DBfree_result(result);*/
 	}
 	else if(event->source == EVENT_SOURCE_DISCOVERY &&
 		(event->object == EVENT_OBJECT_DHOST || event->object == EVENT_OBJECT_DSERVICE) &&
