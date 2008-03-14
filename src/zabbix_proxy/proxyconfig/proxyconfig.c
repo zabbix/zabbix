@@ -26,6 +26,8 @@
 #include "proxyconfig.h"
 #include "../servercomms.h"
 
+#define CONFIG_PROXYCONFIG_RETRY 120 /* seconds */
+
 /******************************************************************************
  *                                                                            *
  * Function: process_proxyconfig_table                                        *
@@ -245,7 +247,7 @@ db_error:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	process_proxyconfig(struct zbx_json_parse *jp)
+static void	process_proxyconfig(struct zbx_json_parse *jp)
 {
 	char		buf[MAX_STRING_LEN];
 	size_t		len = sizeof(buf);
@@ -258,8 +260,7 @@ static int	process_proxyconfig(struct zbx_json_parse *jp)
 /*
  * {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *          ^
- */
-	while (NULL != (p = zbx_json_pair_next(jp, p, buf, len)) && res == SUCCEED) {
+ */	while (NULL != (p = zbx_json_pair_next(jp, p, buf, len)) && res == SUCCEED) {
 		if (ZBX_JSON_TYPE_OBJECT != zbx_json_type(p)) {
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid type of data for table \"%s\" \"%.40s...\"",
 					buf,
@@ -274,13 +275,11 @@ static int	process_proxyconfig(struct zbx_json_parse *jp)
 		DBcommit();
 	else
 		DBrollback();
-
-	return res;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: process_nodes                                                    *
+ * Function: process_configuration_sync                                       *
  *                                                                            *
  * Purpose: calculates checks sum of config data                              *
  *                                                                            *
@@ -297,13 +296,16 @@ static void	process_configuration_sync()
 {
 	zbx_sock_t	sock;
 	char		*data;
-/*	int		now = time(NULL);*/
 	struct		zbx_json_parse jp;
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_configuration_sync()");
 
-	if (FAIL == connect_to_server(&sock, 60)) /* alarm */
-		return;
+	while (FAIL == connect_to_server(&sock, 600)) { /* alarm */
+		zabbix_log(LOG_LEVEL_DEBUG, "Connect to the server failed. Retry after %d seconds",
+				CONFIG_PROXYCONFIG_RETRY);
+
+		sleep(CONFIG_PROXYCONFIG_RETRY);
+	}
 
 	if (FAIL == get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &data))
 		goto exit;
@@ -311,12 +313,9 @@ static void	process_configuration_sync()
 	if (FAIL == zbx_json_open(data, &jp))
 		goto exit;
 
-	if (FAIL == process_proxyconfig(&jp))
-		zabbix_log(LOG_LEVEL_DEBUG, "----- process_proxyconfig() ---> FAIL <---");
+	process_proxyconfig(&jp);
 exit:
 	disconnect_server(&sock);
-
-/*	zabbix_log(LOG_LEVEL_DEBUG, "<-----> process_nodes [Selected records in %d seconds]", time(NULL)-now);*/
 }
 
 /******************************************************************************
