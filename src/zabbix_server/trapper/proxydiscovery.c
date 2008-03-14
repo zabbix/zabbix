@@ -46,9 +46,8 @@
 int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
 	char			tmp[MAX_STRING_LEN];
-	DB_DCHECK		check;
-	DB_DHOST		host;
-	DB_DSERVICE		service;
+	DB_DCHECK		dcheck;
+	DB_DHOST		dhost;
 	struct zbx_json_parse	jp_data, jp_row;
 	int			res = SUCCEED;
 
@@ -78,14 +77,14 @@ int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	hosttime = atoi(tmp);
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)) {
+		memset(&dhost, 0, sizeof(dhost));
+
 		p = NULL;
 		while (NULL != (p = zbx_json_next(&jp_data, p)) && SUCCEED == res) {
 			if (FAIL == (res = zbx_json_brackets_open(p, &jp_row)))
 				break;
 
-			memset(&host, 0, sizeof(host));
-			memset(&check, 0, sizeof(check));
-			memset(&service, 0, sizeof(service));
+			memset(&dcheck, 0, sizeof(dcheck));
 
 			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
 				goto json_parse_error;
@@ -93,11 +92,11 @@ int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DRULE, tmp, sizeof(tmp)))
 				goto json_parse_error;
-			check.druleid = zbx_atoui64(tmp);
+			dcheck.druleid = zbx_atoui64(tmp);
 
 			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TYPE, tmp, sizeof(tmp)))
 				goto json_parse_error;
-			check.type = atoi(tmp);
+			dcheck.type = atoi(tmp);
 
 			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 				goto json_parse_error;
@@ -108,54 +107,27 @@ int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, key_, sizeof(key_)))
 				goto json_parse_error;
-			check.key_ = key_;
+			dcheck.key_ = key_;
 
-			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, check.value, sizeof(check.value)))
+			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, dcheck.value, sizeof(dcheck.value)))
 				goto json_parse_error;
 
 			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp)))
 				goto json_parse_error;
-			check.status = atoi(tmp);
+			dcheck.status = atoi(tmp);
 
-			register_host(&host, &check, ip);
+			if (dcheck.type == -1) {
+				memset(&dhost, 0, sizeof(dhost));
+				dhost.druleid = dcheck.druleid;
 
-			if (host.dhostid > 0) {
-				service.dhostid = host.dhostid;
-				register_service(&service, &check, ip, port);
+				register_host(&dhost, ip, dcheck.status);
+				update_host_status(&dhost, dcheck.status, itemtime);
+			} else {
+				memset(&dhost, 0, sizeof(dhost));
+				dhost.druleid = dcheck.druleid;
+
+				update_service(&dhost, &dcheck, ip, port, itemtime);
 			}
-
-			if (service.dserviceid == 0)
-				continue;
-
-			host.status	= check.status;
-			service.status	= check.status;
-			if (check.status == DOBJECT_STATUS_UP) {
-				/* Update host status */
-				if (host.status == DOBJECT_STATUS_DOWN || host.lastup == 0) {
-					host.lastdown		= 0;
-					host.lastup		= itemtime;
-					update_dhost(&host);
-				}
-				/* Update service status */
-				if (service.status == DOBJECT_STATUS_DOWN || service.lastup == 0) {
-					service.lastdown	= 0;
-					service.lastup		= itemtime;
-					update_dservice(&service);
-				}
-			} else { /* DOBJECT_STATUS_DOWN */
-				if (host.status == DOBJECT_STATUS_UP || host.lastdown == 0) {
-					host.lastdown		= itemtime;
-					host.lastup		= 0;
-					update_dhost(&host);
-				}
-				/* Update service status */
-				if (service.status == DOBJECT_STATUS_UP || service.lastdown == 0) {
-					service.lastdown	= itemtime;
-					service.lastup		= 0;
-					update_dservice(&service);
-				}
-			}
-/*			add_service_event(&service);*/
 
 			continue;
 json_parse_error:
