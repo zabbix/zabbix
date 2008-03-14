@@ -44,7 +44,6 @@ static void	send_heartbeat()
 {
 	zbx_sock_t		sock;
 	struct zbx_json		j;
-	int			res;
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_configuration_sync()");
 
@@ -55,7 +54,7 @@ static void	send_heartbeat()
 	if (FAIL == connect_to_server(&sock, CONFIG_HEARTBEAT_FREQUENCY)) /* alarm */
 		return;
 
-	if (FAIL == (res = put_data_to_server(&sock, &j)))
+	if (FAIL == put_data_to_server(&sock, &j))
 		zabbix_log(LOG_LEVEL_WARNING, "Heartbeat message sendig failed");
 
 	disconnect_server(&sock);
@@ -81,7 +80,7 @@ void main_heart_loop()
 	struct	sigaction phan;
 	int	start, sleeptime;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In main_heart_loop()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_heart_loop()");
 
 	phan.sa_handler = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
