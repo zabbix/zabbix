@@ -490,6 +490,11 @@ static int	process_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	update_proxy_lastaccess(proxy_hostid);
 
+	if (send_result(sock, SUCCEED, NULL) != SUCCEED) {
+		zabbix_log( LOG_LEVEL_WARNING, "Error sending result back");
+		zabbix_syslog("Trapper: error sending result back");
+	}
+
 	return SUCCEED;
 }
 
