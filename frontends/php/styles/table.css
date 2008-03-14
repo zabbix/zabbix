@@ -18,11 +18,13 @@ table.nowrap tr td {
 td,tr
 {
 	font-family:Verdana, Arial, Helvetica, sans-serif;
-	font-size:8pt;
+	font-size: 8pt;
 	text-decoration: none;
 }
 
-td.center 		{	text-align: center;	}
+td.center{
+	text-align: center;
+}
 
 /**************** PAGE TABLE ****************/
 /* header */
