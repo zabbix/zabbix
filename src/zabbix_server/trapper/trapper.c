@@ -444,7 +444,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occured                                     *
  *                                                                            *
- * Author: Alksander Vladishev                                                *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -453,12 +453,44 @@ static int	process_proxy_values(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
 	zbx_uint64_t	proxy_hostid;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_proxy_values()");
+
 	if (FAIL == get_proxy_id(jp, &proxy_hostid))
 		return FAIL;
 
 	update_proxy_lastaccess(proxy_hostid);
 
 	return process_new_values(sock, jp, proxy_hostid);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_proxy_heartbeat                                          *
+ *                                                                            *
+ * Purpose: process heartbeat sent by proxy servers                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occured                                     *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	process_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)
+{
+	zbx_uint64_t	proxy_hostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_proxy_heartbeat()");
+
+	if (FAIL == get_proxy_id(jp, &proxy_hostid))
+		return FAIL;
+
+	update_proxy_lastaccess(proxy_hostid);
+
+	return SUCCEED;
 }
 
 static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
@@ -571,6 +603,10 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_DISCOVERY_DATA) && zbx_process == ZBX_PROCESS_SERVER)
 				{
 					ret = process_discovery_data(sock, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT) && zbx_process == ZBX_PROCESS_SERVER)
+				{
+					ret = process_proxy_heartbeat(sock, &jp);
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 				{
