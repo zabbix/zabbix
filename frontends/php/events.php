@@ -28,7 +28,7 @@
 	$page["title"] = "S_LATEST_EVENTS";
 	$page["file"] = "events.php";
 	$page['hist_arg'] = array('groupid','hostid');
-	$page['scripts'] = array('url.js');
+	$page['scripts'] = array('url.js','calendar.js');
 
 	define('ZBX_PAGE_DO_REFRESH', 1);
 
@@ -45,15 +45,21 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"source"=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN($allowed_sources),	NULL),
-		"show_unknown"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		"groupid"=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 		"hostid"=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 		"triggerid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 		"start"=>			array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535)."({}%".PAGE_SIZE."==0)",	NULL),
 		"next"=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		"prev"=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
+// filter
 		"filter_rst"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		"filter_set"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
+		
+		"show_unknown"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
+		
+		'filter_timesince'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
+		'filter_timetill'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
+
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -61,22 +67,36 @@ include_once "include/page_header.php";
 	);
 
 	$_REQUEST['source'] = get_request('source', get_profile('web.events.source', 0));
-	
-	check_fields($fields);
-	validate_sort_and_sortorder('e.eventid',ZBX_SORT_DOWN);
 
+	check_fields($fields);
+	validate_sort_and_sortorder('e.clock',ZBX_SORT_DOWN);
 // filter prepare	
 	if(isset($_REQUEST['filter_rst'])){
 		$_REQUEST['triggerid'] = 0;
 		$_REQUEST['show_unknown'] = 0;
+		
+		$_REQUEST['filter_timesince'] = 0;
+		$_REQUEST['filter_timetill'] = 0;
 	}
-
+	
 	$_REQUEST['triggerid'] = get_request('triggerid',get_profile('web.events.filter.triggerid',0));
 	$show_unknown = get_request('show_unknown',get_profile('web.events.filter.show_unknown',0));
-
-	if(isset($_REQUEST['filter_set'])){
+	
+	$_REQUEST['filter_timesince'] = get_request('filter_timesince',get_profile('web.events.filter.timesince',0));
+	$_REQUEST['filter_timetill'] = get_request('filter_timetill',get_profile('web.events.filter.timetill',0));
+	
+	if(($_REQUEST['filter_timetill'] > 0) && ($_REQUEST['filter_timesince'] > $_REQUEST['filter_timetill'])){
+		$tmp = $_REQUEST['filter_timesince'];
+		$_REQUEST['filter_timesince'] = $_REQUEST['filter_timetill'];
+		$_REQUEST['filter_timetill'] = $tmp;
+	}
+	
+	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		update_profile('web.events.filter.triggerid',$_REQUEST['triggerid']);
 		update_profile('web.events.filter.show_unknown',$show_unknown);
+		
+		update_profile('web.events.filter.timesince',$_REQUEST['filter_timesince']);
+		update_profile('web.events.filter.timetill',$_REQUEST['filter_timetill']);
 	}
 // --------------
 
@@ -247,10 +267,13 @@ include_once "include/page_header.php";
 
 		$trigger_list = '('.trim($trigger_list,',').')';
 		$sql_cond=($show_unknown == 0)?(' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.' '):('');
+		$sql_cond.=($_REQUEST['filter_timesince']>0)?' AND e.clock>'.$_REQUEST['filter_timesince']:' AND e.clock>100';
+		$sql_cond.=($_REQUEST['filter_timetill']>0)?' AND e.clock<'.$_REQUEST['filter_timetill']:'';
 
 		$table = new CTableInfo(S_NO_EVENTS_FOUND); 
 		$table->SetHeader(array(
-				make_sorting_link(S_TIME,'e.eventid'),
+//				make_sorting_link(S_TIME,'e.eventid'),
+				make_sorting_link(S_TIME,'e.clock'),
 				is_show_subnodes() ? S_NODE : null,
 				$_REQUEST["hostid"] == 0 ? S_HOST : null,
 				S_DESCRIPTION,
@@ -264,12 +287,11 @@ include_once "include/page_header.php";
 		if(!empty($triggers)){
 			$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.value, e.acknowledged '.
 					' FROM events e '.
-					' WHERE e.object='.EVENT_OBJECT_TRIGGER.
+					' WHERE (e.object+0)='.EVENT_OBJECT_TRIGGER.
 						' AND e.objectid IN '.$trigger_list.
 						$sql_cond.
-//					' ORDER BY e.object DESC,e.objectid DESC,e.eventid DESC';
-					order_by('e.eventid');
-
+					order_by('e.clock');
+//SDI($sql);
 			$result = DBselect($sql,10*($_REQUEST['start']+PAGE_SIZE));
 		}
 
@@ -422,22 +444,78 @@ include_once "include/page_header.php";
 		$next = new Clink('Next '.PAGE_SIZE, 'events.php?next=1'.url_param('start'),'styled');
 	}	
 
-	$filterForm = new CFormTable(S_FILTER);//,'events.php?','POST',null,'sform');
+	$filterForm = new CFormTable(S_FILTER);//,'events.php?filter_set=1','POST',null,'sform');
 	$filterForm->AddOption('name','zbx_filter');
 	$filterForm->AddOption('id','zbx_filter');
+	$filterForm->SetMethod('get');
 
 	if(EVENT_SOURCE_TRIGGERS == $source){
 	
-/*	
-		$filterForm->AddRow(S_PERIOD,array(
-								S_FROM.SPACE, new CTextBox('filter_since_day','',2),
-								new CTextBox('filter_since_month','',2),
-								new CTextBox('filter_since_year','',4),
-								S_TILL.SPACE, new CTextBox('filter_till_day','',2),
-								new CTextBox('filter_till_month','',2),
-								new CTextBox('filter_till_year','',4),
-							));
-*/	
+		$script = new CScript("javascript: if(CLNDR['events_since'].clndr.setSDateFromOuterObj()){". 
+								"$('filter_timesince').value = parseInt(CLNDR['events_since'].clndr.sdt.getTime()/1000);}".
+							"if(CLNDR['events_till'].clndr.setSDateFromOuterObj()){". 
+								"$('filter_timetill').value = parseInt(CLNDR['events_till'].clndr.sdt.getTime()/1000);}"
+							);
+		$filterForm->AddAction('onsubmit',$script);
+		
+		$filterForm->AddVar('filter_timesince',($_REQUEST['filter_timesince']>0)?$_REQUEST['filter_timesince']:'');
+		$filterForm->AddVar('filter_timetill',($_REQUEST['filter_timetill']>0)?$_REQUEST['filter_timetill']:'');
+//*	
+		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, null);
+		$clndr_icon->AddAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['events_since'].clndr.clndrshow(pos.top,pos.left);");
+		
+		$filtertimetab = new CTable();
+		$filtertimetab->AddOption('width','10%');
+		$filtertimetab->SetCellPadding(0);
+		$filtertimetab->SetCellSpacing(0);
+/*		$filtertimetab->AddRow(array(
+								SPACE, 
+								new CCol('D','center'),
+								new CCol('/','center'),
+								new CCol('M','center'),
+								new CCol('/','center'),
+								new CCol('Y','center'),
+								new CCol('H','center'),
+								new CCol(':','center'),
+								new CCol('M','center'),
+								SPACE
+						));
+*/		
+		$filtertimetab->AddRow(array(
+								S_FROM, 
+								new CNumericBox('filter_since_day',(($_REQUEST['filter_timesince']>0)?date('d',$_REQUEST['filter_timesince']):''),2),
+								'/',
+								new CNumericBox('filter_since_month',(($_REQUEST['filter_timesince']>0)?date('m',$_REQUEST['filter_timesince']):''),2),
+								'/',
+								new CNumericBox('filter_since_year',(($_REQUEST['filter_timesince']>0)?date('Y',$_REQUEST['filter_timesince']):''),4),
+								new CNumericBox('filter_since_hour',(($_REQUEST['filter_timesince']>0)?date('H',$_REQUEST['filter_timesince']):''),2),
+								':',
+								new CNumericBox('filter_since_minute',(($_REQUEST['filter_timesince']>0)?date('i',$_REQUEST['filter_timesince']):''),2),
+								$clndr_icon
+						));
+		zbx_add_post_js('create_calendar(null,["filter_since_day","filter_since_month","filter_since_year","filter_since_hour","filter_since_minute"],"events_since");');
+	
+		$clndr_icon->AddAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['events_till'].clndr.clndrshow(pos.top,pos.left);");
+		$filtertimetab->AddRow(array(
+								S_TILL, 
+								new CNumericBox('filter_till_day',(($_REQUEST['filter_timetill']>0)?date('d',$_REQUEST['filter_timetill']):''),2),
+								'/',
+								new CNumericBox('filter_till_month',(($_REQUEST['filter_timetill']>0)?date('m',$_REQUEST['filter_timetill']):''),2),
+								'/',
+								new CNumericBox('filter_till_year',(($_REQUEST['filter_timetill']>0)?date('Y',$_REQUEST['filter_timetill']):''),4),
+								new CNumericBox('filter_till_hour',(($_REQUEST['filter_timetill']>0)?date('H',$_REQUEST['filter_timetill']):''),2),
+								':',
+								new CNumericBox('filter_till_minute',(($_REQUEST['filter_timetill']>0)?date('i',$_REQUEST['filter_timetill']):''),2),
+								$clndr_icon
+						));
+		zbx_add_post_js('create_calendar(null,["filter_till_day","filter_till_month","filter_till_year","filter_till_hour","filter_till_minute"],"events_till");');
+		
+		zbx_add_post_js('addListener($("filter_icon"),"click",CLNDR[\'events_since\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'events_since\'].clndr));'.
+						'addListener($("filter_icon"),"click",CLNDR[\'events_till\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'events_till\'].clndr));'
+						);
+		
+		$filterForm->AddRow(S_PERIOD, $filtertimetab);
+//*/	
 		$filterForm->AddVar('triggerid',$_REQUEST['triggerid']);
 		
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){

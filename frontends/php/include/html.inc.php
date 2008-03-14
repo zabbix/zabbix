@@ -161,6 +161,7 @@
 		$icon = new CDiv(SPACE,($state)?'filteropened':'filterclosed');
 		$icon->AddAction('onclick',new CScript("javascript: change_filter_state(this,'".$id."');"));
 		$icon->AddOption('title',S_SHOW.'/'.S_HIDE.' '.S_FILTER);
+		$icon->AddAction('id','filter_icon');
 
 		$td_icon = new CCol($icon);
 		$td_icon->AddOption('valign','bottom');

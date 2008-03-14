@@ -31,6 +31,7 @@
 			$this->tag_body_start = '';
 			$this->options['class'] = 'biginput';
 			$this->AddOption('name', $name);
+			$this->AddOption('id', $name);
 			$this->AddOption('size', $size);
 			$this->AddOption('value',$value);
 			$this->SetReadonly($readonly);

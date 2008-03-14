@@ -191,8 +191,8 @@ include_once "include/page_header.php";
 	show_table_header(array(S_DASHBOARD_BIG,SPACE),SPACE);
 
 	$left_tab = new CTable();
-	$left_tab->SetCellPadding(5);
-	$left_tab->SetCellSpacing(5);
+	$left_tab->SetCellPadding(3);
+	$left_tab->SetCellSpacing(3);
 
 	$left_tab->AddOption('border',0);
 	
@@ -254,8 +254,8 @@ include_once "include/page_header.php";
 	$left_tab->AddRow(SPACE);
 	
 	$right_tab = new CTable();
-	$right_tab->SetCellPadding(5);
-	$right_tab->SetCellSpacing(5);
+	$right_tab->SetCellPadding(3);
+	$right_tab->SetCellSpacing(3);
 
 	$right_tab->AddOption('border',0);
 

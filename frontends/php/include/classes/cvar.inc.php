@@ -27,6 +27,8 @@
 			parent::CTag('input','no');
 			$this->options['type'] = 'hidden';
 			$this->options['name'] = $name;
+			$this->options['id'] = $name;
+			
 			$this->SetValue($value);
 		}
 		function SetValue($value)

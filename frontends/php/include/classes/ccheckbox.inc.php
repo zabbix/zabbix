@@ -29,6 +29,7 @@
 			$this->options['type'] = 'checkbox';
 			$this->options['value'] = $value;
 			$this->options['name'] = $name;
+			$this->options['id'] = $name;
 			$this->SetAction($action);
 			$this->SetChecked($checked);
 		}

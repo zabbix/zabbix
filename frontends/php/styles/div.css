@@ -107,7 +107,7 @@ div.filteropened{
 	background-repeat:no-repeat;
 }
 
-div.filteropened:hover{
+div.filteropened:hover{         
 	cursor:pointer;
 }
 
