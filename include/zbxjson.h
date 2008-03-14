@@ -47,6 +47,7 @@
 
 #define	ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS	"active checks"
 #define	ZBX_PROTO_VALUE_PROXY_CONFIG		"proxy config"
+#define	ZBX_PROTO_VALUE_PROXY_HEARTBEAT		"proxy heartbeat"
 #define ZBX_PROTO_VALUE_DISCOVERY_DATA		"discovery data"
 #define ZBX_PROTO_VALUE_HISTORY_DATA		"history data"
 #define	ZBX_PROTO_VALUE_SENDER_DATA		"sender data"

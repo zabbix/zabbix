@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
+	heart \
 	../zabbix_server/dbsyncer \
 	../zabbix_server/discoverer \
 	housekeeper \
@@ -21,6 +22,7 @@ zabbix_proxy_SOURCES = \
 	proxy.c
 
 zabbix_proxy_LDADD = \
+	heart/libzbxheart.a \
 	$(top_srcdir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	housekeeper/libzbxhousekeeper.a \

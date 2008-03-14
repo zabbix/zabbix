@@ -202,6 +202,9 @@ src/zabbix_proxy/datasender/datasender.c -text
 src/zabbix_proxy/datasender/datasender.h -text
 src/zabbix_proxy/events.c -text
 src/zabbix_proxy/events.h -text
+src/zabbix_proxy/heart/Makefile.am -text
+src/zabbix_proxy/heart/heart.c -text
+src/zabbix_proxy/heart/heart.h -text
 src/zabbix_proxy/housekeeper/Makefile.am -text
 src/zabbix_proxy/housekeeper/housekeeper.c -text
 src/zabbix_proxy/housekeeper/housekeeper.h -text
