@@ -1175,7 +1175,7 @@ include_once "include/page_header.php";
 					SPACE,
 					make_sorting_link(S_NAME,'g.name')),
 				' # ',
-				S_MEMBERS,S_ACCESSED));
+				S_MEMBERS,S_LASTSEEN_AGE));
 
 			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid());
 
@@ -1203,7 +1203,7 @@ include_once "include/page_header.php";
 				}
 
 				if($db_proxy['lastaccess'] != 0)
-					$lastclock = date(S_DATE_FORMAT_YMDHMS, $db_proxy['lastaccess']);
+					$lastclock = zbx_date2age($db_proxy['lastaccess']);
 				else
 					$lastclock = new CCol('-', 'center');
 
