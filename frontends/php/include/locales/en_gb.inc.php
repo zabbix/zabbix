@@ -1023,6 +1023,8 @@
 	'S_PROBLEMS'=>				'Problems',
 	'S_PERCENTAGE'=>			'Percentage',
 	'S_SLA'=>				'SLA',
+	'S_HOUR'=>				'Hour',
+	'S_MINUTE'=>			'Minute',
 	'S_DAY'=>				'Day',
 	'S_MONTH'=>				'Month',
 	'S_YEAR'=>				'Year',

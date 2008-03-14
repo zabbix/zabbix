@@ -285,10 +285,11 @@ minuteup: function(){
 
 hourup: function(){
 	var hourinsec = 3600;
+
 	if((this.bstime+hourinsec+1+this.period)>=parseInt(this.dt.getTime()/1000)){  // max date is date when script has been loaded
 		if((this.period - hourinsec) < this.period_min){ 
 			if(((this.dt.getTime()/1000) - (this.bstime+hourinsec)) < this.period_min) return;
-			this.period = ((this.dt.getTime()/1000) - (this.bstime+hourinsec));
+			this.period = parseInt((this.dt.getTime()/1000) - (this.bstime+hourinsec));
 		}
 		else{
 			this.period-=hourinsec;
@@ -320,7 +321,7 @@ dayup: function(){
 
 		if((this.period - dayinsec) < this.period_min){ 
 			if(((this.dt.getTime()/1000) - (this.bstime+dayinsec)) < this.period_min) return;
-			this.period = ((this.dt.getTime()/1000) - (this.bstime+dayinsec));
+			this.period = parseInt((this.dt.getTime()/1000) - (this.bstime+dayinsec));
 		}
 		else{
 			this.period-=dayinsec;
@@ -352,7 +353,7 @@ monthup: function(){
 
 		if((this.period - monthinsec) < this.period_min){ 
 			if(((this.dt.getTime()/1000) - (this.bstime+monthinsec)) < this.period_min) return;
-			this.period = ((this.dt.getTime()/1000) - (this.bstime+monthinsec));
+			this.period = parseInt((this.dt.getTime()/1000) - (this.bstime+monthinsec));
 		}
 		else{
 			this.period-=monthinsec;
