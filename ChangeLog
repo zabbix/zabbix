@@ -1,5 +1,10 @@
+Changes for 1.5.1:
+
+ - [DEV-137] increased max number of log file lines sent per second to 100 (Alexei)
+
 Changes for 1.5:
 
+ - [DEV-137] increased max number of log file lines sent per second to 100 (Alexei)
  - [DEV-127] improved system status widget in dashboard screen (Artem)
  - [DEV-125] added "Discovery status" widget (Artem)
  - [DEV-123] screen "queue" moved to administration section (Artem)
