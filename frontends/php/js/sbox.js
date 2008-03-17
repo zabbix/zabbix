@@ -47,7 +47,7 @@ mouse_event:		'',				// json object wheres defined needed event params
 start_event:		'',				// copy of mouse_event when box created
 
 stime:				'',				//	new start time
-period:				'',				//	new period
+period:				0,				//	new period
 
 obj:				'',				// objects params
 dom_obj:			'',				// selection div html obj
@@ -69,6 +69,7 @@ initialize: function(stime, period){
 	
 	this.obj.stime = stime;
 	this.obj.period = period;
+	this.box.width = 0;
 
 	this.mouse_event.mousedown = false;	
 },
