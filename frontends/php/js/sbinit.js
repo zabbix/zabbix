@@ -87,7 +87,10 @@ function showgraphmenu(obj_id){
 	date = datetoarray(G_MENU.bstime+SCROLL_BAR.period);
 	SCROLL_BAR.tabinforight.innerHTML = date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4]+':'+date[5];
 
-	
+	if(IE){
+		try{$('scroll_calendar').setStyle({'border' : '0px white solid;'});}
+		catch(e){}
+	}
 	scrl.style.visibility = 'visible';
 }
 

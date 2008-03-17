@@ -150,7 +150,8 @@ setArgument: function(key,value){
 
 	var valueisset = false;
 	if(typeof(key) == 'undefined') throw 'Invalid argument past for setArgument';
-	value = value || '';
+	
+	value =('undefined' != value)?value:'';
 
 	for(i=0; i < this.arguments.length; i++){
 		if(this.arguments[i][0] == key){

@@ -51,16 +51,13 @@ div#scroll{
 }
 
 img#scroll_calendar{
-	position:absolute;
+	position: absolute;
 	top: -12px;
-	left: 0px;
+	left: 0px;	
 }
 
 img#scroll_calendar:hover{
 	cursor: pointer;
-	position:absolute;
-	top: -12px;
-	left: 0px;
 }
 
 div#scrolltableft{

@@ -216,13 +216,11 @@ include_once "include/page_header.php";
 						' WHERE '.DBin_node('druleid').
 						order_by('d.name,d.iprange,d.delay','d.druleid'));
 						
-		while($rule_data = DBfetch($db_rules))
-		{
+		while($rule_data = DBfetch($db_rules)){
 			$cheks = array();
 			$db_checks = DBselect("select * from dchecks where druleid=".$rule_data["druleid"].
 				" order by type,druleid");
-			while($check_data = DBfetch($db_checks))
-			{
+			while($check_data = DBfetch($db_checks)){
 				$cheks[] = discovery_check_type2str($check_data['type']);
 			}
 
