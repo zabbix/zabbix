@@ -751,6 +751,8 @@ static void process_check(DB_DRULE *rule, DB_DHOST *dhost, int *host_status, DB_
 
 			now = time(NULL);
 
+			DBbegin();
+
 			switch (zbx_process) {
 			case ZBX_PROCESS_SERVER	:
 				update_service(dhost, check, ip, port, now);
@@ -759,6 +761,7 @@ static void process_check(DB_DRULE *rule, DB_DHOST *dhost, int *host_status, DB_
 				proxy_update_service(check, ip, port, now);
 				break;
 			}
+			DBcommit();
 		}
 	}
 
@@ -920,6 +923,8 @@ static void process_rule(DB_DRULE *rule)
 			}
 			DBfree_result(result);
 
+			DBbegin();
+
 			switch (zbx_process) {
 			case ZBX_PROCESS_SERVER	:
 				if (dhost.dhostid == 0)
@@ -931,6 +936,7 @@ static void process_rule(DB_DRULE *rule)
 				proxy_update_host(rule->druleid, ip, host_status, now);
 				break;
 			}
+			DBcommit();
 		}
 	}
 
