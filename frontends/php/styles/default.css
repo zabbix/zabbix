@@ -108,6 +108,13 @@ img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 	color: #000000;
 }
 
+.pointer{
+}
+.pointer:hover{
+	cursor: pointer;
+}
+
+
 /**************** HINT BOX *****************/
 
 #hint_box {
