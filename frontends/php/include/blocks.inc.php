@@ -40,7 +40,10 @@ function make_favorite_graphs($available_hosts=false){
 			$host = get_host_by_itemid($resourceid);
 			$item["description"] = item_description($item["description"],$item["key_"]);
 			
-			$capt = new CSpan(new CLink($host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$resourceid));
+			$link = new CLink($host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$resourceid);
+			$link->SetTarget('blank');
+			
+			$capt = new CSpan($link);
 			$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
 			
 			$icon = new CLink(new CImg('images/general/chart.png','chart',18,18,'borderless'),'history.php?action=showgraph&itemid='.$resourceid.'&fullscreen=1');
@@ -52,7 +55,10 @@ function make_favorite_graphs($available_hosts=false){
 			$result = get_hosts_by_graphid($resourceid);
 			$ghost = DBFetch($result);
 	
-			$capt = new CSpan(new CLink($ghost['host'].':'.$graph['name'],'charts.php?graphid='.$resourceid));
+			$link = new CLink($ghost['host'].':'.$graph['name'],'charts.php?graphid='.$resourceid);
+			$link->SetTarget('blank');
+	
+			$capt = new CSpan($link);
 			$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
 			
 			$icon = new CLink(new CImg('images/general/chart.png','chart',18,18,'borderless'),'charts.php?graphid='.$resourceid.'&fullscreen=1');
@@ -81,8 +87,11 @@ function make_favorite_screens(){
 	foreach($fav_screens['id'] as $key => $resourceid){
 		if('slides' == $fav_screens['resource'][$key]){
 			if(!$slide = get_slideshow_by_slideshowid($resourceid)) continue;
+
+			$link = new CLink($slide['name'],'screens.php?config=1&elementid='.$resourceid);
+			$link->SetTarget('blank');
 		
-			$capt = new CSpan(new CLink($slide['name'],'screens.php?config=1&elementid='.$resourceid));
+			$capt = new CSpan($link);
 			$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
 			
 			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=1&elementid='.$resourceid.'&fullscreen=1');
@@ -91,10 +100,13 @@ function make_favorite_screens(){
 		else{
 			if(!$screen = get_screen_by_screenid($resourceid)) continue;
 		
-			$capt = new CSpan(new CLink($screen['name'],'screens.php?resourceid='.$resourceid));
+			$link = new CLink($screen['name'],'screens.php?config=0&elementid='.$resourceid);
+			$link->SetTarget('blank');
+			
+			$capt = new CSpan($link);
 			$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
 			
-			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?resourceid='.$resourceid.'&fullscreen=1');
+			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=0&elementid='.$resourceid.'&fullscreen=1');
 			$icon->SetTarget('blank');
 		}
 		
@@ -122,7 +134,10 @@ function make_favorite_maps(){
 	foreach($fav_sysmaps['id'] as $key => $resourceid){
 		if(!$sysmap = get_sysmap_by_sysmapid($resourceid)) continue;
 
-		$capt = new CSpan(new CLink($sysmap['name'],'maps.php?sysmapid='.$resourceid));
+		$link = new CLink($sysmap['name'],'maps.php?sysmapid='.$resourceid);
+		$link->SetTarget('blank');
+
+		$capt = new CSpan($link);
 		$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
 		
 		$icon = new CLink(new CImg('images/general/chart.png','map',18,18,'borderless'),'maps.php?sysmapid='.$resourceid.'&fullscreen=1');

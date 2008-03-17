@@ -109,7 +109,7 @@
 
 		$form->AddRow(S_SLIDES, array(
 			$tblSteps,
-			!isset($new_step) ? new CButton('add_step',S_ADD,
+			!isset($new_step) ? new CButton('add_step_bttn',S_ADD,
 				"return create_var('".$form->GetName()."','add_step',1, true);") : null,
 			(count($steps) > 0) ? new CButton('del_sel_step',S_DELETE_SELECTED) : null
 			));
