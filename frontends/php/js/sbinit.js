@@ -73,21 +73,12 @@ function showgraphmenu(obj_id){
 			G_MENU.gmenushow();
 		}
 	}
-	if(IE){
-		$('scroll_calendar').attachEvent('onclick',gmshow);
-	}
-	else{
-		$('scroll_calendar').addEventListener('click',gmshow,false);
-	}
-
-	var date = datetoarray(G_MENU.bstime);
 	
-	SCROLL_BAR.tabinfoleft.innerHTML = SCROLL_BAR.FormatStampbyDHM(SCROLL_BAR.period)+" | "+date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4]+':'+date[5];
+	addListener($('scroll_calendar'),'click',gmshow,false);
 	
-	date = datetoarray(G_MENU.bstime+SCROLL_BAR.period);
-	SCROLL_BAR.tabinforight.innerHTML = date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4]+':'+date[5];
-
+	
 	if(IE){
+		SCROLL_BAR.settabinfo();
 		try{$('scroll_calendar').setStyle({'border' : '0px white solid;'});}
 		catch(e){}
 	}
@@ -104,7 +95,6 @@ function graphsubmit(){
 	uri.setArgument('stime', SCROLL_BAR.getsTime());
 	uri.setArgument('period', SCROLL_BAR.getPeriod());
 	location.href = uri.getUrl();
-
 }
 
 function gmenuload(){

@@ -27,50 +27,35 @@ var SCROLL_BAR;
 var IMG_PATH='images/general/bar';
 //var cal = new calendar();
 
-function scrollinit(x,y,w,period,stime,timel,bar_stime){
-	if((typeof(x) == 'undefined') && (typeof(y) == 'undefined')){
-		alert("Parametrs haven't been sent properly");
+function scrollinit(left,top,w,period,stime,timel,bar_stime){
+	if((typeof(top) == 'undefined') && (typeof(left) == 'undefined')){
+		throw "Parametrs haven't been sent properly";
 		return false;
 	}
-	w = w | 0;
-	if(w == 0){ 
-		w=get_bodywidth() - 36;
-	}
-	scrollcreate(x,y,w);
 	
-	period = period || 3600;
-	
-	stime = stime || 0;
-	timel = timel || 0;
-	
-	bar_stime = bar_stime || stime;
+	w=get_bodywidth() - 36;
 
-	gmenuinit(y,x,period,bar_stime);
+	period = ('undefined' == typeof(period))?3600:period;	
+	stime = ('undefined' == typeof(stime))?0:stime;
+	bar_stime = ('undefined' == typeof(bar_stime))?0:bar_stime;
 
-	SCROLL_BAR = new scrollbar(stime,timel,period,bar_stime);
-	
-	var scroll_x = $('scroll');
-	var arrow_l = $('arrow_l');
-	var arrow_r = $('arrow_r');
-	
-	arrow_l.onmousedown = SCROLL_BAR.arrowmousedown.bind(SCROLL_BAR);
-	arrow_r.onmousedown = SCROLL_BAR.arrowmousedown.bind(SCROLL_BAR);
+	gmenuinit(top,left,period,bar_stime);
 
-	scroll_x.onmouseover=	SCROLL_BAR.arrowmouseover.bind(SCROLL_BAR);
-	scroll_x.onmouseout =	SCROLL_BAR.arrowmouseout.bind(SCROLL_BAR);
+	SCROLL_BAR = new scrollbar(stime,period,bar_stime,w);
+	SCROLL_BAR.showscroll(top,left);
+	
+	SCROLL_BAR.scrl_arrowleft.onmousedown = SCROLL_BAR.arrowmousedown.bind(SCROLL_BAR);
+	SCROLL_BAR.scrl_arrowright.onmousedown = SCROLL_BAR.arrowmousedown.bind(SCROLL_BAR);
+
+	SCROLL_BAR.scrl_scroll.onmouseover=	SCROLL_BAR.arrowmouseover.bind(SCROLL_BAR);
+	SCROLL_BAR.scrl_scroll.onmouseout =	SCROLL_BAR.arrowmouseout.bind(SCROLL_BAR);
 	
 	$('scroll_left').onclick  = SCROLL_BAR.scrollmoveleft.bind(SCROLL_BAR);
 	$('scroll_right').onclick = SCROLL_BAR.scrollmoveright.bind(SCROLL_BAR);
 
-	$('scroll_bar').onmousedown = SCROLL_BAR.mousedown.bind(SCROLL_BAR);
-	if(IE){
-		document.attachEvent('onmouseup',SCROLL_BAR.mouseup.bindAsEventListener(SCROLL_BAR));
-	}
-	else{
-		document.addEventListener('mouseup',SCROLL_BAR.mouseup.bindAsEventListener(SCROLL_BAR),true);
-	}
+	SCROLL_BAR.scrl_bar.onmousedown = SCROLL_BAR.mousedown.bind(SCROLL_BAR);
 	
-//	cal.onselect = SCROLL_BAR.movebarbydate.bind(SCROLL_BAR);
+	addListener(document,'mouseup',SCROLL_BAR.mouseup.bindAsEventListener(SCROLL_BAR),true);
 }
 
 
@@ -79,102 +64,117 @@ var scrollbar = Class.create();
 scrollbar.prototype = {
 
 dt : new Date(),	// Date object
-starttime:0	,		// time in seconds, for scrollbar
-timelength: 0,		// starttime+timelength = endtime
+sdt: new Date(),	// Selected Date object
 
-bar : '',			// bar object
+starttime:0	,		// time in seconds, for scrollbar
+timeline: 0,		// starttime+timeline = endtime
+
 barX: 0,			// bar location on x-axis relativ to scrollbar
 barW: 8+4+4,		// bar width
-minbarW: 16,		// min allowed value for barW due to period > 3600
+
+minbarW: 16,		// min allowed value for barW
+
 scrollbarX: 0,		// scrollbar location
 scrollbarW: 0,		// length of scroll where bar can move
-maxX: 8+4+4+12,		// max movement range for bar
-mouseX: 0,			// mouse location
-barmsdown: 0,		// if mousedown on bar = 1, else = 0
-
-arrow: '',			// pressed arrow (l/r)
-arrowleft: '',		// left arrow
-arrowright:'',		// right arrow
-arrowX: 0,			// arrow position
-arrowmsdown: 0,		// if mousedown on arrow = 1, else = 0
-arrowmsX: 0,		// mouse location when dragging arrows
-
-barbgl:26,			// size of left side +6 of bar 
-barbgr:26,			// size of right side +6 of bar 
 
 period: 3600,		// viewable period (1h,2h etc.)
 
 pxtime: 0,			// 1px = some time
 
-tabinfoleft: '',	// html object(div) where view info (left)
-tabinforight: '',	// html object(div) where view info (right)
+// action vars
+mouseStartX: 0,			// Mouse start position
+arrowmouseStartX: 0,	// Mouse start position on draging arrows
 
-scrollmsover: 0,	// if mouse over scrollbar then = 1, out = 0
+prevMouseX: 0,			// Mouse prev x to direction
 
-changed: 0,			// switches to 1, when scrollbar been moved or period changed
+barStartX: 0,			// barX state on begining of action
+barStartW: 0,			// narW state on begining of action
 
-xp:	0,				// exponential of time length
+// DOM obj
+scrl_scroll: '',			// html scroll object
+scrl_bar : '',				// html bar object
+scrl_arrowleft: '',			// html left arrow
+scrl_arrowright:'',			// html right arrow
+scrl_tabinfoleft: '',		// html object(div) where view info (left)
+scrl_tabinforight: '',		// html object(div) where view info (right)
+scrl_barbgl:'',					// size of left side +6 of bar 
+scrl_barbgr:'',					// size of right side +6 of bar 
 
-initialize: function(stime,timel,period,bar_stime){ // where to put bar on start(time on graph)
+// status
+scrollmsover: 0,		// if mouse over scrollbar then = 1, out = 0
+barmsdown: 0,			// if mousedown on bar = 1, else = 0
+arrowmsdown: 0,			// if mousedown on arrow = 1, else = 0
+arrow: '',				// pressed arrow (l/r)
+changed: 0,				// switches to 1, when scrollbar been moved or period changed
+
+xp:	0,					// exponential of time length
+
+initialize: function(stime,period,bar_stime,width){ // where to put bar on start(time on graph)
 	try{
-		this.tabinfoleft = $('scrolltableft');
-		this.tabinforight = $('scrolltabright');
-		
-		this.arrowleft = $('arrow_l');
-		this.arrowright = $('arrow_r');
-		this.arrowX = this.barX;
-	
-		this.bar = $('scroll_bar');
-	
-		this.barbgl = $('bar_bg_l');
-		this.barbgr = $('bar_bg_r');
-
-		this.period = parseInt(period);
+		this.scrollcreate(0,0,width);		
+		this.period = period;
 
 /************************************************************************
 *	 Do not change till you fully understand what you are doing.		*
 ************************************************************************/
 
 		if(stime < 10000000){
-			this.timelength = (timel < this.period)?(3*this.period):timel;
-			this.starttime = parseInt(this.dt.getTime()/1000 - this.timelength);
+			this.starttime = parseInt((this.dt.getTime()/1000) - (3*this.period));
 		}
 		else{
 			this.starttime = stime;
-			this.timelength = (timel < this.period)?((this.dt.getTime()/1000) - stime):timel;
-
-			if(this.timelength < (2*this.period)){
-				this.timelength = 3*this.period;
-				this.starttime = parseInt(this.dt.getTime()/1000 - this.timelength);
-			}
 		}
 
-		this.endtime = this.dt.getTime()/1000;
-		this.maxX = parseInt($('scroll_middle').style.width);
+		this.timeline =  parseInt((this.dt.getTime()/1000) - this.starttime);
 
-		this.settabinfo(this.barX);
+		if(this.timeline < (2*this.period)){
+			this.timeline = 3*this.period;
+			this.starttime = parseInt(this.dt.getTime()/1000 - this.timeline);
+		}
 		
-		this.xp = Math.log(this.timelength) / this.maxX;
+		if(!bar_stime) bar_stime = (this.dt.getTime()/1000) - this.period;
+
+		this.scrollbarMaxW = parseInt($('scroll_middle').style.width);
+
+		this.xp = Math.log(this.timeline) / this.scrollbarMaxW;
 		
 		this.minbarW = this.time2px(3600);
+		this.minbarW = (this.minbarW<16)?16:this.minbarW;
+
 		this.period2bar(this.period);
 
-		this.scrollbarW = parseInt(this.maxX) - this.barW;
+		this.scrollbarW = parseInt(this.scrollbarMaxW) - this.barW;
 		this.calcpx2time();
-
-		if(typeof(bar_stime) != 'undefined') this.movebarbydate(bar_stime);
 		
-		this.changed = 0; // we need to reset this attribute, becouse generaly we may already performe a movement.
+		this.barX = this.time2px(bar_stime - this.starttime);
+		this.barX = this.checkbarX(0);
+		
+//SDI(this.barX+' : '+this.barW+' : '+this.scrollbarMaxW);	
+//SDI(this.barX+' : '+this.barW+' : '+this.scrollbarMaxW);
+
+		this.barchangeW();
+		this.movescroll();
+		
+		this.settabinfo();
+
+		this.changed = 0; // we need to reset this attribute, because generaly we may already performe a movement
 	} catch(e){
-		alert("ERROR: ScrollBar initialization failed!");
+		throw "ERROR: ScrollBar initialization failed!";
 		return false;
 	}
 },
 
+showscroll: function(top,left){
+	this.scrl_scroll.setStyle({top: top+'px', left: left+'px'});
+},
+
 onbarchange: function(){		
 	this.changed = 1;
-//	SDI(this.timelength+' : '+this.maxX+' : '+this.barW+' : '+this.barX);
+//	SDI(this.timeline+' : '+this.scrollbarMaxW+' : '+this.barW+' : '+this.barX);
 	this.onchange();
+},
+
+barmousedown: function(){
 },
 
 scrollmouseout: function(){		//  U may use this func to attach some function on mouseout from scroll method
@@ -192,21 +192,10 @@ onchange: function(){			//  executed every time the bar period or bar time is ch
 --------------------------------------------------------------------------*/
 
 arrowmouseover: function(){
-	this.arrowmovetoX(this.arrowX);
-/*	var arrowflag = false;
-	if(this.barX > 12){
-		this.arrowleft.setStyle({display: 'inline'});
-		arrowflag = true;
-	}
+	this.arrowmovetoX();
 	
-	if((this.barX+this.barW) < (this.maxX-12)){
-		this.arrowright.setStyle({display: 'inline'});
-		arrowflag = true;
-	}
-	if(!arrowflag) this.arrowright.setStyle({display: 'inline'});
-*/	
-	this.arrowleft.setStyle({display: 'inline'});
-	this.arrowright.setStyle({display: 'inline'});
+	this.scrl_arrowleft.setStyle({display: 'inline'});
+	this.scrl_arrowright.setStyle({display: 'inline'});
 	
 	this.scrollmsover = 1;
 	
@@ -219,8 +208,8 @@ arrowmouseover: function(){
 
 arrowmouseout: function(){
 
-	this.arrowleft.setStyle({display: 'none'});
-	this.arrowright.setStyle({display: 'none'});
+	this.scrl_arrowleft.setStyle({display: 'none'});
+	this.scrl_arrowright.setStyle({display: 'none'});
 	this.scrollmsover = 0;
 	
 	try{
@@ -237,7 +226,12 @@ arrowmousedown: function(e){
 	this.deselectall();
 	
 	this.arrow = e.originalTarget || e.srcElement;
-	this.arrowmsX = parseInt(this.getmousexy(e).x);
+	
+	this.arrowmouseStartX = parseInt(this.getmousexy(e).x);
+	this.prevmouseX = this.arrowmouseStartX;
+	
+	this.barStartX = this.barX;
+	this.barStartW = this.barW;
 
 	if((this.arrow.id != 'arrow_l') && (this.arrow.id != 'arrow_r')) return false;
 	
@@ -249,61 +243,65 @@ arrowmousedown: function(e){
 
 arrowmousemove: function(e){
 	e = e || window.event;
-	
+
 	if(this.arrow.id == 'arrow_l'){
 		this.arrowmousemove_L(e);
 	}
 	else{ 
 		this.arrowmousemove_R(e);
 	}
-	
+
 	this.calcpx2time();
-	this.period = this.calcperiod(this.barW);
-	this.settabinfo(this.barX);
+	this.period = this.calcperiod();
+	this.settabinfo();
 },
 
 arrowmousemove_L: function(e){
 	var mousexy = this.getmousexy(e);
+	var mouseXdiff = parseInt(mousexy.x) - parseInt(this.arrowmouseStartX);
 
-	var mouseXdiff = parseInt(mousexy.x) - parseInt(this.arrowmsX);
-	var barXr = this.barX+this.barW;
-	
 	if((this.barW < this.minbarW) && ( mouseXdiff > 0))	return false;
 
-	var barWtemp = parseInt(this.barW) - parseInt(mouseXdiff);
-	var barXtemp = barXr - barWtemp;
+	var barXtemp = this.barX;
+	var barWtemp = this.barW;
 	
-	if(barXtemp < 0) return barWtemp;
-	barWtemp = this.checkbarW(barWtemp, this.checkbarX(barXtemp, mousexy.x), mousexy.x);
-	
-	if((barWtemp > this.minbarW) && (barWtemp != this.barW) && ((this.barX + mouseXdiff) > -1)){
-		this.barW = barWtemp;
-		this.barX = this.checkbarX(barXtemp, mousexy.x);
-	} 
+	if((mousexy.x-this.prevmouseX) < 0){
+		this.barX = parseInt(this.barStartX + mouseXdiff);
+		this.barX = this.checkbarX(mousexy.x);
+		
+		this.barW = this.barW + (barXtemp - this.barX);
+		this.barW = this.checkbarW(mousexy.x);
+	}
+	else{
+		this.barW = parseInt(this.barStartW - mouseXdiff);
+		this.barW = this.checkbarW(mousexy.x);
+		
+		this.barX = parseInt(this.barX + barWtemp-this.barW);
+		this.barX = this.checkbarX(mousexy.x);
+	}
 
-	this.barchangeW(this.barW);
-	this.barmovetoX(this.barX);
-	this.arrowmovelefttoX(this.barX);
+//SDI(this.barX+' : '+this.barW+' : '+mouseXdiff);
+
+	this.barchangeW();
+	this.barmovetoX();
+	this.arrowmovelefttoX();
 },
 
 arrowmousemove_R: function(e){
 	var mousexy = this.getmousexy(e);
-	var mouseXdiff = parseInt(mousexy.x) - parseInt(this.arrowmsX);
-	
-	var barWtemp = parseInt(this.barW) + parseInt(mouseXdiff);
-	
-	barWtemp = this.checkbarW(barWtemp, this.barX, mousexy.x);
+	var mouseXdiff = parseInt(mousexy.x) - parseInt(this.arrowmouseStartX);
 
-	if((barWtemp > this.minbarW) && (barWtemp != this.barW)){
-		this.barW = barWtemp;
-	}
-	
-	this.barchangeW(this.barW);
-	this.arrowmoverighttoX(this.barX);
+	this.barW = parseInt(this.barStartW) + parseInt(mouseXdiff);
+	this.barW = this.checkbarW(mousexy.x);
+
+//SDI(this.barW+' : '+this.minbarW);
+
+	this.barchangeW();
+	this.arrowmoverighttoX();
 },
 
 arrowmouseup: function(e){
-	this.period = this.calcperiod(this.barW);
+	this.period = this.calcperiod();
 	document.onmousemove = null;
 	this.arrowmsdown = 0;
 	this.onbarchange();
@@ -318,17 +316,13 @@ mousedown: function(e){
 	e = e || window.event;
 	this.deselectall();
 
-	this.scrollbarX = Position.cumulativeOffset(this.bar.parentNode)[0];
-	this.barX = Position.cumulativeOffset(this.bar)[0] - this.scrollbarX;
-	this.mouseX = parseInt(this.getmousexy(e).x);
+	this.mouseStartX = parseInt(this.getmousexy(e).x);
+	this.prevmouseX = this.mouseStartX;
+	this.barStartX = this.barX;
 
 	this.barmsdown = 1;
 	this.barmousedown();
 	document.onmousemove = this.mousemove.bind(this);
-},
-
-mousebardown: function(e){
-	
 },
 
 mousebarup: function(e){
@@ -351,25 +345,29 @@ mousemove: function(e){
 	e = e || window.event;
 		
 	var mousexy = this.getmousexy(e);
-	var mouseXdiff = parseInt(mousexy.x) - parseInt(this.mouseX);
+	var mouseXdiff = parseInt(mousexy.x) - parseInt(this.mouseStartX);
 	
-	this.barX = parseInt(this.barX) + parseInt(mouseXdiff);
-	this.barX = this.checkbarX(this.barX, mousexy.x);
+	this.barX = parseInt(this.barStartX + mouseXdiff);
+	this.barX = this.checkbarX(mousexy.x);
 	
-	this.barmovetoX(this.barX);
-	this.arrowmovetoX(this.barX);
+	this.barmovetoX();
+	this.arrowmovetoX();
 },
 //-------------------------------
 
 //--- scrollmoves
 scrollmoveleft: function(){
 	this.barmousedown();
-	this.movescroll(this.barX-1);
+	
+	this.barX--;
+	this.movescroll();
 	this.onbarchange();	
 },
 scrollmoveright: function(){
 	this.barmousedown();
-	this.movescroll(this.barX+1);
+	
+	this.barX++;
+	this.movescroll();
 	this.onbarchange();	
 },
 //-------------------------------
@@ -379,73 +377,70 @@ scrollmoveright: function(){
 ------------------------------ FUNC IN USE ------------------------------
 -----------------------------------------------------------------------*/
 //---arrow
-arrowmovelefttoX: function(x){
-	this.arrowleft.setStyle({left: (x+17-12)+'px'});
+arrowmovelefttoX: function(){
+	this.scrl_arrowleft.setStyle({left: (this.barX+17-12)+'px'});
 },
 
-arrowmoverighttoX: function(x){
+arrowmoverighttoX: function(){
+	var x = this.barX;
 	x += parseInt(this.barW)+17;
-	this.arrowright.setStyle({left: x+'px'});
+	this.scrl_arrowright.setStyle({left: x+'px'});
 },
 //-------------------------------
 
 //---bar
-checkbarW: function(barWtemp,barXtemp,msx){
-	if(barWtemp < this.minbarW){
+checkbarW: function(msx){
+
+//SDI(this.barX+' : '+this.arrowMouseStartX+' : '+msx+' : '+this.barW);
+	if(this.barW < this.minbarW){
 		return this.minbarW;
 	}
-//	SDI(barXtemp+' : '+this.arrowmsX+' : '+msx+'<br />'+barWtemp+' : '+this.barW);
-	
-	if(barWtemp < 16){ 
-		return 16;
-	} 
-	else if((barWtemp + barXtemp) > this.maxX){
-		return this.maxX - barXtemp;
+	else if((this.barW + this.barX) > this.scrollbarMaxW){
+		return (this.scrollbarMaxW - this.barX);
 	}
-	else{
-		this.arrowmsX = parseInt(msx);
-		return barWtemp;
-	}	
+	this.prevmouseX = msx;
+return this.barW;
 },
 
-checkbarX: function(barXtemp,msx){
-	if(barXtemp < 0){ 
+checkbarX: function(msx){
+	
+	if(this.barX < 0){ 
 		return 0;
 	} 
-	else if((barXtemp + this.barW) > this.maxX){
-		return this.scrollbarW;
+	else if((this.barX + this.barW) > this.scrollbarMaxW){
+		return (this.scrollbarMaxW - this.barW);
 	} 
-	else{
-		this.mouseX = parseInt(msx);
-		return barXtemp;
-	}
+	
+	this.prevmouseX = msx;
+return this.barX;
 },
 
-barchangeW: function(w){
-	this.scrollbarW = parseInt(this.maxX - w);
+barchangeW: function(){
+	var w = this.barW;
+	
+	this.scrollbarW = parseInt(this.scrollbarMaxW - w);
 
 	w -=12;
 	var wl = Math.round(w/2);
 	var wr = w - wl;
-	this.barbgl.setStyle({width: wl +'px'});
-	this.barbgr.setStyle({width: wr +'px'});
+	this.scrl_barbgl.setStyle({width: wl +'px'});
+	this.scrl_barbgr.setStyle({width: wr +'px'});
 },
 
-barmovetoX: function(x){
-	this.arrowX = x;
-	this.bar.setStyle({left: (x+17) +'px'});
+barmovetoX: function(){
+	this.scrl_bar.setStyle({left: (this.barX+17) +'px'});
 	
-	this.settabinfo(x);
-	if(IE) this.bar.setStyle({width: this.barW +'px'});
+	this.settabinfo();
+	if(IE) this.scrl_bar.setStyle({width: this.barW +'px'});
 },
 //-------------------------------
 
 calcpx2time: function(){
 	if( this.scrollbarW > 0){
-		this.pxtime = parseInt((this.timelength - this.period) / this.scrollbarW);
+		this.pxtime = parseInt((this.timeline - this.period) / this.scrollbarW);
 	}
 	else{
-		this.pxtime = parseInt(this.timelength - this.period);
+		this.pxtime = parseInt(this.timeline - this.period);
 	}
 },
 
@@ -453,14 +448,14 @@ time2px: function(time){
 	var px = time/this.pxtime;
 	if(px == 'Infinity'){
 		var c = (Math.log(time) / this.xp)
-		var cor = this.maxX/1.1 - c;
-		px = Math.round(c - cor);
+		var cor = this.scrollbarMaxW/1.1 - c;
+		px = c - cor;
 	} 
 return Math.round(px);
 },
 
 px2time: function(px){
-	var cor = (this.maxX/1.1 - px)/2;
+	var cor = (this.scrollbarMaxW/1.1 - px)/2;
 	cor = (cor > 0)?cor:0;
 	
 	var c = Math.round(px+cor);
@@ -478,24 +473,23 @@ getmousexy: function(e){
 	};
 },
 
-formatdate: function(x,adjust){
+datetoarray: function(unixtime){
 
-	adjust = adjust || 0;
-	this.dt.setTime(Math.round((this.starttime+(x*this.pxtime) + adjust) * 1000));
-
-	var date = new Array();
-	date[0] = this.dt.getDate();
-	date[1] = this.dt.getMonth()+1;
-	date[2] = this.dt.getFullYear();
-	date[3] = this.dt.getHours();
-	date[4] = this.dt.getMinutes();
-	date[5] = this.dt.getSeconds();
+	var date = new Date();
+	date.setTime(unixtime*1000);
 	
-	for(i = 0; i < date.length; i++){
-		if((date[i]+'').length < 2) date[i] = '0'+date[i];
+	var thedate = new Array();
+	thedate[0] = date.getDate();
+	thedate[1] = date.getMonth()+1;
+	thedate[2] = date.getFullYear();
+	thedate[3] = date.getHours();
+	thedate[4] = date.getMinutes();
+	thedate[5] = date.getSeconds();
+
+	for(i = 0; i < thedate.length; i++){
+		if((thedate[i]+'').length < 2) thedate[i] = '0'+thedate[i];
 	}
-	
-return date;
+return thedate;
 },
 
 deselectall: function(){
@@ -512,57 +506,57 @@ deselectall: function(){
 ------------------------------ FUNC USES ------------------------------
 ---------------------------------------------------------------------*/
 //---arrow
-arrowmovetoX: function(x){
-	this.arrowmovelefttoX(x);
-	this.arrowmoverighttoX(x);
+arrowmovetoX: function(){
+	this.arrowmovelefttoX(this.barX);
+	this.arrowmoverighttoX(this.barX);
 },
 //-------------------------------
 
 //---bar
 period2bar: function(period){
-	var barW = this.time2px(period);
-	this.barW = this.checkbarW(barW);
+	this.barW = this.time2px(period);
+	this.barW = this.checkbarW(0);
 	
 	this.barchangeW(this.barW);	
 },
 //-------------------------------
 
-movebarbydate: function(timestamp){
-	timestamp = parseInt(timestamp - this.starttime);
-	this.movescroll(this.time2px(timestamp));
-},
-
-movescroll: function(x){
-	this.barX = this.checkbarX(x,0);
-	this.barmovetoX(this.barX);
-	this.arrowmovetoX(this.barX);
-	this.settabinfo(this.barX);
+movescroll: function(){
+	this.barX = this.checkbarX(0);
+	this.barmovetoX();
+	this.arrowmovetoX();
+	this.settabinfo();
 	this.onbarchange();
 },
 
-settabinfo: function(x){
+settabinfo: function(){
+	if((this.barX+this.barW) < this.scrollbarMaxW){
+		this.sdt.setTime(Math.round(this.starttime+(this.barX * this.pxtime)) * 1000);
+	}
+	else{
+		this.sdt.setTime(this.dt.getTime()-(this.period * 1000));
+	}
 	
-	var date = this.formatdate(x);
-	this.tabinfoleft.innerHTML = this.FormatStampbyDHM(this.period)+" | "+date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4]+':'+date[5];
+	var date = this.datetoarray((this.sdt.getTime() / 1000));
+	this.scrl_tabinfoleft.innerHTML = this.FormatStampbyDHM(this.period)+" | "+date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4]+':'+date[5];
 	
-	date = this.formatdate(x,this.period);
-	this.tabinforight.innerHTML = date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4]+':'+date[5];
+	var date = this.datetoarray((this.sdt.getTime() / 1000) + this.period);
+	this.scrl_tabinforight.innerHTML = date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4]+':'+date[5];
 },
 
-calcperiod: function(barW){
-	var period = this.px2time(barW)
-	period = (period > this.timelength)?(this.timelength):(period);
+calcperiod: function(){
+	var period = this.px2time(this.barW)
+	period = (period > this.timeline)?(this.timeline):(period);
 	this.getPeriod();
 return period;
 },
 
 getsTimeInUnix: function(){
-
 	return Math.round((this.starttime+(this.barX*this.pxtime)));
 },
 
 getsTime: function(){
-	var date = this.formatdate(this.barX);
+	var date = this.datetoarray((this.sdt.getTime() / 1000));
 return ''+date[2]+date[1]+date[0]+date[3]+date[4];
 },
 
@@ -581,31 +575,29 @@ FormatStampbyDHM: function(timestamp){
 	str+=hours+'h '+minutes+'m ';
 	
 return str;
-}
-}
-
+},
 
 /*-------------------------------------------------------------------------------------------------*\
 *										SCROLL CREATION												*
 \*-------------------------------------------------------------------------------------------------*/
-function scrollcreate(x,y,w){
-	var div_scroll = document.createElement('div');
-	document.getElementsByTagName('body')[0].appendChild(div_scroll);
+scrollcreate: function(x,y,w){
+	this.scrl_scroll = document.createElement('div');
+	document.getElementsByTagName('body')[0].appendChild(this.scrl_scroll);
 
-	Element.extend(div_scroll);
-	div_scroll.setAttribute('id','scroll');
-	div_scroll.setStyle({top: y+'px', left: x+'px',width: (17*2+w)+'px',visibility: 'hidden'});
+	Element.extend(this.scrl_scroll);
+	this.scrl_scroll.setAttribute('id','scroll');
+	this.scrl_scroll.setStyle({top: y+'px', left: x+'px',width: (17*2+w)+'px',visibility: 'hidden'});
 	
 
-	var div = document.createElement('div');
-	div_scroll.appendChild(div);
+	this.scrl_tabinfoleft = document.createElement('div');
+	this.scrl_scroll.appendChild(this.scrl_tabinfoleft);
 
-	Element.extend(div);
-	div.setAttribute('id','scrolltableft');
-	div.appendChild(document.createTextNode('0'));
+	Element.extend(this.scrl_tabinfoleft);
+	this.scrl_tabinfoleft.setAttribute('id','scrolltableft');
+	this.scrl_tabinfoleft.appendChild(document.createTextNode('0'));
 	
 	var img = document.createElement('img');
-	div_scroll.appendChild(img);
+	this.scrl_scroll.appendChild(img);
 	
 	img.setAttribute('src',IMG_PATH+'/cal.gif');
 	img.setAttribute('width','16');
@@ -614,87 +606,87 @@ function scrollcreate(x,y,w){
 	img.setAttribute('alt','cal');
 	img.setAttribute('id','scroll_calendar');
 
-	var div = document.createElement('div');
-	div_scroll.appendChild(div);
+	this.scrl_tabinforight = document.createElement('div');
+	this.scrl_scroll.appendChild(this.scrl_tabinforight);
 	
-	Element.extend(div);
-	div.setAttribute('id','scrolltabright');
-	div.appendChild(document.createTextNode('0'));
-	
-
-	var div = document.createElement('div');
-	div_scroll.appendChild(div);
-	
-	Element.extend(div);
-	div.setAttribute('id','arrow_l');
+	Element.extend(this.scrl_tabinforight);
+	this.scrl_tabinforight.setAttribute('id','scrolltabright');
+	this.scrl_tabinforight.appendChild(document.createTextNode('0'));
 	
 
+	this.scrl_arrowleft = document.createElement('div');
+	this.scrl_scroll.appendChild(this.scrl_arrowleft);
+	
+	Element.extend(this.scrl_arrowleft);
+	this.scrl_arrowleft.setAttribute('id','arrow_l');
+	
+
+	this.scrl_arrowright = document.createElement('div');
+	this.scrl_scroll.appendChild(this.scrl_arrowright);
+	
+	Element.extend(this.scrl_arrowright);
+	this.scrl_arrowright.setAttribute('id','arrow_r');
+	
+	
 	var div = document.createElement('div');
-	div_scroll.appendChild(div);
-	
-	Element.extend(div);
-	div.setAttribute('id','arrow_r');
-	
-	
-	var div = document.createElement('div');
-	div_scroll.appendChild(div);
+	this.scrl_scroll.appendChild(div);
 	
 	Element.extend(div);
 	div.setAttribute('id','scroll_left');
 	
 
 	var div_mid = document.createElement('div');
-	div_scroll.appendChild(div_mid);
+	this.scrl_scroll.appendChild(div_mid);
 	
 	Element.extend(div_mid);
 	div_mid.setAttribute('id','scroll_middle');
 	div_mid.setStyle({width: w+'px'});
 
-	var div_bar = document.createElement('div');
-	div_mid.appendChild(div_bar);
+	this.scrl_bar = document.createElement('div');
+	div_mid.appendChild(this.scrl_bar);
 	
-	Element.extend(div_bar);
-	div_bar.setAttribute('id','scroll_bar');
+	Element.extend(this.scrl_bar);
+	this.scrl_bar.setAttribute('id','scroll_bar');
 	
 	
 	var div = document.createElement('div');
-	div_bar.appendChild(div);
+	this.scrl_bar.appendChild(div);
 	
 	Element.extend(div);
 	div.setAttribute('id','bar_left');
 
 	
-	var div = document.createElement('div');
-	div_bar.appendChild(div);
+	this.scrl_barbgl = document.createElement('div');
+	this.scrl_bar.appendChild(this.scrl_barbgl);
 	
-	Element.extend(div);
-	div.setAttribute('id','bar_bg_l');
+	Element.extend(this.scrl_barbgl);
+	this.scrl_barbgl.setAttribute('id','bar_bg_l');
 	
 
 	var div = document.createElement('div');
-	div_bar.appendChild(div);
+	this.scrl_bar.appendChild(div);
 	
 	Element.extend(div);
 	div.setAttribute('id','bar_middle');
 	div.setAttribute('align','middle');
 
 	
+	this.scrl_barbgr = document.createElement('div');
+	this.scrl_bar.appendChild(this.scrl_barbgr);
+	
+	Element.extend(this.scrl_barbgr);
+	this.scrl_barbgr.setAttribute('id','bar_bg_r');
+	
+	
 	var div = document.createElement('div');
-	div_bar.appendChild(div);
-	
-	Element.extend(div);
-	div.setAttribute('id','bar_bg_r');
-	
-	
-	var div = document.createElement('div');
-	div_bar.appendChild(div);
+	this.scrl_bar.appendChild(div);
 	
 	Element.extend(div);
 	div.setAttribute('id','bar_right');
 	
 
 	var div = document.createElement('div');
-	div_scroll.appendChild(div);
+	this.scrl_scroll.appendChild(div);
 	
 	Element.extend(div);
 	div.setAttribute('id','scroll_right');
@@ -722,5 +714,6 @@ function scrollcreate(x,y,w){
 	<div id="scroll_right"></div>
 </div>
 */
+}
 }
 -->
