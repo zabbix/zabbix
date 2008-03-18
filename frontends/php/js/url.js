@@ -151,13 +151,13 @@ setArgument: function(key,value){
 	var valueisset = false;
 	if(typeof(key) == 'undefined') throw 'Invalid argument past for setArgument';
 	
-	value =('undefined' != value)?value:'';
+	value =('undefined' != typeof(value))?value:'';
 
 	for(i=0; i < this.arguments.length; i++){
 		if(this.arguments[i][0] == key){
 			valueisset = true;
 			this.arguments[i][1] = value;
-		};
+		}
 	}	
 	if(!valueisset)	this.arguments[this.arguments.length] = new Array(key,value);
 	this.formatQuery();
