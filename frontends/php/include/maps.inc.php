@@ -637,7 +637,7 @@
 				if($host["status"] != HOST_STATUS_MONITORED)	continue;
 
 				$scripts_by_hosts = get_accessible_scripts_by_hosts(array($db_element["elementid"]));
-				
+
 				if(empty($url))	$url='tr_status.php?hostid='.$db_element['elementid'].'&noactions=true&onlytrue=true&compact=true';
 				
 				$alt = "Host: ".$host["host"]." ".$alt;
@@ -682,7 +682,11 @@
 					if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
 						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$db_element["elementid"]."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
-				$menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: Redirect('".$url."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				$menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: Redirect('tr_status.php?hostid=".$db_element['elementid']."&noactions=true&onlytrue=true&compact=true')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+
+				if(!empty($db_element["url"])){
+					$menus.= "['".S_MAP.SPACE.S_URL."',\"javascript: Redirect('".$url."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				}
 				
 				$menus = trim($menus,',');
 				$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180); cancelEvent(event);";
