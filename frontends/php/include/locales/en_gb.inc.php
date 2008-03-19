@@ -839,6 +839,8 @@
 	'S_PARAMS'=>				'Additional parameters',
 
 //	events.php
+	'S_EVENT_DETAILS'=>			'Event details',
+	'S_LIST'=>					'List',
 	'S_LATEST_EVENTS'=>			'Latest events',
 	'S_HISTORY_OF_EVENTS_BIG'=>		'HISTORY OF EVENTS',
 	'S_NO_EVENTS_FOUND'=>			'No events found',

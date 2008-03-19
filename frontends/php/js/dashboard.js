@@ -22,36 +22,6 @@ function setRefreshRate(id,interval){
 
 }
 
-function change_hat_state(icon, divid){
-	if((typeof(icon) == 'undefined') || (typeof(divid) == 'undefined')) throw "Function [change_hat_state()] awaits exactly 2 arguments.";
-
-	if(typeof(Ajax) == 'undefined'){
-		throw("Prototype.js lib is required!");
-		return false;
-	}
-
-	deselectAll(); 
-	var hat_state = ShowHide(divid); 
-	switchElementsClass(icon,"arrowup","arrowdown");
-
-	if(false === hat_state) return false;
-	
-	var params = {
-		'favobj': 	'hat',
-		'favid': 	divid,
-		'state':	hat_state
-	}
-	
-	new Ajax.Request("dashboard.php?output=ajax",
-					{
-						'method': 'post',
-						'parameters':	params,
-						'onSuccess': function(resp){ },//alert(resp.responseText);
-						'onFailure': function(){	document.location = 'dashboard.php?'+Object.toQueryString(params);}
-					}
-	);
-}
-
 function create_menu(e,id){
 	if (!e) var e = window.event;
 	id='menu_'+id;

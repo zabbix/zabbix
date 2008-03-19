@@ -440,6 +440,9 @@
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);
 	
+	define('AVAILABLE_NOCACHE',	0);		// take available objects not from cache
+	
+	
 //	define('BR',	"<br/>\n");
 	define('SBR',	"<br/>\n");
 	define('SPACE',	'&nbsp;');
