@@ -131,7 +131,7 @@
 							0, /* useip */
 							"", /* dns */
 							"", /* ip */
-							0,
+							0, /* proxy_hostid */
 							array(),
 							null,
 							array());

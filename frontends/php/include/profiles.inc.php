@@ -68,10 +68,12 @@ function	update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN){
 	if($type==PROFILE_TYPE_ARRAY && !is_array($value))	$value = array($value);
 
 	if(PROFILE_TYPE_ARRAY == $type){
+		DBstart();
 		$sql='DELETE FROM profiles WHERE userid='.$USER_DETAILS["userid"].' and idx='.zbx_dbstr($idx);
 		DBExecute($sql);
-
-		insert_profile($idx,$value,$type);
+				
+		$result = insert_profile($idx,$value,$type);
+		DBend($result);
 	}
 	else{
 		$row = DBfetch(DBselect('SELECT value FROM profiles WHERE userid='.$USER_DETAILS["userid"].' AND idx='.zbx_dbstr($idx)));
@@ -94,18 +96,19 @@ return true;
 function insert_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN){
 	global $USER_DETAILS;
 	
+	$result = true;
 	if(is_array($value)){
 		foreach($value as $key => $val){
-			insert_profile($idx,$val,$type);		// recursion!!!
+			$result&=insert_profile($idx,$val,$type);		// recursion!!!
 		}
 	}
 	else{
 		$profileid = get_dbid('profiles', 'profileid');
 		$sql='INSERT INTO profiles (profileid,userid,idx,value,valuetype)'.
 				' VALUES ('.$profileid.','.$USER_DETAILS["userid"].','.zbx_dbstr($idx).','.zbx_dbstr($value).','.$type.')';
-		DBexecute($sql);
+		$result = DBexecute($sql);
 	}
-
+return $result;
 }
 
 /***********************************/
