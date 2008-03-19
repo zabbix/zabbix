@@ -113,15 +113,21 @@ COpt::profiling_start("page");
 							"label"=>S_WEB,
 							"sub_pages"=>array("httpdetails.php")
 						),
-					array("url"=>"latest.php"	,"label"=>S_LATEST_DATA	,
-						"sub_pages"=>array("history.php","chart.php")
+					array(
+							"url"=>"latest.php",
+							"label"=>S_LATEST_DATA,
+							"sub_pages"=>array("history.php","chart.php")
 						),
 					array(
 							"url"=>"tr_status.php",
 							"label"=>S_TRIGGERS,
 							"sub_pages"=>array("acknow.php","tr_comments.php","chart4.php","scripts_exec.php")
 						),
-					array("url"=>"events.php"	,"label"=>S_EVENTS	),
+					array(
+							"url"=>"events.php",
+							"label"=>S_EVENTS,
+							"sub_pages"=>array("tr_events.php")
+						),
 					array(
 							"url"=>"actions.php",
 							"label"=>S_ACTIONS),
@@ -414,6 +420,7 @@ COpt::profiling_start("page");
 
     <script type="text/javascript" src="js/common.js"></script>
 	<script type="text/javascript" src="js/prototype.js"></script>
+	<script type="text/javascript" src="js/url.js"></script>
 <?php
 	if(isset($page['scripts']) && is_array($page['scripts'])){
 		foreach($page['scripts'] as $id => $script){

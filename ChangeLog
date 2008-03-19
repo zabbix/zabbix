@@ -1,5 +1,6 @@
 Changes for 1.5.1:
 
+ - [DEV-139] added transaction functionality to frontend (Artem)
  - [DEV-138] added support of update interval in icmp* simpe checks (Sasha)
  - [DEV-137] increased max number of log file lines sent per second to 100 (Alexei)
 

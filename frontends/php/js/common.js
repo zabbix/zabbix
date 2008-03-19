@@ -408,6 +408,38 @@ function deselectAll(){
 /************************************************************************************/
 /*										 Pages stuff								*/
 /************************************************************************************/
+function change_hat_state(icon, divid){
+	if((typeof(icon) == 'undefined') || (typeof(divid) == 'undefined')) throw "Function [change_hat_state()] awaits exactly 2 arguments.";
+
+	if(typeof(Ajax) == 'undefined'){
+		throw("Prototype.js lib is required!");
+		return false;
+	}
+
+	deselectAll(); 
+	var hat_state = ShowHide(divid); 
+	switchElementsClass(icon,"arrowup","arrowdown");
+
+	if(false === hat_state) return false;
+	
+	var params = {
+		'favobj': 	'hat',
+		'favid': 	divid,
+		'state':	hat_state
+	}
+	
+	var uri = new url(location.href);
+	new Ajax.Request(uri.getPath()+"?output=ajax",
+					{
+						'method': 'post',
+						'parameters':params,
+						'onSuccess': function(resp){ },//alert(resp.responseText);
+						'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(params); }
+					}
+	);
+	
+}
+
 function change_filter_state(icon, divid){
 	if((typeof(icon) == 'undefined') || (typeof(divid) == 'undefined')) throw "Function [change_filter_state()] awaits exactly 2 arguments.";
 
@@ -429,7 +461,6 @@ function change_filter_state(icon, divid){
 	}
 	
 	var uri = new url(location.href);
-
 	new Ajax.Request(uri.getPath()+"?output=ajax",
 					{
 						'method': 'post',

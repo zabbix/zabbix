@@ -569,11 +569,12 @@ createDaysTab: function(){
 \*-------------------------------------------------------------------------------------------------*/
 calendarcreate: function(){
 		this.clndr_calendar = document.createElement('div');
-	document.body.appendChild(this.clndr_calendar);
-	
+		
 		Element.extend(this.clndr_calendar);
 		this.clndr_calendar.className = 'calendar';
-		this.clndr_calendar.setStyle({display: 'none'});
+		this.clndr_calendar.hide();
+		
+	document.body.appendChild(this.clndr_calendar);
 		
 		addListener(this.clndr_calendar,'mousemove', deselectAll);
 	

@@ -46,7 +46,7 @@ check_fields($fields);
 if(isset($_REQUEST['execute'])){
 	if($script = get_script_by_scriptid($_REQUEST['scriptid'])){
 		if($script['host_access'] == SCRIPT_HOST_ACCESS_WRITE){
-			$hosts_read_write = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,null,$_REQUEST['hostid']));
+			$hosts_read_write = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE));
 
 			if(uint_in_array($_REQUEST['hostid'],$hosts_read_write)){
 //SDI('WRITE: '.$_REQUEST['scriptid'].' : '.$_REQUEST['hostid']);
@@ -55,8 +55,9 @@ if(isset($_REQUEST['execute'])){
 				insert_command_result_form($_REQUEST['scriptid'],$_REQUEST['hostid']);
 /*				echo nl2br(htmlspecialchars($result));*/
 			}
-		} else {
-			$hosts_read_only  = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,null,$_REQUEST['hostid']));
+		} 
+		else {
+			$hosts_read_only  = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY));
 
 			if(uint_in_array($_REQUEST['hostid'],$hosts_read_only)){
 //SDI('READ: '.$_REQUEST['scriptid'].' : '.$_REQUEST['hostid']);

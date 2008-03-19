@@ -21,27 +21,20 @@
 
 ?>
 <?php
-	function	check_right_on_discovery($permission)
-	{
+	function	check_right_on_discovery($permission){
 		global $USER_DETAILS;
 
-		if( $USER_DETAILS['type'] >= USER_TYPE_ZABBIX_ADMIN )
-		{
-			if ( 0 == count(
-					get_accessible_nodes_by_user($USER_DETAILS, $permission, null, PERM_RES_IDS_ARRAY, get_current_nodeid())
-					))
+		if( $USER_DETAILS['type'] >= USER_TYPE_ZABBIX_ADMIN ){
+			if (0 < count(get_accessible_nodes_by_user($USER_DETAILS, $permission, null, PERM_RES_IDS_ARRAY, get_current_nodeid())))
 				return true;
 		}
-
-		return false;
+	return false;
 	}
 
-	function	svc_default_port($type_int)
-	{
+	function	svc_default_port($type_int){
 		$port = 0;
 
-		switch($type_int)
-		{
+		switch($type_int){
 			case SVC_SSH:	$port = 22;	break;
 			case SVC_LDAP:	$port = 389;	break;
 			case SVC_SMTP:	$port = 25;	break;
@@ -56,7 +49,7 @@
 			case SVC_SNMPv2:$port = 161;	break;
 		}
 
-		return $port;
+	return $port;
 	}
 
 	function	discovery_check_type2str($type_int)

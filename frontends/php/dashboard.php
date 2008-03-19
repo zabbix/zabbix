@@ -30,7 +30,7 @@ require_once "include/blocks.inc.php";
 $page["title"] = "S_DASHBOARD";
 $page["file"] = "dashboard.php";
 $page['hist_arg'] = array();
-$page['scripts'] = array('url.js','dashboard.js','showhint.js');
+$page['scripts'] = array('dashboard.js','showhint.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -329,7 +329,7 @@ include_once "include/page_header.php";
 
 	$drules = DBfetch(DBselect('SELECT COUNT(d.druleid) as cnt FROM drules d WHERE '.DBin_node('d.druleid').' AND d.status='.DRULE_STATUS_ACTIVE));
 
-	if(($drules['cnt'] > 0) && (USER_TYPE_ZABBIX_ADMIN <= $USER_DETAILS['type'])){
+	if(($drules['cnt'] > 0) && check_right_on_discovery(PERM_READ_ONLY)){
 	
 		$refresh_tab[] = array(	'id' => 'hat_dscvry','interval'  => get_profile('web.dahsboard.rf_rate.hat_dscvry',60));
 

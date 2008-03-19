@@ -28,9 +28,13 @@
 	$page["title"] = "S_LATEST_EVENTS";
 	$page["file"] = "events.php";
 	$page['hist_arg'] = array('groupid','hostid');
-	$page['scripts'] = array('url.js','calendar.js');
+	$page['scripts'] = array('calendar.js');
 
-	define('ZBX_PAGE_DO_REFRESH', 1);
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+	
+	if(PAGE_TYPE_HTML == $page['type']){
+		define('ZBX_PAGE_DO_REFRESH', 1);
+	}
 
 include_once "include/page_header.php";
 
@@ -40,8 +44,9 @@ include_once "include/page_header.php";
 
 	$allowed_sources[] = EVENT_SOURCE_TRIGGERS;
 	if($allow_discovery) $allowed_sources[] = EVENT_SOURCE_DISCOVERY;
-
+	
 	define('PAGE_SIZE',	100);
+	
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"source"=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN($allowed_sources),	NULL),
@@ -69,8 +74,21 @@ include_once "include/page_header.php";
 	$_REQUEST['source'] = get_request('source', get_profile('web.events.source', 0));
 
 	check_fields($fields);
-	validate_sort_and_sortorder('e.clock',ZBX_SORT_DOWN);
-// filter prepare	
+	
+/* AJAX */	
+	if(isset($_REQUEST['favobj'])){
+		if('filter' == $_REQUEST['favobj']){
+//			echo 'alert("'.$_REQUEST['favid'].' : '.$_REQUEST['state'].'");';
+			update_profile('web.events.filter.state',$_REQUEST['state']);
+		}
+	}	
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+//--------
+
+/* FILTER */
 	if(isset($_REQUEST['filter_rst'])){
 		$_REQUEST['triggerid'] = 0;
 		$_REQUEST['show_unknown'] = 0;
@@ -100,21 +118,11 @@ include_once "include/page_header.php";
 	}
 // --------------
 
+	validate_sort_and_sortorder('e.clock',ZBX_SORT_DOWN);
+	
 	$source = get_request('source', EVENT_SOURCE_TRIGGERS);
 	update_profile('web.events.source',$source);
 	
-	
-	if(isset($_REQUEST['favobj'])){
-		if('filter' == $_REQUEST['favobj']){
-//			echo 'alert("'.$_REQUEST['favid'].' : '.$_REQUEST['state'].'");';
-			update_profile('web.events.filter.state',$_REQUEST['state']);
-		}
-	}	
-
-	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		exit();
-	}
-
 ?>
 <?php
 	$_REQUEST["start"] = get_request("start", 0);
@@ -219,7 +227,7 @@ include_once "include/page_header.php";
 		$cmbSource = new CComboBox('source', $source, 'submit()');
 		$cmbSource->AddItem(EVENT_SOURCE_TRIGGERS, S_TRIGGER);
 		$cmbSource->AddItem(EVENT_SOURCE_DISCOVERY, S_DISCOVERY);
-		$r_form->AddItem(array(S_SOURCE, SPACE, $cmbSource));
+		$r_form->AddItem(array(SPACE.S_SOURCE.SPACE, $cmbSource));
 	}
 
 	show_table_header(S_HISTORY_OF_EVENTS_BIG.SPACE.date("[H:i:s]",time()),$r_form);
@@ -277,7 +285,7 @@ include_once "include/page_header.php";
 				is_show_subnodes() ? S_NODE : null,
 				$_REQUEST["hostid"] == 0 ? S_HOST : null,
 				S_DESCRIPTION,
-				S_VALUE,
+				S_STATUS,
 				S_SEVERITY,
 				S_DURATION,
 				($config['event_ack_enable'])?S_ACK:NULL,
@@ -307,10 +315,10 @@ include_once "include/page_header.php";
 			}
 		
 			if($row["value"] == TRIGGER_VALUE_FALSE){
-				$value=new CCol(S_OFF,"off");
+				$value=new CCol(S_FALSE_BIG,"off");
 			}
 			elseif($row["value"] == TRIGGER_VALUE_TRUE){
-				$value=new CCol(S_ON,"on");
+				$value=new CCol(S_TRUE_BIG,"on");
 			}
 			else{
 				$value=new CCol(S_UNKNOWN_BIG,"unknown");
@@ -413,7 +421,7 @@ include_once "include/page_header.php";
 
 			$table->AddRow(array(
 				date("Y.M.d H:i:s",$row["clock"]),
-				get_node_name_by_elid($row['triggerid']),
+				is_show_subnodes() ? get_node_name_by_elid($row['triggerid']) : null,
 				$_REQUEST["hostid"] == 0 ? $row['host'] : null,
 				new CLink(
 					expand_trigger_description_by_data($row, ZBX_FLAG_EVENT),
