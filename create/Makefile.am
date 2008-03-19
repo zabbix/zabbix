@@ -5,6 +5,7 @@ EXTRA_DIST = \
 	schema/oracle.sql \
 	schema/postgresql.sql \
 	schema/sqlite.sql \
+	data/images/*.png \
 	data/data.sql \
 	data/images_oracle.sql \
 	data/images_pgsql.sql \
