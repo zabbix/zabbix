@@ -1,5 +1,6 @@
 Changes for 1.4.5:
 
+ - [ZBX-338] png files for images_oracle.sql script (Sasha)
  - [ZBX-322] fixed possible incorrect autodiscovery (Sasha)
  - [ZBX-315] fixed server irregulary stop on OpenBSD (Sasha)
  - [ZBX-206] fixed case sensitive hosts sorting (Artem)
