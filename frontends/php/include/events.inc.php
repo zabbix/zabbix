@@ -26,13 +26,23 @@
 			default:			return S_UNKNOWN;
 		}
 	}
+	
+	function get_tr_event_by_eventid($eventid){
+		$result = DBfetch(DBselect('SELECT e.*,t.triggerid, t.description,t.priority,t.status,t.type '.
+									' FROM events e,triggers t '.
+									' WHERE e.eventid='.$eventid.
+										' AND e.object='.EVENT_OBJECT_TRIGGER.
+										' AND t.triggerid=e.objectid '
+									));
+	return $result;
+	}
 
 	
 /* function:
  *     event_initial_time
  *
  * description:
- *     returs 'true' if event is initial, otherwise false; 
+ *     returns 'true' if event is initial, otherwise false; 
  *
  * author: Aly
  */
@@ -264,50 +274,67 @@ function get_history_of_discovery_events($start,$num){
 return $table;
 }
 
-function make_event_details($triggerid,&$trigger_data){
+// author: Aly	
+function make_event_details($eventid){
+	$event = get_tr_event_by_eventid($eventid);
+	
 	$table = new CTableInfo();
 	
-	if(is_show_subnodes()){
-		$table->AddRow(array(S_NODE, get_node_name_by_elid($triggerid)));
+	$table->AddRow(array(S_EVENT, expand_trigger_description($event['triggerid'])));
+	$table->AddRow(array(S_TIME, date('Y.M.d H:i:s',$event['clock'])));
+	
+	$duration = zbx_date2age($event['clock']);
+	if($next_event = get_next_event($event,1)){
+		$duration = zbx_date2age($event['clock'],$next_event['clock']);
+	}
+
+	if($event["value"] == TRIGGER_VALUE_FALSE){
+		$value=new CCol(S_FALSE_BIG,"off");
+	}
+	elseif($event["value"] == TRIGGER_VALUE_TRUE){
+		$value=new CCol(S_TRUE_BIG,"on");
+	}
+	else{
+		$value=new CCol(S_UNKNOWN_BIG,"unknown");
 	}
 	
-	$table->AddRow(array(S_HOST, $trigger_data['host']));
-	$table->AddRow(array(S_TRIGGER, $trigger_data['exp_desc']));
-	$table->AddRow(array(S_SEVERITY, new CSpan(get_severity_description($trigger_data["priority"]), get_severity_style($trigger_data["priority"]))));
-	$table->AddRow(array(S_EXPRESSION, $trigger_data['exp_expr']));
+
+	$ack = '-';
+	if($event["value"] == 1 && $event["acknowledged"] == 1){
+		$db_acks = get_acknowledges_by_eventid($event["eventid"]);
+		$rows=0;
+		while($a=DBfetch($db_acks))	$rows++;
+		
+		$ack=array(
+			new CLink(new CSpan(S_YES,'off'),'acknow.php?eventid='.$event['eventid'],'action'),
+			SPACE.'('.$rows.')'
+			);
+	}
+
+	$table->AddRow(array(S_STATUS, $value));	
+	$table->AddRow(array(S_DURATION, $duration));
+	$table->AddRow(array(S_ACKNOWLEDGED, $ack));
 	
 return $table;
 }
 
-function make_small_eventlist($triggerid,&$trigger_data,$show_unknown=0){
-	$sql_cond = '';
-	if(0 == $show_unknown){
-		$sql_cond = ' AND value<>2 ';
-	}
+function make_small_eventlist($triggerid,&$trigger_data){
 	
 	$table = new CTableInfo();
-	$table->SetHeader(array(S_TIME,S_STATUS,S_ACK,S_DURATION));
+	$table->SetHeader(array(S_TIME,S_STATUS,S_DURATION, S_AGE, S_ACK, S_ACTIONS));
 
 	$sql = 'SELECT * '.
 			' FROM events '.
 			' WHERE objectid='.$triggerid.
 				' AND object='.EVENT_OBJECT_TRIGGER.
-				$sql_cond.
 			' ORDER BY clock DESC';
 
-	$result = DBselect($sql,10*($_REQUEST['start']+PAGE_SIZE));
+	$result = DBselect($sql,20);
 
 	$rows = array();
 	$count = 0;
 	
-	$col=0;
-	$skip = $_REQUEST['start'];
-	while(($col<PAGE_SIZE) && ($row=DBfetch($result))){	
-		if($skip > 0){
-			if((0 == $show_unknown) && ($row['value'] == TRIGGER_VALUE_UNKNOWN)) continue;
-			$skip--;
-			continue;
-		}
+	while($row=DBfetch($result)){	
 		
 		if(!empty($rows) && ($rows[$count]['value'] != $row['value'])){
 			$count++;
@@ -320,7 +347,6 @@ function make_small_eventlist($triggerid,&$trigger_data,$show_unknown=0){
 			$count++;
 		}
 		$rows[$count] = $row;
-		$col++;
 	}
 
 	$clock=time();
@@ -340,10 +366,11 @@ function make_small_eventlist($triggerid,&$trigger_data,$show_unknown=0){
 		else{
 			$value=new CCol(S_UNKNOWN_BIG,"unknown");
 		}
+		
 	
-		$ack = "-";
-		if($row["value"] == 1 && $row["acknowledged"] == 1){
-			$db_acks = get_acknowledges_by_eventid($row["eventid"]);
+		$ack = '-';
+		if(1 == $row['acknowledged']){
+			$db_acks = get_acknowledges_by_eventid($row['eventid']);
 			$rows=0;
 			while($a=DBfetch($db_acks))	$rows++;
 			
@@ -352,12 +379,75 @@ function make_small_eventlist($triggerid,&$trigger_data,$show_unknown=0){
 				SPACE.'('.$rows.')'
 				);
 		}
+		
+//actions								
+		$actions= new CTable(' - ');
+
+		$sql='SELECT COUNT(a.alertid) as cnt '.
+				' FROM alerts a '.
+				' WHERE a.eventid='.$row['eventid'];
+								
+		$alerts=DBfetch(DBselect($sql));
+
+		if(isset($alerts['cnt']) && ($alerts['cnt'] > 0)){
+			$sql='SELECT COUNT(a.alertid) as sent '.
+					' FROM alerts a '.
+					' WHERE a.eventid='.$row['eventid'].
+						' AND a.status='.ALERT_STATUS_SENT;
+			$alerts=DBfetch(DBselect($sql));
+
+			$alert_cnt = new CSpan($alerts['sent'],'green');
+			if($alerts['sent']){
+				$hint=get_actions_hint_by_eventid($row['eventid'],ALERT_STATUS_SENT);
+				$alert_cnt->SetHint($hint);
+			}
+			$tdl = new CCol(($alerts['sent'])?$alert_cnt:SPACE);
+			$tdl->AddOption('width','10');
+
+			$sql='SELECT COUNT(a.alertid) as inprogress '.
+					' FROM alerts a '.
+					' WHERE a.eventid='.$row['eventid'].
+						' AND a.status='.ALERT_STATUS_NOT_SENT;
+			$alerts=DBfetch(DBselect($sql));
+
+			$alert_cnt = new CSpan($alerts['inprogress'],'orange');
+			if($alerts['inprogress']){
+				$hint=get_actions_hint_by_eventid($row['eventid'],ALERT_STATUS_NOT_SENT);
+				$alert_cnt->SetHint($hint);
+			}
+			$tdc = new CCol(($alerts['inprogress'])?$alert_cnt:SPACE);
+			$tdc->AddOption('width','10');
+
+			$sql='SELECT COUNT(a.alertid) as failed '.
+					' FROM alerts a,functions f,items i,events e'.
+					' WHERE a.eventid='.$row['eventid'].
+						' AND a.status='.ALERT_STATUS_FAILED;
+			$alerts=DBfetch(DBselect($sql));
+
+			$alert_cnt = new CSpan($alerts['failed'],'red');
+			if($alerts['failed']){
+				$hint=get_actions_hint_by_eventid($row['eventid'],ALERT_STATUS_FAILED);
+				$alert_cnt->SetHint($hint);
+			}
+
+			$tdr = new CCol(($alerts['failed'])?$alert_cnt:SPACE);
+			$tdr->AddOption('width','10');
+			
+			$actions->AddRow(array($tdl,$tdc,$tdr));
+		}
+//--------		
 
 		$table->AddRow(array(
-			date('Y.M.d H:i:s',$row['clock']),
+			new CLink(
+					date('Y.M.d H:i:s',$row['clock']),
+					"tr_events.php?triggerid=".$trigger_data['triggerid'].'&eventid='.$row['eventid'],
+					"action"
+					),
 			$value,
+			$duration,
+			zbx_date2age($row['clock']),
 			$ack,
-			$duration
+			$actions
 			));
 	}
 return $table;

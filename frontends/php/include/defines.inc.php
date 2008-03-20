@@ -22,6 +22,7 @@
 	define('XML_TAG_ZABBIX_EXPORT',		'zabbix_export');
 	define('XML_TAG_HOSTS',			'hosts');
 	define('XML_TAG_HOST',			'host');
+	define('XML_TAG_HOSTPROFILE',	'host_profile');
 	define('XML_TAG_GROUPS',		'groups');
 	define('XML_TAG_GROUP',			'group');
 	define('XML_TAG_APPLICATIONS',		'applications');

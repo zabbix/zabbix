@@ -288,7 +288,7 @@ function make_system_summary($available_hosts=false){
 //actions								
 						$actions= new CTable(' - ');
 
-						$sql='SELECT COUNT(a.alertid) as all'.
+						$sql='SELECT COUNT(a.alertid) as cnt'.
 								' FROM alerts a,functions f,items i,events e'.
 								' WHERE a.eventid='.$row_inf_event['eventid'].
 									' AND e.eventid = a.eventid'.
@@ -298,7 +298,7 @@ function make_system_summary($available_hosts=false){
 
 						$alerts=DBfetch(DBselect($sql));
 			
-						if(isset($alerts['all']) && ($alerts['all'] > 0)){
+						if(isset($alerts['cnt']) && ($alerts['cnt'] > 0)){
 							$mixed = 0;
 // Sent
 							$sql='SELECT COUNT(a.alertid) as sent '.
@@ -581,7 +581,7 @@ function make_latest_issues($available_hosts=false){
 //actions								
 			$actions= new CTable(' - ');
 
-			$sql='SELECT COUNT(a.alertid) as all '.
+			$sql='SELECT COUNT(a.alertid) as cnt '.
 					' FROM alerts a,functions f,items i,events e'.
 					' WHERE a.eventid='.$row_event['eventid'].
 						' AND e.eventid = a.eventid'.
@@ -591,7 +591,7 @@ function make_latest_issues($available_hosts=false){
 					
 			$alerts=DBfetch(DBselect($sql));
 
-			if(isset($alerts['all']) && ($alerts['all'] > 0)){
+			if(isset($alerts['cnt']) && ($alerts['cnt'] > 0)){
 				$sql='SELECT COUNT(a.alertid) as sent '.
 						' FROM alerts a,functions f,items i,events e'.
 						' WHERE a.eventid='.$row_event['eventid'].
