@@ -476,6 +476,11 @@ table.tableinfo tr td {
 	padding-bottom: 0px;
 	height: 20px;
 }
+
+table.tableinfo tr td.wraptext {
+	white-space:normal;
+}
+
 table.tableinfo tr td.message {
 	text-align: center;
 }

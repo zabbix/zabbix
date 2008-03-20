@@ -34,6 +34,22 @@
 				'port'		=> '',
 				'status'	=> '')
 			),
+// based on mod by scricca
+		XML_TAG_HOSTPROFILE => array(
+			'attribures'	=> array(),
+			'elements'	=> array(
+				'devicetype'	=> '',
+				'name'		=> '',
+				'os'			=> '',
+				'serialno' 	=> '',
+				'tag' 		=> '',
+				'macaddress' 	=> '',
+				'hardware' 	=> '',
+				'software' 	=> '',
+				'contact' 	=> '',
+				'location' 	=> '',
+				'notes' 		=> '')
+			),
 		XML_TAG_ITEM => array(
 			'attribures'	=> array(
 				'type'			=> '',
@@ -306,7 +322,27 @@
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
 			}
-				
+			
+// based on  mod by scricca
+			$data = DBfetch(DBselect('SELECT hp.* FROM hosts_profiles hp WHERE hp.hostid='.$hostid));
+			if(!$data) return false;
+			
+			zbx_xmlwriter_start_element ($memory,XML_TAG_HOSTPROFILE);
+			
+			$map =& $ZBX_EXPORT_MAP[XML_TAG_HOSTPROFILE];
+
+			foreach($map['attribures'] as $db_name => $xml_name){
+				if(empty($xml_name)) $xml_name = $db_name;
+				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
+			}
+			foreach($map['elements'] as $db_name => $xml_name){
+				if(empty($data[$db_name])) continue;
+				if(empty($xml_name)) $xml_name = $db_name;
+				zbx_xmlwriter_write_element($memory, $xml_name, $data[$db_name]);
+			}
+			zbx_xmlwriter_end_element($memory);
+//--
+
 			if($db_groups = DBselect('select g.name from groups g, hosts_groups hg'.
 				' where g.groupid=hg.groupid and hg.hostid='.$hostid))
 			{

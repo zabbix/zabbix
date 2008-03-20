@@ -129,8 +129,8 @@
 							10050,
 							HOST_STATUS_TEMPLATE,
 							0, /* useip */
-							"", /* dns */
-							"", /* ip */
+							'', /* dns */
+							'', /* ip */
 							0, /* proxy_hostid */
 							array(),
 							null,
@@ -143,6 +143,7 @@
 					$this->sub_node	= null;
 					array_push($this->main_node, $name);
 					break; // case
+				case XML_TAG_HOSTPROFILE:
 				case XML_TAG_TEMPLATE:
 				case XML_TAG_ITEM:
 				case XML_TAG_TRIGGER:
@@ -192,8 +193,8 @@
 					if(!isset($data['port']))	$data['port']	= 10050;
 					if(!isset($data['status']))	$data['status']	= 0;
 					if(!isset($data['useip']))	$data['useip'] = 0;
-					if(!isset($data['dns']))	$data['dns'] = "";
-					if(!isset($data['ip']))		$data['ip'] = "";
+					if(!isset($data['dns']))	$data['dns'] = '';
+					if(!isset($data['ip']))		$data['ip'] = '';
 
 					if(update_host($data['hostid'], $data['name'], $data['port'], $data['status'],
 						$data['useip'], $data['dns'], $data['ip'], 0, $data['templates'], null, $data['groups']))
@@ -202,6 +203,34 @@
 					}
 					
 					break; // case
+// based on  mod by scricca	
+				case XML_TAG_HOSTPROFILE:
+					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
+						break; //case
+
+					if(!isset($data['devicetype']))		$data['devicetype'] = '';
+					if(!isset($data['name']))			$data['name'] = '';
+					if(!isset($data['os']))				$data['os'] = '';
+					if(!isset($data['serialno']))		$data['serialno'] = '';
+					if(!isset($data['tag']))			$data['tag'] = '';
+					if(!isset($data['macaddress']))		$data['macaddress'] = '';
+					if(!isset($data['hardware']))		$data['hardware'] = '';
+					if(!isset($data['software']))		$data['software'] = '';
+					if(!isset($data['contact']))		$data['contact'] = '';
+					if(!isset($data['location']))		$data['location'] = '';
+					if(!isset($data['notes']))			$data['notes'] = '';
+					
+					delete_host_profile($this->data[XML_TAG_HOST]['hostid']);
+					
+					if(add_host_profile($this->data[XML_TAG_HOST]['hostid'], $data['devicetype'], $data['name'], $data['os'],
+						$data['serialno'], $data['tag'], $data['macaddress'], $data['hardware'], $data['software'],
+						$data['contact'], $data['location'], $data['notes']))
+					{
+						info('Host Profile ['.$this->data[XML_TAG_HOST]['name'].'] updated');
+					}
+ 					
+ 					break; // case
+//---
 				case XML_TAG_GROUP:
 					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
 						break; //case
@@ -279,7 +308,7 @@
 						break; // case
 					}
 
-					if(!isset($data['description']))		$data['description']		= "";
+					if(!isset($data['description']))		$data['description']		= '';
 					if(!isset($data['delay']))			$data['delay']			= 30;
 					if(!isset($data['history']))			$data['history']		= 90;
 					if(!isset($data['trends']))			$data['trends']			= 365;

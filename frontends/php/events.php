@@ -425,7 +425,8 @@ include_once "include/page_header.php";
 				$_REQUEST["hostid"] == 0 ? $row['host'] : null,
 				new CLink(
 					expand_trigger_description_by_data($row, ZBX_FLAG_EVENT),
-					"events.php?triggerid=".$row["triggerid"],"action"
+					"tr_events.php?triggerid=".$row["triggerid"].'&eventid='.$row['eventid'],
+					"action"
 					),
 				$value,
 				new CCol(get_severity_description($row["priority"]), get_severity_style($row["priority"])),

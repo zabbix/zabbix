@@ -133,6 +133,7 @@ include_once 'include/discovery.inc.php';
 	return	$result;
 	}
 	
+	
 	# Add Action's condition
 
 	function	add_action_condition($actionid, $condition)
@@ -778,9 +779,8 @@ include_once 'include/discovery.inc.php';
 		}
 		return TRUE;
 	}
-
-	function get_history_of_actions($start,$num)
-	{
+	
+	function get_history_of_actions($start,$num){
 		global $USER_DETAILS;
 		
 		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_MODE_LT);
@@ -864,7 +864,83 @@ include_once 'include/discovery.inc.php';
 
 		return $table;
 	}
+	
+// Author: Aly
+function get_actions_for_event($eventid){
+	global $USER_DETAILS;
+	
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_MODE_LT);
 
+	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
+	$table->SetHeader(array(
+			is_show_subnodes() ? make_sorting_link(S_NODES,'a.alertid') : null,
+			make_sorting_link(S_TIME,'a.clock'),
+			make_sorting_link(S_TYPE,'mt.description'),
+			make_sorting_link(S_STATUS,'a.status'),
+			make_sorting_link(S_RETRIES_LEFT,'a.retries'),
+			make_sorting_link(S_RECIPIENTS,'a.sendto'),
+			S_MESSAGE,
+			S_ERROR
+			));
+			
+	
+	$result=DBselect('SELECT DISTINCT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
+			' FROM alerts a,media_type mt,functions f,items i,events e '.
+			' WHERE mt.mediatypeid=a.mediatypeid '.
+				' AND a.eventid='.$eventid.
+				' AND e.eventid = a.eventid'.
+				' AND e.objectid=f.triggerid '.
+				' AND f.itemid=i.itemid '.
+				' AND i.hostid not in ('.$denyed_hosts.')'.
+				' AND '.DBin_node('a.alertid').
+			order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries'));
+		
+	while(($row=DBfetch($result))&&($col<$num)){
+		$time=date("Y.M.d H:i:s",$row["clock"]);
+
+		if($row["status"] == ALERT_STATUS_SENT){
+			$status=new CSpan(S_SENT,"green");
+			$retries=new CSpan(SPACE,"green");
+		}
+		else if($row["status"] == ALERT_STATUS_NOT_SENT){
+			$status=new CSpan(S_IN_PROGRESS,"orange");
+			$retries=new CSpan(ALERT_MAX_RETRIES - $row["retries"],"orange");
+		}
+		else{
+			$status=new CSpan(S_NOT_SENT,"red");
+			$retries=new CSpan(0,"red");
+		}
+		$sendto=$row["sendto"];
+
+		$pre = new CTag('pre','yes');
+		$pre->AddItem(array(bold(S_SUBJECT.': '),$row["subject"]));
+		$subject = empty($row["subject"]) ? '' : $pre;
+		
+		$pre = new CTag('pre','yes');
+		$pre->AddItem($row["message"]);
+		$message = array($subject, $pre);
+
+		if($row["error"] == ""){
+			$error=new CSpan(SPACE,"off");
+		}
+		else{
+			$error=new CSpan($row["error"],"on");
+		}
+		$table->AddRow(array(
+			get_node_name_by_elid($row['alertid']),
+			new CCol($time, 'top'),
+			new CCol($row["description"], 'top'),
+			new CCol($status, 'top'),
+			new CCol($retries, 'top'),
+			new CCol($sendto, 'top'),
+			new CCol($message, 'top'),
+			new CCol($error, 'top')));
+	}
+
+return $table;
+}
+
+// Author: Aly
 function get_actions_hint_by_eventid($eventid,$status=NULL){
 	global $USER_DETAILS;
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
