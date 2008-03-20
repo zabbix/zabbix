@@ -895,7 +895,7 @@ function get_actions_for_event($eventid){
 				' AND '.DBin_node('a.alertid').
 			order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries'));
 		
-	while(($row=DBfetch($result))&&($col<$num)){
+	while($row=DBfetch($result)){
 		$time=date("Y.M.d H:i:s",$row["clock"]);
 
 		if($row["status"] == ALERT_STATUS_SENT){
@@ -912,14 +912,8 @@ function get_actions_for_event($eventid){
 		}
 		$sendto=$row["sendto"];
 
-		$pre = new CTag('pre','yes');
-		$pre->AddItem(array(bold(S_SUBJECT.': '),$row["subject"]));
-		$subject = empty($row["subject"]) ? '' : $pre;
+		$message = array(bold(S_SUBJECT.': '),br(),$row["subject"],br(),br(),bold(S_MESSAGE.': '),br(),$row['message']);
 		
-		$pre = new CTag('pre','yes');
-		$pre->AddItem($row["message"]);
-		$message = array($subject, $pre);
-
 		if($row["error"] == ""){
 			$error=new CSpan(SPACE,"off");
 		}
@@ -933,8 +927,8 @@ function get_actions_for_event($eventid){
 			new CCol($status, 'top'),
 			new CCol($retries, 'top'),
 			new CCol($sendto, 'top'),
-			new CCol($message, 'top'),
-			new CCol($error, 'top')));
+			new CCol($message, 'wraptext top'),
+			new CCol($error, 'wraptext top')));
 	}
 
 return $table;
