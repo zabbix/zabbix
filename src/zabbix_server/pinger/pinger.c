@@ -247,13 +247,13 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int now)
 	fclose(f);
 
 #ifdef HAVE_IPV6
-	zbx_snprintf(tmp, sizeof(tmp), "%s -e 2>/dev/null <%s;%s -e 2>/dev/null <%s",
+	zbx_snprintf(tmp, sizeof(tmp), "%s -c3 2>/dev/null <%s;%s -c3 2>/dev/null <%s",
 			CONFIG_FPING_LOCATION,
 			filename,
 			CONFIG_FPING6_LOCATION,
 			filename);
 #else /* HAVE_IPV6 */
-	zbx_snprintf(tmp, sizeof(tmp), "%s -e 2>/dev/null <%s",
+	zbx_snprintf(tmp, sizeof(tmp), "%s -c3 2>/dev/null <%s",
 			CONFIG_FPING_LOCATION,
 			filename);
 #endif /* HAVE_IPV6 */
@@ -272,10 +272,11 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int now)
 		zabbix_log(LOG_LEVEL_DEBUG, "Update IP [%s]",
 				tmp);
 
+		/* 12fc::21 : [0], 76 bytes, 0.39 ms (0.39 avg, 0% loss) */
+
 		host = NULL;
 
-		c = strchr(tmp, ' ');
-		if (c != NULL) {
+		if (NULL != (c = strchr(tmp, ' '))) {
 			*c = '\0';
 			for (i = 0; i < hosts_count; i++)
 				if (0 == strcmp(tmp, hosts[i].addr)) {
@@ -286,13 +287,10 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int now)
 
 		if (NULL != host) {
 			c++;
-			
-			if (strstr(c, "alive") != NULL) {
+			if (NULL != (c = strchr(c, '('))) {
+				c++;
 				host->alive = 1;
-				sscanf(c, "is alive (%lf ms)",
-						&host->mseconds);
-				zabbix_log(LOG_LEVEL_DEBUG, "Mseconds [%lf]",
-						host->mseconds);
+				host->mseconds = atof(c);
 			}
 		}
 	}
@@ -303,9 +301,10 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int now)
 	items = 0;
 
 	for (i = 0; i < hosts_count; i++) {
-		zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] alive [%d]",
+		zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] alive [%d] " ZBX_FS_DBL " ms",
 				hosts[i].addr,
-				hosts[i].alive);
+				hosts[i].alive,
+				hosts[i].mseconds);
 
 		init_result(&value);
 		SET_UI64_RESULT(&value, hosts[i].alive);

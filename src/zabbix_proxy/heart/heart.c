@@ -45,7 +45,7 @@ static void	send_heartbeat()
 	zbx_sock_t		sock;
 	struct zbx_json		j;
 	
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_configuration_sync()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In send_heartbeat()");
 
 	zbx_json_init(&j, 128);
 	zbx_json_addstring(&j, "request", ZBX_PROTO_VALUE_PROXY_HEARTBEAT, ZBX_JSON_TYPE_STRING);
