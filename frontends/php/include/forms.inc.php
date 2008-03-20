@@ -639,17 +639,19 @@
 			$title = S_ACKNOWLEDGE_ALARM_BY;
 			$btn_txt2 = S_ACKNOWLEDGE.' '.S_AND_SYMB.' '.S_RETURN;			
 		}
-		else if(!DBfetch(get_acknowledges_by_eventid(get_request('eventid',0))))
-		{
-			$title = S_ACKNOWLEDGE_ALARM_BY;
-			$btn_txt = S_ACKNOWLEDGE;
-			$btn_txt2 = S_ACKNOWLEDGE.' '.S_AND_SYMB.' '.S_RETURN;
-		}
-		else
-		{
-			$title = S_ADD_COMMENT_BY;
-			$btn_txt = S_SAVE;
-			$btn_txt2 = S_SAVE.' '.S_AND_SYMB.' '.S_RETURN;
+		else{
+			$temp=get_acknowledges_by_eventid(get_request('eventid',0));
+			
+			if(!DBfetch($temp)){
+				$title = S_ACKNOWLEDGE_ALARM_BY;
+				$btn_txt = S_ACKNOWLEDGE;
+				$btn_txt2 = S_ACKNOWLEDGE.' '.S_AND_SYMB.' '.S_RETURN;
+			}
+			else{
+				$title = S_ADD_COMMENT_BY;
+				$btn_txt = S_SAVE;
+				$btn_txt2 = S_SAVE.' '.S_AND_SYMB.' '.S_RETURN;
+			}
 		}
 
 		$frmMsg= new CFormTable($title." \"".$USER_DETAILS["alias"]."\"");
@@ -2255,7 +2257,7 @@
 	function	insert_login_form(){
 // author: 	Aly
 // description:
-//			konqueror bug #138024; adding usless param(login=1) to the form's action path to avoid bug!!
+//			konqueror bug #138024; adding useless param(login=1) to the form's action path to avoid bug!!
 
 		$frmLogin = new CFormTable('Login','index.php?login=1',"post","multipart/form-data");
 		$frmLogin->SetHelp('web.index.login');
@@ -2371,11 +2373,12 @@
 			$btnSelect, BR(),
 			new CButton("add_dependence",S_ADD)
 			),'new');
-			
+	/* end new dependence */
+	
 		$type_select = new CComboBox('type');
 		$type_select->Additem(TRIGGER_MULT_EVENT_DISABLED,S_NORMAL,(($type == TRIGGER_MULT_EVENT_ENABLED)?'no':'yes'));
 		$type_select->Additem(TRIGGER_MULT_EVENT_ENABLED,S_NORMAL.SPACE.'+'.SPACE.S_MULTIPLE_TRUE_EVENTS,(($type == TRIGGER_MULT_EVENT_ENABLED)?'yes':'no'));
-	/* end new dependence */
+
 		$frmTrig->AddRow(S_EVENT_GENERATION,$type_select);
 
 		$cmbPrior = new CComboBox("priority",$priority);

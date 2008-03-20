@@ -19,39 +19,56 @@
 **/
 ?>
 <?php
-	function	get_last_event_by_triggerid($triggerid)
-	{
-		$event_data = DBfetch(DBselect('select * from events where objectid='.$triggerid.
-			' and object='.EVENT_OBJECT_TRIGGER.' order by objectid desc, object desc, eventid desc', 1));
-		if(!$event_data)
-			return FALSE;
-		return $event_data;
+function get_last_event_by_triggerid($triggerid){
+	$event_data = DBfetch(DBselect('SELECT * '.
+				' FROM events '.
+				' WHERE objectid='.$triggerid.
+					' and object='.EVENT_OBJECT_TRIGGER.
+				' ORDER BY objectid desc, object desc, eventid desc', 1));
+	if(!$event_data)
+		return FALSE;
+return $event_data;
+}
+
+function get_acknowledges_by_eventid($eventid){
+	return DBselect("select * from acknowledges where eventid=$eventid");
+}
+
+function	add_acknowledge_coment($eventid, $userid, $message)
+{
+	$result = set_event_acnowledged($eventid);
+	if(!$result)
+		return $result;
+
+	$acknowledgeid = get_dbid("acknowledges","acknowledgeid");
+
+	$result =  DBexecute("insert into acknowledges (acknowledgeid,userid,eventid,clock,message)".
+		" values ($acknowledgeid,$userid,$eventid,".time().",".zbx_dbstr($message).")");
+
+	if(!$result)
+		return $result;
+
+	return $acknowledgeid;
+}
+
+function	set_event_acnowledged($eventid){
+	return DBexecute("update events set acknowledged=1 where eventid=$eventid");
+}
+
+function make_acktab_by_eventid($eventid){
+	$table = new CTableInfo();
+	$table->SetHeader(array(S_TIME,S_USER, S_COMMENTS));
+
+	$acks = get_acknowledges_by_eventid($eventid);
+	
+	while($ack = DBfetch($acks)){
+		$user = get_user_by_userid($ack['userid']);
+		$table->AddRow(array(
+			date('d-m-Y h:i:s A',$ack['clock']),
+			$user['alias'],
+			new CCol(nl2br($ack['message']),'wraptext')
+		));
 	}
-
-	function 	&get_acknowledges_by_eventid($eventid)
-	{
-		return DBselect("select * from acknowledges where eventid=$eventid");
-	}
-
-	function	add_acknowledge_coment($eventid, $userid, $message)
-	{
-		$result = set_event_acnowledged($eventid);
-		if(!$result)
-			return $result;
-
-		$acknowledgeid = get_dbid("acknowledges","acknowledgeid");
-
-		$result =  DBexecute("insert into acknowledges (acknowledgeid,userid,eventid,clock,message)".
-			" values ($acknowledgeid,$userid,$eventid,".time().",".zbx_dbstr($message).")");
-
-		if(!$result)
-			return $result;
-
-		return $acknowledgeid;
-	}
-
-	function	set_event_acnowledged($eventid)
-	{
-		return DBexecute("update events set acknowledged=1 where eventid=$eventid");
-	}
+return $table;
+}
 ?>

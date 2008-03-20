@@ -175,8 +175,10 @@ include_once "include/page_header.php";
 		}
 
 		$templates = get_request('templates', array());
+		
+		$_REQUEST['proxy_hostid'] = get_request('proxy_hostid',0);
 
-		if(isset($_REQUEST["hostid"])){
+		if(isset($_REQUEST['hostid'])){
 			if(isset($_REQUEST['clear_templates'])) {
 				foreach($_REQUEST['clear_templates'] as $id){
 					unlink_template($_REQUEST["hostid"], $id, false);
