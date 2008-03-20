@@ -28,7 +28,7 @@ function	get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN){
 	$result = $default_value;
 
 	if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
-		$db_profiles = DBselect('SELECT * FROM profiles WHERE userid='.$USER_DETAILS["userid"].' AND idx='.zbx_dbstr($idx));
+		$db_profiles = DBselect('SELECT * FROM profiles WHERE userid='.$USER_DETAILS["userid"].' AND idx='.zbx_dbstr($idx).' ORDER BY profileid ASC');
 
 		if($profile=DBfetch($db_profiles)){
 		
