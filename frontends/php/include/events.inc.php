@@ -419,7 +419,7 @@ function make_small_eventlist($triggerid,&$trigger_data){
 			$tdc->AddOption('width','10');
 
 			$sql='SELECT COUNT(a.alertid) as failed '.
-					' FROM alerts a,functions f,items i,events e'.
+					' FROM alerts a '.
 					' WHERE a.eventid='.$row['eventid'].
 						' AND a.status='.ALERT_STATUS_FAILED;
 			$alerts=DBfetch(DBselect($sql));

@@ -133,8 +133,9 @@ $right_tab->AddRow(create_hat(
 		));
 		
 $right_tab->AddRow(create_hat(
-			S_EVENTS.SPACE.S_LIST.SPACE.'['.S_LAST.' 20]',
-			make_small_eventlist($_REQUEST['triggerid'],$trigger_data),//null,
+			S_EVENTS.SPACE.S_LIST.SPACE.'['.S_LAST.' 20]', 
+			//null,//
+			make_small_eventlist($_REQUEST['triggerid'],$trigger_data),
 			null,
 			'hat_eventlist',
 			get_profile('web.tr_events.hats.hat_eventlist.state',1)
