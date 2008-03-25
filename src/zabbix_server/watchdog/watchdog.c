@@ -184,12 +184,13 @@ void main_watchdog_loop()
 
 	init_config();
 
-	for(;;)
-	{
+	DBclose();
+
+	for (;;) {
 		ping_database();
+
 		sleep(60);
 	}
 
 	/* We will never reach this point */
-	DBclose();
 }

@@ -1,5 +1,6 @@
 Changes for 1.4.5:
 
+ - [ZBX-294,ZBX-296] Oracle related fixes (Sasha)
  - [ZBX-343] fixed possible hang of server trapper process (Alexei)
  - [ZBX-341] fixed compilation problem under Tru64/OSF (Alexei)
  - [ZBX-338] png files for images_oracle.sql script (Sasha)
