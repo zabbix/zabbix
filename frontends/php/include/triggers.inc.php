@@ -1226,8 +1226,11 @@
 	{
 		if(is_null($time)) $time = time();
 
-		$result = DBselect('select value,clock from events where objectid='.$triggerid.' and object='.EVENT_OBJECT_TRIGGER.
-			' order by clock desc',1);
+		$result = DBselect('SELECT value,clock '.
+						' FROM events '.
+						' WHERE objectid='.$triggerid.
+							' AND object='.EVENT_OBJECT_TRIGGER.
+						' ORDER BY clock desc',1);
 		$last_value = DBfetch($result);
 		if($last_value)
 		{
@@ -1237,12 +1240,12 @@
 		$eventid = get_dbid("events","eventid");
 		$result = DBexecute('insert into events(eventid,source,object,objectid,clock,value) '.
 				' values('.$eventid.','.EVENT_SOURCE_TRIGGERS.','.EVENT_OBJECT_TRIGGER.','.$triggerid.','.$time.','.$value.')');
-		if($value == TRIGGER_VALUE_FALSE || $value == TRIGGER_VALUE_TRUE)
-		{
-			DBexesute('update alerts set retries=3,error=\'Trigger changed its status. WIll not send repeats.\''.
-				' where triggerid='.$triggerid.' and repeats>0 and status='.ALERT_STATUS_NOT_SENT);
+				
+		if($value == TRIGGER_VALUE_FALSE || $value == TRIGGER_VALUE_TRUE){
+			DBexesute('update alerts set retries=3,error=\'Trigger changed its status. Will not send repeats.\''.
+				' where eventid='.$eventid.' and repeats>0 and status='.ALERT_STATUS_NOT_SENT);
 		}
-		return true;
+	return true;
 	}
 
 	function	add_trigger_dependency($triggerid,$depid)
@@ -1292,8 +1295,6 @@
 
 		$result=delete_sysmaps_elements_with_triggerid($triggerid);
 		if(!$result)	return	$result;
-
-		DBexecute("delete from alerts where triggerid=$triggerid");
 		
 		DBexecute("delete from sysmaps_link_triggers where triggerid=$triggerid");
 		

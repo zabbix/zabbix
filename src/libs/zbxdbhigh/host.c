@@ -728,7 +728,6 @@ static int	DBdelete_trigger(
 			DBexecute("delete from trigger_depends where triggerid_up=" ZBX_FS_UI64, triggerid);
 			DBexecute("delete from functions where triggerid=" ZBX_FS_UI64, triggerid);
 			DBexecute("delete from events where objectid=" ZBX_FS_UI64 " and object=%i", triggerid, EVENT_OBJECT_TRIGGER);
-			DBexecute("delete from alerts where triggerid=" ZBX_FS_UI64, triggerid);
 
 			DBexecute("delete from sysmaps_link_triggers where triggerid=" ZBX_FS_UI64, triggerid);
 
