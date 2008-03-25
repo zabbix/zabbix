@@ -51,17 +51,20 @@ include_once "include/page_header.php";
 
 	if(isset($_REQUEST["serviceid"]) && $_REQUEST["serviceid"] > 0){
 		
-		if( !($service = DBfetch(DBselect("select s.* from services s left join triggers t on s.triggerid=t.triggerid ".
-			" left join functions f on t.triggerid=f.triggerid left join items i on f.itemid=i.itemid ".
-			" where (i.hostid is null or i.hostid not in (".$denyed_hosts.")) ".
-				' and '.DBin_node('s.serviceid').
-				" and s.serviceid=".$_REQUEST["serviceid"]
+		if( !($service = DBfetch(DBselect('SELECT s.* '.
+					' FROM services s '.
+						' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
+						' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
+						' LEFT JOIN items i on f.itemid=i.itemid '.
+			' WHERE (i.hostid IS NULL OR i.hostid NOT IN ('.$denyed_hosts.')) '.
+				' AND '.DBin_node('s.serviceid').
+				' AND s.serviceid='.$_REQUEST['serviceid']
 			))))
 		{
 			access_deny();
 		}
 	}
-	unset($_REQUEST["serviceid"]);
+	unset($_REQUEST['serviceid']);
 ?>
 <?php
 	show_table_header(S_IT_SERVICES_BIG);

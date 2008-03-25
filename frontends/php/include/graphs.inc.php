@@ -103,12 +103,10 @@
  *     Eugene Grigorjev 
  *
  */
-	function	graph_item_calc_fnc2str($calc_fnc, $type=null)
-	{
+	function	graph_item_calc_fnc2str($calc_fnc, $type=null){
 		if($type == GRAPH_ITEM_AGGREGATED) return '-';
 		
-		switch($calc_fnc)
-		{
+		switch($calc_fnc){
 			case CALC_FNC_ALL:      $calc_fnc = S_ALL_SMALL;        break;
 			case CALC_FNC_MIN:      $calc_fnc = S_MIN_SMALL;        break;
 			case CALC_FNC_MAX:      $calc_fnc = S_MAX_SMALL;        break;
@@ -116,42 +114,47 @@
 			case CALC_FNC_AVG:
 			default:		$calc_fnc = S_AVG_SMALL;        break;
 		}
-		return $calc_fnc;
+	return $calc_fnc;
 	}
 	
-	function 	get_graph_by_gitemid($gitemid)
-	{
-		$db_graphs = DBselect("SELECT distinct g.* FROM graphs g, graphs_items gi".
-			" WHERE g.graphid=gi.graphid and gi.gitemid=$gitemid");
-		return DBfetch($db_graphs);
-		
+	function get_graph_by_gitemid($gitemid){
+		$db_graphs = DBselect('SELECT distinct g.* '.
+						' FROM graphs g, graphs_items gi '.
+						' WHERE g.graphid=gi.graphid '.
+							' AND gi.gitemid='.$gitemid);
+			
+	return DBfetch($db_graphs);
 	}
 
-	function 	get_graphs_by_hostid($hostid)
-	{
-		return DBselect("SELECT distinct g.* FROM graphs g, graphs_items gi, items i".
-			" WHERE g.graphid=gi.graphid and gi.itemid=i.itemid and i.hostid=$hostid");
+	function get_graphs_by_hostid($hostid){
+		return DBselect('SELECT distinct g.* '.
+						' FROM graphs g, graphs_items gi, items i '.
+						' WHERE g.graphid=gi.graphid '.
+							' AND gi.itemid=i.itemid '.
+							' AND i.hostid='.$hostid);
 	}
 
-	function	get_realhosts_by_graphid($graphid)
-	{
+	function get_realhosts_by_graphid($graphid){
 		$graph = get_graph_by_graphid($graphid);
 		if($graph["templateid"] != 0)
 			return get_realhosts_by_graphid($graph["templateid"]);
 
-		return get_hosts_by_graphid($graphid);
+	return get_hosts_by_graphid($graphid);
 	}
 
-	function 	get_hosts_by_graphid($graphid)
-	{
-		return DBselect("SELECT distinct h.* FROM graphs_items gi, items i, hosts h".
-			" WHERE h.hostid=i.hostid and gi.itemid=i.itemid and gi.graphid=$graphid");
+	function get_hosts_by_graphid($graphid){	
+		return DBselect('SELECT distinct h.* '.
+							' FROM graphs_items gi, items i, hosts h'.
+							' WHERE h.hostid=i.hostid '.
+								' AND gi.itemid=i.itemid '.
+								' AND gi.graphid='.$graphid);
 	}
 
-	function	get_graphitems_by_graphid($graphid)
-	{
-		return DBselect("SELECT * FROM graphs_items WHERE graphid=$graphid".
-			" order by itemid,drawtype,sortorder,color,yaxisside"); 
+	function get_graphitems_by_graphid($graphid){
+		return DBselect('SELECT * '.
+					' FROM graphs_items '.
+					' WHERE graphid='.$graphid.
+					' ORDER BY itemid,drawtype,sortorder,color,yaxisside'); 
 	}
 
 	/*
@@ -199,12 +202,12 @@
 	{
 		$result=DBselect("SELECT * FROM graphs_items WHERE gitemid=$gitemid");
 		$row=DBfetch($result);
-		if($row)
-		{
+		if($row){
 			return	$row;
 		}
 		error("No graph item with gitemid=[$gitemid]");
-		return	$result;
+		
+	return	$result;
 	}
 
 	function	get_graphitem_by_itemid($itemid)
@@ -231,8 +234,7 @@
 		return	false;
 	}
 
-	function	get_graphs_by_templateid($templateid)
-	{
+	function	get_graphs_by_templateid($templateid){
 		return DBselect("SELECT * FROM graphs WHERE templateid=$templateid");
 	}
 
@@ -372,28 +374,25 @@
 			}
 		}
 
-		if ( $result )
-		{
+		if ( $result ){
 			info('Graph "'.$name.'" added to hosts '.implode(',',$host_list));
 
 			/* add graphs for child hosts */
-
-			$host = DBfetch(get_hosts_by_graphid($graphid));
+			$tmp_hosts = get_hosts_by_graphid($graphid);
+			$host = DBfetch($tmp_hosts);
 
 			$chd_hosts = get_hosts_by_templateid($host['hostid']);
-			while($chd_host = DBfetch($chd_hosts))
-			{
+			while($chd_host = DBfetch($chd_hosts)){
 				copy_graph_to_host($graphid, $chd_host['hostid'], false);
 			}
 		}
 
-		if ( !$result && $graphid )
-		{
+		if ( !$result && $graphid ){
 			delete_graph($graphid);
 			$graphid = false;
 		}
 
-		return $graphid;
+	return $graphid;
 	}
 
         /*
@@ -452,9 +451,9 @@
 		}
 
 		/* check items for template graph */
-		$host = DBfetch(get_hosts_by_graphid($graphid));
-		if ( $host["status"] == HOST_STATUS_TEMPLATE )
-		{
+		$tmp_hosts = get_hosts_by_graphid($graphid);
+		$host = DBfetch($tmp_hosts);
+		if ( $host["status"] == HOST_STATUS_TEMPLATE ){
 			unset($new_hostid);
 			$itemid = array(0);
 
@@ -484,8 +483,9 @@
 		$chd_graphs = get_graphs_by_templateid($graphid);
 		while($chd_graph = DBfetch($chd_graphs))
 		{
-			$chd_host = DBfetch(get_hosts_by_graphid($chd_graph['graphid']));
-			if ( ! ($new_gitems = get_same_graphitems_for_host($gitems, $chd_host['hostid'])) )
+			$tmp_hosts = get_hosts_by_graphid($chd_graph['graphid']);
+			$chd_host = DBfetch($tmp_hosts);
+			if ( !($new_gitems = get_same_graphitems_for_host($gitems, $chd_host['hostid'])) )
 			{ /* skip host with missed items */
 				error('Can not update graph "'.$name.'" for host "'.$chd_host['host'].'"');
 				return $result;
@@ -652,7 +652,8 @@
 			{
 				if( !is_array($templateid) ) $templateid=array($templateid);
 
-				$tmp_host = DBfetch(get_hosts_by_graphid($db_graph['templateid']));
+				$tmp_hhosts = get_hosts_by_graphid($db_graph['templateid']);
+				$tmp_host = DBfetch($tmp_hhosts);
 
 				if( !uint_in_array($tmp_host['hostid'], $templateid))
 					continue;
