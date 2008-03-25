@@ -591,7 +591,7 @@ require_once "include/items.inc.php";
 		return	false;
 	}
 
-	function	&get_hosts_by_templateid($templateid)
+	function	get_hosts_by_templateid($templateid)
 	{
 		return DBselect("select h.* from hosts h, hosts_templates ht where h.hostid=ht.hostid and ht.templateid=$templateid");
 	}
@@ -881,7 +881,7 @@ require_once "include/items.inc.php";
  * Comments:
  *
  */
-	function	validate_group($perm, $options = array(),$group_var=null){
+	function validate_group($perm, $options = array(),$group_var=null){
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
 		$_REQUEST["groupid"]    = get_request("groupid",get_profile($group_var,0));
 
@@ -907,7 +907,7 @@ require_once "include/items.inc.php";
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *       If applicationid is NULL add application, in other cases update
 	 */
-	function	db_save_application($name,$hostid,$applicationid=null,$templateid=0)
+	function db_save_application($name,$hostid,$applicationid=null,$templateid=0)
 	{
 		if(!is_string($name)){
 			error("incorrect parameters for 'db_save_application'");
@@ -996,7 +996,7 @@ require_once "include/items.inc.php";
 	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
 	 *
 	 */
-	function	add_application($name,$hostid,$templateid=0)
+	function add_application($name,$hostid,$templateid=0)
 	{
 		return db_save_application($name,$hostid,null,$templateid);
 	}
@@ -1011,7 +1011,7 @@ require_once "include/items.inc.php";
 	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
 	 *
 	 */
-	function	update_application($applicationid,$name,$hostid,$templateid=0)
+	function update_application($applicationid,$name,$hostid,$templateid=0)
 	{
 		return db_save_application($name,$hostid,$applicationid,$templateid);
 	}
@@ -1028,7 +1028,7 @@ require_once "include/items.inc.php";
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	delete_application($applicationid)
+	function delete_application($applicationid)
 	{
 		$app = get_application_by_applicationid($applicationid);
 		$host = get_host_by_hostid($app["hostid"]);
@@ -1065,7 +1065,7 @@ require_once "include/items.inc.php";
 		return $result;
 	}
 
-	function	get_application_by_applicationid($applicationid,$no_error_message=0)
+	function get_application_by_applicationid($applicationid,$no_error_message=0)
 	{
 		$result = DBselect("select * from applications where applicationid=".$applicationid);
 		$row=DBfetch($result);
@@ -1079,12 +1079,12 @@ require_once "include/items.inc.php";
 		
 	}
 
-	function	&get_applications_by_templateid($applicationid)
+	function get_applications_by_templateid($applicationid)
 	{
 		return DBselect("select * from applications where templateid=".$applicationid);
 	}
 
-	function	get_realhost_by_applicationid($applicationid)
+	function get_realhost_by_applicationid($applicationid)
 	{
 		$application = get_application_by_applicationid($applicationid);
 		if($application["templateid"] > 0)
@@ -1093,7 +1093,7 @@ require_once "include/items.inc.php";
 		return get_host_by_applicationid($applicationid);
 	}
 
-	function	get_host_by_applicationid($applicationid)
+	function get_host_by_applicationid($applicationid)
 	{
 		$sql="select h.* from hosts h, applications a where a.hostid=h.hostid and a.applicationid=$applicationid";
 		$result=DBselect($sql);
@@ -1106,12 +1106,12 @@ require_once "include/items.inc.php";
 		return	false;
 	}
 
-	function	&get_items_by_applicationid($applicationid)
+	function get_items_by_applicationid($applicationid)
 	{
 		return DBselect("select i.* from items i,items_applications ia where i.itemid=ia.itemid and ia.applicationid=$applicationid");
 	}
 
-	function	&get_applications_by_hostid($hostid)
+	function get_applications_by_hostid($hostid)
 	{
 		return DBselect('select * from applications where hostid='.$hostid);
 	}
@@ -1130,7 +1130,7 @@ require_once "include/items.inc.php";
 	 *           $templateid can be numeric or numeric array
 	 *
 	 */
-	function        delete_template_applications($hostid, $templateid = null, $unlink_mode = false)
+	function delete_template_applications($hostid, $templateid = null, $unlink_mode = false)
 	{
 		$db_apps = get_applications_by_hostid($hostid);
 		while($db_app = DBfetch($db_apps))
@@ -1184,7 +1184,7 @@ require_once "include/items.inc.php";
 	 *           $templateid can be numeric or numeric array
 	 *
 	 */
-	function	copy_template_applications($hostid, $templateid = null, $copy_mode = false)
+	function copy_template_applications($hostid, $templateid = null, $copy_mode = false)
 	{
 		if(null == $templateid)
 		{
@@ -1222,7 +1222,7 @@ require_once "include/items.inc.php";
 	 *           $templateid_list can be numeric or numeric array
 	 *
 	 */
-	function	validate_templates($templateid_list)
+	function validate_templates($templateid_list)
 	{
 		if(is_numeric($templateid_list))return true;
 		if(!is_array($templateid_list))	return false;
@@ -1246,10 +1246,8 @@ require_once "include/items.inc.php";
 		return $result;
 	}
 				
-	function	host_status2str($status)
-	{
-		switch($status)
-		{
+	function host_status2str($status){
+		switch($status){
 			case HOST_STATUS_MONITORED:	$status = S_MONITORED;		break;
 			case HOST_STATUS_NOT_MONITORED:	$status = S_NOT_MONITORED;	break;
 			case HOST_STATUS_TEMPLATE:	$status = S_TEMPLATE;		break;
@@ -1260,10 +1258,8 @@ require_once "include/items.inc.php";
 		return $status;
 	}
 	
-	function	host_status2style($status)
-	{
-		switch($status)
-		{
+	function host_status2style($status){
+		switch($status){
 			case HOST_STATUS_MONITORED:	$status = 'off';	break;
 			case HOST_STATUS_NOT_MONITORED:	$status = 'on';		break;
 			default:
@@ -1274,7 +1270,7 @@ require_once "include/items.inc.php";
 	
 // Add Host Profile
 
-	function	add_host_profile($hostid,$devicetype,$name,$os,$serialno,$tag,$macaddress,$hardware,$software,$contact,$location,$notes){
+	function add_host_profile($hostid,$devicetype,$name,$os,$serialno,$tag,$macaddress,$hardware,$software,$contact,$location,$notes){
 		
 		$result=DBselect("select * from hosts_profiles where hostid=$hostid");
 		if(DBfetch($result)){
@@ -1294,7 +1290,7 @@ require_once "include/items.inc.php";
 
 // Delete Host Profile
 
-	function	delete_host_profile($hostid){
+	function delete_host_profile($hostid){
 		$result=DBexecute("delete from hosts_profiles where hostid=$hostid");
 
 	return $result;
