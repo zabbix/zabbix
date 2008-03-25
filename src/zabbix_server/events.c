@@ -185,8 +185,8 @@ int	process_event(DB_EVENT *event)
 	/* Cancel currently active alerts */
 /*	if(event->value == TRIGGER_VALUE_FALSE || event->value == TRIGGER_VALUE_TRUE)
 	{
-		DBexecute("update alerts set retries=3,error='Trigger changed its status. Will not send repeats.' where triggerid=" ZBX_FS_UI64 " and repeats>0 and status=%d",
-			event->triggerid, ALERT_STATUS_NOT_SENT);
+		DBexecute("update alerts set retries=3,error='Trigger changed its status. Will not send repeats.' where eventid=" ZBX_FS_UI64 " and repeats>0 and status=%d",
+			event->eventid, ALERT_STATUS_NOT_SENT);
 	}*/
 
 	if(event->skip_actions == 0)
