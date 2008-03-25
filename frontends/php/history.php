@@ -536,20 +536,20 @@ COpt::profiling_start("history");
 					$value = $row["value"]; 
 
 				$new_row = array(date("Y.M.d H:i:s",$row["clock"]));
-				if(str_in_array($item_type,array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64)))
-				{
+				if(str_in_array($item_type,array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))){
 					array_push($new_row,$value);
 				}
-				else
-				{
-					array_push($new_row,array("<pre>",htmlspecialchars($value),"</pre>"));
+				else{
+					$pre = new CTag('pre','yes');
+					$pre->AddItem($value);
+					
+					array_push($new_row,$pre);
 				}
-				if(!isset($_REQUEST["plaintext"]))
-				{
+				
+				if(!isset($_REQUEST["plaintext"])){
 					$table->ShowRow($new_row);
 				}
-				else
-				{
+				else{
 					echo date("Y-m-d H:i:s",$row["clock"]);
 					echo "\t".$row["clock"]."\t".$row["value"]."\n";
 				}

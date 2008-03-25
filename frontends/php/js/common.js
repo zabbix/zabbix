@@ -527,9 +527,11 @@ function remove_childs(form_name,rmvbyname,tag){
 function remove_element(elmnt,tag){
 	if(elmnt.nodeName == tag){
 		elmnt.parentNode.removeChild(elmnt);
-	} else if(elmnt.nodeType == 9){
+	} 
+	else if(elmnt.nodeType == 9){
 		return;
-	} else {
+	} 
+	else {
 		remove_element(elmnt.parentNode,tag);
 	}
 }
