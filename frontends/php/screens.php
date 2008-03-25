@@ -28,7 +28,7 @@
 	$page["title"] = "S_CUSTOM_SCREENS";
 	$page["file"] = "screens.php";
 	$page['hist_arg'] = array('config','elementid');
-	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbox.js','sbinit.js'); //do not change order!!!
+	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js'); //do not change order!!!
 
 	$_REQUEST["fullscreen"] = get_request("fullscreen", 0);
 

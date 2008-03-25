@@ -1232,8 +1232,7 @@
 							' AND object='.EVENT_OBJECT_TRIGGER.
 						' ORDER BY clock desc',1);
 		$last_value = DBfetch($result);
-		if($last_value)
-		{
+		if($last_value){
 			if($value == $last_value['value'])
 				return false;
 		}
@@ -1248,8 +1247,7 @@
 	return true;
 	}
 
-	function	add_trigger_dependency($triggerid,$depid)
-	{
+	function add_trigger_dependency($triggerid,$depid){
 		$result=insert_dependency($triggerid,$depid);;
 		if(!$result)
 		{

@@ -26,7 +26,7 @@
 	$page["file"]	= "history.php";
 	$page["title"]	= "S_HISTORY";
 	$page['hist_arg'] = array('hostid','grouid','graphid','period','dec','inc','left','right','stime');
-	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbox.js','sbinit.js');
+	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js');
 	
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 		

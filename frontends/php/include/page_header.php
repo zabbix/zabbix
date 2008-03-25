@@ -426,9 +426,11 @@ COpt::profiling_start("page");
 		foreach($page['scripts'] as $id => $script){
 			if(file_exists('js/'.$script)){
 				echo '    <script type="text/javascript" src="js/'.$script.'"></script>'."\n";
-			} elseif(file_exists($script)){
+			} 
+			else if(file_exists($script)){
 				echo '    <script type="text/javascript" src="'.$script.'"></script>'."\n";
-			} else {
+			} 
+			else {
 				echo '<!-- js script "'.$script.'" not found-->'."\n";
 			}
 		}
