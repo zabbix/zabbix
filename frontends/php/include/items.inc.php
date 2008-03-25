@@ -612,6 +612,7 @@
 			$db_tmp_item["logtimefmt"],
 			$db_tmp_item["valuemapid"],
 			$db_tmp_item["delay_flex"],
+			$db_tmp_item["params"],
 			get_same_applications_for_host(get_applications_by_itemid($db_tmp_item["itemid"]),$hostid),
 			$copy_mode ? 0 : $db_tmp_item["itemid"]);
 	}
@@ -647,7 +648,6 @@
 		
 		while($db_tmp_item = DBfetch($db_tmp_items))
 		{
-			$apps = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item["itemid"]),$hostid);
 			add_item(
 				$db_tmp_item["description"],
 				$db_tmp_item["key_"],
@@ -674,7 +674,7 @@
 				$db_tmp_item["valuemapid"],
 				$db_tmp_item["delay_flex"],
 				$db_tmp_item["params"],
-				$apps,
+				get_same_applications_for_host(get_applications_by_itemid($db_tmp_item["itemid"]),$hostid),
 				$copy_mode ? 0 : $db_tmp_item["itemid"]);
 		}
 	}
@@ -1048,19 +1048,17 @@ COpt::profiling_stop('prepare table');
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function get_same_applications_for_host($applications, $hostid)
-	{
+	function get_same_applications_for_host($applications, $hostid){
 		$child_applications = array();
 
-		foreach($applications as $appid)
-		{
+		foreach($applications as $appid){
 			$db_apps = DBselect("select a1.applicationid from applications a1, applications a2".
 					" where a1.name=a2.name and a1.hostid=".$hostid." and a2.applicationid=".$appid);
 			$db_app = DBfetch($db_apps);
 			if(!$db_app) continue;
 			array_push($child_applications,$db_app["applicationid"]);
 		}
-		return $child_applications;
+	return $child_applications;
 	}
 
 	/******************************************************************************

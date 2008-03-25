@@ -527,15 +527,15 @@ include_once "include/page_header.php";
 
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 
-	if(isset($_REQUEST["form_mass_update"]) && isset($_REQUEST["group_itemid"]))
-	{
+	if(isset($_REQUEST["form_mass_update"]) && isset($_REQUEST["group_itemid"])){
 		echo SBR;
 		insert_mass_update_item_form("group_itemid");
-	} else if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["group_itemid"]))
-	{
+	} 
+	else if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["group_itemid"])){
 		echo SBR;
 		insert_copy_elements_to_forms("group_itemid");
-	} elseif (!isset($_REQUEST["form"]) ||  !str_in_array($_REQUEST["form"],array(S_CREATE_ITEM,"update","clone"))) {
+	} 
+	else if (!isset($_REQUEST["form"]) ||  !str_in_array($_REQUEST["form"],array(S_CREATE_ITEM,"update","clone"))) {
 		echo SBR;
 // Table HEADER
 		$form = new CForm();
