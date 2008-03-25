@@ -27,7 +27,7 @@
 	$page["title"] = "S_DETAILS_OF_SCENARIO";
 	$page["file"] = "httpdetails.php";
 	$page['hist_arg'] = array('hostid','grouid','graphid','period','stime');
-	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbox.js','sbinit.js');
+	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js');
 	
 	define('ZBX_PAGE_DO_REFRESH', 1);
 
