@@ -1,5 +1,6 @@
 Changes for 1.4.5:
 
+ - [ZBX-295] fixed processing of null values under Oracle. Thanks to Max Lapan. (Sasha)
  - [ZBX-340] Oracle related fixes (Sasha)
  - [ZBX-294,ZBX-296] Oracle related fixes (Sasha)
  - [ZBX-343] fixed possible hang of server trapper process (Alexei)
