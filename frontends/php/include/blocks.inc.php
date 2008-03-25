@@ -650,12 +650,14 @@ function make_latest_issues($available_hosts=false){
 				$actions->AddRow(array($tdl,$tdc,$tdr));
 			}
 //--------			
-		
+			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"events.php?triggerid=".$row["triggerid"].'&source=0',"action");
+			$clock->SetTarget('_blank');
+			
 			$table->AddRow(array(
 				get_node_name_by_elid($row['triggerid']),
 				$host,
 				new CCol($description,get_severity_style($row["priority"])),
-				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"events.php?triggerid=".$row["triggerid"],"action"),					
+				$clock,
 				zbx_date2age($row_event['clock']),
 				($config['event_ack_enable'])?(new CCol($ack,"center")):NULL,
 				$actions

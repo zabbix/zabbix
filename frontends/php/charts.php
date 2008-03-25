@@ -26,7 +26,7 @@
 	$page['title'] = 'S_CUSTOM_GRAPHS';
 	$page['file'] = 'charts.php';
 	$page['hist_arg'] = array('hostid','grouid','graphid','period','dec','inc','left','right','stime');
-	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbox.js','sbinit.js');
+	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js');
 	
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 ?>
@@ -110,19 +110,21 @@ include_once 'include/page_header.php';
 	$_REQUEST["period"] = get_request("period",get_profile("web.graph[".$_REQUEST["graphid"]."].period", ZBX_PERIOD_DEFAULT));
 	$effectiveperiod = navigation_bar_calc();
 	
-	$options = array("allow_all_hosts","monitored_hosts","with_items");//, "always_select_first_host");
+	$options = array("allow_all_hosts","monitored_hosts","with_items");//, "always_select_first_host");//
 	if(!$ZBX_WITH_SUBNODES)	array_push($options,"only_current_node");
 	
 	validate_group_with_host(PERM_READ_ONLY,$options);
 
-	if($_REQUEST['graphid'] > 0 && $_REQUEST['hostid'] > 0)
-	{
+	if($_REQUEST['graphid'] > 0){
 		$result=DBselect('SELECT g.graphid '.
-					' FROM graphs g, graphs_items gi, items i'.
-					' WHERE i.hostid='.$_REQUEST['hostid'].
-						' AND gi.itemid = i.itemid'.
-						' AND gi.graphid = g.graphid '.
-						' AND g.graphid='.$_REQUEST['graphid']);
+					' FROM graphs g, graphs_items gi, items i, hosts_groups hg'.
+					' WHERE g.graphid='.$_REQUEST['graphid'].
+						' AND gi.graphid=g.graphid '.
+						' AND i.itemid=gi.itemid '.
+						' AND hg.hostid=i.hostid '.
+						($_REQUEST['hostid']?' AND i.hostid='.$_REQUEST['hostid']:'').
+						($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'')
+					);
 
 		if(!DBfetch($result)) $_REQUEST['graphid'] = 0;
 	}
@@ -141,7 +143,7 @@ include_once 'include/page_header.php';
 	$availiable_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
 	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
 
-	if($_REQUEST['graphid'] > 0 && DBfetch(DBselect('select distinct graphid from graphs where graphid='.$_REQUEST['graphid'])))
+	if($_REQUEST['graphid'] > 0 && DBfetch(DBselect('SELECT DISTINCT graphid FROM graphs WHERE graphid='.$_REQUEST['graphid'])))
 	{
 		if(! ($row = DBfetch(DBselect(' SELECT distinct h.host, g.name '.
 					' FROM hosts h, items i, graphs_items gi, graphs g '.
@@ -160,23 +162,6 @@ include_once 'include/page_header.php';
 			access_deny();
 		}
 		array_push($h1, new CLink($row['name'], '?graphid='.$_REQUEST['graphid'].(isset($_REQUEST['fullscreen']) ? '' : '&fullscreen=1')));
-
-		if(infavorites('web.favorite.graphids',$_REQUEST['graphid'],'graphs')){
-			$icon = new CDiv(SPACE,'iconminus');
-			$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
-			$icon->AddAction('onclick',new CScript("javascript: rm4favorites('graphs','".$_REQUEST['graphid']."',0);"));
-		}
-		else{
-			$icon = new CDiv(SPACE,'iconplus');
-			$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
-			$icon->AddAction('onclick',new CScript("javascript: add2favorites('graphs','".$_REQUEST['graphid']."');"));
-		}
-		$icon->AddOption('id','addrm_fav');
-
-		$icon_tab = new CTable();
-		$icon_tab->AddRow(array($icon,SPACE,$h1));
-		
-		$h1 = $icon_tab;
 	}
 	else
 	{
@@ -382,6 +367,25 @@ include_once 'include/page_header.php';
 	}
 	
 	$r_form->AddItem(array(SPACE.S_GRAPH.SPACE,$cmbGraph));
+	
+	if($_REQUEST['graphid'] > 0){
+		if(infavorites('web.favorite.graphids',$_REQUEST['graphid'],'graphs')){
+			$icon = new CDiv(SPACE,'iconminus');
+			$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
+			$icon->AddAction('onclick',new CScript("javascript: rm4favorites('graphs','".$_REQUEST['graphid']."',0);"));
+		}
+		else{
+			$icon = new CDiv(SPACE,'iconplus');
+			$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
+			$icon->AddAction('onclick',new CScript("javascript: add2favorites('graphs','".$_REQUEST['graphid']."');"));
+		}
+		$icon->AddOption('id','addrm_fav');
+
+		$icon_tab = new CTable();
+		$icon_tab->AddRow(array($icon,SPACE,$h1));
+		
+		$h1 = $icon_tab;
+	}
 	
 	show_table_header($h1, $r_form);
 ?>
