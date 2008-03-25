@@ -209,10 +209,10 @@ include_once "include/page_header.php";
 								' where t.triggerid=f.triggerid and f.itemid=i.itemid'.
 								' group by f.triggerid, i.hostid, t.description',
 					S_GRAPH		=> !isset($graphs[$host['hostid']]) ? null :
-								'select g.name as info, i.hostid, count(distinct i.hostid) as cnt'.
+								'select MIN(g.name) as info, i.hostid, count(distinct i.hostid) as cnt'.
 								' from graphs_items gi, items i, graphs g '.
 								' where g.graphid=gi.graphid and gi.itemid=i.itemid'.
-								' group by gi.graphid, i.hostid'
+								' group by gi.graphid, i.hostid '
 
 					);
 				foreach($sqls as $el_type => $sql)
