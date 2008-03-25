@@ -490,7 +490,7 @@ typedef enum
 #define	AGENT_TIMEOUT	3
 
 #define	SENDER_TIMEOUT		60
-#define	TRAPPER_TIMEOUT		5
+#define	ZABBIX_TRAPPER_TIMEOUT	300
 #define	SNMPTRAPPER_TIMEOUT	5
 
 #ifndef MAX
