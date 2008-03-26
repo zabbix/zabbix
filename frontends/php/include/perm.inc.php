@@ -247,10 +247,10 @@ COpt::counter_up('perm');
 //			It seems that host details are not required by the logic
 //			$host_data += DBfetch(DBselect('select * from hosts where hostid='.$host_data['hostid']));
 
-			if(is_null($host_data['nodeid'])) $host_data['nodeid'] = id2nodeid($host_data['hostid']);
+			if(empty($host_data['nodeid'])) $host_data['nodeid'] = id2nodeid($host_data['hostid']);
 
 			/* if no rights defined used node rights */
-			if( (is_null($host_data['permission']) || is_null($host_data['userid'])) ){
+			if( (empty($host_data['permission']) || is_null($host_data['userid'])) ){
 				if( isset($processed[$host_data['hostid']]) )
 					continue;
 

@@ -68,8 +68,6 @@
 					} 
 					else if(!is_null($el)){
 						parent::AddItem(new CCol($el));
-					} else {
-						parent::AddItem('<td></td>');
 					}
 				}
 			}
