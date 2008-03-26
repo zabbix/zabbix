@@ -282,7 +282,7 @@
 				$result = DBexecute('commit;');
 				break;
 			case "ORACLE":
-				$result = ocicommit();
+				$result = ocicommit($DB);
 				$DB_TRANSACTIONS = 0;
 				break;
 			case "SQLITE3":
@@ -313,7 +313,7 @@
 				$result = DBexecute('rollback;');
 				break;
 			case "ORACLE":
-				$result = ocirollback();
+				$result = ocirollback($DB);
 				$DB_TRANSACTIONS = 0;
 				break;
 			case "SQLITE3":
@@ -475,7 +475,7 @@
 	return $result;
 	}
 
-	function	DBfetch(&$cursor){
+	function DBfetch(&$cursor){
 		global $DB, $DB_TYPE;
 	
 		$result = false;
@@ -492,7 +492,7 @@
 				if(ocifetchinto($cursor, $row, (OCI_ASSOC+OCI_RETURN_NULLS))){
 					$result = array();
 					foreach($row as $key => $value){
-						$result[strtolower($key)] = $value;
+						$result[strtolower($key)] = (str_in_array(strtolower(ocicolumntype($cursor,$key)),array('varchar2','blob','clob')) && is_null($value))?'':$value;
 					}
 				}
 				break;

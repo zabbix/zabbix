@@ -252,10 +252,10 @@ include_once "include/page_header.php";
 				make_sorting_link(S_DIMENSION_COLS_ROWS,'size'),
 				S_SCREEN));
 
-			$result=DBselect('SELECT s.screenid,s.name,s.hsize,s.vsize,(s.hsize*s.vsize) as size '.
+			$result=DBselect('SELECT s.screenid,s.name,s.hsize,s.vsize,(s.hsize*s.vsize) as s_size '.
 							' FROM screens s '.
 							' WHERE '.DBin_node('s.screenid').
-							order_by('s.name,size','s.screenid'));
+							order_by('s.name,s_size','s.screenid'));
 			while($row=DBfetch($result)){
 				
 				if(!screen_accessiable($row["screenid"], PERM_READ_WRITE)) continue;
