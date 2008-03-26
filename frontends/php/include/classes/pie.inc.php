@@ -173,7 +173,7 @@ function selectData(){
 		}
 		
 		$this->sum += $item_value;
-		$strvaluelength = max($strvaluelength,strlen($item_value));
+		$strvaluelength = max($strvaluelength,strlen(convert_units($item_value,$this->items[$i]['unit'])));
 	}
 	
 	if(isset($graph_sum)) $this->sum = $graph_sum;
@@ -303,9 +303,10 @@ function drawLegend(){
 		}
 		
 		$proc = ($datavalue * 100)/ $this->sum;
-		
+//		convert_units($datavalue,$this->items[$i]["units"]),
 		if(isset($data) && isset($datavalue)){
-			$strvalue = sprintf(S_VALUE.': '.((round($datavalue)!=$datavalue)?'%0.4f':'%s').' ('.((round($proc)!=$proc)?'%0.2f':'%s')."%s)",$datavalue,$proc,'%');
+			$strvalue = sprintf(S_VALUE.': %s ('.((round($proc)!=$proc)?'%0.2f':'%s')."%s)",convert_units($datavalue,$this->items[$i]["units"]),$proc,'%');
+
 			$str = sprintf('%s: %s [%s] ',
 					str_pad($this->items[$i]['host'],$max_host_len,' '),
 					str_pad($this->items[$i]['description'],$max_desc_len,' '),
