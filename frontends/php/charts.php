@@ -428,15 +428,8 @@ include_once 'include/page_header.php';
 		if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
 			$row = 	"\n".'<script language="javascript" type="text/javascript">
 				<!--
-				A_SBOX["'.$dom_graph_id.'"] = new Object;
-				A_SBOX["'.$dom_graph_id.'"].shiftT = 17;
-				A_SBOX["'.$dom_graph_id.'"].shiftL = '.$shiftXleft.';
-
-				var ZBX_G_WIDTH = get_bodywidth();		
-				ZBX_G_WIDTH-= parseInt('.($shiftXleft+$shiftXright).'+parseInt((SF)?10:10));
-
 				document.write(\'<img id="'.$dom_graph_id.'" src="chart6.php?graphid='.$_REQUEST['graphid'].url_param('stime').
-				'&period='.$effectiveperiod.'&width=\'+ZBX_G_WIDTH+\'" /><br />\');
+				'&period='.$effectiveperiod.'" /><br />\');
 				-->
 				</script>'."\n";
 		}
@@ -473,10 +466,11 @@ include_once 'include/page_header.php';
 			$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 		}
 		
-		$script = 	'scrollinit(0,0,0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');
-					showgraphmenu("graph");
-					graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH,'.$graph_height.');
-					';
+		$script = 'scrollinit(0,0,0,'.$effectiveperiod.','.$stime.',0,'.$bstime.'); showgraphmenu("graph");';
+		
+		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
+			$script.= 'graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH,'.$graph_height.');'; 
+		}
 						
 		zbx_add_post_js($script);
 //		navigation_bar('charts.php',array('groupid','hostid','graphid'));

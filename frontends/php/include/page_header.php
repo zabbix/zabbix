@@ -105,7 +105,7 @@ COpt::profiling_start("page");
 					array(
 							"url"=>"dashboard.php",
 							"label"=>S_DASHBOARD,
-							"sub_pages"=>array("chart2.php","charts.php","screens.php","maps.php","map.php")
+							"sub_pages"=>array("chart2.php","chart6.php","charts.php","screens.php","maps.php","map.php")
 						),
 					array("url"=>"overview.php"	,"label"=>S_OVERVIEW	),
 					array(
@@ -139,7 +139,7 @@ COpt::profiling_start("page");
 							"url"=>"srv_status.php",
 							"label"=>S_IT_SERVICES,
 							'forse_disable_subnodes' => true,
-							"sub_pages"=>array("report3.php","chart_sla.php","chart5.php")
+							"sub_pages"=>array("report3.php","report7.php","chart_sla.php","chart5.php")
 						),
 					array("url"=>"vtext.php"),
 					array("url"=>"chart3.php")
