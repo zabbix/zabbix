@@ -87,6 +87,7 @@ function selectData(){
 
 	for($i=0; $i < $this->num; $i++){
 	
+		$real_item = get_item_by_itemid($this->items[$i]['itemid']);
 		$type = $this->items[$i]['calc_type'];
 
 		$from_time	= $this->from_time;
@@ -94,7 +95,9 @@ function selectData(){
 		
 		$sql_arr = array();
 				
-		if(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)){
+		if((($real_item['history']*86400) > (time()-($from_time+$this->period/2))) &&				// should pick data from history or trends
+			(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))		// is reasonable to take data from history?
+		{
 			array_push($sql_arr,
 				'SELECT h.itemid, '.
 					' avg(h.value) AS avg,min(h.value) AS min, '.
