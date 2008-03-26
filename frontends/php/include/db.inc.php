@@ -415,11 +415,22 @@ COpt::savesqlrequest($query);
 				$result = pg_fetch_array($cursor);
 				break;
 			case "ORACLE":
+				$text_datatypes = array('VARCHAR2','CLOB');
 				if(ocifetchinto($cursor, $row, OCI_ASSOC+OCI_NUM+OCI_RETURN_NULLS))
 				{
 					$result = array();
 					$keys = (array_keys($row));
-					foreach ($keys as $k)		$result[strtolower($k)] = $row[$k];
+					foreach ($keys as $k)
+					{
+						$field = is_int($k) ? $k + 1 : $k;
+						$column_type  = ocicolumntype($cursor, $field);
+						$field_is_null = ocicolumnisnull($cursor, $field);
+
+						if ($field_is_null && str_in_array($column_type,$text_datatypes))
+							$result[strtolower($k)] = '';
+						else
+							$result[strtolower($k)] = $row[$k];
+					}
 				} 
 				break;
 			case "SQLITE3":

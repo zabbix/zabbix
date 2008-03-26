@@ -66,8 +66,6 @@
                 		        	parent::AddItem($el);
 					} elseif(!is_null($el)) {
 						parent::AddItem('<td>'.unpack_object($el).'</td>');
-					} else {
-						parent::AddItem('<td></td>');
 					}
 				}
 			}
