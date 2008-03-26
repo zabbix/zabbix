@@ -168,7 +168,7 @@ class Chart extends Graph{
 		if($this->m_showWorkPeriod != 1) return;
 		if($this->period > 2678400) return; // > 31*24*3600 (month)
 
-		$db_work_period = DBselect("select work_period from config");
+		$db_work_period = DBselect("SELECT work_period FROM config");
 		$work_period = DBfetch($db_work_period);
 		if(!$work_period)
 			return;
@@ -229,13 +229,18 @@ class Chart extends Graph{
 		$max = 3;
 		$cnt = 0;
 
-		$db_triggers = DBselect("select distinct tr.triggerid,tr.expression,tr.priority from triggers tr,functions f,items i".
-			" where tr.triggerid=f.triggerid and f.function in ('last','min','max') and".
-			" tr.status=".TRIGGER_STATUS_ENABLED." and i.itemid=f.itemid and f.itemid=".$this->items[0]["itemid"]." order by tr.priority");
+		$db_triggers = DBselect('SELECT distinct tr.triggerid,tr.expression,tr.priority '.
+						' FROM triggers tr,functions f,items i'.
+						' WHERE tr.triggerid=f.triggerid '.
+							' AND f.function in ("last","min","max") '.
+							' AND tr.status='.TRIGGER_STATUS_ENABLED.
+							' AND i.itemid=f.itemid '.
+							' AND f.itemid='.$this->items[0]["itemid"].
+						' ORDER BY tr.priority');
 
 		while(($trigger = DBfetch($db_triggers)) && ($cnt < $max))
 		{
-			$db_fnc_cnt = DBselect('select count(*) as cnt from functions f where f.triggerid='.$trigger['triggerid']);
+			$db_fnc_cnt = DBselect('SELECT count(*) as cnt FROM functions f WHERE f.triggerid='.$trigger['triggerid']);
 			$fnc_cnt = DBfetch($db_fnc_cnt);
 			if($fnc_cnt['cnt'] != 1) continue;
 
@@ -671,7 +676,8 @@ class Chart extends Graph{
 		$x = $this->sizeX;		// graph size in px	
 
 		for($i=0; $i < $this->num; $i++){
-		
+
+			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
 			$type = $this->items[$i]["calc_type"];
 
 			if($type == GRAPH_ITEM_AGGREGATED) {
@@ -685,33 +691,45 @@ class Chart extends Graph{
 			
 			$calc_field = 'round('.$x.'*(mod('.zbx_dbcast_2bigint('clock').'+'.$z.','.$p.'))/('.$p.'),0)';  /* required for 'group by' support of Oracle */
 			$sql_arr = array();
-			
-			if(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)){
+	
+			if((($real_item['history']*86400) > (time()-($from_time+$this->period/2))) &&				// should pick data from history or trends
+				(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))		// is reasonable to take data from history?
+			{
 				array_push($sql_arr,
-					'select itemid,'.$calc_field.' as i,'.
-					' count(*) as count,avg(value) as avg,min(value) as min,'.
-					' max(value) as max,max(clock) as clock'.
-					' from history where itemid='.$this->items[$i]['itemid'].' and clock>='.$from_time.
-					' and clock<='.$to_time.' group by itemid,'.$calc_field
+					'SELECT itemid,'.$calc_field.' as i,'.
+						' count(*) as count,avg(value) as avg,min(value) as min,'.
+						' max(value) as max,max(clock) as clock'.
+					' FROM history '.
+					' WHERE itemid='.$this->items[$i]['itemid'].
+						' AND clock>='.$from_time.
+						' AND clock<='.$to_time.
+					' GROUP BY itemid,'.$calc_field
 					,
 
-					'select itemid,'.$calc_field.' as i,'.
-					' count(*) as count,avg(value) as avg,min(value) as min,'.
-					' max(value) as max,max(clock) as clock'.
-					' from history_uint where itemid='.$this->items[$i]['itemid'].' and clock>='.$from_time.
-					' and clock<='.$to_time.' group by itemid,'.$calc_field
+					'SELECT itemid,'.$calc_field.' as i,'.
+						' count(*) as count,avg(value) as avg,min(value) as min,'.
+						' max(value) as max,max(clock) as clock'.
+					' FROM history_uint '.
+					' WHERE itemid='.$this->items[$i]['itemid'].
+						' AND clock>='.$from_time.
+						' AND clock<='.$to_time.
+					' GROUP BY itemid,'.$calc_field
 					);
 			}
 			else{
 				array_push($sql_arr,
-					'select itemid,'.$calc_field.' as i,'.
-					' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
-					' max(value_max) as max,max(clock) as clock'.
-					' from trends where itemid='.$this->items[$i]['itemid'].' and clock>='.$from_time.
-					' and clock<='.$to_time.' group by itemid,'.$calc_field
+					'SELECT itemid,'.$calc_field.' as i,'.
+						' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
+						' max(value_max) as max,max(clock) as clock'.
+					' FROM trends '.
+					' WHERE itemid='.$this->items[$i]['itemid'].
+						' AND clock>='.$from_time.
+						' AND clock<='.$to_time.
+					' GROUP BY itemid,'.$calc_field
 					);
 					
-				$this->items[$i]['delay'] = max(($this->items[$i]['delay']*ZBX_GRAPH_MAX_DELAY),ZBX_MAX_TREND_DIFF)/ZBX_GRAPH_MAX_DELAY + 1;
+//				$this->items[$i]['delay'] = max(($this->items[$i]['delay']*ZBX_GRAPH_MAX_DELAY),ZBX_MAX_TREND_DIFF)/ZBX_GRAPH_MAX_DELAY + 1;
+				$this->items[$i]['delay'] = max($this->items[$i]['delay'],3600);
 			}
 //SDI($sql_arr);
 			$curr_data = &$this->data[$this->items[$i]["itemid"]][$type];
@@ -775,7 +793,7 @@ class Chart extends Graph{
 
 					$first_idx = $ci - $dx;
 
-					if($first_idx < 0)	$first_idx = $ci; // if no data from start of graph get current data as first data
+					if($first_idx < 0)	$first_idx = $ci; // if no data FROM start of graph get current data as first data
 
 					for(;$cj > 0; $cj--){
 					
