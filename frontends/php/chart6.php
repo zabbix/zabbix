@@ -23,7 +23,7 @@
 	require_once "include/graphs.inc.php";
 	require_once "include/classes/pie.inc.php";
 	
-	$page["file"]	= "chart2.php";
+	$page["file"]	= "chart6.php";
 	$page["title"]	= "S_CHART";
 	$page["type"]	= PAGE_TYPE_IMAGE;
 
