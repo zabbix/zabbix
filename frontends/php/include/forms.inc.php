@@ -2788,7 +2788,7 @@ include_once 'include/discovery.inc.php';
 			$status 	= $action['status'];
 
 			/* prepare conditions */
-			$db_conditions = DBselect('select conditiontype, operator, value from conditions'.
+			$db_conditions = DBselect('select conditiontype, operator, value from conditions '.
 				' where actionid='.$_REQUEST['actionid'].' order by conditiontype,conditionid');
 
 			while($condition_data = DBfetch($db_conditions))

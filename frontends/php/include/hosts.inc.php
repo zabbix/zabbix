@@ -454,14 +454,14 @@ require_once "include/items.inc.php";
 
 	// disable actions
 		$db_actions = DBselect("select distinct actionid from conditions ".
-			" where conditiontype=".CONDITION_TYPE_HOST." and value=".$hostid);
+			" where conditiontype=".CONDITION_TYPE_HOST." and value=".zbx_dbstr($hostid));
 		while($db_action = DBfetch($db_actions))
 		{
 			DBexecute("update actions set status=".ACTION_STATUS_DISABLED.
 				" where actionid=".$db_action["actionid"]);
 		}
 	// delete action conditions
-		DBexecute('delete from conditions where conditiontype='.CONDITION_TYPE_HOST.' and value='.$hostid);
+		DBexecute('delete from conditions where conditiontype='.CONDITION_TYPE_HOST.' and value='.zbx_dbstr($hostid));
 
 	// delete host profile
 		delete_host_profile($hostid);
