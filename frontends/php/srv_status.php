@@ -19,9 +19,10 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/services.inc.php";
-
+	require_once("include/config.inc.php");
+	require_once("include/services.inc.php");
+	require_once('include/classes/ctree.inc.php');
+		
 	$page["title"] = "S_IT_SERVICES";
 	$page["file"] = "srv_status.php";
 	$page['scripts'] = array('services.js');
@@ -36,11 +37,26 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"serviceid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,			NULL),
-		"showgraph"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1")."isset({serviceid})",NULL)
+		"showgraph"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1")."isset({serviceid})",NULL),
+// ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'hat'"),		NULL),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
 	);
 
 	check_fields($fields);
-?>
+
+/* AJAX */	
+	if(isset($_REQUEST['favobj'])){
+		if('hat' == $_REQUEST['favobj']){
+			update_profile('web.srv_status.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state']);
+		}
+	}	
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+//--------?>
 <?php
         if( isset($_REQUEST["serviceid"]) && $_REQUEST["serviceid"] > 0 && ! (DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"]))) )
         {
@@ -67,7 +83,7 @@ include_once "include/page_header.php";
 	unset($_REQUEST['serviceid']);
 ?>
 <?php
-	show_table_header(S_IT_SERVICES_BIG);
+//	show_table_header(S_IT_SERVICES_BIG);
 
 	if(isset($service)&&isset($_REQUEST["showgraph"])){
 		$table  = new CTable(null,'chart');
@@ -91,21 +107,23 @@ include_once "include/page_header.php";
 		
 		$services = array();
 		$row = array(
-						'0' => 0,'serviceid' => 0,
-						'1' => 0,'serviceupid' => 0,
-						'2' => '','caption' => 'root',
-						'3' => '','status' => SPACE,
-						'4' => '','reason' => SPACE,
-						'5' => '','sla' => SPACE,
-						'6' => '','sla2' => SPACE,
-						'7' => '','graph' => SPACE,
-						'7' => '','linkid'=>''
+						'id' => 0,
+						'serviceid' => 0,
+						'serviceupid' => 0,
+						'caption' => 'root',
+						'status' => SPACE,
+						'reason' => SPACE,
+						'sla' => SPACE,
+						'sla2' => SPACE,
+						'graph' => SPACE,
+						'linkid'=>''
 						);
 		
 		$services[0]=$row;
 		$now=time();
 		
 		while($row = DBFetch($result)){
+			$row['id'] = $row['serviceid'];
 		
 			(empty($row['serviceupid']))?($row['serviceupid']='0'):('');
 			(empty($row['description']))?($row['description']='None'):('');
@@ -186,9 +204,18 @@ include_once "include/page_header.php";
 						'graph' => bold(S_GRAPH)));
 		
 		if($tree){
-			echo $tree->CreateJS();
-			echo $tree->SimpleHTML();
-		} else {
+			$tab = create_hat(
+					S_IT_SERVICES_BIG,
+					$tree->getHTML(),
+					null,
+					'hat_services',
+					get_profile('web.srv_status.hats.hat_services.state',1)
+				);
+				
+			$tab->Show();
+			unset($tab);
+		} 
+		else {
 			error('Can\'t format Tree. Check logick structure in service links');
 		}
 	}
