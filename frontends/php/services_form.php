@@ -447,7 +447,8 @@ if(isset($_REQUEST['sform'])){
 			array_push($childs,$child);
 		}
 //---
-	}else{
+	}
+	else{
 		$name		= get_request("name","");
 		$showsla	= get_request("showsla",0);
 		$goodsla	= get_request("goodsla",99.05);
@@ -467,12 +468,12 @@ if(isset($_REQUEST['sform'])){
 		$frmService->AddVar("serviceid",$service["serviceid"]);
 	}
 	
-	$frmService->AddRow(S_NAME,new CTextBox("name",$name));
+	$frmService->AddRow(S_NAME,new CTextBox("name",$name,60));
 	
 //link
 //-------------------------------------------- <LINK> --------------------------------------------
 //parent link
-	$ctb = new CTextBox("parent_name",$parentname);
+	$ctb = new CTextBox("parent_name",$parentname,60);
 	$ctb->Addoption('disabled','disabled');
 
 	$frmService->AddVar("parentname",$parentname);

@@ -416,20 +416,25 @@
 
 		$data[$period_start]['alarm'] = get_last_service_value($serviceid,$period_start);
 
-		$service_alarms = DBselect("SELECT clock,value FROM service_alarms".
-			" WHERE serviceid=".$serviceid." and clock>=".$period_start." and clock<=".$period_end." order by clock");
+		$service_alarms = DBselect('SELECT clock,value '.
+							' FROM service_alarms '.
+							' WHERE serviceid='.$serviceid.
+								' AND clock>='.$period_start.
+								' AND clock<='.$period_end.
+							' ORDER BY clock');
 
 		/* add alarms */
-		while($db_alarm_row = DBfetch($service_alarms))
-		{
+		while($db_alarm_row = DBfetch($service_alarms)){
 			$data[$db_alarm_row['clock']]['alarm'] = $db_alarm_row['value'];
 		}
 
 		/* add periodical downtimes */
-		$service_times = DBselect('SELECT ts_from,ts_to FROM services_times WHERE type='.SERVICE_TIME_TYPE_UPTIME.
-				' and serviceid='.$serviceid);
-		if($db_time_row = DBfetch($service_times))
-		{
+		$service_times = DBselect('SELECT ts_from,ts_to '.
+						' FROM services_times '.
+						' WHERE type='.SERVICE_TIME_TYPE_UPTIME.
+							' AND serviceid='.$serviceid);
+							
+		if($db_time_row = DBfetch($service_times)){
 			/* if exist any uptime - unmarked time is downtime */
 			$unmarked_period_type = 'dt';
 			do{
@@ -440,8 +445,7 @@
 
 			}while($db_time_row = DBfetch($service_times));
 		}
-		else
-		{
+		else{
 			/* if missed any uptime - unmarked time is uptime */
 			$unmarked_period_type = 'ut';
 		}
@@ -449,8 +453,7 @@
 		/* add periodical downtimes */
 		$service_times = DBselect('SELECT ts_from,ts_to FROM services_times WHERE type='.SERVICE_TIME_TYPE_DOWNTIME.
 				' and serviceid='.$serviceid);
-		while($db_time_row = DBfetch($service_times))
-		{
+		while($db_time_row = DBfetch($service_times)){
 			expand_periodical_service_times($data,
 				$period_start, $period_end,
 				$db_time_row['ts_from'], $db_time_row['ts_to'],
@@ -678,7 +681,7 @@ $dt = 0;
 				}			
 			}
 		} else {
-			$rows['caption'] = '<font style="color: #888888;">'.$rows['caption'].'</font>';
+			$rows['caption'] = new CSpan($rows['caption'],'unknown');
 			$temp[$rows['serviceid'].','.$linkid]=$rows;
 		}
 	return ;
