@@ -684,7 +684,8 @@ class Chart extends Graph{
 				/* skip current period */
 				$from_time	= $this->from_time - $this->period * $this->items[$i]["periods_cnt"];
 				$to_time	= $this->from_time;
-			} else {
+			} 
+			else {
 				$from_time	= $this->from_time;
 				$to_time	= $this->to_time;
 			}
