@@ -626,7 +626,7 @@ include_once "include/page_header.php";
 					$description,BR.BR.
 					"<strong>".S_DEPENDS_ON."</strong>".BR);
 
-				$deps = get_trigger_dependences_by_triggerid($row["triggerid"]);
+				$deps = get_trigger_dependencies_by_triggerid($row["triggerid"]);
 				
 				foreach($deps as $val)
 					$description[] = expand_trigger_description($val).BR;
