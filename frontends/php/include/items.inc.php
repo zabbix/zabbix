@@ -860,24 +860,37 @@ COpt::profiling_start('prepare data');
 
 		unset($items);
 		unset($hosts);
-		while($row = DBfetch($result))
-		{
+		// get rid of warnings about $triggers undefined
+		$items = array();
+		while($row = DBfetch($result)){
+			$descr = item_description($row["description"],$row["key_"]);
 			$row['host'] = get_node_name_by_elid($row['hostid']).$row['host'];
 			$hosts[strtolower($row['host'])] = $row['host'];
-			$items[item_description($row["description"],$row["key_"])][$row['host']] = array(
-				'itemid'	=> $row['itemid'],
-				'value_type'	=> $row['value_type'],
-				'lastvalue'	=> $row['lastvalue'],
-				'units'		=> $row['units'],
-				'description'	=> $row['description'],
-				'valuemapid'    => $row['valuemapid'],
-				'severity'	=> $row['priority'],
-				'tr_value'	=> $row['tr_value'],
-				'triggerid'	=> $row['triggerid']
+
+			// A little tricky check for attempt to overwrite active trigger (value=1) with
+			// inactive or active trigger with lower priority.
+			$val = 0;
+
+			if (array_key_exists($descr, $items) && array_key_exists($row['host'], $items[$descr])){
+				$prio = $items[$descr][$row['host']]['severity'];
+				$val  = $items[$descr][$row['host']]['tr_value'];
+			}
+
+			if((TRIGGER_VALUE_FALSE == $val) || ((TRIGGER_VALUE_TRUE == $row['tr_value']) && ($prio<$row['priority']))){
+				$items[$descr][$row['host']] = array(
+					'itemid'	=> $row['itemid'],
+					'value_type'=> $row['value_type'],
+					'lastvalue'	=> $row['lastvalue'],
+					'units'		=> $row['units'],
+					'description'=> $row['description'],
+					'valuemapid' => $row['valuemapid'],
+					'severity'	=> $row['priority'],
+					'tr_value'	=> $row['tr_value'],
+					'triggerid'	=> $row['triggerid']
 				);
+			}
 		}
-		if(!isset($hosts))
-		{
+		if(!isset($hosts)){
 			return $table;
 		}
 

@@ -1801,67 +1801,75 @@
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	get_triggers_overview($groupid)
-	{
+	function	get_triggers_overview($groupid){
 		global $USER_DETAILS;
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
-		if($groupid > 0)
-		{
-			$group_where = ',hosts_groups hg where hg.groupid='.$groupid.' and hg.hostid=h.hostid and';
-		} else {
-			$group_where = ' where';
-		}
 
-		$result=DBselect('select distinct t.triggerid,t.description,t.expression,t.value,t.priority,t.lastchange,h.hostid,h.host'.
-			' from hosts h,items i,triggers t, functions f '.$group_where.
-			' h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid'.
-			' and h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid()).') '.
-			' and t.status='.TRIGGER_STATUS_ENABLED.' and i.status='.ITEM_STATUS_ACTIVE.
-			' order by t.description');
+		$group_where=($groupid>0)?',hosts_groups hg WHERE hg.groupid='.$groupid.' and hg.hostid=h.hostid and':' WHERE ';
+
+		$result=DBselect('SELECT DISTINCT t.triggerid,t.description,t.expression,t.value,t.priority,t.lastchange,h.hostid,h.host'.
+						' FROM hosts h,items i,triggers t, functions f '.
+						$group_where.' h.status='.HOST_STATUS_MONITORED.
+							' AND h.hostid=i.hostid '.
+							' AND i.itemid=f.itemid '.
+							' AND f.triggerid=t.triggerid'.
+							' AND h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid()).') '.
+							' AND t.status='.TRIGGER_STATUS_ENABLED.
+							' AND i.status='.ITEM_STATUS_ACTIVE.
+						' ORDER BY t.description');
 		unset($triggers);
 		unset($hosts);
-		while($row = DBfetch($result))
-		{
+
+		$triggers = array();
+
+		while($row = DBfetch($result)){
 			$row['host'] = get_node_name_by_elid($row['hostid']).$row['host'];
 			$row['description'] = expand_trigger_description_constants($row['description'], $row);
 
 			$hosts[strtolower($row['host'])] = $row['host'];
-			$triggers[$row['description']][$row['host']] = array(
-				'hostid'	=> $row['hostid'], 
-				'triggerid'	=> $row['triggerid'], 
-				'value'		=> $row['value'], 
-				'lastchange'	=> $row['lastchange'],
-				'priority'	=> $row['priority']);
+
+			// A little tricky check for attempt to overwrite active trigger (value=1) with
+			// inactive or active trigger with lower priority.
+			$val = TRIGGER_VALUE_FALSE;
+
+			if (array_key_exists($row['description'], $triggers) && array_key_exists($row['host'], $triggers[$row['description']])){
+				$prio = $triggers[$row['description']][$row['host']]['priority'];
+				$val  = $triggers[$row['description']][$row['host']]['value'];
+			}
+
+			if((TRIGGER_VALUE_FALSE == $val) || ((TRIGGER_VALUE_TRUE == $row['value']) && ($prio<$row['priority']))){
+				$triggers[$row['description']][$row['host']] = array(
+					'hostid'	=> $row['hostid'],
+					'triggerid'	=> $row['triggerid'],
+					'value'		=> $row['value'],
+					'lastchange'	=> $row['lastchange'],
+					'priority'	=> $row['priority']);
+			}
 		}
-		if(!isset($hosts))
-		{
+		
+		if(!isset($hosts)){
 			return $table;
 		}
 		ksort($hosts);
 
 		$header=array(new CCol(S_TRIGGERS,'center'));
-		foreach($hosts as $hostname)
-		{
+		foreach($hosts as $hostname){
 			$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
 		}
 		$table->SetHeader($header,'vertical_header');
 
-		foreach($triggers as $descr => $trhosts)
-		{
+		foreach($triggers as $descr => $trhosts){
 			$table_row = array(nbsp($descr));
-			foreach($hosts as $hostname)
-			{
+			foreach($hosts as $hostname){
 				$css_class = NULL;
 
 				unset($tr_ov_menu);
 				$ack = null;
 				unset($style);
-				if(isset($trhosts[$hostname]))
-				{
+				if(isset($trhosts[$hostname])){
 					unset($ack_menu);
-					switch($trhosts[$hostname]['value'])
-					{
+					switch($trhosts[$hostname]['value']){
 						case TRIGGER_VALUE_TRUE:
 							$css_class = get_severity_style($trhosts[$hostname]['priority']);
 							if( ($ack = get_last_event_by_triggerid($trhosts[$hostname]['triggerid'])) )
