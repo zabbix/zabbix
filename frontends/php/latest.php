@@ -108,10 +108,10 @@ include_once "include/page_header.php";
 	$availiable_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
 	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
 
-	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
-		" where g.groupid in (".$availiable_groups.") ".
-		" and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
-		" and h.hostid=i.hostid and hg.hostid=h.hostid and i.status=".ITEM_STATUS_ACTIVE.
+	$result=DBselect("SELECT DISTINCT g.groupid,g.name FROM groups g, hosts_groups hg, hosts h, items i ".
+		" WHERE g.groupid in (".$availiable_groups.") ".
+		" AND hg.groupid=g.groupid AND h.status=".HOST_STATUS_MONITORED.
+		" AND h.hostid=i.hostid AND hg.hostid=h.hostid AND i.status=".ITEM_STATUS_ACTIVE.
 		" order by g.name");
 	while($row=DBfetch($result))
 	{
@@ -122,28 +122,35 @@ include_once "include/page_header.php";
 	}
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 	
-	if($_REQUEST["groupid"] > 0)
-	{
-		$sql="select distinct h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED.
-			" and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
-			" and i.status=".ITEM_STATUS_ACTIVE.
-			" and h.hostid in (".$availiable_hosts.") ".
-			" group by h.hostid,h.host order by h.host";
+	if($_REQUEST["groupid"] > 0){
+		$sql='SELECT DISTINCT h.hostid,h.host '.
+				' FROM hosts h,items i,hosts_groups hg '.
+				' WHERE h.status='.HOST_STATUS_MONITORED.
+					' AND h.hostid=i.hostid '.
+					' AND hg.groupid='.$_REQUEST['groupid'].
+					' AND hg.hostid=h.hostid'.
+					' AND i.status='.ITEM_STATUS_ACTIVE.
+					' AND h.hostid IN ('.$availiable_hosts.') '.
+			' GROUP BY h.hostid,h.host '.
+			' ORDER BY h.host';
 	}
-	else
-	{
+	else{
 		$cmbHosts->AddItem(0,S_ALL_SMALL);
-		$sql="select distinct h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED.
-			" and i.status=".ITEM_STATUS_ACTIVE." and h.hostid=i.hostid".
-			" and h.hostid in (".$availiable_hosts.") ".
-			" group by h.hostid,h.host order by h.host";
+		$sql='SELECT DISTINCT h.hostid,h.host '.
+			' FROM hosts h,items i '.
+			' WHERE h.status='.HOST_STATUS_MONITORED.
+				' AND i.status='.ITEM_STATUS_ACTIVE.
+				' AND h.hostid=i.hostid'.
+				' AND h.hostid IN ('.$availiable_hosts.') '.
+			' GROUP BY h.hostid,h.host '.
+			' ORDER BY h.host';
 	}
+	
 	$result=DBselect($sql);
-	while($row=DBfetch($result))
-	{
+	while($row=DBfetch($result)){
 		$cmbHosts->AddItem(
 				$row['hostid'],
-				get_node_name_by_elid($row['hostid']).$row["host"]
+				get_node_name_by_elid($row['hostid']).$row['host']
 				);
 	}
 
@@ -176,32 +183,37 @@ include_once "include/page_header.php";
 	$table=new CTableInfo();
 	$table->SetHeader(array(
 		is_show_subnodes() ? S_NODE : null,
-		$_REQUEST["hostid"] ==0 ? S_HOST : NULL,
+		(0==$_REQUEST["hostid"]) ? S_HOST : NULL,
 		($link->ToString()).SPACE.S_DESCRIPTION,
 		S_LAST_CHECK,S_LAST_VALUE,S_CHANGE,S_HISTORY));
 	$table->ShowStart();
 
-	$compare_host = ($_REQUEST["hostid"] > 0)?(' and h.hostid='.$_REQUEST['hostid']):'';
+	$compare_host = ($_REQUEST["hostid"] > 0)?(' AND h.hostid='.$_REQUEST['hostid']):'';
 
 	$any_app_exist = false;
 		
-	$db_applications = DBselect("select distinct h.host,h.hostid,a.* from applications a,hosts h ".
-		" where a.hostid=h.hostid".$compare_host.' and h.hostid in ('.$availiable_hosts.')'.
-		" and h.status=".HOST_STATUS_MONITORED." order by a.name,a.applicationid,h.host");
-	while($db_app = DBfetch($db_applications))
-	{		
-		$db_items = DBselect("select distinct i.* from items i,items_applications ia".
-			" where ia.applicationid=".$db_app["applicationid"]." and i.itemid=ia.itemid".
-			" and i.status=".ITEM_STATUS_ACTIVE.
-			" order by i.description, i.itemid");
+	$db_applications = DBselect('SELECT DISTINCT h.host,h.hostid,a.* '.
+					' FROM applications a,hosts h '.
+					' WHERE a.hostid=h.hostid'.
+						$compare_host.
+						' AND h.hostid in ('.$availiable_hosts.')'.
+						' AND h.status='.HOST_STATUS_MONITORED.
+					' ORDER BY a.name,a.applicationid,h.host');
+	while($db_app = DBfetch($db_applications)){		
+		$db_items = DBselect('SELECT DISTINCT i.* '.
+					' FROM items i,items_applications ia'.
+					' WHERE ia.applicationid='.$db_app['applicationid'].
+						' AND i.itemid=ia.itemid'.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+					' ORDER BY i.description, i.itemid');
 
 		$app_rows = array();
 		$item_cnt = 0;
-		while($db_item = DBfetch($db_items))
-		{
+		while($db_item = DBfetch($db_items)){
+		
 			$description = item_description($db_item["description"],$db_item["key_"]);
 
-			if( '' != $_REQUEST["select"] && !stristr($description, $_REQUEST["select"]) ) continue;
+			if(!empty($_REQUEST["select"]) && !stristr($description, $_REQUEST["select"])) continue;
 
 			++$item_cnt;
 			if(!uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
@@ -216,31 +228,28 @@ include_once "include/page_header.php";
 			if( isset($db_item["lastvalue"]) && isset($db_item["prevvalue"]) &&
 				($db_item["value_type"] == 0) && ($db_item["lastvalue"]-$db_item["prevvalue"] != 0) )
 			{
-				if($db_item["lastvalue"]-$db_item["prevvalue"]<0)
-				{
+				if($db_item["lastvalue"]-$db_item["prevvalue"]<0){
 					$change=convert_units($db_item["lastvalue"]-$db_item["prevvalue"],$db_item["units"]);
 				}
-				else
-				{
+				else{
 					$change="+".convert_units($db_item["lastvalue"]-$db_item["prevvalue"],$db_item["units"]);
 				}
 				$change=nbsp($change);
 			}
-			else
-			{
+			else{
 				$change=new CCol("-","center");
 			}
-			if(($db_item["value_type"]==ITEM_VALUE_TYPE_FLOAT) ||($db_item["value_type"]==ITEM_VALUE_TYPE_UINT64))
-			{
+			
+			if(($db_item["value_type"]==ITEM_VALUE_TYPE_FLOAT) ||($db_item["value_type"]==ITEM_VALUE_TYPE_UINT64)){
 				$actions=new CLink(S_GRAPH,"history.php?action=showgraph&itemid=".$db_item["itemid"],"action");
 			}
-			else
-			{
+			else{
 				$actions=new CLink(S_HISTORY,"history.php?action=showvalues&period=3600&itemid=".$db_item["itemid"],"action");
 			}
+			
 			array_push($app_rows, new CRow(array(
-				is_show_subnodes() ? SPACE : null,
-				$_REQUEST["hostid"] > 0 ? NULL : SPACE,
+				is_show_subnodes()?SPACE:null,
+				($_REQUEST["hostid"]>0)?NULL:SPACE,
 				str_repeat(SPACE,6).$description,
 				$lastclock,
 				new CCol($lastvalue, $lastvalue=='-' ? 'center' : null),
@@ -248,21 +257,21 @@ include_once "include/page_header.php";
 				$actions
 				)));
 		}
-		if($item_cnt > 0)
-		{
-			if(uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps))
+		if($item_cnt > 0){
+			if(uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps)){
 				$link = new CLink(new CImg("images/general/opened.gif"),
 					"?close=1&applicationid=".$db_app["applicationid"].
 					url_param("groupid").url_param("hostid").url_param("applications").
 					url_param("select"));
-			else
+			}
+			else{
 				$link = new CLink(new CImg("images/general/closed.gif"),
 					"?open=1&applicationid=".$db_app["applicationid"].
 					url_param("groupid").url_param("hostid").url_param("applications").
 					url_param("select"));
+			}
 
-			$col = new CCol(array($link,SPACE,bold($db_app["name"]),
-				SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
+			$col = new CCol(array($link,SPACE,bold($db_app["name"]),SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
 			$col->SetColSpan(5);
 
 			$table->ShowRow(array(
@@ -308,8 +317,8 @@ include_once "include/page_header.php";
 		$app_rows = array();
 		$item_cnt = 0;
 		
-		while($db_item = DBfetch($db_items))
-		{
+		while($db_item = DBfetch($db_items)){
+		
 			$description = item_description($db_item["description"],$db_item["key_"]);
 	
 			if( '' != $_REQUEST["select"] && !stristr($description, $_REQUEST["select"]) ) continue;
@@ -328,32 +337,29 @@ include_once "include/page_header.php";
 				($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT || $db_item["value_type"] == ITEM_VALUE_TYPE_UINT64) &&
 				($db_item["lastvalue"]-$db_item["prevvalue"] != 0) )
 			{
-				if($db_item["lastvalue"]-$db_item["prevvalue"]<0)
-				{
+				if($db_item["lastvalue"]-$db_item["prevvalue"]<0){
 					$change=convert_units($db_item["lastvalue"]-$db_item["prevvalue"],$db_item["units"]);
 					$change=nbsp($change);
 				}
-				else
-				{
+				else{
 					$change="+".convert_units($db_item["lastvalue"]-$db_item["prevvalue"],$db_item["units"]);
 					$change=nbsp($change);
 				}
 			}
-			else
-			{
+			else{
 				$change=new CCol("-","center");
 			}
-			if(($db_item["value_type"]==ITEM_VALUE_TYPE_FLOAT) ||($db_item["value_type"]==ITEM_VALUE_TYPE_UINT64))
-			{
+			
+			if(($db_item["value_type"]==ITEM_VALUE_TYPE_FLOAT) ||($db_item["value_type"]==ITEM_VALUE_TYPE_UINT64)){
 				$actions=new CLink(S_GRAPH,"history.php?action=showgraph&itemid=".$db_item["itemid"],"action");
 			}
-			else
-			{
+			else{
 				$actions=new CLink(S_HISTORY,"history.php?action=showvalues&period=3600&itemid=".$db_item["itemid"],"action");
 			}
+			
 			array_push($app_rows, new CRow(array(
-				is_show_subnodes() ? SPACE : null,//get_node_name_by_elid($db_item['itemid']) : null,
-				$_REQUEST["hostid"] > 0 ? NULL : SPACE,//$db_item["host"],
+				is_show_subnodes()?($item_cnt?SPACE:get_node_name_by_elid($db_item['itemid'])):null,
+				$_REQUEST["hostid"] > 0 ? NULL : ($item_cnt?SPACE:$db_item["host"]),
 				str_repeat(SPACE, ($any_app_exist ? 6 : 0)).$description,
 				$lastclock,
 				new CCol($lastvalue, $lastvalue == '-' ? 'center' : null),
@@ -362,31 +368,30 @@ include_once "include/page_header.php";
 				)));
 		}
 	
-		if($item_cnt > 0)
-		{
-			if($any_app_exist)
-			{
-				if(uint_in_array(0,$_REQUEST["applications"]) || isset($show_all_apps))
-					$link = new CLink(new CImg("images/general/opened.gif"),
-						"?close=1&applicationid=0".
-						url_param("groupid").url_param("hostid").url_param("applications").
-						url_param("select"));
-				else
-					$link = new CLink(new CImg("images/general/closed.gif"),
-						"?open=1&applicationid=0".
-						url_param("groupid").url_param("hostid").url_param("applications").
-						url_param("select"));
-	
-				$col = new CCol(array($link,SPACE,bold(S_MINUS_OTHER_MINUS),
-					SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
-				$col->SetColSpan(5);
-				
-				$table->ShowRow(array(
-						get_node_name_by_elid($db_appitem['hostid']),
-						$_REQUEST["hostid"] > 0 ? NULL : $db_appitem["host"],
-						$col
-						));	
-				}
+		if($item_cnt > 0){
+
+			if(uint_in_array(0,$_REQUEST["applications"]) || isset($show_all_apps)){
+				$link = new CLink(new CImg("images/general/opened.gif"),
+					"?close=1&applicationid=0".
+					url_param("groupid").url_param("hostid").url_param("applications").
+					url_param("select"));
+			}
+			else{
+				$link = new CLink(new CImg("images/general/closed.gif"),
+					"?open=1&applicationid=0".
+					url_param("groupid").url_param("hostid").url_param("applications").
+					url_param("select"));
+			}
+
+			$col = new CCol(array($link,SPACE,bold(S_MINUS_OTHER_MINUS),SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
+			$col->SetColSpan(5);
+			
+			$table->ShowRow(array(
+					get_node_name_by_elid($db_appitem['hostid']),
+					$_REQUEST["hostid"] > 0 ? NULL : $db_appitem["host"],
+					$col
+					));	
+					
 			foreach($app_rows as $row)
 				$table->ShowRow($row);
 		}
