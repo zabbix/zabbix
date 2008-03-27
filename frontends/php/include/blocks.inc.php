@@ -689,7 +689,7 @@ function make_webmon_overview($available_hosts=false){
 		));
 
 	$sql = 'SELECT DISTINCT g.groupid, g.name '.
-			' FROM httptest ht, applications a, hosts h, groups g, hosts_groups hg '.
+			' FROM httptest ht, applications a, groups g, hosts_groups hg '.
 			' WHERE hg.hostid in ('.$available_hosts.') '.
 				' AND hg.hostid=a.hostid '.
 				' AND g.groupid=hg.groupid '.
