@@ -18,8 +18,10 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-include_once "include/config.inc.php";
-include_once "include/services.inc.php";
+require_once("include/config.inc.php");
+require_once("include/services.inc.php");
+require_once('include/classes/ctree.inc.php');
+require_once('include/html.inc.php');
 
 $page["title"] = "S_CONFIGURATION_OF_IT_SERVICES";
 $page["file"] = "services.php";
@@ -33,10 +35,28 @@ include_once "include/page_header.php";
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"msg"=>		array(T_ZBX_STR, O_OPT,	 null,	null ,NULL)
+		"msg"=>		array(T_ZBX_STR, O_OPT,	 null,	null ,NULL),
+
+// ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'hat'"),		NULL),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
+
 	);
 
 	check_fields($fields);
+
+/* AJAX */	
+	if(isset($_REQUEST['favobj'])){
+		if('hat' == $_REQUEST['favobj']){
+			update_profile('web.services.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state']);
+		}
+	}	
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+//--------
 
 //--------------------------------------------------------------------------
 
@@ -58,20 +78,23 @@ $result=DBSelect($query);
 
 $services = array();
 $row = array(
-				'0' => 0,'serviceid' => 0,
-				'1' => 0,'serviceupid' => 0,
-				'2' => '','caption' => S_ROOT_SMALL,
-				'3' => '','status' => SPACE,
-				'4' => '','algorithm' => SPACE,
-				'5' => '','description' => SPACE,
-				'6' => 0,'soft' => 0,
-				'7' => '','linkid'=>''
+				'id' =>	0,
+				'serviceid' => 0,
+				'serviceupid' => 0,
+				'caption' => S_ROOT_SMALL,
+				'status' => SPACE,
+				'algorithm' => SPACE,
+				'description' => SPACE,
+				'soft' => 0,
+				'linkid'=>''
 				);
 
 $services[0]=$row;
 
 while($row = DBFetch($result)){
 
+		$row['id'] = $row['serviceid'];
+		
 		(empty($row['serviceupid']))?($row['serviceupid']='0'):('');
 		(empty($row['triggerid']))?($row['description']='None'):($row['description']=expand_trigger_description($row['triggerid']));
 		
@@ -107,14 +130,24 @@ if(isset($_REQUEST['msg']) && !empty($_REQUEST['msg'])){
 }
 
 
-show_table_header(S_IT_SERVICES_BIG);
+//show_table_header(S_IT_SERVICES_BIG);
 
 $tree = new CTree($treeServ,array('caption' => bold(S_SERVICE),'algorithm' => bold(S_STATUS_CALCULATION), 'description' => bold(S_TRIGGER)));
 
 if($tree){
-	echo $tree->CreateJS();
-	echo $tree->SimpleHTML();
-} else {
+	
+	$tab = create_hat(
+			S_IT_SERVICES_BIG,
+			$tree->getHTML(),
+			null,
+			'hat_services',
+			get_profile('web.services.hats.hat_services.state',1)
+		);
+		
+	$tab->Show();
+	unset($tab);
+}
+else {
 	error(S_CANT_FORMAT_TREE);
 }
 

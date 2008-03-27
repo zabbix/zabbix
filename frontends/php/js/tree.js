@@ -17,8 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 // JavaScript Document
-// Title: tree manipulation class
-// Author: Aly
 
 var tree ={
 init : function(){
@@ -61,7 +59,7 @@ ChangeNodeStatus : function(id){
 		}
 		cookie.create(tree_name,cookie_str);
 	} catch(e){
-//		IE?(alert(e.description)):(alert(e));
+		IE?(alert(e.description)):(alert(e));
 	}
 },
 
@@ -71,10 +69,10 @@ closeSNodeX : function(id,img){
 		nodelist = treenode[id].nodelist.split('.');
 		if(this.getNodeStatus(id) == 'close'){
 			this.OpenNode(nodelist);
-			img.src = 'images/general/tree/'+img.name.toUpperCase()+'.gif';
+			img.src = 'images/general/tree/minus.gif';
 		} else {
 			this.CloseNode(nodelist);
-			img.src = 'images/general/tree/'+img.name.toUpperCase()+'c.gif';
+			img.src = 'images/general/tree/plus.gif';
 		}
 		this.ChangeNodeStatus(id);
 	} catch(e){
@@ -87,7 +85,7 @@ OpenNode : function(nodelist){
 	try{
 		var c = nodelist.length-1;
 		for(var i=0; i<c; i++){
-			document.getElementById(nodelist[i]).style.display = (!IE || OP)?("table-row"):('block');
+			document.getElementById('id_'+nodelist[i]).style.display = (IE)?('block'):('table-row');
 			if(this.getNodeStatus(nodelist[i]) == 'open'){
 				this.OpenNode(treenode[nodelist[i]].nodelist.split('.'));
 			}
@@ -101,7 +99,7 @@ CloseNode : function(nodelist){
 	try{
 		var c = nodelist.length-1;
 		for(var i=0; i<c; i++){
-			document.getElementById(nodelist[i]).style.display = 'none';
+			document.getElementById('id_'+nodelist[i]).style.display = 'none';
 			if(this.getNodeStatus(nodelist[i]) == 'open'){
 				this.CloseNode(treenode[nodelist[i]].nodelist.split('.'));
 			}
@@ -133,9 +131,9 @@ onStartOpen : function(nodes){
 onStartSetStatus : function(id){
 	try{
 		if(typeof(treenode[id]) == 'undefined') return;
-		var img_id=id+'I';;
+		var img_id='idi_'+id;
 		var img = document.getElementById(img_id);
-		img.src = 'images/general/tree/'+img.name.toUpperCase()+'.gif';
+		img.src = 'images/general/tree/minus.gif';
 		
 		treenode[id].status = 'open';
 	} catch(e){
