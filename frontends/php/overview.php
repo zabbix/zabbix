@@ -28,6 +28,12 @@ $page["file"] = "overview.php";
 $page['hist_arg'] = array('groupid','type');
 
 define('ZBX_PAGE_DO_REFRESH', 1);
+
+$_REQUEST["fullscreen"] = get_request("fullscreen", 0);
+
+if($_REQUEST["fullscreen"]){
+	define('ZBX_PAGE_NO_MENU', 1);
+}
 	
 include_once "include/page_header.php";
 
@@ -41,9 +47,10 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 }
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
-		'view_style'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),		NULL),
-		'type'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),		NULL)
+		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
+		'view_style'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	NULL),
+		'type'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	NULL),
+		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	NULL)
 	);
 
 	check_fields($fields);
@@ -121,7 +128,8 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 	}
 
 	$help->SetHint($help_table);
-	show_table_header(array($help, S_OVERVIEW_BIG), $form);
+	
+	show_table_header(array($help, new Clink(S_OVERVIEW_BIG,'overview.php?fullscreen='.($_REQUEST['fullscreen']?'0':'1'))), $form);
 	unset($help, $help_table, $form, $col);
 	
 	$form = new CForm();
