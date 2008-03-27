@@ -40,7 +40,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-	$text = get_request("text","");;
+	$text = get_request("text"," ");;
 	$font = get_request("font",3);
 	
 	$width = ImageFontWidth($font) * strlen($text);
