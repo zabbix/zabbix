@@ -483,7 +483,7 @@
 								$data['status'],
 								$data['comments'],
 								$data['url'],
-								get_trigger_dependences_by_triggerid($trigger['triggerid']),
+								get_trigger_dependencies_by_triggerid($trigger['triggerid']),
 								$trigger['templateid']);
 
 							break; // case

@@ -744,7 +744,7 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	get_trigger_dependences_by_triggerid($triggerid)
+	function	get_trigger_dependencies_by_triggerid($triggerid)
 	{
 		$result = array();
 
@@ -760,7 +760,7 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	replace_template_dependences($deps, $hostid)
+	function	replace_template_dependencies($deps, $hostid)
 	{
 		foreach($deps as $id => $val)
 		{
@@ -781,8 +781,8 @@
 	{
 		$trigger = get_trigger_by_triggerid($triggerid);
 
-		$deps = replace_template_dependences(
-				get_trigger_dependences_by_triggerid($triggerid),
+		$deps = replace_template_dependencies(
+				get_trigger_dependencies_by_triggerid($triggerid),
 				$hostid);
 
 		$sql='SELECT t2.triggerid, t2.expression '.
@@ -859,7 +859,7 @@
 
 		DBexecute("update triggers set expression=".zbx_dbstr($newexpression).
 			" where triggerid=$newtriggerid");
-// copy dependences
+// copy dependencies
 		delete_dependencies_by_triggerid($newtriggerid);
 		foreach($deps as $dep_id)
 		{
@@ -1382,7 +1382,7 @@
 						NULL,		// status
 						$comments,
 						$url,
-						replace_template_dependences($deps, $chd_trig_host['hostid']),
+						replace_template_dependencies($deps, $chd_trig_host['hostid']),
 						$triggerid);
 				}
 			}
@@ -1713,11 +1713,11 @@
 			copy_trigger_to_host($trigger["triggerid"], $hostid, $copy_mode);
 		}
 
-		update_template_dependences_for_host($hostid);
+		update_template_dependencies_for_host($hostid);
 	}
 
 	/*
-	 * Function: update_template_dependences_for_host
+	 * Function: update_template_dependencies_for_host
 	 *
 	 * Description: 
 	 *     Update template triggers
@@ -1728,7 +1728,7 @@
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	update_template_dependences_for_host($hostid)
+	function	update_template_dependencies_for_host($hostid)
 	{
 		$db_triggers = get_triggers_by_hostid($hostid);
 		while($trigger_data = DBfetch($db_triggers))
@@ -1743,8 +1743,8 @@
 					/*$status*/			NULL,
 					/*$comments*/		NULL,
 					/*$url*/			NULL,
-					replace_template_dependences(
-						get_trigger_dependences_by_triggerid($trigger_data['triggerid']),
+					replace_template_dependencies(
+						get_trigger_dependencies_by_triggerid($trigger_data['triggerid']),
 						$hostid),
 					$trigger_data['triggerid']);
 
