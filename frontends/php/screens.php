@@ -256,7 +256,7 @@ include_once "include/page_header.php";
 		
 
 		$result=DBselect('SELECT DISTINCT g.groupid, g.name '.
-					' FROM groups g, hosts_groups hg, hosts h, items i, graphs_items gi '.
+					' FROM groups g, hosts_groups hg, hosts h, items i '.
 					' WHERE g.groupid in ('.$availiable_groups.') '.
 						' AND hg.groupid=g.groupid '.
 						' AND h.status='.HOST_STATUS_MONITORED.
@@ -273,8 +273,8 @@ include_once "include/page_header.php";
 		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 		
 		if($_REQUEST['groupid'] > 0){
-			$sql = ' SELECT distinct h.hostid,h.host '.
-				' FROM hosts h,items i,hosts_groups hg, graphs_items gi '.
+			$sql = ' SELECT DISTINCT h.hostid,h.host '.
+				' FROM hosts h,items i,hosts_groups hg '.
 				' WHERE h.status='.HOST_STATUS_MONITORED.
 					' AND h.hostid=i.hostid '.
 					' AND hg.groupid='.$_REQUEST['groupid'].
@@ -283,18 +283,17 @@ include_once "include/page_header.php";
 				' ORDER BY h.host';
 		}
 		else{
-			$sql = 'SELECT distinct h.hostid,h.host '.
-				' FROM hosts h,items i, graphs_items gi '.
+			$sql = 'SELECT DISTINCT h.hostid,h.host '.
+				' FROM hosts h,items i '.
 				' WHERE h.status='.HOST_STATUS_MONITORED.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					' AND h.hostid=i.hostid'.
 					' AND h.hostid IN ('.$availiable_hosts.') '.
 				' ORDER BY h.host';
 		}
-//SDI($sql);
+
 		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			$cmbHosts->AddItem(
 					$row['hostid'],
 					get_node_name_by_elid($row['hostid']).$row['host']
