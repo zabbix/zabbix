@@ -248,9 +248,10 @@ include_once "include/page_header.php";
 			else{
 				$actions=new CLink(S_HISTORY,"history.php?action=showvalues&period=3600&itemid=".$db_item["itemid"],"action");
 			}
+			
 			array_push($app_rows, new CRow(array(
-				is_show_subnodes() ? SPACE : null,
-				$_REQUEST["hostid"] > 0 ? NULL : SPACE,
+				is_show_subnodes()?SPACE:null,
+				($_REQUEST["hostid"]>0)?NULL:SPACE,
 				str_repeat(SPACE,6).$description,
 				$lastclock,
 				new CCol($lastvalue, $lastvalue=='-' ? 'center' : null),
@@ -273,8 +274,7 @@ include_once "include/page_header.php";
 					url_param("select"));
 			}
 
-			$col = new CCol(array($link,SPACE,bold($db_app["name"]),
-				SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
+			$col = new CCol(array($link,SPACE,bold($db_app["name"]),SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
 			$col->SetColSpan(5);
 
 			$table->ShowRow(array(
@@ -361,8 +361,8 @@ include_once "include/page_header.php";
 			}
 			
 			array_push($app_rows, new CRow(array(
-				is_show_subnodes() ? SPACE : null,//get_node_name_by_elid($db_item['itemid']) : null,
-				$_REQUEST["hostid"] > 0 ? NULL : SPACE,//$db_item["host"],
+				is_show_subnodes()?($item_cnt?SPACE:get_node_name_by_elid($db_item['itemid'])):null,
+				$_REQUEST["hostid"] > 0 ? NULL : ($item_cnt?SPACE:$db_item["host"]),
 				str_repeat(SPACE, ($any_app_exist ? 6 : 0)).$description,
 				$lastclock,
 				new CCol($lastvalue, $lastvalue == '-' ? 'center' : null),
@@ -372,29 +372,29 @@ include_once "include/page_header.php";
 		}
 	
 		if($item_cnt > 0){
-			if($any_app_exist){
-				if(uint_in_array(0,$_REQUEST["applications"]) || isset($show_all_apps)){
-					$link = new CLink(new CImg("images/general/opened.gif"),
-						"?close=1&applicationid=0".
-						url_param("groupid").url_param("hostid").url_param("applications").
-						url_param("select"));
-				}
-				else{
-					$link = new CLink(new CImg("images/general/closed.gif"),
-						"?open=1&applicationid=0".
-						url_param("groupid").url_param("hostid").url_param("applications").
-						url_param("select"));
-				}
-				
-				$col = new CCol(array($link,SPACE,bold(S_MINUS_OTHER_MINUS),SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
-				$col->SetColSpan(5);
-				
-				$table->ShowRow(array(
-						get_node_name_by_elid($db_appitem['hostid']),
-						$_REQUEST["hostid"] > 0 ? NULL : $db_appitem["host"],
-						$col
-						));	
-				}
+
+			if(uint_in_array(0,$_REQUEST["applications"]) || isset($show_all_apps)){
+				$link = new CLink(new CImg("images/general/opened.gif"),
+					"?close=1&applicationid=0".
+					url_param("groupid").url_param("hostid").url_param("applications").
+					url_param("select"));
+			}
+			else{
+				$link = new CLink(new CImg("images/general/closed.gif"),
+					"?open=1&applicationid=0".
+					url_param("groupid").url_param("hostid").url_param("applications").
+					url_param("select"));
+			}
+
+			$col = new CCol(array($link,SPACE,bold(S_MINUS_OTHER_MINUS),SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
+			$col->SetColSpan(5);
+			
+			$table->ShowRow(array(
+					get_node_name_by_elid($db_appitem['hostid']),
+					$_REQUEST["hostid"] > 0 ? NULL : $db_appitem["host"],
+					$col
+					));	
+					
 			foreach($app_rows as $row)	$table->ShowRow($row);
 		}
 	}
