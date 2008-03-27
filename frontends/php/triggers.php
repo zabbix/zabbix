@@ -52,7 +52,7 @@ include_once "include/page_header.php";
 		"url"=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
 		"status"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,NULL),
 
-		"dependences"=>		array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
+		"dependencies"=>		array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
 		"new_dependence"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID.'{}>0','isset({add_dependence})'),
 		"rem_dependence"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
 
@@ -116,7 +116,7 @@ include_once "include/page_header.php";
 
 		$type = $_REQUEST['type'];
 
-		$deps = get_request("dependences",array());
+		$deps = get_request("dependencies",array());
 
 		if(isset($_REQUEST["triggerid"]))
 		{
@@ -222,19 +222,19 @@ include_once "include/page_header.php";
 /* DEPENDENCE ACTIONS */
 	elseif(isset($_REQUEST["add_dependence"])&&isset($_REQUEST["new_dependence"]))
 	{
-		if(!isset($_REQUEST["dependences"]))
-			$_REQUEST["dependences"] = array();
+		if(!isset($_REQUEST["dependencies"]))
+			$_REQUEST["dependencies"] = array();
 
-		if(!uint_in_array($_REQUEST["new_dependence"], $_REQUEST["dependences"]))
-			array_push($_REQUEST["dependences"], $_REQUEST["new_dependence"]);
+		if(!uint_in_array($_REQUEST["new_dependence"], $_REQUEST["dependencies"]))
+			array_push($_REQUEST["dependencies"], $_REQUEST["new_dependence"]);
 	}
 	elseif(isset($_REQUEST["del_dependence"])&&isset($_REQUEST["rem_dependence"]))
 	{
-		if(isset($_REQUEST["dependences"])){
-			foreach($_REQUEST["dependences"]as $key => $val)
+		if(isset($_REQUEST["dependencies"])){
+			foreach($_REQUEST["dependencies"]as $key => $val)
 			{
 				if(!uint_in_array($val, $_REQUEST["rem_dependence"]))	continue;
-				unset($_REQUEST["dependences"][$key]);
+				unset($_REQUEST["dependencies"][$key]);
 			}
 		}
 	}
@@ -440,8 +440,8 @@ include_once "include/page_header.php";
 				"triggers.php?form=update&triggerid=".$row["triggerid"].
 					"&hostid=".$row["hostid"], 'action');
 
-			//add dependences
-			$deps = get_trigger_dependences_by_triggerid($row["triggerid"]);
+			//add dependencies
+			$deps = get_trigger_dependencies_by_triggerid($row["triggerid"]);
 			if(count($deps) > 0){
 				$description[] = array(BR(),BR(),bold(S_DEPENDS_ON.':'),SPACE,BR());
 				foreach($deps as $val)

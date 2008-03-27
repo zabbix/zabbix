@@ -2285,7 +2285,7 @@
 		}
 
 		$dep_el=array();
-		$dependences = get_request("dependences",array());
+		$dependencies = get_request("dependencies",array());
 	
 		$limited = null;
 		
@@ -2324,8 +2324,8 @@
 					" WHERE t.triggerid=d.triggerid_up AND d.triggerid_down=".$_REQUEST["triggerid"]);
 				while($trig=DBfetch($trigs))
 				{
-					if(uint_in_array($trig["triggerid"],$dependences))	continue;
-					array_push($dependences,$trig["triggerid"]);
+					if(uint_in_array($trig["triggerid"],$dependencies))	continue;
+					array_push($dependencies,$trig["triggerid"]);
 				}
 			}
 		}
@@ -2339,23 +2339,23 @@
 					"&srcfld1=expression&expression=' + escape(GetSelectedText(this.form.elements['expression'])),700,200);"))
 			));
 
-	/* dependences */
-		foreach($dependences as $val){
+	/* dependencies */
+		foreach($dependencies as $val){
 			array_push($dep_el,
 				array(
 					new CCheckBox("rem_dependence[]", 'no', null, strval($val)),
 					expand_trigger_description($val)
 				),
 				BR());
-			$frmTrig->AddVar("dependences[]",strval($val));
+			$frmTrig->AddVar("dependencies[]",strval($val));
 		}
 
 		if(count($dep_el)==0)
-			array_push($dep_el, "No dependences defined");
+			array_push($dep_el, "No dependencies defined");
 		else
 			array_push($dep_el, new CButton('del_dependence','delete selected'));
 		$frmTrig->AddRow("The trigger depends on",$dep_el);
-	/* end dependences */
+	/* end dependencies */
 
 		global $USER_DETAILS;
 	/* new dependence */
