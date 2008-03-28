@@ -160,8 +160,8 @@ sub newstate
 	switch ($state)
 	{
 		case "field"	{
-			if($output{"type"} eq "sql" && $new eq "index") { print $pkey; }
-			if($output{"type"} eq "sql" && $new eq "table") { print $pkey; }
+			if($output{"type"} eq "sql" && $new eq "index") { print $pkey; print $orasqn; }
+			if($output{"type"} eq "sql" && $new eq "table") { print $pkey; print $orasqn; }
 			if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},\n"; }
 			if($new eq "field") { print ",\n" }
 		}
@@ -180,6 +180,8 @@ sub process_table
 {
 	local $line=$_[0];
 	local $tmp;
+
+	$orasqn = "";
 
 	newstate("table");
 	($table_name,$pkey,$flags)=split(/\|/, $line,4);
@@ -238,6 +240,23 @@ sub process_field
 		{
 		#	$default="DEFAULT NULL";
 			$null="";
+		}
+		if ($type eq "t_serial" && $output{"database"} eq "oracle")
+		{
+			$orasqn =
+"CREATE SEQUENCE $table_name\_$name
+START WITH 1
+INCREMENT BY 1
+NOMAXVALUE;
+CREATE TRIGGER $table_name\_trigger
+BEFORE INSERT ON $table_name
+FOR EACH ROW
+BEGIN
+	IF (:new.$name IS NULL OR :new.$name = 0) THEN
+		SELECT $table_name\_$name.nextval INTO :new.$name FROM dual;
+	END IF;
+END;
+/\n";
 		}
 		print "\t$name\t\t$type_2\t\t$default\t$null";
 	}
