@@ -17,5 +17,6 @@ CREATE INDEX triggers_1 on triggers_tmp (status);
 CREATE INDEX triggers_2 on triggers_tmp (value);
 
 insert into triggers_tmp select * from triggers;
+drop sequence triggers_triggerid;
 drop table triggers;
-alter table triggers_tmp rename triggers;
+alter table triggers_tmp rename to triggers;

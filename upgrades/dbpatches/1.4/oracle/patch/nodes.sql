@@ -1,4 +1,4 @@
-EATE TABLE nodes (
+CREATE TABLE nodes (
         nodeid          number(10)              DEFAULT '0'     NOT NULL,
         name            varchar2(64)            DEFAULT '0'     ,
         timezone                number(10)              DEFAULT '0'     NOT NULL,

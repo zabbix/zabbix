@@ -11,5 +11,6 @@ CREATE INDEX auditlog_1 on auditlog_tmp (userid,clock);
 CREATE INDEX auditlog_2 on auditlog_tmp (clock);
 
 insert into auditlog_tmp select * from auditlog;
+drop sequence auditlog_auditid;
 drop table auditlog;
-alter table auditlog_tmp rename auditlog;
+alter table auditlog_tmp rename to auditlog;

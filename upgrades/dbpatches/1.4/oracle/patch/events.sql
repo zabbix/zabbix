@@ -1,4 +1,4 @@
-CREATE TABLE events_tmp (
+CREATE TABLE events (
         eventid         number(20)              DEFAULT '0'     NOT NULL,
         source          number(10)              DEFAULT '0'     NOT NULL,
         object          number(10)              DEFAULT '0'     NOT NULL,
@@ -8,8 +8,9 @@ CREATE TABLE events_tmp (
         acknowledged            number(10)              DEFAULT '0'     NOT NULL,
         PRIMARY KEY (eventid)
 );
-CREATE INDEX events_1 on events_tmp (object,objectid,clock);
-CREATE INDEX events_2 on events_tmp (clock);
+CREATE INDEX events_1 on events (object,objectid,clock);
+CREATE INDEX events_2 on events (clock);
 
 insert into events select alarmid,0,0,triggerid,clock,value,acknowledged from alarms;
+drop sequence alarms_alarmid;
 drop table alarms;

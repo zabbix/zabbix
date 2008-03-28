@@ -13,5 +13,6 @@ CREATE TABLE media_type_tmp (
 );
 
 insert into media_type_tmp select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,'','' from media_type;
+drop sequence media_type_mediatypeid;
 drop table media_type;
-alter table media_type_tmp rename media_type;
+alter table media_type_tmp rename to media_type;

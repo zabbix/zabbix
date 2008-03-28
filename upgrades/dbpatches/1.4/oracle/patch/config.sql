@@ -10,4 +10,4 @@ CREATE TABLE config_tmp (
 
 insert into config_tmp select 1,alert_history,alarm_history,refresh_unsupported,work_period,0 from config;
 drop table config;
-alter table config_tmp rename config;
+alter table config_tmp rename to config;

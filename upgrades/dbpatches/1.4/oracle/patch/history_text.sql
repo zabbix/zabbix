@@ -7,6 +7,21 @@ CREATE TABLE history_text_tmp (
 );
 CREATE INDEX history_text_1 on history_text_tmp (itemid,clock);
 
-insert into history_text_tmp select * from history_text;
+create sequence history_text_tmp_id
+start with 1
+increment by 1
+nomaxvalue;
+
+create trigger history_text_tmp_trigger
+before insert on history_text_tmp
+for each row
+begin
+	select history_text_tmp_id.nextval into :new.id from dual;
+end;
+/
+
+insert into history_text_tmp select NULL,itemid,clock,value from history_text;
+drop trigger history_text_tmp_trigger;
+drop sequence history_text_tmp_id;
 drop table history_text;
-alter table history_text_tmp rename history_text;
+alter table history_text_tmp rename to history_text;

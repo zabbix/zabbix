@@ -16,4 +16,4 @@ CREATE TABLE hosts_profiles_tmp (
 
 insert into hosts_profiles_tmp select * from hosts_profiles;
 drop table hosts_profiles;
-alter table hosts_profiles_tmp rename hosts_profiles;
+alter table hosts_profiles_tmp rename to hosts_profiles;

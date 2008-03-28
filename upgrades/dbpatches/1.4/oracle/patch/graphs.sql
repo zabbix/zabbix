@@ -14,6 +14,7 @@ CREATE TABLE graphs_tmp (
 );
 CREATE INDEX graphs_graphs_1 on graphs_tmp (name);
 
-insert into graphs_tmp select *,0 from graphs;
+insert into graphs_tmp select graphid,name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,0 from graphs;
+drop sequence graphs_graphid;
 drop table graphs;
-alter table graphs_tmp rename graphs;
+alter table graphs_tmp rename to graphs;

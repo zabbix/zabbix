@@ -11,5 +11,6 @@ CREATE TABLE history_log_tmp (
 CREATE INDEX history_log_1 on history_log_tmp (itemid,clock);
 
 insert into history_log_tmp select * from history_log;
+drop sequence history_log_id;
 drop table history_log;
-alter table history_log_tmp rename history_log;
+alter table history_log_tmp rename to history_log;

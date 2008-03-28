@@ -13,5 +13,6 @@ CREATE TABLE graphs_items_tmp (
 );
 
 insert into graphs_items_tmp select * from graphs_items;
+drop sequence graphs_items_gitemid;
 drop table graphs_items;
-alter table graphs_items_tmp rename graphs_items;
+alter table graphs_items_tmp rename to graphs_items;

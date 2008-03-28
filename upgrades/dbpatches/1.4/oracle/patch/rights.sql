@@ -9,5 +9,6 @@ CREATE TABLE rights_tmp (
 CREATE INDEX rights_1 on rights_tmp (groupid);
 
 -- insert into rights_tmp select * from rights;
+drop sequence rights_rightid;
 drop table rights;
-alter table rights_tmp rename rights;
+alter table rights_tmp rename to rights;

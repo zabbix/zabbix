@@ -15,5 +15,6 @@ CREATE TABLE sysmaps_elements_tmp (
 );
 
 insert into sysmaps_elements_tmp select s.selementid,s.sysmapid,s.elementid,s.elementtype,i1.imageid,i2.imageid,i1.imageid,s.label,s.label_location,s.x,s.y,s.url from sysmaps_elements s,images i1,images i2 where s.icon=i1.name and s.icon_on=i2.name;
+drop sequence sysmaps_elements_selementid;
 drop table sysmaps_elements;
-alter table sysmaps_elements_tmp rename sysmaps_elements;
+alter table sysmaps_elements_tmp rename to sysmaps_elements;

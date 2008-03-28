@@ -10,4 +10,4 @@ CREATE TABLE trends_tmp (
 
 insert into trends_tmp select * from trends;
 drop table trends;
-alter table trends_tmp rename trends;
+alter table trends_tmp rename to trends;

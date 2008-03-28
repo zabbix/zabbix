@@ -9,5 +9,6 @@ CREATE INDEX applications_1 on applications_tmp (templateid);
 CREATE UNIQUE INDEX applications_2 on applications_tmp (hostid,name);
 
 insert into applications_tmp select * from applications;
+drop sequence applications_applicationid;
 drop table applications;
-alter table applications_tmp rename applications;
+alter table applications_tmp rename to applications;

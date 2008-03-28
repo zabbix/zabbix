@@ -7,4 +7,4 @@ CREATE INDEX history_uint_1 on history_uint_tmp (itemid,clock);
 
 insert into history_uint_tmp select * from history_uint;
 drop table history_uint;
-alter table history_uint_tmp rename history_uint;
+alter table history_uint_tmp rename to history_uint;

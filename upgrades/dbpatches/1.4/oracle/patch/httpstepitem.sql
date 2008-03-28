@@ -1,4 +1,4 @@
-EATE TABLE httpstepitem (
+CREATE TABLE httpstepitem (
         httpstepitemid          number(20)              DEFAULT '0'     NOT NULL,
         httpstepid              number(20)              DEFAULT '0'     NOT NULL,
         itemid          number(20)              DEFAULT '0'     NOT NULL,

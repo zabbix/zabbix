@@ -1,4 +1,4 @@
-EATE TABLE node_cksum (
+CREATE TABLE node_cksum (
         cksumid         number(20)              DEFAULT '0'     NOT NULL,
         nodeid          number(20)              DEFAULT '0'     NOT NULL,
         tablename               varchar2(64)            DEFAULT ''      ,

@@ -1,26 +1,15 @@
-CREATE TABLE hosts_templates_tmp (
+drop sequence hosts_templates_hosttemplateid;
+drop table hosts_templates;
+
+CREATE TABLE hosts_templates (
         hosttemplateid          number(20)              DEFAULT '0'     NOT NULL,
         hostid          number(20)              DEFAULT '0'     NOT NULL,
         templateid              number(20)              DEFAULT '0'     NOT NULL,
         PRIMARY KEY (hosttemplateid)
 );
-CREATE UNIQUE INDEX hosts_templates_1 on hosts_templates_tmp (hostid,templateid);
+CREATE UNIQUE INDEX hosts_templates_1 on hosts_templates (hostid,templateid);
 
-insert into hosts_templates_tmp select NULL,hostid,templateid from hosts where templateid<>0;
-drop table  hosts_templates;
-alter table hosts_templates_tmp rename  hosts_templates;
-
-CREATE TABLE hosts_templates_tmp (
-        hosttemplateid          number(20)              DEFAULT '0'     NOT NULL,
-        hostid          number(20)              DEFAULT '0'     NOT NULL,
-        templateid              number(20)              DEFAULT '0'     NOT NULL,
-        PRIMARY KEY (hosttemplateid)
-);
-CREATE UNIQUE INDEX hosts_templates_1 on hosts_templates_tmp (hostid,templateid);
-
-insert into hosts_templates_tmp select * from  hosts_templates;
-drop table  hosts_templates;
-alter table hosts_templates_tmp rename  hosts_templates;
+insert into hosts_templates select hostid,hostid,templateid from hosts where templateid<>0;
 
 -- hosts.sql
 
@@ -42,5 +31,6 @@ CREATE INDEX hosts_1 on hosts_tmp (host);
 CREATE INDEX hosts_2 on hosts_tmp (status);
 
 insert into hosts_tmp select hostid,host,host,useip,ip,port,status,disable_until,error,available,errors_from from hosts;
+drop sequence hosts_hostid;
 drop table hosts;
-alter table hosts_tmp rename hosts;
+alter table hosts_tmp rename to hosts;

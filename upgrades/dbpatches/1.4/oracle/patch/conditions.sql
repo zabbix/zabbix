@@ -9,5 +9,6 @@ CREATE TABLE conditions_tmp (
 CREATE INDEX conditions_1 on conditions_tmp (actionid);
 
 insert into conditions_tmp select * from conditions;
+drop sequence conditions_conditionid;
 drop table conditions;
-alter table conditions_tmp rename conditions;
+alter table conditions_tmp rename to conditions;

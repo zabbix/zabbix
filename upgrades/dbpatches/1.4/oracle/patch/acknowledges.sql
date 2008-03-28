@@ -11,5 +11,6 @@ CREATE INDEX acknowledges_2 on acknowledges_tmp (eventid);
 CREATE INDEX acknowledges_3 on acknowledges_tmp (clock);
 
 insert into acknowledges_tmp select * from acknowledges;
+drop sequence acknowledges_acknowledgeid;
 drop table acknowledges;
-alter table acknowledges_tmp rename acknowledges;
+alter table acknowledges_tmp rename to acknowledges;

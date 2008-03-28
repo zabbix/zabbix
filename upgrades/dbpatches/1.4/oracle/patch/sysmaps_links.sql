@@ -12,5 +12,6 @@ CREATE TABLE sysmaps_links_tmp (
 );
 
 insert into sysmaps_links_tmp select * from sysmaps_links;
+drop sequence sysmaps_links_linkid;
 drop table sysmaps_links;
-alter table sysmaps_links_tmp rename sysmaps_links;
+alter table sysmaps_links_tmp rename to sysmaps_links;

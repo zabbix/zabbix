@@ -11,5 +11,6 @@ CREATE TABLE services_tmp (
 );
 
 insert into services_tmp select * from services;
+drop sequence services_serviceid;
 drop table services;
-alter table services_tmp rename services;
+alter table services_tmp rename to services;

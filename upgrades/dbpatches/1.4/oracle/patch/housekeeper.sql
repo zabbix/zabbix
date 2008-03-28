@@ -7,5 +7,6 @@ CREATE TABLE housekeeper_tmp (
 );
 
 insert into housekeeper_tmp select * from housekeeper;
+drop sequence housekeeper_housekeeperid;
 drop table housekeeper;
-alter table housekeeper_tmp rename housekeeper;
+alter table housekeeper_tmp rename to housekeeper;

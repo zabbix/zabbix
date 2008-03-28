@@ -6,5 +6,6 @@ CREATE TABLE usrgrp_tmp (
 CREATE INDEX usrgrp_1 on usrgrp_tmp (name);
 
 insert into usrgrp_tmp select * from usrgrp;
+drop sequence usrgrp_usrgrpid;
 drop table usrgrp;
-alter table usrgrp_tmp rename usrgrp;
+alter table usrgrp_tmp rename to usrgrp;

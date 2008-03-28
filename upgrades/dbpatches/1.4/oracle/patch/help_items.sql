@@ -7,4 +7,4 @@ CREATE TABLE help_items_tmp (
 
 insert into help_items_tmp select * from help_items;
 drop table help_items;
-alter table help_items_tmp rename help_items;
+alter table help_items_tmp rename to help_items;

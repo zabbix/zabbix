@@ -7,4 +7,4 @@ CREATE INDEX history_1 on history_tmp (itemid,clock);
 
 insert into history_tmp select * from history;
 drop table history;
-alter table history_tmp rename history;
+alter table history_tmp rename to history;
