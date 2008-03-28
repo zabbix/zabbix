@@ -18,6 +18,7 @@ CREATE TABLE screens_items_tmp (
 );
 
 insert into screens_items_tmp select * from screens_items;
+drop trigger screens_items_trigger;
 drop sequence screens_items_screenid;
 drop table screens_items;
 alter table screens_items_tmp rename to screens_items;

@@ -26,6 +26,7 @@ insert into operations select actionid,actionid,actiontype,recipient,userid,subj
 update operations set longdata=scripts_tmp where operationtype=1;
 alter table operations drop column scripts_tmp;
 
+drop trigger actions_trigger;
 drop sequence actions_actionid;
 drop table actions;
 alter table actions_tmp rename to actions;

@@ -7,6 +7,7 @@ CREATE TABLE screens_tmp (
 );
 
 insert into screens_tmp select * from screens;
+drop trigger screens_trigger;
 drop sequence screens_screenid;
 drop table screens;
 alter table screens_tmp rename to screens;

@@ -11,6 +11,7 @@ CREATE INDEX functions_1 on functions_tmp (triggerid);
 CREATE INDEX functions_2 on functions_tmp (itemid,function,parameter);
 
 insert into functions_tmp select * from functions;
+drop trigger functions_trigger;
 drop sequence functions_functionid;
 drop table functions;
 alter table functions_tmp rename to functions;

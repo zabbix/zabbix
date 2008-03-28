@@ -12,5 +12,6 @@ CREATE INDEX events_1 on events (object,objectid,clock);
 CREATE INDEX events_2 on events (clock);
 
 insert into events select alarmid,0,0,triggerid,clock,value,acknowledged from alarms;
+drop trigger alarms_trigger;
 drop sequence alarms_alarmid;
 drop table alarms;

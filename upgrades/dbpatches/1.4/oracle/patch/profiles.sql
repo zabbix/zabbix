@@ -9,6 +9,7 @@ CREATE TABLE profiles_tmp (
 CREATE UNIQUE INDEX profiles_1 on profiles_tmp (userid,idx);
 
 insert into profiles_tmp select * from profiles;
+drop trigger profiles_trigger;
 drop sequence profiles_profileid;
 drop table profiles;
 alter table profiles_tmp rename to profiles;

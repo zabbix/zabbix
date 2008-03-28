@@ -1,3 +1,4 @@
+drop trigger hosts_templates_trigger;
 drop sequence hosts_templates_hosttemplateid;
 drop table hosts_templates;
 
@@ -31,6 +32,7 @@ CREATE INDEX hosts_1 on hosts_tmp (host);
 CREATE INDEX hosts_2 on hosts_tmp (status);
 
 insert into hosts_tmp select hostid,host,host,useip,ip,port,status,disable_until,error,available,errors_from from hosts;
+drop trigger hosts_trigger;
 drop sequence hosts_hostid;
 drop table hosts;
 alter table hosts_tmp rename to hosts;

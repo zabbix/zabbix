@@ -12,6 +12,7 @@ CREATE INDEX media_1 on media_tmp (userid);
 CREATE INDEX media_2 on media_tmp (mediatypeid);
 
 insert into media_tmp select * from media;
+drop trigger media_trigger;
 drop sequence media_mediaid;
 drop table media;
 alter table media_tmp rename to media;

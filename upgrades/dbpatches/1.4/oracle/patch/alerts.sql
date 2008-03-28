@@ -22,6 +22,7 @@ CREATE INDEX alerts_5 on alerts_tmp (mediatypeid);
 CREATE INDEX alerts_6 on alerts_tmp (userid);
 
 insert into alerts_tmp select alertid,actionid,triggerid,userid,clock,mediatypeid,sendto,subject,message,status,retries,error,nextcheck from alerts;
+drop trigger alerts_trigger;
 drop sequence alerts_alertid;
 drop table alerts;
 alter table alerts_tmp rename to alerts;
