@@ -49,6 +49,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	@PROXY_LIBS@
 
 zabbix_proxy_LDFLAGS = \

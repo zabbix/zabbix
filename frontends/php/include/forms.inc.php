@@ -186,7 +186,7 @@
 
 			//TODO init checks
 			$dchecks = array();
-			$db_checks = DBselect('SELECT * FROM dchecks WHERE druleid='.$_REQUEST['druleid']);
+			$db_checks = DBselect('SELECT type,ports,key_,snmp_community FROM dchecks WHERE druleid='.$_REQUEST['druleid']);
 			while($check_data = DBfetch($db_checks))
 			{
 				$dchecks[] = array( 'type' => $check_data['type'], 'ports' => $check_data['ports'] ,
@@ -231,7 +231,7 @@
 			{
 				case SVC_SNMPv1:
 				case SVC_SNMPv2:
-					$external_param = '"'.$data['snmp_community'].'":"'.$data['key'].'"';
+					$external_param = ' "'.$data['snmp_community'].'":"'.$data['key'].'"';
 					break;
 				case SVC_AGENT:	
 					$external_param = ' "'.$data['key'].'"';
@@ -239,10 +239,12 @@
 				default:
 					$external_param = null;
 			}
+			$port_def = svc_default_port($data['type']);
 			$dchecks[$id] = array(
-				new CCheckBox('selected_checks[]',null,null,$id), SPACE,
-				discovery_check_type2str($data['type']), SPACE,
-				'('.$data['ports'].')'.SPACE.$external_param,
+				new CCheckBox('selected_checks[]',null,null,$id),
+				discovery_check_type2str($data['type']),
+				($port_def == $data['ports'] ? '' : SPACE.'('.$data['ports'].')').
+				$external_param,
 				BR()
 			);
 		}
@@ -256,7 +258,7 @@
 		$cmbChkType = new CComboBox('new_check_type',$new_check_type,
 			"if(add_variable(this, 'type_changed', 1)) submit()"
 			);
-		foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2) as $type_int)
+		foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_ICMPPING) as $type_int)
 			$cmbChkType->AddItem($type_int, discovery_check_type2str($type_int));
 
 		if(isset($_REQUEST['type_changed']))
@@ -275,14 +277,18 @@
 				$form->AddVar('new_check_snmp_community', '');
 				$external_param = array_merge($external_param, array(BR(), S_KEY, new CTextBox('new_check_key', $new_check_key), BR()));
 				break;
+			case SVC_ICMPPING:
+				$form->AddVar('new_check_ports', '0');
 			default:
 				$form->AddVar('new_check_snmp_community', '');
 				$form->AddVar('new_check_key', '');
 		}
 
+		$ports_box = $new_check_type == SVC_ICMPPING ? NULL : array(S_PORTS_SMALL, SPACE,
+				new CNumericBox('new_check_ports', $new_check_ports,5));
 		$form->AddRow(S_NEW_CHECK, array(
 			$cmbChkType, SPACE,
-			S_PORTS_SMALL, SPACE, new CNumericBox('new_check_ports', $new_check_ports,5),
+			$ports_box,
 			$external_param,
 			new CButton('add_check', S_ADD)
 		),'new');
@@ -3155,7 +3161,8 @@ include_once 'include/discovery.inc.php';
 				case CONDITION_TYPE_DSERVICE_TYPE:
 					$cmbCondVal = new CComboBox('new_condition[value]');
 					foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP,
-						SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,SVC_AGENT,SVC_SNMPv1,SVC_SNMPv2) as $svc)
+						SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,SVC_AGENT,SVC_SNMPv1,SVC_SNMPv2,
+						SVC_ICMPPING) as $svc)
 						$cmbCondVal->AddItem($svc,discovery_check_type2str($svc));
 
 					$rowCondition[] = $cmbCondVal;
