@@ -58,6 +58,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(JABBER_LDADD) \
 	@SERVER_LIBS@
 

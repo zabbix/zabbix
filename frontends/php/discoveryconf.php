@@ -46,7 +46,7 @@ include_once "include/page_header.php";
 		"selected_checks"=>	array(T_ZBX_INT, O_OPT, null, null, null),
 
 		"new_check_type"=>	array(T_ZBX_INT, O_OPT,  null,	
-			IN(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2)),
+			IN(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_ICMPPING)),
 										'isset({add_check})'),
 
 		"new_check_ports"=>	array(T_ZBX_PORTS, O_OPT,  null,	NOT_EMPTY,	'isset({add_check})'),
