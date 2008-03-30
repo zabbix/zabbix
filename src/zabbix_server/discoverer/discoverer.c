@@ -24,6 +24,7 @@
 #include "db.h"
 #include "log.h"
 #include "sysinfo.h"
+#include "zbxicmpping.h"
 
 #include "daemon.h"
 #include "discoverer.h"
@@ -525,6 +526,7 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 	char		key[MAX_STRING_LEN];
 	AGENT_RESULT 	value;
 	DB_ITEM		item;
+	ZBX_FPING_HOST	host;
 
 	assert(check);
 	assert(ip);
@@ -585,6 +587,7 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 		case SVC_AGENT:
 		case SVC_SNMPv1:
 		case SVC_SNMPv2c:
+		case SVC_ICMPPING:
 			break;
 		default:
 			ret = FAIL;
@@ -658,6 +661,17 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 					ret = FAIL;
 				}
 #endif
+				break;
+			case SVC_ICMPPING:
+				memset(&host, 0, sizeof(host));
+				strscpy(host.addr, ip);
+				host.useip = 1;
+
+				if (SUCCEED == do_ping(&host, 1)) {
+				       if (0 == host.alive)
+					       ret = FAIL;
+				} else
+					ret = FAIL;
 				break;
 			/* Simple checks */
 			default:

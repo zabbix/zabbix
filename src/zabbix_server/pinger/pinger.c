@@ -24,18 +24,10 @@
 #include "log.h"
 #include "zlog.h"
 #include "sysinfo.h"
-#include "threads.h"
 #include "zbxserver.h"
+#include "zbxicmpping.h"
 
 #include "pinger.h"
-
-#define ZBX_FPING_HOST struct zbx_fipng_host
-ZBX_FPING_HOST
-{
-	char		addr[HOST_ADDR_LEN_MAX];
-	int		alive, useip;
-	double		mseconds;
-};
 
 static zbx_process_t	zbx_process;
 static int		pinger_num;
@@ -58,7 +50,7 @@ static int		pinger_num;
  * Comments: can be done in process_data()                                    *
  *                                                                            *
  ******************************************************************************/
-static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value, int now, int *items)
+static void process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value, int now, int *items)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -102,8 +94,48 @@ static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value, i
 		(*items)++;
 	}
 	DBfree_result(result);
+}
 
-	return SUCCEED;
+/******************************************************************************
+ *                                                                            *
+ * Function: process_values                                                   *
+ *                                                                            *
+ * Purpose: process new item value                                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: successfully processed items                                 *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: can be done in process_data()                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int process_values(ZBX_FPING_HOST *hosts, int hosts_count, int now)
+{
+	int		i, items = 0;
+	AGENT_RESULT	value;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_values()");
+
+	for (i = 0; i < hosts_count; i++) {
+		zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] alive [%d] " ZBX_FS_DBL " sec.",
+				hosts[i].addr,
+				hosts[i].alive,
+				hosts[i].sec);
+
+		init_result(&value);
+		SET_UI64_RESULT(&value, hosts[i].alive);
+		process_value(SERVER_ICMPPING_KEY, &hosts[i], &value, now, &items);
+		free_result(&value);
+				
+		init_result(&value);
+		SET_DBL_RESULT(&value, hosts[i].sec);
+		process_value(SERVER_ICMPPINGSEC_KEY, &hosts[i], &value, now, &items);
+		free_result(&value);
+	}
+
+	return items;
 }
 
 /******************************************************************************
@@ -196,130 +228,6 @@ static int get_pinger_hosts(ZBX_FPING_HOST **hosts, int *hosts_allocated, int no
 	zabbix_log(LOG_LEVEL_DEBUG, "End of get_pinger_hosts()");
 
 	return hosts_count;
-}
-
-
-/******************************************************************************
- *                                                                            *
- * Function: do_ping                                                          *
- *                                                                            *
- * Purpose: ping hosts listed in the host files                               *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: => 0 - successfully processed items                          *
- *               FAIL - otherwise                                             *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: use external binary 'fping' to avoid superuser priviledges       *
- *                                                                            *
- ******************************************************************************/
-static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int now)
-{
-	FILE		*f;
-	char		filename[MAX_STRING_LEN];
-	char		tmp[MAX_STRING_LEN];
-	int		i, items = 0;
-	char		*c;
-	ZBX_FPING_HOST	*host;
-	AGENT_RESULT	value;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In do_ping() [hosts_count:%d]",
-			hosts_count);
-
-	zbx_snprintf(filename, sizeof(filename), "/tmp/zabbix_server_%li.pinger",
-			zbx_get_thread_id());
-
-	if (NULL == (f = fopen(filename, "w"))) {
-		zabbix_log(LOG_LEVEL_ERR, "Cannot open file [%s] [%s]",
-				filename,
-				strerror(errno));
-		zabbix_syslog("Cannot open file [%s] [%s]",
-				filename,
-				strerror(errno));
-		return FAIL;
-	}
-
-	for (i = 0; i < hosts_count; i++)
-		fprintf(f, "%s\n", hosts[i].addr);
-
-	fclose(f);
-
-#ifdef HAVE_IPV6
-	zbx_snprintf(tmp, sizeof(tmp), "%s -c3 2>/dev/null <%s;%s -c3 2>/dev/null <%s",
-			CONFIG_FPING_LOCATION,
-			filename,
-			CONFIG_FPING6_LOCATION,
-			filename);
-#else /* HAVE_IPV6 */
-	zbx_snprintf(tmp, sizeof(tmp), "%s -c3 2>/dev/null <%s",
-			CONFIG_FPING_LOCATION,
-			filename);
-#endif /* HAVE_IPV6 */
-
-	if (0 == (f = popen(tmp, "r"))) {
-		zabbix_log(LOG_LEVEL_ERR, "Cannot execute [%s] [%s]",
-				CONFIG_FPING_LOCATION,
-				strerror(errno));
-		zabbix_syslog("Cannot execute [%s] [%s]",
-				CONFIG_FPING_LOCATION,
-				strerror(errno));
-		return FAIL;
-	}
-
-	while (NULL != fgets(tmp, sizeof(tmp), f)) {
-		zabbix_log(LOG_LEVEL_DEBUG, "Update IP [%s]",
-				tmp);
-
-		/* 12fc::21 : [0], 76 bytes, 0.39 ms (0.39 avg, 0% loss) */
-
-		host = NULL;
-
-		if (NULL != (c = strchr(tmp, ' '))) {
-			*c = '\0';
-			for (i = 0; i < hosts_count; i++)
-				if (0 == strcmp(tmp, hosts[i].addr)) {
-					host = &hosts[i];
-					break;
-				}
-		}
-
-		if (NULL != host) {
-			c++;
-			if (NULL != (c = strchr(c, '('))) {
-				c++;
-				host->alive = 1;
-				host->mseconds = atof(c);
-			}
-		}
-	}
-	pclose(f);
-
-	unlink(filename);
-
-	items = 0;
-
-	for (i = 0; i < hosts_count; i++) {
-		zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] alive [%d] " ZBX_FS_DBL " ms",
-				hosts[i].addr,
-				hosts[i].alive,
-				hosts[i].mseconds);
-
-		init_result(&value);
-		SET_UI64_RESULT(&value, hosts[i].alive);
-		process_value(SERVER_ICMPPING_KEY, &hosts[i], &value, now, &items);
-		free_result(&value);
-				
-		init_result(&value);
-		SET_DBL_RESULT(&value, hosts[i].mseconds/1000);
-		process_value(SERVER_ICMPPINGSEC_KEY, &hosts[i], &value, now, &items);
-		free_result(&value);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of do_ping()");
-
-	return items;
 }
 
 /******************************************************************************
@@ -419,7 +327,8 @@ void main_pinger_loop(zbx_process_t p, int num)
 		if (0 < (hosts_count = get_pinger_hosts(&hosts, &hosts_allocated, now))) {
 			zbx_setproctitle("pinger [pinging hosts]");
 
-			items = do_ping(hosts, hosts_count, now);
+			if (SUCCEED == do_ping(hosts, hosts_count))
+				items = process_values(hosts, hosts_count, now); 
 		}
 	
 		sec = zbx_time() - sec;

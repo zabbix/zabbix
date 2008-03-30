@@ -237,7 +237,8 @@ typedef enum
 	SVC_TCP,
 	SVC_AGENT,
 	SVC_SNMPv1,
-	SVC_SNMPv2c
+	SVC_SNMPv2c,
+	SVC_ICMPPING
 } zbx_dservice_type_t;
 
 

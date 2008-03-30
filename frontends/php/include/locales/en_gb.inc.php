@@ -70,6 +70,7 @@
 	'S_NNTP'=>				'NNTP',
 	'S_IMAP'=>				'IMAP',
 	'S_TCP'=>				'TCP',
+	'S_ICMPPING'=>				'ICMP Ping',
 	'S_PORTS_SMALL'=>			'ports',
 
 	'S_DISCOVERY_RULES_DELETED'=>		'Discovery rules deleted',

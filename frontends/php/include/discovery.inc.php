@@ -35,18 +35,19 @@
 		$port = 0;
 
 		switch($type_int){
-			case SVC_SSH:	$port = 22;	break;
-			case SVC_LDAP:	$port = 389;	break;
-			case SVC_SMTP:	$port = 25;	break;
-			case SVC_FTP:	$port = 21;	break;
-			case SVC_HTTP:	$port = 80;	break;
-			case SVC_POP:	$port = 110;	break;
-			case SVC_NNTP:	$port = 119;	break;
-			case SVC_IMAP:	$port = 143;	break;
-			case SVC_TCP:	$port = 80;	break;
-			case SVC_AGENT:	$port = 10050;	break;
-			case SVC_SNMPv1:$port = 161;	break;
-			case SVC_SNMPv2:$port = 161;	break;
+			case SVC_SSH:		$port = 22;	break;
+			case SVC_LDAP:		$port = 389;	break;
+			case SVC_SMTP:		$port = 25;	break;
+			case SVC_FTP:		$port = 21;	break;
+			case SVC_HTTP:		$port = 80;	break;
+			case SVC_POP:		$port = 110;	break;
+			case SVC_NNTP:		$port = 119;	break;
+			case SVC_IMAP:		$port = 143;	break;
+			case SVC_TCP:		$port = 80;	break;
+			case SVC_AGENT:		$port = 10050;	break;
+			case SVC_SNMPv1:	$port = 161;	break;
+			case SVC_SNMPv2:	$port = 161;	break;
+			case SVC_ICMPPING:	$port = 0;	break;
 		}
 
 	return $port;
@@ -66,6 +67,7 @@
 		$str_type[SVC_AGENT]	= S_ZABBIX_AGENT;
 		$str_type[SVC_SNMPv1]	= S_SNMPV1_AGENT;
 		$str_type[SVC_SNMPv2]	= S_SNMPV2_AGENT;
+		$str_type[SVC_ICMPPING]	= S_ICMPPING;
 
 		if(isset($str_type[$type_int]))
 			return $str_type[$type_int];
