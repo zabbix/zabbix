@@ -417,40 +417,22 @@ void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *late
 /* Rewrite required to simplify logic ?*/
 int	latest_service_alarm(zbx_uint64_t serviceid, int status)
 {
-	int	clock;
+	int	servicealarmid;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int ret = FAIL;
+	char sql[MAX_STRING_LEN];
 
+	zbx_snprintf(sql,"select servicealarmid, value from service_alarms where serviceid=" ZBX_FS_UI64 " order by servicealarmid desc",serviceid);
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In latest_service_alarm()");
 
-	result = DBselect("select max(clock) from service_alarms where serviceid=" ZBX_FS_UI64,
-		serviceid);
+	result = DBselectN(sql,1);
 	row = DBfetch(result);
 
-	if(!row || DBis_null(row[0])==SUCCEED)
-        {
-                zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
-                ret = FAIL;
+	if(row && (DBis_null(row[1])==FAIL) && (atoi(row[1]) == status)){
+		ret = SUCCEED;
         }
-	else
-	{
-		clock=atoi(row[0]);
-		DBfree_result(result);
-
-		result = DBselect("select value from service_alarms where serviceid=" ZBX_FS_UI64 " and clock=%d",
-			serviceid,
-			clock);
-		row = DBfetch(result);
-		if(row && DBis_null(row[0]) != SUCCEED)
-		{
-			if(atoi(row[0]) == status)
-			{
-				ret = SUCCEED;
-			}
-		}
-	}
 
 	DBfree_result(result);
 

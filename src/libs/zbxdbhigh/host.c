@@ -275,6 +275,8 @@ static int	DBget_service_status(
 	DB_ROW		row;
 
 	int status = 0;
+	char sql[MAX_STRING_LEN];
+	char sort_order[MAX_STRING_LEN];
 
 	if( 0 != triggerid )
 	{
@@ -288,25 +290,21 @@ static int	DBget_service_status(
 
 	if((SERVICE_ALGORITHM_MAX == algorithm) || (SERVICE_ALGORITHM_MIN == algorithm))
 	{
-		if(SERVICE_ALGORITHM_MAX == algorithm)
-		{
-			result = DBselect("select count(*),max(status) from services s,services_links l "
-					"where l.serviceupid=" ZBX_FS_UI64 " and s.serviceid=l.servicedownid",
-					serviceid);
-		}
-		/* MIN otherwise */
-		else
-		{
-			result = DBselect("select count(*),min(status) from services s,services_links l "
-					"where l.serviceupid=" ZBX_FS_UI64 " and s.serviceid=l.servicedownid",
-					serviceid);
-		}
+		
+		sort_order=(SERVICE_ALGORITHM_MAX == algorithm)?" DESC ":" ASC ";
+		zbx_snprintf(sql,"select s.status from services s,services_links l "
+				"where l.serviceupid=" ZBX_FS_UI64 " and s.serviceid=l.servicedownid order by s.status %s",
+				serviceid,
+				sort_order);
+
+		result = DBselectN(sql,1);
+
 		row=DBfetch(result);
-		if(row && DBis_null(row[0]) != SUCCEED && DBis_null(row[1]) != SUCCEED)
+		if(row && DBis_null(row[0]) != SUCCEED)
 		{
 			if(atoi(row[0])!=0)
 			{
-				status = atoi(row[1]);
+				status = atoi(row[0]);
 			}
 		}
 		DBfree_result(result);
@@ -352,8 +350,7 @@ void	DBupdate_services_rec(
 		{
 /* Do nothing */
 		}
-		else if((SERVICE_ALGORITHM_MAX == algorithm)
-			||
+		else if((SERVICE_ALGORITHM_MAX == algorithm) ||
 			(SERVICE_ALGORITHM_MIN == algorithm))
 		{
 			status = DBget_service_status(serviceupid, algorithm, 0);
@@ -520,6 +517,7 @@ static int	DBdelete_service(
 	DBexecute("DELETE FROM service_alarms WHERE serviceid=" ZBX_FS_UI64, serviceid);
 	DBexecute("delete from services_links where servicedownid=" ZBX_FS_UI64 " or serviceupid=" ZBX_FS_UI64, serviceid, serviceid);
 	DBexecute("delete from services where serviceid=" ZBX_FS_UI64, serviceid);
+	DBexecute("delete from services_times where serviceid=" ZBX_FS_UI64, serviceid);
 
 	DBupdate_services_status_all();
 	
