@@ -290,12 +290,12 @@ static int	DBget_service_status(
 
 	if((SERVICE_ALGORITHM_MAX == algorithm) || (SERVICE_ALGORITHM_MIN == algorithm))
 	{
+
+		strcpy(sort_order,((SERVICE_ALGORITHM_MAX == algorithm)?" DESC ":" ASC "));
 		
-		sort_order=(SERVICE_ALGORITHM_MAX == algorithm)?" DESC ":" ASC ";
-		zbx_snprintf(sql,"select s.status from services s,services_links l "
-				"where l.serviceupid=" ZBX_FS_UI64 " and s.serviceid=l.servicedownid order by s.status %s",
-				serviceid,
-				sort_order);
+		zbx_snprintf(sql,sizeof(sql),"select s.status from services s,services_links l where l.serviceupid=" ZBX_FS_UI64 " and s.serviceid=l.servicedownid order by s.status %s", 
+			serviceid, 
+			sort_order);
 
 		result = DBselectN(sql,1);
 

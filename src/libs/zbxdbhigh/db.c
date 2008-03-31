@@ -417,13 +417,12 @@ void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *late
 /* Rewrite required to simplify logic ?*/
 int	latest_service_alarm(zbx_uint64_t serviceid, int status)
 {
-	int	servicealarmid;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int ret = FAIL;
 	char sql[MAX_STRING_LEN];
 
-	zbx_snprintf(sql,"select servicealarmid, value from service_alarms where serviceid=" ZBX_FS_UI64 " order by servicealarmid desc",serviceid);
+	zbx_snprintf(sql,sizeof(sql),"select servicealarmid, value from service_alarms where serviceid=" ZBX_FS_UI64 " order by servicealarmid desc", serviceid);
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In latest_service_alarm()");
 
