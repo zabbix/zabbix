@@ -1,5 +1,6 @@
 Changes for 1.5.1:
 
+ - [DEV-134] JSON static buffer (Sasha)
  - [DEV-15] autodiscovery by ICMP pings (Sasha)
  - [DEV-72] improved icmpping* processing. added "-c3" to fping (Sasha) 
  - [DEV-122] improved "Events" screen, added "Event Details" screen (Artem)
