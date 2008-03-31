@@ -69,8 +69,11 @@ typedef enum
 	ZBX_JSON_COMMA
 } zbx_json_status_t;
 
+#define ZBX_JSON_STAT_BUF_LEN 4096
+
 struct zbx_json {
 	char			*buffer;
+	char			buf_stat[ZBX_JSON_STAT_BUF_LEN];
 	size_t			buffer_allocated;
 	size_t			buffer_offset;
 	size_t			buffer_size;
