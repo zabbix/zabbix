@@ -63,17 +63,64 @@ static void __zbx_zbx_set_json_strerror(const char *fmt, ...)
 	va_end(args);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: __zbx_json_realloc                                               *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: -                                                            * 
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	__zbx_json_realloc(struct zbx_json *j, size_t need)
+{
+	int	realloc = 0;
+
+	if (j->buffer == NULL) {
+		if (need > sizeof(j->buf_stat)) {
+			j->buffer_allocated = need;
+			j->buffer = zbx_malloc(j->buffer, j->buffer_allocated);
+		} else {
+			j->buffer_allocated = sizeof(j->buf_stat);
+			j->buffer = j->buf_stat;
+		}
+		return;
+	}
+			
+	while (need > j->buffer_allocated) {
+		if (0 == j->buffer_allocated)
+			j->buffer_allocated = 1024;
+		else
+			j->buffer_allocated *= 2;
+		realloc = 1;
+	}
+
+	if (1 == realloc) {
+		if (j->buffer == j->buf_stat) {
+			j->buffer = zbx_malloc(j->buffer, j->buffer_allocated);
+			memcpy(j->buffer, j->buf_stat, sizeof(j->buf_stat));
+		} else
+			j->buffer = zbx_realloc(j->buffer, j->buffer_allocated);
+	}
+}
+
 void	zbx_json_init(struct zbx_json *j, size_t allocate)
 {
 	assert(j);
 
 	j->buffer = NULL;
-	j->buffer_allocated = allocate;
-	j->buffer = zbx_malloc(j->buffer, j->buffer_allocated);
+	j->buffer_allocated = 0;
 	j->buffer_offset = 0;
 	j->buffer_size = 0;
 	j->status = ZBX_JSON_EMPTY;
 	j->level = 0;
+	__zbx_json_realloc(j, allocate);
 	*j->buffer = '\0';
 
 	zbx_json_addobject(j, NULL);
@@ -96,27 +143,8 @@ void	zbx_json_free(struct zbx_json *j)
 {
 	assert(j);
 
-	zbx_free(j->buffer);
-}
-
-static int	__zbx_json_realloc(struct zbx_json *j, size_t need)
-{
-	int	realloc = 0;
-
-	while (need > j->buffer_allocated) {
-		if (0 == j->buffer_allocated)
-			j->buffer_allocated = 1024;
-		else
-			j->buffer_allocated *= 2;
-		realloc = 1;
-	}
-
-	if (1 == realloc)/* {
-printf("----- zbx_json_realloc() [need:%zd] [allocated:%zd]\n", need, j->buffer_allocated);*/
-		j->buffer = zbx_realloc(j->buffer, j->buffer_allocated);
-/*	}*/
-
-	return SUCCEED;
+	if (j->buffer != j->buf_stat)
+		zbx_free(j->buffer);
 }
 
 static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
@@ -322,7 +350,7 @@ int	zbx_json_close(struct zbx_json *j)
 
 /******************************************************************************
  *                                                                            *
- * Function: __zbx_json_rbracket                                                *
+ * Function: __zbx_json_rbracket                                              *
  *                                                                            *
  * Purpose: return position of right bracket                                  *
  *                                                                            *
