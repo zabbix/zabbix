@@ -138,7 +138,8 @@ include_once "include/page_header.php";
 			
 			if($row["status"]==0 || (isset($service) && (bccomp($service["serviceid"] , $row["serviceid"]) == 0))){
 				$row['reason']="-";
-			} else {
+			} 
+			else {
 				$row['reason'] = new CList(null,"itservices");
 				$result2=DBselect("select s.triggerid,s.serviceid from services s, triggers t ".
 					" where s.status>0 and s.triggerid is not NULL and t.triggerid=s.triggerid ".
@@ -162,8 +163,9 @@ include_once "include/page_header.php";
 				$period_start	= $now-7*24*3600;
 				$period_end	= $now;
 				
-				$stat = calculate_service_availability($row["serviceid"],$period_start,$period_end);
 
+				$stat = calculate_service_availability($row["serviceid"],$period_start,$period_end);
+				
 				if($row["goodsla"] > $stat["ok"]){
 					$sla_style='red';
 				} else {

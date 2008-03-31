@@ -919,14 +919,16 @@ COpt::profiling_start('prepare data');
 
 			// A little tricky check for attempt to overwrite active trigger (value=1) with
 			// inactive or active trigger with lower priority.
-			$val = 0;
-
-			if (array_key_exists($descr, $items) && array_key_exists($row['host'], $items[$descr])){
-				$prio = $items[$descr][$row['host']]['severity'];
-				$val  = $items[$descr][$row['host']]['tr_value'];
-			}
-
-			if((TRIGGER_VALUE_FALSE == $val) || ((TRIGGER_VALUE_TRUE == $row['tr_value']) && ($prio<$row['priority']))){
+			if (!isset($items[$descr][$row['host']]) ||
+				(
+					(($items[$descr][$row['host']]['tr_value'] == TRIGGER_VALUE_FALSE) && ($row['tr_value'] == TRIGGER_VALUE_TRUE)) ||
+					(
+						(($items[$descr][$row['host']]['tr_value'] == TRIGGER_VALUE_FALSE) || ($row['tr_value'] == TRIGGER_VALUE_TRUE)) &&
+						($row['priority'] > $items[$descr][$row['host']]['severity'])
+					)
+				)
+			)
+			{
 				$items[$descr][$row['host']] = array(
 					'itemid'	=> $row['itemid'],
 					'value_type'=> $row['value_type'],
