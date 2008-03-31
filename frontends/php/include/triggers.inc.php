@@ -1831,14 +1831,16 @@
 
 			// A little tricky check for attempt to overwrite active trigger (value=1) with
 			// inactive or active trigger with lower priority.
-			$val = TRIGGER_VALUE_FALSE;
-
-			if (array_key_exists($row['description'], $triggers) && array_key_exists($row['host'], $triggers[$row['description']])){
-				$prio = $triggers[$row['description']][$row['host']]['priority'];
-				$val  = $triggers[$row['description']][$row['host']]['value'];
-			}
-
-			if((TRIGGER_VALUE_FALSE == $val) || ((TRIGGER_VALUE_TRUE == $row['value']) && ($prio<$row['priority']))){
+			if(!isset($triggers[$row['description']][$row['host']]) ||
+				(
+					(($triggers[$row['description']][$row['host']]['value'] == TRIGGER_VALUE_FALSE) && ($row['value'] == TRIGGER_VALUE_TRUE)) ||
+					(
+						(($triggers[$row['description']][$row['host']]['value'] == TRIGGER_VALUE_FALSE) || ($row['value'] == TRIGGER_VALUE_TRUE)) &&
+						($row['priority'] > $triggers[$row['description']][$row['host']]['priority']) 
+					)
+				)
+			)
+			{
 				$triggers[$row['description']][$row['host']] = array(
 					'hostid'	=> $row['hostid'],
 					'triggerid'	=> $row['triggerid'],
