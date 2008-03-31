@@ -115,7 +115,8 @@ if(isset($_REQUEST['saction'])){
 		show_messages($result, S_SERVICE_DELETED, S_CANNOT_DELETE_SERVICE);
 		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_IT_SERVICE,' Name ['.$service["name"].'] id ['.$service['serviceid'].']');
 		unset($service);
-	} elseif(isset($_REQUEST["save_service"])){
+	} 
+	else if(isset($_REQUEST["save_service"])){
 	
 		$service_times = get_request('service_times',array());
 		$childs = get_request('childs',array());
@@ -132,7 +133,8 @@ if(isset($_REQUEST['saction'])){
 			$serviceid = $service["serviceid"];
 			$audit_acrion = AUDIT_ACTION_UPDATE;
 			
-		} else {
+		} 
+		else {
 			$result = add_service(
 				$_REQUEST["name"],$triggerid,$_REQUEST["algorithm"],
 				$_REQUEST["showsla"],$_REQUEST["goodsla"],$_REQUEST["sortorder"],
@@ -144,7 +146,8 @@ if(isset($_REQUEST['saction'])){
 		
 		add_audit_if($result,$audit_acrion,AUDIT_RESOURCE_IT_SERVICE,' Name ['.$_REQUEST["name"].'] id ['.$serviceid.']');
 			
-	} elseif(isset($_REQUEST["add_server"])){
+	} 
+	else if(isset($_REQUEST["add_server"])){
 		if(!($host_data = DBfetch(DBselect('select h.* from hosts h where '.DBin_node('h.hostid').' and h.hostid not in ('.$denyed_hosts.') and h.hostid='.$_REQUEST["serverid"])))){
 			access_deny();
 		}
@@ -208,7 +211,8 @@ if(isset($_REQUEST['pservices'])){
 					' AND '.DBin_node('s.serviceid').
 					' AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') '.
 				' ORDER BY s.sortorder,s.name';
-	} else {
+	} 
+	else {
 		$query = 'SELECT DISTINCT s.* '.
 			' FROM services s '.
 				' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.

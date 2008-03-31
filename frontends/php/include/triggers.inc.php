@@ -281,38 +281,6 @@
 	}
 
 	/*
-	 * Function: get_trigger_priority
-	 *
-	 * Description: 
-	 *     retrive trigger's priority
-	 *     
-	 * Author: 
-	 *     Artem Suharev
-	 *
-	 * Comments:
-	 *
-	 */
-	
-	function get_trigger_priority($triggerid){
-		$sql = 'SELECT count(*) as count, priority '.
-				' FROM triggers '.
-				' WHERE triggerid='.$triggerid.
-					' AND status=0 '.
-					' AND value='.TRIGGER_VALUE_TRUE.
-				' GROUP BY priority';
-		
-		$rows = DBfetch(DBselect($sql));
-
-		if($rows && !is_null($rows['count']) && !is_null($rows['priority']) && ($rows['count'] > 0)){
-			$status = $rows['priority'];
-		}
-		else{
-			$status = 0;
-		}
-	return $status;
-	}
-
-	/*
 	 * Function: get_realhosts_by_triggerid 
 	 *
 	 * Description: 
@@ -1777,12 +1745,16 @@
 			$group_where = ' where';
 		}
 
-		$result=DBselect('select distinct t.triggerid,t.description,t.expression,t.value,t.priority,t.lastchange,h.hostid,h.host'.
-			' from hosts h,items i,triggers t, functions f '.$group_where.
-			' h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid'.
-			' and h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid()).') '.
-			' and t.status='.TRIGGER_STATUS_ENABLED.' and i.status='.ITEM_STATUS_ACTIVE.
-			' order by t.description');
+		$result=DBselect('SELECT DISTINCT t.triggerid,t.description,t.expression,t.value,t.priority,t.lastchange,h.hostid,h.host'.
+			' FROM hosts h,items i,triggers t, functions f '.
+			$group_where.' h.status='.HOST_STATUS_MONITORED.
+				' AND h.hostid=i.hostid '.
+				' AND i.itemid=f.itemid '.
+				' AND f.triggerid=t.triggerid'.
+				' AND h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid()).') '.
+				' AND t.status='.TRIGGER_STATUS_ENABLED.
+				' AND i.status='.ITEM_STATUS_ACTIVE.
+			' ORDER BY t.description');
 		unset($triggers);
 		unset($hosts);
 		
@@ -1796,14 +1768,16 @@
 
 			// A little tricky check for attempt to overwrite active trigger (value=1) with
 			// inactive or active trigger with lower priority.
-			$val = TRIGGER_VALUE_FALSE;
-
-			if (array_key_exists($row['description'], $triggers) && array_key_exists($row['host'], $triggers[$row['description']])){
-				$prio = $triggers[$row['description']][$row['host']]['priority'];
-				$val  = $triggers[$row['description']][$row['host']]['value'];
-			}
-
-			if((TRIGGER_VALUE_FALSE == $val) || ((TRIGGER_VALUE_TRUE == $row['value']) && ($prio<$row['priority']))){
+			if(!isset($triggers[$row['description']][$row['host']]) ||
+				(
+					(($triggers[$row['description']][$row['host']]['value'] == TRIGGER_VALUE_FALSE) && ($row['value'] == TRIGGER_VALUE_TRUE)) ||
+					(
+						(($triggers[$row['description']][$row['host']]['value'] == TRIGGER_VALUE_FALSE) || ($row['value'] == TRIGGER_VALUE_TRUE)) &&
+						($row['priority'] > $triggers[$row['description']][$row['host']]['priority']) 
+					)
+				)
+			)
+			{
 				$triggers[$row['description']][$row['host']] = array(
 					'hostid'	=> $row['hostid'],
 					'triggerid'	=> $row['triggerid'],
