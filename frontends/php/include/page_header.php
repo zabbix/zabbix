@@ -105,7 +105,7 @@ COpt::profiling_start("page");
 					array(
 							"url"=>"dashboard.php",
 							"label"=>S_DASHBOARD,
-							"sub_pages"=>array("chart2.php","chart6.php","charts.php","screens.php","maps.php","map.php")
+							"sub_pages"=>array("chart2.php","chart3.php","chart6.php","chart7.php","charts.php","screens.php","maps.php","map.php")
 						),
 					array("url"=>"overview.php"	,"label"=>S_OVERVIEW	),
 					array(
