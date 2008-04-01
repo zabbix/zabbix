@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -275,13 +275,14 @@ static int	DBget_service_status(
 	DB_ROW		row;
 
 	int status = 0;
-	char sql[MAX_STRING_LEN];
 	char sort_order[MAX_STRING_LEN];
-
+	char sql[MAX_STRING_LEN];
+	
 	if( 0 != triggerid )
 	{
 		result = DBselect("select priority from triggers where triggerid=" ZBX_FS_UI64 " and status=0 and value=%d", triggerid, TRIGGER_VALUE_TRUE);
-		if( (row = DBfetch(result)) )
+		row = DBfetch(result);
+		if(row && (DBis_null(row[0])!=SUCCEED))
 		{
 			status = atoi(row[0]);
 		}
@@ -478,13 +479,10 @@ void	DBupdate_services(
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(serviceid,row[0]);
-
+		
 		DBadd_service_alarm(
 			serviceid,
-			DBget_service_status(
-				serviceid,
-				atoi(row[1]),
-				0),
+			status,
 			time(NULL)
 			);
 

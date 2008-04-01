@@ -801,7 +801,7 @@ function update_services($triggerid, $status){
 	$result = DBselect('SELECT serviceid,algorithm FROM services WHERE triggerid='.$triggerid);
 
 	while(($rows=DBfetch($result))){
-		$status = get_service_status($rows['serviceid'],$rows['algorithm']);
+//		$status = get_service_status($rows['serviceid'],$rows['algorithm'],$triggerid);
 		add_service_alarm($rows['serviceid'],$status,time());
 
 		update_services_rec($rows['serviceid']);
