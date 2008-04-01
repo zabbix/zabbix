@@ -254,8 +254,15 @@ static int	process_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, time_t now,
 		init_result(&agent);
 
 		if( SUCCEED == set_result_type(&agent, item.value_type, value)) {
-			process_new_value(&item, &agent, now);
-			update_triggers(item.itemid);
+			switch (zbx_process) {
+			case ZBX_PROCESS_SERVER:
+				process_new_value(&item, &agent, now);
+				update_triggers(item.itemid);
+				break;
+			case ZBX_PROCESS_PROXY:
+				proxy_process_new_value(&item, &agent, now);
+				break;
+			}
 		} else {
 			zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not suitable for [%s@%s]",
 					value,
