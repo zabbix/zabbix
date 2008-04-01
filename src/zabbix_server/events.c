@@ -194,7 +194,7 @@ int	process_event(DB_EVENT *event)
 		process_actions(event);
 	}
 
-	if(event->value == TRIGGER_VALUE_TRUE)
+	if(TRIGGER_VALUE_TRUE == event->value)
 	{
 		DBupdate_services(event->objectid, event->trigger_priority);
 	}

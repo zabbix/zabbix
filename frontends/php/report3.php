@@ -52,11 +52,14 @@ include_once "include/page_header.php";
 
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
 	
-	if( !($service = DBfetch(DBselect("select s.* from services s left join triggers t on s.triggerid=t.triggerid ".
-		" left join functions f on t.triggerid=f.triggerid left join items i on f.itemid=i.itemid ".
-		" where (i.hostid is NULL or i.hostid not in (".$denyed_hosts.")) ".
-		' and '.DBin_node('s.serviceid').
-		" and s.serviceid=".$_REQUEST["serviceid"]
+	if( !($service = DBfetch(DBselect('SELECT s.* '.
+					' FROM services s '.
+						' LEFT JOIN triggers t on s.triggerid=t.triggerid '.
+						' LEFT JOIN functions f on t.triggerid=f.triggerid '.
+						' LEFT JOIN items i on f.itemid=i.itemid '.
+					' WHERE (i.hostid is NULL or i.hostid not in ('.$denyed_hosts.')) '.
+						' AND '.DBin_node('s.serviceid').
+						' AND s.serviceid='.$_REQUEST['serviceid']
 		))))
 	{
 		access_deny();

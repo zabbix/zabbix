@@ -441,7 +441,7 @@ int	latest_service_alarm(zbx_uint64_t serviceid, int status)
 int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
 {
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_service_alarm()");
-
+	
 	if(latest_service_alarm(serviceid,status) == SUCCEED)
 	{
 		return SUCCEED;
