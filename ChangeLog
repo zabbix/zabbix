@@ -1,9 +1,13 @@
-Changes for 1.4.5:
+Changes for 1.4.6:
 
+ - [ZBX-348] fixed incorrect processing of large integer values for {ITEM.LASTVALUE} (Alexei)
  - [ZBX-337] added Oracle upgrade scripts (Sasha) 
  - [ZBX-301] fixes some typos (Artem)
  - [ZBX-310] fixes for PGSQL (Artem)
  - [ZBX-336] fixed vtext.php (Artem)
+
+Changes for 1.4.5:
+
  - [ZBX-295] fixed processing of null values under Oracle. Thanks to Max Lapan. (Sasha)
  - [ZBX-340] Oracle related fixes. Thanks to Max Lapan. (Sasha)
  - [ZBX-294,ZBX-296] Oracle related fixes. Thanks to Max Lapan. (Sasha)

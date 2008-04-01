@@ -1550,7 +1550,9 @@ static void	add_value_suffix_normal(char *value, int max_len, char *units)
 		value,
 		units);
 
-	value_uint64 = labs(zbx_atoui64(value));
+	ZBX_STR2UINT64(value_uint64, value);
+
+/*	value_uint64 = llabs(zbx_atoui64(value));*/
 
 	/* SPecial processing for bits */
 	if(strcmp(units,"b") == 0 || strcmp(units,"bps") == 0)
