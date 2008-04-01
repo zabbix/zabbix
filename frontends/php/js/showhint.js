@@ -19,12 +19,6 @@
 **
 */
 
-function GetPos(obj){	
-	var pos = getPosition(obj);
-	
-return [pos.left,pos.top];
-}
-
 var hint_box = null;
 
 function hide_hint()
@@ -52,7 +46,7 @@ function show_hint_ext(obj, e, hint_text, width, class_name)
 	hint_box.style.width = width;
 
 	var cursor = get_cursor_position(e);
-	var pos = GetPos(obj);
+	var pos = getPosition(obj);
 
 	var body_width = get_bodywidth();
 
@@ -66,7 +60,7 @@ function show_hint_ext(obj, e, hint_text, width, class_name)
 	}
 
 	hint_box.x	= cursor.x;
-	hint_box.y	= pos[1];
+	hint_box.y	= pos.top;
 
 	hint_box.style.left = cursor.x + "px";
 //	hint_box.style.left	= hint_box.x + obj.offsetWidth + 10 + "px";
@@ -79,12 +73,11 @@ function show_hint_ext(obj, e, hint_text, width, class_name)
 function update_hint(obj, e)
 {
 	if(!hint_box) return;
+	if('undefined' == typeof(hint_box.y)) return;
 
 	var cursor = get_cursor_position(e);
-	var pos = GetPos(obj);
-	
 	var body_width = get_bodywidth();
-
+	
 	if(parseInt(cursor.x+10+hint_box.offsetWidth) > body_width){
 		cursor.x-=parseInt(hint_box.offsetWidth);
 		cursor.x-=10;
