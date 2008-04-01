@@ -920,16 +920,6 @@ int main(int argc, char **argv)
 
 	int	nodeid;
 
-	char	tmp[MAX_STRING_LEN];
-
-	zbx_snprintf(tmp, sizeof(tmp), "%s", "12991270912");
-
-	add_value_suffix(tmp, sizeof(tmp), "B", 3);
-
-	printf("%s\n", tmp);
-
-	exit(1);
-
 	progname = argv[0];
 
 	/* Parse the command-line. */
