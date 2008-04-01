@@ -73,6 +73,9 @@ void	zbx_db_close(void)
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbsocket, int port)
 {
 	int	ret = ZBX_DB_OK;
+#ifdef	HAVE_SQLITE3
+	char	*p, *path;
+#endif /* HAVE_SQLITE3 */
 
 	/*	zabbix_log(LOG_LEVEL_ERR, "[%s] [%s] [%s]\n",dbname, dbuser, dbpassword ); */
 #ifdef	HAVE_MYSQL
@@ -196,8 +199,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	ret = sqlite3_open(dbname, &conn);
 
 /* check to see that the backend connection was successfully made */
-	if(ret)
-	{
+	if (ret) {
 		zabbix_log(LOG_LEVEL_ERR, "Can't open database [%s]: %s\n", dbname, sqlite3_errmsg(conn));
 		DBclose();
 		exit(FAIL);
@@ -206,16 +208,19 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	/* Do not return SQLITE_BUSY immediately, wait for N ms */
 	sqlite3_busy_timeout(conn, 60*1000);
 
-/*	if(ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
-	{
-		zbx_error("Unable to create mutex for sqlite");
-		exit(FAIL);
-	}*/
-
 	sqlite_transaction_started = 0;
 
-	DBexecute("PRAGMA synchronous=OFF");
-	DBexecute("PRAGMA temp_store=MEMORY");
+	path = strdup(dbname);
+	if (NULL != (p = strrchr(path, '/')))
+		*++p = '\0';
+	else
+		*path = '\0';
+
+	DBexecute("PRAGMA synchronous = 0"); /* OFF */
+	DBexecute("PRAGMA temp_store = 2"); /* MEMORY */
+	DBexecute("PRAGMA temp_store_directory = '%s'", path);
+
+	zbx_free(path);
 
 	return ret;
 #endif

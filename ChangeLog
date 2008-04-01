@@ -1,5 +1,6 @@
 Changes for 1.5.1:
 
+ - [DEV-98] added support of ZABBIX Proxy (Sasha)
  - [DEV-134] JSON static buffer (Sasha)
  - [DEV-15] autodiscovery by ICMP pings (Sasha)
  - [DEV-72] improved icmpping* processing. added "-c3" to fping (Sasha) 
