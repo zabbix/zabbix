@@ -103,11 +103,10 @@ include_once 'include/page_header.php';
 		$_REQUEST["groupid"] = $_REQUEST["hostid"] = 0;
 	}
 
-	$_REQUEST["graphid"] = get_request("graphid", get_profile("web.charts.graphid", 0));
+	$_REQUEST["graphid"] =	get_request("graphid", get_profile("web.charts.graphid", 0));
+	$_REQUEST["keep"] 	=	get_request("keep", 1); // possible excessed REQUEST variable !!!
+	$_REQUEST["period"] =	get_request("period",get_profile("web.graph[".$_REQUEST["graphid"]."].period", ZBX_PERIOD_DEFAULT));
 	
-	$_REQUEST["keep"] = get_request("keep", 1); // possible excessed REQUEST variable !!!
-
-	$_REQUEST["period"] = get_request("period",get_profile("web.graph[".$_REQUEST["graphid"]."].period", ZBX_PERIOD_DEFAULT));
 	$effectiveperiod = navigation_bar_calc();
 	
 	$options = array("allow_all_hosts","monitored_hosts","with_items");//, "always_select_first_host");//
@@ -115,7 +114,7 @@ include_once 'include/page_header.php';
 	
 	validate_group_with_host(PERM_READ_ONLY,$options);
 
-	if($_REQUEST['graphid'] > 0){
+	if($_REQUEST['graphid']>0){
 		$result=DBselect('SELECT g.graphid '.
 					' FROM graphs g, graphs_items gi, items i, hosts_groups hg'.
 					' WHERE g.graphid='.$_REQUEST['graphid'].
@@ -130,8 +129,7 @@ include_once 'include/page_header.php';
 	}
 ?>
 <?php
-	if($_REQUEST['graphid'] > 0 && $_REQUEST['period'] >= ZBX_MIN_PERIOD)
-	{
+	if(($_REQUEST['graphid']>0) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD)){
 		update_profile('web.graph['.$_REQUEST['graphid'].'].period',$_REQUEST['period']);
 	}
 
@@ -140,31 +138,19 @@ include_once 'include/page_header.php';
 <?php
 	$h1 = array(S_GRAPHS_BIG.SPACE."/".SPACE);
 	
-	$availiable_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
-	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
-
-	if($_REQUEST['graphid'] > 0 && DBfetch(DBselect('SELECT DISTINCT graphid FROM graphs WHERE graphid='.$_REQUEST['graphid'])))
-	{
-		if(! ($row = DBfetch(DBselect(' SELECT distinct h.host, g.name '.
-					' FROM hosts h, items i, graphs_items gi, graphs g '.
-					' WHERE h.status='.HOST_STATUS_MONITORED.
-						' AND h.hostid=i.hostid '.
-						' AND g.graphid='.$_REQUEST['graphid'].
-						' AND i.itemid=gi.itemid '.
-						' AND gi.graphid=g.graphid'.
-//						' AND h.hostid NOT IN ('.$denyed_hosts.') '.
-						' AND h.hostid IN ('.$availiable_hosts.') '.
-						' AND '.DBin_node('g.graphid').
-					' ORDER BY h.host, g.name'
-				))))
-		{
+	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+	
+	$available_graphs = get_accessible_graphs(PERM_READ_LIST, null, get_current_nodeid());
+	
+	if(($_REQUEST['graphid']>0) && ($row=DBfetch(DBselect('SELECT DISTINCT graphid, name FROM graphs WHERE graphid='.$_REQUEST['graphid'])))){
+		if(!graph_accessible($_REQUEST['graphid'])){
 			update_profile('web.charts.graphid',0);
 			access_deny();
 		}
 		array_push($h1, new CLink($row['name'], '?graphid='.$_REQUEST['graphid'].(isset($_REQUEST['fullscreen']) ? '' : '&fullscreen=1')));
 	}
-	else
-	{
+	else{
 		$_REQUEST['graphid'] = 0;
 		array_push($h1, S_SELECT_GRAPH_TO_DISPLAY);
 	}
@@ -182,11 +168,11 @@ include_once 'include/page_header.php';
 	$cmbHosts->AddItem(0,S_ALL_SMALL);
 	$cmbGraph->AddItem(0,S_SELECT_GRAPH_DOT_DOT_DOT);
 	
-// Selecting first group,host,graph if it's one of kind ;)
+// Selecting first group,host,graph if it's one of a kind ;)
 	if($_REQUEST['groupid'] == 0){
 		$sql = 'SELECT COUNT(DISTINCT g.groupid) as grpcount, MAX(g.groupid) as groupid'.
 				' FROM groups g, hosts_groups hg, hosts h, items i, graphs_items gi '.
-				' WHERE g.groupid in ('.$availiable_groups.') '.
+				' WHERE g.groupid in ('.$available_groups.') '.
 					' AND hg.groupid=g.groupid '.
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND h.hostid=i.hostid '.
@@ -201,25 +187,17 @@ include_once 'include/page_header.php';
 	}
 	
 	if($_REQUEST['hostid'] == 0){
-		if($_REQUEST['groupid'] > 0){
-			$sql = 'SELECT COUNT(DISTINCT h.hostid) as hstcount, MAX(h.hostid) as hostid '.
-				' FROM hosts h,items i,hosts_groups hg, graphs_items gi '.
-				' WHERE h.status='.HOST_STATUS_MONITORED.
-					' AND h.hostid=i.hostid '.
-					' AND hg.groupid='.$_REQUEST['groupid'].
-					' AND hg.hostid=h.hostid '.
-					' AND h.hostid IN ('.$availiable_hosts.') '.
-					' AND i.itemid=gi.itemid';
-		}
-		else{
-			$sql = 'SELECT COUNT(DISTINCT h.hostid) as hstcount, MAX(h.hostid) as hostid '.
-				' FROM hosts h,items i, graphs_items gi '.
-				' WHERE h.status='.HOST_STATUS_MONITORED.
-					' AND i.status='.ITEM_STATUS_ACTIVE.
-					' AND h.hostid=i.hostid'.
-					' AND h.hostid IN ('.$availiable_hosts.') '.
-					' AND i.itemid=gi.itemid';
-		}
+		$sql = 'SELECT COUNT(DISTINCT h.hostid) as hstcount, MAX(h.hostid) as hostid '.
+			' FROM hosts h,items i,hosts_groups hg, graphs_items gi '.
+			' WHERE h.status='.HOST_STATUS_MONITORED.
+				' AND i.itemid=gi.itemid'.
+				' AND i.status='.ITEM_STATUS_ACTIVE.
+				' AND h.hostid=i.hostid '.
+				' AND hg.hostid=h.hostid '.
+				($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
+				' AND gi.graphid IN ('.$available_graphs.')';
+//				' AND h.hostid IN ('.$available_hosts.') ';
+
 
 		if($cnt_row = DBfetch(DBselect($sql))){
 			if($cnt_row['hstcount'] == 1){
@@ -228,38 +206,22 @@ include_once 'include/page_header.php';
 			}
 		}
 	}
+	
 	if($_REQUEST['graphid'] == 0){
-		if($_REQUEST['hostid'] > 0){
-			$sql = 'SELECT COUNT(DISTINCT g.graphid) as grphcount, MAX(g.graphid) as graphid '.
-				' FROM graphs g,graphs_items gi,items i'.
-				' WHERE i.itemid=gi.itemid '.
-					' AND g.graphid=gi.graphid '.
-					' AND i.hostid='.$_REQUEST['hostid'].
-					' AND '.DBin_node('g.graphid').
-					' AND i.hostid IN ('.$availiable_hosts.') ';
-		}
-		elseif ($_REQUEST['groupid'] > 0){
-			$sql = 'SELECT COUNT(DISTINCT g.graphid) as grphcount, MAX(g.graphid) as graphid '.
-				' FROM graphs g,graphs_items gi,items i,hosts_groups hg,hosts h'.
-				' WHERE i.itemid=gi.itemid '.
-					' AND g.graphid=gi.graphid '.
-					' AND i.hostid=hg.hostid '.
-					' AND hg.groupid='.$_REQUEST['groupid'].
-					' AND i.hostid=h.hostid '.
-					' AND h.status='.HOST_STATUS_MONITORED.
-					' AND '.DBin_node('g.graphid').
-					' AND h.hostid IN ('.$availiable_hosts.') ';
-		}
-		else{
-			$sql = 'SELECT COUNT(DISTINCT g.graphid) as grphcount, MAX(g.graphid) as graphid '.
-				' FROM graphs g,graphs_items gi,items i,hosts h'.
-				' WHERE i.itemid=gi.itemid '.
-					' AND g.graphid=gi.graphid '.
-					' AND i.hostid=h.hostid '.
-					' AND h.status='.HOST_STATUS_MONITORED.
-					' AND '.DBin_node('g.graphid').
-					' AND h.hostid IN ('.$availiable_hosts.') ';
-		}
+
+		$sql = 'SELECT COUNT(DISTINCT g.graphid) as grphcount, MAX(g.graphid) as graphid '.
+			' FROM graphs g,graphs_items gi,items i,hosts_groups hg,hosts h'.
+			' WHERE i.itemid=gi.itemid '.
+				' AND g.graphid=gi.graphid '.
+				' AND i.hostid=hg.hostid '.
+				($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
+				' AND i.hostid=h.hostid '.
+				($_REQUEST['hostid']?' AND h.hostid='.$_REQUEST['hostid']:'').
+				' AND h.status='.HOST_STATUS_MONITORED.
+				' AND '.DBin_node('g.graphid').
+				' AND g.graphid IN ('.$available_graphs.')';
+//				' AND h.hostid IN ('.$available_hosts.') ';
+
 		if($cnt_row = DBfetch(DBselect($sql))){
 			if($cnt_row['grphcount'] == 1){
 				$_REQUEST['graphid'] = $cnt_row['graphid'];
@@ -273,15 +235,15 @@ include_once 'include/page_header.php';
 	
 	$result=DBselect('SELECT DISTINCT g.groupid, g.name '.
 				' FROM groups g, hosts_groups hg, hosts h, items i, graphs_items gi '.
-				' WHERE g.groupid in ('.$availiable_groups.') '.
+				' WHERE g.groupid in ('.$available_groups.') '.
 					' AND hg.groupid=g.groupid '.
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND h.hostid=i.hostid '.
 					' AND hg.hostid=h.hostid '.
 					' AND i.itemid=gi.itemid '.
 				' ORDER BY g.name');
-	while($row=DBfetch($result))
-	{
+				
+	while($row=DBfetch($result)){
 		$cmbGroup->AddItem(
 				$row['groupid'],
 				get_node_name_by_elid($row['groupid']).$row["name"]
@@ -290,30 +252,20 @@ include_once 'include/page_header.php';
 	
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 	
-	if($_REQUEST['groupid'] > 0){
-		$sql = ' SELECT distinct h.hostid,h.host '.
-			' FROM hosts h,items i,hosts_groups hg, graphs_items gi '.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND h.hostid=i.hostid '.
-				' AND hg.groupid='.$_REQUEST['groupid'].
-				' AND hg.hostid=h.hostid '.
-				' AND h.hostid IN ('.$availiable_hosts.') '.
-				' AND i.itemid=gi.itemid'.
-			' ORDER BY h.host';
-	}
-	else{
-		$sql = 'SELECT distinct h.hostid,h.host '.
-			' FROM hosts h,items i, graphs_items gi '.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND h.hostid=i.hostid'.
-				' AND h.hostid IN ('.$availiable_hosts.') '.
-				' AND i.itemid=gi.itemid'.
-			' ORDER BY h.host';
-	}
+	$sql = 'SELECT DISTINCT h.hostid,h.host '.
+		' FROM hosts h,items i,hosts_groups hg, graphs_items gi '.
+		' WHERE h.status='.HOST_STATUS_MONITORED.
+			' AND i.itemid=gi.itemid'.
+			' AND i.status='.ITEM_STATUS_ACTIVE.
+			' AND h.hostid=i.hostid '.
+			' AND hg.hostid=h.hostid '.
+			($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
+			' AND gi.graphid IN ('.$available_graphs.')'.
+//			' AND h.hostid IN ('.$available_hosts.') '.
+		' ORDER BY h.host';
+	
 	$result=DBselect($sql);
-	while($row=DBfetch($result))
-	{
+	while($row=DBfetch($result)){
 		$cmbHosts->AddItem(
 				$row['hostid'],
 				get_node_name_by_elid($row['hostid']).$row['host']
@@ -321,45 +273,23 @@ include_once 'include/page_header.php';
 	}
 
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-
-	if($_REQUEST['hostid'] > 0){
-		$sql = 'SELECT distinct g.graphid,g.name '.
-			' FROM graphs g,graphs_items gi,items i'.
-			' WHERE i.itemid=gi.itemid '.
-				' AND g.graphid=gi.graphid '.
-				' AND i.hostid='.$_REQUEST['hostid'].
-				' AND '.DBin_node('g.graphid').
-				' AND i.hostid IN ('.$availiable_hosts.') '.
-			' ORDER BY g.name';
-	}
-	elseif ($_REQUEST['groupid'] > 0){
-		$sql = 'SELECT distinct g.graphid,g.name '.
-			' FROM graphs g,graphs_items gi,items i,hosts_groups hg,hosts h'.
-			' WHERE i.itemid=gi.itemid '.
-				' AND g.graphid=gi.graphid '.
-				' AND i.hostid=hg.hostid '.
-				' AND hg.groupid='.$_REQUEST['groupid'].
-				' AND i.hostid=h.hostid '.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND '.DBin_node('g.graphid').
-				' AND h.hostid IN ('.$availiable_hosts.') '.
-			' ORDER BY g.name';
-	}
-	else{
-		$sql = 'SELECT DISTINCT g.graphid,g.name '.
-			' FROM graphs g,graphs_items gi,items i,hosts h'.
-			' WHERE i.itemid=gi.itemid '.
-				' AND g.graphid=gi.graphid '.
-				' AND i.hostid=h.hostid '.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND '.DBin_node('g.graphid').
-				' AND h.hostid IN ('.$availiable_hosts.') '.
-			' ORDER BY g.name';
-	}
+	
+	$sql = 'SELECT DISTINCT g.graphid,g.name '.
+		' FROM graphs g,graphs_items gi,items i,hosts_groups hg,hosts h'.
+		' WHERE gi.graphid=g.graphid '.
+			' AND i.itemid=gi.itemid '.
+			' AND hg.hostid=i.hostid '.
+			' AND h.hostid=i.hostid '.
+			' AND h.status='.HOST_STATUS_MONITORED.
+			($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
+			($_REQUEST['hostid']?' AND h.hostid='.$_REQUEST['hostid']:'').
+			' AND '.DBin_node('g.graphid').
+			' AND g.graphid IN ('.$available_graphs.')'.
+//			' AND h.hostid IN ('.$available_hosts.') ';
+		' ORDER BY g.name';
 
 	$result = DBselect($sql);
-	while($row=DBfetch($result))
-	{
+	while($row=DBfetch($result)){
 		$cmbGraph->AddItem(
 				$row['graphid'],
 				get_node_name_by_elid($row['graphid']).$row['name']

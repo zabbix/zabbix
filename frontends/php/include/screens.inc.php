@@ -28,24 +28,20 @@
 
 		$result = false;
 
-		if(DBselect('select screenid from screens where screenid='.$screenid.
-			' and '.DBin_node('screenid', get_current_nodeid($perm))))
+		if(DBfetch(DBselect('SELECT screenid FROM screens WHERE screenid='.$screenid.' AND '.DBin_node('screenid', get_current_nodeid($perm)))))
 		{
 			$result = true;
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 			
-			$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
-			$denyed_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
-			
-			$db_result = DBselect("select * from screens_items where screenid=".$screenid);
-			while(($ac_data = DBfetch($db_result)) && $result)
-			{
-				switch($ac_data['resourcetype'])
-				{
+			$db_result = DBselect('SELECT * FROM screens_items WHERE screenid='.$screenid);
+			while(($ac_data = DBfetch($db_result)) && $result){
+				switch($ac_data['resourcetype']){
 					case SCREEN_RESOURCE_GRAPH:
 						$itemid = array();
 
-						$db_gitems = DBselect("select distinct itemid from graphs_items ".
-							" where graphid=".$ac_data['resourceid']);
+						$db_gitems = DBselect('SELECT DISTINCT itemid '.
+										' FROM graphs_items '.
+										' WHERE graphid='.$ac_data['resourceid']);
 						
 						while($gitem_data = DBfetch($db_gitems)) array_push($itemid, $gitem_data['itemid']);
 						
@@ -57,8 +53,10 @@
 						if(!isset($itemid))
 							$itemid = array($ac_data['resourceid']);
 
-						if(DBfetch(DBselect("select itemid from items where itemid in (".implode(',',$itemid).") ".
-							" and hostid in (".$denyed_hosts.")")))
+						if(DBfetch(DBselect('SELECT itemid '.
+										' FROM items '.
+										' WHERE itemid IN ('.implode(',',$itemid).') '.
+											' AND hostid NOT IN ('.$available_hosts.')')))
 						{
 							$result = false;
 						}	

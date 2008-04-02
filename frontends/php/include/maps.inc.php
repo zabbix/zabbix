@@ -83,20 +83,18 @@
 
 		$result = false;
 
-		if($db_result = DBselect('select * from sysmaps_elements where sysmapid='.$sysmapid.
-			' and '.DBin_node('sysmapid', get_current_nodeid($perm))))
+		if($db_result = DBselect('SELECT * '.
+						' FROM sysmaps_elements '.
+						' WHERE sysmapid='.$sysmapid.
+							' AND '.DBin_node('sysmapid', get_current_nodeid($perm))))
 		{
 			$result = true;
-			
-			$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 						
-			while(($se_data = DBfetch($db_result)) && $result)
-			{
-				switch($se_data['elementtype'])
-				{
+			while(($se_data = DBfetch($db_result)) && $result){
+				switch($se_data['elementtype']){
 					case SYSMAP_ELEMENT_TYPE_HOST:
-						if(uint_in_array($se_data['elementid'],explode(',',$denyed_hosts)))
-						{
+						if(!uint_in_array($se_data['elementid'],explode(',',$available_hosts))){
 							$result = false;
 						}
 						break;
@@ -104,21 +102,26 @@
 						$result &= sysmap_accessiable($se_data['elementid'], PERM_READ_ONLY);
 						break;
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						if( DBfetch(DBselect('select triggerid from triggers where triggerid='.$se_data['elementid'])) &&
-						    !DBfetch(DBselect('SELECT DISTINCT t.*'.
+						if(DBfetch(DBselect('SELECT triggerid FROM triggers WHERE triggerid='.$se_data['elementid']))){
+							$sql = 'SELECT DISTINCT t.triggerid'.
 							' FROM triggers t,items i,functions f'.
 							' WHERE f.itemid=i.itemid '.
 								' AND t.triggerid=f.triggerid'.
-								' AND i.hostid NOT IN ('.$denyed_hosts.') '.
-								' AND t.triggerid='.$se_data['elementid'])))
-						{
-							$result = false;
-						}
+								' AND i.hostid NOT IN ('.$available_hosts.') '.
+								' AND t.triggerid='.$se_data['elementid'];
+							if(DBfetch(DBselect($sql,1))){
+								$result = false;
+							}
+						} 
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						if( DBfetch(DBselect('SELECT groupid FROM groups WHERE groupid='.$se_data['elementid'])) &&
-						    uint_in_array($se_data['elementid'],get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT, PERM_RES_IDS_ARRAY)))
-						{
+						$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, null, PERM_RES_IDS_ARRAY);
+						
+						$sql = 'SELECT groupid '.
+							' FROM groups '.
+							' WHERE groupid='.$se_data['elementid'];
+							
+						if(DBfetch(DBselect($sql,1)) && !uint_in_array($se_data['elementid'],$available_groups)){
 							$result = false;
 						}
 						break;

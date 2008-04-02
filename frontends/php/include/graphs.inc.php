@@ -29,8 +29,7 @@
  *     Eugene Grigorjev 
  *
  */
-	function	graph_item_type2str($type,$count=null)
-	{
+	function	graph_item_type2str($type,$count=null){
 		switch($type){
 			case GRAPH_ITEM_SUM:	
 				$type = S_GRAPH_SUM;
@@ -56,8 +55,7 @@
  *     Eugene Grigorjev 
  *
  */
-	function	graph_item_drawtypes()
-	{
+	function	graph_item_drawtypes(){
 		return array(
 				GRAPH_ITEM_DRAWTYPE_LINE,
 				GRAPH_ITEM_DRAWTYPE_FILLED_REGION,
@@ -66,7 +64,7 @@
 				GRAPH_ITEM_DRAWTYPE_DASHED_LINE
 			    );
 	}
-
+	
 /*
  * Function: graph_item_drawtype2str
  *
@@ -77,19 +75,17 @@
  *     Eugene Grigorjev 
  *
  */
-	function	graph_item_drawtype2str($drawtype,$type=null)
-	{
-	if($type == GRAPH_ITEM_AGGREGATED) return '-';
+	function	graph_item_drawtype2str($drawtype,$type=null){
+		if($type == GRAPH_ITEM_AGGREGATED) return '-';
 
-	switch($drawtype)
-	{
-		case GRAPH_ITEM_DRAWTYPE_LINE:		$drawtype = "Line";		break;
-		case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:	$drawtype = "Filled region";	break;
-		case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:	$drawtype = "Bold line";	break;
-		case GRAPH_ITEM_DRAWTYPE_DOT:		$drawtype = "Dot";		break;
-		case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:	$drawtype = "Dashed line";	break;
-		default: $drawtype = S_UNKNOWN;		break;
-	}
+		switch($drawtype){
+			case GRAPH_ITEM_DRAWTYPE_LINE:		$drawtype = "Line";		break;
+			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:	$drawtype = "Filled region";	break;
+			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:	$drawtype = "Bold line";	break;
+			case GRAPH_ITEM_DRAWTYPE_DOT:		$drawtype = "Dot";		break;
+			case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:	$drawtype = "Dashed line";	break;
+			default: $drawtype = S_UNKNOWN;		break;
+		}
 	return $drawtype;
 	}
 
@@ -157,16 +153,100 @@
 					' ORDER BY itemid,drawtype,sortorder,color,yaxisside'); 
 	}
 
-	/*
-	 * Function: get_min_itemclock_by_graphid
-	 *
-	 * Description:
-	 *     Return the time of the 1st apearance of items included in graph in trends
-	 *
-	 * Author:
-	 *     Aly
-	 *
-	 */	
+/*
+ * Function: graph_accessible
+ *
+ * Description:
+ *     Checks if graph is accessible to USER
+ *
+ * Author:
+ *     Aly
+ *
+ */		
+	function graph_accessible($graphid){
+		global $USER_DETAILS;
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
+		
+		$sql = 	'SELECT g.graphid '.
+				' FROM graphs as g, graphs_items as gi, items as i '.
+				' WHERE g.graphid='.$graphid.
+					' AND g.graphid=gi.graphid '.
+					' AND i.itemid=gi.itemid '.
+					' AND i.hostid NOT IN ('.$available_hosts.')';
+
+		if(DBfetch(DBselect($sql,1))){
+			return false;
+		}
+	return true;
+	}
+
+
+/*
+ * Function: get_accessible_graphs_by_host
+ *
+ * Description:
+ *     returns string of accessible graphid's
+ *
+ * Author:
+ *     Aly
+ *
+ */		
+	function get_accessible_graphs($perm,$perm_res=null,$nodeid=null,$hostid=null){
+		global $USER_DETAILS;
+
+		if(is_null($perm_res))
+			$perm_res = PERM_RES_STRING_LINE;
+		
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, null, null, $nodeid);
+		
+		$denied_graphs = array();
+		$available_graphs = array();
+		
+		$sql = 	'SELECT DISTINCT g.graphid '.
+				' FROM graphs as g, graphs_items as gi, items as i '.
+				' WHERE g.graphid=gi.graphid '.
+					(!empty($hostid)?' AND i.hostid='.$hostid:'').
+					' AND i.itemid=gi.itemid '.
+					' AND i.hostid NOT IN ('.$available_hosts.')';
+
+		$result = DBselect($sql);
+		while($graph = DBfetch($result)){
+			$denied_graphs[] = $graph['graphid'];
+		}
+
+		$sql = 	'SELECT DISTINCT g.graphid '.
+				' FROM graphs as g, graphs_items as gi, items as i '.
+				' WHERE g.graphid=gi.graphid '.
+					(!empty($hostid)?' AND i.hostid='.$hostid:'').
+					' AND i.itemid=gi.itemid '.
+					' AND i.status='.ITEM_STATUS_ACTIVE.
+					(!empty($denied_graphs)?' AND g.graphid  NOT IN ('.implode(',',$denied_graphs).')':'');
+					
+		$result = DBselect($sql);
+		while($graph = DBfetch($result)){
+			$available_graphs[$graph['graphid']] = $graph['graphid'];
+		}
+		
+		if(PERM_RES_STRING_LINE == $perm_res){
+			if(count($result) == 0) 
+				$available_graphs = '-1';
+			else
+				$available_graphs = implode(',',$available_graphs);
+		}
+		
+	return $available_graphs;
+	}
+
+/*
+ * Function: get_min_itemclock_by_graphid
+ *
+ * Description:
+ *     Return the time of the 1st apearance of items included in graph in trends
+ *
+ * Author:
+ *     Aly
+ *
+ */	
 	function get_min_itemclock_by_graphid($graphid){
 		$row = DBfetch(DBselect('SELECT MIN(t.clock) as clock '.
 						' FROM graphs_items gi, trends t '.

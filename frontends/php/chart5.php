@@ -38,19 +38,34 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	if(! (DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"]))) )
-	{
+	if(!DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"]))){
 		fatal_error(S_NO_IT_SERVICE_DEFINED);
 	}
 
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
 	
-	if( !($service = DBfetch(DBselect("select s.* from services s left join triggers t on s.triggerid=t.triggerid ".
-		" left join functions f on t.triggerid=f.triggerid left join items i on f.itemid=i.itemid ".
-		" where (i.hostid is NULL or i.hostid not in (".$denyed_hosts.")) ".
-		" and s.serviceid=".$_REQUEST["serviceid"]
-		))))
-	{
+	$sql = 'SELECT s.serviceid '.
+			' FROM services s, triggers t, functions f, items i '.
+			' WHERE s.serviceid='.$_REQUEST['serviceid'].
+				' AND t.triggerid=s.triggerid '.
+				' AND f.triggerid=t.triggerid '.
+				' AND i.itemid=f.itemid	'.
+				' AND i.hostid NOT IN ('.$available_hosts.')';
+
+	if(DBfetch(DBselect($sql,1))){
+		access_deny();
+	}
+
+	
+	$sql = 'SELECT s.* '.
+			' FROM services s '.
+				' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
+				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
+				' LEFT JOIN items i on f.itemid=i.itemid '.
+			' WHERE s.serviceid='.$_REQUEST['serviceid'].
+				' AND i.hostid IN ('.$available_hosts.')';
+		
+	if(!$service = DBfetch(DBselect($sql))){
 		access_deny();
 	}
 ?>
