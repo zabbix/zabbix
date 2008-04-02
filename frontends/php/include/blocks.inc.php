@@ -34,7 +34,7 @@ function make_favorite_graphs($available_hosts=false){
 	$fav_graphs = get4favorites('web.favorite.graphids');
 	
 	foreach($fav_graphs['id'] as $key => $resourceid){
-		if('simple_graph' == $fav_graphs['resource'][$key]){
+		if('itemid' == $fav_graphs['resource'][$key]){
 			if(!$item = get_item_by_itemid($resourceid)) continue;
 	
 			$host = get_host_by_itemid($resourceid);
@@ -85,7 +85,7 @@ function make_favorite_screens(){
 	
 	$fav_screens = get4favorites('web.favorite.screenids');
 	foreach($fav_screens['id'] as $key => $resourceid){
-		if('slides' == $fav_screens['resource'][$key]){
+		if('slideid' == $fav_screens['resource'][$key]){
 			if(!$slide = get_slideshow_by_slideshowid($resourceid)) continue;
 
 			$link = new CLink($slide['name'],'screens.php?config=1&elementid='.$resourceid);
@@ -890,7 +890,7 @@ function make_graph_submenu(){
 			
 	$fav_graphs = get4favorites('web.favorite.graphids');
 	foreach($fav_graphs['id'] as $key => $resourceid){
-		if('simple_graph' == $fav_graphs['resource'][$key]){
+		if('itemid' == $fav_graphs['resource'][$key]){
 			if(!$item = get_item_by_itemid($resourceid)) continue;
 	
 			$host = get_host_by_itemid($resourceid);
@@ -898,7 +898,7 @@ function make_graph_submenu(){
 			
 			$graphids[] = array( 
 							'name'	=>	$host['host'].':'.$item['description'],
-							'favobj'=>	'simple_graph',
+							'favobj'=>	'itemid',
 							'favid'	=>	$resourceid,
 							'action'=>	'remove'
 						);
@@ -911,7 +911,7 @@ function make_graph_submenu(){
 	
 			$graphids[] = array( 
 							'name'	=>	$ghost['host'].':'.$graph['name'],
-							'favobj'=>	'graphs',
+							'favobj'=>	'graphid',
 							'favid'	=>	$resourceid,
 							'action'=>	'remove'
 						);
@@ -951,7 +951,7 @@ function make_sysmap_submenu(){
 
 		$sysmapids[] = array( 
 							'name'	=>	$sysmap['name'],
-							'favobj'=>	'sysmaps',
+							'favobj'=>	'sysmapid',
 							'favid'	=>	$resourceid,
 							'action'=>	'remove'
 						);
@@ -1005,7 +1005,7 @@ function make_screen_submenu(){
 		
 			$screenids[] = array( 
 								'name'	=>	$slide['name'],
-								'favobj'=>	'slides',
+								'favobj'=>	'slideid',
 								'favid'	=>	$resourceid,
 								'action'=>	'remove'
 							);
@@ -1016,7 +1016,7 @@ function make_screen_submenu(){
 		
 			$screenids[] = array( 
 								'name'	=>	$screen['name'],
-								'favobj'=>	'screens',
+								'favobj'=>	'screenid',
 								'favid'	=>	$resourceid,
 								'action'=>	'remove'
 							);

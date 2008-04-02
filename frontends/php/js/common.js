@@ -129,7 +129,7 @@ function add2favorites(favobj,favid){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(resp){ },//alert(resp.responseText);
+						'onSuccess': function(resp){ alert(resp.responseText);},//alert(resp.responseText);
 						'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);

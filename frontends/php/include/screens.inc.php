@@ -98,7 +98,7 @@
 		return $screenid;
         }
 
-        function        update_screen($screenid,$name,$hsize,$vsize)
+        function update_screen($screenid,$name,$hsize,$vsize)
         {
                 $sql="update screens set name=".zbx_dbstr($name).",hsize=$hsize,vsize=$vsize where screenid=$screenid";
                 return  DBexecute($sql);
@@ -113,6 +113,9 @@
 
 			$result=DBexecute('delete from slides where screenid='.$screenid);
 			if(!$result) return $result;
+			
+			$result = rm4favorites('web.favorite.screenids',$screenid,ZBX_FAVORITES_ALL,'screenid');
+			if(!$result)	return	$result;
 			
 		return  DBexecute("delete from screens where screenid=$screenid");
         }

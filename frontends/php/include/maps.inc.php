@@ -199,6 +199,9 @@
 
 		$result = DBexecute("delete from sysmaps_elements where sysmapid=$sysmapid");
 		if(!$result)	return	$result;
+		
+		$result = rm4favorites('web.favorite.sysmapids',$sysmapd,ZBX_FAVORITES_ALL,'sysmapid');
+		if(!$result)	return	$result;
 
 	return DBexecute("delete from sysmaps where sysmapid=$sysmapid");
 	}

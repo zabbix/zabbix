@@ -57,23 +57,21 @@ include_once "include/page_header.php";
 ?>
 <?php
 	if(isset($_REQUEST['favobj'])){
-		if('sysmaps' == $_REQUEST['favobj']){
+		if('sysmapid' == $_REQUEST['favobj']){
 			$result = false;
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.sysmapids',$_REQUEST['favid'],$_REQUEST['favobj']);
 				if($result){
 					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVORITES.'";'."\n");
-					print('$("addrm_fav").onclick = function(){rm4favorites("sysmaps","'.$_REQUEST['favid'].'",0);}'."\n");
+					print('$("addrm_fav").onclick = function(){rm4favorites("sysmapid","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
 			else if('remove' == $_REQUEST['action']){
-				while(infavorites('web.favorite.sysmapids',$_REQUEST['favid'],$_REQUEST['favobj'])){
-					$result = rm4favorites('web.favorite.sysmapids',$_REQUEST['favid'],0,$_REQUEST['favobj']);
-				}
+				$result = rm4favorites('web.favorite.sysmapids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
 				
 				if($result){
 					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVORITES.'";'."\n");
-					print('$("addrm_fav").onclick = function(){ add2favorites("sysmaps","'.$_REQUEST['favid'].'");}'."\n");
+					print('$("addrm_fav").onclick = function(){ add2favorites("sysmapid","'.$_REQUEST['favid'].'");}'."\n");
 				}
 			}
 			
@@ -136,15 +134,15 @@ include_once "include/page_header.php";
 
 		array_push($text, nbsp(" / "), new CLink($all_maps[$_REQUEST["sysmapid"]],$url));
 		
-		if(infavorites('web.favorite.sysmapids',$_REQUEST['sysmapid'],'sysmaps')){
+		if(infavorites('web.favorite.sysmapids',$_REQUEST['sysmapid'],'sysmapid')){
 			$icon = new CDiv(SPACE,'iconminus');
 			$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
-			$icon->AddAction('onclick',new CScript("javascript: rm4favorites('sysmaps','".$_REQUEST["sysmapid"]."',0);"));
+			$icon->AddAction('onclick',new CScript("javascript: rm4favorites('sysmapid','".$_REQUEST["sysmapid"]."',0);"));
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
 			$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
-			$icon->AddAction('onclick',new CScript("javascript: add2favorites('sysmaps','".$_REQUEST["sysmapid"]."');"));
+			$icon->AddAction('onclick',new CScript("javascript: add2favorites('sysmapid','".$_REQUEST["sysmapid"]."');"));
 		}
 		$icon->AddOption('id','addrm_fav');
 	
