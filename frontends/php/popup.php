@@ -224,6 +224,8 @@ include_once "include/page_header.php";
 	$frmTitle->AddVar("srctbl",	$srctbl);
 	$frmTitle->AddVar("srcfld1",	$srcfld1);
 	$frmTitle->AddVar("srcfld2",	$srcfld2);
+	if(isset($_REQUEST['reference']))
+		$frmTitle->AddVar("reference",	$_REQUEST['reference']);
 
 	if(isset($only_hostid))
 	{
@@ -547,7 +549,7 @@ include_once "include/page_header.php";
 		{
 			$name = new CLink($row["name"],"#","action");
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -582,7 +584,7 @@ include_once "include/page_header.php";
 		{
 			$name = new CLink($row['host'],'#','action');
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -612,7 +614,7 @@ include_once "include/page_header.php";
 					);
 					
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -641,7 +643,7 @@ include_once "include/page_header.php";
 					'action'
 					);
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -667,7 +669,7 @@ include_once "include/page_header.php";
 		{
 			$name = new CLink($row["key_"],"#","action");
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -716,7 +718,7 @@ include_once "include/page_header.php";
 			$description = new CLink($exp_desc,"#","action");
 			
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $exp_desc).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -844,7 +846,7 @@ include_once "include/page_header.php";
 			$row["description"] = $row['host'].':'.$row["description"];
 
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -891,7 +893,7 @@ include_once "include/page_header.php";
 			$name = new CLink($row["name"],"#","action");
 			
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -918,7 +920,7 @@ include_once "include/page_header.php";
 			$name = new CLink($row["name"],"#","action");
 			
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -937,6 +939,8 @@ include_once "include/page_header.php";
 	{
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
 		$table->SetHeader(array(S_NAME,S_GRAPH_TYPE));
+		
+		$available_graphs = get_accessible_graphs(PERM_READ_LIST, null, get_current_nodeid());
 
 		$sql = 'SELECT DISTINCT g.graphid,g.name,g.graphtype,n.name as node_name, h.host'.
 					' FROM graphs g '.
@@ -944,7 +948,7 @@ include_once "include/page_header.php";
 						' LEFT JOIN items i ON gi.itemid=i.itemid '.
 						' LEFT JOIN hosts h ON h.hostid=i.hostid '.
 						' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.graphid').
-					' WHERE h.hostid IN ('.$accessible_hosts.')'.
+					' WHERE g.graphid IN ('.$available_graphs.')'.
 						' AND '.DBin_node('g.graphid', $nodeid);
 
 		if(isset($hostid)) 
@@ -959,7 +963,7 @@ include_once "include/page_header.php";
 
 			$description = new CLink($row['name'],'#','action');
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -1030,7 +1034,7 @@ include_once "include/page_header.php";
 			$row["description"] = $row['node_name'].$row['host'].':'.$row["description"];
 
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -1073,7 +1077,7 @@ include_once "include/page_header.php";
 			$description = new CLink($row['name'],'#','action');
 
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -1162,7 +1166,7 @@ include_once "include/page_header.php";
 			$name = new CLink($row["name"],"#","action");
 			
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -1194,7 +1198,7 @@ include_once "include/page_header.php";
 			$name = new CLink($row["name"],"#","action");
 			
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -1235,7 +1239,7 @@ include_once "include/page_header.php";
 			$row['name'] = $row['node_name'].$row['name'];
 			
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -1272,7 +1276,7 @@ include_once "include/page_header.php";
 			$row['name'] = $row['node_name'].$row['name'];
 			
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
 					"window.opener.setTimeout('add2favorites();', 1000);";
 			}
@@ -1311,7 +1315,7 @@ include_once "include/page_header.php";
 				$name = new CLink(bold(S_MINUS_ALL_GROUPS_MINUS),'#','action');
 				
 				if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-					$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+					$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 						get_window_opener($dstfrm, $dstfld2, create_id_by_nodeid(0,$nodeid)).
 						"window.opener.setTimeout('add2favorites();', 1000);";
 				}

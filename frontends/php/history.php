@@ -81,23 +81,21 @@ include_once "include/page_header.php";
 ?>
 <?php
 	if(isset($_REQUEST['favobj'])){
-		if(in_array($_REQUEST['favobj'],array('simple_graph','graphs'))){
+		if(in_array($_REQUEST['favobj'],array('itemid','graphid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 				if($result){
 					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVORITES.'";'."\n");
-					print('$("addrm_fav").onclick = function(){rm4favorites("simple_graph","'.$_REQUEST['favid'].'",0);}'."\n");
+					print('$("addrm_fav").onclick = function(){rm4favorites("itemid","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
 			else if('remove' == $_REQUEST['action']){
-				while(infavorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj'])){
-					$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],0,$_REQUEST['favobj']);
-				}
+				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
 				
 				if($result){
 					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVORITES.'";'."\n");
-					print('$("addrm_fav").onclick = function(){ add2favorites("simple_graph","'.$_REQUEST['favid'].'");}'."\n");
+					print('$("addrm_fav").onclick = function(){ add2favorites("itemid","'.$_REQUEST['favid'].'");}'."\n");
 				}
 			}
 
@@ -176,15 +174,15 @@ include_once "include/page_header.php";
 			item_description($item_data["description"],$item_data["key_"]));
 			
 		if('showgraph' == $_REQUEST['action']){
-			if(infavorites('web.favorite.graphids',$_REQUEST['itemid'],'simple_graph')){
+			if(infavorites('web.favorite.graphids',$_REQUEST['itemid'],'itemid')){
 				$icon = new CDiv(SPACE,'iconminus');
 				$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
-				$icon->AddAction('onclick',new CScript("javascript: rm4favorites('simple_graph','".$_REQUEST['itemid']."',0);"));
+				$icon->AddAction('onclick',new CScript("javascript: rm4favorites('itemid','".$_REQUEST['itemid']."',0);"));
 			}
 			else{
 				$icon = new CDiv(SPACE,'iconplus');
 				$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
-				$icon->AddAction('onclick',new CScript("javascript: add2favorites('simple_graph','".$_REQUEST['itemid']."');"));
+				$icon->AddAction('onclick',new CScript("javascript: add2favorites('itemid','".$_REQUEST['itemid']."');"));
 			}
 			$icon->AddOption('id','addrm_fav');
 	

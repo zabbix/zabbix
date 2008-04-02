@@ -209,7 +209,7 @@ function rm4favorites($favobj,$favid,$favcnt=null,$resource=null){
 			if($favcnt < 1){
 				unset($favorites[$key]);
 				unset($fav_rsrc[$key]);
-				break;
+				if($favcnt > ZBX_FAVORITES_ALL) break;
 			}
 		}
 		$favcnt--;

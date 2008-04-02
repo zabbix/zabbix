@@ -107,7 +107,7 @@ include_once "include/page_header.php";
 			}
 		}
 
-		if(in_array($_REQUEST['favobj'],array('simple_graph','graphs'))){
+		if(in_array($_REQUEST['favobj'],array('itemid','graphid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
@@ -127,7 +127,7 @@ include_once "include/page_header.php";
 			}
 		}
 		
-		if('sysmaps' == $_REQUEST['favobj']){
+		if('sysmapid' == $_REQUEST['favobj']){
 			$result = false;
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.sysmapids',$_REQUEST['favid'],$_REQUEST['favobj']);
@@ -146,7 +146,7 @@ include_once "include/page_header.php";
 				echo 'dashboard_submenu["menu_sysmaps"] = '.zbx_jsvalue(make_sysmap_submenu()).';';
 			}
 		}
-		if(in_array($_REQUEST['favobj'],array('screens','slides'))){
+		if(in_array($_REQUEST['favobj'],array('screenid','slideid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
