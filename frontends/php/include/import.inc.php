@@ -369,33 +369,36 @@
 					if(!isset($data['comments']))		$data['comments']	= '';
 					if(!isset($data['url']))		$data['url']		= '';
 
-					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
-					{
-						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip'])
-						{
+					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid']){
+						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip']){
 							info('Trigger ['.$data['description'].'] skipped - user rule for host');
 							break; // case
 						}
-						if(strstr($data['expression'],'{HOSTNAME}'))
-						{
+						if(strstr($data['expression'],'{HOSTNAME}')){
 							error('Trigger ['.$data['description'].'] skipped - missed host');
 							break; // case
 						}
 					}
-					else
-					{
+					else{
 						$data['expression'] = str_replace('{HOSTNAME}',
 									$this->data[XML_TAG_HOST]['name'],
 									$data['expression']);
 
-						if($trigger = DBfetch(DBselect('select distinct t.triggerid,t.templateid '.
-							' from triggers t,functions f,items i '.
-							' where t.triggerid=f.triggerid and f.itemid=i.itemid'.
-							' and i.hostid='.$this->data[XML_TAG_HOST]['hostid'].
-							' and t.description='.zbx_dbstr($data['description']))))
-						{ /* exist */
-							if($this->trigger['exist']==1) /* skip */
-							{
+						$result = DBselect('SELECT DISTINCT t.triggerid,t.templateid,t.expression '.
+ 							' FROM triggers t,functions f,items i '.
+ 							' WHERE t.triggerid=f.triggerid '.
+								' AND f.itemid=i.itemid'.
+	 							' AND i.hostid='.$this->data[XML_TAG_HOST]['hostid'].
+								' AND t.description='.zbx_dbstr($data['description']));
+
+						while($trigger = DBfetch($result)){
+							if(explode_exp($trigger['expression'],0) == $data['expression']){
+								break; // while
+							}
+						}
+
+						if(!empty($trigger)){ /* exist */
+							if($this->trigger['exist']==1){ /* skip */
 								info('Trigger ['.$data['description'].'] skipped - user rule');
 								break; // case
 							}
