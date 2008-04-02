@@ -38,19 +38,33 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 
-	if(! (DBfetch(DBselect('select distinct  t.triggerid from triggers t where t.triggerid='.$_REQUEST['triggerid']))) )
-	{
+	if(!DBfetch(DBselect('select distinct  t.triggerid from triggers t where t.triggerid='.$_REQUEST['triggerid']))){
 		fatal_error(S_NO_TRIGGER_DEFINED);
 	}
+	
+	$sql = 'SELECT t.triggerid '.
+			' FROM hosts h, items i, functions f, triggers t'.
+			' WHERE h.hostid=i.hostid '.
+				' AND i.itemid=f.itemid '.
+				' AND f.triggerid=t.triggerid '.
+				' AND t.triggerid='.$_REQUEST['triggerid'].
+				' AND i.hostid NOT IN ('.$available_hosts.') ';
 
-	if(! ($db_data = DBfetch(DBselect('select distinct  t.triggerid,t.description,t.expression,h.host,h.hostid '.
-			' from hosts h, items i, functions f, triggers t'.
-			' where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid='.$_REQUEST["triggerid"].
-			' and i.hostid not in ('.$denyed_hosts.') '
-			))))
-	{
+	if(DBfetch(DBselect($sql,1))){
+		access_deny();
+	}
+				
+	$sql = 'SELECT DISTINCT t.triggerid,t.description,t.expression, h.host,h.hostid '.
+			' FROM hosts h, items i, functions f, triggers t'.
+			' WHERE h.hostid=i.hostid '.
+				' AND i.itemid=f.itemid '.
+				' AND f.triggerid=t.triggerid '.
+				' AND t.triggerid='.$_REQUEST["triggerid"].
+				' AND i.hostid IN ('.$available_hosts.')';
+			
+	if(!$db_data = DBfetch(DBselect($sql))){
 		access_deny();
 	}
 

@@ -47,27 +47,26 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	if(! (DBfetch(DBselect('select graphid from graphs where graphid='.$_REQUEST['graphid']))) )
-	{
+	if(!DBfetch(DBselect('select graphid from graphs where graphid='.$_REQUEST['graphid']))){
 		show_error_message(S_NO_GRAPH_DEFINED);
-
 	}
 
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_MODE_LT);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
 	
-	if( !($db_data = DBfetch(DBselect(
-					'SELECT g.*,h.host,h.hostid '.
-					' FROM graphs as g '.
-						' LEFT JOIN graphs_items as gi ON g.graphid=gi.graphid '.
-						' LEFT JOIN items as i ON gi.itemid=i.itemid '.
-						' LEFT JOIN hosts as h ON i.hostid=h.hostid '.
-					' WHERE g.graphid='.$_REQUEST['graphid'].
-						' AND ( h.hostid not in ('.$denyed_hosts.') '.
-						' OR h.hostid is NULL) '))))
-	{
+	if(!graph_accessible($_REQUEST['graphid'])){
 		access_deny();
 	}
 
+	$sql = 'SELECT g.*,h.host,h.hostid '.
+				' FROM graphs as g '.
+					' LEFT JOIN graphs_items as gi ON g.graphid=gi.graphid '.
+					' LEFT JOIN items as i ON gi.itemid=i.itemid '.
+					' LEFT JOIN hosts as h ON i.hostid=h.hostid '.
+				' WHERE g.graphid='.$_REQUEST['graphid'].
+					' AND h.hostid IN ('.$available_hosts.') ';
+					
+	$db_data = DBfetch(DBselect($sql));
+	
 	$graph = new Pie($db_data["graphtype"]);
 
 	if(isset($_REQUEST["period"]))		$graph->SetPeriod($_REQUEST["period"]);
