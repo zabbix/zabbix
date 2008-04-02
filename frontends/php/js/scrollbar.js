@@ -265,22 +265,23 @@ arrowmousemove_L: function(e){
 	var barXtemp = this.barX;
 	var barWtemp = this.barW;
 	
+	var PrevbarX = this.barX;
+	var tmp = (mousexy.x-this.prevmouseX);
 	if((mousexy.x-this.prevmouseX) < 0){
 		this.barX = parseInt(this.barStartX + mouseXdiff);
 		this.barX = this.checkbarX(mousexy.x);
-		
+
 		this.barW = this.barW + (barXtemp - this.barX);
-		this.barW = this.checkbarW(mousexy.x);
+		this.barW = this.checkbarW(this.prevmouseX);
 	}
 	else{
 		this.barW = parseInt(this.barStartW - mouseXdiff);
 		this.barW = this.checkbarW(mousexy.x);
 		
-		this.barX = parseInt(this.barX + barWtemp-this.barW);
-		this.barX = this.checkbarX(mousexy.x);
+		this.barX = parseInt(this.barX+(barWtemp-this.barW));
+		this.barX = this.checkbarX(this.prevmouseX);
 	}
-
-//SDI(this.barX+' : '+this.barW+' : '+mouseXdiff);
+//SDI('LEFT: X:'+this.barX+' Width: '+this.barW+' Diff: '+mouseXdiff+' Mx: '+mousexy.x+'  PMx: '+this.prevmouseX);
 
 	this.barchangeW();
 	this.barmovetoX();
@@ -294,7 +295,7 @@ arrowmousemove_R: function(e){
 	this.barW = parseInt(this.barStartW) + parseInt(mouseXdiff);
 	this.barW = this.checkbarW(mousexy.x);
 
-//SDI(this.barW+' : '+this.minbarW);
+//SDI('RIGHT: X:'+this.barX+' Width: '+this.barW+' Diff: '+mouseXdiff);
 
 	this.barchangeW();
 	this.arrowmoverighttoX();
@@ -425,6 +426,8 @@ barchangeW: function(){
 	var wr = w - wl;
 	this.scrl_barbgl.setStyle({width: wl +'px'});
 	this.scrl_barbgr.setStyle({width: wr +'px'});
+	
+	if(IE) this.scrl_bar.setStyle({width: this.barW +'px'});
 },
 
 barmovetoX: function(){
