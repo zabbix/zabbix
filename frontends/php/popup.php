@@ -246,7 +246,7 @@ include_once "include/page_header.php";
 		array_push($validation_param, "always_select_first_host");
 		validate_group_with_host(PERM_READ_LIST,$validation_param);
 	}
-	elseif(str_in_array($srctbl,array('hosts','templates','host_templates'))){
+	else if(str_in_array($srctbl,array('hosts','templates','host_templates'))){
 		validate_group(PERM_READ_LIST,$validation_param);
 	}
 
@@ -444,7 +444,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	elseif($srctbl == "templates")
+	else if($srctbl == "templates")
 	{
 		$existed_templates = get_request('existed_templates', array());
 		$templates = get_request('templates', array());
@@ -454,7 +454,7 @@ include_once "include/page_header.php";
 		{
 			show_error_message('Conflict between selected templates');
 		}
-		elseif(isset($_REQUEST['select']))
+		else if(isset($_REQUEST['select']))
 		{
 			$new_templates = array_diff($templates, $existed_templates);
 			if(count($new_templates) > 0) 
@@ -534,7 +534,7 @@ include_once "include/page_header.php";
 		$form->AddItem($table);
 		$form->Show();
 	}
-	elseif(str_in_array($srctbl,array("host_group")))
+	else if(str_in_array($srctbl,array("host_group")))
 	{
 		$accessible_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 
@@ -564,7 +564,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	elseif(str_in_array($srctbl,array('host_templates')))
+	else if(str_in_array($srctbl,array('host_templates')))
 	{
 		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
 		$table->SetHeader(array(S_NAME));
@@ -599,7 +599,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	elseif($srctbl == "usrgrp")
+	else if($srctbl == "usrgrp")
 	{
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->SetHeader(array(S_NAME));
@@ -629,7 +629,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	elseif($srctbl == "users")
+	else if($srctbl == "users")
 	{
 		$table = new CTableInfo(S_NO_USERS_DEFINED);
 		$table->SetHeader(array(S_NAME));
@@ -658,7 +658,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	elseif($srctbl == "help_items")
+	else if($srctbl == "help_items")
 	{
 		$table = new CTableInfo(S_NO_ITEMS);
 		$table->SetHeader(array(S_KEY,S_DESCRIPTION));
@@ -687,24 +687,22 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	elseif($srctbl == "triggers")
-	{
+	else if($srctbl == "triggers"){
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->SetHeader(array(
 			S_NAME,
 			S_SEVERITY,
 			S_STATUS));
 
-		$sql = 'SELECT h.host,t.triggerid,t.description,t.expression,t.priority,t.status,'.
-				'count(d.triggerid_up) as dep_count '.
+		$sql = 'SELECT h.host,t.triggerid,t.description,t.expression,t.priority,t.status,count(d.triggerid_up) as dep_count '.
 				' FROM hosts h,items i,functions f, triggers t'.
-				' left join trigger_depends d on d.triggerid_down=t.triggerid '.
+				' LEFT JOIN trigger_depends d ON d.triggerid_down=t.triggerid '.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
 					' AND t.triggerid=f.triggerid'.
 					' AND '.DBin_node('t.triggerid', $nodeid).
-					' and h.hostid in ('.$accessible_hosts.')'.
-					' and h.status in ('.implode(',', $host_status).')';
+					' AND h.hostid in ('.$accessible_hosts.')'.
+					' AND h.status in ('.implode(',', $host_status).')';
 
 		if(isset($hostid)) 
 			$sql .= ' AND h.hostid='.$hostid;
@@ -771,7 +769,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	elseif($srctbl == "logitems")
+	else if($srctbl == "logitems")
 	{
 		insert_js_function('add_item_variable');
 		
@@ -814,7 +812,7 @@ include_once "include/page_header.php";
 
 		$table->Show();
 	}
-	elseif($srctbl == "items")
+	else if($srctbl == "items")
 	{
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->SetHeader(array(
@@ -867,7 +865,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	elseif($srctbl == "applications")
+	else if($srctbl == "applications")
 	{
 		$table = new CTableInfo(S_NO_APPLICATIONS_DEFINED);
 		$table->SetHeader(array(
@@ -908,7 +906,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	elseif($srctbl == "nodes")
+	else if($srctbl == "nodes")
 	{
 		$table = new CTableInfo(S_NO_NODES_DEFINED);
 		$table->SetHeader(S_NAME);
@@ -935,7 +933,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	elseif($srctbl == "graphs")
+	else if($srctbl == "graphs")
 	{
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
 		$table->SetHeader(array(S_NAME,S_GRAPH_TYPE));
@@ -998,7 +996,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	elseif($srctbl == "simple_graph")
+	else if($srctbl == "simple_graph")
 	{
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 		$table->SetHeader(array(
@@ -1055,7 +1053,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	elseif($srctbl == "sysmaps")
+	else if($srctbl == "sysmaps")
 	{
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->SetHeader(array(S_NAME));
@@ -1094,7 +1092,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	elseif($srctbl == "plain_text")
+	else if($srctbl == "plain_text")
 	{
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 		$table->SetHeader(array(
@@ -1151,7 +1149,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	elseif('slides' == $srctbl)
+	else if('slides' == $srctbl)
 	{
 		require_once "include/screens.inc.php";
 
@@ -1182,7 +1180,7 @@ include_once "include/page_header.php";
 
 		$table->Show();
 	}
-	elseif($srctbl == 'screens')
+	else if($srctbl == 'screens')
 	{
 		require_once "include/screens.inc.php";
 
@@ -1214,7 +1212,7 @@ include_once "include/page_header.php";
 
 		$table->Show();
 	}
-	elseif($srctbl == 'screens2')
+	else if($srctbl == 'screens2')
 	{
 		require_once "include/screens.inc.php";
 
@@ -1255,7 +1253,7 @@ include_once "include/page_header.php";
 
 		$table->Show();
 	}
-	elseif($srctbl == "overview")
+	else if($srctbl == "overview")
 	{
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->SetHeader(S_NAME);
