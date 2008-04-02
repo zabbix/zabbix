@@ -91,11 +91,11 @@ include_once "include/page_header.php";
 
 	$all_maps = array();
 	
-	$result = DBselect('select sysmapid,name from sysmaps '.
-		' where '.DBin_node('sysmapid').
-		' order by name');
-	while($row=DBfetch($result))
-	{
+	$result = DBselect('SELECT sysmapid,name '.
+						' FROM sysmaps '.
+						' WHERE '.DBin_node('sysmapid').
+						' ORDER BY name');
+	while($row=DBfetch($result)){
 		if(!sysmap_accessiable($row["sysmapid"],PERM_READ_ONLY))
 			continue;
 

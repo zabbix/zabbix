@@ -184,7 +184,7 @@
 		return $perm_mode;
 	}
 
-	function	get_accessible_hosts_by_user(&$user_data,$perm,$perm_mode=null,$perm_res=null,$nodeid=null,$cache=1){
+	function get_accessible_hosts_by_user(&$user_data,$perm,$perm_mode=null,$perm_res=null,$nodeid=null,$cache=1){
 		static $available_hosts;
 
 		if(is_null($perm_res))		$perm_res	= PERM_RES_STRING_LINE;
@@ -244,19 +244,15 @@ COpt::counter_up('perm');
 
 		$processed = array();
 		while($host_data = DBfetch($db_hosts)){
-//			It seems that host details are not required by the logic
-//			$host_data += DBfetch(DBselect('select * from hosts where hostid='.$host_data['hostid']));
-
 			if(empty($host_data['nodeid'])) $host_data['nodeid'] = id2nodeid($host_data['hostid']);
 
 			/* if no rights defined used node rights */
-			if( (empty($host_data['permission']) || is_null($host_data['userid'])) ){
+			if( (empty($host_data['permission']) || empty($host_data['userid'])) ){
 				if( isset($processed[$host_data['hostid']]) )
 					continue;
 
 				if(!isset($nodes)){
-					$nodes = get_accessible_nodes_by_user($user_data,
-						PERM_DENY,PERM_MODE_GE,PERM_RES_DATA_ARRAY);
+					$nodes = get_accessible_nodes_by_user($user_data, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
 				}
 				if( !isset($nodes[$host_data['nodeid']]) || $user_type==USER_TYPE_ZABBIX_USER )
 					$host_data['permission'] = PERM_DENY;
@@ -285,8 +281,7 @@ COpt::counter_up('perm');
 	return $result;
 	}
 
-	function	get_accessible_groups_by_user($user_data,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
-	{
+	function get_accessible_groups_by_user($user_data,$perm,$perm_mode=null,$perm_res=null,$nodeid=null){
 		global $ZBX_LOCALNODEID;
 
 		if(is_null($perm_mode))		$perm_mode	= PERM_MODE_GE;

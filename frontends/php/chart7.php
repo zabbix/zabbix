@@ -49,26 +49,21 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_MODE_LT, PERM_RES_IDS_ARRAY);
-	
-	$items = get_request('items', array());
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, null, PERM_RES_IDS_ARRAY);
 
+	$items = get_request('items', array());
 	asort_by_key($items, 'sortorder');
 
-	foreach($items as $gitem)
-	{
-		if( !($host = DBfetch(DBselect('select h.* from hosts h,items i where h.hostid=i.hostid and i.itemid='.$gitem['itemid']))) )
-		{
+	foreach($items as $gitem){
+		if(!$host=DBfetch(DBselect('SELECT h.* FROM hosts h,items i WHERE h.hostid=i.hostid AND i.itemid='.$gitem['itemid']))){
 			fatal_error(S_NO_ITEM_DEFINED);
 		}
-		if(uint_in_array($host['hostid'], $denyed_hosts))
-		{
+		if(!uint_in_array($host['hostid'], $available_hosts)){
 			access_deny();
 		}
 	}
 
 	$graph = new Pie(get_request("graphtype"	,GRAPH_TYPE_NORMAL));
-
 	$graph->SetHeader($host["host"].":".get_request("name",""));
 	
 	$graph3d = get_request('graph3d',0);
@@ -77,7 +72,7 @@ include_once "include/page_header.php";
 	if($graph3d == 1) $graph->SwitchPie3D();
 	$graph->SwitchLegend($legend);
 	
-	unset($host, $denyed_hosts);
+	unset($host);
 
 	if(isset($_REQUEST["period"]))		$graph->SetPeriod($_REQUEST["period"]);
 	if(isset($_REQUEST["from"]))		$graph->SetFrom($_REQUEST["from"]);
