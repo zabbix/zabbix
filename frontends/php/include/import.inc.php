@@ -461,15 +461,22 @@
 						$data['expression'] = str_replace('{HOSTNAME}',
 									$this->data[XML_TAG_HOST]['name'],
 									$data['expression']);
+ 
+						$result = DBselect('SELECT DISTINCT t.triggerid,t.templateid,t.expression '.
+ 							' FROM triggers t,functions f,items i '.
+ 							' WHERE t.triggerid=f.triggerid '.
+								' AND f.itemid=i.itemid'.
+	 							' AND i.hostid='.$this->data[XML_TAG_HOST]['hostid'].
+								' AND t.description='.zbx_dbstr($data['description']));
 
-						if($trigger = DBfetch(DBselect('select distinct t.triggerid,t.templateid '.
-							' from triggers t,functions f,items i '.
-							' where t.triggerid=f.triggerid and f.itemid=i.itemid'.
-							' and i.hostid='.$this->data[XML_TAG_HOST]['hostid'].
-							' and t.description='.zbx_dbstr($data['description']))))
-						{ /* exist */
-							if($this->trigger['exist']==1) /* skip */
-							{
+						while($trigger = DBfetch($result)){
+							if(explode_exp($trigger['expression'],0) == $data['expression']){
+								break; // while
+							}
+						}
+
+						if(!empty($trigger)){ /* exist */
+							if($this->trigger['exist']==1){ /* skip */
 								info('Trigger ['.$data['description'].'] skipped - user rule');
 								break; // case
 							}
