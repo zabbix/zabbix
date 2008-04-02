@@ -22,19 +22,16 @@ include_once 'include/discovery.inc.php';
 
 ?>
 <?php
-	function	action_accessiable($actionid,$perm)
-	{
+	function	action_accessiable($actionid,$perm){
 		global $USER_DETAILS;
 
 		$result = false;
 
-		if ( DBselect('select actionid from actions where actionid='.$actionid.
-			' and '.DBin_node('actionid')) )
-		{
+		if (DBselect('select actionid from actions where actionid='.$actionid.' and '.DBin_node('actionid'))){
 			$result = true;
 			
-			$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
-			$denyed_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 			
 			$db_result = DBselect('SELECT * FROM conditions WHERE actionid='.$actionid);
 			while(($ac_data = DBfetch($db_result)) && $result)
@@ -43,26 +40,24 @@ include_once 'include/discovery.inc.php';
 
 				switch($ac_data['conditiontype']){
 					case CONDITION_TYPE_HOST_GROUP:
-						if(uint_in_array($ac_data['value'],explode(',',$denyed_groups)))
-						{
+						if(!uint_in_array($ac_data['value'],explode(',',$available_groups))){
 							$result = false;
 						}
 						break;
 					case CONDITION_TYPE_HOST:
-						if(uint_in_array($ac_data['value'],explode(',',$denyed_hosts)))
-						{
+						if(!uint_in_array($ac_data['value'],explode(',',$available_hosts))){
 							$result = false;
 						}
 						break;
 					case CONDITION_TYPE_TRIGGER:
-						if(!DBfetch(DBselect('SELECT DISTINCT t.*'.
-							' FROM triggers t,items i,functions f,events e'.
-							' WHERE f.itemid=i.itemid '.
-								' AND t.triggerid=f.triggerid'.
-								' AND i.hostid NOT IN ('.$denyed_hosts.') '.
-								' AND e.eventid='.$ac_data['value'].
-								' AND t.triggerid=e.objectid')))
-						{
+						$sql = 'SELECT DISTINCT t.triggerid'.
+							' FROM triggers t,items i,functions f '.
+							' WHERE t.triggerid='.$ac_data['value'].
+								' AND f.triggerid=t.triggerid'.
+								' AND i.itemid=f.itemid '.
+								' AND i.hostid NOT IN ('.$available_hosts.')';
+								
+						if(DBfetch(DBselect($sql,1))){
 							$result = false;
 						}
 						break;
@@ -72,44 +67,42 @@ include_once 'include/discovery.inc.php';
 		return $result;
 	}
 
-	function	check_permission_for_action_conditions($conditions)
-	{
+	function	check_permission_for_action_conditions($conditions){
 		global $USER_DETAILS;
 
 		$result = true;
 
-		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
-		$denyed_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 		
-		foreach($conditions as $ac_data)
-		{
+		foreach($conditions as $ac_data){
 			if($ac_data['operator'] != 0) continue;
 
 			switch($ac_data['type'])
 			{
 				case CONDITION_TYPE_HOST_GROUP:
-					if(uint_in_array($ac_data['value'],explode(',',$denyed_groups)))
-					{
+					if(!uint_in_array($ac_data['value'],explode(',',$available_groups))){
 						error(S_INCORRECT_GROUP);
 						$result = false;
 					}
 					break;
 				case CONDITION_TYPE_HOST:
-					if(uint_in_array($ac_data['value'],explode(',',$denyed_hosts)))
-					{
+					if(!uint_in_array($ac_data['value'],explode(',',$available_hosts))){
 						error(S_INCORRECT_HOST);
 						$result = false;
 					}
 					break;
 				case CONDITION_TYPE_TRIGGER:
-					if(!DBfetch(DBselect('SELECT DISTINCT t.*'.
-						' FROM triggers t,items i,functions f,events e'.
-						' WHERE f.itemid=i.itemid '.
-							' AND t.triggerid=f.triggerid'.
-							' AND i.hostid NOT IN ('.$denyed_hosts.') '.
-							' AND e.eventid='.$ac_data['value'].
-							' AND t.triggerid=e.objectid')))
-					{
+					$sql = 'SELECT DISTINCT t.triggerid'.
+							' FROM triggers t,items i,functions f '. //,events e'.
+							' WHERE t.triggerid='.$ac_data['value'].
+								' AND f.triggerid=t.triggerid'.
+								' AND i.itemid=f.itemid '.
+								' AND i.hostid NOT IN ('.$available_hosts.')';
+//								' AND e.eventid='.$ac_data['value'].
+//								' AND t.triggerid=e.objectid';
+							
+					if(DBfetch(DBselect($sql,1))){
 						error(S_INCORRECT_TRIGGER);
 						$result = false;
 					}
@@ -749,29 +742,23 @@ include_once 'include/discovery.inc.php';
 		return true;
 	}
 
-	function validate_commands($commands)
-	{
+	function validate_commands($commands){
 		$cmd_list = split("\n",$commands);
-		foreach($cmd_list as $cmd)
-		{
+		foreach($cmd_list as $cmd){
 			$cmd = trim($cmd, "\x00..\x1F");
 			if(!ereg("^(({HOSTNAME})|([0-9a-zA-Z\_\.[.-.]]{1,}))(:|#)[[:print:]]*$",$cmd,$cmd_items)){
 				error("Incorrect command: '$cmd'");
 				return FALSE;
 			}
-			if($cmd_items[4] == "#")
-			{ // group
-				if(!DBfetch(DBselect("select groupid from groups where name=".zbx_dbstr($cmd_items[1]))))
-				{
+			
+			if($cmd_items[4] == "#"){ // group
+				if(!DBfetch(DBselect("select groupid from groups where name=".zbx_dbstr($cmd_items[1])))){
 					error("Unknown group name: '".$cmd_items[1]."' in command ".$cmd."'");
 					return FALSE;
 				}
 			}
-			elseif($cmd_items[4] == ":")
-			{ // host
-				if( $cmd_items[1] != '{HOSTNAME}' && 
-					!DBfetch(DBselect("select hostid from hosts where host=".zbx_dbstr($cmd_items[1]))) )
-				{
+			else if($cmd_items[4] == ":"){ // host
+				if(($cmd_items[1] != '{HOSTNAME}') && !DBfetch(DBselect("select hostid from hosts where host=".zbx_dbstr($cmd_items[1])))){
 					error("Unknown host name '".$cmd_items[1]."' in command '".$cmd."'");
 					return FALSE;
 				}
@@ -783,7 +770,7 @@ include_once 'include/discovery.inc.php';
 	function get_history_of_actions($start,$num){
 		global $USER_DETAILS;
 		
-		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_MODE_LT);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
 
 		$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 		$table->SetHeader(array(
@@ -804,17 +791,15 @@ include_once 'include/discovery.inc.php';
 					' AND e.eventid = a.eventid'.
 					' AND e.objectid=f.triggerid '.
 					' AND f.itemid=i.itemid '.
-					' AND i.hostid not in ('.$denyed_hosts.')'.
+					' AND i.hostid IN ('.$available_hosts.')'.
 					' AND '.DBin_node('a.alertid').
 				order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries'),
 			10*$start+$num);
 			
 		$col=0;
 		$skip=$start;
-		while(($row=DBfetch($result))&&($col<$num))
-		{
-			if($skip > 0) 
-			{
+		while(($row=DBfetch($result))&&($col<$num)){
+			if($skip > 0) {
 				$skip--;
 				continue;
 			}
@@ -869,7 +854,7 @@ include_once 'include/discovery.inc.php';
 function get_actions_for_event($eventid){
 	global $USER_DETAILS;
 	
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_MODE_LT);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(
@@ -891,7 +876,7 @@ function get_actions_for_event($eventid){
 				' AND e.eventid = a.eventid'.
 				' AND e.objectid=f.triggerid '.
 				' AND f.itemid=i.itemid '.
-				' AND i.hostid not in ('.$denyed_hosts.')'.
+				' AND i.hostid IN ('.$available_hosts.')'.
 				' AND '.DBin_node('a.alertid').
 			order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries'));
 		
