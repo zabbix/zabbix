@@ -504,6 +504,8 @@ if((ini_get('mbstring.func_overload') > 5)){
 	define('ZBX_USER_ONLINE_TIME',600);		// 10min
 	define('ZBX_GUEST_USER','guest');
 	define('ZBX_DEFAULT_CSS','default.css');
+	
+	define('ZBX_FAVORITES_ALL', -1);
 
 /* Define if your logs are in non-standard format */
 /*	define('ZBX_LOG_ENCODING_DEFAULT', 'Shift_JIS');*/

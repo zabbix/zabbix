@@ -75,7 +75,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 
 	if(isset($_REQUEST['favobj'])){
-		if(in_array($_REQUEST['favobj'],array('screens','slides'))){
+		if(in_array($_REQUEST['favobj'],array('screenid','slideid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
@@ -85,9 +85,7 @@ include_once "include/page_header.php";
 				}
 			}
 			else if('remove' == $_REQUEST['action']){
-				while(infavorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj'])){
-					$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],0,$_REQUEST['favobj']);
-				}
+				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
 				
 				if($result){
 					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVORITES.'";'."\n");
@@ -202,15 +200,15 @@ include_once "include/page_header.php";
 			if($_REQUEST["fullscreen"]==0) $url .= "&fullscreen=1";
 			$text[] = array(nbsp(" / "),new CLink($element["name"], $url));
 			
-			if(infavorites('web.favorite.screenids',$elementid,(0 == $config)?'screens':'slides')){
+			if(infavorites('web.favorite.screenids',$elementid,(0 == $config)?'screenid':'slideid')){
 				$icon = new CDiv(SPACE,'iconminus');
 				$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
-				$icon->AddAction('onclick',new CScript("javascript: rm4favorites('".((0 == $config)?'screens':'slides')."','".$elementid."',0);"));
+				$icon->AddAction('onclick',new CScript("javascript: rm4favorites('".((0 == $config)?'screenid':'slideid')."','".$elementid."',0);"));
 			}
 			else{
 				$icon = new CDiv(SPACE,'iconplus');
 				$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
-				$icon->AddAction('onclick',new CScript("javascript: add2favorites('".((0 == $config)?'screens':'slides')."','".$elementid."');"));
+				$icon->AddAction('onclick',new CScript("javascript: add2favorites('".((0 == $config)?'screenid':'slideid')."','".$elementid."');"));
 			}
 			
 			$icon->AddOption('id','addrm_fav');

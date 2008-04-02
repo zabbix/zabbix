@@ -813,8 +813,10 @@
 		if(!$result)	return	$result;
 
 		$result = DBexecute("delete from items where itemid=$itemid");
-		if($result)
-		{
+		if(!$result)	return	$result;
+		
+		$result = rm4favorites('web.favorite.graphids',$itemid,ZBX_FAVORITES_ALL,'itemid');
+		if($result){
 			info("Item '".$host["host"].":".$item["key_"]."' deleted");
 		}
 		return $result;

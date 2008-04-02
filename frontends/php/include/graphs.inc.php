@@ -301,13 +301,11 @@
 		return	$result;
 	}
 
-	function	get_graph_by_graphid($graphid)
-	{
+	function	get_graph_by_graphid($graphid){
 
 		$result=DBselect("SELECT * FROM graphs WHERE graphid=$graphid");
 		$row=DBfetch($result);
-		if($row)
-		{
+		if($row){
 			return	$row;
 		}
 		error("No graph with graphid=[$graphid]");
@@ -626,14 +624,12 @@
          * Comments: !!! Don't forget sync code with C !!!
          *
          */
-	function	delete_graph($graphid)
-	{
+	function	delete_graph($graphid){
 		$graph = get_graph_by_graphid($graphid);
 
 		$host_list = array();
 		$db_hosts = get_hosts_by_graphid($graphid);
-		while($db_host = DBfetch($db_hosts))
-		{
+		while($db_host = DBfetch($db_hosts)){
 			$host_list[] = '"'.$db_host['host'].'"';
 		}
 
@@ -648,13 +644,15 @@
 		DBexecute('delete from screens_items where resourceid='.$graphid.' and resourcetype='.SCREEN_RESOURCE_GRAPH);
 
 		/* delete graph */
-		if ( ($result = DBexecute('DELETE FROM graphs_items WHERE graphid='.$graphid)) )
-		if ( ($result = DBexecute('DELETE FROM graphs WHERE graphid='.$graphid)) )
-		{	
+		$result = DBexecute('DELETE FROM graphs_items WHERE graphid='.$graphid);
+		$result &= DBexecute('DELETE FROM graphs WHERE graphid='.$graphid);
+		$result &= rm4favorites('web.favorite.graphids',$graphid,ZBX_FAVORITES_ALL,'graphid');
+		
+		if($result){
 			info('Graph "'.$graph['name'].'" deleted from hosts '.implode(',',$host_list));
 		}
 
-		return $result;
+	return $result;
 	}
 
         /*
