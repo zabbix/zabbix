@@ -84,7 +84,7 @@ function SDI(msg){
 		doc_body.appendChild(div_help);
 		
 		div_help.setAttribute('id','div_help');
-		div_help.setAttribute('style','position: absolute; bottom: 10px; right: 10px; border: 1px red solid; width: 800px; height: 400px; background-color: white; overflow: auto;');
+		div_help.setAttribute('style','position: absolute; left: 10px; top: 10px; border: 1px red solid; width: 800px; height: 400px; background-color: white; overflow: auto;');
 	}
 	
 	div_help.appendChild(document.createTextNode("DEBUG INFO: "));

@@ -110,6 +110,20 @@ function gmenuload(){
 	location.href = uri.getUrl();
 }
 
+
+function sboxload(){
+	var date = datetoarray(parseInt(this.stime));	// `this` becomes related to the object who ownes that function!!
+//SDI(this.sbox_id);
+	var stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
+
+	var uri = new url(location.href);
+	
+	uri.setArgument('stime', stime);
+	uri.setArgument('period', this.period);
+
+	location.href = uri.getUrl();
+}
+
 function graph_zoom_init(graph_id,stime,period,width,height){
 	if((typeof(graph_id) == 'undefined') || empty(graph_id)) return;
 	
@@ -163,19 +177,6 @@ function graph_zoom_init(graph_id,stime,period,width,height){
 
 	
 	A_SBOX[graph_id].sbox.sboxload = sboxload;
-}
-
-function sboxload(){
-	var date = datetoarray(parseInt(this.stime));	// `this` becomes related to the object who ownes that function!!
-//SDI(this.sbox_id);
-	var stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
-
-	var uri = new url(location.href);
-	
-	uri.setArgument('stime', stime);
-	uri.setArgument('period', this.period);
-
-	location.href = uri.getUrl();
 }
 
 function datetoarray(unixtime){
