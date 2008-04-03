@@ -193,7 +193,7 @@ static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t t
 		case '"': *p++ = '\\'; *p++ = '"'; break; /* quatation mark */
 		case '\\': *p++ = '\\'; *p++ = '\\'; break; /* reverse solidus */
 		case '/': *p++ = '\\'; *p++ = '/'; break; /* solidus */
-		case '\b': *p++ = '\\'; *p++ = 'b'; break; //* backspace */
+		case '\b': *p++ = '\\'; *p++ = 'b'; break; /* backspace */
 		case '\f': *p++ = '\\'; *p++ = 'f'; break; /* formfeed */
 		case '\n': *p++ = '\\'; *p++ = 'n'; break; /* newline */
 		case '\r': *p++ = '\\'; *p++ = 'r'; break; /* carriage return */
