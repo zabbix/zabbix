@@ -16,9 +16,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-/*
-#define	ZABBIX_TEST
-*/
 
 #include "common.h"
 
@@ -30,10 +27,6 @@
 #include "zlog.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
-
-#ifdef ZABBIX_TEST
-#include "zbxjson.h"
-#endif
 
 #include "sysinfo.h"
 #include "zbxserver.h"
@@ -304,44 +297,6 @@ void	init_config(void)
 #endif
 }
 
-#ifdef ZABBIX_TEST
-int	test()
-{
-printf("test()\n");
-
-	struct zbx_json	j;
-	zbx_uint64_t	id = 100100000000001;
-	int		i;
-	int		s = time(NULL);
-	zbx_uint64_t	useip = 1, port = 10050;
-
-	zbx_json_init(&j, 128*1024);
-
-	zbx_json_addstring(&j, "type", "ZBX_PROXY_CONFIG");
-	zbx_json_addarray(&j, "hosts");
-		
-	for (i = 0; i < 1000000; i++) {
-		zbx_json_addobject(&j, NULL);
-		zbx_json_adduint64(&j, "hostid", &id);
-		zbx_json_addstring(&j, "host", "zbxw01");
-		zbx_json_addstring(&j, "dns", NULL);
-		zbx_json_adduint64(&j, "useip", &useip);
-		zbx_json_addstring(&j, "ip", "127.0.0.1");
-		zbx_json_adduint64(&j, "port", &port);
-		zbx_json_close(&j);
-
-		id++;
-	}
-printf("[sizeof:%4d] [size:%4d] [offset:%4d] [status:%d] [time:%d]\n", j.buffer_allocated, j.buffer_size, j.buffer_offset, j.status, time(NULL) - s);
-/*fprintf(stderr, j.buffer);*/
-
-	zbx_json_free(&j);
-}
-#endif
-
-
-
-
 /******************************************************************************
  *                                                                            *
  * Function: main                                                             *
@@ -398,25 +353,6 @@ int main(int argc, char **argv)
 		init_database_cache();
 	}
 
-#ifdef ZABBIX_TEST
-/*	struct sigaction  phan;
-
-	phan.sa_handler = test_child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = 0;
-
-	sigaction(SIGINT,       &phan, NULL);
-	sigaction(SIGQUIT,      &phan, NULL);
-	sigaction(SIGTERM,      &phan, NULL);
-	sigaction(SIGPIPE,      &phan, NULL);
-	sigaction(SIGCHLD,      &phan, NULL);
-*/
-	test();
-
-	zbx_on_exit();
-	return 0;
-#endif /* ZABBIX_TEST */
-	
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }
 
@@ -459,7 +395,6 @@ int MAIN_ZABBIX_ENTRY(void)
 #       define IPV6_FEATURE_STATUS " NO"
 #endif
 
-/*	zabbix_log( LOG_LEVEL_WARNING, "INFO [%s]", ZBX_SQL_MOD(a,%d)); */
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_proxy. ZABBIX %s.", ZABBIX_VERSION);
 
 	zabbix_log( LOG_LEVEL_WARNING, "**** Enabled features ****");
@@ -477,23 +412,6 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 #endif /* HAVE_SQLITE3 */
 
-/*	DBconnect(ZBX_DB_CONNECT_EXIT);*/
-
-/* Need to set trigger status to UNKNOWN since last run */
-/* DBconnect() already made in init_config() */
-/*	DBconnect();*/
-/*	DBupdate_triggers_status_after_restart();
-	DBclose();*/
-
-/* To make sure that we can connect to the database before forking new processes */
-/*	DBconnect(ZBX_DB_CONNECT_EXIT);*/
-/* Do not close database. It is required for database cache */
-/*	DBclose();*/
-
-/*	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC)) {
-		zbx_error("Unable to create mutex for node syncs");
-		exit(FAIL);
-	}*/
 	DBinit();
 
 	threads = calloc(1 + CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS
