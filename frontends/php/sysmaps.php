@@ -57,7 +57,7 @@ include_once "include/page_header.php";
 	
 	if(isset($_REQUEST["sysmapid"]))
 	{
-		if(!sysmap_accessiable($_REQUEST["sysmapid"],PERM_READ_WRITE))
+		if(!sysmap_accessible($_REQUEST["sysmapid"],PERM_READ_WRITE))
 			access_deny();
 	
 		$sysmap = DBfetch(DBselect("select * from sysmaps where sysmapid=".$_REQUEST["sysmapid"]));
@@ -130,7 +130,7 @@ include_once "include/page_header.php";
 						
 		while($row=DBfetch($result))
 		{
-			if(!sysmap_accessiable($row["sysmapid"],PERM_READ_WRITE)) continue;
+			if(!sysmap_accessible($row["sysmapid"],PERM_READ_WRITE)) continue;
 
 			$table->AddRow(array(
 				new CLink($row["name"], "sysmaps.php?form=update".

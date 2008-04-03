@@ -3772,7 +3772,7 @@ include_once 'include/discovery.inc.php';
 							' WHERE s.sysmapid='.$resourceid);
 
 				while($row=DBfetch($result)){
-					if(!sysmap_accessiable($row['sysmapid'],PERM_READ_ONLY)) continue;
+					if(!sysmap_accessible($row['sysmapid'],PERM_READ_ONLY)) continue;
 			
 					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 					$caption = $row['node_name'].$row['name'];
@@ -3878,7 +3878,7 @@ include_once 'include/discovery.inc.php';
 							' WHERE s.screenid='.$resourceid);
 
 				while($row=DBfetch($result)){
-					if(!screen_accessiable($row['screenid'], PERM_READ_ONLY)) continue;
+					if(!screen_accessible($row['screenid'], PERM_READ_ONLY)) continue;
 					if(check_screen_recursion($_REQUEST['screenid'],$row['screenid'])) continue;
 					
 					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
@@ -4907,7 +4907,7 @@ include_once 'include/discovery.inc.php';
 					' order by node_name,s.name');
 			while($db_map = DBfetch($db_maps))
 			{
-				if(!sysmap_accessiable($db_map["sysmapid"],PERM_READ_ONLY)) continue;
+				if(!sysmap_accessible($db_map["sysmapid"],PERM_READ_ONLY)) continue;
 				$node_name = isset($db_map['node_name']) ? '('.$db_map['node_name'].') ' : '';
 				$cmbMaps->AddItem($db_map["sysmapid"],$node_name.$db_map["name"]);
 			}

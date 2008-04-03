@@ -40,7 +40,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	if(!sysmap_accessiable($_REQUEST["sysmapid"],PERM_READ_ONLY))
+	if(!sysmap_accessible($_REQUEST["sysmapid"],PERM_READ_ONLY))
 	{
 		access_deny();
 	}

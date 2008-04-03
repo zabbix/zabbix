@@ -203,13 +203,15 @@ function rm4favorites($favobj,$favid,$favcnt=null,$resource=null){
 
 	$resource = (is_null($resource))?0:$resource;
 	$favcnt = (is_null($favcnt))?0:$favcnt;	
+	
+	if($favid == 0) $favcnt = ZBX_FAVORITES_ALL;
 
 	foreach($favorites as $key => $value){
 		if(((bccomp($favid,$value) == 0) || ($favid == 0)) && ($fav_rsrc[$key] == $resource)){
 			if($favcnt < 1){
 				unset($favorites[$key]);
 				unset($fav_rsrc[$key]);
-				if($favcnt > ZBX_FAVORITES_ALL) break;
+				if($favcnt > ZBX_FAVORITES_ALL) break;  // foreach
 			}
 		}
 		$favcnt--;

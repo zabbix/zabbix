@@ -69,7 +69,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 	show_table_header("CONFIGURATION OF NETWORK MAP");
-	if(!sysmap_accessiable($_REQUEST["sysmapid"],PERM_READ_WRITE)) access_deny();
+	if(!sysmap_accessible($_REQUEST["sysmapid"],PERM_READ_WRITE)) access_deny();
 	
 	$sysmap = DBfetch(DBselect("select * from sysmaps where sysmapid=".$_REQUEST["sysmapid"]));
 ?>
