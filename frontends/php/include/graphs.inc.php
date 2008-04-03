@@ -200,7 +200,7 @@
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, null, null, $nodeid);
 		
 		$denied_graphs = array();
-		$available_graphs = array();
+		$result = array();
 		
 		$sql = 	'SELECT DISTINCT g.graphid '.
 				' FROM graphs as g, graphs_items as gi, items as i '.
@@ -209,8 +209,8 @@
 					' AND i.itemid=gi.itemid '.
 					' AND i.hostid NOT IN ('.$available_hosts.')';
 
-		$result = DBselect($sql);
-		while($graph = DBfetch($result)){
+		$db_graphs = DBselect($sql);
+		while($graph = DBfetch($db_graphs)){
 			$denied_graphs[] = $graph['graphid'];
 		}
 
@@ -222,19 +222,19 @@
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					(!empty($denied_graphs)?' AND g.graphid  NOT IN ('.implode(',',$denied_graphs).')':'');
 					
-		$result = DBselect($sql);
-		while($graph = DBfetch($result)){
-			$available_graphs[$graph['graphid']] = $graph['graphid'];
+		$db_graphs = DBselect($sql);
+		while($graph = DBfetch($db_graphs)){
+			$result[$graph['graphid']] = $graph['graphid'];
 		}
 		
 		if(PERM_RES_STRING_LINE == $perm_res){
 			if(count($result) == 0) 
-				$available_graphs = '-1';
+				$result = '-1';
 			else
-				$available_graphs = implode(',',$available_graphs);
+				$result = implode(',',$result);
 		}
 		
-	return $available_graphs;
+	return $result;
 	}
 
 /*
