@@ -858,6 +858,9 @@ static int	DBdelete_history_by_itemid(
 		if( use_housekeeper )
 		{
 			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)"
+					" values (" ZBX_FS_UI64 ",'history_text','itemid'," ZBX_FS_UI64 ")", 
+						DBget_maxid("housekeeper","housekeeperid"), itemid);
+			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)"
 					" values (" ZBX_FS_UI64 ",'history_log','itemid'," ZBX_FS_UI64 ")", 
 						DBget_maxid("housekeeper","housekeeperid"), itemid);
 			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)"
@@ -872,6 +875,7 @@ static int	DBdelete_history_by_itemid(
 		}
 		else
 		{
+			DBexecute("delete from history_text where itemid=" ZBX_FS_UI64, itemid);
 			DBexecute("delete from history_log where itemid=" ZBX_FS_UI64, itemid);
 			DBexecute("delete from history_uint where itemid=" ZBX_FS_UI64, itemid);
 			DBexecute("delete from history_str where itemid=" ZBX_FS_UI64, itemid);
