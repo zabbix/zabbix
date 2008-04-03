@@ -22,7 +22,7 @@
 	require_once "include/actions.inc.php";
 ?>
 <?php
-	function	screen_accessiable($screenid,$perm)
+	function	screen_accessible($screenid,$perm)
 	{
 		global $USER_DETAILS;
 
@@ -64,10 +64,10 @@
 						unset($itemid);
 						break;
 					case SCREEN_RESOURCE_MAP:
-						$result &= sysmap_accessiable($ac_data['resourceid'], PERM_READ_ONLY);
+						$result &= sysmap_accessible($ac_data['resourceid'], PERM_READ_ONLY);
 						break;
 					case SCREEN_RESOURCE_SCREEN:
-						$result &= screen_accessiable($ac_data['resourceid'],PERM_READ_ONLY);
+						$result &= screen_accessible($ac_data['resourceid'],PERM_READ_ONLY);
 						break;
 					case SCREEN_RESOURCE_SERVER_INFO:
 					case SCREEN_RESOURCE_HOSTS_INFO:
@@ -222,7 +222,7 @@
 	// editmode: 0 - view with actions, 1 - edit mode, 2 - view without any actions
 	function get_screen($screenid, $editmode, $effectiveperiod=NULL)
 	{
-		if(!screen_accessiable($screenid, $editmode ? PERM_READ_WRITE : PERM_READ_ONLY))
+		if(!screen_accessible($screenid, $editmode ? PERM_READ_WRITE : PERM_READ_ONLY))
 			access_deny();
 		
 		if(is_null($effectiveperiod)) 
@@ -550,7 +550,7 @@
 		return $table;
 	}
 
-	function	slideshow_accessiable($slideshowid, $perm)
+	function	slideshow_accessible($slideshowid, $perm)
 	{
 		$result = false;
 
@@ -561,7 +561,7 @@
 			$db_slides = DBselect('select distinct screenid from slides where slideshowid='.$slideshowid);
 			while($slide_data = DBfetch($db_slides))
 			{
-				if( !($result = screen_accessiable($slide_data["screenid"], PERM_READ_ONLY)) ) break;
+				if( !($result = screen_accessible($slide_data["screenid"], PERM_READ_ONLY)) ) break;
 			}
 		}
 		return $result;
@@ -574,7 +574,7 @@
 
 	function	validate_slide($slide)
 	{
-		if(!screen_accessiable($slide["screenid"], PERM_READ_ONLY)) return false;
+		if(!screen_accessible($slide["screenid"], PERM_READ_ONLY)) return false;
 
 		if( !is_numeric($slide['delay']) ) return false;
 

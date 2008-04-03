@@ -1067,7 +1067,7 @@ include_once "include/page_header.php";
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
 		
-			if(!sysmap_accessiable($row["sysmapid"],PERM_READ_ONLY)) continue;
+			if(!sysmap_accessible($row["sysmapid"],PERM_READ_ONLY)) continue;
 			
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 			$name = $row['node_name'].$row['name'];
@@ -1158,7 +1158,7 @@ include_once "include/page_header.php";
 
 		$result = DBselect('select slideshowid,name from slideshows where '.DBin_node('slideshowid',$nodeid).' order by name');
 		while($row=DBfetch($result)){
-			if(!slideshow_accessiable($row["slideshowid"], PERM_READ_ONLY))
+			if(!slideshow_accessible($row["slideshowid"], PERM_READ_ONLY))
 				continue;
 
 			$name = new CLink($row["name"],"#","action");
@@ -1190,7 +1190,7 @@ include_once "include/page_header.php";
 		$result = DBselect('select screenid,name from screens where '.DBin_node('screenid',$nodeid).' order by name');
 		while($row=DBfetch($result))
 		{
-			if(!screen_accessiable($row["screenid"], PERM_READ_ONLY))
+			if(!screen_accessible($row["screenid"], PERM_READ_ONLY))
 				continue;
 
 			$name = new CLink($row["name"],"#","action");
@@ -1226,9 +1226,9 @@ include_once "include/page_header.php";
 							' ORDER BY s.name');
 		while($row=DBfetch($result))
 		{
-			if(!screen_accessiable($row["screenid"], PERM_READ_ONLY))
+			if(!screen_accessible($row["screenid"], PERM_READ_ONLY))
 				continue;
-			if(!screen_accessiable($row['screenid'], PERM_READ_ONLY)) continue;
+			if(!screen_accessible($row['screenid'], PERM_READ_ONLY)) continue;
 			if(check_screen_recursion($_REQUEST['screenid'],$row['screenid'])) continue;
 			
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';

@@ -19,7 +19,10 @@
 **/
 ?>
 <?php
+require_once "include/graphs.inc.php";
 require_once "include/screens.inc.php";
+require_once "include/maps.inc.php";
+
 
 // Author: Aly
 function make_favorite_graphs($available_hosts=false){
@@ -51,7 +54,8 @@ function make_favorite_graphs($available_hosts=false){
 		}
 		else{
 			if(!$graph = get_graph_by_graphid($resourceid)) continue;
-	
+			if(!graph_accessible($resourceid)) continue;
+			
 			$result = get_hosts_by_graphid($resourceid);
 			$ghost = DBFetch($result);
 	
@@ -85,8 +89,9 @@ function make_favorite_screens(){
 	
 	$fav_screens = get4favorites('web.favorite.screenids');
 	foreach($fav_screens['id'] as $key => $resourceid){
-		if('slideid' == $fav_screens['resource'][$key]){
+		if('slideshowid' == $fav_screens['resource'][$key]){
 			if(!$slide = get_slideshow_by_slideshowid($resourceid)) continue;
+			if(!slideshow_accessible($resourceid, PERM_READ_ONLY)) continue;
 
 			$link = new CLink($slide['name'],'screens.php?config=1&elementid='.$resourceid);
 			$link->SetTarget('blank');
@@ -99,6 +104,7 @@ function make_favorite_screens(){
 		}
 		else{
 			if(!$screen = get_screen_by_screenid($resourceid)) continue;
+			if(!screen_accessible($resourceid, PERM_READ_ONLY)) continue;
 		
 			$link = new CLink($screen['name'],'screens.php?config=0&elementid='.$resourceid);
 			$link->SetTarget('blank');
@@ -133,7 +139,8 @@ function make_favorite_maps(){
 	
 	foreach($fav_sysmaps['id'] as $key => $resourceid){
 		if(!$sysmap = get_sysmap_by_sysmapid($resourceid)) continue;
-
+		if(!sysmap_accessible($resourceid,PERM_READ_ONLY)) continue;
+		
 		$link = new CLink($sysmap['name'],'maps.php?sysmapid='.$resourceid);
 		$link->SetTarget('blank');
 
@@ -887,11 +894,13 @@ function make_graph_menu(&$menu,&$submenu){
 
 function make_graph_submenu(){
 	$graphids = array();
-			
+	
 	$fav_graphs = get4favorites('web.favorite.graphids');
 	foreach($fav_graphs['id'] as $key => $resourceid){
 		if('itemid' == $fav_graphs['resource'][$key]){
 			if(!$item = get_item_by_itemid($resourceid)) continue;
+			
+			$item_added = true;
 	
 			$host = get_host_by_itemid($resourceid);
 			$item["description"] = item_description($item["description"],$item["key_"]);
@@ -905,10 +914,12 @@ function make_graph_submenu(){
 		}
 		else{
 			if(!$graph = get_graph_by_graphid($resourceid)) continue;
+			
+			$graph_added = true;
 	
 			$result = get_hosts_by_graphid($resourceid);
 			$ghost = DBFetch($result);
-	
+			
 			$graphids[] = array( 
 							'name'	=>	$ghost['host'].':'.$graph['name'],
 							'favobj'=>	'graphid',
@@ -916,6 +927,24 @@ function make_graph_submenu(){
 							'action'=>	'remove'
 						);
 		}
+	}
+
+	if(isset($graph_added)){
+			$graphids[] = array( 
+			'name'	=>	S_REMOVE.SPACE.S_ALL.SPACE.S_GRAPHS,
+			'favobj'=>	'graphid',
+			'favid'	=>	0,
+			'action'=>	'remove'
+		);
+	}
+	
+	if(isset($item_added)){
+		$graphids[] = array( 
+			'name'	=>	S_REMOVE.SPACE.S_ALL.SPACE.S_SIMPLE_GRAPHS,
+			'favobj'=>	'itemid',
+			'favid'	=>	0,
+			'action'=>	'remove'
+		);
 	}
 	
 return $graphids;
@@ -953,6 +982,15 @@ function make_sysmap_submenu(){
 							'name'	=>	$sysmap['name'],
 							'favobj'=>	'sysmapid',
 							'favid'	=>	$resourceid,
+							'action'=>	'remove'
+						);
+	}
+	
+	if(!empty($sysmapids)){
+		$sysmapids[] = array( 
+							'name'	=>	S_REMOVE.SPACE.S_ALL.SPACE.S_MAPS,
+							'favobj'=>	'sysmapid',
+							'favid'	=>	0,
 							'action'=>	'remove'
 						);
 	}
@@ -1000,20 +1038,22 @@ function make_screen_submenu(){
 	
 	$fav_screens = get4favorites('web.favorite.screenids');
 	foreach($fav_screens['id'] as $key => $resourceid){
-		if('slides' == $fav_screens['resource'][$key]){
+		if('slideshowid' == $fav_screens['resource'][$key]){
 			if(!$slide = get_slideshow_by_slideshowid($resourceid)) continue;
-		
+			$slide_added = true;
+			
 			$screenids[] = array( 
 								'name'	=>	$slide['name'],
-								'favobj'=>	'slideid',
+								'favobj'=>	'slideshowid',
 								'favid'	=>	$resourceid,
 								'action'=>	'remove'
 							);
 
 		}
 		else{
-			if(!$screen = get_screen_by_screenid($resourceid)) continue;
-		
+			if(!$screen = get_screen_by_screenid($resourceid)) continue;			
+			$screen_added = true;
+			
 			$screenids[] = array( 
 								'name'	=>	$screen['name'],
 								'favobj'=>	'screenid',
@@ -1021,6 +1061,25 @@ function make_screen_submenu(){
 								'action'=>	'remove'
 							);
 		}
+	}
+	
+
+	if(isset($screen_added)){
+		$screenids[] = array( 
+			'name'	=>	S_REMOVE.SPACE.S_ALL.SPACE.S_SCREENS,
+			'favobj'=>	'screenid',
+			'favid'	=>	0,
+			'action'=>	'remove'
+		);
+	}
+	
+	if(isset($slide_added)){
+		$screenids[] = array( 
+			'name'	=>	S_REMOVE.SPACE.S_ALL.SPACE.S_SLIDES,
+			'favobj'=>	'slideshowid',
+			'favid'	=>	0,
+			'action'=>	'remove'
+		);
 	}
 	
 return $screenids;

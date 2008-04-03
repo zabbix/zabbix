@@ -1083,6 +1083,7 @@
 	'S_RIGHTS_OF_RESOURCES'=>		'User rights',
 	'S_NO_RESOURCES_DEFINED'=>		'No resources defined',
 	'S_SIMPLE_GRAPH'=>			'Simple graph',
+	'S_SIMPLE_GRAPHS'=>			'Simple graphs',
 	'S_SIMPLE_GRAPH_BIG'=>			'SIMPLE GRAPH',
 	'S_GRAPH_NAME'=>			'Graph name',
 	'S_WIDTH'=>				'Width',

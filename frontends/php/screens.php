@@ -75,7 +75,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 
 	if(isset($_REQUEST['favobj'])){
-		if(in_array($_REQUEST['favobj'],array('screenid','slideid'))){
+		if(in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
@@ -149,7 +149,7 @@ include_once "include/page_header.php";
 				' order by name'
 				);
 		while($row=DBfetch($result)){
-			if(!screen_accessiable($row["elementid"], PERM_READ_ONLY))
+			if(!screen_accessible($row["elementid"], PERM_READ_ONLY))
 				continue;
 
 			$cmbElements->AddItem(
@@ -167,7 +167,7 @@ include_once "include/page_header.php";
 				' order by name'
 				);
 		while($row=DBfetch($result)){
-			if(!slideshow_accessiable($row["elementid"], PERM_READ_ONLY))
+			if(!slideshow_accessible($row["elementid"], PERM_READ_ONLY))
 				continue;
 
 			$cmbElements->AddItem(
@@ -185,12 +185,12 @@ include_once "include/page_header.php";
 
 	if(isset($elementid)){
 		if(0 == $config){
-			if(!screen_accessiable($elementid, PERM_READ_ONLY))
+			if(!screen_accessible($elementid, PERM_READ_ONLY))
 				access_deny();
 			$element = get_screen_by_screenid($elementid);
 		}
 		else{
-			if(!slideshow_accessiable($elementid, PERM_READ_ONLY))
+			if(!slideshow_accessible($elementid, PERM_READ_ONLY))
 				access_deny();
 			$element = get_slideshow_by_slideshowid($elementid);
 		}
@@ -200,15 +200,15 @@ include_once "include/page_header.php";
 			if($_REQUEST["fullscreen"]==0) $url .= "&fullscreen=1";
 			$text[] = array(nbsp(" / "),new CLink($element["name"], $url));
 			
-			if(infavorites('web.favorite.screenids',$elementid,(0 == $config)?'screenid':'slideid')){
+			if(infavorites('web.favorite.screenids',$elementid,(0 == $config)?'screenid':'slideshowid')){
 				$icon = new CDiv(SPACE,'iconminus');
 				$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
-				$icon->AddAction('onclick',new CScript("javascript: rm4favorites('".((0 == $config)?'screenid':'slideid')."','".$elementid."',0);"));
+				$icon->AddAction('onclick',new CScript("javascript: rm4favorites('".((0 == $config)?'screenid':'slideshowid')."','".$elementid."',0);"));
 			}
 			else{
 				$icon = new CDiv(SPACE,'iconplus');
 				$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
-				$icon->AddAction('onclick',new CScript("javascript: add2favorites('".((0 == $config)?'screenid':'slideid')."','".$elementid."');"));
+				$icon->AddAction('onclick',new CScript("javascript: add2favorites('".((0 == $config)?'screenid':'slideshowid')."','".$elementid."');"));
 			}
 			
 			$icon->AddOption('id','addrm_fav');

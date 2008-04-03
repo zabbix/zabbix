@@ -22,7 +22,7 @@ include_once 'include/discovery.inc.php';
 
 ?>
 <?php
-	function	action_accessiable($actionid,$perm){
+	function	action_accessible($actionid,$perm){
 		global $USER_DETAILS;
 
 		$result = false;

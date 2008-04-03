@@ -146,7 +146,7 @@ include_once "include/page_header.php";
 				echo 'dashboard_submenu["menu_sysmaps"] = '.zbx_jsvalue(make_sysmap_submenu()).';';
 			}
 		}
-		if(in_array($_REQUEST['favobj'],array('screenid','slideid'))){
+		if(in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);

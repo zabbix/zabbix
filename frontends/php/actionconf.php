@@ -84,7 +84,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 	validate_sort_and_sortorder();
 	
-	if(isset($_REQUEST['actionid']) && !action_accessiable($_REQUEST['actionid'], PERM_READ_WRITE))
+	if(isset($_REQUEST['actionid']) && !action_accessible($_REQUEST['actionid'], PERM_READ_WRITE))
 	{
 		access_deny();
 	}
@@ -354,7 +354,7 @@ include_once "include/page_header.php";
 							order_by('a.name,a.status','a.actionid'));
 		while($action_data = DBfetch($db_actions))
 		{
-			if(!action_accessiable($action_data['actionid'], PERM_READ_WRITE)) continue;
+			if(!action_accessible($action_data['actionid'], PERM_READ_WRITE)) continue;
 
 			$conditions=array();
 			$db_conditions = DBselect('select * from conditions where actionid='.$action_data['actionid'].
