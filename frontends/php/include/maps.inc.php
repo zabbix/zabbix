@@ -66,7 +66,7 @@
 	}
 
         /*
-         * Function: sysmap_accessiable
+         * Function: sysmap_accessible
          *
          * Description:
          *     Check permission for map
@@ -77,7 +77,7 @@
          *     Eugene Grigorjev 
          *
          */
-	function sysmap_accessiable($sysmapid,$perm)
+	function sysmap_accessible($sysmapid,$perm)
 	{
 		global $USER_DETAILS;
 
@@ -99,7 +99,7 @@
 						}
 						break;
 					case SYSMAP_ELEMENT_TYPE_MAP:
-						$result &= sysmap_accessiable($se_data['elementid'], PERM_READ_ONLY);
+						$result &= sysmap_accessible($se_data['elementid'], PERM_READ_ONLY);
 						break;
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						if(DBfetch(DBselect('SELECT triggerid FROM triggers WHERE triggerid='.$se_data['elementid']))){

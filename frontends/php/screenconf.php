@@ -78,7 +78,7 @@ include_once "include/page_header.php";
 	{
 		if(isset($_REQUEST["screenid"]))
 		{
-			if(!screen_accessiable($_REQUEST["screenid"], PERM_READ_WRITE))
+			if(!screen_accessible($_REQUEST["screenid"], PERM_READ_WRITE))
 				access_deny();
 		}
 
@@ -126,7 +126,7 @@ include_once "include/page_header.php";
 	{
 		if(isset($_REQUEST['slideshowid']))
 		{
-			if(!slideshow_accessiable($_REQUEST['slideshowid'], PERM_READ_WRITE))
+			if(!slideshow_accessible($_REQUEST['slideshowid'], PERM_READ_WRITE))
 				access_deny();
 		}
 
@@ -258,7 +258,7 @@ include_once "include/page_header.php";
 							order_by('s.name,s_size','s.screenid'));
 			while($row=DBfetch($result)){
 				
-				if(!screen_accessiable($row["screenid"], PERM_READ_WRITE)) continue;
+				if(!screen_accessible($row["screenid"], PERM_READ_WRITE)) continue;
 
 				$table->AddRow(array(
 					new CLink($row["name"],"?config=0&form=update&screenid=".$row["screenid"],
@@ -296,7 +296,7 @@ include_once "include/page_header.php";
 							
 			while($slide_data = DBfetch($db_slides))
 			{
-				if(!slideshow_accessiable($slide_data['slideshowid'], PERM_READ_WRITE)) continue;
+				if(!slideshow_accessible($slide_data['slideshowid'], PERM_READ_WRITE)) continue;
 
 				$table->AddRow(array(
 					new CLink($slide_data['name'],'?config=1&form=update&slideshowid='.$slide_data['slideshowid'],
