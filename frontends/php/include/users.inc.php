@@ -472,7 +472,7 @@
 		}
 
 		$menus=rtrim($menus,',').'),';
-		if($USER_DETAILS['userid'] == $userid){
+		if(bccomp($USER_DETAILS['userid'],$userid) == 0){
 			$menus=rtrim($menus,',').')';
 		}
 		else{

@@ -340,22 +340,20 @@ include_once "include/page_header.php";
 
 /****** ACTIONS FOR GROUPS **********/
 /* CLONE HOST */
-	elseif($_REQUEST["config"]==1 && isset($_REQUEST["clone"]) && isset($_REQUEST["groupid"]))
-	{
+	else if($_REQUEST["config"]==1 && isset($_REQUEST["clone"]) && isset($_REQUEST["groupid"])){
 		unset($_REQUEST["groupid"]);
 		$_REQUEST["form"] = "clone";
 	}
-	elseif($_REQUEST["config"]==1&&isset($_REQUEST["save"]))
-	{
+	else if($_REQUEST["config"]==1&&isset($_REQUEST["save"])){
 		$hosts = get_request("hosts",array());
-		if(isset($_REQUEST["groupid"]))
-		{
+		if(isset($_REQUEST["groupid"])){
 			$result = update_host_group($_REQUEST["groupid"], $_REQUEST["gname"], $hosts);
 			$action 	= AUDIT_ACTION_UPDATE;
 			$msg_ok		= S_GROUP_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_GROUP;
 			$groupid = $_REQUEST["groupid"];
-		} else {
+		} 
+		else {
 			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				access_deny();
 
@@ -1044,30 +1042,36 @@ include_once "include/page_header.php";
 			$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 			$cmbGroup->AddItem(0,S_ALL_SMALL);
 
-			$result=DBselect("select distinct g.groupid,g.name from groups g,hosts_groups hg".
-				" where g.groupid=hg.groupid and hg.hostid in (".$available_hosts.") ".
-				" order by name");
-			while($row=DBfetch($result))
-			{
+			$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
+						' FROM groups g,hosts_groups hg '.
+						' WHERE g.groupid=hg.groupid '.
+							' AND hg.hostid IN ('.$available_hosts.') '.
+							' ORDER BY name');
+							
+			while($row=DBfetch($result)){
 				$cmbGroup->AddItem($row["groupid"],$row["name"]);
 			}
+			
 			$form->AddItem(S_GROUP.SPACE);
 			$form->AddItem($cmbGroup);
 
-			if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0)
-			{
-				$sql="select distinct h.hostid,h.host from hosts h,hosts_groups hg".
-					" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid ".
-					" and h.hostid in (".$available_hosts.") ".
-					' and h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-					' group by h.hostid,h.host order by h.host';
+			if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0){
+				$sql='SELECT DISTINCT h.hostid,h.host '.
+					' FROM hosts h,hosts_groups hg '.
+					' WHERE hg.groupid='.$_REQUEST['groupid'].
+						' AND hg.hostid=h.hostid '.
+						' AND h.hostid in ('.$available_hosts.') '.
+//						' AND h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+					' GROUP BY h.hostid,h.host '.
+					' ORDER BY h.host';
 			}
-			else
-			{
-				$sql="select distinct h.hostid,h.host from hosts h ".
-					' where h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-					" and h.hostid in (".$available_hosts.") ".
-					" group by h.hostid,h.host order by h.host";
+			else{
+				$sql='SELECT DISTINCT h.hostid,h.host '.
+					' FROM hosts h '.
+					' WHERE h.hostid IN ('.$available_hosts.') '.
+//						' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
+						' GROUP BY h.hostid,h.host '.
+						' ORDER BY h.host';
 			}
 			$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit();");
 

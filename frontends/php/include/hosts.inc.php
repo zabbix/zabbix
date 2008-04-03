@@ -65,19 +65,18 @@ require_once "include/items.inc.php";
 			return false;
 		}
 	
-		if($groupid==null)
+		if(is_null($groupid))
 			$result = DBselect("select * from groups where ".DBin_node('groupid')." AND name=".zbx_dbstr($name));
 		else
 			$result = DBselect("select * from groups where ".DBin_node('groupid')." AND name=".zbx_dbstr($name).
 				" and groupid<>$groupid");
 		
-		if(DBfetch($result))
-		{
+		if(DBfetch($result)){
 			error("Group '$name' already exists");
 			return false;
 		}
-		if($groupid==null)
-		{
+		
+		if(is_null($groupid)){
 			$groupid=get_dbid("groups","groupid");
 			if(!DBexecute("insert into groups (groupid,name) values (".$groupid.",".zbx_dbstr($name).")"))
 				return false;
@@ -90,7 +89,7 @@ require_once "include/items.inc.php";
 
 	function	add_group_to_host($hostid,$newgroup="")
 	{
-		if($newgroup == "" || $newgroup == null)
+		if(empty($newgroup))
 			 return true;
 
 		$groupid = db_save_group($newgroup);
@@ -206,18 +205,15 @@ require_once "include/items.inc.php";
 			return false;
 		}
 
-		if($hostid==null)
-		{
+		if(is_null($hostid)){
 			$hostid = get_dbid("hosts","hostid");
 			$result = DBexecute("insert into hosts".
 				" (hostid,proxy_hostid,host,port,status,useip,dns,ip,disable_until,available)".
 				" values ($hostid,$proxy_hostid,".zbx_dbstr($host).",$port,$status,$useip,".zbx_dbstr($dns).",".zbx_dbstr($ip).",0,"
 				.HOST_AVAILABLE_UNKNOWN.")");
 		}
-		else
-		{
-			if(check_circle_host_link($hostid, $templates))
-			{
+		else{
+			if(check_circle_host_link($hostid, $templates)){
 				error("Circle link can't be created");
 				return false;
 			}
@@ -499,7 +495,7 @@ require_once "include/items.inc.php";
 			return false;
 		}
 	
-		if($proxyid==null)
+		if(is_null($proxyid))
 			$result = DBselect('select * from hosts where status in ('.HOST_STATUS_PROXY.')'.
 					' and '.DBin_node('hostid').' AND host='.zbx_dbstr($name));
 		else
@@ -512,7 +508,7 @@ require_once "include/items.inc.php";
 			error("Proxy '$name' already exists");
 			return false;
 		}
-		if($proxyid==null)
+		if(is_null($proxyid))
 		{
 			$proxyid=get_dbid('hosts','hostid');
 			if(!DBexecute('insert into hosts (hostid,host,status)'.
@@ -914,18 +910,18 @@ require_once "include/items.inc.php";
 			return false;
 		}
 	
-		if($applicationid==null)
+		if(is_null($applicationid))
 			$result = DBselect("select * from applications where name=".zbx_dbstr($name)." and hostid=".$hostid);
 		else
 			$result = DBselect("select * from applications where name=".zbx_dbstr($name)." and hostid=".$hostid.
 				" and applicationid<>$applicationid");
 
 		$db_app = DBfetch($result);
-		if($db_app && $templateid==0)
-		{
+		if($db_app && $templateid==0){
 			error("Application '$name' already exists");
 			return false;
 		}
+		
 		if($db_app && $applicationid!=null)
 		{ // delete old application with same name
 			delete_application($db_app["applicationid"]);
