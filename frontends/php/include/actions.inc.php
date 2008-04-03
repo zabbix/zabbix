@@ -819,20 +819,12 @@ include_once 'include/discovery.inc.php';
 			}
 			$sendto=$row["sendto"];
 
-			$pre = new CTag('pre','yes');
-			$pre->AddItem(array(bold(S_SUBJECT.': '),$row["subject"]));
-			$subject = empty($row["subject"]) ? '' : $pre;
-			
-			$pre = new CTag('pre','yes');
-			$pre->AddItem($row["message"]);
-			$message = array($subject, $pre);
+			$message = array(bold(S_SUBJECT.': '),br(),$row["subject"],br(),br(),bold(S_MESSAGE.': '),br(),$row['message']);
 
-			if($row["error"] == "")
-			{
+			if(empty($row["error"])){
 				$error=new CSpan(SPACE,"off");
 			}
-			else
-			{
+			else{
 				$error=new CSpan($row["error"],"on");
 			}
 			$table->AddRow(array(
@@ -843,7 +835,7 @@ include_once 'include/discovery.inc.php';
 				new CCol($retries, 'top'),
 				new CCol($sendto, 'top'),
 				new CCol($message, 'top'),
-				new CCol($error, 'top')));
+				new CCol($error, 'wraptext top')));
 			$col++;
 		}
 
@@ -899,12 +891,13 @@ function get_actions_for_event($eventid){
 
 		$message = array(bold(S_SUBJECT.': '),br(),$row["subject"],br(),br(),bold(S_MESSAGE.': '),br(),$row['message']);
 		
-		if($row["error"] == ""){
+		if(empty($row["error"])){
 			$error=new CSpan(SPACE,"off");
 		}
 		else{
 			$error=new CSpan($row["error"],"on");
 		}
+		
 		$table->AddRow(array(
 			get_node_name_by_elid($row['alertid']),
 			new CCol($time, 'top'),

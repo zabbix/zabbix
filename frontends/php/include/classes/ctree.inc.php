@@ -104,7 +104,7 @@ var $maxlevel=0;
 		$tr = $this->MakeSImgStr($id);
 		
 		$td = new CCol($this->tree[$id]['caption']);
-		$td->AddOption('style','height: 20px; padding-right: 10px; padding-left: 2px;');
+		$td->AddOption('style',' white-space: normal; height: 20px; padding-right: 10px; padding-left: 2px;');
 		$tr->AddItem($td);
 	
 		$table->AddRow($tr);

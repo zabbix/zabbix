@@ -252,7 +252,7 @@ include_once "include/page_header.php";
 
 	$accessible_nodes	= get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid(true));
 	$denyed_hosts		= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
-	$accessible_hosts	= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_hosts	= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	$nodeid				= get_current_nodeid();
 
 	if(isset($only_hostid))
@@ -291,7 +291,7 @@ include_once "include/page_header.php";
 			$db_groups = DBselect('SELECT DISTINCT g.groupid,g.name from groups g, hosts_groups hg, hosts h '.
 				' where '.DBin_node('g.groupid', $nodeid).
 				' AND g.groupid=hg.groupid AND hg.hostid=h.hostid'.
-				' and h.hostid in ('.$accessible_hosts.')'.
+				' and h.hostid in ('.$available_hosts.')'.
 				' and h.status in ('.implode(',', $host_status).')'.
 				' order by name');
 			while($group = DBfetch($db_groups))
@@ -330,7 +330,7 @@ include_once "include/page_header.php";
 			}
 
 			$sql .= DBin_node('h.hostid', $nodeid).
-				' and h.hostid in ('.$accessible_hosts.')'.
+				' and h.hostid in ('.$available_hosts.')'.
 				' and h.status in ('.implode(',', $host_status).')'.
 				' order by host,h.hostid';
 
@@ -374,7 +374,7 @@ include_once "include/page_header.php";
 			$sql .= " where ";
 
 		$sql .= DBin_node('h.hostid', $nodeid).
-				' and h.hostid in ('.$accessible_hosts.')'.
+				' and h.hostid in ('.$available_hosts.')'.
 				' and h.status in ('.implode(',', $host_status).')'.
 				" order by h.host,h.hostid";
 
@@ -497,7 +497,7 @@ include_once "include/page_header.php";
 			$sql .= " where ";
 
 		$sql .= DBin_node('h.hostid', $nodeid).
-				" AND h.hostid in (".$accessible_hosts.") ".
+				" AND h.hostid in (".$available_hosts.") ".
 				" AND h.status=".HOST_STATUS_TEMPLATE.
 				" order by h.host,h.hostid";
 
@@ -536,14 +536,14 @@ include_once "include/page_header.php";
 	}
 	else if(str_in_array($srctbl,array("host_group")))
 	{
-		$accessible_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+		$available_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->SetHeader(array(S_NAME));
 
 		$db_groups = DBselect("SELECT DISTINCT groupid,name from groups ".
 			' where '.DBin_node('groupid', $nodeid).
-			" AND groupid in (".$accessible_groups.") ".
+			" AND groupid in (".$available_groups.") ".
 			" order by name");
 		while($row = DBfetch($db_groups))
 		{
@@ -577,7 +577,7 @@ include_once "include/page_header.php";
 			$sql .= ' WHERE ';
 
 		$sql .= DBin_node('h.hostid',$nodeid).' AND h.status='.HOST_STATUS_TEMPLATE.
-				' AND h.hostid in ('.$accessible_hosts.') '.
+				' AND h.hostid in ('.$available_hosts.') '.
 				' ORDER BY h.host,h.hostid';
 		$db_hosts = DBselect($sql);
 		while($row = DBfetch($db_hosts))
@@ -688,6 +688,8 @@ include_once "include/page_header.php";
 		$table->Show();
 	}
 	else if($srctbl == "triggers"){
+		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+			
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->SetHeader(array(
 			S_NAME,
@@ -701,7 +703,7 @@ include_once "include/page_header.php";
 					' AND h.hostid=i.hostid '.
 					' AND t.triggerid=f.triggerid'.
 					' AND '.DBin_node('t.triggerid', $nodeid).
-					' AND h.hostid in ('.$accessible_hosts.')'.
+					' AND t.triggerid IN ('.$available_triggers.')'.
 					' AND h.status in ('.implode(',', $host_status).')';
 
 		if(isset($hostid)) 
@@ -780,13 +782,15 @@ include_once "include/page_header.php";
 			S_DESCRIPTION,S_KEY,nbsp(S_UPDATE_INTERVAL),
 			S_STATUS));
 
-		$db_items = DBselect("SELECT DISTINCT h.host,i.* from items i,hosts h".
-			" where i.value_type=".ITEM_VALUE_TYPE_LOG." AND h.hostid=i.hostid".
-			' AND '.DBin_node('i.itemid', $nodeid).
-			(isset($hostid) ? " AND ".$hostid."=i.hostid " : "").
-			' and h.hostid in ('.$accessible_hosts.')'.
-			' and h.status in ('.implode(',', $host_status).')'.
-			" order by h.host,i.description, i.key_, i.itemid");
+		$db_items = DBselect('SELECT DISTINCT h.host,i.* '.
+					' FROM items i,hosts h'.
+					' WHERE i.value_type='.ITEM_VALUE_TYPE_LOG.
+						' AND h.hostid=i.hostid '.
+						' AND '.DBin_node('i.itemid', $nodeid).
+						(isset($hostid)?' AND '.$hostid.'=i.hostid ':'').
+						' and h.hostid in ('.$available_hosts.')'.
+						' and h.status in ('.implode(',', $host_status).')'.
+					' ORDER BY h.host,i.description, i.key_, i.itemid');
 
 		while($db_item = DBfetch($db_items))
 		{
@@ -826,8 +830,8 @@ include_once "include/page_header.php";
 		$sql = 'SELECT DISTINCT h.host,i.* from hosts h,items i '.
 				' WHERE h.hostid=i.hostid '.
 					' AND '.DBin_node('i.itemid', $nodeid).
-					' and h.hostid in ('.$accessible_hosts.')'.
-					' and h.status in ('.implode(',', $host_status).')';
+					' AND h.hostid in ('.$available_hosts.')'.
+					' AND h.status in ('.implode(',', $host_status).')';
 
 		if(isset($hostid)) 
 			$sql .= ' AND h.hostid='.$hostid;
@@ -876,7 +880,7 @@ include_once "include/page_header.php";
 				' FROM hosts h,applications a '.
 				' WHERE h.hostid=a.hostid '.
 					' AND '.DBin_node('a.applicationid', $nodeid).
-					' and h.hostid in ('.$accessible_hosts.')'.
+					' and h.hostid in ('.$available_hosts.')'.
 					' and h.status in ('.implode(',', $host_status).')';
 
 		if(isset($hostid)) 
@@ -1022,8 +1026,7 @@ include_once "include/page_header.php";
 		$sql .= " order by h.host, i.description, i.key_, i.itemid";
 			
 		$result = DBselect($sql);
-		while($row = DBfetch($result))
-		{
+		while($row = DBfetch($result)){
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 			$row["description"] = item_description($row["description"],$row["key_"]);
 			
@@ -1226,9 +1229,7 @@ include_once "include/page_header.php";
 							' ORDER BY s.name');
 		while($row=DBfetch($result))
 		{
-			if(!screen_accessible($row["screenid"], PERM_READ_ONLY))
-				continue;
-			if(!screen_accessible($row['screenid'], PERM_READ_ONLY)) continue;
+			if(!screen_accessible($row["screenid"], PERM_READ_ONLY)) continue;
 			if(check_screen_recursion($_REQUEST['screenid'],$row['screenid'])) continue;
 			
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
@@ -1291,7 +1292,7 @@ include_once "include/page_header.php";
 		$table->Show();
 	}
 	else if($srctbl == 'host_group_scr'){
-		$accessible_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+		$available_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->SetHeader(array(S_NAME));
@@ -1299,7 +1300,7 @@ include_once "include/page_header.php";
 		$db_groups = DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name,n.nodeid '.
 						' FROM hosts_groups hg, groups g '.
 							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
-						' WHERE g.groupid IN ('.$accessible_groups.') '.
+						' WHERE g.groupid IN ('.$available_groups.') '.
 							' AND '.DBin_node('g.groupid',$nodeid).
 						' ORDER BY n.nodeid,g.name');
 		

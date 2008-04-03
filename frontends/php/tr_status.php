@@ -164,20 +164,20 @@ include_once "include/page_header.php";
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	$cmbHosts->AddItem(0,S_ALL_SMALL);
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+	$available_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
 	$scripts_by_hosts = get_accessible_scripts_by_hosts(explode(',',$available_hosts));
 	
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+	
 	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
-					' FROM groups g, hosts_groups hg, hosts h, items i, functions f, triggers t '.
-					' WHERE h.hostid in ('.$available_hosts.') '.
+					' FROM groups g, hosts_groups hg, hosts h, items i '.
+					' WHERE g.groupid in ('.$available_groups.') '.
 						' AND hg.groupid=g.groupid '.
 						' AND h.status='.HOST_STATUS_MONITORED.
 						' AND h.hostid=i.hostid '.
 						' AND hg.hostid=h.hostid '.
 						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND i.itemid=f.itemid '.
-						' AND t.triggerid=f.triggerid '.
-						' AND t.status='.TRIGGER_STATUS_ENABLED.
 					' ORDER BY g.name');
 										
 	while($row=DBfetch($result)){
@@ -189,32 +189,19 @@ include_once "include/page_header.php";
 	}
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 	
-	if($_REQUEST["groupid"] > 0){
-		$sql='SELECT DISTINCT h.hostid,h.host '.
-			' FROM hosts h,items i,hosts_groups hg, functions f, triggers t '.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND h.hostid=i.hostid '.
-				' AND hg.groupid='.$_REQUEST["groupid"].
-				' AND hg.hostid=h.hostid'.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND i.itemid=f.itemid '.
-				' AND t.triggerid=f.triggerid '.
-				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND h.hostid in ('.$available_hosts.') '.
-			' ORDER BY h.host';
-	}
-	else{
-		$sql='SELECT DISTINCT h.hostid,h.host '.
-			' FROM hosts h,items i, functions f, triggers t '.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND h.hostid=i.hostid'.
-				' AND i.itemid=f.itemid '.
-				' AND t.triggerid=f.triggerid '.
-				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND h.hostid in ('.$available_hosts.') '.
-			' ORDER BY h.host';
-	}
+	
+	$sql='SELECT DISTINCT h.hostid,h.host '.
+		' FROM hosts_groups hg, hosts h, items i, functions f, triggers t '.
+		' WHERE t.triggerid in ('.$available_triggers.') '.
+			' AND t.status='.TRIGGER_STATUS_ENABLED.
+			' AND f.triggerid=t.triggerid '.
+			' AND i.itemid=f.itemid '.
+			' AND i.status='.ITEM_STATUS_ACTIVE.
+			' AND h.hostid=i.hostid '.												
+			' AND h.status='.HOST_STATUS_MONITORED.
+			' AND hg.hostid=h.hostid '.
+			($_REQUEST["groupid"]?' AND hg.groupid='.$_REQUEST["groupid"]:'').
+		' ORDER BY h.host';
 	
 	$result=DBselect($sql);
 	$flag = false;
@@ -375,11 +362,13 @@ include_once "include/page_header.php";
 	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, t.expression,t.priority, '.
 							' t.lastchange,t.comments,t.url,t.value,h.host,h.hostid,t.type '.
 					' FROM triggers t,hosts h,items i,functions f, hosts_groups hg '.
-					' WHERE f.itemid=i.itemid AND h.hostid=i.hostid '.
+					' WHERE f.itemid=i.itemid '.
+						' AND h.hostid=i.hostid '.
 						' AND hg.hostid=h.hostid '.
-						' AND t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
-						' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
-						' AND h.hostid in ('.$available_hosts.') '.
+						' AND t.triggerid=f.triggerid '.
+						' AND t.status='.TRIGGER_STATUS_ENABLED.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+						' AND t.triggerid in ('.$available_triggers.') '.
 						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.
 						order_by('h.host,h.hostid,t.description,t.priority,t.lastchange');
 
@@ -411,7 +400,8 @@ include_once "include/page_header.php";
 
 		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
 					' FROM events e, triggers t '.
-					' WHERE e.object=0 AND e.objectid='.$row['triggerid'].
+					' WHERE e.object=0 '.
+						' AND e.objectid='.$row['triggerid'].
 						' AND t.triggerid=e.objectid '.$cond.
 					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 

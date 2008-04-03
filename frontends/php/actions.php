@@ -39,7 +39,21 @@ include_once "include/page_header.php";
 		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
 		"start"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535)."({}%".PAGE_SIZE."==0)",	NULL),
 		"next"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
-		"prev"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL)
+		"prev"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
+		
+// filter
+		"filter_rst"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
+		"filter_set"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
+		
+		"recipient"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
+		
+		'filter_timesince'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
+		'filter_timetill'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
+
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
 	);
 
 	check_fields($fields);
@@ -61,7 +75,7 @@ include_once "include/page_header.php";
 	if($_REQUEST["start"] < 0) $_REQUEST["start"] = 0;
 ?>
 <?php
-        $table = get_history_of_actions($_REQUEST["start"], PAGE_SIZE);
+	$table = get_history_of_actions($_REQUEST["start"], PAGE_SIZE);
 	
 	$form = new CForm();
 	$form->SetMethod('get');
