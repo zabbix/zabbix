@@ -143,13 +143,15 @@ include_once "include/page_header.php";
 	
 	    $available_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, null, null, get_current_nodeid());
+		
+		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 			$sql = 'SELECT DISTINCT h.hostid '.
 					' FROM hosts h, functions f, items i'.
 					' WHERE i.itemid=f.itemid '.
 						' AND h.hostid=i.hostid '.
-						' AND h.hostid IN ('.$available_hosts.') '.
+						' AND f.triggerid IN ('.$available_triggers.') '.
 						' AND f.triggerid='.$_REQUEST['triggerid'];
 						
 			if($host = DBfetch(DBselect($sql,1))){
@@ -193,27 +195,18 @@ include_once "include/page_header.php";
 		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 		
 		$cmbHosts->AddItem(0,S_ALL_SMALL);
-		if($_REQUEST['groupid'] > 0){
-			$sql='SELECT DISTINCT h.hostid,h.host '.
-				' FROM hosts h,items i,hosts_groups hg '.
-				' WHERE h.status='.HOST_STATUS_MONITORED.
-					' AND h.hostid=i.hostid AND hg.groupid='.$_REQUEST['groupid'].
-					' AND hg.hostid=h.hostid AND h.hostid in ('.$available_hosts.') '.
-//				' GROUP BY h.hostid,h.host '.
-				' ORDER BY h.host';
-		}
-		else{
-			$sql='SELECT DISTINCT h.hostid,h.host '.
-				' FROM hosts h,items i '.
-				' WHERE h.status='.HOST_STATUS_MONITORED.
-					' AND h.hostid=i.hostid'.
-					' AND h.hostid in ('.$available_hosts.') '.
-//				' GROUP BY h.hostid,h.host '.
-				' ORDER BY h.host';
-		}
+
+		$sql='SELECT DISTINCT h.hostid,h.host '.
+			' FROM hosts h,items i,hosts_groups hg '.
+			' WHERE h.status='.HOST_STATUS_MONITORED.
+				' AND h.hostid=i.hostid '.
+				($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
+				' AND hg.hostid=h.hostid '.
+				' AND h.hostid in ('.$available_hosts.') '.
+			' ORDER BY h.host';
+			
 		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			$cmbHosts->AddItem(
 					$row['hostid'],
 					get_node_name_by_elid($row['hostid']).$row['host']
@@ -260,7 +253,7 @@ include_once "include/page_header.php";
 
 		$sql = 'SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,t.type '.
 				' FROM triggers t, functions f, items i, hosts h '.$sql_from.
-				' WHERE '.DBin_node('t.triggerid').
+				' WHERE t.triggerid IN ('.$available_triggers.') '.
 					' AND t.triggerid=f.triggerid '.
 					' AND f.itemid=i.itemid '.
 					' AND i.hostid=h.hostid '.
@@ -335,13 +328,11 @@ include_once "include/page_header.php";
 			$actions= new CTable(' - ');
 
 			$sql='SELECT COUNT(a.alertid) as cnt_all'.
-					' FROM alerts a,functions f,items i,events e'.
+					' FROM alerts a,events e'.
 					' WHERE a.eventid='.$row['eventid'].
 						' AND e.eventid = a.eventid'.
-						' AND f.triggerid=e.objectid '.
-						' AND i.itemid=f.itemid '.
-						' AND i.hostid IN ('.$available_hosts.') ';
-
+						' AND e.object='.EVENT_OBJECT_TRIGGER.
+						' AND e.objectid IN ('.$available_triggers.') ';
 					
 			$alerts=DBfetch(DBselect($sql));
 
@@ -349,38 +340,35 @@ include_once "include/page_header.php";
 				$mixed = 0;
 // Sent
 				$sql='SELECT COUNT(a.alertid) as sent '.
-						' FROM alerts a,functions f,items i,events e'.
+						' FROM alerts a,events e'.
 						' WHERE a.eventid='.$row['eventid'].
 							' AND a.status='.ALERT_STATUS_SENT.
 							' AND e.eventid = a.eventid'.
-							' AND f.triggerid=e.objectid '.
-							' AND i.itemid=f.itemid '.
-							' AND i.hostid IN ('.$available_hosts.') ';
+							' AND e.object='.EVENT_OBJECT_TRIGGER.
+							' AND e.objectid IN ('.$available_triggers.') ';
 
 				$tmp=DBfetch(DBselect($sql));
 				$alerts['sent'] = $tmp['sent'];
 				$mixed+=($alerts['sent'])?ALERT_STATUS_SENT:0;
 // In progress
 				$sql='SELECT COUNT(a.alertid) as inprogress '.
-						' FROM alerts a,functions f,items i,events e'.
+						' FROM alerts a,events e'.
 						' WHERE a.eventid='.$row['eventid'].
 							' AND a.status='.ALERT_STATUS_NOT_SENT.
 							' AND e.eventid = a.eventid'.
-							' AND f.triggerid=e.objectid '.
-							' AND i.itemid=f.itemid '.
-							' AND i.hostid IN ('.$available_hosts.') ';
+							' AND e.object='.EVENT_OBJECT_TRIGGER.
+							' AND e.objectid IN ('.$available_triggers.') ';
 
 				$tmp=DBfetch(DBselect($sql));
 				$alerts['inprogress'] = $tmp['inprogress'];
 // Failed
 				$sql='SELECT COUNT(a.alertid) as failed '.
-						' FROM alerts a,functions f,items i,events e'.
+						' FROM alerts a,events e'.
 						' WHERE a.eventid='.$row['eventid'].
 							' AND a.status='.ALERT_STATUS_FAILED.
 							' AND e.eventid = a.eventid'.
-							' AND f.triggerid=e.objectid '.
-							' AND i.itemid=f.itemid '.
-							' AND i.hostid IN ('.$available_hosts.') ';
+							' AND e.object='.EVENT_OBJECT_TRIGGER.
+							' AND e.objectid IN ('.$available_triggers.') ';
 
 				$tmp=DBfetch(DBselect($sql));
 				$alerts['failed'] = $tmp['failed'];
@@ -477,19 +465,7 @@ include_once "include/page_header.php";
 		$filtertimetab->AddOption('width','10%');
 		$filtertimetab->SetCellPadding(0);
 		$filtertimetab->SetCellSpacing(0);
-/*		$filtertimetab->AddRow(array(
-								SPACE, 
-								new CCol('D','center'),
-								new CCol('/','center'),
-								new CCol('M','center'),
-								new CCol('/','center'),
-								new CCol('Y','center'),
-								new CCol('H','center'),
-								new CCol(':','center'),
-								new CCol('M','center'),
-								SPACE
-						));
-*/		
+	
 		$filtertimetab->AddRow(array(
 								S_FROM, 
 								new CNumericBox('filter_since_day',(($_REQUEST['filter_timesince']>0)?date('d',$_REQUEST['filter_timesince']):''),2),

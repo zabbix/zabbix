@@ -65,7 +65,7 @@ include_once "include/page_header.php";
 		if('refresh' == $_REQUEST['favobj']){
 			switch($_REQUEST['favid']){
 				case 'hat_syssum':
-					$syssum = make_system_summary($available_hosts);
+					$syssum = make_system_summary();
 					$syssum->show();
 					break;
 				case 'hat_stszbx':
@@ -73,7 +73,7 @@ include_once "include/page_header.php";
 					$stszbx->Show();
 					break;
 				case 'hat_lastiss':
-					$lastiss = make_latest_issues($available_hosts);
+					$lastiss = make_latest_issues();
 					$lastiss->Show();
 					break;
 				case 'hat_webovr':
@@ -117,7 +117,7 @@ include_once "include/page_header.php";
 			}
 
 			if((PAGE_TYPE_JS == $page['type']) && $result){
-				$innerHTML = make_favorite_graphs($available_hosts);
+				$innerHTML = make_favorite_graphs();
 				$innerHTML = $innerHTML->toString();
 				print('$("hat_favgrph").update('.zbx_jsvalue($innerHTML).');');
 				
@@ -222,7 +222,7 @@ include_once "include/page_header.php";
 	
 	$left_tab->AddRow(create_hat(
 			S_FAVORITE.SPACE.S_GRAPHS,
-			make_favorite_graphs($available_hosts),
+			make_favorite_graphs(),
 			array($graph_menu),
 			'hat_favgrph',
 			get_profile('web.dashboard.hats.hat_favgrph.state',1)
@@ -286,7 +286,7 @@ include_once "include/page_header.php";
 	
 	$right_tab->AddRow(create_hat(
 			S_SYSTEM_STATUS,
-			null,//make_system_summary($available_hosts),
+			null,//make_system_summary(),
 			array($refresh_menu),
 			'hat_syssum',
 			get_profile('web.dashboard.hats.hat_syssum.state',1)
@@ -309,7 +309,7 @@ include_once "include/page_header.php";
 	$refresh_menu->AddOption('title',S_MENU);
 		
 	$right_tab->AddRow(create_hat(S_LATEST_ISSUES,
-			null,//make_latest_issues($available_hosts),
+			null,//make_latest_issues(),
 			array($refresh_menu),
 			'hat_lastiss',
 			get_profile('web.dashboard.hats.hat_lastiss.state',1)

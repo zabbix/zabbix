@@ -202,7 +202,7 @@ include_once "include/page_header.php";
 						'status' => bold(S_STATUS), 
 						'reason' => bold(S_REASON),
 						'sla' => bold(S_SLA_LAST_7_DAYS),
-						'sla2' => bold(nbsp(S_PLANNED_CURRENT_SLA)),
+						'sla2' => bold(nbsp(S_SLA)),
 						'graph' => bold(S_GRAPH)));
 		
 		if($tree){

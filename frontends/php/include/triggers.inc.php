@@ -172,6 +172,72 @@
 	}
 
 	INIT_TRIGGER_EXPRESSION_STRUCTURES();
+	
+/*
+ * Function: get_accessible_triggers
+ *
+ * Description:
+ *     returns string of accessible triggers
+ *
+ * Author:
+ *     Aly
+ *
+ */		
+	function get_accessible_triggers($perm,$perm_res=null,$nodeid=null,$hostid=null,$cache=1){
+		global $USER_DETAILS;
+		static $available_triggers;
+		
+		$result = array();
+
+		if(is_null($perm_res)) $perm_res = PERM_RES_STRING_LINE;
+		$nodeid_str =(is_array($nodeid))?implode('',$nodeid):strval($nodeid);
+		$hostid_str =(is_array($hostid))?implode('',$hostid):strval($hostid);
+			
+		if($cache && isset($available_triggers[$perm][$perm_res][$nodeid_str][$hostid_str])){
+			return $available_triggers[$perm][$perm_res][$nodeid_str][$hostid_str];
+		}
+
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, null, null, $nodeid);
+		
+		$denied_graphs = array();
+		$available_graphs = array();
+		
+		$sql = 	'SELECT DISTINCT t.triggerid '.
+				' FROM triggers t, functions f, items as i '.
+				' WHERE t.triggerid=f.triggerid '.
+					' AND f.itemid=i.itemid'.
+					(!empty($hostid)?' AND i.hostid='.$hostid:'').
+					' AND i.hostid NOT IN ('.$available_hosts.')';
+
+		$db_triggers = DBselect($sql);
+		while($trigger = DBfetch($db_triggers)){
+			$denied_triggers[] = $trigger['triggerid'];
+		}
+
+		$sql = 	'SELECT DISTINCT t.triggerid '.
+				' FROM triggers t, functions f, items as i '.
+				' WHERE t.triggerid=f.triggerid '.
+					' AND f.itemid=i.itemid'.
+					' AND i.status='.ITEM_STATUS_ACTIVE.
+					(!empty($hostid)?' AND i.hostid='.$hostid:'').
+					(!empty($denied_triggers)?' AND t.triggerid  NOT IN ('.implode(',',$denied_triggers).')':'');
+					
+		$db_triggers = DBselect($sql);
+		while($trigger = DBfetch($db_triggers)){
+			$result[$trigger['triggerid']] = $trigger['triggerid'];
+		}
+		
+		if(PERM_RES_STRING_LINE == $perm_res){
+			if(count($result) == 0) 
+				$result = '-1';
+			else
+				$result = implode(',',$result);
+		}
+		
+		$available_triggers[$perm][$perm_res][$nodeid_str][$hostid_str] = $result;
+		
+	return $result;
+	}
 
 
 	/*
