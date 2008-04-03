@@ -337,7 +337,7 @@ include_once "include/page_header.php";
 						 showgraphmenu("iframe");';
 							
 			zbx_add_post_js($script); 
-			$img = new CImg('images/general/tree/O.gif','space','20','20');
+			$img = new CImg('images/general/tree/zero.gif','space','20','20');
 			$img->Show();
 			echo SBR;
 //			navigation_bar("screens.php",array('config','elementid'));
