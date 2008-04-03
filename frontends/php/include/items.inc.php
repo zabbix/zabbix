@@ -1110,6 +1110,9 @@ COpt::profiling_stop('prepare table');
 		{
 			$housekeeperid = get_dbid('housekeeper','housekeeperid');
 			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+				" values ($housekeeperid,'history_text','itemid',$itemid)");
+			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
 				" values ($housekeeperid,'history_log','itemid',$itemid)");
 			$housekeeperid = get_dbid('housekeeper','housekeeperid');
 			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
@@ -1123,6 +1126,7 @@ COpt::profiling_stop('prepare table');
 			return TRUE;
 		}
 
+		DBexecute("delete from history_text where itemid=$itemid");
 		DBexecute("delete from history_log where itemid=$itemid");
 		DBexecute("delete from history_uint where itemid=$itemid");
 		DBexecute("delete from history_str where itemid=$itemid");

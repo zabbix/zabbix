@@ -951,7 +951,7 @@
 		{
 			$frmUser->AddItemToBottomRow(SPACE);
 			$delete_b = new CButtonDelete("Delete selected user?",url_param("form").url_param("config").url_param("userid"));
-			if($USER_DETAILS['userid'] == $userid){
+			if(bccomp($USER_DETAILS['userid'],$userid) == 0){
 				$delete_b->AddOption('disabled','disabled');
 			}	
 
@@ -982,9 +982,11 @@
 			$gui_access = $usrgrp['gui_access'];
 			
 			$group_users = array();
-			$db_users=DBselect("SELECT distinct u.userid,u.alias FROM users u,users_groups ug ".
-				"where u.userid=ug.userid AND ug.usrgrpid=".$_REQUEST["usrgrpid"].
-				" order by alias");
+			$db_users=DBselect('SELECT distinct u.userid,u.alias '.
+						' FROM users u,users_groups ug '.
+						' WHERE u.userid=ug.userid '.
+							' AND ug.usrgrpid='.$_REQUEST['usrgrpid'].
+						' ORDER BY alias');
 
 			while($db_user=DBfetch($db_users))
 				$group_users[$db_user["userid"]] = $db_user['alias'];

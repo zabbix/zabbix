@@ -205,7 +205,7 @@ function rm4favorites($favobj,$favid,$favcnt=null,$resource=null){
 	$favcnt = (is_null($favcnt))?0:$favcnt;	
 
 	foreach($favorites as $key => $value){
-		if(($favid == $value) && ($fav_rsrc[$key] == $resource)){
+		if(((bccomp($favid,$value) == 0) || ($favid == 0)) && ($fav_rsrc[$key] == $resource)){
 			if($favcnt < 1){
 				unset($favorites[$key]);
 				unset($fav_rsrc[$key]);
@@ -238,7 +238,7 @@ function infavorites($favobj,$favid,$resource=null){
 	$fav = get4favorites($favobj);
 	if(!empty($fav)){
 		foreach($fav['id'] as $id => $resourceid){
-			if($favid == $resourceid){
+			if(bccomp($favid,$resourceid) == 0){
 				if(is_null($resource) || ($fav['resource'][$id] == $resource))
 					return true;
 			}
