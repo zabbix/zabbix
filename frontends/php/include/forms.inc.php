@@ -884,8 +884,13 @@
 		
 		$frmUser->AddRow(S_THEME, $cmbTheme);
 
-		$autologin_script = new CScript(" var autologout = document.getElementById('autologout'); autologout.value = 0; autologout.readOnly=this.checked; autologout.disabled=false; ");
-		$frmUser->AddRow(S_AUTO_LOGIN,	new CCheckBox("autologin",$autologin,$autologin_script,1));
+		$chkbx_autologin = new CCheckBox("autologin",
+							$autologin,
+							new CScript(" var autologout = document.getElementById('autologout'); autologout.value = 0; autologout.readOnly=this.checked; autologout.disabled=false;"),
+							1);
+		$chkbx_autologin->AddOption('autocomplete','off');
+		
+		$frmUser->AddRow(S_AUTO_LOGIN,	$chkbx_autologin);
 		$frmUser->AddRow(S_AUTO_LOGOUT,	array(new CNumericBox("autologout",$autologout,4,$autologin),S_SECONDS));
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
