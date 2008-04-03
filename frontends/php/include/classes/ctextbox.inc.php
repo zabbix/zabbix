@@ -38,9 +38,11 @@
 		}
 		function SetReadonly($value='yes')
 		{
-			if($value=='yes')
+			if((is_string($value) && ($value=="yes" || $value=="checked" || $value=="on") || $value=="1") || (is_int($value)&&$value<>0))
+//				return $this->options['disabled'] = 'disabled';
 				return $this->options['readonly'] = 'readonly';
 
+//			$this->DelOption('disabled');
 			$this->DelOption('readonly');
 		}
 		function SetValue($value=NULL)
