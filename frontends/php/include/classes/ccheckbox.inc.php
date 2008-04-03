@@ -42,8 +42,7 @@
 		}
 		function SetChecked($value="yes")
 		{
-			if((is_string($value)&& ($value=="yes" || $value=="checked" || $value=="on") || $value=="1")
-			|| (is_int($value)&&$value<>0))
+			if((is_string($value)&& ($value=="yes" || $value=="checked" || $value=="on") || $value=="1") || (is_int($value)&&$value<>0))
 				return $this->options['checked'] = 'checked';
 
 			$this->DelOption("checked");

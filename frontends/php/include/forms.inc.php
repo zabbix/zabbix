@@ -784,22 +784,19 @@
 
 		if(isset($userid))	$frmUser->AddVar("userid",$userid);
 
-		if($profile==0)
-		{
+		if($profile==0){
 			$frmUser->AddRow(S_ALIAS,	new CTextBox("alias",$alias,20));
 			$frmUser->AddRow(S_NAME,	new CTextBox("name",$name,20));
 			$frmUser->AddRow(S_SURNAME,	new CTextBox("surname",$surname,20));
 		}
 
-		if(!isset($userid) || isset($change_password))
-		{
+		if(!isset($userid) || isset($change_password)){
 			$frmUser->AddRow(S_PASSWORD,	new CPassBox("password1",$password1,20));
 			$frmUser->AddRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox("password2",$password2,20));
 			if(isset($change_password))
 				$frmUser->AddVar('change_password', $change_password);
 		}
-		else
-		{
+		else{
 			$passwd_but = new CButton("change_password", S_CHANGE_PASSWORD);
 			if($alias == ZBX_GUEST_USER){
 				$passwd_but->AddOption('disabled','disabled');
@@ -807,18 +804,15 @@
 			$frmUser->AddRow(S_PASSWORD, $passwd_but);
 		}
 
-		if($profile==0)
-		{
+		if($profile==0){
 			global $USER_DETAILS;
 
 			$frmUser->AddVar('user_groups',$user_groups);
 
-			if(isset($userid) && (bccomp($USER_DETAILS['userid'], $userid)==0))
-			{
+			if(isset($userid) && (bccomp($USER_DETAILS['userid'], $userid)==0)){
 				$frmUser->AddVar('user_type',$user_type);
 			}
-			else
-			{
+			else{
 				$cmbUserType = new CComboBox('user_type', $user_type, $perm_details ? 'submit();' : null);
 				$cmbUserType->AddItem(USER_TYPE_ZABBIX_USER,	user_type2str(USER_TYPE_ZABBIX_USER));
 				$cmbUserType->AddItem(USER_TYPE_ZABBIX_ADMIN,	user_type2str(USER_TYPE_ZABBIX_ADMIN));
@@ -829,8 +823,7 @@
 			$lstGroups = new CListBox('user_groups_to_del[]');
 			$lstGroups->options['style'] = 'width: 270px';
 
-			foreach($user_groups as $groupid => $group_name)
-			{
+			foreach($user_groups as $groupid => $group_name){
 				$lstGroups->AddItem($groupid,	$group_name);
 			}
 
@@ -842,7 +835,7 @@
 						'return PopUp("popup_usrgrp.php?dstfrm='.$frmUser->GetName().
 						'&list_name=user_groups_to_del[]&var_name=user_groups",450, 450);'),
 					SPACE,
-					(count($user_groups) > 0) ? new CButton('del_user_group',S_DELETE_SELECTED) : null
+					(count($user_groups) > 0)?new CButton('del_user_group',S_DELETE_SELECTED):null
 				));
 
 			$frmUser->AddVar('user_medias', $user_medias);
@@ -891,8 +884,9 @@
 		
 		$frmUser->AddRow(S_THEME, $cmbTheme);
 
-		$frmUser->AddRow(S_AUTO_LOGIN,	new CCheckBox("autologin",$autologin,null,1));
-		$frmUser->AddRow(S_AUTO_LOGOUT,	array(new CNumericBox("autologout",$autologout,4),S_SECONDS));
+		$autologin_script = new CScript(" var autologout = document.getElementById('autologout'); autologout.value = 0; autologout.readOnly=this.checked; autologout.disabled=false; ");
+		$frmUser->AddRow(S_AUTO_LOGIN,	new CCheckBox("autologin",$autologin,$autologin_script,1));
+		$frmUser->AddRow(S_AUTO_LOGOUT,	array(new CNumericBox("autologout",$autologout,4,$autologin),S_SECONDS));
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
 
@@ -982,7 +976,7 @@
 			$gui_access = $usrgrp['gui_access'];
 			
 			$group_users = array();
-			$db_users=DBselect('SELECT distinct u.userid,u.alias '.
+			$db_users=DBselect('SELECT DISTINCT u.userid,u.alias '.
 						' FROM users u,users_groups ug '.
 						' WHERE u.userid=ug.userid '.
 							' AND ug.usrgrpid='.$_REQUEST['usrgrpid'].
@@ -1926,7 +1920,7 @@
 		{
 			$cmbApps = new CListBox("applications[]",$applications,6);
 			$cmbApps->AddItem(0,"-".S_NONE."-");
-			$db_applications = DBselect("SELECT distinct applicationid,name FROM applications".
+			$db_applications = DBselect("SELECT DISTINCT applicationid,name FROM applications".
 				" WHERE hostid=".$_REQUEST["hostid"]." order by name");
 			while($db_app = DBfetch($db_applications))
 			{
@@ -1960,7 +1954,7 @@
 
 	        $cmbGroups = new CComboBox("add_groupid",$add_groupid);		
 
-	        $groups=DBselect("SELECT distinct groupid,name FROM groups ".
+	        $groups=DBselect("SELECT DISTINCT groupid,name FROM groups ".
 			"where groupid in (".get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).") ".
 			" order by name");
 	        while($group=DBfetch($groups))
@@ -2170,7 +2164,7 @@
 
 		$cmbApps = new CListBox('applications[]',$applications,6);
 		$cmbApps->AddItem(0,"-".S_NONE."-");
-		$db_applications = DBselect("SELECT distinct applicationid,name FROM applications".
+		$db_applications = DBselect("SELECT DISTINCT applicationid,name FROM applications".
 			" WHERE hostid=".$_REQUEST["hostid"]." order by name");
 		while($db_app = DBfetch($db_applications))
 		{
@@ -2209,7 +2203,7 @@
 		$cmbCopyType->AddItem(1,S_HOST_GROUPS);
 		$frmCopy->AddRow(S_TARGET_TYPE, $cmbCopyType);
 
-		$target_sql = 'SELECT distinct g.groupid as target_id, g.name as target_name'.
+		$target_sql = 'SELECT DISTINCT g.groupid as target_id, g.name as target_name'.
 			' FROM groups g, hosts_groups hg'.
 			' WHERE hg.groupid=g.groupid';
 
@@ -4240,7 +4234,7 @@ include_once 'include/discovery.inc.php';
 			$ip		= $db_host["ip"];
 
 // add groups
-			$db_groups=DBselect("SELECT distinct groupid FROM hosts_groups WHERE hostid=".$_REQUEST["hostid"].
+			$db_groups=DBselect("SELECT DISTINCT groupid FROM hosts_groups WHERE hostid=".$_REQUEST["hostid"].
 				" AND groupid in (".
 				get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid()).
 				") ");
@@ -4290,7 +4284,7 @@ include_once 'include/discovery.inc.php';
 
 		$frm_row = array();
 		
-		$db_groups=DBselect("SELECT distinct groupid,name FROM groups ".
+		$db_groups=DBselect("SELECT DISTINCT groupid,name FROM groups ".
 			" WHERE groupid in (".
 			get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid()).
 			") order by name");
@@ -4474,7 +4468,7 @@ include_once 'include/discovery.inc.php';
 		if(isset($_REQUEST["groupid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$name=$group["name"];
-			$db_hosts=DBselect('SELECT distinct h.hostid,host FROM hosts h, hosts_groups hg'.
+			$db_hosts=DBselect('SELECT DISTINCT h.hostid,host FROM hosts h, hosts_groups hg'.
 					' WHERE h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
 					' AND h.hostid=hg.hostid AND hg.groupid='.$_REQUEST['groupid'].
 					' order by host');
@@ -4499,7 +4493,7 @@ include_once 'include/discovery.inc.php';
 		$frmHostG->AddRow(S_GROUP_NAME,new CTextBox("gname",$name,30));
 
 		$cmbHosts = new CListBox("hosts[]",$hosts,10);
-		$db_hosts=DBselect('SELECT distinct hostid,host FROM hosts'.
+		$db_hosts=DBselect('SELECT DISTINCT hostid,host FROM hosts'.
 				' WHERE status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
 				' AND hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).')'.
 				' order by host');
@@ -4846,7 +4840,7 @@ include_once 'include/discovery.inc.php';
 		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
 		$allowed_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 		
-		$db_hosts = DBselect("SELECT distinct n.name as node_name,h.hostid,h.host FROM hosts h".
+		$db_hosts = DBselect("SELECT DISTINCT n.name as node_name,h.hostid,h.host FROM hosts h".
 			" left join nodes n on n.nodeid=".DBid2nodeid("h.hostid").
 			" WHERE h.hostid not in(".$denyed_hosts.")".
 			" order by node_name,h.host");
@@ -4876,18 +4870,19 @@ include_once 'include/discovery.inc.php';
 		{
 			$host = "";
 
-			$host_info = DBfetch(DBselect("SELECT distinct n.name as node_name,h.hostid,h.host FROM hosts h ".
-				" left join nodes n on n.nodeid=".DBid2nodeid("h.hostid").
-				" WHERE h.hostid not in(".$denyed_hosts.") AND  hostid=".$elementid.
-				" order by node_name,h.host"));
+			$host_info = DBfetch(DBselect('SELECT DISTINCT n.name as node_name,h.hostid,h.host '.
+						' FROM hosts h '.
+							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid("h.hostid").
+						' WHERE h.hostid not in('.$denyed_hosts.') '.
+							' AND  hostid='.$elementid.
+						' ORDER BY node_name,h.host'));
 			if($host_info)
 				$host = $host_info["host"];
 			else
 				$elementid=0;
 
-			if($elementid==0)
-			{
-				$host = "";
+			if($elementid==0){
+				$host = '';
 				$elementid = 0;
 			}
 
@@ -4902,9 +4897,10 @@ include_once 'include/discovery.inc.php';
 		elseif($elementtype==SYSMAP_ELEMENT_TYPE_MAP)
 		{
 			$cmbMaps = new CComboBox("elementid",$elementid);
-			$db_maps = DBselect('SELECT distinct n.name as node_name,s.sysmapid,s.name FROM sysmaps s'.
-					' left join nodes n on n.nodeid='.DBid2nodeid("s.sysmapid").
-					' order by node_name,s.name');
+			$db_maps = DBselect('SELECT DISTINCT n.name as node_name,s.sysmapid,s.name '.
+								' FROM sysmaps s'.
+									' left join nodes n on n.nodeid='.DBid2nodeid("s.sysmapid").
+								' order by node_name,s.name');
 			while($db_map = DBfetch($db_maps))
 			{
 				if(!sysmap_accessible($db_map["sysmapid"],PERM_READ_ONLY)) continue;
@@ -4916,7 +4912,7 @@ include_once 'include/discovery.inc.php';
 		elseif($elementtype==SYSMAP_ELEMENT_TYPE_TRIGGER)
 		{
 			$trigger = "";
-			$trigger_info = DBfetch(DBselect("SELECT distinct n.name as node_name,h.hostid,h.host,t.*".
+			$trigger_info = DBfetch(DBselect("SELECT DISTINCT n.name as node_name,h.hostid,h.host,t.*".
 				" FROM triggers t left join functions f on t.triggerid=f.triggerid ".
 				" left join items i on i.itemid=f.itemid left join hosts h on h.hostid=i.hostid ".
 				" left join nodes n on n.nodeid=".DBid2nodeid("t.triggerid").
@@ -4946,7 +4942,7 @@ include_once 'include/discovery.inc.php';
 		{
 			$group = "";
 
-			$group_info = DBfetch(DBselect("SELECT distinct n.name as node_name,g.groupid,g.name FROM groups g ".
+			$group_info = DBfetch(DBselect("SELECT DISTINCT n.name as node_name,g.groupid,g.name FROM groups g ".
 				" left join nodes n on n.nodeid=".DBid2nodeid("g.groupid").
 				" WHERE g.groupid in (".$allowed_groups.") AND g.groupid=".$elementid.
 				" order by node_name,g.name"));
