@@ -119,8 +119,6 @@ include_once "include/page_header.php";
 		"form_refresh"=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
 
-	$_REQUEST["config"] = get_request("config",get_profile("web.host.config",0));
-
 	check_fields($fields);
 	validate_sort_and_sortorder();
 	
