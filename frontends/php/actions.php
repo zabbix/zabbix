@@ -58,6 +58,49 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 	validate_sort_and_sortorder();
+	
+/* AJAX */	
+	if(isset($_REQUEST['favobj'])){
+		if('filter' == $_REQUEST['favobj']){
+			update_profile('web.actions.filter.state',$_REQUEST['state']);
+		}
+	}	
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+//--------
+
+/* FILTER */
+	if(isset($_REQUEST['filter_rst'])){
+		$_REQUEST['triggerid'] = 0;
+		$_REQUEST['show_unknown'] = 0;
+		
+		$_REQUEST['filter_timesince'] = 0;
+		$_REQUEST['filter_timetill'] = 0;
+	}
+	
+	$_REQUEST['triggerid'] = get_request('triggerid',get_profile('web.events.filter.triggerid',0));
+	$show_unknown = get_request('show_unknown',get_profile('web.events.filter.show_unknown',0));
+	
+	$_REQUEST['filter_timesince'] = get_request('filter_timesince',get_profile('web.events.filter.timesince',0));
+	$_REQUEST['filter_timetill'] = get_request('filter_timetill',get_profile('web.events.filter.timetill',0));
+	
+	if(($_REQUEST['filter_timetill'] > 0) && ($_REQUEST['filter_timesince'] > $_REQUEST['filter_timetill'])){
+		$tmp = $_REQUEST['filter_timesince'];
+		$_REQUEST['filter_timesince'] = $_REQUEST['filter_timetill'];
+		$_REQUEST['filter_timetill'] = $tmp;
+	}
+	
+	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
+		update_profile('web.events.filter.triggerid',$_REQUEST['triggerid']);
+		update_profile('web.events.filter.show_unknown',$show_unknown);
+		
+		update_profile('web.events.filter.timesince',$_REQUEST['filter_timesince']);
+		update_profile('web.events.filter.timetill',$_REQUEST['filter_timetill']);
+	}
+// --------------
+
 ?>
 <?php
 	
