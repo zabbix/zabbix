@@ -136,7 +136,7 @@ include_once "include/page_header.php";
 
 	$frmForm->AddItem($cmbConf);
 	
-	show_table_header(S_AUDIT_BIG, $frmForm);
+//	show_table_header(S_AUDIT_BIG, $frmForm);
 
 
 	if(0 == $config){
@@ -195,12 +195,12 @@ include_once "include/page_header.php";
 			));
 		}
 			
-		show_table_header(S_AUDIT_LOGS,null);
+		show_table_header(S_AUDIT_LOGS, $frmForm);
 	}
 	else if(1 == $config){
 		$table = get_history_of_actions($_REQUEST["start"], PAGE_SIZE, $sql_cond);
 				
-		show_table_header(S_AUDIT_ACTIONS,null);
+		show_table_header(S_AUDIT_ACTIONS, $frmForm);
 	}
 
 /************************* FILTER **************************/
