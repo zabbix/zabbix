@@ -768,9 +768,7 @@ include_once 'include/discovery.inc.php';
 	}
 	
 	function get_history_of_actions($start,$num){
-		global $USER_DETAILS;
-		
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
+		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
 
 		$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 		$table->SetHeader(array(
@@ -786,12 +784,10 @@ include_once 'include/discovery.inc.php';
 				
 		
 		$result=DBselect('SELECT DISTINCT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
-				' FROM alerts a,media_type mt,functions f,items i,events e '.
+				' FROM alerts a,media_type mt,events e '.
 				' WHERE mt.mediatypeid=a.mediatypeid '.
 					' AND e.eventid = a.eventid'.
-					' AND e.objectid=f.triggerid '.
-					' AND f.itemid=i.itemid '.
-					' AND i.hostid IN ('.$available_hosts.')'.
+					' AND e.objectid IN ('.$available_triggers.') '.
 					' AND '.DBin_node('a.alertid').
 				order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries'),
 			10*$start+$num);
@@ -844,9 +840,7 @@ include_once 'include/discovery.inc.php';
 	
 // Author: Aly
 function get_actions_for_event($eventid){
-	global $USER_DETAILS;
-	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(
@@ -862,13 +856,11 @@ function get_actions_for_event($eventid){
 			
 	
 	$result=DBselect('SELECT DISTINCT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
-			' FROM alerts a,media_type mt,functions f,items i,events e '.
+			' FROM alerts a,media_type mt,events e '.
 			' WHERE mt.mediatypeid=a.mediatypeid '.
 				' AND a.eventid='.$eventid.
 				' AND e.eventid = a.eventid'.
-				' AND e.objectid=f.triggerid '.
-				' AND f.itemid=i.itemid '.
-				' AND i.hostid IN ('.$available_hosts.')'.
+				' AND e.objectid IN ('.$available_triggers.') '.
 				' AND '.DBin_node('a.alertid').
 			order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries'));
 		
@@ -914,8 +906,7 @@ return $table;
 
 // Author: Aly
 function get_actions_hint_by_eventid($eventid,$status=NULL){
-	global $USER_DETAILS;
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
 	
 	$tab_hint = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$tab_hint->AddOption('style', 'width: 300px;');
@@ -926,17 +917,13 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 			S_STATUS
 			));
 			
-	$sql_param = (is_null($status))?'':' AND a.status='.$status;
-	
 	$sql = 'SELECT DISTINCT a.alertid,mt.description,a.sendto,a.status,u.alias '.
-			' FROM alerts a,media_type mt,functions f,items i,events e, users u '.
+			' FROM alerts a,media_type mt,events e, users u '.
 			' WHERE mt.mediatypeid=a.mediatypeid '.
 				' AND a.eventid='.$eventid.
-				$sql_param.
+				(is_null($status)?'':' AND a.status='.$status).
 				' AND e.eventid = a.eventid'.
-				' AND f.triggerid=e.objectid '.
-				' AND i.itemid=f.itemid '.
-				' AND i.hostid IN ('.$available_hosts.') '.
+				' AND e.objectid IN ('.$available_triggers.') '.
 				' AND '.DBin_node('a.alertid').
 				' AND u.userid=a.userid '.
 			' ORDER BY mt.description';

@@ -86,7 +86,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 	validate_sort_and_sortorder();
 
-	$options = array("allow_all_hosts","monitored_hosts","with_monitored_items","always_select_first_host","only_current_node");
+	$options = array("allow_all_hosts","with_monitored_items","only_current_node","always_select_first_host");
 	validate_group_with_host(PERM_READ_WRITE,$options,'web.last.conf.groupid', 'web.last.conf.hostid');
 ?>
 <?php
@@ -96,32 +96,31 @@ include_once "include/page_header.php";
 	$_REQUEST['graph3d'] = get_request('graph3d', 0);
 	$_REQUEST['legend'] = get_request('legend', 0);
 	
-	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, null, null, get_current_nodeid());
+	$available_graphs = get_accessible_graphs(PERM_READ_WRITE, null, get_current_nodeid());
 
 // ---- <ACTIONS> ----
-	if(isset($_REQUEST["clone"]) && isset($_REQUEST["graphid"]))
-	{
+	if(isset($_REQUEST["clone"]) && isset($_REQUEST["graphid"])){
 		unset($_REQUEST["graphid"]);
 		$_REQUEST["form"] = "clone";
 	}
-	else if(isset($_REQUEST["save"]))
-	{
+	else if(isset($_REQUEST["save"])){
 		$items = get_request('items', array());
-		foreach($items as $gitem)
-		{
-			$host = DBfetch(DBselect('SELECT h.* FROM hosts h,items i WHERE h.hostid=i.hostid AND i.itemid='.$gitem['itemid']));
-			if(uint_in_array($host['hostid'], explode(',',$denyed_hosts)))
-			{
+		foreach($items as $gitem){
+			$sql = 'SELECT h.hostid '.
+							' FROM hosts h,items i '.
+							' WHERE h.hostid=i.hostid '.
+								' AND i.itemid='.$gitem['itemid'].
+								' AND h.hostid NOT IN ('.$available_hosts.')';
+			if(DBfetch(DBselect($sql,1))){
 				access_deny();
 			}
 		}
-		if(count($items) <= 0)
-		{
+		
+		if(count($items) <= 0){
 			info(S_REQUIRED_ITEMS_FOR_GRAPH);
 		}
-		else
-		{
+		else{
 			isset($_REQUEST["yaxistype"])?(''):($_REQUEST["yaxistype"]=0);
 			isset($_REQUEST["yaxismin"])?(''):($_REQUEST["yaxismin"]=0);
 			isset($_REQUEST["yaxismax"])?(''):($_REQUEST["yaxismax"]=0);
@@ -129,8 +128,7 @@ include_once "include/page_header.php";
 			$showworkperiod	= isset($_REQUEST["showworkperiod"]) ? 1 : 0;
 			$showtriggers	= isset($_REQUEST["showtriggers"]) ? 1 : 0;
 
-			if(isset($_REQUEST["graphid"]))
-			{
+			if(isset($_REQUEST["graphid"])){
 
 				$result = update_graph_with_items($_REQUEST["graphid"],
 					$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
@@ -138,24 +136,21 @@ include_once "include/page_header.php";
 					$showworkperiod,$showtriggers,$_REQUEST["graphtype"],
 					$_REQUEST["legend"],$_REQUEST["graph3d"],$items);
 
-				if($result)
-				{
+				if($result){
 					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
 						"Graph ID [".$_REQUEST["graphid"]."] Graph [".
 						$_REQUEST["name"]."]");
 				}
 				show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 			}
-			else
-			{
+			else{
 
 				$result = add_graph_with_items($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 					$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
 					$showworkperiod,$showtriggers,$_REQUEST["graphtype"],
 					$_REQUEST["legend"],$_REQUEST["graph3d"],$items);
 
-				if($result)
-				{
+				if($result){
 					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
 						"Graph [".$_REQUEST["name"]."]");
 				}
@@ -166,36 +161,30 @@ include_once "include/page_header.php";
 			}
 		}
 	}
-	elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["graphid"]))
-	{
+	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["graphid"])){
 		$graph=get_graph_by_graphid($_REQUEST["graphid"]);
+		
 		$result=delete_graph($_REQUEST["graphid"]);
-		if($result)
-		{
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,
-				"Graph [".$graph["name"]."]");
+		if($result){
+			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,"Graph [".$graph["name"]."]");
 			unset($_REQUEST["form"]);
 		}
 		show_messages($result, S_GRAPH_DELETED, S_CANNOT_DELETE_GRAPH);
 	}
-	elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["group_graphid"]))
-	{
-		foreach($_REQUEST["group_graphid"] as $id)
-		{
+	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["group_graphid"])){
+	
+		foreach($_REQUEST["group_graphid"] as $id){
 			$graph=get_graph_by_graphid($id);
 			if($graph["templateid"]<>0)	continue;
-			if(delete_graph($id))
-			{
+			if(delete_graph($id)){
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,
 					"Graph [".$graph["name"]."]");
 			}
 		}
 		show_messages(TRUE, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 	}
-	elseif(isset($_REQUEST["copy"])&&isset($_REQUEST["group_graphid"])&&isset($_REQUEST["form_copy_to"]))
-	{
-		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type']))
-		{
+	else if(isset($_REQUEST["copy"])&&isset($_REQUEST["group_graphid"])&&isset($_REQUEST["form_copy_to"])){
+		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
 			if(0 == $_REQUEST['copy_type'])
 			{ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
@@ -205,7 +194,7 @@ include_once "include/page_header.php";
 				$hosts_ids = array();
 				$db_hosts = DBselect('SELECT distinct h.hostid FROM hosts h, hosts_groups hg'.
 					' WHERE h.hostid=hg.hostid AND hg.groupid in ('.implode(',',$_REQUEST['copy_targetid']).')'.
-					' AND h.hostid in ('.$availiable_hosts.")"
+					' AND h.hostid in ('.$available_hosts.")"
 					);
 				while($db_host = DBfetch($db_hosts))
 				{
@@ -219,26 +208,23 @@ include_once "include/page_header.php";
 				}
 			unset($_REQUEST["form_copy_to"]);
 		}
-		else
-		{
+		else{
 			error('No target selection.');
 		}
 		show_messages();
 	}
-	elseif(isset($_REQUEST['delete_item']) && isset($_REQUEST['group_gid']))
-	{
-		foreach($_REQUEST['items'] as $gid => $data)
-		{
+	else if(isset($_REQUEST['delete_item']) && isset($_REQUEST['group_gid'])){
+	
+		foreach($_REQUEST['items'] as $gid => $data){
 			if(!isset($_REQUEST['group_gid'][$gid])) continue;
 			unset($_REQUEST['items'][$gid]);
 		}
 		unset($_REQUEST['delete_item'], $_REQUEST['group_gid']);
 	}
-	elseif(isset($_REQUEST['new_graph_item']))
-	{
+	else if(isset($_REQUEST['new_graph_item'])){
 		$new_gitem = get_request('new_graph_item', array());
-		foreach($_REQUEST['items'] as $gid => $data)
-		{
+		
+		foreach($_REQUEST['items'] as $gid => $data){
 			if(	(bccomp($new_gitem['itemid'] , $data['itemid'])==0) &&
 				$new_gitem['yaxisside'] == $data['yaxisside'] &&
 				$new_gitem['calc_fnc'] == $data['calc_fnc'] &&
@@ -249,20 +235,17 @@ include_once "include/page_header.php";
 				break;
 			}
 		}
-		if(!isset($already_exist))
-		{
+		if(!isset($already_exist)){
 			array_push($_REQUEST['items'], $new_gitem);
 		}
 	}
-	elseif(isset($_REQUEST['move_up']) && isset($_REQUEST['items']))
-	{
+	else if(isset($_REQUEST['move_up']) && isset($_REQUEST['items'])){
 		if(isset($_REQUEST['items'][$_REQUEST['move_up']]))
 			if($_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] > 0)
 				$_REQUEST['items'][$_REQUEST['move_up']]['sortorder']
 					 = ''.($_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] - 1);
 	}
-	elseif(isset($_REQUEST['move_down']) && isset($_REQUEST['items']))
-	{
+	else if(isset($_REQUEST['move_down']) && isset($_REQUEST['items'])){
 		if(isset($_REQUEST['items'][$_REQUEST['move_down']]))
 			if($_REQUEST['items'][$_REQUEST['move_down']]['sortorder'] < 1000)
 				$_REQUEST['items'][$_REQUEST['move_down']]['sortorder']++;
@@ -278,12 +261,10 @@ include_once "include/page_header.php";
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
 	echo SBR;
 
-	if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["group_graphid"]))
-	{
+	if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["group_graphid"])){
 		insert_copy_elements_to_forms("group_graphid");
 	}
-	else if(isset($_REQUEST["form"]))
-	{
+	else if(isset($_REQUEST["form"])){
 		insert_graph_form();
 		echo SBR;
 		$table = new CTable(NULL,"graph");
@@ -299,7 +280,8 @@ include_once "include/page_header.php";
 				url_param('show_triggers').url_param('graphtype')));
 			$table->Show();
 		}
-	} else {
+	} 
+	else {
 /* Table HEADER */
 		if(isset($_REQUEST["graphid"])&&($_REQUEST["graphid"]==0))
 		{
@@ -314,41 +296,34 @@ include_once "include/page_header.php";
 
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 
-		$result=DBselect('SELECT distinct g.groupid,g.name '.
-			' FROM groups g, hosts_groups hg, hosts h, items i '.
-			' WHERE h.hostid IN ('.$availiable_hosts.') '.
-				' AND hg.groupid=g.groupid '.
-				' AND h.hostid=i.hostid AND hg.hostid=h.hostid '.
-			' ORDER BY g.name');
-
+		$sql = 'SELECT DISTINCT g.groupid,g.name '.
+			' FROM groups g, hosts_groups hg '.
+			' WHERE hg.groupid = g.groupid '.
+				' AND hg.hostid IN ('.$available_hosts.') '.
+			' ORDER BY g.name';
+		$result=DBselect($sql);
 		while($row=DBfetch($result)){
 			$cmbGroup->AddItem($row["groupid"],$row["name"]);
 		}
 		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
-		
-		if($_REQUEST["groupid"] > 0)
-		{
-			$sql='SELECT h.hostid,h.host FROM hosts h,items i,hosts_groups hg '.
-				'WHERE h.hostid=i.hostid '.
-					' AND hg.groupid='.$_REQUEST["groupid"].
+
+		if($_REQUEST["groupid"] > 0){
+			$sql='SELECT DISTINCT h.hostid,h.host '.
+				' FROM hosts h, hosts_groups hg '.
+				' WHERE hg.groupid='.$_REQUEST["groupid"].
 					' AND hg.hostid=h.hostid '.
-					' AND h.hostid in ('.$availiable_hosts.') '.
-				' GROUP BY h.hostid,h.host '.
+					' AND h.hostid IN ('.$available_hosts.') '.
 				' ORDER BY h.host';
 		}
-		else
-		{
+		else{
 			$cmbHosts->AddItem(0,S_ALL_SMALL);
-			$sql='SELECT h.hostid,h.host '.
-				' FROM hosts h,items i '.
-				' WHERE h.hostid=i.hostid'.
-					' AND h.hostid IN ('.$availiable_hosts.') '.
-				' GROUP BY h.hostid,h.host '.
+			$sql='SELECT DISTINCT h.hostid,h.host '.
+				' FROM hosts h '.
+				' WHERE h.hostid IN ('.$available_hosts.') '.
 				' ORDER BY h.host';
 		}
 		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			$cmbHosts->AddItem($row["hostid"],$row["host"]);
 		}
 
@@ -373,52 +348,42 @@ include_once "include/page_header.php";
 		if($_REQUEST["hostid"] > 0)
 		{
 			$result = DBselect('SELECT DISTINCT g.* '.
-						' FROM graphs g '.
-							' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
-							' LEFT JOIN items i ON gi.itemid=i.itemid '.
-						' WHERE i.hostid='.$_REQUEST['hostid'].
-							' AND i.hostid NOT IN ('.$denyed_hosts.') '.
-							' AND '.DBin_node('g.graphid').
-							' AND i.hostid is not NULL '.
+						' FROM graphs g, graphs_items gi,items i '.
+						' WHERE g.graphid IN ('.$available_graphs.') '.
+							' AND gi.graphid=g.graphid '.
+							' AND i.itemid=gi.itemid '.
+							' AND i.hostid='.$_REQUEST['hostid'].
 						order_by('g.name,g.width,g.height,g.graphtype','g.graphid'));
 		}
-		else
-		{
+		else{
 			$result = DBselect('SELECT DISTINCT g.* '.
 						' FROM graphs g '.
-							' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
-							' LEFT JOIN items i ON gi.itemid=i.itemid '.
-						' WHERE '.DBin_node('g.graphid').
-							' AND ( i.hostid not in ('.$denyed_hosts.')  OR i.hostid is NULL )'.
+						' WHERE g.graphid IN ('.$available_graphs.') '.
 						order_by('g.name,g.width,g.height,g.graphtype','g.graphid'));
 		}
-		while($row=DBfetch($result))
-		{
-			if($_REQUEST["hostid"] != 0)
-			{
+		
+		while($row=DBfetch($result)){
+			if($_REQUEST["hostid"] != 0){
 				$host_list = NULL;
 			}
-			else
-			{
+			else{
 				$host_list = array();
 				$db_hosts = get_hosts_by_graphid($row["graphid"]);
-				while($db_host = DBfetch($db_hosts))
-				{
+				while($db_host = DBfetch($db_hosts)){
 					array_push($host_list, $db_host["host"]);
 				}
 				$host_list = implode(',',$host_list);
 			}
 	
-			if($row["templateid"]==0)
-			{
+			if($row["templateid"]==0){
 				$name = new CLink($row["name"],
 					"graphs.php?graphid=".$row["graphid"]."&form=update".
 					url_param("groupid").url_param("hostid"),'action');
-			} else {
+			} 
+			else {
 				$real_hosts = get_realhosts_by_graphid($row["templateid"]);
 				$real_host = DBfetch($real_hosts);
-				if($real_host)
-				{
+				if($real_host){
 					$name = array(
 						new CLink($real_host["host"],"graphs.php?".
 							"hostid=".$real_host["hostid"],
@@ -427,8 +392,7 @@ include_once "include/page_header.php";
 						$row["name"]
 						);
 				}
-				else
-				{
+				else{
 					array_push($description,
 						new CSpan("error","on"),
 						":",
