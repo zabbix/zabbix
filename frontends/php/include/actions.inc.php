@@ -767,7 +767,7 @@ include_once 'include/discovery.inc.php';
 		return TRUE;
 	}
 	
-	function get_history_of_actions($start,$num){
+	function get_history_of_actions($start,$num,$sql_cond=''){
 		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
 
 		$table = new CTableInfo(S_NO_ACTIONS_FOUND);
@@ -782,15 +782,16 @@ include_once 'include/discovery.inc.php';
 				S_ERROR
 				));
 				
-		
-		$result=DBselect('SELECT DISTINCT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
+		$sql = 'SELECT DISTINCT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
 				' FROM alerts a,media_type mt,events e '.
 				' WHERE mt.mediatypeid=a.mediatypeid '.
 					' AND e.eventid = a.eventid'.
+					$sql_cond.
 					' AND e.objectid IN ('.$available_triggers.') '.
 					' AND '.DBin_node('a.alertid').
-				order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries'),
-			10*$start+$num);
+				order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries');
+
+		$result=DBselect($sql,10*$start+$num);
 			
 		$col=0;
 		$skip=$start;
