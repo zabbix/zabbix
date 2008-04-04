@@ -63,20 +63,15 @@ include_once "include/page_header.php";
                 unset($_REQUEST["serviceid"]);
         }
 
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
 
 	if(isset($_REQUEST["serviceid"]) && $_REQUEST["serviceid"] > 0){
-		
-		if( !($service = DBfetch(DBselect('SELECT s.* '.
+		$sql = 'SELECT s.serviceid '.
 					' FROM services s '.
-						' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
-						' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
-						' LEFT JOIN items i on f.itemid=i.itemid '.
-			' WHERE (i.hostid IS NULL OR i.hostid NOT IN ('.$denyed_hosts.')) '.
-				' AND '.DBin_node('s.serviceid').
-				' AND s.serviceid='.$_REQUEST['serviceid']
-			))))
-		{
+					' WHERE (s.triggerid is NULL OR s.triggerid NOT IN ('.$available_triggers.')) '.
+						' AND s.serviceid='.$_REQUEST['serviceid'];
+		if(DBfetch(DBselect($sql))){
 			access_deny();
 		}
 	}
@@ -89,20 +84,18 @@ include_once "include/page_header.php";
 		$table  = new CTable(null,'chart');
 		$table->AddRow(new CImg("chart5.php?serviceid=".$service["serviceid"].url_param('path')));
 		$table->Show();
-	} else {
-	
+	} 
+	else {
 		$query = 'SELECT DISTINCT s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid, s.triggerid, '.
 				' s.name as caption, s.algorithm, t.description, t.expression, s.sortorder, sl.linkid, s.showsla, s.goodsla, s.status '.
 			' FROM services s '.
 				' LEFT JOIN triggers t ON s.triggerid = t.triggerid '.
 				' LEFT JOIN services_links sl ON  s.serviceid = sl.serviceupid and NOT(sl.soft=0) '.
 				' LEFT JOIN services_links sl_p ON  s.serviceid = sl_p.servicedownid and sl_p.soft=0 '.
-				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
-				' LEFT JOIN items i ON f.itemid=i.itemid '.
 			' WHERE '.DBin_node('s.serviceid').
-				' AND (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
+				' AND (t.triggerid IS NULL OR t.triggerid IN ('.$available_triggers.')) '.
 			' ORDER BY s.sortorder, sl_p.serviceupid, s.serviceid';
-		
+
 		$result=DBSelect($query);
 		
 		$services = array();
@@ -137,20 +130,26 @@ include_once "include/page_header.php";
 			}
 			
 			if($row["status"]==0 || (isset($service) && (bccomp($service["serviceid"] , $row["serviceid"]) == 0))){
-				$row['reason']="-";
+				$row['reason']='-';
 			} 
 			else {
-				$row['reason'] = new CList(null,"itservices");
-				$result2=DBselect("select s.triggerid,s.serviceid from services s, triggers t ".
-					" where s.status>0 and s.triggerid is not NULL and t.triggerid=s.triggerid ".
-						' and '.DBin_node('s.serviceid').
-					" order by s.status desc,t.description");
+				$row['reason']='-';
+				$result2=DBselect('SELECT s.triggerid,s.serviceid '.
+								' FROM services s, triggers t '.
+								' WHERE s.status>0 '.
+									' AND s.triggerid is not NULL '.
+									' AND t.triggerid=s.triggerid '.
+									' AND t.triggerid IN ('.$available_triggers.') '.
+									' AND '.DBin_node('s.serviceid').
+								' ORDER BY s.status DESC, t.description');
 					
 				while($row2=DBfetch($result2)){
+					if($row['reason'] == '-')
+						$row['reason'] = new CList(null,"itservices");
 					if(does_service_depend_on_the_service($row["serviceid"],$row2["serviceid"])){
 						$row['reason']->AddItem(new CLink(
-							expand_trigger_description($row2["triggerid"]),
-							"events.php?triggerid=".$row2["triggerid"]));
+										expand_trigger_description($row2["triggerid"]),
+										"events.php?triggerid=".$row2["triggerid"]));
 					}
 				}
 			}
@@ -218,7 +217,7 @@ include_once "include/page_header.php";
 			unset($tab);
 		} 
 		else {
-			error('Can\'t format Tree. Check logick structure in service links');
+			error('Can not format Tree. Check logik structure in service links');
 		}
 	}
 ?>

@@ -87,20 +87,17 @@ include_once "include/page_header.php";
 
 //----------------------------------------------------------------------
 
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
 
 	if(isset($_REQUEST['serviceid']) && $_REQUEST['serviceid'] > 0){
-		$query = "select s.* from services s ".
-			" LEFT JOIN triggers t on s.triggerid=t.triggerid ".
-			" LEFT JOIN functions f on t.triggerid=f.triggerid ".
-			" LEFT JOIN items i on f.itemid=i.itemid ".
-			" where (i.hostid is null or i.hostid not in (".$denyed_hosts.")) ".
-			' and '.DBin_node('s.serviceid').
-			" and s.serviceid=".$_REQUEST["serviceid"];
-			
-		if( !($service = DBFetch(DBSelect($query))) ){
+		$sql = 'SELECT s.* '.
+					' FROM services s '.
+					' WHERE (s.triggerid IS NULL OR s.triggerid IN ('.$available_triggers.')) '.
+						' AND s.serviceid='.$_REQUEST['serviceid'];
+		if(!$service = DBfetch(DBselect($sql))){
 			access_deny();
-		}
+		} 		
 	}
 
 /*-------------------------------------------- ACTIONS --------------------------------------------*/
@@ -148,7 +145,12 @@ if(isset($_REQUEST['saction'])){
 			
 	} 
 	else if(isset($_REQUEST["add_server"])){
-		if(!($host_data = DBfetch(DBselect('select h.* from hosts h where '.DBin_node('h.hostid').' and h.hostid not in ('.$denyed_hosts.') and h.hostid='.$_REQUEST["serverid"])))){
+		$sql = 'SELECT h.* '.
+				' FROM hosts h '.
+				' WHERE '.DBin_node('h.hostid').
+					' AND h.hostid IN ('.$available_hosts.') '.
+					' AND h.hostid='.$_REQUEST["serverid"];
+		if(!$host_data = DBfetch(DBselect($sql))){
 			access_deny();
 		}
 		
@@ -203,29 +205,19 @@ if(isset($_REQUEST['pservices'])){
 		
 		$query = 'SELECT DISTINCT s.* '.
 				' FROM services s '.
-					' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
-					' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
-					' LEFT JOIN items i ON f.itemid=i.itemid '.
-					' LEFT JOIN services_links sl ON s.serviceid=sl.servicedownid '.
-				' WHERE (i.hostid IS null OR i.hostid NOT IN ('.$denyed_hosts.')) '.
-					' AND '.DBin_node('s.serviceid').
+				' WHERE '.DBin_node('s.serviceid').
+					' AND (s.triggerid IS NULL OR s.triggerid in ('.$available_triggers.')) '.
 					' AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') '.
 				' ORDER BY s.sortorder,s.name';
 	} 
 	else {
 		$query = 'SELECT DISTINCT s.* '.
 			' FROM services s '.
-				' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
-				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
-				' LEFT JOIN items i ON f.itemid=i.itemid '.
-				' LEFT JOIN services_links sl ON s.serviceid=sl.servicedownid '.
-			' WHERE (i.hostid IS null '.
-					' OR i.hostid NOT IN ('.$denyed_hosts.') '.
-					' ) '.
-				' AND '.DBin_node('s.serviceid').
+			' WHERE '.DBin_node('s.serviceid').
+				' AND (s.triggerid IS NULL OR s.triggerid in ('.$available_triggers.')) '.
 			' ORDER BY s.sortorder,s.name';
 	}	
-	
+
 	$db_services = DBselect($query);
 	
 	while($db_service_data = DBfetch($db_services)){
@@ -283,24 +275,16 @@ if(isset($_REQUEST['cservices'])){
 	
 		$query = 'SELECT DISTINCT s.* '.
 				' FROM services s '.
-					' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
-					' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
-					' LEFT JOIN items i on f.itemid=i.itemid '.
-					' LEFT JOIN services_links sl on s.serviceid=sl.servicedownid '.
-				' WHERE (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
-					' AND '.DBin_node('s.serviceid').
+				' WHERE '.DBin_node('s.serviceid').
+					' AND (s.triggerid IS NULL OR s.triggerid in ('.$available_triggers.')) '.
 					' AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') '.
 				' ORDER BY s.sortorder,s.name';
 		
 	} else {
 		$query = 'SELECT DISTINCT s.* '.
 				' FROM services s '.
-					' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
-					' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
-					' LEFT JOIN items i on f.itemid=i.itemid '.
-					' LEFT JOIN services_links sl on s.serviceid=sl.servicedownid '.
-				' WHERE (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
-					' AND '.DBin_node('s.serviceid').
+				' WHERE '.DBin_node('s.serviceid').
+					' AND (s.triggerid IS NULL OR s.triggerid in ('.$available_triggers.')) '.
 				' ORDER BY s.sortorder,s.name';
 	}
 	
@@ -406,8 +390,7 @@ if(isset($_REQUEST['sform'])){
 			array_push($service_times, $stime);
 		}
 //links
-		$query = 'SELECT DISTINCT '.
-					' sl.linkid, sl.soft, sl.serviceupid, sl.servicedownid, '.
+		$query = 'SELECT DISTINCT sl.linkid, sl.soft, sl.serviceupid, sl.servicedownid, '.
 					' s1.name as serviceupname, s2.name as servicedownname '.
 				' FROM services s1, services s2, services_links sl '.
 				' WHERE sl.serviceupid=s1.serviceid '.
@@ -425,10 +408,7 @@ if(isset($_REQUEST['sform'])){
 		
 		$query = 'SELECT DISTINCT s.*, sl.soft '.
 				' FROM services s1, services s2, services_links sl, services s '.
-					' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
-					' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
-					' LEFT JOIN items i ON f.itemid=i.itemid '.
-				' WHERE (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
+				' WHERE (s.triggerid IS NULL OR s.triggerid IN ('.$available_triggers.')) '.
 					' AND '.DBin_node('s.serviceid').
 					' AND sl.serviceupid=s1.serviceid '.
 					' AND sl.servicedownid=s2.serviceid '.

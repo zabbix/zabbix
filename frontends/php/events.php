@@ -78,7 +78,6 @@ include_once "include/page_header.php";
 /* AJAX */	
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-//			echo 'alert("'.$_REQUEST['favid'].' : '.$_REQUEST['state'].'");';
 			update_profile('web.events.filter.state',$_REQUEST['state']);
 		}
 	}	
