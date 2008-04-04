@@ -129,9 +129,6 @@ COpt::profiling_start("page");
 							"sub_pages"=>array("tr_events.php")
 						),
 					array(
-							"url"=>"actions.php",
-							"label"=>S_ACTIONS),
-					array(
 							"url"=>"discovery.php",
 							"label"=>S_DISCOVERY, 
 							"user_type"=>USER_TYPE_ZABBIX_ADMIN),

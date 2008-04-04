@@ -336,6 +336,7 @@
 	'S_ALERTS_BIG'=>			'ALERTS',
 	'S_TYPE'=>				'Type',
 	'S_RECIPIENTS'=>			'Recipient(s)',
+	'S_RECIPIENT'=>			'Recipient',
 	'S_ERROR'=>				'Error',
 	'S_SENT'=>				'sent',
 	'S_NOT_SENT'=>				'not sent',
@@ -1418,8 +1419,10 @@
 
 
 //	audit.php
-	'S_AUDIT_LOG'=>				'Audit log',
-	'S_AUDIT_LOG_BIG'=>			'AUDIT LOG',
+	'S_AUDIT'=>					'Audit',
+	'S_AUDIT_BIG'=>				'AUDIT',
+	'S_AUDIT_LOGS'=>			'Audit logs',
+	'S_AUDIT_ACTIONS'=>			'Audit actions',
 	'S_ACTION'=>				'Action',
 	'S_DETAILS'=>				'Details',
 	'S_UNKNOWN_ACTION'=>			'Unknown action',

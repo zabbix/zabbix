@@ -273,7 +273,7 @@ include_once "include/page_header.php";
 				url_param('name').url_param('legend').url_param('graph3d').url_param('width').url_param('height').url_param('graphtype')));
 			$table->Show();
 		}
-		else {
+		else{
 			$table->AddRow(new CImg('chart3.php?period=3600'.url_param('items').
 				url_param('name').url_param('width').url_param('height').url_param('yaxistype').
 				url_param('yaxismin').url_param('yaxismax').url_param('show_work_period').
@@ -322,6 +322,7 @@ include_once "include/page_header.php";
 				' WHERE h.hostid IN ('.$available_hosts.') '.
 				' ORDER BY h.host';
 		}
+		
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
 			$cmbHosts->AddItem($row["hostid"],$row["host"]);
@@ -345,8 +346,7 @@ include_once "include/page_header.php";
 			make_sorting_link(S_HEIGHT,'g.height'),
 			make_sorting_link(S_GRAPH_TYPE,'g.graphtype')));
 
-		if($_REQUEST["hostid"] > 0)
-		{
+		if($_REQUEST["hostid"] > 0){
 			$result = DBselect('SELECT DISTINCT g.* '.
 						' FROM graphs g, graphs_items gi,items i '.
 						' WHERE g.graphid IN ('.$available_graphs.') '.
