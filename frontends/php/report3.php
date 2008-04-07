@@ -45,23 +45,19 @@ include_once "include/page_header.php";
 	define("YEAR_LEFT_SHIFT", 5);
 ?>
 <?php
-	if(! (DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"]))) )
-	{
+	if(!DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"]))){
 		fatal_error(S_NO_IT_SERVICE_DEFINED);
 	}
-
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
 	
-	if( !($service = DBfetch(DBselect('SELECT s.* '.
-					' FROM services s '.
-						' LEFT JOIN triggers t on s.triggerid=t.triggerid '.
-						' LEFT JOIN functions f on t.triggerid=f.triggerid '.
-						' LEFT JOIN items i on f.itemid=i.itemid '.
-					' WHERE (i.hostid is NULL or i.hostid not in ('.$denyed_hosts.')) '.
-						' AND '.DBin_node('s.serviceid').
-						' AND s.serviceid='.$_REQUEST['serviceid']
-		))))
-	{
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+	
+	$sql = 'SELECT s.* '.
+			' FROM services s '.
+			' WHERE s.serviceid='.$_REQUEST['serviceid'].
+				' AND (s.triggerid IS NULL OR s.triggerid IN ('.$available_triggers.')) '.
+				' AND DBin_node('s.serviceid')';
+				
+	if(!$service = DBfetch(DBselect($sql))){
 		access_deny();
 	}
 ?>
@@ -78,10 +74,11 @@ include_once "include/page_header.php";
 	$form->AddItem(array(SPACE.S_PERIOD.SPACE, $cmbPeriod));
 
 	$cmbYear = new CComboBox("year", $year, "submit();");
-	for($y = (date("Y") - YEAR_LEFT_SHIFT); $y <= date("Y"); $y++)
-	{
+	
+	for($y = (date("Y") - YEAR_LEFT_SHIFT); $y <= date("Y"); $y++){
 		$cmbYear->AddItem($y, $y);
 	}
+	
 	$form->AddItem(array(SPACE.S_YEAR.SPACE, $cmbYear));
 
 	show_table_header(array(
@@ -97,50 +94,48 @@ include_once "include/page_header.php";
 	
 	$header = array(S_OK,S_PROBLEMS,S_DOWNTIME,S_PERCENTAGE,S_SLA);
 
-        switch($period)
-	{
-		case "yearly":
-			$from	= (date("Y") - YEAR_LEFT_SHIFT);
-			$to	= date("Y");
-			array_unshift($header, new CCol(S_YEAR,"center"));
-			function get_time($y)	{	return mktime(0,0,0,1,1,$y);		}
-			function format_time($t){	return date("Y", $t);			}
-			function format_time2($t){	return null; };
-			break;
-		case "monthly":
-			$from	= 1;
-			$to	= 12;
-			array_unshift($header, new CCol(S_MONTH,"center"));
-			function get_time($m)	{	global $year;	return mktime(0,0,0,$m,1,$year);	}
-			function format_time($t){	return date("M Y",$t);			}
-			function format_time2($t){	return null; };
-			break;
-		case "dayly":
-			$from	= 1;
-			$to	= 365;
-			array_unshift($header, new CCol(S_DAY,"center"));
-			function get_time($d)	{	global $year;	return mktime(0,0,0,1,$d,$year);	}
-			function format_time($t){	return date("d M Y",$t);		}
-			function format_time2($t){	return null; };
-			break;
-		case "weekly":
-		default:
-			$from	= 0;
-			$to	= 52;
-			array_unshift($header,new CCol(S_FROM,"center"),new CCol(S_TILL,"center"));
-			function get_time($w)	{
-				global $year;	
-
-				$time	= mktime(0,0,0,1, 1, $year);
-				$wd	= date("w", $time);
-				$wd	= $wd == 0 ? 6 : $wd - 1;
-
-				return ($time + ($w*7 - $wd)*24*3600);
-			}
-			function format_time($t){	return date("d M Y H:i",$t);	}
-			function format_time2($t){	return format_time($t); };
-			break;
-
+        switch($period){
+			case "yearly":
+				$from	= (date("Y") - YEAR_LEFT_SHIFT);
+				$to	= date("Y");
+				array_unshift($header, new CCol(S_YEAR,"center"));
+				function get_time($y)	{	return mktime(0,0,0,1,1,$y);		}
+				function format_time($t){	return date("Y", $t);			}
+				function format_time2($t){	return null; };
+				break;
+			case "monthly":
+				$from	= 1;
+				$to	= 12;
+				array_unshift($header, new CCol(S_MONTH,"center"));
+				function get_time($m)	{	global $year;	return mktime(0,0,0,$m,1,$year);	}
+				function format_time($t){	return date("M Y",$t);			}
+				function format_time2($t){	return null; };
+				break;
+			case "dayly":
+				$from	= 1;
+				$to	= 365;
+				array_unshift($header, new CCol(S_DAY,"center"));
+				function get_time($d)	{	global $year;	return mktime(0,0,0,1,$d,$year);	}
+				function format_time($t){	return date("d M Y",$t);		}
+				function format_time2($t){	return null; };
+				break;
+			case "weekly":
+			default:
+				$from	= 0;
+				$to	= 52;
+				array_unshift($header,new CCol(S_FROM,"center"),new CCol(S_TILL,"center"));
+				function get_time($w)	{
+					global $year;	
+	
+					$time	= mktime(0,0,0,1, 1, $year);
+					$wd	= date("w", $time);
+					$wd	= $wd == 0 ? 6 : $wd - 1;
+	
+					return ($time + ($w*7 - $wd)*24*3600);
+				}
+				function format_time($t){	return date("d M Y H:i",$t);	}
+				function format_time2($t){	return format_time($t); };
+				break;
 	}
 
 	$table->SetHeader($header);

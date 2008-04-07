@@ -250,8 +250,7 @@ include_once "include/page_header.php";
 		validate_group(PERM_READ_LIST,$validation_param);
 	}
 
-	$accessible_nodes	= get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid(true));
-	$denyed_hosts		= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
+	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid(true));
 	$available_hosts	= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	$nodeid				= get_current_nodeid();
 
@@ -260,42 +259,42 @@ include_once "include/page_header.php";
 		if(!isset($_REQUEST["hostid"]) || (bccomp($_REQUEST["hostid"], $only_hostid) != 0)) access_deny();
 		$hostid = $only_hostid;
 	}
-	else
-	{
+	else{
 		if(str_in_array($srctbl,array('hosts','host_group','triggers','logitems','items',
 									'applications','screens','slides','graphs','simple_graph',
 									'sysmaps','plain_text','screens2','overview','host_group_scr')))
 		{
-			if(ZBX_DISTRIBUTED)
-			{
+			if(ZBX_DISTRIBUTED){
 				$nodeid = get_request('nodeid', $nodeid);
 				$cmbNode = new CComboBox('nodeid', $nodeid, 'submit()');
-				$db_nodes = DBselect('select * from nodes where nodeid in ('.$accessible_nodes.')');
-				while($node_data = DBfetch($db_nodes))
-				{
+				$db_nodes = DBselect('select * from nodes where nodeid in ('.$available_nodes.')');
+				
+				while($node_data = DBfetch($db_nodes)){
 					$cmbNode->AddItem($node_data['nodeid'], $node_data['name']);
 					if((bccomp($nodeid , $node_data['nodeid']) == 0)) $ok = true;
 				}
 				$frmTitle->AddItem(array(SPACE,S_NODE,SPACE,$cmbNode));
 			}
-		}	
+		}
+		
 		if(!isset($ok)) $nodeid = get_current_nodeid();
 		unset($ok);
 		
-		if(str_in_array($srctbl,array('hosts','templates','triggers','logitems','items','applications','host_templates','graphs','simple_graph','plain_text')))
-		{
+		if(str_in_array($srctbl,array('hosts','templates','triggers','logitems','items','applications','host_templates','graphs','simple_graph','plain_text'))){
 			$groupid = get_request('groupid',get_profile('web.popup.groupid',0));
 
 			$cmbGroups = new CComboBox('groupid',$groupid,'submit()');
 			$cmbGroups->AddItem(0,S_ALL_SMALL);
-			$db_groups = DBselect('SELECT DISTINCT g.groupid,g.name from groups g, hosts_groups hg, hosts h '.
-				' where '.DBin_node('g.groupid', $nodeid).
-				' AND g.groupid=hg.groupid AND hg.hostid=h.hostid'.
-				' and h.hostid in ('.$available_hosts.')'.
-				' and h.status in ('.implode(',', $host_status).')'.
-				' order by name');
-			while($group = DBfetch($db_groups))
-			{
+			$db_groups = DBselect('SELECT DISTINCT g.groupid,g.name '.
+								' FROM groups g, hosts_groups hg, hosts h '.
+								' WHERE '.DBin_node('g.groupid', $nodeid).
+									' AND g.groupid=hg.groupid '.
+									' AND hg.hostid=h.hostid'.
+									' AND h.hostid in ('.$available_hosts.')'.
+									' AND h.status in ('.implode(',', $host_status).')'.
+								' ORDER BY name');
+								
+			while($group = DBfetch($db_groups)){
 				$cmbGroups->AddItem($group["groupid"],$group["name"]);
 				if((bccomp($groupid , $group["groupid"]) == 0)) $ok = true;
 			}
@@ -304,50 +303,48 @@ include_once "include/page_header.php";
 			if(!isset($ok) || $groupid == 0) unset($groupid);
 			unset($ok);
 		}
-		if(str_in_array($srctbl,array("help_items")))
-		{
+		
+		if(str_in_array($srctbl,array("help_items"))){
 			$itemtype = get_request("itemtype",get_profile("web.popup.itemtype",0));
 			$cmbTypes = new CComboBox("itemtype",$itemtype,"submit()");
 			foreach($allowed_item_types as $type)
 				$cmbTypes->AddItem($type, item_type2str($type));
 			$frmTitle->AddItem(array(S_TYPE,SPACE,$cmbTypes));
 		}
-		if(str_in_array($srctbl,array("triggers","logitems","items",'applications','graphs','simple_graph','plain_text')))
-		{
+		
+		if(str_in_array($srctbl,array("triggers","logitems","items",'applications','graphs','simple_graph','plain_text'))){
 			$hostid = get_request("hostid",get_profile("web.popup.hostid",0));
 			$cmbHosts = new CComboBox("hostid",$hostid,"submit()");
 			
 			$sql = 'SELECT DISTINCT h.hostid,h.host FROM hosts h';
-			if(isset($groupid))
-			{
+			if(isset($groupid)){
 				$sql .= ',hosts_groups hg WHERE '.
 					' h.hostid=hg.hostid AND hg.groupid='.$groupid.' AND ';
 			}
-			else
-			{
+			else{
 				$sql .= ' WHERE ';
 				$cmbHosts->AddItem(0,S_ALL_SMALL);
 			}
 
 			$sql .= DBin_node('h.hostid', $nodeid).
-				' and h.hostid in ('.$available_hosts.')'.
-				' and h.status in ('.implode(',', $host_status).')'.
+					' and h.hostid in ('.$available_hosts.')'.
+					' and h.status in ('.implode(',', $host_status).')'.
 				' order by host,h.hostid';
 
 			$db_hosts = DBselect($sql);
-			while($host = DBfetch($db_hosts))
-			{
+			
+			while($host = DBfetch($db_hosts)){
 				$cmbHosts->AddItem($host["hostid"],$host["host"]);
 				if(bccomp($hostid , $host["hostid"]) == 0) $ok = true;
 			}
+			
 			$frmTitle->AddItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
 			update_profile("web.popup.hostid",$hostid);
 			if(!isset($ok) || $hostid == 0) unset($hostid);
 			unset($ok);
 		}
 
-		if(str_in_array($srctbl,array("triggers","hosts")))
-		{
+		if(str_in_array($srctbl,array("triggers","hosts"))){
 			$btnEmpty = new CButton("empty",S_EMPTY,
 				get_window_opener($dstfrm, $dstfld1, 0).
 				get_window_opener($dstfrm, $dstfld2, '').
@@ -361,22 +358,22 @@ include_once "include/page_header.php";
 	show_table_header($page["title"], $frmTitle);
 ?>
 <?php
-	if($srctbl == "hosts")
-	{
+	if($srctbl == "hosts"){
 		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 		$table->SetHeader(array(S_HOST,S_DNS,S_IP,S_PORT,S_STATUS,S_AVAILABILITY));
 
-		$sql = "SELECT DISTINCT h.* from hosts h";
+		$sql = 'SELECT DISTINCT h.* FROM hosts h';
+				
 		if(isset($groupid))
-			$sql .= ",hosts_groups hg where hg.groupid=".$groupid.
-				" AND h.hostid=hg.hostid AND ";
+			$sql .= ',hosts_groups hg WHERE hg.groupid='.$groupid.
+				' AND h.hostid=hg.hostid AND ';
 		else
-			$sql .= " where ";
+			$sql .= ' WHERE ';
 
 		$sql .= DBin_node('h.hostid', $nodeid).
-				' and h.hostid in ('.$available_hosts.')'.
-				' and h.status in ('.implode(',', $host_status).')'.
-				" order by h.host,h.hostid";
+					' and h.hostid in ('.$available_hosts.')'.
+					' and h.status in ('.implode(',', $host_status).')'.
+				' order by h.host,h.hostid';
 
 
 		$db_hosts = DBselect($sql);
@@ -915,7 +912,7 @@ include_once "include/page_header.php";
 		$table = new CTableInfo(S_NO_NODES_DEFINED);
 		$table->SetHeader(S_NAME);
 
-		$result = DBselect('SELECT DISTINCT * from nodes where nodeid in ('.$accessible_nodes.')');
+		$result = DBselect('SELECT DISTINCT * from nodes where nodeid in ('.$available_nodes.')');
 		while($row = DBfetch($result))
 		{
 
@@ -1000,8 +997,8 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	else if($srctbl == "simple_graph")
-	{
+	else if($srctbl == "simple_graph"){
+	
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 		$table->SetHeader(array(
 			(isset($hostid) ? null : S_HOST),
@@ -1018,7 +1015,7 @@ include_once "include/page_header.php";
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					' AND '.DBin_node('i.itemid', $nodeid).
-					' AND h.hostid not in ('.$denyed_hosts.')';
+					' AND h.hostid IN ('.$available_hosts.')';
 
 		if(isset($hostid)) 
 			$sql .= ' AND h.hostid='.$hostid;
@@ -1095,8 +1092,8 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	else if($srctbl == "plain_text")
-	{
+	else if($srctbl == "plain_text"){
+	
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 		$table->SetHeader(array(
 			(isset($hostid) ? null : S_HOST),
@@ -1113,7 +1110,7 @@ include_once "include/page_header.php";
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					' AND '.DBin_node('i.itemid', $nodeid).
-					' AND h.hostid not in ('.$denyed_hosts.')';
+					' AND h.hostid IN ('.$available_hosts.')';
 
 		if(isset($hostid)) 
 			$sql .= ' AND h.hostid='.$hostid;

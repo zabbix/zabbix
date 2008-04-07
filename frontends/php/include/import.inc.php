@@ -36,13 +36,13 @@
 			$this->trigger	= array('exist' => 0, 'missed' => 0);
 			$this->graph	= array('exist' => 0, 'missed' => 0);
 
-			$this->accessible_groups = get_accessible_groups_by_user($USER_DETAILS,
+			$this->available_groups = get_accessible_groups_by_user($USER_DETAILS,
 				PERM_READ_WRITE, null, PERM_RES_IDS_ARRAY, get_current_nodeid());
 
-			$this->accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,
+			$this->available_hosts = get_accessible_hosts_by_user($USER_DETAILS,
 				PERM_READ_WRITE, null, PERM_RES_IDS_ARRAY, get_current_nodeid());
 				
-			$this->accessible_nodes = get_accessible_nodes_by_user($USER_DETAILS,
+			$this->available_nodes = get_accessible_nodes_by_user($USER_DETAILS,
 				PERM_READ_WRITE, null, PERM_RES_IDS_ARRAY, get_current_nodeid());
 		}
 		
@@ -92,7 +92,7 @@
 					
 					if($host_data = DBfetch(DBselect('select hostid from hosts'.
 						' where host='.zbx_dbstr($data['name']).
-						' and '.DBin_node('hostid',get_current_nodeid(false)))))
+							' and '.DBin_node('hostid',get_current_nodeid(false)))))
 					{ /* exist */
 						if($this->host['exist']==1) /* skip */
 						{
@@ -100,7 +100,7 @@
 							info('Host ['.$data['name'].'] skipped - user rule');
 							break; // case
 						}
-						if(!uint_in_array($host_data['hostid'], $this->accessible_hosts)){
+						if(!uint_in_array($host_data['hostid'], $this->available_hosts)){
 							error('Host ['.$data['name'].'] skipped - Access deny.');
 							break; // case
 						}
@@ -117,8 +117,8 @@
 							break; // case
 						}
 						
-//						if( count($this->accessible_nodes) > 0 ){
-						if(!uint_in_array(get_current_nodeid(),$this->accessible_nodes)){
+//						if( count($this->available_nodes) > 0 ){
+						if(!uint_in_array(get_current_nodeid(),$this->available_nodes)){
 							error('Host ['.$data['name'].'] skipped - Access deny.');
 							break; // case
 						}
@@ -183,7 +183,6 @@
 			global $USER_DETAILS;
 			
 			$data = &$this->data[$name];
-			
 			switch($name)
 			{
 				case XML_TAG_HOST:
@@ -243,7 +242,7 @@
 						break; // case
 					}
 					
-					if(!uint_in_array($group["groupid"], $this->accessible_groups))
+					if(!uint_in_array($group["groupid"], $this->available_groups))
 					{
 						error('Group ['.$this->element_data.'] skipped - Access deny.');
 						break; // case
@@ -287,7 +286,7 @@
 						break; // case
 					}
 					
-					if(!uint_in_array($template["hostid"], $this->accessible_hosts))
+					if(!uint_in_array($template["hostid"], $this->available_hosts))
 					{
 						error('Template ['.$this->element_data.'] skipped - Access deny.');
 						break; // case

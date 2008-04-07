@@ -112,50 +112,44 @@ include_once "include/page_header.php";
 	$_REQUEST["action"] = get_request("action", "showgraph");
 
 /*** Prepare page header - start ***/
-	if(is_array($_REQUEST["itemid"]))
-	{
-
+	if(is_array($_REQUEST["itemid"])){
 		$_REQUEST["itemid"] = array_unique($_REQUEST["itemid"]);
 
-		if(isset($_REQUEST["remove_log"]) && isset($_REQUEST["cmbloglist"]))
-		{
+		if(isset($_REQUEST["remove_log"]) && isset($_REQUEST["cmbloglist"])){
 			foreach($_REQUEST["itemid"] as $id => $itemid)
 				if((bccomp($itemid , $_REQUEST["cmbloglist"])==0))
 					unset($_REQUEST["itemid"][$id]);
 		}
 
 		$items_count = count($_REQUEST["itemid"]);
-		if($items_count > 1)
-		{
+		if($items_count > 1){
 			$main_header = count($_REQUEST["itemid"])." log files";
 		}
-		else
-		{
+		else{
 			$_REQUEST["itemid"] = array_pop($_REQUEST["itemid"]);
 		}
 	}
 
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
-
-	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid());
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid());
 	
-	if((DBfetch(DBselect("select h.host,i.hostid,i.description,i.key_ from items i,hosts h ".
-		" where i.itemid in (".(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).") ".
-		" and h.hostid=i.hostid ".
-		" and h.hostid in (".$denyed_hosts.")"))))
+	if(DBfetch(DBselect('SELECT h.host,i.hostid,i.description,i.key_ '.
+					' FROM items i,hosts h '.
+					' WHERE i.itemid IN ('.(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).') '.
+						' AND h.hostid=i.hostid '.
+						' AND h.hostid NOT IN ('.$available_hosts.')')))
 	{
 		access_deny();
 	}
 	
-	$item_data = DBfetch(DBselect("select h.host,i.hostid,i.* from items i,hosts h ".
-		" where i.itemid in (".(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).") ".
-		" and h.hostid=i.hostid "));
+	$item_data = DBfetch(DBselect('SELECT h.host,i.hostid,i.* '.
+							' FROM items i,hosts h '.
+							' WHERE i.itemid in ('.(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).') '.
+								' AND h.hostid=i.hostid '));
 
 	$item_type = $item_data["value_type"];
 	$l_header = null;
 
-	if(!is_array($_REQUEST["itemid"]))
-	{
+	if(!is_array($_REQUEST["itemid"])){
 		$main_header = $item_data["host"].": ".item_description($item_data["description"],$item_data["key_"]);
 		
 		if(isset($_REQUEST["plaintext"]))
@@ -381,15 +375,16 @@ include_once "include/page_header.php";
 			}
 
 
-			$sql = "select hst.host,i.itemid,i.key_,i.description,h.clock,h.value,i.valuemapid,h.timestamp,h.source,h.severity".
-				" from history_log h, items i, hosts hst".
-				" where hst.hostid=i.hostid and h.itemid=i.itemid".$sql_filter." and i.itemid in (".$itemid_lst.")".$cond_clock.
-				" order by h.clock desc, h.id desc";
+			$sql = 'SELECT hst.host,i.itemid,i.key_,i.description,h.clock,h.value,i.valuemapid,h.timestamp,h.source,h.severity'.
+					' FROM history_log h, items i, hosts hst'.
+					' WHERE hst.hostid=i.hostid '.
+						' AND h.itemid=i.itemid'.$sql_filter.
+						' AND i.itemid in ('.$itemid_lst.')'.$cond_clock.
+					' ORDER BY h.clock desc, h.id desc';
 
 			$result=DBselect($sql,$limit);
 
-			if(!isset($_REQUEST["plaintext"]))
-			{
+			if(!isset($_REQUEST['plaintext'])){
 				$table = new CTableInfo('...','log_history_table');
 				$table->SetHeader(array(S_TIMESTAMP,
 					$item_cout > 1 ? S_ITEM : null,
@@ -397,17 +392,14 @@ include_once "include/page_header.php";
 
 				$table->ShowStart(); // to solve memory leak we call 'Show' method by steps
 			}
-			else
-			{
+			else{
 				echo "<pre>\n";
 			}
 
-			while($row=DBfetch($result))
-			{
+			while($row=DBfetch($result)){
 				$color_style = null;
 
-				if(isset($_REQUEST["filter"]) && $_REQUEST["filter"]!="")
-				{
+				if(isset($_REQUEST["filter"]) && $_REQUEST["filter"]!=""){
 					$contain = zbx_stristr($row["value"],$_REQUEST["filter"]) ? TRUE : FALSE;
 
 					if(!isset($_REQUEST["mark_color"])) $_REQUEST["mark_color"] = MARK_COLOR_RED;
@@ -417,8 +409,7 @@ include_once "include/page_header.php";
 					if((!$contain) && ($_REQUEST["filter_task"] == FILTER_TAST_INVERT_MARK))
 						$color_style = $_REQUEST["mark_color"];
 
-					switch($color_style)
-					{
+					switch($color_style){
 						case MARK_COLOR_RED:	$color_style="mark_as_red"; break;
 						case MARK_COLOR_GREEN:	$color_style="mark_as_green"; break;
 						case MARK_COLOR_BLUE:	$color_style="mark_as_blue"; break;
@@ -430,21 +421,17 @@ include_once "include/page_header.php";
 				if($item_cout > 1)
 					array_push($new_row,$row["host"].":".item_description($row["description"],$row["key_"]));
 
-				if($row["timestamp"] == 0)
-				{
+				if($row["timestamp"] == 0){
 					array_push($new_row,new CCol("-","center"));
 				}
-				else
-				{
+				else{
 					array_push($new_row,date("Y.M.d H:i:s",$row["timestamp"]));
 				}
 				
-				if($row["source"] == "")
-				{
+				if($row["source"] == ""){
 					array_push($new_row,new CCol("-","center"));
 				}
-				else
-				{
+				else{
 					array_push($new_row,$row["source"]);
 				}
 
@@ -459,27 +446,25 @@ include_once "include/page_header.php";
 //				array_push($new_row,htmlspecialchars($row["value"]));
 				array_push($new_row,htmlspecialchars(encode_log($row["value"])));
 
-				if(!isset($_REQUEST["plaintext"]))
-				{
+				if(!isset($_REQUEST["plaintext"])){
 
 					$crow = new CRow($new_row); 
 
-					if(is_null($color_style) && is_array($_REQUEST["itemid"]))
-					{
+					if(is_null($color_style) && is_array($_REQUEST["itemid"])){
 						$min_color = 0x98;
 						$max_color = 0xF8;
 						$int_color = ($max_color - $min_color) / count($_REQUEST["itemid"]);
 						$int_color *= array_search($row["itemid"],$_REQUEST["itemid"]);
 						$int_color += $min_color;
 						$crow->AddOption("style","background-color: ".sprintf("#%X%X%X",$int_color,$int_color,$int_color));
-					} else {
+					} 
+					else {
 						$crow->SetClass($color_style);
 					}
 
 					$crow->Show();	// to solve memory leak we call 'Show' method for each element
 				}
-				else
-				{
+				else{
 					echo date("Y-m-d H:i:s",$row["clock"]);
 					echo "\t".$row["clock"]."\t".$row["value"]."\n";
 				}
@@ -489,39 +474,36 @@ include_once "include/page_header.php";
 			else
 				echo "</pre>";
 		}
-		else
-		{
-			switch($item_type)
-			{
+		else{
+			switch($item_type){
 				case ITEM_VALUE_TYPE_FLOAT:	$h_table = "history";		break;
 				case ITEM_VALUE_TYPE_UINT64:	$h_table = "history_uint";	break;
 				case ITEM_VALUE_TYPE_TEXT:	$h_table = "history_text";	break;
 				default:			$h_table = "history_str";
 			}
 
-			$result = DBselect("select h.clock,h.value,i.valuemapid from $h_table h, items i".
-					" where h.itemid=i.itemid and i.itemid=".$_REQUEST["itemid"].
-					$cond_clock." order by clock desc",
+			$result = DBselect('SELECT h.clock,h.value,i.valuemapid '.
+							' FROM '.$h_table.' h, items i '.
+							' WHERE h.itemid=i.itemid '.
+								' AND i.itemid='.$_REQUEST['itemid'].
+								$cond_clock.
+							' ORDER BY clock desc',
 				$limit);
 
-			if(!isset($_REQUEST["plaintext"]))
-			{
+			if(!isset($_REQUEST["plaintext"])){
 				$table = new CTableInfo();
 				$table->SetHeader(array(S_TIMESTAMP, S_VALUE));
 				$table->AddOption('id','graph');
 				$table->ShowStart(); // to solve memory leak we call 'Show' method by steps
 			}
-			else
-			{
+			else{
 				echo "<pre>\n";
 			}
 
 COpt::profiling_start("history");
-			while($row=DBfetch($result))
-			{
+			while($row=DBfetch($result)){
 				
-				if($DB_TYPE == "ORACLE" && $item_type == ITEM_VALUE_TYPE_TEXT)
-				{
+				if($DB_TYPE == "ORACLE" && $item_type == ITEM_VALUE_TYPE_TEXT){
 					if(isset($row["value"]))
 						$row["value"] = $row["value"]->load();
 					else
