@@ -518,6 +518,7 @@ int	DBget_history_str_count(void);
 int	DBget_trends_count(void);
 int	DBget_triggers_count(void);
 int	DBget_queue_count(void);
+zbx_uint64_t DBget_proxy_lastaccess(const char *hostname);
 
 void    DBescape_string(const char *from, char *to, int maxlen);
 char*   DBdyn_escape_string(const char *str);

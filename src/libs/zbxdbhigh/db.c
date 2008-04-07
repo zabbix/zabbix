@@ -1536,6 +1536,34 @@ int	DBget_queue_count(void)
 	return res;
 }
 
+zbx_uint64_t DBget_proxy_lastaccess(const char *hostname)
+{
+	zbx_uint64_t	res;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In D()");
+
+	result = DBselect("select lastaccess from hosts where host='%s' and status in (%d)",
+			hostname,
+			HOST_STATUS_PROXY);
+
+	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0])) {
+		zabbix_log(LOG_LEVEL_ERR, "Proxy \"%s\" not exists",
+				hostname);
+		zabbix_syslog("Proxy \"%s\" not exists",
+				hostname);
+		DBfree_result(result);
+		return FAIL;
+	}
+
+	res = zbx_atoui64(row[0]);
+
+	DBfree_result(result);
+
+	return res;
+}
+
 int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t eventid,  zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message)
 {
 	int	now;

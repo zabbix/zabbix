@@ -40,54 +40,109 @@
 int	get_value_internal(DB_ITEM *item, AGENT_RESULT *result)
 {
 	zbx_uint64_t	i;
-	char		error[MAX_STRING_LEN];
+	char		tmp[MAX_STRING_LEN], params[MAX_STRING_LEN],
+			hostname[HOST_HOST_LEN_MAX];
+	int		nparams;
 
 	init_result(result);
 
-	if(strcmp(item->key,"zabbix[triggers]")==0)
+	if (0 != strncmp(item->key,"zabbix[",7))
+		goto not_supported;
+
+	if (parse_command(item->key, NULL, 0, params, sizeof(params)) != 2)
+		goto not_supported;
+				
+	if (get_param(params, 1, tmp, sizeof(tmp)) != 0)
+		goto not_supported;
+
+	nparams = num_param(params);
+
+	if (0 == strcmp(tmp, "triggers"))		/* zabbix["triggers"] */
 	{
+		if (1 != nparams)
+			goto not_supported;
+
 		i = (zbx_uint64_t)DBget_triggers_count();
 		SET_UI64_RESULT(result, i);
 	}
-	else if(strcmp(item->key,"zabbix[items]")==0)
+	else if (0 == strcmp(tmp, "items"))		/* zabbix["items"] */
 	{
+		if (1 != nparams)
+			goto not_supported;
+
 		i = (zbx_uint64_t)DBget_items_count();
 		SET_UI64_RESULT(result, i);
 	}
-	else if(strcmp(item->key,"zabbix[items_unsupported]")==0)
+	else if (0 == strcmp(tmp, "items_unsupported"))	/* zabbix["items_unsupported"] */
 	{
-		i=DBget_items_unsupported_count();
+		if (1 != nparams)
+			goto not_supported;
+
+		i = DBget_items_unsupported_count();
 		SET_UI64_RESULT(result, i);
 	}
-	else if(strcmp(item->key,"zabbix[history]")==0)
+	else if (0 == strcmp(tmp, "history"))		/* zabbix["history"] */
 	{
-		i=DBget_history_count();
+		if (1 != nparams)
+			goto not_supported;
+
+		i = DBget_history_count();
 		SET_UI64_RESULT(result, i);
 	}
-	else if(strcmp(item->key,"zabbix[history_str]")==0)
+	else if (0 == strcmp(tmp, "history_str"))	/* zabbix["history_str"] */
 	{
-		i=DBget_history_str_count();
+		if (1 != nparams)
+			goto not_supported;
+
+		i = DBget_history_str_count();
 		SET_UI64_RESULT(result, i);
 	}
-	else if(strcmp(item->key,"zabbix[trends]")==0)
+	else if (0 == strcmp(tmp, "trends"))		/* zabbix["trends"] */
 	{
-		i=DBget_trends_count();
+		if (1 != nparams)
+			goto not_supported;
+
+		i = DBget_trends_count();
 		SET_UI64_RESULT(result, i);
 	}
-	else if(strcmp(item->key,"zabbix[queue]")==0)
+	else if (0 == strcmp(tmp, "queue"))		/* zabbix["queue"] */
 	{
-		i=DBget_queue_count();
+		if (1 != nparams)
+			goto not_supported;
+
+		i = DBget_queue_count();
+		SET_UI64_RESULT(result, i);
+	}
+	else if (0 == strcmp(tmp, "proxy"))		/* zabbix["proxy",<hostname>,"lastaccess"] */
+	{
+		if (3 != nparams)
+			goto not_supported;
+
+		if (get_param(params, 2, hostname, sizeof(hostname)) != 0)
+			goto not_supported;
+
+		if (0 != get_param(params, 3, tmp, sizeof(tmp)))
+			goto not_supported;
+
+		if (0 == strcmp(tmp, "lastaccess")) {
+			if (FAIL == (i = DBget_proxy_lastaccess(hostname)))
+				goto not_supported;
+		} else
+			goto not_supported;
+
 		SET_UI64_RESULT(result, i);
 	}
 	else
-	{
-		zbx_snprintf(error,sizeof(error),"Internal check [%s] is not supported",
-			item->key);
-		zabbix_log( LOG_LEVEL_WARNING, "%s",
-			error);
-		SET_STR_RESULT(result, strdup(error));
-		return NOTSUPPORTED;
-	}
+		goto not_supported;
 
 	return SUCCEED;
+not_supported:
+	zbx_snprintf(tmp, sizeof(tmp), "Internal check [%s] is not supported",
+			item->key);
+	zabbix_log(LOG_LEVEL_WARNING, "%s",
+			tmp);
+
+	SET_STR_RESULT(result, strdup(tmp));
+
+	return NOTSUPPORTED;
 }
