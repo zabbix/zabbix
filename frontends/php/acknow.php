@@ -62,7 +62,7 @@ include_once "include/page_header.php";
 //$bulk = (count($events) > 1);
 ?>
 <?php
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
 	
 	$eventids = '';
 	foreach($events as $id => $eventid){
@@ -71,13 +71,9 @@ include_once "include/page_header.php";
 	$eventids = trim($eventids,',');
 	
 	$db_data = DBfetch(DBselect('SELECT COUNT(DISTINCT  e.eventid) as cnt'.
-			' FROM hosts h, items i, functions f, events e, triggers t'.
-			' WHERE h.hostid=i.hostid '.
-				' AND i.itemid=f.itemid '.
-				' AND f.triggerid=t.triggerid '.
-				' AND e.eventid in ('.$eventids.') '.
-				' AND i.hostid not in ('.$denyed_hosts.') '.
-				' AND e.objectid=t.triggerid '.
+			' FROM events e'.
+			' WHERE e.eventid in ('.$eventids.') '.
+				' AND e.objectid IN ('.$available_triggers.') '.
 				' AND e.object='.EVENT_OBJECT_TRIGGER.
 				' AND '.DBin_node('e.eventid')
 			));
@@ -92,24 +88,21 @@ include_once "include/page_header.php";
 			' AND i.itemid=f.itemid '.
 			' AND f.triggerid=t.triggerid '.
 			' AND e.eventid in ('.$eventids.') '.
-			' AND i.hostid not in ('.$denyed_hosts.') '.
-			' AND e.objectid=t.triggerid '.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
+			' AND e.objectid=t.triggerid '.
+			' AND t.triggerid IN ('.$available_triggers.') '.
 			' AND '.DBin_node('e.eventid')
 			));
-				
-	unset($denyed_hosts);
 
-	if(isset($_REQUEST['save']) && !$bulk)
-	{
+	if(isset($_REQUEST['save']) && !$bulk){
 		$result = add_acknowledge_coment(
 			$db_data['eventid'],
 			$USER_DETAILS['userid'],
 			$_REQUEST['message']);
 
 		show_messages($result, S_COMMENT_ADDED, S_CANNOT_ADD_COMMENT);
-		if($result)
-		{
+		
+		if($result){
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_TRIGGER, S_ACKNOWLEDGE_ADDED.
 				' ['.expand_trigger_description_by_data($db_data).']'.
 				' ['.$_REQUEST["message"].']');

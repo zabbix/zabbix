@@ -65,16 +65,12 @@
 	{
 		$result = "";
 
-		if(is_array($var))
-		{
+		if(is_array($var)){
 			foreach($var as $id => $par)
-				$result .= prepare_url($par,
-					isset($varname) ? $varname."[".$id."]": $id
-					);
+				$result .= prepare_url($par,isset($varname) ? $varname."[".$id."]": $id);
 		}
-		else
-		{
-			$result = "&".$varname."=".urlencode($var);
+		else{
+			$result = '&'.$varname.'='.urlencode($var);
 		}
 		return $result;
 	}
@@ -100,6 +96,7 @@
 		if(isset($var)){
 			$result = prepare_url($var,$name);
 		}
+
 	return $result;
 	}
 	

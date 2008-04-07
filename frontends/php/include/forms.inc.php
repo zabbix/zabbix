@@ -995,8 +995,8 @@
 				'SELECT r.*,n.name as name FROM rights r, nodes n WHERE r.groupid='.$_REQUEST["usrgrpid"].
 					' AND r.type='.RESOURCE_TYPE_NODE.' AND r.id=n.nodeid',
 				'SELECT r.*, n.name as node_name, g.name as name FROM groups g '.
-					' left join rights r on r.type='.RESOURCE_TYPE_GROUP.' AND r.id=g.groupid '.
-					' left join nodes n on n.nodeid='.DBid2nodeid('g.groupid').
+					' LEFT JOIN rights r on r.type='.RESOURCE_TYPE_GROUP.' AND r.id=g.groupid '.
+					' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('g.groupid').
 					' WHERE r.groupid='.$_REQUEST["usrgrpid"],
 				);
 			foreach($sqls as $sql)
@@ -2327,10 +2327,12 @@
 				$comments	= $trigger["comments"];
 				$url		= $trigger["url"];
 
-				$trigs=DBselect("SELECT t.triggerid,t.description,t.expression FROM triggers t,trigger_depends d".
-					" WHERE t.triggerid=d.triggerid_up AND d.triggerid_down=".$_REQUEST["triggerid"]);
-				while($trig=DBfetch($trigs))
-				{
+				$trigs=DBselect('SELECT t.triggerid,t.description,t.expression '.
+							' FROM triggers t,trigger_depends d '.
+							' WHERE t.triggerid=d.triggerid_up '.
+								' AND d.triggerid_down='.$_REQUEST['triggerid']);
+								
+				while($trig=DBfetch($trigs)){
 					if(uint_in_array($trig["triggerid"],$dependencies))	continue;
 					array_push($dependencies,$trig["triggerid"]);
 				}
@@ -2417,11 +2419,14 @@
 		$frmTrig->Show();
 	}
 
-	function insert_trigger_comment_form($triggerid)
-	{
-		$trigger	= DBfetch(DBselect('SELECT t.*, h.* FROM triggers t, functions f, items i, hosts h '.
-			' WHERE t.triggerid='.$triggerid.' AND f.triggerid=t.triggerid AND f.itemid=i.itemid '.
-			' AND i.hostid=h.hostid '));
+	function insert_trigger_comment_form($triggerid){
+	
+		$trigger = DBfetch(DBselect('SELECT t.*, h.* '.
+			' FROM triggers t, functions f, items i, hosts h '.
+			' WHERE t.triggerid='.$triggerid.
+				' AND f.triggerid=t.triggerid '.
+				' AND f.itemid=i.itemid '.
+				' AND i.hostid=h.hostid '));
 
 		$frmComent = new CFormTable(S_COMMENTS." for ".$trigger['host']." : \"".expand_trigger_description_by_data($trigger)."\"");
 		$frmComent->SetHelp("web.tr_comments.comments.php");
@@ -2433,8 +2438,7 @@
 		$frmComent->Show();
 	}
 
-	function	insert_graph_form()
-	{
+	function insert_graph_form(){
 		global  $_REQUEST;
 
 		$frmGraph = new CFormTable(S_GRAPH,null,'post');
@@ -3734,7 +3738,7 @@ include_once 'include/discovery.inc.php';
 			if($resourceid > 0){
 				$result=DBselect('SELECT n.name as node_name,h.host,i.description,i.itemid,i.key_ '.
 						' FROM hosts h,items i '.
-							' left join nodes n on n.nodeid='.DBid2nodeid('i.itemid').
+							' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('i.itemid').
 						' WHERE h.hostid=i.hostid '.
 							' AND h.status='.HOST_STATUS_MONITORED.
 							' AND i.status='.ITEM_STATUS_ACTIVE.
@@ -3797,7 +3801,7 @@ include_once 'include/discovery.inc.php';
 			if($resourceid > 0){
 				$result=DBselect('SELECT n.name as node_name,h.host,i.description,i.itemid,i.key_ '.
 						' FROM hosts h,items i '.
-							' left join nodes n on n.nodeid='.DBid2nodeid('i.itemid').
+							' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('i.itemid').
 						' WHERE h.hostid=i.hostid '.
 							' AND h.status='.HOST_STATUS_MONITORED.
 							' AND i.status='.ITEM_STATUS_ACTIVE.
@@ -4804,16 +4808,15 @@ include_once 'include/discovery.inc.php';
 		$frmEl->SetHelp("web.sysmap.host.php");
 		$frmEl->AddVar("sysmapid",$_REQUEST["sysmapid"]);
 
-		if(isset($_REQUEST["selementid"]))
-		{
+		if(isset($_REQUEST["selementid"])){
 			$frmEl->AddVar("selementid",$_REQUEST["selementid"]);
 
 			$element = get_sysmaps_element_by_selementid($_REQUEST["selementid"]);
 			$frmEl->SetTitle("Map element \"".$element["label"]."\"");
 		}
 
-		if(isset($_REQUEST["selementid"]) && !isset($_REQUEST["form_refresh"]))
-		{
+		if(isset($_REQUEST["selementid"]) && !isset($_REQUEST["form_refresh"])){
+		
 			$elementid	= $element["elementid"];
 			$elementtype	= $element["elementtype"];
 			$label		= $element["label"];
@@ -4826,8 +4829,8 @@ include_once 'include/discovery.inc.php';
 			$label_location	= $element["label_location"];
 			if(is_null($label_location)) $label_location = -1;
 		}
-		else
-		{
+		else{
+		
 			$elementid 	= get_request("elementid", 	0);
 			$elementtype	= get_request("elementtype", 	SYSMAP_ELEMENT_TYPE_HOST);
 			$label		= get_request("label",		"");
@@ -4842,17 +4845,19 @@ include_once 'include/discovery.inc.php';
 
 		$cmbType = new CComboBox("elementtype",$elementtype,"submit()");
 
-		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
-		$allowed_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+		$available_groups = 	get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+		$available_hosts = 		get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+		$available_triggers = 	get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
 		
-		$db_hosts = DBselect("SELECT DISTINCT n.name as node_name,h.hostid,h.host FROM hosts h".
-			" left join nodes n on n.nodeid=".DBid2nodeid("h.hostid").
-			" WHERE h.hostid not in(".$denyed_hosts.")".
-			" order by node_name,h.host");
+		$db_hosts = DBselect('SELECT DISTINCT n.name as node_name,h.hostid,h.host '.
+					' FROM hosts h'.
+						' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('h.hostid').
+					' WHERE h.hostid IN ('.$available_hosts.')'.
+					' ORDER BY node_name,h.host');
 		if($db_hosts)
 			$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_HOST,	S_HOST);
 
-		$db_maps = DBselect("SELECT sysmapid FROM sysmaps WHERE sysmapid!=".$_REQUEST["sysmapid"]);
+		$db_maps = DBselect('SELECT sysmapid FROM sysmaps WHERE sysmapid!='.$_REQUEST['sysmapid']);
 		if(DBfetch($db_maps))
 			$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_MAP,	S_MAP);
 
@@ -4871,14 +4876,13 @@ include_once 'include/discovery.inc.php';
 		$cmbLocation->AddItem(3,S_TOP);
 		$frmEl->AddRow(S_LABEL_LOCATION,$cmbLocation);
 
-		if($elementtype==SYSMAP_ELEMENT_TYPE_HOST) 
-		{
-			$host = "";
+		if($elementtype==SYSMAP_ELEMENT_TYPE_HOST) {
+			$host = '';
 
 			$host_info = DBfetch(DBselect('SELECT DISTINCT n.name as node_name,h.hostid,h.host '.
 						' FROM hosts h '.
 							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid("h.hostid").
-						' WHERE h.hostid not in('.$denyed_hosts.') '.
+						' WHERE h.hostid IN ('.$available_hosts.') '.
 							' AND  hostid='.$elementid.
 						' ORDER BY node_name,h.host'));
 			if($host_info)
@@ -4899,66 +4903,65 @@ include_once 'include/discovery.inc.php';
 					"T")
 			));
 		}
-		elseif($elementtype==SYSMAP_ELEMENT_TYPE_MAP)
-		{
+		else if($elementtype==SYSMAP_ELEMENT_TYPE_MAP){
 			$cmbMaps = new CComboBox("elementid",$elementid);
 			$db_maps = DBselect('SELECT DISTINCT n.name as node_name,s.sysmapid,s.name '.
 								' FROM sysmaps s'.
-									' left join nodes n on n.nodeid='.DBid2nodeid("s.sysmapid").
-								' order by node_name,s.name');
-			while($db_map = DBfetch($db_maps))
-			{
+									' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('s.sysmapid').
+								' ORDER BY node_name,s.name');
+			while($db_map = DBfetch($db_maps)){
 				if(!sysmap_accessible($db_map["sysmapid"],PERM_READ_ONLY)) continue;
 				$node_name = isset($db_map['node_name']) ? '('.$db_map['node_name'].') ' : '';
 				$cmbMaps->AddItem($db_map["sysmapid"],$node_name.$db_map["name"]);
 			}
 			$frmEl->AddRow(S_MAP, $cmbMaps);
 		}
-		elseif($elementtype==SYSMAP_ELEMENT_TYPE_TRIGGER)
-		{
+		else if($elementtype==SYSMAP_ELEMENT_TYPE_TRIGGER){
 			$trigger = "";
-			$trigger_info = DBfetch(DBselect("SELECT DISTINCT n.name as node_name,h.hostid,h.host,t.*".
-				" FROM triggers t left join functions f on t.triggerid=f.triggerid ".
-				" left join items i on i.itemid=f.itemid left join hosts h on h.hostid=i.hostid ".
-				" left join nodes n on n.nodeid=".DBid2nodeid("t.triggerid").
-				" WHERE h.hostid not in (".$denyed_hosts.") AND t.triggerid=".$elementid.
-				" order by node_name,h.host,t.description"));
+			$trigger_info = DBfetch(DBselect('SELECT DISTINCT n.name as node_name,h.hostid,h.host,t.*'.
+				' FROM triggers t '.
+					' LEFT JOIN functions f on t.triggerid=f.triggerid '.
+					' LEFT JOIN items i on i.itemid=f.itemid '.
+					' LEFT JOIN hosts h on h.hostid=i.hostid '.
+					' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('t.triggerid').
+				' WHERE t.triggerid='.$elementid.
+					' AND t.triggerid IN ('.$available_triggers.') '.
+				' ORDER BY node_name,h.host,t.description'));
 			
 			if($trigger_info)
 				$trigger = expand_trigger_description_by_data($trigger_info);
 			else
 				$elementid=0;
 
-			if($elementid==0)
-			{
-				$trigger = "";
+			if($elementid==0){
+				$trigger = '';
 				$elementid = 0;
 			}
 
-			$frmEl->AddVar("elementid",$elementid);
+			$frmEl->AddVar('elementid',$elementid);
 			$frmEl->AddRow(S_TRIGGER, array(
-				new CTextBox("trigger",$trigger,32,'yes'),
-				new CButton("btn1",S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
+				new CTextBox('trigger',$trigger,32,'yes'),
+				new CButton('btn1',S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
 					"&dstfld1=elementid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description');",
 					"T")
 			));
 		}
-		elseif($elementtype==SYSMAP_ELEMENT_TYPE_HOST_GROUP)
-		{
-			$group = "";
+		else if($elementtype==SYSMAP_ELEMENT_TYPE_HOST_GROUP){
+			$group = '';
 
-			$group_info = DBfetch(DBselect("SELECT DISTINCT n.name as node_name,g.groupid,g.name FROM groups g ".
-				" left join nodes n on n.nodeid=".DBid2nodeid("g.groupid").
-				" WHERE g.groupid in (".$allowed_groups.") AND g.groupid=".$elementid.
-				" order by node_name,g.name"));
+			$group_info = DBfetch(DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
+								' FROM groups g '.
+									' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('g.groupid').
+								' WHERE g.groupid in ('.$available_groups.') '.
+									' AND g.groupid='.$elementid.
+								' ORDER BY node_name,g.name'));
 
 			if($group_info)
 				$group = $group_info["name"];
 			else
 				$elementid=0;
 
-			if($elementid==0)
-			{
+			if($elementid==0){
 				$group = "";
 				$elementid = 0;
 			}
