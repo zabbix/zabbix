@@ -190,15 +190,13 @@ include_once "include/page_header.php";
 		S_HISTORY));
 	$table->ShowStart();
 
-	$compare_host = ($_REQUEST['hostid'] > 0)?(' and h.hostid='.$_REQUEST['hostid']):'';
-	$compare_host.= ($_REQUEST['groupid']> 0)?' AND hg.groupid ='.$_REQUEST['groupid']:'';
+	$compare_host = $_REQUEST['hostid']?' AND h.hostid='.$_REQUEST['hostid']:'';
+	$compare_host.= $_REQUEST['groupid']?' AND hg.hostid=h.hostid AND hg.groupid ='.$_REQUEST['groupid']:'';
 
-	$any_app_exist = false;
-		
 	$db_applications = DBselect('SELECT DISTINCT h.host,h.hostid,a.* '.
-					' FROM applications a, hosts h, hosts_groups hg '.
-					' WHERE a.hostid=h.hostid'.$compare_host.
-						' AND hg.hostid=h.hostid '.
+					' FROM applications a, hosts h'.($_REQUEST['groupid']?', hosts_groups hg ':'').
+					' WHERE a.hostid=h.hostid'.
+						$compare_host.
 						' AND h.hostid IN ('.$available_hosts.')'.
 						' AND h.status='.HOST_STATUS_MONITORED.
 					order_by('h.host,h.hostid','a.name,a.applicationid'));
@@ -216,7 +214,7 @@ include_once "include/page_header.php";
 		while($db_item = DBfetch($db_items)){
 			$description = item_description($db_item["description"],$db_item["key_"]);
 
-			if( '' != $_REQUEST["select"] && !zbx_stristr($description, $_REQUEST["select"]) ) continue;
+			if(!empty($_REQUEST["select"]) && !zbx_stristr($description, $_REQUEST["select"]) ) continue;
 
 			++$item_cnt;
 			if(!uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
@@ -259,22 +257,26 @@ include_once "include/page_header.php";
 				$actions
 				)));
 		}
-		
+
 		if($item_cnt > 0){
 			if(uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps)){
 				$link = new CLink(new CImg("images/general/opened.gif"),
 					"?close=1&applicationid=".$db_app["applicationid"].
-					url_param("groupid").url_param("hostid").url_param("applications").
+					url_param("groupid").
+					url_param("hostid").
+					url_param("applications").
 					url_param("select"));
 			}
 			else{
 				$link = new CLink(new CImg("images/general/closed.gif"),
 					"?open=1&applicationid=".$db_app["applicationid"].
-					url_param("groupid").url_param("hostid").url_param("applications").
+					url_param("groupid").
+					url_param("hostid").
+					url_param("applications").
 					url_param("select"));
 			}
 
-			$col = new CCol(array($link,SPACE,bold($db_app["name"]),SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
+			$col = new CCol(array($link,SPACE,bold($db_app["name"]),SPACE.'('.$item_cnt.SPACE.S_ITEMS.')'));
 			$col->SetColSpan(5);
 
 			$table->ShowRow(array(
@@ -283,21 +285,19 @@ include_once "include/page_header.php";
 					$col
 					));
 
-			$any_app_exist = true;
-		
 			foreach($app_rows as $row)	$table->ShowRow($row);
 		}
 	}
 	
 
 	$sql = 'SELECT DISTINCT h.host,h.hostid '.
-			' FROM hosts h, hosts_groups hg, items i LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
+			' FROM hosts h'.($_REQUEST['groupid']?', hosts_groups hg ':'').', items i '.
+				' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
 			' WHERE ia.itemid is NULL '.
-				' AND hg.hostid=h.hostid '.
+				$compare_host.
 				' AND h.hostid=i.hostid '.
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
-				$compare_host.
 				' AND h.hostid in ('.$available_hosts.') '.
 			' ORDER BY h.host';
 		
@@ -306,13 +306,13 @@ include_once "include/page_header.php";
 	while($db_appitem = DBfetch($db_appitems)){
 
 		$sql = 'SELECT h.host,h.hostid,i.* '.
-				' FROM hosts h, hosts_groups hg, items i LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
+				' FROM hosts h'.($_REQUEST['groupid']?', hosts_groups hg ':'').', items i '.
+					' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
 				' WHERE ia.itemid is NULL '.
-					' AND hg.hostid=h.hostid '.
+					$compare_host.
 					' AND h.hostid=i.hostid '.
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
-					$compare_host.
 					' AND h.hostid='.$db_appitem['hostid'].
 				' ORDER BY i.description,i.itemid';
 				
@@ -324,10 +324,11 @@ include_once "include/page_header.php";
 		while($db_item = DBfetch($db_items)){
 			$description = item_description($db_item["description"],$db_item["key_"]);
 	
-			if( '' != $_REQUEST["select"] && !zbx_stristr($description, $_REQUEST["select"]) ) continue;
+			if(!empty($_REQUEST["select"]) && !zbx_stristr($description, $_REQUEST["select"]) ) continue;
 	
 			++$item_cnt;
-			if(!uint_in_array(0,$_REQUEST["applications"]) && $any_app_exist && !isset($show_all_apps)) continue;
+
+			if(!uint_in_array(0,$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
 	
 			if(isset($db_item["lastclock"]))
 				$lastclock=zbx_date2str(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
@@ -353,7 +354,7 @@ include_once "include/page_header.php";
 				$change=new CCol("-","center");
 			}
 			
-			if(($db_item["value_type"]==ITEM_VALUE_TYPE_FLOAT) ||($db_item["value_type"]==ITEM_VALUE_TYPE_UINT64)){
+			if(($db_item["value_type"]==ITEM_VALUE_TYPE_FLOAT) || ($db_item["value_type"]==ITEM_VALUE_TYPE_UINT64)){
 				$actions=new CLink(S_GRAPH,"history.php?action=showgraph&itemid=".$db_item["itemid"],"action");
 			}
 			else{
@@ -362,8 +363,8 @@ include_once "include/page_header.php";
 			
 			array_push($app_rows, new CRow(array(
 				is_show_subnodes()?($item_cnt?SPACE:get_node_name_by_elid($db_item['itemid'])):null,
-				$_REQUEST["hostid"] > 0 ? NULL : ($item_cnt?SPACE:$db_item["host"]),
-				str_repeat(SPACE, ($any_app_exist ? 6 : 0)).$description,
+				$_REQUEST["hostid"]?NULL:($item_cnt?SPACE:$db_item["host"]),
+				str_repeat(SPACE, 6).$description,
 				$lastclock,
 				new CCol($lastvalue, $lastvalue == '-' ? 'center' : null),
 				$change,
@@ -386,7 +387,7 @@ include_once "include/page_header.php";
 					url_param("select"));
 			}
 
-			$col = new CCol(array($link,SPACE,bold(S_MINUS_OTHER_MINUS),SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
+			$col = new CCol(array($link,SPACE,bold(S_MINUS_OTHER_MINUS),SPACE.'('.$item_cnt.SPACE.S_ITEMS.')'));
 			$col->SetColSpan(5);
 			
 			$table->ShowRow(array(

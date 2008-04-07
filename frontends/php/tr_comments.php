@@ -50,26 +50,27 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 
-	if(! ($db_data = DBfetch(DBselect('select * from items i, functions f '.
-	                        ' where i.itemid=f.itemid and f.triggerid='.$_REQUEST["triggerid"].
-				" and i.hostid not in (".$denyed_hosts.")".
-				' and '.DBin_node('f.triggerid')
-				))))
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+	
+	if(!$db_data = DBfetch(DBselect('SELECT * '.
+							' FROM items i, functions f '.
+	                        ' WHERE i.itemid=f.itemid '.
+								' AND f.triggerid='.$_REQUEST["triggerid"].
+								' AND f.triggerid IN ('.$available_triggers.') '.
+								' AND '.DBin_node('f.triggerid')
+				)))
 	{
 		access_deny();
 	}
 	$trigger_hostid = $db_data['hostid'];
 	
-	if(isset($_REQUEST["save"]))
-	{
-		$result = update_trigger_comments($_REQUEST["triggerid"],$_REQUEST["comments"]);
+	if(isset($_REQUEST["save"])){
 	
+		$result = update_trigger_comments($_REQUEST["triggerid"],$_REQUEST["comments"]);
 		show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
 
-		if($result)
-		{
+		if($result){
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_TRIGGER,
 				S_TRIGGER." [".$_REQUEST["triggerid"]."] [".expand_trigger_description($_REQUEST["triggerid"])."] ".
 				S_COMMENTS." [".$_REQUEST["comments"]."]");

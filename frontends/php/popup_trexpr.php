@@ -183,16 +183,17 @@ include_once "include/page_header.php";
 	$dstfld1	= get_request("dstfld1",	'');	// destination field
 	$itemid		= get_request("itemid",		0);
 
-	$denyed_hosts	= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
+	$available_hosts	= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	
-	if($item_data = DBfetch(DBselect("select distinct h.host,i.* from hosts h,items i ".
-		" where h.hostid=i.hostid and h.hostid not in (".$denyed_hosts.")".
-		" and i.itemid=".$itemid)))
+	if($item_data = DBfetch(DBselect('SELECT DISTINCT h.host,i.* '.
+						' FROM hosts h,items i '.
+						' WHERE h.hostid=i.hostid '.
+							' AND h.hostid IN ('.$available_hosts.') '.
+							' AND i.itemid='.$itemid)))
 	{
 		$description = $item_data['host'].':'.item_description($item_data["description"],$item_data["key_"]);
 	}
-	else
-	{
+	else{
 		$itemid = 0;
 		$description = '';
 	}

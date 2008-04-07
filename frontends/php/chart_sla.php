@@ -38,22 +38,19 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	if(! (DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"]))) )
-	{
+	if(!DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"])) ){
 		fatal_error(S_NO_IT_SERVICE_DEFINED);
 	}
 
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
 	
-	if( !($service = DBfetch(DBselect('SELECT s.* '.
-					' FROM services s '.
-						' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
-						' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
-						' LEFT JOIN items i ON f.itemid=i.itemid '.
-					' WHERE (i.hostid is NULL or i.hostid not in ('.$denyed_hosts.')) '.
-						' AND s.serviceid='.$_REQUEST['serviceid']
-		))))
-	{
+	$sql = 'SELECT s.* '.
+			' FROM services s '.
+			' WHERE s.serviceid='.$_REQUEST['serviceid'].
+				' AND (s.triggerid IS NULL OR s.triggerid in ('.$available_triggers.')) '.
+				' AND DBin_node('s.serviceid')';
+				
+	if(!$service = DBfetch(DBselect($sql))){
 		access_deny();
 	}
 ?>
