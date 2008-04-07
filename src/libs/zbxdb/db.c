@@ -412,9 +412,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	char	*sql = NULL;
 	int	ret = ZBX_DB_OK;
 
-/* suseconds_t is not defined under UP-UX */
-/*	struct timeval tv;
-	suseconds_t    msec;*/
+/*	double	sec;*/
 
 #ifdef	HAVE_POSTGRESQL
 	PGresult	*result;
@@ -423,8 +421,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	char *error=0;
 #endif
 
-/*	gettimeofday(&tv, NULL);
-	msec = tv.tv_usec;*/
+/*	sec = zbx_time();*/
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
@@ -508,10 +505,6 @@ lbl_exec:
 		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed [%i]:%s", ret, error);
 		sqlite3_free(error);
-/*		if(!sqlite_transaction_started)
-		{
-			php_sem_release(&sqlite_access);
-		}*/
 		ret = ZBX_DB_FAIL;
 	}
 
@@ -525,10 +518,10 @@ lbl_exec:
 		php_sem_release(&sqlite_access);
 	}
 #endif
-	
-/*	gettimeofday(&tv, NULL);
-	if((double)(tv.tv_usec-msec)/1000000 > 0.1)
-		zabbix_log( LOG_LEVEL_WARNING, "Long query: " ZBX_FS_DBL " sec, query %s", (double)(tv.tv_usec-msec)/1000000, sql );*/
+
+/*	sec = zbx_time() - sec;	
+	if(sec > 0.1)
+		zabbix_log( LOG_LEVEL_WARNING, "Long query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);*/
 
 	zbx_free(sql);
 	return ret;
@@ -673,9 +666,7 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 	char	*sql = NULL;
 	DB_RESULT result;
 
-/* suseconds_t is not defined under HP=UX */
-/*	struct timeval tv;
-	suseconds_t    msec;*/
+/*	double	sec;*/
 
 #ifdef	HAVE_ORACLE
 	sqlo_stmt_handle_t sth;
@@ -685,8 +676,7 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 	char *error=NULL;
 #endif
 
-/*	gettimeofday(&tv, NULL);
-	msec = tv.tv_usec;*/
+/*	sec = zbx_time();*/
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
@@ -787,9 +777,9 @@ lbl_get_table:
 	}
 #endif
 
-/*	gettimeofday(&tv, NULL);
-	if((double)(tv.tv_usec-msec)/1000000 > 0.1)
-		zabbix_log( LOG_LEVEL_WARNING, "Long query: " ZBX_FS_DBL " sec, query %s", (double)(tv.tv_usec-msec)/1000000, sql );*/
+/*	sec = zbx_time() - sec;	
+	if(sec > 0.1)
+		zabbix_log( LOG_LEVEL_WARNING, "Long query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);*/
 
 	zbx_free(sql);
 	return result;
