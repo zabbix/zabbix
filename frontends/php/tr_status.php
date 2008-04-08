@@ -147,11 +147,12 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	
 	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
 
-	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i, functions f, triggers t ".
+	$result=DBselect('select distinct g.groupid,g.name '.
+		' from groups g, hosts_groups hg, hosts h, items i, functions f, triggers t '.
 		" where h.hostid in (".$availiable_hosts.") ".
-		" AND hg.groupid=g.groupid AND h.status=".HOST_STATUS_MONITORED.
-		" AND h.hostid=i.hostid AND hg.hostid=h.hostid AND i.status=".ITEM_STATUS_ACTIVE.
-		" AND i.itemid=f.itemid AND t.triggerid=f.triggerid AND t.status=".TRIGGER_STATUS_ENABLED.
+			" AND hg.groupid=g.groupid AND h.status=".HOST_STATUS_MONITORED.
+			" AND h.hostid=i.hostid AND hg.hostid=h.hostid AND i.status=".ITEM_STATUS_ACTIVE.
+			" AND i.itemid=f.itemid AND t.triggerid=f.triggerid AND t.status=".TRIGGER_STATUS_ENABLED.
 		" order by g.name");
 	while($row=DBfetch($result))
 	{
@@ -337,12 +338,15 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	
 	$cond.=($show_unknown == 0)?' AND t.value<>2 ':'';
 		
-	$result = DBselect('SELECT DISTINCT t.triggerid,t.status,t.description, '.
-							' t.expression,t.priority,t.lastchange,t.comments,t.url,t.value,h.host '.
+	$result = DBselect('SELECT DISTINCT t.triggerid,t.status,t.description, t.expression,t.priority,t.lastchange,t.comments,t.url,t.value,h.host '.
 					' FROM triggers t,hosts h,items i,functions f '.
-					' WHERE f.itemid=i.itemid AND h.hostid=i.hostid '.
-						' AND t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
-						' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
+					' WHERE f.itemid=i.itemid '.
+						' AND h.hostid=i.hostid '.
+						' AND t.triggerid=f.triggerid '.
+						' AND t.status='.TRIGGER_STATUS_ENABLED.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+						' AND '.DBin_node('t.triggerid').
+//						' AND h.hostid IN ('.$availiable_hosts.') '. 
 						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
 						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.' '.$sort);
 
