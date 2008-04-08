@@ -346,8 +346,8 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 						' AND t.status='.TRIGGER_STATUS_ENABLED.
 						' AND i.status='.ITEM_STATUS_ACTIVE.
 						' AND '.DBin_node('t.triggerid').
-//						' AND h.hostid IN ('.$availiable_hosts.') '. 
-						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
+						' AND h.hostid IN ('.$availiable_hosts.') '. 
+//						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
 						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.' '.$sort);
 
 	while($row=DBfetch($result))
