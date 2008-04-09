@@ -1,5 +1,6 @@
 Changes for 1.4.6:
 
+ - [ZBX-350] fixed processing in_condition under Oracle (Sasha)
  - [ZBX-348] fixed incorrect processing of large integer values for {ITEM.LASTVALUE} (Alexei)
  - [ZBX-337] added Oracle upgrade scripts (Sasha) 
  - [ZBX-301] fixes some typos (Artem)

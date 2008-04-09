@@ -56,7 +56,7 @@
 		}
 	
 //---
-		$trigger_list = '';
+		$trigger_list = array();
 		$sql = 'SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host '.
 			' FROM triggers t, functions f, items i, hosts h '.$sql_from.
 			' WHERE '.DBin_node('t.triggerid').
@@ -67,20 +67,19 @@
 		$rez = DBselect($sql);
 		while($rowz = DBfetch($rez)){
 			$triggers[$rowz['triggerid']] = $rowz;
-			$trigger_list.=$rowz['triggerid'].',';
+			array_push($trigger_list, $rowz['triggerid']);
 		}
 
 		if(!empty($triggers)){
-			$trigger_list = '('.trim($trigger_list,',').')';
 			$sql_cond=($show_unknown == 0)?(' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.' '):('');
 			
 			$sql = 'SELECT e.eventid, e.objectid as triggerid,e.clock,e.value '.
 					' FROM events e '.
 					' WHERE '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.
-					  ' AND e.objectid IN '.$trigger_list.
+					' AND '.DBin_condition('e.objectid', $trigger_list).
 					  $sql_cond.
 					' ORDER BY e.eventid DESC';
-	
+
 			$result = DBselect($sql,10*($start+$num));
 		}
 		       
