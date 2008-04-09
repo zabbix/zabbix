@@ -718,4 +718,28 @@ else {
 	function remove_nodes_from_id($id){
 		return bcmod($id,'100000000000');
 	}
+
+	function DBin_condition($fieldname, $array)
+	{
+		global $DB_TYPE;
+
+		$condition = $fieldname.' IN (';
+		
+		switch($DB_TYPE) {
+			case 'ORACLE':
+				$items = array_chunk($array, 1000);
+				$chunks = count($items);
+				for ($i = 0; $i < $chunks; $i++) {
+					if ($i > 0)
+						$condition .= ') OR '.$fieldname.' IN (';
+					$condition .= implode(",",$items[$i]);
+				}
+				$condition .= ')';
+				if ($chunks > 1)
+					$condition = '('.$condition.')';
+				return $condition;
+			default:
+				return $condition.implode(",",$array).')';
+		}
+	}
 ?>
