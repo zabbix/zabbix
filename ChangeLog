@@ -1,5 +1,6 @@
 Changes for 1.4.6:
 
+ - [ZBX-351] added support of floating point values w/o zero (.12) (Sasha)
  - [ZBX-350] fixed processing in_condition under Oracle (Sasha)
  - [ZBX-348] fixed incorrect processing of large integer values for {ITEM.LASTVALUE} (Alexei)
  - [ZBX-337] added Oracle upgrade scripts (Sasha) 
