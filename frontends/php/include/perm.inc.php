@@ -129,8 +129,9 @@
 		return $perm_mode;
 	}
 
-	function	get_accessible_hosts_by_user(&$user_data,$perm,$perm_mode=null,$perm_res=null,$nodeid=null,$hostid=null)
-	{
+	function	get_accessible_hosts_by_user(&$user_data,$perm,$perm_mode=null,$perm_res=null,$nodeid=null,$hostid=null){
+		global $DB_TYPE;
+		
 		if(is_null($perm_res))		$perm_res	= PERM_RES_STRING_LINE;
 		if($perm == PERM_READ_LIST)	$perm		= PERM_READ_ONLY;
 
@@ -160,35 +161,32 @@ COpt::counter_up('perm');
 		if(count($where)) 	$where = ' where '.implode(' and ',$where);
 		else			$where = '';
 	
+		$sortorder = (isset($DB_TYPE) && (($DB_TYPE == 'MYSQL') || ($DB_TYPE == 'SQLITE3')))?' DESC ':'';
+		
 		$sql = 'select distinct n.nodeid,n.name as node_name,h.hostid,h.host, min(r.permission) as permission,ug.userid '.
-			' from hosts h left join hosts_groups hg on hg.hostid=h.hostid '.
-			' left join groups g on g.groupid=hg.groupid '.
-			' left join rights r on r.id=g.groupid and r.type='.RESOURCE_TYPE_GROUP.
-			' left join users_groups ug on ug.usrgrpid=r.groupid and ug.userid='.$userid.
-			' left join nodes n on '.DBid2nodeid('h.hostid').'=n.nodeid '.
+			' from hosts h '.
+				' left join hosts_groups hg on hg.hostid=h.hostid '.
+				' left join groups g on g.groupid=hg.groupid '.
+				' left join rights r on r.id=g.groupid and r.type='.RESOURCE_TYPE_GROUP.
+				' left join users_groups ug on ug.usrgrpid=r.groupid and ug.userid='.$userid.
+				' left join nodes n on '.DBid2nodeid('h.hostid').'=n.nodeid '.
 			$where.' group by h.hostid,n.nodeid,n.name,h.host,ug.userid '.
-			' order by n.name,n.nodeid, h.host, permission desc, userid desc';
+			' order by n.name,n.nodeid, h.host, permission '.$sortorder.', userid '.$sortorder;
 
 		$db_hosts = DBselect($sql);
 
 		$processed = array();
-		while($host_data = DBfetch($db_hosts))
-		{
-//			It seems that host details are not required by the logic
-//			$host_data += DBfetch(DBselect('select * from hosts where hostid='.$host_data['hostid']));
-
+		while($host_data = DBfetch($db_hosts)){
+		
 			if(is_null($host_data['nodeid'])) $host_data['nodeid'] = id2nodeid($host_data['hostid']);
 
 			/* if no rights defined used node rights */
-			if( (is_null($host_data['permission']) || is_null($host_data['userid'])) )
-			{
+			if( (is_null($host_data['permission']) || is_null($host_data['userid'])) ){
 				if( isset($processed[$host_data['hostid']]) )
 					continue;
 
-				if(!isset($nodes))
-				{
-					$nodes = get_accessible_nodes_by_user($user_data,
-						PERM_DENY,PERM_MODE_GE,PERM_RES_DATA_ARRAY);
+				if(!isset($nodes)){
+					$nodes = get_accessible_nodes_by_user($user_data,PERM_DENY,PERM_MODE_GE,PERM_RES_DATA_ARRAY);
 				}
 				if( !isset($nodes[$host_data['nodeid']]) || $user_type==USER_TYPE_ZABBIX_USER )
 					$host_data['permission'] = PERM_DENY;
@@ -206,8 +204,7 @@ COpt::counter_up('perm');
 
 		unset($processed, $host_data, $db_hosts);
 
-		if($perm_res == PERM_RES_STRING_LINE) 
-		{
+		if($perm_res == PERM_RES_STRING_LINE) {
 			if(count($result) == 0) 
 				$result = '-1';
 			else
