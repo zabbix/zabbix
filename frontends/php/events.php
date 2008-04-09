@@ -248,7 +248,7 @@ include_once "include/page_header.php";
 
 //---
 		$triggers = array();
-		$trigger_list = '';
+		$trigger_list = array();
 
 		$sql = 'SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,t.type '.
 				' FROM triggers t, functions f, items i, hosts h '.$sql_from.
@@ -262,10 +262,9 @@ include_once "include/page_header.php";
 		$rez = DBselect($sql);
 		while($rowz = DBfetch($rez)){
 			$triggers[$rowz['triggerid']] = $rowz;
-			$trigger_list.=$rowz['triggerid'].',';
+			array_push($trigger_list, $rowz['triggerid']);
 		}
 
-		$trigger_list = '('.trim($trigger_list,',').')';
 		$sql_cond=($show_unknown == 0)?(' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.' '):('');
 		$sql_cond.=($_REQUEST['filter_timesince']>0)?' AND e.clock>'.$_REQUEST['filter_timesince']:' AND e.clock>100';
 		$sql_cond.=($_REQUEST['filter_timetill']>0)?' AND e.clock<'.$_REQUEST['filter_timetill']:'';
@@ -288,7 +287,7 @@ include_once "include/page_header.php";
 			$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.value, e.acknowledged '.
 					' FROM events e '.
 					' WHERE (e.object+0)='.EVENT_OBJECT_TRIGGER.
-						' AND e.objectid IN '.$trigger_list.
+					' AND '.DBin_condition('e.objectid', $trigger_list).
 						$sql_cond.
 					order_by('e.clock');
 //SDI($sql);
