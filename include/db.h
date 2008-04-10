@@ -580,12 +580,10 @@ int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock);
 int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock);
 int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 
-int	DBproxy_add_history(zbx_uint64_t itemid, double value, int clock);
-int	DBproxy_add_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
-int	DBproxy_add_history_str(zbx_uint64_t itemid, char *value, int clock);
-#define DBproxy_add_history_log(id, itemid, value, clock, timestamp, source, severity) \
-	DBadd_history_log(id, itemid, value, clock, timestamp, source, severity)
-#define	DBproxy_add_history_text(itemid, value, clock) \
-	DBadd_history_text(itemid, value, clock)
+int	DBproxy_add_history(const char *host, const char *key, int clock, double value);
+int	DBproxy_add_history_uint(const char *host, const char *key, int clock, zbx_uint64_t value);
+int	DBproxy_add_history_str(const char *host, const char *key, int clock, char *value);
+int	DBproxy_add_history_text(const char *host, const char *key, int clock, char *value);
+int	DBproxy_add_history_log(const char *host, const char *key, int clock, int timestamp, char *source, int severity, char *value);
 
 #endif
