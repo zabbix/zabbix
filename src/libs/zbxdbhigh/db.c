@@ -1945,12 +1945,6 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 						tablename,
 						fieldname);
 			}
-
-			DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',"ZBX_FS_UI64")",
-				nodeid,
-				tablename,
-				fieldname,
-				ret1);
 			continue;
 		} else {
 			ZBX_STR2UINT64(ret1, row[0]);
@@ -2031,41 +2025,100 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 	return ret;*/
 }
 
-int	DBproxy_add_history(zbx_uint64_t itemid, double value, int clock)
+int	DBproxy_add_history(const char *host, const char *key, int clock, double value)
 {
+	char		host_esc[MAX_STRING_LEN], key_esc[MAX_STRING_LEN];
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history()");
 
-	DBexecute("insert into history_sync (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
+	DBescape_string(host, host_esc, sizeof(host_esc));
+	DBescape_string(key, key_esc, sizeof(key_esc));
+
+	DBexecute("insert into proxy_history (host,key_,clock,value) values ('%s','%s',%d,'" ZBX_FS_DBL "')",
+			host_esc,
+			key_esc,
 			clock,
-			itemid,
 			value);
 
 	return SUCCEED;
 }
 
-int	DBproxy_add_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
+int	DBproxy_add_history_uint(const char *host, const char *key, int clock, zbx_uint64_t value)
 {
+	char		host_esc[MAX_STRING_LEN], key_esc[MAX_STRING_LEN];
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_uint()");
 
-	DBexecute("insert into history_uint_sync (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+	DBescape_string(host, host_esc, sizeof(host_esc));
+	DBescape_string(key, key_esc, sizeof(key_esc));
+
+	DBexecute("insert into proxy_history (host,key_,clock,value) values ('%s','%s',%d,'" ZBX_FS_UI64 "')",
+			host_esc,
+			key_esc,
 			clock,
-			itemid,
 			value);
 
 	return SUCCEED;
 }
 
-int	DBproxy_add_history_str(zbx_uint64_t itemid, char *value, int clock)
+int	DBproxy_add_history_str(const char *host, const char *key, int clock, char *value)
 {
-	char	value_esc[MAX_STRING_LEN];
+	char	host_esc[MAX_STRING_LEN], key_esc[MAX_STRING_LEN], value_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_str()");
 
-	DBescape_string(value, value_esc, MAX_STRING_LEN);
+	DBescape_string(host, host_esc, sizeof(host_esc));
+	DBescape_string(key, key_esc, sizeof(key_esc));
+	DBescape_string(value, value_esc, sizeof(value_esc));
 
-	DBexecute("insert into history_str_sync (clock,itemid,value) values (%d," ZBX_FS_UI64 ",'%s')",
+	DBexecute("insert into proxy_history (host,key_,clock,value) values ('%s','%s',%d,'%s')",
+			host_esc,
+			key_esc,
 			clock,
-			itemid,
+			value_esc);
+
+	return SUCCEED;
+}
+
+int	DBproxy_add_history_text(const char *host, const char *key, int clock, char *value)
+{
+	char	host_esc[MAX_STRING_LEN], key_esc[MAX_STRING_LEN], *value_esc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_text()");
+
+	DBescape_string(host, host_esc, sizeof(host_esc));
+	DBescape_string(key, key_esc, sizeof(key_esc));
+	value_esc = DBdyn_escape_string(value);
+
+	DBexecute("insert into proxy_history (host,key_,clock,value) values ('%s','%s',%d,'%s')",
+			host_esc,
+			key_esc,
+			clock,
+			value_esc);
+
+	return SUCCEED;
+}
+
+int	DBproxy_add_history_log(const char *host, const char *key, int clock, int timestamp, char *source, int severity, char *value)
+{
+	char		host_esc[MAX_STRING_LEN], key_esc[MAX_STRING_LEN],
+			source_esc[MAX_STRING_LEN], *value_esc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_log()");
+
+	DBescape_string(host, host_esc, sizeof(host_esc));
+	DBescape_string(key, key_esc, sizeof(key_esc));
+	DBescape_string(source, source_esc, sizeof(source_esc));
+	value_esc = DBdyn_escape_string(value);
+
+	DBexecute("insert into proxy_history (host,key_,clock,timestamp,source,severity,value)"
+			" values ('%s','%s',%d,%d,'%s',%d,'%s')",
+			host_esc,
+			key_esc,
+			clock,
+			timestamp,
+			source_esc,
+			severity,
 			value_esc);
 
 	return SUCCEED;
