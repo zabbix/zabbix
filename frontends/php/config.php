@@ -404,8 +404,8 @@ include_once "include/page_header.php";
 				$mappings_row = array();
 				$db_maps = DBselect("select * from mappings".
 					" where valuemapid=".$db_valuemap["valuemapid"]);
-				while($db_map = DBfetch($db_maps))
-				{
+					
+				while($db_map = DBfetch($db_maps)){
 					array_push($mappings_row, 
 						$db_map["value"],
 						SPACE.RARR.SPACE,
@@ -416,7 +416,8 @@ include_once "include/page_header.php";
 					new CLink($db_valuemap["name"],"config.php?form=update&".
 						"valuemapid=".$db_valuemap["valuemapid"].url_param("config"),
 						"action"),
-					$mappings_row));
+					empty($mappings_row)?SPACE:$mappings_row
+				));
 			}
 			
 			$table->Show();

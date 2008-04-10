@@ -797,9 +797,9 @@ include_once "include/page_header.php";
 					$error = NULL;
 				}
 				else{
-					$dns = $row['dns'];
-					$ip = $row['ip'];
-					$port = $row["port"];
+					$dns = empty($row['dns'])?'-':$row['dns'];
+					$ip = empty($row['ip'])?'-':$row['ip'];
+					$port = empty($row['port'])?'-':$row["port"];
 
 					if(1 == $row['useip'])
 						$ip = bold($ip);
@@ -833,6 +833,12 @@ include_once "include/page_header.php";
 					if($row['error'] == '')	$error = new CCol(SPACE,'off');
 					else			$error = new CCol($row['error'],'on');
 
+					$row["error"] = trim($row["error"]);
+					if(empty($row["error"]))
+						$error = new CCol('-',"off");
+					else 
+						$error = new CCol($row["error"],"on");
+
 				}
 
 				$popup_menu_actions = array(
@@ -842,11 +848,13 @@ include_once "include/page_header.php";
 					array(S_GRAPHS, 'graphs.php?hostid='.$row['hostid'], array('tw'=>'_blank')),
 					);
 
-				$db_groups = DBselect('select g.groupid, g.name from groups g left join hosts_groups hg '.
-						' on g.groupid=hg.groupid and hg.hostid='.$row['hostid'].
-						' where '.DBin_node('g.groupid').' AND hg.hostid is NULL order by g.name,g.groupid');
-						
-				while($group_data = DBfetch($db_groups)){
+				$db_groups = DBselect('SELECT g.groupid, g.name '.
+						' FROM groups g '.
+							' LEFT JOIN hosts_groups hg on g.groupid=hg.groupid and hg.hostid='.$row['hostid'].
+						' WHERE hostid is NULL '.
+						' ORDER BY g.name,g.groupid');
+				while($group_data = DBfetch($db_groups))
+				{
 					$add_to[] = array($group_data['name'], '?'.
 							url_param($group_data['groupid'], false, 'add_to_group').
 							url_param($row['hostid'], false, 'hostid')
@@ -888,7 +896,7 @@ include_once "include/page_header.php";
 					$dns,
 					$ip,
 					$port,
-					implode(', ',$templates),
+					empty($templates)?'-':implode(', ',$templates),
 					$status,
 					$available,
 					$error,
@@ -912,12 +920,12 @@ include_once "include/page_header.php";
 
 		}
 	}
-	elseif($_REQUEST["config"]==1)
-	{
+	elseif($_REQUEST["config"]==1){
 		if(isset($_REQUEST["form"]))
 		{
 			insert_hostgroups_form(get_request("groupid",NULL));
-		} else {
+		} 
+		else {
 			show_table_header(S_HOST_GROUPS_BIG);
 
 			$form = new CForm('hosts.php');
@@ -974,7 +982,7 @@ include_once "include/page_header.php";
 							url_param("config"),'action')
 					),
 					$count,
-					$hosts
+					empty($hosts)?'-':$hosts
 					));
 			}
 			$table->SetFooter(new CCol(array(
@@ -989,8 +997,7 @@ include_once "include/page_header.php";
 			$form->Show();
 		}
 	}
-	elseif($_REQUEST["config"]==2)
-	{
+	elseif($_REQUEST["config"]==2){
 		show_table_header(S_TEMPLATE_LINKAGE_BIG);
 
 		$table = new CTableInfo(S_NO_LINKAGES);
@@ -1021,18 +1028,17 @@ include_once "include/page_header.php";
 			}
 			$table->AddRow(array(
 				new CSpan($template["host"],"unknown"),
-				$host_list
+				empty($host_list)?'-':$host_list
 				));
 		}
 
 		$table->Show();
 	}
-	elseif($_REQUEST["config"]==4)
-	{
-		if(isset($_REQUEST["form"]))
-		{
+	else if($_REQUEST["config"]==4){
+		if(isset($_REQUEST["form"])){
 			insert_application_form();
-		} else {
+		} 
+		else {
 	// Table HEADER
 			$form = new CForm();
 			$form->SetMethod('get');
@@ -1074,8 +1080,7 @@ include_once "include/page_header.php";
 			$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit();");
 
 			$result=DBselect($sql);
-			while($row=DBfetch($result))
-			{
+			while($row=DBfetch($result)){
 				$cmbHosts->AddItem($row["hostid"],$row["host"]);
 			}
 
@@ -1126,9 +1131,7 @@ include_once "include/page_header.php";
 
 
 				$table->AddRow(array(
-					array(new CCheckBox("applications[]",NULL,NULL,$db_app["applicationid"]),
-					SPACE,
-					$name),
+					array(new CCheckBox("applications[]",NULL,NULL,$db_app["applicationid"]),SPACE,$name),
 					array(new CLink(S_ITEMS,"items.php?hostid=".$db_app["hostid"],"action"),
 					SPACE."($rows)")
 					));
