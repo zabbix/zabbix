@@ -185,6 +185,7 @@
 	}
 
 	function get_accessible_hosts_by_user(&$user_data,$perm,$perm_mode=null,$perm_res=null,$nodeid=null,$cache=1){
+		global $DB_TYPE;
 		static $available_hosts;
 
 		if(is_null($perm_res))		$perm_res	= PERM_RES_STRING_LINE;
@@ -228,6 +229,8 @@ COpt::counter_up('perm');
 		 	$where = ' where '.implode(' and ',$where);
 		else
 			$where = '';
+			
+		$sortorder = (isset($DB_TYPE) && (($DB_TYPE == 'MYSQL') || ($DB_TYPE == 'SQLITE3')))?' DESC ':'';
 	
 		$sql = 'SELECT DISTINCT n.nodeid,n.name as node_name,h.hostid,h.host, min(r.permission) as permission,ug.userid '.
 			' FROM hosts h '.
@@ -238,7 +241,7 @@ COpt::counter_up('perm');
 				' LEFT JOIN nodes n ON '.DBid2nodeid('h.hostid').'=n.nodeid '.
 			$where.
 			' GROUP BY h.hostid,n.nodeid,n.name,h.host,ug.userid '.
-			' ORDER BY n.name,n.nodeid, h.host, permission desc, userid desc';
+			' ORDER BY n.name,n.nodeid, h.host, permission '.$sortorder.', userid '.$sortorder;
 
 		$db_hosts = DBselect($sql);
 

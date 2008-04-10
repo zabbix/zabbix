@@ -793,9 +793,9 @@ include_once "include/page_header.php";
 					"&group_task=".($db_item["status"] ? "Activate+selected" : "Disable+selected"),
 					item_status2style($db_item["status"])));
 	
-			if($db_item["error"] == "")
+			if($db_item["error"] == '')
 			{
-				$error=new CCol(SPACE,"off");
+				$error=new CCol('-',"off");
 			}
 			else
 			{
@@ -803,7 +803,7 @@ include_once "include/page_header.php";
 			}
 
 			$applications = $show_applications ? implode(', ', get_applications_by_itemid($db_item["itemid"], 'name')) : null;
-
+			
 			$chkBox = new CCheckBox("group_itemid[]",null,null,$db_item["itemid"]);
 			//if($db_item["templateid"] > 0) $chkBox->SetEnabled(false);
 			$table->AddRow(array(
@@ -815,7 +815,7 @@ include_once "include/page_header.php";
 				$db_item["trends"],
 				item_type2str($db_item['type']),
 				$status,
-				$applications,
+				('' == $applications)?'-':$applications,
 				$error
 				));
 		}

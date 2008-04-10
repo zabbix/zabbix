@@ -195,10 +195,11 @@ require_once "include/items.inc.php";
 		}
 
 
-		if(DBfetch(DBselect(
-			"select * from hosts where host=".zbx_dbstr($host).
-				' and '.DBin_node('hostid', get_current_nodeid(false)).
-				(isset($hostid) ? ' and hostid<>'.$hostid : '')
+		if(DBfetch(DBselect('SELECT h.host '.
+				' FROM hosts h '.
+				' WHERE h.host='.zbx_dbstr($host).
+					' AND '.DBin_node('h.hostid', get_current_nodeid(false)).
+					(isset($hostid)?' AND h.hostid<>'.$hostid:'')
 			)))
 		{
 			error("Host '$host' already exists");
@@ -207,25 +208,29 @@ require_once "include/items.inc.php";
 
 		if(is_null($hostid)){
 			$hostid = get_dbid("hosts","hostid");
-			$result = DBexecute("insert into hosts".
-				" (hostid,proxy_hostid,host,port,status,useip,dns,ip,disable_until,available)".
-				" values ($hostid,$proxy_hostid,".zbx_dbstr($host).",$port,$status,$useip,".zbx_dbstr($dns).",".zbx_dbstr($ip).",0,"
-				.HOST_AVAILABLE_UNKNOWN.")");
+			$result = DBexecute('insert into hosts '.
+				' (hostid,proxy_hostid,host,port,status,useip,dns,ip,disable_until,available) '.
+				' values ('.$hostid.','.$proxy_hostid.','.zbx_dbstr($host).','.$port.','.$status.','.$useip.','.zbx_dbstr($dns).','.zbx_dbstr($ip).',0,'
+					.HOST_AVAILABLE_UNKNOWN.')');
 		}
 		else{
 			if(check_circle_host_link($hostid, $templates)){
 				error("Circle link can't be created");
 				return false;
 			}
-
-			$result = DBexecute("update hosts set proxy_hostid=$proxy_hostid,host=".zbx_dbstr($host).",".
-				"port=$port,useip=$useip,dns=".zbx_dbstr($dns).",ip=".zbx_dbstr($ip)." where hostid=$hostid");
+			$result = DBexecute('UPDATE hosts SET proxy_hostid='.$proxy_hostid.
+							',host='.zbx_dbstr($host).
+							',port='.$port.
+							',status='.$status.
+							',useip='.$useip.
+							',dns='.zbx_dbstr($dns).
+							',ip='.zbx_dbstr($ip).
+				' WHERE hostid='.$hostid);
 
 			update_host_status($hostid, $status);
 		}
 		
-		foreach($templates as $id => $name)
-		{
+		foreach($templates as $id => $name){
 			$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
 			if(!($result = DBexecute('insert into hosts_templates values ('.$hosttemplateid.','.$hostid.','.$id.')')))
 				break;
