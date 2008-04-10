@@ -237,7 +237,7 @@ function get_history_of_discovery_events($start,$num){
 		if($event_data["value"] == 0){
 			$value=new CCol(S_UP,"off");
 		}
-		elseif($event_data["value"] == 1){
+		else if($event_data["value"] == 1){
 			$value=new CCol(S_DOWN,"on");
 		}
 		else{

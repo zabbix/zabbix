@@ -719,27 +719,25 @@ else {
 		return bcmod($id,'100000000000');
 	}
 
-	function DBin_condition($fieldname, $array)
-	{
+	function DBin_condition($fieldname, &$array){
 		global $DB_TYPE;
 
-		$condition = $fieldname.' IN (';
+		$condition = '';
 		
 		switch($DB_TYPE) {
 			case 'ORACLE':
 				$items = array_chunk($array, 1000);
-				$chunks = count($items);
-				for ($i = 0; $i < $chunks; $i++) {
-					if ($i > 0)
-						$condition .= ') OR '.$fieldname.' IN (';
-					$condition .= implode(",",$items[$i]);
+				foreach($items as $id => $value){
+					$condition.=!empty($condition)?') OR '.$fieldname.' IN (':'';
+					$condition.= implode(',',$value);
 				}
-				$condition .= ')';
-				if ($chunks > 1)
-					$condition = '('.$condition.')';
-				return $condition;
+				break;
 			default:
-				return $condition.implode(",",$array).')';
+				$condition = implode(',',$array);
 		}
+		
+		if(empty($condition)) $condition = '0';
+
+	return '('.$fieldname.' IN ('.$condition.'))';
 	}
 ?>
