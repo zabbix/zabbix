@@ -325,11 +325,11 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 
 	switch ($sort)
 	{
-		case "host":		$sort="order by h.host";	if($_REQUEST["hostid"] <= 0)	break; /* else "description" */
-		case "description":	$sort="order by t.description";				break;
-		case "priority":	$sort="order by t.priority desc, t.description";	break;
-		case "lastchange":	$sort="order by t.lastchange desc, t.priority";		break;
-		default:			$sort="order by t.priority desc, t.description";
+		case "host":		$sort=" order by h.host";	if($_REQUEST["hostid"] <= 0)	break; /* else "description" */
+		case "description":	$sort=" order by t.description";				break;
+		case "priority":	$sort=" order by t.priority desc, t.description";	break;
+		case "lastchange":	$sort=" order by t.lastchange desc, t.priority";		break;
+		default:			$sort=" order by t.priority desc, t.description";
 	}
 
 	$cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid'].' ':'';

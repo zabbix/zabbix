@@ -647,20 +647,20 @@ include_once "include/page_header.php";
 				S_ACTIONS
 				));
 		
-			$sql="select h.* from";
-			if(isset($_REQUEST["groupid"]))
-			{
-				$sql .= " hosts h,hosts_groups hg where";
-				$sql .= " hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and";
-			} else  $sql .= " hosts h where";
-			$sql .=	" h.hostid in (".$available_hosts.") ".
+			$sql='SELECT h.* FROM';
+			if(isset($_REQUEST["groupid"])){
+				$sql .= ' hosts h,hosts_groups hg ';
+				$sql .= ' WHERE hg.groupid='.$_REQUEST["groupid"].' and hg.hostid=h.hostid and';
+			} 
+			else  $sql .= ' hosts h where';
+			
+			$sql .=	' h.hostid in ('.$available_hosts.') '.
 				$status_filter.
-				" order by h.host";
+				' ORDER BY h.host';
 
 			$result=DBselect($sql);
 		
-			while($row=DBfetch($result))
-			{
+			while($row=DBfetch($result)){
 				$add_to = array();
 				$delete_from = array();
 
@@ -674,8 +674,7 @@ include_once "include/page_header.php";
 					));
 		
 				
-				if($show_only_tmp)
-				{
+				if($show_only_tmp){
 					$dns = NULL;
 					$ip = NULL;
 					$port = NULL;
@@ -683,11 +682,10 @@ include_once "include/page_header.php";
 					$available = NULL;
 					$error = NULL;
 				}
-				else
-				{
-					$dns = $row['dns'];
-					$ip = $row['ip'];
-					$port = $row["port"];
+				else{
+					$dns = empty($row['dns'])?'-':$row['dns'];
+					$ip = empty($row['ip'])?'-':$row['ip'];
+					$port = empty($row['port'])?'-':$row["port"];
 
 					if(1 == $row['useip'])
 						$ip = bold($ip);
@@ -698,7 +696,8 @@ include_once "include/page_header.php";
 						$status=new CLink(S_MONITORED,"hosts.php?hosts%5B%5D=".$row["hostid"].
 							"&disable=1".url_param("config").url_param("groupid"),
 							"off");
-					} else if($row["status"] == HOST_STATUS_NOT_MONITORED) {
+					} 
+					else if($row["status"] == HOST_STATUS_NOT_MONITORED) {
 						$status=new CLink(S_NOT_MONITORED,"hosts.php?hosts%5B%5D=".$row["hostid"].
 							"&activate=1".url_param("config").url_param("groupid"),
 							"on");
@@ -716,8 +715,11 @@ include_once "include/page_header.php";
 					else if($row["available"] == HOST_AVAILABLE_UNKNOWN)
 						$available=new CCol(S_UNKNOWN,"unknown");
 
-					if($row["error"] == "")	$error = new CCol(SPACE,"off");
-					else			$error = new CCol($row["error"],"on");
+					$row["error"] = trim($row["error"]);
+					if(empty($row["error"]))
+						$error = new CCol('-',"off");
+					else 
+						$error = new CCol($row["error"],"on");
 
 				}
 
@@ -728,9 +730,11 @@ include_once "include/page_header.php";
 					array(S_GRAPHS, 'graphs.php?hostid='.$row['hostid'], array('tw'=>'_blank')),
 					);
 
-				$db_groups = DBselect('select g.groupid, g.name from groups g left join hosts_groups hg '.
-						' on g.groupid=hg.groupid and hg.hostid='.$row['hostid'].
-						' where hostid is NULL order by g.name,g.groupid');
+				$db_groups = DBselect('SELECT g.groupid, g.name '.
+						' FROM groups g '.
+							' LEFT JOIN hosts_groups hg on g.groupid=hg.groupid and hg.hostid='.$row['hostid'].
+						' WHERE hostid is NULL '.
+						' ORDER BY g.name,g.groupid');
 				while($group_data = DBfetch($db_groups))
 				{
 					$add_to[] = array($group_data['name'], '?'.
@@ -775,7 +779,7 @@ include_once "include/page_header.php";
 					$dns,
 					$ip,
 					$port,
-					implode(', ',$templates),
+					empty($templates)?'-':implode(', ',$templates),
 					$status,
 					$available,
 					$error,
@@ -798,12 +802,12 @@ include_once "include/page_header.php";
 
 		}
 	}
-	elseif($_REQUEST["config"]==1)
-	{
+	elseif($_REQUEST["config"]==1){
 		if(isset($_REQUEST["form"]))
 		{
 			insert_hostgroups_form(get_request("groupid",NULL));
-		} else {
+		} 
+		else {
 			show_table_header(S_HOST_GROUPS_BIG);
 
 			$form = new CForm('hosts.php');
@@ -824,16 +828,18 @@ include_once "include/page_header.php";
 
 			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid());
 
-			$db_groups=DBselect("select groupid,name from groups".
-					" where groupid in (".$available_groups.")".
-					" order by name");
+			$db_groups=DBselect('select groupid,name from groups'.
+					' where groupid in ('.$available_groups.')'.
+					' order by name');
 			while($db_group=DBfetch($db_groups))
 			{
-				$db_hosts = DBselect("select distinct h.host, h.status".
-					" from hosts h, hosts_groups hg".
-					" where h.hostid=hg.hostid and hg.groupid=".$db_group["groupid"].
-					" and h.hostid in (".$available_hosts.")".
-					" and h.status not in (".HOST_STATUS_DELETED.") order by host");
+				$db_hosts = DBselect('select distinct h.host, h.status'.
+					' from hosts h, hosts_groups hg'.
+					' where h.hostid=hg.hostid '.
+						' and hg.groupid='.$db_group['groupid'].
+						' and h.hostid in ('.$available_hosts.')'.
+						' and h.status not in ('.HOST_STATUS_DELETED.') '.
+						' order by host');
 
 				$hosts = array();
 				$count = 0;
@@ -855,7 +861,7 @@ include_once "include/page_header.php";
 							url_param("config"),'action')
 					),
 					$count,
-					implode(', ',$hosts)
+					empty($hosts)?'-':implode(', ',$hosts)
 					));
 			}
 			$table->SetFooter(new CCol(array(
@@ -870,49 +876,48 @@ include_once "include/page_header.php";
 			$form->Show();
 		}
 	}
-	elseif($_REQUEST["config"]==2)
-	{
+	elseif($_REQUEST["config"]==2){
 		show_table_header(S_TEMPLATE_LINKAGE_BIG);
 
 		$table = new CTableInfo(S_NO_LINKAGES);
 		$table->SetHeader(array(S_TEMPLATES,S_HOSTS));
 
-		$templates = DBSelect("select * from hosts where status=".HOST_STATUS_TEMPLATE.
-			" and hostid in (".$available_hosts.")".
-			" order by host");
-		while($template = DBfetch($templates))
-		{
-			$hosts = DBSelect("select h.* from hosts h, hosts_templates ht where ht.templateid=".$template["hostid"].
-				" and ht.hostid=h.hostid ".
-				" and h.status not in (".HOST_STATUS_TEMPLATE.")".
-				" and h.hostid in (".$available_hosts.")".
-				" order by host");
+		$templates = DBSelect('select * '.
+				' from hosts '.
+				' where status='.HOST_STATUS_TEMPLATE.
+					' and hostid in ('.$available_hosts.')'.
+				' order by host');
+				
+		while($template = DBfetch($templates)){
+			$hosts = DBSelect('select h.* '.
+				' from hosts h, hosts_templates ht '.
+				' where ht.templateid='.$template['hostid'].
+					' and ht.hostid=h.hostid '.
+					' and h.status not in ('.HOST_STATUS_TEMPLATE.')'.
+					' and h.hostid in ('.$available_hosts.')'.
+				' order by host');
 			$host_list = array();
-			while($host = DBfetch($hosts))
-			{
-				if($host["status"] == HOST_STATUS_NOT_MONITORED)
-				{
+			while($host = DBfetch($hosts)){
+				if($host["status"] == HOST_STATUS_NOT_MONITORED){
 					array_push($host_list, unpack_object(new CSpan($host["host"],"on")));
 				}
-				else
-				{
+				else{
 					array_push($host_list, $host["host"]);
 				}
 			}
 			$table->AddRow(array(
 				new CSpan($template["host"],"unknown"),
-				implode(', ',$host_list)
+				empty($host_list)?'-':implode(', ',$host_list)
 				));
 		}
 
 		$table->Show();
 	}
-	elseif($_REQUEST["config"]==4)
-	{
-		if(isset($_REQUEST["form"]))
-		{
+	else if($_REQUEST["config"]==4){
+		if(isset($_REQUEST["form"])){
 			insert_application_form();
-		} else {
+		} 
+		else {
 	// Table HEADER
 			$form = new CForm();
 			$form->SetMethod('get');
@@ -920,9 +925,11 @@ include_once "include/page_header.php";
 			$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 			$cmbGroup->AddItem(0,S_ALL_SMALL);
 
-			$result=DBselect("select distinct g.groupid,g.name from groups g,hosts_groups hg".
-				" where g.groupid=hg.groupid and hg.hostid in (".$available_hosts.") ".
-				" order by name");
+			$result=DBselect('select distinct g.groupid,g.name '.
+						' from groups g,hosts_groups hg'.
+						' where g.groupid=hg.groupid '.
+							' and hg.hostid in ('.$available_hosts.') '.
+						' order by name');
 			while($row=DBfetch($result))
 			{
 				$cmbGroup->AddItem($row["groupid"],$row["name"]);
@@ -930,25 +937,28 @@ include_once "include/page_header.php";
 			$form->AddItem(S_GROUP.SPACE);
 			$form->AddItem($cmbGroup);
 
-			if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0)
-			{
-				$sql="select distinct h.hostid,h.host from hosts h,hosts_groups hg".
-					" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid ".
-					" and h.hostid in (".$available_hosts.") ".
-					" and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
+			if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0){
+				$sql='select distinct h.hostid,h.host '.
+					' from hosts h,hosts_groups hg'.
+					' where hg.groupid='.$_REQUEST['groupid'].
+						' and hg.hostid=h.hostid '.
+						' and h.hostid in ('.$available_hosts.') '.
+						' and h.status<>'.HOST_STATUS_DELETED.
+					' group by h.hostid,h.host '.
+					' order by h.host';
 			}
-			else
-			{
-				$sql="select distinct h.hostid,h.host from hosts h ".
-					" where h.status<>".HOST_STATUS_DELETED.
-					" and h.hostid in (".$available_hosts.") ".
-					" group by h.hostid,h.host order by h.host";
+			else{
+				$sql='select distinct h.hostid,h.host '.
+					' from hosts h '.
+					' where h.status<>'.HOST_STATUS_DELETED.
+						' and h.hostid in ('.$available_hosts.') '.
+					' group by h.hostid,h.host '.
+					' order by h.host';
 			}
 			$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit();");
 
 			$result=DBselect($sql);
-			while($row=DBfetch($result))
-			{
+			while($row=DBfetch($result)){
 				$cmbHosts->AddItem($row["hostid"],$row["host"]);
 			}
 
@@ -964,8 +974,7 @@ include_once "include/page_header.php";
 
 			$table = new CTableInfo();
 			$table->SetHeader(array(
-				array(new CCheckBox("all_applications",NULL,
-					"CheckAll('".$form->GetName()."','all_applications');"),
+				array(new CCheckBox("all_applications",NULL,"CheckAll('".$form->GetName()."','all_applications');"),
 				SPACE,
 				S_APPLICATION),
 				S_SHOW
@@ -996,9 +1005,7 @@ include_once "include/page_header.php";
 
 
 				$table->AddRow(array(
-					array(new CCheckBox("applications[]",NULL,NULL,$db_app["applicationid"]),
-					SPACE,
-					$name),
+					array(new CCheckBox("applications[]",NULL,NULL,$db_app["applicationid"]),SPACE,$name),
 					array(new CLink(S_ITEMS,"items.php?hostid=".$db_app["hostid"],"action"),
 					SPACE."($rows)")
 					));

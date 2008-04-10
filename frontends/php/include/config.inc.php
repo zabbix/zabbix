@@ -18,7 +18,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-function SDI($msg="SDI") { echo "DEBUG INFO: "; var_export($msg); echo BR; } // DEBUG INFO!!!
+function SDI($msg="SDI") { echo "DEBUG INFO: "; var_dump($msg); echo BR; } // DEBUG INFO!!!
 function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo BR; } // DEBUG INFO!!!
 function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
