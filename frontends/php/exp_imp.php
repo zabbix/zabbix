@@ -262,8 +262,7 @@ include_once "include/page_header.php";
 			
 			$table->ShowEnd();
 		}
-		else
-		{
+		else{
 	/* table HOSTS */
 			$form = new CForm(null,'post');
 			$form->SetName('hosts');
@@ -272,17 +271,18 @@ include_once "include/page_header.php";
 			
 			$cmbGroups = new CComboBox("groupid",get_request("groupid",0),"submit()");
 			$cmbGroups->AddItem(0,S_ALL_SMALL);
-			$result=DBselect("select distinct g.groupid,g.name from groups g,hosts_groups hg,hosts h".
-					" where h.hostid in (".$available_hosts.") ".
-					" and g.groupid=hg.groupid and h.hostid=hg.hostid".
-					" order by g.name");
-			while($row=DBfetch($result))
-			{
+			$result=DBselect('select distinct g.groupid,g.name '.
+					' from groups g,hosts_groups hg,hosts h'.
+					' where h.hostid in ('.$available_hosts.') '.
+						' and g.groupid=hg.groupid '.
+						' and h.hostid=hg.hostid '.
+					' order by g.name');
+			while($row=DBfetch($result)){
 				$cmbGroups->AddItem($row["groupid"],$row["name"]);
 				if((bccomp($row["groupid"] , $_REQUEST["groupid"])==0)) $correct_host = 1;
 			}
-			if(!isset($correct_host))
-			{
+			
+			if(!isset($correct_host)){
 				unset($_REQUEST["groupid"]);
 				$cmbGroups->SetValue(0);
 			}
@@ -329,8 +329,8 @@ include_once "include/page_header.php";
 
 			$result=DBselect($sql);
 		
-			while($row=DBfetch($result))
-			{
+			while($row=DBfetch($result)){
+			
 				$host=new CCol(array(
 					new CCheckBox('hosts['.$row['hostid'].']',
 						isset($hosts[$row['hostid']]) || !isset($update),
@@ -358,15 +358,13 @@ include_once "include/page_header.php";
 								
 				/* calculate items */
 				$item_cnt = DBfetch(DBselect('select count(itemid) as cnt from items where hostid='.$row['hostid']));
-				if($item_cnt['cnt'] > 0)
-				{
+				if($item_cnt['cnt'] > 0){
 					$item_cnt = array(new CCheckBox('items['.$row['hostid'].']',
 							isset($items[$row['hostid']]) || !isset($update),
 							NULL,true),
 						$item_cnt['cnt']);
 				}
-				else
-				{
+				else{
 					$item_cnt = '-';
 				}
 				
@@ -407,21 +405,19 @@ include_once "include/page_header.php";
 				
 				/* $screens = 0; */
 
-				if($row["status"] == HOST_STATUS_TEMPLATE)
-				{
+				if($row["status"] == HOST_STATUS_TEMPLATE){
 					$ip = $dns = $port = '-';
 				}
-				else
-				{
-					$ip = $row["ip"];
-					$dns = $row["dns"];
+				else{
+					$ip = (empty($row["ip"]))?'-':$row["ip"];
+					$dns = (empty($row["dns"]))?'-':$row["dns"];
 
 					if($row["useip"]==1)
 						$ip = bold($ip);
 					else
 						$dns = bold($dns);
 
-					$port = $row["port"];
+					$port = (empty($row["port"]))?'-':$row["port"];
 				}
 
 				$table->AddRow(array(

@@ -23,6 +23,7 @@
 /* public */
 		function CCol($item=NULL,$class=NULL){
 			parent::CTag("td","yes");
+			
 			$this->AddItem($item);
 			$this->SetClass($class);
 		}
