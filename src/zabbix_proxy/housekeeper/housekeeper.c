@@ -110,11 +110,7 @@ static int housekeeping_history(int now)
 
         zabbix_log(LOG_LEVEL_DEBUG, "In housekeeping_history()");
 
-	records += delete_history("history_sync", "history_lastid", now);
-	records += delete_history("history_uint_sync", "history_uint_lastid", now);
-	records += delete_history("history_str_sync", "history_str_lastid", now);
-	records += delete_history("history_text", "history_text_lastid", now);
-	records += delete_history("history_log", "history_log_lastid", now);
+	records += delete_history("proxy_history", "history_lastid", now);
 	records += delete_history("proxy_dhistory", "dhistory_lastid", now);
 
         return records;

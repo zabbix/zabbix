@@ -625,27 +625,27 @@ static int	proxy_add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 	if(item->value_type==ITEM_VALUE_TYPE_UINT64)
 	{
 		if(GET_UI64_RESULT(value))
-			DBproxy_add_history_uint(item->itemid,value->ui64,now);
+			DBproxy_add_history_uint(item->host_name, item->key, now, value->ui64);
 	}
 	else if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 	{
 		if(GET_DBL_RESULT(value))
-			DBproxy_add_history(item->itemid,value->dbl,now);
+			DBproxy_add_history(item->host_name, item->key, now, value->dbl);
 	}
 	else if(item->value_type==ITEM_VALUE_TYPE_STR)
 	{
 		if(GET_STR_RESULT(value))
-			DBproxy_add_history_str(item->itemid,value->str,now);
+			DBproxy_add_history_str(item->host_name, item->key, now, value->str);
 	}
 	else if(item->value_type==ITEM_VALUE_TYPE_LOG)
 	{
 		if(GET_STR_RESULT(value))
-			DBproxy_add_history_log(0, item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
+			DBproxy_add_history_log(item->host_name, item->key, now, item->timestamp, item->eventlog_source, item->eventlog_severity, value->str);
 	}
 	else if(item->value_type==ITEM_VALUE_TYPE_TEXT)
 	{
 		if(GET_TEXT_RESULT(value))
-			DBproxy_add_history_text(item->itemid,value->text,now);
+			DBproxy_add_history_text(item->host_name, item->key, now, value->text);
 	}
 	else
 	{
