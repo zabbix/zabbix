@@ -46,36 +46,10 @@ struct last_ids {
 };
 
 static ZBX_HISTORY_TABLE ht[]={
-	{"history_sync", "history_lastid",
+	{"proxy_history", "history_lastid",
 		{
-		{"clock",	ZBX_PROTO_TAG_CLOCK},
-		{"value",	ZBX_PROTO_TAG_VALUE},
-		{NULL}
-		}
-	},
-	{"history_uint_sync", "history_uint_lastid",
-		{
-		{"clock",	ZBX_PROTO_TAG_CLOCK},
-		{"value",	ZBX_PROTO_TAG_VALUE},
-		{NULL}
-		}
-	},
-	{"history_str_sync", "history_str_lastid",
-		{
-		{"clock",	ZBX_PROTO_TAG_CLOCK},
-		{"value",	ZBX_PROTO_TAG_VALUE},
-		{NULL}
-		}
-	},
-	{"history_text", "history_text_lastid",
-		{
-		{"clock",	ZBX_PROTO_TAG_CLOCK},
-		{"value",	ZBX_PROTO_TAG_VALUE},
-		{NULL}
-		}
-	},
-	{"history_log", "history_log_lastid",
-		{
+		{"host",	ZBX_PROTO_TAG_HOST},
+		{"key_",	ZBX_PROTO_TAG_KEY},
 		{"clock",	ZBX_PROTO_TAG_CLOCK},
 		{"timestamp",	ZBX_PROTO_TAG_LOGTIMESTAMP},
 		{"source",	ZBX_PROTO_TAG_LOGSOURCE},
@@ -225,14 +199,14 @@ static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx
 
 	get_lastid(ht, &id);
 
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select d.id,h.host,i.key_");
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select id");
 
 	for (f = 0; ht->fields[f].field != NULL; f ++)
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",d.%s",
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",%s",
 				ht->fields[f].field);
 
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from hosts h,items i,%s d"
-			" where h.hostid=i.hostid and i.itemid=d.itemid and d.id>" ZBX_FS_UI64 " order by d.id",
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s"
+			" where id>" ZBX_FS_UI64 " order by id",
 			ht->table,
 			id);
 
@@ -245,8 +219,6 @@ static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx
 
 		*lastid = zbx_atoui64(row[0]);
 
-		zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, row[1], ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(j, ZBX_PROTO_TAG_KEY, row[2], ZBX_JSON_TYPE_STRING);
 		for (f = 0; ht->fields[f].field != NULL; f ++) {
 			field = DBget_field(table, ht->fields[f].field);
 
@@ -261,7 +233,7 @@ static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx
 				break;
 			}
 
-			zbx_json_addstring(j, ht->fields[f].tag, row[f + 3], jt);
+			zbx_json_addstring(j, ht->fields[f].tag, row[f + 1], jt);
 		}
 
 		records++;
