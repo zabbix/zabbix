@@ -287,7 +287,7 @@ include_once "include/page_header.php";
 			$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.value, e.acknowledged '.
 					' FROM events e '.
 					' WHERE (e.object+0)='.EVENT_OBJECT_TRIGGER.
-					' AND '.DBin_condition('e.objectid', $trigger_list).
+						' AND '.DBin_condition('e.objectid', $trigger_list).
 						$sql_cond.
 					order_by('e.clock');
 //SDI($sql);
