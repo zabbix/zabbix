@@ -252,15 +252,16 @@ include_once "include/page_header.php";
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 		$cmbHosts->AddItem(0,S_DEFAULT);
 		
-
-		$result=DBselect('SELECT DISTINCT g.groupid, g.name '.
+		$sql = 'SELECT DISTINCT g.groupid, g.name '.
 					' FROM groups g, hosts_groups hg, hosts h, items i '.
 					' WHERE g.groupid in ('.$availiable_groups.') '.
 						' AND hg.groupid=g.groupid '.
 						' AND h.status='.HOST_STATUS_MONITORED.
 						' AND h.hostid=i.hostid '.
 						' AND hg.hostid=h.hostid '.
-					' ORDER BY g.name');
+					' ORDER BY g.name';
+
+		$result=DBselect($sql);
 		while($row=DBfetch($result)){
 			$cmbGroup->AddItem(
 					$row['groupid'],

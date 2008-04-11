@@ -616,53 +616,47 @@ else {
 		return (' '.DBid2nodeid($id_name).' in ('.$nodes.') ');
 	}
 
-	function in_node( $id_var, $nodes = null )
-	{
-		if ( is_null($nodes) )	$nodes = get_current_nodeid();
+	function in_node( $id_var, $nodes = null ){
+		if(is_null($nodes))	
+			$nodes = get_current_nodeid();
 
-		if ( empty($nodes) )	$nodes = 0;
+		if(empty($nodes))
+			$nodes = 0;
 
-		if ( is_numeric($nodes) )
-		{
+		if(is_numeric($nodes)){
 			$nodes = array($nodes);
 		}
-		else if ( is_string($nodes) )
-		{
-			if ( !eregi('([0-9\,]+)', $nodes ) )
+		else if(is_string($nodes)){
+			if(!eregi('([0-9\,]+)',$nodes))
 				fatal_error('Incorrect "nodes" for "in_node". Passed ['.$nodes.']');
-
+				
 			$nodes = explode(',', $nodes);
 		}
-		else if ( !is_array($nodes) )
-		{
+		else if (!is_array($nodes)){
 			fatal_error('Incorrect type of "nodes" for "in_node". Passed ['.gettype($nodes).']');
 		}
 
-		return uint_in_array(id2nodeid($id_var), $nodes);
+	return uint_in_array(id2nodeid($id_var), $nodes);
 	}
 
-	function	get_dbid($table,$field)
-	{
+	function	get_dbid($table,$field){
 		$nodeid = get_current_nodeid(false);
 
 		$found = false;
-		do
-		{
+		do{
 			global $ZBX_LOCALNODEID;
 
 			$min=bcadd(bcmul($nodeid,"100000000000000"),bcmul($ZBX_LOCALNODEID,"100000000000"));
 			$max=bcadd(bcadd(bcmul($nodeid,"100000000000000"),bcmul($ZBX_LOCALNODEID,"100000000000")),"99999999999");
 			$row = DBfetch(DBselect("select nextid from ids where nodeid=$nodeid and table_name='$table' and field_name='$field'"));
-			if(!$row)
-			{
+			if(!$row){
 				$row=DBfetch(DBselect("select max($field) as id from $table where $field>=$min and $field<=$max"));
-				if(!$row || is_null($row["id"]))
-				{
+				if(!$row || is_null($row["id"])){
+				
 					DBexecute("insert into ids (nodeid,table_name,field_name,nextid) ".
 						" values ($nodeid,'$table','$field',$min)");
 				}
-				else
-				{
+				else{
 					/*
 					$ret1 = $row["id"];
 					if($ret1 >= $max) {
@@ -674,8 +668,7 @@ else {
 				}
 				continue;
 			}
-			else
-			{
+			else{
 				$ret1 = $row["nextid"];
 				if((bccomp($ret1,$min) < 0) || !(bccomp($ret1,$max) < 0)) {
 					DBexecute("delete from ids where nodeid=$nodeid and table_name='$table' and field_name='$field'");
