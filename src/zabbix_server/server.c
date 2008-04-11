@@ -842,7 +842,7 @@ void test()
 		zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_DEBUG,CONFIG_LOG_FILE);
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
+	zabbix_log( LOG_LEVEL_INFORMATION, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
 
 	printf("-= Test Started =-\n\n");
 
@@ -1270,7 +1270,7 @@ void	zbx_on_exit()
 	php_sem_remove(&sqlite_access);
 #endif /* HAVE_SQLITE3 */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Server stopped");
+	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Server stopped. ZABBIX %s.", ZABBIX_VERSION);
 
 	exit(SUCCEED);
 }
