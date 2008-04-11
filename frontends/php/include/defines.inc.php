@@ -495,8 +495,8 @@ if((ini_get('mbstring.func_overload') > 5)){
 	define('ZBX_EXPRESSION_MACRO_ID', 13);
 	define('ZBX_EXPRESSION_RIGHT_ID', 14);
 
-	define('ZBX_MIN_PERIOD', 3600);
-	define('ZBX_MAX_PERIOD', 12*31*24*3600);
+	define('ZBX_MIN_PERIOD', 3600);				// ~1 hour
+	define('ZBX_MAX_PERIOD', 12*31*24*3600);	// ~1 year
 	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
 	
 	define('ZBX_HISTORY_COUNT',5);
@@ -506,6 +506,10 @@ if((ini_get('mbstring.func_overload') > 5)){
 	define('ZBX_DEFAULT_CSS','default.css');
 	
 	define('ZBX_FAVORITES_ALL', -1);
+
+// Allow for testing 
+	define('ZBX_ALLOW_UNICODE',1);
+	
 
 /* Define if your logs are in non-standard format */
 /*	define('ZBX_LOG_ENCODING_DEFAULT', 'Shift_JIS');*/
