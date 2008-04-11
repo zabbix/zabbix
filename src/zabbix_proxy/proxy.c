@@ -607,7 +607,7 @@ void	zbx_on_exit()
 	php_sem_remove(&sqlite_access);
 #endif /* HAVE_SQLITE3 */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Server stopped");
+	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Server stopped. ZABBIX %s.", ZABBIX_VERSION);
 
 	exit(SUCCEED);
 }

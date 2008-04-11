@@ -329,7 +329,7 @@ void	zbx_on_exit()
 
 	zbx_sleep(2); /* wait for all threads closing */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Agent stopped");
+	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Agent stopped. ZABBIX %s.", ZABBIX_VERSION);
 
 	zabbix_close_log();
 
