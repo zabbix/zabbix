@@ -269,7 +269,6 @@ DB_ITEM
 	int	host_available;
 	int	host_errors_from;
 	int	useip;
-	char	*shortname;
 	char	*snmp_community;
 	char	*snmp_oid;
 	int	snmp_port;
