@@ -197,7 +197,7 @@
 			return $available_triggers[$perm][$perm_res][$nodeid_str][$hostid_str];
 		}
 
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, null, null, $nodeid);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, null, $nodeid);
 		
 		$denied_graphs = array();
 		$available_graphs = array();
@@ -1467,27 +1467,26 @@
 		return $result;
 	}
 
-	function	check_right_on_trigger_by_triggerid($permission,$triggerid,$accessible_hosts=null)
+	function	check_right_on_trigger_by_triggerid($permission,$triggerid,$available_hosts=null)
 	{
 		$trigger_data = DBfetch(DBselect('select expression from triggers where triggerid='.$triggerid));
 
 		if(!$trigger_data) return false;
 
-		return check_right_on_trigger_by_expression($permission, explode_exp($trigger_data['expression'], 0), $accessible_hosts);
+		return check_right_on_trigger_by_expression($permission, explode_exp($trigger_data['expression'], 0), $available_hosts);
 	}
 
-	function	check_right_on_trigger_by_expression($permission,$expression,$accessible_hosts=null)
+	function	check_right_on_trigger_by_expression($permission,$expression,$available_hosts=null)
 	{
-		if(is_null($accessible_hosts))
+		if(is_null($available_hosts))
 		{
 			global $USER_DETAILS;
-			$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission, null, PERM_RES_IDS_ARRAY);
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission, PERM_RES_IDS_ARRAY);
 		}
-		if(!is_array($accessible_hosts)) $accessible_hosts = explode(',', $accessible_hosts);
+		if(!is_array($available_hosts)) $available_hosts = explode(',', $available_hosts);
                 $db_hosts = get_hosts_by_expression($expression);
-		while($host_data = DBfetch($db_hosts))
-		{
-			if(!uint_in_array($host_data['hostid'], $accessible_hosts)) return false;
+		while($host_data = DBfetch($db_hosts)){
+			if(!uint_in_array($host_data['hostid'], $available_hosts)) return false;
 		}
 
 		return true;
@@ -1817,7 +1816,7 @@
 				' AND h.hostid=i.hostid '.
 				' AND i.itemid=f.itemid '.
 				' AND f.triggerid=t.triggerid'.
-				' AND h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid()).') '.
+				' AND h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).') '.
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 			' ORDER BY t.description');

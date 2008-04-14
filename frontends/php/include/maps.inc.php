@@ -113,7 +113,7 @@
 
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, null);
+						$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 						
 						$sql = 'SELECT g.groupid '.
 							' FROM groups g '.
@@ -192,16 +192,12 @@
 		while($rows = DBfetch($res)){
 			$result&=delete_link($rows['linkid']);
 		}
-//		$result = DBexecute("delete FROM sysmaps_links WHERE sysmapid=$sysmapid");
-//		if(!$result)	return	$result;
 
-		$result = DBexecute("delete FROM sysmaps_elements WHERE sysmapid=$sysmapid");
-		if(!$result)	return	$result;
+		$result = DBexecute('delete FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
+		$result &= DBexecute('DELETE FROM profiles WHERE idx="web.favorite.sysmapids" AND resource="sysmapid" AND value='.$sysmapid);
+		$result &= DBexecute('DELETE FROM sysmaps WHERE sysmapid='.$sysmapid);
 		
-		$result = rm4favorites('web.favorite.sysmapids',$sysmapd,ZBX_FAVORITES_ALL,'sysmapid');
-		if(!$result)	return	$result;
-
-	return DBexecute("delete FROM sysmaps WHERE sysmapid=$sysmapid");
+	return $result;
 	}
 
 // LINKS

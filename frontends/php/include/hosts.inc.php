@@ -423,10 +423,7 @@ require_once "include/items.inc.php";
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	delete_host($hostid, $unlink_mode = false)
-	{
-		global $DB_TYPE;
-
+	function	delete_host($hostid, $unlink_mode = false){
 		$ret = false;
 
 	// unlink child hosts
@@ -438,8 +435,7 @@ require_once "include/items.inc.php";
 
 	// delete items -> triggers -> graphs
 		$db_items = get_items_by_hostid($hostid);
-		while($db_item = DBfetch($db_items))
-		{
+		while($db_item = DBfetch($db_items)){
 			delete_item($db_item["itemid"]);
 		}
 
@@ -735,7 +731,7 @@ require_once "include/items.inc.php";
 
 		$with_node = '';
 
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,null,null,get_current_nodeid(!$only_current_node));
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,null,get_current_nodeid(!$only_current_node));
 
 		if(is_null($a_groupid)){
 			$groupid = 0;

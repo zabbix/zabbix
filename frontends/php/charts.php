@@ -134,8 +134,8 @@ include_once 'include/page_header.php';
 <?php
 	$h1 = array(S_GRAPHS_BIG.SPACE."/".SPACE);
 	
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
 	
 	$available_graphs = get_accessible_graphs(PERM_READ_LIST, null, get_current_nodeid());
 	

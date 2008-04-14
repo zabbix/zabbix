@@ -388,7 +388,7 @@ COpt::profiling_start("page");
     <link rel="stylesheet" href="css.css" />
 <?php
 	global $DB;
-	if(!is_null($DB)){
+	if(!is_null($DB['DB'])){
 		$css = false;
 		$config=select_config();		
 		if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
@@ -567,7 +567,8 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		
 		$table->AddRow($tr);
 		$table->Show();
-	} elseif(($page["type"] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')) {
+	} 
+	else if(($page["type"] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')) {
 		echo SBR;
 	}
 //------------------------------------ </HISTORY> ---------------------------------------

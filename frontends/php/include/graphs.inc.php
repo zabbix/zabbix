@@ -197,7 +197,7 @@
 		if(is_null($perm_res))
 			$perm_res = PERM_RES_STRING_LINE;
 		
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, null, null, $nodeid);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, null, $nodeid);
 		
 		$denied_graphs = array();
 		$result = array();
@@ -220,7 +220,7 @@
 					(!empty($hostid)?' AND i.hostid='.$hostid:'').
 					' AND i.itemid=gi.itemid '.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
-					(!empty($denied_graphs)?' AND g.graphid  NOT IN ('.implode(',',$denied_graphs).')':'');
+					(!empty($denied_graphs)?' AND g.graphid NOT IN ('.implode(',',$denied_graphs).')':'');
 					
 		$db_graphs = DBselect($sql);
 		while($graph = DBfetch($db_graphs)){
@@ -632,21 +632,20 @@
 		while($db_host = DBfetch($db_hosts)){
 			$host_list[] = '"'.$db_host['host'].'"';
 		}
-
+		
+		$result = true;
 		/* firstly remove child graphs */
 		$chd_graphs = get_graphs_by_templateid($graphid);
-		while($chd_graph = DBfetch($chd_graphs))
-		{ /* recursion */
-			if ( !($result = delete_graph($chd_graph['graphid'])) )
-				return $result;
+		while($chd_graph = DBfetch($chd_graphs)){ /* recursion */
+			$result &= delete_graph($chd_graph['graphid']);
 		}
 
-		DBexecute('delete from screens_items where resourceid='.$graphid.' and resourcetype='.SCREEN_RESOURCE_GRAPH);
+		$result &= DBexecute('DELETE FROM screens_items WHERE resourceid='.$graphid.' AND resourcetype='.SCREEN_RESOURCE_GRAPH);
 
 		/* delete graph */
-		$result = DBexecute('DELETE FROM graphs_items WHERE graphid='.$graphid);
+		$result &= DBexecute('DELETE FROM graphs_items WHERE graphid='.$graphid);
 		$result &= DBexecute('DELETE FROM graphs WHERE graphid='.$graphid);
-		$result &= rm4favorites('web.favorite.graphids',$graphid,ZBX_FAVORITES_ALL,'graphid');
+		$result &= DBexecute('DELETE FROM profiles WHERE idx="web.favorite.graphids" AND resource="graphid" AND value='.$graphid);
 		
 		if($result){
 			info('Graph "'.$graph['name'].'" deleted from hosts '.implode(',',$host_list));

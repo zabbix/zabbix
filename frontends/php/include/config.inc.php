@@ -90,7 +90,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	set_error_handler('zbx_err_handler');
 
-	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 	global $ZBX_LOCALES;
 
@@ -264,8 +264,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			define('ZBX_DISABLE_SUBNODES', 1);
 	}
 
-	function	get_current_nodeid( $forse_with_subnodes = null, $perm = null ){
-		global	$ZBX_CURRENT_NODEID, $ZBX_CURRENT_SUBNODES, $ZBX_WITH_SUBNODES;
+	function get_current_nodeid($forse_with_subnodes = null, $perm = null){
+		global $USER_DETAILS, $ZBX_CURRENT_NODEID, $ZBX_CURRENT_SUBNODES, $ZBX_WITH_SUBNODES;
 
 		if(!isset($ZBX_CURRENT_NODEID))
 			init_nodes();
@@ -273,14 +273,13 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$result = ( is_show_subnodes($forse_with_subnodes) ? $ZBX_CURRENT_SUBNODES : $ZBX_CURRENT_NODEID );
 		
 		if(!is_null($perm)){
-			global $USER_DETAILS;
 			$result = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY, null, null, $result);
 		}
 
 	return $result;
 	}
 
-	function	get_node_name_by_elid($id_val, $forse_with_subnodes = null){
+	function get_node_name_by_elid($id_val, $forse_with_subnodes = null){
 		global $ZBX_NODES;
 
 		if ( ! is_show_subnodes($forse_with_subnodes) )
@@ -294,7 +293,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return '['.$ZBX_NODES[$nodeid]['name'].'] ';
 	}
 
-	function	is_show_subnodes($forse_with_subnodes = null){
+	function is_show_subnodes($forse_with_subnodes = null){
 		global	$ZBX_WITH_SUBNODES;
 
 		if ( is_null($forse_with_subnodes)){
@@ -1081,7 +1080,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 
 	function	get_status(){
-		global $DB_TYPE;
+		global $DB;
 		$status = array();
 // server
 		if( (exec('ps -ef|grep zabbix_server|grep -v grep|wc -l')>0) || (exec('ps -ax|grep zabbix_server|grep -v grep|wc -l')>0) ){
@@ -1091,7 +1090,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			$status["zabbix_server"] = S_NO;
 		}
 // history & trends
-/*		if ($DB_TYPE == "MYSQL")
+/*		if ($DB['DB_TYPE'] == "MYSQL")
 		{
 			$row=DBfetch(DBselect("show table status like 'history'"));
 			$status["history_count"]  = $row["Rows"];

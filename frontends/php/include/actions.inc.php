@@ -609,8 +609,7 @@ include_once 'include/discovery.inc.php';
 		{
 			case CONDITION_TYPE_HOST_GROUP:
 				if(!uint_in_array($value,
-					get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,
-						PERM_RES_IDS_ARRAY)))
+					get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY)))
 				{
 					error(S_INCORRECT_GROUP);
 					return false;
@@ -626,8 +625,7 @@ include_once 'include/discovery.inc.php';
 				break;
 			case CONDITION_TYPE_HOST:
 				if(!uint_in_array($value,
-					get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,
-						PERM_RES_IDS_ARRAY)))
+					get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY)))
 				{
 					error(S_INCORRECT_HOST);
 					return false;
@@ -718,8 +716,7 @@ include_once 'include/discovery.inc.php';
 			case OPERATION_TYPE_GROUP_ADD:
 			case OPERATION_TYPE_GROUP_REMOVE:
 				if(!uint_in_array($operation['objectid'],
-					get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
-						PERM_RES_IDS_ARRAY)))
+					get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				{
 					error(S_INCORRECT_GROUP);
 					return false;
@@ -728,8 +725,7 @@ include_once 'include/discovery.inc.php';
 			case OPERATION_TYPE_TEMPLATE_ADD:
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
 				if(!uint_in_array($operation['objectid'],
-					get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,
-						PERM_RES_IDS_ARRAY)))
+					get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				{
 					error(S_INCORRECT_HOST);
 					return false;

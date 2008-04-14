@@ -38,6 +38,8 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
+	
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 ?>
 
 <?php
@@ -80,9 +82,7 @@ include_once "include/page_header.php";
 			' AND i.nextcheck<'.$now.
 			" AND i.key_ not in ('status','icmpping','icmppingsec','zabbix[log]') ".
 			' AND i.value_type not in ('.ITEM_VALUE_TYPE_LOG.') '.
-			' AND h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).')'.
-//			' AND h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,$ZBX_LOCALNODEID).')'.
-//			' AND '.DBin_node('h.hostid', $ZBX_LOCALNODEID).
+			' AND h.hostid in ('.$available_hosts.')'.
 			' AND '.DBin_node('h.hostid', get_current_nodeid()).
 		' order by i.nextcheck,h.host,i.description,i.key_');
 

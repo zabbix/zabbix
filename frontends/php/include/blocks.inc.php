@@ -28,10 +28,14 @@ require_once "include/maps.inc.php";
 function make_favorite_graphs(){
 	$table = new CTableInfo();
 	
-	$fav_graphs = get4favorites('web.favorite.graphids');
+	$fav_graphs = get_multi_profile('web.favorite.graphids');
 	
-	foreach($fav_graphs['id'] as $key => $resourceid){
-		if('itemid' == $fav_graphs['resource'][$key]){
+	foreach($fav_graphs as $key => $favorite){
+		
+		$resource = $favorite['resource'];
+		$resourceid = $favorite['value'];
+
+		if('itemid' == $resource){
 			if(!$item = get_item_by_itemid($resourceid)) continue;
 	
 			$host = get_host_by_itemid($resourceid);
@@ -81,9 +85,13 @@ return $table;
 function make_favorite_screens(){
 	$table = new CTableInfo();
 	
-	$fav_screens = get4favorites('web.favorite.screenids');
-	foreach($fav_screens['id'] as $key => $resourceid){
-		if('slideshowid' == $fav_screens['resource'][$key]){
+	$fav_screens = get_multi_profile('web.favorite.screenids');
+
+	foreach($fav_screens as $key => $favorite){
+		$resource = $favorite['resource'];
+		$resourceid = $favorite['value'];
+
+		if('slideshowid' == $resource){
 			if(!$slide = get_slideshow_by_slideshowid($resourceid)) continue;
 			if(!slideshow_accessible($resourceid, PERM_READ_ONLY)) continue;
 
@@ -129,9 +137,13 @@ return $table;
 function make_favorite_maps(){
 	$table = new CTableInfo();
 	
-	$fav_sysmaps = get4favorites('web.favorite.sysmapids');
+	$fav_sysmaps = get_multi_profile('web.favorite.sysmapids');
 	
-	foreach($fav_sysmaps['id'] as $key => $resourceid){
+	foreach($fav_sysmaps as $key => $favorite){
+	
+		$resource = $favorite['resource'];
+		$resourceid = $favorite['value'];
+		
 		if(!$sysmap = get_sysmap_by_sysmapid($resourceid)) continue;
 		if(!sysmap_accessible($resourceid,PERM_READ_ONLY)) continue;
 		
@@ -164,8 +176,8 @@ function make_system_summary(){
 	global $USER_DETAILS;
 	$config=select_config();
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
-	$available_triggers = get_accessible_triggers(PERM_READ_LIST, null, get_current_nodeid());
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_triggers = get_accessible_triggers(PERM_READ_LIST);
 		
 	$table = new CTableInfo();
 	$table->SetHeader(array(
@@ -498,8 +510,8 @@ return 	$table;
 function make_latest_issues(){
 	global $USER_DETAILS;
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
-	$available_triggers = get_accessible_triggers(PERM_READ_LIST, null, get_current_nodeid());
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_triggers = get_accessible_triggers(PERM_READ_LIST);
 
 	$scripts_by_hosts = get_accessible_scripts_by_hosts(explode(',',$available_hosts));
 	$config=select_config();
@@ -669,7 +681,7 @@ return $table;
 function make_webmon_overview(){
 	global $USER_DETAILS;
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 
 	$table  = new CTableInfo();
 	$table->SetHeader(array(
@@ -742,7 +754,7 @@ return $table;
 function make_latest_data(){
 	global $USER_DETAILS;
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	
 	while($db_app = DBfetch($db_applications)){
 		$db_items = DBselect('SELECT DISTINCT i.* '.
@@ -879,9 +891,14 @@ function make_graph_menu(&$menu,&$submenu){
 function make_graph_submenu(){
 	$graphids = array();
 	
-	$fav_graphs = get4favorites('web.favorite.graphids');
-	foreach($fav_graphs['id'] as $key => $resourceid){
-		if('itemid' == $fav_graphs['resource'][$key]){
+	$fav_graphs = get_multi_profile('web.favorite.graphids');
+	
+	foreach($fav_graphs as $key => $favorite){
+		
+		$resource = $favorite['resource'];
+		$resourceid = $favorite['value'];
+
+		if('itemid' == $resource){
 			if(!$item = get_item_by_itemid($resourceid)) continue;
 			
 			$item_added = true;
@@ -957,9 +974,13 @@ function make_sysmap_menu(&$menu,&$submenu){
 
 function make_sysmap_submenu(){
 	$sysmapids = array();
-	$fav_sysmaps = get4favorites('web.favorite.sysmapids');
+	$fav_sysmaps = get_multi_profile('web.favorite.sysmapids');
 	
-	foreach($fav_sysmaps['id'] as $key => $resourceid){
+	foreach($fav_sysmaps as $key => $favorite){
+	
+		$resource = $favorite['resource'];
+		$resourceid = $favorite['value'];
+		
 		if(!$sysmap = get_sysmap_by_sysmapid($resourceid)) continue;
 
 		$sysmapids[] = array( 
@@ -1020,9 +1041,13 @@ function make_screen_menu(&$menu,&$submenu){
 function make_screen_submenu(){
 	$screenids = array();
 	
-	$fav_screens = get4favorites('web.favorite.screenids');
-	foreach($fav_screens['id'] as $key => $resourceid){
-		if('slideshowid' == $fav_screens['resource'][$key]){
+	$fav_screens = get_multi_profile('web.favorite.screenids');
+
+	foreach($fav_screens as $key => $favorite){
+		$resource = $favorite['resource'];
+		$resourceid = $favorite['value'];
+
+		if('slideshowid' == $resource){
 			if(!$slide = get_slideshow_by_slideshowid($resourceid)) continue;
 			$slide_added = true;
 			

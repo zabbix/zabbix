@@ -80,7 +80,7 @@ include_once "include/page_header.php";
 	
 	$showdisabled = get_request("showdisabled", 0);
 	
-	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid());
+	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 
 	if(isset($_REQUEST['hostid']) && !uint_in_array($_REQUEST['hostid'], explode(',',$accessible_hosts)))
 	{

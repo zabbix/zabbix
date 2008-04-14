@@ -74,33 +74,31 @@ include_once "include/page_header.php";
 	update_profile('web.screenconf.config', $_REQUEST['config']);
 ?>
 <?php
-	if( 0 == $config )
-	{
-		if(isset($_REQUEST["screenid"]))
-		{
+	if( 0 == $config ){
+		if(isset($_REQUEST["screenid"])){
 			if(!screen_accessible($_REQUEST["screenid"], PERM_READ_WRITE))
 				access_deny();
 		}
 
-		if(isset($_REQUEST['clone']) && isset($_REQUEST['screenid']))
-		{
+		if(isset($_REQUEST['clone']) && isset($_REQUEST['screenid'])){
 			unset($_REQUEST['screenid']);
 			$_REQUEST['form'] = 'clone';
 		}
-		else if(isset($_REQUEST['save']))
-		{
-			if(isset($_REQUEST["screenid"]))
-			{
+		else if(isset($_REQUEST['save'])){
+			if(isset($_REQUEST["screenid"])){
 				// TODO check permission by new value.
-				$result=update_screen($_REQUEST["screenid"],
-					$_REQUEST["name"],$_REQUEST["hsize"],$_REQUEST["vsize"]);
+				$result=update_screen($_REQUEST["screenid"],$_REQUEST["name"],$_REQUEST["hsize"],$_REQUEST["vsize"]);
 				$audit_action = AUDIT_ACTION_UPDATE;
 				show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
-			} else {
+			} 
+			else {
 				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 					access_deny();
-
-				$result=add_screen($_REQUEST["name"],$_REQUEST["hsize"],$_REQUEST["vsize"]);
+				
+				DBstart();
+				add_screen($_REQUEST["name"],$_REQUEST["hsize"],$_REQUEST["vsize"]);
+				$result = DBend();
+				
 				$audit_action = AUDIT_ACTION_ADD;
 				show_messages($result,S_SCREEN_ADDED,S_CANNOT_ADD_SCREEN);
 			}
@@ -110,11 +108,12 @@ include_once "include/page_header.php";
 				unset($_REQUEST["screenid"]);
 			}
 		}
-		if(isset($_REQUEST["delete"])&&isset($_REQUEST["screenid"]))
-		{
-			if($screen = get_screen_by_screenid($_REQUEST["screenid"]))
-			{
-				$result = delete_screen($_REQUEST["screenid"]);
+		if(isset($_REQUEST["delete"])&&isset($_REQUEST["screenid"])){
+			if($screen = get_screen_by_screenid($_REQUEST["screenid"])){
+				DBstart();
+					delete_screen($_REQUEST["screenid"]);
+				$result = DBend();
+				
 				show_messages($result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
 				add_audit_if($result, AUDIT_ACTION_DELETE,AUDIT_RESOURCE_SCREEN," Name [".$screen['name']."] ");
 			}
@@ -122,32 +121,32 @@ include_once "include/page_header.php";
 			unset($_REQUEST["form"]);
 		}
 	}
-	else
-	{
-		if(isset($_REQUEST['slideshowid']))
-		{
+	else{
+		if(isset($_REQUEST['slideshowid'])){
 			if(!slideshow_accessible($_REQUEST['slideshowid'], PERM_READ_WRITE))
 				access_deny();
 		}
 
-		if(isset($_REQUEST['clone']) && isset($_REQUEST['slideshowid']))
-		{
+		if(isset($_REQUEST['clone']) && isset($_REQUEST['slideshowid'])){
 			unset($_REQUEST['slideshowid']);
 			$_REQUEST['form'] = 'clone';
 		}
-		else if(isset($_REQUEST['save']))
-		{
+		else if(isset($_REQUEST['save'])){
 			$slides = get_request('steps', array());
 
-			if(isset($_REQUEST['slideshowid']))
-			{ /* update */
-				$result=update_slideshow($_REQUEST['slideshowid'],$_REQUEST['name'],$_REQUEST['delay'],$slides);
+			if(isset($_REQUEST['slideshowid'])){ /* update */
+				DBstart();
+				update_slideshow($_REQUEST['slideshowid'],$_REQUEST['name'],$_REQUEST['delay'],$slides);
+				$result = DBend();
+				
 				$audit_action = AUDIT_ACTION_UPDATE;
 				show_messages($result, S_SLIDESHOW_UPDATED, S_CANNOT_UPDATE_SLIDESHOW);
 			}
-			else
-			{ /* add */
-				$result=add_slideshow($_REQUEST['name'],$_REQUEST['delay'],$slides);
+			else{ /* add */
+				DBstart();
+				add_slideshow($_REQUEST['name'],$_REQUEST['delay'],$slides);
+				$result = DBend();
+				
 				$audit_action = AUDIT_ACTION_ADD;
 				show_messages($result, S_SLIDESHOW_ADDED, S_CANNOT_ADD_SLIDESHOW);
 			}
@@ -156,14 +155,11 @@ include_once "include/page_header.php";
 				unset($_REQUEST['form'], $_REQUEST['slideshowid']);
 			}
 		}
-		else if(isset($_REQUEST['cancel_step']))
-		{
+		else if(isset($_REQUEST['cancel_step'])){
 			unset($_REQUEST['add_step'], $_REQUEST['new_step']);
 		}
-		else if(isset($_REQUEST['add_step']))
-		{
-			if(isset($_REQUEST['new_step']))
-			{
+		else if(isset($_REQUEST['add_step'])){
+			if(isset($_REQUEST['new_step'])){
 				if(isset($_REQUEST['new_step']['sid']))
 					$_REQUEST['steps'][$_REQUEST['new_step']['sid']] = $_REQUEST['new_step'];
 				else
@@ -171,49 +167,44 @@ include_once "include/page_header.php";
 
 				unset($_REQUEST['add_step'], $_REQUEST['new_step']);
 			}
-			else
-			{
+			else{
 				$_REQUEST['new_step'] = array();
 			}
 		}
-		else if(isset($_REQUEST['edit_step']))
-		{
+		else if(isset($_REQUEST['edit_step'])){
 			$_REQUEST['new_step'] = $_REQUEST['steps'][$_REQUEST['edit_step']];
 			$_REQUEST['new_step']['sid'] = $_REQUEST['edit_step'];
 		}
-		else if(isset($_REQUEST['del_sel_step'])&&isset($_REQUEST['sel_step'])&&is_array($_REQUEST['sel_step']))
-		{
+		else if(isset($_REQUEST['del_sel_step'])&&isset($_REQUEST['sel_step'])&&is_array($_REQUEST['sel_step'])){
 			foreach($_REQUEST['sel_step'] as $sid)
 				if(isset($_REQUEST['steps'][$sid]))
 					unset($_REQUEST['steps'][$sid]);
 		}
-		else if(isset($_REQUEST['move_up']) && isset($_REQUEST['steps'][$_REQUEST['move_up']]))
-		{
+		else if(isset($_REQUEST['move_up']) && isset($_REQUEST['steps'][$_REQUEST['move_up']])){
 			$new_id = $_REQUEST['move_up'] - 1;
 
-			if(isset($_REQUEST['steps'][$new_id]))
-			{
+			if(isset($_REQUEST['steps'][$new_id])){
 				$tmp = $_REQUEST['steps'][$new_id];
 				$_REQUEST['steps'][$new_id] = $_REQUEST['steps'][$_REQUEST['move_up']];
 				$_REQUEST['steps'][$_REQUEST['move_up']] = $tmp;
 			}
 		}
-		else if(isset($_REQUEST['move_down']) && isset($_REQUEST['steps'][$_REQUEST['move_down']]))
-		{
+		else if(isset($_REQUEST['move_down']) && isset($_REQUEST['steps'][$_REQUEST['move_down']])){
 			$new_id = $_REQUEST['move_down'] + 1;
 
-			if(isset($_REQUEST['steps'][$new_id]))
-			{
+			if(isset($_REQUEST['steps'][$new_id])){
 				$tmp = $_REQUEST['steps'][$new_id];
 				$_REQUEST['steps'][$new_id] = $_REQUEST['steps'][$_REQUEST['move_down']];
 				$_REQUEST['steps'][$_REQUEST['move_down']] = $tmp;
 			}
 		}
-		else if(isset($_REQUEST['delete'])&&isset($_REQUEST['slideshowid']))
-		{
-			if($slideshow = get_slideshow_by_slideshowid($_REQUEST['slideshowid']))
-			{
-				$result = delete_slideshow($_REQUEST['slideshowid']);
+		else if(isset($_REQUEST['delete'])&&isset($_REQUEST['slideshowid'])){
+			if($slideshow = get_slideshow_by_slideshowid($_REQUEST['slideshowid'])){
+			
+				DBstart();
+					delete_slideshow($_REQUEST['slideshowid']);
+				$result = DBend();
+				
 				show_messages($result, S_SLIDESHOW_DELETED, S_CANNOT_DELETE_SLIDESHOW);
 				add_audit_if($result, AUDIT_ACTION_DELETE,AUDIT_RESOURCE_SLIDESHOW," Name [".$slideshow['name']."] ");
 			}
@@ -236,14 +227,11 @@ include_once "include/page_header.php";
 	show_table_header(0 == $config ? S_CONFIGURATION_OF_SCREENS_BIG : S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
 	echo SBR;
 
-	if( 0 == $config )
-	{
-		if(isset($_REQUEST["form"]))
-		{
+	if( 0 == $config ){
+		if(isset($_REQUEST["form"])){
 			insert_screen_form();
 		}
-		else
-		{
+		else{
 			show_table_header(S_SCREENS_BIG);
 
 			$table = new CTableInfo(S_NO_SCREENS_DEFINED);
@@ -270,14 +258,11 @@ include_once "include/page_header.php";
 			$table->Show();
 		}
 	}
-	else
-	{
-		if(isset($_REQUEST["form"]))
-		{
+	else{
+		if(isset($_REQUEST["form"])){
 			insert_slideshow_form();
 		}
-		else
-		{
+		else{
 			show_table_header(S_SLIDESHOWS_BIG);
 
 			$table = new CTableInfo(S_NO_SLIDESHOWS_DEFINED);
@@ -294,8 +279,7 @@ include_once "include/page_header.php";
 							' GROUP BY s.slideshowid,s.name,s.delay '.
 							order_by('s.name,s.delay,cnt','s.slideshowid'));
 							
-			while($slide_data = DBfetch($db_slides))
-			{
+			while($slide_data = DBfetch($db_slides)){
 				if(!slideshow_accessible($slide_data['slideshowid'], PERM_READ_WRITE)) continue;
 
 				$table->AddRow(array(
@@ -309,10 +293,6 @@ include_once "include/page_header.php";
 		}
 
 	}
-?>
-
-<?php
 
 include_once "include/page_footer.php";
-
 ?>
