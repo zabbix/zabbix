@@ -967,6 +967,135 @@ static int evaluate_NODATA(char *value,DB_ITEM	*item,int parameter)
 
 /******************************************************************************
  *                                                                            *
+ * Function: evaluate_STR                                                     *
+ *                                                                            *
+ * Purpose: evaluate function 'str' for the item                              *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - <string>[,seconds]                                *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int evaluate_STR(char *value, DB_ITEM *item, char *function, char *parameters)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	char		str[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
+	int		num = 0, flag, now;
+	int		rows;
+	int		len;
+	int		res = SUCCEED;
+
+	char		*table = NULL;
+	char		*key = NULL;
+	char		table_str[] = "history_str", key_str[] = "clock";
+	char		table_text[] = "history_text", key_text[] = "id";
+	char		table_log[] = "history_log", key_log[] = "id";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_STR()");
+
+	switch (item->value_type) {
+		case ITEM_VALUE_TYPE_STR:
+			table = table_str;
+			key = key_str;
+			break;
+		case ITEM_VALUE_TYPE_TEXT:
+			table = table_text;
+			key = key_text;
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			table = table_log;
+			key = key_log;
+			break;
+		default:
+			return FAIL;
+	}
+
+	if (0 == num_param(parameters))
+		return FAIL;
+
+	if (0 != get_param(parameters, 1, str, sizeof(str)))
+		return FAIL;
+
+	if (0 == get_param(parameters, 2, tmp, sizeof(tmp))) {
+		if (tmp[0] == '#') {
+			num = atoi(tmp + 1);
+			flag = ZBX_FLAG_VALUES;
+		} else {
+			num = atoi(tmp);
+			flag = ZBX_FLAG_SEC;
+		}
+	} else {
+		num = 1;
+		flag = ZBX_FLAG_VALUES;
+	}
+
+	now = time(NULL);
+
+	if (flag == ZBX_FLAG_SEC) {
+		result = DBselect("select value from %s where itemid=" ZBX_FS_UI64 " and clock>%d",
+			table,
+			item->itemid,
+			now - num);
+	} else { /* ZBX_FLAG_VALUES */
+		zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=" ZBX_FS_UI64 " order by %s desc",
+			table,
+			item->itemid,
+			key);
+		result = DBselectN(tmp, num);
+	}
+
+	rows = 0;
+	if (0 == strcmp(function, "str")) {
+		while (NULL != (row = DBfetch(result))) {
+			if (NULL != strstr(row[0], str)) {
+				rows = 2;
+				break;
+			}
+			rows = 1;
+		}
+	} else if (0 == strcmp(function, "regexp")) {
+		while (NULL != (row = DBfetch(result))) {
+			if (NULL != zbx_regexp_match(row[0], str, &len)) {
+				rows = 2;
+				break;
+			}
+			rows = 1;
+		}
+	} else if (0 == strcmp(function, "iregexp")) {
+		while (NULL != (row = DBfetch(result))) {
+			if (NULL != zbx_iregexp_match(row[0], str, &len)) {
+				rows = 2;
+				break;
+			}
+			rows = 1;
+		}
+	}
+
+	if (0 == rows) {
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for STR is empty" );
+		res = FAIL;
+	} else {
+		if (2 == rows)
+			strcpy(value, "1");
+		else
+			strcpy(value, "0");
+	}
+
+	DBfree_result(result);
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: evaluate_function                                                *
  *                                                                            *
  * Purpose: evaluate function                                                 *
@@ -994,7 +1123,6 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	int	fuzlow, fuzhig;
 
 	int	day;
-	int	len;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_function(%s)",
 		function);
@@ -1258,60 +1386,9 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 			}*/
 		}
 	}
-	else if(strcmp(function,"str")==0)
+	else if(0 == strcmp(function, "str") || 0 == strcmp(function, "regexp") || 0 == strcmp(function, "iregexp"))
 	{
-		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
-		{
-			if(item->lastvalue_null==0 && strstr(item->lastvalue_str, parameter) != NULL)
-			{
-				strcpy(value,"1");
-			}
-			else
-			{
-				strcpy(value,"0");
-			}
-
-		}
-		else
-		{
-			ret = FAIL;
-		}
-	}
-	else if(strcmp(function,"regexp")==0)
-	{
-		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
-		{
-			if(item->lastvalue_null==0 && zbx_regexp_match(item->lastvalue_str, parameter, &len) != NULL)
-			{
-				strcpy(value,"1");
-			}
-			else
-			{
-				strcpy(value,"0");
-			}
-		}
-		else
-		{
-			ret = FAIL;
-		}
-	}
-	else if(strcmp(function,"iregexp")==0)
-	{
-		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
-		{
-			if(item->lastvalue_null==0 && zbx_iregexp_match(item->lastvalue_str, parameter, &len) != NULL)
-			{
-				strcpy(value,"1");
-			}
-			else
-			{
-				strcpy(value,"0");
-			}
-		}
-		else
-		{
-			ret = FAIL;
-		}
+		ret = evaluate_STR(value, item, function, parameter);
 	}
 	else if(strcmp(function,"now")==0)
 	{
