@@ -130,7 +130,7 @@ include_once "include/page_header.php";
 		}
 	}
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid());
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	
 	if(DBfetch(DBselect('SELECT h.host,i.hostid,i.description,i.key_ '.
 					' FROM items i,hosts h '.
@@ -503,7 +503,7 @@ include_once "include/page_header.php";
 COpt::profiling_start("history");
 			while($row=DBfetch($result)){
 				
-				if($DB_TYPE == "ORACLE" && $item_type == ITEM_VALUE_TYPE_TEXT){
+				if($DB['TYPE'] == "ORACLE" && $item_type == ITEM_VALUE_TYPE_TEXT){
 					if(isset($row["value"]))
 						$row["value"] = $row["value"]->load();
 					else

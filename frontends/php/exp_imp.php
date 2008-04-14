@@ -70,21 +70,18 @@ include_once "include/page_header.php";
 	update_profile("web.exp_imp.config", $config);
 ?>
 <?php
-	if($config == 1)
-	{
+	if($config == 1){
 		$rules = get_request('rules', array());
-		foreach(array('host', 'template', 'item', 'trigger', 'graph') as $key)
-		{
+		foreach(array('host', 'template', 'item', 'trigger', 'graph') as $key){
 			if(!isset($rules[$key]['exist']))	$rules[$key]['exist']	= 0;
 			if(!isset($rules[$key]['missed']))	$rules[$key]['missed']	= 0;
 		}
 
 	}
-	else
-	{
+	else{
 		validate_group(PERM_READ_ONLY);
 	
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,PERM_RES_IDS_ARRAY,get_current_nodeid());
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,get_current_nodeid());
 
 		$hosts		= get_request('hosts', array());
 		$templates	= get_request('templates', array());
@@ -92,10 +89,8 @@ include_once "include/page_header.php";
 		$graphs		= get_request('graphs', array());
 		$triggers	= get_request('triggers', array());
 		
-		function &zbx_array_val_inc($arr, $inc_size = 1)
-		{
-			foreach($arr as $id => $val)
-			{
+		function &zbx_array_val_inc($arr, $inc_size = 1){
+			foreach($arr as $id => $val){
 				$arr[$id] = $val + $inc_size;
 			}
 			return $arr;
@@ -112,8 +107,7 @@ include_once "include/page_header.php";
 		$available_hosts = implode(',', $available_hosts);
 	}
 		
-	if(isset($EXPORT_DATA))
-	{
+	if(isset($EXPORT_DATA)){
 		include_once "include/export.inc.php";
 		
 		$exporter = new CZabbixXMLExport();
@@ -123,8 +117,7 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php	
-	switch($config)
-	{
+	switch($config){
 		case 1:
 			$title = S_IMPORT_BIG;
 			$frm_title = S_IMPORT;
@@ -146,10 +139,8 @@ include_once "include/page_header.php";
 	show_table_header($title, $form);
 	echo SBR;
 
-	if($config == 1)
-	{
-		if(isset($_FILES['import_file']))
-		{
+	if($config == 1){
+		if(isset($_FILES['import_file'])){
 			include_once "include/import.inc.php";
 
 			$importer = new CZabbixXMLImport();
@@ -190,18 +181,15 @@ include_once "include/page_header.php";
 		$form->AddItemToBottomRow(new CButton('import', S_IMPORT));
 		$form->Show();
 	}
-	else
-	{
+	else{
 
-		if($preview)
-		{
+		if($preview){
 			$table = new CTableInfo(S_NO_DATA_FOR_EXPORT);
 			$table->SetHeader(array(S_HOST, S_ELEMENTS));
 			$table->ShowStart();
 
 			$db_hosts = DBselect('select * from hosts where hostid in ('.implode(',',array_keys($hosts)).')');
-			while($host = DBfetch($db_hosts))
-			{
+			while($host = DBfetch($db_hosts)){
 				$el_table = new CTableInfo(S_ONLY_HOST_INFO);
 				$sqls = array(
 					S_TEMPLATE	=> !isset($templates[$host['hostid']]) ? null : 
@@ -226,13 +214,11 @@ include_once "include/page_header.php";
 								' GROUP BY gi.graphid, i.hostid'
 
 					);
-				foreach($sqls as $el_type => $sql)
-				{
+				foreach($sqls as $el_type => $sql){
 					if(!isset($sql)) continue;
 
 					$db_els = DBselect($sql);
-					while($el = DBfetch($db_els))
-					{
+					while($el = DBfetch($db_els)){
 						if($el['cnt'] != 1 || (bccomp($el['hostid'] , $host['hostid']) != 0)) continue;
 						$el_table->AddRow(array($el_type, $el['info']));
 					}
@@ -344,15 +330,13 @@ include_once "include/page_header.php";
 				
 				/* calculate template */
 				$template_cnt = DBfetch(DBselect('select count(hosttemplateid) as cnt from hosts_templates where hostid='.$row['hostid']));
-				if($template_cnt['cnt'] > 0)
-				{
+				if($template_cnt['cnt'] > 0){
 					$template_cnt = array(new CCheckBox('templates['.$row['hostid'].']',
 							isset($templates[$row['hostid']]) || !isset($update),
 							NULL,true),
 						$template_cnt['cnt']);
 				}
-				else
-				{
+				else{
 					$template_cnt = '-';
 				}
 								
@@ -373,15 +357,13 @@ include_once "include/page_header.php";
 				$db_triggers = DBselect('select f.triggerid, i.hostid, count(distinct i.hostid) as cnt from functions f, items i '.
 					' where f.itemid=i.itemid group by f.triggerid, i.hostid');
 				while($db_tr = DBfetch($db_triggers)) if($db_tr['cnt'] == 1 && (bccomp($db_tr['hostid'] , $row['hostid'])==0)) $trigger_cnt++;
-				if($trigger_cnt > 0)
-				{
+				if($trigger_cnt > 0){
 					$trigger_cnt = array(new CCheckBox('triggers['.$row['hostid'].']',
 							isset($triggers[$row['hostid']]) || !isset($update),
 							NULL,true),
 						$trigger_cnt);
 				}
-				else
-				{
+				else{
 					$trigger_cnt = '-';
 				}
 			
@@ -391,15 +373,13 @@ include_once "include/page_header.php";
 					' from graphs_items gi, items i '.
 					' where gi.itemid=i.itemid group by gi.graphid, i.hostid');
 				while($db_tr = DBfetch($db_graphs)) if($db_tr['cnt'] == 1 && (bccomp($db_tr['hostid'] , $row['hostid'])==0)) $graph_cnt++;
-				if($graph_cnt > 0)
-				{
+				if($graph_cnt > 0){
 					$graph_cnt = array(new CCheckBox('graphs['.$row['hostid'].']',
 							isset($graphs[$row['hostid']]) || !isset($update),
 							NULL,true),
 						$graph_cnt);
 				}
-				else
-				{
+				else{
 					$graph_cnt = '-';
 				}
 				

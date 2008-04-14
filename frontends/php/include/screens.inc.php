@@ -105,23 +105,16 @@
         }
 
         function delete_screen($screenid){
-			$result=DBexecute("delete from screens_items where screenid=$screenid");
-			if(!$result) return $result;
-			
-			$result=DBexecute("delete from screens_items where resourceid=$screenid and resourcetype=".SCREEN_RESOURCE_SCREEN);
-			if(!$result) return $result;
-
-			$result=DBexecute('delete from slides where screenid='.$screenid);
-			if(!$result) return $result;
-			
-			$result = rm4favorites('web.favorite.screenids',$screenid,ZBX_FAVORITES_ALL,'screenid');
-			if(!$result)	return	$result;
-			
-		return  DBexecute("delete from screens where screenid=$screenid");
+			$result=DBexecute('delete from screens_items where screenid='.$screenid);
+			$result&=DBexecute('delete from screens_items where resourceid='.$screenid.' and resourcetype='.SCREEN_RESOURCE_SCREEN);
+			$result&=DBexecute('delete from slides where screenid='.$screenid);
+			$result&=DBexecute('DELETE FROM profiles WHERE idx="web.favorite.screenids" AND resource="screenid" AND value='.$screenid);
+			$result&=DBexecute('delete from screens where screenid='.$screenid);	
+		return	$result;
         }
 
         function add_screen_item($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url,$dynamic){
-			$sql="DELETE FROM screens_items WHERE screenid=$screenid and x=$x and y=$y";
+			$sql='DELETE FROM screens_items WHERE screenid='.$screenid.' and x='.$x.' and y='.$y;
 			DBexecute($sql);
 			
 			$screenitemid=get_dbid("screens_items","screenitemid");
@@ -612,26 +605,22 @@
 		return $slideshowid;
 	}
 
-	function	update_slideshow($slideshowid, $name, $delay, $slides)
-	{
-		foreach($slides as $slide)
-		{
-			if( !validate_slide($slide) )
+	function	update_slideshow($slideshowid, $name, $delay, $slides){
+		foreach($slides as $slide){
+			if(!validate_slide($slide))
 				return false;
 		}
 
-		if( !($result = DBexecute('update slideshows set name='.zbx_dbstr($name).',delay='.$delay.' where slideshowid='.$slideshowid)) )
+		if(!$result = DBexecute('update slideshows set name='.zbx_dbstr($name).',delay='.$delay.' where slideshowid='.$slideshowid))
 			return false;
 
 		DBexecute('delete from slides where slideshowid='.$slideshowid);
 
 		$i = 0;
-		foreach($slides as $slide)
-		{
+		foreach($slides as $slide){
 			$slideid = get_dbid('slides','slideid');
 			if( !($result = DBexecute('insert into slides (slideid,slideshowid,screenid,step,delay) '.
-				' values ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')')) )
-			{
+				' values ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')')) ){
 				return false;
 			}
 		}
@@ -639,12 +628,13 @@
 		return true;
 	}
 
-	function	delete_slideshow($slideshowid)
-	{
-		return (
-			DBexecute('delete from slideshows where slideshowid='.$slideshowid) &&
-			DBexecute('delete from slides where slideshowid='.$slideshowid)
-		);
+	function	delete_slideshow($slideshowid){
+
+		$result = DBexecute('delete from slideshows where slideshowid='.$slideshowid);
+		$result &= DBexecute('delete from slides where slideshowid='.$slideshowid);
+		$result &= DBexecute('DELETE FROM profiles WHERE idx="web.favorite.screenids" AND resource="slideshowid" AND value='.$slideshowid);
+		
+		return $result;
 	}
 	
 
@@ -657,7 +647,7 @@
 			return $table;
 		}
 
-		global $DB_TYPE;
+		global $DB;
 
 		$item=get_item_by_itemid($itemid);
 		switch($item["value_type"])
@@ -685,7 +675,7 @@
 			switch($item["value_type"])
 			{
 				case ITEM_VALUE_TYPE_TEXT:	
-					if($DB_TYPE == "ORACLE")
+					if($DB['TYPE'] == "ORACLE")
 					{
 						if(isset($row["value"]))
 						{

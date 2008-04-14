@@ -96,8 +96,8 @@ include_once "include/page_header.php";
 	$_REQUEST['graph3d'] = get_request('graph3d', 0);
 	$_REQUEST['legend'] = get_request('legend', 0);
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, null, null, get_current_nodeid());
-	$available_graphs = get_accessible_graphs(PERM_READ_WRITE, null, get_current_nodeid());
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
+	$available_graphs = get_accessible_graphs(PERM_READ_WRITE);
 
 // ---- <ACTIONS> ----
 	if(isset($_REQUEST["clone"]) && isset($_REQUEST["graphid"])){
@@ -129,13 +129,15 @@ include_once "include/page_header.php";
 			$showtriggers	= isset($_REQUEST["showtriggers"]) ? 1 : 0;
 
 			if(isset($_REQUEST["graphid"])){
-
-				$result = update_graph_with_items($_REQUEST["graphid"],
+				
+				DBstart();
+				update_graph_with_items($_REQUEST["graphid"],
 					$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 					$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
 					$showworkperiod,$showtriggers,$_REQUEST["graphtype"],
 					$_REQUEST["legend"],$_REQUEST["graph3d"],$items);
-
+				$result = DBend();
+				
 				if($result){
 					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
 						"Graph ID [".$_REQUEST["graphid"]."] Graph [".
@@ -144,12 +146,13 @@ include_once "include/page_header.php";
 				show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 			}
 			else{
-
-				$result = add_graph_with_items($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
+				DBstart();
+				add_graph_with_items($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 					$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
 					$showworkperiod,$showtriggers,$_REQUEST["graphtype"],
 					$_REQUEST["legend"],$_REQUEST["graph3d"],$items);
-
+				$result = DBend();
+				
 				if($result){
 					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
 						"Graph [".$_REQUEST["name"]."]");
@@ -164,7 +167,10 @@ include_once "include/page_header.php";
 	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["graphid"])){
 		$graph=get_graph_by_graphid($_REQUEST["graphid"]);
 		
-		$result=delete_graph($_REQUEST["graphid"]);
+		DBstart();
+			delete_graph($_REQUEST["graphid"]);
+		$result = DBend();
+		
 		if($result){
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,"Graph [".$graph["name"]."]");
 			unset($_REQUEST["form"]);
@@ -173,39 +179,42 @@ include_once "include/page_header.php";
 	}
 	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["group_graphid"])){
 	
+		$result = true;
 		foreach($_REQUEST["group_graphid"] as $id){
 			$graph=get_graph_by_graphid($id);
 			if($graph["templateid"]<>0)	continue;
-			if(delete_graph($id)){
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,
-					"Graph [".$graph["name"]."]");
+			
+			DBstart();
+			delete_graph($id);
+			$result &= DBend();
+			
+			if($result){
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,"Graph [".$graph["name"]."]");
 			}
 		}
-		show_messages(TRUE, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
+		show_messages($result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 	}
 	else if(isset($_REQUEST["copy"])&&isset($_REQUEST["group_graphid"])&&isset($_REQUEST["form_copy_to"])){
 		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
-			if(0 == $_REQUEST['copy_type'])
-			{ /* hosts */
+			if(0 == $_REQUEST['copy_type']){ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
 			}
-			else
-			{ /* groups */
+			else{ /* groups */
 				$hosts_ids = array();
 				$db_hosts = DBselect('SELECT distinct h.hostid FROM hosts h, hosts_groups hg'.
 					' WHERE h.hostid=hg.hostid AND hg.groupid in ('.implode(',',$_REQUEST['copy_targetid']).')'.
 					' AND h.hostid in ('.$available_hosts.")"
 					);
-				while($db_host = DBfetch($db_hosts))
-				{
+				while($db_host = DBfetch($db_hosts)){
 					array_push($hosts_ids, $db_host['hostid']);
 				}
 			}
+			DBstart();
 			foreach($_REQUEST["group_graphid"] as $graph_id)
-				foreach($hosts_ids as $host_id)
-				{
+				foreach($hosts_ids as $host_id){
 					copy_graph_to_host($graph_id, $host_id, true);
 				}
+			$result = DBend();
 			unset($_REQUEST["form_copy_to"]);
 		}
 		else{
@@ -240,15 +249,20 @@ include_once "include/page_header.php";
 		}
 	}
 	else if(isset($_REQUEST['move_up']) && isset($_REQUEST['items'])){
-		if(isset($_REQUEST['items'][$_REQUEST['move_up']]))
-			if($_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] > 0)
-				$_REQUEST['items'][$_REQUEST['move_up']]['sortorder']
-					 = ''.($_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] - 1);
+		if(isset($_REQUEST['items'][$_REQUEST['move_up']])){
+			if($_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] > 0){
+			
+				$_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] = ''.($_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] - 1);
+			}
+		}
 	}
 	else if(isset($_REQUEST['move_down']) && isset($_REQUEST['items'])){
-		if(isset($_REQUEST['items'][$_REQUEST['move_down']]))
-			if($_REQUEST['items'][$_REQUEST['move_down']]['sortorder'] < 1000)
+		if(isset($_REQUEST['items'][$_REQUEST['move_down']])){
+			if($_REQUEST['items'][$_REQUEST['move_down']]['sortorder'] < 1000){
+			
 				$_REQUEST['items'][$_REQUEST['move_down']]['sortorder']++;
+			}
+		}
 	}
 // ----</ACTIONS>----
 ?>

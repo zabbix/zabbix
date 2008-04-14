@@ -94,8 +94,8 @@ include_once "include/page_header.php";
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 
-	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid());
-	$accessible_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
+	$accessible_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 
 	$result=DBselect('select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, '.
 		' applications a, httptest ht where g.groupid in ('.$accessible_groups.') '.

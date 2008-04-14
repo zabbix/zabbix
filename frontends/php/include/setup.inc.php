@@ -350,9 +350,9 @@
 			$table = new CTable();
 			$table->SetAlign('center');
 			
-			$DB_TYPE = $this->GetConfig('DB_TYPE');
+			$DB['TYPE'] = $this->GetConfig('DB_TYPE');
 
-			$cmbType = new CComboBox('type', $DB_TYPE);
+			$cmbType = new CComboBox('type', $DB['TYPE']);
 			foreach($ZBX_CONFIG['allowed_db'] as $id => $name)
 			{
 				$cmbType->AddItem($id, $name);
@@ -531,24 +531,24 @@
 
 		function CheckConnection()
 		{
-			global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+			global $DB;
 
-			$old_DB		= $DB;
-			$old_DB_TYPE	= $DB_TYPE;
-			$old_DB_SERVER	= $DB_SERVER;
-			$old_DB_PORT	= $DB_PORT;
-			$old_DB_DATABASE= $DB_DATABASE;
-			$old_DB_USER	= $DB_USER;
-			$old_DB_PASSWORD= $DB_PASSWORD;
+			$old_DB		= $DB['DB'];
+			$old_DB_TYPE	= $DB['TYPE'];
+			$old_DB_SERVER	= $DB['SERVER'];
+			$old_DB_PORT	= $DB['PORT'];
+			$old_DB_DATABASE= $DB['DATABASE'];
+			$old_DB_USER	= $DB['USER'];
+			$old_DB_PASSWORD= $DB['PASSWORD'];
 
-			$DB_TYPE	= $this->GetConfig('DB_TYPE');
-			if(is_null($DB_TYPE))	return false;
+			$DB['TYPE']	= $this->GetConfig('DB_TYPE');
+			if(is_null($DB['TYPE']))	return false;
 
-			$DB_SERVER	= $this->GetConfig('DB_SERVER',		'localhost');
-			$DB_PORT	= $this->GetConfig('DB_PORT',		'0');
-			$DB_DATABASE	= $this->GetConfig('DB_DATABASE',	'zabbix');
-			$DB_USER	= $this->GetConfig('DB_USER',		'root');
-			$DB_PASSWORD	= $this->GetConfig('DB_PASSWORD',	'');
+			$DB['SERVER']	= $this->GetConfig('DB_SERVER',		'localhost');
+			$DB['PORT']	= $this->GetConfig('DB_PORT',		'0');
+			$DB['DATABASE']	= $this->GetConfig('DB_DATABASE',	'zabbix');
+			$DB['USER']	= $this->GetConfig('DB_USER',		'root');
+			$DB['PASSWORD']	= $this->GetConfig('DB_PASSWORD',	'');
 
 			$error = '';
 			if(!($result = DBconnect($error)))
@@ -563,22 +563,22 @@
 			
 			DBclose();
 
-			if($DB_TYPE == 'SQLITE3' && !zbx_is_callable(array('sem_get','sem_acquire','sem_release','sem_remove')))
+			if($DB['TYPE'] == 'SQLITE3' && !zbx_is_callable(array('sem_get','sem_acquire','sem_release','sem_remove')))
 			{
 				error('SQLite3 required IPC functions');
 				$result &= false;
 			}
 			
 			/* restore connection */
-			global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+			global $DB;
 
-			$DB		= $old_DB;
-			$DB_TYPE	= $old_DB_TYPE;
-			$DB_SERVER	= $old_DB_SERVER;
-			$DB_PORT	= $old_DB_PORT;
-			$DB_DATABASE	= $old_DB_DATABASE;
-			$DB_USER	= $old_DB_USER;
-			$DB_PASSWORD	= $old_DB_PASSWORD;
+			$DB['DB']		= $old_DB;
+			$DB['TYPE']	= $old_DB_TYPE;
+			$DB['SERVER']	= $old_DB_SERVER;
+			$DB['PORT']	= $old_DB_PORT;
+			$DB['DATABASE']	= $old_DB_DATABASE;
+			$DB['USER']	= $old_DB_USER;
+			$DB['PASSWORD']	= $old_DB_PASSWORD;
 
 			DBconnect($error);
 
@@ -595,7 +595,7 @@
 			{
 				include $ZBX_CONFIGURATION_FILE;
 			
-				switch($DB_TYPE)
+				switch($DB['TYPE'])
 				{
 					case 'MYSQL':		$ZBX_SCHEMA_FILE = 'mysql.sql';		break;
 					case 'POSTGRESQL':	$ZBX_SCHEMA_FILE = 'postgresql.sql';	break;
@@ -673,15 +673,15 @@
 
 		function CheckConfigurationFile()
 		{
-			global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD, $ZBX_SERVER, $ZBX_SERVER_PORT;
+			global $DB;
 
-			$old_DB			= $DB;
-			$old_DB_TYPE		= $DB_TYPE;
-			$old_DB_SERVER		= $DB_SERVER;
-			$old_DB_PORT		= $DB_PORT;
-			$old_DB_DATABASE	= $DB_DATABASE;
-			$old_DB_USER		= $DB_USER;
-			$old_DB_PASSWORD	= $DB_PASSWORD;
+			$old_DB				= $DB['DB'];
+			$old_DB_TYPE		= $DB['TYPE'];
+			$old_DB_SERVER		= $DB['SERVER'];
+			$old_DB_PORT		= $DB['PORT'];
+			$old_DB_DATABASE	= $DB['DATABASE'];
+			$old_DB_USER		= $DB['USER'];
+			$old_DB_PASSWORD	= $DB['PASSWORD'];
 			$old_ZBX_SERVER		= $ZBX_SERVER;
 			$old_ZBX_SERVER_PORT	= $ZBX_SERVER_PORT;
 
@@ -694,20 +694,20 @@
 			{
 				include $ZBX_CONFIGURATION_FILE;
 
-				if(	isset($DB_TYPE) && 
-					isset($DB_SERVER) && 
-					isset($DB_DATABASE) && 
-					isset($DB_USER) && 
-					isset($DB_PASSWORD) &&
+				if(	isset($DB['TYPE']) && 
+					isset($DB['SERVER']) && 
+					isset($DB['DATABASE']) && 
+					isset($DB['USER']) && 
+					isset($DB['PASSWORD']) &&
 					isset($ZBX_SERVER) &&
 					isset($ZBX_SERVER_PORT) &&
 					isset($IMAGE_FORMAT_DEFAULT) &&
-					$DB_TYPE		== $this->GetConfig('DB_TYPE',				null) &&
-					$DB_SERVER		== $this->GetConfig('DB_SERVER',			null) &&
-					$DB_PORT		== $this->GetConfig('DB_PORT',				null) &&
-					$DB_DATABASE		== $this->GetConfig('DB_DATABASE',			null) &&
-					$DB_USER		== $this->GetConfig('DB_USER',				null) &&
-					$DB_PASSWORD		== $this->GetConfig('DB_PASSWORD',			null)
+					$DB['TYPE']		== $this->GetConfig('DB_TYPE',				null) &&
+					$DB['SERVER']		== $this->GetConfig('DB_SERVER',			null) &&
+					$DB['PORT']		== $this->GetConfig('DB_PORT',				null) &&
+					$DB['DATABASE']		== $this->GetConfig('DB_DATABASE',			null) &&
+					$DB['USER']		== $this->GetConfig('DB_USER',				null) &&
+					$DB['PASSWORD']		== $this->GetConfig('DB_PASSWORD',			null)
 					)
 				{
 					if(!DBconnect($error_msg))
@@ -732,15 +732,15 @@
 			}
 
 			/* restore connection */
-			global $DB, $DB_TYPE, $DB_PORT, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD, $ZBX_SERVER, $ZBX_SERVER_PORT;
+			global $DB;
 
-			$DB		= $old_DB;
-			$DB_TYPE	= $old_DB_TYPE;
-			$DB_SERVER	= $old_DB_SERVER;
-			$DB_PORT	= $old_DB_PORT;
-			$DB_DATABASE	= $old_DB_DATABASE;
-			$DB_USER	= $old_DB_USER;
-			$DB_PASSWORD	= $old_DB_PASSWORD;
+			$DB['DB']		= $old_DB;
+			$DB['TYPE']	= $old_DB_TYPE;
+			$DB['SERVER']	= $old_DB_SERVER;
+			$DB['PORT']	= $old_DB_PORT;
+			$DB['DATABASE']	= $old_DB_DATABASE;
+			$DB['USER']	= $old_DB_USER;
+			$DB['PASSWORD']	= $old_DB_PASSWORD;
 			$ZBX_SERVER	= $old_ZBX_SERVER;
 			$ZBX_SERVER_PORT= $old_ZBX_SERVER_PORT;
 
@@ -885,14 +885,14 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-global $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD, $IMAGE_FORMAT_DEFAULT, $ZBX_SERVER, $ZBX_SERVER_PORT;
+global $DB;
 
-$DB_TYPE		= "'.$this->GetConfig('DB_TYPE'		,'unknown').'";
-$DB_SERVER		= "'.$this->GetConfig('DB_SERVER'	,'unknown').'";
-$DB_PORT		= "'.$this->GetConfig('DB_PORT'		,'0').'";
-$DB_DATABASE		= "'.$this->GetConfig('DB_DATABASE'	,'unknown').'";
-$DB_USER		= "'.$this->GetConfig('DB_USER'		,'unknown').'";
-$DB_PASSWORD		= "'.$this->GetConfig('DB_PASSWORD'	,'').'";
+$DB["TYPE"]		= "'.$this->GetConfig('DB_TYPE'		,'unknown').'";
+$DB["SERVER"]		= "'.$this->GetConfig('DB_SERVER'	,'unknown').'";
+$DB["PORT"]		= "'.$this->GetConfig('DB_PORT'		,'0').'";
+$DB["DATABASE"]		= "'.$this->GetConfig('DB_DATABASE'	,'unknown').'";
+$DB["USER"]		= "'.$this->GetConfig('DB_USER'		,'unknown').'";
+$DB["PASSWORD"]		= "'.$this->GetConfig('DB_PASSWORD'	,'').'";
 $ZBX_SERVER		= "'.$this->GetConfig('ZBX_SERVER'	,'').'";
 $ZBX_SERVER_PORT	= "'.$this->GetConfig('ZBX_SERVER_PORT'	,'0').'";
 

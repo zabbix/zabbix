@@ -142,29 +142,26 @@
 	}
 
 	# Delete Item definition from selected group
-
-	function	delete_item_from_group($groupid,$itemid)
-	{
-		if(!isset($itemid))
-		{
+	function delete_item_from_group($groupid,$itemid){
+		if(!isset($itemid)){
 			return 0;
 		}
 
 		$item=get_item_by_itemid($itemid);
-		if(!$item)
-		{
+		if(!$item){
 			return 0;
 		}
 
-		$sql="select i.itemid from hosts_groups hg,items i".
-			" where hg.groupid=$groupid and i.key_=".zbx_dbstr($item["key_"]).
-			" and hg.hostid=i.hostid";
+		$sql='SELECT i.itemid '.
+			' FROM hosts_groups hg,items i'.
+			' WHERE hg.groupid='.$groupid.
+				' AND i.key_='.zbx_dbstr($item["key_"]).
+				' AND hg.hostid=i.hostid';
 		$result=DBexecute($sql);
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			delete_item($row["itemid"]);
 		}
-		return 1;
+	return 1;
 	}
 
 	# Add Item definition to selected group
@@ -776,15 +773,13 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	delete_item($itemid)
-	{
+	function	delete_item($itemid){
 		$item = get_item_by_itemid($itemid);
 		$host = get_host_by_itemid($itemid);
 
 		// first delete child items
 		$db_items = DBselect("select itemid from items where templateid=$itemid");
-		while($db_item = DBfetch($db_items))
-		{// recursion
+		while($db_item = DBfetch($db_items)){// recursion
 			$result = delete_item($db_item["itemid"]);
 			if(!$result)	return	$result;
 		}
@@ -802,24 +797,21 @@
 		$result = delete_history_by_itemid($itemid, 1 /* use housekeeper */);
 		if(!$result)	return	$result;
 
-		DBexecute('delete from screens_items where resourceid='.$itemid.' and resourcetype in ('.
+		$result &= DBexecute('delete from screens_items where resourceid='.$itemid.' and resourcetype in ('.
 					(implode(',',array(
 						SCREEN_RESOURCE_SIMPLE_GRAPH,
 						SCREEN_RESOURCE_PLAIN_TEXT)
 						)
 					).')');
 
-		$result = DBexecute("delete from items_applications where itemid=$itemid");
-		if(!$result)	return	$result;
-
-		$result = DBexecute("delete from items where itemid=$itemid");
-		if(!$result)	return	$result;
+		$result &= DBexecute('delete from items_applications where itemid='.$itemid);
+		$result &= DBexecute('delete from items where itemid='.$itemid);
+		$result &= DBexecute('DELETE FROM profiles WHERE idx="web.favorite.graphids" AND resource="itemid" AND value='.$itemid);
 		
-		$result = rm4favorites('web.favorite.graphids',$itemid,ZBX_FAVORITES_ALL,'itemid');
 		if($result){
 			info("Item '".$host["host"].":".$item["key_"]."' deleted");
 		}
-		return $result;
+	return $result;
 	}
 
 	/*
@@ -889,7 +881,7 @@
 	function get_items_data_overview($groupid,$view_style=null)
 	{
 		global	$USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 
 		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
 		

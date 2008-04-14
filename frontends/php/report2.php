@@ -59,7 +59,7 @@ include_once 'include/page_header.php';
 	validate_group_with_host(PERM_READ_LIST,$options);	
 ?>
 <?php
-$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
+$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 show_report2_header($config,$available_hosts);
 ?>
 <?php

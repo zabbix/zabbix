@@ -237,8 +237,8 @@ include_once "include/page_header.php";
 		
 		validate_group_with_host(PERM_READ_ONLY,$options);
 		
-		$availiable_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
-		$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+		$availiable_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
+		$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
 		
 		$r_form = new CForm();
 		$r_form->SetMethod('get');

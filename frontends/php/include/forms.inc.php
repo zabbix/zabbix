@@ -1162,7 +1162,7 @@
 			$lst['node']['read_only']	= new CListBox('nodes_read'	,null	,6);
 			$lst['node']['deny']		= new CListBox('nodes_deny'	,null	,6);
 
-			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
+			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, null, PERM_RES_DATA_ARRAY);
 
 			foreach($nodes as $node)
 			{
@@ -1182,8 +1182,7 @@
 		$lst['group']['read_only']	= new CListBox('groups_read'	,null	,10);
 		$lst['group']['deny']		= new CListBox('groups_deny'	,null	,10);
 
-		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY, 
-			ZBX_DISTRIBUTED ? null : $ZBX_LOCALNODEID);
+		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, null, PERM_RES_DATA_ARRAY, get_current_nodeid(false));
 
 		foreach($groups as $group)
 		{
@@ -1202,13 +1201,10 @@
 		$lst['host']['read_only']	= new CListBox('hosts_read'	,null	,15);
 		$lst['host']['deny']		= new CListBox('hosts_deny'	,null	,15);
 
-		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY,
-			ZBX_DISTRIBUTED ? null : $ZBX_LOCALNODEID);
+		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, null, PERM_RES_DATA_ARRAY, get_current_nodeid(false));
 
-		foreach($hosts as $host)
-		{
-			switch($host['permission'])
-			{
+		foreach($hosts as $host){
+			switch($host['permission']){
 				case PERM_READ_ONLY:	$list_name='read_only';		break;
 				case PERM_READ_WRITE:	$list_name='read_write';	break;
 				default:		$list_name='deny';		break;
@@ -1217,11 +1213,9 @@
 		}
 		unset($hosts);
 		
-		foreach($lst as $name => $lists)
-		{
+		foreach($lst as $name => $lists){
 			$row = new CRow();
-			foreach($lists as $class => $list_obj)
-			{
+			foreach($lists as $class => $list_obj){
 				$row->AddItem(new CCol($list_obj, $class));
 			}
 			$table->AddRow($row);
@@ -1960,7 +1954,7 @@
 	        $cmbGroups = new CComboBox("add_groupid",$add_groupid);		
 
 	        $groups=DBselect("SELECT DISTINCT groupid,name FROM groups ".
-			"where groupid in (".get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).") ".
+			"where groupid in (".get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY).") ".
 			" order by name");
 	        while($group=DBfetch($groups))
 	        {
@@ -3696,9 +3690,9 @@ include_once 'include/discovery.inc.php';
                 $cmbRes->AddItem(SCREEN_RESOURCE_EVENTS,       S_HISTORY_OF_EVENTS);
 		$form->AddRow(S_RESOURCE,$cmbRes);
 
-		if($resourcetype == SCREEN_RESOURCE_GRAPH)
-		{
+		if($resourcetype == SCREEN_RESOURCE_GRAPH){
 	// User-defined graph
+			$resourceid = graph_accessible($resourceid)?$resourceid:0;
 
 			$caption = '';
 			$id=0;
@@ -3710,8 +3704,7 @@ include_once 'include/discovery.inc.php';
 							' LEFT JOIN items i ON gi.itemid=i.itemid '.
 							' LEFT JOIN hosts h ON h.hostid=i.hostid '.
 							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.graphid').
-						' WHERE i.hostid NOT IN ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT).')'.
-							' AND g.graphid='.$resourceid);
+						' WHERE g.graphid='.$resourceid);
 
 				while($row=DBfetch($result)){
 					$row["node_name"] = isset($row["node_name"]) ? "(".$row["node_name"].") " : '';
@@ -3742,7 +3735,7 @@ include_once 'include/discovery.inc.php';
 						' WHERE h.hostid=i.hostid '.
 							' AND h.status='.HOST_STATUS_MONITORED.
 							' AND i.status='.ITEM_STATUS_ACTIVE.
-							' AND i.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT).')'.
+							' AND i.hostid IN ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
 							' AND i.itemid='.$resourceid);
 
 				while($row=DBfetch($result)){
@@ -3792,8 +3785,7 @@ include_once 'include/discovery.inc.php';
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 			
 		}
-		elseif($resourcetype == SCREEN_RESOURCE_PLAIN_TEXT)
-		{
+		else if($resourcetype == SCREEN_RESOURCE_PLAIN_TEXT){
 // Plain text
 			$caption = '';
 			$id=0;
@@ -3805,7 +3797,7 @@ include_once 'include/discovery.inc.php';
 						' WHERE h.hostid=i.hostid '.
 							' AND h.status='.HOST_STATUS_MONITORED.
 							' AND i.status='.ITEM_STATUS_ACTIVE.
-							' AND i.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT).')'.
+							' AND i.hostid IN ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
 							' AND i.itemid='.$resourceid);
 
 				while($row=DBfetch($result)){
@@ -3847,7 +3839,7 @@ include_once 'include/discovery.inc.php';
 				$result=DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
 						' FROM hosts_groups hg,hosts h,groups g '.
 							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
-						' WHERE g.groupid in ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
+						' WHERE g.groupid IN ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
 							' AND g.groupid=hg.groupid '.
 							' AND hg.hostid=h.hostid '.
 							' AND h.status='.HOST_STATUS_MONITORED.
@@ -4245,7 +4237,7 @@ include_once 'include/discovery.inc.php';
 // add groups
 			$db_groups=DBselect("SELECT DISTINCT groupid FROM hosts_groups WHERE hostid=".$_REQUEST["hostid"].
 				" AND groupid in (".
-				get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid()).
+				get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).
 				") ");
 			while($db_group=DBfetch($db_groups)){
 				if(uint_in_array($db_group["groupid"],$groups)) continue;
@@ -4295,7 +4287,7 @@ include_once 'include/discovery.inc.php';
 		
 		$db_groups=DBselect("SELECT DISTINCT groupid,name FROM groups ".
 			" WHERE groupid in (".
-			get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid()).
+			get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).
 			") order by name");
 		while($db_group=DBfetch($db_groups))
 		{
@@ -4504,7 +4496,7 @@ include_once 'include/discovery.inc.php';
 		$cmbHosts = new CListBox("hosts[]",$hosts,10);
 		$db_hosts=DBselect('SELECT DISTINCT hostid,host FROM hosts'.
 				' WHERE status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-				' AND hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).')'.
+				' AND hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
 				' order by host');
 		while($db_host=DBfetch($db_hosts))
 		{
@@ -4571,7 +4563,7 @@ include_once 'include/discovery.inc.php';
 		$cmbHosts = new CListBox("hosts[]",$hosts,10);
 		$db_hosts=DBselect('select hostid,proxy_hostid,host from hosts'.
 			' where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-			' and hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).')'.
+			' and hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
 			' order by host');
 		while($db_host=DBfetch($db_hosts))
 		{

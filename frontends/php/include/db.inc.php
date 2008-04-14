@@ -19,39 +19,33 @@
 **/
 ?>
 <?php
-	global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD, $DB_TRANSACTIONS;
+	global $DB;
 
-	function	DBconnect(&$error)
-	{
+	function DBconnect(&$error){
 		$result = true;
 		
-		global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD, $DB_TRANSACTIONS;
+		global $DB;
 
-		$DB = null;
+		$DB['DB'] = null;
+		$DB['TRANSACTIONS'] = 0;
 
-//SDI('type: '.$DB_TYPE.'; server: '.$DB_SERVER.'; port: '.$DB_PORT.'; db: '.$DB_DATABASE.'; usr: '.$DB_USER.'; pass: '.$DB_PASSWORD);
+//SDI('type: '.$DB['TYPE'].'; server: '.$DB['SERVER'].'; port: '.$DB['PORT'].'; db: '.$DB['DATABASE'].'; usr: '.$DB['USER'].'; pass: '.$DB['PASSWORD']);
 
-		if(!isset($DB_TYPE))
-		{
+		if(!isset($DB['TYPE'])){
 			$error = "Unknown database type.";
 			$result = false;
 		}
-		else
-		{
-			switch($DB_TYPE)
-			{
+		else{
+			switch($DB['TYPE']){
 				case "MYSQL":
-					$mysql_server = $DB_SERVER.( !empty($DB_PORT) ? ':'.$DB_PORT : '');
+					$mysql_server = $DB['SERVER'].( !empty($DB['PORT']) ? ':'.$DB['PORT'] : '');
 
-					if ( !($DB = mysql_pconnect($mysql_server,$DB_USER,$DB_PASSWORD)))
-					{
+					if (!$DB['DB']= mysql_pconnect($mysql_server,$DB['USER'],$DB['PASSWORD'])){
 						$error = "Error connecting to database [".mysql_error()."]";
 						$result = false;
 					}
-					else
-					{
-						if ( !mysql_select_db($DB_DATABASE) )
-						{
+					else{
+						if (!mysql_select_db($DB['DATABASE'])){
 							$error = 'Error database selection ['.mysql_error().']';
 							$result = false;
 						}
@@ -59,38 +53,35 @@
 					break;
 				case "POSTGRESQL":
 					$pg_connection_string = 
-						( !empty($DB_SERVER) ? 'host=\''.$DB_SERVER.'\' ' : '').
-						'dbname=\''.$DB_DATABASE.'\' '.
-						( !empty($DB_USER) ? 'user=\''.$DB_USER.'\' ' : '').
-						( !empty($DB_PASSWORD) ? 'password=\''.$DB_PASSWORD.'\' ' : '').
-						( !empty($DB_PORT) ? 'port='.$DB_PORT : '');
+						( !empty($DB['SERVER']) ? 'host=\''.$DB['SERVER'].'\' ' : '').
+						'dbname=\''.$DB['DATABASE'].'\' '.
+						( !empty($DB['USER']) ? 'user=\''.$DB['USER'].'\' ' : '').
+						( !empty($DB['PASSWORD']) ? 'password=\''.$DB['PASSWORD'].'\' ' : '').
+						( !empty($DB['PORT']) ? 'port='.$DB['PORT'] : '');
 
-					$DB=pg_connect($pg_connection_string);
-					if(!$DB)
-					{
+					$DB['DB']= pg_connect($pg_connection_string);
+					if(!$DB['DB']){
 						$error = 'Error connecting to database';
 						$result = false;
 					}
 					break;
 				case "ORACLE":
-					$DB = ociplogon($DB_USER, $DB_PASSWORD, $DB_DATABASE);
-/*					$DB = ocilogon($DB_USER, $DB_PASSWORD, $DB_DATABASE);*/
-					//$DB = ocilogon($DB_USER, $DB_PASSWORD, "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$DB_SERVER)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=$DB_DATABASE)))");
-					if(!$DB)
-					{
+					$DB['DB']= ociplogon($DB['USER'], $DB['PASSWORD'], $DB['DATABASE']);
+//					$DB['DB']= ociplogon($DB['USER'], $DB['PASSWORD'], "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$DB['SERVER'])(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=$DB['DATABASE'])))");
+					if(!$DB['DB']){
 						$error = "Error connecting to database";
 						$result = false;
 					}
 					break;
 				case "SQLITE3":
-					$DB_TRANSACTIONS = 0;
+					$DB['TRANSACTIONS'] = 0;
 					if(!function_exists('init_db_access')){
 						function init_db_access(){
-							global $DB_DATABASE, $ZBX_SEM_ID;
+							global $DB, $ZBX_SEM_ID;
 
 							$ZBX_SEM_ID = false;
-							if(function_exists('ftok') && function_exists('sem_get') && file_exists($DB_DATABASE)){
-								$ZBX_SEM_ID = sem_get(ftok($DB_DATABASE, 'z'), 1);
+							if(function_exists('ftok') && function_exists('sem_get') && file_exists($DB['DATABASE'])){
+								$ZBX_SEM_ID = sem_get(ftok($DB['DATABASE'], 'z'), 1);
 							}
 						}
 					}
@@ -126,9 +117,9 @@
 					}
 
 
-					if(file_exists($DB_DATABASE)){
-						$DB = sqlite3_open($DB_DATABASE);
-						if(!$DB){
+					if(file_exists($DB['DATABASE'])){
+						$DB['DB']= sqlite3_open($DB['DATABASE']);
+						if(!$DB['DB']){
 							$error = "Error connecting to database";
 							$result = false;
 						}
@@ -146,30 +137,30 @@
 			}
 		}
 		if( false == $result )
-			$DB = null;
+			$DB['DB']= null;
 
 		return $result;
 	}
 
 	function	DBclose(){
-		global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD, $DB_TRANSACTIONS;
+		global $DB;
 
 		$result = false;
 
-		if( isset($DB) && !empty($DB) ){
-			switch($DB_TYPE){
+		if( isset($DB['DB']) && !empty($DB['DB']) ){
+			switch($DB['TYPE']){
 				case "MYSQL":		
-					$result = mysql_close($DB);	
+					$result = mysql_close($DB['DB']);	
 					break;
 				case "POSTGRESQL":
-					$result = pg_close($DB);
+					$result = pg_close($DB['DB']);
 					break;
 				case "ORACLE":
-					$result = ocilogoff($DB);
+					$result = ocilogoff($DB['DB']);
 					break;
 				case "SQLITE3":		
 					$result = true; 
-					sqlite3_close($DB);	
+					sqlite3_close($DB['DB']);	
 					free_db_access();
 					break;
 				default:		break;
@@ -190,12 +181,10 @@
 		return $result;
 	}
 
-	function	DBloadfile($file, &$error)
-	{
-		global $DB_TYPE;
+	function	DBloadfile($file, &$error){
+		global $DB;
 
-		if(!file_exists($file))
-		{
+		if(!file_exists($file)){
 			$error = 'DBloadfile. Missing file['.$file.']';
 			return false;
 		}
@@ -220,12 +209,21 @@
 		return true;
 	}
 	
-	function DBStart(){
-		global $DB,$DB_TYPE,$DB_TRANSACTIONS;
-//SDI('TRANSACTION STARTED');
+	function DBstart(){
+		global $DB;
+
+		$DB['TRANSACTIONS']++;
+		
+		if($DB['TRANSACTIONS']>1){
+			info('POSSIBLE ERROR: Used incorect logic in database processing, started subtransaction!');
+		return $DB['TRANSACTION_STATE'];
+		}
+		
+		$DB['TRANSACTION_STATE'] = true;
+		
 		$result = false;
-		if( isset($DB) && !empty($DB) )
-		switch($DB_TYPE){
+		if(isset($DB['DB']) && !empty($DB['DB']))
+		switch($DB['TYPE']){
 			case "MYSQL":
 				$result = DBexecute('begin;');
 				break;
@@ -233,23 +231,13 @@
 				$result = DBexecute('begin;');
 				break;
 			case "ORACLE":
-				$DB_TRANSACTIONS++;
-				
-				if($DB_TRANSACTIONS>1){
-					info("POSSIBLE ERROR: Used incorect logic in database processing started subtransaction!");
-				}
 				$result = true;
 // TODO			OCI_DEFAULT
 				break;
-			case "SQLITE3":
-				$DB_TRANSACTIONS++;
-				
-				if(1 == $DB_TRANSACTIONS){
+			case "SQLITE3":				
+				if(1 == $DB['TRANSACTIONS']){
 					lock_db_access();
 					$result = DBexecute('begin;');
-				}
-				else{
-					error("POSSIBLE ERROR: Used incorect logic in database processing started subtransaction!");
 				}
 				break;
 		}
@@ -257,7 +245,25 @@
 	}
 	
 	
-	function DBend($result=true){
+	function DBend($result=null){
+		global $DB;
+		
+		if($DB['TRANSACTIONS'] != 1){
+			$DB['TRANSACTIONS']--;
+			
+			if($DB['TRANSACTIONS'] < 1){
+				$DB['TRANSACTIONS'] = 0;
+				$DB['TRANSACTION_STATE'] = false;
+				info('POSSIBLE ERROR: Used incorect logic in database processing, transaction not started!');
+			}
+		return $DB['TRANSACTION_STATE'];
+		}
+		
+		$DB['TRANSACTIONS'] = 0;
+		
+		if(empty($result))
+			$result = $DB['TRANSACTION_STATE'];
+
 		if($result){ // OK
 			$result = DBcommit();
 		}
@@ -265,16 +271,16 @@
 		if(!$result){ // FAIL
 			DBrollback();
 		}
-//SDI('TRANSACTION ENDED: '.$result);
+		
 	return $result;
 	}
 	
 	function DBcommit(){
-		global $DB,$DB_TYPE,$DB_TRANSACTIONS;
-//SDI('COMMITED!');
+		global $DB;
+		
 		$result = false;
-		if( isset($DB) && !empty($DB) )
-		switch($DB_TYPE){
+		if( isset($DB['DB']) && !empty($DB['DB']) )
+		switch($DB['TYPE']){
 			case "MYSQL":
 				$result = DBexecute('commit;');
 				break;
@@ -282,30 +288,24 @@
 				$result = DBexecute('commit;');
 				break;
 			case "ORACLE":
-				$result = ocicommit($DB);
-				$DB_TRANSACTIONS = 0;
+				$result = ocicommit($DB['DB']);
+
 				break;
 			case "SQLITE3":
-				if($DB_TRANSACTIONS>1)
-					$DB_TRANSACTIONS--;
-				
-				if(1 == $DB_TRANSACTIONS){
-					$result = DBexecute('commit;');
-					$DB_TRANSACTIONS = 0;
-					
-					unlock_db_access();
-				}
+				$result = DBexecute('commit;');
+				unlock_db_access();
 				break;
 		}
+				
 	return $result;
 	}
 	
 	function DBrollback(){
-		global $DB,$DB_TYPE,$DB_TRANSACTIONS;
-//SDI('ROLLED BACK!');
+		global $DB;
+
 		$result = false;
-		if( isset($DB) && !empty($DB) )
-		switch($DB_TYPE){
+		if( isset($DB['DB']) && !empty($DB['DB']) )
+		switch($DB['TYPE']){
 			case "MYSQL":
 				$result = DBexecute('rollback;');
 				break;
@@ -313,21 +313,14 @@
 				$result = DBexecute('rollback;');
 				break;
 			case "ORACLE":
-				$result = ocirollback($DB);
-				$DB_TRANSACTIONS = 0;
+				$result = ocirollback($DB['DB']);
 				break;
-			case "SQLITE3":
-				if($DB_TRANSACTIONS>1)
-					$DB_TRANSACTIONS--;
-				
-				if(1 == $DB_TRANSACTIONS){
-					$result = DBexecute('rollback;');
-					$DB_TRANSACTIONS = 0;
-					
-					unlock_db_access();
-				}
+			case "SQLITE3":				
+				$result = DBexecute('rollback;');
+				unlock_db_access();
 				break;
 		}
+		
 	return $result;
 	}
 
@@ -347,20 +340,19 @@
 			SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
 	*/
 
-	function	&DBselect($query, $limit='NO')
-	{
-		global $DB, $DB_TYPE, $DB_TRANSACTIONS;
+	function &DBselect($query, $limit='NO'){
+		global $DB;
 
 //COpt::savesqlrequest($query);
 
 		$result = false;
-		if( isset($DB) && !empty($DB) )
-		switch($DB_TYPE){
+		if( isset($DB['DB']) && !empty($DB['DB']) )
+		switch($DB['TYPE']){
 			case "MYSQL":
 				if(is_numeric($limit)){
 					$query .= ' limit '.intval($limit);
 				}
-				$result=mysql_query($query,$DB);
+				$result=mysql_query($query,$DB['DB']);
 				if(!$result){
 					error("Error in query [$query] [".mysql_error()."]");
 				}
@@ -369,7 +361,7 @@
 				if(is_numeric($limit)){
 					$query .= ' limit '.intval($limit);
 				}
-				$result = pg_query($DB,$query);
+				$result = pg_query($DB['DB'],$query);
 				if(!$result){
 					error("Error in query [$query] [".pg_last_error()."]");
 				}
@@ -378,29 +370,20 @@
 				if(is_numeric($limit)){
 					$query = 'select * from ('.$query.') where rownum<'.intval($limit);
 				}
-
-				$stid=OCIParse($DB,$query);
-				if(!$stid){
-					$e=@ocierror();
-					error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
-				}
-				
-				$result=@OCIExecute($stid,($DB_TRANSACTIONS?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS));
+				$result = DBexecute($query);
 				if(!$result){
-					$e=ocierror($stid);
+					$e = ocierror($stid);
 					error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
 				}
-				else{
-					$result = $stid;
-				}
+
 				break;
 			case "SQLITE3":
-				if(!$DB_TRANSACTIONS){
+				if(!$DB['TRANSACTIONS']){
 					lock_db_access();
 				}
 				
-				if(!($result = sqlite3_query($DB,$query))){
-					error("Error in query [$query] [".sqlite3_error($DB)."]");
+				if(!($result = sqlite3_query($DB['DB'],$query))){
+					error("Error in query [$query] [".sqlite3_error($DB['DB'])."]");
 				}
 				else{
 					$data = array();
@@ -419,7 +402,7 @@
 
 					$result = &$data;
 				}
-				if(!$DB_TRANSACTIONS){
+				if(!$DB['TRANSACTIONS']){
 					unlock_db_access();
 				}
 				break;
@@ -428,60 +411,75 @@
 		return $result;
 	}
 
-	function	DBexecute($query, $skip_error_messages=0){
-		global $DB,$DB_TYPE,$DB_TRANSACTIONS;
+	function DBexecute($query, $skip_error_messages=0){
+		global $DB;
 
 //COpt::savesqlrequest($query);
 
 		$result = false;
 
-		if( isset($DB) && !empty($DB) )
-		switch($DB_TYPE){
+		if( isset($DB['DB']) && !empty($DB['DB']) )
+		switch($DB['TYPE']){
 			case "MYSQL":
-				$result=mysql_query($query,$DB);
+				$result=mysql_query($query,$DB['DB']);
 
 				if(!$result){
 					error("Error in query [$query] [".mysql_error()."]");
 				}
 				break;
 			case "POSTGRESQL":
-				if(!($result = pg_query($DB,$query))){
+				if(!($result = pg_query($DB['DB'],$query))){
 					error("Error in query [$query] [".pg_last_error()."]");
 				}
 				break;
 			case "ORACLE":
-				$result = DBselect($query);
-				if(!$result){
-					$e = ocierror($stid);
+				$stid=OCIParse($DB['DB'],$query);
+				if(!$stid){
+					$e=@ocierror();
 					error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
 				}
+				
+				$result=@OCIExecute($stid,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS));
+				if(!$result){
+					$e=ocierror($stid);
+					error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
+				}
+				else{
+					$result = $stid;
+				}
+
 				break;
 			case "SQLITE3":
-				if(!$DB_TRANSACTIONS){
+				if(!$DB['TRANSACTIONS']){
 					lock_db_access();
 				}
 
-				$result = sqlite3_exec($DB, $query);
+				$result = sqlite3_exec($DB['DB'], $query);
 				if(!$result){
-					error("Error in query [$query] [".sqlite3_error($DB)."]");
+					error("Error in query [$query] [".sqlite3_error($DB['DB'])."]");
 				}
 				
-				if(!$DB_TRANSACTIONS){
+				if(!$DB['TRANSACTIONS']){
 					unlock_db_access();
 				}
 				break;
+		}
+		if($DB['TRANSACTIONS']){
+			$DB['TRANSACTION_STATE'] &= $result;
+//			SDI($query);
+//			SDI($DB['TRANSACTION_STATE']);
 		}
 
 	return $result;
 	}
 
 	function DBfetch(&$cursor){
-		global $DB, $DB_TYPE;
+		global $DB;
 	
 		$result = false;
 		
-		if(isset($DB) && !empty($DB))
-		switch($DB_TYPE){
+		if(isset($DB['DB']) && !empty($DB['DB']))
+		switch($DB['TYPE']){
 			case "MYSQL":
 				$result = mysql_fetch_assoc($cursor);
 				break;
@@ -509,7 +507,7 @@
 	
 
 /* string value prepearing */
-if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
+if(isset($DB['TYPE']) && $DB['TYPE'] == "ORACLE") {
 	function zbx_dbstr($var)	{
 		return "'".ereg_replace('\'','\'\'',$var)."'";	
 	}
@@ -518,7 +516,7 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 		return ' CAST('.$field.' AS NUMBER(20)) ';
 	}
 }
-else if(isset($DB_TYPE) && $DB_TYPE == "MYSQL") {
+else if(isset($DB['TYPE']) && $DB['TYPE'] == "MYSQL") {
 	function zbx_dbstr($var)	{
 		return "'".mysql_real_escape_string($var)."'";
 	}
@@ -527,7 +525,7 @@ else if(isset($DB_TYPE) && $DB_TYPE == "MYSQL") {
 		return ' CAST('.$field.' AS UNSIGNED) ';
 	}
 }
-else if(isset($DB_TYPE) && $DB_TYPE == "POSTGRESQL") {
+else if(isset($DB['TYPE']) && $DB['TYPE'] == "POSTGRESQL") {
 	function zbx_dbstr($var)	{
 		return "'".pg_escape_string($var)."'";
 	}
@@ -546,11 +544,11 @@ else {
 	}
 } 
 
-	function	zbx_dbconcat($params)
+	function zbx_dbconcat($params)
 	{
-		global $DB_TYPE;
+		global $DB;
 
-		switch($DB_TYPE)
+		switch($DB['TYPE'])
 		{
 			case "SQLITE3":
 				return implode(' || ',$params);
@@ -560,9 +558,9 @@ else {
 	}
 	
 	function zbx_sql_mod($x,$y){
-		global $DB_TYPE;
+		global $DB;
 
-		switch($DB_TYPE)
+		switch($DB['TYPE'])
 		{
 			case "SQLITE3":
 				return ' ('.$x.' %% '.$y.')';
@@ -573,9 +571,9 @@ else {
 
 	function DBid2nodeid($id_name)
 	{
-		global $DB_TYPE;
+		global $DB;
 
-		switch($DB_TYPE)
+		switch($DB['TYPE'])
 		{
 			case "MYSQL":
 				$result = '('.$id_name.' div 100000000000000)';
@@ -713,11 +711,11 @@ else {
 	}
 
 	function DBin_condition($fieldname, &$array){
-		global $DB_TYPE;
+		global $DB;
 
 		$condition = '';
 		
-		switch($DB_TYPE) {
+		switch($DB['TYPE']) {
 			case 'ORACLE':
 				$items = array_chunk($array, 1000);
 				foreach($items as $id => $value){

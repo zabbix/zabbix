@@ -22,13 +22,19 @@
 /********** USER PROFILE ***********/
 
 //---------- GET USER VALUE -------------
-function	get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN){
+function get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN,$resource=null){
 	global $USER_DETAILS;
 
 	$result = $default_value;
 
 	if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
-		$db_profiles = DBselect('SELECT * FROM profiles WHERE userid='.$USER_DETAILS["userid"].' AND idx='.zbx_dbstr($idx).' ORDER BY profileid ASC');
+		$sql = 'SELECT value, valuetype '.
+				' FROM profiles '.
+				' WHERE userid='.$USER_DETAILS["userid"].
+					' AND idx='.zbx_dbstr($idx).
+					(is_null($resource)?'':' AND resource='.zbx_dbstr($resource)).
+				' ORDER BY profileid ASC';
+		$db_profiles = DBselect($sql);
 
 		if($profile=DBfetch($db_profiles)){
 		
@@ -41,14 +47,42 @@ function	get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN){
 				}
 			}
 			else{
-				switch($type){
-					case PROFILE_TYPE_INT:		
-						$result = intval($profile["value"]);
-						break;
-					case PROFILE_TYPE_STR:
-					default:
-						$result = strval($profile["value"]);
+				$result = strval($profile["value"]);
+			}
+		}
+	}
+
+return $result;
+}
+
+
+// multi value
+function get_multi_profile($idx,$default_value=array(),$type=PROFILE_TYPE_UNKNOWN,$resource=null){
+	global $USER_DETAILS;
+
+	$result = $default_value;
+
+	if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
+		$sql = 'SELECT value,value2,resource,valuetype '.
+				' FROM profiles '.
+				' WHERE userid='.$USER_DETAILS["userid"].
+					' AND idx='.zbx_dbstr($idx).
+					(is_null($resource)?'':' AND resource='.zbx_dbstr($resource)).
+				' ORDER BY profileid ASC';
+		$db_profiles = DBselect($sql);
+
+		if($profile=DBfetch($db_profiles)){
+		
+			if(PROFILE_TYPE_UNKNOWN == $type) $type = $profile["valuetype"];
+	
+			if(PROFILE_TYPE_MULTI_ARRAY == $type){
+				$result[] = $profile;
+				while($profile=DBfetch($db_profiles)){
+					$result[] = $profile;
 				}
+			}
+			else{
+				$result = $profile;
 			}
 		}
 	}
@@ -57,7 +91,7 @@ return $result;
 }
 
 //----------- ADD/EDIT USERPROFILE -------------
-function	update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN){
+function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$resource=null){
 	global $USER_DETAILS;
 
 	if($USER_DETAILS["alias"]==ZBX_GUEST_USER){
@@ -65,49 +99,140 @@ function	update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN){
 	}
 	
 	if($type==PROFILE_TYPE_UNKNOWN && is_array($value))	$type = PROFILE_TYPE_ARRAY;
-	if($type==PROFILE_TYPE_ARRAY && !is_array($value))	$value = array($value);
+	if(($type==PROFILE_TYPE_ARRAY) && !is_array($value)) $value = array($value);
+
+	DBstart();	
 
 	if(PROFILE_TYPE_ARRAY == $type){
-		DBstart();
-		$sql='DELETE FROM profiles WHERE userid='.$USER_DETAILS["userid"].' and idx='.zbx_dbstr($idx);
+		
+		$sql='DELETE FROM profiles '.
+			' WHERE userid='.$USER_DETAILS["userid"].
+				' AND idx='.zbx_dbstr($idx);
 		DBExecute($sql);
-				
-		$result = insert_profile($idx,$value,$type);
-		DBend($result);
+		
+		foreach($value as $id => $val){
+			insert_profile($idx,$val,$type,$resource);
+		}
 	}
 	else{
-		$row = DBfetch(DBselect('SELECT value FROM profiles WHERE userid='.$USER_DETAILS["userid"].' AND idx='.zbx_dbstr($idx)));
+		$sql = 'SELECT profileid '.
+				' FROM profiles '.
+				' WHERE userid='.$USER_DETAILS["userid"].
+					' AND idx='.zbx_dbstr($idx).
+					(is_null($resource)?'':' AND resource='.zbx_dbstr($resource));
+					
+		$row = DBfetch(DBselect($sql));
 
 		if(!$row){
-			insert_profile($idx,$value,$type);
+			insert_profile($idx,$value,$type,$resource);
 		}
 		else{
 			$sql='UPDATE profiles SET value='.zbx_dbstr($value).',valuetype='.$type.
 				' WHERE userid='.$USER_DETAILS["userid"].
-					' AND idx='.zbx_dbstr($idx);
+					' AND idx='.zbx_dbstr($idx).
+					(is_null($resource)?'':' AND resource='.zbx_dbstr($resource));
 			DBexecute($sql);
 		}
 	}
 	
-return true;
+	$result = DBend();
+	
+return $result;
 }
 
-// Author: Aly
-function insert_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN){
+function update_multi_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$resource=null){
 	global $USER_DETAILS;
+
+	if($USER_DETAILS["alias"]==ZBX_GUEST_USER){
+		return false;
+	}
 	
-	$result = true;
-	if(is_array($value)){
-		foreach($value as $key => $val){
-			$result&=insert_profile($idx,$val,$type);		// recursion!!!
+	if(empty($value)) $type = PROFILE_TYPE_MULTI_ARRAY;
+	if(!is_array($value))	$value = array('value' => $value);
+	
+	if($type==PROFILE_TYPE_UNKNOWN && isset($value['value'])) $type = PROFILE_TYPE_MULTI;
+	if($type==PROFILE_TYPE_UNKNOWN && isset($value[0]['value'])) $type = PROFILE_TYPE_MULTI_ARRAY;
+		
+	if(($type==PROFILE_TYPE_MULTI_ARRAY) && isset($value['value']))	$value = array($value); 
+
+	DBstart();	
+
+	if(PROFILE_TYPE_MULTI_ARRAY == $type){
+		$sql='DELETE FROM profiles '.
+			' WHERE userid='.$USER_DETAILS["userid"].
+				' AND idx='.zbx_dbstr($idx);
+		DBExecute($sql);
+
+		foreach($value as $id => $val){
+			insert_profile($idx,$val,$type,$resource);
 		}
 	}
-	else{
-		$profileid = get_dbid('profiles', 'profileid');
-		$sql='INSERT INTO profiles (profileid,userid,idx,value,valuetype)'.
-				' VALUES ('.$profileid.','.$USER_DETAILS["userid"].','.zbx_dbstr($idx).','.zbx_dbstr($value).','.$type.')';
-		$result = DBexecute($sql);
+	else {
+		$sql = 'SELECT profileid '.
+				' FROM profiles '.
+				' WHERE userid='.$USER_DETAILS["userid"].
+					' AND idx='.zbx_dbstr($idx).
+					(is_null($resource)?'':' AND resource='.zbx_dbstr($resource));
+					
+		$row = DBfetch(DBselect($sql));
+
+		if(!$row){
+			insert_profile($idx,$value,$type,$resource);
+		}
+		else{
+			$val1 = isset($value['value'])?$value['value']:'';
+			$val2 = isset($value['value2'])?$value['value2']:'';
+			$rsrc = isset($value['resource'])?$value['resource']:(is_null($resource)?'':resource);
+
+			$sql='UPDATE profiles '.
+				' SET value='.zbx_dbstr($val1).
+						',value2='.zbx_dbstr($val2).
+						',resource='.zbx_dbstr($rsrc).
+						',valuetype='.$type.
+				' WHERE userid='.$USER_DETAILS["userid"].
+					' AND idx='.zbx_dbstr($idx).
+					(is_null($resource)?'':' AND resource='.zbx_dbstr($resource));
+			DBexecute($sql);
+		}
 	}
+	
+	$result = DBend();
+	
+return $result;
+}
+
+
+// Author: Aly
+function insert_profile($idx,$value,$type,$resource=null){
+	global $USER_DETAILS;
+
+	$profileid = get_dbid('profiles', 'profileid');
+	
+	$val1 = $value;
+	$val2 = '';
+	$rsrc = is_null($resource)?'':$resource;
+	
+	if(($type == PROFILE_TYPE_MULTI_ARRAY) || 
+		($type == PROFILE_TYPE_MULTI) ||
+		is_array($value))
+	{
+		$val1 = isset($value['value'])?$value['value']:'';
+		$val2 = isset($value['value2'])?$value['value2']:'';
+		$rsrc = isset($value['resource'])?$value['resource']:$rsrc;
+	}
+
+	if(empty($val1)) return false;
+	
+	$sql='INSERT INTO profiles (profileid,userid,idx,value,value2,resource,valuetype)'.
+		' VALUES ('.$profileid.','.
+					$USER_DETAILS["userid"].','.
+					zbx_dbstr($idx).','.
+					zbx_dbstr($val1).','.
+					zbx_dbstr($val2).','.
+					zbx_dbstr($rsrc).','.
+					$type.')';
+	$result = DBexecute($sql);
+	
 return $result;
 }
 
@@ -119,11 +244,11 @@ function get_user_history(){
 	$history=array();
 	$delimiter = new CSpan('&raquo;','delimiter');
 	for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
-		if($rows = get_profile('web.history.'.$i,false)){
+		if($rows = get_multi_profile('web.history.'.$i,false,PROFILE_TYPE_MULTI)){
 			if($i>0){
 				array_push($history,$delimiter);
 			}
-			$url = new CLink($rows[0],$rows[1],'history');
+			$url = new CLink($rows['value'],$rows['value2'],'history');
 			array_push($history,array(SPACE,$url,SPACE));
 		}
 	}
@@ -148,29 +273,32 @@ function add_user_history($page){
 	}
 	$url = $page['file'].$url;
 
+
 	$curr = 0;
 	$profile = array();
 	for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
-		$history = get_profile('web.history.'.$i,false);
-		if($history = get_profile('web.history.'.$i,false)){
-			if($history[0] != $title){
+		if($history = get_multi_profile('web.history.'.$i,false)){
+			if($history['value'] != $title){
 				$profile[$curr] = $history;
 				$curr++;
 			}
 		}
 	}
-			
-	$history = array($title,$url);
+
+	$history = array('value' => $title, 
+					'value2' => $url);
+				
 	if($curr < ZBX_HISTORY_COUNT){
 		for($i = 0; $i < $curr; $i++){
-			update_profile('web.history.'.$i,$profile[$i],PROFILE_TYPE_ARRAY);
+			update_multi_profile('web.history.'.$i,$profile[$i]);
 		}
-		$result = update_profile('web.history.'.$curr,$history,PROFILE_TYPE_ARRAY);
-	} else {
+		$result = update_multi_profile('web.history.'.$curr,$history);
+	} 
+	else {
 		for($i = 1; $i < ZBX_HISTORY_COUNT; $i++){
-			update_profile('web.history.'.($i-1),$profile[$i],PROFILE_TYPE_ARRAY);
+			update_multi_profile('web.history.'.($i-1),$profile[$i]);
 		}
-		$result = update_profile('web.history.'.(ZBX_HISTORY_COUNT-1),$history,PROFILE_TYPE_ARRAY);
+		$result = update_multi_profile('web.history.'.(ZBX_HISTORY_COUNT-1),$history);
 	}
 
 return $result;
@@ -180,68 +308,43 @@ return $result;
 /********** USER FAVORITES ***********/
 // Author: Aly
 function add2favorites($favobj,$favid,$resource=null){
-	$favrsrc = $favobj.'_rsrc';
+	$favorites = get_multi_profile($favobj);
 
-	$favorites = get_profile($favobj,array());
-	$fav_rsrc =  get_profile($favrsrc,array());
-
-	$favorites[] = $favid;
-	$fav_rsrc[] =  (is_null($resource))?0:$resource;
-
-	$result = update_profile($favobj,$favorites);
-	$result &= update_profile($favrsrc,$fav_rsrc);
+	$favorites[] = array('value' => $favid);
 	
+	$result = update_multi_profile($favobj,$favorites,PROFILE_TYPE_MULTI_ARRAY,$resource);
 return $result;
 }
 
 // Author: Aly
 function rm4favorites($favobj,$favid,$favcnt=null,$resource=null){
-	$favrsrc = $favobj.'_rsrc';
+	$favorites = get_multi_profile($favobj);
 
-	$favorites = get_profile($favobj,array());
-	$fav_rsrc =  get_profile($favrsrc,array());
-
-	$resource = (is_null($resource))?0:$resource;
-	$favcnt = (is_null($favcnt))?0:$favcnt;	
-	
+	$favcnt = (is_null($favcnt))?0:$favcnt;		
 	if($favid == 0) $favcnt = ZBX_FAVORITES_ALL;
 
-	foreach($favorites as $key => $value){
-		if(((bccomp($favid,$value) == 0) || ($favid == 0)) && ($fav_rsrc[$key] == $resource)){
+	foreach($favorites as $key => $favorite){
+		if(((bccomp($favid,$favorite['value']) == 0) || ($favid == 0)) && ($favorite['resource'] == $resource)){
 			if($favcnt < 1){
 				unset($favorites[$key]);
-				unset($fav_rsrc[$key]);
 				if($favcnt > ZBX_FAVORITES_ALL) break;  // foreach
 			}
 		}
 		$favcnt--;
 	}
 
-	$result = update_profile($favobj,$favorites);
-	$result &= update_profile($favrsrc,$fav_rsrc);
+	$result = update_multi_profile($favobj,$favorites,PROFILE_TYPE_MULTI_ARRAY);
 return $result;
 }
 
 // Author: Aly
-function get4favorites($favobj){
-	$favrsrc = $favobj.'_rsrc';
-	
-	$fav = array();
-	$fav['id'] = get_profile($favobj,array());
-	$fav['resource'] =  get_profile($favrsrc,array());
-	
-return $fav;
-}
-
-
-// Author: Aly
 function infavorites($favobj,$favid,$resource=null){
 
-	$fav = get4favorites($favobj);
-	if(!empty($fav)){
-		foreach($fav['id'] as $id => $resourceid){
-			if(bccomp($favid,$resourceid) == 0){
-				if(is_null($resource) || ($fav['resource'][$id] == $resource))
+	$favorites = get_multi_profile($favobj);
+	if(!empty($favorites)){
+		foreach($favorites as $id => $favorite){
+			if(bccomp($favid,$favorite['value']) == 0){
+				if(is_null($resource) || ($favorite['resource'] == $resource))
 					return true;
 			}
 		}
