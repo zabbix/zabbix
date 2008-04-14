@@ -64,24 +64,27 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
-	if(isset($_REQUEST["save"]))
-	{
-		if(isset($_REQUEST["sysmapid"]))
-		{
+	if(isset($_REQUEST["save"])){
+		if(isset($_REQUEST["sysmapid"])){
 			// TODO check permission by new value.
-			$result=update_sysmap($_REQUEST["sysmapid"],$_REQUEST["name"],$_REQUEST["width"],
+			DBstart();
+			update_sysmap($_REQUEST["sysmapid"],$_REQUEST["name"],$_REQUEST["width"],
 				$_REQUEST["height"],$_REQUEST["backgroundid"],$_REQUEST["label_type"],
 				$_REQUEST["label_location"]);
-
+			$result = DBend();
+			
 			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
 			show_messages($result,"Network map updated","Cannot update network map");
-		} else {
+		} 
+		else {
 			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				access_deny();
-
-			$result=add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
+			
+			DBstart();
+			add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 				$_REQUEST["backgroundid"],$_REQUEST["label_type"],$_REQUEST["label_location"]);
-
+			$result = DBend();
+			
 			add_audit_if($result,AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
 			show_messages($result,"Network map added","Cannot add network map");
 		}
@@ -89,9 +92,11 @@ include_once "include/page_header.php";
 			unset($_REQUEST["form"]);
 		}
 	}
-	elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["sysmapid"]))
-	{
-		$result = delete_sysmap($_REQUEST["sysmapid"]);
+	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["sysmapid"])){
+		DBstart();
+		delete_sysmap($_REQUEST["sysmapid"]);
+		$result = DBend();
+		
 		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].']');
 		show_messages($result,"Network map deleted","Cannot delete network map");
 		if($result){
@@ -108,12 +113,10 @@ include_once "include/page_header.php";
 	echo SBR;
 ?>
 <?php
-	if(isset($_REQUEST["form"]))
-	{
+	if(isset($_REQUEST["form"])){
 		insert_map_form();
 	}
-	else
-	{
+	else{
 		show_table_header(S_MAPS_BIG);
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->SetHeader(array(

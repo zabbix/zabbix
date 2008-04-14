@@ -21,10 +21,8 @@
 	include_once "include/hosts.inc.php";
 ?>
 <?php
-	class CZabbixXMLImport
-	{
-		function CZabbixXMLImport()
-		{
+	class CZabbixXMLImport{
+		function CZabbixXMLImport(){
 			global $USER_DETAILS;
 
 			$this->main_node= null;
@@ -46,33 +44,27 @@
 				PERM_READ_WRITE, null, PERM_RES_IDS_ARRAY, get_current_nodeid());
 		}
 		
-		function CharacterData($parser, $data) 
-		{
+		function CharacterData($parser, $data) {
 			$this->element_data .= html_entity_decode($data);
 		}
 		
-		function StartElement($parser, $name, $attrs) 
-		{
+		function StartElement($parser, $name, $attrs) {
 			$this->element_data = '';
 
-			if(!isset($this->root))
-			{
+			if(!isset($this->root)){
 				if($name == XML_TAG_ZABBIX_EXPORT)
 					if(isset($attrs['version']))
-						if($attrs['version'] == '1.0')
-						{
+						if($attrs['version'] == '1.0'){
 							$this->root = true;
 							return;
 						}
-						else
-						{
+						else{
 							error(S_UNSUPPORTED_VERSION_OF_IMPORTED_DATA);
 						}
 				error(S_UNSUPPORTED_FILE_FORMAT);
 				$this->root = false;
 			}
-			elseif(!$this->root)
-			{
+			else if(!$this->root){
 				return false;
 			}
 			
@@ -81,8 +73,7 @@
 			foreach($attrs as $id => $val)
 				$attrs[$id] = html_entity_decode($val);
 
-			switch($name)
-			{
+			switch($name){
 				case XML_TAG_HOST:
 					$this->main_node= array($name);
 					$this->sub_node	= null;
@@ -94,8 +85,7 @@
 						' where host='.zbx_dbstr($data['name']).
 							' and '.DBin_node('hostid',get_current_nodeid(false)))))
 					{ /* exist */
-						if($this->host['exist']==1) /* skip */
-						{
+						if($this->host['exist']==1) /* skip */{
 							$data['skip'] = true;
 							info('Host ['.$data['name'].'] skipped - user rule');
 							break; // case
@@ -108,16 +98,13 @@
 						$data['hostid']		= $host_data['hostid'];
 						$data['templates']	= get_templates_by_hostid($host_data['hostid']);
 					}
-					else
-					{ /* missed */
-						if($this->host['missed']==1) /* skip */
-						{
+					else{ /* missed */
+						if($this->host['missed']==1){ /* skip */
 							$data['skip'] = true;
 							info('Host ['.$data['name'].'] skipped - user rule');
 							break; // case
 						}
 						
-//						if( count($this->available_nodes) > 0 ){
 						if(!uint_in_array(get_current_nodeid(),$this->available_nodes)){
 							error('Host ['.$data['name'].'] skipped - Access deny.');
 							break; // case
@@ -173,18 +160,15 @@
 			}
 		}
 
-		function EndElement($parser, $name) 
-		{
-			if(!$this->root)
-			{
+		function EndElement($parser, $name) {
+			if(!$this->root){
 				return false;
 			}
 
 			global $USER_DETAILS;
 			
 			$data = &$this->data[$name];
-			switch($name)
-			{
+			switch($name){
 				case XML_TAG_HOST:
 					if($data['skip'] || !isset($data['hostid']) || !$data['hostid'])
 						break; // case
@@ -242,8 +226,7 @@
 						break; // case
 					}
 					
-					if(!uint_in_array($group["groupid"], $this->available_groups))
-					{
+					if(!uint_in_array($group["groupid"], $this->available_groups)){
 						error('Group ['.$this->element_data.'] skipped - Access deny.');
 						break; // case
 					}
@@ -265,8 +248,7 @@
 					{
 						$applicationid = add_application($this->element_data, $this->data[XML_TAG_HOST]['hostid']);
 					}
-					else
-					{
+					else{
 						$applicationid = $application['applicationid'];
 					}
 
@@ -280,14 +262,12 @@
 					if(!($template = DBfetch(DBselect('SELECT DISTINCT host, hostid '.
 								' FROM hosts'.
 								' WHERE '.DBin_node('hostid').
-									' AND host='.zbx_dbstr($this->element_data)))))
-					{
+									' AND host='.zbx_dbstr($this->element_data))))){
 						error('Missed template ['.$this->element_data.']');
 						break; // case
 					}
 					
-					if(!uint_in_array($template["hostid"], $this->available_hosts))
-					{
+					if(!uint_in_array($template["hostid"], $this->available_hosts)){
 						error('Template ['.$this->element_data.'] skipped - Access deny.');
 						break; // case
 					}
@@ -295,10 +275,8 @@
 					$this->data[XML_TAG_HOST]['templates'][$template["hostid"]] = $template['host'];
 					break; // case
 				case XML_TAG_ITEM:
-					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
-					{
-						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip'])
-						{
+					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid']){
+						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip']){
 							info('Item ['.$data['description'].'] skipped - user rule for host');
 							break; // case
 						}
@@ -331,16 +309,14 @@
 					if(!isset($data['params']))			$data['params']			= '';
 					if(!isset($data['applications']))		$data['applications']		= array();
 
-					if(!empty($data['valuemap']))
-					{
+					if(!empty($data['valuemap'])){
 						if( $valuemap = DBfetch(DBselect('select valuemapid from valuemaps '.
 										' where '.DBin_node('valuemapid', get_current_nodeid(false)).
 										' and name='.zbx_dbstr($data['valuemap']))) )
 						{
 							$data['valuemapid'] = $valuemap['valuemapid'];
 						}
-						else
-						{
+						else{
 							$data['valuemapid'] = add_valuemap($data['valuemap'],array());
 						}
 					}
@@ -350,13 +326,12 @@
 						' and hostid='.$this->data[XML_TAG_HOST]['hostid'].' and '.
 						DBin_node('itemid', get_current_nodeid(false)))))
 					{ /* exist */
-						if($this->item['exist']==1) /* skip */
-						{
+						if($this->item['exist']==1) /* skip */{
 							info('Item ['.$data['description'].'] skipped - user rule');
 							break;
 						}
 
-						if( !isset($data['valuemapid']) )
+						if(!isset($data['valuemapid']))
 							$data['valuemapid'] = $item['valuemapid'];
 
 						update_item(
@@ -392,10 +367,8 @@
 								)),
 							$item['templateid']);
 					}
-					else
-					{ /* missed */
-						if($this->item['missed']==1) /* skip */
-						{
+					else{ /* missed */
+						if($this->item['missed']==1) /* skip */{
 							info('Item ['.$data['description'].'] skipped - user rule');
 							break; // case
 						}
@@ -442,21 +415,17 @@
 					if(!isset($data['comments']))		$data['comments']	= '';
 					if(!isset($data['url']))		$data['url']		= '';
 
-					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
-					{
-						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip'])
-						{
+					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid']){
+						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip']){
 							info('Trigger ['.$data['description'].'] skipped - user rule for host');
 							break; // case
 						}
-						if(zbx_strstr($data['expression'],'{HOSTNAME}'))
-						{
+						if(zbx_strstr($data['expression'],'{HOSTNAME}')){
 							error('Trigger ['.$data['description'].'] skipped - missed host');
 							break; // case
 						}
 					}
-					else
-					{
+					else{
 						$data['expression'] = str_replace('{HOSTNAME}',
 									$this->data[XML_TAG_HOST]['name'],
 									$data['expression']);
@@ -494,14 +463,12 @@
 
 							break; // case
 						}
-						else /* missed */
-						{
+						else{ /* missed */
 							// continue [add_trigger]
 						}
 					}
 					
-					if($this->trigger['missed']==1) /* skip */
-					{
+					if($this->trigger['missed']==1) /* skip */{
 						info('Trigger ['.$data['description'].'] skipped - user rule');
 						break; // case
 					}
@@ -517,8 +484,7 @@
 
 					break; // case
 				case XML_TAG_GRAPH:
-					if(isset($data['error']))
-					{
+					if(isset($data['error'])){
 						error('Graph ['.$data['name'].'] skipped - error occured');
 						break; // case
 					}
@@ -533,31 +499,27 @@
 					if(!isset($data['show_3d']))		$data['show_3d']		= 0;
 					if(!isset($data['items']))		$data['items']			= array();
 
-					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
-					{
-						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip'])
-						{
+					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid']){
+						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip']){
 							info('Graph ['.$data['name'].'] skipped - user rule for host');
 							break; // case
 						}
 						foreach($data['items'] as $id)
 
-						if(zbx_strstr($data['name'],'{HOSTNAME}'))
-						{
+						if(zbx_strstr($data['name'],'{HOSTNAME}')){
 							error('Graph ['.$data['name'].'] skipped - missed host');
 							break; // case
 						}
 					}
-					else
-					{
+					else{
 						if($graph = DBfetch(DBselect('select distinct g.graphid, g.templateid'.
 							' from graphs g, graphs_items gi, items i'.
-							' where g.graphid=gi.graphid and gi.itemid=i.itemid'.
-							' and g.name='.zbx_dbstr($data['name']).
-							' and i.hostid='.$this->data[XML_TAG_HOST]['hostid'])))
+							' where g.graphid=gi.graphid '.
+								' and gi.itemid=i.itemid'.
+								' and g.name='.zbx_dbstr($data['name']).
+								' and i.hostid='.$this->data[XML_TAG_HOST]['hostid'])))
 						{ /* exist */
-							if($this->graph['exist']==1) /* skip */
-							{
+							if($this->graph['exist']==1){ /* skip */
 								info('Graph ['.$data['name'].'] skipped - user rule');
 								break; // case
 							}
@@ -580,16 +542,13 @@
 								$graph['templateid']);
 							DBexecute('delete from graphs_items where graphid='.$data['graphid']);
 						}
-						else
-						{ /* missed */
+						else{ /* missed */
 							// continue [add_group]
 						}
 					}
 					
-					if(!isset($data['graphid']))
-					{
-						if($this->graph['missed']==1) /* skip */
-						{
+					if(!isset($data['graphid'])){
+						if($this->graph['missed']==1){ /* skip */
 							info('Graph ['.$data['name'].'] skipped - user rule');
 							break; // case
 						}
@@ -609,8 +568,7 @@
 							);
 					}
 
-					foreach($data['items'] as $item)
-					{
+					foreach($data['items'] as $item){
 						add_item_to_graph(
 							$data['graphid'],
 							$item['itemid'],
@@ -628,8 +586,7 @@
 						break; // case
 						
 					$data['key'] = explode(':', $data['item']);
-					if(count($data['key']) < 2)
-					{
+					if(count($data['key']) < 2){
 						$this->data[XML_TAG_GRAPH]['error'] = true;
 						error('Incorrect element for graph ['.$data['name'].']');
 						break; // case
@@ -638,8 +595,7 @@
 					$data['host']	= array_shift($data['key']);
 					$data['key']	= implode(':', $data['key']);
 
-					if(isset($this->data[XML_TAG_HOST]['name']))
-					{
+					if(isset($this->data[XML_TAG_HOST]['name'])){
 						$data['host'] = str_replace('{HOSTNAME}',$this->data[XML_TAG_HOST]['name'],$data['host']);
 					}
 
@@ -670,8 +626,7 @@
 				case XML_TAG_SCREEN_ELEMENT:
 					break; // case*/
 				default:
-					if(isset($this->sub_node) && isset($this->main_node))
-					{
+					if(isset($this->sub_node) && isset($this->main_node)){
 						$main_node = array_pop($this->main_node);
 						$this->data[$main_node][$this->sub_node] = $this->element_data;
 						array_push($this->main_node, $main_node);
@@ -685,8 +640,7 @@
 			array_pop($this->main_node);
 		}
 
-		function Parse($file)
-		{
+		function Parse($file){
 			$this->main_node	= null;
 			$this->sub_node		= null;
 			$this->data		= null;
@@ -699,19 +653,15 @@
 			
 			xml_set_character_data_handler($xml_parser, array(&$this, "characterData"));
 
-			if (!($fp = fopen($file, "r")))
-			{
+			if(!$fp = fopen($file, "r")){
 				error("could not open XML input");
 				xml_parser_free($xml_parser);
 				return false;
 			}
-			else
-			{
-				while ($data = fread($fp, 4096))
-				{
-					if (!xml_parse($xml_parser, $data, feof($fp)))
-					{
-						error(	sprintf("XML error: %s at line %d",
+			else{
+				while($data = fread($fp, 4096)){
+					if(!xml_parse($xml_parser, $data, feof($fp))){
+						error(sprintf("XML error: %s at line %d",
 							xml_error_string(xml_get_error_code($xml_parser)),
 							xml_get_current_line_number($xml_parser))
 							);
@@ -731,8 +681,7 @@
 			return true;
 		}
 
-		function SetRules($host, $template, $item, $trigger, $graph)
-		{
+		function SetRules($host, $template, $item, $trigger, $graph){
 			$this->host	= $host;
 			$this->template = $template;
 			$this->item	= $item;
@@ -741,24 +690,18 @@
 		}
 	}
 
-	class CZabbixHostImport
-	{
-		function CZabbixHostImport()
-		{
+	class CZabbixHostImport{
+		function CZabbixHostImport(){
 		}
 		
-		function Parse($file)
-		{
-			if (!($fp = fopen($file, "r")))
-			{
+		function Parse($file){
+			if (!($fp = fopen($file, "r"))){
 				error("could not open XML input");
 				xml_parser_free($xml_parser);
 				return false;
 			}
-			else
-			{
-				while(!feof($fp))
-				{
+			else{
+				while(!feof($fp)){
 					$len = fgets($fp);
 					echo $len.'<br/>'."\n";
 				}

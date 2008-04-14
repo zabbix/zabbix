@@ -164,11 +164,12 @@ include_once "include/page_header.php";
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	$cmbHosts->AddItem(0,S_ALL_SMALL);
 	
-	$available_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
+	$available_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	
 	$scripts_by_hosts = get_accessible_scripts_by_hosts(explode(',',$available_hosts));
 	
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY);
 	
 	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
 					' FROM groups g, hosts_groups hg, hosts h, items i '.

@@ -111,8 +111,8 @@ function get_accessible_scripts_by_hosts($hosts){
 		$hosts = array('0' => hosts);
 	}
 	
-	$hosts_read_only  = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()));
-	$hosts_read_write = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid()));
+	$hosts_read_only  = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY));
+	$hosts_read_write = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE));
 
 // initialize array 
 	foreach($hosts as $id => $hostid){

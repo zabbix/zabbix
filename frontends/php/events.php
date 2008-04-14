@@ -140,8 +140,8 @@ include_once "include/page_header.php";
 
 	if(EVENT_SOURCE_TRIGGERS == $source){
 	
-	    $available_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, null, null, get_current_nodeid());
+	    $available_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
 		
 		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
 

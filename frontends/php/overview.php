@@ -70,23 +70,24 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
 	if($_REQUEST["type"] == SHOW_TRIGGERS){
-		$from = ", functions f, triggers t";
-		$where = " and i.itemid=f.itemid and f.triggerid=t.triggerid and t.status=".TRIGGER_STATUS_ENABLED;
+		$from = ', functions f, triggers t';
+		$where = 'and i.itemid=f.itemid and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED;
 	}
 	else{
 		$where = $from = '';
 	}
 	
-	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i".$from.
-		" where g.groupid in (".
-			get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid()).
-		") ".
-		" and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
-		" and h.hostid=i.hostid and hg.hostid=h.hostid and i.status=".ITEM_STATUS_ACTIVE.
-		$where.
-		" order by g.name");
-	while($row=DBfetch($result))
-	{
+	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
+				' FROM groups g, hosts_groups hg, hosts h, items i'.$from.
+				' WHERE g.groupid IN ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).') '.
+					' AND hg.groupid=g.groupid '.
+					' AND h.status='.HOST_STATUS_MONITORED.
+					' AND h.hostid=i.hostid '.
+					' AND hg.hostid=h.hostid '.
+					' AND i.status='.ITEM_STATUS_ACTIVE.
+					$where.
+				' ORDER BY g.name');
+	while($row=DBfetch($result)){
 		$cmbGroup->AddItem(
 				$row["groupid"],
 				get_node_name_by_elid($row["groupid"]).$row["name"]

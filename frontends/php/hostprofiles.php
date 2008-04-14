@@ -50,15 +50,17 @@ include_once "include/page_header.php";
 
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
-	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
 
-	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
-		" where h.hostid in (".$availiable_hosts.") ".
-		" and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
-		" and h.hostid=i.hostid and hg.hostid=h.hostid ".
-		" order by g.name");
-	while($row=DBfetch($result))
-	{
+	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
+		' FROM groups g, hosts_groups hg, hosts h, items i '.
+		' WHERE h.hostid IN ('.$availiable_hosts.') '.
+			' AND hg.groupid=g.groupid '.
+			' AND h.status='.HOST_STATUS_MONITORED.
+			' AND h.hostid=i.hostid '.
+			' AND hg.hostid=h.hostid '.
+		' ORDER BY g.name');
+	while($row=DBfetch($result)){
 		$cmbGroup->AddItem(
 				$row['groupid'],
 				get_node_name_by_elid($row['groupid']).$row['name']
@@ -70,13 +72,11 @@ include_once "include/page_header.php";
 ?>
 
 <?php
-	if(isset($_REQUEST["hostid"]))
-	{
+	if(isset($_REQUEST["hostid"])){
 		echo SBR;
 		insert_host_profile_form();
 	}
-	else
-	{
+	else{
 		$table = new CTableInfo();
 		$table->setHeader(array(
 			is_show_subnodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
