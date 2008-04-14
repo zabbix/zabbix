@@ -1274,24 +1274,20 @@ lbl_exit:
 #else /* HAVE_ORACLE */
 
 	char		*value_esc = NULL;
-	int		value_esc_max_len = 0;
-	int		sql_max_len = 0;
 	zbx_uint64_t	id;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_str()");
 
-	value_esc_max_len = strlen(value)+1024;
-	value_esc = zbx_malloc(value_esc, value_esc_max_len);
+	value_esc = DBdyn_escape_string(value);
 
-	sql_max_len = value_esc_max_len+100;
-
-	DBescape_string(value,value_esc,value_esc_max_len);
 	id = DBget_maxid("history_text", "id");
-	DBexecute("insert into history_text (id,clock,itemid,value) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s')",
-		id,
-		clock,
-		itemid,
-		value_esc);
+
+	DBexecute("insert into history_text (id,clock,itemid,value)"
+			" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s')",
+			id,
+			clock,
+			itemid,
+			value_esc);
 
 	zbx_free(value_esc);
 
@@ -1302,18 +1298,14 @@ lbl_exit:
 
 int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity)
 {
-	char	value_esc[MAX_STRING_LEN];
-	char	source_esc[MAX_STRING_LEN];
+	char	*value_esc = NULL, source_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_log()");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_log(value:%s)", value);
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_log(source:%s)", source);
+	value_esc = DBdyn_escape_string(value);
+	DBescape_string(source, source_esc, sizeof(source_esc));
 
-	DBescape_string(value,value_esc,MAX_STRING_LEN);
-	DBescape_string(source,source_esc,MAX_STRING_LEN);
-
-	if(id == 0)
+	if (id == 0)
 		id = DBget_maxid("history_log", "id");
 
 	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity)"
@@ -1326,7 +1318,7 @@ int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clo
 			source_esc,
 			severity);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of add_history_log()");
+	zbx_free(value_esc);
 
 	return SUCCEED;
 }
@@ -2096,6 +2088,8 @@ int	DBproxy_add_history_text(const char *host, const char *key, int clock, char 
 			clock,
 			value_esc);
 
+	zbx_free(value_esc);
+
 	return SUCCEED;
 }
 
@@ -2120,6 +2114,8 @@ int	DBproxy_add_history_log(const char *host, const char *key, int clock, int ti
 			source_esc,
 			severity,
 			value_esc);
+
+	zbx_free(value_esc);
 
 	return SUCCEED;
 }
