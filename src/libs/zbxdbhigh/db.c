@@ -1802,6 +1802,8 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->delay_flex	= row[35];
 	item->host_dns		= row[36];
 	item->params		= row[37];		/* !!! WHAT about CLOB??? */
+
+	item->eventlog_source=NULL;
 }
 
 /*
