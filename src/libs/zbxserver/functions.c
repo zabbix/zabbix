@@ -519,7 +519,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 			item->key,
 			item->host_name);
 		item->status = ITEM_STATUS_ACTIVE;
-		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64,
+		DBexecute("update items set status=%d,error='' where itemid=" ZBX_FS_UI64,
 			ITEM_STATUS_ACTIVE,
 			item->itemid);
 	}
