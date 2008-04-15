@@ -70,6 +70,9 @@ static void	process_listener(zbx_sock_t *s)
 
 ZBX_THREAD_ENTRY(listener_thread, pSock)
 {
+#if defined(ZABBIX_DAEMON)
+	struct	sigaction phan;
+#endif
 	int 
 		ret,
 		local_request_failed = 0;
@@ -79,6 +82,13 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 	assert(pSock);
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd listener started");
+
+#if defined(ZABBIX_DAEMON)
+	phan.sa_handler = child_signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+	sigaction(SIGALRM, &phan, NULL);
+#endif
 
 	memcpy(&s, ((zbx_sock_t *)pSock), sizeof(zbx_sock_t));
 
