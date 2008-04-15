@@ -646,8 +646,7 @@ include_once "include/page_header.php";
 			$show_applications = 0;
 			$show_host = 1;
 		}
-		else
-		{
+		else{
 			
 			$form->AddItem(array('[', 
 				new CLink($showdisabled ? S_HIDE_DISABLED_ITEMS : S_SHOW_DISABLED_ITEMS,
@@ -660,27 +659,29 @@ include_once "include/page_header.php";
 			$result=DBselect("select distinct g.groupid,g.name from groups g,hosts_groups hg".
 				" where g.groupid=hg.groupid and hg.hostid in (".$accessible_hosts.") ".
 				" order by name");
-			while($row=DBfetch($result))
-			{
+			while($row=DBfetch($result)){
 				$cmbGroup->AddItem($row["groupid"],$row["name"]);
 			}
 			$form->AddItem(S_GROUP.SPACE);
 			$form->AddItem($cmbGroup);
 
-			if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0)
-			{
-				$sql='select distinct h.hostid,h.host from hosts h,hosts_groups hg'.
-					' where hg.groupid='.$_REQUEST['groupid'].' and hg.hostid=h.hostid '.
-					' and h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-					' and h.hostid in ('.$accessible_hosts.') '.
-					' group by h.hostid,h.host order by h.host';
+			if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0){
+				$sql='select distinct h.hostid,h.host '.
+					' from hosts h,hosts_groups hg'.
+					' where hg.groupid='.$_REQUEST['groupid'].
+						' and hg.hostid=h.hostid '.
+						' and h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
+						' and h.hostid in ('.$accessible_hosts.') '.
+					' group by h.hostid,h.host '.
+					' order by h.host';
 			}
-			else
-			{
-				$sql='select distinct h.hostid,h.host from hosts h'.
+			else{
+				$sql='select distinct h.hostid,h.host '.
+					' from hosts h'.
 					' where h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-					' and h.hostid in ('.$accessible_hosts.') '.
-					' group by h.hostid,h.host order by h.host';
+						' and h.hostid in ('.$accessible_hosts.') '.
+					' group by h.hostid,h.host '.
+					' order by h.host';
 			}
 
 			$result=DBselect($sql);
@@ -690,8 +691,7 @@ include_once "include/page_header.php";
 
 			unset($correct_hostid);
 			$first_hostid = -1;
-			while($row=DBfetch($result))
-			{
+			while($row=DBfetch($result)){
 				$cmbHosts->AddItem($row["hostid"],$row["host"]);
 
 				if($_REQUEST["hostid"]!=0){
@@ -710,8 +710,7 @@ include_once "include/page_header.php";
 			$form->AddItem(SPACE);
 			$form->AddItem(new CButton("external_filter",S_EXTERNAL_FILTER));
 
-			if($host_info = DBfetch(DBselect('select host from hosts where hostid='.$_REQUEST["hostid"])))
-			{
+			if($host_info = DBfetch(DBselect('select host from hosts where hostid='.$_REQUEST["hostid"]))){
 				$form->AddVar('with_host', $host_info['host']);
 			}
 			$where_case[] = 'i.hostid='.$_REQUEST['hostid'];
@@ -780,12 +779,10 @@ include_once "include/page_header.php";
 					"&group_task=".($db_item["status"] ? "Activate+selected" : "Disable+selected"),
 					item_status2style($db_item["status"])));
 	
-			if($db_item["error"] == '')
-			{
+			if($db_item["error"] == ''){
 				$error=new CCol('-',"off");
 			}
-			else
-			{
+			else{
 				$error=new CCol($db_item["error"],"on");
 			}
 

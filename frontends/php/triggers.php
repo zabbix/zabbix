@@ -400,8 +400,7 @@ include_once "include/page_header.php";
 		$sql .= order_by('h.host,t.description,t.priority,t.status');
 
 		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts))
 				continue;
 
@@ -416,17 +415,14 @@ include_once "include/page_header.php";
 							$row["triggerid"]),     /* value */
 						SPACE);
 
-			if($row["templateid"])
-			{
+			if($row["templateid"]){
 				$real_hosts = get_realhosts_by_triggerid($row["triggerid"]);
 				$real_host = DBfetch($real_hosts);
-				if($real_host)
-				{
+				if($real_host){
 					$description[] = new CLink($real_host["host"],
 							"triggers.php?&hostid=".$real_host["hostid"], 'unknown');
 				}
-				else
-				{
+				else{
 					$description[] = new CSpan("error","on");
 				}
 				$description[] = ':';
