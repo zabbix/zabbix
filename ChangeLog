@@ -72,6 +72,7 @@ Changes for 1.5:
 
 Changes for 1.4.6:
 
+ - [ZBX-44] added timeout handler for processing net.tcp.* items (Sasha)
  - [ZBX-356] fixed possible server crash for non *log() items with type 'log' (Sasha)
  - [ZBX-354] added support of new parameter sec|#num for str(),regexp() and iregexp() (Sasha)
  - [ZBX-351] added support of floating point values w/o zero (.12) (Sasha)
