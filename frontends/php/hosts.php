@@ -258,13 +258,14 @@ include_once "include/page_header.php";
 			while($db_host=DBfetch($db_hosts)){			
 				$host=get_host_by_hostid($db_host["hostid"]);
 
-				if(!uint_in_array($db_host["hostid"],$hosts)) continue;
-				if(!delete_host($db_host["hostid"], $unlink_mode))	continue;
-
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,"Host [".$host["host"]."]");
+				if(!uint_in_array($db_host["hostid"],$hosts)) continue;			
+				$result=delete_host($db_host["hostid"], $unlink_mode);
+				
+				if($result)
+					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,"Host [".$host["host"]."]");
 			}
 			$result = DBend();
-			show_messages($result, S_HOST_DELETED, NULL);
+			show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 		}
 		unset($_REQUEST["delete"]);
 	}
@@ -302,17 +303,20 @@ include_once "include/page_header.php";
 		$hosts = get_request("hosts",array());
 
 		$db_hosts=DBselect('select hostid from hosts where '.DBin_node('hostid'));
-		while($db_host=DBfetch($db_hosts)){
-		
+		DBstart();
+		while($db_host=DBfetch($db_hosts)){		
 			if(!uint_in_array($db_host["hostid"],$hosts)) continue;
+
 			$host=get_host_by_hostid($db_host["hostid"]);
 			$res=update_host_status($db_host["hostid"],$status);
-
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,
-				"Old status [".$host["status"]."] "."New status [".$status."]");
+			
+			if($res){
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,"Old status [".$host["status"]."] "."New status [".$status."]");
+			}
 		}
+		$result = DBend();
 		
-		show_messages($result, S_HOST_STATUS_UPDATED, NULL);
+		show_messages($result, S_HOST_STATUS_UPDATED, S_CANNOT_UPDATE_HOST);
 		unset($_REQUEST["activate"]);
 	}
 
@@ -390,22 +394,22 @@ include_once "include/page_header.php";
 			$groups = get_request("groups",array());
 
 			$db_groups=DBselect('select groupid, name from groups where '.DBin_node('groupid'));
+			
+			DBstart();
 			while($db_group=DBfetch($db_groups)){
 				if(!uint_in_array($db_group["groupid"],$groups)) continue;
 			
 				if(!($group = get_hostgroup_by_groupid($db_group["groupid"]))) continue;
-				
-				DBstart();
 				$result = delete_host_group($db_group["groupid"]);
-				$result = DBend();
 				
 				if($result){
 					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST_GROUP,
 					S_HOST_GROUP." [".$group["name"]." ] [".$group['groupid']."]");
 				}
 			}
-
-			show_messages(true, S_GROUP_DELETED, NULL);
+			$result = DBend();
+			
+			show_messages(true, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 		}
 		unset($_REQUEST["delete"]);
 	}
@@ -420,6 +424,7 @@ include_once "include/page_header.php";
 			' where h.hostid=hg.hostid '.
 				' and h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 				' and '.DBin_node('h.hostid'));
+		DBstart();
 		while($db_host=DBfetch($db_hosts)){
 			if(!uint_in_array($db_host["groupid"],$groups)) continue;
 			$host=get_host_by_hostid($db_host["hostid"]);
@@ -429,8 +434,9 @@ include_once "include/page_header.php";
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,
 				"Old status [".$host["status"]."] "."New status [".$status."]");
 		}
+		$result = DBend();
 		
-		show_messages($result, S_HOST_STATUS_UPDATED, NULL);
+		show_messages($result, S_HOST_STATUS_UPDATED, S_CANNOT_UPDATE_HOST);
 		unset($_REQUEST["activate"]);
 	}
 
@@ -483,19 +489,19 @@ include_once "include/page_header.php";
 			$db_applications = DBselect("select applicationid, name, hostid from applications ".
 				'where '.DBin_node('applicationid'));
 
+			DBstart();
 			while($db_app = DBfetch($db_applications)){
 				if(!uint_in_array($db_app["applicationid"],$applications))	continue;
 				
-				DBstart();
 				$result = delete_application($db_app["applicationid"]);
-				$result = DBend();
-				
+
 				if($result){
 					$host = get_host_by_hostid($db_app["hostid"]);
 					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_APPLICATION,"Application [".$db_app["name"]."] from host [".$host["host"]."]");
 				}
 			}
-
+			$result = DBend();
+			
 			show_messages(true, S_APPLICATION_DELETED, NULL);
 		}
 		unset($_REQUEST["delete"]);
@@ -505,6 +511,7 @@ include_once "include/page_header.php";
 		$result = true;
 		$applications = get_request("applications",array());
 
+		DBstart();
 		foreach($applications as $id => $appid){
 	
 			$sql = 'SELECT ia.itemid,i.hostid,i.key_'.
@@ -531,6 +538,7 @@ include_once "include/page_header.php";
 					}
 			}
 		}
+		$result = DBend();
 		(isset($_REQUEST["activate"]))?show_messages($result, S_ITEMS_ACTIVATED, null):show_messages($result, S_ITEMS_DISABLED, null);
 	}
 	else if($_REQUEST["config"]==5 && isset($_REQUEST["save"])){
@@ -608,6 +616,7 @@ include_once "include/page_header.php";
 		$status = isset($_REQUEST["activate"]) ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 		$hosts = get_request("hosts",array());
 
+		DBstart();
 		foreach($hosts as $hostid){
 			$db_hosts = DBselect('SELECT  hostid,status '.
 								' FROM hosts '.
@@ -624,7 +633,8 @@ include_once "include/page_header.php";
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,"Old status [".$old_status."] "."New status [".$status."] [".$db_host["hostid"]."]");
 			}
 		}
-
+		$result = DBend();
+		
 		show_messages($result, S_HOST_STATUS_UPDATED, NULL);
 
 		if(isset($_REQUEST["activate"]))

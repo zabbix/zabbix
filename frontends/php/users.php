@@ -466,9 +466,8 @@ include_once "include/page_header.php";
 							' FROM users u'.
 							' WHERE '.DBin_node('u.userid').
 							order_by('u.alias,u.name,u.surname,u.type','u.userid'));
-			while($db_user=DBfetch($db_users))
-			{
-//Log Out 10min ot Autologout time
+			while($db_user=DBfetch($db_users)){
+//Log Out 10min or Autologout time
 				$online_time = (($db_user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$db_user['autologout']))?ZBX_USER_ONLINE_TIME:$db_user['autologout'];
 				$db_sessions = DBselect('SELECT count(*) as count, max(s.lastaccess) as lastaccess'.
 						' FROM sessions s, users u'.
@@ -484,11 +483,13 @@ include_once "include/page_header.php";
 					$online=new CCol(S_NO,"disabled");
 				
 				$user_groups = array();
-				$db_groups = DBselect("select g.name from usrgrp g, users_groups ug".
-					" where g.usrgrpid=ug.usrgrpid and ug.userid=".$db_user['userid']);
+				$db_groups = DBselect('SELECT g.name '.
+									' FROM usrgrp g, users_groups ug '.
+									' WHERE g.usrgrpid=ug.usrgrpid '.
+										' and ug.userid='.$db_user['userid']);
+										
 				while($db_group = DBfetch($db_groups))
 					array_push($user_groups,empty($user_groups)?'':BR(),$db_group['name']);
-				
 				
 				$db_user['users_status'] = check_perm2system($db_user['userid']);
 				$db_user['gui_access'] = check_perm2login($db_user['userid']);
