@@ -1,5 +1,6 @@
 Changes for 1.4.6:
 
+ - [ZBX-357] fixed problem with clearing error message for activated items (Sasha)
  - [ZBX-339] fixes problem in frontend with clearing history for text items (Sasha) 
  - [ZBX-44] added timeout handler for processing net.tcp.* items (Sasha)
  - [ZBX-356] fixed possible server crash for non *log() items with type 'log' (Sasha)

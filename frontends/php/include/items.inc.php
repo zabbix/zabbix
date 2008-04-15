@@ -431,7 +431,10 @@
 				DBexecute("insert into items_applications (itemappid,itemid,applicationid) values($itemappid,".$itemid.",".$appid.")");
 			}
 		}
-		
+
+		if ($status == ITEM_STATUS_ACTIVE)
+			DBexecute("update items set error='' where itemid=$itemid and status<>$status");
+
 		$result=DBexecute(
 			"update items set description=".zbx_dbstr($description).",key_=".zbx_dbstr($key).",".
 			"hostid=$hostid,delay=$delay,history=$history,nextcheck=0,type=$type,status=".$status.','.
