@@ -751,46 +751,6 @@ void  DBdelete_trigger(zbx_uint64_t triggerid)
 	DBexecute("delete from triggers where triggerid=" ZBX_FS_UI64,triggerid);
 }
 
-void  DBdelete_triggers_by_itemid(zbx_uint64_t itemid)
-{
-	zbx_uint64_t	triggerid;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_triggers_by_itemid(" ZBX_FS_UI64 ")",
-		itemid);
-	result = DBselect("select triggerid from functions where itemid=" ZBX_FS_UI64,
-		itemid);
-
-	while((row=DBfetch(result)))
-	{
-		ZBX_STR2UINT64(triggerid, row[0]);
-/*		triggerid=atoi(row[0]);*/
-		DBdelete_trigger(triggerid);
-	}
-	DBfree_result(result);
-
-	DBexecute("delete from functions where itemid=" ZBX_FS_UI64,
-		itemid);
-
-	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_triggers_by_itemid(" ZBX_FS_UI64 ")",
-		itemid);
-}
-
-void DBdelete_trends_by_itemid(zbx_uint64_t itemid)
-{
-	DBexecute("delete from trends where itemid=" ZBX_FS_UI64,
-		itemid);
-}
-
-void DBdelete_history_by_itemid(zbx_uint64_t itemid)
-{
-	DBexecute("delete from history where itemid=" ZBX_FS_UI64,
-		itemid);
-	DBexecute("delete from history_str where itemid=" ZBX_FS_UI64,
-		itemid);
-}
-
 void DBupdate_triggers_status_after_restart(void)
 {
 	int	lastchange;
