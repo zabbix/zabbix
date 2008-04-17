@@ -248,6 +248,8 @@ moveSBoxByObj: function(){
 	if(arguments.length < 1) return false;
 
 	var p_obj = arguments[arguments.length-1];
+	p_obj = $(p_obj);
+	
 	if('undefined' == typeof(p_obj.nodeName)) return false;
 
 	var posxy = getPosition(p_obj);

@@ -60,7 +60,7 @@ include_once "include/page_header.php";
 
 //--------------------------------------------------------------------------
 
-$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 
 $query = 'SELECT DISTINCT s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid, s.triggerid, '.
 		' s.name as caption, s.algorithm, t.description, t.expression, s.sortorder, sl.linkid, s.showsla, s.goodsla, s.status '.
@@ -69,7 +69,7 @@ $query = 'SELECT DISTINCT s.serviceid, sl.servicedownid, sl_p.serviceupid as ser
 		' LEFT JOIN services_links sl ON  s.serviceid = sl.serviceupid and NOT(sl.soft=0) '.
 		' LEFT JOIN services_links sl_p ON  s.serviceid = sl_p.servicedownid and sl_p.soft=0 '.
 	' WHERE '.DBin_node('s.serviceid').
-		' AND (t.triggerid IS NULL OR t.triggerid IN ('.$available_triggers.')) '.
+		' AND (t.triggerid IS NULL OR '.DBcondition('t.triggerid',$available_triggers).') '.
 	' ORDER BY s.sortorder, sl_p.serviceupid, s.serviceid';
 
 $result=DBSelect($query);

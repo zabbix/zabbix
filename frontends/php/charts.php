@@ -367,9 +367,10 @@ include_once 'include/page_header.php';
 				A_SBOX["'.$dom_graph_id.'"].shiftT = 17;
 				A_SBOX["'.$dom_graph_id.'"].shiftL = '.$shiftXleft.';
 				
-				var ZBX_G_WIDTH = get_bodywidth();		
+				var ZBX_G_WIDTH = get_bodywidth();
+				if(!is_number(ZBX_G_WIDTH)) ZBX_G_WIDTH = 900;
+				
 				ZBX_G_WIDTH-= parseInt('.($shiftXleft+$shiftXright).'+parseInt((SF)?27:27));
-				//ZBX_G_WIDTH-= '.($shiftXleft+$shiftXright+27).';
 				
 				document.write(\'<img id="'.$dom_graph_id.'" src="chart2.php?graphid='.$_REQUEST['graphid'].url_param('stime').
 				'&period='.$effectiveperiod.'&width=\'+ZBX_G_WIDTH+\'" /><br />\');
@@ -395,10 +396,10 @@ include_once 'include/page_header.php';
 		
 		$script = 'scrollinit(0,0,0,'.$effectiveperiod.','.$stime.',0,'.$bstime.'); showgraphmenu("graph");';
 		
-		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
+		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){		
 			$script.= 'graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH,'.$graph_height.');'; 
 		}
-						
+
 		zbx_add_post_js($script);
 //		navigation_bar('charts.php',array('groupid','hostid','graphid'));
 //-------------

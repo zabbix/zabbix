@@ -56,7 +56,7 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 // ACTION /////////////////////////////////////////////////////////////////////////////
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
