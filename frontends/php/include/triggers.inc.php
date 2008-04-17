@@ -197,7 +197,7 @@
 			return $available_triggers[$perm][$perm_res][$nodeid_str][$hostid_str];
 		}
 
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, null, $nodeid);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid);
 		
 		$denied_graphs = array();
 		$available_graphs = array();
@@ -207,7 +207,7 @@
 				' WHERE t.triggerid=f.triggerid '.
 					' AND f.itemid=i.itemid'.
 					(!empty($hostid)?' AND i.hostid='.$hostid:'').
-					' AND i.hostid NOT IN ('.$available_hosts.')';
+					' AND '.DBcondition('i.hostid',$available_hosts,true);
 
 		$db_triggers = DBselect($sql);
 		while($trigger = DBfetch($db_triggers)){
@@ -220,7 +220,7 @@
 					' AND f.itemid=i.itemid'.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					(!empty($hostid)?' AND i.hostid='.$hostid:'').
-					(!empty($denied_triggers)?' AND t.triggerid  NOT IN ('.implode(',',$denied_triggers).')':'');
+					(!empty($denied_triggers)?' AND '.DBcondition('t.triggerid',$denied_triggers,true):'');
 					
 		$db_triggers = DBselect($sql);
 		while($trigger = DBfetch($db_triggers)){
@@ -1467,24 +1467,21 @@
 		return $result;
 	}
 
-	function	check_right_on_trigger_by_triggerid($permission,$triggerid,$available_hosts=null)
+	function	check_right_on_trigger_by_triggerid($permission,$triggerid)
 	{
 		$trigger_data = DBfetch(DBselect('select expression from triggers where triggerid='.$triggerid));
 
 		if(!$trigger_data) return false;
 
-		return check_right_on_trigger_by_expression($permission, explode_exp($trigger_data['expression'], 0), $available_hosts);
+		return check_right_on_trigger_by_expression($permission, explode_exp($trigger_data['expression'], 0));
 	}
 
-	function	check_right_on_trigger_by_expression($permission,$expression,$available_hosts=null)
-	{
-		if(is_null($available_hosts))
-		{
-			global $USER_DETAILS;
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission, PERM_RES_IDS_ARRAY);
-		}
-		if(!is_array($available_hosts)) $available_hosts = explode(',', $available_hosts);
-                $db_hosts = get_hosts_by_expression($expression);
+	function	check_right_on_trigger_by_expression($permission,$expression){
+	
+		global $USER_DETAILS;
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission, PERM_RES_IDS_ARRAY);
+
+		$db_hosts = get_hosts_by_expression($expression);
 		while($host_data = DBfetch($db_hosts)){
 			if(!uint_in_array($host_data['hostid'], $available_hosts)) return false;
 		}

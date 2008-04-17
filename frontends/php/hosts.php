@@ -39,9 +39,6 @@ include_once "include/page_header.php";
 		access_deny();
 	}
 
-	if(count($available_hosts) == 0) $available_hosts = array(-1);
-	$available_hosts = implode(',', $available_hosts);
-
 	if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"] > 0){
 		if(!uint_in_array($_REQUEST["groupid"], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
 			access_deny();
@@ -644,7 +641,7 @@ include_once "include/page_header.php";
 	}
 
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
 ?>
 <?php
 	$frmForm = new CForm();
@@ -711,7 +708,7 @@ include_once "include/page_header.php";
 
 			$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
 							' FROM groups g,hosts_groups hg,hosts h '.
-							' WHERE h.hostid in ('.$available_hosts.') '.
+							' WHERE '.DBcondition('h.hostid',$available_hosts).
 								' AND g.groupid=hg.groupid '.
 								' AND h.hostid=hg.hostid'.
 								$status_filter.
@@ -770,7 +767,7 @@ include_once "include/page_header.php";
 				$sql.= ' hosts h WHERE ';
 			}
 			
-			$sql.= ' h.hostid IN ('.$available_hosts.') '.
+			$sql.= DBcondition('h.hostid',$available_hosts).
 				$status_filter.
 				order_by('h.host,h.port,h.ip,h.status,h.available,h.dns');
 
@@ -964,7 +961,7 @@ include_once "include/page_header.php";
 						' FROM hosts h, hosts_groups hg'.
 						' WHERE h.hostid=hg.hostid '.
 						' AND hg.groupid='.$db_group['groupid'].
-						' AND h.hostid in ('.$available_hosts.')'.
+						' AND '.DBcondition('h.hostid',$available_hosts).
 						' AND h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
 						' order by host'
 						);
@@ -1016,7 +1013,7 @@ include_once "include/page_header.php";
 		$templates = DBSelect('SELECT h.* '.
 						' FROM hosts h'.
 						' WHERE h.status='.HOST_STATUS_TEMPLATE.
-							' AND h.hostid in ('.$available_hosts.') '.
+							' AND '.DBcondition('h.hostid',$available_hosts).
 						order_by('h.host'));
 						
 		while($template = DBfetch($templates)){
@@ -1025,7 +1022,7 @@ include_once "include/page_header.php";
 							' WHERE ht.templateid='.$template['hostid'].
 								' AND ht.hostid=h.hostid '.
 								' AND h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-								' AND h.hostid in ('.$available_hosts.') '.
+								' AND '.DBcondition('h.hostid',$available_hosts).
 							' ORDER BY host');
 			$host_list = array();
 			while($host = DBfetch($hosts))
@@ -1057,7 +1054,7 @@ include_once "include/page_header.php";
 			$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
 						' FROM groups g,hosts_groups hg '.
 						' WHERE g.groupid=hg.groupid '.
-							' AND hg.hostid IN ('.$available_hosts.') '.
+							' AND '.DBcondition('hg.hostid',$available_hosts).
 							' ORDER BY name');
 							
 			while($row=DBfetch($result)){
@@ -1072,7 +1069,7 @@ include_once "include/page_header.php";
 					' FROM hosts h,hosts_groups hg '.
 					' WHERE hg.groupid='.$_REQUEST['groupid'].
 						' AND hg.hostid=h.hostid '.
-						' AND h.hostid in ('.$available_hosts.') '.
+						' AND '.DBcondition('h.hostid',$available_hosts).
 //						' AND h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 					' GROUP BY h.hostid,h.host '.
 					' ORDER BY h.host';
@@ -1080,7 +1077,7 @@ include_once "include/page_header.php";
 			else{
 				$sql='SELECT DISTINCT h.hostid,h.host '.
 					' FROM hosts h '.
-					' WHERE h.hostid IN ('.$available_hosts.') '.
+					' WHERE '.DBcondition('h.hostid',$available_hosts).
 //						' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
 						' GROUP BY h.hostid,h.host '.
 						' ORDER BY h.host';
@@ -1189,8 +1186,8 @@ include_once "include/page_header.php";
 				$db_hosts = DBselect('SELECT DISTINCT host,status'.
 						' FROM hosts'.
 						' WHERE proxy_hostid='.$db_proxy['hostid'].
-						' AND hostid in ('.$available_hosts.')'.
-						' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+							' AND '.DBcondition('hostid',$available_hosts).
+							' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 						' order by host'
 						);
 

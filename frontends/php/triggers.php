@@ -96,7 +96,7 @@ include_once "include/page_header.php";
 <?php
 	update_profile("web.triggers.showdisabled",$showdisabled);
 
-	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
 
 /* FORM ACTIONS */
 	if(isset($_REQUEST["clone"]) && isset($_REQUEST["triggerid"])){
@@ -232,7 +232,7 @@ include_once "include/page_header.php";
 	else if(isset($_REQUEST["group_enable"])&&isset($_REQUEST["g_triggerid"])){
 	
 		foreach($_REQUEST["g_triggerid"] as $triggerid){
-			if(!check_right_on_trigger_by_triggerid(null, $triggerid, $accessible_hosts)) continue;
+			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
 			$result=DBselect("SELECT triggerid FROM triggers t WHERE t.triggerid=".zbx_dbstr($triggerid));
 			if(!($row = DBfetch($result))) continue;
@@ -254,7 +254,7 @@ include_once "include/page_header.php";
 	}
 	else if(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_triggerid"])){
 		foreach($_REQUEST["g_triggerid"] as $triggerid){
-			if(!check_right_on_trigger_by_triggerid(null, $triggerid, $accessible_hosts)) continue;
+			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
 			$result=DBselect("SELECT triggerid FROM triggers t WHERE t.triggerid=".zbx_dbstr($triggerid));
 			if(!($row = DBfetch($result))) continue;
@@ -274,7 +274,7 @@ include_once "include/page_header.php";
 	else if(isset($_REQUEST["group_delete"])&&isset($_REQUEST["g_triggerid"])){
 		
 		foreach($_REQUEST["g_triggerid"] as $triggerid){
-			if(!check_right_on_trigger_by_triggerid(null, $triggerid, $accessible_hosts)) continue;
+			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
 			$result=DBselect("SELECT triggerid,templateid FROM triggers t WHERE t.triggerid=".zbx_dbstr($triggerid));
 			if(!($row = DBfetch($result))) continue;
@@ -313,7 +313,7 @@ include_once "include/page_header.php";
 	
 	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
 		' FROM groups g, hosts_groups hg, hosts h, items i '.
-		' WHERE h.hostid in ('.$accessible_hosts.') '.
+		' WHERE '.DBcondition('h.hostid',$available_hosts).
 			' AND hg.groupid=g.groupid '.
 			' AND h.hostid=i.hostid '.
 			' AND hg.hostid=h.hostid '.
@@ -329,7 +329,7 @@ include_once "include/page_header.php";
 			' WHERE h.hostid=i.hostid '.
 				' AND hg.groupid='.$_REQUEST['groupid'].
 				' AND hg.hostid=h.hostid'.
-				' AND h.hostid in ('.$accessible_hosts.') '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 			' GROUP BY h.hostid,h.host '.
 			' ORDER BY h.host';
 	}
@@ -338,7 +338,7 @@ include_once "include/page_header.php";
 		$sql='SELECT h.hostid,h.host '.
 			' FROM hosts h,items i '.
 			' WHERE h.hostid=i.hostid '.
-				' AND h.hostid in ('.$accessible_hosts.') '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 			' GROUP BY h.hostid,h.host '.
 			' ORDER BY h.host';
 	}
@@ -401,7 +401,7 @@ include_once "include/page_header.php";
 
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
-			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts))
+			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid']))
 				continue;
 
 			if(is_null($row['host'])) $row['host'] = '';

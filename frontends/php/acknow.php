@@ -62,18 +62,12 @@ include_once "include/page_header.php";
 //$bulk = (count($events) > 1);
 ?>
 <?php
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
-	
-	$eventids = '';
-	foreach($events as $id => $eventid){
-		$eventids.= $id.',';
-	}
-	$eventids = trim($eventids,',');
-	
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid());
+		
 	$db_data = DBfetch(DBselect('SELECT COUNT(DISTINCT  e.eventid) as cnt'.
 			' FROM events e'.
-			' WHERE e.eventid in ('.$eventids.') '.
-				' AND e.objectid IN ('.$available_triggers.') '.
+			' WHERE '.DBcondition('e.eventid',$events).
+				' AND '.DBcondition('e.objectid',$available_triggers).
 				' AND e.object='.EVENT_OBJECT_TRIGGER.
 				' AND '.DBin_node('e.eventid')
 			));
@@ -87,10 +81,10 @@ include_once "include/page_header.php";
 		' WHERE h.hostid=i.hostid '.
 			' AND i.itemid=f.itemid '.
 			' AND f.triggerid=t.triggerid '.
-			' AND e.eventid in ('.$eventids.') '.
+			' AND '.DBcondition('e.eventid',$events).
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.objectid=t.triggerid '.
-			' AND t.triggerid IN ('.$available_triggers.') '.
+			' AND '.DBcondition('t.triggerid',$available_triggers).
 			' AND '.DBin_node('e.eventid')
 			));
 
@@ -108,8 +102,7 @@ include_once "include/page_header.php";
 				' ['.$_REQUEST["message"].']');
 		}
 	}
-	else if(isset($_REQUEST["saveandreturn"]))
-	{
+	else if(isset($_REQUEST["saveandreturn"])){
 		$result = true;
 		if($bulk) {
 			$_REQUEST['message'] .= ($_REQUEST['message'] != ''? "\n\r" : '').S_SYS_BULK_ACKNOWLEDGE;

@@ -49,12 +49,12 @@ include_once "include/page_header.php";
 		fatal_error(S_NO_IT_SERVICE_DEFINED);
 	}
 	
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 	
 	$sql = 'SELECT s.* '.
 			' FROM services s '.
 			' WHERE s.serviceid='.$_REQUEST['serviceid'].
-				' AND (s.triggerid IS NULL OR s.triggerid IN ('.$available_triggers.')) '.
+				' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 				' AND DBin_node('s.serviceid')';
 				
 	if(!$service = DBfetch(DBselect($sql))){

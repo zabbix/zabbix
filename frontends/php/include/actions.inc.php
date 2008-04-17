@@ -764,7 +764,7 @@ include_once 'include/discovery.inc.php';
 	}
 	
 	function get_history_of_actions($start,$num,$sql_cond=''){
-		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 
 		$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 		$table->SetHeader(array(
@@ -783,7 +783,7 @@ include_once 'include/discovery.inc.php';
 				' WHERE mt.mediatypeid=a.mediatypeid '.
 					' AND e.eventid = a.eventid'.
 					$sql_cond.
-					' AND e.objectid IN ('.$available_triggers.') '.
+					' AND '.DBcondition('e.objectid',$available_triggers).
 					' AND '.DBin_node('a.alertid').
 				order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries');
 
@@ -837,7 +837,7 @@ include_once 'include/discovery.inc.php';
 	
 // Author: Aly
 function get_actions_for_event($eventid){
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(
@@ -857,7 +857,7 @@ function get_actions_for_event($eventid){
 			' WHERE mt.mediatypeid=a.mediatypeid '.
 				' AND a.eventid='.$eventid.
 				' AND e.eventid = a.eventid'.
-				' AND e.objectid IN ('.$available_triggers.') '.
+				' AND '.DBcondition('e.objectid',$available_triggers).
 				' AND '.DBin_node('a.alertid').
 			order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries'));
 		
@@ -903,7 +903,7 @@ return $table;
 
 // Author: Aly
 function get_actions_hint_by_eventid($eventid,$status=NULL){
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 	
 	$tab_hint = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$tab_hint->AddOption('style', 'width: 300px;');
@@ -920,7 +920,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 				' AND a.eventid='.$eventid.
 				(is_null($status)?'':' AND a.status='.$status).
 				' AND e.eventid = a.eventid'.
-				' AND e.objectid IN ('.$available_triggers.') '.
+				' AND '.DBcondition('e.objectid',$available_triggers).
 				' AND '.DBin_node('a.alertid').
 				' AND u.userid=a.userid '.
 			' ORDER BY mt.description';

@@ -176,8 +176,8 @@ function make_system_summary(){
 	global $USER_DETAILS;
 	$config=select_config();
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-	$available_triggers = get_accessible_triggers(PERM_READ_LIST);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_LIST,PERM_RES_DATA_ARRAY);
 		
 	$table = new CTableInfo();
 	$table->SetHeader(array(
@@ -193,7 +193,7 @@ function make_system_summary(){
 
 	$gr_result=DBselect('SELECT DISTINCT g.groupid,g.name '.
 					' FROM groups g, hosts_groups hg, hosts h, items i, functions f, triggers t '.
-					' WHERE h.hostid in ('.$available_hosts.') '.
+					' WHERE '.DBcondition('h.hostid',$available_hosts).
 						' AND hg.groupid=g.groupid '.
 						' AND h.status='.HOST_STATUS_MONITORED.
 						' AND h.hostid=i.hostid '.
@@ -231,7 +231,7 @@ function make_system_summary(){
 				' AND t.triggerid=f.triggerid '.
 				' AND t.value='.TRIGGER_VALUE_TRUE.
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND h.hostid in ('.$available_hosts.') '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 			' GROUP BY t.priority';
 //SDI($sql);
 		$tr_result = DBSelect($sql);
@@ -260,9 +260,11 @@ function make_system_summary(){
 								' AND hg.groupid='.$group['groupid'].
 								' AND h.hostid=i.hostid '.
 								' AND hg.hostid=h.hostid '.
-								' AND t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
-								' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
-								' AND t.triggerid IN ('.$available_triggers.') '.
+								' AND t.triggerid=f.triggerid '.
+								' AND t.status='.TRIGGER_STATUS_ENABLED.
+								' AND i.status='.ITEM_STATUS_ACTIVE.
+								' AND '.DBin_node('t.triggerid').
+								' AND '.DBcondition('t.triggerid', $available_triggers).
 								' AND h.status='.HOST_STATUS_MONITORED.
 								' AND t.value='.TRIGGER_VALUE_TRUE.
 								' AND t.priority='.$key.
@@ -277,7 +279,8 @@ function make_system_summary(){
 			
 					$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
 								' FROM events e, triggers t '.
-								' WHERE e.object=0 AND e.objectid='.$row_inf['triggerid'].
+								' WHERE e.object=0 '.
+									' AND e.objectid='.$row_inf['triggerid'].
 									' AND t.triggerid=e.objectid '.
 									' AND e.value='.TRIGGER_VALUE_TRUE.
 								' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
@@ -301,11 +304,8 @@ function make_system_summary(){
 						$actions= new CTable(' - ');
 
 						$sql='SELECT COUNT(a.alertid) as cnt'.
-								' FROM alerts a,events e'.
-								' WHERE a.eventid='.$row_inf_event['eventid'].
-									' AND e.eventid = a.eventid'.
-									' AND e.object='.EVENT_OBJECT_TRIGGER.
-									' AND e.objectid IN ('.$available_triggers.') ';
+								' FROM alerts a '.
+								' WHERE a.eventid='.$row_inf_event['eventid'];
 
 						$alerts=DBfetch(DBselect($sql));
 			
@@ -313,35 +313,26 @@ function make_system_summary(){
 							$mixed = 0;
 // Sent
 							$sql='SELECT COUNT(a.alertid) as sent '.
-									' FROM alerts a,events e'.
+									' FROM alerts a '.
 									' WHERE a.eventid='.$row_inf_event['eventid'].
-										' AND a.status='.ALERT_STATUS_SENT.
-										' AND e.eventid = a.eventid'.
-										' AND e.object='.EVENT_OBJECT_TRIGGER.
-										' AND e.objectid IN ('.$available_triggers.') ';
+										' AND a.status='.ALERT_STATUS_SENT;
 			
 							$tmp=DBfetch(DBselect($sql));
 							$alerts['sent'] = $tmp['sent'];
 							$mixed+=($alerts['sent'])?ALERT_STATUS_SENT:0;
 // In progress
 							$sql='SELECT COUNT(a.alertid) as inprogress '.
-									' FROM alerts a,events e'.
+									' FROM alerts a '.
 									' WHERE a.eventid='.$row_inf_event['eventid'].
-										' AND a.status='.ALERT_STATUS_NOT_SENT.
-										' AND e.eventid = a.eventid'.
-										' AND e.object='.EVENT_OBJECT_TRIGGER.
-										' AND e.objectid IN ('.$available_triggers.') ';
+										' AND a.status='.ALERT_STATUS_NOT_SENT;
 			
 							$tmp=DBfetch(DBselect($sql));
 							$alerts['inprogress'] = $tmp['inprogress'];
 // Failed
 							$sql='SELECT COUNT(a.alertid) as failed '.
-									' FROM alerts a,events e'.
+									' FROM alerts a '.
 									' WHERE a.eventid='.$row_inf_event['eventid'].
-										' AND a.status='.ALERT_STATUS_FAILED.
-										' AND e.eventid = a.eventid'.
-										' AND e.object='.EVENT_OBJECT_TRIGGER.
-										' AND e.objectid IN ('.$available_triggers.') ';
+										' AND a.status='.ALERT_STATUS_FAILED;
 			
 							$tmp=DBfetch(DBselect($sql));
 							$alerts['failed'] = $tmp['failed'];
@@ -510,10 +501,10 @@ return 	$table;
 function make_latest_issues(){
 	global $USER_DETAILS;
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-	$available_triggers = get_accessible_triggers(PERM_READ_LIST);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_LIST,PERM_RES_IDS_ARRAY);
 
-	$scripts_by_hosts = get_accessible_scripts_by_hosts(explode(',',$available_hosts));
+	$scripts_by_hosts = get_accessible_scripts_by_hosts($available_hosts);
 	$config=select_config();
 	
 	$table  = new CTableInfo();
@@ -532,9 +523,11 @@ function make_latest_issues(){
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
 					' AND hg.hostid=h.hostid '.
-					' AND t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
-					' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
-					' AND t.triggerid IN ('.$available_triggers.') '.
+					' AND t.triggerid=f.triggerid '.
+					' AND t.status='.TRIGGER_STATUS_ENABLED.
+					' AND i.status='.ITEM_STATUS_ACTIVE.
+					' AND '.DBin_node('t.triggerid').
+					' AND '.DBcondition('t.triggerid',$available_triggers).
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND t.value='.TRIGGER_VALUE_TRUE.
 				' ORDER BY t.lastchange DESC';
@@ -590,23 +583,17 @@ function make_latest_issues(){
 			$actions= new CTable(' - ');
 
 			$sql='SELECT COUNT(a.alertid) as cnt '.
-					' FROM alerts a,events e'.
-					' WHERE a.eventid='.$row_event['eventid'].
-						' AND e.eventid = a.eventid'.
-						' AND e.object='.EVENT_OBJECT_TRIGGER.
-						' AND e.objectid IN ('.$available_triggers.') ';
+					' FROM alerts a '.
+					' WHERE a.eventid='.$row_event['eventid'];
 
 					
 			$alerts=DBfetch(DBselect($sql));
 
 			if(isset($alerts['cnt']) && ($alerts['cnt'] > 0)){
 				$sql='SELECT COUNT(a.alertid) as sent '.
-						' FROM alerts a,events e'.
+						' FROM alerts a '.
 						' WHERE a.eventid='.$row_event['eventid'].
-							' AND a.status='.ALERT_STATUS_SENT.
-							' AND e.eventid = a.eventid'.
-							' AND e.object='.EVENT_OBJECT_TRIGGER.
-							' AND e.objectid IN ('.$available_triggers.') ';
+							' AND a.status='.ALERT_STATUS_SENT;
 
 				$alerts=DBfetch(DBselect($sql));
 
@@ -619,12 +606,9 @@ function make_latest_issues(){
 				$tdl->AddOption('width','10');
 
 				$sql='SELECT COUNT(a.alertid) as inprogress '.
-						' FROM alerts a,events e'.
+						' FROM alerts a '.
 						' WHERE a.eventid='.$row_event['eventid'].
-							' AND a.status='.ALERT_STATUS_NOT_SENT.
-							' AND e.eventid = a.eventid'.
-							' AND e.object='.EVENT_OBJECT_TRIGGER.
-							' AND e.objectid IN ('.$available_triggers.') ';
+							' AND a.status='.ALERT_STATUS_NOT_SENT;
 
 				$alerts=DBfetch(DBselect($sql));
 
@@ -637,12 +621,9 @@ function make_latest_issues(){
 				$tdc->AddOption('width','10');
 
 				$sql='SELECT COUNT(a.alertid) as failed '.
-						' FROM alerts a,events e'.
+						' FROM alerts a '.
 						' WHERE a.eventid='.$row_event['eventid'].
-							' AND a.status='.ALERT_STATUS_FAILED.
-							' AND e.eventid = a.eventid'.
-							' AND e.object='.EVENT_OBJECT_TRIGGER.
-							' AND e.objectid IN ('.$available_triggers.') ';
+							' AND a.status='.ALERT_STATUS_FAILED;
 
 				$alerts=DBfetch(DBselect($sql));
 
@@ -681,7 +662,7 @@ return $table;
 function make_webmon_overview(){
 	global $USER_DETAILS;
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_DATA_ARRAY);
 
 	$table  = new CTableInfo();
 	$table->SetHeader(array(
@@ -695,7 +676,7 @@ function make_webmon_overview(){
 
 	$sql = 'SELECT DISTINCT g.groupid, g.name '.
 			' FROM httptest ht, applications a, groups g, hosts_groups hg '.
-			' WHERE hg.hostid in ('.$available_hosts.') '.
+			' WHERE '.DBcondition('hg.hostid',$available_hosts).
 				' AND hg.hostid=a.hostid '.
 				' AND g.groupid=hg.groupid '.
 				' AND a.applicationid=ht.applicationid '.
@@ -754,7 +735,7 @@ return $table;
 function make_latest_data(){
 	global $USER_DETAILS;
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	
 	while($db_app = DBfetch($db_applications)){
 		$db_items = DBselect('SELECT DISTINCT i.* '.
