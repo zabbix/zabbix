@@ -487,12 +487,23 @@
 				$result = pg_fetch_assoc($cursor);
 				break;
 			case "ORACLE":
-				if(ocifetchinto($cursor, $row, (OCI_ASSOC+OCI_RETURN_NULLS))){
+				$text_datatypes = array('VARCHAR','VARCHAR2','CLOB','BLOB');
+				if(ocifetchinto($cursor, $row, OCI_ASSOC+OCI_RETURN_NULLS))
+				{
 					$result = array();
-					foreach($row as $key => $value){
-						$result[strtolower($key)] = (str_in_array(strtolower(ocicolumntype($cursor,$key)),array('varchar2','blob','clob')) && is_null($value))?'':$value;
+					$keys = (array_keys($row));
+					foreach ($keys as $k)
+					{
+						$field = is_int($k) ? $k + 1 : $k;
+						$column_type  = ocicolumntype($cursor, $field);
+						$field_is_null = ocicolumnisnull($cursor, $field);
+
+						if ($field_is_null && str_in_array($column_type,$text_datatypes))
+							$result[strtolower($k)] = '';
+						else
+							$result[strtolower($k)] = $row[$k];
 					}
-				}
+				} 
 				break;
 			case "SQLITE3":
 				if($cursor){
