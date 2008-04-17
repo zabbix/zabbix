@@ -17,7 +17,7 @@ div#selection_box{
 
 div.box_on{
 	position: absolute;
-/*	border: 1px black solid;
+/*	border: 1px red solid;
 /*	background-color:#FF0000;*/
 	z-index:2;
 }

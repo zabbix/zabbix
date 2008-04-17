@@ -317,7 +317,8 @@ include_once 'include/page_header.php';
 ?>
 <?php
 	$table = new CTableInfo('...','chart');
-
+//	$table->AddOption('border',1);
+	
 	if($_REQUEST['graphid'] > 0){
 		$graphtype = GRAPH_TYPE_NORMAL;
 		$yaxis = 0;
