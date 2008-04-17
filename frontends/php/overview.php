@@ -71,7 +71,9 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 	
 	if($_REQUEST["type"] == SHOW_TRIGGERS){
 		$from = ', functions f, triggers t';
-		$where = 'and i.itemid=f.itemid and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED;
+		$where = ' and i.itemid=f.itemid '.
+					' and f.triggerid=t.triggerid '.
+					' and t.status='.TRIGGER_STATUS_ENABLED;
 	}
 	else{
 		$where = $from = '';
