@@ -4838,13 +4838,13 @@ include_once 'include/discovery.inc.php';
 		$cmbType = new CComboBox("elementtype",$elementtype,"submit()");
 
 		$available_groups = 	get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
-		$available_hosts = 		get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-		$available_triggers = 	get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+		$available_hosts = 		get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+		$available_triggers = 	get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 		
 		$db_hosts = DBselect('SELECT DISTINCT n.name as node_name,h.hostid,h.host '.
 					' FROM hosts h'.
 						' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('h.hostid').
-					' WHERE h.hostid IN ('.$available_hosts.')'.
+					' WHERE '.DBcondition('h.hostid',$available_hosts).
 					' ORDER BY node_name,h.host');
 		if($db_hosts)
 			$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_HOST,	S_HOST);
@@ -4874,8 +4874,8 @@ include_once 'include/discovery.inc.php';
 			$host_info = DBfetch(DBselect('SELECT DISTINCT n.name as node_name,h.hostid,h.host '.
 						' FROM hosts h '.
 							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid("h.hostid").
-						' WHERE h.hostid IN ('.$available_hosts.') '.
-							' AND  hostid='.$elementid.
+						' WHERE '.DBcondition('h.hostid',$available_hosts).
+							' AND hostid='.$elementid.
 						' ORDER BY node_name,h.host'));
 			if($host_info)
 				$host = $host_info["host"];
@@ -4917,7 +4917,7 @@ include_once 'include/discovery.inc.php';
 					' LEFT JOIN hosts h on h.hostid=i.hostid '.
 					' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('t.triggerid').
 				' WHERE t.triggerid='.$elementid.
-					' AND t.triggerid IN ('.$available_triggers.') '.
+					' AND '.DBcondition('t.triggerid',$available_triggers).
 				' ORDER BY node_name,h.host,t.description'));
 			
 			if($trigger_info)

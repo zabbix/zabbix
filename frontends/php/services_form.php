@@ -88,12 +88,12 @@ include_once "include/page_header.php";
 //----------------------------------------------------------------------
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
 	if(isset($_REQUEST['serviceid']) && $_REQUEST['serviceid'] > 0){
 		$sql = 'SELECT s.* '.
 					' FROM services s '.
-					' WHERE (s.triggerid IS NULL OR s.triggerid IN ('.$available_triggers.')) '.
+					' WHERE (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 						' AND s.serviceid='.$_REQUEST['serviceid'];
 		if(!$service = DBfetch(DBselect($sql))){
 			access_deny();
@@ -206,7 +206,7 @@ if(isset($_REQUEST['pservices'])){
 		$query = 'SELECT DISTINCT s.* '.
 				' FROM services s '.
 				' WHERE '.DBin_node('s.serviceid').
-					' AND (s.triggerid IS NULL OR s.triggerid in ('.$available_triggers.')) '.
+					' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 					' AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') '.
 				' ORDER BY s.sortorder,s.name';
 	} 
@@ -214,7 +214,7 @@ if(isset($_REQUEST['pservices'])){
 		$query = 'SELECT DISTINCT s.* '.
 			' FROM services s '.
 			' WHERE '.DBin_node('s.serviceid').
-				' AND (s.triggerid IS NULL OR s.triggerid in ('.$available_triggers.')) '.
+				' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 			' ORDER BY s.sortorder,s.name';
 	}	
 
@@ -276,7 +276,7 @@ if(isset($_REQUEST['cservices'])){
 		$query = 'SELECT DISTINCT s.* '.
 				' FROM services s '.
 				' WHERE '.DBin_node('s.serviceid').
-					' AND (s.triggerid IS NULL OR s.triggerid in ('.$available_triggers.')) '.
+					' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 					' AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') '.
 				' ORDER BY s.sortorder,s.name';
 		
@@ -284,7 +284,7 @@ if(isset($_REQUEST['cservices'])){
 		$query = 'SELECT DISTINCT s.* '.
 				' FROM services s '.
 				' WHERE '.DBin_node('s.serviceid').
-					' AND (s.triggerid IS NULL OR s.triggerid in ('.$available_triggers.')) '.
+					' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 				' ORDER BY s.sortorder,s.name';
 	}
 	
@@ -408,7 +408,7 @@ if(isset($_REQUEST['sform'])){
 		
 		$query = 'SELECT DISTINCT s.*, sl.soft '.
 				' FROM services s1, services s2, services_links sl, services s '.
-				' WHERE (s.triggerid IS NULL OR s.triggerid IN ('.$available_triggers.')) '.
+				' WHERE (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 					' AND '.DBin_node('s.serviceid').
 					' AND sl.serviceupid=s1.serviceid '.
 					' AND sl.servicedownid=s2.serviceid '.

@@ -51,13 +51,13 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	
 	if(!$db_data = DBfetch(DBselect('SELECT * '.
 							' FROM items i, functions f '.
 	                        ' WHERE i.itemid=f.itemid '.
 								' AND f.triggerid='.$_REQUEST["triggerid"].
-								' AND f.triggerid IN ('.$available_triggers.') '.
+								' AND '.DBcondition('f.triggerid',$available_triggers).
 								' AND '.DBin_node('f.triggerid')
 				)))
 	{

@@ -251,7 +251,7 @@ include_once "include/page_header.php";
 	}
 
 	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid(true));
-	$available_hosts	= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_hosts	= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$nodeid				= get_current_nodeid();
 
 	if(isset($only_hostid))
@@ -290,7 +290,7 @@ include_once "include/page_header.php";
 								' WHERE '.DBin_node('g.groupid', $nodeid).
 									' AND g.groupid=hg.groupid '.
 									' AND hg.hostid=h.hostid'.
-									' AND h.hostid in ('.$available_hosts.')'.
+									' AND '.DBcondition('h.hostid',$available_hosts).
 									' AND h.status in ('.implode(',', $host_status).')'.
 								' ORDER BY name');
 								
@@ -327,7 +327,7 @@ include_once "include/page_header.php";
 			}
 
 			$sql .= DBin_node('h.hostid', $nodeid).
-					' and h.hostid in ('.$available_hosts.')'.
+					' and '.DBcondition('h.hostid',$available_hosts).
 					' and h.status in ('.implode(',', $host_status).')'.
 				' order by host,h.hostid';
 
@@ -371,7 +371,7 @@ include_once "include/page_header.php";
 			$sql .= ' WHERE ';
 
 		$sql .= DBin_node('h.hostid', $nodeid).
-					' and h.hostid in ('.$available_hosts.')'.
+					' and '.DBcondition('h.hostid',$available_hosts).
 					' and h.status in ('.implode(',', $host_status).')'.
 				' order by h.host,h.hostid';
 
@@ -494,9 +494,9 @@ include_once "include/page_header.php";
 			$sql .= " where ";
 
 		$sql .= DBin_node('h.hostid', $nodeid).
-				" AND h.hostid in (".$available_hosts.") ".
-				" AND h.status=".HOST_STATUS_TEMPLATE.
-				" order by h.host,h.hostid";
+				' AND '.DBcondition('h.hostid',$available_hosts).
+				' AND h.status='.HOST_STATUS_TEMPLATE.
+				' order by h.host,h.hostid';
 
 		$db_hosts = DBselect($sql);
 		while($host = DBfetch($db_hosts))
@@ -573,8 +573,9 @@ include_once "include/page_header.php";
 		else
 			$sql .= ' WHERE ';
 
-		$sql .= DBin_node('h.hostid',$nodeid).' AND h.status='.HOST_STATUS_TEMPLATE.
-				' AND h.hostid in ('.$available_hosts.') '.
+		$sql .= DBin_node('h.hostid',$nodeid).
+					' AND h.status='.HOST_STATUS_TEMPLATE.
+					' AND '.DBcondition('h.hostid',$available_hosts).
 				' ORDER BY h.host,h.hostid';
 		$db_hosts = DBselect($sql);
 		while($row = DBfetch($db_hosts))
@@ -685,7 +686,7 @@ include_once "include/page_header.php";
 		$table->Show();
 	}
 	else if($srctbl == "triggers"){
-		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid());
 			
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->SetHeader(array(
@@ -700,7 +701,7 @@ include_once "include/page_header.php";
 					' AND h.hostid=i.hostid '.
 					' AND t.triggerid=f.triggerid'.
 					' AND '.DBin_node('t.triggerid', $nodeid).
-					' AND t.triggerid IN ('.$available_triggers.')'.
+					' AND '.DBcondition('t.triggerid',$available_triggers).
 					' AND h.status in ('.implode(',', $host_status).')';
 
 		if(isset($hostid)) 
@@ -785,7 +786,7 @@ include_once "include/page_header.php";
 						' AND h.hostid=i.hostid '.
 						' AND '.DBin_node('i.itemid', $nodeid).
 						(isset($hostid)?' AND '.$hostid.'=i.hostid ':'').
-						' and h.hostid in ('.$available_hosts.')'.
+						' and '.DBcondition('h.hostid',$available_hosts).
 						' and h.status in ('.implode(',', $host_status).')'.
 					' ORDER BY h.host,i.description, i.key_, i.itemid');
 
@@ -827,7 +828,7 @@ include_once "include/page_header.php";
 		$sql = 'SELECT DISTINCT h.host,i.* from hosts h,items i '.
 				' WHERE h.hostid=i.hostid '.
 					' AND '.DBin_node('i.itemid', $nodeid).
-					' AND h.hostid in ('.$available_hosts.')'.
+					' AND '.DBcondition('h.hostid',$available_hosts).
 					' AND h.status in ('.implode(',', $host_status).')';
 
 		if(isset($hostid)) 
@@ -877,7 +878,7 @@ include_once "include/page_header.php";
 				' FROM hosts h,applications a '.
 				' WHERE h.hostid=a.hostid '.
 					' AND '.DBin_node('a.applicationid', $nodeid).
-					' and h.hostid in ('.$available_hosts.')'.
+					' and '.DBcondition('h.hostid',$available_hosts).
 					' and h.status in ('.implode(',', $host_status).')';
 
 		if(isset($hostid)) 
@@ -947,7 +948,7 @@ include_once "include/page_header.php";
 						' LEFT JOIN items i ON gi.itemid=i.itemid '.
 						' LEFT JOIN hosts h ON h.hostid=i.hostid '.
 						' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.graphid').
-					' WHERE g.graphid IN ('.$available_graphs.')'.
+					' WHERE '.DBcondition('g.graphid',$available_graphs).
 						' AND '.DBin_node('g.graphid', $nodeid);
 
 		if(isset($hostid)) 
@@ -1015,7 +1016,7 @@ include_once "include/page_header.php";
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					' AND '.DBin_node('i.itemid', $nodeid).
-					' AND h.hostid IN ('.$available_hosts.')';
+					' AND '.DBcondition('h.hostid',$available_hosts);
 
 		if(isset($hostid)) 
 			$sql .= ' AND h.hostid='.$hostid;
@@ -1110,7 +1111,7 @@ include_once "include/page_header.php";
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					' AND '.DBin_node('i.itemid', $nodeid).
-					' AND h.hostid IN ('.$available_hosts.')';
+					' AND '.DBcondition('h.hostid',$available_hosts);
 
 		if(isset($hostid)) 
 			$sql .= ' AND h.hostid='.$hostid;

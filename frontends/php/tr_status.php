@@ -47,8 +47,7 @@
 	$new=explode(",",$tr_hash);
 	$old=explode(",",$triggers_hash);
 
-	if( $old[1] != $new[1] )
-	{
+	if( $old[1] != $new[1] ){
 		if( $new[0] < $old[0] )	// Number of trigger decreased
 			$status = "off";
 		else			// Number of trigger increased
@@ -169,7 +168,7 @@ include_once "include/page_header.php";
 	
 	$scripts_by_hosts = get_accessible_scripts_by_hosts(explode(',',$available_hosts));
 	
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_DATA_ARRAY);
 	
 	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
 					' FROM groups g, hosts_groups hg, hosts h, items i '.
@@ -193,7 +192,7 @@ include_once "include/page_header.php";
 	
 	$sql='SELECT DISTINCT h.hostid,h.host '.
 		' FROM hosts_groups hg, hosts h, items i, functions f, triggers t '.
-		' WHERE t.triggerid in ('.$available_triggers.') '.
+		' WHERE '.DBcondition('t.triggerid',$available_triggers).
 			' AND t.status='.TRIGGER_STATUS_ENABLED.
 			' AND f.triggerid=t.triggerid '.
 			' AND i.itemid=f.itemid '.
@@ -369,7 +368,7 @@ include_once "include/page_header.php";
 						' AND t.triggerid=f.triggerid '.
 						' AND t.status='.TRIGGER_STATUS_ENABLED.
 						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND t.triggerid in ('.$available_triggers.') '.
+						' AND '.DBcondition('t.triggerid',$available_triggers).
 						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.
 						order_by('h.host,h.hostid,t.description,t.priority,t.lastchange');
 

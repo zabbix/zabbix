@@ -37,13 +37,10 @@
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
-function zbxCallPostScripts()
-{
+function zbxCallPostScripts(){
 <?php
-		if(isset($ZBX_PAGE_POST_JS))
-		{
-			foreach($ZBX_PAGE_POST_JS as $script)
-			{
+		if(isset($ZBX_PAGE_POST_JS)){
+			foreach($ZBX_PAGE_POST_JS as $script){
 				echo $script."\n";
 			}
 		}

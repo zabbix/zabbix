@@ -64,14 +64,14 @@ include_once "include/page_header.php";
         }
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
 	if(isset($_REQUEST["serviceid"]) && $_REQUEST["serviceid"] > 0){
 		$sql = 'SELECT s.serviceid '.
 					' FROM services s '.
-					' WHERE (s.triggerid is NULL OR s.triggerid NOT IN ('.$available_triggers.')) '.
+					' WHERE (s.triggerid is NULL OR '.DBcondition('s.triggerid',$available_triggers,true).') '.
 						' AND s.serviceid='.$_REQUEST['serviceid'];
-		if(DBfetch(DBselect($sql))){
+		if(DBfetch(DBselect($sql,1))){
 			access_deny();
 		}
 	}
@@ -93,7 +93,7 @@ include_once "include/page_header.php";
 				' LEFT JOIN services_links sl ON  s.serviceid = sl.serviceupid and NOT(sl.soft=0) '.
 				' LEFT JOIN services_links sl_p ON  s.serviceid = sl_p.servicedownid and sl_p.soft=0 '.
 			' WHERE '.DBin_node('s.serviceid').
-				' AND (t.triggerid IS NULL OR t.triggerid IN ('.$available_triggers.')) '.
+				' AND (t.triggerid IS NULL OR '.DBcondition('t.triggerid',$available_triggers).') '.
 			' ORDER BY s.sortorder, sl_p.serviceupid, s.serviceid';
 
 		$result=DBSelect($query);
@@ -139,7 +139,7 @@ include_once "include/page_header.php";
 								' WHERE s.status>0 '.
 									' AND s.triggerid is not NULL '.
 									' AND t.triggerid=s.triggerid '.
-									' AND t.triggerid IN ('.$available_triggers.') '.
+									' AND '.DBcondition('f.triggerid',$available_triggers).
 									' AND '.DBin_node('s.serviceid').
 								' ORDER BY s.status DESC, t.description');
 					

@@ -88,12 +88,12 @@
 							' AND '.DBin_node('sysmapid', get_current_nodeid($perm))))
 		{
 			$result = true;
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 						
 			while(($se_data = DBfetch($db_result)) && $result){
 				switch($se_data['elementtype']){
 					case SYSMAP_ELEMENT_TYPE_HOST:
-						if(!uint_in_array($se_data['elementid'],explode(',',$available_hosts))){
+						if(!uint_in_array($se_data['elementid'],$available_hosts)){
 							$result = false;
 						}
 						break;
@@ -101,12 +101,12 @@
 						$result &= sysmap_accessible($se_data['elementid'], PERM_READ_ONLY);
 						break;
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+						$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 						
 						$sql = 'SELECT t.triggerid '.
 								' FROM triggers t'.
 								' WHERE t.triggerid='.$se_data['elementid'].
-									' AND t.triggerid NOT IN ('.$available_triggers.') ';
+									' AND '.DBcondition('t.triggerid',$available_triggers,true);
 						if(DBfetch(DBselect($sql,1))){
 								$result = false;
 						}

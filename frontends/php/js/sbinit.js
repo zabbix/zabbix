@@ -150,7 +150,7 @@ function graph_zoom_init(graph_id,stime,period,width,height){
 	boxongraph.style.width = A_SBOX[graph_id].sbox.obj.width+'px';
 
 // Listeners
-	addListener(window,'resize',A_SBOX[graph_id].sbox.moveSBoxByObj.bindAsEventListener(A_SBOX[graph_id].sbox,igraph));
+	addListener(window,'resize',A_SBOX[graph_id].sbox.moveSBoxByObj.bindAsEventListener(A_SBOX[graph_id].sbox,graph_id));
 	
 	if(IE){
 		igraph.attachEvent('onmousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox));
@@ -168,6 +168,10 @@ function graph_zoom_init(graph_id,stime,period,width,height){
 	addListener(document,'mouseup',A_SBOX[graph_id].sbox.mouseup.bindAsEventListener(A_SBOX[graph_id].sbox),true);
 	
 	A_SBOX[graph_id].sbox.sboxload = sboxload;
+	
+	if(KQ){
+		setTimeout('A_SBOX['+graph_id+'].sbox.moveSBoxByObj('+graph_id+');',500);
+	}
 }
 
 function datetoarray(unixtime){

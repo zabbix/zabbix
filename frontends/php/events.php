@@ -143,14 +143,14 @@ include_once "include/page_header.php";
 	    $available_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
 		
-		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, null, get_current_nodeid());
+		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_DATA_ARRAY, get_current_nodeid());
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 			$sql = 'SELECT DISTINCT h.hostid '.
 					' FROM hosts h, functions f, items i'.
 					' WHERE i.itemid=f.itemid '.
 						' AND h.hostid=i.hostid '.
-						' AND f.triggerid IN ('.$available_triggers.') '.
+						' AND '.DBcondition('f.triggerid', $available_triggers).
 						' AND f.triggerid='.$_REQUEST['triggerid'];
 						
 			if($host = DBfetch(DBselect($sql,1))){
@@ -252,7 +252,7 @@ include_once "include/page_header.php";
 
 		$sql = 'SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,t.type '.
 				' FROM triggers t, functions f, items i, hosts h '.$sql_from.
-				' WHERE t.triggerid IN ('.$available_triggers.') '.
+				' WHERE '.DBcondition('t.triggerid', $available_triggers).
 					' AND t.triggerid=f.triggerid '.
 					' AND f.itemid=i.itemid '.
 					' AND i.hostid=h.hostid '.
@@ -287,7 +287,7 @@ include_once "include/page_header.php";
 			$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.value, e.acknowledged '.
 					' FROM events e '.
 					' WHERE (e.object+0)='.EVENT_OBJECT_TRIGGER.
-						' AND '.DBin_condition('e.objectid', $trigger_list).
+						' AND '.DBcondition('e.objectid', $trigger_list).
 						$sql_cond.
 					order_by('e.clock');
 //SDI($sql);
@@ -326,11 +326,8 @@ include_once "include/page_header.php";
 			$actions= new CTable(' - ');
 
 			$sql='SELECT COUNT(a.alertid) as cnt_all'.
-					' FROM alerts a,events e'.
-					' WHERE a.eventid='.$row['eventid'].
-						' AND e.eventid = a.eventid'.
-						' AND e.object='.EVENT_OBJECT_TRIGGER.
-						' AND e.objectid IN ('.$available_triggers.') ';
+					' FROM alerts a '.
+					' WHERE a.eventid='.$row['eventid'];
 					
 			$alerts=DBfetch(DBselect($sql));
 
@@ -338,35 +335,26 @@ include_once "include/page_header.php";
 				$mixed = 0;
 // Sent
 				$sql='SELECT COUNT(a.alertid) as sent '.
-						' FROM alerts a,events e'.
+						' FROM alerts a '.
 						' WHERE a.eventid='.$row['eventid'].
-							' AND a.status='.ALERT_STATUS_SENT.
-							' AND e.eventid = a.eventid'.
-							' AND e.object='.EVENT_OBJECT_TRIGGER.
-							' AND e.objectid IN ('.$available_triggers.') ';
+							' AND a.status='.ALERT_STATUS_SENT;
 
 				$tmp=DBfetch(DBselect($sql));
 				$alerts['sent'] = $tmp['sent'];
 				$mixed+=($alerts['sent'])?ALERT_STATUS_SENT:0;
 // In progress
 				$sql='SELECT COUNT(a.alertid) as inprogress '.
-						' FROM alerts a,events e'.
+						' FROM alerts a '.
 						' WHERE a.eventid='.$row['eventid'].
-							' AND a.status='.ALERT_STATUS_NOT_SENT.
-							' AND e.eventid = a.eventid'.
-							' AND e.object='.EVENT_OBJECT_TRIGGER.
-							' AND e.objectid IN ('.$available_triggers.') ';
+							' AND a.status='.ALERT_STATUS_NOT_SENT;
 
 				$tmp=DBfetch(DBselect($sql));
 				$alerts['inprogress'] = $tmp['inprogress'];
 // Failed
 				$sql='SELECT COUNT(a.alertid) as failed '.
-						' FROM alerts a,events e'.
+						' FROM alerts a '.
 						' WHERE a.eventid='.$row['eventid'].
-							' AND a.status='.ALERT_STATUS_FAILED.
-							' AND e.eventid = a.eventid'.
-							' AND e.object='.EVENT_OBJECT_TRIGGER.
-							' AND e.objectid IN ('.$available_triggers.') ';
+							' AND a.status='.ALERT_STATUS_FAILED;
 
 				$tmp=DBfetch(DBselect($sql));
 				$alerts['failed'] = $tmp['failed'];

@@ -487,23 +487,12 @@
 				$result = pg_fetch_assoc($cursor);
 				break;
 			case "ORACLE":
-				$text_datatypes = array('VARCHAR','VARCHAR2','CLOB','BLOB');
-				if(ocifetchinto($cursor, $row, OCI_ASSOC+OCI_RETURN_NULLS))
-				{
+				if(ocifetchinto($cursor, $row, (OCI_ASSOC+OCI_RETURN_NULLS))){
 					$result = array();
-					$keys = (array_keys($row));
-					foreach ($keys as $k)
-					{
-						$field = is_int($k) ? $k + 1 : $k;
-						$column_type  = ocicolumntype($cursor, $field);
-						$field_is_null = ocicolumnisnull($cursor, $field);
-
-						if ($field_is_null && str_in_array($column_type,$text_datatypes))
-							$result[strtolower($k)] = '';
-						else
-							$result[strtolower($k)] = $row[$k];
+					foreach($row as $key => $value){
+						$result[strtolower($key)] = (str_in_array(strtolower(ocicolumntype($cursor,$key)),array('varchar','varchar2','blob','clob')) && is_null($value))?'':$value;
 					}
-				} 
+				}
 				break;
 			case "SQLITE3":
 				if($cursor){
@@ -721,16 +710,22 @@ else {
 		return bcmod($id,'100000000000');
 	}
 
-	function DBin_condition($fieldname, &$array){
+	function DBcondition($fieldname, &$array, $notin=false){
 		global $DB;
 
 		$condition = '';
-		
+
+		$in = 		$notin?' NOT IN ':' IN ';
+		$concat = 	$notin?' AND ':' OR ';
+
 		switch($DB['TYPE']) {
 			case 'ORACLE':
 				$items = array_chunk($array, 1000);
 				foreach($items as $id => $value){
-					$condition.=!empty($condition)?') OR '.$fieldname.' IN (':'';
+					if($notin)
+						$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
+					else
+						$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
 					$condition.= implode(',',$value);
 				}
 				break;
@@ -740,6 +735,7 @@ else {
 		
 		if(empty($condition)) $condition = '0';
 
-	return '('.$fieldname.' IN ('.$condition.'))';
+	return '('.$fieldname.$in.'('.$condition.'))';
 	}
+	
 ?>
