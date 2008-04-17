@@ -135,8 +135,12 @@ include_once "include/page_header.php";
 			$dissum=$dissum+$leng;
 			$sum=$dissum;
 		}
-	
-		$proc=(100*$sum)/($falsesum+$truesum+$dissum);
+
+		$total = $falsesum + $truesum + $dissum;
+		if ($total == 0)
+			$proc = 0;
+		else
+			$proc = (100*$sum)/$total;
 		$proc=round($proc*100)/100;
 		$proc="$proc%";
  

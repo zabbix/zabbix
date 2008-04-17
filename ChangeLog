@@ -1,5 +1,6 @@
 Changes for 1.4.6:
 
+ - [ZBX-361] fixed possible "division by zero" in Monitoring/Triggers screen (Sasha)
  - [ZBX-360] fixed possible warning messages under Oracle while updating items (Sasha)
  - [ZBX-357] fixed problem with clearing error message for activated items (Sasha)
  - [ZBX-339] fixes problem in frontend with clearing history for text items (Sasha) 
