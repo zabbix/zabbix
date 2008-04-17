@@ -415,7 +415,7 @@ COpt::savesqlrequest($query);
 				$result = pg_fetch_array($cursor);
 				break;
 			case "ORACLE":
-				$text_datatypes = array('VARCHAR2','CLOB');
+				$text_datatypes = array('VARCHAR','VARCHAR2','CLOB');
 				if(ocifetchinto($cursor, $row, OCI_ASSOC+OCI_NUM+OCI_RETURN_NULLS))
 				{
 					$result = array();
