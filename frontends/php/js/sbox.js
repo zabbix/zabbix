@@ -96,6 +96,12 @@ mousedown: function(e){
 		this.optimize_event(e);
 
 		this.deselectall();
+		
+		if(IE){
+			var posxy = getPosition(this.dom_obj);
+			if((this.mouse_event.left < posxy.left) || (this.mouse_event.left > (posxy.left+this.dom_obj.offsetWidth))) return false;
+		}
+		
 		this.create_box();
 		this.mouse_event.mousedown = true;
 	}
@@ -154,11 +160,10 @@ create_box: function(){
 		this.box.height = height;
 	
 		if(IE){
-//			this.dom_box.attachEvent('onmousemove',S_BOX.mousemove.bindAsEventListener(S_BOX));
-			this.dom_box.onmousemove = A_SBOX[this.sbox_id].sbox.mousemove.bind(A_SBOX[this.sbox_id].sbox);
+			this.dom_box.onmousemove = this.mousemove.bind(this);
 		}
 		else{
-			this.dom_box.addEventListener('mousemove',A_SBOX[this.sbox_id].sbox.mousemove.bindAsEventListener(A_SBOX[this.sbox_id].sbox),true);
+			this.dom_box.addEventListener('mousemove',this.mousemove.bindAsEventListener(this),true);
 		}
 	
 		this.start_event.top = this.mouse_event.top;
@@ -238,6 +243,25 @@ validateH: function(h){
 return h;
 },
 
+moveSBoxByObj: function(){	
+
+	if(arguments.length < 1) return false;
+
+	var p_obj = arguments[arguments.length-1];
+	if('undefined' == typeof(p_obj.nodeName)) return false;
+
+	var posxy = getPosition(p_obj);
+	this.dom_obj.style.top = (posxy.top+A_SBOX[this.sbox_id].shiftT)+'px';
+	this.dom_obj.style.left = (posxy.left+A_SBOX[this.sbox_id].shiftL-1)+'px';	
+
+	posxy = getPosition(this.dom_obj);
+
+	this.obj.top = parseInt(posxy.top); 
+	this.obj.left = parseInt(posxy.left);
+},
+
+
+
 optimize_event: function(e){
 	if (e.pageX || e.pageY) {
 		this.mouse_event.left = e.pageX;
@@ -274,13 +298,13 @@ clear_params: function(){
 }
 
 function create_box_on_obj(obj_ref){
-	if((typeof(obj_ref) == 'undefined')) throw('Reference Object is not defined');
+	if((typeof(obj_ref) == 'undefined')) throw('Reference Object sent to SBOX is not defined');
 	
 	var div = document.createElement('div');
 	obj_ref.appendChild(div);
 	
-	div = $(div);
-	div.addClassName('box_on');
+	div = (div);
+	div.className = 'box_on';
 	
 return div;
 }

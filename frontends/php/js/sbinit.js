@@ -130,14 +130,13 @@ function graph_zoom_init(graph_id,stime,period,width,height){
 	A_SBOX[graph_id].sbox = sbox_init(stime,period);
 	A_SBOX[graph_id].sbox.sbox_id = graph_id;
 	
-	var igraph = $(graph_id);
-	var posxy = getPosition(igraph);
-	
+	var igraph = $(graph_id);	
 	var boxongraph = create_box_on_obj(igraph.parentNode);
 	
-	boxongraph.style.top = (posxy.top+A_SBOX[graph_id].shiftT)+'px';
-	boxongraph.style.left = (posxy.left+A_SBOX[graph_id].shiftL-1)+'px';
+	A_SBOX[graph_id].sbox.dom_obj = boxongraph;
 	
+	A_SBOX[graph_id].sbox.moveSBoxByObj(igraph);
+
 	width = width || 900;
 	height = height || 200;
 	
@@ -149,32 +148,24 @@ function graph_zoom_init(graph_id,stime,period,width,height){
 
 	boxongraph.style.height = A_SBOX[graph_id].sbox.obj.height+'px';
 	boxongraph.style.width = A_SBOX[graph_id].sbox.obj.width+'px';
-	
-	posxy = getPosition(boxongraph);	
-	
-	A_SBOX[graph_id].sbox.obj.left = parseInt(posxy.left);
-	A_SBOX[graph_id].sbox.obj.top = parseInt(posxy.top); 
-	
-	A_SBOX[graph_id].sbox.dom_obj = boxongraph;
 
+// Listeners
+	addListener(window,'resize',A_SBOX[graph_id].sbox.moveSBoxByObj.bindAsEventListener(A_SBOX[graph_id].sbox,igraph));
+	
 	if(IE){
-//		boxongraph.attachEvent('onmousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox));
 		igraph.attachEvent('onmousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox));
-//		boxongraph.attachEvent('onmousemove',A_SBOX[graph_id].sbox.mousemove.bindAsEventListener(A_SBOX[graph_id].sbox));
 		igraph.onmousemove = A_SBOX[graph_id].sbox.mousemove.bind(A_SBOX[graph_id].sbox);
-		document.attachEvent('onmouseup',A_SBOX[graph_id].sbox.mouseup.bindAsEventListener(A_SBOX[graph_id].sbox));
 	}
 	else if(OP){
 		boxongraph.addEventListener('mousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox),false);
 		boxongraph.onmousemove = A_SBOX[graph_id].sbox.mousemove.bind(A_SBOX[graph_id].sbox);
-		document.addEventListener('mouseup',A_SBOX[graph_id].sbox.mouseup.bindAsEventListener(A_SBOX[graph_id].sbox),true);
 	}
 	else{
-		boxongraph.addEventListener('mousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox),false);
-		boxongraph.onmousemove = A_SBOX[graph_id].sbox.mousemove.bind(A_SBOX[graph_id].sbox);
-		document.addEventListener('mouseup',A_SBOX[graph_id].sbox.mouseup.bindAsEventListener(A_SBOX[graph_id].sbox),true);
+		boxongraph.addEventListener('mousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox),false);		
+		boxongraph.addEventListener('mousemove',A_SBOX[graph_id].sbox.mousemove.bindAsEventListener(A_SBOX[graph_id].sbox),false);	
 	}
-
+	
+	addListener(document,'mouseup',A_SBOX[graph_id].sbox.mouseup.bindAsEventListener(A_SBOX[graph_id].sbox),true);
 	
 	A_SBOX[graph_id].sbox.sboxload = sboxload;
 }
