@@ -70,7 +70,7 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
 	if($_REQUEST["type"] == SHOW_TRIGGERS){
-		$from = ', functions f, triggers t';
+		$from = ', functions f, triggers t ';
 		$where = ' and i.itemid=f.itemid '.
 					' and f.triggerid=t.triggerid '.
 					' and t.status='.TRIGGER_STATUS_ENABLED;
