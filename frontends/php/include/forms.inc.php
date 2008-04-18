@@ -4715,37 +4715,30 @@ include_once 'include/discovery.inc.php';
 //--- end mod ---
  
 
-	function insert_application_form()
-	{
-		global $_REQUEST;
-
+	function insert_application_form(){
 		$frm_title = "New Application";
 
-		if(isset($_REQUEST["applicationid"]))
-		{
+		if(isset($_REQUEST["applicationid"])){
 			$result=DBselect("SELECT * FROM applications WHERE applicationid=".$_REQUEST["applicationid"]);
 			$row=DBfetch($result);
 			$frm_title = "Application: \"".$row["name"]."\"";
 		}
-		if(isset($_REQUEST["applicationid"]) && !isset($_REQUEST["form_refresh"]))
-		{
+		
+		if(isset($_REQUEST["applicationid"]) && !isset($_REQUEST["form_refresh"])){
 			$appname = $row["name"];
 			$apphostid = $row["hostid"];
 		}
-		else
-		{
+		else{
 			$appname = get_request("appname","");
 			$apphostid = get_request("apphostid",get_request("hostid",0));
 		}
 
 		$db_host = get_host_by_hostid($apphostid,1 /* no error message */);
-		if($db_host)
-		{
+		if($db_host){
 			$apphost = $db_host["host"];
 		}
-		else
-		{
-			$apphost = "";
+		else{
+			$apphost = '';
 			$apphostid = 0;
 		}
 
