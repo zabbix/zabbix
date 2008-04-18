@@ -57,7 +57,7 @@ include_once "include/page_header.php";
 		"groups"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		"applications"=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 /* host */
-		"hostid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'isset({config})&&({config}==0||{config}==5)&&isset({form})&&({form}=="update")'),
+		"hostid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'isset({config})&&({config}==0||{config}==5||{config}==2)&&isset({form})&&({form}=="update")'),
 		"host"=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'isset({config})&&({config}==0||{config}==3||{config}==5)&&isset({save})'),
 		'proxy_hostid'=>array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,		'isset({config})&&({config}==0)&&isset({save})'),
 		"dns"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'(isset({config})&&({config}==0))&&isset({save})'),
@@ -81,7 +81,7 @@ include_once "include/page_header.php";
 		"software"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
 		"contact"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
 		"location"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
-		"notes"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		"notes"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),		
 /* group */
 		"groupid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'(isset({config})&&({config}==1))&&(isset({form})&&({form}=="update"))'),
 		"gname"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'(isset({config})&&({config}==1))&&isset({save})'),
@@ -91,6 +91,9 @@ include_once "include/page_header.php";
 		"appname"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'(isset({config})&&({config}==4))&&isset({save})'),
 		"apphostid"=>	array(T_ZBX_INT, O_OPT, NULL,	DB_ID.'{}>0',	'(isset({config})&&({config}==4))&&isset({save})'),
 		"apptemplateid"=>array(T_ZBX_INT,O_OPT,	NULL,	DB_ID,	NULL),
+		
+/* host linkage form */
+		"tname"=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'isset({config})&&({config}==2)&&isset({save})'),
 
 /* actions */
 		"activate"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),	
@@ -126,8 +129,87 @@ include_once "include/page_header.php";
 <?php
 
 /************ ACTIONS FOR HOSTS ****************/
+// Original mod by scricca@vipsnet.net
+// Modified by Aly
+/* this code menages operations to unlink 1 template from multiple hosts */
+	if ($_REQUEST["config"]==2 && (isset($_REQUEST["unlink"]))){
+		$hosts = get_request("hosts",array());
+		if(isset($_REQUEST["hostid"])){
+			$templateid=$_REQUEST["hostid"];
+			$result = false;
+// Permission check			
+			$tmp_hosts = array_diff($hosts,$available_hosts);
+			$hosts = array_diff($hosts,$tmp_hosts);
+			unset($tmp_hosts);
+//--
+			DBstart();
+			foreach($hosts as $id => $hostid){
+				$result=unlink_template($hostid,$templateid);				
+			}
+			$result = DBend();
+			
+			show_messages($result, S_UNLINK_FROM_TEMPLATE, S_CANNOT_UNLINK_FROM_TEMPLATE);
+			if($result){
+				$host=get_host_by_hostid($templateid);
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,
+					'Host ['.$host['host'].'] '.
+					'Mass Linkage '.
+					'Status ['.$host['status'].']');
+			}
+		
+			unset($_REQUEST["unlink"]);
+			unset($_REQUEST["hostid"]);
+			unset($_REQUEST["form"]);
+		}
+	}
+/* this code menages operations to link 1 template to multiple hosts */
+	if($_REQUEST["config"]==2 && (isset($_REQUEST["save"]))){
+		if(isset($_REQUEST['hostid'])){
+			$hosts = get_request('hosts',array());
+			$templateid=$_REQUEST['hostid'];
+			$result = false;
+// Permission check
+			$tmp_hosts = array_diff($hosts,$available_hosts);
+			$hosts = array_diff($hosts,$tmp_hosts);
+			unset($tmp_hosts);
+//--
+			
+			$template_name=DBfetch(DBselect('SELECT host FROM hosts WHERE hostid='.$templateid));			
+			DBstart();
+			foreach($hosts as $id => $hostid){
+			
+				$host_groups=array();
+				$db_hosts_groups = DBselect('SELECT groupid FROM hosts_groups WHERE hostid='.$hostid);
+				while($hg = DBfetch($db_hosts_groups)) $host_groups[] = $hg['groupid'];
+
+				$host=get_host_by_hostid($hostid);
+				
+				$templates_tmp=get_templates_by_hostid($hostid);
+				$templates_tmp[$templateid]=$template_name["host"];
+				
+				$result=update_host($hostid,
+								$host["host"],$host["port"],$host["status"],$host["useip"],$host["dns"],
+								$host["ip"],$host['proxy_hostid'],$templates_tmp,null,$host_groups);
+			}
+			$result = DBend();
+			
+			show_messages($result, S_LINK_TO_TEMPLATE, S_CANNOT_LINK_TO_TEMPLATE);
+			if($result){
+				$host=get_host_by_hostid($templateid);
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,
+					'Host ['.$host['host'].'] '.
+					'Mass Linkage '.
+					'Status ['.$host['status'].']');
+			}
+
+			unset($_REQUEST["save"]);
+			unset($_REQUEST["hostid"]);
+			unset($_REQUEST["form"]);
+		}
+	}
+//---------  END MOD ------------
 /* UNLINK HOST */
-	if(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && (isset($_REQUEST["unlink"]) || isset($_REQUEST["unlink_and_clear"]))){
+	else if(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && (isset($_REQUEST["unlink"]) || isset($_REQUEST["unlink_and_clear"]))){
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 		if(isset($_REQUEST["unlink"])){
 			$unlink_templates = array_keys($_REQUEST["unlink"]);
@@ -686,22 +768,20 @@ include_once "include/page_header.php";
 	show_table_header(S_CONFIGURATION_OF_HOSTS_GROUPS_AND_TEMPLATES, $frmForm);
 	echo SBR;
 ?>
-
 <?php
-	if($_REQUEST["config"]==0 || $_REQUEST["config"]==3)
-	{
+	if($_REQUEST["config"]==0 || $_REQUEST["config"]==3){
 		$show_only_tmp = 0;
 		if($_REQUEST["config"]==3)
 			$show_only_tmp = 1;
 
 		if(isset($_REQUEST["form"])){
 			insert_host_form($show_only_tmp);
-		} 
+		}
 		else {
 			if($show_only_tmp==1)
-				$status_filter = " and h.status in (".HOST_STATUS_TEMPLATE.") ";
+				$status_filter = ' AND h.status IN ('.HOST_STATUS_TEMPLATE.') ';
 			else
-				$status_filter = " and h.status in (".HOST_STATUS_MONITORED.",".HOST_STATUS_NOT_MONITORED.") ";
+				$status_filter = ' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') ';
 				
 			$cmbGroups = new CComboBox("groupid",get_request("groupid",0),"submit()");
 			$cmbGroups->AddItem(0,S_ALL_SMALL);
@@ -955,8 +1035,7 @@ include_once "include/page_header.php";
 							' FROM groups g'.
 							' WHERE g.groupid in ('.$available_groups.')'.
 							order_by('g.name'));
-			while($db_group=DBfetch($db_groups))
-			{
+			while($db_group=DBfetch($db_groups)){
 				$db_hosts = DBselect('SELECT DISTINCT h.host, h.status'.
 						' FROM hosts h, hosts_groups hg'.
 						' WHERE h.hostid=hg.hostid '.
@@ -1002,42 +1081,51 @@ include_once "include/page_header.php";
 			$form->Show();
 		}
 	}
+// Original mod by scricca@vipsnet.net
+// Modified by Aly
+/* this code adds links to Template Names in Template_Linkage page and link them to the form in forms.inc.php */
 	else if($_REQUEST["config"]==2){
-		show_table_header(S_TEMPLATE_LINKAGE_BIG);
-
-		$table = new CTableInfo(S_NO_LINKAGES);
-		$table->SetHeader(array(
-				make_sorting_link(S_TEMPLATES,'h.host'),
-				S_HOSTS));
-
-		$templates = DBSelect('SELECT h.* '.
-						' FROM hosts h'.
-						' WHERE h.status='.HOST_STATUS_TEMPLATE.
-							' AND '.DBcondition('h.hostid',$available_hosts).
-						order_by('h.host'));
-						
-		while($template = DBfetch($templates)){
-			$hosts = DBSelect('SELECT h.* '.
-							' FROM hosts h, hosts_templates ht '.
-							' WHERE ht.templateid='.$template['hostid'].
-								' AND ht.hostid=h.hostid '.
-								' AND h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-								' AND '.DBcondition('h.hostid',$available_hosts).
-							' ORDER BY host');
-			$host_list = array();
-			while($host = DBfetch($hosts))
-			{
-				$style = $host["status"] == HOST_STATUS_MONITORED ? NULL : 'on';
-
-				array_push($host_list, empty($host_list) ? '' : ', ', new CSpan($host["host"], $style));
-			}
-			$table->AddRow(array(
-				new CSpan($template["host"],"unknown"),
-				empty($host_list)?'-':$host_list
+	
+		if(isset($_REQUEST["form"])){
+			insert_template_form(get_request("hostid",NULL));
+		} 
+		else{
+	
+			show_table_header(S_TEMPLATE_LINKAGE_BIG);
+		
+			$table = new CTableInfo(S_NO_LINKAGES);
+			$table->SetHeader(array(S_TEMPLATES,S_HOSTS));
+		
+			$templates = DBSelect('SELECT h.* FROM hosts h'.
+					' WHERE h.status='.HOST_STATUS_TEMPLATE.
+						' AND '.DBcondition('h.hostid',$available_hosts).
+					' ORDER BY h.host');
+			while($template = DBfetch($templates)){
+			
+				$hosts = DBSelect('SELECT h.* '.
+					' FROM hosts h, hosts_templates ht '.
+					' WHERE ht.templateid='.$template['hostid'].
+						' AND ht.hostid=h.hostid '.
+						' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
+						' AND '.DBcondition('h.hostid',$available_hosts).
+					' ORDER BY host');
+				$host_list = array();
+				while($host = DBfetch($hosts)){
+					$style = ($host["status"] == HOST_STATUS_MONITORED)?NULL:'on';
+					array_push($host_list, empty($host_list) ? '' : ', ', new CSpan($host["host"], $style));
+				}
+				$table->AddRow(array(		
+					new CCol(array(
+						new CLink($template['host'],'hosts.php?form=update&hostid='.
+							$template['hostid'].url_param('hostid').url_param('config'), 'action')
+						),'unknown'),
+					empty($host_list)?'-':$host_list
 				));
+			}
+			
+			$table->Show();
 		}
-
-		$table->Show();
+//----- END MODE -----
 	}
 	else if($_REQUEST["config"]==4){
 		if(isset($_REQUEST["form"])){
