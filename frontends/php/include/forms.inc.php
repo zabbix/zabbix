@@ -4261,6 +4261,64 @@ include_once 'include/discovery.inc.php';
 		$frmHostP->AddItemToBottomRow(new CButtonCancel(url_param("groupid")));
 		$frmHostP->Show();
 	}
+	
+// Original mod by scricca@vipsnet.net
+// Modified by Aly
+/* this code creates a form to link/unlink 1 template to/from multiple hosts */
+ 	function insert_template_form(){
+ 		global	$USER_DETAILS;
+ 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
+		
+ 		$frm_title = S_TEMPLATE;
+
+ 		if(isset($_REQUEST["hostid"])){
+ 			$template = get_host_by_hostid($_REQUEST["hostid"]);
+ 			$frm_title = S_TEMPLATE.' ['.$template['host'].']';
+ 		}
+		
+ 		if(isset($_REQUEST['hostid']) && !isset($_REQUEST["form_refresh"])){
+ 			$name=$template['host'];
+ 		}
+ 		else{
+ 			$name=get_request("tname",'');
+ 		}
+		
+ 		$frmHostT = new CFormTable($frm_title,"hosts.php");
+ 		$frmHostT->SetHelp("web.hosts.group.php");
+ 		$frmHostT->AddVar("config",get_request("config",2));
+ 		if(isset($_REQUEST["hostid"])){
+ 			$frmHostT->AddVar("hostid",$_REQUEST["hostid"]);
+ 		}
+ 
+ 		$frmHostT->AddRow(S_TEMPLATE,new CTextBox("tname",$name,60));
+ 
+ 		$cmbHosts = new CListBox('hosts[]',null,10);
+		
+		$sql = 'SELECT DISTINCT h.hostid,h.host '.
+			' FROM hosts h'.
+ 			' WHERE ( h.status='.HOST_STATUS_MONITORED.' OR h.status='.HOST_STATUS_NOT_MONITORED.' ) '.
+ 				' AND h.hostid IN ('.$available_hosts.')'.
+ 			' ORDER BY h.host';
+			
+ 		$db_hosts=DBselect($sql);
+			
+ 		while($db_host=DBfetch($db_hosts)){
+ 			$cmbHosts->AddItem(
+ 					$db_host["hostid"],
+ 					get_node_name_by_elid($db_host["hostid"]).$db_host["host"]
+ 					);
+ 		}
+		
+ 		$frmHostT->AddRow(S_HOSTS,$cmbHosts);
+ 		$frmHostT->AddItemToBottomRow(new CButton('save',S_LINK_TO_TEMPLATE));
+ 		$frmHostT->AddItemToBottomRow(SPACE);
+ 		$frmHostT->AddItemToBottomRow(new CButton('unlink',S_UNLINK_FROM_TEMPLATE));
+ 		$frmHostT->AddItemToBottomRow(SPACE);
+ 		$frmHostT->AddItemToBottomRow(new CButtonCancel(url_param("config")));
+ 		$frmHostT->Show();
+	}
+//--- end mod ---
+ 
 
 	function insert_application_form()
 	{

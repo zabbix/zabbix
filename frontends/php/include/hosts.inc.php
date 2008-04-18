@@ -327,12 +327,13 @@ require_once "include/items.inc.php";
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	unlink_template($hostid, $templateid, $unlink_mode = true)
-	{
-		if( !is_numeric($templateid) ) fatal_error('Not supported type for [templateid] in [unlink_template] - ['.$templateid.']');
+	function	unlink_template($hostid, $templateid, $unlink_mode = true){
+		if(!is_numeric($templateid)) 
+			fatal_error('Not supported type for [templateid] in [unlink_template] - ['.$templateid.']');
 
-		delete_template_elements($hostid, $templateid, $unlink_mode);
-		DBexecute("delete from hosts_templates where hostid=".$hostid.' and templateid='.$templateid);
+		$result = delete_template_elements($hostid, $templateid, $unlink_mode);
+		$result&= DBexecute("delete from hosts_templates where hostid=".$hostid.' and templateid='.$templateid);
+	return $result;
 	}
 
 	/*
@@ -353,6 +354,7 @@ require_once "include/items.inc.php";
 		delete_template_triggers($hostid, $templateid, $unlink_mode);
 		delete_template_items($hostid, $templateid, $unlink_mode);
 		delete_template_applications($hostid, $templateid, $unlink_mode);
+	return true;
 	}	
 
 	/*
@@ -990,13 +992,11 @@ require_once "include/items.inc.php";
 		return	false;
 	}
 
-	function	&get_items_by_applicationid($applicationid)
-	{
+	function &get_items_by_applicationid($applicationid){
 		return DBselect("select i.* from items i,items_applications ia where i.itemid=ia.itemid and ia.applicationid=$applicationid");
 	}
 
-	function	&get_applications_by_hostid($hostid)
-	{
+	function &get_applications_by_hostid($hostid){
 		return DBselect('select * from applications where hostid='.$hostid);
 	}
 
@@ -1014,11 +1014,9 @@ require_once "include/items.inc.php";
 	 *           $templateid can be numeric or numeric array
 	 *
 	 */
-	function        delete_template_applications($hostid, $templateid = null, $unlink_mode = false)
-	{
+	function delete_template_applications($hostid, $templateid = null, $unlink_mode = false){
 		$db_apps = get_applications_by_hostid($hostid);
-		while($db_app = DBfetch($db_apps))
-		{
+		while($db_app = DBfetch($db_apps)){
 			if($db_app["templateid"] == 0)
 				continue;
 

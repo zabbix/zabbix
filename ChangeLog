@@ -1,5 +1,6 @@
 Changes for 1.4.6:
 
+ - [ZBX-362] added mass template linkage to hosts, mod by sergio.cricca (Artem)
  - [ZBX-361] fixed possible "division by zero" in Monitoring/Triggers screen (Sasha)
  - [ZBX-360] fixed possible warning messages under Oracle while updating items (Sasha)
  - [ZBX-357] fixed problem with clearing error message for activated items (Sasha)
