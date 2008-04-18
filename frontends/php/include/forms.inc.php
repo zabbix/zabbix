@@ -4645,11 +4645,11 @@ include_once 'include/discovery.inc.php';
  		global	$USER_DETAILS;
  		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
 		
- 		$frm_title = S_TEMPLATE;
+ 		$frm_title = S_TEMPLATE_LINKAGE;
 
  		if(isset($_REQUEST["hostid"])){
  			$template = get_host_by_hostid($_REQUEST["hostid"]);
- 			$frm_title = S_TEMPLATE.' ['.$template['host'].']';
+ 			$frm_title.= ' ['.$template['host'].']';
  		}
 		
  		if(isset($_REQUEST['hostid']) && !isset($_REQUEST["form_refresh"])){
@@ -4669,7 +4669,26 @@ include_once 'include/discovery.inc.php';
  		$frmHostT->AddRow(S_TEMPLATE,new CTextBox("tname",$name,60));
  
  		$cmbHosts = new CListBox('hosts[]',null,10);
-		
+
+		$hosts_in_tpl = array();
+		$sql = 'SELECT DISTINCT h.hostid,h.host '.
+			' FROM hosts h,hosts_templates ht'.
+ 			' WHERE ht.templateid='.$_REQUEST['hostid'].
+				' AND h.hostid=ht.hostid'.
+				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
+ 				' AND '.DBcondition('h.hostid',$available_hosts).
+ 			' ORDER BY h.host';
+
+ 		$db_hosts=DBselect($sql);
+ 		while($db_host=DBfetch($db_hosts)){
+ 			$cmbHosts->AddItem(
+ 					$db_host["hostid"],
+ 					get_node_name_by_elid($db_host["hostid"]).$db_host["host"]
+ 					);
+			$hosts_in_tpl[] = $db_host["hostid"];
+ 		}		
+							
+		$available_hosts = array_diff($available_hosts,$hosts_in_tpl);
 		$sql = 'SELECT DISTINCT h.hostid,h.host '.
 			' FROM hosts h'.
  			' WHERE ( h.status='.HOST_STATUS_MONITORED.' OR h.status='.HOST_STATUS_NOT_MONITORED.' ) '.
@@ -4679,10 +4698,10 @@ include_once 'include/discovery.inc.php';
  		$db_hosts=DBselect($sql);
 			
  		while($db_host=DBfetch($db_hosts)){
- 			$cmbHosts->AddItem(
- 					$db_host["hostid"],
- 					get_node_name_by_elid($db_host["hostid"]).$db_host["host"]
- 					);
+			$cmbitem = new CComboItem($db_host["hostid"],get_node_name_by_elid($db_host["hostid"]).$db_host["host"]);
+			$cmbitem->AddOption('style','color: grey;');
+			
+ 			$cmbHosts->AddItem($cmbitem);
  		}
 		
  		$frmHostT->AddRow(S_HOSTS,$cmbHosts);

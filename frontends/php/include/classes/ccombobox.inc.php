@@ -85,19 +85,24 @@
 		function AddItem($value, $caption='', $selected=NULL, $enabled='yes')
 		{
 //			if($enabled=='no') return;	/* disable item method 1 */
-			if(is_null($selected)){
-				$selected = 'no';
-				if(is_array($this->value)) {
-					if(str_in_array($value,$this->value))
-						$selected = 'yes';
-				}
-				else if(strcmp($value,$this->value) == 0)
-				{
-					$selected = 'yes';
-				}
+			if(strtolower(get_class($value))=='ccomboitem') {
+				parent::AddItem($value);
 			}
-
-			parent::AddItem(new CComboItem($value,$caption,$selected,$enabled));
+			else{
+				if(is_null($selected)){
+					$selected = 'no';
+					if(is_array($this->value)) {
+						if(str_in_array($value,$this->value))
+							$selected = 'yes';
+					}
+					else if(strcmp($value,$this->value) == 0)
+					{
+						$selected = 'yes';
+					}
+				}
+	
+				parent::AddItem(new CComboItem($value,$caption,$selected,$enabled));
+			}
 		}
 	}
 
