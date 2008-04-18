@@ -347,7 +347,8 @@ include_once "include/page_header.php";
 	{
 // FORM
 		insert_httptest_form();
-	} else {
+	} 
+	else {
 
 // Table HEADER
 		$form = new CForm();

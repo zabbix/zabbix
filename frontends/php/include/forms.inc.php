@@ -340,9 +340,7 @@
 		$form->show();
 	}
 	
-	function	insert_httptest_form()
-	{
-		global $_REQUEST;
+	function	insert_httptest_form(){
 
 		$form = new CFormTable(S_SCENARIO, null, 'post');
 		$form->SetHelp("web.webmon.httpconf.php");
@@ -452,7 +450,7 @@
 				$down->OnClick("return create_var('".$form->GetName()."','move_down',".$sid.", true);");
 			}
 
-			$name = new CLink($s['name'],'#','action');
+			$name = new CLink(htmlspecialchars($s['name']),'#','action');
 			$name->OnClick('return PopUp("popup_httpstep.php?dstfrm='.$form->GetName().
 				'&list_name=steps&sid='.$sid.
 				url_param($s['name'],false,'name').
@@ -477,8 +475,8 @@
 				array(new CCheckBox('sel_step[]',null,null,$sid), $name),
 				$s['timeout'].SPACE.S_SEC_SMALL,
 				$url,
-				$s['required'],
-				$s['status_codes'],
+				htmlspecialchars($s['required']),
+				htmlspecialchars($s['status_codes']),
 				array($up, isset($up) && isset($down) ? SPACE : null, $down)
 				));
 		}
