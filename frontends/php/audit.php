@@ -158,7 +158,7 @@ include_once "include/page_header.php";
 
 		
 		for($i=0; $row=DBfetch($result); $i++){
-			if($i<$start)	continue;
+			if($i<$_REQUEST['start'])	continue;
 	
 			switch($row["action"]){
 				case AUDIT_ACTION_ADD:			
