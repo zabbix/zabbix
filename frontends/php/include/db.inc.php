@@ -19,13 +19,20 @@
 **/
 ?>
 <?php
-	global $DB;
-
 	function DBconnect(&$error){
 		$result = true;
 		
-		global $DB;
+		global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
 
+		if(!isset($DB)){
+			if(isset($DB_TYPE))	$DB['TYPE'] = $DB_TYPE;
+			if(isset($DB_SERVER)) $DB['SERVER'] = $DB_SERVER;
+			if(isset($DB_PORT))	$DB['PORT'] = $DB_PORT;
+			if(isset($DB_DATABASE))	$DB['DATABASE'] = $DB_DATABASE;
+			if(isset($DB_USER))	$DB['USER'] = $DB_USER;
+			if(isset($DB_PASSWORD))	$DB['PASSWORD'] = $DB_PASSWORD;
+		}
+				
 		$DB['DB'] = null;
 		$DB['TRANSACTIONS'] = 0;
 
