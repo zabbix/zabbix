@@ -125,49 +125,56 @@ static int	zbx_get_cpu_num(void)
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 #ifdef _WINDOWS
-
-	PDH_STATUS	status;
-	int		i;
-	char		counter_path[MAX_COUNTER_PATH];
+	PDH_STATUS			status;
+	char				cpu[16], counter_path[PDH_MAX_COUNTER_PATH];
+	PDH_COUNTER_PATH_ELEMENTS	cpe;
+	int				i;
+	DWORD				dwSize;
 
 	memset(pcpus, 0, sizeof(ZBX_CPUS_STAT_DATA));
 
 	pcpus->count = zbx_get_cpu_num();
 
-	if (PdhOpenQuery(NULL,0,&pcpus->pdh_query)!=ERROR_SUCCESS)
-	{
-		zabbix_log( LOG_LEVEL_ERR, "Call to PdhOpenQuery() failed: %s", strerror_from_system(GetLastError()));
+	if (ERROR_SUCCESS != (status = PdhOpenQuery(NULL, 0, &pcpus->pdh_query))) {
+		zabbix_log( LOG_LEVEL_ERR, "Call to PdhOpenQuery() failed: %s",
+				strerror_from_module(status, "PDH.DLL"));
 		return 1;
 	}
 
-	zbx_snprintf(counter_path, sizeof(counter_path), "\\%s(_Total)\\%s",GetCounterName(PCI_PROCESSOR),GetCounterName(PCI_PROCESSOR_TIME));
+	cpe.szMachineName = NULL;
+	cpe.szObjectName = GetCounterName(PCI_PROCESSOR);
+	cpe.szInstanceName = cpu;
+	cpe.szParentInstance = NULL;
+	cpe.dwInstanceIndex = -1;
+	cpe.szCounterName = GetCounterName(PCI_PROCESSOR_TIME);
 
-	if (ERROR_SUCCESS != (status = PdhAddCounter(
-		pcpus->pdh_query, 
-		counter_path, 0, 
-		&pcpus->cpu[0].usage_couter)))
-	{
-		zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter \"%s\" to query: %s", counter_path, strerror_from_module(status,"PDH.DLL"));
-		return 2;
-	}
+	for(i = 0 /* 0 : _Total; >0 : cpu */; i <= pcpus->count; i++) {
+		if (i == 0)
+			zbx_strlcpy(cpu, "_Total", sizeof(cpu));
+		else
+			_itoa_s(i, cpu, sizeof(cpu), 10);
 
-	for(i=1 /* 0 - is Total cpus */; i <= pcpus->count /* "<=" instead of  "+ 1" */; i++)
-	{
-		zbx_snprintf(counter_path, sizeof(counter_path),"\\%s(%d)\\%s", GetCounterName(PCI_PROCESSOR), i-1, GetCounterName(PCI_PROCESSOR_TIME));
-
-		if (ERROR_SUCCESS != (status = PdhAddCounter(
-			pcpus->pdh_query, 
-			counter_path,0,
-			&pcpus->cpu[i].usage_couter)))
+		dwSize = sizeof(counter_path);
+		if (ERROR_SUCCESS != (status = PdhMakeCounterPath(&cpe, counter_path, &dwSize, 0)))
 		{
-			zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter \"%s\" to query: %s", counter_path, strerror_from_module(status,"PDH.DLL"));
+			zabbix_log(LOG_LEVEL_ERR, "Call to PdhMakeCounterPath() failed: %s",
+					strerror_from_module(status, "PDH.DLL"));
+			return 1;
+		}
+
+		if (ERROR_SUCCESS != (status = PdhAddCounter(pcpus->pdh_query, counter_path, 0,
+				&pcpus->cpu[i].usage_couter)))
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter \"%s\" to query: %s",
+					counter_path, strerror_from_module(status, "PDH.DLL"));
 			return 2;
 		}
 	}
 
 	if (ERROR_SUCCESS != (status = PdhCollectQueryData(pcpus->pdh_query)))
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Call to PdhCollectQueryData() failed: %s", strerror_from_module(status,"PDH.DLL"));
+		zabbix_log( LOG_LEVEL_ERR, "Call to PdhCollectQueryData() failed: %s",
+				strerror_from_module(status, "PDH.DLL"));
 		return 3;
 	}
 
@@ -176,12 +183,23 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		PdhGetRawCounterValue(pcpus->cpu[i].usage_couter, NULL, &pcpus->cpu[i].usage_old);
 	}
 
-	zbx_snprintf(counter_path, sizeof(counter_path), "\\%s\\%s", GetCounterName(PCI_SYSTEM), GetCounterName(PCI_PROCESSOR_QUEUE_LENGTH));
+	cpe.szObjectName = GetCounterName(PCI_SYSTEM);
+	cpe.szInstanceName = NULL;
+	cpe.szCounterName = GetCounterName(PCI_PROCESSOR_QUEUE_LENGTH);
+
+	dwSize = sizeof(counter_path);
+	if (ERROR_SUCCESS != (status = PdhMakeCounterPath(&cpe, counter_path, &dwSize, 0)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Call to PdhMakeCounterPath() failed: %s",
+				strerror_from_module(status, "PDH.DLL"));
+		return 1;
+	}
 
 	/* Prepare for CPU execution queue usage collection */
 	if (ERROR_SUCCESS != (status = PdhAddCounter(pcpus->pdh_query, counter_path, 0, &pcpus->queue_counter)))
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter \"%s\" to query: %s", counter_path, strerror_from_module(status,"PDH.DLL"));
+		zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter \"%s\" to query: %s",
+				counter_path, strerror_from_module(status, "PDH.DLL"));
 		return 2;
 	}
 

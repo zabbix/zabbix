@@ -1,5 +1,6 @@
 Changes for 1.5.1:
 
+ - [DEV-143] improved support of numeric performance counters for Windows agents (Sasha)
  - [DEV-141] improved performance of ZABBIX Proxy module (Sasha)
  - [DEV-140] added support of zabbix[proxy,<proxyname>,lastaccess] (Sasha)
  - [DEV-124] screen actions moved to Audit, added filter for Audit (Artem)

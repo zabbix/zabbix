@@ -24,9 +24,9 @@
 
 int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char counter_path[MAX_COUNTER_PATH];
+	char	counter_path[64];
 
-	zbx_snprintf(counter_path, sizeof(counter_path), "\\%s\\%s",GetCounterName(PCI_SYSTEM),GetCounterName(PCI_SYSTEM_UP_TIME));
+	zbx_snprintf(counter_path, sizeof(counter_path), "\\%d\\%d", PCI_SYSTEM, PCI_SYSTEM_UP_TIME);
 
 	return PERF_MONITOR(cmd, counter_path, flags, result);
 }
