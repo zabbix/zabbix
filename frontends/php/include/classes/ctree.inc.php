@@ -43,7 +43,8 @@ var $maxlevel=0;
 		if(!$this->CheckTree()){
 			$this->Destroy();
 			return false;
-		} else {
+		} 
+		else {
 			$this->CountDepth();
 		}
 	}
@@ -232,6 +233,7 @@ var $maxlevel=0;
 	}
 	
 	public function GetImg($id,$img){
+
 		$img=str_replace('T','I',$img);
 		$img=str_replace('L','O',$img);
 		$ch = 'L';
@@ -243,6 +245,7 @@ var $maxlevel=0;
 			$ch='T';
 		}
 		$img.=$ch;
+		
 	return $img;
 	}
 	
@@ -254,10 +257,10 @@ var $maxlevel=0;
 			$this->tree[$id]['nodetype'] = 0;
 			
 			$parentid=$cell['parentid'];
-			$this->tree[$parentid]['childnodes'][] = $cell['id'];
+			$this->tree[$parentid]['childnodes'][] = $id;//$cell['id'];
 	
 			$this->tree[$id]['nodelist'] = '';
-	//		echo $id.BR;
+//		echo $parentid.' : '.$id.'('.$cell['id'].')'.SBR;
 		}
 		
 	return true;

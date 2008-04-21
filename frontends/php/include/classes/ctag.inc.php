@@ -262,7 +262,7 @@
 				$this->options[$name] = unpack_object($value);
 			}
 			else if(!empty($value)){
-				$this->options[$name] = htmlentities(str_replace(array("\r", "\n"), '', strval($value)),ENT_COMPAT,S_HTML_CHARSET); 
+				$this->options[$name] = htmlentities(str_replace(array("\r", "\n"), '', strval($value)),ENT_COMPAT,S_HTML_CHARSET);
 			}
 		}
 
