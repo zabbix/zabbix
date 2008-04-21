@@ -30,7 +30,7 @@ require_once "include/blocks.inc.php";
 $page["title"] = "S_DASHBOARD";
 $page["file"] = "dashboard.php";
 $page['hist_arg'] = array();
-$page['scripts'] = array('dashboard.js','showhint.js');
+$page['scripts'] = array('updater.js','dashboard.js','showhint.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
