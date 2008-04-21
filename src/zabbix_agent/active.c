@@ -426,7 +426,7 @@ static int	send_buffer(
 		buffer.count,
 		CONFIG_BUFFER_SIZE);
 
-	now = time(NULL);
+	now = (int)time(NULL);
 	if(buffer.count < CONFIG_BUFFER_SIZE && now-lastsent < CONFIG_BUFFER_SEND)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Will not send now. Now %d lastsent %d < %d",
