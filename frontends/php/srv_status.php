@@ -58,8 +58,10 @@ include_once "include/page_header.php";
 	}
 //--------?>
 <?php
-        if( isset($_REQUEST["serviceid"]) && $_REQUEST["serviceid"] > 0 && ! (DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"]))) )
-        {
+        if(isset($_REQUEST["serviceid"]) && 
+			($_REQUEST["serviceid"]>0) && 
+			!DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"])))
+		{
                 unset($_REQUEST["serviceid"]);
         }
 
@@ -139,7 +141,7 @@ include_once "include/page_header.php";
 								' WHERE s.status>0 '.
 									' AND s.triggerid is not NULL '.
 									' AND t.triggerid=s.triggerid '.
-									' AND '.DBcondition('f.triggerid',$available_triggers).
+									' AND '.DBcondition('t.triggerid',$available_triggers).
 									' AND '.DBin_node('s.serviceid').
 								' ORDER BY s.status DESC, t.description');
 					
@@ -167,20 +169,22 @@ include_once "include/page_header.php";
 				
 				if($row["goodsla"] > $stat["ok"]){
 					$sla_style='red';
-				} else {
+				} 
+				else {
 					$sla_style='green';
 				}
 				
 				$row['sla2'] = array(new CSpan(round($row["goodsla"],3),'green'),'/', new CSpan(round($stat["ok"],3),$sla_style));
-			} else {
+			} 
+			else {
 				$row['sla']= "-";
 				$row['sla2']= "-";
 			}
 			
 			if(isset($services[$row['serviceid']])){
 				$services[$row['serviceid']] = array_merge($services[$row['serviceid']],$row);
-			} else {
-				
+			} 
+			else {
 				$services[$row['serviceid']] = $row;
 			}
 		
@@ -190,13 +194,13 @@ include_once "include/page_header.php";
 			if(isset($row['servicedownid']))
 			$services[$row['serviceid']]['childs'][] = array('id' => $row['servicedownid'], 'soft' => 1, 'linkid' => $row['linkid']);
 		}
-		
+
 		$treeServ = array();
 		createShowServiceTree($services,$treeServ);	//return into $treeServ parametr
-		
+
 		//permission issue
 		$treeServ = del_empty_nodes($treeServ);
-		
+
 		$tree = new CTree($treeServ,array('caption' => bold(S_SERVICE),
 						'status' => bold(S_STATUS), 
 						'reason' => bold(S_REASON),

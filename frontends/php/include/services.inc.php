@@ -705,7 +705,8 @@ if($serviceid == 1 || $serviceid == 2){
 						createShowServiceTree($services,$temp,$nodeid['id'],$services[$nodeid['id']]['serviceupid'],$rows['serviceid'],$nodeid['soft'], $nodeid['linkid']);	}
 				}			
 			}
-		} else {
+		} 
+		else {
 			$rows['caption'] = new CSpan($rows['caption']);
 			$rows['caption']->AddOption('style','color: #888888;');
 			$temp[$rows['serviceid'].','.$linkid]=$rows;
