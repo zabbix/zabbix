@@ -387,8 +387,7 @@ COpt::profiling_start("page");
     <meta name="Author" content="ZABBIX SIA" />
     <link rel="stylesheet" href="css.css" />
 <?php
-	global $DB;
-	if(!is_null($DB['DB'])){
+	if(isset($DB['DB']) && !is_null($DB['DB'])){
 		$css = false;
 		$config=select_config();		
 		if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
