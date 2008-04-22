@@ -267,8 +267,6 @@ require_once "include/items.inc.php";
 		add_group_to_host($hostid,$newgroup);
 
 		sync_host_with_templates($hostid);
-
-		update_profile("HOST_PORT",$port);
 		
 		return	$hostid;
 	}
