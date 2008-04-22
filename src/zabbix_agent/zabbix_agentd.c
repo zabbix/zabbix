@@ -243,15 +243,24 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. ZABBIX %s.", ZABBIX_VERSION);
 
-	if( FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT) )
+	if(0 == CONFIG_DISABLE_PASSIVE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Listener failed with error: %s.", zbx_tcp_strerror());
-		exit(1);
+		if( FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT) )
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Listener failed with error: %s.", zbx_tcp_strerror());
+			exit(1);
+		}
 	}
 
 	init_collector_data();
 
 	/* --- START THREADS ---*/
+
+	if(1 == CONFIG_DISABLE_PASSIVE)
+	{
+		/* Only main process and active checks will be started */
+		CONFIG_ZABBIX_FORKS = 2;
+	}
 
 	threads = calloc(CONFIG_ZABBIX_FORKS, sizeof(ZBX_THREAD_HANDLE));
 
