@@ -70,7 +70,17 @@ interval:		10,						// update interval in sec
 				method: 'post',
 				'parameters':	obj4update.params,
 				'evalScripts': true,
-				'onSuccess': function(resp){ obj4update.lastupdate = time; obj4update.ready = true; },	//SDI(resp.responseText);
+				'onSuccess': function(resp){ 
+						var headers = resp.getAllResponseHeaders(); 
+//						alert(headers);
+						if(headers.indexOf('Ajax-response: false') > -1){
+							resp.responseText = $(obj4update.id).innerHTML;
+//							return false;
+						}
+						
+						obj4update.lastupdate = time; 
+						obj4update.ready = true;
+					},	//SDI(resp.responseText);
 				'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(obj4update.params); }
 			});	
 	}
