@@ -29,12 +29,14 @@ function setRefreshRate(id,interval){
 		'favcnt':	interval
 	}
 
-	new Ajax.Request("dashboard.php?output=ajax",
+	var uri = new url(location.href);
+
+	new Ajax.Request(uri.getPath()+'?output=ajax',
 					{
 						'method': 'post',
 						'parameters':params,
 						'onSuccess': function(resp){ },//alert(resp.responseText);
-						'onFailure': function(){ document.location = 'dashboard.php?'+Object.toQueryString(params); }
+						'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);
 

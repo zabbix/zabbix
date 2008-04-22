@@ -996,10 +996,8 @@ COpt::profiling_stop('prepare table');
 
 		$value = '-';
 		$ack = null;
-		if(isset($ithosts[$hostname]))
-		{
-			if($ithosts[$hostname]['tr_value'] == TRIGGER_VALUE_TRUE)
-			{
+		if(isset($ithosts[$hostname])){
+			if($ithosts[$hostname]['tr_value'] == TRIGGER_VALUE_TRUE){
 				$css_class = get_severity_style($ithosts[$hostname]['severity']);
 				$ack = get_last_event_by_triggerid($ithosts[$hostname]['triggerid']);
 				if ( 1 == $ack['acknowledged'] )
@@ -1039,7 +1037,7 @@ COpt::profiling_stop('prepare table');
 			}
 		}
 
-		if($value == '-')	$css_class = 'center';
+//		if($value == '-')	$css_class = 'center';
 		$value_col = new CCol(array($value,$ack),$css_class);
 
 		if(isset($it_ov_menu))

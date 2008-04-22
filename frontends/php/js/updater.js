@@ -63,13 +63,15 @@ interval:		10,						// update interval in sec
 	update: function(obj4update,time){
 		obj4update.ready = false;
 		
+		var uri = new url(obj4update.url);
+		
 		new Ajax.Updater(obj4update.id, obj4update.url,
 			{
 				method: 'post',
 				'parameters':	obj4update.params,
 				'evalScripts': true,
 				'onSuccess': function(resp){ obj4update.lastupdate = time; obj4update.ready = true; },	//SDI(resp.responseText);
-				'onFailure': function(){ document.location = 'dashboard.php?'+Object.toQueryString(obj4update.params); }
+				'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(obj4update.params); }
 			});	
 	}
 }
