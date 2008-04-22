@@ -1793,17 +1793,16 @@
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	get_triggers_overview($groupid,$view_style=null)
-	{
+	function	get_triggers_overview($groupid,$view_style=null){
 		global $USER_DETAILS;
 
 		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
 		
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
-		if($groupid > 0)
-		{
+		if($groupid > 0){
 			$group_where = ',hosts_groups hg where hg.groupid='.$groupid.' and hg.hostid=h.hostid and';
-		} else {
+		} 
+		else {
 			$group_where = ' where';
 		}
 
@@ -1856,17 +1855,14 @@
 		
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_TRIGGERS,'center'));
-			foreach($hosts as $hostname)
-			{
+			foreach($hosts as $hostname){
 				$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
 			}
 			$table->SetHeader($header,'vertical_header');
 
-			foreach($triggers as $descr => $trhosts)
-			{
+			foreach($triggers as $descr => $trhosts){
 				$table_row = array(nbsp($descr));
-				foreach($hosts as $hostname)
-				{
+				foreach($hosts as $hostname){
 					$table_row=get_trigger_overview_cells($table_row,$trhosts,$hostname);
 				}
 				$table->AddRow($table_row);
@@ -1874,8 +1870,7 @@
 		}
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
-			foreach($triggers as $descr => $trhosts)
-			{
+			foreach($triggers as $descr => $trhosts){
 				$header=array_merge($header,array(new CImg('vtext.php?text='.$descr)));
 			}
 			$table->SetHeader($header,'vertical_header');
@@ -1898,11 +1893,10 @@
 
 		unset($tr_ov_menu);
 		$ack = null;
-		if(isset($trhosts[$hostname]))
-		{
+		if(isset($trhosts[$hostname])){
 			unset($ack_menu);
-			switch($trhosts[$hostname]['value'])
-			{
+			
+			switch($trhosts[$hostname]['value']){
 				case TRIGGER_VALUE_TRUE:
 					$css_class = get_severity_style($trhosts[$hostname]['priority']);
 					if( ($ack = get_last_event_by_triggerid($trhosts[$hostname]['triggerid'])) )
@@ -1947,11 +1941,9 @@
 				' from items i, functions f '.
 				' where f.itemid=i.itemid and f.triggerid='.$trhosts[$hostname]['triggerid']);
 
-			while($item_data = DBfetch($db_items))
-			{
+			while($item_data = DBfetch($db_items)){
 				$description = item_description($item_data['description'], $item_data['key_']);
-				switch($item_data['value_type'])
-				{
+				switch($item_data['value_type']){
 					case ITEM_VALUE_TYPE_UINT64:
 					case ITEM_VALUE_TYPE_FLOAT:
 						$action = 'showgraph';
@@ -1973,15 +1965,14 @@
 					'history.php?action='.$action.'&itemid='.$item_data['itemid'].'&period=3600',
 					 array('tw'=>'_blank', 'sb'=>$status_bar));
 			}
-			if(isset($item_menu['showgraph']))
-			{
+			if(isset($item_menu['showgraph'])){
 				$tr_ov_menu[] = array(S_GRAPHS,	null, null,
 					array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
 					);
 				$tr_ov_menu = array_merge($tr_ov_menu, $item_menu['showgraph']);
 			}
-			if(isset($item_menu['showlatest']))
-			{
+			
+			if(isset($item_menu['showlatest'])){
 				$tr_ov_menu[] = array(S_VALUES,	null, null, 
 					array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
 					);
@@ -1992,13 +1983,11 @@
 		}
 
 		$status_col = new CCol(array(SPACE, $ack),$css_class);
-		if(isset($style))
-		{
+		if(isset($style)){
 			$status_col->AddOption('style', $style);
 		}
 
-		if(isset($tr_ov_menu))
-		{
+		if(isset($tr_ov_menu)){
 			$tr_ov_menu  = new CPUMenu($tr_ov_menu,170);
 			$status_col->OnClick($tr_ov_menu->GetOnActionJS());
 			$status_col->AddAction('onmouseover',
