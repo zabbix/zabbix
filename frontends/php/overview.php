@@ -106,15 +106,17 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 	$help = new CHelp('web.view.php','left');
 	$help_table = new CTableInfo();
 	$help_table->AddOption('style', 'width: 200px');
+	
 	if($_REQUEST["type"]==SHOW_TRIGGERS){
 		$help_table->AddRow(array(new CCol(SPACE, 'normal'), S_DISABLED));
 	}
 	
 	foreach(array(1,2,3,4,5) as $tr_severity)
 		$help_table->AddRow(array(new CCol(get_severity_description($tr_severity),get_severity_style($tr_severity)),S_ENABLED));
+		
 	$help_table->AddRow(array(new CCol(SPACE, 'unknown_trigger'), S_UNKNOWN));
-	if($_REQUEST["type"]==SHOW_TRIGGERS)
-	{
+	
+	if($_REQUEST["type"]==SHOW_TRIGGERS){
 		$col = new CCol(SPACE, 'unknown_trigger');
 		$col->AddOption('style','background-image: url(images/gradients/blink1.gif); '.
 			'background-position: top left; background-repeat: repeate;');
@@ -125,8 +127,7 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 		$help_table->AddRow(array($col, S_15_MIN));
 		$help_table->AddRow(array(new CCol(SPACE), S_NO_TRIGGER));
 	}
-	else
-	{
+	else{
 		$help_table->AddRow(array(new CCol(SPACE), S_DISABLED.' '.S_OR.' '.S_NO_TRIGGER));
 	}
 
@@ -146,27 +147,23 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 	
 	show_table_header($form, NULL);
 ?>
-
 <?php
-	if($_REQUEST["type"]==SHOW_DATA)
-	{
+	if($_REQUEST["type"]==SHOW_DATA){
+	
 COpt::profiling_start("get_items_data_overview");
 		$table = get_items_data_overview($_REQUEST["groupid"],$_REQUEST['view_style']);
 COpt::profiling_stop("get_items_data_overview");
 		$table->Show();
 		unset($table);
 	}
-	elseif($_REQUEST["type"]==SHOW_TRIGGERS)
-	{
+	else if($_REQUEST["type"]==SHOW_TRIGGERS){
+	
 COpt::profiling_start("get_triggers_overview");
 		$table = get_triggers_overview($_REQUEST["groupid"],$_REQUEST['view_style']);
 COpt::profiling_stop("get_triggers_overview");
 		$table->Show();
 		unset($table);
 	}
-?>
-<?php
 
 include_once "include/page_footer.php";
-
 ?>
