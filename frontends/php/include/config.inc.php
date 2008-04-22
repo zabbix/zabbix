@@ -181,6 +181,13 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	}
 //*/
 
+// Ajax do not need warnings or Errors
+	if((isset($DENY_GUI) || isset($show_setup) || isset($show_warning)) && (PAGE_TYPE_HTML <> detect_page_type(PAGE_TYPE_HTML))){
+		header('Ajax-response: false');
+		exit();
+	}
+//---
+	
 	if(isset($DENY_GUI)){
 		unset($show_warning);
 		include_once("warning.php");
