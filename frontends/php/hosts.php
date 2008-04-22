@@ -270,15 +270,16 @@ include_once "include/page_header.php";
 			$hostid = add_host(
 				$_REQUEST["host"],$_REQUEST["port"],$_REQUEST["status"],$useip,$_REQUEST["dns"],
 				$_REQUEST["ip"],$_REQUEST["proxy_hostid"],$templates,$_REQUEST["newgroup"],$groups);
-
+			$result	= DBend()?$hostid:false;
+			
 			$msg_ok 	= S_HOST_ADDED;
 			$msg_fail 	= S_CANNOT_ADD_HOST;
 			$audit_action 	= AUDIT_ACTION_ADD;
-
-			$result	= DBend()?$hostid:false;
 		}
 
 		if($result){
+			update_profile("HOST_PORT",$_REQUEST['port']);
+
 			DBstart();
 			delete_host_profile($hostid);
 						

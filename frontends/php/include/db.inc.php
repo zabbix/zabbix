@@ -149,7 +149,7 @@
 		return $result;
 	}
 
-	function	DBclose(){
+	function DBclose(){
 		global $DB;
 
 		$result = false;
@@ -188,7 +188,7 @@
 		return $result;
 	}
 
-	function	DBloadfile($file, &$error){
+	function DBloadfile($file, &$error){
 		global $DB;
 
 		if(!file_exists($file)){
@@ -218,9 +218,9 @@
 	
 	function DBstart(){
 		global $DB;
-
+//SDI('DBStart(): '.$DB['TRANSACTIONS']);
 		$DB['TRANSACTIONS']++;
-		
+
 		if($DB['TRANSACTIONS']>1){
 			info('POSSIBLE ERROR: Used incorect logic in database processing, started subtransaction!');
 		return $DB['TRANSACTION_STATE'];
@@ -254,7 +254,7 @@
 	
 	function DBend($result=null){
 		global $DB;
-		
+//SDI('DBend(): '.$DB['TRANSACTIONS']);
 		if($DB['TRANSACTIONS'] != 1){
 			$DB['TRANSACTIONS']--;
 			
@@ -265,7 +265,7 @@
 			}
 		return $DB['TRANSACTION_STATE'];
 		}
-		
+
 		$DB['TRANSACTIONS'] = 0;
 		
 		if(empty($result))
@@ -420,9 +420,8 @@
 
 	function DBexecute($query, $skip_error_messages=0){
 		global $DB;
-
+//SDI($query);
 //COpt::savesqlrequest($query);
-
 		$result = false;
 
 		if( isset($DB['DB']) && !empty($DB['DB']) )
