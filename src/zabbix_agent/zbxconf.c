@@ -46,6 +46,7 @@ char	*CONFIG_HOSTNAME		= NULL;
 
 
 int	CONFIG_DISABLE_ACTIVE		= 0;
+int	CONFIG_DISABLE_PASSIVE		= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LISTEN_PORT	= 10050;
 int	CONFIG_SERVER_PORT	= 10051;
@@ -75,6 +76,7 @@ void    load_config()
 		{"LogFile",		&CONFIG_LOG_FILE,	0,TYPE_STRING,	PARM_OPT,	0,0},
 		{"LogFileSize",		&CONFIG_LOG_FILE_SIZE,	0,TYPE_INT,	PARM_OPT,	0,1024},
 		{"DisableActive",	&CONFIG_DISABLE_ACTIVE,	0,TYPE_INT,	PARM_OPT,	0,1},
+		{"DisablePassive",	&CONFIG_DISABLE_PASSIVE,0,TYPE_INT,	PARM_OPT,	0,1},
 		{"Timeout",		&CONFIG_TIMEOUT,	0,TYPE_INT,	PARM_OPT,	1,30},
 		{"ListenPort",		&CONFIG_LISTEN_PORT,	0,TYPE_INT,	PARM_OPT,	1024,32767},
 		{"ServerPort",		&CONFIG_SERVER_PORT,	0,TYPE_INT,	PARM_OPT,	1024,32767},
@@ -121,6 +123,12 @@ void    load_config()
 			zabbix_log( LOG_LEVEL_CRIT, "Hostname is not defined");
 			exit(1);
 		}
+	}
+
+	if(CONFIG_DISABLE_ACTIVE == 1 && CONFIG_DISABLE_PASSIVE == 1)
+	{
+		zabbix_log( LOG_LEVEL_CRIT, "Either active or passive checks must be enabled");
+		exit(1);
 	}
 }
 
