@@ -26,7 +26,10 @@
 	$page['title']	= 'S_AVAILABILITY_REPORT';
 	$page['file']	= 'report2.php';
 	$page['hist_arg'] = array('config','groupid','hostid','tpl_triggerid');
-
+	$page['scripts'] = array('calendar.js');
+	
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+	
 include_once 'include/page_header.php';
 
 ?>
@@ -39,19 +42,66 @@ include_once 'include/page_header.php';
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			NULL),
 		'tpl_triggerid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			NULL),
 		
-		'triggerid'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,			NULL)
+		'triggerid'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,			NULL),
+		
+// filter
+		"filter_rst"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
+		"filter_set"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
+		
+		'filter_timesince'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
+		'filter_timetill'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
+
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
 	);
 
 	check_fields($fields);
 
+/* AJAX */	
+	if(isset($_REQUEST['favobj'])){
+		if('filter' == $_REQUEST['favobj']){
+			update_profile('web.avail_report.filter.state',$_REQUEST['state']);
+		}
+	}	
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+	
+//--------
+/* FILTER */
+	if(isset($_REQUEST['filter_rst'])){
+		$_REQUEST['filter_timesince'] = 0;
+		$_REQUEST['filter_timetill'] = 0;
+	}
+	
+	$_REQUEST['filter_timesince'] = get_request('filter_timesince',get_profile('web.avail_report.filter.timesince',0));
+	$_REQUEST['filter_timetill'] = get_request('filter_timetill',get_profile('web.avail_report.filter.timetill',0));
+	
+	if(($_REQUEST['filter_timetill'] > 0) && ($_REQUEST['filter_timesince'] > $_REQUEST['filter_timetill'])){
+		$tmp = $_REQUEST['filter_timesince'];
+		$_REQUEST['filter_timesince'] = $_REQUEST['filter_timetill'];
+		$_REQUEST['filter_timetill'] = $tmp;
+	}
+	
+	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
+		update_profile('web.avail_report.filter.timesince',$_REQUEST['filter_timesince']);
+		update_profile('web.avail_report.filter.timetill',$_REQUEST['filter_timetill']);
+	}
+// --------------
+
 	$config = get_request('config',get_profile('web.avail_report.config',0));
 	update_profile('web.avail_report.config',$config);
+	
+	$options = array('allow_all_hosts','always_select_first_host','with_items');
 
 	if(0 == $config){
-		$options = array('allow_all_hosts','always_select_first_host','monitored_hosts','with_items');
+		array_push($options,'monitored_hosts');
 	}
 	else{
-		$options = array('allow_all_hosts','always_select_first_host','templated_hosts','with_items');
+		array_push($options,'templated_hosts');
 	}
 		
 	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
@@ -59,10 +109,10 @@ include_once 'include/page_header.php';
 	validate_group_with_host(PERM_READ_LIST,$options);	
 ?>
 <?php
-$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-show_report2_header($config,$available_hosts);
-?>
-<?php
+
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	show_report2_header($config,$available_hosts);
+	
 	if( isset($_REQUEST['triggerid']) &&
 		!($trigger_data = DBfetch(DBselect('SELECT DISTINCT t.*, h.host, h.hostid '.
 					' FROM triggers t, functions f, items i, hosts h '.
@@ -88,6 +138,78 @@ show_report2_header($config,$available_hosts);
 		$table->Show();
 	}
 	else if(isset($_REQUEST['hostid'])){
+/************************* FILTER *************************/
+/***********************************************************/	
+		$filterForm = new CFormTable(S_FILTER);//,'events.php?filter_set=1','POST',null,'sform');
+		$filterForm->AddOption('name','zbx_filter');
+		$filterForm->AddOption('id','zbx_filter');
+		$filterForm->SetMethod('get');
+	
+		$script = new CScript("javascript: if(CLNDR['avail_report_since'].clndr.setSDateFromOuterObj()){". 
+								"$('filter_timesince').value = parseInt(CLNDR['avail_report_since'].clndr.sdt.getTime()/1000);}".
+							"if(CLNDR['avail_report_till'].clndr.setSDateFromOuterObj()){". 
+								"$('filter_timetill').value = parseInt(CLNDR['avail_report_till'].clndr.sdt.getTime()/1000);}"
+							);
+		$filterForm->AddAction('onsubmit',$script);
+		
+		$filterForm->AddVar('filter_timesince',($_REQUEST['filter_timesince']>0)?$_REQUEST['filter_timesince']:'');
+		$filterForm->AddVar('filter_timetill',($_REQUEST['filter_timetill']>0)?$_REQUEST['filter_timetill']:'');
+	//*	
+		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
+		$clndr_icon->AddAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
+		
+		$filtertimetab = new CTable();
+		$filtertimetab->AddOption('width','10%');
+		$filtertimetab->SetCellPadding(0);
+		$filtertimetab->SetCellSpacing(0);
+	
+		$filtertimetab->AddRow(array(
+								S_FROM, 
+								new CNumericBox('filter_since_day',(($_REQUEST['filter_timesince']>0)?date('d',$_REQUEST['filter_timesince']):''),2),
+								'/',
+								new CNumericBox('filter_since_month',(($_REQUEST['filter_timesince']>0)?date('m',$_REQUEST['filter_timesince']):''),2),
+								'/',
+								new CNumericBox('filter_since_year',(($_REQUEST['filter_timesince']>0)?date('Y',$_REQUEST['filter_timesince']):''),4),
+								new CNumericBox('filter_since_hour',(($_REQUEST['filter_timesince']>0)?date('H',$_REQUEST['filter_timesince']):''),2),
+								':',
+								new CNumericBox('filter_since_minute',(($_REQUEST['filter_timesince']>0)?date('i',$_REQUEST['filter_timesince']):''),2),
+								$clndr_icon
+						));
+		zbx_add_post_js('create_calendar(null,["filter_since_day","filter_since_month","filter_since_year","filter_since_hour","filter_since_minute"],"avail_report_since");');
+	
+		$clndr_icon->AddAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['avail_report_till'].clndr.clndrshow(pos.top,pos.left);");
+		$filtertimetab->AddRow(array(
+								S_TILL, 
+								new CNumericBox('filter_till_day',(($_REQUEST['filter_timetill']>0)?date('d',$_REQUEST['filter_timetill']):''),2),
+								'/',
+								new CNumericBox('filter_till_month',(($_REQUEST['filter_timetill']>0)?date('m',$_REQUEST['filter_timetill']):''),2),
+								'/',
+								new CNumericBox('filter_till_year',(($_REQUEST['filter_timetill']>0)?date('Y',$_REQUEST['filter_timetill']):''),4),
+								new CNumericBox('filter_till_hour',(($_REQUEST['filter_timetill']>0)?date('H',$_REQUEST['filter_timetill']):''),2),
+								':',
+								new CNumericBox('filter_till_minute',(($_REQUEST['filter_timetill']>0)?date('i',$_REQUEST['filter_timetill']):''),2),
+								$clndr_icon
+						));
+		zbx_add_post_js('create_calendar(null,["filter_till_day","filter_till_month","filter_till_year","filter_till_hour","filter_till_minute"],"avail_report_till");');
+		
+		zbx_add_post_js('addListener($("filter_icon"),"click",CLNDR[\'avail_report_since\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'avail_report_since\'].clndr));'.
+						'addListener($("filter_icon"),"click",CLNDR[\'avail_report_till\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'avail_report_till\'].clndr));'
+						);
+		
+		$filterForm->AddRow(S_PERIOD, $filtertimetab);
+	//*/	
+
+		$reset = new CButton("filter_rst",S_RESET);
+		$reset->SetType('button');
+		$reset->SetAction('javascript: var uri = new url(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+	
+		$filterForm->AddItemToBottomRow($reset);
+		$filterForm->AddItemToBottomRow(new CButton("filter_set",S_FILTER));
+								
+		$filter = create_filter(S_FILTER,NULL,$filterForm,'tr_filter',get_profile('web.avail_report.filter.state',0));
+		$filter->Show();
+//-------
+
 		if(0 == $config){
 			if($_REQUEST['hostid'] > 0)	
 				$sql_cond = ' AND h.hostid='.$_REQUEST['hostid'];
@@ -137,7 +259,7 @@ show_report2_header($config,$available_hosts);
 		while($row=DBfetch($result)){
 			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts)) continue;
 
-			$availability = calculate_availability($row['triggerid'],0,0);
+			$availability = calculate_availability($row['triggerid'],$_REQUEST['filter_timesince'],$_REQUEST['filter_timetill']);
 
 			$true	= new CSpan(sprintf("%.4f%%",$availability['true']), 'on');
 			$false	= new CSpan(sprintf("%.4f%%",$availability['false']), 'off');
@@ -157,10 +279,9 @@ show_report2_header($config,$available_hosts);
 				));
 		}
 		$table->show();
+		
+		
 	}
-?>
-<?php
-	
-	include_once 'include/page_footer.php';
 
+include_once 'include/page_footer.php';
 ?>
