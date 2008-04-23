@@ -1127,17 +1127,17 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			$status["trends_count"]=$row["cnt"];
 		}*/
 // events
-		$row=DBfetch(DBselect("select count(eventid) as cnt from events"));
-		$status["events_count"]=$row["cnt"];
+/*		$row=DBfetch(DBselect("select count(eventid) as cnt from events"));
+		$status["events_count"]=$row["cnt"];*/
 // alerts
-		$row=DBfetch(DBselect("select count(alertid) as cnt from alerts"));
-		$status["alerts_count"]=$row["cnt"];
+/*		$row=DBfetch(DBselect("select count(alertid) as cnt from alerts"));
+		$status["alerts_count"]=$row["cnt"];*/
 // triggers
 		$sql = 'SELECT COUNT(t.triggerid) as cnt '.
 				' FROM triggers t, functions f, items i, hosts h'.
 				' WHERE t.triggerid=f.triggerid '.
 					' AND f.itemid=i.itemid '.
-					' AND i.status=0 '.
+					' AND i.status='.ITEM_STATUS_ACTIVE.
 					' AND i.hostid=h.hostid '.
 					' AND h.status='.HOST_STATUS_MONITORED;
 					
@@ -1202,6 +1202,14 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		while(DBfetch($result))		$status["users_online"]++;
 		$result=DBselect("select distinct s.userid from sessions s, users u where u.userid=s.userid and u.autologout=0");
 		while(DBfetch($result))		$status["users_online"]++;
+
+		$result=DBselect("select i.type, i.delay, count(*),count(*)/i.delay as qps from items i,hosts h where i.status=".ITEM_STATUS_ACTIVE." and i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED." group by i.type,i.delay order by i.type, i.delay");
+
+		$status["qps_total"]=0;
+		while($row=DBfetch($result))
+		{
+			$status["qps_total"]+=$row["qps"];
+		}
 
 		return $status;
 	}
