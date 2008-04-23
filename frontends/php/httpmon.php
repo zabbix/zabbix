@@ -48,41 +48,39 @@ include_once "include/page_header.php";
 	check_fields($fields);
 	validate_sort_and_sortorder();
 
-	validate_group_with_host(PERM_READ_ONLY,array("allow_all_hosts","always_select_first_host","monitored_hosts"));
+	$options = array('allow_all_hosts','monitored_hosts');//,'always_select_first_host'
+
+	$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.groupid',-1));
+	if($_REQUEST['groupid'] == -1) array_push($options,'always_select_first_host');
+	
+//	validate_group_with_host(PERM_READ_ONLY,array('allow_all_hosts','always_select_first_host','monitored_hosts'));
 ?>
 <?php
 	$_REQUEST["applications"] = get_request("applications",get_profile("web.httpmon.applications",array()),PROFILE_TYPE_ARRAY);
 
-	if(isset($_REQUEST["open"]))
-	{
-		if(!isset($_REQUEST["applicationid"]))
-		{
+	if(isset($_REQUEST["open"])){
+		if(!isset($_REQUEST["applicationid"])){
 			$_REQUEST["applications"] = array();
 			$show_all_apps = 1;
 		}
-		elseif(!uint_in_array($_REQUEST["applicationid"],$_REQUEST["applications"]))
-		{
+		else if(!uint_in_array($_REQUEST["applicationid"],$_REQUEST["applications"])){
 			array_push($_REQUEST["applications"],$_REQUEST["applicationid"]);
 		}
 		
-	} elseif(isset($_REQUEST["close"]))
-	{
-		if(!isset($_REQUEST["applicationid"]))
-		{
+	} 
+	else if(isset($_REQUEST["close"])){
+		if(!isset($_REQUEST["applicationid"])){
 			$_REQUEST["applications"] = array();
 		}
-		elseif(($i=array_search($_REQUEST["applicationid"], $_REQUEST["applications"])) !== FALSE)
-		{
+		else if(($i=array_search($_REQUEST["applicationid"], $_REQUEST["applications"])) !== FALSE){
 			unset($_REQUEST["applications"][$i]);
 		}
 	}
 
 	/* limit opened application count */
-	while(count($_REQUEST["applications"]) > 25)
-	{
+	while(count($_REQUEST["applications"]) > 25){
 		array_shift($_REQUEST["applications"]);
 	}
-
 
 	update_profile("web.httpmon.applications",$_REQUEST["applications"],PROFILE_TYPE_ARRAY);
 ?>
@@ -91,46 +89,66 @@ include_once "include/page_header.php";
 	$form = new CForm();
 	$form->SetMethod('get');
 	
-	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
+	$cmbGroup = new CComboBox("groupid",null,"submit();");
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 
 	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
 	$accessible_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 
-	$result=DBselect('select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, '.
-		' applications a, httptest ht where g.groupid in ('.$accessible_groups.') '.
-		' and hg.groupid=g.groupid and h.status='.HOST_STATUS_MONITORED.
-		' and h.hostid=a.hostid and hg.hostid=h.hostid'.
-		' and ht.applicationid=a.applicationid and ht.status='.HTTPTEST_STATUS_ACTIVE.
-		" order by g.name");
-	while($row=DBfetch($result))
-	{
+	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
+		' FROM groups g, hosts_groups hg, hosts h, applications a, httptest ht '.
+		' WHERE g.groupid in ('.$accessible_groups.') '.
+			' AND hg.groupid=g.groupid '.
+			' AND h.status='.HOST_STATUS_MONITORED.
+			' AND h.hostid=a.hostid '.
+			' AND hg.hostid=h.hostid'.
+			' AND ht.applicationid=a.applicationid '.
+			' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
+		' ORDER BY g.name');
+	while($row=DBfetch($result)){
+		if($_REQUEST['groupid'] == -1){
+			$_REQUEST['groupid'] = $row['groupid'];
+		}
 		$cmbGroup->AddItem(
 			$row['groupid'],
-			get_node_name_by_elid($row['groupid']).$row['name']
+			get_node_name_by_elid($row['groupid']).$row['name'],
+			($_REQUEST['groupid'] == $row['groupid'])?1:0
 			);
 	}
+
+//	Supposed to be here
+	validate_group_with_host(PERM_READ_ONLY,$options);
+
 	$form->AddItem(S_GROUP.SPACE);
 	$form->AddItem($cmbGroup);
 
 	$_REQUEST["hostid"] = get_request("hostid",0);
 	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit();");
-
-	if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"] > 0)
-	{
-		$sql='select distinct h.hostid,h.host from hosts_groups hg, hosts h,applications a,httptest ht '.
-			' where h.status='.HOST_STATUS_MONITORED.' and h.hostid=a.hostid and hg.hostid=h.hostid '.
-			' and hg.groupid='.$_REQUEST["groupid"].' and h.hostid in ('.$accessible_hosts.') '.
-			' and a.applicationid=ht.applicationid and ht.status='.HTTPTEST_STATUS_ACTIVE.
-			' group by h.hostid,h.host order by h.host';
+	$cmbHosts->AddItem(0,S_ALL_SMALL);
+	
+	if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"] > 0){
+		$sql='SElECT DISTINCT h.hostid,h.host '.
+			' FROM hosts_groups hg, hosts h,applications a,httptest ht '.
+			' WHERE h.status='.HOST_STATUS_MONITORED.
+				' AND h.hostid=a.hostid '.
+				' AND hg.hostid=h.hostid '.
+				' AND hg.groupid='.$_REQUEST["groupid"].
+				' AND h.hostid in ('.$accessible_hosts.') '.
+				' AND a.applicationid=ht.applicationid '.
+				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
+			' GROUP BY h.hostid,h.host'.
+			' ORDER BY h.host';
 	}
-	else
-	{
-		$cmbHosts->AddItem(0,S_ALL_SMALL);
-		$sql='select distinct h.hostid,h.host from hosts h,applications a,httptest ht '.
-			' where h.status='.HOST_STATUS_MONITORED.' and h.hostid=a.hostid and ht.status='.HTTPTEST_STATUS_ACTIVE.
-			' and ht.applicationid=a.applicationid and h.hostid in ('.$accessible_hosts.') '.
-			' group by h.hostid,h.host order by h.host';
+	else{
+		$sql='SELECT DISTINCT h.hostid,h.host '.
+			' FROM hosts h,applications a,httptest ht '.
+			' WHERE h.status='.HOST_STATUS_MONITORED.
+				' AND h.hostid=a.hostid '.
+				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
+				' AND ht.applicationid=a.applicationid '.
+				' AND h.hostid in ('.$accessible_hosts.') '.
+			' GROUP BY h.hostid,h.host '.
+			' ORDER BY h.host';
 	}
 
 	$result=DBselect($sql);
@@ -176,9 +194,9 @@ include_once "include/page_header.php";
 	$any_app_exist = false;
 
 	if($_REQUEST["hostid"] > 0)
-		$compare_host = " and h.hostid=".$_REQUEST["hostid"];
+		$compare_host = " AND h.hostid=".$_REQUEST["hostid"];
 	else
-		$compare_host = " and h.hostid in (".$accessible_hosts.") ";
+		$compare_host = " AND h.hostid in (".$accessible_hosts.") ";
 		
 	$db_applications = DBselect('SELECT DISTINCT h.host,h.hostid,a.* '.
 							' FROM applications a,hosts h '.
@@ -190,7 +208,7 @@ include_once "include/page_header.php";
 		$db_httptests = DBselect('select wt.*,a.name as application,h.host,h.hostid from httptest wt '.
 			' left join applications a on wt.applicationid=a.applicationid '.
 			' left join hosts h on h.hostid=a.hostid'.
-			' where a.applicationid='.$db_app["applicationid"].' and wt.status <> 1'.
+			' where a.applicationid='.$db_app["applicationid"].' AND wt.status <> 1'.
 			order_by('wt.name','h.host'));
 
 		$app_rows = array();
@@ -288,9 +306,6 @@ include_once "include/page_header.php";
 
 	$form->AddItem($table);
 	$form->Show();
-?>
-<?php
 
 include_once "include/page_footer.php"
-
 ?>
