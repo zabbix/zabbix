@@ -31,7 +31,7 @@ var $maxlevel=0;
 
 
 	/*public*/
-	public function CTree($value=array(),$fields=array()){
+	/*public*/ function CTree($value=array(),$fields=array()){
 		$this->tree = $value;
 		$this->fields = $fields;
 		$this->treename = $this->fields['caption'];
@@ -49,12 +49,11 @@ var $maxlevel=0;
 		}
 	}
 	
-	public function GetTree(){
+	/*public*/ function GetTree(){
 		return $this->tree;
 	}
 	
-	/*private*/
-	public function MakeHeaders(){
+	/*private*/ function MakeHeaders(){
 		$c=0;
 		$tr = new CRow();
 		$tr->AddItem($this->fields['caption']);
@@ -69,7 +68,7 @@ var $maxlevel=0;
 	return $tr;
 	}
 	
-	public function SimpleHTML(){
+	/*private*/ function SimpleHTML(){
 		$table = new CTable('','tabletree');
 		
 		$table->SetCellSpacing(0);
@@ -89,13 +88,13 @@ var $maxlevel=0;
 	return $table;
 	}
 	
-	public function getHTML(){
+	/*public */ function getHTML(){
 		$html[] = $this->CreateJS();
 		$html[] = $this->SimpleHTML();
 	return $html;
 	}
 	
-	public function MakeSHTMLRow($id){
+	/*private*/  function MakeSHTMLRow($id){
 		
 		$table = new CTable();
 		$table->SetCellSpacing(0);
@@ -126,7 +125,7 @@ var $maxlevel=0;
 	return $tr;
 	}
 	
-	public function MakeSImgStr($id){
+	/*private*/ function MakeSImgStr($id){
 		$tr = new CRow();
 		$td = new CCol();
 	
@@ -186,7 +185,7 @@ var $maxlevel=0;
 	return $tr;
 	}
 	
-	public function CountDepth(){
+	/*private*/  function CountDepth(){
 		foreach($this->tree as $id => $rows){
 			
 			if($rows['id'] == '0'){
@@ -207,7 +206,7 @@ var $maxlevel=0;
 	}
 	
 	
-	public function CreateJS(){
+	/*public*/ function CreateJS(){
 	global $page;
 		$js = '
 		<script src="js/tree.js" type="text/javascript"></script>
@@ -232,7 +231,7 @@ var $maxlevel=0;
 	return new CScript($js);
 	}
 	
-	public function GetImg($id,$img){
+	/*private*/ function GetImg($id,$img){
 
 		$img=str_replace('T','I',$img);
 		$img=str_replace('L','O',$img);
@@ -249,7 +248,7 @@ var $maxlevel=0;
 	return $img;
 	}
 	
-	public function CheckTree(){
+	/*private*/ function CheckTree(){
 		if(!is_array($this->tree)){
 			return false;
 		}
@@ -266,11 +265,11 @@ var $maxlevel=0;
 	return true;
 	}
 	
-	public function Destroy(){
+	/*private*/ function Destroy(){
 		unset($this->tree);
 	}
 	
-	public function getUserAlias(){
+	/*private*/ function getUserAlias(){
 	global $USER_DETAILS;
 	return $USER_DETAILS["alias"];
 	}
