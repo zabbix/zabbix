@@ -698,7 +698,7 @@ require_once "include/items.inc.php";
 	 */
 	function get_correct_group_and_host($a_groupid=null, $a_hostid=null, $perm=PERM_READ_WRITE, $options = array()){
 		if(!is_array($options)){
-			fatal_error("Incorrest options for get_correct_group_and_host");
+			fatal_error("Incorrect options for get_correct_group_and_host");
 		}
 		
 		global $USER_DETAILS;
@@ -738,7 +738,24 @@ require_once "include/items.inc.php";
 		}
 		else{
 			$groupid = $a_groupid;
+			
+			if(($groupid < 0) && str_in_array('always_select_first_group',$options)){
+				$with_node = ' AND '.DBin_node('g.groupid', get_current_nodeid(!$only_current_node));
 
+				$sql = 'SELECT DISTINCT g.name,g.groupid '.
+								' FROM groups g, hosts_groups hg, hosts h'.$item_table.
+								' WHERE hg.groupid=g.groupid '.
+									' AND h.hostid=hg.hostid '.
+									' AND h.hostid IN ('.$available_hosts.') '.
+									$with_host_status.
+									$with_items.
+									$with_node.
+								' ORDER BY g.name';
+//SDI($groupid);
+				$groupid=($grp = DBfetch(DBselect($sql,1)))?$grp['groupid']:0;
+//SDI($groupid);
+			}
+			
 			if($groupid > 0){
 				$with_node = ' AND '.DBin_node('g.groupid', get_current_nodeid(!$only_current_node));
 
@@ -760,10 +777,10 @@ require_once "include/items.inc.php";
 		else{
 			$hostid = $a_hostid;
 /* is not 'All' selected */
-			if(!($hostid == 0 && $allow_all_hosts == 1)) {
+			if(!(($hostid == 0) && ($allow_all_hosts == 1))) {
 				$group_table = '';
 				$witth_group = '';
-
+				
 				if($groupid != 0){
 					$with_node = ' AND '.DBin_node('hg.hostid', get_current_nodeid(!$only_current_node));
 					
@@ -805,8 +822,7 @@ require_once "include/items.inc.php";
 							$hostid = 0;
 					}
 				}
-				if(($hostid < 0) || ($hostid == 0 && $always_select_first_host == 1)) /* incorrect host */
-				{
+				if(($hostid < 0) || ($hostid == 0 && $always_select_first_host == 1)) /* incorrect host */{
 					$hostid = $first_hostid_in_group;
 				}
 			}
@@ -884,8 +900,11 @@ require_once "include/items.inc.php";
 
 		if(!in_node($_REQUEST["groupid"])) $_REQUEST["groupid"] = 0;
 		
-		$result = get_correct_group_and_host($_REQUEST["groupid"],null,$perm,$options);
-		$_REQUEST["groupid"]    = $result["groupid"];
+		if(str_in_array('always_select_first_group',$options) && ($_REQUEST['groupid'] == 0))
+			$_REQUEST['groupid'] = -1;
+		
+		$result = get_correct_group_and_host($_REQUEST['groupid'],null,$perm,$options);
+		$_REQUEST["groupid"] = $result["groupid"];
 
 		update_profile($group_var,$_REQUEST["groupid"]);
 	}
