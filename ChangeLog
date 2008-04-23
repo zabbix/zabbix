@@ -1,5 +1,6 @@
 Changes for 1.5.1:
 
+ - [DEV-164] added required server performance info to Status of ZABBIX (Alexei)
  - [DEV-160] added time filter in "Availability report" (Artem)
  - [DEV-159] added automatic selection first group and host in WEB monitoring (Artem)
  - [DEV-148] added support of DisablePassive parameter for agent (Alexei)

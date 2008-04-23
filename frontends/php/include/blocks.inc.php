@@ -427,8 +427,8 @@ function make_status_of_zbx(){
 			new CSpan($status['triggers_count_off'],'off'),']'
 		)
 	));
-	$table->AddRow(array(S_NUMBER_OF_EVENTS,$status['events_count'],' - '));
-	$table->AddRow(array(S_NUMBER_OF_ALERTS,$status['alerts_count'],' - '));
+/*	$table->AddRow(array(S_NUMBER_OF_EVENTS,$status['events_count'],' - '));
+	$table->AddRow(array(S_NUMBER_OF_ALERTS,$status['alerts_count'],' - '));*/
 
 //Log Out 10min	
 	$sql = 'SELECT DISTINCT u.userid, s.lastaccess, u.autologout '.
@@ -445,6 +445,7 @@ function make_status_of_zbx(){
 	}
 
 	$table->AddRow(array(S_NUMBER_OF_USERS,$usr_cnt,new CSpan($online_cnt,'green')));
+	$table->AddRow(array(S_REQUIRED_SERVER_PERFORMANCE_NVPS,$status['qps_total'],' - '));
 	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 return $table;
 }
