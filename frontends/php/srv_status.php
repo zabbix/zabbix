@@ -146,7 +146,7 @@ include_once "include/page_header.php";
 								' ORDER BY s.status DESC, t.description');
 					
 				while($row2=DBfetch($result2)){
-					if($row['reason'] == '-')
+					if(is_string($row['reason']) && ($row['reason'] == '-'))
 						$row['reason'] = new CList(null,"itservices");
 					if(does_service_depend_on_the_service($row["serviceid"],$row2["serviceid"])){
 						$row['reason']->AddItem(new CLink(
