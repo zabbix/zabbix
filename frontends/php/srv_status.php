@@ -37,7 +37,7 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"serviceid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,			NULL),
-		"showgraph"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1")."isset({serviceid})",NULL),
+		"showgraph"=>		array(T_ZBX_INT, O_OPT,	P_SYS,			IN("1"),		'isset({serviceid})'),
 // ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'hat'"),		NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
@@ -71,9 +71,10 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST["serviceid"]) && $_REQUEST["serviceid"] > 0){
 		$sql = 'SELECT s.serviceid '.
 					' FROM services s '.
-					' WHERE (s.triggerid is NULL OR '.DBcondition('s.triggerid',$available_triggers,true).') '.
+					' WHERE (s.triggerid is NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 						' AND s.serviceid='.$_REQUEST['serviceid'];
-		if(DBfetch(DBselect($sql,1))){
+
+		if(!$service = DBfetch(DBselect($sql,1))){
 			access_deny();
 		}
 	}

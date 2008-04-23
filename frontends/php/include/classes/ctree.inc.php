@@ -20,18 +20,21 @@
 
 class CTree{
 
-/*public*/
+/*public *//*
 var $tree='';
 var $fields='';
 var $treename='';
 
-/*private*/
+/*private *//*
 var $size=0;
 var $maxlevel=0;
-
+*/
 
 	/*public*/
 	/*public*/ function CTree($value=array(),$fields=array()){
+	
+		$this->maxlevel=0;
+
 		$this->tree = $value;
 		$this->fields = $fields;
 		$this->treename = $this->fields['caption'];
