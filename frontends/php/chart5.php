@@ -42,30 +42,14 @@ include_once "include/page_header.php";
 		fatal_error(S_NO_IT_SERVICE_DEFINED);
 	}
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 	
 	$sql = 'SELECT s.serviceid '.
-			' FROM services s, triggers t, functions f, items i '.
-			' WHERE s.serviceid='.$_REQUEST['serviceid'].
-				' AND t.triggerid=s.triggerid '.
-				' AND f.triggerid=t.triggerid '.
-				' AND i.itemid=f.itemid	'.
-				' AND i.hostid NOT IN ('.$available_hosts.')';
+				' FROM services s '.
+				' WHERE (s.triggerid is NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
+					' AND s.serviceid='.$_REQUEST['serviceid'];
 
-	if(DBfetch(DBselect($sql,1))){
-		access_deny();
-	}
-
-	
-	$sql = 'SELECT s.* '.
-			' FROM services s '.
-				' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
-				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
-				' LEFT JOIN items i on f.itemid=i.itemid '.
-			' WHERE s.serviceid='.$_REQUEST['serviceid'].
-				' AND i.hostid IN ('.$available_hosts.')';
-		
-	if(!$service = DBfetch(DBselect($sql))){
+	if(!$service = DBfetch(DBselect($sql,1))){
 		access_deny();
 	}
 ?>
