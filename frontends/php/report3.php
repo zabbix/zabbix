@@ -55,7 +55,7 @@ include_once "include/page_header.php";
 			' FROM services s '.
 			' WHERE s.serviceid='.$_REQUEST['serviceid'].
 				' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
-				' AND DBin_node('s.serviceid')';
+				' AND '.DBin_node('s.serviceid');
 				
 	if(!$service = DBfetch(DBselect($sql))){
 		access_deny();
