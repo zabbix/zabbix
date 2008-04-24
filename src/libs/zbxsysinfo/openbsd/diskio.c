@@ -21,174 +21,114 @@
 
 #include "sysinfo.h"
 
-/*
-static int get_disk_stats(const char *device, struct diskstats *result)
+static int get_disk_stats(const char *devname, zbx_uint64_t *rbytes, zbx_uint64_t *wbytes, zbx_uint64_t *roper, zbx_uint64_t *woper)
 {
-	int ret = SYSINFO_RET_FAIL;
-	int mib[2];
-	int drive_count;
-	size_t l; 
-	struct diskstats *stats;
-	int i;
+	int			ret = SYSINFO_RET_FAIL, mib[2], drive_count;
+	size_t			len;
+	struct diskstats	*stats;
+	int			i;
 
 	mib[0] = CTL_HW;
 	mib[1] = HW_DISKCOUNT;
 
-	l = sizeof(drive_count);
+	len = sizeof(drive_count);
 
-	if (sysctl(mib, 2, &drive_count, &l, NULL, 0) == 0 ) 
-	{
-		l = (drive_count * sizeof(struct diskstats));
-		stats = calloc(drive_count, l);
-		if (stats)
-		{
-			mib[0] = CTL_HW;
-			mib[1] = HW_DISKSTATS;
- 
-			if (sysctl(mib, 2, stats, &l, NULL, 0) == 0)
-			{
-				for (i = 0; i < drive_count; i++)
-				{
-					if (strcmp(device, stats[i].ds_name) == 0)
-					{
-						memmove(result, &stats[i], sizeof(struct diskstats));
-						ret = SYSINFO_RET_OK;
-						break;
-					}
-				}
+	if (0 != sysctl(mib, 2, &drive_count, &len, NULL, 0)) 
+		return SYSINFO_RET_FAIL;
+
+	len = (drive_count * sizeof(struct diskstats));
+
+	if (NULL == (stats = calloc(drive_count, len)))
+		return SYSINFO_RET_FAIL;
+
+	mib[0] = CTL_HW;
+	mib[1] = HW_DISKSTATS;
+
+	if (rbytes)
+		*rbytes = 0;
+	if (wbytes)
+		*wbytes = 0;
+	if (roper)
+		*roper = 0;
+	if (woper)
+		*woper = 0;
+
+	if (0 == sysctl(mib, 2, stats, &len, NULL, 0)) {
+		for (i = 0; i < drive_count; i++) {
+			if (0 == strcmp(devname, "all") || 0 == strcmp(devname, stats[i].ds_name)) {
+				if (rbytes)
+					*rbytes += stats[i].ds_rbytes;
+				if (wbytes)
+					*wbytes += stats[i].ds_wbytes;
+				if (roper)
+					*roper += stats[i].ds_rxfer;
+				if (woper)
+					*woper += stats[i].ds_wxfer;
+				ret = SYSINFO_RET_OK;
 			}
-
-			free(stats);
 		}
 	}
-	return ret;
-}
-*/
 
-static int	VFS_DEV_READ_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-/*	char devname[MAX_STRING_LEN];
-	struct diskstats ds;*/
-	int ret = SYSINFO_RET_FAIL;
-        
-	assert(result);
+	free(stats);
 
-        init_result(result);
-/*	
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(get_param(param, 1, devname, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-	
-	if(get_disk_stats(devname, &ds) == SYSINFO_RET_OK)
-	{
-		SET_UI64_RESULT(result,  ds.ds_rbytes);
-		ret = SYSINFO_RET_OK;
-	}
-*/
 	return ret;
 }
 
-static int	VFS_DEV_READ_OPERATIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VFS_DEV_READ_BYTES(const char *devname, AGENT_RESULT *result)
 {
-/*	char devname[MAX_STRING_LEN];
-	struct diskstats ds;*/
-	int ret = SYSINFO_RET_FAIL;
-        
-	assert(result);
+	zbx_uint64_t	value;
 
-        init_result(result);
-/*	
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if (SYSINFO_RET_OK != get_disk_stats(devname, &value, NULL, NULL, NULL))
+		return SYSINFO_RET_FAIL;
 
-        if(get_param(param, 1, devname, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-	
-	if(get_disk_stats(devname, &ds) == SYSINFO_RET_OK)
-	{
-		SET_UI64_RESULT(result, ds.ds_rxfer);
-		ret = SYSINFO_RET_OK;
-	}
-*/	
-	return ret;
+	SET_UI64_RESULT(result, value);
+
+	return SYSINFO_RET_OK;
 }
 
-static int	VFS_DEV_WRITE_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VFS_DEV_READ_OPERATIONS(const char *devname, AGENT_RESULT *result)
 {
-/*	char devname[MAX_STRING_LEN];
-	struct diskstats ds;*/
-	int ret = SYSINFO_RET_FAIL;
-        
-	assert(result);
+	zbx_uint64_t	value;
 
-        init_result(result);
-/*	
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if (SYSINFO_RET_OK != get_disk_stats(devname, NULL, NULL, &value, NULL))
+		return SYSINFO_RET_FAIL;
 
-        if(get_param(param, 1, devname, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-	
-	if(get_disk_stats(devname, &ds) == SYSINFO_RET_OK)
-	{
-		SET_UI64_RESULT(result, ds.ds_wbytes);
-		ret = SYSINFO_RET_OK;
-	}
-*/	
-	return ret;
+	SET_UI64_RESULT(result, value);
+
+	return SYSINFO_RET_OK;
 }
 
-static int	VFS_DEV_WRITE_OPERATIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VFS_DEV_WRITE_BYTES(const char *devname, AGENT_RESULT *result)
 {
-/*	char devname[MAX_STRING_LEN];
-	struct diskstats ds; */
-	int ret = SYSINFO_RET_FAIL;
-/*       
-	assert(result);
+	zbx_uint64_t	value;
 
-        init_result(result);
-	
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if (SYSINFO_RET_OK != get_disk_stats(devname, NULL, &value, NULL, NULL))
+		return SYSINFO_RET_FAIL;
 
-        if(get_param(param, 1, devname, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-	
-	if(get_disk_stats(devname, &ds) == SYSINFO_RET_OK)
-	{
-		SET_UI64_RESULT(result, ds.ds_wxfer);
-		ret = SYSINFO_RET_OK;
-	}
-*/	
-	return ret;
+	SET_UI64_RESULT(result, value);
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
+{
+	zbx_uint64_t	value;
+
+	if (SYSINFO_RET_OK != get_disk_stats(devname, NULL, NULL, NULL, &value))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, value);
+
+	return SYSINFO_RET_OK;
 }
 
 int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
 #define DEV_FNCLIST struct dev_fnclist_s
 DEV_FNCLIST
 {
-	char *mode;
-	int (*function)();
+	char	*mode;
+	int	(*function)();
 };
 
 	DEV_FNCLIST fl[] = 
@@ -198,49 +138,40 @@ DEV_FNCLIST
 		{0,		0}
 	};
 
-	char devname[MAX_STRING_LEN];
-	char mode[MAX_STRING_LEN];
-	int i;
+	char	devname[MAX_STRING_LEN];
+	char	mode[MAX_STRING_LEN];
+	int	i;
 	
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 	
-        if(num_param(param) > 3)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if (num_param(param) > 3)
+		return SYSINFO_RET_FAIL;
 
-        if(get_param(param, 1, devname, sizeof(devname)) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if (0 != get_param(param, 1, devname, sizeof(devname)))
+		*devname = '\0';
 	
-	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-        {
-                mode[0] = '\0';
-        }
+	/* default parameter */
+	if (*devname == '\0')
+		zbx_snprintf(devname, sizeof(devname), "all");
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
+
+	/* default parameter */
+	if (*mode == '\0')
+		zbx_snprintf(mode, sizeof(mode), "operations");
 	
-        if(mode[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "%s", fl[0].mode);
-	}
-	
-	for(i=0; fl[i].mode!=0; i++)
-	{
-		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-		{
-			return (fl[i].function)(cmd, devname, flags, result);
-		}
-	}
+	for (i = 0; fl[i].mode != 0; i++)
+		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
+			return (fl[i].function)(devname, result);
 	
 	return SYSINFO_RET_FAIL;
 }
 
 int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
 #define DEV_FNCLIST struct dev_fnclist_s
 DEV_FNCLIST
 {
@@ -255,135 +186,34 @@ DEV_FNCLIST
 		{0,		0}
 	};
 
-	char devname[MAX_STRING_LEN];
-	char mode[MAX_STRING_LEN];
-	int i;
+	char	devname[MAX_STRING_LEN];
+	char	mode[MAX_STRING_LEN];
+	int	i;
 	
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 	
-        if(num_param(param) > 3)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if (num_param(param) > 3)
+		return SYSINFO_RET_FAIL;
 
-        if(get_param(param, 1, devname, sizeof(devname)) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-	
-	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-        {
-                mode[0] = '\0';
-        }
-	
-        if(mode[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "%s", fl[0].mode);
-	}
-	
-	for(i=0; fl[i].mode!=0; i++)
-	{
-		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-		{
-			return (fl[i].function)(cmd, devname, flags, result);
-		}
-	}
+	if (0 != get_param(param, 1, devname, sizeof(devname)))
+		*devname = '\0';
+
+	/* default parameter */
+	if (*devname == '\0')
+		zbx_snprintf(devname, sizeof(devname), "all");
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)) != 0)
+		*mode = '\0';
+
+	/* default parameter */
+	if (*mode == '\0')
+		zbx_snprintf(mode, sizeof(mode), "operations");
+
+	for (i = 0; fl[i].mode != 0; i++)
+		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
+			return (fl[i].function)(devname, result);
 	
 	return SYSINFO_RET_FAIL;
 }
-
-static int	DISK_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",2,2, flags, result);
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	DISK_RIO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",3,2, flags, result);
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	DISK_WIO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",4,2, flags, result);
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	DISK_RBLK(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",5,2, flags, result);
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	DISK_WBLK(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",6,2, flags, result);
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-int	OLD_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char    key[MAX_STRING_LEN];
-	int 	ret;
-
-	assert(result);
-
-        init_result(result);
-
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-	if(strcmp(key,"disk_io") == 0)
-	{
-		ret = DISK_IO(cmd, param, flags, result);
-	}
-	else if(strcmp(key,"disk_rio") == 0)
-	{
-		ret = DISK_RIO(cmd, param, flags, result);
-	}
-	else if(strcmp(key,"disk_wio") == 0)
-	{
-		ret = DISK_WIO(cmd, param, flags, result);
-	}
-    	else if(strcmp(key,"disk_rblk") == 0)
-	{
-		ret = DISK_RBLK(cmd, param, flags, result);
-	}
-    	else if(strcmp(key,"disk_wblk") == 0)
-	{
-		ret = DISK_WBLK(cmd, param, flags, result);
-	}
-	else
-	{
-		ret = SYSINFO_RET_FAIL;
-	}
-    
-	return ret;
-}
-
