@@ -21,219 +21,156 @@
 
 #include "sysinfo.h"
 
-int	get_fs_size_stat(char *fs, double *total, double *free, double *usage)
+int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *used, double *pfree, double *pused)
 {
 #ifdef HAVE_SYS_STATVFS_H
-        struct statvfs   s;
+	struct statvfs	s;
 #else
-        struct statfs   s;
+	struct statfs	s;
 #endif
 
-        assert(fs);
+	assert(fs);
 
 #ifdef HAVE_SYS_STATVFS_H
-        if ( statvfs( fs, &s) != 0 )
+	if (0 != statvfs(fs, &s))
 #else
-        if ( statfs( fs, &s) != 0 )
+	if (0 != statfs(fs, &s))
 #endif
-        {
-                return  SYSINFO_RET_FAIL;
-        }
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
 #ifdef HAVE_SYS_STATVFS_H
-        if(total)
-                (*total) = (double)(s.f_blocks * (s.f_frsize / 1024.0));
-        if(free)
-                (*free)  = (double)(s.f_bavail * (s.f_frsize / 1024.0));
-        if(usage)
-                (*usage) = (double)((s.f_blocks - s.f_bavail) * (s.f_frsize / 1024.0));
+	if (total)
+		*total = (zbx_uint64_t)s.f_blocks * s.f_frsize;
+	if (free)
+		*free = (zbx_uint64_t)s.f_bfree * s.f_frsize;
+	if (used)
+		*used = (zbx_uint64_t)(s.f_blocks - s.f_bfree) * s.f_frsize;
+	if (pfree)
+		*pfree = (double)(100.0 * s.f_bfree) / s.f_blocks;
+	if (pused)
+		*pused = (double)(100.0 * (s.f_blocks - s.f_bfree)) / s.f_blocks;
 #else
-        if(total)
-                (*total) = (double)(s.f_blocks * (s.f_bsize / 1024.0));
-        if(free)
-                (*free)  = (double)(s.f_bfree * (s.f_bsize / 1024.0));
-        if(usage)
-                (*usage) = (double)((s.f_blocks - s.f_bfree) * (s.f_bsize / 1024.0));
+	if (total)
+		*total = (zbx_uint64_t)s.f_blocks * s.f_bsize;
+	if (free)
+		*free = (zbx_uint64_t)s.f_bfree * s.f_bsize;
+	if (used)
+		*used = (zbx_uint64_t)(s.f_blocks - s.f_bfree) * s.f_bsize;
+	if (pfree)
+		*pfree = (double)(100.0 * s.f_bfree) / s.f_blocks;
+	if (pused)
+		*pused = (double)(100.0 * (s.f_blocks - s.f_bfree)) / s.f_blocks;
 #endif
-        return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
 
-static int	VFS_FS_USED(const char *cmd, char *param, unsigned flags, AGENT_RESULT *result)
+static int	VFS_FS_USED(const char *fs, AGENT_RESULT *result)
 {
-/*        char    mountPoint[MAX_STRING_LEN];*/
-        double  value = 0;
+	zbx_uint64_t	value = 0;
 
-        assert(result);
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, &value, NULL, NULL))
+		return SYSINFO_RET_FAIL;
 
-        init_result(result);
+	SET_UI64_RESULT(result, value);
 
-/*        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
-
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-                return SYSINFO_RET_FAIL;*/
-
-        if(get_fs_size_stat(param, NULL, NULL, &value) != SYSINFO_RET_OK)
-                return  SYSINFO_RET_FAIL;
-
-        SET_UI64_RESULT(result, value);
-
-        return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
 
-static int	VFS_FS_FREE(const char *cmd, char *param, unsigned flags, AGENT_RESULT *result)
+static int	VFS_FS_FREE(const char *fs, AGENT_RESULT *result)
 {
-/*        char    mountPoint[MAX_STRING_LEN];*/
-        double  value = 0;
+	zbx_uint64_t	value = 0;
 
-        assert(result);
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, &value, NULL, NULL, NULL))
+		return SYSINFO_RET_FAIL;
 
-        init_result(result);
+	SET_UI64_RESULT(result, value);
 
-/*        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
-
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-                return SYSINFO_RET_FAIL;*/
-
-        if(get_fs_size_stat(param, NULL, &value, NULL) != SYSINFO_RET_OK)
-                return  SYSINFO_RET_FAIL;
-
-        SET_UI64_RESULT(result, value);
-
-        return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
 
-static int	VFS_FS_TOTAL(const char *cmd, char *param, unsigned flags, AGENT_RESULT *result)
+static int	VFS_FS_TOTAL(const char *fs, AGENT_RESULT *result)
 {
-/*        char    mountPoint[MAX_STRING_LEN];*/
-        double  value = 0;
+	zbx_uint64_t	value = 0;
 
-        assert(result);
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, &value, NULL, NULL, NULL, NULL))
+		return SYSINFO_RET_FAIL;
 
-        init_result(result);
+	SET_UI64_RESULT(result, value);
 
-/*        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
-
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }*/
-
-        if(get_fs_size_stat(param, &value, NULL, NULL) != SYSINFO_RET_OK)
-                return  SYSINFO_RET_FAIL;
-
-        SET_UI64_RESULT(result, value);
-
-        return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 
 }
 
-static int	VFS_FS_PFREE(const char *cmd, char *param, unsigned flags, AGENT_RESULT *result)
+static int	VFS_FS_PFREE(const char *fs, AGENT_RESULT *result)
 {
-/*        char    mountPoint[MAX_STRING_LEN];*/
-        double  tot_val = 0;
-        double  free_val = 0;
+	double	value = 0;
 
-        assert(result);
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, NULL, &value, NULL))
+		return SYSINFO_RET_FAIL;
 
-        init_result(result);
+	SET_DBL_RESULT(result, value);
 
-/*        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
-
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-                return SYSINFO_RET_FAIL;*/
-
-        if(get_fs_size_stat(param, &tot_val, &free_val, NULL) != SYSINFO_RET_OK)
-                return  SYSINFO_RET_FAIL;
-
-        SET_DBL_RESULT(result, (100.0 * free_val) / tot_val);
-
-        return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
 
-static int	VFS_FS_PUSED(const char *cmd, char *param, unsigned flags, AGENT_RESULT *result)
+static int	VFS_FS_PUSED(const char *fs, AGENT_RESULT *result)
 {
-/*        char    mountPoint[MAX_STRING_LEN];*/
-        double  tot_val = 0;
-        double  usg_val = 0;
+	double	value = 0;
 
-        assert(result);
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, NULL, NULL, &value))
+		return SYSINFO_RET_FAIL;
 
-        init_result(result);
+	SET_DBL_RESULT(result, value);
 
-/*        if(num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
-
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-                return SYSINFO_RET_FAIL;*/
-
-        if(get_fs_size_stat(param, &tot_val, NULL, &usg_val) != SYSINFO_RET_OK)
-                return  SYSINFO_RET_FAIL;
-
-        SET_DBL_RESULT(result, (100.0 * usg_val) / tot_val);
-
-        return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
 
 int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
 #define FS_FNCLIST struct fs_fnclist_s
 FS_FNCLIST
 {
-	char *mode;
-	int (*function)();
+	char	*mode;
+	int	(*function)();
 };
 
-	FS_FNCLIST fl[] = 
+	FS_FNCLIST fl[] =
 	{
-		{"free" ,	VFS_FS_FREE},
-		{"total" ,	VFS_FS_TOTAL},
+		{"free",	VFS_FS_FREE},
+		{"total",	VFS_FS_TOTAL},
 		{"used",	VFS_FS_USED},
-		{"pfree" ,	VFS_FS_PFREE},
-		{"pused" ,	VFS_FS_PUSED},
+		{"pfree",	VFS_FS_PFREE},
+		{"pused",	VFS_FS_PUSED},
 		{0,		0}
 	};
 
-	char fsname[MAX_STRING_LEN];
-	char mode[MAX_STRING_LEN];
-	int i;
-	
-        assert(result);
+	char	fsname[MAX_STRING_LEN];
+	char	mode[MAX_STRING_LEN];
+	int	i;
 
-        init_result(result);
-	
-        if(num_param(param) > 2)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	assert(result);
 
-        if(get_param(param, 1, fsname, sizeof(fsname)) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-	
-	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-        {
-                mode[0] = '\0';
-        }
-        if(mode[0] == '\0')
-	{
-		/* default parameter */
+	init_result(result);
+
+	if (num_param(param) > 2)
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, fsname, sizeof(fsname)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
+
+	/* default parameter */
+	if (*mode == '\0')
 		zbx_snprintf(mode, sizeof(mode), "total");
-	}
-	
-	for(i=0; fl[i].mode!=0; i++)
-	{
-		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-		{
-			return (fl[i].function)(cmd, fsname, flags, result);
-		}
-	}
-	
+
+	for (i = 0; fl[i].mode != 0; i++)
+		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
+			return (fl[i].function)(fsname, result);
+
 	return SYSINFO_RET_FAIL;
 }
 
