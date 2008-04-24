@@ -34,18 +34,21 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
 
-	if (0 == get_param(param, 1, mode, sizeof(mode))) {
-		if (*mode != '\0') {
-			if (0 != strcmp(mode, "online"))
-				return SYSINFO_RET_FAIL;
-		}
-	}
+	if (0 != get_param(param, 1, mode, sizeof(mode)))
+		*mode = '\0';
+
+	if (*mode == '\0')
+		zbx_snprintf(mode, sizeof(mode), "online");
+
+	if (0 != strcmp(mode, "online"))
+		return SYSINFO_RET_FAIL;
 
 	mib[0] = CTL_HW;
 	mib[1] = HW_NCPU;
 
 	len = sizeof(ncpu);
-	if (-1 == sysctl(mib, 2, &ncpu, &len, NULL, 0))
+
+	if (0 != sysctl(mib, 2, &ncpu, &len, NULL, 0))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, ncpu);
