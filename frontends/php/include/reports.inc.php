@@ -118,7 +118,7 @@ function show_report2_header($config,$available_hosts){
 		if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
 			$sql_cond.= ' AND t.templateid='.$_REQUEST['tpl_triggerid'];
 
-		$result = DBselect('SELECT DISTINCT g.groupid,g.name,h.host,t.description '.
+		$result = DBselect('SELECT DISTINCT g.groupid,g.name '.
 			' FROM triggers t,hosts h,items i,functions f, hosts_templates ht, groups g, hosts_groups hg '.
 			' WHERE f.itemid=i.itemid '.
 				' AND h.hostid=i.hostid '.
@@ -131,7 +131,8 @@ function show_report2_header($config,$available_hosts){
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				' AND h.status='.HOST_STATUS_MONITORED.
 				$sql_cond.
-			' ORDER BY h.host, t.description');
+			' ORDER BY g.name');
+
 		while($row=DBfetch($result)){
 			$cmbHGrps->AddItem(
 				$row['groupid'],
