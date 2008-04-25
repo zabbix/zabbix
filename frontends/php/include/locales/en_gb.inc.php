@@ -491,6 +491,19 @@
 	'S_NODES_BIG'=>				'NODES',
 	'S_NEW_NODE'=>				'New node',
 	'S_NO_NODES_DEFINED'=>			'No nodes defined',
+	
+//  Authentication
+	'S_AUTHENTICATION'=>				'Authentication',
+	'S_AUTHENTICATION_TO_ZABBIX'=>		'Authentication to ZABBIX',
+	'S_BASE_DN'=>						'Base DN',
+	'S_BIND_DN'=>						'Bind DN',
+	'S_BIND_PASSWORD'=>					'Bind Password',
+	'S_SEARCH_ATTRIBUTE'=>				'Search attribute',
+	'S_TEST'=>							'Test',
+	'S_WAS_NOT'=>						'was not',
+	'S_SUCCESSFUL_SMALL'=>				'successful',
+	'S_MUST_BE_VALID_SMALL'=>			'must be valid',
+	
 
 //	Latest values
 	'S_LATEST_VALUES'=>			'Latest values',

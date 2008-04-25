@@ -35,8 +35,7 @@
 	CHECK USER AUTHORISATION
 *****************************************/
 
-	function	check_authorisation()
-	{
+	function check_authorisation(){
 		global	$page;
 		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
 		global	$USER_DETAILS;
@@ -47,9 +46,9 @@
 		
 		$sessionid = get_cookie("zbx_sessionid");
 
-		if(!is_null($sessionid))
-		{
-			$login = $USER_DETAILS = DBfetch(DBselect('SELECT u.*,s.* FROM sessions s,users u'.
+		if(!is_null($sessionid)){
+			$login = $USER_DETAILS = DBfetch(DBselect('SELECT u.*,s.* '.
+						' FROM sessions s,users u'.
 						' WHERE s.sessionid='.zbx_dbstr($sessionid).
 							' AND s.userid=u.userid'.
 							' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
@@ -60,7 +59,8 @@
 		}
 		
 		if(!$USER_DETAILS){
-			$login = $USER_DETAILS = DBfetch(DBselect('SELECT u.* FROM users u '.
+			$login = $USER_DETAILS = DBfetch(DBselect('SELECT u.* '.
+										' FROM users u '.
 										' WHERE u.alias='.zbx_dbstr(ZBX_GUEST_USER).
 											' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
 			if(!$USER_DETAILS){
@@ -103,8 +103,7 @@
 					"nodeid"=>0));
 		}
 		
-		if(!$login || isset($incorrect_session) || isset($missed_user_guest))
-		{
+		if(!$login || isset($incorrect_session) || isset($missed_user_guest)){
 			if(isset($incorrect_session))		$message = "Session was ended, please relogin!";
 			else if(isset($missed_user_guest)){
 				$row = DBfetch(DBselect('SELECT count(u.userid) as user_cnt FROM users u'));
@@ -119,6 +118,28 @@
 			exit;
 		}
 	}
+	
+/*****************************************
+	LDAP AUTHENTICATION
+*****************************************/
+function ldap_authentication($user,$passwd,$cnf=NULL){
+	if(is_null($cnf)){
+		$config = select_config();
+		foreach($config as $id => $value){
+			if(strpos($id,'ldap_') !== false){
+				$cnf[str_replace('ldap_','',$id)] = $config[$id];
+			}
+		}
+	}
+		
+	$ldap = new CLdap($cnf);
+	$ldap->connect();
+	
+	$result = $ldap->checkPass($user,$passwd);
+
+return $result;
+}
+
 
 /***********************************************
 	CHECK USER ACCESS TO SYSTEM STATUS

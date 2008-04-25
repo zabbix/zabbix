@@ -153,7 +153,7 @@ include_once "include/page_header.php";
 			$_REQUEST["password1"] = get_request("password1", null);
 			$_REQUEST["password2"] = get_request("password2", null);
 
-			if(isset($_REQUEST["password1"]) && $_REQUEST["password1"] == "" && $_REQUEST["alias"]!=ZBX_GUEST_USER){
+			if(isset($_REQUEST["password1"]) && empty($_REQUEST["password1"]) && $_REQUEST["alias"]!=ZBX_GUEST_USER){
 				show_error_message(S_ONLY_FOR_GUEST_ALLOWED_EMPTY_PASSWORD);
 			}
 			else if($_REQUEST["password1"]!=$_REQUEST["password2"]){
