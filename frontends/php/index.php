@@ -56,16 +56,36 @@
 //		return;
 	}
 
-	if(isset($_REQUEST["enter"])&&($_REQUEST["enter"]=="Enter"))
-	{
-		$name = get_request("name","");
-		$password = md5(get_request("password",""));
+	if(isset($_REQUEST["enter"])&&($_REQUEST["enter"]=="Enter")){
+	
+		$config = select_config();
+		
+		$name = get_request('name','');
+		$password = md5(get_request('password',''));
+		
+		switch($config['authentication_type']){
+			case ZBX_AUTH_LDAP:
+				$login = ldap_authentication($name,get_request('password',''));
+				break;
+			case ZBX_AUTH_INTERNAL:
+			default:
+				$alt_auth = ZBX_AUTH_INTERNAL;
+				$login = true;
+		}
 
-		$login = $row = DBfetch(DBselect('SELECT u.userid,u.alias,u.name,u.surname,u.url,u.refresh '.
+		if($login){
+			$login = $row = DBfetch(DBselect('SELECT u.userid,u.alias,u.name,u.surname,u.url,u.refresh,u.passwd '.
 						' FROM users u, users_groups ug, usrgrp g '.
  						' WHERE u.alias='.zbx_dbstr($name).
-							' AND u.passwd='.zbx_dbstr($password).
+							((ZBX_AUTH_INTERNAL==$config['authentication_type'])?' AND u.passwd='.zbx_dbstr($password):'').
 							' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
+		}
+		
+// update internal pass if it's different
+		if($login && ($row['passwd']!=$password) && (ZBX_AUTH_INTERNAL!=$config['authentication_type'])){
+			DBexecute('UPDATE users SET passwd='.zbx_dbstr($password).' WHERE userid='.zbx_dbstr($row['userid']));
+		}
+		
 		if($login){
 			$login = (check_perm2login($row['userid']) && check_perm2system($row['userid']));
 		}
@@ -80,9 +100,9 @@
 			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,"Correct login [".$name."]");
 			
 			if(empty($row["url"])){
-				global $USER_DETAILS;
-				$USER_DETAILS["alias"] = $row['alias'];
+				$USER_DETAILS['alias'] = $row['alias'];
 				$USER_DETAILS['userid'] = $row['userid'];
+				
 				$row["url"] = get_profile('web.menu.view.last','index.php');
 				unset($USER_DETAILS);
 			}
