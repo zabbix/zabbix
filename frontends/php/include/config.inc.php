@@ -38,51 +38,51 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 // END OF GLOBALS
 
 // Include Classes
-	require_once("include/classes/ctag.inc.php");
-	require_once("include/classes/cvar.inc.php");
-	require_once("include/classes/cspan.inc.php");
-	require_once("include/classes/cimg.inc.php");
-	require_once("include/classes/ccolor.inc.php");
-	require_once("include/classes/clink.inc.php");
-	require_once("include/classes/chelp.inc.php");
-	require_once("include/classes/cbutton.inc.php");
-	require_once("include/classes/clist.inc.php");
-	require_once("include/classes/ccombobox.inc.php");
-	require_once("include/classes/ctable.inc.php");
-	require_once("include/classes/ctableinfo.inc.php");
-	require_once("include/classes/ctextarea.inc.php");
-	require_once("include/classes/ctextbox.inc.php");
-	require_once("include/classes/cform.inc.php");
-	require_once("include/classes/cfile.inc.php");
-	require_once("include/classes/ccheckbox.inc.php");
-	require_once("include/classes/cform.inc.php");
-	require_once("include/classes/cformtable.inc.php");
-	require_once("include/classes/cmap.inc.php");
-	require_once("include/classes/cflash.inc.php");
-	require_once("include/classes/ciframe.inc.php");
-	require_once("include/classes/cpumenu.inc.php");
-	require_once("include/classes/graph.inc.php");
+	require_once('include/classes/ctag.inc.php');
+	require_once('include/classes/cvar.inc.php');
+	require_once('include/classes/cspan.inc.php');
+	require_once('include/classes/cimg.inc.php');
+	require_once('include/classes/ccolor.inc.php');
+	require_once('include/classes/cldap.inc.php');
+	require_once('include/classes/clink.inc.php');
+	require_once('include/classes/chelp.inc.php');
+	require_once('include/classes/cbutton.inc.php');
+	require_once('include/classes/clist.inc.php');
+	require_once('include/classes/ccombobox.inc.php');
+	require_once('include/classes/ctable.inc.php');
+	require_once('include/classes/ctableinfo.inc.php');
+	require_once('include/classes/ctextarea.inc.php');
+	require_once('include/classes/ctextbox.inc.php');
+	require_once('include/classes/cform.inc.php');
+	require_once('include/classes/cfile.inc.php');
+	require_once('include/classes/ccheckbox.inc.php');
+	require_once('include/classes/cform.inc.php');
+	require_once('include/classes/cformtable.inc.php');
+	require_once('include/classes/cmap.inc.php');
+	require_once('include/classes/cflash.inc.php');
+	require_once('include/classes/ciframe.inc.php');
+	require_once('include/classes/cpumenu.inc.php');
+	require_once('include/classes/graph.inc.php');
 	require_once('include/classes/cscript.inc.php');
 
 // Include Tactical Overview modules
 
-	require_once 	"include/locales.inc.php";
+	require_once 	'include/locales.inc.php';
 
-	include_once("include/classes/chostsinfo.mod.php");
-	include_once("include/classes/ctriggerinfo.mod.php");
-	include_once("include/classes/cserverinfo.mod.php");
-	include_once("include/classes/cflashclock.mod.php");
+	include_once('include/classes/chostsinfo.mod.php');
+	include_once('include/classes/ctriggerinfo.mod.php');
+	include_once('include/classes/cserverinfo.mod.php');
+	include_once('include/classes/cflashclock.mod.php');
 
-	require_once 	"include/perm.inc.php";
-	require_once 	"include/audit.inc.php";
-	require_once 	"include/js.inc.php";
+	require_once 	'include/perm.inc.php';
+	require_once 	'include/audit.inc.php';
+	require_once 	'include/js.inc.php';
 
 // Include Validation
 
-	require_once 	"include/validate.inc.php";
+	require_once 	'include/validate.inc.php';
 
-	function zbx_err_handler($errno, $errstr, $errfile, $errline)
-	{
+	function zbx_err_handler($errno, $errstr, $errfile, $errline){
 		error($errstr.'['.$errfile.':'.$errline.']');
 	}
 	
@@ -115,7 +115,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	if(file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !isset($DENY_GUI)){
 		include $ZBX_CONFIGURATION_FILE;
-		require_once("include/db.inc.php");
+		require_once('include/db.inc.php');
 		
 		$error = '';
 		if(!DBconnect($error)){
@@ -148,7 +148,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			include $ZBX_CONFIGURATION_FILE;
 		}
 		
-		require_once("include/db.inc.php");
+		require_once('include/db.inc.php');
 		
 		define('ZBX_PAGE_NO_AUTHERIZATION', true);
 		define('ZBX_DISTRIBUTED', false);
@@ -157,18 +157,18 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	
 	if(!defined('ZBX_PAGE_NO_AUTHERIZATION')){
 		check_authorisation();
-		include_once("include/locales/".$USER_DETAILS["lang"].".inc.php");
+		include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
 		process_locales();
 	}
 	else{
 		$USER_DETAILS = array(
-			"alias" =>ZBX_GUEST_USER,
-			"userid"=>0,
-			"lang"  =>"en_gb",
-			"type"  =>"0",
-			"node"  =>array(
-				"name"  =>'- unknown -',
-				"nodeid"=>0));
+			'alias' =>ZBX_GUEST_USER,
+			'userid'=>0,
+			'lang'  =>'en_gb',
+			'type'  =>'0',
+			'node'  =>array(
+				'name'  =>'- unknown -',
+				'nodeid'=>0));
 	}
 	
 // INIT MB Strings if it's available
@@ -190,21 +190,21 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	
 	if(isset($DENY_GUI)){
 		unset($show_warning);
-		include_once("warning.php");
+		include_once('warning.php');
 	}
 
 	if(isset($show_setup)){
 		unset($show_setup);
-		include_once("setup.php");
+		include_once('setup.php');
 	}
 	else if(isset($show_warning)){
 		unset($show_warning);
-		include_once("warning.php");
+		include_once('warning.php');
 	}
 
 	/********** END INITIALIZATION ************/
 
-	function	init_nodes(){
+	function init_nodes(){
 		/* Init CURRENT NODE ID */
 		global	$USER_DETAILS,
 			$ZBX_LOCALNODEID, $ZBX_LOCMASTERID,
@@ -219,10 +219,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			$ZBX_CURRENT_NODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node
 			$ZBX_WITH_SUBNODES = get_cookie('zbx_with_subnodes', false); // Show elements from subnodes
 
-			if(isset($_REQUEST['switch_node']))
-			{
-				if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$_REQUEST['switch_node'])))
-				{
+			if(isset($_REQUEST['switch_node'])){
+				if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$_REQUEST['switch_node']))){
 					$ZBX_CURRENT_NODEID = $_REQUEST['switch_node'];
 				}
 				unset($node_data);
@@ -1015,8 +1013,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	reset_items_nextcheck($triggerid)
-	{
+	function reset_items_nextcheck($triggerid){
 		$sql="select itemid from functions where triggerid=$triggerid";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
@@ -1028,8 +1025,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	# Update configuration
 
-	function	update_config($configs)
-	{
+	function update_config($configs){
 		$update = array();
 		
 		if(isset($configs['work_period']) && !is_null($configs['work_period'])){
@@ -1059,8 +1055,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	}
 	
 	# Show History Graph
-
-	function	show_history($itemid,$from,$stime,$period){
+	function show_history($itemid,$from,$stime,$period){
 		$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);   
 		show_table_header(S_TILL.SPACE.$till.' ('.($period/3600).' HOURs)');
 
@@ -1086,8 +1081,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	}
 
 
-	function	get_status(){
-		global $DB;
+	function get_status(){
+//		global $DB;
 		$status = array();
 // server
 		if( (exec('ps -ef|grep zabbix_server|grep -v grep|wc -l')>0) || (exec('ps -ax|grep zabbix_server|grep -v grep|wc -l')>0) ){
@@ -1206,111 +1201,86 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$result=DBselect("select i.type, i.delay, count(*),count(*)/i.delay as qps from items i,hosts h where i.status=".ITEM_STATUS_ACTIVE." and i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED." group by i.type,i.delay order by i.type, i.delay");
 
 		$status["qps_total"]=0;
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			$status["qps_total"]+=$row["qps"];
 		}
 
 		return $status;
 	}
 
-	function	get_resource_name($permission,$id)
-	{
+	function get_resource_name($permission,$id){
 		$res="-";
-		if($permission=="Graph")
-		{
-			if(isset($id)&&($id!=0))
-			{
+		if($permission=="Graph"){
+			if(isset($id)&&($id!=0)){
 				if($graph=get_graph_by_graphid($id))
 					$res=$graph["name"];
 			}
-			elseif(!isset($id) || $id == 0)
-			{
+			else if(!isset($id) || $id == 0){
 				$res="All graphs";
 			}
 		}
-		else if($permission=="Host")
-		{
-			if(isset($id)&&($id!=0))
-			{
+		else if($permission=="Host"){
+			if(isset($id)&&($id!=0)){
 				if($host=get_host_by_hostid($id))
 					$res=$host["host"];
 			}
-			elseif(!isset($id) || $id == 0)
-			{
+			else if(!isset($id) || $id == 0){
 				$res="All hosts";
 			}
 		}
-		else if($permission=="Screen")
-		{
-			if(isset($id)&&($id!=0))
-			{
+		else if($permission=="Screen"){
+			if(isset($id)&&($id!=0)){
 				if($screen=get_screen_by_screenid($id))
 					$res=$screen["name"];
 			}
-			elseif(!isset($id) || $id == 0)
-			{
+			else if(!isset($id) || $id == 0){
 				$res="All screens";
 			}
 		}
-		else if($permission=="Item")
-		{
-			if(isset($id)&&($id!=0))
-			{
+		else if($permission=="Item"){
+			if(isset($id)&&($id!=0)){
 				if($item=get_item_by_itemid($id))
 					if($host=get_host_by_hostid($item["hostid"]))
 						$res=$host["host"].":".$item["description"];
 			}
-			elseif(!isset($id) || $id == 0)
-			{
+			else if(!isset($id) || $id == 0){
 				$res="All items";
 			}
 		}
-		else if($permission=="User")
-		{
-			if(isset($id)&&($id!=0))
-			{
+		else if($permission=="User"){
+			if(isset($id)&&($id!=0)){
 				if($user=get_user_by_userid($id))
 					$res=$user["alias"];
 			}
-			elseif(!isset($id) || $id == 0)
-			{
+			else if(!isset($id) || $id == 0){
 				$res="All users";
 			}
 		}
-		else if($permission=="Network map")
-		{
-			if(isset($id)&&($id!=0))
-			{
+		else if($permission=="Network map"){
+			if(isset($id)&&($id!=0)){
 				if($user=get_sysmap_by_sysmapid($id))
 					$res=$user["name"];
 			}
-			elseif(!isset($id) || $id == 0)
+			else if(!isset($id) || $id == 0)
 			{
 				$res="All maps";
 			}
 		}
-		else if($permission=="Application")
-		{
-			if(isset($id)&&($id > 0))
-			{
+		else if($permission=="Application"){
+			if(isset($id)&&($id > 0)){
 				if($app = get_application_by_applicationid($id))
 					$res = $app["name"];
 			}
-			elseif(!isset($id) || $id == 0)
-			{
+			else if(!isset($id) || $id == 0){
 				$res="All applications";
 			}
 		}
-		else if($permission=="Service")
-		{
-			if(isset($id)&&($id > 0))
-			{
+		else if($permission=="Service"){
+			if(isset($id)&&($id > 0)){
 				if($service = get_service_by_serviceid($id))
 					$res = $service["name"];
 			}
-			elseif(!isset($id) || $id == 0)
-			{
+			else if(!isset($id) || $id == 0){
 				$res="All services";
 			}
 		}
@@ -1321,21 +1291,17 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return $res;
 	}
 
-	function	not_empty($var)
-	{
+	function not_empty($var){
 		return ($var == "" ? 0 : 1);
 	}
 
-	function	empty2null($var)
-	{
+	function empty2null($var){
 		return ($var == "") ? null : $var;
 	}
 
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
-	if(function_exists("imagesetstyle"))
-	{
-		function DashedLine($image,$x1,$y1,$x2,$y2,$color)
-		{
+	if(function_exists("imagesetstyle")){
+		function DashedLine($image,$x1,$y1,$x2,$y2,$color){
 // Style for dashed lines
 //			$style = array($color, $color, $color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
 			$style = array($color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
@@ -1344,16 +1310,13 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		}
 
 	}
-	else
-	{
-		function DashedLine($image,$x1,$y1,$x2,$y2,$color)
-		{
+	else{
+		function DashedLine($image,$x1,$y1,$x2,$y2,$color){
 			ImageDashedLine($image,$x1,$y1,$x2,$y2,$color);
 		}
 	}
 
-	function DashedRectangle($image,$x1,$y1,$x2,$y2,$color)
-	{
+	function DashedRectangle($image,$x1,$y1,$x2,$y2,$color){
 		DashedLine($image, $x1,$y1,$x1,$y2,$color);
 		DashedLine($image, $x1,$y2,$x2,$y2,$color);
 		DashedLine($image, $x2,$y2,$x2,$y1,$color);
@@ -1361,12 +1324,10 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	}
 
 
-	function	add_mapping_to_valuemap($valuemapid, $mappings)
-	{
+	function add_mapping_to_valuemap($valuemapid, $mappings){
 		DBexecute("delete from mappings where valuemapid=$valuemapid");
 
-		foreach($mappings as $map)
-		{
+		foreach($mappings as $map){
 			$mappingid = get_dbid("mappings","mappingid");
 
 			$result = DBexecute("insert into mappings (mappingid,valuemapid, value, newvalue)".
@@ -1379,8 +1340,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return TRUE;
 	}
 
-	function	add_valuemap($name, $mappings)
-	{
+	function add_valuemap($name, $mappings){
 		if(!is_array($mappings))	return FALSE;
 
 		$valuemapid = get_dbid("valuemaps","valuemapid");
@@ -1393,15 +1353,13 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		if(!$result){
 			delete_valuemap($valuemapid);
 		}
-		else
-		{
+		else{
 			$result = $valuemapid;
 		}
 		return $result;
 	}
 
-	function	update_valuemap($valuemapid, $name, $mappings)
-	{
+	function update_valuemap($valuemapid, $name, $mappings){
 		if(!is_array($mappings))	return FALSE;
 
 		$result = DBexecute("update valuemaps set name=".zbx_dbstr($name).
@@ -1417,22 +1375,19 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return $result;
 	}
 
-	function	delete_valuemap($valuemapid)
-	{
+	function delete_valuemap($valuemapid){
 		DBexecute("delete from mappings where valuemapid=$valuemapid");
 		DBexecute("delete from valuemaps where valuemapid=$valuemapid");
 		return TRUE;
 	}
 
-	function	replace_value_by_map($value, $valuemapid)
-	{
+	function replace_value_by_map($value, $valuemapid){
 		if($valuemapid < 1) return $value;
 
 		$result = DBselect("select newvalue from mappings".
 			" where valuemapid=".zbx_dbstr($valuemapid)." and value=".zbx_dbstr($value));
 		$row = DBfetch($result);
-		if($row)
-		{
+		if($row){
 			return $row["newvalue"]." "."($value)";
 		}
 		return $value;
@@ -1452,20 +1407,19 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return true;
 	}
 
-	function	set_image_header($format=null)
-	{
+	function set_image_header($format=null){
 		global $IMAGE_FORMAT_DEFAULT;
 
 		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
 		
 		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg"); 
 		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html"); 
-		else					Header( "Content-type:  image/png"); 
+		else								Header( "Content-type:  image/png"); 
+		
 		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 	}
 	
-	function ImageOut($image,$format=NULL)
-	{
+	function ImageOut($image,$format=NULL){
 		global $IMAGE_FORMAT_DEFAULT;
 
 		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
@@ -1487,7 +1441,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *
 	 * author: Eugene Grigorjev
 	 */
-	function	get_cookie($name, $default_value=null){
+	function get_cookie($name, $default_value=null){
 		if(isset($_COOKIE[$name]))	return $_COOKIE[$name];
 		// else
 		return $default_value;
@@ -1501,7 +1455,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *
 	 * author: Eugene Grigorjev
 	 */
-	function	zbx_setcookie($name, $value, $time=null){
+	function zbx_setcookie($name, $value, $time=null){
 		setcookie($name, $value, isset($time) ? $time : (0));
 		$_COOKIE[$name] = $value;
 	}
@@ -1514,7 +1468,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *
 	 * author: Aly
 	 */
-	function	zbx_unsetcookie($name){
+	function zbx_unsetcookie($name){
 		zbx_setcookie($name, null, -99999);
 	}
 	
@@ -1526,7 +1480,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *
 	 * author: Eugene Grigorjev
 	 */
-	function	zbx_flush_post_cookies($unset=false){
+	function zbx_flush_post_cookies($unset=false){
 		global $ZBX_PAGE_COOKIES;
 
 		if(isset($ZBX_PAGE_COOKIES)){
@@ -1552,21 +1506,17 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *
 	 * author: Eugene Grigorjev
 	 */
-	function	zbx_set_post_cookie($name, $value, $time=null)
-	{
+	function	zbx_set_post_cookie($name, $value, $time=null){
 		global $ZBX_PAGE_COOKIES;
 
 		$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time) ? $time : (0));
 	}
 
-	function	inarr_isset($keys, $array=null)
-	{
+	function	inarr_isset($keys, $array=null){
 		if(is_null($array)) $array =& $_REQUEST;
 
-		if(is_array($keys))
-		{
-			foreach($keys as $id => $key)
-			{
+		if(is_array($keys)){
+			foreach($keys as $id => $key){
 				if( !isset($array[$key]) )
 					return false;
 			}
@@ -1584,10 +1534,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *
 	 * author: Eugene Grigorjev
 	 */
-	function	zbx_rksort(&$array, $flags=NULL)
-	{
-		if(is_array($array))
-		{
+	function zbx_rksort(&$array, $flags=NULL){
+		if(is_array($array)){
 			foreach($array as $id => $data)
 				zbx_rksort($array[$id]);
 
@@ -1604,8 +1552,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *
 	 * author: Alexei Vladishev
 	 */
-	function	zbx_date2str($format, $timestamp)
-	{
+	function zbx_date2str($format, $timestamp){
 		return ($timestamp==0)?S_NEVER:date($format,$timestamp);
 	}
 	
@@ -1617,7 +1564,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *
 	 * author: Aly
 	 */
-	function	zbx_date2age($start_date,$end_date=0){
+	function zbx_date2age($start_date,$end_date=0){
 	
 		$start_date=date('U',$start_date);
 		if($end_date)
@@ -1636,14 +1583,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	return $str;
 	}
 
-	function	encode_log($data)
-	{
-		if(defined('ZBX_LOG_ENCODING_DEFAULT') && function_exists('mb_convert_encoding'))
-		{
+	function encode_log($data){
+		if(defined('ZBX_LOG_ENCODING_DEFAULT') && function_exists('mb_convert_encoding')){
 			$new=mb_convert_encoding($data, S_HTML_CHARSET, ZBX_LOG_ENCODING_DEFAULT);
 		}
-		else
-		{
+		else{
 			$new = $data;
 		}
 		return $new;

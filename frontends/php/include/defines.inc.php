@@ -19,28 +19,8 @@
 **/
 ?>
 <?php
-	define('XML_TAG_ZABBIX_EXPORT',		'zabbix_export');
-	define('XML_TAG_HOSTS',			'hosts');
-	define('XML_TAG_HOST',			'host');
-	define('XML_TAG_HOSTPROFILE',	'host_profile');
-	define('XML_TAG_GROUPS',		'groups');
-	define('XML_TAG_GROUP',			'group');
-	define('XML_TAG_APPLICATIONS',		'applications');
-	define('XML_TAG_APPLICATION',		'application');
-	define('XML_TAG_ITEMS',			'items');
-	define('XML_TAG_ITEM',			'item');
-	define('XML_TAG_TEMPLATES',		'templates');
-	define('XML_TAG_TEMPLATE',		'template');
-	define('XML_TAG_TRIGGERS',		'triggers');
-	define('XML_TAG_TRIGGER',		'trigger');
-	define('XML_TAG_GRAPHS',		'graphs');
-	define('XML_TAG_GRAPH',			'graph');
-	define('XML_TAG_GRAPH_ELEMENT',		'graph_element');
-	define('XML_TAG_GRAPH_ELEMENTS',	'graph_elements');
-	define('XML_TAG_SCREENS',		'screens');
-	define('XML_TAG_SCREEN',		'screen');
-	define('XML_TAG_SCREEN_ELEMENT',	'screen_element');
-	define('XML_TAG_SCREEN_ELEMENTS',	'screen_elements');
+	define('ZBX_AUTH_INTERNAL',	0);
+	define('ZBX_AUTH_LDAP',		1);
 	
 	define('PAGE_TYPE_HTML',		0);
 	define('PAGE_TYPE_IMAGE',		1);
@@ -516,6 +496,29 @@ if((ini_get('mbstring.func_overload') > 5)){
 /*	define('ZBX_LOG_ENCODING_DEFAULT', 'Shift_JIS');*/
 
 	define('ZBX_HAVE_IPV6', 1);
+	
+	define('XML_TAG_ZABBIX_EXPORT',		'zabbix_export');
+	define('XML_TAG_HOSTS',			'hosts');
+	define('XML_TAG_HOST',			'host');
+	define('XML_TAG_HOSTPROFILE',	'host_profile');
+	define('XML_TAG_GROUPS',		'groups');
+	define('XML_TAG_GROUP',			'group');
+	define('XML_TAG_APPLICATIONS',		'applications');
+	define('XML_TAG_APPLICATION',		'application');
+	define('XML_TAG_ITEMS',			'items');
+	define('XML_TAG_ITEM',			'item');
+	define('XML_TAG_TEMPLATES',		'templates');
+	define('XML_TAG_TEMPLATE',		'template');
+	define('XML_TAG_TRIGGERS',		'triggers');
+	define('XML_TAG_TRIGGER',		'trigger');
+	define('XML_TAG_GRAPHS',		'graphs');
+	define('XML_TAG_GRAPH',			'graph');
+	define('XML_TAG_GRAPH_ELEMENT',		'graph_element');
+	define('XML_TAG_GRAPH_ELEMENTS',	'graph_elements');
+	define('XML_TAG_SCREENS',		'screens');
+	define('XML_TAG_SCREEN',		'screen');
+	define('XML_TAG_SCREEN_ELEMENT',	'screen_element');
+	define('XML_TAG_SCREEN_ELEMENTS',	'screen_elements');
 
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))

@@ -35,6 +35,7 @@ frontends/php/audio/trigger_on_average.wav -text
 frontends/php/audio/trigger_on_disaster.wav -text
 frontends/php/audio/trigger_on_high.wav -text
 frontends/php/audio/trigger_on_warning.wav -text
+frontends/php/authentication.php -text
 frontends/php/chart6.php -text
 frontends/php/chart7.php -text
 frontends/php/conf/maintenance.inc.php -text
@@ -131,6 +132,7 @@ frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/blocks.inc.php -text
 frontends/php/include/classes/chart.inc.php -text
+frontends/php/include/classes/cldap.inc.php -text
 frontends/php/include/classes/cscript.inc.php -text
 frontends/php/include/classes/pie.inc.php -text
 frontends/php/include/js.inc.php -text

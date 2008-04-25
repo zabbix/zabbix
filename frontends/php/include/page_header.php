@@ -97,144 +97,144 @@ COpt::profiling_start("page");
 	*/
 	
 	$ZBX_MENU = array(
-		"view"=>array(
-				"label"			=> S_MONITORING,
-				"node_perm"		=> PERM_READ_LIST,
-				"default_page_id"	=> 0,
-				"pages"=>array(
+		'view'=>array(
+				'label'			=> S_MONITORING,
+				'node_perm'		=> PERM_READ_LIST,
+				'default_page_id'	=> 0,
+				'pages'=>array(
 					array(
-							"url"=>"dashboard.php",
-							"label"=>S_DASHBOARD,
-							"sub_pages"=>array("chart2.php","chart3.php","chart6.php","chart7.php","charts.php","screens.php","maps.php","map.php")
+							'url'=>'dashboard.php',
+							'label'=>S_DASHBOARD,
+							'sub_pages'=>array('chart2.php','chart3.php','chart6.php','chart7.php','charts.php','screens.php','maps.php','map.php')
 						),
-					array("url"=>"overview.php"	,"label"=>S_OVERVIEW	),
+					array('url'=>'overview.php'	,'label'=>S_OVERVIEW	),
 					array(
-							"url"=>"httpmon.php",
-							"label"=>S_WEB,
-							"sub_pages"=>array("httpdetails.php")
-						),
-					array(
-							"url"=>"latest.php",
-							"label"=>S_LATEST_DATA,
-							"sub_pages"=>array("history.php","chart.php")
+							'url'=>'httpmon.php',
+							'label'=>S_WEB,
+							'sub_pages'=>array('httpdetails.php')
 						),
 					array(
-							"url"=>"tr_status.php",
-							"label"=>S_TRIGGERS,
-							"sub_pages"=>array("acknow.php","tr_comments.php","chart4.php","scripts_exec.php")
+							'url'=>'latest.php',
+							'label'=>S_LATEST_DATA,
+							'sub_pages'=>array('history.php','chart.php')
 						),
 					array(
-							"url"=>"events.php",
-							"label"=>S_EVENTS,
-							"sub_pages"=>array("tr_events.php")
+							'url'=>'tr_status.php',
+							'label'=>S_TRIGGERS,
+							'sub_pages'=>array('acknow.php','tr_comments.php','chart4.php','scripts_exec.php')
 						),
 					array(
-							"url"=>"discovery.php",
-							"label"=>S_DISCOVERY, 
-							"user_type"=>USER_TYPE_ZABBIX_ADMIN),
+							'url'=>'events.php',
+							'label'=>S_EVENTS,
+							'sub_pages'=>array('tr_events.php')
+						),
 					array(
-							"url"=>"srv_status.php",
-							"label"=>S_IT_SERVICES,
+							'url'=>'discovery.php',
+							'label'=>S_DISCOVERY, 
+							'user_type'=>USER_TYPE_ZABBIX_ADMIN),
+					array(
+							'url'=>'srv_status.php',
+							'label'=>S_IT_SERVICES,
 							'forse_disable_subnodes' => true,
-							"sub_pages"=>array("report3.php","report7.php","chart_sla.php","chart5.php")
+							'sub_pages'=>array('report3.php','report7.php','chart_sla.php','chart5.php')
 						),
-					array("url"=>"vtext.php"),
-					array("url"=>"chart3.php")
+					array('url'=>'vtext.php'),
+					array('url'=>'chart3.php')
 					)
 				),
-		"cm"=>array(
-				"label"			=> S_INVENTORY,
-				"node_perm"		=> PERM_READ_LIST,
-				"default_page_id"	=> 0,
-				"pages"=>array(
-					array("url"=>"hostprofiles.php"	,"label"=>S_HOSTS	)
+		'cm'=>array(
+				'label'			=> S_INVENTORY,
+				'node_perm'		=> PERM_READ_LIST,
+				'default_page_id'	=> 0,
+				'pages'=>array(
+					array('url'=>'hostprofiles.php'	,'label'=>S_HOSTS	)
 					)
 				),
-		"reports"=>array(
-				"label"			=> S_REPORTS,
-				"node_perm"		=> PERM_READ_LIST,
-				"default_page_id"	=> 0,
-				"pages"=>array(
-					array("url"=>"report1.php",	"label"=>S_STATUS_OF_ZABBIX	),
-					array("url"=>"report2.php",	"label"=>S_AVAILABILITY_REPORT	),
-					array("url"=>"report5.php",	"label"=>S_TRIGGERS_TOP_100	)   
+		'reports'=>array(
+				'label'			=> S_REPORTS,
+				'node_perm'		=> PERM_READ_LIST,
+				'default_page_id'	=> 0,
+				'pages'=>array(
+					array('url'=>'report1.php',	'label'=>S_STATUS_OF_ZABBIX	),
+					array('url'=>'report2.php',	'label'=>S_AVAILABILITY_REPORT	),
+					array('url'=>'report5.php',	'label'=>S_TRIGGERS_TOP_100	)   
 					)
 				),
-		"config"=>array(
-				"label"			=> S_CONFIGURATION,
-				"user_type"		=> USER_TYPE_ZABBIX_ADMIN,
-				"node_perm"		=> PERM_READ_LIST,
-				"default_page_id"	=> 0,
-				"forse_disable_subnodes"=> true,
-				"pages"=>array(
+		'config'=>array(
+				'label'			=> S_CONFIGURATION,
+				'user_type'		=> USER_TYPE_ZABBIX_ADMIN,
+				'node_perm'		=> PERM_READ_LIST,
+				'default_page_id'	=> 0,
+				'forse_disable_subnodes'=> true,
+				'pages'=>array(
 					array(
-							"url"=>"config.php",
-							"label"=>S_GENERAL,
-							"sub_pages"=>array("image.php")
-						),
-					array(
-							"url"=>"httpconf.php",
-							"label"=>S_WEB,
-							"sub_pages"=>array("popup_httpstep.php")
-						),
-					array("url"=>"hosts.php"	,"label"=>S_HOSTS),
-					array(
-							"url"=>"items.php",
-							"label"=>S_ITEMS,
-							"sub_pages"=>array("tr_logform.php")		
+							'url'=>'config.php',
+							'label'=>S_GENERAL,
+							'sub_pages'=>array('image.php')
 						),
 					array(
-							"url"=>"triggers.php",
-							"label"=>S_TRIGGERS,
-							"sub_pages"=>array("popup_trexpr.php")
+							'url'=>'httpconf.php',
+							'label'=>S_WEB,
+							'sub_pages'=>array('popup_httpstep.php')
 						),
-					array("url"=>"actionconf.php"	,"label"=>S_ACTIONS),
-					array("url"=>"sysmaps.php"	,"label"=>S_MAPS,
-						"sub_pages"=>array("sysmap.php","popup_link_tr.php")
+					array('url'=>'hosts.php'	,'label'=>S_HOSTS),
+					array(
+							'url'=>'items.php',
+							'label'=>S_ITEMS,
+							'sub_pages'=>array('tr_logform.php')		
 						),
-					array("url"=>"graphs.php"	,"label"=>S_GRAPHS,
-						"sub_pages"=>array("popup_gitem.php")
+					array(
+							'url'=>'triggers.php',
+							'label'=>S_TRIGGERS,
+							'sub_pages'=>array('popup_trexpr.php')
 						),
-					array("url"=>"screenconf.php"	,"label"=>S_SCREENS,
-						"sub_pages"=>array("screenedit.php")
+					array('url'=>'actionconf.php'	,'label'=>S_ACTIONS),
+					array('url'=>'sysmaps.php'	,'label'=>S_MAPS,
+						'sub_pages'=>array('sysmap.php','popup_link_tr.php')
 						),
-					array("url"=>"services.php"	,"label"=>S_IT_SERVICES,
-						"sub_pages"=>array("services_form.php")	
+					array('url'=>'graphs.php'	,'label'=>S_GRAPHS,
+						'sub_pages'=>array('popup_gitem.php')
+						),
+					array('url'=>'screenconf.php'	,'label'=>S_SCREENS,
+						'sub_pages'=>array('screenedit.php')
+						),
+					array('url'=>'services.php'	,'label'=>S_IT_SERVICES,
+						'sub_pages'=>array('services_form.php')	
 						),
 					array('url'=>'discoveryconf.php','label'=>S_DISCOVERY),
-					array("url"=>"exp_imp.php"	,"label"=>S_EXPORT_IMPORT),
-					array("url"=>"popup.php")
+					array('url'=>'exp_imp.php'	,'label'=>S_EXPORT_IMPORT),
+					array('url'=>'popup.php')
 					)
 				),
-		"admin"=>array(
-				"label"			=> S_ADMINISTRATION,
-				"user_type"		=> USER_TYPE_SUPER_ADMIN,
-				"node_perm"		=> PERM_READ_WRITE,
-				"default_page_id"	=> 1,
-				"forse_disable_subnodes"=> true,
-				"pages"=>array(
-					ZBX_DISTRIBUTED ? array("url"=>"nodes.php"	,"label"=>S_NODES) : null ,
-					array("url"=>"users.php"	,"label"=>S_USERS		,
-						"sub_pages"=>array("popup_media.php",
-							"popup_usrgrp.php","popup_right.php","popup_users.php")
+		'admin'=>array(
+				'label'			=> S_ADMINISTRATION,
+				'user_type'		=> USER_TYPE_SUPER_ADMIN,
+				'node_perm'		=> PERM_READ_WRITE,
+				'default_page_id'	=> 1,
+				'forse_disable_subnodes'=> true,
+				'pages'=>array(
+					ZBX_DISTRIBUTED ? array('url'=>'nodes.php'	,'label'=>S_NODES) : null ,
+					array('url'=>'authentication.php'	,'label'=>S_AUTHENTICATION),
+					array('url'=>'users.php'	,'label'=>S_USERS		,
+						'sub_pages'=>array('popup_media.php','popup_usrgrp.php','popup_right.php','popup_users.php')
 						),
-					array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
-					array("url"=>"scripts.php"	,"label"=>S_SCRIPTS),
-					array("url"=>"audit.php"	,"label"=>S_AUDIT		),
-					array("url"=>"queue.php"	,"label"=>S_QUEUE	),
-					array("url"=>"report4.php"	,"label"=>S_NOTIFICATIONS	),
-					array("url"=>"locales.php"	,"label"=>S_LOCALES	),
-					array("url"=>"instal.php"	,"label"=>S_INSTALLATION	,
-						"sub_pages"=>array("setup.php","warning.php"))
+					array('url'=>'media_types.php'	,'label'=>S_MEDIA_TYPES		),
+					array('url'=>'scripts.php'	,'label'=>S_SCRIPTS),
+					array('url'=>'audit.php'	,'label'=>S_AUDIT		),
+					array('url'=>'queue.php'	,'label'=>S_QUEUE	),
+					array('url'=>'report4.php'	,'label'=>S_NOTIFICATIONS	),
+					array('url'=>'locales.php'	,'label'=>S_LOCALES	),
+					array('url'=>'instal.php'	,'label'=>S_INSTALLATION	,
+						'sub_pages'=>array('setup.php','warning.php'))
 					)
 				),
-		"login"=>array(
-				"label"			=> S_LOGIN,
-				"default_page_id"	=> 0,
-				"forse_disable_subnodes"=> true,
-				"pages"=>array(
-					array("url"=>"index.php",
-						"sub_pages"=>array("profile.php")
+		'login'=>array(
+				'label'			=> S_LOGIN,
+				'default_page_id'	=> 0,
+				'forse_disable_subnodes'=> true,
+				'pages'=>array(
+					array('url'=>'index.php',
+						'sub_pages'=>array('profile.php')
 						)
 					)
 				)
@@ -243,20 +243,17 @@ COpt::profiling_start("page");
 	$main_menu_row	= array();
 	$sub_menu_row	= array();
 
-	foreach($ZBX_MENU as $label=>$sub)
-	{
+	foreach($ZBX_MENU as $label=>$sub){
 // Check permissions for main menu
 		unset($deny);
-		if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
-		{
-			if(isset($sub['user_type']))
-			{
+		if(!defined('ZBX_PAGE_NO_AUTHERIZATION')){
+			if(isset($sub['user_type'])){
 				if($USER_DETAILS['type'] < $sub['user_type'])
 					$deny = true;
 			}
 
 			if(isset($sub['node_perm'])){
-				if ( 0 == count(get_accessible_nodes_by_user(
+				if(0==count(get_accessible_nodes_by_user(
 									$USER_DETAILS,
 									$sub['node_perm'],
 									null,
@@ -330,7 +327,7 @@ COpt::profiling_start("page");
 		}
 
 		if(isset($menu_url)){ /* active menu */
-			$class = "active";
+			$class = 'active';
 
 			update_profile('web.menu.'.$label.'.last', $menu_url);
 
@@ -354,15 +351,15 @@ COpt::profiling_start("page");
 		else{
 			if(isset($deny)) continue;
 
-			$class = "horizontal_menu_n";
+			$class = 'horizontal_menu_n';
 
 			$menu_url = get_profile('web.menu.'.$label.'.last',false);
 
 			if(!$menu_url)
-				$menu_url = $sub['pages'][$sub['default_page_id']]["url"];
+				$menu_url = $sub['pages'][$sub['default_page_id']]['url'];
 		}
 
-		array_push($main_menu_row, new CCol(new CLink($sub['label'], $menu_url, "highlight"),$class));
+		array_push($main_menu_row, new CCol(new CLink($sub['label'], $menu_url, 'highlight'),$class));
 		unset($menu_url, $class);
 	}
 
@@ -372,7 +369,7 @@ COpt::profiling_start("page");
 
 	zbx_flush_post_cookies(isset($denyed_page_requested));
 
-	if($page["type"] == PAGE_TYPE_HTML)
+	if($page['type'] == PAGE_TYPE_HTML)
 	{
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

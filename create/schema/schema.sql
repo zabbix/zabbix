@@ -356,6 +356,14 @@ FIELD		|event_ack_enable|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|event_expire	|t_integer	|'7'	|NOT NULL	|ZBX_SYNC
 FIELD		|event_show_max	|t_integer	|'100'	|NOT NULL	|ZBX_SYNC
 FIELD		|default_theme	|t_varchar(128)	|'default.css'	|NOT NULL	|ZBX_SYNC
+FIELD		|authentication_type|t_integer	|0	|NOT NULL	|ZBX_SYNC
+FIELD		|ldap_host	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|ldap_port	|t_integer	|389	|NOT NULL	|ZBX_SYNC
+FIELD		|ldap_base_dn	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|ldap_bind_dn	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|ldap_bind_password|t_varchar(128)|''	|NOT NULL	|ZBX_SYNC
+FIELD		|ldap_search_attribute|t_varchar(128)|''|NOT NULL	|ZBX_SYNC
+
 
 TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|'0'	|NOT NULL	|0

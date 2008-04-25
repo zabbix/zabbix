@@ -683,9 +683,11 @@
 	}
 
 	# Insert form for User
-	function	insert_user_form($userid,$profile=0){
+	function insert_user_form($userid,$profile=0){
 		global $ZBX_LOCALES;
 		global $USER_DETAILS;
+		
+		$config = select_config();
 
 		$frm_title = S_USER;
 		if(isset($userid)){
@@ -721,8 +723,7 @@
 			}
 
 			$db_medias = DBselect('SELECT m.* FROM media m WHERE m.userid='.$userid);
-			while($db_media = DBfetch($db_medias))
-			{
+			while($db_media = DBfetch($db_medias)){
 				array_push($user_medias, 
 					array(	'mediatypeid' => $db_media['mediatypeid'],
 						'period' => $db_media['period'],
@@ -736,8 +737,7 @@
 			$new_group_id	= 0;
 			$new_group_name = '';
 		}
-		else
-		{
+		else{
 			$alias		= get_request("alias","");
 			$name		= get_request("name","");
 			$surname	= get_request("surname","");
@@ -766,13 +766,11 @@
 		$media_type_ids = array();
 		foreach($user_medias as $one_media) $media_type_ids[$one_media['mediatypeid']] = 1;
 
-		if(count($media_type_ids) > 0)
-		{
+		if(count($media_type_ids) > 0){
 			$db_media_types = DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt'.
 				' WHERE mt.mediatypeid in ('.implode(',',array_keys($media_type_ids)).')');
 
-			while($db_media_type = DBfetch($db_media_types))
-			{
+			while($db_media_type = DBfetch($db_media_types)){
 				$media_types[$db_media_type['mediatypeid']] = $db_media_type['description'];
 			}	
 		}
@@ -790,20 +788,28 @@
 			$frmUser->AddRow(S_SURNAME,	new CTextBox("surname",$surname,20));
 		}
 
-		if(!isset($userid) || isset($change_password)){
-			$frmUser->AddRow(S_PASSWORD,	new CPassBox("password1",$password1,20));
-			$frmUser->AddRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox("password2",$password2,20));
-			if(isset($change_password))
-				$frmUser->AddVar('change_password', $change_password);
+		if(ZBX_AUTH_INTERNAL == $config['authentication_type']){
+			if(!isset($userid) || isset($change_password)){
+				$frmUser->AddRow(S_PASSWORD,	new CPassBox("password1",$password1,20));
+				$frmUser->AddRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox("password2",$password2,20));
+				if(isset($change_password))
+					$frmUser->AddVar('change_password', $change_password);
+			}
+			else{
+				$passwd_but = new CButton("change_password", S_CHANGE_PASSWORD);
+				if($alias == ZBX_GUEST_USER){
+					$passwd_but->AddOption('disabled','disabled');
+				}	
+				$frmUser->AddRow(S_PASSWORD, $passwd_but);
+			}
 		}
 		else{
-			$passwd_but = new CButton("change_password", S_CHANGE_PASSWORD);
-			if($alias == ZBX_GUEST_USER){
-				$passwd_but->AddOption('disabled','disabled');
-			}	
-			$frmUser->AddRow(S_PASSWORD, $passwd_but);
+			if(!isset($userid) || isset($change_password)){
+				$frmUser->addVar('password1','zabbix');
+				$frmUser->addVar('password2','zabbix');
+			}
 		}
-
+		
 		if($profile==0){
 			global $USER_DETAILS;
 
@@ -4075,8 +4081,7 @@ include_once 'include/discovery.inc.php';
 		$frmMedia->Show();
 	}
 
-	function	insert_housekeeper_form()
-	{
+ 	function insert_housekeeper_form(){
 		$config=select_config();
 		
 		$frmHouseKeep = new CFormTable(S_HOUSEKEEPER,"config.php");

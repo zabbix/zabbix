@@ -81,14 +81,11 @@ include_once "include/page_header.php";
 	update_profile("web.config.config",$_REQUEST["config"]);
 
 	$result = 0;
-	if($_REQUEST["config"]==3)
-	{
+	if($_REQUEST["config"]==3){
 /* IMAGES ACTIONS */
-		if(isset($_REQUEST["save"]))
-		{
+		if(isset($_REQUEST["save"])){
 			$file = isset($_FILES["image"]) && $_FILES["image"]["name"] != "" ? $_FILES["image"] : NULL;
-			if(isset($_REQUEST["imageid"]))
-			{
+			if(isset($_REQUEST["imageid"])){
 	/* UPDATE */
 				$result=update_image($_REQUEST["imageid"],$_REQUEST["name"],
 					$_REQUEST["imagetype"],$file);
@@ -96,7 +93,8 @@ include_once "include/page_header.php";
 				$msg_ok = S_IMAGE_UPDATED;
 				$msg_fail = S_CANNOT_UPDATE_IMAGE;
 				$audit_action = "Image [".$_REQUEST["name"]."] updated";
-			} else {
+			} 
+			else {
 	/* ADD */
 				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,
 						PERM_RES_IDS_ARRAY,get_current_nodeid())))
@@ -110,12 +108,12 @@ include_once "include/page_header.php";
 				$audit_action = "Image [".$_REQUEST["name"]."] added";
 			}
 			show_messages($result, $msg_ok, $msg_fail);
-			if($result)
-			{
+			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_IMAGE,$audit_action);
 				unset($_REQUEST["form"]);
 			}
-		} elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["imageid"])) {
+		} 
+		else if(isset($_REQUEST["delete"])&&isset($_REQUEST["imageid"])) {
 	/* DELETE */
 			$image = get_image_by_imageid($_REQUEST["imageid"]);
 			
@@ -129,7 +127,7 @@ include_once "include/page_header.php";
 			unset($image, $_REQUEST["imageid"]);
 		}
 	}
-	elseif(isset($_REQUEST["save"]) && ($_REQUEST["config"]==8)){
+	else if(isset($_REQUEST["save"]) && ($_REQUEST["config"]==8)){
 		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
@@ -143,8 +141,7 @@ include_once "include/page_header.php";
 
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 
-		if($result)
-		{
+		if($result){
 			$msg = array();
 			if(!is_null($val = get_request('event_ack_enable')))
 				$msg[] = S_EVENT_ACKNOWLEDGES.' ['.($val?(S_DISABLED):(S_ENABLED)).']';
@@ -156,7 +153,7 @@ include_once "include/page_header.php";
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,implode('; ',$msg));
 		}		
 	}
-	elseif(isset($_REQUEST["save"]) && ($_REQUEST["config"]==9)){
+	else if(isset($_REQUEST["save"]) && ($_REQUEST["config"]==9)){
 		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
@@ -173,8 +170,7 @@ include_once "include/page_header.php";
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,$msg);
 		}		
 	}
-	elseif(isset($_REQUEST["save"])&&uint_in_array($_REQUEST["config"],array(0,5,7)))
-	{
+	else if(isset($_REQUEST["save"])&&uint_in_array($_REQUEST["config"],array(0,5,7))){
 
 		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
@@ -190,8 +186,7 @@ include_once "include/page_header.php";
 		$result=update_config($configs);
 
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
-		if($result)
-		{
+		if($result){
 			$msg = array();
 			if(!is_null($val = get_request('event_history')))
 				$msg[] = S_DO_NOT_KEEP_EVENTS_OLDER_THAN.' ['.$val.']';
@@ -201,14 +196,11 @@ include_once "include/page_header.php";
 				$msg[] = S_REFRESH_UNSUPPORTED_ITEMS.' ['.$val.']';
 			if(!is_null($val = get_request('work_period')))
 				$msg[] = S_WORKING_TIME.' ['.$val.']';
-			if(!is_null($val = get_request('alert_usrgrpid')))
-			{
-				if(0 == $val) 
-				{
+			if(!is_null($val = get_request('alert_usrgrpid'))){
+				if(0 == $val) {
 					$val = S_NONE;
 				}
-				else
-				{
+				else{
 					$val = DBfetch(DBselect('select name from usrgrp where usrgrpid='.$val));
 					$val = $val['name'];
 				}
@@ -219,46 +211,38 @@ include_once "include/page_header.php";
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,implode('; ',$msg));
 		}
 	}
-	elseif($_REQUEST["config"]==6)
-	{
+	else if($_REQUEST["config"]==6){
 		$_REQUEST["valuemap"] = get_request("valuemap",array());
-		if(isset($_REQUEST["add_map"]))
-		{
+		if(isset($_REQUEST["add_map"])){
 			$added = 0;
 			$cnt = count($_REQUEST["valuemap"]);
-			for($i=0; $i < $cnt; $i++)
-			{
+			for($i=0; $i < $cnt; $i++){
 				if($_REQUEST["valuemap"][$i]["value"] != $_REQUEST["add_value"])	continue;
 				$_REQUEST["valuemap"][$i]["newvalue"] = $_REQUEST["add_newvalue"];
 				$added = 1;
 				break;
 			}
-			if($added == 0)
-			{
+			if($added == 0){
 				array_push($_REQUEST["valuemap"],array(
 					"value"		=> $_REQUEST["add_value"],
 					"newvalue"	=> $_REQUEST["add_newvalue"]));
 			}
 		}
-		elseif(isset($_REQUEST["del_map"])&&isset($_REQUEST["rem_value"]))
-		{
+		else if(isset($_REQUEST["del_map"])&&isset($_REQUEST["rem_value"])){
 			$_REQUEST["valuemap"] = get_request("valuemap",array());
 			foreach($_REQUEST["rem_value"] as $val)
 				unset($_REQUEST["valuemap"][$val]);
 		}
-		elseif(isset($_REQUEST["save"]))
-		{
+		else if(isset($_REQUEST["save"])){
 			$mapping = get_request("valuemap",array());
-			if(isset($_REQUEST["valuemapid"]))
-			{
+			if(isset($_REQUEST["valuemapid"])){
 				$result = update_valuemap($_REQUEST["valuemapid"],$_REQUEST["mapname"], $mapping);
 				$audit_action	= AUDIT_ACTION_UPDATE;
 				$msg_ok		= S_VALUE_MAP_UPDATED;
 				$msg_fail	= S_CANNNOT_UPDATE_VALUE_MAP;
 				$valuemapid	= $_REQUEST["valuemapid"];
 			}
-			else
-			{
+			else{
 				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,
 					PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				{
@@ -270,16 +254,15 @@ include_once "include/page_header.php";
 				$msg_fail	= S_CANNNOT_ADD_VALUE_MAP;
 				$valuemapid	= $result;
 			}
-			if($result)
-			{
+			
+			if($result){
 				add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP,
 					S_VALUE_MAP." [".$_REQUEST["mapname"]."] [".$valuemapid."]");
 				unset($_REQUEST["form"]);
 			}
 			show_messages($result,$msg_ok, $msg_fail);
 		}
-		elseif(isset($_REQUEST["delete"]) && isset($_REQUEST["valuemapid"]))
-		{
+		else if(isset($_REQUEST["delete"]) && isset($_REQUEST["valuemapid"])){
 			$result = false;
 
 			if(($map_data = DBfetch(DBselect('select * from valuemaps where '.DBin_node('valuemapid').
@@ -287,8 +270,7 @@ include_once "include/page_header.php";
 			{
 				$result = delete_valuemap($_REQUEST["valuemapid"]);
 			}
-			if($result)
-			{
+			if($result){
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_VALUE_MAP,
 					S_VALUE_MAP." [".$map_data["name"]."] [".$map_data['valuemapid']."]");
 				unset($_REQUEST["form"]);
@@ -334,23 +316,23 @@ include_once "include/page_header.php";
 	{
 		insert_housekeeper_form();
 	}
-	elseif($_REQUEST["config"]==5)
+	else if($_REQUEST["config"]==5)
 	{
 		insert_other_parameters_form();
 	}
-	elseif($_REQUEST["config"]==7)
+	else if($_REQUEST["config"]==7)
 	{
 		insert_work_period_form();
 	}
-	elseif($_REQUEST["config"]==8)
+	else if($_REQUEST["config"]==8)
 	{
 		insert_event_ack_form();
 	}
-	elseif($_REQUEST["config"]==9)
+	else if($_REQUEST["config"]==9)
 	{
 		insert_themes_form();
 	}
-	elseif($_REQUEST["config"]==3)
+	else if($_REQUEST["config"]==3)
 	{
 		if(isset($_REQUEST["form"]))
 		{
@@ -386,7 +368,7 @@ include_once "include/page_header.php";
 			$table->show();
 		}
 	}
-	elseif($_REQUEST["config"]==6)
+	else if($_REQUEST["config"]==6)
 	{
 		if(isset($_REQUEST["form"]))
 		{
