@@ -747,7 +747,7 @@ void  DBdelete_trigger(zbx_uint64_t triggerid)
 
 	DBdelete_services_by_triggerid(triggerid);
 
-	DBexecute("delete sysmaps_link_triggers where triggerid=" ZBX_FS_UI64,triggerid);
+	DBexecute("delete from sysmaps_link_triggers where triggerid=" ZBX_FS_UI64,triggerid);
 	DBexecute("delete from triggers where triggerid=" ZBX_FS_UI64,triggerid);
 }
 
