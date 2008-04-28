@@ -70,7 +70,7 @@ class CLdap{
 
 		$this->bound = 0;
 
-		if(!$this->ds = ldap_connect($this->cnf['host'],$this->cnf['port'])){
+		if(!$this->ds=ldap_connect($this->cnf['host'],$this->cnf['port'])){
 			error("LDAP: couldn't connect to LDAP server");
 			return false;
 		}

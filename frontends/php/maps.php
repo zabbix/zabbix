@@ -161,12 +161,11 @@ include_once "include/page_header.php";
 
 	$cmbMaps = new CComboBox("sysmapid",get_request("sysmapid",0),"submit()");
 	
-	foreach($all_maps as $id => $name)
-	{
+	foreach($all_maps as $id => $name){
 		$cmbMaps->AddItem($id, $name);
 	}
-	if($cmbMaps->ItemsCount()>0)
-	{	
+	
+	if($cmbMaps->ItemsCount()>0){
 		$form->AddItem($cmbMaps);
 	}
 
@@ -174,8 +173,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$table = new CTable(S_NO_MAPS_DEFINED,"map");
-	if(isset($_REQUEST["sysmapid"]))
-	{
+	if(isset($_REQUEST["sysmapid"])){
 		$action_map = get_action_map_by_sysmapid($_REQUEST["sysmapid"]);
 		$table->AddRow($action_map);
 

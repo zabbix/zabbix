@@ -870,6 +870,7 @@
 
 //	sysmap.php
 	'S_LINK'=>				'Link',
+	'S_LINKS'=>				'Links',
 	'S_LABEL'=>				'Label',
 	'S_X'=>					'X',
 	'S_Y'=>					'Y',
