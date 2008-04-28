@@ -1,5 +1,6 @@
 Changes for 1.4.6:
 
+ - [ZBX-365] added support of long process names for proc.num and proc.mem, Linux 2.6 (Sasha)
  - [ZBX-78] fixed detection of net-snmp libs (Alexei)
  - [ZBX-362] added mass template linkage to hosts, mod by sergio.cricca (Artem)
  - [ZBX-361] fixed possible "division by zero" in Monitoring/Triggers screen (Sasha)
