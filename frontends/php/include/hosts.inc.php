@@ -477,20 +477,17 @@ require_once "include/items.inc.php";
 		return DBexecute("delete from groups where groupid=$groupid");
 	}
 
-	function	get_hostgroup_by_groupid($groupid)
-	{
+	function get_hostgroup_by_groupid($groupid){
 		$result=DBselect("select * from groups where groupid=".$groupid);
 		$row=DBfetch($result);
-		if($row)
-		{
+		if($row){
 			return $row;
 		}
 		error("No host groups with groupid=[$groupid]");
 		return  false;
 	}
 
-	function	db_save_proxy($name,$proxyid=null)
-	{
+	function db_save_proxy($name,$proxyid=null){
 		if(!is_string($name)){
 			error("incorrect parameters for 'db_save_proxy'");
 			return false;
@@ -504,43 +501,41 @@ require_once "include/items.inc.php";
 					' and '.DBin_node('hostid').' AND host='.zbx_dbstr($name).
 					' and hostid<>'.$proxyid);
 		
-		if(DBfetch($result))
-		{
+		if(DBfetch($result)){
 			error("Proxy '$name' already exists");
 			return false;
 		}
-		if(is_null($proxyid))
-		{
+		
+		if(is_null($proxyid)){
 			$proxyid=get_dbid('hosts','hostid');
 			if(!DBexecute('insert into hosts (hostid,host,status)'.
-					' values ('.$proxyid.','.zbx_dbstr($name).','.HOST_STATUS_PROXY.')'))
+				' values ('.$proxyid.','.zbx_dbstr($name).','.HOST_STATUS_PROXY.')'))
+			{
 				return false;
+			}
+			
 			return $proxyid;
 		}
 		else
 			return DBexecute('update hosts set host='.zbx_dbstr($name).' where hostid='.$proxyid);
 	}
 
-	function	delete_proxy($proxyid)
-	{
+	function delete_proxy($proxyid){
 		if(!DBexecute("update hosts set proxy_hostid=0 where proxy_hostid=$proxyid"))
 			return false;
 
 		return DBexecute("delete from hosts where hostid=$proxyid");
 	}
 
-	function	update_hosts_by_proxyid($proxyid,$hosts=array())
-	{
+	function update_hosts_by_proxyid($proxyid,$hosts=array()){
 		DBexecute('update hosts set proxy_hostid=0 where proxy_hostid='.$proxyid);
 
-		foreach($hosts as $hostid)
-		{
+		foreach($hosts as $hostid){
 			DBexecute('update hosts set proxy_hostid='.$proxyid.' where hostid='.$hostid);
 		}
 	}
 
-	function	add_proxy($name,$hosts=array())
-	{
+	function add_proxy($name,$hosts=array()){
 		$proxyid = db_save_proxy($name);
 		if(!$proxyid)
 			return	$proxyid;
@@ -550,8 +545,7 @@ require_once "include/items.inc.php";
 		return $proxyid;
 	}
 
-	function	update_proxy($proxyid,$name,$hosts)
-	{
+	function update_proxy($proxyid,$name,$hosts){
 		$result = db_save_proxy($name,$proxyid);
 		if(!$result)
 			return	$result;
@@ -561,13 +555,11 @@ require_once "include/items.inc.php";
 		return $result;
 	}
 
-	function get_host_by_itemid($itemid)
-	{
+	function get_host_by_itemid($itemid){
 		$sql="select h.* from hosts h, items i where i.hostid=h.hostid and i.itemid=$itemid";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
-		if($row)
-		{
+		if($row){
 			return $row;
 		}
 		error("No host with itemid=[$itemid]");
