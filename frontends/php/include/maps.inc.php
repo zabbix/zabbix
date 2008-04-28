@@ -264,8 +264,9 @@
 	}
 
 	function add_link_trigger($linkid,$triggerid,$drawtype,$color){
-		$sql = 'INSERT INTO sysmaps_link_triggers (linkid,triggerid,drawtype,color) '.
-					" VALUES ('$linkid','$triggerid','$drawtype',".zbx_dbstr($color).")";
+		$linktriggerid=get_dbid("sysmaps_link_triggers","linktriggerid");
+		$sql = 'INSERT INTO sysmaps_link_triggers (linktriggerid,linkid,triggerid,drawtype,color) '.
+					" VALUES ('$linktriggerid','$linkid','$triggerid','$drawtype',".zbx_dbstr($color).")";
 	return DBexecute($sql);
 	}
 

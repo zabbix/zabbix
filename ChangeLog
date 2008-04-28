@@ -1,5 +1,6 @@
 Changes for 1.5.1:
 
+ - [DEV-166] fixed problem with node syncing (Sasha)
  - [DEV-145] added Ldap authentication (Artem)
  - [DEV-147] added support network and disk stats under OpenBSD (Sasha)
  - [DEV-164] added required server performance info to Status of ZABBIX (Alexei)
