@@ -25,42 +25,35 @@
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	mode[128];
-	int	sysinfo_name = -1;
+	int	sysinfo_name;
 	long	ncpu = 0;
-	
-        assert(result);
 
-        init_result(result);
-	
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	assert(result);
 
-        if(get_param(param, 1, mode, sizeof(mode)) != 0)
-        {
-                mode[0] = '\0';
-        }
-        if(mode[0] == '\0')
-	{
-		/* default parameter */
+	init_result(result);
+
+	if (num_param(param) > 1)
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, mode, sizeof(mode)))
+		*mode = '\0';
+
+	/* default parameter */
+	if (*mode == '\0')
 		zbx_snprintf(mode, sizeof(mode), "online");
-	}
 
-	if(0 == strncmp(mode, "online", sizeof(mode)))
-	{
+	if (0 == strncmp(mode, "online", sizeof(mode)))
 		sysinfo_name = _SC_NPROCESSORS_ONLN;
-	}
 	else if(0 == strncmp(mode, "max", sizeof(mode)))
-	{
 		sysinfo_name = _SC_NPROCESSORS_CONF;
-	}
+	else
+		return SYSINFO_RET_FAIL;
 
-	if ( -1 == sysinfo_name || (-1 == (ncpu = sysconf(sysinfo_name)) && EINVAL == errno) )
+	if (-1 == (ncpu = sysconf(sysinfo_name)) && EINVAL == errno)
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, ncpu);
-	
+
 	return SYSINFO_RET_OK;
 }
 
@@ -72,19 +65,19 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	
 	int cpu_num = 0;
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 	
-        if(num_param(param) > 3)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(num_param(param) > 3)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(get_param(param, 1, cpuname, sizeof(cpuname)) != 0)
-        {
+	if(get_param(param, 1, cpuname, sizeof(cpuname)) != 0)
+	{
 		cpuname[0] = '\0';
-        }
+	}
 
 	if(cpuname[0] == '\0')
 	{
@@ -93,21 +86,21 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	}
 
 	if(get_param(param, 2, type, sizeof(type)) != 0)
-        {
-                type[0] = '\0';
-        }
-        if(type[0] == '\0')
+	{
+		type[0] = '\0';
+	}
+	if(type[0] == '\0')
 	{
 		/* default parameter */
 		zbx_snprintf(type, sizeof(type), "user");
 	}
 	
 	if(get_param(param, 3, mode, sizeof(mode)) != 0)
-        {
-                mode[0] = '\0';
-        }
+	{
+		mode[0] = '\0';
+	}
 	
-        if(mode[0] == '\0')
+	if(mode[0] == '\0')
 	{
 		/* default parameter */
 		zbx_snprintf(mode, sizeof(mode), "avg1");
@@ -175,7 +168,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 		
 	if(getloadavg(load, 3))
 	{
@@ -194,7 +187,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 		
 	if(getloadavg(load, 3))
 	{
@@ -213,7 +206,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	if(getloadavg(load, 3))
 	{
@@ -248,19 +241,19 @@ CPU_FNCLIST
 	char mode[MAX_STRING_LEN];
 	int i;
 	
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 	
-        if(num_param(param) > 2)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(num_param(param) > 2)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(get_param(param, 1, cpuname, sizeof(cpuname)) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(get_param(param, 1, cpuname, sizeof(cpuname)) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 	if(cpuname[0] == '\0')
 	{
 		/* default parameter */
@@ -272,10 +265,10 @@ CPU_FNCLIST
 	}
 	
 	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-        {
-                mode[0] = '\0';
-        }
-        if(mode[0] == '\0')
+	{
+		mode[0] = '\0';
+	}
+	if(mode[0] == '\0')
 	{
 		/* default parameter */
 		zbx_snprintf(mode, sizeof(mode), "avg1");
@@ -293,9 +286,9 @@ CPU_FNCLIST
 
 int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 	
 	return SYSINFO_RET_FAIL;
 }
@@ -310,9 +303,9 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 	
 	FILE *f;
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	if(NULL != ( f = fopen("/proc/stat","r") ))
 	{

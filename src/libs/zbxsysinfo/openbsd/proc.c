@@ -22,15 +22,20 @@
 
 #include <sys/sysctl.h>
 
-#define ARGS_START_SIZE 64
-
-int	proc_argv(pid_t pid, char ***argv, size_t *argv_alloc, int *argc)
-{
 #define DO_SUM 0
 #define DO_MAX 1
 #define DO_MIN 2
 #define DO_AVG 3
 
+#define ZBX_PROC_STAT_ALL 0
+#define ZBX_PROC_STAT_RUN 1
+#define ZBX_PROC_STAT_SLEEP 2
+#define ZBX_PROC_STAT_ZOMB 3
+	
+#define ARGS_START_SIZE 64
+
+int	proc_argv(pid_t pid, char ***argv, size_t *argv_alloc, int *argc)
+{
 	size_t	sz;
 	int	mib[4], ret;
 
@@ -85,11 +90,6 @@ void	collect_args(char **argv, int argc, char **args, size_t *args_alloc)
 
 int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define ZBX_PROC_STAT_ALL 0
-#define ZBX_PROC_STAT_RUN 1
-#define ZBX_PROC_STAT_SLEEP 2
-#define ZBX_PROC_STAT_ZOMB 3
-
 	char	procname[MAX_STRING_LEN],
 		buffer[MAX_STRING_LEN],
 		proccomm[MAX_STRING_LEN];
@@ -98,7 +98,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		mib[4];
 
 	double	value = 0.0,
-		memsize = -1.0;
+		memsize = 0;
 	int	proccount = 0;
 
 	size_t	sz;
@@ -193,13 +193,12 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 			comm_ok = 1;
 
 		if (proc_ok && comm_ok) {
-			proccount++;
 			value = proc[i].kp_eproc.e_vm.vm_tsize
 				+ proc[i].kp_eproc.e_vm.vm_dsize
 				+ proc[i].kp_eproc.e_vm.vm_ssize;
 			value *= pagesize;
 
-			if (memsize < 0)
+			if (0 == proccount++)
 				memsize = value;
 			else {
 				if (do_task == DO_MAX)
@@ -214,11 +213,6 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	zbx_free(proc);
 	zbx_free(argv);
 	zbx_free(args);
-
-	if (memsize < 0) {
-		/* incorrect process name */
-		memsize = 0;
-	}
 
 	if (do_task == DO_AVG) {
 		SET_DBL_RESULT(result, proccount == 0 ? 0 : memsize/proccount);

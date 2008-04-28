@@ -205,8 +205,6 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #else
 	unsigned char	respbuf[NS_PACKETSZ];
 #endif
-	char	buf[MAX_STRING_LEN];
-	char	data[MAX_STRING_LEN];
 
 	assert(result);
 
