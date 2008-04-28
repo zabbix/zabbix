@@ -137,10 +137,9 @@ include_once "include/page_header.php";
 		if(isset($_REQUEST["hostid"])){
 			$templateid=$_REQUEST["hostid"];
 			$result = false;
+
 // Permission check			
-			$tmp_hosts = array_diff($hosts,$available_hosts);
-			$hosts = array_diff($hosts,$tmp_hosts);
-			unset($tmp_hosts);
+			$hosts = array_intersect($hosts,$available_hosts);
 //--
 			DBstart();
 			foreach($hosts as $id => $hostid){
