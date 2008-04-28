@@ -37,6 +37,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.6:
 
+ - [ZBX-365] added support of long process names for proc.num and proc.mem, Linux 2.6 (Sasha)
  - [ZBX-78] fixed detection of net-snmp libs (Alexei)
  - [ZBX-348] fixed incorrect processing of large integer values for {ITEM.LASTVALUE} (Alexei)
  - [ZBX-337] added Oracle upgrade scripts (Sasha) 
