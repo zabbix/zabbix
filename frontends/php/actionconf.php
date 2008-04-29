@@ -38,54 +38,50 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 
-		"actionid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,					null),
-		"name"=>	array(T_ZBX_STR, O_OPT,	 null,	NOT_EMPTY,				'isset({save})'),
-		"eventsource"=>	array(T_ZBX_INT, O_MAND, null,
-			IN(array(EVENT_SOURCE_TRIGGERS,EVENT_SOURCE_DISCOVERY)),	null),
-		"evaltype"=>	array(T_ZBX_INT, O_OPT,	 null,
-			IN(array(ACTION_EVAL_TYPE_AND_OR,ACTION_EVAL_TYPE_AND,ACTION_EVAL_TYPE_OR)), 	'isset({save})'),
-		"status"=>	array(T_ZBX_INT, O_OPT,	 null,
-			IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)),			'isset({save})'),
+		"actionid"=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,					null),
+		"name"=>			array(T_ZBX_STR, O_OPT,	 null,	NOT_EMPTY,				'isset({save})'),
+		"eventsource"=>		array(T_ZBX_INT, O_MAND, null, IN(array(EVENT_SOURCE_TRIGGERS,EVENT_SOURCE_DISCOVERY)),	null),
+		"evaltype"=>		array(T_ZBX_INT, O_OPT,	 null, IN(array(ACTION_EVAL_TYPE_AND_OR,ACTION_EVAL_TYPE_AND,ACTION_EVAL_TYPE_OR)), 	'isset({save})'),
+		"status"=>			array(T_ZBX_INT, O_OPT,	 null, IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)),			'isset({save})'),
 
-		"g_actionid"=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
+		"g_actionid"=>		array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
 
-		"conditions"=>	array(null, O_OPT, null, null, null),
-		"g_conditionid"=> array(null, O_OPT, null, null, null),
+		"conditions"=>		array(null, O_OPT, null, null, null),
+		"g_conditionid"=> 	array(null, O_OPT, null, null, null),
 
-		"new_condition"=>		array(null, 	 O_OPT,  null,	null,	'isset({add_condition})'),
+		"new_condition"=>	array(null, 	 O_OPT,  null,	null,	'isset({add_condition})'),
 
 		"operations"=>		array(null, O_OPT, null, null, null),
 		"g_operationid"=>	array(null, O_OPT, null, null, null),
 
-		"edit_operationid"=>	array(null, O_OPT, P_ACT,	DB_ID,	null),
+		"edit_operationid"=>array(null, O_OPT, P_ACT,	DB_ID,	null),
 
 		"new_operation"=>	array(null, O_OPT,  null,	null,	'isset({add_operation})'),
 
 
 /* actions */
-		"group_delete"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"group_enable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"group_disable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"add_condition"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"del_condition"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"group_delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"group_enable"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"group_disable"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"add_condition"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"del_condition"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"cancel_new_condition"=>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"add_operation"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"del_operation"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"add_operation"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"del_operation"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"cancel_new_operation"=>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"clone"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"save"=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"clone"=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"delete"=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"cancel"=>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 /* other */
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"form"=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder();
+	validate_sort_and_sortorder('a.name',ZBX_SORT_UP);
 	
-	if(isset($_REQUEST['actionid']) && !action_accessible($_REQUEST['actionid'], PERM_READ_WRITE))
-	{
+	if(isset($_REQUEST['actionid']) && !action_accessible($_REQUEST['actionid'], PERM_READ_WRITE)){
 		access_deny();
 	}
 ?>
@@ -93,31 +89,24 @@ include_once "include/page_header.php";
 	update_profile('web.actionconf.eventsource',$_REQUEST['eventsource']);
 ?>
 <?php
-	if(inarr_isset(array('clone','actionid')))
-	{
+	if(inarr_isset(array('clone','actionid'))){
 		unset($_REQUEST['actionid']);
 		$_REQUEST['form'] = 'clone';
 	}
-	elseif(isset($_REQUEST['cancel_new_condition']))
-	{
+	else if(isset($_REQUEST['cancel_new_condition'])){
 		unset($_REQUEST['new_condition']);
 	}
-	elseif(isset($_REQUEST['cancel_new_operation']))
-	{
+	else if(isset($_REQUEST['cancel_new_operation'])){
 		unset($_REQUEST['new_operation']);
 	}
-	elseif(isset($_REQUEST['save']))
-	{
-		global $USER_DETAILS;
-
+	else if(isset($_REQUEST['save'])){
 		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
 		$conditions = get_request('conditions', array());
 		$operations = get_request('operations', array());
 
-		if(isset($_REQUEST['actionid']))
-		{
+		if(isset($_REQUEST['actionid'])){
 			$actionid=$_REQUEST['actionid'];
 			$result = update_action($actionid,
 				$_REQUEST['name'],$_REQUEST['eventsource'],
@@ -126,7 +115,8 @@ include_once "include/page_header.php";
 				);
 
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
-		} else {
+		} 
+		else {
 			$actionid=add_action(
 				$_REQUEST['name'],$_REQUEST['eventsource'],
 				$_REQUEST['evaltype'],$_REQUEST['status'],
@@ -137,18 +127,14 @@ include_once "include/page_header.php";
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 		}
 
-		if($result) // result - OK
-		{
+		if($result) // result - OK{
 			add_audit(!isset($_REQUEST['actionid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION, 
 				S_NAME.': '.$_REQUEST['name']);
 
 			unset($_REQUEST['form']);
 		}
 	}
-	elseif(inarr_isset(array('delete','actionid')))
-	{
-		global $USER_DETAILS;
-
+	else if(inarr_isset(array('delete','actionid'))){
 		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
@@ -156,20 +142,17 @@ include_once "include/page_header.php";
 
 		$result = delete_action($_REQUEST['actionid']);
 		show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
-		if($result)
-		{
+		if($result){
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ACTION,
 				'Id ['.$_REQUEST['actionid'].'] '.S_NAME.' ['.$action_data['name'].']');
 			unset($_REQUEST['form']);
 			unset($_REQUEST['actionid']);
 		}
 	}
-	elseif(inarr_isset(array('add_condition','new_condition')))
-	{
+	else if(inarr_isset(array('add_condition','new_condition'))){
 		$new_condition = $_REQUEST['new_condition'];
 
-		if( validate_condition($new_condition['type'],$new_condition['value']) )
-		{
+		if( validate_condition($new_condition['type'],$new_condition['value']) ){
 			$_REQUEST['conditions'] = get_request('conditions',array());
 			if(!str_in_array($new_condition,$_REQUEST['conditions']))
 				array_push($_REQUEST['conditions'],$new_condition);
@@ -177,30 +160,25 @@ include_once "include/page_header.php";
 			unset($_REQUEST['new_condition']);
 		}
 	}
-	elseif(inarr_isset(array('del_condition','g_conditionid')))
-	{
+	else if(inarr_isset(array('del_condition','g_conditionid'))){
 		$_REQUEST['conditions'] = get_request('conditions',array());
 		foreach($_REQUEST['g_conditionid'] as $val){
 			unset($_REQUEST['conditions'][$val]);
 		}
 	}
-	elseif(inarr_isset(array('add_operation','new_operation')))
-	{
+	else if(inarr_isset(array('add_operation','new_operation'))){
 		$new_operation = $_REQUEST['new_operation'];
 
-		if( validate_operation($new_operation) )
-		{
+		if(validate_operation($new_operation)){
 			zbx_rksort($new_operation);
 
 			$_REQUEST['operations'] = get_request('operations',array());
 
-			if(!isset($new_operation['id']))
-			{
+			if(!isset($new_operation['id'])){
 				if(!str_in_array($new_operation,$_REQUEST['operations']))
 					array_push($_REQUEST['operations'],$new_operation);
 			}
-			else
-			{
+			else{
 				$id = $new_operation['id'];
 				unset($new_operation['id']);
 				$_REQUEST['operations'][$id] = $new_operation;
@@ -209,29 +187,24 @@ include_once "include/page_header.php";
 			unset($_REQUEST['new_operation']);
 		}
 	}
-	elseif(inarr_isset(array('del_operation','g_operationid')))
-	{
+	else if(inarr_isset(array('del_operation','g_operationid'))){
 		$_REQUEST['operations'] = get_request('operations',array());
 		foreach($_REQUEST['g_operationid'] as $val){
 			unset($_REQUEST['operations'][$val]);
 		}
 	}
-	elseif(inarr_isset(array('edit_operationid')))
-	{	
+	else if(inarr_isset(array('edit_operationid'))){	
 		$_REQUEST['edit_operationid'] = array_keys($_REQUEST['edit_operationid']);
 		$edit_operationid = $_REQUEST['edit_operationid'] =array_pop($_REQUEST['edit_operationid']);
 		$_REQUEST['operations'] = get_request('operations',array());
-		if(isset($_REQUEST['operations'][$edit_operationid]))
-		{
+		
+		if(isset($_REQUEST['operations'][$edit_operationid])){
 			$_REQUEST['new_operation'] = $_REQUEST['operations'][$edit_operationid];
 			$_REQUEST['new_operation']['id'] = $edit_operationid;
 		}
 	}
 /* GROUP ACTIONS */
-	elseif(isset($_REQUEST['group_enable'])&&isset($_REQUEST['g_actionid']))
-	{
-		global $USER_DETAILS;
-
+	else if(isset($_REQUEST['group_enable'])&&isset($_REQUEST['g_actionid'])){
 		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 		
@@ -242,21 +215,18 @@ include_once "include/page_header.php";
 		$result=DBselect($query);
 		
 		$actionids = array();
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			$res = update_action_status($row['actionid'],0);
 			if($res)
 				$actionids[] = $row['actionid'];
 		}
-		if(isset($res))
-		{
+		
+		if(isset($res)){
 			show_messages(true, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] enabled');
 		}
 	}
-	elseif(isset($_REQUEST['group_disable'])&&isset($_REQUEST['g_actionid']))
-	{
-		global $USER_DETAILS;
+	else if(isset($_REQUEST['group_disable'])&&isset($_REQUEST['g_actionid'])){
 
 		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
@@ -268,22 +238,18 @@ include_once "include/page_header.php";
 		$result=DBselect($query);
 
 		$actionids = array();
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			$res = update_action_status($row['actionid'],1);
 			if($res) 
 				$actionids[] = $row['actionid'];
 		}
-		if(isset($res))
-		{
+		
+		if(isset($res)){
 			show_messages(true, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] disabled');
 		}
 	}
-	elseif(isset($_REQUEST['group_delete'])&&isset($_REQUEST['g_actionid']))
-	{
-		global $USER_DETAILS;
-
+	else if(isset($_REQUEST['group_delete'])&&isset($_REQUEST['g_actionid'])){
 		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
@@ -292,20 +258,18 @@ include_once "include/page_header.php";
 				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') '
 				);
 		$actionids = array();
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			$del_res = delete_action($row['actionid']);
 			if($del_res) 
 				$actionids[] = $row['actionid'];
 		}
-		if(isset($del_res))
-		{
+		
+		if(isset($del_res)){
 			show_messages(TRUE, S_ACTIONS_DELETED, S_CANNOT_DELETE_ACTIONS);
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] deleted');
 		}
 	}
 ?>
-
 <?php
 /* header */
 	$form = new CForm();
@@ -316,13 +280,11 @@ include_once "include/page_header.php";
 	show_table_header(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
 	echo SBR;
 
-	if(isset($_REQUEST['form']))
-	{
+	if(isset($_REQUEST['form'])){
 /* form */
 		insert_action_form();
 	}
-	else
-	{
+	else{
 		$form = new CForm();
 		$form->SetMethod('get');
 		
@@ -352,15 +314,13 @@ include_once "include/page_header.php";
 							' WHERE a.eventsource='.$_REQUEST['eventsource'].
 								' AND '.DBin_node('actionid').
 							order_by('a.name,a.status','a.actionid'));
-		while($action_data = DBfetch($db_actions))
-		{
+		while($action_data = DBfetch($db_actions)){
 			if(!action_accessible($action_data['actionid'], PERM_READ_WRITE)) continue;
 
 			$conditions=array();
 			$db_conditions = DBselect('select * from conditions where actionid='.$action_data['actionid'].
 				' order by conditiontype,conditionid');
-			while($condition_data = DBfetch($db_conditions))
-			{
+			while($condition_data = DBfetch($db_conditions)){
 				array_push($conditions, array(get_condition_desc(
 							$condition_data['conditiontype'],
 							$condition_data['operator'],
@@ -374,14 +334,12 @@ include_once "include/page_header.php";
 			while($operation_data = DBfetch($db_operations))
 				array_push($operations,array(get_operation_desc(SHORT_DESCRITION, $operation_data),BR()));
 				
-			if($action_data['status'] == ACTION_STATUS_DISABLED)
-			{
+			if($action_data['status'] == ACTION_STATUS_DISABLED){
 				$status= new CLink(S_DISABLED,
 					'actionconf.php?group_enable=1&g_actionid%5B%5D='.$action_data['actionid'].url_param('eventsource'),
 					'disabled');
 			}
-			else
-			{
+			else{
 				$status= new CLink(S_ENABLED,
 					'actionconf.php?group_disable=1&g_actionid%5B%5D='.$action_data['actionid'].url_param('eventsource'),
 					'enabled');

@@ -24,9 +24,10 @@
 	require_once "include/httptest.inc.php";
 	require_once "include/forms.inc.php";
 
-        $page["title"] = "S_STATUS_OF_WEB_MONITORING";
-        $page["file"] = "httpmon.php";
+	$page["title"] = "S_STATUS_OF_WEB_MONITORING";
+	$page["file"] = "httpmon.php";
 	$page['hist_arg'] = array('open','groupid','hostid');
+	
 	define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once "include/page_header.php";
@@ -46,7 +47,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder();
+	validate_sort_and_sortorder('wt.name',ZBX_SORT_DOWN);
 
 	$options = array('allow_all_hosts','monitored_hosts');//,'always_select_first_host'
 
