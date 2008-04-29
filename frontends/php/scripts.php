@@ -198,6 +198,8 @@ if(isset($_REQUEST['form'])){
 	$frmScr->Show();
 }
 else {
+	validate_sort_and_sortorder('s.name',ZBX_SORT_UP);
+	
 	$form = new CForm();
 	$form->SetName('scripts');
 	$form->AddOption('id','scripts');
@@ -206,8 +208,8 @@ else {
 	
 	$table=new CTableInfo(S_NO_SCRIPTS_DEFINED);
 	$table->setHeader(array(
-				array(new CCheckBox('all_scripts',null,"CheckAll('".$form->GetName()."','all_scripts');"),S_NAME),
-						S_COMMAND, 
+				array(new CCheckBox('all_scripts',null,"CheckAll('".$form->GetName()."','all_scripts');"),make_sorting_link(S_NAME,'s.name')),
+						make_sorting_link(S_COMMAND,'s.command'), 
 						S_USER_GROUP,
 						S_HOST_GROUP,
 						S_HOST_ACCESS
@@ -217,7 +219,7 @@ else {
 	$sql = 'SELECT s.* '.
 			' FROM scripts s '.
 			' WHERE '.DBin_node('s.scriptid').
-			' ORDER BY s.scriptid ASC';
+			order_by('s.name,s.command');
 	
 	$scripts=DBselect($sql);
 	

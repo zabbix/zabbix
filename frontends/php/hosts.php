@@ -117,7 +117,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder();
+	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 	
 	if($_REQUEST["config"]==4)
 		validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host","only_current_node"),'web.last.conf.groupid', 'web.last.conf.hostid');

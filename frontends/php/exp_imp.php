@@ -61,7 +61,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder();
+	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 	
 	$preview = isset($_REQUEST['preview']) ? true : false;
 	$config = get_request('config', 0);

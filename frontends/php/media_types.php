@@ -35,27 +35,16 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
 // media form
-		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,
-						'(isset({form})&&({form}=="update"))'),
-		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN(implode(',',
-						array(ALERT_TYPE_EMAIL,ALERT_TYPE_EXEC,ALERT_TYPE_SMS,ALERT_TYPE_JABBER))),
-						'(isset({save}))'),
-		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'(isset({save}))'),
-		"smtp_server"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'isset({type})&&({type}=='.ALERT_TYPE_EMAIL.')&&isset({save})'),
-		"smtp_helo"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'isset({type})&&({type}=='.ALERT_TYPE_EMAIL.')&&isset({save})'),
-		"smtp_email"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'isset({type})&&({type}=='.ALERT_TYPE_EMAIL.')&&isset({save})'),
-		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'isset({type})&&({type}=='.ALERT_TYPE_EXEC.')&&isset({save})'),
-		"gsm_modem"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'isset({type})&&({type}=='.ALERT_TYPE_SMS.')&&isset({save})'),
-		"username"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'(isset({type})&&{type}=='.ALERT_TYPE_JABBER.')&&isset({save})'),
-		"password"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'isset({type})&&({type}=='.ALERT_TYPE_JABBER.')&&isset({save})'),
+		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
+		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN(implode(',',array(ALERT_TYPE_EMAIL,ALERT_TYPE_EXEC,ALERT_TYPE_SMS,ALERT_TYPE_JABBER))),'(isset({save}))'),
+		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({save}))'),
+		"smtp_server"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.ALERT_TYPE_EMAIL.')&&isset({save})'),
+		"smtp_helo"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.ALERT_TYPE_EMAIL.')&&isset({save})'),
+		"smtp_email"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.ALERT_TYPE_EMAIL.')&&isset({save})'),
+		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.ALERT_TYPE_EXEC.')&&isset({save})'),
+		"gsm_modem"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.ALERT_TYPE_SMS.')&&isset({save})'),
+		"username"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({type})&&{type}=='.ALERT_TYPE_JABBER.')&&isset({save})'),
+		"password"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.ALERT_TYPE_JABBER.')&&isset({save})'),
 /* actions */
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -66,16 +55,14 @@ include_once "include/page_header.php";
 	);
 	
 	check_fields($fields);
-	validate_sort_and_sortorder();
+	validate_sort_and_sortorder('mt.description',ZBX_SORT_UP);
 ?>
 <?php
 
 /* MEDIATYPE ACTIONS */
 	$result = 0;
-	if(isset($_REQUEST["save"]))
-	{
-		if(isset($_REQUEST["mediatypeid"]))
-		{
+	if(isset($_REQUEST["save"])){
+		if(isset($_REQUEST["mediatypeid"])){
 /* UPDATE */
 			$action = AUDIT_ACTION_UPDATE;
 			$result=update_mediatype($_REQUEST["mediatypeid"],
@@ -85,8 +72,7 @@ include_once "include/page_header.php";
 
 			show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
 		}
-		else
-		{
+		else{
 /* ADD */
 			$action = AUDIT_ACTION_ADD;
 			$result=add_mediatype(

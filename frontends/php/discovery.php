@@ -34,7 +34,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder();
+	validate_sort_and_sortorder('dhostid',ZBX_SORT_UP);
 
 	$r_form = new CForm();
 	$r_form->SetMethod('get');

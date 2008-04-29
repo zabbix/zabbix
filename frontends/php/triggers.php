@@ -36,76 +36,76 @@ include_once "include/page_header.php";
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"groupid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
-		"hostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({save})'),
+		'groupid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
+		'hostid'=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({save})'),
 
-		"triggerid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
+		'triggerid'=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
 
-		"copy_type"	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN("0,1"),'isset({copy})'),
-		"copy_mode"	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN("0"),NULL),
+		'copy_type'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1'),'isset({copy})'),
+		'copy_mode'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),NULL),
 
 		'type'=>	array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	'isset({save})'),
-		"description"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
-		"expression"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
-		"priority"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4,5"),'isset({save})'),
-		"comments"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
-		"url"=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
-		"status"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,NULL),
+		'description'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
+		'expression'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
+		'priority'=>	array(T_ZBX_INT, O_OPT,  NULL,  IN('0,1,2,3,4,5'),'isset({save})'),
+		'comments'=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
+		'url'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
+		'status'=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,NULL),
 
-		"dependencies"=>		array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
-		"new_dependence"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID.'{}>0','isset({add_dependence})'),
-		"rem_dependence"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
+		'dependencies'=>		array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
+		'new_dependence'=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID.'{}>0','isset({add_dependence})'),
+		'rem_dependence'=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
 
-		"g_triggerid"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
-		"copy_targetid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
-		"filter_groupid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
+		'g_triggerid'=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
+		'copy_targetid'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
+		'filter_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 
-		"showdisabled"=>	array(T_ZBX_INT, O_OPT, P_SYS, IN("0,1"),	NULL),
+		'showdisabled'=>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	NULL),
 		
 /* actions */
-		"add_dependence"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"del_dependence"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"group_enable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"group_disable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"group_delete"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"copy"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"clone"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'add_dependence'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'del_dependence'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'group_enable'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'group_disable'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'group_delete'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'copy'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 /* other */
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		"form_copy_to"=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
+		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'form_copy_to'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
-	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.triggers.showdisabled", 0));
+	$_REQUEST['showdisabled'] = get_request('showdisabled', get_profile('web.triggers.showdisabled', 0));
 	
 	check_fields($fields);
-	validate_sort_and_sortorder();
+	validate_sort_and_sortorder('t.description',ZBX_SORT_UP);
 	
-	if(isset($_REQUEST["triggerid"]))
-		if(!check_right_on_trigger_by_triggerid(PERM_READ_WRITE, $_REQUEST["triggerid"]))
+	if(isset($_REQUEST['triggerid']))
+		if(!check_right_on_trigger_by_triggerid(PERM_READ_WRITE, $_REQUEST['triggerid']))
 			access_deny();
 
-	$showdisabled = get_request("showdisabled", 0);
+	$showdisabled = get_request('showdisabled', 0);
 
-	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host","with_items","only_current_node"),
+	validate_group_with_host(PERM_READ_WRITE,array('allow_all_hosts','always_select_first_host','with_items','only_current_node'),
 		'web.last.conf.groupid', 'web.last.conf.hostid');
 ?>
 <?php
-	update_profile("web.triggers.showdisabled",$showdisabled);
+	update_profile('web.triggers.showdisabled',$showdisabled);
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
 
 /* FORM ACTIONS */
-	if(isset($_REQUEST["clone"]) && isset($_REQUEST["triggerid"])){
-		unset($_REQUEST["triggerid"]);
-		$_REQUEST["form"] = "clone";
+	if(isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])){
+		unset($_REQUEST['triggerid']);
+		$_REQUEST['form'] = 'clone';
 	}
-	else if(isset($_REQUEST["save"])){
+	else if(isset($_REQUEST['save'])){
 		show_messages();
-		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST["expression"]))
+		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST['expression']))
 			access_deny();
 
 		$now=time();
@@ -114,31 +114,31 @@ include_once "include/page_header.php";
 
 		$type = $_REQUEST['type'];
 
-		$deps = get_request("dependencies",array());
+		$deps = get_request('dependencies',array());
 
-		if(isset($_REQUEST["triggerid"])){
-			$trigger_data = get_trigger_by_triggerid($_REQUEST["triggerid"]);
+		if(isset($_REQUEST['triggerid'])){
+			$trigger_data = get_trigger_by_triggerid($_REQUEST['triggerid']);
 			if($trigger_data['templateid']){
-				$_REQUEST["description"] = $trigger_data["description"];
-				$_REQUEST["expression"] = explode_exp($trigger_data["expression"],0);
+				$_REQUEST['description'] = $trigger_data['description'];
+				$_REQUEST['expression'] = explode_exp($trigger_data['expression'],0);
 			}
 
 			DBstart();
-			$result=update_trigger($_REQUEST["triggerid"],
-				$_REQUEST["expression"],$_REQUEST["description"],$type,
-				$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
+			$result=update_trigger($_REQUEST['triggerid'],
+				$_REQUEST['expression'],$_REQUEST['description'],$type,
+				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
 				$deps, $trigger_data['templateid']);
 			$result = DBend();
 			
-			$triggerid = $_REQUEST["triggerid"];
+			$triggerid = $_REQUEST['triggerid'];
 			$audit_action = AUDIT_ACTION_UPDATE;
 
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		} 
 		else {
 			DBstart();
-			$triggerid=add_trigger($_REQUEST["expression"],$_REQUEST["description"],$type,
-				$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
+			$triggerid=add_trigger($_REQUEST['expression'],$_REQUEST['description'],$type,
+				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
 				$deps);
 			$result = DBend();
 						
@@ -147,11 +147,11 @@ include_once "include/page_header.php";
 		}
 
 		if($result){
-			add_audit($audit_action, AUDIT_RESOURCE_TRIGGER,S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ");
-			unset($_REQUEST["form"]);
+			add_audit($audit_action, AUDIT_RESOURCE_TRIGGER,S_TRIGGER.' ['.$triggerid.'] ['.expand_trigger_description($triggerid).'] ');
+			unset($_REQUEST['form']);
 		}
 	}
-	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["triggerid"])){
+	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['triggerid'])){
 		$result = false;
 		
 		if($trigger_data = DBfetch(
@@ -173,13 +173,13 @@ include_once "include/page_header.php";
 		
 		if($result){
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER,
-				S_TRIGGER." [".$_REQUEST["triggerid"]."] [".expand_trigger_description_by_data($trigger_data)."] ");
+				S_TRIGGER.' ['.$_REQUEST['triggerid'].'] ['.expand_trigger_description_by_data($trigger_data).'] ');
 			
-			unset($_REQUEST["form"]);
-			unset($_REQUEST["triggerid"]);
+			unset($_REQUEST['form']);
+			unset($_REQUEST['triggerid']);
 		}
 	}
-	else if(isset($_REQUEST["copy"])&&isset($_REQUEST["g_triggerid"])&&isset($_REQUEST["form_copy_to"])){
+	else if(isset($_REQUEST['copy'])&&isset($_REQUEST['g_triggerid'])&&isset($_REQUEST['form_copy_to'])){
 		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
 			if(0 == $_REQUEST['copy_type']){ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
@@ -201,11 +201,11 @@ include_once "include/page_header.php";
 				}
 			}
 
-			foreach($_REQUEST["g_triggerid"] as $trigger_id)
+			foreach($_REQUEST['g_triggerid'] as $trigger_id)
 				foreach($hosts_ids as $host_id){
 					copy_trigger_to_host($trigger_id, $host_id, true);
 				}
-			unset($_REQUEST["form_copy_to"]);
+			unset($_REQUEST['form_copy_to']);
 		}
 		else{
 			error('No target selection.');
@@ -213,9 +213,9 @@ include_once "include/page_header.php";
 		show_messages();
 	}
 /* DEPENDENCE ACTIONS */
-	else if(isset($_REQUEST["add_dependence"])&&isset($_REQUEST["new_dependence"])){
-		if(!isset($_REQUEST["dependencies"]))
-			$_REQUEST["dependencies"] = array();
+	else if(isset($_REQUEST['add_dependence'])&&isset($_REQUEST['new_dependence'])){
+		if(!isset($_REQUEST['dependencies']))
+			$_REQUEST['dependencies'] = array();
 
 		if(!uint_in_array($_REQUEST["new_dependence"], $_REQUEST["dependencies"]))
 			array_push($_REQUEST["dependencies"], $_REQUEST["new_dependence"]);

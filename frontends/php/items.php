@@ -24,8 +24,8 @@
 	require_once "include/items.inc.php";
 	require_once "include/forms.inc.php";
 
-        $page["title"] = "S_CONFIGURATION_OF_ITEMS";
-        $page["file"] = "items.php";
+	$page["title"] = "S_CONFIGURATION_OF_ITEMS";
+	$page["file"] = "items.php";
 	$page['hist_arg'] = array();
 
 include_once "include/page_header.php";
@@ -33,146 +33,144 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"external_filter"=>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
-		"selection_mode"=>	array(T_ZBX_INT, O_OPT,	null,	IN("0,1"),		null),
+		'external_filter'=>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
+		'selection_mode'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		null),
 
-		"type_visible"=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"community_visible"=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"securityname_visible"=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"securitylevel_visible"=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"authpassphrase_visible"=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"privpassphras_visible"=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"port_visible"=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"value_type_visible"=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"units_visible"=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"formula_visible"=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"delay_visible"=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"delay_flex_visible"=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"history_visible"=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"trends_visible"=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"status_visible"=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"logtimefmt_visible"=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"delta_visible"=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"valuemapid_visible"=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"trapper_hosts_visible"=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
-		"applications_visible"=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'type_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'community_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'securityname_visible'=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'securitylevel_visible'=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'authpassphrase_visible'=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'privpassphras_visible'=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'port_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'value_type_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'units_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'formula_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'delay_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'delay_flex_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'history_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'trends_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'status_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'logtimefmt_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'delta_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'valuemapid_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'trapper_hosts_visible'=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
+		'applications_visible'=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
 
-		"with_node"=>		array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,	null,		null),
-		"with_group"=>		array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,	null,		null),
-		"with_host"=>		array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,	null,		null),
-		"with_application"=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,	null,		null),
-		"with_description"=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,	null,		null),
-		"with_type"=>		array(T_ZBX_INT, O_OPT,  null,  
+		'with_node'=>		array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,	null,		null),
+		'with_group'=>		array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,	null,		null),
+		'with_host'=>		array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,	null,		null),
+		'with_application'=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,	null,		null),
+		'with_description'=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,	null,		null),
+		'with_type'=>		array(T_ZBX_INT, O_OPT,  null,  
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
 				ITEM_TYPE_AGGREGATE,ITEM_TYPE_HTTPTEST,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR)),null),
-		"with_key"=>		array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null,		null),
-		"with_snmp_community"=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null,	null),
-		"with_snmp_oid"=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null,	null),
-		"with_snmp_port"=>	array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),	null),
-		"with_snmpv3_securityname"=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null, null),
-		"with_snmpv3_securitylevel"=>	array(T_ZBX_INT, O_OPT,  null,  IN("-1,0,1,2"), null),
-		"with_snmpv3_authpassphrase"=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null, null),
-		"with_snmpv3_privpassphrase"=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null, null),
-		"with_value_type"=>	array(T_ZBX_INT, O_OPT,  null,  IN("-1,0,1,2,3,4"),null),
-		"with_units"=>	array(T_ZBX_STR, O_OPT,  null,  P_UNSET_EMPTY, null, null),
-		"with_formula"=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null, null),
-		"with_delay"=>		array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,86400),null),
-		"with_history"=>	array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),null),
-		"with_trends"=>		array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),null),
-		"with_status"=>		array(T_ZBX_INT, O_OPT,  null,  IN("-1,0,1,3"),null),
-		"with_logtimefmt"=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null, null),
-		"with_delta"=>	array(T_ZBX_INT, O_OPT,  null,  IN("-1,0,1,2"), null),
-		"with_trapper_hosts"=>array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null, null),
+		'with_key'=>		array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null,		null),
+		'with_snmp_community'=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null,	null),
+		'with_snmp_oid'=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null,	null),
+		'with_snmp_port'=>	array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),	null),
+		'with_snmpv3_securityname'=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null, null),
+		'with_snmpv3_securitylevel'=>	array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,2'), null),
+		'with_snmpv3_authpassphrase'=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null, null),
+		'with_snmpv3_privpassphrase'=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null, null),
+		'with_value_type'=>	array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,2,3,4'),null),
+		'with_units'=>	array(T_ZBX_STR, O_OPT,  null,  P_UNSET_EMPTY, null, null),
+		'with_formula'=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null, null),
+		'with_delay'=>		array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,86400),null),
+		'with_history'=>	array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),null),
+		'with_trends'=>		array(T_ZBX_INT, O_OPT,  P_UNSET_EMPTY,  BETWEEN(0,65535),null),
+		'with_status'=>		array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,3'),null),
+		'with_logtimefmt'=>	array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null, null),
+		'with_delta'=>	array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,2'), null),
+		'with_trapper_hosts'=>array(T_ZBX_STR, O_OPT,  P_UNSET_EMPTY,  null, null),
 
-		"groupid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,null),
-		"hostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({save})'),
+		'groupid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,null),
+		'hostid'=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({save})'),
 
-		"add_groupid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,		'(isset({register})&&({register}=="go"))'),
-		"action"=>	array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,		'(isset({register})&&({register}=="go"))'),
+		'add_groupid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,		'(isset({register})&&({register}=="go"))'),
+		'action'=>	array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,		'(isset({register})&&({register}=="go"))'),
 
-		"copy_type"	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN("0,1"),	'isset({copy})'),
-		"copy_mode"	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN("0"),null),
+		'copy_type'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1'),	'isset({copy})'),
+		'copy_mode'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),null),
 
-		"itemid"=>	array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-		"description"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
-		"key"=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
-		"delay"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),'isset({save})&&(isset({type})&&({type}!=2))'),
-		"new_delay_flex"=>	array(T_ZBX_STR, O_OPT,  NOT_EMPTY,  "",'isset({add_delay_flex})&&(isset({type})&&({type}!=2))'),
-		"rem_delay_flex"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),null),
-		"delay_flex"=>	array(T_ZBX_STR, O_OPT,  null,  "",null),
-		"history"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})'),
-		"status"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})'),
-		"type"=>	array(T_ZBX_INT, O_OPT,  null,  
+		'itemid'=>	array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
+		'description'=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
+		'key'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
+		'delay'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),'isset({save})&&(isset({type})&&({type}!=2))'),
+		'new_delay_flex'=>	array(T_ZBX_STR, O_OPT,  NOT_EMPTY,  '','isset({add_delay_flex})&&(isset({type})&&({type}!=2))'),
+		'rem_delay_flex'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),null),
+		'delay_flex'=>	array(T_ZBX_STR, O_OPT,  null,  '',null),
+		'history'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})'),
+		'status'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})'),
+		'type'=>	array(T_ZBX_INT, O_OPT,  null,  
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 					ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_AGGREGATE,ITEM_TYPE_HTTPTEST,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR)),'isset({save})'),
-		"trends"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),		'isset({save})'),
-		"value_type"=>	array(T_ZBX_INT, O_OPT,  null,  IN("0,1,2,3,4"),	'isset({save})'),
-		"valuemapid"=>	array(T_ZBX_INT, O_OPT,	 null,	DB_ID,				'isset({save})'),
-		"params"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
+		'trends'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),		'isset({save})'),
+		'value_type'=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2,3,4'),	'isset({save})'),
+		'valuemapid'=>	array(T_ZBX_INT, O_OPT,	 null,	DB_ID,				'isset({save})'),
+		'params'=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
 
-		"snmp_community"=>array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})&&isset({type})&&'.IN("1,4","type")),
-		"snmp_oid"=>	array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,			'isset({save})&&isset({type})&&'.IN("1,4,6","type")),
-		"snmp_port"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN("1,4,6","type")),
+		'snmp_community'=>array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})&&isset({type})&&'.IN('1,4','type')),
+		'snmp_oid'=>	array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,			'isset({save})&&isset({type})&&'.IN('1,4,6','type')),
+		'snmp_port'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN('1,4,6','type')),
 
-		"snmpv3_securitylevel"=>array(T_ZBX_INT, O_OPT,  null,  IN("0,1,2"),	'isset({save})&&(isset({type})&&({type}==6))'),
-		"snmpv3_securityname"=>array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&(isset({type})&&({type}==6))'),
-		"snmpv3_authpassphrase"=>array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&(isset({type})&&({type}==6))'),
-		"snmpv3_privpassphrase"=>array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&(isset({type})&&({type}==6))'),
+		'snmpv3_securitylevel'=>array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&(isset({type})&&({type}==6))'),
+		'snmpv3_securityname'=>array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&(isset({type})&&({type}==6))'),
+		'snmpv3_authpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&(isset({type})&&({type}==6))'),
+		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&(isset({type})&&({type}==6))'),
 
-		"trapper_hosts"=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&isset({type})&&({type}==2)'),
-		"units"=>	array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&'.IN("0,3","type")),
-		"multiplier"=>	array(T_ZBX_INT, O_OPT,  null,  IN("0,1"),	'isset({save})&&isset({type})&&'.IN("0,3","type")),
-		"delta"=>	array(T_ZBX_INT, O_OPT,  null,  IN("0,1,2"),	'isset({save})&&isset({type})&&'.IN("0,3","type")),
+		'trapper_hosts'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&isset({type})&&({type}==2)'),
+		'units'=>	array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&'.IN('0,3','type')),
+		'multiplier'=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1'),	'isset({save})&&isset({type})&&'.IN('0,3','type')),
+		'delta'=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&isset({type})&&'.IN('0,3','type')),
 
-		"formula"=>	array(T_ZBX_DBL, O_OPT,  null,  null,			'isset({save})&&(isset({multiplier})&&({multiplier}==1))'),
-		"logtimefmt"=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({value_type})&&({value_type}==2))'),
+		'formula'=>	array(T_ZBX_DBL, O_OPT,  null,  null,			'isset({save})&&(isset({multiplier})&&({multiplier}==1))'),
+		'logtimefmt'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({value_type})&&({value_type}==2))'),
                  
-		"group_itemid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
-		"copy_targetid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
-		"filter_groupid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
-		"applications"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
+		'group_itemid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
+		'copy_targetid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
+		'filter_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
+		'applications'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
 
-		"showdisabled"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	null),
+		'showdisabled'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null),
 		
-		"del_history"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"add_delay_flex"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"del_delay_flex"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'del_history'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'add_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'del_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
-		"register"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"group_task"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"clone"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"update"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"copy"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"select"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_copy_to"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_mass_update"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
+		'register'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'group_task'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'update'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'copy'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'select'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_copy_to'=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_mass_update'=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
 	);
 
-	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.items.showdisabled", 0));
+	$_REQUEST['showdisabled'] = get_request('showdisabled', get_profile('web.items.showdisabled', 0));
 	
 	check_fields($fields);
-	validate_sort_and_sortorder();
+	validate_sort_and_sortorder('i.description',ZBX_SORT_UP);
 	
-	$showdisabled = get_request("showdisabled", 0);
+	$showdisabled = get_request('showdisabled', 0);
 	
 	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 
-	if(isset($_REQUEST['hostid']) && !uint_in_array($_REQUEST['hostid'], explode(',',$accessible_hosts)))
-	{
+	if(isset($_REQUEST['hostid']) && !uint_in_array($_REQUEST['hostid'], explode(',',$accessible_hosts))){
 		unset($_REQUEST['hostid']);
 	}
 		
-	validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host","only_current_node"),
-		'web.last.conf.groupid', 'web.last.conf.hostid');
+	validate_group_with_host(PERM_READ_WRITE,array('always_select_first_host','only_current_node'),'web.last.conf.groupid', 'web.last.conf.hostid');
 
-	update_profile("web.items.showdisabled",$showdisabled);
+	update_profile('web.items.showdisabled',$showdisabled);
 ?>
 <?php
 	$result = 0;
@@ -186,9 +184,9 @@ include_once "include/page_header.php";
 			unset($_REQUEST['delay_flex'][$val]);
 		}
 	}
-	else if(isset($_REQUEST["add_delay_flex"])&&isset($_REQUEST["new_delay_flex"])){
-		$_REQUEST['delay_flex'] = get_request("delay_flex", array());
-		array_push($_REQUEST['delay_flex'],$_REQUEST["new_delay_flex"]);
+	else if(isset($_REQUEST['add_delay_flex'])&&isset($_REQUEST['new_delay_flex'])){
+		$_REQUEST['delay_flex'] = get_request('delay_flex', array());
+		array_push($_REQUEST['delay_flex'],$_REQUEST['new_delay_flex']);
 	}
 	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["itemid"])){
 		$result = false;

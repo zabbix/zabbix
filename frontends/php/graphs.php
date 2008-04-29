@@ -84,7 +84,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder();
+	validate_sort_and_sortorder('g.name',ZBX_SORT_UP);
 
 	$options = array("allow_all_hosts","with_monitored_items","only_current_node","always_select_first_host");
 	validate_group_with_host(PERM_READ_WRITE,$options,'web.last.conf.groupid', 'web.last.conf.hostid');
