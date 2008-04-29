@@ -43,8 +43,7 @@
 <?php
 	$sessionid = get_cookie('zbx_sessionid', null);
 	
-	if(isset($_REQUEST["reconnect"]) && isset($sessionid))
-	{
+	if(isset($_REQUEST["reconnect"]) && isset($sessionid)){
 		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,"Manual Logout");
 		
 		zbx_unsetcookie('zbx_sessionid');
@@ -63,16 +62,27 @@
 		$name = get_request('name','');
 		$password = md5(get_request('password',''));
 		
-		switch($config['authentication_type']){
-			case ZBX_AUTH_LDAP:
-				$login = ldap_authentication($name,get_request('password',''));
-				break;
-			case ZBX_AUTH_INTERNAL:
-			default:
-				$alt_auth = ZBX_AUTH_INTERNAL;
-				$login = true;
+		$sql = 'SELECT u.userid,u.attempt_failed, u.attempt_clock, u.attempt_ip '.
+				' FROM users u '.
+				' WHERE u.alias='.zbx_dbstr($name).
+					' AND ( attempt_failed<'.ZBX_LOGIN_ATTEMPTS.
+							' OR (attempt_failed>'.(ZBX_LOGIN_ATTEMPTS-1).
+									' AND ('.time().'-attempt_clock)>'.ZBX_LOGIN_BLOCK.'))';
+					
+		$login = $attempt = DBfetch(DBselect($sql));
+		
+		if($login){
+			switch($config['authentication_type']){
+				case ZBX_AUTH_LDAP:
+					$login = ldap_authentication($name,get_request('password',''));
+					break;
+				case ZBX_AUTH_INTERNAL:
+				default:
+					$alt_auth = ZBX_AUTH_INTERNAL;
+					$login = true;
+			}
 		}
-
+		
 		if($login){
 			$login = $row = DBfetch(DBselect('SELECT u.userid,u.alias,u.name,u.surname,u.url,u.refresh,u.passwd '.
 						' FROM users u, users_groups ug, usrgrp g '.
@@ -89,13 +99,12 @@
 		if($login){
 			$login = (check_perm2login($row['userid']) && check_perm2system($row['userid']));
 		}
-
+		
 		if($login){
 			$sessionid = md5(time().$password.$name.rand(0,10000000));
 			zbx_setcookie('zbx_sessionid',$sessionid);
 			
-			DBexecute("insert into sessions (sessionid,userid,lastaccess)".
-				" values (".zbx_dbstr($sessionid).",".$row["userid"].",".time().")");
+			DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess) VALUES ('.zbx_dbstr($sessionid).','.$row['userid'].','.time().')');
 
 			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,"Correct login [".$name."]");
 			
@@ -113,16 +122,25 @@
 		else{
 			$row = NULL;
 			
-			$_REQUEST['message'] = "Login name or password is incorrect";
-			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,"Login failed [".$name."]");
+			$_REQUEST['message'] = 'Login name or password is incorrect';
+			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,'Login failed ['.$name.']');
+			
+			if($attempt){
+				$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];			
+				$attempt['attempt_failed']++;
+				$sql = 'UPDATE users SET attempt_failed='.zbx_dbstr($attempt['attempt_failed']).
+										', attempt_clock='.time().
+										', attempt_ip='.zbx_dbstr($ip).
+									' WHERE userid='.zbx_dbstr($attempt['userid']);
+				DBexecute($sql);
+			}
 		}
 	}
 
 include_once "include/page_header.php";
 	
 	if(isset($_REQUEST['message'])) show_error_message($_REQUEST['message']);
-?>
-<?php
+
 	if(!isset($sessionid)){
 		insert_login_form();
 	}
