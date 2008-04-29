@@ -53,8 +53,13 @@
 							' AND s.userid=u.userid'.
 							' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
 							' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
+
 			if(!$USER_DETAILS){
 				$incorect_session = true;
+			}
+			else if($login['attempt_failed']){
+				error('There was ['.$login['attempt_failed'].'] failed attempts to Login from ['.$login['attempt_ip'].'] at ['.date('d.m.Y H:nn',$login['attempt_clock']).'] o\'clock!');
+				DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.zbx_dbstr($login['userid']));
 			}
 		}
 		

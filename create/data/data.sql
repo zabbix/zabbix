@@ -34,8 +34,8 @@ INSERT INTO scripts VALUES (2,'Traceroute','/usr/bin/traceroute {HOST.CONN}',0);
 -- Dumping data for table `users`
 --
 
-INSERT INTO users VALUES (1,'Admin','Zabbix','Administrator','d41d8cd98f00b204e9800998ecf8427e','',0, 900,'en_gb',30,3,'deafault.css');
-INSERT INTO users VALUES (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e','',0,900,'en_gb',30,1,'default.css');
+INSERT INTO users VALUES (1,'Admin','Zabbix','Administrator','d41d8cd98f00b204e9800998ecf8427e','',0, 900,'en_gb',30,3,'deafault.css',0,'',0);
+INSERT INTO users VALUES (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e','',0,900,'en_gb',30,1,'default.css',0,'',0);
 
 --
 -- Dumping data for table `usrgrp`
