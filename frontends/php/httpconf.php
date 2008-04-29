@@ -24,8 +24,8 @@
 	require_once "include/httptest.inc.php";
 	require_once "include/forms.inc.php";
 
-        $page["title"] = "S_CONFIGURATION_OF_WEB_MONITORING";
-        $page["file"] = "httpconf.php";
+	$page["title"] = "S_CONFIGURATION_OF_WEB_MONITORING";
+	$page["file"] = "httpconf.php";
 	$page['hist_arg'] = array('groupid','hostid');
 
 include_once "include/page_header.php";
@@ -76,14 +76,13 @@ include_once "include/page_header.php";
 	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.httpconf.showdisabled", 0));
 	
 	check_fields($fields);
-	validate_sort_and_sortorder();
+	validate_sort_and_sortorder('wt.name',ZBX_SORT_UP);
 	
 	$showdisabled = get_request("showdisabled", 0);
 	
 	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 
-	if(isset($_REQUEST['hostid']) && !uint_in_array($_REQUEST['hostid'], explode(',',$accessible_hosts)))
-	{
+	if(isset($_REQUEST['hostid']) && !uint_in_array($_REQUEST['hostid'], explode(',',$accessible_hosts))){
 		unset($_REQUEST['hostid']);
 	}
 		
@@ -94,78 +93,62 @@ include_once "include/page_header.php";
 <?php
 	$_REQUEST["applications"] = get_request("applications",get_profile("web.httpconf.applications",array()),PROFILE_TYPE_ARRAY);
 
-	if(isset($_REQUEST["open"]))
-	{
-		if(!isset($_REQUEST["applicationid"]))
-		{
+	if(isset($_REQUEST["open"])){
+		if(!isset($_REQUEST["applicationid"])){
 			$_REQUEST["applications"] = array();
 			$show_all_apps = 1;
 		}
-		elseif(!uint_in_array($_REQUEST["applicationid"],$_REQUEST["applications"]))
-		{
+		else if(!uint_in_array($_REQUEST["applicationid"],$_REQUEST["applications"])){
 			array_push($_REQUEST["applications"],$_REQUEST["applicationid"]);
 		}
 		
-	} elseif(isset($_REQUEST["close"]))
-	{
-		if(!isset($_REQUEST["applicationid"]))
-		{
+	} 
+	else if(isset($_REQUEST["close"])){
+		if(!isset($_REQUEST["applicationid"])){
 			$_REQUEST["applications"] = array();
 		}
-		elseif(($i=array_search($_REQUEST["applicationid"], $_REQUEST["applications"])) !== FALSE)
-		{
+		else if(($i=array_search($_REQUEST["applicationid"], $_REQUEST["applications"])) !== FALSE){
 			unset($_REQUEST["applications"][$i]);
 		}
 	}
 
 	/* limit opened application count */
-	while(count($_REQUEST["applications"]) > 25)
-	{
+	while(count($_REQUEST["applications"]) > 25){
 		array_shift($_REQUEST["applications"]);
 	}
 
-
 	update_profile("web.httpconf.applications",$_REQUEST["applications"],PROFILE_TYPE_ARRAY);
-?>
-<?php
-	if(isset($_REQUEST['del_sel_step'])&&isset($_REQUEST['sel_step'])&&is_array($_REQUEST['sel_step']))
-	{
+
+	if(isset($_REQUEST['del_sel_step'])&&isset($_REQUEST['sel_step'])&&is_array($_REQUEST['sel_step'])){
 		foreach($_REQUEST['sel_step'] as $sid)
 			if(isset($_REQUEST['steps'][$sid]))
 				unset($_REQUEST['steps'][$sid]);
 	}
-	else if(isset($_REQUEST['new_httpstep']))
-	{
+	else if(isset($_REQUEST['new_httpstep'])){
 		$_REQUEST['steps'] = get_request('steps', array());
 		array_push($_REQUEST['steps'],$_REQUEST['new_httpstep']);
 	}
-	else if(isset($_REQUEST['move_up']) && isset($_REQUEST['steps'][$_REQUEST['move_up']]))
-	{
+	else if(isset($_REQUEST['move_up']) && isset($_REQUEST['steps'][$_REQUEST['move_up']])){
 		$new_id = $_REQUEST['move_up'] - 1;
 
-		if(isset($_REQUEST['steps'][$new_id]))
-		{
+		if(isset($_REQUEST['steps'][$new_id])){
 			$tmp = $_REQUEST['steps'][$new_id];
 			$_REQUEST['steps'][$new_id] = $_REQUEST['steps'][$_REQUEST['move_up']];
 			$_REQUEST['steps'][$_REQUEST['move_up']] = $tmp;
 		}
 	}
-	else if(isset($_REQUEST['move_down']) && isset($_REQUEST['steps'][$_REQUEST['move_down']]))
-	{
+	else if(isset($_REQUEST['move_down']) && isset($_REQUEST['steps'][$_REQUEST['move_down']])){
 		$new_id = $_REQUEST['move_down'] + 1;
 
-		if(isset($_REQUEST['steps'][$new_id]))
-		{
+		if(isset($_REQUEST['steps'][$new_id])){
 			$tmp = $_REQUEST['steps'][$new_id];
 			$_REQUEST['steps'][$new_id] = $_REQUEST['steps'][$_REQUEST['move_down']];
 			$_REQUEST['steps'][$_REQUEST['move_down']] = $tmp;
 		}
 	}
-	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["httptestid"]))
-	{
+	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["httptestid"])){
 		$result = false;
-		if($httptest_data = get_httptest_by_httptestid($_REQUEST["httptestid"]))
-		{
+		if($httptest_data = get_httptest_by_httptestid($_REQUEST["httptestid"])){
 			$result = delete_httptest($_REQUEST["httptestid"]);
 		}
 		show_messages($result, S_SCENARIO_DELETED, S_CANNOT_DELETE_SCENARIO);
@@ -178,13 +161,11 @@ include_once "include/page_header.php";
 		unset($_REQUEST["httptestid"]);
 		unset($_REQUEST["form"]);
 	}
-	else if(isset($_REQUEST["clone"]) && isset($_REQUEST["httptestid"]))
-	{
+	else if(isset($_REQUEST["clone"]) && isset($_REQUEST["httptestid"])){
 		unset($_REQUEST["httptestid"]);
 		$_REQUEST["form"] = "clone";
 	}
-	else if(isset($_REQUEST["save"]))
-	{
+	else if(isset($_REQUEST["save"])){
 		/*
 		$delay_flex = get_request('delay_flex',array());
 		$db_delay_flex = "";
@@ -193,8 +174,7 @@ include_once "include/page_header.php";
 		$db_delay_flex = trim($db_delay_flex,";");
 		// for future use */
 
-		if(isset($_REQUEST["httptestid"]))
-		{
+		if(isset($_REQUEST["httptestid"])){
 			$result = update_httptest($_REQUEST["httptestid"], $_REQUEST['hostid'], $_REQUEST["application"],
 				$_REQUEST["name"],$_REQUEST["delay"],$_REQUEST["status"],$_REQUEST["agent"],
 				$_REQUEST["macros"],$_REQUEST["steps"]);
@@ -204,8 +184,7 @@ include_once "include/page_header.php";
 			
 			show_messages($result, S_SCENARIO_UPDATED, S_CANNOT_UPDATE_SCENARIO);
 		}
-		else
-		{
+		else{
 			$httptestid = add_httptest($_REQUEST['hostid'],$_REQUEST["application"],
 				$_REQUEST["name"],$_REQUEST["delay"],$_REQUEST["status"],$_REQUEST["agent"],
 				$_REQUEST["macros"],$_REQUEST["steps"]);
@@ -224,19 +203,15 @@ include_once "include/page_header.php";
 			unset($_REQUEST["form"]);
 		}
 	}
-	elseif(isset($_REQUEST["group_task"])&&isset($_REQUEST["group_httptestid"]))
-	{
-		if($_REQUEST["group_task"]=="Delete selected")
-		{
+	else if(isset($_REQUEST["group_task"])&&isset($_REQUEST["group_httptestid"])){
+		if($_REQUEST["group_task"]=="Delete selected"){
 			$result = false;
 
 			$group_httptestid = $_REQUEST["group_httptestid"];
-			foreach($group_httptestid as $id)
-			{
+			foreach($group_httptestid as $id){
 				if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
 				/* if($httptest_data["templateid"]<>0)	continue; // for future use */
-				if(delete_httptest($id))
-				{
+				if(delete_httptest($id)){
 					$result = true;
 					
 					$host = get_host_by_applicationid($httptest_data["applicationid"]);
@@ -247,17 +222,14 @@ include_once "include/page_header.php";
 			}
 			show_messages($result, S_SCENARIO_DELETED, null);
 		}
-		else if($_REQUEST["group_task"] == S_ACTIVATE_SELECTED)
-		{
+		else if($_REQUEST["group_task"] == S_ACTIVATE_SELECTED){
 			$result = false;
 			
 			$group_httptestid = $_REQUEST["group_httptestid"];
-			foreach($group_httptestid as $id)
-			{
+			foreach($group_httptestid as $id){
 				if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
 				
-				if(activate_httptest($id))
-				{
+				if(activate_httptest($id)){
 					$result = true;
 					
 					$host = get_host_by_applicationid($httptest_data["applicationid"]);
@@ -269,17 +241,14 @@ include_once "include/page_header.php";
 			}
 			show_messages($result, S_SCENARIO_ACTIVATED, null);
 		}
-		elseif($_REQUEST["group_task"]== S_DISABLE_SELECTED)
-		{
+		else if($_REQUEST["group_task"]== S_DISABLE_SELECTED){
 			$result = false;
 			
 			$group_httptestid = $_REQUEST["group_httptestid"];
-			foreach($group_httptestid as $id)
-			{
+			foreach($group_httptestid as $id){
 				if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
 
-				if(disable_httptest($id))
-				{
+				if(disable_httptest($id)){
 					$result = true;				
 				
 					$host = get_host_by_applicationid($httptest_data["applicationid"]);
@@ -291,17 +260,14 @@ include_once "include/page_header.php";
 			}
 			show_messages($result, S_SCENARIO_DISABLED, null);
 		}
-		elseif($_REQUEST["group_task"]== S_CLEAN_HISTORY_SELECTED_SCENARIOS)
-		{
+		else if($_REQUEST["group_task"]== S_CLEAN_HISTORY_SELECTED_SCENARIOS){
 			$result = false;
 			
 			$group_httptestid = $_REQUEST["group_httptestid"];
-			foreach($group_httptestid as $id)
-			{
+			foreach($group_httptestid as $id){
 				if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
 
-				if(delete_history_by_httptestid($id))
-				{
+				if(delete_history_by_httptestid($id)){
 					$result = true;
 					DBexecute("update httptest set nextcheck=0".
 						/* ",lastvalue=null,lastclock=null,prevvalue=null". // for future use */
@@ -321,12 +287,9 @@ include_once "include/page_header.php";
 <?php
 	/* make steps with unique names */
 	$_REQUEST['steps'] = get_request('steps',array());
-	foreach($_REQUEST['steps'] as $s1id => $s1)
-	{
-		foreach($_REQUEST['steps'] as $s2id => $s2)
-		{
-			if((strcmp($s1['name'],$s2['name'])==0) && $s1id != $s2id)
-			{
+	foreach($_REQUEST['steps'] as $s1id => $s1){
+		foreach($_REQUEST['steps'] as $s2id => $s2){
+			if((strcmp($s1['name'],$s2['name'])==0) && $s1id != $s2id){
 				$_REQUEST['steps'][$s1id] = $_REQUEST['steps'][$s2id];
 				unset($_REQUEST['steps'][$s2id]);
 			}
@@ -345,11 +308,11 @@ include_once "include/page_header.php";
 	echo SBR;
 
 	$db_hosts=DBselect('select hostid from hosts where '.DBin_node('hostid'));
-	if(isset($_REQUEST["form"])&&isset($_REQUEST["hostid"])&&DBfetch($db_hosts))
-	{
+	if(isset($_REQUEST["form"])&&isset($_REQUEST["hostid"])&&DBfetch($db_hosts)){
 // FORM
 		insert_httptest_form();
-	} else {
+	} 
+	else {
 
 // Table HEADER
 		$form = new CForm();
@@ -363,30 +326,34 @@ include_once "include/page_header.php";
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 
-		$result=DBselect("select distinct g.groupid,g.name from groups g,hosts_groups hg".
-			" where g.groupid=hg.groupid and hg.hostid in (".$accessible_hosts.") ".
-			" order by name");
-		while($row=DBfetch($result))
-		{
+		$result=DBselect('select distinct g.groupid,g.name '.
+						' from groups g,hosts_groups hg '.
+						' where g.groupid=hg.groupid '.
+							' and hg.hostid in ('.$accessible_hosts.') '.
+						' order by name');
+		while($row=DBfetch($result)){
 			$cmbGroup->AddItem($row["groupid"],$row["name"]);
 		}
 		$form->AddItem(S_GROUP.SPACE);
 		$form->AddItem($cmbGroup);
 
-		if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0)
-		{
-			$sql="select distinct h.hostid,h.host from hosts h,hosts_groups hg".
-				" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid ".
-				' and h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-				" and h.hostid in (".$accessible_hosts.") ".
-				" group by h.hostid,h.host order by h.host";
+		if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0){
+			$sql='select distinct h.hostid,h.host '.
+				' from hosts h,hosts_groups hg '.
+				' where hg.groupid='.$_REQUEST["groupid"].
+					' and hg.hostid=h.hostid '.
+					' and h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
+					' and h.hostid in ('.$accessible_hosts.') '.
+				' group by h.hostid,h.host '.
+				' order by h.host';
 		}
-		else
-		{
-			$sql="select distinct h.hostid,h.host from hosts h".
-				' where h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-				" and h.hostid in (".$accessible_hosts.")".
-				" group by h.hostid,h.host order by h.host";
+		else{
+			$sql='select distinct h.hostid,h.host '.
+				' from hosts h '.
+				' where h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
+					' and h.hostid in ('.$accessible_hosts.') '.
+				' group by h.hostid,h.host '.
+				' order by h.host';
 		}
 
 		$result=DBselect($sql);
@@ -396,8 +363,7 @@ include_once "include/page_header.php";
 
 		unset($correct_hostid);
 		$first_hostid = -1;
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			$cmbHosts->AddItem($row["hostid"],$row["host"]);
 
 			if($_REQUEST["hostid"]!=0){
@@ -421,13 +387,9 @@ include_once "include/page_header.php";
 		$form->AddVar('hostid',$_REQUEST["hostid"]);
 
 		if(isset($show_all_apps))
-			$link = new CLink(new CImg("images/general/opened.gif"),
-				"?close=1".
-				url_param("groupid").url_param("hostid"));
+			$link = new CLink(new CImg("images/general/opened.gif"),'?close=1'.url_param("groupid").url_param("hostid"));
 		else
-			$link = new CLink(new CImg("images/general/closed.gif"),
-				"?open=1".
-				url_param("groupid").url_param("hostid"));
+			$link = new CLink(new CImg("images/general/closed.gif"),'?open=1'.url_param("groupid").url_param("hostid"));
 
 		$table  = new CTableInfo();
 		$table->setHeader(array(
@@ -444,9 +406,9 @@ include_once "include/page_header.php";
 					' FROM applications a,hosts h '.
 					' WHERE a.hostid=h.hostid '.
 						' AND h.hostid='.$_REQUEST['hostid'].
-					' order by a.name,a.applicationid,h.host');
-	while($db_app = DBfetch($db_applications))
-	{
+					' ORDER BY a.name,a.applicationid,h.host');
+					
+	while($db_app = DBfetch($db_applications)){
 		$db_httptests = DBselect('SELECT wt.*,a.name as application,h.host,h.hostid '.
 					' FROM httptest wt '.
 						' LEFT JOIN applications a ON wt.applicationid=a.applicationid '.
@@ -457,8 +419,7 @@ include_once "include/page_header.php";
 
 		$app_rows = array();
 		$httptest_cnt = 0;
-		while($httptest_data = DBfetch($db_httptests))
-		{
+		while($httptest_data = DBfetch($db_httptests)){
 			++$httptest_cnt;
 			if(!uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
 

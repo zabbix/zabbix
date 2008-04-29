@@ -123,7 +123,7 @@ include_once "include/page_header.php";
 
 
 	check_fields($fields);
-	validate_sort_and_sortorder();	
+	validate_sort_and_sortorder('u.alias',ZBX_SORT_UP);	
 ?>
 <?php
 	if($_REQUEST['config']==0){

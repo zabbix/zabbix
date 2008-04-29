@@ -33,45 +33,45 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"druleid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
-		"name"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
+		'druleid'=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
+		'name'=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
 		'proxy_hostid'=>array(T_ZBX_INT, O_OPT,	 null,	DB_ID,	'isset({save})'),
-		"iprange"=>	array(T_ZBX_IP_RANGE, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
-		"delay"=>	array(T_ZBX_INT, O_OPT,	 null,	null, 		'isset({save})'),
-		"status"=>	array(T_ZBX_INT, O_OPT,	 null,	IN("0,1"), 	'isset({save})'),
+		'iprange'=>	array(T_ZBX_IP_RANGE, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
+		'delay'=>	array(T_ZBX_INT, O_OPT,	 null,	null, 		'isset({save})'),
+		'status'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1'), 	'isset({save})'),
 
-		"g_druleid"=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
+		'g_druleid'=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
 
-		"dchecks"=>	array(null, O_OPT, null, null, null),
-		"selected_checks"=>	array(T_ZBX_INT, O_OPT, null, null, null),
+		'dchecks'=>	array(null, O_OPT, null, null, null),
+		'selected_checks'=>	array(T_ZBX_INT, O_OPT, null, null, null),
 
-		"new_check_type"=>	array(T_ZBX_INT, O_OPT,  null,	
+		'new_check_type'=>	array(T_ZBX_INT, O_OPT,  null,	
 			IN(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_ICMPPING)),
 										'isset({add_check})'),
 
-		"new_check_ports"=>	array(T_ZBX_PORTS, O_OPT,  null,	NOT_EMPTY,	'isset({add_check})'),
-		"new_check_key"=>	array(T_ZBX_STR, O_OPT,  null,	null,	'isset({add_check})'),
-		"new_check_snmp_community"=>	array(T_ZBX_STR, O_OPT,  null,	null,	'isset({add_check})'),
+		'new_check_ports'=>	array(T_ZBX_PORTS, O_OPT,  null,	NOT_EMPTY,	'isset({add_check})'),
+		'new_check_key'=>	array(T_ZBX_STR, O_OPT,  null,	null,	'isset({add_check})'),
+		'new_check_snmp_community'=>	array(T_ZBX_STR, O_OPT,  null,	null,	'isset({add_check})'),
 
-		"type_changed"=>	array(T_ZBX_INT, O_OPT, null, IN(1), null),
+		'type_changed'=>	array(T_ZBX_INT, O_OPT, null, IN(1), null),
 
 /* actions */
-		"add_check"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"delete_ckecks"=> 	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"group_enable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"group_disable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"group_delete"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"clone"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'add_check'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'delete_ckecks'=> 	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'group_enable'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'group_disable'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'group_delete'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 /* other */
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
+		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder();
+	validate_sort_and_sortorder('d.name',ZBX_SORT_UP);
 	
 	$_REQUEST['dchecks'] = get_request('dchecks', array());
 	
@@ -88,13 +88,11 @@ include_once "include/page_header.php";
 		if( !str_in_array($new_dcheck, $_REQUEST['dchecks']))
 			$_REQUEST['dchecks'][] = $new_dcheck;
 	}
-	else if(inarr_isset(array('delete_ckecks', 'selected_checks')))
-	{
+	else if(inarr_isset(array('delete_ckecks', 'selected_checks'))){
 		foreach($_REQUEST['selected_checks'] as $chk_id)
 			unset($_REQUEST['dchecks'][$chk_id]);
 	}
-	else if(inarr_isset('save'))
-	{
+	else if(inarr_isset('save')){
 		if(inarr_isset('druleid'))
 		{ /* update */
 			$msg_ok = S_DISCOVERY_RULE_UPDATED;

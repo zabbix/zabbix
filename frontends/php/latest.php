@@ -47,7 +47,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder();
+	validate_sort_and_sortorder('i.description',ZBX_SORT_UP);
 	
 	$options = array("allow_all_hosts","monitored_hosts","with_monitored_items");//,"always_select_first_host");
 	if(!$ZBX_WITH_SUBNODES)	array_push($options,"only_current_node");

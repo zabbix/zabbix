@@ -32,7 +32,7 @@ else{
 	$page['hist_arg'] = array('');
 }
 
-define('ZBX_ALLOW_UNICODE',1);
+if(!defined('ZBX_ALLOW_UNICODE')) define('ZBX_ALLOW_UNICODE',1);
 
 include_once "include/page_header.php";
 
