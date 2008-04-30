@@ -1,5 +1,6 @@
 Changes for 1.5.3
 
+ - [DEV-161] changed greeting message (Artem)
  - [DEV-157] added fullscreen icon to monitoring screens (Artem)
 
 Changes for 1.5.2:
