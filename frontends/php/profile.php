@@ -60,21 +60,18 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	if(isset($_REQUEST["cancel"]))
-	{
-		Redirect('index.php');
+	if(isset($_REQUEST["cancel"])){
+		$url = get_profile('web.menu.view.last', 'index.php');
+		Redirect($url);
 	}
-	elseif(isset($_REQUEST["save"]))
-	{
+	else if(isset($_REQUEST["save"])){
 		$_REQUEST["password1"] = get_request("password1", null);
 		$_REQUEST["password2"] = get_request("password2", null);
 
-		if(isset($_REQUEST["password1"]) && $_REQUEST["password1"] == "")
-		{
+		if(isset($_REQUEST["password1"]) && $_REQUEST["password1"] == ""){
 			show_error_message(S_ONLY_FOR_GUEST_ALLOWED_EMPTY_PASSWORD);
 		}
-		elseif($_REQUEST["password1"]==$_REQUEST["password2"])
-		{
+		else if($_REQUEST["password1"]==$_REQUEST["password2"]){
 			$result=update_user_profile($USER_DETAILS["userid"],$_REQUEST["password1"],
 									$_REQUEST["url"],get_request("autologin",0),$_REQUEST["autologout"],
 									$_REQUEST["lang"],$_REQUEST['theme'],$_REQUEST["refresh"]
