@@ -372,6 +372,8 @@
 	'S_RIGHT_DIR'=>				'Right',
 	'S_LEFT_DIR'=>				'Left',
 	'S_SELECT_GRAPH_DOT_DOT_DOT'=>		'Select graph...',
+	'S_FULLSCREEN'=>			'Fullscreen',
+	'S_VIEW'=>					'View',
 
 // Colors
 	'S_BLACK'=>				'Black',

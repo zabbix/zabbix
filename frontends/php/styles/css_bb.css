@@ -276,6 +276,14 @@ div.arrowdown{
 	background-image: url('../images/general/bttn/arrowdown_bb.png');
 }
 
+div.fullscreen{
+	background-image: url('../images/general/bttn/fullscreen_bb.png');
+}
+
+div.iconhelp{
+	background-image: url('../images/general/bttn/help_bb.png');
+}
+
 div#scrolltableft{
 	color: #0CF;
 }

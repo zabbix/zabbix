@@ -75,12 +75,7 @@
 			$audio = 'audio/trigger_'.$status.'.wav';
 	}
 
-?>
-<?php
 	define('ZBX_PAGE_DO_REFRESH', 1);
-
-	if(isset($_REQUEST["fullscreen"]))
-		define('ZBX_PAGE_NO_MENU', 1);
 	
 include_once "include/page_header.php";
 	
@@ -88,17 +83,17 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"groupid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
-		"hostid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
-		"noactions"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
-		"compact"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
+		'groupid'=>			array(T_ZBX_INT, O_OPT,	 	P_SYS,	DB_ID, 					null),
+		'hostid'=>			array(T_ZBX_INT, O_OPT,	 	P_SYS,	DB_ID, 					null),
+		'noactions'=>		array(T_ZBX_STR, O_OPT, 	null,	IN('"true","false"'), 	null),
+		'compact'=>			array(T_ZBX_STR, O_OPT,  	null,	IN('"true","false"'), 	null),
 		
-		"show_triggers"=>	array(T_ZBX_INT, O_OPT,  null, null, null),
-		"show_events"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	null,	null),
-		"select"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
-		"txt_select"=>	array(T_ZBX_STR, O_OPT,  null,	null, null),
-		"fullscreen"=>	array(T_ZBX_STR, O_OPT,  null,	null, null),
-		"btnSelect"=>	array(T_ZBX_STR, O_OPT,  null,  null, null)
+		'show_triggers'=>	array(T_ZBX_INT, O_OPT,  	null, 	null, 					null),
+		'show_events'=>		array(T_ZBX_INT, O_OPT,		P_SYS,	null,					null),
+		'select'=>			array(T_ZBX_STR, O_OPT,  	null,	IN('"true","false"'), 	null),
+		'txt_select'=>		array(T_ZBX_STR, O_OPT,  	null,	null, null),
+		'fullscreen'=>		array(T_ZBX_INT, O_OPT,		P_SYS,	IN('0,1'),				null),
+		'btnSelect'=>		array(T_ZBX_STR, O_OPT,  	null,  	null, 					null)
 	);
 
 	check_fields($fields);
@@ -110,10 +105,10 @@ include_once "include/page_header.php";
 	$_REQUEST['noactions']		=	get_request('noactions', get_profile('web.tr_status.noactions', 'true'));
 	$_REQUEST['compact']		=	get_request('compact', get_profile('web.tr_status.compact', 'true'));
 
-	$options = array("allow_all_hosts","monitored_hosts","with_monitored_items");//,"always_select_first_host");
-	if(!$ZBX_WITH_SUBNODES)	array_push($options,"only_current_node");
+	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');//,'always_select_first_host');
+	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
 	
-	validate_group_with_host(PERM_READ_ONLY,$options,"web.tr_status.groupid","web.tr_status.hostid");
+	validate_group_with_host(PERM_READ_ONLY,$options,'web.tr_status.groupid','web.tr_status.hostid');
 
 	update_profile('web.tr_status.show_triggers',$_REQUEST['show_triggers']);
 	update_profile('web.tr_status.show_events',$_REQUEST['show_events']);
@@ -123,8 +118,6 @@ include_once "include/page_header.php";
 	
 	$config=select_config();
 	
-?>
-<?php
 	if(isset($audio)){
 		play_sound($audio);
 	}
@@ -200,7 +193,7 @@ include_once "include/page_header.php";
 			' AND h.hostid=i.hostid '.												
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND hg.hostid=h.hostid '.
-			($_REQUEST["groupid"]?' AND hg.groupid='.$_REQUEST["groupid"]:'').
+			($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
 		' ORDER BY h.host';
 	
 	$result=DBselect($sql);
@@ -215,21 +208,37 @@ include_once "include/page_header.php";
 	if(!$flag) $_REQUEST['hostid'] = 0;
 
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-	$r_form->AddVar("compact",$compact);
-	$r_form->AddVar("show_triggers",$show_triggers);
+	$r_form->AddVar('compact',$compact);
+	$r_form->AddVar('show_triggers',$show_triggers);
 	$r_form->AddVar('show_events',$show_events);
 	$r_form->AddVar('noactions',$noactions);
 	$r_form->AddVar('select',$select);
 	$r_form->AddVar('txt_select',$txt_select);
-	if(isset($_REQUEST['fullscreen'])) $r_form->AddVar('fullscreen',1);
+	$r_form->AddVar('fullscreen',$_REQUEST['fullscreen']);
 
-	show_table_header(
-		new CLink(SPACE.S_STATUS_OF_TRIGGERS_BIG.SPACE.date("[H:i:s]",time()),"tr_status.php?show_triggers=$show_triggers".
-			"&show_events=$show_events&noactions=$noactions&compact=$compact".
-			(!isset($_REQUEST["fullscreen"]) ? '&fullscreen=1' : '')),
-		$r_form);
 	
-	if(!isset($_REQUEST["fullscreen"])){
+	$text = array(S_STATUS_OF_TRIGGERS_BIG,SPACE,date('[H:i:s]',time()));
+	
+	$url = 'tr_status.php?show_triggers='.$show_triggers.
+			url_param('show_events').
+			url_param('noactions').
+			url_param('compact').
+			($_REQUEST['fullscreen']?'':'&fullscreen=1');
+
+	$fs_icon = new CDiv(SPACE,'fullscreen');
+	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	
+	$icon_tab = new CTable();
+	$icon_tab->AddRow(array($fs_icon,SPACE,$text));
+	
+	$text = $icon_tab;
+
+	show_table_header($text,$r_form);
+	
+	
+	
+	if(!$_REQUEST["fullscreen"]){
 		$left_col = array();
 		
 		$tr_form = new CForm('tr_status.php');
@@ -309,13 +318,13 @@ include_once "include/page_header.php";
 		show_table_header($left_col);
 	}
 
-  	if(isset($_REQUEST["fullscreen"])){
+  	if($_REQUEST["fullscreen"]){
 		$triggerInfo = new CTriggersInfo();
 		$triggerInfo->HideHeader();
 		$triggerInfo->Show();
 	}
 
-	if(isset($_REQUEST["fullscreen"])){
+	if($_REQUEST["fullscreen"]){
 		$fullscreen='&fullscreen=1';
 	}
 	else{

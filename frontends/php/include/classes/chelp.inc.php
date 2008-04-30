@@ -19,23 +19,19 @@
 **/
 ?>
 <?php
-	class CHelp extends CLink
-	{
+	class CHelp extends CLink{
 /* public */
-		function CHelp($url="index.php",$side=null)
-		{
+		function CHelp($url="index.php",$side=null){
 			if(is_null($side)) $side = 'right';
-			if($side == 'right')
-			{
+			if($side == 'right'){
 				$pside = 'left';
 			}
-			else
-			{
+			else{
 				$side = 'left';
 				$pside = 'right';
 			}
 
-			parent::CLink(new CImg('images/general/help.gif','?'), 'http://www.zabbix.com/manual/v1.1/'.$url);
+			parent::CLink(new CDiv(SPACE,'iconhelp'), 'http://www.zabbix.com/manual/v1.1/'.$url);
 			$this->options['style'] = 'padding-'.$pside.': 5px; float:'.$side;
 			$this->options['target'] = '_blank';
 		}

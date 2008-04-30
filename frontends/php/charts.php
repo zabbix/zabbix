@@ -29,11 +29,6 @@
 	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js');
 	
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-?>
-<?php
-	if(isset($_REQUEST['fullscreen'])){
-		define('ZBX_PAGE_NO_MENU', 1);
-	}
 
 	if(isset($_REQUEST['graphid']) && ($_REQUEST['graphid'] > 0) && (PAGE_TYPE_HTML == $page['type'])){
 		define('ZBX_PAGE_DO_REFRESH', 1);
@@ -41,8 +36,6 @@
 	
 include_once 'include/page_header.php';
 
-?>
-<?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,		DB_ID,NULL),
@@ -53,7 +46,7 @@ include_once 'include/page_header.php';
 		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
 		'action'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go','add','remove'"),NULL),
 		'reset'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
-		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1"),NULL),
+		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1'),NULL),
 		
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
@@ -123,15 +116,13 @@ include_once 'include/page_header.php';
 
 		if(!DBfetch($result)) $_REQUEST['graphid'] = 0;
 	}
-?>
-<?php
+
 	if(($_REQUEST['graphid']>0) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD)){
 		update_profile('web.graph['.$_REQUEST['graphid'].'].period',$_REQUEST['period']);
 	}
 
 	update_profile('web.charts.graphid',$_REQUEST['graphid']);
-?>
-<?php
+
 	$h1 = array(S_GRAPHS_BIG.SPACE."/".SPACE);
 	
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
@@ -144,7 +135,7 @@ include_once 'include/page_header.php';
 			update_profile('web.charts.graphid',0);
 			access_deny();
 		}
-		array_push($h1, new CLink($row['name'], '?graphid='.$_REQUEST['graphid'].(isset($_REQUEST['fullscreen']) ? '' : '&fullscreen=1')));
+		array_push($h1, $row['name']);
 	}
 	else{
 		$_REQUEST['graphid'] = 0;
@@ -153,8 +144,8 @@ include_once 'include/page_header.php';
 
 	$r_form = new CForm();
 	$r_form->SetMethod('get');
-	if(isset($_REQUEST['fullscreen']))
-		$r_form->AddVar('fullscreen', 1);
+	
+	$r_form->AddVar('fullscreen', $_REQUEST['fullscreen']);
 
 	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
 	$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
@@ -306,9 +297,15 @@ include_once 'include/page_header.php';
 			$icon->AddAction('onclick',new CScript("javascript: add2favorites('graphid','".$_REQUEST['graphid']."');"));
 		}
 		$icon->AddOption('id','addrm_fav');
+		
+		$url = '?graphid='.$_REQUEST['graphid'].($_REQUEST['fullscreen']?'':'&fullscreen=1');
+
+		$fs_icon = new CDiv(SPACE,'fullscreen');
+		$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+		$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 
 		$icon_tab = new CTable();
-		$icon_tab->AddRow(array($icon,SPACE,$h1));
+		$icon_tab->AddRow(array($fs_icon,$icon,SPACE,$h1));
 		
 		$h1 = $icon_tab;
 	}

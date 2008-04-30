@@ -26,10 +26,6 @@
 	$page['hist_arg'] = array('sysmapid');
 	$page['scripts'] = array('prototype.js','url.js');
 	
-	if(isset($_REQUEST["fullscreen"])){
-		define('ZBX_PAGE_NO_MENU', 1);
-	}
-
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	
 	if(PAGE_TYPE_HTML == $page['type']){
@@ -105,21 +101,17 @@ include_once "include/page_header.php";
 			$row['name'];
 	}
 
-	if(isset($_REQUEST["sysmapid"]) && (!isset($all_maps[$_REQUEST["sysmapid"]]) || $_REQUEST["sysmapid"] == 0))
-	{
-		if(count($all_maps))
-		{
+	if(isset($_REQUEST["sysmapid"]) && (!isset($all_maps[$_REQUEST["sysmapid"]]) || $_REQUEST["sysmapid"] == 0)){
+		if(count($all_maps)){
 			$_REQUEST["sysmapid"] = $all_maps[0];
 		}
-		else
-		{
+		else{
 			unset($_REQUEST["sysmapid"]);
 		}
 	}
 	unset($all_maps[0]);
 	
-	if(isset($_REQUEST["sysmapid"]))
-	{
+	if(isset($_REQUEST["sysmapid"])){
 		update_profile("web.maps.sysmapid",$_REQUEST["sysmapid"]);
 	}
 ?>
@@ -128,11 +120,7 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST["sysmapid"])){
 		$sysmap = get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
 
-		$url = "maps.php?sysmapid=".$_REQUEST["sysmapid"];
-		if(!isset($_REQUEST["fullscreen"]))
-			$url .= "&fullscreen=1";
-
-		array_push($text, nbsp(" / "), new CLink($all_maps[$_REQUEST["sysmapid"]],$url));
+		array_push($text, nbsp(' / '), $all_maps[$_REQUEST["sysmapid"]]);
 		
 		if(infavorites('web.favorite.sysmapids',$_REQUEST['sysmapid'],'sysmapid')){
 			$icon = new CDiv(SPACE,'iconminus');
@@ -145,9 +133,15 @@ include_once "include/page_header.php";
 			$icon->AddAction('onclick',new CScript("javascript: add2favorites('sysmapid','".$_REQUEST["sysmapid"]."');"));
 		}
 		$icon->AddOption('id','addrm_fav');
+		
+		$url = '?sysmapid='.$_REQUEST['sysmapid'].($_REQUEST['fullscreen']?'':'&fullscreen=1');
+
+		$fs_icon = new CDiv(SPACE,'fullscreen');
+		$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+		$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 	
 		$icon_tab = new CTable();
-		$icon_tab->AddRow(array($icon,SPACE,$text));
+		$icon_tab->AddRow(array($fs_icon,$icon,SPACE,$text));
 		
 		$text = $icon_tab;
 
@@ -156,8 +150,7 @@ include_once "include/page_header.php";
 	$form = new CForm();
 	$form->SetMethod('get');
 	
-	if(isset($_REQUEST["fullscreen"]))
-		$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
+	$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
 
 	$cmbMaps = new CComboBox("sysmapid",get_request("sysmapid",0),"submit()");
 	

@@ -49,18 +49,19 @@ include_once "include/page_header.php";
 	
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"source"=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN($allowed_sources),	NULL),
-		"groupid"=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
-		"hostid"=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
-		"triggerid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
-		"start"=>			array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535)."({}%".PAGE_SIZE."==0)",	NULL),
-		"next"=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
-		"prev"=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
+		'source'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN($allowed_sources),	NULL),
+		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
+		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
+		'triggerid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
+		'start'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535).'({}%'.PAGE_SIZE.'==0)',	NULL),
+		'next'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
+		'prev'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
+		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 // filter
-		"filter_rst"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
-		"filter_set"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
+		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
+		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 		
-		"show_unknown"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
+		'show_unknown'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		
 		'filter_timesince'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
 		'filter_timetill'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
@@ -124,10 +125,10 @@ include_once "include/page_header.php";
 	
 ?>
 <?php
-	$_REQUEST["start"] = get_request("start", 0);
-	$_REQUEST["start"]-=(isset($_REQUEST["prev"]))?PAGE_SIZE:0;
-	$_REQUEST["start"]+=(isset($_REQUEST["next"]))?PAGE_SIZE:0;
-	$_REQUEST["start"]=($_REQUEST["start"])?$_REQUEST["start"]:0;
+	$_REQUEST['start'] = get_request('start', 0);
+	$_REQUEST['start']-=(isset($_REQUEST['prev']))?PAGE_SIZE:0;
+	$_REQUEST['start']+=(isset($_REQUEST['next']))?PAGE_SIZE:0;
+	$_REQUEST['start']=($_REQUEST['start'])?$_REQUEST['start']:0;
 	
 ?>
 <?php
@@ -168,10 +169,11 @@ include_once "include/page_header.php";
 			}
 		}
 		
-		validate_group_with_host(PERM_READ_ONLY, array("allow_all_hosts","monitored_hosts","with_items"));
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+		validate_group_with_host(PERM_READ_ONLY, array('allow_all_hosts','monitored_hosts','with_items'));
 
-		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
-		$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
+		$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
+		$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
 
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 		
@@ -222,22 +224,38 @@ include_once "include/page_header.php";
 		$r_form->AddItem(array(SPACE.S_SOURCE.SPACE, $cmbSource));
 	}
 
-	show_table_header(S_HISTORY_OF_EVENTS_BIG.SPACE.date("[H:i:s]",time()),$r_form);
+// Header	
+	$text = array(S_HISTORY_OF_EVENTS_BIG,SPACE,date('[H:i:s]',time()));
+	
+	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+
+	$fs_icon = new CDiv(SPACE,'fullscreen');
+	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	
+	$icon_tab = new CTable();
+	$icon_tab->AddRow(array($fs_icon,SPACE,$text));
+	
+	$text = $icon_tab;
+
+	show_table_header($text,$r_form);
+//-------------
+
 	
 	if($source == EVENT_SOURCE_DISCOVERY){
-		$table = get_history_of_discovery_events($_REQUEST["start"], PAGE_SIZE);
+		$table = get_history_of_discovery_events($_REQUEST['start'], PAGE_SIZE);
 	}
 	else{
 		$config = select_config();
 
 		$sql_from = $sql_cond = '';
 
-		if($_REQUEST["hostid"] > 0){
-			$sql_cond = ' and h.hostid='.$_REQUEST["hostid"];
+		if($_REQUEST['hostid'] > 0){
+			$sql_cond = ' and h.hostid='.$_REQUEST['hostid'];
 		}
-		else if($_REQUEST["groupid"] > 0){
+		else if($_REQUEST['groupid'] > 0){
 			$sql_from = ', hosts_groups hg ';
-			$sql_cond = ' and h.hostid=hg.hostid and hg.groupid='.$_REQUEST["groupid"];
+			$sql_cond = ' and h.hostid=hg.hostid and hg.groupid='.$_REQUEST['groupid'];
 		}
 		else{
 			$sql_from = ', hosts_groups hg ';
@@ -274,7 +292,7 @@ include_once "include/page_header.php";
 //				make_sorting_link(S_TIME,'e.eventid'),
 				make_sorting_link(S_TIME,'e.clock'),
 				is_show_subnodes() ? S_NODE : null,
-				$_REQUEST["hostid"] == 0 ? S_HOST : null,
+				$_REQUEST['hostid'] == 0 ? S_HOST : null,
 				S_DESCRIPTION,
 				S_STATUS,
 				S_SEVERITY,
