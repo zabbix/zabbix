@@ -36,10 +36,11 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"serviceid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,			NULL),
-		"showgraph"=>		array(T_ZBX_INT, O_OPT,	P_SYS,			IN("1"),		'isset({serviceid})'),
+		'serviceid'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,			NULL),
+		'showgraph'=>		array(T_ZBX_INT, O_OPT,	P_SYS,			IN('1'),		'isset({serviceid})'),
+		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,			IN('0,1'),	NULL),
 // ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'hat'"),		NULL),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	IN('"hat"'),		NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
 	);
@@ -58,11 +59,11 @@ include_once "include/page_header.php";
 	}
 //--------?>
 <?php
-        if(isset($_REQUEST["serviceid"]) && 
-			($_REQUEST["serviceid"]>0) && 
-			!DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"])))
+        if(isset($_REQUEST['serviceid']) && 
+			($_REQUEST['serviceid']>0) && 
+			!DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST['serviceid'])))
 		{
-                unset($_REQUEST["serviceid"]);
+                unset($_REQUEST['serviceid']);
         }
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
@@ -210,6 +211,12 @@ include_once "include/page_header.php";
 						'graph' => bold(S_GRAPH)));
 		
 		if($tree){
+			$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+	
+			$fs_icon = new CDiv(SPACE,'fullscreen');
+			$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+			$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	
 			$tab = create_hat(
 					S_IT_SERVICES_BIG,
 					$tree->getHTML(),

@@ -44,6 +44,7 @@ include_once "include/page_header.php";
 		
 		'output'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'jsscriptid'=>	array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 		
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
@@ -188,7 +189,24 @@ include_once "include/page_header.php";
 //	validate_group(PERM_READ_ONLY,array("allow_all_hosts","monitored_hosts","with_monitored_items"));
 //	$time = new CSpan(date("[H:i:s]",time()));
 //	$time->AddOption('id','refreshed');
-	show_table_header(array(S_DASHBOARD_BIG,SPACE),SPACE);
+
+// Header	
+	$text = array(S_DASHBOARD_BIG);
+	
+	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+
+	$fs_icon = new CDiv(SPACE,'fullscreen');
+	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	
+	$icon_tab = new CTable();
+	$icon_tab->AddRow(array($fs_icon,SPACE,$text));
+	
+	$text = $icon_tab;
+
+	show_table_header($text,SPACE);
+//-------------
+	
 
 	$left_tab = new CTable();
 	$left_tab->SetCellPadding(3);

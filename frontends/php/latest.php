@@ -43,7 +43,8 @@ include_once "include/page_header.php";
 		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 		"select"=>		array(T_ZBX_STR, O_OPT, NULL,	NULL,		NULL),
 
-		"show"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,		NULL)
+		"show"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,		NULL),
+		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 	);
 
 	check_fields($fields);
@@ -56,7 +57,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-	$_REQUEST["select"] = get_request("select","");
+	$_REQUEST["select"] = get_request('select','');
 
 	$_REQUEST["groupbyapp"] = get_request("groupbyapp",get_profile("web.latest.groupbyapp",1));
 	update_profile("web.latest.groupbyapp",$_REQUEST["groupbyapp"]);
@@ -152,7 +153,24 @@ include_once "include/page_header.php";
 	}
 
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-	show_table_header(S_LATEST_DATA_BIG,$r_form);
+	
+// Header	
+	$text = array(S_LATEST_DATA_BIG);
+	
+	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1').url_param('select');
+
+	$fs_icon = new CDiv(SPACE,'fullscreen');
+	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	
+	$icon_tab = new CTable();
+	$icon_tab->AddRow(array($fs_icon,SPACE,$text));
+	
+	$text = $icon_tab;
+
+	show_table_header($text,$r_form);
+//-------------
+	
 
 	$r_form = new CForm();
 	$r_form->SetMethod('get');
@@ -181,8 +199,8 @@ include_once "include/page_header.php";
 	
 	$table=new CTableInfo();
 	$table->SetHeader(array(
-		is_show_subnodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
-		$_REQUEST["hostid"] ==0 ? make_sorting_link(S_HOST,'h.host') : NULL,
+		is_show_subnodes()?make_sorting_link(S_NODE,'h.hostid') : null,
+		($_REQUEST["hostid"] ==0)?make_sorting_link(S_HOST,'h.host') : NULL,
 		array($link,SPACE,make_sorting_link(S_DESCRIPTION,'i.description')),
 		make_sorting_link(S_LAST_CHECK,'i.lastclock'),
 		S_LAST_VALUE,
@@ -265,6 +283,7 @@ include_once "include/page_header.php";
 					url_param("groupid").
 					url_param("hostid").
 					url_param("applications").
+					url_param("fullscreen").
 					url_param("select"));
 			}
 			else{
@@ -273,6 +292,7 @@ include_once "include/page_header.php";
 					url_param("groupid").
 					url_param("hostid").
 					url_param("applications").
+					url_param("fullscreen").
 					url_param("select"));
 			}
 

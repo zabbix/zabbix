@@ -89,6 +89,28 @@ div.arrowdown:hover{
 	cursor:pointer;
 }
 
+div.fullscreen{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/fullscreen.png');
+	background-repeat:no-repeat;
+}
+
+div.fullscreen:hover{
+	cursor:pointer;
+}
+
+div.iconhelp{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/help.png');
+	background-repeat:no-repeat;
+}
+
+div.iconhelp:hover{
+	cursor:pointer;
+}
+
 div.filterclosed{
 	height: 9px;
 	width: 9px;

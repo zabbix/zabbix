@@ -31,6 +31,7 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"druleid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
+		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 	);
 
 	check_fields($fields);
@@ -51,7 +52,23 @@ include_once "include/page_header.php";
 				);
 	$r_form->AddItem(array(S_DISCOVERY_RULE.SPACE,$cmbDRules));
 
-	show_table_header(S_STATUS_OF_DISCOVERY_BIG, $r_form);
+// Header	
+	$text = array(S_STATUS_OF_DISCOVERY_BIG);
+	
+	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+
+	$fs_icon = new CDiv(SPACE,'fullscreen');
+	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	
+	$icon_tab = new CTable();
+	$icon_tab->AddRow(array($fs_icon,SPACE,$text));
+	
+	$text = $icon_tab;
+
+	show_table_header($text, $r_form);
+//-------------
+	
 
 	$services = array();
 

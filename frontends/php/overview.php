@@ -28,20 +28,12 @@ $page["file"] = "overview.php";
 $page['hist_arg'] = array('groupid','type');
 
 define('ZBX_PAGE_DO_REFRESH', 1);
-
-$_REQUEST["fullscreen"] = get_request("fullscreen", 0);
-
-if($_REQUEST["fullscreen"]){
-	define('ZBX_PAGE_NO_MENU', 1);
-}
-	
-include_once "include/page_header.php";
-
 define("SHOW_TRIGGERS",0);
 define("SHOW_DATA",1);
 
-if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
-{
+include_once "include/page_header.php";
+
+if(isset($_REQUEST["select"])&&($_REQUEST["select"]!="")){
 	unset($_REQUEST["groupid"]);
 	unset($_REQUEST["hostid"]);
 }
@@ -132,9 +124,25 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 	}
 
 	$help->SetHint($help_table);
+// Header	
+	$text = array(S_OVERVIEW_BIG);
 	
-	show_table_header(array($help, new Clink(S_OVERVIEW_BIG,'overview.php?fullscreen='.($_REQUEST['fullscreen']?'0':'1'))), $form);
+	$url = 'overview.php?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+
+	$fs_icon = new CDiv(SPACE,'fullscreen');
+	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	
+	$icon_tab = new CTable();
+	$icon_tab->AddRow(array($fs_icon,$help,$text));
+	
+	$text = $icon_tab;
+
+	show_table_header($text,$form);
 	unset($help, $help_table, $form, $col);
+
+//-------------
+
 	
 	$form = new CForm();
 	$form->SetMethod('get');

@@ -30,12 +30,6 @@
 	$page['hist_arg'] = array('config','elementid');
 	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js'); //do not change order!!!
 
-	$_REQUEST["fullscreen"] = get_request("fullscreen", 0);
-
-	if($_REQUEST["fullscreen"]){
-		define('ZBX_PAGE_NO_MENU', 1);
-	}
-
 	$_REQUEST['config'] = get_request('config',get_profile('web.screens.config',0));
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
@@ -110,7 +104,6 @@ include_once "include/page_header.php";
 		update_profile('web.screens.config', $_REQUEST['config']);
 
 	$_REQUEST["elementid"] = get_request("elementid",get_profile("web.screens.elementid", null));
-	$_REQUEST["fullscreen"] = get_request("fullscreen", 0);
 
 	if( 2 != $_REQUEST["fullscreen"] )
 		update_profile("web.screens.elementid",$_REQUEST["elementid"]);
@@ -196,9 +189,7 @@ include_once "include/page_header.php";
 		}
 
 		if( $element ){
-			$url = "?elementid=".$elementid;
-			if($_REQUEST["fullscreen"]==0) $url .= "&fullscreen=1";
-			$text[] = array(nbsp(" / "),new CLink($element["name"], $url));
+			$text = array(nbsp(' / '),$element["name"]);
 			
 			if(infavorites('web.favorite.screenids',$elementid,(0 == $config)?'screenid':'slideshowid')){
 				$icon = new CDiv(SPACE,'iconminus');
@@ -210,11 +201,16 @@ include_once "include/page_header.php";
 				$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
 				$icon->AddAction('onclick',new CScript("javascript: add2favorites('".((0 == $config)?'screenid':'slideshowid')."','".$elementid."');"));
 			}
-			
 			$icon->AddOption('id','addrm_fav');
+			
+			$url = '?elementid='.$elementid.($_REQUEST['fullscreen']?'':'&fullscreen=1');
+
+			$fs_icon = new CDiv(SPACE,'fullscreen');
+			$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+			$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 		
 			$icon_tab = new CTable();
-			$icon_tab->AddRow(array($icon,SPACE,$text));
+			$icon_tab->AddRow(array($fs_icon,$icon,SPACE,$text));
 			
 			$text = $icon_tab;
 		}

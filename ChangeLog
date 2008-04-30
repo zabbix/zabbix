@@ -1,3 +1,7 @@
+Changes for 1.5.3
+
+ - [DEV-157] added fullscreen icon to monitoring screens (Artem)
+
 Changes for 1.5.2:
 
  - [DEV-153] added protection against brute force attack (Artem)

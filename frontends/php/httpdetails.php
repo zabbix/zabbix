@@ -47,28 +47,45 @@ include_once "include/page_header.php";
 		"httptestid"=>	array(T_ZBX_INT, O_MAND,	null,	DB_ID,		null),
 
 		"groupid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-		"hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null)
+		"hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		
+		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 	);
 
 	check_fields($fields);
 
 	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 
-	if(!($httptest_data = DBfetch(DBselect('select ht.* from httptest ht, applications a '.
-		' where a.hostid in ('.$accessible_hosts.') and a.applicationid=ht.applicationid '.
-		' and ht.httptestid='.$_REQUEST['httptestid']))))
-	{
+	$sql = 'select ht.* '.
+		' from httptest ht, applications a '.
+		' where a.hostid in ('.$accessible_hosts.') '.
+			' and a.applicationid=ht.applicationid '.
+			' and ht.httptestid='.$_REQUEST['httptestid'];
+			
+	if(!$httptest_data = DBfetch(DBselect($sql))){
 		access_deny();
 	}
 	
 	navigation_bar_calc();
 ?>
 <?php
-	$lnkCancel = new CLink(S_CANCEL,'httpmon.php'.url_param('groupid').url_param('hostid'));
-	show_table_header(array(S_DETAILS_OF_SCENARIO_BIG.' "',
-						bold($httptest_data['name']),
-						'" - '.date(S_DATE_FORMAT_YMDHMS,$httptest_data['lastcheck'])),$lnkCancel
-					);
+// Header	
+	$text = array(S_DETAILS_OF_SCENARIO_BIG.' / ',bold($httptest_data['name']),' ['.date(S_DATE_FORMAT_YMDHMS,$httptest_data['lastcheck']).']');
+	
+	$url = '?httptestid='.$_REQUEST['httptestid'].'&fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+
+	$fs_icon = new CDiv(SPACE,'fullscreen');
+	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	
+	$icon_tab = new CTable();
+	$icon_tab->AddRow(array($fs_icon,SPACE,$text));
+	
+	$text = $icon_tab;
+
+	show_table_header($text,new CLink(S_CANCEL,'httpmon.php'.url_param('groupid').url_param('hostid')));
+
+//-------------
 
 // TABLE
 	$table  = new CTableInfo();
