@@ -58,6 +58,10 @@ frontends/php/images/general/bttn/arrowdown.png -text
 frontends/php/images/general/bttn/arrowdown_bb.png -text
 frontends/php/images/general/bttn/arrowup.png -text
 frontends/php/images/general/bttn/arrowup_bb.png -text
+frontends/php/images/general/bttn/fullscreen.png -text
+frontends/php/images/general/bttn/fullscreen_bb.png -text
+frontends/php/images/general/bttn/help.png -text
+frontends/php/images/general/bttn/help_bb.png -text
 frontends/php/images/general/bttn/menu.png -text
 frontends/php/images/general/bttn/menu_bb.png -text
 frontends/php/images/general/bttn/minus.png -text

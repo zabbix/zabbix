@@ -33,6 +33,8 @@ COpt::profiling_start("page");
 
 	if(!isset($page["type"])) $page["type"] = PAGE_TYPE_HTML;
 	if(!isset($page["file"])) $page["file"] = basename($_SERVER['PHP_SELF']);
+	
+	if($_REQUEST['fullscreen']=get_request('fullscreen', 0)) define('ZBX_PAGE_NO_MENU', 1);
 
 	include_once "include/locales/en_gb.inc.php";
 	process_locales();
