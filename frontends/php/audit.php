@@ -296,8 +296,8 @@ include_once "include/page_header.php";
 	$reset->SetType('button');
 	$reset->SetAction('javascript: var uri = new url(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
-	$filterForm->AddItemToBottomRow($reset);
 	$filterForm->AddItemToBottomRow(new CButton("filter_set",S_FILTER));
+	$filterForm->AddItemToBottomRow($reset);
 
 	$navigation = array(
 						new CSpan(array('&laquo; ',$prev),'textcolorstyles'),
