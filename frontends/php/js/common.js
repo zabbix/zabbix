@@ -568,3 +568,21 @@ function get_bodywidth(){
 	}
 return w;
 }
+
+function empty_form(id){
+	id = $(id);
+	var count = 0;
+	
+	var inputs = id.getElementsByTagName('input');
+	for(var i=0; i<inputs.length;i++){
+		if((inputs[i].type == 'text') && (typeof(inputs[i].hidden) == 'undefined') && !empty(inputs[i].value)) return false;
+		if((inputs[i].type == 'checkbox') && (inputs[i].checked)) return false;
+	}
+	
+	var selects = id.getElementsByTagName('select');
+	for(var i=0; i<selects.length;i++){
+		if((typeof(selects[i].hidden) == 'undefined') && (selects[i].selectedIndex)) return false;
+	}
+	
+return true;
+}
