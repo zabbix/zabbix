@@ -25,15 +25,14 @@
 	global $page;
 	global $ZBX_PAGE_POST_JS;
 
-	if(!defined('PAGE_HEADER_LOADED'))
-	{
+	if(!defined('PAGE_HEADER_LOADED')){
 		define ('PAGE_HEADER_LOADED', 1);
 	}
-
+	
+	add_user_history($page);
 	show_messages();
 		
-	if($page['type'] == PAGE_TYPE_HTML)
-	{
+	if($page['type'] == PAGE_TYPE_HTML){
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -50,8 +49,7 @@ function zbxCallPostScripts(){
 </script>
 <?php
 
-		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER'))
-		{
+		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')){
 			$table = new CTable(NULL,"page_footer");
 			$table->SetCellSpacing(0);
 			$table->SetCellPadding(1);

@@ -146,7 +146,7 @@ include_once "include/page_header.php";
 	}
 	else{
 		$logoff = new CLink('here', '?reconnect=1', 'styled');
-		echo '<div align="center" class="textcolorstyles">Welcom to ZABBIX! You are connected as <b>'.$USER_DETAILS['alias'].'</b>.</div>';
+		echo '<div align="center" class="textcolorstyles">Welcome to ZABBIX! You are connected as <b>'.$USER_DETAILS['alias'].'</b>.</div>';
 	}	
 ?>
 <?php
