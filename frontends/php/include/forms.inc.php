@@ -1231,183 +1231,93 @@
 		return $table;
 	}
 
-	function	insert_item_selection_form()
-	{
-		global $_REQUEST;
+	function get_item_filter_form(){
+	
 
-		if(isset($_REQUEST['form_refresh']) && isset($_REQUEST['select']))
-		{
-			$selection_mode			= get_request("selection_mode"			,0);
-			    				                   			    
-			$with_node			= empty2null(get_request("with_node"));
-			$with_group			= empty2null(get_request("with_group"));
-			$with_host			= empty2null(get_request("with_host"));
-			$with_application		= empty2null(get_request("with_application"));
-			$with_description		= empty2null(get_request("with_description"));
-			$with_type			= get_request("with_type"			,-1);
-			$with_key			= empty2null(get_request("with_key"));
-			$with_snmp_community		= empty2null(get_request("with_snmp_community"));
-			$with_snmp_oid			= empty2null(get_request("with_snmp_oid"));
-			$with_snmp_port			= empty2null(get_request("with_snmp_port"));
-			$with_snmpv3_securityname	= empty2null(get_request("with_snmpv3_securityname"));
-			$with_snmpv3_securitylevel	= get_request("with_snmpv3_securitylevel"	,-1);
-			$with_snmpv3_authpassphrase	= empty2null(get_request("with_snmpv3_authpassphrase"));
-			$with_snmpv3_privpassphrase	= empty2null(get_request("with_snmpv3_privpassphrase"));
-			$with_value_type		= get_request("with_value_type"			,-1);
-			$with_units			= empty2null(get_request("with_units"));
-			$with_formula			= empty2null(get_request("with_formula"));
-			$with_delay			= empty2null(get_request("with_delay"));
-			$with_history			= empty2null(get_request("with_history"));
-			$with_trends			= empty2null(get_request("with_trends"));
-			$with_status			= empty2null(get_request("with_status"));
-			$with_logtimefmt		= empty2null(get_request("with_logtimefmt"));
-			$with_delta			= empty2null(get_request("with_delta"));
-			$with_trapper_hosts		= empty2null(get_request("with_trapper_hosts"));
-		}
-		else
-		{
-			$selection_mode			= get_request("selection_mode"            ,get_profile("selection_mode",		0));
-			    								    
-			$with_node			= empty2null(get_request("with_node"                 ,get_profile("with_node")));
-			$with_group			= empty2null(get_request("with_group"                ,get_profile("with_group")));
-			$with_host			= empty2null(get_request("with_host"                 ,get_profile("with_host")));
-			$with_application		= empty2null(get_request("with_application"          ,get_profile("with_application")));
-			$with_description		= empty2null(get_request("with_description"          ,get_profile("with_description")));
-			$with_type			= get_request("with_type"                 ,get_profile("with_type",			-1));
-			$with_key			= empty2null(get_request("with_key"                  ,get_profile("with_key")));
-			$with_snmp_community		= empty2null(get_request("with_snmp_community"       ,get_profile("with_snmp_community")));
-			$with_snmp_oid			= empty2null(get_request("with_snmp_oid"             ,get_profile("with_snmp_oid")));
-			$with_snmp_port			= empty2null(get_request("with_snmp_port"            ,get_profile("with_snmp_port")));
-			$with_snmpv3_securityname	= empty2null(get_request("with_snmpv3_securityname"  ,get_profile("with_snmpv3_securityname")));
-			$with_snmpv3_securitylevel	= get_request("with_snmpv3_securitylevel" ,get_profile("with_snmpv3_securitylevel",	-1));
-			$with_snmpv3_authpassphrase	= empty2null(get_request("with_snmpv3_authpassphrase",get_profile("with_snmpv3_authpassphrase")));
-			$with_snmpv3_privpassphrase	= empty2null(get_request("with_snmpv3_privpassphrase",get_profile("with_snmpv3_privpassphrase")));
-			$with_value_type		= get_request("with_value_type"           ,get_profile("with_value_type",		-1));
-			$with_units			= empty2null(get_request("with_units"                ,get_profile("with_units")));
-			$with_formula			= empty2null(get_request("with_formula"              ,get_profile("with_formula")));
-			$with_delay			= empty2null(get_request("with_delay"                ,get_profile("with_delay")));
-			$with_history			= empty2null(get_request("with_history"              ,get_profile("with_history")));
-			$with_trends			= empty2null(get_request("with_trends"               ,get_profile("with_trends")));
-			$with_status			= empty2null(get_request("with_status"               ,get_profile("with_status")));
-			$with_logtimefmt		= empty2null(get_request("with_logtimefmt"           ,get_profile("with_logtimefmt")));
-			$with_delta			= empty2null(get_request("with_delta"                ,get_profile("with_delta")));
-			$with_trapper_hosts		= empty2null(get_request("with_trapper_hosts"        ,get_profile("with_trapper_hosts")));
-		}
+		$selection_mode					= $_REQUEST['selection_mode'];
+															
+		$filter_node					= $_REQUEST['filter_node'];
+		$filter_group					= $_REQUEST['filter_group'];
+		$filter_host					= $_REQUEST['filter_host'];
+		$filter_application				= $_REQUEST['filter_application'];
+		$filter_description				= $_REQUEST['filter_description'];
+		$filter_type					= $_REQUEST['filter_type'];
+		$filter_key						= $_REQUEST['filter_key'];
+		$filter_snmp_community			= $_REQUEST['filter_snmp_community'];
+		$filter_snmp_oid				= $_REQUEST['filter_snmp_oid'];
+		$filter_snmp_port				= $_REQUEST['filter_snmp_port'];
+		$filter_snmpv3_securityname		= $_REQUEST['filter_snmpv3_securityname'];
+		$filter_snmpv3_securitylevel	= $_REQUEST['filter_snmpv3_securitylevel'];
+		$filter_snmpv3_authpassphrase	= $_REQUEST['filter_snmpv3_authpassphrase'];
+		$filter_snmpv3_privpassphrase	= $_REQUEST['filter_snmpv3_privpassphrase'];
+		$filter_value_type				= $_REQUEST['filter_value_type'];
+		$filter_units					= $_REQUEST['filter_units'];
+		$filter_formula					= $_REQUEST['filter_formula'];
+		$filter_delay					= $_REQUEST['filter_delay'];
+		$filter_history					= $_REQUEST['filter_history'];
+		$filter_trends					= $_REQUEST['filter_trends'];
+		$filter_status					= $_REQUEST['filter_status'];
+		$filter_logtimefmt				= $_REQUEST['filter_logtimefmt'];
+		$filter_delta					= $_REQUEST['filter_delta'];
+		$filter_trapper_hosts			= $_REQUEST['filter_trapper_hosts'];
 
-		if($selection_mode == 0)
-		{
-			$with_node = null;
-			$with_group = null;
-			//$with_host = null;
-			$with_application = null;
-			//$with_description = null;
-			$with_type = -1;
-			//$with_key = null;
-			$with_snmp_community = null;
-			$with_snmp_oid = null;
-			$with_snmp_port = null;
-			$with_snmpv3_securityname = null;
-			$with_snmpv3_securitylevel = -1;
-			$with_snmpv3_authpassphrase = null;
-			$with_snmpv3_privpassphrase = null;
-			$with_value_type = -1;
-			$with_units = null;
-			$with_formula = null;
-			$with_delay = null;
-			$with_history = null;
-			$with_trends = null;
-			$with_status = null;
-			$with_logtimefmt = null;
-			$with_delta = null;
-			$with_trapper_hosts = null;
-		}
+		$form = new CFormTable(S_ITEM.' '.S_FILTER);
 		
-		update_profile("selection_mode"            , $_REQUEST['selection_mode']             = $selection_mode);
-							        			     			
-		update_profile("with_node"                 , $_REQUEST['with_node']                  = $with_node);
-		update_profile("with_group"                , $_REQUEST['with_group']                 = $with_group);
-		update_profile("with_host"                 , $_REQUEST['with_host']                  = $with_host);
-		update_profile("with_application"          , $_REQUEST['with_application']           = $with_application);
-		update_profile("with_description"          , $_REQUEST['with_description']           = $with_description);
-		update_profile("with_type"                 , $_REQUEST['with_type']                  = $with_type);
-		update_profile("with_key"                  , $_REQUEST['with_key']                   = $with_key);
-		update_profile("with_snmp_community"       , $_REQUEST['with_snmp_community']        = $with_snmp_community);
-		update_profile("with_snmp_oid"             , $_REQUEST['with_snmp_oid']              = $with_snmp_oid);
-		update_profile("with_snmp_port"            , $_REQUEST['with_snmp_port']             = $with_snmp_port);
-		update_profile("with_snmpv3_securityname"  , $_REQUEST['with_snmpv3_securityname']   = $with_snmpv3_securityname);
-		update_profile("with_snmpv3_securitylevel" , $_REQUEST['with_snmpv3_securitylevel']  = $with_snmpv3_securitylevel);
-		update_profile("with_snmpv3_authpassphrase", $_REQUEST['with_snmpv3_authpassphrase'] = $with_snmpv3_authpassphrase);
-		update_profile("with_snmpv3_privpassphrase", $_REQUEST['with_snmpv3_privpassphrase'] = $with_snmpv3_privpassphrase);
-		update_profile("with_value_type"           , $_REQUEST['with_value_type']            = $with_value_type);
-		update_profile("with_units"                , $_REQUEST['with_units']                 = $with_units);
-		update_profile("with_formula"              , $_REQUEST['with_formula']               = $with_formula);
-		update_profile("with_delay"                , $_REQUEST['with_delay']                 = $with_delay);
-		update_profile("with_history"              , $_REQUEST['with_history']               = $with_history);
-		update_profile("with_trends"               , $_REQUEST['with_trends']                = $with_trends);
-		update_profile("with_status"               , $_REQUEST['with_status']                = $with_status);
-		update_profile("with_logtimefmt"           , $_REQUEST['with_logtimefmt']            = $with_logtimefmt);
-		update_profile("with_delta"                , $_REQUEST['with_delta']                 = $with_delta);
-		update_profile("with_trapper_hosts"        , $_REQUEST['with_trapper_hosts']         = $with_trapper_hosts);
+		$form->AddOption('name','zbx_filter');
+		$form->AddOption('id','zbx_filter');
+		$form->SetMethod('get');
+		
+		$form->AddAction('onsubmit',"javascript: if(empty_form(this)) return Confirm('Filter is empty! All items will be selected. Proceed?');");
 
-		$form = new CFormTable(S_ITEM_SELECTION);
-		$form->SetName('frmselection');
-
-		$form->AddVar('hostid',get_request('hostid'));
-		$form->AddVar('external_filter', 1);
-
-		$form->SetTitle(S_ITEM_SELECTION,SPACE);
-
+		$form->AddVar('filter_hostid',get_request('filter_hostid',get_request('hostid')));
 		$form->AddVar('selection_mode', $selection_mode);
 
 		$modeLink = new CLink($selection_mode == 0 ? S_ADVANCED : S_SIMPLE, '#','action');
-		$modeLink->SetAction('create_var(\''.$form->GetName().'\',\'selection_mode\','.($selection_mode == 0 ? 1 : 0).',true)');
+		$modeLink->SetAction("create_var('".$form->GetName()."','selection_mode',".($selection_mode == 0 ? 1 : 0).',true);');
+		
 		$form->AddRow(S_SELECTION_MODE,$modeLink);
 
-		if(ZBX_DISTRIBUTED && $selection_mode)
-		{
+		if(ZBX_DISTRIBUTED && $selection_mode){
 			$form->AddRow(array('from ',bold(S_NODE),' like'), array(
-				new CTextBox('with_node',$with_node,32),
-				new CButton("btn_node",S_SELECT,"return PopUp('popup.php?dstfrm=".$form->GetName().
-					"&dstfld1=with_node&srctbl=nodes&srcfld1=name',450,450);",
+				new CTextBox('filter_node',$filter_node,32),
+				new CButton('btn_node',S_SELECT,"return PopUp('popup.php?dstfrm=".$form->GetName().
+					"&dstfld1=filter_node&srctbl=nodes&srcfld1=name',450,450);",
 					"G")
 			));
 		}
 
-		if($selection_mode)
-		{
+		if($selection_mode){
 			$form->AddRow(array('from ',bold(S_HOST_GROUP),' like'), array(
-				new CTextBox('with_group',$with_group,32),
+				new CTextBox('filter_group',$filter_group,32),
 				new CButton("btn_group",S_SELECT,"return PopUp('popup.php?dstfrm=".$form->GetName().
-					"&dstfld1=with_group&srctbl=host_group&srcfld1=name',450,450);",
+					"&dstfld1=filter_group&srctbl=host_group&srcfld1=name',450,450);",
 					"G")
 			));
 		}
 
 		$form->AddRow(array('from ',bold(S_HOST),' like'),array(
-			new CTextBox('with_host',$with_host,32),
+			new CTextBox('filter_host',$filter_host,32),
 			new CButton("btn_host",S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$form->GetName().
-				"&dstfld1=with_host&dstfld2=hostid&srctbl=hosts&srcfld1=host&srcfld2=hostid',450,450);",
+				"&dstfld1=filter_host&dstfld2=filter_hostid&srctbl=hosts&srcfld1=host&srcfld2=hostid',450,450);",
 				'H')
 			));
 
-		if($selection_mode)
-		{
+		if($selection_mode){
 			$form->AddRow(array('from ',bold(S_APPLICATION),' like'),array(
-				new CTextBox('with_application', $with_application, 32),
+				new CTextBox('filter_application', $filter_application, 32),
 				new CButton('btn_app',S_SELECT,
 					'return PopUp("popup.php?dstfrm='.$form->GetName().
-					'&dstfld1=with_application&srctbl=applications'.
+					'&dstfld1=filter_application&srctbl=applications'.
 					'&srcfld1=name",400,300,"application");',
 					'A')
 				));
 		}
 
-		$form->AddRow(array('with ',bold(S_DESCRIPTION),' like'), new CTextBox("with_description",$with_description,40));
+		$form->AddRow(array('with ',bold(S_DESCRIPTION),' like'), new CTextBox("filter_description",$filter_description,40));
 
-		if($selection_mode)
-		{
-			$cmbType = new CComboBox("with_type",$with_type, "submit()");
+		if($selection_mode){
+			$cmbType = new CComboBox("filter_type",$filter_type, "submit()");
 			$cmbType->AddItem(-1, S_ALL_SMALL);
 			foreach(array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_TRAPPER,
@@ -1416,26 +1326,23 @@
 			$form->AddRow(array('with ',bold(S_TYPE)), $cmbType);
 		}
 
-		$form->AddRow(array('with ',bold(S_KEY),' like'), array(new CTextBox("with_key",$with_key,40)));
+		$form->AddRow(array('with ',bold(S_KEY),' like'), array(new CTextBox("filter_key",$filter_key,40)));
 
-		if($selection_mode)
-		{
-			if(($with_type==ITEM_TYPE_SNMPV1)||($with_type==ITEM_TYPE_SNMPV2C)||$with_type==ITEM_TYPE_SNMPV3)
-			{ 
+		if($selection_mode){
+			if(($filter_type==ITEM_TYPE_SNMPV1)||($filter_type==ITEM_TYPE_SNMPV2C)||$filter_type==ITEM_TYPE_SNMPV3){
 				$form->AddRow(array('with ',bold(S_SNMP_COMMUNITY),' like'),
-					new CTextBox("with_snmp_community",$with_snmp_community,16));
+					new CTextBox("filter_snmp_community",$filter_snmp_community,16));
 				$form->AddRow(array('with ',bold(S_SNMP_OID),' like'),
-					new CTextBox("with_snmp_oid",$with_snmp_oid,40));
+					new CTextBox("filter_snmp_oid",$filter_snmp_oid,40));
 				$form->AddRow(array('with ',bold(S_SNMP_PORT),' like'),
-					new CNumericBox("with_snmp_port",$with_snmp_port,5,null,true));
+					new CNumericBox("filter_snmp_port",$filter_snmp_port,5,null,true));
 			}
 
-			if($with_type==ITEM_TYPE_SNMPV3)
-			{
+			if($filter_type==ITEM_TYPE_SNMPV3){
 				$form->AddRow(array('with ',bold(S_SNMPV3_SECURITY_NAME),' like'),
-					new CTextBox("with_snmpv3_securityname",$with_snmpv3_securityname,64));
+					new CTextBox("filter_snmpv3_securityname",$filter_snmpv3_securityname,64));
 
-				$cmbSecLevel = new CComboBox("with_snmpv3_securitylevel",$with_snmpv3_securitylevel);
+				$cmbSecLevel = new CComboBox("filter_snmpv3_securitylevel",$filter_snmpv3_securitylevel);
 				$cmbSecLevel->AddItem(-1,S_ALL_SMALL);
 				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,"NoAuthPriv");
 				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,"AuthNoPriv");
@@ -1443,14 +1350,14 @@
 				$form->AddRow(array('with ',bold(S_SNMPV3_SECURITY_LEVEL)), $cmbSecLevel);
 
 				$form->AddRow(array('with ',bold(S_SNMPV3_AUTH_PASSPHRASE),' like'),
-					new CTextBox("with_snmpv3_authpassphrase",$with_snmpv3_authpassphrase,64));
+					new CTextBox("filter_snmpv3_authpassphrase",$filter_snmpv3_authpassphrase,64));
 
 				$form->AddRow(array('with ',bold(S_SNMPV3_PRIV_PASSPHRASE),' like'),
-					new CTextBox("with_snmpv3_privpassphrase",$with_snmpv3_privpassphrase,64));
+					new CTextBox("filter_snmpv3_privpassphrase",$filter_snmpv3_privpassphrase,64));
 			}
 
 
-			$cmbValType = new CComboBox("with_value_type",$with_value_type,"submit()");
+			$cmbValType = new CComboBox("filter_value_type",$filter_value_type,"submit()");
 			$cmbValType->AddItem(-1,	S_ALL_SMALL);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UINT64);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
@@ -1459,37 +1366,37 @@
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
 			$form->AddRow(array('with ',bold(S_TYPE_OF_INFORMATION)),$cmbValType);
 			
-			if( ($with_value_type==ITEM_VALUE_TYPE_FLOAT) || ($with_value_type==ITEM_VALUE_TYPE_UINT64))
+			if( ($filter_value_type==ITEM_VALUE_TYPE_FLOAT) || ($filter_value_type==ITEM_VALUE_TYPE_UINT64))
 			{
-				$form->AddRow(array('with ',bold(S_UNITS)), new CTextBox("with_units",$with_units,40));
-				$form->AddRow(array('with ',bold(S_CUSTOM_MULTIPLIER),' like'), new CTextBox("with_formula",$with_formula,40));
+				$form->AddRow(array('with ',bold(S_UNITS)), new CTextBox("filter_units",$filter_units,40));
+				$form->AddRow(array('with ',bold(S_CUSTOM_MULTIPLIER),' like'), new CTextBox("filter_formula",$filter_formula,40));
 			}
 
-			if($with_type != ITEM_TYPE_TRAPPER && $with_type != ITEM_TYPE_HTTPTEST)
+			if($filter_type != ITEM_TYPE_TRAPPER && $filter_type != ITEM_TYPE_HTTPTEST)
 			{
 				$form->AddRow(array('with ',bold(S_UPDATE_INTERVAL_IN_SEC)),
-					new CNumericBox("with_delay",$with_delay,5,null,true));
+					new CNumericBox("filter_delay",$filter_delay,5,null,true));
 			}
 
 			$form->AddRow(array('with ',bold(S_KEEP_HISTORY_IN_DAYS)),
-				new CNumericBox("with_history",$with_history,8,null,true));
+				new CNumericBox("filter_history",$filter_history,8,null,true));
 
-			$form->AddRow(array('with ',bold(S_KEEP_TRENDS_IN_DAYS)), new CNumericBox("with_trends",$with_trends,8,null,true));
+			$form->AddRow(array('with ',bold(S_KEEP_TRENDS_IN_DAYS)), new CNumericBox("filter_trends",$filter_trends,8,null,true));
 
-			$cmbStatus = new CComboBox("with_status",$with_status);
+			$cmbStatus = new CComboBox("filter_status",$filter_status);
 			$cmbStatus->AddItem(-1,S_ALL_SMALL);
 			foreach(array(ITEM_STATUS_ACTIVE,ITEM_STATUS_DISABLED,ITEM_STATUS_NOTSUPPORTED) as $st)
 				$cmbStatus->AddItem($st,item_status2str($st));
 			$form->AddRow(array('with ',bold(S_STATUS)),$cmbStatus);
 
-			if($with_value_type==ITEM_VALUE_TYPE_LOG)
+			if($filter_value_type==ITEM_VALUE_TYPE_LOG)
 			{
-				$form->AddRow(array('with ',bold(S_LOG_TIME_FORMAT)), new CTextBox("with_logtimefmt",$with_logtimefmt,16));
+				$form->AddRow(array('with ',bold(S_LOG_TIME_FORMAT)), new CTextBox("filter_logtimefmt",$filter_logtimefmt,16));
 			}
 
-			if( ($with_value_type==ITEM_VALUE_TYPE_FLOAT) || ($with_value_type==ITEM_VALUE_TYPE_UINT64))
+			if( ($filter_value_type==ITEM_VALUE_TYPE_FLOAT) || ($filter_value_type==ITEM_VALUE_TYPE_UINT64))
 			{
-				$cmbDelta= new CComboBox("with_delta",$with_delta);
+				$cmbDelta= new CComboBox("filter_delta",$filter_delta);
 				$cmbDelta->AddItem(-1,S_ALL_SMALL);
 				$cmbDelta->AddItem(0,S_AS_IS);
 				$cmbDelta->AddItem(1,S_DELTA_SPEED_PER_SECOND);
@@ -1497,17 +1404,20 @@
 				$form->AddRow(array('with ',bold(S_STORE_VALUE)),$cmbDelta);
 			}
 			
-			if($with_type==ITEM_TYPE_TRAPPER)
+			if($filter_type==ITEM_TYPE_TRAPPER)
 			{
-				$form->AddRow(array('with ',bold(S_ALLOWED_HOSTS),' like'), new CTextBox("with_trapper_hosts",$with_trapper_hosts,40));
+				$form->AddRow(array('with ',bold(S_ALLOWED_HOSTS),' like'), new CTextBox("filter_trapper_hosts",$filter_trapper_hosts,40));
 			}
 		}
 
-		$form->AddItemToBottomRow(array(
-			new CButton('select',S_SEARCH),
-			new CButtonCancel('&external_filter=1')));
-
-		$form->Show();
+		$reset = new CButton("filter_rst",S_RESET);
+		$reset->SetType('button');
+		$reset->SetAction('javascript: var uri = new url(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+	
+		$form->AddItemToBottomRow(new CButton("filter_set",S_FILTER));
+		$form->AddItemToBottomRow($reset);
+		
+	return $form;
 	}
 
 	# Insert form for Item information

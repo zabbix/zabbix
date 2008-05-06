@@ -199,9 +199,10 @@ include_once "include/page_header.php";
 	{
 //		return empty($field) ? "" : "window.opener.document.forms['".addslashes($frame)."'].elements['".addslashes($field)."'].value='".addslashes($value)."';";
 		if(empty($field)) return '';
-		
+
+//						"alert(window.opener.document.getElementById('".addslashes($field)."').value);".		
 		$script = 	'try{'.
-						"window.opener.document.getElementsByName('".addslashes($field)."')[0].value='".addslashes($value)."';".
+						"window.opener.document.getElementById('".addslashes($field)."').value='".addslashes($value)."';".
 					'} catch(e){'.
 						'throw("Error: Target not found")'.
 					'}'."\n";
@@ -377,8 +378,8 @@ include_once "include/page_header.php";
 
 
 		$db_hosts = DBselect($sql);
-		while($host = DBfetch($db_hosts))
-		{
+		while($host = DBfetch($db_hosts)){
+		
 			$name = new CLink($host["host"],"#","action");
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
@@ -403,12 +404,10 @@ include_once "include/page_header.php";
 			else
 				$status=S_UNKNOWN;
 
-			if($host["status"] == HOST_STATUS_TEMPLATE)
-			{
+			if($host["status"] == HOST_STATUS_TEMPLATE){
 				$dns = $ip = $port = $available = '-';
 			}
-			else
-			{
+			else{
 				$dns = $host['dns'];
 				$ip = $host['ip'];
 
@@ -441,18 +440,15 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	else if($srctbl == "templates")
-	{
+	else if($srctbl == "templates"){
 		$existed_templates = get_request('existed_templates', array());
 		$templates = get_request('templates', array());
 		$templates = $templates + $existed_templates;
 
-		if(!validate_templates(array_keys($templates)))
-		{
+		if(!validate_templates(array_keys($templates))){
 			show_error_message('Conflict between selected templates');
 		}
-		else if(isset($_REQUEST['select']))
-		{
+		else if(isset($_REQUEST['select'])){
 			$new_templates = array_diff($templates, $existed_templates);
 			if(count($new_templates) > 0) 
 			{

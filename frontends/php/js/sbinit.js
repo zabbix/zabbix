@@ -91,8 +91,10 @@ function graphsubmit(){
 	scrl.style.display = 'none';
 	
 	var uri = new url(location.href);
-	
+
+//	if((SCROLL_BAR.dt.getTime()-(SCROLL_BAR.period * 1000)) != SCROLL_BAR.sdt.getTime()) 
 	uri.setArgument('stime', SCROLL_BAR.getsTime());
+		
 	uri.setArgument('period', SCROLL_BAR.getPeriod());
 	location.href = uri.getUrl();
 }
@@ -103,7 +105,7 @@ function gmenuload(){
 	
 	var stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
 	var uri = new url(location.href);
-	
+
 	uri.setArgument('stime', stime);
 	uri.setArgument('period', G_MENU.period);
 	
