@@ -42,7 +42,7 @@ class CLdap{
 				
 				'mapping'=> 		array(
 										'alias'=>	 	'uid',
-										'userid'=> 		'uidnumber',
+										'userid'=> 		'uidnumbera',
 										'passwd'=>		'userpassword',
 									),
 				
@@ -216,8 +216,8 @@ class CLdap{
 
 // overwrite if other attribs are specified.
 		if(is_array($this->cnf['mapping'])){
-			foreach($this->cnf['mapping'] as $localkey => $key) {
-				$info[$localkey] = $user_result[$key][0];
+			foreach($this->cnf['mapping'] as $localkey => $key){
+				$info[$localkey] = isset($user_result[$key])?$user_result[$key][0]:null;
 			}
 		}
 		$user_result = array_merge($info,$user_result);
