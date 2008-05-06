@@ -255,6 +255,27 @@ function get_user_history(){
 return $history;
 }
 
+function get_last_history_page($same_page=false){
+	global $page;
+	$title = explode('[',$page['title']);
+	$title = $title[0];
+	
+	$rows=false;
+	for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
+		$new_rows = get_multi_profile('web.history.'.$i,false,PROFILE_TYPE_MULTI);
+		
+		if(!$same_page && ($title == $new_rows['value'])) continue;
+		$rows = $new_rows;
+	}
+	
+	if(is_array($rows)){
+		$rows['page'] = $rows['value'];
+		$rows['url'] = $rows['value2'];
+	}
+	
+return $rows;
+}
+
 // Author: Aly
 function add_user_history($page){
 

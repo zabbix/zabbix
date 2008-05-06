@@ -147,7 +147,7 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 
 		if (0 != id) {
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
-				"and %s="ZBX_FS_UI64,
+				" and %s="ZBX_FS_UI64,
 				tables[t].recid,
 				id);
 		}

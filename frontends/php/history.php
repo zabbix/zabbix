@@ -30,7 +30,7 @@
 	
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 		
-	if(isset($_REQUEST['plaintext']) || isset($_REQUEST['fullscreen'])){
+	if(isset($_REQUEST['plaintext'])){
 		define('ZBX_PAGE_NO_MENU', 1);
 	}
 	else if(PAGE_TYPE_HTML == $page['type']){
@@ -74,7 +74,7 @@ include_once "include/page_header.php";
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		"form_copy_to"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
-		"fullscreen"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	null)
+		"fullscreen"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	null,	null)
 	);
 
 	check_fields($fields);
@@ -155,11 +155,9 @@ include_once "include/page_header.php";
 		if(isset($_REQUEST["plaintext"]))
 			echo $main_header.SBR;
 	
-		if($_REQUEST["action"]=="showgraph")
-		{
+		if($_REQUEST["action"]=="showgraph"){
 			$_REQUEST["period"] = get_request("period",get_profile("web.item[".$_REQUEST["itemid"]."].graph.period", ZBX_PERIOD_DEFAULT));
-			if($_REQUEST["period"] >= ZBX_MIN_PERIOD)
-			{
+			if($_REQUEST["period"] >= ZBX_MIN_PERIOD){
 				update_profile("web.item[".$_REQUEST["itemid"]."].graph.period",$_REQUEST["period"]);
 			}
 		}
@@ -193,7 +191,7 @@ include_once "include/page_header.php";
 
 	$to_save_request = null;
 
-	if( !isset($_REQUEST['plaintext']) && !isset($_REQUEST['fullscreen']) ){
+	if( !isset($_REQUEST['plaintext']) && ($_REQUEST['fullscreen']==0) ){
 		if($item_type == ITEM_VALUE_TYPE_LOG){
 			$l_header = new CForm();
 			$l_header->SetName("loglist");
@@ -334,7 +332,7 @@ include_once "include/page_header.php";
 				$r_header = null;
 			}
 
-			if(($l_header || $r_header) &&	!isset($_REQUEST['fullscreen']))
+			if(($l_header || $r_header) &&	($_REQUEST['fullscreen']==0))
 					show_table_header($l_header,$r_header);
 		}
 		else{

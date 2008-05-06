@@ -58,7 +58,7 @@
 				$incorect_session = true;
 			}
 			else if($login['attempt_failed']){
-				error('There was ['.$login['attempt_failed'].'] failed attempts to Login from ['.$login['attempt_ip'].'] at ['.date('d.m.Y H:nn',$login['attempt_clock']).'] o\'clock!');
+				error('There was ['.$login['attempt_failed'].'] failed attempts to Login from ['.$login['attempt_ip'].'] at ['.date('d.m.Y H:i',$login['attempt_clock']).'] o\'clock!');
 				DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.zbx_dbstr($login['userid']));
 			}
 		}
