@@ -22,39 +22,43 @@
 	class CLink extends CTag
 	{
 /* public */
-		function CLink($item=NULL,$url=NULL,$class=NULL,$action=NULL)
-		{
-			parent::CTag("a","yes");
+		function CLink($item=NULL,$url=NULL,$class=NULL,$action=NULL){
+			parent::CTag('a','yes');
 
-			$this->tag_start= "";
-			$this->tag_end = "";
-			$this->tag_body_start = "";
-			$this->tag_body_end = "";
+			$this->tag_start= '';
+			$this->tag_end = '';
+			$this->tag_body_start = '';
+			$this->tag_body_end = '';
 
 			if(!is_null($class))	$this->SetClass($class);
 			if(!is_null($item))	$this->AddItem($item);
 			if(!is_null($url))	$this->SetUrl($url);
 			if(!is_null($action))	$this->SetAction($action);
 		}
-		function SetAction($value=NULL)
-		{
+		
+		function SetAction($value=NULL){
 			if(is_null($value))
 				return $this->options['action'] = $page['file'];
 
 			return parent::AddAction('onclick', $value);
 		}
-		function SetUrl($value)
-		{
+		
+		function SetUrl($value){
 			$this->AddOption('href', $value);
 		}
-		function SetTarget($value=NULL)
-		{
-			if(is_null($value))
-			{
+		
+		function getUrl(){
+			if(isset($this->options['href']))
+				return $this->options['href'];
+			else
+				return null;
+		}
+		
+		function SetTarget($value=NULL){
+			if(is_null($value)){
 				unset($this->options['target']);
 			}
-			else
-			{
+			else{
 				$this->options['target'] = $value;
 			}
 		}

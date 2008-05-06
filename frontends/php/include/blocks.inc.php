@@ -177,7 +177,7 @@ function make_system_summary(){
 	$config=select_config();
 	
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-	$available_triggers = get_accessible_triggers(PERM_READ_LIST,PERM_RES_DATA_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_LIST,PERM_RES_IDS_ARRAY);
 		
 	$table = new CTableInfo();
 	$table->SetHeader(array(
@@ -666,7 +666,7 @@ return $table;
 function make_webmon_overview(){
 	global $USER_DETAILS;
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_DATA_ARRAY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
 	$table  = new CTableInfo();
 	$table->SetHeader(array(

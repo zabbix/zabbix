@@ -127,7 +127,7 @@ include_once "include/page_header.php";
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 		}
 
-		if($result) // result - OK{
+		if($result){ // result - OK
 			add_audit(!isset($_REQUEST['actionid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION, 
 				S_NAME.': '.$_REQUEST['name']);
 

@@ -120,12 +120,24 @@ include_once "include/page_header.php";
 				' ['.($bulk)?(' BULK ACKNOWLEDGE '):(expand_trigger_description_by_data($db_data)).']'.
 				' ['.$_REQUEST['message'].']');
 		}
-		
-		Redirect('tr_status.php?hostid='.get_profile('web.tr_status.hostid',0));
+
+		$last_page=get_last_history_page();
+
+		if(!$last_page){
+			$last_page['url']='tr_status.php?hostid='.get_profile('web.tr_status.hostid',0);
+		}
+
+		Redirect($last_page['url']);
 		exit;
 	}
 	else if(isset($_REQUEST['cancel'])){
-		Redirect('tr_status.php?hostid='.get_profile('web.tr_status.hostid',0));
+		$last_page=get_last_history_page();
+
+		if(!$last_page){
+			$last_page['url']='tr_status.php?hostid='.get_profile('web.tr_status.hostid',0);
+		}
+
+		Redirect($last_page['url']);
 		exit;
 	}
 ?>
