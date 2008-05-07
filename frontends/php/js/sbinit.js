@@ -89,13 +89,18 @@ function graphsubmit(){
 	var scrl = $('scroll');
 
 	scrl.style.display = 'none';
-	
-	var uri = new url(location.href);
 
-//	if((SCROLL_BAR.dt.getTime()-(SCROLL_BAR.period * 1000)) != SCROLL_BAR.sdt.getTime()) 
-	uri.setArgument('stime', SCROLL_BAR.getsTime());
-		
+	var uri = new url(location.href);
+	var stime = SCROLL_BAR.getsTime();
+
+	if((SCROLL_BAR.dt.getTime()-(SCROLL_BAR.period * 1000)) == SCROLL_BAR.sdt.getTime()){
+//	alert((SCROLL_BAR.dt.getTime()-(SCROLL_BAR.period * 1000))+' != '+SCROLL_BAR.sdt.getTime());		
+		stime=parseInt(stime)+100000000;
+	}
+
+	uri.setArgument('stime', stime);
 	uri.setArgument('period', SCROLL_BAR.getPeriod());
+
 	location.href = uri.getUrl();
 }
 

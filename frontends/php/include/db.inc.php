@@ -598,26 +598,22 @@ else {
 		return (int)bcdiv("$id_var",'100000000000000');
 	}
 
-	function DBin_node( $id_name, $nodes = null )
-	{
-		if ( is_null($nodes) )	$nodes = get_current_nodeid();
+	function DBin_node( $id_name, $nodes = null ){
+		if(is_null($nodes))	$nodes = get_current_nodeid();
 
-		if ( empty($nodes) )	$nodes = 0;
+		if(empty($nodes))	$nodes = 0;
 
-		if ( is_array($nodes) )
-		{
+		if(is_array($nodes)){
 			$nodes = implode(',', $nodes);
 		}
-		else if ( is_string($nodes) )
-		{
+		else if(is_string($nodes)){
 			if ( !eregi('([0-9\,]+)', $nodes ) )
 				fatal_error('Incorrect "nodes" for "DBin_node". Passed ['.$nodes.']');
 		}
-		else if ( !is_numeric($nodes) )
-		{
+		else if(!is_numeric($nodes)){
 			fatal_error('Incorrect type of "nodes" for "DBin_node". Passed ['.gettype($nodes).']');
 		}
-		return (' '.DBid2nodeid($id_name).' in ('.$nodes.') ');
+	return (' '.DBid2nodeid($id_name).' in ('.$nodes.') ');
 	}
 
 	function in_node( $id_var, $nodes = null ){

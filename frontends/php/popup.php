@@ -931,30 +931,34 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	else if($srctbl == "graphs")
-	{
+	else if($srctbl == "graphs"){
+	
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
-		$table->SetHeader(array(S_NAME,S_GRAPH_TYPE));
+		$table->SetHeader(array(
+			isset($hostid)?null:S_HOST,
+			S_NAME,
+			S_GRAPH_TYPE
+		));
 		
-		$available_graphs = get_accessible_graphs(PERM_READ_LIST, null, get_current_nodeid());
+		$available_graphs = get_accessible_graphs(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid());
 
-		$sql = 'SELECT DISTINCT g.graphid,g.name,g.graphtype,n.name as node_name, h.host'.
-					' FROM graphs g '.
-						' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
-						' LEFT JOIN items i ON gi.itemid=i.itemid '.
-						' LEFT JOIN hosts h ON h.hostid=i.hostid '.
-						' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.graphid').
-					' WHERE '.DBcondition('g.graphid',$available_graphs).
-						' AND '.DBin_node('g.graphid', $nodeid);
+		$sql = 'SELECT DISTINCT g.graphid,g.name,g.graphtype,h.host '.
+			' FROM graphs g,graphs_items gi,items i,hosts h '.
+			' WHERE gi.graphid=g.graphid '.
+				' AND i.itemid=gi.itemid '.
+				' AND h.hostid=i.hostid '.
+				' AND h.status='.HOST_STATUS_MONITORED.
+				' AND '.DBin_node('g.graphid').
+				' AND '.DBcondition('g.graphid',$available_graphs);
 
 		if(isset($hostid)) 
 			$sql .= ' AND h.hostid='.$hostid;
 
-		$sql .= ' ORDER BY node_name,host,name,graphid';
+		$sql .= ' ORDER BY h.host,g.name';
 
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
-			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
+			$row['node_name'] = get_node_name_by_elid($row['graphid']);
 			$name = $row['node_name'].$row['host'].':'.$row['name'];
 
 			$description = new CLink($row['name'],'#','action');
@@ -986,6 +990,7 @@ include_once "include/page_header.php";
 			}
 			
 			$table->AddRow(array(
+				isset($hostid)?null:$row['host'],
 				$description,
 				$graphtype
 			));
