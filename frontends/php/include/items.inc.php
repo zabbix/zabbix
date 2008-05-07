@@ -421,15 +421,15 @@
 			}
 		}
 
-		DBexecute("update items set lastlogsize=0 where itemid=$itemid and key_<>".zbx_dbstr($key));
-
-		$result = DBexecute("delete from items_applications where itemid=$itemid");
-		foreach($applications as $appid)
-		{
-			$itemappid=get_dbid("items_applications","itemappid");
-			DBexecute("insert into items_applications (itemappid,itemid,applicationid) values($itemappid,".$itemid.",".$appid.")");
+		if(isset($_REQUEST['applications_visible'])){	
+			$result = DBexecute("delete from items_applications where itemid=$itemid");
+			foreach($applications as $appid)
+			{
+				$itemappid=get_dbid("items_applications","itemappid");
+				DBexecute("insert into items_applications (itemappid,itemid,applicationid) values($itemappid,".$itemid.",".$appid.")");
+			}
 		}
-
+		
 		$result=DBexecute(
 			"update items set description=".zbx_dbstr($description).",key_=".zbx_dbstr($key).",".
 			"hostid=$hostid,delay=$delay,history=$history,nextcheck=0,type=$type,status=".$status.','.

@@ -1,5 +1,6 @@
 Changes for 1.4.j:
 
+ - [ZBX-65] fixed bug with applications on items mass update (Artem)
  - added support of encoding parameter for regexp[] and iregexp[]. Integrated patch (Sasha)
  - improved support of macros {ITEM.VALUE} (Sasha)
  - do not generate unknown events (Alexei)
