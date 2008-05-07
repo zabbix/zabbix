@@ -533,7 +533,7 @@
 		{
 			global $DB;
 
-			$old_DB		= $DB['DB'];
+//			$old_DB		= $DB['DB'];
 			$old_DB_TYPE	= $DB['TYPE'];
 			$old_DB_SERVER	= $DB['SERVER'];
 			$old_DB_PORT	= $DB['PORT'];
@@ -572,7 +572,7 @@
 			/* restore connection */
 			global $DB;
 
-			$DB['DB']		= $old_DB;
+//			$DB['DB']		= $old_DB;
 			$DB['TYPE']	= $old_DB_TYPE;
 			$DB['SERVER']	= $old_DB_SERVER;
 			$DB['PORT']	= $old_DB_PORT;
@@ -673,9 +673,9 @@
 
 		function CheckConfigurationFile()
 		{
-			global $DB;
+			global $DB,$ZBX_SERVER,$ZBX_SERVER_PORT;
 
-			$old_DB				= $DB['DB'];
+//			$old_DB				= $DB['DB'];
 			$old_DB_TYPE		= $DB['TYPE'];
 			$old_DB_SERVER		= $DB['SERVER'];
 			$old_DB_PORT		= $DB['PORT'];
@@ -734,7 +734,7 @@
 			/* restore connection */
 			global $DB;
 
-			$DB['DB']		= $old_DB;
+//			$DB['DB']		= $old_DB;
 			$DB['TYPE']	= $old_DB_TYPE;
 			$DB['SERVER']	= $old_DB_SERVER;
 			$DB['PORT']	= $old_DB_PORT;
