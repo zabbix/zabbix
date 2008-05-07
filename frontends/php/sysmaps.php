@@ -55,8 +55,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 	validate_sort_and_sortorder('sm.name',ZBX_SORT_UP);
 	
-	if(isset($_REQUEST["sysmapid"]))
-	{
+	if(isset($_REQUEST["sysmapid"])){
 		if(!sysmap_accessible($_REQUEST["sysmapid"],PERM_READ_WRITE))
 			access_deny();
 	
@@ -131,8 +130,7 @@ include_once "include/page_header.php";
 						' WHERE '.DBin_node('sm.sysmapid').
 						order_by('sm.name,sm.width,sm.height','sm.sysmapid'));
 						
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			if(!sysmap_accessible($row["sysmapid"],PERM_READ_WRITE)) continue;
 
 			$table->AddRow(array(

@@ -128,7 +128,7 @@ include_once 'include/page_header.php';
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
 	
-	$available_graphs = get_accessible_graphs(PERM_READ_LIST, null, get_current_nodeid());
+	$available_graphs = get_accessible_graphs(PERM_READ_LIST, PERM_RES_IDS_ARRAY, get_current_nodeid());
 	
 	if(($_REQUEST['graphid']>0) && ($row=DBfetch(DBselect('SELECT DISTINCT graphid, name FROM graphs WHERE graphid='.$_REQUEST['graphid'])))){
 		if(!graph_accessible($_REQUEST['graphid'])){
@@ -182,7 +182,7 @@ include_once 'include/page_header.php';
 				' AND h.hostid=i.hostid '.
 				' AND hg.hostid=h.hostid '.
 				($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
-				' AND gi.graphid IN ('.$available_graphs.')';
+				' AND '.DBcondition('gi.graphid',$available_graphs);
 //				' AND h.hostid IN ('.$available_hosts.') ';
 
 
@@ -206,7 +206,7 @@ include_once 'include/page_header.php';
 				($_REQUEST['hostid']?' AND h.hostid='.$_REQUEST['hostid']:'').
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND '.DBin_node('g.graphid').
-				' AND g.graphid IN ('.$available_graphs.')';
+				' AND '.DBcondition('g.graphid',$available_graphs);
 //				' AND h.hostid IN ('.$available_hosts.') ';
 
 		if($cnt_row = DBfetch(DBselect($sql))){
@@ -247,7 +247,7 @@ include_once 'include/page_header.php';
 			' AND h.hostid=i.hostid '.
 			' AND hg.hostid=h.hostid '.
 			($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
-			' AND gi.graphid IN ('.$available_graphs.')'.
+			' AND '.DBcondition('gi.graphid',$available_graphs).
 //			' AND h.hostid IN ('.$available_hosts.') '.
 		' ORDER BY h.host';
 	
@@ -271,7 +271,7 @@ include_once 'include/page_header.php';
 			($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
 			($_REQUEST['hostid']?' AND h.hostid='.$_REQUEST['hostid']:'').
 			' AND '.DBin_node('g.graphid').
-			' AND g.graphid IN ('.$available_graphs.')'.
+			' AND '.DBcondition('g.graphid',$available_graphs).
 //			' AND h.hostid IN ('.$available_hosts.') ';
 		' ORDER BY g.name';
 

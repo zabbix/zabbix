@@ -527,11 +527,12 @@ function make_latest_issues(){
 					' AND t.triggerid=f.triggerid '.
 					' AND t.status='.TRIGGER_STATUS_ENABLED.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
-					' AND '.DBin_node('t.triggerid').
+//					' AND '.DBin_node('t.triggerid').
 					' AND '.DBcondition('t.triggerid',$available_triggers).
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND t.value='.TRIGGER_VALUE_TRUE.
 				' ORDER BY t.lastchange DESC';
+
 	$result = DBselect($sql);
 
 	while($row=DBfetch($result)){
