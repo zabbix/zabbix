@@ -46,4 +46,3 @@ int	SYSTEM_BOOTTIME(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return SYSINFO_RET_FAIL;
 #endif /* HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME */
 }
-

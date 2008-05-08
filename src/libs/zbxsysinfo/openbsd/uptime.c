@@ -24,8 +24,8 @@
 int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME
-	size_t		len;
 	int		mib[2], now;
+	size_t		len;
 	struct timeval	uptime;
 
 	assert(result);
@@ -37,7 +37,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	len = sizeof(struct timeval);
 
-	if (-1 == sysctl(mib, 2, &uptime, &len, NULL, 0))
+	if (0 != sysctl(mib, 2, &uptime, &len, NULL, 0))
 		return SYSINFO_RET_FAIL;
 
 	now = time(NULL);

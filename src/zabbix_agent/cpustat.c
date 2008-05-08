@@ -72,6 +72,21 @@ static int	zbx_get_cpu_num(void)
 
 	return ncpu;
 
+#elif defined(HAVE_FUNCTION_SYSCTL_HW_NCPU)
+	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
+	/* OpenBSD 4.2 i386 */
+	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	size_t	len;
+	int	mib[] = {CTL_HW, HW_NCPU}, ncpu;
+
+	len = sizeof(ncpu);
+
+	if (0 != sysctl(mib, 2, &ncpu, &len, NULL, 0)) {
+		zabbix_log(LOG_LEVEL_WARNING , "Failed sysctl to determine number of CPUs, adjust to 1");
+		return 1;
+	}
+
+	return ncpu;
 #elif defined(HAVE_PROC_CPUINFO)
 
 	FILE *f = NULL;

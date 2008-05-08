@@ -173,4 +173,3 @@ FS_FNCLIST
 
 	return SYSINFO_RET_FAIL;
 }
-

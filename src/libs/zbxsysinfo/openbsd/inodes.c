@@ -158,7 +158,7 @@ FS_FNCLIST
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, fsname, sizeof(mode)))
+	if (0 != get_param(param, 1, fsname, sizeof(fsname)))
 		return SYSINFO_RET_FAIL;
 	
 	if (0 != get_param(param, 2, mode, sizeof(mode)))

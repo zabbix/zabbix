@@ -106,33 +106,24 @@ int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
-	char    filename[MAX_STRING_LEN];
+	char		filename[MAX_STRING_LEN];
 
         assert(result);
 
         init_result(result);
 
-        if(num_param(param) > 1)
-        {
+        if (num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
-        }
 
-        if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
-        {
+        if (0 != get_param(param, 1, filename, sizeof(filename)))
                 return SYSINFO_RET_FAIL;
-        }
 
 	SET_UI64_RESULT(result, 0);
-	/* File exists */
-	if(stat(filename,&buf) == 0)
-	{
-		/* Regular file */
-		if(S_ISREG(buf.st_mode))
-		{
+
+	if (0 == stat(filename, &buf))	/* File exists */
+		if (S_ISREG(buf.st_mode))	/* Regular file */
 			SET_UI64_RESULT(result, 1);
-		}
-	}
-	/* File does not exist or any other error */
+
 	return SYSINFO_RET_OK;
 }
 
