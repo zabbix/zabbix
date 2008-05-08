@@ -68,10 +68,14 @@
 		{
 			parent::CTag('select','yes');
 			$this->tag_end = '';
-			$this->options['class'] = 'biginput';
+
+			$this->options['id'] = $name;
 			$this->options['name'] = $name;
-			$this->value = $value;
+
+			$this->options['class'] = 'biginput';
 			$this->options['size'] = 1;
+			
+			$this->value = $value;
 			$this->SetAction($action);
 		}
 		function SetAction($value='submit()', $event='onchange')
@@ -106,83 +110,23 @@
 		}
 	}
 
-	class CListBox extends CComboBox
-	{
+	class CListBox extends CComboBox{
 /* public */
-		function CListBox($name='listbox',$value=NULL,$size=5,$action=NULL)
-		{
+		function CListBox($name='listbox',$value=NULL,$size=5,$action=NULL){
 			parent::CComboBox($name,NULL,$action);
 			$this->options['multiple'] = 'multiple';
 			$this->options['size'] = $size;
 			$this->SetValue($value);
 		}
+		
 		function SetSize($value)
 		{
 			$this->options['size'] = $value;
 		}
 	}
 
-	function	inseret_javascript_for_editable_combobox()
-	{
-		if(defined('EDITABLE_COMBOBOX_SCRIPT_INSERTTED')) return;
-
-		define('EDITABLE_COMBOBOX_SCRIPT_INSERTTED', 1);
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-		function CEditableComboBoxInit(obj)
-		{
-			var opt = obj.options;
-
-			if(obj.value) obj.oldValue = obj.value;
-
-			for (var i = 0; i < opt.length; i++)
-				if (-1 == opt.item(i).value)
-					return;
-
-			opt = document.createElement("option");
-			opt.value = -1;
-			opt.text = "(other ...)";
-
-			if(!obj.options.add)
-				obj.insertBefore(opt, obj.options.item(0));
-			else
-				obj.options.add(opt, 0);
-
-			return;
-		}
-
-		function CEditableComboBoxOnChange(obj,size)
-		{
-			if(-1 != obj.value)
-			{
-				obj.oldValue = obj.value;
-			}
-			else
-			{
-				var new_obj = document.createElement("input");
-				new_obj.type = "text";
-				new_obj.name = obj.name;
-				if(size && size > 0)
-				{
-					new_obj.size = size;
-				}
-				new_obj.className = obj.className;
-				if(obj.oldValue) new_obj.value = obj.oldValue;
-				obj.parentNode.replaceChild(new_obj, obj);
-				new_obj.focus();
-				new_obj.select();
-			}
-		}
--->
-</script>
-<?php
-	}
-
-	class CEditableComboBox extends CComboBox
-	{
-		function CEditableComboBox($name='editablecombobox',$value=NULL,$size=0,$action=NULL)
-		{
+	class CEditableComboBox extends CComboBox{
+		function CEditableComboBox($name='editablecombobox',$value=NULL,$size=0,$action=NULL){
 			inseret_javascript_for_editable_combobox();
 
 			parent::CComboBox($name,$value,$action);
@@ -190,16 +134,13 @@
 			parent::AddAction('onchange','CEditableComboBoxOnChange(this,'.$size.');');
 		}
 
-		function AddItem($value, $caption='', $selected=NULL, $enabled='yes')
-		{
-			if(is_null($selected))
-			{
+		function AddItem($value, $caption='', $selected=NULL, $enabled='yes'){
+			if(is_null($selected)){
 				if(is_array($this->value)) {
 					if(str_in_array($value,$this->value))
 						$this->value_exist = 1;
 				}
-				else if(strcmp($value,$this->value) == 0)
-				{
+				else if(strcmp($value,$this->value) == 0){
 					$this->value_exist = 1;
 				}
 			}
@@ -207,13 +148,68 @@
 			parent::AddItem($value,$caption,$selected,$enabled);
 		}
 
-		function ToString($destroy=true)
-		{
-			if(!isset($this->value_exist) && !empty($this->value))
-			{
+		function ToString($destroy=true){
+			if(!isset($this->value_exist) && !empty($this->value)){
 				$this->AddItem($this->value, $this->value, 'yes');
 			}
 			return parent::ToString($destroy);
+		}
+	}
+	
+	class CTweenBox{
+		function ctweenbox($name_l,$name_r,$size){
+			$this->lbox = new ClistBox($name_l,null,$size);
+//			$this->lbox->AddOption('style','width: 140px;');
+			
+			$this->rbox = new ClistBox($name_r,null,$size);
+//			$this->rbox->AddOption('style','width: 140px;');
+		}
+		
+		function AddItem($expr, $value, $caption, $selected=NULL, $enabled='yes'){
+			if($expr){
+				$box = &$this->lbox;
+			}
+			else{
+				$box = &$this->rbox;
+			}
+
+			$box->AddItem($value,$caption,$selected,$enabled);
+		}
+		
+		function SetAction($expr, $value='submit()', $event='onchange'){
+			if($expr){
+				$box = &$this->lbox;
+			}
+			else{
+				$box = &$this->rbox;
+			}
+			$box->AddOption($event,$value);
+		}
+		
+		function Get($caption_l=null,$caption_r=null){
+			$grp_tab = new CTable();
+			if(!is_null($caption_l) || !is_null($caption_r)){
+				$grp_tab->AddRow(array(bold($caption_l),SPACE,bold($caption_r)));
+			}
+
+			$id_l = $this->lbox->options['id'];
+			$id_r = $this->rbox->options['id'];
+			
+			$add_btn = new CButton('add',' « ');//S_ADD);//
+			$add_btn->SetType('button');
+			$add_btn->SetAction('javascript: moveListBoxSelectedItem("'.$id_r.'","'.$id_l.'");');
+			
+			$rmv_btn = new CButton('remove',' » ');//S_REMOVE);//
+			$rmv_btn->SetType('button');
+			$rmv_btn->SetAction('javascript: moveListBoxSelectedItem("'.$id_l.'","'.$id_r.'");');
+			
+			$grp_tab->AddRow(array($this->lbox,new CCol(array($add_btn,BR(),$rmv_btn),'top'),$this->rbox));
+		return $grp_tab;
+		}
+		
+		function Show($caption_l=null,$caption_r=null){
+			$tab = $this->Get($caption_l,$caption_r);
+			$tab->Show();
 		}
 	}
 ?>

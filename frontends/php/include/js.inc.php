@@ -54,7 +54,7 @@ function zbx_add_post_js($script)
 }
 
 
-function	get_js_sizeable_graph($dom_graph_id,$url){
+function get_js_sizeable_graph($dom_graph_id,$url){
 
 return new CScript('
 	<script language="JavaScript" type="text/javascript">
@@ -75,7 +75,7 @@ return new CScript('
 }
 
 
-function	get_dynamic_chart($dom_graph_id,$img_src,$width=0){
+function get_dynamic_chart($dom_graph_id,$img_src,$width=0){
 	if(is_int($width) && $width > 0) $img_src.= url_param($width, false, 'width');
 	$result = new CScript('
 		<script language="JavaScript" type="text/javascript">
@@ -106,6 +106,53 @@ function	get_dynamic_chart($dom_graph_id,$img_src,$width=0){
 		-->
 		</script>');
 return $result;
+}
+
+function inseret_javascript_for_editable_combobox(){
+	if(defined('EDITABLE_COMBOBOX_SCRIPT_INSERTTED')) return;
+	define('EDITABLE_COMBOBOX_SCRIPT_INSERTTED', 1);
+	
+	$js = 'function CEditableComboBoxInit(obj){
+		var opt = obj.options;
+
+		if(obj.value) obj.oldValue = obj.value;
+
+		for (var i = 0; i < opt.length; i++)
+			if (-1 == opt.item(i).value)
+				return;
+
+		opt = document.createElement("option");
+		opt.value = -1;
+		opt.text = "(other ...)";
+
+		if(!obj.options.add)
+			obj.insertBefore(opt, obj.options.item(0));
+		else
+			obj.options.add(opt, 0);
+
+		return;
+	}
+
+	function CEditableComboBoxOnChange(obj,size){
+		if(-1 != obj.value){
+			obj.oldValue = obj.value;
+		}
+		else{
+			var new_obj = document.createElement("input");
+			new_obj.type = "text";
+			new_obj.name = obj.name;
+			if(size && size > 0){
+				new_obj.size = size;
+			}
+			new_obj.className = obj.className;
+			if(obj.oldValue) new_obj.value = obj.oldValue;
+			obj.parentNode.replaceChild(new_obj, obj);
+			new_obj.focus();
+			new_obj.select();
+		}
+	}';
+	
+	insert_js($js);
 }
 
 function insert_showhint_javascript(){

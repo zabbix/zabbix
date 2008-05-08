@@ -621,6 +621,7 @@
 	'S_AS_BLUE'=>				'as Blue',
 
 //	hosts.php
+	'S_IN'=>					'In',
 	'S_APPLICATION'=>			'Application',
 	'S_APPLICATIONS'=>			'Applications',
 	'S_APPLICATIONS_BIG'=>			'APPLICATIONS',
