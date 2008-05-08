@@ -4396,7 +4396,7 @@ include_once 'include/discovery.inc.php';
 		while($db_host=DBfetch($db_hosts)){
 			$cmbHosts->AddItem(
 					$db_host["hostid"],
-					get_node_name_by_elid($db_host["hostid"]).$db_host["host"]
+					get_node_name_by_elid($db_host['hostid']).$db_host["host"]
 					);
 		}
 		$frmHostG->AddRow(S_HOSTS,$cmbHosts->Get(S_HOSTS.SPACE.S_IN,S_OTHER.SPACE.S_HOSTS));
