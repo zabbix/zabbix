@@ -23,6 +23,7 @@
 
 int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXFILES
 	int	mib[2];
 	size_t	len;
 	int	maxfiles;
@@ -42,10 +43,14 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	SET_UI64_RESULT(result, maxfiles);
 
 	return SYSINFO_RET_OK;
+#else
+	return	SYSINFO_RET_FAIL;
+#endif
 }
 
 int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXPROC
 	int	mib[2];
 	size_t	len;
 	int	maxproc;
@@ -65,4 +70,7 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	SET_UI64_RESULT(result, maxproc);
 
 	return SYSINFO_RET_OK;
+#else
+	return	SYSINFO_RET_FAIL;
+#endif
 }
