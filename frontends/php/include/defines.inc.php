@@ -19,6 +19,8 @@
 **/
 ?>
 <?php
+	define('ZABBIX_VERSION','1.5.3');
+	
 	define('ZBX_AUTH_INTERNAL',	0);
 	define('ZBX_AUTH_LDAP',		1);
 	
