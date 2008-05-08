@@ -427,7 +427,6 @@
 	'S_GRAPH'=>			'Grafikon',
 	'S_TREND'=>			'Trend',
 	'S_COMPARE'=>			'Compare',
-	'S_ZABBIX_VER'=>			'ZABBIX 1.4.2',
 	'S_COPYRIGHT_BY'=>			'Copyright 2001-2007 by',
 	'S_CONNECTED_AS'=>			'Connected as',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
