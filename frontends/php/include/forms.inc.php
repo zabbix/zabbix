@@ -4193,7 +4193,7 @@ include_once 'include/discovery.inc.php';
 		
 		$frmHost->AddRow(S_NAME,new CTextBox('host',$host,20));
 
-		$grp_tb = new CTweenBox('groups_in','groups_out',10);
+		$grp_tb = new CTweenBox($frmHost,'groups',10);
 	
 		$db_groups=DBselect('SELECT DISTINCT groupid,name '.
 						' FROM groups '.

@@ -44,7 +44,6 @@ include_once "include/page_header.php";
 			access_deny();
 		}
 	}
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION

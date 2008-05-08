@@ -247,6 +247,7 @@ function add_variable(o_el, s_name, x_value, s_formname, o_document){
 	
 	o_variable.type = 'hidden';
 	o_variable.name = s_name;
+	o_variable.id = s_name;
 	o_variable.value = x_value;
 
 	form.appendChild(o_variable);
@@ -269,6 +270,7 @@ function create_var(form_name, var_name, var_val, subm){
 		
 		objVar.setAttribute('type', 	'hidden');
 		objVar.setAttribute('name', 	var_name);
+		objVar.setAttribute('id', 		var_name);
 	}
 	
 	objVar.value = var_val;
@@ -525,15 +527,19 @@ function remove_childs(form_name,rmvbyname,tag){
 }
 
 function remove_element(elmnt,tag){
-	if(elmnt.nodeName == tag){
-		elmnt.parentNode.removeChild(elmnt);
-	} 
-	else if(elmnt.nodeType == 9){
-		return;
-	} 
-	else {
-		remove_element(elmnt.parentNode,tag);
+	elmnt = $(elmnt);
+	if(!is_null(elmnt)){
+		if(('undefined' != typeof(elmnt.nodeName)) && (elmnt.nodeName.toLowerCase() == tag.toLowerCase())){
+			elmnt.parentNode.removeChild(elmnt);
+		} 
+		else if(elmnt.nodeType == 9){
+			return false;
+		} 
+		else {
+			remove_element(elmnt.parentNode,tag);
+		}
 	}
+return true;
 }
 
 function resizeiframe(id){
@@ -587,7 +593,10 @@ function empty_form(id){
 return true;
 }
 
-function moveListBoxSelectedItem(from,to){
+
+function moveListBoxSelectedItem(formname,objname,from,to,action){
+	var result = true
+	
 	from = $(from);
 	to = $(to);
 	
@@ -599,10 +608,18 @@ function moveListBoxSelectedItem(from,to){
 			var caption = IE?from.options[i].innerText:from.options[i].textContent;
 			temp.appendChild(document.createTextNode(caption));
 			
-			from.removeChild(from.options[i]);
+			if(action.toLowerCase() == 'add'){
+				result &= create_var(formname, objname+'['+from.options[i].value+']', from.options[i].value, false);
+			}
+			else if(String.toLowerCase(action) == 'rmv'){
+				result &= remove_element(objname+'['+from.options[i].value+']','input');
+			}
 			
+			from.removeChild(from.options[i]);
+
 			to.appendChild(temp);
 			i--;
 		}
 	}
+return result;
 }

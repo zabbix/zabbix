@@ -157,51 +157,56 @@
 	}
 	
 	class CTweenBox{
-		function ctweenbox($name_l,$name_r,$size){
-			$this->lbox = new ClistBox($name_l,null,$size);
-//			$this->lbox->AddOption('style','width: 140px;');
+		function ctweenbox(&$form,$name,$size){
+			$this->form = &$form;
+			$this->name = $name;			
 			
-			$this->rbox = new ClistBox($name_r,null,$size);
+			$this->id_l = $this->name.'_left';
+			$this->id_r = $this->name.'_right';
+			
+			$this->lbox = new ClistBox($this->id_l,null,$size);
+			$this->rbox = new ClistBox($this->id_r,null,$size);
+
+//			$this->lbox->AddOption('style','width: 140px;');
 //			$this->rbox->AddOption('style','width: 140px;');
 		}
 		
 		function AddItem($expr, $value, $caption, $selected=NULL, $enabled='yes'){
 			if($expr){
-				$box = &$this->lbox;
+				$this->lbox->AddItem($value,$caption,$selected,$enabled);
+				$this->form->AddVar($this->name.'['.$value.']',$value);
 			}
 			else{
-				$box = &$this->rbox;
+				$this->rbox->AddItem($value,$caption,$selected,$enabled);
 			}
-
-			$box->AddItem($value,$caption,$selected,$enabled);
 		}
 		
-		function SetAction($expr, $value='submit()', $event='onchange'){
+		function SetAction($expr, $event='onchange', $value='submit()'){
+//			$box = &$this->lbox;
 			if($expr){
-				$box = &$this->lbox;
+				$this->lbox->AddOption($event,$value);
 			}
 			else{
-				$box = &$this->rbox;
+				$this->rbox->AddOption($event,$value);
 			}
-			$box->AddOption($event,$value);
 		}
 		
 		function Get($caption_l=null,$caption_r=null){
 			$grp_tab = new CTable();
+			$grp_tab->SetCellSpacing(0);
+			$grp_tab->SetCellPadding(0);
+			
 			if(!is_null($caption_l) || !is_null($caption_r)){
 				$grp_tab->AddRow(array(bold($caption_l),SPACE,bold($caption_r)));
 			}
 
-			$id_l = $this->lbox->options['id'];
-			$id_r = $this->rbox->options['id'];
-			
 			$add_btn = new CButton('add',' « ');//S_ADD);//
 			$add_btn->SetType('button');
-			$add_btn->SetAction('javascript: moveListBoxSelectedItem("'.$id_r.'","'.$id_l.'");');
+			$add_btn->SetAction('javascript: moveListBoxSelectedItem("'.$this->form->GetName().'","'.$this->name.'","'.$this->id_r.'","'.$this->id_l.'","add");');
 			
 			$rmv_btn = new CButton('remove',' » ');//S_REMOVE);//
 			$rmv_btn->SetType('button');
-			$rmv_btn->SetAction('javascript: moveListBoxSelectedItem("'.$id_l.'","'.$id_r.'");');
+			$rmv_btn->SetAction('javascript: moveListBoxSelectedItem("'.$this->form->GetName().'","'.$this->name.'","'.$this->id_l.'","'.$this->id_r.'","rmv");');
 			
 			$grp_tab->AddRow(array($this->lbox,new CCol(array($add_btn,BR(),$rmv_btn),'top'),$this->rbox));
 		return $grp_tab;
