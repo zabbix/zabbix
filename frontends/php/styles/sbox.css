@@ -4,8 +4,8 @@
 div#selection_box{
 	position: absolute;
 	
-	filter:alpha(opacity=40);
 	-moz-opacity:.40;
+	filter:alpha(opacity=40);
 	opacity:.40;
 	background-color:#0000FF;
 	border:1px black solid;
