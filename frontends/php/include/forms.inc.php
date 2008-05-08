@@ -4091,94 +4091,89 @@ include_once 'include/discovery.inc.php';
 		$frmHouseKeep->Show();
 	}
 
-	function	insert_host_form($show_only_tmp=0)
-	{
+	function insert_host_form($show_only_tmp=0){
 		global $USER_DETAILS;
-		global $_REQUEST;
 
-		$groups= get_request("groups",array());
+		$groups= get_request('groups',array());
 
-		$newgroup	= get_request("newgroup","");
+		$newgroup	= get_request('newgroup','');
 
-		$host 		= get_request("host",	"");
-		$port 		= get_request("port",	get_profile("HOST_PORT",10050));
-		$status		= get_request("status",	HOST_STATUS_MONITORED);
-		$useip		= get_request("useip",	0);
-		$dns		= get_request("dns",	"");
-		$ip		= get_request("ip",	"0.0.0.0");
-		$proxy_hostid	= get_request("proxy_hostid","");
+		$host 		= get_request('host',	'');
+		$port 		= get_request('port',	get_profile('HOST_PORT',10050));
+		$status		= get_request('status',	HOST_STATUS_MONITORED);
+		$useip		= get_request('useip',	0);
+		$dns		= get_request('dns',	'');
+		$ip			= get_request('ip',	'0.0.0.0');
+		$proxy_hostid	= get_request('proxy_hostid','');
 
-		$useprofile = get_request("useprofile","no");
+		$useprofile = get_request('useprofile','no');
 
-		$devicetype	= get_request("devicetype","");
-		$name		= get_request("name","");
-		$os		= get_request("os","");
-		$serialno	= get_request("serialno","");
-		$tag		= get_request("tag","");
-		$macaddress	= get_request("macaddress","");
-		$hardware	= get_request("hardware","");
-		$software	= get_request("software","");
-		$contact	= get_request("contact","");
-		$location	= get_request("location","");
-		$notes		= get_request("notes","");
+		$devicetype	= get_request('devicetype','');
+		$name		= get_request('name','');
+		$os			= get_request('os','');
+		$serialno	= get_request('serialno','');
+		$tag		= get_request('tag','');
+		$macaddress	= get_request('macaddress','');
+		$hardware	= get_request('hardware','');
+		$software	= get_request('software','');
+		$contact	= get_request('contact','');
+		$location	= get_request('location','');
+		$notes		= get_request('notes','');
 
-		$templates	= get_request("templates",array());
+		$templates	= get_request('templates',array());
 		$clear_templates = get_request('clear_templates',array());
 
 		$frm_title	= $show_only_tmp ? S_TEMPLATE : S_HOST;
 
-		if(isset($_REQUEST["hostid"]))
-		{
-			$db_host=get_host_by_hostid($_REQUEST["hostid"]);
-			$frm_title	.= SPACE."\"".$db_host["host"]."\"";
+		if(isset($_REQUEST['hostid'])){
+			$db_host=get_host_by_hostid($_REQUEST['hostid']);
+			$frm_title	.= SPACE.'"'.$db_host['host'].'"';
 
-			$original_templates = get_templates_by_hostid($_REQUEST["hostid"]);
+			$original_templates = get_templates_by_hostid($_REQUEST['hostid']);
 		}
-		else
-		{
+		else{
 			$original_templates = array();
 		}
 
-		if(isset($_REQUEST["hostid"]) && !isset($_REQUEST["form_refresh"]))
+		if(isset($_REQUEST['hostid']) && !isset($_REQUEST['form_refresh']))
 		{
-			$proxy_hostid	= $db_host["proxy_hostid"];
-			$host		= $db_host["host"];
-			$port		= $db_host["port"];
-			$status		= $db_host["status"];
-			$useip		= $db_host["useip"];
-			$dns		= $db_host["dns"];
-			$ip		= $db_host["ip"];
+			$proxy_hostid	= $db_host['proxy_hostid'];
+			$host		= $db_host['host'];
+			$port		= $db_host['port'];
+			$status		= $db_host['status'];
+			$useip		= $db_host['useip'];
+			$dns		= $db_host['dns'];
+			$ip		= $db_host['ip'];
 
 // add groups
-			$db_groups=DBselect("SELECT DISTINCT groupid FROM hosts_groups WHERE hostid=".$_REQUEST["hostid"].
-				" AND groupid in (".
-				get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).
-				") ");
+			$db_groups=DBselect('SELECT DISTINCT groupid '.
+							' FROM hosts_groups '.
+							' WHERE hostid='.$_REQUEST['hostid'].
+								' AND groupid in ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).') ');
 			while($db_group=DBfetch($db_groups)){
-				if(uint_in_array($db_group["groupid"],$groups)) continue;
-				array_push($groups, $db_group["groupid"]);
+				if(uint_in_array($db_group['groupid'],$groups)) continue;
+				array_push($groups, $db_group['groupid']);
 			}
 // read profile
-			$db_profiles = DBselect("SELECT * FROM hosts_profiles WHERE hostid=".$_REQUEST["hostid"]);
+			$db_profiles = DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid']);
 
-			$useprofile = "no";
+			$useprofile = 'no';
 			$db_profile = DBfetch($db_profiles);
-			if($db_profile)
-			{
-				$useprofile = "yes";
+			if($db_profile){
+				$useprofile = 'yes';
 
 
-				$devicetype	= $db_profile["devicetype"];
-				$name		= $db_profile["name"];
-				$os		= $db_profile["os"];
-				$serialno	= $db_profile["serialno"];
-				$tag		= $db_profile["tag"];
-				$macaddress	= $db_profile["macaddress"];
-				$hardware	= $db_profile["hardware"];
-				$software	= $db_profile["software"];
-				$contact	= $db_profile["contact"];
-				$location	= $db_profile["location"];
-				$notes		= $db_profile["notes"];
+				$devicetype	= $db_profile['devicetype'];
+				$name		= $db_profile['name'];
+				$os			= $db_profile['os'];
+				$serialno	= $db_profile['serialno'];
+				$tag		= $db_profile['tag'];
+				$macaddress	= $db_profile['macaddress'];
+				$hardware	= $db_profile['hardware'];
+				$software	= $db_profile['software'];
+				$contact	= $db_profile['contact'];
+				$location	= $db_profile['location'];
+				$notes		= $db_profile['notes'];
 			}
 			$templates = $original_templates;
 		}
@@ -4187,57 +4182,45 @@ include_once 'include/discovery.inc.php';
 		$clear_templates = array_diff($clear_templates,array_keys($templates));
 		asort($templates);
 
-		$frmHost = new CFormTable($frm_title,"hosts.php");
-		$frmHost->SetHelp("web.hosts.host.php");
-		$frmHost->AddVar("config",get_request("config",0));
+		$frmHost = new CFormTable($frm_title,'hosts.php');
+		$frmHost->SetHelp('web.hosts.host.php');
+		$frmHost->AddVar('config',get_request('config',0));
 
 		$frmHost->AddVar('clear_templates',$clear_templates);
 
-		if(isset($_REQUEST["hostid"]))		$frmHost->AddVar("hostid",$_REQUEST["hostid"]);
-		if(isset($_REQUEST["groupid"]))		$frmHost->AddVar("groupid",$_REQUEST["groupid"]);
+		if(isset($_REQUEST['hostid']))		$frmHost->AddVar('hostid',$_REQUEST['hostid']);
+		if(isset($_REQUEST['groupid']))		$frmHost->AddVar('groupid',$_REQUEST['groupid']);
 		
-		$frmHost->AddRow(S_NAME,new CTextBox("host",$host,20));
+		$frmHost->AddRow(S_NAME,new CTextBox('host',$host,20));
 
-		$frm_row = array();
-		
-		$db_groups=DBselect("SELECT DISTINCT groupid,name FROM groups ".
-			" WHERE groupid in (".
-			get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).
-			") order by name");
-		while($db_group=DBfetch($db_groups))
-		{
-			array_push($frm_row,
-				array(
-					new CCheckBox("groups[]",
-						uint_in_array($db_group["groupid"],$groups) ? 'yes' : 'no', 
-						null,
-						$db_group["groupid"]
-						),
-					get_node_name_by_elid($db_group["groupid"]).$db_group["name"]
-				),
-				BR());
+		$grp_tb = new CTweenBox('groups_in','groups_out',10);
+	
+		$db_groups=DBselect('SELECT DISTINCT groupid,name '.
+						' FROM groups '.
+						' WHERE groupid IN ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).') '.
+						' ORDER BY name');
+						
+		while($db_group=DBfetch($db_groups)){
+			$grp_tb->AddItem(uint_in_array($db_group['groupid'],$groups),$db_group['groupid'],$db_group['name']);
 		}
-		$frmHost->AddRow(S_GROUPS,$frm_row);
+		
+		$frmHost->AddRow(S_GROUPS,$grp_tb->Get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS));
 
-		$frmHost->AddRow(S_NEW_GROUP,new CTextBox("newgroup",$newgroup),'new');
+		$frmHost->AddRow(S_NEW_GROUP,new CTextBox('newgroup',$newgroup),'new');
 
 // onchange does not work on some browsers: MacOS, KDE browser
-		if($show_only_tmp)
-		{
-			$frmHost->AddVar("useip",0);
-			$frmHost->AddVar("ip","0.0.0.0");
-			$frmHost->AddVar("dns","");
+		if($show_only_tmp){
+			$frmHost->AddVar('useip',0);
+			$frmHost->AddVar('ip','0.0.0.0');
+			$frmHost->AddVar('dns','');
 		}
-		else
-		{
-			$frmHost->AddRow(S_DNS_NAME,new CTextBox("dns",$dns,"40"));
-			if(defined('ZBX_HAVE_IPV6'))
-			{
-				$frmHost->AddRow(S_IP_ADDRESS,new CTextBox("ip",$ip,"39"));
+		else{
+			$frmHost->AddRow(S_DNS_NAME,new CTextBox('dns',$dns,'40'));
+			if(defined('ZBX_HAVE_IPV6')){
+				$frmHost->AddRow(S_IP_ADDRESS,new CTextBox('ip',$ip,'39'));
 			}
-			else
-			{
-				$frmHost->AddRow(S_IP_ADDRESS,new CTextBox("ip",$ip,"15"));
+			else{
+				$frmHost->AddRow(S_IP_ADDRESS,new CTextBox('ip',$ip,'15'));
 			}
 
 			$cmbConnectBy = new CComboBox('useip', $useip);
@@ -4246,20 +4229,19 @@ include_once 'include/discovery.inc.php';
 			$frmHost->AddRow(S_CONNECT_TO,$cmbConnectBy);
 		}
 
-		if($show_only_tmp)
-		{
-			$port = "10050";
+		if($show_only_tmp){
+			$port = '10050';
 			$status = HOST_STATUS_TEMPLATE;
 
-			$frmHost->AddVar("port",$port);
-			$frmHost->AddVar("status",$status);
+			$frmHost->AddVar('port',$port);
+			$frmHost->AddVar('status',$status);
 		}
 		else
 		{
-			$frmHost->AddRow(S_PORT,new CNumericBox("port",$port,5));	
+			$frmHost->AddRow(S_PORT,new CNumericBox('port',$port,5));	
 
 //Proxy
-			$cmbProxy = new CComboBox("proxy_hostid", $proxy_hostid);
+			$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 
 			$cmbProxy->AddItem(0, S_NO_PROXY);
 			$db_proxies = DBselect('SELECT hostid,host FROM hosts'.
@@ -4270,7 +4252,7 @@ include_once 'include/discovery.inc.php';
 			$frmHost->AddRow(S_MONITORED_BY_PROXY,$cmbProxy);
 //----------
 
-			$cmbStatus = new CComboBox("status",$status);
+			$cmbStatus = new CComboBox('status',$status);
 			$cmbStatus->AddItem(HOST_STATUS_MONITORED,	S_MONITORED);
 			$cmbStatus->AddItem(HOST_STATUS_NOT_MONITORED,	S_NOT_MONITORED);
 			$frmHost->AddRow(S_STATUS,$cmbStatus);	

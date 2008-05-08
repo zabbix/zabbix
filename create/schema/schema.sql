@@ -571,6 +571,8 @@ FIELD		|scriptid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|command	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|host_access	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|usrgrpid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|groupid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|screens|screenid|ZBX_SYNC
 FIELD		|screenid	|t_id		|'0'	|NOT NULL	|0
