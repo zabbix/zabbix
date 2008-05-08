@@ -209,7 +209,7 @@
 			$grp_tab->SetCellPadding(0);
 			
 			if(!is_null($caption_l) || !is_null($caption_r)){
-				$grp_tab->AddRow(array(bold($caption_l),SPACE,bold($caption_r)));
+				$grp_tab->AddRow(array($caption_l,SPACE,$caption_r));
 			}
 
 			$add_btn = new CButton('add',' « ');//S_ADD);//
