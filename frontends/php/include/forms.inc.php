@@ -4127,7 +4127,7 @@ include_once 'include/discovery.inc.php';
 
 		if(isset($_REQUEST['hostid'])){
 			$db_host=get_host_by_hostid($_REQUEST['hostid']);
-			$frm_title	.= SPACE.'"'.$db_host['host'].'"';
+			$frm_title	.= SPACE.' ['.$db_host['host'].']';
 
 			$original_templates = get_templates_by_hostid($_REQUEST['hostid']);
 		}
@@ -4135,8 +4135,7 @@ include_once 'include/discovery.inc.php';
 			$original_templates = array();
 		}
 
-		if(isset($_REQUEST['hostid']) && !isset($_REQUEST['form_refresh']))
-		{
+		if(isset($_REQUEST['hostid']) && !isset($_REQUEST['form_refresh'])){
 			$proxy_hostid	= $db_host['proxy_hostid'];
 			$host		= $db_host['host'];
 			$port		= $db_host['port'];
@@ -4152,7 +4151,7 @@ include_once 'include/discovery.inc.php';
 								' AND groupid in ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).') ');
 			while($db_group=DBfetch($db_groups)){
 				if(uint_in_array($db_group['groupid'],$groups)) continue;
-				array_push($groups, $db_group['groupid']);
+				$groups[$db_group['groupid']] = $db_group['groupid'];
 			}
 // read profile
 			$db_profiles = DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid']);
@@ -4193,15 +4192,14 @@ include_once 'include/discovery.inc.php';
 		
 		$frmHost->AddRow(S_NAME,new CTextBox('host',$host,20));
 
-		$grp_tb = new CTweenBox($frmHost,'groups',10);
-	
+		$grp_tb = new CTweenBox($frmHost,'groups',$groups);	
 		$db_groups=DBselect('SELECT DISTINCT groupid,name '.
 						' FROM groups '.
 						' WHERE groupid IN ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).') '.
 						' ORDER BY name');
 						
 		while($db_group=DBfetch($db_groups)){
-			$grp_tb->AddItem(uint_in_array($db_group['groupid'],$groups),$db_group['groupid'],$db_group['name']);
+			$grp_tb->AddItem($db_group['groupid'],$db_group['name']);
 		}
 		
 		$frmHost->AddRow(S_GROUPS,$grp_tb->Get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS));
@@ -4351,58 +4349,57 @@ include_once 'include/discovery.inc.php';
 	}
 
 	# Insert form for Host Groups
-	function	insert_hostgroups_form()
-	{
-		global  $_REQUEST;
+	function	insert_hostgroups_form(){
 		global	$USER_DETAILS;
 
 		$hosts = get_request("hosts",array());
 		$frm_title = S_HOST_GROUP;
-		if(isset($_REQUEST["groupid"]))
-		{
+		if(isset($_REQUEST["groupid"])){
 			$group = get_hostgroup_by_groupid($_REQUEST["groupid"]);
-			$frm_title = S_HOST_GROUP." \"".$group["name"]."\"";
+			$frm_title = S_HOST_GROUP.' ['.$group["name"].']';
 		}
-		if(isset($_REQUEST["groupid"]) && !isset($_REQUEST["form_refresh"]))
-		{
+		
+		if(isset($_REQUEST["groupid"]) && !isset($_REQUEST["form_refresh"])){
 			$name=$group["name"];
-			$db_hosts=DBselect('SELECT DISTINCT h.hostid,host FROM hosts h, hosts_groups hg'.
+			$db_hosts=DBselect('SELECT DISTINCT h.hostid,host '.
+					' FROM hosts h, hosts_groups hg '.
 					' WHERE h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-					' AND h.hostid=hg.hostid AND hg.groupid='.$_REQUEST['groupid'].
+						' AND h.hostid=hg.hostid '.
+						' AND hg.groupid='.$_REQUEST['groupid'].
 					' order by host');
-			while($db_host=DBfetch($db_hosts))
-			{
+			while($db_host=DBfetch($db_hosts)){
 				if(uint_in_array($db_host["hostid"],$hosts)) continue;
 				array_push($hosts, $db_host["hostid"]);
 			}
 		}
-		else
-		{
+		else{
 			$name=get_request("gname","");
 		}
+		
 		$frmHostG = new CFormTable($frm_title,"hosts.php");
 		$frmHostG->SetHelp("web.hosts.group.php");
 		$frmHostG->AddVar("config",get_request("config",1));
-		if(isset($_REQUEST["groupid"]))
-		{
+		
+		if(isset($_REQUEST["groupid"])){
 			$frmHostG->AddVar("groupid",$_REQUEST["groupid"]);
 		}
 
 		$frmHostG->AddRow(S_GROUP_NAME,new CTextBox("gname",$name,30));
 
-		$cmbHosts = new CListBox("hosts[]",$hosts,10);
-		$db_hosts=DBselect('SELECT DISTINCT hostid,host FROM hosts'.
+		$cmbHosts = new CTweenBox($frmHostG,'hosts',$hosts);
+		$db_hosts=DBselect('SELECT DISTINCT hostid,host '.
+				' FROM hosts '.
 				' WHERE status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-				' AND hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
+					' AND hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
 				' order by host');
-		while($db_host=DBfetch($db_hosts))
-		{
+				
+		while($db_host=DBfetch($db_hosts)){
 			$cmbHosts->AddItem(
 					$db_host["hostid"],
 					get_node_name_by_elid($db_host["hostid"]).$db_host["host"]
 					);
 		}
-		$frmHostG->AddRow(S_HOSTS,$cmbHosts);
+		$frmHostG->AddRow(S_HOSTS,$cmbHosts->Get(S_HOSTS.SPACE.S_IN,S_OTHER.SPACE.S_HOSTS));
 
 		$frmHostG->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["groupid"]))
@@ -4422,59 +4419,57 @@ include_once 'include/discovery.inc.php';
 	}
 
 	# Insert form for Proxies
-	function	insert_proxies_form()
-	{
-		global  $_REQUEST;
+	function	insert_proxies_form(){
 		global	$USER_DETAILS;
 
 		$hosts = array();
 		$frm_title = S_PROXY;
-		if(isset($_REQUEST["hostid"]))
-		{
+		
+		if(isset($_REQUEST["hostid"])){
 			$proxy = get_host_by_hostid($_REQUEST["hostid"]);
-			$frm_title = S_PROXY." \"".$proxy["host"]."\"";
+			$frm_title = S_PROXY.' ['.$proxy["host"].']';
 		}
-		if(isset($_REQUEST["hostid"]) && !isset($_REQUEST["form_refresh"]))
-		{
+		
+		if(isset($_REQUEST["hostid"]) && !isset($_REQUEST["form_refresh"])){
 			$name=$proxy["host"];
-			$db_hosts=DBselect("SELECT hostid FROM hosts".
-				" WHERE status not in (".HOST_STATUS_DELETED.") ".
-				" AND proxy_hostid=".$_REQUEST["hostid"]);
+			$db_hosts=DBselect('SELECT hostid '.
+				' FROM hosts '.
+				' WHERE status NOT IN ('.HOST_STATUS_DELETED.') '.
+					' AND proxy_hostid='.$_REQUEST['hostid']);
+					
 			while($db_host=DBfetch($db_hosts))
 				array_push($hosts, $db_host["hostid"]);
 		}
-		else
-		{
+		else{
 			$name=get_request("host","");
 		}
+		
 		$frmHostG = new CFormTable($frm_title,"hosts.php");
 		$frmHostG->SetHelp("web.proxy.php");
 		$frmHostG->AddVar("config",get_request("config",5));
-		if(isset($_REQUEST["hostid"]))
-		{
+		
+		if(isset($_REQUEST["hostid"])){
 			$frmHostG->AddVar("hostid",$_REQUEST["hostid"]);
 		}
 
 		$frmHostG->AddRow(S_PROXY_NAME,new CTextBox("host",$name,30));
 
-		$cmbHosts = new CListBox("hosts[]",$hosts,10);
-		$db_hosts=DBselect('select hostid,proxy_hostid,host from hosts'.
+		$cmbHosts = new CTweenBox($frmHostG,'hosts',$hosts);
+		$db_hosts=DBselect('select hostid,proxy_hostid,host '.
+			' from hosts '.
 			' where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-			' and hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
+				' and hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).') '.
 			' order by host');
-		while($db_host=DBfetch($db_hosts))
-		{
-			$cmbHosts->AddItem(
-					$db_host["hostid"],
+		while($db_host=DBfetch($db_hosts)){
+			$cmbHosts->AddItem($db_host["hostid"],
 					get_node_name_by_elid($db_host["hostid"]).$db_host["host"],
 					NULL,
-					$db_host["proxy_hostid"] == 0 || (isset($_REQUEST["hostid"]) && $db_host["proxy_hostid"] == $_REQUEST["hostid"]));
+					($db_host["proxy_hostid"] == 0 || isset($_REQUEST["hostid"]) && ($db_host["proxy_hostid"] == $_REQUEST["hostid"])));
 		}
-		$frmHostG->AddRow(S_HOSTS,$cmbHosts);
+		$frmHostG->AddRow(S_HOSTS,$cmbHosts->Get(S_PROXY.SPACE.S_HOSTS,S_OTHER.SPACE.S_HOSTS));
 
 		$frmHostG->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["hostid"]))
-		{
+		if(isset($_REQUEST["hostid"])){
 			$frmHostG->AddItemToBottomRow(SPACE);
 			$frmHostG->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmHostG->AddItemToBottomRow(SPACE);
@@ -4535,9 +4530,6 @@ include_once 'include/discovery.inc.php';
 		$frmHostP->Show();
 	}
 	
-// Original mod by scricca@vipsnet.net
-// Modified by Aly
-/* this code creates a form to link/unlink 1 template to/from multiple hosts */
  	function insert_template_form(){
  		global	$USER_DETAILS;
  		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
@@ -4565,8 +4557,6 @@ include_once 'include/discovery.inc.php';
  
  		$frmHostT->AddRow(S_TEMPLATE,new CTextBox("tname",$name,60));
  
- 		$cmbHosts = new CListBox('hosts[]',null,10);
-
 		$hosts_in_tpl = array();
 		$sql = 'SELECT DISTINCT h.hostid,h.host '.
 			' FROM hosts h,hosts_templates ht'.
@@ -4578,14 +4568,10 @@ include_once 'include/discovery.inc.php';
 
  		$db_hosts=DBselect($sql);
  		while($db_host=DBfetch($db_hosts)){
- 			$cmbHosts->AddItem(
- 					$db_host["hostid"],
- 					get_node_name_by_elid($db_host["hostid"]).$db_host["host"]
- 					);
-			$hosts_in_tpl[] = $db_host["hostid"];
+			$hosts_in_tpl[$db_host['hostid']] = $db_host['hostid'];
  		}		
-							
-		$available_hosts = array_diff($available_hosts,$hosts_in_tpl);
+
+ 		$cmbHosts = new CTweenBox($frmHostT,'hosts',$hosts_in_tpl);
 		$sql = 'SELECT DISTINCT h.hostid,h.host '.
 			' FROM hosts h'.
  			' WHERE ( h.status='.HOST_STATUS_MONITORED.' OR h.status='.HOST_STATUS_NOT_MONITORED.' ) '.
@@ -4595,13 +4581,11 @@ include_once 'include/discovery.inc.php';
  		$db_hosts=DBselect($sql);
 			
  		while($db_host=DBfetch($db_hosts)){
-			$cmbitem = new CComboItem($db_host["hostid"],get_node_name_by_elid($db_host["hostid"]).$db_host["host"]);
-			$cmbitem->AddOption('style','color: grey;');
-			
- 			$cmbHosts->AddItem($cmbitem);
+ 			$cmbHosts->AddItem($db_host['hostid'],get_node_name_by_elid($db_host['hostid']).$db_host['host']);
  		}
 		
- 		$frmHostT->AddRow(S_HOSTS,$cmbHosts);
+ 		$frmHostT->AddRow(S_HOSTS,$cmbHosts->Get(S_HOSTS.SPACE.S_IN,S_OTHER.SPACE.S_HOSTS));
+		
  		$frmHostT->AddItemToBottomRow(new CButton('save',S_LINK_TO_TEMPLATE));
  		$frmHostT->AddItemToBottomRow(SPACE);
  		$frmHostT->AddItemToBottomRow(new CButton('unlink',S_UNLINK_FROM_TEMPLATE));
@@ -4609,8 +4593,7 @@ include_once 'include/discovery.inc.php';
  		$frmHostT->AddItemToBottomRow(new CButtonCancel(url_param("config")));
  		$frmHostT->Show();
 	}
-//--- end mod ---
- 
+
 
 	function insert_application_form(){
 		$frm_title = "New Application";
