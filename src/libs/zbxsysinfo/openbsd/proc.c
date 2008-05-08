@@ -34,7 +34,7 @@
 	
 #define ARGS_START_SIZE 64
 
-int	proc_argv(pid_t pid, char ***argv, size_t *argv_alloc, int *argc)
+static int	proc_argv(pid_t pid, char ***argv, size_t *argv_alloc, int *argc)
 {
 	size_t	sz;
 	int	mib[4], ret;
@@ -68,7 +68,7 @@ retry:
 	return SUCCEED;
 }
 
-void	collect_args(char **argv, int argc, char **args, size_t *args_alloc)
+static void	collect_args(char **argv, int argc, char **args, size_t *args_alloc)
 {
 	int	i, args_offset, len;
 

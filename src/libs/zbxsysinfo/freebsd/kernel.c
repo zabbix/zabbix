@@ -24,24 +24,24 @@
 int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXFILES
-	int	mib[2],len;
+	int	mib[2];
+	size_t	len;
 	int	maxfiles;
 
 	assert(result);
 
-        init_result(result);	
+	init_result(result);
 
-	mib[0]=CTL_KERN;
-	mib[1]=KERN_MAXFILES;
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_MAXFILES;
 
-	len=sizeof(maxfiles);
+	len = sizeof(maxfiles);
 
-	if(sysctl(mib,2,&maxfiles,(size_t *)&len,NULL,0) != 0)
-	{
-		return	SYSINFO_RET_FAIL;
-	}
+	if (0 != sysctl(mib, 2, &maxfiles, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
 
-     	SET_UI64_RESULT(result, maxfiles);
+	SET_UI64_RESULT(result, maxfiles);
+
 	return SYSINFO_RET_OK;
 #else
 	return	SYSINFO_RET_FAIL;
@@ -51,64 +51,26 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXPROC
-	int	mib[2],len;
+	int	mib[2];
+	size_t	len;
 	int	maxproc;
 
 	assert(result);
 
-        init_result(result);	
+	init_result(result);	
 	
-	mib[0]=CTL_KERN;
-	mib[1]=KERN_MAXPROC;
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_MAXPROC;
 
-	len=sizeof(maxproc);
+	len = sizeof(maxproc);
 
-	if(sysctl(mib,2,&maxproc,(size_t *)&len,NULL,0) != 0)
-	{
-		return	SYSINFO_RET_FAIL;
-/*		printf("Errno [%m]");*/
-	}
+	if (0 != sysctl(mib, 2, &maxproc, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
 
-	
-     	SET_UI64_RESULT(result, maxproc);
+	SET_UI64_RESULT(result, maxproc);
+
 	return SYSINFO_RET_OK;
 #else
 	return	SYSINFO_RET_FAIL;
 #endif
 }
-
-int     OLD_KERNEL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char    key[MAX_STRING_LEN];
-        int     ret;
-
-        assert(result);
-
-        init_result(result);	
-
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(strcmp(key,"maxfiles") == 0)
-        {
-                ret = KERNEL_MAXFILES(cmd, param, flags, result);
-        }
-        else if(strcmp(key,"maxproc") == 0)
-        {
-                ret = KERNEL_MAXPROC(cmd, param, flags, result);
-        }
-        else
-        {
-                ret = SYSINFO_RET_FAIL;
-        }
-
-        return ret;
-}
-

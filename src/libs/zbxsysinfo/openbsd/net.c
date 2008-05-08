@@ -94,9 +94,7 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 					if (kvm_read(kp, (u_long)ifp, &v, len) < len)
 						break;
 
-					if (0 == strcmp(if_name, "all") || 0 == strcmp(if_name, v.if_xname)) {
-					fprintf(stderr, "----- %s\n", v.if_xname);
-
+					if (*if_name == '\0' || 0 == strcmp(if_name, v.if_xname)) {
 						if (ibytes)
 							*ibytes += v.if_ibytes;
 						if (ipackets)
@@ -212,10 +210,6 @@ NET_FNCLIST
 	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
 		*if_name = '\0';
 
-	/* default parameter */
-	if (*if_name == '\0')
-		zbx_snprintf(if_name, sizeof(if_name), "all");
-
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
 
@@ -297,10 +291,6 @@ NET_FNCLIST
 
 	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
 		*if_name = '\0';
-
-	/* default parameter */
-	if (*if_name == '\0')
-		zbx_snprintf(if_name, sizeof(if_name), "all");
 
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
@@ -396,10 +386,6 @@ NET_FNCLIST
 	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
 		*if_name = '\0';
 
-	/* default parameter */
-	if (*if_name == '\0')
-		zbx_snprintf(if_name, sizeof(if_name), "all");
-
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
 
@@ -437,10 +423,6 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
 
 	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
 		*if_name = '\0';
-
-	/* default parameter */
-	if (*if_name == '\0')
-		zbx_snprintf(if_name, sizeof(if_name), "all");
 
 	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &value))
 		return SYSINFO_RET_FAIL;

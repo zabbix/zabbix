@@ -50,7 +50,8 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   nlist.h net/if.h kvm.h linux/kernel.h ldap.h getopt.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
-  sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h)
+  sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
+  net/if_mib.h sys/user.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -310,17 +311,85 @@ AC_TRY_COMPILE(
 #endif /* HAVE_SYS_VMMETER_H */
 ],
 [
+	int		mib[] = {CTL_VM, VM_METER};
 	size_t		len;
-	int		mib[2];
 	struct vmtotal	v;
 
 	len = sizeof(struct vmtotal);
-	mib[0] = CTL_VM;
-	mib[1] = VM_METER;
 
 	sysctl(mib, 2, &v, &len, NULL, 0);
 ],
 AC_DEFINE(HAVE_SYS_VMMETER_VMTOTAL,1,[Define to 1 if struct 'vmtotal' exist .])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for uvmexp_sysctl in uvm/uvm_extern.h
+AC_MSG_CHECKING(for uvmexp_sysctl in struct uvm/uvm_extern.h)
+AC_TRY_COMPILE(
+[
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif /* HAVE_SYS_TYPES_H */
+
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */ 
+
+#include <sys/sysctl.h>
+
+#ifdef HAVE_VM_VM_PARAM_H
+#include <vm/vm_param.h>
+#endif /* HAVE_VM_VM_PARAM_H */
+
+#ifdef HAVE_SYS_VMMETER_H
+#include <sys/vmmeter.h>
+#endif /* HAVE_SYS_VMMETER_H */
+],
+[
+	int			mib[] = {CTL_VM, VM_UVMEXP2};
+	size_t			len;
+	struct uvmexp_sysctl	v;
+
+	len = sizeof(struct uvmexp_sysctl);
+
+	sysctl(mib, 2, &v, &len, NULL, 0);
+],
+AC_DEFINE(HAVE_UVM_UVMEXP2,1,[Define to 1 if struct 'uvmexp_sysctl' exist .])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for uvmexp in uvm/uvm_extern.h
+AC_MSG_CHECKING(for uvmexp in struct uvm/uvm_extern.h)
+AC_TRY_COMPILE(
+[
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif /* HAVE_SYS_TYPES_H */
+
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */ 
+
+#include <sys/sysctl.h>
+
+#ifdef HAVE_VM_VM_PARAM_H
+#include <vm/vm_param.h>
+#endif /* HAVE_VM_VM_PARAM_H */
+
+#ifdef HAVE_SYS_VMMETER_H
+#include <sys/vmmeter.h>
+#endif /* HAVE_SYS_VMMETER_H */
+],
+[
+	int		mib[] = {CTL_VM, VM_UVMEXP};
+	size_t		len;
+	struct uvmexp	v;
+
+	len = sizeof(struct uvmexp);
+
+	sysctl(mib, 2, &v, &len, NULL, 0);
+],
+AC_DEFINE(HAVE_UVM_UVMEXP,1,[Define to 1 if struct 'uvmexp' exist .])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 

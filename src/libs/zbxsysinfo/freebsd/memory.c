@@ -21,349 +21,180 @@
 
 #include "sysinfo.h"
 
-static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
-#ifdef HAVE_PROC
-        FILE    *f = NULL;
-        char    *t;
-        char    c[MAX_STRING_LEN];
-	zbx_uint64_t    res = 0;
+#if defined(HAVE_FUNCTION_SYSCTLBYNAME)
+	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	u_int		totalpages, pagesize;
+	size_t		len;
 
-        assert(result);
+	len = sizeof(totalpages);
 
-        init_result(result);
+	if (0 != sysctlbyname("vm.stats.vm.v_page_count", &totalpages, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
 
-        if(NULL == (f = fopen("/proc/meminfo","r")))
-        {
-                return  SYSINFO_RET_FAIL;
-        }
+	len = sizeof(pagesize);
 
-        while(NULL != fgets(c,MAX_STRING_LEN,f))
-        {
-                if(strncmp(c,"Cached:",7) == 0)
-                {
-                        t=(char *)strtok(c," ");
-                        t=(char *)strtok(NULL," ");
-                        sscanf(t, ZBX_FS_UI64, &res );
-                        t=(char *)strtok(NULL," ");
+	if (0 != sysctlbyname("vm.stats.vm.v_page_size", &pagesize, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
 
-                        if(strcasecmp(t,"kb"))          res <<= 10;
-                        else if(strcasecmp(t, "mb"))    res <<= 20;
-                        else if(strcasecmp(t, "gb"))    res <<= 30;
-                        else if(strcasecmp(t, "tb"))    res <<= 40;
+	SET_UI64_RESULT(result, (zbx_uint64_t)totalpages * pagesize);
 
-                        break;
-                }
-        }
-
-        zbx_fclose(f);
-
-        SET_UI64_RESULT(result, res);
-        return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 #else
-	assert(result);
+	return SYSINFO_RET_FAIL;
+#endif /* HAVE_FUNCTION_SYSCTLBYNAME */
+}
 
-        init_result(result);
-		
+static int	VM_MEMORY_FREE(AGENT_RESULT *result)
+{
+#if defined(HAVE_FUNCTION_SYSCTLBYNAME)
+	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	u_int		freepages, pagesize;
+	size_t		len;
+
+	len = sizeof(freepages);
+
+	if (0 != sysctlbyname("vm.stats.vm.v_free_count", &freepages, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	len = sizeof(pagesize);
+
+	if (0 != sysctlbyname("vm.stats.vm.v_page_size", &pagesize, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)freepages * pagesize);
+
+	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif /* HAVE_FUNCTION_SYSCTLBYNAME */
+}
+
+static int	VM_MEMORY_USED(AGENT_RESULT *result)
+{
+#if defined(HAVE_FUNCTION_SYSCTLBYNAME)
+	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	u_int		totalpages, freepages, pagesize;
+	size_t		len;
+
+	len = sizeof(totalpages);
+
+	if (0 != sysctlbyname("vm.stats.vm.v_page_count", &totalpages, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	len = sizeof(freepages);
+
+	if (0 != sysctlbyname("vm.stats.vm.v_free_count", &freepages, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	len = sizeof(pagesize);
+
+	if (0 != sysctlbyname("vm.stats.vm.v_page_size", &pagesize, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)(totalpages - freepages) * pagesize);
+
+	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif /* HAVE_FUNCTION_SYSCTLBYNAME */
+}
+
+static int	VM_MEMORY_PFREE(AGENT_RESULT *result)
+{
+#if defined(HAVE_FUNCTION_SYSCTLBYNAME)
+	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	u_int		totalpages, freepages;
+	size_t		len;
+
+	len = sizeof(totalpages);
+
+	if (0 != sysctlbyname("vm.stats.vm.v_page_count", &totalpages, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	len = sizeof(freepages);
+
+	if (0 != sysctlbyname("vm.stats.vm.v_free_count", &freepages, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_DBL_RESULT(result, (double)(100.0 * freepages) / totalpages);
+
+	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif /* HAVE_FUNCTION_SYSCTLBYNAME */
+}
+
+static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
+{
+#if defined(HAVE_FUNCTION_SYSCTLBYNAME)
+	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	u_int		totalpages, freepages;
+	size_t		len;
+
+	len = sizeof(totalpages);
+
+	if (0 != sysctlbyname("vm.stats.vm.v_page_count", &totalpages, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	len = sizeof(freepages);
+
+	if (0 != sysctlbyname("vm.stats.vm.v_free_count", &freepages, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_DBL_RESULT(result, (double)(100.0 * (totalpages - freepages)) / totalpages);
+
+	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif /* HAVE_FUNCTION_SYSCTLBYNAME */
+}
+
+static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
+{
+#if defined(HAVE_FUNCTION_SYSCTLBYNAME)
+	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	u_int		cachepages, pagesize;
+	size_t		len;
+
+	len = sizeof(cachepages);
+
+	if (0 != sysctlbyname("vm.stats.vm.v_cache_count", &cachepages, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	len = sizeof(pagesize);
+
+	if (0 != sysctlbyname("vm.stats.vm.v_page_size", &pagesize, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)cachepages * pagesize);
+
+	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif /* HAVE_FUNCTION_SYSCTLBYNAME */
+}
+
+static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
+{
+#if defined(HAVE_SYS_VMMETER_VMTOTAL)
+	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	int	mib[] = {CTL_VM, VM_METER};
+	size_t	len;
+	struct	vmtotal v;
+
+	len = sizeof(v);
+
+	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)(v.t_vmshr + v.t_rmshr) * sysconf(_SC_PAGESIZE));
+
+	return SYSINFO_RET_OK;
+#else
 	return SYSINFO_RET_FAIL;
 #endif
-}
-
-static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	assert(result);
-
-        init_result(result);
-		
-#ifdef HAVE_SYSINFO_BUFFERRAM
-	struct sysinfo info;
-
-	if( 0 == sysinfo(&info))
-	{
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, (zbx_uint64_t)info.bufferram * (zbx_uint64_t)info.mem_unit);
-#else
-		SET_UI64_RESULT(result, info.bufferram);
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;
-	}
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef HAVE_SYSINFO_SHAREDRAM
-	struct sysinfo info;
-#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
-	int mib[2],len;
-	struct vmtotal v;
-#endif
-
-	assert(result);
-
-        init_result(result);
-		
-#ifdef HAVE_SYSINFO_SHAREDRAM
-
-	if( 0 == sysinfo(&info))
-	{
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, (zbx_uint64_t)info.sharedram * (zbx_uint64_t)info.mem_unit);
-#else
-		SET_UI64_RESULT(result, info.sharedram);
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;
-	}
-#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
-
-	len=sizeof(struct vmtotal);
-	mib[0]=CTL_VM;
-	mib[1]=VM_METER;
-
-	sysctl(mib,2,&v,&len,NULL,0);
-
-	SET_UI64_RESULT(result, v.t_armshr * getpagesize());
-	return SYSINFO_RET_OK;
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#if defined(HAVE_SYS_PSTAT_H)
-	struct	pst_static pst;
-	long	page;
-#elif defined(HAVE_SYSINFO_TOTALRAM)
-	struct sysinfo info;
-#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
-	int mib[2], len, total;
-#elif defined(HAVE_SYS_SYSCTL_H)
-	static int mib[] = { CTL_HW, HW_PHYSMEM };
-	size_t len;
-	unsigned int memory;
-	int ret;
-#endif
-
-	assert(result);
-
-        init_result(result);
-		
-#if defined(HAVE_SYS_PSTAT_H)
-
-	if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	else
-	{
-		/* Get page size */	
-		page = pst.page_size;
-		/* Total physical memory in bytes */	
-		SET_UI64_RESULT(result, (zbx_uint64_t)page*(zbx_uint64_t)pst.physical_memory);
-		return SYSINFO_RET_OK;
-	}
-#elif defined(HAVE_SYSINFO_TOTALRAM)
-
-	if( 0 == sysinfo(&info))
-	{
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, (zbx_uint64_t)info.totalram * (zbx_uint64_t)info.mem_unit);
-#else
-		SET_UI64_RESULT(result, info.totalram);
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;
-	}
-#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
-
-	len = sizeof(total);
-	mib[0]=CTL_HW;
-	mib[1]=HW_PHYSMEM;
-	sysctl(mib, 2, &total, &len, NULL, 0);
-
-	SET_UI64_RESULT(result, total);
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_SYS_SYSCTL_H)
-	
-	len=sizeof(memory);
-
-	if(0==sysctl(mib,2,&memory,&len,NULL,0))
-	{
-		SET_UI64_RESULT(result, memory);
-		ret=SYSINFO_RET_OK;
-	}
-	else
-	{
-		ret=SYSINFO_RET_FAIL;
-	}
-	return ret;
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#if defined(HAVE_SYS_PSTAT_H)
-	struct	pst_static pst;
-	struct	pst_dynamic dyn;
-	long	page;
-#elif defined(HAVE_SYSINFO_FREERAM)
-	struct sysinfo info;
-#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
-	int mib[2],len;
-	struct vmtotal v;
-#elif defined(HAVE_MACH_HOST_INFO_H)
-	vm_statistics_data_t page_info;
-	vm_size_t pagesize;
-	mach_msg_type_number_t count;
-	kern_return_t kret;
-	int ret;
-#endif
-
-	assert(result);
-
-        init_result(result);
-		
-#if defined(HAVE_SYS_PSTAT_H)
-
-	if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	else
-	{
-		/* Get page size */	
-		page = pst.page_size;
-/*		return pst.physical_memory;*/
-
-		if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
-		{
-			return SYSINFO_RET_FAIL;
-		}
-		else
-		{
-/*		cout<<"total virtual memory allocated is " << dyn.psd_vm << "
-		pages, " << dyn.psd_vm * page << " bytes" << endl;
-		cout<<"active virtual memory is " << dyn.psd_avm <<" pages, " <<
-		dyn.psd_avm * page << " bytes" << endl;
-		cout<<"total real memory is " << dyn.psd_rm << " pages, " <<
-		dyn.psd_rm * page << " bytes" << endl;
-		cout<<"active real memory is " << dyn.psd_arm << " pages, " <<
-		dyn.psd_arm * page << " bytes" << endl;
-		cout<<"free memory is " << dyn.psd_free << " pages, " <<
-*/
-		/* Free memory in bytes */
-
-			SET_UI64_RESULT(result, (zbx_uint64_t)dyn.psd_free * (zbx_uint64_t)page);
-			return SYSINFO_RET_OK;
-		}
-	}
-#elif defined(HAVE_SYSINFO_FREERAM)
-
-	if( 0 == sysinfo(&info))
-	{
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, (zbx_uint64_t)info.freeram * (zbx_uint64_t)info.mem_unit);
-#else	
-		SET_UI64_RESULT(result, info.freeram);
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;
-	}
-#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
-
-	len=sizeof(struct vmtotal);
-	mib[0]=CTL_VM;
-	mib[1]=VM_METER;
-
-	sysctl(mib,2,&v,&len,NULL,0);
-
-	SET_UI64_RESULT(result, v.t_free * getpagesize());
-	return SYSINFO_RET_OK;
-/* OS/X */
-#elif defined(HAVE_MACH_HOST_INFO_H)
-	
-	pagesize = 0;
-	kret = host_page_size (mach_host_self(), &pagesize);
-
-	count = HOST_VM_INFO_COUNT;
-	kret = host_statistics (mach_host_self(), HOST_VM_INFO,
-	(host_info_t)&page_info, &count);
-	if (kret == KERN_SUCCESS)
-	{
-		double pw, pa, pi, pf, pu;
-
-		pw = (double)page_info.wire_count*pagesize;
-		pa = (double)page_info.active_count*pagesize;
-		pi = (double)page_info.inactive_count*pagesize;
-		pf = (double)page_info.free_count*pagesize;
-
-		pu = pw+pa+pi;
-
-		SET_UI64_RESULT(result, pf);
-		ret = SYSINFO_RET_OK;
-	}
-	else
-	{
-		ret = SYSINFO_RET_FAIL;
-	}
-	return ret;
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-static int      VM_MEMORY_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	AGENT_RESULT	result_tmp;
-	zbx_uint64_t	tot_val = 0;
-	zbx_uint64_t	free_val = 0;
-
-	assert(result);
-
-	init_result(result);
-	init_result(&result_tmp);
-
-	if(VM_MEMORY_TOTAL(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK ||
-		!(result_tmp.type & AR_UINT64))
-			return  SYSINFO_RET_FAIL;
-	tot_val = result_tmp.ui64;
-
-	/* Check fot division by zero */
-	if(tot_val == 0)
-	{
-		free_result(&result_tmp);
-		return  SYSINFO_RET_FAIL;
-	}
-
-	if(VM_MEMORY_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK ||
-		!(result_tmp.type & AR_UINT64))
-			return  SYSINFO_RET_FAIL;
-	free_val = result_tmp.ui64;
-
-	free_result(&result_tmp);
-
-	SET_DBL_RESULT(result, (100.0 * (double)free_val) / (double)tot_val);
-
-	return SYSINFO_RET_OK;
 }
 
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -371,51 +202,43 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 #define MEM_FNCLIST struct mem_fnclist_s
 MEM_FNCLIST
 {
-	char *mode;
-	int (*function)();
+	char	*mode;
+	int	(*function)();
 };
 
 	MEM_FNCLIST fl[] = 
 	{
-		{"free",	VM_MEMORY_FREE},
-		{"pfree",       VM_MEMORY_PFREE},
-		{"shared",	VM_MEMORY_SHARED},
 		{"total",	VM_MEMORY_TOTAL},
-		{"buffers",	VM_MEMORY_BUFFERS},
+		{"free",	VM_MEMORY_FREE},
+		{"used",	VM_MEMORY_USED},
+		{"pfree",	VM_MEMORY_PFREE},
+		{"pused",	VM_MEMORY_PUSED},
+		{"shared",	VM_MEMORY_SHARED},
 		{"cached",	VM_MEMORY_CACHED},
-		{0,	0}
+		{0,		0}
 	};
-        char    mode[MAX_STRING_LEN];
-	int i;
 
-        assert(result);
+	char	mode[MAX_STRING_LEN];
+	int	i;
 
-        init_result(result);
+	assert(result);
 
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	init_result(result);
 
-        if(get_param(param, 1, mode, sizeof(mode)) != 0)
-        {
-                mode[0] = '\0';
-        }
+	if (num_param(param) > 1)
+		return SYSINFO_RET_FAIL;
 
-        if(mode[0] == '\0')
-	{
-		/* default parameter */
+	if (0 != get_param(param, 1, mode, sizeof(mode)))
+		*mode = '\0';
+
+	/* default parameter */
+	if (*mode == '\0')
 		zbx_snprintf(mode, sizeof(mode), "total");
-	}
-	
-	for(i=0; fl[i].mode!=0; i++)
-	{
-		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-		{
-			return (fl[i].function)(cmd, param, flags, result);
-		}
-	}
-	
+
+	for(i = 0; fl[i].mode != 0; i++)
+		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
+			return (fl[i].function)(result);
+
 	return SYSINFO_RET_FAIL;
 }
 

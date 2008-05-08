@@ -23,13 +23,12 @@
 
 static int	get_vmmemory_stat(zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *used, zbx_uint64_t *shared, double *pfree, double *pused)
 {
-	int		mib[2];
+#if defined(HAVE_SYS_VMMETER_VMTOTAL)
+	int		mib[] = {CTL_VM, VM_METER};
 	struct vmtotal	v;
 	size_t		len;
 
 	len = sizeof(v);
-	mib[0] = CTL_VM;
-	mib[1] = VM_METER;
 
 	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
 		return SYSINFO_RET_FAIL;
@@ -48,6 +47,9 @@ static int	get_vmmemory_stat(zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64
 		*pused = (double)(100.0 * v.t_rm) / (v.t_rm + v.t_free);
 
 	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif /* HAVE_SYS_VMMETER_VMTOTAL */
 }
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
@@ -124,13 +126,11 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 
 static int	VM_MEMORY_BUFFERS(AGENT_RESULT *result)
 {
-	int		mib[2], pages;
+	int		mib[] = {CTL_VM, VM_NKMEMPAGES}, pages;
 	size_t		len;
 	zbx_uint64_t	value;
 
 	len = sizeof(pages);
-	mib[0] = CTL_VM;
-	mib[1] = VM_NKMEMPAGES;
 
 	if (0 != sysctl(mib, 2, &pages, &len, NULL, 0))
 		return SYSINFO_RET_FAIL;
@@ -144,14 +144,12 @@ static int	VM_MEMORY_BUFFERS(AGENT_RESULT *result)
 
 static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 {
-	int		mib[2];
+	int		mib[] = {CTL_VM, VM_UVMEXP};
 	struct uvmexp	v;
 	size_t		len;
 	zbx_uint64_t	value;
 
 	len = sizeof(v);
-	mib[0] = CTL_VM;
-	mib[1] = VM_UVMEXP;
 
 	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
 		return SYSINFO_RET_FAIL;
@@ -207,4 +205,3 @@ MEM_FNCLIST
 
 	return SYSINFO_RET_FAIL;
 }
-
