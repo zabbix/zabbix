@@ -169,8 +169,8 @@
 			$this->lbox = new ClistBox($this->id_l,null,$size);
 			$this->rbox = new ClistBox($this->id_r,null,$size);
 
-//			$this->lbox->AddOption('style','width: 140px;');
-//			$this->rbox->AddOption('style','width: 140px;');
+			$this->lbox->AddOption('style','width: 280px;');
+			$this->rbox->AddOption('style','width: 280px;');
 		}
 		
 		function AddItem($value, $caption, $selected=null, $enabled='yes'){

@@ -1038,9 +1038,9 @@ include_once "include/page_header.php";
 				$db_hosts = DBselect('SELECT DISTINCT h.host, h.status'.
 						' FROM hosts h, hosts_groups hg'.
 						' WHERE h.hostid=hg.hostid '.
-						' AND hg.groupid='.$db_group['groupid'].
-						' AND '.DBcondition('h.hostid',$available_hosts).
-						' AND h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
+							' AND hg.groupid='.$db_group['groupid'].
+							' AND '.DBcondition('h.hostid',$available_hosts).
+							' AND h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
 						' order by host'
 						);
 
@@ -1057,7 +1057,7 @@ include_once "include/page_header.php";
 
 				$table->AddRow(array(
 					array(
-						new CCheckBox("groups[]",NULL,NULL,$db_group["groupid"]),
+						new CCheckBox('groups[]',NULL,NULL,$db_group["groupid"]),
 						SPACE,
 						new CLink(
 							$db_group["name"],
@@ -1065,7 +1065,7 @@ include_once "include/page_header.php";
 							url_param("config"),'action')
 					),
 					$count,
-					empty($hosts)?'-':$hosts
+					new CCol((empty($hosts)?'-':$hosts),'wraptext')
 					));
 			}
 			$table->SetFooter(new CCol(array(
