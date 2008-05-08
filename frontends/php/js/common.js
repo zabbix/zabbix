@@ -611,7 +611,7 @@ function moveListBoxSelectedItem(formname,objname,from,to,action){
 			if(action.toLowerCase() == 'add'){
 				result &= create_var(formname, objname+'['+from.options[i].value+']', from.options[i].value, false);
 			}
-			else if(String.toLowerCase(action) == 'rmv'){
+			else if(action.toLowerCase() == 'rmv'){
 				result &= remove_element(objname+'['+from.options[i].value+']','input');
 			}
 			
