@@ -1239,12 +1239,11 @@ include_once "include/page_header.php";
 			$form->Show();
 		}
 	}
-	else if($_REQUEST["config"]==5) /* Proxies */
-	{
-		if(isset($_REQUEST["form"]))
-		{
+	else if($_REQUEST["config"]==5){ /* Proxies */
+		if(isset($_REQUEST["form"])){
 			insert_proxies_form(get_request("hostid",NULL));
-		} else {
+		} 
+		else {
 			show_table_header(S_PROXIES_BIG);
 
 			$form = new CForm('hosts.php');

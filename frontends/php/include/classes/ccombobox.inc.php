@@ -50,7 +50,7 @@
 		}
 		function SetSelected($value='yes')
 		{
-			if((is_string($value) && ($value == 'yes' || $value == "selected" || $value=='on'))
+			if((is_string($value) && ($value == 'yes' || $value == 'selected' || $value=='on'))
 				|| (is_int($value) && $value<>0))
 				return $this->options['selected'] = 'selected';
 
@@ -157,9 +157,11 @@
 	}
 	
 	class CTweenBox{
-		function ctweenbox(&$form,$name,$size){
+		function ctweenbox(&$form,$name,$value=null,$size=10){
 			$this->form = &$form;
-			$this->name = $name;			
+			$this->name = $name;
+			
+			$this->value = $value;
 			
 			$this->id_l = $this->name.'_left';
 			$this->id_r = $this->name.'_right';
@@ -171,13 +173,23 @@
 //			$this->rbox->AddOption('style','width: 140px;');
 		}
 		
-		function AddItem($expr, $value, $caption, $selected=NULL, $enabled='yes'){
-			if($expr){
-				$this->lbox->AddItem($value,$caption,$selected,$enabled);
+		function AddItem($value, $caption, $selected=null, $enabled='yes'){
+			if(is_null($selected)){
+				if(is_array($this->value)) {
+					if(str_in_array($value,$this->value))
+						$selected = 1;
+				}
+				else if(strcmp($value,$this->value) == 0){
+					$selected = 1;
+				}
+			}
+
+			if((is_int($selected) && $selected!=0) || (is_string($selected) && ($selected == 'yes' || $selected == 'selected' || $selected=='on'))){
+				$this->lbox->AddItem($value,$caption,null,$enabled);
 				$this->form->AddVar($this->name.'['.$value.']',$value);
 			}
 			else{
-				$this->rbox->AddItem($value,$caption,$selected,$enabled);
+				$this->rbox->AddItem($value,$caption,null,$enabled);
 			}
 		}
 		
@@ -191,7 +203,7 @@
 			}
 		}
 		
-		function Get($caption_l=null,$caption_r=null){
+		function Get($caption_l=S_IN,$caption_r=S_OTHER){
 			$grp_tab = new CTable();
 			$grp_tab->SetCellSpacing(0);
 			$grp_tab->SetCellPadding(0);
@@ -212,9 +224,14 @@
 		return $grp_tab;
 		}
 		
-		function Show($caption_l=null,$caption_r=null){
+		function Show($caption_l=S_IN,$caption_r=S_OTHER){
 			$tab = $this->Get($caption_l,$caption_r);
 			$tab->Show();
+		}
+		
+		function toString(){
+			$tab = $this->Get();
+			return $tab->toString();
 		}
 	}
 ?>
