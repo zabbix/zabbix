@@ -76,7 +76,9 @@
 			if(!is_string($value)){
 				return $this->error("Incorrect value for SetAlign [$value]");
 			}
-			return $this->AddOption('name',$value);
+			$this->AddOption('name',$value);
+			$this->AddOption('id',$value);
+		return true;
 		}
 		
 		function SetAlign($value){
