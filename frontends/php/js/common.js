@@ -586,3 +586,23 @@ function empty_form(id){
 	
 return true;
 }
+
+function moveListBoxSelectedItem(from,to){
+	from = $(from);
+	to = $(to);
+	
+	for(i = 0; i < from.options.length; i++) {
+		if(from.options[i].selected == true) {
+			var temp = document.createElement('option');
+			temp.setAttribute('value',from.options[i].value);
+			
+			var caption = IE?from.options[i].innerText:from.options[i].textContent;
+			temp.appendChild(document.createTextNode(caption));
+			
+			from.removeChild(from.options[i]);
+			
+			to.appendChild(temp);
+			i--;
+		}
+	}
+}

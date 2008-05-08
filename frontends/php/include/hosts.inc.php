@@ -283,13 +283,13 @@ require_once "include/items.inc.php";
 	 * Comments:
 	 *
 	 *     NOTE: templates = array(id => name, id2 => name2, ...)
-	 */
-	function	update_host($hostid,$host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$newgroup,$groups)
-	{
+	 */	
+	function update_host($hostid,$host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$newgroup,$groups){
+	
 		$old_templates = get_templates_by_hostid($hostid);
 		$unlinked_templates = array_diff($old_templates, $templates);
-		foreach($unlinked_templates as $id => $name)
-		{
+		
+		foreach($unlinked_templates as $id => $name){
 			unlink_template($hostid, $id);
 		}
 		
@@ -302,11 +302,9 @@ require_once "include/items.inc.php";
 			return $result;
 
 		update_host_groups($hostid, $groups);
-
 		add_group_to_host($hostid,$newgroup);
 
-		if(count($new_templates) > 0)
-		{
+		if(count($new_templates) > 0){
 			sync_host_with_templates($hostid,array_keys($new_templates));
 		}
 
