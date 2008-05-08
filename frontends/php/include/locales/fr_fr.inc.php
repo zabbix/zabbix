@@ -419,7 +419,6 @@
 	'S_GRAPH'=>			'Graphique',
 	'S_TREND'=>			'Tendance',
 	'S_COMPARE'=>			'Comparaison',
-	'S_ZABBIX_VER'=>			'ZABBIX 1.4.1',
 	'S_COPYRIGHT_BY'=>			'Copyright 2001-2006 par',
 	'S_CONNECTED_AS'=>			'Connecté au nom de',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',

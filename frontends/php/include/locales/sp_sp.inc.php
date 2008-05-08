@@ -427,7 +427,6 @@
 	'S_GRAPH'=>			'Gráficos',
 	'S_TREND'=>			'Tendencia',
 	'S_COMPARE'=>			'Comparar',
-	'S_ZABBIX_VER'=>			'ZABBIX 1.4.2',
 	'S_COPYRIGHT_BY'=>			'Copyright 2001-2007 por',
 	'S_CONNECTED_AS'=>			'Conectado como',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',

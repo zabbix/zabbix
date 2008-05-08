@@ -242,7 +242,6 @@
 	'S_GRAPH'=>			'График',
 	'S_TREND'=>			'Динамика изменения',
 	'S_COMPARE'=>			'Сравнить',
-	'S_ZABBIX_VER'=>			'ZABBIX 1.1.5',
 	'S_COPYRIGHT_BY'=>			'Copyright 2001-2006 by',
 	'S_CONNECTED_AS'=>			'Подключен как',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
