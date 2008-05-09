@@ -198,7 +198,7 @@
 		}
 
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid);
-		
+
 		$denied_graphs = array();
 		$available_graphs = array();
 		
