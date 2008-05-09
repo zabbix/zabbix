@@ -270,25 +270,26 @@ COpt::counter_up('perm');
 
 		$processed = array();
 		while($host_data = DBfetch($db_hosts)){
-			if(empty($host_data['nodeid'])) $host_data['nodeid'] = id2nodeid($host_data['hostid']);
+			if(zbx_empty($host_data['nodeid'])) $host_data['nodeid'] = id2nodeid($host_data['hostid']);
 
 			/* if no rights defined used node rights */
-			if( (empty($host_data['permission']) || empty($host_data['userid'])) ){
-				if( isset($processed[$host_data['hostid']]) )
-					continue;
+
+			if( zbx_empty($host_data['permission']) || zbx_empty($host_data['userid'])){
+				if(isset($processed[$host_data['hostid']]) )	continue;
 
 				if(!isset($nodes)){
 					$nodes = get_accessible_nodes_by_user($user_data, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
 				}
-				if( !isset($nodes[$host_data['nodeid']]) || $user_type==USER_TYPE_ZABBIX_USER )
+				
+				if(!isset($nodes[$host_data['nodeid']]) || $user_type==USER_TYPE_ZABBIX_USER )
 					$host_data['permission'] = PERM_DENY;
 				else
 					$host_data['permission'] = $nodes[$host_data['nodeid']]['permission'];
 			}
 
 			$processed[$host_data['hostid']] = true;
+
 			if($host_data['permission'] < $perm) continue;
-//			if(eval('return ('.$host_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;')) continue;
 
 			$result[$host_data['hostid']] = eval('return '.$resdata.';');
 		}
@@ -301,7 +302,7 @@ COpt::counter_up('perm');
 			else
 				$result = implode(',',$result);
 		}
-		
+
 		$available_hosts[$userid][$perm][$perm_res][$nodeid_str] = $result;
 	return $result;
 	}
@@ -349,10 +350,10 @@ COpt::counter_up('perm');
 
 		$processed = array();
 		while($group_data = DBfetch($db_groups)){
-			if(empty($group_data['nodeid'])) $group_data['nodeid'] = id2nodeid($group_data['groupid']);
+			if(zbx_empty($group_data['nodeid'])) $group_data['nodeid'] = id2nodeid($group_data['groupid']);
 
 			/* deny if no rights defined */
-			if( empty($group_data['permission']) || empty($group_data['userid']) ){
+			if( zbx_empty($group_data['permission']) || zbx_empty($group_data['userid']) ){
 				if(isset($processed[$group_data['groupid']])) continue;
 
 				if(!isset($nodes)){
@@ -449,7 +450,7 @@ COpt::counter_up('perm');
 			$processed_nodeids[$node_data["nodeid"]] = $node_data["nodeid"];
 
 			/* deny if no rights defined (for local node read/write)*/
-			if(empty($node_data['permission']) || empty($node_data['userid'])){
+			if(zbx_empty($node_data['permission']) || zbx_empty($node_data['userid'])){
 				if($user_type == USER_TYPE_SUPER_ADMIN)
 					$node_data['permission'] = PERM_READ_WRITE;
 				else

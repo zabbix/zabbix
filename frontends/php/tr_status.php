@@ -162,7 +162,7 @@ include_once "include/page_header.php";
 	$scripts_by_hosts = get_accessible_scripts_by_hosts(explode(',',$available_hosts));
 	
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-	
+
 	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
 					' FROM groups g, hosts_groups hg, hosts h, items i '.
 					' WHERE g.groupid in ('.$available_groups.') '.
