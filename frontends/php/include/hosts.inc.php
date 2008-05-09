@@ -484,6 +484,19 @@ require_once "include/items.inc.php";
 		error("No host groups with groupid=[$groupid]");
 		return  false;
 	}
+	
+	function get_groupids_by_host($hostid){
+		$groupids = array();
+		
+		$result=DBselect('SELECT DISTINCT hg.groupid '.
+						' FROM hosts_groups hg '.
+						' WHERE hg.hostid='.$hostid);
+		while($row=DBfetch($result)){
+			$groupids[$row['groupid']] = $row['groupid'];
+		}
+		
+	return $groupids;
+	}
 
 	function db_save_proxy($name,$proxyid=null){
 		if(!is_string($name)){
@@ -564,8 +577,8 @@ require_once "include/items.inc.php";
 		return	false;
 	}
 
-	function	get_host_by_hostid($hostid,$no_error_message=0)
-	{
+	function get_host_by_hostid($hostid,$no_error_message=0){
+	
 		$sql="select * from hosts where hostid=$hostid";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
@@ -578,15 +591,14 @@ require_once "include/items.inc.php";
 		return	false;
 	}
 
-	function	get_hosts_by_templateid($templateid)
-	{
+	function	get_hosts_by_templateid($templateid){
 		return DBselect("select h.* from hosts h, hosts_templates ht where h.hostid=ht.hostid and ht.templateid=$templateid");
 	}
 
 	# Update Host status
 
-	function	update_host_status($hostid,$status)
-	{
+	function	update_host_status($hostid,$status){
+	
 		$row=DBfetch(DBselect("select status,host from hosts where hostid=$hostid"));
 		$old_status=$row["status"];
 		if($status != $old_status)
@@ -615,17 +627,17 @@ require_once "include/items.inc.php";
 	 * Comments:
 	 *
 	 */
-	function	get_templates_by_hostid($hostid)
-	{
-		$resuilt = array();
-		$db_templates = DBselect('select distinct h.hostid,h.host from hosts_templates ht '.
-			' left join hosts h on h.hostid=ht.templateid '.
-			' where ht.hostid='.$hostid);
-		while($template_data = DBfetch($db_templates))
-		{
-			$resuilt[$template_data['hostid']] = $template_data['host'];
+	function	get_templates_by_hostid($hostid){
+		$result = array();
+		$db_templates = DBselect('select distinct h.hostid,h.host '.
+				' from hosts_templates ht '.
+					' left join hosts h on h.hostid=ht.templateid '.
+				' where ht.hostid='.$hostid);
+				
+		while($template_data = DBfetch($db_templates)){
+			$result[$template_data['hostid']] = $template_data['host'];
 		}
-		return $resuilt;
+		return $result;
 	}
 
 	/*
