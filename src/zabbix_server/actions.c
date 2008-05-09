@@ -123,6 +123,41 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		DBfree_result(result);
 	}
+	else if (event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_HOST_TEMPLATE)
+	{
+		condition_value = zbx_atoui64(condition->value);
+
+		result = DBselect("select distinct ht.templateid from hosts_templates ht,items i,functions f,triggers t"
+				" where ht.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64,
+				event->objectid);
+
+		if (condition->operator == CONDITION_OPERATOR_EQUAL) {
+			while (NULL != (row = DBfetch(result))) {
+				hostid = zbx_atoui64(row[0]);
+
+				if (condition_value == hostid) {
+					ret = SUCCEED;
+					break;
+				}
+			}
+		} else if (condition->operator == CONDITION_OPERATOR_NOT_EQUAL) {
+			ret = SUCCEED;
+
+			while (NULL != (row = DBfetch(result))) {
+				hostid = zbx_atoui64(row[0]);
+
+				if (condition_value == hostid) {
+					ret = FAIL;
+					break;
+				}
+			}
+		} else
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+
+		DBfree_result(result);
+	}
 	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_HOST)
 	{
 		ZBX_STR2UINT64(condition_value, condition->value);
