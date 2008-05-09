@@ -45,6 +45,7 @@ include_once 'include/discovery.inc.php';
 						}
 						break;
 					case CONDITION_TYPE_HOST:
+					case CONDITION_TYPE_HOST_TEMPLATE:
 						if(!uint_in_array($ac_data['value'],explode(',',$available_hosts))){
 							$result = false;
 						}
@@ -87,6 +88,7 @@ include_once 'include/discovery.inc.php';
 					}
 					break;
 				case CONDITION_TYPE_HOST:
+				case CONDITION_TYPE_HOST_TEMPLATE:
 					if(!uint_in_array($ac_data['value'],explode(',',$available_hosts))){
 						error(S_INCORRECT_HOST);
 						$result = false;
@@ -310,6 +312,7 @@ include_once 'include/discovery.inc.php';
 	function	condition_type2str($conditiontype)
 	{
 		$str_type[CONDITION_TYPE_HOST_GROUP]		= S_HOST_GROUP;
+		$str_type[CONDITION_TYPE_HOST_TEMPLATE]		= S_HOST_TEMPLATE;
 		$str_type[CONDITION_TYPE_TRIGGER]		= S_TRIGGER;
 		$str_type[CONDITION_TYPE_HOST]			= S_HOST;
 		$str_type[CONDITION_TYPE_TRIGGER_NAME]		= S_TRIGGER_DESCRIPTION;
@@ -341,6 +344,7 @@ include_once 'include/discovery.inc.php';
 				$str_val = expand_trigger_description($value);
 				break;
 			case CONDITION_TYPE_HOST:
+			case CONDITION_TYPE_HOST_TEMPLATE:
 				$str_val = get_host_by_hostid($value);
 				$str_val = $str_val['host'];
 				break;
@@ -469,6 +473,7 @@ include_once 'include/discovery.inc.php';
 	{
 		$conditions[EVENT_SOURCE_TRIGGERS] = array(
 				CONDITION_TYPE_HOST_GROUP,
+				CONDITION_TYPE_HOST_TEMPLATE,
 				CONDITION_TYPE_HOST,
 				CONDITION_TYPE_TRIGGER,
 				CONDITION_TYPE_TRIGGER_NAME,
@@ -534,6 +539,10 @@ include_once 'include/discovery.inc.php';
 	function	get_operators_by_conditiontype($conditiontype)
 	{
 		$operators[CONDITION_TYPE_HOST_GROUP] = array(
+				CONDITION_OPERATOR_EQUAL,
+				CONDITION_OPERATOR_NOT_EQUAL
+			);
+		$operators[CONDITION_TYPE_HOST_TEMPLATE] = array(
 				CONDITION_OPERATOR_EQUAL,
 				CONDITION_OPERATOR_NOT_EQUAL
 			);
@@ -610,6 +619,14 @@ include_once 'include/discovery.inc.php';
 			case CONDITION_TYPE_HOST_GROUP:
 				if(!uint_in_array($value,
 					get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY)))
+				{
+					error(S_INCORRECT_GROUP);
+					return false;
+				}
+				break;
+			case CONDITION_TYPE_HOST_TEMPLATE:
+				if(!uint_in_array($value,
+					get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY)))
 				{
 					error(S_INCORRECT_GROUP);
 					return false;

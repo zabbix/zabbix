@@ -1,5 +1,6 @@
 Changes for 1.5.3
 
+ - [DEV-167] added support of Host Template=<template> in actions (Sasha)
  - [DEV-168] added more supported items in FreeBSD, NetBSD and OpenBSD (Sasha)
  - [DEV-161] changed greeting message (Artem)
  - [DEV-157] added fullscreen icon to monitoring screens (Artem)
