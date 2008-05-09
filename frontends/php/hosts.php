@@ -260,7 +260,7 @@ include_once 'include/page_header.php';
 			$db_host = get_host_by_hostid($hostid);
 			$db_templates = get_templates_by_hostid($hostid);
 
-			foreach($db_host as $key){
+			foreach($db_host as $key => $value){
 				if(isset($visible[$key])){
 					$db_host[$key] = $_REQUEST[$key];
 				}
