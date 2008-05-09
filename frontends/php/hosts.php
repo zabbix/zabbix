@@ -48,8 +48,8 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		// 0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications; 5 - Proxies
-		"config"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2,3,4,5"),	NULL), 
+		// 0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications; 5 - Proxies; 6 - host mass update
+		"config"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2,3,4,5,6"),	NULL), 
 
 /* ARAYS */
 		"hosts"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
@@ -735,6 +735,7 @@ include_once "include/page_header.php";
 	$cmbConf->AddItem(1,S_HOST_GROUPS);
 	$cmbConf->AddItem(2,S_TEMPLATE_LINKAGE);
 	$cmbConf->AddItem(4,S_APPLICATIONS);
+	$cmbConf->AddItem(6,S_MASS_UPDATE);
 
 	switch($_REQUEST["config"]){
 		case 0:
@@ -1316,6 +1317,9 @@ include_once "include/page_header.php";
 			$form->AddItem($table);
 			$form->Show();
 		}
+	}
+	else if($_REQUEST["config"]==6){ /* Host Mass Update */
+		insert_mass_update_host_form();
 	}
 ?>
 <?php

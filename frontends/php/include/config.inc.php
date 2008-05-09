@@ -1291,8 +1291,10 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return $res;
 	}
 
-	function not_empty($var){
-		return ($var == "" ? 0 : 1);
+	function zbx_empty($var){
+		if(is_null($var)) return true;
+		if($var == '') return true;
+	return false;
 	}
 
 	function empty2null($var){
