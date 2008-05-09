@@ -4099,6 +4099,8 @@
 	function insert_mass_update_host_form(){//$elements_array_name){
 		global $USER_DETAILS;
 
+		$visible = get_request('visible',array());
+		
 		$groups= get_request('groups',array());
 
 		$newgroup	= get_request('newgroup','');
@@ -4139,13 +4141,16 @@
 		$frmHost = new CFormTable($frm_title,'hosts.php');
 		$frmHost->SetHelp('web.hosts.host.php');
 		$frmHost->AddVar('config',get_request('config',0));
+		$frmHost->AddVar('massupdate',get_request('massupdate',1));
+		
+		$hosts = $_REQUEST['hosts'];
+		foreach($hosts as $id => $hostid){
+			$frmHost->AddVar('hosts['.$hostid.']',$hostid);
+		}
 
 		$frmHost->AddVar('clear_templates',$clear_templates);
-
-		if(isset($_REQUEST['hostid']))		$frmHost->AddVar('hostid',$_REQUEST['hostid']);
-		if(isset($_REQUEST['groupid']))		$frmHost->AddVar('groupid',$_REQUEST['groupid']);
 		
-//		$frmItem->AddRow(array( new CVisibilityBox('type_visible', get_request('type_visible'), 'type', S_ORIGINAL),S_TYPE), $cmbType);
+//		$frmItem->AddRow(array( new CVisibilityBox('visible[type]', isset($visible['type']), 'type', S_ORIGINAL),S_TYPE), $cmbType);
 
 		$frmHost->AddRow(S_NAME,S_ORIGINAL);
 
@@ -4158,20 +4163,20 @@
 		while($db_group=DBfetch($db_groups)){
 			$grp_tb->AddItem($db_group['groupid'],$db_group['name']);
 		}
-		
-		$frmHost->AddRow(array(new CVisibilityBox('groups_visible', get_request('groups_visible'), $grp_tb->GetName(), S_ORIGINAL),S_GROUPS),
+
+		$frmHost->AddRow(array(new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->GetName(), S_ORIGINAL),S_GROUPS),
 						$grp_tb->Get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)
 					);
 
-		$frmHost->AddRow(array(new CVisibilityBox('newgroup_visible', get_request('newgroup_visible'), 'newgroup', S_ORIGINAL),S_NEW_GROUP),
+		$frmHost->AddRow(array(new CVisibilityBox('visible[newgroup]', isset($visible['newgroup']), 'newgroup', S_ORIGINAL),S_NEW_GROUP),
 						new CTextBox('newgroup',$newgroup),
 						'new'
 					);
 
 // onchange does not work on some browsers: MacOS, KDE browser
-		$frmHost->AddRow(array(new CVisibilityBox('dns_visible', get_request('dns_visible'), 'dns', S_ORIGINAL),S_DNS_NAME),new CTextBox('dns',$dns,'40'));
+		$frmHost->AddRow(array(new CVisibilityBox('visible[dns]', isset($visible['dns']), 'dns', S_ORIGINAL),S_DNS_NAME),new CTextBox('dns',$dns,'40'));
 		
-		$frmHost->AddRow(array(new CVisibilityBox('ip_visible', get_request('ip_visible'), 'ip', S_ORIGINAL),S_IP_ADDRESS),
+		$frmHost->AddRow(array(new CVisibilityBox('visible[ip]', isset($visible['ip']), 'ip', S_ORIGINAL),S_IP_ADDRESS),
 						new CTextBox('ip',$ip,defined('ZBX_HAVE_IPV6')?39:15)
 					);
 
@@ -4179,11 +4184,11 @@
 		$cmbConnectBy->AddItem(0, S_DNS_NAME);
 		$cmbConnectBy->AddItem(1, S_IP_ADDRESS);
 		
-		$frmHost->AddRow(array(new CVisibilityBox('useip_visible', get_request('useip_visible'), 'useip', S_ORIGINAL),S_CONNECT_TO),
+		$frmHost->AddRow(array(new CVisibilityBox('visible[useip]', isset($visible['useip']), 'useip', S_ORIGINAL),S_CONNECT_TO),
 						$cmbConnectBy
 					);
 
-		$frmHost->AddRow(array(new CVisibilityBox('port_visible', get_request('port_visible'), 'port', S_ORIGINAL),S_PORT),
+		$frmHost->AddRow(array(new CVisibilityBox('visible[port]', isset($visible['port']), 'port', S_ORIGINAL),S_PORT),
 						new CNumericBox('port',$port,5)
 					);
 
@@ -4196,7 +4201,7 @@
 		while ($db_proxy = DBfetch($db_proxies))
 			$cmbProxy->AddItem($db_proxy['hostid'], $db_proxy['host']);
 
-		$frmHost->AddRow(array(new CVisibilityBox('proxy_hostid_visible', get_request('proxy_hostid_visible'), 'proxy_hostid', S_ORIGINAL),S_MONITORED_BY_PROXY),
+		$frmHost->AddRow(array(new CVisibilityBox('visible[proxy_hostid]', isset($visible['proxy_hostid']), 'proxy_hostid', S_ORIGINAL),S_MONITORED_BY_PROXY),
 						$cmbProxy
 					);
 //----------
@@ -4205,14 +4210,20 @@
 		$cmbStatus->AddItem(HOST_STATUS_MONITORED,	S_MONITORED);
 		$cmbStatus->AddItem(HOST_STATUS_NOT_MONITORED,	S_NOT_MONITORED);
 		
-		$frmHost->AddRow(array(new CVisibilityBox('status_visible', get_request('status_visible'), 'status', S_ORIGINAL),S_STATUS),
+		$frmHost->AddRow(array(new CVisibilityBox('visible[status]', isset($visible['status']), 'status', S_ORIGINAL),S_STATUS),
 						$cmbStatus
 					);
 
 		$template_table = new CTable();
+		
+		$template_table->AddOption('name','template_table');
+		$template_table->AddOption('id','template_table');
+		
 		$template_table->SetCellPadding(0);
 		$template_table->SetCellSpacing(0);
-
+		
+//		$template_table->AddOption('style','border: 1px black solid;');
+		
 		foreach($templates as $id => $temp_name){
 			$frmHost->AddVar('templates['.$id.']',$temp_name);
 			$template_table->AddRow(array(
@@ -4223,30 +4234,29 @@
 				);
 		}
 
-		$frmHost->AddRow(S_LINK_WITH_TEMPLATE, array($template_table,
-				new CButton('add_template',S_ADD,
+		$template_table->AddRow(new CButton('add_template',S_ADD,
 					"return PopUp('popup.php?dstfrm=".$frmHost->GetName().
 					"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
-					url_param($templates,false,'existed_templates')."',450,450)",
-					'T')
-				));
+					url_param($templates,false,'existed_templates')."',450,450)"));
+							
+		$frmHost->AddRow(array(new CVisibilityBox('visible[template_table]', isset($visible['template_table']), 'template_table', S_ORIGINAL),S_LINK_WITH_TEMPLATE), $template_table, 'T');
 	
-		$frmHost->AddRow(array(new CVisibilityBox('useprofile_visible', get_request('useprofile_visible'), 'useprofile', S_ORIGINAL),S_USE_PROFILE),
+		$frmHost->AddRow(array(new CVisibilityBox('visible[useprofile]', isset($visible['useprofile']), 'useprofile', S_ORIGINAL),S_USE_PROFILE),
 					new CCheckBox("useprofile",$useprofile,"submit()")
 				);
 
 		if($useprofile=="yes"){
-			$frmHost->AddRow(array(new CVisibilityBox('devicetype_visible', get_request('devicetype_visible'), 'devicetype', S_ORIGINAL),S_DEVICE_TYPE),new CTextBox("devicetype",$devicetype,61));
-			$frmHost->AddRow(array(new CVisibilityBox('name_visible', get_request('name_visible'), 'name', S_ORIGINAL),S_NAME),new CTextBox("name",$name,61));
-			$frmHost->AddRow(array(new CVisibilityBox('os_visible', get_request('os_visible'), 'os', S_ORIGINAL),S_OS),new CTextBox("os",$os,61));
-			$frmHost->AddRow(array(new CVisibilityBox('serialno_visible', get_request('serialno_visible'), 'serialno', S_ORIGINAL),S_SERIALNO),new CTextBox("serialno",$serialno,61));
-			$frmHost->AddRow(array(new CVisibilityBox('tag_visible', get_request('tag_visible'), 'tag', S_ORIGINAL),S_TAG),new CTextBox("tag",$tag,61));
-			$frmHost->AddRow(array(new CVisibilityBox('macaddress_visible', get_request('macaddress_visible'), 'macaddress', S_ORIGINAL),S_MACADDRESS),new CTextBox("macaddress",$macaddress,61));
-			$frmHost->AddRow(array(new CVisibilityBox('hardware_visible', get_request('hardware_visible'), 'hardware', S_ORIGINAL),S_HARDWARE),new CTextArea("hardware",$hardware,60,4));
-			$frmHost->AddRow(array(new CVisibilityBox('software_visible', get_request('software_visible'), 'software', S_ORIGINAL),S_SOFTWARE),new CTextArea("software",$software,60,4));
-			$frmHost->AddRow(array(new CVisibilityBox('contact_visible', get_request('contact_visible'), 'contact', S_ORIGINAL),S_CONTACT),new CTextArea("contact",$contact,60,4));
-			$frmHost->AddRow(array(new CVisibilityBox('location_visible', get_request('location_visible'), 'location', S_ORIGINAL),S_LOCATION),new CTextArea("location",$location,60,4));
-			$frmHost->AddRow(array(new CVisibilityBox('notes_visible', get_request('notes_visible'), 'notes', S_ORIGINAL),S_NOTES),new CTextArea("notes",$notes,60,4));
+			$frmHost->AddRow(array(new CVisibilityBox('visible[devicetype]', isset($visible['devicetype']), 'devicetype', S_ORIGINAL),S_DEVICE_TYPE),new CTextBox("devicetype",$devicetype,61));
+			$frmHost->AddRow(array(new CVisibilityBox('visible[name]', isset($visible['name']), 'name', S_ORIGINAL),S_NAME),new CTextBox("name",$name,61));
+			$frmHost->AddRow(array(new CVisibilityBox('visible[os]', isset($visible['os']), 'os', S_ORIGINAL),S_OS),new CTextBox("os",$os,61));
+			$frmHost->AddRow(array(new CVisibilityBox('visible[serialno]', isset($visible['serialno']), 'serialno', S_ORIGINAL),S_SERIALNO),new CTextBox("serialno",$serialno,61));
+			$frmHost->AddRow(array(new CVisibilityBox('visible[tag]', isset($visible['tag']), 'tag', S_ORIGINAL),S_TAG),new CTextBox("tag",$tag,61));
+			$frmHost->AddRow(array(new CVisibilityBox('visible[macaddress]', isset($visible['macaddress']), 'macaddress', S_ORIGINAL),S_MACADDRESS),new CTextBox("macaddress",$macaddress,61));
+			$frmHost->AddRow(array(new CVisibilityBox('visible[hardware]', isset($visible['hardware']), 'hardware', S_ORIGINAL),S_HARDWARE),new CTextArea("hardware",$hardware,60,4));
+			$frmHost->AddRow(array(new CVisibilityBox('visible[software]', isset($visible['software']), 'software', S_ORIGINAL),S_SOFTWARE),new CTextArea("software",$software,60,4));
+			$frmHost->AddRow(array(new CVisibilityBox('visible[contact]', isset($visible['contact']), 'contact', S_ORIGINAL),S_CONTACT),new CTextArea("contact",$contact,60,4));
+			$frmHost->AddRow(array(new CVisibilityBox('visible[location]', isset($visible['location']), 'location', S_ORIGINAL),S_LOCATION),new CTextArea("location",$location,60,4));
+			$frmHost->AddRow(array(new CVisibilityBox('visible[notes]', isset($visible['notes']), 'notes', S_ORIGINAL),S_NOTES),new CTextArea("notes",$notes,60,4));
 		}
 		else{
 			$frmHost->AddVar("devicetype",	$devicetype);
@@ -4262,32 +4272,7 @@
 			$frmHost->AddVar("notes",	$notes);
 		}
 
-		$frmHost->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["hostid"]))
-		{
-			$frmHost->AddItemToBottomRow(SPACE);
-			$frmHost->AddItemToBottomRow(new CButton("clone",S_CLONE));
-			$frmHost->AddItemToBottomRow(SPACE);
-			$frmHost->AddItemToBottomRow(
-				new CButtonDelete(S_DELETE_SELECTED_HOST_Q,
-					url_param("form").url_param("config").url_param("hostid").
-					url_param("groupid")
-				)
-			);
-
-			if($show_only_tmp)
-			{
-				$frmHost->AddItemToBottomRow(SPACE);
-				$frmHost->AddItemToBottomRow(
-					new CButtonQMessage('delete_and_clear',
-						'Delete AND clear',
-                                        	S_DELETE_SELECTED_HOSTS_Q,
-						url_param("form").url_param("config").url_param("hostid").
-						url_param("groupid")
-					)
-				);
-			}
-		}
+		$frmHost->AddItemToBottomRow(new CButton("save",S_SAVE));		
 		$frmHost->AddItemToBottomRow(SPACE);
 		$frmHost->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param("groupid")));
 		$frmHost->Show();
@@ -4687,9 +4672,7 @@
 	}
 
 	# Insert host profile ReadOnly form
-	function	insert_host_profile_form()
-	{
-		global $_REQUEST;
+	function insert_host_profile_form(){
 
 		$frmHostP = new CFormTable(S_HOST_PROFILE);
 		$frmHostP->SetHelp("web.host_profile.php");
@@ -4697,9 +4680,7 @@
 		$result=DBselect("SELECT * FROM hosts_profiles WHERE hostid=".$_REQUEST["hostid"]);
 
 		$row=DBfetch($result);
-		if($row)
-		{
-
+		if($row){
 			$devicetype=$row["devicetype"];
 			$name=$row["name"];
 			$os=$row["os"];
@@ -4724,8 +4705,7 @@
 			$frmHostP->AddRow(S_LOCATION,new CTextArea("location",$location,60,4,'yes'));
 			$frmHostP->AddRow(S_NOTES,new CTextArea("notes",$notes,60,4,'yes'));
 		}
-		else
-		{
+		else{
 			$frmHostP->AddSpanRow("Profile for this host is missing","form_row_c");
 		}
 		$frmHostP->AddItemToBottomRow(new CButtonCancel(url_param("groupid")));
