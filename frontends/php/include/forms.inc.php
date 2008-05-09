@@ -3017,6 +3017,17 @@
 							'T')
 						);
 					break;
+				case CONDITION_TYPE_HOST_TEMPLATE:
+					$frmAction->AddVar('new_condition[value]','0');
+					$rowCondition[] = array(
+						new CTextBox('host','',20,'yes'),
+						new CButton('btn1',S_SELECT,
+							"return PopUp('popup.php?dstfrm=".$frmAction->GetName().
+							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=host_templates".
+							"&srcfld1=hostid&srcfld2=host',450,450);",
+							'T')
+						);
+					break;
 				case CONDITION_TYPE_HOST:
 					$frmAction->AddVar('new_condition[value]','0');
 					$rowCondition[] = array(

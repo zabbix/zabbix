@@ -250,6 +250,7 @@
 	'S_CANNOT_LINK_TO_TEMPLATE'=>		'CAnnot link to template',
 	'S_UNLINK_FROM_TEMPLATE'=>			'Unlink from template',
 	'S_CANNOT_UNLINK_FROM_TEMPLATE'=>	'Cannot unlink from template',
+	'S_HOST_TEMPLATE'=>			'Host template',
 
 	'S_INCORRECT_TRIGGER'=>			'Incorrect trigger',
 	'S_INCORRECT_HOST'=>			'Incorrect host',
