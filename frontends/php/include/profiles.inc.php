@@ -207,7 +207,7 @@ function insert_profile($idx,$value,$type,$resource=null){
 	global $USER_DETAILS;
 
 	$profileid = get_dbid('profiles', 'profileid');
-	
+
 	$val1 = $value;
 	$val2 = '';
 	$rsrc = is_null($resource)?'':$resource;
@@ -221,7 +221,7 @@ function insert_profile($idx,$value,$type,$resource=null){
 		$rsrc = isset($value['resource'])?$value['resource']:$rsrc;
 	}
 
-	if(empty($val1)) return false;
+	if(is_null($val1)) return false;
 	
 	$sql='INSERT INTO profiles (profileid,userid,idx,value,value2,resource,valuetype)'.
 		' VALUES ('.$profileid.','.
@@ -231,6 +231,7 @@ function insert_profile($idx,$value,$type,$resource=null){
 					zbx_dbstr($val2).','.
 					zbx_dbstr($rsrc).','.
 					$type.')';
+
 	$result = DBexecute($sql);
 	
 return $result;
