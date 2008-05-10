@@ -1,20 +1,19 @@
 /* CSS Document */
 
 
-P 		{font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt; }
-P:link 		{color:black; text-decoration: underline; }
-P:visited 	{color:black; text-decoration: none; }
-P:hover 	{color:black; text-decoration: none;}
-P:active 	{color:black; text-decoration: none;}
+P 			{	font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt; }
+P:link 		{	color:black; text-decoration: underline; }
+P:visited 	{	color:black; text-decoration: none; }
+P:hover 	{	color:black; text-decoration: none;}
+P:active 	{	color:black; text-decoration: none;}
 
-p.uppercase	{text-transform: uppercase}
-p.margin	{margin-left: 10pt}
+p.uppercase	{	text-transform: uppercase;}
+p.margin	{	margin-left: 10pt;}
 
 p.msgerror	{	color: #CC0000; }
-p.msgok		{	color: #223344;	}
+p.msgok		{	color: #22AA44;	}
 	
-p.info
-{
+p.info{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 8pt;
 	border: 1px dashed #000000;
@@ -22,8 +21,7 @@ p.info
 	background-color: #FFFFFF;
 }
 
-p.error
-{
+p.error{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 8pt;
 	border: 1px dashed #000000;

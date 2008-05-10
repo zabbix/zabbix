@@ -287,10 +287,7 @@ include_once 'include/page_header.php';
 				$db_host['host'],$db_host['port'],$db_host['status'],$useip,$db_host['dns'],
 				$db_host['ip'],$db_host['proxy_hostid'],$db_host['templates'],$_REQUEST['newgroup'],$db_host['groups']);
 
-			$msg_ok 	= S_HOST_UPDATED;
-			$msg_fail 	= S_CANNOT_UPDATE_HOST;
-			$audit_action 	= AUDIT_ACTION_UPDATE;
-			
+		
 			if($update && isset($visible['useprofile'])){
 				
 				$host_profile=DBfetch(DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$hostid));
@@ -314,6 +311,10 @@ include_once 'include/page_header.php';
 		}
 
 		$result = DBend();
+		
+		$msg_ok 	= S_HOSTS.SPACE.S_UPDATED;
+		$msg_fail 	= S_CANNOT_UPDATE.SPACE.S_HOSTS;
+		$audit_action 	= AUDIT_ACTION_UPDATE;
 
 		show_messages($result, $msg_ok, $msg_fail);
 		if($result){

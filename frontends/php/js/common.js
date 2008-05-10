@@ -95,8 +95,8 @@ function SDI(msg){
 	div_help.appendChild(document.createElement("br"));
 }
 
-function close_window()
-{
+function close_window(){
+	
 	window.setTimeout("window.close()", 500); /* Solve bug for Internet Explorer */
 	return false;
 }

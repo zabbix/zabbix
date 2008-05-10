@@ -247,6 +247,20 @@ table.history td.caption{
 	color:#0AF;
 }
 
+/* MESSAGES */
+table.msgok{
+	border: 1px #0088FF solid;
+}
+
+table.msgok td.clr{
+	background-color:#0088FF;
+}
+
+table.msgok td.msg{
+	background-color:#BBBBFF;
+}
+/*----------*/
+
 /*////////////////	DIVS	////////////////////*/
 
 div.zabbix_logo{
@@ -295,12 +309,6 @@ div#scrolltabright{
 span.green{
 	color:		#0088FF;
 }
-
-/*////////////////	PARAGRAPHS	////////////////////*/
-
-p.msgerror	{	color: #FF2222; }
-p.msgok		{	color: #0088FF;	}
-
 
 /*////////////////	FORMS	////////////////////*/
 

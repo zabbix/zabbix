@@ -99,6 +99,7 @@ include_once "include/page_header.php";
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
 
 /* FORM ACTIONS */
+
 	if(isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])){
 		unset($_REQUEST['triggerid']);
 		$_REQUEST['form'] = 'clone';
@@ -299,6 +300,13 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
+	$form = new CForm();
+	$form->SetMethod('get');
+	$form->AddItem(new CButton("form",S_CREATE_TRIGGER));
+
+	show_table_header(S_CONFIGURATION_OF_TRIGGERS_BIG,$form);
+	echo SBR;
+	
 	$r_form = new CForm();
 	$r_form->SetMethod('get');
 	$r_form->AddItem(array('[', 
@@ -349,8 +357,6 @@ include_once "include/page_header.php";
 	}
 
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-
-	$r_form->AddItem(array(SPACE, new CButton("form", S_CREATE_TRIGGER)));
 
 	show_table_header(S_TRIGGERS_BIG, $r_form);
 ?>

@@ -270,6 +270,8 @@
 		
 		if(empty($result))
 			$result = $DB['TRANSACTION_STATE'];
+			
+//SDI('Result: '.$result);
 
 		if($result){ // OK
 			$result = DBcommit();
@@ -415,6 +417,12 @@
 				break;
 		}
 		
+		if($DB['TRANSACTIONS'] && !$result){
+			$DB['TRANSACTION_STATE'] &= $result;
+//			SDI($query);
+//			SDI($DB['TRANSACTION_STATE']);
+		}
+		
 		return $result;
 	}
 
@@ -470,7 +478,8 @@
 				}
 				break;
 		}
-		if($DB['TRANSACTIONS']){
+		
+		if($DB['TRANSACTIONS'] && !$result){
 			$DB['TRANSACTION_STATE'] &= $result;
 //			SDI($query);
 //			SDI($DB['TRANSACTION_STATE']);
