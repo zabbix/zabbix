@@ -24,8 +24,7 @@ require_once "include/triggers.inc.php";
 require_once "include/items.inc.php";
 
 /* HOST GROUP functions */
-	function	add_host_to_group($hostid, $groupid)
-	{
+	function	add_host_to_group($hostid, $groupid){
 		if(!is_numeric($hostid) || !is_numeric($groupid)){
 			error("incorrect parameters for 'add_host_to_group' [hostid:".$hostid."][groupid:".$groupid."]");
 			return false;
@@ -37,8 +36,7 @@ require_once "include/items.inc.php";
 		return $hostgroupid;
 	}
 
-	function	delete_host_from_group($hostid, $groupid)
-	{
+	function	delete_host_from_group($hostid, $groupid){
 		if(!is_numeric($hostid) || !is_numeric($groupid)){
 			error("incorrect parameters for 'add_host_to_group' [hostid:".$hostid."][groupid:".$groupid."]");
 			return false;
@@ -58,8 +56,7 @@ require_once "include/items.inc.php";
 	 * Comments:
 	 *
 	 */
-	function	db_save_group($name,$groupid=null)
-	{
+	function	db_save_group($name,$groupid=null){
 		if(!is_string($name)){
 			error("incorrect parameters for 'db_save_group'");
 			return false;
@@ -87,8 +84,7 @@ require_once "include/items.inc.php";
 			return DBexecute("update groups set name=".zbx_dbstr($name)." where groupid=$groupid");
 	}
 
-	function	add_group_to_host($hostid,$newgroup="")
-	{
+	function	add_group_to_host($hostid,$newgroup=""){
 		if(empty($newgroup))
 			 return true;
 
@@ -99,8 +95,7 @@ require_once "include/items.inc.php";
 		return add_host_to_group($hostid, $groupid);
 	}
 
-	function	update_host_groups_by_groupid($groupid,$hosts=array())
-	{
+	function	update_host_groups_by_groupid($groupid,$hosts=array()){
 		DBexecute("delete from hosts_groups where groupid=$groupid");
 
 		foreach($hosts as $hostid)
@@ -109,8 +104,7 @@ require_once "include/items.inc.php";
 		}
 	}
 
-	function	update_host_groups($hostid,$groups=array())
-	{
+	function	update_host_groups($hostid,$groups=array()){
 		DBexecute("delete from hosts_groups where hostid=$hostid");
 
 		foreach($groups as $groupid)
@@ -119,8 +113,7 @@ require_once "include/items.inc.php";
 		}
 	}
 
-	function	add_host_group($name,$hosts=array())
-	{
+	function	add_host_group($name,$hosts=array()){
 		$groupid = db_save_group($name);
 		if(!$groupid)
 			return	$groupid;
@@ -130,8 +123,7 @@ require_once "include/items.inc.php";
 		return $groupid;
 	}
 
-	function	update_host_group($groupid,$name,$hosts)
-	{
+	function	update_host_group($groupid,$name,$hosts){
 		$result = db_save_group($name,$groupid);
 		if(!$result)
 			return	$result;
@@ -155,8 +147,7 @@ require_once "include/items.inc.php";
 	 *     NOTE: templates = array(id => name, id2 => name2, ...)
 	 *
 	 */
-	function 	check_circle_host_link($hostid, $templates)
-	{
+	function 	check_circle_host_link($hostid, $templates){
 		if(count($templates) == 0)	return false;
 		if(isset($templates[$hostid]))	return true;
 		foreach($templates as $id => $name)
@@ -180,8 +171,7 @@ require_once "include/items.inc.php";
 	 *
 	 *     NOTE: templates = array(id => name, id2 => name2, ...)
 	 */
-	function	db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$hostid=null)
-	{
+	function	db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$hostid=null){
 		if( !eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host) )
 		{
 			error("Incorrect characters used for Hostname");
@@ -254,8 +244,7 @@ require_once "include/items.inc.php";
 	 *
 	 *     NOTE: templates = array(id => name, id2 => name2, ...)
 	 */
-	function	add_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$newgroup,$groups)
-	{
+	function	add_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$newgroup,$groups){
 		$hostid = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates);
 		if(!$hostid)
 			return $hostid;
@@ -344,8 +333,7 @@ require_once "include/items.inc.php";
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	delete_template_elements($hostid, $templateid = null, $unlink_mode = false)
-	{
+	function	delete_template_elements($hostid, $templateid = null, $unlink_mode = false){
 		delete_template_graphs($hostid, $templateid, $unlink_mode);
 		delete_template_triggers($hostid, $templateid, $unlink_mode);
 		delete_template_items($hostid, $templateid, $unlink_mode);
@@ -365,8 +353,7 @@ require_once "include/items.inc.php";
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	copy_template_elements($hostid, $templateid = null, $copy_mode = false)
-	{
+	function	copy_template_elements($hostid, $templateid = null, $copy_mode = false){
 		copy_template_applications($hostid, $templateid, $copy_mode);
 		copy_template_items($hostid, $templateid, $copy_mode);
 		copy_template_triggers($hostid, $templateid, $copy_mode);
@@ -385,14 +372,12 @@ require_once "include/items.inc.php";
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	sync_host_with_templates($hostid, $templateid = null)
-	{
+	function	sync_host_with_templates($hostid, $templateid = null){
 		delete_template_elements($hostid, $templateid);		
 		copy_template_elements($hostid, $templateid);
 	}
 
-	function	delete_groups_by_hostid($hostid)
-	{
+	function	delete_groups_by_hostid($hostid){
 		$sql="select groupid from hosts_groups where hostid=$hostid";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
@@ -464,8 +449,7 @@ require_once "include/items.inc.php";
 		return DBexecute("delete from hosts where hostid=$hostid");
 	}
 
-	function	delete_host_group($groupid)
-	{
+	function	delete_host_group($groupid){
 		if(!delete_sysmaps_elements_with_groupid($groupid))
 			return false;
 		
@@ -629,15 +613,16 @@ require_once "include/items.inc.php";
 	 */
 	function	get_templates_by_hostid($hostid){
 		$result = array();
-		$db_templates = DBselect('select distinct h.hostid,h.host '.
-				' from hosts_templates ht '.
-					' left join hosts h on h.hostid=ht.templateid '.
-				' where ht.hostid='.$hostid);
+		$db_templates = DBselect('SELECT DISTINCT h.hostid,h.host '.
+				' FROM hosts_templates ht '.
+					' LEFT JOIN hosts h ON h.hostid=ht.templateid '.
+				' WHERE ht.hostid='.$hostid);
 				
 		while($template_data = DBfetch($db_templates)){
 			$result[$template_data['hostid']] = $template_data['host'];
 		}
-		return $result;
+		
+	return $result;
 	}
 
 	/*
@@ -653,23 +638,20 @@ require_once "include/items.inc.php";
 	 * Comments:
 	 *
 	 */
-	function	validate_group_with_templates($perm, $options = array(),$group_var=null,$host_var=null)
-	{
+	function	validate_group_with_templates($perm, $options = array(),$group_var=null,$host_var=null){
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
 		if(is_null($host_var))	$host_var = "web.latest.hostid";
 
 		$_REQUEST["groupid"]    = get_request("groupid", -1 );
 		$_REQUEST["hostid"]     = get_request("hostid", get_profile($host_var,0));
 
-		if($_REQUEST["groupid"] == -1)
-		{
+		if($_REQUEST["groupid"] == -1){
 			$_REQUEST["groupid"] = get_profile($group_var,0);
 			
 			if(!in_node($_REQUEST["groupid"])) $_REQUEST["groupid"] = 0;
 
-			if ($_REQUEST["hostid"] > 0 && !DBfetch(DBselect('select groupid from hosts_groups '.
-				' where hostid='.$_REQUEST["hostid"].' and groupid='.$_REQUEST["groupid"])))
-			{
+			if ($_REQUEST["hostid"] > 0 && !DBfetch(DBselect('SELECT groupid FROM hosts_groups '.
+				' WHERE hostid='.$_REQUEST["hostid"].' and groupid='.$_REQUEST["groupid"]))){
 					$_REQUEST["groupid"] = 0;
 			}
 		}
@@ -854,8 +836,7 @@ require_once "include/items.inc.php";
  * Comments:
  *
  */
-	function	validate_group_with_host($perm, $options = array(),$group_var=null,$host_var=null)
-	{
+	function	validate_group_with_host($perm, $options = array(),$group_var=null,$host_var=null){
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
 		if(is_null($host_var))	$host_var = "web.latest.hostid";
 
@@ -925,8 +906,7 @@ require_once "include/items.inc.php";
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *       If applicationid is NULL add application, in other cases update
 	 */
-	function db_save_application($name,$hostid,$applicationid=null,$templateid=0)
-	{
+	function db_save_application($name,$hostid,$applicationid=null,$templateid=0){
 		if(!is_string($name)){
 			error("incorrect parameters for 'db_save_application'");
 			return false;
@@ -1014,8 +994,7 @@ require_once "include/items.inc.php";
 	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
 	 *
 	 */
-	function add_application($name,$hostid,$templateid=0)
-	{
+	function add_application($name,$hostid,$templateid=0){
 		return db_save_application($name,$hostid,null,$templateid);
 	}
 
@@ -1029,8 +1008,7 @@ require_once "include/items.inc.php";
 	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
 	 *
 	 */
-	function update_application($applicationid,$name,$hostid,$templateid=0)
-	{
+	function update_application($applicationid,$name,$hostid,$templateid=0){
 		return db_save_application($name,$hostid,$applicationid,$templateid);
 	}
 	
@@ -1046,8 +1024,7 @@ require_once "include/items.inc.php";
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function delete_application($applicationid)
-	{
+	function delete_application($applicationid){
 		$app = get_application_by_applicationid($applicationid);
 		$host = get_host_by_hostid($app["hostid"]);
 
@@ -1083,8 +1060,7 @@ require_once "include/items.inc.php";
 		return $result;
 	}
 
-	function get_application_by_applicationid($applicationid,$no_error_message=0)
-	{
+	function get_application_by_applicationid($applicationid,$no_error_message=0){
 		$result = DBselect("select * from applications where applicationid=".$applicationid);
 		$row=DBfetch($result);
 		if($row)
@@ -1097,13 +1073,11 @@ require_once "include/items.inc.php";
 		
 	}
 
-	function get_applications_by_templateid($applicationid)
-	{
+	function get_applications_by_templateid($applicationid){
 		return DBselect("select * from applications where templateid=".$applicationid);
 	}
 
-	function get_realhost_by_applicationid($applicationid)
-	{
+	function get_realhost_by_applicationid($applicationid){
 		$application = get_application_by_applicationid($applicationid);
 		if($application["templateid"] > 0)
 			return get_realhost_by_applicationid($application["templateid"]);
@@ -1111,8 +1085,7 @@ require_once "include/items.inc.php";
 		return get_host_by_applicationid($applicationid);
 	}
 
-	function get_host_by_applicationid($applicationid)
-	{
+	function get_host_by_applicationid($applicationid){
 		$sql="select h.* from hosts h, applications a where a.hostid=h.hostid and a.applicationid=$applicationid";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
@@ -1124,13 +1097,11 @@ require_once "include/items.inc.php";
 		return	false;
 	}
 
-	function get_items_by_applicationid($applicationid)
-	{
+	function get_items_by_applicationid($applicationid){
 		return DBselect("select i.* from items i,items_applications ia where i.itemid=ia.itemid and ia.applicationid=$applicationid");
 	}
 
-	function get_applications_by_hostid($hostid)
-	{
+	function get_applications_by_hostid($hostid){
 		return DBselect('select * from applications where hostid='.$hostid);
 	}
 
@@ -1148,8 +1119,7 @@ require_once "include/items.inc.php";
 	 *           $templateid can be numeric or numeric array
 	 *
 	 */
-	function delete_template_applications($hostid, $templateid = null, $unlink_mode = false)
-	{
+	function delete_template_applications($hostid, $templateid = null, $unlink_mode = false){
 		$db_apps = get_applications_by_hostid($hostid);
 		while($db_app = DBfetch($db_apps)){
 			if($db_app["templateid"] == 0)
@@ -1201,8 +1171,7 @@ require_once "include/items.inc.php";
 	 *           $templateid can be numeric or numeric array
 	 *
 	 */
-	function copy_template_applications($hostid, $templateid = null, $copy_mode = false)
-	{
+	function copy_template_applications($hostid, $templateid = null, $copy_mode = false){
 		if(null == $templateid)
 		{
 			$templateid = array_keys(get_templates_by_hostid($hostid));
@@ -1239,8 +1208,7 @@ require_once "include/items.inc.php";
 	 *           $templateid_list can be numeric or numeric array
 	 *
 	 */
-	function validate_templates($templateid_list)
-	{
+	function validate_templates($templateid_list){
 		if(is_numeric($templateid_list))return true;
 		if(!is_array($templateid_list))	return false;
 		if(count($templateid_list)<2)	return true;
