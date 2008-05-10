@@ -150,7 +150,7 @@ function display_element(name){
 function closeform(page){
 	var msg="";
 	try{
-		msg = (IE)?(document.getElementsByTagName('p')[0].innerText):(document.getElementsByTagName('p')[0].textContent);
+		msg = (IE)?(document.getElementById('page_msg').innerText):(document.getElementById('page_msg').textContent);
 	} catch(e){
 		alert(e);
 	}
