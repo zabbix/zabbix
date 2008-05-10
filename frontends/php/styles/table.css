@@ -1121,3 +1121,62 @@ table.history td.caption{
 }
 
 /**************** </HISTORY> *****************/
+
+
+/***************** <MESSAGE> *****************/
+table.msgok{
+	width: 100%;
+	border: 1px #44CC44 solid;
+	margin-bottom: 2px;
+}
+
+table.msgok tr{
+	height: 26px;
+}
+
+table.msgok td{
+	color:#333;
+	font-family: Verdana, Helvetica, Geneva;
+	font-size:11px;
+	text-align:center;
+}
+
+table.msgok td.clr{
+	width: 60px;
+	background-color:#44CC44;
+	font-size:10px;
+	font-weight: bold;
+}
+
+table.msgok td.msg{
+	background-color:#BBFFBB;
+}
+
+table.msgerr{
+	width: 100%;
+	border: 1px #CC4444 solid;
+	margin-bottom: 2px;
+}
+
+table.msgerr tr{
+	height: 26px;
+}
+
+table.msgerr td{
+	color:#333;
+	font-family: Verdana, Helvetica, Geneva;
+	font-size:11px;
+	text-align:center;
+}
+
+table.msgerr td.clr{
+	width: 60px;
+	background-color:#CC4444;
+	font-size:10px;
+	font-weight: bold;
+}
+
+table.msgerr td.msg{
+	background-color:#FFBBBB;
+}
+/**************** </MESSAGE> *****************/

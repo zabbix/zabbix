@@ -137,19 +137,22 @@ include_once "include/page_header.php";
 	$form->AddItem($cmbConfig);
 
 	show_table_header($title, $form);
-	echo SBR;
-
 	if($config == 1){
 		if(isset($_FILES['import_file'])){
 			include_once "include/import.inc.php";
 
+			DBstart();
+			
 			$importer = new CZabbixXMLImport();
 			$importer->SetRules($rules['host'],$rules['template'],$rules['item'],$rules['trigger'],$rules['graph']);
 			$importer->Parse($_FILES['import_file']['tmp_name']);
 
 			unset($importer);
+			
+			$result = DBend();
+			
+			show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
 		}
-		show_messages();
 		
 		$form = new CFormTable($frm_title,null,"post","multipart/form-data");
 		$form->AddVar('config', $config);
@@ -182,7 +185,7 @@ include_once "include/page_header.php";
 		$form->Show();
 	}
 	else{
-
+		echo SBR;
 		if($preview){
 			$table = new CTableInfo(S_NO_DATA_FOR_EXPORT);
 			$table->SetHeader(array(S_HOST, S_ELEMENTS));

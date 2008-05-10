@@ -310,7 +310,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return $forse_with_subnodes;
 	}
 
-	function	access_deny(){
+	function access_deny(){
 	
 		include_once "include/page_header.php";
 		show_error_message(S_NO_PERMISSIONS);
@@ -463,32 +463,27 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return $val;
 	}
 	
-	function mem2str($size)
-	{
+	function mem2str($size){
 		$prefix = 'B';
 		if($size > 1048576) {	$size = $size/1048576;	$prefix = 'M'; }
 		elseif($size > 1024) {	$size = $size/1024;	$prefix = 'K'; }
 		return round($size, 6).$prefix;
 	}
 
-	function getmicrotime()
-	{
+	function getmicrotime(){
 		list($usec, $sec) = explode(" ",microtime()); 
 		return ((float)$usec + (float)$sec); 
 	}
 
 	/* Do not forget to sync it with add_value_suffix in evalfunc.c! */ 
-	function	convert_units($value,$units)
-	{
+	function convert_units($value,$units){
 // Special processing for unix timestamps
-		if($units=="unixtime")
-		{
+		if($units=="unixtime"){
 			$ret=date("Y.m.d H:i:s",$value);
 			return $ret;
 		}
 //Special processing of uptime
-		if($units=="uptime")
-		{
+		if($units=="uptime"){
 			$ret="";
 			$days=floor($value/(24*3600));
 			if($days>0)
@@ -516,8 +511,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			return $ret;
 		}
 // Special processing for seconds
-		if($units=="s")
-		{
+		if($units=="s"){
 			$ret="";
 
 			$t=floor($value/(365*24*3600));
@@ -558,8 +552,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$u="";
 
 // Special processing for bits (kilo=1000, not 1024 for bits)
-		if( ($units=="b") || ($units=="bps"))
-		{
+		if( ($units=="b") || ($units=="bps")){
 			$abs=abs($value);
 
 			if($abs<1000)
@@ -595,8 +588,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		}
 
 
-		if($units=="")
-		{
+		if($units==""){
 			if(round($value) == round($value,2))
 			{
 				return sprintf("%.0f",$value);
@@ -609,37 +601,30 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 		$abs=abs($value);
 
-		if($abs<1024)
-		{
+		if($abs<1024){
 			$u="";
 		}
-		else if($abs<1024*1024)
-		{
+		else if($abs<1024*1024){
 			$u="K";
 			$value=$value/1024;
 		}
-		else if($abs<1024*1024*1024)
-		{
+		else if($abs<1024*1024*1024){
 			$u="M";
 			$value=$value/(1024*1024);
 		}
-		else if($abs<1024*1024*1024*1024)
-		{
+		else if($abs<1024*1024*1024*1024){
 			$u="G";
 			$value=$value/(1024*1024*1024);
 		}
-		else
-		{
+		else{
 			$u="T";
 			$value=$value/(1024*1024*1024*1024);
 		}
 
-		if(round($value) == round($value,2))
-		{
+		if(round($value) == round($value,2)){
 			$s=sprintf("%.0f",$value);
 		}
-		else
-		{
+		else{
 			$s=sprintf("%.2f",$value);
 		}
 
@@ -648,8 +633,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
-	function	calc_trigger_hash()
-	{
+	function calc_trigger_hash(){
 
 		$priority = array(0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0);
 		$triggerids="";
@@ -657,8 +641,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	       	$result=DBselect('select t.triggerid,t.priority from triggers t,hosts h,items i,functions f'.
 			'  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0');
 
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			$ack = get_last_event_by_triggerid($row["triggerid"]);
 			if($ack["acknowledged"] == 1) continue;
 
@@ -674,22 +657,18 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return	"$priorities,$md5sum";
 	}
 
-	function	select_config()
-	{
+	function select_config(){
 		$row=DBfetch(DBselect("select * from config where ".DBin_node("configid", get_current_nodeid(false))));
-		if($row)
-		{
+		if($row){
 			return	$row;
 		}
-		else
-		{
+		else{
 			error("Unable to select configuration");
 		}
 		return	$row;
 	}
 
-	function	show_messages($bool=TRUE,$okmsg=NULL,$errmsg=NULL)
-	{
+	function show_messages($bool=TRUE,$okmsg=NULL,$errmsg=NULL){
 		global	$page, $ZBX_MESSAGES;
 
 		if (! defined('PAGE_HEADER_LOADED')) return;
@@ -703,10 +682,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		if(!$bool && !is_null($errmsg))		$msg="ERROR: ".$errmsg;
 		else if($bool && !is_null($okmsg))	$msg=$okmsg;
 
-		if(isset($msg))
-		{
-			switch($page["type"])
-			{
+		if(isset($msg)){
+			switch($page["type"]){
 				case PAGE_TYPE_IMAGE:
 					array_push($message, array(
 						'text'	=> $msg,
@@ -720,32 +697,37 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					break;			
 				case PAGE_TYPE_HTML:
 				default:
-					$p = new CTag('p','yes');
-					$p->AddOption('align','center');
-					$p->AddOption('class',((!$bool)?'msgerror':'msgok'));
-					$p->AddItem(bold('['.$msg.']'));
-					$p->Show();
+					$msg_tab = new CTable($msg,($bool?'msgok':'msgerr'));
+					$msg_tab->SetCellPadding(0);
+					$msg_tab->SetCellSpacing(0);
+					
+					$msg_col = new CCol(bold($msg),'msg');
+					
+					$msg_details = SPACE;
+					if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
+						$msg_details = new CDiv(S_DETAILS,'pointer');
+						$msg_details->AddAction('onclick',new CScript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
+						$msg_details->AddOption('title',S_MAXIMIZE.'/'.S_MINIMIZE);
+					}
+					
+					$msg_tab->AddRow(array(new CCol($msg_details,'clr'),$msg_col));
+					$msg_tab->Show();
 					break;
 			}
 		}
 
 
-		if(isset($ZBX_MESSAGES))
-		{
-			if($page["type"] == PAGE_TYPE_IMAGE)
-			{
+		if(isset($ZBX_MESSAGES)){
+			if($page["type"] == PAGE_TYPE_IMAGE){
 				$msg_font = 2;
-				foreach($ZBX_MESSAGES as $msg)
-				{
-					if($msg['type'] == 'error')
-					{
+				foreach($ZBX_MESSAGES as $msg){
+					if($msg['type'] == 'error'){
 						array_push($message, array(
 							'text'	=> $msg['message'],
 							'color'	=> array('R'=>255,'G'=>55,'B'=>55),
 							'font'	=> $msg_font));
 					}
-					else
-					{
+					else{
 						array_push($message, array(
 							'text'	=> $msg['message'],
 							'color'	=> array('R'=>155,'G'=>155,'B'=>55),
@@ -755,44 +737,52 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					$height += imagefontheight($msg_font) + 1;
 				}
 			}
-			elseif($page["type"] == PAGE_TYPE_XML)
-			{
-				foreach($ZBX_MESSAGES as $msg)
-				{
+			else if($page["type"] == PAGE_TYPE_XML){
+				foreach($ZBX_MESSAGES as $msg){
 					echo '['.$msg['type'].'] '.$msg['message']."\n";
 				}
 			}
-			else
-			{
+			else{
 				$lst_error = new CList(null,'messages');
-				foreach($ZBX_MESSAGES as $msg)
+
+				foreach($ZBX_MESSAGES as $msg){
 					$lst_error->AddItem($msg['message'], $msg['type']);
+					$bool &= ('error' != strtolower($msg['type']));
+				}
 //message scroll if needed
 				$msg_show = 6;
-				$msg_font_size = 7;
+				$msg_font_size = 6;
 				$msg_count = count($ZBX_MESSAGES);
 				
 				if($msg_count > $msg_show) $msg_count = $msg_show;
 					
 				$msg_count = ($msg_count * $msg_font_size * 4) + 2;
 				$lst_error->AddOption('style','font-size: '.$msg_font_size.'pt; height: '.$msg_count.'px;');
-//---
-				$lst_error->Show();
 				
-				unset($lst_error);
+
+				$tab = new CTable(null,($bool?'msgok':'msgerr'));
+				
+				$tab->SetCellPadding(0);
+				$tab->SetCellSpacing(0);
+
+				$tab->AddOption('id','msg_messages');
+				$tab->AddOption('style','display: none; width: 100%;');
+				
+				$tab->AddRow(new CCol($lst_error,'msg'));
+				$tab->Show();
+//---
 			}
 			$ZBX_MESSAGES = null;
 		}
-
-		if($page["type"] == PAGE_TYPE_IMAGE && count($message) > 0)
-		{
+		
+		if($page["type"] == PAGE_TYPE_IMAGE && count($message) > 0){
 			$width += 2;
 			$height += 2;
 			$canvas = imagecreate($width, $height);
 			ImageFilledRectangle($canvas,0,0,$width,$height, ImageColorAllocate($canvas, 255, 255, 255));
 
-			foreach($message as $id => $msg)
-			{
+			foreach($message as $id => $msg){
+			
 				$message[$id]['y'] = 1 + (isset($previd) ? $message[$previd]['y'] + $message[$previd]['h'] : 0 );
 				$message[$id]['h'] = imagefontheight($msg['font']);
 				
@@ -812,23 +802,19 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		}
 	}
 
-	function	show_message($msg)
-	{
+	function show_message($msg){
 		show_messages(TRUE,$msg,'');
 	}
 
-	function	show_error_message($msg)
-	{
+	function show_error_message($msg){
 		show_messages(FALSE,'',$msg);
 	}
 
-	function	parse_period($str)
-	{
+	function parse_period($str){
 		$out = NULL;
 		$str = trim($str,';');
 		$periods = split(';',$str);
-		foreach($periods as $preiod)
-		{
+		foreach($periods as $preiod){
 			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr))
 				return NULL;
 			for($i = $arr[1]; $i <= $arr[2]; $i++)
@@ -846,14 +832,12 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return $out;
 	}
 
-	function	find_period_start($periods,$time)
-	{
+	function find_period_start($periods,$time){
 		$date = getdate($time);
 		$wday = $date['wday'] == 0 ? 7 : $date['wday'];
 		$curr = $date['hours']*100+$date['minutes'];
 
-		if(isset($periods[$wday]))
-		{
+		if(isset($periods[$wday])){
 			$next_h = -1;
 			$next_m = -1;
 			foreach($periods[$wday] as $period)
@@ -877,8 +861,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				return mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']);
 			}
 		}
-		for($days=1; $days < 7 ; ++$days)
-		{
+		for($days=1; $days < 7 ; ++$days){
 			$new_wday = (($wday + $days - 1)%7 + 1);
 			if(isset($periods[$new_wday ]))
 			{
@@ -902,14 +885,12 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return -1;
 	}
 
-	function	find_period_end($periods,$time,$max_time)
-	{
+	function find_period_end($periods,$time,$max_time){
 		$date = getdate($time);
 		$wday = $date['wday'] == 0 ? 7 : $date['wday'];
 		$curr = $date['hours']*100+$date['minutes'];
 
-		if(isset($periods[$wday]))
-		{
+		if(isset($periods[$wday])){
 			$next_h = -1;
 			$next_m = -1;
 			foreach($periods[$wday] as $period)
@@ -944,13 +925,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return -1;
 	}
 
-	function	validate_period(&$str)
-	{
+	function validate_period(&$str){
 		$str = trim($str,';');
 		$out = "";
 		$periods = split(';',$str);
-		foreach($periods as $preiod)
-		{
+		foreach($periods as $preiod){
 			// arr[idx]   1       2         3             4            5            6
 			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr))
 				return false;
@@ -973,25 +952,20 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return true;
 	}
 
-	function	validate_float($str)
-	{
+	function validate_float($str){
 //		echo "Validating float:$str<br>";
-		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, $arr)) 
-		{
+		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, $arr)) {
 			return 0;
 		}
-		else
-		{
+		else{
 			return -1;
 		}
 	}
 
 // Check if str has format #<float> or <float>
-	function	validate_ticks($str)
-	{
+	function validate_ticks($str){
 //		echo "Validating float:$str<br>";
-		if (eregi('^[ ]*#([0-9]+)((\.)?)([0-9]*)[ ]*$', $str, $arr)) 
-		{
+		if (eregi('^[ ]*#([0-9]+)((\.)?)([0-9]*)[ ]*$', $str, $arr)) {
 			return 0;
 		}
 		else return validate_float($str);
@@ -999,8 +973,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	# Add event
 
-	function	get_event_by_eventid($eventid)
-	{
+	function get_event_by_eventid($eventid){
 		$db_events = DBselect("select * from events where eventid=$eventid");
 		return DBfetch($db_events);
 	}
@@ -1016,8 +989,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	function reset_items_nextcheck($triggerid){
 		$sql="select itemid from functions where triggerid=$triggerid";
 		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			$sql="update items set nextcheck=0 where itemid=".$row["itemid"];
 			DBexecute($sql);
 		}
@@ -1092,8 +1064,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			$status["zabbix_server"] = S_NO;
 		}
 // history & trends
-/*		if ($DB['DB_TYPE'] == "MYSQL")
-		{
+/*		if ($DB['DB_TYPE'] == "MYSQL"){
 			$row=DBfetch(DBselect("show table status like 'history'"));
 			$status["history_count"]  = $row["Rows"];
 			$row=DBfetch(DBselect("show table status like 'history_log'"));
@@ -1106,8 +1077,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			$row=DBfetch(DBselect("show table status like 'trends'"));
 			$status["trends_count"] = $row["Rows"];
 		}
-		else
-		{
+		else{
 			$row=DBfetch(DBselect("select count(itemid) as cnt from history"));
 			$status["history_count"]  = $row["cnt"];
 			$row=DBfetch(DBselect("select count(itemid) as cnt from history_log"));
@@ -1508,13 +1478,13 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *
 	 * author: Eugene Grigorjev
 	 */
-	function	zbx_set_post_cookie($name, $value, $time=null){
+	function zbx_set_post_cookie($name, $value, $time=null){
 		global $ZBX_PAGE_COOKIES;
 
 		$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time) ? $time : (0));
 	}
 
-	function	inarr_isset($keys, $array=null){
+	function inarr_isset($keys, $array=null){
 		if(is_null($array)) $array =& $_REQUEST;
 
 		if(is_array($keys)){

@@ -237,16 +237,16 @@ include_once "include/page_header.php";
 		$_REQUEST['filter_snmpv3_securitylevel']	= get_request('filter_snmpv3_securitylevel' 		,get_profile('web.items.filter.snmpv3_securitylevel',	-1));
 		$_REQUEST['filter_snmpv3_authpassphrase']	= empty2null(get_request('filter_snmpv3_authpassphrase',get_profile('web.items.filter.snmpv3_authpassphrase')));
 		$_REQUEST['filter_snmpv3_privpassphrase']	= empty2null(get_request('filter_snmpv3_privpassphrase',get_profile('web.items.filter.snmpv3_privpassphrase')));
-		$_REQUEST['filter_value_type']		= get_request('filter_value_type'						,get_profile('web.items.filter.value_type',		-1));
-		$_REQUEST['filter_units']			= empty2null(get_request('filter_units'					,get_profile('web.items.filter.units')));
-		$_REQUEST['filter_formula']			= empty2null(get_request('filter_formula'				,get_profile('web.items.filter.formula')));
-		$_REQUEST['filter_delay']			= empty2null(get_request('filter_delay'					,get_profile('web.items.filter.delay')));
-		$_REQUEST['filter_history']			= empty2null(get_request('filter_history'				,get_profile('web.items.filter.history')));
-		$_REQUEST['filter_trends']			= empty2null(get_request('filter_trends'				,get_profile('web.items.filter.trends')));
-		$_REQUEST['filter_status']			= empty2null(get_request('filter_status'				,get_profile('web.items.filter.status')));
-		$_REQUEST['filter_logtimefmt']		= empty2null(get_request('filter_logtimefmt'			,get_profile('web.items.filter.logtimefmt')));
-		$_REQUEST['filter_delta']			= empty2null(get_request('filter_delta'					,get_profile('web.items.filter.delta')));
-		$_REQUEST['filter_trapper_hosts']		= empty2null(get_request('filter_trapper_hosts'		,get_profile('web.items.filter.trapper_hosts')));
+		$_REQUEST['filter_value_type']		= get_request('filter_value_type'					,get_profile('web.items.filter.value_type',		-1));
+		$_REQUEST['filter_units']			= empty2null(get_request('filter_units'				,get_profile('web.items.filter.units')));
+		$_REQUEST['filter_formula']			= empty2null(get_request('filter_formula'			,get_profile('web.items.filter.formula')));
+		$_REQUEST['filter_delay']			= empty2null(get_request('filter_delay'				,get_profile('web.items.filter.delay')));
+		$_REQUEST['filter_history']			= empty2null(get_request('filter_history'			,get_profile('web.items.filter.history')));
+		$_REQUEST['filter_trends']			= empty2null(get_request('filter_trends'			,get_profile('web.items.filter.trends')));
+		$_REQUEST['filter_status']			= empty2null(get_request('filter_status'			,get_profile('web.items.filter.status')));
+		$_REQUEST['filter_logtimefmt']		= empty2null(get_request('filter_logtimefmt'		,get_profile('web.items.filter.logtimefmt')));
+		$_REQUEST['filter_delta']			= empty2null(get_request('filter_delta'				,get_profile('web.items.filter.delta')));
+		$_REQUEST['filter_trapper_hosts']	= empty2null(get_request('filter_trapper_hosts'		,get_profile('web.items.filter.trapper_hosts')));
 	}
 	
 	if(isset($_REQUEST['filter_rst'])){
@@ -255,9 +255,9 @@ include_once "include/page_header.php";
 		$_REQUEST['filter_key'] = null;
 	}
 	else{
-		$_REQUEST['filter_host']			= empty2null(get_request('filter_host'					,get_profile('web.items.filter.host')));
-		$_REQUEST['filter_description']		= empty2null(get_request('filter_description'			,get_profile('web.items.filter.description')));
-		$_REQUEST['filter_key']				= empty2null(get_request('filter_key'						,get_profile('web.items.filter.key')));
+		$_REQUEST['filter_host']		= empty2null(get_request('filter_host'			,get_profile('web.items.filter.host')));
+		$_REQUEST['filter_description']	= empty2null(get_request('filter_description'	,get_profile('web.items.filter.description')));
+		$_REQUEST['filter_key']			= empty2null(get_request('filter_key'			,get_profile('web.items.filter.key')));
 	}
 	
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst']) || ($prev_selection_mode != $_REQUEST['selection_mode'])){
@@ -638,13 +638,12 @@ include_once "include/page_header.php";
 	$form->AddItem(new CButton("form",S_CREATE_ITEM));
 
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
-
+	echo SBR;
+	
 	if(isset($_REQUEST["form_mass_update"]) && isset($_REQUEST["group_itemid"])){
-		echo SBR;
 		insert_mass_update_item_form("group_itemid");
 	} 
 	else if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["group_itemid"])){
-		echo SBR;
 		insert_copy_elements_to_forms("group_itemid");
 	} 
 	else if (!isset($_REQUEST["form"]) ||  !str_in_array($_REQUEST["form"],array(S_CREATE_ITEM,"update","clone"))) {

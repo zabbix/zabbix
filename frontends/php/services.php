@@ -119,19 +119,12 @@ $treeServ = del_empty_nodes($treeServ);
 //----
 
 if(isset($_REQUEST['msg']) && !empty($_REQUEST['msg'])){
-	$p = new Ctag('p','yes');
-	$p->AddOption('align','center');
-	$p->AddOption('id','message');
-	$p->AddOption('class','textcolorstyles');
-	$p->AddItem(bold($_REQUEST['msg']));
-	$p->Show();
+	show_messages(true,$_REQUEST['msg']);
 }
-
 
 //show_table_header(S_IT_SERVICES_BIG);
 
 $tree = new CTree($treeServ,array('caption' => bold(S_SERVICE),'algorithm' => bold(S_STATUS_CALCULATION), 'description' => bold(S_TRIGGER)));
-
 if($tree){
 	
 	$tab = create_hat(
