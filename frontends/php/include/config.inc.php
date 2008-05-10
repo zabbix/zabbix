@@ -766,7 +766,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				$tab->SetCellSpacing(0);
 
 				$tab->AddOption('id','msg_messages');
-				$tab->AddOption('style','display: none; width: 100%;');
+				$tab->AddOption('style','width: 100%;');
+				
+				if(isset($msg_tab)){
+					$tab->AddOption('style','display: none;');
+				}
 				
 				$tab->AddRow(new CCol($lst_error,'msg'));
 				$tab->Show();
