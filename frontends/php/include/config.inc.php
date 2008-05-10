@@ -702,6 +702,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					$msg_tab->SetCellSpacing(0);
 					
 					$msg_col = new CCol(bold($msg),'msg');
+					$msg_col->AddOption('id','page_msg');
 					
 					$msg_details = SPACE;
 					if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
