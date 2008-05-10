@@ -868,7 +868,7 @@ include_once 'include/page_header.php';
 
 	$frmForm->AddItem($cmbConf);
 	if(isset($btn)){
-		$frmForm->AddItem(SPACE."|".SPACE);
+		$frmForm->AddItem(SPACE);
 		$frmForm->AddItem($btn);
 	}
 	show_table_header(S_CONFIGURATION_OF_HOSTS_GROUPS_AND_TEMPLATES, $frmForm);
