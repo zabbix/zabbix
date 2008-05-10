@@ -120,22 +120,28 @@ if(isset($_REQUEST['saction'])){
 
 		$triggerid = (isset($_REQUEST["linktrigger"]))?($_REQUEST["triggerid"]):(null);
 
+		DBstart();
 		if(isset($service["serviceid"])){
 			$result = update_service($service["serviceid"],
 				$_REQUEST["name"],$triggerid,$_REQUEST["algorithm"],
 				$_REQUEST["showsla"],$_REQUEST["goodsla"],$_REQUEST["sortorder"],
-				$service_times,$_REQUEST['parentid'],$childs);
-				
-			show_messages($result, S_SERVICE_UPDATED, S_CANNOT_UPDATE_SERVICE);
-			$serviceid = $service["serviceid"];
-			$audit_acrion = AUDIT_ACTION_UPDATE;
-			
+				$service_times,$_REQUEST['parentid'],$childs);			
 		} 
 		else {
 			$result = add_service(
 				$_REQUEST["name"],$triggerid,$_REQUEST["algorithm"],
 				$_REQUEST["showsla"],$_REQUEST["goodsla"],$_REQUEST["sortorder"],
 				$service_times,$_REQUEST['parentid'],$childs);
+		}
+		
+		$result = DBend()?$result:false;
+		
+		if(isset($serrvice['serviceid'])){
+			show_messages($result, S_SERVICE_UPDATED, S_CANNOT_UPDATE_SERVICE);
+			$serviceid = $service["serviceid"];
+			$audit_acrion = AUDIT_ACTION_UPDATE;
+		}
+		else{
 			show_messages($result, S_SERVICE_ADDED, S_CANNOT_ADD_SERVICE);
 			$serviceid = $result;
 			$audit_acrion = AUDIT_ACTION_ADD;
