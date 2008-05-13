@@ -58,17 +58,14 @@ function is_array(obj) {
       'splice' in obj && 'join' in obj;	  
 }
 
-if (!Array.prototype.forEach)
-{
-  Array.prototype.forEach = function(fun /*, thisp*/)
-  {
+if (!Array.prototype.forEach){
+  Array.prototype.forEach = function(fun /*, thisp*/){
     var len = this.length;
     if (typeof fun != "function")
       throw new TypeError();
 
     var thisp = arguments[1];
-    for (var i = 0; i < len; i++)
-    {
+    for (var i = 0; i < len; i++){
       if (i in this)
         fun.call(thisp, this[i], i, this);
     }
@@ -264,11 +261,12 @@ function create_var(form_name, var_name, var_val, subm){
 	
 	if(is_null(objVar)){
 		objVar = document.createElement('input');
+		objVar.setAttribute('type', 	'hidden');
+		
 		if(!objVar) return false;
 
 		frmForm.appendChild(objVar);
 		
-		objVar.setAttribute('type', 	'hidden');
 		objVar.setAttribute('name', 	var_name);
 		objVar.setAttribute('id', 		var_name);
 	}
