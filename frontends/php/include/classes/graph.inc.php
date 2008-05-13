@@ -179,7 +179,7 @@ class	Graph{
 	{
 // Avoid sizeX==0, to prevent division by zero later
 		if($value == 0) $value = NULL;
-		if($value > 1300) $value = 1300;
+//		if($value > 1300) $value = 1300;
 		if(is_null($value)) $value = 900;
 
 		$this->sizeX = $value;

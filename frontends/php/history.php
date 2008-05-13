@@ -51,7 +51,7 @@ include_once "include/page_header.php";
 		"inc"=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		"left"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		"right"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		"stime"=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
+		"stime"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 
 		"filter_task"=>	array(T_ZBX_STR, O_OPT,	 null,	
 			IN(FILTER_TAST_SHOW.','.FILTER_TAST_HIDE.','.FILTER_TAST_MARK.','.FILTER_TAST_INVERT_MARK), null),
@@ -250,8 +250,7 @@ include_once "include/page_header.php";
 		
 		$cmbAction = new CComboBox("action",$_REQUEST["action"],"submit()");
 
-		if(str_in_array($item_type,array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64)))
-		{
+		if(str_in_array($item_type,array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))){
 			$cmbAction->AddItem("showgraph",S_GRAPH_OF_SPECIFIED_PERIOD);
 		}
 
@@ -267,15 +266,15 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
-	if($_REQUEST["action"]=="showgraph" && $item_type != ITEM_VALUE_TYPE_LOG)
-	{
+	if($_REQUEST["action"]=="showgraph" && $item_type != ITEM_VALUE_TYPE_LOG){
 		$dom_graph_id = 'graph';
-		show_history($_REQUEST["itemid"],$_REQUEST["from"],$_REQUEST["stime"],$effectiveperiod);
+
+		$bstime = isset($_REQUEST['stime'])?$_REQUEST['stime']:date('YmdHi',(time()-$_REQUEST['period']));
+		show_history($_REQUEST["itemid"],$_REQUEST["from"],$bstime,$effectiveperiod);
 	}
-	elseif($_REQUEST["action"]=="showvalues" || $_REQUEST["action"]=="showlatest")
-	{
-		if($_REQUEST["action"]=="showvalues")
-		{		
+	else if($_REQUEST["action"]=="showvalues" || $_REQUEST["action"]=="showlatest"){
+	
+		if($_REQUEST["action"]=="showvalues"){		
 			$time = time(null) - $effectiveperiod - $_REQUEST["from"] * 3600;
 			$till = time(null) - $_REQUEST["from"] * 3600;
 			$hours=$effectiveperiod / 3600;
@@ -285,15 +284,12 @@ include_once "include/page_header.php";
 								'['.S_FROM_SMALL.': '.date('Y.M.d H:i:s',$time).'] ['.S_TILL_SMALL.': '.date('Y.M.d H:i:s',$till).']'
 							);
 		}
-		else
-		{
+		else{
 			$l_header = null;
 		}
 
-		if(!isset($_REQUEST["plaintext"]))
-		{
-			if($item_type==ITEM_VALUE_TYPE_LOG)
-			{
+		if(!isset($_REQUEST["plaintext"])){
+			if($item_type==ITEM_VALUE_TYPE_LOG){
 				$to_save_request = array("filter_task", "filter", "mark_color");
 
 				$filter_task = get_request("filter_task",0);
@@ -345,31 +341,29 @@ include_once "include/page_header.php";
 		$limit = "NO";
 		if($_REQUEST["action"]=="showlatest"){
 			$limit = 500;
-		} elseif($_REQUEST["action"]=="showvalues"){
+		} 
+		else if($_REQUEST["action"]=="showvalues"){
 			$cond_clock = " and h.clock>$time and h.clock<$till";
 		}
 
-		if($item_type==ITEM_VALUE_TYPE_LOG)
-		{
-			$itemid_lst = "";
-			if(is_array($_REQUEST["itemid"]))
-			{
+		if($item_type==ITEM_VALUE_TYPE_LOG){
+			$itemid_lst = '';
+			
+			if(is_array($_REQUEST["itemid"])){
 				$itemid_lst = implode(',',$_REQUEST["itemid"]);
 				$item_cout = count($_REQUEST["itemid"]);
 			}
-			else
-			{
+			else{
 				$itemid_lst = $_REQUEST["itemid"];
 				$item_cout = 1;
 			}
 
-			$sql_filter = "";
-			if(isset($_REQUEST["filter"]) && $_REQUEST["filter"]!="")
-			{
+			$sql_filter = '';
+			if(isset($_REQUEST["filter"]) && $_REQUEST["filter"]!=""){
 				if($_REQUEST["filter_task"] == FILTER_TAST_SHOW)
-					$sql_filter = " and h.value like ".zbx_dbstr("%".$_REQUEST["filter"]."%")."";
-				elseif($_REQUEST["filter_task"] == FILTER_TAST_HIDE)
-					$sql_filter = " and h.value not like ".zbx_dbstr("%".$_REQUEST["filter"]."%")."";
+					$sql_filter = " and h.value like ".zbx_dbstr("%".$_REQUEST["filter"]."%");
+				else if($_REQUEST["filter_task"] == FILTER_TAST_HIDE)
+					$sql_filter = " and h.value not like ".zbx_dbstr("%".$_REQUEST["filter"]."%");
 			}
 
 
@@ -543,8 +537,8 @@ COpt::profiling_stop("history");
 		}
 	}
 
-	if(!isset($_REQUEST["plaintext"]))
-	{
+	if(!isset($_REQUEST["plaintext"])){
+	
 		if(str_in_array($_REQUEST["action"],array("showvalues","showgraph"))){
 			
 			$stime = get_min_itemclock_by_itemid($_REQUEST["itemid"]);
