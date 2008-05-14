@@ -283,7 +283,10 @@ void	collect_perfstat()
 	PDH_STATISTICS	statData;
 	PDH_STATUS	status;
 
-	if (NULL == ppsd->pdh_query)
+	if (NULL == ppsd->pdh_query)	/* collector is not started */
+		return;
+
+	if (NULL == ppsd->pPerfCounterList)	/* no counters */
 		return;
 
 	if (ERROR_SUCCESS != (status = PdhCollectQueryData(ppsd->pdh_query))) {
