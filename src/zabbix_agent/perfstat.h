@@ -20,19 +20,11 @@
 #ifndef ZABBIX_PERFSTAT_H
 #define ZABBIX_PERFSTAT_H
 
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 
 #	include "perfmon.h"
 
 #	define PERF_COLLECTOR_STARTED(collector)	((collector) && (collector)->perfs.pdh_query)
-
-#else /* not _WINDOWS */
-
-#	define PDH_RAW_COUNTER	void*
-#	define HCOUNTER		void*
-#	define HQUERY		void*
-
-#endif /* _WINDOWS */
 
 struct zbx_perfs
 {
@@ -55,11 +47,13 @@ typedef struct s_perfs_stat_data
 	HQUERY		pdh_query;
 } ZBX_PERF_STAT_DATA;
 
-int	add_perfs_from_config(char *line);
+int	add_perf_counter(const char *name, const char *counterPath, int interval);
+int	add_perfs_from_config(const char *line);
 void	perfs_list_free(void);
 
 int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf);
-void	collect_perfstat(ZBX_PERF_STAT_DATA *pcpus);
-void	close_perf_collector(ZBX_PERF_STAT_DATA *pcpus);
+void	collect_perfstat();
+void	close_perf_collector();
+#endif /* _WINDOWS */
 
 #endif /* ZABBIX_PERFSTAT_H */

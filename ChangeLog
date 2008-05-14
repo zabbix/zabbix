@@ -1,5 +1,6 @@
 Changes for 1.5.3
 
+ - [DEV-163] added support of perf_counter[path<,period>] (Sasha)
  - [DEV-169] improved msg functionality in GUI (Artem)
  - [DEV-149] added hosts masss update functionality (Artem)
  - [DEV-167] added support of Host Template=<template> in actions (Sasha)

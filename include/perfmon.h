@@ -55,5 +55,6 @@ typedef struct perfcounter PERFCOUNTER;
 extern PERFCOUNTER *PerfCounterList;
 
 char *GetCounterName(unsigned long index);
+int check_counter_path(char *counterPath);
 
 #endif /* ZABBIX_PERFMON_H */

@@ -549,7 +549,7 @@ static const char	*zbx_json_decodestring(const char *p, char *string, size_t len
 				return ++p;
 			}
 			state = 1;
-		} else if (state == 1 && o - string < len - 1/*'\0'*/) {
+		} else if (state == 1 && (size_t)(o - string) < len - 1/*'\0'*/) {
 			if (*p == '\\') {
 				switch (*++p) {
 				case '"': 
@@ -585,7 +585,7 @@ static const char	*zbx_json_decodeint(const char *p, char *string, size_t len)
 		if ((*p < '0' || *p > '9') && *p != '-') {
 			*o = '\0';
 			return p;
-		} else if (o - string < len - 1/*'\0'*/)
+		} else if ((size_t)(o - string) < len - 1/*'\0'*/)
 			*o++ = *p;
 		p++;
 	}
