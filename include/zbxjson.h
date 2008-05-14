@@ -94,6 +94,7 @@ void	zbx_json_free(struct zbx_json *j);
 void	zbx_json_addobject(struct zbx_json *j, const char *name);
 void	zbx_json_addarray(struct zbx_json *j, const char *name);
 void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type);
+void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value);
 int	zbx_json_close(struct zbx_json *j);
 
 int		zbx_json_open(char *buffer, struct zbx_json_parse *jp);

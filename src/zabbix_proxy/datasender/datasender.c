@@ -345,7 +345,6 @@ static int	history_sender(struct zbx_json *j)
 {
 	int		i, r, records = 0;
 	zbx_sock_t	sock;
-	char		buf[11]; /* strlen("4294967296") + 1 */
 	zbx_uint64_t	lastid;
 	struct last_ids li[ZBX_SENDER_TABLE_COUNT];
 	int		li_no = 0;
@@ -372,9 +371,7 @@ static int	history_sender(struct zbx_json *j)
 	}
 	zbx_json_close(j);
 
-	zbx_snprintf(buf, sizeof(buf), "%d", (int)time(NULL));
-
-	zbx_json_addstring(j, ZBX_PROTO_TAG_CLOCK, buf, ZBX_JSON_TYPE_INT);
+	zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
 	if (SUCCEED == put_data_to_server(&sock, j)) {
 		DBbegin();
@@ -407,7 +404,6 @@ static int	dhistory_sender(struct zbx_json *j)
 {
 	int		i, r, records = 0;
 	zbx_sock_t	sock;
-	char		buf[11]; /* strlen("4294967296") + 1 */
 	zbx_uint64_t	lastid;
 	struct last_ids li[ZBX_SENDER_TABLE_COUNT];
 	int		li_no = 0;
@@ -434,9 +430,7 @@ static int	dhistory_sender(struct zbx_json *j)
 	}
 	zbx_json_close(j);
 
-	zbx_snprintf(buf, sizeof(buf), "%d", (int)time(NULL));
-
-	zbx_json_addstring(j, ZBX_PROTO_TAG_CLOCK, buf, ZBX_JSON_TYPE_INT);
+	zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
 	if (SUCCEED == put_data_to_server(&sock, j)) {
 		DBbegin();
