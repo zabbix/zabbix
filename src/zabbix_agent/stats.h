@@ -38,7 +38,9 @@ typedef struct s_collector_data
 	ZBX_CPUS_STAT_DATA	cpus;
 	ZBX_INTERFACES_DATA	interfaces;
 	ZBX_DISKDEVICES_DATA	diskdevices;
+#ifdef _WINDOWS
 	ZBX_PERF_STAT_DATA	perfs;
+#endif /* _WINDOWS */
 } ZBX_COLLECTOR_DATA;
  
 extern ZBX_COLLECTOR_DATA *collector;
