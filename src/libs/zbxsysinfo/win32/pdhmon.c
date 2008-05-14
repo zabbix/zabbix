@@ -58,53 +58,47 @@ int	PERF_MONITOR(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	PDH_STATUS			status;
 	PDH_RAW_COUNTER			rawData, rawData2;
 	PDH_FMT_COUNTERVALUE		counterValue;
-	char				counter_path[PDH_MAX_COUNTER_PATH];
-	PDH_COUNTER_PATH_ELEMENTS	*cpe = NULL;
-	int				ret = SYSINFO_RET_FAIL, is_numeric;
-	DWORD				dwSize;
+	char				counter_path[PDH_MAX_COUNTER_PATH],
+					tmp[MAX_STRING_LEN];
+	int				ret = SYSINFO_RET_FAIL, interval;
+	PERF_COUNTERS *perfs;
 
-	if (num_param(param) > 1)
+	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
-	if (get_param(param, 1, counter_path, sizeof(counter_path)) != 0)
+	if (0 != get_param(param, 1, counter_path, sizeof(counter_path)))
 		*counter_path = '\0';
 
 	if (*counter_path == '\0')
 		return SYSINFO_RET_FAIL;
 
-	dwSize = 0;
-retry:
-	if (ERROR_SUCCESS != (status = PdhParseCounterPath(counter_path, cpe, &dwSize, 0))) {
-		if (status == PDH_MORE_DATA) {
-			cpe = (PDH_COUNTER_PATH_ELEMENTS *)zbx_malloc(cpe, dwSize);
-			goto retry;
-		}
-		zabbix_log(LOG_LEVEL_DEBUG, "Can't parse counter path \"%s\": %s",
-				counter_path, strerror_from_module(status, "PDH.DLL"));
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
+		*tmp = '\0';
 
-		zbx_free(cpe);
+	if (*tmp != '\0' && FAIL == is_uint(tmp))
 		return SYSINFO_RET_FAIL;
-	}
 
-	is_numeric = (SUCCEED == is_uint(cpe->szObjectName)) ? 0x01 : 0;
-	is_numeric |= (SUCCEED == is_uint(cpe->szCounterName)) ? 0x02 : 0;
-	if (0 != is_numeric) {
-		if (0x01 & is_numeric)
-			cpe->szObjectName = GetCounterName(atoi(cpe->szObjectName));
-		if (0x02 & is_numeric)
-			cpe->szCounterName = GetCounterName(atoi(cpe->szCounterName));
+	interval = *tmp == '\0' ? 1 : atoi(tmp);
 
-		dwSize = sizeof(counter_path);
-		if (ERROR_SUCCESS != (status = PdhMakeCounterPath(cpe, counter_path, &dwSize, 0))) {
-			zabbix_log(LOG_LEVEL_ERR, "Can't make counter path: %s",
-					strerror_from_module(status, "PDH.DLL"));
-			zbx_free(cpe);
-			return SYSINFO_RET_FAIL;
+	if (FAIL == check_counter_path(counter_path))
+		return SYSINFO_RET_FAIL;
+
+	if (interval > 1) {
+		if ( !PERF_COLLECTOR_STARTED(collector) ) {
+			SET_MSG_RESULT(result, strdup("Collector is not started!"));
+			return SYSINFO_RET_OK;
 		}
-		zabbix_log(LOG_LEVEL_DEBUG, "Counter path converted to \"%s\"",
-				counter_path);
+
+		for (perfs = collector->perfs.pPerfCounterList; perfs != NULL; perfs = perfs->next) {
+			if (0 == strcmp(perfs->counter_path, counter_path) && perfs->interval == interval) {
+				SET_DBL_RESULT(result, perfs->lastValue);
+				return SYSINFO_RET_OK;
+			}
+		}
+
+		if (FAIL == add_perf_counter("", counter_path, interval))
+			return SYSINFO_RET_FAIL;
 	}
-	zbx_free(cpe);
 
 	if (ERROR_SUCCESS == (status = PdhOpenQuery(NULL, 0, &query)))
 	{

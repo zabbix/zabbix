@@ -68,3 +68,53 @@ char *GetCounterName(DWORD index)
 
 	return counterName->name;
 }
+
+/*
+ * Check performance counter path and convert from numeric format
+ *
+ * counterPath[PDH_MAX_COUNTER_PATH]
+ */
+
+int check_counter_path(char *counterPath)
+{
+	DWORD				dwSize;
+	PDH_COUNTER_PATH_ELEMENTS	*cpe = NULL;
+	PDH_STATUS			status;
+	int				is_numeric;
+
+	dwSize = 0;
+retry:
+	if (ERROR_SUCCESS != (status = PdhParseCounterPath(counterPath, cpe, &dwSize, 0))) {
+		if (status == PDH_MORE_DATA) {
+			cpe = (PDH_COUNTER_PATH_ELEMENTS *)zbx_malloc(cpe, dwSize);
+			goto retry;
+		}
+		zabbix_log(LOG_LEVEL_DEBUG, "Can't parse counter path \"%s\": %s",
+				counterPath, strerror_from_module(status, "PDH.DLL"));
+
+		zbx_free(cpe);
+		return FAIL;
+	}
+
+	is_numeric = (SUCCEED == is_uint(cpe->szObjectName)) ? 0x01 : 0;
+	is_numeric |= (SUCCEED == is_uint(cpe->szCounterName)) ? 0x02 : 0;
+	if (0 != is_numeric) {
+		if (0x01 & is_numeric)
+			cpe->szObjectName = GetCounterName(atoi(cpe->szObjectName));
+		if (0x02 & is_numeric)
+			cpe->szCounterName = GetCounterName(atoi(cpe->szCounterName));
+
+		dwSize = PDH_MAX_COUNTER_PATH;
+		if (ERROR_SUCCESS != (status = PdhMakeCounterPath(cpe, counterPath, &dwSize, 0))) {
+			zabbix_log(LOG_LEVEL_ERR, "Can't make counter path: %s",
+					strerror_from_module(status, "PDH.DLL"));
+			zbx_free(cpe);
+			return FAIL;
+		}
+		zabbix_log(LOG_LEVEL_DEBUG, "Counter path converted to \"%s\"",
+				counterPath);
+	}
+	zbx_free(cpe);
+
+	return SUCCEED;
+}

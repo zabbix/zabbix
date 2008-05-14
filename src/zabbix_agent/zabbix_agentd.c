@@ -254,6 +254,8 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	init_collector_data();
 
+	load_user_parameters();
+
 	/* --- START THREADS ---*/
 
 	if(1 == CONFIG_DISABLE_PASSIVE)
@@ -334,7 +336,6 @@ void	zbx_on_exit()
 	free_metrics();
 	free_collector_data();
 	alias_list_free();
-	perfs_list_free();
 
 	zbx_sleep(2); /* wait for all threads closing */
 
@@ -371,8 +372,6 @@ int	main(int argc, char **argv)
 		zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]", APPLICATION_NAME, CONFIG_HOSTNAME);
 	}
 #endif /* _WINDOWS */
-
-	load_user_parameters();
 
 	switch (t.task) {
 #if defined (_WINDOWS)
