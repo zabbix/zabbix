@@ -90,7 +90,7 @@ int	PERF_MONITOR(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		}
 
 		for (perfs = collector->perfs.pPerfCounterList; perfs != NULL; perfs = perfs->next) {
-			if (0 == strcmp(perfs->counter_path, counter_path) && perfs->interval == interval) {
+			if (0 == strcmp(perfs->counterPath, counter_path) && perfs->interval == interval) {
 				SET_DBL_RESULT(result, perfs->lastValue);
 				return SYSINFO_RET_OK;
 			}
