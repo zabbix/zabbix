@@ -51,9 +51,10 @@ typedef struct zbx_active_buffer_element_type
 	char	*key;
 	char	*value;
 	int	timestamp;
-	int	source;
+	char	*source;
 	int	severity;
 	long	lastlogsize;
+	int	clock;
 } ZBX_ACTIVE_BUFFER_ELEMENT;
 
 typedef struct zbx_active_buffer_type

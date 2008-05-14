@@ -415,7 +415,6 @@ static int	send_buffer(
 	int		ret = SUCCEED;
 	struct zbx_json json;
 	int		i;
-	char		tmp[MAX_STRING_LEN];
 	static int	lastsent = 0;
 	int		now;
 
@@ -445,9 +444,6 @@ static int	send_buffer(
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_AGENT_DATA, ZBX_JSON_TYPE_STRING);
 
-	zbx_snprintf(tmp, sizeof(tmp), "%d", (int)time(NULL));
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_CLOCK, tmp, ZBX_JSON_TYPE_INT);
-
 	zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 
 	for(i=0;i<buffer.count;i++)
@@ -455,11 +451,22 @@ static int	send_buffer(
 		zbx_json_addobject(&json, NULL);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, buffer.data[i].host, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, buffer.data[i].key, ZBX_JSON_TYPE_STRING);
-		zbx_snprintf(tmp, sizeof(tmp), "%d", buffer.data[i].timestamp);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_CLOCK, tmp, ZBX_JSON_TYPE_INT);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, buffer.data[i].value, ZBX_JSON_TYPE_STRING);
+		if (buffer.data[i].lastlogsize)
+			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGLASTSIZE, buffer.data[i].lastlogsize);
+		if (buffer.data[i].timestamp)
+			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, buffer.data[i].timestamp);
+		if (buffer.data[i].source)
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, buffer.data[i].source, ZBX_JSON_TYPE_STRING);
+		if (buffer.data[i].severity)
+			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, buffer.data[i].severity);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, buffer.data[i].clock);
 		zbx_json_close(&json);
 	}
+
+	zbx_json_close(&json);
+
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, MIN(buffer.count*CONFIG_TIMEOUT, 60)))) {
 
@@ -501,6 +508,7 @@ static int	send_buffer(
 			if(buffer.data[i].host != NULL)		zbx_free(buffer.data[i].host);
 			if(buffer.data[i].key != NULL)		zbx_free(buffer.data[i].key);
 			if(buffer.data[i].value != NULL)	zbx_free(buffer.data[i].value);
+			if(buffer.data[i].source != NULL)	zbx_free(buffer.data[i].source);
 		}
 		buffer.count = 0;
 	}
@@ -546,8 +554,8 @@ static int	process_value(
 		unsigned short	*severity
 )
 {
-	int ret = SUCCEED;
-	int i;
+	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
+	int				ret = SUCCEED;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_value('%s','%s','%s')",
 		host, key, value);
@@ -567,11 +575,8 @@ static int	process_value(
 	if(buffer.count < CONFIG_BUFFER_SIZE)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Buffer: new element %d", buffer.count);
-		memset(&buffer.data[buffer.count], 0, sizeof(ZBX_ACTIVE_BUFFER_ELEMENT));
-		buffer.data[buffer.count].host = strdup(host);
-		buffer.data[buffer.count].key = strdup(key);
-		buffer.data[buffer.count].timestamp = (int)time(NULL);
-		buffer.data[buffer.count].value = strdup(value);
+
+		el = &buffer.data[buffer.count];
 		buffer.count++;
 	}
 	else
@@ -581,19 +586,31 @@ static int	process_value(
 		if(buffer.data[0].host != NULL)	zbx_free(buffer.data[0].host);
 		if(buffer.data[0].key != NULL)	zbx_free(buffer.data[0].key);
 		if(buffer.data[0].value != NULL)	zbx_free(buffer.data[0].value);
+		if(buffer.data[0].source != NULL)	zbx_free(buffer.data[0].source);
 		memmove(&buffer.data[0],&buffer.data[1], (CONFIG_BUFFER_SIZE-1)*sizeof(ZBX_ACTIVE_BUFFER_ELEMENT));
 
-		buffer.data[CONFIG_BUFFER_SIZE-1].host = strdup(host);
-		buffer.data[CONFIG_BUFFER_SIZE-1].key = strdup(key);
-		buffer.data[CONFIG_BUFFER_SIZE-1].timestamp = (int)time(NULL);
-		buffer.data[CONFIG_BUFFER_SIZE-1].value = strdup(value);
+		el = &buffer.data[CONFIG_BUFFER_SIZE-1];
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "BUFFER");
+	memset(el, 0, sizeof(ZBX_ACTIVE_BUFFER_ELEMENT));
+	el->host	= strdup(host);
+	el->key		= strdup(key);
+	el->value	= strdup(value);
+	if (source)
+		el->source	= strdup(source);
+	if (severity)
+		el->severity	= *severity;
+	if (lastlogsize)
+		el->lastlogsize	= *lastlogsize;
+	if (timestamp)
+		el->timestamp	= *timestamp;
+	el->clock	= (int)time(NULL);
+
+/*	zabbix_log(LOG_LEVEL_DEBUG, "BUFFER");
 		for(i=0;i<buffer.count;i++)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, " Host %s Key %s Values %s", buffer.data[i].host, buffer.data[i].key, buffer.data[i].value);
-		}
+		}*/
 
 	return ret;
 }
