@@ -22,6 +22,10 @@
 
 #include "system.h"
 
+#ifdef _WINDOWS
+	#include "perfmon.h"
+#endif /* _WINDOWS */
+
 int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	assert(result);
@@ -36,10 +40,11 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(_WINDOWS)
-#	ifdef TODO
-#		error Realize function SYSTEM_UNUM!!!
-#	endif /* todo */
-	return SYSINFO_RET_FAIL;
+	char	counter_path[64];
+
+	zbx_snprintf(counter_path, sizeof(counter_path), "\\%d\\%d", PCI_TERMINAL_SERVICES, PCI_TOTAL_SESSIONS);
+
+	return PERF_MONITOR(cmd, counter_path, flags, result);
 #else
         assert(result);
 
