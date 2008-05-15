@@ -33,6 +33,8 @@
 #define PCI_PROCESSOR_TIME		(6)
 #define PCI_PROCESSOR_QUEUE_LENGTH	(44)
 #define PCI_SYSTEM_UP_TIME		(674)
+#define PCI_TERMINAL_SERVICES		(2176)
+#define PCI_TOTAL_SESSIONS		(2178)
 
 //
 // Performance Countername structure
