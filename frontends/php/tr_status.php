@@ -224,6 +224,7 @@ include_once "include/page_header.php";
 	$r_form->AddVar('noactions',$noactions);
 	$r_form->AddVar('select',$select);
 	$r_form->AddVar('txt_select',$txt_select);
+	$r_form->AddVar('btnSelect',get_request('btnSelect'));
 	$r_form->AddVar('fullscreen',$_REQUEST['fullscreen']);
 
 	
@@ -258,6 +259,9 @@ include_once "include/page_header.php";
 		$tr_form->AddVar("compact",$compact);
 		$tr_form->AddVar("noactions",$noactions);
 		$tr_form->AddVar("select",$select);
+		$tr_form->AddVar('txt_select',$txt_select);
+		$tr_form->AddVar('btnSelect',get_request('btnSelect'));
+		$tr_form->AddVar('fullscreen',$_REQUEST['fullscreen']);
 		
 		$tr_select = new CComboBox('show_triggers',S_TRIGGERS,'javascript: submit();');
 		if(TRIGGERS_OPTION_ONLYTRUE){
@@ -299,17 +303,17 @@ include_once "include/page_header.php";
 			
 		array_push($left_col, '[', new CLink($noactions != 'true' ? S_HIDE_ACTIONS : S_SHOW_ACTIONS,
 			"tr_status.php?noactions=".($noactions != 'true' ? 'true' : 'false').
-			"&show_triggers=$show_triggers&show_events=$show_events&compact=$compact&select=$select&txt_select=$txt_select"
+			"&show_triggers=$show_triggers&show_events=$show_events&compact=$compact&select=$select&txt_select=$txt_select".url_param('btnSelect')
 			), ']'.SPACE);
 
 		array_push($left_col, '[', new CLink($compact != 'true' ? S_HIDE_DETAILS: S_SHOW_DETAILS,
 			"tr_status.php?compact=".($compact != 'true' ? 'true' : 'false').
-			"&show_triggers=$show_triggers&show_events=$show_events&noactions=$noactions&select=$select&txt_select=$txt_select"
+			"&show_triggers=$show_triggers&show_events=$show_events&noactions=$noactions&select=$select&txt_select=$txt_select".url_param('btnSelect')
 			), ']'.SPACE);
 		
 		array_push($left_col, '[', new CLink($select != 'true' ? S_SELECT : S_HIDE_SELECT,
 			"tr_status.php?select=".($select != 'true' ? 'true' : 'false').
-			"&show_triggers=$show_triggers&show_events=$show_events&noactions=$noactions&compact=$compact&txt_select=$txt_select"
+			"&show_triggers=$show_triggers&show_events=$show_events&noactions=$noactions&compact=$compact&txt_select=$txt_select".url_param('btnSelect')
 			), ']');
 			
 		if($select=='true'){
