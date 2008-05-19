@@ -56,7 +56,7 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!="")){
 		array_push($options,'always_select_first_group');
 	}
 	
-	validate_group(PERM_READ_ONLY,$options);
+	validate_group(PERM_READ_ONLY,$options,'web.overview.groupid');
 
 	$_REQUEST["type"] = get_request("type",get_profile("web.overview.type",SHOW_TRIGGERS));
 	update_profile("web.overview.type",$_REQUEST["type"]);
