@@ -377,7 +377,7 @@
 				break;
 			case "ORACLE":
 				if(is_numeric($limit)){
-					$query = 'select * from ('.$query.') where rownum<'.intval($limit);
+					$query = 'select * from ('.$query.') where rownum<='.intval($limit);
 				}
 				$result = DBexecute($query);
 				if(!$result){
