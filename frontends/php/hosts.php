@@ -840,7 +840,7 @@ include_once 'include/page_header.php';
 	$cmbConf->AddItem(1,S_HOST_GROUPS);
 	$cmbConf->AddItem(2,S_TEMPLATE_LINKAGE);
 	$cmbConf->AddItem(4,S_APPLICATIONS);
-	$cmbConf->AddItem(6,S_MASS_UPDATE);
+//	$cmbConf->AddItem(6,S_MASS_UPDATE);
 
 	switch($_REQUEST["config"]){
 		case 0:
