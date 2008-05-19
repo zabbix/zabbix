@@ -73,9 +73,8 @@
 					}
 					break;
 				case "ORACLE":
-					$DB = ociplogon($DB_USER, $DB_PASSWORD, $DB_DATABASE);
-/*					$DB = ocilogon($DB_USER, $DB_PASSWORD, $DB_DATABASE);*/
-					//$DB = ocilogon($DB_USER, $DB_PASSWORD, "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$DB_SERVER)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=$DB_DATABASE)))");
+//					$DB = ociplogon($DB_USER, $DB_PASSWORD, $DB_DATABASE);
+					$DB = ociplogon($DB_USER, $DB_PASSWORD, "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$DB_SERVER)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=$DB_DATABASE)))");
 					if(!$DB)
 					{
 						$error = "Error connecting to database";
@@ -299,7 +298,7 @@ COpt::savesqlrequest($query);
 			case "ORACLE":
 				if(is_numeric($limit))
 				{
-					$query = 'select * from ('.$query.') where rownum<'.intval($limit);
+					$query = 'select * from ('.$query.') where rownum<='.intval($limit);
 				}
 
 				$stid=OCIParse($DB,$query);

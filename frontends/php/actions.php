@@ -72,6 +72,7 @@ include_once "include/page_header.php";
 	$form->AddItem($btnPrev);
 
 	$btnNext = new CButton("next","Next ".PAGE_SIZE." >>");
+
 	if($table->GetNumRows() < PAGE_SIZE)
 		$btnNext->SetEnabled('no');
 	$form->AddItem($btnNext);
