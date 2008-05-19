@@ -686,7 +686,7 @@ require_once "include/items.inc.php";
 		}
 		
 		global $USER_DETAILS;
-		
+
 		$first_hostid_in_group = 0;
 
 		$allow_all_hosts = (str_in_array("allow_all_hosts",$options)) ? 1 : 0;
