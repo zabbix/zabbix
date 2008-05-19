@@ -888,7 +888,7 @@ require_once "include/items.inc.php";
 		
 		$result = get_correct_group_and_host($_REQUEST['groupid'],null,$perm,$options);
 		$_REQUEST["groupid"] = $result["groupid"];
-
+		
 		update_profile($group_var,$_REQUEST["groupid"]);
 	}
 
