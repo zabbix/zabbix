@@ -203,7 +203,7 @@
 		$available_graphs = array();
 		
 		$sql = 	'SELECT DISTINCT t.triggerid '.
-				' FROM triggers t, functions f, items as i '.
+				' FROM triggers t, functions f, items i '.
 				' WHERE t.triggerid=f.triggerid '.
 					' AND f.itemid=i.itemid'.
 					(!empty($hostid)?' AND i.hostid='.$hostid:'').
@@ -215,7 +215,7 @@
 		}
 
 		$sql = 	'SELECT DISTINCT t.triggerid '.
-				' FROM triggers t, functions f, items as i '.
+				' FROM triggers t, functions f, items i '.
 				' WHERE t.triggerid=f.triggerid '.
 					' AND f.itemid=i.itemid'.
 					' AND i.status='.ITEM_STATUS_ACTIVE.

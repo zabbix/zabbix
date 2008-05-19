@@ -56,10 +56,10 @@ include_once 'include/page_header.php';
 	}
 
 	$sql = 'SELECT g.*,h.host,h.hostid '.
-				' FROM graphs as g '.
-					' LEFT JOIN graphs_items as gi ON g.graphid=gi.graphid '.
-					' LEFT JOIN items as i ON gi.itemid=i.itemid '.
-					' LEFT JOIN hosts as h ON i.hostid=h.hostid '.
+				' FROM graphs g '.
+					' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
+					' LEFT JOIN items i ON gi.itemid=i.itemid '.
+					' LEFT JOIN hosts h ON i.hostid=h.hostid '.
 				' WHERE g.graphid='.$_REQUEST['graphid'].
 					' AND h.hostid IN ('.$available_hosts.') ';
 					
