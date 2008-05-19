@@ -230,7 +230,6 @@ include_once 'include/page_header.php';
 	}
 /* HOST MASS UPDATE */
 	else if($_REQUEST['config']==0 && isset($_REQUEST['massupdate']) && isset($_REQUEST['save'])){
-		$useip = get_request('useip',0);
 		$hosts = get_request('hosts',array());
 		$visible = get_request('visible',array());
 
@@ -284,7 +283,7 @@ include_once 'include/page_header.php';
 			}
 
 			$update = update_host($hostid,
-				$db_host['host'],$db_host['port'],$db_host['status'],$useip,$db_host['dns'],
+				$db_host['host'],$db_host['port'],$db_host['status'],$db_host['useip'],$db_host['dns'],
 				$db_host['ip'],$db_host['proxy_hostid'],$db_host['templates'],$_REQUEST['newgroup'],$db_host['groups']);
 
 		
