@@ -32,38 +32,38 @@ function make_favorite_graphs(){
 	
 	foreach($fav_graphs as $key => $favorite){
 		
-		$resource = $favorite['resource'];
-		$resourceid = $favorite['value'];
+		$source = $favorite['source'];
+		$sourceid = $favorite['value'];
 
-		if('itemid' == $resource){
-			if(!$item = get_item_by_itemid($resourceid)) continue;
+		if('itemid' == $source){
+			if(!$item = get_item_by_itemid($sourceid)) continue;
 	
-			$host = get_host_by_itemid($resourceid);
+			$host = get_host_by_itemid($sourceid);
 			$item["description"] = item_description($item["description"],$item["key_"]);
 			
-			$link = new CLink($host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$resourceid);
+			$link = new CLink($host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$sourceid);
 			$link->SetTarget('blank');
 			
 			$capt = new CSpan($link);
 			$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
 			
-			$icon = new CLink(new CImg('images/general/chart.png','chart',18,18,'borderless'),'history.php?action=showgraph&itemid='.$resourceid.'&fullscreen=1');
+			$icon = new CLink(new CImg('images/general/chart.png','chart',18,18,'borderless'),'history.php?action=showgraph&itemid='.$sourceid.'&fullscreen=1');
 			$icon->SetTarget('blank');
 		}
 		else{
-			if(!$graph = get_graph_by_graphid($resourceid)) continue;
-			if(!graph_accessible($resourceid)) continue;
+			if(!$graph = get_graph_by_graphid($sourceid)) continue;
+			if(!graph_accessible($sourceid)) continue;
 			
-			$result = get_hosts_by_graphid($resourceid);
+			$result = get_hosts_by_graphid($sourceid);
 			$ghost = DBFetch($result);
 	
-			$link = new CLink($ghost['host'].':'.$graph['name'],'charts.php?graphid='.$resourceid);
+			$link = new CLink($ghost['host'].':'.$graph['name'],'charts.php?graphid='.$sourceid);
 			$link->SetTarget('blank');
 	
 			$capt = new CSpan($link);
 			$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
 			
-			$icon = new CLink(new CImg('images/general/chart.png','chart',18,18,'borderless'),'charts.php?graphid='.$resourceid.'&fullscreen=1');
+			$icon = new CLink(new CImg('images/general/chart.png','chart',18,18,'borderless'),'charts.php?graphid='.$sourceid.'&fullscreen=1');
 			$icon->SetTarget('blank');
 		}
 		
@@ -88,33 +88,33 @@ function make_favorite_screens(){
 	$fav_screens = get_multi_profile('web.favorite.screenids');
 
 	foreach($fav_screens as $key => $favorite){
-		$resource = $favorite['resource'];
-		$resourceid = $favorite['value'];
+		$source = $favorite['source'];
+		$sourceid = $favorite['value'];
 
-		if('slideshowid' == $resource){
-			if(!$slide = get_slideshow_by_slideshowid($resourceid)) continue;
-			if(!slideshow_accessible($resourceid, PERM_READ_ONLY)) continue;
+		if('slideshowid' == $source){
+			if(!$slide = get_slideshow_by_slideshowid($sourceid)) continue;
+			if(!slideshow_accessible($sourceid, PERM_READ_ONLY)) continue;
 
-			$link = new CLink($slide['name'],'screens.php?config=1&elementid='.$resourceid);
+			$link = new CLink($slide['name'],'screens.php?config=1&elementid='.$sourceid);
 			$link->SetTarget('blank');
 		
 			$capt = new CSpan($link);
 			$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
 			
-			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=1&elementid='.$resourceid.'&fullscreen=1');
+			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=1&elementid='.$sourceid.'&fullscreen=1');
 			$icon->SetTarget('blank');
 		}
 		else{
-			if(!$screen = get_screen_by_screenid($resourceid)) continue;
-			if(!screen_accessible($resourceid, PERM_READ_ONLY)) continue;
+			if(!$screen = get_screen_by_screenid($sourceid)) continue;
+			if(!screen_accessible($sourceid, PERM_READ_ONLY)) continue;
 		
-			$link = new CLink($screen['name'],'screens.php?config=0&elementid='.$resourceid);
+			$link = new CLink($screen['name'],'screens.php?config=0&elementid='.$sourceid);
 			$link->SetTarget('blank');
 			
 			$capt = new CSpan($link);
 			$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
 			
-			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=0&elementid='.$resourceid.'&fullscreen=1');
+			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=0&elementid='.$sourceid.'&fullscreen=1');
 			$icon->SetTarget('blank');
 		}
 		
@@ -141,19 +141,19 @@ function make_favorite_maps(){
 	
 	foreach($fav_sysmaps as $key => $favorite){
 	
-		$resource = $favorite['resource'];
-		$resourceid = $favorite['value'];
+		$source = $favorite['source'];
+		$sourceid = $favorite['value'];
 		
-		if(!$sysmap = get_sysmap_by_sysmapid($resourceid)) continue;
-		if(!sysmap_accessible($resourceid,PERM_READ_ONLY)) continue;
+		if(!$sysmap = get_sysmap_by_sysmapid($sourceid)) continue;
+		if(!sysmap_accessible($sourceid,PERM_READ_ONLY)) continue;
 		
-		$link = new CLink($sysmap['name'],'maps.php?sysmapid='.$resourceid);
+		$link = new CLink($sysmap['name'],'maps.php?sysmapid='.$sourceid);
 		$link->SetTarget('blank');
 
 		$capt = new CSpan($link);
 		$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
 		
-		$icon = new CLink(new CImg('images/general/chart.png','map',18,18,'borderless'),'maps.php?sysmapid='.$resourceid.'&fullscreen=1');
+		$icon = new CLink(new CImg('images/general/chart.png','map',18,18,'borderless'),'maps.php?sysmapid='.$sourceid.'&fullscreen=1');
 		$icon->SetTarget('blank');
 
 		$table->AddRow(new CCol(array(
@@ -881,36 +881,36 @@ function make_graph_submenu(){
 	
 	foreach($fav_graphs as $key => $favorite){
 		
-		$resource = $favorite['resource'];
-		$resourceid = $favorite['value'];
+		$source = $favorite['source'];
+		$sourceid = $favorite['value'];
 
-		if('itemid' == $resource){
-			if(!$item = get_item_by_itemid($resourceid)) continue;
+		if('itemid' == $source){
+			if(!$item = get_item_by_itemid($sourceid)) continue;
 			
 			$item_added = true;
 	
-			$host = get_host_by_itemid($resourceid);
+			$host = get_host_by_itemid($sourceid);
 			$item["description"] = item_description($item["description"],$item["key_"]);
 			
 			$graphids[] = array( 
 							'name'	=>	$host['host'].':'.$item['description'],
 							'favobj'=>	'itemid',
-							'favid'	=>	$resourceid,
+							'favid'	=>	$sourceid,
 							'action'=>	'remove'
 						);
 		}
 		else{
-			if(!$graph = get_graph_by_graphid($resourceid)) continue;
+			if(!$graph = get_graph_by_graphid($sourceid)) continue;
 			
 			$graph_added = true;
 	
-			$result = get_hosts_by_graphid($resourceid);
+			$result = get_hosts_by_graphid($sourceid);
 			$ghost = DBFetch($result);
 			
 			$graphids[] = array( 
 							'name'	=>	$ghost['host'].':'.$graph['name'],
 							'favobj'=>	'graphid',
-							'favid'	=>	$resourceid,
+							'favid'	=>	$sourceid,
 							'action'=>	'remove'
 						);
 		}
@@ -964,15 +964,15 @@ function make_sysmap_submenu(){
 	
 	foreach($fav_sysmaps as $key => $favorite){
 	
-		$resource = $favorite['resource'];
-		$resourceid = $favorite['value'];
+		$source = $favorite['source'];
+		$sourceid = $favorite['value'];
 		
-		if(!$sysmap = get_sysmap_by_sysmapid($resourceid)) continue;
+		if(!$sysmap = get_sysmap_by_sysmapid($sourceid)) continue;
 
 		$sysmapids[] = array( 
 							'name'	=>	$sysmap['name'],
 							'favobj'=>	'sysmapid',
-							'favid'	=>	$resourceid,
+							'favid'	=>	$sourceid,
 							'action'=>	'remove'
 						);
 	}
@@ -1030,29 +1030,29 @@ function make_screen_submenu(){
 	$fav_screens = get_multi_profile('web.favorite.screenids');
 
 	foreach($fav_screens as $key => $favorite){
-		$resource = $favorite['resource'];
-		$resourceid = $favorite['value'];
+		$source = $favorite['source'];
+		$sourceid = $favorite['value'];
 
-		if('slideshowid' == $resource){
-			if(!$slide = get_slideshow_by_slideshowid($resourceid)) continue;
+		if('slideshowid' == $source){
+			if(!$slide = get_slideshow_by_slideshowid($sourceid)) continue;
 			$slide_added = true;
 			
 			$screenids[] = array( 
 								'name'	=>	$slide['name'],
 								'favobj'=>	'slideshowid',
-								'favid'	=>	$resourceid,
+								'favid'	=>	$sourceid,
 								'action'=>	'remove'
 							);
 
 		}
 		else{
-			if(!$screen = get_screen_by_screenid($resourceid)) continue;			
+			if(!$screen = get_screen_by_screenid($sourceid)) continue;			
 			$screen_added = true;
 			
 			$screenids[] = array( 
 								'name'	=>	$screen['name'],
 								'favobj'=>	'screenid',
-								'favid'	=>	$resourceid,
+								'favid'	=>	$sourceid,
 								'action'=>	'remove'
 							);
 		}
