@@ -628,6 +628,23 @@ require_once "include/items.inc.php";
 		else
 		{
 			$groupid = $a_groupid;
+			
+			if(($groupid < 0) && str_in_array('always_select_first_group',$options)){
+				$with_node = ' AND '.DBin_node('g.groupid', get_current_nodeid(!$only_current_node));
+
+				$sql = 'SELECT DISTINCT g.name,g.groupid '.
+								' FROM groups g, hosts_groups hg, hosts h'.$item_table.
+								' WHERE hg.groupid=g.groupid '.
+									' AND h.hostid=hg.hostid '.
+									' AND h.hostid IN ('.$available_hosts.') '.
+									$with_host_status.
+									$with_items.
+									$with_node.
+								' ORDER BY g.name';
+//SDI($groupid);
+				$groupid=($grp = DBfetch(DBselect($sql,1)))?$grp['groupid']:0;
+//SDI($groupid);
+			}
 
 			if($groupid > 0)
 			{
@@ -766,12 +783,14 @@ require_once "include/items.inc.php";
 	 * Comments:
 	 *
 	 */
-	function	validate_group($perm, $options = array(),$group_var=null)
-	{
+	function	validate_group($perm, $options = array(),$group_var=null){
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
 		$_REQUEST["groupid"]    = get_request("groupid",get_profile($group_var,0));
 
 		if(!in_node($_REQUEST["groupid"])) $_REQUEST["groupid"] = 0;
+		
+		if(str_in_array('always_select_first_group',$options) && ($_REQUEST['groupid'] == 0))
+			$_REQUEST['groupid'] = -1;
 		
 		$result = get_correct_group_and_host($_REQUEST["groupid"],null,$perm,$options);
 		$_REQUEST["groupid"]    = $result["groupid"];

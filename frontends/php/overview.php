@@ -51,27 +51,29 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
-	validate_group(PERM_READ_ONLY,array("allow_all_hosts","monitored_hosts","with_monitored_items"));
-?>
-<?php
-	$_REQUEST["type"] = get_request("type",get_profile("web.overview.type",SHOW_TRIGGERS));
+	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
+	
+	if(!isset($_REQUEST['groupid'])){
+		array_push($options,'always_select_first_group');
+	}
+	validate_group(PERM_READ_ONLY,$options);
 
+	$_REQUEST["type"] = get_request("type",get_profile("web.overview.type",SHOW_TRIGGERS));
 	update_profile("web.overview.type",$_REQUEST["type"]);
+	
 ?>
 <?php
 	$form = new CForm();
 	$form->SetMethod('get');
-	
+
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
-	if($_REQUEST["type"] == SHOW_TRIGGERS)
-	{
+	if($_REQUEST["type"] == SHOW_TRIGGERS){
 		$from = ", functions f, triggers t";
 		$where = " and i.itemid=f.itemid and f.triggerid=t.triggerid and t.status=".TRIGGER_STATUS_ENABLED;
 	}
-	else
-	{
+	else{
 		$where = $from = '';
 	}
 	
