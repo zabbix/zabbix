@@ -22,7 +22,7 @@
 /********** USER PROFILE ***********/
 
 //---------- GET USER VALUE -------------
-function get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN,$resource=null){
+function get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN,$source=null){
 	global $USER_DETAILS;
 
 	$result = $default_value;
@@ -32,7 +32,7 @@ function get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN,$resour
 				' FROM profiles '.
 				' WHERE userid='.$USER_DETAILS["userid"].
 					' AND idx='.zbx_dbstr($idx).
-					(is_null($resource)?'':' AND resource='.zbx_dbstr($resource)).
+					(is_null($source)?'':' AND source='.zbx_dbstr($source)).
 				' ORDER BY profileid ASC';
 		$db_profiles = DBselect($sql);
 
@@ -57,17 +57,17 @@ return $result;
 
 
 // multi value
-function get_multi_profile($idx,$default_value=array(),$type=PROFILE_TYPE_UNKNOWN,$resource=null){
+function get_multi_profile($idx,$default_value=array(),$type=PROFILE_TYPE_UNKNOWN,$source=null){
 	global $USER_DETAILS;
 
 	$result = $default_value;
 
 	if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
-		$sql = 'SELECT value,value2,resource,valuetype '.
+		$sql = 'SELECT value,value2,source,valuetype '.
 				' FROM profiles '.
 				' WHERE userid='.$USER_DETAILS["userid"].
 					' AND idx='.zbx_dbstr($idx).
-					(is_null($resource)?'':' AND resource='.zbx_dbstr($resource)).
+					(is_null($source)?'':' AND source='.zbx_dbstr($source)).
 				' ORDER BY profileid ASC';
 		$db_profiles = DBselect($sql);
 
@@ -91,7 +91,7 @@ return $result;
 }
 
 //----------- ADD/EDIT USERPROFILE -------------
-function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$resource=null){
+function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$source=null){
 	global $USER_DETAILS;
 
 	if($USER_DETAILS["alias"]==ZBX_GUEST_USER){
@@ -111,7 +111,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$resource=null){
 		DBExecute($sql);
 		
 		foreach($value as $id => $val){
-			insert_profile($idx,$val,$type,$resource);
+			insert_profile($idx,$val,$type,$source);
 		}
 	}
 	else{
@@ -119,18 +119,18 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$resource=null){
 				' FROM profiles '.
 				' WHERE userid='.$USER_DETAILS["userid"].
 					' AND idx='.zbx_dbstr($idx).
-					(is_null($resource)?'':' AND resource='.zbx_dbstr($resource));
+					(is_null($source)?'':' AND source='.zbx_dbstr($source));
 					
 		$row = DBfetch(DBselect($sql));
 
 		if(!$row){
-			insert_profile($idx,$value,$type,$resource);
+			insert_profile($idx,$value,$type,$source);
 		}
 		else{
 			$sql='UPDATE profiles SET value='.zbx_dbstr($value).',valuetype='.$type.
 				' WHERE userid='.$USER_DETAILS["userid"].
 					' AND idx='.zbx_dbstr($idx).
-					(is_null($resource)?'':' AND resource='.zbx_dbstr($resource));
+					(is_null($source)?'':' AND source='.zbx_dbstr($source));
 			DBexecute($sql);
 		}
 	}
@@ -140,7 +140,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$resource=null){
 return $result;
 }
 
-function update_multi_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$resource=null){
+function update_multi_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$source=null){
 	global $USER_DETAILS;
 
 	if($USER_DETAILS["alias"]==ZBX_GUEST_USER){
@@ -164,7 +164,7 @@ function update_multi_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$resource=n
 		DBExecute($sql);
 
 		foreach($value as $id => $val){
-			insert_profile($idx,$val,$type,$resource);
+			insert_profile($idx,$val,$type,$source);
 		}
 	}
 	else {
@@ -172,26 +172,26 @@ function update_multi_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$resource=n
 				' FROM profiles '.
 				' WHERE userid='.$USER_DETAILS["userid"].
 					' AND idx='.zbx_dbstr($idx).
-					(is_null($resource)?'':' AND resource='.zbx_dbstr($resource));
+					(is_null($source)?'':' AND source='.zbx_dbstr($source));
 					
 		$row = DBfetch(DBselect($sql));
 
 		if(!$row){
-			insert_profile($idx,$value,$type,$resource);
+			insert_profile($idx,$value,$type,$source);
 		}
 		else{
 			$val1 = isset($value['value'])?$value['value']:'';
 			$val2 = isset($value['value2'])?$value['value2']:'';
-			$rsrc = isset($value['resource'])?$value['resource']:(is_null($resource)?'':resource);
+			$rsrc = isset($value['source'])?$value['source']:(is_null($source)?'':source);
 
 			$sql='UPDATE profiles '.
 				' SET value='.zbx_dbstr($val1).
 						',value2='.zbx_dbstr($val2).
-						',resource='.zbx_dbstr($rsrc).
+						',source='.zbx_dbstr($rsrc).
 						',valuetype='.$type.
 				' WHERE userid='.$USER_DETAILS["userid"].
 					' AND idx='.zbx_dbstr($idx).
-					(is_null($resource)?'':' AND resource='.zbx_dbstr($resource));
+					(is_null($source)?'':' AND source='.zbx_dbstr($source));
 			DBexecute($sql);
 		}
 	}
@@ -203,14 +203,14 @@ return $result;
 
 
 // Author: Aly
-function insert_profile($idx,$value,$type,$resource=null){
+function insert_profile($idx,$value,$type,$source=null){
 	global $USER_DETAILS;
 
 	$profileid = get_dbid('profiles', 'profileid');
 
 	$val1 = $value;
 	$val2 = '';
-	$rsrc = is_null($resource)?'':$resource;
+	$rsrc = is_null($source)?'':$source;
 	
 	if(($type == PROFILE_TYPE_MULTI_ARRAY) || 
 		($type == PROFILE_TYPE_MULTI) ||
@@ -218,12 +218,12 @@ function insert_profile($idx,$value,$type,$resource=null){
 	{
 		$val1 = isset($value['value'])?$value['value']:'';
 		$val2 = isset($value['value2'])?$value['value2']:'';
-		$rsrc = isset($value['resource'])?$value['resource']:$rsrc;
+		$rsrc = isset($value['source'])?$value['source']:$rsrc;
 	}
 
 	if(is_null($val1)) return false;
 	
-	$sql='INSERT INTO profiles (profileid,userid,idx,value,value2,resource,valuetype)'.
+	$sql='INSERT INTO profiles (profileid,userid,idx,value,value2,source,valuetype)'.
 		' VALUES ('.$profileid.','.
 					$USER_DETAILS["userid"].','.
 					zbx_dbstr($idx).','.
@@ -329,24 +329,24 @@ return $result;
 
 /********** USER FAVORITES ***********/
 // Author: Aly
-function add2favorites($favobj,$favid,$resource=null){
+function add2favorites($favobj,$favid,$source=null){
 	$favorites = get_multi_profile($favobj);
 
 	$favorites[] = array('value' => $favid);
 	
-	$result = update_multi_profile($favobj,$favorites,PROFILE_TYPE_MULTI_ARRAY,$resource);
+	$result = update_multi_profile($favobj,$favorites,PROFILE_TYPE_MULTI_ARRAY,$source);
 return $result;
 }
 
 // Author: Aly
-function rm4favorites($favobj,$favid,$favcnt=null,$resource=null){
+function rm4favorites($favobj,$favid,$favcnt=null,$source=null){
 	$favorites = get_multi_profile($favobj);
 
 	$favcnt = (is_null($favcnt))?0:$favcnt;		
 	if($favid == 0) $favcnt = ZBX_FAVORITES_ALL;
 
 	foreach($favorites as $key => $favorite){
-		if(((bccomp($favid,$favorite['value']) == 0) || ($favid == 0)) && ($favorite['resource'] == $resource)){
+		if(((bccomp($favid,$favorite['value']) == 0) || ($favid == 0)) && ($favorite['source'] == $source)){
 			if($favcnt < 1){
 				unset($favorites[$key]);
 				if($favcnt > ZBX_FAVORITES_ALL) break;  // foreach
@@ -360,13 +360,13 @@ return $result;
 }
 
 // Author: Aly
-function infavorites($favobj,$favid,$resource=null){
+function infavorites($favobj,$favid,$source=null){
 
 	$favorites = get_multi_profile($favobj);
 	if(!empty($favorites)){
 		foreach($favorites as $id => $favorite){
 			if(bccomp($favid,$favorite['value']) == 0){
-				if(is_null($resource) || ($favorite['resource'] == $resource))
+				if(is_null($source) || ($favorite['source'] == $source))
 					return true;
 			}
 		}
