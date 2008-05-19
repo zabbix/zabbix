@@ -394,7 +394,7 @@ include_once "include/page_header.php";
 	$fav_form->AddOption('style','display: inline; margin: 0px;');
 	$fav_form->AddVar('favobj','');
 	$fav_form->AddVar('favid','');
-	$fav_form->AddVar('resource','');
+	$fav_form->AddVar('source','');
 	$fav_form->Show();
 
 	$jsmenu = new CPUMenu(null,170);
