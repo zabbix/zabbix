@@ -218,7 +218,7 @@
 		}
 
 		$sql = 'SELECT max(s.serviceid) as serviceid '.
-					' FROM services as s, services_links as sl '.
+					' FROM services s, services_links sl '.
 					' WHERE s.serviceid = sl.serviceupid '.
 					  ' AND NOT(s.triggerid IS NULL) '.
 					' GROUP BY s.serviceid;';
@@ -827,8 +827,8 @@ function update_services_status_all(){
 	clear_parents_from_trigger();	
 
 	$result = DBselect('SELECT s.serviceid,s.algorithm,s.triggerid '.
-						' FROM services as s '.
-						' WHERE s.serviceid NOT IN (select distinct sl.serviceupid from services_links as sl)');
+						' FROM services s '.
+						' WHERE s.serviceid NOT IN (select distinct sl.serviceupid from services_links sl)');
 
 	while($rows=DBfetch($result)){
 		$status = get_service_status($rows['serviceid'],$rows['algorithm'],$rows['triggerid']);
@@ -838,8 +838,8 @@ function update_services_status_all(){
 	}	
 
 	$result = DBselect('SELECT MAX(sl.servicedownid) as serviceid, sl.serviceupid '.
-						' FROM services_links AS sl '.
-						' WHERE sl.servicedownid NOT IN (select distinct sl.serviceupid from services_links as sl) '.
+						' FROM services_links sl '.
+						' WHERE sl.servicedownid NOT IN (select distinct sl.serviceupid from services_links sl) '.
 						' GROUP BY sl.serviceupid');
 
 	while($rows=DBfetch($result)){
