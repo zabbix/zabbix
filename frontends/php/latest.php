@@ -50,8 +50,9 @@ include_once "include/page_header.php";
 	check_fields($fields);
 	validate_sort_and_sortorder('i.description',ZBX_SORT_UP);
 	
-	$options = array("allow_all_hosts","monitored_hosts","with_monitored_items");//,"always_select_first_host");
+	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
 	
+	$_REQUEST['hostid'] = get_request('hostid',get_profile('web.latest.last.hostid'));
 	if(!isset($_REQUEST['hostid'])){
 		array_push($options,'always_select_first_host');
 		
@@ -61,46 +62,46 @@ include_once "include/page_header.php";
 		}
 	}
 
-	if(!$ZBX_WITH_SUBNODES)	array_push($options,"only_current_node");
+	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
 
 	validate_group_with_host(PERM_READ_ONLY,$options,'web.latest.last.groupid','web.latest.last.hostid');
 
 ?>
 <?php
 
-	$_REQUEST["select"] = get_request('select','');
+	$_REQUEST['select'] = get_request('select','');
 
-	$_REQUEST["groupbyapp"] = get_request("groupbyapp",get_profile("web.latest.groupbyapp",1));
-	update_profile("web.latest.groupbyapp",$_REQUEST["groupbyapp"]);
+	$_REQUEST['groupbyapp'] = get_request('groupbyapp',get_profile('web.latest.groupbyapp',1));
+	update_profile('web.latest.groupbyapp',$_REQUEST['groupbyapp']);
 
-	$_REQUEST["applications"] = get_request("applications",get_profile("web.latest.applications",array()),PROFILE_TYPE_ARRAY);
+	$_REQUEST['applications'] = get_request('applications',get_profile('web.latest.applications',array()),PROFILE_TYPE_ARRAY);
 
-	if(isset($_REQUEST["open"])){
-		if(!isset($_REQUEST["applicationid"])){
-			$_REQUEST["applications"] = array();
+	if(isset($_REQUEST['open'])){
+		if(!isset($_REQUEST['applicationid'])){
+			$_REQUEST['applications'] = array();
 			$show_all_apps = 1;
 		}
-		else if(!uint_in_array($_REQUEST["applicationid"],$_REQUEST["applications"])){
-			array_push($_REQUEST["applications"],$_REQUEST["applicationid"]);
+		else if(!uint_in_array($_REQUEST['applicationid'],$_REQUEST['applications'])){
+			array_push($_REQUEST['applications'],$_REQUEST['applicationid']);
 		}
 		
 	} 
-	elseif(isset($_REQUEST["close"])){
-		if(!isset($_REQUEST["applicationid"])){
-			$_REQUEST["applications"] = array();
+	elseif(isset($_REQUEST['close'])){
+		if(!isset($_REQUEST['applicationid'])){
+			$_REQUEST['applications'] = array();
 		}
-		else if(($i=array_search($_REQUEST["applicationid"], $_REQUEST["applications"])) !== FALSE){
-			unset($_REQUEST["applications"][$i]);
+		else if(($i=array_search($_REQUEST['applicationid'], $_REQUEST['applications'])) !== FALSE){
+			unset($_REQUEST['applications'][$i]);
 		}
 	}
 
 	/* limit opened application count */
-	while(count($_REQUEST["applications"]) > 25){
-		array_shift($_REQUEST["applications"]);
+	while(count($_REQUEST['applications']) > 25){
+		array_shift($_REQUEST['applications']);
 	}
 
 
-	update_profile("web.latest.applications",$_REQUEST["applications"],PROFILE_TYPE_ARRAY);
+	update_profile('web.latest.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY);
 ?>
 <?php
 	$r_form = new CForm();
