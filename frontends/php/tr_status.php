@@ -105,8 +105,18 @@ include_once "include/page_header.php";
 	$_REQUEST['noactions']		=	get_request('noactions', get_profile('web.tr_status.noactions', 'true'));
 	$_REQUEST['compact']		=	get_request('compact', get_profile('web.tr_status.compact', 'true'));
 
-	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');//,'always_select_first_host');
+	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
 	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
+	
+	$_REQUEST['hostid'] = get_request('hostid',get_profile('web.tr_status.hostid'));
+	if(!isset($_REQUEST['hostid'])){
+		array_push($options,'always_select_first_host');
+		
+		$_REQUEST['groupid'] = get_request('groupid',get_profile('web.tr_status.groupid'));
+		if(!isset($_REQUEST['groupid'])){
+			validate_group(PERM_READ_ONLY,array('allow_all_hosts','monitored_hosts','with_monitored_items','always_select_first_group'),'web.tr_status.groupid');
+		}
+	}
 	
 	validate_group_with_host(PERM_READ_ONLY,$options,'web.tr_status.groupid','web.tr_status.hostid');
 
