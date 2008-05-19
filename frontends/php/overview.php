@@ -51,11 +51,13 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!="")){
 	update_profile('web.overview.view.style',$_REQUEST['view_style']);
 	
 	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
-	
+
+	$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.last.groupid'));
 	if(!isset($_REQUEST['groupid'])){
 		array_push($options,'always_select_first_group');
-	}
-	
+		validate_group(PERM_READ_ONLY, $options, 'web.overview.groupid');
+	}	
+
 	validate_group(PERM_READ_ONLY,$options,'web.overview.groupid');
 
 	$_REQUEST["type"] = get_request("type",get_profile("web.overview.type",SHOW_TRIGGERS));

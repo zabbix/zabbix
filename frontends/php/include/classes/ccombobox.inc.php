@@ -99,8 +99,7 @@
 						if(str_in_array($value,$this->value))
 							$selected = 'yes';
 					}
-					else if(strcmp($value,$this->value) == 0)
-					{
+					else if(strcmp($value,$this->value) == 0){
 						$selected = 'yes';
 					}
 				}

@@ -51,9 +51,20 @@ include_once "include/page_header.php";
 	validate_sort_and_sortorder('i.description',ZBX_SORT_UP);
 	
 	$options = array("allow_all_hosts","monitored_hosts","with_monitored_items");//,"always_select_first_host");
+	
+	if(!isset($_REQUEST['hostid'])){
+		array_push($options,'always_select_first_host');
+		
+		$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.last.groupid'));
+		if(!isset($_REQUEST['groupid'])){
+			validate_group(PERM_READ_ONLY,array('allow_all_hosts','monitored_hosts','with_monitored_items','always_select_first_group'),'web.latest.last.groupid');
+		}
+	}
+
 	if(!$ZBX_WITH_SUBNODES)	array_push($options,"only_current_node");
 
 	validate_group_with_host(PERM_READ_ONLY,$options,'web.latest.last.groupid','web.latest.last.hostid');
+
 ?>
 <?php
 
@@ -96,7 +107,7 @@ include_once "include/page_header.php";
 	$r_form->SetMethod('get');
 
 	$r_form->AddVar("select",$_REQUEST["select"]);
-
+	
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
 
