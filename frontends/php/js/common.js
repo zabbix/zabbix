@@ -22,12 +22,14 @@ var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
 var SF = (agt.indexOf("safari") != -1);
 var KQ = (agt.indexOf("khtml") != -1) && (!SF);
 var GK = (agt.indexOf("gecko") != -1) && !KQ && !SF;
+var MC = (agt.indexOf('mac') != -1)
 
 function checkBrowser(){
 	if(OP) SDI('Opera');
 	if(IE) SDI('IE');
 	if(SF) SDI('Safari');
 	if(KQ) SDI('Konqueror');
+	if(MC) SDI('Mac');
 return 0;
 }
 

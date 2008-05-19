@@ -89,7 +89,7 @@
 		function AddItem($value, $caption='', $selected=NULL, $enabled='yes')
 		{
 //			if($enabled=='no') return;	/* disable item method 1 */
-			if(strtolower(get_class($value))=='ccomboitem') {
+			if(strtolower(get_class($value))=='ccomboitem'){
 				parent::AddItem($value);
 			}
 			else{

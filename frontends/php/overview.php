@@ -50,14 +50,20 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!="")){
 	$_REQUEST['view_style'] = get_request('view_style',get_profile('web.overview.view.style',STYLE_TOP));
 	update_profile('web.overview.view.style',$_REQUEST['view_style']);
 	
-	validate_group(PERM_READ_ONLY,array("allow_all_hosts","monitored_hosts","with_monitored_items"));
+	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
+	
+	if(!isset($_REQUEST['groupid'])){
+		array_push($options,'always_select_first_group');
+	}
+	
+	validate_group(PERM_READ_ONLY,$options);
 
 	$_REQUEST["type"] = get_request("type",get_profile("web.overview.type",SHOW_TRIGGERS));
 	update_profile("web.overview.type",$_REQUEST["type"]);
 
 	$form = new CForm();
 	$form->SetMethod('get');
-	
+
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	

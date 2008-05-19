@@ -168,7 +168,7 @@
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
 		
 		$sql = 	'SELECT g.graphid '.
-				' FROM graphs as g, graphs_items as gi, items as i '.
+				' FROM graphs g, graphs_items gi, items i '.
 				' WHERE g.graphid='.$graphid.
 					' AND g.graphid=gi.graphid '.
 					' AND i.itemid=gi.itemid '.
@@ -203,7 +203,7 @@
 		$result = array();
 		
 		$sql = 	'SELECT DISTINCT g.graphid '.
-				' FROM graphs as g, graphs_items as gi, items as i '.
+				' FROM graphs g, graphs_items gi, items i '.
 				' WHERE g.graphid=gi.graphid '.
 					(!empty($hostid)?' AND i.hostid='.$hostid:'').
 					' AND i.itemid=gi.itemid '.
@@ -215,7 +215,7 @@
 		}
 
 		$sql = 	'SELECT DISTINCT g.graphid '.
-				' FROM graphs as g, graphs_items as gi, items as i '.
+				' FROM graphs g, graphs_items gi, items i '.
 				' WHERE g.graphid=gi.graphid '.
 					(!empty($hostid)?' AND i.hostid='.$hostid:'').
 					' AND i.itemid=gi.itemid '.

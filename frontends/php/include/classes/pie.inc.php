@@ -102,7 +102,8 @@ function selectData(){
 				'SELECT h.itemid, '.
 					' avg(h.value) AS avg,min(h.value) AS min, '.
 					' max(h.value) AS max,max(h.clock) AS clock, max(i.lastvalue) as lst '.
-				' FROM history AS h LEFT JOIN items AS i ON h.itemid = i.itemid'.
+				' FROM history h '.
+					' LEFT JOIN items i ON h.itemid = i.itemid'.
 				' WHERE h.itemid='.$this->items[$i]['itemid'].
 					' AND h.clock>='.$from_time.
 					' AND h.clock<='.$to_time.
@@ -112,7 +113,8 @@ function selectData(){
 				'SELECT hu.itemid, '.
 					' avg(hu.value) AS avg,min(hu.value) AS min,'.
 					' max(hu.value) AS max,max(hu.clock) AS clock, max(i.lastvalue) as lst'.
-				' FROM history_uint AS hu LEFT JOIN items AS i ON hu.itemid = i.itemid'.
+				' FROM history_uint hu '.
+					' LEFT JOIN items i ON hu.itemid = i.itemid'.
 				' WHERE hu.itemid='.$this->items[$i]['itemid'].
 					' AND hu.clock>='.$from_time.
 					' AND hu.clock<='.$to_time.
@@ -124,7 +126,8 @@ function selectData(){
 				'SELECT t.itemid, '.
 					' avg(t.value_avg) AS avg,min(t.value_min) AS min,'.
 					' max(t.value_max) AS max,max(t.clock) AS clock, max(i.lastvalue) as lst'.
-				' FROM trends AS t LEFT JOIN items AS i ON t.itemid = i.itemid'.
+				' FROM trends t '.
+					' LEFT JOIN items i ON t.itemid = i.itemid'.
 				' WHERE t.itemid='.$this->items[$i]['itemid'].
 					' AND t.clock>='.$from_time.
 					' AND t.clock<='.$to_time.

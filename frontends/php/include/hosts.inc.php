@@ -873,9 +873,9 @@ require_once "include/items.inc.php";
  *
  * Author:
  *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
+ * 
  * Comments:
- *
+ *		Modified: by Aly
  */
 	function validate_group($perm, $options = array(),$group_var=null){
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
