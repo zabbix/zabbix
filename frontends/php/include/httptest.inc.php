@@ -389,7 +389,7 @@
 		return DBfetch(DBselect('select * from httptest where httptestid='.$httptestid));
 	}
 
-	function	&get_httpsteps_by_httptestid($httptestid)
+	function	get_httpsteps_by_httptestid($httptestid)
 	{
 		return DBselect('select * from httpstep where httptestid='.$httptestid);
 	}
@@ -402,5 +402,13 @@
 	function	get_httpstep_by_no($httptestid, $no)
 	{
 		return DBfetch(DBselect('select * from httpstep where httptestid='.$httptestid.' and no='.$no));
+	}
+	
+	function get_httptests_by_hostid($hostid){
+		$sql = 'SELECT DISTINCT ht.* '.
+				' FROM httptest ht, applications ap '.
+				' WHERE ap.hostid='.$hostid.
+					' AND ht.applicationid=ap.applicationid';
+		return DBselect($sql);
 	}
 ?>
