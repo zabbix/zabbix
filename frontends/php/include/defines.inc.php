@@ -440,7 +440,8 @@
 if((ini_get('mbstring.func_overload') > 5)){
 	define('ZBX_MBSTRINGS_OVERLOADED',1);
 	define('ZBX_EREG_SPACE_SYMB','\-');
-}else{
+}
+else{
 	define('ZBX_EREG_SPACE_SYMB','-');
 }
 	define('ZBX_EREG_INTERNAL_NAMES', '([0-9a-zA-Z_.[:space:][.'.ZBX_EREG_SPACE_SYMB.'.]$]+)');
