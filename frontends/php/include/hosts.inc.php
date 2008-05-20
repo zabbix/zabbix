@@ -22,6 +22,7 @@
 require_once "include/graphs.inc.php";
 require_once "include/triggers.inc.php";
 require_once "include/items.inc.php";
+require_once "include/httptest.inc.php";
 
 /* HOST GROUP functions */
 	function	add_host_to_group($hostid, $groupid){
@@ -444,6 +445,12 @@ require_once "include/items.inc.php";
 
 	// delete host profile
 		delete_host_profile($hostid);
+		
+	// delete web tests
+		$db_httptests = get_httptests_by_hostid($hostid);
+		while($db_httptest = DBfetch($db_httptests)){
+			delete_httptest($db_httptest['httptestid']);
+		}
 
 	// delete host
 		return DBexecute("delete from hosts where hostid=$hostid");
