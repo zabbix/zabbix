@@ -88,7 +88,7 @@ class CLdap{
 					}
 				}
 // needs version 3
-				if(!empty($this->cnf['referrals'])) {
+				if(!zbx_empty($this->cnf['referrals'])) {
 					if(!ldap_set_option($this->ds, LDAP_OPT_REFERRALS,$this->cnf['referrals'])){
 					   error('Setting LDAP referrals to off failed');		
 					}
@@ -196,7 +196,7 @@ class CLdap{
 		else {
 			$filter = "(ObjectClass=*)";
 		}
-		
+
 		$sr     = ldap_search($this->ds, $base, $filter);
 		$result = ldap_get_entries($this->ds, $sr);
 				
