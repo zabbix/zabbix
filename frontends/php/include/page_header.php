@@ -74,7 +74,7 @@ COpt::profiling_start("page");
 			if(!isset($page['title'])) $page['title'] = 'ZABBIX';
 			
 			if(defined('ZBX_DISTRIBUTED')){
-				if($curr_node_data = DBfetch(DBselect('select * from nodes where nodeid='.get_current_nodeid(false))))
+				if(isset($DB['DB']) && ($curr_node_data = DBfetch(DBselect('select * from nodes where nodeid='.get_current_nodeid(false)))))
 					$page['title'] .= ' ('.$curr_node_data['name'].')';
 			}
 			
