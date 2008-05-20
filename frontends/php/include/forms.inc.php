@@ -4154,7 +4154,7 @@
 
 		$frmHost->AddRow(S_NAME,S_ORIGINAL);
 
-		$grp_tb = new CTweenBox($frmHost,'groups',null,6);	
+		$grp_tb = new CTweenBox($frmHost,'groups',$groups,6);	
 		$db_groups=DBselect('SELECT DISTINCT groupid,name '.
 						' FROM groups '.
 						' WHERE groupid IN ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).') '.
