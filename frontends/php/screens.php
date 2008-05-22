@@ -330,7 +330,7 @@ include_once "include/page_header.php";
 				$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 			}
 			
- 			$script = 	'scrollinit(0,0,0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');
+ 			$script = 	'scrollinit(0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');
 						 showgraphmenu("iframe");';
 							
 			zbx_add_post_js($script); 

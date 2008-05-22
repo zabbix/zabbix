@@ -57,6 +57,8 @@ dom_period_span:	'',				// period container html obj
 
 px2time:			'',				// seconds in 1px
 
+dynamic:			'',				// how page updates, all page/graph only update
+
 
 initialize: function(stime, period){
 	
@@ -295,7 +297,9 @@ clear_params: function(){
 	this.start_event = new Object;
 	
 	this.dom_box = '';
+	
 	this.box = new Object;
+	this.box.width = 0;
 }
 }
 

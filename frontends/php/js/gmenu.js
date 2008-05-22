@@ -28,14 +28,14 @@ var _PE_GM = null;				// Periodical executer obj reference
 var GMENU_IMG_PATH='images/general/bar';
 //var cal = new calendar();
 
-function gmenuinit(top,left,period,bar_stime){
+function gmenuinit(bar_stime,period){
 	
-	gmenucreate(top,left);
+	gmenucreate(0,0);
 	
 	period = period || 3600;
 	bar_stime = bar_stime || 0;
 	
-	G_MENU = new gmenu(period,bar_stime);
+	G_MENU = new gmenu(bar_stime,period);
 	
 	G_MENU.gm_value = $('gmenu_period_value');
 	G_MENU.gm_type = $('gmenu_period_type');
@@ -181,7 +181,7 @@ period_type: 0,			// period value type
 							
 period_typename: new Array('Hours','Days','Weeks','Months','Years'),	//period value type 
 
-initialize: function(period, bstime){
+initialize: function(bstime,period){
 	this.bstime = parseInt(bstime);						// setting graph starttime
 	
 	if(this.bstime < 1000000000){

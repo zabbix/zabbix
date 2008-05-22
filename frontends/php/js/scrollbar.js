@@ -27,8 +27,8 @@ var SCROLL_BAR;
 var IMG_PATH='images/general/bar';
 //var cal = new calendar();
 
-function scrollinit(left,top,w,period,stime,timel,bar_stime){
-	if((typeof(top) == 'undefined') && (typeof(left) == 'undefined')){
+function scrollinit(w,period,stime,timel,bar_stime){
+	if(typeof(w) == 'undefined'){
 		throw "Parametrs haven't been sent properly";
 		return false;
 	}
@@ -39,11 +39,10 @@ function scrollinit(left,top,w,period,stime,timel,bar_stime){
 	stime = ('undefined' == typeof(stime))?0:stime;
 	bar_stime = ('undefined' == typeof(bar_stime))?0:bar_stime;
 
-	gmenuinit(top,left,period,bar_stime);
+	gmenuinit(bar_stime,period);
 
 	SCROLL_BAR = new scrollbar(stime,period,bar_stime,w);
-	SCROLL_BAR.showscroll(top,left);
-	
+
 	SCROLL_BAR.scrl_arrowleft.onmousedown = SCROLL_BAR.arrowmousedown.bind(SCROLL_BAR);
 	SCROLL_BAR.scrl_arrowright.onmousedown = SCROLL_BAR.arrowmousedown.bind(SCROLL_BAR);
 
@@ -97,8 +96,10 @@ scrl_arrowleft: '',			// html left arrow
 scrl_arrowright:'',			// html right arrow
 scrl_tabinfoleft: '',		// html object(div) where view info (left)
 scrl_tabinforight: '',		// html object(div) where view info (right)
-scrl_barbgl:'',					// size of left side +6 of bar 
-scrl_barbgr:'',					// size of right side +6 of bar 
+scrl_barbgl:'',				// size of left side +6 of bar 
+scrl_barbgr:'',				// size of right side +6 of bar 
+
+dom_graphs: new Array(),	// list of img objects (graphs), attached to this bar
 
 // status
 scrollmsover: 0,		// if mouse over scrollbar then = 1, out = 0
@@ -106,13 +107,17 @@ barmsdown: 0,			// if mousedown on bar = 1, else = 0
 arrowmsdown: 0,			// if mousedown on arrow = 1, else = 0
 arrow: '',				// pressed arrow (l/r)
 changed: 0,				// switches to 1, when scrollbar been moved or period changed
+disabled: 1,			// activates/disables scrollbar
 
 xp:	0,					// exponential of time length
 
 initialize: function(stime,period,bar_stime,width){ // where to put bar on start(time on graph)
 	try{
-		this.scrollcreate(0,0,width);		
+		if(empty(this.scrl_scroll)) this.scrollcreate(0,0,width);
+		
 		this.period = period;
+		this.barX = 0;
+		this.barW = 8+4+4;
 
 /************************************************************************
 *	 Do not change till you fully understand what you are doing.		*
@@ -131,12 +136,13 @@ initialize: function(stime,period,bar_stime,width){ // where to put bar on start
 			this.timeline = 3*this.period;
 			this.starttime = parseInt(this.dt.getTime()/1000 - this.timeline);
 		}
-		
+
 		if(!bar_stime) bar_stime = (this.dt.getTime()/1000) - this.period;
 
 		this.scrollbarMaxW = parseInt($('scroll_middle').style.width);
 
 		this.xp = Math.log(this.timeline) / this.scrollbarMaxW;
+		this.pxtime = 0;
 		
 		this.minbarW = this.time2px(3600);
 		this.minbarW = (this.minbarW<16)?16:this.minbarW;
@@ -145,16 +151,13 @@ initialize: function(stime,period,bar_stime,width){ // where to put bar on start
 
 		this.scrollbarW = parseInt(this.scrollbarMaxW) - this.barW;
 		this.calcpx2time();
-		
+
 		this.barX = this.time2px(bar_stime - this.starttime);
 		this.barX = this.checkbarX(0);
-		
-//SDI(this.barX+' : '+this.barW+' : '+this.scrollbarMaxW);	
-//SDI(this.barX+' : '+this.barW+' : '+this.scrollbarMaxW);
-
+//SDI(this.xp+' : '+this.period+' : '+bar_stime+' : '+this.starttime+" ---||--- "+this.barX+' : '+this.barW+' : '+this.scrollbarMaxW);		
 		this.barchangeW();
 		this.movescroll();
-		
+
 		this.settabinfo();
 
 		this.changed = 0; // we need to reset this attribute, because generaly we may already performe a movement
@@ -221,6 +224,7 @@ arrowmouseout: function(){
 },
 
 arrowmousedown: function(e){
+	if(this.disabled) return false;
 	e = e || window.event;
 
 	this.deselectall();
@@ -242,8 +246,11 @@ arrowmousedown: function(e){
 },
 
 arrowmousemove: function(e){
+	if(this.disabled) return false;
 	e = e || window.event;
 
+	if(this.arrowmsdown!=1) return false;
+	
 	if(this.arrow.id == 'arrow_l'){
 		this.arrowmousemove_L(e);
 	}
@@ -302,6 +309,8 @@ arrowmousemove_R: function(e){
 },
 
 arrowmouseup: function(e){
+	if(this.disabled) return false;
+	
 	this.period = this.calcperiod();
 	document.onmousemove = null;
 	this.arrowmsdown = 0;
@@ -314,26 +323,33 @@ arrowmouseup: function(e){
 ------------------------------ BAR CONTROLS ------------------------------
 ------------------------------------------------------------------------*/
 mousedown: function(e){
+	if(this.disabled) return false;
+	
 	e = e || window.event;
 	this.deselectall();
 
 	this.mouseStartX = parseInt(this.getmousexy(e).x);
 	this.prevmouseX = this.mouseStartX;
 	this.barStartX = this.barX;
-
+	
 	this.barmsdown = 1;
 	this.barmousedown();
 	document.onmousemove = this.mousemove.bind(this);
 },
 
 mousebarup: function(e){
+	if(this.disabled) return false;
+	
 	document.onmousemove = null;
 	this.barmsdown = 0;
 	this.onbarchange();	
 },
 
 mouseup: function(e){
+	if(this.disabled) return false;
+	
 	e = e || window.event;
+	
 	if(	this.barmsdown == 1){
 		this.mousebarup(e);
 	}
@@ -343,6 +359,8 @@ mouseup: function(e){
 },
 
 mousemove: function(e){
+	if(this.disabled) return false;
+	
 	e = e || window.event;
 		
 	var mousexy = this.getmousexy(e);
@@ -358,6 +376,8 @@ mousemove: function(e){
 
 //--- scrollmoves
 scrollmoveleft: function(){
+	if(this.disabled) return false;
+	
 	this.barmousedown();
 	
 	this.barX--;
@@ -365,6 +385,8 @@ scrollmoveleft: function(){
 	this.onbarchange();	
 },
 scrollmoveright: function(){
+	if(this.disabled) return false;
+	
 	this.barmousedown();
 	
 	this.barX++;
@@ -476,25 +498,6 @@ getmousexy: function(e){
 	};
 },
 
-datetoarray: function(unixtime){
-
-	var date = new Date();
-	date.setTime(unixtime*1000);
-	
-	var thedate = new Array();
-	thedate[0] = date.getDate();
-	thedate[1] = date.getMonth()+1;
-	thedate[2] = date.getFullYear();
-	thedate[3] = date.getHours();
-	thedate[4] = date.getMinutes();
-	thedate[5] = date.getSeconds();
-
-	for(i = 0; i < thedate.length; i++){
-		if((thedate[i]+'').length < 2) thedate[i] = '0'+thedate[i];
-	}
-return thedate;
-},
-
 deselectall: function(){
 	if(IE){
 		document.selection.empty();
@@ -517,9 +520,10 @@ arrowmovetoX: function(){
 
 //---bar
 period2bar: function(period){
-	this.barW = this.time2px(period);
+
+	this.barW = this.time2px(period);	
 	this.barW = this.checkbarW(0);
-	
+
 	this.barchangeW(this.barW);	
 },
 //-------------------------------
@@ -540,10 +544,10 @@ settabinfo: function(){
 		this.sdt.setTime(this.dt.getTime()-(this.period * 1000));
 	}
 	
-	var date = this.datetoarray((this.sdt.getTime() / 1000));
+	var date = datetoarray((this.sdt.getTime() / 1000));
 	this.scrl_tabinfoleft.innerHTML = this.FormatStampbyDHM(this.period)+" | "+date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4]+':'+date[5];
 	
-	var date = this.datetoarray((this.sdt.getTime() / 1000) + this.period);
+	var date = datetoarray((this.sdt.getTime() / 1000) + this.period);
 	this.scrl_tabinforight.innerHTML = date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4]+':'+date[5];
 },
 
@@ -555,11 +559,11 @@ return period;
 },
 
 getsTimeInUnix: function(){
-	return Math.round((this.starttime+(this.barX*this.pxtime)));
+	return parseInt(this.sdt.getTime()/1000);
 },
 
 getsTime: function(){
-	var date = this.datetoarray((this.sdt.getTime() / 1000));
+	var date = datetoarray(this.sdt.getTime() / 1000);
 return ''+date[2]+date[1]+date[0]+date[3]+date[4];
 },
 

@@ -1034,7 +1034,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	# Show History Graph
 	function show_history($itemid,$from,$stime,$period){
 		$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);   
-		show_table_header(S_TILL.SPACE.$till.' ('.($period/3600).' HOURs)');
+		
+		show_table_header(S_TILL.SPACE.$till.' ( '.zbx_date2age($stime,$stime+$period).' )');
 
 		$td = new CCol(get_js_sizeable_graph('graph','chart.php?itemid='.$itemid.
 				url_param($from,false,'from').
