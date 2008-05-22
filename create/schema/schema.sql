@@ -510,6 +510,7 @@ FIELD		|params		|t_item_param	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 UNIQUE		|1		|hostid,key_
 INDEX		|2		|nextcheck
 INDEX		|3		|status
+INDEX		|4		|templateid
 
 TABLE|items_applications|itemappid|ZBX_SYNC
 FIELD		|itemappid	|t_id		|'0'	|NOT NULL	|0
