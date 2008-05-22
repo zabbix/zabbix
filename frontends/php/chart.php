@@ -59,6 +59,14 @@ include_once "include/page_header.php";
 
 	$graph = new Chart();
 	
+	$effectiveperiod = navigation_bar_calc();
+
+	$_REQUEST['period'] = get_request('period',get_profile('web.item['.$_REQUEST['itemid'].'].graph.period', ZBX_PERIOD_DEFAULT));
+	if($_REQUEST['period'] >= ZBX_MIN_PERIOD){
+		update_profile('web.item['.$_REQUEST['itemid'].'].graph.period',$_REQUEST['period']);
+	}
+
+	
 	if(isset($_REQUEST["period"]))		$graph->SetPeriod($_REQUEST["period"]);
 	if(isset($_REQUEST["from"]))		$graph->SetFrom($_REQUEST["from"]);
 	if(isset($_REQUEST["width"]))		$graph->SetWidth($_REQUEST["width"]);

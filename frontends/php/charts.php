@@ -391,10 +391,10 @@ include_once 'include/page_header.php';
 			$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 		}
 		
-		$script = 'scrollinit(0,0,0,'.$effectiveperiod.','.$stime.',0,'.$bstime.'); showgraphmenu("graph");';
+		$script = 'scrollinit(0,'.$effectiveperiod.','.$stime.',0,'.$bstime.'); showgraphmenu("graph");';
 		
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){		
-			$script.= 'graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH,'.$graph_height.');'; 
+			$script.= 'graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH,'.$graph_height.',true);'; 
 		}
 
 		zbx_add_post_js($script);

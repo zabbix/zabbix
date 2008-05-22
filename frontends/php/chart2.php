@@ -54,7 +54,15 @@ include_once 'include/page_header.php';
 	if(!graph_accessible($_REQUEST['graphid'])){
 		access_deny();
 	}
-
+	
+	$effectiveperiod = navigation_bar_calc();
+	
+	if(($_REQUEST['graphid']>0) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD)){
+		update_profile('web.graph['.$_REQUEST['graphid'].'].period',$_REQUEST['period']);
+	}
+	
+	update_profile('web.charts.graphid',$_REQUEST['graphid']);	
+		
 	$sql = 'SELECT g.*,h.host,h.hostid '.
 				' FROM graphs g '.
 					' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.

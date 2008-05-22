@@ -261,10 +261,10 @@ include_once "include/page_header.php";
 		$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 	}
 	
-	$script = 	'scrollinit(0,0,0,'.$period.','.$stime.',0,'.$bstime.');
+	$script = 	'scrollinit(0,'.$period.','.$stime.',0,'.$bstime.');
 				showgraphmenu("graph");
-				graph_zoom_init("graph_1",'.$bstime.','.$period.',ZBX_G_WIDTH, 150);
-				graph_zoom_init("graph_2",'.$bstime.','.$period.',ZBX_G_WIDTH, 150);';
+				graph_zoom_init("graph_1",'.$bstime.','.$period.',ZBX_G_WIDTH, 150, false);
+				graph_zoom_init("graph_2",'.$bstime.','.$period.',ZBX_G_WIDTH, 150, false);';
 					
 	zbx_add_post_js($script); 
 
