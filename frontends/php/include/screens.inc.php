@@ -400,7 +400,8 @@
 						$g_img->AddOPtion('id',$dom_graph_id);
 
 						$item = new CLink($g_img,$action);
-						if(!is_null($graphid)){
+
+						if(!is_null($graphid) && ($editmode != 1)){
 							insert_js('	A_SBOX["'.$dom_graph_id.'"] = new Object;'.
 										'A_SBOX["'.$dom_graph_id.'"].shiftT = 17;'.
 										'A_SBOX["'.$dom_graph_id.'"].shiftL = '.$shiftXleft.';'
@@ -413,7 +414,7 @@
 							else{
 								$stime = 'null';
 							}
-							zbx_add_post_js('graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.');');
+							zbx_add_post_js('graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
 						}
 					}
 				}

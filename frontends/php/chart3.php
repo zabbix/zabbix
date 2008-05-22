@@ -19,33 +19,33 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/graphs.inc.php";
-	require_once "include/classes/chart.inc.php";
+	require_once 'include/config.inc.php';
+	require_once 'include/graphs.inc.php';
+	require_once 'include/classes/chart.inc.php';
 	
-	$page["file"]	= "chart3.php";
-	$page["title"]	= "S_CHART";
-	$page["type"]	= PAGE_TYPE_IMAGE;
+	$page['file']	= 'chart3.php';
+	$page['title']	= 'S_CHART';
+	$page['type']	= PAGE_TYPE_IMAGE;
 
-include_once "include/page_header.php";
+include_once 'include/page_header.php';
 
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"period"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
-		"from"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
-		"stime"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
-		"border"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
-		"name"=>	array(T_ZBX_STR, O_OPT,	NULL,		null,			null),
-		"width"=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
-		"height"=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
-		"yaxistype"=>	array(T_ZBX_INT, O_OPT,	NULL,		IN("0,1,2"),		null),
-		"graphtype"=>	array(T_ZBX_INT, O_OPT,	NULL,		IN("0,1"),		null),
-		"yaxismin"=>	array(T_ZBX_DBL, O_OPT,	NULL,		BETWEEN(-65535,65535),	null),
-		"yaxismax"=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,	null),
-		"yaxismax"=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,	null),
-		"items"=>	array(T_ZBX_STR, O_OPT,	NULL,		null,			null)
+		'period'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
+		'from'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
+		'stime'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
+		'border'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
+		'name'=>	array(T_ZBX_STR, O_OPT,	NULL,		null,			null),
+		'width'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
+		'height'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
+		'yaxistype'=>	array(T_ZBX_INT, O_OPT,	NULL,		IN('0,1,2'),		null),
+		'graphtype'=>	array(T_ZBX_INT, O_OPT,	NULL,		IN('0,1'),		null),
+		'yaxismin'=>	array(T_ZBX_DBL, O_OPT,	NULL,		BETWEEN(-65535,65535),	null),
+		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,	null),
+		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,	null),
+		'items'=>	array(T_ZBX_STR, O_OPT,	NULL,		null,			null)
 	);
 
 	check_fields($fields);
@@ -64,37 +64,37 @@ include_once "include/page_header.php";
 			access_deny();
 		}
 	}
+	
+	$graph = new Chart(get_request('graphtype'	,GRAPH_TYPE_NORMAL));
 
-	$graph = new Chart(get_request("graphtype"	,GRAPH_TYPE_NORMAL));
-
-	$graph->SetHeader($host["host"].":".get_request("name",""));
+	$graph->SetHeader($host['host'].':'.get_request('name',''));
 
 	unset($host);
 
-	if(isset($_REQUEST["period"]))		$graph->SetPeriod($_REQUEST["period"]);
-	if(isset($_REQUEST["from"]))		$graph->SetFrom($_REQUEST["from"]);
-	if(isset($_REQUEST["stime"]))		$graph->SetSTime($_REQUEST["stime"]);
-	if(isset($_REQUEST["border"]))		$graph->SetBorder(0);
+	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
+	if(isset($_REQUEST['from']))		$graph->SetFrom($_REQUEST['from']);
+	if(isset($_REQUEST['stime']))		$graph->SetSTime($_REQUEST['stime']);
+	if(isset($_REQUEST['border']))		$graph->SetBorder(0);
 
-	$graph->SetWidth(get_request("width",		900));
-	$graph->SetHeight(get_request("height",		200));
+	$graph->SetWidth(get_request('width',		900));
+	$graph->SetHeight(get_request('height',		200));
 
-	$graph->ShowWorkPeriod(get_request("showworkperiod"	,1));
-	$graph->ShowTriggers(get_request("showtriggers"		,1));
-	$graph->SetYAxisType(get_request("yaxistype"		,GRAPH_YAXIS_TYPE_CALCULATED));
-	$graph->SetYAxisMin(get_request("yaxismin"		,0.00));
-	$graph->SetYAxisMax(get_request("yaxismax"		,100.00));
+	$graph->ShowWorkPeriod(get_request('showworkperiod'	,1));
+	$graph->ShowTriggers(get_request('showtriggers'		,1));
+	$graph->SetYAxisType(get_request('yaxistype'		,GRAPH_YAXIS_TYPE_CALCULATED));
+	$graph->SetYAxisMin(get_request('yaxismin'		,0.00));
+	$graph->SetYAxisMax(get_request('yaxismax'		,100.00));
 
 	foreach($items as $id => $gitem)
 	{
 		$graph->AddItem(
-			$gitem["itemid"],
-			$gitem["yaxisside"],
-			$gitem["calc_fnc"],
-			$gitem["color"],
-			$gitem["drawtype"],
-			$gitem["type"],
-			$gitem["periods_cnt"]
+			$gitem['itemid'],
+			$gitem['yaxisside'],
+			$gitem['calc_fnc'],
+			$gitem['color'],
+			$gitem['drawtype'],
+			$gitem['type'],
+			$gitem['periods_cnt']
 			);
 
 		unset($items[$id]);
@@ -103,6 +103,6 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once 'include/page_footer.php';
 
 ?>

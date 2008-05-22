@@ -28,7 +28,7 @@ function hidegraphmenu(pe){
 	_PE_SB.stop();
 	_PE_SB = null;
 	
-	if((G_MENU.gmenumsover == 0 ) && (SCROLL_BAR.barmsdown == 0) && (SCROLL_BAR.arrowmsdown == 0)){
+	if((G_MENU.gmenumsover == 0 ) && (SCROLL_BAR.barmsdown == 0) && (SCROLL_BAR.arrowmsdown == 0) && (SCROLL_BAR.changed == 1)){
 		graphsubmit();
 	}
 }
@@ -38,19 +38,25 @@ function showgraphmenu(obj_id){
 	var obj = $(obj_id);
 	if((typeof(obj) == 'undefined')) return false;
 	
+	var period_exec = 2;
+	if(obj.nodeName.toLowerCase() == 'img'){
+		SCROLL_BAR.dom_graphs.push(obj);
+		addListener(obj,'load',function(){SCROLL_BAR.disabled=0;});
+		period_exec = 0.01;
+	}
+
 	var pos = getPosition(obj);
 	pos.top+=obj.offsetHeight+18;
 	
-	var scrl = $('scroll');
-	scrl.style.top = pos.top+"px";
-	scrl.style.left = 1+"px";
+	SCROLL_BAR.scrl_scroll.style.top = pos.top+"px"; // 110 = G_MENU height
+	SCROLL_BAR.scrl_scroll.style.left = 1+"px";
 	
 	G_MENU.gm_gmenu.style.top = (pos.top-108)+"px"; // 110 = G_MENU height
 	G_MENU.gm_gmenu.style.left = 1+"px";
 	
 	SCROLL_BAR.onchange = function(){
 		if(is_null(_PE_SB)){
-			_PE_SB = new PeriodicalExecuter(hidegraphmenu,2);
+			_PE_SB = new PeriodicalExecuter(hidegraphmenu,period_exec);
 		}
 	}
 	
@@ -66,8 +72,10 @@ function showgraphmenu(obj_id){
 //	G_MENU.gmenumouseout = function(){G_MENU.gmenuhide(); }
 	
 	var gmshow = function(){
+		if(SCROLL_BAR.disabled) return false;
+		
 		if(SCROLL_BAR.changed == 1){
-			G_MENU.gmenushow(SCROLL_BAR.period,SCROLL_BAR.getsTimeInUnix());
+			G_MENU.gmenushow(SCROLL_BAR.getsTimeInUnix(),SCROLL_BAR.period);
 		}
 		else{
 			G_MENU.gmenushow();
@@ -76,66 +84,24 @@ function showgraphmenu(obj_id){
 	
 	addListener($('scroll_calendar'),'click',gmshow,false);
 	
-	
 	if(IE){
 		SCROLL_BAR.settabinfo();
 		try{$('scroll_calendar').setStyle({'border' : '0px white solid;'});}
 		catch(e){}
 	}
-	scrl.style.visibility = 'visible';
-}
-
-function graphsubmit(){
-	var scrl = $('scroll');
-
-	scrl.style.display = 'none';
-
-	var uri = new url(location.href);
-	var stime = SCROLL_BAR.getsTime();
-
-	if((SCROLL_BAR.dt.getTime()-(SCROLL_BAR.period * 1000)) == SCROLL_BAR.sdt.getTime()){
-//	alert((SCROLL_BAR.dt.getTime()-(SCROLL_BAR.period * 1000))+' != '+SCROLL_BAR.sdt.getTime());		
-		stime=parseInt(stime)+100000000;
-	}
-
-	uri.setArgument('stime', stime);
-	uri.setArgument('period', SCROLL_BAR.getPeriod());
-
-	location.href = uri.getUrl();
-}
-
-function gmenuload(){
 	
-	var date = datetoarray(G_MENU.bstime);
-	
-	var stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
-	var uri = new url(location.href);
-
-	uri.setArgument('stime', stime);
-	uri.setArgument('period', G_MENU.period);
-	
-	location.href = uri.getUrl();
+	SCROLL_BAR.scrl_scroll.style.visibility = 'visible';
+	SCROLL_BAR.disabled=0;
 }
 
 
-function sboxload(){
-	var date = datetoarray(parseInt(this.stime));	// `this` becomes related to the object who ownes that function!!
-//SDI(this.sbox_id);
-	var stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
-
-	var uri = new url(location.href);
-	
-	uri.setArgument('stime', stime);
-	uri.setArgument('period', this.period);
-
-	location.href = uri.getUrl();
-}
-
-function graph_zoom_init(graph_id,stime,period,width,height){
+function graph_zoom_init(graph_id,stime,period,width,height, dynamic){
 	if((typeof(graph_id) == 'undefined') || empty(graph_id)) return;
+	dynamic = dynamic || 0;
 	
 	A_SBOX[graph_id].sbox = sbox_init(stime,period);
 	A_SBOX[graph_id].sbox.sbox_id = graph_id;
+	A_SBOX[graph_id].sbox.dynamic = dynamic;
 	
 	var igraph = $(graph_id);	
 	var boxongraph = create_box_on_obj(igraph.parentNode);
@@ -179,6 +145,93 @@ function graph_zoom_init(graph_id,stime,period,width,height){
 	if(KQ){
 		setTimeout('A_SBOX['+graph_id+'].sbox.moveSBoxByObj('+graph_id+');',500);
 	}
+}
+
+function graphload(dom_objects,unix_stime,period,dynamic){
+
+	if(period < 3600) return false;
+	
+	var date = datetoarray(unix_stime);
+	var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
+	
+	if((typeof(SCROLL_BAR) != 'undefined') && SCROLL_BAR.changed){
+		if((SCROLL_BAR.dt.getTime()-(SCROLL_BAR.period * 1000)) == SCROLL_BAR.sdt.getTime()){
+			url_stime=parseInt(url_stime)+100000000;
+		}
+	}
+
+
+	if(empty(dom_objects) || !dynamic){
+		dynamic = 0;
+		dom_objects = new Array(location);
+	}
+	
+	dynamic = dynamic || 0;
+	var src = '';
+	var uri = '';
+	
+	if(!is_array(dom_objects)) dom_objects = new Array($(dom_objects));
+
+	if(dynamic){
+		for(var i=0; i<dom_objects.length; i++){
+			if((typeof(dom_objects[i].nodeName) == 'undefined') && (dom_objects[i].nodeName.toLowerCase() != 'img')){
+				continue;
+			}
+// SBOX			
+			A_SBOX[dom_objects[i].id].sbox.obj.stime = unix_stime;
+			A_SBOX[dom_objects[i].id].sbox.obj.period = period;
+//------
+//SCROLL_BAR
+			SCROLL_BAR.initialize(SCROLL_BAR.starttime,period,unix_stime,0)
+
+			SCROLL_BAR.scrl_tabinfoleft.innerHTML = SCROLL_BAR.FormatStampbyDHM(period)+" | "+date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4]+':'+date[5];
+
+			date = datetoarray(unix_stime + (parseInt(period/60)*60));
+			SCROLL_BAR.scrl_tabinforight.innerHTML = date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4]+':'+date[5];
+
+//----------
+//GMENU
+			G_MENU.initialize(unix_stime,period);
+			
+			G_MENU.syncBSDateByBSTime();
+		
+			G_MENU.calcPeriodAndTypeByUnix(period);
+			G_MENU.setBSDate();
+			G_MENU.setPeriod();
+			G_MENU.setPeriodType();
+//---------
+//alert(url_stime);
+			uri = new url(dom_objects[i].src);
+			uri.setArgument('stime', url_stime);
+			uri.setArgument('period', period);
+			
+			dom_objects[i].src = uri.getUrl();
+		}
+	}
+	else{
+		uri = new url(dom_objects[0].href);
+		uri.setArgument('stime', url_stime);
+		uri.setArgument('period', period);
+
+		dom_objects[0].href = uri.getUrl();
+	}	
+}
+
+function graphsubmit(){
+	SCROLL_BAR.disabled = 1;
+	SCROLL_BAR.changed = 0;
+	graphload(SCROLL_BAR.dom_graphs, SCROLL_BAR.getsTimeInUnix(), SCROLL_BAR.getPeriod(), (SCROLL_BAR.dom_graphs.length > 0));
+}
+
+function gmenuload(){
+	G_MENU.gmenuhide();
+	graphload(SCROLL_BAR.dom_graphs, G_MENU.bstime, G_MENU.period, (SCROLL_BAR.dom_graphs.length > 0));		
+}
+
+
+function sboxload(){
+	var igraph = $(this.sbox_id);
+	graphload(igraph, parseInt(this.stime), this.period, this.dynamic);	
 }
 
 function datetoarray(unixtime){

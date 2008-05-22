@@ -56,7 +56,7 @@ include_once "include/page_header.php";
 	if(!graph_accessible($_REQUEST['graphid'])){
 		access_deny();
 	}
-
+	
 	$sql = 'SELECT g.*,h.host,h.hostid '.
 				' FROM graphs g '.
 					' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.

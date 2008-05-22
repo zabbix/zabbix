@@ -62,7 +62,17 @@ include_once "include/page_header.php";
 			access_deny();
 		}
 	}
+	
+	
+	$effectiveperiod = navigation_bar_calc();
 
+	if(count($items) == 1){
+		$_REQUEST['period'] = get_request('period',get_profile('web.item['.$items['itemid'].'].graph.period', ZBX_PERIOD_DEFAULT));
+		if($_REQUEST['period'] >= ZBX_MIN_PERIOD){
+			update_profile('web.item['.$items['itemid'].'].graph.period',$_REQUEST['period']);
+		}
+	}
+	
 	$graph = new Pie(get_request("graphtype"	,GRAPH_TYPE_NORMAL));
 	$graph->SetHeader($host["host"].":".get_request("name",""));
 	
