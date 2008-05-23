@@ -49,7 +49,7 @@ class CLdap{
 				'referrals'=> 		0,
 				'version'=> 		3,
 				
-				'starttls'=>		false,
+				'starttls'=>		null,
 				'deref'=>			null,
 			);
 
@@ -82,7 +82,7 @@ class CLdap{
 			}
 			else{
 //use TLS (needs version 3)
-				if(!empty($this->cnf['starttls'])){
+				if(isset($this->cnf['starttls'])){
 					if(!ldap_start_tls($this->ds)){
 						error('Starting TLS failed');
 					}

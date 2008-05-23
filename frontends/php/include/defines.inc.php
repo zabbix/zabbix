@@ -23,6 +23,7 @@
 	
 	define('ZBX_AUTH_INTERNAL',	0);
 	define('ZBX_AUTH_LDAP',		1);
+	define('ZBX_AUTH_HTTP',		2);
 	
 	define('PAGE_TYPE_HTML',		0);
 	define('PAGE_TYPE_IMAGE',		1);
