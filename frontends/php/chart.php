@@ -50,9 +50,9 @@ include_once "include/page_header.php";
 //		show_message(S_NO_ITEM_DEFINED);
 	}
 
-	if(! ($db_data = DBfetch(DBselect("select i.itemid from items i ".
-		" where i.hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).") ".
-		" and i.itemid=".$_REQUEST["itemid"]))))
+	if(! ($db_data = DBfetch(DBselect('SELECT i.itemid from items i '.
+		' WHERE i.hostid IN ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).') '.
+			' AND i.itemid='.$_REQUEST['itemid']))))
 	{
 		access_deny();
 	}

@@ -44,7 +44,7 @@
 	$sessionid = get_cookie('zbx_sessionid', null);
 	
 	if(isset($_REQUEST["reconnect"]) && isset($sessionid)){
-		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,"Manual Logout");
+		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,'Manual Logout');
 		
 		zbx_unsetcookie('zbx_sessionid');
 		DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
@@ -55,10 +55,21 @@
 //		return;
 	}
 
-	if(isset($_REQUEST["enter"])&&($_REQUEST["enter"]=="Enter")){
-	
-		$config = select_config();
+	$config = select_config();
+	if($config['authentication_type'] == ZBX_AUTH_HTTP){
 		
+		if(isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])){
+			$_REQUEST['enter'] = 'Enter';
+			$_REQUEST['name'] = $_SERVER["PHP_AUTH_USER"];
+//			$_REQUEST['password'] = $_SERVER["PHP_AUTH_PW"];
+		}
+		else{
+			access_deny();
+		}
+	}
+	
+	if(isset($_REQUEST['enter'])&&($_REQUEST['enter']=='Enter')){
+	
 		$name = get_request('name','');
 		$password = md5(get_request('password',''));
 		
@@ -76,6 +87,9 @@
 				case ZBX_AUTH_LDAP:
 					$login = ldap_authentication($name,get_request('password',''));
 					break;
+				case ZBX_AUTH_HTTP:
+					$login = true;
+					break;
 				case ZBX_AUTH_INTERNAL:
 				default:
 					$alt_auth = ZBX_AUTH_INTERNAL;
@@ -91,11 +105,11 @@
 							' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
 		}
 		
-// update internal pass if it's different
+/* update internal pass if it's different
 		if($login && ($row['passwd']!=$password) && (ZBX_AUTH_INTERNAL!=$config['authentication_type'])){
 			DBexecute('UPDATE users SET passwd='.zbx_dbstr($password).' WHERE userid='.zbx_dbstr($row['userid']));
 		}
-		
+*/		
 		if($login){
 			$login = (check_perm2login($row['userid']) && check_perm2system($row['userid']));
 		}
@@ -138,16 +152,23 @@
 	}
 
 include_once "include/page_header.php";
-	
+
 	if(isset($_REQUEST['message'])) show_error_message($_REQUEST['message']);
 
 	if(!isset($sessionid)){
-		insert_login_form();
+		switch($config['authentication_type']){
+			case ZBX_AUTH_HTTP:
+				break;
+			case ZBX_AUTH_LDAP:
+			case ZBX_AUTH_INTERNAL:
+			default:
+			insert_login_form();
+		}
+
 	}
 	else{
-		$logoff = new CLink('here', '?reconnect=1', 'styled');
 		echo '<div align="center" class="textcolorstyles">Welcome to ZABBIX! You are connected as <b>'.$USER_DETAILS['alias'].'</b>.</div>';
-	}	
+	}
 ?>
 <?php
 

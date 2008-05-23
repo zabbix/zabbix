@@ -23,17 +23,13 @@
 
 	require_once 	"include/users.inc.php";
 
-	function	insert_slideshow_form()
-	{
-		global $_REQUEST;
-
+	function insert_slideshow_form(){
 		$form = new CFormTable(S_SLIDESHOW, null, 'post');
 		$form->SetHelp('config_advanced.php');
 		
 		$form->AddVar('config', 1);
 			
-		if(isset($_REQUEST['slideshowid']))
-		{
+		if(isset($_REQUEST['slideshowid'])){
 			$form->AddVar('slideshowid', $_REQUEST['slideshowid']);
 		}
 
@@ -43,16 +39,15 @@
 
 		$new_step	= get_request('new_step', null);
 		
-		if((isset($_REQUEST['slideshowid']) && !isset($_REQUEST['form_refresh'])))
-		{
+		if((isset($_REQUEST['slideshowid']) && !isset($_REQUEST['form_refresh']))){
 			$slideshow_data = DBfetch(DBselect('SELECT * FROM slideshows WHERE slideshowid='.$_REQUEST['slideshowid']));
 		
 			$name		= $slideshow_data['name'];
 			$delay		= $slideshow_data['delay'];
 			$steps		= array();
 			$db_steps = DBselect('SELECT * FROM slides WHERE slideshowid='.$_REQUEST['slideshowid'].' order by step');
-			while($step_data = DBfetch($db_steps))
-			{
+			
+			while($step_data = DBfetch($db_steps)){
 				$steps[$step_data['step']] = array(
 						'screenid' => $step_data['screenid'],
 						'delay' => $step_data['delay']
@@ -66,14 +61,13 @@
 		
 		$tblSteps = new CTableInfo(S_NO_SLIDES_DEFINED);
 		$tblSteps->SetHeader(array(S_SCREEN, S_DELAY, SPACE));
-		if(count($steps) > 0)
-		{
+		if(count($steps) > 0){
 			ksort($steps);
 			$first = min(array_keys($steps));
 			$last = max(array_keys($steps));
 		}
-		foreach($steps as $sid => $s)
-		{
+		
+		foreach($steps as $sid => $s){
 			if( !isset($s['screenid']) ) $s['screenid'] = 0;
 
 			if(isset($s['delay']) && $s['delay'] > 0 )
@@ -82,15 +76,13 @@
 				$s['delay'] = $delay;
 			
 			$up = null;
-			if($sid != $first)
-			{
+			if($sid != $first){
 				$up = new CLink(S_UP,'#','action');
 				$up->OnClick("return create_var('".$form->GetName()."','move_up',".$sid.", true);");
 			}
 			
 			$down = null;
-			if($sid != $last)
-			{
+			if($sid != $last){
 				$down = new CLink(S_DOWN,'#','action');
 				$down->OnClick("return create_var('".$form->GetName()."','move_down',".$sid.", true);");
 			}

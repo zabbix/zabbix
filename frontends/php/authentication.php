@@ -32,7 +32,7 @@ include_once('include/page_header.php');
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
-		'config'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('0'),	NULL),
+		'config'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('1,2'),	NULL),
 
 // LDAP form
 		'ldap_host'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,			'isset({config})&&({config}==0)&&(isset({save})||isset({test}))'),
@@ -45,7 +45,7 @@ include_once('include/page_header.php');
 		
 		'ldap_search_attribute'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,			'isset({config})&&({config}==0)&&(isset({save})||isset({test}))'),
 		
-		'authentication_type'=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),			NULL),
+		'authentication_type'=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1,2'),			NULL),
 		
 		'user_password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==0)&&(isset({authentication_type})||isset({test}))'),
 
@@ -60,7 +60,7 @@ include_once('include/page_header.php');
 ?>
 
 <?php
-	$_REQUEST['config'] = get_request('config',get_profile('web.authentication.config',0));
+	$_REQUEST['config'] = get_request('config',get_profile('web.authentication.config',ZBX_AUTH_LDAP));
 	check_fields($fields);
 	
 	update_profile('web.authentication.config',$_REQUEST['config']);
@@ -68,7 +68,7 @@ include_once('include/page_header.php');
 	$_REQUEST['authentication_type'] = get_request('authentication_type',ZBX_AUTH_INTERNAL);
 	
 	$result = 0;
-	if($_REQUEST['config']==0){
+	if($_REQUEST['config']==ZBX_AUTH_LDAP){
 		if(isset($_REQUEST['save'])){
 	
 			$config=select_config();
@@ -117,6 +117,36 @@ include_once('include/page_header.php');
 			show_messages($result, S_LDAP.SPACE.S_LOGIN.SPACE.S_SUCCESSFUL_SMALL, S_LDAP.SPACE.S_LOGIN.SPACE.S_WAS_NOT.SPACE.S_SUCCESSFUL_SMALL);
 		}
 	}
+	if(ZBX_AUTH_HTTP==$_REQUEST['config']){
+		if(isset($_REQUEST['save'])){
+		
+			$config=select_config();
+
+			$cur_auth_type = $config['authentication_type'] ;
+			$config['authentication_type'] = ZBX_AUTH_HTTP;
+			
+			foreach($config as $id => $value){
+				if(isset($_REQUEST[$id])){
+					$config[$id] = $_REQUEST[$id];
+				}
+				else{
+					unset($config[$id]);
+				}
+			}
+
+// If we do save and auth_type changed or is set to LDAP, reset all sessions 
+			if(($cur_auth_type<>$config['authentication_type']) || (ZBX_AUTH_HTTP == $config['authentication_type'])){
+				DBexecute('DELETE FROM sessions WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
+			}
+			$result=update_config($config);
+	
+			show_messages($result, S_HTTP_AUTH.SPACE.S_UPDATED, S_HTTP_AUTH.SPACE.S_WAS_NOT.SPACE.S_UPDATED);
+	
+			if($result){
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,S_HTTP_AUTH);
+			}
+		}
+	}
 	show_messages();
 ?>
 <?php
@@ -124,7 +154,8 @@ include_once('include/page_header.php');
 	$form = new CForm('authentication.php');
 	$form->SetMethod('get');
 	$cmbConfig = new CCombobox('config',$_REQUEST['config'],'submit()');
-	$cmbConfig->AddItem(0,S_LDAP);
+	$cmbConfig->AddItem(ZBX_AUTH_LDAP,S_LDAP);
+	$cmbConfig->AddItem(ZBX_AUTH_HTTP,S_HTTP);
 
 	$form->AddItem($cmbConfig);
 
@@ -133,7 +164,7 @@ include_once('include/page_header.php');
 ?>
 
 <?php
-	if($_REQUEST['config']==0){
+	if(ZBX_AUTH_LDAP==$_REQUEST['config']){
 		$config=select_config();
 
 		if(isset($_REQUEST['form_refresh'])){
@@ -152,7 +183,7 @@ include_once('include/page_header.php');
 		
 		$frmAuth = new CFormTable(S_LDAP,'authentication.php');
 		$frmAuth->SetHelp('web.authentication.php');
-		$frmAuth->AddVar('config',get_request('config',0));
+		$frmAuth->AddVar('config',get_request('config',ZBX_AUTH_LDAP));
 		$frmAuth->AddVar('form_refresh',$form_refresh);
 
 		$frmAuth->AddRow(S_LDAP.SPACE.S_HOST, new CTextBox('ldap_host',$config['ldap_host'],64));
@@ -175,6 +206,34 @@ include_once('include/page_header.php');
 
 		$frmAuth->AddItemToBottomRow(new CButton('save',S_SAVE));
 		$frmAuth->AddItemToBottomRow(new CButton('test',S_TEST));
+		$frmAuth->Show();
+	}
+	else if(ZBX_AUTH_HTTP==$_REQUEST['config']){
+		$config=select_config();
+
+		if(isset($_REQUEST['form_refresh'])){
+			foreach($config as $id => $value){
+				if(isset($_REQUEST[$id])){
+					$config[$id] = $_REQUEST[$id];
+				}
+				else{
+					unset($config[$id]);
+				}
+			}
+		}
+
+		$form_refresh = get_request('form_refresh',0);
+		$form_refresh++;
+		
+		$frmAuth = new CFormTable(S_HTTP_AUTH,'authentication.php');
+		$frmAuth->SetHelp('web.authentication.php');
+		$frmAuth->AddVar('config',get_request('config',ZBX_AUTH_HTTP));
+		$frmAuth->AddVar('form_refresh',$form_refresh);
+
+		$action = "javascript: if(confirm('Switching HTTP authentication will delete all current sessions! Continue?')) return true; else return false;";
+		$frmAuth->AddRow(S_HTTP_AUTH.SPACE.S_ENABLED, new CCheckBox('authentication_type', (ZBX_AUTH_HTTP == $config['authentication_type']), $action, ZBX_AUTH_HTTP));
+
+		$frmAuth->AddItemToBottomRow(new CButton('save',S_SAVE));
 		$frmAuth->Show();
 	}
 
