@@ -509,6 +509,7 @@
 	'S_WAS_NOT'=>						'was not',
 	'S_SUCCESSFUL_SMALL'=>				'successful',
 	'S_MUST_BE_VALID_SMALL'=>			'must be valid',
+	'S_HTTP_AUTH'=>						'HTTP Authentication',
 	
 
 //	Latest values
