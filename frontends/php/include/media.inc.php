@@ -22,10 +22,10 @@
 
 	function	media_type2str($type)
 	{
-		$str_type[ALERT_TYPE_EMAIL]	= S_EMAIL;
-		$str_type[ALERT_TYPE_EXEC]	= S_SCRIPT;
-		$str_type[ALERT_TYPE_SMS]	= S_SMS;
-		$str_type[ALERT_TYPE_JABBER]	= S_JABBER;
+		$str_type[MEDIA_TYPE_EMAIL]	= S_EMAIL;
+		$str_type[MEDIA_TYPE_EXEC]	= S_SCRIPT;
+		$str_type[MEDIA_TYPE_SMS]	= S_SMS;
+		$str_type[MEDIA_TYPE_JABBER]	= S_JABBER;
 		
 		if(isset($str_type[$type]))
 			return $str_type[$type];

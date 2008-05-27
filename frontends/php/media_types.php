@@ -36,15 +36,15 @@ include_once "include/page_header.php";
 
 // media form
 		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
-		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN(implode(',',array(ALERT_TYPE_EMAIL,ALERT_TYPE_EXEC,ALERT_TYPE_SMS,ALERT_TYPE_JABBER))),'(isset({save}))'),
+		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN(implode(',',array(MEDIA_TYPE_EMAIL,MEDIA_TYPE_EXEC,MEDIA_TYPE_SMS,MEDIA_TYPE_JABBER))),'(isset({save}))'),
 		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({save}))'),
-		"smtp_server"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.ALERT_TYPE_EMAIL.')&&isset({save})'),
-		"smtp_helo"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.ALERT_TYPE_EMAIL.')&&isset({save})'),
-		"smtp_email"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.ALERT_TYPE_EMAIL.')&&isset({save})'),
-		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.ALERT_TYPE_EXEC.')&&isset({save})'),
-		"gsm_modem"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.ALERT_TYPE_SMS.')&&isset({save})'),
-		"username"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({type})&&{type}=='.ALERT_TYPE_JABBER.')&&isset({save})'),
-		"password"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.ALERT_TYPE_JABBER.')&&isset({save})'),
+		"smtp_server"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
+		"smtp_helo"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
+		"smtp_email"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
+		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EXEC.')&&isset({save})'),
+		"gsm_modem"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_SMS.')&&isset({save})'),
+		"username"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({type})&&{type}=='.MEDIA_TYPE_JABBER.')&&isset({save})'),
+		"password"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_JABBER.')&&isset({save})'),
 /* actions */
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -135,19 +135,19 @@ include_once "include/page_header.php";
 		{
 			switch($row['type'])
 			{
-				case ALERT_TYPE_EMAIL:
+				case MEDIA_TYPE_EMAIL:
 					$details =
 						S_SMTP_SERVER.": '".$row['smtp_server']."', ".
 						S_SMTP_HELO.": '".$row['smtp_helo']."', ". 
 						S_SMTP_EMAIL.": '".$row['smtp_email']."'";
 					break;
-				case ALERT_TYPE_EXEC:
+				case MEDIA_TYPE_EXEC:
 					$details = S_SCRIPT_NAME.": '".$row['exec_path']."'";
 					break;
-				case ALERT_TYPE_SMS:
+				case MEDIA_TYPE_SMS:
 					$details = S_GSM_MODEM.": '".$row['gsm_modem']."'";
 					break;
-				case ALERT_TYPE_JABBER:
+				case MEDIA_TYPE_JABBER:
 					$details = S_JABBER_IDENTIFIER.": '".$row['username']."'";
 					break;
 				default:

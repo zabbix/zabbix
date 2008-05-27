@@ -3386,26 +3386,26 @@
 
 		$frmMeadia->AddRow(S_DESCRIPTION,new CTextBox("description",$description,30));
 		$cmbType = new CComboBox("type",$type,"submit()");
-		$cmbType->AddItem(ALERT_TYPE_EMAIL,S_EMAIL);
-		$cmbType->AddItem(ALERT_TYPE_JABBER,S_JABBER);
-		$cmbType->AddItem(ALERT_TYPE_SMS,S_SMS);
-		$cmbType->AddItem(ALERT_TYPE_EXEC,S_SCRIPT);
+		$cmbType->AddItem(MEDIA_TYPE_EMAIL,S_EMAIL);
+		$cmbType->AddItem(MEDIA_TYPE_JABBER,S_JABBER);
+		$cmbType->AddItem(MEDIA_TYPE_SMS,S_SMS);
+		$cmbType->AddItem(MEDIA_TYPE_EXEC,S_SCRIPT);
 		$frmMeadia->AddRow(S_TYPE,$cmbType);
 
 		switch($type)
 		{
-		case ALERT_TYPE_EMAIL:
+		case MEDIA_TYPE_EMAIL:
 			$frmMeadia->AddRow(S_SMTP_SERVER,new CTextBox("smtp_server",$smtp_server,30));
 			$frmMeadia->AddRow(S_SMTP_HELO,new CTextBox("smtp_helo",$smtp_helo,30));
 			$frmMeadia->AddRow(S_SMTP_EMAIL,new CTextBox("smtp_email",$smtp_email,30));
 			break;
-		case ALERT_TYPE_SMS:
+		case MEDIA_TYPE_SMS:
 			$frmMeadia->AddRow(S_GSM_MODEM,new CTextBox("gsm_modem",$gsm_modem,50));
 			break;
-		case ALERT_TYPE_EXEC:
+		case MEDIA_TYPE_EXEC:
 			$frmMeadia->AddRow(S_SCRIPT_NAME,new CTextBox("exec_path",$exec_path,50));
 			break;
-		case ALERT_TYPE_JABBER:
+		case MEDIA_TYPE_JABBER:
 			$frmMeadia->AddRow(S_JABBER_IDENTIFIER, new CTextBox("username",$username,30));
 			$frmMeadia->AddRow(S_PASSWORD, new CPassBox("password",$password,30));
 		}
