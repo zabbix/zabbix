@@ -102,6 +102,7 @@ typedef enum {
 #define DB_HTTPSTEP	struct zbx_httpstep_type
 #define DB_HTTPSTEPITEM	struct zbx_httpstepitem_type
 #define DB_HTTPTESTITEM	struct zbx_httptestitem_type
+#define DB_ESCALATION	struct zbx_escalation_type
 
 #define	MAX_HISTORY_STR_LEN	255
 
@@ -340,7 +341,7 @@ DB_MEDIA
 DB_MEDIATYPE
 {
 	zbx_uint64_t		mediatypeid;
-	zbx_alert_type_t	type;
+	zbx_media_type_t	type;
 	char	*description;
 	char	*smtp_server;
 	char	*smtp_helo;
@@ -372,6 +373,10 @@ DB_ACTION
 	int		evaltype;
 	int		status;
 	int		eventsource;
+	int		esc_period;
+	char		*shortdata;
+	char		*longdata;
+	int		recovery_msg;
 };
 
 DB_OPERATION
@@ -383,6 +388,9 @@ DB_OPERATION
 	zbx_uint64_t	objectid;
 	char		*shortdata;
 	char		*longdata;
+	int		esc_period;
+	int		default_msg;
+	int		evaltype;
 };
 
 DB_CONDITION
@@ -460,6 +468,15 @@ DB_HTTPTESTITEM
 	zbx_httpitem_type_t	type;
 };
 
+DB_ESCALATION
+{
+	zbx_uint64_t		escalationid;
+	zbx_uint64_t		actionid;
+	int			esc_step;
+	zbx_escalation_status_t	status;
+	int			nextcheck;
+};
+
 #define DB_NODE "%s"
 #define DBnode_local(fieldid) DBnode(fieldid, CONFIG_NODEID)
 const char *DBnode(const char *fieldid, const int nodeid);
@@ -505,6 +522,9 @@ int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, const char *error)
 int	DBproxy_update_item_status_to_notsupported(zbx_uint64_t itemid);
 int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock);
 int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t eventid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message);
+int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
+int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid);
+int	DBremove_escalation(zbx_uint64_t escalationid);
 void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(zbx_uint64_t triggerid);
 /*int	DBupdate_trigger_value(int triggerid,int value,int clock);*/

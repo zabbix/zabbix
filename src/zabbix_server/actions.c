@@ -65,7 +65,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
+int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 {
 	DB_RESULT result;
 	DB_ROW	row;
@@ -329,6 +329,25 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		else
 		{
 			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+				condition->operator,
+				condition->conditionid);
+		}
+	}
+	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_EVENT_ACKNOWLEDGED)
+	{
+		result = DBselect("select count(*) from acknowledges where eventid=" ZBX_FS_UI64,
+				event->eventid);
+
+		value_int = (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]) && 0 != atoi(row[0])) ? 1 : 0;
+
+		DBfree_result(result);
+
+zabbix_log(LOG_LEVEL_ERR, "----- operator:%d value:%s:%d=%d", condition->operator, condition->value, atoi(condition->value), value_int);
+		if(condition->operator == CONDITION_OPERATOR_EQUAL) {
+			if (value_int == atoi(condition->value))
+				ret = SUCCEED;
+		} else {
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
 				condition->operator,
 				condition->conditionid);
 		}
@@ -730,12 +749,12 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 
 		switch(operation.operationtype)
 		{
-			case	OPERATION_TYPE_MESSAGE:
+/*			case	OPERATION_TYPE_MESSAGE:
 				op_notify_user(event,action,&operation);
 				break;
 			case	OPERATION_TYPE_COMMAND:
 				op_run_commands(event,&operation);
-				break;
+				break;*/
 			case	OPERATION_TYPE_HOST_ADD:
 				op_host_add(event);
 				break;
@@ -807,12 +826,17 @@ void	process_actions(DB_EVENT *event)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Conditions match our event. Execute operations.");
 
-			execute_operations(event, &action);
-
+			if (event->source == EVENT_SOURCE_TRIGGERS && event->object == EVENT_OBJECT_TRIGGER)
+				DBstart_escalation(action.actionid, event->objectid, event->eventid);
+			else
+				execute_operations(event, &action);
 		}
 		else
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Conditions do not match our event. Do not execute operations.");
+
+			if (event->source == EVENT_SOURCE_TRIGGERS && event->object == EVENT_OBJECT_TRIGGER)
+				DBstop_escalation(action.actionid, event->objectid);
 		}
 	}
 	DBfree_result(result);

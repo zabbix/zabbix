@@ -58,7 +58,7 @@
  * Comments: Cannot use action->userid as it may also be groupid              *
  *                                                                            *
  ******************************************************************************/
-static	void	send_to_user_medias(DB_EVENT *event,DB_OPERATION *operation, zbx_uint64_t userid)
+/*static	void	send_to_user_medias(DB_EVENT *event,DB_OPERATION *operation, zbx_uint64_t userid)
 {
 	DB_MEDIA media;
 	DB_RESULT result;
@@ -101,7 +101,7 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_OPERATION *operation, zbx_uin
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End send_to_user_medias()");
 }
-
+*/
 /******************************************************************************
  *                                                                            *
  * Function: check_user_active                                                *
@@ -117,7 +117,7 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_OPERATION *operation, zbx_uin
  * Comments:                    			                      *
  *                                                                            *
  ******************************************************************************/
-int check_user_active(zbx_uint64_t userid){
+/*int check_user_active(zbx_uint64_t userid){
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		rtrn = SUCCEED;
@@ -132,7 +132,7 @@ int check_user_active(zbx_uint64_t userid){
 
 return rtrn;
 }
-
+*/
 /******************************************************************************
  *                                                                            *
  * Function: op_notify_user                                                   *
@@ -149,7 +149,7 @@ return rtrn;
  * Comments: action->recipient specifies user or group                        *
  *                                                                            *
  ******************************************************************************/
-void	op_notify_user(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
+/*void	op_notify_user(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -186,7 +186,7 @@ void	op_notify_user(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 	}
 	zabbix_log(LOG_LEVEL_DEBUG, "End send_to_user()");
 }
-
+*/
 
 /******************************************************************************
  *                                                                            *
@@ -354,44 +354,33 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
  * Comments: commands devided with newline                                    *
  *                                                                            *
  ******************************************************************************/
-void	op_run_commands(DB_EVENT *event, DB_OPERATION *operation)
+void	op_run_commands(char *cmd_list)
 {
-	DB_RESULT result;
+	DB_RESULT	result;
 	DB_ROW		row;
+	char		*alias, *command;
+	int		is_group;
 
-	char *cmd_list = NULL;
-	char *alias = NULL;
-	char *command = NULL;
-	int is_group = 0;
+	assert(cmd_list);
 
-	assert(event);
-	assert(operation);
+	zabbix_log(LOG_LEVEL_DEBUG, "In run_commands()");
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In run_commands(operationid:" ZBX_FS_UI64 ")",
-		operation->operationid);
+	while (1 != get_next_command(&cmd_list, &alias, &is_group, &command)) {
+		if (!alias || *alias == '\0' || !command || *command == '\0')
+			continue;
 
-	cmd_list = operation->longdata;
-	while(get_next_command(&cmd_list,&alias,&is_group,&command)!=1)
-	{
-		if(!alias || !command) continue;
-		if(alias == '\0' || command == '\0') continue;
-		if(is_group)
-		{
-			result = DBselect("select distinct h.host from hosts_groups hg,hosts h, groups g where hg.hostid=h.hostid and hg.groupid=g.groupid and g.name='%s'" DB_NODE,
-				alias,
-				DBnode_local("h.hostid"));
-			while((row=DBfetch(result)))
-			{
+		if (is_group) {
+			result = DBselect("select distinct h.host from hosts_groups hg,hosts h,groups g"
+					" where hg.hostid=h.hostid and hg.groupid=g.groupid and g.name='%s'" DB_NODE,
+					alias,
+					DBnode_local("h.hostid"));
+
+			while (NULL != (row = DBfetch(result)))
 				run_remote_command(row[0], command);
-			}
-			
+
 			DBfree_result(result);
-		}
-		else
-		{
+		} else
 			run_remote_command(alias, command);
-		}
-/*		DBadd_alert(action->actionid,trigger->triggerid, userid, media.mediatypeid,media.sendto,action->subject,action->scripts); */ /* TODO !!! Add alert for remote commands !!! */
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "End run_commands()");
 }
