@@ -274,7 +274,30 @@
 	return $style;
 	}
 	
-
+	/*
+	 * Function: get_service_status_of_trigger
+	 *
+	 * Description: 
+	 *     retrive trigger's priority for services
+	 *     
+	 * Author: 
+	 *     Artem Suharev
+	 *
+	 * Comments:
+	 *
+	 */
+	
+	function get_service_status_of_trigger($triggerid){
+		$sql = 'SELECT triggerid, priority '.
+				' FROM triggers '.
+				' WHERE triggerid='.$triggerid.
+					' AND status='.TRIGGER_STATUS_ENABLED.
+					' AND value='.TRIGGER_VALUE_TRUE;
+		
+		$status = ($rows=DBfetch(DBselect($sql,1)))?$rows['priority']:0;
+	return $status;
+	}
+	
 	/*
 	 * Function: get_severity_description 
 	 *
