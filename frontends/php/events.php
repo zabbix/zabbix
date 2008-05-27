@@ -345,7 +345,8 @@ include_once "include/page_header.php";
 
 			$sql='SELECT COUNT(a.alertid) as cnt_all'.
 					' FROM alerts a '.
-					' WHERE a.eventid='.$row['eventid'];
+					' WHERE a.eventid='.$row['eventid'].
+						' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')';
 					
 			$alerts=DBfetch(DBselect($sql));
 
@@ -355,6 +356,7 @@ include_once "include/page_header.php";
 				$sql='SELECT COUNT(a.alertid) as sent '.
 						' FROM alerts a '.
 						' WHERE a.eventid='.$row['eventid'].
+							' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')'.
 							' AND a.status='.ALERT_STATUS_SENT;
 
 				$tmp=DBfetch(DBselect($sql));
@@ -364,6 +366,7 @@ include_once "include/page_header.php";
 				$sql='SELECT COUNT(a.alertid) as inprogress '.
 						' FROM alerts a '.
 						' WHERE a.eventid='.$row['eventid'].
+							' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')'.
 							' AND a.status='.ALERT_STATUS_NOT_SENT;
 
 				$tmp=DBfetch(DBselect($sql));
@@ -372,12 +375,12 @@ include_once "include/page_header.php";
 				$sql='SELECT COUNT(a.alertid) as failed '.
 						' FROM alerts a '.
 						' WHERE a.eventid='.$row['eventid'].
+							' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')'.
 							' AND a.status='.ALERT_STATUS_FAILED;
 
 				$tmp=DBfetch(DBselect($sql));
 				$alerts['failed'] = $tmp['failed'];
 				$mixed+=($alerts['failed'])?ALERT_STATUS_FAILED:0;
-
 
 				if($alerts['inprogress']){
 					$status = new CSpan(S_IN_PROGRESS,'orange');

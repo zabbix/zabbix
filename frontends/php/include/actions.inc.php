@@ -798,7 +798,7 @@ include_once 'include/discovery.inc.php';
 		$sql = 'SELECT DISTINCT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
 				' FROM events e,alerts a'.
 				' left join media_type mt on mt.mediatypeid=a.mediatypeid'.
-				' WHERE e.eventid = a.eventid'.
+				' WHERE e.eventid = a.eventid and alerttype in ('.ALERT_TYPE_MESSAGE.')'.
 					$sql_cond.
 					' AND '.DBcondition('e.objectid',$available_triggers).
 					' AND '.DBin_node('a.alertid').
@@ -872,12 +872,12 @@ function get_actions_for_event($eventid){
 	$result=DBselect('SELECT DISTINCT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
 			' FROM events e,alerts a'.
 			' left join media_type mt on mt.mediatypeid=a.mediatypeid'.
-			' WHERE a.eventid='.$eventid.
+			' WHERE a.eventid='.$eventid.' and alerttype in ('.ALERT_TYPE_MESSAGE.')'.
 				' AND e.eventid = a.eventid'.
 				' AND '.DBcondition('e.objectid',$available_triggers).
 				' AND '.DBin_node('a.alertid').
 			order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries'));
-		
+
 	while($row=DBfetch($result)){
 		$time=date("Y.M.d H:i:s",$row["clock"]);
 
@@ -934,7 +934,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 	$sql = 'SELECT DISTINCT a.alertid,mt.description,a.sendto,a.status,u.alias '.
 			' FROM events e,users u,alerts a'.
 			' left join media_type mt on mt.mediatypeid=a.mediatypeid'.
-			' WHERE a.eventid='.$eventid.
+			' WHERE a.eventid='.$eventid.' and alerttype in ('.ALERT_TYPE_MESSAGE.')'.
 				(is_null($status)?'':' AND a.status='.$status).
 				' AND e.eventid = a.eventid'.
 				' AND '.DBcondition('e.objectid',$available_triggers).
@@ -942,7 +942,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 				' AND u.userid=a.userid '.
 			' ORDER BY mt.description';
 	$result=DBselect($sql);
-		
+
 	while($row=DBfetch($result)){
 
 		if($row["status"] == ALERT_STATUS_SENT){
