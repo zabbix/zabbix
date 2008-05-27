@@ -273,6 +273,7 @@
 		if(!$type) $style='normal';//$style.='_empty';
 	return $style;
 	}
+	
 
 	/*
 	 * Function: get_severity_description 
