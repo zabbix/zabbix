@@ -240,7 +240,12 @@ include_once "include/page_header.php";
 			
 			if($result = update_trigger_status($row['triggerid'],0)){
 				
-				$status = get_trigger_priority($row['triggerid']);
+				$status = 0;
+				$db_trigger = get_trigger_by_triggerid($row['triggerid']);
+				if((TRIGGER_STATUS_ENABLED == $db_trigger['status']) && (TRIGGER_VALUE_TRUE == $db_trigger['value'])){
+					$status = $trigger['priority'];
+				}
+
 				update_services($triggerid, $status); // updating status to all services by the dependency
 				
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
