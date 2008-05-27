@@ -931,7 +931,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 			S_STATUS
 			));
 			
-	$sql = 'SELECT DISTINCT a.alertid,mt.description,a.sendto,a.status,u.alias '.
+	$sql = 'SELECT DISTINCT a.alertid,mt.description,a.sendto,a.status,u.alias,a.retries '.
 			' FROM events e,users u,alerts a'.
 			' left join media_type mt on mt.mediatypeid=a.mediatypeid'.
 			' WHERE a.eventid='.$eventid.' and alerttype in ('.ALERT_TYPE_MESSAGE.')'.
