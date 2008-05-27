@@ -236,17 +236,12 @@ include_once "include/page_header.php";
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
 			$result=DBselect("SELECT triggerid FROM triggers t WHERE t.triggerid=".zbx_dbstr($triggerid));
-			if(!($row = DBfetch($result))) continue;
+			if(!$row = DBfetch($result)) continue;
 			
 			if($result = update_trigger_status($row['triggerid'],0)){
 				
-				$status = 0;
-				$db_trigger = get_trigger_by_triggerid($row['triggerid']);
-				if((TRIGGER_STATUS_ENABLED == $db_trigger['status']) && (TRIGGER_VALUE_TRUE == $db_trigger['value'])){
-					$status = $trigger['priority'];
-				}
-
-				update_services($triggerid, $status); // updating status to all services by the dependency
+				$serv_status = get_service_status_of_trigger($row['triggerid']);
+				update_services($triggerid, $serv_status); // updating status to all services by the dependency
 				
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
 					S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ".S_ENABLED);
