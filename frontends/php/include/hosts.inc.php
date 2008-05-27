@@ -1132,16 +1132,13 @@ require_once "include/httptest.inc.php";
 			if($db_app["templateid"] == 0)
 				continue;
 
-			if($templateid != null)
-			{
-				if( !is_array($templateid))
+			if($templateid != null){
+				if(!is_array($templateid))
 					$templateid = array($templateid);
 
 				unset($skip);
-				if( ($tmp_app_data = get_application_by_applicationid($db_app["templateid"])) )
-				{
-					if( !uint_in_array($tmp_app_data["hostid"], $templateid) )
-					{
+				if($tmp_app_data = get_application_by_applicationid($db_app["templateid"])){
+					if(!uint_in_array($tmp_app_data["hostid"], $templateid)){
 						$skip = true;
 						break;
 					}
@@ -1150,15 +1147,12 @@ require_once "include/httptest.inc.php";
 				
 			}
 			
-			if($unlink_mode)
-			{
-				if(DBexecute("update applications set templateid=0 where applicationid=".$db_app["applicationid"]))
-				{
+			if($unlink_mode){
+				if(DBexecute("update applications set templateid=0 where applicationid=".$db_app["applicationid"])){
 					info("Application '".$db_app["name"]."' unlinked");
 				}
 			}
-			else
-			{
+			else{
 				delete_application($db_app["applicationid"]);
 			}
 		}

@@ -148,10 +148,7 @@
 	function get_service_status($serviceid,$algorithm,$triggerid=null,$status=0){
 		
 		if(is_numeric($triggerid)){
-			$trigger = get_trigger_by_triggerid($triggerid);
-			if((TRIGGER_STATUS_ENABLED == $trigger['status']) && (TRIGGER_VALUE_TRUE == $trigger['value'])){
-				$status = $trigger['priority'];
-			}
+			$status = ($serv_status = get_service_status_of_trigger(triggerid))?$serv_status:$status;
 		}
 		
 		if((SERVICE_ALGORITHM_MAX == $algorithm) || (SERVICE_ALGORITHM_MIN == $algorithm)){
@@ -165,7 +162,7 @@
 			$result = DBselect($sql);
 			
 			$rows = DBfetch($result);	
-			if($rows && !empty($rows['status'])){
+			if($rows && !zbx_empty($rows['status'])){
 				$status=$rows['status'];
 			}
 		}
@@ -208,7 +205,7 @@
 	 *
 	 */
 	
-	function	clear_parents_from_trigger($serviceid=0){
+	function clear_parents_from_trigger($serviceid=0){
 		if($serviceid != 0){
 			$sql='UPDATE services '.
 					' SET triggerid = null '.
@@ -234,7 +231,7 @@
 
 	# Return TRUE if triggerid is a reason why the service is not OK
 	# Warning: recursive function
-	function	does_service_depend_on_the_service($serviceid,$serviceid2){
+	function does_service_depend_on_the_service($serviceid,$serviceid2){
 		$service=get_service_by_serviceid($serviceid);
 		if($service["status"]==0){
 			return	FALSE;
@@ -256,18 +253,18 @@
 	}
 
 	function	service_has_parent($serviceid){
-		$row = DBfetch(DBselect("SELECT count(*) as cnt FROM services_links WHERE servicedownid=$serviceid"));
-		if($row["cnt"]>0){
+		$row = DBfetch(DBselect('SELECT linkid FROM services_links WHERE servicedownid='.$serviceid));
+		if($row && !zbx_empty($row['linkid'])){
 			return	TRUE;
 		}
 		return	FALSE;
 	}
 
+// Seems not used ant more!
 	function	service_has_no_this_parent($parentid,$serviceid)
 	{
-		$row = DBfetch(DBselect("SELECT count(*) as cnt FROM services_links WHERE serviceupid=$parentid and servicedownid=$serviceid"));
-		if($row["cnt"]>0)
-		{
+		$row = DBfetch(DBselect('SELECT linkid FROM services_links WHERE serviceupid='.$parentid.' AND servicedownid='.$serviceid));
+		if($row && !zbx_empty($row['linkid'])){
 			return	FALSE;
 		}
 		return	TRUE;

@@ -122,7 +122,7 @@ include_once 'include/page_header.php';
 
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
-
+	
 	if($_REQUEST['config']==4)
 		validate_group_with_host(PERM_READ_WRITE,array('always_select_first_host','only_current_node'),'web.last.conf.groupid', 'web.last.conf.hostid');
 	else if($_REQUEST['config']==0 || $_REQUEST['config']==3)
@@ -133,10 +133,8 @@ include_once 'include/page_header.php';
 <?php
 
 /************ ACTIONS FOR HOSTS ****************/
-// Original mod by scricca@vipsnet.net
-// Modified by Aly
 /* this code menages operations to unlink 1 template from multiple hosts */
-	if ($_REQUEST['config']==2 && (isset($_REQUEST['unlink']))){
+	if($_REQUEST['config']==2 && (isset($_REQUEST['save']))){
 		$hosts = get_request('hosts',array());
 		if(isset($_REQUEST['hostid'])){
 			$templateid=$_REQUEST['hostid'];
@@ -144,42 +142,27 @@ include_once 'include/page_header.php';
 
 // Permission check			
 			$hosts = array_intersect($hosts,$available_hosts);
-//--
+//-- unlink --
 			DBstart();
-			foreach($hosts as $id => $hostid){
-				$result=unlink_template($hostid,$templateid);				
+	
+			$linked_hosts = array();
+			$db_childs = get_hosts_by_templateid($templateid);
+			while($db_child = DBfetch($db_childs)){
+				$linked_hosts[$db_child['hostid']] = $db_child['hostid'];
 			}
-			$result = DBend();
-			
-			show_messages($result, S_UNLINK_FROM_TEMPLATE, S_CANNOT_UNLINK_FROM_TEMPLATE);
-			if($result){
-				$host=get_host_by_hostid($templateid);
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,
-					'Host ['.$host['host'].'] '.
-					'Mass Linkage '.
-					'Status ['.$host['status'].']');
+
+			$unlink_hosts = array_diff($linked_hosts,$hosts);
+						
+			foreach($unlink_hosts as $id => $value){
+				unlink_template($value, $templateid, false);
 			}
-		
-			unset($_REQUEST['unlink']);
-			unset($_REQUEST['hostid']);
-			unset($_REQUEST['form']);
-		}
-	}
-/* this code menages operations to link 1 template to multiple hosts */
-	if($_REQUEST['config']==2 && (isset($_REQUEST['save']))){
-		if(isset($_REQUEST['hostid'])){
-			$hosts = get_request('hosts',array());
-			$templateid=$_REQUEST['hostid'];
-			$result = false;
-// Permission check
-			$tmp_hosts = array_diff($hosts,$available_hosts);
-			$hosts = array_diff($hosts,$tmp_hosts);
-			unset($tmp_hosts);
-//--
+//----------
+//-- link --
+			$link_hosts = array_diff($hosts,$linked_hosts);
 			
 			$template_name=DBfetch(DBselect('SELECT host FROM hosts WHERE hostid='.$templateid));			
-			DBstart();
-			foreach($hosts as $id => $hostid){
+
+			foreach($link_hosts as $id => $hostid){
 			
 				$host_groups=array();
 				$db_hosts_groups = DBselect('SELECT groupid FROM hosts_groups WHERE hostid='.$hostid);
@@ -194,6 +177,8 @@ include_once 'include/page_header.php';
 								$host['host'],$host['port'],$host['status'],$host['useip'],$host['dns'],
 								$host['ip'],$host['proxy_hostid'],$templates_tmp,null,$host_groups);
 			}
+//----------
+
 			$result = DBend();
 			
 			show_messages($result, S_LINK_TO_TEMPLATE, S_CANNOT_LINK_TO_TEMPLATE);
@@ -204,13 +189,12 @@ include_once 'include/page_header.php';
 					'Mass Linkage '.
 					'Status ['.$host['status'].']');
 			}
-
+//---		
 			unset($_REQUEST['save']);
 			unset($_REQUEST['hostid']);
 			unset($_REQUEST['form']);
 		}
 	}
-//---------  END MOD ------------
 /* UNLINK HOST */
 	else if(($_REQUEST['config']==0 || $_REQUEST['config']==3) && (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());

@@ -4760,9 +4760,7 @@
 		
  		$frmHostT->AddRow(S_HOSTS,$cmbHosts->Get(S_HOSTS.SPACE.S_IN,S_OTHER.SPACE.S_HOSTS));
 		
- 		$frmHostT->AddItemToBottomRow(new CButton('save',S_LINK_TO_TEMPLATE));
- 		$frmHostT->AddItemToBottomRow(SPACE);
- 		$frmHostT->AddItemToBottomRow(new CButton('unlink',S_UNLINK_FROM_TEMPLATE));
+ 		$frmHostT->AddItemToBottomRow(new CButton('save',S_SAVE));
  		$frmHostT->AddItemToBottomRow(SPACE);
  		$frmHostT->AddItemToBottomRow(new CButtonCancel(url_param("config")));
  		$frmHostT->Show();
