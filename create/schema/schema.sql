@@ -165,6 +165,8 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|retries	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|esc_step	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|alerttype	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|actionid
 INDEX		|2		|clock
 INDEX		|3		|eventid
@@ -318,6 +320,12 @@ FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|eventsource	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|esc_period	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|shortdata	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|longdata	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|recovery_msg	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|r_shortdata	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|r_longdata	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 
 TABLE|operations|operationid|ZBX_SYNC
 FIELD		|operationid	|t_id		|'0'	|NOT NULL	|0
@@ -327,7 +335,30 @@ FIELD		|object		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|objectid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|shortdata	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|longdata	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|esc_period	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|esc_step_from	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|esc_step_to	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|default_msg	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|actionid
+
+TABLE|opconditions|opconditionid|ZBX_SYNC
+FIELD		|opconditionid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|operationid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|conditiontype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|operator	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+INDEX		|1		|operationid
+
+TABLE|escalations|escalationid|0
+FIELD		|escalationid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|actionid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|triggerid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|eventid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|nextcheck	|t_time		|'0'	|NOT NULL	|0
+FIELD		|esc_step	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|actionid,triggerid
 
 TABLE|applications|applicationid|ZBX_SYNC
 FIELD		|applicationid	|t_id		|'0'	|NOT NULL	|0
@@ -363,7 +394,6 @@ FIELD		|ldap_base_dn	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|ldap_bind_dn	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|ldap_bind_password|t_varchar(128)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|ldap_search_attribute|t_varchar(128)|''|NOT NULL	|ZBX_SYNC
-
 
 TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|'0'	|NOT NULL	|0
