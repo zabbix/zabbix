@@ -284,7 +284,8 @@ typedef enum
 	CONDITION_TYPE_DSTATUS,
 	CONDITION_TYPE_DUPTIME,
 	CONDITION_TYPE_DVALUE,
-	CONDITION_TYPE_HOST_TEMPLATE
+	CONDITION_TYPE_HOST_TEMPLATE,
+	CONDITION_TYPE_EVENT_ACKNOWLEDGED
 } zbx_condition_type_t;
 
 /* Condition operators */
@@ -317,14 +318,14 @@ typedef enum
 /* Special item key used for internal ZABBIX log */
 #define SERVER_ZABBIXLOG_KEY	"zabbix[log]"
 
-/* Alert types */
+/* Media types */
 typedef enum
 {
-	ALERT_TYPE_EMAIL = 0,
-	ALERT_TYPE_EXEC,
-	ALERT_TYPE_SMS,
-	ALERT_TYPE_JABBER
-} zbx_alert_type_t;
+	MEDIA_TYPE_EMAIL = 0,
+	MEDIA_TYPE_EXEC,
+	MEDIA_TYPE_SMS,
+	MEDIA_TYPE_JABBER
+} zbx_media_type_t;
 
 /* Alert statuses */
 typedef enum
@@ -333,6 +334,21 @@ typedef enum
 	ALERT_STATUS_SENT,
 	ALERT_STATUS_FAILED
 } zbx_alert_status_t;
+
+/* Escalation stauses */
+typedef enum
+{
+	ESCALATION_STATUS_ACTIVE = 0,
+	ESCALATION_STATUS_RECOVERY,
+	ESCALATION_STATUS_COMPLETED /* only in server code */
+} zbx_escalation_status_t;
+
+/* Alert types */
+typedef enum
+{
+	ALERT_TYPE_MESSAGE = 0,
+	ALERT_TYPE_COMMAND
+} zbx_alert_type_t;
 
 /* Item statuses */
 typedef enum

@@ -24,6 +24,7 @@
 #include "common.h"
 #include "db.h"
 
+void	add_trigger_info(DB_EVENT *event);
 int	process_event(DB_EVENT *event);
 
 #endif

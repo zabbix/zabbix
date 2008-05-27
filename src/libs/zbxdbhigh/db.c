@@ -1565,6 +1565,41 @@ int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t eventid
 	return SUCCEED;
 }
 
+int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
+{
+	zbx_uint64_t	escalationid;
+
+	escalationid = DBget_maxid("escalations", "escalationid");
+
+	DBexecute("insert into escalations (escalationid,actionid,triggerid,eventid,status)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d)",
+			escalationid,
+			actionid,
+			triggerid,
+			eventid,
+			ESCALATION_STATUS_ACTIVE);
+
+	return SUCCEED;
+}
+
+int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid)
+{
+	DBexecute("update escalations set status=%d,nextcheck=0 where actionid=" ZBX_FS_UI64 " and triggerid=" ZBX_FS_UI64,
+			ESCALATION_STATUS_RECOVERY,
+			actionid,
+			triggerid);
+
+	return SUCCEED;
+}
+
+int	DBremove_escalation(zbx_uint64_t escalationid)
+{
+	DBexecute("delete from escalations where escalationid=" ZBX_FS_UI64,
+			escalationid);
+
+	return SUCCEED;
+}
+
 void	DBvacuum(void)
 {
 #ifdef	HAVE_POSTGRESQL
@@ -1837,9 +1872,9 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 	int		found  = FAIL, dbres, nodeid;
 	const ZBX_TABLE	*table;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_maxid(%s,%s)",
-		tablename,
-		fieldname);
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_maxid \"%s\".\"%s\"",
+			tablename,
+			fieldname);
 
 	table = DBget_table(tablename);
 	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;
@@ -1936,7 +1971,10 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 	}
 	while(FAIL == found);
 
-	zabbix_log(LOG_LEVEL_DEBUG, ZBX_FS_UI64, ret2);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of DBget_maxid \"%s\".\"%s\":" ZBX_FS_UI64,
+			tablename,
+			fieldname,
+			ret2);
 
 	return ret2;
 

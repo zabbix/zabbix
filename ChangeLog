@@ -1,5 +1,6 @@
 Changes for 1.5.3
 
+ - [DEV-173] added support of notification escalations on server side (Sasha)
  - [DEV-172] added support of Apache authentication (Artem)
  - [DEV-170] improved charts period & start time selection (Artem)
  - [DEV-163] added support of perf_counter[path<,period>] (Sasha)
