@@ -134,6 +134,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 	char		*subject_esc	= NULL;
 	char		*message_esc	= NULL;
 	char		*error_esc	= NULL;
+	char		error[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_message_alert()");
 /*	zabbix_log(LOG_LEVEL_DEBUG,"MESSAGE\n\tuserid : " ZBX_FS_UI64 "\n\tsubject: %s\n\tmessage: %s", userid, subject, message);*/
@@ -194,8 +195,21 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 	DBfree_result(result);
 
 	if (0 == medias) {
+		result = DBselect("select name,surname,alias from users where userid=" ZBX_FS_UI64,
+				userid);
+
+		if (NULL != (row = DBfetch(result))) {
+			zbx_snprintf(error, sizeof(error), "No media defined for user %s %s (%s)",
+					row[0],
+					row[1],
+					row[2]);
+		} else
+			zbx_snprintf(error, sizeof(error), "No media defined");
+
+		DBfree_result(result);
+
 		alertid		= DBget_maxid("alerts", "alertid");
-		error_esc	= DBdyn_escape_string("No media defined");
+		error_esc	= DBdyn_escape_string(error);
 
 		DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock"
 				",subject,message,status,alerttype,error,esc_step)"
