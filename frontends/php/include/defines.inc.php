@@ -230,10 +230,13 @@
 	define('ALERT_STATUS_SENT',1);
 	define('ALERT_STATUS_FAILED',2);
 
-	define('ALERT_TYPE_EMAIL',0);
-	define('ALERT_TYPE_EXEC',1);
-	define('ALERT_TYPE_SMS',2);
-	define('ALERT_TYPE_JABBER',3);
+	define('ALERT_TYPE_MESSAGE',0);
+	define('ALERT_TYPE_COMMAND',1);
+
+	define('MEDIA_TYPE_EMAIL',0);
+	define('MEDIA_TYPE_EXEC',1);
+	define('MEDIA_TYPE_SMS',2);
+	define('MEDIA_TYPE_JABBER',3);
 
 	define('ACTION_STATUS_ENABLED',0);
 	define('ACTION_STATUS_DISABLED',1);
