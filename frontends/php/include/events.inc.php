@@ -385,7 +385,8 @@ function make_small_eventlist($triggerid,&$trigger_data){
 
 		$sql='SELECT COUNT(a.alertid) as cnt '.
 				' FROM alerts a '.
-				' WHERE a.eventid='.$row['eventid'];
+				' WHERE a.eventid='.$row['eventid'].
+					' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')';
 								
 		$alerts=DBfetch(DBselect($sql));
 
@@ -393,6 +394,7 @@ function make_small_eventlist($triggerid,&$trigger_data){
 			$sql='SELECT COUNT(a.alertid) as sent '.
 					' FROM alerts a '.
 					' WHERE a.eventid='.$row['eventid'].
+						' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')'.
 						' AND a.status='.ALERT_STATUS_SENT;
 			$alerts=DBfetch(DBselect($sql));
 
@@ -407,6 +409,7 @@ function make_small_eventlist($triggerid,&$trigger_data){
 			$sql='SELECT COUNT(a.alertid) as inprogress '.
 					' FROM alerts a '.
 					' WHERE a.eventid='.$row['eventid'].
+						' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')'.
 						' AND a.status='.ALERT_STATUS_NOT_SENT;
 			$alerts=DBfetch(DBselect($sql));
 
@@ -421,6 +424,7 @@ function make_small_eventlist($triggerid,&$trigger_data){
 			$sql='SELECT COUNT(a.alertid) as failed '.
 					' FROM alerts a '.
 					' WHERE a.eventid='.$row['eventid'].
+						' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')'.
 						' AND a.status='.ALERT_STATUS_FAILED;
 			$alerts=DBfetch(DBselect($sql));
 
