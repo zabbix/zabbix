@@ -1,5 +1,6 @@
 Changes for 1.5.3
 
+ - [DEV-173] added support of macros {EVENT.DATE},{EVENT.TIME},{EVENT.AGE} and {ESC.HISTORY} (Sasha)
  - [DEV-173] added support of notification escalations on server side (Sasha)
  - [DEV-172] added support of Apache authentication (Artem)
  - [DEV-170] improved charts period & start time selection (Artem)

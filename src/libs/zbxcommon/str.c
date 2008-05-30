@@ -1564,3 +1564,22 @@ int	num_key_param(char *param)
 
 	return ret;
 }
+
+char	*zbx_age2str(int age)
+{
+	int		days, hours, minutes, offset;
+	static char	buffer[32];
+
+	days	= (int)((double)age / 86400);
+	hours	= (int)((double)(age - days * 86400) / 3600);
+	minutes	= (int)((double)(age - days * 86400 - hours * 3600) / 60);
+	offset	= 0;
+
+	if (days)
+		offset = zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dd ", days);
+	if (days || hours)
+		offset = zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dh ", hours);
+	offset = zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dm ", minutes);
+
+	return buffer;
+}
