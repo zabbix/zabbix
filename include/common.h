@@ -707,6 +707,7 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len );
 #endif /* HAVE_IPV6 */
 /* Time related functions */
 double	time_diff(struct timeval *from, struct timeval *to);
+char	*zbx_age2str(int age);
 
 int MAIN_ZABBIX_ENTRY(void);
 

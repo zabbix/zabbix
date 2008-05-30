@@ -752,6 +752,7 @@ static void	expand_trigger_description_constants(
 #define MVAR_EVENT_DATE			"{EVENT.DATE}"
 #define MVAR_EVENT_TIME			"{EVENT.TIME}"
 #define MVAR_EVENT_AGE			"{EVENT.AGE}"
+#define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_HOST_NAME			"{HOSTNAME}"
 #define MVAR_IPADDRESS			"{IPADDRESS}"
 #define MVAR_TIME			"{TIME}"
@@ -789,9 +790,10 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 		*str_out = NULL,
 		*replace_to = NULL;
 
-	char	tmp[MAX_STRING_LEN];
-
-	int	var_len, days, hours, minutes, offset;
+	char	tmp[MAX_STRING_LEN], *buf = NULL;
+	int	buf_offset, buf_allocated = MAX_STRING_LEN;
+	int	status;
+	int	var_len;
 
 	time_t  now;
 	struct  tm      *tm;
@@ -816,9 +818,9 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 	while((pr = strchr(pl, '{')))
 	{
 		pr[0] = '\0';
-zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
+/*zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);*/
 		str_out = zbx_strdcat(str_out, pl);
-zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
+/*zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);*/
 		pr[0] = '{';
 
 		replace_to = zbx_dsprintf(replace_to, "{");
@@ -1357,8 +1359,8 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			now	= event->clock;
 			tm	= localtime(&now);
 			replace_to = zbx_dsprintf(replace_to, "%.4d.%.2d.%.2d",
-				tm->tm_year+1900,
-				tm->tm_mon+1,
+				tm->tm_year + 1900,
+				tm->tm_mon + 1,
 				tm->tm_mday);
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
@@ -1380,19 +1382,51 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_EVENT_AGE);
 
-			now	= time(NULL) - event->clock;
-			days	= (int)(now / 86400);
-			hours	= (int)((now - days * 86400) / 3600);
-			minutes	= (int)(((now - days * 86400) - (hours * 3600)) / 60);
-			offset	= 0;
+			now		= time(NULL) - event->clock;
+			replace_to	= zbx_dsprintf(replace_to, "%s", zbx_age2str(now));
+		}
+		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
+			strncmp(pr, MVAR_ESC_HISTORY, strlen(MVAR_ESC_HISTORY)) == 0)
+		{
+			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
+			var_len = strlen(MVAR_ESC_HISTORY);
 
-			if (days)
-				offset = zbx_snprintf(tmp + offset, sizeof(tmp) - offset, "%dd ", days);
-			if (days || hours)
-				offset = zbx_snprintf(tmp + offset, sizeof(tmp) - offset, "%dh ", hours);
-			offset = zbx_snprintf(tmp + offset, sizeof(tmp) - offset, "%dm ", minutes);
+			if (NULL == buf)
+				buf = zbx_malloc(buf, buf_allocated);
+			buf_offset	= 0;
+			*buf		= '\0';
 
-			replace_to = zbx_dsprintf(replace_to, "%s", tmp);
+			result = DBselect("select a.clock,a.status,m.description,a.sendto,a.error"
+					" from alerts a left join media_type m on m.mediatypeid = a.mediatypeid"
+					" where a.eventid=" ZBX_FS_UI64 " and a.alerttype=%d order by a.clock",
+					event->eventid,
+					ALERT_TYPE_MESSAGE);
+
+			while (NULL != (row = DBfetch(result))) {
+				now	= atoi(row[0]);
+				tm	= localtime(&now);
+				status	= atoi(row[1]);
+
+				zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 256,
+						"%.4d.%.2d.%.2d %.2d:%.2d:%.2d %-11s %s %s %s\n",
+						tm->tm_year + 1900,
+						tm->tm_mon + 1,
+						tm->tm_mday,
+						tm->tm_hour,
+						tm->tm_min,
+						tm->tm_sec,
+						(status == ALERT_STATUS_NOT_SENT ? "in progress" :
+							(status == ALERT_STATUS_SENT ? "sent" : "failed")),
+						SUCCEED == DBis_null(row[2]) ? "" : row[2],
+						row[3],
+						row[4]);
+			}
+			if (0 != buf_offset)
+				buf[--buf_offset] = '\0';
+
+			replace_to = zbx_dsprintf(replace_to, "%s", buf);
+
+			DBfree_result(result);
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) && 
 			strncmp(pr, MVAR_TRIGGER_SEVERITY, strlen(MVAR_TRIGGER_SEVERITY)) == 0)
@@ -1408,18 +1442,19 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			else					replace_to = zbx_dsprintf(replace_to, "Unknown");
 		}
 
-zabbix_log(LOG_LEVEL_DEBUG, "str_out2 [%s] replace_to [%s]", str_out, replace_to);
+/*zabbix_log(LOG_LEVEL_DEBUG, "str_out2 [%s] replace_to [%s]", str_out, replace_to);*/
 		str_out = zbx_strdcat(str_out, replace_to);
-zabbix_log(LOG_LEVEL_DEBUG, "str_out2 [%s] replace_to [%s]", str_out, replace_to);
+/*zabbix_log(LOG_LEVEL_DEBUG, "str_out2 [%s] replace_to [%s]", str_out, replace_to);*/
 		pl = pr + var_len;
 
 		zbx_free(replace_to);
 	}
-zabbix_log(LOG_LEVEL_DEBUG, "str_out3 [%s] pl [%s]", str_out, pl);
+/*zabbix_log(LOG_LEVEL_DEBUG, "str_out3 [%s] pl [%s]", str_out, pl);*/
 	str_out = zbx_strdcat(str_out, pl);
-zabbix_log(LOG_LEVEL_DEBUG, "str_out3 [%s] pl [%s]", str_out, pl);
+/*zabbix_log(LOG_LEVEL_DEBUG, "str_out3 [%s] pl [%s]", str_out, pl);*/
 
 	zbx_free(*data);
+	zbx_free(buf);
 
 	*data = str_out;
 
