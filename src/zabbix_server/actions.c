@@ -335,22 +335,26 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_EVENT_ACKNOWLEDGED)
 	{
-		result = DBselect("select count(*) from acknowledges where eventid=" ZBX_FS_UI64,
+		
+		result = DBselect("select acknowledged from events where eventid=" ZBX_FS_UI64,
 				event->eventid);
 
-		value_int = (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]) && 0 != atoi(row[0])) ? 1 : 0;
+		if (NULL != (row = DBfetch(result))) {
+			value_int = atoi(row[0]);
+
+			if(condition->operator == CONDITION_OPERATOR_EQUAL) {
+				if (value_int == atoi(condition->value))
+					ret = SUCCEED;
+			} else {
+				zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+						condition->operator,
+						condition->conditionid);
+			}
+		} else
+			zabbix_log(LOG_LEVEL_ERR, "Unknown event [" ZBX_FS_UI64 "]",
+					event->eventid);
 
 		DBfree_result(result);
-
-zabbix_log(LOG_LEVEL_ERR, "----- operator:%d value:%s:%d=%d", condition->operator, condition->value, atoi(condition->value), value_int);
-		if(condition->operator == CONDITION_OPERATOR_EQUAL) {
-			if (value_int == atoi(condition->value))
-				ret = SUCCEED;
-		} else {
-			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-				condition->operator,
-				condition->conditionid);
-		}
 	}
 	else if(event->source == EVENT_SOURCE_DISCOVERY &&
 		event->object == EVENT_OBJECT_DSERVICE &&
