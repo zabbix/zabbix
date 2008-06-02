@@ -2845,8 +2845,12 @@
 			$tblAct->AddRow(array(S_PERIOD.' ('.S_SECONDS_SMALL.')', $period_box));
 		}
 		else{
+			$esc_period = 0;
 			$_REQUEST['esc_period'] = 0;
 			$tblAct->AddItem(new CVar('esc_period',0));
+		}
+		
+		if(0 == $esc_period){
 			unset($_REQUEST['new_opcondition']);
 		}
 		
