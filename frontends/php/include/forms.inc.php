@@ -2863,6 +2863,10 @@
 				$tblAct->AddRow(array(S_RECOVERY_SUBJECT, new CTextBox('r_shortdata', $r_shortdata, 50)));
 				$tblAct->AddRow(array(S_RECOVERY_MESSAGE, new CTextArea('r_longdata', $r_longdata,50,5)));
 			}
+			else{
+				$tblAct->AddItem(new CVar('r_shortdata', $r_shortdata));
+				$tblAct->AddItem(new CVar('r_longdata', $r_longdata));
+			}
 		}
 		else{
 			unset($_REQUEST['recovery_msg']);
@@ -3446,8 +3450,8 @@
 					$tblNewOperation->AddRow(array(S_MESSAGE, new CTextArea('new_operation[longdata]', $new_operation['longdata'],77,7)));
 				}
 				else{
-					$tblOper->AddItem(new CVar('new_operation[shortdata]',''));
-					$tblOper->AddItem(new CVar('new_operation[longdata]',''));
+					$tblOper->AddItem(new CVar('new_operation[shortdata]',$new_operation['shortdata']));
+					$tblOper->AddItem(new CVar('new_operation[longdata]',$new_operation['longdata']));
 				}
 				break;
 			case OPERATION_TYPE_COMMAND:
