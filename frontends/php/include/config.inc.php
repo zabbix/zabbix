@@ -486,26 +486,21 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		if($units=="uptime"){
 			$ret="";
 			$days=floor($value/(24*3600));
-			if($days>0)
-			{
+			if($days>0){
 				$value=$value-$days*(24*3600);
 			}
 			$hours=floor($value/(3600));
-			if($hours>0)
-			{
+			if($hours>0){
 				$value=$value-$hours*3600;
 			}
 			$min=floor($value/(60));
-			if($min>0)
-			{
+			if($min>0){
 				$value=$value-$min*(60);
 			}
-			if($days==0)
-			{
+			if($days==0){
 				$ret = sprintf("%02d:%02d:%02d", $hours, $min, $value);
 			}
-			else
-			{
+			else{
 				$ret = sprintf("%d days, %02d:%02d:%02d", $days, $hours, $min, $value);
 			}
 			return $ret;
@@ -756,7 +751,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				$msg_count = count($ZBX_MESSAGES);
 				
 				if($msg_count > $msg_show) $msg_count = $msg_show;
-					
+				
+				$msg_count = ($msg_count > $msg_show)?$msg_count:$msg_show;
 				$msg_count = ($msg_count * $msg_font_size * 4) + 2;
 				$lst_error->AddOption('style','font-size: '.$msg_font_size.'pt; height: '.$msg_count.'px;');
 				
