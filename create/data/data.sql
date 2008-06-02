@@ -6353,8 +6353,8 @@ INSERT INTO items_applications VALUES (2299,154,18452);
 -- Dumping data for table `actions`
 --
 
-INSERT INTO actions VALUES (2,'Auto discovery. Linux servers.',1,0,1);
-INSERT INTO actions VALUES (3,'Auto discovery. Windows servers.',1,0,1);
+INSERT INTO actions VALUES (2,'Auto discovery. Linux servers.',1,0,1,0,'','',0,'','');
+INSERT INTO actions VALUES (3,'Auto discovery. Windows servers.',1,0,1,0,'','',0,'','');
 
 --
 -- Dumping data for table `conditions`
@@ -6371,10 +6371,10 @@ INSERT INTO conditions VALUES (7,3,12,2,'Windows');
 -- Dumping data for table `operations`
 --
 
-INSERT INTO operations VALUES (3,2,6,0,10001,'','');
-INSERT INTO operations VALUES (4,2,4,0,2,'','');
-INSERT INTO operations VALUES (5,3,4,0,3,'','');
-INSERT INTO operations VALUES (6,3,6,0,10002,'','');
+INSERT INTO operations VALUES (3,2,6,0,10001,'','',0,1,1,0,0);
+INSERT INTO operations VALUES (4,2,4,0,2,'','',0,1,1,0,0);
+INSERT INTO operations VALUES (5,3,4,0,3,'','',0,1,1,0,0);
+INSERT INTO operations VALUES (6,3,6,0,10002,'','',0,1,1,0,0);
 
 --
 -- Dumping data for table `drules`
