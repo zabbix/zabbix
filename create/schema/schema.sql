@@ -321,8 +321,8 @@ FIELD		|eventsource	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|esc_period	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|shortdata	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|longdata	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|def_shortdata	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|def_longdata	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|recovery_msg	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|r_shortdata	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|r_longdata	|t_blob		|''	|NOT NULL	|ZBX_SYNC

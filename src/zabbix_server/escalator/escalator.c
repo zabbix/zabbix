@@ -469,7 +469,7 @@ static void	execute_escalation(DB_ESCALATION *escalation, DB_EVENT *event)
 
 	switch (escalation->status) {
 		case ESCALATION_STATUS_ACTIVE:
-			result = DBselect("select actionid,eventsource,esc_period,shortdata,longdata"
+			result = DBselect("select actionid,eventsource,esc_period,def_shortdata,def_longdata"
 					" from actions where actionid=" ZBX_FS_UI64,
 					escalation->actionid);
 			break;
