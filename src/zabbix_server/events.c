@@ -189,12 +189,10 @@ int	process_event(DB_EVENT *event)
 			event->eventid, ALERT_STATUS_NOT_SENT);
 	}*/
 
-/*	zabbix_set_log_level(LOG_LEVEL_DEBUG);*/
 	if(event->skip_actions == 0)
 	{
 		process_actions(event);
 	}
-/*	zabbix_set_log_level(LOG_LEVEL_CRIT);*/
 
 	if(TRIGGER_VALUE_TRUE == event->value)
 	{
