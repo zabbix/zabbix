@@ -19,18 +19,20 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/actions.inc.php";
-	require_once "include/hosts.inc.php";
-	require_once "include/triggers.inc.php";
-	require_once "include/events.inc.php";
-	require_once "include/forms.inc.php";
+	require_once 'include/config.inc.php';
+	require_once 'include/actions.inc.php';
+	require_once 'include/hosts.inc.php';
+	include_once 'include/discovery.inc.php';
+	require_once 'include/triggers.inc.php';
+	require_once 'include/events.inc.php';
+	require_once 'include/forms.inc.php';
 
-	$page["title"]	= "S_CONFIGURATION_OF_ACTIONS";
-	$page["file"]	= "actionconf.php";
+
+	$page['title']	= "S_CONFIGURATION_OF_ACTIONS";
+	$page['file']	= 'actionconf.php';
 	$page['hist_arg'] = array();
 
-include_once "include/page_header.php";
+include_once 'include/page_header.php';
 	
 	$_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
 ?>
@@ -38,48 +40,86 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 
-		"actionid"=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,					null),
-		"name"=>			array(T_ZBX_STR, O_OPT,	 null,	NOT_EMPTY,				'isset({save})'),
-		"eventsource"=>		array(T_ZBX_INT, O_MAND, null, IN(array(EVENT_SOURCE_TRIGGERS,EVENT_SOURCE_DISCOVERY)),	null),
-		"evaltype"=>		array(T_ZBX_INT, O_OPT,	 null, IN(array(ACTION_EVAL_TYPE_AND_OR,ACTION_EVAL_TYPE_AND,ACTION_EVAL_TYPE_OR)), 	'isset({save})'),
-		"status"=>			array(T_ZBX_INT, O_OPT,	 null, IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)),			'isset({save})'),
+		'actionid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,					null),
+		'name'=>			array(T_ZBX_STR, O_OPT,	 null,	NOT_EMPTY,				'isset({save})'),
+		'eventsource'=>		array(T_ZBX_INT, O_MAND, null, IN(array(EVENT_SOURCE_TRIGGERS,EVENT_SOURCE_DISCOVERY)),	null),
+		'evaltype'=>		array(T_ZBX_INT, O_OPT,	 null, IN(array(ACTION_EVAL_TYPE_AND_OR,ACTION_EVAL_TYPE_AND,ACTION_EVAL_TYPE_OR)), 	'isset({save})'),
+		'esc_period'=>		array(T_ZBX_INT, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),		
+		'status'=>			array(T_ZBX_INT, O_OPT,	 null, IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)),			'isset({save})'),
+		
+		'def_shortdata'=>	array(T_ZBX_STR, O_OPT,	 null,	null,				'isset({save})'),
+		'def_longdata'=>	array(T_ZBX_STR, O_OPT,	 null,	null,				'isset({save})'),
 
-		"g_actionid"=>		array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
+		'recovery_msg'=>	array(T_ZBX_INT, O_OPT,  null,	null,		null),
+		'r_shortdata'=>		array(T_ZBX_STR, O_OPT,	 null,	NOT_EMPTY,				'isset({recovery_msg})&&isset({save})'),
+		'r_longdata'=>		array(T_ZBX_STR, O_OPT,	 null,	NOT_EMPTY,				'isset({recovery_msg})&&isset({save})'),
 
-		"conditions"=>		array(null, O_OPT, null, null, null),
-		"g_conditionid"=> 	array(null, O_OPT, null, null, null),
+		'g_actionid'=>		array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
 
-		"new_condition"=>	array(null, 	 O_OPT,  null,	null,	'isset({add_condition})'),
+		'conditions'=>		array(null, O_OPT, null, null, null),
+		'g_conditionid'=> 	array(null, O_OPT, null, null, null),
 
-		"operations"=>		array(null, O_OPT, null, null, null),
-		"g_operationid"=>	array(null, O_OPT, null, null, null),
+		'new_condition'=>	array(null, 	 O_OPT,  null,	null,	'isset({add_condition})'),
+		
+		'operations'=>		array(null, O_OPT, null, null, null),
+		'g_operationid'=>	array(null, O_OPT, null, null, null),
 
-		"edit_operationid"=>array(null, O_OPT, P_ACT,	DB_ID,	null),
+		'edit_operationid'=>array(null, O_OPT, P_ACT,	DB_ID,	null),
 
-		"new_operation"=>	array(null, O_OPT,  null,	null,	'isset({add_operation})'),
+		'new_operation'=>	array(null, O_OPT,  null,	null,	'isset({add_operation})'),
+		
+		'esc_step_from'=>	array(T_ZBX_INT, O_OPT,  null,	null,		null),
+		'esc_step_to'=>		array(T_ZBX_INT, O_OPT,  null,	null,		null),
+		
+		'esc_step_period'=>	array(T_ZBX_INT, O_OPT,  null,	null,		null),
+		
+		'opconditions'=>		array(null, O_OPT, null, null, null),
+		'g_opconditionid'=> 	array(null, O_OPT, null, null, null),
 
+		'new_opcondition'=>	array(null, 	 O_OPT,  null,	null,	'isset({add_opcondition})'),
 
 /* actions */
-		"group_delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"group_enable"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"group_disable"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"add_condition"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"del_condition"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"cancel_new_condition"=>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"add_operation"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"del_operation"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"cancel_new_operation"=>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"save"=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"clone"=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"delete"=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"cancel"=>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'group_delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'group_enable'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'group_disable'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'add_condition'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'del_condition'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel_new_condition'=>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'add_operation'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'del_operation'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel_new_operation'=>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'add_opcondition'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'del_opcondition'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel_new_opcondition'=>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		
+		'save'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'clone'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'delete'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel'=>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 /* other */
-		"form"=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
+		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
+		
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
 	);
 
 	check_fields($fields);
 	validate_sort_and_sortorder('a.name',ZBX_SORT_UP);
+//SDI($_REQUEST);
+/* AJAX */	
+	if(isset($_REQUEST['favobj'])){
+		if('filter' == $_REQUEST['favobj']){
+			update_profile('web.audit.filter.state',$_REQUEST['state']);
+		}
+	}	
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+//--------
 	
 	if(isset($_REQUEST['actionid']) && !action_accessible($_REQUEST['actionid'], PERM_READ_WRITE)){
 		access_deny();
@@ -99,36 +139,53 @@ include_once "include/page_header.php";
 	else if(isset($_REQUEST['cancel_new_operation'])){
 		unset($_REQUEST['new_operation']);
 	}
+	else if(isset($_REQUEST['cancel_new_opcondition'])){
+		unset($_REQUEST['new_opcondition']);
+	}
 	else if(isset($_REQUEST['save'])){
 		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
+		$_REQUEST['recovery_msg'] = get_request('recovery_msg',0);
+		$_REQUEST['r_shortdata'] = get_request('r_shortdata','');
+		$_REQUEST['r_longdata'] = get_request('r_longdata','');
+		
 		$conditions = get_request('conditions', array());
 		$operations = get_request('operations', array());
 
+		DBstart();
 		if(isset($_REQUEST['actionid'])){
+
 			$actionid=$_REQUEST['actionid'];
 			$result = update_action($actionid,
-				$_REQUEST['name'],$_REQUEST['eventsource'],
+				$_REQUEST['name'],$_REQUEST['eventsource'],$_REQUEST['esc_period'],
+				$_REQUEST['def_shortdata'],$_REQUEST['def_longdata'],
+				$_REQUEST['recovery_msg'],$_REQUEST['r_shortdata'],$_REQUEST['r_longdata'],
 				$_REQUEST['evaltype'],$_REQUEST['status'],
 				$conditions, $operations
 				);
 
+			$result = DBend();
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		} 
 		else {
+			
 			$actionid=add_action(
-				$_REQUEST['name'],$_REQUEST['eventsource'],
+				$_REQUEST['name'],$_REQUEST['eventsource'],$_REQUEST['esc_period'],
+				$_REQUEST['def_shortdata'],$_REQUEST['def_longdata'],
+				$_REQUEST['recovery_msg'],$_REQUEST['r_shortdata'],$_REQUEST['r_longdata'],
 				$_REQUEST['evaltype'],$_REQUEST['status'],
 				$conditions, $operations
 				);
 			$result=$actionid;
 
+			$result = DBend();
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 		}
 
 		if($result){ // result - OK
-			add_audit(!isset($_REQUEST['actionid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION, 
+			add_audit(!isset($_REQUEST['actionid'])?AUDIT_ACTION_ADD:AUDIT_ACTION_UPDATE, 
+				AUDIT_RESOURCE_ACTION, 
 				S_NAME.': '.$_REQUEST['name']);
 
 			unset($_REQUEST['form']);
@@ -140,7 +197,10 @@ include_once "include/page_header.php";
 
 		$action_data = DBfetch(DBselect('select name from actions where actionid='.$_REQUEST['actionid']));
 
-		$result = delete_action($_REQUEST['actionid']);
+		DBstart();
+		delete_action($_REQUEST['actionid']);
+		$result = DBend();
+		
 		show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
 		if($result){
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ACTION,
@@ -165,6 +225,30 @@ include_once "include/page_header.php";
 		foreach($_REQUEST['g_conditionid'] as $val){
 			unset($_REQUEST['conditions'][$val]);
 		}
+	}
+	else if(inarr_isset(array('add_opcondition','new_opcondition'))){
+		$new_opcondition = $_REQUEST['new_opcondition'];
+
+		if( validate_condition($new_opcondition['conditiontype'],$new_opcondition['value']) ){
+			$new_operation = get_request('new_operation',array());
+			if(!isset($new_operation['opconditions'])) $new_operation['opconditions'] = array();
+			
+			if(!str_in_array($new_opcondition,$new_operation['opconditions']))
+				array_push($new_operation['opconditions'],$new_opcondition);
+
+			$_REQUEST['new_operation'] = $new_operation;
+			
+			unset($_REQUEST['new_opcondition']);
+		}
+	}
+	else if(inarr_isset(array('del_opcondition','g_opconditionid'))){
+		$new_operation = get_request('new_operation',array());
+
+		foreach($_REQUEST['g_opconditionid'] as $val){
+			unset($new_operation['opconditions'][$val]);
+		}
+		
+		$_REQUEST['new_operation'] = $new_operation;
 	}
 	else if(inarr_isset(array('add_operation','new_operation'))){
 		$new_operation = $_REQUEST['new_operation'];
@@ -215,14 +299,17 @@ include_once "include/page_header.php";
 		$result=DBselect($query);
 		
 		$actionids = array();
+
+		DBstart();
 		while($row=DBfetch($result)){
 			$res = update_action_status($row['actionid'],0);
 			if($res)
 				$actionids[] = $row['actionid'];
 		}
-		
-		if(isset($res)){
-			show_messages(true, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+		$result = DBend();
+
+		if($result && isset($res)){
+			show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] enabled');
 		}
 	}
@@ -238,14 +325,16 @@ include_once "include/page_header.php";
 		$result=DBselect($query);
 
 		$actionids = array();
+		Dbstart();
 		while($row=DBfetch($result)){
 			$res = update_action_status($row['actionid'],1);
 			if($res) 
 				$actionids[] = $row['actionid'];
 		}
+		$result = DBend();
 		
-		if(isset($res)){
-			show_messages(true, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+		if($result && isset($res)){
+			show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] disabled');
 		}
 	}
@@ -258,13 +347,15 @@ include_once "include/page_header.php";
 				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') '
 				);
 		$actionids = array();
+		DBstart();
 		while($row=DBfetch($result)){
 			$del_res = delete_action($row['actionid']);
 			if($del_res) 
 				$actionids[] = $row['actionid'];
 		}
+		$result = DBend();
 		
-		if(isset($del_res)){
+		if($result && isset($del_res)){
 			show_messages(TRUE, S_ACTIONS_DELETED, S_CANNOT_DELETE_ACTIONS);
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] deleted');
 		}
@@ -278,11 +369,104 @@ include_once "include/page_header.php";
 	$form->AddVar('eventsource', $_REQUEST['eventsource']);
 	$form->AddItem(new CButton('form',S_CREATE_ACTION));
 	show_table_header(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
-	echo SBR;
 
 	if(isset($_REQUEST['form'])){
 /* form */
-		insert_action_form();
+//		insert_action_form();
+//* NEW Form 
+		$frmAction = new CForm('actionconf.php','post');
+		$frmAction->SetName(S_ACTION);
+		
+		$frmAction->AddVar('form',get_request('form',1));
+		$from_rfr = get_request('form_refresh',0);
+		$frmAction->AddVar('form_refresh',$from_rfr+1);
+		if(isset($_REQUEST['actionid'])){
+//			$action = get_action_by_actionid($_REQUEST['actionid']);
+			$frmAction->AddVar('actionid',$_REQUEST['actionid']);
+		}
+		
+		$left_tab = new CTable();
+		$left_tab->SetCellPadding(3);
+		$left_tab->SetCellSpacing(3);
+		
+		$left_tab->AddOption('border',0);
+		
+		$left_tab->AddRow(create_hat(
+				S_ACTION,
+				get_act_action_form(),//null,
+				null,
+				'hat_action',
+				get_profile('web.actionconf.hats.hat_action.state',1)
+			));
+			
+		$left_tab->AddRow(create_hat(
+				S_ACTION_CONDITIONS,
+				get_act_condition_form(),//null,
+				null,
+				'hat_conditions',
+				get_profile('web.actionconf.hats.hat_conditions.state',1)
+			));
+			
+		if(isset($_REQUEST['new_condition'])){
+			$left_tab->AddRow(create_hat(
+					S_NEW_CONDITION,
+					get_act_new_cond_form(),//null,
+					null,
+					'hat_new_cond',
+					get_profile('web.actionconf.hats.hat_new_cond.state',1)
+				));			
+		}
+
+
+		$right_tab = new CTable();
+		$right_tab->SetCellPadding(3);
+		$right_tab->SetCellSpacing(3);
+		
+		$right_tab->AddOption('border',0);
+				
+		$right_tab->AddRow(create_hat(
+				S_ACTION_OPERATIONS,
+				get_act_operations_form(),//null,
+				null,
+				'hat_operations',
+				get_profile('web.actionconf.hats.hat_operations.state',1)
+			));
+
+		if(isset($_REQUEST['new_operation'])){
+			$right_tab->AddRow(create_hat(
+					S_EDIT_OPERATION,
+					get_act_new_oper_form(),//null,
+					null,
+					'hat_new_oper',
+					get_profile('web.actionconf.hats.hat_new_oper.state',1)
+				));
+		}
+		
+		if(isset($_REQUEST['new_opcondition'])){
+			$right_tab->AddRow(create_hat(
+					S_NEW.SPACE.S_OPERATION_CONDITION,
+					get_oper_new_cond_form(),//null,
+					null,
+					'hat_new_oper_cond',
+					get_profile('web.actionconf.hats.hat_new_oper_cond.state',1)
+				));
+		}
+		
+		$td_l = new CCol($left_tab);
+		$td_l->AddOption('valign','top');
+		
+		$td_r = new CCol($right_tab);
+		$td_r->AddOption('valign','top');
+		
+		$outer_table = new CTable();
+		$outer_table->AddOption('border',0);
+		$outer_table->SetCellPadding(1);
+		$outer_table->SetCellSpacing(1);
+		$outer_table->AddRow(array($td_l,$td_r));
+		
+		$frmAction->Additem($outer_table);
+		$frmAction->Show();
+//*/
 	}
 	else{
 		$form = new CForm();
@@ -376,7 +560,5 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
-
 	include_once "include/page_footer.php";
-
 ?>

@@ -71,10 +71,10 @@
 			parent::CTextBox($name,$value,$size,$readonly);
 			$this->AddOption('MaxLength', $size);
 			$this->AddOption('Style', 'text-align: right;');
-			$this->AddAction('OnKeyPress',
+			$this->AddAction('onkeypress',
 				' var c = (window.event) ? event.keyCode : event.which;'.
 				' if(event.ctrlKey || c <= 31 || (c >= 48 && c <= 57)) return true; else return false; ');
-			$this->AddAction('OnChange',
+			$this->AddAction('onchange',
 					($allowempty ? ' if(this.value.length==0 || this.value==null) this.value = \'\'; else ' : '').
 					' if(isNaN(parseInt(this.value))) this.value = 0; '.
 					' else this.value = parseInt(this.value);'
