@@ -61,7 +61,7 @@ include_once 'include/page_header.php';
 
 		'new_condition'=>	array(null, 	 O_OPT,  null,	null,	'isset({add_condition})'),
 		
-		'operations'=>		array(null, O_OPT, null, null, null),
+		'operations'=>		array(null, O_OPT, null, null, 'isset({save})'),
 		'g_operationid'=>	array(null, O_OPT, null, null, null),
 
 		'edit_operationid'=>array(null, O_OPT, P_ACT,	DB_ID,	null),
