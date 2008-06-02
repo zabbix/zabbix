@@ -1,5 +1,6 @@
 Changes for 1.5.3
 
+ - [ZBX-380] added support of directories for Include in configuration file (Sasha)
  - [DEV-171] added support of notification escalations on frontend side (Artem)
  - [DEV-173] added support of macros {EVENT.DATE},{EVENT.TIME},{EVENT.AGE} and {ESC.HISTORY} (Sasha)
  - [DEV-173] added support of notification escalations on server side (Sasha)
