@@ -2862,8 +2862,6 @@
 		}
 		else{
 			unset($_REQUEST['recovery_msg']);
-			$tblAct->AddItem(new CVar('r_shortdata', ''));
-			$tblAct->AddItem(new CVar('r_longdata',''));
 		}
 		
 		$cmbStatus = new CComboBox('status',$status);

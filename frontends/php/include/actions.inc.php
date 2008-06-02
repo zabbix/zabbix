@@ -226,7 +226,7 @@ function add_action($name, $eventsource, $esc_period, $def_shortdata, $def_longd
 	$actionid=get_dbid('actions','actionid');
 
 	$result = DBexecute('INSERT INTO actions (actionid,name,eventsource,esc_period,def_shortdata,def_longdata,recovery_msg,r_shortdata,r_longdata,evaltype,status)'.
-				' VALUES ('.$actionid.','.zbx_dbstr($name).','.$eventsource.','.zbx_dbstr($def_shortdata).','.zbx_dbstr($def_longdata).','.$esc_period.','.$recovery_msg.','.zbx_dbstr($r_shortdata).','.zbx_dbstr($r_longdata).','.$evaltype.','.$status.')');
+				' VALUES ('.$actionid.','.zbx_dbstr($name).','.$eventsource.','.$esc_period.','.zbx_dbstr($def_shortdata).','.zbx_dbstr($def_longdata).','.$recovery_msg.','.zbx_dbstr($r_shortdata).','.zbx_dbstr($r_longdata).','.$evaltype.','.$status.')');
 
 	if(!$result)
 		return $result;
