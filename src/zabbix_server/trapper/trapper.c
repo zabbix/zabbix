@@ -213,15 +213,15 @@ void	child_trapper_main(int i, zbx_sock_t *s)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for(;;)
-	{
-		zbx_setproctitle("waiting for connection");
-		zbx_tcp_accept(s);
+	for (;;) {
+		zbx_setproctitle("trapper [waiting for connection]");
+		if (SUCCEED == zbx_tcp_accept(s)) {
+			zbx_setproctitle("trapper [processing data]");
+			process_trapper_child(s);
 
-		zbx_setproctitle("processing data");
-		process_trapper_child(s);
-
-		zbx_tcp_unaccept(s);
+			zbx_tcp_unaccept(s);
+		} else
+			zabbix_log(LOG_LEVEL_WARNING, "Trapper failed to accept connection");
 	}
 	DBclose();
 }
