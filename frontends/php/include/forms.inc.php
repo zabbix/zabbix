@@ -3210,7 +3210,7 @@
 			$db_operations = DBselect('SELECT * '.
 							' FROM operations'.
 							' WHERE actionid='.$_REQUEST['actionid'].
-							' ORDER BY operationtype,object,operationid');
+							' ORDER BY esc_step_from,operationtype,object,operationid');
 
 			while($operation_data = DBfetch($db_operations)){
 				$operation_data = array(
@@ -3259,7 +3259,7 @@
 
 		zbx_rksort($operations);
 
-		$delay = 0;
+		$delay = count_operations_delay($operations,$esc_period);
 		foreach($operations as $id => $val){
 			if( !str_in_array($val['operationtype'], $allowed_operations) )	continue;
 			
@@ -3273,13 +3273,12 @@
 			$esc_period_txt = null;
 			$esc_delay_txt = null;
 			
+			if($val['esc_step_from'] < 1) $val['esc_step_from'] = 1;
+			
 			if($esc_period){
 				$esc_steps_txt = $val['esc_step_from'].' - '.$val['esc_step_to'];
 				$esc_period_txt = $val['esc_period']?$val['esc_period']:S_DEFAULT;
-				$esc_delay_txt = $delay?convert_units($delay,'uptime'):S_AT_MOMENT;
-				
-				$delay_period = $val['esc_period']?$val['esc_period']:$esc_period;
-				$delay += $delay_period*abs($val['esc_step_from']-$val['esc_step_to']);
+				$esc_delay_txt = $delay[$val['esc_step_from']]?convert_units($delay[$val['esc_step_from']],'uptime'):S_AT_MOMENT;
 			}
 			
 			$tblOper->AddRow(array(
@@ -3349,7 +3348,11 @@
 		
 		/* init new_operation variable */
 		$new_operation = get_request('new_operation', array());
-		if( !is_array($new_operation) ) $new_operation = array();
+
+		if(!is_array($new_operation)){
+			$new_operation = array();
+			$new_operation['default_msg'] = 1;
+		}
 
 		if(!isset($new_operation['operationtype']))	$new_operation['operationtype']	= OPERATION_TYPE_MESSAGE;
 		if(!isset($new_operation['object']))		$new_operation['object']	= OPERATION_OBJECT_GROUP;
@@ -3379,11 +3382,14 @@
 		if(isset($_REQUEST['esc_period']) && ($_REQUEST['esc_period']>0)){
 			$tblStep = new CTable(null,'nowrap');
 
-			$tblStep->AddRow(array(S_FROM, new CNumericBox('new_operation[esc_step_from]', $new_operation['esc_step_from'],5)));
+			$step_from = new CNumericBox('new_operation[esc_step_from]', $new_operation['esc_step_from'],4);
+			$step_from->AddAction('onchange','javascript:'.$step_from->GetOption('onchange').' if(this.value == 0) this.value=1;');
+			
+			$tblStep->AddRow(array(S_FROM, $step_from));
 			$tblStep->AddRow(array(
 								S_TO, 
 								new CCol(array(
-									new CNumericBox('new_operation[esc_step_to]', $new_operation['esc_step_to'],5),
+									new CNumericBox('new_operation[esc_step_to]', $new_operation['esc_step_to'],4),
 									' [0-'.S_INFINITY.']'))
 							));
 							
