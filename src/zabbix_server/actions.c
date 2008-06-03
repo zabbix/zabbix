@@ -840,7 +840,7 @@ void	process_actions(DB_EVENT *event)
 			zabbix_log( LOG_LEVEL_DEBUG, "Conditions do not match our event. Do not execute operations.");
 
 			if (event->source == EVENT_SOURCE_TRIGGERS && event->object == EVENT_OBJECT_TRIGGER)
-				DBstop_escalation(action.actionid, event->objectid, event->eventid);
+				DBstop_escalation(action.actionid, event->objectid);
 		}
 	}
 	DBfree_result(result);
