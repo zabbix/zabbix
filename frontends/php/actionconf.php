@@ -67,12 +67,7 @@ include_once 'include/page_header.php';
 		'edit_operationid'=>array(null, O_OPT, P_ACT,	DB_ID,	null),
 
 		'new_operation'=>	array(null, O_OPT,  null,	null,	'isset({add_operation})'),
-		
-		'esc_step_from'=>	array(T_ZBX_INT, O_OPT,  null,	null,		null),
-		'esc_step_to'=>		array(T_ZBX_INT, O_OPT,  null,	null,		null),
-		
-		'esc_step_period'=>	array(T_ZBX_INT, O_OPT,  null,	null,		null),
-		
+				
 		'opconditions'=>		array(null, O_OPT, null, null, null),
 		'g_opconditionid'=> 	array(null, O_OPT, null, null, null),
 
@@ -252,7 +247,6 @@ include_once 'include/page_header.php';
 	}
 	else if(inarr_isset(array('add_operation','new_operation'))){
 		$new_operation = $_REQUEST['new_operation'];
-
 		if(validate_operation($new_operation)){
 			zbx_rksort($new_operation);
 
