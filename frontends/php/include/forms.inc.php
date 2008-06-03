@@ -3079,7 +3079,7 @@
 				$rowCondition[] = array(
 					new CTextBox('group','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".$tblCond->GetName().
+						"return PopUp('popup.php?dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=group&srctbl=host_group".
 						"&srcfld1=groupid&srcfld2=name',450,450);",
 						'T')
@@ -3090,7 +3090,7 @@
 				$rowCondition[] = array(
 					new CTextBox('host','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".$tblCond->GetName().
+						"return PopUp('popup.php?dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=host_templates".
 						"&srcfld1=hostid&srcfld2=host',450,450);",
 						'T')
@@ -3101,7 +3101,7 @@
 				$rowCondition[] = array(
 					new CTextBox('host','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".$tblCond->GetName().
+						"return PopUp('popup.php?dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=hosts".
 						"&srcfld1=hostid&srcfld2=host',450,450);",
 						'T')
@@ -3112,7 +3112,7 @@
 				$rowCondition[] = array(
 					new CTextBox('trigger','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".$tblCond->GetName().
+						"return PopUp('popup.php?dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=trigger&srctbl=triggers".
 						"&srcfld1=triggerid&srcfld2=description');",
 						'T')
