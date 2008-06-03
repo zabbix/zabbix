@@ -483,14 +483,36 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 			}
 			break;
 		case LONG_DESCRITION:
-			switch($data['operationtype'])
-			{
+			switch($data['operationtype']){
 				case OPERATION_TYPE_MESSAGE:
 					// for PHP4
-					$temp = bold(S_SUBJECT);
-					$result = $temp->ToString().': '.$data['shortdata']."\n";
-					$temp = bold(S_MESSAGE);
-					$result .= $temp->ToString().":\n".$data['longdata'];
+					if(isset($data['default_msg']) && !empty($data['default_msg'])){
+						if(isset($_REQUEST['def_shortdata']) && isset($_REQUEST['def_longdata'])){
+							$temp = bold(S_SUBJECT.': ');
+							$result = $temp->ToString().$_REQUEST['def_shortdata']."\n";
+							$temp = bold(S_MESSAGE.':');
+							$result .= $temp->ToString().$_REQUEST['def_longdata'];
+						}
+						else if(isset($data['operationid'])){ 
+							$sql = 'SELECT a.def_shortdata,a.def_longdata '.
+									' FROM actions a, operations o '.
+									' WHERE a.actionid=o.actionid '.
+										' AND o.operationid='.$data['operationid'];
+							if($rows = DBfetch(DBselect($sql,1))){
+								$temp = bold(S_SUBJECT.': ');
+								$result = $temp->ToString().$rows['def_shortdata']."\n";
+								$temp = bold(S_MESSAGE.':');
+								$result .= $temp->ToString().$rows['def_longdata'];
+							}
+						}
+					}
+					else{
+						$temp = bold(S_SUBJECT.': ');
+						$result = $temp->ToString().$data['shortdata']."\n";
+						$temp = bold(S_MESSAGE.':');
+						$result .= $temp->ToString().$data['longdata'];
+					}
+
 					break;
 				case OPERATION_TYPE_COMMAND:
 					$temp = bold(S_REMOTE_COMMANDS);
