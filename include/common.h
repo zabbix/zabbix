@@ -340,6 +340,7 @@ typedef enum
 {
 	ESCALATION_STATUS_ACTIVE = 0,
 	ESCALATION_STATUS_RECOVERY,
+	ESCALATION_STATUS_SLEEP,
 	ESCALATION_STATUS_COMPLETED /* only in server code */
 } zbx_escalation_status_t;
 
