@@ -157,7 +157,7 @@ function add_action_operation($actionid, $operation){
 	
 	if(!isset($operation['default_msg'])) $operation['default_msg'] = 0;
 	if(!isset($operation['opconditions'])) $operation['opconditions'] = array();
-	
+
 	$result = DBexecute('INSERT INTO operations (operationid, actionid, operationtype, object, objectid, shortdata, longdata, esc_period, esc_step_from, esc_step_to, default_msg, evaltype)'.
 		' values('.$operationid.','.$actionid.','.
 			$operation['operationtype'].','.
@@ -515,8 +515,8 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 
 					break;
 				case OPERATION_TYPE_COMMAND:
-					$temp = bold(S_REMOTE_COMMANDS);
-					$result = $temp->ToString().":\n".$data['longdata'];
+					$temp = bold(S_REMOTE_COMMANDS.': ');
+					$result = $temp->ToString().$data['longdata'];
 					break;
 				default: break;
 			}
@@ -1005,7 +1005,12 @@ function get_actions_for_event($eventid){
 		}
 		$sendto=$row["sendto"];
 
-		$message = array(bold(S_SUBJECT.': '),br(),$row["subject"],br(),br(),bold(S_MESSAGE.': '),br(),$row['message']);
+		$message = array(bold(S_SUBJECT.':'),br(),$row["subject"],br(),br(),bold(S_MESSAGE.':'));
+		$msg = explode("\n",$row['message']);
+		foreach($msg as $m)
+		{
+			array_push($message, BR(), $m);
+		}
 		
 		if(empty($row["error"])){
 			$error=new CSpan(SPACE,"off");

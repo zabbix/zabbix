@@ -412,9 +412,9 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		zbx_free(p);
 	}
 
-	if (0 == action->esc_period)
-		escalation->status = ESCALATION_STATUS_COMPLETED;
-	else {
+	if (0 == action->esc_period) {
+		escalation->status = (action->recovery_msg == 1) ? ESCALATION_STATUS_SLEEP : ESCALATION_STATUS_COMPLETED;
+	} else {
 		if (0 == operations) {
 			result = DBselect("select operationid from operations where actionid=" ZBX_FS_UI64 " and esc_step_from>%d",
 					action->actionid,
@@ -430,7 +430,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 			esc_period = (0 != esc_period) ? esc_period : action->esc_period;
 			escalation->nextcheck = time(NULL) + esc_period;
 		} else
-			escalation->status = ESCALATION_STATUS_COMPLETED;
+			escalation->status = (action->recovery_msg == 1) ? ESCALATION_STATUS_SLEEP : ESCALATION_STATUS_COMPLETED;
 	}
 }
 
@@ -441,9 +441,11 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 	zbx_uint64_t	userid;
 	
 	if (1 == action->recovery_msg) {
-		result = DBselect("select distinct userid from alerts where actionid=" ZBX_FS_UI64 " and eventid=" ZBX_FS_UI64,
+		result = DBselect("select distinct userid from alerts where actionid=" ZBX_FS_UI64
+				" and eventid=" ZBX_FS_UI64 " and alerttype=%d",
 				action->actionid,
-				event->eventid);
+				event->eventid,
+				ALERT_TYPE_MESSAGE);
 
 		while (NULL != (row = DBfetch(result))) {
 			userid = zbx_atoui64(row[0]);
@@ -469,7 +471,7 @@ static void	execute_escalation(DB_ESCALATION *escalation, DB_EVENT *event)
 
 	switch (escalation->status) {
 		case ESCALATION_STATUS_ACTIVE:
-			result = DBselect("select actionid,eventsource,esc_period,def_shortdata,def_longdata"
+			result = DBselect("select actionid,eventsource,esc_period,def_shortdata,def_longdata,recovery_msg"
 					" from actions where actionid=" ZBX_FS_UI64,
 					escalation->actionid);
 			break;
@@ -561,7 +563,9 @@ static void	process_escalations(int now)
 		if (escalation.status == ESCALATION_STATUS_COMPLETED)
 			DBremove_escalation(escalation.escalationid);
 		else
-			DBexecute("update escalations set esc_step=%d,nextcheck=%d where escalationid=" ZBX_FS_UI64,
+			DBexecute("update escalations set status=%d,esc_step=%d,nextcheck=%d"
+					" where escalationid=" ZBX_FS_UI64,
+					escalation.status,
 					escalation.esc_step,
 					escalation.nextcheck,
 					escalation.escalationid);
