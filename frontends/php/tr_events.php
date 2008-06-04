@@ -125,13 +125,21 @@ $right_tab->AddRow(create_hat(
 		));
 		
 $right_tab->AddRow(create_hat(
-			S_ACTIONS,
-			get_actions_for_event($_REQUEST['eventid']),//null,
+			S_MESSAGE_ACTIONS,
+			get_action_msgs_for_event($_REQUEST['eventid']),//null,
 			null,
-			'hat_eventactions',
-			get_profile('web.tr_events.hats.hat_eventactions.state',1)
+			'hat_eventactionmsgs',
+			get_profile('web.tr_events.hats.hat_eventactionmsgs.state',1)
 		));
-		
+
+$right_tab->AddRow(create_hat(
+			S_COMMAND_ACTIONS,
+			get_action_cmds_for_event($_REQUEST['eventid']),//null,
+			null,
+			'hat_eventactioncmds',
+			get_profile('web.tr_events.hats.hat_eventactioncmds.state',1)
+		));
+
 $right_tab->AddRow(create_hat(
 			S_EVENTS.SPACE.S_LIST.SPACE.'['.S_LAST.' 20]', 
 			//null,//

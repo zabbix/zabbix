@@ -963,7 +963,7 @@ function get_history_of_actions($start,$num,$sql_cond=''){
 }
 	
 // Author: Aly
-function get_actions_for_event($eventid){
+function get_action_msgs_for_event($eventid){
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
@@ -978,19 +978,23 @@ function get_actions_for_event($eventid){
 			S_ERROR
 			));
 			
-	
-	$result=DBselect('SELECT DISTINCT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
+	$sql = 'SELECT DISTINCT a.alertid,a.clock,a.esc_step, mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
 			' FROM events e,alerts a'.
-			' left join media_type mt on mt.mediatypeid=a.mediatypeid'.
-			' WHERE a.eventid='.$eventid.' and alerttype in ('.ALERT_TYPE_MESSAGE.')'.
+				' left join media_type mt on mt.mediatypeid=a.mediatypeid'.
+			' WHERE a.eventid='.$eventid.
+				' AND a.alerttype='.ALERT_TYPE_MESSAGE.
 				' AND e.eventid = a.eventid'.
 				' AND '.DBcondition('e.objectid',$available_triggers).
 				' AND '.DBin_node('a.alertid').
-			order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries'));
+			order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries');
+	$result=DBselect($sql);
 
 	while($row=DBfetch($result)){
 		$time=date("Y.M.d H:i:s",$row["clock"]);
-
+		if($row['esc_step'] > 0){
+			$time = array(bold(S_STEP.': '),br(),$row["esc_step"],br(),br(),bold(S_TIME.': '),br(),$time);	
+		}
+		
 		if($row["status"] == ALERT_STATUS_SENT){
 			$status=new CSpan(S_SENT,"green");
 			$retries=new CSpan(SPACE,"green");
@@ -1026,6 +1030,76 @@ function get_actions_for_event($eventid){
 			new CCol($status, 'top'),
 			new CCol($retries, 'top'),
 			new CCol($sendto, 'top'),
+			new CCol($message, 'wraptext top'),
+			new CCol($error, 'wraptext top')));
+	}
+
+return $table;
+}
+
+// Author: Aly
+function get_action_cmds_for_event($eventid){
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+
+	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
+	$table->SetHeader(array(
+			is_show_subnodes() ? make_sorting_link(S_NODES,'a.alertid') : null,
+			make_sorting_link(S_TIME,'a.clock'),
+			make_sorting_link(S_STATUS,'a.status'),
+			make_sorting_link(S_RETRIES_LEFT,'a.retries'),
+			S_COMMAND,
+			S_ERROR
+			));
+			
+	$sql = 'SELECT DISTINCT a.alertid,a.clock,a.esc_step,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
+			' FROM events e,alerts a'.
+			' WHERE a.eventid='.$eventid.
+				' AND a.alerttype='.ALERT_TYPE_COMMAND.
+				' AND e.eventid = a.eventid'.
+				' AND '.DBcondition('e.objectid',$available_triggers).
+				' AND '.DBin_node('a.alertid').
+			order_by('a.clock,a.alertid,a.sendto,a.status,a.retries');
+	$result=DBselect($sql);
+
+	while($row=DBfetch($result)){
+		$time=date("Y.M.d H:i:s",$row["clock"]);
+		if($row['esc_step'] > 0){
+			$time = array(bold(S_STEP.': '),br(),$row["esc_step"],br(),br(),bold(S_TIME.': '),br(),$time);	
+		}
+		
+		if($row["status"] == ALERT_STATUS_SENT){
+			$status=new CSpan(S_SENT,"green");
+			$retries=new CSpan(SPACE,"green");
+		}
+		else if($row["status"] == ALERT_STATUS_NOT_SENT){
+			$status=new CSpan(S_IN_PROGRESS,"orange");
+			$retries=new CSpan(ALERT_MAX_RETRIES - $row["retries"],"orange");
+		}
+		else{
+			$status=new CSpan(S_NOT_SENT,"red");
+			$retries=new CSpan(0,"red");
+		}
+		$sendto=$row["sendto"];
+
+		$message = array(bold(S_COMMAND.':'));
+		$msg = explode("\n",$row['message']);
+		foreach($msg as $m)
+		{
+			array_push($message, BR(), $m);
+		}
+
+		if(empty($row["error"])){
+			$error=new CSpan(SPACE,"off");
+		}
+		else{
+			$error=new CSpan($row["error"],"on");
+		}
+		
+		$table->AddRow(array(
+			get_node_name_by_elid($row['alertid']),
+			new CCol($time, 'top'),
+			new CCol($status, 'top'),
+			new CCol($retries, 'top'),
 			new CCol($message, 'wraptext top'),
 			new CCol($error, 'wraptext top')));
 	}
@@ -1072,6 +1146,8 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 			$status=new CSpan(S_NOT_SENT,"red");
 			$retries=new CSpan(0,"red");
 		}
+		
+		$row['description'] = empty($row['description'])?'-':$row['description'];
 		
 		$tab_hint->AddRow(array(
 			get_node_name_by_elid($row['alertid']),
