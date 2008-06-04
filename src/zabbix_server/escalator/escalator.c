@@ -40,47 +40,70 @@ ZBX_USER_MSG
 	void		*next;
 };
 
-static void	add_user_msg(DB_OPERATION *operation, ZBX_USER_MSG **user_msg, char *subject, char *message)
+static int	check_perm2system(zbx_uint64_t userid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+	int		res = SUCCEED;
+
+	result = DBselect( "select count(g.usrgrpid) from usrgrp g, users_groups ug where ug.userid=" ZBX_FS_UI64
+			" and g.usrgrpid = ug.usrgrpid and g.users_status=%d",
+			userid,
+			GROUP_STATUS_DISABLED);
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]) && atoi(row[0]) > 0)
+		res = FAIL;
+
+	DBfree_result(result);
+
+	return res;
+}
+
+static void	add_user_msg(zbx_uint64_t userid, ZBX_USER_MSG **user_msg, char *subject, char *message)
+{
 	ZBX_USER_MSG	*p;
-	zbx_uint64_t	userid;
+
+	if (SUCCEED != check_perm2system(userid))
+		return;
+
+	p = *user_msg;
+	while (NULL != p) {
+		if (p->userid == userid && 0 == strcmp(p->subject, subject)
+				&& 0 == strcmp(p->message, message))
+			break;
+
+		p = p->next;
+	}
+
+	if (NULL == p) {
+		p = zbx_malloc(p, sizeof(ZBX_USER_MSG));
+
+		p->userid = userid;
+		p->subject = strdup(subject);
+		p->message = strdup(message);
+		p->next = *user_msg;
+
+		*user_msg = p;
+	}
+}
+
+static void	add_object_msg(DB_OPERATION *operation, ZBX_USER_MSG **user_msg, char *subject, char *message)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	switch (operation->object) {
 		case OPERATION_OBJECT_USER:
+			add_user_msg(operation->objectid, user_msg, subject, message);
+			break;
 		case OPERATION_OBJECT_GROUP:
-			/* user group disabled ? */
 			result = DBselect("select ug.userid from users_groups ug,usrgrp g"
-					" WHERE ug.%s=" ZBX_FS_UI64 " AND g.usrgrpid=ug.usrgrpid AND g.users_status=%d",
-					operation->object == OPERATION_OBJECT_USER ? "userid" : "usrgrpid",
+					" WHERE ug.usrgrpid=" ZBX_FS_UI64 " AND g.usrgrpid=ug.usrgrpid AND g.users_status=%d",
 					operation->objectid,
 					GROUP_STATUS_ACTIVE);
 
-			while (NULL != (row = DBfetch(result))) {
-				userid = zbx_atoui64(row[0]);
-
-				p = *user_msg;
-				while (NULL != p) {
-					if (p->userid == userid && 0 == strcmp(p->subject, subject)
-							&& 0 == strcmp(p->message, message))
-						break;
-
-					p = p->next;
-				}
-
-				if (NULL == p) {
-					p = zbx_malloc(p, sizeof(ZBX_USER_MSG));
-
-					p->userid = userid;
-					p->subject = strdup(subject);
-					p->message = strdup(message);
-					p->next = *user_msg;
-
-					*user_msg = p;
-
-				}
-			}
+			while (NULL != (row = DBfetch(result)))
+				add_user_msg(zbx_atoui64(row[0]), user_msg, subject, message);
 
 			DBfree_result(result);
 			break;
@@ -383,7 +406,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 						longdata = action->longdata;
 					}
 					
-					add_user_msg(&operation, &user_msg, shortdata, longdata);
+					add_object_msg(&operation, &user_msg, shortdata, longdata);
 					break;
 				case	OPERATION_TYPE_COMMAND:
 					add_command_alert(escalation, event, action, operation.longdata);
