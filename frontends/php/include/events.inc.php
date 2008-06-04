@@ -380,65 +380,8 @@ function make_small_eventlist($triggerid,&$trigger_data){
 				);
 		}
 		
-//actions								
-		$actions= new CTable(' - ');
-
-		$sql='SELECT COUNT(a.alertid) as cnt '.
-				' FROM alerts a '.
-				' WHERE a.eventid='.$row['eventid'].
-					' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')';
-								
-		$alerts=DBfetch(DBselect($sql));
-
-		if(isset($alerts['cnt']) && ($alerts['cnt'] > 0)){
-			$sql='SELECT COUNT(a.alertid) as sent '.
-					' FROM alerts a '.
-					' WHERE a.eventid='.$row['eventid'].
-						' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')'.
-						' AND a.status='.ALERT_STATUS_SENT;
-			$alerts=DBfetch(DBselect($sql));
-
-			$alert_cnt = new CSpan($alerts['sent'],'green');
-			if($alerts['sent']){
-				$hint=get_actions_hint_by_eventid($row['eventid'],ALERT_STATUS_SENT);
-				$alert_cnt->SetHint($hint);
-			}
-			$tdl = new CCol(($alerts['sent'])?$alert_cnt:SPACE);
-			$tdl->AddOption('width','10');
-
-			$sql='SELECT COUNT(a.alertid) as inprogress '.
-					' FROM alerts a '.
-					' WHERE a.eventid='.$row['eventid'].
-						' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')'.
-						' AND a.status='.ALERT_STATUS_NOT_SENT;
-			$alerts=DBfetch(DBselect($sql));
-
-			$alert_cnt = new CSpan($alerts['inprogress'],'orange');
-			if($alerts['inprogress']){
-				$hint=get_actions_hint_by_eventid($row['eventid'],ALERT_STATUS_NOT_SENT);
-				$alert_cnt->SetHint($hint);
-			}
-			$tdc = new CCol(($alerts['inprogress'])?$alert_cnt:SPACE);
-			$tdc->AddOption('width','10');
-
-			$sql='SELECT COUNT(a.alertid) as failed '.
-					' FROM alerts a '.
-					' WHERE a.eventid='.$row['eventid'].
-						' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')'.
-						' AND a.status='.ALERT_STATUS_FAILED;
-			$alerts=DBfetch(DBselect($sql));
-
-			$alert_cnt = new CSpan($alerts['failed'],'red');
-			if($alerts['failed']){
-				$hint=get_actions_hint_by_eventid($row['eventid'],ALERT_STATUS_FAILED);
-				$alert_cnt->SetHint($hint);
-			}
-
-			$tdr = new CCol(($alerts['failed'])?$alert_cnt:SPACE);
-			$tdr->AddOption('width','10');
-			
-			$actions->AddRow(array($tdl,$tdc,$tdr));
-		}
+//actions
+		$actions= get_event_actions_stat_hints($row['eventid']);					
 //--------		
 
 		$table->AddRow(array(
