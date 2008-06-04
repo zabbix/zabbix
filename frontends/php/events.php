@@ -22,6 +22,7 @@
 	require_once "include/config.inc.php";
 	require_once "include/hosts.inc.php";
 	require_once "include/events.inc.php";
+	require_once "include/actions.inc.php";
 	require_once "include/discovery.inc.php";
 	require_once "include/html.inc.php";
 
@@ -341,68 +342,7 @@ include_once "include/page_header.php";
 				$duration = zbx_date2age($row['clock'],$next_event['clock']);
 			}
 // Actions								
-			$actions= new CTable(' - ');
-
-			$sql='SELECT COUNT(a.alertid) as cnt_all'.
-					' FROM alerts a '.
-					' WHERE a.eventid='.$row['eventid'].
-						' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')';
-					
-			$alerts=DBfetch(DBselect($sql));
-
-			if(isset($alerts['cnt_all']) && ($alerts['cnt_all'] > 0)){
-				$mixed = 0;
-// Sent
-				$sql='SELECT COUNT(a.alertid) as sent '.
-						' FROM alerts a '.
-						' WHERE a.eventid='.$row['eventid'].
-							' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')'.
-							' AND a.status='.ALERT_STATUS_SENT;
-
-				$tmp=DBfetch(DBselect($sql));
-				$alerts['sent'] = $tmp['sent'];
-				$mixed+=($alerts['sent'])?ALERT_STATUS_SENT:0;
-// In progress
-				$sql='SELECT COUNT(a.alertid) as inprogress '.
-						' FROM alerts a '.
-						' WHERE a.eventid='.$row['eventid'].
-							' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')'.
-							' AND a.status='.ALERT_STATUS_NOT_SENT;
-
-				$tmp=DBfetch(DBselect($sql));
-				$alerts['inprogress'] = $tmp['inprogress'];
-// Failed
-				$sql='SELECT COUNT(a.alertid) as failed '.
-						' FROM alerts a '.
-						' WHERE a.eventid='.$row['eventid'].
-							' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.')'.
-							' AND a.status='.ALERT_STATUS_FAILED;
-
-				$tmp=DBfetch(DBselect($sql));
-				$alerts['failed'] = $tmp['failed'];
-				$mixed+=($alerts['failed'])?ALERT_STATUS_FAILED:0;
-
-				if($alerts['inprogress']){
-					$status = new CSpan(S_IN_PROGRESS,'orange');
-				}
-				else if(ALERT_STATUS_SENT == $mixed){
-					$status = new CSpan(S_OK,'green');
-				}
-				else if(ALERT_STATUS_FAILED == $mixed){
-					$status = new CSpan(S_FAILED,'red');
-				}
-				else{
-					$tdl = new CCol(($alerts['sent'])?(new CSpan($alerts['sent'],'green')):SPACE);
-					$tdl->AddOption('width','10');
-					
-					$tdr = new CCol(($alerts['failed'])?(new CSpan($alerts['failed'],'red')):SPACE);
-					$tdr->AddOption('width','10');
-
-					$status = new CRow(array($tdl,$tdr));
-				}
-
-				$actions->AddRow($status);
-			}
+			$actions= get_event_actions_status($row['eventid']);
 //--------		
 
 			if($config['event_ack_enable']){
