@@ -211,14 +211,15 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 		alertid		= DBget_maxid("alerts", "alertid");
 		error_esc	= DBdyn_escape_string(error);
 
-		DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock"
+		DBexecute("insert into alerts (alertid,actionid,eventid,userid,retries,clock"
 				",subject,message,status,alerttype,error,esc_step)"
-				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d"
+				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d"
 				",'%s','%s',%d,%d,'%s',%d)",
 				alertid,
 				action->actionid,
 				event->eventid,
 				userid,
+				ALERT_MAX_RETRIES,
 				now,
 				subject_esc,
 				message_esc,
