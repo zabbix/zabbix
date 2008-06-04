@@ -277,6 +277,8 @@
 //	actions.php
 	'S_ACTIONS'=>					'Actions',
 	'S_ACTIONS_BIG'=>				'ACTIONS',
+	'S_MESSAGE_ACTIONS'=>			'Message actions',
+	'S_COMMAND_ACTIONS'=>			'Command actions',
 	'S_ACTION_ADDED'=>				'Action added',
 	'S_CANNOT_ADD_ACTION'=>			'Cannot add action',
 	'S_ACTION_UPDATED'=>			'Action updated',
@@ -534,6 +536,7 @@
 	'S_MINUS_OTHER_MINUS'=>			'- other -',
 	'S_DESCRIPTION_LARGE'=>			'DESCRIPTION',
 	'S_DESCRIPTION_SMALL'=>			'Description',
+	'S_NO_DESCRIPTION'=>			'No description',
 	'S_GRAPH'=>				'Graph',
 	'S_TREND'=>				'Trend',
 	'S_COMPARE'=>				'Compare',
