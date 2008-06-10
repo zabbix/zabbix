@@ -992,7 +992,7 @@ function get_action_msgs_for_event($eventid){
 	while($row=DBfetch($result)){
 		$time=date("Y.M.d H:i:s",$row["clock"]);
 		if($row['esc_step'] > 0){
-			$time = array(bold(S_STEP.': '),br(),$row["esc_step"],br(),br(),bold(S_TIME.': '),br(),$time);	
+			$time = array(bold(S_STEP.': '),$row["esc_step"],br(),bold(S_TIME.': '),br(),$time);	
 		}
 		
 		if($row["status"] == ALERT_STATUS_SENT){
@@ -1063,7 +1063,7 @@ function get_action_cmds_for_event($eventid){
 	while($row=DBfetch($result)){
 		$time=date("Y.M.d H:i:s",$row["clock"]);
 		if($row['esc_step'] > 0){
-			$time = array(bold(S_STEP.': '),br(),$row["esc_step"],br(),br(),bold(S_TIME.': '),br(),$time);	
+			$time = array(bold(S_STEP.': '),$row["esc_step"],br(),bold(S_TIME.': '),br(),$time);	
 		}
 		
 		if($row["status"] == ALERT_STATUS_SENT){
