@@ -610,8 +610,7 @@ else {
 		return $result;
 	}
 
-	function id2nodeid($id_var)
-	{
+	function id2nodeid($id_var){
 		return (int)bcdiv("$id_var",'100000000000000');
 	}
 
@@ -656,7 +655,7 @@ else {
 	return uint_in_array(id2nodeid($id_var), $nodes);
 	}
 
-	function	get_dbid($table,$field){
+	function get_dbid($table,$field){
 		$nodeid = get_current_nodeid(false);
 
 		$found = false;

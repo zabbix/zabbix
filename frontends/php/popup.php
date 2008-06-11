@@ -251,7 +251,7 @@ include_once "include/page_header.php";
 		validate_group(PERM_READ_LIST,$validation_param);
 	}
 
-	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid(true));
+	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,get_current_nodeid(true));
 	$available_hosts	= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$nodeid				= get_current_nodeid();
 

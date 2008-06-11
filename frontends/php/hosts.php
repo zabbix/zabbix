@@ -232,7 +232,7 @@ include_once 'include/page_header.php';
 			}
 		}
 		else{
-			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				access_deny();
 		}
 
@@ -324,7 +324,7 @@ include_once 'include/page_header.php';
 			}
 		}
 		else{
-			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				access_deny();
 		}
 
@@ -520,7 +520,7 @@ include_once 'include/page_header.php';
 			$groupid = $_REQUEST["groupid"];
 		} 
 		else {
-			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				access_deny();
 			
 			DBstart();
@@ -720,7 +720,7 @@ include_once 'include/page_header.php';
 			$hostid		= $_REQUEST["hostid"];
 		} 
 		else {
-			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				access_deny();
 			
 			$hostid		= add_proxy($_REQUEST["host"], $hosts);
