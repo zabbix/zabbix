@@ -96,8 +96,7 @@ include_once "include/page_header.php";
 			} 
 			else {
 	/* ADD */
-				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,
-						PERM_RES_IDS_ARRAY,get_current_nodeid())))
+				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				{
 					access_deny();
 				}
@@ -128,7 +127,7 @@ include_once "include/page_header.php";
 		}
 	}
 	else if(isset($_REQUEST["save"]) && ($_REQUEST["config"]==8)){
-		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
 /* OTHER ACTIONS */
@@ -154,7 +153,7 @@ include_once "include/page_header.php";
 		}		
 	}
 	else if(isset($_REQUEST["save"]) && ($_REQUEST["config"]==9)){
-		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
 /* OTHER ACTIONS */
@@ -172,7 +171,7 @@ include_once "include/page_header.php";
 	}
 	else if(isset($_REQUEST["save"])&&uint_in_array($_REQUEST["config"],array(0,5,7))){
 
-		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
 /* OTHER ACTIONS */
@@ -243,8 +242,7 @@ include_once "include/page_header.php";
 				$valuemapid	= $_REQUEST["valuemapid"];
 			}
 			else{
-				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,
-					PERM_RES_IDS_ARRAY,get_current_nodeid())))
+				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				{
 					access_deny();
 				}

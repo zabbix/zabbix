@@ -25,7 +25,7 @@
 		global $USER_DETAILS;
 
 		if( $USER_DETAILS['type'] >= USER_TYPE_ZABBIX_ADMIN ){
-			if (0 < count(get_accessible_nodes_by_user($USER_DETAILS, $permission, null, PERM_RES_IDS_ARRAY, get_current_nodeid())))
+			if(count(get_accessible_nodes_by_user($USER_DETAILS, $permission, PERM_RES_IDS_ARRAY, get_current_nodeid())))
 				return true;
 		}
 	return false;

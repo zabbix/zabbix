@@ -76,7 +76,7 @@ include_once "include/page_header.php";
 			show_messages($result,"Network map updated","Cannot update network map");
 		} 
 		else {
-			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				access_deny();
 			
 			DBstart();

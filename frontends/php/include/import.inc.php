@@ -38,7 +38,7 @@
 
 			$this->available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY, get_current_nodeid());
 				
-			$this->available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, null, PERM_RES_IDS_ARRAY, get_current_nodeid());
+			$this->available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY, get_current_nodeid());
 		}
 		
 		function CharacterData($parser, $data) {

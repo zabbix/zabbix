@@ -57,7 +57,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 	validate_sort_and_sortorder();
 	
-	$accessible_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,PERM_RES_IDS_ARRAY, get_current_nodeid(true));
+	$accessible_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY, get_current_nodeid(true));
 
 	if ( 0 == count($accessible_nodes) )
 	{
