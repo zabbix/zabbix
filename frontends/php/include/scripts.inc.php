@@ -175,7 +175,7 @@ function get_accessible_scripts_by_hosts($hosts){
 	}
 /*
 */
-
+//SDI($scripts_by_host);
 return $scripts_by_host;
 }
 ?>

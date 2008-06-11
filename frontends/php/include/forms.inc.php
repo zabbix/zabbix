@@ -106,8 +106,7 @@
 			(count($steps) > 0) ? new CButton('del_sel_step',S_DELETE_SELECTED) : null
 			));
 
-		if(isset($new_step))
-		{
+		if(isset($new_step)){
 			if( !isset($new_step['screenid']) )	$new_step['screenid'] = 0;
 			if( !isset($new_step['delay']) )	$new_step['delay'] = 0;
 
@@ -686,7 +685,7 @@
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
 
 			$user=get_user_by_userid($userid);
-			$frm_title = S_USER." \"".$user["alias"]."\"";
+			$frm_title = S_USER.' "'.$user["alias"].'"';
 		}
 
 		if(isset($userid) && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"]))){
@@ -893,8 +892,7 @@
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
 
-		if($profile==0)
-		{
+		if(0 == $profile){
 			$frmUser->AddVar('perm_details', $perm_details);
 
 			$link = new CLink($perm_details ? S_HIDE : S_SHOW ,'#','action');
@@ -905,32 +903,24 @@
 				);
 			$frmUser->AddSpanRow($resources_list,'right_header');
 
-			if($perm_details)
-			{
+			if($perm_details){
 				$group_ids = array_keys($user_groups);
 				if(count($group_ids) == 0) $group_ids = array(-1);
-				$db_rights = DBselect('SELECT * FROM rights r WHERE r.groupid in ('.implode(',',$group_ids).')');
+				$db_rights = DBselect('SELECT * FROM rights r WHERE r.groupid IN ('.implode(',',$group_ids).')');
 
 				$tmp_perm = array();
-				while($db_right = DBfetch($db_rights))
-				{
-					if(isset($tmp_perm[$db_right['type']][$db_right['id']]))
-					{
-						$tmp_perm[$db_right['type']][$db_right['id']] = 
-							min($tmp_perm[$db_right['type']][$db_right['id']],
-								$db_right['permission']);
+				while($db_right = DBfetch($db_rights)){
+					if(isset($tmp_perm[$db_right['type']][$db_right['id']])){
+						$tmp_perm[$db_right['type']][$db_right['id']] = min($tmp_perm[$db_right['type']][$db_right['id']],$db_right['permission']);
 					}
-					else
-					{
+					else{
 						$tmp_perm[$db_right['type']][$db_right['id']] = $db_right['permission'];
 					}
 				}
 
 				$user_rights = array();
-				foreach($tmp_perm as $type => $res)
-				{
-					foreach($res as $id => $perm)
-					{
+				foreach($tmp_perm as $type => $res){
+					foreach($res as $id => $perm){
 						array_push($user_rights, array(	
 							'type'		=> $type,
 							'id'		=> $id,
@@ -938,7 +928,8 @@
 							));
 					}
 				}
-				
+//SDI($user_rights);
+//SDI($user_type);
 				$frmUser->AddSpanRow(get_rights_of_elements_table($user_rights, $user_type));
 			}
 		}
@@ -1146,26 +1137,22 @@
 		$frmUserG->Show();
 	}
 
-	function	get_rights_of_elements_table($rights=array(),$user_type=USER_TYPE_ZABBIX_USER)
-	{
+	function get_rights_of_elements_table($rights=array(),$user_type=USER_TYPE_ZABBIX_USER){
 		global $ZBX_LOCALNODEID;
 
 		$table = new CTable('S_NO_ACCESSIBLE_RESOURCES', 'right_table');
 		$table->SetHeader(array(SPACE, S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
 
-		if(ZBX_DISTRIBUTED)
-		{
+		if(ZBX_DISTRIBUTED){
 			$lst['node']['label']		= S_NODES;
 			$lst['node']['read_write']	= new CListBox('nodes_write'	,null	,6);
 			$lst['node']['read_only']	= new CListBox('nodes_read'	,null	,6);
 			$lst['node']['deny']		= new CListBox('nodes_deny'	,null	,6);
 
-			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, null, PERM_RES_DATA_ARRAY);
+			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
 
-			foreach($nodes as $node)
-			{
-				switch($node['permission'])
-				{
+			foreach($nodes as $node){
+				switch($node['permission']){
 					case PERM_READ_ONLY:	$list_name='read_only';		break;
 					case PERM_READ_WRITE:	$list_name='read_write';	break;
 					default:		$list_name='deny';		break;
@@ -1180,15 +1167,23 @@
 		$lst['group']['read_only']	= new CListBox('groups_read'	,null	,10);
 		$lst['group']['deny']		= new CListBox('groups_deny'	,null	,10);
 
-		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, null, PERM_RES_DATA_ARRAY, get_current_nodeid(false));
-
-		foreach($groups as $group)
-		{
-			switch($group['permission'])
-			{
-				case PERM_READ_ONLY:	$list_name='read_only';		break;
-				case PERM_READ_WRITE:	$list_name='read_write';	break;
-				default:		$list_name='deny';		break;
+		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(false));
+/*
+SDI($groups);
+		$rights['userid'] = 3;
+		$available_groups= get_accessible_groups_by_user($rights, PERM_DENY, PERM_RES_DATA_ARRAY);
+SDI($available_groups);
+//*/		
+		foreach($groups as $group){
+			switch($group['permission']){
+				case PERM_READ_ONLY:
+					$list_name='read_only';
+					break;
+				case PERM_READ_WRITE:
+					$list_name='read_write';
+					break;
+				default:
+					$list_name='deny';
 			}
 			$lst['group'][$list_name]->AddItem($group['groupid'],$group['node_name'].':'.$group['name']);
 		}
@@ -1199,7 +1194,7 @@
 		$lst['host']['read_only']	= new CListBox('hosts_read'	,null	,15);
 		$lst['host']['deny']		= new CListBox('hosts_deny'	,null	,15);
 
-		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, null, PERM_RES_DATA_ARRAY, get_current_nodeid(false));
+		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(false));
 
 		foreach($hosts as $host){
 			switch($host['permission']){
