@@ -293,8 +293,9 @@
 				' WHERE triggerid='.$triggerid.
 					' AND status='.TRIGGER_STATUS_ENABLED.
 					' AND value='.TRIGGER_VALUE_TRUE;
-		
+
 		$status = ($rows=DBfetch(DBselect($sql,1)))?$rows['priority']:0;
+
 	return $status;
 	}
 	

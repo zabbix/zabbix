@@ -148,9 +148,9 @@
 	function get_service_status($serviceid,$algorithm,$triggerid=null,$status=0){
 		
 		if(is_numeric($triggerid)){
-			$status = ($serv_status = get_service_status_of_trigger(triggerid))?$serv_status:$status;
+			$status = ($serv_status = get_service_status_of_trigger($triggerid))?$serv_status:$status;
 		}
-		
+
 		if((SERVICE_ALGORITHM_MAX == $algorithm) || (SERVICE_ALGORITHM_MIN == $algorithm)){
 			$sort_order = (SERVICE_ALGORITHM_MAX == $algorithm)?' DESC ':' ASC ';
 			
