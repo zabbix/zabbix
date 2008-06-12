@@ -645,7 +645,7 @@
 		/* delete graph */
 		$result &= DBexecute('DELETE FROM graphs_items WHERE graphid='.$graphid);
 		$result &= DBexecute('DELETE FROM graphs WHERE graphid='.$graphid);
-		$result &= DBexecute('DELETE FROM profiles WHERE idx="web.favorite.graphids" AND source="graphid" AND value='.$graphid);
+		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='graphid' AND value='$graphid'");
 		
 		if($result){
 			info('Graph "'.$graph['name'].'" deleted from hosts '.implode(',',$host_list));

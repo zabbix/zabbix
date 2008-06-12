@@ -119,6 +119,7 @@
 							array(),
 							null,
 							array());
+							
 					}
 					break; // case
 				case XML_TAG_GRAPH:
