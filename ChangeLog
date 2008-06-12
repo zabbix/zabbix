@@ -1,3 +1,8 @@
+Changes for 1.5.4
+
+ - [DEV-176] implemented "color only non-zero values" in "Status of triggers" (Artem)
+ - [DEV-175] added last login time to users tab (Artem)
+
 Changes for 1.5.3
 
  - [ZBX-380] added support of directories for Include in configuration file (Sasha)
