@@ -469,18 +469,23 @@ include_once "include/page_header.php";
 			while($db_user=DBfetch($db_users)){
 //Log Out 10min or Autologout time
 				$online_time = (($db_user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$db_user['autologout']))?ZBX_USER_ONLINE_TIME:$db_user['autologout'];
-				$db_sessions = DBselect('SELECT count(*) as count, max(s.lastaccess) as lastaccess'.
+				$online=new CCol(S_NO,"disabled");
+				
+				$sql = 'SELECT s.lastaccess'.
 						' FROM sessions s, users u'.
 						' WHERE s.userid='.$db_user['userid'].
 							' AND s.userid=u.userid '.
-							' AND (s.lastaccess+'.$online_time.')>='.time());
+						' ORDER BY lastaccess DESC';
 
-				$db_ses_cnt=DBfetch($db_sessions);
-
-				if($db_ses_cnt["count"]>0)
-					$online=new CCol(S_YES.' ('.date('r',$db_ses_cnt['lastaccess']).')',"enabled");
-				else
-					$online=new CCol(S_NO,"disabled");
+				$db_sessions = DBselect($sql,1);
+				if($db_ses_cnt=DBfetch($db_sessions)){
+					if(($db_ses_cnt['lastaccess']+$online_time) >= time()){
+						$online=new CCol(S_YES.' ('.date('r',$db_ses_cnt['lastaccess']).')',"enabled");
+					}
+					else{
+						$online=new CCol(S_NO.' ('.date('r',$db_ses_cnt['lastaccess']).')',"disabled");
+					}
+				}	
 				
 				$user_groups = array();
 				$db_groups = DBselect('SELECT g.name '.
