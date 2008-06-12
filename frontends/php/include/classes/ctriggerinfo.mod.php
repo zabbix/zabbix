@@ -44,43 +44,41 @@
 			$this->style = $value;
 		}
 
-		function SetNodeid($nodeid)
-		{
+		function SetNodeid($nodeid){
 			$this->nodeid = (int)$nodeid;
 		}
 		
-		function HideHeader()
-		{
+		function HideHeader(){
 			$this->show_header = false;
 		}
 
-		function BodyToString()
-		{
+		function BodyToString(){
 			global $USER_DETAILS;
-
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_RES_IDS_ARRAY, $this->nodeid);
+			
 			$this->CleanItems();
 
 			$ok = $uncn = $info = $warn = $avg = $high = $dis = 0;
 
-			$db_priority = DBselect("select t.priority,t.value,count(*) as cnt from triggers t,hosts h,items i,functions f".
-				" where t.status=".TRIGGER_STATUS_ENABLED." and f.itemid=i.itemid ".
-				" and h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and t.triggerid=f.triggerid ".
-				" and i.status=".ITEM_STATUS_ACTIVE.
-				' and h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,
-					null, null, $this->nodeid).') '.
-				" group by priority,t.value");
-			while($row=DBfetch($db_priority))
-			{
-				switch($row["value"])
-				{
+			$db_priority = DBselect('SELECT t.priority,t.value,count(*) as cnt '.
+							' FROM triggers t,hosts h,items i,functions f '.
+							' WHERE t.status='.TRIGGER_STATUS_ENABLED.
+								' AND f.itemid=i.itemid '.
+								' AND h.hostid=i.hostid '.
+								' AND h.status='.HOST_STATUS_MONITORED.
+								' AND t.triggerid=f.triggerid '.
+								' AND i.status='.ITEM_STATUS_ACTIVE.
+								' AND '.DBcondition('h.hostid',$available_hosts).
+							' GROUP BY priority,t.value');
+			while($row=DBfetch($db_priority)){
+				switch($row["value"]){
 					case TRIGGER_VALUE_TRUE:
-						switch($row["priority"])
-						{
-							case 1: $info	+= $row["cnt"];	break;
-							case 2: $warn	+= $row["cnt"];	break;
-							case 3: $avg	+= $row["cnt"];	break;
-							case 4: $high	+= $row["cnt"];	break;
-							case 5: $dis	+= $row["cnt"];	break;
+						switch($row["priority"]){
+							case TRIGGER_SEVERITY_INFORMATION:	$info	+= $row["cnt"];	break;
+							case TRIGGER_SEVERITY_WARNING:		$warn	+= $row["cnt"];	break;
+							case TRIGGER_SEVERITY_AVERAGE:		$avg	+= $row["cnt"];	break;
+							case TRIGGER_SEVERITY_HIGH:			$high	+= $row["cnt"];	break;
+							case TRIGGER_SEVERITY_DISASTER:		$dis	+= $row["cnt"];	break;
 							default:
 								$uncn	+= $row["cnt"];	break;
 						}
@@ -92,29 +90,26 @@
 				}
 			}
 
-			if($this->show_header)
-			{
+			if($this->show_header){
 				$header = new CCol(S_TRIGGERS_INFO,"header");
 				if($this->style == STYLE_HORISONTAL)
 					$header->SetColspan(7);
 				$this->AddRow($header);
 			}
 
-			$trok	= new CCol($ok.SPACE.S_OK,		"normal");
-			$uncn	= new CCol($uncn.SPACE.S_NOT_CLASSIFIED,"unknown");
-			$info	= new CCol($info.SPACE.S_INFORMATION,	"information");
-			$warn	= new CCol($warn.SPACE.S_WARNING,	"warning");
-			$avg	= new CCol($avg.SPACE.S_AVERAGE,	"average");
-			$high	= new CCol($high.SPACE.S_HIGH,		"high");
-			$dis	= new CCol($dis.SPACE.S_DISASTER,	"disaster");
+			$trok	= new CCol($ok.SPACE.S_OK,					get_severity_style('ok',false));
+			$uncn	= new CCol($uncn.SPACE.S_NOT_CLASSIFIED,	get_severity_style(TRIGGER_SEVERITY_NOT_CLASSIFIED,$uncn));
+			$info	= new CCol($info.SPACE.S_INFORMATION,		get_severity_style(TRIGGER_SEVERITY_INFORMATION,$info));
+			$warn	= new CCol($warn.SPACE.S_WARNING,			get_severity_style(TRIGGER_SEVERITY_WARNING,$warn));
+			$avg	= new CCol($avg.SPACE.S_AVERAGE,			get_severity_style(TRIGGER_SEVERITY_AVERAGE,$avg));
+			$high	= new CCol($high.SPACE.S_HIGH,				get_severity_style(TRIGGER_SEVERITY_HIGH,$high));
+			$dis	= new CCol($dis.SPACE.S_DISASTER,			get_severity_style(TRIGGER_SEVERITY_DISASTER,$dis));
 			
 
-			if($this->style == STYLE_HORISONTAL)
-			{
+			if(STYLE_HORISONTAL == $this->style){
 				$this->AddRow(array($trok, $uncn, $info, $warn, $avg, $high, $dis));
 			}
-			else
-			{			
+			else{			
 				$this->AddRow($trok);
 				$this->AddRow($uncn);
 				$this->AddRow($info);
