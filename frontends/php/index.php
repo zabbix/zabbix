@@ -59,7 +59,8 @@
 	if($config['authentication_type'] == ZBX_AUTH_HTTP){
 		
 		if(isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])){
-			$_REQUEST['enter'] = 'Enter';
+			if(!isset($sessionid)) $_REQUEST['enter'] = 'Enter';
+			
 			$_REQUEST['name'] = $_SERVER["PHP_AUTH_USER"];
 //			$_REQUEST['password'] = $_SERVER["PHP_AUTH_PW"];
 		}

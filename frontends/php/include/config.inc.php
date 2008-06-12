@@ -1444,6 +1444,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 */
 	function zbx_unsetcookie($name){
 		zbx_setcookie($name, null, -99999);
+		unset($_COOKIE[$name]);
 	}
 	
 	/* function:

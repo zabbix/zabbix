@@ -105,11 +105,11 @@
         }
 
         function delete_screen($screenid){
-			$result=DBexecute('delete from screens_items where screenid='.$screenid);
-			$result&=DBexecute('delete from screens_items where resourceid='.$screenid.' and resourcetype='.SCREEN_RESOURCE_SCREEN);
-			$result&=DBexecute('delete from slides where screenid='.$screenid);
-			$result&=DBexecute('DELETE FROM profiles WHERE idx="web.favorite.screenids" AND source="screenid" AND value='.$screenid);
-			$result&=DBexecute('delete from screens where screenid='.$screenid);	
+			$result=DBexecute('DELETE FROM screens_items where screenid='.$screenid);
+			$result&=DBexecute('DELETE FROM screens_items where resourceid='.$screenid.' and resourcetype='.SCREEN_RESOURCE_SCREEN);
+			$result&=DBexecute('DELETE FROM slides where screenid='.$screenid);
+			$result&=DBexecute("DELETE FROM profiles WHERE idx='web.favorite.screenids' AND source='screenid' AND value='$screenid'");
+			$result&=DBexecute('DELETE FROM screens where screenid='.$screenid);	
 		return	$result;
         }
 
@@ -139,7 +139,7 @@
 
         function delete_screen_item($screenitemid)
         {
-                $sql="delete from screens_items where screenitemid=$screenitemid";
+                $sql="DELETE FROM screens_items where screenitemid=$screenitemid";
                 return  DBexecute($sql);
         }
 
@@ -615,7 +615,7 @@
 		if(!$result = DBexecute('update slideshows set name='.zbx_dbstr($name).',delay='.$delay.' where slideshowid='.$slideshowid))
 			return false;
 
-		DBexecute('delete from slides where slideshowid='.$slideshowid);
+		DBexecute('DELETE FROM slides where slideshowid='.$slideshowid);
 
 		$i = 0;
 		foreach($slides as $slide){
@@ -629,11 +629,11 @@
 		return true;
 	}
 
-	function	delete_slideshow($slideshowid){
+	function delete_slideshow($slideshowid){
 
-		$result = DBexecute('delete from slideshows where slideshowid='.$slideshowid);
-		$result &= DBexecute('delete from slides where slideshowid='.$slideshowid);
-		$result &= DBexecute('DELETE FROM profiles WHERE idx="web.favorite.screenids" AND source="slideshowid" AND value='.$slideshowid);
+		$result = DBexecute('DELETE FROM slideshows where slideshowid='.$slideshowid);
+		$result &= DBexecute('DELETE FROM slides where slideshowid='.$slideshowid);
+		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.screenids' AND source='slideshowid' AND value='$slideshowid'");
 		
 		return $result;
 	}

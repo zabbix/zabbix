@@ -279,7 +279,7 @@ function make_system_summary(){
 			
 					$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
 								' FROM events e, triggers t '.
-								' WHERE e.object=0 '.
+								' WHERE e.object='.EVENT_SOURCE_TRIGGERS.
 									' AND e.objectid='.$row_inf['triggerid'].
 									' AND t.triggerid=e.objectid '.
 									' AND e.value='.TRIGGER_VALUE_TRUE.
@@ -506,7 +506,7 @@ function make_latest_issues(){
 
 		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
 					' FROM events e, triggers t '.
-					' WHERE e.object=0 '.
+					' WHERE e.object='.EVENT_SOURCE_TRIGGERS.
 						' AND e.objectid='.$row['triggerid'].
 						' AND t.triggerid=e.objectid '.
 						' AND e.value='.TRIGGER_VALUE_TRUE.
