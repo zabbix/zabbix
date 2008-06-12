@@ -800,7 +800,7 @@
 		$result = delete_history_by_itemid($itemid, 1 /* use housekeeper */);
 		if(!$result)	return	$result;
 
-		$result &= DBexecute('delete from screens_items where resourceid='.$itemid.' and resourcetype in ('.
+		$result &= DBexecute('DELETE FROM screens_items WHERE resourceid='.$itemid.' AND resourcetype IN ('.
 					(implode(',',array(
 						SCREEN_RESOURCE_SIMPLE_GRAPH,
 						SCREEN_RESOURCE_PLAIN_TEXT)
@@ -809,7 +809,7 @@
 
 		$result &= DBexecute('delete from items_applications where itemid='.$itemid);
 		$result &= DBexecute('delete from items where itemid='.$itemid);
-		$result &= DBexecute('DELETE FROM profiles WHERE idx="web.favorite.graphids" AND source="itemid" AND value='.$itemid);
+		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='itemid' AND value='$itemid'");
 		
 		if($result){
 			info("Item '".$host["host"].":".$item["key_"]."' deleted");
