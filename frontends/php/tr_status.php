@@ -331,7 +331,6 @@ include_once "include/page_header.php";
 		}
 		show_table_header($left_col);
 	}
-
   	if($_REQUEST["fullscreen"]){
 		$triggerInfo = new CTriggersInfo();
 		$triggerInfo->HideHeader();
@@ -347,7 +346,7 @@ include_once "include/page_header.php";
 	
 	$m_form = new CForm('acknow.php');
 	$m_form->SetName('tr_status');
-	
+
 	$table  = new CTableInfo();
 	$table->ShowStart();
 	
