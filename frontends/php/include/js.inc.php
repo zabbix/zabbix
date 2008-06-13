@@ -187,7 +187,7 @@ function simple_js_redirect($url,$timeout=null){
 	echo '</script>';
 }
 
-function	play_sound($filename){
+function play_sound($filename){
 
 	echo '<script language="javascript" type="text/javascript">
 	
@@ -202,7 +202,7 @@ function	play_sound($filename){
 }
 
 
-function	SetFocus($frm_name, $fld_name){
+function SetFocus($frm_name, $fld_name){
 	echo '<script language="javascript" type="text/javascript">
 	<!--
 		document.forms["'.$frm_name.'"].elements["'.$fld_name.'"].focus();
@@ -210,7 +210,7 @@ function	SetFocus($frm_name, $fld_name){
 	</script>';
 }
 
-function	Alert($msg){
+function Alert($msg){
 	echo '<script language="javascript" type="text/javascript">
 	<!--
 		alert("'.$msg.'");
