@@ -525,7 +525,11 @@ createDaysTab: function(){
 	table.appendChild(tbody);
 	
 	var cur_month = this.cdt.getMonth();
-	var prev_days = this.cdt.getDay();
+	
+// make 0 - monday, not sunday(as default)
+	var prev_days = this.cdt.getDay() - 1;
+	if(prev_days < 0) prev_days = 6;
+	
 	if(prev_days > 0){
 		this.cdt.setTime(this.cdt.getTime() - (prev_days*86400000));
 	}	
