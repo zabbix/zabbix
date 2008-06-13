@@ -380,8 +380,10 @@ include_once 'include/page_header.php';
 		$frmAction->AddVar('form',get_request('form',1));
 		$from_rfr = get_request('form_refresh',0);
 		$frmAction->AddVar('form_refresh',$from_rfr+1);
+		
+		$action = null;
 		if(isset($_REQUEST['actionid'])){
-//			$action = get_action_by_actionid($_REQUEST['actionid']);
+			$action = get_action_by_actionid($_REQUEST['actionid']);
 			$frmAction->AddVar('actionid',$_REQUEST['actionid']);
 		}
 		
@@ -393,7 +395,7 @@ include_once 'include/page_header.php';
 		
 		$left_tab->AddRow(create_hat(
 				S_ACTION,
-				get_act_action_form(),//null,
+				get_act_action_form($action),//null,
 				null,
 				'hat_action',
 				get_profile('web.actionconf.hats.hat_action.state',1)
@@ -401,7 +403,7 @@ include_once 'include/page_header.php';
 			
 		$left_tab->AddRow(create_hat(
 				S_ACTION_CONDITIONS,
-				get_act_condition_form(),//null,
+				get_act_condition_form($action),//null,
 				null,
 				'hat_conditions',
 				get_profile('web.actionconf.hats.hat_conditions.state',1)
@@ -410,7 +412,7 @@ include_once 'include/page_header.php';
 		if(isset($_REQUEST['new_condition'])){
 			$left_tab->AddRow(create_hat(
 					S_NEW_CONDITION,
-					get_act_new_cond_form(),//null,
+					get_act_new_cond_form($action),//null,
 					null,
 					'hat_new_cond',
 					get_profile('web.actionconf.hats.hat_new_cond.state',1)
@@ -426,7 +428,7 @@ include_once 'include/page_header.php';
 				
 		$right_tab->AddRow(create_hat(
 				S_ACTION_OPERATIONS,
-				get_act_operations_form(),//null,
+				get_act_operations_form($action),//null,
 				null,
 				'hat_operations',
 				get_profile('web.actionconf.hats.hat_operations.state',1)
@@ -435,7 +437,7 @@ include_once 'include/page_header.php';
 		if(isset($_REQUEST['new_operation'])){
 			$right_tab->AddRow(create_hat(
 					S_EDIT_OPERATION,
-					get_act_new_oper_form(),//null,
+					get_act_new_oper_form($action),//null,
 					null,
 					'hat_new_oper',
 					get_profile('web.actionconf.hats.hat_new_oper.state',1)
@@ -445,7 +447,7 @@ include_once 'include/page_header.php';
 		if(isset($_REQUEST['new_opcondition'])){
 			$right_tab->AddRow(create_hat(
 					S_NEW.SPACE.S_OPERATION_CONDITION,
-					get_oper_new_cond_form(),//null,
+					get_oper_new_cond_form($action),//null,
 					null,
 					'hat_new_oper_cond',
 					get_profile('web.actionconf.hats.hat_new_oper_cond.state',1)
