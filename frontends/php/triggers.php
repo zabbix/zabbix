@@ -201,11 +201,12 @@ include_once "include/page_header.php";
 					array_push($hosts_ids, $db_host['hostid']);
 				}
 			}
-
+			DBstart();
 			foreach($_REQUEST['g_triggerid'] as $trigger_id)
 				foreach($hosts_ids as $host_id){
 					copy_trigger_to_host($trigger_id, $host_id, true);
 				}
+			$result = DBend();
 			unset($_REQUEST['form_copy_to']);
 		}
 		else{
@@ -232,10 +233,11 @@ include_once "include/page_header.php";
 /* GROUP ACTIONS */
 	else if(isset($_REQUEST["group_enable"])&&isset($_REQUEST["g_triggerid"])){
 	
+		DBstart();
 		foreach($_REQUEST["g_triggerid"] as $triggerid){
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
-			$result=DBselect("SELECT triggerid FROM triggers t WHERE t.triggerid=".zbx_dbstr($triggerid));
+			$result=DBselect('SELECT triggerid FROM triggers t WHERE t.triggerid='.zbx_dbstr($triggerid));
 			if(!$row = DBfetch($result)) continue;
 			
 			if($result = update_trigger_status($row['triggerid'],0)){
@@ -246,14 +248,14 @@ include_once "include/page_header.php";
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
 					S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ".S_ENABLED);
 			}
-			$result2 = isset($result2) ? $result2 | $result : $result;
 		}
 		
-		if(isset($result2)){
-			show_messages($result2, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
-		}
+		$result = DBend();
+		show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+
 	}
 	else if(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_triggerid"])){
+		DBstart();
 		foreach($_REQUEST["g_triggerid"] as $triggerid){
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
@@ -266,14 +268,14 @@ include_once "include/page_header.php";
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
 					S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ".S_DISABLED);
 			}
-			$result2 = isset($result2) ? $result2 | $result : $result;
 		}
-		if(isset($result2)){
-			show_messages($result2, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
-		}
+		
+		$result = DBend();
+		show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 	}
 	else if(isset($_REQUEST["group_delete"])&&isset($_REQUEST["g_triggerid"])){
-		
+
+		DBstart();		
 		foreach($_REQUEST["g_triggerid"] as $triggerid){
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
@@ -283,20 +285,16 @@ include_once "include/page_header.php";
 			
 			$description = expand_trigger_description($triggerid);
 			
-			DBstart();
 			$result = delete_trigger($row["triggerid"]);
-			$result = DBend();
 			
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
 					S_TRIGGER." [".$triggerid."] [".$description."] ".S_DISABLED);
 			}
-
-			$result2 = isset($result2) ? $result2 | $result : $result;
 		}
-		if(isset($result2)){
-			show_messages($result2, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
-		}
+		
+		$result = DBend();
+		show_messages($result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
 ?>
 <?php
