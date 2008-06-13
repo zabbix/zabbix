@@ -170,7 +170,8 @@ COpt::counter_up('perm');
 				' left join rights r on r.id=g.groupid and r.type='.RESOURCE_TYPE_GROUP.
 				' left join users_groups ug on ug.usrgrpid=r.groupid and ug.userid='.$userid.
 				' left join nodes n on '.DBid2nodeid('h.hostid').'=n.nodeid '.
-			$where.' group by h.hostid,n.nodeid,n.name,h.host,ug.userid '.
+			$where.
+			' group by h.hostid,n.nodeid,n.name,h.host,ug.userid '.
 			' order by n.name,n.nodeid, h.host, permission '.$sortorder.', userid '.$sortorder;
 
 		$db_hosts = DBselect($sql);
@@ -182,7 +183,7 @@ COpt::counter_up('perm');
 
 			/* if no rights defined used node rights */
 			if( (is_null($host_data['permission']) || is_null($host_data['userid'])) ){
-				if( isset($processed[$host_data['hostid']]) )
+				if( isset($processed[$host_data['hostid']]) || is_null($host_data['userid']))
 					continue;
 
 				if(!isset($nodes)){
@@ -216,7 +217,7 @@ COpt::counter_up('perm');
 
 	function	get_accessible_groups_by_user($user_data,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
 	{
-		global $ZBX_LOCALNODEID;
+		global $ZBX_LOCALNODEID, $DB_TYPE;
 
 		if(is_null($perm_mode))		$perm_mode	= PERM_MODE_GE;
 		if(is_null($perm_res))		$perm_res	= PERM_RES_STRING_LINE;
@@ -242,21 +243,27 @@ COpt::counter_up('perm');
 	
 		if(count($where)) 	$where = ' where '.implode(' and ',$where);
 		else			$where = '';
-	
-		/* if no rights defined used node rights */
-		$db_groups = DBselect('select n.nodeid as nodeid,n.name as node_name,hg.groupid,hg.name,min(r.permission) as permission,g.userid'.
-			' from groups hg left join rights r on r.id=hg.groupid and r.type='.RESOURCE_TYPE_GROUP.
-			' left join users_groups g on r.groupid=g.usrgrpid and g.userid='.$userid.
-			' left join nodes n on '.DBid2nodeid('hg.groupid').'=n.nodeid '.
-			$where.' group by n.nodeid, n.name, hg.groupid, hg.name, g.userid, g.userid '.
-			' order by n.name, hg.name, permission desc');
+
+		$sortorder = (isset($DB_TYPE) && (($DB_TYPE == 'MYSQL') || ($DB_TYPE == 'SQLITE3')))?' DESC ':'';	
+		
+		$sql = 'SELECT n.nodeid as nodeid,n.name as node_name,hg.groupid,hg.name,min(r.permission) as permission,g.userid'.
+			' FROM groups hg '.
+				' LEFT JOIN rights r ON r.id=hg.groupid and r.type='.RESOURCE_TYPE_GROUP.
+				' LEFT JOIN users_groups g ON r.groupid=g.usrgrpid and g.userid='.$userid.
+				' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid '.
+			$where.
+			' GROUP BY n.nodeid, n.name, hg.groupid, hg.name, g.userid, g.userid '.
+			' ORDER BY n.name, hg.name, permission '.$sortorder;
+
+/* if no rights defined used node rights */
+		$db_groups = DBselect($sql);
 
 		$processed = array();
 		while($group_data = DBfetch($db_groups))
 		{
 			if(is_null($group_data['nodeid'])) $group_data['nodeid'] = id2nodeid($group_data['groupid']);
 
-			/* deny if no rights defined */
+/* deny if no rights defined */
 			if( is_null($group_data['permission']) || is_null($group_data['userid']) )
 			{
 				if(isset($processed[$group_data['groupid']]))

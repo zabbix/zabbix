@@ -912,10 +912,9 @@
 					}
 					else
 					{
-						$link = new CLink($function_data["host"].":".$function_data["key_"],
-							'history.php?action='.( $function_data["value_type"] ==0 ? 'showvalues' : 'showgraph').
-							'&itemid='.$function_data['itemid']);
-					
+						$link = new CLink($function_data['host'].':'.$function_data['key_'],
+							'history.php?action='.( (($function_data['value_type'] == ITEM_VALUE_TYPE_FLOAT) || ($function_data['value_type'] == ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues').'&itemid='.$function_data['itemid']);
+												
 						$exp .= '{'.$link->ToString().'.'.bold($function_data["function"].'(').$function_data["parameter"].bold(')').'}';
 					}
 				}
