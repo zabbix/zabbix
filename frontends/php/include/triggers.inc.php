@@ -726,40 +726,33 @@
 	}
 
 
-	function	add_trigger(
-		$expression, $description, $type, $priority, $status,
-		$comments, $url, $deps=array(), $templateid=0)
-	{
-		
+	function add_trigger($expression, $description, $type, $priority, $status, $comments, $url, $deps=array(), $templateid=0){
 		if( !validate_expression($expression) )
 			return false;
 
 		$triggerid=get_dbid("triggers","triggerid");
 		
-		$result=DBexecute("insert into triggers".
-			"  (triggerid,description,type,priority,status,comments,url,value,error,templateid)".
-			" values ($triggerid,".zbx_dbstr($description).",$type,$priority,$status,".zbx_dbstr($comments).",".
-			"".zbx_dbstr($url).",2,'Trigger just added. No status update so far.',$templateid)");
-		if(!$result)
-		{
+		$result=DBexecute('INSERT INTO triggers '.
+			'  (triggerid,description,type,priority,status,comments,url,value,error,templateid) '.
+			" values ($triggerid,".zbx_dbstr($description).",$type,$priority,$status,".zbx_dbstr($comments).','.
+			zbx_dbstr($url).",2,'Trigger just added. No status update so far.',$templateid)");
+			
+		if(!$result){
 			return	$result;
 		}
  
 		add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
  
-		if( null == ($expression = implode_exp($expression,$triggerid)) )
-		{
+		if( null == ($expression = implode_exp($expression,$triggerid)) ){
 			$result = false;
 		}
 
-		if($result)
-		{
+		if($result){
 			DBexecute("update triggers set expression=".zbx_dbstr($expression)." where triggerid=$triggerid");
 
 			reset_items_nextcheck($triggerid);
 
-			foreach($deps as $val)
-			{
+			foreach($deps as $val){
 				$result = add_trigger_dependency($triggerid, $val);
 			}
 		}
@@ -767,29 +760,26 @@
 		$trig_hosts = get_hosts_by_triggerid($triggerid);
 		$trig_host = DBfetch($trig_hosts);
 		
-		if($result)
-		{
+		if($result){
 			$msg = "Added trigger '".$description."'";
-			if($trig_host)
-			{
+			if($trig_host){
 				$msg .= " to host '".$trig_host["host"]."'";
 			}
 			info($msg);
 		}
 
-		if($trig_host)
-		{// create trigger for childs
+		if($trig_host){
+// create trigger for childs
 			$child_hosts = get_hosts_by_templateid($trig_host["hostid"]);
-			while($child_host = DBfetch($child_hosts))
-			{
+			while($child_host = DBfetch($child_hosts)){
 				if( !($result = copy_trigger_to_host($triggerid, $child_host["hostid"])))
 					break;
 			}
 		}
 
 		if(!$result){
-			if($templateid == 0)
-			{ // delete main trigger (and recursively childs)
+			if($templateid == 0){ 
+// delete main trigger (and recursively childs)
 				delete_trigger($triggerid);
 			}
 			return $result;
@@ -803,15 +793,14 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	get_trigger_dependencies_by_triggerid($triggerid)
-	{
+	function get_trigger_dependencies_by_triggerid($triggerid){
 		$result = array();
 
-		$db_deps = DBselect("select * from trigger_depends where triggerid_down=".$triggerid);
+		$db_deps = DBselect('SELECT * FROM trigger_depends WHERE triggerid_down='.$triggerid);
 		while($db_dep = DBfetch($db_deps))
 				$result[] = $db_dep['triggerid_up'];
 			
-		return $result;
+	return $result;
 	}
 
 	/******************************************************************************
@@ -819,16 +808,19 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	replace_template_dependencies($deps, $hostid)
-	{
-		foreach($deps as $id => $val)
-		{
-			if($db_new_dep = DBfetch(DBselect('select t.triggerid from triggers t,functions f,items i '.
-				' where t.templateid='.$val.' and f.triggerid=t.triggerid '.
-				' and f.itemid=i.itemid and i.hostid='.$hostid)))
+	function	replace_template_dependencies($deps, $hostid){
+		foreach($deps as $id => $val){
+			if($db_new_dep = DBfetch(DBselect('SEELCT t.triggerid '.
+				' FROM triggers t,functions f,items i '.
+				' WHERE t.templateid='.$val.
+					' AND f.triggerid=t.triggerid '.
+					' AND f.itemid=i.itemid '.
+					' AND i.hostid='.$hostid)))
+			{
 					$deps[$id] = $db_new_dep['triggerid'];
+			}
 		}
-		return $deps;
+	return $deps;
 	}
 
 	/******************************************************************************
@@ -836,8 +828,7 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	copy_trigger_to_host($triggerid, $hostid, $copy_mode = false)
-	{
+	function copy_trigger_to_host($triggerid, $hostid, $copy_mode = false){
 		$trigger = get_trigger_by_triggerid($triggerid);
 
 		$deps = replace_template_dependencies(
@@ -876,9 +867,9 @@
 
 		$newtriggerid=get_dbid('triggers','triggerid');
 
-		$result = DBexecute('INSERT INTO triggers'.
+		$result = DBexecute('INSERT INTO triggers '.
 					' (triggerid,description,type,priority,status,comments,url,value,expression,templateid)'.
-				' VALUES ('.$newtriggerid.','.zbx_dbstr($trigger['description']).','.$trigger['type'].','.$trigger['priority'].','.
+					' VALUES ('.$newtriggerid.','.zbx_dbstr($trigger['description']).','.$trigger['type'].','.$trigger['priority'].','.
 					$trigger["status"].','.zbx_dbstr($trigger["comments"]).','.
 					zbx_dbstr($trigger["url"]).",2,'{???:???}',".($copy_mode ? 0 : $triggerid).')');
 
@@ -890,23 +881,19 @@
 
 		// Loop: functions
 		$functions = get_functions_by_triggerid($triggerid);
-		while($function = DBfetch($functions))
-		{
+		while($function = DBfetch($functions)){
 			$item = get_item_by_itemid($function["itemid"]);
 
-			$host_items = DBselect("select * from items".
-				" where key_=".zbx_dbstr($item["key_"]).
-				" and hostid=".$host["hostid"]);
+			$host_items = DBselect('SELECT * FROM items WHERE key_='.zbx_dbstr($item['key_']).' AND hostid='.$host['hostid']);
 			$host_item = DBfetch($host_items);
-			if(!$host_item)
-			{
+			if(!$host_item){
 				error("Missing key '".$item["key_"]."' for host '".$host["host"]."'");
 				return FALSE;
 			}
 
 			$newfunctionid=get_dbid("functions","functionid");
 
-			$result = DBexecute("insert into functions (functionid,itemid,triggerid,function,parameter)".
+			$result = DBexecute('INSERT INTO functions (functionid,itemid,triggerid,function,parameter) '.
 				" values ($newfunctionid,".$host_item["itemid"].",$newtriggerid,".
 				zbx_dbstr($function["function"]).",".zbx_dbstr($function["parameter"]).")");
 
@@ -916,12 +903,10 @@
 				$newexpression);
 		}
 
-		DBexecute("update triggers set expression=".zbx_dbstr($newexpression).
-			" where triggerid=$newtriggerid");
+		DBexecute('UPDATE triggers SET expression='.zbx_dbstr($newexpression).' WHERE triggerid='.$newtriggerid);
 // copy dependencies
 		delete_dependencies_by_triggerid($newtriggerid);
-		foreach($deps as $dep_id)
-		{
+		foreach($deps as $dep_id){
 			add_trigger_dependency($newtriggerid, $dep_id);
 		}
 
@@ -929,15 +914,15 @@
 
 // Copy triggers to the child hosts
 		$child_hosts = get_hosts_by_templateid($hostid);
-		while($child_host = DBfetch($child_hosts))
-		{// recursion
+		while($child_host = DBfetch($child_hosts)){
+// recursion
 			$result = copy_trigger_to_host($newtriggerid, $child_host["hostid"]);
 			if(!$result){
 				return result;
 			}
 		}
 
-		return $newtriggerid;
+	return $newtriggerid;
 	}
 	
 
@@ -948,8 +933,7 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	explode_exp ($expression, $html,$template=false)
-	{
+	function explode_exp ($expression, $html,$template=false){
 //		echo "EXPRESSION:",$expression,"<Br>";
 
 		$functionid='';
@@ -959,17 +943,16 @@
 		else{
 			$exp=array();
 		}
+		
 		$state='';
-		for($i=0,$max=strlen($expression); $i<$max; $i++)
-		{
-			if($expression[$i] == '{')
-			{
+		for($i=0,$max=strlen($expression); $i<$max; $i++){
+			if($expression[$i] == '{'){
 				$functionid='';
 				$state='FUNCTIONID';
 				continue;
 			}
-			if($expression[$i] == '}')
-			{
+			
+			if($expression[$i] == '}'){
 				$state='';
 				if($functionid=="TRIGGER.VALUE"){
 					if(0 == $html) $exp.='{'.$functionid.'}';
@@ -1034,23 +1017,20 @@
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	implode_exp ($expression, $triggerid)
-	{
+	function implode_exp ($expression, $triggerid){
 		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO;
 		$expr = $expression;
 		$short_exp = $expression;
 
 		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
 		/* build short expression {12}>10 */
-		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr))
-		{
-			if ( $arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_ALLOWED_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) )
-			{
+		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
+			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_ALLOWED_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]])){
 				error('[ie] Unknown macro ['.$arr[ZBX_EXPRESSION_MACRO_ID].']');
 				return false;
 			}
-			else if( !$arr[ZBX_EXPRESSION_MACRO_ID] ) 
-			{
+			else if(!$arr[ZBX_EXPRESSION_MACRO_ID]) {
+			
 				$s_expr		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID];
 				$host		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_HOST_ID];
 				$key		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_KEY_ID];
@@ -1084,28 +1064,25 @@
 			$expr = $arr[ZBX_EXPRESSION_LEFT_ID].$ZBX_TR_EXPR_REPLACE_TO.$arr[ZBX_EXPRESSION_RIGHT_ID];
 		}
 
-		return $short_exp;
+	return $short_exp;
 	}
 
-	function	update_trigger_comments($triggerid,$comments)
-	{
-		return	DBexecute("update triggers set comments=".zbx_dbstr($comments).
-			" where triggerid=$triggerid");
+	function update_trigger_comments($triggerid,$comments){
+		return	DBexecute('UPDATE triggers SET comments='.zbx_dbstr($comments).
+					' WHERE triggerid='.$triggerid);
 	}
 
 	# Update Trigger status
 
-	function	update_trigger_status($triggerid,$status)
-	{
+	function update_trigger_status($triggerid,$status){
 		// first update status for child triggers
 		$db_chd_triggers = get_triggers_by_templateid($triggerid);
-		while($db_chd_trigger = DBfetch($db_chd_triggers))
-		{
+		while($db_chd_trigger = DBfetch($db_chd_triggers)){
 			update_trigger_status($db_chd_trigger["triggerid"],$status);
 		}
 
 		add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
-		return	DBexecute("update triggers set status=$status where triggerid=$triggerid");
+	return	DBexecute('UPDATE triggers SET status='.$status.' WHERE triggerid='.$triggerid);
 	}
 
 	/*
@@ -1120,14 +1097,13 @@
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	extract_numbers($str)
-	{
+	function extract_numbers($str){
 		$numbers = array();
 		while ( ereg(ZBX_EREG_NUMBER.'([[:print:]]*)', $str, $arr) ) {
 			$numbers[] = $arr[1];
 			$str = $arr[2];
 		}
-		return $numbers;
+	return $numbers;
 	}
 
 	/*
@@ -1143,27 +1119,21 @@
 	 *           replcae $1-9 macros
 	 *
 	 */
-	function	expand_trigger_description_constants($description, $row)
-	{
-		if($row && isset($row['expression']))
-		{
+	function	expand_trigger_description_constants($description, $row){
+		if($row && isset($row['expression'])){
 			$numbers = extract_numbers(ereg_replace('(\{[0-9]+\})', 'function', $row['expression']));
 			$description = $row["description"];
 
-			for ( $i = 0; $i < 9; $i++ )
-			{
-				$description = 
-					str_replace(
-						'$'.($i+1),
-						isset($numbers[$i]) ? 
-							$numbers[$i] : 
-							'', 
-						$description
-						);
+			for ( $i = 0; $i < 9; $i++ ){
+				$description = str_replace(
+									'$'.($i+1),
+									isset($numbers[$i])?$numbers[$i]:'', 
+									$description
+								);
 			}
 		}
 
-		return $description;
+	return $description;
 	}
 	/*
 	 * Function: expand_trigger_description_by_data
@@ -1177,54 +1147,48 @@
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER)
-	{
-		if($row)
-		{
+	function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER){
+		if($row){
 			$description = expand_trigger_description_constants($row['description'], $row);
 
 			if(is_null($row["host"])) $row["host"] = "{HOSTNAME}";
 			$description = str_replace("{HOSTNAME}", $row["host"],$description);
 
-			if(zbx_strstr($description,"{ITEM.LASTVALUE}"))
-			{
+			if(zbx_strstr($description,"{ITEM.LASTVALUE}")){
 				$row2=DBfetch(DBselect('SELECT i.lastvalue, i.value_type, i.itemid '.
 										' FROM items i, triggers t, functions f '.
 										' WHERE i.itemid=f.itemid '.
 											' AND f.triggerid=t.triggerid '.
 											' AND t.triggerid='.$row['triggerid']));
 
-				if($row2['value_type']!=ITEM_VALUE_TYPE_LOG)
-				{
+				if($row2['value_type']!=ITEM_VALUE_TYPE_LOG){
 					$description = str_replace('{ITEM.LASTVALUE}', $row2['lastvalue'],$description);
 				}
-				else
-				{
+				else{
 					$row3=DBfetch(DBselect("select max(clock) as max from history_log where itemid=".$row2["itemid"]));
-					if($row3 && !is_null($row3["max"]))
-					{
+					if($row3 && !is_null($row3["max"])){
 						$row4=DBfetch(DBselect("select value from history_log where itemid=".$row2["itemid"]." and clock=".$row3["max"]));
 						$description = str_replace("{ITEM.LASTVALUE}", $row4["value"],$description);
 					}
 				}
 			}
 
-			if(zbx_strstr($description,'{ITEM.VALUE}'))
-			{
+			if(zbx_strstr($description,'{ITEM.VALUE}')){
 				$value=($flag==ZBX_FLAG_TRIGGER)?
 						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,1,1):
 						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,1,$row['clock']);
+						
 				$description = str_replace("{ITEM.VALUE}",
 						$value,
 						$description);
 			}
 
 			for($i=1; $i<10; $i++){
-				if(zbx_strstr($description,"{ITEM.VALUE$i}"))
-				{
+				if(zbx_strstr($description,"{ITEM.VALUE$i}")){
 					$value=($flag==ZBX_FLAG_TRIGGER)?
 							trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,$i,1):
 							trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,$i,$row['clock']);
+							
 					$description = str_replace("{ITEM.VALUE$i}",
 							$value,
 							$description);
@@ -1232,43 +1196,41 @@
 
 			}
 		}
-		else
-		{
+		else{
 			$description = "*ERROR*";
 		}
-		return $description;
+	return $description;
 	}
 	
-	function	expand_trigger_description_simple($triggerid)
-	{
+	function expand_trigger_description_simple($triggerid){
 		return expand_trigger_description_by_data(
 			DBfetch(
-				DBselect("select distinct t.description,h.host,t.expression,t.triggerid ".
-					" from triggers t left join functions f on t.triggerid=f.triggerid ".
-					" left join items i on f.itemid=i.itemid ".
-					" left join hosts h on i.hostid=h.hostid ".
-					" where t.triggerid=$triggerid")
+				DBselect('SELECT DISTINCT t.description,h.host,t.expression,t.triggerid '.
+					' FROM triggers t '.
+						' LEFT JOIN functions f on t.triggerid=f.triggerid '.
+						' LEFT JOIN items i on f.itemid=i.itemid '.
+						' LEFT JOIN hosts h on i.hostid=h.hostid '.
+					' WHERE t.triggerid='.$triggerid)
 				)
 			);
 	}
 
-	function	expand_trigger_description($triggerid)
-	{
+	function expand_trigger_description($triggerid){
 		$description=expand_trigger_description_simple($triggerid);
 		$description=htmlspecialchars($description);
 
-		return $description;
+	return $description;
 	}
 
-	function	update_trigger_value_to_unknown_by_hostid($hostid)
-	{
-		$result = DBselect("select distinct t.triggerid".
-			" from hosts h,items i,triggers t,functions f".
-			" where f.triggerid=t.triggerid and f.itemid=i.itemid".
-			" and h.hostid=i.hostid and h.hostid=$hostid");
+	function update_trigger_value_to_unknown_by_hostid($hostid){
+		$result = DBselect('SELECT DISTINCT t.triggerid '.
+			' FROM hosts h,items i,triggers t,functions f '.
+			' WHERE f.triggerid=t.triggerid '.
+				' AND f.itemid=i.itemid '.
+				' AND h.hostid=i.hostid '.
+				' AND h.hostid='.$hostid);
 		$now = time();
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			if(!add_event($row["triggerid"],TRIGGER_VALUE_UNKNOWN,$now)) continue;
 
 			DBexecute('update triggers set value='.TRIGGER_VALUE_UNKNOWN.' where triggerid='.$row["triggerid"]);
@@ -1280,8 +1242,7 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function add_event($triggerid, $value, $time=NULL)
-	{
+	function add_event($triggerid, $value, $time=NULL){
 		if(is_null($time)) $time = time();
 
 		$result = DBselect('SELECT value,clock '.
@@ -1307,8 +1268,7 @@
 
 	function add_trigger_dependency($triggerid,$depid){
 		$result=insert_dependency($triggerid,$depid);;
-		if(!$result)
-		{
+		if(!$result){
 			return $result;
 		}
 		//add_additional_dependencies($triggerid,$depid);
@@ -1322,8 +1282,7 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	delete_trigger($triggerid)
-	{
+	function delete_trigger($triggerid){
 		// first delete child triggers
 		$db_triggers= get_triggers_by_templateid($triggerid);
 		while($db_trigger = DBfetch($db_triggers))
@@ -1987,7 +1946,7 @@
 				$item_menu[$action][] = array(
 					$description,
 					'history.php?action='.$action.'&itemid='.$item_data['itemid'].'&period=3600',
-					 array('tw'=>'_blank', 'sb'=>$status_bar));
+					 array('tw'=>'', 'sb'=>$status_bar));
 			}
 			if(isset($item_menu['showgraph'])){
 				$tr_ov_menu[] = array(S_GRAPHS,	null, null,
