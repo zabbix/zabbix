@@ -67,7 +67,7 @@ function action_accessible($actionid,$perm){
 	return $result;
 }
 
-function	check_permission_for_action_conditions($conditions){
+function check_permission_for_action_conditions($conditions){
 	global $USER_DETAILS;
 
 	$result = true;
@@ -779,25 +779,20 @@ function validate_condition($conditiontype, $value)
 	return true;
 }
 
-function	validate_operation($operation)
-{
+function validate_operation($operation){
 	global $USER_DETAILS;
 
-	switch($operation['operationtype'])
-	{
+	switch($operation['operationtype']){
 		case OPERATION_TYPE_MESSAGE:
-			switch($operation['object'])
-			{
+			switch($operation['object']){
 				case OPERATION_OBJECT_USER:
-					if( !get_user_by_userid($operation['objectid']) )
-					{
+					if( !get_user_by_userid($operation['objectid']) ){
 						error(S_INCORRECT_USER);
 						return false;
 					}
 					break;
 				case OPERATION_OBJECT_GROUP:
-					if( !get_group_by_usrgrpid($operation['objectid']) )
-					{
+					if( !get_group_by_usrgrpid($operation['objectid']) ){
 						error(S_INCORRECT_GROUP);
 						return false;
 					}
@@ -814,18 +809,14 @@ function	validate_operation($operation)
 			break;
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:
-			if(!uint_in_array($operation['objectid'],
-				get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
-			{
+			if(!uint_in_array($operation['objectid'], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
 				error(S_INCORRECT_GROUP);
 				return false;
 			}
 			break;
 		case OPERATION_TYPE_TEMPLATE_ADD:
 		case OPERATION_TYPE_TEMPLATE_REMOVE:
-			if(!uint_in_array($operation['objectid'],
-				get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
-			{
+			if(!uint_in_array($operation['objectid'], get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
 				error(S_INCORRECT_HOST);
 				return false;
 			}
@@ -834,14 +825,14 @@ function	validate_operation($operation)
 			error(S_INCORRECT_OPERATION_TYPE);
 			return false;
 	}
-	return true;
+return true;
 }
 
 function validate_commands($commands){
 	$cmd_list = split("\n",$commands);
 	foreach($cmd_list as $cmd){
 		$cmd = trim($cmd, "\x00..\x1F");
-		if(!ereg("^(({HOSTNAME})|([0-9a-zA-Z\_\.[.-.]]{1,}))(:|#)[[:print:]]*$",$cmd,$cmd_items)){
+		if(!ereg("^(({HOSTNAME})|".ZBX_EREG_INTERNAL_NAMES.")(:|#)[[:print:]]*$",$cmd,$cmd_items)){
 			error("Incorrect command: '$cmd'");
 			return FALSE;
 		}

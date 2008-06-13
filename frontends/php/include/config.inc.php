@@ -748,12 +748,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 //message scroll if needed
 				$msg_show = 6;
 				$msg_font_size = 6;
-				$msg_count = count($ZBX_MESSAGES);
+				$msg_count = count($ZBX_MESSAGES) + 1;
 				
 				if($msg_count > $msg_show) $msg_count = $msg_show;
-				
-				$msg_count = ($msg_count > $msg_show)?$msg_count:$msg_show;
-				$msg_count = ($msg_count * $msg_font_size * 4) + 2;
+
+				$msg_count = ($msg_count * $msg_font_size * 4);
 				$lst_error->AddOption('style','font-size: '.$msg_font_size.'pt; height: '.$msg_count.'px;');
 				
 

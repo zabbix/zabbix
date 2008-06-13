@@ -253,7 +253,7 @@ include_once 'include/page_header.php';
 			$_REQUEST['operations'] = get_request('operations',array());
 
 			if($new_operation['esc_step_from'] > $new_operation['esc_step_to']) {
-				$from				= $new_operation['esc_step_to'];
+				$from	= $new_operation['esc_step_to'];
 				$new_operation['esc_step_to']	= $new_operation['esc_step_from'];
 				$new_operation['esc_step_from']	= $from;
 			}
@@ -467,6 +467,8 @@ include_once 'include/page_header.php';
 		$outer_table->AddRow(array($td_l,$td_r));
 		
 		$frmAction->Additem($outer_table);
+		
+		show_messages();
 		$frmAction->Show();
 //*/
 	}
