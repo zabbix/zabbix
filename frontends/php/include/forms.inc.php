@@ -3194,7 +3194,7 @@ SDI($available_groups);
 		}
 
 		$operations	= get_request('operations',array());
-		
+
 		if(isset($_REQUEST['actionid']) && !isset($_REQUEST['form_refresh'])){
 			$eventsource = $action['eventsource'];
 			$evaltype	= $action['evaltype'];
@@ -3240,6 +3240,11 @@ SDI($available_groups);
 			$evaltype	= get_request('evaltype');
 			$esc_period	= get_request('esc_period');
 		}
+
+		foreach($operations as $key => $operation) {
+			$esc_step_from[$key]  = $operation['esc_step_from'];
+		}
+		array_multisort($esc_step_from, SORT_ASC, $operations);
 
 		$tblOper->SetHeader(array(
 				new CCheckBox('all_operations',null,'CheckAll("'.S_ACTION.'","all_operations","g_operationid");'),
