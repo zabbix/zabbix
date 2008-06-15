@@ -1,5 +1,6 @@
 Changes for 1.5.4
 
+ - [DEV-185] added support of zabbix[uptime] and zabbix[boottime] (Alexei)
  - [DEV-176] implemented "color only non-zero values" in "Status of triggers" (Artem)
  - [DEV-175] added last login time to users tab (Artem)
  - [DEV-178] improved the permissions scheme in frontend (Artem)
