@@ -129,7 +129,7 @@ include_once "include/page_header.php";
 				$_REQUEST['expression'],$_REQUEST['description'],$type,
 				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
 				$deps, $trigger_data['templateid']);
-			$result = DBend();
+			$result = DBend($result);
 			
 			$triggerid = $_REQUEST['triggerid'];
 			$audit_action = AUDIT_ACTION_UPDATE;
@@ -141,7 +141,7 @@ include_once "include/page_header.php";
 			$triggerid=add_trigger($_REQUEST['expression'],$_REQUEST['description'],$type,
 				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
 				$deps);
-			$result = DBend();
+			$result = DBend($triggerid);
 						
 			$audit_action = AUDIT_ACTION_ADD;
 			show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
@@ -167,7 +167,7 @@ include_once "include/page_header.php";
 		{
 			DBstart();
 			$result = delete_trigger($_REQUEST['triggerid']);
-			$result = DBend();
+			$result = DBend($result);
 		}
 		
 		show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
@@ -201,12 +201,13 @@ include_once "include/page_header.php";
 					array_push($hosts_ids, $db_host['hostid']);
 				}
 			}
+			$result = true;
 			DBstart();
 			foreach($_REQUEST['g_triggerid'] as $trigger_id)
 				foreach($hosts_ids as $host_id){
-					copy_trigger_to_host($trigger_id, $host_id, true);
+					$result &= copy_trigger_to_host($trigger_id, $host_id, true);
 				}
-			$result = DBend();
+			$result = DBend($result);
 			unset($_REQUEST['form_copy_to']);
 		}
 		else{
@@ -232,15 +233,16 @@ include_once "include/page_header.php";
 	}
 /* GROUP ACTIONS */
 	else if(isset($_REQUEST["group_enable"])&&isset($_REQUEST["g_triggerid"])){
-	
+		$result = true;
+		
 		DBstart();
 		foreach($_REQUEST["g_triggerid"] as $triggerid){
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
-			$result=DBselect('SELECT triggerid FROM triggers t WHERE t.triggerid='.zbx_dbstr($triggerid));
-			if(!$row = DBfetch($result)) continue;
+			$res = DBselect('SELECT triggerid FROM triggers t WHERE t.triggerid='.zbx_dbstr($triggerid));
+			if(!$row = DBfetch($res)) continue;
 			
-			if($result = update_trigger_status($row['triggerid'],0)){
+			if($result &= update_trigger_status($row['triggerid'],0)){
 				
 				$serv_status = get_service_status_of_trigger($row['triggerid']);
 				update_services($triggerid, $serv_status); // updating status to all services by the dependency
@@ -249,51 +251,51 @@ include_once "include/page_header.php";
 					S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ".S_ENABLED);
 			}
 		}
-		
-		$result = DBend();
+		$result = DBend($result && !empty($_REQUEST["g_triggerid"]));
 		show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 
 	}
 	else if(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_triggerid"])){
+		$result = true;
+		
 		DBstart();
 		foreach($_REQUEST["g_triggerid"] as $triggerid){
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
-			$result=DBselect("SELECT triggerid FROM triggers t WHERE t.triggerid=".zbx_dbstr($triggerid));
-			if(!($row = DBfetch($result))) continue;
-			if($result = update_trigger_status($row["triggerid"],1));{
+			$res=DBselect("SELECT triggerid FROM triggers t WHERE t.triggerid=".zbx_dbstr($triggerid));
+			if(!$row = DBfetch($res)) continue;
 			
+			if($result &= update_trigger_status($row["triggerid"],1));{
 				update_services($triggerid, 0); // updating status to all services by the dependency
 				
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
 					S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ".S_DISABLED);
 			}
 		}
-		
-		$result = DBend();
+		$result = DBend($result && !empty($_REQUEST["g_triggerid"]));
 		show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+		
 	}
 	else if(isset($_REQUEST["group_delete"])&&isset($_REQUEST["g_triggerid"])){
-
+		$result = true;
+		
 		DBstart();		
 		foreach($_REQUEST["g_triggerid"] as $triggerid){
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
-			$result=DBselect("SELECT triggerid,templateid FROM triggers t WHERE t.triggerid=".zbx_dbstr($triggerid));
-			if(!($row = DBfetch($result))) continue;
+			$res=DBselect("SELECT triggerid,templateid FROM triggers t WHERE t.triggerid=".zbx_dbstr($triggerid));
+			if(!$row = DBfetch($result)) continue;
 			if($row["templateid"] <> 0)	continue;
 			
 			$description = expand_trigger_description($triggerid);
-			
-			$result = delete_trigger($row["triggerid"]);
+			$result &= delete_trigger($row["triggerid"]);
 			
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
 					S_TRIGGER." [".$triggerid."] [".$description."] ".S_DISABLED);
 			}
 		}
-		
-		$result = DBend();
+		$result = DBend($result && !empty($_REQUEST["g_triggerid"]));
 		show_messages($result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
 ?>

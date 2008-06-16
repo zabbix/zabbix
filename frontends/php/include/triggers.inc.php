@@ -808,9 +808,9 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	replace_template_dependencies($deps, $hostid){
+	function replace_template_dependencies($deps, $hostid){
 		foreach($deps as $id => $val){
-			if($db_new_dep = DBfetch(DBselect('SEELCT t.triggerid '.
+			if($db_new_dep = DBfetch(DBselect('SELECT t.triggerid '.
 				' FROM triggers t,functions f,items i '.
 				' WHERE t.templateid='.$val.
 					' AND f.triggerid=t.triggerid '.
@@ -871,7 +871,7 @@
 					' (triggerid,description,type,priority,status,comments,url,value,expression,templateid)'.
 					' VALUES ('.$newtriggerid.','.zbx_dbstr($trigger['description']).','.$trigger['type'].','.$trigger['priority'].','.
 					$trigger["status"].','.zbx_dbstr($trigger["comments"]).','.
-					zbx_dbstr($trigger["url"]).",2,'{???:???}',".($copy_mode ? 0 : $triggerid).')');
+					zbx_dbstr($trigger["url"]).",2,'0',".($copy_mode ? 0 : $triggerid).')');
 
 		if(!$result)
 			return $result;
