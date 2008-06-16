@@ -284,7 +284,7 @@ include_once "include/page_header.php";
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
 			$res=DBselect("SELECT triggerid,templateid FROM triggers t WHERE t.triggerid=".zbx_dbstr($triggerid));
-			if(!$row = DBfetch($result)) continue;
+			if(!$row = DBfetch($res)) continue;
 			if($row["templateid"] <> 0)	continue;
 			
 			$description = expand_trigger_description($triggerid);
