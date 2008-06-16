@@ -268,18 +268,24 @@ if(!isset($DB)){
 
 		$DB['TRANSACTIONS'] = 0;
 		
-		if(empty($result))
-			$result = $DB['TRANSACTION_STATE'];
+		if(is_null($result)){
+			$DBresult = $DB['TRANSACTION_STATE'];
+		}
+		else{
+			$DBresult = $result && $DB['TRANSACTION_STATE'];
+		}
 			
 //SDI('Result: '.$result);
 
-		if($result){ // OK
-			$result = DBcommit();
+		if($DBresult){ // OK
+			$DBresult = DBcommit();
 		}
 		
-		if(!$result){ // FAIL
+		if(!$DBresult){ // FAIL
 			DBrollback();
 		}
+		
+		$result = (!is_null($result) && $DBresult)?$result:$DBresult;
 		
 	return $result;
 	}

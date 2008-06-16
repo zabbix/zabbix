@@ -3767,7 +3767,7 @@ static int	DBcopy_trigger_to_host(
 
 			DBexecute("insert into triggers"
 				" (triggerid,description,priority,status,comments,url,type,value,expression,templateid)"
-				" values (" ZBX_FS_UI64 ",'%s',%i,%i,'%s','%s',%i,2,'{???:???}'," ZBX_FS_UI64 ")",
+				" values (" ZBX_FS_UI64 ",'%s',%i,%i,'%s','%s',%i,2,'0'," ZBX_FS_UI64 ")",
 					new_triggerid,
 					description_esc,	/* description */
 					atoi(trigger_data[1]),	/* priority */
