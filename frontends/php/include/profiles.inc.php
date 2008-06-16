@@ -328,9 +328,26 @@ return $result;
 /********* END USER HISTORY **********/
 
 /********** USER FAVORITES ***********/
+/********** USER FAVORITES ***********/
+// Author: Aly
+function get_favorites($favobj,$nodeid=null){
+	$fav = get_multi_profile($favobj);
+	
+	if(is_null($nodeid))
+		$nodeid = get_current_nodeid();
+		
+	if(!is_array($nodeid))
+		$nodeid = array($nodeid);
+
+	foreach($fav as $key => $favorite){
+		if(!uint_in_array(id2nodeid($favorite['value']),$nodeid)) unset($fav[$key]);
+	}
+
+return $fav;
+}
 // Author: Aly
 function add2favorites($favobj,$favid,$source=null){
-	$favorites = get_multi_profile($favobj);
+	$favorites = get_favorites($favobj);
 
 	$favorites[] = array('value' => $favid);
 	
@@ -340,7 +357,7 @@ return $result;
 
 // Author: Aly
 function rm4favorites($favobj,$favid,$favcnt=null,$source=null){
-	$favorites = get_multi_profile($favobj);
+	$favorites = get_favorites($favobj);
 
 	$favcnt = (is_null($favcnt))?0:$favcnt;		
 	if($favid == 0) $favcnt = ZBX_FAVORITES_ALL;
@@ -362,7 +379,7 @@ return $result;
 // Author: Aly
 function infavorites($favobj,$favid,$source=null){
 
-	$favorites = get_multi_profile($favobj);
+	$favorites = get_favorites($favobj);
 	if(!empty($favorites)){
 		foreach($favorites as $id => $favorite){
 			if(bccomp($favid,$favorite['value']) == 0){
