@@ -321,7 +321,7 @@ COpt::profiling_start("page");
 				}					
 			}
 
-			if (	isset($page_exist) &&
+			if (isset($page_exist) &&
 				( isset($sub['forse_disable_subnodes']) || isset($sub_pages['forse_disable_subnodes']) ) &&
 				!defined('ZBX_DISABLE_SUBNODES'))
 			{
@@ -494,29 +494,23 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 		$node_form = null;
 
-		if(ZBX_DISTRIBUTED)
-		{
+		if(ZBX_DISTRIBUTED){
 			$lst_nodes = new CComboBox('switch_node', get_current_nodeid(false), "submit()");
-			$db_nodes = DBselect(
-					'select * from nodes '.
-					' where nodeid in ('.
-					get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST).
-					') '.
-					' order by name '
+			$db_nodes = DBselect('SELECT * '.
+						' FROM nodes '.
+						' WHERE nodeid IN ('.get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST).') '.
+						' ORDER BY name '
 					);
-			while($node_data = DBfetch($db_nodes))
-			{
+			while($node_data = DBfetch($db_nodes)){
 				$lst_nodes->AddItem($node_data['nodeid'],$node_data['name']);
 			}
 
-			if( $lst_nodes->ItemsCount() > 1 )
-			{
+			if($lst_nodes->ItemsCount() > 1){
 				$node_form = new CForm();
 				$node_form->AddItem(array(S_CURRENT_NODE,$lst_nodes));
 				unset($lst_nodes);
 
-				if ( !defined('ZBX_DISABLE_SUBNODES') )
-				{
+				if(!defined('ZBX_DISABLE_SUBNODES')){
 					global $ZBX_WITH_SUBNODES;
 
 					$cmd_show_subnodes = new CComboBox('show_subnodes', !empty($ZBX_WITH_SUBNODES) ? 1 : 0, "submit()");

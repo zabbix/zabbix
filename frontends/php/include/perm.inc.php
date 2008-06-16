@@ -404,19 +404,32 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 //COpt::counter_up('perm_nodes['.$userid.','.$perm.','.$perm_mode.','.$perm_res.','.$nodeid.']');
 //COpt::counter_up('perm');
 
-	$available_hosts = get_accessible_hosts_by_user($user_data,$perm,PERM_RES_IDS_ARRAY,$nodeid);	
-	foreach($available_hosts as $id => $hostid){
-		$node_data[id2nodeid($hostid)] = id2nodeid($hostid); 
+	if(USER_TYPE_SUPER_ADMIN == $user_type){
+		$nodes = DBselect('SELECT nodeid FROM nodes');
+		while($node = DBfetch($nodes)){
+			$node_data[$node['nodeid']] = $node;
+			$node_data[$node['nodeid']]['permission'] = PERM_READ_WRITE;
+		}
 	}
+	else{
+		$available_hosts = get_accessible_hosts_by_user($user_data,$perm,PERM_RES_DATA_ARRAY,$nodeid);	
+		foreach($available_hosts as $id => $host){
+			$nodeid = id2nodeid($host['hostid']);
+			$permission = (isset($node_data[$nodeid]) && ($permission < $node_data[$nodeid]['permission']))?$node_data[$nodeid]['permission']:$host['permission'];
 	
-	switch($perm_res){
-		case PERM_RES_DATA_ARRAY:
-			foreach($node_data as $nodeid => $node){
-				$node = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$nodeid));
+			$node_data[$nodeid]['nodeid'] = $nodeid;
+			$node_data[$nodeid]['permission'] = $permission;
+		}
+	}
+
+	foreach($node_data as $nodeid => $node){
+		switch($perm_res){
+			case PERM_RES_DATA_ARRAY:
+				$db_node = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$nodeid));
 				
 				if(!ZBX_DISTRIBUTED){
 					if(!$node){
-						$node = array(
+						$db_node = array(
 							'nodeid'	=> $ZBX_LOCALNODEID,
 							'name'		=> 'local',
 							'permission'	=> PERM_READ_WRITE,
@@ -428,12 +441,13 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 					}
 				}
 				
-				$result[$nodeid] = $node;
-			}
-			break;
-		default:
-			$result = $node_data;
-			break;
+				$result[$nodeid] = array_merge($db_node,$node);
+
+				break;
+			default:
+				$result[$nodeid] = $nodeid;
+				break;
+		}
 	}
 
 	if($perm_res == PERM_RES_STRING_LINE) {
@@ -605,20 +619,28 @@ function get_accessible_nodes_by_rights(&$rights,$user_type,$perm,$perm_res=null
 	
 //COpt::counter_up('perm_nodes['.$userid.','.$perm.','.$perm_mode.','.$perm_res.','.$nodeid.']');
 //COpt::counter_up('perm');
+//SDI(get_accessible_hosts_by_rights($rights,$user_type,$perm,PERM_RES_DATA_ARRAY,$nodeid));
+	$available_hosts = get_accessible_hosts_by_rights($rights,$user_type,$perm,PERM_RES_DATA_ARRAY,$nodeid);	
+	foreach($available_hosts as $id => $host){
+		$nodeid = id2nodeid($host['hostid']);
+		$permission = $host['permission'];
+		
+		if(isset($node_data[$nodeid]) && ($permission < $node_data[$nodeid]['permission'])){
+			$permission = $node_data[$nodeid]['permission'];
+		} 
 
-	$available_hosts = get_accessible_hosts_by_rights($rights,$user_type,$perm,PERM_RES_IDS_ARRAY,$nodeid);	
-	foreach($available_hosts as $id => $hostid){
-		$node_data[id2nodeid($hostid)] = id2nodeid($hostid); 
+		$node_data[$nodeid]['nodeid'] = $nodeid;
+		$node_data[$nodeid]['permission'] = $permission;
 	}
-	
-	switch($perm_res){
-		case PERM_RES_DATA_ARRAY:
-			foreach($node_data as $nodeid => $node){
-				$node = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$nodeid));
+
+	foreach($node_data as $nodeid => $node){
+		switch($perm_res){
+			case PERM_RES_DATA_ARRAY:
+				$db_node = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$nodeid));
 				
 				if(!ZBX_DISTRIBUTED){
 					if(!$node){
-						$node = array(
+						$db_node = array(
 							'nodeid'	=> $ZBX_LOCALNODEID,
 							'name'		=> 'local',
 							'permission'	=> PERM_READ_WRITE,
@@ -630,14 +652,15 @@ function get_accessible_nodes_by_rights(&$rights,$user_type,$perm,$perm_res=null
 					}
 				}
 				
-				$result[$nodeid] = $node;
-			}
-			break;
-		default:
-			$result = $node_data;
-			break;
-	}
+				$result[$nodeid] = array_merge($db_node,$node);
 
+				break;
+			default:
+				$result[$nodeid] = $nodeid;
+				break;
+		}
+	}
+	
 	if($perm_res == PERM_RES_STRING_LINE) {
 		if(count($result) == 0) 
 			$result = '-1';

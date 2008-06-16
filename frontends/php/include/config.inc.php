@@ -234,7 +234,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				$ZBX_CURMASTERID = $node_data['masterid'];
 			}
 			
-			$ZBX_NODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, null, PERM_RES_DATA_ARRAY);
+			$ZBX_NODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
 
 			if ( !isset($ZBX_NODES[$ZBX_CURRENT_NODEID]) ){
 				$denyed_page_requested = true;
