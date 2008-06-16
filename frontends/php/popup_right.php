@@ -41,7 +41,7 @@ include_once "include/page_header.php";
 
 	$dstfrm		= get_request("dstfrm",		0);			// destination form
 	$permission	= get_request("permission",	PERM_DENY);		// right
-	$type		= get_request("type",		get_profile('web.right_type.last', RESOURCE_TYPE_GROUP));	// type of resource
+	$type		= get_request("type",		RESOURCE_TYPE_GROUP);	// type of resource
 
 	update_profile('web.right_type.last', $type);
 ?>
@@ -83,8 +83,8 @@ function add_right(formname,type,id,permission,name)
 	$frmTitle = new CForm();
 	$frmTitle->AddVar('dstfrm',$dstfrm);
 	$frmTitle->AddVar('permission', $permission);
-	if(ZBX_DISTRIBUTED)
-	{
+/*
+	if(ZBX_DISTRIBUTED){
 		$cmbResourceType = new CComboBox('type',$type,'submit();');
 		$cmbResourceType->AddItem(RESOURCE_TYPE_NODE, S_NODES);
 		$cmbResourceType->AddItem(RESOURCE_TYPE_GROUP, S_HOST_GROUPS);
@@ -92,6 +92,7 @@ function add_right(formname,type,id,permission,name)
 			S_RESOURCE_TYPE, SPACE,
 			$cmbResourceType));
 	}
+//*/
 	show_table_header(permission2str($permission),$frmTitle);
 
 	$table = new CTableInfo(S_NO_RESOURCES_DEFINED);
