@@ -309,7 +309,7 @@ include_once "include/page_header.php";
 						' AND '.DBcondition('e.objectid', $trigger_list).
 						$sql_cond.
 					order_by('e.clock');
-//SDI($sql);
+
 			$result = DBselect($sql,10*($_REQUEST['start']+PAGE_SIZE));
 		}
 

@@ -28,8 +28,7 @@ require_once "include/maps.inc.php";
 function make_favorite_graphs(){
 	$table = new CTableInfo();
 	
-	$fav_graphs = get_multi_profile('web.favorite.graphids');
-	
+	$fav_graphs = get_favorites('web.favorite.graphids');
 	foreach($fav_graphs as $key => $favorite){
 		
 		$source = $favorite['source'];
@@ -85,7 +84,7 @@ return $table;
 function make_favorite_screens(){
 	$table = new CTableInfo();
 	
-	$fav_screens = get_multi_profile('web.favorite.screenids');
+	$fav_screens = get_favorites('web.favorite.screenids');
 
 	foreach($fav_screens as $key => $favorite){
 		$source = $favorite['source'];
@@ -137,7 +136,7 @@ return $table;
 function make_favorite_maps(){
 	$table = new CTableInfo();
 	
-	$fav_sysmaps = get_multi_profile('web.favorite.sysmapids');
+	$fav_sysmaps = get_favorites('web.favorite.sysmapids');
 	
 	foreach($fav_sysmaps as $key => $favorite){
 	
@@ -476,7 +475,6 @@ function make_latest_issues(){
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND t.value='.TRIGGER_VALUE_TRUE.
 				' ORDER BY t.lastchange DESC';
-
 	$result = DBselect($sql);
 
 	while($row=DBfetch($result)){
@@ -511,7 +509,6 @@ function make_latest_issues(){
 						' AND t.triggerid=e.objectid '.
 						' AND e.value='.TRIGGER_VALUE_TRUE.
 					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
-
 		$res_events = DBSelect($event_sql,1);
 
 		while($row_event=DBfetch($res_events)){
@@ -764,7 +761,7 @@ function make_graph_menu(&$menu,&$submenu){
 function make_graph_submenu(){
 	$graphids = array();
 	
-	$fav_graphs = get_multi_profile('web.favorite.graphids');
+	$fav_graphs = get_favorites('web.favorite.graphids');
 	
 	foreach($fav_graphs as $key => $favorite){
 		
@@ -847,7 +844,7 @@ function make_sysmap_menu(&$menu,&$submenu){
 
 function make_sysmap_submenu(){
 	$sysmapids = array();
-	$fav_sysmaps = get_multi_profile('web.favorite.sysmapids');
+	$fav_sysmaps = get_favorites('web.favorite.sysmapids');
 	
 	foreach($fav_sysmaps as $key => $favorite){
 	
@@ -914,7 +911,7 @@ function make_screen_menu(&$menu,&$submenu){
 function make_screen_submenu(){
 	$screenids = array();
 	
-	$fav_screens = get_multi_profile('web.favorite.screenids');
+	$fav_screens = get_favorites('web.favorite.screenids');
 
 	foreach($fav_screens as $key => $favorite){
 		$source = $favorite['source'];

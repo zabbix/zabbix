@@ -206,7 +206,6 @@ include_once "include/page_header.php";
 
 	show_table_header($text,SPACE);
 //-------------
-	
 
 	$left_tab = new CTable();
 	$left_tab->SetCellPadding(3);
