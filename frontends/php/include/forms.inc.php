@@ -3240,6 +3240,7 @@ SDI($available_groups);
 			$esc_period	= get_request('esc_period');
 		}
 
+		$esc_step_from = array();
 		foreach($operations as $key => $operation) {
 			$esc_step_from[$key]  = $operation['esc_step_from'];
 		}
