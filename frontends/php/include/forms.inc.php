@@ -774,9 +774,9 @@
 		if(isset($userid))	$frmUser->AddVar("userid",$userid);
 
 		if($profile==0){
-			$frmUser->AddRow(S_ALIAS,	new CTextBox("alias",$alias,20));
-			$frmUser->AddRow(S_NAME,	new CTextBox("name",$name,20));
-			$frmUser->AddRow(S_SURNAME,	new CTextBox("surname",$surname,20));
+			$frmUser->AddRow(S_ALIAS,	new CTextBox("alias",$alias,40));
+			$frmUser->AddRow(S_NAME,	new CTextBox("name",$name,40));
+			$frmUser->AddRow(S_SURNAME,	new CTextBox("surname",$surname,40));
 		}
 
 		if(ZBX_AUTH_INTERNAL == $config['authentication_type']){
@@ -818,7 +818,7 @@
 			}
 			
 			$lstGroups = new CListBox('user_groups_to_del[]');
-			$lstGroups->options['style'] = 'width: 270px';
+			$lstGroups->options['style'] = 'width: 280px';
 
 			foreach($user_groups as $groupid => $group_name){
 				$lstGroups->AddItem($groupid,	$group_name);
@@ -951,19 +951,16 @@
 	}
 
 	# Insert form for User Groups
-	function	insert_usergroups_form()
-	{
+	function insert_usergroups_form(){
 		global  $USER_DETAILS;
 
 		$frm_title = S_USER_GROUP;
-		if(isset($_REQUEST["usrgrpid"]))
-		{
+		if(isset($_REQUEST["usrgrpid"])){
 			$usrgrp		= get_group_by_usrgrpid($_REQUEST["usrgrpid"]);
-			$frm_title 	= S_USER_GROUP." \"".$usrgrp["name"]."\"";
+			$frm_title 	= S_USER_GROUP.' "'.$usrgrp['name'].'"';
 		}
 
-		if(isset($_REQUEST["usrgrpid"]) && !isset($_REQUEST["form_refresh"]))
-		{
+		if(isset($_REQUEST["usrgrpid"]) && !isset($_REQUEST["form_refresh"])){
 			$name	= $usrgrp['name'];
 
 			$users_status = $usrgrp['users_status'];
@@ -988,11 +985,9 @@
 					' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('g.groupid').
 					' WHERE r.groupid='.$_REQUEST["usrgrpid"],
 				);
-			foreach($sqls as $sql)
-			{
+			foreach($sqls as $sql){
 				$db_rights = DBselect($sql);
-				while($db_right = DBfetch($db_rights))
-				{
+				while($db_right = DBfetch($db_rights)){
 					if(isset($db_right['node_name']))
 						$db_right['name'] = $db_right['node_name'].':'.$db_right['name'];
 
@@ -1004,9 +999,8 @@
 				}
 			}
 		}
-		else
-		{
-			$name	=			get_request("gname","");
+		else{
+			$name	=			get_request('gname','');
 			$users_status = 	get_request('users_status',0);
 			$gui_access = 		get_request('gui_access',0);
 			$group_users	= get_request("group_users",array());
@@ -1020,12 +1014,12 @@
 		$frmUserG->SetHelp("web.users.groups.php");
 		$frmUserG->AddVar("config",get_request("config",1));
 
-		if(isset($_REQUEST["usrgrpid"]))
-		{
+		if(isset($_REQUEST["usrgrpid"])){
 			$frmUserG->AddVar("usrgrpid",$_REQUEST["usrgrpid"]);
 		}
+		
 		$grName = new CTextBox("gname",$name,49);
-		$grName->options['style'] = 'width: 250px';
+		$grName->options['style'] = 'width: 280px';
 		$frmUserG->AddRow(S_GROUP_NAME,$grName);
 
 		$frmUserG->AddVar('group_rights', $group_rights);
@@ -1033,7 +1027,7 @@
 		$frmUserG->AddVar('group_users', $group_users);
 
 		$lstUsers = new CListBox('group_users_to_del[]');
-		$lstUsers->options['style'] = 'width: 250px';
+		$lstUsers->options['style'] = 'width: 280px';
 
 		foreach($group_users as $userid => $alias)
 		{
@@ -1081,14 +1075,12 @@
 
 		$lstWrite = new CListBox('right_to_del[read_write][]'	,null	,20);
 		$lstRead  = new CListBox('right_to_del[read_only][]'	,null	,20);
-		$lstDeny  = new CListBox('right_to_del[deny][]'		,null	,20);
+		$lstDeny  = new CListBox('right_to_del[deny][]'			,null	,20);
 
-		foreach($group_rights as $name => $element_data)
-		{
-			if($element_data['permission'] == PERM_DENY)		$lstDeny->AddItem($name, $name);
-			elseif ($element_data['permission'] == PERM_READ_ONLY)	$lstRead->AddItem($name, $name);
-			elseif ($element_data['permission'] == PERM_READ_WRITE)	$lstWrite->AddItem($name, $name);
-			
+		foreach($group_rights as $name => $element_data){
+			if($element_data['permission'] == PERM_DENY)			$lstDeny->AddItem($name, $name);
+			else if($element_data['permission'] == PERM_READ_ONLY)	$lstRead->AddItem($name, $name);
+			else if($element_data['permission'] == PERM_READ_WRITE)	$lstWrite->AddItem($name, $name);
 		}
 
 		$table_Rights->SetHeader(array(S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
@@ -1145,9 +1137,9 @@
 
 		if(ZBX_DISTRIBUTED){
 			$lst['node']['label']		= S_NODES;
-			$lst['node']['read_write']	= new CListBox('nodes_write'	,null	,6);
-			$lst['node']['read_only']	= new CListBox('nodes_read'	,null	,6);
-			$lst['node']['deny']		= new CListBox('nodes_deny'	,null	,6);
+			$lst['node']['read_write']	= new CListBox('nodes_write',null	,10);
+			$lst['node']['read_only']	= new CListBox('nodes_read'	,null	,10);
+			$lst['node']['deny']		= new CListBox('nodes_deny'	,null	,10);
 
 			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
 			foreach($nodes as $node){
@@ -1162,17 +1154,12 @@
 		}
 
 		$lst['group']['label']		= S_HOST_GROUPS;
-		$lst['group']['read_write']	= new CListBox('groups_write'	,null	,10);
-		$lst['group']['read_only']	= new CListBox('groups_read'	,null	,10);
-		$lst['group']['deny']		= new CListBox('groups_deny'	,null	,10);
+		$lst['group']['read_write']	= new CListBox('groups_write'	,null	,15);
+		$lst['group']['read_only']	= new CListBox('groups_read'	,null	,15);
+		$lst['group']['deny']		= new CListBox('groups_deny'	,null	,15);
 
-		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(false));
-/*
-SDI($groups);
-		$rights['userid'] = 3;
-		$available_groups= get_accessible_groups_by_user($rights, PERM_DENY, PERM_RES_DATA_ARRAY);
-SDI($available_groups);
-//*/		
+		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
+	
 		foreach($groups as $group){
 			switch($group['permission']){
 				case PERM_READ_ONLY:
@@ -1193,7 +1180,7 @@ SDI($available_groups);
 		$lst['host']['read_only']	= new CListBox('hosts_read'	,null	,15);
 		$lst['host']['deny']		= new CListBox('hosts_deny'	,null	,15);
 
-		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(false));
+		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
 
 		foreach($hosts as $host){
 			switch($host['permission']){
