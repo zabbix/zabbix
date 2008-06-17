@@ -33,6 +33,9 @@
 	
 	define('ZBX_LOGIN_ATTEMPTS', 5);
 	define('ZBX_LOGIN_BLOCK', 30);
+	
+	define('ZBX_SESSION_ACTIVE', 0);
+	define('ZBX_SESSION_PASSIVE', 1);
 
 	define('T_ZBX_STR',			0);
 	define('T_ZBX_INT',			1);
