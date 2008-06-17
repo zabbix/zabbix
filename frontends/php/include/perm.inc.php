@@ -410,6 +410,8 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 			$node_data[$node['nodeid']] = $node;
 			$node_data[$node['nodeid']]['permission'] = PERM_READ_WRITE;
 		}
+		
+		if(empty($node_data)) $node_data[0]['nodeid'] = 0;
 	}
 	else{
 		$available_hosts = get_accessible_hosts_by_user($user_data,$perm,PERM_RES_DATA_ARRAY,$nodeid);	
