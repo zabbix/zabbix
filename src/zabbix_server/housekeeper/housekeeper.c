@@ -105,7 +105,7 @@ static int housekeeping_sessions(int now)
 		now);
 
 	deleted = DBexecute("delete from sessions where lastaccess<%d",
-		now-31*86400);
+		now-365*86400);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [sessions]",
 		deleted);

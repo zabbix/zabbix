@@ -50,6 +50,7 @@ function check_authorisation(){
 		$login = $USER_DETAILS = DBfetch(DBselect('SELECT u.*,s.* '.
 					' FROM sessions s,users u'.
 					' WHERE s.sessionid='.zbx_dbstr($sessionid).
+						' AND s.status='.ZBX_SESSION_ACTIVE.
 						' AND s.userid=u.userid'.
 						' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
 						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
@@ -86,20 +87,20 @@ function check_authorisation(){
 
 	if($login){
 		zbx_setcookie("zbx_sessionid",$sessionid,$USER_DETAILS['autologin']?(time()+86400*31):0);	//1 month
-		DBexecute("update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid));
+		DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE sessionid='.zbx_dbstr($sessionid));
 	}
 	else{
 		$USER_DETAILS = NULL;
 		
 		zbx_unsetcookie('zbx_sessionid');
-		DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
+		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
 		unset($sessionid);
 	}
 
 	if($USER_DETAILS){
 		$USER_DETAILS['node'] = DBfetch(DBselect('select * from nodes where nodeid='.id2nodeid($USER_DETAILS['userid'])));
-		if(empty($USER_DETAILS['node']))
-		{
+		
+		if(empty($USER_DETAILS['node'])){
 			$USER_DETAILS['node']['name'] = '- unknown -';
 			$USER_DETAILS['node']['nodeid'] = $ZBX_LOCALNODEID;
 		}
