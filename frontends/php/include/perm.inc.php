@@ -58,7 +58,14 @@ function check_authorisation(){
 			$incorect_session = true;
 		}
 		else if($login['attempt_failed']){
-			error('There was ['.$login['attempt_failed'].'] failed attempts to Login from ['.$login['attempt_ip'].'] at ['.date('d.m.Y H:i',$login['attempt_clock']).'] o\'clock!');
+			error(new CScript(array(
+						bold($login['attempt_failed']),
+						'failed login attempts logged. Last failed attempt was from ',
+						bold($login['attempt_ip']),
+						' on ',
+						bold(date('d.m.Y H:i',$login['attempt_clock'])),
+						'.')));
+			
 			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.zbx_dbstr($login['userid']));
 		}
 	}
@@ -389,11 +396,13 @@ COpt::counter_up('perm');
 	return $result;
 }
 
-function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=null){
+function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null){
 	global $ZBX_LOCALNODEID;
-
+	
+	$nodeid = get_current_nodeid(true);
+//SDI($nodeid);
 	if(is_null($perm_res))	$perm_res=PERM_RES_STRING_LINE;
-
+	
 	$userid		=& $user_data['userid'];
 	$user_type	=& $user_data['type'];
 	if(!isset($userid)) fatal_error('Incorrect user data in "get_accessible_nodes_by_user"');
@@ -610,8 +619,10 @@ function get_accessible_groups_by_rights(&$rights,$user_type,$perm,$perm_res=nul
 return $result;
 }
 
-function get_accessible_nodes_by_rights(&$rights,$user_type,$perm,$perm_res=null,$nodeid=null){
+function get_accessible_nodes_by_rights(&$rights,$user_type,$perm,$perm_res=null){
 	global $ZBX_LOCALNODEID;
+	
+	$nodeid = get_current_nodeid(true);
 
 	if(is_null($perm_res))	$perm_res=PERM_RES_STRING_LINE;
 	if(is_null($user_type)) $user_type = USER_TYPE_ZABBIX_USER;

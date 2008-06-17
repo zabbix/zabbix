@@ -76,14 +76,20 @@
 		
 		$sql = 'SELECT u.userid,u.attempt_failed, u.attempt_clock, u.attempt_ip '.
 				' FROM users u '.
-				' WHERE u.alias='.zbx_dbstr($name).
-					' AND ( attempt_failed<'.ZBX_LOGIN_ATTEMPTS.
-							' OR (attempt_failed>'.(ZBX_LOGIN_ATTEMPTS-1).
-									' AND ('.time().'-attempt_clock)>'.ZBX_LOGIN_BLOCK.'))';
+				' WHERE u.alias='.zbx_dbstr($name);
+				
+//SQL to BLOCK attempts
+//					.' AND ( attempt_failed<'.ZBX_LOGIN_ATTEMPTS.
+//							' OR (attempt_failed>'.(ZBX_LOGIN_ATTEMPTS-1).
+//									' AND ('.time().'-attempt_clock)>'.ZBX_LOGIN_BLOCK.'))';
 					
 		$login = $attempt = DBfetch(DBselect($sql));
 		
 		if($login){
+			if($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS){
+				sleep(ZBX_LOGIN_BLOCK);
+			}
+			
 			switch($config['authentication_type']){
 				case ZBX_AUTH_LDAP:
 					$login = ldap_authentication($name,get_request('password',''));

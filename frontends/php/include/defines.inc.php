@@ -32,7 +32,7 @@
 	define('PAGE_TYPE_HTML_BLOCK',	4);	//simple block of html (as text)
 	
 	define('ZBX_LOGIN_ATTEMPTS', 5);
-	define('ZBX_LOGIN_BLOCK', 180);
+	define('ZBX_LOGIN_BLOCK', 30);
 
 	define('T_ZBX_STR',			0);
 	define('T_ZBX_INT',			1);
