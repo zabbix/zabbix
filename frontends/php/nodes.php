@@ -110,6 +110,8 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
+	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null, get_current_nodeid(true));
+	
 	if(isset($_REQUEST["form"])){
 		insert_node_form();
 	}

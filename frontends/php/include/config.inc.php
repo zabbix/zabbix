@@ -220,7 +220,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			$ZBX_WITH_SUBNODES = get_cookie('zbx_with_subnodes', false); // Show elements from subnodes
 
 			if(isset($_REQUEST['switch_node'])){
-				if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$_REQUEST['switch_node']))){
+				if($node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$_REQUEST['switch_node']))){
 					$ZBX_CURRENT_NODEID = $_REQUEST['switch_node'];
 				}
 				unset($node_data);
@@ -230,11 +230,17 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				$ZBX_WITH_SUBNODES = !empty($_REQUEST['show_subnodes']);
 			}
 
-			if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$ZBX_CURRENT_NODEID))){
+			if($node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$ZBX_CURRENT_NODEID))){
 				$ZBX_CURMASTERID = $node_data['masterid'];
 			}
 			
-			$ZBX_NODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
+//			$ZBX_NODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
+
+			$sql = 'SELECT * FROM nodes';
+			$db_nodes = DBselect($sql);
+			while($node = DBfetch($db_nodes)){
+				$ZBX_NODES[$node['nodeid']] = $node;
+			}
 
 			if ( !isset($ZBX_NODES[$ZBX_CURRENT_NODEID]) ){
 				$denyed_page_requested = true;
@@ -242,14 +248,14 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
 			}
 
-			foreach ( $ZBX_NODES as $nodeid => $node_data ){
-				for ( 	$curr_node = &$node_data;
-					$curr_node['masterid'] != 0 &&
-					(bccomp($curr_node['masterid'] , $ZBX_CURRENT_NODEID) != 0);
-					$curr_node = &$ZBX_NODES[$curr_node['masterid']]
-				);
+			foreach($ZBX_NODES as $nodeid => $node_data ){
+				$curr_node = &$node_data;
 
-				if (bccomp($curr_node['masterid'],$ZBX_CURRENT_NODEID) == 0 ){
+				while(($curr_node['masterid']!=0) && (bccomp($curr_node['masterid'],$ZBX_CURRENT_NODEID)!=0)){
+					$curr_node = &$ZBX_NODES[$curr_node['masterid']];
+				}
+
+				if(bccomp($curr_node['masterid'],$ZBX_CURRENT_NODEID) == 0 ){
 					$ZBX_CURRENT_SUBNODES[$nodeid] = $nodeid;
 				}
 			}
@@ -271,14 +277,12 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	function get_current_nodeid($forse_with_subnodes = null, $perm = null){
 		global $USER_DETAILS, $ZBX_CURRENT_NODEID, $ZBX_CURRENT_SUBNODES, $ZBX_WITH_SUBNODES;
-
 		if(!isset($ZBX_CURRENT_NODEID))
 			init_nodes();
 
 		$result = ( is_show_subnodes($forse_with_subnodes) ? $ZBX_CURRENT_SUBNODES : $ZBX_CURRENT_NODEID );
-		
 		if(!is_null($perm)){
-			$result = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY, null, null, $result);
+			$result = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY, null, $result);
 		}
 
 	return $result;
@@ -301,13 +305,14 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	function is_show_subnodes($forse_with_subnodes = null){
 		global	$ZBX_WITH_SUBNODES;
 
-		if ( is_null($forse_with_subnodes)){
-			if ( defined('ZBX_DISABLE_SUBNODES'))
+		if(is_null($forse_with_subnodes)){
+			if(defined('ZBX_DISABLE_SUBNODES'))
 				$forse_with_subnodes = false;
 			else
 				$forse_with_subnodes = $ZBX_WITH_SUBNODES;
 		}
-		return $forse_with_subnodes;
+
+	return $forse_with_subnodes;
 	}
 
 	function access_deny(){

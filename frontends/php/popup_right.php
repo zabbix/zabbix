@@ -32,9 +32,11 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		NULL),
+		"dstfrm"=>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		NULL),
 		"permission"=>	array(T_ZBX_INT, O_MAND,P_SYS,	IN(PERM_DENY.','.PERM_READ_ONLY.','.PERM_READ_WRITE),	NULL),
-		"type"=>	array(T_ZBX_INT, O_OPT, P_SYS,	IN(RESOURCE_TYPE_GROUP.(ZBX_DISTRIBUTED ? ','.RESOURCE_TYPE_NODE : '')), NULL)
+		"type"=>		array(T_ZBX_INT, O_OPT, P_SYS,	IN(RESOURCE_TYPE_GROUP.(ZBX_DISTRIBUTED ? ','.RESOURCE_TYPE_NODE : '')), NULL),
+		'nodeid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	NULL),
+		
 	);
 
 	check_fields($fields);
@@ -42,31 +44,29 @@ include_once "include/page_header.php";
 	$dstfrm		= get_request("dstfrm",		0);			// destination form
 	$permission	= get_request("permission",	PERM_DENY);		// right
 	$type		= get_request("type",		RESOURCE_TYPE_GROUP);	// type of resource
+	$nodeid		= get_request('nodeid', 	get_current_nodeid(false));
 
 	update_profile('web.right_type.last', $type);
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
 
-function add_var_to_opener_obj(obj,name,value)
-{
-        new_variable = window.opener.document.createElement('input');
-        new_variable.type = 'hidden';
-        new_variable.name = name;
-        new_variable.value = value;
-
-        obj.appendChild(new_variable);
+function add_var_to_opener_obj(obj,name,value){
+	new_variable = window.opener.document.createElement('input');
+	new_variable.type = 'hidden';
+	new_variable.name = name;
+	new_variable.value = value;
+	
+	obj.appendChild(new_variable);
 }
 
-function add_right(formname,type,id,permission,name)
-{
-        var form = window.opener.document.forms[formname];
-
-        if(!form)
-        {
-                close_window();
-		return false;
-        }
+function add_right(formname,type,id,permission,name){
+	var form = window.opener.document.forms[formname];
+	
+	if(!form){
+		close_window();
+	return false;
+	}
 
 	add_var_to_opener_obj(form,'new_right[type]',type);
 	add_var_to_opener_obj(form,'new_right[id]',id);
@@ -83,16 +83,22 @@ function add_right(formname,type,id,permission,name)
 	$frmTitle = new CForm();
 	$frmTitle->AddVar('dstfrm',$dstfrm);
 	$frmTitle->AddVar('permission', $permission);
-/*
+
 	if(ZBX_DISTRIBUTED){
-		$cmbResourceType = new CComboBox('type',$type,'submit();');
-		$cmbResourceType->AddItem(RESOURCE_TYPE_NODE, S_NODES);
-		$cmbResourceType->AddItem(RESOURCE_TYPE_GROUP, S_HOST_GROUPS);
-		$frmTitle->AddItem(array(
-			S_RESOURCE_TYPE, SPACE,
-			$cmbResourceType));
+		$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
+
+		$cmbResourceNode = new CComboBox('nodeid',$nodeid,'submit();');
+		$cmbResourceNode->AddItem(0, S_ALL);
+		
+		$sql = 'SELECT name,nodeid FROM nodes WHERE '.DBcondition('nodeid',$available_nodes);
+		$db_nodes = DBselect($sql);
+		while($node = DBfetch($db_nodes)){
+			$cmbResourceNode->AddItem($node['nodeid'], $node['name']);
+		}
+		
+		$frmTitle->AddItem(array(S_NODE, SPACE, $cmbResourceNode));
 	}
-//*/
+
 	show_table_header(permission2str($permission),$frmTitle);
 
 	$table = new CTableInfo(S_NO_RESOURCES_DEFINED);
@@ -100,19 +106,15 @@ function add_right(formname,type,id,permission,name)
 	
 	$db_resources = null;
 
-	if(ZBX_DISTRIBUTED && $type == RESOURCE_TYPE_NODE)
-	{
-		$db_resources = DBselect('select n.name as name, n.nodeid as id from nodes n order by n.name');
-	}
-	elseif($type == RESOURCE_TYPE_GROUP)
-	{
-		$db_resources = DBselect('select n.name as node_name, g.name as name, g.groupid as id'.
-			' from groups g left join nodes n on '.DBid2nodeid('g.groupid').'=n.nodeid '.
-			' order by n.name, g.name');
+	if($type == RESOURCE_TYPE_GROUP){
+		$db_resources = DBselect('SELECT n.name as node_name, g.name as name, g.groupid as id'.
+						' FROM groups g '.
+							' LEFT JOIN nodes n on '.DBid2nodeid('g.groupid').'=n.nodeid '.
+						($nodeid?' WHERE nodeid='.$nodeid:'').
+						' ORDER BY n.name, g.name');
 	}
 
-	while($db_resource = DBfetch($db_resources))
-	{
+	while($db_resource = DBfetch($db_resources)){
 		if(isset($db_resource['node_name']))
 			$db_resource['name'] = $db_resource['node_name'].':'.$db_resource['name'];
 
