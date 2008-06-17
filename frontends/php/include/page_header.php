@@ -40,6 +40,7 @@ COpt::profiling_start("page");
 	process_locales();
 	set_zbx_locales();
 	/* Init CURRENT NODE ID */
+
 	init_nodes();
 	
 	/* set Page header */
@@ -83,6 +84,7 @@ COpt::profiling_start("page");
 			}
 		break; 
 	} 
+
 	/* switch($page["type"]) */
 
 	/* NOTE - menu array format:
@@ -572,8 +574,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 	unset($db_nodes, $node_data);
 	unset($sub_menu_table, $sub_menu_row);
 
-	if(isset($denyed_page_requested))
-	{
+	if(isset($denyed_page_requested)){
 		access_deny();
 	}
 
