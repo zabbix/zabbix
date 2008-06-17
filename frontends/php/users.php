@@ -471,19 +471,19 @@ include_once "include/page_header.php";
 				$online_time = (($db_user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$db_user['autologout']))?ZBX_USER_ONLINE_TIME:$db_user['autologout'];
 				$online=new CCol(S_NO,"disabled");
 				
-				$sql = 'SELECT s.lastaccess'.
+				$sql = 'SELECT s.lastaccess, s.status'.
 						' FROM sessions s, users u'.
 						' WHERE s.userid='.$db_user['userid'].
 							' AND s.userid=u.userid '.
 						' ORDER BY lastaccess DESC';
 
 				$db_sessions = DBselect($sql,1);
-				if($db_ses_cnt=DBfetch($db_sessions)){
-					if(($db_ses_cnt['lastaccess']+$online_time) >= time()){
-						$online=new CCol(S_YES.' ('.date('r',$db_ses_cnt['lastaccess']).')',"enabled");
+				if($db_ses=DBfetch($db_sessions)){
+					if((ZBX_SESSION_ACTIVE == $db_ses['status']) && (($db_ses['lastaccess']+$online_time) >= time())){
+						$online=new CCol(S_YES.' ('.date('r',$db_ses['lastaccess']).')',"enabled");
 					}
 					else{
-						$online=new CCol(S_NO.' ('.date('r',$db_ses_cnt['lastaccess']).')',"disabled");
+						$online=new CCol(S_NO.' ('.date('r',$db_ses['lastaccess']).')',"disabled");
 					}
 				}	
 				

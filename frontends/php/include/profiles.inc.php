@@ -335,7 +335,7 @@ function get_favorites($favobj,$nodeid=null){
 	
 	if(is_null($nodeid))
 		$nodeid = get_current_nodeid();
-		
+
 	if(!is_array($nodeid))
 		$nodeid = array($nodeid);
 

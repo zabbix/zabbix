@@ -47,7 +47,7 @@
 		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,'Manual Logout');
 		
 		zbx_unsetcookie('zbx_sessionid');
-		DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
+		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
 		unset($sessionid);
 
 		Redirect("index.php");
@@ -125,7 +125,7 @@
 			$sessionid = md5(time().$password.$name.rand(0,10000000));
 			zbx_setcookie('zbx_sessionid',$sessionid);
 			
-			DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess) VALUES ('.zbx_dbstr($sessionid).','.$row['userid'].','.time().')');
+			DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.$row['userid'].','.time().','.ZBX_SESSION_ACTIVE.')');
 
 			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,"Correct login [".$name."]");
 			
