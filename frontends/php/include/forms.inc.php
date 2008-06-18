@@ -2842,7 +2842,7 @@
 			$tblAct->AddItem(new CVar('esc_period',$esc_period));
 		}
 		
-		if(isset($_REQUEST['escalation'])){
+		if(!isset($_REQUEST['escalation'])){
 			unset($_REQUEST['new_opcondition']);
 		}
 		
@@ -3377,7 +3377,7 @@
 
 		$tblNewOperation = new CTable(null,'nowrap');
 		
-		if(isset($_REQUEST['esc_period']) && ($_REQUEST['esc_period']>0)){
+		if(isset($_REQUEST['escalation'])){
 			$tblStep = new CTable(null,'nowrap');
 
 			$step_from = new CNumericBox('new_operation[esc_step_from]', $new_operation['esc_step_from'],4);
@@ -3561,7 +3561,7 @@
 		}
 
 // new Operation conditions
-		if(isset($_REQUEST['esc_period']) && ($_REQUEST['esc_period']>0)){		
+		if(isset($_REQUEST['escalation'])){
 			$tblCond = new CTable();
 
 			$opconditions	= $new_operation['opconditions'];
