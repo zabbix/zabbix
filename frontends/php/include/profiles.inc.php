@@ -90,6 +90,11 @@ function get_multi_profile($idx,$default_value=array(),$type=PROFILE_TYPE_UNKNOW
 return $result;
 }
 
+function get_node_profile($idx,$default_value=null,$nodeid=null){
+	$profile = profiles_in_node(get_profile($idx,$default_value),$nodeid);
+return (zbx_empty($profile))?$default_value:$profile;
+}
+
 //----------- ADD/EDIT USERPROFILE -------------
 function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$source=null){
 	global $USER_DETAILS;
@@ -328,11 +333,10 @@ return $result;
 /********* END USER HISTORY **********/
 
 /********** USER FAVORITES ***********/
-/********** USER FAVORITES ***********/
 // Author: Aly
 function get_favorites($favobj,$nodeid=null){
 	$fav = get_multi_profile($favobj);
-	
+
 	if(is_null($nodeid))
 		$nodeid = get_current_nodeid();
 
@@ -347,7 +351,7 @@ return $fav;
 }
 // Author: Aly
 function add2favorites($favobj,$favid,$source=null){
-	$favorites = get_favorites($favobj);
+	$favorites = get_favorites($favobj,get_current_nodeid(true));
 
 	$favorites[] = array('value' => $favid);
 	
@@ -357,7 +361,7 @@ return $result;
 
 // Author: Aly
 function rm4favorites($favobj,$favid,$favcnt=null,$source=null){
-	$favorites = get_favorites($favobj);
+	$favorites = get_favorites($favobj,get_current_nodeid(true));
 
 	$favcnt = (is_null($favcnt))?0:$favcnt;		
 	if($favid == 0) $favcnt = ZBX_FAVORITES_ALL;
@@ -391,4 +395,28 @@ function infavorites($favobj,$favid,$source=null){
 return false;
 }
 /********** END USER FAVORITES ***********/
+
+/********** MISC ***********/
+
+function profiles_in_node($profile, $nodeid=null){
+	if(is_null($nodeid))
+		$nodeid = get_current_nodeid();
+		
+	if(!is_array($nodeid))
+		$nodeid = array($nodeid);
+
+	if(is_array($profile)){
+		foreach($profile as $key => $value){
+			$value = profiles_in_node($value,$nodeid);
+			if(!zbx_empty($value)) $profile[$key] = $value;
+			else unset($profile[$key]);
+		}
+	}
+	else if(is_numeric($profile)){
+		if(!uint_in_array(id2nodeid($profile),$nodeid)) $profile = null;;
+	}
+	
+return $profile;
+}
+/********** END MISC ***********/
 ?>
