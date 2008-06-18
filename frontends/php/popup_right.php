@@ -34,7 +34,7 @@ include_once "include/page_header.php";
 	$fields=array(
 		"dstfrm"=>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		NULL),
 		"permission"=>	array(T_ZBX_INT, O_MAND,P_SYS,	IN(PERM_DENY.','.PERM_READ_ONLY.','.PERM_READ_WRITE),	NULL),
-		"type"=>		array(T_ZBX_INT, O_OPT, P_SYS,	IN(RESOURCE_TYPE_GROUP.(ZBX_DISTRIBUTED ? ','.RESOURCE_TYPE_NODE : '')), NULL),
+//		"type"=>		array(T_ZBX_INT, O_OPT, P_SYS,	IN(RESOURCE_TYPE_GROUP.(ZBX_DISTRIBUTED ? ','.RESOURCE_TYPE_NODE : '')), NULL),
 		'nodeid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	NULL),
 		
 	);
@@ -106,13 +106,11 @@ function add_right(formname,type,id,permission,name){
 	
 	$db_resources = null;
 
-	if($type == RESOURCE_TYPE_GROUP){
-		$db_resources = DBselect('SELECT n.name as node_name, g.name as name, g.groupid as id'.
-						' FROM groups g '.
-							' LEFT JOIN nodes n on '.DBid2nodeid('g.groupid').'=n.nodeid '.
-						($nodeid?' WHERE nodeid='.$nodeid:'').
-						' ORDER BY n.name, g.name');
-	}
+	$db_resources = DBselect('SELECT n.name as node_name, g.name as name, g.groupid as id'.
+					' FROM groups g '.
+						' LEFT JOIN nodes n on '.DBid2nodeid('g.groupid').'=n.nodeid '.
+					($nodeid?' WHERE nodeid='.$nodeid:'').
+					' ORDER BY n.name, g.name');
 
 	while($db_resource = DBfetch($db_resources)){
 		if(isset($db_resource['node_name']))

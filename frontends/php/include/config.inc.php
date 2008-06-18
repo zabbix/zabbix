@@ -284,7 +284,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 		$result = ( is_show_subnodes($forse_with_subnodes) ? $ZBX_CURRENT_SUBNODES : $ZBX_CURRENT_NODEID );
 		if(!is_null($perm)){
-			$result = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY, null, $result);
+			$result = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY);
 		}
 
 	return $result;
@@ -1106,7 +1106,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 /*		$row=DBfetch(DBselect("select count(alertid) as cnt from alerts"));
 		$status["alerts_count"]=$row["cnt"];*/
 // triggers
-		$sql = 'SELECT COUNT(t.triggerid) as cnt '.
+		$sql = 'SELECT COUNT(DISTINCT t.triggerid) as cnt '.
 				' FROM triggers t, functions f, items i, hosts h'.
 				' WHERE t.triggerid=f.triggerid '.
 					' AND f.itemid=i.itemid '.
@@ -1132,7 +1132,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$row=DBfetch(DBselect($sql." and t.status=0 and t.value=2"));
 		$status["triggers_count_unknown"]=$row["cnt"];
 // items 
-		$sql = 'SELECT COUNT(i.itemid) as cnt '.
+		$sql = 'SELECT COUNT(DISTINCT i.itemid) as cnt '.
 				' FROM items i, hosts h '.
 				' WHERE i.hostid=h.hostid '.
 					' AND h.status='.HOST_STATUS_MONITORED;

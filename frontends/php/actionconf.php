@@ -42,10 +42,11 @@ include_once 'include/page_header.php';
 
 		'actionid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,					null),
 		'name'=>			array(T_ZBX_STR, O_OPT,	 null,	NOT_EMPTY,				'isset({save})'),
-		'eventsource'=>		array(T_ZBX_INT, O_MAND, null, IN(array(EVENT_SOURCE_TRIGGERS,EVENT_SOURCE_DISCOVERY)),	null),
-		'evaltype'=>		array(T_ZBX_INT, O_OPT,	 null, IN(array(ACTION_EVAL_TYPE_AND_OR,ACTION_EVAL_TYPE_AND,ACTION_EVAL_TYPE_OR)), 	'isset({save})'),
-		'esc_period'=>		array(T_ZBX_INT, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),		
-		'status'=>			array(T_ZBX_INT, O_OPT,	 null, IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)),			'isset({save})'),
+		'eventsource'=>		array(T_ZBX_INT, O_MAND, null,	IN(array(EVENT_SOURCE_TRIGGERS,EVENT_SOURCE_DISCOVERY)),	null),
+		'evaltype'=>		array(T_ZBX_INT, O_OPT,	 null,	IN(array(ACTION_EVAL_TYPE_AND_OR,ACTION_EVAL_TYPE_AND,ACTION_EVAL_TYPE_OR)), 	'isset({save})'),
+		'esc_period'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(60,999999),		'isset({save})&&isset({escalation})'),
+		'escalation'=>		array(T_ZBX_INT, O_OPT,  null,	IN("0,1"),		null),
+		'status'=>			array(T_ZBX_INT, O_OPT,	 null,	IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)),			'isset({save})'),
 		
 		'def_shortdata'=>	array(T_ZBX_STR, O_OPT,	 null,	null,				'isset({save})'),
 		'def_longdata'=>	array(T_ZBX_STR, O_OPT,	 null,	null,				'isset({save})'),
@@ -138,12 +139,14 @@ include_once 'include/page_header.php';
 		unset($_REQUEST['new_opcondition']);
 	}
 	else if(isset($_REQUEST['save'])){
-		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
 		$_REQUEST['recovery_msg'] = get_request('recovery_msg',0);
 		$_REQUEST['r_shortdata'] = get_request('r_shortdata','');
 		$_REQUEST['r_longdata'] = get_request('r_longdata','');
+		
+		if(!isset($_REQUEST['escalation'])) $_REQUEST['esc_period'] = 0;
 		
 		$conditions = get_request('conditions', array());
 		$operations = get_request('operations', array());
