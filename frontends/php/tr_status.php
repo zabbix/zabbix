@@ -173,7 +173,7 @@ include_once "include/page_header.php";
 
 	$scripts_by_hosts = get_accessible_scripts_by_hosts(explode(',',$available_hosts));
 
-	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
+	$sql = 'SELECT DISTINCT g.groupid,g.name '.
 					' FROM groups g, hosts_groups hg, hosts h, items i '.
 					' WHERE g.groupid in ('.$available_groups.') '.
 						' AND hg.groupid=g.groupid '.
@@ -181,7 +181,9 @@ include_once "include/page_header.php";
 						' AND h.hostid=i.hostid '.
 						' AND hg.hostid=h.hostid '.
 						' AND i.status='.ITEM_STATUS_ACTIVE.
-					' ORDER BY g.name');
+					' ORDER BY g.name';
+
+	$result=DBselect($sql);
 										
 	while($row=DBfetch($result)){
 		$cmbGroup->AddItem(

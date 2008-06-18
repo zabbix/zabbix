@@ -818,7 +818,7 @@
 			}
 			
 			$lstGroups = new CListBox('user_groups_to_del[]');
-			$lstGroups->options['style'] = 'width: 280px';
+			$lstGroups->options['style'] = 'width: 320px';
 
 			foreach($user_groups as $groupid => $group_name){
 				$lstGroups->AddItem($groupid,	$group_name);
@@ -2795,8 +2795,14 @@
 			$recovery_msg	= $action['recovery_msg'];
 			$r_shortdata	= $action['r_shortdata'];
 			$r_longdata		= $action['r_longdata'];
+			
+			if($esc_period) $_REQUEST['escalation'] = 1;
 		}
 		else{
+			
+			if(isset($_REQUEST['escalation']) && (0 == $_REQUEST['esc_period'])) 
+				$_REQUEST['esc_period'] = 3600;
+						
 			$name			= get_request('name');
 			$eventsource	= get_request('eventsource');
 			$esc_period		= get_request('esc_period',0);
@@ -2808,6 +2814,8 @@
 			$recovery_msg	= get_request('recovery_msg',0);			
 			$r_shortdata	= get_request('r_shortdata','');
 			$r_longdata		= get_request('r_longdata','');
+			
+			if(!$esc_period) unset($_REQUEST['escalation']);
 		}
 
 		$tblAct->AddRow(array(S_NAME, new CTextBox('name', $name, 50)));
@@ -2819,19 +2827,22 @@
 		$cmbSource->AddItem(EVENT_SOURCE_DISCOVERY, S_DISCOVERY);
 		$tblAct->AddRow(array(S_EVENT_SOURCE, $cmbSource));
 		
+				
 		if(EVENT_SOURCE_TRIGGERS == $eventsource){
-			$period_box = new CNumericBox('esc_period', $esc_period, 6, 'no');
-			$period_box->AddAction('onchange','javascript: '.$period_box->GetOption('onchange').'submit();');
+			$tblAct->AddRow(array(S_ENABLE_ESCALATIONS, new CCheckBox('escalation',isset($_REQUEST['escalation']),'javascript: submit();',1)));
 			
-			$tblAct->AddRow(array(S_PERIOD.' ('.S_SECONDS_SMALL.')', $period_box));
+			if(isset($_REQUEST['escalation'])){
+				$tblAct->AddRow(array(S_PERIOD.' ('.S_SECONDS_SMALL.')', array(new CNumericBox('esc_period', $esc_period, 6, 'no'), '['.S_MIN_SMALL.' 60]')));
+			}
+			else{
+				$tblAct->AddItem(new CVar('esc_period',$esc_period));
+			}
 		}
 		else{
-			$esc_period = 0;
-			$_REQUEST['esc_period'] = 0;
-			$tblAct->AddItem(new CVar('esc_period',0));
+			$tblAct->AddItem(new CVar('esc_period',$esc_period));
 		}
 		
-		if(0 == $esc_period){
+		if(isset($_REQUEST['escalation'])){
 			unset($_REQUEST['new_opcondition']);
 		}
 		
@@ -3235,10 +3246,10 @@
 
 		$tblOper->SetHeader(array(
 				new CCheckBox('all_operations',null,'CheckAll("'.S_ACTION.'","all_operations","g_operationid");'),
-				$esc_period?S_STEPS:null,
+				isset($_REQUEST['escalation'])?S_STEPS:null,
 				S_DETAILS,
-				$esc_period?S_PERIOD.' ('.S_SEC_SMALL.')':null,
-				$esc_period?S_DELAY:null,
+				isset($_REQUEST['escalation'])?S_PERIOD.' ('.S_SEC_SMALL.')':null,
+				isset($_REQUEST['escalation'])?S_DELAY:null,
 				S_ACTION
 			));
 
@@ -3262,7 +3273,7 @@
 			
 			if($val['esc_step_from'] < 1) $val['esc_step_from'] = 1;
 			
-			if($esc_period){
+			if(isset($_REQUEST['escalation'])){
 				$esc_steps_txt = $val['esc_step_from'].' - '.$val['esc_step_to'];
 				$esc_period_txt = $val['esc_period']?$val['esc_period']:S_DEFAULT;
 				$esc_delay_txt = $delay[$val['esc_step_from']]?convert_units($delay[$val['esc_step_from']],'uptime'):S_AT_MOMENT;
@@ -3306,7 +3317,7 @@
 		}
 
 		$td = new CCol($oper_buttons);
-		$td->AddOption('colspan',$esc_period?6:3);
+		$td->AddOption('colspan',isset($_REQUEST['escalation'])?6:3);
 		$td->AddOption('style','text-align: right;');
 		
 		$tblOper->SetFooter($td);
