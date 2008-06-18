@@ -146,14 +146,19 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
 	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
 
-	$result=DBselect('select distinct g.groupid,g.name '.
-		' from groups g, hosts_groups hg, hosts h, items i, functions f, triggers t '.
-		" where h.hostid in (".$availiable_hosts.") ".
-			" AND hg.groupid=g.groupid AND h.status=".HOST_STATUS_MONITORED.
-			" AND h.hostid=i.hostid AND hg.hostid=h.hostid AND i.status=".ITEM_STATUS_ACTIVE.
-			" AND i.itemid=f.itemid AND t.triggerid=f.triggerid AND t.status=".TRIGGER_STATUS_ENABLED.
-		" order by g.name");
+	$sql = 'SELECT DISTINCT g.groupid,g.name '.
+					' FROM groups g, hosts_groups hg, hosts h, items i '.
+					' WHERE g.groupid in ('.$available_groups.') '.
+						' AND hg.groupid=g.groupid '.
+						' AND h.status='.HOST_STATUS_MONITORED.
+						' AND h.hostid=i.hostid '.
+						' AND hg.hostid=h.hostid '.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+					' ORDER BY g.name';
+
+	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
 		$cmbGroup->AddItem(
