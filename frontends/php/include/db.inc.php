@@ -654,7 +654,7 @@ else {
 				
 			$nodes = explode(',', $nodes);
 		}
-		else if (!is_array($nodes)){
+		else if(!is_array($nodes)){
 			fatal_error('Incorrect type of "nodes" for "in_node". Passed ['.gettype($nodes).']');
 		}
 
