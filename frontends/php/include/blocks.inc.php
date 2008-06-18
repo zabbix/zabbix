@@ -40,7 +40,7 @@ function make_favorite_graphs(){
 			$host = get_host_by_itemid($sourceid);
 			$item["description"] = item_description($item["description"],$item["key_"]);
 			
-			$link = new CLink($host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid).':'.$host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$sourceid);
 			$link->SetTarget('blank');
 			
 			$capt = new CSpan($link);
@@ -56,7 +56,7 @@ function make_favorite_graphs(){
 			$result = get_hosts_by_graphid($sourceid);
 			$ghost = DBFetch($result);
 	
-			$link = new CLink($ghost['host'].':'.$graph['name'],'charts.php?graphid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid).$ghost['host'].':'.$graph['name'],'charts.php?graphid='.$sourceid);
 			$link->SetTarget('blank');
 	
 			$capt = new CSpan($link);
@@ -94,7 +94,7 @@ function make_favorite_screens(){
 			if(!$slide = get_slideshow_by_slideshowid($sourceid)) continue;
 			if(!slideshow_accessible($sourceid, PERM_READ_ONLY)) continue;
 
-			$link = new CLink($slide['name'],'screens.php?config=1&elementid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid).$slide['name'],'screens.php?config=1&elementid='.$sourceid);
 			$link->SetTarget('blank');
 		
 			$capt = new CSpan($link);
@@ -107,7 +107,7 @@ function make_favorite_screens(){
 			if(!$screen = get_screen_by_screenid($sourceid)) continue;
 			if(!screen_accessible($sourceid, PERM_READ_ONLY)) continue;
 		
-			$link = new CLink($screen['name'],'screens.php?config=0&elementid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid).$screen['name'],'screens.php?config=0&elementid='.$sourceid);
 			$link->SetTarget('blank');
 			
 			$capt = new CSpan($link);
@@ -146,7 +146,7 @@ function make_favorite_maps(){
 		if(!$sysmap = get_sysmap_by_sysmapid($sourceid)) continue;
 		if(!sysmap_accessible($sourceid,PERM_READ_ONLY)) continue;
 		
-		$link = new CLink($sysmap['name'],'maps.php?sysmapid='.$sourceid);
+		$link = new CLink(get_node_name_by_elid($sourceid).$sysmap['name'],'maps.php?sysmapid='.$sourceid);
 		$link->SetTarget('blank');
 
 		$capt = new CSpan($link);

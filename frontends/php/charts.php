@@ -92,7 +92,9 @@ include_once 'include/page_header.php';
 		$_REQUEST["groupid"] = $_REQUEST["hostid"] = 0;
 	}
 
-	$_REQUEST["graphid"] =	get_request("graphid", get_profile("web.charts.graphid", 0));
+	$_REQUEST["graphid"] = get_request("graphid", get_node_profile("web.charts.graphid", 0));//get_profile("web.charts.graphid", 0));
+	if(!in_node($_REQUEST["graphid"])) $_REQUEST["graphid"] = 0;
+
 	$_REQUEST["keep"] 	=	get_request("keep", 1); // possible excessed REQUEST variable !!!
 	$_REQUEST["period"] =	get_request("period",get_profile("web.graph[".$_REQUEST["graphid"]."].period", ZBX_PERIOD_DEFAULT));
 	
@@ -123,13 +125,13 @@ include_once 'include/page_header.php';
 
 	update_profile('web.charts.graphid',$_REQUEST['graphid']);
 
-	$h1 = array(S_GRAPHS_BIG.SPACE."/".SPACE);
+	$h1 = array(S_GRAPHS_BIG.SPACE.'/'.SPACE);
 	
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
 	
 	$available_graphs = get_accessible_graphs(PERM_READ_LIST, PERM_RES_IDS_ARRAY, get_current_nodeid());
-	
+
 	if(($_REQUEST['graphid']>0) && ($row=DBfetch(DBselect('SELECT DISTINCT graphid, name FROM graphs WHERE graphid='.$_REQUEST['graphid'])))){
 		if(!graph_accessible($_REQUEST['graphid'])){
 			update_profile('web.charts.graphid',0);
