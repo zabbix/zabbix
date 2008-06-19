@@ -209,10 +209,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		global	$USER_DETAILS,
 			$ZBX_LOCALNODEID, $ZBX_LOCMASTERID,
 			$ZBX_CURRENT_NODEID, $ZBX_CURRENT_SUBNODES, $ZBX_CURMASTERID,
-			$ZBX_NODES,
+			$ZBX_NODES,$ZBX_NODES_IDS,
 			$ZBX_WITH_SUBNODES;
 
 		$ZBX_CURRENT_SUBNODES = array();
+		$ZBX_NODES_IDS = array();
 		$ZBX_NODES = array();
 		if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED){
 		
@@ -234,11 +235,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				$ZBX_CURMASTERID = $node_data['masterid'];
 			}
 			
-//			$ZBX_NODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
-
-			$sql = 'SELECT * FROM nodes';
+			$sql = 'SELECT nodeid,name,masterid FROM nodes';
 			$db_nodes = DBselect($sql);
+
 			while($node = DBfetch($db_nodes)){
+				$ZBX_NODES_IDS[$node['nodeid']] = $node['nodeid'];
 				$ZBX_NODES[$node['nodeid']] = $node;
 			}
 
@@ -255,11 +256,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					$curr_node = &$ZBX_NODES[$curr_node['masterid']];
 				}
 
-				if(bccomp($curr_node['masterid'],$ZBX_CURRENT_NODEID) == 0 ){
+				if(bccomp($curr_node['masterid'],$ZBX_CURRENT_NODEID)==0){
 					$ZBX_CURRENT_SUBNODES[$nodeid] = $nodeid;
 				}
 			}
-			
+
 			zbx_set_post_cookie('zbx_current_nodeid',$ZBX_CURRENT_NODEID);
 			zbx_set_post_cookie('zbx_with_subnodes',$ZBX_WITH_SUBNODES);
 		}
@@ -274,7 +275,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		if ( count($ZBX_CURRENT_SUBNODES) < 2 && !defined('ZBX_DISABLE_SUBNODES') )
 			define('ZBX_DISABLE_SUBNODES', 1);
 
-		$ZBX_CURRENT_SUBNODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_IDS_ARRAY);
+		$ZBX_CURRENT_SUBNODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_IDS_ARRAY, $ZBX_CURRENT_SUBNODES);
 	}
 
 	function get_current_nodeid($forse_with_subnodes = null, $perm = null){
