@@ -651,12 +651,12 @@
 		global $DB;
 
 		$item=get_item_by_itemid($itemid);
-		switch($item["value_type"])
-		{
-			case ITEM_VALUE_TYPE_FLOAT:	$history_table = "history";		break;
+		switch($item["value_type"]){
+			case ITEM_VALUE_TYPE_FLOAT:		$history_table = "history";		break;
 			case ITEM_VALUE_TYPE_UINT64:	$history_table = "history_uint";	break;
-			case ITEM_VALUE_TYPE_TEXT:	$history_table = "history_text";	break;
-			default:			$history_table = "history_str";		break;
+			case ITEM_VALUE_TYPE_TEXT:		$history_table = "history_text";	break;
+			case ITEM_VALUE_TYPE_LOG:		$history_table = "history_log";         break;
+			default:						$history_table = "history_str";		break;
 		}
 
 		$sql='SELECT h.clock,h.value,i.valuemapid '.
