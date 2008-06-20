@@ -94,7 +94,7 @@ include_once "include/page_header.php";
 		'web.last.conf.groupid', 'web.last.conf.hostid');
 ?>
 <?php
-	update_profile('web.triggers.showdisabled',$showdisabled);
+	update_profile('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
 

@@ -216,7 +216,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$ZBX_NODES_IDS = array();
 		$ZBX_NODES = array();
 		if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED){
-		
+//SDI($_REQUEST);
 			$ZBX_CURRENT_NODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node
 			$ZBX_WITH_SUBNODES = get_cookie('zbx_with_subnodes', false); // Show elements from subnodes
 
@@ -285,7 +285,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 		$result = ( is_show_subnodes($forse_with_subnodes) ? $ZBX_CURRENT_SUBNODES : $ZBX_CURRENT_NODEID );
 		if(!is_null($perm)){
-			$result = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY);
+			$result = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY, $ZBX_CURRENT_SUBNODES);
 		}
 
 	return $result;

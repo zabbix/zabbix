@@ -128,7 +128,7 @@ include_once 'include/page_header.php';
 	else if($_REQUEST['config']==0 || $_REQUEST['config']==3)
 		validate_group(PERM_READ_WRITE,array(),'web.last.conf.groupid');
 
-	update_profile('web.hosts.config',$_REQUEST['config']);
+	update_profile('web.hosts.config',$_REQUEST['config'], PROFILE_TYPE_INT);
 ?>
 <?php
 
@@ -232,7 +232,7 @@ include_once 'include/page_header.php';
 			}
 		}
 		else{
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
 		}
 
@@ -325,7 +325,7 @@ include_once 'include/page_header.php';
 			}
 		}
 		else{
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
 		}
 
@@ -369,7 +369,7 @@ include_once 'include/page_header.php';
 		}
 
 		if($result){
-			update_profile('HOST_PORT',$_REQUEST['port']);
+			update_profile('HOST_PORT',$_REQUEST['port'], PROFILE_TYPE_INT);
 
 			DBstart();
 			delete_host_profile($hostid);
@@ -526,7 +526,7 @@ include_once 'include/page_header.php';
 			$groupid = $_REQUEST["groupid"];
 		} 
 		else {
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
 			
 			DBstart();
@@ -728,7 +728,7 @@ include_once 'include/page_header.php';
 			$hostid		= $_REQUEST["hostid"];
 		} 
 		else {
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
 			
 			$hostid	&= add_proxy($_REQUEST["host"], $hosts);

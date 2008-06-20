@@ -48,7 +48,7 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!="")){
 	check_fields($fields);
 	
 	$_REQUEST['view_style'] = get_request('view_style',get_profile('web.overview.view.style',STYLE_TOP));
-	update_profile('web.overview.view.style',$_REQUEST['view_style']);
+	update_profile('web.overview.view.style',$_REQUEST['view_style'],PROFILE_TYPE_INT);
 	
 	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
 
@@ -61,7 +61,7 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!="")){
 	validate_group(PERM_READ_ONLY,$options,'web.overview.groupid');
 
 	$_REQUEST["type"] = get_request("type",get_profile("web.overview.type",SHOW_TRIGGERS));
-	update_profile("web.overview.type",$_REQUEST["type"]);
+	update_profile("web.overview.type",$_REQUEST["type"],PROFILE_TYPE_INT);
 
 	$form = new CForm();
 	$form->SetMethod('get');

@@ -35,7 +35,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$_REQUEST["config"]=get_request("config",get_profile("web.users.config",0));
-	update_profile("web.users.config",$_REQUEST["config"]);
+	update_profile("web.users.config",$_REQUEST["config"],PROFILE_TYPE_INT);
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION

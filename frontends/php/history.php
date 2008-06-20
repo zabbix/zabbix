@@ -149,32 +149,32 @@ include_once "include/page_header.php";
 	$item_type = $item_data["value_type"];
 	$l_header = null;
 
-	if(!is_array($_REQUEST["itemid"])){
-		$main_header = $item_data["host"].": ".item_description($item_data["description"],$item_data["key_"]);
+	if(!is_array($_REQUEST['itemid'])){
+		$main_header = $item_data['host'].': '.item_description($item_data['description'],$item_data['key_']);
 		
-		if(isset($_REQUEST["plaintext"]))
+		if(isset($_REQUEST['plaintext']))
 			echo $main_header.SBR;
 	
-		if($_REQUEST["action"]=="showgraph"){
-			$_REQUEST["period"] = get_request("period",get_profile("web.item[".$_REQUEST["itemid"]."].graph.period", ZBX_PERIOD_DEFAULT));
-			if($_REQUEST["period"] >= ZBX_MIN_PERIOD){
-				update_profile("web.item[".$_REQUEST["itemid"]."].graph.period",$_REQUEST["period"]);
+		if($_REQUEST['action']=='showgraph'){
+			$_REQUEST['period'] = get_request('period',get_profile('web.item.graph.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['itemid']));
+			if($_REQUEST['period'] >= ZBX_MIN_PERIOD){
+				update_profile('web.item.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['itemid']);
 			}
 		}
 		
-		$l_header = array(new CLink($item_data['host'],"latest.php?hostid=".$item_data['hostid']),": ",
-			item_description($item_data["description"],$item_data["key_"]));
+		$l_header = array(new CLink($item_data['host'],'latest.php?hostid='.$item_data['hostid']),': ',
+			item_description($item_data['description'],$item_data['key_']));
 			
 		if('showgraph' == $_REQUEST['action']){
 			if(infavorites('web.favorite.graphids',$_REQUEST['itemid'],'itemid')){
 				$icon = new CDiv(SPACE,'iconminus');
 				$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
-				$icon->AddAction('onclick',new CScript("javascript: rm4favorites('itemid','".$_REQUEST['itemid']."',0);"));
+				$icon->AddAction('onclick',new CScript('javascript: rm4favorites('itemid',''.$_REQUEST['itemid'].'',0);'));
 			}
 			else{
 				$icon = new CDiv(SPACE,'iconplus');
 				$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
-				$icon->AddAction('onclick',new CScript("javascript: add2favorites('itemid','".$_REQUEST['itemid']."');"));
+				$icon->AddAction('onclick',new CScript('javascript: add2favorites('itemid',''.$_REQUEST['itemid'].'');'));
 			}
 			$icon->AddOption('id','addrm_fav');
 	
@@ -194,34 +194,30 @@ include_once "include/page_header.php";
 	if( !isset($_REQUEST['plaintext']) && ($_REQUEST['fullscreen']==0) ){
 		if($item_type == ITEM_VALUE_TYPE_LOG){
 			$l_header = new CForm();
-			$l_header->SetName("loglist");
-			$l_header->AddVar("action",$_REQUEST["action"]);
-			$l_header->AddVar("from",$_REQUEST["from"]);
-			$l_header->AddVar("period",$_REQUEST["period"]);
-			$l_header->AddVar("itemid",$_REQUEST["itemid"]);
+			$l_header->SetName('loglist');
+			$l_header->AddVar('action',$_REQUEST['action']);
+			$l_header->AddVar('from',$_REQUEST['from']);
+			$l_header->AddVar('period',$_REQUEST['period']);
+			$l_header->AddVar('itemid',$_REQUEST['itemid']);
 
-			if(isset($_REQUEST["filter_task"]))	$l_header->AddVar("filter_task",$_REQUEST["filter_task"]);
-			if(isset($_REQUEST["filter"]))		$l_header->AddVar("filter",$_REQUEST["filter"]);
-			if(isset($_REQUEST["mark_color"]))	$l_header->AddVar("mark_color",$_REQUEST["mark_color"]);
+			if(isset($_REQUEST['filter_task']))	$l_header->AddVar('filter_task',$_REQUEST['filter_task']);
+			if(isset($_REQUEST['filter']))		$l_header->AddVar('filter',$_REQUEST['filter']);
+			if(isset($_REQUEST['mark_color']))	$l_header->AddVar('mark_color',$_REQUEST['mark_color']);
 
-			$cmbLogList = new CComboBox("cmbloglist");
-			if(is_array($_REQUEST["itemid"]))
-			{
+			$cmbLogList = new CComboBox('cmbloglist');
+			if(is_array($_REQUEST['itemid'])){
 				$cmbLogList->AddItem(0, $main_header);
-				foreach($_REQUEST["itemid"] as $itemid)
-				{
-					if(!($item = get_item_by_itemid($itemid)) || $item["value_type"] != ITEM_VALUE_TYPE_LOG)
-					{
+				foreach($_REQUEST['itemid'] as $itemid){
+					if(!($item = get_item_by_itemid($itemid)) || $item['value_type'] != ITEM_VALUE_TYPE_LOG){
 						invalid_url();
 					}
 					
-					$host = get_host_by_hostid($item["hostid"]);
-					$cmbLogList->AddItem($itemid,$host["host"].": ".item_description($item["description"],$item["key_"]));
+					$host = get_host_by_hostid($item['hostid']);
+					$cmbLogList->AddItem($itemid,$host['host'].': '.item_description($item['description'],$item['key_']));
 				}
 			}
-			else
-			{
-				$cmbLogList->AddItem($_REQUEST["itemid"], $main_header);
+			else{
+				$cmbLogList->AddItem($_REQUEST['itemid'], $main_header);
 			}
 
 			$l_header->AddItem(array(

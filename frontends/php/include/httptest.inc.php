@@ -45,16 +45,13 @@
 		return $status;
 	}
 
-	function	db_save_step($hostid, $applicationid, $httptestid, $testname, $name, $no, $timeout, $url, $posts, $required, $status_codes, $delay, $history, $trends)
-	{
-		if( $no <= 0 )
-		{
+	function db_save_step($hostid, $applicationid, $httptestid, $testname, $name, $no, $timeout, $url, $posts, $required, $status_codes, $delay, $history, $trends){
+		if( $no <= 0 ){
 			error('Scenario step number can\'t be less then 1');
 			return false;
 		}
 
-		if (!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)) 
-		{
+		if (!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)) {
 			error("Scenario step name should contain '0-9a-zA-Z_ .$'- characters only");
 			return false;
 		}

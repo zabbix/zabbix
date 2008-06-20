@@ -324,7 +324,7 @@ COpt::profiling_start("page");
 		if(isset($menu_url)){ /* active menu */
 			$class = 'active';
 
-			update_profile('web.menu.'.$label.'.last', $menu_url);
+			update_profile('web.menu.'.$label.'.last', $menu_url, PROFILE_TYPE_STR);
 
 			if(isset($deny)){
 				$denyed_page_requested = true;

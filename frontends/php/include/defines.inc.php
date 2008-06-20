@@ -320,12 +320,14 @@
 	define('MARK_COLOR_GREEN',	2);
 	define('MARK_COLOR_BLUE',	3);
 
-	define('PROFILE_TYPE_UNKNOWN',	0);
-	define('PROFILE_TYPE_ARRAY',	1);
+	define('PROFILE_TYPE_UNKNOWN',		0);
+	define('PROFILE_TYPE_ID',			1);
+	define('PROFILE_TYPE_INT',			2);
+	define('PROFILE_TYPE_STR',			3);
+	define('PROFILE_TYPE_ARRAY_ID',		4);
+	define('PROFILE_TYPE_ARRAY_INT',	5);
+	define('PROFILE_TYPE_ARRAY_STR',	6);
 	
-	define('PROFILE_TYPE_MULTI',	2);
-	define('PROFILE_TYPE_MULTI_ARRAY',	3);
-
 	define('CALC_FNC_MIN', 1);
 	define('CALC_FNC_AVG', 2);
 	define('CALC_FNC_MAX', 4);

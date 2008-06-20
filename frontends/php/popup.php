@@ -189,14 +189,12 @@ include_once "include/page_header.php";
 <?php
 	global $USER_DETAILS;
 
-	if($min_user_type > $USER_DETAILS['type'])
-	{
+	if($min_user_type > $USER_DETAILS['type']){
 		access_deny();
 	}
 ?>
 <?php
-	function get_window_opener($frame, $field, $value)
-	{
+	function get_window_opener($frame, $field, $value){
 //		return empty($field) ? "" : "window.opener.document.forms['".addslashes($frame)."'].elements['".addslashes($field)."'].value='".addslashes($value)."';";
 		if(empty($field)) return '';
 
@@ -228,8 +226,7 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST['reference']))
 		$frmTitle->AddVar("reference",	$_REQUEST['reference']);
 
-	if(isset($only_hostid))
-	{
+	if(isset($only_hostid)){
 		$_REQUEST['hostid'] = $only_hostid;
 		$frmTitle->AddVar("only_hostid",$only_hostid);
 		unset($_REQUEST["groupid"],$_REQUEST["nodeid"]);
@@ -251,12 +248,11 @@ include_once "include/page_header.php";
 		validate_group(PERM_READ_LIST,$validation_param);
 	}
 
-	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,get_current_nodeid(true));
-	$available_hosts	= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-	$nodeid				= get_current_nodeid();
+	$nodeid 			= get_request('nodeid', get_current_nodeid());
+	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
+	$available_hosts	= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,$nodeid);
 
-	if(isset($only_hostid))
-	{
+	if(isset($only_hostid)){
 		if(!isset($_REQUEST["hostid"]) || (bccomp($_REQUEST["hostid"], $only_hostid) != 0)) access_deny();
 		$hostid = $only_hostid;
 	}
@@ -266,9 +262,8 @@ include_once "include/page_header.php";
 									'sysmaps','plain_text','screens2','overview','host_group_scr')))
 		{
 			if(ZBX_DISTRIBUTED){
-				$nodeid = get_request('nodeid', $nodeid);
 				$cmbNode = new CComboBox('nodeid', $nodeid, 'submit()');
-				$db_nodes = DBselect('select * from nodes where nodeid in ('.$available_nodes.')');
+				$db_nodes = DBselect('SELECT * FROM nodes WHERE '.DBcondition('nodeid',$available_nodes));
 				
 				while($node_data = DBfetch($db_nodes)){
 					$cmbNode->AddItem($node_data['nodeid'], $node_data['name']);
@@ -529,7 +524,7 @@ include_once "include/page_header.php";
 	}
 	else if(str_in_array($srctbl,array("host_group")))
 	{
-		$available_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+		$available_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,$nodeid);
 
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->SetHeader(array(S_NAME));
@@ -682,7 +677,7 @@ include_once "include/page_header.php";
 		$table->Show();
 	}
 	else if($srctbl == "triggers"){
-		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid());
+		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, $nodeid);
 			
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->SetHeader(array(
@@ -940,15 +935,13 @@ include_once "include/page_header.php";
 			S_GRAPH_TYPE
 		));
 		
-		$available_graphs = get_accessible_graphs(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid());
-
+		$available_graphs = get_accessible_graphs(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, $nodeid);
 		$sql = 'SELECT DISTINCT g.graphid,g.name,g.graphtype,h.host '.
 			' FROM graphs g,graphs_items gi,items i,hosts h '.
 			' WHERE gi.graphid=g.graphid '.
 				' AND i.itemid=gi.itemid '.
 				' AND h.hostid=i.hostid '.
 				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND '.DBin_node('g.graphid').
 				' AND '.DBcondition('g.graphid',$available_graphs);
 
 		if(isset($hostid)) 
