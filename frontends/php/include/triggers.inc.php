@@ -809,7 +809,7 @@
 					' (triggerid,description,priority,status,comments,url,value,expression,templateid)'.
 				' VALUES ('.$newtriggerid.','.zbx_dbstr($trigger['description']).','.$trigger['priority'].','.
 					$trigger["status"].','.zbx_dbstr($trigger["comments"]).','.
-					zbx_dbstr($trigger["url"]).",2,'{???:???}',".($copy_mode ? 0 : $triggerid).')');
+					zbx_dbstr($trigger["url"]).",2,'0',".($copy_mode ? 0 : $triggerid).')');
 
 		if(!$result)
 			return $result;
