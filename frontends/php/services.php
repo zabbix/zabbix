@@ -49,7 +49,7 @@ include_once "include/page_header.php";
 /* AJAX */	
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.services.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state']);
+			update_profile('web.services.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'],PROFILE_TYPE_INT);
 		}
 	}	
 

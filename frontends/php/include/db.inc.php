@@ -736,7 +736,6 @@ else {
 
 	function DBcondition($fieldname, &$array, $notin=false){
 		global $DB;
-
 		$condition = '';
 
 		$in = 		$notin?' NOT IN ':' IN ';

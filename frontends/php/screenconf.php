@@ -71,7 +71,7 @@ include_once "include/page_header.php";
 	
 	$config = $_REQUEST['config'] = get_request('config', 0);
 
-	update_profile('web.screenconf.config', $_REQUEST['config']);
+	update_profile('web.screenconf.config', $_REQUEST['config'],PROFILE_TYPE_INT);
 ?>
 <?php
 	if( 0 == $config ){
@@ -92,7 +92,7 @@ include_once "include/page_header.php";
 				show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
 			} 
 			else {
-				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 					access_deny();
 				
 				DBstart();

@@ -190,7 +190,7 @@ include_once 'include/page_header.php';
 		}
 	}
 	else if(inarr_isset(array('delete','actionid'))){
-		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
 		$action_data = DBfetch(DBselect('select name from actions where actionid='.$_REQUEST['actionid']));
@@ -292,7 +292,7 @@ include_once 'include/page_header.php';
 	}
 /* GROUP ACTIONS */
 	else if(isset($_REQUEST['group_enable'])&&isset($_REQUEST['g_actionid'])){
-		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 		
 		$query = 'select distinct actionid from actions'.
@@ -318,7 +318,7 @@ include_once 'include/page_header.php';
 	}
 	else if(isset($_REQUEST['group_disable'])&&isset($_REQUEST['g_actionid'])){
 
-		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
 		$query = 'select distinct actionid from actions'.
@@ -342,7 +342,7 @@ include_once 'include/page_header.php';
 		}
 	}
 	else if(isset($_REQUEST['group_delete'])&&isset($_REQUEST['g_actionid'])){
-		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
 		$result=DBselect('select distinct actionid from actions'.

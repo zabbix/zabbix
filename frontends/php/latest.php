@@ -72,9 +72,9 @@ include_once "include/page_header.php";
 	$_REQUEST['select'] = get_request('select','');
 
 	$_REQUEST['groupbyapp'] = get_request('groupbyapp',get_profile('web.latest.groupbyapp',1));
-	update_profile('web.latest.groupbyapp',$_REQUEST['groupbyapp']);
+	update_profile('web.latest.groupbyapp',$_REQUEST['groupbyapp'],PROFILE_TYPE_INT);
 
-	$_REQUEST['applications'] = get_request('applications',get_profile('web.latest.applications',array()),PROFILE_TYPE_ARRAY);
+	$_REQUEST['applications'] = get_request('applications',get_profile('web.latest.applications',array(),PROFILE_TYPE_ARRAY_ID));
 
 	if(isset($_REQUEST['open'])){
 		if(!isset($_REQUEST['applicationid'])){
@@ -100,8 +100,7 @@ include_once "include/page_header.php";
 		array_shift($_REQUEST['applications']);
 	}
 
-
-	update_profile('web.latest.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY);
+	update_profile('web.latest.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
 ?>
 <?php
 	$r_form = new CForm();

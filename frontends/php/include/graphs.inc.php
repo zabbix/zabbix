@@ -198,7 +198,7 @@
 			$perm_res = PERM_RES_STRING_LINE;
 		
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, null, $nodeid);
-		
+
 		$denied_graphs = array();
 		$result = array();
 		
@@ -233,7 +233,7 @@
 			else
 				$result = implode(',',$result);
 		}
-		
+
 	return $result;
 	}
 

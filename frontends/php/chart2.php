@@ -58,7 +58,7 @@ include_once 'include/page_header.php';
 	$effectiveperiod = navigation_bar_calc();
 	
 	if(($_REQUEST['graphid']>0) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD)){
-		update_profile('web.graph['.$_REQUEST['graphid'].'].period',$_REQUEST['period']);
+		update_profile('web.graph.period',$_REQUEST['period'],PROFILE_TYPE_INT,$_REQUEST['graphid']);
 	}
 	
 	update_profile('web.charts.graphid',$_REQUEST['graphid']);	

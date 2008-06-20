@@ -399,8 +399,9 @@ COpt::counter_up('perm');
 
 function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=null){
 	global $ZBX_LOCALNODEID, $ZBX_NODES_IDS;
-	
+
 	if(is_null($nodeid)) $nodeid = $ZBX_NODES_IDS;
+	if(!is_array($nodeid)) $nodeid = array($nodeid);
 	if(is_null($perm_res))	$perm_res=PERM_RES_STRING_LINE;
 
 	$userid		=& $user_data['userid'];
@@ -414,7 +415,7 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 //COpt::counter_up('perm');
 
 	if(USER_TYPE_SUPER_ADMIN == $user_type){
-		$nodes = DBselect('SELECT nodeid FROM nodes WHERE '.DBcondition('nodeid',$nodeid));
+		$nodes = DBselect('SELECT nodeid FROM nodes WHERE '.DBcondition('nodeid', $nodeid));
 		while($node = DBfetch($nodes)){
 			$node_data[$node['nodeid']] = $node;
 			$node_data[$node['nodeid']]['permission'] = PERM_READ_WRITE;

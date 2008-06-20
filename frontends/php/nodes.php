@@ -57,7 +57,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 	validate_sort_and_sortorder();
 	
-	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY, get_current_nodeid(true));
+	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
 
 	if (0 == count($available_nodes) ){
 		access_deny();
@@ -110,7 +110,7 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
-	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null, get_current_nodeid(true));
+	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
 	
 	if(isset($_REQUEST["form"])){
 		insert_node_form();

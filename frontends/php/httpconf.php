@@ -88,10 +88,10 @@ include_once "include/page_header.php";
 		
 	validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host","only_current_node"),'web.last.conf.groupid', 'web.last.conf.hostid');
 
-	update_profile("web.httpconf.showdisabled",$showdisabled);
+	update_profile("web.httpconf.showdisabled",$showdisabled, PROFILE_TYPE_STR);
 ?>
 <?php
-	$_REQUEST["applications"] = get_request("applications",get_profile("web.httpconf.applications",array()),PROFILE_TYPE_ARRAY);
+	$_REQUEST["applications"] = get_request("applications",get_profile("web.httpconf.applications",array(),PROFILE_TYPE_ARRAY_ID));
 
 	if(isset($_REQUEST["open"])){
 		if(!isset($_REQUEST["applicationid"])){
@@ -117,7 +117,7 @@ include_once "include/page_header.php";
 		array_shift($_REQUEST["applications"]);
 	}
 
-	update_profile("web.httpconf.applications",$_REQUEST["applications"],PROFILE_TYPE_ARRAY);
+	update_profile("web.httpconf.applications",$_REQUEST["applications"],PROFILE_TYPE_ARRAY_ID);
 
 	if(isset($_REQUEST['del_sel_step'])&&isset($_REQUEST['sel_step'])&&is_array($_REQUEST['sel_step'])){
 		foreach($_REQUEST['sel_step'] as $sid)
