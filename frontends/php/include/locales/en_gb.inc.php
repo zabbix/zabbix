@@ -669,6 +669,8 @@
 	'S_HOST_ADDED'=>			'Host added',
 	'S_CANNOT_ADD_HOST'=>			'Cannot add host',
 	'S_ITEMS_ADDED'=>			'Items added',
+	'S_ITEMS_COPIED'=>			'Items copied',
+	'S_CANNOT_COPY_ITEMS'=>			'Cannot copy items',
 	'S_CANNOT_ADD_ITEMS'=>			'Cannot add items',
 	'S_HOST_UPDATED'=>			'Host updated',
 	'S_CANNOT_UPDATE_HOST'=>		'Cannot update host',
