@@ -120,11 +120,11 @@ include_once "include/page_header.php";
 	
 	validate_group_with_host(PERM_READ_ONLY,$options,'web.tr_status.groupid','web.tr_status.hostid');
 
-	update_profile('web.tr_status.show_triggers',$_REQUEST['show_triggers']);
-	update_profile('web.tr_status.show_events',$_REQUEST['show_events']);
+	update_profile('web.tr_status.show_triggers',$_REQUEST['show_triggers'], PROFILE_TYPE_INT);
+	update_profile('web.tr_status.show_events',$_REQUEST['show_events'], PROFILE_TYPE_INT);
 
-	update_profile('web.tr_status.noactions',$_REQUEST['noactions']);
-	update_profile('web.tr_status.compact',$_REQUEST['compact']);
+	update_profile('web.tr_status.noactions',$_REQUEST['noactions'], PROFILE_TYPE_STR);
+	update_profile('web.tr_status.compact',$_REQUEST['compact'], PROFILE_TYPE_STR);
 	
 	$config=select_config();
 	

@@ -57,7 +57,7 @@ include_once "include/page_header.php";
 //	validate_group_with_host(PERM_READ_ONLY,array('allow_all_hosts','always_select_first_host','monitored_hosts'));
 ?>
 <?php
-	$_REQUEST["applications"] = get_request("applications",get_profile("web.httpmon.applications",array()),PROFILE_TYPE_ARRAY);
+	$_REQUEST["applications"] = get_request("applications",get_profile("web.httpmon.applications",array(),PROFILE_TYPE_ARRAY_ID));
 
 	if(isset($_REQUEST["open"])){
 		if(!isset($_REQUEST["applicationid"])){
@@ -83,7 +83,7 @@ include_once "include/page_header.php";
 		array_shift($_REQUEST["applications"]);
 	}
 
-	update_profile("web.httpmon.applications",$_REQUEST["applications"],PROFILE_TYPE_ARRAY);
+	update_profile("web.httpmon.applications",$_REQUEST["applications"],PROFILE_TYPE_ARRAY_ID);
 ?>
 <?php
 // Table HEADER

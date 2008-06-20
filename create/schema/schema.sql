@@ -582,12 +582,14 @@ FIELD		|passwd		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 TABLE|profiles|profileid|ZBX_SYNC
 FIELD		|profileid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|userid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|idx		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|value2		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|source		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|valuetype	|t_integer	|0	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|idx
+FIELD		|idx		|t_varchar(96)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|idx2		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|value_id	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|source		|t_varchar(96)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+INDEX		|1		|userid,idx,idx2
 
 TABLE|rights|rightid|ZBX_SYNC
 FIELD		|rightid	|t_id		|'0'	|NOT NULL	|0

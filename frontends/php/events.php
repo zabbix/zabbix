@@ -80,7 +80,7 @@ include_once "include/page_header.php";
 /* AJAX */	
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.events.filter.state',$_REQUEST['state']);
+			update_profile('web.events.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}	
 
@@ -112,17 +112,17 @@ include_once "include/page_header.php";
 	
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		update_profile('web.events.filter.triggerid',$_REQUEST['triggerid']);
-		update_profile('web.events.filter.show_unknown',$show_unknown);
+		update_profile('web.events.filter.show_unknown',$show_unknown, PROFILE_TYPE_INT);
 		
-		update_profile('web.events.filter.timesince',$_REQUEST['filter_timesince']);
-		update_profile('web.events.filter.timetill',$_REQUEST['filter_timetill']);
+		update_profile('web.events.filter.timesince',$_REQUEST['filter_timesince'], PROFILE_TYPE_INT);
+		update_profile('web.events.filter.timetill',$_REQUEST['filter_timetill'], PROFILE_TYPE_INT);
 	}
 // --------------
 
 	validate_sort_and_sortorder('e.clock',ZBX_SORT_DOWN);
 	
 	$source = get_request('source', EVENT_SOURCE_TRIGGERS);
-	update_profile('web.events.source',$source);
+	update_profile('web.events.source',$source, PROFILE_TYPE_INT);
 	
 ?>
 <?php

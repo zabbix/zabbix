@@ -174,7 +174,7 @@ include_once "include/page_header.php";
 /* AJAX */	
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.items.filter.state',$_REQUEST['state']);
+			update_profile('web.items.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}	
 
@@ -186,10 +186,10 @@ include_once "include/page_header.php";
 /* FILTER */
 	
 	if(isset($_REQUEST['filter_set'])) 
-		update_profile('web.items.filter.enabled',1);
+		update_profile('web.items.filter.enabled',1, PROFILE_TYPE_INT);
 
 	if(isset($_REQUEST['filter_rst']))
-		update_profile('web.items.filter.enabled',0);
+		update_profile('web.items.filter.enabled',0, PROFILE_TYPE_INT);
 		
 	$filter_enabled = get_profile('web.items.filter.enabled',0);
 	
@@ -261,32 +261,32 @@ include_once "include/page_header.php";
 	}
 	
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst']) || ($prev_selection_mode != $_REQUEST['selection_mode'])){
-		update_profile('web.items.filter.selection_mode'            , $_REQUEST['selection_mode']);
+		update_profile('web.items.filter.selection_mode'            , $_REQUEST['selection_mode'], PROFILE_TYPE_STR);
 							        			     			
-		update_profile('web.items.filter.node'                 , $_REQUEST['filter_node']);
-		update_profile('web.items.filter.group'                , $_REQUEST['filter_group']);
-		update_profile('web.items.filter.host'                 , $_REQUEST['filter_host']);
-		update_profile('web.items.filter.application'          , $_REQUEST['filter_application']);
-		update_profile('web.items.filter.description'          , $_REQUEST['filter_description']);
-		update_profile('web.items.filter.type'                 , $_REQUEST['filter_type']);
-		update_profile('web.items.filter.key'                  , $_REQUEST['filter_key']);
-		update_profile('web.items.filter.snmp_community'       , $_REQUEST['filter_snmp_community']);
-		update_profile('web.items.filter.snmp_oid'             , $_REQUEST['filter_snmp_oid']);
-		update_profile('web.items.filter.snmp_port'            , $_REQUEST['filter_snmp_port']);
-		update_profile('web.items.filter.snmpv3_securityname'  , $_REQUEST['filter_snmpv3_securityname']);
-		update_profile('web.items.filter.snmpv3_securitylevel' , $_REQUEST['filter_snmpv3_securitylevel']);
-		update_profile('web.items.filter.snmpv3_authpassphrase', $_REQUEST['filter_snmpv3_authpassphrase']);
-		update_profile('web.items.filter.snmpv3_privpassphrase', $_REQUEST['filter_snmpv3_privpassphrase']);
-		update_profile('web.items.filter.value_type'           , $_REQUEST['filter_value_type']);
-		update_profile('web.items.filter.units'                , $_REQUEST['filter_units']);
-		update_profile('web.items.filter.formula'              , $_REQUEST['filter_formula']);
-		update_profile('web.items.filter.delay'                , $_REQUEST['filter_delay']);
-		update_profile('web.items.filter.history'              , $_REQUEST['filter_history']);
-		update_profile('web.items.filter.trends'               , $_REQUEST['filter_trends']);
-		update_profile('web.items.filter.status'               , $_REQUEST['filter_status']);
-		update_profile('web.items.filter.logtimefmt'           , $_REQUEST['filter_logtimefmt']);
-		update_profile('web.items.filter.delta'                , $_REQUEST['filter_delta']);
-		update_profile('web.items.filter.trapper_hosts'        , $_REQUEST['filter_trapper_hosts']);
+		update_profile('web.items.filter.node'                 , $_REQUEST['filter_node'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.group'                , $_REQUEST['filter_group'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.host'                 , $_REQUEST['filter_host'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.application'          , $_REQUEST['filter_application'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.description'          , $_REQUEST['filter_description'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.type'                 , $_REQUEST['filter_type'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.key'                  , $_REQUEST['filter_key'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.snmp_community'       , $_REQUEST['filter_snmp_community'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.snmp_oid'             , $_REQUEST['filter_snmp_oid'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.snmp_port'            , $_REQUEST['filter_snmp_port'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.snmpv3_securityname'  , $_REQUEST['filter_snmpv3_securityname'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.snmpv3_securitylevel' , $_REQUEST['filter_snmpv3_securitylevel'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.snmpv3_authpassphrase', $_REQUEST['filter_snmpv3_authpassphrase'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.snmpv3_privpassphrase', $_REQUEST['filter_snmpv3_privpassphrase'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.value_type'           , $_REQUEST['filter_value_type'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.units'                , $_REQUEST['filter_units'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.formula'              , $_REQUEST['filter_formula'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.delay'                , $_REQUEST['filter_delay'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.history'              , $_REQUEST['filter_history'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.trends'               , $_REQUEST['filter_trends'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.status'               , $_REQUEST['filter_status'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.logtimefmt'           , $_REQUEST['filter_logtimefmt'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.delta'                , $_REQUEST['filter_delta'], PROFILE_TYPE_STR);
+		update_profile('web.items.filter.trapper_hosts'        , $_REQUEST['filter_trapper_hosts'], PROFILE_TYPE_STR);
 	}	
 
 	if(!empty($_REQUEST['filter_hostid'])) $_REQUEST['hostid'] = $_REQUEST['filter_hostid'];
@@ -301,7 +301,7 @@ include_once "include/page_header.php";
 		
 	validate_group_with_host(PERM_READ_WRITE,array('always_select_first_host','only_current_node'),'web.last.conf.groupid', 'web.last.conf.hostid');
 
-	update_profile('web.items.showdisabled',$showdisabled);
+	update_profile('web.items.showdisabled',$showdisabled, PROFILE_TYPE_INT);
 ?>
 <?php
 	$result = 0;

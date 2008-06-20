@@ -92,11 +92,11 @@ include_once 'include/page_header.php';
 		$_REQUEST["groupid"] = $_REQUEST["hostid"] = 0;
 	}
 
-	$_REQUEST["graphid"] = get_request("graphid", get_node_profile("web.charts.graphid", 0));//get_profile("web.charts.graphid", 0));
+	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0));
 	if(!in_node($_REQUEST["graphid"])) $_REQUEST["graphid"] = 0;
 
-	$_REQUEST["keep"] 	=	get_request("keep", 1); // possible excessed REQUEST variable !!!
-	$_REQUEST["period"] =	get_request("period",get_profile("web.graph[".$_REQUEST["graphid"]."].period", ZBX_PERIOD_DEFAULT));
+	$_REQUEST["keep"] 	=	get_request('keep', 1); // possible excessed REQUEST variable !!!
+	$_REQUEST["period"] =	get_request('period',get_profile('web.graph.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['graphid']));
 	
 	$effectiveperiod = navigation_bar_calc();
 	
@@ -120,7 +120,7 @@ include_once 'include/page_header.php';
 	}
 
 	if(($_REQUEST['graphid']>0) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD)){
-		update_profile('web.graph['.$_REQUEST['graphid'].'].period',$_REQUEST['period']);
+		update_profile('web.graph.period',$_REQUEST['period'],PROFILE_TYPE_INT,$_REQUEST['graphid']);
 	}
 
 	update_profile('web.charts.graphid',$_REQUEST['graphid']);

@@ -62,7 +62,7 @@ include_once 'include/page_header.php';
 /* AJAX */	
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.avail_report.filter.state',$_REQUEST['state']);
+			update_profile('web.avail_report.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}	
 
@@ -87,13 +87,13 @@ include_once 'include/page_header.php';
 	}
 	
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		update_profile('web.avail_report.filter.timesince',$_REQUEST['filter_timesince']);
-		update_profile('web.avail_report.filter.timetill',$_REQUEST['filter_timetill']);
+		update_profile('web.avail_report.filter.timesince',$_REQUEST['filter_timesince'], PROFILE_TYPE_INT);
+		update_profile('web.avail_report.filter.timetill',$_REQUEST['filter_timetill'], PROFILE_TYPE_INT);
 	}
 // --------------
 
 	$config = get_request('config',get_profile('web.avail_report.config',0));
-	update_profile('web.avail_report.config',$config);
+	update_profile('web.avail_report.config',$config, PROFILE_TYPE_INT);
 	
 	$options = array('allow_all_hosts','always_select_first_host','with_items');
 

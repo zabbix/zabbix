@@ -36,33 +36,28 @@
 	return $str;
 	}
 
-	function bfirst($str) // mark first symbol of string as bold
-	{
+	function bfirst($str){
+// mark first symbol of string as bold
 		$res = bold($str[0]);
 		for($i=1,$max=strlen($str); $i<$max; $i++)	$res .= $str[$i];
 		$str = $res;
 		return $str;	
 	}
 
-	function nbsp($str)
-	{
+	function nbsp($str){
 		return str_replace(" ",SPACE,$str);
 	}
 
-	function url1_param($parameter)
-	{
-		if(isset($_REQUEST[$parameter]))
-		{
+	function url1_param($parameter){
+		if(isset($_REQUEST[$parameter])){
 			return "$parameter=".$_REQUEST[$parameter];
 		}
-		else
-		{
+		else{
 			return "";
 		}
 	}
 
-	function prepare_url(&$var, $varname=null)
-	{
+	function prepare_url(&$var, $varname=null){
 		$result = "";
 
 		if(is_array($var)){
