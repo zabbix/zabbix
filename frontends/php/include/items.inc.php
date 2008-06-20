@@ -257,12 +257,12 @@
 
 		$db_item = DBfetch(DBselect("select itemid,hostid from items".
 			" where hostid=$hostid and key_=".zbx_dbstr($key)));
-		if($db_item && $templateid == 0)
-		{
+		if($db_item && $templateid == 0){
 			error("An item with the Key [".$key."] already exists for host [".$host["host"]."].".
 				" The key must be unique.");
 			return FALSE;
-		} elseif ($db_item && $templateid != 0){
+		} 
+		else if ($db_item && $templateid != 0){
 
 			$result = update_item(
 				$db_item["itemid"], $description, $key, $db_item["hostid"],
@@ -295,8 +295,7 @@
 		if(!$result)
 			return $result;
 
-		foreach($applications as $appid)
-		{
+		foreach($applications as $appid){
 			$itemappid=get_dbid("items_applications","itemappid");
 			DBexecute("insert into items_applications (itemappid,itemid,applicationid) values($itemappid,".$itemid.",".$appid.")");
 		}
@@ -306,9 +305,8 @@
 // add items to child hosts
 
 		$db_hosts = get_hosts_by_templateid($host["hostid"]);
-		while($db_host = DBfetch($db_hosts))
-		{
-		// recursion
+		while($db_host = DBfetch($db_hosts)){
+// recursion
 			$result = add_item($description, $key, $db_host["hostid"],
 				$delay, $history, $status, $type, $snmp_community, $snmp_oid,
 				$value_type, $trapper_hosts, $snmp_port, $units, $multiplier,
@@ -327,7 +325,7 @@
 			delete_item($itemid);
 		}
 		
-		return $result;
+	return $result;
 	}
 
 	# Update Item status
@@ -583,11 +581,10 @@
 	 * Comments:
 	 *
 	 */
-	function	copy_item_to_host($itemid, $hostid, $copy_mode = false)
-	{
+	function copy_item_to_host($itemid, $hostid, $copy_mode = false){
 		$db_tmp_item = get_item_by_itemid($itemid);
 
-		add_item(
+		$result = add_item(
 			$db_tmp_item["description"],
 			$db_tmp_item["key_"],
 			$hostid,
@@ -615,6 +612,8 @@
 			$db_tmp_item["params"],
 			get_same_applications_for_host(get_applications_by_itemid($db_tmp_item["itemid"]),$hostid),
 			$copy_mode ? 0 : $db_tmp_item["itemid"]);
+			
+	return $result;
 	}
 
 	/*

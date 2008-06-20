@@ -468,7 +468,9 @@ include_once "include/page_header.php";
 				foreach($hosts_ids as $host_id){
 					$result &= copy_item_to_host($item_id, $host_id, true);
 				}
+				
 			$result = DBend($result);
+			show_messages($result, S_ITEMS_COPIED, S_CANNOT_COPY_ITEMS);
 			unset($_REQUEST["form_copy_to"]);
 		}
 		else{
