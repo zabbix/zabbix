@@ -201,11 +201,11 @@ include_once "include/page_header.php";
 					array_push($hosts_ids, $db_host['hostid']);
 				}
 			}
-			$result = true;
+			$result = false;
 			DBstart();
 			foreach($_REQUEST['g_triggerid'] as $trigger_id)
 				foreach($hosts_ids as $host_id){
-					$result &= copy_trigger_to_host($trigger_id, $host_id, true);
+					$result |= copy_trigger_to_host($trigger_id, $host_id, true);
 				}
 			$result = DBend($result);
 			unset($_REQUEST['form_copy_to']);
@@ -233,7 +233,7 @@ include_once "include/page_header.php";
 	}
 /* GROUP ACTIONS */
 	else if(isset($_REQUEST["group_enable"])&&isset($_REQUEST["g_triggerid"])){
-		$result = true;
+		$result = false;
 		
 		DBstart();
 		foreach($_REQUEST["g_triggerid"] as $triggerid){
@@ -242,8 +242,10 @@ include_once "include/page_header.php";
 			$res = DBselect('SELECT triggerid FROM triggers t WHERE t.triggerid='.zbx_dbstr($triggerid));
 			if(!$row = DBfetch($res)) continue;
 			
-			if($result &= update_trigger_status($row['triggerid'],0)){
-				
+			$cur_result = update_trigger_status($row['triggerid'],0);
+			$result |= $cur_result;
+			
+			if($cur_result){				
 				$serv_status = get_service_status_of_trigger($row['triggerid']);
 				update_services($triggerid, $serv_status); // updating status to all services by the dependency
 				
@@ -251,12 +253,12 @@ include_once "include/page_header.php";
 					S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ".S_ENABLED);
 			}
 		}
-		$result = DBend($result && !empty($_REQUEST["g_triggerid"]));
+		$result = DBend($result);
 		show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 
 	}
 	else if(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_triggerid"])){
-		$result = true;
+		$result = false;
 		
 		DBstart();
 		foreach($_REQUEST["g_triggerid"] as $triggerid){
@@ -265,19 +267,22 @@ include_once "include/page_header.php";
 			$res=DBselect("SELECT triggerid FROM triggers t WHERE t.triggerid=".zbx_dbstr($triggerid));
 			if(!$row = DBfetch($res)) continue;
 			
-			if($result &= update_trigger_status($row["triggerid"],1));{
+			$cur_result = update_trigger_status($row["triggerid"],1);
+			$result |= $cur_result;
+			
+			if($cur_result){
 				update_services($triggerid, 0); // updating status to all services by the dependency
 				
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
 					S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ".S_DISABLED);
 			}
 		}
-		$result = DBend($result && !empty($_REQUEST["g_triggerid"]));
+		$result = DBend($result);
 		show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 		
 	}
 	else if(isset($_REQUEST["group_delete"])&&isset($_REQUEST["g_triggerid"])){
-		$result = true;
+		$result = false;
 		
 		DBstart();		
 		foreach($_REQUEST["g_triggerid"] as $triggerid){
@@ -288,14 +293,15 @@ include_once "include/page_header.php";
 			if($row["templateid"] <> 0)	continue;
 			
 			$description = expand_trigger_description($triggerid);
-			$result &= delete_trigger($row["triggerid"]);
+			$cur_result = delete_trigger($row["triggerid"]);
+			$result |= $cur_result;
 			
-			if($result){
+			if($cur_result){
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
 					S_TRIGGER." [".$triggerid."] [".$description."] ".S_DISABLED);
 			}
 		}
-		$result = DBend($result && !empty($_REQUEST["g_triggerid"]));
+		$result = DBend($result);
 		show_messages($result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
 ?>

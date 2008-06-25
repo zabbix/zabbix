@@ -421,11 +421,11 @@ include_once "include/page_header.php";
 		if("0" === get_request("formula",null)) $_REQUEST['multiplier']=0;
 
 		$group_itemid = $_REQUEST["group_itemid"];
-		$result = true;
+		$result = false;
 		
 		DBstart();
 		foreach($group_itemid as $id){
-			$result &= smart_update_item($id,
+			$result |= smart_update_item($id,
 				null,null,null,get_request("delay"),
 				get_request("history"),get_request("status"),get_request("type"),
 				get_request("snmp_community"),get_request("snmp_oid"),get_request("value_type"),
@@ -435,7 +435,7 @@ include_once "include/page_header.php";
 				get_request("snmpv3_privpassphrase"),get_request("formula"),get_request("trends"),
 				get_request("logtimefmt"),get_request("valuemapid"),$db_delay_flex,null,$applications);
 		}
-		$result = DBend($result && !empty($group_itemid));
+		$result = DBend($result);
 		
 		show_messages($result, S_ITEMS_UPDATED);
 		unset($_REQUEST["group_itemid"], $_REQUEST["form_mass_update"], $_REQUEST["update"]);
@@ -561,7 +561,7 @@ include_once "include/page_header.php";
 	}
 	else if(isset($_REQUEST["group_task"])&&isset($_REQUEST["group_itemid"])){
 		if($_REQUEST["group_task"]==S_DELETE_SELECTED){
-			$result = true;
+			$result = false;
 			$group_itemid = $_REQUEST["group_itemid"];
 
 			DBstart();
@@ -569,15 +569,16 @@ include_once "include/page_header.php";
 				if(!$item = get_item_by_itemid($id))	continue;
 				if($item["templateid"]<>0)	continue;
 
-				$result &= delete_item($id);
-				
-				if($result){
+				$cur_result = delete_item($id);
+				$result |= $cur_result;
+			
+				if($cur_result){
 					$host = get_host_by_hostid($item["hostid"]);
 					add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM." [".$item["key_"]."] [".$id."] ".S_HOST." [".$host['host']."]");
 				}
 			}
 			
-			$result = DBend($result && !empty($group_itemid));
+			$result = DBend($result);
 			show_messages($result, S_ITEMS_DELETED, null);
 		}
 		else if($_REQUEST["group_task"]==S_ACTIVATE_SELECTED){
@@ -588,12 +589,16 @@ include_once "include/page_header.php";
 			foreach($group_itemid as $id){
 				if(!$item = get_item_by_itemid($id))	continue;
 				
-				if(activate_item($id)){
-					$result = true;
+				$cur_result = activate_item($id);
+				$result |= $cur_result;
+			
+				if($cur_result){
 					$host = get_host_by_hostid($item["hostid"]);
 					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM." [".$item["key_"]."] [".$id."] ".S_HOST." [".$host['host']."] ".S_ITEMS_ACTIVATED);
 				}
 			}
+			
+			$result = DBend($result);
 			show_messages($result, S_ITEMS_ACTIVATED, null);
 		}
 		else if($_REQUEST["group_task"]==S_DISABLE_SELECTED){
@@ -602,29 +607,31 @@ include_once "include/page_header.php";
 			
 			DBstart();
 			foreach($group_itemid as $id){
-				if(!($item = get_item_by_itemid($id)))	continue;
+				if(!$item = get_item_by_itemid($id))	continue;
 
-				if(disable_item($id)){
-					$result = true;				
-				
+				$cur_result = disable_item($id);
+				$result |= $cur_result;
+			
+				if($cur_result){
 					$host = get_host_by_hostid($item["hostid"]);
 					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,	S_ITEM." [".$item["key_"]."] [".$id."] ".S_HOST." [".$host['host']."] ".S_ITEMS_DISABLED);
 				}
 			}
-			$result = DBend($result && !empty($group_itemid));
+			$result = DBend($result);
 			show_messages($result, S_ITEMS_DISABLED, null);
 		}
 		else if($_REQUEST["group_task"]==S_CLEAN_HISTORY_SELECTED_ITEMS){
-			$result = true;
+			$result = false;
 			$group_itemid = $_REQUEST["group_itemid"];
 			
 			DBstart();
 			foreach($group_itemid as $id){
 				if(!$item = get_item_by_itemid($id))	continue;
 
-				
-				$result &= delete_history_by_itemid($id);
-				if($result){
+				$cur_result = delete_history_by_itemid($id);
+				$result |= $cur_result;
+
+				if($cur_result){
 					DBexecute("update items set nextcheck=0,lastvalue=null,lastclock=null,prevvalue=null where itemid=$id");
 					
 					$host = get_host_by_hostid($item["hostid"]);
@@ -632,7 +639,7 @@ include_once "include/page_header.php";
 						S_ITEM." [".$item["key_"]."] [".$id."] ".S_HOST." [".$host['host']."] ".S_HISTORY_CLEANED);
 				}
 			}
-			$result = DBend($result && !empty($group_itemid));
+			$result = DBend($result);
 			show_messages($result, S_HISTORY_CLEANED, $result);
 		}
 	}
