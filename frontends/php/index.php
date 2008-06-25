@@ -50,7 +50,7 @@
 		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
 		unset($sessionid);
 
-		Redirect("index.php");
+		redirect("index.php");
 		die();
 //		return;
 	}
@@ -136,7 +136,7 @@
 				$row["url"] = get_profile('web.menu.view.last','index.php');
 				unset($USER_DETAILS);
 			}
-			Redirect($row["url"]);
+			redirect($row["url"]);
 			die();
 //			return;
 		}

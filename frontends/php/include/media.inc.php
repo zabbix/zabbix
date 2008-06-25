@@ -33,9 +33,8 @@
 		return S_UNKNOWN;
 	}
 
-	function	media_severity2str($severity)
-	{
-
+	function media_severity2str($severity){
+	
 		insert_showhint_javascript();
 		$mapping = array(
 			0 => array('letter' => 'N', 'style' => (($severity & 1)  ? 'enabled' : NULL)),
@@ -46,8 +45,7 @@
 			5 => array('letter' => 'D', 'style' => (($severity & 32) ? 'enabled' : NULL))
 		);
 
-		foreach($mapping as $id => $map)
-		{
+		foreach($mapping as $id => $map){
 			$result[$id] = new CSpan($map['letter'], $map['style']);
 			$result[$id]->SetHint(get_severity_description($id)." (".(isset($map['style']) ? "on" : "off").")");
 		}
@@ -55,8 +53,8 @@
 	return $result;
 	}
 
-	function	get_media_by_mediaid($mediaid)
-	{
+	function get_media_by_mediaid($mediaid){
+	
 		$sql="select * from media where mediaid=$mediaid"; 
 		$result=DBselect($sql);
 		$row=DBfetch($result);

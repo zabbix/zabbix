@@ -174,7 +174,7 @@ include_once "include/page_header.php";
 	}
 	else{
 		show_table_header("DISPLAYED ELEMENTS", new CButton("form","Add element",
-			"return Redirect('".$page["file"]."?form=add_element".url_param("sysmapid")."');"));
+			"return redirect('".$page["file"]."?form=add_element".url_param("sysmapid")."');"));
 
 		$table = new CTableInfo();
 		$table->SetHeader(array(S_LABEL,S_TYPE,S_X,S_Y,S_ICON_OFF,S_ICON_ON,S_ICON_UNKNOWN));
@@ -208,7 +208,7 @@ include_once "include/page_header.php";
 
 		echo SBR;
 		show_table_header("CONNECTORS", new CButton("form","Create connection",
-			"return Redirect('".$page["file"]."?form=add_link".
+			"return redirect('".$page["file"]."?form=add_link".
 			url_param("sysmapid")."');"));
 
 		$table = new CTableInfo();

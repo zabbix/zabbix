@@ -217,7 +217,7 @@ function get_cursor_position(e){
 	return cursor;
 }
 
-function Redirect(url) {
+function redirect(url) {
 	window.location = url;
 	return false;
 }
@@ -255,12 +255,13 @@ return true;
 }
 
 function create_var(form_name, var_name, var_val, subm){
-	var frmForm = document.forms[form_name];
+	
+	var frmForm = (is_string(form_name))?document.forms[form_name]:form_name;
 	if(!frmForm) return false;
 
 	var objVar = document.getElementsByName(var_name);
 	objVar=(objVar.length>0)?objVar[0]:null;
-	
+
 	if(is_null(objVar)){
 		objVar = document.createElement('input');
 		objVar.setAttribute('type', 	'hidden');

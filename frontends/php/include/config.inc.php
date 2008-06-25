@@ -1484,7 +1484,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *      require calling 'zbx_flush_post_cookies' function
 	 *	Called from:
 	 *         a) in 'include/page_header.php'
-	 *         b) from 'Redirect()'
+	 *         b) from 'redirect()'
 	 *
 	 * author: Eugene Grigorjev
 	 */
