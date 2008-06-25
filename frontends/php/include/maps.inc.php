@@ -194,7 +194,7 @@
 		}
 
 		$result = DBexecute('DELETE FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
-		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.sysmapids' AND source='sysmapid' AND value='$sysmapid'");
+		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.sysmapids' AND source='sysmapid' AND value_id=$sysmapid");
 		$result &= DBexecute('DELETE FROM sysmaps WHERE sysmapid='.$sysmapid);
 		
 	return $result;

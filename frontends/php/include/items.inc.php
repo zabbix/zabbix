@@ -808,7 +808,7 @@
 
 		$result &= DBexecute('delete from items_applications where itemid='.$itemid);
 		$result &= DBexecute('delete from items where itemid='.$itemid);
-		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='itemid' AND value='$itemid'");
+		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='itemid' AND value_id=$itemid");
 		
 		if($result){
 			info("Item '".$host["host"].":".$item["key_"]."' deleted");

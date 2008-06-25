@@ -108,7 +108,7 @@
 			$result=DBexecute('DELETE FROM screens_items where screenid='.$screenid);
 			$result&=DBexecute('DELETE FROM screens_items where resourceid='.$screenid.' and resourcetype='.SCREEN_RESOURCE_SCREEN);
 			$result&=DBexecute('DELETE FROM slides where screenid='.$screenid);
-			$result&=DBexecute("DELETE FROM profiles WHERE idx='web.favorite.screenids' AND source='screenid' AND value='$screenid'");
+			$result&=DBexecute("DELETE FROM profiles WHERE idx='web.favorite.screenids' AND source='screenid' AND value_id=$screenid");
 			$result&=DBexecute('DELETE FROM screens where screenid='.$screenid);	
 		return	$result;
         }
@@ -633,7 +633,7 @@
 
 		$result = DBexecute('DELETE FROM slideshows where slideshowid='.$slideshowid);
 		$result &= DBexecute('DELETE FROM slides where slideshowid='.$slideshowid);
-		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.screenids' AND source='slideshowid' AND value='$slideshowid'");
+		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.screenids' AND source='slideshowid' AND value_id=$slideshowid");
 		
 		return $result;
 	}
