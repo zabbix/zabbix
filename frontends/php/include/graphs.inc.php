@@ -29,7 +29,7 @@
  *     Eugene Grigorjev 
  *
  */
-	function	graph_item_type2str($type,$count=null){
+	function graph_item_type2str($type,$count=null){
 		switch($type){
 			case GRAPH_ITEM_SUM:	
 				$type = S_GRAPH_SUM;
@@ -42,7 +42,7 @@
 				$type = S_SIMPLE;	
 				break;
 		}
-		return $type;
+	return $type;
 	}
 	
 /*
@@ -55,7 +55,7 @@
  *     Eugene Grigorjev 
  *
  */
-	function	graph_item_drawtypes(){
+	function graph_item_drawtypes(){
 		return array(
 				GRAPH_ITEM_DRAWTYPE_LINE,
 				GRAPH_ITEM_DRAWTYPE_FILLED_REGION,
@@ -75,7 +75,7 @@
  *     Eugene Grigorjev 
  *
  */
-	function	graph_item_drawtype2str($drawtype,$type=null){
+	function graph_item_drawtype2str($drawtype,$type=null){
 		if($type == GRAPH_ITEM_AGGREGATED) return '-';
 
 		switch($drawtype){
@@ -99,7 +99,7 @@
  *     Eugene Grigorjev 
  *
  */
-	function	graph_item_calc_fnc2str($calc_fnc, $type=null){
+	function graph_item_calc_fnc2str($calc_fnc, $type=null){
 		if($type == GRAPH_ITEM_AGGREGATED) return '-';
 		
 		switch($calc_fnc){
@@ -258,17 +258,17 @@
 	return 0;
 	}
 
-	/*
-	 * Function: get_min_itemclock_by_itemid
-	 *
-	 * Description:
-	 *     Return the time of the 1st apearance of item in trends
-	 *
-	 * Author:
-	 *     Aly
-	 *
-	 */	
-	function	get_min_itemclock_by_itemid($itemid){
+/*
+ * Function: get_min_itemclock_by_itemid
+ *
+ * Description:
+ *     Return the time of the 1st apearance of item in trends
+ *
+ * Author:
+ *     Aly
+ *
+ */	
+	function get_min_itemclock_by_itemid($itemid){
 		$row = DBfetch(DBselect('SELECT MIN(t.clock) as clock '.
 						' FROM trends t '.
 						' WHERE t.itemid='.$itemid)); 
@@ -277,9 +277,35 @@
 			return  $row['clock'];
 	return 0;
 	}
+	
+// Show History Graph
+	function show_history($itemid,$from,$stime,$period){
+		$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);   
+		
+		show_table_header(S_TILL.SPACE.$till.' ( '.zbx_date2age($stime,$stime+$period).' )');
 
-	function	get_graphitem_by_gitemid($gitemid)
-	{
+		$td = new CCol(get_js_sizeable_graph('graph','chart.php?itemid='.$itemid.
+				url_param($from,false,'from').
+				url_param($stime,false,'stime').
+				url_param($period,false,'period')));
+		$td->AddOption('align','center');
+		
+		$tr = new CRow($td);
+		$tr->AddOption('bgcolor','#dddddd');
+		
+		$table = new CTable();
+		$table->AddOption('width','100%');
+		$table->AddOption('bgcolor','#cccccc');
+		$table->AddOption('cellspacing','1');
+		$table->AddOption('cellpadding','3');
+		
+		$table->AddRow($tr);
+		
+		$table->Show();
+		echo SBR;
+	}
+
+	function	get_graphitem_by_gitemid($gitemid){
 		$result=DBselect("SELECT * FROM graphs_items WHERE gitemid=$gitemid");
 		$row=DBfetch($result);
 		if($row){
@@ -579,8 +605,7 @@
 
 		DBexecute('delete from graphs_items where graphid='.$graphid);
 
-		foreach($gitems as $gitem)
-		{
+		foreach($gitems as $gitem){
 			if ( ! ($result = add_item_to_graph(
 					$graphid,
 					$gitem['itemid'],
@@ -596,13 +621,12 @@
 			}
 		}
 
-		if ( ($result = update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,
-						$showtriggers,$graphtype,$legend,$graph3d,$templateid)) )
+		if ($result = update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,
+						$showtriggers,$graphtype,$legend,$graph3d,$templateid))
 		{
 			$host_list = array();
 			$db_hosts = get_hosts_by_graphid($graphid);
-			while($db_host = DBfetch($db_hosts))
-			{
+			while($db_host = DBfetch($db_hosts)){
 				$host_list[] = '"'.$db_host["host"].'"';
 			}
 

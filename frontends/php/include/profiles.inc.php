@@ -31,7 +31,7 @@ function get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN,$idx2=n
 	if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
 		$sql_cond = '';
 		if(profile_type($type,'id'))	$sql_cond.= ' AND '.DBin_node('value_id');
-		if(is_numeric($idx2)) 			$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
+		if(zbx_numeric($idx2)) 			$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
 		if(!is_null($source)) 			$sql_cond.= ' AND source='.zbx_dbstr($source);
 		
 		$sql = 'SELECT value_id, value_int, value_str, type '.
@@ -72,7 +72,7 @@ function get_source_profile($idx,$default_value=array(),$type=PROFILE_TYPE_UNKNO
 	if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
 		$sql_cond = '';
 		if(profile_type($type,'id'))	$sql_cond.= ' AND '.DBin_node('value_id');
-		if(is_numeric($idx2)) 			$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
+		if(zbx_numeric($idx2)) 			$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
 		if(!is_null($source)) 			$sql_cond.= ' AND source='.zbx_dbstr($source);
 		
 		$sql = 'SELECT value_id,value_int,value_str,source,type '.
@@ -116,7 +116,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 	if($value === false) return false;
 
 	$sql_cond = '';
-	if(is_numeric($idx2)) 	$sql_cond = ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
+	if(zbx_numeric($idx2)) 	$sql_cond = ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
 
 	DBstart();	
 	if(profile_type($type,'array')){
@@ -125,7 +125,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 			' WHERE userid='.$USER_DETAILS["userid"].
 				' AND idx='.zbx_dbstr($idx).
 				$sql_cond;
-				
+
 		DBexecute($sql);
 		foreach($value as $id => $val){
 			insert_profile($idx,$val,$type,$idx2,$source);
@@ -153,7 +153,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 			
 			$val[$value_type] = $value;	
 
-			$idx2 = is_numeric($idx2)?$idx2:0;
+			$idx2 = zbx_numeric($idx2)?$idx2:0;
 			$src = is_null($source)?'':$source;
 
 			if(is_array($value)){
@@ -195,7 +195,7 @@ function insert_profile($idx,$value,$type,$idx2,$source){
 	
 	$val[$value_type] = $value;	
 	
-	$idx2 = is_numeric($idx2)?$idx2:0;
+	$idx2 = zbx_numeric($idx2)?$idx2:0;
 	$src = is_null($source)?'':$source;
 
 	if(is_array($value)){
@@ -271,14 +271,14 @@ function profile_type_by_value($value,$type=PROFILE_TYPE_UNKNOWN){
 		
 		if(is_array($value)){
 			if(isset($value['value'])) 
-				$type=is_numeric($value['value'])?PROFILE_TYPE_ARRAY_ID:PROFILE_TYPE_ARRAY_STR;
+				$type=zbx_numeric($value['value'])?PROFILE_TYPE_ARRAY_ID:PROFILE_TYPE_ARRAY_STR;
 		}
 		else{
-			$type=is_numeric($value)?PROFILE_TYPE_ARRAY_ID:PROFILE_TYPE_ARRAY_STR;
+			$type=zbx_numeric($value)?PROFILE_TYPE_ARRAY_ID:PROFILE_TYPE_ARRAY_STR;
 		}
 	}
 	else{
-		if(is_numeric($value)) $type = PROFILE_TYPE_ID;
+		if(zbx_numeric($value)) $type = PROFILE_TYPE_ID;
 		else $type = PROFILE_TYPE_STR;
 	}
 return $type;
@@ -296,7 +296,7 @@ function profile_value_by_type(&$value,$type){
 		switch($type){	
 			case PROFILE_TYPE_ID:
 			case PROFILE_TYPE_INT:
-				if(is_numeric($value['value'])){
+				if(zbx_numeric($value['value'])){
 					$result['value'] = intval($value['value']);
 				}
 				else{
@@ -314,7 +314,7 @@ function profile_value_by_type(&$value,$type){
 		switch($type){	
 			case PROFILE_TYPE_ID:
 			case PROFILE_TYPE_INT:
-				$result = is_numeric($value)?intval($value):false;
+				$result = zbx_numeric($value)?intval($value):false;
 			break;
 			case PROFILE_TYPE_STR:
 				$result = strval($value);
@@ -328,6 +328,48 @@ return $result;
 
 /********** END MISC ***********/
 
+/************ CONFIG **************/
+
+function select_config(){
+	$row=DBfetch(DBselect("select * from config where ".DBin_node("configid", get_current_nodeid(false))));
+	if($row){
+		return	$row;
+	}
+	else{
+		error("Unable to select configuration");
+	}
+	return	$row;
+}
+
+function update_config($configs){
+	$update = array();
+	
+	if(isset($configs['work_period']) && !is_null($configs['work_period'])){
+		if(!validate_period($configs['work_period'])){
+			error(S_ICORRECT_WORK_PERIOD);
+			return NULL;
+		}
+	}
+	if(isset($configs['alert_usrgrpid']) && !is_null($configs['alert_usrgrpid'])){
+		if(($configs['alert_usrgrpid'] != 0) && !DBfetch(DBselect('select usrgrpid from usrgrp where usrgrpid='.$configs['alert_usrgrpid']))){
+			error(S_INCORRECT_GROUP);;
+			return NULL;
+		}
+	}
+	
+	foreach($configs as $key => $value){
+		if(!is_null($value)) 
+			$update[] = $key.'='.zbx_dbstr($value);
+	}
+
+	if(count($update) == 0){
+		error(S_NOTHING_TO_DO);
+		return NULL;
+	}
+
+return	DBexecute('update config set '.implode(',',$update).' where '.DBin_node('configid', get_current_nodeid(false)));
+}
+/************ END CONFIG **************/
 
 /************ HISTORY **************/
 // Author: Aly

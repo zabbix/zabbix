@@ -27,6 +27,11 @@
 		}
 	}
 	
+	function get_event_by_eventid($eventid){
+		$db_events = DBselect("select * from events where eventid=$eventid");
+		return DBfetch($db_events);
+	}
+
 	function get_tr_event_by_eventid($eventid){
 		$result = DBfetch(DBselect('SELECT e.*,t.triggerid, t.description,t.priority,t.status,t.type '.
 									' FROM events e,triggers t '.

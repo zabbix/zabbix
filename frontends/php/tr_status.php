@@ -250,7 +250,6 @@ include_once "include/page_header.php";
 	show_table_header($text,$r_form);
 	
 	
-	
 	if(!$_REQUEST["fullscreen"]){
 		$left_col = array();
 		

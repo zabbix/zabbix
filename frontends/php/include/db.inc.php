@@ -364,7 +364,7 @@ if(!isset($DB)){
 		if( isset($DB['DB']) && !empty($DB['DB']) )
 		switch($DB['TYPE']){
 			case "MYSQL":
-				if(is_numeric($limit)){
+				if(zbx_numeric($limit)){
 					$query .= ' limit '.intval($limit);
 				}
 				$result=mysql_query($query,$DB['DB']);
@@ -373,7 +373,7 @@ if(!isset($DB)){
 				}
 				break;
 			case "POSTGRESQL":
-				if(is_numeric($limit)){
+				if(zbx_numeric($limit)){
 					$query .= ' limit '.intval($limit);
 				}
 				$result = pg_query($DB['DB'],$query);
@@ -382,7 +382,7 @@ if(!isset($DB)){
 				}
 				break;
 			case "ORACLE":
-				if(is_numeric($limit)){
+				if(zbx_numeric($limit)){
 					$query = 'select * from ('.$query.') where rownum<='.intval($limit);
 				}
 				$result = DBexecute($query);
@@ -632,7 +632,7 @@ else {
 			if ( !eregi('([0-9\,]+)', $nodes ) )
 				fatal_error('Incorrect "nodes" for "DBin_node". Passed ['.$nodes.']');
 		}
-		else if(!is_numeric($nodes)){
+		else if(!zbx_numeric($nodes)){
 			fatal_error('Incorrect type of "nodes" for "DBin_node". Passed ['.gettype($nodes).']');
 		}
 	return (' '.DBid2nodeid($id_name).' in ('.$nodes.') ');
@@ -645,7 +645,7 @@ else {
 		if(empty($nodes))
 			$nodes = 0;
 
-		if(is_numeric($nodes)){
+		if(zbx_numeric($nodes)){
 			$nodes = array($nodes);
 		}
 		else if(is_string($nodes)){
