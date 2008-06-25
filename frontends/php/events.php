@@ -259,7 +259,7 @@ include_once "include/page_header.php";
 			$sql_cond = ' and h.hostid=hg.hostid and hg.groupid='.$_REQUEST['groupid'];
 		}
 		else{
-			$sql_from = ', hosts_groups hg ';
+			$sql_from = '';
 			$sql_cond = ' and h.hostid in ('.$available_hosts.') ';
 		}
 		

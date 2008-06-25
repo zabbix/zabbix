@@ -30,8 +30,9 @@ function get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN,$idx2=n
 
 	if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
 		$sql_cond = '';
-		if(ctype_digit($idx2)) 	$sql_cond = ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
-		if(!is_null($source)) 	$sql_cond.= ' AND source='.zbx_dbstr($source);
+		if(profile_type($type,'id'))	$sql_cond.= ' AND '.DBin_node('value_id');
+		if(ctype_digit($idx2)) 			$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
+		if(!is_null($source)) 			$sql_cond.= ' AND source='.zbx_dbstr($source);
 		
 		$sql = 'SELECT value_id, value_int, value_str, type '.
 				' FROM profiles '.
@@ -43,10 +44,10 @@ function get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN,$idx2=n
 
 		if($profile=DBfetch($db_profiles)){
 		
-			if(PROFILE_TYPE_UNKNOWN == $type) $type = $profile['type'];
+			if(profile_type($type,'unknown')) $type = $profile['type'];
 			$value_type = profile_field_by_type($type);
 
-			if(profile_type_array($type)){
+			if(profile_type($type,'array')){
 				$result[] = $profile[$value_type];
 				while($profile=DBfetch($db_profiles)){
 					$result[] = $profile[$value_type];
@@ -70,8 +71,9 @@ function get_source_profile($idx,$default_value=array(),$type=PROFILE_TYPE_UNKNO
 
 	if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
 		$sql_cond = '';
-		if(ctype_digit($idx2)) 	$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
-		if(!is_null($source)) 	$sql_cond.= ' AND source='.zbx_dbstr($source);
+		if(profile_type($type,'id'))	$sql_cond.= ' AND '.DBin_node('value_id');
+		if(ctype_digit($idx2)) 			$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
+		if(!is_null($source)) 			$sql_cond.= ' AND source='.zbx_dbstr($source);
 		
 		$sql = 'SELECT value_id,value_int,value_str,source,type '.
 				' FROM profiles '.
@@ -82,10 +84,10 @@ function get_source_profile($idx,$default_value=array(),$type=PROFILE_TYPE_UNKNO
 
 		$db_profiles = DBselect($sql);
 		if($profile=DBfetch($db_profiles)){
-			if(PROFILE_TYPE_UNKNOWN == $type) $type = $profile['type'];
+			if(profile_type($type,'unknown')) $type = $profile['type'];
 			$value_type = profile_field_by_type($type);
 			
-			if(profile_type_array($type)){
+			if(profile_type($type,'array')){
 				$result[] = array('value'=>$profile[$value_type], 'source'=>$profile['source']);
 				
 				while($profile=DBfetch($db_profiles)){
@@ -103,17 +105,12 @@ function get_source_profile($idx,$default_value=array(),$type=PROFILE_TYPE_UNKNO
 return $result;
 }
 
-function get_node_profile($idx,$default_value=null,$nodeid=null){
-	$profile = profiles_in_node(get_profile($idx,$default_value),$nodeid);
-return (zbx_empty($profile))?$default_value:$profile;
-}
-
 //----------- ADD/EDIT USERPROFILE -------------
 function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$source=null){
 	global $USER_DETAILS;
 	if($USER_DETAILS["alias"]==ZBX_GUEST_USER) return false;
 
-	if(PROFILE_TYPE_UNKNOWN == $type) $type = profile_type_by_value($value);
+	if(profile_type($type,'unknown')) $type = profile_type_by_value($value);
 	else $value = profile_value_by_type($value,$type);
 
 	if($value === false) return false;
@@ -122,7 +119,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 	if(ctype_digit($idx2)) 	$sql_cond = ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
 
 	DBstart();	
-	if(profile_type_array($type)){
+	if(profile_type($type,'array')){
 		
 		$sql='DELETE FROM profiles '.
 			' WHERE userid='.$USER_DETAILS["userid"].
@@ -225,8 +222,28 @@ return $result;
 }
 
 // ----------- MISC PROFILE FUNCTIONS -----------
-function profile_type_array($type){
-	return uint_in_array($type,array(PROFILE_TYPE_ARRAY_ID,PROFILE_TYPE_ARRAY_INT,PROFILE_TYPE_ARRAY_STR));
+function profile_type($type,$profile_type){
+	$profile_type = strtolower($profile_type);
+	switch($profile_type){
+		case 'array':
+			$result = uint_in_array($type,array(PROFILE_TYPE_ARRAY_ID,PROFILE_TYPE_ARRAY_INT,PROFILE_TYPE_ARRAY_STR));
+			break;
+		case 'id':
+			$result = uint_in_array($type,array(PROFILE_TYPE_ID,PROFILE_TYPE_ARRAY_ID));
+			break;
+		case 'int':
+			$result = uint_in_array($type,array(PROFILE_TYPE_INT,PROFILE_TYPE_ARRAY_INT));
+			break;
+		case 'str':
+			$result = uint_in_array($type,array(PROFILE_TYPE_STR,PROFILE_TYPE_ARRAY_STR));
+			break;
+		case 'unknown':
+			$result = ($type == PROFILE_TYPE_UNKNOWN);
+			break;
+		default:
+			$result = false;
+	}
+return $result;
 }
 
 function profile_field_by_type($type){
@@ -269,7 +286,7 @@ return $type;
 
 function profile_value_by_type(&$value,$type){
 	
-	if(profile_type_array($type)){
+	if(profile_type($type,'array')){
 		$result = is_array($value)?$value:array($value);
 	}
 	else if(is_array($value)){
@@ -309,8 +326,7 @@ function profile_value_by_type(&$value,$type){
 return $result;
 }
 
-/***********************************/
-
+/********** END MISC ***********/
 
 
 /************ HISTORY **************/
@@ -404,20 +420,10 @@ return $result;
 /********** USER FAVORITES ***********/
 // Author: Aly
 function get_favorites($favobj,$nodeid=null){
-	$fav = get_source_profile($favobj);
-
-	if(is_null($nodeid))
-		$nodeid = get_current_nodeid();
-
-	if(!is_array($nodeid))
-		$nodeid = array($nodeid);
-
-	foreach($fav as $key => $favorite){
-		if(!uint_in_array(id2nodeid($favorite['value']),$nodeid)) unset($fav[$key]);
-	}
-
+	$fav = get_source_profile($favobj,array(),PROFILE_TYPE_ARRAY_ID);
 return $fav;
 }
+
 // Author: Aly
 function add2favorites($favobj,$favid,$source=null){
 	$favorites = get_favorites($favobj,get_current_nodeid(true));
@@ -464,28 +470,4 @@ function infavorites($favobj,$favid,$source=null){
 return false;
 }
 /********** END USER FAVORITES ***********/
-
-/********** MISC ***********/
-
-function profiles_in_node($profile, $nodeid=null){
-	if(is_null($nodeid))
-		$nodeid = get_current_nodeid();
-		
-	if(!is_array($nodeid))
-		$nodeid = array($nodeid);
-
-	if(is_array($profile)){
-		foreach($profile as $key => $value){
-			$value = profiles_in_node($value,$nodeid);
-			if(!zbx_empty($value)) $profile[$key] = $value;
-			else unset($profile[$key]);
-		}
-	}
-	else if(is_numeric($profile)){
-		if(!uint_in_array(id2nodeid($profile),$nodeid)) $profile = null;;
-	}
-	
-return $profile;
-}
-/********** END MISC ***********/
 ?>
