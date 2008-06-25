@@ -1,8 +1,11 @@
 /* CSS Document */
 
 /**************** FORM ELEMENTS ****************/
-.biginput
-{
+select{
+	cursor: pointer;
+}
+
+.biginput{
 	font-family: Verdana, Helvetica, Geneva;
 	font-size: 10px;
 	border: 1px solid gray;
@@ -16,13 +19,13 @@
 	border-color: black;
 }
 
-.biginput[readonly] /* NOTE: Ignored by IE */
-{
+.biginput[readonly]{
+/* NOTE: Ignored by IE */
 	border-color: #D0D0D0;
 	background-color: #EEEEEE;
 }
 
-.button {
+.button{
 	font-family: Verdana, Helvetica, Geneva;
 	font-size: 10px;
 	background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left;
@@ -30,8 +33,14 @@
 	height: 18px;
 	padding: 0px 5px 0px 5px;
 	margin: 2px;
+	cursor: pointer;
 }
-.button:hover {
+
+.button:hover{
 	text-decoration: underline;
 	border-color: black;
+}
+
+.checkbox{
+	cursor: pointer;
 }

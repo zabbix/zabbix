@@ -254,7 +254,7 @@ else {
 	
 	$tr = new CCol(
 				array(
-					new CButton('form',S_ADD_SCRIPT,"javascript: Redirect('scripts.php?form=1');"),
+					new CButton('form',S_ADD_SCRIPT,"javascript: redirect('scripts.php?form=1');"),
 					SPACE,
 					$qbutton
 				)

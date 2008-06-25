@@ -22,7 +22,8 @@
 	require_once "include/config.inc.php";
 	require_once "include/triggers.inc.php";
 	require_once "include/forms.inc.php";
-
+	require_once "include/js.inc.php";
+	
 	$dstfrm		= get_request("dstfrm",		0);	// destination form
 
 	$page["title"] = "S_GRAPH_ITEM";
@@ -62,70 +63,10 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-
-function add_var_to_opener_obj(obj,name,value)
-{
-        new_variable = window.opener.document.createElement('input');
-        new_variable.type = 'hidden';
-        new_variable.name = name;
-        new_variable.value = value;
-
-        obj.appendChild(new_variable);
-}
-
-function add_graph_item(formname,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt)
-{
-        var form = window.opener.document.forms[formname];
-
-        if(!form)
-        {
-                close_window();
-		return false;
-        }
-
-	add_var_to_opener_obj(form,'new_graph_item[itemid]',itemid);
-	add_var_to_opener_obj(form,'new_graph_item[color]',color);
-	add_var_to_opener_obj(form,'new_graph_item[drawtype]',drawtype);
-	add_var_to_opener_obj(form,'new_graph_item[sortorder]',sortorder);
-	add_var_to_opener_obj(form,'new_graph_item[yaxisside]',yaxisside);
-	add_var_to_opener_obj(form,'new_graph_item[calc_fnc]',calc_fnc);
-	add_var_to_opener_obj(form,'new_graph_item[type]',type);
-	add_var_to_opener_obj(form,'new_graph_item[periods_cnt]',periods_cnt);
 	
-	form.submit();
-	close_window();
-	return true;
-}
+	insert_js_function('add_graph_item');
+	insert_js_function('update_graph_item');
 
-function update_graph_item(formname,list_name,gid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt)
-{
-        var form = window.opener.document.forms[formname];
-
-        if(!form)
-        {
-                close_window();
-		return false;
-        }
-
-	add_var_to_opener_obj(form,list_name + '[' + gid + '][itemid]',itemid);
-	add_var_to_opener_obj(form,list_name + '[' + gid + '][color]',color);
-	add_var_to_opener_obj(form,list_name + '[' + gid + '][drawtype]',drawtype);
-	add_var_to_opener_obj(form,list_name + '[' + gid + '][sortorder]',sortorder);
-	add_var_to_opener_obj(form,list_name + '[' + gid + '][yaxisside]',yaxisside);
-	add_var_to_opener_obj(form,list_name + '[' + gid + '][calc_fnc]',calc_fnc);
-	add_var_to_opener_obj(form,list_name + '[' + gid + '][type]',type);
-	add_var_to_opener_obj(form,list_name + '[' + gid + '][periods_cnt]',periods_cnt);
-	
-	form.submit();
-	close_window();
-	return true;
-}
--->
-</script>
-<?php
 	$_REQUEST['drawtype'] = get_request('drawtype',0);
 	$_REQUEST['yaxisside'] = get_request('yaxisside',0);
 	$_REQUEST['sortorder'] = get_request('sortorder',0);

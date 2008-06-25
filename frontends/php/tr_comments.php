@@ -78,7 +78,7 @@ include_once "include/page_header.php";
 	}
 	else if(isset($_REQUEST["cancel"]))
 	{
-		Redirect('tr_status.php?hostid='.$trigger_hostid);
+		redirect('tr_status.php?hostid='.$trigger_hostid);
 		exit;
 		
 	}
