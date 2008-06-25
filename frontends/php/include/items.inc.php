@@ -194,43 +194,35 @@
 		if(($i = array_search(0,$applications)) !== FALSE)
 			unset($applications[$i]);
 
-		if( !eregi('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key) )
-		{
+		if( !eregi('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key) ){
 			error("Incorrect key format 'key_name[param1,param2,...]'");
 			return false;
 		}
 
-		if($delay<1)
-		{
+		if($delay<1){
 			error("Delay cannot be less than 1 second");
 			return FALSE;
 		}
 
-		if( ($snmp_port<1)||($snmp_port>65535))
-		{
+		if( ($snmp_port<1)||($snmp_port>65535)){
 			error("Invalid SNMP port");
 			return FALSE;
 		}
 
-		if($value_type == ITEM_VALUE_TYPE_STR)
-		{
+		if($value_type == ITEM_VALUE_TYPE_STR){
 			$delta=0;
 		}
 
-		if( ($type == ITEM_TYPE_AGGREGATE) && ($value_type != ITEM_VALUE_TYPE_FLOAT))
-		{
+		if( ($type == ITEM_TYPE_AGGREGATE) && ($value_type != ITEM_VALUE_TYPE_FLOAT)){
 			error("Value type must be Float for aggregate items");
 			return FALSE;
 		}
-		if($type == ITEM_TYPE_AGGREGATE)
-		{
+		if($type == ITEM_TYPE_AGGREGATE){
 			/* grpfunc('group','key','itemfunc','numeric param') */
 //			if(eregi('^((.)*)(\(\'((.)*)\'\,\'((.)*)\'\,\'((.)*)\'\,\'([0-9]+)\'\))$', $key, $arr))
-			if(eregi('^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$', $key, $arr))
-			{
+			if(eregi('^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$', $key, $arr)){
 				$g=$arr[1];
-				if(!str_in_array($g,array("grpmax","grpmin","grpsum","grpavg")))
-				{
+				if(!str_in_array($g,array("grpmax","grpmin","grpsum","grpavg"))){
 					error("Group function [$g] is not one of [grpmax,grpmin,grpsum,grpavg]");
 					return FALSE;
 				}
@@ -240,71 +232,72 @@
 				$g=$arr[6];
 				// Item function
 				$g=$arr[8];
-				if(!str_in_array($g,array("last", "min", "max", "avg", "sum","count")))
-				{
-					error("Item function [$g] is not one of [last, min, max, avg, sum,count]");
+				if(!str_in_array($g,array('last', 'min', 'max', 'avg', 'sum','count'))){
+					error('Item function ['.$g.'] is not one of [last, min, max, avg, sum,count]');
 					return FALSE;
 				}
 				// Parameter
 				$g=$arr[10];
 			}
-			else
-			{
-				error("Key does not match grpfunc[\"group\",\"key\",\"itemfunc\",\"numeric param\")");
+			else{
+				error('Key does not match grpfunc["group","key","itemfunc","numeric param")');
 				return FALSE;
 			}
 		}
 
-		$db_item = DBfetch(DBselect("select itemid,hostid from items".
-			" where hostid=$hostid and key_=".zbx_dbstr($key)));
+		$db_item = DBfetch(DBselect('SELECT itemid,hostid '.
+								' FROM items '.
+								' WHERE hostid='.$hostid.
+									' AND key_='.zbx_dbstr($key)));
 		if($db_item && $templateid == 0){
-			error("An item with the Key [".$key."] already exists for host [".$host["host"]."].".
-				" The key must be unique.");
+			error('An item with the Key ['.$key.'] already exists for host ['.$host['host'].']. The key must be unique.');
 			return FALSE;
 		} 
 		else if ($db_item && $templateid != 0){
 
 			$result = update_item(
-				$db_item["itemid"], $description, $key, $db_item["hostid"],
+				$db_item['itemid'], $description, $key, $db_item['hostid'],
 				$delay, $history, $status, $type, $snmp_community, $snmp_oid,
 				$value_type, $trapper_hosts, $snmp_port, $units, $multiplier,
 				$delta, $snmpv3_securityname, $snmpv3_securitylevel,
 				$snmpv3_authpassphrase, $snmpv3_privpassphrase, $formula,
 				$trends, $logtimefmt, $valuemapid, $delay_flex, $params,
-				get_same_applications_for_host($applications, $db_item["hostid"]),
+				get_same_applications_for_host($applications, $db_item['hostid']),
 				$templateid);
 
 			return $result;
 		}
 
 		// first add mother item
-		$itemid=get_dbid("items","itemid");
-		$result=DBexecute("insert into items".
-			" (itemid,description,key_,hostid,delay,history,nextcheck,status,type,".
-			"snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,".
-			"delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,".
-			"snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,delay_flex,params,templateid)".
-			" values ($itemid,".zbx_dbstr($description).",".zbx_dbstr($key).",$hostid,$delay,$history,0,
-			$status,$type,".zbx_dbstr($snmp_community).",".zbx_dbstr($snmp_oid).",$value_type,".
-			zbx_dbstr($trapper_hosts).",$snmp_port,".zbx_dbstr($units).",$multiplier,$delta,".
-			zbx_dbstr($snmpv3_securityname).",$snmpv3_securitylevel,".
-			zbx_dbstr($snmpv3_authpassphrase).",".zbx_dbstr($snmpv3_privpassphrase).",".
-			zbx_dbstr($formula).",$trends,".zbx_dbstr($logtimefmt).",$valuemapid,".
-			zbx_dbstr($delay_flex).",".zbx_dbstr($params).",$templateid)");
+		$itemid=get_dbid('items','itemid');
+		$result=DBexecute('INSERT INTO items '.
+				' (itemid,description,key_,hostid,delay,history,nextcheck,status,type,'.
+					'snmp_community,snmp_oid,value_type,trapper_hosts,'.
+					'snmp_port,units,multiplier,'.
+					'delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,'.
+					'snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,'.
+					'delay_flex,params,templateid)'.
+			' VALUES ('.$itemid.','.zbx_dbstr($description).','.zbx_dbstr($key).','.$hostid.','.$delay.','.$history.',0,'.$status.','.$type.','.
+					zbx_dbstr($snmp_community).','.zbx_dbstr($snmp_oid).','.$value_type.','.zbx_dbstr($trapper_hosts).','.
+					$snmp_port.','.zbx_dbstr($units).','.$multiplier.','.
+					$delta.','.zbx_dbstr($snmpv3_securityname).','.$snmpv3_securitylevel.','.zbx_dbstr($snmpv3_authpassphrase).','.
+					zbx_dbstr($snmpv3_privpassphrase).','.zbx_dbstr($formula).','.$trends.','.zbx_dbstr($logtimefmt).','.$valuemapid.','.
+					zbx_dbstr($delay_flex).','.zbx_dbstr($params).','.$templateid.')'
+			);
 
 		if(!$result)
 			return $result;
 
 		foreach($applications as $appid){
-			$itemappid=get_dbid("items_applications","itemappid");
-			DBexecute("insert into items_applications (itemappid,itemid,applicationid) values($itemappid,".$itemid.",".$appid.")");
+			$itemappid=get_dbid('items_applications','itemappid');
+			DBexecute('INSERT INTO items_applications (itemappid,itemid,applicationid) VALUES('.$itemappid.','.$itemid.','.$appid.')');
 		}
 
-		info("Added new item ".$host["host"].":$key");
+		info('Added new item '.$host['host'].':$key');
 
 // add items to child hosts
 
-		$db_hosts = get_hosts_by_templateid($host["hostid"]);
+		$db_hosts = get_hosts_by_templateid($host['hostid']);
 		while($db_host = DBfetch($db_hosts)){
 // recursion
 			$result = add_item($description, $key, $db_host["hostid"],
@@ -537,33 +530,26 @@
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	delete_template_items($hostid, $templateid = null, $unlink_mode = false)
-	{
+	function delete_template_items($hostid, $templateid = null, $unlink_mode = false){
 		$db_items = get_items_by_hostid($hostid);
-		while($db_item = DBfetch($db_items))
-		{
+		while($db_item = DBfetch($db_items)){
 			if($db_item["templateid"] == 0)
 				continue;
 
-			if( !is_null($templateid))
-			{
-				if ( !is_array($templateid) )	$templateid = array($templateid);
+			if( !is_null($templateid)){
+				if(!is_array($templateid))	$templateid = array($templateid);
 
 				$db_tmp_item = get_item_by_itemid($db_item["templateid"]);
 
-				if ( !uint_in_array($db_tmp_item["hostid"], $templateid) )
-					continue;
+				if(!uint_in_array($db_tmp_item["hostid"], $templateid)) continue;
 			}
 
-			if($unlink_mode)
-			{
-				if(DBexecute("update items set templateid=0 where itemid=".$db_item["itemid"]))
-                                {
-                                        info("Item '".$db_item["key_"]."' unlinked");
-                                }
+			if($unlink_mode){
+				if(DBexecute("update items set templateid=0 where itemid=".$db_item["itemid"])){
+					info("Item '".$db_item["key_"]."' unlinked");
+				}
 			}
-			else
-			{
+			else{
 				delete_item($db_item["itemid"]);
 			}
 		}

@@ -31,7 +31,7 @@ function get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN,$idx2=n
 	if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
 		$sql_cond = '';
 		if(profile_type($type,'id'))	$sql_cond.= ' AND '.DBin_node('value_id');
-		if(ctype_digit($idx2)) 			$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
+		if(is_numeric($idx2)) 			$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
 		if(!is_null($source)) 			$sql_cond.= ' AND source='.zbx_dbstr($source);
 		
 		$sql = 'SELECT value_id, value_int, value_str, type '.
@@ -72,7 +72,7 @@ function get_source_profile($idx,$default_value=array(),$type=PROFILE_TYPE_UNKNO
 	if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
 		$sql_cond = '';
 		if(profile_type($type,'id'))	$sql_cond.= ' AND '.DBin_node('value_id');
-		if(ctype_digit($idx2)) 			$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
+		if(is_numeric($idx2)) 			$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
 		if(!is_null($source)) 			$sql_cond.= ' AND source='.zbx_dbstr($source);
 		
 		$sql = 'SELECT value_id,value_int,value_str,source,type '.
@@ -116,7 +116,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 	if($value === false) return false;
 
 	$sql_cond = '';
-	if(ctype_digit($idx2)) 	$sql_cond = ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
+	if(is_numeric($idx2)) 	$sql_cond = ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
 
 	DBstart();	
 	if(profile_type($type,'array')){
@@ -153,7 +153,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 			
 			$val[$value_type] = $value;	
 
-			$idx2 = ctype_digit($idx2)?$idx2:0;
+			$idx2 = is_numeric($idx2)?$idx2:0;
 			$src = is_null($source)?'':$source;
 
 			if(is_array($value)){
@@ -195,7 +195,7 @@ function insert_profile($idx,$value,$type,$idx2,$source){
 	
 	$val[$value_type] = $value;	
 	
-	$idx2 = ctype_digit($idx2)?$idx2:0;
+	$idx2 = is_numeric($idx2)?$idx2:0;
 	$src = is_null($source)?'':$source;
 
 	if(is_array($value)){
@@ -271,14 +271,14 @@ function profile_type_by_value($value,$type=PROFILE_TYPE_UNKNOWN){
 		
 		if(is_array($value)){
 			if(isset($value['value'])) 
-				$type=ctype_digit($value['value'])?PROFILE_TYPE_ARRAY_ID:PROFILE_TYPE_ARRAY_STR;
+				$type=is_numeric($value['value'])?PROFILE_TYPE_ARRAY_ID:PROFILE_TYPE_ARRAY_STR;
 		}
 		else{
-			$type=ctype_digit($value)?PROFILE_TYPE_ARRAY_ID:PROFILE_TYPE_ARRAY_STR;
+			$type=is_numeric($value)?PROFILE_TYPE_ARRAY_ID:PROFILE_TYPE_ARRAY_STR;
 		}
 	}
 	else{
-		if(ctype_digit($value)) $type = PROFILE_TYPE_ID;
+		if(is_numeric($value)) $type = PROFILE_TYPE_ID;
 		else $type = PROFILE_TYPE_STR;
 	}
 return $type;
@@ -296,7 +296,7 @@ function profile_value_by_type(&$value,$type){
 		switch($type){	
 			case PROFILE_TYPE_ID:
 			case PROFILE_TYPE_INT:
-				if(ctype_digit($value['value'])){
+				if(is_numeric($value['value'])){
 					$result['value'] = intval($value['value']);
 				}
 				else{
@@ -314,7 +314,7 @@ function profile_value_by_type(&$value,$type){
 		switch($type){	
 			case PROFILE_TYPE_ID:
 			case PROFILE_TYPE_INT:
-				$result = ctype_digit($value)?intval($value):false;
+				$result = is_numeric($value)?intval($value):false;
 			break;
 			case PROFILE_TYPE_STR:
 				$result = strval($value);
