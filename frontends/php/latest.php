@@ -52,12 +52,12 @@ include_once "include/page_header.php";
 	
 	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
 	
-	$_REQUEST['hostid'] = get_request('hostid',get_profile('web.latest.last.hostid'));
-	if(!isset($_REQUEST['hostid'])){
+	$_REQUEST['hostid'] = get_request('hostid',get_profile('web.latest.last.hostid', null, PROFILE_TYPE_ID));
+	if(is_null($_REQUEST['hostid'])){
 		array_push($options,'always_select_first_host');
 		
-		$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.last.groupid'));
-		if(!isset($_REQUEST['groupid'])){
+		$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.last.groupid', null, PROFILE_TYPE_ID));
+		if(is_null($_REQUEST['groupid'])){
 			validate_group(PERM_READ_ONLY,array('allow_all_hosts','monitored_hosts','with_monitored_items','always_select_first_group'),'web.latest.last.groupid');
 		}
 	}

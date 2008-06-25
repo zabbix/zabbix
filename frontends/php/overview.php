@@ -52,8 +52,8 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!="")){
 	
 	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
 
-	$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.last.groupid'));
-	if(!isset($_REQUEST['groupid'])){
+	$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.last.groupid', null, PROFILE_TYPE_ID));
+	if(is_null($_REQUEST['groupid'])){
 		array_push($options,'always_select_first_group');
 		validate_group(PERM_READ_ONLY, $options, 'web.overview.groupid');
 	}	
