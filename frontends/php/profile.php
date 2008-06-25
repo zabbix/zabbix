@@ -62,7 +62,7 @@ include_once "include/page_header.php";
 <?php
 	if(isset($_REQUEST["cancel"])){
 		$url = get_profile('web.menu.view.last', 'index.php');
-		Redirect($url);
+		redirect($url);
 	}
 	else if(isset($_REQUEST["save"])){
 		$_REQUEST["password1"] = get_request("password1", null);

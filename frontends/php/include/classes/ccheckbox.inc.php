@@ -26,10 +26,13 @@
 		{
 			parent::CTag('input','no');
 			$this->tag_body_start = '';
-			$this->options['type'] = 'checkbox';
-			$this->options['value'] = $value;
-			$this->options['name'] = $name;
-			$this->options['id'] = $name;
+			
+			$this->AddOption('class','checkbox');
+			$this->AddOption('type','checkbox');
+			$this->AddOption('value',$value);
+			$this->AddOption('name',$name);
+			$this->AddOption('id',$name);
+			
 			$this->SetAction($action);
 			$this->SetChecked($checked);
 		}

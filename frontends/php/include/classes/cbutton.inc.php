@@ -68,7 +68,7 @@
 			if(!is_null($value))
 				$url = $url.$value;
 
-			return parent::SetAction("return Redirect('$url')");
+			return parent::SetAction("return redirect('$url')");
 		}
 	}
 
@@ -117,7 +117,7 @@
 			
 			if(isset($this->vars))
 			{
-				$action = "Redirect('".$page["file"]."?".$this->name."=1".$this->vars."')";
+				$action = "redirect('".$page["file"]."?".$this->name."=1".$this->vars."')";
 			}
 			else
 			{

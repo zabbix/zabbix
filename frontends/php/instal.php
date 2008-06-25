@@ -47,7 +47,7 @@ include_once "include/page_footer.php";
 <?php
 	if(isset($_REQUEST['install']))
 	{
-		Redirect('setup.php');
+		redirect('setup.php');
 	}
 	elseif(isset($_REQUEST['update']))
 	{

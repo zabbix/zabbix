@@ -715,14 +715,12 @@
 
 			$db_medias = DBselect('SELECT m.* FROM media m WHERE m.userid='.$userid);
 			while($db_media = DBfetch($db_medias)){
-				array_push($user_medias, 
-					array(	'mediatypeid' => $db_media['mediatypeid'],
-						'period' => $db_media['period'],
-						'sendto' => $db_media['sendto'],
-						'severity' => $db_media['severity'],
-						'active' => $db_media['active']
-					)
-				);
+				$user_medias[] = array('mediaid' => $db_media['mediaid'],
+									'mediatypeid' => $db_media['mediatypeid'],
+									'period' => $db_media['period'],
+									'sendto' => $db_media['sendto'],
+									'severity' => $db_media['severity'],
+									'active' => $db_media['active']);
 			}
 
 			$new_group_id	= 0;
@@ -758,8 +756,9 @@
 		foreach($user_medias as $one_media) $media_type_ids[$one_media['mediatypeid']] = 1;
 
 		if(count($media_type_ids) > 0){
-			$db_media_types = DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt'.
-				' WHERE mt.mediatypeid in ('.implode(',',array_keys($media_type_ids)).')');
+			$db_media_types = DBselect('SELECT mt.mediatypeid, mt.description '.
+									' FROM media_type mt '.
+									' WHERE mt.mediatypeid IN ('.implode(',',array_keys($media_type_ids)).')');
 
 			while($db_media_type = DBfetch($db_media_types)){
 				$media_types[$db_media_type['mediatypeid']] = $db_media_type['description'];
@@ -837,7 +836,7 @@
 
 			$frmUser->AddVar('user_medias', $user_medias);
 
-			$media_table = new CTable(S_NO_MEDIA_DEFINED);
+			$media_table = new CTableInfo(S_NO_MEDIA_DEFINED);
 			foreach($user_medias as $id => $one_media){
 				if(!isset($one_media["active"]) || $one_media["active"]==0){
 					$status = new CLink(S_ENABLED,'#','enabled');
@@ -848,20 +847,29 @@
 					$status->OnClick("return create_var('".$frmUser->GetName()."','enable_media',".$id.", true);");
 				}
 
+				$media_url = '?dstfrm='.$frmUser->GetName().
+								'&media='.$id.
+								'&mediatypeid='.$one_media['mediatypeid'].
+								'&sendto='.$one_media['sendto'].
+								'&period='.$one_media['period'].
+								'&severity='.$one_media['severity'].
+								'&active='.$one_media['active'];
+				
 				$media_table->AddRow(array(
 					new CCheckBox('user_medias_to_del[]',null,null,$id),
 					new CSpan($media_types[$one_media['mediatypeid']], 'nowrap'),
 					new CSpan($one_media['sendto'], 'nowrap'),
 					new CSpan($one_media['period'], 'nowrap'),
 					media_severity2str($one_media['severity']),
-					$status)
+					$status,
+					new CButton('edit_media',S_EDIT,'javascript: return PopUp("popup_media.php'.$media_url.'",550,400);'))
 				);
 			}
 
 			$frmUser->AddRow(
 						S_MEDIA, 
 						array($media_table,
-							new CButton('add_media',S_ADD,'return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'",550,400);'),
+							new CButton('add_media',S_ADD,'javascript: return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'",550,400);'),
 							SPACE,
 							(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
 						));
@@ -4316,63 +4324,6 @@
 		return $form;
 	}
 
-	function	insert_media_form()
-	{	/* NOTE: only NEW media is acessed */
-
-		global $_REQUEST;
-
-		$severity	= get_request("severity",array(0,1,2,3,4,5));
-		$sendto		= get_request("sendto","");
-		$mediatypeid	= get_request("mediatypeid",0);
-		$active		= get_request("active",0);
-		$period		= get_request("period","1-7,00:00-23:59");
-
-		$frmMedia = new CFormTable(S_NEW_MEDIA);
-		$frmMedia->SetHelp("web.media.php");
-
-		$frmMedia->AddVar("dstfrm",$_REQUEST["dstfrm"]);
-
-		$cmbType = new CComboBox("mediatypeid",$mediatypeid);
-		$types=DBselect("SELECT mediatypeid,description FROM media_type".
-				' WHERE '.DBin_node('mediatypeid').' order by type');
-		while($type=DBfetch($types))
-		{
-			$cmbType->AddItem(
-					$type["mediatypeid"],
-					get_node_name_by_elid($type["mediatypeid"]).$type["description"]
-					);
-		}
-		$frmMedia->AddRow(S_TYPE,$cmbType);
-
-		$frmMedia->AddRow(S_SEND_TO,new CTextBox("sendto",$sendto,20));	
-		$frmMedia->AddRow(S_WHEN_ACTIVE,new CTextBox("period",$period,48));	
-	
-		$frm_row = array();
-		for($i=0; $i<=5; $i++){
-			array_push($frm_row, 
-				array(
-					new CCheckBox(
-						"severity[]",
-						str_in_array($i,$severity)?'yes':'no', 
-						null,		/* action */
-						$i),		/* value */
-					get_severity_description($i)
-				),
-				BR());
-		}
-		$frmMedia->AddRow(S_USE_IF_SEVERITY,$frm_row);
-
-		$cmbStat = new CComboBox("active",$active);
-		$cmbStat->AddItem(0,S_ENABLED);
-		$cmbStat->AddItem(1,S_DISABLED);
-		$frmMedia->AddRow("Status",$cmbStat);
-	
-		$frmMedia->AddItemToBottomRow(new CButton("add", S_ADD));
-		$frmMedia->AddItemToBottomRow(SPACE);
-		$frmMedia->AddItemToBottomRow(new CButtonCancel(null, 'close_window();'));
-		$frmMedia->Show();
-	}
-
  	function insert_housekeeper_form(){
 		$config=select_config();
 		
@@ -4390,8 +4341,7 @@
 		$frmHouseKeep->Show();
 	}
 
-	function	insert_work_period_form()
-	{
+	function insert_work_period_form(){
 		$config=select_config();
 		
 		$frmHouseKeep = new CFormTable(S_WORKING_TIME,"config.php");

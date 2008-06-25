@@ -127,7 +127,7 @@ include_once "include/page_header.php";
 			$last_page['url']='tr_status.php?hostid='.get_profile('web.tr_status.hostid',0);
 		}
 
-		Redirect($last_page['url']);
+		redirect($last_page['url']);
 		exit;
 	}
 	else if(isset($_REQUEST['cancel'])){
@@ -137,7 +137,7 @@ include_once "include/page_header.php";
 			$last_page['url']='tr_status.php?hostid='.get_profile('web.tr_status.hostid',0);
 		}
 
-		Redirect($last_page['url']);
+		redirect($last_page['url']);
 		exit;
 	}
 ?>

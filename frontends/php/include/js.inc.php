@@ -9,10 +9,8 @@
  *
  * author: Eugene Grigorjev
  */
-function zbx_jsvalue($value)
-{
-	if(!is_array($value)) 
-	{
+function zbx_jsvalue($value){
+	if(!is_array($value)) {
 		if(is_object($value)) return unpack_object($value);
 		if(is_string($value)) return '\''.str_replace('\'','\\\'',			/*  '	=> \'	*/
 							str_replace("\n", '\n', 		/*  LF	=> \n	*/
@@ -20,15 +18,13 @@ function zbx_jsvalue($value)
 									str_replace("\r", '', 	/*  CR	=> remove */
 										($value))))).'\'';
 		if(is_null($value)) return 'null';
-		return strval($value);
+	return strval($value);
 	}
 
 	if(count($value) == 0) return '[]';
 
-	foreach($value as $id => $v)
-	{
+	foreach($value as $id => $v){
 		if(!isset($is_object) && is_string($id)) $is_object = true;
-
 		$value[$id] = (isset($is_object) ? '\''.$id.'\' : ' : '').zbx_jsvalue($v);
 	}
 
@@ -46,8 +42,7 @@ function zbx_jsvalue($value)
  *
  * author: Eugene Grigorjev
  */
-function zbx_add_post_js($script)
-{
+function zbx_add_post_js($script){
 	global $ZBX_PAGE_POST_JS;
 
 	$ZBX_PAGE_POST_JS[] = $script;
@@ -166,88 +161,139 @@ function insert_showhint_javascript(){
 function redirect($url,$timeout=null){
 	zbx_flush_post_cookies();
 
-	echo '<script language="JavaScript" type="text/javascript">';
 	if( is_numeric($timeout) ) { 
-		echo 'setTimeout(\'window.location="'.$url.'"\','.($timeout*1000).')';
+		$script.='setTimeout(\'window.location="'.$url.'"\','.($timeout*1000).')';
 	} 
 	else {
-		echo 'window.location = "'.$url.'";';
+		$script.='window.location = "'.$url.'";';
 	}
-	echo '</script>';
+	insert_js($script);
 }
 
 function simple_js_redirect($url,$timeout=null){
-	echo '<script language="JavaScript" type="text/javascript">';
+	$script = '';
 	if( is_numeric($timeout) ) { 
-		echo 'setTimeout(\'window.location="'.$url.'"\','.($timeout*1000).')';
+		$script.='setTimeout(\'window.location="'.$url.'"\','.($timeout*1000).')';
 	} 
 	else {
-		echo 'window.location = "'.$url.'";';
+		$script.='window.location = "'.$url.'";';
 	}
-	echo '</script>';
+	insert_js($script);
 }
 
 function play_sound($filename){
-
-	echo '<script language="javascript" type="text/javascript">
-	
-	if (IE){
-		document.writeln(\'<bgsound src="'.$filename.'" loop="0" />\');
-	}
-	else{
-		document.writeln(\'<embed src="'.$filename.'" autostart="true" width="0" height="0" loop="0" />\');
-		document.writeln(\'<noembed><bgsound src="'.$filename.'" loop="0" /></noembed>\');
-	}
-	</script>';
+	insert_js('	if (IE){
+			document.writeln(\'<bgsound src="'.$filename.'" loop="0" />\');
+		}
+		else{
+			document.writeln(\'<embed src="'.$filename.'" autostart="true" width="0" height="0" loop="0" />\');
+			document.writeln(\'<noembed><bgsound src="'.$filename.'" loop="0" /></noembed>\');
+		}');
 }
 
 
-function SetFocus($frm_name, $fld_name){
-	echo '<script language="javascript" type="text/javascript">
-	<!--
-		document.forms["'.$frm_name.'"].elements["'.$fld_name.'"].focus();
-	//-->
-	</script>';
+function setFocus($frm_name, $fld_name){
+	insert_js('document.forms["'.$frm_name.'"].elements["'.$fld_name.'"].focus();');
 }
 
-function Alert($msg){
-	echo '<script language="javascript" type="text/javascript">
-	<!--
-		alert("'.$msg.'");
-	//-->
-	</script>';
+function alert($msg){
+	insert_js('alert("'.$msg.'");');
 }
 
 function insert_js_function($fnct_name){
 	switch($fnct_name){
 		case 'add_item_variable':
-			echo '<script type="text/javascript">
-					<!--
-					function add_item_variable(s_formname,x_value){
-						if(add_variable(null, "itemid[]", x_value, s_formname, window.opener.document)){
-							var o_form;
-					
-							if( !(o_form = window.opener.document.forms[s_formname]) )
-								 throw "Missed form with name ["+s_formname+"].";
-					
-							var element = o_form.elements["itemid"];
-							if(element) element.name = "itemid[]";
-					
-							o_form.submit();
-						}
-					
+			insert_js('function add_item_variable(s_formname,x_value){
+				if(add_variable(null, "itemid[]", x_value, s_formname, window.opener.document)){
+					var o_form;
+			
+					if( !(o_form = window.opener.document.forms[s_formname]) )
+						 throw "Missed form with name ["+s_formname+"].";
+			
+					var element = o_form.elements["itemid"];
+					if(element) element.name = "itemid[]";
+			
+					o_form.submit();
+				}
+			
+				close_window();
+					return true;
+			}');
+			break;
+		case 'add_media':
+			insert_js('function add_media(formname,media,mediatypeid,sendto,period,active,severity){
+				var form = window.opener.document.forms[formname];
+				var media_name = (media > -1)?"user_medias["+media+"]":"new_media";
+				
+				if(!form){
+					close_window();
+				return false;
+				}
+
+				window.opener.create_var(form,media_name+"[mediatypeid]",mediatypeid);
+				window.opener.create_var(form,media_name+"[sendto]",sendto);
+				window.opener.create_var(form,media_name+"[period]",period);
+				window.opener.create_var(form,media_name+"[active]",active);
+				window.opener.create_var(form,media_name+"[severity]",severity);
+			
+				form.submit();
+				close_window();
+			return true;
+			}');
+			break;
+		case 'add_graph_item':
+			insert_js('function add_graph_item(formname,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt){
+					var form = window.opener.document.forms[formname];
+				
+					if(!form){
 						close_window();
-							return true;
+					return false;
 					}
-					-->
-				 </script>';
+						
+					window.opener.create_var(form,"new_graph_item[itemid]",itemid);
+					window.opener.create_var(form,"new_graph_item[color]",color);
+					window.opener.create_var(form,"new_graph_item[drawtype]",drawtype);
+					window.opener.create_var(form,"new_graph_item[sortorder]",sortorder);
+					window.opener.create_var(form,"new_graph_item[yaxisside]",yaxisside);
+					window.opener.create_var(form,"new_graph_item[calc_fnc]",calc_fnc);
+					window.opener.create_var(form,"new_graph_item[type]",type);
+					window.opener.create_var(form,"new_graph_item[periods_cnt]",periods_cnt);
+					
+					form.submit();
+					close_window();
+					return true;
+				}');
+			break;
+		case 'update_graph_item':
+			insert_js('function update_graph_item(formname,list_name,gid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt){
+				var form = window.opener.document.forms[formname];
+			
+				if(!form){
+					close_window();
+				return false;
+				}
+			
+				window.opener.create_var(form,list_name + "[" + gid + "][itemid]",itemid);
+				window.opener.create_var(form,list_name + "[" + gid + "][color]",color);
+				window.opener.create_var(form,list_name + "[" + gid + "][drawtype]",drawtype);
+				window.opener.create_var(form,list_name + "[" + gid + "][sortorder]",sortorder);
+				window.opener.create_var(form,list_name + "[" + gid + "][yaxisside]",yaxisside);
+				window.opener.create_var(form,list_name + "[" + gid + "][calc_fnc]",calc_fnc);
+				window.opener.create_var(form,list_name + "[" + gid + "][type]",type);
+				window.opener.create_var(form,list_name + "[" + gid + "][periods_cnt]",periods_cnt);
+				
+				form.submit();
+				close_window();
+				return true;
+			}');
 			break;
 		default:
 			break;
 	}
-}
+};
+
 
 function insert_js($script){
-print('<script type="text/javascript">'."\n".$script."\n".'</script>');
+print('<script type="text/javascript"><!--'."\n".$script."\n".'--></script>');
 }
 ?>
