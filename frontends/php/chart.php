@@ -61,9 +61,9 @@ include_once "include/page_header.php";
 	
 	$effectiveperiod = navigation_bar_calc();
 
-	$_REQUEST['period'] = get_request('period',get_profile('web.item['.$_REQUEST['itemid'].'].graph.period', ZBX_PERIOD_DEFAULT));
+	$_REQUEST['period'] = get_request('period',get_profile('web.item.graph.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['itemid']));
 	if($_REQUEST['period'] >= ZBX_MIN_PERIOD){
-		update_profile('web.item['.$_REQUEST['itemid'].'].graph.period',$_REQUEST['period']);
+		update_profile('web.item.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['itemid']);
 	}
 
 	

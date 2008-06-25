@@ -169,12 +169,12 @@ include_once "include/page_header.php";
 			if(infavorites('web.favorite.graphids',$_REQUEST['itemid'],'itemid')){
 				$icon = new CDiv(SPACE,'iconminus');
 				$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
-				$icon->AddAction('onclick',new CScript('javascript: rm4favorites('itemid',''.$_REQUEST['itemid'].'',0);'));
+				$icon->AddAction('onclick',new CScript("javascript: rm4favorites('itemid','".$_REQUEST['itemid']."',0);"));
 			}
 			else{
 				$icon = new CDiv(SPACE,'iconplus');
 				$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
-				$icon->AddAction('onclick',new CScript('javascript: add2favorites('itemid',''.$_REQUEST['itemid'].'');'));
+				$icon->AddAction('onclick',new CScript("javascript: add2favorites('itemid','".$_REQUEST['itemid']."');"));
 			}
 			$icon->AddOption('id','addrm_fav');
 	

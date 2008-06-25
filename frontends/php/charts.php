@@ -92,8 +92,8 @@ include_once 'include/page_header.php';
 		$_REQUEST["groupid"] = $_REQUEST["hostid"] = 0;
 	}
 
-	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0));
-	if(!in_node($_REQUEST["graphid"])) $_REQUEST["graphid"] = 0;
+	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0, PROFILE_TYPE_ID));
+	if(!in_node($_REQUEST['graphid'])) $_REQUEST['graphid'] = 0;
 
 	$_REQUEST["keep"] 	=	get_request('keep', 1); // possible excessed REQUEST variable !!!
 	$_REQUEST["period"] =	get_request('period',get_profile('web.graph.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['graphid']));
