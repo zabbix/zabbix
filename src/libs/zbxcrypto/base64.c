@@ -128,9 +128,10 @@ static unsigned char char_base64_decode(char c)
  *----------------------------------------------------------------------*/
 void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
 {
-	int 	i;
-	unsigned char from1=0,from2=0,from3=0;
-	unsigned char to1=0,to2=0,to3=0,to4=0;
+	int		i;
+	unsigned char	from1=0,from2=0,from3=0;
+	unsigned char	to1=0,to2=0,to3=0,to4=0;
+	char		*p;
 
 	if ( 0 == in_size )
 	{
@@ -140,8 +141,13 @@ void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
 	assert(p_str);
 	assert(p_b64str);
 
+	p = p_b64str;
+
 	for ( i = 0; i < in_size ; i += 3 )
 	{
+		if (p - p_b64str > ZBX_MAX_B64_LEN - 5)
+			break;
+
 		from1 = from2 = from3 = 0;
 		from1 = p_str[i];
 		if (i+1 < in_size)
@@ -159,24 +165,24 @@ void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
 		to3 = ((from2&0xf)<<2)|(from3>>6);
 		to4 = from3&0x3f;
 
-		*(p_b64str++) = char_base64_encode(to1);
-		*(p_b64str++) = char_base64_encode(to2);
+		*p++ = char_base64_encode(to1);
+		*p++ = char_base64_encode(to2);
 
 		if (i+1 < in_size)
 		{
-			*(p_b64str++) = char_base64_encode(to3);
+			*p++ = char_base64_encode(to3);
 		}
 		else
 		{
-			*(p_b64str++) = '=';	/* Padding */
+			*p++ = '=';	/* Padding */
 		}
 		if (i+2 < in_size)
 		{
-			*(p_b64str++) = char_base64_encode(to4);
+			*p++ = char_base64_encode(to4);
 		}
 		else
 		{
-			*(p_b64str++) = '=';	/* Padding */
+			*p++ = '=';	/* Padding */
 		};
 
 /*		if ( i % (76/4*3) == 0)
@@ -185,8 +191,8 @@ void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
 			*(p_b64str++) = '\n';
 		}*/
 	};
-	
-	*p_b64str = '\0';
+
+	*p = '\0';
 	return;
 }
 /*------------------------------------------------------------------------
