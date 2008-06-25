@@ -139,6 +139,7 @@ frontends/php/include/classes/chart.inc.php -text
 frontends/php/include/classes/cldap.inc.php -text
 frontends/php/include/classes/cscript.inc.php -text
 frontends/php/include/classes/pie.inc.php -text
+frontends/php/include/func.inc.php -text
 frontends/php/include/js.inc.php -text
 frontends/php/include/locales/hu_hu.inc.php -text
 frontends/php/include/locales/pt_br.inc.php -text

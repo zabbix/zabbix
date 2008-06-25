@@ -27,6 +27,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	require_once 	"include/defines.inc.php";
 	require_once 	"include/html.inc.php";
 	require_once	"include/copt.lib.php";
+	require_once	"include/func.inc.php";
 	require_once	"include/profiles.inc.php";
 	require_once	"conf/maintenance.inc.php";
 	
@@ -342,335 +343,6 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	return $default;
 	}
 	
-	function zbx_strlen(&$str){
-		if(!$strlen = strlen($str)) return $strlen;
-		
-		$reallen = 0;
-		$fbin= 1 << 7;
-		$sbin= 1 << 6;
-	
-	// check first byte for 11xxxxxx or 0xxxxxxx
-		for($i=0; $i < $strlen; $i++){
-			if(((ord($str[$i]) & $fbin) && (ord($str[$i]) & $sbin)) || !(ord($str[$i]) & $fbin)) $reallen++;
-		}
-	return $reallen;
-	}
-	
-	function zbx_strstr($haystack,$needle){
-		$pos = strpos($haystack,$needle);
-		if($pos !== FALSE){
-			$pos = substr($haystack,$pos);
-		}
-	return $pos;
-	}
-	
-	function zbx_stristr($haystack,$needle){
-		$haystack_B = strtoupper($haystack);
-		$needle = strtoupper($needle);
-		
-		$pos = strpos($haystack_B,$needle);
-		if($pos !== FALSE){
-			$pos = substr($haystack,$pos);
-		}
-	return $pos;
-	}
-	
-	function uint_in_array($needle,$haystack){
-		foreach($haystack as $id => $value)
-			if(bccomp($needle,$value) == 0) return true;
-	return false;
-	}
-
-	function str_in_array($needle,$haystack,$strict=false){
-		if(is_array($needle)){
-			return in_array($needle,$haystack,$strict);
-		}
-		else if($strict){
-			foreach($haystack as $id => $value) 
-				if($needle === $value) return true;
-		}
-		else{
-			foreach($haystack as $id => $value)
-				if(strcmp($needle,$value) == 0) return true;
-		}
-	return false;
-	}
-
-	function zbx_stripslashes($value){
-		if(is_array($value)){
-			foreach($value as $id => $data)
-				$value[$id] = zbx_stripslashes($data); 
-				// $value = array_map('zbx_stripslashes',$value); /* don't use 'array_map' it buggy with indexes */
-		} elseif (is_string($value)){
-			$value = stripslashes($value);
-		}
-		return $value;
-	}
-
-	function get_request($name, $def=NULL){
-		if(isset($_REQUEST[$name]))
-			return $_REQUEST[$name];
-		else
-			return $def;
-	}
-
-	function info($msg){
-		global $ZBX_MESSAGES;
-
-		if(is_null($ZBX_MESSAGES))
-			$ZBX_MESSAGES = array();
-
-		array_push($ZBX_MESSAGES, array('type' => 'info', 'message' => $msg));
-	}
-
-	function error($msg){
-		global $ZBX_MESSAGES;
-
-		if(is_null($ZBX_MESSAGES))
-			$ZBX_MESSAGES = array();
-
-		array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
-	}
-
-	function clear_messages(){
-		global $ZBX_MESSAGES;
-
-		$ZBX_MESSAGES = null;
-	}
-
-	function asort_by_key(&$array, $key){
-		if(!is_array($array)) {
-			error('Incorrect type of asort_by_key');
-			return array();
-		}
-		
-		$key = htmlspecialchars($key);
-		uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
-	return $array;
-	}
-
-	function fatal_error($msg){
-		include_once "include/page_header.php";
-		show_error_message($msg);
-		include_once "include/page_footer.php";
-	}
-	
-	function str2mem($val){
-		$val = trim($val);
-		$last = strtolower($val{strlen($val)-1});
-		switch($last){
-			// The 'G' modifier is available since PHP 5.1.0
-			case 'g':
-				$val *= 1024;
-			case 'm':
-				$val *= 1024;
-			case 'k':
-				$val *= 1024;
-		}
-
-		return $val;
-	}
-	
-	function mem2str($size){
-		$prefix = 'B';
-		if($size > 1048576) {	$size = $size/1048576;	$prefix = 'M'; }
-		elseif($size > 1024) {	$size = $size/1024;	$prefix = 'K'; }
-		return round($size, 6).$prefix;
-	}
-
-	function getmicrotime(){
-		list($usec, $sec) = explode(" ",microtime()); 
-		return ((float)$usec + (float)$sec); 
-	}
-
-	/* Do not forget to sync it with add_value_suffix in evalfunc.c! */ 
-	function convert_units($value,$units){
-// Special processing for unix timestamps
-		if($units=="unixtime"){
-			$ret=date("Y.m.d H:i:s",$value);
-			return $ret;
-		}
-//Special processing of uptime
-		if($units=="uptime"){
-			$ret="";
-			$days=floor($value/(24*3600));
-			if($days>0){
-				$value=$value-$days*(24*3600);
-			}
-			$hours=floor($value/(3600));
-			if($hours>0){
-				$value=$value-$hours*3600;
-			}
-			$min=floor($value/(60));
-			if($min>0){
-				$value=$value-$min*(60);
-			}
-			if($days==0){
-				$ret = sprintf("%02d:%02d:%02d", $hours, $min, $value);
-			}
-			else{
-				$ret = sprintf("%d days, %02d:%02d:%02d", $days, $hours, $min, $value);
-			}
-			return $ret;
-		}
-// Special processing for seconds
-		if($units=="s"){
-			$ret="";
-
-			$t=floor($value/(365*24*3600));
-			if($t>0)
-			{
-				$ret=$t."y";
-				$value=$value-$t*(365*24*3600);
-			}
-			$t=floor($value/(30*24*3600));
-			if($t>0)
-			{
-				$ret=$ret.$t."m";
-				$value=$value-$t*(30*24*3600);
-			}
-			$t=floor($value/(24*3600));
-			if($t>0)
-			{
-				$ret=$ret.$t."d";
-				$value=$value-$t*(24*3600);
-			}
-			$t=floor($value/(3600));
-			if($t>0)
-			{
-				$ret=$ret.$t."h";
-				$value=$value-$t*(3600);
-			}
-			$t=floor($value/(60));
-			if($t>0)
-			{
-				$ret=$ret.$t."m";
-				$value=$value-$t*(60);
-			}
-			$ret=$ret.round($value, 2)."s";
-		
-			return $ret;	
-		}
-
-		$u="";
-
-// Special processing for bits (kilo=1000, not 1024 for bits)
-		if( ($units=="b") || ($units=="bps")){
-			$abs=abs($value);
-
-			if($abs<1000)
-			{
-				$u="";
-			}
-			else if($abs<1000*1000)
-			{
-				$u="K";
-				$value=$value/1000;
-			}
-			else if($abs<1000*1000*1000)
-			{
-				$u="M";
-				$value=$value/(1000*1000);
-			}
-			else
-			{
-				$u="G";
-				$value=$value/(1000*1000*1000);
-			}
-	
-			if(round($value) == round($value,2))
-			{
-				$s=sprintf("%.0f",$value);
-			}
-			else
-			{
-				$s=sprintf("%.2f",$value);
-			}
-
-			return "$s $u$units";
-		}
-
-
-		if($units==""){
-			if(round($value) == round($value,2))
-			{
-				return sprintf("%.0f",$value);
-			}
-			else
-			{
-				return sprintf("%.2f",$value);
-			}
-		}
-
-		$abs=abs($value);
-
-		if($abs<1024){
-			$u="";
-		}
-		else if($abs<1024*1024){
-			$u="K";
-			$value=$value/1024;
-		}
-		else if($abs<1024*1024*1024){
-			$u="M";
-			$value=$value/(1024*1024);
-		}
-		else if($abs<1024*1024*1024*1024){
-			$u="G";
-			$value=$value/(1024*1024*1024);
-		}
-		else{
-			$u="T";
-			$value=$value/(1024*1024*1024*1024);
-		}
-
-		if(round($value) == round($value,2)){
-			$s=sprintf("%.0f",$value);
-		}
-		else{
-			$s=sprintf("%.2f",$value);
-		}
-
-		return "$s $u$units";
-	}
-
-
-//	The hash has form <md5sum of triggerid>,<sum of priorities>
-	function calc_trigger_hash(){
-
-		$priority = array(0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0);
-		$triggerids="";
-
-	       	$result=DBselect('select t.triggerid,t.priority from triggers t,hosts h,items i,functions f'.
-			'  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0');
-
-		while($row=DBfetch($result)){
-			$ack = get_last_event_by_triggerid($row["triggerid"]);
-			if($ack["acknowledged"] == 1) continue;
-
-			$triggerids="$triggerids,".$row["triggerid"];
-			$priority[$row["priority"]]++;
-		}
-
-		$md5sum=md5($triggerids);
-
-		$priorities=0;
-		for($i=0;$i<=5;$i++)	$priorities += pow(100,$i)*$priority[$i];
-
-		return	"$priorities,$md5sum";
-	}
-
-	function select_config(){
-		$row=DBfetch(DBselect("select * from config where ".DBin_node("configid", get_current_nodeid(false))));
-		if($row){
-			return	$row;
-		}
-		else{
-			error("Unable to select configuration");
-		}
-		return	$row;
-	}
-
 	function show_messages($bool=TRUE,$okmsg=NULL,$errmsg=NULL){
 		global	$page, $ZBX_MESSAGES;
 
@@ -818,6 +490,61 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		show_messages(FALSE,'',$msg);
 	}
 
+	function info($msg){
+		global $ZBX_MESSAGES;
+
+		if(is_null($ZBX_MESSAGES))
+			$ZBX_MESSAGES = array();
+
+		array_push($ZBX_MESSAGES, array('type' => 'info', 'message' => $msg));
+	}
+
+	function error($msg){
+		global $ZBX_MESSAGES;
+
+		if(is_null($ZBX_MESSAGES))
+			$ZBX_MESSAGES = array();
+
+		array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
+	}
+
+	function clear_messages(){
+		global $ZBX_MESSAGES;
+
+		$ZBX_MESSAGES = null;
+	}
+
+	function fatal_error($msg){
+		include_once "include/page_header.php";
+		show_error_message($msg);
+		include_once "include/page_footer.php";
+	}
+	
+//	The hash has form <md5sum of triggerid>,<sum of priorities>
+	function calc_trigger_hash(){
+
+		$priority = array(0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0);
+		$triggerids="";
+
+	       	$result=DBselect('select t.triggerid,t.priority from triggers t,hosts h,items i,functions f'.
+			'  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0');
+
+		while($row=DBfetch($result)){
+			$ack = get_last_event_by_triggerid($row["triggerid"]);
+			if($ack["acknowledged"] == 1) continue;
+
+			$triggerids="$triggerids,".$row["triggerid"];
+			$priority[$row["priority"]]++;
+		}
+
+		$md5sum=md5($triggerids);
+
+		$priorities=0;
+		for($i=0;$i<=5;$i++)	$priorities += pow(100,$i)*$priority[$i];
+
+		return	"$priorities,$md5sum";
+	}
+
 	function parse_period($str){
 		$out = NULL;
 		$str = trim($str,';');
@@ -825,8 +552,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		foreach($periods as $preiod){
 			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr))
 				return NULL;
-			for($i = $arr[1]; $i <= $arr[2]; $i++)
-			{
+			for($i = $arr[1]; $i <= $arr[2]; $i++){
 				if(!isset($out[$i])) $out[$i] = array();
 				array_push($out[$i],
 					array(
@@ -848,8 +574,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		if(isset($periods[$wday])){
 			$next_h = -1;
 			$next_m = -1;
-			foreach($periods[$wday] as $period)
-			{
+			foreach($periods[$wday] as $period){
 				$per_start = $period['start_h']*100+$period['start_m'];
 				if($per_start > $curr)
 				{
@@ -864,15 +589,13 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				if($per_end <= $curr) continue;
 				return $time;
 			}
-			if($next_h >= 0 && $next_m >= 0)
-			{
+			if($next_h >= 0 && $next_m >= 0){
 				return mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']);
 			}
 		}
 		for($days=1; $days < 7 ; ++$days){
 			$new_wday = (($wday + $days - 1)%7 + 1);
-			if(isset($periods[$new_wday ]))
-			{
+			if(isset($periods[$new_wday ])){
 				$next_h = -1;
 				$next_m = -1;
 				foreach($periods[$new_wday] as $period)
@@ -901,8 +624,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		if(isset($periods[$wday])){
 			$next_h = -1;
 			$next_m = -1;
-			foreach($periods[$wday] as $period)
-			{
+			foreach($periods[$wday] as $period){
 				$per_start = $period['start_h']*100+$period['start_m'];
 				$per_end = $period['end_h']*100+$period['end_m'];
 				if($per_start > $curr) continue;
@@ -914,8 +636,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					$next_m = $period['end_m'];
 				}
 			}
-			if($next_h >= 0 && $next_m >= 0)
-			{
+			if($next_h >= 0 && $next_m >= 0){
 				$new_time = mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']);
 
 				if($new_time == $time)
@@ -979,13 +700,6 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		else return validate_float($str);
 	}
 
-	# Add event
-
-	function get_event_by_eventid($eventid){
-		$db_events = DBselect("select * from events where eventid=$eventid");
-		return DBfetch($db_events);
-	}
-
 
 	/******************************************************************************
 	 *                                                                            *
@@ -1002,65 +716,6 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			DBexecute($sql);
 		}
 	}
-
-	# Update configuration
-
-	function update_config($configs){
-		$update = array();
-		
-		if(isset($configs['work_period']) && !is_null($configs['work_period'])){
-			if(!validate_period($configs['work_period'])){
-				error(S_ICORRECT_WORK_PERIOD);
-				return NULL;
-			}
-		}
-		if(isset($configs['alert_usrgrpid']) && !is_null($configs['alert_usrgrpid'])){
-			if(($configs['alert_usrgrpid'] != 0) && !DBfetch(DBselect('select usrgrpid from usrgrp where usrgrpid='.$configs['alert_usrgrpid']))){
-				error(S_INCORRECT_GROUP);;
-				return NULL;
-			}
-		}
-		
-		foreach($configs as $key => $value){
-			if(!is_null($value)) 
-				$update[] = $key.'='.zbx_dbstr($value);
-		}
-
-		if(count($update) == 0){
-			error(S_NOTHING_TO_DO);
-			return NULL;
-		}
-
-	return	DBexecute('update config set '.implode(',',$update).' where '.DBin_node('configid', get_current_nodeid(false)));
-	}
-	
-	# Show History Graph
-	function show_history($itemid,$from,$stime,$period){
-		$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);   
-		
-		show_table_header(S_TILL.SPACE.$till.' ( '.zbx_date2age($stime,$stime+$period).' )');
-
-		$td = new CCol(get_js_sizeable_graph('graph','chart.php?itemid='.$itemid.
-				url_param($from,false,'from').
-				url_param($stime,false,'stime').
-				url_param($period,false,'period')));
-		$td->AddOption('align','center');
-		
-		$tr = new CRow($td);
-		$tr->AddOption('bgcolor','#dddddd');
-		
-		$table = new CTable();
-		$table->AddOption('width','100%');
-		$table->AddOption('bgcolor','#cccccc');
-		$table->AddOption('cellspacing','1');
-		$table->AddOption('cellpadding','3');
-		
-		$table->AddRow($tr);
-		
-		$table->Show();
-		echo SBR;
-	}
-
 
 	function get_status(){
 //		global $DB;
@@ -1240,8 +895,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				if($user=get_sysmap_by_sysmapid($id))
 					$res=$user["name"];
 			}
-			else if(!isset($id) || $id == 0)
-			{
+			else if(!isset($id) || $id == 0){
 				$res="All maps";
 			}
 		}
@@ -1270,17 +924,6 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return $res;
 	}
 
-	function zbx_empty($var){
-		if(is_null($var)) return true;		
-		if(is_array($var) && empty($var)) return true;
-		if(is_string($var) && ($var === '')) return true;
-	return false;
-	}
-
-	function empty2null($var){
-		return ($var == "") ? null : $var;
-	}
-
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
 	if(function_exists("imagesetstyle")){
 		function DashedLine($image,$x1,$y1,$x2,$y2,$color){
@@ -1306,6 +949,42 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	}
 
 
+	function set_image_header($format=null){
+		global $IMAGE_FORMAT_DEFAULT;
+
+		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
+		
+		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg"); 
+		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html"); 
+		else								Header( "Content-type:  image/png"); 
+		
+		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
+	}
+	
+	function ImageOut($image,$format=NULL){
+		global $IMAGE_FORMAT_DEFAULT;
+
+		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
+		
+		if(IMAGE_FORMAT_JPEG == $format)
+			ImageJPEG($image);
+		else
+			ImagePNG($image);
+
+		imagedestroy($image);
+	}
+
+	function encode_log($data){
+		if(defined('ZBX_LOG_ENCODING_DEFAULT') && function_exists('mb_convert_encoding')){
+			$new=mb_convert_encoding($data, S_HTML_CHARSET, ZBX_LOG_ENCODING_DEFAULT);
+		}
+		else{
+			$new = $data;
+		}
+		return $new;
+	}
+
+/*************** VALUE MAPPING ******************/
 	function add_mapping_to_valuemap($valuemapid, $mappings){
 		DBexecute("delete from mappings where valuemapid=$valuemapid");
 
@@ -1374,209 +1053,177 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		}
 		return $value;
 	}
+/*************** END VALUE MAPPING ******************/
 
-	function natksort(&$array) {
-		$keys = array_keys($array);
-		natcasesort($keys);
+/*************** CONVERTING ******************/
 
-		$new_array = array();
-
-		foreach ($keys as $k) {
-			$new_array[$k] = $array[$k];
+	function empty2null($var){
+		return ($var == "") ? null : $var;
+	}
+	
+	function str2mem($val){
+		$val = trim($val);
+		$last = strtolower($val{strlen($val)-1});
+		switch($last){
+			// The 'G' modifier is available since PHP 5.1.0
+			case 'g':
+				$val *= 1024;
+			case 'm':
+				$val *= 1024;
+			case 'k':
+				$val *= 1024;
 		}
 
-		$array = $new_array;
-		return true;
-	}
-
-	function set_image_header($format=null){
-		global $IMAGE_FORMAT_DEFAULT;
-
-		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
-		
-		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg"); 
-		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html"); 
-		else								Header( "Content-type:  image/png"); 
-		
-		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
+		return $val;
 	}
 	
-	function ImageOut($image,$format=NULL){
-		global $IMAGE_FORMAT_DEFAULT;
-
-		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
-		
-		if(IMAGE_FORMAT_JPEG == $format)
-			ImageJPEG($image);
-		else
-			ImagePNG($image);
-
-		imagedestroy($image);
+	function mem2str($size){
+		$prefix = 'B';
+		if($size > 1048576) {	$size = $size/1048576;	$prefix = 'M'; }
+		elseif($size > 1024) {	$size = $size/1024;	$prefix = 'K'; }
+		return round($size, 6).$prefix;
 	}
 
-	/* function:
-	 *      get_cookie
-	 *
-	 * description:
-	 *      return cookie value by name,
-	 *      if cookie is not present return $default_value.
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function get_cookie($name, $default_value=null){
-		if(isset($_COOKIE[$name]))	return $_COOKIE[$name];
-		// else
-		return $default_value;
-	}
-
-	/* function:
-	 *      zbx_setcookie
-	 *
-	 * description:
-	 *      set cookies.
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function zbx_setcookie($name, $value, $time=null){
-		setcookie($name, $value, isset($time) ? $time : (0));
-		$_COOKIE[$name] = $value;
-	}
-	
-	/* function:
-	 *      zbx_unsetcookie
-	 *
-	 * description:
-	 *      unset and clear cookies.
-	 *
-	 * author: Aly
-	 */
-	function zbx_unsetcookie($name){
-		zbx_setcookie($name, null, -99999);
-		unset($_COOKIE[$name]);
-	}
-	
-	/* function:
-	 *     zbx_flush_post_cookies
-	 *
-	 * description:
-	 *     set posted cookies.
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function zbx_flush_post_cookies($unset=false){
-		global $ZBX_PAGE_COOKIES;
-
-		if(isset($ZBX_PAGE_COOKIES)){
-			foreach($ZBX_PAGE_COOKIES as $cookie){
-				if($unset)
-					zbx_unsetcookie($cookie[0]);
-				else
-					zbx_setcookie($cookie[0], $cookie[1], $cookie[2]);
+	/* Do not forget to sync it with add_value_suffix in evalfunc.c! */ 
+	function convert_units($value,$units){
+// Special processing for unix timestamps
+		if($units=="unixtime"){
+			$ret=date("Y.m.d H:i:s",$value);
+			return $ret;
+		}
+//Special processing of uptime
+		if($units=="uptime"){
+			$ret="";
+			$days=floor($value/(24*3600));
+			if($days>0){
+				$value=$value-$days*(24*3600);
 			}
-			unset($ZBX_PAGE_COOKIES);
-		}
-	}
-
-	/* function:
-	 *      zbx_set_post_cookie
-	 *
-	 * description:
-	 *      set cookies after authorisation.
-	 *      require calling 'zbx_flush_post_cookies' function
-	 *	Called from:
-	 *         a) in 'include/page_header.php'
-	 *         b) from 'redirect()'
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function zbx_set_post_cookie($name, $value, $time=null){
-		global $ZBX_PAGE_COOKIES;
-
-		$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time) ? $time : (0));
-	}
-
-	function inarr_isset($keys, $array=null){
-		if(is_null($array)) $array =& $_REQUEST;
-
-		if(is_array($keys)){
-			foreach($keys as $id => $key){
-				if( !isset($array[$key]) )
-					return false;
+			$hours=floor($value/(3600));
+			if($hours>0){
+				$value=$value-$hours*3600;
 			}
-			return true;
+			$min=floor($value/(60));
+			if($min>0){
+				$value=$value-$min*(60);
+			}
+			if($days==0){
+				$ret = sprintf("%02d:%02d:%02d", $hours, $min, $value);
+			}
+			else{
+				$ret = sprintf("%d days, %02d:%02d:%02d", $days, $hours, $min, $value);
+			}
+			return $ret;
+		}
+// Special processing for seconds
+		if($units=="s"){
+			$ret="";
+
+			$t=floor($value/(365*24*3600));
+			if($t>0){
+				$ret=$t."y";
+				$value=$value-$t*(365*24*3600);
+			}
+			$t=floor($value/(30*24*3600));
+			if($t>0){
+				$ret=$ret.$t."m";
+				$value=$value-$t*(30*24*3600);
+			}
+			$t=floor($value/(24*3600));
+			if($t>0){
+				$ret=$ret.$t."d";
+				$value=$value-$t*(24*3600);
+			}
+			$t=floor($value/(3600));
+			if($t>0){
+				$ret=$ret.$t."h";
+				$value=$value-$t*(3600);
+			}
+			$t=floor($value/(60));
+			if($t>0){
+				$ret=$ret.$t."m";
+				$value=$value-$t*(60);
+			}
+			$ret=$ret.round($value, 2)."s";
+		
+			return $ret;	
 		}
 
-		return isset($array[$keys]);
-	}
+		$u="";
 
-	/* function:
-	 *      zbx_rksort
-	 *
-	 * description:
-	 *      Recursively sort an array by key
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function zbx_rksort(&$array, $flags=NULL){
-		if(is_array($array)){
-			foreach($array as $id => $data)
-				zbx_rksort($array[$id]);
+// Special processing for bits (kilo=1000, not 1024 for bits)
+		if( ($units=="b") || ($units=="bps")){
+			$abs=abs($value);
 
-			ksort($array,$flags);
+			if($abs<1000){
+				$u="";
+			}
+			else if($abs<1000*1000){
+				$u="K";
+				$value=$value/1000;
+			}
+			else if($abs<1000*1000*1000){
+				$u="M";
+				$value=$value/(1000*1000);
+			}
+			else{
+				$u="G";
+				$value=$value/(1000*1000*1000);
+			}
+	
+			if(round($value) == round($value,2)){
+				$s=sprintf("%.0f",$value);
+			}
+			else{
+				$s=sprintf("%.2f",$value);
+			}
+
+			return "$s $u$units";
 		}
-		return $array;
-	}
 
-	/* function:
-	 *      zbx_date2str
-	 *
-	 * description:
-	 *      Convert timestamp to string representation. Retun 'Never' if 0.
-	 *
-	 * author: Alexei Vladishev
-	 */
-	function zbx_date2str($format, $timestamp){
-		return ($timestamp==0)?S_NEVER:date($format,$timestamp);
-	}
-	
-	/* function:
-	 *      zbx_date2age
-	 *
-	 * description:
-	 *      Calculate and convert timestamp to string representation. 
-	 *
-	 * author: Aly
-	 */
-	function zbx_date2age($start_date,$end_date=0){
-	
-		$start_date=date('U',$start_date);
-		if($end_date)
-			$end_date=date('U',$end_date);
-		else
-			$end_date = time();
 
-		$time = abs($end_date-$start_date);
-		
-//SDI($start_date.' - '.$end_date.' = '.$time);
-		
-		$days = (int) ($time / 86400);
-		$hours = (int) (($time - $days*86400) / 3600);
-		$minutes = (int) ((($time - $days*86400) - ($hours*3600)) / 60);
-		$str = (($days)?$days.'d ':'').(($hours)?$hours.'h ':'').$minutes.'m';
-	return $str;
-	}
+		if($units==""){
+			if(round($value) == round($value,2)){
+				return sprintf("%.0f",$value);
+			}
+			else{
+				return sprintf("%.2f",$value);
+			}
+		}
 
-	function encode_log($data){
-		if(defined('ZBX_LOG_ENCODING_DEFAULT') && function_exists('mb_convert_encoding')){
-			$new=mb_convert_encoding($data, S_HTML_CHARSET, ZBX_LOG_ENCODING_DEFAULT);
+		$abs=abs($value);
+
+		if($abs<1024){
+			$u="";
+		}
+		else if($abs<1024*1024){
+			$u="K";
+			$value=$value/1024;
+		}
+		else if($abs<1024*1024*1024){
+			$u="M";
+			$value=$value/(1024*1024);
+		}
+		else if($abs<1024*1024*1024*1024){
+			$u="G";
+			$value=$value/(1024*1024*1024);
 		}
 		else{
-			$new = $data;
+			$u="T";
+			$value=$value/(1024*1024*1024*1024);
 		}
-		return $new;
-	}
 
-	
+		if(round($value) == round($value,2)){
+			$s=sprintf("%.0f",$value);
+		}
+		else{
+			$s=sprintf("%.2f",$value);
+		}
+
+		return "$s $u$units";
+	}
+/*************** END CONVERTING ******************/
+
+/*************** TABLE SORTING ******************/
 	/* function:
 	 *      validate_sort_and_sortorder
 	 *
