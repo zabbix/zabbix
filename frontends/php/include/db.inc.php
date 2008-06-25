@@ -645,7 +645,7 @@ else {
 		if(empty($nodes))
 			$nodes = 0;
 
-		if(ctype_digit($nodes)){
+		if(is_numeric($nodes)){
 			$nodes = array($nodes);
 		}
 		else if(is_string($nodes)){

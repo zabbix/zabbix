@@ -462,11 +462,11 @@ include_once "include/page_header.php";
 				}
 			}
 			
-			$result = true;
+			$result = false;
 			DBstart();
 			foreach($_REQUEST["group_itemid"] as $item_id)
 				foreach($hosts_ids as $host_id){
-					$result &= copy_item_to_host($item_id, $host_id, true);
+					$result |= copy_item_to_host($item_id, $host_id, true);
 				}
 				
 			$result = DBend($result);
