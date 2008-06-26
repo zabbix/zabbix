@@ -416,7 +416,7 @@ include_once "include/page_header.php";
 				}
 			}
 
-			$chkBox = new CCheckBox("group_graphid[]",NULL,NULL,$row["graphid"]);
+			$chkBox = new CCheckBox('group_graphid['.$row["graphid"].']',NULL,NULL,$row["graphid"]);
 			if($row["templateid"] > 0) $chkBox->SetEnabled(false);
 
 			switch($row["graphtype"]){

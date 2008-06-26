@@ -1,5 +1,6 @@
 Changes for 1.5.4
 
+ - [DEV-177] added checkbox range selection (Artem)
  - [DEV-183] added support of applications in action conditions (Sasha)
  - [DEV-174] added ability to edit user medias (Artem)
  - [DEV-185] added support of zabbix[uptime] and zabbix[boottime] (Alexei)

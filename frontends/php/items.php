@@ -930,7 +930,7 @@ include_once "include/page_header.php";
 			$applications = $show_applications ? implode(', ', get_applications_by_itemid($db_item["itemid"], 'name')) : null;
 			if(!is_null($applications) && empty($applications)) $applications = ' - ';
 			
-			$chkBox = new CCheckBox("group_itemid[]",null,null,$db_item["itemid"]);
+			$chkBox = new CCheckBox('group_itemid['.$db_item["itemid"].']',null,null,$db_item["itemid"]);
 			//if($db_item["templateid"] > 0) $chkBox->SetEnabled(false);
 			$table->AddRow(array(
 				$show_host ? $db_item['host'] : null,

@@ -447,7 +447,7 @@ include_once "include/page_header.php";
 					httptest_status2style($httptest_data["status"])));
 	
 
-			$chkBox = new CCheckBox("group_httptestid[]",null,null,$httptest_data["httptestid"]);
+			$chkBox = new CCheckBox('group_httptestid['.$httptest_data["httptestid"].']',null,null,$httptest_data["httptestid"]);
 			
 			$step_cout = DBfetch(DBselect('select count(*) as cnt from httpstep where httptestid='.$httptest_data["httptestid"]));
 			$step_cout = $step_cout['cnt'];
@@ -461,8 +461,7 @@ include_once "include/page_header.php";
 				$status
 				)));
 		}
-		if($httptest_cnt > 0)
-		{
+		if($httptest_cnt > 0){
 			if(uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps))
 				$link = new CLink(new CImg("images/general/opened.gif"),
 					"?close=1&applicationid=".$db_app["applicationid"].

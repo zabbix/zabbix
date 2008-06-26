@@ -967,7 +967,7 @@ include_once 'include/page_header.php';
 				$templates = get_templates_by_hostid($row["hostid"]);
 				
 				$host=new CCol(array(
-					new CCheckBox("hosts[]",NULL,NULL,$row["hostid"]),
+					new CCheckBox('hosts['.$row["hostid"].']',NULL,NULL,$row["hostid"]),
 					SPACE,
 					$description));
 		
@@ -1159,7 +1159,7 @@ include_once 'include/page_header.php';
 
 				$table->AddRow(array(
 					array(
-						new CCheckBox('groups[]',NULL,NULL,$db_group["groupid"]),
+						new CCheckBox('groups['.$db_group["groupid"].']',NULL,NULL,$db_group["groupid"]),
 						SPACE,
 						new CLink(
 							$db_group["name"],
@@ -1325,7 +1325,7 @@ include_once 'include/page_header.php';
 
 
 				$table->AddRow(array(
-					array(new CCheckBox("applications[]",NULL,NULL,$db_app["applicationid"]),SPACE,$name),
+					array(new CCheckBox('applications['.$db_app["applicationid"].']',NULL,NULL,$db_app["applicationid"]),SPACE,$name),
 					array(new CLink(S_ITEMS,"items.php?hostid=".$db_app["hostid"],"action"),
 					SPACE."($rows)")
 					));
@@ -1396,7 +1396,7 @@ include_once 'include/page_header.php';
 
 				$table->AddRow(array(
 					array(
-						new CCheckBox("hosts[]", NULL, NULL, $db_proxy["hostid"]),
+						new CCheckBox('hosts['.$db_proxy["hostid"].']', NULL, NULL, $db_proxy["hostid"]),
 						SPACE,
 						new CLink($db_proxy["host"],
 								"hosts.php?form=update&hostid=".$db_proxy["hostid"].url_param("config"),
