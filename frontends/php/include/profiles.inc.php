@@ -40,8 +40,8 @@ function get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN,$idx2=n
 					' AND idx='.zbx_dbstr($idx).
 					$sql_cond.
 				' ORDER BY profileid ASC';
-		$db_profiles = DBselect($sql);
 
+		$db_profiles = DBselect($sql);
 		if($profile=DBfetch($db_profiles)){
 		
 			if(profile_type($type,'unknown')) $type = $profile['type'];
@@ -314,7 +314,7 @@ function profile_value_by_type(&$value,$type){
 		switch($type){	
 			case PROFILE_TYPE_ID:
 			case PROFILE_TYPE_INT:
-				$result = zbx_numeric($value)?intval($value):false;
+				$result = zbx_numeric($value)?$value:false;
 			break;
 			case PROFILE_TYPE_STR:
 				$result = strval($value);
