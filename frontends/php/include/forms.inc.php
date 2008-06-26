@@ -3171,6 +3171,9 @@
 			case CONDITION_TYPE_DVALUE:
 				$rowCondition[] = new CTextBox('new_condition[value]', "", 40);
 				break;
+			case CONDITION_TYPE_APPLICATION:
+				$rowCondition[] = new CTextBox('new_condition[value]', "", 40);
+				break;
 		}
 
 		$tblCond->AddRow($rowCondition);

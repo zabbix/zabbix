@@ -361,7 +361,8 @@ function	condition_type2str($conditiontype)
 	$str_type[CONDITION_TYPE_DSTATUS]		= S_DISCOVERY_STATUS;
 	$str_type[CONDITION_TYPE_DUPTIME]		= S_UPTIME_DOWNTIME;
 	$str_type[CONDITION_TYPE_DVALUE]		= S_RECEIVED_VALUE;
-	$str_type[CONDITION_TYPE_EVENT_ACKNOWLEDGED]		= S_EVENT_ACKNOWLEDGED;
+	$str_type[CONDITION_TYPE_EVENT_ACKNOWLEDGED]	= S_EVENT_ACKNOWLEDGED;
+	$str_type[CONDITION_TYPE_APPLICATION]		= S_APPLICATION;
 
 	if(isset($str_type[$conditiontype]))
 		return $str_type[$conditiontype];
@@ -417,6 +418,9 @@ function	condition_value2str($conditiontype, $value)
 			break;
 		case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
 			$str_val = ($value)?S_ACK:S_NOT_ACK;
+			break;
+		case CONDITION_TYPE_APPLICATION:
+			$str_val = $value;
 			break;
 		default:
 			return S_UNKNOWN;
@@ -530,6 +534,8 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 
 function get_conditions_by_eventsource($eventsource){
 	$conditions[EVENT_SOURCE_TRIGGERS] = array(
+			CONDITION_TYPE_APPLICATION,
+			CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 			CONDITION_TYPE_HOST_GROUP,
 			CONDITION_TYPE_HOST_TEMPLATE,
 			CONDITION_TYPE_HOST,
@@ -537,8 +543,7 @@ function get_conditions_by_eventsource($eventsource){
 			CONDITION_TYPE_TRIGGER_NAME,
 			CONDITION_TYPE_TRIGGER_SEVERITY,
 			CONDITION_TYPE_TRIGGER_VALUE,
-			CONDITION_TYPE_TIME_PERIOD,
-			CONDITION_TYPE_EVENT_ACKNOWLEDGED
+			CONDITION_TYPE_TIME_PERIOD
 		);
 	$conditions[EVENT_SOURCE_DISCOVERY] = array(
 			CONDITION_TYPE_DHOST_IP,
@@ -673,6 +678,11 @@ function	get_operators_by_conditiontype($conditiontype)
 	$operators[CONDITION_TYPE_EVENT_ACKNOWLEDGED] = array(
 			CONDITION_OPERATOR_EQUAL
 		);
+	$operators[CONDITION_TYPE_APPLICATION] = array(
+			CONDITION_OPERATOR_EQUAL,
+			CONDITION_OPERATOR_LIKE,
+			CONDITION_OPERATOR_NOT_LIKE	
+		);
 
 	if(isset($operators[$conditiontype]))
 		return $operators[$conditiontype];
@@ -770,6 +780,7 @@ function validate_condition($conditiontype, $value)
 		case CONDITION_TYPE_TRIGGER_SEVERITY:
 		case CONDITION_TYPE_DUPTIME:
 		case CONDITION_TYPE_DVALUE:
+		case CONDITION_TYPE_APPLICATION:
 			break;
 		default:
 			error(S_INCORRECT_CONDITION_TYPE);
