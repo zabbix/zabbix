@@ -843,7 +843,7 @@ require_once "include/httptest.inc.php";
  * Comments:
  *
  */
-	function	validate_group_with_host($perm, $options = array(),$group_var=null,$host_var=null){
+	function validate_group_with_host($perm, $options = array(),$group_var=null,$host_var=null){
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
 		if(is_null($host_var))	$host_var = "web.latest.hostid";
 
@@ -867,7 +867,7 @@ require_once "include/httptest.inc.php";
 
 		$_REQUEST["groupid"]    = $result["groupid"];
 		$_REQUEST["hostid"]     = $result["hostid"];
-		
+
 		update_profile($host_var,$_REQUEST["hostid"], PROFILE_TYPE_ID);
 		update_profile($group_var,$_REQUEST["groupid"], PROFILE_TYPE_ID);
 	}
