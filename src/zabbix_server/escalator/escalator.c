@@ -147,7 +147,7 @@ static void	add_command_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 	zbx_free(command_esc);
 }
 
-static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action, zbx_uint64_t userid, char *subject, char *message)
+static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action, zbx_uint64_t eventid, zbx_uint64_t userid, char *subject, char *message)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -201,7 +201,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 				"," ZBX_FS_UI64 ",'%s','%s','%s',%d,%d,%d)",
 				alertid,
 				action->actionid,
-				event->eventid,
+				eventid,
 				userid,
 				now,
 				mediatypeid,
@@ -240,7 +240,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 				",'%s','%s',%d,%d,'%s',%d)",
 				alertid,
 				action->actionid,
-				event->eventid,
+				eventid,
 				userid,
 				ALERT_MAX_RETRIES,
 				now,
@@ -429,7 +429,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		p = user_msg;
 		user_msg = user_msg->next;
 
-		add_message_alert(escalation, event, action, p->userid, p->subject, p->message);
+		add_message_alert(escalation, event, action, event->eventid, p->userid, p->subject, p->message);
 
 		zbx_free(p->subject);
 		zbx_free(p->message);
@@ -474,7 +474,7 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 		while (NULL != (row = DBfetch(result))) {
 			userid = zbx_atoui64(row[0]);
 
-			add_message_alert(escalation, event, action, userid, action->shortdata, action->longdata);
+			add_message_alert(escalation, event, action, escalation->r_eventid, userid, action->shortdata, action->longdata);
 		}
 
 		DBfree_result(result);
@@ -552,7 +552,7 @@ static void	process_escalations(int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_escalations()");
 
-	result = DBselect("select e.escalationid,e.actionid,e.esc_step,e.status,ev.eventid"
+	result = DBselect("select e.escalationid,e.actionid,e.r_eventid,e.esc_step,e.status,ev.eventid"
 			",ev.source,ev.object,ev.objectid,ev.clock,ev.value,ev.acknowledged"
 			" from escalations e,events ev where e.eventid=ev.eventid"
 			" and e.status in (%d,%d) and e.nextcheck<=%d" DB_NODE,
@@ -565,18 +565,19 @@ static void	process_escalations(int now)
 		memset(&escalation, 0, sizeof(escalation));
 		escalation.escalationid		= zbx_atoui64(row[0]);
 		escalation.actionid		= zbx_atoui64(row[1]);
-		escalation.esc_step		= atoi(row[2]);
-		escalation.status		= atoi(row[3]);
+		escalation.r_eventid		= zbx_atoui64(row[2]);
+		escalation.esc_step		= atoi(row[3]);
+		escalation.status		= atoi(row[4]);
 		escalation.nextcheck		= 0;
 
 		memset(&event, 0, sizeof(event));
-		event.eventid			= zbx_atoui64(row[4]);
-		event.source			= atoi(row[5]);
-		event.object			= atoi(row[6]);
-		event.objectid			= zbx_atoui64(row[7]);
-		event.clock			= atoi(row[8]);
-		event.value			= atoi(row[9]);
-		event.acknowledged		= atoi(row[10]);
+		event.eventid			= zbx_atoui64(row[5]);
+		event.source			= atoi(row[6]);
+		event.object			= atoi(row[7]);
+		event.objectid			= zbx_atoui64(row[8]);
+		event.clock			= atoi(row[9]);
+		event.value			= atoi(row[10]);
+		event.acknowledged		= atoi(row[11]);
 
 		add_trigger_info(&event);
 
