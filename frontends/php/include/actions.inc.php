@@ -1069,7 +1069,7 @@ function get_action_cmds_for_event($eventid){
 		}
 		
 		if($row["status"] == ALERT_STATUS_SENT){
-			$status=new CSpan(S_SENT,"green");
+			$status=new CSpan(S_EXECUTED,"green");
 		}
 		else if($row["status"] == ALERT_STATUS_NOT_SENT){
 			$status=new CSpan(S_IN_PROGRESS,"orange");
