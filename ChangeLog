@@ -38,6 +38,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.6:
 
+ - [ZBX-386] fixed possible agent crash in processing of active checks (Sasha)
  - [ZBX-379] added error checking for accept on server side (Sasha) 
  - [ZBX-365] added support of long process names for proc.num and proc.mem, Linux 2.6 (Sasha)
  - [ZBX-78] fixed detection of net-snmp libs (Alexei)

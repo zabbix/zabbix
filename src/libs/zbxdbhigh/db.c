@@ -1132,7 +1132,7 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock, int ms)
 	zbx_uint64_t	id;
 
 	sqlo_lob_desc_t		loblp;		/* the lob locator */
-	sqlo_stmt_handle_t	sth;
+	sqlo_stmt_handle_t	sth = 0;
 
 	sqlo_autocommit_off(oracle);
 
