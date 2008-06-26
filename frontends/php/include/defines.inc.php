@@ -553,5 +553,4 @@ else{
 /* init $_REQUEST */
 	ini_set('variables_order', 'GP');
 	$_REQUEST = $_POST + $_GET;
-
 ?>
