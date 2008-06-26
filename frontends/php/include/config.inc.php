@@ -24,8 +24,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 ?>
 <?php
-	require_once	"include/func.inc.php";
 	require_once 	"include/defines.inc.php";
+	require_once	"include/func.inc.php";
 	require_once 	"include/html.inc.php";
 	require_once	"include/copt.lib.php";
 	require_once	"include/profiles.inc.php";
@@ -1056,7 +1056,17 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 /*************** END VALUE MAPPING ******************/
 
 /*************** CONVERTING ******************/
-
+	function zbx_stripslashes($value){
+		if(is_array($value)){
+			foreach($value as $id => $data)
+				$value[$id] = zbx_stripslashes($data); 
+				// $value = array_map('zbx_stripslashes',$value); /* don't use 'array_map' it buggy with indexes */
+		} elseif (is_string($value)){
+			$value = stripslashes($value);
+		}
+		return $value;
+	}
+	
 	function empty2null($var){
 		return ($var == "") ? null : $var;
 	}
