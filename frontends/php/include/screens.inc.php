@@ -22,14 +22,12 @@
 	require_once "include/actions.inc.php";
 ?>
 <?php
-	function	screen_accessible($screenid,$perm)
-	{
+	function screen_accessible($screenid,$perm){
 		global $USER_DETAILS;
 
 		$result = false;
 
-		if(DBfetch(DBselect('SELECT screenid FROM screens WHERE screenid='.$screenid.' AND '.DBin_node('screenid', get_current_nodeid($perm)))))
-		{
+		if(DBfetch(DBselect('SELECT screenid FROM screens WHERE screenid='.$screenid.' AND '.DBin_node('screenid', get_current_nodeid($perm))))){
 			$result = true;
 			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 			

@@ -92,9 +92,9 @@ include_once "include/page_header.php";
 				show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
 			} 
 			else {
-				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
+				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 					access_deny();
-				
+
 				DBstart();
 				add_screen($_REQUEST["name"],$_REQUEST["hsize"],$_REQUEST["vsize"]);
 				$result = DBend();
