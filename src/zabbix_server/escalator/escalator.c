@@ -138,7 +138,7 @@ static void	add_command_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 			event->eventid,
 			now,
 			command_esc,
-			ALERT_STATUS_NOT_SENT,
+			ALERT_STATUS_SENT,
 			ALERT_TYPE_COMMAND,
 			escalation->esc_step);
 

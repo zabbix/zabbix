@@ -358,6 +358,7 @@
 	'S_RECIPIENT'=>				'Recipient',
 	'S_ERROR'=>					'Error',
 	'S_SENT'=>					'sent',
+	'S_EXECUTED'=>					'executed',
 	'S_NOT_SENT'=>				'not sent',
 	'S_NO_ACTIONS_FOUND'=>			'No actions found',
 	'S_SHOW_NEXT_100'=>				'Show next 100',
