@@ -728,8 +728,7 @@ class Chart extends Graph{
 						' AND clock<='.$to_time.
 					' GROUP BY itemid,'.$calc_field
 					);
-					
-//				$this->items[$i]['delay'] = max(($this->items[$i]['delay']*ZBX_GRAPH_MAX_DELAY),ZBX_MAX_TREND_DIFF)/ZBX_GRAPH_MAX_DELAY + 1;
+
 				$this->items[$i]['delay'] = max($this->items[$i]['delay'],3600);
 			}
 //SDI($sql_arr);

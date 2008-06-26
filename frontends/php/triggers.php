@@ -421,7 +421,7 @@ include_once "include/page_header.php";
 
 
 			$description = array(	new CCheckBox(
-							"g_triggerid[]",        /* name */
+							'g_triggerid['.$row['triggerid'].']',        /* name */
 							NULL,                   /* checked */
 							NULL,                   /* action */
 							$row["triggerid"]),     /* value */

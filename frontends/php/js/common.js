@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2008 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ function checkBrowser(){
 	if(SF) SDI('Safari');
 	if(KQ) SDI('Konqueror');
 	if(MC) SDI('Mac');
+	if(GK) SDI('FireFox');
 return 0;
 }
 
@@ -89,7 +90,6 @@ function SDI(msg){
 	div_help.appendChild(document.createTextNode("DEBUG INFO: "));
 	div_help.appendChild(document.createElement("br"));
 	div_help.appendChild(document.createTextNode(msg));
-	div_help.appendChild(document.createElement("br"));
 	div_help.appendChild(document.createElement("br"));
 	div_help.appendChild(document.createElement("br"));
 }
@@ -344,8 +344,7 @@ function PopUp(url,width,height,form_name){
 function CheckAll(form_name, chkMain, shkName){
 	var frmForm = document.forms[form_name];
 	var value = frmForm.elements[chkMain].checked;
-	for (var i=0; i < frmForm.length; i++)
-	{
+	for (var i=0; i < frmForm.length; i++){
 		name = frmForm.elements[i].name.split('[')[0];
 		if(frmForm.elements[i].type != 'checkbox') continue;
 		if(name == chkMain) continue;
@@ -408,6 +407,20 @@ function deselectAll(){
 		sel.removeAllRanges();
 	}
 }
+
+function eventTarget(e){
+	var targ = false;
+	
+	if (!e) var e = window.event;
+	if (e.target) targ = e.target;
+	else if (e.srcElement) targ = e.srcElement;
+	
+// defeat Safari bug
+	if (targ.nodeType == 3) targ = targ.parentNode;
+	
+return targ;
+}
+
 /************************************************************************************/
 /*										 Pages stuff								*/
 /************************************************************************************/
@@ -489,14 +502,12 @@ function GetSelectedText(obj){
 	return obj.value;
 }
 
-function ScaleChartToParenElement(obj_name)
-{
+function ScaleChartToParenElement(obj_name){
 	var obj = document.getElementsByName(obj_name);
 
 	if(obj.length <= 0) throw "Can't find objects with name [" + obj_name +"]";
 
-	for(i = obj.length-1; i>=0; i--)
-	{
+	for(i = obj.length-1; i>=0; i--){
 		obj[i].src += "&width=" + (obj[i].parentNode.offsetWidth - obj[i].parentNode.offsetLeft - 10);
 	}
 }

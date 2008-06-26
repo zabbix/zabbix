@@ -539,7 +539,7 @@ include_once 'include/page_header.php';
 			$tblActions->AddRow(array(
 				array(
 					new CCheckBox(
-						'g_actionid[]',			/* name */
+						'g_actionid['.$action_data['actionid'].']',			/* name */
 						null,				/* checked */
 						null,				/* action */
 						$action_data['actionid']),	/* value */
