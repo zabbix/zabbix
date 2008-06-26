@@ -24,10 +24,10 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 ?>
 <?php
+	require_once	"include/func.inc.php";
 	require_once 	"include/defines.inc.php";
 	require_once 	"include/html.inc.php";
 	require_once	"include/copt.lib.php";
-	require_once	"include/func.inc.php";
 	require_once	"include/profiles.inc.php";
 	require_once	"conf/maintenance.inc.php";
 	

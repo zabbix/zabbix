@@ -356,6 +356,47 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 
 		DBfree_result(result);
 	}
+	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_APPLICATION)
+	{
+		result = DBselect("select distinct a.name from applications a,items_applications i,functions f,triggers t"
+				" where a.applicationid=i.applicationid and i.itemid=f.itemid"
+				" and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64,
+				event->objectid);
+
+		switch (condition->operator) {
+			case CONDITION_OPERATOR_EQUAL:
+				while (NULL != (row = DBfetch(result))) {
+					if (0 == strcmp(row[0], condition->value)) {
+						ret = SUCCEED;
+						break;
+					}
+				}
+				break;
+			case CONDITION_OPERATOR_LIKE:
+				while (NULL != (row = DBfetch(result))) {
+					if (NULL != strstr(row[0], condition->value)) {
+						ret = SUCCEED;
+						break;
+					}
+				}
+				break;
+			case CONDITION_OPERATOR_NOT_LIKE:
+				ret = SUCCEED;
+				while (NULL != (row = DBfetch(result))) {
+					if (NULL != strstr(row[0], condition->value)) {
+						ret = FAIL;
+						break;
+					}
+				}
+				break;
+			default:
+				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+						condition->operator,
+						condition->conditionid);
+		}
+
+		DBfree_result(result);
+	}
 	else if(event->source == EVENT_SOURCE_DISCOVERY &&
 		event->object == EVENT_OBJECT_DSERVICE &&
 		condition->conditiontype == CONDITION_TYPE_DVALUE)
