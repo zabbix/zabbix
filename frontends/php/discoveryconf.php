@@ -239,7 +239,7 @@ include_once "include/page_header.php";
 
 			$drule=new CCol(array(
 					new CCheckBox(
-						"g_druleid[]",		/* name */
+						'g_druleid['.$rule_data["druleid"].']',		/* name */
 						null,			/* checked */
 						null,			/* action */
 						$rule_data["druleid"]),	/* value */

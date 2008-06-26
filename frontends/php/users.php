@@ -604,7 +604,7 @@ include_once "include/page_header.php";
 								
 				$table->addRow(array(
 					array(
-						 new CCheckBox("group_groupid[]",NULL,NULL,$row["usrgrpid"]),
+						 new CCheckBox('group_groupid['.$row["usrgrpid"].']',NULL,NULL,$row["usrgrpid"]),
 						$alias = new CLink($row["name"],
 							"users.php?form=update".url_param("config").
 							"&usrgrpid=".$row["usrgrpid"]."#form", 'action')

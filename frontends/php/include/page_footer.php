@@ -48,6 +48,13 @@ function zbxCallPostScripts(){
 		}
 ?>
 }
+
+//try{
+	chkbx_range_ext.init();
+//}
+//catch(e){
+//	throw('Chekbox extension failed!');
+//}
 -->
 </script>
 <?php

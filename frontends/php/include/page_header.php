@@ -409,6 +409,7 @@ COpt::profiling_start("page");
     <script type="text/javascript" src="js/common.js"></script>
 	<script type="text/javascript" src="js/prototype.js"></script>
 	<script type="text/javascript" src="js/url.js"></script>
+	<script type="text/javascript" src="js/chkbxrange.js"></script>
 <?php
 	if(isset($page['scripts']) && is_array($page['scripts'])){
 		foreach($page['scripts'] as $id => $script){
