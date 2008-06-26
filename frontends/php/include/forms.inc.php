@@ -856,7 +856,7 @@
 								'&active='.$one_media['active'];
 				
 				$media_table->AddRow(array(
-					new CCheckBox('user_medias_to_del[]',null,null,$id),
+					new CCheckBox('user_medias_to_del['.$id.']',null,null,$id),
 					new CSpan($media_types[$one_media['mediatypeid']], 'nowrap'),
 					new CSpan($one_media['sendto'], 'nowrap'),
 					new CSpan($one_media['period'], 'nowrap'),

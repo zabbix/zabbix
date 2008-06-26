@@ -128,7 +128,7 @@ include_once "include/page_header.php";
 		array_push($frm_row, 
 			array(
 				new CCheckBox(
-					"severity[]",
+					"severity[$i]",
 					str_in_array($i,$severity)?'yes':'no', 
 					null,		/* action */
 					$i),		/* value */
