@@ -1582,10 +1582,11 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 	return SUCCEED;
 }
 
-int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid)
+int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
 {
-	DBexecute("update escalations set status=%d,nextcheck=0 where actionid=" ZBX_FS_UI64
-			" and triggerid=" ZBX_FS_UI64,
+	DBexecute("update escalations set r_eventid=" ZBX_FS_UI64 ",status=%d,nextcheck=0"
+			" where actionid=" ZBX_FS_UI64 " and triggerid=" ZBX_FS_UI64,
+			eventid,
 			ESCALATION_STATUS_RECOVERY,
 			actionid,
 			triggerid);

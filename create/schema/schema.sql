@@ -355,6 +355,7 @@ FIELD		|escalationid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|actionid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|triggerid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|eventid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|r_eventid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|nextcheck	|t_time		|'0'	|NOT NULL	|0
 FIELD		|esc_step	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
