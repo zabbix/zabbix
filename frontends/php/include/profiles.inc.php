@@ -297,7 +297,7 @@ function profile_value_by_type(&$value,$type){
 			case PROFILE_TYPE_ID:
 			case PROFILE_TYPE_INT:
 				if(zbx_numeric($value['value'])){
-					$result['value'] = intval($value['value']);
+					$result['value'] = $value['value'];
 				}
 				else{
 					$result = false;
