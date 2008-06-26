@@ -157,6 +157,9 @@ static int	get_value(
 	}
 	zbx_tcp_close(&s);
 
+	if (FAIL == ret)
+		zbx_error("Get value error: %s", zbx_tcp_strerror());
+
 	return ret;
 }
 
