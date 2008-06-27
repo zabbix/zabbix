@@ -256,7 +256,7 @@
 	'S_ADD_HOST'=>					'Add host',
 	'S_REMOVE_HOST'=>				'Remove host',
 	'S_LINK_TO_TEMPLATE'=>				'Link to template',
-	'S_CANNOT_LINK_TO_TEMPLATE'=>		'CAnnot link to template',
+	'S_CANNOT_LINK_TO_TEMPLATE'=>		'Cannot link to template',
 	'S_UNLINK_FROM_TEMPLATE'=>			'Unlink from template',
 	'S_CANNOT_UNLINK_FROM_TEMPLATE'=>	'Cannot unlink from template',
 	'S_HOST_TEMPLATE'=>					'Host template',
