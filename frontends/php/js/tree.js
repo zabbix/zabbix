@@ -21,9 +21,9 @@
 var tree ={
 init : function(){
 	if((tree_init = cookie.read(tree_name)) != null){
-		var nodes = tree_init.split('.');
+		var nodes = tree_init.split(';');
 		var c = nodes.length-1;
-		for(var i=0; i<c;i++){
+		for(var i=0; i<c; i++){
 			this.onStartSetStatus(nodes[i]);
 		}
 		this.onStartOpen(nodes);
@@ -53,7 +53,7 @@ ChangeNodeStatus : function(id){
 		for(var i = 1; i < treenode.length; i++){
 			if(typeof(treenode[i]) != 'undefined'){
 				if(treenode[i].status == 'open'){
-					cookie_str+=i+'.';
+					cookie_str+=i+';';
 				}
 			}
 		}
@@ -66,11 +66,12 @@ ChangeNodeStatus : function(id){
 
 closeSNodeX : function(id,img){
 	try{
-		nodelist = treenode[id].nodelist.split('.');
+		nodelist = treenode[id].nodelist.split(';');
 		if(this.getNodeStatus(id) == 'close'){
 			this.OpenNode(nodelist);
 			img.src = 'images/general/tree/minus.gif';
-		} else {
+		} 
+		else {
 			this.CloseNode(nodelist);
 			img.src = 'images/general/tree/plus.gif';
 		}
@@ -87,7 +88,7 @@ OpenNode : function(nodelist){
 		for(var i=0; i<c; i++){
 			document.getElementById('id_'+nodelist[i]).style.display = (IE)?('block'):('table-row');
 			if(this.getNodeStatus(nodelist[i]) == 'open'){
-				this.OpenNode(treenode[nodelist[i]].nodelist.split('.'));
+				this.OpenNode(treenode[nodelist[i]].nodelist.split(';'));
 			}
 		}
 	} catch(e){
@@ -101,7 +102,7 @@ CloseNode : function(nodelist){
 		for(var i=0; i<c; i++){
 			document.getElementById('id_'+nodelist[i]).style.display = 'none';
 			if(this.getNodeStatus(nodelist[i]) == 'open'){
-				this.CloseNode(treenode[nodelist[i]].nodelist.split('.'));
+				this.CloseNode(treenode[nodelist[i]].nodelist.split(';'));
 			}
 		}
 	} catch(e){ 
@@ -110,14 +111,14 @@ CloseNode : function(nodelist){
 },
 
 onStartOpen : function(nodes){
-	var nodes = tree_init.split('.');
+	var nodes = tree_init.split(';');
 	var c = nodes.length-1;
 	for(var i=0; i<c;i++){
 		if(typeof(nodes[i]) != 'undefined'){
 			try{
 //				alert(nodes[i]+' : '+this.checkParent(nodes[i]));
 				if(this.checkParent(nodes[i])){
-					var nodelist = treenode[nodes[i]].nodelist.split('.');
+					var nodelist = treenode[nodes[i]].nodelist.split(';');
 					this.OpenNode(nodelist);
 				}
 			} catch(e){
@@ -137,7 +138,7 @@ onStartSetStatus : function(id){
 		
 		treenode[id].status = 'open';
 	} catch(e){
-//		alert('OnStartSetStatus: '+e);
+		alert('OnStartSetStatus: '+e);
 	}
 },
 
