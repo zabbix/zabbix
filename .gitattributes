@@ -147,6 +147,7 @@ frontends/php/include/reports.inc.php -text
 frontends/php/include/scripts.inc.php -text
 frontends/php/js/blink.js -text
 frontends/php/js/calendar.js -text
+frontends/php/js/chkbxrange.js -text
 frontends/php/js/common.js -text
 frontends/php/js/cookies.js -text
 frontends/php/js/dashboard.js -text
