@@ -64,7 +64,7 @@ function add_child_service(name,serviceid,trigger,triggerid){
 	var chkbx = document.createElement('input');
 	chkbx.type = 'checkbox';
 	chkbx.value = serviceid;
-	chkbx.name = 'childs['+serviceid+'][serviceid]';
+	chkbx.name = 'childs_to_del['+serviceid+'][serviceid]';
 	
 	var input = document.createElement('input');
 	input.setAttribute('type','hidden');

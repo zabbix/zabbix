@@ -488,7 +488,7 @@ if(isset($_REQUEST['sform'])){
 	$table->headerClass = 'header';
 	$table->footerClass = 'footer';
 	
-	$table->SetHeader(array(new CCheckBox("all_child_services",null,"check_childs('".$frmService->GetName()."','childs','all_child_services');"),S_SERVICES,S_SOFT_LINK,S_TRIGGER));
+	$table->SetHeader(array(new CCheckBox("all_child_services",null,"check_childs('".$frmService->GetName()."','childs','all_child_services');"),S_SERVICES,S_SOFT,S_TRIGGER));
 
 	$table->AddOption('id','service_childs');
 
@@ -504,7 +504,7 @@ if(isset($_REQUEST['sform'])){
 
 		$table->AddRow(array(
 				array(
-					new CCheckBox('childs['.$child['serviceid'].'][serviceid]',null,null,$child['serviceid']),
+					new CCheckBox('childs_to_del['.$child['serviceid'].'][serviceid]',null,null,$child['serviceid']),
 					new CVar('childs['.$child['serviceid'].'][serviceid]', $child['serviceid'])
 					),
 				array(
@@ -529,7 +529,7 @@ if(isset($_REQUEST['sform'])){
 	
 	$cb2 = new CButton('del_child_service',S_REMOVE);
 	$cb2->SetType('button');
-	$cb2->SetAction("javascript: remove_childs('".$frmService->GetName()."','childs','tr');");
+	$cb2->SetAction("javascript: remove_childs('".$frmService->GetName()."','childs_to_del','tr');");
 
 	$frmService->AddRow(S_DEPENDS_ON,array($table,BR(),$cb,$cb2));
 //----------

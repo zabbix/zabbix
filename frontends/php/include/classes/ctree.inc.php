@@ -221,7 +221,7 @@ var $maxlevel=0;
 				
 		foreach($this->tree as $id => $rows){
 			$parentid = $rows['parentid'];
-			$this->tree[$parentid]['nodelist'].=$id.'.';
+			$this->tree[$parentid]['nodelist'].=$id.';';
 		}
 		
 		foreach($this->tree as $id => $rows){
