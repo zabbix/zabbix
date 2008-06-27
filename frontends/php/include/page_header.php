@@ -500,7 +500,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 			if($lst_nodes->ItemsCount() > 1){
 				$node_form = new CForm();
-				$node_form->AddItem(array(S_CURRENT_NODE,$lst_nodes));
+				$node_form->AddItem(array(new CSpan(S_CURRENT_NODE,'textcolorstyles'),$lst_nodes));
 				unset($lst_nodes);
 
 				if(!defined('ZBX_DISABLE_SUBNODES')){
@@ -510,7 +510,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 					$cmd_show_subnodes->AddItem(0, S_CURRENT_NODE_ONLY);
 					$cmd_show_subnodes->AddItem(1, S_WITH_SUBNODES);
 
-					$node_form->AddItem(array(SPACE, S_SHOW, $cmd_show_subnodes));
+					$node_form->AddItem(array(SPACE, new CSpan(S_SHOW,'textcolorstyles'), $cmd_show_subnodes));
 				}
 
 // No need for the button anymore
