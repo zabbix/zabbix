@@ -323,8 +323,8 @@ include_once "include/page_header.php";
 			$form->SetMethod('get');
 			
 			$form->AddItem(new CTextBox("txt_select",$txt_select,15));
-			$form->AddItem(new CButton("btnSelect", "Select"));
-			$form->AddItem(new CButton("btnSelect", "Inverse select"));
+			$form->AddItem(new CButton("btnSelect", S_SELECT));
+			$form->AddItem(new CButton("btnSelect", S_INVERSE_SELECT));
 			$form->AddVar("compact",$compact);
 			$form->AddVar("noactions",$noactions);
 			$form->AddVar("select",$select);
@@ -437,7 +437,7 @@ include_once "include/page_header.php";
 
 		$description = expand_trigger_description($row['triggerid']);
 
-		if(isset($_REQUEST["btnSelect"]) && '' != $txt_select && ((zbx_stristr($description, $txt_select)) == ($_REQUEST["btnSelect"]=="Inverse select"))) continue;
+		if(isset($_REQUEST["btnSelect"]) && '' != $txt_select && ((zbx_stristr($description, $txt_select)) == ($_REQUEST["btnSelect"]==S_INVERSE_SELECT))) continue;
 
 		if($row["url"] != "")
 		{

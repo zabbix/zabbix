@@ -364,6 +364,13 @@
 	'S_SHOW_NEXT_100'=>				'Show next 100',
 	'S_SHOW_PREVIOUS_100'=>			'Show previous 100',
 
+// Lines
+	'S_LINE'=>					'Line',
+	'S_FILLED_REGION'=>			'Filled region',
+	'S_BOLD_LINE'=>				'Bold line',
+	'S_DOT'=>					'Dot',
+	'S_DASHED_LINE'=>			'Dashed line',
+	
 //	charts.php
 	'S_CUSTOM_GRAPHS'=>				'Custom graphs',
 	'S_GRAPHS_BIG'=>				'GRAPHS',
@@ -405,6 +412,13 @@
 	'S_RED'=>				'Red',
 	'S_WHITE'=>				'White',
 	'S_YELLOW'=>				'Yellow',
+
+// Lines
+	'S_LINE'=>				'Line',
+	'S_FILLED_REGION'=>			'Filled region',
+	'S_BOLD_LINE'=>				'Bold line',
+	'S_DOT'=>				'Dot',
+	'S_DASHED_LINE'=>			'Dashed line',
 
 //	config.php
 	'S_THEMES'=>					'Themes',
@@ -736,6 +750,7 @@
 	'S_CREATE_PROXY'=>			'Create Proxy',
 	'S_PROXY_NAME'=>			'Proxy name',
 	'S_LASTSEEN_AGE'=>			'Last seen (age)',
+	
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
 	'S_DEVICE_TYPE'=>			'Device type',
@@ -881,6 +896,7 @@
 	'S_ORIGINAL'=>				'Original',
 	'S_NEW_FLEXIBLE_INTERVAL'=>		'New flexible interval',
 	'S_FLEXIBLE_INTERVALS'=>		'Flexible intervals (sec)',
+	'S_NO_FLEXIBLE_INTERVALS'=>		'No flexible intervals',
 	'S_PARAMS'=>				'Additional parameters',
 
 //	events.php
@@ -907,13 +923,25 @@
 	'S_ICON_UNKNOWN'=>			'Icon (unknown)',
 	'S_ELEMENT_1'=>				'Element 1',
 	'S_ELEMENT_2'=>				'Element 2',
-	'S_LINK_STATUS_INDICATOR'=>		'Link status indicator',
-	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	'Configuration of network maps',
+	'S_LINK_STATUS_INDICATOR'=>					'Link status indicator',
+	'S_CONFIGURATION_OF_NETWORK_MAPS'=>			'Configuration of network maps',
+	'S_CONFIGURATION_OF_NETWORK_MAPS_BIG'=>		'CONFIGURATION OF NETWORK MAPS',
+	'S_DISPLAYED_ELEMENTS'=>				'DISPLAYED ELEMENTS',
+	'S_CONNECTORS'=>						'CONNECTORS',
+	'S_ADD_ELEMENT'=>				'Add element',
+	'S_CREATE_CONNECTION'=>			'Create connection',
+	'S_COORDINATE_X'=>				'Coordinate X',
+	'S_COORDINATE_Y'=>				'Coordinate Y',
+	'S_TYPE_OFF'=>				'Type (OFF)',
+	'S_TYPE_ON'=>				'Type (ON)',
+	'S_COLOR_OFF'=>				'Color (OFF)',
+	'S_COLOR_ON'=>				'Color (ON)',
+	
+	
 
 //	sysmaps.php
 	'S_MAPS_BIG'=>						'MAPS',
 	'S_NO_MAPS_DEFINED'=>				'No maps defined',
-	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	'CONFIGURATION OF NETWORK MAPS',
 	'S_CREATE_MAP'=>					'Create Map',
 	'S_ICON_LABEL_LOCATION'=>			'Icon label location',
 	'S_BOTTOM'=>						'Bottom',
@@ -1324,6 +1352,9 @@
 	'S_MULTIPLE_TRUE_EVENTS'=>	'Multiple TRUE events',
 	'S_SHOW_DISABLED_TRIGGERS'=>		'Show disabled triggers',
 	'S_HIDE_DISABLED_TRIGGERS'=>		'Hide disabled triggers',
+	'S_THE_TRIGGER_DEPENDS_ON'=>		'The trigger depends on',
+	'S_NO_DEPENDENCES_DEFINED'=>		'No dependences defined',
+	'S_NEW_DEPENDENCY'=>			'New dependency',
 
 	'S_MULTIPLE_EVENTS'=>		'Multiple events',
 	'S_EVENT_GENERATION'=>		'Event generation',
@@ -1351,6 +1382,7 @@
 	'S_HIDE_DETAILS'=>				'Hide details',
 	'S_SHOW_DETAILS'=>				'Show details',
 	'S_SELECT'=>					'Select',
+	'S_INVERSE_SELECT'=>			'Inverse Select',
 	'S_HIDE_SELECT'=>				'Hide select',
 	'S_TRIGGERS_BIG'=>				'TRIGGERS',
 	'S_NAME_BIG'=>					'NAME',
