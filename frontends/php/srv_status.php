@@ -107,7 +107,7 @@ include_once "include/page_header.php";
 						'id' => 0,
 						'serviceid' => 0,
 						'serviceupid' => 0,
-						'caption' => 'root',
+						'caption' => S_ROOT_SMALL,
 						'status' => SPACE,
 						'reason' => SPACE,
 						'sla' => SPACE,

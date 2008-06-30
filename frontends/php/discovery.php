@@ -35,7 +35,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('dhostid',ZBX_SORT_UP);
+	validate_sort_and_sortorder('ip',ZBX_SORT_UP);
 
 	$r_form = new CForm();
 	$r_form->SetMethod('get');
@@ -87,8 +87,8 @@ include_once "include/page_header.php";
 
 	$header = array(
 			is_show_subnodes() ? new CCol(S_NODE, 'center') : null,
-			new CCol(make_sorting_link(S_HOST,'dhostid'), 'center'),
-			new CCol(array(S_UPTIME.'/',BR(),S_DOWNTIME),'center')
+			new CCol(make_sorting_link(S_HOST,'ip'), 'center'),
+			new CCol(array(S_UPTIME.'/',S_DOWNTIME),'center')
 			);
 
 	foreach ($services as $name => $foo) {
@@ -107,7 +107,7 @@ include_once "include/page_header.php";
 		$db_dhosts = DBselect('SELECT dhostid,druleid,ip,status,lastup,lastdown '.
 				' FROM dhosts WHERE '.DBin_node('dhostid').
 				' AND druleid='.$drule['druleid'].
-				order_by('dhostid','status,ip'));
+				order_by('ip','dhostid,status'));
 		while($dhost = DBfetch($db_dhosts)){
 			$class = 'enabled';
 			$time = 'lastup';

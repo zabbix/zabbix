@@ -68,7 +68,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	show_table_header("CONFIGURATION OF NETWORK MAP");
+	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS_BIG);
 	if(!sysmap_accessible($_REQUEST["sysmapid"],PERM_READ_WRITE)) access_deny();
 	
 	$sysmap = DBfetch(DBselect("select * from sysmaps where sysmapid=".$_REQUEST["sysmapid"]));
@@ -153,7 +153,7 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST["form"]) && ($_REQUEST["form"]=="add_element" ||
 		($_REQUEST["form"]=="update" && isset($_REQUEST["selementid"]))))
 	{
-		show_table_header("DISPLAYED ELEMENTS");
+		show_table_header(S_DISPLAYED_ELEMENTS);
 		echo SBR;
 		insert_map_element_form();
 	}
@@ -163,7 +163,7 @@ include_once "include/page_header.php";
 		$row = DBfetch(DBselect("select count(*) as count from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]));
 		if($row["count"]>1)
 		{
-			show_table_header("CONNECTORS");
+			show_table_header(S_CONNECTORS);
 			echo SBR;
 			insert_map_link_form();
 		}
@@ -173,7 +173,7 @@ include_once "include/page_header.php";
 		}
 	}
 	else{
-		show_table_header("DISPLAYED ELEMENTS", new CButton("form","Add element",
+		show_table_header(S_DISPLAYED_ELEMENTS, new CButton("form",S_ADD_ELEMENT,
 			"return redirect('".$page["file"]."?form=add_element".url_param("sysmapid")."');"));
 
 		$table = new CTableInfo();
@@ -207,7 +207,7 @@ include_once "include/page_header.php";
 		$table->show();
 
 		echo SBR;
-		show_table_header("CONNECTORS", new CButton("form","Create connection",
+		show_table_header(S_CONNECTORS, new CButton("form",S_CREATE_CONNECTION,
 			"return redirect('".$page["file"]."?form=add_link".
 			url_param("sysmapid")."');"));
 
