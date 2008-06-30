@@ -77,11 +77,11 @@
 
 		switch($drawtype)
 		{
-			case GRAPH_ITEM_DRAWTYPE_LINE:		$drawtype = "Line";		break;
-			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:	$drawtype = "Filled region";	break;
-			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:	$drawtype = "Bold line";	break;
-			case GRAPH_ITEM_DRAWTYPE_DOT:		$drawtype = "Dot";		break;
-			case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:	$drawtype = "Dashed line";	break;
+			case GRAPH_ITEM_DRAWTYPE_LINE:		$drawtype = S_LINE;		break;
+			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:	$drawtype = S_FILLED_REGION;	break;
+			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:	$drawtype = S_BOLD_LINE;	break;
+			case GRAPH_ITEM_DRAWTYPE_DOT:		$drawtype = S_DOT;		break;
+			case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:	$drawtype = S_DASHED_LINE;	break;
 			default: $drawtype = S_UNKNOWN;		break;
 		}
 		return $drawtype;

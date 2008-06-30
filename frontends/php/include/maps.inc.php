@@ -57,10 +57,10 @@
         {
 		switch($drawtype)
 		{
-			case MAP_LINK_DRAWTYPE_LINE:		$drawtype = "Line";		break;
-			case MAP_LINK_DRAWTYPE_BOLD_LINE:	$drawtype = "Bold line";	break;
-			case MAP_LINK_DRAWTYPE_DOT:		$drawtype = "Dot";		break;
-			case MAP_LINK_DRAWTYPE_DASHED_LINE:	$drawtype = "Dashed line";	break;
+			case MAP_LINK_DRAWTYPE_LINE:		$drawtype = S_LINE;		break;
+			case MAP_LINK_DRAWTYPE_BOLD_LINE:	$drawtype = S_BOLD_LINE;	break;
+			case MAP_LINK_DRAWTYPE_DOT:		$drawtype = S_DOT;		break;
+			case MAP_LINK_DRAWTYPE_DASHED_LINE:	$drawtype = S_DASHED_LINE;	break;
 			default: $drawtype = S_UNKNOWN;		break;
 		}
 		return $drawtype;

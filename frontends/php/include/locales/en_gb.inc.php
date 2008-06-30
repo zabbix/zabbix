@@ -367,6 +367,13 @@
 	'S_WHITE'=>				'White',
 	'S_YELLOW'=>				'Yellow',
 
+// Lines
+	'S_LINE'=>				'Line',
+	'S_FILLED_REGION'=>			'Filled region',
+	'S_BOLD_LINE'=>				'Bold line',
+	'S_DOT'=>				'Dot',
+	'S_DASHED_LINE'=>			'Dashed line',
+
 //	config.php
 	'S_CANNNOT_UPDATE_VALUE_MAP'=>		'Cannot update value map',
 	'S_VALUE_MAP_ADDED'=>			'Value map added',
@@ -782,6 +789,7 @@
 	'S_ORIGINAL'=>				'Original',
 	'S_NEW_FLEXIBLE_INTERVAL'=>		'New flexible interval',
 	'S_FLEXIBLE_INTERVALS'=>		'Flexible intervals (sec)',
+	'S_NO_FLEXIBLE_INTERVALS'=>		'No flexible intervals',
 
 //	events.php
 	'S_LATEST_EVENTS'=>			'Latest events',
@@ -795,7 +803,6 @@
 
 //	sysmap.php
 	'S_LINK'=>				'Link',
-	'S_LABEL'=>				'Label',
 	'S_X'=>					'X',
 	'S_Y'=>					'Y',
 	'S_ICON_ON'=>				'Icon (on)',
@@ -805,11 +812,23 @@
 	'S_ELEMENT_2'=>				'Element 2',
 	'S_LINK_STATUS_INDICATOR'=>		'Link status indicator',
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	'Configuration of network maps',
+	'S_CONFIGURATION_OF_NETWORK_MAPS_BIG'=>	'CONFIGURATION OF NETWORK MAPS',
+	'S_DISPLAYED_ELEMENTS'=>		'DISPLAYED ELEMENTS',
+	'S_CONNECTORS'=>			'CONNECTORS',
+	'S_ADD_ELEMENT'=>			'Add element',
+	'S_CREATE_CONNECTION'=>			'Create connection',
+	'S_COORDINATE_X'=>			'Coordinate X',
+	'S_COORDINATE_Y'=>			'Coordinate Y',
+	'S_TYPE_OFF'=>				'Type (OFF)',
+	'S_TYPE_ON'=>				'Type (ON)',
+	'S_COLOR_OFF'=>				'Color (OFF)',
+	'S_COLOR_ON'=>				'Color (ON)',
+	
+	
 
 //	sysmaps.php
 	'S_MAPS_BIG'=>				'MAPS',
 	'S_NO_MAPS_DEFINED'=>			'No maps defined',
-	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	'CONFIGURATION OF NETWORK MAPS',
 	'S_CREATE_MAP'=>			'Create Map',
 	'S_ICON_LABEL_LOCATION'=>		'Icon label location',
 	'S_BOTTOM'=>				'Bottom',
@@ -1172,6 +1191,9 @@
 	'S_LAST_OF'=>				'Last of',
 	'S_SHOW_DISABLED_TRIGGERS'=>		'Show disabled triggers',
 	'S_HIDE_DISABLED_TRIGGERS'=>		'Hide disabled triggers',
+	'S_THE_TRIGGER_DEPENDS_ON'=>		'The trigger depends on',
+	'S_NO_DEPENDENCES_DEFINED'=>		'No dependences defined',
+	'S_NEW_DEPENDENCY'=>			'New dependency',
 
 
 //	tr_comments.php
@@ -1191,6 +1213,7 @@
 	'S_HIDE_DETAILS'=>			'Hide details',
 	'S_SHOW_DETAILS'=>			'Show details',
 	'S_SELECT'=>				'Select',
+	'S_INVERSE_SELECT'=>			'Inverse Select',
 	'S_HIDE_SELECT'=>			'Hide select',
 	'S_TRIGGERS_BIG'=>			'TRIGGERS',
 	'S_NAME_BIG'=>				'NAME',

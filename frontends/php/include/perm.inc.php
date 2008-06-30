@@ -173,7 +173,7 @@ COpt::counter_up('perm');
 			$where.
 			' group by h.hostid,n.nodeid,n.name,h.host,ug.userid '.
 			' order by n.name,n.nodeid, h.host, permission '.$sortorder.', userid '.$sortorder;
-
+//SDI($sql);
 		$db_hosts = DBselect($sql);
 
 		$processed = array();

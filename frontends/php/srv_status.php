@@ -88,7 +88,7 @@ include_once "include/page_header.php";
 		$row = array(
 						'0' => 0,'serviceid' => 0,
 						'1' => 0,'serviceupid' => 0,
-						'2' => '','caption' => 'root',
+						'2' => '','caption' => S_ROOT_SMALL,
 						'3' => '','status' => SPACE,
 						'4' => '','reason' => SPACE,
 						'5' => '','sla' => SPACE,

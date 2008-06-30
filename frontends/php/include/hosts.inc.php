@@ -623,10 +623,10 @@ require_once "include/httptest.inc.php";
 
 		$with_node = "";
 
-		$accessed_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,null,null,get_current_nodeid(!$only_current_node));
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,null,null,get_current_nodeid(!$only_current_node));
 
 //SDI(get_current_nodeid(!$only_current_node));
-//SDI($accessed_hosts);
+//SDI($available_hosts);
 
 		if(is_null($a_groupid))
 		{
