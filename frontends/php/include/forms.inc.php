@@ -1548,7 +1548,7 @@
 		}
 
 		if(count($delay_flex_el)==0)
-			array_push($delay_flex_el, "No flexible intervals");
+			array_push($delay_flex_el, S_NO_FLEXIBLE_INTERVALS);
 		else
 			array_push($delay_flex_el, new CButton('del_delay_flex','delete selected'));
 
@@ -1711,8 +1711,8 @@
 		if($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_HTTPTEST)
 		{
 			$frmItem->AddRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));
-			$frmItem->AddRow("Flexible intervals (sec)", $delay_flex_el);
-			$frmItem->AddRow("New flexible interval", 
+			$frmItem->AddRow(S_FLEXIBLE_INTERVALS, $delay_flex_el);
+			$frmItem->AddRow(S_NEW_FLEXIBLE_INTERVAL, 
 				array(
 					S_DELAY, SPACE,
 					new CNumericBox("new_delay_flex[delay]","50",5), 
@@ -2248,10 +2248,10 @@
 		}
 
 		if(count($dep_el)==0)
-			array_push($dep_el, "No dependencies defined");
+			array_push($dep_el,  S_NO_DEPENDENCES_DEFINED);
 		else
 			array_push($dep_el, new CButton('del_dependence','delete selected'));
-		$frmTrig->AddRow("The trigger depends on",$dep_el);
+		$frmTrig->AddRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
 	/* end dependencies */
 
 		global $USER_DETAILS;
@@ -2266,7 +2266,7 @@
 				"&srcfld1=triggerid&srcfld2=description',600,450);",
 				'T');
 		
-		$frmTrig->AddRow("New dependency",array($txtCondVal, 
+		$frmTrig->AddRow(S_NEW_DEPENDENCY,array($txtCondVal, 
 			$btnSelect, BR(),
 			new CButton("add_dependence",S_ADD)
 			),'new');
@@ -2279,8 +2279,7 @@
 		$frmTrig->AddRow(S_EVENT_GENERATION,$type_select);
 
 		$cmbPrior = new CComboBox("priority",$priority);
-		for($i = 0; $i <= 5; $i++)
-		{
+		for($i = 0; $i <= 5; $i++){
 			$cmbPrior->AddItem($i,get_severity_description($i));
 		}
 		$frmTrig->AddRow(S_SEVERITY,$cmbPrior);
@@ -2290,13 +2289,11 @@
 		$frmTrig->AddRow(S_DISABLED,new CCheckBox("status",$status));
  
 		$frmTrig->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["triggerid"]))
-		{
+		if(isset($_REQUEST["triggerid"])){
 			$frmTrig->AddItemToBottomRow(SPACE);
 			$frmTrig->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmTrig->AddItemToBottomRow(SPACE);
-			if( !$limited )
-			{
+			if( !$limited ){
 				$frmTrig->AddItemToBottomRow(new CButtonDelete("Delete trigger?",
 					url_param("form").url_param("groupid").url_param("hostid").
 					url_param("triggerid")));
@@ -5319,7 +5316,7 @@
 
 		$frmEl->AddRow(S_TYPE,$cmbType);
 
-		$frmEl->AddRow("Label", new CTextBox("label", $label, 32));
+		$frmEl->AddRow(S_LABEL, new CTextBox("label", $label, 32));
 
 		$cmbLocation = new CComboBox("label_location",$label_location);
 		$cmbLocation->AddItem(-1,'-');
@@ -5444,8 +5441,8 @@
 		$frmEl->AddRow(S_ICON_ON,$cmbIconOn);
 		$frmEl->AddRow(S_ICON_UNKNOWN,$cmbIconUnknown);
 
-		$frmEl->AddRow("Coordinate X", new CNumericBox("x", $x, 5));
-		$frmEl->AddRow("Coordinate Y", new CNumericBox("y", $y, 5));
+		$frmEl->AddRow(S_COORDINATE_X, new CNumericBox("x", $x, 5));
+		$frmEl->AddRow(S_COORDINATE_Y, new CNumericBox("y", $y, 5));
 		$frmEl->AddRow(S_URL, new CTextBox("url", $url, 64));
 
 		$frmEl->AddItemToBottomRow(new CButton("save",S_SAVE));
@@ -5539,8 +5536,8 @@
 
 /* END preparation */
 
-		$frmCnct->AddRow("Element 1",$cmbElements1);
-		$frmCnct->AddRow("Element 2",$cmbElements2);
+		$frmCnct->AddRow(S_ELEMENT_1,$cmbElements1);
+		$frmCnct->AddRow(S_ELEMENT_2,$cmbElements2);
 
 //trigger links
 		foreach($triggers as $id => $trigger){
