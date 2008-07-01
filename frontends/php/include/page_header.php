@@ -109,9 +109,11 @@ COpt::profiling_start("page");
 					array(
 							'url'=>'dashboard.php',
 							'label'=>S_DASHBOARD,
-							'sub_pages'=>array('chart2.php','chart3.php','chart6.php','chart7.php','charts.php','screens.php','maps.php','map.php')
 						),
-					array('url'=>'overview.php'	,'label'=>S_OVERVIEW	),
+					array(
+							'url'=>'overview.php',
+							'label'=>S_OVERVIEW	
+						),
 					array(
 							'url'=>'httpmon.php',
 							'label'=>S_WEB,
@@ -131,6 +133,20 @@ COpt::profiling_start("page");
 							'url'=>'events.php',
 							'label'=>S_EVENTS,
 							'sub_pages'=>array('tr_events.php')
+						),
+					array(
+							'url'=>'charts.php',
+							'label'=>S_GRAPHS,
+							'sub_pages'=>array('chart2.php','chart3.php','chart6.php','chart7.php')
+						),
+					array(
+							'url'=>'screens.php',
+							'label'=>S_SCREENS	
+						),
+					array(
+							'url'=>'maps.php',
+							'label'=>S_MAPS,
+							'sub_pages'=>array('map.php')
 						),
 					array(
 							'url'=>'discovery.php',
