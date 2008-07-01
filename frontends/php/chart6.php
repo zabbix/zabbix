@@ -52,7 +52,7 @@ include_once "include/page_header.php";
 	}
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
-	
+
 	if(!graph_accessible($_REQUEST['graphid'])){
 		access_deny();
 	}
