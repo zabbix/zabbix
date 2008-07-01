@@ -155,13 +155,11 @@ include_once "include/page_header.php";
 		if(isset($_REQUEST['plaintext']))
 			echo $main_header.SBR;
 	
-		if($_REQUEST['action']=='showgraph'){
-			$_REQUEST['period'] = get_request('period',get_profile('web.item.graph.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['itemid']));
-			if($_REQUEST['period'] >= ZBX_MIN_PERIOD){
-				update_profile('web.item.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['itemid']);
-			}
+		$_REQUEST['period'] = get_request('period',get_profile('web.item.graph.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['itemid']));
+		if($_REQUEST['period'] >= ZBX_MIN_PERIOD){
+			update_profile('web.item.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['itemid']);
 		}
-		
+
 		$l_header = array(new CLink($item_data['host'],'latest.php?hostid='.$item_data['hostid']),': ',
 			item_description($item_data['description'],$item_data['key_']));
 			
@@ -234,12 +232,6 @@ include_once "include/page_header.php";
 		
 		$form->AddVar("itemid",$_REQUEST["itemid"]);
 
-		if($_REQUEST["action"]!="showlatest")
-		{
-			$form->AddVar("from",$_REQUEST["from"]);
-			$form->AddVar("period",$_REQUEST["period"]);
-		}
-
 		if(isset($_REQUEST["filter_task"]))	$form->AddVar("filter_task",$_REQUEST["filter_task"]);
 		if(isset($_REQUEST["filter"]))		$form->AddVar("filter",$_REQUEST["filter"]);
 		if(isset($_REQUEST["mark_color"]))	$form->AddVar("mark_color",$_REQUEST["mark_color"]);
@@ -270,7 +262,8 @@ include_once "include/page_header.php";
 	}
 	else if($_REQUEST["action"]=="showvalues" || $_REQUEST["action"]=="showlatest"){
 	
-		if($_REQUEST["action"]=="showvalues"){		
+		if($_REQUEST["action"]=="showvalues"){
+						
 			$time = time(null) - $effectiveperiod - $_REQUEST["from"] * 3600;
 			$till = time(null) - $_REQUEST["from"] * 3600;
 			$hours=$effectiveperiod / 3600;
