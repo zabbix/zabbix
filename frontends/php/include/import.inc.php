@@ -64,7 +64,7 @@
 			else if(!$this->root){
 				return false;
 			}
-			
+
 			$data = &$this->data[$name];
 			
 			foreach($attrs as $id => $val)
@@ -128,10 +128,29 @@
 					$this->sub_node	= null;
 					array_push($this->main_node, $name);
 					break; // case
+				case XML_TAG_DEPENDENCY:
+					// checks if trigger has been skipped
+					if(str_in_array($attrs['description'], $this->data[XML_TAG_DEPENDENCIES]['skip'])){
+						info('Trigger ['.$attrs['description'].'] dependency update skipped - user rule');
+						break;
+					}
+					
+					// searches trigger by host name & trigger description
+					if(!$trigger_down = get_trigger_by_description($attrs['description'])){
+						error('Trigger ['.$attrs['description'].'] dependency update skipped - trigger not found');
+						break;
+					}
+					
+					$data['triggerid_down'] = $trigger_down['triggerid'];
+					$data['triggerid_up']	= array();
+					$this->sub_node	= null;
+					array_push($this->main_node, $name);
+					break;
 				case XML_TAG_HOSTPROFILE:
 				case XML_TAG_TEMPLATE:
 				case XML_TAG_ITEM:
 				case XML_TAG_TRIGGER:
+				case XML_TAG_DEPENDS:
 				case XML_TAG_GRAPH_ELEMENT:
 				/*case XML_TAG_SCREEN:
 				case XML_TAG_SCREEN_ELEMENT:*/
@@ -140,8 +159,11 @@
 					array_push($this->main_node, $name);
 					break; // case
 				case XML_TAG_HOSTS:
-				case XML_TAG_GROUPS:
+					$this->data[XML_TAG_DEPENDENCIES]['skip'] = array();
+					break;
+				case XML_TAG_DEPENDENCIES:
 				case XML_TAG_ZABBIX_EXPORT:
+				case XML_TAG_GROUPS:
 				case XML_TAG_APPLICATIONS:
 				case XML_TAG_TEMPLATES:
 				case XML_TAG_ITEMS:
@@ -215,11 +237,13 @@
 				case XML_TAG_GROUP:
 					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
 						break; //case
-
-					if(!($group = DBfetch(DBselect('select groupid, name from groups'.
-						' where '.DBin_node('groupid',get_current_nodeid(false)).
-						' and name='.zbx_dbstr($this->element_data)))))
-					{
+						
+					$sql = 'SELECT groupid, name '.
+							' FROM groups'.
+							' WHERE '.DBin_node('groupid',get_current_nodeid(false)).
+								' AND name='.zbx_dbstr($this->element_data);
+								
+					if(!$group = DBfetch(DBselect($sql))){
 						error('Missed group ['.$this->element_data.']');
 						break; // case
 					}
@@ -232,6 +256,25 @@
 					array_push($this->data[XML_TAG_HOST]['groups'], $group["groupid"]);
 
 					break; // case
+				case XML_TAG_DEPENDENCY:
+					if(!isset($data['triggerid_down']) || !$data['triggerid_down'])
+						break; // case
+					
+					update_trigger($data['triggerid_down'],
+							null,null,null,
+							null,null,null,null,
+							$data['triggerid_up'], null);
+												
+					break; // case
+				case XML_TAG_DEPENDS:
+					if(!isset($this->data[XML_TAG_DEPENDENCY]['triggerid_down']) || !$this->data[XML_TAG_DEPENDENCY]['triggerid_down'])
+						break; //case
+					
+					if(!$trigger_up = get_trigger_by_description($this->element_data)) break;
+					
+					array_push($this->data[XML_TAG_DEPENDENCY]['triggerid_up'], $trigger_up['triggerid']);
+
+					break; // case
 				case XML_TAG_APPLICATION:
 					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
 						break; //case
@@ -239,11 +282,12 @@
 					if(!isset($this->data[XML_TAG_ITEM]))
 						break; //case
 
-					if(!($application = DBfetch(DBselect('select applicationid from applications'.
-						' where '.DBin_node('applicationid',get_current_nodeid(false)).
-						' and name='.zbx_dbstr($this->element_data).
-						' and hostid='.$this->data[XML_TAG_HOST]['hostid']))))
-					{
+					$sql= 'SELECT applicationid '.
+						' FROM applications'.
+						' WHERE '.DBin_node('applicationid',get_current_nodeid(false)).
+							' AND name='.zbx_dbstr($this->element_data).
+							' AND hostid='.$this->data[XML_TAG_HOST]['hostid'];
+					if(!$application = DBfetch(DBselect($sql))){
 						$applicationid = add_application($this->element_data, $this->data[XML_TAG_HOST]['hostid']);
 					}
 					else{
@@ -257,10 +301,11 @@
 					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
 						break; //case
 
-					if(!($template = DBfetch(DBselect('SELECT DISTINCT host, hostid '.
+					$sql= 'SELECT DISTINCT host, hostid '.
 								' FROM hosts'.
 								' WHERE '.DBin_node('hostid').
-									' AND host='.zbx_dbstr($this->element_data))))){
+									' AND host='.zbx_dbstr($this->element_data);
+					if(!$template = DBfetch(DBselect($sql))){
 						error('Missed template ['.$this->element_data.']');
 						break; // case
 					}
@@ -284,13 +329,13 @@
 					}
 
 					if(!isset($data['description']))		$data['description']		= '';
-					if(!isset($data['delay']))			$data['delay']			= 30;
+					if(!isset($data['delay']))				$data['delay']			= 30;
 					if(!isset($data['history']))			$data['history']		= 90;
-					if(!isset($data['trends']))			$data['trends']			= 365;
-					if(!isset($data['status']))			$data['status']			= 0;
-					if(!isset($data['units']))			$data['units']			= '';
+					if(!isset($data['trends']))				$data['trends']			= 365;
+					if(!isset($data['status']))				$data['status']			= 0;
+					if(!isset($data['units']))				$data['units']			= '';
 					if(!isset($data['multiplier']))			$data['multiplier']		= 0;
-					if(!isset($data['delta']))			$data['delta']			= 0;
+					if(!isset($data['delta']))				$data['delta']			= 0;
 					if(!isset($data['formula']))			$data['formula']		= '';
 					if(!isset($data['lastlogsize']))		$data['lastlogsize']		= 0;
 					if(!isset($data['logtimefmt']))			$data['logtimefmt']		= '';
@@ -303,27 +348,31 @@
 					if(!isset($data['snmpv3_securitylevel']))	$data['snmpv3_securitylevel']	= 0;
 					if(!isset($data['snmpv3_authpassphrase']))	$data['snmpv3_authpassphrase']	= '';
 					if(!isset($data['snmpv3_privpassphrase']))	$data['snmpv3_privpassphrase']	= '';
-					if(!isset($data['valuemap']))			$data['valuemap']		= '';
-					if(!isset($data['params']))			$data['params']			= '';
-					if(!isset($data['applications']))		$data['applications']		= array();
+					if(!isset($data['valuemap']))				$data['valuemap']		= '';
+					if(!isset($data['params']))					$data['params']			= '';
+					if(!isset($data['applications']))			$data['applications']		= array();
 
 					if(!empty($data['valuemap'])){
-						if( $valuemap = DBfetch(DBselect('select valuemapid from valuemaps '.
-										' where '.DBin_node('valuemapid', get_current_nodeid(false)).
-										' and name='.zbx_dbstr($data['valuemap']))) )
-						{
+						$sql = 'SELECT valuemapid '.
+								' FROM valuemaps '.
+								' WHERE '.DBin_node('valuemapid', get_current_nodeid(false)).
+									' AND name='.zbx_dbstr($data['valuemap']);
+										
+						if( $valuemap = DBfetch(DBselect($sql))){
 							$data['valuemapid'] = $valuemap['valuemapid'];
 						}
 						else{
 							$data['valuemapid'] = add_valuemap($data['valuemap'],array());
 						}
 					}
-
-					if($item = DBfetch(DBselect('select itemid,valuemapid,templateid from items'.
-						' where key_='.zbx_dbstr($data['key']).
-						' and hostid='.$this->data[XML_TAG_HOST]['hostid'].' and '.
-						DBin_node('itemid', get_current_nodeid(false)))))
-					{ /* exist */
+					
+					$sql = 'SELECT itemid,valuemapid,templateid '.
+							' FROM items '.
+							' WHERE key_='.zbx_dbstr($data['key']).
+								' AND hostid='.$this->data[XML_TAG_HOST]['hostid'].
+								' AND '.DBin_node('itemid', get_current_nodeid(false));
+						
+					if($item = DBfetch(DBselect($sql))){ /* exist */
 						if($this->item['exist']==1) /* skip */{
 							info('Item ['.$data['description'].'] skipped - user rule');
 							break;
@@ -415,10 +464,18 @@
 
 					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid']){
 						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip']){
+						
+// remember skipped triggers for dependencies
+							$this->data[XML_TAG_DEPENDENCIES]['skip'][] = $this->data[XML_TAG_HOST]['name'].':'.$data['description'];
+							
 							info('Trigger ['.$data['description'].'] skipped - user rule for host');
 							break; // case
 						}
 						if(zbx_strstr($data['expression'],'{HOSTNAME}')){
+						
+// remember skipped triggers for dependencies
+							$this->data[XML_TAG_DEPENDENCIES]['skip'][] = $this->data[XML_TAG_HOST]['name'].':'.$data['description'];
+
 							error('Trigger ['.$data['description'].'] skipped - missed host');
 							break; // case
 						}
@@ -443,6 +500,10 @@
 
 						if(!empty($trigger)){ /* exist */
 							if($this->trigger['exist']==1){ /* skip */
+							
+// remember skipped triggers for dependencies
+								$this->data[XML_TAG_DEPENDENCIES]['skip'][] = $this->data[XML_TAG_HOST]['name'].':'.$data['description'];
+
 								info('Trigger ['.$data['description'].'] skipped - user rule');
 								break; // case
 							}
@@ -467,6 +528,10 @@
 					}
 					
 					if($this->trigger['missed']==1) /* skip */{
+					
+// remember skipped triggers for dependencies
+						$this->data[XML_TAG_DEPENDENCIES]['skip'][] = $this->data[XML_TAG_HOST]['name'].':'.$data['description'];
+
 						info('Trigger ['.$data['description'].'] skipped - user rule');
 						break; // case
 					}
