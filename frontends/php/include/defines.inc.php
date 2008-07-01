@@ -534,6 +534,9 @@ else{
 	define('XML_TAG_SCREEN',		'screen');
 	define('XML_TAG_SCREEN_ELEMENT',	'screen_element');
 	define('XML_TAG_SCREEN_ELEMENTS',	'screen_elements');
+	define('XML_TAG_DEPENDENCIES',		'dependencies');
+	define('XML_TAG_DEPENDENCY',		'dependency');
+	define('XML_TAG_DEPENDS',			'depends');
 
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))
