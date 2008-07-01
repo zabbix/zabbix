@@ -34,6 +34,12 @@
 				'port'		=> '',
 				'status'	=> '')
 			),
+		XML_TAG_DEPENDENCY => array(
+			'attribures'	=> array(
+				'dependency'	=> 'description'),
+			'elements'	=> array(
+				'depends'		=> '')
+			),
 // based on mod by scricca
 		XML_TAG_HOSTPROFILE => array(
 			'attribures'	=> array(),
@@ -118,58 +124,50 @@
 			)
 		);
 
-	function zbx_xmlwriter_open_memory()
-	{
+	function zbx_xmlwriter_open_memory(){
 		return array('tabs' => 0, 'tag'=>array());
 	}
 	
-	function zbx_xmlwriter_set_indent($mem, $val)
-	{
+	function zbx_xmlwriter_set_indent($mem, $val){
 		return true;
 	}
 	
-	function zbx_xmlwriter_start_document(&$mem, $ver)
-	{
+	function zbx_xmlwriter_start_document(&$mem, $ver){
 		echo '<?xml version="'.$ver.'"?';
 		return true;
 	}
 	
-	function zbx_xmlwriter_start_element(&$mem, $tag)
-	{
+	function zbx_xmlwriter_start_element(&$mem, $tag){
 		array_push($mem['tag'], $tag);
 		echo '>'."\n".str_repeat("\t",$mem['tabs']).'<'.$tag;
 		$mem['tabs']++;
 		return true;
 	}
-	function zbx_xmlwriter_write_attribute(&$mem, $name, $val)
-	{
+	
+	function zbx_xmlwriter_write_attribute(&$mem, $name, $val){
 		echo ' '.$name.'="'.htmlspecialchars($val).'"';
 		return true;
 	}
 	
-	function zbx_xmlwriter_end_element(&$mem)
-	{
+	function zbx_xmlwriter_end_element(&$mem){
 		$teg = array_pop($mem['tag']);
 		$mem['tabs']--;
 		echo '>'."\n".str_repeat("\t",$mem['tabs']).'</'.$teg;
 	}
 	
-	function zbx_xmlwriter_output_memory(&$mem, $val)
-	{ /* NOTE: use this function only in the end of xml file creation */
+	function zbx_xmlwriter_output_memory(&$mem, $val){ 
+/* NOTE: use this function only in the end of xml file creation */
 		echo '>';
 	}
 	
-	function zbx_xmlwriter_write_element(&$mem, $name, $val)
-	{
+	function zbx_xmlwriter_write_element(&$mem, $name, $val){
 		echo '>'."\n".str_repeat("\t",$mem['tabs']).'<'.$name.'>'.htmlspecialchars($val).'</'.$name;
 	}
 	
-	class CZabbixXMLExport
-	{
+	class CZabbixXMLExport{
 		function CZabbixXMLExport(){}
 		
-		function export_item(&$memory, $itemid)
-		{
+		function export_item(&$memory, $itemid){
 			global $ZBX_EXPORT_MAP;
 
 			$data = DBfetch(DBselect('select * from items where itemid='.$itemid));
@@ -179,27 +177,24 @@
 
 			$map =& $ZBX_EXPORT_MAP[XML_TAG_ITEM];
 			
-			foreach($map['attribures'] as $db_name => $xml_name)
-			{
+			foreach($map['attribures'] as $db_name => $xml_name){
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
 			}
-			foreach($map['elements'] as $db_name => $xml_name)
-			{
+			
+			foreach($map['elements'] as $db_name => $xml_name){
 				if(!isset($data[$db_name])) continue;
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
 			}
 
-			if( !empty($data['valuemapid']) && $valuemap = DBfetch(DBselect('select name from valuemaps where valuemapid='.$data['valuemapid'])))
-			{
+			if( !empty($data['valuemapid']) && $valuemap = DBfetch(DBselect('select name from valuemaps where valuemapid='.$data['valuemapid']))){
 				zbx_xmlwriter_write_element($memory, 'valuemap', $valuemap['name']);
 			}
 
 			$db_applications=DBselect('select distinct a.name from applications a,items_applications ia '.
 				       ' where ia.applicationid=a.applicationid and ia.itemid='.$itemid);
-			if ($application = DBfetch($db_applications))
-			{
+			if($application = DBfetch($db_applications)){
 				zbx_xmlwriter_start_element ($memory,XML_TAG_APPLICATIONS);
 				do {
 					zbx_xmlwriter_write_element ($memory, XML_TAG_APPLICATION, $application['name']);
@@ -211,8 +206,7 @@
 		}
 
 		
-		function export_trigger(&$memory, $triggerid)
-		{
+		function export_trigger(&$memory, $triggerid){
 			global $ZBX_EXPORT_MAP;
 
 			$data = DBfetch(DBselect('select * from triggers where triggerid='.$triggerid));
@@ -224,13 +218,12 @@
 			
 			$map =& $ZBX_EXPORT_MAP[XML_TAG_TRIGGER];
 			
-			foreach($map['attribures'] as $db_name => $xml_name)
-			{
+			foreach($map['attribures'] as $db_name => $xml_name){
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
 			}
-			foreach($map['elements'] as $db_name => $xml_name)
-			{
+			
+			foreach($map['elements'] as $db_name => $xml_name){
 				if(!isset($data[$db_name])) continue;
 				if(empty($xml_name)) $xml_name = $db_name;
 				
@@ -239,12 +232,16 @@
 			zbx_xmlwriter_end_element($memory); // XML_TAG_TRIGGER
 		}
 		
-		function export_graph_element(&$memory, $gitemid)
-		{
+		function export_graph_element(&$memory, $gitemid){
 			global $ZBX_EXPORT_MAP;
 
-			$data = DBfetch(DBselect('select gi.*,i.key_,h.host from graphs_items gi, items i, hosts h'.
-				' where h.hostid=i.hostid and i.itemid=gi.itemid and gi.gitemid='.$gitemid));
+			$sql = 'select gi.*,i.key_,h.host '.
+					' from graphs_items gi, items i, hosts h'.
+					' where h.hostid=i.hostid '.
+						' and i.itemid=gi.itemid '.
+						' and gi.gitemid='.$gitemid;
+						
+			$data = DBfetch(DBselect($sql));
 			if(!$data) return false;
 
 			$data['item'] = '{HOSTNAME}:'.$data['key_'];
@@ -253,13 +250,12 @@
 			
 			$map =& $ZBX_EXPORT_MAP[XML_TAG_GRAPH_ELEMENT];
 			
-			foreach($map['attribures'] as $db_name => $xml_name)
-			{
+			foreach($map['attribures'] as $db_name => $xml_name){
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
 			}
-			foreach($map['elements'] as $db_name => $xml_name)
-			{
+			
+			foreach($map['elements'] as $db_name => $xml_name){
 				if(!isset($data[$db_name])) continue;
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
@@ -267,8 +263,7 @@
 			zbx_xmlwriter_end_element($memory); // XML_TAG_GRAPH_ELEMENT
 		}
 
-		function export_graph(&$memory, $graphid)
-		{
+		function export_graph(&$memory, $graphid){
 			global $ZBX_EXPORT_MAP;
 
 			$data = DBfetch(DBselect('select * from graphs where graphid='.$graphid));
@@ -278,21 +273,21 @@
 			
 			$map =& $ZBX_EXPORT_MAP[XML_TAG_GRAPH];
 			
-			foreach($map['attribures'] as $db_name => $xml_name)
-			{
+			foreach($map['attribures'] as $db_name => $xml_name){
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
 			}
-			foreach($map['elements'] as $db_name => $xml_name)
-			{
+			
+			foreach($map['elements'] as $db_name => $xml_name){
 				if(!isset($data[$db_name])) continue;
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
 			}
+			
 			zbx_xmlwriter_start_element ($memory,XML_TAG_GRAPH_ELEMENTS);
+			
 			$db_elements = DBselect('select gitemid from graphs_items where graphid='.$graphid);
-			while($element = DBfetch($db_elements))
-			{
+			while($element = DBfetch($db_elements)){
 				$this->export_graph_element($memory, $element['gitemid']);
 			}
 				
@@ -300,8 +295,7 @@
 			zbx_xmlwriter_end_element($memory); // XML_TAG_GRAPH
 		}
 		
-		function export_host(&$memory, $hostid, $export_templates, $export_items, $export_triggers, $export_graphs)
-		{
+		function export_host(&$memory, $hostid, $export_templates, $export_items, $export_triggers, $export_graphs){
 			global $ZBX_EXPORT_MAP;
 
 			$data = DBfetch(DBselect('select * from hosts where hostid='.$hostid));
@@ -311,13 +305,12 @@
 			
 			$map =& $ZBX_EXPORT_MAP[XML_TAG_HOST];
 
-			foreach($map['attribures'] as $db_name => $xml_name)
-			{
+			foreach($map['attribures'] as $db_name => $xml_name){
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
 			}
-			foreach($map['elements'] as $db_name => $xml_name)
-			{
+			
+			foreach($map['elements'] as $db_name => $xml_name){
 				if(!isset($data[$db_name])) continue;
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
@@ -335,86 +328,133 @@
 					if(empty($xml_name)) $xml_name = $db_name;
 					zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
 				}
+				
 				foreach($map['elements'] as $db_name => $xml_name){
 					if(empty($data[$db_name])) continue;
 					if(empty($xml_name)) $xml_name = $db_name;
 					zbx_xmlwriter_write_element($memory, $xml_name, $data[$db_name]);
 				}
+				
 				zbx_xmlwriter_end_element($memory); // XML_TAG_HOSTPROFILE
 			}
 //--
-
-			if($db_groups = DBselect('select g.name from groups g, hosts_groups hg'.
-				' where g.groupid=hg.groupid and hg.hostid='.$hostid))
-			{
+			$sql = 'select g.name '.
+					' from groups g, hosts_groups hg '.
+					' where g.groupid=hg.groupid '.
+						' and hg.hostid='.$hostid;
+			if($db_groups = DBselect()){
 				zbx_xmlwriter_start_element ($memory,XML_TAG_GROUPS);
-				while($group = DBfetch($db_groups))
-				{
+				
+				while($group = DBfetch($db_groups)){
 					zbx_xmlwriter_write_element ($memory, XML_TAG_GROUP, $group['name']);
 				}
+				
 				zbx_xmlwriter_end_element($memory); // XML_TAG_GROUP
 			}
 			
 			if($export_templates){
-				$query = 'SELECT t.host '.
-					' FROM hosts t, hosts_templates ht'.
-					' WHERE t.hostid=ht.templateid AND ht.hostid='.$hostid;
+				$sql = 'SELECT t.host '.
+					' FROM hosts t, hosts_templates ht '.
+					' WHERE t.hostid=ht.templateid '.
+						' AND ht.hostid='.$hostid;
 							
-				if($db_templates = DBselect($query)){
+				if($db_templates = DBselect($sql)){
 					zbx_xmlwriter_start_element ($memory,XML_TAG_TEMPLATES);
 
 					while($template = DBfetch($db_templates)){
 						zbx_xmlwriter_write_element ($memory, XML_TAG_TEMPLATE, $template['host']);
 					}
 				}
+				
 				zbx_xmlwriter_end_element($memory); // XML_TAG_TEMPLATES
 			}
 
-			if($export_items)
-			{
+			if($export_items){
 				zbx_xmlwriter_start_element ($memory,XML_TAG_ITEMS);
+				
 				$db_items=DBselect('select itemid from items where hostid='.$hostid);
-				while($item_id = DBfetch($db_items))
-				{
+				while($item_id = DBfetch($db_items)){
 					$this->export_item($memory, $item_id['itemid']);
 				}
+				
 				zbx_xmlwriter_end_element($memory); // XML_TAG_ITEMS
 			}
 			
 			
-			if($export_triggers)
-			{
+			if($export_triggers){
 				zbx_xmlwriter_start_element ($memory,XML_TAG_TRIGGERS);
+				
 				$db_triggers = DBselect('select f.triggerid, i.hostid, count(distinct i.hostid) as cnt '.
 					' from functions f, items i '.
-					' where f.itemid=i.itemid group by f.triggerid, i.hostid');
-				while($trigger = DBfetch($db_triggers))
-				{
+					' where f.itemid=i.itemid '.
+					' group by f.triggerid, i.hostid');
+				while($trigger = DBfetch($db_triggers)){
 					if((bccomp($trigger['hostid'] , $hostid) != 0) || $trigger['cnt']!=1) continue;
 					$this->export_trigger($memory, $trigger['triggerid']);
 				}
+				
 				zbx_xmlwriter_end_element($memory); // XML_TAG_TRIGGERS
 			}
-			if($export_graphs)
-			{
+			if($export_graphs){
 				zbx_xmlwriter_start_element ($memory, XML_TAG_GRAPHS);
+				
 				$db_graphs = DBselect('select gi.graphid, i.hostid, count(distinct i.hostid) as cnt '.
 					' from graphs_items gi, items i '.
-					' where gi.itemid=i.itemid group by gi.graphid, i.hostid');
-				while($graph = DBfetch($db_graphs))
-				{
+					' where gi.itemid=i.itemid '.
+					' group by gi.graphid, i.hostid');
+				while($graph = DBfetch($db_graphs)){
 					if((bccomp($graph['hostid'] , $hostid) != 0) || $graph['cnt']!=1) continue;
 					$this->export_graph($memory, $graph['graphid']);
 				}
+				
 				zbx_xmlwriter_end_element($memory); // XML_TAG_GRAPHS
 			}
 			/* export screens */
 			zbx_xmlwriter_end_element($memory); // XML_TAG_HOST
 			return true;
 		}
+		
+		function export_dependency(&$memory, $triggerid, $host, $description){
+			global $ZBX_EXPORT_MAP;
+			if(!$triggerid) return false;			
+			
+			$data['dependency'] = $host.':'.$description;
+			
+			zbx_xmlwriter_start_element ($memory,XML_TAG_DEPENDENCY);
+			
+			$map =& $ZBX_EXPORT_MAP[XML_TAG_DEPENDENCY];
 
-		function Export(&$hosts, &$templates, &$items, &$triggers, &$graphs)
-		{
+			foreach($map['attribures'] as $db_name => $xml_name){
+				if(empty($xml_name)) $xml_name = $db_name;
+				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
+			}
+			
+			$sql = 'SELECT t.triggerid, t.description, h.host'.
+					' FROM trigger_depends td, triggers t, items i, hosts h, functions f '.
+					' WHERE td.triggerid_down='.$triggerid.
+						' AND t.triggerid=td.triggerid_up '.
+						' AND f.triggerid=t.triggerid '.
+						' AND i.itemid=f.itemid '.
+						' AND h.hostid=i.hostid '.
+					' GROUP BY t.triggerid, t.description';			
+
+			$res = DBselect($sql);
+			while($data = DBfetch($res)){
+				$data['depends'] = $data['host'].':'.$data['description'];
+				foreach($map['elements'] as $db_name => $xml_name){
+					if(!isset($data[$db_name])) continue;
+					if(empty($xml_name)) $xml_name = $db_name;
+					zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
+				}
+			}
+//--
+			/* export screens */
+			zbx_xmlwriter_end_element($memory); // XML_TAG_DEPENDENCY
+			return true;
+		}
+
+		function Export(&$hosts, &$templates, &$items, &$triggers, &$graphs){
+		
 			$memory = zbx_xmlwriter_open_memory();
 			zbx_xmlwriter_set_indent($memory, true);
 			zbx_xmlwriter_start_document($memory,'1.0');
@@ -422,9 +462,9 @@
 			zbx_xmlwriter_write_attribute($memory, 'version', '1.0');
 			zbx_xmlwriter_write_attribute($memory, 'date', date('d.m.y'));
 			zbx_xmlwriter_write_attribute($memory, 'time', date('h.i'));
+			
 				zbx_xmlwriter_start_element ($memory,XML_TAG_HOSTS);
-				foreach(array_keys($hosts) as $hostid)
-				{
+				foreach($hosts as $hostid => $val){
 					$this->export_host(
 						$memory,
 						$hostid,
@@ -435,6 +475,34 @@
 						);
 				}
 				zbx_xmlwriter_end_element($memory); // XML_TAG_HOSTS
+				
+				if(!empty($triggers)){
+
+					zbx_xmlwriter_start_element ($memory,XML_TAG_DEPENDENCIES);
+					foreach($triggers as $hostid => $val){
+						
+						$sql = 'SELECT h.host, t.description, t.triggerid '.
+								' FROM trigger_depends td, triggers t, functions f, items i, hosts h '.
+								' WHERE h.hostid='.$hostid.
+									' AND i.hostid=h.hostid '.
+									' AND f.itemid=i.itemid '.
+									' AND t.triggerid=f.triggerid '.
+									' AND td.triggerid_down=t.triggerid '.
+								' GROUP BY t.triggerid, t.description';
+
+						$dependent_triggers = DBselect($sql);
+						while($deps = DBfetch($dependent_triggers)){
+							$this->export_dependency(
+								$memory,
+								$deps['triggerid'],
+								$deps['host'],
+								$deps['description']
+								);						
+						}
+					}
+					zbx_xmlwriter_end_element($memory); // XML_TAG_DEPENDENCIES
+				}
+				
 			zbx_xmlwriter_end_element($memory); // XML_TAG_ZABBIX_EXPORT
 			die(zbx_xmlwriter_output_memory($memory,true));
 		}

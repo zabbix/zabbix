@@ -582,18 +582,21 @@ require_once "include/httptest.inc.php";
 		return	false;
 	}
 
-	function	get_hosts_by_templateid($templateid){
-		return DBselect("select h.* from hosts h, hosts_templates ht where h.hostid=ht.hostid and ht.templateid=$templateid");
+	function get_hosts_by_templateid($templateid){
+		return DBselect('SELECT h.* '.
+						' FROM hosts h, hosts_templates ht '.
+						' WHERE h.hostid=ht.hostid '.
+							' AND ht.templateid='.$templateid);
 	}
 
 	# Update Host status
 
-	function	update_host_status($hostid,$status){
+	function update_host_status($hostid,$status){
 	
 		$row=DBfetch(DBselect("select status,host from hosts where hostid=$hostid"));
 		$old_status=$row["status"];
-		if($status != $old_status)
-		{
+		
+		if($status != $old_status){
 			update_trigger_value_to_unknown_by_hostid($hostid);
 			info("Updated status of host ".$row["host"]);
 			return	DBexecute('update hosts set status='.$status.' where hostid='.$hostid.

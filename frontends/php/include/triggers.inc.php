@@ -407,8 +407,11 @@
 
 	function get_hosts_by_triggerid($triggerid)
 	{
-		return DBselect('select distinct h.* from hosts h, functions f, items i'.
-			' where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid='.$triggerid);
+		return DBselect('SELECT DISTINCT h.* '.
+						' FROM hosts h, functions f, items i '.
+						' WHERE i.itemid=f.itemid '.
+							' and h.hostid=i.hostid '.
+							' and f.triggerid='.$triggerid);
 	}
 
 	function get_functions_by_triggerid($triggerid)
@@ -416,18 +419,18 @@
 		return DBselect('select * from functions where triggerid='.$triggerid);
 	}
 
-	/*
-	 * Function: get_triggers_by_hostid
-	 *
-	 * Description: 
-	 *     retrive selection of triggers by hostid
-	 *     
-	 * Author: 
-	 *    Aly
-	 *
-	 * Comments:
-	 *
-	 */
+/*
+ * Function: get_triggers_by_hostid
+ *
+ * Description: 
+ *     retrive selection of triggers by hostid
+ *     
+ * Author: 
+ *    Aly
+ *
+ * Comments:
+ *
+ */
 	function get_triggers_by_hostid($hostid){
 		$db_triggers = DBselect('SELECT DISTINCT t.* '.
 								' FROM triggers t, functions f, items i '.
@@ -436,9 +439,37 @@
 									' AND f.triggerid=t.triggerid');
 	return $db_triggers;
 	}
+	
 
-	function get_triggers_by_templateid($triggerid)
-	{
+/*
+ * Function: get_trigger_by_description
+ *
+ * Description: 
+ *     retrive triggerid by description
+ *     
+ * Author: 
+ *    Aly
+ *
+ * Comments:
+ *	  description - host-name:trigger-description. Example( "unix server:low free disk space")
+ */
+	
+	function get_trigger_by_description($desc){
+		list($host_name, $trigger_description) = explode(':',$desc);
+		
+		$sql = 'SELECT t.* '.
+				' FROM triggers t, items i, functions f, hosts h '.
+				' WHERE h.host='.zbx_dbstr($host_name).
+					' AND i.hostid=h.hostid '.
+					' AND f.itemid=i.itemid '.
+					' AND t.triggerid=f.triggerid '.
+					' AND t.description='.zbx_dbstr($trigger_description).
+				' ORDER BY t.triggerid DESC';
+		$trigger = DBfetch(DBselect($sql,1));
+	return $trigger;
+	}
+
+	function get_triggers_by_templateid($triggerid){
 		return DBselect('select * from triggers where templateid='.$triggerid);
 	}
 
@@ -1119,7 +1150,7 @@
 	 *           replcae $1-9 macros
 	 *
 	 */
-	function	expand_trigger_description_constants($description, $row){
+	function expand_trigger_description_constants($description, $row){
 		if($row && isset($row['expression'])){
 			$numbers = extract_numbers(ereg_replace('(\{[0-9]+\})', 'function', $row['expression']));
 			$description = $row["description"];
@@ -1348,7 +1379,7 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	update_trigger($triggerid,$expression=NULL,$description=NULL,$type=NULL,$priority=NULL,$status=NULL,
+	function update_trigger($triggerid,$expression=NULL,$description=NULL,$type=NULL,$priority=NULL,$status=NULL,
 		$comments=NULL,$url=NULL,$deps=array(),$templateid=0)
 	{
 		$trigger	= get_trigger_by_triggerid($triggerid);
@@ -1370,17 +1401,14 @@
 
 		$exp_hosts 	= get_hosts_by_expression($expression);
 		
-		if( $exp_hosts )
-		{
+		if( $exp_hosts ){
 			$chd_hosts	= get_hosts_by_templateid($trig_host["hostid"]);
 
-			if(DBfetch($chd_hosts))
-			{
+			if(DBfetch($chd_hosts)){
 				$exp_host = DBfetch($exp_hosts);
 
 				$db_chd_triggers = get_triggers_by_templateid($triggerid);
-				while($db_chd_trigger = DBfetch($db_chd_triggers))
-				{
+				while($db_chd_trigger = DBfetch($db_chd_triggers)){
 					$chd_trig_hosts = get_hosts_by_triggerid($db_chd_trigger["triggerid"]);
 					$chd_trig_host = DBfetch($chd_trig_hosts);
 
@@ -1406,8 +1434,7 @@
 		}
 
 		$result=delete_function_by_triggerid($triggerid);
-		if(!$result)
-		{
+		if(!$result){
 			return	$result;
 		}
 
@@ -1450,8 +1477,7 @@
 		return $result;
 	}
 
-	function	check_right_on_trigger_by_triggerid($permission,$triggerid)
-	{
+	function check_right_on_trigger_by_triggerid($permission,$triggerid){
 		$trigger_data = DBfetch(DBselect('select expression from triggers where triggerid='.$triggerid));
 
 		if(!$trigger_data) return false;
@@ -1459,7 +1485,7 @@
 		return check_right_on_trigger_by_expression($permission, explode_exp($trigger_data['expression'], 0));
 	}
 
-	function	check_right_on_trigger_by_expression($permission,$expression){
+	function check_right_on_trigger_by_expression($permission,$expression){
 	
 		global $USER_DETAILS;
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission, PERM_RES_IDS_ARRAY);
@@ -1477,12 +1503,10 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	delete_dependencies_by_triggerid($triggerid)
-	{
+	function delete_dependencies_by_triggerid($triggerid){
 		$db_deps = DBselect('select triggerid_up, triggerid_down from trigger_depends'.
 			' where triggerid_down='.$triggerid);
-		while($db_dep = DBfetch($db_deps))
-		{
+		while($db_dep = DBfetch($db_deps)){
 			DBexecute('update triggers set dep_level=dep_level-1 where triggerid='.$db_dep['triggerid_up']);
 			DBexecute('delete from trigger_depends'.
 				' where triggerid_up='.$db_dep['triggerid_up'].
@@ -1496,13 +1520,12 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	insert_dependency($triggerid_down,$triggerid_up)
-	{
+	function insert_dependency($triggerid_down,$triggerid_up){
+	
 		$triggerdepid = get_dbid("trigger_depends","triggerdepid");
 		$result=DBexecute("insert into trigger_depends (triggerdepid,triggerid_down,triggerid_up)".
 			" values ($triggerdepid,$triggerid_down,$triggerid_up)");
-		if(!$result)
-		{
+		if(!$result){
 			return	$result;
 		}
 		return DBexecute("update triggers set dep_level=dep_level+1 where triggerid=$triggerid_up");
