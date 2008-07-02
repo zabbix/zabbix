@@ -245,6 +245,19 @@ include_once "include/page_header.php";
 			get_profile('web.dashboard.hats.hat_favgrph.state',1)
 		));
 		
+	$screen_menu = new CDiv(SPACE,'iconmenu');
+	$screen_menu->AddAction('onclick','javascript: create_menu(event,"screens");');
+	$screen_menu->AddOption('title',S_MENU);
+
+	$left_tab->AddRow(create_hat(
+			S_FAVORITE.SPACE.S_SCREENS,
+			make_favorite_screens(),
+			array($screen_menu),
+			'hat_favscr',
+			get_profile('web.dashboard.hats.hat_favscr.state',1)
+		));
+		
+		
 	$sysmap_menu = new CDiv(SPACE,'iconmenu');
 	$sysmap_menu->AddAction('onclick','javascript: create_menu(event,"sysmaps");');
 	$sysmap_menu->AddOption('title',S_MENU);
@@ -257,17 +270,6 @@ include_once "include/page_header.php";
 			get_profile('web.dashboard.hats.hat_favmap.state',1)
 		));
 		
-	$screen_menu = new CDiv(SPACE,'iconmenu');
-	$screen_menu->AddAction('onclick','javascript: create_menu(event,"screens");');
-	$screen_menu->AddOption('title',S_MENU);
-
-	$left_tab->AddRow(create_hat(
-			S_FAVORITE.SPACE.S_SCREENS,
-			make_favorite_screens(),
-			array($screen_menu),
-			'hat_favscr',
-			get_profile('web.dashboard.hats.hat_favscr.state',1)
-		));
 	$left_tab->AddRow(SPACE);
 	
 	$right_tab = new CTable();

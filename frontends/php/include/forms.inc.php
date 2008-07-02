@@ -961,7 +961,9 @@
 	# Insert form for User Groups
 	function insert_usergroups_form(){
 		global  $USER_DETAILS;
-
+		
+		$config = select_config();
+		
 		$frm_title = S_USER_GROUP;
 		if(isset($_REQUEST["usrgrpid"])){
 			$usrgrp		= get_group_by_usrgrpid($_REQUEST["usrgrpid"]);
@@ -1009,8 +1011,8 @@
 		}
 		else{
 			$name	=			get_request('gname','');
-			$users_status = 	get_request('users_status',0);
-			$gui_access = 		get_request('gui_access',0);
+			$users_status = 	get_request('users_status',GROUP_STATUS_ENABLED);
+			$gui_access = 		get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);
 			$group_users	= get_request("group_users",array());
 			$group_rights	= get_request("group_rights",array());
 		}
@@ -1037,8 +1039,7 @@
 		$lstUsers = new CListBox('group_users_to_del[]');
 		$lstUsers->options['style'] = 'width: 280px';
 
-		foreach($group_users as $userid => $alias)
-		{
+		foreach($group_users as $userid => $alias){
 			$lstUsers->AddItem($userid,	$alias);
 		}
 
@@ -1059,8 +1060,12 @@
 
 		if($granted){
 			$cmbGUI = new CComboBox('gui_access',$gui_access);		
-			$cmbGUI->AddItem(GROUP_GUI_ACCESS_ENABLED,S_ENABLED);
-			$cmbGUI->AddItem(GROUP_GUI_ACCESS_DISABLED,S_DISABLED);
+			$cmbGUI->AddItem(GROUP_GUI_ACCESS_SYSTEM,user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM));
+			
+			if(ZBX_AUTH_HTTP != $config['authentication_type'])
+				$cmbGUI->AddItem(GROUP_GUI_ACCESS_INTERNAL,user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL));
+				
+			$cmbGUI->AddItem(GROUP_GUI_ACCESS_DISABLED,user_auth_type2str(GROUP_GUI_ACCESS_DISABLED));
 			
 			$frmUserG->AddRow(S_GUI_ACCESS, $cmbGUI);
 			
@@ -1072,8 +1077,8 @@
 
 		}
 		else{
-			$frmUserG->AddVar('gui_access',GROUP_GUI_ACCESS_ENABLED);
-			$frmUserG->AddRow(S_GUI_ACCESS, new CSpan(S_ENABLED,'green'));
+			$frmUserG->AddVar('gui_access',$gui_access);
+			$frmUserG->AddRow(S_GUI_ACCESS, new CSpan(user_auth_type2str($gui_access),'green'));
 
 			$frmUserG->AddVar('users_status',GROUP_STATUS_ENABLED);
 			$frmUserG->AddRow(S_USERS_STATUS, new CSpan(S_ENABLED,'green'));

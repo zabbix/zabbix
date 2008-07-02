@@ -91,7 +91,7 @@ include_once('include/page_header.php');
 			
 // If we do save and auth_type changed or is set to LDAP, reset all sessions 
 			if($result && (($cur_auth_type<>$config['authentication_type']) || (ZBX_AUTH_LDAP == $config['authentication_type']))){
-				DBexecute('DELETE FROM sessions WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
+				DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
 			}
 			
 			if($result){
@@ -119,28 +119,44 @@ include_once('include/page_header.php');
 	}
 	if(ZBX_AUTH_HTTP==$_REQUEST['config']){
 		if(isset($_REQUEST['save'])){
-		
-			$config=select_config();
-
-			$cur_auth_type = $config['authentication_type'] ;
-			$config['authentication_type'] = ZBX_AUTH_HTTP;
 			
-			foreach($config as $id => $value){
-				if(isset($_REQUEST[$id])){
-					$config[$id] = $_REQUEST[$id];
-				}
-				else{
-					unset($config[$id]);
+			$update = true;
+			if(ZBX_AUTH_HTTP == $_REQUEST['authentication_type']){
+				$sql = 'SELECT COUNT(g.usrgrpid) as cnt_usrgrp FROM usrgrp g WHERE g.gui_access='.GROUP_GUI_ACCESS_INTERNAL;
+				$res = DBfetch(DBselect($sql));
+				if($res['cnt_usrgrp'] > 0){
+					$update = false;
 				}
 			}
-
-// If we do save and auth_type changed or is set to LDAP, reset all sessions 
-			if(($cur_auth_type<>$config['authentication_type']) || (ZBX_AUTH_HTTP == $config['authentication_type'])){
-				DBexecute('DELETE FROM sessions WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
-			}
-			$result=update_config($config);
+			
+			if($update){
+				$config=select_config();
 	
-			show_messages($result, S_HTTP_AUTH.SPACE.S_UPDATED, S_HTTP_AUTH.SPACE.S_WAS_NOT.SPACE.S_UPDATED);
+				$cur_auth_type = $config['authentication_type'] ;
+				$config['authentication_type'] = ZBX_AUTH_HTTP;
+				
+				foreach($config as $id => $value){
+					if(isset($_REQUEST[$id])){
+						$config[$id] = $_REQUEST[$id];
+					}
+					else{
+						unset($config[$id]);
+					}
+				}
+	
+	// If we do save and auth_type changed or is set to LDAP, reset all sessions 
+				if(($cur_auth_type<>$config['authentication_type']) || (ZBX_AUTH_HTTP == $config['authentication_type'])){
+					DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
+				}
+
+				$result=update_config($config);
+			}
+			else{
+				info('Exists ['.$res['usrgrp'].'] groups with ['.S_INTERNAL.'] GUI access.');
+				$result=false;
+			}
+			
+			show_messages($result, S_HTTP_AUTH.SPACE.S_UPDATED, S_CANNOT_UPDATE.SPACE.S_HTTP_AUTH);
 	
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,S_HTTP_AUTH);
@@ -195,7 +211,7 @@ include_once('include/page_header.php');
 		$frmAuth->AddRow(S_BIND_DN.'*', new CTextBox('ldap_bind_dn',$config['ldap_bind_dn'],64));
 		$frmAuth->AddRow(S_BIND_PASSWORD.'*',new CPassBox('ldap_bind_password',$config['ldap_bind_password']));
 
-		$action = "javascript: if(confirm('Switching LDAP authentication will delete all current sessions! Continue?')) return true; else return false;";
+		$action = "javascript: if(confirm('Switching LDAP authentication will reset all current sessions! Continue?')) return true; else return false;";
 		$frmAuth->AddRow(S_LDAP.SPACE.S_AUTHENTICATION.SPACE.S_ENABLED, new CCheckBox('authentication_type', $config['authentication_type'],$action,ZBX_AUTH_LDAP));
 
 		$frmAuth->AddRow(S_TEST.SPACE.S_AUTHENTICATION, ' ['.S_MUST_BE_VALID_SMALL.SPACE.S_LDAP.SPACE.S_USER.']');
@@ -210,7 +226,7 @@ include_once('include/page_header.php');
 	}
 	else if(ZBX_AUTH_HTTP==$_REQUEST['config']){
 		$config=select_config();
-
+/*
 		if(isset($_REQUEST['form_refresh'])){
 			foreach($config as $id => $value){
 				if(isset($_REQUEST[$id])){
@@ -221,7 +237,7 @@ include_once('include/page_header.php');
 				}
 			}
 		}
-
+//*/
 		$form_refresh = get_request('form_refresh',0);
 		$form_refresh++;
 		
@@ -230,7 +246,7 @@ include_once('include/page_header.php');
 		$frmAuth->AddVar('config',get_request('config',ZBX_AUTH_HTTP));
 		$frmAuth->AddVar('form_refresh',$form_refresh);
 
-		$action = "javascript: if(confirm('Switching HTTP authentication will delete all current sessions! Continue?')) return true; else return false;";
+		$action = "javascript: if(confirm('Switching HTTP authentication will reset all current sessions! Continue?')) return true; else return false;";
 		$frmAuth->AddRow(S_HTTP_AUTH.SPACE.S_ENABLED, new CCheckBox('authentication_type', (ZBX_AUTH_HTTP == $config['authentication_type']), $action, ZBX_AUTH_HTTP));
 
 		$frmAuth->AddItemToBottomRow(new CButton('save',S_SAVE));

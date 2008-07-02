@@ -32,7 +32,7 @@
 	define('PAGE_TYPE_HTML_BLOCK',	4);	//simple block of html (as text)
 	
 	define('ZBX_LOGIN_ATTEMPTS', 5);
-	define('ZBX_LOGIN_BLOCK', 30);
+	define('ZBX_LOGIN_BLOCK', 30);	// sec
 	
 	define('ZBX_SESSION_ACTIVE', 0);
 	define('ZBX_SESSION_PASSIVE', 1);
@@ -347,8 +347,11 @@
 	define('GROUP_STATUS_DISABLED', 1);	
 	define('GROUP_STATUS_ENABLED', 0);
 	
-	define('GROUP_GUI_ACCESS_DISABLED', 1);	
-	define('GROUP_GUI_ACCESS_ENABLED', 0);	
+// IMPORTANT!!!    by priority	DESC
+	define('GROUP_GUI_ACCESS_SYSTEM', 	0);
+	define('GROUP_GUI_ACCESS_INTERNAL', 1);
+	define('GROUP_GUI_ACCESS_DISABLED', 2);	
+	
 
 	define('PERM_MAX',		3);
 	define('PERM_READ_WRITE',	3);
