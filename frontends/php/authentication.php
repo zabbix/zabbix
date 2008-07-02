@@ -224,7 +224,7 @@ include_once('include/page_header.php');
 					' ORDER BY alias ASC';
 			$u_res = DBselect($sql);
 			while($db_user = Dbfetch($u_res)){
-				if((check_perm2login($db_user['userid']) && check_perm2system($db_user['userid'])){
+				if(check_perm2login($db_user['userid']) && check_perm2system($db_user['userid'])){
 					$usr_test->AddItem($db_user['alias'],$db_user['alias']);
 				}
 			}
