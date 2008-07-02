@@ -19,8 +19,7 @@
 **/
 ?>
 <?php
-	function	user_type2str($user_type_int)
-	{
+	function user_type2str($user_type_int){
 		$str_user_type[USER_TYPE_ZABBIX_USER]	= S_ZABBIX_USER;
 		$str_user_type[USER_TYPE_ZABBIX_ADMIN]	= S_ZABBIX_ADMIN;
 		$str_user_type[USER_TYPE_SUPER_ADMIN]	= S_SUPER_ADMIN;
@@ -31,19 +30,33 @@
 		return S_UNKNOWN;
 	}
 
-	# Add User definition
+	function user_auth_type2str($auth_type){
+		if(is_null($auth_type)){
+			global $USER_DETAILS;
+			$auth_type = get_user_auth($USER_DETAILS['userid']);
+		}
+		
+		$auth_user_type[GROUP_GUI_ACCESS_SYSTEM]	= S_SYSTEM_DEFAULT;
+		$auth_user_type[GROUP_GUI_ACCESS_INTERNAL]	= S_INTERNAL;
+		$auth_user_type[GROUP_GUI_ACCESS_DISABLED]	= S_DISABLED;
 
-	function	add_user($name,$surname,$alias,$passwd,$url,$autologin,$autologout,$lang,$theme,$refresh,$user_type,$user_groups,$user_medias)
-	{
+		if(isset($auth_user_type[$auth_type]))
+			return $auth_user_type[$auth_type];
+
+	return S_UNKNOWN;
+	}
+	
+
+// Add User definition
+	function add_user($name,$surname,$alias,$passwd,$url,$autologin,$autologout,$lang,$theme,$refresh,$user_type,$user_groups,$user_medias){
 		global $USER_DETAILS;
 
-		if($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN)
-		{
+		if($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN){
 			error("Insufficient permissions");
 			return 0;
 		}
-		if(DBfetch(DBselect("select * from users where alias=".zbx_dbstr($alias)." and ".DBin_node('userid', get_current_nodeid(false)))))
-		{
+		
+		if(DBfetch(DBselect("select * from users where alias=".zbx_dbstr($alias)." and ".DBin_node('userid', get_current_nodeid(false))))){
 			error('User "'.$alias.'" already exists');
 			return 0;
 		}
@@ -54,11 +67,9 @@
 			' values ('.$userid.','.zbx_dbstr($name).','.zbx_dbstr($surname).','.zbx_dbstr($alias).','.
 			zbx_dbstr(md5($passwd)).','.zbx_dbstr($url).','.$autologin.','.$autologout.','.zbx_dbstr($lang).','.zbx_dbstr($theme).','.$refresh.','.$user_type.')');
 		
-		if($result)
-		{
+		if($result){
 			DBexecute('delete from users_groups where userid='.$userid);
-			foreach($user_groups as $groupid => $grou_pname)
-			{
+			foreach($user_groups as $groupid => $grou_pname){
 				$users_groups_id = get_dbid("users_groups","id");
 				$result = DBexecute('insert into users_groups (id,usrgrpid,userid)'.
 					'values('.$users_groups_id.','.$groupid.','.$userid.')');
@@ -386,18 +397,24 @@
 	}
 	
 	
-	function change_group_gui_access($usrgrpid,$gui_access){
+	function change_group_gui_access($usrgrpid,$gui_access){		
 		$res = false;
 
-		$grant = true;
-		if($gui_access == GROUP_GUI_ACCESS_DISABLED) $grant= granted2update_group($usrgrpid);
-		
-		if($grant){
-			$res = DBexecute('UPDATE usrgrp SET gui_access='.$gui_access.' WHERE usrgrpid='.$usrgrpid);
-		}
-		else{
+		if(($gui_access == GROUP_GUI_ACCESS_DISABLED) && !granted2update_group($usrgrpid)){
 			error(S_USER_CANNOT_CHANGE_GUI_ACCESS);
+			return false;
 		}
+				
+		if(GROUP_GUI_ACCESS_INTERNAL == $gui_access){
+			$config = select_config();
+		 	if(ZBX_AUTH_HTTP == $config['authentication_type']){
+				error(S_CANNOT_SET.' ['.S_INTERNAL.'] '.S_GROUP.' '.S_GUI_ACCESS);
+				return false;
+			}
+		}
+		
+		$res = DBexecute('UPDATE usrgrp SET gui_access='.$gui_access.' WHERE usrgrpid='.$usrgrpid);
+		
 	return $res;
 	}
 	

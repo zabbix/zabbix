@@ -170,10 +170,10 @@
 
 //	admin.php
 	'S_PREVIOUS'=>				'<< Previous',
-	'S_NEXT'=>				'Next >>',
-	'S_RETRY'=>				'Retry',
+	'S_NEXT'=>					'Next >>',
+	'S_RETRY'=>					'Retry',
 	'S_FINISH'=>				'Finish',
-	'S_FAIL'=>				'Fail',
+	'S_FAIL'=>					'Fail',
 	'S_UPDATE_BIG'=>			'UPDATE',
 	'S_INSTALLATION'=>			'Installation',
 	'S_NEW_INSTALLATION'=>			'New installation',
@@ -1428,6 +1428,9 @@
 	'S_CANNOT_UPDATE_PROXY'=>		'Cannot update proxy',
 	'S_PROXY_DELETED'=>			'Proxy deleted',
 	'S_CANNOT_DELETE_PROXY'=>		'Cannot delete proxy',
+	'S_GUI_ACCESS_UPDATED'=>		'GUI access updated',
+	'S_CANNOT_UPDATE_GUI_ACCESS'=>		'Cannot update GUI access',
+	'S_CANNOT_SET'=>					'Cannot set',
 	'S_USER_CANNOT_DISABLE_ITSELF'=>	'User cannot disable itself',
 	'S_USER_CANNOT_CHANGE_STATUS'=>		'User cannot change status to itself',
 	'S_USER_CANNOT_CHANGE_GUI_ACCESS'=>		'User cannot change GUI access to itself',
@@ -1472,6 +1475,7 @@
 	'S_ADD_TO'=>						'Add to',
 	'S_REMOVE_FROM'=>					'Remove from',
 	'S_STATUS_DISABLED'=>				'Status disabled',
+	'S_INTERNAL'=>						'Internal',
 
 //scripts.php
 	'S_SCRIPTS'=>				'Scripts',
