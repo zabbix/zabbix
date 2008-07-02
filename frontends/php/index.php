@@ -56,7 +56,9 @@
 	}
 
 	$config = select_config();
-	if($config['authentication_type'] == ZBX_AUTH_HTTP){
+	$authentication_type = $config['authentication_type'];
+	
+	if($authentication_type == ZBX_AUTH_HTTP){
 		
 		if(isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])){
 			if(!isset($sessionid)) $_REQUEST['enter'] = 'Enter';
@@ -90,7 +92,17 @@
 				sleep(ZBX_LOGIN_BLOCK);
 			}
 			
-			switch($config['authentication_type']){
+			switch(get_user_auth($login['userid'])){
+				case GROUP_GUI_ACCESS_INTERNAL:
+					$authentication_type = ZBX_AUTH_INTERNAL;
+					break;
+				case GROUP_GUI_ACCESS_SYSTEM:
+				case GROUP_GUI_ACCESS_DISABLED:
+				default:
+					break;
+			}
+			
+			switch($authentication_type){
 				case ZBX_AUTH_LDAP:
 					$login = ldap_authentication($name,get_request('password',''));
 					break;
@@ -108,12 +120,12 @@
 			$login = $row = DBfetch(DBselect('SELECT u.userid,u.alias,u.name,u.surname,u.url,u.refresh,u.passwd '.
 						' FROM users u, users_groups ug, usrgrp g '.
  						' WHERE u.alias='.zbx_dbstr($name).
-							((ZBX_AUTH_INTERNAL==$config['authentication_type'])?' AND u.passwd='.zbx_dbstr($password):'').
+							((ZBX_AUTH_INTERNAL==$authentication_type)?' AND u.passwd='.zbx_dbstr($password):'').
 							' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
 		}
 		
 /* update internal pass if it's different
-		if($login && ($row['passwd']!=$password) && (ZBX_AUTH_INTERNAL!=$config['authentication_type'])){
+		if($login && ($row['passwd']!=$password) && (ZBX_AUTH_INTERNAL!=$authentication_type)){
 			DBexecute('UPDATE users SET passwd='.zbx_dbstr($password).' WHERE userid='.zbx_dbstr($row['userid']));
 		}
 */		
@@ -163,7 +175,7 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST['message'])) show_error_message($_REQUEST['message']);
 
 	if(!isset($sessionid)){
-		switch($config['authentication_type']){
+		switch($authentication_type){
 			case ZBX_AUTH_HTTP:
 				break;
 			case ZBX_AUTH_LDAP:

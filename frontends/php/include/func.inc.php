@@ -225,6 +225,7 @@ function zbx_rksort(&$array, $flags=NULL){
 /************* ZBX MISC *************/
 function zbx_numeric($value){
 	if(is_array($value)) return false;
+	if(zbx_empty($value)) return false;
 	
 	$value = strval($value);
 return ctype_digit($value);

@@ -173,7 +173,7 @@ function  check_perm2system($userid){
 		' WHERE ug.userid = '.zbx_dbstr($userid).
 			' AND g.usrgrpid = ug.usrgrpid '.
 			' AND g.users_status = '.GROUP_STATUS_DISABLED;
-	$res = DBFetch(DBSelect($sql));
+	$res = DBfetch(DBSelect($sql));
 
 return ($res['grp_count'] == 0)?true:false;
 }
@@ -189,15 +189,34 @@ return ($res['grp_count'] == 0)?true:false;
  * Author: Aly
  */
 
-function  check_perm2login($userid){
-	$sql = 'SELECT COUNT(g.usrgrpid) as grp_count '.
-		' FROM usrgrp g, users_groups ug '.
-		' WHERE ug.userid = '.zbx_dbstr($userid).
-			' AND g.usrgrpid = ug.usrgrpid '.
-			' AND g.gui_access = '.GROUP_GUI_ACCESS_DISABLED;
-	$res = DBFetch(DBSelect($sql));
+function check_perm2login($userid){
+	$res = get_user_auth($userid);
 
-return ($res['grp_count'] == 0)?true:false;
+return (GROUP_GUI_ACCESS_DISABLED == $res)?false:true;
+}
+
+/* Function: get_user_auth()
+ *
+ * Description:
+ * 		Returns user authentication type
+ * 
+ * Comments:
+ *		default is SYSTEM auth
+ *	
+ * Author: Aly
+ */
+function get_user_auth($userid){
+	$result = GROUP_GUI_ACCESS_SYSTEM;
+	
+	$sql = 'SELECT MAX(g.gui_access) as gui_access '.
+		' FROM usrgrp g, users_groups ug '.
+		' WHERE ug.userid='.zbx_dbstr($userid).
+			' AND g.usrgrpid=ug.usrgrpid ';
+	$acc = DBfetch(DBselect($sql));
+
+	if(!zbx_empty($acc['gui_access'])) $result=$acc['gui_access'];
+	
+return $result;
 }
 
 /***********************************************
