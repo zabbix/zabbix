@@ -54,7 +54,7 @@
 		die();
 //		return;
 	}
-
+	
 	$config = select_config();
 	$authentication_type = $config['authentication_type'];
 	
@@ -72,10 +72,12 @@
 	}
 	
 	if(isset($_REQUEST['enter'])&&($_REQUEST['enter']=='Enter')){
-	
-		$name = get_request('name','');
-		$password = md5(get_request('password',''));
 		
+		$name = get_request('name','');
+		$passwd = get_request('password','');
+		
+		$password = md5($passwd);
+
 		$sql = 'SELECT u.userid,u.attempt_failed, u.attempt_clock, u.attempt_ip '.
 				' FROM users u '.
 				' WHERE u.alias='.zbx_dbstr($name);
@@ -86,6 +88,10 @@
 //									' AND ('.time().'-attempt_clock)>'.ZBX_LOGIN_BLOCK.'))';
 					
 		$login = $attempt = DBfetch(DBselect($sql));
+		
+		if(($name!=ZBX_GUEST_USER) && zbx_empty($passwd)){
+			$login = $attempt = false;
+		}		
 		
 		if($login){
 			if($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS){
