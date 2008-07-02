@@ -215,8 +215,27 @@ include_once('include/page_header.php');
 		$frmAuth->AddRow(S_LDAP.SPACE.S_AUTHENTICATION.SPACE.S_ENABLED, new CCheckBox('authentication_type', $config['authentication_type'],$action,ZBX_AUTH_LDAP));
 
 		$frmAuth->AddRow(S_TEST.SPACE.S_AUTHENTICATION, ' ['.S_MUST_BE_VALID_SMALL.SPACE.S_LDAP.SPACE.S_USER.']');
-		$frmAuth->AddRow(S_LOGIN , new CTextBox('user',$USER_DETAILS['alias'],null,'yes'));
+		
+		if(GROUP_GUI_ACCESS_INTERNAL == get_user_auth($USER_DETAILS['userid'])){
+			$usr_test = new CComboBox('user', $USER_DETAILS['alias']);
+			$sql = 'SELECT u.alias, u.userid '.
+					' FROM users u '.
+					' WHERE '.DBin_node('u.userid').
+					' ORDER BY alias ASC';
+			$u_res = DBselect($sql);
+			while($db_user = Dbfetch($u_res)){
+				if((check_perm2login($db_user['userid']) && check_perm2system($db_user['userid'])){
+					$usr_test->AddItem($db_user['alias'],$db_user['alias']);
+				}
+			}
+		}
+		else{
+			$usr_test = new CTextBox('user',$USER_DETAILS['alias'],null,'yes');
+		}
+		
+		$frmAuth->AddRow(S_LOGIN , $usr_test);
 		$frmAuth->AddRow(S_USER.SPACE.S_PASSWORD,new CPassBox('user_password'));
+
 //		$frmAuth->AddRow( ,new CTextBox('',$config['']));
 //		$frmAuth->AddRow( ,new CTextBox('',$config['']));
 
