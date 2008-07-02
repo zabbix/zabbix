@@ -219,6 +219,35 @@ function get_user_auth($userid){
 return $result;
 }
 
+/* Function: get_user_system_auth()
+ *
+ * Description:
+ * 		Returns overal user authentication type in system
+ * 
+ * Comments:
+ *		default is INTERNAL auth
+ *	
+ * Author: Aly
+ */
+function get_user_system_auth($userid){
+	$result = ZBX_AUTH_INTERNAL;
+	
+	$user_auth = get_user_auth($userid);
+	
+	switch($user_auth){
+		case GROUP_GUI_ACCESS_SYSTEM:
+			$config = select_config();
+			$result = $config['authentication_type'];
+			break;
+		case GROUP_GUI_ACCESS_INTERNAL:
+		case GROUP_GUI_ACCESS_DISABLED:
+		default:
+			break;
+	}
+	
+return $result;
+}
+
 /***********************************************
 	GET ACCESSIBLE RESOURCES BY USERID
 ************************************************/
