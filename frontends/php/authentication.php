@@ -152,7 +152,7 @@ include_once('include/page_header.php');
 				$result=update_config($config);
 			}
 			else{
-				info('Exists ['.$res['usrgrp'].'] groups with ['.S_INTERNAL.'] GUI access.');
+				info('Exists ['.$res['cnt_usrgrp'].'] groups with ['.S_INTERNAL.'] GUI access.');
 				$result=false;
 			}
 			
