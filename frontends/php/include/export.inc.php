@@ -461,7 +461,7 @@
 			zbx_xmlwriter_start_element ($memory,XML_TAG_ZABBIX_EXPORT);
 			zbx_xmlwriter_write_attribute($memory, 'version', '1.0');
 			zbx_xmlwriter_write_attribute($memory, 'date', date('d.m.y'));
-			zbx_xmlwriter_write_attribute($memory, 'time', date('h.i'));
+			zbx_xmlwriter_write_attribute($memory, 'time', date('H.i'));
 			
 				zbx_xmlwriter_start_element ($memory,XML_TAG_HOSTS);
 				foreach($hosts as $hostid => $val){

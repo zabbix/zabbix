@@ -59,7 +59,7 @@ include_once 'include/page_header.php';
 <?php
 
 	if(isset($_REQUEST['favobj'])){
-		if(in_array($_REQUEST['favobj'],array('itemid','graphid'))){
+		if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);

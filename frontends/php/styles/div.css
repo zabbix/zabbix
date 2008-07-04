@@ -133,6 +133,29 @@ div.filteropened:hover{
 	cursor:pointer;
 }
 
+div.iconsound{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/sound.png');
+	background-repeat:no-repeat;
+}
+
+div.iconsound:hover{
+	cursor:pointer;
+}
+
+div.iconmute{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/mute.png');
+	background-repeat:no-repeat;
+}
+
+div.iconmute:hover{
+	cursor:pointer;
+}
+
+
 span.footer_sign{
 	padding-right: 5px;
 	padding-left: 5px;
