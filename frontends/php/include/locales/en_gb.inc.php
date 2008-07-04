@@ -1367,6 +1367,8 @@
 	'S_ADD'=>				'Add',
 
 //	tr_status.php
+	'S_SOUND'=>						'Sound',
+	'S_MUTE'=>						'Mute',
 	'S_STATUS_OF_TRIGGERS'=>		'Status of triggers',
 	'S_STATUS_OF_TRIGGERS_BIG'=>	'STATUS OF TRIGGERS',
 	'S_SHOW_ONLY_TRUE'=>			'Show only true',

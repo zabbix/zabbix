@@ -30,6 +30,8 @@
 	$page["title"] = "S_STATUS_OF_TRIGGERS";
 	$page['scripts'] = array('blink.js');
 	$page['hist_arg'] = array('groupid','hostid','compact','onlytrue','noactions','select');
+	
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 ?>
 <?php
@@ -93,10 +95,26 @@ include_once "include/page_header.php";
 		'select'=>			array(T_ZBX_STR, O_OPT,  	null,	IN('"true","false"'), 	null),
 		'txt_select'=>		array(T_ZBX_STR, O_OPT,  	null,	null, null),
 		'fullscreen'=>		array(T_ZBX_INT, O_OPT,		P_SYS,	IN('0,1'),				null),
-		'btnSelect'=>		array(T_ZBX_STR, O_OPT,  	null,  	null, 					null)
+		'btnSelect'=>		array(T_ZBX_STR, O_OPT,  	null,  	null, 					null),
+		
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+
 	);
 
 	check_fields($fields);
+	
+	if(isset($_REQUEST['favobj'])){
+		if(str_in_array($_REQUEST['favobj'],array('sound'))){
+			update_profile('web.tr_status.mute',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
+	}	
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+	
 	validate_sort_and_sortorder('t.lastchange',ZBX_SORT_DOWN);
 
 	$_REQUEST['show_triggers']	=	get_request('show_triggers', get_profile('web.tr_status.show_triggers', TRIGGERS_OPTION_ONLYTRUE));
@@ -127,8 +145,10 @@ include_once "include/page_header.php";
 	update_profile('web.tr_status.compact',$_REQUEST['compact'], PROFILE_TYPE_STR);
 	
 	$config=select_config();
-	
-	if(isset($audio)){
+
+	$mute = get_profile('web.tr_status.mute',0);	
+
+	if(isset($audio) && !$mute){
 		play_sound($audio);
 	}
 ?>                                                                                                             
@@ -241,9 +261,13 @@ include_once "include/page_header.php";
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+
+	$mute_icon = new CDiv(SPACE,$mute?'iconmute':'iconsound');
+	$mute_icon->AddOption('title',S_SOUND.' '.S_ON.'/'.S_OFF);
+	$mute_icon->AddAction('onclick',new CScript("javascript: switch_mute(this);"));
 	
 	$icon_tab = new CTable();
-	$icon_tab->AddRow(array($fs_icon,SPACE,$text));
+	$icon_tab->AddRow(array($fs_icon,$mute_icon,SPACE,$text));
 	
 	$text = $icon_tab;
 

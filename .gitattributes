@@ -66,8 +66,12 @@ frontends/php/images/general/bttn/menu.png -text
 frontends/php/images/general/bttn/menu_bb.png -text
 frontends/php/images/general/bttn/minus.png -text
 frontends/php/images/general/bttn/minus_bb.png -text
+frontends/php/images/general/bttn/mute.png -text
+frontends/php/images/general/bttn/mute_bb.png -text
 frontends/php/images/general/bttn/plus.png -text
 frontends/php/images/general/bttn/plus_bb.png -text
+frontends/php/images/general/bttn/sound.png -text
+frontends/php/images/general/bttn/sound_bb.png -text
 frontends/php/images/general/chart.png -text
 frontends/php/images/general/closed.gif -text svneol=unset#unset
 frontends/php/images/general/error_small.gif -text
