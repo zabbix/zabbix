@@ -419,11 +419,13 @@ include_once "include/page_header.php";
 							NULL,true),
 						$screens)*/
 					));
-				$table->SetFooter(new CCol(array(
-					new CButton('preview', S_PREVIEW),
-					new CButton('export', S_EXPORT)
-					)));
 			}
+			
+			$table->SetFooter(new CCol(array(
+				new CButton('preview', S_PREVIEW),
+				new CButton('export', S_EXPORT)
+				)));
+
 			$form->AddItem($table);
 			$form->Show();
 		}

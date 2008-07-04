@@ -298,6 +298,14 @@ div.iconhelp{
 	background-image: url('../images/general/bttn/help_bb.png');
 }
 
+div.iconsound{
+	background-image: url('../images/general/bttn/sound_bb.png');
+}
+
+div.iconmute{
+	background-image: url('../images/general/bttn/mute_bb.png');
+}
+
 div#scrolltableft{
 	color: #0CF;
 }

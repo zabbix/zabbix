@@ -1,5 +1,6 @@
 Changes for 1.5.4
- 
+
+ - [DEV-188] implemented sound on/off button in status of triggers screens (Artem) 
  - [DEV-184] added trigger dependencies in export/import (Artem)
  - [DEV-150] added error reporting for zabbix_get (Sasha)
  - [DEV-177] added checkbox range selection (Artem)
