@@ -173,7 +173,7 @@ COpt::counter_up('perm');
 			$where.
 			' group by h.hostid,n.nodeid,n.name,h.host,ug.userid '.
 			' order by n.name,n.nodeid, h.host, permission '.$sortorder.', userid '.$sortorder;
-//SDI($sql);
+
 		$db_hosts = DBselect($sql);
 
 		$processed = array();
@@ -183,7 +183,7 @@ COpt::counter_up('perm');
 
 			/* if no rights defined used node rights */
 			if( (is_null($host_data['permission']) || is_null($host_data['userid'])) ){
-				if( isset($processed[$host_data['hostid']]) || is_null($host_data['userid']))
+				if(($user_type != USER_TYPE_SUPER_ADMIN) && (isset($processed[$host_data['hostid']]) || is_null($host_data['userid'])))
 					continue;
 
 				if(!isset($nodes)){

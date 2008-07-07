@@ -658,7 +658,7 @@ require_once "include/httptest.inc.php";
 				$with_node = " and ".DBin_node('g.groupid', get_current_nodeid(!$only_current_node));
 
 				if(!DBfetch(DBselect("select distinct g.groupid from groups g, hosts_groups hg, hosts h".$item_table.
-					" where hg.groupid=g.groupid and h.hostid=hg.hostid and h.hostid in (".$accessed_hosts.") ".
+					" where hg.groupid=g.groupid and h.hostid=hg.hostid and h.hostid in (".$available_hosts.") ".
 					" and g.groupid=".$groupid.$with_host_status.$with_items.$with_node)))
 				{
 					$groupid = 0;
@@ -696,7 +696,7 @@ require_once "include/httptest.inc.php";
 //SDI('C: '.$a_groupid.' : '.$a_hostid);
 
 				if($db_host = DBfetch(DBselect("select distinct h.hostid,h.host from hosts h ".$item_table.$group_table.
-					" where h.hostid in (".$accessed_hosts.") "
+					" where h.hostid in (".$available_hosts.") "
 					.$with_host_status.$with_items.$witth_group.$with_node.
 					" order by h.host")))
 				{
@@ -709,7 +709,7 @@ require_once "include/httptest.inc.php";
 				{
 					if(!DBfetch(DBselect("select distinct h.hostid from hosts h".$item_table.
 						" where h.hostid=".$hostid.$with_host_status.$with_items.$with_node.
-						" and h.hostid in (".$accessed_hosts.") ")))
+						" and h.hostid in (".$available_hosts.") ")))
 					{
 							$hostid = 0;
 					}
