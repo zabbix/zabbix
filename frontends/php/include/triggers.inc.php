@@ -1278,7 +1278,7 @@
 				' values('.$eventid.','.EVENT_SOURCE_TRIGGERS.','.EVENT_OBJECT_TRIGGER.','.$triggerid.','.$time.','.$value.')');
 		if($value == TRIGGER_VALUE_FALSE || $value == TRIGGER_VALUE_TRUE)
 		{
-			DBexesute('update alerts set retries=3,error=\'Trigger changed its status. WIll not send repeats.\''.
+			DBexecute('update alerts set retries=3,error=\'Trigger changed its status. WIll not send repeats.\''.
 				' where triggerid='.$triggerid.' and repeats>0 and status='.ALERT_STATUS_NOT_SENT);
 		}
 		return true;

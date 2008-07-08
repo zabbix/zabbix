@@ -1,5 +1,6 @@
 Changes for 1.4.6:
 
+ - [ZBX-167] fixed typo in triggers update function (Artem)
  - [ZBX-272] fixed default link to local interface in *BSD for net.if* items (Sasha)
  - [ZBX-386] fixed possible agent crash in processing of active checks (Sasha)
  - [ZBX-379] added error checking for accept on server side (Sasha) 
