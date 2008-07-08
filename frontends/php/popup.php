@@ -109,8 +109,7 @@
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'nodes':
-			if(ZBX_DISTRIBUTED)
-			{
+			if(ZBX_DISTRIBUTED){
 				$page["title"] = "S_NODES_BIG";
 				$min_user_type = USER_TYPE_ZABBIX_USER;
 				break;
@@ -445,8 +444,7 @@ include_once "include/page_header.php";
 		}
 		else if(isset($_REQUEST['select'])){
 			$new_templates = array_diff($templates, $existed_templates);
-			if(count($new_templates) > 0) 
-			{
+			if(count($new_templates) > 0) {
 				foreach($new_templates as $id => $name)
 				{
 ?>
@@ -702,7 +700,7 @@ include_once "include/page_header.php";
 			' ORDER BY h.host,t.description';
 
 		$result=DBselect($sql);
-		while($row=DBfetch($result)){
+		while($row=DBfetch($result)){			
 			$exp_desc = expand_trigger_description_by_data($row);
 			$description = new CLink($exp_desc,"#","action");
 			
@@ -718,8 +716,7 @@ include_once "include/page_header.php";
 			
 			$description->SetAction($action." close_window(); return false;");
 			
-			if($row['dep_count'] > 0)
-			{
+			if($row['dep_count'] > 0){
 				$description = array(
 					$description,
 					BR(),BR(),
@@ -732,16 +729,13 @@ include_once "include/page_header.php";
 					$description[] = array(expand_trigger_description($val),BR());
 			}
 
-			if($row["status"] == TRIGGER_STATUS_DISABLED)
-			{
+			if($row["status"] == TRIGGER_STATUS_DISABLED){
 				$status= new CSpan(S_DISABLED, 'disabled');
 			}
-			else if($row["status"] == TRIGGER_STATUS_UNKNOWN)
-			{
+			else if($row["status"] == TRIGGER_STATUS_UNKNOWN){
 				$status= new CSpan(S_UNKNOWN, 'unknown');
 			}
-			else if($row["status"] == TRIGGER_STATUS_ENABLED)
-			{
+			else if($row["status"] == TRIGGER_STATUS_ENABLED){
 				$status= new CSpan(S_ENABLED, 'enabled');
 			}
 

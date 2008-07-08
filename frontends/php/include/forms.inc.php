@@ -133,8 +133,7 @@
 		}
 		
 		$form->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST['slideshowid']))
-		{
+		if(isset($_REQUEST['slideshowid'])){
 			$form->AddItemToBottomRow(SPACE);
 			$form->AddItemToBottomRow(new CButton('clone',S_CLONE));
 			$form->AddItemToBottomRow(SPACE);
@@ -147,14 +146,12 @@
                 $form->Show();
 	}
 
-	function	insert_drule_form()
-	{
-		global $_REQUEST;
+	function insert_drule_form(){
+
 
 		$frm_title = S_DISCOVERY_RULE;
 			
-		if(isset($_REQUEST['druleid']))
-		{
+		if(isset($_REQUEST['druleid'])){
 			if( ($rule_data = DBfetch(DBselect("SELECT * FROM drules WHERE druleid=".$_REQUEST["druleid"]))))
 				$frm_title = S_DISCOVERY_RULE." \"".$rule_data["name"]."\"";
 		}
@@ -162,13 +159,11 @@
 		$form = new CFormTable($frm_title, null, 'post');
 		$form->SetHelp("web.discovery.rule.php");
 
-		if(isset($_REQUEST['druleid']))
-		{
+		if(isset($_REQUEST['druleid'])){
 			$form->AddVar('druleid', $_REQUEST['druleid']);
 		}
 		
-		if(isset($_REQUEST['druleid']) && $rule_data && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"])))
-		{
+		if(isset($_REQUEST['druleid']) && $rule_data && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"]))){
 			$proxy_hostid	= $rule_data['proxy_hostid'];
 			$name		= $rule_data['name'];
 			$iprange	= $rule_data['iprange'];
@@ -184,8 +179,7 @@
 						'key' => $check_data['key_'], 'snmp_community' => $check_data['snmp_community']);
 			}
 		}
-		else
-		{
+		else{
 			$proxy_hostid	= get_request("proxy_hostid",0);
 			$name		= get_request('name','');
 			$iprange	= get_request('iprange','192.168.0.1-255');
@@ -216,8 +210,7 @@
 
 		$form->AddVar('dchecks', $dchecks);
 
-		foreach($dchecks as $id => $data)
-		{
+		foreach($dchecks as $id => $data){
 			switch($data['type'])
 			{
 				case SVC_SNMPv1:
@@ -240,8 +233,7 @@
 			);
 		}
 
-		if(count($dchecks))
-		{
+		if(count($dchecks)){
 			$dchecks[] = new CButton('delete_ckecks', S_DELETE_SELECTED);
 			$form->AddRow(S_CHECKS, $dchecks);
 		}
@@ -252,13 +244,11 @@
 		foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_ICMPPING) as $type_int)
 			$cmbChkType->AddItem($type_int, discovery_check_type2str($type_int));
 
-		if(isset($_REQUEST['type_changed']))
-		{
+		if(isset($_REQUEST['type_changed'])){
 			$new_check_ports = svc_default_port($new_check_type);
 		}
 		$external_param = array();
-		switch($new_check_type)
-		{
+		switch($new_check_type){
 			case SVC_SNMPv1:
 			case SVC_SNMPv2:
 				$external_param = array_merge($external_param, array(BR(), S_SNMP_COMMUNITY, SPACE, new CTextBox('new_check_snmp_community', $new_check_snmp_community)));
@@ -290,8 +280,7 @@
 		$form->AddRow(S_STATUS,$cmbStatus);
 
 		$form->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["druleid"]))
-		{
+		if(isset($_REQUEST["druleid"])){
 			$form->AddItemToBottomRow(SPACE);
 			$form->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$form->AddItemToBottomRow(SPACE);
@@ -337,7 +326,7 @@
 	
 	function	insert_httptest_form()
 	{
-		global $_REQUEST;
+
 
 		$form = new CFormTable(S_SCENARIO, null, 'post');
 		$form->SetHelp("web.webmon.httpconf.php");
@@ -347,8 +336,7 @@
 			
 		$form->AddVar("hostid",$_REQUEST["hostid"]);
 			
-		if(isset($_REQUEST["httptestid"]))
-		{
+		if(isset($_REQUEST["httptestid"])){
 			$form->AddVar("httptestid",$_REQUEST["httptestid"]);
 		}
 
@@ -360,8 +348,7 @@
 		$macros		= get_request('macros', array());
 		$steps		= get_request('steps', array());
 		
-		if((isset($_REQUEST["httptestid"]) && !isset($_REQUEST["form_refresh"])) || isset($limited))
-		{
+		if((isset($_REQUEST["httptestid"]) && !isset($_REQUEST["form_refresh"])) || isset($limited)){
 			$httptest_data = DBfetch(DBselect("SELECT wt.*, a.name as application ".
 				" FROM httptest wt,applications a WHERE wt.httptestid=".$_REQUEST["httptestid"].
 				" AND a.applicationid=wt.applicationid"));
@@ -420,13 +407,11 @@
 
 		$tblSteps = new CTableInfo();
 		$tblSteps->SetHeader(array(S_NAME,S_TIMEOUT,S_URL,S_REQUIRED,S_STATUS,SPACE));
-		if(count($steps) > 0)
-		{
+		if(count($steps) > 0){
 			$first = min(array_keys($steps));
 			$last = max(array_keys($steps));
 		}
-		foreach($steps as $sid => $s)
-		{
+		foreach($steps as $sid => $s){
 			if(!isset($s['name']))		$s['name'] = '';
 			if(!isset($s['timeout']))	$s['timeout'] = 15;
 			if(!isset($s['url']))       	$s['url'] = '';
@@ -485,8 +470,7 @@
 			));
 		
 		$form->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["httptestid"]))
-		{
+		if(isset($_REQUEST["httptestid"])){
 			$form->AddItemToBottomRow(SPACE);
 			$form->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$form->AddItemToBottomRow(SPACE);
@@ -528,14 +512,13 @@
 	
 	function	insert_node_form()
 	{
-		global $_REQUEST;
+
 
 		global $ZBX_CURMASTERID;
 		
 		$frm_title = S_NODE;
 			
-		if(isset($_REQUEST['nodeid']))
-		{
+		if(isset($_REQUEST['nodeid'])){
 			$node_data = get_node_by_nodeid($_REQUEST['nodeid']);
 
 			$node_type = detect_node_type($node_data);
@@ -548,13 +531,11 @@
 		$frmNode= new CFormTable($frm_title);
 		$frmNode->SetHelp("node.php");
 
-		if(isset($_REQUEST['nodeid']))
-		{
+		if(isset($_REQUEST['nodeid'])){
 			$frmNode->AddVar('nodeid', $_REQUEST['nodeid']);
 		}
 		
-		if(isset($_REQUEST['nodeid']) && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"])))
-		{
+		if(isset($_REQUEST['nodeid']) && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"]))){
 			$new_nodeid	= $node_data['nodeid'];
 			$name		= $node_data['name'];
 			$timezone	= $node_data['timezone'];
@@ -563,8 +544,7 @@
 			$slave_history	= $node_data['slave_history'];
 			$slave_trends	= $node_data['slave_trends'];
 		}
-		else
-		{
+		else{
 			$new_nodeid	= get_request('new_nodeid',0);
 			$name 		= get_request('name','');
 			$timezone 	= get_request('timezone', 0);
@@ -583,8 +563,7 @@
 
 		$frmNode->AddRow(S_ID, new CNumericBox('new_nodeid', $new_nodeid, 10));
 
-		if(!isset($_REQUEST['nodeid']))
-		{
+		if(!isset($_REQUEST['nodeid'])){
 			$cmbNodeType = new CComboBox('node_type', $node_type, 'submit()');
 			$cmbNodeType->AddItem(ZBX_NODE_REMOTE, S_REMOTE);
 			if($ZBX_CURMASTERID == 0)
@@ -592,20 +571,17 @@
 				$cmbNodeType->AddItem(ZBX_NODE_MASTER, S_MASTER);
 			}
 		}
-		else
-		{
+		else{
 			$cmbNodeType = new CTextBox('node_type_name', node_type2str($node_type), null, 'yes');
 		}
 		$frmNode->AddRow(S_TYPE, 	$cmbNodeType);
 
-		if($node_type == ZBX_NODE_REMOTE)
-		{
+		if($node_type == ZBX_NODE_REMOTE){
 			$frmNode->AddRow(S_MASTER_NODE, new CTextBox('master_name',	$master_node['name'], 40, 'yes'));
 		}
 
 		$cmbTimeZone = new CComboBox('timezone', $timezone);
-		for($i = -12; $i <= 13; $i++)
-		{
+		for($i = -12; $i <= 13; $i++){
 			$cmbTimeZone->AddItem($i, "GMT".sprintf("%+03d:00", $i));
 		}
 		$frmNode->AddRow(S_TIME_ZONE, $cmbTimeZone);
@@ -616,8 +592,7 @@
 
 		
 		$frmNode->AddItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($_REQUEST['nodeid']) && $node_type != ZBX_NODE_LOCAL)
-		{
+		if(isset($_REQUEST['nodeid']) && $node_type != ZBX_NODE_LOCAL){
 			$frmNode->AddItemToBottomRow(SPACE);
 			$frmNode->AddItemToBottomRow(new CButtonDelete("Delete selected node?",
 				url_param("form").url_param("nodeid")));
@@ -630,7 +605,7 @@
 	function insert_new_message_form($events,$bulk)
 	{
 		global $USER_DETAILS;
-		global $_REQUEST;
+
 	
 		if($bulk){
 			$title = S_ACKNOWLEDGE_ALARM_BY;
@@ -945,8 +920,7 @@
 		}
 
 		$frmUser->AddItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($userid) && $profile == 0)
-		{
+		if(isset($userid) && $profile == 0){
 			$frmUser->AddItemToBottomRow(SPACE);
 			$delete_b = new CButtonDelete("Delete selected user?",url_param("form").url_param("config").url_param("userid"));
 			if(bccomp($USER_DETAILS['userid'],$userid) == 0){
@@ -1127,14 +1101,12 @@
 			);
 		$frmUserG->AddSpanRow($resources_list,'right_header');
 
-		if($perm_details)
-		{
+		if($perm_details){
 			$frmUserG->AddSpanRow(get_rights_of_elements_table($group_rights));
 		}
 
 		$frmUserG->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["usrgrpid"]))
-		{
+		if(isset($_REQUEST["usrgrpid"])){
 			$frmUserG->AddItemToBottomRow(SPACE);
 			$frmUserG->AddItemToBottomRow(new CButtonDelete("Delete selected group?",
 				url_param("form").url_param("config").url_param("usrgrpid")));
@@ -1466,8 +1438,7 @@
 			$host = $host_info["host"];
 		}
 
-		if(isset($_REQUEST["itemid"]))
-		{
+		if(isset($_REQUEST["itemid"])){
 			$frmItem->AddVar("itemid",$_REQUEST["itemid"]);
 
 			$item_data = DBfetch(DBselect("SELECT i.*, h.host, h.hostid".
@@ -1477,8 +1448,7 @@
 			$limited = ($item_data['templateid'] == 0  && $item_data['type'] != ITEM_TYPE_HTTPTEST) ? null : 'yes';
 		}
 
-		if((isset($_REQUEST["itemid"]) && !isset($_REQUEST["form_refresh"])) || isset($limited))
-		{
+		if((isset($_REQUEST["itemid"]) && !isset($_REQUEST["form_refresh"])) || isset($limited)){
 			$description	= $item_data["description"];
 			$key		= $item_data["key_"];
 			$host		= $item_data["host"];
@@ -1529,8 +1499,7 @@
 
 		$delay_flex_el = array();
 
-		if($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_HTTPTEST)
-		{
+		if($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_HTTPTEST){
 			$i = 0;
 			foreach($delay_flex as $val)
 			{
@@ -1569,13 +1538,11 @@
 
 		$frmItem->AddRow(S_DESCRIPTION, new CTextBox("description",$description,40, $limited));
 
-		if(isset($limited))
-		{
+		if(isset($limited)){
 			$frmItem->AddRow(S_TYPE,  new CTextBox("typename", item_type2str($type), 40, 'yes'));
 			$frmItem->AddVar('type', $type);
 		}
-		else
-		{
+		else{
 			$cmbType = new CComboBox("type",$type,"submit()");
 			foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3,ITEM_TYPE_TRAPPER,
@@ -1584,8 +1551,7 @@
 			$frmItem->AddRow(S_TYPE, $cmbType);
 		}
 
-		if(($type==ITEM_TYPE_SNMPV1)||($type==ITEM_TYPE_SNMPV2C))
-		{ 
+		if(($type==ITEM_TYPE_SNMPV1)||($type==ITEM_TYPE_SNMPV2C)){ 
 			$frmItem->AddVar("snmpv3_securityname",$snmpv3_securityname);
 			$frmItem->AddVar("snmpv3_securitylevel",$snmpv3_securitylevel);
 			$frmItem->AddVar("snmpv3_authpassphrase",$snmpv3_authpassphrase);
@@ -1595,8 +1561,7 @@
 			$frmItem->AddRow(S_SNMP_OID, new CTextBox("snmp_oid",$snmp_oid,40,$limited));
 			$frmItem->AddRow(S_SNMP_PORT, new CNumericBox("snmp_port",$snmp_port,5,$limited));
 		}
-		else if($type==ITEM_TYPE_SNMPV3)
-		{
+		else if($type==ITEM_TYPE_SNMPV3){
 			$frmItem->AddVar("snmp_community",$snmp_community);
 
 			$frmItem->AddRow(S_SNMP_OID, new CTextBox("snmp_oid",$snmp_oid,40,$limited));
@@ -1632,8 +1597,7 @@
 
 			$frmItem->AddRow(S_SNMP_PORT, new CNumericBox("snmp_port",$snmp_port,5,$limited));
 		}
-		else
-		{
+		else{
 			$frmItem->AddVar("snmp_community",$snmp_community);
 			$frmItem->AddVar("snmp_oid",$snmp_oid);
 			$frmItem->AddVar("snmp_port",$snmp_port);
@@ -1643,12 +1607,10 @@
 			$frmItem->AddVar("snmpv3_privpassphrase",$snmpv3_privpassphrase);
 		}
 
-		if(isset($limited))
-		{
+		if(isset($limited)){
 			$btnSelect = null;
 		}
-		else
-		{
+		else{
 			$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmItem->GetName().
 				"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype=".$type."');",
@@ -1657,22 +1619,18 @@
 		
 		$frmItem->AddRow(S_KEY, array(new CTextBox("key",$key,40,$limited), $btnSelect));
 
-		if( ITEM_TYPE_DB_MONITOR == $type )
-		{
+		if( ITEM_TYPE_DB_MONITOR == $type ){
 			$frmItem->AddRow(S_PARAMS, new CTextArea("params",$params,60,4));
 		}
-		else
-		{
+		else{
 			$frmItem->AddVar("params",$params);
 		}
 
-		if(isset($limited))
-		{
+		if(isset($limited)){
 			$frmItem->AddVar("value_type", $value_type);
 			$cmbValType = new CTextBox('value_type_name', item_value_type2str($value_type), 40, 'yes');
 		}
-		else
-		{
+		else{
 			$cmbValType = new CComboBox("value_type",$value_type,"submit()");
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UINT64);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
@@ -1682,8 +1640,7 @@
 		}
 		$frmItem->AddRow(S_TYPE_OF_INFORMATION,$cmbValType);
 		
-		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64))
-		{
+		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64)){
 			$frmItem->AddRow(S_UNITS, new CTextBox("units",$units,40, $limited));
 
 			if(isset($limited))
@@ -1700,23 +1657,19 @@
 			$frmItem->AddRow(S_USE_MULTIPLIER, $cmbMultipler);
 			
 		}
-		else
-		{
+		else{
 			$frmItem->AddVar("units",$units);
 			$frmItem->AddVar("multiplier",$multiplier);
 		}
 
 		if( !is_numeric($formula)) $formula = 1;
-		if($multiplier == 1)
-		{
+		if($multiplier == 1){
 			$frmItem->AddRow(S_CUSTOM_MULTIPLIER, new CTextBox("formula",$formula,40,$limited));
 		}
-		else
-		{
+		else{
 			$frmItem->AddVar("formula",$formula);
 		}
-		if($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_HTTPTEST)
-		{
+		if($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_HTTPTEST){
 			$frmItem->AddRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));
 			$frmItem->AddRow(S_FLEXIBLE_INTERVALS, $delay_flex_el);
 			$frmItem->AddRow(S_NEW_FLEXIBLE_INTERVAL, 
@@ -1728,8 +1681,7 @@
 					new CButton("add_delay_flex",S_ADD)
 				),'new');
 		}
-		else
-		{
+		else{
 			$frmItem->AddVar("delay",$delay);
 			$frmItem->AddVar("delay_flex",null);
 		}
@@ -1746,30 +1698,25 @@
 			$cmbStatus->AddItem($st,item_status2str($st));
 		$frmItem->AddRow(S_STATUS,$cmbStatus);
 
-		if($value_type==ITEM_VALUE_TYPE_LOG)
-		{
+		if($value_type==ITEM_VALUE_TYPE_LOG){
 			$frmItem->AddRow(S_LOG_TIME_FORMAT, new CTextBox("logtimefmt",$logtimefmt,16,$limited));
 		}
-		else
-		{
+		else{
 			$frmItem->AddVar("logtimefmt",$logtimefmt);
 		}
 
-		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64))
-		{
+		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64)){
 			$cmbDelta= new CComboBox("delta",$delta);
 			$cmbDelta->AddItem(0,S_AS_IS);
 			$cmbDelta->AddItem(1,S_DELTA_SPEED_PER_SECOND);
 			$cmbDelta->AddItem(2,S_DELTA_SIMPLE_CHANGE);
 			$frmItem->AddRow(S_STORE_VALUE,$cmbDelta);
 		}
-		else
-		{
+		else{
 			$frmItem->AddVar("delta",0);
 		}
 		
-		if(($value_type==ITEM_VALUE_TYPE_UINT64) || ($value_type == ITEM_VALUE_TYPE_STR))
-		{
+		if(($value_type==ITEM_VALUE_TYPE_UINT64) || ($value_type == ITEM_VALUE_TYPE_STR)){
 			if(isset($limited) && $type != ITEM_TYPE_HTTPTEST)
 			{
 				$frmItem->AddVar("valuemapid", $valuemapid);
@@ -1797,29 +1744,24 @@
 			$frmItem->AddRow(array(S_SHOW_VALUE.SPACE,$link),$cmbMap);
 			
 		}
-		else
-		{
+		else{
 			$frmItem->AddVar("valuemapid",0);
 		}
 
-		if($type==ITEM_TYPE_TRAPPER)
-		{
+		if($type==ITEM_TYPE_TRAPPER){
 			$frmItem->AddRow(S_ALLOWED_HOSTS, new CTextBox("trapper_hosts",$trapper_hosts,40,$limited));
 		}
-		else
-		{
+		else{
 			$frmItem->AddVar("trapper_hosts",$trapper_hosts);
 		}
 
-		if($type==ITEM_TYPE_HTTPTEST)
-		{
+		if($type==ITEM_TYPE_HTTPTEST){
 			$app_names = get_applications_by_itemid($_REQUEST["itemid"], 'name');
 			$frmItem->AddRow(S_APPLICATIONS, new CTextBox("application_name",
 				isset($app_names[0]) ? $app_names[0] : '', 20, $limited));
 			$frmItem->AddVar("applications",$applications,6);
 		}
-		else
-		{
+		else{
 			$cmbApps = new CListBox("applications[]",$applications,6);
 			$cmbApps->AddItem(0,"-".S_NONE."-");
 			$db_applications = DBselect("SELECT DISTINCT applicationid,name FROM applications".
@@ -1832,8 +1774,7 @@
 		}
 
 		$frmRow = array(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["itemid"]))
-		{
+		if(isset($_REQUEST["itemid"])){
 			array_push($frmRow,
 				SPACE,
 				new CButton("clone",S_CLONE));
@@ -1870,8 +1811,7 @@
 
 		$cmbAction = new CComboBox("action");
 		$cmbAction->AddItem("add to group",S_ADD_TO_GROUP);
-		if(isset($_REQUEST["itemid"]))
-		{
+		if(isset($_REQUEST["itemid"])){
 			$cmbAction->AddItem("update in group",S_UPDATE_IN_GROUP);
 			$cmbAction->AddItem("delete FROM group",S_DELETE_FROM_GROUP);
 		}
@@ -1930,8 +1870,7 @@
 		$delay_flex_el = array();
 
 		$i = 0;
-		foreach($delay_flex as $val)
-		{
+		foreach($delay_flex as $val){
 			if(!isset($val["delay"]) && !isset($val["period"])) continue;
 
 			array_push($delay_flex_el,
@@ -2066,8 +2005,7 @@
 		$cmbApps->AddItem(0,"-".S_NONE."-");
 		$db_applications = DBselect("SELECT DISTINCT applicationid,name FROM applications".
 			" WHERE hostid=".$_REQUEST["hostid"]." order by name");
-		while($db_app = DBfetch($db_applications))
-		{
+		while($db_app = DBfetch($db_applications)){
 			$cmbApps->AddItem($db_app["applicationid"],$db_app["name"]);
 		}
 		$frmItem->AddRow(array( new CVisibilityBox('applications_visible', get_request('applications_visible'), 'applications[]',
@@ -2088,8 +2026,7 @@
 		$group_itemid = get_request($elements_array_name, array());
 		$copy_targetid = get_request("copy_targetid", array());
 
-		if(!is_array($group_itemid) || (is_array($group_itemid) && count($group_itemid) < 1))
-		{
+		if(!is_array($group_itemid) || (is_array($group_itemid) && count($group_itemid) < 1)){
 			error("Incorrect list of items.");
 			return;
 		}
@@ -2107,8 +2044,7 @@
 			' FROM groups g, hosts_groups hg'.
 			' WHERE hg.groupid=g.groupid';
 
-		if(0 == $copy_type)
-		{
+		if(0 == $copy_type){
 			$cmbGroup = new CComboBox('filter_groupid',$filter_groupid,'submit()');
 			$cmbGroup->AddItem(0,S_ALL_SMALL);
 			$groups = DBselect($target_sql);
@@ -2127,8 +2063,7 @@
 
 		$db_targets = DBselect($target_sql.' order by target_name');
 		$target_list = array();
-		while($target = DBfetch($db_targets))
-		{
+		while($target = DBfetch($db_targets)){
 			array_push($target_list,array(
 				new CCheckBox('copy_targetid[]',
 					uint_in_array($target['target_id'], $copy_targetid), 
@@ -2155,34 +2090,93 @@
 		$frmCopy->Show();
 	}
 
+// TRIGGERS
+	function insert_mass_update_trigger_form(){//$elements_array_name){
+		global $USER_DETAILS;
+SDI($_REQUEST);
+		$visible = get_request('visible',array());
 
-	function	insert_login_form(){
-// author: 	Aly
-// description:
-//			konqueror bug #138024; adding useless param(login=1) to the form's action path to avoid bug!!
 
-		$frmLogin = new CFormTable('Login','index.php?login=1',"post","multipart/form-data");
-		$frmLogin->SetHelp('web.index.login');
-		$frmLogin->AddRow('Login name', new CTextBox('name'));
-		$frmLogin->AddRow('Password', new CPassBox('password'));
-		$frmLogin->AddItemToBottomRow(new CButton('enter','Enter'));
-		$frmLogin->Show(false);
+		$priority 		= get_request('priority',	'');
+		$dependencies	= get_request('dependencies',array());
 
-		SetFocus($frmLogin->GetName(),"name");
+		$frm_title	= S_TRIGGERS_MASSUPDATE;
+
+		$original_templates = array();
+
+		asort($dependencies);
+
+		$frmMTrig = new CFormTable($frm_title,'triggers.php');
+		$frmMTrig->AddVar('massupdate',get_request('massupdate',1));
 		
-		$frmLogin->Destroy();
+		$triggers = $_REQUEST['g_triggerid'];
+		foreach($triggers as $id => $triggerid){
+			$frmMTrig->AddVar('g_triggerid['.$triggerid.']',$triggerid);
+		}
+
+		$cmbPrior = new CComboBox("priority",$priority);
+		for($i = 0; $i <= 5; $i++){
+			$cmbPrior->AddItem($i,get_severity_description($i));
+		}
+		$frmMTrig->AddRow(array(new CVisibilityBox('visible[priority]', isset($visible['priority']), 'priority', S_ORIGINAL), S_SEVERITY),
+						$cmbPrior
+					);
+
+/* fependencies */
+		$dep_el = array();
+		foreach($dependencies as $val){
+			array_push($dep_el,
+				array(
+					new CCheckBox("rem_dependence[]", 'no', null, strval($val)),
+					expand_trigger_description($val)
+				),
+				BR());
+			$frmMTrig->AddVar("dependencies[]",strval($val));
+		}
+
+		if(count($dep_el)==0)
+			$dep_el[] = S_NO_DEPENDENCES_DEFINED;
+		else
+			$dep_el[] = new CButton('del_dependence','delete selected');
+			
+//		$frmMTrig->AddRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
+/* end dependencies */
+/* new dependence */
+		$frmMTrig->AddVar('new_dependence','0');
+
+		$txtCondVal = new CTextBox('trigger','',75,'yes');		
+		
+		$btnSelect = new CButton('btn1', S_SELECT,
+				"return PopUp('popup.php?dstfrm=".S_TRIGGERS_MASSUPDATE.
+				"&dstfld1=new_dependence&dstfld2=trigger&srctbl=triggers".
+				"&srcfld1=triggerid&srcfld2=description',600,450);",
+				'T');
+		
+		array_push($dep_el, array(br(),$txtCondVal,$btnSelect,br(),new CButton("add_dependence",S_ADD)));
+		
+		$dep_div = new CDiv($dep_el);
+		$dep_div->AddOption('id','dependency_box');
+		
+		$frmMTrig->AddRow(array(new CVisibilityBox('visible[dependencies]', isset($visible['dependencies']), 'dependency_box', S_ORIGINAL),S_TRIGGER_DEPENDENCIES), 	
+							$dep_div
+						);
+/* end new dependence */
+							
+	
+		$frmMTrig->AddItemToBottomRow(new CButton('mass_save',S_SAVE));
+		$frmMTrig->AddItemToBottomRow(SPACE);
+		$frmMTrig->AddItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
+		$frmMTrig->Show();
 	}
-
+	
 // Insert form for Trigger
-	function	insert_trigger_form()
-	{
-		global $_REQUEST;
-
+	function insert_trigger_form(){
+		global $USER_DETAILS;
+		
 		$frmTrig = new CFormTable(S_TRIGGER,"triggers.php");
 		$frmTrig->SetHelp("config_triggers.php");
 
-		if(isset($_REQUEST["hostid"]))
-		{
+		if(isset($_REQUEST["hostid"])){
 			$frmTrig->AddVar("hostid",$_REQUEST["hostid"]);
 		}
 
@@ -2191,8 +2185,7 @@
 	
 		$limited = null;
 		
-		if(isset($_REQUEST["triggerid"]))
-		{
+		if(isset($_REQUEST["triggerid"])){
 			$frmTrig->AddVar("triggerid",$_REQUEST["triggerid"]);
 			$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
 
@@ -2201,21 +2194,19 @@
 			$limited = $trigger['templateid'] ? 'yes' : null;
 		}
 
-		$expression	= get_request("expression"	,"");
+		$expression		= get_request("expression"	,"");
 		$description	= get_request("description"	,"");
-		$type = get_request('type', 0);
-		$priority	= get_request("priority"	,0);
-		$status		= get_request("status"		,0);
-		$comments	= get_request("comments"	,"");
-		$url		= get_request("url"		,"");
+		$type 			= get_request('type', 0);
+		$priority		= get_request("priority"	,0);
+		$status			= get_request("status"		,0);
+		$comments		= get_request("comments"	,"");
+		$url			= get_request("url"		,"");
 
-		if((isset($_REQUEST["triggerid"]) && !isset($_REQUEST["form_refresh"]))  || isset($limited))
-		{
+		if((isset($_REQUEST["triggerid"]) && !isset($_REQUEST["form_refresh"]))  || isset($limited)){
 			$description	= $trigger["description"];
 			$expression	= explode_exp($trigger["expression"],0);
 
-			if(!isset($limited) || !isset($_REQUEST["form_refresh"]))
-			{
+			if(!isset($limited) || !isset($_REQUEST["form_refresh"])){
 				$type = $trigger['type'];
 				$priority	= $trigger["priority"];
 				$status		= $trigger["status"];
@@ -2233,7 +2224,7 @@
 				}
 			}
 		}
-
+		
 		$frmTrig->AddRow(S_NAME, new CTextBox("description",$description,90, $limited));
 		$frmTrig->AddRow(S_EXPRESSION, array(
 				new CTextBox("expression",$expression,75, $limited),
@@ -2242,7 +2233,6 @@
 					"&dstfld1=expression&srctbl=expression".
 					"&srcfld1=expression&expression=' + escape(GetSelectedText(this.form.elements['expression'])),700,200);"))
 			));
-
 	/* dependencies */
 		foreach($dependencies as $val){
 			array_push($dep_el,
@@ -2261,7 +2251,6 @@
 		$frmTrig->AddRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
 	/* end dependencies */
 
-		global $USER_DETAILS;
 	/* new dependence */
 		$frmTrig->AddVar('new_dependence','0');
 
@@ -2272,6 +2261,7 @@
 				"&dstfld1=new_dependence&dstfld2=trigger&srctbl=triggers".
 				"&srcfld1=triggerid&srcfld2=description',600,450);",
 				'T');
+		
 		
 		$frmTrig->AddRow(S_NEW_DEPENDENCY,array($txtCondVal, 
 			$btnSelect, BR(),
@@ -2340,8 +2330,7 @@
 
 		$items = get_request('items', array());
 
-		if(isset($_REQUEST["graphid"]))
-		{
+		if(isset($_REQUEST["graphid"])){
 			$frmGraph->AddVar("graphid",$_REQUEST["graphid"]);
 
 			$result=DBselect("SELECT * FROM graphs WHERE graphid=".$_REQUEST["graphid"]);
@@ -2349,8 +2338,7 @@
 			$frmGraph->SetTitle(S_GRAPH." \"".$row["name"]."\"");
 		}
 
-		if(isset($_REQUEST['graphid']) && !isset($_REQUEST['form_refresh']))
-		{
+		if(isset($_REQUEST['graphid']) && !isset($_REQUEST['form_refresh'])){
 			$name		=$row['name'];
 			$width		=$row['width'];
 			$height		=$row['height'];
@@ -2415,8 +2403,7 @@
 		$_REQUEST['graph3d']	= $graph3d;
 		/********************/
 
-		if($graphtype != GRAPH_TYPE_NORMAL)
-		{
+		if($graphtype != GRAPH_TYPE_NORMAL){
 			foreach($items as $gid => $gitem)
 			{
 				if($gitem['type'] != GRAPH_ITEM_AGGREGATED) continue;
@@ -2532,8 +2519,7 @@
 			}
 			$dedlete_button = new CButton('delete_item', S_DELETE_SELECTED);
 		}
-		else
-		{
+		else{
 			$items_table = $dedlete_button = null;
 		}
 		$frmGraph->AddRow(S_ITEMS,
@@ -2550,8 +2536,7 @@
 		unset($items_table, $dedlete_button);
 
 		$frmGraph->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["graphid"]))
-		{
+		if(isset($_REQUEST["graphid"])){
 			$frmGraph->AddItemToBottomRow(SPACE);
 			$frmGraph->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmGraph->AddItemToBottomRow(SPACE);
@@ -2566,7 +2551,7 @@
 
 	function	insert_graphitem_form()
 	{
-		global $_REQUEST;
+
 
 		$frmGItem = new CFormTable(S_NEW_ITEM_FOR_THE_GRAPH);
 		$frmGItem->SetName('graph_item');
@@ -2590,8 +2575,7 @@
 		$monitored_hosts = get_request('monitored_hosts', null);
 
 		$description = '';
-		if($itemid > 0)
-		{
+		if($itemid > 0){
 			$description = DBfetch(DBselect("select * FROM items WHERE itemid=".$itemid));
 			$description = item_description($description['description'],$description['key_']);
 		}
@@ -2606,12 +2590,10 @@
 		$txtCondVal = new CTextBox('description',$description,50,'yes');
 
 		$host_condition = "";
-		if(isset($only_hostid))
-		{// graph for template must use only one host
+		if(isset($only_hostid)){// graph for template must use only one host
 			$host_condition = "&only_hostid=".$only_hostid;
 		}
-		else if(isset($monitored_hosts))
-		{
+		else if(isset($monitored_hosts)){
 			$host_condition = "&monitored_hosts=1";
 		}
 
@@ -2707,14 +2689,13 @@
 
 	function	insert_value_mapping_form()
 	{
-		global $_REQUEST;
+
 
 		$frmValmap = new CFormTable(S_VALUE_MAP);
 		$frmValmap->SetHelp("web.mapping.php");
 		$frmValmap->AddVar("config",get_request("config",6));
 
-		if(isset($_REQUEST["valuemapid"]))
-		{
+		if(isset($_REQUEST["valuemapid"])){
 			$frmValmap->AddVar("valuemapid",$_REQUEST["valuemapid"]);
 			$db_valuemaps = DBselect("select * FROM valuemaps".
 				" WHERE valuemapid=".$_REQUEST["valuemapid"]);
@@ -2724,8 +2705,7 @@
 			$frmValmap->SetTitle(S_VALUE_MAP." \"".$db_valuemap["name"]."\"");
 		}
 
-		if(isset($_REQUEST["valuemapid"]) && !isset($_REQUEST["form_refresh"]))
-		{
+		if(isset($_REQUEST["valuemapid"]) && !isset($_REQUEST["form_refresh"])){
 			$valuemap = array();
 			$mapname = $db_valuemap["name"];
 			$mappings = DBselect("select * FROM mappings WHERE valuemapid=".$_REQUEST["valuemapid"]);
@@ -2738,8 +2718,7 @@
 				array_push($valuemap, $value);
 			}				
 		}
-		else
-		{
+		else{
 			$mapname = get_request("mapname","");
 			$valuemap = get_request("valuemap",array());
 		}
@@ -2748,8 +2727,7 @@
 
 		$i = 0;
 		$valuemap_el = array();
-		foreach($valuemap as $value)
-		{
+		foreach($valuemap as $value){
 			array_push($valuemap_el,
 				array(
 					new CCheckBox("rem_value[]", 'no', null, $i),
@@ -3793,8 +3771,7 @@
 		$cmbType->AddItem(MEDIA_TYPE_EXEC,S_SCRIPT);
 		$frmMeadia->AddRow(S_TYPE,$cmbType);
 
-		switch($type)
-		{
+		switch($type){
 		case MEDIA_TYPE_EMAIL:
 			$frmMeadia->AddRow(S_SMTP_SERVER,new CTextBox("smtp_server",$smtp_server,30));
 			$frmMeadia->AddRow(S_SMTP_HELO,new CTextBox("smtp_helo",$smtp_helo,30));
@@ -3812,8 +3789,7 @@
 		}
 
 		$frmMeadia->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["mediatypeid"]))
-		{
+		if(isset($_REQUEST["mediatypeid"])){
 			$frmMeadia->AddItemToBottomRow(SPACE);
 			$frmMeadia->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA,
 				url_param("form").url_param("mediatypeid")));
@@ -3825,14 +3801,13 @@
 
 	function	insert_image_form()
 	{
-		global $_REQUEST;
+
 
 		$frmImages = new CFormTable(S_IMAGE,"config.php","post","multipart/form-data");
 		$frmImages->SetHelp("web.config.images.php");
 		$frmImages->AddVar("config",get_request("config",3));
 
-		if(isset($_REQUEST["imageid"]))
-		{
+		if(isset($_REQUEST["imageid"])){
 			$result=DBselect("select imageid,imagetype,name FROM images".
 				" WHERE imageid=".$_REQUEST["imageid"]);
 
@@ -3841,14 +3816,12 @@
 			$frmImages->AddVar("imageid",$_REQUEST["imageid"]);
 		}
 
-		if(isset($_REQUEST["imageid"]) && !isset($_REQUEST["form_refresh"]))
-		{
+		if(isset($_REQUEST["imageid"]) && !isset($_REQUEST["form_refresh"])){
 			$name		= $row["name"];
 			$imagetype	= $row["imagetype"];
 			$imageid	= $row["imageid"];
 		}
-		else
-		{
+		else{
 			$name		= get_request("name","");
 			$imagetype	= get_request("imagetype",1);
 			$imageid	= get_request("imageid",0);
@@ -3863,16 +3836,14 @@
 
 		$frmImages->AddRow(S_UPLOAD,new CFile("image"));
 
-		if($imageid > 0)
-		{
+		if($imageid > 0){
 			$frmImages->AddRow(S_IMAGE,new CLink(
 				new CImg("image.php?width=640&height=480&imageid=".$imageid,"no image",null),
 				"image.php?imageid=".$row["imageid"]));
 		}
 
 		$frmImages->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["imageid"]))
-		{
+		if(isset($_REQUEST["imageid"])){
 			$frmImages->AddItemToBottomRow(SPACE);
 			$frmImages->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_IMAGE,
 				url_param("form").url_param("config").url_param("imageid")));
@@ -3884,24 +3855,21 @@
 
 	function insert_screen_form()
 	{
-		global $_REQUEST;
+
 
 		$frm_title = S_SCREEN;
-		if(isset($_REQUEST["screenid"]))
-		{
+		if(isset($_REQUEST["screenid"])){
 			$result=DBselect("select screenid,name,hsize,vsize FROM screens g".
 				" WHERE screenid=".$_REQUEST["screenid"]);
 			$row=DBfetch($result);
 			$frm_title = S_SCREEN." \"".$row["name"]."\"";
 		}
-		if(isset($_REQUEST["screenid"]) && !isset($_REQUEST["form_refresh"]))
-		{
+		if(isset($_REQUEST["screenid"]) && !isset($_REQUEST["form_refresh"])){
 			$name=$row["name"];
 			$hsize=$row["hsize"];
 			$vsize=$row["vsize"];
 		}
-		else
-		{
+		else{
 			$name=get_request("name","");
 			$hsize=get_request("hsize",1);
 			$vsize=get_request("bsize",1);
@@ -3911,8 +3879,7 @@
 
 		$frmScr->AddVar('config', 0);
 
-		if(isset($_REQUEST["screenid"]))
-		{
+		if(isset($_REQUEST["screenid"])){
 			$frmScr->AddVar("screenid",$_REQUEST["screenid"]);
 		}
 		$frmScr->AddRow(S_NAME, new CTextBox("name",$name,32));
@@ -3920,8 +3887,7 @@
 		$frmScr->AddRow(S_ROWS, new CNumericBox("vsize",$vsize,3));
 
 		$frmScr->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["screenid"]))
-		{
+		if(isset($_REQUEST["screenid"])){
 			/* $frmScr->AddItemToBottomRow(SPACE);
 			$frmScr->AddItemToBottomRow(new CButton('clone',S_CLONE)); !!! TODO */
 			$frmScr->AddItemToBottomRow(SPACE);
@@ -4035,8 +4001,7 @@
 			$form->AddRow(S_GRAPH_NAME,array($textfield,SPACE,$selectbtn));
 			
 		}
-		elseif($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH)
-		{
+		else if($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH){
 	// Simple graph
 			$caption = '';
 			$id=0;
@@ -4068,8 +4033,7 @@
 			
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 		}
-		elseif($resourcetype == SCREEN_RESOURCE_MAP)
-		{
+		else if($resourcetype == SCREEN_RESOURCE_MAP){
 	// Map
 			$caption = '';
 			$id=0;
@@ -4131,19 +4095,17 @@
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 			$form->AddRow(S_SHOW_LINES, new CNumericBox('elements',$elements,2));
 		}
-		elseif($resourcetype == SCREEN_RESOURCE_ACTIONS)
-		{
+		else if($resourcetype == SCREEN_RESOURCE_ACTIONS){
 // History of actions
 				$form->AddRow(S_SHOW_LINES, new CNumericBox('elements',$elements,2));
 	$form->AddVar('resourceid',0);
 		}
-		elseif($resourcetype == SCREEN_RESOURCE_EVENTS)
-		{
+		else if($resourcetype == SCREEN_RESOURCE_EVENTS){
 // History of events
 				$form->AddRow(S_SHOW_LINES, new CNumericBox('elements',$elements,2));
 				$form->AddVar('resourceid',0);
 		}
-		elseif(uint_in_array($resourcetype,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW))){
+		else if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW))){
 // Overiews
 			$caption = '';
 			$id=0;
@@ -4174,7 +4136,7 @@
 			
 			$form->AddRow(S_GROUP,array($textfield,SPACE,$selectbtn));
 		}
-		elseif($resourcetype == SCREEN_RESOURCE_SCREEN){
+		else if($resourcetype == SCREEN_RESOURCE_SCREEN){
 // Screens
 			$caption = '';
 			$id=0;
@@ -4246,63 +4208,53 @@
 			$form->AddVar("resourceid",0);
 		}
 
-		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_HOSTS_INFO,SCREEN_RESOURCE_TRIGGERS_INFO)))
-		{
+		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_HOSTS_INFO,SCREEN_RESOURCE_TRIGGERS_INFO))){
 			$cmbStyle = new CComboBox("style", $style);
 			$cmbStyle->AddItem(STYLE_HORISONTAL,	S_HORISONTAL);
 			$cmbStyle->AddItem(STYLE_VERTICAL,	S_VERTICAL);
 			$form->AddRow(S_STYLE,	$cmbStyle);
 		}
-		else if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW)))
-		{
+		else if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW))){
 			$cmbStyle = new CComboBox('style', $style);
 			$cmbStyle->AddItem(STYLE_LEFT,	S_LEFT);
 			$cmbStyle->AddItem(STYLE_TOP,	S_TOP);
 			$form->AddRow(S_HOSTS_LOCATION,	$cmbStyle);
 		}
-		else if($resourcetype == SCREEN_RESOURCE_CLOCK)
-		{
+		else if($resourcetype == SCREEN_RESOURCE_CLOCK){
 			$cmbStyle = new CComboBox("style", $style);
 			$cmbStyle->AddItem(TIME_TYPE_LOCAL,	S_LOCAL_TIME);
 			$cmbStyle->AddItem(TIME_TYPE_SERVER,	S_SERVER_TIME);
 			$form->AddRow(S_TIME_TYPE,	$cmbStyle);
 		}
-		else
-		{
+		else{
 			$form->AddVar("style",	0);
 		}
 
-		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_URL)))
-		{
+		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_URL))){
 			$form->AddRow(S_URL, new CTextBox("url",$url,60));
 		}
-		else
-		{
+		else{
 			$form->AddVar("url",	"");
 		}
 
-		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL)))
-		{
+		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL))){
 			$form->AddRow(S_WIDTH,	new CNumericBox("width",$width,5));
 			$form->AddRow(S_HEIGHT,	new CNumericBox("height",$height,5));
 		}
-		else
-		{
+		else{
 			$form->AddVar("width",	0);
 			$form->AddVar("height",	0);
 		}
 
 		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_MAP,
-			SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL)))
-		{
+			SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL))){
 			$cmbHalign = new CComboBox("halign",$halign);
 			$cmbHalign->AddItem(HALIGN_CENTER,	S_CENTER);
 			$cmbHalign->AddItem(HALIGN_LEFT,	S_LEFT);
 			$cmbHalign->AddItem(HALIGN_RIGHT,	S_RIGHT);
 			$form->AddRow(S_HORISONTAL_ALIGN,	$cmbHalign);
 		}
-		else
-		{
+		else{
 			$form->AddVar("halign",	0);
 		}
 
@@ -4429,7 +4381,8 @@
 		$frmHouseKeep->AddItemToBottomRow(new CButton('save',S_SAVE));
 		$frmHouseKeep->Show();
 	}
-	
+
+
 // HOSTS
 	function insert_mass_update_host_form(){//$elements_array_name){
 		global $USER_DETAILS;
@@ -4509,7 +4462,9 @@
 					);
 
 // onchange does not work on some browsers: MacOS, KDE browser
-		$frmHost->AddRow(array(new CVisibilityBox('visible[dns]', isset($visible['dns']), 'dns', S_ORIGINAL),S_DNS_NAME),new CTextBox('dns',$dns,'40'));
+		$frmHost->AddRow(array(new CVisibilityBox('visible[dns]', isset($visible['dns']), 'dns', S_ORIGINAL),S_DNS_NAME),
+						new CTextBox('dns',$dns,'40')
+					);
 		
 		$frmHost->AddRow(array(new CVisibilityBox('visible[ip]', isset($visible['ip']), 'ip', S_ORIGINAL),S_IP_ADDRESS),
 						new CTextBox('ip',$ip,defined('ZBX_HAVE_IPV6')?39:15)
@@ -4531,12 +4486,18 @@
 		$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 
 		$cmbProxy->AddItem(0, S_NO_PROXY);
-		$db_proxies = DBselect('SELECT hostid,host FROM hosts'.
-				' where status in ('.HOST_STATUS_PROXY.') and '.DBin_node('hostid'));
+		
+		$sql = 'SELECT hostid,host '.
+				' FROM hosts '.
+				' WHERE status IN ('.HOST_STATUS_PROXY.') '.
+					' AND '.DBin_node('hostid');
+		$db_proxies = DBselect($sql);
 		while ($db_proxy = DBfetch($db_proxies))
 			$cmbProxy->AddItem($db_proxy['hostid'], $db_proxy['host']);
 
-		$frmHost->AddRow(array(new CVisibilityBox('visible[proxy_hostid]', isset($visible['proxy_hostid']), 'proxy_hostid', S_ORIGINAL),S_MONITORED_BY_PROXY),
+		$frmHost->AddRow(array(
+						new CVisibilityBox('visible[proxy_hostid]', isset($visible['proxy_hostid']), 'proxy_hostid', S_ORIGINAL),
+						S_MONITORED_BY_PROXY),
 						$cmbProxy
 					);
 //----------
@@ -4612,6 +4573,7 @@
 		$frmHost->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param("groupid")));
 		$frmHost->Show();
 	}
+
 
 	function insert_host_form($show_only_tmp=0){
 		global $USER_DETAILS;
@@ -4756,8 +4718,7 @@
 			$frmHost->AddVar('port',$port);
 			$frmHost->AddVar('status',$status);
 		}
-		else
-		{
+		else{
 			$frmHost->AddRow(S_PORT,new CNumericBox('port',$port,5));	
 
 //Proxy
@@ -4782,8 +4743,7 @@
 		$template_table->SetCellPadding(0);
 		$template_table->SetCellSpacing(0);
 
-		foreach($templates as $id => $temp_name)
-		{
+		foreach($templates as $id => $temp_name){
 			$frmHost->AddVar('templates['.$id.']',$temp_name);
 			$template_table->AddRow(array(
 					$temp_name,
@@ -4801,17 +4761,14 @@
 					'T')
 				));
 	
-		if($show_only_tmp)
-		{
+		if($show_only_tmp){
 			$useprofile = "no";
 			$frmHost->AddVar("useprofile",$useprofile);
 		}
-		else
-		{
+		else{
 			$frmHost->AddRow(S_USE_PROFILE,new CCheckBox("useprofile",$useprofile,"submit()"));
 		}
-		if($useprofile=="yes")
-		{
+		if($useprofile=="yes"){
 			$frmHost->AddRow(S_DEVICE_TYPE,new CTextBox("devicetype",$devicetype,61));
 			$frmHost->AddRow(S_NAME,new CTextBox("name",$name,61));
 			$frmHost->AddRow(S_OS,new CTextBox("os",$os,61));
@@ -4824,8 +4781,7 @@
 			$frmHost->AddRow(S_LOCATION,new CTextArea("location",$location,60,4));
 			$frmHost->AddRow(S_NOTES,new CTextArea("notes",$notes,60,4));
 		}
-		else
-		{
+		else{
 			$frmHost->AddVar("devicetype",	$devicetype);
 			$frmHost->AddVar("name",	$name);
 			$frmHost->AddVar("os",		$os);
@@ -4840,8 +4796,7 @@
 		}
 
 		$frmHost->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["hostid"]))
-		{
+		if(isset($_REQUEST["hostid"])){
 			$frmHost->AddItemToBottomRow(SPACE);
 			$frmHost->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmHost->AddItemToBottomRow(SPACE);
@@ -4871,7 +4826,7 @@
 	}
 
 	# Insert form for Host Groups
-	function	insert_hostgroups_form(){
+	function insert_hostgroups_form(){
 		global	$USER_DETAILS;
 
 		$hosts = get_request("hosts",array());
@@ -4924,8 +4879,7 @@
 		$frmHostG->AddRow(S_HOSTS,$cmbHosts->Get(S_HOSTS.SPACE.S_IN,S_OTHER.SPACE.S_HOSTS));
 
 		$frmHostG->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["groupid"]))
-		{
+		if(isset($_REQUEST["groupid"])){
 			$frmHostG->AddItemToBottomRow(SPACE);
 			$frmHostG->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmHostG->AddItemToBottomRow(SPACE);
@@ -5147,8 +5101,8 @@
 
 		$frmApp->AddVar("apphostid",$apphostid);
 
-		if(!isset($_REQUEST["applicationid"]))
-		{ // anly new application can SELECT host
+		if(!isset($_REQUEST["applicationid"])){ 
+// anly new application can SELECT host
 			$frmApp->AddRow(S_HOST,array(
 				new CTextBox("apphost",$apphost,32,'yes'),
 				new CButton("btn1",S_SELECT,
@@ -5159,13 +5113,13 @@
 		}
 
 		$frmApp->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["applicationid"]))
-		{
+		if(isset($_REQUEST["applicationid"])){
 			$frmApp->AddItemToBottomRow(SPACE);
 			$frmApp->AddItemToBottomRow(new CButtonDelete("Delete this application?",
 					url_param("config").url_param("hostid").url_param("groupid").
 					url_param("form").url_param("applicationid")));
 		}
+		
 		$frmApp->AddItemToBottomRow(SPACE);
 		$frmApp->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param("hostid").url_param("groupid")));
 
@@ -5173,20 +5127,16 @@
 
 	}
 
-	function insert_map_form()
-	{
-		global $_REQUEST;
-
+	function insert_map_form(){
 		$frm_title = "New system map";
 
-		if(isset($_REQUEST["sysmapid"]))
-		{
+		if(isset($_REQUEST["sysmapid"])){
 			$result=DBselect("SELECT * FROM sysmaps WHERE sysmapid=".$_REQUEST["sysmapid"]);
 			$row=DBfetch($result);
 			$frm_title = "System map: \"".$row["name"]."\"";
 		}
-		if(isset($_REQUEST["sysmapid"]) && !isset($_REQUEST["form_refresh"]))
-		{
+		
+		if(isset($_REQUEST["sysmapid"]) && !isset($_REQUEST["form_refresh"])){
 			$name		= $row["name"];
 			$width		= $row["width"];
 			$height		= $row["height"];
@@ -5194,8 +5144,7 @@
 			$label_type	= $row["label_type"];
 			$label_location	= $row["label_location"];
 		}
-		else
-		{
+		else{
 			$name		= get_request("name","");
 			$width		= get_request("width",800);
 			$height		= get_request("height",600);
@@ -5217,14 +5166,15 @@
 
 		$cmbImg = new CComboBox("backgroundid",$backgroundid);
 		$cmbImg->AddItem(0,"No image...");
+		
 		$result=DBselect('SELECT * FROM images WHERE imagetype=2 AND '.DBin_node('imageid').' order by name');
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			$cmbImg->AddItem(
 					$row["imageid"],
 					get_node_name_by_elid($row["imageid"]).$row["name"]
 					);
 		}
+		
 		$frmMap->AddRow(S_BACKGROUND_IMAGE,$cmbImg);
 
 		$cmbLabel = new CComboBox("label_type",$label_type);
@@ -5244,12 +5194,13 @@
 		$frmMap->AddRow(S_ICON_LABEL_LOCATION,$cmbLocation);
 
 		$frmMap->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["sysmapid"]))
-		{
+		
+		if(isset($_REQUEST["sysmapid"])){
 			$frmMap->AddItemToBottomRow(SPACE);
 			$frmMap->AddItemToBottomRow(new CButtonDelete("Delete system map?",
 					url_param("form").url_param("sysmapid")));
 		}
+		
 		$frmMap->AddItemToBottomRow(SPACE);
 		$frmMap->AddItemToBottomRow(new CButtonCancel());
 
@@ -5257,8 +5208,7 @@
 		
 	}
 
-	function insert_map_element_form()
-	{
+	function insert_map_element_form(){
 		global $USER_DETAILS;
 
 		$frmEl = new CFormTable("New map element","sysmap.php");
@@ -5435,15 +5385,16 @@
 		$cmbIconOff	= new CComboBox("iconid_off",$iconid_off);
 		$cmbIconOn	= new CComboBox("iconid_on",$iconid_on);
 		$cmbIconUnknown	= new CComboBox("iconid_unknown",$iconid_unknown);
+		
 		$result = DBselect('SELECT * FROM images WHERE imagetype=1 AND '.DBin_node('imageid').' order by name');
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			$row["name"] = get_node_name_by_elid($row["imageid"]).$row["name"];
 
 			$cmbIconOff->AddItem($row["imageid"],$row["name"]);
 			$cmbIconOn->AddItem($row["imageid"],$row["name"]);
 			$cmbIconUnknown->AddItem($row["imageid"],$row["name"]);
 		}
+		
 		$frmEl->AddRow(S_ICON_OFF,$cmbIconOff);
 		$frmEl->AddRow(S_ICON_ON,$cmbIconOn);
 		$frmEl->AddRow(S_ICON_UNKNOWN,$cmbIconUnknown);
@@ -5453,8 +5404,7 @@
 		$frmEl->AddRow(S_URL, new CTextBox("url", $url, 64));
 
 		$frmEl->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["selementid"]))
-		{
+		if(isset($_REQUEST["selementid"])){
 			$frmEl->AddItemToBottomRow(SPACE);
 			$frmEl->AddItemToBottomRow(new CButtonDelete("Delete element?",url_param("form").
 				url_param("selementid").url_param("sysmapid")));
@@ -5465,9 +5415,7 @@
 		$frmEl->Show();
 	}
 
-	function insert_map_link_form()
-	{
-		global $_REQUEST;
+	function insert_map_link_form(){
 
 		$frmCnct = new CFormTable("New connector","sysmap.php");
 		$frmCnct->SetHelp("web.sysmap.connector.php");
@@ -5614,8 +5562,7 @@
 		$frmCnct->AddRow(S_COLOR.' ('.S_OFF.')',new CColor('color',$color));
 
 		$frmCnct->AddItemToBottomRow(new CButton("save_link",S_SAVE));
-		if(isset($_REQUEST["linkid"]))
-		{
+		if(isset($_REQUEST["linkid"])){
 			$frmCnct->AddItemToBottomRow(SPACE);
 			$frmCnct->AddItemToBottomRow(new CButtonDelete("Delete link?",
 				url_param("linkid").url_param("sysmapid")));

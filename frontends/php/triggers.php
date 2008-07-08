@@ -36,31 +36,35 @@ include_once "include/page_header.php";
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'groupid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
-		'hostid'=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({save})'),
+		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
+		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({save})'),
 
-		'triggerid'=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
+		'triggerid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
 
-		'copy_type'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1'),'isset({copy})'),
-		'copy_mode'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),NULL),
+		'copy_type'	=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1'),'isset({copy})'),
+		'copy_mode'	=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),NULL),
 
-		'type'=>	array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	'isset({save})'),
-		'description'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
-		'expression'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
-		'priority'=>	array(T_ZBX_INT, O_OPT,  NULL,  IN('0,1,2,3,4,5'),'isset({save})'),
-		'comments'=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
-		'url'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
-		'status'=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,NULL),
+		'type'=>			array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	'isset({save})'),
+		'description'=>		array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
+		'expression'=>		array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
+		'priority'=>		array(T_ZBX_INT, O_OPT,  NULL,  IN('0,1,2,3,4,5'),'isset({save})'),
+		'comments'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
+		'url'=>				array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
+		'status'=>			array(T_ZBX_STR, O_OPT,  NULL,	NULL,NULL),
 
-		'dependencies'=>		array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
+		'dependencies'=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
 		'new_dependence'=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID.'{}>0','isset({add_dependence})'),
 		'rem_dependence'=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
 
-		'g_triggerid'=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
+		'g_triggerid'=>		array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
 		'copy_targetid'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
 		'filter_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 
 		'showdisabled'=>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	NULL),
+		
+/* mass update*/
+		'massupdate'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'visible'=>			array(T_ZBX_STR, O_OPT,	null, 	null,	null),
 		
 /* actions */
 		'add_dependence'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -68,13 +72,14 @@ include_once "include/page_header.php";
 		'group_enable'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'group_disable'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'group_delete'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'copy'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'copy'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'mass_save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 /* other */
-		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_copy_to'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
@@ -82,6 +87,7 @@ include_once "include/page_header.php";
 	$_REQUEST['showdisabled'] = get_request('showdisabled', get_profile('web.triggers.showdisabled', 0));
 	
 	check_fields($fields);
+
 	validate_sort_and_sortorder('t.description',ZBX_SORT_UP);
 	
 	if(isset($_REQUEST['triggerid']))
@@ -104,13 +110,60 @@ include_once "include/page_header.php";
 		unset($_REQUEST['triggerid']);
 		$_REQUEST['form'] = 'clone';
 	}
+	else if(isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])){
+		show_messages();
+		
+		$result = false;
+		$available_triggers = get_accessible_triggers(PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
+		
+		$visible = $_REQUEST['visible'];
+		$dependencies = get_request('dependencies',array());
+		
+		$triggers = $_REQUEST['g_triggerid'];
+		$triggers = array_intersect($triggers, $available_triggers);
+		
+		DBstart();		
+		foreach($triggers as $id => $triggerid){
+			$db_trig = get_trigger_by_triggerid($triggerid);
+			$db_trig['dependencies'] = get_trigger_dependencies_by_triggerid($triggerid);
+
+			foreach($db_trig as $key => $value){
+				if(isset($visible[$key])){
+					$db_trig[$key] = $_REQUEST[$key];
+				}
+			}
+			
+			$result2=update_trigger($db_trig['triggerid'],
+				null,null,null,
+				$db_trig['priority'],null,null,null,
+				$db_trig['dependencies']);
+			
+			$result |= $result2;
+			
+			if($result2){
+				add_audit(
+					AUDIT_ACTION_UPDATE, 
+					AUDIT_RESOURCE_TRIGGER,
+					S_TRIGGER.' ['.$db_trig['triggerid'].'] ['.expand_trigger_description($db_trig['triggerid']).'] '
+				);
+			}
+		}		
+		$result = DBend($result);
+
+		show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
+		if($result){
+			unset($_REQUEST['massupdate']);
+			unset($_REQUEST['form']);
+		}
+	}
 	else if(isset($_REQUEST['save'])){
 		show_messages();
+		
 		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST['expression']))
 			access_deny();
 
 		$now=time();
-		if(isset($_REQUEST['status']))	{ $status=TRIGGER_STATUS_DISABLED; }
+		if(isset($_REQUEST['status'])){ $status=TRIGGER_STATUS_DISABLED; }
 		else{ $status=TRIGGER_STATUS_ENABLED; }
 
 		$type = $_REQUEST['type'];
@@ -367,10 +420,15 @@ include_once "include/page_header.php";
 	show_table_header(S_TRIGGERS_BIG, $r_form);
 ?>
 <?php
-	if(isset($_REQUEST["form"])){
+	if(isset($_REQUEST['massupdate']) && isset($_REQUEST['g_triggerid'])){
+		echo SBR;
+		insert_mass_update_trigger_form();	
+	}
+	else if(isset($_REQUEST["form"])){
 /* FORM */
 		echo SBR;
 		insert_trigger_form();
+		
 	} 
 	else if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["g_triggerid"])){
 		echo SBR;
@@ -502,7 +560,9 @@ include_once "include/page_header.php";
 			SPACE,
 			new CButtonQMessage('group_delete',S_DELETE_SELECTED,S_DELETE_SELECTED_TRIGGERS_Q),
 			SPACE,
-			new CButton('form_copy_to',S_COPY_SELECTED_TO)
+			new CButton('form_copy_to',S_COPY_SELECTED_TO),
+			SPACE,
+			new CButton('massupdate',S_TRIGGERS_MASSUPDATE)
 		)));
 
 		$form->AddItem($table);

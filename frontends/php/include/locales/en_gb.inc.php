@@ -1358,6 +1358,10 @@
 
 	'S_MULTIPLE_EVENTS'=>		'Multiple events',
 	'S_EVENT_GENERATION'=>		'Event generation',
+	
+	'S_TRIGGERS_MASSUPDATE'=>	'Triggers massupdate',
+	'S_TRIGGER_DEPENDENCIES'=>	'Trigger dependencies',
+	'S_INCORRECT_DEPENDENCY'=>	'Incorrect dependency',
 
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			'Trigger comments',
