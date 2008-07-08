@@ -187,7 +187,17 @@ include_once "include/page_header.php";
 			case ZBX_AUTH_LDAP:
 			case ZBX_AUTH_INTERNAL:
 			default:
-			insert_login_form();
+//	konqueror bug #138024; adding useless param(login=1) to the form's action path to avoid bug!!
+				$frmLogin = new CFormTable('Login','index.php?login=1',"post","multipart/form-data");
+				$frmLogin->SetHelp('web.index.login');
+				$frmLogin->AddRow('Login name', new CTextBox('name'));
+				$frmLogin->AddRow('Password', new CPassBox('password'));
+				$frmLogin->AddItemToBottomRow(new CButton('enter','Enter'));
+				$frmLogin->Show(false);
+		
+				SetFocus($frmLogin->GetName(),"name");
+				
+				$frmLogin->Destroy();
 		}
 
 	}
