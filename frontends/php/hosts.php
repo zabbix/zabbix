@@ -292,24 +292,29 @@ include_once 'include/page_header.php';
 						$host_profile['location'],$host_profile['notes']);
 				}
 			}
+			
+			if($result){
+				add_audit(
+					AUDIT_ACTION_UPDATE,
+					AUDIT_RESOURCE_HOST,
+					'Host ['.$db_host['host'].'] IP ['.$db_host['ip'].'] '.'Status ['.$db_host['status'].']'
+				);
+			}
 		}
 
 		$result = DBend($result);
 		
 		$msg_ok 	= S_HOSTS.SPACE.S_UPDATED;
 		$msg_fail 	= S_CANNOT_UPDATE.SPACE.S_HOSTS;
-		$audit_action 	= AUDIT_ACTION_UPDATE;
 
 		show_messages($result, $msg_ok, $msg_fail);
-		if($result){
-			add_audit($audit_action,AUDIT_RESOURCE_HOST,
-				'Host ['.$db_host['host'].'] IP ['.$db_host['ip'].'] '.
-				'Status ['.$db_host['status'].']');
 
+		if($result){
 			unset($_REQUEST['massupdate']);
 			unset($_REQUEST['form']);
 			unset($_REQUEST['hosts']);
 		}
+		
 		unset($_REQUEST['save']);
 	}
 /* SAVE HOST */
