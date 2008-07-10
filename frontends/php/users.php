@@ -309,7 +309,7 @@ include_once 'include/page_header.php';
 		}
 		else if(isset($_REQUEST['new_right'])){
 			$_REQUEST['group_rights'] = get_request('group_rights', array());
-			foreach(array('type', 'id', 'permission') as $fld_name)
+			foreach(array('id', 'permission') as $fld_name)
 				$_REQUEST['group_rights'][$_REQUEST['new_right']['name']][$fld_name] = $_REQUEST['new_right'][$fld_name];
 		}
 		else if(isset($_REQUEST['new_user'])){
