@@ -178,7 +178,6 @@
 		
 //		$table->AddRow($tab);
 		$table->AddRow($div);
-
 	return $table;
 	}
 	

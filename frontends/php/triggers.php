@@ -121,8 +121,8 @@ include_once "include/page_header.php";
 		
 		$triggers = $_REQUEST['g_triggerid'];
 		$triggers = array_intersect($triggers, $available_triggers);
-		
-		DBstart();		
+
+		DBstart();
 		foreach($triggers as $id => $triggerid){
 			$db_trig = get_trigger_by_triggerid($triggerid);
 			$db_trig['dependencies'] = get_trigger_dependencies_by_triggerid($triggerid);
@@ -132,11 +132,11 @@ include_once "include/page_header.php";
 					$db_trig[$key] = $_REQUEST[$key];
 				}
 			}
-			
+
 			$result2=update_trigger($db_trig['triggerid'],
 				null,null,null,
 				$db_trig['priority'],null,null,null,
-				$db_trig['dependencies']);
+				$db_trig['dependencies'],null);
 			
 			$result |= $result2;
 			

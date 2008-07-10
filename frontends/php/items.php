@@ -645,7 +645,6 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
-
 	$form = new CForm();
 	$form->SetMethod('get');
 	$form->SetName('hdrform');
@@ -885,17 +884,16 @@ include_once "include/page_header.php";
 
 		$from_tables['i'] = 'items i'; /* NOTE: must be added as last element to use left join */
 
-		$db_items = DBselect('SELECT DISTINCT th.host as template_host,th.hostid as template_hostid, h.host, i.* '.
-						' FROM '.implode(',', $from_tables).
-							' LEFT JOIN items ti ON i.templateid=ti.itemid '.
-							' LEFT JOIN hosts th ON ti.hostid=th.hostid '.
-						' WHERE '.implode(' and ', $where_case).
-						order_by('h.host,i.description,i.key_,i.delay,i.history,i.trends,i.type,i.status','i.itemid'));
-						
-		while($db_item = DBfetch($db_items)){
-		
-			$description = array();
+		$sql = 'SELECT DISTINCT th.host as template_host,th.hostid as template_hostid, h.host, i.* '.
+				' FROM '.implode(',', $from_tables).
+					' LEFT JOIN items ti ON i.templateid=ti.itemid '.
+					' LEFT JOIN hosts th ON ti.hostid=th.hostid '.
+				' WHERE '.implode(' and ', $where_case).
+				order_by('h.host,i.description,i.key_,i.delay,i.history,i.trends,i.type,i.status','i.itemid');
+		$db_items = DBselect($sql);
 
+		while($db_item = DBfetch($db_items)){
+			$description = array();
 			$item_description = item_description($db_item["description"],$db_item["key_"]);
 
 			if(isset($_REQUEST['filter_description']) && !zbx_stristr($item_description, $_REQUEST['filter_description']) ) continue;
@@ -908,7 +906,7 @@ include_once "include/page_header.php";
 						'unknown'),
 					":");
 			}
-			
+
 			array_push($description, new CLink(
 				item_description($db_item["description"],$db_item["key_"]),
 				"?form=update&itemid=".
@@ -926,7 +924,7 @@ include_once "include/page_header.php";
 			else{
 				$error=new CCol($db_item["error"],"on");
 			}
-
+			
 			$applications = $show_applications ? implode(', ', get_applications_by_itemid($db_item["itemid"], 'name')) : null;
 			if(!is_null($applications) && empty($applications)) $applications = ' - ';
 			
@@ -963,7 +961,6 @@ include_once "include/page_header.php";
 
 		$form->AddItem($table);
 		$form->Show();
-
 	}
 
 	if(isset($_REQUEST["form"]) && (str_in_array($_REQUEST["form"],array(S_CREATE_ITEM,"update","clone")) ||

@@ -198,8 +198,8 @@
 
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid);
 
-		$denied_graphs = array();
-		$available_graphs = array();
+		$denied_triggers = array();
+		$available_triggers = array();
 		
 		$sql = 	'SELECT DISTINCT t.triggerid '.
 				' FROM triggers t, functions f, items i '.
@@ -207,7 +207,6 @@
 					' AND f.itemid=i.itemid'.
 					(!empty($hostid)?' AND i.hostid='.$hostid:'').
 					' AND '.DBcondition('i.hostid',$available_hosts,true);
-
 		$db_triggers = DBselect($sql);
 		while($trigger = DBfetch($db_triggers)){
 			$denied_triggers[] = $trigger['triggerid'];
@@ -217,10 +216,9 @@
 				' FROM triggers t, functions f, items i '.
 				' WHERE t.triggerid=f.triggerid '.
 					' AND f.itemid=i.itemid'.
-					' AND i.status='.ITEM_STATUS_ACTIVE.
 					(!empty($hostid)?' AND i.hostid='.$hostid:'').
 					(!empty($denied_triggers)?' AND '.DBcondition('t.triggerid',$denied_triggers,true):'');
-					
+
 		$db_triggers = DBselect($sql);
 		while($trigger = DBfetch($db_triggers)){
 			$result[$trigger['triggerid']] = $trigger['triggerid'];
