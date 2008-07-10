@@ -4481,7 +4481,7 @@
 		}
 		
 		$frmHost->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["hostid"])){
+		if(isset($_REQUEST["hostid"]) && ($_REQUEST['form'] != 'full_clone')){
 			$frmHost->AddItemToBottomRow(SPACE);
 			$frmHost->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmHost->AddItemToBottomRow(SPACE);

@@ -109,11 +109,12 @@ include_once 'include/page_header.php';
 		'unlink'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 		'unlink_and_clear'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 
-		'save'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'clone'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'full_clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete_and_clear'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'cancel'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 
 /* other */
 		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
@@ -211,6 +212,11 @@ include_once 'include/page_header.php';
 	else if(($_REQUEST['config']==0 || $_REQUEST['config']==3) && isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])){
 		unset($_REQUEST['hostid']);
 		$_REQUEST['form'] = 'clone';
+	}
+/* FULL CLONE HOST */
+	else if(($_REQUEST['config']==0 || $_REQUEST['config']==3) && isset($_REQUEST['full_clone']) && isset($_REQUEST['hostid'])){
+//		unset($_REQUEST['hostid']);
+		$_REQUEST['form'] = 'full_clone';
 	}
 /* HOST MASS UPDATE */
 	else if($_REQUEST['config']==0 && isset($_REQUEST['massupdate']) && isset($_REQUEST['save'])){
@@ -337,11 +343,16 @@ include_once 'include/page_header.php';
 		$templates = get_request('templates', array());
 		
 		$_REQUEST['proxy_hostid'] = get_request('proxy_hostid',0);
+		
+		$clone_hostid = false;
+		if($_REQUEST['form'] == 'full_clone'){
+			$clone_hostid = $_REQUEST['hostid'];
+			unset($_REQUEST['hostid']);
+		}
 
+		$result = true;
+		DBstart();
 		if(isset($_REQUEST['hostid'])){
-			$result = true;
-			
-			DBstart();
 			if(isset($_REQUEST['clear_templates'])) {
 				foreach($_REQUEST['clear_templates'] as $id){
 					$result &= unlink_template($_REQUEST['hostid'], $id, false);
@@ -352,8 +363,6 @@ include_once 'include/page_header.php';
 				$_REQUEST['host'],$_REQUEST['port'],$_REQUEST['status'],$useip,$_REQUEST['dns'],
 				$_REQUEST['ip'],$_REQUEST['proxy_hostid'],$templates,$_REQUEST['newgroup'],$groups);
 				
-			$result = DBend($result);
-
 			$msg_ok 	= S_HOST_UPDATED;
 			$msg_fail 	= S_CANNOT_UPDATE_HOST;
 			$audit_action 	= AUDIT_ACTION_UPDATE;
@@ -361,21 +370,69 @@ include_once 'include/page_header.php';
 			$hostid = $_REQUEST['hostid'];
 		} 
 		else {
-			DBstart();
-			$hostid = add_host(
+			$hostid = $result = add_host(
 				$_REQUEST['host'],$_REQUEST['port'],$_REQUEST['status'],$useip,$_REQUEST['dns'],
 				$_REQUEST['ip'],$_REQUEST['proxy_hostid'],$templates,$_REQUEST['newgroup'],$groups);
-				
-			$result	= DBend($hostid);
 			
 			$msg_ok 	= S_HOST_ADDED;
 			$msg_fail 	= S_CANNOT_ADD_HOST;
 			$audit_action 	= AUDIT_ACTION_ADD;
 		}
 
+		if(!zbx_empty($hostid) && $clone_hostid && ($_REQUEST['form'] == 'full_clone')){
+// Host items			
+			$sql = 'SELECT DISTINCT i.itemid '.
+					' FROM items i'.
+					' WHERE i.hostid='.$clone_hostid.
+						' AND i.templateid=0 '.
+					' ORDER BY i.description';
+					
+			$res = DBselect($sql);
+			while($db_item = DBfetch($res)){
+				$result &= copy_item_to_host($db_item['itemid'], $hostid, true);
+			}
+						
+// Host triggers
+			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+			
+			$sql = 'SELECT DISTINCT t.triggerid '.
+					' FROM triggers t, items i, functions f'.
+					' WHERE i.hostid='.$clone_hostid.
+						' AND f.itemid=i.itemid '.
+						' AND t.triggerid=f.triggerid '.
+						' AND '.DBcondition('t.triggerid', $available_triggers).
+						' AND t.templateid=0 '.
+					' ORDER BY t.description';
+					
+			$res = DBselect($sql);
+			while($db_trig = DBfetch($res)){
+				$result &= copy_trigger_to_host($db_trig['triggerid'], $hostid, true);
+			}
+		
+// Host graphs
+			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+			
+			$sql = 'SELECT DISTINCT g.graphid '.
+						' FROM graphs g, graphs_items gi,items i '.
+						' WHERE '.DBcondition('g.graphid',$available_graphs).
+							' AND gi.graphid=g.graphid '.
+							' AND g.templateid=0 '.
+							' AND i.itemid=gi.itemid '.
+							' AND i.hostid='.$clone_hostid.
+						' ORDER BY g.name';
+											
+			$res = DBselect($sql);
+			while($db_graph = DBfetch($res)){
+				$result &= copy_graph_to_host($db_graph['graphid'], $hostid, true);
+			}
+			
+			$_REQUEST['hostid'] = $clone_hostid;
+		}
+		$result	= DBend($result);
+		
 		if($result){
 			update_profile('HOST_PORT',$_REQUEST['port'], PROFILE_TYPE_INT);
-
+			
 			DBstart();
 			delete_host_profile($hostid);
 						
@@ -386,10 +443,13 @@ include_once 'include/page_header.php';
 					$_REQUEST['hardware'],$_REQUEST['software'],$_REQUEST['contact'],
 					$_REQUEST['location'],$_REQUEST['notes']);
 			}
-			$result = DBend($result);
+			
+			$result	= DBend($result);
 		}
 
+		
 		show_messages($result, $msg_ok, $msg_fail);
+		
 		if($result){
 			add_audit($audit_action,AUDIT_RESOURCE_HOST,
 				'Host ['.$_REQUEST['host'].'] IP ['.$_REQUEST['ip'].'] '.
@@ -495,7 +555,6 @@ include_once 'include/page_header.php';
 		show_messages($result, S_HOST_STATUS_UPDATED, S_CANNOT_UPDATE_HOST);
 		unset($_REQUEST["activate"]);
 	}
-
 	else if(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && isset($_REQUEST["chstatus"]) && isset($_REQUEST["hostid"])){
 	
 		$host=get_host_by_hostid($_REQUEST["hostid"]);
@@ -549,7 +608,8 @@ include_once 'include/page_header.php';
 		}
 		unset($_REQUEST["save"]);
 	}
-	if($_REQUEST["config"]==1&&isset($_REQUEST["delete"])){
+	
+	if(($_REQUEST["config"]==1) && isset($_REQUEST["delete"])){
 		if(isset($_REQUEST["groupid"])){
 			$result = false;
 			if($group = get_hostgroup_by_groupid($_REQUEST["groupid"])){
@@ -592,7 +652,7 @@ include_once 'include/page_header.php';
 		unset($_REQUEST["delete"]);
 	}
 
-	if($_REQUEST["config"]==1&&(isset($_REQUEST["activate"])||isset($_REQUEST["disable"]))){
+	if(($_REQUEST["config"]==1) && (isset($_REQUEST["activate"]) || isset($_REQUEST["disable"]))){
 		$result = true;
 		$status = isset($_REQUEST["activate"]) ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 		$groups = get_request("groups",array());
@@ -685,7 +745,7 @@ include_once 'include/page_header.php';
 		}
 		unset($_REQUEST["delete"]);
 	}
-	else if(($_REQUEST["config"]==4) &&(isset($_REQUEST["activate"])||isset($_REQUEST["disable"]))){
+	else if(($_REQUEST["config"]==4) && (isset($_REQUEST["activate"]) || isset($_REQUEST["disable"]))){
 /* group operations */
 		$result = true;
 		$applications = get_request("applications",array());
@@ -871,9 +931,8 @@ include_once 'include/page_header.php';
 ?>
 <?php
 	if($_REQUEST["config"]==0 || $_REQUEST["config"]==3){
-		$show_only_tmp = 0;
-		if($_REQUEST["config"]==3)
-			$show_only_tmp = 1;
+
+		$show_only_tmp=($_REQUEST["config"] == 3)?1:0;
 
 		if(isset($_REQUEST['massupdate']) && isset($_REQUEST['hosts'])){
 			insert_mass_update_host_form();
