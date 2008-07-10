@@ -38,6 +38,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.6:
 
+ - [ZBX-286] fixed possible server crash on some platforms (Sasha)
  - [ZBX-272] fixed default link to local interface in *BSD for net.if* items (Sasha)
  - [ZBX-386] fixed possible agent crash in processing of active checks (Sasha)
  - [ZBX-379] added error checking for accept on server side (Sasha) 

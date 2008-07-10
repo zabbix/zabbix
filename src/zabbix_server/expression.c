@@ -815,9 +815,9 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 	while((pr = strchr(pl, '{')))
 	{
 		pr[0] = '\0';
-zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
+/*zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);*/
 		str_out = zbx_strdcat(str_out, pl);
-zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
+/*zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);*/
 		pr[0] = '{';
 
 		replace_to = zbx_dsprintf(replace_to, "{");
@@ -1361,16 +1361,16 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			else					replace_to = zbx_dsprintf(replace_to, "Unknown");
 		}
 
-zabbix_log(LOG_LEVEL_DEBUG, "str_out2 [%s] replace_to [%s]", str_out, replace_to);
+/*zabbix_log(LOG_LEVEL_DEBUG, "str_out2 [%s] replace_to [%s]", str_out, replace_to);*/
 		str_out = zbx_strdcat(str_out, replace_to);
-zabbix_log(LOG_LEVEL_DEBUG, "str_out2 [%s] replace_to [%s]", str_out, replace_to);
+/*zabbix_log(LOG_LEVEL_DEBUG, "str_out2 [%s] replace_to [%s]", str_out, replace_to);*/
 		pl = pr + var_len;
 
 		zbx_free(replace_to);
 	}
-zabbix_log(LOG_LEVEL_DEBUG, "str_out3 [%s] pl [%s]", str_out, pl);
+/*zabbix_log(LOG_LEVEL_DEBUG, "str_out3 [%s] pl [%s]", str_out, pl);*/
 	str_out = zbx_strdcat(str_out, pl);
-zabbix_log(LOG_LEVEL_DEBUG, "str_out3 [%s] pl [%s]", str_out, pl);
+/*zabbix_log(LOG_LEVEL_DEBUG, "str_out3 [%s] pl [%s]", str_out, pl);*/
 
 	zbx_free(*data);
 
