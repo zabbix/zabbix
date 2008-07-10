@@ -97,8 +97,7 @@
 
 	# Update User definition
 
-	function	update_user($userid,$name,$surname,$alias,$passwd,$url,$autologin,$autologout,$lang,$theme,$refresh,$user_type,$user_groups,$user_medias)
-	{
+	function update_user($userid,$name,$surname,$alias,$passwd,$url,$autologin,$autologout,$lang,$theme,$refresh,$user_type,$user_groups,$user_medias){
 		if(DBfetch(DBselect("select * from users where alias=".zbx_dbstr($alias)." and userid<>$userid and ".DBin_node('userid', get_current_nodeid(false))))){
 			error("User '$alias' already exists");
 			return 0;
@@ -276,10 +275,9 @@
 	USER GROUPS
 **************************/
 
-	function	add_user_group($name,$users_status,$gui_access,$users=array(),$rights=array()){
+	function add_user_group($name,$users_status,$gui_access,$users=array(),$rights=array()){
 	
-		if(DBfetch(DBselect('select * from usrgrp where name='.zbx_dbstr($name).' and '.DBin_node('usrgrpid', get_current_nodeid(false)))))
-		{
+		if(DBfetch(DBselect('select * from usrgrp where name='.zbx_dbstr($name).' and '.DBin_node('usrgrpid', get_current_nodeid(false))))){
 			error("Group '$name' already exists");
 			return 0;
 		}
@@ -303,8 +301,8 @@
 		$result=DBexecute("delete from rights where groupid=".$usrgrpid);
 		foreach($rights as $right){
 			$id = get_dbid('rights','rightid');
-			$result=DBexecute('insert into rights (rightid,groupid,type,permission,id)'.
-				' values ('.$id.','.$usrgrpid.','.$right['type'].','.$right['permission'].','.$right['id'].')');
+			$result=DBexecute('insert into rights (rightid,groupid,permission,id)'.
+				' values ('.$id.','.$usrgrpid.','.$right['permission'].','.$right['id'].')');
 				
 			if(!$result)	return	$result;
 		}
@@ -312,7 +310,7 @@
 		return $result;
 	}
 
-	function	update_user_group($usrgrpid,$name,$users_status,$gui_access,$users=array(),$rights=array()){
+	function update_user_group($usrgrpid,$name,$users_status,$gui_access,$users=array(),$rights=array()){
 		global $USER_DETAILS;
 		
 		if(DBfetch(DBselect('select * from usrgrp where name='.zbx_dbstr($name).
@@ -350,13 +348,13 @@
 		$result=DBexecute("delete from rights where groupid=".$usrgrpid);
 		foreach($rights as $right){
 			$id = get_dbid('rights','rightid');
-			$result=DBexecute('insert into rights (rightid,groupid,type,permission,id)'.
-				' values ('.$id.','.$usrgrpid.','.$right['type'].','.$right['permission'].','.$right['id'].')');
+			$result=DBexecute('insert into rights (rightid,groupid,permission,id)'.
+				' values ('.$id.','.$usrgrpid.','.$right['permission'].','.$right['id'].')');
 				
 			if(!$result)	return	$result;
 		}
 
-		return $result;
+	return $result;
 	}
 
 	function	delete_user_group($usrgrpid){

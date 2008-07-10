@@ -681,8 +681,11 @@
 			$user_groups	= array();
 			$user_medias		= array();
 
-			$db_user_groups = DBselect('SELECT g.* FROM usrgrp g, users_groups ug'.
-				' WHERE ug.usrgrpid=g.usrgrpid AND ug.userid='.$userid);
+			$sql = 'SELECT g.* '.
+					' FROM usrgrp g, users_groups ug '.
+					' WHERE ug.usrgrpid=g.usrgrpid '.
+						' AND ug.userid='.$userid;
+			$db_user_groups = DBselect($sql);
 
 			while($db_group = DBfetch($db_user_groups)){
 				$user_groups[$db_group['usrgrpid']] = $db_group['name'];
@@ -895,23 +898,20 @@
 
 				$tmp_perm = array();
 				while($db_right = DBfetch($db_rights)){
-					if(isset($tmp_perm[$db_right['type']][$db_right['id']])){
-						$tmp_perm[$db_right['type']][$db_right['id']] = min($tmp_perm[$db_right['type']][$db_right['id']],$db_right['permission']);
+					if(isset($tmp_perm[$db_right['id']])){
+						$tmp_perm[$db_right['id']] = min($tmp_perm[$db_right['id']],$db_right['permission']);
 					}
 					else{
-						$tmp_perm[$db_right['type']][$db_right['id']] = $db_right['permission'];
+						$tmp_perm[$db_right['id']] = $db_right['permission'];
 					}
 				}
 
 				$user_rights = array();
-				foreach($tmp_perm as $type => $res){
-					foreach($res as $id => $perm){
-						array_push($user_rights, array(	
-							'type'		=> $type,
-							'id'		=> $id,
-							'permission'	=> $perm
-							));
-					}
+				foreach($tmp_perm as $id => $perm){
+					array_push($user_rights, array(	
+						'id'		=> $id,
+						'permission'	=> $perm
+						));
 				}
 //SDI($user_rights);
 //SDI($user_type);
@@ -963,26 +963,21 @@
 				$group_users[$db_user["userid"]] = $db_user['alias'];
 
 			$group_rights = array();			
-			$sqls = array(
-				'SELECT r.*,n.name as name FROM rights r, nodes n WHERE r.groupid='.$_REQUEST["usrgrpid"].
-					' AND r.type='.RESOURCE_TYPE_NODE.' AND r.id=n.nodeid',
-				'SELECT r.*, n.name as node_name, g.name as name FROM groups g '.
-					' LEFT JOIN rights r on r.type='.RESOURCE_TYPE_GROUP.' AND r.id=g.groupid '.
-					' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('g.groupid').
-					' WHERE r.groupid='.$_REQUEST["usrgrpid"],
-				);
-			foreach($sqls as $sql){
-				$db_rights = DBselect($sql);
-				while($db_right = DBfetch($db_rights)){
-					if(isset($db_right['node_name']))
-						$db_right['name'] = $db_right['node_name'].':'.$db_right['name'];
+			$sql = 'SELECT r.*, n.name as node_name, g.name as name '.
+					' FROM groups g '.
+						' LEFT JOIN rights r on r.id=g.groupid '.
+						' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('g.groupid').
+					' WHERE r.groupid='.$_REQUEST["usrgrpid"];
+					
+			$db_rights = DBselect($sql);
+			while($db_right = DBfetch($db_rights)){
+				if(isset($db_right['node_name']))
+					$db_right['name'] = $db_right['node_name'].':'.$db_right['name'];
 
-					$group_rights[$db_right['name']] = array(
-						'type'		=> $db_right['type'],
-						'permission'	=> $db_right['permission'],
-						'id'		=> $db_right['id']
-					);
-				}
+				$group_rights[$db_right['name']] = array(
+					'permission'	=> $db_right['permission'],
+					'id'		=> $db_right['id']
+				);
 			}
 		}
 		else{

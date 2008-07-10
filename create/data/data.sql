@@ -61,9 +61,9 @@ INSERT INTO users_groups VALUES (2,8,2);
 -- Dumping data for table `rights`
 --
 
--- INSERT INTO rights VALUES (1,1,0,0,0);
--- INSERT INTO rights VALUES (2,1,0,0,0);
--- INSERT INTO rights VALUES (3,2,0,0,0);
+-- INSERT INTO rights VALUES (1,1,0,0);
+-- INSERT INTO rights VALUES (2,1,0,0);
+-- INSERT INTO rights VALUES (3,2,0,0);
 
 --
 -- Dumping data for table hosts
