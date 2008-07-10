@@ -57,7 +57,7 @@ function add_var_to_opener_obj(obj,name,value){
 	obj.appendChild(new_variable);
 }
 
-function add_right(formname,type,id,permission,name){
+function add_right(formname,id,permission,name){
 	var form = window.opener.document.forms[formname];
 	
 	if(!form){
@@ -65,7 +65,6 @@ function add_right(formname,type,id,permission,name){
 	return false;
 	}
 
-	add_var_to_opener_obj(form,'new_right[type]',type);
 	add_var_to_opener_obj(form,'new_right[id]',id);
 	add_var_to_opener_obj(form,'new_right[permission]',permission);
 	add_var_to_opener_obj(form,'new_right[name]',name);
@@ -114,7 +113,7 @@ function add_right(formname,type,id,permission,name){
 			$db_resource['name'] = $db_resource['node_name'].':'.$db_resource['name'];
 
 		$name = new CLink($db_resource['name'],'#','action');
-		$name->SetAction("return add_right('".$dstfrm."','".$type."','".$db_resource['id']."','".$permission."','".$db_resource['name']."');");
+		$name->SetAction("return add_right('".$dstfrm."','".$db_resource['id']."','".$permission."','".$db_resource['name']."');");
 
 		$table->AddRow(array($name));
 	}

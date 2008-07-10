@@ -595,7 +595,6 @@ INDEX		|1		|userid,idx,idx2
 TABLE|rights|rightid|ZBX_SYNC
 FIELD		|rightid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|groupid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|permission	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|id		|t_id		|	|		|ZBX_SYNC
 INDEX		|1		|groupid

@@ -304,7 +304,7 @@ COpt::counter_up('perm');
 		' FROM hosts h '.
 			' LEFT JOIN hosts_groups hg ON hg.hostid=h.hostid '.
 			' LEFT JOIN groups g ON g.groupid=hg.groupid '.
-			' LEFT JOIN rights r ON r.id=g.groupid and r.type='.RESOURCE_TYPE_GROUP.
+			' LEFT JOIN rights r ON r.id=g.groupid '.
 			' LEFT JOIN users_groups ug ON ug.usrgrpid=r.groupid and ug.userid='.$userid.
 			' LEFT JOIN nodes n ON '.DBid2nodeid('h.hostid').'=n.nodeid '.
 		$where.
@@ -386,7 +386,7 @@ COpt::counter_up('perm');
 
 	$sql = 'SELECT n.nodeid as nodeid,n.name as node_name,hg.groupid,hg.name,min(r.permission) as permission,g.userid'.
 		' FROM groups hg '.
-			' LEFT JOIN rights r ON r.id=hg.groupid AND r.type='.RESOURCE_TYPE_GROUP.
+			' LEFT JOIN rights r ON r.id=hg.groupid '.
 			' LEFT JOIN users_groups g ON r.groupid=g.usrgrpid AND g.userid='.$userid.
 			' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid '.
 		$where.
@@ -538,8 +538,8 @@ function get_accessible_hosts_by_rights(&$rights,$user_type,$perm,$perm_res=null
 	$result = array();
 	$res_perm = array();
 	
-	foreach($rights as $right){
-		$res_perm[$right['type']][$right['id']] = $right['permission'];
+	foreach($rights as $id => $right){
+		$res_perm[$right['id']] = $right['permission'];
 	}
 
 	$host_perm = array();
@@ -557,14 +557,9 @@ function get_accessible_hosts_by_rights(&$rights,$user_type,$perm,$perm_res=null
 
 	$db_hosts = DBselect($sql);
 	while($host_data = DBfetch($db_hosts)){
-		if(isset($host_data['groupid']) && isset($res_perm[RESOURCE_TYPE_GROUP][$host_data['groupid']])){
-			$host_perm[$host_data['hostid']][RESOURCE_TYPE_GROUP][$host_data['groupid']] = $res_perm[RESOURCE_TYPE_GROUP][$host_data['groupid']];
-		}
-
-		if(isset($res_perm[RESOURCE_TYPE_NODE][$host_data['nodeid']])){
-			$host_perm[$host_data['hostid']][RESOURCE_TYPE_NODE] = $res_perm[RESOURCE_TYPE_NODE][$host_data['nodeid']];
-		}
-		
+		if(isset($host_data['groupid']) && isset($res_perm[$host_data['groupid']])){
+			$host_perm[$host_data['hostid']][$host_data['groupid']] = $res_perm[$host_data['groupid']];
+		}		
 		$host_perm[$host_data['hostid']]['data'] = $host_data;
 	}
 
@@ -576,8 +571,8 @@ function get_accessible_hosts_by_rights(&$rights,$user_type,$perm,$perm_res=null
 			$host_data['permission'] = PERM_MAX;
 		}
 		else{
-			if(isset($host_perm[$hostid][RESOURCE_TYPE_GROUP])){
-				$host_data['permission'] = min($host_perm[$hostid][RESOURCE_TYPE_GROUP]);
+			if(isset($host_perm[$hostid])){
+				$host_data['permission'] = min($host_perm[$hostid]);
 			}
 			else{
 				if(is_null($host_data['nodeid'])) $host_data['nodeid'] = id2nodeid($host_data['groupid']);
@@ -619,8 +614,7 @@ function get_accessible_groups_by_rights(&$rights,$user_type,$perm,$perm_res=nul
 	else $where = '';
 
 	$group_perm = array();
-	foreach($rights as $right){
-		if($right['type'] != RESOURCE_TYPE_GROUP) continue;
+	foreach($rights as $id => $right){
 		$group_perm[$right['id']] = $right['permission'];
 	}
 
