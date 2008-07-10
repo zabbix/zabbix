@@ -2093,9 +2093,8 @@
 // TRIGGERS
 	function insert_mass_update_trigger_form(){//$elements_array_name){
 		global $USER_DETAILS;
-SDI($_REQUEST);
-		$visible = get_request('visible',array());
 
+		$visible = get_request('visible',array());
 
 		$priority 		= get_request('priority',	'');
 		$dependencies	= get_request('dependencies',array());
@@ -3899,390 +3898,6 @@ SDI($_REQUEST);
 		$frmScr->Show();	
 	}
 
-	function get_screen_item_form(){
-	
-		global $USER_DETAILS;
-
-		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,'screenedit.php#form');
-		$form->SetHelp('web.screenedit.cell.php');
-
-		if(isset($_REQUEST["screenitemid"])){
-			$iresult=DBSelect('SELECT * FROM screens_items'.
-							' WHERE screenid='.$_REQUEST['screenid'].
-								' AND screenitemid='.$_REQUEST['screenitemid']
-							);
-
-			$form->AddVar("screenitemid",$_REQUEST["screenitemid"]);
-		} 
-		else{
-			$form->AddVar("x",$_REQUEST["x"]);
-			$form->AddVar("y",$_REQUEST["y"]);
-		}
-
-		if(isset($_REQUEST["screenitemid"]) && !isset($_REQUEST["form_refresh"])){
-		
-			$irow = DBfetch($iresult);
-			$resourcetype	= $irow["resourcetype"];
-			$resourceid	= $irow["resourceid"];
-			$width		= $irow["width"];
-			$height		= $irow["height"];
-			$colspan	= $irow["colspan"];
-			$rowspan	= $irow["rowspan"];
-			$elements	= $irow["elements"];
-			$valign		= $irow["valign"];
-			$halign		= $irow["halign"];
-			$style		= $irow["style"];
-			$url		= $irow["url"];
-			$dynamic	= $irow['dynamic'];
-		}
-		else{
-			$resourcetype	= get_request("resourcetype",	0);
-			$resourceid	= get_request("resourceid",	0);
-			$width		= get_request("width",		500);
-			$height		= get_request("height",		100);
-			$colspan	= get_request("colspan",	0);
-			$rowspan	= get_request("rowspan",	0);
-			$elements	= get_request("elements",	25);
-			$valign		= get_request("valign",		VALIGN_DEFAULT);
-			$halign		= get_request("halign",		HALIGN_DEFAULT);
-			$style		= get_request("style",		0);
-			$url		= get_request("url",		"");
-			$dynamic	= get_request("dynamic",	SCREEN_SIMPLE_ITEM);
-		}
-
-		$form->AddVar("screenid",$_REQUEST["screenid"]);
-
-		$cmbRes = new CCombobox("resourcetype",$resourcetype,"submit()");
-		$cmbRes->AddItem(SCREEN_RESOURCE_GRAPH,		S_GRAPH);
-		$cmbRes->AddItem(SCREEN_RESOURCE_SIMPLE_GRAPH,	S_SIMPLE_GRAPH);
-		$cmbRes->AddItem(SCREEN_RESOURCE_PLAIN_TEXT,	S_PLAIN_TEXT);
-		$cmbRes->AddItem(SCREEN_RESOURCE_MAP,		S_MAP);
-		$cmbRes->AddItem(SCREEN_RESOURCE_SCREEN,	S_SCREEN);
-		$cmbRes->AddItem(SCREEN_RESOURCE_SERVER_INFO,	S_SERVER_INFO);
-		$cmbRes->AddItem(SCREEN_RESOURCE_HOSTS_INFO,	S_HOSTS_INFO);
-		$cmbRes->AddItem(SCREEN_RESOURCE_TRIGGERS_INFO,	S_TRIGGERS_INFO);
-		$cmbRes->AddItem(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,	S_TRIGGERS_OVERVIEW);
-		$cmbRes->AddItem(SCREEN_RESOURCE_DATA_OVERVIEW,		S_DATA_OVERVIEW);
-		$cmbRes->AddItem(SCREEN_RESOURCE_CLOCK,		S_CLOCK);
-		$cmbRes->AddItem(SCREEN_RESOURCE_URL,		S_URL);
-		$cmbRes->AddItem(SCREEN_RESOURCE_ACTIONS,	S_HISTORY_OF_ACTIONS);
-                $cmbRes->AddItem(SCREEN_RESOURCE_EVENTS,       S_HISTORY_OF_EVENTS);
-		$form->AddRow(S_RESOURCE,$cmbRes);
-
-		if($resourcetype == SCREEN_RESOURCE_GRAPH){
-	// User-defined graph
-			$resourceid = graph_accessible($resourceid)?$resourceid:0;
-
-			$caption = '';
-			$id=0;
-		
-			if($resourceid > 0){
-				$result = DBselect('SELECT DISTINCT g.graphid,g.name,n.name as node_name, h.host'.
-						' FROM graphs g '.
-							' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
-							' LEFT JOIN items i ON gi.itemid=i.itemid '.
-							' LEFT JOIN hosts h ON h.hostid=i.hostid '.
-							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.graphid').
-						' WHERE g.graphid='.$resourceid);
-
-				while($row=DBfetch($result)){
-					$row["node_name"] = isset($row["node_name"]) ? "(".$row["node_name"].") " : '';
-					$caption = $row["node_name"].$row["host"].":".$row["name"];
-					$id = $resourceid;
-				}
-			}
-
-			$form->AddVar('resourceid',$id);
-			
-			$textfield = new Ctextbox('caption',$caption,75,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
-			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
-			
-			$form->AddRow(S_GRAPH_NAME,array($textfield,SPACE,$selectbtn));
-			
-		}
-		else if($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH){
-	// Simple graph
-			$caption = '';
-			$id=0;
-		
-			if($resourceid > 0){
-				$result=DBselect('SELECT n.name as node_name,h.host,i.description,i.itemid,i.key_ '.
-						' FROM hosts h,items i '.
-							' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('i.itemid').
-						' WHERE h.hostid=i.hostid '.
-							' AND h.status='.HOST_STATUS_MONITORED.
-							' AND i.status='.ITEM_STATUS_ACTIVE.
-							' AND i.hostid IN ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
-							' AND i.itemid='.$resourceid);
-
-				while($row=DBfetch($result)){
-					$description_=item_description($row['description'],$row['key_']);
-					$row["node_name"] = isset($row["node_name"]) ? "(".$row["node_name"].") " : '';
-	
-					$caption = $row['node_name'].$row['host'].': '.$description_;
-					$id = $resourceid;
-				}
-			}
-
-			$form->AddVar('resourceid',$id);
-			
-			$textfield = new Ctextbox('caption',$caption,75,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description',800,450);");
-			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
-			
-			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
-		}
-		else if($resourcetype == SCREEN_RESOURCE_MAP){
-	// Map
-			$caption = '';
-			$id=0;
-		
-			if($resourceid > 0){
-				$result=DBselect('SELECT n.name as node_name, s.sysmapid,s.name '.
-							' FROM sysmaps s'.
-								' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('s.sysmapid').
-							' WHERE s.sysmapid='.$resourceid);
-
-				while($row=DBfetch($result)){
-					if(!sysmap_accessible($row['sysmapid'],PERM_READ_ONLY)) continue;
-			
-					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-					$caption = $row['node_name'].$row['name'];
-					$id = $resourceid;
-				}
-			}
-
-			$form->AddVar('resourceid',$id);
-			$textfield = new Ctextbox('caption',$caption,60,'yes');
-			
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name',400,450);");
-			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
-			
-			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
-			
-		}
-		else if($resourcetype == SCREEN_RESOURCE_PLAIN_TEXT){
-// Plain text
-			$caption = '';
-			$id=0;
-			
-			if($resourceid > 0){
-				$result=DBselect('SELECT n.name as node_name,h.host,i.description,i.itemid,i.key_ '.
-						' FROM hosts h,items i '.
-							' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('i.itemid').
-						' WHERE h.hostid=i.hostid '.
-							' AND h.status='.HOST_STATUS_MONITORED.
-							' AND i.status='.ITEM_STATUS_ACTIVE.
-							' AND i.hostid IN ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
-							' AND i.itemid='.$resourceid);
-
-				while($row=DBfetch($result)){
-					$description_=item_description($row['description'],$row['key_']);
-					$row["node_name"] = isset($row["node_name"]) ? '('.$row["node_name"].') ' : '';
-	
-					$caption = $row['node_name'].$row['host'].': '.$description_;
-					$id = $resourceid;
-				}
-			}
-			
-			$form->AddVar('resourceid',$id);
-			
-			$textfield = new Ctextbox('caption',$caption,75,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=plain_text&srcfld1=itemid&srcfld2=description',800,450);");
-			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
-			
-			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
-			$form->AddRow(S_SHOW_LINES, new CNumericBox('elements',$elements,2));
-		}
-		else if($resourcetype == SCREEN_RESOURCE_ACTIONS){
-// History of actions
-				$form->AddRow(S_SHOW_LINES, new CNumericBox('elements',$elements,2));
-	$form->AddVar('resourceid',0);
-		}
-		else if($resourcetype == SCREEN_RESOURCE_EVENTS){
-// History of events
-				$form->AddRow(S_SHOW_LINES, new CNumericBox('elements',$elements,2));
-				$form->AddVar('resourceid',0);
-		}
-		else if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW))){
-// Overiews
-			$caption = '';
-			$id=0;
-			
-			if($resourceid > 0){
-				$result=DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
-						' FROM hosts_groups hg,hosts h,groups g '.
-							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
-						' WHERE g.groupid IN ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
-							' AND g.groupid=hg.groupid '.
-							' AND hg.hostid=h.hostid '.
-							' AND h.status='.HOST_STATUS_MONITORED.
-							' AND g.groupid='.$resourceid);
-
-				while($row=DBfetch($result)){
-					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-
-					$caption = $row['node_name'].$row['name'];
-					$id = $resourceid;
-				}
-			}
-			
-			$form->AddVar('resourceid',$id);
-			
-			$textfield = new Ctextbox('caption',$caption,75,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=overview&srcfld1=groupid&srcfld2=name',800,450);");
-			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
-			
-			$form->AddRow(S_GROUP,array($textfield,SPACE,$selectbtn));
-		}
-		else if($resourcetype == SCREEN_RESOURCE_SCREEN){
-// Screens
-			$caption = '';
-			$id=0;
-			
-			if($resourceid > 0){
-				$result=DBselect('SELECT DISTINCT n.name as node_name,s.screenid,s.name '.
-							' FROM screens s '.
-								' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('s.screenid').
-							' WHERE s.screenid='.$resourceid);
-
-				while($row=DBfetch($result)){
-					if(!screen_accessible($row['screenid'], PERM_READ_ONLY)) continue;
-					if(check_screen_recursion($_REQUEST['screenid'],$row['screenid'])) continue;
-					
-					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-					$caption = $row['node_name'].$row['name'];
-					$id = $resourceid;
-				}
-			}
-			
-			$form->AddVar('resourceid',$id);
-			
-			$textfield = new Ctextbox('caption',$caption,60,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=screens2&srcfld1=screenid&srcfld2=name&screenid=".$_REQUEST['screenid']."',800,450);");
-			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
-			
-			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
-		}
-		else if($resourcetype == SCREEN_RESOURCE_HOSTS_INFO){  
-// HOTS info
-			$caption = '';
-			$id=0;
-			
-			if(remove_nodes_from_id($resourceid) > 0){
-				$result=DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
-						' FROM hosts_groups hg, groups g '.
-							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
-						' WHERE g.groupid in ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
-							' AND g.groupid='.$resourceid);
-
-				while($row=DBfetch($result)){					
-					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-					$caption = $row['node_name'].$row['name'];
-					$id = $resourceid;
-				}
-			}
-			else if(remove_nodes_from_id($resourceid)==0){
-				$result=DBselect('SELECT DISTINCT n.name as node_name '.
-						' FROM nodes n '.
-						' WHERE n.nodeid='.id2nodeid($resourceid));
-
-				while($row=DBfetch($result)){					
-					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-					$caption = $row['node_name'].S_MINUS_ALL_GROUPS_MINUS;
-					$id = $resourceid;
-				}
-			}
-
-			$form->AddVar('resourceid',$id);
-			
-			$textfield = new Ctextbox('caption',$caption,60,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=host_group_scr&srcfld1=groupid&srcfld2=name',480,450);");
-			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
-			
-			$form->AddRow(S_GROUP,array($textfield,SPACE,$selectbtn));
-		}
-		else{
-// SCREEN_RESOURCE_TRIGGERS_INFO,  SCREEN_RESOURCE_CLOCK
-			$form->AddVar("resourceid",0);
-		}
-
-		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_HOSTS_INFO,SCREEN_RESOURCE_TRIGGERS_INFO))){
-			$cmbStyle = new CComboBox("style", $style);
-			$cmbStyle->AddItem(STYLE_HORISONTAL,	S_HORISONTAL);
-			$cmbStyle->AddItem(STYLE_VERTICAL,	S_VERTICAL);
-			$form->AddRow(S_STYLE,	$cmbStyle);
-		}
-		else if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW))){
-			$cmbStyle = new CComboBox('style', $style);
-			$cmbStyle->AddItem(STYLE_LEFT,	S_LEFT);
-			$cmbStyle->AddItem(STYLE_TOP,	S_TOP);
-			$form->AddRow(S_HOSTS_LOCATION,	$cmbStyle);
-		}
-		else if($resourcetype == SCREEN_RESOURCE_CLOCK){
-			$cmbStyle = new CComboBox("style", $style);
-			$cmbStyle->AddItem(TIME_TYPE_LOCAL,	S_LOCAL_TIME);
-			$cmbStyle->AddItem(TIME_TYPE_SERVER,	S_SERVER_TIME);
-			$form->AddRow(S_TIME_TYPE,	$cmbStyle);
-		}
-		else{
-			$form->AddVar("style",	0);
-		}
-
-		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_URL))){
-			$form->AddRow(S_URL, new CTextBox("url",$url,60));
-		}
-		else{
-			$form->AddVar("url",	"");
-		}
-
-		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL))){
-			$form->AddRow(S_WIDTH,	new CNumericBox("width",$width,5));
-			$form->AddRow(S_HEIGHT,	new CNumericBox("height",$height,5));
-		}
-		else{
-			$form->AddVar("width",	0);
-			$form->AddVar("height",	0);
-		}
-
-		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_MAP,
-			SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL))){
-			$cmbHalign = new CComboBox("halign",$halign);
-			$cmbHalign->AddItem(HALIGN_CENTER,	S_CENTER);
-			$cmbHalign->AddItem(HALIGN_LEFT,	S_LEFT);
-			$cmbHalign->AddItem(HALIGN_RIGHT,	S_RIGHT);
-			$form->AddRow(S_HORISONTAL_ALIGN,	$cmbHalign);
-		}
-		else{
-			$form->AddVar("halign",	0);
-		}
-
-		$cmbValign = new CComboBox("valign",$valign);
-		$cmbValign->AddItem(VALIGN_MIDDLE,	S_MIDDLE);
-		$cmbValign->AddItem(VALIGN_TOP,		S_TOP);
-		$cmbValign->AddItem(VALIGN_BOTTOM,	S_BOTTOM);
-		$form->AddRow(S_VERTICAL_ALIGN,	$cmbValign);
-
-		$form->AddRow(S_COLUMN_SPAN,	new CNumericBox("colspan",$colspan,2));
-		$form->AddRow(S_ROW_SPAN,	new CNumericBox("rowspan",$rowspan,2));
-
-// dynamic AddOn
-		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_PLAIN_TEXT))){
-			$form->AddRow(S_DYNAMIC_ITEM,	new CCheckBox("dynamic",$dynamic,null,1));
-		}
-
-		$form->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["screenitemid"])){
-			$form->AddItemToBottomRow(SPACE);
-			$form->AddItemToBottomRow(new CButtonDelete(null,
-				url_param("form").url_param("screenid").url_param("screenitemid")));
-		}
-		$form->AddItemToBottomRow(SPACE);
-		$form->AddItemToBottomRow(new CButtonCancel(url_param("screenid")));
-		return $form;
-	}
-
  	function insert_housekeeper_form(){
 		$config=select_config();
 		
@@ -4626,7 +4241,7 @@ SDI($_REQUEST);
 			$status		= $db_host['status'];
 			$useip		= $db_host['useip'];
 			$dns		= $db_host['dns'];
-			$ip		= $db_host['ip'];
+			$ip			= $db_host['ip'];
 
 // add groups
 			$db_groups=DBselect('SELECT DISTINCT groupid '.
@@ -4795,25 +4410,96 @@ SDI($_REQUEST);
 			$frmHost->AddVar("notes",	$notes);
 		}
 
+		if($_REQUEST['form'] == 'full_clone'){
+// Host items
+			$items_lbx = new CListBox('items',null,8);
+			$items_lbx->AddOption('disabled','disabled');
+			
+			$sql = 'SELECT * '.
+					' FROM items '.
+					' WHERE hostid='.$_REQUEST['hostid'].
+						' AND templateid=0 '.
+					' ORDER BY description';
+					
+			$host_items_res = DBselect($sql);
+			while($host_item = DBfetch($host_items_res)){
+				$item_description = item_description($host_item['description'],$host_item['key_']);
+				$items_lbx->AddItem($host_item['itemid'],$item_description);
+			}
+			
+			if($items_lbx->ItemsCount() < 1) $items_lbx->AddOption('style','width: 200px;');
+			$frmHost->AddRow(S_ITEMS, $items_lbx);
+			
+// Host triggers
+			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+			
+			$trig_lbx = new CListBox('triggers',null,8);
+			$trig_lbx->AddOption('disabled','disabled');
+
+			$sql = 'SELECT DISTINCT t.* '.
+					' FROM triggers t, items i, functions f'.
+					' WHERE i.hostid='.$_REQUEST['hostid'].
+						' AND f.itemid=i.itemid '.
+						' AND t.triggerid=f.triggerid '.
+						' AND '.DBcondition('t.triggerid', $available_triggers).
+						' AND t.templateid=0 '.
+					' ORDER BY t.description';
+					
+			$host_trig_res = DBselect($sql);
+			while($host_trig = DBfetch($host_trig_res)){
+				$trig_description = expand_trigger_description($host_trig["triggerid"]);
+				$trig_lbx->AddItem($host_trig['triggerid'],$trig_description);
+			}
+			
+			if($trig_lbx->ItemsCount() < 1) $trig_lbx->AddOption('style','width: 200px;');
+			$frmHost->AddRow(S_TRIGGERS, $trig_lbx);
+		
+// Host graphs
+			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+			
+			$graphs_lbx = new CListBox('graphs',null,8);
+			$graphs_lbx->AddOption('disabled','disabled');
+
+			$def_items = array();
+			$sql = 'SELECT DISTINCT g.* '.
+						' FROM graphs g, graphs_items gi,items i '.
+						' WHERE '.DBcondition('g.graphid',$available_graphs).
+							' AND gi.graphid=g.graphid '.
+							' AND g.templateid=0 '.
+							' AND i.itemid=gi.itemid '.
+							' AND i.hostid='.$_REQUEST['hostid'].
+						' ORDER BY g.name';
+											
+			$host_graph_res = DBselect($sql);
+			while($host_graph = DBfetch($host_graph_res)){
+				$graphs_lbx->AddItem($host_graph['graphid'],$host_graph['name']);
+			}
+			
+			if($graphs_lbx->ItemsCount() < 1) $graphs_lbx->AddOption('style','width: 200px;');
+			
+			$frmHost->AddRow(S_GRAPHS, $graphs_lbx);
+		}
+		
 		$frmHost->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["hostid"])){
 			$frmHost->AddItemToBottomRow(SPACE);
 			$frmHost->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmHost->AddItemToBottomRow(SPACE);
+			$frmHost->AddItemToBottomRow(new CButton("full_clone",S_FULL_CLONE));
+			
+			$frmHost->AddItemToBottomRow(SPACE);
 			$frmHost->AddItemToBottomRow(
 				new CButtonDelete(S_DELETE_SELECTED_HOST_Q,
 					url_param("form").url_param("config").url_param("hostid").
 					url_param("groupid")
-				)
-			);
+				));
 
-			if($show_only_tmp)
-			{
+			if($show_only_tmp){
 				$frmHost->AddItemToBottomRow(SPACE);
 				$frmHost->AddItemToBottomRow(
 					new CButtonQMessage('delete_and_clear',
 						'Delete AND clear',
-                                        	S_DELETE_SELECTED_HOSTS_Q,
+						S_DELETE_SELECTED_HOSTS_Q,
 						url_param("form").url_param("config").url_param("hostid").
 						url_param("groupid")
 					)
