@@ -802,8 +802,7 @@
 
 		$db_graphs = get_graphs_by_hostid($templateid);
 
-		while($db_graph = DBfetch($db_graphs))
-		{
+		while($db_graph = DBfetch($db_graphs)){
 			copy_graph_to_host($db_graph["graphid"], $hostid, $copy_mode);
 		}
 	}
@@ -820,15 +819,13 @@
          * Comments: !!! Don't forget sync code with C !!!
          *
          */
-	function	copy_graph_to_host($graphid, $hostid, $copy_mode = false)
-	{
+	function copy_graph_to_host($graphid, $hostid, $copy_mode = false){
 		$result = false;
 
 		$gitems = array();
 
 		$db_graph_items = get_graphitems_by_graphid($graphid);
-		while( $db_gitem = DBfetch($db_graph_items) )
-		{
+		while( $db_gitem = DBfetch($db_graph_items) ){
 			$gitems[] = array(
 				'itemid'	=> $db_gitem['itemid'],
 				'color'		=> $db_gitem['color'],
@@ -843,68 +840,63 @@
 
 		$db_graph = get_graph_by_graphid($graphid);
 
-		if ( ($new_gitems = get_same_graphitems_for_host($gitems, $hostid)) )
-		{
+		if ( ($new_gitems = get_same_graphitems_for_host($gitems, $hostid)) ){
 			unset($chd_graphid);
+			
 			$chd_graphs = get_graphs_by_hostid($hostid);
-			while( !isset($chd_graphid) && $chd_graph = DBfetch($chd_graphs))
-			{ /* compare graphs */
+			while( !isset($chd_graphid) && $chd_graph = DBfetch($chd_graphs)){ 
+/* compare graphs */
 				if ( $chd_graph['templateid'] != 0 ) continue;
 
 				unset($equal);
 				$chd_gitems = get_graphitems_by_graphid($chd_graph["graphid"]);
-				while($chd_gitem = DBfetch($chd_gitems))
-				{
+				while($chd_gitem = DBfetch($chd_gitems)){
 					unset($gitem_equal);
-					foreach($new_gitems as $new_gitem)
-					{
+					
+					foreach($new_gitems as $new_gitem){
 						if(cmp_graphitems($new_gitem, $chd_gitem))	continue;
 
 						$gitem_equal = true;
 						break;
 					}
 
-					if ( !isset($gitem_equal) )
-					{
+					if(!isset($gitem_equal)){
 						unset($equal);
 						break;
 					}
 
 					/* founded equal graph item */
-					if ( !isset($equal) ) $equal = 0;
+					if(!isset($equal))$equal = 0;
 
 					$equal++;
 				}
 
-				if ( isset($equal) && count($new_gitems) == $equal )
-				{ /* founded equal graph */
+				if(isset($equal) && (count($new_gitems) == $equal)){ 
+/* founded equal graph */
 					$chd_graphid = $chd_graph["graphid"];
 					break;
 				}
 			}
 
-			if ( isset($chd_graphid) )
-			{
+			if(isset($chd_graphid)){
 				$result = update_graph_with_items($chd_graphid, $db_graph['name'], $db_graph['width'], $db_graph['height'],
 					$db_graph['yaxistype'], $db_graph['yaxismin'], $db_graph['yaxismax'],
 					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],
 					$db_graph['show_legend'], $db_graph['show_3d'], $new_gitems, ($copy_mode ? 0: $db_graph['graphid']));
 			}
-			else
-			{
+			else{
 				$result = add_graph_with_items($db_graph['name'], $db_graph['width'], $db_graph['height'],
 					$db_graph['yaxistype'], $db_graph['yaxismin'], $db_graph['yaxismax'],
 					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],
 					$db_graph['show_legend'], $db_graph['show_3d'], $new_gitems, ($copy_mode ? 0: $db_graph['graphid']));
 			}
 		}
-		else
-		{
+		else{
 			$host = get_host_by_hostid($hostid);
 			info('Skipped coping of graph "'.$db_graph["name"].'" to host "'.$host['host'].'"');
 		}
 
-		return $result;
+	return $result;
 	}
 
 	function navigation_bar_calc(){

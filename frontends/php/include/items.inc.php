@@ -32,10 +32,8 @@
 	 * Comments:
 	 *
 	 */
-	function	item_type2str($type)
-	{
-		switch($type)
-		{
+	function item_type2str($type){
+		switch($type){
 			case ITEM_TYPE_ZABBIX:		$type = S_ZABBIX_AGENT;			break;
 			case ITEM_TYPE_SNMPV1:		$type = S_SNMPV1_AGENT;			break;
 			case ITEM_TYPE_TRAPPER:		$type = S_ZABBIX_TRAPPER;		break;
@@ -50,7 +48,7 @@
 			case ITEM_TYPE_DB_MONITOR:	$type = S_ZABBIX_DATABASE_MONITOR;	break;
 			default:$type = S_UNKNOWN;			break;
 		}
-		return $type;
+	return $type;
 	}
 
 	/*
@@ -65,10 +63,8 @@
 	 * Comments:
 	 *
 	 */
-	function	item_value_type2str($value_type)
-	{
-		switch($value_type)
-		{
+	function item_value_type2str($value_type){
+		switch($value_type){
 			case ITEM_VALUE_TYPE_UINT64:	$value_type = S_NUMERIC_UINT64;		break;
 			case ITEM_VALUE_TYPE_FLOAT:	$value_type = S_NUMERIC_FLOAT;		break;
 			case ITEM_VALUE_TYPE_STR:	$value_type = S_CHARACTER;		break;
@@ -76,7 +72,7 @@
 			case ITEM_VALUE_TYPE_TEXT:	$value_type = S_TEXT;			break;
 			default:$value_type = S_UNKNOWN;			break;
 		}
-		return $value_type;
+	return $value_type;
 	}
 
 	/*
@@ -91,17 +87,15 @@
 	 * Comments:
 	 *
 	 */
-	function	item_status2str($status)
-	{
-		switch($status)
-		{
+	function	item_status2str($status){
+		switch($status){
 			case ITEM_STATUS_ACTIVE:	$status = S_ACTIVE;		break;
 			case ITEM_STATUS_DISABLED:	$status = S_DISABLED;		break;
 			case ITEM_STATUS_NOTSUPPORTED:	$status = S_NOT_SUPPORTED;	break;
 			default:
 				$status = S_UNKNOWN;		break;
 		}
-		return $status;
+	return $status;
 	}
 	
 	/*
@@ -116,17 +110,15 @@
 	 * Comments:
 	 *
 	 */
-	function	item_status2style($status)
-	{
-		switch($status)
-		{
+	function	item_status2style($status){
+		switch($status){
 			case ITEM_STATUS_ACTIVE:	$status = 'off';	break;
 			case ITEM_STATUS_DISABLED:	$status = 'on';		break;
 			case ITEM_STATUS_NOTSUPPORTED:	
 			default:
 				$status = 'unknown';	break;
 		}
-		return $status;
+	return $status;
 	}
 	# Update Item definition for selected group
 
@@ -134,11 +126,10 @@
 	{
 		$sql="select i.itemid,i.hostid from hosts_groups hg,items i where hg.groupid=$groupid and i.key_=".zbx_dbstr($key)." and hg.hostid=i.hostid";
 		$result=DBexecute($sql);
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			update_item($row["itemid"],$description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$applications);
 		}
-		return 1;
+	return 1;
 	}
 
 	# Delete Item definition from selected group
@@ -323,8 +314,7 @@
 
 	# Update Item status
 
-	function	update_item_status($itemid,$status)
-	{
+	function update_item_status($itemid,$status){
 		if($status==ITEM_STATUS_ACTIVE)
 			$sql="update items set status=$status,error='' where itemid=$itemid";
 		else
@@ -349,33 +339,28 @@
 		if(($i = array_search(0,$applications)) !== FALSE)
 			unset($applications[$i]);
 
-		if( !eregi('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key) )
-		{
+		if( !eregi('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key) ){
 			error("Incorrect key format 'key_name[param1,param2,...]'");
 			return false;
 		}
 
-		if($delay<1)
-		{
+		if($delay<1){
 			error("Delay cannot be less than 1 second");
 			return FALSE;
 		}
 
-		if( ($snmp_port<1)||($snmp_port>65535))
-		{
+		if( ($snmp_port<1)||($snmp_port>65535)){
 			error("Invalid SNMP port");
 			return FALSE;
 		}
 
-		if($value_type == ITEM_VALUE_TYPE_STR)
-		{
+		if($value_type == ITEM_VALUE_TYPE_STR){
 			$delta=0;
 		}
 
 		$db_item = DBfetch(DBselect("select itemid from items".
 			" where hostid=$hostid and itemid<>$itemid and key_=".zbx_dbstr($key)));
-		if($db_item && $templateid == 0)
-		{
+		if($db_item && $templateid == 0){
 			error("An item with the same Key already exists for host ".$host["host"].".".
 				" The key must be unique.");
 			return FALSE;
@@ -383,8 +368,7 @@
 
 		 // first update child items
 		$db_tmp_items = DBselect("select itemid, hostid from items where templateid=$itemid");
-		while($db_tmp_item = DBfetch($db_tmp_items))
-		{
+		while($db_tmp_item = DBfetch($db_tmp_items)){
 		// recursion
 			$result = update_item(
 				$db_tmp_item["itemid"], $description, $key, $db_tmp_item["hostid"],
@@ -401,8 +385,7 @@
 				return $result;
 		}
 
-		if($db_item && $templateid != 0)
-		{
+		if($db_item && $templateid != 0){
 			$result = delete_item($db_item["itemid"]);
 			if(!$result) {
 				error("Can't update item '".$host["host"].":$key'");
@@ -414,8 +397,7 @@
 
 		if(isset($_REQUEST['applications_visible'])){	
 			$result = DBexecute("delete from items_applications where itemid=$itemid");
-			foreach($applications as $appid)
-			{
+			foreach($applications as $appid){
 				$itemappid=get_dbid("items_applications","itemappid");
 				DBexecute("insert into items_applications (itemappid,itemid,applicationid) values($itemappid,".$itemid.",".$appid.")");
 			}
@@ -437,12 +419,12 @@
 			"formula=".zbx_dbstr($formula).",trends=$trends,logtimefmt=".zbx_dbstr($logtimefmt).",".
 			"valuemapid=$valuemapid,delay_flex=".zbx_dbstr($delay_flex).",params=".zbx_dbstr($params).",".
 			"templateid=$templateid where itemid=$itemid");
-		if($result)
-		{
+			
+		if($result){
 			info("Item '".$host["host"].":$key' updated");
-
 		}
-		return $result;
+		
+	return $result;
 	}
 
 	/*
@@ -614,15 +596,12 @@
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	copy_template_items($hostid, $templateid = null, $copy_mode = false)
-	{
-		if($templateid == null)
-		{
+	function copy_template_items($hostid, $templateid = null, $copy_mode = false){
+		if($templateid == null){
 			$templateid = array_keys(get_templates_by_hostid($hostid));
 		}
 		
-		if(is_array($templateid))
-		{
+		if(is_array($templateid)){
 			foreach($templateid as $id)
 				copy_template_items($hostid, $id, $copy_mode); // attention recursion
 			return;
@@ -631,8 +610,7 @@
 		$db_tmp_items = get_items_by_hostid($templateid);
 
 		
-		while($db_tmp_item = DBfetch($db_tmp_items))
-		{
+		while($db_tmp_item = DBfetch($db_tmp_items)){
 			add_item(
 				$db_tmp_item["description"],
 				$db_tmp_item["key_"],
@@ -678,10 +656,8 @@
 		return $result;
 	}
 
-	# Disable Item
-
-	function	disable_item($itemid)
-	{
+// Disable Item
+	function disable_item($itemid){
 		 // first update status for child items
 		$db_tmp_items = DBselect("select itemid, hostid from items where templateid=$itemid");
 		while($db_tmp_item = DBfetch($db_tmp_items))
@@ -691,23 +667,20 @@
 		}
 
 		$result = DBexecute("update items set status=".ITEM_STATUS_DISABLED." where itemid=$itemid");
-		return $result;
+	return $result;
 	}
 
-	function	&get_items_by_hostid($hostid)
-	{
-		return DBselect("select * from items where hostid=$hostid"); 
+	function get_items_by_hostid($hostid){
+		return DBselect('select * from items where hostid='.$hostid); 
 	}
 
-	function	get_item_by_itemid($itemid)
-	{
-		$row = DBfetch(DBselect("select * from items where itemid=$itemid")); 
-		if($row)
-		{
+	function get_item_by_itemid($itemid){
+		$row = DBfetch(DBselect('select * from items where itemid='.$itemid)); 
+		if($row){
 			return	$row;
 		}
 		error("No item with itemid=[$itemid]");
-		return	FALSE;
+	return	FALSE;
 	}
 	
 /*
@@ -814,44 +787,38 @@
 	 * Comments: indexes between 1-x
 	 *
 	 */
-	function	get_n_param($key, $num)
-	{
+	function get_n_param($key, $num){
 		$param="";
 
 		$num--;
 
-		if( ereg('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key, $arr) )
-		{
+		if(ereg('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key, $arr)){
 			$params = zbx_get_params($arr[ZBX_KEY_PARAM_ID]);
 
-			if(isset($params[$num]))
-			{
+			if(isset($params[$num])){
 				$param = $params[$num];
 			}
 		}
 
-		return $param;
+	return $param;
 	}
 
-	function	item_description($description, $key)
-	{
+	function item_description($description, $key){
 		$descr=$description;
 
-		for($i=9;$i>0;$i--)
-		{
+		for($i=9;$i>0;$i--){
 			$descr=str_replace("$$i",get_n_param($key,$i),$descr);
 		}
 
-		return $descr;
+	return $descr;
 	}
 	
-	function	get_realhost_by_itemid($itemid)
-	{
+	function get_realhost_by_itemid($itemid){
 		$itme = get_item_by_itemid($itemid);
 		if($itme["templateid"] <> 0)
 			return get_realhost_by_itemid($itme["templateid"]);
 
-		return get_host_by_itemid($itemid);
+	return get_host_by_itemid($itemid);
 	}
 
 	/*
@@ -866,8 +833,7 @@
 	 * Comments:
 	 *
 	 */
-	function get_items_data_overview($groupid,$view_style=null)
-	{
+	function get_items_data_overview($groupid,$view_style=null){
 		global	$USER_DETAILS;
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 
@@ -875,20 +841,23 @@
 		
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
-		if($groupid > 0)
-		{
+		if($groupid > 0){
 			$group_where = ",hosts_groups hg where hg.groupid=$groupid and hg.hostid=h.hostid and";
-		} else {
+		} 
+		else {
 			$group_where = " where";
 		}
 
 COpt::profiling_start('prepare data');
 		$result = DBselect('select distinct h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
-			' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
-			' from hosts h,items i left join  functions f on f.itemid=i.itemid left join triggers t on t.triggerid=f.triggerid '.
-			$group_where.
-			' h.hostid in ('.$available_hosts.') '.
-			' and h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.status='.ITEM_STATUS_ACTIVE.
+				' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
+			' from hosts h,items i '.
+				' left join  functions f on f.itemid=i.itemid '.
+				' left join triggers t on t.triggerid=f.triggerid '.
+			$group_where.' h.hostid in ('.$available_hosts.') '.
+				' and h.status='.HOST_STATUS_MONITORED.
+				' and h.hostid=i.hostid '.
+				' and i.status='.ITEM_STATUS_ACTIVE.
 			' order by i.description,i.itemid');
 
 		unset($items);
@@ -925,8 +894,8 @@ COpt::profiling_start('prepare data');
 				);
 			}
 		}
-		if(!isset($hosts))
-		{
+		
+		if(!isset($hosts)){
 			return $table;
 		}
 
@@ -936,14 +905,14 @@ COpt::profiling_start('prepare table');
 
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_ITEMS,'center'));
-			foreach($hosts as $hostname)
-			{
+			foreach($hosts as $hostname){
 				$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
 			}
+			
 			$table->SetHeader($header,'vertical_header');
 			$curr_rime = time();
-			foreach($items as $descr => $ithosts)
-			{
+			
+			foreach($items as $descr => $ithosts){
 				$table_row = array(nbsp($descr));
 				foreach($hosts as $hostname){
 					$table_row = get_item_data_overview_cells($table_row,$ithosts,$hostname);
@@ -953,18 +922,16 @@ COpt::profiling_start('prepare table');
 		}
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
-			foreach($items as $descr => $ithosts)
-			{
+			foreach($items as $descr => $ithosts){
 				$header=array_merge($header,array(new CImg('vtext.php?text='.$descr)));
 			}
+			
 			$table->SetHeader($header,'vertical_header');
 			$curr_rime = time();
 			
-			foreach($hosts as $hostname)
-			{
+			foreach($hosts as $hostname){
 				$table_row = array(nbsp($hostname));
-				foreach($items as $descr => $ithosts)
-				{
+				foreach($items as $descr => $ithosts){
 					$table_row = get_item_data_overview_cells($table_row,$ithosts,$hostname);
 				}
 				$table->AddRow($table_row);
@@ -1000,8 +967,7 @@ COpt::profiling_stop('prepare table');
 					array('tw'=>'_blank'))
 				);
 
-			switch($ithosts[$hostname]['value_type'])
-			{
+			switch($ithosts[$hostname]['value_type']){
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_FLOAT:
 					$it_ov_menu = array_merge(array(
@@ -1025,8 +991,7 @@ COpt::profiling_stop('prepare table');
 //		if($value == '-')	$css_class = 'center';
 		$value_col = new CCol(array($value,$ack),$css_class);
 
-		if(isset($it_ov_menu))
-		{
+		if(isset($it_ov_menu)){
 			$it_ov_menu  = new CPUMenu($it_ov_menu,170);
 			$value_col->OnClick($it_ov_menu->GetOnActionJS());
 			$value_col->AddOption('style', 'cursor: pointer;');
@@ -1080,13 +1045,11 @@ COpt::profiling_stop('prepare table');
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	delete_history_by_itemid($itemid, $use_housekeeper=0)
-	{
+	function	delete_history_by_itemid($itemid, $use_housekeeper=0){
 		$result = delete_trends_by_itemid($itemid,$use_housekeeper);
 		if(!$result)	return $result;
 
-		if($use_housekeeper)
-		{
+		if($use_housekeeper){
 			$housekeeperid = get_dbid('housekeeper','housekeeperid');
 			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
 				" values ($housekeeperid,'history_text','itemid',$itemid)");
@@ -1118,69 +1081,56 @@ COpt::profiling_stop('prepare table');
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	delete_trends_by_itemid($itemid, $use_housekeeper=0)
-	{
-		if($use_housekeeper)
-		{
+	function	delete_trends_by_itemid($itemid, $use_housekeeper=0){
+		if($use_housekeeper){
 			$housekeeperid = get_dbid('housekeeper','housekeeperid');
 			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
 				" values ($housekeeperid, 'trends','itemid',$itemid)");
 			return TRUE;
 		}
-		return	DBexecute("delete from trends where itemid=$itemid");
+	return	DBexecute("delete from trends where itemid=$itemid");
 	}
 	
-	function	format_lastvalue($db_item)
-	{
-		if($db_item["value_type"] == ITEM_VALUE_TYPE_LOG)
-		{
+	function	format_lastvalue($db_item){
+		if($db_item["value_type"] == ITEM_VALUE_TYPE_LOG){
 			$row=DBfetch(DBselect("select value from history_log where itemid=".$db_item["itemid"]." order by clock desc", 1));
-			if($row)
-			{
+			if($row){
 				$lastvalue=/*nbsp(htmlspecialchars(*/$row["value"]/*))*/;
 				if(strlen($lastvalue) > 20)
 					$lastvalue = substr($lastvalue,0,20)." ...";
 				$lastvalue = nbsp(htmlspecialchars($lastvalue));
 			}
-			else
-			{
+			else{
 				$lastvalue="-";
 			}
 
 		}
-		else if(isset($db_item["lastvalue"]))
-		{
-			if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT)
-			{
+		else if(isset($db_item["lastvalue"])){
+			if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT){
 				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
 			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64)
-			{
+			else if($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64){
 				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
 			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_TEXT)
-			{
+			else if($db_item["value_type"] == ITEM_VALUE_TYPE_TEXT){
 				$lastvalue="...";
 			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_STR)
-			{
+			else if($db_item["value_type"] == ITEM_VALUE_TYPE_STR){
 					$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)));
 					if(strlen($db_item["lastvalue"]) > 20)
 						$lastvalue .= " ...";
 			}
-			else
-			{
+			else{
 				$lastvalue="Unknown value type";
 			}
 			if($db_item["valuemapid"] > 0);
 				$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
 
 		}
-		else
-		{
+		else{
 			$lastvalue = "-";
 		}
-		return $lastvalue;
+	return $lastvalue;
 	}
 
 	/*
@@ -1199,42 +1149,38 @@ COpt::profiling_stop('prepare table');
 	 * Comments:
 	 *
 	 */
-	function	item_get_history($db_item, $last = 1, $clock = 0)
-	{
+	function item_get_history($db_item, $last = 1, $clock = 0){
 		$value = NULL;
 
-		switch($db_item["value_type"])
-		{
-		case	ITEM_VALUE_TYPE_FLOAT:
-			$table = "history";
-			break;
-		case	ITEM_VALUE_TYPE_UINT64:
-			$table = "history_uint";
-			break;
-		case	ITEM_VALUE_TYPE_TEXT:
-			$table = "history_text";
-			break;
-		case	ITEM_VALUE_TYPE_STR:
-			$table = "history_str";
-			break;
-		case	ITEM_VALUE_TYPE_LOG:
-		default:
-			$table = "history_log";
-			break;
+		switch($db_item["value_type"]){
+			case ITEM_VALUE_TYPE_FLOAT:
+				$table = "history";
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				$table = "history_uint";
+				break;
+			case ITEM_VALUE_TYPE_TEXT:
+				$table = "history_text";
+				break;
+			case ITEM_VALUE_TYPE_STR:
+				$table = "history_str";
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+			default:
+				$table = "history_log";
+				break;
 		}
-		if ($last == 0)
-		{
+		
+		if($last == 0){
 			$sql = "select value from $table where itemid=".$db_item["itemid"]." and clock=$clock";
 			$row = DBfetch(DBselect($sql, 1));
 			if($row)
 				$value = $row["value"];
 		}
-		else
-		{
+		else{
 			$sql = "select max(clock) as clock from $table where itemid=".$db_item["itemid"];
 			$row = DBfetch(DBselect($sql));
-			if ($row && !is_null($row["clock"]))
-			{
+			if($row && !is_null($row["clock"])){
 				$clock = $row["clock"];
 				$sql = "select value from $table where itemid=".$db_item["itemid"]." and clock=$clock";
 				$row = DBfetch(DBselect($sql, 1));
