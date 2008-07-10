@@ -70,7 +70,6 @@ include_once "include/page_header.php";
 	$graph = new Pie($db_data["graphtype"]);
 
 	if(isset($_REQUEST["period"]))		$graph->SetPeriod($_REQUEST["period"]);
-	if(isset($_REQUEST["from"]))		$graph->SetFrom($_REQUEST["from"]);
 	if(isset($_REQUEST["stime"]))		$graph->SetSTime($_REQUEST["stime"]);
 	if(isset($_REQUEST["border"]))		$graph->SetBorder(0);
 
@@ -88,9 +87,10 @@ include_once "include/page_header.php";
 	if($db_data['show_3d'] == 1) $graph->SwitchPie3D();
 	$graph->SwitchLegend($db_data['show_legend']);
 
-	$result = DBselect("select gi.* from graphs_items gi ".
-		" where gi.graphid=".$db_data["graphid"].
-		" order by gi.sortorder, gi.itemid desc");
+	$result = DBselect('SELECT gi.* '.
+					' FROM graphs_items gi '.
+					' WHERE gi.graphid='.$db_data['graphid'].
+					' ORDER BY gi.sortorder, gi.itemid DESC');
 
 	while($db_data=DBfetch($result))
 	{
