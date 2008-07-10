@@ -51,7 +51,7 @@ include_once "include/page_header.php";
 		"inc"=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		"left"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		"right"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		"stime"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		"stime"=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
 
 		"filter_task"=>	array(T_ZBX_STR, O_OPT,	 null,	
 			IN(FILTER_TAST_SHOW.','.FILTER_TAST_HIDE.','.FILTER_TAST_MARK.','.FILTER_TAST_INVERT_MARK), null),
@@ -263,9 +263,11 @@ include_once "include/page_header.php";
 	else if($_REQUEST["action"]=="showvalues" || $_REQUEST["action"]=="showlatest"){
 	
 		if($_REQUEST["action"]=="showvalues"){
-						
-			$time = time(null) - $effectiveperiod - $_REQUEST["from"] * 3600;
-			$till = time(null) - $_REQUEST["from"] * 3600;
+			
+			$bstime = isset($_REQUEST['stime'])?$_REQUEST['stime']:date('YmdHi',(time()-$_REQUEST['period']));
+			$time = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+			$till = $time + $effectiveperiod;
+			
 			$hours=$effectiveperiod / 3600;
 
 			$l_header = array(S_SHOWING_HISTORY_OF.SPACE.$effectiveperiod.SPACE.S_SECONDS_SMALL.'('.$hours.' h)',
