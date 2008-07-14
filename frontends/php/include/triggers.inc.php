@@ -1417,7 +1417,6 @@
 
 		delete_dependencies_by_triggerid($triggerid);
 
-
 		foreach($deps as $id => $triggerid_up){
 			if(!$result2=add_trigger_dependency($triggerid, $triggerid_up)){
 				error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_description($triggerid_up).']');
