@@ -412,7 +412,7 @@ include_once "include/page_header.php";
 		$applications = get_request("applications",array());
 
 		$delay_flex = get_request('delay_flex',array());
-		$db_delay_flex = "";
+		$db_delay_flex = '';
 		foreach($delay_flex as $val)
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		$db_delay_flex = trim($db_delay_flex,";");

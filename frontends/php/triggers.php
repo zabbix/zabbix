@@ -241,7 +241,7 @@ include_once "include/page_header.php";
 			else{ /* groups */
 				$hosts_ids = array();
 				$group_ids = '';
-				foreach($_REQUEST['copy_targetid'] as $group_id){
+				foreach($_REQUEST['copy_targetid'] as $id => $group_id){
 					$group_ids .= $group_id.',';
 				}
 				$group_ids = trim($group_ids,',');
@@ -289,7 +289,7 @@ include_once "include/page_header.php";
 		$result = false;
 		
 		DBstart();
-		foreach($_REQUEST["g_triggerid"] as $triggerid){
+		foreach($_REQUEST["g_triggerid"] as $id => $triggerid){
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
 			$res = DBselect('SELECT triggerid FROM triggers t WHERE t.triggerid='.zbx_dbstr($triggerid));
@@ -314,7 +314,7 @@ include_once "include/page_header.php";
 		$result = false;
 		
 		DBstart();
-		foreach($_REQUEST["g_triggerid"] as $triggerid){
+		foreach($_REQUEST["g_triggerid"] as $id => $triggerid){
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
 			$res=DBselect("SELECT triggerid FROM triggers t WHERE t.triggerid=".zbx_dbstr($triggerid));
