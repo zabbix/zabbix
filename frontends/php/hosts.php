@@ -179,7 +179,6 @@ include_once 'include/page_header.php';
 								$host['ip'],$host['proxy_hostid'],$templates_tmp,null,$host_groups);
 			}
 //----------
-
 			$result = DBend($result);
 			
 			show_messages($result, S_LINK_TO_TEMPLATE, S_CANNOT_LINK_TO_TEMPLATE);
@@ -543,7 +542,7 @@ include_once 'include/page_header.php';
 		while($db_host=DBfetch($db_hosts)){		
 			if(!uint_in_array($db_host["hostid"],$hosts)) continue;
 
-			$host=get_host_by_hostid($db_host["hostid"]);
+			$host = get_host_by_hostid($db_host["hostid"]);
 			$result &= update_host_status($db_host["hostid"],$status);
 			
 			if($result){

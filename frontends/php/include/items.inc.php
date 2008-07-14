@@ -284,7 +284,7 @@
 			DBexecute('INSERT INTO items_applications (itemappid,itemid,applicationid) VALUES('.$itemappid.','.$itemid.','.$appid.')');
 		}
 
-		info('Added new item '.$host['host'].':$key');
+		info('Added new item '.$host['host'].':'.$key);
 
 // add items to child hosts
 
@@ -473,8 +473,7 @@
 
 		$item_data = get_item_by_itemid($itemid);
 
-		foreach($restore_rules as $var_name => $info)
-		{
+		foreach($restore_rules as $var_name => $info){
 			if (!isset($info['db_varname'])) $info['db_varname'] = $var_name;
 
 			if ($item_data['type'] == ITEM_TYPE_HTTPTEST && !isset($info['httptest']))

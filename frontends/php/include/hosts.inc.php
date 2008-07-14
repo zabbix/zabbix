@@ -172,15 +172,14 @@ require_once "include/httptest.inc.php";
 	 *
 	 *     NOTE: templates = array(id => name, id2 => name2, ...)
 	 */
-	function	db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$hostid=null){
-		if( !eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host) )
-		{
+	function db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$hostid=null){
+		
+		if(!eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host)){
 			error("Incorrect characters used for Hostname");
 			return false;
 		}
 
- 		if ( !empty($dns) && !eregi('^'.ZBX_EREG_DNS_FORMAT.'$', $dns)) 
-		{
+ 		if(!empty($dns) && !eregi('^'.ZBX_EREG_DNS_FORMAT.'$', $dns)){
 			error("Incorrect characters used for DNS");
 			return false;
 		}
@@ -229,7 +228,7 @@ require_once "include/httptest.inc.php";
 
 		if($result) $result = $hostid;
 		
-		return $result;
+	return $result;
 	}
 
 	/*
@@ -245,7 +244,7 @@ require_once "include/httptest.inc.php";
 	 *
 	 *     NOTE: templates = array(id => name, id2 => name2, ...)
 	 */
-	function	add_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$newgroup,$groups){
+	function add_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$newgroup,$groups){
 		$hostid = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates);
 		if(!$hostid)
 			return $hostid;
@@ -287,7 +286,7 @@ require_once "include/httptest.inc.php";
 
 		$new_templates = array_diff($templates, $old_templates);
 
-		$result = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$new_templates,$hostid);
+		$result = (bool) db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$new_templates,$hostid);
 		if(!$result)
 			return $result;
 
@@ -298,7 +297,7 @@ require_once "include/httptest.inc.php";
 			sync_host_with_templates($hostid,array_keys($new_templates));
 		}
 
-		return	$result;
+	return	$result;
 	}
 
 	/*
@@ -603,8 +602,7 @@ require_once "include/httptest.inc.php";
 					' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
 					);
 		}
-		else
-		{
+		else{
 			return 1;
 		}
 	}
