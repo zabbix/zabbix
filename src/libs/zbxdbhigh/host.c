@@ -1180,7 +1180,7 @@ static int	DBupdate_graph(
 		"yaxistype=%i,yaxismin=%i,yaxismax=%i,templateid=" ZBX_FS_UI64 ","
 		"show_work_period=%i,show_triggers=%i,graphtype=%i"
 		" where graphid=" ZBX_FS_UI64,
-		name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,
+		name_esc,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,
 		graphid);
 
 	zbx_free(name_esc);
