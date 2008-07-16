@@ -1276,14 +1276,14 @@ include_once 'include/page_header.php';
 				$host_list = array();
 				while($host = DBfetch($hosts)){
 					$style = ($host["status"] == HOST_STATUS_MONITORED)?NULL:'on';
-					array_push($host_list, empty($host_list) ? '' : ', ', new CSpan($host["host"], $style));
+					array_push($host_list, empty($host_list)?'':', ', new CSpan($host["host"], $style));
 				}
 				$table->AddRow(array(		
 					new CCol(array(
 						new CLink($template['host'],'hosts.php?form=update&hostid='.
 							$template['hostid'].url_param('hostid').url_param('config'), 'action')
 						),'unknown'),
-					empty($host_list)?'-':$host_list
+					empty($host_list)?'-':new CCol($host_list,'wraptext')
 				));
 			}
 			

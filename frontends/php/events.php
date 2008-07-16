@@ -386,7 +386,13 @@ include_once "include/page_header.php";
 	
 	if($table->GetNumRows() >= PAGE_SIZE){
 		$next = new Clink('Next '.PAGE_SIZE, 'events.php?next=1'.url_param('start'),'styled');
-	}	
+	}
+	
+	$navigation = array(
+				new CSpan(array('&laquo; ',$prev),'textcolorstyles'),
+				new CSpan(' | ','divider'),
+				new CSpan(array($next,' &raquo;'),'textcolorstyles')
+			);
 
 	$filterForm = new CFormTable(S_FILTER);//,'events.php?filter_set=1','POST',null,'sform');
 	$filterForm->AddOption('name','zbx_filter');
@@ -478,15 +484,13 @@ include_once "include/page_header.php";
 
 		$filterForm->AddItemToBottomRow(new CButton("filter_set",S_FILTER));
 		$filterForm->AddItemToBottomRow($reset);
-	}
 
-	$navigation = array(
-						new CSpan(array('&laquo; ',$prev),'textcolorstyles'),
-						new CSpan(' | ','divider'),
-						new CSpan(array($next,' &raquo;'),'textcolorstyles'));
-						
-	$filter = create_filter(S_FILTER,$navigation,$filterForm,'tr_filter',get_profile('web.events.filter.state',0));
-	$filter->Show();
+		$filter = create_filter(S_FILTER,$navigation,$filterForm,'tr_filter',get_profile('web.events.filter.state',0));
+		$filter->Show();
+	}
+	else{
+		show_thin_table_header(SPACE,$navigation);
+	}
 //-------
 
 	$table->Show();
