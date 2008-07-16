@@ -254,7 +254,18 @@ sub process_field
 		$_=$type;
 		s/$type_short/$a/g;
 		$type_2=$_;
-		if($default ne "")	{ $default="DEFAULT $default"; }
+
+		if($default ne ""){
+			$default="DEFAULT $default"; 
+		}
+		
+		if($output{"database"} eq "mysql"){
+			@text_fields = ('blob','longblob','text','longtext');
+			if(grep /$output{$type_short}/, @text_fields){ 
+				$default=""; 
+			}
+		}
+
 		# Special processing for Oracle "default 'ZZZ' not null" -> "default 'ZZZ'. NULL=='' in Oracle!"
 		if(($output{"database"} eq "oracle") && (0==index($type_2,"varchar2")))
 		{
