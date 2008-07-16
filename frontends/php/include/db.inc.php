@@ -151,7 +151,6 @@ if(!isset($DB)){
 
 	function DBclose(){
 		global $DB;
-
 		$result = false;
 
 		if( isset($DB['DB']) && !empty($DB['DB']) ){
@@ -232,10 +231,10 @@ if(!isset($DB)){
 		if(isset($DB['DB']) && !empty($DB['DB']))
 		switch($DB['TYPE']){
 			case "MYSQL":
-				$result = DBexecute('begin;');
+				$result = DBexecute('begin');
 				break;
 			case "POSTGRESQL":
-				$result = DBexecute('begin;');
+				$result = DBexecute('begin');
 				break;
 			case "ORACLE":
 				$result = true;
@@ -244,7 +243,7 @@ if(!isset($DB)){
 			case "SQLITE3":				
 				if(1 == $DB['TRANSACTIONS']){
 					lock_db_access();
-					$result = DBexecute('begin;');
+					$result = DBexecute('begin');
 				}
 				break;
 		}
@@ -297,17 +296,17 @@ if(!isset($DB)){
 		if( isset($DB['DB']) && !empty($DB['DB']) )
 		switch($DB['TYPE']){
 			case "MYSQL":
-				$result = DBexecute('commit;');
+				$result = DBexecute('commit');
 				break;
 			case "POSTGRESQL":
-				$result = DBexecute('commit;');
+				$result = DBexecute('commit');
 				break;
 			case "ORACLE":
 				$result = ocicommit($DB['DB']);
 
 				break;
 			case "SQLITE3":
-				$result = DBexecute('commit;');
+				$result = DBexecute('commit');
 				unlock_db_access();
 				break;
 		}
@@ -322,16 +321,16 @@ if(!isset($DB)){
 		if( isset($DB['DB']) && !empty($DB['DB']) )
 		switch($DB['TYPE']){
 			case "MYSQL":
-				$result = DBexecute('rollback;');
+				$result = DBexecute('rollback');
 				break;
 			case "POSTGRESQL":
-				$result = DBexecute('rollback;');
+				$result = DBexecute('rollback');
 				break;
 			case "ORACLE":
 				$result = ocirollback($DB['DB']);
 				break;
 			case "SQLITE3":				
-				$result = DBexecute('rollback;');
+				$result = DBexecute('rollback');
 				unlock_db_access();
 				break;
 		}
@@ -357,9 +356,8 @@ if(!isset($DB)){
 
 	function &DBselect($query, $limit='NO'){
 		global $DB;
-
 //COpt::savesqlrequest($query);
-
+//SDI('SQL: '.$query);
 		$result = false;
 		if( isset($DB['DB']) && !empty($DB['DB']) )
 		switch($DB['TYPE']){
@@ -434,7 +432,7 @@ if(!isset($DB)){
 
 	function DBexecute($query, $skip_error_messages=0){
 		global $DB;
-//SDI($query);
+//SDI('SQL Exec: '.$query);
 //COpt::savesqlrequest($query);
 		$result = false;
 
