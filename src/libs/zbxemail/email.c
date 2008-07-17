@@ -230,7 +230,9 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	time(&email_time);
 	local_time = localtime(&email_time);
 	strftime( str_time, MAX_STRING_LEN, "%a, %d %b %Y %H:%M:%S %z", local_time );
-	cp = zbx_dsprintf(cp,"From:<%s>\r\nTo:<%s>\r\nDate: %s\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,str_time,mailsubject, mailbody);
+	cp = zbx_dsprintf(cp, "From:<%s>\r\nTo:<%s>\r\nDate: %s\r\nSubject: %s\r\n"
+			"Content-Type: text/plain; charset=\"UTF-8\"\r\n\r\n%s",
+			smtp_email, mailto, str_time, mailsubject, mailbody);
 	e=write(s.socket,cp,strlen(cp)); 
 	zbx_free(cp);
 	zbx_free(mailsubject);

@@ -1,5 +1,6 @@
 Changes for 1.5.4
 
+ - [ZBX-391] added charset info to the email header. Thanks to Vadim Pilipenko. (Sasha)
  - [DEV-189] added full clone to hosts (Artem)
  - [DEV-182] added massupdate for triggers (Artem)
  - [DEV-188] implemented sound on/off button in status of triggers screens (Artem) 
