@@ -147,8 +147,8 @@ include_once 'include/page_header.php';
 			$user_groups = get_request('user_groups', array());
 			$user_medias = get_request('user_medias', array());
 
-			$_REQUEST['password1'] = get_request('password1', '');
-			$_REQUEST['password2'] = get_request('password2', '');
+			$_REQUEST['password1'] = get_request('password1', null);
+			$_REQUEST['password2'] = get_request('password2', null);
 
 			if($_REQUEST['password1']!=$_REQUEST['password2']){
 				if(isset($_REQUEST['userid']))
@@ -156,8 +156,11 @@ include_once 'include/page_header.php';
 				else
 					show_error_message(S_CANNOT_ADD_USER_BOTH_PASSWORDS_MUST);
 			}
-			else if(isset($_REQUEST['password1']) && $_REQUEST['password1'] != '' && $_REQUEST['alias']==ZBX_GUEST_USER){
+			else if(isset($_REQUEST['password1']) && ($_REQUEST['alias']==ZBX_GUEST_USER) && !zbx_empty($_REQUEST['password1'])){
 				show_error_message(S_FOR_GUEST_PASSWORD_MUST_BE_EMPTY);
+			}
+			else if(isset($_REQUEST['password1']) && ($_REQUEST['alias']!=ZBX_GUEST_USER) && zbx_empty($_REQUEST['password1'])){
+				show_error_message(S_PASSWORD_SHOULD_NOT_BE_EMPTY);
 			}
 			else {
 				if(isset($_REQUEST['userid'])){

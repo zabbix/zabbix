@@ -107,7 +107,7 @@
 						' name='.zbx_dbstr($name).
 						' ,surname='.zbx_dbstr($surname).
 						' ,alias='.zbx_dbstr($alias).
-						(isset($passwd) ? (',passwd='.zbx_dbstr(md5($passwd))) : '').
+						(isset($passwd)?(',passwd='.zbx_dbstr(md5($passwd))):'').
 						' ,url='.zbx_dbstr($url).
 						' ,autologin='.$autologin.
 						' ,autologout='.$autologout.
