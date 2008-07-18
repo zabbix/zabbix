@@ -2060,7 +2060,7 @@
 		$target_list = array();
 		while($target = DBfetch($db_targets)){
 			array_push($target_list,array(
-				new CCheckBox('copy_targetid[]',
+				new CCheckBox('copy_targetid['.$target['target_id'].']',
 					uint_in_array($target['target_id'], $copy_targetid), 
 					null, 
 					$target['target_id']),
@@ -4707,7 +4707,7 @@
  			$frmHostT->AddVar("hostid",$_REQUEST["hostid"]);
  		}
  
- 		$frmHostT->AddRow(S_TEMPLATE,new CTextBox("tname",$name,60));
+ 		$frmHostT->AddRow(S_TEMPLATE,new CTextBox("tname",$name,60,'yes'));
  
 		$hosts_in_tpl = array();
 		$sql = 'SELECT DISTINCT h.hostid,h.host '.

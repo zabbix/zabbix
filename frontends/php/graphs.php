@@ -86,8 +86,9 @@ include_once "include/page_header.php";
 	check_fields($fields);
 	validate_sort_and_sortorder('g.name',ZBX_SORT_UP);
 
-	$options = array("allow_all_hosts","with_monitored_items","only_current_node","always_select_first_host");
+	$options = array('allow_all_hosts','only_current_node','always_select_first_host');//'with_monitored_items',
 	validate_group_with_host(PERM_READ_WRITE,$options,'web.last.conf.groupid', 'web.last.conf.hostid');
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 ?>
 <?php
 
@@ -96,8 +97,8 @@ include_once "include/page_header.php";
 	$_REQUEST['graph3d'] = get_request('graph3d', 0);
 	$_REQUEST['legend'] = get_request('legend', 0);
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-	$available_graphs = get_accessible_graphs(PERM_READ_WRITE);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
+	$available_graphs = get_accessible_graphs(PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
 
 // ---- <ACTIONS> ----
 	if(isset($_REQUEST["clone"]) && isset($_REQUEST["graphid"])){
@@ -108,10 +109,10 @@ include_once "include/page_header.php";
 		$items = get_request('items', array());
 		foreach($items as $gitem){
 			$sql = 'SELECT h.hostid '.
-							' FROM hosts h,items i '.
-							' WHERE h.hostid=i.hostid '.
-								' AND i.itemid='.$gitem['itemid'].
-								' AND h.hostid NOT IN ('.$available_hosts.')';
+					' FROM hosts h,items i '.
+					' WHERE h.hostid=i.hostid '.
+						' AND i.itemid='.$gitem['itemid'].
+						' AND '.DBcondition('h.hostid',$available_hosts,true);
 			if(DBfetch(DBselect($sql,1))){
 				access_deny();
 			}
@@ -201,10 +202,13 @@ include_once "include/page_header.php";
 			}
 			else{ /* groups */
 				$hosts_ids = array();
-				$db_hosts = DBselect('SELECT distinct h.hostid FROM hosts h, hosts_groups hg'.
-					' WHERE h.hostid=hg.hostid AND hg.groupid in ('.implode(',',$_REQUEST['copy_targetid']).')'.
-					' AND h.hostid in ('.$available_hosts.")"
-					);
+				
+				$sql = 'SELECT distinct h.hostid '.
+						' FROM hosts h, hosts_groups hg'.
+						' WHERE h.hostid=hg.hostid '.
+							' AND hg.groupid IN ('.implode(',',$_REQUEST['copy_targetid']).')'.
+							' AND '.DBcondition('h.hostid',$available_hosts);
+				$db_hosts = DBselect($sql);
 				while($db_host = DBfetch($db_hosts)){
 					array_push($hosts_ids, $db_host['hostid']);
 				}
@@ -265,7 +269,7 @@ include_once "include/page_header.php";
 		}
 	}
 // ----</ACTIONS>----
-	$available_graphs = get_accessible_graphs(PERM_READ_WRITE);
+	$available_graphs = get_accessible_graphs(PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
 ?>
 <?php
 	$form = new CForm();
@@ -298,8 +302,7 @@ include_once "include/page_header.php";
 	} 
 	else {
 /* Table HEADER */
-		if(isset($_REQUEST["graphid"])&&($_REQUEST["graphid"]==0))
-		{
+		if(isset($_REQUEST["graphid"])&&($_REQUEST["graphid"]==0)){
 			unset($_REQUEST["graphid"]);
 		}
 
@@ -314,7 +317,7 @@ include_once "include/page_header.php";
 		$sql = 'SELECT DISTINCT g.groupid,g.name '.
 			' FROM groups g, hosts_groups hg '.
 			' WHERE hg.groupid = g.groupid '.
-				' AND hg.hostid IN ('.$available_hosts.') '.
+				' AND '.DBcondition('hg.hostid',$available_hosts).
 			' ORDER BY g.name';
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
@@ -327,14 +330,16 @@ include_once "include/page_header.php";
 				' FROM hosts h, hosts_groups hg '.
 				' WHERE hg.groupid='.$_REQUEST["groupid"].
 					' AND hg.hostid=h.hostid '.
-					' AND h.hostid IN ('.$available_hosts.') '.
+					' AND '.DBcondition('h.hostid',$available_hosts).
+					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
 				' ORDER BY h.host';
 		}
 		else{
 			$cmbHosts->AddItem(0,S_ALL_SMALL);
 			$sql='SELECT DISTINCT h.hostid,h.host '.
 				' FROM hosts h '.
-				' WHERE h.hostid IN ('.$available_hosts.') '.
+				' WHERE '.DBcondition('h.hostid',$available_hosts).
+					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
 				' ORDER BY h.host';
 		}
 		
@@ -364,7 +369,7 @@ include_once "include/page_header.php";
 		if($_REQUEST["hostid"] > 0){
 			$result = DBselect('SELECT DISTINCT g.* '.
 						' FROM graphs g, graphs_items gi,items i '.
-						' WHERE g.graphid IN ('.$available_graphs.') '.
+						' WHERE '.DBcondition('g.graphid',$available_graphs).
 							' AND gi.graphid=g.graphid '.
 							' AND i.itemid=gi.itemid '.
 							' AND i.hostid='.$_REQUEST['hostid'].
@@ -373,7 +378,7 @@ include_once "include/page_header.php";
 		else{
 			$result = DBselect('SELECT DISTINCT g.* '.
 						' FROM graphs g '.
-						' WHERE g.graphid IN ('.$available_graphs.') '.
+						' WHERE '.DBcondition('g.graphid',$available_graphs).
 						order_by('g.name,g.width,g.height,g.graphtype','g.graphid'));
 		}
 		

@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2008 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@
 	define('PAGE_TYPE_JS',			3);	//javascript
 	define('PAGE_TYPE_HTML_BLOCK',	4);	//simple block of html (as text)
 	
-	define('ZBX_LOGIN_ATTEMPTS', 5);
-	define('ZBX_LOGIN_BLOCK', 30);	// sec
+	define('ZBX_LOGIN_ATTEMPTS', 	5);
+	define('ZBX_LOGIN_BLOCK', 		30); // sec
 	
 	define('ZBX_SESSION_ACTIVE', 0);
 	define('ZBX_SESSION_PASSIVE', 1);
