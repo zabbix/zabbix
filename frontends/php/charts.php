@@ -382,8 +382,7 @@ include_once 'include/page_header.php';
 	$table->Show();
 	echo SBR;
 	
-	if($_REQUEST['graphid'] > 0)
-	{
+	if($_REQUEST['graphid'] > 0){
 // NAV BAR
 		$stime = get_min_itemclock_by_graphid($_REQUEST['graphid']);
 		$stime = (is_null($stime))?0:$stime;

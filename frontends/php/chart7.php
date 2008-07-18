@@ -92,8 +92,7 @@ include_once "include/page_header.php";
 	$graph->SetWidth(get_request("width",		400));
 	$graph->SetHeight(get_request("height",		300));
 	
-	foreach($items as $id => $gitem)
-	{
+	foreach($items as $id => $gitem){
 //		SDI($gitem);
 		$graph->AddItem(
 			$gitem["itemid"],
