@@ -178,8 +178,10 @@ function graphload(dom_objects,unix_stime,period,dynamic){
 				continue;
 			}
 // SBOX			
-			A_SBOX[dom_objects[i].id].sbox.obj.stime = unix_stime;
-			A_SBOX[dom_objects[i].id].sbox.obj.period = period;
+			if('undefined' != typeof(A_SBOX[dom_objects[i].id])){
+				A_SBOX[dom_objects[i].id].sbox.obj.stime = unix_stime;
+				A_SBOX[dom_objects[i].id].sbox.obj.period = period;
+			}
 //------
 //SCROLL_BAR
 			SCROLL_BAR.initialize(SCROLL_BAR.starttime,period,unix_stime,0)
