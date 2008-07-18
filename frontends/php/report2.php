@@ -138,6 +138,19 @@ include_once 'include/page_header.php';
 		$table->Show();
 	}
 	else if(isset($_REQUEST['hostid'])){
+		
+/*
+		if($_REQUEST['hostid'] > 0){
+			$row	= DBfetch(DBselect('SELECT host FROM hosts WHERE hostid='.$_REQUEST['hostid']));
+			show_table_header($row['host']);
+		}
+		else{
+			if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
+				show_table_header(expand_trigger_description($_REQUEST['tpl_triggerid']));
+			else
+				show_table_header(S_ALL_HOSTS_BIG);				
+		}
+//*/
 /************************* FILTER *************************/
 /***********************************************************/	
 		$filterForm = new CFormTable(S_FILTER);//,'events.php?filter_set=1','POST',null,'sform');
@@ -226,16 +239,6 @@ include_once 'include/page_header.php';
 				$sql_cond.= ' AND t.templateid='.$_REQUEST['tpl_triggerid'];
 		}
 		
-		if($_REQUEST['hostid'] > 0){
-			$row	= DBfetch(DBselect('SELECT host FROM hosts WHERE hostid='.$_REQUEST['hostid']));
-			show_table_header($row['host']);
-		}
-		else{
-			if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
-				show_table_header(expand_trigger_description($_REQUEST['tpl_triggerid']));
-			else
-				show_table_header(S_ALL_HOSTS_BIG);				
-		}
 		$result = DBselect('SELECT DISTINCT h.hostid,h.host,t.triggerid,t.expression,t.description,t.value '.
 			' FROM triggers t,hosts h,items i,functions f, hosts_templates ht, groups g, hosts_groups hg '.
 			' WHERE f.itemid=i.itemid '.

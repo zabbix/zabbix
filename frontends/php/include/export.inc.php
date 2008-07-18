@@ -40,7 +40,6 @@
 			'elements'	=> array(
 				'depends'		=> '')
 			),
-// based on mod by scricca
 		XML_TAG_HOSTPROFILE => array(
 			'attribures'	=> array(),
 			'elements'	=> array(
@@ -318,7 +317,6 @@
 			
 // based on  mod by scricca
 			$data = DBfetch(DBselect('SELECT hp.* FROM hosts_profiles hp WHERE hp.hostid='.$hostid));
-//			if(!$data) return false;
 			if($data){
 				zbx_xmlwriter_start_element ($memory,XML_TAG_HOSTPROFILE);
 				

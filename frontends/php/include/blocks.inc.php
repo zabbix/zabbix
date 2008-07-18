@@ -979,7 +979,7 @@ function add_refresh_objects($ref_tab){
 }
 
 function get_refresh_obj_script($obj){
-	$obj['url'] = (isset($obj['url']))?$obj['url']:'dashboard.php?output=html';
+	$obj['url'] = (isset($obj['url']))?$obj['url']:'?output=html';
 return 'updater.setObj4Update("'.$obj['id'].'",'.$obj['interval'].',"'.$obj['url'].'",{"favobj": "refresh", "favid": "'.$obj['id'].'"});';
 }
 

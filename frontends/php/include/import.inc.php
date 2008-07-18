@@ -575,12 +575,12 @@
 						}
 					}
 					else{
-						if($graph = DBfetch(DBselect('select distinct g.graphid, g.templateid'.
-							' from graphs g, graphs_items gi, items i'.
-							' where g.graphid=gi.graphid '.
-								' and gi.itemid=i.itemid'.
-								' and g.name='.zbx_dbstr($data['name']).
-								' and i.hostid='.$this->data[XML_TAG_HOST]['hostid'])))
+						if($graph = DBfetch(DBselect('SELECT DISTINCT g.graphid, g.templateid'.
+							' FROM graphs g, graphs_items gi, items i'.
+							' WHERE g.graphid=gi.graphid '.
+								' AND gi.itemid=i.itemid'.
+								' AND g.name='.zbx_dbstr($data['name']).
+								' AND i.hostid='.$this->data[XML_TAG_HOST]['hostid'])))
 						{ /* exist */
 							if($this->graph['exist']==1){ /* skip */
 								info('Graph ['.$data['name'].'] skipped - user rule');
