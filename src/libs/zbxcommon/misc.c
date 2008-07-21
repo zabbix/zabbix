@@ -510,11 +510,7 @@ int	is_double_prefix(char *c)
 		if((c[i]=='.')&&(dot==-1))
 		{
 			dot=i;
-
-			if((dot!=0)&&(dot!=(int)strlen(c)-1))
-			{
-				continue;
-			}
+			continue;
 		}
 		/* Last digit is prefix 'K', 'M', 'G' */
 		if( ((c[i]=='K')||(c[i]=='M')||(c[i]=='G')) && (i == (int)strlen(c)-1))
