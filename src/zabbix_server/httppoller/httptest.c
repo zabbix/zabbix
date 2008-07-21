@@ -168,6 +168,10 @@ static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
 				SET_UI64_RESULT(&value, stat->test_last_step);
 				process_value(httptestitem.itemid,&value);
 				break;
+			case ZBX_HTTPITEM_TYPE_SPEED:
+				SET_UI64_RESULT(&value, stat->speed_download);
+				process_value(httptestitem.itemid, &value);
+				break;
 			default:
 				break;
 		}
@@ -263,6 +267,8 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 	int		lastfailedstep;
 
 	S_ZBX_HTTPSTAT	stat;
+	double		speed_download = 0;
+	int		speed_download_num = 0;
 
 	CURL            *easyhandle = NULL;
 
@@ -466,6 +472,11 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				err_str = strdup(curl_easy_strerror(err));
 				lastfailedstep = httpstep.no;
 			}
+			else
+			{
+				speed_download += stat.speed_download;
+				speed_download_num++;
+			}
 		}
 
 		httptest->time+=stat.total_time;
@@ -492,6 +503,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 	stat.test_total_time =  httptest->time;
 	stat.test_last_step = lastfailedstep;
+	stat.speed_download = speed_download_num ? speed_download / speed_download_num : 0;
 
 	process_test_data(httptest, &stat);
 
