@@ -50,11 +50,11 @@ include_once "include/page_header.php";
 
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
-	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
 
 	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
 		' FROM groups g, hosts_groups hg, hosts h, items i '.
-		' WHERE h.hostid IN ('.$availiable_hosts.') '.
+		' WHERE '.DBcondition('h.hostid',$available_hosts).
 			' AND hg.groupid=g.groupid '.
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND h.hostid=i.hostid '.
@@ -88,28 +88,25 @@ include_once "include/page_header.php";
 			make_sorting_link(S_MACADDRESS,'p.macaddress'))
 		);
 
-		if($_REQUEST["groupid"] > 0)
-		{
+		if($_REQUEST["groupid"] > 0){
 			$sql='SELECT h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress'.
 				' FROM hosts h,hosts_profiles p,hosts_groups hg '.
 				' WHERE h.hostid=p.hostid'.
 					' and h.hostid=hg.hostid '.
 					' and hg.groupid='.$_REQUEST['groupid'].
-					' and h.hostid in ('.$availiable_hosts.') '.
+					' and '.DBcondition('h.hostid',$available_hosts).
 				order_by('h.host,h.hostid,p.name,p.os,p.serialno,p.tag,p.macaddress');
 		}
 		else{
-		
 			$sql='SELECT h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress'.
 				' FROM hosts h,hosts_profiles p '.
 				' WHERE h.hostid=p.hostid'.
-					' AND h.hostid in ('.$availiable_hosts.') '.
+					' AND '.DBcondition('h.hostid',$available_hosts).
 				order_by('h.host,h.hostid,p.name,p.os,p.serialno,p.tag,p.macaddress');
 		}
 
 		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			$table->AddRow(array(
 				get_node_name_by_elid($row['hostid']),
 				new CLink($row["host"],"?hostid=".$row["hostid"].url_param("groupid"),"action"),

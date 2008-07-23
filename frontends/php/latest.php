@@ -45,9 +45,27 @@ include_once "include/page_header.php";
 
 		"show"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,		NULL),
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
+		
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
 	check_fields($fields);
+	
+/* AJAX	*/
+	if(isset($_REQUEST['favobj'])){
+		if('hat' == $_REQUEST['favobj']){
+			update_profile('web.latest.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
+	}	
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+//--------
+
 	validate_sort_and_sortorder('i.description',ZBX_SORT_UP);
 	
 	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
@@ -103,6 +121,10 @@ include_once "include/page_header.php";
 	update_profile('web.latest.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
 ?>
 <?php
+
+	$p_elemetns = array();
+	
+// Header
 	$r_form = new CForm();
 	$r_form->SetMethod('get');
 
@@ -115,7 +137,7 @@ include_once "include/page_header.php";
 	$cmbHosts->AddItem(0,S_ALL_SMALL);
 	
 	$available_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
 
 	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
 					' FROM groups g, hosts_groups hg, hosts h, items i '.
@@ -142,7 +164,7 @@ include_once "include/page_header.php";
 				' AND hg.groupid='.$_REQUEST['groupid'].
 				' AND hg.hostid=h.hostid'.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND h.hostid in ('.$available_hosts.') '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 			' ORDER BY h.host';
 	}
 	else{
@@ -151,7 +173,7 @@ include_once "include/page_header.php";
 			' WHERE h.status='.HOST_STATUS_MONITORED.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				' AND h.hostid=i.hostid'.
-				' AND h.hostid in ('.$available_hosts.') '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 			' ORDER BY h.host';
 	}
 	
@@ -165,34 +187,24 @@ include_once "include/page_header.php";
 
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 	
-// Header	
-	$text = array(S_LATEST_DATA_BIG);
-	
 	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1').url_param('select');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 	
-	$icon_tab = new CTable();
-	$icon_tab->AddRow(array($fs_icon,SPACE,$text));
+	$l_form = new CForm();
+	$l_form->SetMethod('get');
 	
-	$text = $icon_tab;
+	$l_form->AddVar("hostid",$_REQUEST["hostid"]);
+	$l_form->AddVar("groupid",$_REQUEST["groupid"]);
 
-	show_table_header($text,$r_form);
+	$l_form->AddItem(array(S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE, new CTextBox("select",$_REQUEST["select"],20)));
+	$l_form->AddItem(array(SPACE, new CButton("show",S_SHOW)));
+
+	$p_elements[] = get_table_header($l_form,$r_form);
 //-------------
-	
 
-	$r_form = new CForm();
-	$r_form->SetMethod('get');
-	
-	$r_form->AddVar("hostid",$_REQUEST["hostid"]);
-	$r_form->AddVar("groupid",$_REQUEST["groupid"]);
-
-	$r_form->AddItem(array(S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE, new CTextBox("select",$_REQUEST["select"],20)));
-	$r_form->AddItem(array(SPACE, new CButton("show",S_SHOW)));
-
-	show_table_header(NULL, $r_form);
 ?>
 <?php
 	if(isset($show_all_apps)){
@@ -217,7 +229,8 @@ include_once "include/page_header.php";
 		S_LAST_VALUE,
 		S_CHANGE,
 		S_HISTORY));
-	$table->ShowStart();
+		
+//	$table->ShowStart();
 
 	$compare_host = $_REQUEST['hostid']?' AND h.hostid='.$_REQUEST['hostid']:'';
 	$compare_host.= $_REQUEST['groupid']?' AND hg.hostid=h.hostid AND hg.groupid ='.$_REQUEST['groupid']:'';
@@ -226,7 +239,7 @@ include_once "include/page_header.php";
 					' FROM applications a, hosts h'.($_REQUEST['groupid']?', hosts_groups hg ':'').
 					' WHERE a.hostid=h.hostid'.
 						$compare_host.
-						' AND h.hostid IN ('.$available_hosts.')'.
+						' AND '.DBcondition('h.hostid',$available_hosts).
 						' AND h.status='.HOST_STATUS_MONITORED.
 					order_by('h.host,h.hostid','a.name,a.applicationid'));
 					
@@ -310,13 +323,13 @@ include_once "include/page_header.php";
 			$col = new CCol(array($link,SPACE,bold($db_app["name"]),SPACE.'('.$item_cnt.SPACE.S_ITEMS.')'));
 			$col->SetColSpan(5);
 
-			$table->ShowRow(array(
+			$table->AddRow(array(
 					get_node_name_by_elid($db_app['hostid']),
 					$_REQUEST["hostid"] > 0 ? NULL : $db_app["host"],
 					$col
 					));
 
-			foreach($app_rows as $row)	$table->ShowRow($row);
+			foreach($app_rows as $row)	$table->AddRow($row);
 		}
 	}
 	
@@ -329,7 +342,7 @@ include_once "include/page_header.php";
 				' AND h.hostid=i.hostid '.
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND h.hostid in ('.$available_hosts.') '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 			' ORDER BY h.host';
 		
 	$db_appitems = DBselect($sql);
@@ -421,17 +434,27 @@ include_once "include/page_header.php";
 			$col = new CCol(array($link,SPACE,bold(S_MINUS_OTHER_MINUS),SPACE.'('.$item_cnt.SPACE.S_ITEMS.')'));
 			$col->SetColSpan(5);
 			
-			$table->ShowRow(array(
+			$table->AddRow(array(
 					get_node_name_by_elid($db_appitem['hostid']),
 					$_REQUEST["hostid"] > 0 ? NULL : $db_appitem["host"],
 					$col
 					));	
 					
-			foreach($app_rows as $row)	$table->ShowRow($row);
+			foreach($app_rows as $row)	$table->AddRow($row);
 		}
 	}
 	
-	$table->ShowEnd();
+	$p_elements[] = $table;
+	
+	$latest_hat = create_hat(
+			S_LATEST_DATA_BIG,
+			$p_elements,
+			array($fs_icon),
+			'hat_latest',
+			get_profile('web.latest.hats.hat_latest.state',1)
+	);
+
+	$latest_hat->Show();
 ?>
 <?php
 include_once "include/page_footer.php";

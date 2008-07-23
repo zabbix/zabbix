@@ -110,7 +110,7 @@ include_once 'include/page_header.php';
 ?>
 <?php
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	show_report2_header($config,$available_hosts);
 	
 	if( isset($_REQUEST['triggerid']) &&
@@ -120,7 +120,7 @@ include_once 'include/page_header.php';
 						' AND t.triggerid=f.triggerid '.
 						' AND f.itemid=i.itemid '.
 						' AND i.hostid=h.hostid '.
-						' AND h.hostid in ('.$available_hosts.') '
+						' AND '.DBcondition('h.hostid',$available_hosts)
 					))) )
 	{
 		unset($_REQUEST['triggerid']);
@@ -245,7 +245,7 @@ include_once 'include/page_header.php';
 				' AND hg.hostid=h.hostid'.
 				' AND g.groupid=hg.groupid '.
 				' AND h.hostid=i.hostid '.
-				' AND h.hostid in ('.$available_hosts.')'.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				' AND t.triggerid=f.triggerid '.
 				' AND '.DBin_node('t.triggerid').
@@ -255,12 +255,12 @@ include_once 'include/page_header.php';
 			' ORDER BY h.host, t.description');
 
 		
-		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
 		$table = new CTableInfo();
 		$table->setHeader(array(is_show_subnodes() ? S_NODE : null,(($_REQUEST['hostid'] == 0) || (1 == $config))?S_HOST:NULL, S_NAME,S_TRUE,S_FALSE,S_UNKNOWN,S_GRAPH));
 		while($row=DBfetch($result)){
-			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts)) continue;
+			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'])) continue;
 
 			$availability = calculate_availability($row['triggerid'],$_REQUEST['filter_timesince'],$_REQUEST['filter_timetill']);
 

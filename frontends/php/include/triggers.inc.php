@@ -1655,32 +1655,25 @@
 		while($trigger = DBfetch($triggers)){
 			if($trigger["templateid"]==0)	continue;
 
-			if($templateid != null)
-                        {
-				if( !is_array($templateid))
-					$templateid = array($templateid);
-
-                                $db_tmp_hosts = get_hosts_by_triggerid($trigger["templateid"]);
+			if($templateid != null){
+				if( !is_array($templateid)) $templateid = array($templateid);
+					
+				$db_tmp_hosts = get_hosts_by_triggerid($trigger["templateid"]);
 				$tmp_host = DBfetch($db_tmp_hosts);
 
-				if( !uint_in_array($tmp_host["hostid"], $templateid) )
-					continue;
-                        }
+				if(!uint_in_array($tmp_host["hostid"], $templateid)) continue;
+			}
 
-                        if($unlink_mode)
-                        {
-                                if(DBexecute("update triggers set templateid=0 where triggerid=".$trigger["triggerid"]))
-                                {
-                                        info("Trigger '".$trigger["description"]."' unlinked");
-                                }
-                        }
-                        else
-                        {
+			if($unlink_mode){
+				if(DBexecute("update triggers set templateid=0 where triggerid=".$trigger["triggerid"])){
+						info("Trigger '".$trigger["description"]."' unlinked");
+				}
+			}
+			else{
 				delete_trigger($trigger["triggerid"]);
 			}
 		}
-
-		return TRUE;
+	return TRUE;
 	}
 	
 	/*
@@ -1765,7 +1758,9 @@
 	 */
 	function get_triggers_overview($groupid,$view_style=null){
 		global $USER_DETAILS;
-
+		
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+		
 		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
 		
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
@@ -1776,13 +1771,14 @@
 			$group_where = ' where';
 		}
 
+		
 		$result=DBselect('SELECT DISTINCT t.triggerid,t.description,t.expression,t.value,t.priority,t.lastchange,h.hostid,h.host'.
 			' FROM hosts h,items i,triggers t, functions f '.
 			$group_where.' h.status='.HOST_STATUS_MONITORED.
 				' AND h.hostid=i.hostid '.
 				' AND i.itemid=f.itemid '.
 				' AND f.triggerid=t.triggerid'.
-				' AND h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).') '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 			' ORDER BY t.description');

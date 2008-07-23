@@ -29,8 +29,7 @@
 
 	$srctbl		= get_request("srctbl",  '');	// source table name
 
-	switch($srctbl)
-	{
+	switch($srctbl){
 		case 'host_templates':
 		case 'templates':
 			$page["title"] = "S_TEMPLATES_BIG";
@@ -127,8 +126,7 @@
 
 include_once "include/page_header.php";
 
-	if(isset($error))
-	{
+	if(isset($error)){
 		invalid_url();
 	}
 	
@@ -520,8 +518,7 @@ include_once "include/page_header.php";
 		$form->AddItem($table);
 		$form->Show();
 	}
-	else if(str_in_array($srctbl,array("host_group")))
-	{
+	else if(str_in_array($srctbl,array("host_group"))){
 		$available_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,$nodeid);
 
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
@@ -531,8 +528,7 @@ include_once "include/page_header.php";
 			' where '.DBin_node('groupid', $nodeid).
 			" AND groupid in (".$available_groups.") ".
 			" order by name");
-		while($row = DBfetch($db_groups))
-		{
+		while($row = DBfetch($db_groups)){
 			$name = new CLink($row["name"],"#","action");
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
@@ -550,8 +546,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	else if(str_in_array($srctbl,array('host_templates')))
-	{
+	else if(str_in_array($srctbl,array('host_templates'))){
 		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
 		$table->SetHeader(array(S_NAME));
 
@@ -567,8 +562,7 @@ include_once "include/page_header.php";
 					' AND '.DBcondition('h.hostid',$available_hosts).
 				' ORDER BY h.host,h.hostid';
 		$db_hosts = DBselect($sql);
-		while($row = DBfetch($db_hosts))
-		{
+		while($row = DBfetch($db_hosts)){
 			$name = new CLink($row['host'],'#','action');
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
@@ -586,14 +580,12 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	else if($srctbl == "usrgrp")
-	{
+	else if($srctbl == "usrgrp"){
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->SetHeader(array(S_NAME));
 
 		$result = DBselect('select * from usrgrp where '.DBin_node('usrgrpid').' order by name');
-		while($row = DBfetch($result))
-		{
+		while($row = DBfetch($result)){
 			$name = new CLink(
 					get_node_name_by_elid($row['usrgrpid']).$row['name'],
 					'#',
@@ -616,14 +608,12 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	else if($srctbl == "users")
-	{
+	else if($srctbl == "users"){
 		$table = new CTableInfo(S_NO_USERS_DEFINED);
 		$table->SetHeader(array(S_NAME));
 
 		$result = DBselect('select * from users where '.DBin_node('userid').' order by name');
-		while($row = DBfetch($result))
-		{
+		while($row = DBfetch($result)){
 			$name = new CLink(
 					get_node_name_by_elid($row['userid']).$row['alias'],
 					'#',
@@ -645,15 +635,13 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	else if($srctbl == "help_items")
-	{
+	else if($srctbl == "help_items"){
 		$table = new CTableInfo(S_NO_ITEMS);
 		$table->SetHeader(array(S_KEY,S_DESCRIPTION));
 
 		$result = DBselect("select * from help_items where itemtype=".$itemtype." order by key_");
 
-		while($row = DBfetch($result))
-		{
+		while($row = DBfetch($result)){
 			$name = new CLink($row["key_"],"#","action");
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
@@ -754,8 +742,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	else if($srctbl == "logitems")
-	{
+	else if($srctbl == "logitems"){
 		insert_js_function('add_item_variable');
 		
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);

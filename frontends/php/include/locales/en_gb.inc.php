@@ -1327,6 +1327,7 @@
 	'S_TRIGGER_ADDED'=>			'Trigger added',
 	'S_CANNOT_ADD_TRIGGER'=>		'Cannot add trigger',
 	'S_SEVERITY'=>				'Severity',
+	'S_MIN_SEVERITY'=>			'Min severity',
 	'S_EXPRESSION'=>			'Expression',
 	'S_DISABLED'=>				'Disabled',
 	'S_ENABLED'=>				'Enabled',

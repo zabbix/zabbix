@@ -365,77 +365,74 @@ include_once "include/page_header.php";
 
 	show_table_header(S_CONFIGURATION_OF_TRIGGERS_BIG,$form);
 	echo SBR;
-	
-	$r_form = new CForm();
-	$r_form->SetMethod('get');
-	$r_form->AddItem(array('[', 
-		new CLink($showdisabled ? S_HIDE_DISABLED_TRIGGERS : S_SHOW_DISABLED_TRIGGERS,
-			'triggers.php?showdisabled='.($showdisabled ? 0 : 1),NULL),
-		']', SPACE));
-
-	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
-	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
-
-	$cmbGroup->AddItem(0,S_ALL_SMALL);
-	
-	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
-		' FROM groups g, hosts_groups hg, hosts h, items i '.
-		' WHERE '.DBcondition('h.hostid',$available_hosts).
-			' AND hg.groupid=g.groupid '.
-			' AND h.hostid=i.hostid '.
-			' AND hg.hostid=h.hostid '.
-		' ORDER BY g.name');
-	while($row=DBfetch($result)){
-		$cmbGroup->AddItem($row['groupid'],$row['name']);
-	}
-	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
-	
-	if($_REQUEST['groupid'] > 0){
-		$sql='SELECT h.hostid,h.host '.
-			' FROM hosts h,items i,hosts_groups hg '.
-			' WHERE h.hostid=i.hostid '.
-				' AND hg.groupid='.$_REQUEST['groupid'].
-				' AND hg.hostid=h.hostid'.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-			' GROUP BY h.hostid,h.host '.
-			' ORDER BY h.host';
-	}
-	else{
-		$cmbHosts->AddItem(0,S_ALL_SMALL);
-		$sql='SELECT h.hostid,h.host '.
-			' FROM hosts h,items i '.
-			' WHERE h.hostid=i.hostid '.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-			' GROUP BY h.hostid,h.host '.
-			' ORDER BY h.host';
-	}
-	
-	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		$cmbHosts->AddItem($row["hostid"],$row["host"]);
-	}
-
-	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-
-	show_table_header(S_TRIGGERS_BIG, $r_form);
 ?>
 <?php
 	if(isset($_REQUEST['massupdate']) && isset($_REQUEST['g_triggerid'])){
-		echo SBR;
 		insert_mass_update_trigger_form();	
 	}
 	else if(isset($_REQUEST["form"])){
 /* FORM */
-		echo SBR;
 		insert_trigger_form();
 		
 	} 
 	else if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["g_triggerid"])){
-		echo SBR;
 		insert_copy_elements_to_forms("g_triggerid");
 	} 
 	else{
 /* TABLE */
+		$r_form = new CForm();
+		$r_form->SetMethod('get');
+		$r_form->AddItem(array('[', 
+			new CLink($showdisabled ? S_HIDE_DISABLED_TRIGGERS : S_SHOW_DISABLED_TRIGGERS,
+				'triggers.php?showdisabled='.($showdisabled ? 0 : 1),NULL),
+			']', SPACE));
+	
+		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
+		$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
+	
+		$cmbGroup->AddItem(0,S_ALL_SMALL);
+		
+		$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
+			' FROM groups g, hosts_groups hg, hosts h, items i '.
+			' WHERE '.DBcondition('h.hostid',$available_hosts).
+				' AND hg.groupid=g.groupid '.
+				' AND h.hostid=i.hostid '.
+				' AND hg.hostid=h.hostid '.
+			' ORDER BY g.name');
+		while($row=DBfetch($result)){
+			$cmbGroup->AddItem($row['groupid'],$row['name']);
+		}
+		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+		
+		if($_REQUEST['groupid'] > 0){
+			$sql='SELECT h.hostid,h.host '.
+				' FROM hosts h,items i,hosts_groups hg '.
+				' WHERE h.hostid=i.hostid '.
+					' AND hg.groupid='.$_REQUEST['groupid'].
+					' AND hg.hostid=h.hostid'.
+					' AND '.DBcondition('h.hostid',$available_hosts).
+				' GROUP BY h.hostid,h.host '.
+				' ORDER BY h.host';
+		}
+		else{
+			$cmbHosts->AddItem(0,S_ALL_SMALL);
+			$sql='SELECT h.hostid,h.host '.
+				' FROM hosts h,items i '.
+				' WHERE h.hostid=i.hostid '.
+					' AND '.DBcondition('h.hostid',$available_hosts).
+				' GROUP BY h.hostid,h.host '.
+				' ORDER BY h.host';
+		}
+		
+		$result=DBselect($sql);
+		while($row=DBfetch($result)){
+			$cmbHosts->AddItem($row["hostid"],$row["host"]);
+		}
+	
+		$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+	
+		show_table_header(S_TRIGGERS_BIG, $r_form);
+			
 		$form = new CForm('triggers.php');
 		$form->SetName('triggers');
 		$form->SetMethod('post');

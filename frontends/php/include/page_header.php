@@ -209,14 +209,14 @@ COpt::profiling_start("page");
 							'sub_pages'=>array('popup_trexpr.php')
 						),
 					array('url'=>'actionconf.php'	,'label'=>S_ACTIONS),
-					array('url'=>'sysmaps.php'	,'label'=>S_MAPS,
-						'sub_pages'=>array('sysmap.php','popup_link_tr.php')
-						),
 					array('url'=>'graphs.php'	,'label'=>S_GRAPHS,
 						'sub_pages'=>array('popup_gitem.php')
 						),
 					array('url'=>'screenconf.php'	,'label'=>S_SCREENS,
 						'sub_pages'=>array('screenedit.php')
+						),
+					array('url'=>'sysmaps.php'	,'label'=>S_MAPS,
+						'sub_pages'=>array('sysmap.php','popup_link_tr.php')
 						),
 					array('url'=>'services.php'	,'label'=>S_IT_SERVICES,
 						'sub_pages'=>array('services_form.php')	

@@ -103,8 +103,6 @@ include_once "include/page_header.php";
 		$triggers	= zbx_array_val_inc(array_flip(array_intersect(array_keys($triggers),	array_keys($hosts))));
 
 		if(count($hosts)==0) $hosts[-1] = 1;
-
-		$available_hosts = implode(',', $available_hosts);
 	}
 		
 	if(isset($EXPORT_DATA)){
@@ -191,7 +189,7 @@ include_once "include/page_header.php";
 			$table->SetHeader(array(S_HOST, S_ELEMENTS));
 			$table->ShowStart();
 
-			$db_hosts = DBselect('select * from hosts where hostid in ('.implode(',',array_keys($hosts)).')');
+			$db_hosts = DBselect('SELECT * FROM hosts WHERE '.DBcondition('hostid',array_keys($hosts));
 			while($host = DBfetch($db_hosts)){
 				$el_table = new CTableInfo(S_ONLY_HOST_INFO);
 				$sqls = array(
@@ -260,12 +258,12 @@ include_once "include/page_header.php";
 			
 			$cmbGroups = new CComboBox("groupid",get_request("groupid",0),"submit()");
 			$cmbGroups->AddItem(0,S_ALL_SMALL);
-			$result=DBselect('select distinct g.groupid,g.name '.
-					' from groups g,hosts_groups hg,hosts h'.
-					' where h.hostid in ('.$available_hosts.') '.
-						' and g.groupid=hg.groupid '.
-						' and h.hostid=hg.hostid '.
-					' order by g.name');
+			$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
+					' FROM groups g,hosts_groups hg,hosts h '.
+					' WHERE '.DBcondition('h.hostid',$available_hosts).
+						' AND g.groupid=hg.groupid '.
+						' AND h.hostid=hg.hostid '.
+					' ORDER BY g.name');
 			while($row=DBfetch($result)){
 				$cmbGroups->AddItem($row["groupid"],$row["name"]);
 				if((bccomp($row["groupid"] , $_REQUEST["groupid"])==0)) $correct_host = 1;
@@ -313,7 +311,7 @@ include_once "include/page_header.php";
 			else  $sql .= ' hosts h '.
 						' WHERE';
 			
-			$sql .=	' h.hostid in ('.$available_hosts.') '.
+			$sql .=	DBcondition('h.hostid',$available_hosts).
 					order_by('h.host,h.dns,h.ip,h.port,h.status');
 
 			$result=DBselect($sql);

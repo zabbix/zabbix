@@ -30,7 +30,7 @@ function action_accessible($actionid,$perm){
 	if (DBselect('select actionid from actions where actionid='.$actionid.' and '.DBin_node('actionid'))){
 		$result = true;
 		
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 		
 		$db_result = DBselect('SELECT * FROM conditions WHERE actionid='.$actionid);
@@ -39,13 +39,13 @@ function action_accessible($actionid,$perm){
 
 			switch($ac_data['conditiontype']){
 				case CONDITION_TYPE_HOST_GROUP:
-					if(!uint_in_array($ac_data['value'],explode(',',$available_groups))){
+					if(!uint_in_array($ac_data['value'],$available_groups)){
 						$result = false;
 					}
 					break;
 				case CONDITION_TYPE_HOST:
 				case CONDITION_TYPE_HOST_TEMPLATE:
-					if(!uint_in_array($ac_data['value'],explode(',',$available_hosts))){
+					if(!uint_in_array($ac_data['value'],$available_hosts)){
 						$result = false;
 					}
 					break;
@@ -55,7 +55,7 @@ function action_accessible($actionid,$perm){
 						' WHERE t.triggerid='.$ac_data['value'].
 							' AND f.triggerid=t.triggerid'.
 							' AND i.itemid=f.itemid '.
-							' AND i.hostid NOT IN ('.$available_hosts.')';
+							' AND '.DBcondition('i.hostid',$available_hosts, true);
 							
 					if(DBfetch(DBselect($sql,1))){
 						$result = false;
@@ -72,7 +72,7 @@ function check_permission_for_action_conditions($conditions){
 
 	$result = true;
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 	
 	foreach($conditions as $ac_data){
@@ -80,14 +80,14 @@ function check_permission_for_action_conditions($conditions){
 
 		switch($ac_data['type']){
 			case CONDITION_TYPE_HOST_GROUP:
-				if(!uint_in_array($ac_data['value'],explode(',',$available_groups))){
+				if(!uint_in_array($ac_data['value'],$available_groups)){
 					error(S_INCORRECT_GROUP);
 					$result = false;
 				}
 				break;
 			case CONDITION_TYPE_HOST:
 			case CONDITION_TYPE_HOST_TEMPLATE:
-				if(!uint_in_array($ac_data['value'],explode(',',$available_hosts))){
+				if(!uint_in_array($ac_data['value'],$available_hosts)){
 					error(S_INCORRECT_HOST);
 					$result = false;
 				}
@@ -98,7 +98,7 @@ function check_permission_for_action_conditions($conditions){
 						' WHERE t.triggerid='.$ac_data['value'].
 							' AND f.triggerid=t.triggerid'.
 							' AND i.itemid=f.itemid '.
-							' AND i.hostid NOT IN ('.$available_hosts.')';
+							' AND '.DBcondition('i.hostid',$available_hosts, true);
 //								' AND e.eventid='.$ac_data['value'].
 //								' AND t.triggerid=e.objectid';
 						

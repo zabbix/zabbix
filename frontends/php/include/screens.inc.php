@@ -29,7 +29,7 @@
 
 		if(DBfetch(DBselect('SELECT screenid FROM screens WHERE screenid='.$screenid.' AND '.DBin_node('screenid', get_current_nodeid($perm))))){
 			$result = true;
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 			
 			$db_result = DBselect('SELECT * FROM screens_items WHERE screenid='.$screenid);
 			while(($ac_data = DBfetch($db_result)) && $result){
@@ -54,7 +54,7 @@
 						if(DBfetch(DBselect('SELECT itemid '.
 										' FROM items '.
 										' WHERE itemid IN ('.implode(',',$itemid).') '.
-											' AND hostid NOT IN ('.$available_hosts.')')))
+											' AND '.DBcondition('hostid',$available_hosts,true))))
 						{
 							$result = false;
 						}	
@@ -394,7 +394,8 @@
 	
 	function get_screen_item_form(){
 		global $USER_DETAILS;
-
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+		
 		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,'screenedit.php#form');
 		$form->SetHelp('web.screenedit.cell.php');
 
@@ -505,7 +506,7 @@
 						' WHERE h.hostid=i.hostid '.
 							' AND h.status='.HOST_STATUS_MONITORED.
 							' AND i.status='.ITEM_STATUS_ACTIVE.
-							' AND i.hostid IN ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
+							' AND '.DBcondition('i.hostid',$available_hosts).
 							' AND i.itemid='.$resourceid);
 
 				while($row=DBfetch($result)){
@@ -566,7 +567,7 @@
 						' WHERE h.hostid=i.hostid '.
 							' AND h.status='.HOST_STATUS_MONITORED.
 							' AND i.status='.ITEM_STATUS_ACTIVE.
-							' AND i.hostid IN ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
+							' AND '.DBcondition('i.hostid',$available_hosts).
 							' AND i.itemid='.$resourceid);
 
 				while($row=DBfetch($result)){

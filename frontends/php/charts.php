@@ -128,7 +128,7 @@ include_once 'include/page_header.php';
 	$h1 = array(S_GRAPHS_BIG.SPACE.'/'.SPACE);
 	
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
 	
 	$available_graphs = get_accessible_graphs(PERM_READ_LIST, PERM_RES_IDS_ARRAY, get_current_nodeid());
 
@@ -185,7 +185,7 @@ include_once 'include/page_header.php';
 				' AND hg.hostid=h.hostid '.
 				($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
 				' AND '.DBcondition('gi.graphid',$available_graphs);
-//				' AND h.hostid IN ('.$available_hosts.') ';
+//				' AND '.DBcondition('h.hostid',$available_hosts);
 
 
 		if($cnt_row = DBfetch(DBselect($sql))){
@@ -209,7 +209,7 @@ include_once 'include/page_header.php';
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND '.DBin_node('g.graphid').
 				' AND '.DBcondition('g.graphid',$available_graphs);
-//				' AND h.hostid IN ('.$available_hosts.') ';
+//				' AND '.DBcondition('h.hostid',$available_hosts);
 
 		if($cnt_row = DBfetch(DBselect($sql))){
 			if($cnt_row['grphcount'] == 1){
@@ -250,7 +250,7 @@ include_once 'include/page_header.php';
 			' AND hg.hostid=h.hostid '.
 			($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
 			' AND '.DBcondition('gi.graphid',$available_graphs).
-//			' AND h.hostid IN ('.$available_hosts.') '.
+//			' AND '.DBcondition('h.hostid',$available_hosts).
 		' ORDER BY h.host';
 	
 	$result=DBselect($sql);
@@ -274,7 +274,7 @@ include_once 'include/page_header.php';
 			($_REQUEST['hostid']?' AND h.hostid='.$_REQUEST['hostid']:'').
 			' AND '.DBin_node('g.graphid').
 			' AND '.DBcondition('g.graphid',$available_graphs).
-//			' AND h.hostid IN ('.$available_hosts.') ';
+//			' AND '.DBcondition('h.hostid',$available_hosts);
 		' ORDER BY g.name';
 
 	$result = DBselect($sql);
