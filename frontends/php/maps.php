@@ -45,6 +45,7 @@ include_once "include/page_header.php";
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL)
 	);
 
@@ -53,7 +54,12 @@ include_once "include/page_header.php";
 ?>
 <?php
 	if(isset($_REQUEST['favobj'])){
-		if('sysmapid' == $_REQUEST['favobj']){
+		if(isset($_REQUEST['favobj'])){
+			if('hat' == $_REQUEST['favobj']){
+				update_profile('web.maps.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			}
+		}	
+		else if('sysmapid' == $_REQUEST['favobj']){
 			$result = false;
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.sysmapids',$_REQUEST['favid'],$_REQUEST['favobj']);
@@ -116,11 +122,12 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
-	$text = array(S_NETWORK_MAPS_BIG);
+	$p_elements = array();
+	
 	if(isset($_REQUEST["sysmapid"])){
 		$sysmap = get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
 
-		array_push($text, nbsp(' / '), $all_maps[$_REQUEST["sysmapid"]]);
+		$text = $all_maps[$_REQUEST["sysmapid"]];
 		
 		if(infavorites('web.favorite.sysmapids',$_REQUEST['sysmapid'],'sysmapid')){
 			$icon = new CDiv(SPACE,'iconminus');
@@ -138,13 +145,7 @@ include_once "include/page_header.php";
 
 		$fs_icon = new CDiv(SPACE,'fullscreen');
 		$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
-	
-		$icon_tab = new CTable();
-		$icon_tab->AddRow(array($fs_icon,$icon,SPACE,$text));
-		
-		$text = $icon_tab;
-
+		$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));	
 	}
 
 	$form = new CForm();
@@ -162,7 +163,7 @@ include_once "include/page_header.php";
 		$form->AddItem($cmbMaps);
 	}
 
-	show_table_header($text,$form);
+	$p_elements[] = get_table_header($text,$form);
 ?>
 <?php
 	$table = new CTable(S_NO_MAPS_DEFINED,"map");
@@ -174,7 +175,18 @@ include_once "include/page_header.php";
 		$imgMap->SetMap($action_map->GetName());
 		$table->AddRow($imgMap);
 	}
-	$table->Show();
+		
+	$p_elements[] = $table;
+	
+	$latest_hat = create_hat(
+			S_NETWORK_MAPS_BIG,
+			$p_elements,
+			array($icon,$fs_icon),
+			'hat_maps',
+			get_profile('web.maps.hats.hat_maps.state',1)
+	);
+
+	$latest_hat->Show();
 ?>
 <?php
 

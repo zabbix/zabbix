@@ -325,7 +325,7 @@ include_once 'include/page_header.php';
 /* SAVE HOST */
 	else if(($_REQUEST['config']==0 || $_REQUEST['config']==3) && isset($_REQUEST['save'])){
 		$useip = get_request('useip',0);
-		$groups=get_request('groups',array());
+		$groups= get_request('groups',array());
 		
 		if(count($groups) > 0){
 			$accessible_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
@@ -602,7 +602,7 @@ include_once 'include/page_header.php';
 		}
 		show_messages($result, $msg_ok, $msg_fail);
 		if($result){
-			add_audit($action,AUDIT_RESOURCE_HOST_GROUP,S_HOST_GROUP." [".$_REQUEST["gname"]." ] [".$groupid."]");
+			add_audit($action,AUDIT_RESOURCE_HOST_GROUP,S_HOST_GROUP.' ['.$_REQUEST['gname'].'] ['.$groupid.']');
 			unset($_REQUEST["form"]);
 		}
 		unset($_REQUEST["save"]);
@@ -1024,9 +1024,6 @@ include_once 'include/page_header.php';
 			
 				array_push($description, new CLink($row["host"], "hosts.php?form=update&hostid=".$row["hostid"].url_param("groupid").url_param("config"), 'action'));
 
-				$add_to = array();
-				$delete_from = array();
-
 				$templates = get_templates_by_hostid($row["hostid"]);
 				
 				$host=new CCol(array(
@@ -1088,62 +1085,20 @@ include_once 'include/page_header.php';
 
 				}
 
-				$popup_menu_actions = array(
-					array(S_SHOW, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))),
-					array(S_ITEMS, 'items.php?hostid='.$row['hostid'], array('tw'=>'_blank')),
-					array(S_TRIGGERS, 'triggers.php?hostid='.$row['hostid'], array('tw'=>'_blank')),
-					array(S_GRAPHS, 'graphs.php?hostid='.$row['hostid'], array('tw'=>'_blank')),
-					);
 
-				$db_groups = DBselect('SELECT g.groupid, g.name '.
-						' FROM groups g '.
-							' LEFT JOIN hosts_groups hg on g.groupid=hg.groupid and hg.hostid='.$row['hostid'].
-						' WHERE hostid is NULL '.
-						' ORDER BY g.name,g.groupid');
-				while($group_data = DBfetch($db_groups))
-				{
-					$add_to[] = array($group_data['name'], '?'.
-							url_param($group_data['groupid'], false, 'add_to_group').
-							url_param($row['hostid'], false, 'hostid')
-							);
-				}
+				$show = host_js_menu($row["hostid"]);
 
-				$db_groups = DBselect('select g.groupid, g.name from groups g, hosts_groups hg '.
-						' where g.groupid=hg.groupid and hg.hostid='.$row['hostid'].
-						' order by g.name,g.groupid');
-						
-				while($group_data = DBfetch($db_groups)){
-					$delete_from[] = array($group_data['name'], '?'.
-							url_param($group_data['groupid'], false, 'delete_from_group').
-							url_param($row['hostid'], false, 'hostid')
-							);
+				$templates_linked = array();
+				foreach($templates as $templateid => $temp){
+					$templates_linked[$templateid] = array(empty($templates_linked)?'':', ',host_js_menu($templateid, $templates[$templateid]));
 				}
-
-				if(count($add_to) > 0 || count($delete_from) > 0){
-					$popup_menu_actions[] = array(S_GROUPS, null, null,
-						array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
-				}
-				
-				if(count($add_to) > 0){
-					$popup_menu_actions[] = array_merge(array(S_ADD_TO_GROUP, null, null, 
-						array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))), $add_to);
-				}
-				
-				if(count($delete_from) > 0){
-					$popup_menu_actions[] = array_merge(array(S_DELETE_FROM_GROUP, null, null, 
-						array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))), $delete_from);
-				}
-
-				$mnuActions = new CPUMenu($popup_menu_actions);
-
-				$show = new CLink(S_SELECT, '#', 'action', $mnuActions->GetOnActionJS());
 
 				$table->addRow(array(
 					$host,
 					$dns,
 					$ip,
 					$port,
-					empty($templates)?'-':implode(', ',$templates),
+					empty($templates)?'-':$templates_linked,
 					$status,
 					$available,
 					$error,

@@ -165,14 +165,14 @@
  */		
 	function graph_accessible($graphid){
 		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 		
 		$sql = 	'SELECT g.graphid '.
 				' FROM graphs g, graphs_items gi, items i '.
 				' WHERE g.graphid='.$graphid.
 					' AND g.graphid=gi.graphid '.
 					' AND i.itemid=gi.itemid '.
-					' AND i.hostid NOT IN ('.$available_hosts.')';
+					' AND '.DBcondition('i.hostid',$available_hosts,true);
 
 		if(DBfetch(DBselect($sql,1))){
 			return false;
@@ -197,7 +197,7 @@
 		if(is_null($perm_res))
 			$perm_res = PERM_RES_STRING_LINE;
 		
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, null, $nodeid);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid);
 
 		$denied_graphs = array();
 		$result = array();
@@ -207,7 +207,7 @@
 				' WHERE g.graphid=gi.graphid '.
 					(!empty($hostid)?' AND i.hostid='.$hostid:'').
 					' AND i.itemid=gi.itemid '.
-					' AND i.hostid NOT IN ('.$available_hosts.')';
+					' AND '.DBcondition('i.hostid',$available_hosts, true);
 
 		$db_graphs = DBselect($sql);
 		while($graph = DBfetch($db_graphs)){

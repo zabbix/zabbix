@@ -50,15 +50,20 @@ include_once "include/page_header.php";
 		"hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+
 	);
 
 	check_fields($fields);
 
-	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
 	$sql = 'select ht.* '.
 		' from httptest ht, applications a '.
-		' where a.hostid in ('.$accessible_hosts.') '.
+		' where '.DBcondition('a.hostid',$available_hosts).
 			' and a.applicationid=ht.applicationid '.
 			' and ht.httptestid='.$_REQUEST['httptestid'];
 			

@@ -71,7 +71,7 @@ include_once "include/page_header.php";
 		default:	$time_dif=24*3600;	break;
 	}
 
-	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 		$sql = 'SELECT h.host, t.triggerid, t.description, t.expression, t.priority, count(distinct e.eventid) as cnt_event '.
 						' FROM hosts h, triggers t, functions f, items i, events e'.
 						' WHERE h.hostid = i.hostid '.
@@ -80,7 +80,7 @@ include_once "include/page_header.php";
 							' and t.triggerid=e.objectid '.
 							' and e.object='.EVENT_OBJECT_TRIGGER.
 							' and e.clock>'.(time()-$time_dif).
-							' and h.hostid in ('.$accessible_hosts.') '.
+							' and '.DBcondition('h.hostid',$available_hosts).
 							' and '.DBin_node('t.triggerid').
 						' GROUP BY h.host,t.triggerid,t.description,t.expression,t.priority '.
 						' ORDER BY cnt_event desc, h.host, t.description, t.triggerid';
@@ -88,7 +88,7 @@ include_once "include/page_header.php";
         $result=DBselect($sql, 100);
 
         while($row=DBfetch($result)){
-			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts))
+			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $available_hosts))
 				continue;
 
             $table->addRow(array(

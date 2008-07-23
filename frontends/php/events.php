@@ -58,6 +58,7 @@ include_once "include/page_header.php";
 		'next'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		'prev'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
+
 // filter
 		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
@@ -143,7 +144,7 @@ include_once "include/page_header.php";
 	if(EVENT_SOURCE_TRIGGERS == $source){
 	
 	    $available_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 		
 		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_DATA_ARRAY, get_current_nodeid());
 
@@ -156,12 +157,14 @@ include_once "include/page_header.php";
 						' AND f.triggerid='.$_REQUEST['triggerid'];
 						
 			if($host = DBfetch(DBselect($sql,1))){
-				$_REQUEST['hostid'] = $host['hostid'];							
-				if($group = DBfetch(DBselect('SELECT DISTINCT hg.groupid '.
-									' FROM hosts_groups hg'.
-									' WHERE hg.hostid='.$_REQUEST['hostid'].
-										' AND hg.hostid in ('.$available_hosts.') ')))
-				{
+				$_REQUEST['hostid'] = $host['hostid'];
+				
+				$sql = 'SELECT DISTINCT hg.groupid '.
+						' FROM hosts_groups hg '.
+						' WHERE hg.hostid='.$_REQUEST['hostid'].
+							' AND '.DBcondition('hg.hostid',$available_hosts);
+							
+				if($group = DBfetch(DBselect($sql))){
 					$_REQUEST['groupid'] = $group['groupid'];
 				}
 			}
@@ -204,7 +207,7 @@ include_once "include/page_header.php";
 				' AND h.hostid=i.hostid '.
 				($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
 				' AND hg.hostid=h.hostid '.
-				' AND h.hostid in ('.$available_hosts.') '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 			' ORDER BY h.host';
 			
 		$result=DBselect($sql);
@@ -226,6 +229,8 @@ include_once "include/page_header.php";
 	}
 
 // Header	
+	$p_elements = array();
+	
 	$text = array(S_HISTORY_OF_EVENTS_BIG,SPACE,date('[H:i:s]',time()));
 	
 	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
@@ -234,12 +239,8 @@ include_once "include/page_header.php";
 	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 	
-	$icon_tab = new CTable();
-	$icon_tab->AddRow(array($fs_icon,SPACE,$text));
+	$p_elements[] = get_table_header(S_EVENTS,$r_form);
 	
-	$text = $icon_tab;
-
-	show_table_header($text,$r_form);
 //-------------
 
 	
@@ -256,11 +257,11 @@ include_once "include/page_header.php";
 		}
 		else if($_REQUEST['groupid'] > 0){
 			$sql_from = ', hosts_groups hg ';
-			$sql_cond = ' and h.hostid=hg.hostid and hg.groupid='.$_REQUEST['groupid'];
+			$sql_cond = ' AND h.hostid=hg.hostid and hg.groupid='.$_REQUEST['groupid'];
 		}
 		else{
 			$sql_from = '';
-			$sql_cond = ' and h.hostid in ('.$available_hosts.') ';
+			$sql_cond = ' AND '.DBcondition('h.hostid',$available_hosts);
 		}
 		
 		$sql_cond.=(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0))?(' AND t.triggerid='.$_REQUEST['triggerid'].' '):'';
@@ -485,17 +486,25 @@ include_once "include/page_header.php";
 		$filterForm->AddItemToBottomRow(new CButton("filter_set",S_FILTER));
 		$filterForm->AddItemToBottomRow($reset);
 
-		$filter = create_filter(S_FILTER,$navigation,$filterForm,'tr_filter',get_profile('web.events.filter.state',0));
-		$filter->Show();
+		$p_elements[] = create_filter(S_FILTER,$navigation,$filterForm,'tr_filter',get_profile('web.events.filter.state',0));
 	}
 	else{
-		show_thin_table_header(SPACE,$navigation);
+		$p_elements[] = get_thin_table_header(SPACE,$navigation);
 	}
 //-------
 
-	$table->Show();
+	$p_elements[] = $table;
+	$p_elements[] = get_thin_table_header(SPACE,$navigation);
 	
-	show_thin_table_header(SPACE,$navigation);
+	$events_hat = create_hat(
+			$text,
+			$p_elements,
+			$fs_icon,
+			'hat_events',
+			get_profile('web.events.hats.hat_events.state',1)
+	);
+
+	$events_hat->Show();
 ?>
 <?php
 

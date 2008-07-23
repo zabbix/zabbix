@@ -2316,7 +2316,6 @@
 
 	function insert_graph_form(){
 
-
 		$frmGraph = new CFormTable(S_GRAPH,null,'post');
 		$frmGraph->SetName('frm_graph');
 		$frmGraph->SetHelp("web.graphs.graph.php");
@@ -2346,8 +2345,7 @@
 			$graph3d	= $row['show_3d'];
 
 			$db_items = DBselect('SELECT * FROM graphs_items WHERE graphid='.$_REQUEST['graphid']);
-			while($item = DBfetch($db_items))
-			{
+			while($item = DBfetch($db_items)){
 				array_push($items,
 					array(
 						'itemid'	=> $item['itemid'],
@@ -2360,7 +2358,8 @@
 						'periods_cnt'	=> $item['periods_cnt']
 					));
 			}
-		} else {
+		} 
+		else {
 			$name		= get_request('name'		,'');
 			$graphtype	= get_request("graphtype"	,GRAPH_TYPE_NORMAL);
 			
@@ -2376,8 +2375,8 @@
 			$yaxistype	= get_request("yaxistype"	,GRAPH_YAXIS_TYPE_CALCULATED);
 			$yaxismin	= get_request("yaxismin"	,0.00);
 			$yaxismax	= get_request("yaxismax"	,100.00);
-			$showworkperiod = get_request("showworkperiod"	,1);
-			$showtriggers	= get_request("showtriggers"	,1);
+			$showworkperiod = get_request("showworkperiod"	,0);
+			$showtriggers	= get_request("showtriggers"	,0);
 			$legend		= get_request("legend"	,0);
 			$graph3d	= get_request("graph3d"	,0);
 		}
@@ -2410,8 +2409,14 @@
 		$group_gid = get_request('group_gid', array());
 	
 		$frmGraph->AddRow(S_NAME,new CTextBox("name",$name,32));
-		$frmGraph->AddRow(S_WIDTH,new CNumericBox("width",$width,5));
-		$frmGraph->AddRow(S_HEIGHT,new CNumericBox("height",$height,5));
+		
+		$g_width = new CNumericBox("width",$width,5);
+		$g_width->Addoption('onblur','javascript: submit();');
+		$frmGraph->AddRow(S_WIDTH,$g_width);
+		
+		$g_height = new CNumericBox("height",$height,5);
+		$g_height->Addoption('onblur','javascript: submit();');
+		$frmGraph->AddRow(S_HEIGHT,$g_height);
 
 		$cmbGType = new CComboBox("graphtype",$graphtype,'graphs.submit(this)');
 		$cmbGType->AddItem(GRAPH_TYPE_NORMAL,S_NORMAL);
@@ -4509,6 +4514,7 @@
 	# Insert form for Host Groups
 	function insert_hostgroups_form(){
 		global	$USER_DETAILS;
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
 		$hosts = get_request("hosts",array());
 		$frm_title = S_HOST_GROUP;
@@ -4521,10 +4527,10 @@
 			$name=$group["name"];
 			$db_hosts=DBselect('SELECT DISTINCT h.hostid,host '.
 					' FROM hosts h, hosts_groups hg '.
-					' WHERE h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
+					' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
 						' AND h.hostid=hg.hostid '.
 						' AND hg.groupid='.$_REQUEST['groupid'].
-					' order by host');
+					' ORDER BY host');
 			while($db_host=DBfetch($db_hosts)){
 				if(uint_in_array($db_host["hostid"],$hosts)) continue;
 				array_push($hosts, $db_host["hostid"]);
@@ -4548,8 +4554,8 @@
 		$db_hosts=DBselect('SELECT DISTINCT hostid,host '.
 				' FROM hosts '.
 				' WHERE status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-					' AND hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
-				' order by host');
+					' AND '.DBcondition('hostid',$available_hosts).
+				' ORDER BY host');
 				
 		while($db_host=DBfetch($db_hosts)){
 			$cmbHosts->AddItem(
@@ -4578,7 +4584,8 @@
 	# Insert form for Proxies
 	function	insert_proxies_form(){
 		global	$USER_DETAILS;
-
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+		
 		$hosts = array();
 		$frm_title = S_PROXY;
 		
@@ -4612,11 +4619,11 @@
 		$frmHostG->AddRow(S_PROXY_NAME,new CTextBox("host",$name,30));
 
 		$cmbHosts = new CTweenBox($frmHostG,'hosts',$hosts);
-		$db_hosts=DBselect('select hostid,proxy_hostid,host '.
-			' from hosts '.
-			' where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-				' and hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).') '.
-			' order by host');
+		$db_hosts=DBselect('SELECT hostid,proxy_hostid,host '.
+							' FROM hosts '.
+							' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
+								' AND '.DBcondition('hostid',$available_hosts).
+							' ORDER BY host');
 		while($db_host=DBfetch($db_hosts)){
 			$cmbHosts->AddItem($db_host["hostid"],
 					get_node_name_by_elid($db_host["hostid"]).$db_host["host"],
@@ -4647,7 +4654,7 @@
 		$frmHostP = new CFormTable(S_HOST_PROFILE);
 		$frmHostP->SetHelp("web.host_profile.php");
 
-		$result=DBselect("SELECT * FROM hosts_profiles WHERE hostid=".$_REQUEST["hostid"]);
+		$result=DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$_REQUEST["hostid"]);
 
 		$row=DBfetch($result);
 		if($row){
@@ -4751,7 +4758,7 @@
 		if(isset($_REQUEST["applicationid"])){
 			$result=DBselect("SELECT * FROM applications WHERE applicationid=".$_REQUEST["applicationid"]);
 			$row=DBfetch($result);
-			$frm_title = "Application: \"".$row["name"]."\"";
+			$frm_title = 'Application: "'.$row['name'].'"';
 		}
 		
 		if(isset($_REQUEST["applicationid"]) && !isset($_REQUEST["form_refresh"])){
@@ -5254,8 +5261,7 @@
 		$frmCnct->Show();
 	}
 
-	function insert_command_result_form($scriptid,$hostid)
-	{
+	function insert_command_result_form($scriptid,$hostid){
 		$result = execute_script($scriptid,$hostid);
 
 		$script_info = DBfetch(DBselect("SELECT name FROM scripts WHERE scriptid=$scriptid"));
@@ -5266,6 +5272,7 @@
 			error($message);
 			$message = "";
 		}
+		
 		$frmResult->AddRow(S_RESULT,new CTextArea("message",$message,100,25,'yes'));
 		$frmResult->AddItemToBottomRow(new CButton('close',S_CLOSE,'window.close();'));
 

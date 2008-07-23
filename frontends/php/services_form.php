@@ -87,7 +87,7 @@ include_once "include/page_header.php";
 
 //----------------------------------------------------------------------
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
 	if(isset($_REQUEST['serviceid']) && $_REQUEST['serviceid'] > 0){
@@ -154,7 +154,7 @@ if(isset($_REQUEST['saction'])){
 		$sql = 'SELECT h.* '.
 				' FROM hosts h '.
 				' WHERE '.DBin_node('h.hostid').
-					' AND h.hostid IN ('.$available_hosts.') '.
+					' AND '.DBcondition('h.hostid',$available_hosts).
 					' AND h.hostid='.$_REQUEST["serverid"];
 		if(!$host_data = DBfetch(DBselect($sql))){
 			access_deny();

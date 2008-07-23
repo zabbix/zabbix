@@ -43,10 +43,28 @@ include_once "include/page_header.php";
 		"open"=>		array(T_ZBX_INT, O_OPT,	null,	IN("1"),	null),
 
 		"groupid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	null),
-		"hostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null)
+		"hostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null),
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+
 	);
 
 	check_fields($fields);
+
+/* AJAX	*/
+	if(isset($_REQUEST['favobj'])){
+		if('hat' == $_REQUEST['favobj']){
+			update_profile('web.httpmon.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
+	}	
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+//--------
+
 	validate_sort_and_sortorder('wt.name',ZBX_SORT_DOWN);
 
 	$options = array('allow_all_hosts','monitored_hosts');//,'always_select_first_host'
@@ -86,6 +104,9 @@ include_once "include/page_header.php";
 	update_profile("web.httpmon.applications",$_REQUEST["applications"],PROFILE_TYPE_ARRAY_ID);
 ?>
 <?php
+
+	$p_elements = array();
+	
 // Table HEADER
 	$form = new CForm();
 	$form->SetMethod('get');
@@ -93,12 +114,13 @@ include_once "include/page_header.php";
 	$cmbGroup = new CComboBox("groupid",null,"submit();");
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 
-	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
-	$accessible_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
-
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
+	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
+//\ ([hg]{1,2}\.hostid)\ [inIN]+\ \(.\.\$[a-z_]+\..\)\ 
+// '.DBcondition('$1',$available_hosts)
 	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
 		' FROM groups g, hosts_groups hg, hosts h, applications a, httptest ht '.
-		' WHERE g.groupid in ('.$accessible_groups.') '.
+		' WHERE g.groupid in ('.$available_groups.') '.
 			' AND hg.groupid=g.groupid '.
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND h.hostid=a.hostid '.
@@ -134,7 +156,7 @@ include_once "include/page_header.php";
 				' AND h.hostid=a.hostid '.
 				' AND hg.hostid=h.hostid '.
 				' AND hg.groupid='.$_REQUEST["groupid"].
-				' AND h.hostid in ('.$accessible_hosts.') '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 				' AND a.applicationid=ht.applicationid '.
 				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
 			' GROUP BY h.hostid,h.host'.
@@ -147,14 +169,13 @@ include_once "include/page_header.php";
 				' AND h.hostid=a.hostid '.
 				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
 				' AND ht.applicationid=a.applicationid '.
-				' AND h.hostid in ('.$accessible_hosts.') '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 			' GROUP BY h.hostid,h.host '.
 			' ORDER BY h.host';
 	}
 
 	$result=DBselect($sql);
-	while($row=DBfetch($result))
-	{
+	while($row=DBfetch($result)){
 		$cmbHosts->AddItem(
 			$row['hostid'],
 			get_node_name_by_elid($row['hostid']).$row['host']
@@ -164,7 +185,7 @@ include_once "include/page_header.php";
 	$form->AddItem(SPACE.S_HOST.SPACE);
 	$form->AddItem($cmbHosts);
 	
-	show_table_header(S_STATUS_OF_WEB_MONITORING_BIG, $form);
+	$p_elements[] = get_table_header(SPACE, $form);
 
 // TABLE
 	$form = new CForm();
@@ -195,27 +216,31 @@ include_once "include/page_header.php";
 	$any_app_exist = false;
 
 	if($_REQUEST["hostid"] > 0)
-		$compare_host = " AND h.hostid=".$_REQUEST["hostid"];
+		$compare_host = ' AND h.hostid='.$_REQUEST["hostid"];
 	else
-		$compare_host = " AND h.hostid in (".$accessible_hosts.") ";
-		
-	$db_applications = DBselect('SELECT DISTINCT h.host,h.hostid,a.* '.
-							' FROM applications a,hosts h '.
-							' WHERE a.hostid=h.hostid '.$compare_host.
-							order_by('a.applicationid,h.host,h.hostid','a.name')
-		);
-	while($db_app = DBfetch($db_applications))
-	{
-		$db_httptests = DBselect('select wt.*,a.name as application,h.host,h.hostid from httptest wt '.
-			' left join applications a on wt.applicationid=a.applicationid '.
-			' left join hosts h on h.hostid=a.hostid'.
-			' where a.applicationid='.$db_app["applicationid"].' AND wt.status <> 1'.
-			order_by('wt.name','h.host'));
-
+		$compare_host = ' AND '.DBcondition('h.hostid',$available_hosts);
+	
+	$sql = 'SELECT DISTINCT h.host,h.hostid,a.* '.
+			' FROM applications a,hosts h '.
+			' WHERE a.hostid=h.hostid '.
+				$compare_host.
+			order_by('a.applicationid,h.host,h.hostid','a.name');
+	$db_applications = DBselect($sql);
+	while($db_app = DBfetch($db_applications)){
+	
 		$app_rows = array();
 		$httptest_cnt = 0;
-		while($httptest_data = DBfetch($db_httptests))
-		{
+
+		$sql = 'SELECT wt.*,a.name as application,h.host,h.hostid '.
+			' FROM httptest wt '.
+				' LEFT JOIN applications a on wt.applicationid=a.applicationid '.
+				' LEFT JOIN hosts h on h.hostid=a.hostid'.
+			' WHERE a.applicationid='.$db_app["applicationid"].
+				' AND wt.status <> 1'.
+			order_by('wt.name','h.host');
+
+		$db_httptests = DBselect($sql);
+		while($httptest_data = DBfetch($db_httptests)){
 			++$httptest_cnt;
 			if(!uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
 
@@ -231,34 +256,29 @@ include_once "include/page_header.php";
 			else
 				$lastcheck = new CCol('-', 'center');
 
-			if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] )
-			{
+			if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
 				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['curstep']);
 				$state = S_IN_CHECK.' "'.$step_data['name'].'" ['.$httptest_data['curstep'].' '.S_OF_SMALL.' '.$step_cout.']';
 
 				$status['msg'] = S_IN_PROGRESS;
 				$status['style'] = 'unknown';
 			}
-			else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] )
-			{
+			else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] ){
 				$state = S_IDLE_TILL." ".date(S_DATE_FORMAT_YMDHMS,$httptest_data['nextcheck']);
 
-				if($httptest_data['lastfailedstep'] > 0)
-				{
+				if($httptest_data['lastfailedstep'] > 0){
 					$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep']);
 					$status['msg'] = S_FAILED_ON.' "'.$step_data['name'].'" '.
 						'['.$httptest_data['lastfailedstep'].' '.S_OF_SMALL.' '.$step_cout.'] '.
 						' '.S_ERROR.': '.$httptest_data['error'];
 					$status['style'] = 'disabled';
 				}
-				else
-				{
+				else{
 					$status['msg'] = S_OK_BIG;
 					$status['style'] = 'enabled';
 				}
 			}
-			else
-			{
+			else{
 				$state = S_IDLE_TILL." ".date(S_DATE_FORMAT_YMDHMS,$httptest_data['nextcheck']);
 				$status['msg'] = S_UNKNOWN;
 				$status['style'] = 'unknown';
@@ -274,8 +294,7 @@ include_once "include/page_header.php";
 				new CSpan($status['msg'], $status['style'])
 				)));
 		}
-		if($httptest_cnt > 0)
-		{
+		if($httptest_cnt > 0){
 			if(uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps))
 				$link = new CLink(new CImg("images/general/opened.gif"),
 					"?close=1&applicationid=".$db_app["applicationid"].
@@ -306,7 +325,17 @@ include_once "include/page_header.php";
 	}
 
 	$form->AddItem($table);
-	$form->Show();
+	
+	$p_elements[] = $form;
+	
+	$latest_hat = create_hat(
+			S_STATUS_OF_WEB_MONITORING_BIG,
+			$p_elements,
+			null,
+			'hat_httpmon',
+			get_profile('web.httpmon.hats.hat_httpmon.state',1)
+	);
 
+	$latest_hat->Show();
 include_once "include/page_footer.php"
 ?>

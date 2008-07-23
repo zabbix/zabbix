@@ -119,7 +119,7 @@ include_once "include/page_header.php";
 		add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].'] Link ['.$linkid.'] updated ');
 		if($result)	unset($_REQUEST["form"]);
 	}
-	elseif(isset($_REQUEST["delete"])){
+	else if(isset($_REQUEST["delete"])){
 		
 		if(isset($_REQUEST["linkid"])){
 			$result=delete_link($_REQUEST["linkid"]);
@@ -133,8 +133,7 @@ include_once "include/page_header.php";
 				unset($_REQUEST["form"]);
 			}
 		}
-		elseif(isset($_REQUEST["selementid"]))
-		{
+		else if(isset($_REQUEST["selementid"])){
 			$result=delete_sysmaps_element($_REQUEST["selementid"]);
 			show_messages($result,"Element deleted","Cannot delete element");
 			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,
@@ -147,7 +146,6 @@ include_once "include/page_header.php";
 		}
 	}
 ?>
-
 <?php
 	echo SBR;
 	if(isset($_REQUEST["form"]) && ($_REQUEST["form"]=="add_element" ||
@@ -161,15 +159,13 @@ include_once "include/page_header.php";
 		($_REQUEST["form"]=="update" && isset($_REQUEST["linkid"]))))
 	{
 		$row = DBfetch(DBselect("select count(*) as count from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]));
-		if($row["count"]>1)
-		{
+		if($row["count"]>1){
 			show_table_header(S_CONNECTORS);
 			echo SBR;
 			insert_map_link_form();
 		}
-		else
-		{
-			info("No elements in this map");
+		else{
+			info('Not enough elements in this map');
 		}
 	}
 	else{
@@ -181,8 +177,7 @@ include_once "include/page_header.php";
 
 		$db_elements = DBselect("select * from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"].
 			" order by label");
-		while($db_element = DBfetch($db_elements))
-		{
+		while($db_element = DBfetch($db_elements)){
 
 			if(    $db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST)		$type = S_HOST;
 			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP)		$type = S_MAP;
@@ -259,19 +254,19 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-
+	
+	show_messages();
+	
 	echo SBR;
 	$map=get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
 	show_table_header($map["name"]);
 
 	$table = new CTable(NULL,"map");
-	if(isset($_REQUEST["sysmapid"]))
-	{
+	if(isset($_REQUEST["sysmapid"])){
 		$linkMap = new CMap("links".$_REQUEST["sysmapid"]."_".rand(0,100000));
 
 		$db_elements = DBselect("select * from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]);
-		while($db_element = DBfetch($db_elements))
-		{
+		while($db_element = DBfetch($db_elements)){
 			$tmp_img = get_png_by_selementid($db_element["selementid"]);
 			if(!$tmp_img) continue;
 
@@ -286,6 +281,7 @@ include_once "include/page_header.php";
 				$db_element["label"]);
 
 		}
+		
 		$imgMap = new CImg("map.php?sysmapid=".$_REQUEST["sysmapid"]);
 		$imgMap->SetMap($linkMap->GetName());
 		$table->AddRow($linkMap);

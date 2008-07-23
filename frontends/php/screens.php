@@ -234,7 +234,7 @@ include_once "include/page_header.php";
 		validate_group_with_host(PERM_READ_ONLY,$options);
 		
 		$availiable_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
-		$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
+		$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
 		
 		$r_form = new CForm();
 		$r_form->SetMethod('get');
@@ -274,7 +274,7 @@ include_once "include/page_header.php";
 					' AND h.hostid=i.hostid '.
 					' AND hg.groupid='.$_REQUEST['groupid'].
 					' AND hg.hostid=h.hostid '.
-					' AND h.hostid IN ('.$availiable_hosts.') '.
+					' AND '.DBcondition('h.hostid',$available_hosts).
 				' ORDER BY h.host';
 		}
 		else{
@@ -283,7 +283,7 @@ include_once "include/page_header.php";
 				' WHERE h.status='.HOST_STATUS_MONITORED.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					' AND h.hostid=i.hostid'.
-					' AND h.hostid IN ('.$availiable_hosts.') '.
+					' AND '.DBcondition('h.hostid',$available_hosts).
 				' ORDER BY h.host';
 		}
 
