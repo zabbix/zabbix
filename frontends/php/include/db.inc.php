@@ -571,12 +571,10 @@ else {
 	}
 } 
 
-	function zbx_dbconcat($params)
-	{
+	function zbx_dbconcat($params){
 		global $DB;
 
-		switch($DB['TYPE'])
-		{
+		switch($DB['TYPE']){
 			case "SQLITE3":
 				return implode(' || ',$params);
 			default:
@@ -587,8 +585,7 @@ else {
 	function zbx_sql_mod($x,$y){
 		global $DB;
 
-		switch($DB['TYPE'])
-		{
+		switch($DB['TYPE']){
 			case "SQLITE3":
 				return ' ('.$x.' %% '.$y.')';
 			default:
@@ -596,12 +593,10 @@ else {
 		}
 	}
 
-	function DBid2nodeid($id_name)
-	{
+	function DBid2nodeid($id_name){
 		global $DB;
 
-		switch($DB['TYPE'])
-		{
+		switch($DB['TYPE']){
 			case "MYSQL":
 				$result = '('.$id_name.' div 100000000000000)';
 				break;

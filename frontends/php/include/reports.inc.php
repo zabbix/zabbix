@@ -37,7 +37,7 @@ function show_report2_header($config,$available_hosts){
 	$status_filter=($config==1)?' AND h.status='.HOST_STATUS_TEMPLATE:' AND h.status='.HOST_STATUS_MONITORED;
 	$sql = 'SELECT DISTINCT g.groupid,g.name '.
 					' FROM groups g,hosts_groups hg,hosts h'.
-					' WHERE h.hostid in ('.$available_hosts.') '.
+					' WHERE '.DBcondition('h.hostid',$available_hosts).
 						' AND g.groupid=hg.groupid '.
 						' AND h.hostid=hg.hostid'.
 						$status_filter.
@@ -71,7 +71,7 @@ function show_report2_header($config,$available_hosts){
 			' WHERE h.hostid=i.hostid '.
 				' AND hg.groupid='.$_REQUEST['groupid'].
 				' AND hg.hostid=h.hostid'.
-				' AND h.hostid in ('.$available_hosts.') '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 				$sql_cond.
 			' GROUP BY h.hostid,h.host '.
 			' ORDER BY h.host';
@@ -80,7 +80,7 @@ function show_report2_header($config,$available_hosts){
 		$sql='SELECT h.hostid,h.host '.
 			' FROM hosts h,items i '.
 			' WHERE h.hostid=i.hostid '.
-				' AND h.hostid in ('.$available_hosts.') '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 				$sql_cond.
 			' GROUP BY h.hostid,h.host '.
 			' ORDER BY h.host';
@@ -124,7 +124,7 @@ function show_report2_header($config,$available_hosts){
 				' AND h.hostid=i.hostid '.
 				' AND hg.hostid=h.hostid'.
 				' AND g.groupid=hg.groupid '.
-				' AND h.hostid in ('.$available_hosts.')'.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				' AND t.triggerid=f.triggerid '.
 				' AND '.DBin_node('t.triggerid').
@@ -140,7 +140,7 @@ function show_report2_header($config,$available_hosts){
 				);
 		}
 		
-		$sql_cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid']:' AND h.hostid in ('.$available_hosts.')';
+		$sql_cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid']:' AND '.DBcondition('h.hostid',$available_hosts);
 		$sql = 'SELECT DISTINCT t.triggerid,t.description '.
 			' FROM triggers t,hosts h,items i,functions f '.
 			' WHERE f.itemid=i.itemid '.

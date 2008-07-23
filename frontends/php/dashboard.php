@@ -190,21 +190,14 @@ include_once "include/page_header.php";
 //	$time = new CSpan(date("[H:i:s]",time()));
 //	$time->AddOption('id','refreshed');
 
+	$p_elements = array();
 // Header	
-	$text = array(S_DASHBOARD_BIG);
-	
+
 	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
-	
-	$icon_tab = new CTable();
-	$icon_tab->AddRow(array($fs_icon,SPACE,$text));
-	
-	$text = $icon_tab;
-
-	show_table_header($text,SPACE);
 //-------------
 
 	$left_tab = new CTable();
@@ -387,7 +380,7 @@ include_once "include/page_header.php";
 	$outer_table->SetCellSpacing(1);
 	$outer_table->AddRow(array($td_l,$td_r));
 	
-	$outer_table->Show();
+	$p_elements[] = $outer_table;
 
 	$fav_form = new CForm();
 	$fav_form->AddOption('name','fav_form');
@@ -396,7 +389,18 @@ include_once "include/page_header.php";
 	$fav_form->AddVar('favobj','');
 	$fav_form->AddVar('favid','');
 	$fav_form->AddVar('source','');
-	$fav_form->Show();
+	
+	$p_elements[] = $fav_form;
+	
+	$dashboard_hat = create_hat(
+			S_DASHBOARD_BIG,
+			$p_elements,
+			array($fs_icon),
+			'hat_dashboard',
+			get_profile('web.dashboard.hats.hat_dashboard.state',1)
+	);
+
+	$dashboard_hat->Show();
 
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();

@@ -248,6 +248,7 @@ include_once "include/page_header.php";
 				break;
 			}
 		}
+		
 		if(!isset($already_exist)){
 			array_push($_REQUEST['items'], $new_gitem);
 		}

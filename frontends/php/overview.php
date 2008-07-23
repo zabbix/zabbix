@@ -23,17 +23,18 @@ require_once "include/hosts.inc.php";
 require_once "include/triggers.inc.php";
 require_once "include/items.inc.php";
 
-$page["title"] = "S_OVERVIEW";
-$page["file"] = "overview.php";
+$page['title'] = "S_OVERVIEW";
+$page['file'] = 'overview.php';
 $page['hist_arg'] = array('groupid','type');
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_REFRESH', 1);
-define("SHOW_TRIGGERS",0);
-define("SHOW_DATA",1);
+define('SHOW_TRIGGERS',0);
+define('SHOW_DATA',1);
 
 include_once "include/page_header.php";
 
-if(isset($_REQUEST["select"])&&($_REQUEST["select"]!="")){
+if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	unset($_REQUEST["groupid"]);
 	unset($_REQUEST["hostid"]);
 }
@@ -42,11 +43,28 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!="")){
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 		'view_style'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	NULL),
 		'type'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	NULL),
-		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	NULL)
+		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	NULL),
+		
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
 	check_fields($fields);
 	
+/* AJAX	*/
+	if(isset($_REQUEST['favobj'])){
+		if('hat' == $_REQUEST['favobj']){
+			update_profile('web.overview.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
+	}	
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+//--------
+
 	$_REQUEST['view_style'] = get_request('view_style',get_profile('web.overview.view.style',STYLE_TOP));
 	update_profile('web.overview.view.style',$_REQUEST['view_style'],PROFILE_TYPE_INT);
 	
@@ -96,14 +114,14 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!="")){
 				);
 	}
 	
-	$form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+	$form->AddItem(array(S_GROUP.SPACE,$cmbGroup,SPACE));
 
 	$cmbType = new CComboBox("type",$_REQUEST["type"],"submit()");
 	$cmbType->AddItem(SHOW_TRIGGERS,S_TRIGGERS);
 	$cmbType->AddItem(SHOW_DATA,	S_DATA);
 	$form->AddItem(array(S_TYPE.SPACE,$cmbType));
 
-	$help = new CHelp('web.view.php','left');
+	$help = new CHelp('web.view.php','right');
 	$help_table = new CTableInfo();
 	$help_table->AddOption('style', 'width: 200px');
 	
@@ -132,6 +150,7 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!="")){
 	}
 
 	$help->SetHint($help_table);
+	
 // Header	
 	$text = array(S_OVERVIEW_BIG);
 	
@@ -141,27 +160,19 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!="")){
 	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 	
-	$icon_tab = new CTable();
-	$icon_tab->AddRow(array($fs_icon,$help,$text));
-	
-	$text = $icon_tab;
-
-	show_table_header($text,$form);
-	unset($help, $help_table, $form, $col);
-
-//-------------
-
-	
-	$form = new CForm();
-	$form->SetMethod('get');
+	$form_l = new CForm();
+	$form_l->SetMethod('get');
 	
 	$cmbStyle = new CComboBox("view_style",$_REQUEST["view_style"],"submit()");
 	$cmbStyle->AddItem(STYLE_TOP,S_TOP);
 	$cmbStyle->AddItem(STYLE_LEFT,S_LEFT);
 	
-	$form->Additem(array(S_HOSTS_LOCATION.SPACE,$cmbStyle));
+	$form_l->Additem(array(S_HOSTS_LOCATION.SPACE,$cmbStyle));
+
+	$p_elements[] = get_table_header($form_l,$form);
+
+//-------------
 	
-	show_table_header($form, NULL);
 ?>
 <?php
 	if($_REQUEST["type"]==SHOW_DATA){
@@ -169,17 +180,27 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!="")){
 COpt::profiling_start("get_items_data_overview");
 		$table = get_items_data_overview($_REQUEST["groupid"],$_REQUEST['view_style']);
 COpt::profiling_stop("get_items_data_overview");
-		$table->Show();
-		unset($table);
 	}
 	else if($_REQUEST["type"]==SHOW_TRIGGERS){
 	
 COpt::profiling_start("get_triggers_overview");
 		$table = get_triggers_overview($_REQUEST["groupid"],$_REQUEST['view_style']);
 COpt::profiling_stop("get_triggers_overview");
-		$table->Show();
-		unset($table);
 	}
+
+	$p_elements[] = $table;
+	
+	$overview_hat = create_hat(
+			$text,
+			$p_elements,
+			array($help,$fs_icon),
+			'hat_overview',
+			get_profile('web.overview.hats.hat_overview.state',1)
+	);
+
+	$overview_hat->Show();	
+//	$table->Show();
+//	unset($table);
 
 include_once "include/page_footer.php";
 ?>

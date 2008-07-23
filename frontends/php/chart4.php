@@ -38,7 +38,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
 	if(!DBfetch(DBselect('select distinct  t.triggerid from triggers t where t.triggerid='.$_REQUEST['triggerid']))){
 		fatal_error(S_NO_TRIGGER_DEFINED);
@@ -50,7 +50,7 @@ include_once "include/page_header.php";
 				' AND i.itemid=f.itemid '.
 				' AND f.triggerid=t.triggerid '.
 				' AND t.triggerid='.$_REQUEST['triggerid'].
-				' AND i.hostid NOT IN ('.$available_hosts.') ';
+				' AND '.DBcondition('i.hostid',$available_hosts,true);
 
 	if(DBfetch(DBselect($sql,1))){
 		access_deny();
@@ -62,7 +62,7 @@ include_once "include/page_header.php";
 				' AND i.itemid=f.itemid '.
 				' AND f.triggerid=t.triggerid '.
 				' AND t.triggerid='.$_REQUEST["triggerid"].
-				' AND i.hostid IN ('.$available_hosts.')';
+				' AND '.DBcondition('i.hostid',$available_hosts);
 			
 	if(!$db_data = DBfetch(DBselect($sql))){
 		access_deny();
@@ -91,7 +91,7 @@ include_once "include/page_header.php";
 	$black		= ImageColorAllocate($im,0,0,0); 
 	$gray		= ImageColorAllocate($im,150,150,150); 
 	$white		= ImageColorAllocate($im,255,255,255); 
-	$bg		= ImageColorAllocate($im,6+6*16,7+7*16,8+8*16);
+	$bg			= ImageColorAllocate($im,6+6*16,7+7*16,8+8*16);
 
 	$x=imagesx($im); 
 	$y=imagesy($im);
@@ -117,8 +117,7 @@ include_once "include/page_header.php";
 	if($wday==0) $wday=7;
 	$start=$start-($wday-1)*24*3600;
 
-	for($i=0;$i<52;$i++)
-	{
+	for($i=0;$i<52;$i++){
 		$period_start=$start+7*24*3600*$i;
 		$period_end=$start+7*24*3600*($i+1);
 		$stat=calculate_availability($_REQUEST["triggerid"],$period_start,$period_end);
@@ -129,14 +128,12 @@ include_once "include/page_header.php";
 		$count_now[$i]=1;
 	}
 
-	for($i=0;$i<=$sizeY;$i+=$sizeY/10)
-	{
+	for($i=0;$i<=$sizeY;$i+=$sizeY/10){
 		DashedLine($im,$shiftX,$i+$shiftYup,$sizeX+$shiftX,$i+$shiftYup,$gray);
 	}
 
 	$j=0;
-	for($i=0;$i<=$sizeX;$i+=$sizeX/52)
-	{
+	for($i=0;$i<=$sizeX;$i+=$sizeX/52){
 		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
 		$period_start=$start+7*24*3600*$j;
 		ImageStringUp($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date("d.M",$period_start) , $black);
@@ -145,8 +142,7 @@ include_once "include/page_header.php";
 
 	$maxY=100;
 	$tmp=max($true);
-	if($tmp>$maxY)
-	{
+	if($tmp>$maxY){
 		$maxY=$tmp;
 	}
 	$minY=0;
@@ -154,13 +150,10 @@ include_once "include/page_header.php";
 	$maxX=900;
 	$minX=0;
 
-	for($i=0;$i<52;$i++)
-	{
-
+	for($i=0;$i<52;$i++){
 		$x1=(900/52)*$sizeX*($i-$minX)/($maxX-$minX);
 
-		ImageFilledRectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,ImageColorAllocate($im,200,200,120))
-;
+		ImageFilledRectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,ImageColorAllocate($im,200,200,120));
 		$y1=$sizeY*$true[$i]/100;
 
 		ImageFilledRectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$y1+$shiftYup,ImageColorAllocate($im,200,120,120));

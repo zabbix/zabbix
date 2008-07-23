@@ -967,7 +967,6 @@ include_once "include/page_header.php";
 		($_REQUEST["form"]=="mass_update" && isset($_REQUEST['group_itemid']))))
 	{
 // FORM
-		echo SBR;
 		insert_item_form();
 	}
 ?>

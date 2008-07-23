@@ -32,11 +32,30 @@ include_once "include/page_header.php";
 	$fields=array(
 		"druleid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
 	check_fields($fields);
+	
+/* AJAX	*/
+	if(isset($_REQUEST['favobj'])){
+		if('hat' == $_REQUEST['favobj']){
+			update_profile('web.discovery.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
+	}	
+
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+//--------
+
 	validate_sort_and_sortorder('ip',ZBX_SORT_UP);
 
+	$p_elements = array();
+	
 	$r_form = new CForm();
 	$r_form->SetMethod('get');
 	
@@ -53,7 +72,7 @@ include_once "include/page_header.php";
 	$r_form->AddItem(array(S_DISCOVERY_RULE.SPACE,$cmbDRules));
 
 // Header	
-	$text = array(S_STATUS_OF_DISCOVERY_BIG);
+	$text = array(SPACE);
 	
 	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 
@@ -61,12 +80,7 @@ include_once "include/page_header.php";
 	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 	
-	$icon_tab = new CTable();
-	$icon_tab->AddRow(array($fs_icon,SPACE,$text));
-	
-	$text = $icon_tab;
-
-	show_table_header($text, $r_form);
+	$p_elements[] = get_table_header($text, $r_form);
 //-------------
 	
 
@@ -149,19 +163,16 @@ include_once "include/page_header.php";
 			$table->AddRow(array(get_node_name_by_elid($drule['druleid']),$col));
 		}
 
-		foreach($discovery_info as $ip => $h_data)
-		{
+		foreach($discovery_info as $ip => $h_data){
 			$table_row = array(
 				get_node_name_by_elid($h_data['druleid']),
 				new CSpan($ip, $h_data['class']),
 				new CSpan(($h_data['time'] == 0 ? '' : convert_units(time() - $h_data['time'], 'uptime')), $h_data['class'])
 				);
-			foreach($services as $name => $foo)
-			{
+			foreach($services as $name => $foo){
 				$class = null; $time = SPACE;
 
-				if(isset($h_data['services'][$name]))
-				{
+				if(isset($h_data['services'][$name])){
 					$class = $h_data['services'][$name]['class'];
 					$time = $h_data['services'][$name]['time'];
 				}
@@ -171,7 +182,17 @@ include_once "include/page_header.php";
 		}
 	}
 
-	$table->Show();
+	$p_elements[] = $table;
+	
+	$latest_hat = create_hat(
+			S_STATUS_OF_DISCOVERY_BIG,
+			$p_elements,
+			array($fs_icon),
+			'hat_discovery',
+			get_profile('web.discovery.hats.hat_discovery.state',1)
+	);
+
+	$latest_hat->Show();
 ?>
 <?php
 

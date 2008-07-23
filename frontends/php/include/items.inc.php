@@ -834,17 +834,19 @@
 	 */
 	function get_items_data_overview($groupid,$view_style=null){
 		global	$USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
 		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
 		
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 		if($groupid > 0){
-			$group_where = ",hosts_groups hg where hg.groupid=$groupid and hg.hostid=h.hostid and";
+			$group_where = ',hosts_groups hg '.
+							' WHERE hg.groupid='.$groupid.
+								' AND hg.hostid=h.hostid AND ';
 		} 
 		else {
-			$group_where = " where";
+			$group_where = ' WHERE ';
 		}
 
 COpt::profiling_start('prepare data');
@@ -853,7 +855,8 @@ COpt::profiling_start('prepare data');
 			' from hosts h,items i '.
 				' left join  functions f on f.itemid=i.itemid '.
 				' left join triggers t on t.triggerid=f.triggerid '.
-			$group_where.' h.hostid in ('.$available_hosts.') '.
+			$group_where.
+				DBcondition('h.hostid',$available_hosts).
 				' and h.status='.HOST_STATUS_MONITORED.
 				' and h.hostid=i.hostid '.
 				' and i.status='.ITEM_STATUS_ACTIVE.

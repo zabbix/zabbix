@@ -80,9 +80,9 @@ include_once "include/page_header.php";
 	
 	$showdisabled = get_request("showdisabled", 0);
 	
-	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
 
-	if(isset($_REQUEST['hostid']) && !uint_in_array($_REQUEST['hostid'], explode(',',$accessible_hosts))){
+	if(isset($_REQUEST['hostid']) && !uint_in_array($_REQUEST['hostid'], $available_hosts)){
 		unset($_REQUEST['hostid']);
 	}
 		
@@ -329,7 +329,7 @@ include_once "include/page_header.php";
 		$result=DBselect('select distinct g.groupid,g.name '.
 						' from groups g,hosts_groups hg '.
 						' where g.groupid=hg.groupid '.
-							' and hg.hostid in ('.$accessible_hosts.') '.
+							' and '.DBcondition('hg.hostid',$available_hosts).
 						' order by name');
 		while($row=DBfetch($result)){
 			$cmbGroup->AddItem($row["groupid"],$row["name"]);
@@ -343,7 +343,7 @@ include_once "include/page_header.php";
 				' where hg.groupid='.$_REQUEST["groupid"].
 					' and hg.hostid=h.hostid '.
 					' and h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
-					' and h.hostid in ('.$accessible_hosts.') '.
+					' and '.DBcondition('h.hostid',$available_hosts).
 				' group by h.hostid,h.host '.
 				' order by h.host';
 		}
@@ -351,7 +351,7 @@ include_once "include/page_header.php";
 			$sql='select distinct h.hostid,h.host '.
 				' from hosts h '.
 				' where h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
-					' and h.hostid in ('.$accessible_hosts.') '.
+					' and '.DBcondition('h.hostid',$available_hosts).
 				' group by h.hostid,h.host '.
 				' order by h.host';
 		}

@@ -66,7 +66,7 @@ include_once "include/page_header.php";
                 unset($_REQUEST['serviceid']);
         }
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
 	if(isset($_REQUEST["serviceid"]) && $_REQUEST["serviceid"] > 0){

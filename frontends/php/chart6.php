@@ -51,7 +51,7 @@ include_once "include/page_header.php";
 		show_error_message(S_NO_GRAPH_DEFINED);
 	}
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 
 	if(!graph_accessible($_REQUEST['graphid'])){
 		access_deny();
@@ -63,7 +63,7 @@ include_once "include/page_header.php";
 					' LEFT JOIN items i ON gi.itemid=i.itemid '.
 					' LEFT JOIN hosts h ON i.hostid=h.hostid '.
 				' WHERE g.graphid='.$_REQUEST['graphid'].
-					' AND h.hostid IN ('.$available_hosts.') ';
+					' AND '.DBcondition('h.hostid',$available_hosts);
 					
 	$db_data = DBfetch(DBselect($sql));
 	

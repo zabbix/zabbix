@@ -44,15 +44,16 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	if(! (DBfetch(DBselect('select itemid from items where itemid='.$_REQUEST['itemid']))) )
-	{
+	if(!DBfetch(DBselect('select itemid from items where itemid='.$_REQUEST['itemid']))){
 		show_error_message(S_NO_ITEM_DEFINED);
 //		show_message(S_NO_ITEM_DEFINED);
 	}
 
-	if(! ($db_data = DBfetch(DBselect('SELECT i.itemid from items i '.
-		' WHERE i.hostid IN ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).') '.
-			' AND i.itemid='.$_REQUEST['itemid']))))
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	
+	if(!$db_data = DBfetch(DBselect('SELECT i.itemid from items i '.
+					' WHERE '.DBcondition('i.hostid',$available_hosts).
+						' AND i.itemid='.$_REQUEST['itemid'])))
 	{
 		access_deny();
 	}
