@@ -240,7 +240,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 
 			if (h->value_type == ITEM_VALUE_TYPE_LOG)
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-						"prevvalue=lastvalue,lastvalue='%s',lastlogsize=%d",
+						",prevvalue=lastvalue,lastvalue='%s',lastlogsize=%d",
 						value_esc,
 						h->lastlogsize);
 			else
