@@ -24,7 +24,8 @@
 ZBX_FPING_HOST
 {
 	char		addr[HOST_ADDR_LEN_MAX];
-	int		alive, useip;
+	int		useip;
+	zbx_uint64_t	alive;
 	double		sec;
 };
 
