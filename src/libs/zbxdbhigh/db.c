@@ -1052,6 +1052,58 @@ int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 	return SUCCEED;
 }
 
+static int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		hour;
+	int		num;
+	zbx_uint64_t	value_min, value_avg, value_max;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In add_trend_uint()");
+
+	hour=clock-clock%3600;
+
+	result = DBselect("select num,value_min,value_avg,value_max from trends_uint where itemid=" ZBX_FS_UI64 " and clock=%d",
+		itemid,
+		hour);
+
+	row=DBfetch(result);
+
+	if(row)
+	{
+		num = atoi(row[0]);
+		value_min = zbx_atoui64(row[1]);
+		value_avg = zbx_atoui64(row[2]);
+		value_max = zbx_atoui64(row[3]);
+		if(value<value_min)	value_min=value;
+		if(value>value_max)	value_max=value;
+		value_avg=(num*value_avg+value)/(num+1);
+		num++;
+		DBexecute("update trends_uint set num=%d,value_min=" ZBX_FS_UI64 ",value_avg=" ZBX_FS_UI64 ",value_max=" ZBX_FS_UI64 " where itemid=" ZBX_FS_UI64 " and clock=%d",
+			num,
+			value_min,
+			value_avg,
+			value_max,
+			itemid,
+			hour);
+	}
+	else
+	{
+		DBexecute("insert into trends_uint (clock,itemid,num,value_min,value_avg,value_max) values (%d," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+			hour,
+			itemid,
+			1,
+			value,
+			value,
+			value);
+	}
+
+	DBfree_result(result);
+
+	return SUCCEED;
+}
+
 int	DBadd_history(zbx_uint64_t itemid, double value, int clock)
 {
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history()");
@@ -1098,7 +1150,7 @@ int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 			value);
 	}
 
-	DBadd_trend(itemid, (double)value, clock);
+	DBadd_trend_uint(itemid, value, clock);
 
 	if((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID>0))
 	{
