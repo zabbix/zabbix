@@ -132,12 +132,13 @@ include_once "include/page_header.php";
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	
-	if(DBfetch(DBselect('SELECT h.host,i.hostid,i.description,i.key_ '.
-					' FROM items i,hosts h '.
-					' WHERE i.itemid IN ('.(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).') '.
-						' AND h.hostid=i.hostid '.
-						' AND '.DBcondition('h.hostid',$available_hosts, true))))
-	{
+	$sql = 'SELECT h.host,i.hostid,i.description,i.key_ '.
+			' FROM items i,hosts h '.
+			' WHERE i.itemid IN ('.(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).') '.
+				' AND h.hostid=i.hostid '.
+				' AND '.DBcondition('h.hostid',$available_hosts, true);
+				
+	if(DBfetch(DBselect($sql))){
 		access_deny();
 	}
 	

@@ -44,8 +44,7 @@ COpt::profiling_start("page");
 	init_nodes();
 	
 	/* set Page header */
-	switch($page["type"])
-	{
+	switch($page["type"]){
 		case PAGE_TYPE_IMAGE:
 			set_image_header();
 			define('ZBX_PAGE_NO_MENU', 1);
@@ -79,7 +78,7 @@ COpt::profiling_start("page");
 					$page['title'] .= ' ('.$curr_node_data['name'].')';
 			}
 			
-			if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"]){
+			if((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && $USER_DETAILS["refresh"]){
 				$page['title'] .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
 			}
 		break; 
@@ -391,9 +390,11 @@ COpt::profiling_start("page");
 	if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"]) { 
 		echo '<meta http-equiv="refresh" content="'.$USER_DETAILS["refresh"].'" />';
 	}
- ?>
-    <meta name="Author" content="ZABBIX SIA" />
-    <link rel="stylesheet" href="css.css" />
+?>
+ 
+<meta name="Author" content="ZABBIX SIA" />
+
+<link rel="stylesheet" href="css.css" />
 <?php
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
 		$css = false;
@@ -585,11 +586,9 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		access_deny();
 	}
 
-	if(version_compare(phpversion(), '5.1.0RC1', '>=') && $page['type'] == PAGE_TYPE_HTML)
-	{
+	if(version_compare(phpversion(), '5.1.0RC1', '>=') && $page['type'] == PAGE_TYPE_HTML){
 		$tmezone = ini_get('date.timezone');
-		if(empty($tmezone)) 
-		{
+		if(empty($tmezone)) {
 			info('Timezone for PHP is not set. Please set "date.timezone" option in php.ini.');
 			date_default_timezone_set('UTC');
 		}

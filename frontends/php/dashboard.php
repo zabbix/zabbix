@@ -298,7 +298,7 @@ include_once "include/page_header.php";
 	
 	$right_tab->AddRow(create_hat(
 			S_SYSTEM_STATUS,
-			null,//make_system_summary(),
+			new CSpan(S_LOADING_P,'textcolorstyles'),//make_system_summary(),
 			array($refresh_menu),
 			'hat_syssum',
 			get_profile('web.dashboard.hats.hat_syssum.state',1)
@@ -310,7 +310,7 @@ include_once "include/page_header.php";
 
 	$right_tab->AddRow(create_hat(
 			S_STATUS_OF_ZABBIX,
-			null,//make_status_of_zbx(),
+			new CSpan(S_LOADING_P,'textcolorstyles'),//make_status_of_zbx(),
 			array($refresh_menu),
 			'hat_stszbx',
 			get_profile('web.dashboard.hats.hat_stszbx.state',1)
@@ -321,7 +321,7 @@ include_once "include/page_header.php";
 	$refresh_menu->AddOption('title',S_MENU);
 		
 	$right_tab->AddRow(create_hat(S_LATEST_ISSUES,
-			null,//make_latest_issues(),
+			new CSpan(S_LOADING_P,'textcolorstyles'),//make_latest_issues(),
 			array($refresh_menu),
 			'hat_lastiss',
 			get_profile('web.dashboard.hats.hat_lastiss.state',1)
@@ -333,7 +333,7 @@ include_once "include/page_header.php";
 
 	$right_tab->AddRow(create_hat(
 			S_WEB_MONITORING,
-			null,//make_webmon_overview(),
+			new CSpan(S_LOADING_P,'textcolorstyles'),//make_webmon_overview(),
 			array($refresh_menu),
 			'hat_webovr',
 			get_profile('web.dashboard.hats.hat_webovr.state',1)
@@ -351,7 +351,7 @@ include_once "include/page_header.php";
 	
 		$right_tab->AddRow(create_hat(
 				S_DISCOVERY_STATUS,
-				null,//make_discovery_status(),//
+				new CSpan(S_LOADING_P,'textcolorstyles'),//make_discovery_status(),//
 				array($refresh_menu),
 				'hat_dscvry',
 				get_profile('web.dashboard.hats.hat_dscvry.state',1)
