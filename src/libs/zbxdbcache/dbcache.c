@@ -854,7 +854,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 						history[i].itemid,
 						history[i].clock,
 						history[i].timestamp,
-						history[i].source,
+						(NULL != history[i].source) ? history[i].source : "",
 						history[i].severity,
 						value_esc_dyn);
 #else
@@ -865,7 +865,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 						history[i].itemid,
 						history[i].clock,
 						history[i].timestamp,
-						history[i].source,
+						(NULL != history[i].source) ? history[i].source : "",
 						history[i].severity,
 						value_esc_dyn);
 #endif
@@ -1093,7 +1093,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 					history[i].itemid,
 					history[i].clock,
 					history[i].timestamp,
-					history[i].source,
+					(NULL != history[i].source) ? history[i].source : "",
 					history[i].severity,
 					value_esc_dyn);
 #else
@@ -1103,7 +1103,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 					history[i].itemid,
 					history[i].clock,
 					history[i].timestamp,
-					history[i].source,
+					(NULL != history[i].source) ? history[i].source : "",
 					history[i].severity,
 					value_esc_dyn);
 #endif
@@ -1165,8 +1165,6 @@ int	DCsync_history(int sync_type)
 	int			i, j, history_num, n, f;
 	int			syncs;
 	int			total_num = 0;
-/*	double			sec;
-	sec = zbx_time();*/
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_history(history_first:%d history_num:%d)",
 			cache->history_first,
@@ -1197,7 +1195,12 @@ int	DCsync_history(int sync_type)
 					history[history_num].value.value_str = strdup(cache->history[f].value.value_str);
 
 					if (history[history_num].value_type == ITEM_VALUE_TYPE_LOG)
-						history[history_num].source = strdup(cache->history[f].source);
+					{
+						if (NULL != cache->history[f].source)
+							history[history_num].source = strdup(cache->history[f].source);
+						else
+							history[history_num].source = NULL;
+					}
 				}
 
 				for (j = f; j != cache->history_first; j = (j == 0 ? ZBX_HISTORY_SIZE : j) - 1)
@@ -1251,18 +1254,13 @@ int	DCsync_history(int sync_type)
 			{
 				zbx_free(history[i].value.value_str);
 
-				if (history[i].value_type == ITEM_VALUE_TYPE_LOG)
+				if (history[i].value_type == ITEM_VALUE_TYPE_LOG && NULL != history[i].source)
 					zbx_free(history[i].source);
 			}
 		}
 		total_num += history_num;
 	} while (--syncs > 0 || sync_type == ZBX_SYNC_FULL);
 
-/*	zabbix_log(LOG_LEVEL_CRIT, "DCsync_history first:%6d; cache:%6d; synced:%4d; spent " ZBX_FS_DBL " seconds",
-			cache->history_first,
-			cache->history_num,
-			total_num,
-			zbx_time() - sec);*/
 	return total_num;
 }
 
@@ -1315,7 +1313,7 @@ static void DCvacuum_text()
 			{
 				cache->history[index].value.value_str -= offset;
 
-				if (cache->history[index].value_type == ITEM_VALUE_TYPE_LOG)
+				if (cache->history[index].value_type == ITEM_VALUE_TYPE_LOG && NULL != cache->history[index].source)
 					cache->history[index].source -= offset;
 			}
 		}
@@ -1864,7 +1862,7 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestam
 	LOCK_CACHE;
 
 	len1 = strlen(value) + 1;
-	len2 = strlen(source) + 1;
+	len2 = (NULL != source && *source != '\0') ? strlen(source) + 1 : 0;
 	history = DCget_history_ptr(itemid, len1 + len2);
 
 	history->itemid			= itemid;
@@ -1874,9 +1872,15 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestam
 	zbx_strlcpy(cache->last_text, value, len1);
 	cache->last_text		+= len1;
 	history->timestamp		= timestamp;
-	history->source			= cache->last_text;
-	zbx_strlcpy(cache->last_text, source, len2);
-	cache->last_text		+= len2;
+
+	if (NULL != source) {
+		history->source		= cache->last_text;
+		zbx_strlcpy(cache->last_text, source, len2);
+		cache->last_text	+= len2;
+	}
+	else
+		history->source		= NULL;
+
 	history->severity		= severity;
 	history->lastlogsize		= lastlogsize;
 
