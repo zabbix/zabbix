@@ -23,6 +23,20 @@
 #include "common.h"
 #include "comms.h"
 
+#define AGENT_VALUE	struct zbx_agent_value_t
+
+AGENT_VALUE
+{
+	int	clock;
+	char	host_name[HOST_HOST_LEN_MAX];
+	char	key[ITEM_KEY_LEN_MAX];
+	char	*value;
+	int	lastlogsize;
+	int	timestamp;
+	char	*source;
+	int	severity;
+};
+
 int	send_result(zbx_sock_t *sock, int result, char *info);
 void	child_trapper_main(zbx_process_t p, zbx_sock_t *s);
 

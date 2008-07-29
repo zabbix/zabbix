@@ -28,6 +28,7 @@
 #include "zbxicmpping.h"
 
 #include "pinger.h"
+#include "dbcache.h"
 
 static zbx_process_t	zbx_process;
 static int		pinger_num;
@@ -79,17 +80,25 @@ static void process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value, 
 	while (NULL != (row = DBfetch(result))) {
 		DBget_item_from_db(&item, row);
 
-		DBbegin();
-		switch (zbx_process) {
-		case ZBX_PROCESS_SERVER:
-			process_new_value(&item, value, now);
-			update_triggers(item.itemid);
-			break;
-		case ZBX_PROCESS_PROXY:
-			proxy_process_new_value(&item, value, now);
-			break;
+		if (0 == CONFIG_DBSYNCER_FORKS)
+		{
+			DBbegin();
+			switch (zbx_process) {
+			case ZBX_PROCESS_SERVER:
+				process_new_value(&item, value, now);
+				update_triggers(item.itemid);
+				break;
+			case ZBX_PROCESS_PROXY:
+				proxy_process_new_value(&item, value, now);
+				break;
+			}
+			DBcommit();
 		}
-		DBcommit();
+		else
+		{
+			process_new_value(&item, value, now);
+			DCadd_nextcheck(&item, now, NULL);
+		}
 
 		(*items)++;
 	}
@@ -118,6 +127,9 @@ static int process_values(ZBX_FPING_HOST *hosts, int hosts_count, int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_values()");
 
+	if (0 != CONFIG_DBSYNCER_FORKS)
+		DCinit_nextchecks();
+
 	for (i = 0; i < hosts_count; i++) {
 		zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] alive [%d] " ZBX_FS_DBL " sec.",
 				hosts[i].addr,
@@ -134,6 +146,9 @@ static int process_values(ZBX_FPING_HOST *hosts, int hosts_count, int now)
 		process_value(SERVER_ICMPPINGSEC_KEY, &hosts[i], &value, now, &items);
 		free_result(&value);
 	}
+
+	if (0 != CONFIG_DBSYNCER_FORKS)
+		DCflush_nextchecks();
 
 	return items;
 }

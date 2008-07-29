@@ -22,6 +22,7 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
+#include "threads.h"
 
 #include "dbcache.h"
 #include "dbsyncer.h"
@@ -43,8 +44,10 @@
  ******************************************************************************/
 int main_dbsyncer_loop()
 {
-	int	now;
+	int	now, sleeptime, last_sleeptime = -1, num;
 	double	sec;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_dbsyncer_loop()");
 
 	zbx_setproctitle("db syncer [connecting to the database]");
 
@@ -55,18 +58,41 @@ int main_dbsyncer_loop()
 
 		now = time(NULL);
 		sec = zbx_time();
+		num = DCsync_history(ZBX_SYNC_PARTIAL);
+		sec = zbx_time() - sec;
 
-		DCsync();
+		if (last_sleeptime == -1)
+		{
+			sleeptime = now - time(NULL) + CONFIG_DBSYNCER_FREQUENCY;
+		}
+		else
+		{
+			sleeptime = last_sleeptime;
+			if (num >= ZBX_SYNC_MAX)
+				sleeptime--;
+			else if (num < ZBX_SYNC_MAX / 2)
+				sleeptime++;
+		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Spent " ZBX_FS_DBL " sec",
-				zbx_time() - sec);
+		if (sleeptime < 0)
+			sleeptime = 0;
+		else if (sleeptime > CONFIG_DBSYNCER_FREQUENCY)
+			sleeptime = CONFIG_DBSYNCER_FREQUENCY;
 
-		zbx_setproctitle("db syncer [sleeping for %d seconds]",
-				CONFIG_DBSYNCER_FREQUENCY);
-		zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
-				CONFIG_DBSYNCER_FREQUENCY);
+		last_sleeptime = sleeptime;
 
-		sleep(CONFIG_DBSYNCER_FREQUENCY);
+		zabbix_log(LOG_LEVEL_DEBUG, "DB syncer spent " ZBX_FS_DBL " second while processing %d items. "
+				"Nextsync after %d sec.",
+				sec,
+				num,
+				sleeptime);
+
+		if (sleeptime > 0) {
+			zbx_setproctitle("db syncer [sleeping for %d seconds]", 
+					sleeptime);
+
+			sleep(sleeptime);
+		}
 	}
 	DBclose();
 }

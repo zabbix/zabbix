@@ -1503,9 +1503,9 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char **data)
 
 	if('\0' == *data[0]) return;
 	
-	zabbix_log(LOG_LEVEL_DEBUG, "Before substitute_simple_macros(%s)", *data);
+/*	zabbix_log(LOG_LEVEL_DEBUG, "Before substitute_simple_macros(%s)", *data);*/
 	substitute_simple_macros(event, action, data, MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY);
-	zabbix_log(LOG_LEVEL_DEBUG, "After substitute_simple_macros(%s)", *data);
+/*	zabbix_log(LOG_LEVEL_DEBUG, "After substitute_simple_macros(%s)", *data);*/
 
 	pl = *data;
 	while((pr = strchr(pl, '{')))
@@ -1599,7 +1599,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char **data)
  * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)              *
  *                                                                            *
  ******************************************************************************/
-int	substitute_functions(char **exp, char *error, int maxerrlen)
+static int	substitute_functions(char **exp, char *error, int maxerrlen)
 {
 	char	*value;
 	char	functionid[MAX_STRING_LEN];
@@ -1674,7 +1674,7 @@ int	substitute_functions(char **exp, char *error, int maxerrlen)
  *                    ({a0:system[procload].max(300)}>3)                      *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_expression(int *result,char **expression, int trigger_value, char *error, int maxerrlen)
+int	evaluate_expression(int *result,char **expression, DB_TRIGGER *trigger, char *error, int maxerrlen)
 {
 	/* Required for substitution of macros */
 	DB_EVENT	event;
@@ -1686,7 +1686,7 @@ int	evaluate_expression(int *result,char **expression, int trigger_value, char *
 	/* Substitute macros first */
 	memset(&event,0,sizeof(DB_EVENT));	
 	memset(&action,0,sizeof(DB_ACTION));	
-	event.value = trigger_value;
+	event.value = trigger->value;
 
 	substitute_simple_macros(&event, &action, expression, MACRO_TYPE_TRIGGER_EXPRESSION);
 

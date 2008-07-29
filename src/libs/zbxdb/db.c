@@ -84,7 +84,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	conn = mysql_init(NULL);
 
-	if( ! mysql_real_connect( conn, host, user, password, dbname, port, dbsocket,0 ) )
+	if( ! mysql_real_connect( conn, host, user, password, dbname, port, dbsocket, CLIENT_MULTI_STATEMENTS) )
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s [%d]",
 			mysql_error(conn), mysql_errno(conn));
@@ -191,7 +191,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 
 	if (ZBX_DB_OK == ret)
-		sqlo_autocommit_on(oracle);
+		sqlo_autocommit_off(oracle);
 
 	return ret;
 #endif
@@ -342,6 +342,9 @@ void zbx_db_commit(void)
 #ifdef	HAVE_POSTGRESQL
 	zbx_db_execute("%s","commit;");
 #endif
+#ifdef	HAVE_ORACLE
+	zbx_db_execute("%s","commit");
+#endif
 #ifdef	HAVE_SQLITE3
 
 	if(sqlite_transaction_started > 1)
@@ -384,6 +387,9 @@ void zbx_db_rollback(void)
 #ifdef	HAVE_POSTGRESQL
 	zbx_db_execute("rollback;");
 #endif
+#ifdef	HAVE_ORACLE
+	zbx_db_execute("rollback");
+#endif
 #ifdef	HAVE_SQLITE3
 
 	if(sqlite_transaction_started > 1)
@@ -420,6 +426,9 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 #ifdef	HAVE_SQLITE3
 	char *error=0;
 #endif
+#ifdef HAVE_MYSQL
+	int		status;
+#endif
 
 /*	sec = zbx_time();*/
 
@@ -434,7 +443,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	}
 	else
 	{
-		if(mysql_query(conn,sql) != 0)
+		if ((status = mysql_query(conn,sql)) != 0)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Query failed: [%s] %s [%d]",
 				sql, mysql_error(conn), mysql_errno(conn) );
@@ -453,7 +462,24 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 		}
 		else
 		{
-			ret = (int)mysql_affected_rows(conn);
+			do {
+				if (mysql_field_count(conn) == 0)
+				{
+/*					zabbix_log(LOG_LEVEL_DEBUG, ZBX_FS_UI64 " rows affected",
+							(zbx_uint64_t)mysql_affected_rows(conn));*/
+					ret += (int)mysql_affected_rows(conn);
+				}
+				else  /* some error occurred */
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "Could not retrieve result set");
+					break;
+				}
+
+				/* more results? -1 = no, >0 = error, 0 = yes (keep looping) */
+			        if ((status = mysql_next_result(conn)) > 0)
+					zabbix_log(LOG_LEVEL_ERR, "Error: %s [%d]",
+							mysql_error(conn), mysql_errno(conn));
+			} while (status == 0);
 		}
 	}
 #endif
