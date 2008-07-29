@@ -477,8 +477,8 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 
 				/* more results? -1 = no, >0 = error, 0 = yes (keep looping) */
 			        if ((status = mysql_next_result(conn)) > 0)
-					zabbix_log(LOG_LEVEL_ERR, "Error: %s [%d]",
-							mysql_error(conn), mysql_errno(conn));
+					zabbix_log(LOG_LEVEL_ERR, "Query failed: [%s] %s [%d]",
+							sql, mysql_error(conn), mysql_errno(conn));
 			} while (status == 0);
 		}
 	}
