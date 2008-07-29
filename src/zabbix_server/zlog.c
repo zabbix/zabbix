@@ -66,11 +66,14 @@ void __zbx_zabbix_syslog(const char *fmt, ...)
 	/* This is made to disable writing to database for watchdog */
 	if(CONFIG_ENABLE_LOG == 0)	return;
 
-	result = DBselect("select %s where h.hostid=i.hostid and i.key_='%s' and i.value_type=%d" DB_NODE,
-		ZBX_SQL_ITEM_SELECT,
-		SERVER_ZABBIXLOG_KEY,
-		ITEM_VALUE_TYPE_STR,
-		DBnode_local("h.hostid"));
+	result = DBselect("select %s where h.hostid=i.hostid and h.status=%d and i.status=%d"
+			" and h.proxy_hostid=0 and i.key_='%s' and i.value_type=%d" DB_NODE,
+			ZBX_SQL_ITEM_SELECT,
+			ITEM_STATUS_ACTIVE,
+			HOST_STATUS_MONITORED,
+			SERVER_ZABBIXLOG_KEY,
+			ITEM_VALUE_TYPE_STR,
+			DBnode_local("h.hostid"));
 
 	now = time(NULL);
 
@@ -85,10 +88,16 @@ void __zbx_zabbix_syslog(const char *fmt, ...)
 
 		init_result(&agent);
 		SET_STR_RESULT(&agent, strdup(value_str));
-		process_new_value(&item, &agent, now);
-		free_result(&agent);
 
-		update_triggers(item.itemid);
+		if (0 == CONFIG_DBSYNCER_FORKS)
+		{
+			process_new_value(&item, &agent, now);
+			update_triggers(item.itemid);
+		}
+		else
+			process_new_value(&item, &agent, now);
+
+		free_result(&agent);
 	}
 
 	DBfree_result(result);

@@ -807,191 +807,149 @@ void DBupdate_triggers_status_after_restart(void)
 	return; 
 }
 
-void DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock, char *error)
+void DBupdate_host_availability(DB_ITEM *item, int available, int clock, const char *error)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char	error_esc[MAX_STRING_LEN];
-	int	disable_until;
+	char	error_esc[MAX_STRING_LEN], error_msg[MAX_STRING_LEN];
+	int	log_level = LOG_LEVEL_WARNING;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In update_host_availability()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In update_host_availability()");
 
-	if(error!=NULL)
+	if (item->host_available == available)
 	{
-		DBescape_string(error,error_esc,MAX_STRING_LEN);
-	}
-	else
-	{
-		strscpy(error_esc,"");
-	}
-
-	result = DBselect("select available,disable_until from hosts where hostid=" ZBX_FS_UI64,
-		hostid);
-	row=DBfetch(result);
-
-	if(!row)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot select host with hostid [" ZBX_FS_UI64 "]",
-			hostid);
-		zabbix_syslog("Cannot select host with hostid [" ZBX_FS_UI64 "]",
-			hostid);
-		DBfree_result(result);
+		if (available == HOST_AVAILABLE_FALSE)
+		{
+			DBescape_string(error, error_esc, sizeof(error_esc));
+			DBexecute("update hosts set error='%s',disable_until=%d where hostid=" ZBX_FS_UI64,
+					error_esc,
+					clock + CONFIG_UNAVAILABLE_DELAY,
+					item->hostid);
+		}
 		return;
 	}
 
-	disable_until = atoi(row[1]);
+	item->host_available = available;
 
-	if(available == atoi(row[0]))
+	if (available == HOST_AVAILABLE_TRUE)
 	{
-/*		if((available==HOST_AVAILABLE_FALSE) 
-		&&(clock+CONFIG_UNREACHABLE_PERIOD>disable_until) )
-		{
-		}
-		else
-		{*/
-			zabbix_log(LOG_LEVEL_DEBUG, "Host already has availability [%d]",
-				available);
-			DBfree_result(result);
-			return;
-/*		}*/
-	}
+		zbx_snprintf(error_msg, sizeof(error_msg), "Enabling host [%s]",
+				item->host_name);
 
-	DBfree_result(result);
-
-	if(available==HOST_AVAILABLE_TRUE)
-	{
-		DBexecute("update hosts set available=%d,error=' ',errors_from=0 where hostid=" ZBX_FS_UI64,
-			HOST_AVAILABLE_TRUE,
-			hostid);
-	}
-	else if(available==HOST_AVAILABLE_FALSE)
-	{
-/*		if(disable_until+CONFIG_UNREACHABLE_PERIOD>clock)
-		{
-			zbx_snprintf(sql,sizeof(sql),"update hosts set available=%d,disable_until=disable_until+%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,CONFIG_UNREACHABLE_DELAY,error_esc,hostid);
-		}
-		else
-		{
-			zbx_snprintf(sql,sizeof(sql),"update hosts set available=%d,disable_until=%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,clock+CONFIG_UNREACHABLE_DELAY,error_esc,hostid);
-		}*/
-		/* '%s ' - space to make Oracle happy */
-		DBexecute("update hosts set available=%d,error='%s ' where hostid=" ZBX_FS_UI64,
-			HOST_AVAILABLE_FALSE,
-			error_esc,
-			hostid);
-	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_ERR, "Unknown host availability [%d] for hostid [" ZBX_FS_UI64 "]",
-			available,
-			hostid);
-		zabbix_syslog("Unknown host availability [%d] for hostid [" ZBX_FS_UI64 "]",
-			available,
-			hostid);
-		return;
-	}
-
-	update_triggers_status_to_unknown(hostid,clock,"Host is unavailable.");
-	zabbix_log(LOG_LEVEL_DEBUG,"End of update_host_availability()");
-
-	return;
-}
-
-void	DBproxy_update_host_availability(zbx_uint64_t hostid, int available, int clock)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		disable_until;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBproxy_update_host_availability()");
-
-	result = DBselect("select available,disable_until from hosts where hostid=" ZBX_FS_UI64,
-			hostid);
-
-	if (NULL == (row = DBfetch(result))) {
-		zabbix_log(LOG_LEVEL_ERR, "Cannot select host with hostid [" ZBX_FS_UI64 "]",
-				hostid);
-		zabbix_syslog("Cannot select host with hostid [" ZBX_FS_UI64 "]",
-				hostid);
-		goto out;
-	}
-
-	disable_until = atoi(row[1]);
-
-	if (available == atoi(row[0])) {
-		zabbix_log(LOG_LEVEL_DEBUG, "Host already has availability [%d]",
-				available);
-		goto out;
-	}
-
-	switch (available) {
-	case HOST_AVAILABLE_TRUE:
-		DBexecute("update hosts set available=%d,errors_from=0 where hostid=" ZBX_FS_UI64,
-				HOST_AVAILABLE_TRUE,
-				hostid);
-		break;
-	case HOST_AVAILABLE_FALSE:
-		DBexecute("update hosts set available=%d where hostid=" ZBX_FS_UI64,
-				HOST_AVAILABLE_FALSE,
-				hostid);
-		break;
-	default:
-		zabbix_log( LOG_LEVEL_ERR, "Unknown host availability [%d] for hostid [" ZBX_FS_UI64 "]",
+		DBexecute("update hosts set available=%d,error='',errors_from=0 where hostid=" ZBX_FS_UI64,
 				available,
-				hostid);
+				item->hostid);
+		item->host_errors_from = 0;
 	}
-
-out:
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG,"End of DBproxy_update_host_availability()");
-
-	return;
-}
-
-int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, const char *error)
-{
-	char	error_esc[MAX_STRING_LEN];
-	int	now;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBupdate_item_status_to_notsupported()");
-
-	if(error!=NULL)
+	else if (available == HOST_AVAILABLE_FALSE)
 	{
-		DBescape_string(error,error_esc,MAX_STRING_LEN);
+		zbx_snprintf(error_msg, sizeof(error_msg), "Host [%s] will be checked after %d seconds",
+				item->host_name,
+				CONFIG_UNAVAILABLE_DELAY);
+
+		DBescape_string(error, error_esc, sizeof(error_esc));
+		DBexecute("update hosts set available=%d,error='%s',disable_until=%d where hostid=" ZBX_FS_UI64,
+				available,
+				error_esc,
+				clock + CONFIG_UNAVAILABLE_DELAY,
+				item->hostid);
+
+		update_triggers_status_to_unknown(item->hostid, clock, "Host is unavailable.");
 	}
 	else
 	{
-		strscpy(error_esc,"");
+		log_level = LOG_LEVEL_ERR;
+		zbx_snprintf(error_msg, sizeof(error_msg), "Unknown host availability [%d] for host [%s]",
+				available,
+				item->host_name);
 	}
 
-	now = time(NULL);
+	zabbix_log(log_level, "%s", error_msg);
+	zabbix_syslog("%s", error_msg);
+}
 
-	/* '%s ' to make Oracle happy */
-	DBexecute("update items set status=%d,nextcheck=%d,error='%s ' where itemid=" ZBX_FS_UI64,
-		ITEM_STATUS_NOTSUPPORTED,
-		CONFIG_REFRESH_UNSUPPORTED+now,
-		error_esc,
-		itemid);
+void	DBproxy_update_host_availability(DB_ITEM *item, int available, int clock)
+{
+	char	error_msg[MAX_STRING_LEN];
+	int	log_level = LOG_LEVEL_WARNING;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBproxy_update_host_availability()");
+
+	if (item->host_available == available)
+	{
+		if (available == HOST_AVAILABLE_FALSE)
+		{
+			DBexecute("update hosts set disable_until=%d where hostid=" ZBX_FS_UI64,
+					clock + CONFIG_UNAVAILABLE_DELAY,
+					item->hostid);
+		}
+		return;
+	}
+
+	item->host_available = available;
+
+	if (available == HOST_AVAILABLE_TRUE)
+	{
+		zbx_snprintf(error_msg, sizeof(error_msg), "Enabling host [%s]",
+				item->host_name);
+
+		DBexecute("update hosts set available=%d,errors_from=0 where hostid=" ZBX_FS_UI64,
+				available,
+				item->hostid);
+		item->host_errors_from = 0;
+	}
+	else if (available == HOST_AVAILABLE_FALSE)
+	{
+		zbx_snprintf(error_msg, sizeof(error_msg), "Host [%s] will be checked after %d seconds",
+				item->host_name,
+				CONFIG_UNAVAILABLE_DELAY);
+
+		DBexecute("update hosts set available=%d,disable_until=%d where hostid=" ZBX_FS_UI64,
+				available,
+				clock + CONFIG_UNAVAILABLE_DELAY,
+				item->hostid);
+	}
+	else
+	{
+		log_level = LOG_LEVEL_ERR;
+		zbx_snprintf(error_msg, sizeof(error_msg), "Unknown host availability [%d] for host [%s]",
+				available,
+				item->host_name);
+	}
+
+	zabbix_log(log_level, "%s", error_msg);
+	zabbix_syslog("%s", error_msg);
+}
+
+int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error)
+{
+	char	error_esc[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBupdate_item_status_to_notsupported()");
+
+	DBescape_string(error, error_esc, sizeof(error_esc));
+
+	DBexecute("update items set status=%d,lastclock=%d,nextcheck=%d,error='%s' where itemid=" ZBX_FS_UI64,
+			ITEM_STATUS_NOTSUPPORTED,
+			clock,
+			clock + CONFIG_REFRESH_UNSUPPORTED,
+			error_esc,
+			item->itemid);
+
+	item->status = ITEM_STATUS_NOTSUPPORTED;
 
 	return SUCCEED;
 }
-
-int	DBproxy_update_item_status_to_notsupported(zbx_uint64_t itemid)
+/*
+int	DBproxy_update_item_status_to_notsupported(DB_ITEM *item, int clock)
 {
-	int	now;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBproxy_update_item_status_to_notsupported()");
-
-	now = time(NULL);
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBproxy_update_item_status_to_notsupported()");
 
 	DBexecute("update items set status=%d,nextcheck=%d where itemid=" ZBX_FS_UI64,
-		ITEM_STATUS_NOTSUPPORTED,
-		CONFIG_REFRESH_UNSUPPORTED+now,
-		itemid);
+			ITEM_STATUS_NOTSUPPORTED,
+			clock + CONFIG_REFRESH_UNSUPPORTED,
+			itemid);
 
 	return SUCCEED;
-}
+}*/
 
 static int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 {
@@ -1002,11 +960,6 @@ static int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 	double	value_min, value_avg, value_max;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_trend()");
-
-	if(CONFIG_DBSYNCER_FORKS >0)
-	{
-		return DCadd_trend(itemid, value, clock);
-	}
 
 	hour=clock-clock%3600;
 
@@ -1118,17 +1071,17 @@ int	DBadd_history(zbx_uint64_t itemid, double value, int clock)
 			clock,
 			itemid,
 			value);
-	}
 
-	DBadd_trend(itemid, value, clock);
+		DBadd_trend(itemid, value, clock);
 
-	if((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID>0))
-	{
-		DBexecute("insert into history_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
-			get_nodeid_by_id(itemid),
-			clock,
-			itemid,
-			value);
+		if((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID>0))
+		{
+			DBexecute("insert into history_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
+				get_nodeid_by_id(itemid),
+				clock,
+				itemid,
+				value);
+		}
 	}
 
 	return SUCCEED;
@@ -1148,17 +1101,17 @@ int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 			clock,
 			itemid,
 			value);
-	}
 
-	DBadd_trend_uint(itemid, value, clock);
+		DBadd_trend_uint(itemid, value, clock);
 
-	if((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID>0))
-	{
-		DBexecute("insert into history_uint_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-			get_nodeid_by_id(itemid),
-			clock,
-			itemid,
-			value);
+		if((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID>0))
+		{
+			DBexecute("insert into history_uint_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+				get_nodeid_by_id(itemid),
+				clock,
+				itemid,
+				value);
+		}
 	}
 
 	return SUCCEED;
@@ -1174,23 +1127,23 @@ int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock)
 	{
 		DCadd_history_str(itemid, value, clock);
 	}
+	else
+	{
+		DBescape_string(value,value_esc,MAX_STRING_LEN);
 
-	DBescape_string(value,value_esc,MAX_STRING_LEN);
-
-	if(CONFIG_DBSYNCER_FORKS == 0) {
 		DBexecute("insert into history_str (clock,itemid,value) values (%d," ZBX_FS_UI64 ",'%s')",
 			clock,
 			itemid,
 			value_esc);
-	}
 
-	if((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID>0))
-	{
-		DBexecute("insert into history_str_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 ",'%s')",
-			get_nodeid_by_id(itemid),
-			clock,
-			itemid,
-			value_esc);
+		if((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID>0))
+		{
+			DBexecute("insert into history_str_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 ",'%s')",
+				get_nodeid_by_id(itemid),
+				clock,
+				itemid,
+				value_esc);
+		}
 	}
 
 	return SUCCEED;
@@ -1204,133 +1157,141 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 	int		value_esc_max_len = 0;
 	int		ret = FAIL;
 	zbx_uint64_t	id;
-
-	sqlo_lob_desc_t		loblp;		/* the lob locator */
-	sqlo_stmt_handle_t	sth = 0;
-
-	sqlo_autocommit_off(oracle);
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_text()");
-
-	value_esc_max_len = strlen(value)+1024;
-	value_esc = zbx_malloc(value_esc, value_esc_max_len);
-
-	DBescape_string(value, value_esc, value_esc_max_len-1);
-	value_esc_max_len = strlen(value_esc);
-
-	/* alloate the lob descriptor */
-	if(sqlo_alloc_lob_desc(oracle, &loblp) < 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"CLOB allocating failed:%s", sqlo_geterror(oracle));
-		goto lbl_exit;
-	}
-
-	id = DBget_maxid("history_text", "id");
-	zbx_snprintf(sql, sizeof(sql), "insert into history_text (id,clock,itemid,value)"
-		" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ", EMPTY_CLOB()) returning value into :1",
-		id,
-		clock,
-		itemid);
-
-	zabbix_log(LOG_LEVEL_DEBUG,"Query:%s", sql);
-
-	/* parse the statement */
-	sth = sqlo_prepare(oracle, sql);
-	if(sth < 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"Query prepearing failed:%s", sqlo_geterror(oracle));
-		goto lbl_exit;
-	}
-
-	/* bind input variables. Note: we bind the lob descriptor here */
-	if(SQLO_SUCCESS != sqlo_bind_by_pos(sth, 1, SQLOT_CLOB, &loblp, 0, NULL, 0))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"CLOB binding failed:%s", sqlo_geterror(oracle));
-		goto lbl_exit_loblp;
-	}
-
-	/* execute the statement */
-	if(sqlo_execute(sth, 1) != SQLO_SUCCESS)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"Query failed:%s", sqlo_geterror(oracle));
-		goto lbl_exit_loblp;
-	}
-
-	/* write the lob */
-	ret = sqlo_lob_write_buffer(oracle, loblp, value_esc_max_len, value_esc, value_esc_max_len, SQLO_ONE_PIECE);
-	if(ret < 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"CLOB writing failed:%s", sqlo_geterror(oracle) );
-		goto lbl_exit_loblp;
-	}
-
-	/* commiting */
-	if(sqlo_commit(oracle) < 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"Commiting failed:%s", sqlo_geterror(oracle) );
-	}
-
-	ret = SUCCEED;
-
-lbl_exit_loblp:
-	sqlo_free_lob_desc(oracle, &loblp);
-
-lbl_exit:
-	if(sth >= 0)	sqlo_close(sth);
-	zbx_free(value_esc);
-
-	sqlo_autocommit_on(oracle);
-
-	return ret;
-
-#else /* HAVE_ORACLE */
-
+#else
 	char		*value_esc = NULL;
 	zbx_uint64_t	id;
+#endif
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_str()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_text()");
 
-	value_esc = DBdyn_escape_string(value);
+	if(CONFIG_DBSYNCER_FORKS > 0)
+	{
+		DCadd_history_text(itemid, value, clock);
+	}
+	else
+	{
+#ifdef HAVE_ORACLE
+		sqlo_lob_desc_t		loblp;		/* the lob locator */
+		sqlo_stmt_handle_t	sth = 0;
 
-	id = DBget_maxid("history_text", "id");
+		sqlo_autocommit_off(oracle);
 
-	DBexecute("insert into history_text (id,clock,itemid,value)"
-			" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s')",
+		value_esc_max_len = strlen(value)+1024;
+		value_esc = zbx_malloc(value_esc, value_esc_max_len);
+
+		DBescape_string(value, value_esc, value_esc_max_len-1);
+		value_esc_max_len = strlen(value_esc);
+
+		/* alloate the lob descriptor */
+		if(sqlo_alloc_lob_desc(oracle, &loblp) < 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG,"CLOB allocating failed:%s", sqlo_geterror(oracle));
+			goto lbl_exit;
+		}
+
+		id = DBget_maxid("history_text", "id");
+		zbx_snprintf(sql, sizeof(sql), "insert into history_text (id,clock,itemid,value)"
+			" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ", EMPTY_CLOB()) returning value into :1",
 			id,
 			clock,
-			itemid,
-			value_esc);
+			itemid);
 
-	zbx_free(value_esc);
+		zabbix_log(LOG_LEVEL_DEBUG,"Query:%s", sql);
 
-	return SUCCEED;
+		/* parse the statement */
+		sth = sqlo_prepare(oracle, sql);
+		if(sth < 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG,"Query prepearing failed:%s", sqlo_geterror(oracle));
+			goto lbl_exit;
+		}
 
+		/* bind input variables. Note: we bind the lob descriptor here */
+		if(SQLO_SUCCESS != sqlo_bind_by_pos(sth, 1, SQLOT_CLOB, &loblp, 0, NULL, 0))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG,"CLOB binding failed:%s", sqlo_geterror(oracle));
+			goto lbl_exit_loblp;
+		}
+
+		/* execute the statement */
+		if(sqlo_execute(sth, 1) != SQLO_SUCCESS)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG,"Query failed:%s", sqlo_geterror(oracle));
+			goto lbl_exit_loblp;
+		}
+
+		/* write the lob */
+		ret = sqlo_lob_write_buffer(oracle, loblp, value_esc_max_len, value_esc, value_esc_max_len, SQLO_ONE_PIECE);
+		if(ret < 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG,"CLOB writing failed:%s", sqlo_geterror(oracle) );
+			goto lbl_exit_loblp;
+		}
+
+		/* commiting */
+		if(sqlo_commit(oracle) < 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG,"Commiting failed:%s", sqlo_geterror(oracle) );
+		}
+
+		ret = SUCCEED;
+
+lbl_exit_loblp:
+		sqlo_free_lob_desc(oracle, &loblp);
+
+lbl_exit:
+		if(sth >= 0)	sqlo_close(sth);
+		zbx_free(value_esc);
+
+		sqlo_autocommit_on(oracle);
+
+		return ret;
+
+#else /* HAVE_ORACLE */
+		value_esc = DBdyn_escape_string(value);
+
+		id = DBget_maxid("history_text", "id");
+
+		DBexecute("insert into history_text (id,clock,itemid,value)"
+				" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s')",
+				id,
+				clock,
+				itemid,
+				value_esc);
+
+		zbx_free(value_esc);
 #endif
+	}
+	return SUCCEED;
 }
 
-int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity)
+int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, int lastlogsize)
 {
-	char	*value_esc = NULL, source_esc[MAX_STRING_LEN];
+	char		*value_esc = NULL, source_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_log()");
 
-	value_esc = DBdyn_escape_string(value);
-	DBescape_string(source, source_esc, sizeof(source_esc));
+	if(CONFIG_DBSYNCER_FORKS > 0)
+	{
+		DCadd_history_log(itemid, value, clock, timestamp, source, severity, lastlogsize);
+	}
+	else
+	{
+		value_esc = DBdyn_escape_string(value);
+		DBescape_string(source, source_esc, sizeof(source_esc));
 
-	if (id == 0)
-		id = DBget_maxid("history_log", "id");
+		DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity)"
+				" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",
+				DBget_maxid("history_log", "id"),
+				clock,
+				itemid,
+				timestamp,
+				value_esc,
+				source_esc,
+				severity);
 
-	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity)"
-			" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",
-			id,
-			clock,
-			itemid,
-			timestamp,
-			value_esc,
-			source_esc,
-			severity);
-
-	zbx_free(value_esc);
+		zbx_free(value_esc);
+	}
 
 	return SUCCEED;
 }
@@ -1917,7 +1878,7 @@ const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
 	return NULL;
 }
 
-zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
+zbx_uint64_t DBget_maxid_num(char *tablename, char *fieldname, int num)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2001,10 +1962,11 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 				continue;
 			}
 
-			DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s' and field_name='%s'",
-				nodeid,
-				tablename,
-				fieldname);
+			DBexecute("update ids set nextid=nextid+%d where nodeid=%d and table_name='%s' and field_name='%s'",
+					num,
+					nodeid,
+					tablename,
+					fieldname);
 
 			result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
 				nodeid,
@@ -2018,7 +1980,7 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 			} else {
 				ZBX_STR2UINT64(ret2, row[0]);
 				DBfree_result(result);
-				if (ret1 + 1 == ret2)
+				if (ret1 + num == ret2)
 					found = SUCCEED;
 			}
 		}
@@ -2030,7 +1992,7 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 			fieldname,
 			ret2);
 
-	return ret2;
+	return ret2 - num + 1;
 
 /*	if(CONFIG_NODEID == 0)
 	{
@@ -2071,106 +2033,109 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 	return ret;*/
 }
 
-int	DBproxy_add_history(const char *host, const char *key, int clock, double value)
+void	DBproxy_add_history(zbx_uint64_t itemid, double value, int clock)
 {
-	char		host_esc[MAX_STRING_LEN], key_esc[MAX_STRING_LEN];
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history()");
 
-	DBescape_string(host, host_esc, sizeof(host_esc));
-	DBescape_string(key, key_esc, sizeof(key_esc));
-
-	DBexecute("insert into proxy_history (host,key_,clock,value) values ('%s','%s',%d,'" ZBX_FS_DBL "')",
-			host_esc,
-			key_esc,
-			clock,
-			value);
-
-	return SUCCEED;
+	if(CONFIG_DBSYNCER_FORKS > 0)
+	{
+		DCadd_history(itemid, value, clock);
+	}
+	else
+	{
+		DBexecute("insert into proxy_history (itemid,clock,value) values (" ZBX_FS_UI64 ",%d,'" ZBX_FS_DBL "')",
+				itemid,
+				clock,
+				value);
+	}
 }
 
-int	DBproxy_add_history_uint(const char *host, const char *key, int clock, zbx_uint64_t value)
+void	DBproxy_add_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 {
-	char		host_esc[MAX_STRING_LEN], key_esc[MAX_STRING_LEN];
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_uint()");
 
-	DBescape_string(host, host_esc, sizeof(host_esc));
-	DBescape_string(key, key_esc, sizeof(key_esc));
-
-	DBexecute("insert into proxy_history (host,key_,clock,value) values ('%s','%s',%d,'" ZBX_FS_UI64 "')",
-			host_esc,
-			key_esc,
-			clock,
-			value);
-
-	return SUCCEED;
+	if(CONFIG_DBSYNCER_FORKS > 0)
+	{
+		DCadd_history_uint(itemid, value, clock);
+	}
+	else
+	{
+		DBexecute("insert into proxy_history (itemid,clock,value) values (" ZBX_FS_UI64 ",%d,'" ZBX_FS_UI64 "')",
+				itemid,
+				clock,
+				value);
+	}
 }
 
-int	DBproxy_add_history_str(const char *host, const char *key, int clock, char *value)
+void	DBproxy_add_history_str(zbx_uint64_t itemid, char *value, int clock)
 {
-	char	host_esc[MAX_STRING_LEN], key_esc[MAX_STRING_LEN], value_esc[MAX_STRING_LEN];
+	char	value_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_str()");
 
-	DBescape_string(host, host_esc, sizeof(host_esc));
-	DBescape_string(key, key_esc, sizeof(key_esc));
-	DBescape_string(value, value_esc, sizeof(value_esc));
+	if(CONFIG_DBSYNCER_FORKS > 0)
+	{
+		DCadd_history_str(itemid, value, clock);
+	}
+	else
+	{
+		DBescape_string(value, value_esc, sizeof(value_esc));
 
-	DBexecute("insert into proxy_history (host,key_,clock,value) values ('%s','%s',%d,'%s')",
-			host_esc,
-			key_esc,
-			clock,
-			value_esc);
-
-	return SUCCEED;
+		DBexecute("insert into proxy_history (itemid,clock,value) values (" ZBX_FS_UI64 ",%d,'%s')",
+				itemid,
+				clock,
+				value_esc);
+	}
 }
 
-int	DBproxy_add_history_text(const char *host, const char *key, int clock, char *value)
+void	DBproxy_add_history_text(zbx_uint64_t itemid, char *value, int clock)
 {
-	char	host_esc[MAX_STRING_LEN], key_esc[MAX_STRING_LEN], *value_esc;
+	char	*value_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_text()");
 
-	DBescape_string(host, host_esc, sizeof(host_esc));
-	DBescape_string(key, key_esc, sizeof(key_esc));
-	value_esc = DBdyn_escape_string(value);
+	if(CONFIG_DBSYNCER_FORKS > 0)
+	{
+		DCadd_history_text(itemid, value, clock);
+	}
+	else
+	{
+		value_esc = DBdyn_escape_string(value);
 
-	DBexecute("insert into proxy_history (host,key_,clock,value) values ('%s','%s',%d,'%s')",
-			host_esc,
-			key_esc,
-			clock,
-			value_esc);
+		DBexecute("insert into proxy_history (itemid,clock,value) values (" ZBX_FS_UI64 ",%d,'%s')",
+				itemid,
+				clock,
+				value_esc);
 
-	zbx_free(value_esc);
-
-	return SUCCEED;
+		zbx_free(value_esc);
+	}
 }
 
-int	DBproxy_add_history_log(const char *host, const char *key, int clock, int timestamp, char *source, int severity, char *value)
+void	DBproxy_add_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, int lastlogsize)
 {
-	char		host_esc[MAX_STRING_LEN], key_esc[MAX_STRING_LEN],
-			source_esc[MAX_STRING_LEN], *value_esc;
+	char		source_esc[MAX_STRING_LEN], *value_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_log()");
 
-	DBescape_string(host, host_esc, sizeof(host_esc));
-	DBescape_string(key, key_esc, sizeof(key_esc));
-	DBescape_string(source, source_esc, sizeof(source_esc));
-	value_esc = DBdyn_escape_string(value);
+	if(CONFIG_DBSYNCER_FORKS > 0)
+	{
+		DCadd_history_log(itemid, value, clock, timestamp, source, severity, lastlogsize);
+	}
+	else
+	{
+		DBescape_string(source, source_esc, sizeof(source_esc));
+		value_esc = DBdyn_escape_string(value);
 
-	DBexecute("insert into proxy_history (host,key_,clock,timestamp,source,severity,value)"
-			" values ('%s','%s',%d,%d,'%s',%d,'%s')",
-			host_esc,
-			key_esc,
-			clock,
-			timestamp,
-			source_esc,
-			severity,
-			value_esc);
+		DBexecute("insert into proxy_history (itemid,clock,timestamp,source,severity,value)"
+				" values (" ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s')",
+				itemid,
+				clock,
+				timestamp,
+				source_esc,
+				severity,
+				value_esc);
 
-	zbx_free(value_esc);
-
-	return SUCCEED;
+		zbx_free(value_esc);
+	}
 }
 

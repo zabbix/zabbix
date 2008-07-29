@@ -152,7 +152,7 @@ void	update_triggers(zbx_uint64_t itemid)
 		trigger.type		= atoi(row[8]);
 
 		exp = strdup(trigger.expression);
-		if( evaluate_expression(&exp_value, &exp, trigger.value, error, sizeof(error)) != 0 )
+		if( evaluate_expression(&exp_value, &exp, &trigger, error, sizeof(error)) != 0 )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated [%s]",
 				trigger.expression,
@@ -295,7 +295,8 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 		else if(item->value_type==ITEM_VALUE_TYPE_LOG)
 		{
 			if(GET_STR_RESULT(value))
-				DBadd_history_log(0, item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
+				DBadd_history_log(item->itemid, value->str, now, item->timestamp, item->eventlog_source,
+						item->eventlog_severity, item->lastlogsize);
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_TEXT)
 		{
@@ -575,10 +576,16 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 			}
 		}
 	}
+/*
+zabbix_log(LOG_LEVEL_CRIT, "I");
+*/
 
 	add_history(item, value, now);
-	update_item(item, value, now);
-	update_functions(item);
+	if (0 == CONFIG_DBSYNCER_FORKS)
+	{
+		update_item(item, value, now);
+		update_functions(item);
+	}
 }
 
 /******************************************************************************
@@ -625,27 +632,27 @@ static int	proxy_add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 	if(item->value_type==ITEM_VALUE_TYPE_UINT64)
 	{
 		if(GET_UI64_RESULT(value))
-			DBproxy_add_history_uint(item->host_name, item->key, now, value->ui64);
+			DBproxy_add_history_uint(item->itemid, value->ui64, now);
 	}
 	else if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 	{
 		if(GET_DBL_RESULT(value))
-			DBproxy_add_history(item->host_name, item->key, now, value->dbl);
+			DBproxy_add_history(item->itemid, value->dbl, now);
 	}
 	else if(item->value_type==ITEM_VALUE_TYPE_STR)
 	{
 		if(GET_STR_RESULT(value))
-			DBproxy_add_history_str(item->host_name, item->key, now, value->str);
+			DBproxy_add_history_str(item->itemid, value->str, now);
 	}
 	else if(item->value_type==ITEM_VALUE_TYPE_LOG)
 	{
 		if(GET_STR_RESULT(value))
-			DBproxy_add_history_log(item->host_name, item->key, now, item->timestamp, item->eventlog_source, item->eventlog_severity, value->str);
+			DBproxy_add_history_log(item->itemid, value->str, now, item->timestamp, item->eventlog_source, item->eventlog_severity, item->lastlogsize);
 	}
 	else if(item->value_type==ITEM_VALUE_TYPE_TEXT)
 	{
 		if(GET_TEXT_RESULT(value))
-			DBproxy_add_history_text(item->host_name, item->key, now, value->text);
+			DBproxy_add_history_text(item->itemid, value->str, now);
 	}
 	else
 	{
@@ -738,5 +745,6 @@ void	proxy_process_new_value(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 		item->key);
 
 	proxy_add_history(item, value, now);
-	proxy_update_item(item, value, now);
+	if (0 == CONFIG_DBSYNCER_FORKS)
+		proxy_update_item(item, value, now);
 }

@@ -26,7 +26,6 @@
 
 int	cmp_double(double a,double b);
 int	find_char(char *str,char c);
-int	evaluate_expression(int *result,char **expression, int triggger_value, char *error, int maxerrlen);
 void	delete_reol(char *c);
 
 #endif
