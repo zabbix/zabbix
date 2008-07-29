@@ -247,15 +247,26 @@
  *     Aly
  *
  */	
-	function get_min_itemclock_by_graphid($graphid){
+	function get_min_itemclock_by_graphid($graphid)
+	{
+		$min = 0;
 		$row = DBfetch(DBselect('SELECT MIN(t.clock) as clock '.
 						' FROM graphs_items gi, trends t '.
 						' WHERE gi.graphid='.$graphid.
 						  ' AND t.itemid = gi.itemid')); 
 						  
-		if(!empty($row) && $row) 
-			return  $row['clock'];
-	return 0;
+		if(!empty($row) && $row && $row['clock']) 
+			$min = $row['clock'];
+
+		$row = DBfetch(DBselect('SELECT MIN(t.clock) as clock '.
+						' FROM graphs_items gi, trends_uint t '.
+						' WHERE gi.graphid='.$graphid.
+						  ' AND t.itemid = gi.itemid')); 
+						  
+		if(!empty($row) && $row && $row['clock']) 
+			$min = $min == 0 ? $row['clock'] : min($min, $row['clock']);
+
+		return $min;
 	}
 
 /*
@@ -268,14 +279,24 @@
  *     Aly
  *
  */	
-	function get_min_itemclock_by_itemid($itemid){
+	function get_min_itemclock_by_itemid($itemid)
+	{
+		$min = 0;
 		$row = DBfetch(DBselect('SELECT MIN(t.clock) as clock '.
 						' FROM trends t '.
 						' WHERE t.itemid='.$itemid)); 
 						  
-		if(!empty($row) && $row) 
-			return  $row['clock'];
-	return 0;
+		if(!empty($row) && $row && $row['clock']) 
+			$min = $row['clock'];
+
+		$row = DBfetch(DBselect('SELECT MIN(t.clock) as clock '.
+						' FROM trends_uint t '.
+						' WHERE t.itemid='.$itemid)); 
+						  
+		if(!empty($row) && $row && $row['clock']) 
+			$min = $min == 0 ? $row['clock'] : min($min, $row['clock']);
+
+		return $min;
 	}
 	
 // Show History Graph

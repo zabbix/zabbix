@@ -136,7 +136,7 @@ include_once "include/page_header.php";
 					' FROM items i,hosts h '.
 					' WHERE i.itemid IN ('.(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).') '.
 						' AND h.hostid=i.hostid '.
-						' AND '.DBcondition('h.hostid',$available_host, true))))
+						' AND '.DBcondition('h.hostid',$available_hosts, true))))
 	{
 		access_deny();
 	}
