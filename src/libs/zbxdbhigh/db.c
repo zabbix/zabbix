@@ -993,7 +993,7 @@ int	DBproxy_update_item_status_to_notsupported(zbx_uint64_t itemid)
 	return SUCCEED;
 }
 
-int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
+static int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
