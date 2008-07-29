@@ -748,6 +748,16 @@ class Chart extends Graph{
 						' AND clock>='.$from_time.
 						' AND clock<='.$to_time.
 					' GROUP BY itemid,'.$calc_field
+					,
+
+					'SELECT itemid,'.$calc_field.' as i,'.
+						' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
+						' max(value_max) as max,max(clock) as clock'.
+					' FROM trends_uint '.
+					' WHERE itemid='.$this->items[$i]['itemid'].
+						' AND clock>='.$from_time.
+						' AND clock<='.$to_time.
+					' GROUP BY itemid,'.$calc_field
 					);
 
 				$this->items[$i]['delay'] = max($this->items[$i]['delay'],3600);

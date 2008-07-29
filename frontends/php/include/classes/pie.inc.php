@@ -132,6 +132,17 @@ function selectData(){
 					' AND t.clock>='.$from_time.
 					' AND t.clock<='.$to_time.
 				' GROUP BY t.itemid'
+				,
+
+				'SELECT t.itemid, '.
+					' avg(t.value_avg) AS avg,min(t.value_min) AS min,'.
+					' max(t.value_max) AS max,max(t.clock) AS clock, max(i.lastvalue) as lst'.
+				' FROM trends_uint t '.
+					' LEFT JOIN items i ON t.itemid = i.itemid'.
+				' WHERE t.itemid='.$this->items[$i]['itemid'].
+					' AND t.clock>='.$from_time.
+					' AND t.clock<='.$to_time.
+				' GROUP BY t.itemid'
 				);
 		}
 		
