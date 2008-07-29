@@ -22,6 +22,7 @@ div.average{
 	padding-left: 2px;
 	margin-right: 5px;
 }
+
 div.warning{
 	background-color: #EFEFCC;
 	width: 100%;
@@ -30,6 +31,18 @@ div.warning{
 	margin-right: 5px;
 }
 
+div.onajaxload{
+	position: absolute;
+	background-color:#000000; 
+	
+	filter:alpha(opacity=10);
+	opacity:.10;
+	
+	cursor:wait;
+	z-index: 50;
+}
+
+/********* DIV IMG *********/
 div.zabbix_logo{
 	height: 31px;
 	width: 118px;
@@ -154,7 +167,7 @@ div.iconmute{
 div.iconmute:hover{
 	cursor:pointer;
 }
-
+/********* DIV IMG END *********/
 
 span.footer_sign{
 	padding-right: 5px;

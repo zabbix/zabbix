@@ -29,17 +29,7 @@ function setRefreshRate(id,interval){
 		'favcnt':	interval
 	}
 
-	var uri = new url(location.href);
-
-	new Ajax.Request(uri.getPath()+'?output=ajax',
-					{
-						'method': 'post',
-						'parameters':params,
-						'onSuccess': function(resp){ },//alert(resp.responseText);
-						'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(params); }
-					}
-	);
-
+	send_params(params);
 }
 
 function create_menu(e,id){

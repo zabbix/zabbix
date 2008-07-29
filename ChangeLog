@@ -1,5 +1,7 @@
 Changes for 1.5.4
 
+ - [DEV-191] added inline update of "Latest Data" screen (Artem)
+ - [DEV-193] improved viewing integer items on graphs (Artem)
  - [DEV-196] improved performance of server module (Sasha)
  - [DEV-197] added support of trends_uint (Sasha)
  - [ZBX-391] added charset info to the email header. Thanks to Vadim Pilipenko. (Sasha)

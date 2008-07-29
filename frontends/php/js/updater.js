@@ -23,6 +23,7 @@ var updater = {
 objlist:		new Array(),			// list of objects
 optlist :		new Array(),			// object params, list
 interval:		10,						// update interval in sec
+inloadobj:		new Array(),			// array containing updated obj and statuses
 
 	setObj4Update: function(id,frequency,url,params){
 		var obj = document.getElementById(id);
@@ -64,7 +65,6 @@ interval:		10,						// update interval in sec
 		obj4update.ready = false;
 		
 		var uri = new url(obj4update.url);
-		
 		new Ajax.Updater(obj4update.id, obj4update.url,
 			{
 				method: 'post',
@@ -83,5 +83,97 @@ interval:		10,						// update interval in sec
 					},	//SDI(resp.responseText);
 				'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(obj4update.params); }
 			});	
+	},
+	
+	onetime_update: function(obj,update_url){
+		obj = $(obj);
+		
+		if(!is_string(update_url)){
+			var upd_form = $(update_url);
+			if(('undefined' != upd_form.tagName) && (upd_form.tagName.toLowerCase() == 'form')){
+				update_url = '?'+upd_form.serialize();
+			}
+		}
+				
+		this.setLoadingImg(obj);
+		
+		var uri = new url(update_url);
+		var params = {
+			'favobj': 	'refresh',
+			'favid': 	obj.id,
+			'output':	'html'
+		}
+		
+		if('undefined' != this.optlist[obj.id]){
+			this.optlist[obj.id].url = update_url+(empty(update_url)?'?':'&')+Object.toQueryString(params);
+		}
+
+		var ajax_result = new Ajax.Updater(obj, update_url,
+			{
+				method: 		'post',
+				'parameters':	params,
+				'evalScripts': 	true,
+				'onSuccess': 	function(resp){ 
+						var headers = resp.getAllResponseHeaders();  //	alert(headers);
+
+						if(headers.indexOf('Ajax-response: false') > -1){
+							alert('False Oo');
+							resp.responseText = $(obj).innerHTML;
+						}
+						updater.rmwLoadingImg(obj);
+					},	//	alert(resp.responseText);
+				'onFailure': 	function(transport){ 
+						document.location = uri.getUrl(); 
+					}
+			});
+
+	return !ajax_result.success;
+	},
+	
+	setLoadingImg: function(obj){
+		obj = $(obj);
+		if('undefined' == typeof(this.inloadobj[obj.id])){
+			this.inloadobj[obj.id] = new Array();
+			this.inloadobj[obj.id].status = false;
+			this.inloadobj[obj.id].divref = null;
+		}
+		
+		if(this.inloadobj[obj.id].status == false){
+			this.inloadobj[obj.id].status = true;
+			
+			var ddiv = document.createElement('div');		
+			document.body.appendChild(ddiv);
+			
+			ddiv.className = 'onajaxload';
+		}
+		else if(this.inloadobj[obj.id].status == true){
+			var ddiv = this.inloadobj[obj.id].divref;
+		}
+		else{
+			return true;
+		}
+		
+		var obj_params = getPosition(obj);
+		obj_params.height = obj.offsetHeight;
+		obj_params.width = obj.offsetWidth;
+		
+		Element.extend(ddiv);
+		ddiv.setStyle({ 'top': obj_params.top+'px', 
+					  	'left': obj_params.left+'px',
+						'width': obj_params.width+'px',
+						'height': obj_params.height+'px'
+						});
+		
+		this.inloadobj[obj.id].divref = ddiv;
+	},
+
+	rmwLoadingImg: function(obj){
+		if('undefined' != typeof(this.inloadobj[obj.id])){
+			this.inloadobj[obj.id].status = false;
+			this.inloadobj[obj.id].divref.style.cursor = 'auto';
+			
+			document.body.removeChild(this.inloadobj[obj.id].divref);
+			this.inloadobj[obj.id].divref = null;
+		}
 	}
 }

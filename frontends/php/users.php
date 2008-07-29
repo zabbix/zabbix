@@ -171,7 +171,8 @@ include_once 'include/page_header.php';
 						$_REQUEST['password1'],$_REQUEST['url'],get_request('autologin',0),$_REQUEST['autologout'],
 						$_REQUEST['lang'],$_REQUEST['theme'],$_REQUEST['refresh'],$_REQUEST['user_type'],
 						$user_groups, $user_medias);
-					$result = DBend();
+						
+					$result = DBend($result);
 					
 					show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 				} 
@@ -183,8 +184,9 @@ include_once 'include/page_header.php';
 						$_REQUEST['password1'],$_REQUEST['url'],get_request('autologin',0),$_REQUEST['autologout'],
 						$_REQUEST['lang'],$_REQUEST['theme'],$_REQUEST['refresh'],$_REQUEST['user_type'],
 						$user_groups, $user_medias);
-					$result = DBend();
-					
+						
+					$result = DBend($result);
+
 					show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 				}
 				if($result){
@@ -213,12 +215,14 @@ include_once 'include/page_header.php';
 			$result = false;
 
 			$group_userid = get_request('group_userid', array());
+
+			DBstart();
 			foreach($group_userid as $userid){
 				if(!($user_data = get_user_by_userid($userid))) continue;
 
-				DBstart();
-				$result = delete_user($userid);
-				$result = DBend();
+
+				$result |= delete_user($userid);
+				
 				if($result){
 					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
 						'User alias ['.$user_data['alias'].'] name ['.$user_data['name'].'] surname ['.
@@ -226,14 +230,15 @@ include_once 'include/page_header.php';
 				}
 			}
 			
-			show_messages($result, S_USER_DELETED,NULL);
+			$result = DBend($result);			
+			show_messages($result, S_USER_DELETED,S_CANNOT_DELETE_USER);
 		}
 		else if(isset($_REQUEST['delete'])&&isset($_REQUEST['userid'])){
 			$user=get_user_by_userid($_REQUEST['userid']);
 			
 			DBstart();
-			$result=delete_user($_REQUEST['userid']);
-			$result = DBend();
+			$result = delete_user($_REQUEST['userid']);
+			$result = DBend($result);
 			
 			show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
 			if($result){
@@ -250,8 +255,8 @@ include_once 'include/page_header.php';
 			$group=get_group_by_usrgrpid($_REQUEST['usrgrpid']);
 			
 			DBstart();
-			$result=add_user_to_group($_REQUEST['userid'],$_REQUEST['usrgrpid']);
-			$result = DBend();
+			$result = add_user_to_group($_REQUEST['userid'],$_REQUEST['usrgrpid']);
+			$result = DBend($result);
 			
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			if($result){
@@ -270,8 +275,8 @@ include_once 'include/page_header.php';
 			$group=get_group_by_usrgrpid($_REQUEST['usrgrpid']);
 			
 			DBstart();
-			$result=remove_user_from_group($_REQUEST['userid'],$_REQUEST['usrgrpid']);
-			$result = DBend();
+			$result = remove_user_from_group($_REQUEST['userid'],$_REQUEST['usrgrpid']);
+			$result = DBend($result);
 			
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			if($result){
@@ -332,8 +337,8 @@ include_once 'include/page_header.php';
 				$action = AUDIT_ACTION_UPDATE;
 				
 				DBstart();
-				$result=update_user_group($_REQUEST['usrgrpid'], $_REQUEST['gname'], $_REQUEST['users_status'], $_REQUEST['gui_access'], $group_users, $group_rights);
-				$result = DBend();
+				$result = update_user_group($_REQUEST['usrgrpid'], $_REQUEST['gname'], $_REQUEST['users_status'], $_REQUEST['gui_access'], $group_users, $group_rights);
+				$result = DBend($result);
 				
 				show_messages($result, S_GROUP_UPDATED, S_CANNOT_UPDATE_GROUP);
 			}
@@ -341,8 +346,8 @@ include_once 'include/page_header.php';
 				$action = AUDIT_ACTION_ADD;
 				
 				DBstart();
-				$result=add_user_group($_REQUEST['gname'], $_REQUEST['users_status'], $_REQUEST['gui_access'], $group_users, $group_rights);
-				$result = DBend();
+				$result = add_user_group($_REQUEST['gname'], $_REQUEST['users_status'], $_REQUEST['gui_access'], $group_users, $group_rights);
+				$result = DBend($result);
 				
 				show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
 			}
@@ -355,26 +360,28 @@ include_once 'include/page_header.php';
 		else if(isset($_REQUEST['delete_selected'])&&isset($_REQUEST['group_groupid'])){
 			$result = false;
 			$group_groupid = get_request('group_groupid', array());
+			
+			DBstart();
 			foreach($group_groupid as $usrgrpid){
 				if(!($group = get_group_by_usrgrpid($usrgrpid))) continue;
 
-				DBstart();
-				$result = delete_user_group($usrgrpid);
-				$result = DBend();
+				
+				$result |= delete_user_group($usrgrpid);
+				
 				if($result){
 					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER_GROUP,'Group name ['.$group['name'].']');
 				}
 			}
-			if($result){
-				show_messages($result, S_GROUP_DELETED);
-			}
+			$result = DBend($result);
+			
+			show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 		}
 		else if(isset($_REQUEST['delete'])){
 			$group = get_group_by_usrgrpid($_REQUEST['usrgrpid']);
 			
 			DBstart();
-			$result=delete_user_group($_REQUEST['usrgrpid']);
-			$result = DBend();
+			$result = delete_user_group($_REQUEST['usrgrpid']);
+			$result = DBend($result);
 			
 			show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 			if($result){

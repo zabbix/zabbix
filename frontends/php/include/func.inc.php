@@ -19,6 +19,45 @@
 **/
 ?>
 <?php
+/************* DYNAMIC REFRESH *************/
+
+function add_refresh_objects($ref_tab){
+	$min = PHP_INT_MAX;
+	foreach($ref_tab as $id => $obj){
+		$obj['interval'] = (isset($obj['interval']))?$obj['interval']:60;
+		zbx_add_post_js(get_refresh_obj_script($obj));
+		
+		$min = ($min < $obj['interval'])?$min:$obj['interval'];
+	}
+	zbx_add_post_js('updater.interval = 10; updater.check4Update();');
+}
+
+function get_refresh_obj_script($obj){
+	$obj['url'] = isset($obj['url'])?$obj['url']:'';
+	$obj['url'].= (zbx_empty($obj['url'])?'?':'&').'output=html';
+	
+return 'updater.setObj4Update("'.$obj['id'].'",'.$obj['interval'].',"'.$obj['url'].'",{"favobj": "refresh", "favid": "'.$obj['id'].'"});';
+}
+
+function make_refresh_menu($id,$cur_interval,&$menu,&$submenu){
+
+	$menu['menu_'.$id][] = array(S_REFRESH, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
+	$intervals = array('10','30','60', '120','600','900');
+	
+	foreach($intervals as $key => $value){
+		$menu['menu_'.$id][] = array(
+					S_EVERY.SPACE.$value.SPACE.S_SECONDS_SMALL, 
+					'javascript: setRefreshRate("'.$id.'",'.$value.');'.
+					'void(0);',	
+					null, 
+					array('outer' => ($value == $cur_interval)?'pum_b_submenu':'pum_o_submenu', 'inner'=>array('pum_i_submenu')
+			));
+	}
+	$submenu['menu_'.$id][] = array();
+}
+
+/************* END REFRESH *************/
+
 /************ REQUEST ************/
 function get_request($name, $def=NULL){
 	if(isset($_REQUEST[$name]))
@@ -297,5 +336,7 @@ function str_in_array($needle,$haystack,$strict=false){
 	}
 return false;
 }
+
+/************* END ZBX MISC *************/
 
 ?>

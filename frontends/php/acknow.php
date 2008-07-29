@@ -117,7 +117,7 @@ include_once "include/page_header.php";
 
 		if($result){
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_TRIGGER, S_ACKNOWLEDGE_ADDED.
-				' ['.($bulk)?(' BULK ACKNOWLEDGE '):(expand_trigger_description_by_data($db_data)).']'.
+				' ['.($bulk)?' BULK ACKNOWLEDGE ':(expand_trigger_description_by_data($db_data)).']'.
 				' ['.$_REQUEST['message'].']');
 		}
 
@@ -151,15 +151,14 @@ include_once "include/page_header.php";
 		$table->SetAlign("center");
 
 		$db_acks = get_acknowledges_by_eventid($db_data["eventid"]);
-		while($db_ack = DBfetch($db_acks))
-		{
+		while($db_ack = DBfetch($db_acks)){
 			$db_user = get_user_by_userid($db_ack["userid"]);
 			$table->AddRow(array(
 				new CCol($db_user["alias"],"user"),
 				new CCol(date("d-m-Y h:i:s A",$db_ack["clock"]),"time")),
 				"title");
 	
-			$msgCol = new CCol(nl2br($db_ack["message"]));
+			$msgCol = new CCol(new CScript(nl2br($db_ack["message"])));
 			$msgCol->SetColspan(2);
 			$table->AddRow($msgCol,"msg");
 		}

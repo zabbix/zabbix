@@ -41,7 +41,8 @@ class Chart extends Graph{
 		$this->zero = array();
 		$this->graphorientation = '';
 		
-		$this->gridPixels = 40;
+		$this->gridLinesCount = NULL;		// How many grids to draw
+		$this->gridPixels = 40;		// optimal grid size
 	}
 
 	function updateShifts(){
@@ -581,18 +582,19 @@ class Chart extends Graph{
 					}
 				}
 			}
-			
+/*
 			if(isset($minY)&&($minY>0)){
-				$minY = $minY - ($minY * 0.2) - 0.05;
+				$minY = $minY - ($minY * 0.1) - 0.05;
 			} 
 			else if(isset($minY)&&($minY<0)){
-				$minY = $minY + ($minY * 0.2) - 0.05;
+				$minY = $minY + ($minY * 0.1) - 0.05;
 			} 
 			else {
 				$minY=0;
 			}
 			
 			$minY = round($minY,1);
+//*/
 			return $minY;
 		}
 	}
@@ -653,25 +655,24 @@ class Chart extends Graph{
 					
 				}
 			}
-
+/*
 			if(isset($maxY)&&($maxY>0)){
 			
-/*
-				$exp = round(log10($maxY));
-				$mant = $maxY/pow(10,$exp);
+//				$exp = round(log10($maxY));
+//				$mant = $maxY/pow(10,$exp);
 				
-				$mant=((round(($mant*11)/6)-1)*6)/10;
-				$maxY = $mant*pow(10,$exp);
-//*/
+//				$mant=((round(($mant*11)/6)-1)*6)/10;
+//				$maxY = $mant*pow(10,$exp);
 
-				$maxY = round($maxY,1) + round($maxY,1)*0.2 + 0.05;
+				$maxY = round($maxY,1);// + round($maxY,1)*0.2 + 0.05;
 			} 
 			else if(isset($maxY)&&($maxY<0)){
-				$maxY = round($maxY,1) - round($maxY,1)*0.2 + 0.05;
+				$maxY = round($maxY,1);// - round($maxY,1)*0.2 + 0.05;
 			} 
 			else {
 				$maxY=0.3;
 			}
+//*/
 			return $maxY;
 		}
 	}
@@ -698,8 +699,15 @@ class Chart extends Graph{
 		for($i=0; $i < $this->num; $i++){
 
 			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
+			
+			if(!isset($this->axis_valuetype[$this->items[$i]['axisside']])){
+				$this->axis_valuetype[$this->items[$i]['axisside']] = $real_item['value_type'];
+			}
+			else if($this->axis_valuetype[$this->items[$i]['axisside']] != $real_item['value_type']){
+				$this->axis_valuetype[$this->items[$i]['axisside']] = ITEM_VALUE_TYPE_FLOAT;
+			}
+			
 			$type = $this->items[$i]["calc_type"];
-
 			if($type == GRAPH_ITEM_AGGREGATED) {
 				/* skip current period */
 				$from_time	= $this->from_time - $this->period * $this->items[$i]["periods_cnt"];
@@ -823,15 +831,10 @@ class Chart extends Graph{
 
 					if($first_idx < 0)	$first_idx = $ci; // if no data FROM start of graph get current data as first data
 
-					for(;$cj > 0; $cj--){
-					
-/*							if(($first_idx == $ci) && ($dx < ($this->sizeX)) && ($this->type == GRAPH_TYPE_STACKED)){
-							$curr_data->count[$ci - ($dx - $cj)] = 1;
-						}
-						else //*/
+					for(;$cj > 0; $cj--){					
 						if(($dx < ($this->sizeX/20)) && ($this->type == GRAPH_TYPE_STACKED)){
 							$curr_data->count[$ci - ($dx - $cj)] = 1;
-						}//*/
+						}
 						
 						foreach(array('clock','min','max','avg') as $var_name){
 							$var = &$curr_data->$var_name;
@@ -903,6 +906,67 @@ class Chart extends Graph{
 		}
 		/* end calculation of stacked graphs */
 	}
+	
+	function correctMinMax(){
+		$this->gridLinesCount = round($this->sizeY/$this->gridPixels) + 1;
+		
+		$sides = array(GRAPH_YAXIS_SIDE_LEFT,GRAPH_YAXIS_SIDE_RIGHT);
+		foreach($sides as $side){
+//SDI($side);
+			if(!isset($this->axis_valuetype[$side])) continue;
+			
+			if($this->axis_valuetype[$side] == ITEM_VALUE_TYPE_UINT64){
+			
+				$this->m_maxY[$side] = round($this->m_maxY[$side]);
+				$this->m_minY[$side] = (int) $this->m_minY[$side];
+		
+				$value_delta = round($this->m_maxY[$side] - $this->m_minY[$side]);
+				
+				$step = (int) (($value_delta/$this->gridLinesCount) + 1);	// round to top
+				$value_delta2 = $step * $this->gridLinesCount;
+//SDI($value_delta.' <> '.$value_delta2);
+				$first_delta = round(($value_delta2-$value_delta)/2);
+				$second_delta = ($value_delta2-$value_delta) - $first_delta;
+
+//SDI($this->m_maxY[$side].' : '.$first_delta.' --- '.$this->m_minY[$side].' : '.$second_delta);
+				if($this->m_minY[$side] >= 0){
+					if($this->m_minY[$side] < $second_delta){
+						$first_delta += $second_delta - $this->m_minY[$side];
+						$second_delta = $this->m_minY[$side];
+					}
+				}
+				else if(($this->m_maxY[$side] <= 0)){
+					if($this->m_maxY[$side] > $first_delta){
+						$second_delta += $first_delta - $this->m_maxY[$side];
+						$first_delta = $this->m_maxY[$side];
+					}
+				}				
+				
+				$this->m_maxY[$side] += $first_delta;
+				$this->m_minY[$side] -= ($value_delta2-$value_delta) - $first_delta;
+			}
+			else if($this->axis_valuetype[$side] == ITEM_VALUE_TYPE_FLOAT){
+//*
+				if($this->m_maxY[$side]>0){
+			
+					$this->m_maxY[$side] = round($this->m_maxY[$side],1);// + round($this->m_maxY[$side],1)*0.2 + 0.05;
+				} 
+				else if($this->m_maxY[$side]<0){
+					$this->m_maxY[$side] = round($this->m_maxY[$side],1);// - round($this->m_maxY[$side],1)*0.2 + 0.05;
+				} 				
+				
+				if($this->m_minY[$side]>0){
+					$this->m_minY[$side] = $this->m_minY[$side] - ($this->m_minY[$side] * 0.2) - 0.05;
+				} 
+				else if($this->m_minY[$side]<0){
+					$this->m_minY[$side] = $this->m_minY[$side] + ($this->m_minY[$side] * 0.2) - 0.05;
+				} 
+				
+				$this->m_minY[$side] = round($this->m_minY[$side],1);
+//*/
+			}
+		}
+	}
 
 	function DrawLeftSide(){
 		if($this->yaxisleft == 1){
@@ -916,7 +980,7 @@ class Chart extends Graph{
 				}
 			}
 			
-			$hstr_count = round($this->sizeY / $this->gridPixels) + 1;
+			$hstr_count = $this->gridLinesCount;
 			for($i=0;$i<=$hstr_count;$i++){
 				$str = str_pad(convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units),10," ", STR_PAD_LEFT);
 				ImageString($this->im, 
@@ -953,7 +1017,7 @@ class Chart extends Graph{
 					break;
 				}
 			}
-			$hstr_count = round($this->sizeY / $this->gridPixels) + 1;
+			$hstr_count = $this->gridLinesCount;
 			for($i=0;$i<=$hstr_count;$i++){
 				$str = str_pad(convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units),10," ");
 				ImageString($this->im, 
@@ -1026,6 +1090,8 @@ class Chart extends Graph{
 		$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]	= $this->calculateMaxY(GRAPH_YAXIS_SIDE_LEFT);
 		$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]	= $this->calculateMaxY(GRAPH_YAXIS_SIDE_RIGHT);
 
+		$this->correctMinMax();
+		
 		$this->updateShifts();
 		$this->calcTriggers();
 		$this->CalcZero();
