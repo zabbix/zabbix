@@ -51,11 +51,14 @@ static int		pinger_num;
  * Comments: can be done in process_data()                                    *
  *                                                                            *
  ******************************************************************************/
-static void process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value, int now, int *items)
+static void process_value(char *key, ZBX_FPING_HOST *host, zbx_uint64_t *value_ui64, double *value_dbl, int now, int *items)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
+	AGENT_RESULT	value;
+
+	assert(value_ui64 || value_dbl);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_value(%s@%s)",
 			key,
@@ -80,25 +83,38 @@ static void process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value, 
 	while (NULL != (row = DBfetch(result))) {
 		DBget_item_from_db(&item, row);
 
+		init_result(&value);
+
+		if (NULL != value_ui64)
+		{
+			SET_UI64_RESULT(&value, *value_ui64);
+		}
+		else
+		{
+			SET_DBL_RESULT(&value, *value_dbl);
+		}
+
 		if (0 == CONFIG_DBSYNCER_FORKS)
 		{
 			DBbegin();
 			switch (zbx_process) {
 			case ZBX_PROCESS_SERVER:
-				process_new_value(&item, value, now);
+				process_new_value(&item, &value, now);
 				update_triggers(item.itemid);
 				break;
 			case ZBX_PROCESS_PROXY:
-				proxy_process_new_value(&item, value, now);
+				proxy_process_new_value(&item, &value, now);
 				break;
 			}
 			DBcommit();
 		}
 		else
 		{
-			process_new_value(&item, value, now);
+			process_new_value(&item, &value, now);
 			DCadd_nextcheck(&item, now, NULL);
 		}
+
+		free_result(&value);
 
 		(*items)++;
 	}
@@ -123,7 +139,6 @@ static void process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value, 
 static int process_values(ZBX_FPING_HOST *hosts, int hosts_count, int now)
 {
 	int		i, items = 0;
-	AGENT_RESULT	value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_values()");
 
@@ -131,20 +146,13 @@ static int process_values(ZBX_FPING_HOST *hosts, int hosts_count, int now)
 		DCinit_nextchecks();
 
 	for (i = 0; i < hosts_count; i++) {
-		zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] alive [%d] " ZBX_FS_DBL " sec.",
+		zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] alive [" ZBX_FS_UI64 "] " ZBX_FS_DBL " sec.",
 				hosts[i].addr,
 				hosts[i].alive,
 				hosts[i].sec);
 
-		init_result(&value);
-		SET_UI64_RESULT(&value, hosts[i].alive);
-		process_value(SERVER_ICMPPING_KEY, &hosts[i], &value, now, &items);
-		free_result(&value);
-				
-		init_result(&value);
-		SET_DBL_RESULT(&value, hosts[i].sec);
-		process_value(SERVER_ICMPPINGSEC_KEY, &hosts[i], &value, now, &items);
-		free_result(&value);
+		process_value(SERVER_ICMPPING_KEY, &hosts[i], &hosts[i].alive, NULL, now, &items);
+		process_value(SERVER_ICMPPINGSEC_KEY, &hosts[i], NULL, &hosts[i].sec, now, &items);
 	}
 
 	if (0 != CONFIG_DBSYNCER_FORKS)
