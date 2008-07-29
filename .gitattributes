@@ -36,6 +36,7 @@ frontends/php/audio/trigger_on_disaster.wav -text
 frontends/php/audio/trigger_on_high.wav -text
 frontends/php/audio/trigger_on_warning.wav -text
 frontends/php/authentication.php -text
+frontends/php/blocks/latest.page.php -text
 frontends/php/chart6.php -text
 frontends/php/chart7.php -text
 frontends/php/conf/maintenance.inc.php -text

@@ -1029,6 +1029,7 @@
 	'S_RESET'=>					'Reset',
 	'S_MAXIMIZE'=>				'Maximize',
 	'S_MINIMIZE'=>				'Minimize',
+	'S_LOADING_P'=>				'Loading...',
 
 //	overview.php
 	'S_SELECT_GROUP_DOT_DOT_DOT'=>		'Select group ...',

@@ -147,12 +147,10 @@
 
 	# Update User definition
 
-	function	update_user_profile($userid,$passwd,$url,$autologin,$autologout,$lang,$theme,$refresh)
-	{
+	function	update_user_profile($userid,$passwd,$url,$autologin,$autologout,$lang,$theme,$refresh){
 		global $USER_DETAILS;
 
-		if((bccomp($userid,$USER_DETAILS["userid"]) != 0))
-		{
+		if((bccomp($userid,$USER_DETAILS["userid"]) != 0)){
 			access_deny();
 		}
 
@@ -169,12 +167,14 @@
 
 	# Delete User definition
 
-	function	delete_user($userid){
+	function delete_user($userid){
 		global $USER_DETAILS;
-		if(DBfetch(DBselect('select * from users where userid='.$userid.' and alias='.zbx_dbstr(ZBX_GUEST_USER)))){
+
+		if(DBfetch(DBselect('SELECT * FROM users WHERE userid='.$userid.' AND alias='.zbx_dbstr(ZBX_GUEST_USER)))){
 			error(S_CANNOT_DELETE_USER.SPACE."'".ZBX_GUEST_USER."'");
 			return	false;
 		}
+		
 		if(bccomp($USER_DETAILS['userid'],$userid) == 0){
 			error(S_USER_CANNOT_DELETE_ITSELF);
 			return false;

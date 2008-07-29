@@ -85,14 +85,16 @@ class	Graph{
 		
 		$this->period=3600;
 		$this->from=0;
-		$this->sizeX=900;
-		$this->sizeY=200;
+		$this->sizeX=900;				// default graph size X
+		$this->sizeY=200;				// default graph size Y
 		$this->shiftXleft=10;
 		$this->shiftXright=60;
 		$this->shiftY=17;
 		$this->border=1;
 		$this->num=0;
-		$this->type = $type;
+		$this->type = $type;			// graph type
+		
+		$this->axis_valuetype = array();		// overal items type (int/float)
 
 	}
 
