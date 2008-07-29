@@ -46,6 +46,7 @@ int main_dbsyncer_loop()
 {
 	int	now, sleeptime, last_sleeptime = -1, num;
 	double	sec;
+	int	retry_up = 0, retry_dn = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_dbsyncer_loop()");
 
@@ -63,15 +64,35 @@ int main_dbsyncer_loop()
 
 		if (last_sleeptime == -1)
 		{
-			sleeptime = now - time(NULL) + CONFIG_DBSYNCER_FREQUENCY;
+			sleeptime = num ? ZBX_SYNC_MAX / num : CONFIG_DBSYNCER_FREQUENCY;
 		}
 		else
 		{
 			sleeptime = last_sleeptime;
-			if (num >= ZBX_SYNC_MAX)
-				sleeptime--;
+			if (num > ZBX_SYNC_MAX)
+			{
+				retry_up = 0;
+				retry_dn++;
+			}
 			else if (num < ZBX_SYNC_MAX / 2)
+			{
+				retry_up++;
+				retry_dn = 0;
+			}
+			else
+				retry_up = retry_dn = 0;
+
+			if (retry_dn >= 3)
+			{
+				sleeptime--;
+				retry_dn = 0;
+			}
+
+			if (retry_up >= 3)
+			{
 				sleeptime++;
+				retry_up = 0;
+			}
 		}
 
 		if (sleeptime < 0)
