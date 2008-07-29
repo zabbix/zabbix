@@ -39,6 +39,7 @@ extern	int	CONFIG_MASTER_NODEID;
 extern	int	CONFIG_DBSYNCER_FORKS;
 extern	int	CONFIG_NODE_NOHISTORY;
 extern  int     CONFIG_REFRESH_UNSUPPORTED;
+extern	int	CONFIG_UNAVAILABLE_DELAY;
 
 typedef enum {
 	GRAPH_TYPE_NORMAL = 0,
@@ -104,7 +105,8 @@ typedef enum {
 #define DB_HTTPTESTITEM	struct zbx_httptestitem_type
 #define DB_ESCALATION	struct zbx_escalation_type
 
-#define	MAX_HISTORY_STR_LEN	255
+#define	HISTORY_STR_VALUE_LEN		255
+#define	HISTORY_STR_VALUE_LEN_MAX	HISTORY_STR_VALUE_LEN+1
 
 /* Trigger related defines */
 #define TRIGGER_DESCRIPTION_LEN		255
@@ -134,6 +136,10 @@ typedef enum {
 
 #define ITEM_KEY_LEN			255
 #define ITEM_KEY_LEN_MAX		ITEM_KEY_LEN+1
+#define ITEM_LASTVALUE_LEN		255
+#define ITEM_LASTVALUE_LEN_MAX		ITEM_LASTVALUE_LEN+1
+#define ITEM_ERROR_LEN			128
+#define ITEM_ERROR_LEN_MAX		ITEM_ERROR_LEN+1
 
 #define GRAPH_NAME_LEN			128
 #define GRAPH_NAME_LEN_MAX		GRAPH_NAME_LEN+1
@@ -153,7 +159,10 @@ typedef enum {
 #define HTTPSTEP_REQUIRED_LEN		255
 #define HTTPSTEP_REQUIRED_LEN_MAX	HTTPSTEP_REQUIRED_LEN+1
 
-#define ZBX_SQL_ITEM_SELECT	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.errors_from,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status,i.trapper_hosts,i.logtimefmt,i.valuemapid,i.delay_flex,h.dns,i.params from hosts h, items i"
+#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.errors_from,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status,i.trapper_hosts,i.logtimefmt,i.valuemapid,i.delay_flex,h.dns,i.params"
+#define ZBX_SQL_ITEM_TABLES	"hosts h, items i"
+#define ZBX_SQL_ITEM_FIELDS_NUM	38
+#define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
 #define ZBX_MAX_SQL_LEN			65535
 
@@ -514,13 +523,14 @@ void		DBrollback();
 
 const ZBX_TABLE	*DBget_table(const char *tablename);
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
-zbx_uint64_t	DBget_maxid(char *table, char *field);
+#define DBget_maxid(table, field)	DBget_maxid_num(table, field, 1)
+zbx_uint64_t	DBget_maxid_num(char *table, char *field, int num);
 
 int	DBget_function_result(char **result,char *functionid);
-void	DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock,char *error);
-void	DBproxy_update_host_availability(zbx_uint64_t hostid, int available, int clock);
-int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, const char *error);
-int	DBproxy_update_item_status_to_notsupported(zbx_uint64_t itemid);
+void	DBupdate_host_availability(DB_ITEM *item, int available, int clock, const char *error);
+void	DBproxy_update_host_availability(DB_ITEM *item, int available, int clock);
+int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
+/*int	DBproxy_update_item_status_to_notsupported(DB_ITEM *item, int clock);*/
 int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock);
 int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t eventid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message);
 int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
@@ -594,15 +604,15 @@ void	DBupdate_services(
 
 /* History related functions */
 int	DBadd_history(zbx_uint64_t itemid, double value, int clock);
-int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity);
+int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, int lastlogsize);
 int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock);
 int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock);
 int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 
-int	DBproxy_add_history(const char *host, const char *key, int clock, double value);
-int	DBproxy_add_history_uint(const char *host, const char *key, int clock, zbx_uint64_t value);
-int	DBproxy_add_history_str(const char *host, const char *key, int clock, char *value);
-int	DBproxy_add_history_text(const char *host, const char *key, int clock, char *value);
-int	DBproxy_add_history_log(const char *host, const char *key, int clock, int timestamp, char *source, int severity, char *value);
+void	DBproxy_add_history(zbx_uint64_t itemid, double value, int clock);
+void	DBproxy_add_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
+void	DBproxy_add_history_str(zbx_uint64_t itemid, char *value, int clock);
+void	DBproxy_add_history_text(zbx_uint64_t itemid, char *value, int clock);
+void	DBproxy_add_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, int lastlogsize);
 
 #endif

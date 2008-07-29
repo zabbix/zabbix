@@ -24,6 +24,7 @@
 #include "sysinfo.h"
 #include "daemon.h"
 #include "zbxserver.h"
+#include "dbcache.h"
 
 #include "poller.h"
 
@@ -100,7 +101,7 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 	zabbix_log(LOG_LEVEL_DEBUG, "End get_value()");
 	return res;
 }
-
+/*
 static int get_minnextcheck(int now)
 {
 	DB_RESULT	result;
@@ -108,11 +109,11 @@ static int get_minnextcheck(int now)
 
 	int		res;
 	char		istatus[16];
-
+*/
 /* Host status	0 == MONITORED
 		1 == NOT MONITORED
 		2 == UNREACHABLE */
-	if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
+/*	if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
 	{
 		result = DBselect("select count(*),min(nextcheck) as nextcheck from items i,hosts h"
 				" where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d)"
@@ -177,49 +178,54 @@ static int get_minnextcheck(int now)
 
 	return	res;
 }
-
+*/
 /* Update special host's item - "status" */
 static void update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 {
-/*	char		value_str[MAX_STRING_LEN];*/
 	AGENT_RESULT	agent;
-
 	DB_ITEM		item;
 	DB_RESULT	result;
 	DB_ROW		row;
-
 	int		update;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_key_status(" ZBX_FS_UI64 ",%d)",
-		hostid,
-		host_status);
+			hostid,
+			host_status);
 
-	result = DBselect("select %s where h.hostid=i.hostid and h.proxy_hostid=0 and h.hostid=" ZBX_FS_UI64 " and i.key_='%s'",
-		ZBX_SQL_ITEM_SELECT,
-		hostid,
-		SERVER_STATUS_KEY);
+	result = DBselect("select %s where h.hostid=i.hostid and i.status=%d"
+			" and h.proxy_hostid=0 and i.key_='%s' and h.hostid=" ZBX_FS_UI64,
+			ZBX_SQL_ITEM_SELECT,
+			ITEM_STATUS_ACTIVE,
+			SERVER_STATUS_KEY,
+			hostid);
 
-	while (NULL != (row = DBfetch(result))) {
-		DBget_item_from_db(&item,row);
+	while (NULL != (row = DBfetch(result)))
+	{
+		DBget_item_from_db(&item, row);
 
 /* Do not process new value for status, if previous status is the same */
-		update = (item.lastvalue_null==1);
-		update = update || ((item.value_type == ITEM_VALUE_TYPE_FLOAT) &&(cmp_double(item.lastvalue_dbl, (double)host_status) == 1));
-		update = update || ((item.value_type == ITEM_VALUE_TYPE_UINT64) &&(item.lastvalue_uint64 != host_status));
+		update = (item.lastvalue_null == 1);
+		update = update || (item.value_type == ITEM_VALUE_TYPE_FLOAT && cmp_double(item.lastvalue_dbl, (double)host_status) == 1);
+		update = update || (item.value_type == ITEM_VALUE_TYPE_UINT64 && item.lastvalue_uint64 != host_status);
 
 		if (update) {
 			init_result(&agent);
 			SET_UI64_RESULT(&agent, host_status);
 
-			switch (zbx_process) {
-			case ZBX_PROCESS_SERVER:
-				process_new_value(&item, &agent, now);
-				update_triggers(item.itemid);
-				break;
-			case ZBX_PROCESS_PROXY:
-				proxy_process_new_value(&item, &agent, now);
-				break;
+			if (0 == CONFIG_DBSYNCER_FORKS)
+			{
+				switch (zbx_process) {
+				case ZBX_PROCESS_SERVER:
+					process_new_value(&item, &agent, now);
+					update_triggers(item.itemid);
+					break;
+				case ZBX_PROCESS_PROXY:
+					proxy_process_new_value(&item, &agent, now);
+					break;
+				}
 			}
+			else
+				process_new_value(&item, &agent, now);
 
 			free_result(&agent);
 		}
@@ -228,54 +234,34 @@ static void update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 	DBfree_result(result);
 }
 
-static void enable_host(DB_ITEM *item, time_t now, char *error)
+static void enable_host(DB_ITEM *item, time_t now)
 {
 	assert(item);
 
-	zabbix_log(LOG_LEVEL_WARNING, "Enabling host [%s]",
-			item->host_name);
-	zabbix_syslog("Enabling host [%s]",
-			item->host_name);
-
 	switch (zbx_process) {
 	case ZBX_PROCESS_SERVER:
-		DBupdate_host_availability(item->hostid, HOST_AVAILABLE_TRUE, now, error);
+		DBupdate_host_availability(item, HOST_AVAILABLE_TRUE, now, NULL);
 		update_key_status(item->hostid, HOST_STATUS_MONITORED, now); /* 0 */
 		break;
 	case ZBX_PROCESS_PROXY:
-		DBproxy_update_host_availability(item->hostid, HOST_AVAILABLE_TRUE, now);
+		DBproxy_update_host_availability(item, HOST_AVAILABLE_TRUE, now);
 		break;
 	}
-
-	item->host_available = HOST_AVAILABLE_TRUE;
 }
 
 static void disable_host(DB_ITEM *item, time_t now, char *error)
 {
 	assert(item);
 
-	zabbix_log(LOG_LEVEL_WARNING, "Host [%s] will be checked after %d seconds",
-			item->host_name,
-			CONFIG_UNAVAILABLE_DELAY);
-	zabbix_syslog("Host [%s] will be checked after %d seconds",
-			item->host_name,
-			CONFIG_UNAVAILABLE_DELAY);
-
 	switch (zbx_process) {
 	case ZBX_PROCESS_SERVER:
-		DBupdate_host_availability(item->hostid, HOST_AVAILABLE_FALSE, now, error);
+		DBupdate_host_availability(item, HOST_AVAILABLE_FALSE, now, error);
 		update_key_status(item->hostid, HOST_AVAILABLE_FALSE, now); /* 2 */
 		break;
 	case ZBX_PROCESS_PROXY:
-		DBproxy_update_host_availability(item->hostid, HOST_AVAILABLE_FALSE, now);
+		DBproxy_update_host_availability(item, HOST_AVAILABLE_FALSE, now);
 		break;
 	}
-
-	item->host_available = HOST_AVAILABLE_FALSE;
-
-	DBexecute("update hosts set disable_until=%d where hostid=" ZBX_FS_UI64,
-		now + CONFIG_UNAVAILABLE_DELAY,
-		item->hostid);
 }
 
 /******************************************************************************
@@ -293,14 +279,13 @@ static void disable_host(DB_ITEM *item, time_t now, char *error)
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-int get_values(void)
+static int get_values(int now)
 {
 	DB_RESULT	result;
 	DB_RESULT	result2;
 	DB_ROW	row;
 	DB_ROW	row2;
 
-	time_t		now;
 	int		delay;
 	int		res;
 	DB_ITEM		item;
@@ -308,14 +293,20 @@ int get_values(void)
 	int		stop = 0, items = 0;
 
 	char		*unreachable_hosts = NULL;
-	char		tmp[MAX_STRING_LEN], istatus[16];
+	int		unreachable_hosts_alloc = 128,
+			unreachable_hosts_offset = 0;
+
+	char		istatus[16];
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_values()");
 
+	if (0 != CONFIG_DBSYNCER_FORKS)
+		DCinit_nextchecks();
+
 	now = time(NULL);
 
-	zbx_snprintf(tmp,sizeof(tmp)-1,ZBX_FS_UI64,0);
-	unreachable_hosts=zbx_strdcat(unreachable_hosts,tmp);
+	unreachable_hosts = zbx_malloc(unreachable_hosts, unreachable_hosts_alloc);
+	*unreachable_hosts = '\0';
 
 	/* Poller for unreachable hosts */
 	if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
@@ -327,7 +318,7 @@ int get_values(void)
 				" and i.key_ not in ('%s','%s','%s','%s')" DB_NODE " group by h.hostid",
 			CONFIG_UNREACHABLE_POLLER_FORKS,
 			poller_num-1,
-			now,
+			now + POLLER_DELAY,
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST,
 			HOST_STATUS_MONITORED,
@@ -352,7 +343,7 @@ int get_values(void)
 				" and " ZBX_SQL_MOD(i.itemid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')"
 				DB_NODE " order by i.nextcheck",
 				ZBX_SQL_ITEM_SELECT,
-				now,
+				now + POLLER_DELAY,
 				istatus,
 				ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST,
 				HOST_STATUS_MONITORED,
@@ -406,50 +397,54 @@ int get_values(void)
 
 		now = time(NULL);
 
-		DBbegin();
-		
-		if(res == SUCCEED )
+		if (res == SUCCEED)
 		{
-			switch (zbx_process) {
-			case ZBX_PROCESS_SERVER:
-				process_new_value(&item, &agent, now);
-				break;
-			case ZBX_PROCESS_PROXY:
-				proxy_process_new_value(&item, &agent, now);
-				break;
+			if (HOST_AVAILABLE_TRUE != item.host_available)
+			{
+				DBbegin();
+		
+				enable_host(&item, now);
+				stop = 1;
+
+				DBcommit();
 			}
 
-			if (HOST_AVAILABLE_TRUE != item.host_available) {
-				enable_host(&item, now, agent.msg);
-				stop = 1;
-			}
-			if (item.host_errors_from != 0) {
+			if (item.host_errors_from != 0)
+			{
+				DBbegin();
+		
 				DBexecute("update hosts set errors_from=0 where hostid=" ZBX_FS_UI64,
 						item.hostid);
 				stop = 1;
+
+				DBcommit();
 			}
 
-			switch (zbx_process) {
-			case ZBX_PROCESS_SERVER:
-				update_triggers(item.itemid);
-				break;
-			default:
-				/* nothing */;
-			}
-
-		}
-		else if(res == NOTSUPPORTED || res == AGENT_ERROR)
-		{
-			if(item.status == ITEM_STATUS_NOTSUPPORTED)
+			if (0 == CONFIG_DBSYNCER_FORKS)
 			{
-				/* It is not correct */
-/*				snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d, lastclock=%d where itemid=%d",calculate_item_nextcheck(item.itemid, CONFIG_REFRESH_UNSUPPORTED,now), now, item.itemid);*/
-				DBexecute("update items set nextcheck=%d, lastclock=%d where itemid=" ZBX_FS_UI64,
-					CONFIG_REFRESH_UNSUPPORTED+now,
-					now,
-					item.itemid);
+				DBbegin();
+		
+				switch (zbx_process) {
+				case ZBX_PROCESS_SERVER:
+					process_new_value(&item, &agent, now);
+					update_triggers(item.itemid);
+					break;
+				case ZBX_PROCESS_PROXY:
+					proxy_process_new_value(&item, &agent, now);
+					break;
+				}
+
+				DBcommit();
 			}
 			else
+			{
+				process_new_value(&item, &agent, now);
+				DCadd_nextcheck(&item, now, NULL);
+			}
+		}
+		else if (res == NOTSUPPORTED || res == AGENT_ERROR)
+		{
+			if (item.status != ITEM_STATUS_NOTSUPPORTED)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s] is not supported by agent on host [%s] Old status [%d]",
 						item.key,
@@ -458,89 +453,101 @@ int get_values(void)
 				zabbix_syslog("Parameter [%s] is not supported by agent on host [%s]",
 						item.key,
 						item.host_name);
+			}
 
-				switch (zbx_process) {
-				case ZBX_PROCESS_SERVER:
-					DBupdate_item_status_to_notsupported(item.itemid, agent.msg);
-					break;
-				case ZBX_PROCESS_PROXY:
-					DBproxy_update_item_status_to_notsupported(item.itemid);
-					break;
-				}
+			if (0 == CONFIG_DBSYNCER_FORKS)
+			{
+				DBbegin();
+		
+				DBupdate_item_status_to_notsupported(&item, now, agent.msg);
 
-	/*			if(HOST_STATUS_UNREACHABLE == item.host_status)*/
-				if (HOST_AVAILABLE_TRUE != item.host_available) {
-					enable_host(&item, now, agent.msg);
-					stop = 1;
-				}
+				DBcommit();
+			}
+			else
+				DCadd_nextcheck(&item, now, agent.msg);
+
+			if (HOST_AVAILABLE_TRUE != item.host_available) {
+				DBbegin();
+		
+				enable_host(&item, now);
+				stop = 1;
+
+				DBcommit();
 			}
 		}
-		else if(res == NETWORK_ERROR)
+		else if (res == NETWORK_ERROR)
 		{
+			DBbegin();
+		
 			/* First error */
-			if(item.host_errors_from==0)
+			if (item.host_errors_from == 0)
 			{
 				zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: first network error, wait for %d seconds",
-					item.host_name,
-					CONFIG_UNREACHABLE_DELAY);
+						item.host_name,
+						CONFIG_UNREACHABLE_DELAY);
 				zabbix_syslog("Host [%s]: first network error, wait for %d seconds",
-					item.host_name,
-					CONFIG_UNREACHABLE_DELAY);
+						item.host_name,
+						CONFIG_UNREACHABLE_DELAY);
 
-				item.host_errors_from=now;
 				DBexecute("update hosts set errors_from=%d,disable_until=%d where hostid=" ZBX_FS_UI64,
-					now,
-					now+CONFIG_UNREACHABLE_DELAY,
-					item.hostid);
+						now,
+						now + CONFIG_UNREACHABLE_DELAY,
+						item.hostid);
+
+				item.host_errors_from = now;
 
 				delay = MIN(4*item.delay, 300);
-				zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] will be checked after %d seconds on host [%s]",
-					item.key,
-					delay,
-					item.host_name);
+
+				zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s] will be checked after %d seconds on host [%s]",
+						item.key,
+						delay,
+						item.host_name);
+
 				DBexecute("update items set nextcheck=%d where itemid=" ZBX_FS_UI64,
-					now + delay,
-					item.itemid);
+						now + delay,
+						item.itemid);
 			}
 			else
 			{
-				if (now - item.host_errors_from > CONFIG_UNREACHABLE_PERIOD) {
+				if (now - item.host_errors_from > CONFIG_UNREACHABLE_PERIOD)
+				{
 					disable_host(&item, now, agent.msg);
 				}
-				/* Still unavailable, but won't change status to UNAVAILABLE yet */
 				else
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: another network error, wait for %d seconds",
-						item.host_name,
-						CONFIG_UNREACHABLE_DELAY);
+					/* Still unavailable, but won't change status to UNAVAILABLE yet */
+					zabbix_log(LOG_LEVEL_WARNING, "Host [%s]: another network error, wait for %d seconds",
+							item.host_name,
+							CONFIG_UNREACHABLE_DELAY);
 					zabbix_syslog("Host [%s]: another network error, wait for %d seconds",
-						item.host_name,
-						CONFIG_UNREACHABLE_DELAY);
+							item.host_name,
+							CONFIG_UNREACHABLE_DELAY);
 
 					DBexecute("update hosts set disable_until=%d where hostid=" ZBX_FS_UI64,
-						now+CONFIG_UNREACHABLE_DELAY,
-						item.hostid);
+							now + CONFIG_UNREACHABLE_DELAY,
+							item.hostid);
 				}
 			}
 
-			zbx_snprintf(tmp,sizeof(tmp)-1,"," ZBX_FS_UI64,item.hostid);
-			unreachable_hosts=zbx_strdcat(unreachable_hosts,tmp);
+			DBcommit();
 
-/*			stop=1;*/
+			zbx_snprintf_alloc(&unreachable_hosts, &unreachable_hosts_alloc, &unreachable_hosts_offset, 32,
+					"%s" ZBX_FS_UI64,
+					0 == unreachable_hosts_offset ? "" : ",",
+					item.hostid);
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_CRIT, "Unknown response code returned.");
+			zabbix_log(LOG_LEVEL_CRIT, "Unknown response code returned.");
 			assert(0==1);
 		}
 		/* Poller for unreachable hosts */
-		if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
+		if (poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
 		{
 			/* We cannot freeit earlier because items has references to the structure */
 			DBfree_result(result2);
 		}
 		free_result(&agent);
-		DBcommit();
 
 		items++;
 	}
@@ -548,7 +555,12 @@ int get_values(void)
 	zbx_free(unreachable_hosts);
 
 	DBfree_result(result);
-	zabbix_log( LOG_LEVEL_DEBUG, "End get_values()");
+
+	if (0 != CONFIG_DBSYNCER_FORKS)
+		DCflush_nextchecks();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End get_values()");
+
 	return items;
 }
 
@@ -556,7 +568,7 @@ void main_poller_loop(zbx_process_t p, int type, int num)
 {
 	struct	sigaction phan;
 	int	now;
-	int	nextcheck, sleeptime;
+	int	/*nextcheck, */sleeptime;
 	int	items;
 	double	sec;
 
@@ -579,31 +591,32 @@ void main_poller_loop(zbx_process_t p, int type, int num)
 		zbx_setproctitle("poller [getting values]");
 
 		now = time(NULL);
-
 		sec = zbx_time();
-		items = get_values();
+		items = get_values(now);
 		sec = zbx_time() - sec;
 
-		nextcheck = get_minnextcheck(now);
+/*		nextcheck = get_minnextcheck(now);*/
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Poller spent " ZBX_FS_DBL " seconds while updating %3d values. Nextcheck: %d Time: %d",
+		zabbix_log(LOG_LEVEL_DEBUG, "Poller spent " ZBX_FS_DBL " seconds while updating %3d values."
+				/*" Nextcheck: %d Time: %d"*/,
 				sec,
-				items,
+				items/*,
 				nextcheck,
-				(int)time(NULL));
+				(int)time(NULL)*/);
 
-		if( FAIL == nextcheck)
+/*		if( FAIL == nextcheck)
 		{
 			sleeptime=POLLER_DELAY;
 		}
 		else
 		{
-			sleeptime=nextcheck-time(NULL);
+			sleeptime=nextcheck-time(NULL);*/
+			sleeptime = now - time(NULL) + 1;
 			if(sleeptime<0)
 			{
 				sleeptime=0;
 			}
-		}
+/*		}*/
 		if(sleeptime>0)
 		{
 			if(sleeptime > POLLER_DELAY)

@@ -235,8 +235,7 @@ INDEX		|1		|itemid,clock
 
 TABLE|proxy_history|id|0
 FIELD		|id		|t_serial	|	|NOT NULL	|0
-FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|timestamp	|t_time		|'0'	|NOT NULL	|0
 FIELD		|source		|t_varchar(64)	|''	|NOT NULL	|0
