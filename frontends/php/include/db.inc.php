@@ -735,8 +735,9 @@ else {
 		$concat = 	$notin?' AND ':' OR ';
 
 		switch($DB['TYPE']) {
+			case 'MYSQL':
 			case 'ORACLE':
-				$items = array_chunk($array, 1000);
+				$items = array_chunk($array, 999);
 				foreach($items as $id => $value){
 					if($notin)
 						$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';

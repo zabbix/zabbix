@@ -35,8 +35,8 @@ div.onajaxload{
 	position: absolute;
 	background-color:#000000; 
 	
-	filter:alpha(opacity=10);
-	opacity:.10;
+	filter:alpha(opacity=05);
+	opacity:.05;
 	
 	cursor:wait;
 	z-index: 50;
@@ -47,6 +47,7 @@ div.zabbix_logo{
 	height: 31px;
 	width: 118px;
 	background: #FFFFFF url('../images/general/zabbix.png') no-repeat;
+	cursor: pointer;
 }
 
 div.iconminus{

@@ -58,12 +58,10 @@
 // Header
 	$r_form = new CForm();
 	$r_form->SetMethod('get');
-//	$r_form->AddOption('onsubmit',"return updater.onetime_update(this);");
+//	$r_form->AddOption('onsubmit',"return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
 
 	$r_form->AddVar("select",$_REQUEST["select"]);
 	
-//	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
-//	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
 	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
 
@@ -388,6 +386,4 @@
 	}
 	
 	$table->Show();
-	
-
 ?>

@@ -433,7 +433,7 @@ include_once "include/page_header.php";
 
 	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, t.expression,t.priority, '.
 					' t.lastchange,t.comments,t.url,t.value,h.host,h.hostid,t.type '.
-			' FROM triggers t,hosts h,items i,functions f '.
+			' FROM triggers t,hosts h,items i,functions f '.($_REQUEST['groupid']?', hosts_groups hg ':'').
 			' WHERE f.itemid=i.itemid '.
 				' AND h.hostid=i.hostid '.
 				' AND t.triggerid=f.triggerid '.

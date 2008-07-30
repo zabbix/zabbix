@@ -105,6 +105,8 @@ inloadobj:		new Array(),			// array containing updated obj and statuses
 		}
 		
 		if('undefined' != this.optlist[obj.id]){
+			var dt = new Date();
+			this.optlist[obj.id].lastupdate = parseInt(dt.getTime()/1000)
 			this.optlist[obj.id].url = update_url+(empty(update_url)?'?':'&')+Object.toQueryString(params);
 		}
 
