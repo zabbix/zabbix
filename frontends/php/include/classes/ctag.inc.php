@@ -165,7 +165,7 @@
 			foreach($this->options as $key => $value){
 				$res .= ' '.$key.'="'.$value.'"';
 			}
-			$res .= ($this->paired=='yes') ? '>' : '/>';
+			$res .= ($this->paired=='yes')?'>':' />';
 		return $res;
 		}
 

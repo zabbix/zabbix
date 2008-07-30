@@ -218,7 +218,6 @@
 					' AND f.itemid=i.itemid'.
 					(!empty($hostid)?' AND i.hostid='.$hostid:'').
 					(!empty($denied_triggers)?' AND '.DBcondition('t.triggerid',$denied_triggers,true):'');
-
 		$db_triggers = DBselect($sql);
 		while($trigger = DBfetch($db_triggers)){
 			$result[$trigger['triggerid']] = $trigger['triggerid'];

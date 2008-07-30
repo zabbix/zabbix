@@ -1276,10 +1276,10 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			$url='?';
 			$url_params = explode('&',$_SERVER['QUERY_STRING']);
 			foreach($url_params as $id => $param){
-				if(empty($param)) continue;
+				if(zbx_empty($param)) continue;
 				
 				list($name,$value) = explode('=',$param);
-				if(empty($name) || ($name == 'sort') || (($name == 'sortorder'))) continue;
+				if(zbx_empty($name) || ($name == 'sort') || (($name == 'sortorder'))) continue;
 				$url.=$param.'&';
 			}
 		}
@@ -1287,7 +1287,14 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			$url.='&';
 		}
 		
-		$link = new CLink($obj,$url.'sort='.$tabfield.'&sortorder='.$sortorder);
+		$url.='sort='.$tabfield.'&sortorder='.$sortorder;
+		
+		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
+			$link = new CLink($obj,$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+		}
+		else{
+			$link = new CLink($obj,$url);
+		}
 		
 		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
 			if($sortorder == ZBX_SORT_UP){
