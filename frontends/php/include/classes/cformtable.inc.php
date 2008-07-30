@@ -51,9 +51,9 @@
 			$this->SetAlign('center');
 			$this->SetHelp();
 
-			$frm_link = new CLink();
+//			$frm_link = new CLink();
 //			$frm_link->SetName("formtable");
-			$this->AddItemToTopRow($frm_link);
+//			$this->AddItemToTopRow($frm_link);
 			
 			$this->AddVar($form_variable, get_request($form_variable, 1));
 			$this->AddVar('form_refresh',get_request('form_refresh',0)+1);

@@ -394,7 +394,7 @@ COpt::profiling_start("page");
  
 <meta name="Author" content="ZABBIX SIA" />
 
-<link rel="stylesheet" href="css.css" />
+<link rel="stylesheet" type="text/css" href="css.css" />
 <?php
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
 		$css = false;
@@ -410,15 +410,15 @@ COpt::profiling_start("page");
 		}
 		
 		if($css){
-			echo '<link rel="stylesheet" href="styles/'.$css.'" />';
+			echo '<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n";
 			$ico = ereg_replace('.*(\_[a-z]+).*',"\\1",$css);
 			if(file_exists('images/general/zabbix'.$ico.'.ico'))
-				echo '<link rel="shortcut icon" href="images/general/zabbix'.$ico.'.ico">';
+				echo '<link rel="shortcut icon" href="images/general/zabbix'.$ico.'.ico" />';
 			else
-				echo '<link rel="shortcut icon" href="images/general/zabbix.ico">';
+				echo '<link rel="shortcut icon" href="images/general/zabbix.ico" />';
 		}
 		else{
-			echo '<link rel="shortcut icon" href="images/general/zabbix.ico">';
+			echo '<link rel="shortcut icon" href="images/general/zabbix.ico" />';
 		}
 	}
 ?>
@@ -478,16 +478,19 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$page_header_r_col[] = array("|", 
 						new CLink(S_PROFILE, "profile.php", "small_font"),"|", 
 						new CLink(S_LOGOUT, "index.php?reconnect=1", "small_font"));
-		} else {
+		} 
+		else {
 			$page_header_r_col[] = array("|", new CLink(S_LOGIN, "index.php?reconnect=1", "small_font"));
 		}
 
 		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),"http://www.zabbix.com");
 		$logo->SetTarget('_blank');
-//		$logo = new CSpan(SPACE,'zabbix_logo');
+//		$logo = new CDiv(SPACE,'zabbix_logo');
+//		$logo->AddAction('onclick',"javascript: document.location = 'http://www.zabbix.com';");		
+		
 		$td_r = new CCol($page_header_r_col, "page_header_r");
 		$td_r->AddOption('width','100%');
-//		$top_page_row	= array(new CCol($logo, "page_header_l"), new CCol($page_header_r_col, "page_header_r"));
+
 		$top_page_row	= array(new CCol($logo, "page_header_l"), $td_r);
 		unset($logo, $page_header_r_col, $help, $support);
 

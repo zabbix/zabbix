@@ -949,10 +949,10 @@ class Chart extends Graph{
 //*
 				if($this->m_maxY[$side]>0){
 			
-					$this->m_maxY[$side] = round($this->m_maxY[$side],1);// + round($this->m_maxY[$side],1)*0.2 + 0.05;
+					$this->m_maxY[$side] = round($this->m_maxY[$side],1) + round($this->m_maxY[$side],1)*0.2 + 0.05;
 				} 
 				else if($this->m_maxY[$side]<0){
-					$this->m_maxY[$side] = round($this->m_maxY[$side],1);// - round($this->m_maxY[$side],1)*0.2 + 0.05;
+					$this->m_maxY[$side] = round($this->m_maxY[$side],1) - round($this->m_maxY[$side],1)*0.2 + 0.05;
 				} 				
 				
 				if($this->m_minY[$side]>0){
