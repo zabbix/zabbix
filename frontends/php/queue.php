@@ -80,7 +80,7 @@ include_once "include/page_header.php";
 			' or (h.status='.HOST_STATUS_MONITORED.' AND h.available='.HOST_AVAILABLE_FALSE.' AND h.disable_until<='.$now.')) '.
 			' AND i.hostid=h.hostid '.
 			' AND i.nextcheck<'.$now.
-			' AND i.key_ not in ("status","icmpping","icmppingsec","zabbix[log]") '.
+			' AND i.key_ NOT IN ('.zbx_dbstr('status').','.zbx_dbstr('icmpping').','.zbx_dbstr('icmppingsec').','.zbx_dbstr('zabbix[log]').') '.
 			' AND i.value_type not in ('.ITEM_VALUE_TYPE_LOG.') '.
 			' AND '.DBcondition('h.hostid',$available_hosts).
 			' AND '.DBin_node('h.hostid', get_current_nodeid()).

@@ -737,7 +737,7 @@ else {
 		switch($DB['TYPE']) {
 			case 'MYSQL':
 			case 'ORACLE':
-				$items = array_chunk($array, 999);
+				$items = array_chunk($array, 950);
 				foreach($items as $id => $value){
 					if($notin)
 						$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
