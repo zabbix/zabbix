@@ -221,64 +221,6 @@ function get_next_event($row,$show_unknown=0){
 return $rez;
 }
 
-
-function get_history_of_discovery_events($start,$num){
-	$db_events = DBselect('select distinct e.source,e.object,e.objectid,e.clock,e.value from events e'.
-		' where e.source='.EVENT_SOURCE_DISCOVERY.' order by e.clock desc',
-		10*($start+$num)
-		);
-   
-	$table = new CTableInfo(S_NO_EVENTS_FOUND); 
-	$table->SetHeader(array(S_TIME, S_IP, S_DESCRIPTION, S_STATUS));
-	$col=0;
-	
-	$skip = $start;
-	while(($event_data = DBfetch($db_events))&&($col<$num)){
-		if($skip > 0){
-			$skip--;
-			continue;
-		}
-
-		if($event_data["value"] == 0){
-			$value=new CCol(S_UP,"off");
-		}
-		else if($event_data["value"] == 1){
-			$value=new CCol(S_DOWN,"on");
-		}
-		else{
-			$value=new CCol(S_UNKNOWN_BIG,"unknown");
-		}
-
-
-		switch($event_data['object']){
-			case EVENT_OBJECT_DHOST:
-				$object_data = DBfetch(DBselect('select ip from dhosts where dhostid='.$event_data['objectid']));
-				$description = SPACE;
-				break;
-			case EVENT_OBJECT_DSERVICE:
-				$object_data = DBfetch(DBselect('select h.ip,s.type,s.port from dhosts h,dservices s '.
-					' where h.dhostid=s.dhostid and s.dserviceid='.$event_data['objectid']));
-				$description = S_SERVICE.': '.discovery_check_type2str($object_data['type']).'; '.
-					S_PORT.': '.$object_data['port'];
-				break;
-			default:
-				continue;
-		}
-
-		if(!$object_data) continue;
-
-
-		$table->AddRow(array(
-			date("Y.M.d H:i:s",$event_data["clock"]),
-			$object_data['ip'],
-			$description,
-			$value));
-
-		$col++;
-	}
-return $table;
-}
-
 // author: Aly	
 function make_event_details($eventid){
 	$event = get_tr_event_by_eventid($eventid);
@@ -401,6 +343,170 @@ function make_small_eventlist($triggerid,&$trigger_data){
 			$ack,
 			$actions
 			));
+	}
+return $table;
+}
+
+function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
+	global $USER_DETAILS;
+	$config = select_config();
+	
+	$show_unknown = get_profile('web.events.filter.show_unknown',0);
+	
+	$sql_from = $sql_cond = '';
+
+	$available_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_DATA_ARRAY, get_current_nodeid());
+	
+	if($hostid > 0){
+		$sql_cond = ' AND h.hostid='.$hostid;
+	}
+	else if($groupid > 0){
+		$sql_from = ', hosts_groups hg ';
+		$sql_cond = ' AND h.hostid=hg.hostid AND hg.groupid='.$groupid;
+	}
+	else{
+		$sql_from = ', hosts_groups hg ';
+		$sql_cond = ' AND '.DBcondition('h.hostid',$available_hosts);
+	}
+
+//---
+	$triggers = array();
+	$trigger_list = array();
+
+	$sql = 'SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,t.type '.
+			' FROM triggers t, functions f, items i, hosts h '.$sql_from.
+			' WHERE '.DBcondition('t.triggerid', $available_triggers).
+				' AND t.triggerid=f.triggerid '.
+				' AND f.itemid=i.itemid '.
+				' AND i.hostid=h.hostid '.
+				' AND h.status='.HOST_STATUS_MONITORED.
+				$sql_cond;
+						
+	$rez = DBselect($sql);
+	while($rowz = DBfetch($rez)){
+		$triggers[$rowz['triggerid']] = $rowz;
+		array_push($trigger_list, $rowz['triggerid']);
+	}
+
+	$sql_cond=($show_unknown == 0)?(' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.' '):('');
+
+	$table = new CTableInfo(S_NO_EVENTS_FOUND); 
+	$table->SetHeader(array(
+			make_sorting_link(S_TIME,'e.eventid'),
+			is_show_subnodes() ? S_NODE : null,
+			$hostid == 0 ? S_HOST : null,
+			S_DESCRIPTION,
+			S_VALUE,
+			S_SEVERITY
+			));
+
+	if(!empty($triggers)){
+		$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.value, e.acknowledged '.
+				' FROM events e '.
+				' WHERE (e.object+0)='.EVENT_OBJECT_TRIGGER.
+					' AND '.DBcondition('e.objectid', $trigger_list).
+					$sql_cond.
+				order_by('e.clock');
+
+		$result = DBselect($sql,10*($start+$num));
+	}
+		
+	$col=0;
+	$skip = $start;
+
+	while(!empty($triggers) && ($col<$num) && ($row=DBfetch($result))){
+		
+		if($skip > 0){
+			if(($show_unknown == 0) && ($row['value'] == TRIGGER_VALUE_UNKNOWN)) continue;
+			$skip--;
+			continue;
+		}
+	
+		if($row["value"] == TRIGGER_VALUE_FALSE){
+			$value=new CCol(S_OFF,"off");
+		}
+		else if($row["value"] == TRIGGER_VALUE_TRUE){
+			$value=new CCol(S_ON,"on");
+		}
+		else{
+			$value=new CCol(S_UNKNOWN_BIG,"unknown");
+		}
+
+		$row = array_merge($triggers[$row['triggerid']],$row);
+		if((0 == $show_unknown) && (!event_initial_time($row,$show_unknown))) continue;
+		
+		$table->AddRow(array(
+			date("Y.M.d H:i:s",$row["clock"]),
+			get_node_name_by_elid($row['triggerid']),
+			($hostid == 0)?$row['host']:null,
+			new CLink(
+				expand_trigger_description_by_data($row, ZBX_FLAG_EVENT),
+				"tr_events.php?triggerid=".$row["triggerid"],"action"
+				),
+			$value,
+			new CCol(get_severity_description($row["priority"]), get_severity_style($row["priority"])),
+		));
+			
+		$col++;
+	}
+return $table;
+}
+
+function get_history_of_discovery_events($start,$num){
+	$db_events = DBselect('select distinct e.source,e.object,e.objectid,e.clock,e.value from events e'.
+		' where e.source='.EVENT_SOURCE_DISCOVERY.' order by e.clock desc',
+		10*($start+$num)
+		);
+   
+	$table = new CTableInfo(S_NO_EVENTS_FOUND); 
+	$table->SetHeader(array(S_TIME, S_IP, S_DESCRIPTION, S_STATUS));
+	$col=0;
+	
+	$skip = $start;
+	while(($event_data = DBfetch($db_events))&&($col<$num)){
+		if($skip > 0){
+			$skip--;
+			continue;
+		}
+
+		if($event_data["value"] == 0){
+			$value=new CCol(S_UP,"off");
+		}
+		else if($event_data["value"] == 1){
+			$value=new CCol(S_DOWN,"on");
+		}
+		else{
+			$value=new CCol(S_UNKNOWN_BIG,"unknown");
+		}
+
+
+		switch($event_data['object']){
+			case EVENT_OBJECT_DHOST:
+				$object_data = DBfetch(DBselect('select ip from dhosts where dhostid='.$event_data['objectid']));
+				$description = SPACE;
+				break;
+			case EVENT_OBJECT_DSERVICE:
+				$object_data = DBfetch(DBselect('select h.ip,s.type,s.port from dhosts h,dservices s '.
+					' where h.dhostid=s.dhostid and s.dserviceid='.$event_data['objectid']));
+				$description = S_SERVICE.': '.discovery_check_type2str($object_data['type']).'; '.
+					S_PORT.': '.$object_data['port'];
+				break;
+			default:
+				continue;
+		}
+
+		if(!$object_data) continue;
+
+
+		$table->AddRow(array(
+			date("Y.M.d H:i:s",$event_data["clock"]),
+			$object_data['ip'],
+			$description,
+			$value));
+
+		$col++;
 	}
 return $table;
 }
