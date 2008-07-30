@@ -18,8 +18,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 	
-	require_once "include/events.inc.php";
-	require_once "include/actions.inc.php";
+	require_once('include/events.inc.php');
+	require_once('include/actions.inc.php');
+	
 ?>
 <?php
 	function screen_accessible($screenid,$perm){
@@ -1001,16 +1002,16 @@
 						$action
 						);
 				}
-				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_MAP) )
-				{
-					$image_map = new CImg("map.php?noedit=1&sysmapid=$resourceid".
-							"&width=$width&height=$height");
-					if($editmode == 0)
-					{
+				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_MAP) ){
+				
+					$image_map = new CImg("map.php?noedit=1&sysmapid=$resourceid"."&width=$width&height=$height");
+					
+					if($editmode == 0){
 						$action_map = get_action_map_by_sysmapid($resourceid);
 						$image_map->SetMap($action_map->GetName());
 						$item = array($action_map,$image_map);
-					} else {
+					} 
+					else {
 						$item = new CLink($image_map, $action);
 					}
 				}
@@ -1028,57 +1029,46 @@
 					$item = array(get_screen_plaintext($resourceid,$elements));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_HOSTS_INFO) )
-				{
+				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_HOSTS_INFO) ){
 					$item = array(new CHostsInfo($resourceid, $style));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_INFO) )
-				{
+				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_INFO) ){
 					$item = array(new CTriggersInfo($style));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SERVER_INFO) )
-				{
+				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SERVER_INFO) ){
 					$item = array(new CServerInfo());
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_CLOCK) )
-				{
+				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_CLOCK) ){
 					$item = new CFlashClock($width, $height, $style, $action);
 				}
-				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SCREEN) )
-				{
+				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SCREEN) ){
 					$item = array(get_screen($resourceid, 2, $effectiveperiod));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_OVERVIEW) )
-				{
+				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_OVERVIEW) ){
 					$item = array(get_triggers_overview($resourceid,$style));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_DATA_OVERVIEW) )
-				{
+				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_DATA_OVERVIEW) ){
 					$item = array(get_items_data_overview($resourceid,$style));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_URL) )
-				{
+				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_URL) ){
 					$item = array(new CIFrame($url,$width,$height,"auto"));
 					if($editmode == 1)	array_push($item,BR(),new CLink(S_CHANGE,$action));
 				}
-				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_ACTIONS) )
-				{
+				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_ACTIONS) ){
 					$item = array(get_history_of_actions(0, $elements));
 					if($editmode == 1)      array_push($item,new CLink(S_CHANGE,$action));
 				}
-				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_EVENTS) )
-				{
+				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_EVENTS) ){
 					$item = array(get_history_of_triggers_events(0, $elements));
 					if($editmode == 1)      array_push($item,new CLink(S_CHANGE,$action));
 				}
-				else
-				{
+				else{
 					$item = array(SPACE);
 					if($editmode == 1)	array_push($item,BR(),new CLink(S_CHANGE,$action));
 				}
