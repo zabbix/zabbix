@@ -54,7 +54,7 @@ function mbstrings_available(){
 return $mbstrings_fnc_exist;
 }
 # Translate global array $TRANSLATION into constants
-function	process_locales(){
+function process_locales(){
 	global $TRANSLATION;
 //SDI(count($TRANSLATION).' : '.$TRANSLATION['S_HTML_CHARSET']);
 	if(isset($TRANSLATION) && is_array($TRANSLATION)){
@@ -68,19 +68,20 @@ function	process_locales(){
 function set_zbx_locales(){
 	global $ZBX_LOCALES;
 	$ZBX_LOCALES = array(
-		"en_gb"=>  S_ENGLISH_GB,
-		"cn_zh"=>  S_CHINESE_CN,
-		"nl_nl"=>  S_DUTCH_NL,
-		"fr_fr"=>  S_FRENCH_FR,
-		"de_de"=>  S_GERMAN_DE,
-		"hu_hu"=>  S_HUNGARY_HU,
-		"it_it"=>  S_ITALIAN_IT,
-		"ja_jp"=>  S_JAPANESE_JP,
-		"lv_lv"=>  S_LATVIAN_LV,
-		"pt_br"=>  S_PORTUGUESE_PT,
-		"ru_ru"=>  S_RUSSIAN_RU,
-		"sp_sp"=>  S_SPANISH_SP,
-		"sv_se"=>  S_SWEDISH_SE,
+		'en_gb'=>  S_ENGLISH_GB,
+		'cn_zh'=>  S_CHINESE_CN,
+		'nl_nl'=>  S_DUTCH_NL,
+		'fr_fr'=>  S_FRENCH_FR,
+		'de_de'=>  S_GERMAN_DE,
+		'hu_hu'=>  S_HUNGARY_HU,
+		'it_it'=>  S_ITALIAN_IT,
+		'ko_kr'=>  S_KOREAN_KO,
+		'ja_jp'=>  S_JAPANESE_JP,
+		'lv_lv'=>  S_LATVIAN_LV,
+		'pt_br'=>  S_PORTUGUESE_PT,
+		'ru_ru'=>  S_RUSSIAN_RU,
+		'sp_sp'=>  S_SPANISH_SP,
+		'sv_se'=>  S_SWEDISH_SE,
 	);
 }
 ?>
