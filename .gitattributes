@@ -147,6 +147,7 @@ frontends/php/include/classes/pie.inc.php -text
 frontends/php/include/func.inc.php -text
 frontends/php/include/js.inc.php -text
 frontends/php/include/locales/hu_hu.inc.php -text
+frontends/php/include/locales/ko_kr.inc.php -text
 frontends/php/include/locales/pt_br.inc.php -text
 frontends/php/include/reports.inc.php -text
 frontends/php/include/scripts.inc.php -text

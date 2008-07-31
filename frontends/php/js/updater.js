@@ -119,7 +119,6 @@ inloadobj:		new Array(),			// array containing updated obj and statuses
 						var headers = resp.getAllResponseHeaders();  //	alert(headers);
 
 						if(headers.indexOf('Ajax-response: false') > -1){
-							alert('False Oo');
 							resp.responseText = $(obj).innerHTML;
 						}
 						updater.rmwLoadingImg(obj);
