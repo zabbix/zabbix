@@ -23,7 +23,6 @@
 	function	process_locales()
 	{
 		global $TRANSLATION;
-		global $GLOBALS;
 //SDI(count($TRANSLATION).' : '.$TRANSLATION['S_HTML_CHARSET']);
 
 		if(isset($TRANSLATION) && is_array($TRANSLATION))

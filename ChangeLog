@@ -1,3 +1,8 @@
+Changes for 1.4.7:
+ 
+ - added Korean locale [thnx to Kodai] (Artem)
+ - updated Japanese locale [thnx to Kodai] (Artem)
+
 Changes for 1.4.6:
 
  - [ZBX-404] fixed update of item "Download speed for scenario '...'" (Sasha)

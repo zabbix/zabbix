@@ -23,14 +23,14 @@
 
 	$TRANSLATION=array(
 
-	'S_DATE_FORMAT_YMDHMS'=>		'd M H:i:s',
-	'S_DATE_FORMAT_YMD'=>			'd M Y',
+	'S_DATE_FORMAT_YMDHMS'=>		'm-d H:i:s',
+	'S_DATE_FORMAT_YMD'=>			'Y-m-d',
 	'S_HTML_CHARSET'=>			'UTF-8',
 
 	'S_ACTIVATE_SELECTED'=>			'選択を有効',
 	'S_DISABLE_SELECTED'=>			'選択を無効',
 	'S_DELETE_SELECTED'=>			'選択を削除',
-	'S_COPY_SELECTED_TO'=>			'選択をコピー',
+	'S_COPY_SELECTED_TO'=>			'選択をコピー...',
 	
 //	dicoveryconf.php
 	'S_HOST_IP'=>				'ホストのIPアドレス',
@@ -130,7 +130,7 @@
 	'S_STEP'=>				'ステップ',
 	'S_STEPS'=>				'ステップ',
 	'S_TIMEOUT'=>				'タイムアウト',
-	'S_POST'=>				'ポスト',
+	'S_POST'=>				'POST',
 	'S_REQUIRED'=>				'要求文字列',
 	'S_STEP_OF_SCENARIO'=>			'シナリオのステップ',
 	
@@ -177,7 +177,7 @@
 	'S_MASTER'=>				'マスター',
 	'S_NODE_UPDATED'=>			'ノードを更新しました',
 	'S_CANNOT_UPDATE_NODE'=>		'ノードを更新できません',
-	'S_NODE_ADDED'=>			'ノーを追加しました',
+	'S_NODE_ADDED'=>			'ノードを追加しました',
 	'S_CANNOT_ADD_NODE'=>			'ノードを追加できません',
 	'S_NODE_DELETED'=>			'ノードを削除しました',
 	'S_CANNOT_DELETE_NODE'=>		'ノードを削除できません',
@@ -235,7 +235,7 @@
 
 	'S_INCORRECT_TRIGGER'=>			'不正なトリガー',
 	'S_INCORRECT_HOST'=>			'不正なホスト',
-	'S_INCORRECT_PERIOD'=>			'不正な基幹',
+	'S_INCORRECT_PERIOD'=>			'不正な期間',
 	'S_INCORRECT_IP'=>			'不正なIPアドレス',
 	'S_INCORRECT_DISCOVERY_CHECK'=>		'不正なディスカバリチェック',
 	'S_INCORRECT_PORT'=>			'不正なポート',
@@ -324,8 +324,8 @@
 	'S_SENT'=>				'送信済み',
 	'S_NOT_SENT'=>				'未送信',
 	'S_NO_ACTIONS_FOUND'=>			'アクションが見つかりません',
-	'S_SHOW_NEXT_100'=>			'次の100を表示',
-	'S_SHOW_PREVIOUS_100'=>			'前の100を表示',
+	'S_SHOW_NEXT_100'=>			'次の100件を表示',
+	'S_SHOW_PREVIOUS_100'=>			'前の100件を表示',
 
 //	charts.php
 	'S_CUSTOM_GRAPHS'=>			'カスタムグラフ',
@@ -352,7 +352,7 @@
 	'S_NAVIGATE'=>				'ナビゲート',
 	'S_RIGHT_DIR'=>				'右',
 	'S_LEFT_DIR'=>				'左',
-	'S_SELECT_GRAPH_DOT_DOT_DOT'=>		'グラフを選択',
+	'S_SELECT_GRAPH_DOT_DOT_DOT'=>		'グラフを選択...',
 
 // Colors
 	'S_BLACK'=>				'黒',
@@ -373,8 +373,6 @@
         'S_BOLD_LINE'=>                         '太線',
         'S_DOT'=>                               '点線',
         'S_DASHED_LINE'=>                       '破線',
-
-
 
 //	config.php
 	'S_CANNNOT_UPDATE_VALUE_MAP'=>		'値のマッピングを更新できません',
@@ -463,7 +461,7 @@
 	'S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE'=>'データベース停止メッセージの送信先グループ',
 	'S_INCORRECT_GROUP'=>			'不正なグループ',
 	'S_NOTHING_TO_DO'=>			'実行するものがありません',
-	'S_ICORRECT_WORK_PERIOD'=>		'不正なワーキング期間',
+	'S_ICORRECT_WORK_PERIOD'=>		'不正なワーキングタイム',
 	
 //	nodes.php
 	'S_NODE'=>				'ノード',
@@ -486,9 +484,7 @@
 	'S_COMPARE'=>				'比較',
 
 //	Footer
-	'S_ZABBIX_VER'=>			'ZABBIX 1.4.5',
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2008 by ',
-	'S_CONNECTED_AS'=>			'Connected as',
+	'S_CONNECTED_AS'=>			'次のユーザでログイン中',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
 
 //	graph.php
@@ -506,7 +502,7 @@
 	'S_UP'=>				'UP',
 	'S_DOWN'=>				'DOWN',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>		'グラフに追加するアイテム',
-	'S_SORT_ORDER_1_100'=>			'ソート順(0〜100)',
+	'S_SORT_ORDER_1_100'=>			'ソート順(0->100)',
 	'S_YAXIS_SIDE'=>			'Y軸',
 	'S_LEFT'=>				'左',
 	'S_FUNCTION'=>				'機能',
@@ -575,7 +571,7 @@
 	'S_APPLICATIONS_BIG'=>			'アプリケーション',
 	'S_CREATE_APPLICATION'=>		'アプリケーションの作成',	
 	'S_DELETE_SELECTED_APPLICATIONS_Q'=>	'選択したアプリケーションを削除しますか?',
-	'S_DISABLE_ITEMS_FROM_SELECTED_APPLICATIONS_Q'=>'選択したアプリケーションのアイテムを削除しますか?',
+	'S_DISABLE_ITEMS_FROM_SELECTED_APPLICATIONS_Q'=>'選択したアプリケーションのアイテムを無効にしますか?',
 	'S_ACTIVATE_ITEMS'=>			'アイテムを有効にする',
 	'S_DISABLE_ITEMS'=>			'アイテムを無効にする',
 	'S_ACTIVATE_ITEMS_FROM_SELECTED_APPLICATIONS_Q'=>'選択したアプリケーションのアイテムを有効にしますか?',
@@ -650,7 +646,7 @@
 	'S_NOT_AVAILABLE'=>			'未監視',
 //	Host profiles
 	'S_HOST_PROFILE'=>			'ホストプロファイル',
-	'S_DEVICE_TYPE'=>			'デバイス名',
+	'S_DEVICE_TYPE'=>			'デバイスタイプ',
 	'S_OS'=>				'OS',
 	'S_SERIALNO'=>				'シリアルNo',
 	'S_TAG'=>				'タグ',
@@ -766,11 +762,11 @@
 	'S_CUSTOM_MULTIPLIER'=>			'乗数',
 	'S_DO_NOT_USE'=>			'使用しない',
 	'S_USE_MULTIPLIER'=>			'乗数を使用',
-	'S_SELECT_HOST_DOT_DOT_DOT'=>		'ホストを選択',
+	'S_SELECT_HOST_DOT_DOT_DOT'=>		'ホストを選択...',
 	'S_LOG_TIME_FORMAT'=>			'ログの時間の形式',
 	'S_CREATE_ITEM'=>			'アイテムの作成',
 	'S_ADD_ITEM'=>				'アイテムを追加',
-	'S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT'=>	'要素のコピー先',
+	'S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT'=>	'要素のコピー先...',
 	'S_MODE'=>				'モード',
 	'S_TARGET'=>				'ターゲット',
 	'S_TARGET_TYPE'=>			'ターゲットタイプ',
@@ -826,6 +822,14 @@
         'S_COLOR_OFF'=>                         '色(正常)',
         'S_COLOR_ON'=>                          '色(障害)',
 
+//	sysmaps.php
+	'S_MAPS_BIG'=>				'マップ',
+	'S_NO_MAPS_DEFINED'=>			'マップが定義されていません',
+	'S_CREATE_MAP'=>			'マップの作成',
+	'S_ICON_LABEL_LOCATION'=>		'アイコンラベルの位置',
+	'S_BOTTOM'=>				'下',
+	'S_TOP'=>				'上',
+
 //	map.php
 	'S_OK_BIG'=>				'正常',
 	'S_PROBLEMS_SMALL'=>			'障害',
@@ -836,11 +840,11 @@
 	'S_NETWORK_MAPS_BIG'=>			'ネットワークマップ',
 	'S_NO_MAPS_TO_DISPLAY'=>		'表示するマップがありません',
 	'S_SELECT_MAP_TO_DISPLAY'=>		'表示するマップを選択する',
-	'S_SELECT_MAP_DOT_DOT_DOT'=>		'マップを選択',
+	'S_SELECT_MAP_DOT_DOT_DOT'=>		'マップを選択...',
 	'S_BACKGROUND_IMAGE'=>			'背景のイメージ',
 	'S_ICON_LABEL_TYPE'=>			'アイコンラベルのタイプ',
 	'S_LABEL'=>				'ラベル',
-	'S_LABEL_LOCATION'=>			'ラベルの場所',
+	'S_LABEL_LOCATION'=>			'ラベルの位置',
 	'S_ELEMENT_NAME'=>			'要素名',
 	'S_STATUS_ONLY'=>			'ステータスのみ',
 	'S_NOTHING'=>				'無',
@@ -891,7 +895,7 @@
 	'S_SWITCH_NODE'=>			'ノードをスイッチ',
 
 //	overview.php
-	'S_SELECT_GROUP_DOT_DOT_DOT'=>		'グループを選択',
+	'S_SELECT_GROUP_DOT_DOT_DOT'=>		'グループを選択...',
 	'S_OVERVIEW'=>				'概要',
 	'S_OVERVIEW_BIG'=>			'概要',
 	'S_EXCL'=>				'!',
@@ -948,8 +952,8 @@
 	'S_FALSE'=>				'正常',
 
 //	report3.php
-	'S_IT_SERVICES_AVAILABILITY_REPORT'=>	'ITサービス可用性レポート',
-	'S_IT_SERVICES_AVAILABILITY_REPORT_BIG'=>	'ITサービス可用性レポート',
+	'S_IT_SERVICES_AVAILABILITY_REPORT'=>	'ITサービス稼働レポート',
+	'S_IT_SERVICES_AVAILABILITY_REPORT_BIG'=>	'ITサービス稼働レポート',
 	'S_FROM'=>				'開始',
 	'S_FROM_SMALL'=>			'開始',
 	'S_TILL'=>				'終了',
@@ -1023,7 +1027,7 @@
 	'S_PLAIN_TEXT'=>			'プレーンテキスト',
 	'S_COLUMN_SPAN'=>			'列の結合',
 	'S_ROW_SPAN'=>				'行の結合',
-	'S_SHOW_LINES'=>			'行を表示',
+	'S_SHOW_LINES'=>			'表示する行数',
 	'S_HOSTS_INFO'=>			'ホスト情報',
 	'S_TRIGGERS_INFO'=>			'トリガー情報',
 	'S_SERVER_INFO'=>			'サーバ情報',
@@ -1056,7 +1060,7 @@
 	'S_SCREENS_BIG'=>			'スクリーン',
 	'S_NO_SCREENS_TO_DISPLAY'=>		'表示するスクリーンが存在しません',
 	'S_SELECT_SCREEN_TO_DISPLAY'=>		'表示するスクリーンを選択して下さい',
-	'S_SELECT_SCREEN_DOT_DOT_DOT'=>		'スクリーンを選択',
+	'S_SELECT_SCREEN_DOT_DOT_DOT'=>		'スクリーンを選択...',
 	'S_NO_SCREENS_DEFINED'=>		'スクリーンが定義されていません',
 
 	'S_SLIDESHOW_UPDATED'=>			'スライドショーを更新しました',
@@ -1097,7 +1101,7 @@
 	'S_MIN_BIG'=>				'最小',
 	'S_SHOW_SLA'=>				'SLAを表示',
 	'S_ACCEPTABLE_SLA_IN_PERCENT'=>		'SLAの許容値(%)',
-	'S_LINK_TO_TRIGGER_Q'=>			'トリガーとリンクしますか?',
+	'S_LINK_TO_TRIGGER_Q'=>			'トリガーとリンク',
 	'S_SORT_ORDER_0_999'=>			'ソート順(0->999)',
 	'S_DELETE_SERVICE_Q'=>			'サービスを削除しますか?',
 	'S_LINK_TO'=>				'リンク先',
@@ -1308,6 +1312,7 @@
 	'S_CHINESE_CN'=>			'中国語 (CN)',
 	'S_DUTCH_NL'=>				'オランダ語 (NL)',
 	'S_HUNGARY_HU'=>                        'ハンガリー語 (HU)',
+	'S_KOREAN_KR'=>				'韓国語 (KR)',
 
 //	index.php
 	'S_ZABBIX_BIG'=>			'ZABBIX',
