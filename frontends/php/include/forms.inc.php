@@ -981,9 +981,9 @@
 			}
 		}
 		else{
-			$name	=			get_request('gname','');
-			$users_status = 	get_request('users_status',GROUP_STATUS_ENABLED);
-			$gui_access = 		get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);
+			$name			= get_request('gname','');
+			$users_status 	= get_request('users_status',GROUP_STATUS_ENABLED);
+			$gui_access 	= get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);
 			$group_users	= get_request("group_users",array());
 			$group_rights	= get_request("group_rights",array());
 		}

@@ -77,14 +77,14 @@ include_once "include/page_header.php";
 		' WHERE i.status='.ITEM_STATUS_ACTIVE.
 			' AND i.type in ('.implode(',',$item_types).') '.
 			' AND ((h.status='.HOST_STATUS_MONITORED.' AND h.available != '.HOST_AVAILABLE_FALSE.') '.
-			' or (h.status='.HOST_STATUS_MONITORED.' AND h.available='.HOST_AVAILABLE_FALSE.' AND h.disable_until<='.$now.')) '.
+				' OR (h.status='.HOST_STATUS_MONITORED.' AND h.available='.HOST_AVAILABLE_FALSE.' AND h.disable_until<='.$now.')) '.
 			' AND i.hostid=h.hostid '.
 			' AND i.nextcheck<'.$now.
 			' AND i.key_ NOT IN ('.zbx_dbstr('status').','.zbx_dbstr('icmpping').','.zbx_dbstr('icmppingsec').','.zbx_dbstr('zabbix[log]').') '.
 			' AND i.value_type not in ('.ITEM_VALUE_TYPE_LOG.') '.
 			' AND '.DBcondition('h.hostid',$available_hosts).
 			' AND '.DBin_node('h.hostid', get_current_nodeid()).
-		' order by i.nextcheck,h.host,i.description,i.key_');
+		' ORDER BY i.nextcheck,h.host,i.description,i.key_');
 
 	$table = new CTableInfo(S_THE_QUEUE_IS_EMPTY);
 
@@ -100,12 +100,12 @@ include_once "include/page_header.php";
 		}
 
 		while($row=DBfetch($result)){
-			if($now-$row["nextcheck"]<=5)		$sec_5[$row["type"]]++;
-			elseif($now-$row["nextcheck"]<=10)	$sec_10[$row["type"]]++;
-			elseif($now-$row["nextcheck"]<=30)	$sec_30[$row["type"]]++;
-			elseif($now-$row["nextcheck"]<=60)	$sec_60[$row["type"]]++;
-			elseif($now-$row["nextcheck"]<=300)	$sec_300[$row["type"]]++;
-			else					$sec_rest[$row["type"]]++;
+			if($now-$row["nextcheck"]<=5)			$sec_5[$row["type"]]++;
+			else if($now-$row["nextcheck"]<=10)		$sec_10[$row["type"]]++;
+			else if($now-$row["nextcheck"]<=30)		$sec_30[$row["type"]]++;
+			else if($now-$row["nextcheck"]<=60)		$sec_60[$row["type"]]++;
+			else if($now-$row["nextcheck"]<=300)	$sec_300[$row["type"]]++;
+			else	$sec_rest[$row["type"]]++;
 
 		}
 		

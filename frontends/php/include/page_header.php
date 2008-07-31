@@ -36,7 +36,7 @@ COpt::profiling_start("page");
 	
 	if($_REQUEST['fullscreen']=get_request('fullscreen', 0)) define('ZBX_PAGE_NO_MENU', 1);
 
-	include_once "include/locales/en_gb.inc.php";
+	include_once('include/locales/en_gb.inc.php');
 	process_locales();
 	set_zbx_locales();
 	/* Init CURRENT NODE ID */

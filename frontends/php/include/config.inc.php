@@ -158,8 +158,10 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	
 	if(!defined('ZBX_PAGE_NO_AUTHERIZATION')){
 		check_authorisation();
-		include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
-		process_locales();
+		if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){
+			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
+			process_locales();
+		}
 	}
 	else{
 		$USER_DETAILS = array(
