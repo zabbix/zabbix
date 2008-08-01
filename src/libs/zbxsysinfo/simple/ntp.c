@@ -22,6 +22,7 @@
 #include "comms.h"
 #include "log.h"
 #include "cfg.h"
+#include "ntp.h"
 
 #define NTP_SCALE  4294967296.0        /* 2^32, of course! */
 
@@ -190,7 +191,7 @@ int	check_ntp(char *host, unsigned short port, int *value_int)
 
 	*value_int = 0;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, 0))) {
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, 0))) {
 		make_packet(&data);
 
 		pack_ntp((unsigned char*)packet, sizeof(packet), &data);

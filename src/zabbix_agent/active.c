@@ -309,7 +309,7 @@ static int	refresh_active_checks(
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, CONFIG_TIMEOUT))) {
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT))) {
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", json.buffer);
 
 		if( SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)) )
@@ -468,7 +468,7 @@ static int	send_buffer(
 
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, MIN(buffer.count*CONFIG_TIMEOUT, 60)))) {
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MIN(buffer.count*CONFIG_TIMEOUT, 60)))) {
 
 		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]",
 			json.buffer);
