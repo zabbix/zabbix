@@ -1,5 +1,6 @@
 Changes for 1.5.4
 
+ - [DEV-194] dependent triggers are not count in SoT (Artem)
  - [DEV-187] increased Url field in web scenario (Sasha)
  - [DEV-195] added support of source ip address (Sasha)
  - [DEV-191] added inline update of "Latest Data" screen (Artem)
