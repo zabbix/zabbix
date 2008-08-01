@@ -1,5 +1,6 @@
 Changes for 1.5.4
 
+ - [DEV-187] increased Url field in web scenario (Sasha)
  - [DEV-195] added support of source ip address (Sasha)
  - [DEV-191] added inline update of "Latest Data" screen (Artem)
  - [DEV-193] improved viewing integer items on graphs (Artem)

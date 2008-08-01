@@ -454,7 +454,7 @@ DB_HTTPSTEP
 	zbx_uint64_t	httptestid;
 	int		no;
 	char		*name;
-	char		url[MAX_STRING_LEN];
+	char		url[MAX_STRING_LEN];	/* excessive length is required to support macros */
 	int		timeout;
 	char		posts[MAX_STRING_LEN];
 	char		required[HTTPSTEP_REQUIRED_LEN_MAX];
