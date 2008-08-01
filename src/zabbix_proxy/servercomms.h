@@ -20,6 +20,7 @@
 #ifndef ZABBIX_SERVERCOMMS_H
 #define ZABBIX_SERVERCOMMS_H
 
+extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_SERVER;
 extern int	CONFIG_SERVER_PORT;
 extern char	*CONFIG_HOSTNAME;
