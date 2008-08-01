@@ -29,7 +29,7 @@ char *progname = NULL;
 char title_message[] = "ZABBIX get - Communicate with ZABBIX agent";
 char usage_message[] = "[-hV] -s<host name or IP> [-p<port>] [-I<ip address>] -k<key>";
 
-#ifndef HAVE_GETOPT_LONG
+#ifdef HAVE_GETOPT_LONG
 char *help_message[] = {
         "Options:",
 	"  -s --host <host name or IP>          Specify host name or IP address of a host.",
