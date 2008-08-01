@@ -21,6 +21,10 @@
 #ifndef ZABBIX_NODECOMMAND_H
 #define ZABBIX_NODECOMMAND_H
 
+#include "comms.h"
+
+extern char	*CONFIG_SOURCE_IP;
+
 int	node_process_command(zbx_sock_t *sock, const char *data);
 
 #endif

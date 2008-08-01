@@ -31,12 +31,12 @@
  * 1 - OK
  * */
 int	tcp_expect(
-		   const char		*host, 
+		   const char		*host,
 		   unsigned short	port,
-		   const char		*request, 
-		   const char		*expect, 
-		   const char		*sendtoclose, 
-		   int				*value_int
+		   const char		*request,
+		   const char		*expect,
+		   const char		*sendtoclose,
+		   int			*value_int
 	   )
 {
 	zbx_sock_t	s;
@@ -47,7 +47,7 @@ int	tcp_expect(
 
 	*value_int = 0;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, 3/*alarm!!!*/))) {
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, 3/*alarm!!!*/))) {
 		if( NULL == request )
 		{
 			*value_int = 1;
