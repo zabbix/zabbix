@@ -36,7 +36,7 @@ int	connect_to_server(zbx_sock_t *sock, int timeout)
 			CONFIG_SERVER_PORT,
 			timeout);
 
-	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout)))
+	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout)))
 		zabbix_log(LOG_LEVEL_ERR, "Unable connect to the server [%s]:%d [%s]",
 				CONFIG_SERVER,
 				CONFIG_SERVER_PORT,
