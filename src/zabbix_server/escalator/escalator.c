@@ -29,7 +29,7 @@
 #include "../events.h"
 #include "../actions.h"
 
-#define CONFIG_ESCALATOR_FREQUENCY	5
+#define CONFIG_ESCALATOR_FREQUENCY	3
 
 #define ZBX_USER_MSG struct zxb_user_msg_t
 ZBX_USER_MSG
@@ -616,7 +616,7 @@ static void	process_escalations(int now)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int get_minnextcheck()
+/*static int get_minnextcheck()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -648,7 +648,7 @@ static int get_minnextcheck()
 	DBfree_result(result);
 
 	return res;
-}
+}*/
 
 /******************************************************************************
  *                                                                            *
@@ -667,7 +667,7 @@ static int get_minnextcheck()
  ******************************************************************************/
 int main_escalator_loop()
 {
-	int			now, nextcheck, sleeptime;
+	int			now/*, nextcheck, sleeptime*/;
 	double			sec;
 	struct sigaction	phan;
 
@@ -692,7 +692,7 @@ int main_escalator_loop()
 
 		sec = zbx_time() - sec;
 
-		nextcheck = get_minnextcheck();
+/*		nextcheck = get_minnextcheck();
 
 		if (FAIL == nextcheck)
 			sleeptime = CONFIG_ESCALATOR_FREQUENCY;
@@ -702,19 +702,23 @@ int main_escalator_loop()
 				sleeptime = 0;
 			else if (sleeptime > CONFIG_ESCALATOR_FREQUENCY)
 				sleeptime = CONFIG_ESCALATOR_FREQUENCY;
-		}
+		}*/
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Escalator spent " ZBX_FS_DBL " seconds while processing escalation items."
 				" Nextcheck after %d sec.",
 				sec,
-				sleeptime);
+				CONFIG_ESCALATOR_FREQUENCY);
 
-		if (sleeptime > 0) {
+		zbx_setproctitle("escalator [sleeping for %d seconds]", 
+				CONFIG_ESCALATOR_FREQUENCY);
+
+		sleep(CONFIG_ESCALATOR_FREQUENCY);
+/*		if (sleeptime > 0) {
 			zbx_setproctitle("escalator [sleeping for %d seconds]", 
 					sleeptime);
 
 			sleep(sleeptime);
-		}
+		}*/
 	}
 
 	/* Never reached */
