@@ -921,6 +921,7 @@
 	'S_ICON_ON'=>				'Icon (on)',
 	'S_ICON_OFF'=>				'Icon (off)',
 	'S_ICON_UNKNOWN'=>			'Icon (unknown)',
+	'S_ICON_DISABLED'=>			'Icon (disabled)',
 	'S_ELEMENT_1'=>				'Element 1',
 	'S_ELEMENT_2'=>				'Element 2',
 	'S_LINK_STATUS_INDICATOR'=>					'Link status indicator',

@@ -683,6 +683,7 @@ FIELD		|label_location	|t_integer	|	|NULL		|ZBX_SYNC
 FIELD		|x		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|y		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|iconid_disabled|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|sysmaps|sysmapid|ZBX_SYNC
 FIELD		|sysmapid	|t_id		|'0'	|NOT NULL	|0

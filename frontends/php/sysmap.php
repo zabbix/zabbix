@@ -45,6 +45,7 @@ include_once "include/page_header.php";
 		"iconid_off"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,		'isset({save})'),
 		"iconid_on"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,		'isset({save})'),
 		"iconid_unknown"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,		'isset({save})'),
+		"iconid_disabled"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,		'isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,  NULL, NULL,		'isset({save})'),
 		"label_location"=>array(T_ZBX_INT, O_OPT, NULL,	IN("-1,0,1,2,3"),'isset({save})'),
 
@@ -81,7 +82,7 @@ include_once "include/page_header.php";
 				$_REQUEST["sysmapid"],$_REQUEST["elementid"],$_REQUEST["elementtype"],
 				$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
 				$_REQUEST["iconid_off"],$_REQUEST["iconid_unknown"],$_REQUEST["iconid_on"],
-				$_REQUEST["url"],$_REQUEST["label_location"]);
+				$_REQUEST["iconid_disabled"],$_REQUEST["url"],$_REQUEST["label_location"]);
 			$selementid = $_REQUEST["selementid"];
 			
 			show_messages($result,"Element updated","Cannot update element");
@@ -91,7 +92,7 @@ include_once "include/page_header.php";
 			$result=add_element_to_sysmap($_REQUEST["sysmapid"],$_REQUEST["elementid"],
 				$_REQUEST["elementtype"],$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
 				$_REQUEST["iconid_off"],$_REQUEST["iconid_unknown"],$_REQUEST["iconid_on"],
-				$_REQUEST["url"],$_REQUEST["label_location"]);
+				$_REQUEST["iconid_disabled"],$_REQUEST["url"],$_REQUEST["label_location"]);
 			$selementid = $result;
 
 			show_messages($result,"Element added","Cannot add element");
@@ -173,7 +174,7 @@ include_once "include/page_header.php";
 			"return redirect('".$page["file"]."?form=add_element".url_param("sysmapid")."');"));
 
 		$table = new CTableInfo();
-		$table->SetHeader(array(S_LABEL,S_TYPE,S_X,S_Y,S_ICON_OFF,S_ICON_ON,S_ICON_UNKNOWN));
+		$table->SetHeader(array(S_LABEL,S_TYPE,S_X,S_Y,S_ICON_OFF,S_ICON_ON,S_ICON_UNKNOWN,S_ICON_DISABLED));
 
 		$db_elements = DBselect("select * from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"].
 			" order by label");
@@ -196,7 +197,8 @@ include_once "include/page_header.php";
 				$db_element["y"],
 				new CImg("image.php?height=24&imageid=".$db_element["iconid_off"],"no image",NULL),
 				new CImg("image.php?height=24&imageid=".$db_element["iconid_on"],"no image",NULL),
-				new CImg("image.php?height=24&imageid=".$db_element["iconid_unknown"],"no image",NULL)
+				new CImg("image.php?height=24&imageid=".$db_element["iconid_unknown"],"no image",NULL),
+				new CImg("image.php?height=24&imageid=".$db_element["iconid_disabled"],"no image",NULL)
 				));
 		}
 		$table->show();
