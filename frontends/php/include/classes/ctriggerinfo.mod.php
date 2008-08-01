@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-	class CTriggersInfo extends CTable
-	{
+	include_once('include/triggers.inc.php');
+	
+	class CTriggersInfo extends CTable{
 		/*
 		var $style;
 		var $show_header;
 		var $nodeid;*/
 		
-		function CTriggersInfo($style = STYLE_HORISONTAL)
-		{
+		function CTriggersInfo($style = STYLE_HORISONTAL){
 			$this->style = null;
 
 			parent::CTable(NULL,"triggers_info");
@@ -36,8 +36,7 @@
 			$this->nodeid = get_current_nodeid();
 		}
 
-		function SetOrientation($value)
-		{
+		function SetOrientation($value){
 			if($value != STYLE_HORISONTAL && $value != STYLE_VERTICAL)
 				return $this->error("Incorrect value for SetOrientation [$value]");
 
@@ -53,9 +52,12 @@
 		}
 
 		function BodyToString(){
-			global $USER_DETAILS;
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_RES_IDS_ARRAY, $this->nodeid);
+			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, $this->nodeid);
 			
+			foreach($available_triggers as $id => $triggerid){
+				if(trigger_dependent($triggerid))	unset($available_triggers[$id]);
+			}
+		
 			$this->CleanItems();
 
 			$ok = $uncn = $info = $warn = $avg = $high = $dis = 0;
@@ -68,9 +70,10 @@
 								' AND h.status='.HOST_STATUS_MONITORED.
 								' AND t.triggerid=f.triggerid '.
 								' AND i.status='.ITEM_STATUS_ACTIVE.
-								' AND '.DBcondition('h.hostid',$available_hosts).
-							' GROUP BY priority,t.value');
+								' AND '.DBcondition('t.triggerid',$available_triggers).
+							' GROUP BY t.priority,t.value');
 			while($row=DBfetch($db_priority)){
+				
 				switch($row["value"]){
 					case TRIGGER_VALUE_TRUE:
 						switch($row["priority"]){
