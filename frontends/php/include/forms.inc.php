@@ -4921,6 +4921,7 @@
 			$iconid_off	= $element["iconid_off"];
 			$iconid_on	= $element["iconid_on"];
 			$iconid_unknown	= $element["iconid_unknown"];
+			$iconid_disabled= $element["iconid_disabled"];
 			$label_location	= $element["label_location"];
 			if(is_null($label_location)) $label_location = -1;
 		}
@@ -4935,6 +4936,7 @@
 			$iconid_off	= get_request("iconid_off",	0);
 			$iconid_on	= get_request("iconid_on",	0);
 			$iconid_unknown	= get_request("iconid_unknown",	0);
+			$iconid_disabled= get_request("iconid_disabled",0);
 			$label_location	= get_request("label_location",	"-1");
 		}
 
@@ -5073,6 +5075,7 @@
 		$cmbIconOff	= new CComboBox("iconid_off",$iconid_off);
 		$cmbIconOn	= new CComboBox("iconid_on",$iconid_on);
 		$cmbIconUnknown	= new CComboBox("iconid_unknown",$iconid_unknown);
+		$cmbIconDisabled= new CComboBox("iconid_disabled",$iconid_disabled);
 		
 		$result = DBselect('SELECT * FROM images WHERE imagetype=1 AND '.DBin_node('imageid').' order by name');
 		while($row=DBfetch($result)){
@@ -5081,11 +5084,13 @@
 			$cmbIconOff->AddItem($row["imageid"],$row["name"]);
 			$cmbIconOn->AddItem($row["imageid"],$row["name"]);
 			$cmbIconUnknown->AddItem($row["imageid"],$row["name"]);
+			$cmbIconDisabled->AddItem($row["imageid"],$row["name"]);
 		}
 		
 		$frmEl->AddRow(S_ICON_OFF,$cmbIconOff);
 		$frmEl->AddRow(S_ICON_ON,$cmbIconOn);
 		$frmEl->AddRow(S_ICON_UNKNOWN,$cmbIconUnknown);
+		$frmEl->AddRow(S_ICON_DISABLED,$cmbIconDisabled);
 
 		$frmEl->AddRow(S_COORDINATE_X, new CNumericBox("x", $x, 5));
 		$frmEl->AddRow(S_COORDINATE_Y, new CNumericBox("y", $y, 5));

@@ -313,7 +313,7 @@
 	# Add Element to system map
 
 	function add_element_to_sysmap($sysmapid,$elementid,$elementtype,
-						$label,$x,$y,$iconid_off,$iconid_unknown,$iconid_on,$url,$label_location)
+						$label,$x,$y,$iconid_off,$iconid_unknown,$iconid_on,$iconid_disabled,$url,$label_location)
 	{
 		if($label_location<0) $label_location='null';
 		if(check_circle_elements_link($sysmapid,$elementid,$elementtype))
@@ -325,10 +325,10 @@
 		$selementid = get_dbid("sysmaps_elements","selementid");
 
 		$result=DBexecute('INSERT INTO sysmaps_elements '.
-							" (selementid,sysmapid,elementid,elementtype,label,x,y,iconid_off,url,iconid_on,label_location,iconid_unknown)".
+							" (selementid,sysmapid,elementid,elementtype,label,x,y,iconid_off,url,iconid_on,label_location,iconid_unknown,iconid_disabled)".
 						" VALUES ($selementid,$sysmapid,$elementid,$elementtype,".zbx_dbstr($label).
 							",$x,$y,$iconid_off,".zbx_dbstr($url).
-							",$iconid_on,$label_location,$iconid_unknown)");
+							",$iconid_on,$label_location,$iconid_unknown,$iconid_disabled)");
 
 		if(!$result)
 			return $result;
@@ -339,7 +339,7 @@
 	# Update Element FROM system map
 
 	function update_sysmap_element($selementid,$sysmapid,$elementid,$elementtype,
-						$label,$x,$y,$iconid_off,$iconid_unknown,$iconid_on,$url,$label_location)
+						$label,$x,$y,$iconid_off,$iconid_unknown,$iconid_on,$iconid_disabled,$url,$label_location)
 	{
 		if($label_location<0) $label_location='null';
 		if(check_circle_elements_link($sysmapid,$elementid,$elementtype))
@@ -352,7 +352,8 @@
 					"SET elementid=$elementid,elementtype=$elementtype,".
 						"label=".zbx_dbstr($label).",x=$x,y=$y,iconid_off=$iconid_off,".
 						"url=".zbx_dbstr($url).",iconid_on=$iconid_on,".
-						"label_location=$label_location,iconid_unknown=$iconid_unknown".
+						"label_location=$label_location,iconid_unknown=$iconid_unknown,".
+						"iconid_disabled=$iconid_disabled".
 					" WHERE selementid=$selementid");
 	}
 
@@ -536,6 +537,14 @@
 					$tr_info[TRIGGER_VALUE_UNKNOWN]['count']	= 1;
 					$tr_info[TRIGGER_VALUE_UNKNOWN]['priority']	= 0;
 					$tr_info[TRIGGER_VALUE_UNKNOWN]['info']		= S_TEMPLATE_SMALL;
+					$tr_info[TRIGGER_VALUE_UNKNOWN]['host_status']	= $host["status"];
+				}
+				elseif($host["status"] == HOST_STATUS_NOT_MONITORED)
+				{
+					$tr_info[TRIGGER_VALUE_UNKNOWN]['count']	= 0;
+					$tr_info[TRIGGER_VALUE_UNKNOWN]['priority']	= 0;
+					$tr_info[TRIGGER_VALUE_UNKNOWN]['info']		= S_DISABLED_BIG;
+					$tr_info[TRIGGER_VALUE_UNKNOWN]['host_status']	= $host["status"];
 				}
 				else
 				{
@@ -547,6 +556,7 @@
 		}
 		elseif($el_type==SYSMAP_ELEMENT_TYPE_MAP)
 		{
+			SDI("5");
 			$db_map = DBfetch(DBselect('select name FROM sysmaps WHERE sysmapid='.$db_element["elementid"]));
 			$el_name = $db_map['name'];
 
@@ -598,7 +608,10 @@
 				$out['info'] = $inf['info'];
 
 			$out['color'] = $colors['Gray'];
-			$out['iconid'] = $db_element['iconid_unknown'];
+			if (isset($inf['host_status']) && $inf['host_status'] == HOST_STATUS_NOT_MONITORED)
+				$out['iconid'] = $db_element['iconid_disabled'];
+			else
+				$out['iconid'] = $db_element['iconid_unknown'];
 		}
 		else
 		{

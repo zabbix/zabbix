@@ -200,7 +200,7 @@ include_once "include/page_header.php";
 				$label_line=$host["ip"];
 
 			if( $host["status"] == HOST_STATUS_NOT_MONITORED )
-				$label_color=$darkred;
+				$label_color = $gray;
 		}
 
 		if($label_line=="" && $info_line=="")	continue;
