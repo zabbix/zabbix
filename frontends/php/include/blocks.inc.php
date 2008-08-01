@@ -376,7 +376,7 @@ function make_status_of_zbx(){
 //Log Out 10min	
 	$sql = 'SELECT DISTINCT u.userid, MAX(s.lastaccess) as lastaccess, u.autologout, s.status '.
 			' FROM users u '.
-				' LEFT JOIN sessions s ON s.userid=u.userid'.
+				' LEFT JOIN sessions s ON s.userid=u.userid AND s.status='.ZBX_SESSION_ACTIVE.
 			' WHERE '.DBin_node('u.userid').
 			' GROUP BY u.userid';
 
