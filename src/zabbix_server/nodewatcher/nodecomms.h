@@ -22,6 +22,8 @@
 
 #include "comms.h"
 
+extern char	*CONFIG_SOURCE_IP;
+
 int	connect_to_node(int nodeid, zbx_sock_t *sock);
 int	send_data_to_node(int nodeid, zbx_sock_t *sock, const char *data);
 int	recv_data_from_node(int nodeid, zbx_sock_t *sock, char **data);
