@@ -2108,7 +2108,7 @@
 	 * Comments: Recursive function
 	 *
 	 */
-	function	trigger_dependent_rec($triggerid,&$level){
+	function trigger_dependent_rec($triggerid,&$level){
 		$ret = FALSE;
 	
 		$level++;
@@ -2116,18 +2116,20 @@
 		/* Check for recursive loop */
 		if($level > 32)	return $ret;
 
-		$result = DBselect("select t.triggerid, t.value from trigger_depends d,triggers t where d.triggerid_down=$triggerid and d.triggerid_up=t.triggerid");
-		while($row = DBfetch($result)){
-                	$triggerid_tmp = $row["triggerid"];
-                	$value_tmp = $row["value"];
-			if(TRIGGER_VALUE_TRUE == $value_tmp || trigger_dependent_rec($triggerid_tmp, $level))
-			{
+		$sql = 'SELECT t.triggerid, t.value '.
+				' FROM trigger_depends d, triggers t '.
+				' WHERE d.triggerid_down='.$triggerid.
+					' AND d.triggerid_up=t.triggerid';
+
+		$result = DBselect($sql);
+		while($row = DBfetch($result)){			
+			if(TRIGGER_VALUE_TRUE == $row['value'] || trigger_dependent_rec($row['triggerid'], $level)){
 				$ret = TRUE;
 				break;
 			}
 		}
 
-		return $ret;
+	return $ret;
 	}
 
 	/*

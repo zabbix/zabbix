@@ -448,6 +448,7 @@ include_once "include/page_header.php";
 	while($row=DBfetch($result)){
 // Check for dependencies
 		if(trigger_dependent($row["triggerid"]))	continue;
+		
 		$cond = '';
 		$event_expire = ($config['event_expire']*86400); // days
 		switch($show_events){
