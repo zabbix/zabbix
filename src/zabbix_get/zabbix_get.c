@@ -29,28 +29,34 @@ char *progname = NULL;
 char title_message[] = "ZABBIX get - Communicate with ZABBIX agent";
 char usage_message[] = "[-hV] -s<host name or IP> [-p<port>] -k<key>";
 
-#ifndef HAVE_GETOPT_LONG
+#ifdef HAVE_GETOPT_LONG
 char *help_message[] = {
         "Options:",
-	"  -p <port number>         Specify port number of agent running on the host. Default is 10050.",
-	"  -s <host name or IP>     Specify host name or IP address of a host.",
-	"  -k <key of metric>       Specify metric name (key) we want to retrieve.",
-	"  -h                       give this help",
-	"  -V                       display version number",
+	"  -s --host <host name or IP>          Specify host name or IP address of a host.",
+	"  -p --port <port number>              Specify port number of agent running on the host. Default is 10050.",
+	"  -I --source-address <ip address>     Specify source IP address",
 	"",
-	"Example: zabbix_get -s127.0.0.1 -p10050 -k\"system[procload]\"",
+	"  -k --key <key of metric>             Specify metric name (key) we want to retrieve.",
+	"",
+	"  -h --help                            Give this help",
+	"  -V --version                         Display version number",
+	"",
+	"Example: zabbix_get -s127.0.0.1 -p10050 -k\"system.cpu.load[all,avg1]\"",
         0 /* end of text */
 };
 #else
 char *help_message[] = {
         "Options:",
-	"  -p --port <port number>        Specify port number of agent running on the host. Default is 10050.",
-	"  -s --host <host name or IP>    Specify host name or IP address of a host.",
-	"  -k --key <key of metric>       Specify metric name (key) we want to retrieve.",
-	"  -h --help                      give this help",
-	"  -V --version                   display version number",
+	"  -s <host name or IP>         Specify host name or IP address of a host.",
+	"  -p <port number>             Specify port number of agent running on the host. Default is 10050.",
+	"  -I <ip address>              Specify source IP address",
 	"",
-	"Example: zabbix_get -s127.0.0.1 -p10050 -k\"system[procload]\"",
+	"  -k <key of metric>           Specify metric name (key) we want to retrieve.",
+	"",
+	"  -h                           Give this help",
+	"  -V                           Display version number",
+	"",
+	"Example: zabbix_get -s127.0.0.1 -p10050 -k\"system.cpu.load[all,avg1]\"",
         0 /* end of text */
 };
 #endif
@@ -60,17 +66,18 @@ char *help_message[] = {
 /* long options */
 struct zbx_option longopts[] =
 {
-	{"port",	1,	0,	'p'},
-	{"host",	1,	0,	's'},
-	{"key",		1,	0,	'k'},
-	{"help",	0,	0,	'h'},
-	{"version",	0,	0,	'V'},
+	{"port",		1,	0,	'p'},
+	{"host",		1,	0,	's'},
+	{"key",			1,	0,	'k'},
+	{"source-address",	1,	0,	'I'},
+	{"help",		0,	0,	'h'},
+	{"version",		0,	0,	'V'},
 	{0,0,0,0}
 };
 
 /* short options */
 
-static char     shortopts[] = "k:p:s:hV";
+static char	shortopts[] = "s:p:k:I:hV";
 
 /* end of COMMAND LINE OPTIONS*/
 
@@ -129,6 +136,7 @@ void    signal_handler( int sig )
  *                                                                            *
  ******************************************************************************/
 static int	get_value(
+	const char      *source_ip,
 	const char	*host,
 	unsigned short	port,
 	const char	*key,
@@ -144,7 +152,7 @@ static int	get_value(
 
 	*value = NULL;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, SENDER_TIMEOUT))) {
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, SENDER_TIMEOUT))) {
 		zbx_snprintf(request, sizeof(request),"%s\n",key);
 		if( SUCCEED == (ret = zbx_tcp_send(&s, request)) )
 		{
@@ -182,6 +190,7 @@ int main(int argc, char **argv)
 	char	*value	= NULL;
 	char	*host	= NULL;
 	char	*key	= NULL;
+	char	*source_ip = NULL;
 	char	ch;
 
 	progname = get_programm_name(argv[0]);
@@ -197,6 +206,9 @@ int main(int argc, char **argv)
 				break;
 			case 's':
 				host = strdup(zbx_optarg);
+				break;
+			case 'I':
+				source_ip = strdup(zbx_optarg);
 				break;
 			case 'h':
 				help();
@@ -229,7 +241,7 @@ int main(int argc, char **argv)
 		signal( SIGALRM, signal_handler );
 #endif /* not WINDOWS */
 
-		ret = get_value(host, port, key, &value);
+		ret = get_value(source_ip, host, port, key, &value);
 
 		if(ret == SUCCEED)
 		{

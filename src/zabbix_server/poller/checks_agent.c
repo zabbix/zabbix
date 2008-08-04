@@ -60,7 +60,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 			addr,
 			item->key);
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, addr, item->port, 0))) {
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, addr, item->port, 0))) {
 		zbx_snprintf(packet, sizeof(packet), "%s\n",item->key);
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", packet);
 

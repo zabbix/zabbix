@@ -29,7 +29,7 @@ char *progname = NULL;
 
 char title_message[] = "ZABBIX send";
 
-char usage_message[] = "[-Vhv] {[-zps] -ko | -i <file>} [-c <file>]";
+char usage_message[] = "[-Vhv] {[-zpsI] -ko | -i <file>} [-c <file>]";
 
 #ifdef HAVE_GETOPT_LONG
 char *help_message[] = {
@@ -39,6 +39,7 @@ char *help_message[] = {
 	"  -z --zabbix-server <Server>          Hostname or IP address of ZABBIX Server",
 	"  -p --port <Server port>              Specify port number of server trapper running on the server. Default is 10051",
 	"  -s --host <Hostname>                 Specify host name. Host IP address and DNS name will not work.",
+	"  -I --source-address <ip address>     Specify source IP address",
 	"",
 	"  -k --key <Key>                       Specify metric name (key) we want to send",
 	"  -o --value <Key value>               Specify value of the key",
@@ -61,6 +62,7 @@ char *help_message[] = {
 	"  -z <Server>                  Hostname or IP address of ZABBIX Server.",
 	"  -p <Server port>             Specify port number of server trapper running on the server. Default is 10051.",
 	"  -s <Hostname>                Specify hostname or IP address of a host.",
+	"  -I <ip address>              Specify source IP address",
 	"",
 	"  -k <Key>                     Specify metric name (key) we want to send.",
 	"  -o <Key value>               Specify value of the key.",
@@ -87,6 +89,7 @@ static struct zbx_option longopts[] =
 	{"zabbix-server",	1,	NULL,	'z'},
 	{"port",		1,	NULL,	'p'},
 	{"host",		1,	NULL,	's'},
+	{"source-address",	1,	NULL,	'I'},
 	{"key",			1,	NULL,	'k'},
 	{"value",		1,	NULL,	'o'},
 	{"input-file",		1,	NULL,	'i'},
@@ -98,7 +101,7 @@ static struct zbx_option longopts[] =
 
 /* short options */
 
-static char     shortopts[] = "c:z:p:s:k:o:i:vhV";
+static char     shortopts[] = "c:I:z:p:s:k:o:i:vhV";
 
 /* end of COMMAND LINE OPTIONS*/
 
@@ -106,6 +109,7 @@ static int	CONFIG_LOG_LEVEL = LOG_LEVEL_CRIT;
 
 static char*	INPUT_FILE = NULL;
 
+static char*	CONFIG_SOURCE_IP = NULL;
 static char*	ZABBIX_SERVER = NULL;
 unsigned short	ZABBIX_SERVER_PORT = 0;
 static char*	ZABBIX_HOSTNAME = NULL;
@@ -133,7 +137,7 @@ static void    send_signal_handler( int sig )
 
 typedef struct zbx_active_metric_type
 {
-	char*	server;
+	char	*source_ip, *server;
 	unsigned short	port;
 	char*	hostname;
 	char*	key;
@@ -171,7 +175,7 @@ static ZBX_THREAD_ENTRY(send_value, args)
 	signal( SIGALRM, send_signal_handler );
 #endif /* NOT _WINDOWS */
 	
-	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, sentdval_args->server, sentdval_args->port, SENDER_TIMEOUT))) {
+	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port, SENDER_TIMEOUT))) {
 		tosend = comms_create_request(sentdval_args->hostname, sentdval_args->key, sentdval_args->key_value,
 			NULL, NULL, NULL, NULL);
 
@@ -209,6 +213,7 @@ static ZBX_THREAD_ENTRY(send_value, args)
 
 static void    init_config(const char* config_file)
 {
+	char*	config_source_ip_from_conf = NULL;
 	char*	zabbix_server_from_conf = NULL;
 	int	zabbix_server_port_from_conf = 0;
 	char*	zabbix_hostname_from_conf = NULL;
@@ -217,6 +222,7 @@ static void    init_config(const char* config_file)
 	struct cfg_line cfg[]=
 	{
 		/* PARAMETER	,VAR				,FUNC	,TYPE(0i,1s)	,MANDATORY	,MIN			,MAX		*/
+		{"SourceIP"	,&config_source_ip_from_conf	,0	,TYPE_STRING	,PARM_OPT	,0			,0		},
 		{"Server"	,&zabbix_server_from_conf	,0	,TYPE_STRING	,PARM_OPT	,0			,0		},
 		{"ServerPort"	,&zabbix_server_port_from_conf	,0	,TYPE_INT	,PARM_OPT	,MIN_ZABBIX_PORT	,MAX_ZABBIX_PORT},
 		{"Hostname"	,&zabbix_hostname_from_conf	,0	,TYPE_STRING	,PARM_OPT	,0			,0		},
@@ -226,6 +232,15 @@ static void    init_config(const char* config_file)
 	if( config_file )
 	{
 		parse_cfg_file(config_file, cfg);
+
+		if (NULL != config_source_ip_from_conf)
+		{
+			if (NULL == CONFIG_SOURCE_IP)   /* apply parameter only if unsetted */
+			{
+				CONFIG_SOURCE_IP = strdup(config_source_ip_from_conf);
+			}
+			zbx_free(config_source_ip_from_conf);
+		}
 
 		if( zabbix_server_from_conf )
 		{
@@ -274,6 +289,9 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 			case 'V':
 				version();
 				exit(-1);
+				break;
+			case 'I':
+				CONFIG_SOURCE_IP = strdup(zbx_optarg);
 				break;
 			case 'z': 
 				ZABBIX_SERVER = strdup(zbx_optarg);

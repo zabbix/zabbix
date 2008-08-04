@@ -22,6 +22,7 @@
 
 #include "threads.h"
 
+extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_HOSTNAME;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 

@@ -1,5 +1,6 @@
 Changes for 1.4.7:
  
+ - [DEV-195] added support of source ip address (Sasha)
  - added Korean locale [thnx to Kodai] (Artem)
  - updated Japanese locale [thnx to Kodai] (Artem)
 

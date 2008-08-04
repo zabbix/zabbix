@@ -317,6 +317,7 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
  ******************************************************************************/
 #if defined(HAVE_IPV6)
 int	zbx_tcp_connect(zbx_sock_t *s,
+	const char	*source_ip,
 	const char	*ip, 
 	unsigned short	port,
 	int		timeout
@@ -324,6 +325,7 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 {
 	int	ret = FAIL;
 	struct	addrinfo *ai = NULL, hints;
+	struct	addrinfo *ai_bind = NULL;
 	char	service[MAX_STRING_LEN];
 
 	ZBX_TCP_START();
@@ -343,6 +345,29 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 	if (ZBX_SOCK_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol))) {
 		zbx_set_tcp_strerror("Cannot create socket [%s]:%d [%s]", ip, port ,strerror_from_system(zbx_sock_last_error()));
 		goto out;
+	}
+
+	if (NULL != source_ip)
+	{
+		memset(&hints, 0x00, sizeof(struct addrinfo));
+		hints.ai_family = PF_UNSPEC;
+		hints.ai_socktype = SOCK_STREAM;
+		hints.ai_flags = AI_NUMERICHOST;
+
+		if (0 != getaddrinfo(source_ip, NULL, &hints, &ai_bind))
+		{
+			zbx_set_tcp_strerror("Invalid source IP address [%s]\n",
+					source_ip);
+			goto out;
+		}
+
+		if (ZBX_TCP_ERROR == bind(s->socket, ai_bind->ai_addr, ai_bind->ai_addrlen))
+		{
+			zbx_set_tcp_strerror("bind() failed with error %d: %s\n",
+					zbx_sock_last_error(),
+					strerror_from_system(zbx_sock_last_error()));
+			goto out;
+		}
 	}
 
 	if (0 != timeout) {
@@ -369,16 +394,21 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 out:
 	if (NULL != ai)
 		freeaddrinfo(ai);
+
+	if (NULL != ai_bind)
+		freeaddrinfo(ai_bind);
+
 	return ret;
 }
 #else
 int	zbx_tcp_connect(zbx_sock_t *s,
+	const char	*source_ip,
 	const char	*ip,
 	unsigned short	port,
 	int		timeout
 	)
 {
-	ZBX_SOCKADDR	servaddr_in;
+	ZBX_SOCKADDR	servaddr_in, source_addr;
 	struct	hostent *hp;
 
 	ZBX_TCP_START();
@@ -397,6 +427,21 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET,SOCK_STREAM,0))) {
 		zbx_set_tcp_strerror("Cannot create socket [%s:%d] [%s]", ip, port ,strerror_from_system(zbx_sock_last_error()));
 		return	FAIL;
+	}
+
+	if (NULL != source_ip)
+	{
+		source_addr.sin_family          = AF_INET;
+		source_addr.sin_addr.s_addr     = inet_addr(source_ip);
+		source_addr.sin_port            = 0;
+
+		if (ZBX_SOCK_ERROR == bind(s->socket, (struct sockaddr *)&source_addr, sizeof(ZBX_SOCKADDR)) )
+		{
+			zbx_set_tcp_strerror("bind() failed with error %d: %s\n",
+					zbx_sock_last_error(),
+					strerror_from_system(zbx_sock_last_error()));
+			return FAIL;
+		}
 	}
 
 	if (0 != timeout) {

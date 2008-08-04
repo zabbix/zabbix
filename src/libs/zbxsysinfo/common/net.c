@@ -47,7 +47,7 @@ int	tcp_expect(
 
 	*value_int = 0;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, 3/*alarm!!!*/))) {
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, 3/*alarm!!!*/))) {
 		if( NULL == request )
 		{
 			*value_int = 1;

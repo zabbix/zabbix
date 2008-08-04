@@ -26,6 +26,7 @@
 #include "sysinfo.h"
 
 extern  int     CONFIG_NOTIMEWAIT;
+extern char	*CONFIG_SOURCE_IP;
 
 extern	int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result);
 

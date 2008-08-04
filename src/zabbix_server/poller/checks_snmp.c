@@ -214,6 +214,9 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 	zabbix_log( LOG_LEVEL_DEBUG, "OID [%s]",
 		item->snmp_oid);
 
+	if (NULL != CONFIG_SOURCE_IP)
+		session.localname = CONFIG_SOURCE_IP;
+
 	SOCK_STARTUP;
 	ss = snmp_open(&session);
 

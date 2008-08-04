@@ -20,6 +20,7 @@
 #ifndef ZABBIX_PINGER_H
 #define ZABBIX_PINGER_H
 
+extern char	*CONFIG_SOURCE_IP;
 extern	int	CONFIG_PINGER_FORKS;
 extern	int	CONFIG_PINGER_FREQUENCY;
 extern	char	*CONFIG_FPING_LOCATION;

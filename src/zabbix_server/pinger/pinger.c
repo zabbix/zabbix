@@ -208,10 +208,15 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
 	FILE		*f;
 	char		filename[MAX_STRING_LEN];
 	char		tmp[MAX_STRING_LEN];
-	int		i;
-	char		*c;
+	int		i, res = FAIL;
+	char		*c, source_ip[64];
 	ZBX_FPING_HOST	*host;
 	AGENT_RESULT	value;
+#ifdef HAVE_IPV6
+	struct		addrinfo hints, *ai = NULL;
+	char		*fping;
+	int		e;
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In do_ping() [hosts_count:%d]",
 			hosts_count);
@@ -234,15 +239,51 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
 
 	fclose(f);
 
+	if (NULL != CONFIG_SOURCE_IP)
+		zbx_snprintf(source_ip, sizeof(source_ip), "-S%s ", CONFIG_SOURCE_IP);
+	else
+		*source_ip = '\0';
+
 #ifdef HAVE_IPV6
-	zbx_snprintf(tmp, sizeof(tmp), "%s -e 2>/dev/null <%s;%s -e 2>/dev/null <%s",
-			CONFIG_FPING_LOCATION,
-			filename,
-			CONFIG_FPING6_LOCATION,
-			filename);
+	if (NULL != CONFIG_SOURCE_IP)
+	{
+		memset(&hints, 0, sizeof(hints));
+		hints.ai_family = PF_UNSPEC;
+		hints.ai_flags = AI_NUMERICHOST;
+		hints.ai_socktype = SOCK_STREAM;
+
+		if (0 != (e = getaddrinfo(CONFIG_SOURCE_IP, NULL, &hints, &ai)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot resolve address [%s], error %d: %s",
+				CONFIG_SOURCE_IP, e, gai_strerror(e));
+			goto out;
+		}
+
+		if (ai->ai_family == PF_INET)
+			fping = CONFIG_FPING_LOCATION;
+		else if (ai->ai_family == PF_INET6)
+			fping = CONFIG_FPING6_LOCATION;
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Unsupported address family [%s]", CONFIG_SOURCE_IP);
+			goto out;
+		}
+
+		zbx_snprintf(tmp, sizeof(tmp), "%s %s-e 2>/dev/null <%s",
+				fping,
+				source_ip,
+				filename);
+	}
+	else
+		zbx_snprintf(tmp, sizeof(tmp), "%s -e 2>/dev/null <%s;%s -e 2>/dev/null <%s",
+				CONFIG_FPING_LOCATION,
+				filename,
+				CONFIG_FPING6_LOCATION,
+				filename);
 #else /* HAVE_IPV6 */
-	zbx_snprintf(tmp, sizeof(tmp), "%s -e 2>/dev/null <%s",
+	zbx_snprintf(tmp, sizeof(tmp), "%s %s-e 2>/dev/null <%s",
 			CONFIG_FPING_LOCATION,
+			source_ip,
 			filename);
 #endif /* HAVE_IPV6 */
 
@@ -253,7 +294,7 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
 		zabbix_syslog("Cannot execute [%s] [%s]",
 				CONFIG_FPING_LOCATION,
 				strerror(errno));
-		return FAIL;
+		goto out;
 	}
 
 	while (NULL != fgets(tmp, sizeof(tmp), f)) {
@@ -286,8 +327,6 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
 	}
 	pclose(f);
 
-	unlink(filename);
-
 	for (i = 0; i < hosts_count; i++) {
 		zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] alive [%d]",
 				hosts[i].useip ? hosts[i].ip : hosts[i].dns,
@@ -304,9 +343,13 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
 		free_result(&value);
 	}
 
+	res = SUCCEED;
+out:
+	unlink(filename);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of do_ping()");
 
-	return SUCCEED;
+	return res;
 }
 
 /******************************************************************************
