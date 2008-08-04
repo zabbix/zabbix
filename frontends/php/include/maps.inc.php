@@ -458,8 +458,7 @@
          *     Eugene Grigorjev 
          *
          */
-	function get_info_by_selementid($selementid)
-	{
+	function get_info_by_selementid($selementid){
 		global $colors;
 
 		$el_name = '';
@@ -502,14 +501,11 @@
 		if( isset($sql[$el_type]) ){
 			$db_triggers = DBselect($sql[$el_type]);
 			$trigger = DBfetch($db_triggers);
-			if($trigger)
-			{
-				if(isset($trigger['el_name']))
-				{
+			if($trigger){
+				if(isset($trigger['el_name'])){
 					$el_name = $trigger['el_name'];
 				}
-				else
-				{
+				else{
 					$el_name = expand_trigger_description_by_data($trigger);
 				}
 
@@ -520,56 +516,51 @@
 						$tr_info[$type] = array('count' => 0);
 
 					$tr_info[$type]['count']++;
-					if(!isset($tr_info[$type]['priority']) || $tr_info[$type]['priority'] < $trigger["priority"])
-					{
+					if(!isset($tr_info[$type]['priority']) || $tr_info[$type]['priority'] < $trigger["priority"]){
 						$tr_info[$type]['priority']	= $trigger["priority"];
 						if($el_type != SYSMAP_ELEMENT_TYPE_TRIGGER && $type!=TRIGGER_VALUE_UNKNOWN)
 							$tr_info[$type]['info']		= expand_trigger_description_by_data($trigger);
 					}
 				} while ($trigger = DBfetch($db_triggers));
 			}
-			elseif($el_type == SYSMAP_ELEMENT_TYPE_HOST)
-			{
+			else if($el_type == SYSMAP_ELEMENT_TYPE_HOST){
 				$host = get_host_by_hostid($db_element["elementid"]);
 				$el_name = $host['host'];
-				if($host["status"] == HOST_STATUS_TEMPLATE)
-				{
+				if($host["status"] == HOST_STATUS_TEMPLATE){
 					$tr_info[TRIGGER_VALUE_UNKNOWN]['count']	= 1;
 					$tr_info[TRIGGER_VALUE_UNKNOWN]['priority']	= 0;
 					$tr_info[TRIGGER_VALUE_UNKNOWN]['info']		= S_TEMPLATE_SMALL;
 					$tr_info[TRIGGER_VALUE_UNKNOWN]['host_status']	= $host["status"];
 				}
-				elseif($host["status"] == HOST_STATUS_NOT_MONITORED)
-				{
+				else if($host["status"] == HOST_STATUS_NOT_MONITORED){
 					$tr_info[TRIGGER_VALUE_UNKNOWN]['count']	= 0;
 					$tr_info[TRIGGER_VALUE_UNKNOWN]['priority']	= 0;
 					$tr_info[TRIGGER_VALUE_UNKNOWN]['info']		= S_DISABLED_BIG;
 					$tr_info[TRIGGER_VALUE_UNKNOWN]['host_status']	= $host["status"];
 				}
-				else
-				{
+				else{
 					$tr_info[TRIGGER_VALUE_FALSE]['count']		= 0;
 					$tr_info[TRIGGER_VALUE_FALSE]['priority']	= 0;
 					$tr_info[TRIGGER_VALUE_FALSE]['info']		= S_OK_BIG;
 				}
 			}
 		}
-		elseif($el_type==SYSMAP_ELEMENT_TYPE_MAP)
-		{
-			SDI("5");
+		else if($el_type==SYSMAP_ELEMENT_TYPE_MAP){
+		
 			$db_map = DBfetch(DBselect('select name FROM sysmaps WHERE sysmapid='.$db_element["elementid"]));
 			$el_name = $db_map['name'];
 
 			$db_subelements = DBselect("select selementid FROM sysmaps_elements".
 				" WHERE sysmapid=".$db_element["elementid"]);
-			while($db_subelement = DBfetch($db_subelements))
-			{// recursion
+			while($db_subelement = DBfetch($db_subelements)){ // recursion
+			
 				$inf = get_info_by_selementid($db_subelement["selementid"]);
 				$type = $inf['type'];
+				
 				if(!isset($tr_info[$type]['count'])) $tr_info[$type]['count'] = 0;
 				$tr_info[$type]['count'] += isset($inf['count']) ? $inf['count'] : 1;
-				if(!isset($tr_info[$type]['priority']) || $tr_info[$type]['priority'] < $inf["priority"])
-				{
+				
+				if(!isset($tr_info[$type]['priority']) || $tr_info[$type]['priority'] < $inf["priority"]){
 					$tr_info[$type]['priority'] = $inf['priority'];
 					$tr_info[$type]['info'] = $inf['info'];
 				}

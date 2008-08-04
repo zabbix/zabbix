@@ -132,7 +132,7 @@ include_once "include/page_header.php";
 //--------
 
 	$config=select_config();
-	
+
 /* FILTER */
 	if(isset($_REQUEST['filter_rst'])){
 		$_REQUEST['show_actions']	= get_request('show_actions',	0);
@@ -170,16 +170,16 @@ include_once "include/page_header.php";
 	if(TRIGGERS_OPTION_NOFALSEFORB && ($_REQUEST['show_triggers'] == TRIGGERS_OPTION_NOFALSEFORB)){
 		$_REQUEST['show_events'] = EVENTS_OPTION_NOFALSEFORB;
 	}
-	
+
 	if(($_REQUEST['show_events'] == EVENTS_OPTION_NOFALSEFORB) && ($_REQUEST['show_triggers'] != TRIGGERS_OPTION_NOFALSEFORB)){
 		$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
 	}
 
-	if(!$config['event_ack_enable'] && (($_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT) || ($_REQUEST['show_events'] != EVENTS_OPTION_ALL))){
+	if((EVENT_ACK_DISABLED == $config['event_ack_enable']) && !str_in_array($_REQUEST['show_events'],array(EVENTS_OPTION_NOEVENT,EVENTS_OPTION_ALL))){
 		$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
 	}
 //--
-	
+
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		update_profile('web.tr_status.filter.show_actions',$_REQUEST['show_actions'], PROFILE_TYPE_INT);
 		update_profile('web.tr_status.filter.show_details',$_REQUEST['show_details'], PROFILE_TYPE_INT);
@@ -309,7 +309,7 @@ include_once "include/page_header.php";
 	$filterForm->SetMethod('post');
 
 	$filterForm->AddVar('fullscreen',$_REQUEST['fullscreen']);
-	
+
 	$tr_select = new CComboBox('show_triggers',$show_triggers,'javasctipt: submit();');
 	if(TRIGGERS_OPTION_ONLYTRUE){
 		$tr_select->Additem(TRIGGERS_OPTION_ONLYTRUE,S_SHOW_ONLY_TRUE);
@@ -342,7 +342,7 @@ include_once "include/page_header.php";
 
 //------- JP -------
 	if($show_triggers==TRIGGERS_OPTION_NOFALSEFORB){
-		$ev_select->Additem(EVENTS_OPTION_NOFALSEFORB,' - ','yes');
+		$ev_select->AddItem(EVENTS_OPTION_NOFALSEFORB,' - ','yes');
 		$ev_select->AddOption('disabled','disabled');
 	}
 //---
