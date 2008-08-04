@@ -25,6 +25,8 @@
 #include "db.h"
 #include "sysinfo.h"
 
+extern char	*CONFIG_SOURCE_IP;
+
 int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value);
 
 #endif
