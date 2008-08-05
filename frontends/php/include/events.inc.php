@@ -304,16 +304,7 @@ function make_small_eventlist($triggerid,&$trigger_data){
 		
 		$duration = zbx_date2age($lclock,$clock);
 
-		if($row["value"] == TRIGGER_VALUE_FALSE){
-			$value=new CCol(S_FALSE_BIG,"off");
-		}
-		elseif($row["value"] == TRIGGER_VALUE_TRUE){
-			$value=new CCol(S_TRUE_BIG,"on");
-		}
-		else{
-			$value=new CCol(S_UNKNOWN_BIG,"unknown");
-		}
-		
+		$value = new CCol(trigger_value2str($row['value']), get_trigger_value_style($row["value"]));
 	
 		$ack = '-';
 		if(1 == $row['acknowledged']){
@@ -424,15 +415,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 			continue;
 		}
 	
-		if($row["value"] == TRIGGER_VALUE_FALSE){
-			$value=new CCol(S_OFF,"off");
-		}
-		else if($row["value"] == TRIGGER_VALUE_TRUE){
-			$value=new CCol(S_ON,"on");
-		}
-		else{
-			$value=new CCol(S_UNKNOWN_BIG,"unknown");
-		}
+		$value = new CCol(trigger_value2str($row['value']), get_trigger_value_style($row['value']));
 
 		$row = array_merge($triggers[$row['triggerid']],$row);
 		if((0 == $show_unknown) && (!event_initial_time($row,$show_unknown))) continue;
@@ -471,16 +454,7 @@ function get_history_of_discovery_events($start,$num){
 			continue;
 		}
 
-		if($event_data["value"] == 0){
-			$value=new CCol(S_UP,"off");
-		}
-		else if($event_data["value"] == 1){
-			$value=new CCol(S_DOWN,"on");
-		}
-		else{
-			$value=new CCol(S_UNKNOWN_BIG,"unknown");
-		}
-
+		$value = new CCol(trigger_value2str($event_data['value']), get_trigger_value_style($event_data['value']));
 
 		switch($event_data['object']){
 			case EVENT_OBJECT_DHOST:
