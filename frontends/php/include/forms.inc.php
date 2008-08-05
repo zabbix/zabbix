@@ -5074,8 +5074,10 @@
 
 		$cmbIconOff	= new CComboBox("iconid_off",$iconid_off);
 		$cmbIconOn	= new CComboBox("iconid_on",$iconid_on);
-		$cmbIconUnknown	= new CComboBox("iconid_unknown",$iconid_unknown);
-		$cmbIconDisabled= new CComboBox("iconid_disabled",$iconid_disabled);
+		if ($elementtype != SYSMAP_ELEMENT_TYPE_MAP)
+			$cmbIconUnknown	= new CComboBox("iconid_unknown",$iconid_unknown);
+		if ($elementtype != SYSMAP_ELEMENT_TYPE_HOST_GROUP && $elementtype != SYSMAP_ELEMENT_TYPE_MAP)
+			$cmbIconDisabled= new CComboBox("iconid_disabled",$iconid_disabled);
 		
 		$result = DBselect('SELECT * FROM images WHERE imagetype=1 AND '.DBin_node('imageid').' order by name');
 		while($row=DBfetch($result)){
@@ -5083,14 +5085,22 @@
 
 			$cmbIconOff->AddItem($row["imageid"],$row["name"]);
 			$cmbIconOn->AddItem($row["imageid"],$row["name"]);
-			$cmbIconUnknown->AddItem($row["imageid"],$row["name"]);
-			$cmbIconDisabled->AddItem($row["imageid"],$row["name"]);
+			if ($elementtype != SYSMAP_ELEMENT_TYPE_MAP)
+				$cmbIconUnknown->AddItem($row["imageid"],$row["name"]);
+			if ($elementtype != SYSMAP_ELEMENT_TYPE_HOST_GROUP && $elementtype != SYSMAP_ELEMENT_TYPE_MAP)
+				$cmbIconDisabled->AddItem($row["imageid"],$row["name"]);
 		}
 		
 		$frmEl->AddRow(S_ICON_OFF,$cmbIconOff);
 		$frmEl->AddRow(S_ICON_ON,$cmbIconOn);
-		$frmEl->AddRow(S_ICON_UNKNOWN,$cmbIconUnknown);
-		$frmEl->AddRow(S_ICON_DISABLED,$cmbIconDisabled);
+		if ($elementtype != SYSMAP_ELEMENT_TYPE_MAP)
+			$frmEl->AddRow(S_ICON_UNKNOWN, $cmbIconUnknown);
+		else
+			$frmEl->AddVar("iconid_unknown", 0);
+		if ($elementtype != SYSMAP_ELEMENT_TYPE_HOST_GROUP && $elementtype != SYSMAP_ELEMENT_TYPE_MAP)
+			$frmEl->AddRow(S_ICON_DISABLED,$cmbIconDisabled);
+		else
+			$frmEl->AddVar("iconid_disabled", 0);
 
 		$frmEl->AddRow(S_COORDINATE_X, new CNumericBox("x", $x, 5));
 		$frmEl->AddRow(S_COORDINATE_Y, new CNumericBox("y", $y, 5));

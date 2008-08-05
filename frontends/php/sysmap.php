@@ -195,10 +195,10 @@ include_once "include/page_header.php";
 				nbsp($type),
 				$db_element["x"],
 				$db_element["y"],
-				new CImg("image.php?height=24&imageid=".$db_element["iconid_off"],"no image",NULL),
-				new CImg("image.php?height=24&imageid=".$db_element["iconid_on"],"no image",NULL),
-				new CImg("image.php?height=24&imageid=".$db_element["iconid_unknown"],"no image",NULL),
-				new CImg("image.php?height=24&imageid=".$db_element["iconid_disabled"],"no image",NULL)
+				$db_element["iconid_off"] ? new CImg("image.php?height=24&imageid=".$db_element["iconid_off"],"no image",NULL) : '-',
+				$db_element["iconid_on"] ? new CImg("image.php?height=24&imageid=".$db_element["iconid_on"],"no image",NULL) : '-',
+				$db_element["iconid_unknown"] ? new CImg("image.php?height=24&imageid=".$db_element["iconid_unknown"],"no image",NULL) : '-',
+				$db_element["iconid_disabled"] ? new CImg("image.php?height=24&imageid=".$db_element["iconid_disabled"],"no image",NULL) : '-'
 				));
 		}
 		$table->show();
