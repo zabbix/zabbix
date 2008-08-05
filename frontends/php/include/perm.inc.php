@@ -19,8 +19,7 @@
 **/
 ?>
 <?php
-function	permission2str($group_permission)
-{
+function permission2str($group_permission){
 	$str_perm[PERM_READ_WRITE]	= S_READ_WRITE;
 	$str_perm[PERM_READ_ONLY]	= S_READ_ONLY;
 	$str_perm[PERM_DENY]		= S_DENY;
@@ -282,9 +281,10 @@ function get_accessible_hosts_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 	$nodeid_str =(is_array($nodeid))?md5(implode('',$nodeid)):strval($nodeid);
 
 	if($cache && isset($available_hosts[$userid][$perm][$perm_res][$nodeid_str])){
+//SDI('Cache!!! '."[$userid][$perm][$perm_res]");
 		return $available_hosts[$userid][$perm][$perm_res][$nodeid_str];
 	}
-
+//SDI('NOOOO Cache!!!'."[$userid][$perm][$perm_res]");
 COpt::counter_up('perm_host['.$userid.','.$perm.','.$perm_res.','.$nodeid.']');
 COpt::counter_up('perm');
 

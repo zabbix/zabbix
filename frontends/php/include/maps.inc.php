@@ -19,23 +19,22 @@
 **/
 ?>
 <?php
-	require_once "include/images.inc.php";
-	require_once "include/hosts.inc.php";
-	require_once "include/triggers.inc.php";
-	require_once "include/scripts.inc.php";
+	require_once('include/images.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/triggers.inc.php');
+	require_once('include/scripts.inc.php');
 	
-        /*
-         * Function: map_link_drawtypes
-         *
-         * Description:
-         *     Return available drawing types for links
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         */
-	function	map_link_drawtypes()
-	{
+/*
+ * Function: map_link_drawtypes
+ *
+ * Description:
+ *     Return available drawing types for links
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ */
+	function map_link_drawtypes(){
 		return array(
 				MAP_LINK_DRAWTYPE_LINE,
 				MAP_LINK_DRAWTYPE_BOLD_LINE,
@@ -44,17 +43,17 @@
 			    );
 	}
 
-        /*
-         * Function: map_link_drawtype2str
-         *
-         * Description:
-         *     Represent integer value of links drawing type into the string
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         */
-	function	map_link_drawtype2str($drawtype){
+/*
+ * Function: map_link_drawtype2str
+ *
+ * Description:
+ *     Represent integer value of links drawing type into the string
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ */
+	function map_link_drawtype2str($drawtype){
 		switch($drawtype){
 			case MAP_LINK_DRAWTYPE_LINE:		$drawtype = S_LINE;			break;
 			case MAP_LINK_DRAWTYPE_BOLD_LINE:	$drawtype = S_BOLD_LINE;	break;
@@ -65,18 +64,15 @@
 	return $drawtype;
 	}
 
-        /*
-         * Function: sysmap_accessible
-         *
-         * Description:
-         *     Check permission for map
-         *
-	 * Return: true on success
-
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         */
+/*
+ * Function: sysmap_accessible
+ *
+ * Description: Check permission for map
+ *
+ * Return: true on success
+ *
+ * Author: Aly
+ */
 	function sysmap_accessible($sysmapid,$perm){
 		global $USER_DETAILS;
 
@@ -88,7 +84,7 @@
 							' AND '.DBin_node('sysmapid', get_current_nodeid($perm))))
 		{
 			$result = true;
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY);
 						
 			while(($se_data = DBfetch($db_result)) && $result){
 				switch($se_data['elementtype']){
@@ -98,29 +94,17 @@
 						}
 						break;
 					case SYSMAP_ELEMENT_TYPE_MAP:
-						$result &= sysmap_accessible($se_data['elementid'], PERM_READ_ONLY);
+						$result = sysmap_accessible($se_data['elementid'], PERM_READ_ONLY);
 						break;
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
-						
-						$sql = 'SELECT t.triggerid '.
-								' FROM triggers t'.
-								' WHERE t.triggerid='.$se_data['elementid'].
-									' AND '.DBcondition('t.triggerid',$available_triggers,true);
-						if(DBfetch(DBselect($sql,1))){
-								$result = false;
+						$available_triggers = get_accessible_triggers($perm, PERM_RES_IDS_ARRAY);
+						if(!uint_in_array($se_data['elementid'],$available_triggers)){
+							$result = false;
 						}
-
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
-						
-						$sql = 'SELECT g.groupid '.
-							' FROM groups g '.
-							' WHERE g.groupid='.$se_data['elementid'].
-								' AND g.groupid NOT IN('.$available_groups.') ';
-							
-						if(DBfetch(DBselect($sql,1))){
+						$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm);						
+						if(!uint_in_array($se_data['elementid'],$available_groups)){
 							$result = false;
 						}
 						break;
@@ -132,7 +116,7 @@
 				' AND '.DBin_node('sysmapid', get_current_nodeid($perm))))
 					$result = true;
 		}
-		return $result;
+	return $result;
 	}
 
 	function get_sysmap_by_sysmapid($sysmapid){
@@ -159,8 +143,7 @@
 
 // Add System Map
 
-	function add_sysmap($name,$width,$height,$backgroundid,$label_type,$label_location)
-	{
+	function add_sysmap($name,$width,$height,$backgroundid,$label_type,$label_location){
 		$sysmapid=get_dbid("sysmaps","sysmapid");
 
 		$result=DBexecute("insert into sysmaps (sysmapid,name,width,height,backgroundid,label_type,label_location)".
@@ -170,13 +153,12 @@
 		if(!$result)
 			return $result;
 
-		return $sysmapid;
+	return $sysmapid;
 	}
 
 // Update System Map
 
-	function update_sysmap($sysmapid,$name,$width,$height,$backgroundid,$label_type,$label_location)
-	{
+	function update_sysmap($sysmapid,$name,$width,$height,$backgroundid,$label_type,$label_location){
 		return	DBexecute("update sysmaps set name=".zbx_dbstr($name).",width=$width,height=$height,".
 			"backgroundid=".$backgroundid.",label_type=$label_type,".
 			"label_location=$label_location WHERE sysmapid=$sysmapid");
@@ -567,8 +549,7 @@
 			}
 		}
 
-		if(isset($tr_info[TRIGGER_VALUE_TRUE]))
-		{
+		if(isset($tr_info[TRIGGER_VALUE_TRUE])){
 			$inf =& $tr_info[TRIGGER_VALUE_TRUE];
 
 			$out['type'] = TRIGGER_VALUE_TRUE;
@@ -586,8 +567,7 @@
 
 			$out['iconid'] = $db_element['iconid_on'];
 		}
-		elseif(isset($tr_info[TRIGGER_VALUE_UNKNOWN]) && !isset($tr_info[TRIGGER_VALUE_FALSE]))
-		{
+		else if(isset($tr_info[TRIGGER_VALUE_UNKNOWN]) && !isset($tr_info[TRIGGER_VALUE_FALSE])){
 			$inf =& $tr_info[TRIGGER_VALUE_UNKNOWN];
 
 			$out['type'] = TRIGGER_VALUE_UNKNOWN;
@@ -604,8 +584,7 @@
 			else
 				$out['iconid'] = $db_element['iconid_unknown'];
 		}
-		else
-		{
+		else{
 			$inf =& $tr_info[TRIGGER_VALUE_FALSE];
 
 			$out['type'] = TRIGGER_VALUE_FALSE;
@@ -622,7 +601,7 @@
 		$out['priority'] = $inf['priority'];
 		$out['name'] = $el_name;
 
-		return $out;
+	return $out;
 	}
 
         /*
@@ -635,19 +614,16 @@
          *     Eugene Grigorjev 
          *
          */
-	function get_action_map_by_sysmapid($sysmapid)
-	{
+	function get_action_map_by_sysmapid($sysmapid){
 		$action_map = new CMap("links$sysmapid");
 
 		$db_elements=DBselect('SELECT * FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
-		while($db_element = DBfetch($db_elements))
-		{
+		while($db_element = DBfetch($db_elements)){
 			$url	= $db_element["url"];
 			$alt	= "Label: ".$db_element["label"];
 			$scripts_by_hosts = null;
 			
-			if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST)
-			{
+			if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST){
 				$host = get_host_by_hostid($db_element["elementid"]);
 				if($host["status"] != HOST_STATUS_MONITORED)	continue;
 
@@ -657,8 +633,7 @@
 				
 				$alt = "Host: ".$host["host"]." ".$alt;
 			}
-			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP)
-			{
+			else if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP){
 				$map = get_sysmap_by_sysmapid($db_element["elementid"]);
 
 				if(empty($url))
@@ -671,8 +646,7 @@
 				if(empty($url) && $db_element["elementid"]!=0)
 					$url="events.php?triggerid=".$db_element["elementid"];
 			}
-			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST_GROUP)
-			{
+			else if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
 				if(empty($url) && $db_element["elementid"]!=0)
 					$url="events.php?hostid=0&groupid=".$db_element["elementid"];
 			}

@@ -54,7 +54,7 @@
 
 						if(DBfetch(DBselect('SELECT itemid '.
 										' FROM items '.
-										' WHERE itemid IN ('.implode(',',$itemid).') '.
+										' WHERE '.DBcondition('itemid',$itemid).
 											' AND '.DBcondition('hostid',$available_hosts,true))))
 						{
 							$result = false;

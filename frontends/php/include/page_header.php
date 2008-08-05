@@ -52,15 +52,15 @@ COpt::profiling_start("page");
 		case PAGE_TYPE_XML:
 			header('Content-Type: text/xml');
 			header('Content-Disposition: attachment; filename="'.$page['file'].'"');
-			define('ZBX_PAGE_NO_MENU', 1);
+			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
 			break;
 		case PAGE_TYPE_JS:
 			header('Content-Type: application/javascript; charset=UTF-8');
-			define('ZBX_PAGE_NO_MENU', 1);
+			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
 			break;
 		case PAGE_TYPE_HTML_BLOCK:
 			header('Content-Type: text/plain; charset=UTF-8');
-			define('ZBX_PAGE_NO_MENU', 1);
+			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
 			break;
 		case PAGE_TYPE_HTML:
 		default:
