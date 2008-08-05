@@ -50,16 +50,21 @@ include_once 'include/page_header.php';
 		
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})')
-		
-	);
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL)
+	);
+		
 	check_fields($fields);
 ?>
 <?php
 
 	if(isset($_REQUEST['favobj'])){
-		if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
+		if('hat' == $_REQUEST['favobj']){
+			update_profile('web.charts.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
+		else if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
@@ -125,7 +130,7 @@ include_once 'include/page_header.php';
 
 	update_profile('web.charts.graphid',$_REQUEST['graphid']);
 
-	$h1 = array(S_GRAPHS_BIG.SPACE.'/'.SPACE);
+	$h1 = array();
 	
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
@@ -143,6 +148,8 @@ include_once 'include/page_header.php';
 		$_REQUEST['graphid'] = 0;
 		array_push($h1, S_SELECT_GRAPH_TO_DISPLAY);
 	}
+
+	$p_elements = array();
 
 	$r_form = new CForm();
 	$r_form->SetMethod('get');
@@ -287,32 +294,7 @@ include_once 'include/page_header.php';
 	
 	$r_form->AddItem(array(SPACE.S_GRAPH.SPACE,$cmbGraph));
 	
-	if($_REQUEST['graphid'] > 0){
-		if(infavorites('web.favorite.graphids',$_REQUEST['graphid'],'graphid')){
-			$icon = new CDiv(SPACE,'iconminus');
-			$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
-			$icon->AddAction('onclick',new CScript("javascript: rm4favorites('graphid','".$_REQUEST['graphid']."',0);"));
-		}
-		else{
-			$icon = new CDiv(SPACE,'iconplus');
-			$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
-			$icon->AddAction('onclick',new CScript("javascript: add2favorites('graphid','".$_REQUEST['graphid']."');"));
-		}
-		$icon->AddOption('id','addrm_fav');
-		
-		$url = '?graphid='.$_REQUEST['graphid'].($_REQUEST['fullscreen']?'':'&fullscreen=1');
-
-		$fs_icon = new CDiv(SPACE,'fullscreen');
-		$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
-
-		$icon_tab = new CTable();
-		$icon_tab->AddRow(array($fs_icon,$icon,SPACE,$h1));
-		
-		$h1 = $icon_tab;
-	}
-	
-	show_table_header($h1, $r_form);
+	$p_elements[] = get_table_header($h1, $r_form);
 ?>
 <?php
 	$table = new CTableInfo('...','chart');
@@ -379,8 +361,41 @@ include_once 'include/page_header.php';
 		
 		$table->AddRow(new CScript($row));
 	}
-	$table->Show();
-	echo SBR;
+	
+	$p_elements[] = $table;
+	$p_elements[] = BR();
+	
+	$icon = null;
+	$fs_icon = null;
+	if($_REQUEST['graphid'] > 0){
+		if(infavorites('web.favorite.graphids',$_REQUEST['graphid'],'graphid')){
+			$icon = new CDiv(SPACE,'iconminus');
+			$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
+			$icon->AddAction('onclick',new CScript("javascript: rm4favorites('graphid','".$_REQUEST['graphid']."',0);"));
+		}
+		else{
+			$icon = new CDiv(SPACE,'iconplus');
+			$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
+			$icon->AddAction('onclick',new CScript("javascript: add2favorites('graphid','".$_REQUEST['graphid']."');"));
+		}
+		$icon->AddOption('id','addrm_fav');
+		
+		$url = '?graphid='.$_REQUEST['graphid'].($_REQUEST['fullscreen']?'':'&fullscreen=1');
+
+		$fs_icon = new CDiv(SPACE,'fullscreen');
+		$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+		$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	}
+	
+	$charts_hat = create_hat(
+			S_GRAPHS_BIG,
+			$p_elements,
+			array($icon,$fs_icon),
+			'hat_charts',
+			get_profile('web.charts.hats.hat_charts.state',1)
+	);
+
+	$charts_hat->Show();
 	
 	if($_REQUEST['graphid'] > 0){
 // NAV BAR

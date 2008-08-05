@@ -2859,8 +2859,6 @@
 		$tblAct->AddRow(array(S_STATUS, $cmbStatus));
 
 		$tblAction = new CTableInfo();
-		$tblAction->AddOption('style','background-color: #CCC;');
-		
 		$tblAction->AddRow($tblAct);
 
 		$td = new CCol(array(new CButton('save',S_SAVE)));
@@ -2991,8 +2989,6 @@
 		$tblCond->AddRow(array(S_CONDITIONS, $cond_el));
 		
 		$tblConditions = new CTableInfo();
-		$tblConditions->AddOption('style','background-color: #CCC;');
-		
 		$tblConditions->AddRow($tblCond);
 
 		$td = new CCol($cond_buttons);
@@ -3007,7 +3003,6 @@
 	
 	function get_act_new_cond_form($action=null){
 		$tblCond = new CTable('','nowrap');
-		$tblCond->AddOption('style','background-color: #CCC;');
 
 		if(isset($_REQUEST['actionid']) && empty($action)){
 			$action = get_action_by_actionid($_REQUEST['actionid']);
@@ -3160,7 +3155,6 @@
 		$tblCond->AddRow($rowCondition);
 		
 		$tblConditions = new CTableInfo();
-		$tblConditions->AddOption('style','background-color: #CCC;');
 		
 		$tblConditions->AddRow($tblCond);
 
@@ -3298,8 +3292,9 @@
 		}
 		unset($operations);
 
+		$tblOperFooter = new CTableInfo(null);
+		
 		$oper_buttons = array();
-
 		if(!isset($_REQUEST['new_operation'])){
 			$oper_buttons[] = new CButton('new_operation',S_NEW);
 		}
@@ -3307,19 +3302,19 @@
 		if($tblOper->ItemsCount() > 0 ){
 			$oper_buttons[] = new CButton('del_operation',S_DELETE_SELECTED);
 		}
-
+		
 		$td = new CCol($oper_buttons);
 		$td->AddOption('colspan',isset($_REQUEST['escalation'])?6:3);
 		$td->AddOption('style','text-align: right;');
 		
-		$tblOper->SetFooter($td);
+
+		$tblOperFooter->SetFooter($td);
 // end of condition list preparation
-	return $tblOper;
+	return array($tblOper,$tblOperFooter);
 	}
 	
 	function get_act_new_oper_form($action=null){
 		$tblOper = new CTableInfo();
-		$tblOper->AddOption('style','background-color: #CCC;');
 
 		if(isset($_REQUEST['actionid']) && empty($action)){
 			$action = get_action_by_actionid($_REQUEST['actionid']);
@@ -3640,6 +3635,7 @@
 		
 		$tblOper->AddRow($tblNewOperation);
 
+
 		$td = new CCol(array(
 			new CButton('add_operation', isset($update_mode)?S_SAVE:S_ADD),
 			SPACE,
@@ -3656,7 +3652,6 @@
 	
 	function get_oper_new_cond_form($action=null){
 		$tblCond = new CTable('','nowrap');
-		$tblCond->AddOption('style','background-color: #CCC;');
 
 		if(isset($_REQUEST['actionid']) && empty($action)){
 			$action = get_action_by_actionid($_REQUEST['actionid']);
@@ -3713,8 +3708,7 @@
 		$tblCond->AddRow($rowCondition);
 		
 		$tblConditions = new CTableInfo();
-		$tblConditions->AddOption('style','background-color: #CCC;');
-		
+
 		$tblConditions->AddRow($tblCond);
 
 		$td = new CCol(array(new CButton('add_opcondition',S_ADD),new CButton('cancel_new_opcondition',S_CANCEL)));
@@ -3798,8 +3792,7 @@
 		$frmMeadia->Show();
 	}
 
-	function	insert_image_form()
-	{
+	function insert_image_form(){
 
 
 		$frmImages = new CFormTable(S_IMAGE,"config.php","post","multipart/form-data");

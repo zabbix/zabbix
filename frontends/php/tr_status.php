@@ -312,7 +312,7 @@ include_once "include/page_header.php";
 
 	$tr_select = new CComboBox('show_triggers',$show_triggers,'javasctipt: submit();');
 	if(TRIGGERS_OPTION_ONLYTRUE){
-		$tr_select->Additem(TRIGGERS_OPTION_ONLYTRUE,S_SHOW_ONLY_TRUE);
+		$tr_select->Additem(TRIGGERS_OPTION_ONLYTRUE,S_SHOW_ONLY_PROBLEMS);
 	}
 	
 	if(TRIGGERS_OPTION_ALL){
@@ -337,7 +337,7 @@ include_once "include/page_header.php";
 	}
 	
 	if(EVENTS_OPTION_ONLYTRUE_NOTACK && $config['event_ack_enable']){
-		$ev_select->AddItem(EVENTS_OPTION_ONLYTRUE_NOTACK,S_SHOW_TRUE_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
+		$ev_select->AddItem(EVENTS_OPTION_ONLYTRUE_NOTACK,S_SHOW_PROBLEM_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
 	}
 
 //------- JP -------
@@ -563,11 +563,11 @@ include_once "include/page_header.php";
 			$table->AddRow(array(
 				($config['event_ack_enable'])?SPACE:NULL,
 				new CCol(
-					get_severity_description($row["priority"]),
-					get_severity_style($row["priority"])
+					get_severity_description($row['priority']),
+					get_severity_style($row['priority'],$row['value'])
 					),
 				$value,
-				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"events.php?triggerid=".$row["triggerid"],"action"),								
+				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row['lastchange']),'events.php?triggerid='.$row['triggerid'],'action'),
 				get_node_name_by_elid($row['triggerid']),
 				$host,
 				$description,
@@ -616,11 +616,11 @@ include_once "include/page_header.php";
 			$table->AddRow(array(
 					($config['event_ack_enable'])?(($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid']))):NULL,
 					new CCol(
-						get_severity_description($row["priority"]),
-						get_severity_style($row["priority"])
+						get_severity_description($row['priority']),
+						get_severity_style($row['priority'],$row['value'])
 						),
 					$value,
-					new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"events.php?triggerid=".$row["triggerid"],"action"),					
+					new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'],'action'),					
 					get_node_name_by_elid($row['triggerid']),
 					$host,
 					$description,
