@@ -94,7 +94,7 @@
 						}
 						break;
 					case SYSMAP_ELEMENT_TYPE_MAP:
-						$result = sysmap_accessible($se_data['elementid'], PERM_READ_ONLY);
+						$result = sysmap_accessible($se_data['elementid'], $perm);
 						break;
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						$available_triggers = get_accessible_triggers($perm, PERM_RES_IDS_ARRAY);
@@ -103,7 +103,7 @@
 						}
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm);						
+						$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY);
 						if(!uint_in_array($se_data['elementid'],$available_groups)){
 							$result = false;
 						}
