@@ -20,11 +20,9 @@
 ?>
 <?php
 
-	class CHostsInfo extends CTable
-	{
+	class CHostsInfo extends CTable{
 		//var $style;
-		function CHostsInfo($groupid=0, $style = STYLE_HORISONTAL)
-		{
+		function CHostsInfo($groupid=0, $style = STYLE_HORISONTAL){
 			$this->nodeid = id2nodeid($groupid);
 			$this->groupid = $groupid;
 			$this->style = null;
@@ -33,16 +31,14 @@
 			$this->SetOrientation($style);
 		}
 
-		function SetOrientation($value)
-		{
+		function SetOrientation($value){
 			if($value != STYLE_HORISONTAL && $value != STYLE_VERTICAL)
 				return $this->error("Incorrect value for SetOrientation [$value]");
 
 			$this->style = $value;
 		}
 
-		function BodyToString()
-		{
+		function BodyToString(){
 			global $USER_DETAILS; 
 			$this->CleanItems();
 
@@ -53,6 +49,7 @@
 			$db_host_cnt = DBselect('SELECT COUNT(*) as cnt '.
 									' FROM hosts h, hosts_groups hg'.
 									' WHERE h.available='.HOST_AVAILABLE_TRUE.
+//										' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
 										' AND hg.groupid IN ('.$accessible_groups.') '.$cond);
 										
 			$host_cnt = DBfetch($db_host_cnt);
@@ -61,6 +58,7 @@
 			$db_host_cnt = DBselect('SELECT COUNT(*) as cnt '.
 									' FROM hosts h, hosts_groups hg'.
 									' WHERE h.available='.HOST_AVAILABLE_FALSE.
+//										' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
 										' AND hg.groupid IN ('.$accessible_groups.') '.$cond);
 
 			$host_cnt = DBfetch($db_host_cnt);
@@ -69,6 +67,7 @@
 			$db_host_cnt = DBselect('SELECT COUNT(*) as cnt '.
 									' FROM hosts h, hosts_groups hg'.
 									' WHERE h.available='.HOST_AVAILABLE_UNKNOWN.
+//										' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
 										' AND hg.groupid IN ('.$accessible_groups.') '.$cond);
 										
 
@@ -97,12 +96,10 @@
 			$notav	= new CCol($notav."  ".S_NOT_AVAILABLE,	"notav");
 			$uncn	= new CCol($uncn."  ".S_UNKNOWN,		"uncn");
 
-			if($this->style == STYLE_HORISONTAL)
-			{
+			if($this->style == STYLE_HORISONTAL){
 				$this->AddRow(array($avail, $notav, $uncn));
 			}
-			else
-			{			
+			else{
 				$this->AddRow($avail);
 				$this->AddRow($notav);
 				$this->AddRow($uncn);

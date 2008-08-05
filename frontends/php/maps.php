@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
+	require_once('include/config.inc.php');
 	
-	$page["title"] = "S_NETWORK_MAPS";
-	$page["file"] = "maps.php";
+	$page['title'] = "S_NETWORK_MAPS";
+	$page['file'] = 'maps.php';
 	$page['hist_arg'] = array('sysmapid');
 	$page['scripts'] = array('prototype.js','url.js');
 	
@@ -32,7 +32,7 @@
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
 	
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 ?>
 <?php

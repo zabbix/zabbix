@@ -191,11 +191,17 @@
  *     Aly
  *
  */		
-	function get_accessible_graphs($perm,$perm_res=null,$nodeid=null,$hostid=null){
+	function get_accessible_graphs($perm,$perm_res=null,$nodeid=null,$hostid=null,$cache=1){
 		global $USER_DETAILS;
-
-		if(is_null($perm_res))
-			$perm_res = PERM_RES_STRING_LINE;
+		static $available_graphs;
+		
+		if(is_null($perm_res)) $perm_res = PERM_RES_STRING_LINE;
+		$nodeid_str =(is_array($nodeid))?implode('',$nodeid):strval($nodeid);
+		$hostid_str =(is_array($hostid))?implode('',$hostid):strval($hostid);
+		
+		if($cache && isset($available_graphs[$perm][$perm_res][$nodeid_str][$hostid_str])){
+			return $available_triggers[$perm][$perm_res][$nodeid_str][$hostid_str];
+		}
 		
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid);
 
@@ -233,6 +239,8 @@
 			else
 				$result = implode(',',$result);
 		}
+		
+		$available_graphs[$perm][$perm_res][$nodeid_str][$hostid_str] = $result;
 
 	return $result;
 	}

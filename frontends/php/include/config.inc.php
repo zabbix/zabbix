@@ -131,7 +131,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
 
 			/* Init LOCAL NODE ID */
-			if($local_node_data = DBfetch(DBselect('select * from nodes where nodetype=1 order by nodeid'))){
+			if($local_node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodetype=1 order by nodeid'))){
 				$ZBX_LOCALNODEID = $local_node_data['nodeid'];
 				$ZBX_LOCMASTERID = $local_node_data['masterid'];
 
@@ -221,7 +221,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED){
 //SDI($_REQUEST);
 			$ZBX_CURRENT_NODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node
-			$ZBX_WITH_SUBNODES = get_cookie('zbx_with_subnodes', false); // Show elements from subnodes
+			$ZBX_WITH_SUBNODES = get_cookie('zbx_with_subnodes', false); // Show elements FROM subnodes
 
 			if(isset($_REQUEST['switch_node'])){
 				if($node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$_REQUEST['switch_node']))){
@@ -528,8 +528,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$priority = array(0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0);
 		$triggerids="";
 
-	       	$result=DBselect('select t.triggerid,t.priority from triggers t,hosts h,items i,functions f'.
-			'  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0');
+	       	$result=DBselect('SELECT t.triggerid,t.priority from triggers t,hosts h,items i,functions f'.
+			'  WHERE t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0');
 
 		while($row=DBfetch($result)){
 			$ack = get_last_event_by_triggerid($row["triggerid"]);
@@ -711,10 +711,10 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *                                                                            *
 	 ******************************************************************************/
 	function reset_items_nextcheck($triggerid){
-		$sql="select itemid from functions where triggerid=$triggerid";
+		$sql="SELECT itemid from functions WHERE triggerid=$triggerid";
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
-			$sql="update items set nextcheck=0 where itemid=".$row["itemid"];
+			$sql="update items set nextcheck=0 WHERE itemid=".$row["itemid"];
 			DBexecute($sql);
 		}
 	}
@@ -731,38 +731,39 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		}
 // history & trends
 /*		if ($DB['DB_TYPE'] == "MYSQL"){
-			$row=DBfetch(DBselect("show table status like 'history'"));
+			$row=DBfetch(DBselect('show table status like "history"'));
 			$status["history_count"]  = $row["Rows"];
-			$row=DBfetch(DBselect("show table status like 'history_log'"));
+			$row=DBfetch(DBselect('show table status like "history_log"'));
 			$status["history_count"] += $row["Rows"];
-			$row=DBfetch(DBselect("show table status like 'history_str'"));
+			$row=DBfetch(DBselect('show table status like "history_str"'));
 			$status["history_count"] += $row["Rows"];
-			$row=DBfetch(DBselect("show table status like 'history_uint'"));
+			$row=DBfetch(DBselect('show table status like "history_uint"'));
 			$status["history_count"] += $row["Rows"];
 
-			$row=DBfetch(DBselect("show table status like 'trends'"));
+			$row=DBfetch(DBselect('show table status like "trends"'));
 			$status["trends_count"] = $row["Rows"];
 		}
 		else{
-			$row=DBfetch(DBselect("select count(itemid) as cnt from history"));
+			$row=DBfetch(DBselect('SELECT COUNT(itemid) as cnt from history'));
 			$status["history_count"]  = $row["cnt"];
-			$row=DBfetch(DBselect("select count(itemid) as cnt from history_log"));
+			$row=DBfetch(DBselect('SELECT COUNT(itemid) as cnt from history_log'));
 			$status["history_count"] += $row["cnt"];
-			$row=DBfetch(DBselect("select count(itemid) as cnt from history_str"));
+			$row=DBfetch(DBselect('SELECT COUNT(itemid) as cnt from history_str'));
 			$status["history_count"] += $row["cnt"];
-			$row=DBfetch(DBselect("select count(itemid) as cnt from history_uint"));
+			$row=DBfetch(DBselect('SELECT COUNT(itemid) as cnt from history_uint'));
 			$status["history_count"] += $row["cnt"];
 
-			$result=DBselect("select count(itemid) as cnt from trends");
+			$result=DBselect('SELECT COUNT(itemid) as cnt from trends');
 			$row=DBfetch($result);
 			$status["trends_count"]=$row["cnt"];
 		}*/
 // events
-/*		$row=DBfetch(DBselect("select count(eventid) as cnt from events"));
+/*		$row=DBfetch(DBselect('SELECT COUNT(eventid) as cnt from events'));
 		$status["events_count"]=$row["cnt"];*/
 // alerts
-/*		$row=DBfetch(DBselect("select count(alertid) as cnt from alerts"));
+/*		$row=DBfetch(DBselect('SELECT COUNT(alertid) as cnt from alerts"));
 		$status["alerts_count"]=$row["cnt"];*/
+		
 // triggers
 		$sql = 'SELECT COUNT(DISTINCT t.triggerid) as cnt '.
 				' FROM triggers t, functions f, items i, hosts h'.
@@ -773,22 +774,23 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					' AND h.status='.HOST_STATUS_MONITORED;
 					
 		$row=DBfetch(DBselect($sql));
-		$status["triggers_count"]=$row["cnt"];
+		$status['triggers_count']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql." and t.status=0"));
-		$status["triggers_count_enabled"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql.' and t.status=0'));
+		$status['triggers_count_enabled']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql." and t.status=1"));
-		$status["triggers_count_disabled"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql.' and t.status=1'));
+		$status['triggers_count_disabled']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql." and t.status=0 and t.value=0"));
-		$status["triggers_count_off"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql.' and t.status=0 and t.value=0'));
+		$status['triggers_count_off']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql." and t.status=0 and t.value=1"));
-		$status["triggers_count_on"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql.' and t.status=0 and t.value=1'));
+		$status['triggers_count_on']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql." and t.status=0 and t.value=2"));
-		$status["triggers_count_unknown"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql.' and t.status=0 and t.value=2'));
+		$status['triggers_count_unknown']=$row['cnt'];
+		
 // items 
 		$sql = 'SELECT COUNT(DISTINCT i.itemid) as cnt '.
 				' FROM items i, hosts h '.
@@ -796,127 +798,147 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					' AND h.status='.HOST_STATUS_MONITORED;
 					
 		$row=DBfetch(DBselect($sql));
-		$status["items_count"]=$row["cnt"];
+		$status['items_count']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql." and i.status=0"));
-		$status["items_count_monitored"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql.' and i.status=0'));
+		$status['items_count_monitored']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql." and i.status=1"));
-		$status["items_count_disabled"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql.' and i.status=1'));
+		$status['items_count_disabled']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql." and i.status=3"));
-		$status["items_count_not_supported"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql.' and i.status=3'));
+		$status['items_count_not_supported']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql." and i.type=2"));
-		$status["items_count_trapper"]=$row["cnt"];
-// hosts
-		$row=DBfetch(DBselect("select count(hostid) as cnt from hosts"));
-		$status["hosts_count"]=$row["cnt"];
-
-		$row=DBfetch(DBselect("select count(hostid) as cnt from hosts where status=".HOST_STATUS_MONITORED));
-		$status["hosts_count_monitored"]=$row["cnt"];
-
-		$row=DBfetch(DBselect("select count(hostid) as cnt from hosts where status=".HOST_STATUS_NOT_MONITORED));
-		$status["hosts_count_not_monitored"]=$row["cnt"];
-
-		$row=DBfetch(DBselect("select count(hostid) as cnt from hosts where status=".HOST_STATUS_TEMPLATE));
-		$status["hosts_count_template"]=$row["cnt"];
-
-		$row=DBfetch(DBselect("select count(hostid) as cnt from hosts where status=".HOST_STATUS_DELETED));
-		$status["hosts_count_deleted"]=$row["cnt"];
-// users
-		$row=DBfetch(DBselect("select count(userid) as cnt from users"));
-		$status["users_count"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql.' and i.type=2'));
+		$status['items_count_trapper']=$row['cnt'];
 		
-		$status["users_online"]=0;
-		$result=DBselect("select distinct s.userid from sessions s, users u where u.userid=s.userid and u.autologout>0 and (s.lastaccess+u.autologout)>".time());
-		while(DBfetch($result))		$status["users_online"]++;
-		$result=DBselect("select distinct s.userid from sessions s, users u where u.userid=s.userid and u.autologout=0");
-		while(DBfetch($result))		$status["users_online"]++;
+// hosts
+		$sql = 'SELECT COUNT(hostid) as cnt '.
+				' FROM hosts '.
+				' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.','.HOST_STATUS_DELETED.' )';
+		$row=DBfetch(DBselect($sql));
+		$status['hosts_count']=$row['cnt'];
 
-		$result=DBselect("select i.type, i.delay, count(*),count(*)/i.delay as qps from items i,hosts h where i.status=".ITEM_STATUS_ACTIVE." and i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED." group by i.type,i.delay order by i.type, i.delay");
+		$row=DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_MONITORED));
+		$status['hosts_count_monitored']=$row['cnt'];
 
-		$status["qps_total"]=0;
+		$row=DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_NOT_MONITORED));
+		$status['hosts_count_not_monitored']=$row['cnt'];
+
+		$row=DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_TEMPLATE));
+		$status['hosts_count_template']=$row['cnt'];
+
+		$row=DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_DELETED));
+		$status['hosts_count_deleted']=$row['cnt'];
+		
+// users
+		$row=DBfetch(DBselect('SELECT COUNT(userid) as cnt FROM users'));
+		$status['users_count']=$row['cnt'];
+		
+		$status['users_online']=0;
+		$sql = 'SELECT DISTINCT s.userid '.
+				' FROM sessions s, users u '.
+				' WHERE u.userid=s.userid '.
+					' AND u.autologout>0 '.
+					' AND (s.lastaccess+u.autologout)>'.time();
+		$result=DBselect($sql);	
+		while(DBfetch($result))		$status['users_online']++;
+		
+		$result=DBselect('SELECT DISTINCT s.userid '.
+						' FROM sessions s, users u '.
+						' WHERE u.userid=s.userid '.
+							' AND u.autologout=0');
+		while(DBfetch($result))		$status['users_online']++;
+
+		$result=DBselect('SELECT i.type, i.delay, count(*),count(*)/i.delay as qps '.
+							' FROM items i,hosts h '.
+							' WHERE i.status='.ITEM_STATUS_ACTIVE.
+								' AND i.hostid=h.hostid '.
+								' AND h.status='.HOST_STATUS_MONITORED.
+							' GROUP BY i.type,i.delay '.
+							' ORDER BY i.type, i.delay');
+
+		$status['qps_total']=0;
 		while($row=DBfetch($result)){
-			$status["qps_total"]+=$row["qps"];
+			$status['qps_total']+=$row['qps'];
 		}
 
-		return $status;
+	return $status;
 	}
 
 	function get_resource_name($permission,$id){
-		$res="-";
-		if($permission=="Graph"){
+		$res='-';
+		if($permission=='Graph'){
 			if(isset($id)&&($id!=0)){
 				if($graph=get_graph_by_graphid($id))
-					$res=$graph["name"];
+					$res=$graph['name'];
 			}
 			else if(!isset($id) || $id == 0){
-				$res="All graphs";
+				$res='All graphs';
 			}
 		}
-		else if($permission=="Host"){
+		else if($permission=='Host'){
 			if(isset($id)&&($id!=0)){
 				if($host=get_host_by_hostid($id))
-					$res=$host["host"];
+					$res=$host['host'];
 			}
 			else if(!isset($id) || $id == 0){
-				$res="All hosts";
+				$res='All hosts';
 			}
 		}
-		else if($permission=="Screen"){
+		else if($permission=='Screen'){
 			if(isset($id)&&($id!=0)){
 				if($screen=get_screen_by_screenid($id))
-					$res=$screen["name"];
+					$res=$screen['name'];
 			}
 			else if(!isset($id) || $id == 0){
-				$res="All screens";
+				$res='All screens';
 			}
 		}
-		else if($permission=="Item"){
+		else if($permission=='Item'){
 			if(isset($id)&&($id!=0)){
 				if($item=get_item_by_itemid($id))
-					if($host=get_host_by_hostid($item["hostid"]))
-						$res=$host["host"].":".$item["description"];
+					if($host=get_host_by_hostid($item['hostid']))
+						$res=$host['host'].':'.$item['description'];
 			}
 			else if(!isset($id) || $id == 0){
-				$res="All items";
+				$res='All items';
 			}
 		}
-		else if($permission=="User"){
+		else if($permission=='User'){
 			if(isset($id)&&($id!=0)){
 				if($user=get_user_by_userid($id))
-					$res=$user["alias"];
+					$res=$user['alias'];
 			}
 			else if(!isset($id) || $id == 0){
-				$res="All users";
+				$res='All users';
 			}
 		}
-		else if($permission=="Network map"){
+		else if($permission=='Network map'){
 			if(isset($id)&&($id!=0)){
 				if($user=get_sysmap_by_sysmapid($id))
-					$res=$user["name"];
+					$res=$user['name'];
 			}
 			else if(!isset($id) || $id == 0){
-				$res="All maps";
+				$res='All maps';
 			}
 		}
-		else if($permission=="Application"){
+		else if($permission=='Application'){
 			if(isset($id)&&($id > 0)){
 				if($app = get_application_by_applicationid($id))
-					$res = $app["name"];
+					$res = $app['name'];
 			}
 			else if(!isset($id) || $id == 0){
-				$res="All applications";
+				$res='All applications';
 			}
 		}
-		else if($permission=="Service"){
+		else if($permission=='Service'){
 			if(isset($id)&&($id > 0)){
 				if($service = get_service_by_serviceid($id))
-					$res = $service["name"];
+					$res = $service['name'];
 			}
 			else if(!isset($id) || $id == 0){
-				$res="All services";
+				$res='All services';
 			}
 		}
 
@@ -927,7 +949,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	}
 
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
-	if(function_exists("imagesetstyle")){
+	if(function_exists('imagesetstyle')){
 		function DashedLine($image,$x1,$y1,$x2,$y2,$color){
 // Style for dashed lines
 //			$style = array($color, $color, $color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
@@ -988,7 +1010,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 /*************** VALUE MAPPING ******************/
 	function add_mapping_to_valuemap($valuemapid, $mappings){
-		DBexecute("delete from mappings where valuemapid=$valuemapid");
+		DBexecute("delete FROM mappings WHERE valuemapid=$valuemapid");
 
 		foreach($mappings as $map){
 			$mappingid = get_dbid("mappings","mappingid");
@@ -1026,7 +1048,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		if(!is_array($mappings))	return FALSE;
 
 		$result = DBexecute("update valuemaps set name=".zbx_dbstr($name).
-			" where valuemapid=$valuemapid");
+			" WHERE valuemapid=$valuemapid");
 
 		if(!$result)
 			return $result;
@@ -1039,16 +1061,16 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	}
 
 	function delete_valuemap($valuemapid){
-		DBexecute("delete from mappings where valuemapid=$valuemapid");
-		DBexecute("delete from valuemaps where valuemapid=$valuemapid");
+		DBexecute("delete FROM mappings WHERE valuemapid=$valuemapid");
+		DBexecute("delete FROM valuemaps WHERE valuemapid=$valuemapid");
 		return TRUE;
 	}
 
 	function replace_value_by_map($value, $valuemapid){
 		if($valuemapid < 1) return $value;
 
-		$result = DBselect("select newvalue from mappings".
-			" where valuemapid=".zbx_dbstr($valuemapid)." and value=".zbx_dbstr($value));
+		$result = DBselect("SELECT newvalue FROM mappings".
+			" WHERE valuemapid=".zbx_dbstr($valuemapid)." and value=".zbx_dbstr($value));
 		$row = DBfetch($result);
 		if($row){
 			return $row["newvalue"]." "."($value)";
