@@ -953,6 +953,7 @@
 	'S_OK_BIG'=>				'OK',
 	'S_PROBLEMS_SMALL'=>			'problems',
 	'S_ZABBIX_URL'=>			'http://www.zabbix.com',
+	'S_PROBLEM_BIG'=>			'PROBLEM',
 
 //	maps.php
 	'S_NETWORK_MAPS'=>			'Network maps',
