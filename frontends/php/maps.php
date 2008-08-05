@@ -54,11 +54,9 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(isset($_REQUEST['favobj'])){
-		if(isset($_REQUEST['favobj'])){
-			if('hat' == $_REQUEST['favobj']){
-				update_profile('web.maps.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
-			}
-		}	
+		if('hat' == $_REQUEST['favobj']){
+			update_profile('web.maps.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
 		else if('sysmapid' == $_REQUEST['favobj']){
 			$result = false;
 			if('add' == $_REQUEST['action']){
@@ -124,6 +122,43 @@ include_once('include/page_header.php');
 <?php
 	$p_elements = array();
 	
+	$text = null;
+	if(isset($_REQUEST["sysmapid"])){
+		$sysmap = get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
+		$text = $all_maps[$_REQUEST["sysmapid"]];		
+	}
+
+	$form = new CForm();
+	$form->SetMethod('get');
+	
+	$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
+
+	$cmbMaps = new CComboBox("sysmapid",get_request("sysmapid",0),"submit()");
+	
+	foreach($all_maps as $id => $name){
+		$cmbMaps->AddItem($id, $name);
+	}
+	
+	if($cmbMaps->ItemsCount()>0){
+		$form->AddItem($cmbMaps);
+		$p_elements[] = get_table_header($text,$form);
+	}
+?>
+<?php
+	$table = new CTable(S_NO_MAPS_DEFINED,"map");
+	if(isset($_REQUEST["sysmapid"])){
+		$action_map = get_action_map_by_sysmapid($_REQUEST["sysmapid"]);
+		$table->AddRow($action_map);
+
+		$imgMap = new CImg("map.php?noedit=1&sysmapid=".$_REQUEST["sysmapid"]);
+		$imgMap->SetMap($action_map->GetName());
+		$table->AddRow($imgMap);
+	}
+		
+	$p_elements[] = $table;
+
+	$icon = null;
+	$fs_icon = null;
 	if(isset($_REQUEST["sysmapid"])){
 		$sysmap = get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
 
@@ -147,36 +182,6 @@ include_once('include/page_header.php');
 		$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 		$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));	
 	}
-
-	$form = new CForm();
-	$form->SetMethod('get');
-	
-	$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
-
-	$cmbMaps = new CComboBox("sysmapid",get_request("sysmapid",0),"submit()");
-	
-	foreach($all_maps as $id => $name){
-		$cmbMaps->AddItem($id, $name);
-	}
-	
-	if($cmbMaps->ItemsCount()>0){
-		$form->AddItem($cmbMaps);
-	}
-
-	$p_elements[] = get_table_header($text,$form);
-?>
-<?php
-	$table = new CTable(S_NO_MAPS_DEFINED,"map");
-	if(isset($_REQUEST["sysmapid"])){
-		$action_map = get_action_map_by_sysmapid($_REQUEST["sysmapid"]);
-		$table->AddRow($action_map);
-
-		$imgMap = new CImg("map.php?noedit=1&sysmapid=".$_REQUEST["sysmapid"]);
-		$imgMap->SetMap($action_map->GetName());
-		$table->AddRow($imgMap);
-	}
-		
-	$p_elements[] = $table;
 	
 	$latest_hat = create_hat(
 			S_NETWORK_MAPS_BIG,

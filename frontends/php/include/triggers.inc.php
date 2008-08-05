@@ -354,8 +354,8 @@
 	 *
 	 */
 	function	trigger_value2str($value){
-		$str_val[TRIGGER_VALUE_FALSE]	= S_FALSE_BIG;
-		$str_val[TRIGGER_VALUE_TRUE]	= S_TRUE_BIG;
+		$str_val[TRIGGER_VALUE_FALSE]	= S_OK_BIG;
+		$str_val[TRIGGER_VALUE_TRUE]	= S_PROBLEM_BIG;
 		$str_val[TRIGGER_VALUE_UNKNOWN]	= S_UNKNOWN_BIG;
 
 		if(isset($str_val[$value]))

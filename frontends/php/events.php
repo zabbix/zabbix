@@ -325,16 +325,8 @@ include_once "include/page_header.php";
 				continue;
 			}
 		
-			if($row["value"] == TRIGGER_VALUE_FALSE){
-				$value=new CCol(S_FALSE_BIG,"off");
-			}
-			elseif($row["value"] == TRIGGER_VALUE_TRUE){
-				$value=new CCol(S_TRUE_BIG,"on");
-			}
-			else{
-				$value=new CCol(S_UNKNOWN_BIG,"unknown");
-			}
-
+			$value = new CCol(trigger_value2str($row['value']), get_trigger_value_style($row["value"]));
+			
 			$row = array_merge($triggers[$row['triggerid']],$row);
 			if((0 == $show_unknown) && (!event_initial_time($row,$show_unknown))) continue;
 			
@@ -365,7 +357,7 @@ include_once "include/page_header.php";
 					"action"
 					),
 				$value,
-				new CCol(get_severity_description($row["priority"]), get_severity_style($row["priority"])),
+				new CCol(get_severity_description($row["priority"]), get_severity_style($row["priority"],$row['value'])),
 				$duration,
 				($config['event_ack_enable'])?$ack:NULL,
 				$actions
