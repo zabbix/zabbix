@@ -449,7 +449,7 @@ return 	$table;
 function make_latest_issues(){
 	global $USER_DETAILS;
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+//	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
 	$scripts_by_hosts = get_accessible_scripts_by_hosts($available_hosts);
@@ -479,6 +479,7 @@ function make_latest_issues(){
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND t.value='.TRIGGER_VALUE_TRUE.
 				' ORDER BY t.lastchange DESC';
+//SDI($sql);
 	$result = DBselect($sql);
 
 	while($row=DBfetch($result)){
