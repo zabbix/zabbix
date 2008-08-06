@@ -30,7 +30,7 @@
 
 		if(DBfetch(DBselect('SELECT screenid FROM screens WHERE screenid='.$screenid.' AND '.DBin_node('screenid', get_current_nodeid($perm))))){
 			$result = true;
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY);
 			
 			$db_result = DBselect('SELECT * FROM screens_items WHERE screenid='.$screenid);
 			while(($ac_data = DBfetch($db_result)) && $result){
@@ -51,6 +51,8 @@
 					case SCREEN_RESOURCE_PLAIN_TEXT:
 						if(!isset($itemid))
 							$itemid = array($ac_data['resourceid']);
+						else if(!is_array($itemid))
+							$itemid = array($itemid);
 
 						if(DBfetch(DBselect('SELECT itemid '.
 										' FROM items '.
