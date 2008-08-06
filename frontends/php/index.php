@@ -57,25 +57,23 @@
 	
 	$config = select_config();
 	$authentication_type = $config['authentication_type'];
-	
+
 	if($authentication_type == ZBX_AUTH_HTTP){
-		
 		if(isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])){
 			if(!isset($sessionid)) $_REQUEST['enter'] = 'Enter';
 			
 			$_REQUEST['name'] = $_SERVER["PHP_AUTH_USER"];
-//			$_REQUEST['password'] = $_SERVER["PHP_AUTH_PW"];
+			$_REQUEST['password'] = 'zabbix';//$_SERVER["PHP_AUTH_PW"];
 		}
 		else{
 			access_deny();
 		}
 	}
-	
+
 	if(isset($_REQUEST['enter'])&&($_REQUEST['enter']=='Enter')){
 		
 		$name = get_request('name','');
 		$passwd = get_request('password','');
-		
 		$password = md5($passwd);
 
 		$sql = 'SELECT u.userid,u.attempt_failed, u.attempt_clock, u.attempt_ip '.
@@ -88,10 +86,10 @@
 //									' AND ('.time().'-attempt_clock)>'.ZBX_LOGIN_BLOCK.'))';
 					
 		$login = $attempt = DBfetch(DBselect($sql));
-		
+
 		if(($name!=ZBX_GUEST_USER) && zbx_empty($passwd)){
 			$login = $attempt = false;
-		}		
+		}
 		
 		if($login){
 			if($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS){

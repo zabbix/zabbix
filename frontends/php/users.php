@@ -540,7 +540,7 @@ include_once 'include/page_header.php';
 			$jsmenu->InsertJavaScript();
 		}
 	}
-	else if($_REQUEST['config']==1){
+	else if($_REQUEST['config']==1){	// USER GROUPS
 		if(isset($_REQUEST['form'])){
 			insert_usergroups_form();
 		}
