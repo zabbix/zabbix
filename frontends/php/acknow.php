@@ -152,13 +152,14 @@ include_once "include/page_header.php";
 
 		$db_acks = get_acknowledges_by_eventid($db_data["eventid"]);
 		while($db_ack = DBfetch($db_acks)){
+			
 			$db_user = get_user_by_userid($db_ack["userid"]);
 			$table->AddRow(array(
 				new CCol($db_user["alias"],"user"),
 				new CCol(date("d-m-Y h:i:s A",$db_ack["clock"]),"time")),
 				"title");
 	
-			$msgCol = new CCol(new CScript(nl2br($db_ack["message"])));
+			$msgCol = new CCol(zbx_nl2br($db_ack['message']));
 			$msgCol->SetColspan(2);
 			$table->AddRow($msgCol,"msg");
 		}
