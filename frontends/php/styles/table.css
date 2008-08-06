@@ -455,15 +455,15 @@ table.tabletree tr.even_row:hover td		{	background-color: #DFDFDF;}
 /*****************************************/
 /*************** Table Info **************/
 
-table.tableinfo
-{
+table.tableinfo{
 	empty-cells:show;
 	color: #000000;
-	width: 100%;
+	width: 100%; 
 	background-color: #AAAAAA;
 	border-spacing:	1px; /* cellspacing */
 	border-width: 0px;
 }
+
 table.tableinfo tr td {
 	white-space: nowrap;
 	word-spacing:	0px;

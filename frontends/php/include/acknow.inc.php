@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 function get_last_event_by_triggerid($triggerid){
 	$event_data = DBfetch(DBselect('SELECT * '.
 				' FROM events '.
@@ -34,8 +35,7 @@ function get_acknowledges_by_eventid($eventid){
 	return DBselect("select * from acknowledges where eventid=$eventid");
 }
 
-function	add_acknowledge_coment($eventid, $userid, $message)
-{
+function add_acknowledge_coment($eventid, $userid, $message){
 	$result = set_event_acnowledged($eventid);
 	if(!$result)
 		return $result;
@@ -51,7 +51,7 @@ function	add_acknowledge_coment($eventid, $userid, $message)
 	return $acknowledgeid;
 }
 
-function	set_event_acnowledged($eventid){
+function set_event_acnowledged($eventid){
 	return DBexecute("update events set acknowledged=1 where eventid=$eventid");
 }
 
@@ -66,9 +66,10 @@ function make_acktab_by_eventid($eventid){
 		$table->AddRow(array(
 			date('d-m-Y h:i:s A',$ack['clock']),
 			$user['alias'],
-			new CCol(nl2br($ack['message']),'wraptext')
+			new CCol(zbx_nl2br($ack['message']),'wraptext')
 		));
 	}
+
 return $table;
 }
 ?>

@@ -19,9 +19,10 @@
 **/
 ?>
 <?php
-require_once "include/graphs.inc.php";
-require_once "include/screens.inc.php";
-require_once "include/maps.inc.php";
+require_once('include/graphs.inc.php');
+require_once('include/screens.inc.php');
+require_once('include/maps.inc.php');
+require_once('include/users.inc.php');
 
 
 // Author: Aly
@@ -173,7 +174,7 @@ return $table;
 // Author: Aly
 function make_system_summary(){
 	global $USER_DETAILS;
-	$config=select_config();
+	$config = select_config();
 	
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
@@ -202,7 +203,7 @@ function make_system_summary(){
 				' AND t.triggerid=f.triggerid '.
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 			' ORDER BY g.name';
-	$gr_result=DBselect($sql);
+	$gr_result = DBselect($sql);
 					
 	while($group = DBFetch($gr_result)){
 		$group_row = new CRow();
@@ -300,7 +301,6 @@ function make_system_summary(){
 						$description = expand_trigger_description_by_data(
 								array_merge($row_inf, array("clock"=>$row_inf_event["clock"])),
 								ZBX_FLAG_EVENT);
-								
 						
 //actions								
 						$actions= get_event_actions_status($row_inf_event['eventid']);
@@ -487,7 +487,6 @@ function make_latest_issues(){
 		if(trigger_dependent($row["triggerid"]))	continue;
 
 		$host = null;
-
 		$menus = '';
 
 		$host_nodeid = id2nodeid($row['hostid']);
@@ -517,9 +516,14 @@ function make_latest_issues(){
 		$res_events = DBSelect($event_sql,1);
 
 		while($row_event=DBfetch($res_events)){
+			$ack = NULL;
 			if($config['event_ack_enable']){
 				if($row_event['acknowledged'] == 1){
+					$ack_info = make_acktab_by_eventid($row_event['eventid']);
+					$ack_info->AddOption('style','width: auto;');
+					
 					$ack=new CLink(S_YES,'acknow.php?eventid='.$row_event['eventid'],'action');
+					$ack->SetHint($ack_info);
 				}
 				else{
 					$ack= new CLink(S_NO,'acknow.php?eventid='.$row_event['eventid'],'on');
@@ -534,7 +538,6 @@ function make_latest_issues(){
 			$actions = get_event_actions_stat_hints($row_event['eventid']);
 //--------			
 			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"events.php?triggerid=".$row["triggerid"].'&source=0',"action");
-			$clock->SetTarget('_blank');
 			
 			$table->AddRow(array(
 				get_node_name_by_elid($row['triggerid']),
@@ -542,7 +545,7 @@ function make_latest_issues(){
 				new CCol($description,get_severity_style($row["priority"])),
 				$clock,
 				zbx_date2age($row_event['clock']),
-				($config['event_ack_enable'])?(new CCol($ack,"center")):NULL,
+				$ack,
 				$actions
 			));			
 		}

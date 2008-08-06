@@ -19,13 +19,13 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/acknow.inc.php";
-	require_once "include/actions.inc.php";
-	require_once "include/events.inc.php";
-	require_once "include/triggers.inc.php";
-	require_once "include/users.inc.php";
-	require_once "include/html.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/acknow.inc.php');
+	require_once('include/actions.inc.php');
+	require_once('include/events.inc.php');
+	require_once('include/triggers.inc.php');
+	require_once('include/users.inc.php');
+	require_once('include/html.inc.php');
 
 	$page["title"]		= "S_EVENT_DETAILS";
 	$page["file"]		= "tr_events.php";

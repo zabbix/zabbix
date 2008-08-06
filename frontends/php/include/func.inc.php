@@ -337,6 +337,14 @@ function str_in_array($needle,$haystack,$strict=false){
 return false;
 }
 
+function zbx_nl2br(&$str){
+	$str_res = array();
+	$str_arr = explode("\n",$str);
+	foreach($str_arr as $id => $str_line){
+		array_push($str_res,$str_line,BR());
+	}
+return $str_res;
+}
 /************* END ZBX MISC *************/
 
 ?>
