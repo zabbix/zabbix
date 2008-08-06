@@ -1,5 +1,6 @@
 Changes for 1.4.7:
 
+ - [ZBX-370] fixed cpu.c for system.cpu.load[] processing (Sasha)
  - [ZBX-412] fixed malfunction of triggers based on log[] and eventlog[] (Sasha)
  - [DEV-195] added support of source ip address (Sasha)
  - added Korean locale [thnx to Kodai] (Artem)
