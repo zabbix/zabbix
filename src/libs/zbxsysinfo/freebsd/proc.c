@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "log.h"
 
 #include <sys/sysctl.h>
 
@@ -31,60 +32,41 @@
 #define ZBX_PROC_STAT_RUN 1
 #define ZBX_PROC_STAT_SLEEP 2
 #define ZBX_PROC_STAT_ZOMB 3
-	
-static kvm_t	*kd = NULL;
 
 static char	*get_commandline(struct kinfo_proc *proc)
 {
-	struct pargs	pa;
+	int		mib[4], i;
 	size_t		sz;
-	char		*p;
 	static char	*args = NULL;
 	static int	args_alloc = 128;
-
-	if (NULL == kd)
-		return NULL;
-
-	sz = sizeof(pa);
-
-	if (kvm_read(kd, (unsigned long)proc->ki_args, &pa, sz) != sz)
-		return NULL;
 
 	if (NULL == args)
 		args = zbx_malloc(args, args_alloc);
 
-	if (args_alloc < pa.ar_length)
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_PROC;
+	mib[2] = KERN_PROC_ARGS;
+	mib[3] = proc->ki_pid;
+retry:
+	sz = (size_t)args_alloc;
+	if (-1 == sysctl(mib, 4, args, &sz, NULL, 0))
 	{
-		args_alloc = pa.ar_length;
-		args = zbx_realloc(args, args_alloc);
+		if (errno == ENOMEM) {
+			args_alloc *= 2;
+			args = zbx_realloc(args, args_alloc);
+			goto retry;
+		}
+		return NULL;
 	}
 
-	if (pa.ar_length != kvm_read(kd, (unsigned long)proc->ki_args
-			+ sizeof(pa.ar_ref) + sizeof(pa.ar_length), args, pa.ar_length))
-		return NULL;
+	for (i = 0; i < (int)(sz - 1); i++)
+		if (args[i] == '\0')
+			args[i] = ' ';
 
-	p = args;
-	sz = 1; /* do not change last '\0' */
-
-	do {
-		if (*p == '\0')
-			*p = ' ';
-		p++;
-	} while (++sz < pa.ar_length);
+	if (sz == 0)
+		zbx_strlcpy(args, proc->ki_comm, args_alloc);
 
 	return args;
-}
-
-static void	init_kernel_access()
-{
-	static int	already = 0;
-
-	if (1 == already)
-		return;
-
-	kd = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL);
-
-	already = 1;
 }
 
 /*
@@ -115,8 +97,6 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	assert(result);
 
 	init_result(result);
-
-	init_kernel_access();
 
 	if (num_param(param) > 4)
 		return SYSINFO_RET_FAIL;
@@ -155,9 +135,6 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if (0 != get_param(param, 4, proccomm, sizeof(proccomm)))
 		*proccomm = '\0';
-
-	if (*proccomm != '\0' && kd == NULL)
-		return SYSINFO_RET_FAIL;
 
 	pagesize = getpagesize();
 
@@ -254,8 +231,6 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 	init_result(result);
 
-	init_kernel_access();
-
 	if (num_param(param) > 4)
 		return SYSINFO_RET_FAIL;
 
@@ -293,9 +268,6 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 	if (0 != get_param(param, 4, proccomm, sizeof(proccomm)))
 		*proccomm = '\0';
-
-	if (*proccomm != '\0' && kd == NULL)
-		return SYSINFO_RET_FAIL;
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_PROC;
