@@ -857,14 +857,10 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd active check started [%s:%u]", activechk_args.host, activechk_args.port);
 
-	zbx_setproctitle("getting list of active checks");
-
 	init_active_metrics();
 
 	while(ZBX_IS_RUNNING)
 	{
-		zbx_setproctitle("processing active checks");
-
 		if(time(NULL) >= nextsend)
 		{
 			send_buffer(activechk_args.host, activechk_args.port);
@@ -873,6 +869,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		if(time(NULL) >= nextrefresh)
 		{
+			zbx_setproctitle("poller [getting list of active checks]");
+
 			if(FAIL == refresh_active_checks(activechk_args.host, activechk_args.port))
 			{
 				nextrefresh = (int)time(NULL) + 60;
@@ -885,6 +883,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		if(time(NULL) >= nextcheck)
 		{
+			zbx_setproctitle("poller [processing active checks]");
+
 			process_active_checks(activechk_args.host, activechk_args.port);
 			nextcheck = get_min_nextcheck();
 			if(FAIL == nextcheck)	nextcheck = (int)time(NULL) + 60;
