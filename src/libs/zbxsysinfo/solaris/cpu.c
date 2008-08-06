@@ -222,7 +222,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef	HAVE_PROC_LOADAVG
+#ifdef	HAVE_GETLOADAVG
 	double	load[3];
 
 	assert(result);
@@ -245,7 +245,7 @@ static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, 
 
 static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef	HAVE_PROC_LOADAVG
+#ifdef	HAVE_GETLOADAVG
 	double	load[3];
 
 	assert(result);
@@ -268,7 +268,7 @@ static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, 
 	       
 static int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef	HAVE_PROC_LOADAVG
+#ifdef	HAVE_GETLOADAVG
 	double	load[3];
 
 	assert(result);

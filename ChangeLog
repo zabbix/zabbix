@@ -124,6 +124,10 @@ Changes for 1.5:
  - changed how is showed messages (Artem)
  - added login/logout (Artem)
 
+Changes for 1.4.7:
+
+ - [ZBX-370] fixed cpu.c for system.cpu.load[] processing (Sasha)
+
 Changes for 1.4.6:
 
  - [ZBX-404] fixed update of item "Download speed for scenario '...'" (Sasha)
