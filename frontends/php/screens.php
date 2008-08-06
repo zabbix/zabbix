@@ -129,22 +129,24 @@ include_once 'include/page_header.php';
 	$form->SetMethod('get');
 	
 	$form->AddVar('fullscreen',$_REQUEST['fullscreen']);
+	if(isset($_REQUEST['period']))	$form->AddVar('period', $_REQUEST['period']);
+	if(isset($_REQUEST['stime']))	$form->AddVar('stime', $_REQUEST['stime']);
 
 	$cmbConfig = new CComboBox('config', $config, 'submit()');
 	$cmbConfig->AddItem(0, S_SCREENS);
 	$cmbConfig->AddItem(1, S_SLIDESHOWS);
 
-	$form->AddItem($cmbConfig);
+	$form->AddItem(array(S_SHOW.SPACE,$cmbConfig));
 
 	$cmbElements = new CComboBox('elementid',$elementid,'submit()');
 	unset($screen_correct);
 	unset($first_screen);
 
 	if( 0 == $config ){
-		$result = DBselect('select screenid as elementid,name '.
-				' from screens '.
-				' where '.DBin_node('screenid').
-				' order by name'
+		$result = DBselect('SELECT screenid as elementid, name '.
+				' FROM screens '.
+				' WHERE '.DBin_node('screenid').
+				' ORDER BY name'
 				);
 		while($row=DBfetch($result)){
 			if(!screen_accessible($row['elementid'], PERM_READ_ONLY))
@@ -183,13 +185,11 @@ include_once 'include/page_header.php';
 
 	if(isset($elementid)){
 		if(0 == $config){
-			if(!screen_accessible($elementid, PERM_READ_ONLY))
-				access_deny();
+			if(!screen_accessible($elementid, PERM_READ_ONLY)) access_deny();
 			$element = get_screen_by_screenid($elementid);
 		}
 		else{
-			if(!slideshow_accessible($elementid, PERM_READ_ONLY))
-				access_deny();
+			if(!slideshow_accessible($elementid, PERM_READ_ONLY)) access_deny();
 			$element = get_slideshow_by_slideshowid($elementid);
 		}
 		
@@ -198,8 +198,13 @@ include_once 'include/page_header.php';
 		}
 	}
 
-	if($cmbElements->ItemsCount() > 0)
-		$form->AddItem($cmbElements);
+	if(0 == $config){
+		if($cmbElements->ItemsCount() > 0) $form->AddItem(array(SPACE.S_SCREENS.SPACE,$cmbElements));
+	}
+	else{
+		if($cmbElements->ItemsCount() > 0) $form->AddItem(array(SPACE.S_SLIDESHOW.SPACE,$cmbElements));
+	}
+	
 	
 	if((2 != $_REQUEST['fullscreen']) && (0 == $config) && !empty($elementid) && check_dynamic_items($elementid)){
 		if(!isset($_REQUEST['hostid'])){
@@ -211,15 +216,9 @@ include_once 'include/page_header.php';
 		
 		validate_group_with_host(PERM_READ_ONLY,$options);
 		
-		$availiable_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
-		$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
+		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
 		
-		$r_form = new CForm();
-		$r_form->SetMethod('get');
-		if(isset($_REQUEST['fullscreen']))	$r_form->AddVar('fullscreen', $_REQUEST['fullscreen']);
-		if(isset($_REQUEST['period']))	$r_form->AddVar('period', $_REQUEST['period']);
-		if(isset($_REQUEST['stime']))	$r_form->AddVar('stime', $_REQUEST['stime']);
-			
 		$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
 		$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
 	
@@ -228,7 +227,7 @@ include_once 'include/page_header.php';
 		
 		$sql = 'SELECT DISTINCT g.groupid, g.name '.
 					' FROM groups g, hosts_groups hg, hosts h, items i '.
-					' WHERE g.groupid in ('.$availiable_groups.') '.
+					' WHERE g.groupid in ('.$available_groups.') '.
 						' AND hg.groupid=g.groupid '.
 						' AND h.status='.HOST_STATUS_MONITORED.
 						' AND h.hostid=i.hostid '.
@@ -243,7 +242,7 @@ include_once 'include/page_header.php';
 					);
 		}
 		
-		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+		$form->AddItem(array(SPACE.S_GROUP.SPACE,$cmbGroup));
 		
 		if($_REQUEST['groupid'] > 0){
 			$sql = ' SELECT DISTINCT h.hostid,h.host '.
@@ -273,8 +272,8 @@ include_once 'include/page_header.php';
 					);
 		}
 	
-		$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));	
-		$p_elements[] = get_table_header($text,array($form,$r_form));
+		$form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));	
+		$p_elements[] = get_table_header($text,$form);
 	}
 	else if(2 != $_REQUEST['fullscreen']){
 		$p_elements[] = get_table_header($text,$form);

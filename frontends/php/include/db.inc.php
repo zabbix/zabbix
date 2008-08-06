@@ -730,6 +730,8 @@ else {
 	function DBcondition($fieldname, &$array, $notin=false){
 		global $DB;
 		$condition = '';
+		
+//if(!is_array($array)) SDI('OPA: '.$fieldname.' : '.$array);
 
 		$in = 		$notin?' NOT IN ':' IN ';
 		$concat = 	$notin?' AND ':' OR ';
