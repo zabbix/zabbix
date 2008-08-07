@@ -174,7 +174,7 @@ include_once "include/page_header.php";
 		}
 		
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
-		validate_group_with_host(PERM_READ_ONLY, array('allow_all_hosts','monitored_hosts','with_items'));
+		validate_group_with_host(PERM_READ_ONLY, array('allow_all_hosts','monitored_hosts','with_items','always_select_first_host'));
 
 		$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
 		$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');

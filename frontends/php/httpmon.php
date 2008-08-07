@@ -67,7 +67,7 @@ include_once "include/page_header.php";
 
 	validate_sort_and_sortorder('wt.name',ZBX_SORT_DOWN);
 
-	$options = array('allow_all_hosts','monitored_hosts');//,'always_select_first_host'
+	$options = array('allow_all_hosts','monitored_hosts','always_select_first_host');
 
 	$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.groupid',-1));
 	if($_REQUEST['groupid'] == -1) array_push($options,'always_select_first_host');
