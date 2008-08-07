@@ -105,7 +105,7 @@ include_once 'include/page_header.php';
 	
 	$effectiveperiod = navigation_bar_calc();
 	
-	$options = array("allow_all_hosts","monitored_hosts","with_items");//, "always_select_first_host");//
+	$options = array('allow_all_hosts','monitored_hosts','with_items','always_select_first_host');
 	if(!$ZBX_WITH_SUBNODES)	array_push($options,"only_current_node");
 	
 	validate_group_with_host(PERM_READ_ONLY,$options);
