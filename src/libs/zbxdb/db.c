@@ -102,17 +102,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 
 	if(ZBX_DB_OK == ret)
-	{
-#ifdef HAVE_MYSQL_AUTOCOMMIT
-		if(mysql_autocommit(conn, 1) != 0)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "Failed to set autocommit to 1: Error: %s [%d]",
-				mysql_error(conn), mysql_errno(conn));
-			ret = ZBX_DB_FAIL;
-		}
-#endif /* HAVE_MYSQL_AUTOCOMMIT */
 		DBexecute("SET CHARACTER SET utf8");
-	}
 
 	if(ZBX_DB_FAIL  == ret)
 	{

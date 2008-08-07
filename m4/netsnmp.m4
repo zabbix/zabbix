@@ -61,6 +61,9 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 		_full_libnetsnmp_libs="`$_libnetsnmp_config --libs` -lcrypto"
 		for i in $_full_libnetsnmp_libs; do
 			case $i in
+				-l*)
+					SNMP_LDFLAGS="${SNMP_LDFLAGS} $i"
+			;;
 				-L*)
 					SNMP_LDFLAGS="${SNMP_LDFLAGS} $i"
 			;;
