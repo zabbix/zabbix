@@ -47,7 +47,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h sys/procfs.h \
   stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h sys/proc.h \
   sys/var.h resolv.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h \
-  nlist.h net/if.h kvm.h linux/kernel.h ldap.h getopt.h procinfo.h sys/dk.h \
+  nlist.h net/if.h kvm.h linux/kernel.h getopt.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
@@ -309,6 +309,10 @@ AC_TRY_COMPILE(
 #ifdef HAVE_SYS_VMMETER_H
 #include <sys/vmmeter.h>
 #endif /* HAVE_SYS_VMMETER_H */
+
+#ifndef NULL
+#define NULL (void *)0
+#endif
 ],
 [
 	int		mib[] = {CTL_VM, VM_METER};
@@ -344,6 +348,10 @@ AC_TRY_COMPILE(
 #ifdef HAVE_SYS_VMMETER_H
 #include <sys/vmmeter.h>
 #endif /* HAVE_SYS_VMMETER_H */
+
+#ifndef NULL
+#define NULL (void *)0
+#endif
 ],
 [
 	int			mib[] = {CTL_VM, VM_UVMEXP2};
@@ -379,6 +387,10 @@ AC_TRY_COMPILE(
 #ifdef HAVE_SYS_VMMETER_H
 #include <sys/vmmeter.h>
 #endif /* HAVE_SYS_VMMETER_H */
+
+#ifndef NULL
+#define NULL (void *)0
+#endif
 ],
 [
 	int		mib[] = {CTL_VM, VM_UVMEXP};
@@ -401,6 +413,10 @@ AC_TRY_COMPILE(
 #include <sys/types.h>
 #include <sys/syscall.h>
 #include <sys/swap.h>
+
+#ifndef NULL
+#define NULL (void *)0
+#endif
 ],
 [
     register int cnt, i;
@@ -830,17 +846,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		fi
 
 		if test "x$found_mysql" = "xyes"; then
-
 			have_db="MySQL"
-
-			dnl Check forql_autocommit in MySQL
-			AC_MSG_CHECKING(for mysql_autocommit in MySQL)
-			AC_TRY_COMPILE(
-			[#include <mysql.h>
-			],[mysql_autocommit(NULL, 0);],
-			AC_DEFINE(HAVE_MYSQL_AUTOCOMMIT,1,[Define to 1 if 'mysql_autocommit' exist .])
-			AC_MSG_RESULT(yes),
-			AC_MSG_RESULT(no))
 		else
 			AC_MSG_ERROR([Not found MySQL library])
 		fi

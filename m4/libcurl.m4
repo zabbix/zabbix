@@ -14,7 +14,7 @@
 # Note that using --without-libcurl does run ACTION-IF-NO.
 #
 # This macro #defines HAVE_LIBCURL if a working libcurl setup is
-# found, and sets @LIBCURL_LIBS@ and @LIBCURL_CPPFLAGS@ to the necessary
+# found, and sets @LIBCURL_LIBS@ and @LIBCURL_CFLAGS@ to the necessary
 # values.  Other useful defines are LIBCURL_FEATURE_xxx where xxx are
 # the various features supported by libcurl, and LIBCURL_PROTOCOL_yyy
 # where yyy are the various protocols supported by libcurl.  Both xxx
@@ -26,7 +26,7 @@
 # curl-config list (e.g. it's "HTTP" and not "http").
 #
 # Users may override the detected values by doing something like:
-# LIBCURL_LIBS="-lcurl" LIBCURL_CPPFLAGS="-I/usr/myinclude" ./configure
+# LIBCURL_LIBS="-lcurl" LIBCURL_CFLAGS="-I/usr/myinclude" ./configure
 #
 # For the sake of sanity, this macro assumes that any libcurl that is
 # found is after version 7.7.2, the first version that included the
@@ -106,17 +106,19 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=yes@:>
         fi
 
 	if test $_libcurl_wanted -eq 0 || test x$libcurl_cv_lib_version_ok = xyes ; then
-           if test x"$LIBCURL_CPPFLAGS" = "x" ; then
-              LIBCURL_CPPFLAGS=`$_libcurl_config --cflags`
+           if test x"$LIBCURL_CFLAGS" = "x" ; then
+              LIBCURL_CFLAGS=`$_libcurl_config --cflags`
            fi
            if test x"$LIBCURL_LIBS" = "x" ; then
 
 		_full_libcurl_libs=`$_libcurl_config --libs`
 		for i in $_full_libcurl_libs; do
 			case $i in
+				-l*)
+					LIBCURL_LDFLAGS="$LIBCURL_LDFLAGS $i"
+			;;
 				-L*)
 					LIBCURL_LDFLAGS="$LIBCURL_LDFLAGS $i"
-
 			;;
 			esac
 		done
@@ -198,7 +200,10 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=yes@:>
 		LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
 		CFLAGS="${CFLAGS} ${LIBCURL_CFLAGS}"
 
-           AC_LINK_IFELSE(AC_LANG_PROGRAM([#include <curl/curl.h>],[
+           AC_LINK_IFELSE(AC_LANG_PROGRAM([#include <curl/curl.h>
+#ifndef NULL
+#define NULL (void *)0
+#endif],[
 /* Try and use a few common options to force a failure if we are
    missing symbols or can't link. */
 int x;
@@ -244,7 +249,7 @@ x=CURLOPT_VERBOSE;
 
            AC_DEFINE(HAVE_LIBCURL,1,
              [Define to 1 if you have a functional curl library.])
-           AC_SUBST(LIBCURL_CPPFLAGS)
+           AC_SUBST(LIBCURL_CFLAGS)
            AC_SUBST(LIBCURL_LDFLAGS)
            AC_SUBST(LIBCURL_LIBS)
            found_curl="yes"
@@ -277,7 +282,7 @@ x=CURLOPT_VERBOSE;
            done
 	else
 	   unset LIBCURL_LIBS
-	   unset LIBCURL_CPPFLAGS
+	   unset LIBCURL_CFLAGS
         fi
      fi
 
