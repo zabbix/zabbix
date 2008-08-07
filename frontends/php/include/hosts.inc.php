@@ -697,10 +697,10 @@ require_once "include/httptest.inc.php";
 
 		$first_hostid_in_group = 0;
 
-		$allow_all_hosts = (str_in_array("allow_all_hosts",$options)) ? 1 : 0;
-		$always_select_first_host = str_in_array("always_select_first_host",$options) ? 1 : 0;
-		$only_current_node = str_in_array("only_current_node",$options) ? 1 : 0;
-
+		$allow_all_hosts = 			str_in_array('allow_all_hosts',$options)?1:0;
+		$always_select_first_host = str_in_array('always_select_first_host',$options)?1:0;
+		$only_current_node = 		str_in_array('only_current_node',$options)?1:0;
+		
 		if(str_in_array('monitored_hosts',$options))
 			$with_host_status = ' AND h.status='.HOST_STATUS_MONITORED;
 		else if(str_in_array('real_hosts',$options))
@@ -751,13 +751,16 @@ require_once "include/httptest.inc.php";
 			if($groupid > 0){
 				$with_node = ' AND '.DBin_node('g.groupid', get_current_nodeid(!$only_current_node));
 
-				if(!DBfetch(DBselect('SELECT DISTINCT g.groupid '.
-								' FROM groups g, hosts_groups hg, hosts h'.$item_table.
-								' WHERE hg.groupid=g.groupid '.
-									' AND h.hostid=hg.hostid '.
-									' AND '.DBcondition('h.hostid',$available_hosts).
-									' AND g.groupid='.$groupid.$with_host_status.$with_items.$with_node)))
-				{
+				$sql = 'SELECT DISTINCT g.groupid '.
+						' FROM groups g, hosts_groups hg, hosts h'.$item_table.
+						' WHERE hg.groupid=g.groupid '.
+							' AND h.hostid=hg.hostid '.
+							' AND '.DBcondition('h.hostid',$available_hosts).
+							' AND g.groupid='.$groupid.
+							$with_host_status.
+							$with_items.
+							$with_node;
+				if(!DBfetch(DBselect($sql))){
 					$groupid = 0;
 				}
 			}
@@ -769,35 +772,38 @@ require_once "include/httptest.inc.php";
 		else{
 			$hostid = $a_hostid;
 /* is not 'All' selected */
-			if(!(($hostid == 0) && ($allow_all_hosts == 1))) {
+//			if(!(($hostid == 0) && ($allow_all_hosts == 1))) {
+			if(($hostid != 0) || ($allow_all_hosts != 1)){
 				$group_table = '';
-				$witth_group = '';
+				$with_group = '';
 				
 				if($groupid != 0){
 					$with_node = ' AND '.DBin_node('hg.hostid', get_current_nodeid(!$only_current_node));
 					
-					if(!DBfetch(DBselect('SELECT hg.hostid FROM hosts_groups hg'.
-						' WHERE hg.groupid='.$groupid.' AND hg.hostid='.$hostid.$with_node))){
-						$hostid = 0;
+					$sql = 'SELECT hg.hostid '.
+							' FROM hosts_groups hg'.
+							' WHERE hg.groupid='.$groupid.
+								' AND hg.hostid='.$hostid.
+								$with_node;
+					if(!DBfetch(DBselect($sql))){
+						$hostid = -1;
 					}
 					$group_table = ' ,hosts_groups hg ';
-					$witth_group = ' AND hg.hostid=h.hostid AND hg.groupid='.$groupid;
+					$with_group = ' AND hg.hostid=h.hostid AND hg.groupid='.$groupid;
 				}
 
 				$with_node = ' AND '.DBin_node('h.hostid',get_current_nodeid(!$only_current_node));
 //SDI('C: '.$a_groupid.' : '.$a_hostid);
-
-				if($db_host = DBfetch(DBselect('SELECT DISTINCT h.hostid,h.host FROM hosts h '.
-						$item_table.
-						$group_table.
+				$sql = 'SELECT DISTINCT h.hostid,h.host '.
+						' FROM hosts h '.$item_table.$group_table.
 						' WHERE '.DBcondition('h.hostid',$available_hosts).
-						$with_host_status.
-						$with_items.
-						$witth_group.
-						$with_node.
-						' ORDER BY h.host')))
-				{
-					$first_hostid_in_group = $db_host["hostid"];
+							$with_host_status.
+							$with_items.
+							$with_group.
+							$with_node.
+						' ORDER BY h.host';
+				if($db_host = DBfetch(DBselect($sql))){
+					$first_hostid_in_group = $db_host['hostid'];
 				}
 
 				if($first_hostid_in_group == 0)	$hostid = 0; /* no hosts in selected groupe */
@@ -811,23 +817,27 @@ require_once "include/httptest.inc.php";
 								$with_items.
 								$with_node)))
 					{
-							$hostid = 0;
+							$hostid = -1;
 					}
 				}
-				if(($hostid < 0) || ($hostid == 0 && $always_select_first_host == 1)) /* incorrect host */{
-					$hostid = $first_hostid_in_group;
+
+				if($hostid < 0){
+					if($always_select_first_host == 1)
+						$hostid = $first_hostid_in_group;
+					else
+						$hostid = 0;
 				}
 			}
 		}
 		
-		$group_correct	= (bccomp($groupid ,$a_groupid)==0) ? 1 : 0;
-		$host_correct	= (bccomp($hostid ,$a_hostid)==0) ? 1 : 0;
+		$group_correct	= (bccomp($groupid ,$a_groupid)==0)?1:0;
+		$host_correct	= (bccomp($hostid ,$a_hostid)==0)?1:0;
 		return array(
 			"groupid"	=> $groupid,
 			"group_correct"	=> $group_correct,
 			"hostid"	=> $hostid,
 			"host_correct"	=> $host_correct,
-			"correct"	=> ($group_correct && $host_correct) ? 1 : 0
+			"correct"	=> ($group_correct && $host_correct)?1:0
 			);
 	}
 
@@ -842,35 +852,35 @@ require_once "include/httptest.inc.php";
  *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
  *
  * Comments:
- *
+ *	   mod by Aly
  */
 	function validate_group_with_host($perm, $options = array(),$group_var=null,$host_var=null){
-		if(is_null($group_var)) $group_var = "web.latest.groupid";
-		if(is_null($host_var))	$host_var = "web.latest.hostid";
+		if(is_null($group_var)) $group_var = 'web.latest.groupid';
+		if(is_null($host_var))	$host_var = 'web.latest.hostid';
 
-		$_REQUEST["groupid"]    = get_request("groupid", -1);
-		$_REQUEST["hostid"]     = get_request("hostid", get_profile($host_var, 0, PROFILE_TYPE_ID));
+		$_REQUEST['groupid']    = get_request('groupid', -1);
+		$_REQUEST['hostid']     = get_request('hostid', get_profile($host_var, -1));
 
-		if(-1 == $_REQUEST["groupid"]){
-			$_REQUEST["groupid"] = get_profile($group_var, 0, PROFILE_TYPE_ID);
+		if(-1 == $_REQUEST['groupid']){
+			$_REQUEST['groupid'] = get_profile($group_var, 0, PROFILE_TYPE_ID);
 			
-			if(!in_node($_REQUEST["groupid"])) $_REQUEST["groupid"] = 0;
+			if(!in_node($_REQUEST['groupid'])) $_REQUEST['groupid'] = 0;
 
-			if(($_REQUEST["hostid"] > 0) && !DBfetch(DBselect('SELECT groupid FROM hosts_groups WHERE hostid='.$_REQUEST["hostid"].' AND groupid='.$_REQUEST["groupid"]))){
-				$_REQUEST["groupid"] = 0;
+			if(($_REQUEST['hostid'] > 0) && !DBfetch(DBselect('SELECT groupid FROM hosts_groups WHERE hostid='.$_REQUEST['hostid'].' AND groupid='.$_REQUEST['groupid']))){
+				$_REQUEST['groupid'] = 0;
 			}
 		}
 
-		if(str_in_array("always_select_first_host",$options) && ($_REQUEST["hostid"] == 0) && ($_REQUEST["groupid"] != 0))
-			$_REQUEST["hostid"] = -1;
+//		if(str_in_array('always_select_first_host',$options) && ($_REQUEST['hostid'] == 0) && ($_REQUEST['groupid'] != 0))
+//			$_REQUEST['hostid'] = -1;
 
-		$result = get_correct_group_and_host($_REQUEST["groupid"],$_REQUEST["hostid"], $perm, $options);
+		$result = get_correct_group_and_host($_REQUEST['groupid'],$_REQUEST['hostid'], $perm, $options);
 
-		$_REQUEST["groupid"]    = $result["groupid"];
-		$_REQUEST["hostid"]     = $result["hostid"];
+		$_REQUEST['groupid']    = $result['groupid'];
+		$_REQUEST['hostid']     = $result['hostid'];
 
-		update_profile($host_var,$_REQUEST["hostid"], PROFILE_TYPE_ID);
-		update_profile($group_var,$_REQUEST["groupid"], PROFILE_TYPE_ID);
+		update_profile($host_var,$_REQUEST['hostid'], PROFILE_TYPE_ID);
+		update_profile($group_var,$_REQUEST['groupid'], PROFILE_TYPE_ID);
 	}
 
 /*
@@ -887,7 +897,7 @@ require_once "include/httptest.inc.php";
  */
 	function validate_group($perm, $options = array(),$group_var=null){
 		if(is_null($group_var)) $group_var = 'web.latest.groupid';
-		$_REQUEST["groupid"] = get_request('groupid',get_profile($group_var, 0, PROFILE_TYPE_ID));
+		$_REQUEST['groupid'] = get_request('groupid',get_profile($group_var, 0, PROFILE_TYPE_ID));
 
 		if(!in_node($_REQUEST['groupid'])) $_REQUEST['groupid'] = 0;
 		

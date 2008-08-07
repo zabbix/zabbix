@@ -63,7 +63,7 @@ include_once "include/page_header.php";
 	$_REQUEST['select'] = get_request('select',get_profile('web.latest.filter.select', ''));
 	update_profile('web.latest.filter.select', $_REQUEST['select'], PROFILE_TYPE_STR);
 
-	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
+	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items','always_select_first_host');
 	
 	$_REQUEST['hostid'] = get_request('hostid',get_profile('web.latest.last.hostid', null));
 	if(is_null($_REQUEST['hostid'])){
@@ -71,7 +71,7 @@ include_once "include/page_header.php";
 		
 		$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.last.groupid', null));
 		if(is_null($_REQUEST['groupid'])){
-			validate_group(PERM_READ_ONLY,array('allow_all_hosts','monitored_hosts','with_monitored_items','always_select_first_group'),'web.latest.last.groupid');
+			validate_group(PERM_READ_ONLY,$options,'web.latest.last.groupid');
 		}
 	}
 

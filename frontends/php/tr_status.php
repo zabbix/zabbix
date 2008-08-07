@@ -200,7 +200,7 @@ include_once "include/page_header.php";
 
 	validate_sort_and_sortorder('t.lastchange',ZBX_SORT_DOWN);
 
-	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
+	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items','always_select_first_host'); //always_select_first_host
 	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
 	
 	$_REQUEST['hostid'] = get_request('hostid',get_profile('web.tr_status.hostid', null, PROFILE_TYPE_ID));
@@ -212,7 +212,8 @@ include_once "include/page_header.php";
 			validate_group(PERM_READ_ONLY,array('allow_all_hosts','monitored_hosts','with_monitored_items','always_select_first_group'),'web.tr_status.groupid');
 		}
 	}
-	
+
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 	validate_group_with_host(PERM_READ_ONLY,$options,'web.tr_status.groupid','web.tr_status.hostid');
 
 	$mute = get_profile('web.tr_status.mute',0);	
@@ -269,7 +270,7 @@ include_once "include/page_header.php";
 			' AND h.status='.HOST_STATUS_MONITORED.
 			($_REQUEST['groupid']?' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid']:'').
 		' ORDER BY h.host';
-	
+
 	$result=DBselect($sql);
 	$flag = false;
 	while($row=DBfetch($result)){
@@ -309,6 +310,8 @@ include_once "include/page_header.php";
 	$filterForm->SetMethod('post');
 
 	$filterForm->AddVar('fullscreen',$_REQUEST['fullscreen']);
+	$filterForm->AddVar('groupid',$_REQUEST['groupid']);
+	$filterForm->AddVar('hostid',$_REQUEST['hostid']);
 
 	$tr_select = new CComboBox('show_triggers',$show_triggers,'javasctipt: submit();');
 	if(TRIGGERS_OPTION_ONLYTRUE){
@@ -441,7 +444,7 @@ include_once "include/page_header.php";
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				' AND '.DBcondition('t.triggerid',$available_triggers).
 				' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.
-				order_by('h.host,h.hostid,t.description,t.priority,t.lastchange');
+			order_by('h.host,h.hostid,t.description,t.priority,t.lastchange');
 
 	$result = DBselect($sql);
 
