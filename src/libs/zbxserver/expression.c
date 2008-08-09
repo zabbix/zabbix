@@ -805,12 +805,10 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros()");
 
-	if(!data || !*data) return;
+	if (NULL == data || '\0' == *data) return;
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros (data:%s)",
 		*data);
-
-	if('\0' == *data[0]) return;
 
 	if ( macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION ) {
 		expand_trigger_description_constants(data, event->objectid);
