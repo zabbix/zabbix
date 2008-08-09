@@ -651,6 +651,8 @@ static char**	extract_numbers(char *str, int *count)
 		result[(*count)-1][len] = '\0';
 
 		s = e;
+		if (*s == '\0')
+			break;
 	}
 
 	return result;
