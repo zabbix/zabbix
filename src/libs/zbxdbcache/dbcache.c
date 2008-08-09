@@ -1938,7 +1938,7 @@ lbl_create:
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for collector. [%s]",strerror(errno));
+			zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for database cache. [%s]",strerror(errno));
 			exit(1);
 		}
 	}
