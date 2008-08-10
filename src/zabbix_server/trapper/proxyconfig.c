@@ -40,7 +40,8 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, ZBX_TABLE *table, const char *reltable, const char *relfield)
+static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, ZBX_TABLE *table,
+		const char *reltable, const char *relfield)
 {
 	char		sql[MAX_STRING_LEN];
 	int		offset = 0, f, fld;
@@ -78,10 +79,27 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " where t.proxy_hostid=" ZBX_FS_UI64,
 				proxy_hostid);
 	else
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ", %1$s r where t.%2$s=r.%2$s and r.proxy_hostid="ZBX_FS_UI64_NO(3),
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ", %1$s r where t.%2$s=r.%2$s"
+				" and r.proxy_hostid="ZBX_FS_UI64_NO(3),
 				reltable,
 				relfield,
 				proxy_hostid);
+
+	if (0 == strcmp(table->table, "hosts"))
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and t.status=%d",
+				HOST_STATUS_MONITORED);
+	if (NULL != reltable && 0 == strcmp(reltable, "hosts"))
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and r.status=%d",
+				HOST_STATUS_MONITORED);
+	if (0 == strcmp(table->table, "items"))
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and t.status in (%d,%d)",
+				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED);
+	if (0 == strcmp(table->table, "drules"))
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and t.status=%d",
+				DRULE_STATUS_MONITORED);
+	if (NULL != reltable && 0 == strcmp(reltable, "drules"))
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and r.status=%d",
+				DRULE_STATUS_MONITORED);
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " order by t.%s",
 			table->recid);
@@ -156,8 +174,10 @@ static int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_proxyconfig_data() [proxy_hostid:" ZBX_FS_UI64 "]",
 			proxy_hostid);
 
-	for (t = 0; tables[t].table != 0; t++) {
-		for (p = 0; pt[p].table != NULL; p++) {
+	for (t = 0; tables[t].table != 0; t++)
+	{
+		for (p = 0; pt[p].table != NULL; p++)
+		{
 			if (0 != strcmp(tables[t].table, pt[p].table))
 				continue;
 
@@ -165,7 +185,6 @@ static int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		}
 	}
 
-/*	fprintf(stderr, "----- [%zd]\n", strlen(j->buffer));*/
 	return ret;
 }
 
