@@ -318,7 +318,7 @@ static int get_values(int now)
 				" and i.key_ not in ('%s','%s','%s','%s')" DB_NODE " group by h.hostid",
 			CONFIG_UNREACHABLE_POLLER_FORKS,
 			poller_num-1,
-			now + POLLER_DELAY,
+			now,
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST,
 			HOST_STATUS_MONITORED,
@@ -343,7 +343,7 @@ static int get_values(int now)
 				" and " ZBX_SQL_MOD(i.itemid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')"
 				DB_NODE " order by i.nextcheck",
 				ZBX_SQL_ITEM_SELECT,
-				now + POLLER_DELAY,
+				now,
 				istatus,
 				ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST,
 				HOST_STATUS_MONITORED,
