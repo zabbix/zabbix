@@ -1379,8 +1379,9 @@ include_once 'include/page_header.php';
 						"CheckAll('".$form->GetName()."','all_hosts');"),
 					SPACE,
 					make_sorting_link(S_NAME,'g.name')),
+				S_LASTSEEN_AGE,
 				' # ',
-				S_MEMBERS,S_LASTSEEN_AGE));
+				S_MEMBERS));
 
 			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 
@@ -1403,14 +1404,14 @@ include_once 'include/page_header.php';
 					$style = $db_host["status"]==HOST_STATUS_MONITORED ? NULL: ( 
 						$db_host["status"]==HOST_STATUS_TEMPLATE ? "unknown" :
 						"on");
-					array_push($hosts, empty($hosts) ? '' : ',', new CSpan($db_host["host"], $style));
+					array_push($hosts, empty($hosts) ? '' : ', ', new CSpan($db_host["host"], $style));
 					$count++;
 				}
 
 				if($db_proxy['lastaccess'] != 0)
 					$lastclock = zbx_date2age($db_proxy['lastaccess']);
 				else
-					$lastclock = new CCol('-', 'center');
+					$lastclock = '-';
 
 				$table->AddRow(array(
 					array(
@@ -1420,9 +1421,9 @@ include_once 'include/page_header.php';
 								"hosts.php?form=update&hostid=".$db_proxy["hostid"].url_param("config"),
 								'action')
 					),
+					$lastclock,
 					$count,
-					$hosts,
-					$lastclock
+					new CCol((empty($hosts) ? '-' : $hosts), 'wraptext')
 					));
 			}
 			$table->SetFooter(new CCol(array(
