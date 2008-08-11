@@ -615,4 +615,7 @@ void	DBproxy_add_history_str(zbx_uint64_t itemid, char *value, int clock);
 void	DBproxy_add_history_text(zbx_uint64_t itemid, char *value, int clock);
 void	DBproxy_add_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, int lastlogsize);
 
+
+void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num);
+
 #endif

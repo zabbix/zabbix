@@ -99,7 +99,16 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 		DBcommit();
 	}
 	else
-		process_new_value(&item, value, now);
+	{
+		switch (zbx_process) {
+		case ZBX_PROCESS_SERVER:
+			process_new_value(&item, value, now);
+			break;
+		case ZBX_PROCESS_PROXY:
+			proxy_process_new_value(&item, value, now);
+			break;
+		}
+	}
  
 	DBfree_result(result);
 

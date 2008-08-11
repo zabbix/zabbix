@@ -46,34 +46,42 @@
  ******************************************************************************/
 static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tablename, const char *p)
 {
-	int			t, f, field_count, insert, offset, execute;
-	ZBX_TABLE		*table = NULL;
-	ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
+	int			f, field_count, insert;
+	const ZBX_TABLE		*table = NULL;
+	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_obj, jp_data, jp_row;
-	char			buf[MAX_STRING_LEN],
-				sql[MAX_STRING_LEN],
-				esc[MAX_STRING_LEN],
-				recid[21]; /* strlen("18446744073709551615") == 20 */
+	char			buf[MAX_STRING_LEN], *esc;
+	zbx_uint64_t		recid;
 	const char		*pf;
+	static zbx_uint64_t	*new = NULL, *old = NULL;
+	static int		new_alloc = 100, old_alloc = 100;
+	int			new_num = 0, old_num = 0;
+	static char		*sql = NULL;
+	static int		sql_alloc = 4096;
+	int			sql_offset;
 	DB_RESULT		result;
+	DB_ROW			row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_proxyconfig_table() [tablename:%s]",
 			tablename);
 
-	for (t = 0; tables[t].table != NULL; t++ )
-		if (0 == strcmp(tables[t].table, tablename))
-			table = &tables[t];
-
-	if (NULL == table) {
+	if (NULL == (table = DBget_table(tablename))) {
 		zabbix_log(LOG_LEVEL_WARNING, "Invalid table name \"%s\"",
 				tablename);
 		return FAIL;
 	}
 
-	if (ZBX_DB_OK > DBexecute("create table %1$s_%2$s_tmp (%2$s "ZBX_DBTYPE_INT64")",
-			table->table,
-			table->recid))
-		goto db_error;
+	if (NULL == new)
+		new = zbx_malloc(new, new_alloc * sizeof(zbx_uint64_t));
+	if (NULL == old)
+		old = zbx_malloc(old, old_alloc * sizeof(zbx_uint64_t));
+	if (NULL == sql)
+		sql = zbx_malloc(sql, sql_alloc * sizeof(char));
+
+	result = DBselect("select %s from %s", table->recid, table->table);
+	while (NULL != (row = DBfetch(result)))
+		uint64_array_add(&old, &old_alloc, &old_num, zbx_atoui64(row[0]));
+	DBfree_result(result);
 
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *          ^---------------------------------------------------------------------------^
@@ -125,100 +133,112 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
  */	if (FAIL == zbx_json_brackets_open(p, &jp_data))
 		goto json_error;
 
+	p = NULL;
+	sql_offset = 0;
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
+#endif
+
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *                                                  ^
- */	p = NULL;
-	while (NULL != (p = zbx_json_next(&jp_data, p))) {
+ */	while (NULL != (p = zbx_json_next(&jp_data, p))) {
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *                                                  ^-------------^
  */		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			goto json_error;
 
 		pf = NULL;
-		if (NULL == (pf = zbx_json_next_value(&jp_row, pf, recid, sizeof(recid))))
+		if (NULL == (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf))))
 			goto json_error;
 
-		result = DBselect("select 0 from %s where %s=%s",
-				table->table,
-				table->recid,
-				recid);
-		insert = (NULL == DBfetch(result));
-		DBfree_result(result);
+		recid = zbx_atoui64(buf);
 
-		offset = 0;
-		if (insert) {
-			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "insert into %s (",
-					table->table);
+		insert = (SUCCEED == uint64_array_exists(old, old_num, recid)) ? 0 : 1;
+
+		if (insert)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "insert into %s (", table->table);
+
 			for (f = 0; f < field_count; f ++)
-				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s,", fields[f]->name);
-			offset--;
-			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ") values (%s,",
-					recid);
-		} else
-			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update %s set ",
-					table->table);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "%s,", fields[f]->name);
 
-		execute = 0;
+			sql_offset--;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, ") values (" ZBX_FS_UI64 ",",
+					recid);
+		}
+		else
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "update %s set ",
+					table->table);
 
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *                                                   ^
  */		f = 1;
-		while (NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf)))) {
-			execute = 1;
-
-			if (f == field_count) {
+		while (NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf))))
+		{
+			if (f == field_count)
+			{
 				zabbix_log(LOG_LEVEL_WARNING, "Invalid number of fields \"%.*s\"",
 						jp_row.end - jp_row.start + 1,
 						jp_row.start);
 				return FAIL;
 			}
 
-			if (fields[f]->type == ZBX_TYPE_INT || fields[f]->type == ZBX_TYPE_UINT || fields[f]->type == ZBX_TYPE_ID || fields[f]->type == ZBX_TYPE_FLOAT) {
+			if (fields[f]->type == ZBX_TYPE_INT || fields[f]->type == ZBX_TYPE_UINT || fields[f]->type == ZBX_TYPE_ID || fields[f]->type == ZBX_TYPE_FLOAT)
+		       	{
 				if (0 == insert)
-					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=", fields[f]->name);
-				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s,", buf);
-			} else {
-				DBescape_string(buf, esc, sizeof(esc));
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "%s=", fields[f]->name);
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "%s,", buf);
+			}
+			else
+			{
 				if (0 == insert)
-					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=", fields[f]->name);
-				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "'%s',", esc);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "%s=", fields[f]->name);
+
+				esc = DBdyn_escape_string(buf);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(esc) + 8, "'%s',", esc);
 			}
 			f++;
 		}
 
-		if (f != field_count) {
+		if (f != field_count)
+		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid number of fields \"%.*s\"",
 					jp_row.end - jp_row.start + 1,
 					jp_row.start);
 			return FAIL;
 		}
 
-		offset--;
+		sql_offset--;
 		if (insert)
-			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ")");
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 4, ");\n");
 		else
-			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " where %s=%s",
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " where %s=" ZBX_FS_UI64 ";\n",
 					table->recid,
 					recid);
 
-		if ((insert || execute) && ZBX_DB_OK > DBexecute("%s", sql))
-			goto db_error;
-		if (ZBX_DB_OK > DBexecute("insert into %1$s_%2$s_tmp (%2$s) values (%3$s)",
-				table->table,
-				table->recid,
-				recid))
-			goto db_error;
+		uint64_array_add(&new, &new_alloc, &new_num, recid);
 	}
 
-	if (ZBX_DB_OK > DBexecute("delete from %1$s where not %2$s in (select %2$s from %1$s_%2$s_tmp)",
-			table->table,
-			table->recid))
-		goto db_error;
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
+#endif
 
-	if (ZBX_DB_OK > DBexecute("drop table %s_%s_tmp",
-			table->table,
-			table->recid))
-		goto db_error;
+	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto db_error;
+
+	uint64_array_rm(old, &old_num, new, new_num);
+
+	if (old_num > 0)
+	{
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "delete from %s where", table->table);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid, old, old_num);
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto db_error;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_proxyconfig_table()");
 
