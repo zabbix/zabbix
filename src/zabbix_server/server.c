@@ -890,7 +890,7 @@ int main(int argc, char **argv)
 	zbx_task_t	task  = ZBX_TASK_START;
 	char    ch      = '\0';
 
-	int	nodeid;
+	int	nodeid = 0;
 
 	progname = argv[0];
 
