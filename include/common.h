@@ -711,6 +711,10 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len );
 double	time_diff(struct timeval *from, struct timeval *to);
 char	*zbx_age2str(int age);
 
+int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value);
+int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value);
+void	uint64_array_rm(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num);
+
 int MAIN_ZABBIX_ENTRY(void);
 
 zbx_uint64_t	zbx_letoh_uint64(

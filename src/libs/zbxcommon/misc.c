@@ -1064,3 +1064,139 @@ int	uint64_in_list(char *list, zbx_uint64_t value)
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_nearestindex                                                 *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alekasander Vladishev                                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_nearestindex(zbx_uint64_t *values, int num, zbx_uint64_t value)
+{
+	int	first_index, last_index, index;
+
+	if (num == 0)
+		return 0;
+
+	first_index = 0;
+	last_index = num - 1;
+	while (1)
+	{
+		index = first_index + (last_index - first_index) / 2;
+
+		if (values[index] == value)
+			return index;
+		else if (last_index == first_index)
+		{
+			if (values[index] < value)
+				index++;
+			return index;
+		}
+		else if (values[index] < value)
+			first_index = index + 1;
+		else
+			last_index = index;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: uint64_array_add                                                 *
+ *                                                                            *
+ * Purpose: add uint64 value to dynamic array                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value)
+{
+	int	index;
+
+	index = get_nearestindex(*values, *num, value);
+	if (index < (*num) && (*values)[index] == value)
+		return index;
+
+	if (*alloc == *num)
+	{
+		*alloc += 100;
+		*values = zbx_realloc(*values, *alloc * sizeof(zbx_uint64_t));
+	}
+
+	memmove(&(*values)[index + 1], &(*values)[index], sizeof(zbx_uint64_t) * (*num - index));
+
+	(*values)[index] = value;
+	(*num)++;
+
+	return index;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: uint64_array_exists                                              *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value)
+{
+	int	index;
+
+	index = get_nearestindex(values, num, value);
+	if (index < num && values[index] == value)
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: uint64_array_remove                                              *
+ *                                                                            *
+ * Purpose: add uint64 value to dynamic array                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	uint64_array_rm(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num)
+{
+	int	rindex, index;
+
+	for (rindex = 0; rindex < rm_num; rindex++)
+	{
+		index = get_nearestindex(values, *num, rm_values[rindex]);
+		if (index == *num || values[index] != rm_values[rindex])
+			continue;
+
+		memmove(&values[index], &values[index + 1], sizeof(zbx_uint64_t) * ((*num) - index - 1));
+		(*num)--;
+	}
+}

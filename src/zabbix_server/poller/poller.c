@@ -225,7 +225,16 @@ static void update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 				}
 			}
 			else
-				process_new_value(&item, &agent, now);
+			{
+				switch (zbx_process) {
+				case ZBX_PROCESS_SERVER:
+					process_new_value(&item, &agent, now);
+					break;
+				case ZBX_PROCESS_PROXY:
+					proxy_process_new_value(&item, &agent, now);
+					break;
+				}
+			}
 
 			free_result(&agent);
 		}
@@ -438,7 +447,14 @@ static int get_values(int now)
 			}
 			else
 			{
-				process_new_value(&item, &agent, now);
+				switch (zbx_process) {
+				case ZBX_PROCESS_SERVER:
+					process_new_value(&item, &agent, now);
+					break;
+				case ZBX_PROCESS_PROXY:
+					proxy_process_new_value(&item, &agent, now);
+					break;
+				}
 				DCadd_nextcheck(&item, now, NULL);
 			}
 		}
