@@ -270,7 +270,16 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 							}
 						}
 						else
-							process_new_value(&item, &agent, values[i].clock);
+						{
+							switch (zbx_process) {
+							case ZBX_PROCESS_SERVER:
+								process_new_value(&item, &agent, values[i].clock);
+								break;
+							case ZBX_PROCESS_PROXY:
+								proxy_process_new_value(&item, &agent, values[i].clock);
+								break;
+							}
+						}
 						(*processed)++;
 					}
 					else

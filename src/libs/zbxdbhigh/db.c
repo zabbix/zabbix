@@ -2139,3 +2139,37 @@ void	DBproxy_add_history_log(zbx_uint64_t itemid, char *value, int clock, int ti
 	}
 }
 
+void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num)
+{
+#define MAX_EXPRESSIONS 950
+	int	i;
+
+	if (0 == num)
+		return;
+
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, " ");
+	if (num > MAX_EXPRESSIONS)
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, "(");
+
+	for (i = 0; i < num; i++)
+	{
+		if (0 == (i % MAX_EXPRESSIONS))
+		{
+			if (0 != i)
+			{
+				(*sql_offset)--;
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 8, ") or ");
+			}
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 128, "%s in (",
+					fieldname);
+		}
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 128, ZBX_FS_UI64 ",",
+				values[i]);
+	}
+
+	(*sql_offset)--;
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, ")");
+
+	if (num > MAX_EXPRESSIONS)
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, ")");
+}
