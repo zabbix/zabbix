@@ -153,6 +153,8 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 	if (NULL == sql)
 		sql = zbx_malloc(sql, sql_allocated);
 
+	DCinit_nextchecks();
+
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 2048,
 			"select %s where h.hostid=i.hostid and h.proxy_hostid=" ZBX_FS_UI64
 			" and h.status=%d and i.status in (%d,%d)",
@@ -281,6 +283,16 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 							}
 						}
 						(*processed)++;
+
+						/* only for screen Administration|Queue */
+						if (0 != proxy_hostid && item.type != ITEM_TYPE_TRAPPER &&
+								item.type != ITEM_TYPE_ZABBIX_ACTIVE &&
+								item.type != ITEM_TYPE_HTTPTEST &&
+								0 != strcmp(item.key, SERVER_STATUS_KEY) &&
+								0 != strcmp(item.key, SERVER_ICMPPING_KEY) &&
+								0 != strcmp(item.key, SERVER_ICMPPINGSEC_KEY) &&
+								0 != strcmp(item.key, SERVER_ZABBIXLOG_KEY))
+							DCadd_nextcheck(&item, values[i].clock, NULL);
 					}
 					else
 					{
@@ -299,6 +311,8 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 		}
 	}
 	DBfree_result(result);
+
+	DCflush_nextchecks();
 
 	if (0 != CONFIG_DBSYNCER_FORKS)
 		DCflush_nextchecks();
