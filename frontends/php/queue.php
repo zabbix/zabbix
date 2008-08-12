@@ -34,7 +34,7 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"show"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	NULL)
+		"show"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2"),	NULL)
 	);
 
 	check_fields($fields);
@@ -50,7 +50,8 @@ include_once "include/page_header.php";
 	
 	$cmbMode = new CComboBox("show", $_REQUEST["show"], "submit();");
 	$cmbMode->AddItem(0, S_OVERVIEW);
-	$cmbMode->AddItem(1, S_DETAILS);
+	$cmbMode->AddItem(1, S_OVERVIEW_BY_PROXY);
+	$cmbMode->AddItem(2, S_DETAILS);
 	$form->AddItem($cmbMode);
 
 	show_table_header(S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG, $form);
@@ -72,7 +73,7 @@ include_once "include/page_header.php";
 			//ITEM_TYPE_HTTPTEST,
 			ITEM_TYPE_EXTERNAL);
 
-	$result = DBselect('SELECT i.itemid,i.nextcheck,i.description,i.key_,i.type,h.host,h.hostid '.
+	$result = DBselect('SELECT i.itemid,i.nextcheck,i.description,i.key_,i.type,h.host,h.hostid,h.proxy_hostid '.
 		' FROM items i,hosts h '.
 		' WHERE i.status='.ITEM_STATUS_ACTIVE.
 			' AND i.type in ('.implode(',',$item_types).') '.
@@ -124,7 +125,51 @@ include_once "include/page_header.php";
 			$table->addRow($elements);
 		}
 	}
-	else{
+	else if ($_REQUEST["show"] == 1)
+	{
+		$db_proxies = DBselect('select hostid from hosts where status='.HOST_STATUS_PROXY);
+
+		while (null != ($db_proxy = DBfetch($db_proxies))){
+			$sec_10[$db_proxy['hostid']]	= 0;
+			$sec_30[$db_proxy['hostid']]	= 0;
+			$sec_60[$db_proxy['hostid']]	= 0;
+			$sec_300[$db_proxy['hostid']]	= 0;
+			$sec_600[$db_proxy['hostid']]	= 0;
+			$sec_rest[$db_proxy['hostid']]	= 0;
+		}
+
+		while ($row = DBfetch($result))
+		{
+			$diff = $now - $row['nextcheck'];
+
+			if ($diff <= 10)	$sec_10[$row['proxy_hostid']]++;
+			else if ($diff <= 30)	$sec_30[$row['proxy_hostid']]++;
+			else if ($diff <= 60)	$sec_60[$row['proxy_hostid']]++;
+			else if ($diff <= 300)	$sec_300[$row['proxy_hostid']]++;
+			else if ($diff <= 600)	$sec_600[$row['proxy_hostid']]++;
+			else	$sec_rest[$row['proxy_hostid']]++;
+
+		}
+
+		$table->setHeader(array(S_PROXY,S_5_SECONDS,S_10_SECONDS,S_30_SECONDS,S_1_MINUTE,S_5_MINUTES,S_MORE_THAN_10_MINUTES));
+
+		$db_proxies = DBselect('select hostid,host from hosts where status='.HOST_STATUS_PROXY);
+
+		while (null != ($db_proxy = DBfetch($db_proxies))){
+			$elements = array(
+				$db_proxy['host'],
+				new CCol($sec_10[$db_proxy['hostid']], $sec_10[$db_proxy['hostid']] ? "unknown_trigger" : "normal"),
+				new CCol($sec_30[$db_proxy['hostid']], $sec_30[$db_proxy['hostid']] ? "information" : "normal"),
+				new CCol($sec_60[$db_proxy['hostid']], $sec_60[$db_proxy['hostid']] ? "warning" : "normal"),
+				new CCol($sec_300[$db_proxy['hostid']], $sec_300[$db_proxy['hostid']] ? "average" : "normal"),
+				new CCol($sec_300[$db_proxy['hostid']], $sec_600[$db_proxy['hostid']] ? "high" : "normal"),
+				new CCol($sec_rest[$db_proxy['hostid']], $sec_rest[$db_proxy['hostid']] ? "disaster" : "normal")
+			);
+			$table->addRow($elements);
+		}
+	}
+	else if ($_REQUEST["show"] == 2)
+	{
 		$table->SetHeader(array(
 				S_NEXT_CHECK,
 				is_show_subnodes() ? S_NODE : null,

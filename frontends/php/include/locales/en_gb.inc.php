@@ -1036,6 +1036,7 @@
 //	overview.php
 	'S_SELECT_GROUP_DOT_DOT_DOT'=>		'Select group ...',
 	'S_OVERVIEW'=>				'Overview',
+	'S_OVERVIEW_BY_PROXY'=>			'Overview by proxy',
 	'S_OVERVIEW_BIG'=>			'OVERVIEW',
 	'S_HOSTS_LOCATION'=>		'Hosts location',
 	'S_EXCL'=>				'!',
