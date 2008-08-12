@@ -166,18 +166,21 @@
 
 // Delete System Map
 
-	function delete_sysmap( $sysmapid ){
-		$result = delete_sysmaps_elements_with_sysmapid($sysmapid);
+	function delete_sysmap($sysmapids){
+		zbx_value2array($sysmapids);
+		
+		$result = delete_sysmaps_elements_with_sysmapid($sysmapids);
 		if(!$result)	return	$result;
 
-		$res=DBselect('SELECT linkid FROM sysmaps_links WHERE sysmapid='.$sysmapid);
+		$res=DBselect('SELECT linkid FROM sysmaps_links WHERE '.DBcondition('sysmapid',$sysmapids));
 		while($rows = DBfetch($res)){
 			$result&=delete_link($rows['linkid']);
 		}
 
-		$result = DBexecute('DELETE FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
-		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.sysmapids' AND source='sysmapid' AND value_id=$sysmapid");
-		$result &= DBexecute('DELETE FROM sysmaps WHERE sysmapid='.$sysmapid);
+		$result = DBexecute('DELETE FROM sysmaps_elements WHERE '.DBcondition('sysmapid',$sysmapids));
+		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.sysmapids' AND source='sysmapid' AND ".DBcondition('value_id',$sysmapids));
+		$result &= DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$sysmapids).' AND resourcetype='.SCREEN_RESOURCE_MAP);
+		$result &= DBexecute('DELETE FROM sysmaps WHERE '.DBcondition('sysmapid',$sysmapids));
 		
 	return $result;
 	}
@@ -346,12 +349,14 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function delete_sysmaps_element($selementid){
+	function delete_sysmaps_element($selementids){
+		zbx_value2array($selementids);
 		
 		$result=TRUE;
 		$sql = 'SELECT linkid FROM sysmaps_links '.
-				' WHERE selementid1='.$selementid.
-					' OR selementid2='.$selementid;
+				' WHERE '.DBcondition('selementid1',$selementids).
+					' OR '.DBcondition('selementid2',$selementids);
+					
 		$res=DBselect($sql);
 		while($rows = DBfetch($res)){
 			$result&=delete_link($rows['linkid']);
@@ -360,7 +365,7 @@
 
 		if(!$result) return	$result;
 
-		return	DBexecute("delete FROM sysmaps_elements WHERE selementid=$selementid");
+	return	DBexecute('DELETE FROM sysmaps_elements WHERE '.DBcondition('selementid',$selementids));
 	}
 
 	/******************************************************************************
@@ -368,54 +373,67 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function delete_sysmaps_elements_with_hostid($hostid){
-		$db_elements = DBselect("select selementid FROM sysmaps_elements".
-			" WHERE elementid=$hostid AND elementtype=".SYSMAP_ELEMENT_TYPE_HOST);
+	function delete_sysmaps_elements_with_hostid($hostids){
+		zbx_value2array($hostids);
+		
+		$db_elements = DBselect('SELECT selementid '.
+					' FROM sysmaps_elements '.
+					' WHERE '.DBcondition('elementid',$hostids).
+						' AND elementtype='.SYSMAP_ELEMENT_TYPE_HOST);
+						
 		while($db_element = DBfetch($db_elements)){
 			delete_sysmaps_element($db_element["selementid"]);
 		}
-		return TRUE;
+	return TRUE;
 	}
 	
-	function delete_sysmaps_elements_with_sysmapid($sysmapid){
-		$db_elements = DBselect("select selementid FROM sysmaps_elements".
-			" WHERE elementid=$sysmapid AND elementtype=".SYSMAP_ELEMENT_TYPE_MAP);
-		while($db_element = DBfetch($db_elements))
-		{
-			delete_sysmaps_element($db_element["selementid"]);
+	function delete_sysmaps_elements_with_sysmapid($sysmapids){
+		zbx_value2array($sysmapids);
+		
+		$db_elements = DBselect('SELECT selementid '.
+					' FROM sysmaps_elements '.
+					' WHERE '.DBcondition('elementid',$sysmapids).
+						' AND elementtype='.SYSMAP_ELEMENT_TYPE_MAP);
+		while($db_element = DBfetch($db_elements)){
+			delete_sysmaps_element($db_element['selementid']);
 		}
-		return TRUE;
+	return TRUE;
 	}
 
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
-	function delete_sysmaps_elements_with_triggerid($triggerid){
-		$db_elements = DBselect('SELECT selementid FROM sysmaps_elements '.
-				' WHERE elementid='.$triggerid.
-					' AND elementtype='.SYSMAP_ELEMENT_TYPE_TRIGGER);
+/******************************************************************************
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with C !!!                            *
+ *                                                                            *
+ ******************************************************************************/
+	function delete_sysmaps_elements_with_triggerid($triggerids){
+		zbx_value2array($triggerids);
+		
+		$db_elements = DBselect('SELECT selementid '.
+					' FROM sysmaps_elements '.
+					' WHERE '.DBcondition('elementid',$triggerids).
+						' AND elementtype='.SYSMAP_ELEMENT_TYPE_TRIGGER);
+		while($db_element = DBfetch($db_elements)){
+			delete_sysmaps_element($db_element["selementid"]);
+		}
+	return TRUE;
+	}
+	
+	function delete_sysmaps_elements_with_groupid($groupids){
+		zbx_value2array($groupids);
+		
+		$db_elements = DBselect('SELECT selementid '.
+						' FROM sysmaps_elements '.
+						' WHERE '.DBcondition('elementid',$groupids).
+							' AND elementtype='.SYSMAP_ELEMENT_TYPE_HOST_GROUP);
 			
 		while($db_element = DBfetch($db_elements)){
 			delete_sysmaps_element($db_element["selementid"]);
 		}
-		return TRUE;
-	}
-	
-	function delete_sysmaps_elements_with_groupid($groupid){
-		$db_elements = DBselect('SELECT selementid FROM sysmaps_elements '.
-			' WHERE elementid='.$groupid.
-				' AND elementtype='.SYSMAP_ELEMENT_TYPE_HOST_GROUP);
-			
-		while($db_element = DBfetch($db_elements)){
-			delete_sysmaps_element($db_element["selementid"]);
-		}
-		return TRUE;
+		
+	return TRUE;
 	}
 
-	function get_png_by_selementid($selementid)
-	{
+	function get_png_by_selementid($selementid){
 		$elements = DBselect("select * FROM sysmaps_elements WHERE selementid=$selementid");
 		if(!$elements)	return FALSE;
 
@@ -427,19 +445,19 @@
 		$image = get_image_by_imageid($info['iconid']);
 		if(!$image)	return FALSE;
 
-		return imagecreatefromstring($image['image']);
+	return imagecreatefromstring($image['image']);
 	}
 
-        /*
-         * Function: get_info_by_selementid
-         *
-         * Description:
-         *     Retrive information for map element
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         */
+/*
+ * Function: get_info_by_selementid
+ *
+ * Description:
+ *     Retrive information for map element
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ */
 	function get_info_by_selementid($selementid){
 		global $colors;
 

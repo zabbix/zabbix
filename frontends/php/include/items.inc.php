@@ -511,22 +511,22 @@
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function delete_template_items($hostid, $templateid = null, $unlink_mode = false){
+	function delete_template_items($hostid, $templateids = null, $unlink_mode = false){
+		zbx_value2array($templateids);
+		
 		$db_items = get_items_by_hostid($hostid);
 		while($db_item = DBfetch($db_items)){
 			if($db_item["templateid"] == 0)
 				continue;
 
 			if( !is_null($templateid)){
-				if(!is_array($templateid))	$templateid = array($templateid);
-
 				$db_tmp_item = get_item_by_itemid($db_item["templateid"]);
 
-				if(!uint_in_array($db_tmp_item["hostid"], $templateid)) continue;
+				if(!uint_in_array($db_tmp_item["hostid"], $templateids)) continue;
 			}
 
 			if($unlink_mode){
-				if(DBexecute("update items set templateid=0 where itemid=".$db_item["itemid"])){
+				if(DBexecute('UPDATE items SET templateid=0 WHERE itemid='.$db_item["itemid"])){
 					info("Item '".$db_item["key_"]."' unlinked");
 				}
 			}
@@ -658,10 +658,8 @@
 // Disable Item
 	function disable_item($itemid){
 		 // first update status for child items
-		$db_tmp_items = DBselect("select itemid, hostid from items where templateid=$itemid");
-		while($db_tmp_item = DBfetch($db_tmp_items))
-		{
-		// recursion
+		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
+		while($db_tmp_item = DBfetch($db_tmp_items)){ // recursion
 			disable_item($db_tmp_item["itemid"]);
 		}
 
@@ -669,8 +667,9 @@
 	return $result;
 	}
 
-	function get_items_by_hostid($hostid){
-		return DBselect('select * from items where hostid='.$hostid); 
+	function get_items_by_hostid($hostids){
+		zbx_value2array($hostids);
+	return DBselect('SELECT * FROM items WHERE '.DBcondition('hostid',$hostids));
 	}
 
 	function get_item_by_itemid($itemid){
@@ -733,43 +732,62 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	delete_item($itemid){
-		$item = get_item_by_itemid($itemid);
-		$host = get_host_by_itemid($itemid);
+	function delete_item($itemids){
+		zbx_value2array($itemids);
 
-		// first delete child items
-		$db_items = DBselect("select itemid from items where templateid=$itemid");
+// Get items INFO before delete them!
+		$items = array();
+		$item_res = DBselect('SELECT itemid, description, key_ FROM items WHERE '.DBcondition('itemid',$itemids));
+		while($item_rows = DBfetch($item_res)){
+			$items[$item_rows['itemid']] = $item_rows;
+		}
+// --
+		$hosts = array();
+		$hosts = get_host_by_itemid($itemids);
+
+// first delete child items
+		$del_cld_items = array();
+		$db_items = DBselect('SELECT itemid FROM items WHERE '.DBcondition('templateid',$itemids));
 		while($db_item = DBfetch($db_items)){// recursion
-			$result = delete_item($db_item["itemid"]);
+			$del_cld_items[$db_item['itemid']] = $db_item['itemid'];
+		}
+		if(!empty($del_cld_items)){
+			$result = delete_item($del_cld_items);
 			if(!$result)	return	$result;
 		}
- 
-		$result = delete_triggers_by_itemid($itemid);
+//--
+// triggers
+		$result = delete_triggers_by_itemid($itemids);
 		if(!$result)	return	$result;
-
-		$db_gitems = DBselect('select distinct graphid from graphs_items where itemid='.$itemid);
-		while($db_gitem = DBfetch($db_gitems))
-		{
-			$result = delete_graph($db_gitem["graphid"]);
+//--
+// delete graphs
+		$del_graphs = array();
+		$db_gitems = DBselect('SELECT DISTINCT graphid FROM graphs_items WHERE '.DBcondition('itemid',$itemids));
+		while($db_gitem = DBfetch($db_gitems)){
+			$del_graphs[$db_gitem['graphid']] = $db_gitem['graphid'];
+		}
+		if(!empty($del_graphs)){
+			$result = delete_graph($del_graphs);
 			if(!$result)	return	$result;
 		}
+//--
 
-		$result = delete_history_by_itemid($itemid, 1 /* use housekeeper */);
+		$result = delete_history_by_itemid($itemids, 1 /* use housekeeper */);
 		if(!$result)	return	$result;
 
-		$result &= DBexecute('DELETE FROM screens_items WHERE resourceid='.$itemid.' AND resourcetype IN ('.
-					(implode(',',array(
-						SCREEN_RESOURCE_SIMPLE_GRAPH,
-						SCREEN_RESOURCE_PLAIN_TEXT)
-						)
-					).')');
+		$temp_arr = array(SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_PLAIN_TEXT);
+		$result &= DBexecute('DELETE FROM screens_items '.
+							' WHERE '.DBcondition('resourceid',$itemids).
+								' AND '.DBcondition('resourcetype', $temp_arr));
 
-		$result &= DBexecute('delete from items_applications where itemid='.$itemid);
-		$result &= DBexecute('delete from items where itemid='.$itemid);
-		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='itemid' AND value_id=$itemid");
+		$result &= DBexecute('DELETE FROM items_applications WHERE '.DBcondition('itemid',$itemids));
+		$result &= DBexecute('DELETE FROM items WHERE '.DBcondition('itemid',$itemids));
+		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='itemid' AND ".DBcondition('value_id',$itemids));
 		
 		if($result){
-			info("Item '".$host["host"].":".$item["key_"]."' deleted");
+			foreach($items as $itemid => $item){
+				info("Item '".$hosts[$itemid]['host'].':'.$item['key_']."' deleted");
+			}
 		}
 	return $result;
 	}
@@ -1030,16 +1048,19 @@ COpt::profiling_stop('prepare table');
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function get_applications_by_itemid($itemid, $field='applicationid')
-	{
+	function get_applications_by_itemid($itemids, $field='applicationid'){
+		zbx_value2array($itemids);
+		
 		$result = array();
 		
-		$db_applications = DBselect("select distinct app.".$field." as result from applications app, items_applications ia".
-			" where app.applicationid=ia.applicationid and ia.itemid=".$itemid);
+		$db_applications = DBselect('SELECT DISTINCT app.'.$field.' as result '.
+										' FROM applications app, items_applications ia '.
+										' WHERE app.applicationid=ia.applicationid '.
+											' AND '.DBcondition('ia.itemid',$itemids));
 		while($db_application = DBfetch($db_applications))
-			array_push($result,$db_application["result"]);
+			array_push($result,$db_application['result']);
 
-		return $result;
+	return $result;
 	}
 
 	/******************************************************************************
@@ -1047,35 +1068,48 @@ COpt::profiling_stop('prepare table');
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	delete_history_by_itemid($itemid, $use_housekeeper=0){
-		$result = delete_trends_by_itemid($itemid,$use_housekeeper);
+	function delete_history_by_itemid($itemids, $use_housekeeper=0){
+		zbx_value2array($itemids);
+
+		$result = delete_trends_by_itemid($itemids,$use_housekeeper);
 		if(!$result)	return $result;
 
 		if($use_housekeeper){
-			$housekeeperid = get_dbid('housekeeper','housekeeperid');
-			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
-				" values ($housekeeperid,'history_text','itemid',$itemid)");
-			$housekeeperid = get_dbid('housekeeper','housekeeperid');
-			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
-				" values ($housekeeperid,'history_log','itemid',$itemid)");
-			$housekeeperid = get_dbid('housekeeper','housekeeperid');
-			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
-				" values ($housekeeperid,'history_uint','itemid',$itemid)");
-			$housekeeperid = get_dbid('housekeeper','housekeeperid');
-			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
-				" values ($housekeeperid,'history_str','itemid',$itemid)");
-			$housekeeperid = get_dbid('housekeeper','housekeeperid');
-			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
-				" values ($housekeeperid,'history','itemid',$itemid)");
+			foreach($itemids as $id => $itemid){
+				$housekeeperid = get_dbid('housekeeper','housekeeperid');
+				$sql = 'INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
+							" VALUES ($housekeeperid,'history_text','itemid',$itemid)";
+				DBexecute($sql);
+				
+				$housekeeperid = get_dbid('housekeeper','housekeeperid');
+				$sql = 'INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
+							" VALUES ($housekeeperid,'history_log','itemid',$itemid)";
+				DBexecute($sql);
+							
+				$housekeeperid = get_dbid('housekeeper','housekeeperid');
+				$sql = 'INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
+							" VALUES ($housekeeperid,'history_uint','itemid',$itemid)";
+				DBexecute($sql);
+							
+				$housekeeperid = get_dbid('housekeeper','housekeeperid');
+				$sql = 'INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
+							" VALUES ($housekeeperid,'history_str','itemid',$itemid)";
+				DBexecute($sql);
+							
+				$housekeeperid = get_dbid('housekeeper','housekeeperid');
+				$sql = 'INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
+							" VALUES ($housekeeperid,'history','itemid',$itemid)";
+				DBexecute($sql);
+			}
 			return TRUE;
 		}
 
-		DBexecute("delete from history_text where itemid=$itemid");
-		DBexecute("delete from history_log where itemid=$itemid");
-		DBexecute("delete from history_uint where itemid=$itemid");
-		DBexecute("delete from history_str where itemid=$itemid");
-		DBexecute("delete from history where itemid=$itemid");
-		return TRUE;
+		DBexecute('DELETE FROM history_text WHERE '.DBcondition('itemid',$itemids));
+		DBexecute('DELETE FROM history_log WHERE '.DBcondition('itemid',$itemids));
+		DBexecute('DELETE FROM history_uint WHERE '.DBcondition('itemid',$itemids));
+		DBexecute('DELETE FROM history_str WHERE '.DBcondition('itemid',$itemids));
+		DBexecute('DELETE FROM history WHERE '.DBcondition('itemid',$itemids));
+	return TRUE;
 	}
 
 	/******************************************************************************
@@ -1083,27 +1117,31 @@ COpt::profiling_stop('prepare table');
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	delete_trends_by_itemid($itemid, $use_housekeeper=0){
+	function delete_trends_by_itemid($itemids, $use_housekeeper=0){
+		zbx_value2array($itemids);
+		
 		if($use_housekeeper){
-			$housekeeperid = get_dbid('housekeeper','housekeeperid');
-			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
-				" values ($housekeeperid, 'trends','itemid',$itemid)");
+			foreach($itemids as $id => $itemid){
+				$housekeeperid = get_dbid('housekeeper','housekeeperid');
+				DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
+					" VALUES ($housekeeperid, 'trends','itemid',$itemid)");
+			}
 			return TRUE;
 		}
-	return	DBexecute("delete from trends where itemid=$itemid");
+	return	DBexecute('DELETE FROM trends WHERE '.DBcondition('itemid',$itemids));
 	}
 	
-	function	format_lastvalue($db_item){
+	function format_lastvalue($db_item){
 		if($db_item["value_type"] == ITEM_VALUE_TYPE_LOG){
-			$row=DBfetch(DBselect("select value from history_log where itemid=".$db_item["itemid"]." order by clock desc", 1));
+			$row=DBfetch(DBselect('SELECT value FROM history_log WHERE itemid='.$db_item['itemid'].' ORDER BY clock DESC', 1));
 			if($row){
-				$lastvalue=/*nbsp(htmlspecialchars(*/$row["value"]/*))*/;
+				$lastvalue=/*nbsp(htmlspecialchars(*/$row['value']/*))*/;
 				if(strlen($lastvalue) > 20)
 					$lastvalue = substr($lastvalue,0,20)." ...";
 				$lastvalue = nbsp(htmlspecialchars($lastvalue));
 			}
 			else{
-				$lastvalue="-";
+				$lastvalue='-';
 			}
 
 		}

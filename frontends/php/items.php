@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/hosts.inc.php";
-	require_once "include/items.inc.php";
-	require_once "include/forms.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/items.inc.php');
+	require_once('include/forms.inc.php');
 
 	$page["title"] = "S_CONFIGURATION_OF_ITEMS";
 	$page["file"] = "items.php";
@@ -299,7 +299,7 @@ include_once "include/page_header.php";
 		unset($_REQUEST['hostid']);
 	}
 		
-	validate_group_with_host(PERM_READ_WRITE,array('always_select_first_host','only_current_node'),'web.last.conf.groupid', 'web.last.conf.hostid');
+	validate_group_with_host(PERM_READ_WRITE,array('always_select_first_group','always_select_first_host','only_current_node'),'web.last.conf.groupid', 'web.last.conf.hostid');
 
 	update_profile('web.items.showdisabled',$showdisabled, PROFILE_TYPE_INT);
 ?>

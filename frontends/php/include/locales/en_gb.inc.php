@@ -751,6 +751,11 @@
 	'S_PROXY_NAME'=>			'Proxy name',
 	'S_LASTSEEN_AGE'=>			'Last seen (age)',
 	
+	'S_TRANSACTION'=>			'Transaction',
+	'S_STARTED_BIG'=>			'STARTED!',
+	'S_COMMITED_BIG'=>			'COMMITED!',
+	'S_ROLLBACKED_BIG'=>		'ROLLBACKED!',
+	
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
 	'S_DEVICE_TYPE'=>			'Device type',

@@ -4413,7 +4413,6 @@
 					' WHERE hostid='.$_REQUEST['hostid'].
 						' AND templateid=0 '.
 					' ORDER BY description';
-					
 			$host_items_res = DBselect($sql);
 			while($host_item = DBfetch($host_items_res)){
 				$item_description = item_description($host_item['description'],$host_item['key_']);

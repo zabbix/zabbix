@@ -740,7 +740,8 @@ void  DBdelete_trigger(zbx_uint64_t triggerid)
 		triggerid);
 	DBexecute("delete from functions where triggerid=" ZBX_FS_UI64,
 		triggerid);
-	DBexecute("delete from events where triggerid=" ZBX_FS_UI64,
+	DBexecute("delete from events where object=%d AND objectid=" ZBX_FS_UI64,
+		EVENT_OBJECT_TRIGGER,
 		triggerid);
 /*	zbx_snprintf(sql,sizeof(sql),"delete from actions where triggerid=%d and scope=%d", triggerid, ACTION_SCOPE_TRIGGER);
 	DBexecute(sql);*/

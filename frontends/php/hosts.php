@@ -486,25 +486,30 @@ include_once 'include/page_header.php';
 		else {
 /* group operations */
 			$result = true;
-			$hosts = get_request("hosts",array());
-			
-			DBstart();
-			$db_hosts=DBselect('select hostid from hosts where '.DBin_node('hostid'));
-			while($db_host=DBfetch($db_hosts)){			
-				$host=get_host_by_hostid($db_host["hostid"]);
+			$hosts = get_request('hosts',array());
+			$del_hosts = array();
+			$sql = 'SELECT host,hostid '.
+					' FROM hosts '.
+					' WHERE '.DBin_node('hostid').
+						' AND '.DBcondition('hostid',$hosts).
+						' AND '.DBcondition('hostid',$available_hosts);
+			$db_hosts=DBselect($sql);
 
-				if(!uint_in_array($db_host["hostid"],$hosts)) continue;			
-				$result &= delete_host($db_host["hostid"], $unlink_mode);
-				
-				if($result)
-					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,"Host [".$host["host"]."]");
+			DBstart();
+			while($db_host=DBfetch($db_hosts)){
+				$del_hosts[$db_host['hostid']] = $db_host['hostid'];
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$db_host['host'].']');
 			}
+			
+			$result = delete_host($del_hosts, $unlink_mode);
 			$result = DBend($result);
+			
 			show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
+
 		}
 		unset($_REQUEST["delete"]);
 	}
-/* ACTIVATE / DISABLE HOSTS */
+/* ADD / REMOVE HOSTS FROM GROUP*/
 	else if(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && (inarr_isset(array('add_to_group','hostid')))){
 		global $USER_DETAILS;
 
@@ -531,24 +536,28 @@ include_once 'include/page_header.php';
 		
 		show_messages($result, S_HOST_UPDATED, S_CANNOT_UPDATE_HOST);
 	}
+/* ACTIVATE / DISABLE HOSTS */
 	else if(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && (isset($_REQUEST["activate"])||isset($_REQUEST["disable"]))){
 	
 		$result = true;
 		$status = isset($_REQUEST["activate"]) ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
-		$hosts = get_request("hosts",array());
+		
+		$hosts = get_request('hosts',array());
+		$act_hosts = array();
+		$sql = 'SELECT host,hostid,status '.
+				' FROM hosts '.
+				' WHERE '.DBin_node('hostid').
+					' AND '.DBcondition('hostid',$hosts).
+					' AND '.DBcondition('hostid',$available_hosts);
+		$db_hosts=DBselect($sql);
 
-		$db_hosts=DBselect('select hostid from hosts where '.DBin_node('hostid'));
 		DBstart();
-		while($db_host=DBfetch($db_hosts)){		
-			if(!uint_in_array($db_host["hostid"],$hosts)) continue;
-
-			$host = get_host_by_hostid($db_host["hostid"]);
-			$result &= update_host_status($db_host["hostid"],$status);
-			
-			if($result){
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,"Old status [".$host["status"]."] "."New status [".$status."]");
-			}
+		while($db_host=DBfetch($db_hosts)){
+			$act_hosts[$db_host['hostid']] = $db_host['hostid'];
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,'Host ['.$db_host['host'].']. Old status ['.$db_host['status'].'] '.'New status ['.$status.']');
 		}
+
+		$result = update_host_status($act_hosts,$status);
 		$result = DBend($result);
 		
 		show_messages($result, S_HOST_STATUS_UPDATED, S_CANNOT_UPDATE_HOST);
@@ -564,7 +573,7 @@ include_once 'include/page_header.php';
 		
 		show_messages($result,S_HOST_STATUS_UPDATED,S_CANNOT_UPDATE_HOST_STATUS);
 		if($result){
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,"Old status [".$host["status"]."] New status [".$_REQUEST["chstatus"]."]");
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,'Host ['.$db_host['host'].']. Old status ['.$host["status"].'] New status ['.$_REQUEST["chstatus"].']');
 		}
 		unset($_REQUEST["chstatus"]);
 		unset($_REQUEST["hostid"]);
@@ -1379,9 +1388,8 @@ include_once 'include/page_header.php';
 						"CheckAll('".$form->GetName()."','all_hosts');"),
 					SPACE,
 					make_sorting_link(S_NAME,'g.name')),
-				S_LASTSEEN_AGE,
 				' # ',
-				S_MEMBERS));
+				S_MEMBERS,S_LASTSEEN_AGE));
 
 			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 
@@ -1404,14 +1412,14 @@ include_once 'include/page_header.php';
 					$style = $db_host["status"]==HOST_STATUS_MONITORED ? NULL: ( 
 						$db_host["status"]==HOST_STATUS_TEMPLATE ? "unknown" :
 						"on");
-					array_push($hosts, empty($hosts) ? '' : ', ', new CSpan($db_host["host"], $style));
+					array_push($hosts, empty($hosts) ? '' : ',', new CSpan($db_host["host"], $style));
 					$count++;
 				}
 
 				if($db_proxy['lastaccess'] != 0)
 					$lastclock = zbx_date2age($db_proxy['lastaccess']);
 				else
-					$lastclock = '-';
+					$lastclock = new CCol('-', 'center');
 
 				$table->AddRow(array(
 					array(
@@ -1421,9 +1429,9 @@ include_once 'include/page_header.php';
 								"hosts.php?form=update&hostid=".$db_proxy["hostid"].url_param("config"),
 								'action')
 					),
-					$lastclock,
 					$count,
-					new CCol((empty($hosts) ? '-' : $hosts), 'wraptext')
+					$hosts,
+					$lastclock
 					));
 			}
 			$table->SetFooter(new CCol(array(
