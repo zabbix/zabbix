@@ -1,5 +1,6 @@
 Changes for 1.5.4
 
+ - [DEV-200] Queue for proxies (Sasha)
  - [DEV-144] Queue now displays numbers differently (Alexei)
  - [DEV-198] added disabled images in the elements of maps (sasha)
  - [DEV-194] dependent triggers are not count in SoT (Artem)
