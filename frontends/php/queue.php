@@ -138,6 +138,13 @@ include_once "include/page_header.php";
 			$sec_rest[$db_proxy['hostid']]	= 0;
 		}
 
+		$sec_10[0]	= 0;
+		$sec_30[0]	= 0;
+		$sec_60[0]	= 0;
+		$sec_300[0]	= 0;
+		$sec_600[0]	= 0;
+		$sec_rest[0]	= 0;
+
 		while ($row = DBfetch($result))
 		{
 			$diff = $now - $row['nextcheck'];
@@ -153,7 +160,7 @@ include_once "include/page_header.php";
 
 		$table->setHeader(array(S_PROXY,S_5_SECONDS,S_10_SECONDS,S_30_SECONDS,S_1_MINUTE,S_5_MINUTES,S_MORE_THAN_10_MINUTES));
 
-		$db_proxies = DBselect('select hostid,host from hosts where status='.HOST_STATUS_PROXY);
+		$db_proxies = DBselect('select hostid,host from hosts where status='.HOST_STATUS_PROXY.' order by host');
 
 		while (null != ($db_proxy = DBfetch($db_proxies))){
 			$elements = array(
@@ -167,6 +174,16 @@ include_once "include/page_header.php";
 			);
 			$table->addRow($elements);
 		}
+		$elements = array(
+			new CCol(S_SERVER, 'bold'),
+			new CCol($sec_10[0], $sec_10[0] ? 'unknown_trigger' : 'normal'),
+			new CCol($sec_30[0], $sec_30[0] ? 'information' : 'normal'),
+			new CCol($sec_60[0], $sec_60[0] ? 'warning' : 'normal'),
+			new CCol($sec_300[0], $sec_300[0] ? 'average' : 'normal'),
+			new CCol($sec_300[0], $sec_600[0] ? 'high' : 'normal'),
+			new CCol($sec_rest[0], $sec_rest[0] ? 'disaster' : 'normal')
+		);
+		$table->addRow($elements);
 	}
 	else if ($_REQUEST["show"] == 2)
 	{
