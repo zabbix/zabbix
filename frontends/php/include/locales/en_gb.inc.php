@@ -1060,7 +1060,7 @@
 	'S_30_SECONDS'=>			'30 seconds',
 	'S_1_MINUTE'=>				'1 minute',
 	'S_5_MINUTES'=>				'5 minutes',
-	'S_MORE_THAN_5_MINUTES'=>		'More than 5 minutes',
+	'S_MORE_THAN_10_MINUTES'=>		'More than 10 minutes',
 
 //	report1.php
 	'S_STATUS_OF_ZABBIX'=>			'Status of ZABBIX',
