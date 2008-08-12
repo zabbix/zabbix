@@ -519,7 +519,7 @@
 			if($db_item["templateid"] == 0)
 				continue;
 
-			if( !is_null($templateid)){
+			if( !is_null($templateids)){
 				$db_tmp_item = get_item_by_itemid($db_item["templateid"]);
 
 				if(!uint_in_array($db_tmp_item["hostid"], $templateids)) continue;
