@@ -79,7 +79,7 @@ include_once "include/page_header.php";
 			' AND ((h.status='.HOST_STATUS_MONITORED.' AND h.available != '.HOST_AVAILABLE_FALSE.') '.
 				' OR (h.status='.HOST_STATUS_MONITORED.' AND h.available='.HOST_AVAILABLE_FALSE.' AND h.disable_until<='.$now.')) '.
 			' AND i.hostid=h.hostid '.
-			' AND i.nextcheck<'.$now.
+			' AND i.nextcheck + 5 <'.$now.
 			' AND i.key_ NOT IN ('.zbx_dbstr('status').','.zbx_dbstr('icmpping').','.zbx_dbstr('icmppingsec').','.zbx_dbstr('zabbix[log]').') '.
 			' AND i.value_type not in ('.ITEM_VALUE_TYPE_LOG.') '.
 			' AND '.DBcondition('h.hostid',$available_hosts).
@@ -91,33 +91,33 @@ include_once "include/page_header.php";
 	if($_REQUEST["show"]==0){
 
 		foreach($item_types as $type){
-			$sec_5[$type]=0;
 			$sec_10[$type]=0;
 			$sec_30[$type]=0;
 			$sec_60[$type]=0;
 			$sec_300[$type]=0;
+			$sec_600[$type]=0;
 			$sec_rest[$type]=0;
 		}
 
 		while($row=DBfetch($result)){
-			if($now-$row["nextcheck"]<=5)			$sec_5[$row["type"]]++;
-			else if($now-$row["nextcheck"]<=10)		$sec_10[$row["type"]]++;
+			if($now-$row["nextcheck"]<=10)			$sec_10[$row["type"]]++;
 			else if($now-$row["nextcheck"]<=30)		$sec_30[$row["type"]]++;
 			else if($now-$row["nextcheck"]<=60)		$sec_60[$row["type"]]++;
-			else if($now-$row["nextcheck"]<=300)	$sec_300[$row["type"]]++;
+			else if($now-$row["nextcheck"]<=300)		$sec_300[$row["type"]]++;
+			else if($now-$row["nextcheck"]<=600)		$sec_600[$row["type"]]++;
 			else	$sec_rest[$row["type"]]++;
 
 		}
 		
-		$table->setHeader(array(S_ITEMS,S_5_SECONDS,S_10_SECONDS,S_30_SECONDS,S_1_MINUTE,S_5_MINUTES,S_MORE_THAN_5_MINUTES));
+		$table->setHeader(array(S_ITEMS,S_5_SECONDS,S_10_SECONDS,S_30_SECONDS,S_1_MINUTE,S_5_MINUTES,S_MORE_THAN_10_MINUTES));
 		foreach($item_types as $type){
 			$elements=array(
 				item_type2str($type),
-				new CCol($sec_5[$type],($sec_5[$type])?"unknown_trigger":"normal"),
-				new CCol($sec_10[$type],($sec_10[$type])?"information":"normal"),
-				new CCol($sec_30[$type],($sec_30[$type])?"warning":"normal"),
-				new CCol($sec_60[$type],($sec_60[$type])?"average":"normal"),
-				new CCol($sec_300[$type],($sec_300[$type])?"high":"normal"),
+				new CCol($sec_10[$type],($sec_10[$type])?"unknown_trigger":"normal"),
+				new CCol($sec_30[$type],($sec_30[$type])?"information":"normal"),
+				new CCol($sec_60[$type],($sec_60[$type])?"warning":"normal"),
+				new CCol($sec_300[$type],($sec_300[$type])?"average":"normal"),
+				new CCol($sec_300[$type],($sec_600[$type])?"high":"normal"),
 				new CCol($sec_rest[$type],($sec_rest[$type])?"disaster":"normal")
 			);
 			
