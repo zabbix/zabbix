@@ -42,69 +42,90 @@
 			global $USER_DETAILS; 
 			$this->CleanItems();
 
-			$accessible_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+			$total = 0;
 
-			$cond = (remove_nodes_from_id($this->groupid)>0)?(' AND hg.groupid='.zbx_dbstr($this->groupid)):(' AND '.DBin_node('hg.groupid', $this->nodeid));
+			$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
-			$db_host_cnt = DBselect('SELECT COUNT(*) as cnt '.
-									' FROM hosts h, hosts_groups hg'.
+			$cond_from = '';
+			if(remove_nodes_from_id($this->groupid)>0){
+				$cond_from = ', hosts_groups hg ';
+				$cond_where = 'AND hg.hostid=h.hostid AND hg.groupid='.$this->groupid;
+			}
+			else{
+				$cond_where = ' AND '.DBin_node('h.hostid', $this->nodeid);
+			}
+
+			$db_host_cnt = DBselect('SELECT COUNT(DISTINCT h.hostid) as cnt '.
+									' FROM hosts h'.$cond_from.
 									' WHERE h.available='.HOST_AVAILABLE_TRUE.
-//										' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-										' AND hg.groupid IN ('.$accessible_groups.') '.$cond);
+										' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
+										' AND '.DBcondition('h.hostid',$accessible_hosts).
+										$cond_where);
 										
 			$host_cnt = DBfetch($db_host_cnt);
 			$avail = $host_cnt['cnt'];
-
-			$db_host_cnt = DBselect('SELECT COUNT(*) as cnt '.
-									' FROM hosts h, hosts_groups hg'.
+			$total += $host_cnt['cnt'];
+			
+			$db_host_cnt = DBselect('SELECT COUNT(DISTINCT h.hostid) as cnt '.
+									' FROM hosts h'.$cond_from.
 									' WHERE h.available='.HOST_AVAILABLE_FALSE.
-//										' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-										' AND hg.groupid IN ('.$accessible_groups.') '.$cond);
+										' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
+										' AND '.DBcondition('h.hostid',$accessible_hosts).
+										$cond_where);
+
 
 			$host_cnt = DBfetch($db_host_cnt);
 			$notav = $host_cnt['cnt'];
+			$total += $host_cnt['cnt'];
 
-			$db_host_cnt = DBselect('SELECT COUNT(*) as cnt '.
-									' FROM hosts h, hosts_groups hg'.
+			$db_host_cnt = DBselect('SELECT COUNT(DISTINCT h.hostid) as cnt '.
+									' FROM hosts h'.$cond_from.
 									' WHERE h.available='.HOST_AVAILABLE_UNKNOWN.
-//										' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-										' AND hg.groupid IN ('.$accessible_groups.') '.$cond);
+										' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
+										' AND '.DBcondition('h.hostid',$accessible_hosts).
+										$cond_where);
 										
 
 			$host_cnt = DBfetch($db_host_cnt);
 			$uncn = $host_cnt['cnt'];
-
+			$total += $host_cnt['cnt'];
+			
 			$node = get_node_by_nodeid($this->nodeid);
 			$header_str = S_HOSTS_INFO.SPACE;
 			
+			$header_str.= S_FOR_GROUP_SMALL.SPACE.'&quot;';
+			if($node > 0) $header_str.= '('.$node['name'].')'.SPACE;
+			
 			if(remove_nodes_from_id($this->groupid)>0){
 				$group = get_hostgroup_by_groupid($this->groupid);
-				$header_str.= S_FOR_GROUP_SMALL.SPACE.'&quot;('.$node['name'].')'.SPACE.$group['name'].'&quot;';
+				$header_str.= $group['name'].'&quot;';
 			}
 			else{
-				$header_str.= S_FOR_NODE_SMALL.SPACE.'&quot;('.$node['name'].')&quot;';
-			}
-			
+				$header_str.= S_ALL.'&quot;';
+			}			
 			
 			$header = new CCol($header_str,"header");			
 			if($this->style == STYLE_HORISONTAL)
-				$header->SetColspan(3);
+				$header->SetColspan(4);
 
 			$this->AddRow($header);
 
-			$avail	= new CCol($avail."  ".S_AVAILABLE,	"avail");
-			$notav	= new CCol($notav."  ".S_NOT_AVAILABLE,	"notav");
-			$uncn	= new CCol($uncn."  ".S_UNKNOWN,		"uncn");
+			$avail	= new CCol($avail.'  '.S_AVAILABLE,		'avail');
+			$notav	= new CCol($notav.'  '.S_NOT_AVAILABLE,	'notav');
+			$uncn	= new CCol($uncn.'  '.S_UNKNOWN,		'uncn');
+			$total	= new CCol($total.'  '.S_TOTAL,			'total');
 
 			if($this->style == STYLE_HORISONTAL){
-				$this->AddRow(array($avail, $notav, $uncn));
+				$this->AddRow(array($avail, $notav, $uncn, $total));
 			}
 			else{
 				$this->AddRow($avail);
 				$this->AddRow($notav);
 				$this->AddRow($uncn);
+				$this->AddRow($total);
 			}
-			return parent::BodyToString();
+			
+		return parent::BodyToString();
 		}
 	}
 ?>

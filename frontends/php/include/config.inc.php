@@ -85,6 +85,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	function zbx_err_handler($errno, $errstr, $errfile, $errline){
 		error($errstr.'['.$errfile.':'.$errline.']');
+//		show_messages();
+//		die();
 	}
 	
 	/********** START INITIALIZATION *********/

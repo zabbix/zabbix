@@ -58,7 +58,7 @@ catch(e){
 -->
 </script>
 <?php
-
+//SDI(SBR.'SELECTS: '.$DB['SELECT_COUNT'].SPACE.SPACE.'EXECUTE: '.$DB['EXECUTE_COUNT'].SPACE.SPACE.'TOTAL: '.($DB['EXECUTE_COUNT']+$DB['SELECT_COUNT']));
 		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')){
 			$table = new CTable(NULL,"page_footer");
 			$table->SetCellSpacing(0);

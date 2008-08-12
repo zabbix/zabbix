@@ -345,6 +345,14 @@ function zbx_nl2br(&$str){
 	}
 return $str_res;
 }
+
+function zbx_value2array(&$values){
+	if(!is_array($values) && !is_null($values)){
+		$tmp = array();
+		$tmp[$values] = $values;
+		$values = $tmp;
+	}
+}
 /************* END ZBX MISC *************/
 
 ?>

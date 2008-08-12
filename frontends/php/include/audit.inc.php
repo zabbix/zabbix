@@ -50,16 +50,14 @@
 		return S_UNKNOWN_RESOURCE;
 	}
 
-	function add_audit_if($condition,$action,$resourcetype,$details)
-	{
+	function add_audit_if($condition,$action,$resourcetype,$details){
 		if($condition) 
 			return add_audit($action,$resourcetype,$details);
 
 		return false;
 	}
 	
-	function add_audit($action,$resourcetype,$details)
-	{
+	function add_audit($action,$resourcetype,$details){
 		global $USER_DETAILS;
 
 		if(!isset($USER_DETAILS["userid"]))	check_authorisation();
@@ -69,7 +67,7 @@
 		if(strlen($details) > 128)
 			$details = substr($details, 0, 125).'...';
 
-		if(($result = DBexecute("insert into auditlog (auditid,userid,clock,action,resourcetype,details) ".
+		if(($result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,action,resourcetype,details) '.
 			" values ($auditid,".$USER_DETAILS["userid"].",".time().",$action,$resourcetype,".zbx_dbstr($details).")")))
 		{
 			$result = $auditid;

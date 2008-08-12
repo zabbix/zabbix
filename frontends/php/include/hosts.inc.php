@@ -312,12 +312,11 @@ require_once "include/httptest.inc.php";
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function unlink_template($hostid, $templateid, $unlink_mode = true){
-		if(!is_numeric($templateid)) 
-			fatal_error('Not supported type for [templateid] in [unlink_template] - ['.$templateid.']');
-
-		$result = delete_template_elements($hostid, $templateid, $unlink_mode);
-		$result&= DBexecute("delete from hosts_templates where hostid=".$hostid.' and templateid='.$templateid);
+	function unlink_template($hostid, $templateids, $unlink_mode = true){
+		zbx_value2array($templateids);
+		
+		$result = delete_template_elements($hostid, $templateids, $unlink_mode);
+		$result&= DBexecute('DELETE FROM hosts_templates WHERE hostid='.$hostid.' AND '.DBcondition('templateid',$templateids));
 	return $result;
 	}
 
@@ -333,11 +332,13 @@ require_once "include/httptest.inc.php";
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function delete_template_elements($hostid, $templateid = null, $unlink_mode = false){
-		delete_template_graphs($hostid, $templateid, $unlink_mode);
-		delete_template_triggers($hostid, $templateid, $unlink_mode);
-		delete_template_items($hostid, $templateid, $unlink_mode);
-		delete_template_applications($hostid, $templateid, $unlink_mode);
+	function delete_template_elements($hostid, $templateids = null, $unlink_mode = false){
+		zbx_value2array($templateids);
+		
+		delete_template_graphs($hostid, $templateids, $unlink_mode);
+		delete_template_triggers($hostid, $templateids, $unlink_mode);
+		delete_template_items($hostid, $templateids, $unlink_mode);
+		delete_template_applications($hostid, $templateids, $unlink_mode);
 	return true;
 	}	
 
@@ -380,79 +381,93 @@ require_once "include/httptest.inc.php";
 	function delete_groups_by_hostid($hostid){
 		$sql="select groupid from hosts_groups where hostid=$hostid";
 		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
+		
 			$sql="delete from hosts_groups where hostid=$hostid and groupid=".$row["groupid"];
 			DBexecute($sql);
+			
 			$sql="select count(*) as count from hosts_groups where groupid=".$row["groupid"];
 			$result2=DBselect($sql);
 			$row2=DBfetch($result2);
-			if($row2["count"]==0)
-			{
+			if($row2["count"]==0){
 				delete_host_group($row["groupid"]);
 			}
 		}
 	}
 
-	/*
-	 * Function: delete_host
-	 *
-	 * Description:
-	 *     Delete host with all elements and relations
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 */
-	function delete_host($hostid, $unlink_mode = false){
-		$ret = false;
-
-	// unlink child hosts
-		$db_childs = get_hosts_by_templateid($hostid);
-		while($db_child = DBfetch($db_childs))
-		{
-			unlink_template($db_child["hostid"], $hostid, $unlink_mode);
+/*
+ * Function: delete_host
+ *
+ * Description:
+ *     Delete host with all elements and relations
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
+	function delete_host($hostids, $unlink_mode = false){
+		zbx_value2array($hostids);
+		
+		$ret = false;		
+// unlink child hosts
+		$db_childs = get_hosts_by_templateid($hostids);
+		while($db_child = DBfetch($db_childs)){
+			unlink_template($db_child['hostid'], $hostids, $unlink_mode);
 		}
 
-	// delete items -> triggers -> graphs
-		$db_items = get_items_by_hostid($hostid);
+// delete items -> triggers -> graphs
+		$del_items = array();
+		$db_items = get_items_by_hostid($hostids);
 		while($db_item = DBfetch($db_items)){
-			delete_item($db_item["itemid"]);
+			$del_items[$db_item['itemid']] = $db_item['itemid'];
+		}
+		if(!empty($del_items)){
+			delete_item($del_items);
 		}
 
-	// delete host from maps
-		delete_sysmaps_elements_with_hostid($hostid);
+// delete host from maps
+		delete_sysmaps_elements_with_hostid($hostids);
 		
-	// delete host from group
-		DBexecute("delete from hosts_groups where hostid=$hostid");
+// delete host from group
+		DBexecute('DELETE FROM hosts_groups WHERE '.DBcondition('hostid',$hostids));
 
-	// delete host from template linkages
-		DBexecute("delete from hosts_templates where hostid=$hostid");
+// delete host from template linkages
+		DBexecute('DELETE FROM hosts_templates WHERE '.DBcondition('hostid',$hostids));
 
-	// disable actions
-		$db_actions = DBselect("select distinct actionid from conditions ".
-			" where conditiontype=".CONDITION_TYPE_HOST." and value=".zbx_dbstr($hostid));
-		while($db_action = DBfetch($db_actions))
-		{
-			DBexecute("update actions set status=".ACTION_STATUS_DISABLED.
-				" where actionid=".$db_action["actionid"]);
+// disable actions
+		$db_actions = DBselect('SELECT DISTINCT actionid '.
+								' FROM conditions '.
+								' WHERE conditiontype='.CONDITION_TYPE_HOST.
+									' AND '.DBcondition('value',$hostids));	// POSIBLE value type violation!!! Warning !!! Warning !!! Warning !!! 
+									
+		while($db_action = DBfetch($db_actions)){
+			DBexecute('UPDATE actions '.
+					' SET status='.ACTION_STATUS_DISABLED.
+					' WHERE actionid='.$db_action['actionid']);
 		}
-	// delete action conditions
-		DBexecute('delete from conditions where conditiontype='.CONDITION_TYPE_HOST.' and value='.zbx_dbstr($hostid));
-
-	// delete host profile
-		delete_host_profile($hostid);
 		
-	// delete web tests
-		$db_httptests = get_httptests_by_hostid($hostid);
+// delete action conditions
+		DBexecute('DELETE FROM conditions '.
+					' WHERE conditiontype='.CONDITION_TYPE_HOST.
+						' AND '.DBcondition('value',$hostids));	// POSIBLE value type violation!!! Warning !!! Warning !!! Warning !!! );
+
+// delete host profile
+		delete_host_profile($hostids);
+		
+// delete web tests
+		$del_httptests = array();
+		$db_httptests = get_httptests_by_hostid($hostids);
 		while($db_httptest = DBfetch($db_httptests)){
-			delete_httptest($db_httptest['httptestid']);
+			$del_httptests[$db_httptest['httptestid']] = $db_httptest['httptestid'];
+		}
+		if(!empty($del_httptests)){
+			delete_httptest($del_httptests);
 		}
 
-	// delete host
-		return DBexecute("delete from hosts where hostid=$hostid");
+// delete host
+	return DBexecute('DELETE FROM hosts WHERE '.DBcondition('hostid',$hostids));
 	}
 
 	function delete_host_group($groupid){
@@ -521,11 +536,12 @@ require_once "include/httptest.inc.php";
 			return DBexecute('update hosts set host='.zbx_dbstr($name).' where hostid='.$proxyid);
 	}
 
-	function delete_proxy($proxyid){
-		if(!DBexecute("update hosts set proxy_hostid=0 where proxy_hostid=$proxyid"))
+	function delete_proxy($proxyids){
+		zbx_value2array($proxyids);
+		if(!DBexecute('UPDATE hosts SET proxy_hostid=0 WHERE '.DBcondition('proxy_hostid',$proxyids)))
 			return false;
 
-		return DBexecute("delete from hosts where hostid=$proxyid");
+	return DBexecute('DELETE FROM hosts WHERE '.DBcondition('hostid',$proxyids));
 	}
 
 	function update_hosts_by_proxyid($proxyid,$hosts=array()){
@@ -556,15 +572,30 @@ require_once "include/httptest.inc.php";
 		return $result;
 	}
 
-	function get_host_by_itemid($itemid){
-		$sql="select h.* from hosts h, items i where i.hostid=h.hostid and i.itemid=$itemid";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row){
-			return $row;
+	function get_host_by_itemid($itemids){
+		zbx_value2array($itemids);	
+		
+		$result = false;
+		$hosts = array();
+		
+		$sql = 'SELECT i.itemid, h.* FROM hosts h, items i WHERE i.hostid=h.hostid AND '.DBcondition('i.itemid',$itemids);
+		$res=DBselect($sql);
+		while($row=DBfetch($res)){
+			$result = true;
+			$hosts[$row['itemid']] = $row;
 		}
-		error("No host with itemid=[$itemid]");
-		return	false;
+		
+		if(count($hosts) == 1){
+			foreach($hosts as $itemid => $host){
+				$result = $host;
+			}
+		}
+		else if($result){
+			$result = $hosts;
+			unset($hosts);
+		}
+		
+	return $result;
 	}
 
 	function get_host_by_hostid($hostid,$no_error_message=0){
@@ -581,26 +612,35 @@ require_once "include/httptest.inc.php";
 		return	false;
 	}
 
-	function get_hosts_by_templateid($templateid){
+	function get_hosts_by_templateid($templateids){
+		zbx_value2array($templateids);
 		return DBselect('SELECT h.* '.
 						' FROM hosts h, hosts_templates ht '.
 						' WHERE h.hostid=ht.hostid '.
-							' AND ht.templateid='.$templateid);
+							' AND '.DBcondition('ht.templateid',$templateids));
 	}
 
 	# Update Host status
 
-	function update_host_status($hostid,$status){
-	
-		$row=DBfetch(DBselect("select status,host from hosts where hostid=$hostid"));
-		$old_status=$row["status"];
+	function update_host_status($hostids,$status){
+		zbx_value2array($hostids);
 		
-		if($status != $old_status){
-			update_trigger_value_to_unknown_by_hostid($hostid);
-			info("Updated status of host ".$row["host"]);
-			return	DBexecute('update hosts set status='.$status.' where hostid='.$hostid.
-					' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
-					);
+		$hosts = array();
+		$result = DBselect('SELECT host, hostid, status FROM hosts WHERE '.DBcondition('hostid',$hostids));
+		while($host=DBfetch($result)){
+			if($status != $host['status']){
+				$hosts[$host['hostid']] = $host['hostid'];
+				info('Updated status of host '.$host['host']);
+			}
+		}
+
+		if(!empty($hosts)){
+			update_trigger_value_to_unknown_by_hostid($hosts);
+
+			return	DBexecute('UPDATE hosts SET status='.$status.
+							' WHERE '.DBcondition('hostid',$hosts).
+								' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
+						);
 		}
 		else{
 			return 1;
@@ -879,8 +919,8 @@ require_once "include/httptest.inc.php";
 		$_REQUEST['groupid']    = $result['groupid'];
 		$_REQUEST['hostid']     = $result['hostid'];
 
-		update_profile($host_var,$_REQUEST['hostid'], PROFILE_TYPE_ID);
-		update_profile($group_var,$_REQUEST['groupid'], PROFILE_TYPE_ID);
+		if($_REQUEST['hostid'] > 0) update_profile($host_var,$_REQUEST['hostid'], PROFILE_TYPE_ID);
+		if($_REQUEST['groupid'] > 0) update_profile($group_var,$_REQUEST['groupid'], PROFILE_TYPE_ID);
 	}
 
 /*
@@ -907,7 +947,7 @@ require_once "include/httptest.inc.php";
 		$result = get_correct_group_and_host($_REQUEST['groupid'],null,$perm,$options);
 		$_REQUEST['groupid'] = $result['groupid'];
 		
-		update_profile($group_var, $_REQUEST['groupid'], PROFILE_TYPE_ID);
+		if($_REQUEST['groupid'] > 0) update_profile($group_var, $_REQUEST['groupid'], PROFILE_TYPE_ID);
 	}
 
 /* APPLICATIONS */
@@ -1137,19 +1177,19 @@ require_once "include/httptest.inc.php";
 	 *           $templateid can be numeric or numeric array
 	 *
 	 */
-	function delete_template_applications($hostid, $templateid = null, $unlink_mode = false){
+	function delete_template_applications($hostid, $templateids = null, $unlink_mode = false){
+		zbx_value2array($templateids);
+		
 		$db_apps = get_applications_by_hostid($hostid);
 		while($db_app = DBfetch($db_apps)){
 			if($db_app["templateid"] == 0)
 				continue;
 
-			if($templateid != null){
-				if(!is_array($templateid))
-					$templateid = array($templateid);
+			if(!is_null($templateids)){
 
 				unset($skip);
 				if($tmp_app_data = get_application_by_applicationid($db_app["templateid"])){
-					if(!uint_in_array($tmp_app_data["hostid"], $templateid)){
+					if(!uint_in_array($tmp_app_data["hostid"], $templateids)){
 						$skip = true;
 						break;
 					}
@@ -1288,8 +1328,9 @@ require_once "include/httptest.inc.php";
 
 // Delete Host Profile
 
-	function delete_host_profile($hostid){
-		$result=DBexecute("delete from hosts_profiles where hostid=$hostid");
+	function delete_host_profile($hostids){
+		zbx_value2array($hostids);
+		$result=DBexecute('DELETE FROM hosts_profiles WHERE '.DBcondition('hostid',$hostids));
 
 	return $result;
 	}

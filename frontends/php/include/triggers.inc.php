@@ -395,12 +395,14 @@
 		return FALSE;
 	}
 
-	function get_hosts_by_triggerid($triggerid){
+	function get_hosts_by_triggerid($triggerids){
+		zbx_value2array($triggerids);
+		
 		return DBselect('SELECT DISTINCT h.* '.
 						' FROM hosts h, functions f, items i '.
 						' WHERE i.itemid=f.itemid '.
-							' and h.hostid=i.hostid '.
-							' and f.triggerid='.$triggerid);
+							' AND h.hostid=i.hostid '.
+							' AND '.DBcondition('f.triggerid',$triggerids));
 	}
 
 	function get_functions_by_triggerid($triggerid){
@@ -457,8 +459,9 @@
 	return $trigger;
 	}
 
-	function get_triggers_by_templateid($triggerid){
-		return DBselect('select * from triggers where templateid='.$triggerid);
+	function get_triggers_by_templateid($triggerids){
+		zbx_value2array($triggerids);
+	return DBselect('SELECT * FROM triggers WHERE '.DBcondition('templateid',$triggerids));
 	}
 
 	/*
@@ -1058,22 +1061,31 @@
 	return $short_exp;
 	}
 
-	function update_trigger_comments($triggerid,$comments){
-		return	DBexecute('UPDATE triggers SET comments='.zbx_dbstr($comments).
-					' WHERE triggerid='.$triggerid);
+	function update_trigger_comments($triggerids,$comments){
+		zbx_value2array($triggerids);
+		
+		return	DBexecute('UPDATE triggers '.
+						' SET comments='.zbx_dbstr($comments).
+						' WHERE '.DBcondition('triggerid',$triggerids));
 	}
 
 	# Update Trigger status
 
-	function update_trigger_status($triggerid,$status){
+	function update_trigger_status($triggerids,$status){
+		zbx_value2array($triggerids);
+		
 		// first update status for child triggers
-		$db_chd_triggers = get_triggers_by_templateid($triggerid);
+		$upd_chd_triggers = array();
+		$db_chd_triggers = get_triggers_by_templateid($triggerids);
 		while($db_chd_trigger = DBfetch($db_chd_triggers)){
-			update_trigger_status($db_chd_trigger["triggerid"],$status);
+			$upd_chd_triggers[$db_chd_trigger['triggerid']] = $db_chd_trigger['triggerid'];
+		}
+		if(!empty($upd_chd_triggers)){
+			update_trigger_status($upd_chd_triggers,$status);
 		}
 
-		add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
-	return	DBexecute('UPDATE triggers SET status='.$status.' WHERE triggerid='.$triggerid);
+		$triggerids = add_event($triggerids,TRIGGER_VALUE_UNKNOWN);
+	return	DBexecute('UPDATE triggers SET status='.$status.' WHERE '.DBcondition('triggerid',$triggerids));
 	}
 
 	/*
@@ -1213,48 +1225,64 @@
 	return $description;
 	}
 
-	function update_trigger_value_to_unknown_by_hostid($hostid){
+	function update_trigger_value_to_unknown_by_hostid($hostids){
+		zbx_value2array($hostids);
+
+		$triggers = array();		
 		$result = DBselect('SELECT DISTINCT t.triggerid '.
-			' FROM hosts h,items i,triggers t,functions f '.
+			' FROM items i,triggers t,functions f '.
 			' WHERE f.triggerid=t.triggerid '.
 				' AND f.itemid=i.itemid '.
-				' AND h.hostid=i.hostid '.
-				' AND h.hostid='.$hostid);
+				' AND '.DBcondition('i.hostid',$hostids));
+
 		$now = time();
 		while($row=DBfetch($result)){
-			if(!add_event($row["triggerid"],TRIGGER_VALUE_UNKNOWN,$now)) continue;
-
-			DBexecute('update triggers set value='.TRIGGER_VALUE_UNKNOWN.' where triggerid='.$row["triggerid"]);
+			$triggers[$row['triggerid']] = $row['triggerid'];
 		}
-	}
-
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
-	function add_event($triggerid, $value, $time=NULL){
-		if(is_null($time)) $time = time();
-
-		$result = DBselect('SELECT value,clock '.
-						' FROM events '.
-						' WHERE objectid='.$triggerid.
-							' AND object='.EVENT_OBJECT_TRIGGER.
-						' ORDER BY clock desc',1);
-		$last_value = DBfetch($result);
-		if($last_value){
-			if($value == $last_value['value'])
-				return false;
+		if(!empty($triggers)){
+// returns updated triggers
+			$triggers = add_event($triggers,TRIGGER_VALUE_UNKNOWN,$now);
 		}
-		$eventid = get_dbid("events","eventid");
-		$result = DBexecute('insert into events(eventid,source,object,objectid,clock,value) '.
-				' values('.$eventid.','.EVENT_SOURCE_TRIGGERS.','.EVENT_OBJECT_TRIGGER.','.$triggerid.','.$time.','.$value.')');
-				
-		if($value == TRIGGER_VALUE_FALSE || $value == TRIGGER_VALUE_TRUE){
-			DBexecute('update alerts set retries=3,error=\'Trigger changed its status. Will not send repeats.\''.
-				' where eventid='.$eventid.' and repeats>0 and status='.ALERT_STATUS_NOT_SENT);
+
+		if(!empty($triggers)){
+			DBexecute('UPDATE triggers SET value='.TRIGGER_VALUE_UNKNOWN.', lastchange='.$now.' WHERE '.DBcondition('triggerid',$triggers));
 		}
 	return true;
+	}
+
+/******************************************************************************
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with C !!!                            *
+ *           !!! C code dosn't support TRIGGERS MULTI EVENT !!!				  *
+ *                                                                            *
+ ******************************************************************************/
+	function add_event($triggerids, $value, $time=NULL){
+		zbx_value2array($triggerids);
+		if(is_null($time)) $time = time();
+
+		$result = DBselect('SELECT DISTINCT triggerid, value, type FROM triggers WHERE '.DBcondition('triggerid',$triggerids));
+		while($trigger = DBfetch($result)){
+			if(($value == $trigger['value']) && !(($value == TRIGGER_VALUE_TRUE) && ($trigger['type'] == TRIGGER_MULT_EVENT_ENABLED))){
+				unset($triggerids[$trigger['triggerid']]);
+			}
+		}
+		
+		$events = array();
+		foreach($triggerids as $id => $triggerid){
+			$eventid = get_dbid('events','eventid');
+			$result = DBexecute('INSERT INTO events (eventid,source,object,objectid,clock,value) '.
+					' VALUES ('.$eventid.','.EVENT_SOURCE_TRIGGERS.','.EVENT_OBJECT_TRIGGER.','.$triggerid.','.$time.','.$value.')');
+			$events[$eventid] = $eventid;
+		}
+				
+		if(!empty($events) && ($value == TRIGGER_VALUE_FALSE || $value == TRIGGER_VALUE_TRUE)){
+			DBexecute('UPDATE alerts '.
+						" SET retries=3,error='Trigger changed its status. Will not send repeats.'".
+					' WHERE '.DBcondition('eventid',$events).
+						' AND repeats>0 '.
+						' AND status='.ALERT_STATUS_NOT_SENT);
+		}
+	return $triggerids;
 	}
 
 	function add_trigger_dependency($triggerid,$depid){
@@ -1268,67 +1296,86 @@
 	return $result;
 	}
 
-	/******************************************************************************
-	 *                                                                            *
-	 * Purpose: Delete Trigger definition                                         *
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
-	function delete_trigger($triggerid){
-		// first delete child triggers
-		$db_triggers= get_triggers_by_templateid($triggerid);
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Delete Trigger definition                                         *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with C !!!                            *
+ *                                                                            *
+ ******************************************************************************/
+	function delete_trigger($triggerids){
+		zbx_value2array($triggerids);
+		
+// first delete child triggers
+		$del_chd_triggers = array();
+		$db_triggers= get_triggers_by_templateid($triggerids);
 		while($db_trigger = DBfetch($db_triggers)){// recursion
-			$result = delete_trigger($db_trigger["triggerid"]);
-			if(!$result)    return  $result;
+			$del_chd_triggers[$db_trigger['triggerid']] = $db_trigger['triggerid'];
+		}
+		if(!empty($del_chd_triggers)){
+			$result = delete_trigger($del_chd_triggers);
+			if(!$result) return  $result;
 		}
 
-		// get hosts before functions deletion !!!
-		$trig_hosts = get_hosts_by_triggerid($triggerid);
+// get hosts before functions deletion !!!
+		$trig_hosts = array();
+		foreach($triggerids as $id => $triggerid){
+			$trig_hosts[$triggerid] = get_hosts_by_triggerid($triggerid);
+		}
 
-		$result = delete_dependencies_by_triggerid($triggerid);
+		$result = delete_dependencies_by_triggerid($triggerids);
 		if(!$result)	return	$result;
 
-		DBexecute("delete from trigger_depends where triggerid_up=$triggerid");
+		DBexecute('DELETE FROM trigger_depends WHERE '.DBcondition('triggerid_up',$triggerids));
 
-		$result=delete_function_by_triggerid($triggerid);
+		$result = delete_function_by_triggerid($triggerids);
 		if(!$result)	return	$result;
 
-		$result=delete_events_by_triggerid($triggerid);
+		$result = delete_events_by_triggerid($triggerids);
 		if(!$result)	return	$result;
 
-		$result=delete_services_by_triggerid($triggerid);
+		$result = delete_services_by_triggerid($triggerids);
 		if(!$result)	return	$result;
 
-		$result=delete_sysmaps_elements_with_triggerid($triggerid);
+		$result = delete_sysmaps_elements_with_triggerid($triggerids);
 		if(!$result)	return	$result;
 		
-		DBexecute("delete from sysmaps_link_triggers where triggerid=$triggerid");
+		DBexecute('DELETE FROM sysmaps_link_triggers WHERE '.DBcondition('triggerid',$triggerids));
 		
-	// disable actions
-		$db_actions = DBselect('select distinct actionid from conditions '.
-			" where conditiontype=".CONDITION_TYPE_TRIGGER." and value=".zbx_dbstr($triggerid));
+// disable actions
+		$db_actions = DBselect('SELECT DISTINCT actionid '.
+								' FROM conditions '.
+								' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
+									' AND '.DBcondition('value',$triggerids));   // POSIBLE VALUE TYPE VIOLATION !!!!!!!!!!!!!!!
+									
 		while($db_action = DBfetch($db_actions)){
-			DBexecute("update actions set status=".ACTION_STATUS_DISABLED.
-				" where actionid=".$db_action["actionid"]);
+			DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.
+				' WHERE actionid='.$db_action['actionid']);
 		}
-	// delete action conditions
-		DBexecute('delete from conditions where conditiontype='.CONDITION_TYPE_TRIGGER.' and value='.zbx_dbstr($triggerid));
+		
+// delete action conditions		// POSIBLE VALUE TYPE VIOLATION !!!!!!!!!!!!!!!
+		DBexecute('DELETE FROM conditions WHERE conditiontype='.CONDITION_TYPE_TRIGGER.' AND '.DBcondition('value',$triggerids));
 
-		$trigger = get_trigger_by_triggerid($triggerid);
-
-		$result = DBexecute("delete from triggers where triggerid=$triggerid");
+// Get triggers INFO before delete them!
+		$triggers = array();
+		$trig_res = DBselect('SELECT triggerid, description FROM triggers WHERE '.DBcondition('triggerid',$triggerids));
+		while($trig_rows = DBfetch($trig_res)){
+			$triggers[$trig_rows['triggerid']] = $trig_rows;
+		}
+// --
+		$result = DBexecute('DELETE FROM triggers WHERE '.DBcondition('triggerid',$triggerids));
 
 		if($result){
-			$msg = "Trigger '".$trigger["description"]."' deleted";
-			$trig_host = DBfetch($trig_hosts);
-			if($trig_host)
-			{
-				$msg .= " from host '".$trig_host["host"]."'";
+			foreach($triggers as $triggerid => $trigger){
+				$msg = "Trigger '".$trigger["description"]."' deleted";
+				$trig_host = DBfetch($trig_hosts[$triggerid]);
+				if($trig_host){
+					$msg .= " from host '".$trig_host["host"]."'";
+				}
+				info($msg);
 			}
-			info($msg);
 		}
-		return $result;
+	return $result;
 	}
 
 	# Update Trigger definition
@@ -1401,16 +1448,16 @@
 		if($event_to_unknown) add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
 		reset_items_nextcheck($triggerid);
 
-		$sql="update triggers set";
-		if(!is_null($expression))	$sql .= " expression=".zbx_dbstr($expression).",";
-		if(!is_null($description))	$sql .= " description=".zbx_dbstr($description).",";
-		if(!is_null($type))			$sql .= " type=$type,";
-		if(!is_null($priority))		$sql .= " priority=$priority,";
-		if(!is_null($status))		$sql .= " status=$status,";
-		if(!is_null($comments))		$sql .= " comments=".zbx_dbstr($comments).",";
-		if(!is_null($url))			$sql .= " url=".zbx_dbstr($url).",";
-		if(!is_null($templateid))	$sql .= " templateid=$templateid,";
-		$sql .= " value=2 where triggerid=$triggerid";
+		$sql="UPDATE triggers SET";
+		if(!is_null($expression))	$sql .= ' expression='.zbx_dbstr($expression).',';
+		if(!is_null($description))	$sql .= ' description='.zbx_dbstr($description).',';
+		if(!is_null($type))			$sql .= ' type='.$type.',';
+		if(!is_null($priority))		$sql .= ' priority='.$priority.',';
+		if(!is_null($status))		$sql .= ' status='.$status.',';
+		if(!is_null($comments))		$sql .= ' comments='.zbx_dbstr($comments).',';
+		if(!is_null($url))			$sql .= ' url='.zbx_dbstr($url).',';
+		if(!is_null($templateid))	$sql .= ' templateid='.$templateid.',';
+		$sql .= ' value=2 WHERE triggerid='.$triggerid;
 
 		$result = DBexecute($sql);
 
@@ -1461,16 +1508,20 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function delete_dependencies_by_triggerid($triggerid){
-		$db_deps = DBselect('select triggerid_up, triggerid_down from trigger_depends'.
-			' where triggerid_down='.$triggerid);
+	function delete_dependencies_by_triggerid($triggerids){
+		zbx_value2array($triggerids);
+		
+		$db_deps = DBselect('SELECT triggerid_up, triggerid_down '.
+						' FROM trigger_depends '.
+						' WHERE '.DBcondition('triggerid_down',$triggerids));
+						
 		while($db_dep = DBfetch($db_deps)){
-			DBexecute('update triggers set dep_level=dep_level-1 where triggerid='.$db_dep['triggerid_up']);
-			DBexecute('delete from trigger_depends'.
-				' where triggerid_up='.$db_dep['triggerid_up'].
-				' and triggerid_down='.$db_dep['triggerid_down']);
+			DBexecute('UPDATE triggers SET dep_level=dep_level-1 WHERE triggerid='.$db_dep['triggerid_up']);
+			DBexecute('DELETE FROM trigger_depends'.
+				' WHERE triggerid_up='.$db_dep['triggerid_up'].
+					' AND triggerid_down='.$db_dep['triggerid_down']);
 		}
-		return true;
+	return true;
 	}
 
 	/******************************************************************************
@@ -1526,12 +1577,14 @@
 	}
 //*/
 
-	function delete_function_by_triggerid($triggerid){
-		return	DBexecute("delete from functions where triggerid=$triggerid");
+	function delete_function_by_triggerid($triggerids){
+		zbx_value2array($triggerids);
+	return	DBexecute('DELETE FROM functions WHERE '.DBcondition('triggerid',$triggerids));
 	}
 
-	function	delete_events_by_triggerid($triggerid){
-		return	DBexecute('delete from events where objectid='.$triggerid.' and object='.EVENT_OBJECT_TRIGGER);
+	function delete_events_by_triggerid($triggerids){
+		zbx_value2array($triggerids);
+	return	DBexecute('DELETE FROM events WHERE '.DBcondition('objectid',$triggerids).' AND object='.EVENT_OBJECT_TRIGGER);
 	}
 
 	/******************************************************************************
@@ -1539,14 +1592,19 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function delete_triggers_by_itemid($itemid){
-		$result=DBselect("select triggerid from functions where itemid=$itemid");
+	function delete_triggers_by_itemid($itemids){
+		zbx_value2array($itemids);
+		
+		$del_triggers = array();
+		$result=DBselect('SELECT triggerid FROM functions WHERE '.DBcondition('itemid',$itemids));
 		while($row=DBfetch($result)){
-			if(!delete_trigger($row["triggerid"])){
-				return FALSE;
-			}
+			$del_triggers[$row['triggerid']] = $row['triggerid'];
 		}
-		return TRUE;
+		if(!empty($del_triggers)){
+			if(!delete_trigger($del_triggers)) return FALSE;
+		}
+
+	return TRUE;
 	}
 
 	/******************************************************************************
@@ -1556,12 +1614,14 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function delete_services_by_triggerid($triggerid){
-		$result = DBselect("select serviceid from services where triggerid=$triggerid");
+	function delete_services_by_triggerid($triggerids){
+		zbx_value2array($triggerids);
+		
+		$result = DBselect('SELECT serviceid FROM services WHERE '.DBcondition('triggerid',$triggerids));
 		while($row = DBfetch($result)){
-			delete_service($row["serviceid"]);
+			delete_service($row['serviceid']);
 		}
-		return	TRUE;
+	return	TRUE;
 	}
 	
 	/*
@@ -1649,23 +1709,23 @@
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function delete_template_triggers($hostid, $templateid = null, $unlink_mode = false){
+	function delete_template_triggers($hostid, $templateids = null, $unlink_mode = false){
+		zbx_value2array($templateids);
+		
 		$triggers = get_triggers_by_hostid($hostid);
 		while($trigger = DBfetch($triggers)){
-			if($trigger["templateid"]==0)	continue;
+			if($trigger['templateid']==0)	continue;
 
-			if($templateid != null){
-				if( !is_array($templateid)) $templateid = array($templateid);
-					
+			if($templateid != null){				
 				$db_tmp_hosts = get_hosts_by_triggerid($trigger["templateid"]);
 				$tmp_host = DBfetch($db_tmp_hosts);
 
-				if(!uint_in_array($tmp_host["hostid"], $templateid)) continue;
+				if(!uint_in_array($tmp_host["hostid"], $templateids)) continue;
 			}
 
 			if($unlink_mode){
-				if(DBexecute("update triggers set templateid=0 where triggerid=".$trigger["triggerid"])){
-						info("Trigger '".$trigger["description"]."' unlinked");
+				if(DBexecute('UPDATE triggers SET templateid=0 WHERE triggerid='.$trigger['triggerid'])){
+						info('Trigger "'.$trigger["description"].'" unlinked');
 				}
 			}
 			else{
