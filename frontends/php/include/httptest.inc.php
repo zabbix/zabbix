@@ -330,82 +330,86 @@
 		return $result;
 	}
 	
-	function	delete_httpstep($httpstepid)
-	{
-		$db_httpstepitems = DBselect('select distinct * from httpstepitem where httpstepid='.$httpstepid);
-		while($httpstepitem_data = DBfetch($db_httpstepitems))
-		{
-			if(!DBexecute('delete from httpstepitem where httpstepitemid='.$httpstepitem_data['httpstepitemid'])) return false;
+	function delete_httpstep($httpstepids){
+		zbx_value2array($httpstepids);
+		
+		$db_httpstepitems = DBselect('SELECT DISTINCT * FROM httpstepitem WHERE '.DBcondition('httpstepid',$httpstepids));
+		while($httpstepitem_data = DBfetch($db_httpstepitems)){
+			if(!DBexecute('DELETE FROM httpstepitem WHERE httpstepitemid='.$httpstepitem_data['httpstepitemid'])) return false;
 			if(!delete_item($httpstepitem_data['itemid'])) return false;
 		}
 			
-		return DBexecute('delete from httpstep where httpstepid='.$httpstepid);
+	return DBexecute('DELETE FROM httpstep WHERE '.DBcondition('httpstepid',$httpstepids));
 	}
 	
-	function	delete_httptest($httptestid)
-	{
-		if (!($httptest = DBfetch(DBselect('select * from httptest where httptestid='.$httptestid)))) return false;
-		
-		$db_httpstep = DBselect('select distinct s.httpstepid from httpstep s '.
-			' where s.httptestid='.$httptestid);
-		while($httpstep_data = DBfetch($db_httpstep))
-		{
-			delete_httpstep($httpstep_data['httpstepid']);
+	function delete_httptest($httptestids){
+		zbx_value2array($httptestids);
+	
+		$httptests = array();
+		foreach($httptestids as $id => $httptestid){
+			$httptests[$httptestid] =  DBfetch(DBselect('SELECT * FROM httptest WHERE httptestid='.$httptestid));
 		}
 		
-		if(!DBexecute('delete from httptest where httptestid='.$httptestid)) return false;
+		$db_httpstep = DBselect('SELECT DISTINCT s.httpstepid '.
+								' FROM httpstep s '.
+								' WHERE '.DBcondition('s.httptestid',$httptestids));
+		$del_httpsteps = array();
+		while($httpstep_data = DBfetch($db_httpstep)){
+			$del_httpsteps[$httpstep_data['httpstepid']] = $httpstep_data['httpstepid'];
+		}
+		delete_httpstep($del_httpsteps);
 		
-		info("Sceanrio '".$httptest["name"]."' deleted");
+		if(!DBexecute('DELETE FROM httptest WHERE '.DBcondition('httptestid',$httptestids))) return false;
 
-		return true;
+		foreach($httptests as $id => $httptest){
+			info("Sceanrio '".$httptest["name"]."' deleted");
+		}		
+		
+	return true;
 	}
 	
-	function	activate_httptest($httptestid)
-	{
-		return DBexecute('update httptest set status='.HTTPTEST_STATUS_ACTIVE.' where httptestid='.$httptestid);
+	function activate_httptest($httptestid){
+		return DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_ACTIVE.' WHERE httptestid='.$httptestid);
 	}
 
-	function	disable_httptest($httptestid)
-	{
-		return DBexecute('update httptest set status='.HTTPTEST_STATUS_DISABLED.' where httptestid='.$httptestid);
+	function disable_httptest($httptestid){
+		return DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_DISABLED.' WHERE httptestid='.$httptestid);
 	}
 
-	function	delete_history_by_httptestid($httptestid)
-	{
-		$db_items = DBselect('select distinct i.itemid from items i, httpstepitem si, httpstep s '.
-			' where s.httptestid='.$httptestid.' and si.httpstepid=s.httpstepid and i.itemid=si.itemid');
-		while($item_data = DBfetch($db_items))
-		{
+	function delete_history_by_httptestid($httptestid){
+		$db_items = DBselect('SELECT DISTINCT i.itemid '.
+							' FROM items i, httpstepitem si, httpstep s '.
+							' WHERE s.httptestid='.$httptestid.
+								' AND si.httpstepid=s.httpstepid '.
+								' AND i.itemid=si.itemid');
+		while($item_data = DBfetch($db_items)){
 			if(!delete_history_by_itemid($item_data['itemid'], 0 /* use housekeeper */)) return false;
 		}
 		return true;
 	}
 
-	function	get_httptest_by_httptestid($httptestid)
-	{
+	function get_httptest_by_httptestid($httptestid){
 		return DBfetch(DBselect('select * from httptest where httptestid='.$httptestid));
 	}
 
-	function	get_httpsteps_by_httptestid($httptestid)
-	{
+	function get_httpsteps_by_httptestid($httptestid){
 		return DBselect('select * from httpstep where httptestid='.$httptestid);
 	}
 
-	function	get_httpstep_by_httpstepid($httpstepid)
-	{
+	function get_httpstep_by_httpstepid($httpstepid){
 		return DBfetch(DBselect('select * from httpstep where httpstepid='.$httpstepid));
 	}
 
-	function	get_httpstep_by_no($httptestid, $no)
-	{
+	function get_httpstep_by_no($httptestid, $no){
 		return DBfetch(DBselect('select * from httpstep where httptestid='.$httptestid.' and no='.$no));
 	}
 	
-	function get_httptests_by_hostid($hostid){
+	function get_httptests_by_hostid($hostids){
+		zbx_value2array($hostids);
 		$sql = 'SELECT DISTINCT ht.* '.
 				' FROM httptest ht, applications ap '.
-				' WHERE ap.hostid='.$hostid.
+				' WHERE '.DBcondition('ap.hostid',$hostids).
 					' AND ht.applicationid=ap.applicationid';
-		return DBselect($sql);
+	return DBselect($sql);
 	}
 ?>

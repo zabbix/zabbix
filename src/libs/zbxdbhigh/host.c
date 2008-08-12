@@ -3053,8 +3053,7 @@ static int	DBadd_event(
 
 	if( !now )	now = time(NULL);
 
-	db_events = DBselect("select value,clock from events where objectid=" ZBX_FS_UI64 " and object=%i "
-		" order by clock desc", triggerid, EVENT_OBJECT_TRIGGER);
+	db_events = DBselect("select lastvalue,type from triggers where triggerid=" ZBX_FS_UI64, triggerid);
 
 	if( (event_data = DBfetch(db_events)) )
 	{

@@ -94,6 +94,7 @@
 
 						$data['hostid']		= $host_data['hostid'];
 						$data['templates']	= get_templates_by_hostid($host_data['hostid']);
+						$data['groups']		= get_groupids_by_host($host_data['hostid']);
 					}
 					else{ /* missed */
 						if($this->host['missed']==1){ /* skip */

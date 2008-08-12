@@ -200,7 +200,7 @@
 		$hostid_str =(is_array($hostid))?implode('',$hostid):strval($hostid);
 		
 		if($cache && isset($available_graphs[$perm][$perm_res][$nodeid_str][$hostid_str])){
-			return $available_triggers[$perm][$perm_res][$nodeid_str][$hostid_str];
+			return $available_graphs[$perm][$perm_res][$nodeid_str][$hostid_str];
 		}
 		
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid);
@@ -227,7 +227,7 @@
 					' AND i.itemid=gi.itemid '.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					(!empty($denied_graphs)?' AND g.graphid NOT IN ('.implode(',',$denied_graphs).')':'');
-					
+
 		$db_graphs = DBselect($sql);
 		while($graph = DBfetch($db_graphs)){
 			$result[$graph['graphid']] = $graph['graphid'];
@@ -239,7 +239,7 @@
 			else
 				$result = implode(',',$result);
 		}
-		
+
 		$available_graphs[$perm][$perm_res][$nodeid_str][$hostid_str] = $result;
 
 	return $result;
@@ -255,8 +255,7 @@
  *     Aly
  *
  */	
-	function get_min_itemclock_by_graphid($graphid)
-	{
+	function get_min_itemclock_by_graphid($graphid){
 		$min = 0;
 		$row = DBfetch(DBselect('SELECT MIN(t.clock) as clock '.
 						' FROM graphs_items gi, trends t '.
@@ -274,7 +273,7 @@
 		if(!empty($row) && $row && $row['clock']) 
 			$min = $min == 0 ? $row['clock'] : min($min, $row['clock']);
 
-		return $min;
+	return $min;
 	}
 
 /*
@@ -287,8 +286,7 @@
  *     Aly
  *
  */	
-	function get_min_itemclock_by_itemid($itemid)
-	{
+	function get_min_itemclock_by_itemid($itemid){
 		$min = 0;
 		$row = DBfetch(DBselect('SELECT MIN(t.clock) as clock '.
 						' FROM trends t '.
@@ -304,7 +302,7 @@
 		if(!empty($row) && $row && $row['clock']) 
 			$min = $min == 0 ? $row['clock'] : min($min, $row['clock']);
 
-		return $min;
+	return $min;
 	}
 	
 // Show History Graph
@@ -334,7 +332,7 @@
 		echo SBR;
 	}
 
-	function	get_graphitem_by_gitemid($gitemid){
+	function get_graphitem_by_gitemid($gitemid){
 		$result=DBselect("SELECT * FROM graphs_items WHERE gitemid=$gitemid");
 		$row=DBfetch($result);
 		if($row){
@@ -345,8 +343,7 @@
 	return	$result;
 	}
 
-	function	get_graphitem_by_itemid($itemid)
-	{
+	function get_graphitem_by_itemid($itemid){
 		$result = DBfetch(DBselect('SELECT * FROM graphs_items WHERE itemid='.$itemid));
 		$row=DBfetch($result);
 		if($row)
@@ -356,7 +353,7 @@
 		return	$result;
 	}
 
-	function	get_graph_by_graphid($graphid){
+	function get_graph_by_graphid($graphid){
 
 		$result=DBselect("SELECT * FROM graphs WHERE graphid=$graphid");
 		$row=DBfetch($result);
@@ -367,8 +364,9 @@
 		return	false;
 	}
 
-	function	get_graphs_by_templateid($templateid){
-		return DBselect("SELECT * FROM graphs WHERE templateid=$templateid");
+	function	get_graphs_by_templateid($templateids){
+		zbx_value2array($templateids);
+	return DBselect('SELECT * FROM graphs WHERE '.DBcondition('templateid',$templateids));
 	}
 
 /*
@@ -677,31 +675,44 @@
          * Comments: !!! Don't forget sync code with C !!!
          *
          */
-	function	delete_graph($graphid){
-		$graph = get_graph_by_graphid($graphid);
-
-		$host_list = array();
-		$db_hosts = get_hosts_by_graphid($graphid);
-		while($db_host = DBfetch($db_hosts)){
-			$host_list[] = '"'.$db_host['host'].'"';
-		}
+	function delete_graph($graphids){
+		zbx_value2array($graphids);
 		
 		$result = true;
-		/* firstly remove child graphs */
-		$chd_graphs = get_graphs_by_templateid($graphid);
+		
+		$graphs = array();
+		$host_lists = array();
+		foreach($graphids as $id => $graphid){
+			$graphs[] = get_graph_by_graphid($graphid);
+	
+			$host_list[$graphid] = array();
+			$db_hosts = get_hosts_by_graphid($graphid);
+			while($db_host = DBfetch($db_hosts)){
+				$host_list[$graphid] = '"'.$db_host['host'].'"';
+			}
+		}		
+// firstly remove child graphs 
+		$del_chd_graphs = array();
+		$chd_graphs = get_graphs_by_templateid($graphids);
 		while($chd_graph = DBfetch($chd_graphs)){ /* recursion */
-			$result &= delete_graph($chd_graph['graphid']);
+			$del_chd_graphs[$chd_graph['graphid']] = $chd_graph['graphid'];
 		}
-
-		$result &= DBexecute('DELETE FROM screens_items WHERE resourceid='.$graphid.' AND resourcetype='.SCREEN_RESOURCE_GRAPH);
+		if(!empty($del_chd_graphs)){
+			$result &= delete_graph($del_chd_graphs);
+		}
+		
+		$result &= DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$graphids).' AND resourcetype='.SCREEN_RESOURCE_GRAPH);
 
 		/* delete graph */
-		$result &= DBexecute('DELETE FROM graphs_items WHERE graphid='.$graphid);
-		$result &= DBexecute('DELETE FROM graphs WHERE graphid='.$graphid);
-		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='graphid' AND value_id=$graphid");
+		$result &= DBexecute('DELETE FROM graphs_items WHERE '.DBcondition('graphid',$graphids));
+		$result &= DBexecute('DELETE FROM graphs WHERE '.DBcondition('graphid',$graphids));
+		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='graphid' AND ".DBcondition('value_id',$graphids));
 		
 		if($result){
-			info('Graph "'.$graph['name'].'" deleted from hosts '.implode(',',$host_list));
+			foreach($graphs as $graphid => $graph){
+				if(isset($host_list[$graphid]))
+					info('Graph "'.$graph['name'].'" deleted from hosts '.implode(',',$host_list[$graphid]));
+			}
 		}
 
 	return $result;
@@ -758,46 +769,39 @@
 		return ( $result ? $gitemid : $result );
 	}
 	
-        /*
-         * Function: delete_template_graphs
-         *
-         * Description:
-         *     Delete template graph from specified host
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         * Comments: !!! Don't forget sync code with C !!!
-         *
-         */
-	function	delete_template_graphs($hostid, $templateid = null /* array format 'arr[id]=name' */, $unlink_mode = false)
-	{
+/*
+ * Function: delete_template_graphs
+ *
+ * Description:
+ *     Delete template graph from specified host
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
+	function delete_template_graphs($hostid, $templateids = null /* array format 'arr[id]=name' */, $unlink_mode = false){
+		zbx_value2array($templateids);
+		
 		$db_graphs = get_graphs_by_hostid($hostid);
-		while($db_graph = DBfetch($db_graphs))
-		{
+		while($db_graph = DBfetch($db_graphs)){
 			if($db_graph['templateid'] == 0)
 				continue;
 
-			if($templateid != null)
-			{
-				if( !is_array($templateid) ) $templateid=array($templateid);
-
+			if(!is_null($templateids)){
 				$tmp_hhosts = get_hosts_by_graphid($db_graph['templateid']);
 				$tmp_host = DBfetch($tmp_hhosts);
 
-				if( !uint_in_array($tmp_host['hostid'], $templateid))
-					continue;
+				if( !uint_in_array($tmp_host['hostid'], $templateids)) continue;
 			}
 
-			if($unlink_mode)
-			{
-				if(DBexecute('update graphs set templateid=0 WHERE graphid='.$db_graph['graphid']))
-				{
+			if($unlink_mode){
+				if(DBexecute('UPDATE graphs SET templateid=0 WHERE graphid='.$db_graph['graphid'])){
 					info('Graph "'.$db_graph['name'].'" unlinked');
 				}	
 			}
-			else
-			{
+			else{
 				delete_graph($db_graph['graphid']);
 			}
 		}

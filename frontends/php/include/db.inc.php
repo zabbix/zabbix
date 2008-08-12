@@ -20,11 +20,11 @@
 ?>
 <?php
 if(!isset($DB)){
-	if(isset($DB_TYPE))	$DB['TYPE'] = $DB_TYPE;
-	if(isset($DB_SERVER)) $DB['SERVER'] = $DB_SERVER;
-	if(isset($DB_PORT))	$DB['PORT'] = $DB_PORT;
+	if(isset($DB_TYPE))		$DB['TYPE'] 	= $DB_TYPE;
+	if(isset($DB_SERVER)) 	$DB['SERVER'] 	= $DB_SERVER;
+	if(isset($DB_PORT))		$DB['PORT'] 	= $DB_PORT;
 	if(isset($DB_DATABASE))	$DB['DATABASE'] = $DB_DATABASE;
-	if(isset($DB_USER))	$DB['USER'] = $DB_USER;
+	if(isset($DB_USER))		$DB['USER'] 	= $DB_USER;
 	if(isset($DB_PASSWORD))	$DB['PASSWORD'] = $DB_PASSWORD;
 }
 
@@ -35,6 +35,10 @@ if(!isset($DB)){
 
 		$DB['DB'] = null;
 		$DB['TRANSACTIONS'] = 0;
+		
+//Stats
+		$DB['SELECT_COUNT'] = 0;
+		$DB['EXECUTE_COUNT'] = 0;
 
 //SDI('type: '.$DB['TYPE'].'; server: '.$DB['SERVER'].'; port: '.$DB['PORT'].'; db: '.$DB['DATABASE'].'; usr: '.$DB['USER'].'; pass: '.$DB['PASSWORD']);
 
@@ -215,9 +219,12 @@ if(!isset($DB)){
 		return true;
 	}
 	
-	function DBstart(){
+	function DBstart($comments=false){
 		global $DB;
 //SDI('DBStart(): '.$DB['TRANSACTIONS']);
+		$DB['COMMENTS'] = $comments;
+		if($DB['COMMENTS']) info(S_TRANSACTION.': '.S_STARTED_BIG);
+		
 		$DB['TRANSACTIONS']++;
 
 		if($DB['TRANSACTIONS']>1){
@@ -280,9 +287,12 @@ if(!isset($DB)){
 			$DBresult = DBcommit();
 		}
 		
+		$msg = S_TRANSACTION.': '.S_COMMITED_BIG;
 		if(!$DBresult){ // FAIL
 			DBrollback();
+			$msg = S_TRANSACTION.': '.S_ROLLBACKED_BIG;
 		}
+		if($DB['COMMENTS']) info($msg);
 		
 		$result = (!is_null($result) && $DBresult)?$result:$DBresult;
 		
@@ -358,7 +368,10 @@ if(!isset($DB)){
 		global $DB;
 //COpt::savesqlrequest($query);
 //SDI('SQL: '.$query);
+
+		$DB['SELECT_COUNT']++;
 		$result = false;
+		
 		if( isset($DB['DB']) && !empty($DB['DB']) )
 		switch($DB['TYPE']){
 			case "MYSQL":
@@ -434,6 +447,8 @@ if(!isset($DB)){
 		global $DB;
 //SDI('SQL Exec: '.$query);
 //COpt::savesqlrequest($query);
+
+		$DB['EXECUTE_COUNT']++;	// WRONG FOR ORACLE!!
 		$result = false;
 
 		if( isset($DB['DB']) && !empty($DB['DB']) )
@@ -693,16 +708,13 @@ else {
 				DBexecute("update ids set nextid=nextid+1 where nodeid=$nodeid and table_name='$table' and field_name='$field'");
 	
 				$row = DBfetch(DBselect("select nextid from ids where nodeid=$nodeid and table_name='$table' and field_name='$field'"));
-				if(!$row || is_null($row["nextid"]))
-				{
+				if(!$row || is_null($row["nextid"])){
 					/* Should never be here */
 					continue;
 				}
-				else
-				{
+				else{
 					$ret2 = $row["nextid"];
-					if(bccomp(bcadd($ret1,1),$ret2) ==0)
-					{
+					if(bccomp(bcadd($ret1,1),$ret2) ==0){
 						$found = true;
 					}
 				}
@@ -731,7 +743,7 @@ else {
 		global $DB;
 		$condition = '';
 		
-//if(!is_array($array)) SDI('OPA: '.$fieldname.' : '.$array);
+if(!is_array($array)) SDI('OPA: '.$fieldname.' : '.$array);
 
 		$in = 		$notin?' NOT IN ':' IN ';
 		$concat = 	$notin?' AND ':' OR ';
