@@ -314,9 +314,6 @@ static int	history_sender(struct zbx_json *j)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In history_sender()");
 
-	if (FAIL == connect_to_server(&sock, 600))	/* alarm !!! */
-		return FAIL;
-
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_HISTORY_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
@@ -336,14 +333,20 @@ static int	history_sender(struct zbx_json *j)
 
 	zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
-	if (SUCCEED == put_data_to_server(&sock, j)) {
-		DBbegin();
-		for (i = 0; i < li_no; i++)
-			set_lastid(li[i].ht, li[i].lastid);
-		DBcommit();
-	}
+	if (records)
+	{
+		if (FAIL == connect_to_server(&sock, 600))	/* alarm !!! */
+			return FAIL;
 
-	disconnect_server(&sock);
+		if (SUCCEED == put_data_to_server(&sock, j)) {
+			DBbegin();
+			for (i = 0; i < li_no; i++)
+				set_lastid(li[i].ht, li[i].lastid);
+			DBcommit();
+		}
+
+		disconnect_server(&sock);
+	}
 
 	return records;
 }
@@ -356,7 +359,7 @@ static int	history_sender(struct zbx_json *j)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value: number of records or FAIL if server is not accessible        * 
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -372,9 +375,6 @@ static int	dhistory_sender(struct zbx_json *j)
 	int		li_no = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In dhistory_sender()");
-
-	if (FAIL == connect_to_server(&sock, 600))	/* alarm !!! */
-		return FAIL;
 
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_DISCOVERY_DATA, ZBX_JSON_TYPE_STRING);
@@ -395,14 +395,20 @@ static int	dhistory_sender(struct zbx_json *j)
 
 	zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
-	if (SUCCEED == put_data_to_server(&sock, j)) {
-		DBbegin();
-		for (i = 0; i < li_no; i++)
-			set_lastid(li[i].ht, li[i].lastid);
-		DBcommit();
-	}
+	if (records)
+	{
+		if (FAIL == connect_to_server(&sock, 600))	/* alarm !!! */
+			return FAIL;
 
-	disconnect_server(&sock);
+		if (SUCCEED == put_data_to_server(&sock, j)) {
+			DBbegin();
+			for (i = 0; i < li_no; i++)
+				set_lastid(li[i].ht, li[i].lastid);
+			DBcommit();
+		}
+
+		disconnect_server(&sock);
+	}
 
 	return records;
 }
@@ -426,7 +432,7 @@ int	main_datasender_loop()
 {
 	struct sigaction	phan;
 	int			now, sleeptime,
-				records;
+				records, r;
 	double			sec;
 	struct zbx_json		j;
 
@@ -450,8 +456,11 @@ int	main_datasender_loop()
 		zbx_setproctitle("data sender [sending data]");
 
 		records = 0;
-		records += history_sender(&j);
-		records += dhistory_sender(&j);
+		if (FAIL != (r = history_sender(&j)))
+			records += r;
+				
+		if (FAIL != (r = dhistory_sender(&j)))
+			records += r;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Datasender spent " ZBX_FS_DBL " seconds while processing %3d values.",
 				zbx_time() - sec,

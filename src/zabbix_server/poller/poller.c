@@ -455,7 +455,7 @@ static int get_values(int now)
 					proxy_process_new_value(&item, &agent, now);
 					break;
 				}
-				DCadd_nextcheck(&item, now, NULL);
+				DCadd_nextcheck(&item, now, 0, NULL);
 			}
 		}
 		else if (res == NOTSUPPORTED || res == AGENT_ERROR)
@@ -480,7 +480,7 @@ static int get_values(int now)
 				DBcommit();
 			}
 			else
-				DCadd_nextcheck(&item, now, agent.msg);
+				DCadd_nextcheck(&item, now, 0, agent.msg);
 
 			if (HOST_AVAILABLE_TRUE != item.host_available) {
 				DBbegin();
