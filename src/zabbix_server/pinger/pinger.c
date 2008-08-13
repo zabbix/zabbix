@@ -118,7 +118,7 @@ static void process_value(char *key, ZBX_FPING_HOST *host, zbx_uint64_t *value_u
 				proxy_process_new_value(&item, &value, now);
 				break;
 			}
-			DCadd_nextcheck(&item, now, NULL);
+			DCadd_nextcheck(&item, now, 0, NULL);
 		}
 
 		free_result(&value);

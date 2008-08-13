@@ -137,7 +137,8 @@ static void	calc_timestamp(char *line,int *timestamp, char *format)
  * Comments: for trapper server process                                       *
  *                                                                            *
  ******************************************************************************/
-static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALUE *values, int value_num, int *processed)
+static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALUE *values, int value_num,
+		int *processed, time_t proxy_timediff)
 {
 	AGENT_RESULT	agent;
 	DB_RESULT	result;
@@ -203,9 +204,6 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 
 	result = DBselect("%s", sql);
 
-	if (0 != CONFIG_DBSYNCER_FORKS)
-		DCinit_nextchecks();
-
 	while (NULL != (row = DBfetch(result))) {
 		DBget_item_from_db(&item, row);
 
@@ -229,13 +227,10 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 							item.key,
 							item.host_name);
 
-					if (0 == CONFIG_DBSYNCER_FORKS)
-						DBupdate_item_status_to_notsupported(&item, values[i].clock, "Not supported by ZABBIX agent");
-					else
-						DCadd_nextcheck(&item, values[i].clock, "Not supported by ZABBIX agent");
+					DCadd_nextcheck(&item, values[i].clock, proxy_timediff, "Not supported by ZABBIX agent");
 
-					(*processed)++;
-
+					if (NULL != processed)
+						(*processed)++;
 				}
 				else
 				{
@@ -282,7 +277,8 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 								break;
 							}
 						}
-						(*processed)++;
+						if (NULL != processed)
+							(*processed)++;
 
 						/* only for screen Administration|Queue */
 						if (0 != proxy_hostid && item.type != ITEM_TYPE_TRAPPER &&
@@ -292,7 +288,7 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 								0 != strcmp(item.key, SERVER_ICMPPING_KEY) &&
 								0 != strcmp(item.key, SERVER_ICMPPINGSEC_KEY) &&
 								0 != strcmp(item.key, SERVER_ZABBIXLOG_KEY))
-							DCadd_nextcheck(&item, values[i].clock, NULL);
+							DCadd_nextcheck(&item, values[i].clock, proxy_timediff, NULL);
 					}
 					else
 					{
@@ -313,9 +309,6 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 	DBfree_result(result);
 
 	DCflush_nextchecks();
-
-	if (0 != CONFIG_DBSYNCER_FORKS)
-		DCflush_nextchecks();
 }
 
 /******************************************************************************
@@ -384,17 +377,14 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 {
 	struct zbx_json_parse   jp_data, jp_row;
 	const char		*p;
-	char			/*host[HOST_HOST_LEN_MAX], key[ITEM_KEY_LEN_MAX],
-				value[MAX_STRING_LEN], */info[MAX_STRING_LEN], /*lastlogsize[MAX_STRING_LEN],
-				timestamp[MAX_STRING_LEN], source[MAX_STRING_LEN], severity[MAX_STRING_LEN],
-				clock[MAX_STRING_LEN], */tmp[MAX_STRING_LEN];
+	char			info[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
 	int			ret = SUCCEED;
 	int			processed = 0, processed_fail = 0;
 	double			sec;
-	time_t			now, hosttime = 0/*, itemtime*/;
+	time_t			now, proxy_timediff = 0;
 
 #define VALUES_MAX	256
-	static AGENT_VALUE	*values = NULL;
+	static AGENT_VALUE	*values = NULL, *av;
 	int			value_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_new_values()");
@@ -406,7 +396,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 		values = zbx_malloc(values, VALUES_MAX * sizeof(AGENT_VALUE));
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
-		hosttime = atoi(tmp);
+		proxy_timediff = now - atoi(tmp);
 
 /* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]} 
  *                                     ^
@@ -439,62 +429,53 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 				jp_row.end - jp_row.start + 1,
 				jp_row.start);*/
 
-		memset(&values[value_num], 0, sizeof(AGENT_VALUE));
+		av = &values[value_num];
 
-		values[value_num].clock = now;
+		memset(av, 0, sizeof(AGENT_VALUE));
 
-		if (hosttime && SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
-			values[value_num].clock -= hosttime - atoi(tmp);
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
+			av->clock = atoi(tmp) + proxy_timediff;
+		else
+			av->clock = now;
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, values[value_num].host_name, sizeof(values[value_num].host_name)))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, av->host_name, sizeof(av->host_name)))
 			continue;
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, values[value_num].key, sizeof(values[value_num].key)))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, av->key, sizeof(av->key)))
 			continue;
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, tmp, sizeof(tmp)))
 			continue;
 
-		values[value_num].value = strdup(tmp);
+		av->value = strdup(tmp);
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, sizeof(tmp))) 
-			values[value_num].lastlogsize = atoi(tmp);
+			av->lastlogsize = atoi(tmp);
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGTIMESTAMP, tmp, sizeof(tmp)))
-			values[value_num].timestamp = atoi(tmp);
+			av->timestamp = atoi(tmp);
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGSOURCE, tmp, sizeof(tmp)))
-			values[value_num].source = strdup(tmp);
+			av->source = strdup(tmp);
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGSEVERITY, tmp, sizeof(tmp)))
-			values[value_num].severity = atoi(tmp);
+			av->severity = atoi(tmp);
 
 		value_num ++;
 
 		if (value_num == VALUES_MAX) {
 			DBbegin();
-			process_mass_data(sock, proxy_hostid, values, value_num, &processed);
+			process_mass_data(sock, proxy_hostid, values, value_num, &processed, proxy_timediff);
 			DBcommit();
 
 			clean_agent_values(values, value_num);
 			value_num = 0;
 		}
-
-/*		DBbegin();
-		if(SUCCEED == process_data(sock, proxy_hostid, itemtime, host, key, value, lastlogsize, timestamp, source, severity))
-		{
-			processed_ok ++;
-		}
-		else
-		{
-			processed_fail ++;
-		}
-		DBcommit();*/
 	}
 
 	if (value_num > 0) {
 		DBbegin();
-		process_mass_data(sock, proxy_hostid, values, value_num, &processed);
+		process_mass_data(sock, proxy_hostid, values, value_num, &processed, proxy_timediff);
 		DBcommit();
 	}
 
@@ -598,6 +579,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 
 	struct 		zbx_json_parse jp;
 	char		value[MAX_STRING_LEN];
+	AGENT_VALUE	av;
 
 	zbx_rtrim(s, " \r\n\0");
 
@@ -750,8 +732,17 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 		}
 		zabbix_log( LOG_LEVEL_DEBUG, "Value [%s]", value_string);
 
+		av.clock = time(NULL);
+		zbx_strlcpy(av.host_name, server, sizeof(av.host_name));
+		zbx_strlcpy(av.key, key, sizeof(av.key));
+		av.value = value_string;
+		av.lastlogsize = atoi(lastlogsize);
+		av.timestamp = atoi(timestamp);
+		av.source = source;
+		av.severity = atoi(severity);
+
 		DBbegin();
-/*		ret=process_data(sock, 0, time(NULL), server, key, value_string, lastlogsize, timestamp, source, severity);*/
+		process_mass_data(sock, 0, &av, 1, NULL, 0);
 		DBcommit();
 		
 		if( zbx_tcp_send_raw(sock, SUCCEED == ret ? "OK" : "NOT OK") != SUCCEED)

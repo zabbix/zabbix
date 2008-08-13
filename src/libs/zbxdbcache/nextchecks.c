@@ -95,7 +95,7 @@ static int	DCget_nextcheck_nearestindex(time_t clock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCadd_nextcheck(DB_ITEM *item, time_t now, const char *error_msg)
+void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *error_msg)
 {
 	int	index, nextcheck;
 
@@ -107,7 +107,7 @@ void	DCadd_nextcheck(DB_ITEM *item, time_t now, const char *error_msg)
 		nextchecks = zbx_realloc(nextchecks, nextcheck_allocated * sizeof(ZBX_DC_NEXTCHECK));
 	}
 
-	nextcheck = calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now);
+	nextcheck = calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now - timediff) + timediff;
 	index = DCget_nextcheck_nearestindex(nextcheck);
 
 	memmove(&nextchecks[index + 1], &nextchecks[index], sizeof(ZBX_DC_NEXTCHECK) * (nextcheck_num - index));
