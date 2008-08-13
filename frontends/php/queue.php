@@ -118,7 +118,7 @@ include_once "include/page_header.php";
 				new CCol($sec_30[$type],($sec_30[$type])?"information":"normal"),
 				new CCol($sec_60[$type],($sec_60[$type])?"warning":"normal"),
 				new CCol($sec_300[$type],($sec_300[$type])?"average":"normal"),
-				new CCol($sec_300[$type],($sec_600[$type])?"high":"normal"),
+				new CCol($sec_600[$type],($sec_600[$type])?"high":"normal"),
 				new CCol($sec_rest[$type],($sec_rest[$type])?"disaster":"normal")
 			);
 			
@@ -169,7 +169,7 @@ include_once "include/page_header.php";
 				new CCol($sec_30[$db_proxy['hostid']], $sec_30[$db_proxy['hostid']] ? "information" : "normal"),
 				new CCol($sec_60[$db_proxy['hostid']], $sec_60[$db_proxy['hostid']] ? "warning" : "normal"),
 				new CCol($sec_300[$db_proxy['hostid']], $sec_300[$db_proxy['hostid']] ? "average" : "normal"),
-				new CCol($sec_300[$db_proxy['hostid']], $sec_600[$db_proxy['hostid']] ? "high" : "normal"),
+				new CCol($sec_600[$db_proxy['hostid']], $sec_600[$db_proxy['hostid']] ? "high" : "normal"),
 				new CCol($sec_rest[$db_proxy['hostid']], $sec_rest[$db_proxy['hostid']] ? "disaster" : "normal")
 			);
 			$table->addRow($elements);
@@ -180,7 +180,7 @@ include_once "include/page_header.php";
 			new CCol($sec_30[0], $sec_30[0] ? 'information' : 'normal'),
 			new CCol($sec_60[0], $sec_60[0] ? 'warning' : 'normal'),
 			new CCol($sec_300[0], $sec_300[0] ? 'average' : 'normal'),
-			new CCol($sec_300[0], $sec_600[0] ? 'high' : 'normal'),
+			new CCol($sec_600[0], $sec_600[0] ? 'high' : 'normal'),
 			new CCol($sec_rest[0], $sec_rest[0] ? 'disaster' : 'normal')
 		);
 		$table->addRow($elements);
