@@ -434,14 +434,19 @@ include_once 'include/page_header.php';
 	$cmbConf->AddItem(0,S_USERS);
 	$cmbConf->AddItem(1,S_USER_GROUPS);
 
-	$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
-	$cmbUGrp->AddItem(0,S_ALL);
-	$result = DBselect('SELECT * FROM usrgrp ORDER BY name');
-	while($usrgrp = DBfetch($result)){
-		$cmbUGrp->AddItem($usrgrp['usrgrpid'],$usrgrp['name']);
+	$frmForm->AddItem($cmbConf);
+	
+	if(0 == $_REQUEST['config']){
+		$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
+		$cmbUGrp->AddItem(0,S_ALL);
+		$result = DBselect('SELECT * FROM usrgrp ORDER BY name');
+		while($usrgrp = DBfetch($result)){
+			$cmbUGrp->AddItem($usrgrp['usrgrpid'],$usrgrp['name']);
+		}
+		
+		$frmForm->AddItem(array(SPACE.SPACE,S_USER_GROUP,$cmbUGrp));
 	}
 	
-	$frmForm->AddItem(array($cmbConf,SPACE.SPACE,S_USER_GROUP,$cmbUGrp));
 	$frmForm->AddItem(SPACE.'|'.SPACE);
 	$frmForm->AddItem($btnNew = new CButton('form',($_REQUEST['config'] == 0) ? S_CREATE_USER : S_CREATE_GROUP));
 	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
