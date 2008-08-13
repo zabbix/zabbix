@@ -45,7 +45,8 @@ include_once 'include/page_header.php';
 /* user */
 		'userid'=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({config})&&({config}==0))&&(isset({form})&&({form}=="update"))'),
 		'group_userid'=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
-
+		'filter_usrgrpid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
+		
 		'alias'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
 		'name'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
 		'surname'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
@@ -423,6 +424,9 @@ include_once 'include/page_header.php';
 	}
 ?>
 <?php
+	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid',get_profile('web.users.filter.usrgrpid',0));
+	update_profile('web.users.filter.usrgrpid',$_REQUEST['filter_usrgrpid'],PROFILE_TYPE_ID);
+	
 	$frmForm = new CForm();
 	$frmForm->SetMethod('get');
 	
@@ -430,7 +434,14 @@ include_once 'include/page_header.php';
 	$cmbConf->AddItem(0,S_USERS);
 	$cmbConf->AddItem(1,S_USER_GROUPS);
 
-	$frmForm->AddItem($cmbConf);
+	$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
+	$cmbUGrp->AddItem(0,S_ALL);
+	$result = DBselect('SELECT * FROM usrgrp ORDER BY name');
+	while($usrgrp = DBfetch($result)){
+		$cmbUGrp->AddItem($usrgrp['usrgrpid'],$usrgrp['name']);
+	}
+	
+	$frmForm->AddItem(array($cmbConf,SPACE.SPACE,S_USER_GROUP,$cmbUGrp));
 	$frmForm->AddItem(SPACE.'|'.SPACE);
 	$frmForm->AddItem($btnNew = new CButton('form',($_REQUEST['config'] == 0) ? S_CREATE_USER : S_CREATE_GROUP));
 	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
@@ -462,9 +473,18 @@ include_once 'include/page_header.php';
 				S_ACTIONS
 				));
 		
-			$db_users=DBselect('SELECT u.userid,u.alias,u.name,u.surname,u.type,u.autologout '.
-							' FROM users u'.
+		
+			$cond_from = '';
+			$cond_where = '';
+			if($_REQUEST['filter_usrgrpid'] > 0){
+				$cond_from = ', users_groups ug, usrgrp ugrp ';
+				$cond_where = ' AND ug.userid = u.userid '.' AND ug.usrgrpid='.$_REQUEST['filter_usrgrpid'];
+			}
+		
+			$db_users=DBselect('SELECT DISTINCT u.userid,u.alias,u.name,u.surname,u.type,u.autologout '.
+							' FROM users u '.$cond_from.
 							' WHERE '.DBin_node('u.userid').
+								$cond_where.
 							order_by('u.alias,u.name,u.surname,u.type','u.userid'));
 			while($db_user=DBfetch($db_users)){
 //Log Out 10min or Autologout time
@@ -550,12 +570,10 @@ include_once 'include/page_header.php';
 
 			$table = new CTableInfo(S_NO_USER_GROUPS_DEFINED);
 			$table->setHeader(array(
-				 array(  new CCheckBox('all_groups',NULL,
-                                        "CheckAll('".$form->GetName()."','all_groups');"),
-					make_sorting_link(S_NAME,'ug.name')),
-				S_MEMBERS,
+				S_USERS_STATUS,
 				S_GUI_ACCESS,
-				S_USERS_STATUS
+				array(  new CCheckBox('all_groups',NULL, "CheckAll('".$form->GetName()."','all_groups');"), make_sorting_link(S_NAME,'ug.name')),
+				S_MEMBERS,
 				));
 		
 			$result=DBselect('SELECT ug.usrgrpid, ug.name, ug.users_status, ug.gui_access '.
@@ -574,7 +592,10 @@ include_once 'include/page_header.php';
 								' ORDER BY u.alias');
 
 				while($db_user=DBfetch($db_users)){
-					$users[$db_user['userid']] = $db_user['alias'];
+					if(!empty($users)) $users[$db_user['userid']][] = ', ';
+					else $users[$db_user['userid']] = array();
+					
+					$users[$db_user['userid']][] = new Clink($db_user['alias'],'users.php?form=update&config=0&userid='.$db_user['userid'].'#form');
 				}
 				
 				$gui_access = user_auth_type2str($row['gui_access']);
@@ -612,15 +633,15 @@ include_once 'include/page_header.php';
 				}
 								
 				$table->addRow(array(
+					$users_status,
+					$gui_access,
 					array(
 						 new CCheckBox('group_groupid['.$row['usrgrpid'].']',NULL,NULL,$row['usrgrpid']),
 						$alias = new CLink($row['name'],
 							'users.php?form=update'.url_param('config').
 							'&usrgrpid='.$row['usrgrpid'].'#form', 'action')
 					),
-					implode(', ',$users),
-					$gui_access,
-					$users_status
+					new CCol($users,'wraptext')
 					));
 			}
 			$table->SetFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_GROUPS_Q)));
