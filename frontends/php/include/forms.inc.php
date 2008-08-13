@@ -4284,7 +4284,7 @@
 		
 		$frmHost->AddRow(S_NAME,new CTextBox('host',$host,20));
 
-		$grp_tb = new CTweenBox($frmHost,'groups',$groups,6);	
+		$grp_tb = new CTweenBox($frmHost,'groups',$groups,10);	
 		$db_groups=DBselect('SELECT DISTINCT groupid,name '.
 						' FROM groups '.
 						' WHERE groupid IN ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).') '.
@@ -4540,9 +4540,9 @@
 			$frmHostG->AddVar("groupid",$_REQUEST["groupid"]);
 		}
 
-		$frmHostG->AddRow(S_GROUP_NAME,new CTextBox("gname",$name,30));
+		$frmHostG->AddRow(S_GROUP_NAME,new CTextBox("gname",$name,48));
 
-		$cmbHosts = new CTweenBox($frmHostG,'hosts',$hosts);
+		$cmbHosts = new CTweenBox($frmHostG,'hosts',$hosts, 25);
 		$db_hosts=DBselect('SELECT DISTINCT hostid,host '.
 				' FROM hosts '.
 				' WHERE status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.

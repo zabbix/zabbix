@@ -59,7 +59,7 @@
 		return "ereg(\"^[a-zA-Z0-9]{1,}$\",{".$var."})&&";
 	}
 	function	KEY_PARAM($var=NULL){
-		return 'ereg(\'^([0-9a-zA-Z\_\.[.'.ZBX_EREG_SPACE_SYMB.'.]\$ ]+)$\',{'.$var.'})&&';
+		return 'ereg(\'^([0-9a-zA-Z\_\.[.'.ZBX_EREG_MINUS_SYMB.'.]\$ ]+)$\',{'.$var.'})&&';
 	}
 	function	validate_ipv4($str,&$arr){
 		if( !ereg('^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$', $str, $arr) )	return false;

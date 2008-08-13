@@ -172,7 +172,7 @@ include_once "include/page_header.php";
 	$srcfld2	= get_request("srcfld2", null);	// second source table field [can be different from fields of source table]
 	
 	$monitored_hosts	= get_request("monitored_hosts", 0);
-	$real_hosts		= get_request("real_hosts", 0);
+	$real_hosts			= get_request("real_hosts", 0);
 	$only_hostid		= get_request("only_hostid", null);
 
 	$host_status		= array();
@@ -229,13 +229,13 @@ include_once "include/page_header.php";
 		unset($_REQUEST["groupid"],$_REQUEST["nodeid"]);
 	}
 	
-	$validation_param = array("allow_all_hosts");
+	$validation_param = array('allow_all_hosts','always_select_first_host');
 
 	if($monitored_hosts)
-		array_push($validation_param, "monitored_hosts");
+		array_push($validation_param, 'monitored_hosts');
 		
 	if($real_hosts)
-		array_push($validation_param, "real_hosts");
+		array_push($validation_param, 'real_hosts');
 		
 	if(str_in_array($srctbl,array("graphs","screens","triggers","logitems","items"))){
 		array_push($validation_param, "always_select_first_host");
