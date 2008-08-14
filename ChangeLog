@@ -1,5 +1,6 @@
 Changes for 1.5.4
 
+ - [DEV-202] fixed compilation problem under Solaris (Sasha)
  - [DEV-201] improved performance on disabling/enabling, deleting hosts (Artem)
  - [DEV-200] Queue for proxies (Sasha)
  - [DEV-144] Queue now displays numbers differently (Alexei)
