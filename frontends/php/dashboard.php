@@ -220,8 +220,8 @@ include_once "include/page_header.php";
 	make_refresh_menu('hat_webovr',get_profile('web.dahsboard.rf_rate.hat_webovr',60),$menu,$submenu);
 	make_refresh_menu('hat_dscvry',get_profile('web.dahsboard.rf_rate.hat_dscvry',60),$menu,$submenu);
 	
-	insert_js('var dashboard_menu='.zbx_jsvalue($menu)."\n".
-			 'var dashboard_submenu='.zbx_jsvalue($submenu)."\n"
+	insert_js('var dashboard_menu='.zbx_jsvalue($menu).";\n".
+			 'var dashboard_submenu='.zbx_jsvalue($submenu).";\n"
 		);
 	
 // --------------
