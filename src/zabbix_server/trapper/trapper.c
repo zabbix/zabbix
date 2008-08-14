@@ -256,6 +256,7 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 					{
 						if (0 == CONFIG_DBSYNCER_FORKS)
 						{
+							DBbegin();
 							switch (zbx_process) {
 							case ZBX_PROCESS_SERVER:
 								process_new_value(&item, &agent, values[i].clock);
@@ -265,6 +266,7 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 								proxy_process_new_value(&item, &agent, values[i].clock);
 								break;
 							}
+							DBcommit();
 						}
 						else
 						{
@@ -464,20 +466,15 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 		value_num ++;
 
 		if (value_num == VALUES_MAX) {
-			DBbegin();
 			process_mass_data(sock, proxy_hostid, values, value_num, &processed, proxy_timediff);
-			DBcommit();
 
 			clean_agent_values(values, value_num);
 			value_num = 0;
 		}
 	}
 
-	if (value_num > 0) {
-		DBbegin();
+	if (value_num > 0)
 		process_mass_data(sock, proxy_hostid, values, value_num, &processed, proxy_timediff);
-		DBcommit();
-	}
 
 	clean_agent_values(values, value_num);
 
@@ -741,9 +738,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 		av.source = source;
 		av.severity = atoi(severity);
 
-		DBbegin();
 		process_mass_data(sock, 0, &av, 1, NULL, 0);
-		DBcommit();
 		
 		if( zbx_tcp_send_raw(sock, SUCCEED == ret ? "OK" : "NOT OK") != SUCCEED)
 		{
