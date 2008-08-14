@@ -145,11 +145,17 @@ include_once 'include/page_header.php';
 			}
 		}
 		else if(isset($_REQUEST['save'])){
+			$config = select_config();
+			
 			$user_groups = get_request('user_groups', array());
 			$user_medias = get_request('user_medias', array());
 
 			$_REQUEST['password1'] = get_request('password1', null);
 			$_REQUEST['password2'] = get_request('password2', null);
+			
+			if($config['authentication_type'] != ZBX_AUTH_INTERNAL){
+				$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
+			}
 
 			if($_REQUEST['password1']!=$_REQUEST['password2']){
 				if(isset($_REQUEST['userid']))

@@ -143,7 +143,7 @@ function ldap_authentication($user,$passwd,$cnf=NULL){
 			}
 		}
 	}
-		
+
 	$ldap = new CLdap($cnf);
 	$ldap->connect();
 	
