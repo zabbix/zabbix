@@ -417,8 +417,88 @@
 	}
 	
 /********************************/
+	function get_user_menu_array($userids = array()){
+		$menu_all = array();
+		$menu_gui_access = array();
+		$menu_users_status = array();
+		
+		$res = DBselect('SELECT DISTINCT g.usrgrpid, g.name, g.gui_access, g.users_status'.
+			' FROM usrgrp g'.
+			' WHERE '.DBin_node('g.usrgrpid', get_current_nodeid(false)).
+			' ORDER BY g.name');
+		
+		while($group=DBfetch($res)){
+			$group['name'] = htmlspecialchars($group['name']);
+			
+			$gui_access = $group['gui_access'];
+			$users_status = $group['users_status'];
+
+			unset($group['gui_access']);
+			unset($group['users_status']);
+
+			$menu_all[] = $group;			
+			if($gui_access != GROUP_GUI_ACCESS_SYSTEM){
+				$menu_gui_access[] = $group;
+			}
+
+			if($users_status == GROUP_STATUS_DISABLED){
+				$menu_users_status[] = $group;
+			}
+		}
+		insert_js(
+			'var menu_usrgrp_all='.zbx_jsvalue($menu_all).";\n".
+			'var menu_usrgrp_gui='.zbx_jsvalue($menu_gui_access).";\n".
+			'var menu_usrgrp_status='.zbx_jsvalue($menu_users_status).";\n"
+		);
+		
+	}
 
 	function get_user_actionmenu($userid){
+		$usr_grp_all_in = array();
+		$usr_grp_gui_in = array();
+		$usr_grp_status_in = array();
+		
+		$sql = 'SELECT DISTINCT g.name, g.usrgrpid, g.gui_access, g.users_status '.
+			' FROM users_groups ug, usrgrp g '.
+			' WHERE ug.userid='.$userid.
+				' AND g.usrgrpid=ug.usrgrpid '.
+				' AND '.DBin_node('g.usrgrpid', get_current_nodeid(false));
+		if($res = DBselect($sql)){
+			while($group = DBFetch($res)){
+				$group['name'] = htmlspecialchars($group['name']);
+				
+				$gui_access = $group['gui_access'];
+				$users_status = $group['users_status'];
+				
+				unset($group['gui_access']);
+				unset($group['users_status']);
+			
+				$usr_grp_all_in[] = $group;	
+				if($gui_access != GROUP_GUI_ACCESS_SYSTEM){
+					$usr_grp_gui_in[] = $groups;
+				}
+				if($users_status == GROUP_STATUS_DISABLED){
+					$usr_grp_status_in[] = $group;
+				}
+			}
+		}
+				
+		$action = new CSpan(S_SELECT);
+
+		$script = new CScript("javascript: create_user_menu(event,".
+												$userid.",".
+												zbx_jsvalue($usr_grp_all_in).",".
+												zbx_jsvalue($usr_grp_gui_in).",".
+												zbx_jsvalue($usr_grp_status_in).");"
+							 );
+							 
+		$action->AddAction('onclick',$script);
+		$action->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
+		
+	return $action;
+	}
+	
+	function get_user_actionmenu_old($userid){
 		global $USER_DETAILS;
 		
 		$action = new CSpan(S_SELECT);		

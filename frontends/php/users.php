@@ -29,6 +29,7 @@
 	$page['title'] = 'S_USERS';
 	$page['file'] = 'users.php';
 	$page['hist_arg'] = array('config');
+	$page['scripts'] = array('users.js');
 
 include_once 'include/page_header.php';
 
@@ -483,7 +484,7 @@ include_once 'include/page_header.php';
 				S_STATUS,
 				S_ACTIONS
 				));
-		
+
 		
 			$cond_from = '';
 			$cond_where = '';
@@ -569,6 +570,8 @@ include_once 'include/page_header.php';
 
 			$jsmenu = new CPUMenu(null,270);
 			$jsmenu->InsertJavaScript();
+			
+			get_user_menu_array();
 		}
 	}
 	else if($_REQUEST['config']==1){	// USER GROUPS
