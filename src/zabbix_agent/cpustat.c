@@ -43,79 +43,73 @@
 static int	zbx_get_cpu_num(void)
 {
 #if defined(_WINDOWS)
-
 	SYSTEM_INFO	sysInfo;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In zbx_get_cpu_num(a)");
 
 	GetSystemInfo(&sysInfo);
 
 	return (int)(sysInfo.dwNumberOfProcessors);
-
 #elif defined(HAVE_SYS_PSTAT_H)
-
 	struct pst_dynamic psd;
 
-	if ( -1 == pstat_getdynamic(&psd, sizeof(struct pst_dynamic), 1, 0) )
-	{
-		zabbix_log(LOG_LEVEL_WARNING , "Failed pstat_getdynamic to determine number of CPUs, adjust to 1");
-		return 1;
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "In zbx_get_cpu_num(b)");
+
+	if (-1 == pstat_getdynamic(&psd, sizeof(struct pst_dynamic), 1, 0))
+		goto return_one;
+
 	return (int)(psd.psd_proc_cnt);
-
 #elif defined(_SC_NPROCESSORS_ONLN)
-	int ncpu = 0;
+	/* Solaris 10 x86 */
+	int	ncpu;
 
-	if ( -1 == (ncpu = sysconf(_SC_NPROCESSORS_ONLN)) && EINVAL == errno )
-	{
-		zabbix_log(LOG_LEVEL_WARNING , "Failed sysconf to determine number of CPUs, adjust to 1");
-		return 1;
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "In zbx_get_cpu_num(c)");
+
+	if (-1 == (ncpu = sysconf(_SC_NPROCESSORS_ONLN)))
+		goto return_one;
 
 	return ncpu;
-
 #elif defined(HAVE_FUNCTION_SYSCTL_HW_NCPU)
-	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
-	/* OpenBSD 4.2 i386 */
-	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	/* NetBSD 3.1 x86; NetBSD 4.0 x86 */
+	/* OpenBSD 4.2 x86 */
+	/* FreeBSD 6.2 x86; FreeBSD 7.0 x86 */
 	size_t	len;
 	int	mib[] = {CTL_HW, HW_NCPU}, ncpu;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In zbx_get_cpu_num(d)");
+
 	len = sizeof(ncpu);
 
-	if (0 != sysctl(mib, 2, &ncpu, &len, NULL, 0)) {
-		zabbix_log(LOG_LEVEL_WARNING , "Failed sysctl to determine number of CPUs, adjust to 1");
-		return 1;
-	}
+	if (0 != sysctl(mib, 2, &ncpu, &len, NULL, 0))
+		goto return_one;
 
 	return ncpu;
 #elif defined(HAVE_PROC_CPUINFO)
+	FILE	*f = NULL;
+	int	ncpu = 0;
 
-	FILE *f = NULL;
-	int ncpu = 0;
+	zabbix_log(LOG_LEVEL_DEBUG, "In zbx_get_cpu_num(e)");
 
-	if(NULL == (file = fopen("/proc/cpuinfo","r") ))
+	if (NULL == (file = fopen("/proc/cpuinfo", "r")))
+		goto return_one;
+
+	while (fgets(line, 1024, file) != NULL)
 	{
-		zabbix_log(LOG_LEVEL_WARNING , "Cannot open [/proc/cpuinfo] to determine number of CPUs, adjust to 1 [%s]",strerror(errno));
-		return 1;
-	}
-
-	while(fgets(line,1024,file) != NULL)
-	{
-		if(strstr(line,"processor") == NULL) continue;
+		if (strstr(line, "processor") == NULL)
+			continue;
 		ncpu++;
 	}
 	zbx_fclose(file);
 
-	if ( ncpu <= 0 )
-	{
-		zabbix_log(LOG_LEVEL_DEBUG , "Can not find [processor] lines in [/proc/cpuinfo] to determine number of CPUs, adjust to 1");
-		return 1;
-	}
+	if (ncpu == 0)
+		goto return_one;
 
 	return ncpu;
-#else
-	zabbix_log(LOG_LEVEL_DEBUG , "Can not determine number of CPUs, adjust to 1");
-	return 1;
 #endif
+
+return_one:
+	zabbix_log(LOG_LEVEL_WARNING, "Can not determine number of CPUs, adjust to 1");
+	return 1;
 }
 
 /******************************************************************************
@@ -145,11 +139,17 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 	int				i;
 	DWORD				dwSize;
+#endif
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In init_cpu_collector()");
 
 	memset(pcpus, 0, sizeof(ZBX_CPUS_STAT_DATA));
 
 	pcpus->count = zbx_get_cpu_num();
 
+	pcpus->cpu = zbx_malloc(pcpus->cpu, sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (pcpus->count + 1));
+
+#ifdef _WINDOWS
 	if (ERROR_SUCCESS != (status = PdhOpenQuery(NULL, 0, &pcpus->pdh_query))) {
 		zabbix_log( LOG_LEVEL_ERR, "Call to PdhOpenQuery() failed: %s",
 				strerror_from_module(status, "PDH.DLL"));
@@ -217,22 +217,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 				counter_path, strerror_from_module(status, "PDH.DLL"));
 		return 2;
 	}
-
-#else /* not _WINDOWS */
-
-	memset(pcpus, 0, sizeof(ZBX_CPUS_STAT_DATA));
-
-	pcpus->count = zbx_get_cpu_num();
-
-
 #endif /* _WINDOWS */
-
-	if ( pcpus->count > MAX_CPU )
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Not supported count of CPUs found %i, allowed %i", pcpus->count, MAX_CPU );
-		pcpus->count = MAX_CPU;
-	}
-
 
 	return 0;
 }
@@ -266,7 +251,7 @@ void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		pcpus->queue_counter = NULL;
 	}
 
-	for(i=0; i < MAX_CPU; i++)
+	for (i = 0; i < pcpus->count; i++)
 	{
 		if(pcpus->cpu[i].usage_couter)
 		{
@@ -283,6 +268,7 @@ void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 #endif /* _WINDOWS */
 
+	zbx_free(pcpus->cpu);
 }
 
 #if !defined(_WINDOWS)
@@ -329,7 +315,7 @@ static int	get_cpustat(
 		return 1;
 	}
 
-	*cpu_user = *cpu_nice = *cpu_system = *cpu_idle = -1;
+	*cpu_user = *cpu_system = *cpu_nice = *cpu_idle = -1;
 
 	zbx_snprintf(cpu_name, sizeof(cpu_name), "cpu%c ", cpuid > 0 ? '0' + (cpuid - 1) : ' ');
 
@@ -403,77 +389,59 @@ static void	apply_cpustat(
 {
 	register int	i	= 0;
 
-	int	time	= 0,
-		time1	= 0,
-		time5	= 0,
-		time15	= 0;
-
-	zbx_uint64_t
-		idle	= 0,
-		idle1	= 0,
-		idle5	= 0,
-		idle15	= 0,
-		user	= 0,
-		user1	= 0,
-		user5	= 0,
-		user15	= 0,
-		system	= 0,
-		system1	= 0,
-		system5	= 0,
-		system15= 0,
-		nice	= 0,
-		nice1	= 0,
-		nice5	= 0,
-		nice15	= 0,
-		all	= 0,
-		all1	= 0,
-		all5	= 0,
-		all15	= 0;
+	int		time = 0, time1 = 0, time5 = 0, time15 = 0;
+	zbx_uint64_t	user = 0, user1 = 0, user5 = 0, user15 = 0,
+			system = 0, system1 = 0, system5 = 0, system15 = 0,
+			nice = 0, nice1 = 0, nice5 = 0, nice15 = 0,
+			idle = 0, idle1 = 0, idle5 = 0, idle15 = 0,
+			all = 0, all1 = 0, all5 = 0, all15 = 0;
 
 	ZBX_SINGLE_CPU_STAT_DATA
-		*curr_cpu = &pcpus->cpu[cpuid];
-
+			*curr_cpu = &pcpus->cpu[cpuid];
 
 	for(i=0; i < MAX_CPU_HISTORY; i++)
 	{
 		if(curr_cpu->clock[i] < now - MAX_CPU_HISTORY)
 		{
-			curr_cpu->clock[i]	= now;
+			curr_cpu->clock[i] = now;
 
 			user	= curr_cpu->h_user[i]	= cpu_user;
 			system	= curr_cpu->h_system[i]	= cpu_system;
 			nice	= curr_cpu->h_nice[i]	= cpu_nice;
 			idle	= curr_cpu->h_idle[i]	= cpu_idle;
 
-			all	= cpu_idle + cpu_user + cpu_nice + cpu_system;
+			all	= cpu_user + cpu_system + cpu_nice + cpu_idle;
+
 			break;
 		}
 	}
 
-	time = time1 = time5 = time15 = now+1;
+	time = time1 = time5 = time15 = now + 1;
 
 	for(i=0; i < MAX_CPU_HISTORY; i++)
 	{
-		if(0 == curr_cpu->clock[i])	continue;
+		if (0 == curr_cpu->clock[i])
+			continue;
 
 		if(curr_cpu->clock[i] == now)
 		{
-			idle	= curr_cpu->h_idle[i];
 			user	= curr_cpu->h_user[i];
-			nice	= curr_cpu->h_nice[i];
 			system	= curr_cpu->h_system[i];
-			all	= idle + user + nice + system;
+			nice	= curr_cpu->h_nice[i];
+			idle	= curr_cpu->h_idle[i];
+
+			all	= user + system + nice + idle;
 		}
 
 #define SAVE_CPU_CLOCK_FOR(t)										\
 		if((curr_cpu->clock[i] >= (now - (t * 60))) && (time ## t > curr_cpu->clock[i]))	\
 		{											\
 			time ## t	= curr_cpu->clock[i];						\
-			idle ## t	= curr_cpu->h_idle[i];						\
 			user ## t	= curr_cpu->h_user[i];						\
-			nice ## t	= curr_cpu->h_nice[i];						\
 			system ## t	= curr_cpu->h_system[i];					\
-			all ## t	= idle ## t + user ## t + nice ## t + system ## t;		\
+			nice ## t	= curr_cpu->h_nice[i];						\
+			idle ## t	= curr_cpu->h_idle[i];						\
+			all ## t	= user ## t + system ## t + nice ## t + idle ## t;		\
 		}
 
 		SAVE_CPU_CLOCK_FOR(1);
@@ -492,21 +460,21 @@ static void	apply_cpustat(
 		curr_cpu->type ## time = 0.;						\
 	}
 
-	CALC_CPU_LOAD(idle, 1);
-	CALC_CPU_LOAD(idle, 5);
-	CALC_CPU_LOAD(idle, 15);
-
 	CALC_CPU_LOAD(user, 1);
 	CALC_CPU_LOAD(user, 5);
 	CALC_CPU_LOAD(user, 15);
+
+	CALC_CPU_LOAD(system, 1);
+	CALC_CPU_LOAD(system, 5);
+	CALC_CPU_LOAD(system, 15);
 
 	CALC_CPU_LOAD(nice, 1);
 	CALC_CPU_LOAD(nice, 5);
 	CALC_CPU_LOAD(nice, 15);
 
-	CALC_CPU_LOAD(system, 1);
-	CALC_CPU_LOAD(system, 5);
-	CALC_CPU_LOAD(system, 15);
+	CALC_CPU_LOAD(idle, 1);
+	CALC_CPU_LOAD(idle, 5);
+	CALC_CPU_LOAD(idle, 15);
 }
 
 #endif /* not _WINDOWS */
