@@ -20,15 +20,9 @@
 #include "common.h"
 #include "cfg.h"
 #include "log.h"
-/*
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <dirent.h>
-*/
+
 char	*CONFIG_FILE			= NULL;
 int	CONFIG_ZABBIX_FORKS		= 5;
-
 
 char	*CONFIG_LOG_FILE		= NULL;
 int	CONFIG_LOG_FILE_SIZE		= 1;
@@ -59,7 +53,10 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg)
 	while (NULL != (d = readdir(dir))) {
 		incl_file = zbx_dsprintf(incl_file, "%s/%s", cfg_file, d->d_name);
 
-		if (d->d_type == DT_REG && parse_cfg_file(incl_file, cfg) == FAIL) {
+		if (stat(incl_file, &sb) == -1 || !S_ISREG(sb.st_mode))
+			continue;
+
+		if (parse_cfg_file(incl_file, cfg) == FAIL) {
 			result = FAIL;
 			break;
 		}

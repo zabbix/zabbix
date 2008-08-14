@@ -81,6 +81,10 @@
 #	include <sys/types.h>
 #endif
 
+#ifdef HAVE_SYS_DIR_H
+#	include <sys/dir.h>
+#endif
+
 #ifdef HAVE_INTTYPES_H
 #	include <inttypes.h>
 #endif
