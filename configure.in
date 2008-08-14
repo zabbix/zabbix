@@ -38,7 +38,7 @@ dnl AM_PROG_LIBTOOL
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
-  syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
+  syslog.h time.h errno.h sys/types.h sys/dir.h sys/stat.h netinet/in.h \
   math.h sys/socket.h dirent.h ctype.h \
   mtent.h fcntl.h sys/param.h sys/mount.h arpa/inet.h \
   sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h \
