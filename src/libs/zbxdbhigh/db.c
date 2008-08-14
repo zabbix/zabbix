@@ -939,18 +939,6 @@ int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *e
 
 	return SUCCEED;
 }
-/*
-int	DBproxy_update_item_status_to_notsupported(DB_ITEM *item, int clock)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "In DBproxy_update_item_status_to_notsupported()");
-
-	DBexecute("update items set status=%d,nextcheck=%d where itemid=" ZBX_FS_UI64,
-			ITEM_STATUS_NOTSUPPORTED,
-			clock + CONFIG_REFRESH_UNSUPPORTED,
-			itemid);
-
-	return SUCCEED;
-}*/
 
 static int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 {
