@@ -615,6 +615,6 @@ function moveListBoxSelectedItem(formname,objname,from,to,action){
 			i--;
 		}
 	}
-	alert('OPA');
+
 return result;
 }
