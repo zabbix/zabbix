@@ -34,6 +34,7 @@ struct history_field_t {
 	const char		*field;
 	const char		*tag;
 	zbx_json_type_t		jt;
+	char			*default_value;
 };
 
 struct history_table_t {
@@ -49,11 +50,11 @@ struct last_ids {
 static ZBX_HISTORY_TABLE ht[]={
 	{"proxy_history", "history_lastid",
 		{
-		{"clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT},
-		{"timestamp",	ZBX_PROTO_TAG_LOGTIMESTAMP,	ZBX_JSON_TYPE_INT},
-		{"source",	ZBX_PROTO_TAG_LOGSOURCE,	ZBX_JSON_TYPE_STRING},
-		{"severity",	ZBX_PROTO_TAG_LOGSEVERITY,	ZBX_JSON_TYPE_INT},
-		{"value",	ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING},
+		{"clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
+		{"timestamp",	ZBX_PROTO_TAG_LOGTIMESTAMP,	ZBX_JSON_TYPE_INT,	"0"},
+		{"source",	ZBX_PROTO_TAG_LOGSOURCE,	ZBX_JSON_TYPE_STRING,	""},
+		{"severity",	ZBX_PROTO_TAG_LOGSEVERITY,	ZBX_JSON_TYPE_INT,	"0"},
+		{"value",	ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	NULL},
 		{NULL}
 		}
 	},
@@ -63,14 +64,14 @@ static ZBX_HISTORY_TABLE ht[]={
 static ZBX_HISTORY_TABLE dht[]={
 	{"proxy_dhistory", "dhistory_lastid",
 		{
-		{"clock",	ZBX_PROTO_TAG_CLOCK,	ZBX_JSON_TYPE_INT},
-		{"druleid",	ZBX_PROTO_TAG_DRULE,	ZBX_JSON_TYPE_INT},
-		{"type",	ZBX_PROTO_TAG_TYPE,	ZBX_JSON_TYPE_INT},
-		{"ip",		ZBX_PROTO_TAG_IP,	ZBX_JSON_TYPE_STRING},
-		{"port",	ZBX_PROTO_TAG_PORT, 	ZBX_JSON_TYPE_INT},
-		{"key_",	ZBX_PROTO_TAG_KEY,	ZBX_JSON_TYPE_STRING},
-		{"value",	ZBX_PROTO_TAG_VALUE,	ZBX_JSON_TYPE_STRING},
-		{"status",	ZBX_PROTO_TAG_STATUS,	ZBX_JSON_TYPE_INT},
+		{"clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
+		{"druleid",	ZBX_PROTO_TAG_DRULE,		ZBX_JSON_TYPE_INT,	NULL},
+		{"type",	ZBX_PROTO_TAG_TYPE,		ZBX_JSON_TYPE_INT,	NULL},
+		{"ip",		ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"port",	ZBX_PROTO_TAG_PORT,	 	ZBX_JSON_TYPE_INT,	NULL},
+		{"key_",	ZBX_PROTO_TAG_KEY,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"value",	ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"status",	ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	NULL},
 		{NULL}
 		}
 	},
@@ -216,7 +217,12 @@ static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx
 		zbx_json_addstring(j, ZBX_PROTO_TAG_KEY, row[2], ZBX_JSON_TYPE_STRING);
 
 		for (f = 0; ht->fields[f].field != NULL; f ++)
+		{
+			if (NULL != ht->fields[f].default_value && 0 == strcmp(row[f + 3], ht->fields[f].default_value))
+				continue;
+
 			zbx_json_addstring(j, ht->fields[f].tag, row[f + 3], ht->fields[f].jt);
+		}
 
 		records++;
 
@@ -277,7 +283,12 @@ static int get_dhistory_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zb
 		*lastid = zbx_atoui64(row[0]);
 
 		for (f = 0; ht->fields[f].field != NULL; f ++)
+		{
+			if (NULL != ht->fields[f].default_value && 0 == strcmp(row[f + 3], ht->fields[f].default_value))
+				continue;
+
 			zbx_json_addstring(j, ht->fields[f].tag, row[f + 1], ht->fields[f].jt);
+		}
 
 		records++;
 
