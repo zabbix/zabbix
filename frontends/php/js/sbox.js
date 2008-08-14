@@ -77,11 +77,12 @@ initialize: function(stime, period){
 },
 
 onselect: function(){
-	this.px2time = parseInt(this.obj.period/this.obj.width);
-	
+	this.px2time = this.obj.period/this.obj.width;
+
 	this.stime = Math.round(this.box.left * this.px2time + this.obj.stime);
 	this.period = this.calcperiod();
 
+//SDI(this.stime+' : '+this.period);
 	this.sboxload();
 },
 
@@ -212,7 +213,8 @@ moveright: function(width){
 },
 
 calcperiod: function(){
-	this.px2time = parseInt(this.obj.period/this.obj.width);
+	this.px2time = this.obj.period/this.obj.width;
+//SDI('CALCP: '+this.box.width+' * '+this.px2time);
 return	Math.round(this.box.width * this.px2time);
 },
 
