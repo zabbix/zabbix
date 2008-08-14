@@ -169,6 +169,7 @@ frontends/php/js/showhint.js -text
 frontends/php/js/tree.js -text
 frontends/php/js/updater.js -text
 frontends/php/js/url.js -text
+frontends/php/js/users.js -text
 frontends/php/locales.php -text
 frontends/php/popup_link_tr.php -text
 frontends/php/scripts.php -text

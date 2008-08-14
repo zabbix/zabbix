@@ -33,7 +33,7 @@ function setRefreshRate(id,interval){
 }
 
 function create_menu(e,id){
-	if (!e) var e = window.event;
+	if(!e) var e = window.event;
 	id='menu_'+id;
 
 	var dbrd_menu = new Array();

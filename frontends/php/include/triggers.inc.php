@@ -1818,26 +1818,25 @@
 	function get_triggers_overview($groupid,$view_style=null){
 		global $USER_DETAILS;
 		
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+		$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 		
 		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
 		
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		if($groupid > 0){
-			$group_where = ',hosts_groups hg where hg.groupid='.$groupid.' and hg.hostid=h.hostid and';
+			$group_where = ',hosts_groups hg WHERE hg.groupid='.$groupid.' AND hg.hostid=h.hostid AND ';
 		} 
 		else {
-			$group_where = ' where';
+			$group_where = ' WHERE ';
 		}
 
-		
 		$result=DBselect('SELECT DISTINCT t.triggerid,t.description,t.expression,t.value,t.priority,t.lastchange,h.hostid,h.host'.
 			' FROM hosts h,items i,triggers t, functions f '.
 			$group_where.' h.status='.HOST_STATUS_MONITORED.
 				' AND h.hostid=i.hostid '.
 				' AND i.itemid=f.itemid '.
 				' AND f.triggerid=t.triggerid'.
-				' AND '.DBcondition('h.hostid',$available_hosts).
+				' AND '.DBcondition('t.triggerid',$available_triggers).
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 			' ORDER BY t.description');

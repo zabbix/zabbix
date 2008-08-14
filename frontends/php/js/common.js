@@ -593,11 +593,14 @@ function moveListBoxSelectedItem(formname,objname,from,to,action){
 	
 	for(i = 0; i < from.options.length; i++) {
 		if(from.options[i].selected == true) {
+/*			
 			var temp = document.createElement('option');
 			temp.setAttribute('value',from.options[i].value);
 			
 			var caption = IE?from.options[i].innerText:from.options[i].textContent;
 			temp.appendChild(document.createTextNode(caption));
+*/
+			var temp = from.options[i].cloneNode(true);
 			
 			if(action.toLowerCase() == 'add'){
 				result &= create_var(formname, objname+'['+from.options[i].value+']', from.options[i].value, false);
@@ -612,5 +615,6 @@ function moveListBoxSelectedItem(formname,objname,from,to,action){
 			i--;
 		}
 	}
+	alert('OPA');
 return result;
 }
