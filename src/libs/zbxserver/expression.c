@@ -1458,7 +1458,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 
 	*data = str_out;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End substitute_simple_macros ()");
 	zabbix_log(LOG_LEVEL_DEBUG, "End substitute_simple_macros (result:%s)",
 		*data);
 }
