@@ -929,11 +929,6 @@ int main(int argc, char **argv)
 
 	init_config();
 
-	if(CONFIG_DBSYNCER_FORKS!=0)
-	{
-		init_database_cache(ZBX_PROCESS_SERVER);
-	}
-
 	switch (task) {
 		case ZBX_TASK_CHANGE_NODEID:
 			change_nodeid(0,nodeid);
@@ -1068,6 +1063,9 @@ int MAIN_ZABBIX_ENTRY(void)
 		zbx_error("Unable to create mutex for node syncs");
 		exit(FAIL);
 	}
+
+	if (CONFIG_DBSYNCER_FORKS != 0)
+		init_database_cache(ZBX_PROCESS_SERVER);
 
 /*#define CALC_TREND*/
 
