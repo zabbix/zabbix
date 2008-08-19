@@ -328,10 +328,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 			}
 		}
 
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, " where itemid=" ZBX_FS_UI64 ";\n",
-				item.itemid);
-
-/* Update item status if required */
+		/* Update item status if required */
 		if (item.status == ITEM_STATUS_NOTSUPPORTED)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s] became supported by agent on host [%s]",
@@ -341,11 +338,13 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 					item.key,
 					item.host_name);
 
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
-					"update items set status=%d,error='' where itemid=" ZBX_FS_UI64 ";\n",
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, ",status=%d,error=''",
 					ITEM_STATUS_ACTIVE,
 					item.itemid);
 		}
+
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, " where itemid=" ZBX_FS_UI64 ";\n",
+				item.itemid);
 	}
 	DBfree_result(result);
 

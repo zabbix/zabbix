@@ -523,7 +523,7 @@ static void proxy_update_host(zbx_uint64_t druleid, char *ip, int status, int no
 static int discover_service(DB_DCHECK *check, char *ip, int port)
 {
 	int		ret = SUCCEED;
-	char		key[MAX_STRING_LEN];
+	char		key[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX];
 	AGENT_RESULT 	value;
 	DB_ITEM		item;
 	ZBX_FPING_HOST	host;
@@ -667,7 +667,7 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 				strscpy(host.addr, ip);
 				host.useip = 1;
 
-				if (SUCCEED == do_ping(&host, 1)) {
+				if (SUCCEED == do_ping(&host, 1, error, sizeof(error))) {
 				       if (0 == host.alive)
 					       ret = FAIL;
 				} else
