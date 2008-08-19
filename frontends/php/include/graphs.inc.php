@@ -382,17 +382,15 @@
  * Only PHP:
  *		$error= true : rise Error if item doesn't exists(error generated), false: special processing (NO error generated)
  */
-	function	get_same_graphitems_for_host($gitems, $dest_hostid, $error=true)
-	{
+	function get_same_graphitems_for_host($gitems, $dest_hostid, $error=true){
 		$result = array();
 
-		foreach($gitems as $gitem)
-		{
+		foreach($gitems as $gitem){
 			$sql = 'SELECT src.itemid '.
-							' FROM items src, items dest '.
-							' WHERE dest.itemid='.zbx_dbstr($gitem['itemid']).
-								' AND src.key_=dest.key_ '.
-								' AND src.hostid='.$dest_hostid;
+					' FROM items src, items dest '.
+					' WHERE dest.itemid='.$gitem['itemid'].
+						' AND src.key_=dest.key_ '.
+						' AND src.hostid='.$dest_hostid;
 			$db_item = DBfetch(DBselect($sql));
 			if (!$db_item && $error){
 				$item = get_item_by_itemid($gitem['itemid']);
@@ -430,8 +428,8 @@
 	{
 		$graphid = get_dbid("graphs","graphid");
 
-		$result=DBexecute("insert into graphs".
-			" (graphid,name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d)".
+		$result=DBexecute('INSERT INTO graphs '.
+			' (graphid,name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d) '.
 			" values ($graphid,".zbx_dbstr($name).",$width,$height,$yaxistype,$yaxismin,".
 			" $yaxismax,$templateid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d)");
 

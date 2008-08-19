@@ -13,7 +13,7 @@ return $rows;
 function add_script($name,$command,$usrgrpid,$groupid,$access){
 	$scriptid = get_dbid('scripts','scriptid');
 	$sql = 'INSERT INTO scripts (scriptid,name,command,usrgrpid,groupid,host_access) '.
-				" VALUES ('$scriptid','$name',".zbx_dbstr($command).",$usrgrpid,$groupid,$access)";
+				" VALUES ($scriptid,".zbx_dbstr($name).','.zbx_dbstr($command).",$usrgrpid,$groupid,$access)";
 	$result = DBexecute($sql);
 	if($result){
 		$result = $scriptid;
@@ -41,21 +41,19 @@ function update_script($scriptid,$name,$command,$usrgrpid,$groupid,$access){
 return $result;
 }
 
-function script_make_command($scriptid,$hostid)
-{
-	$host_db = DBfetch(DBselect("select dns,useip,ip from hosts where hostid=$hostid"));
-	$script_db = DBfetch(DBselect("select command from scripts where scriptid=$scriptid"));
-	if($host_db && $script_db)
-	{
-		$command = $script_db["command"];
-		$command = str_replace("{HOST.DNS}", $host_db["dns"],$command);
-		$command = str_replace("{IPADDRESS}", $host_db["ip"],$command);
-		$command = ($host_db["useip"]==0)?
-				str_replace("{HOST.CONN}", $host_db["dns"],$command):
-				str_replace("{HOST.CONN}", $host_db["ip"],$command);
+function script_make_command($scriptid,$hostid){
+	$host_db = DBfetch(DBselect('SELECT dns,useip,ip FROM hosts WHERE hostid='.$hostid));
+	$script_db = DBfetch(DBselect('SELECT command FROM scripts WHERE scriptid='.$scriptid));
+	
+	if($host_db && $script_db){
+		$command = $script_db['command'];
+		$command = str_replace("{HOST.DNS}", $host_db['dns'],$command);
+		$command = str_replace("{IPADDRESS}", $host_db['ip'],$command);
+		$command = ($host_db['useip']==0)?
+				str_replace("{HOST.CONN}", $host_db['dns'],$command):
+				str_replace("{HOST.CONN}", $host_db['ip'],$command);
 	}
-	else
-	{
+	else{
 		$command = FALSE;
 	}
 	return $command;
@@ -118,7 +116,7 @@ function get_accessible_scripts_by_hosts($hosts){
 			
 	$user_groups = DBfetch(DBselect($sql));
 	$user_groups[] = 0;	// to ALL user groups
-//
+// --
 
 
 // Selecting groups by Hosts	
@@ -132,7 +130,7 @@ function get_accessible_scripts_by_hosts($hosts){
 		$hg_groups[$hg_rows['groupid']] = $hg_rows['groupid'];
 	}
 	$hg_groups[] = 0;	// to ALL host groups
-//
+// --
 
 	$hosts_read_only  = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$hosts_read_write = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
@@ -173,8 +171,6 @@ function get_accessible_scripts_by_hosts($hosts){
 			$scripts_by_host[$hostid][] = $script;
 		}
 	}
-/*
-*/
 //SDI($scripts_by_host);
 return $scripts_by_host;
 }

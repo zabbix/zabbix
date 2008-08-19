@@ -251,7 +251,7 @@
 	function add_link_trigger($linkid,$triggerid,$drawtype,$color){
 		$linktriggerid=get_dbid("sysmaps_link_triggers","linktriggerid");
 		$sql = 'INSERT INTO sysmaps_link_triggers (linktriggerid,linkid,triggerid,drawtype,color) '.
-					" VALUES ('$linktriggerid','$linkid','$triggerid','$drawtype',".zbx_dbstr($color).")";
+					" VALUES ($linktriggerid,$linkid,$triggerid,$drawtype,".zbx_dbstr($color).')';
 	return DBexecute($sql);
 	}
 
@@ -262,11 +262,11 @@
 	}
 	
 	function delete_link_trigger($linkid,$triggerid){
-	return DBexecute("DELETE FROM sysmaps_link_triggers WHERE linkid=$linkid AND triggerid=$triggerid");
+	return DBexecute('DELETE FROM sysmaps_link_triggers WHERE linkid='.$linkid.' AND triggerid='.$triggerid);
 	}
 	
 	function delete_all_link_triggers($linkid){
-	return DBexecute("DELETE FROM sysmaps_link_triggers WHERE linkid=$linkid");
+	return DBexecute('DELETE FROM sysmaps_link_triggers WHERE linkid='.$linkid);
 	}
 
 /*
@@ -284,8 +284,9 @@
 
 		if(bccomp($sysmapid ,$elementid)==0)	return TRUE;
 
-		$db_elements = DBselect("select elementid, elementtype FROM sysmaps_elements".
-			" WHERE sysmapid=$elementid");
+		$db_elements = DBselect('SELECT elementid, elementtype '.
+						' FROM sysmaps_elements '.
+						' WHERE sysmapid='.$elementid);
 
 		while($element = DBfetch($db_elements))
 		{

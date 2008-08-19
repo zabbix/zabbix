@@ -187,22 +187,50 @@ function zbx_date2str($format, $timestamp){
  *
  * author: Aly
  */
-function zbx_date2age($start_date,$end_date=0){
+function zbx_date2age($start_date,$end_date=0,$utime = false){
 
-	$start_date=date('U',$start_date);
-	if($end_date)
-		$end_date=date('U',$end_date);
-	else
-		$end_date = time();
+	if(!$utime){
+		$start_date=date('U',$start_date);
+		if($end_date)
+			$end_date=date('U',$end_date);
+		else
+			$end_date = time();
+	}
 
 	$time = abs($end_date-$start_date);
-	
 //SDI($start_date.' - '.$end_date.' = '.$time);
-	
+
+	$years = (int) ($time / (365*86400));
+	$time -= $years*365*86400;
+
+	$months = (int ) ($time / (30*86400));
+	$time -= $months*30*86400;
+	 
 	$days = (int) ($time / 86400);
-	$hours = (int) (($time - $days*86400) / 3600);
-	$minutes = (int) ((($time - $days*86400) - ($hours*3600)) / 60);
-	$str = (($days)?$days.'d ':'').(($hours)?$hours.'h ':'').$minutes.'m';
+	$time -= $days*86400;
+	
+	$hours = (int) ($time / 3600);
+	$time -= $hours*3600;
+	
+	$minutes = (int) ($time / 60);
+	$time -= $minutes*60;
+	
+	if($time > 1){
+		$seconds = round($time,2);
+		$ms = 0;
+	}
+	else{
+		$seconds = 0;
+		$ms = round($time,3) * 1000;
+	}
+	
+	$str =  (($years)?$years.'y ':'').
+			(($months)?$months.'m ':'').
+			(($days)?$days.'d ':'').
+			(($hours && !$years)?$hours.'h ':'').
+			(($minutes && !$years && !$months)?$minutes.'m ':'').
+			((!$years && !$months && !$days && (!$ms || $seconds))?$seconds.'s ':'').
+			(($ms && !$years && !$months && !$days && !$hours)?$ms.'ms':'');
 return $str;
 }
 
