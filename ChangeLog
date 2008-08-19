@@ -1,3 +1,7 @@
+Changes for 1.5.5
+
+ - [ZBX-406] added error messages if fping is not installed (Sasha)
+
 Changes for 1.5.4
 
  - [DEV-203] fixed probem with permissions of server's shared memory (Sasha)

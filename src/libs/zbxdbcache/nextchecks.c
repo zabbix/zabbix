@@ -107,7 +107,7 @@ void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *err
 		nextchecks = zbx_realloc(nextchecks, nextcheck_allocated * sizeof(ZBX_DC_NEXTCHECK));
 	}
 
-	nextcheck = calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now - timediff) + timediff;
+	nextcheck = NULL == error_msg ? calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now - timediff) + timediff : now;
 	index = DCget_nextcheck_nearestindex(nextcheck);
 
 	memmove(&nextchecks[index + 1], &nextchecks[index], sizeof(ZBX_DC_NEXTCHECK) * (nextcheck_num - index));
