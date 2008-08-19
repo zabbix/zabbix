@@ -121,8 +121,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"ZABBIX Agent"
-#define	ZABBIX_REVDATE		"4 June 2008"
-#define	ZABBIX_VERSION		"1.5.3"
+#define	ZABBIX_REVDATE		"19 August 2008"
+#define	ZABBIX_VERSION		"1.5.4"
 
 #if defined(_WINDOWS)
 extern char ZABBIX_SERVICE_NAME[64];
