@@ -919,14 +919,31 @@ require_once('include/classes/ctree.inc.php');
 		$item=get_item_by_itemid($itemid);
 		switch($item["value_type"])
 		{
-			case ITEM_VALUE_TYPE_FLOAT:	$history_table = "history";		break;
-			case ITEM_VALUE_TYPE_UINT64:	$history_table = "history_uint";	break;
-			case ITEM_VALUE_TYPE_TEXT:	$history_table = "history_text";	break;
-			default:			$history_table = "history_str";		break;
+			case ITEM_VALUE_TYPE_FLOAT:
+				$history_table = "history";
+				$order_field = 'clock';
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				$history_table = "history_uint";
+				$order_field = 'clock';
+				break;
+			case ITEM_VALUE_TYPE_TEXT:
+				$history_table = "history_text";
+				$order_field = 'id';
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				$history_table = "history_log";
+				$order_field = 'id';
+				break;
+			default:
+				$history_table = "history_str";
+				$order_field = 'clock';
+				break;
 		}
 
-		$sql="select h.clock,h.value,i.valuemapid from ".$history_table." h, items i where".
-			" h.itemid=i.itemid and i.itemid=$itemid order by clock desc";
+		$sql='select h.clock,h.value,i.valuemapid from '.$history_table.' h, items i'.
+				' where h.itemid=i.itemid and i.itemid='.$itemid.
+				' order by '.$order_field.' desc';
 
                 $result=DBselect($sql,$elements);
 
