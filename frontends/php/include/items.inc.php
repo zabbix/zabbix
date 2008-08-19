@@ -705,7 +705,7 @@
 		if(isset($itemid)){
 			$sql = 'SELECT src.itemid '.
 							' FROM items src, items dest '.
-							' WHERE dest.itemid='.zbx_dbstr($itemid).
+							' WHERE dest.itemid='.$itemid.
 								' AND src.key_=dest.key_ '.
 								' AND src.hostid='.$dest_hostid;
 								

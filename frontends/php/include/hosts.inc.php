@@ -1327,7 +1327,6 @@ require_once "include/httptest.inc.php";
 	}
 
 // Delete Host Profile
-
 	function delete_host_profile($hostids){
 		zbx_value2array($hostids);
 		$result=DBexecute('DELETE FROM hosts_profiles WHERE '.DBcondition('hostid',$hostids));

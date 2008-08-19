@@ -116,38 +116,30 @@ include_once "include/page_header.php";
 		);
 
 	$db_httpsteps = DBselect('select * from httpstep where httptestid='.$httptest_data['httptestid'].' order by no');
-	while($httpstep_data = DBfetch($db_httpsteps))
-	{
+	while($httpstep_data = DBfetch($db_httpsteps)){
 		$status['msg'] = S_OK_BIG;
 		$status['style'] = 'enabled';
 
-		if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] )
-		{
-			if($httptest_data['curstep'] == ($httpstep_data['no']))
-			{
+		if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
+			if($httptest_data['curstep'] == ($httpstep_data['no'])){
 				$status['msg'] = S_IN_PROGRESS;
 				$status['style'] = 'unknown';
 				$status['skip'] = true;
 			}
-			elseif($httptest_data['curstep'] < ($httpstep_data['no']))
-			{
+			else if($httptest_data['curstep'] < ($httpstep_data['no'])){
 				$status['msg'] = S_UNKNOWN;
 				$status['style'] = 'unknown';
 				$status['skip'] = true;
 			}
 		}
-		else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] )
-		{
-			if($httptest_data['lastfailedstep'] != 0)
-			{
-				if($httptest_data['lastfailedstep'] == ($httpstep_data['no']))
-				{
+		else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] ){
+			if($httptest_data['lastfailedstep'] != 0){
+				if($httptest_data['lastfailedstep'] == ($httpstep_data['no'])){
 					$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
 					$status['style'] = 'disabled';
 					//$status['skip'] = true;
 				}
-				else if($httptest_data['lastfailedstep'] < ($httpstep_data['no']))
-				{
+				else if($httptest_data['lastfailedstep'] < ($httpstep_data['no'])){
 					$status['msg'] = S_UNKNOWN;
 					$status['style'] = 'unknown';
 					$status['skip'] = true;
@@ -155,8 +147,7 @@ include_once "include/page_header.php";
 			}
 
 		}
-		else
-		{
+		else{
 			$status['msg'] = S_UNKNOWN;
 			$status['style'] = 'unknown';
 			$status['skip'] = true;
@@ -164,22 +155,22 @@ include_once "include/page_header.php";
 
 		$item_color = $color[$color['current'] = $color[$color['current']]['next']]['color'];
 
-		$db_items = DBselect('select i.*, hi.type as httpitem_type from items i, httpstepitem hi '.
-			' where hi.itemid=i.itemid and hi.httpstepid='.$httpstep_data['httpstepid']);
-		while($item_data = DBfetch($db_items))
-		{
+		$sql = 'SELECT i.*, hi.type as httpitem_type '.
+				' FROM items i, httpstepitem hi '.
+				' WHERE hi.itemid=i.itemid '.
+					' AND hi.httpstepid='.$httpstep_data['httpstepid'];
+		$db_items = DBselect($sql);
+		while($item_data = DBfetch($db_items)){
 			if(isset($status['skip'])) $item_data['lastvalue'] = null;
 
 			$httpstep_data['item_data'][$item_data['httpitem_type']] = $item_data;
 
 			if (!str_in_array($item_data['httpitem_type'], array(HTTPSTEP_ITEM_TYPE_IN, HTTPSTEP_ITEM_TYPE_TIME))) continue;
 	
-			if(isset($total_data[$item_data['httpitem_type']]))
-			{
+			if(isset($total_data[$item_data['httpitem_type']])){
 				$total_data[$item_data['httpitem_type']]['lastvalue'] += $item_data['lastvalue'];
 			}
-			else
-			{
+			else{
 				$total_data[$item_data['httpitem_type']] = $item_data;
 			}
 			$items[$item_data['httpitem_type']][] = array(
@@ -200,22 +191,19 @@ include_once "include/page_header.php";
 	$status['msg'] = S_OK_BIG;
 	$status['style'] = 'enabled';
 
-	if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] )
-	{
+	if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
 		$status['msg'] = S_IN_PROGRESS;
 		$status['style'] = 'unknown';
 	}
-	else if ( HTTPTEST_STATE_UNKNOWN == $httptest_data['curstate'] )
-	{
+	else if ( HTTPTEST_STATE_UNKNOWN == $httptest_data['curstate'] ){
 		$status['msg'] = S_UNKNOWN;
 		$status['style'] = 'unknown';
 	}
-	else if($httptest_data['lastfailedstep'] > 0)
-	{
+	else if($httptest_data['lastfailedstep'] > 0){
 		$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
 		$status['style'] = 'disabled';
 	}
-
+	
 	$table->AddRow(array(
 		new CCol(S_TOTAL_BIG, 'bold'), 
 		new CCol(SPACE, 'bold'),

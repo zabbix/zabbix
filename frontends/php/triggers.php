@@ -292,7 +292,7 @@ include_once "include/page_header.php";
 		foreach($_REQUEST["g_triggerid"] as $id => $triggerid){
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
-			$res = DBselect('SELECT triggerid FROM triggers t WHERE t.triggerid='.zbx_dbstr($triggerid));
+			$res = DBselect('SELECT triggerid FROM triggers t WHERE t.triggerid='.$triggerid);
 			if(!$row = DBfetch($res)) continue;
 			
 			$cur_result = update_trigger_status($row['triggerid'],0);
@@ -317,7 +317,7 @@ include_once "include/page_header.php";
 		foreach($_REQUEST["g_triggerid"] as $id => $triggerid){
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
-			$res=DBselect("SELECT triggerid FROM triggers t WHERE t.triggerid=".zbx_dbstr($triggerid));
+			$res=DBselect('SELECT triggerid FROM triggers t WHERE t.triggerid='.$triggerid);
 			if(!$row = DBfetch($res)) continue;
 			
 			$cur_result = update_trigger_status($row["triggerid"],1);
@@ -341,7 +341,7 @@ include_once "include/page_header.php";
 		foreach($_REQUEST["g_triggerid"] as $triggerid){
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
 
-			$res=DBselect("SELECT triggerid,templateid FROM triggers t WHERE t.triggerid=".zbx_dbstr($triggerid));
+			$res=DBselect('SELECT triggerid,templateid FROM triggers t WHERE t.triggerid='.$triggerid);
 			if(!$row = DBfetch($res)) continue;
 			if($row["templateid"] <> 0)	continue;
 			
