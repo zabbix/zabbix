@@ -1049,8 +1049,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	function update_valuemap($valuemapid, $name, $mappings){
 		if(!is_array($mappings))	return FALSE;
 
-		$result = DBexecute("update valuemaps set name=".zbx_dbstr($name).
-			" WHERE valuemapid=$valuemapid");
+		$result = DBexecute('UPDATE valuemaps SET name='.zbx_dbstr($name).
+			' WHERE valuemapid='.$valuemapid);
 
 		if(!$result)
 			return $result;
@@ -1063,16 +1063,17 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	}
 
 	function delete_valuemap($valuemapid){
-		DBexecute("delete FROM mappings WHERE valuemapid=$valuemapid");
-		DBexecute("delete FROM valuemaps WHERE valuemapid=$valuemapid");
+		DBexecute('DELETE FROM mappings WHERE valuemapid='.$valuemapid);
+		DBexecute('DELETE FROM valuemaps WHERE valuemapid='.$valuemapid);
 		return TRUE;
 	}
 
 	function replace_value_by_map($value, $valuemapid){
 		if($valuemapid < 1) return $value;
 
-		$result = DBselect("SELECT newvalue FROM mappings".
-			" WHERE valuemapid=".zbx_dbstr($valuemapid)." and value=".zbx_dbstr($value));
+		$result = DBselect('SELECT newvalue FROM mappings '.
+						' WHERE valuemapid='.$valuemapid.
+							' AND value='.zbx_dbstr($value));
 		$row = DBfetch($result);
 		if($row){
 			return $row["newvalue"]." "."($value)";
@@ -1152,36 +1153,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		}
 // Special processing for seconds
 		if($units=="s"){
-			$ret="";
-
-			$t=floor($value/(365*24*3600));
-			if($t>0){
-				$ret=$t."y";
-				$value=$value-$t*(365*24*3600);
-			}
-			$t=floor($value/(30*24*3600));
-			if($t>0){
-				$ret=$ret.$t."m";
-				$value=$value-$t*(30*24*3600);
-			}
-			$t=floor($value/(24*3600));
-			if($t>0){
-				$ret=$ret.$t."d";
-				$value=$value-$t*(24*3600);
-			}
-			$t=floor($value/(3600));
-			if($t>0){
-				$ret=$ret.$t."h";
-				$value=$value-$t*(3600);
-			}
-			$t=floor($value/(60));
-			if($t>0){
-				$ret=$ret.$t."m";
-				$value=$value-$t*(60);
-			}
-			$ret=$ret.round($value, 2)."s";
-		
-			return $ret;	
+			return zbx_date2age(0,$value,true);	
 		}
 
 		$u="";

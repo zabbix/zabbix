@@ -66,7 +66,7 @@ function check_authorisation(){
 						bold(date('d.m.Y H:i',$login['attempt_clock'])),
 						'.')));
 			
-			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.zbx_dbstr($login['userid']));
+			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$login['userid']);
 		}
 	}
 	
@@ -169,7 +169,7 @@ return $result;
 function  check_perm2system($userid){
 	$sql = 'SELECT COUNT(g.usrgrpid) as grp_count '.
 		' FROM usrgrp g, users_groups ug '.
-		' WHERE ug.userid = '.zbx_dbstr($userid).
+		' WHERE ug.userid = '.$userid.
 			' AND g.usrgrpid = ug.usrgrpid '.
 			' AND g.users_status = '.GROUP_STATUS_DISABLED;
 	$res = DBfetch(DBSelect($sql));
@@ -209,7 +209,7 @@ function get_user_auth($userid){
 	
 	$sql = 'SELECT MAX(g.gui_access) as gui_access '.
 		' FROM usrgrp g, users_groups ug '.
-		' WHERE ug.userid='.zbx_dbstr($userid).
+		' WHERE ug.userid='.$userid.
 			' AND g.usrgrpid=ug.usrgrpid ';
 	$acc = DBfetch(DBselect($sql));
 

@@ -130,7 +130,7 @@
 		
 /* update internal pass if it's different
 		if($login && ($row['passwd']!=$password) && (ZBX_AUTH_INTERNAL!=$authentication_type)){
-			DBexecute('UPDATE users SET passwd='.zbx_dbstr($password).' WHERE userid='.zbx_dbstr($row['userid']));
+			DBexecute('UPDATE users SET passwd='.zbx_dbstr($password).' WHERE userid='.$row['userid']);
 		}
 */		
 		if($login){
@@ -165,10 +165,10 @@
 			if($attempt){
 				$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];			
 				$attempt['attempt_failed']++;
-				$sql = 'UPDATE users SET attempt_failed='.zbx_dbstr($attempt['attempt_failed']).
+				$sql = 'UPDATE users SET attempt_failed='.$attempt['attempt_failed'].
 										', attempt_clock='.time().
 										', attempt_ip='.zbx_dbstr($ip).
-									' WHERE userid='.zbx_dbstr($attempt['userid']);
+									' WHERE userid='.$attempt['userid'];
 				DBexecute($sql);
 			}
 		}

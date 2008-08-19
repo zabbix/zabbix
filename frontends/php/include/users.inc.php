@@ -198,7 +198,7 @@
 
 
 	function get_user_by_userid($userid){
-		if($row = DBfetch(DBselect('select * from users where userid='.zbx_dbstr($userid)))){
+		if($row = DBfetch(DBselect('SELECT * FROM users WHERE userid='.$userid))){
 			return	$row;
 		}
 		/* error("No user with id [$userid]"); */
@@ -224,10 +224,11 @@
 	function add_user_to_group($userid,$usrgrpid){
 		$result = false;
 		if(granted2move_user($userid,$usrgrpid)){
-			DBexecute('delete from users_groups where userid='.$userid.' and usrgrpid='.$usrgrpid);
+			DBexecute('DELETE FROM users_groups WHERE userid='.$userid.' AND usrgrpid='.$usrgrpid);
 	
 			$users_groups_id = get_dbid("users_groups","id");
-			$result = DBexecute('insert into users_groups (id,usrgrpid,userid) values('.$users_groups_id.','.$usrgrpid.','.$userid.')');
+			$result = DBexecute('INSERT INTO users_groups (id,usrgrpid,userid) '.
+									' VALUES ('.$users_groups_id.','.$usrgrpid.','.$userid.')');
 		}
 		else{
 			error(S_USER_CANNOT_CHANGE_STATUS);
@@ -238,7 +239,7 @@
 	function remove_user_from_group($userid,$usrgrpid){
 		$result = false;
 		if(granted2move_user($userid,$usrgrpid)){
-			$result = DBexecute('delete from users_groups where userid='.$userid.' and usrgrpid='.$usrgrpid);
+			$result = DBexecute('DELETE FROM users_groups WHERE userid='.$userid.' AND usrgrpid='.$usrgrpid);
 		}
 		else{
 			error(S_USER_CANNOT_CHANGE_STATUS);
@@ -284,7 +285,7 @@
 
 		$usrgrpid=get_dbid("usrgrp","usrgrpid");
 
-		$result=DBexecute("insert into usrgrp (usrgrpid,name) values ($usrgrpid,".zbx_dbstr($name).")");
+		$result=DBexecute("INSERT INTO usrgrp (usrgrpid,name) VALUES ($usrgrpid,".zbx_dbstr($name).")");
 		if(!$result)	return	$result;
 
 // must come before adding user to group
@@ -313,14 +314,14 @@
 	function update_user_group($usrgrpid,$name,$users_status,$gui_access,$users=array(),$rights=array()){
 		global $USER_DETAILS;
 		
-		if(DBfetch(DBselect('select * from usrgrp where name='.zbx_dbstr($name).
+		if(DBfetch(DBselect('SELECT * FROM usrgrp WHERE name='.zbx_dbstr($name).
 			' and usrgrpid<>'.$usrgrpid.' and '.DBin_node('usrgrpid', get_current_nodeid(false)))))
 		{
 			error("Group '$name' already exists");
 			return 0;
 		}
 
-		$result=DBexecute("update usrgrp set name=".zbx_dbstr($name)." where usrgrpid=$usrgrpid");
+		$result=DBexecute('UPDATE usrgrp SET name='.zbx_dbstr($name).' WHERE usrgrpid='.$usrgrpid);
 		if(!$result) return	$result;
 
 // must come before adding user to group
@@ -334,7 +335,7 @@
 			$grant = (!uint_in_array($USER_DETAILS['userid'],$users));
 		}
 		if($grant){
-			$result = DBexecute('delete from users_groups where usrgrpid='.zbx_dbstr($usrgrpid));
+			$result = DBexecute('DELETE FROM users_groups WHERE usrgrpid='.$usrgrpid);
 			foreach($users as $userid => $name){
 				$result &= add_user_to_group($userid,$usrgrpid);
 				if(!$result)	return	$result;
@@ -345,11 +346,11 @@
 			return false;
 		}	
 			
-		$result=DBexecute("delete from rights where groupid=".$usrgrpid);
+		$result=DBexecute('DELETE FROM rights WHERE groupid='.$usrgrpid);
 		foreach($rights as $right){
 			$id = get_dbid('rights','rightid');
-			$result=DBexecute('insert into rights (rightid,groupid,permission,id)'.
-				' values ('.$id.','.$usrgrpid.','.$right['permission'].','.$right['id'].')');
+			$result=DBexecute('INSERT INTO rights (rightid,groupid,permission,id)'.
+				' VALUES ('.$id.','.$usrgrpid.','.$right['permission'].','.$right['id'].')');
 				
 			if(!$result)	return	$result;
 		}
@@ -492,193 +493,6 @@
 												zbx_jsvalue($usr_grp_status_in).");"
 							 );
 							 
-		$action->AddAction('onclick',$script);
-		$action->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
-		
-	return $action;
-	}
-	
-	function get_user_actionmenu_old($userid){
-		global $USER_DETAILS;
-		
-		$action = new CSpan(S_SELECT);		
-
-// add to group
-		$menus = "Array(Array('".S_GROUPS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}),
-						Array('".S_ADD_TO."',null,null,{'outer' : ['pum_o_submenu'],'inner' : ['pum_i_submenu']},";
-		$menus.= "['".S_GROUPS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-
-		$grp_list = '(';
-		if($res = DBselect('SELECT DISTINCT ug.usrgrpid '.
-			' FROM users_groups ug'.
-			' WHERE ug.userid='.zbx_dbstr($userid).
-				' AND '.DBin_node('ug.usrgrpid', get_current_nodeid(false))))
-		{
-			while($tmp = DBFetch($res)) $grp_list.= "'".$tmp['usrgrpid']."'".',';
-		}
-		$grp_list.="'0')";
-		
-		$res = DBselect('SELECT DISTINCT g.usrgrpid, g.name, g.gui_access, g.users_status'.
-			' FROM usrgrp g'.
-			' WHERE g.usrgrpid NOT IN '.$grp_list.
-				' AND '.DBin_node('g.usrgrpid', get_current_nodeid(false)).
-			' ORDER BY g.name');
-
-		while($group=DBfetch($res)){
-			if(!granted2move_user($userid,$group['usrgrpid'])) continue;
-			
-			$caption = new CSpan($group['name']);
-			if($group['users_status'] == GROUP_STATUS_DISABLED){
-				$caption->SetClass('red');
-			}
-			else if($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED){
-				$caption->SetClass('orange');
-			}
-			
-			$caption = htmlspecialchars(unpack_object($caption));
-			$menus.="['".$caption."','users.php?config=0&form=update&grpaction=1&userid=".$userid."&usrgrpid=".$group['usrgrpid']."']\n,";
-		}
-
-		$menus=rtrim($menus,',').'),';
-// remove from group
-		$menus.= "Array('".S_REMOVE_FROM."',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']},";
-		$menus.= "['".S_GROUPS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-				
-		$res = DBselect('SELECT DISTINCT g.usrgrpid, g.name, g.gui_access, g.users_status '.
-			' FROM usrgrp g, users_groups ug'.
-			' WHERE ug.userid='.zbx_dbstr($userid).
-				' AND ug.usrgrpid = g.usrgrpid '.
-				' AND '.DBin_node('g.usrgrpid', get_current_nodeid(false)).
-			' ORDER BY g.name');
-
-		while($group=DBfetch($res)){
-			if(!granted2move_user($userid,$group['usrgrpid'])) continue;
-
-			$caption = new CSpan($group['name']);
-			if($group['users_status'] == GROUP_STATUS_DISABLED){
-				$caption->SetClass('red');
-			}
-			else if($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED){
-				$caption->SetClass('orange');
-			}
-						
-			$caption = htmlspecialchars(unpack_object($caption));
-			$menus.="['".$caption."','users.php?config=0&form=update&grpaction=0&userid=".$userid."&usrgrpid=".$group['usrgrpid']."']\n,";
-		}
-
-		$menus=rtrim($menus,',').'),';
-		if(bccomp($USER_DETAILS['userid'],$userid) == 0){
-			$menus=rtrim($menus,',').')';
-		}
-		else{
-// add to GUI ACCESS
-			$menus.= "Array('".S_GUI_ACCESS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}),
-						Array('".S_ADD_TO."',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']},";
-			$menus.= "['".S_GUI_ACCESS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-			
-			$grp_list = '(';
-			if($res = DBselect('SELECT DISTINCT ug.usrgrpid '.
-				' FROM users_groups ug, usrgrp g'.
-				' WHERE ug.userid='.zbx_dbstr($userid).
-					' AND g.gui_access='.GROUP_GUI_ACCESS_DISABLED.
-					' AND '.DBin_node('g.usrgrpid', get_current_nodeid(false))))
-			{
-				while($tmp = DBFetch($res)) $grp_list.= "'".$tmp['usrgrpid']."'".',';
-			}
-			$grp_list.="'0')";
-//			$grp_list=rtrim($grp_list,',').')';
-			
-			$res = DBselect('SELECT DISTINCT g.usrgrpid, g.name'.
-				' FROM usrgrp g'.
-				' WHERE g.usrgrpid NOT IN'.$grp_list.
-					' AND g.gui_access='.GROUP_GUI_ACCESS_DISABLED.
-					' AND '.DBin_node('g.usrgrpid', get_current_nodeid(false)).
-				' ORDER BY g.name');
-	
-			while($group=DBfetch($res)){
-				$caption = new CSpan($group['name'],'orange');			
-				$caption = htmlspecialchars(unpack_object($caption));
-				$menus.="['".$caption."','users.php?config=0&form=update&grpaction=1&userid=".$userid."&usrgrpid=".$group['usrgrpid']."']\n,";
-			}
-	
-			$menus=rtrim($menus,',').'),';
-// remove from GUI ACCESS
-			$menus.= "Array('".S_REMOVE_FROM."',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']},";
-			$menus.= "['".S_GUI_ACCESS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-					
-			$res = DBselect('SELECT g.name, g.usrgrpid'.
-				' FROM usrgrp g, users_groups ug'.
-				' WHERE ug.userid='.zbx_dbstr($userid).
-					' AND ug.usrgrpid = g.usrgrpid '.
-					' AND g.gui_access='.GROUP_GUI_ACCESS_DISABLED.
-					' AND '.DBin_node('g.usrgrpid', get_current_nodeid(false)).
-				' ORDER BY g.name');
-	
-			while($group=DBfetch($res)){
-				$caption = new CSpan($group['name'],'orange');			
-				$caption = htmlspecialchars(unpack_object($caption));
-	
-				$menus.="['".$caption."','users.php?config=0&form=update&grpaction=0&userid=".$userid."&usrgrpid=".$group['usrgrpid']."']\n,";
-			}
-	
-			$menus=rtrim($menus,',').'),';
-	
-// add to DISABLED
-			$menus.= "Array('".S_STATUS_DISABLED."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}),
-						Array('".S_ADD_TO."',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']},";
-			$menus.= "['".S_STATUS_DISABLED."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-			
-			$grp_list = '(';
-			if($res = DBselect('SELECT DISTINCT ug.usrgrpid '.
-				' FROM users_groups ug, usrgrp g'.
-				' WHERE ug.userid='.zbx_dbstr($userid).
-					' AND g.users_status='.GROUP_STATUS_DISABLED.
-					' AND '.DBin_node('g.usrgrpid', get_current_nodeid(false))))
-			{
-				while($tmp = DBFetch($res)) $grp_list.= "'".$tmp['usrgrpid']."'".',';
-			}
-			$grp_list.="'0')";
-//			$grp_list=rtrim($grp_list,',').')';
-			
-			$res = DBselect('SELECT DISTINCT g.usrgrpid, g.name'.
-				' FROM usrgrp g'.
-				' WHERE g.usrgrpid NOT IN'.$grp_list.
-					' AND g.users_status='.GROUP_STATUS_DISABLED.
-					' AND '.DBin_node('g.usrgrpid', get_current_nodeid(false)).
-				' ORDER BY g.name');
-	
-			while($group=DBfetch($res)){
-				$caption = new CSpan($group['name'],'red');			
-				$caption = htmlspecialchars(unpack_object($caption));
-	
-				$menus.="['".$caption."','users.php?config=0&form=update&grpaction=1&userid=".$userid."&usrgrpid=".$group['usrgrpid']."']\n,";
-			}
-	
-			$menus=rtrim($menus,',').'),';
-// remove from DISABLED
-			$menus.= "Array('".S_REMOVE_FROM."',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']},";
-			$menus.= "['".S_STATUS_DISABLED."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-					
-			$res = DBselect('SELECT g.name, g.usrgrpid'.
-				' FROM usrgrp g, users_groups ug'.
-				' WHERE ug.userid='.zbx_dbstr($userid).
-					' AND ug.usrgrpid = g.usrgrpid '.
-					' AND g.users_status='.GROUP_STATUS_DISABLED.
-					' AND '.DBin_node('g.usrgrpid', get_current_nodeid(false)).
-				' ORDER BY g.name');
-	
-	
-			while($group=DBfetch($res)){
-				$caption = new CSpan($group['name'],'red');			
-				$caption = htmlspecialchars(unpack_object($caption));
-	
-				$menus.="['".$caption."','users.php?config=0&form=update&grpaction=0&userid=".$userid."&usrgrpid=".$group['usrgrpid']."']\n,";
-			}
-	
-			$menus=rtrim($menus,',').'))';
-		}
-		
-		$script = new CScript("javascript: show_popup_menu(event,".$menus.",240);");
 		$action->AddAction('onclick',$script);
 		$action->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
 		

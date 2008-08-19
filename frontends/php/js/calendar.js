@@ -254,12 +254,12 @@ setSDateDMY: function(d,m,y){
 		result = true;
 	}
 
-	if((y > 71) && (y < 1971)){
+	if((y > 71) && (y < 1970)){
 		this.sdt.setYear(y);
 		result = true;
 	}
 	
-	if((y > 1971) && (y < 10000)){
+	if((y > 1970) && (y < 10000)){
 		this.sdt.setFullYear(y);
 		result = true;
 	}
