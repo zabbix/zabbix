@@ -3,6 +3,7 @@ CREATE TABLE escalations (
         actionid                bigint unsigned         DEFAULT '0'     NOT NULL,
         triggerid               bigint unsigned         DEFAULT '0'     NOT NULL,
         eventid         bigint unsigned         DEFAULT '0'     NOT NULL,
+        r_eventid               bigint unsigned         DEFAULT '0'     NOT NULL,
         nextcheck               integer         DEFAULT '0'     NOT NULL,
         esc_step                integer         DEFAULT '0'     NOT NULL,
         status          integer         DEFAULT '0'     NOT NULL,
