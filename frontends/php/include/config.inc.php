@@ -976,7 +976,6 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 			switch($item["value_type"])
 			{
 				case ITEM_VALUE_TYPE_TEXT:	
-				case ITEM_VALUE_TYPE_LOG:	
 					if($DB_TYPE == "ORACLE")
 					{
 						if(isset($row["value"]))
