@@ -29,4 +29,4 @@ ZBX_FPING_HOST
 	double		sec;
 };
 
-int do_ping(ZBX_FPING_HOST *hosts, int hosts_count);
+int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, char *error, int max_error_len);
