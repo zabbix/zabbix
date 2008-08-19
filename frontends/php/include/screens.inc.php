@@ -321,19 +321,34 @@
 		global $DB;
 
 		$item=get_item_by_itemid($itemid);
-		switch($item["value_type"]){
-			case ITEM_VALUE_TYPE_FLOAT:		$history_table = "history";		break;
-			case ITEM_VALUE_TYPE_UINT64:	$history_table = "history_uint";	break;
-			case ITEM_VALUE_TYPE_TEXT:		$history_table = "history_text";	break;
-			case ITEM_VALUE_TYPE_LOG:		$history_table = "history_log";         break;
-			default:						$history_table = "history_str";		break;
+		switch($item['value_type']){
+			case ITEM_VALUE_TYPE_FLOAT:
+				$history_table = 'history';
+				$order_field = 'clock';
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				$history_table = 'history_uint';
+				$order_field = 'clock';
+				break;
+			case ITEM_VALUE_TYPE_TEXT:
+				$history_table = 'history_text';
+				$order_field = 'id';
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				$history_table = 'history_log';
+				$order_field = 'id';
+				break;
+			default:
+				$history_table = 'history_str';
+				$order_field = 'clock';
+				break;
 		}
 
 		$sql='SELECT h.clock,h.value,i.valuemapid '.
 			' FROM '.$history_table.' h, items i '.
 			' WHERE h.itemid=i.itemid '.
 				' AND i.itemid='.$itemid.
-			' ORDER BY h.clock DESC';
+			' ORDER BY h.'.$order_field.' DESC';
 
 		$result=DBselect($sql,$elements);
 
