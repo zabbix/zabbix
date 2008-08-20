@@ -114,13 +114,13 @@ include_once "include/page_header.php";
 	$cmbGroup = new CComboBox("groupid",null,"submit();");
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 //\ ([hg]{1,2}\.hostid)\ [inIN]+\ \(.\.\$[a-z_]+\..\)\ 
 // '.DBcondition('$1',$available_hosts)
 	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
 		' FROM groups g, hosts_groups hg, hosts h, applications a, httptest ht '.
-		' WHERE g.groupid in ('.$available_groups.') '.
+		' WHERE '.DBcondition('g.groupid',$available_groups).
 			' AND hg.groupid=g.groupid '.
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND h.hostid=a.hostid '.

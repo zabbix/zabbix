@@ -29,7 +29,7 @@
 	$page['title'] = 'S_USERS';
 	$page['file'] = 'users.php';
 	$page['hist_arg'] = array('config');
-	$page['scripts'] = array('users.js');
+	$page['scripts'] = array('menu_scripts.js');
 
 include_once 'include/page_header.php';
 
@@ -571,7 +571,7 @@ include_once 'include/page_header.php';
 			$jsmenu = new CPUMenu(null,270);
 			$jsmenu->InsertJavaScript();
 			
-			get_user_menu_array();
+			set_users_jsmenu_array();
 		}
 	}
 	else if($_REQUEST['config']==1){	// USER GROUPS

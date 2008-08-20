@@ -16,6 +16,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+
+
 var agt = navigator.userAgent.toLowerCase();
 var OP = (agt.indexOf("opera") != -1) && window.opera;
 var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
@@ -61,20 +63,6 @@ function is_array(obj) {
       'splice' in obj && 'join' in obj;	  
 }
 
-if (!Array.prototype.forEach){
-  Array.prototype.forEach = function(fun /*, thisp*/){
-    var len = this.length;
-    if (typeof fun != "function")
-      throw new TypeError();
-
-    var thisp = arguments[1];
-    for (var i = 0; i < len; i++){
-      if (i in this)
-        fun.call(thisp, this[i], i, this);
-    }
-  };
-}
-
 function SDI(msg){
 	var div_help = document.getElementById('div_help');
 
@@ -94,113 +82,20 @@ function SDI(msg){
 	div_help.appendChild(document.createElement("br"));
 }
 
-function close_window(){
+/// Alpha-Betic sorting
+
+function addListener(element, eventname, expression, bubbling){
+	bubbling = bubbling || false;
 	
-	window.setTimeout("window.close()", 500); /* Solve bug for Internet Explorer */
-	return false;
-}
-
-function add2favorites(favobj,favid){
-	if('undefined' == typeof(Ajax)){
-		throw("Prototype.js lib is required!");
-		return false;
-	}
-
-	if(typeof(favobj) == 'undefined'){
-		var fav_form = document.getElementById('fav_form');
-		if(!fav_form) throw "Object not found.";
-		
-		var favobj = fav_form.favobj.value;
-		var favid = fav_form.favid.value;
-	}
-	
-	if((typeof(favid) == 'undefined') || empty(favid)) return;
-	
-	var params = {
-		'favobj': 	favobj,
-		'favid': 	favid,
-		'action':	'add'
-	}
-	
-	send_params(params);
-//	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
-}
-
-function rm4favorites(favobj,favid,menu_rowid){
-//	alert(favobj+','+favid+','+menu_rowid);
-	if('undefined' == typeof(Ajax)){
-		throw("Prototype.js lib is required!");
-		return false;
-	}
-
-	if((typeof(favobj) == 'undefined') || (typeof(favid) == 'undefined')) 
-		throw "No agruments sent to function [rm4favorites()].";
-
-	var params = {
-		'favobj': 	favobj,
-		'favid': 	favid,
-		'favcnt':	menu_rowid,
-		'action':	'remove'
-	}
-
-	send_params(params);
-//	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
-}
-
-function getPosition(obj){
-	var pos = {top: 0, left: 0};
-	if(typeof(obj.offsetParent) != 'undefined') {
-		pos.left = obj.offsetLeft;
-		pos.top = obj.offsetTop;
-		while (obj = obj.offsetParent) {
-			pos.left += obj.offsetLeft;
-			pos.top += obj.offsetTop;
-		}
-	}
-return pos;
-}
-
-function get_scroll_pos(){
-	var scrOfX = 0, scrOfY = 0;
-//Netscape compliant
-	if( typeof( window.pageYOffset ) == 'number' ){
-		scrOfY = window.pageYOffset;
-		scrOfX = window.pageXOffset;
-	}
-//DOM compliant
-	else if( document.body && ( document.body.scrollLeft || document.body.scrollTop ) ){
-		scrOfY = document.body.scrollTop;
-		scrOfX = document.body.scrollLeft;
-	}
-//IE6 standards compliant mode
-	else if( document.documentElement && ( document.documentElement.scrollLeft || document.documentElement.scrollTop ) ){
-		scrOfY = document.documentElement.scrollTop;
-		scrOfX = document.documentElement.scrollLeft;
-	}
-	return [ scrOfX, scrOfY ];
-}
-
-function get_cursor_position(e){
-	e = e || window.event;
-	var cursor = {x:0, y:0};
-	if(e.pageX || e.pageY){
-		cursor.x = e.pageX;
-		cursor.y = e.pageY;
+	if(window.addEventListener)	{
+		element.addEventListener(eventname, expression, bubbling);
+		return true;
 	} 
-	else {
-		var de = document.documentElement;
-		var b = document.body;
-		cursor.x = e.clientX + 
-		(de.scrollLeft || b.scrollLeft) - (de.clientLeft || 0);
-		cursor.y = e.clientY + 
-		(de.scrollTop || b.scrollTop) - (de.clientTop || 0);
-	}
-	return cursor;
-}
-
-function redirect(url) {
-	window.location = url;
-	return false;
+	else if(window.attachEvent) {
+		element.attachEvent('on'+eventname, expression);
+		return true;
+	} 
+	else return false;
 }
 
 function add_variable(o_el, s_name, x_value, s_formname, o_document){
@@ -235,6 +130,48 @@ function add_variable(o_el, s_name, x_value, s_formname, o_document){
 return true;
 }
 
+function cancelEvent(e){
+	if (!e) var e = window.event;	
+//SDI(e);
+	if(e){
+		if(IE){
+			e.cancelBubble = true;
+			e.returnValue = false;
+		}
+		else{
+			e.stopPropagation();
+			e.preventDefault();
+		}
+	}
+return false;
+}
+
+function CheckAll(form_name, chkMain, shkName){
+	var frmForm = document.forms[form_name];
+	var value = frmForm.elements[chkMain].checked;
+	for (var i=0; i < frmForm.length; i++){
+		name = frmForm.elements[i].name.split('[')[0];
+		if(frmForm.elements[i].type != 'checkbox') continue;
+		if(name == chkMain) continue;
+		if(shkName && shkName != name) continue;
+		if(frmForm.elements[i].disabled == true) continue;
+		frmForm.elements[i].checked = value;
+	}
+}
+
+function close_window(){
+	
+	window.setTimeout("window.close()", 500); /* Solve bug for Internet Explorer */
+	return false;
+}
+
+function Confirm(msg){
+	if(confirm(msg,'title'))
+		return true;
+	else
+		return false;
+}
+
 function create_var(form_name, var_name, var_val, subm){
 	
 	var frmForm = (is_string(form_name))?document.forms[form_name]:form_name;
@@ -263,47 +200,140 @@ function create_var(form_name, var_name, var_val, subm){
 return false;
 }
 
-function Confirm(msg){
-	if(confirm(msg,'title'))
-		return true;
-	else
-		return false;
+
+function deselectAll(){
+	if(IE){
+		document.selection.empty();
+	}
+	else if(!KQ){	
+		var sel = window.getSelection();
+		sel.removeAllRanges();
+	}
 }
 
-function ShowHide(obj,style){
-	if(typeof(style) == 'undefined')
-		var style = 'inline';
-	if(is_string(obj))
-		obj = document.getElementById(obj);
-	if(!obj){
-		throw 'ShowHide(): Object not foun.';
-		return false;
+function empty_form(id){
+	id = $(id);
+	var count = 0;
+	
+	var inputs = id.getElementsByTagName('input');
+	for(var i=0; i<inputs.length;i++){
+		if((inputs[i].type == 'text') && (typeof(inputs[i].hidden) == 'undefined') && !empty(inputs[i].value)) return false;
+		if((inputs[i].type == 'checkbox') && (inputs[i].checked)) return false;
 	}
-
-	if(obj.style.display != 'none'){
-		obj.style.display = 'none';
-		return 0;
+	
+	var selects = id.getElementsByTagName('select');
+	for(var i=0; i<selects.length;i++){
+		if((typeof(selects[i].hidden) == 'undefined') && (selects[i].selectedIndex)) return false;
 	}
-	else{
-		obj.style.display = style;
-		return 1;
-	}
-return false;
+	
+return true;
 }
 
-function switchElementsClass(obj,class1,class2){
-	obj = $(obj);
-	if(!obj) return false;
+function eventTarget(e){
+	var targ = false;
+	
+	if (!e) var e = window.event;
+	if (e.target) targ = e.target;
+	else if (e.srcElement) targ = e.srcElement;
+	
+// defeat Safari bug
+	if (targ.nodeType == 3) targ = targ.parentNode;
+	
+return targ;
+}
 
-	if(obj.className == class1){
-		obj.className = class2;
-		return class2;
+function getPosition(obj){
+	var pos = {top: 0, left: 0};
+	if(typeof(obj.offsetParent) != 'undefined') {
+		pos.left = obj.offsetLeft;
+		pos.top = obj.offsetTop;
+		while (obj = obj.offsetParent) {
+			pos.left += obj.offsetLeft;
+			pos.top += obj.offsetTop;
+		}
+	}
+return pos;
+}
+
+function getSelectedText(obj){
+	if(IE){
+		obj.focus();
+		return document.selection.createRange().text;
+	}
+	else if(obj.selectionStart){
+		if(obj.selectionStart != obj.selectionEnd) {
+			var s = obj.selectionStart;
+			var e = obj.selectionEnd;
+			return obj.value.substring(s, e);
+		}
+	}
+	return obj.value;
+}
+
+
+function get_bodywidth(){
+	var w = parseInt(document.body.scrollWidth);
+	var w2 = parseInt(document.body.offsetWidth);
+
+	if(KQ){
+		w = (w2 < w)?w2:w;
+		w-=16;
 	}
 	else{
-		obj.className = class1;
-		return class1;
+		w = (w2 > w)?w2:w;
 	}
-return false;
+return w;
+}
+
+
+function get_cursor_position(e){
+	e = e || window.event;
+	var cursor = {x:0, y:0};
+	if(e.pageX || e.pageY){
+		cursor.x = e.pageX;
+		cursor.y = e.pageY;
+	} 
+	else {
+		var de = document.documentElement;
+		var b = document.body;
+		cursor.x = e.clientX + 
+		(de.scrollLeft || b.scrollLeft) - (de.clientLeft || 0);
+		cursor.y = e.clientY + 
+		(de.scrollTop || b.scrollTop) - (de.clientTop || 0);
+	}
+	return cursor;
+}
+
+function get_scroll_pos(){
+	var scrOfX = 0, scrOfY = 0;
+//Netscape compliant
+	if( typeof( window.pageYOffset ) == 'number' ){
+		scrOfY = window.pageYOffset;
+		scrOfX = window.pageXOffset;
+	}
+//DOM compliant
+	else if( document.body && ( document.body.scrollLeft || document.body.scrollTop ) ){
+		scrOfY = document.body.scrollTop;
+		scrOfX = document.body.scrollLeft;
+	}
+//IE6 standards compliant mode
+	else if( document.documentElement && ( document.documentElement.scrollLeft || document.documentElement.scrollTop ) ){
+		scrOfY = document.documentElement.scrollTop;
+		scrOfX = document.documentElement.scrollLeft;
+	}
+	return [ scrOfX, scrOfY ];
+}
+
+
+function openWinCentered(loc, winname, iwidth, iheight, params){
+		tp=Math.ceil((screen.height-iheight)/2);
+		lf=Math.ceil((screen.width-iwidth)/2);
+		if (params.length > 0){
+			params = ', ' + params;
+		}
+
+	var WinObjReferer = window.open(loc,winname,"width="+iwidth+",height="+iheight+",top="+tp+",left="+lf+params);
+	WinObjReferer.focus();
 }
 
 function PopUp(url,width,height,form_name){
@@ -322,179 +352,9 @@ function PopUp(url,width,height,form_name){
 	return false;
 }
 
-function CheckAll(form_name, chkMain, shkName){
-	var frmForm = document.forms[form_name];
-	var value = frmForm.elements[chkMain].checked;
-	for (var i=0; i < frmForm.length; i++){
-		name = frmForm.elements[i].name.split('[')[0];
-		if(frmForm.elements[i].type != 'checkbox') continue;
-		if(name == chkMain) continue;
-		if(shkName && shkName != name) continue;
-		if(frmForm.elements[i].disabled == true) continue;
-		frmForm.elements[i].checked = value;
-	}
-}
-
-
-
-function openWinCentered(loc, winname, iwidth, iheight, params){
-		tp=Math.ceil((screen.height-iheight)/2);
-		lf=Math.ceil((screen.width-iwidth)/2);
-		if (params.length > 0){
-			params = ', ' + params;
-		}
-
-	var WinObjReferer = window.open(loc,winname,"width="+iwidth+",height="+iheight+",top="+tp+",left="+lf+params);
-	WinObjReferer.focus();
-}
-
-
-function addListener(element, eventname, expression, bubbling){
-	bubbling = bubbling || false;
-	
-	if(window.addEventListener)	{
-		element.addEventListener(eventname, expression, bubbling);
-		return true;
-	} 
-	else if(window.attachEvent) {
-		element.attachEvent('on'+eventname, expression);
-		return true;
-	} 
-	else return false;
-}
-
-function cancelEvent(e){
-	if (!e) var e = window.event;	
-//SDI(e);
-	if(e){
-		if(IE){
-			e.cancelBubble = true;
-			e.returnValue = false;
-		}
-		else{
-			e.stopPropagation();
-			e.preventDefault();
-		}
-	}
-return false;
-}
-
-function deselectAll(){
-	if(IE){
-		document.selection.empty();
-	}
-	else if(!KQ){	
-		var sel = window.getSelection();
-		sel.removeAllRanges();
-	}
-}
-
-function eventTarget(e){
-	var targ = false;
-	
-	if (!e) var e = window.event;
-	if (e.target) targ = e.target;
-	else if (e.srcElement) targ = e.srcElement;
-	
-// defeat Safari bug
-	if (targ.nodeType == 3) targ = targ.parentNode;
-	
-return targ;
-}
-
-function send_params(params){
-
-	var uri = new url(location.href);
-	new Ajax.Request(uri.getPath()+"?output=ajax",
-					{
-						'method': 'post',
-						'parameters':params,
-						'onSuccess': function(resp){ },//alert(resp.responseText);
-						'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(params); }
-					}
-	);
-}
-
-
-/************************************************************************************/
-/*										 Pages stuff								*/
-/************************************************************************************/
-function change_hat_state(icon, divid){
-	deselectAll(); 
-	var hat_state = ShowHide(divid); 
-	switchElementsClass(icon,"arrowup","arrowdown");
-
-	if(false === hat_state) return false;
-	
-	var params = {
-		'favobj': 	'hat',
-		'favid': 	divid,
-		'state':	hat_state
-	}
-	
-	send_params(params);
-}
-
-function change_filter_state(icon, divid){
-	deselectAll(); 
-	var filter_state = ShowHide(divid); 
-	switchElementsClass(icon,"filteropened","filterclosed");
-	
-	if(false === filter_state) return false;
-
-	var params = {
-		'favobj': 	'filter',
-		'favid': 	divid,
-		'state':	filter_state
-	}
-	
-	send_params(params);	
-}
-
-function switch_mute(icon){
-	deselectAll(); 
-	var sound_state = switchElementsClass(icon,"iconmute","iconsound");
-
-	if(false === sound_state) return false;
-	sound_state = (sound_state == "iconmute")?1:0;
-
-	var params = {
-		'favobj': 	'sound',
-		'state':	sound_state
-	}
-	
-	send_params(params);
-}
-
-function GetSelectedText(obj){
-	if(IE){
-		obj.focus();
-		return document.selection.createRange().text;
-	}
-	else if(obj.selectionStart){
-		if(obj.selectionStart != obj.selectionEnd) {
-			var s = obj.selectionStart;
-			var e = obj.selectionEnd;
-			return obj.value.substring(s, e);
-		}
-	}
-	return obj.value;
-}
-
-function ScaleChartToParenElement(obj_name){
-	var obj = document.getElementsByName(obj_name);
-
-	if(obj.length <= 0) throw "Can't find objects with name [" + obj_name +"]";
-
-	for(i = obj.length-1; i>=0; i--){
-		obj[i].src += "&width=" + (obj[i].parentNode.offsetWidth - obj[i].parentNode.offsetLeft - 10);
-	}
-}
-
-function insert_sizeable_graph(graph_id,url){
-	if((typeof(ZBX_G_WIDTH) != 'undefined')) url += "&amp;width="+ZBX_G_WIDTH;
-
-	document.write('<img id="'+graph_id+'" src="'+url+'" alt="graph" /><br />');
+function redirect(url) {
+	window.location = url;
+	return false;
 }
 
 function remove_childs(form_name,rmvbyname,tag){
@@ -552,69 +412,58 @@ function resizeiframe(id){
 	}
 }
 
-function get_bodywidth(){
-	var w = parseInt(document.body.scrollWidth);
-	var w2 = parseInt(document.body.offsetWidth);
+function ShowHide(obj,style){
+	if(typeof(style) == 'undefined')
+		var style = 'inline';
+	if(is_string(obj))
+		obj = document.getElementById(obj);
+	if(!obj){
+		throw 'ShowHide(): Object not foun.';
+		return false;
+	}
 
-	if(KQ){
-		w = (w2 < w)?w2:w;
-		w-=16;
+	if(obj.style.display != 'none'){
+		obj.style.display = 'none';
+		return 0;
 	}
 	else{
-		w = (w2 > w)?w2:w;
+		obj.style.display = style;
+		return 1;
 	}
-return w;
+return false;
 }
 
-function empty_form(id){
-	id = $(id);
-	var count = 0;
-	
-	var inputs = id.getElementsByTagName('input');
-	for(var i=0; i<inputs.length;i++){
-		if((inputs[i].type == 'text') && (typeof(inputs[i].hidden) == 'undefined') && !empty(inputs[i].value)) return false;
-		if((inputs[i].type == 'checkbox') && (inputs[i].checked)) return false;
+function switchElementsClass(obj,class1,class2){
+	obj = $(obj);
+	if(!obj) return false;
+
+	if(obj.className == class1){
+		obj.className = class2;
+		return class2;
 	}
-	
-	var selects = id.getElementsByTagName('select');
-	for(var i=0; i<selects.length;i++){
-		if((typeof(selects[i].hidden) == 'undefined') && (selects[i].selectedIndex)) return false;
+	else{
+		obj.className = class1;
+		return class1;
 	}
-	
-return true;
+return false;
 }
 
 
-function moveListBoxSelectedItem(formname,objname,from,to,action){
-	var result = true
-	
-	from = $(from);
-	to = $(to);
-	
-	for(i = 0; i < from.options.length; i++) {
-		if(from.options[i].selected == true) {
-/*			
-			var temp = document.createElement('option');
-			temp.setAttribute('value',from.options[i].value);
-			
-			var caption = IE?from.options[i].innerText:from.options[i].textContent;
-			temp.appendChild(document.createTextNode(caption));
-*/
-			var temp = from.options[i].cloneNode(true);
-			
-			if(action.toLowerCase() == 'add'){
-				result &= create_var(formname, objname+'['+from.options[i].value+']', from.options[i].value, false);
-			}
-			else if(action.toLowerCase() == 'rmv'){
-				result &= remove_element(objname+'['+from.options[i].value+']','input');
-			}
-			
-			from.removeChild(from.options[i]);
+/************************************************************************************/
+/*										 Pages stuff								*/
+/************************************************************************************/
+function ScaleChartToParenElement(obj_name){
+	var obj = document.getElementsByName(obj_name);
 
-			to.appendChild(temp);
-			i--;
-		}
+	if(obj.length <= 0) throw "Can't find objects with name [" + obj_name +"]";
+
+	for(i = obj.length-1; i>=0; i--){
+		obj[i].src += "&width=" + (obj[i].parentNode.offsetWidth - obj[i].parentNode.offsetLeft - 10);
 	}
+}
 
-return result;
+function insert_sizeable_graph(graph_id,url){
+	if((typeof(ZBX_G_WIDTH) != 'undefined')) url += "&amp;width="+ZBX_G_WIDTH;
+
+	document.write('<img id="'+graph_id+'" src="'+url+'" alt="graph" /><br />');
 }

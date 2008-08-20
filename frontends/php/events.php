@@ -144,7 +144,7 @@ include_once "include/page_header.php";
 	if(EVENT_SOURCE_TRIGGERS == $source){
 	
 	    $available_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
 		
 		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_DATA_ARRAY, get_current_nodeid());
 
@@ -183,7 +183,7 @@ include_once "include/page_header.php";
 		
         $result=DBselect('SELECT DISTINCT g.groupid,g.name '.
 						' FROM groups g, hosts_groups hg, hosts h, items i '.
-	                	' WHERE g.groupid in ('.$available_groups.') '.
+	                	' WHERE '.DBcondition('g.groupid',$available_groups).
 			                ' AND hg.groupid=g.groupid '.
 							' AND h.status='.HOST_STATUS_MONITORED.
 			                ' AND h.hostid=i.hostid '.
