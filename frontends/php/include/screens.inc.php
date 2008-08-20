@@ -622,10 +622,11 @@
 			$id=0;
 			
 			if($resourceid > 0){
+				$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 				$result=DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
 						' FROM hosts_groups hg,hosts h,groups g '.
 							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
-						' WHERE g.groupid IN ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
+						' WHERE '.DBcondition('g.groupid',$available_groups).
 							' AND g.groupid=hg.groupid '.
 							' AND hg.hostid=h.hostid '.
 							' AND h.status='.HOST_STATUS_MONITORED.
@@ -681,11 +682,12 @@
 			$caption = '';
 			$id=0;
 			
+			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 			if(remove_nodes_from_id($resourceid) > 0){
 				$result=DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
 						' FROM hosts_groups hg, groups g '.
 							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
-						' WHERE g.groupid in ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
+						' WHERE '.DBcondition('g.groupid',$available_groups).
 							' AND g.groupid='.$resourceid);
 
 				while($row=DBfetch($result)){					

@@ -133,7 +133,7 @@ include_once 'include/page_header.php';
 	$h1 = array();
 	
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
 	
 	$available_graphs = get_accessible_graphs(PERM_READ_LIST, PERM_RES_IDS_ARRAY, get_current_nodeid());
 
@@ -168,7 +168,7 @@ include_once 'include/page_header.php';
 	if($_REQUEST['groupid'] == 0){
 		$sql = 'SELECT COUNT(DISTINCT g.groupid) as grpcount, MAX(g.groupid) as groupid'.
 				' FROM groups g, hosts_groups hg, hosts h, items i, graphs_items gi '.
-				' WHERE g.groupid in ('.$available_groups.') '.
+				' WHERE '.DBcondition('g.groupid',$available_groups).
 					' AND hg.groupid=g.groupid '.
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND h.hostid=i.hostid '.
@@ -231,7 +231,7 @@ include_once 'include/page_header.php';
 	
 	$result=DBselect('SELECT DISTINCT g.groupid, g.name '.
 				' FROM groups g, hosts_groups hg, hosts h, items i, graphs_items gi '.
-				' WHERE g.groupid in ('.$available_groups.') '.
+				' WHERE '.DBcondition('g.groupid',$available_groups).
 					' AND hg.groupid=g.groupid '.
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND h.hostid=i.hostid '.

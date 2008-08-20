@@ -97,9 +97,11 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		$where = $from = '';
 	}
 	
+	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
+	
 	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
 				' FROM groups g, hosts_groups hg, hosts h, items i'.$from.
-				' WHERE g.groupid IN ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).') '.
+				' WHERE '.DBcondition('g.groupid',$available_groups).
 					' AND hg.groupid=g.groupid '.
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND h.hostid=i.hostid '.

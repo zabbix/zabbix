@@ -19,19 +19,20 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/hosts.inc.php';
-	require_once 'include/forms.inc.php';
+	require_once('include/config.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/forms.inc.php');
 
 	$page['title'] = "S_HOSTS";
 	$page['file'] = 'hosts.php';
 	$page['hist_arg'] = array('groupid','config','hostid');
-
-include_once 'include/page_header.php';
+	$page['scripts'] = array('menu_scripts.js');
+	
+include_once('include/page_header.php');
 
 	$_REQUEST['config'] = get_request('config',get_profile('web.hosts.config',0));
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 	if(isset($_REQUEST['hostid']) && $_REQUEST['hostid'] > 0 && !uint_in_array($_REQUEST['hostid'], $available_hosts)) {
 		access_deny();
 	}
@@ -127,7 +128,7 @@ include_once 'include/page_header.php';
 	if($_REQUEST['config']==4)
 		validate_group_with_host(PERM_READ_WRITE,array('always_select_first_host','only_current_node'),'web.last.conf.groupid', 'web.last.conf.hostid');
 	else if($_REQUEST['config']==0 || $_REQUEST['config']==3)
-		validate_group(PERM_READ_WRITE,array(),'web.last.conf.groupid');
+		validate_group(PERM_READ_WRITE,array('real_hosts'),'web.last.conf.groupid');
 
 	update_profile('web.hosts.config',$_REQUEST['config'], PROFILE_TYPE_INT);
 ?>
@@ -954,7 +955,7 @@ include_once 'include/page_header.php';
 			else
 				$status_filter = ' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') ';
 				
-			$cmbGroups = new CComboBox("groupid",get_request("groupid",0),"submit()");
+			$cmbGroups = new CComboBox('groupid',get_request('groupid',0),'submit()');
 			$cmbGroups->AddItem(0,S_ALL_SMALL);
 
 			$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
@@ -1012,7 +1013,6 @@ include_once 'include/page_header.php';
 				$sql.= ' WHERE hg.groupid='.$_REQUEST['groupid'].
 							' AND hg.hostid=h.hostid '.
 							' AND';
-							
 			} 
 			else{  
 				$sql.= ' hosts h WHERE ';
@@ -1095,7 +1095,7 @@ include_once 'include/page_header.php';
 				}
 
 
-				$show = host_js_menu($row["hostid"]);
+				$show = host_js_menu($row['hostid']);
 
 				$templates_linked = array();
 				foreach($templates as $templateid => $temp){
@@ -1112,6 +1112,11 @@ include_once 'include/page_header.php';
 					$available,
 					$error,
 					$show));
+
+				$jsmenu = new CPUMenu(null,270);
+				$jsmenu->InsertJavaScript();
+
+				set_hosts_jsmenu_array();
 			}
 
 			$footerButtons = array(
@@ -1161,7 +1166,7 @@ include_once 'include/page_header.php';
 
 			$db_groups=DBselect('SELECT g.groupid,g.name '.
 							' FROM groups g'.
-							' WHERE g.groupid in ('.$available_groups.')'.
+							' WHERE '.DBcondition('g.groupid',$available_groups).
 							order_by('g.name'));
 			while($db_group=DBfetch($db_groups)){
 				$db_hosts = DBselect('SELECT DISTINCT h.host, h.status'.
@@ -1384,27 +1389,27 @@ include_once 'include/page_header.php';
 			$table = new CTableInfo(S_NO_PROXIES_DEFINED);
 
 			$table->setHeader(array(
-				array(	new CCheckBox("all_hosts",NULL,
-						"CheckAll('".$form->GetName()."','all_hosts');"),
-					SPACE,
-					make_sorting_link(S_NAME,'g.name')),
-				S_LASTSEEN_AGE,
-				' # ',
-				S_MEMBERS));
+					array(new CCheckBox("all_hosts",NULL,"CheckAll('".$form->GetName()."','all_hosts');"),
+						SPACE,
+						make_sorting_link(S_NAME,'g.name')),
+						S_LASTSEEN_AGE,
+						' # ',
+						S_MEMBERS
+					));
 
-			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-
-			$db_proxies=DBselect('select hostid,host,lastaccess from hosts'.
-					' where status in ('.HOST_STATUS_PROXY.') and '.DBin_node('hostid').
-					order_by('host'));
-			while($db_proxy=DBfetch($db_proxies))
-			{
+			$db_proxies=DBselect('SELECT hostid,host,lastaccess '.
+								' FROM hosts'.
+								' WHERE status IN ('.HOST_STATUS_PROXY.') '.
+									' AND '.DBin_node('hostid').
+								order_by('host'));
+					
+			while($db_proxy=DBfetch($db_proxies)){
 				$db_hosts = DBselect('SELECT DISTINCT host,status'.
 						' FROM hosts'.
 						' WHERE proxy_hostid='.$db_proxy['hostid'].
 							' AND '.DBcondition('hostid',$available_hosts).
-							' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-						' order by host'
+							' AND status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+						' ORDER BY host'
 						);
 
 				$hosts = array();

@@ -447,16 +447,12 @@ include_once "include/page_header.php";
 			}
 			else{ /* groups */
 				$hosts_ids = array();
-				$group_ids = "";
-				foreach($_REQUEST['copy_targetid'] as $group_id){
-					$group_ids .= $group_id.',';
-				}
-				$group_ids = trim($group_ids,',');
+				$group_ids = $_REQUEST['copy_targetid'];
 
-				$db_hosts = DBselect('select distinct h.hostid '.
-					' from hosts h, hosts_groups hg'.
-					' where h.hostid=hg.hostid '.
-						' and hg.groupid in ('.$group_ids.')');
+				$db_hosts = DBselect('SELECT DISTINCT h.hostid '.
+					' FROM hosts h, hosts_groups hg'.
+					' WHERE h.hostid=hg.hostid '.
+						' AND '.DBcondition('hg.groupid',$group_ids));
 				while($db_host = DBfetch($db_hosts)){
 					array_push($hosts_ids, $db_host['hostid']);
 				}

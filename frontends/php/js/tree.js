@@ -17,6 +17,8 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 // JavaScript Document
+// Tree manipulations class
+// author: Aly
 
 var tree ={
 init : function(){

@@ -34,9 +34,9 @@
 			$this->trigger	= array('exist' => 0, 'missed' => 0);
 			$this->graph	= array('exist' => 0, 'missed' => 0);
 
-			$this->available_groups = get_accessible_groups_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
+			$this->available_groups = get_accessible_groups_by_user($USER_DETAILS, PERM_READ_WRITE);
 
-			$this->available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
+			$this->available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 				
 			$this->available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
 		}
@@ -78,9 +78,9 @@
 					$data['groups'] = array();
 					$data['skip']	= false;
 					
-					if($host_data = DBfetch(DBselect('select hostid from hosts'.
-						' where host='.zbx_dbstr($data['name']).
-							' and '.DBin_node('hostid',get_current_nodeid(false)))))
+					if($host_data = DBfetch(DBselect('SELECT hostid FROM hosts'.
+						' WHERE host='.zbx_dbstr($data['name']).
+							' AND '.DBin_node('hostid',get_current_nodeid(false)))))
 					{ /* exist */
 						if($this->host['exist']==1) /* skip */{
 							$data['skip'] = true;

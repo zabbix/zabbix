@@ -21,11 +21,9 @@
 <?php
 	require_once("include/classes/ctag.inc.php");
 
-	class CComboItem extends CTag
-	{
+	class CComboItem extends CTag{
 /* public */
-		function CComboItem($value,$caption=NULL,$selected=NULL, $enabled=NULL)
-		{
+		function CComboItem($value,$caption=NULL,$selected=NULL, $enabled=NULL){
 			parent::CTag('option','yes');
 			$this->tag_body_start = "";
 			$this->options['value'] = $value;
@@ -36,20 +34,20 @@
 			$this->SetEnabled($enabled);
 
 		}
-		function SetValue($value)
-		{
+		
+		function SetValue($value){
 			return $this->options['value'] = $value;
 		}
-		function GetValue()
-		{
+		
+		function GetValue(){
 			return $this->GetOption('value');
 		}
-		function SetCaption($value=NULL)
-		{
+		
+		function SetCaption($value=NULL){
 			$this->AddItem(nbsp($value));
 		}
-		function SetSelected($value='yes')
-		{
+		
+		function SetSelected($value='yes'){
 			if((is_string($value) && ($value == 'yes' || $value == 'selected' || $value=='on'))
 				|| (is_int($value) && $value<>0))
 				return $this->options['selected'] = 'selected';
@@ -58,14 +56,12 @@
 		}
 	}
 
-	class CComboBox extends CTag
-	{
+	class CComboBox extends CTag{
 /* private */
 		//var $value;
 
 /* public */
-		function CComboBox($name='combobox',$value=NULL,$action=NULL)
-		{
+		function CComboBox($name='combobox',$value=NULL,$action=NULL){
 			parent::CTag('select','yes');
 			$this->tag_end = '';
 
@@ -78,16 +74,16 @@
 			$this->value = $value;
 			$this->SetAction($action);
 		}
-		function SetAction($value='submit()', $event='onchange')
-		{
+		
+		function SetAction($value='submit()', $event='onchange'){
 			$this->AddOption($event,$value);
 		}
-		function SetValue($value=NULL)
-		{
+		
+		function SetValue($value=NULL){
 			$this->value = $value;
 		}
-		function AddItem($value, $caption='', $selected=NULL, $enabled='yes')
-		{
+		
+		function AddItem($value, $caption='', $selected=NULL, $enabled='yes'){
 //			if($enabled=='no') return;	/* disable item method 1 */
 			if(strtolower(get_class($value))=='ccomboitem'){
 				parent::AddItem($value);
@@ -118,8 +114,7 @@
 			$this->SetValue($value);
 		}
 		
-		function SetSize($value)
-		{
+		function SetSize($value){
 			$this->options['size'] = $value;
 		}
 	}
@@ -157,6 +152,8 @@
 	
 	class CTweenBox{
 		function ctweenbox(&$form,$name,$value=null,$size=10){
+			insert_javascript_for_twinbox();
+			
 			$this->form = &$form;
 			$this->name = $name.'_tweenbox';
 			$this->varname = $name;

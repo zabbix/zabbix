@@ -175,7 +175,7 @@ if(isset($_REQUEST['form'])){
 		
 	$sql = 'SELECT DISTINCT g.name, g.groupid '.
 			' FROM groups g '.
-			' WHERE g.groupid IN ('.$available_groups.') '.
+			' WHERE '.DBcondition('g.groupid',$available_groups).
 			' ORDER BY g.name';
 			
 	$grp_result = DBselect($sql);

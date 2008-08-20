@@ -894,7 +894,7 @@
 			if($perm_details){
 				$group_ids = array_keys($user_groups);
 				if(count($group_ids) == 0) $group_ids = array(-1);
-				$db_rights = DBselect('SELECT * FROM rights r WHERE r.groupid IN ('.implode(',',$group_ids).')');
+				$db_rights = DBselect('SELECT * FROM rights r WHERE '.DBcondition('r.groupid',$group_ids));
 
 				$tmp_perm = array();
 				while($db_right = DBfetch($db_rights)){
@@ -1792,12 +1792,13 @@
 
 	        $cmbGroups = new CComboBox("add_groupid",$add_groupid);		
 
-	        $groups=DBselect("SELECT DISTINCT groupid,name FROM groups ".
-			"where groupid in (".get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY).") ".
-			" order by name");
-	        while($group=DBfetch($groups))
-	        {
-			$cmbGroups->AddItem(
+			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+	        $groups=DBselect('SELECT DISTINCT groupid,name '.
+				' FROM groups '.
+				' WHERE '.DBcondition('groupid',$available_groups).
+				' order by name');
+	        while($group=DBfetch($groups)){
+				$cmbGroups->AddItem(
 					$group["groupid"],
 					get_node_name_by_elid($group["groupid"]).$group["name"]
 					);
@@ -4050,10 +4051,11 @@
 
 		$frmHost->AddRow(S_NAME,S_ORIGINAL);
 
+		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 		$grp_tb = new CTweenBox($frmHost,'groups',$groups,6);	
 		$db_groups=DBselect('SELECT DISTINCT groupid,name '.
 						' FROM groups '.
-						' WHERE groupid IN ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).') '.
+						' WHERE '.DBcondition('groupid',$available_groups).
 						' ORDER BY name');
 						
 		while($db_group=DBfetch($db_groups)){
@@ -4237,10 +4239,11 @@
 			$ip			= $db_host['ip'];
 
 // add groups
+			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 			$db_groups=DBselect('SELECT DISTINCT groupid '.
 							' FROM hosts_groups '.
 							' WHERE hostid='.$_REQUEST['hostid'].
-								' AND groupid in ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).') ');
+								' AND '.DBcondition('groupid',$available_groups));
 			while($db_group=DBfetch($db_groups)){
 				if(uint_in_array($db_group['groupid'],$groups)) continue;
 				$groups[$db_group['groupid']] = $db_group['groupid'];
@@ -4284,10 +4287,11 @@
 		
 		$frmHost->AddRow(S_NAME,new CTextBox('host',$host,20));
 
+		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 		$grp_tb = new CTweenBox($frmHost,'groups',$groups,10);	
 		$db_groups=DBselect('SELECT DISTINCT groupid,name '.
 						' FROM groups '.
-						' WHERE groupid IN ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST).') '.
+						' WHERE '.DBcondition('groupid',$available_groups).
 						' ORDER BY name');
 						
 		while($db_group=DBfetch($db_groups)){
@@ -4935,7 +4939,7 @@
 		$cmbType = new CComboBox("elementtype",$elementtype,"submit()");
 
 		$available_groups = 	get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
-		$available_hosts = 		get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+		$available_hosts = 		get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 		$available_triggers = 	get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 		
 		$db_hosts = DBselect('SELECT DISTINCT n.name as node_name,h.hostid,h.host '.
@@ -5041,7 +5045,7 @@
 			$group_info = DBfetch(DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
 								' FROM groups g '.
 									' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('g.groupid').
-								' WHERE g.groupid in ('.$available_groups.') '.
+								' WHERE '.DBcondition('g.groupid',$available_groups).
 									' AND g.groupid='.$elementid.
 								' ORDER BY node_name,g.name'));
 

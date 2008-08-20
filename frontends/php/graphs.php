@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/hosts.inc.php";
-	require_once "include/graphs.inc.php";
-	require_once "include/forms.inc.php";
-	require_once "include/classes/chart.inc.php";
-	require_once "include/classes/pie.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/graphs.inc.php');
+	require_once('include/forms.inc.php');
+	require_once('include/classes/chart.inc.php');
+	require_once('include/classes/pie.inc.php');
 	
 
 	$page["title"] = "S_CONFIGURATION_OF_GRAPHS";
@@ -87,8 +87,7 @@ include_once "include/page_header.php";
 	validate_sort_and_sortorder('g.name',ZBX_SORT_UP);
 
 	$options = array('allow_all_hosts','only_current_node','always_select_first_host');//'with_monitored_items',
-	validate_group_with_host(PERM_READ_WRITE,$options,'web.last.conf.groupid', 'web.last.conf.hostid');
-//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+	validate_group_with_host(PERM_READ_WRITE,$options,'web.last.conf.groupid', 'web.last.conf.hostid');	
 ?>
 <?php
 
@@ -97,7 +96,7 @@ include_once "include/page_header.php";
 	$_REQUEST['graph3d'] = get_request('graph3d', 0);
 	$_REQUEST['legend'] = get_request('legend', 0);
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 	$available_graphs = get_accessible_graphs(PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
 
 // ---- <ACTIONS> ----
@@ -206,7 +205,7 @@ include_once "include/page_header.php";
 				$sql = 'SELECT distinct h.hostid '.
 						' FROM hosts h, hosts_groups hg'.
 						' WHERE h.hostid=hg.hostid '.
-							' AND hg.groupid IN ('.implode(',',$_REQUEST['copy_targetid']).')'.
+							' AND '.DBcondition('hg.groupid',$_REQUEST['copy_targetid']).
 							' AND '.DBcondition('h.hostid',$available_hosts);
 				$db_hosts = DBselect($sql);
 				while($db_host = DBfetch($db_hosts)){
@@ -310,8 +309,8 @@ include_once "include/page_header.php";
 		$r_form = new CForm();
 		$r_form->SetMethod('get');
 		
-		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
-		$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
+		$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
+		$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
 
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 
@@ -322,17 +321,17 @@ include_once "include/page_header.php";
 			' ORDER BY g.name';
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
-			$cmbGroup->AddItem($row["groupid"],$row["name"]);
+			$cmbGroup->AddItem($row['groupid'],$row['name']);
 		}
 		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 
-		if($_REQUEST["groupid"] > 0){
+		if($_REQUEST['groupid'] > 0){
 			$sql='SELECT DISTINCT h.hostid,h.host '.
 				' FROM hosts h, hosts_groups hg '.
-				' WHERE hg.groupid='.$_REQUEST["groupid"].
+				' WHERE hg.groupid='.$_REQUEST['groupid'].
 					' AND hg.hostid=h.hostid '.
 					' AND '.DBcondition('h.hostid',$available_hosts).
-					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
+					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
 				' ORDER BY h.host';
 		}
 		else{
@@ -340,7 +339,7 @@ include_once "include/page_header.php";
 			$sql='SELECT DISTINCT h.hostid,h.host '.
 				' FROM hosts h '.
 				' WHERE '.DBcondition('h.hostid',$available_hosts).
-					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
+					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
 				' ORDER BY h.host';
 		}
 		

@@ -267,7 +267,7 @@ function get_accessible_hosts_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 //		global $DB;
 	static $available_hosts;
 
-	if(is_null($perm_res))		$perm_res	= PERM_RES_STRING_LINE;
+	if(is_null($perm_res))		$perm_res	= PERM_RES_IDS_ARRAY;//PERM_RES_STRING_LINE;
 	if($perm == PERM_READ_LIST)	$perm		= PERM_READ_ONLY;
 	
 	$result = array();
@@ -366,7 +366,7 @@ function get_accessible_groups_by_user($user_data,$perm,$perm_res=null,$nodeid=n
 	global $ZBX_LOCALNODEID;
 
 	if(is_null($nodeid)) $nodeid = get_current_nodeid();
-	if(is_null($perm_res))		$perm_res	= PERM_RES_STRING_LINE;
+	if(is_null($perm_res))		$perm_res	= PERM_RES_IDS_ARRAY;//PERM_RES_STRING_LINE;
 
 	$result = array();
 	
