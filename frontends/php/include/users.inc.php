@@ -314,9 +314,12 @@
 	function update_user_group($usrgrpid,$name,$users_status,$gui_access,$users=array(),$rights=array()){
 		global $USER_DETAILS;
 		
-		if(DBfetch(DBselect('SELECT * FROM usrgrp WHERE name='.zbx_dbstr($name).
-			' and usrgrpid<>'.$usrgrpid.' and '.DBin_node('usrgrpid', get_current_nodeid(false)))))
-		{
+		$sql = 'SELECT * '.
+				' FROM usrgrp '.
+				' WHERE name='.zbx_dbstr($name).
+					' AND usrgrpid<>'.$usrgrpid.
+					' AND '.DBin_node('usrgrpid', get_current_nodeid(false));
+		if(DBfetch(DBselect($sql))){
 			error("Group '$name' already exists");
 			return 0;
 		}
@@ -358,7 +361,7 @@
 	return $result;
 	}
 
-	function	delete_user_group($usrgrpid){
+	function delete_user_group($usrgrpid){
 		$result = DBexecute("delete from rights where groupid=$usrgrpid");
 		if(!$result)	return	$result;
 
@@ -371,7 +374,7 @@
 	return	$result;
 	}
 
-	function	get_group_by_usrgrpid($usrgrpid){
+	function get_group_by_usrgrpid($usrgrpid){
 		if($row = DBfetch(DBselect("select * from usrgrp where usrgrpid=".$usrgrpid))){
 			return $row;
 		}
@@ -418,7 +421,7 @@
 	}
 	
 /********************************/
-	function get_user_menu_array($userids = array()){
+	function set_users_jsmenu_array(){
 		$menu_all = array();
 		$menu_gui_access = array();
 		$menu_users_status = array();
@@ -464,28 +467,27 @@
 			' WHERE ug.userid='.$userid.
 				' AND g.usrgrpid=ug.usrgrpid '.
 				' AND '.DBin_node('g.usrgrpid', get_current_nodeid(false));
-		if($res = DBselect($sql)){
-			while($group = DBFetch($res)){
-				$group['name'] = htmlspecialchars($group['name']);
-				
-				$gui_access = $group['gui_access'];
-				$users_status = $group['users_status'];
-				
-				unset($group['gui_access']);
-				unset($group['users_status']);
+		$res = DBselect($sql);
+
+		while($group = DBFetch($res)){
+			$group['name'] = htmlspecialchars($group['name']);
 			
-				$usr_grp_all_in[] = $group;	
-				if($gui_access != GROUP_GUI_ACCESS_SYSTEM){
-					$usr_grp_gui_in[] = $groups;
-				}
-				if($users_status == GROUP_STATUS_DISABLED){
-					$usr_grp_status_in[] = $group;
-				}
+			$gui_access = $group['gui_access'];
+			$users_status = $group['users_status'];
+			
+			unset($group['gui_access']);
+			unset($group['users_status']);
+		
+			$usr_grp_all_in[] = $group;	
+			if($gui_access != GROUP_GUI_ACCESS_SYSTEM){
+				$usr_grp_gui_in[] = $group;
+			}
+			if($users_status == GROUP_STATUS_DISABLED){
+				$usr_grp_status_in[] = $group;
 			}
 		}
 				
 		$action = new CSpan(S_SELECT);
-
 		$script = new CScript("javascript: create_user_menu(event,".
 												$userid.",".
 												zbx_jsvalue($usr_grp_all_in).",".

@@ -18,19 +18,19 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-require_once "include/config.inc.php";
-require_once "include/hosts.inc.php";
-require_once "include/triggers.inc.php";
-require_once "include/items.inc.php";
-require_once "include/actions.inc.php";
-require_once "include/discovery.inc.php";
-require_once "include/html.inc.php";
-require_once "include/blocks.inc.php";
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/triggers.inc.php');
+require_once('include/items.inc.php');
+require_once('include/actions.inc.php');
+require_once('include/discovery.inc.php');
+require_once('include/html.inc.php');
+require_once('include/blocks.inc.php');
 
 $page["title"] = "S_DASHBOARD";
 $page["file"] = "dashboard.php";
 $page['hist_arg'] = array();
-$page['scripts'] = array('updater.js','dashboard.js','showhint.js');
+$page['scripts'] = array('updater.js','menu_scripts.js','showhint.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -168,20 +168,6 @@ include_once "include/page_header.php";
 		}
 	}	
 	
-	if(isset($_REQUEST['output'])){
-		if('json2' == $_REQUEST['output']){
-			echo 'try{'.
-					'json.callBack("sdt"); '.
-					'json.removeScript("'.$_REQUEST['jsscriptid'].'");'.
-				' }catch(e){ '.
-					'alert("Warning: incorrect JSON return.");'.
-					'json.removeScript("'.$_REQUEST['jsscriptid'].'");'.
-				' }';
-		}
-	}
-	
-
-
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 		exit();
 	}
@@ -227,7 +213,7 @@ include_once "include/page_header.php";
 // --------------
 
 	$graph_menu = new CDiv(SPACE,'iconmenu');
-	$graph_menu->AddAction('onclick','javascript: create_menu(event,"graphs");');
+	$graph_menu->AddAction('onclick','javascript: create_dashboard_menu(event,"graphs");');
 	$graph_menu->AddOption('title',S_MENU);
 	
 	$left_tab->AddRow(create_hat(
@@ -239,7 +225,7 @@ include_once "include/page_header.php";
 		));
 		
 	$screen_menu = new CDiv(SPACE,'iconmenu');
-	$screen_menu->AddAction('onclick','javascript: create_menu(event,"screens");');
+	$screen_menu->AddAction('onclick','javascript: create_dashboard_menu(event,"screens");');
 	$screen_menu->AddOption('title',S_MENU);
 
 	$left_tab->AddRow(create_hat(
@@ -252,7 +238,7 @@ include_once "include/page_header.php";
 		
 		
 	$sysmap_menu = new CDiv(SPACE,'iconmenu');
-	$sysmap_menu->AddAction('onclick','javascript: create_menu(event,"sysmaps");');
+	$sysmap_menu->AddAction('onclick','javascript: create_dashboard_menu(event,"sysmaps");');
 	$sysmap_menu->AddOption('title',S_MENU);
 		
 	$left_tab->AddRow(create_hat(
@@ -293,7 +279,7 @@ include_once "include/page_header.php";
 	);
 
 	$refresh_menu = new CDiv(SPACE,'iconmenu');
-	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_syssum");');
+	$refresh_menu->AddAction('onclick','javascript: create_dashboard_menu(event,"hat_syssum");');
 	$refresh_menu->AddOption('title',S_MENU);
 	
 	$right_tab->AddRow(create_hat(
@@ -305,7 +291,7 @@ include_once "include/page_header.php";
 		));
 
 	$refresh_menu = new CDiv(SPACE,'iconmenu');
-	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_stszbx");');
+	$refresh_menu->AddAction('onclick','javascript: create_dashboard_menu(event,"hat_stszbx");');
 	$refresh_menu->AddOption('title',S_MENU);
 
 	$right_tab->AddRow(create_hat(
@@ -317,7 +303,7 @@ include_once "include/page_header.php";
 		));
 		
 	$refresh_menu = new CDiv(SPACE,'iconmenu');
-	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_lastiss");');
+	$refresh_menu->AddAction('onclick','javascript: create_dashboard_menu(event,"hat_lastiss");');
 	$refresh_menu->AddOption('title',S_MENU);
 		
 	$right_tab->AddRow(create_hat(S_LATEST_ISSUES,
@@ -328,7 +314,7 @@ include_once "include/page_header.php";
 		));
 		
 	$refresh_menu = new CDiv(SPACE,'iconmenu');
-	$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_webovr");');
+	$refresh_menu->AddAction('onclick','javascript: create_dashboard_menu(event,"hat_webovr");');
 	$refresh_menu->AddOption('title',S_MENU);
 
 	$right_tab->AddRow(create_hat(
@@ -346,7 +332,7 @@ include_once "include/page_header.php";
 		$refresh_tab[] = array(	'id' => 'hat_dscvry','interval'  => get_profile('web.dahsboard.rf_rate.hat_dscvry',60));
 
 		$refresh_menu = new CDiv(SPACE,'iconmenu');
-		$refresh_menu->AddAction('onclick','javascript: create_menu(event,"hat_dscvry");');
+		$refresh_menu->AddAction('onclick','javascript: create_dashboard_menu(event,"hat_dscvry");');
 		$refresh_menu->AddOption('title',S_MENU);
 	
 		$right_tab->AddRow(create_hat(

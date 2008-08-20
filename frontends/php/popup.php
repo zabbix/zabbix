@@ -524,10 +524,11 @@ include_once "include/page_header.php";
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->SetHeader(array(S_NAME));
 
-		$db_groups = DBselect("SELECT DISTINCT groupid,name from groups ".
-			' where '.DBin_node('groupid', $nodeid).
-			" AND groupid in (".$available_groups.") ".
-			" order by name");
+		$db_groups = DBselect('SELECT DISTINCT groupid,name '.
+						' FROM groups '.
+						' WHERE '.DBin_node('groupid', $nodeid).
+							' AND '.DBcondition('groupid',$available_groups).
+						' ORDER BY name');
 		while($row = DBfetch($db_groups)){
 			$name = new CLink($row["name"],"#","action");
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
@@ -1273,7 +1274,7 @@ include_once "include/page_header.php";
 		$db_groups = DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name,n.nodeid '.
 						' FROM hosts_groups hg, groups g '.
 							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
-						' WHERE g.groupid IN ('.$available_groups.') '.
+						' WHERE '.DBcondition('g.groupid',$available_groups).
 							' AND '.DBin_node('g.groupid',$nodeid).
 						' ORDER BY n.nodeid,g.name');
 		

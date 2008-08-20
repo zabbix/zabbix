@@ -30,7 +30,7 @@ function action_accessible($actionid,$perm){
 	if (DBselect('select actionid from actions where actionid='.$actionid.' and '.DBin_node('actionid'))){
 		$result = true;
 		
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 		
 		$db_result = DBselect('SELECT * FROM conditions WHERE actionid='.$actionid);
@@ -72,7 +72,7 @@ function check_permission_for_action_conditions($conditions){
 
 	$result = true;
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 	
 	foreach($conditions as $ac_data){
@@ -711,7 +711,7 @@ function validate_condition($conditiontype, $value)
 			break;
 		case CONDITION_TYPE_HOST_TEMPLATE:
 			if(!uint_in_array($value,
-				get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY)))
+				get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY)))
 			{
 				error(S_INCORRECT_GROUP);
 				return false;
@@ -727,7 +727,7 @@ function validate_condition($conditiontype, $value)
 			break;
 		case CONDITION_TYPE_HOST:
 			if(!uint_in_array($value,
-				get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY)))
+				get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY)))
 			{
 				error(S_INCORRECT_HOST);
 				return false;

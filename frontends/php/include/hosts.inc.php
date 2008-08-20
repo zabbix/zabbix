@@ -673,61 +673,18 @@ require_once "include/httptest.inc.php";
 	return $result;
 	}
 
-	/*
-	 * Function: validate_group_with_templates
-	 *
-	 * Description:
-	 *     Check available groups and host(template) by user permission
-	 *     and check current group an host(template) relations
-	 *
-	 * Author:
-	 *     Aly
-	 *
-	 * Comments:
-	 *
-	 */
-	function validate_group_with_templates($perm, $options = array(),$group_var=null,$host_var=null){
-		if(is_null($group_var)) $group_var = "web.latest.groupid";
-		if(is_null($host_var))	$host_var = "web.latest.hostid";
-
-		$_REQUEST["groupid"]    = get_request("groupid", -1 );
-		$_REQUEST["hostid"]     = get_request("hostid", get_profile($host_var,0));
-
-		if($_REQUEST["groupid"] == -1){
-			$_REQUEST["groupid"] = get_profile($group_var,0);
-			
-			if(!in_node($_REQUEST["groupid"])) $_REQUEST["groupid"] = 0;
-
-			if ($_REQUEST["hostid"] > 0 && !DBfetch(DBselect('SELECT groupid FROM hosts_groups '.
-				' WHERE hostid='.$_REQUEST["hostid"].' and groupid='.$_REQUEST["groupid"]))){
-					$_REQUEST["groupid"] = 0;
-			}
-		}
-
-		if(str_in_array("always_select_first_host",$options) && $_REQUEST["hostid"] == 0 && $_REQUEST["groupid"] != 0)
-			$_REQUEST["hostid"] = -1;
-
-		$result = get_correct_group_and_host($_REQUEST["groupid"],$_REQUEST["hostid"], $perm, $options);
-
-		$_REQUEST["groupid"]    = $result["groupid"];
-		$_REQUEST["hostid"]     = $result["hostid"];
-		
-		update_profile($host_var,$_REQUEST["hostid"]);
-		update_profile($group_var,$_REQUEST["groupid"]);
-	}
-
-	/*
-	 * Function: get_correct_group_and_host
-	 *
-	 * Description:
-	 *     Retrive correct relations for group and host
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
+/*
+ * Function: get_correct_group_and_host
+ *
+ * Description:
+ *     Retrive correct relations for group and host
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ */
 	function get_correct_group_and_host($a_groupid=null, $a_hostid=null, $perm=PERM_READ_WRITE, $options = array()){
 		if(!is_array($options)){
 			fatal_error("Incorrect options for get_correct_group_and_host");
@@ -790,19 +747,24 @@ require_once "include/httptest.inc.php";
 			
 			if($groupid > 0){
 				$with_node = ' AND '.DBin_node('g.groupid', get_current_nodeid(!$only_current_node));
-
 				$sql = 'SELECT DISTINCT g.groupid '.
 						' FROM groups g, hosts_groups hg, hosts h'.$item_table.
 						' WHERE hg.groupid=g.groupid '.
 							' AND h.hostid=hg.hostid '.
 							' AND '.DBcondition('h.hostid',$available_hosts).
-							' AND g.groupid='.$groupid.
+//							' AND g.groupid='.$groupid.
 							$with_host_status.
 							$with_items.
 							$with_node;
-				if(!DBfetch(DBselect($sql))){
-					$groupid = 0;
+				if(!DBfetch(DBselect($sql.' AND g.groupid='.$groupid))){
+					if($db_group = DBfetch(DBselect($sql,1))){
+						$groupid = $db_group['groupid'];
+					}
+					else{
+						$groupid = 0;
+					}
 				}
+
 			}
 		}
 
@@ -880,7 +842,7 @@ require_once "include/httptest.inc.php";
 			"correct"	=> ($group_correct && $host_correct)?1:0
 			);
 	}
-
+	
 /*
  * Function: validate_group_with_host
  *
@@ -943,7 +905,7 @@ require_once "include/httptest.inc.php";
 		
 		if(str_in_array('always_select_first_group',$options) && ($_REQUEST['groupid'] == 0))
 			$_REQUEST['groupid'] = -1;
-		
+
 		$result = get_correct_group_and_host($_REQUEST['groupid'],null,$perm,$options);
 		$_REQUEST['groupid'] = $result['groupid'];
 		
@@ -1334,62 +1296,41 @@ require_once "include/httptest.inc.php";
 	return $result;
 	}
 
-
-	function host_js_menu($hostid, $link_text = S_SELECT){
-		$add_to = array();
-		$delete_from = array();
-
- 		$popup_menu_actions = array(
- 			array(S_SHOW, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))),
- 			array(S_ITEMS, 'items.php?hostid='.$hostid, array('tw'=>'')),
- 			array(S_TRIGGERS, 'triggers.php?hostid='.$hostid, array('tw'=>'')),
- 			array(S_GRAPHS, 'graphs.php?hostid='.$hostid, array('tw'=>'')),
- 			);
-
+	function set_hosts_jsmenu_array($hostids = array()){
+		$menu_all = array();
+					
  		$db_groups = DBselect('SELECT g.groupid, g.name '.
- 				' FROM groups g '.
- 					' LEFT JOIN hosts_groups hg on g.groupid=hg.groupid and hg.hostid='.$hostid.
- 				' WHERE hostid is NULL '.
- 				' ORDER BY g.name,g.groupid');
- 		while($group_data = DBfetch($db_groups)){
- 			$add_to[] = array($group_data['name'], '?'.
- 					url_param($group_data['groupid'], false, 'add_to_group').
- 					url_param($hostid, false, 'hostid')
- 					);
- 		}
-
- 		$db_groups = DBselect('SELECT g.groupid, g.name '.
+		 				' FROM groups g '.
+ 						' ORDER BY g.name,g.groupid');
+		
+		while($group=DBfetch($db_groups)){
+			$group['name'] = htmlspecialchars($group['name']);
+			
+			$menu_all[] = $group;			
+		}
+		insert_js('var menu_hstgrp_all='.zbx_jsvalue($menu_all).";\n");
+	}
+	
+	function host_js_menu($hostid,$link_text = S_SELECT){
+		$hst_grp_all_in = array();
+		
+		$db_groups = DBselect('SELECT g.groupid, g.name '.
 				' FROM groups g, hosts_groups hg '.
  				' WHERE g.groupid=hg.groupid '.
 					' AND hg.hostid='.$hostid.
- 				' ORDER BY g.name,g.groupid');
- 				
- 		while($group_data = DBfetch($db_groups)){
- 			$delete_from[] = array($group_data['name'], '?'.
- 					url_param($group_data['groupid'], false, 'delete_from_group').
- 					url_param($hostid, false, 'hostid')
- 					);
- 		}
+ 				' ORDER BY g.name');
 
- 		if(count($add_to) > 0 || count($delete_from) > 0){
- 			$popup_menu_actions[] = array(S_GROUPS, null, null,
- 				array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
- 		}
- 		
- 		if(count($add_to) > 0){
- 			$popup_menu_actions[] = array_merge(array(S_ADD_TO_GROUP, null, null, 
- 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))), $add_to);
- 		}
- 		
- 		if(count($delete_from) > 0){
- 			$popup_menu_actions[] = array_merge(array(S_DELETE_FROM_GROUP, null, null, 
- 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))), $delete_from);
- 		}
-
- 		$mnuActions = new CPUMenu($popup_menu_actions);
-
-		$show = new CLink($link_text, '#', 'action', $mnuActions->GetOnActionJS());
-
-	return $show;
+		while($group = DBfetch($db_groups)){
+			$group['name'] = htmlspecialchars($group['name']);
+			$hst_grp_all_in[] = $group;	
+		}
+				
+		$action = new CSpan($link_text);
+		$script = new CScript('javascript: create_host_menu(event,'.$hostid.','.zbx_jsvalue($hst_grp_all_in).');');
+							 
+		$action->AddAction('onclick',$script);
+		$action->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
+		
+	return $action;
 	}
 ?>

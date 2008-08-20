@@ -103,7 +103,7 @@
 						}
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY);
+						$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm);
 						if(!uint_in_array($se_data['elementid'],$available_groups)){
 							$result = false;
 						}

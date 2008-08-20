@@ -150,6 +150,48 @@ function inseret_javascript_for_editable_combobox(){
 	insert_js($js);
 }
 
+function insert_javascript_for_twinbox(){
+	global $page;
+	if(defined('SHOW_TWINBOX_SCRIPT_INSERTTED') || (PAGE_TYPE_HTML != $page['type'])) return;	
+	define('SHOW_TWINBOX_SCRIPT_INSERTTED', 1);
+
+	$js = 'function moveListBoxSelectedItem(formname,objname,from,to,action){
+			var result = true
+			
+			from = $(from);
+			to = $(to);
+			
+			for(i = 0; i < from.options.length; i++) {
+				if(from.options[i].selected == true) {
+/*			
+					var temp = document.createElement("option");
+					temp.setAttribute("value",from.options[i].value);
+					
+					var caption = IE?from.options[i].innerText:from.options[i].textContent;
+					temp.appendChild(document.createTextNode(caption));
+*/
+					var temp = from.options[i].cloneNode(true);
+					
+					if(action.toLowerCase() == "add"){
+						result &= create_var(formname, objname+"["+from.options[i].value+"]", from.options[i].value, false);
+					}
+					else if(action.toLowerCase() == "rmv"){
+						result &= remove_element(objname+"["+from.options[i].value+"]","input");
+					}
+					
+					from.removeChild(from.options[i]);
+		
+					to.appendChild(temp);
+					i--;
+				}
+			}
+		
+		return result;
+		}';
+		
+	insert_js($js);
+}
+
 function insert_showhint_javascript(){
 	global $page;
 	if(defined('SHOW_HINT_SCRIPT_INSERTTED') || (PAGE_TYPE_HTML != $page['type'])) return;	
