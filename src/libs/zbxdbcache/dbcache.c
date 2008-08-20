@@ -526,8 +526,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  */
 #ifdef HAVE_MYSQL
 	tmp_offset = sql_offset;
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
-			"insert into history values ");
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+			"insert into history (itemid,clock,value) values ");
 #endif
 
 	for (i = 0; i < history_num; i++)
@@ -542,7 +542,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					history[i].value.value_float);
 #else
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-					"insert into history values "
+					"insert into history (itemid,clock,value) values "
 					"(" ZBX_FS_UI64 ",%d," ZBX_FS_DBL ");\n",
 					history[i].itemid,
 					history[i].clock,
@@ -565,7 +565,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 #ifdef HAVE_MYSQL
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 				"insert into history_sync (nodeid,itemid,clock,value) values ");
 #endif
 
@@ -608,8 +608,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  */
 #ifdef HAVE_MYSQL
 	tmp_offset = sql_offset;
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
-			"insert into history_uint values ");
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+			"insert into history_uint (itemid,clock,value) values ");
 #endif
 
 	for (i = 0; i < history_num; i++)
@@ -624,7 +624,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					history[i].value.value_uint64);
 #else
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-					"insert into history_uint values "
+					"insert into history_uint (itemid,clock,value) values "
 					"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ");\n",
 					history[i].itemid,
 					history[i].clock,
@@ -647,7 +647,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 #ifdef HAVE_MYSQL
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 				"insert into history_uint_sync (nodeid,itemid,clock,value) values ");
 #endif
 
@@ -690,8 +690,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  */
 #ifdef HAVE_MYSQL
 	tmp_offset = sql_offset;
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
-			"insert into history_str values ");
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+			"insert into history_str (itemid,clock,value) values ");
 #endif
 
 	for (i = 0; i < history_num; i++)
@@ -707,7 +707,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					value_esc);
 #else
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-					"insert into history_str values "
+					"insert into history_str (itemid,clock,value) values "
 					"(" ZBX_FS_UI64 ",%d,'%s');\n",
 					history[i].itemid,
 					history[i].clock,
@@ -730,7 +730,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 #ifdef HAVE_MYSQL
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 				"insert into history_str_sync (nodeid,itemid,clock,value) values ");
 #endif
 
@@ -787,8 +787,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MYSQL
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
-				"insert into history_text values ");
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+				"insert into history_text (id,itemid,clock,value) values ");
 #endif
 
 		for (i = 0; i < history_num; i++)
@@ -797,15 +797,15 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			{
 				value_esc_dyn = DBdyn_escape_string(history[i].value.value_str);
 #ifdef HAVE_MYSQL
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
 						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s'),",
 						id,
 						history[i].itemid,
 						history[i].clock,
 						value_esc_dyn);
 #else
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
-						"insert into history_text values "
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+						"insert into history_text (id,itemid,clock,value) values "
 						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s');\n",
 						id,
 						history[i].itemid,
@@ -837,34 +837,35 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MYSQL
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
-				"insert into history_log values ");
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+				"insert into history_log (id,itemid,clock,timestamp,source,severity,value) values ");
 #endif
 
 		for (i = 0; i < history_num; i++)
 		{
 			if (history[i].value_type == ITEM_VALUE_TYPE_LOG)
 			{
+				DBescape_string(history[i].source, value_esc, sizeof(value_esc));
 				value_esc_dyn = DBdyn_escape_string(history[i].value.value_str);
 #ifdef HAVE_MYSQL
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
 						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s'),",
 						id,
 						history[i].itemid,
 						history[i].clock,
 						history[i].timestamp,
-						(NULL != history[i].source) ? history[i].source : "",
+						value_esc,
 						history[i].severity,
 						value_esc_dyn);
 #else
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
-						"insert into history_log values "
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+						"insert into history_log (id,itemid,clock,timestamp,source,severity,value) values "
 						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s');\n",
 						id,
 						history[i].itemid,
 						history[i].clock,
 						history[i].timestamp,
-						(NULL != history[i].source) ? history[i].source : "",
+						value_esc,
 						history[i].severity,
 						value_esc_dyn);
 #endif
@@ -926,7 +927,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MYSQL
 	tmp_offset = sql_offset;
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 			"insert into proxy_history (itemid,clock,value) values ");
 #endif
 
@@ -963,7 +964,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MYSQL
 	tmp_offset = sql_offset;
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 			"insert into proxy_history (itemid,clock,value) values ");
 #endif
 
@@ -1000,7 +1001,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MYSQL
 	tmp_offset = sql_offset;
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 			"insert into proxy_history (itemid,clock,value) values ");
 #endif
 
@@ -1038,7 +1039,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MYSQL
 	tmp_offset = sql_offset;
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 			"insert into proxy_history (itemid,clock,value) values ");
 #endif
 
@@ -1048,13 +1049,13 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 		{
 			value_esc_dyn = DBdyn_escape_string(history[i].value.value_str);
 #ifdef HAVE_MYSQL
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
 					"(" ZBX_FS_UI64 ",%d,'%s'),",
 					history[i].itemid,
 					history[i].clock,
 					value_esc_dyn);
 #else
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
 					"insert into proxy_history (itemid,clock,value) values "
 					"(" ZBX_FS_UI64 ",%d,'%s');\n",
 					history[i].itemid,
@@ -1077,7 +1078,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MYSQL
 	tmp_offset = sql_offset;
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 				"insert into proxy_history (itemid,clock,timestamp,source,severity,value) values ");
 #endif
 
@@ -1085,24 +1086,25 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		if (history[i].value_type == ITEM_VALUE_TYPE_LOG)
 		{
+			DBescape_string(history[i].source, value_esc, sizeof(value_esc));
 			value_esc_dyn = DBdyn_escape_string(history[i].value.value_str);
 #ifdef HAVE_MYSQL
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s'),",
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+					"(" ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s'),",
 					history[i].itemid,
 					history[i].clock,
 					history[i].timestamp,
-					(NULL != history[i].source) ? history[i].source : "",
+					value_esc,
 					history[i].severity,
 					value_esc_dyn);
 #else
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
-					"insert into proxy_history (itemid,cloc,timestamp,source,severityk,value) values "
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s');\n",
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+					"insert into proxy_history (itemid,clock,timestamp,source,severity,value) values "
+					"(" ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s');\n",
 					history[i].itemid,
 					history[i].clock,
 					history[i].timestamp,
-					(NULL != history[i].source) ? history[i].source : "",
+					value_esc,
 					history[i].severity,
 					value_esc_dyn);
 #endif
