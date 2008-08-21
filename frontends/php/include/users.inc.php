@@ -37,7 +37,7 @@
 		}
 		
 		$auth_user_type[GROUP_GUI_ACCESS_SYSTEM]	= S_SYSTEM_DEFAULT;
-		$auth_user_type[GROUP_GUI_ACCESS_INTERNAL]	= S_INTERNAL;
+		$auth_user_type[GROUP_GUI_ACCESS_INTERNAL]	= S_INTERNAL_S;
 		$auth_user_type[GROUP_GUI_ACCESS_DISABLED]	= S_DISABLED;
 
 		if(isset($auth_user_type[$auth_type]))
@@ -406,15 +406,7 @@
 			error(S_USER_CANNOT_CHANGE_GUI_ACCESS);
 			return false;
 		}
-				
-		if(GROUP_GUI_ACCESS_INTERNAL == $gui_access){
-			$config = select_config();
-		 	if(ZBX_AUTH_HTTP == $config['authentication_type']){
-				error(S_CANNOT_SET.' ['.S_INTERNAL.'] '.S_GROUP.' '.S_GUI_ACCESS);
-				return false;
-			}
-		}
-		
+
 		$res = DBexecute('UPDATE usrgrp SET gui_access='.$gui_access.' WHERE usrgrpid='.$usrgrpid);
 		
 	return $res;

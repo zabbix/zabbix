@@ -810,7 +810,7 @@ function make_graph_submenu(){
 
 	if(isset($graph_added)){
 			$graphids[] = array( 
-			'name'	=>	S_REMOVE.SPACE.S_ALL.SPACE.S_GRAPHS,
+			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_GRAPHS,
 			'favobj'=>	'graphid',
 			'favid'	=>	0,
 			'action'=>	'remove'
@@ -819,7 +819,7 @@ function make_graph_submenu(){
 	
 	if(isset($item_added)){
 		$graphids[] = array( 
-			'name'	=>	S_REMOVE.SPACE.S_ALL.SPACE.S_SIMPLE_GRAPHS,
+			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SIMPLE_GRAPHS,
 			'favobj'=>	'itemid',
 			'favid'	=>	0,
 			'action'=>	'remove'
@@ -871,7 +871,7 @@ function make_sysmap_submenu(){
 	
 	if(!empty($sysmapids)){
 		$sysmapids[] = array( 
-							'name'	=>	S_REMOVE.SPACE.S_ALL.SPACE.S_MAPS,
+							'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_MAPS,
 							'favobj'=>	'sysmapid',
 							'favid'	=>	0,
 							'action'=>	'remove'
@@ -953,7 +953,7 @@ function make_screen_submenu(){
 
 	if(isset($screen_added)){
 		$screenids[] = array( 
-			'name'	=>	S_REMOVE.SPACE.S_ALL.SPACE.S_SCREENS,
+			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SCREENS,
 			'favobj'=>	'screenid',
 			'favid'	=>	0,
 			'action'=>	'remove'
@@ -962,7 +962,7 @@ function make_screen_submenu(){
 	
 	if(isset($slide_added)){
 		$screenids[] = array( 
-			'name'	=>	S_REMOVE.SPACE.S_ALL.SPACE.S_SLIDES,
+			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SLIDES,
 			'favobj'=>	'slideshowid',
 			'favid'	=>	0,
 			'action'=>	'remove'

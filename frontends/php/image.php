@@ -42,53 +42,50 @@ include_once "include/page_header.php";
 
 	$resize = 0;
 
-	if(isset($_REQUEST["width"]) || isset($_REQUEST["height"]))
-	{
+	if(isset($_REQUEST["width"]) || isset($_REQUEST["height"])){
 		$resize = 1;
-		$th_width = get_request("width",0);
-		$th_height = get_request("height",0);
+		$th_width = get_request('width',0);
+		$th_height = get_request('height',0);
 	}
 
-	if(!($row = get_image_by_imageid($_REQUEST["imageid"]))){
+	if(!($row = get_image_by_imageid($_REQUEST['imageid']))){
 		error('Incorrect image index');
 		include_once "include/page_footer.php";
 	}
 
-	$source = ImageCreateFromString($row["image"]);
+	$source = imagecreatefromstring($row['image']);
 
 	unset($row);
 
-	if($resize == 1)
-	{
+	if($resize == 1){
 		$src_width	= imagesx($source);
 		$src_height	= imagesy($source);
 
 		if($src_width > $th_width || $src_height > $th_height){
-			if($th_width == 0)
-			{
+			if($th_width == 0){
 				$th_width = $th_height * $src_width/$src_height;
-			} else if($th_height == 0)
-			{
+			} 
+			else if($th_height == 0){
 				$th_height = $th_width * $src_height/$src_width;
-			} else {
+			} 
+			else {
 				$a = $th_width/$th_height;
 				$b = $src_width/$src_height;
 
 				if($a > $b){
 					$th_width  = $b * $th_height;
 					$th_height = $th_height;
-				} else {
+				} 
+				else {
 					$th_height = $th_width/$b;
 					$th_width  = $th_width;
 				}
 			}
 
-			if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
-			{
+			if(function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1,1)){
 				$thumb = imagecreatetruecolor($th_width,$th_height);
 			}
-			else
-			{
+			else{
 				$thumb = imagecreate($th_width,$th_height);
 			}
 
@@ -104,7 +101,7 @@ include_once "include/page_header.php";
 			$source = $thumb;
 		}
 	}
-	ImageOut($source);
+	imageout($source);
 ?>
 <?php
 

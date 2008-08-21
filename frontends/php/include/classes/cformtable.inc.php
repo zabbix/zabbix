@@ -19,8 +19,7 @@
 **/
 ?>
 <?php
-	class CFormTable extends CForm
-	{
+	class CFormTable extends CForm{
 /* private *//*
 		var $align;
 		var $title;
@@ -105,13 +104,16 @@
 		function SetHelp($value=NULL){
 			if(is_null($value)) {
 				$this->help = new CHelp();
-			} elseif(strtolower(get_class($value)) == 'chelp') {
+			} 
+			else if(strtolower(get_class($value)) == 'chelp') {
 				$this->help = $value;
-			} elseif(is_string($value)) {
+			} 
+			else if(is_string($value)) {
 				$this->help = new CHelp($value);
 				if($this->GetName()==NULL)
 					$this->SetName($value);
-			} else {
+			} 
+			else {
 				return $this->error("Incorrect value for SetHelp [$value]");
 			}
 			return 0;

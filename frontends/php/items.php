@@ -101,7 +101,8 @@ include_once "include/page_header.php";
                  
 		'group_itemid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
 		'copy_targetid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
-		'filter_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
+		'filter_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
+		'new_application'=>	array(T_ZBX_STR, O_OPT, null,	null,	'isset({save})'),
 		'applications'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
 
 		'showdisabled'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null),
@@ -341,38 +342,60 @@ include_once "include/page_header.php";
 		foreach($delay_flex as $val)
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		$db_delay_flex = trim($db_delay_flex,';');
-
-		if(isset($_REQUEST["itemid"])){
+		
+		if(isset($_REQUEST['itemid'])){
 			DBstart();
-				$result = smart_update_item($_REQUEST["itemid"],
-					$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],
-					$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],
-					$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],
-					$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],
-					$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
-					$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
-					$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
-					$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$db_delay_flex,$_REQUEST["params"],
+			
+			$new_appid = true;
+			$result = false;
+			
+			if(!zbx_empty($_REQUEST['new_application'])){
+				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['hostid']))
+					$applications[$new_appid] = $new_appid;
+			}
+			
+			if($new_appid){				
+				$result = smart_update_item($_REQUEST['itemid'],
+					$_REQUEST['description'],$_REQUEST['key'],$_REQUEST['hostid'],$_REQUEST['delay'],
+					$_REQUEST['history'],$_REQUEST['status'],$_REQUEST['type'],
+					$_REQUEST['snmp_community'],$_REQUEST['snmp_oid'],$_REQUEST['value_type'],
+					$_REQUEST['trapper_hosts'],$_REQUEST['snmp_port'],$_REQUEST['units'],
+					$_REQUEST['multiplier'],$_REQUEST['delta'],$_REQUEST['snmpv3_securityname'],
+					$_REQUEST['snmpv3_securitylevel'],$_REQUEST['snmpv3_authpassphrase'],
+					$_REQUEST['snmpv3_privpassphrase'],$_REQUEST['formula'],$_REQUEST['trends'],
+					$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],$db_delay_flex,$_REQUEST['params'],
 					$applications);
+			}
+			
 			$result = DBend($result);
 
-			$itemid = $_REQUEST["itemid"];
+			$itemid = $_REQUEST['itemid'];
 			$action = AUDIT_ACTION_UPDATE;
 			
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		else{
 			DBstart();
-			$itemid=add_item(
-				$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],
-				$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],
-				$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],
-				$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],
-				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
-				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
-				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
-				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$db_delay_flex,$_REQUEST["params"],
-				$applications);
+			
+			$new_appid = true;
+			$itemid = false;
+			if(!zbx_empty($_REQUEST['new_application'])){
+				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['hostid']))
+					$applications[$new_appid] = $new_appid;
+			}
+			
+			if($new_appid){
+				$itemid=add_item(
+					$_REQUEST['description'],$_REQUEST['key'],$_REQUEST['hostid'],$_REQUEST['delay'],
+					$_REQUEST['history'],$_REQUEST['status'],$_REQUEST['type'],
+					$_REQUEST['snmp_community'],$_REQUEST['snmp_oid'],$_REQUEST['value_type'],
+					$_REQUEST['trapper_hosts'],$_REQUEST['snmp_port'],$_REQUEST['units'],
+					$_REQUEST['multiplier'],$_REQUEST['delta'],$_REQUEST['snmpv3_securityname'],
+					$_REQUEST['snmpv3_securitylevel'],$_REQUEST['snmpv3_authpassphrase'],
+					$_REQUEST['snmpv3_privpassphrase'],$_REQUEST['formula'],$_REQUEST['trends'],
+					$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],$db_delay_flex,$_REQUEST['params'],
+					$applications);
+			}
 				
 			$result = DBend($itemid);
 			
@@ -380,67 +403,67 @@ include_once "include/page_header.php";
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 		if($result){	
-			$host = get_host_by_hostid($_REQUEST["hostid"]);
+			$host = get_host_by_hostid($_REQUEST['hostid']);
 
-			add_audit($action, AUDIT_RESOURCE_ITEM, S_ITEM." [".$_REQUEST["key"]."] [".$itemid."] ".S_HOST." [".$host['host']."]");
+			add_audit($action, AUDIT_RESOURCE_ITEM, S_ITEM.' ['.$_REQUEST['key'].'] ['.$itemid.'] '.S_HOST.' ['.$host['host'].']');
 
-			unset($_REQUEST["itemid"]);
-			unset($_REQUEST["form"]);
+			unset($_REQUEST['itemid']);
+			unset($_REQUEST['form']);
 		}
 	}
-	else if(isset($_REQUEST["del_history"])&&isset($_REQUEST["itemid"])){
+	else if(isset($_REQUEST['del_history'])&&isset($_REQUEST['itemid'])){
 		$result = false;
-		if($item = get_item_by_itemid($_REQUEST["itemid"])){
+		if($item = get_item_by_itemid($_REQUEST['itemid'])){
 			DBstart();
-				$result = delete_history_by_itemid($_REQUEST["itemid"]);
+				$result = delete_history_by_itemid($_REQUEST['itemid']);
 			$result = DBend($result);
 		}
 		
 		if($result){
 			DBexecute('UPDATE items SET nextcheck=0,lastvalue=null,lastclock=null,prevvalue=null '.
-				' WHERE itemid='.$_REQUEST["itemid"]);
+				' WHERE itemid='.$_REQUEST['itemid']);
 			
-			$host = get_host_by_hostid($_REQUEST["hostid"]);
+			$host = get_host_by_hostid($_REQUEST['hostid']);
 
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-				S_ITEM." [".$item["key_"]."] [".$_REQUEST["itemid"]."] ".S_HOST." [".$host['host']."] ".S_HISTORY_CLEANED);
+				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEANED);
 		}
 		show_messages($result, S_HISTORY_CLEANED, S_CANNOT_CLEAN_HISTORY);
 		
 	}
-	else if(isset($_REQUEST["update"])&&isset($_REQUEST["group_itemid"])&&isset($_REQUEST["form_mass_update"])){
-		$applications = get_request("applications",array());
+	else if(isset($_REQUEST['update'])&&isset($_REQUEST['group_itemid'])&&isset($_REQUEST['form_mass_update'])){
+		$applications = get_request('applications',array());
 
 		$delay_flex = get_request('delay_flex',array());
 		$db_delay_flex = '';
 		foreach($delay_flex as $val)
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
-		$db_delay_flex = trim($db_delay_flex,";");
+		$db_delay_flex = trim($db_delay_flex,';');
 		
-		if(!is_null(get_request("formula",null))) $_REQUEST['multiplier']=1;
-		if("0" === get_request("formula",null)) $_REQUEST['multiplier']=0;
+		if(!is_null(get_request('formula',null))) $_REQUEST['multiplier']=1;
+		if('0' === get_request('formula',null)) $_REQUEST['multiplier']=0;
 
-		$group_itemid = $_REQUEST["group_itemid"];
+		$group_itemid = $_REQUEST['group_itemid'];
 		$result = false;
 		
 		DBstart();
 		foreach($group_itemid as $id){
 			$result |= smart_update_item($id,
-				null,null,null,get_request("delay"),
-				get_request("history"),get_request("status"),get_request("type"),
-				get_request("snmp_community"),get_request("snmp_oid"),get_request("value_type"),
-				get_request("trapper_hosts"),get_request("snmp_port"),get_request("units"),
-				get_request("multiplier"),get_request("delta"),get_request("snmpv3_securityname"),
-				get_request("snmpv3_securitylevel"),get_request("snmpv3_authpassphrase"),
-				get_request("snmpv3_privpassphrase"),get_request("formula"),get_request("trends"),
-				get_request("logtimefmt"),get_request("valuemapid"),$db_delay_flex,null,$applications);
+				null,null,null,get_request('delay'),
+				get_request('history'),get_request('status'),get_request('type'),
+				get_request('snmp_community'),get_request('snmp_oid'),get_request('value_type'),
+				get_request('trapper_hosts'),get_request('snmp_port'),get_request('units'),
+				get_request('multiplier'),get_request('delta'),get_request('snmpv3_securityname'),
+				get_request('snmpv3_securitylevel'),get_request('snmpv3_authpassphrase'),
+				get_request('snmpv3_privpassphrase'),get_request('formula'),get_request('trends'),
+				get_request('logtimefmt'),get_request('valuemapid'),$db_delay_flex,null,$applications);
 		}
 		$result = DBend($result);
 		
 		show_messages($result, S_ITEMS_UPDATED);
-		unset($_REQUEST["group_itemid"], $_REQUEST["form_mass_update"], $_REQUEST["update"]);
+		unset($_REQUEST['group_itemid'], $_REQUEST['form_mass_update'], $_REQUEST['update']);
 	}
-	else if(isset($_REQUEST["copy"])&&isset($_REQUEST["group_itemid"])&&isset($_REQUEST["form_copy_to"])){
+	else if(isset($_REQUEST['copy'])&&isset($_REQUEST['group_itemid'])&&isset($_REQUEST['form_copy_to'])){
 		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
 			if(0 == $_REQUEST['copy_type']){ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
@@ -460,25 +483,25 @@ include_once "include/page_header.php";
 			
 			$result = false;
 			DBstart();
-			foreach($_REQUEST["group_itemid"] as $item_id)
+			foreach($_REQUEST['group_itemid'] as $item_id)
 				foreach($hosts_ids as $host_id){
 					$result |= copy_item_to_host($item_id, $host_id, true);
 				}
 				
 			$result = DBend($result);
 			show_messages($result, S_ITEMS_COPIED, S_CANNOT_COPY_ITEMS);
-			unset($_REQUEST["form_copy_to"]);
+			unset($_REQUEST['form_copy_to']);
 		}
 		else{
 			error('No target selection.');
 		}
 		show_messages();
 	}
-	else if(isset($_REQUEST["register"])){
+	else if(isset($_REQUEST['register'])){
 	
-		if($_REQUEST["register"]=="do"){
-			if($_REQUEST["action"]=="add to group"){
-				$applications = get_request("applications",array());
+		if($_REQUEST['register']=='do'){
+			if($_REQUEST['action']=='add to group'){
+				$applications = get_request('applications',array());
 				$delay_flex = get_request('delay_flex',array());
 				$db_delay_flex = '';
 				
@@ -490,28 +513,28 @@ include_once "include/page_header.php";
 				
 				DBstart();
 				$itemid=add_item_to_group(
-					$_REQUEST["add_groupid"],$_REQUEST["description"],$_REQUEST["key"],
-					$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],
-					$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],
-					$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],
-					$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],
-					$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
-					$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
-					$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],
-					$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],
-					$db_delay_flex, $_REQUEST["params"], $applications);
+					$_REQUEST['add_groupid'],$_REQUEST['description'],$_REQUEST['key'],
+					$_REQUEST['hostid'],$_REQUEST['delay'],$_REQUEST['history'],
+					$_REQUEST['status'],$_REQUEST['type'],$_REQUEST['snmp_community'],
+					$_REQUEST['snmp_oid'],$_REQUEST['value_type'],$_REQUEST['trapper_hosts'],
+					$_REQUEST['snmp_port'],$_REQUEST['units'],$_REQUEST['multiplier'],
+					$_REQUEST['delta'],$_REQUEST['snmpv3_securityname'],
+					$_REQUEST['snmpv3_securitylevel'],$_REQUEST['snmpv3_authpassphrase'],
+					$_REQUEST['snmpv3_privpassphrase'],$_REQUEST['formula'],
+					$_REQUEST['trends'],$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],
+					$db_delay_flex, $_REQUEST['params'], $applications);
 					
 				$result = DBend($itemid);
 				show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 				if($result){
-					unset($_REQUEST["form"]);
-					unset($_REQUEST["itemid"]);
+					unset($_REQUEST['form']);
+					unset($_REQUEST['itemid']);
 					unset($itemid);
 				}
 			}
-			if($_REQUEST["action"]=="update in group"){
+			if($_REQUEST['action']=='update in group'){
 			
-				$applications = get_request("applications",array());
+				$applications = get_request('applications',array());
 				$delay_flex = get_request('delay_flex',array());
 				$db_delay_flex = '';
 				
@@ -522,64 +545,64 @@ include_once "include/page_header.php";
 				$db_delay_flex = trim($db_delay_flex,';');
 				
 				DBstart();
-					$result = update_item_in_group($_REQUEST["add_groupid"],
-						$_REQUEST["itemid"],$_REQUEST["description"],$_REQUEST["key"],
-						$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],
-						$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],
-						$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],
-						$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],
-						$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
-						$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
-						$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],
-						$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],
-						$db_delay_flex, $_REQUEST["params"], $applications);
+					$result = update_item_in_group($_REQUEST['add_groupid'],
+						$_REQUEST['itemid'],$_REQUEST['description'],$_REQUEST['key'],
+						$_REQUEST['hostid'],$_REQUEST['delay'],$_REQUEST['history'],
+						$_REQUEST['status'],$_REQUEST['type'],$_REQUEST['snmp_community'],
+						$_REQUEST['snmp_oid'],$_REQUEST['value_type'],$_REQUEST['trapper_hosts'],
+						$_REQUEST['snmp_port'],$_REQUEST['units'],$_REQUEST['multiplier'],
+						$_REQUEST['delta'],$_REQUEST['snmpv3_securityname'],
+						$_REQUEST['snmpv3_securitylevel'],$_REQUEST['snmpv3_authpassphrase'],
+						$_REQUEST['snmpv3_privpassphrase'],$_REQUEST['formula'],
+						$_REQUEST['trends'],$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],
+						$db_delay_flex, $_REQUEST['params'], $applications);
 				$result = DBend($result);
 				
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 				if($result){
-					unset($_REQUEST["form"]);
-					unset($_REQUEST["itemid"]);
+					unset($_REQUEST['form']);
+					unset($_REQUEST['itemid']);
 				}
 			}
-			if($_REQUEST["action"]=="delete from group"){
+			if($_REQUEST['action']=='delete from group'){
 				
 				DBstart();
-					$result = delete_item_from_group($_REQUEST["add_groupid"],$_REQUEST["itemid"]);
+					$result = delete_item_from_group($_REQUEST['add_groupid'],$_REQUEST['itemid']);
 				$result = DBend($result);
 				
 				show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 				if($result){
-					unset($_REQUEST["form"]);
-					unset($_REQUEST["itemid"]);
+					unset($_REQUEST['form']);
+					unset($_REQUEST['itemid']);
 				}
 			}
 		}
 	}
-	else if(isset($_REQUEST["group_task"])&&isset($_REQUEST["group_itemid"])){
-		if($_REQUEST["group_task"]==S_DELETE_SELECTED){
+	else if(isset($_REQUEST['group_task'])&&isset($_REQUEST['group_itemid'])){
+		if($_REQUEST['group_task']==S_DELETE_SELECTED){
 			$result = false;
-			$group_itemid = $_REQUEST["group_itemid"];
+			$group_itemid = $_REQUEST['group_itemid'];
 
 			DBstart();
 			foreach($group_itemid as $id){
 				if(!$item = get_item_by_itemid($id))	continue;
-				if($item["templateid"]<>0)	continue;
+				if($item['templateid']<>0)	continue;
 
 				$cur_result = delete_item($id);
 				$result |= $cur_result;
 			
 				if($cur_result){
-					$host = get_host_by_hostid($item["hostid"]);
-					add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM." [".$item["key_"]."] [".$id."] ".S_HOST." [".$host['host']."]");
+					$host = get_host_by_hostid($item['hostid']);
+					add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']');
 				}
 			}
 			
 			$result = DBend($result);
 			show_messages($result, S_ITEMS_DELETED, null);
 		}
-		else if($_REQUEST["group_task"]==S_ACTIVATE_SELECTED){
+		else if($_REQUEST['group_task']==S_ACTIVATE_SELECTED){
 			$result = false;
-			$group_itemid = $_REQUEST["group_itemid"];
+			$group_itemid = $_REQUEST['group_itemid'];
 			
 			DBstart();
 			foreach($group_itemid as $id){
@@ -589,17 +612,17 @@ include_once "include/page_header.php";
 				$result |= $cur_result;
 			
 				if($cur_result){
-					$host = get_host_by_hostid($item["hostid"]);
-					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM." [".$item["key_"]."] [".$id."] ".S_HOST." [".$host['host']."] ".S_ITEMS_ACTIVATED);
+					$host = get_host_by_hostid($item['hostid']);
+					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_ITEMS_ACTIVATED);
 				}
 			}
 			
 			$result = DBend($result);
 			show_messages($result, S_ITEMS_ACTIVATED, null);
 		}
-		else if($_REQUEST["group_task"]==S_DISABLE_SELECTED){
+		else if($_REQUEST['group_task']==S_DISABLE_SELECTED){
 			$result = false;
-			$group_itemid = $_REQUEST["group_itemid"];
+			$group_itemid = $_REQUEST['group_itemid'];
 			
 			DBstart();
 			foreach($group_itemid as $id){
@@ -609,16 +632,16 @@ include_once "include/page_header.php";
 				$result |= $cur_result;
 			
 				if($cur_result){
-					$host = get_host_by_hostid($item["hostid"]);
-					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,	S_ITEM." [".$item["key_"]."] [".$id."] ".S_HOST." [".$host['host']."] ".S_ITEMS_DISABLED);
+					$host = get_host_by_hostid($item['hostid']);
+					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,	S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_ITEMS_DISABLED);
 				}
 			}
 			$result = DBend($result);
 			show_messages($result, S_ITEMS_DISABLED, null);
 		}
-		else if($_REQUEST["group_task"]==S_CLEAN_HISTORY_SELECTED_ITEMS){
+		else if($_REQUEST['group_task']==S_CLEAN_HISTORY_SELECTED_ITEMS){
 			$result = false;
-			$group_itemid = $_REQUEST["group_itemid"];
+			$group_itemid = $_REQUEST['group_itemid'];
 			
 			DBstart();
 			foreach($group_itemid as $id){
@@ -628,11 +651,11 @@ include_once "include/page_header.php";
 				$result |= $cur_result;
 
 				if($cur_result){
-					DBexecute("update items set nextcheck=0,lastvalue=null,lastclock=null,prevvalue=null where itemid=$id");
+					DBexecute('update items set nextcheck=0,lastvalue=null,lastclock=null,prevvalue=null where itemid='.$id);
 					
-					$host = get_host_by_hostid($item["hostid"]);
+					$host = get_host_by_hostid($item['hostid']);
 					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-						S_ITEM." [".$item["key_"]."] [".$id."] ".S_HOST." [".$host['host']."] ".S_HISTORY_CLEANED);
+						S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEANED);
 				}
 			}
 			$result = DBend($result);
@@ -645,21 +668,21 @@ include_once "include/page_header.php";
 	$form->SetMethod('get');
 	$form->SetName('hdrform');
 
-	$form->AddVar("hostid",$_REQUEST["hostid"]);
-	$form->AddVar("groupid",$_REQUEST["groupid"]);
+	$form->AddVar('hostid',$_REQUEST['hostid']);
+	$form->AddVar('groupid',$_REQUEST['groupid']);
 
-	$form->AddItem(new CButton("form",S_CREATE_ITEM));
+	$form->AddItem(new CButton('form',S_CREATE_ITEM));
 
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	echo SBR;
 	
-	if(isset($_REQUEST["form_mass_update"]) && isset($_REQUEST["group_itemid"])){
-		insert_mass_update_item_form("group_itemid");
+	if(isset($_REQUEST['form_mass_update']) && isset($_REQUEST['group_itemid'])){
+		insert_mass_update_item_form('group_itemid');
 	} 
-	else if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["group_itemid"])){
-		insert_copy_elements_to_forms("group_itemid");
+	else if(isset($_REQUEST['form_copy_to']) && isset($_REQUEST['group_itemid'])){
+		insert_copy_elements_to_forms('group_itemid');
 	} 
-	else if (!isset($_REQUEST["form"]) ||  !str_in_array($_REQUEST["form"],array(S_CREATE_ITEM,"update","clone"))) {
+	else if (!isset($_REQUEST['form']) ||  !str_in_array($_REQUEST['form'],array(S_CREATE_ITEM,'update','clone'))) {
 // Table HEADER
 		$form = new CForm();
 		$form->SetMethod('get');
@@ -675,7 +698,7 @@ include_once "include/page_header.php";
 				'?showdisabled='.($showdisabled ? 0 : 1),null),
 			']', SPACE));
 
-		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
+		$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit();');
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 
 		$result=DBselect('select distinct g.groupid,g.name '.
@@ -684,12 +707,12 @@ include_once "include/page_header.php";
 						' and '.DBcondition('hg.hostid',$available_hosts).
 					' order by name');
 		while($row=DBfetch($result)){
-			$cmbGroup->AddItem($row["groupid"],$row["name"]);
+			$cmbGroup->AddItem($row['groupid'],$row['name']);
 		}
 		$form->AddItem(S_GROUP.SPACE);
 		$form->AddItem($cmbGroup);
 
-		if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0){
+		if(isset($_REQUEST['groupid']) && $_REQUEST['groupid']>0){
 			$sql='select distinct h.hostid,h.host '.
 				' from hosts h,hosts_groups hg'.
 				' where hg.groupid='.$_REQUEST['groupid'].
@@ -710,28 +733,28 @@ include_once "include/page_header.php";
 
 		$result=DBselect($sql);
 
-		$_REQUEST["hostid"] = get_request("hostid",0);
-		$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit();");
+		$_REQUEST['hostid'] = get_request('hostid',0);
+		$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit();');
 
 		unset($correct_hostid);
 		$first_hostid = -1;
 		while($row=DBfetch($result)){
-			$cmbHosts->AddItem($row["hostid"],$row["host"]);
+			$cmbHosts->AddItem($row['hostid'],$row['host']);
 
-			if($_REQUEST["hostid"]!=0){
-				if(bccomp($_REQUEST["hostid"], $row["hostid"]) == 0)
+			if($_REQUEST['hostid']!=0){
+				if(bccomp($_REQUEST['hostid'], $row['hostid']) == 0)
 					$correct_hostid = 'ok';
 			}
 			if($first_hostid <= 0)
-				$first_hostid = $row["hostid"];
+				$first_hostid = $row['hostid'];
 		}
 		if(!isset($correct_hostid))
-			$_REQUEST["hostid"] = $first_hostid;
+			$_REQUEST['hostid'] = $first_hostid;
 
 		$form->AddItem(SPACE.S_HOST.SPACE);
 		$form->AddItem($cmbHosts);
 
-//			if($host_info = DBfetch(DBselect('select host from hosts where hostid='.$_REQUEST["hostid"]))){
+//			if($host_info = DBfetch(DBselect('select host from hosts where hostid='.$_REQUEST['hostid']))){
 //				$form->AddVar('filter_host', $host_info['host']);
 //			}
 		if(!$filter_enabled){
@@ -866,7 +889,7 @@ include_once "include/page_header.php";
 		$table  = new CTableInfo();
 		$table->SetHeader(array(
 			$show_host ? make_sorting_link(S_HOST,'h.host') : null,
-			array(	new CCheckBox("all_items",null,
+			array(	new CCheckBox('all_items',null,
 					"CheckAll('".$form->GetName()."','all_items');"),
 				make_sorting_link(S_DESCRIPTION,'i.description')),
 			make_sorting_link(S_KEY,'i.key_'),

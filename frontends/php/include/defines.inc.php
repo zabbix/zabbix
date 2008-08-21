@@ -60,9 +60,14 @@
 	define('P_NZERO',			32);
 
 //	MISC PARAMETERS
-	define('IMAGE_FORMAT_PNG',         	'PNG');
-	define('IMAGE_FORMAT_JPEG',         	'JPEG');
-	define('IMAGE_FORMAT_TEXT',         	'JPEG');
+	define('IMAGE_FORMAT_PNG',		'PNG');
+	define('IMAGE_FORMAT_JPEG',		'JPEG');
+	define('IMAGE_FORMAT_TEXT',		'JPEG');
+	
+	define('IMAGE_TYPE_UNKNOWN',	0);
+	define('IMAGE_TYPE_ICON',		1);
+	define('IMAGE_TYPE_BACKGROUND',	2);
+	
 	
 	define('ZBX_SORT_UP',			'ASC');
 	define('ZBX_SORT_DOWN',			'DESC');

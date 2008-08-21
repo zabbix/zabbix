@@ -1,5 +1,9 @@
 Changes for 1.5.5
 
+ - [DEV-199] added user group selection in configuration of users screen (Artem)
+ - [DEV-205] added possibility to add applications from items form (Artem)
+ - [DEV-205] added selection of image type in the list of images (Artem)
+ - [DEV-144] added internal authentication selection form (Artem)
  - [ZBX-406] added error messages if fping is not installed (Sasha)
 
 Changes for 1.5.4

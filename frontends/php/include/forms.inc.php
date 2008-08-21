@@ -1032,10 +1032,7 @@
 		if($granted){
 			$cmbGUI = new CComboBox('gui_access',$gui_access);		
 			$cmbGUI->AddItem(GROUP_GUI_ACCESS_SYSTEM,user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM));
-			
-			if(ZBX_AUTH_HTTP != $config['authentication_type'])
-				$cmbGUI->AddItem(GROUP_GUI_ACCESS_INTERNAL,user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL));
-				
+			$cmbGUI->AddItem(GROUP_GUI_ACCESS_INTERNAL,user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL));				
 			$cmbGUI->AddItem(GROUP_GUI_ACCESS_DISABLED,user_auth_type2str(GROUP_GUI_ACCESS_DISABLED));
 			
 			$frmUserG->AddRow(S_GUI_ACCESS, $cmbGUI);
@@ -1375,120 +1372,119 @@
 	}
 
 // Insert form for Item information
-	function	insert_item_form()
-	{
-
+	function insert_item_form(){
 		global  $USER_DETAILS;
 
-		$frmItem = new CFormTable(S_ITEM,"items.php","post");
-		$frmItem->SetHelp("web.items.item.php");
+		$frmItem = new CFormTable(S_ITEM,'items.php','post');
+		$frmItem->SetHelp('web.items.item.php');
 
-		$frmItem->AddVar("config",get_request("config",0));
-		if(isset($_REQUEST["groupid"]))
+		$frmItem->AddVar('config',get_request('config',0));
+		if(isset($_REQUEST['groupid']))
 
-		$frmItem->AddVar("hostid",$_REQUEST["hostid"]);
+		$frmItem->AddVar('hostid',$_REQUEST['hostid']);
 		$frmItem->AddVar('applications_visible',1);
 
 
-		$description	= get_request("description"	,"");
-		$key		= get_request("key"		,"");
-		$host		= get_request("host",		null);
-		$delay		= get_request("delay"		,30);
-		$history	= get_request("history"		,90);
-		$status		= get_request("status"		,0);
-		$type		= get_request("type"		,0);
-		$snmp_community	= get_request("snmp_community"	,"public");
-		$snmp_oid	= get_request("snmp_oid"	,"interfaces.ifTable.ifEntry.ifInOctets.1");
-		$snmp_port	= get_request("snmp_port"	,161);
-		$value_type	= get_request("value_type"	,ITEM_VALUE_TYPE_UINT64);
-		$trapper_hosts	= get_request("trapper_hosts"	,"");
-		$units		= get_request("units"		,'');
-		$valuemapid	= get_request("valuemapid"	,0);
-		$params		= get_request("params"		,"DSN=<database source name>\n".
-								 "user=<user name>\n".
-								 "password=<password>\n".
-								 "sql=<query>");
-		$multiplier	= get_request("multiplier"	,0);
-		$delta		= get_request("delta"		,0);
-		$trends		= get_request("trends"		,365);
-		$applications	= get_request("applications"	,array());
-		$delay_flex	= get_request("delay_flex"	,array());
+		$description	= get_request('description'	,'');
+		$key			= get_request('key'		,'');
+		$host			= get_request('host',		null);
+		$delay			= get_request('delay'		,30);
+		$history		= get_request('history'		,90);
+		$status			= get_request('status'		,0);
+		$type			= get_request('type'		,0);
+		$snmp_community	= get_request('snmp_community'	,'public');
+		$snmp_oid		= get_request('snmp_oid'	,'interfaces.ifTable.ifEntry.ifInOctets.1');
+		$snmp_port		= get_request('snmp_port'	,161);
+		$value_type		= get_request('value_type'	,ITEM_VALUE_TYPE_UINT64);
+		$trapper_hosts	= get_request('trapper_hosts'	,'');
+		$units			= get_request('units'		,'');
+		$valuemapid		= get_request('valuemapid'	,0);
+		$params			= get_request('params'		,'DSN=<database source name>\n'.
+								 'user=<user name>\n'.
+								 'password=<password>\n'.
+								 'sql=<query>');
+		$multiplier		= get_request('multiplier'	,0);
+		$delta			= get_request('delta'		,0);
+		$trends			= get_request('trends'		,365);
+		$new_application= get_request('new_application',	'')	;
+		$applications	= get_request('applications'	,array());
+		$delay_flex		= get_request('delay_flex'	,array());
 
-		$snmpv3_securityname	= get_request("snmpv3_securityname"	,"");
-		$snmpv3_securitylevel	= get_request("snmpv3_securitylevel"	,0);
-		$snmpv3_authpassphrase	= get_request("snmpv3_authpassphrase"	,"");
-		$snmpv3_privpassphrase	= get_request("snmpv3_privpassphrase"	,"");
+		$snmpv3_securityname	= get_request('snmpv3_securityname'	,'');
+		$snmpv3_securitylevel	= get_request('snmpv3_securitylevel'	,0);
+		$snmpv3_authpassphrase	= get_request('snmpv3_authpassphrase'	,'');
+		$snmpv3_privpassphrase	= get_request('snmpv3_privpassphrase'	,'');
 
-		$formula	= get_request("formula"		,"1");
-		$logtimefmt	= get_request("logtimefmt"	,"");
+		$formula	= get_request('formula'		,'1');
+		$logtimefmt	= get_request('logtimefmt'	,'');
 
-		$add_groupid	= get_request("add_groupid"	,get_request("groupid",0));
+		$add_groupid	= get_request('add_groupid'	,get_request('groupid',0));
 
 		$limited 	= null;
 
-		if("" == $key && $type == ITEM_TYPE_DB_MONITOR) $key = "db.odbc.select[<unique short description>]";
+		if('' == $key && $type == ITEM_TYPE_DB_MONITOR) $key = 'db.odbc.select[<unique short description>]';
 
 		if(is_null($host)){
-			$host_info = get_host_by_hostid($_REQUEST["hostid"]);
-			$host = $host_info["host"];
+			$host_info = get_host_by_hostid($_REQUEST['hostid']);
+			$host = $host_info['host'];
 		}
 
-		if(isset($_REQUEST["itemid"])){
-			$frmItem->AddVar("itemid",$_REQUEST["itemid"]);
+		if(isset($_REQUEST['itemid'])){
+			$frmItem->AddVar('itemid',$_REQUEST['itemid']);
 
-			$item_data = DBfetch(DBselect("SELECT i.*, h.host, h.hostid".
-				" FROM items i,hosts h WHERE i.itemid=".$_REQUEST["itemid"].
-				" AND h.hostid=i.hostid"));
+			$item_data = DBfetch(DBselect('SELECT i.*, h.host, h.hostid '.
+				' FROM items i,hosts h '.
+				' WHERE i.itemid='.$_REQUEST['itemid'].
+					' AND h.hostid=i.hostid'));
 
 			$limited = ($item_data['templateid'] == 0  && $item_data['type'] != ITEM_TYPE_HTTPTEST) ? null : 'yes';
 		}
 
-		if((isset($_REQUEST["itemid"]) && !isset($_REQUEST["form_refresh"])) || isset($limited)){
-			$description	= $item_data["description"];
-			$key		= $item_data["key_"];
-			$host		= $item_data["host"];
-			$type		= $item_data["type"];
-			$snmp_community	= $item_data["snmp_community"];
-			$snmp_oid	= $item_data["snmp_oid"];
-			$snmp_port	= $item_data["snmp_port"];
-			$value_type	= $item_data["value_type"];
-			$trapper_hosts	= $item_data["trapper_hosts"];
-			$units		= $item_data["units"];
-			$valuemapid	= $item_data["valuemapid"];
-			$multiplier	= $item_data["multiplier"];
-			$hostid		= $item_data["hostid"];
-			$params		= $item_data["params"];
+		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh'])) || isset($limited)){
+			$description	= $item_data['description'];
+			$key			= $item_data['key_'];
+			$host			= $item_data['host'];
+			$type			= $item_data['type'];
+			$snmp_community	= $item_data['snmp_community'];
+			$snmp_oid		= $item_data['snmp_oid'];
+			$snmp_port		= $item_data['snmp_port'];
+			$value_type		= $item_data['value_type'];
+			$trapper_hosts	= $item_data['trapper_hosts'];
+			$units			= $item_data['units'];
+			$valuemapid		= $item_data['valuemapid'];
+			$multiplier		= $item_data['multiplier'];
+			$hostid			= $item_data['hostid'];
+			$params			= $item_data['params'];
 			
-			$snmpv3_securityname	= $item_data["snmpv3_securityname"];
-			$snmpv3_securitylevel	= $item_data["snmpv3_securitylevel"];
-			$snmpv3_authpassphrase	= $item_data["snmpv3_authpassphrase"];
-			$snmpv3_privpassphrase	= $item_data["snmpv3_privpassphrase"];
+			$snmpv3_securityname	= $item_data['snmpv3_securityname'];
+			$snmpv3_securitylevel	= $item_data['snmpv3_securitylevel'];
+			$snmpv3_authpassphrase	= $item_data['snmpv3_authpassphrase'];
+			$snmpv3_privpassphrase	= $item_data['snmpv3_privpassphrase'];
 
-			$formula	= $item_data["formula"];
-			$logtimefmt	= $item_data["logtimefmt"];
+			$formula	= $item_data['formula'];
+			$logtimefmt	= $item_data['logtimefmt'];
 
-			if(!isset($limited) || !isset($_REQUEST["form_refresh"]))
-			{
-				$delay		= $item_data["delay"];
-				$history	= $item_data["history"];
-				$status		= $item_data["status"];
-				$delta		= $item_data["delta"];
-				$trends		= $item_data["trends"];
-				$db_delay_flex	= $item_data["delay_flex"];
+			$new_application = get_request('new_application',	'');
+			
+			if(!isset($limited) || !isset($_REQUEST['form_refresh'])){
+				$delay		= $item_data['delay'];
+				$history	= $item_data['history'];
+				$status		= $item_data['status'];
+				$delta		= $item_data['delta'];
+				$trends		= $item_data['trends'];
+				$db_delay_flex	= $item_data['delay_flex'];
 				
-				if(isset($db_delay_flex))
-				{
-					$arr_of_dellays = explode(";",$db_delay_flex);
-					foreach($arr_of_dellays as $one_db_delay)
-					{
-						$arr_of_delay = explode("/",$one_db_delay);
+				if(isset($db_delay_flex)){
+					$arr_of_dellays = explode(';',$db_delay_flex);
+					foreach($arr_of_dellays as $one_db_delay){
+						$arr_of_delay = explode('/',$one_db_delay);
 						if(!isset($arr_of_delay[0]) || !isset($arr_of_delay[1])) continue;
 
-						array_push($delay_flex,array("delay"=>$arr_of_delay[0],"period"=>$arr_of_delay[1]));
+						array_push($delay_flex,array('delay'=>$arr_of_delay[0],'period'=>$arr_of_delay[1]));
 					}
 				}
 				
-				$applications = array_unique(array_merge($applications, get_applications_by_itemid($_REQUEST["itemid"])));
+				$applications = array_unique(array_merge($applications, get_applications_by_itemid($_REQUEST['itemid'])));
 			}
 		}
 
@@ -1496,20 +1492,19 @@
 
 		if($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_HTTPTEST){
 			$i = 0;
-			foreach($delay_flex as $val)
-			{
-				if(!isset($val["delay"]) && !isset($val["period"])) continue;
+			foreach($delay_flex as $val){
+				if(!isset($val['delay']) && !isset($val['period'])) continue;
 
 				array_push($delay_flex_el,
 					array(
-						new CCheckBox("rem_delay_flex[]", 'no', null,$i),
-							$val["delay"],
-							" sec at ",
-							$val["period"]
+						new CCheckBox('rem_delay_flex[]', 'no', null,$i),
+							$val['delay'],
+							' sec at ',
+							$val['period']
 					),
 					BR());
-				$frmItem->AddVar("delay_flex[".$i."][delay]", $val['delay']);
-				$frmItem->AddVar("delay_flex[".$i."][period]", $val['period']);
+				$frmItem->AddVar('delay_flex['.$i.'][delay]', $val['delay']);
+				$frmItem->AddVar('delay_flex['.$i.'][period]', $val['period']);
 				$i++;
 				if($i >= 7) break; /* limit count of  intervals
 						    * 7 intervals by 30 symbols = 210 characters
@@ -1525,20 +1520,21 @@
 
 		if(count($applications)==0)  array_push($applications,0);
 
-		if(isset($_REQUEST["itemid"])) {
+		if(isset($_REQUEST['itemid'])) {
 			$frmItem->SetTitle(S_ITEM." '$host:".$item_data["description"]."'");
-		} else {
+		} 
+		else {
 			$frmItem->SetTitle(S_ITEM." '$host:$description'");
 		}
 
-		$frmItem->AddRow(S_DESCRIPTION, new CTextBox("description",$description,40, $limited));
+		$frmItem->AddRow(S_DESCRIPTION, new CTextBox('description',$description,40, $limited));
 
 		if(isset($limited)){
-			$frmItem->AddRow(S_TYPE,  new CTextBox("typename", item_type2str($type), 40, 'yes'));
+			$frmItem->AddRow(S_TYPE,  new CTextBox('typename', item_type2str($type), 40, 'yes'));
 			$frmItem->AddVar('type', $type);
 		}
 		else{
-			$cmbType = new CComboBox("type",$type,"submit()");
+			$cmbType = new CComboBox('type',$type,'submit()');
 			foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3,ITEM_TYPE_TRAPPER,
 				ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR) as $it)
@@ -1547,59 +1543,56 @@
 		}
 
 		if(($type==ITEM_TYPE_SNMPV1)||($type==ITEM_TYPE_SNMPV2C)){ 
-			$frmItem->AddVar("snmpv3_securityname",$snmpv3_securityname);
-			$frmItem->AddVar("snmpv3_securitylevel",$snmpv3_securitylevel);
-			$frmItem->AddVar("snmpv3_authpassphrase",$snmpv3_authpassphrase);
-			$frmItem->AddVar("snmpv3_privpassphrase",$snmpv3_privpassphrase);
+			$frmItem->AddVar('snmpv3_securityname',$snmpv3_securityname);
+			$frmItem->AddVar('snmpv3_securitylevel',$snmpv3_securitylevel);
+			$frmItem->AddVar('snmpv3_authpassphrase',$snmpv3_authpassphrase);
+			$frmItem->AddVar('snmpv3_privpassphrase',$snmpv3_privpassphrase);
 
-			$frmItem->AddRow(S_SNMP_COMMUNITY, new CTextBox("snmp_community",$snmp_community,16,$limited));
-			$frmItem->AddRow(S_SNMP_OID, new CTextBox("snmp_oid",$snmp_oid,40,$limited));
-			$frmItem->AddRow(S_SNMP_PORT, new CNumericBox("snmp_port",$snmp_port,5,$limited));
+			$frmItem->AddRow(S_SNMP_COMMUNITY, new CTextBox('snmp_community',$snmp_community,16,$limited));
+			$frmItem->AddRow(S_SNMP_OID, new CTextBox('snmp_oid',$snmp_oid,40,$limited));
+			$frmItem->AddRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5,$limited));
 		}
 		else if($type==ITEM_TYPE_SNMPV3){
-			$frmItem->AddVar("snmp_community",$snmp_community);
+			$frmItem->AddVar('snmp_community',$snmp_community);
 
-			$frmItem->AddRow(S_SNMP_OID, new CTextBox("snmp_oid",$snmp_oid,40,$limited));
+			$frmItem->AddRow(S_SNMP_OID, new CTextBox('snmp_oid',$snmp_oid,40,$limited));
 
 			$frmItem->AddRow(S_SNMPV3_SECURITY_NAME,
-				new CTextBox("snmpv3_securityname",$snmpv3_securityname,64,$limited));
+				new CTextBox('snmpv3_securityname',$snmpv3_securityname,64,$limited));
 
-			if(isset($limited))
-			{
-				$frmItem->AddVar("snmpv3_securitylevel", $snmpv3_securitylevel);
-				switch($snmpv3_securitylevel)
-				{
-					case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:	$snmpv3_securitylevel="NoAuthPriv";	break;
-					case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:	$snmpv3_securitylevel = "AuthNoPriv";	break;
-					case ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV:	$snmpv3_securitylevel = "AuthPriv";	break;
+			if(isset($limited)){
+				$frmItem->AddVar('snmpv3_securitylevel', $snmpv3_securitylevel);
+				switch($snmpv3_securitylevel){
+					case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:	$snmpv3_securitylevel='NoAuthPriv';	break;
+					case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:	$snmpv3_securitylevel = 'AuthNoPriv';	break;
+					case ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV:	$snmpv3_securitylevel = 'AuthPriv';	break;
 				}
-				$frmItem->AddRow(S_SNMPV3_SECURITY_LEVEL,  new CTextBox("snmpv3_securitylevel_desc", 
+				$frmItem->AddRow(S_SNMPV3_SECURITY_LEVEL,  new CTextBox('snmpv3_securitylevel_desc', 
 					$snmpv3_securitylevel, $limited));
 			}
-			else
-			{
-				$cmbSecLevel = new CComboBox("snmpv3_securitylevel",$snmpv3_securitylevel);
-				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,"NoAuthPriv");
-				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,"AuthNoPriv");
-				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,"AuthPriv");
+			else{
+				$cmbSecLevel = new CComboBox('snmpv3_securitylevel',$snmpv3_securitylevel);
+				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'NoAuthPriv');
+				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'AuthNoPriv');
+				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'AuthPriv');
 				$frmItem->AddRow(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel);
 			}
 			$frmItem->AddRow(S_SNMPV3_AUTH_PASSPHRASE,
-				new CTextBox("snmpv3_authpassphrase",$snmpv3_authpassphrase,64,$limited));
+				new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64,$limited));
 
 			$frmItem->AddRow(S_SNMPV3_PRIV_PASSPHRASE,
-				new CTextBox("snmpv3_privpassphrase",$snmpv3_privpassphrase,64,$limited));
+				new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64,$limited));
 
-			$frmItem->AddRow(S_SNMP_PORT, new CNumericBox("snmp_port",$snmp_port,5,$limited));
+			$frmItem->AddRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5,$limited));
 		}
 		else{
-			$frmItem->AddVar("snmp_community",$snmp_community);
-			$frmItem->AddVar("snmp_oid",$snmp_oid);
-			$frmItem->AddVar("snmp_port",$snmp_port);
-			$frmItem->AddVar("snmpv3_securityname",$snmpv3_securityname);
-			$frmItem->AddVar("snmpv3_securitylevel",$snmpv3_securitylevel);
-			$frmItem->AddVar("snmpv3_authpassphrase",$snmpv3_authpassphrase);
-			$frmItem->AddVar("snmpv3_privpassphrase",$snmpv3_privpassphrase);
+			$frmItem->AddVar('snmp_community',$snmp_community);
+			$frmItem->AddVar('snmp_oid',$snmp_oid);
+			$frmItem->AddVar('snmp_port',$snmp_port);
+			$frmItem->AddVar('snmpv3_securityname',$snmpv3_securityname);
+			$frmItem->AddVar('snmpv3_securitylevel',$snmpv3_securitylevel);
+			$frmItem->AddVar('snmpv3_authpassphrase',$snmpv3_authpassphrase);
+			$frmItem->AddVar('snmpv3_privpassphrase',$snmpv3_privpassphrase);
 		}
 
 		if(isset($limited)){
@@ -1612,21 +1605,21 @@
 				'T');
 		}
 		
-		$frmItem->AddRow(S_KEY, array(new CTextBox("key",$key,40,$limited), $btnSelect));
+		$frmItem->AddRow(S_KEY, array(new CTextBox('key',$key,40,$limited), $btnSelect));
 
 		if( ITEM_TYPE_DB_MONITOR == $type ){
-			$frmItem->AddRow(S_PARAMS, new CTextArea("params",$params,60,4));
+			$frmItem->AddRow(S_PARAMS, new CTextArea('params',$params,60,4));
 		}
 		else{
-			$frmItem->AddVar("params",$params);
+			$frmItem->AddVar('params',$params);
 		}
 
 		if(isset($limited)){
-			$frmItem->AddVar("value_type", $value_type);
+			$frmItem->AddVar('value_type', $value_type);
 			$cmbValType = new CTextBox('value_type_name', item_value_type2str($value_type), 40, 'yes');
 		}
 		else{
-			$cmbValType = new CComboBox("value_type",$value_type,"submit()");
+			$cmbValType = new CComboBox('value_type',$value_type,'submit()');
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UINT64);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
@@ -1636,16 +1629,14 @@
 		$frmItem->AddRow(S_TYPE_OF_INFORMATION,$cmbValType);
 		
 		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64)){
-			$frmItem->AddRow(S_UNITS, new CTextBox("units",$units,40, $limited));
+			$frmItem->AddRow(S_UNITS, new CTextBox('units',$units,40, $limited));
 
-			if(isset($limited))
-			{
-				$frmItem->AddVar("multiplier", $multiplier);
+			if(isset($limited)){
+				$frmItem->AddVar('multiplier', $multiplier);
 				$cmbMultipler = new CTextBox('multiplier_name', $multiplier ? S_CUSTOM_MULTIPLIER : S_DO_NOT_USE, 20, 'yes');
 			}
-			else
-			{
-				$cmbMultipler = new CComboBox("multiplier",$multiplier,"submit()");
+			else{
+				$cmbMultipler = new CComboBox('multiplier',$multiplier,'submit()');
 				$cmbMultipler->AddItem(0,S_DO_NOT_USE);
 				$cmbMultipler->AddItem(1,S_CUSTOM_MULTIPLIER);
 			}
@@ -1653,167 +1644,168 @@
 			
 		}
 		else{
-			$frmItem->AddVar("units",$units);
-			$frmItem->AddVar("multiplier",$multiplier);
+			$frmItem->AddVar('units',$units);
+			$frmItem->AddVar('multiplier',$multiplier);
 		}
 
 		if( !is_numeric($formula)) $formula = 1;
 		if($multiplier == 1){
-			$frmItem->AddRow(S_CUSTOM_MULTIPLIER, new CTextBox("formula",$formula,40,$limited));
+			$frmItem->AddRow(S_CUSTOM_MULTIPLIER, new CTextBox('formula',$formula,40,$limited));
 		}
 		else{
-			$frmItem->AddVar("formula",$formula);
+			$frmItem->AddVar('formula',$formula);
 		}
 		if($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_HTTPTEST){
-			$frmItem->AddRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));
+			$frmItem->AddRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox('delay',$delay,5));
 			$frmItem->AddRow(S_FLEXIBLE_INTERVALS, $delay_flex_el);
 			$frmItem->AddRow(S_NEW_FLEXIBLE_INTERVAL, 
 				array(
 					S_DELAY, SPACE,
-					new CNumericBox("new_delay_flex[delay]","50",5), 
+					new CNumericBox('new_delay_flex[delay]','50',5), 
 					S_PERIOD, SPACE,
-					new CTextBox("new_delay_flex[period]","1-7,00:00-23:59",27), BR(),
-					new CButton("add_delay_flex",S_ADD)
+					new CTextBox('new_delay_flex[period]','1-7,00:00-23:59',27), BR(),
+					new CButton('add_delay_flex',S_ADD)
 				),'new');
 		}
 		else{
-			$frmItem->AddVar("delay",$delay);
-			$frmItem->AddVar("delay_flex",null);
+			$frmItem->AddVar('delay',$delay);
+			$frmItem->AddVar('delay_flex',null);
 		}
 
 		$frmItem->AddRow(S_KEEP_HISTORY_IN_DAYS, array(
-			new CNumericBox("history",$history,8),
-			(!isset($_REQUEST["itemid"])) ? null :
-				new CButtonQMessage("del_history",S_CLEAN_HISTORY,S_HISTORY_CLEANING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q)
+			new CNumericBox('history',$history,8),
+			(!isset($_REQUEST['itemid'])) ? null :
+				new CButtonQMessage('del_history',S_CLEAN_HISTORY,S_HISTORY_CLEANING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q)
 			));
-		$frmItem->AddRow(S_KEEP_TRENDS_IN_DAYS, new CNumericBox("trends",$trends,8));
+		$frmItem->AddRow(S_KEEP_TRENDS_IN_DAYS, new CNumericBox('trends',$trends,8));
 
-		$cmbStatus = new CComboBox("status",$status);
+		$cmbStatus = new CComboBox('status',$status);
 		foreach(array(ITEM_STATUS_ACTIVE,ITEM_STATUS_DISABLED,ITEM_STATUS_NOTSUPPORTED) as $st)
 			$cmbStatus->AddItem($st,item_status2str($st));
 		$frmItem->AddRow(S_STATUS,$cmbStatus);
 
 		if($value_type==ITEM_VALUE_TYPE_LOG){
-			$frmItem->AddRow(S_LOG_TIME_FORMAT, new CTextBox("logtimefmt",$logtimefmt,16,$limited));
+			$frmItem->AddRow(S_LOG_TIME_FORMAT, new CTextBox('logtimefmt',$logtimefmt,16,$limited));
 		}
 		else{
-			$frmItem->AddVar("logtimefmt",$logtimefmt);
+			$frmItem->AddVar('logtimefmt',$logtimefmt);
 		}
 
 		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64)){
-			$cmbDelta= new CComboBox("delta",$delta);
+			$cmbDelta= new CComboBox('delta',$delta);
 			$cmbDelta->AddItem(0,S_AS_IS);
 			$cmbDelta->AddItem(1,S_DELTA_SPEED_PER_SECOND);
 			$cmbDelta->AddItem(2,S_DELTA_SIMPLE_CHANGE);
 			$frmItem->AddRow(S_STORE_VALUE,$cmbDelta);
 		}
 		else{
-			$frmItem->AddVar("delta",0);
+			$frmItem->AddVar('delta',0);
 		}
 		
 		if(($value_type==ITEM_VALUE_TYPE_UINT64) || ($value_type == ITEM_VALUE_TYPE_STR)){
-			if(isset($limited) && $type != ITEM_TYPE_HTTPTEST)
-			{
-				$frmItem->AddVar("valuemapid", $valuemapid);
+			if(isset($limited) && $type != ITEM_TYPE_HTTPTEST){
+				$frmItem->AddVar('valuemapid', $valuemapid);
 				$map_name = S_AS_IS;
-				if($map_data = DBfetch(DBselect('SELECT name FROM valuemaps WHERE valuemapid='.$valuemapid)))
-				{
+				if($map_data = DBfetch(DBselect('SELECT name FROM valuemaps WHERE valuemapid='.$valuemapid))){
 					$map_name = $map_data['name'];
 				}
-				$cmbMap = new CTextBox("valuemap_name", $map_name, 20, 'yes');
+				$cmbMap = new CTextBox('valuemap_name', $map_name, 20, 'yes');
 			}
-			else
-			{
-				$cmbMap = new CComboBox("valuemapid",$valuemapid);
+			else{
+				$cmbMap = new CComboBox('valuemapid',$valuemapid);
 				$cmbMap->AddItem(0,S_AS_IS);
 				$db_valuemaps = DBselect('SELECT * FROM valuemaps WHERE '.DBin_node('valuemapid'));
 				while($db_valuemap = DBfetch($db_valuemaps))
 					$cmbMap->AddItem(
-						$db_valuemap["valuemapid"],
-						get_node_name_by_elid($db_valuemap["valuemapid"]).$db_valuemap["name"]
+						$db_valuemap['valuemapid'],
+						get_node_name_by_elid($db_valuemap['valuemapid']).$db_valuemap['name']
 						);
 			}
 			
-			$link = new CLink("throw map","config.php?config=6","action");
-			$link->AddOption("target","_blank");
+			$link = new CLink('throw map','config.php?config=6','action');
+			$link->AddOption('target','_blank');
 			$frmItem->AddRow(array(S_SHOW_VALUE.SPACE,$link),$cmbMap);
 			
 		}
 		else{
-			$frmItem->AddVar("valuemapid",0);
+			$frmItem->AddVar('valuemapid',0);
 		}
 
 		if($type==ITEM_TYPE_TRAPPER){
-			$frmItem->AddRow(S_ALLOWED_HOSTS, new CTextBox("trapper_hosts",$trapper_hosts,40,$limited));
+			$frmItem->AddRow(S_ALLOWED_HOSTS, new CTextBox('trapper_hosts',$trapper_hosts,40,$limited));
 		}
 		else{
-			$frmItem->AddVar("trapper_hosts",$trapper_hosts);
+			$frmItem->AddVar('trapper_hosts',$trapper_hosts);
 		}
 
 		if($type==ITEM_TYPE_HTTPTEST){
-			$app_names = get_applications_by_itemid($_REQUEST["itemid"], 'name');
-			$frmItem->AddRow(S_APPLICATIONS, new CTextBox("application_name",
+			$app_names = get_applications_by_itemid($_REQUEST['itemid'], 'name');
+			$frmItem->AddRow(S_APPLICATIONS, new CTextBox('application_name',
 				isset($app_names[0]) ? $app_names[0] : '', 20, $limited));
-			$frmItem->AddVar("applications",$applications,6);
+			$frmItem->AddVar('applications',$applications,6);
 		}
 		else{
-			$cmbApps = new CListBox("applications[]",$applications,6);
-			$cmbApps->AddItem(0,"-".S_NONE."-");
-			$db_applications = DBselect("SELECT DISTINCT applicationid,name FROM applications".
-				" WHERE hostid=".$_REQUEST["hostid"]." order by name");
-			while($db_app = DBfetch($db_applications))
-			{
-				$cmbApps->AddItem($db_app["applicationid"],$db_app["name"]);
+			
+			$new_app = new CTextBox('new_application',$new_application,40);
+			$frmItem->AddRow(S_NEW_APPLICATION,$new_app);
+			
+			$cmbApps = new CListBox('applications[]',$applications,6);
+			$cmbApps->AddItem(0,'-'.S_NONE.'-');
+			$db_applications = DBselect('SELECT DISTINCT applicationid,name '.
+								' FROM applications '.
+								' WHERE hostid='.$_REQUEST['hostid'].
+								' ORDER BY name');
+			while($db_app = DBfetch($db_applications)){
+				$cmbApps->AddItem($db_app['applicationid'],$db_app['name']);
 			}
 			$frmItem->AddRow(S_APPLICATIONS,$cmbApps);
 		}
 
-		$frmRow = array(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["itemid"])){
+		$frmRow = array(new CButton('save',S_SAVE));
+		if(isset($_REQUEST['itemid'])){
 			array_push($frmRow,
 				SPACE,
-				new CButton("clone",S_CLONE));
+				new CButton('clone',S_CLONE));
 
-			if(!isset($limited))
-			{
+			if(!isset($limited)){
 				array_push($frmRow,
 					SPACE,
-					new CButtonDelete("Delete selected item?",
-						url_param("form").url_param("groupid").url_param("hostid").url_param("config").
-						url_param("itemid"))
+					new CButtonDelete('Delete selected item?',
+						url_param('form').url_param('groupid').url_param('hostid').url_param('config').
+						url_param('itemid'))
 				);
 			}
 		}
 		array_push($frmRow,
 			SPACE,
-			new CButtonCancel(url_param("groupid").url_param("hostid").url_param("config")));
+			new CButtonCancel(url_param('groupid').url_param('hostid').url_param('config')));
 
-		$frmItem->AddSpanRow($frmRow,"form_row_last");
+		$frmItem->AddSpanRow($frmRow,'form_row_last');
 
-	        $cmbGroups = new CComboBox("add_groupid",$add_groupid);		
+	        $cmbGroups = new CComboBox('add_groupid',$add_groupid);		
 
 			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 	        $groups=DBselect('SELECT DISTINCT groupid,name '.
 				' FROM groups '.
 				' WHERE '.DBcondition('groupid',$available_groups).
-				' order by name');
+				' ORDER BY name');
 	        while($group=DBfetch($groups)){
 				$cmbGroups->AddItem(
-					$group["groupid"],
-					get_node_name_by_elid($group["groupid"]).$group["name"]
+					$group['groupid'],
+					get_node_name_by_elid($group['groupid']).$group['name']
 					);
 	        }
 		$frmItem->AddRow(S_GROUP,$cmbGroups);
 
-		$cmbAction = new CComboBox("action");
-		$cmbAction->AddItem("add to group",S_ADD_TO_GROUP);
-		if(isset($_REQUEST["itemid"])){
-			$cmbAction->AddItem("update in group",S_UPDATE_IN_GROUP);
-			$cmbAction->AddItem("delete FROM group",S_DELETE_FROM_GROUP);
+		$cmbAction = new CComboBox('action');
+		$cmbAction->AddItem('add to group',S_ADD_TO_GROUP);
+		if(isset($_REQUEST['itemid'])){
+			$cmbAction->AddItem('update in group',S_UPDATE_IN_GROUP);
+			$cmbAction->AddItem('delete FROM group',S_DELETE_FROM_GROUP);
 		}
 		$frmItem->AddItemToBottomRow($cmbAction);
 		$frmItem->AddItemToBottomRow(SPACE);
-		$frmItem->AddItemToBottomRow(new CButton("register","do"));
+		$frmItem->AddItemToBottomRow(new CButton('register','do'));
 
 		$frmItem->Show();
 	}
@@ -1822,59 +1814,59 @@
 		global  $USER_DETAILS;
 
 		$frmItem = new CFormTable(S_ITEM,null,'post');
-		$frmItem->SetHelp("web.items.item.php");
+		$frmItem->SetHelp('web.items.item.php');
 		$frmItem->SetTitle(S_MASS_UPDATE);
 
-		$frmItem->AddVar("form_mass_update",1);
+		$frmItem->AddVar('form_mass_update',1);
 
-		$frmItem->AddVar("group_itemid",get_request("group_itemid",array()));
-		$frmItem->AddVar("config",get_request("config",0));
-		if(isset($_REQUEST["groupid"]))
-			$frmItem->AddVar("groupid",$_REQUEST["groupid"]);
+		$frmItem->AddVar('group_itemid',get_request('group_itemid',array()));
+		$frmItem->AddVar('config',get_request('config',0));
+		if(isset($_REQUEST['groupid']))
+			$frmItem->AddVar('groupid',$_REQUEST['groupid']);
 
-		$frmItem->AddVar("hostid",$_REQUEST["hostid"]);
+		$frmItem->AddVar('hostid',$_REQUEST['hostid']);
 
-		$description	= get_request("description"	,"");
-		$key		= get_request("key"		,"");
-		$host		= get_request("host",		null);
-		$delay		= get_request("delay"		,30);
-		$history	= get_request("history"		,90);
-		$status		= get_request("status"		,0);
-		$type		= get_request("type"		,0);
-		$snmp_community	= get_request("snmp_community"	,"public");
-		$snmp_oid	= get_request("snmp_oid"	,"interfaces.ifTable.ifEntry.ifInOctets.1");
-		$snmp_port	= get_request("snmp_port"	,161);
-		$value_type	= get_request("value_type"	,ITEM_VALUE_TYPE_UINT64);
-		$trapper_hosts	= get_request("trapper_hosts"	,"");
-		$units		= get_request("units"		,'');
-		$valuemapid	= get_request("valuemapid"	,0);
-		$delta		= get_request("delta"		,0);
-		$trends		= get_request("trends"		,365);
-		$applications	= get_request("applications"	,array());
-		$delay_flex	= get_request("delay_flex"	,array());
+		$description	= get_request('description'	,'');
+		$key		= get_request('key'		,'');
+		$host		= get_request('host',		null);
+		$delay		= get_request('delay'		,30);
+		$history	= get_request('history'		,90);
+		$status		= get_request('status'		,0);
+		$type		= get_request('type'		,0);
+		$snmp_community	= get_request('snmp_community'	,'public');
+		$snmp_oid	= get_request('snmp_oid'	,'interfaces.ifTable.ifEntry.ifInOctets.1');
+		$snmp_port	= get_request('snmp_port'	,161);
+		$value_type	= get_request('value_type'	,ITEM_VALUE_TYPE_UINT64);
+		$trapper_hosts	= get_request('trapper_hosts'	,'');
+		$units		= get_request('units'		,'');
+		$valuemapid	= get_request('valuemapid'	,0);
+		$delta		= get_request('delta'		,0);
+		$trends		= get_request('trends'		,365);
+		$applications	= get_request('applications'	,array());
+		$delay_flex	= get_request('delay_flex'	,array());
 
-		$snmpv3_securityname	= get_request("snmpv3_securityname"	,"");
-		$snmpv3_securitylevel	= get_request("snmpv3_securitylevel"	,0);
-		$snmpv3_authpassphrase	= get_request("snmpv3_authpassphrase"	,"");
-		$snmpv3_privpassphrase	= get_request("snmpv3_privpassphrase"	,"");
+		$snmpv3_securityname	= get_request('snmpv3_securityname'	,'');
+		$snmpv3_securitylevel	= get_request('snmpv3_securitylevel'	,0);
+		$snmpv3_authpassphrase	= get_request('snmpv3_authpassphrase'	,'');
+		$snmpv3_privpassphrase	= get_request('snmpv3_privpassphrase'	,'');
 
-		$formula	= get_request("formula"		,"1");
-		$logtimefmt	= get_request("logtimefmt"	,"");
+		$formula	= get_request('formula'		,'1');
+		$logtimefmt	= get_request('logtimefmt'	,'');
 
-		$add_groupid	= get_request("add_groupid"	,get_request("groupid",0));
+		$add_groupid	= get_request('add_groupid'	,get_request('groupid',0));
 
 		$delay_flex_el = array();
 
 		$i = 0;
 		foreach($delay_flex as $val){
-			if(!isset($val["delay"]) && !isset($val["period"])) continue;
+			if(!isset($val['delay']) && !isset($val['period'])) continue;
 
 			array_push($delay_flex_el,
 				array(
-					new CCheckBox("rem_delay_flex[]", 'no', null,$i),
-						$val["delay"],
-						" sec at ",
-						$val["period"]
+					new CCheckBox('rem_delay_flex[]', 'no', null,$i),
+						$val['delay'],
+						' sec at ',
+						$val['period']
 				),
 				BR());
 			$frmItem->AddVar("delay_flex[".$i."][delay]", $val['delay']);
@@ -3793,69 +3785,70 @@
 		$frmMeadia->Show();
 	}
 
+
 	function insert_image_form(){
 
+		$frmImages = new CFormTable(S_IMAGE,'config.php','post','multipart/form-data');
+		$frmImages->SetHelp('web.config.images.php');
+		$frmImages->AddVar('config',get_request('config',3));
 
-		$frmImages = new CFormTable(S_IMAGE,"config.php","post","multipart/form-data");
-		$frmImages->SetHelp("web.config.images.php");
-		$frmImages->AddVar("config",get_request("config",3));
-
-		if(isset($_REQUEST["imageid"])){
-			$result=DBselect("select imageid,imagetype,name FROM images".
-				" WHERE imageid=".$_REQUEST["imageid"]);
+		if(isset($_REQUEST['imageid'])){
+			$result=DBselect('SELECT imageid,imagetype,name '.
+						' FROM images '.
+						' WHERE imageid='.$_REQUEST['imageid']);
 
 			$row=DBfetch($result);
-			$frmImages->SetTitle(S_IMAGE." \"".$row["name"]."\"");
-			$frmImages->AddVar("imageid",$_REQUEST["imageid"]);
+			$frmImages->SetTitle(S_IMAGE.' "'.$row['name'].'"');
+			$frmImages->AddVar('imageid',$_REQUEST['imageid']);
 		}
 
-		if(isset($_REQUEST["imageid"]) && !isset($_REQUEST["form_refresh"])){
-			$name		= $row["name"];
-			$imagetype	= $row["imagetype"];
-			$imageid	= $row["imageid"];
+		if(isset($_REQUEST['imageid']) && !isset($_REQUEST['form_refresh'])){
+			$name		= $row['name'];
+			$imagetype	= $row['imagetype'];
+			$imageid	= $row['imageid'];
 		}
 		else{
-			$name		= get_request("name","");
-			$imagetype	= get_request("imagetype",1);
-			$imageid	= get_request("imageid",0);
+			$name		= get_request('name','');
+			$imagetype	= get_request('imagetype',1);
+			$imageid	= get_request('imageid',0);
 		}
 
-		$frmImages->AddRow(S_NAME,new CTextBox("name",$name,64));
+		$frmImages->AddRow(S_NAME,new CTextBox('name',$name,64));
 	
-		$cmbImg = new CComboBox("imagetype",$imagetype);
-		$cmbImg->AddItem(1,S_ICON);
-		$cmbImg->AddItem(2,S_BACKGROUND);
+		$cmbImg = new CComboBox('imagetype',$imagetype);
+		$cmbImg->AddItem(IMAGE_TYPE_ICON,S_ICON);
+		$cmbImg->AddItem(IMAGE_TYPE_BACKGROUND,S_BACKGROUND);
+		
 		$frmImages->AddRow(S_TYPE,$cmbImg);
 
-		$frmImages->AddRow(S_UPLOAD,new CFile("image"));
+		$frmImages->AddRow(S_UPLOAD,new CFile('image'));
 
 		if($imageid > 0){
 			$frmImages->AddRow(S_IMAGE,new CLink(
-				new CImg("image.php?width=640&height=480&imageid=".$imageid,"no image",null),
-				"image.php?imageid=".$row["imageid"]));
+				new CImg('image.php?width=640&height=480&imageid='.$imageid,'no image',null),'image.php?imageid='.$row['imageid']));
 		}
 
-		$frmImages->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["imageid"])){
+		$frmImages->AddItemToBottomRow(new CButton('save',S_SAVE));
+		if(isset($_REQUEST['imageid'])){
 			$frmImages->AddItemToBottomRow(SPACE);
 			$frmImages->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_IMAGE,
-				url_param("form").url_param("config").url_param("imageid")));
+				url_param('form').url_param('config').url_param('imageid')));
 		}
+		
 		$frmImages->AddItemToBottomRow(SPACE);
-		$frmImages->AddItemToBottomRow(new CButtonCancel(url_param("config")));
+		$frmImages->AddItemToBottomRow(new CButtonCancel(url_param('config')));
 		$frmImages->Show();
 	}
 
-	function insert_screen_form()
-	{
-
+	function insert_screen_form(){
 
 		$frm_title = S_SCREEN;
-		if(isset($_REQUEST["screenid"])){
-			$result=DBselect("select screenid,name,hsize,vsize FROM screens g".
-				" WHERE screenid=".$_REQUEST["screenid"]);
+		if(isset($_REQUEST['screenid'])){
+			$result=DBselect('SELECT screenid,name,hsize,vsize '.
+						' FROM screens g '.
+						' WHERE screenid='.$_REQUEST['screenid']);
 			$row=DBfetch($result);
-			$frm_title = S_SCREEN." \"".$row["name"]."\"";
+			$frm_title = S_SCREEN.' "'.$row["name"].'"';
 		}
 		if(isset($_REQUEST["screenid"]) && !isset($_REQUEST["form_refresh"])){
 			$name=$row["name"];
@@ -3867,6 +3860,7 @@
 			$hsize=get_request("hsize",1);
 			$vsize=get_request("bsize",1);
 		}
+		
 		$frmScr = new CFormTable($frm_title,"screenconf.php");
 		$frmScr->SetHelp("web.screenconf.screen.php");
 
@@ -4100,7 +4094,8 @@
 		$sql = 'SELECT hostid,host '.
 				' FROM hosts '.
 				' WHERE status IN ('.HOST_STATUS_PROXY.') '.
-					' AND '.DBin_node('hostid');
+					' AND '.DBin_node('hostid').
+				' ORDER BY host';
 		$db_proxies = DBselect($sql);
 		while ($db_proxy = DBfetch($db_proxies))
 			$cmbProxy->AddItem($db_proxy['hostid'], $db_proxy['host']);
