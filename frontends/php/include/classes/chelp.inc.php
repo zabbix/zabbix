@@ -31,7 +31,7 @@
 				$pside = 'right';
 			}
 
-			parent::CLink(new CDiv(SPACE,'iconhelp'), 'http://www.zabbix.com/manual/v1.1/'.$url);
+			parent::CLink(new CDiv(SPACE,'iconhelp'), 'http://www.zabbix.com/documentation.php' );//'http://www.zabbix.com/manual/v1.1/'.$url);
 			$this->options['style'] = 'padding-'.$pside.': 5px; float:'.$side;
 			$this->options['target'] = '_blank';
 		}

@@ -101,7 +101,7 @@
 				$header_str.= $group['name'].'&quot;';
 			}
 			else{
-				$header_str.= S_ALL.'&quot;';
+				$header_str.= S_ALL_S.'&quot;';
 			}			
 			
 			$header = new CCol($header_str,"header");			

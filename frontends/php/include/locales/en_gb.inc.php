@@ -521,11 +521,11 @@
 	'S_ICORRECT_WORK_PERIOD'=>		'Icorrect work period',
 	
 //	nodes.php
-	'S_NODE'=>				'Node',
-	'S_NODES'=>				'Nodes',
+	'S_NODE'=>					'Node',
+	'S_NODES'=>					'Nodes',
 	'S_NODES_BIG'=>				'NODES',
 	'S_NEW_NODE'=>				'New node',
-	'S_NO_NODES_DEFINED'=>			'No nodes defined',
+	'S_NO_NODES_DEFINED'=>		'No nodes defined',
 	
 //  Authentication
 	'S_AUTHENTICATION'=>				'Authentication',
@@ -538,14 +538,17 @@
 	'S_WAS_NOT'=>						'was not',
 	'S_SUCCESSFUL_SMALL'=>				'successful',
 	'S_MUST_BE_VALID_SMALL'=>			'must be valid',
+	'S_LDAP_AUTH'=>						'LDAP Authentication',
 	'S_HTTP_AUTH'=>						'HTTP Authentication',
+	'S_ZABBIX_INTERNAL_AUTH'=>			'ZABBIX Internal authentication',
+	'S_DEFAULT_AUTHENTICATION'=>		'Default authentication',
 	
 
 //	Latest values
 	'S_LATEST_VALUES'=>			'Latest values',
 	'S_NO_PERMISSIONS'=>			'No permissions !',
 	'S_LATEST_DATA_BIG'=>			'LATEST DATA',
-	'S_ALL'=>						'All',
+	'S_ALL_S'=>						'All',
 	'S_ALL_SMALL'=>					'all',
 	'S_ALL_BIG'=>					'ALL',
 	'S_MINUS_ALL_MINUS'=>			'- all -',
@@ -903,6 +906,7 @@
 	'S_FLEXIBLE_INTERVALS'=>		'Flexible intervals (sec)',
 	'S_NO_FLEXIBLE_INTERVALS'=>		'No flexible intervals',
 	'S_PARAMS'=>				'Additional parameters',
+	'S_NEW_APPLICATION'=>		'New application',
 
 //	events.php
 	'S_EVENT'=>					'Event',
@@ -1493,7 +1497,7 @@
 	'S_ADD_TO'=>						'Add to',
 	'S_REMOVE_FROM'=>					'Remove from',
 	'S_STATUS_DISABLED'=>				'Status disabled',
-	'S_INTERNAL'=>						'Internal',
+	'S_INTERNAL_S'=>						'Internal',
 
 //scripts.php
 	'S_SCRIPTS'=>				'Scripts',

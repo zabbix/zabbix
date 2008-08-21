@@ -84,7 +84,7 @@ function add_right(formname,id,permission,name){
 		$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
 
 		$cmbResourceNode = new CComboBox('nodeid',$nodeid,'submit();');
-		$cmbResourceNode->AddItem(0, S_ALL);
+		$cmbResourceNode->AddItem(0, S_ALL_S);
 		
 		$sql = 'SELECT name,nodeid FROM nodes WHERE '.DBcondition('nodeid',$available_nodes);
 		$db_nodes = DBselect($sql);

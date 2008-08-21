@@ -157,7 +157,7 @@ if(isset($_REQUEST['form'])){
 	$frmScr->AddRow(S_COMMAND,new CTextBox('command',$command,80));
 	
 	$usr_groups = new CCombobox('usrgrpid',$usrgrpid);
-		$usr_groups->AddItem(0,S_ALL);
+		$usr_groups->AddItem(0,S_ALL_S);
 	
 	$sql = 'SELECT DISTINCT ug.name, ug.usrgrpid '.
 			' FROM usrgrp ug '.
@@ -171,7 +171,7 @@ if(isset($_REQUEST['form'])){
 	$frmScr->AddRow(S_USER_GROUPS,$usr_groups);
 		
 	$host_groups = new CCombobox('groupid',$groupid);
-		$host_groups->AddItem(0,S_ALL);
+		$host_groups->AddItem(0,S_ALL_S);
 		
 	$sql = 'SELECT DISTINCT g.name, g.groupid '.
 			' FROM groups g '.
@@ -225,13 +225,13 @@ else {
 	
 	while($script=DBfetch($scripts)){
 	
-		$user_group_name = S_ALL;
+		$user_group_name = S_ALL_S;
 		if($script['usrgrpid'] > 0){
 			$user_group = get_group_by_usrgrpid($script['usrgrpid']);
 			$user_group_name = $user_group['name'];
 		}
 	
-		$host_group_name = S_ALL;
+		$host_group_name = S_ALL_S;
 		if($script['groupid'] > 0){
 			$group = get_hostgroup_by_groupid($script['groupid']);
 			$host_group_name = $group['name'];
