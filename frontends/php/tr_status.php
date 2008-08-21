@@ -354,7 +354,7 @@ include_once "include/page_header.php";
 	$filterForm->AddRow(S_EVENTS,$ev_select);
 	
 	$severity_select = new CComboBox('show_severity',$show_severity,'javasctipt: submit();');
-	$severity_select->AddItem(-1, S_ALL);
+	$severity_select->AddItem(-1, S_ALL_S);
 	$severity_select->AddItem(TRIGGER_SEVERITY_NOT_CLASSIFIED, 	S_NOT_CLASSIFIED);
 	$severity_select->AddItem(TRIGGER_SEVERITY_INFORMATION,		S_INFORMATION);
 	$severity_select->AddItem(TRIGGER_SEVERITY_WARNING,			S_WARNING);

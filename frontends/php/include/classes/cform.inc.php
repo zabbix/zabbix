@@ -19,52 +19,49 @@
 **/
 ?>
 <?php
-	class CForm extends CTag
-	{
+	class CForm extends CTag{
 /* public */
-		function CForm($action=NULL, $method='post', $enctype=NULL)
-		{
+		function CForm($action=NULL, $method='post', $enctype=NULL){
 			parent::CTag("form","yes");
 			$this->SetMethod($method);
 			$this->SetAction($action);
 			$this->SetEnctype($enctype);
 		}
-		function SetMethod($value='post')
-		{
+		
+		function SetMethod($value='post'){
 			return $this->options['method'] = $value;
 		}
-		function SetAction($value)
-		{
+		
+		function SetAction($value){
 			global $page;
 
-			if(is_null($value))
-			{
-				if(isset($page['file']))
-				{
+			if(is_null($value)){
+				if(isset($page['file'])){
 					$value = $page['file'];
 				}
-				else
-				{
+				else{
 					$value = "#";
 				}
 			}
-			return $this->options['action'] = $value;
+			
+		return $this->options['action'] = $value;
 		}
-		function SetEnctype($value=NULL)
-		{
+		
+		function SetEnctype($value=NULL){
 			if(is_null($value)){
 				return $this->DelOption("enctype");
-			}elseif(!is_string($value)){
+			}
+			else if(!is_string($value)){
 				return $this->error("Incorrect value for SetEnctype [$value]");
 			}
-			return $this->AddOption("enctype",$value);
+			
+		return $this->AddOption("enctype",$value);
 		}
 
-		function AddVar($name, $value)
-		{
+		function AddVar($name, $value){
 			if(empty($value) && $value != 0)	return $value;
 
-			return $this->AddItem(new CVar($name, $value));
+		return $this->AddItem(new CVar($name, $value));
 		}
 	}
 ?>

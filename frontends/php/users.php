@@ -445,7 +445,7 @@ include_once 'include/page_header.php';
 	
 	if(0 == $_REQUEST['config']){
 		$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
-		$cmbUGrp->AddItem(0,S_ALL);
+		$cmbUGrp->AddItem(0,S_ALL_S);
 		$result = DBselect('SELECT * FROM usrgrp ORDER BY name');
 		while($usrgrp = DBfetch($result)){
 			$cmbUGrp->AddItem($usrgrp['usrgrpid'],$usrgrp['name']);
@@ -618,13 +618,6 @@ include_once 'include/page_header.php';
 				if(granted2update_group($row['usrgrpid'])){
 
 					$next_gui_auth = ($row['gui_access']+1 > GROUP_GUI_ACCESS_DISABLED)?GROUP_GUI_ACCESS_SYSTEM:($row['gui_access']+1);
-
-					if(GROUP_GUI_ACCESS_INTERNAL == $next_gui_auth){
-						$config = select_config();
-						if(ZBX_AUTH_HTTP == $config['authentication_type']){
-							$next_gui_auth++;
-						}
-					}
 
 					$gui_access = new CLink($gui_access,
 								'users.php?form=update'.
