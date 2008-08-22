@@ -1222,7 +1222,7 @@ int	DCsync_history(int sync_type)
 				history_num++;
 			}
 			else if (skipped_clock == 0)
-				skipped_clock = history[f].clock;
+				skipped_clock = cache->history[f].clock;
 
 			n--;
 			f++;
