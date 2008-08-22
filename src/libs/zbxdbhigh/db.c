@@ -277,7 +277,7 @@ zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field)
 /*
  * Get function value.
  */ 
-int     DBget_function_result(char **result,char *functionid)
+int     DBget_function_result(char **result,char *functionid, char *error, int maxerrlen)
 {
 	DB_RESULT dbresult;
 	DB_ROW	row;
@@ -289,18 +289,16 @@ int     DBget_function_result(char **result,char *functionid)
 
 	row = DBfetch(dbresult);
 
-	if(!row)
+	if (!row)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "No function for functionid:[%s]",
-			functionid );
-		zabbix_syslog("No function for functionid:[%s]",
-			functionid);
+		zbx_snprintf(error, maxerrlen, "No function for functionid [%s]",
+				functionid);
 		res = FAIL;
 	}
 	else if(DBis_null(row[1]) == SUCCEED)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "function.lastvalue==NULL [%s]",
-			functionid);
+		zbx_snprintf(error, maxerrlen, "function.lastvalue IS NULL for functionid [%s]",
+				functionid);
 		res = FAIL;
 	}
 	else

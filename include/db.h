@@ -526,7 +526,7 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table, field)	DBget_maxid_num(table, field, 1)
 zbx_uint64_t	DBget_maxid_num(char *table, char *field, int num);
 
-int	DBget_function_result(char **result,char *functionid);
+int     DBget_function_result(char **result,char *functionid, char *error, int maxerrlen);
 void	DBupdate_host_availability(DB_ITEM *item, int available, int clock, const char *error);
 void	DBproxy_update_host_availability(DB_ITEM *item, int available, int clock);
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);

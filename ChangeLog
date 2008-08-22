@@ -139,6 +139,7 @@ Changes for 1.5:
 
 Changes for 1.4.7:
 
+ - [ZBX-424] fixed possible server crash while importing XML (Sasha)
  - [ZBX-420] added support of log files in screens (Sasha)
  - [ZBX-418] fixed possible server crash while processing macros (Sasha) 
  - [ZBX-370] fixed cpu.c for system.cpu.load[] processing (Sasha)
