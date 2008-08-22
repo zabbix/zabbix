@@ -604,6 +604,8 @@ int	zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args);
 #	define zbx_snprintf_alloc __zbx_zbx_snprintf_alloc
 #endif /* HAVE___VA_ARGS__ */
 void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...);
+void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src);
+void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);
 
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);

@@ -270,6 +270,76 @@ void __zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 	va_end(args);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strcpy_alloc                                                 *
+ *                                                                            *
+ * Purpose: Add zero character at the end of string.                          *
+ *          Reallocs memory if not enough.                                    *
+ *                                                                            *
+ * Parameters: str - distination buffer poiner                                *
+ *             alloc_len - already allocated memory                           *
+ *             offset - ofsset for writing                                    *
+ *             src - copied null terminated string                            *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src)
+{
+	size_t	sz;
+
+	assert(str && *str);
+	assert(alloc_len);
+	assert(offset);
+	assert(src);
+
+	sz = strlen(src);
+
+	if (*offset + sz >= *alloc_len) {
+		*alloc_len += sz < 32 ? 64 : 2 * sz;
+		*str = zbx_realloc(*str, *alloc_len);
+	}
+
+	memcpy(*str + *offset, src, sz);
+	*offset += sz;
+	(*str)[*offset] = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_chrcpy_alloc                                                 *
+ *                                                                            *
+ * Purpose: Add zero character at the end of string.                          *
+ *          Reallocs memory if not enough.                                    *
+ *                                                                            *
+ * Parameters: str - distination buffer poiner                                *
+ *             alloc_len - already allocated memory                           *
+ *             offset - ofsset for writing                                    *
+ *             src - copied char                                              *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src)
+{
+	assert(str && *str);
+	assert(alloc_len);
+	assert(offset);
+
+	if (*offset + 1 >= *alloc_len) {
+		*alloc_len += 64;
+		*str = zbx_realloc(*str, *alloc_len);
+	}
+
+	(*str)[*offset] = src;
+	(*offset)++;
+	(*str)[*offset] = '\0';
+}
 
 /* Has to be rewritten to avoi malloc */
 char *string_replace(char *str, char *sub_str1, char *sub_str2)
