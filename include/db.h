@@ -490,7 +490,7 @@ void		DBrollback();
 
 zbx_uint64_t	DBget_maxid(char *table, char *field);
 
-int	DBget_function_result(char **result,char *functionid);
+int     DBget_function_result(char **result,char *functionid, char *error, int maxerrlen);
 void	DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock,char *error);
 int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, char *error);
 int	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
