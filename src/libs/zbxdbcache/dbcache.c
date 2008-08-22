@@ -50,6 +50,8 @@ static int		sql_allocated = 65536;
 
 zbx_process_t		zbx_process;
 
+extern int		CONFIG_DBSYNCER_FREQUENCY;
+
 /******************************************************************************
  *                                                                            *
  * Function: DCmass_update_triggers                                           *
@@ -1166,6 +1168,7 @@ int	DCsync_history(int sync_type)
 	int			i, j, history_num, n, f;
 	int			syncs;
 	int			total_num = 0;
+	int			skipped_clock, max_delay;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_history(history_first:%d history_num:%d)",
 			cache->history_first,
@@ -1175,6 +1178,7 @@ int	DCsync_history(int sync_type)
 		return 0;
 
 	syncs = cache->history_num / ZBX_SYNC_MAX;
+	max_delay = (int)time(NULL) - CONFIG_DBSYNCER_FREQUENCY;
 
 	do
 	{
@@ -1183,6 +1187,7 @@ int	DCsync_history(int sync_type)
 		history_num = 0;
 		n = cache->history_num;
 		f = cache->history_first;
+		skipped_clock = 0;
 
 		while (n > 0 && history_num < ZBX_SYNC_MAX)
 		{
@@ -1216,6 +1221,8 @@ int	DCsync_history(int sync_type)
 
 				history_num++;
 			}
+			else if (skipped_clock == 0)
+				skipped_clock = history[f].clock;
 
 			n--;
 			f++;
@@ -1260,7 +1267,7 @@ int	DCsync_history(int sync_type)
 			}
 		}
 		total_num += history_num;
-	} while (--syncs > 0 || sync_type == ZBX_SYNC_FULL);
+	} while (--syncs > 0 || sync_type == ZBX_SYNC_FULL || (skipped_clock != 0 && skipped_clock < max_delay));
 
 	return total_num;
 }
