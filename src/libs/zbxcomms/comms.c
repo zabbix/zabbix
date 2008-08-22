@@ -1039,7 +1039,7 @@ int	zbx_tcp_check_security(
 	else
 	{
 #if !defined(HAVE_IPV6)
-		strcpy(sname, inet_ntoa(name.sin_addr));
+		zbx_strlcpy(sname, inet_ntoa(name.sin_addr), sizeof(sname));
 
 		if(sscanf(sname, "%d.%d.%d.%d", &i[0], &i[1], &i[2], &i[3]) != 4)
 		{
