@@ -52,6 +52,83 @@ ZBX_COLLECTOR_DATA *collector = NULL;
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_get_cpu_num                                                  *
+ *                                                                            *
+ * Purpose: returns the number of processors which are currently inline       *
+ *          (i.e., available).                                                *
+ *                                                                            *
+ * Return value: number of CPUs                                               *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_get_cpu_num(void)
+{
+#if defined(_WINDOWS)
+	SYSTEM_INFO	sysInfo;
+
+	GetSystemInfo(&sysInfo);
+
+	return (int)(sysInfo.dwNumberOfProcessors);
+#elif defined(HAVE_SYS_PSTAT_H)
+	struct pst_dynamic psd;
+
+	if (-1 == pstat_getdynamic(&psd, sizeof(struct pst_dynamic), 1, 0))
+		goto return_one;
+
+	return (int)(psd.psd_proc_cnt);
+#elif defined(_SC_NPROCESSORS_ONLN)
+	/* Solaris 10 x86 */
+	/* FreeBSD 7.0 x86 */
+	int	ncpu;
+
+	if (-1 == (ncpu = sysconf(_SC_NPROCESSORS_ONLN)))
+		goto return_one;
+
+	return ncpu;
+#elif defined(HAVE_FUNCTION_SYSCTL_HW_NCPU)
+	/* NetBSD 3.1 x86; NetBSD 4.0 x86 */
+	/* OpenBSD 4.2 x86 */
+	/* FreeBSD 6.2 x86; FreeBSD 7.0 x86 */
+	size_t	len;
+	int	mib[] = {CTL_HW, HW_NCPU}, ncpu;
+
+	len = sizeof(ncpu);
+
+	if (0 != sysctl(mib, 2, &ncpu, &len, NULL, 0))
+		goto return_one;
+
+	return ncpu;
+#elif defined(HAVE_PROC_CPUINFO)
+	FILE	*f = NULL;
+	int	ncpu = 0;
+
+	if (NULL == (file = fopen("/proc/cpuinfo", "r")))
+		goto return_one;
+
+	while (fgets(line, 1024, file) != NULL)
+	{
+		if (strstr(line, "processor") == NULL)
+			continue;
+		ncpu++;
+	}
+	zbx_fclose(file);
+
+	if (ncpu == 0)
+		goto return_one;
+
+	return ncpu;
+#endif
+
+return_one:
+	zabbix_log(LOG_LEVEL_WARNING, "Can not determine number of CPUs, adjust to 1");
+	return 1;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: init_collector_data                                              *
  *                                                                            *
  * Purpose: Allocate memory for collector                                     *
@@ -68,25 +145,40 @@ ZBX_COLLECTOR_DATA *collector = NULL;
 
 void	init_collector_data(void)
 {
-#if defined (_WINDOWS)
+	int	cpu_count;
+	size_t	sz, sz_cpu;
+#ifndef _WINDOWS
+#define ZBX_MAX_ATTEMPTS 10
+	int	attempts = 0, shm_id;
+	key_t	shm_key;
+#endif
 
-	collector = zbx_malloc(collector, sizeof(ZBX_COLLECTOR_DATA));
+#if defined(_WINDOWS) || defined(HAVE_PROC_STAT) || defined(HAVE_SYS_PSTAT_H)
+	cpu_count = zbx_get_cpu_num();
+#else /* HAVE_FUNCTION_SYSCTLBYNAME sysctlbyname("kern.cp_time"...) supported utilization of all CPU only */
+	cpu_count = 0;
+#endif
+	sz = sizeof(ZBX_COLLECTOR_DATA);
+	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
 
-	memset(collector, 0, sizeof(ZBX_COLLECTOR_DATA));
+#ifdef _WINDOWS
+
+	collector = zbx_malloc(collector, sz);
+	memset(collector, 0, sz);
+
+	collector->cpus.cpu = zbx_malloc(collector->cpus.cpu, sz_cpu);
+	memset(&collector->cpus, 0, sz_cpu);
+
+	collector->cpus.count = cpu_count;
 
 	init_perf_collector(&collector->perfs);
+
 #else /* not _WINDOWS */
-
-#define ZBX_MAX_ATTEMPTS 10
-	int	attempts = 0;
-
-	key_t	shm_key;
-	int	shm_id;
 
 	ZBX_GET_SHM_KEY(shm_key);
 
 lbl_create:
-	if ( -1 == (shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), IPC_CREAT | IPC_EXCL | 0666 /* 0022 */)) )
+	if ( -1 == (shm_id = shmget(shm_key, sz + sz_cpu, IPC_CREAT | IPC_EXCL | 0666 /* 0022 */)) )
 	{
 		if( EEXIST == errno )
 		{
@@ -115,6 +207,7 @@ lbl_create:
 	}
 	
 	collector = shmat(shm_id, 0, 0);
+	collector->cpus.cpu = (void *)collector + sz;
 
 	if ((void*)(-1) == collector)
 	{
