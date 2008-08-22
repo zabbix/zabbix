@@ -70,6 +70,7 @@
 		zbx_uint64_t	h_system[MAX_CPU_HISTORY];
 		zbx_uint64_t	h_nice[MAX_CPU_HISTORY];
 		zbx_uint64_t	h_idle[MAX_CPU_HISTORY];
+		zbx_uint64_t	h_interrupt[MAX_CPU_HISTORY];
 
 		/* public */
 		double	user1;
@@ -84,6 +85,9 @@
 		double	idle1;
 		double	idle5;
 		double	idle15;
+		double	interrupt1;
+		double	interrupt5;
+		double	interrupt15;
 
 	} ZBX_SINGLE_CPU_STAT_DATA;
 

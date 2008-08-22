@@ -217,6 +217,13 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		else if (0 == strcmp(mode, "avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system15)
 		else return SYSINFO_RET_FAIL;
 	}
+	else if (0 == strcmp(type, "interrupt"))
+	{
+		if (0 == strcmp(mode, "avg1")) 		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].interrupt1)
+		else if (0 == strcmp(mode, "avg5")) 	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].interrupt5)
+		else if (0 == strcmp(mode, "avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].interrupt15)
+		else return SYSINFO_RET_FAIL;
+	}
 	else
 		return SYSINFO_RET_FAIL;
 
