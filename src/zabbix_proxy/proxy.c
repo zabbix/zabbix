@@ -165,8 +165,7 @@ int	CONFIG_NODE_NOHISTORY		= 0;
 /* Global variable to control if we should write warnings to log[] */
 int	CONFIG_ENABLE_LOG		= 1;
 
-/* From table config */
-int	CONFIG_REFRESH_UNSUPPORTED	= 0;
+int	CONFIG_REFRESH_UNSUPPORTED	= 600;
 
 /* Zabbix server sturtup time */
 int     CONFIG_SERVER_STARTUP_TIME      = 0;
