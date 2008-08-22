@@ -1593,64 +1593,87 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char **data)
  * Return value:  SUCCEED - evaluated succesfully, exp - updated expression   *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Aleksander Vladishev                             *
  *                                                                            *
  * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)              *
  *                                                                            *
  ******************************************************************************/
 static int	substitute_functions(char **exp, char *error, int maxerrlen)
 {
-	char	*value;
-	char	functionid[MAX_STRING_LEN];
-	int	i,j;
-	int	len;
-	char	*out = NULL;
-	char	c;
+#define ID_LEN 21
+	char	functionid[ID_LEN], *f;
+	char	*out = NULL, *e, *value = NULL;
+	int	out_alloc = 64, out_offset = 0;
+	int	level;
+	char	err[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_functions(%s)",
-		*exp);
+			*exp);
 
-	i = 0;
-	len = strlen(*exp);
-	while(i<len)
+	if (**exp == '\0')
+		goto empty;
+
+	out = zbx_malloc(out, out_alloc);
+
+	for (e = *exp; *e != '\0';)
 	{
-		if((*exp)[i] == '{')
+		if (*e == '{')
 		{
-			for(j=i+1;((*exp)[j]!='}')&&((*exp)[j]!='\0');j++)
+			e++;	/* '{' */
+			f = functionid;
+			while (*e != '}' && *e != '\0')
 			{
-				functionid[j-i-1]=(*exp)[j];
+				if (functionid - f == ID_LEN)
+					break;
+				if (*e < '0' || *e > '9')
+					break;
+
+				*f++ = *e++;
 			}
-			functionid[j-i-1]='\0';
-			if( DBget_function_result( &value, functionid ) != SUCCEED )
+
+			if (*e != '}')
 			{
-/* It may happen because of functions.lastvalue is NULL, so this is not warning  */
-				zbx_snprintf(error,maxerrlen, "Unable to get value for functionid [%s]",
-					functionid);
-				zabbix_log( LOG_LEVEL_DEBUG, "%s",
-					error);
-				zabbix_syslog("%s",
-					error);
-				return	FAIL;
+				zbx_snprintf(error, maxerrlen, "Invalid expression [%s]",
+						*exp);
+				level = LOG_LEVEL_WARNING;
+				goto error;
 			}
-			out =  zbx_strdcat(out,value);
+
+			*f = '\0';
+			e++;	/* '}' */
+
+			if (DBget_function_result(&value, functionid, err, sizeof(err)) != SUCCEED)
+			{
+				zbx_snprintf(error, maxerrlen, "Unable to get function value: %s",
+						err);
+				/* It may happen because of functions.lastvalue is NULL, so this is not warning  */
+				level = LOG_LEVEL_DEBUG;
+				goto error;
+			}
+
+			zbx_strcpy_alloc(&out, &out_alloc, &out_offset, value);
+
 			zbx_free(value);
-			i=j+1;
 		}
 		else
-		{
-			c=(*exp)[i+1]; (*exp)[i+1]='\0';
-			out = zbx_strdcat(out, (*exp+i));
-			(*exp)[i+1]=c;
-			i++;
-		}	
+			zbx_chrcpy_alloc(&out, &out_alloc, &out_offset, *e++);
 	}
 	zbx_free(*exp);
 
 	*exp = out;
-	zabbix_log( LOG_LEVEL_DEBUG, "End substitute_functions [%s]",
-		*exp);
+empty:
+	zabbix_log( LOG_LEVEL_DEBUG, "End substitute_functions() [%s]",
+			*exp);
 
 	return SUCCEED;
+error:
+	if (NULL != out)
+		zbx_free(out);
+
+	zabbix_log(level, "%s", error);
+	zabbix_syslog("%s", error);
+
+	return FAIL;
 }
 
 /******************************************************************************
