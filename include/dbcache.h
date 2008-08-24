@@ -40,7 +40,7 @@ extern char *CONFIG_FILE;
 typedef union{
 	double		value_float;
 	zbx_uint64_t	value_uint64;
-	char		*value_str;/*[HISTORY_STR_VALUE_LEN_MAX];*/
+	char		*value_str;
 } history_value_t;
 
 typedef union {
@@ -94,7 +94,8 @@ void	DCadd_history(zbx_uint64_t itemid, double value, int clock);
 void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 void	DCadd_history_str(zbx_uint64_t itemid, char *value, int clock);
 void	DCadd_history_text(zbx_uint64_t itemid, char *value, int clock);
-void	DCadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, int lastlogsize);
+void	DCadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity,
+		int lastlogsize);
 int	DCsync_history(int sync_type);
 void	init_database_cache(zbx_process_t p);
 void	free_database_cache(void);
