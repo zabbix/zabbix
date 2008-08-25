@@ -1,5 +1,6 @@
 Changes for 1.5.5
 
+ - [DEV-423] fixed processing of delta and speed per second values (Sasha)
  - [DEV-199] added user group selection in configuration of users screen (Artem)
  - [DEV-205] added possibility to add applications from items form (Artem)
  - [DEV-205] added selection of image type in the list of images (Artem)

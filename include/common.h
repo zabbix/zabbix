@@ -252,9 +252,12 @@ typedef enum
 #define ITEM_MULTIPLIER_USE			1
 
 /* Item delta types */
-#define ITEM_STORE_AS_IS		0
-#define ITEM_STORE_SPEED_PER_SECOND	1
-#define ITEM_STORE_SIMPLE_CHANGE	2
+typedef enum
+{
+	ITEM_STORE_AS_IS = 0,
+	ITEM_STORE_SPEED_PER_SECOND,
+	ITEM_STORE_SIMPLE_CHANGE
+} zbx_item_store_type_t;
 
 /* Object types for operations */
 #define OPERATION_OBJECT_USER	0
