@@ -54,6 +54,382 @@ extern int		CONFIG_DBSYNCER_FREQUENCY;
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCget_trend_nearestindex                                         *
+ *                                                                            *
+ * Purpose: find nearest index by itemid in array of ZBX_DC_TREND             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alekasander Vladishev                                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DCget_trend_nearestindex(zbx_uint64_t itemid)
+{
+	int	first_index, last_index, index;
+
+	if (cache->trends_num == 0)
+		return 0;
+
+	first_index = 0;
+	last_index = cache->trends_num - 1;
+	while (1)
+	{
+		index = first_index + (last_index - first_index) / 2;
+
+		if (cache->trends[index].itemid == itemid)
+			return index;
+		else if (last_index == first_index)
+		{
+			if (cache->trends[index].itemid < itemid)
+				index++;
+			return index;
+		}
+		else if (cache->trends[index].itemid < itemid)
+			first_index = index + 1;
+		else
+			last_index = index;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_trend                                                      *
+ *                                                                            *
+ * Purpose: find existing or add new structure and return pointer             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: pointer to a new structure or NULL if array is full          *
+ *                                                                            *
+ * Author: Alekasander Vladishev                                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static ZBX_DC_TREND	*DCget_trend(zbx_uint64_t itemid)
+{
+	int	index;
+
+	index = DCget_trend_nearestindex(itemid);
+	if (index < cache->trends_num && cache->trends[index].itemid == itemid)
+		return &cache->trends[index];
+
+	if (cache->trends_num == ZBX_TREND_SIZE)
+		return NULL;
+
+	memmove(&cache->trends[index + 1], &cache->trends[index], sizeof(ZBX_DC_TREND) * (cache->trends_num - index));
+	memset(&cache->trends[index], 0, sizeof(ZBX_DC_TREND));
+	cache->trends[index].itemid = itemid;
+	cache->trends_num++;
+
+	return &cache->trends[index];
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCflush_trend                                                    *
+ *                                                                            *
+ * Purpose: flush trend to the database                                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alekasander Vladishev                                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCflush_trend(ZBX_DC_TREND *trend, int *sql_offset)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		num;
+	history_value_t	value_min, value_avg, value_max;
+
+	switch (trend->value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			result = DBselect("select num,value_min,value_avg,value_max from trends"
+					" where itemid=" ZBX_FS_UI64 " and clock=%d",
+					trend->itemid,
+					trend->clock);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			result = DBselect("select num,value_min,value_avg,value_max from trends_uint"
+					" where itemid=" ZBX_FS_UI64 " and clock=%d",
+					trend->itemid,
+					trend->clock);
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_CRIT, "Invalid value type for trends.");
+			exit(-1);
+	}
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		num = atoi(row[0]);
+		switch (trend->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				value_min.value_float = atof(row[1]);
+				value_avg.value_float = atof(row[2]);
+				value_max.value_float = atof(row[3]);
+
+				if (value_min.value_float < trend->value_min.value_float)
+					trend->value_min.value_float = value_min.value_float;
+				if (value_max.value_float > trend->value_max.value_float)
+					trend->value_max.value_float = value_max.value_float;
+				trend->value_avg.value_float = (trend->num * trend->value_avg.value_float
+						+ num * value_avg.value_float) / (trend->num + num);
+				trend->num += num;
+
+				zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 512,
+						"update trends set num=%d,value_min=" ZBX_FS_DBL ",value_avg=" ZBX_FS_DBL
+						",value_max=" ZBX_FS_DBL " where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
+						trend->num,
+						trend->value_min.value_float,
+						trend->value_avg.value_float,
+						trend->value_max.value_float,
+						trend->itemid,
+						trend->clock);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				value_min.value_uint64 = zbx_atoui64(row[1]);
+				value_avg.value_uint64 = zbx_atoui64(row[2]);
+				value_max.value_uint64 = zbx_atoui64(row[3]);
+
+				if (value_min.value_uint64 < trend->value_min.value_uint64)
+					trend->value_min.value_uint64 = value_min.value_uint64;
+				if (value_max.value_uint64 > trend->value_max.value_uint64)
+					trend->value_max.value_uint64 = value_max.value_uint64;
+				trend->value_avg.value_uint64 = (trend->num * trend->value_avg.value_uint64
+						+ num * value_avg.value_uint64) / (trend->num + num);
+				trend->num += num;
+				
+				zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 512,
+						"update trends_uint set num=%d,value_min=" ZBX_FS_UI64 ",value_avg=" ZBX_FS_UI64
+						",value_max=" ZBX_FS_UI64 " where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
+						trend->num,
+						trend->value_min.value_uint64,
+						trend->value_avg.value_uint64,
+						trend->value_max.value_uint64,
+						trend->itemid,
+						trend->clock);
+				break;
+		}
+	}
+	else
+	{
+		switch (trend->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 512,
+						"insert into trends (itemid,clock,num,value_min,value_avg,value_max)"
+						" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL ");\n",
+						trend->itemid,
+						trend->clock,
+						trend->num,
+						trend->value_min.value_float,
+						trend->value_avg.value_float,
+						trend->value_max.value_float);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 512,
+						"insert into trends_uint (itemid,clock,num,value_min,value_avg,value_max)"
+						" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ");\n",
+						trend->itemid,
+						trend->clock,
+						trend->num,
+						trend->value_min.value_uint64,
+						trend->value_avg.value_uint64,
+						trend->value_max.value_uint64);
+				break;
+		}
+	}
+	DBfree_result(result);
+
+	trend->clock = 0;
+	trend->num = 0;
+	memset(&trend->value_min, 0, sizeof(history_value_t));
+	memset(&trend->value_avg, 0, sizeof(history_value_t));
+	memset(&trend->value_max, 0, sizeof(history_value_t));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCadd_trend                                                      *
+ *                                                                            *
+ * Purpose: add new value to the trends                                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alekasander Vladishev                                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCadd_trend(ZBX_DC_HISTORY *history, int *sql_offset)
+{
+	ZBX_DC_TREND	*trend = NULL, trend_static;
+	int		hour;
+
+	hour = history->clock - history->clock % 3600;
+	
+	if (NULL != (trend = DCget_trend(history->itemid)))
+	{
+		if (trend->num > 0 && (trend->clock != hour || trend->value_type != history->value_type))
+			DCflush_trend(trend, sql_offset);
+
+		trend->value_type	= history->value_type;
+		trend->clock		= hour;
+
+		switch (trend->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				if (trend->num == 0 || history->value.value_float < trend->value_min.value_float)
+					trend->value_min.value_float = history->value.value_float;
+				if (trend->num == 0 || history->value.value_float > trend->value_max.value_float)
+					trend->value_max.value_float = history->value.value_float;
+				trend->value_avg.value_float = (trend->num * trend->value_avg.value_float
+						+ history->value.value_float) / (trend->num + 1);
+				trend->num++;
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				if (trend->num == 0 || history->value.value_uint64 < trend->value_min.value_uint64)
+					trend->value_min.value_uint64 = history->value.value_uint64;
+				if (trend->num == 0 || history->value.value_uint64 > trend->value_max.value_uint64)
+					trend->value_max.value_uint64 = history->value.value_uint64;
+				trend->value_avg.value_uint64 = (trend->num * trend->value_avg.value_uint64
+						+ history->value.value_uint64) / (trend->num + 1);
+				trend->num++;
+				break;
+		}
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Insufficient space for trends. Flushing to disk.");
+
+		trend_static.itemid = history->itemid;
+		trend_static.clock = hour;
+		trend_static.value_type = history->value_type;
+		trend_static.num = 1;
+		switch (trend_static.value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				trend_static.value_min.value_float = history->value.value_float;
+				trend_static.value_avg.value_float = history->value.value_float;
+				trend_static.value_max.value_float = history->value.value_float;
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				trend_static.value_min.value_uint64 = history->value.value_uint64;
+				trend_static.value_avg.value_uint64 = history->value.value_uint64;
+				trend_static.value_max.value_uint64 = history->value.value_uint64;
+				break;
+		}
+
+		DCflush_trend(trend, sql_offset);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCmass_update_trends                                             *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters: history - array of history data                                *
+ *             history_num - number of history structures                     *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
+{
+	int	sql_offset = 0, i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_update_trends()");
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
+#endif
+
+	for (i = 0; i < history_num; i++)
+	{
+		if (history[i].keep_trends == 0)
+			continue;
+
+		if (history[i].value_type != ITEM_VALUE_TYPE_FLOAT && history[i].value_type != ITEM_VALUE_TYPE_UINT64)
+			continue;
+
+		DCadd_trend(&history[i], &sql_offset);
+	}
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
+#endif
+
+	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCsync_trends                                                    *
+ *                                                                            *
+ * Purpose: flush all trends to the database                                  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alekasander Vladishev                                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	DCsync_trends()
+{
+	int	sql_offset = 0, i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_trends(trends_num: %d)",
+			cache->trends_num);
+	
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
+#endif
+
+	for (i = 0; i < cache->trends_num; i ++)
+		DCflush_trend(&cache->trends[i], &sql_offset);
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
+#endif
+
+	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	{
+		DBbegin();
+		DBexecute("%s", sql);
+		DBcommit();
+	}
+
+	cache->trends_num = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of DCsync_trends()");
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCmass_update_triggers                                           *
  *                                                                            *
  * Purpose: re-calculate and updates values of triggers related to the items  *
@@ -68,7 +444,7 @@ extern int		CONFIG_DBSYNCER_FREQUENCY;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
+static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 {
 	char		*exp;
 	char		error[MAX_STRING_LEN];
@@ -173,8 +549,6 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 	char		value_esc[ITEM_LASTVALUE_LEN_MAX];
 	int		sql_offset = 0, i;
 	ZBX_DC_HISTORY	*h;
-	double		value_float;
-	zbx_uint64_t	value_uint64;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DCmass_update_item()");
 
@@ -219,130 +593,128 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 		if (NULL == h)
 			continue;
 
-/*		if (item.type == ITEM_TYPE_ZABBIX_ACTIVE || item.type == ITEM_TYPE_TRAPPER || item.type == ITEM_TYPE_HTTPTEST)*/
+		if (zbx_process == ZBX_PROCESS_PROXY)
+		{
+			item.delta = ITEM_STORE_AS_IS;
+			h->keep_history = 1;
+			h->keep_trends = 0;
+		}
+		else
+		{
+			h->keep_history = item.history;
+			h->keep_trends = item.trends;
+		}
+
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "update items set lastclock=%d",
 				h->clock);
-/*		else
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "update items set nextcheck=%d,lastclock=%d",
-					calculate_item_nextcheck(item.itemid, item.type, item.delay, item.delay_flex, h->clock),
-					h->clock);*/
 
-		if (item.delta == ITEM_STORE_AS_IS)
-		{
-			if (h->value_type == ITEM_VALUE_TYPE_FLOAT)
-				zbx_snprintf(value_esc, sizeof(value_esc), ZBX_FS_DBL, h->value.value_float);
-			else if (h->value_type == ITEM_VALUE_TYPE_UINT64)
-				zbx_snprintf(value_esc, sizeof(value_esc), ZBX_FS_UI64, h->value.value_uint64);
-			else if (h->value_type == ITEM_VALUE_TYPE_STR
-					|| h->value_type == ITEM_VALUE_TYPE_TEXT
-					|| h->value_type == ITEM_VALUE_TYPE_LOG)
-				DBescape_string(h->value.value_str, value_esc, sizeof(value_esc));
-			else
-				*value_esc = '\0';
-
-			if (h->value_type == ITEM_VALUE_TYPE_LOG)
+		switch (h->value_type) {
+			case ITEM_VALUE_TYPE_FLOAT:
+				switch (item.delta) {
+					case ITEM_STORE_AS_IS:
+						h->value.value_float = h->value_orig.value_float;
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+								",prevvalue=lastvalue,lastvalue='" ZBX_FS_DBL "'",
+								h->value_orig.value_float);
+						break;
+					case ITEM_STORE_SPEED_PER_SECOND:
+						if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value_orig.value_float && item.lastclock < h->clock)
+						{
+							h->value.value_float = (h->value_orig.value_float - item.prevorgvalue_dbl)/(h->clock - item.lastclock);
+							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+									",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
+									",lastvalue='" ZBX_FS_DBL "'",
+									h->value_orig.value_float,
+									h->value.value_float);
+						}
+						else
+						{
+							h->keep_history = 0;
+							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+									",prevorgvalue='" ZBX_FS_DBL "'",
+									h->value_orig.value_float);
+						}
+						break;
+					case ITEM_STORE_SIMPLE_CHANGE:
+						if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value_orig.value_float)
+						{
+							h->value.value_float = h->value_orig.value_float - item.prevorgvalue_dbl;
+							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+									",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
+									",lastvalue='" ZBX_FS_DBL "'",
+									h->value_orig.value_float,
+									h->value.value_float);
+						}
+						else
+						{
+							h->keep_history = 0;
+							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+									",prevorgvalue='" ZBX_FS_DBL "'",
+									h->value_orig.value_float);
+						}
+						break;
+				}
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				switch (item.delta) {
+					case ITEM_STORE_AS_IS:
+						h->value.value_uint64 = h->value_orig.value_uint64;
+						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+								",prevvalue=lastvalue,lastvalue='" ZBX_FS_UI64 "'",
+								h->value_orig.value_uint64);
+						break;
+					case ITEM_STORE_SPEED_PER_SECOND:
+						if (item.prevorgvalue_null == 0 && item.prevorgvalue_uint64 <= h->value_orig.value_uint64 && item.lastclock < h->clock)
+						{
+							h->value.value_uint64 = (zbx_uint64_t)(h->value_orig.value_uint64 - item.prevorgvalue_uint64)/(h->clock - item.lastclock);
+							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+									",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "'"
+									",lastvalue='" ZBX_FS_UI64 "'",
+									h->value_orig.value_uint64,
+									h->value.value_uint64);
+						}
+						else
+						{
+							h->keep_history = 0;
+							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+									",prevorgvalue='" ZBX_FS_DBL "'",
+									h->value_orig.value_uint64);
+						}
+						break;
+					case ITEM_STORE_SIMPLE_CHANGE:
+						if (item.prevorgvalue_null == 0 && item.prevorgvalue_uint64 <= h->value_orig.value_uint64)
+						{
+							h->value.value_uint64 = h->value_orig.value_uint64 - item.prevorgvalue_uint64;
+							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+									",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "'"
+									",lastvalue='" ZBX_FS_UI64 "'",
+									h->value_orig.value_uint64,
+									h->value.value_uint64);
+						}
+						else
+						{
+							h->keep_history = 0;
+							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+									",prevorgvalue='" ZBX_FS_UI64 "'",
+									h->value_orig.value_uint64);
+						}
+						break;
+				}
+				break;
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
+				DBescape_string(h->value_orig.value_str, value_esc, sizeof(value_esc));
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+						",prevvalue=lastvalue,lastvalue='%s'",
+						value_esc);
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				DBescape_string(h->value_orig.value_str, value_esc, sizeof(value_esc));
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 						",prevvalue=lastvalue,lastvalue='%s',lastlogsize=%d",
 						value_esc,
 						h->lastlogsize);
-			else
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512, ",prevvalue=lastvalue,lastvalue='%s'",
-						value_esc);
-		}
-		else if (item.delta == ITEM_STORE_SPEED_PER_SECOND)	/* Logic for delta as speed of change */
-		{
-			if (h->value_type == ITEM_VALUE_TYPE_FLOAT)
-			{
-				if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value.value_float)
-				{
-					/* In order to continue normal processing, we assume difference 1 second
-					   Otherwise function update_functions and update_triggers won't work correctly*/
-					if (h->clock != item.lastclock)
-						value_float = (h->value.value_float - item.prevorgvalue_dbl)
-								/ (h->clock - item.lastclock);
-					else
-						value_float = h->value.value_float - item.prevorgvalue_dbl;
-
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
-							",lastvalue='" ZBX_FS_DBL "'",
-							h->value.value_float,
-							value_float);
-				}
-				else
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-							",prevorgvalue='" ZBX_FS_DBL "'",
-							h->value.value_float);
-			}
-			else if (h->value_type == ITEM_VALUE_TYPE_UINT64)
-			{
-				if (item.prevorgvalue_null == 0 && item.prevorgvalue_uint64 <= h->value.value_uint64)
-				{
-					if (h->clock != item.lastclock)
-						value_uint64 = (h->value.value_uint64 - item.prevorgvalue_uint64)
-								/ (h->clock - item.lastclock);
-					else
-						value_uint64 = h->value.value_uint64 - item.prevorgvalue_uint64;
-
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "'"
-							",lastvalue='" ZBX_FS_UI64 "'",
-							h->value.value_uint64,
-							value_uint64);
-				}
-				else
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-							",prevorgvalue='" ZBX_FS_DBL "'",
-							h->value.value_uint64);
-			}
-		}
-		else if (item.delta == ITEM_STORE_SIMPLE_CHANGE)	/* Real delta: simple difference between values */
-		{
-			if (h->value_type == ITEM_VALUE_TYPE_FLOAT)
-			{
-				if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value.value_float)
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
-							",lastvalue='" ZBX_FS_DBL "'",
-							h->value.value_float,
-							h->value.value_float - item.prevorgvalue_dbl);
-				else
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-							",prevorgvalue='" ZBX_FS_DBL "'",
-							h->value.value_float);
-			}
-			else if(h->value_type == ITEM_VALUE_TYPE_UINT64)
-			{
-				if (item.prevorgvalue_null == 0 && item.prevorgvalue_uint64 <= h->value.value_uint64)
-				{
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "'"
-							",lastvalue='" ZBX_FS_UI64 "'",
-							h->value.value_uint64,
-							h->value.value_uint64 - item.prevorgvalue_uint64);
-				}
-				else
-				{
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-							",prevorgvalue='" ZBX_FS_UI64 "'",
-							h->value.value_uint64);
-				}
-			}
-		}
-
-		/* Update item status if required */
-		if (item.status == ITEM_STATUS_NOTSUPPORTED)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s] became supported by agent on host [%s]",
-					item.key,
-					item.host_name);
-			zabbix_syslog("Parameter [%s] became supported by agent on host [%s]",
-					item.key,
-					item.host_name);
-
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, ",status=%d,error=''",
-					ITEM_STATUS_ACTIVE,
-					item.itemid);
+				break;
 		}
 
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, " where itemid=" ZBX_FS_UI64 ";\n",
@@ -534,7 +906,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (history[i].value_type == ITEM_VALUE_TYPE_FLOAT)
+		if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_FLOAT)
 		{
 #ifdef HAVE_MYSQL
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -573,7 +945,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (history[i].value_type == ITEM_VALUE_TYPE_FLOAT)
+			if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_FLOAT)
 			{
 #ifdef HAVE_MYSQL
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -616,7 +988,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (history[i].value_type == ITEM_VALUE_TYPE_UINT64)
+		if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_UINT64)
 		{
 #ifdef HAVE_MYSQL
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -655,7 +1027,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (history[i].value_type == ITEM_VALUE_TYPE_UINT64)
+			if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_UINT64)
 			{
 #ifdef HAVE_MYSQL
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -698,9 +1070,9 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (history[i].value_type == ITEM_VALUE_TYPE_STR)
+		if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_STR)
 		{
-			DBescape_string(history[i].value.value_str, value_esc, sizeof(value_esc));
+			DBescape_string(history[i].value_orig.value_str, value_esc, sizeof(value_esc));
 #ifdef HAVE_MYSQL
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 					"(" ZBX_FS_UI64 ",%d,'%s'),",
@@ -738,9 +1110,9 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (history[i].value_type == ITEM_VALUE_TYPE_STR)
+			if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_STR)
 			{
-				DBescape_string(history[i].value.value_str, value_esc, sizeof(value_esc));
+				DBescape_string(history[i].value_orig.value_str, value_esc, sizeof(value_esc));
 #ifdef HAVE_MYSQL
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 						"(%d," ZBX_FS_UI64 ",%d,'%s'),",
@@ -795,9 +1167,9 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (history[i].value_type == ITEM_VALUE_TYPE_TEXT)
+			if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_TEXT)
 			{
-				value_esc_dyn = DBdyn_escape_string(history[i].value.value_str);
+				value_esc_dyn = DBdyn_escape_string(history[i].value_orig.value_str);
 #ifdef HAVE_MYSQL
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
 						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s'),",
@@ -845,10 +1217,10 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (history[i].value_type == ITEM_VALUE_TYPE_LOG)
+			if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_LOG)
 			{
 				DBescape_string(history[i].source, value_esc, sizeof(value_esc));
-				value_esc_dyn = DBdyn_escape_string(history[i].value.value_str);
+				value_esc_dyn = DBdyn_escape_string(history[i].value_orig.value_str);
 #ifdef HAVE_MYSQL
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
 						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s'),",
@@ -942,14 +1314,14 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 					"(" ZBX_FS_UI64 ",%d,'" ZBX_FS_DBL "'),",
 					history[i].itemid,
 					history[i].clock,
-					history[i].value.value_float);
+					history[i].value_orig.value_float);
 #else
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 					"insert into proxy_history (itemid,clock,value) values "
 					"(" ZBX_FS_UI64 ",%d,'" ZBX_FS_DBL "');\n",
 					history[i].itemid,
 					history[i].clock,
-					history[i].value.value_float);
+					history[i].value_orig.value_float);
 #endif
 		}
 	}
@@ -979,14 +1351,14 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 					"(" ZBX_FS_UI64 ",%d,'" ZBX_FS_UI64 "'),",
 					history[i].itemid,
 					history[i].clock,
-					history[i].value.value_uint64);
+					history[i].value_orig.value_uint64);
 #else
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 					"insert into proxy_history (itemid,clock,value) values "
 					"(" ZBX_FS_UI64 ",%d,'" ZBX_FS_UI64 "');\n",
 					history[i].itemid,
 					history[i].clock,
-					history[i].value.value_uint64);
+					history[i].value_orig.value_uint64);
 #endif
 		}
 	}
@@ -1011,7 +1383,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		if (history[i].value_type == ITEM_VALUE_TYPE_STR)
 		{
-			DBescape_string(history[i].value.value_str, value_esc, sizeof(value_esc));
+			DBescape_string(history[i].value_orig.value_str, value_esc, sizeof(value_esc));
 #ifdef HAVE_MYSQL
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 					"(" ZBX_FS_UI64 ",%d,'%s'),",
@@ -1049,7 +1421,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		if (history[i].value_type == ITEM_VALUE_TYPE_TEXT)
 		{
-			value_esc_dyn = DBdyn_escape_string(history[i].value.value_str);
+			value_esc_dyn = DBdyn_escape_string(history[i].value_orig.value_str);
 #ifdef HAVE_MYSQL
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
 					"(" ZBX_FS_UI64 ",%d,'%s'),",
@@ -1089,7 +1461,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 		if (history[i].value_type == ITEM_VALUE_TYPE_LOG)
 		{
 			DBescape_string(history[i].source, value_esc, sizeof(value_esc));
-			value_esc_dyn = DBdyn_escape_string(history[i].value.value_str);
+			value_esc_dyn = DBdyn_escape_string(history[i].value_orig.value_str);
 #ifdef HAVE_MYSQL
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
 					"(" ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s'),",
@@ -1198,7 +1570,7 @@ int	DCsync_history(int sync_type)
 						|| history[history_num].value_type == ITEM_VALUE_TYPE_TEXT
 						|| history[history_num].value_type == ITEM_VALUE_TYPE_LOG)
 				{
-					history[history_num].value.value_str = strdup(cache->history[f].value.value_str);
+					history[history_num].value_orig.value_str = strdup(cache->history[f].value_orig.value_str);
 
 					if (history[history_num].value_type == ITEM_VALUE_TYPE_LOG)
 					{
@@ -1234,17 +1606,15 @@ int	DCsync_history(int sync_type)
 		if (0 == history_num)
 			break;
 
-		if (NULL == sql)
-			sql = zbx_malloc(sql, sql_allocated);
-
 		DBbegin();
 
 		if (zbx_process == ZBX_PROCESS_SERVER)
 		{
-			DCmass_add_history(history, history_num);
 			DCmass_update_item(history, history_num);
+			DCmass_add_history(history, history_num);
 			DCmass_function_update(history, history_num);
 			DCmass_update_triggers(history, history_num);
+			DCmass_update_trends(history, history_num);
 		}
 		else
 		{
@@ -1260,7 +1630,7 @@ int	DCsync_history(int sync_type)
 					|| history[i].value_type == ITEM_VALUE_TYPE_TEXT
 					|| history[i].value_type == ITEM_VALUE_TYPE_LOG)
 			{
-				zbx_free(history[i].value.value_str);
+				zbx_free(history[i].value_orig.value_str);
 
 				if (history[i].value_type == ITEM_VALUE_TYPE_LOG && NULL != history[i].source)
 					zbx_free(history[i].source);
@@ -1304,7 +1674,7 @@ static void DCvacuum_text()
 				|| cache->history[index].value_type == ITEM_VALUE_TYPE_TEXT
 				|| cache->history[index].value_type == ITEM_VALUE_TYPE_LOG)
 		{
-			first_text = cache->history[index].value.value_str;
+			first_text = cache->history[index].value_orig.value_str;
 			break;
 		}
 	}
@@ -1319,7 +1689,7 @@ static void DCvacuum_text()
 					|| cache->history[index].value_type == ITEM_VALUE_TYPE_TEXT
 					|| cache->history[index].value_type == ITEM_VALUE_TYPE_LOG)
 			{
-				cache->history[index].value.value_str -= offset;
+				cache->history[index].value_orig.value_str -= offset;
 
 				if (cache->history[index].value_type == ITEM_VALUE_TYPE_LOG && NULL != cache->history[index].source)
 					cache->history[index].source -= offset;
@@ -1401,318 +1771,6 @@ retry:
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_trend_nearestindex                                         *
- *                                                                            *
- * Purpose: find nearest index by itemid in array of ZBX_DC_TREND             *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alekasander Vladishev                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	DCget_trend_nearestindex(zbx_uint64_t itemid)
-{
-	int	first_index, last_index, index;
-
-	if (cache->trends_num == 0)
-		return 0;
-
-	first_index = 0;
-	last_index = cache->trends_num - 1;
-	while (1)
-	{
-		index = first_index + (last_index - first_index) / 2;
-
-		if (cache->trends[index].itemid == itemid)
-			return index;
-		else if (last_index == first_index)
-		{
-			if (cache->trends[index].itemid < itemid)
-				index++;
-			return index;
-		}
-		else if (cache->trends[index].itemid < itemid)
-			first_index = index + 1;
-		else
-			last_index = index;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCget_trend                                                      *
- *                                                                            *
- * Purpose: find existing or add new structure and return pointer             *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: pointer to a new structure or NULL if array is full          *
- *                                                                            *
- * Author: Alekasander Vladishev                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static ZBX_DC_TREND	*DCget_trend(zbx_uint64_t itemid)
-{
-	int	index;
-
-	index = DCget_trend_nearestindex(itemid);
-	if (index < cache->trends_num && cache->trends[index].itemid == itemid)
-		return &cache->trends[index];
-
-	if (cache->trends_num == ZBX_TREND_SIZE)
-		return NULL;
-
-	memmove(&cache->trends[index + 1], &cache->trends[index], sizeof(ZBX_DC_TREND) * (cache->trends_num - index));
-	memset(&cache->trends[index], 0, sizeof(ZBX_DC_TREND));
-	cache->trends[index].itemid = itemid;
-	cache->trends_num++;
-
-	return &cache->trends[index];
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCflush_trend                                                    *
- *                                                                            *
- * Purpose: flush trend to the database                                       *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alekasander Vladishev                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static void	DCflush_trend(ZBX_DC_TREND *trend)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		num;
-	trend_value_t	value_min, value_avg, value_max;
-
-	switch (trend->value_type)
-	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			result = DBselect("select num,value_min,value_avg,value_max from trends"
-					" where itemid=" ZBX_FS_UI64 " and clock=%d",
-					trend->itemid,
-					trend->clock);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			result = DBselect("select num,value_min,value_avg,value_max from trends_uint"
-					" where itemid=" ZBX_FS_UI64 " and clock=%d",
-					trend->itemid,
-					trend->clock);
-			break;
-		default:
-			zabbix_log(LOG_LEVEL_CRIT, "Invalid value type for trends.");
-			exit(-1);
-	}
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		num = atoi(row[0]);
-		switch (trend->value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				value_min.value_float = atof(row[1]);
-				value_avg.value_float = atof(row[2]);
-				value_max.value_float = atof(row[3]);
-
-				if (value_min.value_float < trend->value_min.value_float)
-					trend->value_min.value_float = value_min.value_float;
-				if (value_max.value_float > trend->value_max.value_float)
-					trend->value_max.value_float = value_max.value_float;
-				trend->value_avg.value_float = (trend->num * trend->value_avg.value_float
-						+ num * value_avg.value_float) / (trend->num + num);
-				trend->num += num;
-
-				DBexecute("update trends set num=%d,value_min=" ZBX_FS_DBL ",value_avg=" ZBX_FS_DBL
-						",value_max=" ZBX_FS_DBL " where itemid=" ZBX_FS_UI64 " and clock=%d",
-						trend->num,
-						trend->value_min.value_float,
-						trend->value_avg.value_float,
-						trend->value_max.value_float,
-						trend->itemid,
-						trend->clock);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				value_min.value_uint64 = zbx_atoui64(row[1]);
-				value_avg.value_uint64 = zbx_atoui64(row[2]);
-				value_max.value_uint64 = zbx_atoui64(row[3]);
-
-				if (value_min.value_uint64 < trend->value_min.value_uint64)
-					trend->value_min.value_uint64 = value_min.value_uint64;
-				if (value_max.value_uint64 > trend->value_max.value_uint64)
-					trend->value_max.value_uint64 = value_max.value_uint64;
-				trend->value_avg.value_uint64 = (trend->num * trend->value_avg.value_uint64
-						+ num * value_avg.value_uint64) / (trend->num + num);
-				trend->num += num;
-				
-				DBexecute("update trends_uint set num=%d,value_min=" ZBX_FS_UI64 ",value_avg=" ZBX_FS_UI64
-						",value_max=" ZBX_FS_UI64 " where itemid=" ZBX_FS_UI64 " and clock=%d",
-						trend->num,
-						trend->value_min.value_uint64,
-						trend->value_avg.value_uint64,
-						trend->value_max.value_uint64,
-						trend->itemid,
-						trend->clock);
-				break;
-		}
-	}
-	else
-	{
-		switch (trend->value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				DBexecute("insert into trends (itemid,clock,num,value_min,value_avg,value_max)"
-						" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL ")",
-						trend->itemid,
-						trend->clock,
-						trend->num,
-						trend->value_min.value_float,
-						trend->value_avg.value_float,
-						trend->value_max.value_float);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				DBexecute("insert into trends_uint (itemid,clock,num,value_min,value_avg,value_max)"
-						" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-						trend->itemid,
-						trend->clock,
-						trend->num,
-						trend->value_min.value_uint64,
-						trend->value_avg.value_uint64,
-						trend->value_max.value_uint64);
-				break;
-		}
-	}
-	DBfree_result(result);
-
-	trend->clock = 0;
-	trend->num = 0;
-	memset(&trend->value_min, 0, sizeof(trend_value_t));
-	memset(&trend->value_avg, 0, sizeof(trend_value_t));
-	memset(&trend->value_max, 0, sizeof(trend_value_t));
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCsync_trends                                                    *
- *                                                                            *
- * Purpose: flush all trends to the database                                  *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alekasander Vladishev                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void	DCsync_trends()
-{
-	int	i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_trends(trends_num: %d)",
-			cache->trends_num);
-	
-	for (i = 0; i < cache->trends_num; i ++)
-		DCflush_trend(&cache->trends[i]);
-
-	cache->trends_num = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DCsync_trends()");
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCadd_trend                                                      *
- *                                                                            *
- * Purpose: add new value to the trends                                       *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alekasander Vladishev                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void	DCadd_trend(ZBX_DC_HISTORY *history)
-{
-	ZBX_DC_TREND	*trend = NULL, trend_static;
-	int		clock;
-
-	clock = history->clock - history->clock % 3600;
-	
-	if (NULL != (trend = DCget_trend(history->itemid)))
-	{
-		if (trend->num > 0 && (trend->clock != clock || trend->value_type != history->value_type))
-			DCflush_trend(trend);
-
-		trend->value_type	= history->value_type;
-		trend->clock		= clock;
-
-		switch (trend->value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				if (trend->num == 0 || history->value.value_float < trend->value_min.value_float)
-					trend->value_min.value_float = history->value.value_float;
-				if (trend->num == 0 || history->value.value_float > trend->value_max.value_float)
-					trend->value_max.value_float = history->value.value_float;
-				trend->value_avg.value_float = (trend->num * trend->value_avg.value_float
-						+ history->value.value_float) / (trend->num + 1);
-				trend->num++;
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				if (trend->num == 0 || history->value.value_uint64 < trend->value_min.value_uint64)
-					trend->value_min.value_uint64 = history->value.value_uint64;
-				if (trend->num == 0 || history->value.value_uint64 > trend->value_max.value_uint64)
-					trend->value_max.value_uint64 = history->value.value_uint64;
-				trend->value_avg.value_uint64 = (trend->num * trend->value_avg.value_uint64
-						+ history->value.value_uint64) / (trend->num + 1);
-				trend->num++;
-				break;
-		}
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Insufficient space for trends. Flushing to disk.");
-
-		trend_static.itemid = history->itemid;
-		trend_static.clock = clock;
-		trend_static.value_type = history->value_type;
-		trend_static.num = 1;
-		switch (trend_static.value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				trend_static.value_min.value_float = history->value.value_float;
-				trend_static.value_avg.value_float = history->value.value_float;
-				trend_static.value_max.value_float = history->value.value_float;
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				trend_static.value_min.value_uint64 = history->value.value_uint64;
-				trend_static.value_avg.value_uint64 = history->value.value_uint64;
-				trend_static.value_max.value_uint64 = history->value.value_uint64;
-				break;
-		}
-
-		DCflush_trend(trend);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DCadd_history                                                    *
  *                                                                            *
  * Purpose:                                                                   *
@@ -1726,7 +1784,7 @@ void	DCadd_trend(ZBX_DC_HISTORY *history)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCadd_history(zbx_uint64_t itemid, double value, int clock)
+void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock)
 {
 	ZBX_DC_HISTORY	*history;
 
@@ -1737,9 +1795,9 @@ void	DCadd_history(zbx_uint64_t itemid, double value, int clock)
 	history->itemid			= itemid;
 	history->clock			= clock;
 	history->value_type		= ITEM_VALUE_TYPE_FLOAT;
-	history->value.value_float	= value;
-
-	DCadd_trend(history);
+	history->value_orig.value_float	= value_orig;
+	history->value.value_float	= 0;
+	history->keep_history		= 0;
 
 	UNLOCK_CACHE;
 }
@@ -1759,7 +1817,7 @@ void	DCadd_history(zbx_uint64_t itemid, double value, int clock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
+void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int clock)
 {
 	ZBX_DC_HISTORY	*history;
 
@@ -1767,12 +1825,12 @@ void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 
 	history = DCget_history_ptr(itemid, 0);
 
-	history->itemid			= itemid;
-	history->clock			= clock;
-	history->value_type		= ITEM_VALUE_TYPE_UINT64;
-	history->value.value_uint64	= value;
-
-	DCadd_trend(history);
+	history->itemid				= itemid;
+	history->clock				= clock;
+	history->value_type			= ITEM_VALUE_TYPE_UINT64;
+	history->value_orig.value_uint64	= value_orig;
+	history->value.value_uint64		= 0;
+	history->keep_history			= 0;
 
 	UNLOCK_CACHE;
 }
@@ -1792,22 +1850,24 @@ void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCadd_history_str(zbx_uint64_t itemid, char *value, int clock)
+void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock)
 {
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
 	LOCK_CACHE;
 
-	len = strlen(value) + 1;
+	len = strlen(value_orig) + 1;
 	history = DCget_history_ptr(itemid, len);
 
 	history->itemid			= itemid;
 	history->clock			= clock;
 	history->value_type		= ITEM_VALUE_TYPE_STR;
+	history->value_orig.value_str	= cache->last_text;
 	history->value.value_str	= cache->last_text;
-	zbx_strlcpy(cache->last_text, value, len);
+	zbx_strlcpy(cache->last_text, value_orig, len);
 	cache->last_text		+= len;
+	history->keep_history		= 0;
 
 	UNLOCK_CACHE;
 }
@@ -1827,22 +1887,24 @@ void	DCadd_history_str(zbx_uint64_t itemid, char *value, int clock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCadd_history_text(zbx_uint64_t itemid, char *value, int clock)
+void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock)
 {
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
 	LOCK_CACHE;
 
-	len = strlen(value) + 1;
+	len = strlen(value_orig) + 1;
 	history = DCget_history_ptr(itemid, len);
 
 	history->itemid			= itemid;
 	history->clock			= clock;
 	history->value_type		= ITEM_VALUE_TYPE_TEXT;
+	history->value_orig.value_str	= cache->last_text;
 	history->value.value_str	= cache->last_text;
-	zbx_strlcpy(cache->last_text, value, len);
+	zbx_strlcpy(cache->last_text, value_orig, len);
 	cache->last_text		+= len;
+	history->keep_history		= 0;
 
 	UNLOCK_CACHE;
 }
@@ -1862,22 +1924,23 @@ void	DCadd_history_text(zbx_uint64_t itemid, char *value, int clock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, int lastlogsize)
+void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int timestamp, char *source, int severity, int lastlogsize)
 {
 	ZBX_DC_HISTORY	*history;
 	size_t		len1, len2;
 
 	LOCK_CACHE;
 
-	len1 = strlen(value) + 1;
+	len1 = strlen(value_orig) + 1;
 	len2 = (NULL != source && *source != '\0') ? strlen(source) + 1 : 0;
 	history = DCget_history_ptr(itemid, len1 + len2);
 
 	history->itemid			= itemid;
 	history->clock			= clock;
 	history->value_type		= ITEM_VALUE_TYPE_LOG;
+	history->value_orig.value_str	= cache->last_text;
 	history->value.value_str	= cache->last_text;
-	zbx_strlcpy(cache->last_text, value, len1);
+	zbx_strlcpy(cache->last_text, value_orig, len1);
 	cache->last_text		+= len1;
 	history->timestamp		= timestamp;
 
@@ -1891,6 +1954,7 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestam
 
 	history->severity		= severity;
 	history->lastlogsize		= lastlogsize;
+	history->keep_history		= 0;
 
 	UNLOCK_CACHE;
 }
@@ -1966,6 +2030,10 @@ lbl_create:
 	}
 
 	cache->last_text = cache->text;
+
+	if (NULL == sql)
+		sql = zbx_malloc(sql, sql_allocated);
+
 }
 
 /******************************************************************************
@@ -1988,8 +2056,7 @@ static void	DCsync_all()
 	zabbix_log(LOG_LEVEL_DEBUG,"In DCsync_all()");
 
 	DCsync_history(ZBX_SYNC_FULL);
-	if (zbx_process == ZBX_PROCESS_SERVER)
-		DCsync_trends();
+	DCsync_trends();
 
 	zabbix_log(LOG_LEVEL_DEBUG,"End of DCsync_all()");
 }

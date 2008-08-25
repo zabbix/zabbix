@@ -43,21 +43,19 @@ typedef union{
 	char		*value_str;
 } history_value_t;
 
-typedef union {
-	double		value_float;
-	zbx_uint64_t	value_uint64;
-} trend_value_t;
-
 ZBX_DC_HISTORY
 {
 	zbx_uint64_t	itemid;
 	int		clock;
 	int		value_type;
+	history_value_t	value_orig;
 	history_value_t	value;
 	int		timestamp;
 	char		*source;
 	int		severity;
 	int		lastlogsize;
+	int		keep_history;
+	int		keep_trends;
 };
 
 ZBX_DC_TREND
@@ -66,9 +64,9 @@ ZBX_DC_TREND
 	int		clock;
 	int		num;
 	int		value_type;
-	trend_value_t	value_min;
-	trend_value_t	value_avg;
-	trend_value_t	value_max;
+	history_value_t	value_min;
+	history_value_t	value_avg;
+	history_value_t	value_max;
 };
 
 ZBX_DC_CACHE
@@ -90,11 +88,11 @@ ZBX_DC_NEXTCHECK
 	char		*error_msg;
 };
 
-void	DCadd_history(zbx_uint64_t itemid, double value, int clock);
-void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
-void	DCadd_history_str(zbx_uint64_t itemid, char *value, int clock);
-void	DCadd_history_text(zbx_uint64_t itemid, char *value, int clock);
-void	DCadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity,
+void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock);
+void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int clock);
+void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock);
+void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock);
+void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int timestamp, char *source, int severity,
 		int lastlogsize);
 int	DCsync_history(int sync_type);
 void	init_database_cache(zbx_process_t p);
