@@ -188,7 +188,7 @@
 		
 		$result = array();
 
-		if(is_null($perm_res)) $perm_res = PERM_RES_STRING_LINE;
+		if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
 		$nodeid_str =(is_array($nodeid))?implode('',$nodeid):strval($nodeid);
 		$hostid_str =(is_array($hostid))?implode('',$hostid):strval($hostid);
 			
@@ -236,19 +236,19 @@
 	}
 
 
-	/*
-	 * Function: get_severity_style 
-	 *
-	 * Description: 
-	 *     convert severity constant in to the CSS style name
-	 *     
-	 * Author: 
-	 *     Aly
-	 *
-	 * Comments:
-	 *
-	 */
-	function	get_severity_style($severity,$type=true){
+/*
+ * Function: get_severity_style 
+ *
+ * Description: 
+ *     convert severity constant in to the CSS style name
+ *     
+ * Author: 
+ *     Aly
+ *
+ * Comments:
+ *
+ */
+	function get_severity_style($severity,$type=true){
 		switch($severity){
 			case TRIGGER_SEVERITY_DISASTER:
 				$style='disaster';
@@ -270,18 +270,18 @@
 	return $style;
 	}
 	
-	/*
-	 * Function: get_service_status_of_trigger
-	 *
-	 * Description: 
-	 *     retrive trigger's priority for services
-	 *     
-	 * Author: 
-	 *     Artem Suharev
-	 *
-	 * Comments:
-	 *
-	 */
+/*
+ * Function: get_service_status_of_trigger
+ *
+ * Description: 
+ *     retrive trigger's priority for services
+ *     
+ * Author: 
+ *     Artem Suharev
+ *
+ * Comments:
+ *
+ */
 	
 	function get_service_status_of_trigger($triggerid){
 		$sql = 'SELECT triggerid, priority '.
@@ -295,19 +295,19 @@
 	return $status;
 	}
 	
-	/*
-	 * Function: get_severity_description 
-	 *
-	 * Description: 
-	 *     convert severity constant in to the string representation
-	 *     
-	 * Author: 
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
-	function	get_severity_description($severity){
+/*
+ * Function: get_severity_description 
+ *
+ * Description: 
+ *     convert severity constant in to the string representation
+ *     
+ * Author: 
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ */
+	function get_severity_description($severity){
 		if($severity == TRIGGER_SEVERITY_NOT_CLASSIFIED)	return S_NOT_CLASSIFIED;
 		else if($severity == TRIGGER_SEVERITY_INFORMATION)	return S_INFORMATION;
 		else if($severity == TRIGGER_SEVERITY_WARNING)		return S_WARNING;
@@ -318,19 +318,19 @@
 		return S_UNKNOWN;
 	}
 
-	/*
-	 * Function: get_trigger_value_style 
-	 *
-	 * Description: 
-	 *     convert trigger value in to the CSS style name
-	 *     
-	 * Author: 
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
-	function	get_trigger_value_style($value){
+/*
+ * Function: get_trigger_value_style 
+ *
+ * Description: 
+ *     convert trigger value in to the CSS style name
+ *     
+ * Author: 
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ */
+	function get_trigger_value_style($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= 'off';
 		$str_val[TRIGGER_VALUE_TRUE]	= 'on';
 		$str_val[TRIGGER_VALUE_UNKNOWN]	= 'unknown';
@@ -341,19 +341,19 @@
 		return '';
 	}
 
-	/*
-	 * Function: trigger_value2str 
-	 *
-	 * Description: 
-	 *     convert trigger value in to the string representation
-	 *     
-	 * Author: 
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
-	function	trigger_value2str($value){
+/*
+ * Function: trigger_value2str 
+ *
+ * Description: 
+ *     convert trigger value in to the string representation
+ *     
+ * Author: 
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ */
+	function trigger_value2str($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= S_OK_BIG;
 		$str_val[TRIGGER_VALUE_TRUE]	= S_PROBLEM_BIG;
 		$str_val[TRIGGER_VALUE_UNKNOWN]	= S_UNKNOWN_BIG;
@@ -364,18 +364,18 @@
 		return S_UNKNOWN;
 	}
 
-	/*
-	 * Function: get_realhosts_by_triggerid 
-	 *
-	 * Description: 
-	 *     retrive real host for trigger
-	 *     
-	 * Author: 
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
+/*
+ * Function: get_realhosts_by_triggerid 
+ *
+ * Description: 
+ *     retrive real host for trigger
+ *     
+ * Author: 
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ */
 	function get_realhosts_by_triggerid($triggerid){
 		$trigger = get_trigger_by_triggerid($triggerid);
 		if($trigger['templateid'] > 0)
@@ -464,18 +464,18 @@
 	return DBselect('SELECT * FROM triggers WHERE '.DBcondition('templateid',$triggerids));
 	}
 
-	/*
-	 * Function: get_hosts_by_expression
-	 *
-	 * Description: 
-	 *     retrive selection of hosts by trigger expression
-	 *     
-	 * Author: 
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
+/*
+ * Function: get_hosts_by_expression
+ *
+ * Description: 
+ *     retrive selection of hosts by trigger expression
+ *     
+ * Author: 
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ */
 	function get_hosts_by_expression($expression){
 		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO;
 
@@ -501,21 +501,21 @@
 			' and host in ('.implode(',',$hosts).')');
 	}
 
-	/*
-	 * Function: zbx_unquote_param
-	 *
-	 * Description: 
-	 *     unquote string and unescape cahrs
-	 *     
-	 * Author: 
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *     Double quotes used only.
-	 *     Unquote string only if value directly in quotes.
-	 *     Unescape only '\\' and '\"' combination
-	 *
-	 */
+/*
+ * Function: zbx_unquote_param
+ *
+ * Description: 
+ *     unquote string and unescape cahrs
+ *     
+ * Author: 
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *     Double quotes used only.
+ *     Unquote string only if value directly in quotes.
+ *     Unescape only '\\' and '\"' combination
+ *
+ */
 	function zbx_unquote_param($value){
 		$value = trim($value);
 		if ( !empty($value) && '"' == $value[0] ){ 
@@ -581,18 +581,18 @@
 	return $params;
 	}
 
-	/*
-	 * Function: validate_expression 
-	 *
-	 * Description: 
-	 *     check trigger expression syntax and validate values
-	 *     
-	 * Author: 
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
+/*
+ * Function: validate_expression 
+ *
+ * Description: 
+ *     check trigger expression syntax and validate values
+ *     
+ * Author: 
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ */
 	function validate_expression($expression){
 		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
 
@@ -675,8 +675,7 @@
 							}
 						}
 
-						if( 'sec' == $params['type'] 
-							&& (validate_float($parameter[$pid])!=0) ){
+						if( 'sec' == $params['type'] && (validate_float($parameter[$pid])!=0) ){
 							error('['.$parameter[$pid].'] is not a float for function ('.$function.')');
 							return false;
 						}
@@ -1716,7 +1715,7 @@
 		while($trigger = DBfetch($triggers)){
 			if($trigger['templateid']==0)	continue;
 
-			if($templateid != null){				
+			if($templateids != null){				
 				$db_tmp_hosts = get_hosts_by_triggerid($trigger["templateid"]);
 				$tmp_host = DBfetch($db_tmp_hosts);
 
