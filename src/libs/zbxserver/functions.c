@@ -22,6 +22,7 @@
 
 #include "comms.h"
 #include "db.h"
+#include "dbcache.h"
 #include "log.h"
 #include "zlog.h"
 
@@ -171,6 +172,78 @@ void	update_triggers(zbx_uint64_t itemid)
 	DBfree_result(result);
 	zabbix_log( LOG_LEVEL_DEBUG, "End update_triggers [" ZBX_FS_UI64 "]",
 		itemid);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_add_history                                                   *
+ *                                                                            *
+ * Purpose: add new value to the cache                                        *
+ *                                                                            *
+ * Parameters: item - item data                                               *
+ *             value - new value of the item                                  *
+ *             now   - new value of the item                                  *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
+{
+	if (value->type & AR_UINT64)
+		zabbix_log(LOG_LEVEL_DEBUG, "In dc_add_history(itemid:" ZBX_FS_UI64 ",key:\"%s\",value_type:%d,UINT64:"ZBX_FS_UI64")",
+			item->itemid,
+			item->key,
+			item->value_type,
+			value->ui64);
+	if (value->type & AR_STRING)
+		zabbix_log(LOG_LEVEL_DEBUG, "In dc_add_history(itemid:" ZBX_FS_UI64 ",key:\"%s\",value_type:%d,STRING:%s)",
+			item->itemid,
+			item->key,
+			item->value_type,
+			value->str);
+	if (value->type & AR_DOUBLE)
+		zabbix_log(LOG_LEVEL_DEBUG, "In dc_add_history(itemid:" ZBX_FS_UI64 ",key:\"%s\",value_type:%d,DOUBLE:"ZBX_FS_DBL")",
+			item->itemid,
+			item->key,
+			item->value_type,
+			value->dbl);
+	if (value->type & AR_TEXT)
+		zabbix_log(LOG_LEVEL_DEBUG, "In dc_add_history(itemid: "ZBX_FS_UI64 ",key:\"%s\",value_type:%d,TEXT:[%s])",
+			item->itemid,
+			item->key,
+			item->value_type,
+			value->text);
+
+	switch (item->value_type) {
+		case ITEM_VALUE_TYPE_FLOAT:
+			if (GET_DBL_RESULT(value))
+				DCadd_history(item->itemid, value->dbl, now);
+			break;
+		case ITEM_VALUE_TYPE_STR:
+			if (GET_STR_RESULT(value))
+				DCadd_history_str(item->itemid, value->str, now);
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			if (GET_STR_RESULT(value))
+				DCadd_history_log(item->itemid, value->str, now, item->timestamp, item->eventlog_source,
+						item->eventlog_severity, item->lastlogsize);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			if (GET_UI64_RESULT(value))
+				DCadd_history_uint(item->itemid, value->ui64, now);
+			break;
+		case ITEM_VALUE_TYPE_TEXT:
+			if (GET_TEXT_RESULT(value))
+				DCadd_history_text(item->itemid, value->text, now);
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
+				item->value_type,
+				item->itemid);
+	}
+	zabbix_log( LOG_LEVEL_DEBUG, "End of add_history");
 }
 
 /******************************************************************************
@@ -576,16 +649,15 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 			}
 		}
 	}
-/*
-zabbix_log(LOG_LEVEL_CRIT, "I");
-*/
 
-	add_history(item, value, now);
 	if (0 == CONFIG_DBSYNCER_FORKS)
 	{
+		add_history(item, value, now);
 		update_item(item, value, now);
 		update_functions(item);
 	}
+	else
+		dc_add_history(item, value, now);
 }
 
 /******************************************************************************
@@ -603,67 +675,62 @@ zabbix_log(LOG_LEVEL_CRIT, "I");
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
+static void	proxy_add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 {
-	int ret = SUCCEED;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In proxy_add_history(key:%s,value_type:%X,type:%X)",
-		item->key,
-		item->value_type,
-		value->type);
-
 	if (value->type & AR_UINT64)
-		zabbix_log( LOG_LEVEL_DEBUG, "In proxy_add_history(itemid:" ZBX_FS_UI64 ",UINT64:" ZBX_FS_UI64 ")",
+		zabbix_log(LOG_LEVEL_DEBUG, "In add_history(itemid:" ZBX_FS_UI64 ",key:\"%s\",value_type:%d,UINT64:"ZBX_FS_UI64")",
 			item->itemid,
+			item->key,
+			item->value_type,
 			value->ui64);
 	if (value->type & AR_STRING)
-		zabbix_log( LOG_LEVEL_DEBUG, "In proxy_add_history(itemid:" ZBX_FS_UI64 ",STRING:%s)",
+		zabbix_log(LOG_LEVEL_DEBUG, "In add_history(itemid:" ZBX_FS_UI64 ",key:\"%s\",value_type:%d,STRING:%s)",
 			item->itemid,
+			item->key,
+			item->value_type,
 			value->str);
 	if (value->type & AR_DOUBLE)
-		zabbix_log( LOG_LEVEL_DEBUG, "In proxy_add_history(itemid:" ZBX_FS_UI64 ",DOUBLE:" ZBX_FS_DBL ")",
+		zabbix_log(LOG_LEVEL_DEBUG, "In add_history(itemid:" ZBX_FS_UI64 ",key:\"%s\",value_type:%d,DOUBLE:"ZBX_FS_DBL")",
 			item->itemid,
+			item->key,
+			item->value_type,
 			value->dbl);
 	if (value->type & AR_TEXT)
-		zabbix_log( LOG_LEVEL_DEBUG, "In proxy_add_history(itemid:" ZBX_FS_UI64 ",TEXT:[%s])",
+		zabbix_log(LOG_LEVEL_DEBUG, "In add_history(itemid: "ZBX_FS_UI64 ",key:\"%s\",value_type:%d,TEXT:[%s])",
 			item->itemid,
+			item->key,
+			item->value_type,
 			value->text);
 
-	if(item->value_type==ITEM_VALUE_TYPE_UINT64)
-	{
-		if(GET_UI64_RESULT(value))
-			DBproxy_add_history_uint(item->itemid, value->ui64, now);
-	}
-	else if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
-	{
-		if(GET_DBL_RESULT(value))
-			DBproxy_add_history(item->itemid, value->dbl, now);
-	}
-	else if(item->value_type==ITEM_VALUE_TYPE_STR)
-	{
-		if(GET_STR_RESULT(value))
-			DBproxy_add_history_str(item->itemid, value->str, now);
-	}
-	else if(item->value_type==ITEM_VALUE_TYPE_LOG)
-	{
-		if(GET_STR_RESULT(value))
-			DBproxy_add_history_log(item->itemid, value->str, now, item->timestamp, item->eventlog_source, item->eventlog_severity, item->lastlogsize);
-	}
-	else if(item->value_type==ITEM_VALUE_TYPE_TEXT)
-	{
-		if(GET_TEXT_RESULT(value))
-			DBproxy_add_history_text(item->itemid, value->str, now);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
-			item->value_type,
-			item->itemid);
+	switch (item->value_type) {
+		case ITEM_VALUE_TYPE_FLOAT:
+			if (GET_DBL_RESULT(value))
+				DBproxy_add_history(item->itemid, value->dbl, now);
+			break;
+		case ITEM_VALUE_TYPE_STR:
+			if (GET_STR_RESULT(value))
+				DBproxy_add_history_str(item->itemid, value->str, now);
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			if (GET_STR_RESULT(value))
+				DBproxy_add_history_log(item->itemid, value->str, now, item->timestamp, item->eventlog_source,
+						item->eventlog_severity, item->lastlogsize);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			if (GET_UI64_RESULT(value))
+				DBproxy_add_history_uint(item->itemid, value->ui64, now);
+			break;
+		case ITEM_VALUE_TYPE_TEXT:
+			if (GET_TEXT_RESULT(value))
+				DBproxy_add_history_text(item->itemid, value->str, now);
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
+				item->value_type,
+				item->itemid);
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End of proxy_add_history");
-
-	return ret;
 }
 
 /******************************************************************************
@@ -744,7 +811,11 @@ void	proxy_process_new_value(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 	zabbix_log( LOG_LEVEL_DEBUG, "In proxy_process_new_value(%s)",
 		item->key);
 
-	proxy_add_history(item, value, now);
 	if (0 == CONFIG_DBSYNCER_FORKS)
+	{
+		proxy_add_history(item, value, now);
 		proxy_update_item(item, value, now);
+	}
+	else
+		dc_add_history(item, value, now);
 }
