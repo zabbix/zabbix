@@ -136,11 +136,14 @@ void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *err
  ******************************************************************************/
 void	DCflush_nextchecks()
 {
-	int		i, sql_offset = 0;
-	static char	*sql = NULL;
-	static int	sql_allocated = 4096;
-	time_t		last_clock = -1;
-	char		error_esc[ITEM_ERROR_LEN_MAX * 2];
+	int			i, sql_offset = 0;
+	static char		*sql = NULL;
+	static int		sql_allocated = 4096;
+	time_t			last_clock = -1;
+	char			error_esc[ITEM_ERROR_LEN_MAX * 2];
+	static zbx_uint64_t	*ids = NULL;
+	static int		ids_alloc = 20;
+	int			ids_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCflush_nextchecks()");
 
@@ -154,57 +157,74 @@ void	DCflush_nextchecks()
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
 #endif
 
-	for (i = 0; i < nextcheck_num; i++ )
+	if (NULL == ids)
+		ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
+
+	ids_num = 0;
+
+	for (i = nextcheck_num - 1; i >= 0; i--)
 	{
-		if (NULL == nextchecks[i].error_msg)
-		{
-			if (last_clock != nextchecks[i].clock) {
-				if (last_clock != -1)
-				{
-					sql_offset--;
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ");\n");
-				}
+		if (NULL != nextchecks[i].error_msg)
+			continue;
 
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
-						"update items set nextcheck=%d where itemid in (",
-						(int)nextchecks[i].clock);
+		if (SUCCEED == uint64_array_exists(ids, ids_num, nextchecks[i].itemid))
+			continue;
 
-				last_clock = nextchecks[i].clock;
+		uint64_array_add(&ids, &ids_alloc, &ids_num, nextchecks[i].itemid);
+
+		if (last_clock != nextchecks[i].clock) {
+			if (last_clock != -1)
+			{
+				sql_offset--;
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ");\n");
 			}
 
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
-					nextchecks[i].itemid);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
+					"update items set nextcheck=%d where itemid in (",
+					(int)nextchecks[i].clock);
+
+			last_clock = nextchecks[i].clock;
 		}
+
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
+				nextchecks[i].itemid);
 	}
 
-	if (0 != sql_offset)
+	if (sql_offset > 8)
 	{
 		sql_offset--;
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ");\n");
 	}
 
+	ids_num = 0;
+
 	for (i = 0; i < nextcheck_num; i++ )
 	{
-		if (NULL != nextchecks[i].error_msg) /* not supported items */
-		{
-			DBescape_string(nextchecks[i].error_msg, error_esc, sizeof(error_esc));
-			zbx_free(nextchecks[i].error_msg);
+		if (NULL == nextchecks[i].error_msg) /* not supported items */
+			continue;
 
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
-					"update items set status=%d,lastclock=%d,nextcheck=%d,error='%s' where itemid=" ZBX_FS_UI64 ";\n",
-					ITEM_STATUS_NOTSUPPORTED,
-					(int)nextchecks[i].clock,
-					(int)(nextchecks[i].clock + CONFIG_REFRESH_UNSUPPORTED),
-					error_esc,
-					nextchecks[i].itemid);
-		}
+		if (SUCCEED == uint64_array_exists(ids, ids_num, nextchecks[i].itemid))
+			continue;
+
+		uint64_array_add(&ids, &ids_alloc, &ids_num, nextchecks[i].itemid);
+
+		DBescape_string(nextchecks[i].error_msg, error_esc, sizeof(error_esc));
+		zbx_free(nextchecks[i].error_msg);
+
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
+				"update items set status=%d,lastclock=%d,nextcheck=%d,error='%s' where itemid=" ZBX_FS_UI64 ";\n",
+				ITEM_STATUS_NOTSUPPORTED,
+				(int)nextchecks[i].clock,
+				(int)(nextchecks[i].clock + CONFIG_REFRESH_UNSUPPORTED),
+				error_esc,
+				nextchecks[i].itemid);
 	}
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
 #endif
 
-	if (0 != sql_offset)
+	if (sql_offset > 16)
 	{
 		DBbegin();
 		DBexecute("%s", sql);
