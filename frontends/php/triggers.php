@@ -96,8 +96,8 @@ include_once "include/page_header.php";
 
 	$showdisabled = get_request('showdisabled', 0);
 
-	validate_group_with_host(PERM_READ_WRITE,array('allow_all_hosts','always_select_first_host','with_items','only_current_node'),
-		'web.last.conf.groupid', 'web.last.conf.hostid');
+	$options = array('allow_all_hosts','always_select_first_host','with_items','only_current_node');
+	validate_group_with_host(PERM_READ_WRITE,$options,'web.last.conf.groupid','web.last.conf.hostid');
 ?>
 <?php
 	update_profile('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
@@ -281,75 +281,65 @@ include_once "include/page_header.php";
 		}
 	}
 /* GROUP ACTIONS */
-	else if(isset($_REQUEST["group_enable"])&&isset($_REQUEST["g_triggerid"])){
-		$result = false;
+	else if(isset($_REQUEST['group_enable'])&&isset($_REQUEST['g_triggerid'])){
+		$available_triggers  = get_accessible_triggers(PERM_READ_WRITE);
+		
+		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
 		
 		DBstart();
-		foreach($_REQUEST["g_triggerid"] as $id => $triggerid){
-			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
-
-			$res = DBselect('SELECT triggerid FROM triggers t WHERE t.triggerid='.$triggerid);
-			if(!$row = DBfetch($res)) continue;
-			
-			$cur_result = update_trigger_status($row['triggerid'],0);
-			$result |= $cur_result;
-			
-			if($cur_result){				
-				$serv_status = get_service_status_of_trigger($row['triggerid']);
+		$result = update_trigger_status($_REQUEST['g_triggerid'],TRIGGER_STATUS_ENABLED);
+		
+		if($result){
+			foreach($_REQUEST['g_triggerid'] as $id => $triggerid){
+				$serv_status = get_service_status_of_trigger($triggerid);
 				update_services($triggerid, $serv_status); // updating status to all services by the dependency
-				
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
-					S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ".S_ENABLED);
+					
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,S_TRIGGER.' ['.$triggerid.'] ['.expand_trigger_description($triggerid).'] '.S_ENABLED);
 			}
 		}
+		
 		$result = DBend($result);
 		show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 
 	}
-	else if(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_triggerid"])){
-		$result = false;
+	else if(isset($_REQUEST['group_disable'])&&isset($_REQUEST['g_triggerid'])){
+		$available_triggers  = get_accessible_triggers(PERM_READ_WRITE);
+		
+		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
 		
 		DBstart();
-		foreach($_REQUEST["g_triggerid"] as $id => $triggerid){
-			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
-
-			$res=DBselect('SELECT triggerid FROM triggers t WHERE t.triggerid='.$triggerid);
-			if(!$row = DBfetch($res)) continue;
-			
-			$cur_result = update_trigger_status($row["triggerid"],1);
-			$result |= $cur_result;
-			
-			if($cur_result){
+		$result = update_trigger_status($_REQUEST['g_triggerid'],TRIGGER_STATUS_DISABLED);
+		
+		if($result){
+			foreach($_REQUEST['g_triggerid'] as $id => $triggerid){
 				update_services($triggerid, 0); // updating status to all services by the dependency
-				
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
-					S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ".S_DISABLED);
+					
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,S_TRIGGER.' ['.$triggerid.'] ['.expand_trigger_description($triggerid).'] '.S_ENABLED);
 			}
 		}
+		
 		$result = DBend($result);
 		show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 		
 	}
-	else if(isset($_REQUEST["group_delete"])&&isset($_REQUEST["g_triggerid"])){
-		$result = false;
+	else if(isset($_REQUEST['group_delete'])&&isset($_REQUEST['g_triggerid'])){
+		$available_triggers  = get_accessible_triggers(PERM_READ_WRITE);
 		
-		DBstart();		
-		foreach($_REQUEST["g_triggerid"] as $triggerid){
-			if(!check_right_on_trigger_by_triggerid(null, $triggerid)) continue;
-
-			$res=DBselect('SELECT triggerid,templateid FROM triggers t WHERE t.triggerid='.$triggerid);
-			if(!$row = DBfetch($res)) continue;
-			if($row["templateid"] <> 0)	continue;
-			
-			$description = expand_trigger_description($triggerid);
-			$cur_result = delete_trigger($row["triggerid"]);
-			$result |= $cur_result;
-			
-			if($cur_result){
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
-					S_TRIGGER." [".$triggerid."] [".$description."] ".S_DISABLED);
+		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
+		
+		DBstart();
+		foreach($_REQUEST['g_triggerid'] as $id => $triggerid){
+			$row = DBfetch(DBselect('SELECT triggerid,templateid FROM triggers t WHERE t.triggerid='.$triggerid));
+			if($row['templateid'] <> 0){
+				unset($_REQUEST['g_triggerid'][$id]);
+				continue;
 			}
+			
+			$description = expand_trigger_description($triggerid);			
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,S_TRIGGER.' ['.$triggerid.'] ['.$description.'] '.S_DISABLED);
 		}
+		$result = delete_trigger($_REQUEST['g_triggerid']);
+		
 		$result = DBend($result);
 		show_messages($result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
@@ -357,7 +347,7 @@ include_once "include/page_header.php";
 <?php
 	$form = new CForm();
 	$form->SetMethod('get');
-	$form->AddItem(new CButton("form",S_CREATE_TRIGGER));
+	$form->AddItem(new CButton('form',S_CREATE_TRIGGER));
 
 	show_table_header(S_CONFIGURATION_OF_TRIGGERS_BIG,$form);
 	echo SBR;
@@ -366,13 +356,13 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST['massupdate']) && isset($_REQUEST['g_triggerid'])){
 		insert_mass_update_trigger_form();	
 	}
-	else if(isset($_REQUEST["form"])){
+	else if(isset($_REQUEST['form'])){
 /* FORM */
 		insert_trigger_form();
 		
 	} 
-	else if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["g_triggerid"])){
-		insert_copy_elements_to_forms("g_triggerid");
+	else if(isset($_REQUEST['form_copy_to']) && isset($_REQUEST['g_triggerid'])){
+		insert_copy_elements_to_forms('g_triggerid');
 	} 
 	else{
 /* TABLE */
@@ -383,8 +373,8 @@ include_once "include/page_header.php";
 				'triggers.php?showdisabled='.($showdisabled ? 0 : 1),NULL),
 			']', SPACE));
 	
-		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
-		$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
+		$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
+		$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
 	
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 		
@@ -422,7 +412,7 @@ include_once "include/page_header.php";
 		
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
-			$cmbHosts->AddItem($row["hostid"],$row["host"]);
+			$cmbHosts->AddItem($row['hostid'],$row['host']);
 		}
 	
 		$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
@@ -432,15 +422,15 @@ include_once "include/page_header.php";
 		$form = new CForm('triggers.php');
 		$form->SetName('triggers');
 		$form->SetMethod('post');
-		$form->AddVar('hostid',$_REQUEST["hostid"]);
+		$form->AddVar('hostid',$_REQUEST['hostid']);
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->setHeader(array(
 			make_sorting_link(S_SEVERITY,'t.priority'), 
 			make_sorting_link(S_STATUS,'t.status'), 
 
-			$_REQUEST["hostid"] > 0 ? NULL : make_sorting_link(S_HOST,'h.host'),
-			array(	new CCheckBox("all_triggers",NULL,
+			$_REQUEST['hostid'] > 0 ? NULL : make_sorting_link(S_HOST,'h.host'),
+			array(	new CCheckBox('all_triggers',NULL,
 					"CheckAll('".$form->GetName()."','all_triggers');")
 				,make_sorting_link(S_NAME,'t.description'),
 			),
