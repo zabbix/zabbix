@@ -503,7 +503,7 @@ include_once('include/page_header.php');
 			}
 			
 			$result = delete_host($del_hosts, $unlink_mode);
-			$result = DBend($result);
+			$result = DBend(false);//$result);
 			
 			show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 

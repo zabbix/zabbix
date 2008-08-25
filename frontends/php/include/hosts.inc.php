@@ -573,19 +573,21 @@ require_once "include/httptest.inc.php";
 	}
 
 	function get_host_by_itemid($itemids){
+		$res_array = is_array($itemids);
 		zbx_value2array($itemids);	
 		
 		$result = false;
 		$hosts = array();
 		
 		$sql = 'SELECT i.itemid, h.* FROM hosts h, items i WHERE i.hostid=h.hostid AND '.DBcondition('i.itemid',$itemids);
+
 		$res=DBselect($sql);
 		while($row=DBfetch($res)){
 			$result = true;
 			$hosts[$row['itemid']] = $row;
 		}
 		
-		if(count($hosts) == 1){
+		if(!$res_array){
 			foreach($hosts as $itemid => $host){
 				$result = $host;
 			}

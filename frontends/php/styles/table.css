@@ -402,9 +402,8 @@ table.tabletree .imgnode:hover{
 	cursor: pointer;
 }
 
-table.tabletree
-{
-	border: #AAAAAA 1px solid;
+table.tabletree{
+	border: #000 1px solid;
 	empty-cells:show;
 	color: #000000;
 	width: 100%;
@@ -414,14 +413,19 @@ table.tabletree
 table.tabletree tr td {
 	white-space: nowrap;
 	word-spacing:	0px;
+	
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:8pt;
 	text-decoration: none;
 	text-align: left;
+	vertical-align:top;
+	
 	border-width: 0px;
+	
 	padding-top: 0px;
 	padding-bottom: 0px;
-	height: 18px;
+	
+	height: 100%;
 }
 
 table.tabletree tr.header td {
@@ -436,7 +440,6 @@ table.tabletree tr.footer td {
 	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
 	background-color: #6d88ad;
-	vertical-align: middle;
 	padding-right: 5px;
 	padding-left: 5px;
 }
@@ -449,7 +452,7 @@ table.tabletree tr.even_row:hover td		{	background-color: #DFDFDF;}
 
 .tdtree{
 	width: 22px;
-	height: 18px;
+	height: 100%;
 	text-align: left;
 }
 /*****************************************/

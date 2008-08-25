@@ -143,6 +143,7 @@
 			return 0;
 		}
 
+		$del_items = array();
 		$sql='SELECT i.itemid '.
 			' FROM hosts_groups hg,items i'.
 			' WHERE hg.groupid='.$groupid.
@@ -150,7 +151,10 @@
 				' AND hg.hostid=i.hostid';
 		$result=DBexecute($sql);
 		while($row=DBfetch($result)){
-			delete_item($row["itemid"]);
+			$del_items[$row['itemid']] = $row['itemid'];
+		}
+		if(!empty($del_items)){
+			delete_item($del_items);
 		}
 	return 1;
 	}
@@ -641,29 +645,40 @@
 		}
 	}
 
-	# Activate Item
+// Activate Item
 
-	function	activate_item($itemid){
-		 // first update status for child items
-		$db_tmp_items = DBselect("select itemid, hostid from items where templateid=$itemid");
-		while($db_tmp_item = DBfetch($db_tmp_items)){
-		// recursion
-			activate_item($db_tmp_item["itemid"]);
+	function activate_item($itemids){
+		zbx_value2array($itemids);
+		
+// first update status for child items
+		$chd_items = array();
+		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE '.DBcondition('templateid',$itemids));
+		while($db_tmp_item = DBfetch($db_tmp_items)){ 
+			$chd_items[$db_tmp_item['itemid']] = $db_tmp_item['itemid'];
+		}
+		if(!empty($chd_items)){ 
+			activate_item($chd_items);  // Recursion !!!
 		}
 
-		$result = DBexecute("update items set status=".ITEM_STATUS_ACTIVE.",error='',nextcheck=0 where itemid=$itemid");
-		return $result;
+		$result = DBexecute('UPDATE items SET status='.ITEM_STATUS_ACTIVE.",error='',nextcheck=0 ".' WHERE '.DBcondition('itemid',$itemids));
+	return $result;
 	}
 
 // Disable Item
-	function disable_item($itemid){
-		 // first update status for child items
-		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
-		while($db_tmp_item = DBfetch($db_tmp_items)){ // recursion
-			disable_item($db_tmp_item["itemid"]);
+	function disable_item($itemids){
+		zbx_value2array($itemids);
+
+// first update status for child items
+		$chd_items = array();
+		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE '.DBcondition('templateid',$itemids));
+		while($db_tmp_item = DBfetch($db_tmp_items)){ 
+			$chd_items[$db_tmp_item['itemid']] = $db_tmp_item['itemid'];
+		}
+		if(!empty($chd_items)){ 
+			disable_item($chd_items);  // Recursion !!!
 		}
 
-		$result = DBexecute("update items set status=".ITEM_STATUS_DISABLED." where itemid=$itemid");
+		$result = DBexecute('UPDATE items SET status='.ITEM_STATUS_DISABLED.' WHERE '.DBcondition('itemid',$itemids));
 	return $result;
 	}
 
@@ -744,7 +759,6 @@
 // --
 		$hosts = array();
 		$hosts = get_host_by_itemid($itemids);
-
 // first delete child items
 		$del_cld_items = array();
 		$db_items = DBselect('SELECT itemid FROM items WHERE '.DBcondition('templateid',$itemids));

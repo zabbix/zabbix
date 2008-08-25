@@ -56,7 +56,7 @@ var $maxlevel=0;
 		return $this->tree;
 	}
 	
-	/*private*/ function MakeHeaders(){
+	/*private*/ function makeHeaders(){
 		$c=0;
 		$tr = new CRow();
 		$tr->AddItem($this->fields['caption']);
@@ -82,11 +82,12 @@ var $maxlevel=0;
 		$table->headerClass = 'header';
 		$table->footerClass = 'footer';
 		
-		$table->AddOption('border','0');
-		$table->AddRow($this->MakeHeaders());
+		$table->AddOption('valign','top');
+		$table->AddOption('border','1');
+		$table->AddRow($this->makeHeaders());
 	
 		foreach($this->tree as $id => $rows){
-			$table->AddRow($this->MakeSHTMLRow($id));
+			$table->AddRow($this->makeRow($id));
 		}
 	return $table;
 	}
@@ -97,17 +98,18 @@ var $maxlevel=0;
 	return $html;
 	}
 	
-	/*private*/  function MakeSHTMLRow($id){
+	/*private*/  function makeRow($id){
 		
 		$table = new CTable();
 		$table->SetCellSpacing(0);
 		$table->SetCellPadding(0);
-	//	$table->AddOption('border','1');
-		
+		$table->AddOption('border','0');
+		$table->AddOption('height','100%');
+
 		$tr = $this->MakeSImgStr($id);
 		
 		$td = new CCol($this->tree[$id]['caption']);
-		$td->AddOption('style',' white-space: normal; height: 20px; padding-right: 10px; padding-left: 2px;');
+		$td->AddOption('style','height: 100%; vertical-align: top; white-space: normal; padding-right: 10px; padding-left: 2px;');
 		$tr->AddItem($td);
 	
 		$table->AddRow($tr);
@@ -120,7 +122,7 @@ var $maxlevel=0;
 	
 		foreach($this->fields as $key => $value){
 			$td = new CCol($this->tree[$id][$value]);
-			$td->AddOption('style','padding-right: 10px; padding-left: 2px;');
+			$td->AddOption('style',' padding-right: 10px; padding-left: 2px;');
 			$tr->AddItem($td);
 		}
 		
@@ -145,22 +147,21 @@ var $maxlevel=0;
 					break;
 				case 'L':
 					$td->AddOption('valign','top');
-					if($this->tree[$id]['nodetype'] == 2){
-						$div = new CTag('div','yes');
-						$div->AddOption('style','height: 10px; width:22px; background-image:url(images/general/tree/pointc.gif);');
-	
+//					$td->AddOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
+
+					$div = new CTag('div','yes');
+					$div->AddOption('style','height: 10px; width:22px; background-image:url(images/general/tree/pointc.gif);');
+
+					if($this->tree[$id]['nodetype'] == 2){	
 						$img= new CImg('images/general/tree/plus.gif','y','22','14');
 						$img->AddOption('onclick','javascript: tree.closeSNodeX('.$id.',this);');
 						$img->AddOption('id','idi_'.$id);
 						$img->SetClass('imgnode');
-						
-						$div->AddItem($img);
 					} 
 					else {
-						$div = new CTag('div','yes');
-						$div->AddOption('style','height: 10px; width:22px; background-image:url(images/general/tree/pointc.gif);');
-						$div->AddItem(new CImg('images/general/tree/pointl.gif','y','22','14'));
+						$img = new CImg('images/general/tree/pointl.gif','y','22','14');
 					}
+					$div->AddItem($img);
 					$img=$div;
 					break;
 				case 'T':

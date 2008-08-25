@@ -299,8 +299,9 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST['hostid']) && !uint_in_array($_REQUEST['hostid'], $available_hosts)){
 		unset($_REQUEST['hostid']);
 	}
-		
-	validate_group_with_host(PERM_READ_WRITE,array('always_select_first_group','always_select_first_host','only_current_node'),'web.last.conf.groupid', 'web.last.conf.hostid');
+	
+	$options = array('always_select_first_group','always_select_first_host','only_current_node');
+	validate_group_with_host(PERM_READ_WRITE, $options, 'web.last.conf.groupid', 'web.last.conf.hostid');
 
 	update_profile('web.items.showdisabled',$showdisabled, PROFILE_TYPE_INT);
 ?>
@@ -579,63 +580,73 @@ include_once "include/page_header.php";
 		}
 	}
 	else if(isset($_REQUEST['group_task'])&&isset($_REQUEST['group_itemid'])){
+// GROUP TASKS
 		if($_REQUEST['group_task']==S_DELETE_SELECTED){
-			$result = false;
-			$group_itemid = $_REQUEST['group_itemid'];
+			global $USER_DETAILS;
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
+
+			$group_itemid = $_REQUEST['group_itemid'];			
 
 			DBstart();
-			foreach($group_itemid as $id){
-				if(!$item = get_item_by_itemid($id))	continue;
-				if($item['templateid']<>0)	continue;
-
-				$cur_result = delete_item($id);
-				$result |= $cur_result;
 			
-				if($cur_result){
-					$host = get_host_by_hostid($item['hostid']);
-					add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']');
+			$sql = 'SELECT h.host, i.itemid, i.key_, i.templateid '.
+					' FROM items i, hosts h '.
+					' WHERE '.DBcondition('i.itemid',$group_itemid).
+						' AND h.hostid=i.hostid'.
+						' AND '.DBcondition('h.hostid',$available_hosts);
+			$item_res = DBselect($sql);
+			while($item = DBfetch($item_res)){
+				if($item['templateid']<>0){
+					unset($group_itemid[$item['itemid']]);
+					continue;
 				}
+
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');
 			}
 			
+			$result = delete_item($group_itemid);
 			$result = DBend($result);
 			show_messages($result, S_ITEMS_DELETED, null);
 		}
 		else if($_REQUEST['group_task']==S_ACTIVATE_SELECTED){
-			$result = false;
-			$group_itemid = $_REQUEST['group_itemid'];
-			
+			global $USER_DETAILS;
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
+
+			$group_itemid = $_REQUEST['group_itemid'];			
+
 			DBstart();
-			foreach($group_itemid as $id){
-				if(!$item = get_item_by_itemid($id))	continue;
-				
-				$cur_result = activate_item($id);
-				$result |= $cur_result;
-			
-				if($cur_result){
-					$host = get_host_by_hostid($item['hostid']);
-					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_ITEMS_ACTIVATED);
-				}
+			$sql = 'SELECT h.host, i.itemid, i.key_ '.
+					' FROM items i, hosts h '.
+					' WHERE '.DBcondition('i.itemid',$group_itemid).
+						' AND h.hostid=i.hostid'.
+						' AND '.DBcondition('h.hostid',$available_hosts);
+			$item_res = DBselect($sql);
+			while($item = DBfetch($item_res)){
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']'.S_ITEMS_ACTIVATED);
 			}
 			
+			$result = activate_item($group_itemid);
 			$result = DBend($result);
 			show_messages($result, S_ITEMS_ACTIVATED, null);
 		}
 		else if($_REQUEST['group_task']==S_DISABLE_SELECTED){
-			$result = false;
-			$group_itemid = $_REQUEST['group_itemid'];
-			
-			DBstart();
-			foreach($group_itemid as $id){
-				if(!$item = get_item_by_itemid($id))	continue;
+			global $USER_DETAILS;
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 
-				$cur_result = disable_item($id);
-				$result |= $cur_result;
-			
-				if($cur_result){
-					$host = get_host_by_hostid($item['hostid']);
-					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,	S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_ITEMS_DISABLED);
-				}
+			$group_itemid = $_REQUEST['group_itemid'];			
+
+			DBstart();
+			$sql = 'SELECT h.host, i.itemid, i.key_ '.
+					' FROM items i, hosts h '.
+					' WHERE '.DBcondition('i.itemid',$group_itemid).
+						' AND h.hostid=i.hostid'.
+						' AND '.DBcondition('h.hostid',$available_hosts);
+			$item_res = DBselect($sql);
+			while($item = DBfetch($item_res)){
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']'.S_ITEMS_DISABLED);
 			}
+			
+			$result = disable_item($group_itemid);
 			$result = DBend($result);
 			show_messages($result, S_ITEMS_DISABLED, null);
 		}
