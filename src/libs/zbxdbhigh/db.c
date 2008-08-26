@@ -925,14 +925,15 @@ int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *e
 
 	DBescape_string(error, error_esc, sizeof(error_esc));
 
+	item->status	= ITEM_STATUS_NOTSUPPORTED;
+	item->nextcheck	= clock + CONFIG_REFRESH_UNSUPPORTED;
+
 	DBexecute("update items set status=%d,lastclock=%d,nextcheck=%d,error='%s' where itemid=" ZBX_FS_UI64,
-			ITEM_STATUS_NOTSUPPORTED,
+			item->status,
 			clock,
-			clock + CONFIG_REFRESH_UNSUPPORTED,
+			item->nextcheck,
 			error_esc,
 			item->itemid);
-
-	item->status = ITEM_STATUS_NOTSUPPORTED;
 
 	return SUCCEED;
 }

@@ -97,7 +97,7 @@ static int	DCget_nextcheck_nearestindex(time_t clock)
  ******************************************************************************/
 void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *error_msg)
 {
-	int	index, nextcheck;
+	int	index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCadd_nextcheck()");
 
@@ -107,13 +107,14 @@ void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *err
 		nextchecks = zbx_realloc(nextchecks, nextcheck_allocated * sizeof(ZBX_DC_NEXTCHECK));
 	}
 
-	nextcheck = NULL == error_msg ? calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now - timediff) + timediff : now;
-	index = DCget_nextcheck_nearestindex(nextcheck);
+	item->nextcheck = NULL == error_msg ? calculate_item_nextcheck(item->itemid, item->type, item->delay,
+			item->delay_flex, now - timediff) + timediff : now;
+	index = DCget_nextcheck_nearestindex(item->nextcheck);
 
 	memmove(&nextchecks[index + 1], &nextchecks[index], sizeof(ZBX_DC_NEXTCHECK) * (nextcheck_num - index));
 
 	nextchecks[index].itemid = item->itemid;
-	nextchecks[index].clock = nextcheck;
+	nextchecks[index].clock = item->nextcheck;
 	nextchecks[index].error_msg = (NULL != error_msg) ? strdup(error_msg) : NULL;
 
 	nextcheck_num ++;
@@ -212,7 +213,8 @@ void	DCflush_nextchecks()
 		zbx_free(nextchecks[i].error_msg);
 
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
-				"update items set status=%d,lastclock=%d,nextcheck=%d,error='%s' where itemid=" ZBX_FS_UI64 ";\n",
+				"update items set status=%d,lastclock=%d,nextcheck=%d,error='%s'"
+				" where itemid=" ZBX_FS_UI64 ";\n",
 				ITEM_STATUS_NOTSUPPORTED,
 				(int)nextchecks[i].clock,
 				(int)(nextchecks[i].clock + CONFIG_REFRESH_UNSUPPORTED),
