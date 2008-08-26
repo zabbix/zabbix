@@ -182,7 +182,7 @@
 
 
 /*
- * Function: get_accessible_graphs_by_host
+ * Function: get_accessible_graphs
  *
  * Description:
  *     returns string of accessible graphid's
@@ -191,11 +191,10 @@
  *     Aly
  *
  */		
-	function get_accessible_graphs($perm,$perm_res=null,$nodeid=null,$hostid=null,$cache=1){
+	function get_accessible_graphs($perm,$perm_res=PERM_RES_IDS_ARRAY,$nodeid=null,$hostid=null,$cache=1){
 		global $USER_DETAILS;
 		static $available_graphs;
 		
-		if(is_null($perm_res)) $perm_res = PERM_RES_STRING_LINE;
 		$nodeid_str =(is_array($nodeid))?implode('',$nodeid):strval($nodeid);
 		$hostid_str =(is_array($hostid))?implode('',$hostid):strval($hostid);
 		
@@ -226,7 +225,7 @@
 					(!empty($hostid)?' AND i.hostid='.$hostid:'').
 					' AND i.itemid=gi.itemid '.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
-					(!empty($denied_graphs)?' AND g.graphid NOT IN ('.implode(',',$denied_graphs).')':'');
+					(!empty($denied_graphs)?' AND '.DBcondition('g.graphid',$denied_graphs,true):'');
 
 		$db_graphs = DBselect($sql);
 		while($graph = DBfetch($db_graphs)){
@@ -661,18 +660,18 @@
 		return $result;
 	}
 	
-        /*
-         * Function: delete_graph
-         *
-         * Description:
-         *     De;ete graph with templates
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         * Comments: !!! Don't forget sync code with C !!!
-         *
-         */
+/*
+ * Function: delete_graph
+ *
+ * Description:
+ *     De;ete graph with templates
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
 	function delete_graph($graphids){
 		zbx_value2array($graphids);
 		

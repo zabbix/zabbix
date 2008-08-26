@@ -272,7 +272,7 @@ COpt::profiling_start("page");
 			}
 
 			if(isset($sub['node_perm'])){ 
-				if(0 == count(get_accessible_nodes_by_user($USER_DETAILS,$sub['node_perm'],PERM_RES_IDS_ARRAY))){
+				if(0 == count(get_accessible_nodes_by_user($USER_DETAILS,$sub['node_perm']))){
 					$deny = true;
 				}
 			}
@@ -301,7 +301,7 @@ COpt::profiling_start("page");
 				}
 
 				if(isset($sub_pages['node_perm'])){
-					if ( 0 == count(get_accessible_nodes_by_user($USER_DETAILS,$sub_pages['node_perm'],PERM_RES_IDS_ARRAY))){
+					if ( 0 == count(get_accessible_nodes_by_user($USER_DETAILS,$sub_pages['node_perm']))){
 						unset($sub['pages'][$id]);
 						continue;
 					}
@@ -511,9 +511,8 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$lst_nodes = new CComboBox('switch_node', get_current_nodeid(false), "submit()");
 			$db_nodes = DBselect('SELECT * '.
 						' FROM nodes '.
-						' WHERE nodeid IN ('.get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST).') '.
-						' ORDER BY name '
-					);
+						' WHERE '.DBcondition('nodeid',get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST)).
+						' ORDER BY name ');
 			while($node_data = DBfetch($db_nodes)){
 				$lst_nodes->AddItem($node_data['nodeid'],$node_data['name']);
 			}

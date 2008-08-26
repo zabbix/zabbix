@@ -1187,13 +1187,11 @@ require_once "include/httptest.inc.php";
 	 *
 	 */
 	function copy_template_applications($hostid, $templateid = null, $copy_mode = false){
-		if(null == $templateid)
-		{
+		if(null == $templateid){
 			$templateid = array_keys(get_templates_by_hostid($hostid));
 		}
 		
-		if(is_array($templateid))
-		{
+		if(is_array($templateid)){
 			foreach($templateid as $id)
 				copy_template_applications($hostid, $id, $copy_mode); // attention recursion
 			return;
@@ -1201,8 +1199,7 @@ require_once "include/httptest.inc.php";
 
 		$db_tmp_applications = get_applications_by_hostid($templateid);
 
-		while($db_tmp_app = DBfetch($db_tmp_applications))
-		{
+		while($db_tmp_app = DBfetch($db_tmp_applications)){
 			add_application(
 				$db_tmp_app["name"],
 				$hostid,
