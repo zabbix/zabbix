@@ -1568,62 +1568,72 @@ void	DBvacuum(void)
 #endif
 }
 
-void    DBescape_string(const char *str, char *to, int maxlen)
-{  /* NOTE: sync changes with 'DBdyn_escape_string' */
-	register int     i=0, ptr=0;
+/* NOTE: sync changes with 'DBdyn_escape_string' */
+void    DBescape_string(const char *src, char *dst, int len)
+{
+	const char	*s;
+	char		*d;
 #ifdef  HAVE_ORACLE
 #	define ZBX_DB_ESC_CH	'\''
-#else /* not HAVE_ORACLE */
+#else
 #	define ZBX_DB_ESC_CH	'\\'
-#endif /* HAVE_ORACLE */
-	assert(to);
+#endif
+	assert(dst);
 
-	maxlen--;
-	for( i=0,ptr=0; str && str[i] && ptr < maxlen; i++)
+	len--;	/* '\0' */
+
+	for (s = src, d = dst; s && *s && len; s++)
 	{
-		if( str[i] == '\r' ) continue;
+		if (*s == '\r')
+			continue;
 
-		if(	( str[i] == '\'' ) 
+		if (*s == '\'' 
 #ifndef	HAVE_ORACLE
-			|| ( str[i] == '\\' )
-#endif /* not HAVE_ORACLE */
-		)
+			|| *s == '\\'
+#endif
+			)
 		{
-			to[ptr++] = ZBX_DB_ESC_CH;
-			if(ptr >= maxlen)       break;
+			if (len < 2)
+				break;
+			*d++ = ZBX_DB_ESC_CH;
+			len--;
 		}
-		to[ptr++] = str[i];
+		*d++ = *s;
+		len--;
 	}
-	to[ptr] = '\0';
+	*d = '\0';
 }
 
-char*	DBdyn_escape_string(const char *str)
-{  /* NOTE: sync changes with 'DBescape_string' */
-	register int i;
+/* NOTE: sync changes with 'DBdyn_escape_string' */
+char*	DBdyn_escape_string(const char *src)
+{
+	const char	*s;
+	char		*dst = NULL;
+	int		len = 0;
 
-	char *str_esc = NULL;
+	len++;	/* '\0' */
 
-	int	str_esc_len = 0;
-
-	for(i=0; str && str[i]; i++)
+	for (s = src; s && *s; s++)
 	{
-		str_esc_len++;
-		if(	( str[i] == '\'' ) 
-#ifndef	HAVE_ORACLE
-			|| ( str[i] == '\\' )
-#endif /* not HAVE_ORACLE */
-		)
+		if (*s == '\r')
+			continue;
+
+		if (*s == '\'' 
+#if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
+			|| *s == '\\'
+#endif
+			)
 		{
-			str_esc_len++;
+			len++;
 		}
+		len++;
 	}
-	str_esc_len++;
 
-	str_esc = zbx_malloc(str_esc, str_esc_len);
+	dst = zbx_malloc(dst, len);
 
-	DBescape_string(str, str_esc, str_esc_len);
+	DBescape_string(src, dst, len);
 
-	return str_esc;
+	return dst;
 }
 
 void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
