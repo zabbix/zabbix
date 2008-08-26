@@ -344,12 +344,7 @@ function VDI($time,$show=1){
 return ($time['mon'].'/'.$time['mday'].'/'.$time['year'].' '.$time['hours'].':'.$time['minutes'].':'.$time['seconds']);
 }
 */
-	function expand_periodical_service_times(&$data, 
-		$period_start, $period_end, 
-		$ts_from, $ts_to, 
-		$type='ut' /* 'ut' OR 'dt' */
-		)
-	{
+	function expand_periodical_service_times(&$data,  $period_start, $period_end, $ts_from, $ts_to, $type='ut'){ /* 'ut' OR 'dt' */
 //SDI("PERIOD: ".VDI($period_start).' - '.VDI($period_end));
 //SDI('serv time: '.VDI($ts_from,0).' - '.VDI($ts_to,0));
 			/* calculate period FROM '-1 week' to know period name for  $period_start */
@@ -441,13 +436,13 @@ return ($time['mon'].'/'.$time['mday'].'/'.$time['year'].' '.$time['hours'].':'.
 		}
 
 		/* add periodical downtimes */
-		$service_times = DBselect('SELECT ts_from,ts_to FROM services_times WHERE type='.SERVICE_TIME_TYPE_DOWNTIME.
-				' and serviceid='.$serviceid);
+		$sql = 'SELECT ts_from,ts_to '.
+				' FROM services_times '.
+				' WHERE type='.SERVICE_TIME_TYPE_DOWNTIME.
+					' AND serviceid='.$serviceid;
+		$service_times = DBselect($sql);
 		while($db_time_row = DBfetch($service_times)){
-			expand_periodical_service_times($data,
-				$period_start, $period_end,
-				$db_time_row['ts_from'], $db_time_row['ts_to'],
-				'dt');
+			expand_periodical_service_times($data,$period_start, $period_end,$db_time_row['ts_from'], $db_time_row['ts_to'],'dt');
 		}
 
 		/* add one-time downtimes */
@@ -460,12 +455,12 @@ return ($time['mon'].'/'.$time['mday'].'/'.$time['year'].' '.$time['hours'].':'.
 			if($db_time_row['ts_to'] > $period_end)		$db_time_row['ts_to'] = $period_end;
 
 			if(isset($data[$db_time_row['ts_from']]['dt_s']))
-				$data[$db_time_row['ts_from']]['dt_s'] ++;
+				$data[$db_time_row['ts_from']]['dt_s']++;
 			else
 				$data[$db_time_row['ts_from']]['dt_s'] = 1;
 
 			if(isset($data[$db_time_row['ts_to']]['dt_e']))
-				$data[$db_time_row['ts_to']]['dt_e'] ++;
+				$data[$db_time_row['ts_to']]['dt_e']++;
 			else
 				$data[$db_time_row['ts_to']]['dt_e'] = 1;
 		}
@@ -479,8 +474,7 @@ return ($time['mon'].'/'.$time['mday'].'/'.$time['year'].' '.$time['hours'].':'.
 $ut = 0;
 $dt = 0;
 
-		foreach($data as $ts => $val)
-		{
+		foreach($data as $ts => $val){
 			print($ts);
 			print(" - [".date('l d M Y H:i:s',$ts)."]");
 			if(isset($val['ut_s'])) {print(' ut_s-'.$val['ut_s']); $ut+=$val['ut_s'];}
@@ -510,30 +504,24 @@ $dt = 0;
 		if(isset($data[$period_start]['ut_e'])) $ut_cnt -= $data[$period_start]['ut_e'];
 		if(isset($data[$period_start]['dt_s'])) $dt_cnt += $data[$period_start]['dt_s'];
 		if(isset($data[$period_start]['dt_e'])) $dt_cnt -= $data[$period_start]['dt_e'];
-		foreach($data as $ts => $val)
-		{
+		foreach($data as $ts => $val){
 			if($ts == $period_start) continue; /* skip first data [already readed] */
 
-			if($dt_cnt > 0)
-			{
+			if($dt_cnt > 0){
 				$period_type = 'dt';
 			}
-			else if($ut_cnt > 0)
-			{
+			else if($ut_cnt > 0){
 				$period_type = 'ut';
 			}
-			else /* dt_cnt=0 && ut_cnt=0 */
-			{
+			else{ /* dt_cnt=0 && ut_cnt=0 */
 				$period_type = $unmarked_period_type;
 			}
 
 			/* state=0,1 [OK] (1 - information severity of trigger), >1 [PROBLEMS] (trigger severity) */
-			if($prev_alarm > 1)
-			{
+			if($prev_alarm > 1){
 				$sla_time[$period_type]['problem_time']	+= $ts - $prev_time;
 			}
-			else
-			{
+			else{
 				$sla_time[$period_type]['ok_time'] 	+= $ts - $prev_time;
 			}
 //print_r($val); print(SBR);

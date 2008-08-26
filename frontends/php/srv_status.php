@@ -57,7 +57,8 @@ include_once "include/page_header.php";
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 		exit();
 	}
-//--------?>
+//--------
+?>
 <?php
         if(isset($_REQUEST['serviceid']) && 
 			($_REQUEST['serviceid']>0) && 
@@ -84,9 +85,9 @@ include_once "include/page_header.php";
 <?php
 //	show_table_header(S_IT_SERVICES_BIG);
 
-	if(isset($service)&&isset($_REQUEST["showgraph"])){
+	if(isset($service)&&isset($_REQUEST['showgraph'])){
 		$table  = new CTable(null,'chart');
-		$table->AddRow(new CImg("chart5.php?serviceid=".$service["serviceid"].url_param('path')));
+		$table->AddRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')));
 		$table->Show();
 	} 
 	else {
