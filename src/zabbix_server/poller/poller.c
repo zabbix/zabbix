@@ -288,7 +288,7 @@ static void disable_host(DB_ITEM *item, time_t now, char *error)
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-static int get_values(int now)
+static int get_values(int now, int *nextcheck)
 {
 	DB_RESULT	result;
 	DB_RESULT	result2;
@@ -313,6 +313,7 @@ static int get_values(int now)
 		DCinit_nextchecks();
 
 	now = time(NULL);
+	*nextcheck = FAIL;
 
 	unreachable_hosts = zbx_malloc(unreachable_hosts, unreachable_hosts_alloc);
 	*unreachable_hosts = '\0';
@@ -327,11 +328,11 @@ static int get_values(int now)
 				" and i.key_ not in ('%s','%s','%s','%s')" DB_NODE " group by h.hostid",
 			CONFIG_UNREACHABLE_POLLER_FORKS,
 			poller_num-1,
-			now,
+			now + POLLER_DELAY,
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST,
 			HOST_STATUS_MONITORED,
-			now,
+			now + POLLER_DELAY,
 			ITEM_TYPE_INTERNAL,
 			SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY,
 			DBnode_local("h.hostid"));
@@ -352,11 +353,11 @@ static int get_values(int now)
 				" and " ZBX_SQL_MOD(i.itemid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')"
 				DB_NODE " order by i.nextcheck",
 				ZBX_SQL_ITEM_SELECT,
-				now,
+				now + POLLER_DELAY,
 				istatus,
 				ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST,
 				HOST_STATUS_MONITORED,
-				now,
+				now + POLLER_DELAY,
 				ITEM_TYPE_INTERNAL,
 				CONFIG_POLLER_FORKS,
 				poller_num-1,
@@ -398,6 +399,13 @@ static int get_values(int now)
 					item.hostid,item.key);
 				continue;
 			}
+		}
+
+		if (item.nextcheck > time(NULL))
+		{
+			if (*nextcheck == FAIL || (item.nextcheck != 0 && *nextcheck > item.nextcheck))
+				*nextcheck = item.nextcheck;
+			goto skip;
 		}
 
 		init_result(&agent);
@@ -457,6 +465,10 @@ static int get_values(int now)
 				}
 				DCadd_nextcheck(&item, now, 0, NULL);
 			}
+
+			if (poller_type == ZBX_POLLER_TYPE_NORMAL)
+				if (*nextcheck == FAIL || (item.nextcheck != 0 && *nextcheck > item.nextcheck))
+					*nextcheck = item.nextcheck;
 		}
 		else if (res == NOTSUPPORTED || res == AGENT_ERROR)
 		{
@@ -481,6 +493,10 @@ static int get_values(int now)
 			}
 			else
 				DCadd_nextcheck(&item, now, 0, agent.msg);
+
+			if (poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
+				if (*nextcheck == FAIL || (item.nextcheck != 0 && *nextcheck > item.nextcheck))
+					*nextcheck = item.nextcheck;
 
 			if (HOST_AVAILABLE_TRUE != item.host_available) {
 				DBbegin();
@@ -557,6 +573,9 @@ static int get_values(int now)
 			zabbix_log(LOG_LEVEL_CRIT, "Unknown response code returned.");
 			assert(0==1);
 		}
+
+		items++;
+skip:
 		/* Poller for unreachable hosts */
 		if (poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
 		{
@@ -564,8 +583,6 @@ static int get_values(int now)
 			DBfree_result(result2);
 		}
 		free_result(&agent);
-
-		items++;
 	}
 
 	zbx_free(unreachable_hosts);
@@ -584,7 +601,7 @@ void main_poller_loop(zbx_process_t p, int type, int num)
 {
 	struct	sigaction phan;
 	int	now;
-	int	/*nextcheck, */sleeptime;
+	int	nextcheck, sleeptime;
 	int	items;
 	double	sec;
 
@@ -608,48 +625,33 @@ void main_poller_loop(zbx_process_t p, int type, int num)
 
 		now = time(NULL);
 		sec = zbx_time();
-		items = get_values(now);
+		items = get_values(now, &nextcheck);
 		sec = zbx_time() - sec;
 
 /*		nextcheck = get_minnextcheck(now);*/
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Poller spent " ZBX_FS_DBL " seconds while updating %3d values."
-				/*" Nextcheck: %d Time: %d"*/,
-				sec,
-				items/*,
-				nextcheck,
-				(int)time(NULL)*/);
-
-/*		if( FAIL == nextcheck)
-		{
-			sleeptime=POLLER_DELAY;
-		}
+		if (FAIL == nextcheck)
+			sleeptime = POLLER_DELAY;
 		else
 		{
-			sleeptime=nextcheck-time(NULL);*/
-			sleeptime = now - time(NULL) + 1;
-			if(sleeptime<0)
-			{
-				sleeptime=0;
-			}
-/*		}*/
-		if(sleeptime>0)
-		{
-			if(sleeptime > POLLER_DELAY)
-			{
+			sleeptime = nextcheck - time(NULL);
+/*			sleeptime = now - time(NULL) + 1;*/
+			if (sleeptime < 0)
+				sleeptime = 0;
+			if (sleeptime > POLLER_DELAY)
 				sleeptime = POLLER_DELAY;
-			}
-			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
-					sleeptime );
-
-			zbx_setproctitle("poller [sleeping for %d seconds]", 
-					sleeptime);
-
-			sleep( sleeptime );
 		}
-		else
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Poller spent " ZBX_FS_DBL " seconds while updating %3d values."
+				" Sleeping for %d seconds",
+				sec,
+				items,
+				sleeptime);
+
+		if (sleeptime > 0)
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "No sleeping" );
+			zbx_setproctitle("poller [sleeping for %d seconds]", sleeptime);
+			sleep(sleeptime);
 		}
 	}
 }

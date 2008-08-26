@@ -411,7 +411,8 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 	zabbix_log( LOG_LEVEL_DEBUG, "In update_item()");
 
 	value_esc[0]	= '\0';
-	
+	item->nextcheck	= calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now);
+
 	if(item->delta == ITEM_STORE_AS_IS)
 	{
 		if(GET_STR_RESULT(value))
@@ -421,14 +422,14 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 
 		if (item->value_type == ITEM_VALUE_TYPE_LOG) {
 			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d,lastlogsize=%d where itemid=" ZBX_FS_UI64,
-				calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
+				item->nextcheck,
 				value_esc,
 				(int)now,
 				item->lastlogsize,
 				item->itemid);
 		} else {
 			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=" ZBX_FS_UI64,
-				calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
+				item->nextcheck,
 				value_esc,
 				(int)now,
 				item->itemid);
@@ -449,7 +450,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 					{
 						DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "',"
 						"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
-							calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+							item->nextcheck,
 							value->dbl,
 							(value->dbl - item->prevorgvalue_dbl)/(now-item->lastclock),
 							(int)now,
@@ -460,7 +461,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 					{
 						DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "',"
 						"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
-							calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+							item->nextcheck,
 							value->dbl,
 							value->dbl - item->prevorgvalue_dbl,
 							(int)now,
@@ -471,7 +472,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 				else
 				{
 					DBexecute("update items set nextcheck=%d,prevorgvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
-						calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+						item->nextcheck,
 						value->dbl,
 						(int)now,
 						item->itemid);
@@ -488,7 +489,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 					{
 						DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',"
 						"lastvalue='" ZBX_FS_UI64 "',lastclock=%d where itemid=" ZBX_FS_UI64,
-							calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+							item->nextcheck,
 							value->ui64,
 							((zbx_uint64_t)(value->ui64 - item->prevorgvalue_uint64))/(now-item->lastclock),
 							(int)now,
@@ -499,7 +500,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 					{
 						DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',"
 						"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
-							calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+							item->nextcheck,
 							value->ui64,
 							(double)(value->ui64 - item->prevorgvalue_uint64),
 							(int)now,
@@ -510,7 +511,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 				else
 				{
 					DBexecute("update items set nextcheck=%d,prevorgvalue='" ZBX_FS_UI64 "',lastclock=%d where itemid=" ZBX_FS_UI64,
-						calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+						item->nextcheck,
 						value->ui64,
 						(int)now,
 						item->itemid);
@@ -529,7 +530,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 				{
 					DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "',"
 					"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
-						calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+						item->nextcheck,
 						value->dbl,
 						(value->dbl - item->prevorgvalue_dbl),
 						(int)now,
@@ -539,7 +540,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 				else
 				{
 					DBexecute("update items set nextcheck=%d,prevorgvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
-						calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex, now),
+						item->nextcheck,
 						value->dbl,
 						(int)now,
 						item->itemid);
@@ -554,7 +555,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 				{
 					DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',"
 					"lastvalue='" ZBX_FS_UI64 "',lastclock=%d where itemid=" ZBX_FS_UI64,
-						calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+						item->nextcheck,
 						value->ui64,
 						(value->ui64 - item->prevorgvalue_uint64),
 						(int)now,
@@ -564,7 +565,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 				else
 				{
 					DBexecute("update items set nextcheck=%d,prevorgvalue='" ZBX_FS_UI64 "',lastclock=%d where itemid=" ZBX_FS_UI64,
-						calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex, now),
+						item->nextcheck,
 						value->ui64,
 						(int)now,
 						item->itemid);
@@ -752,14 +753,16 @@ static void	proxy_update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 {
 	zabbix_log( LOG_LEVEL_DEBUG, "In proxy_update_item()");
 
+	item->nextcheck	= calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now);
+
 	if (item->value_type == ITEM_VALUE_TYPE_LOG) {
 		DBexecute("update items set nextcheck=%d,lastlogsize=%d where itemid=" ZBX_FS_UI64,
-			calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
+			item->nextcheck,
 			item->lastlogsize,
 			item->itemid);
 	} else {
 		DBexecute("update items set nextcheck=%d where itemid=" ZBX_FS_UI64,
-			calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
+			item->nextcheck,
 			item->itemid);
 	}
 
