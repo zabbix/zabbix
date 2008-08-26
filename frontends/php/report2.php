@@ -211,13 +211,13 @@ include_once 'include/page_header.php';
 		
 		$filterForm->AddRow(S_PERIOD, $filtertimetab);
 	//*/	
-
+		$filterForm->AddItemToBottomRow(new CButton("filter_set",S_FILTER));
+		
 		$reset = new CButton("filter_rst",S_RESET);
 		$reset->SetType('button');
 		$reset->SetAction('javascript: var uri = new url(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 	
 		$filterForm->AddItemToBottomRow($reset);
-		$filterForm->AddItemToBottomRow(new CButton("filter_set",S_FILTER));
 								
 		$filter = create_filter(S_FILTER,NULL,$filterForm,'tr_filter',get_profile('web.avail_report.filter.state',0));
 		$filter->Show();

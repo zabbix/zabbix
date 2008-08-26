@@ -38,31 +38,19 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY);
 
-	if(!DBfetch(DBselect('select distinct  t.triggerid from triggers t where t.triggerid='.$_REQUEST['triggerid']))){
+	if(!DBfetch(DBselect('SELECT DISTINCT t.triggerid FROM triggers t WHERE t.triggerid='.$_REQUEST['triggerid']))){
 		fatal_error(S_NO_TRIGGER_DEFINED);
 	}
-	
-	$sql = 'SELECT t.triggerid '.
-			' FROM hosts h, items i, functions f, triggers t'.
-			' WHERE h.hostid=i.hostid '.
-				' AND i.itemid=f.itemid '.
-				' AND f.triggerid=t.triggerid '.
-				' AND t.triggerid='.$_REQUEST['triggerid'].
-				' AND '.DBcondition('i.hostid',$available_hosts,true);
-
-	if(DBfetch(DBselect($sql,1))){
-		access_deny();
-	}
-				
+					
 	$sql = 'SELECT DISTINCT t.triggerid,t.description,t.expression, h.host,h.hostid '.
 			' FROM hosts h, items i, functions f, triggers t'.
 			' WHERE h.hostid=i.hostid '.
 				' AND i.itemid=f.itemid '.
 				' AND f.triggerid=t.triggerid '.
-				' AND t.triggerid='.$_REQUEST["triggerid"].
-				' AND '.DBcondition('i.hostid',$available_hosts);
+				' AND t.triggerid='.$_REQUEST['triggerid'].
+				' AND '.DBcondition('t.triggerid',$available_triggers);
 			
 	if(!$db_data = DBfetch(DBselect($sql))){
 		access_deny();
@@ -79,36 +67,38 @@ include_once "include/page_header.php";
 
 	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10); 
 	
-	$red		= ImageColorAllocate($im,255,0,0); 
-	$darkred	= ImageColorAllocate($im,150,0,0); 
-	$green		= ImageColorAllocate($im,0,255,0); 
-	$darkgreen	= ImageColorAllocate($im,0,150,0); 
-	$bluei		= ImageColorAllocate($im,0,0,255); 
-	$darkblue	= ImageColorAllocate($im,0,0,150); 
-	$yellow		= ImageColorAllocate($im,255,255,0); 
-	$darkyellow	= ImageColorAllocate($im,150,150,0); 
-	$cyan		= ImageColorAllocate($im,0,255,255); 
-	$black		= ImageColorAllocate($im,0,0,0); 
-	$gray		= ImageColorAllocate($im,150,150,150); 
-	$white		= ImageColorAllocate($im,255,255,255); 
-	$bg			= ImageColorAllocate($im,6+6*16,7+7*16,8+8*16);
+	$red		= imagecolorallocate($im,255,0,0); 
+	$darkred	= imagecolorallocate($im,150,0,0); 
+	$green		= imagecolorallocate($im,0,255,0); 
+	$darkgreen	= imagecolorallocate($im,0,150,0); 
+	$bluei		= imagecolorallocate($im,0,0,255); 
+	$darkblue	= imagecolorallocate($im,0,0,150); 
+	$yellow		= imagecolorallocate($im,255,255,0); 
+	$darkyellow	= imagecolorallocate($im,150,150,0); 
+	$cyan		= imagecolorallocate($im,0,255,255); 
+	$black		= imagecolorallocate($im,0,0,0); 
+	$gray		= imagecolorallocate($im,150,150,150); 
+	$white		= imagecolorallocate($im,255,255,255); 
+	$bg			= imagecolorallocate($im,6+6*16,7+7*16,8+8*16);
 
 	$x=imagesx($im); 
 	$y=imagesy($im);
   
-	ImageFilledRectangle($im,0,0,$x,$y,$white);
-	ImageRectangle($im,0,0,$x-1,$y-1,$black);
+	imagefilledrectangle($im,0,0,$x,$y,$white);
+	imagerectangle($im,0,0,$x-1,$y-1,$black);
 
 	$str = expand_trigger_description_by_data($db_data);
 
 	$str = $str." (year ".date("Y").")";
-	$x = imagesx($im)/2-ImageFontWidth(4)*strlen($str)/2;
-	ImageString($im, 4,$x,1, $str , $darkred);
+	$x = imagesx($im)/2-imagefontwidth(4)*strlen($str)/2;
+	imagestring($im, 4,$x,1, $str , $darkred);
 
 	$now = time(NULL);
 
 	$count_now=array();
-	$true=array();
+	$true = array();
+	$false = array();
+	$unknown = array();
 
 	$year=date("Y");
 	$start=mktime(0,0,0,1,1,$year);
@@ -116,16 +106,19 @@ include_once "include/page_header.php";
 	$wday=date("w",$start);
 	if($wday==0) $wday=7;
 	$start=$start-($wday-1)*24*3600;
+	
+	$weeks = (int)(date('z')/7 +1);
 
-	for($i=0;$i<52;$i++){
+	for($i=0;$i<$weeks;$i++){
 		$period_start=$start+7*24*3600*$i;
 		$period_end=$start+7*24*3600*($i+1);
-		$stat=calculate_availability($_REQUEST["triggerid"],$period_start,$period_end);
 		
-		$true[$i]=$stat["true"];
-		$false[$i]=$stat["false"];
-		$unknown[$i]=$stat["unknown"];
+		$stat=calculate_availability($_REQUEST['triggerid'],$period_start,$period_end);
+		$true[$i]=$stat['true'];
+		$false[$i]=$stat['false'];
+		$unknown[$i]=$stat['unknown'];
 		$count_now[$i]=1;
+//SDI($false[$i]);
 	}
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/10){
@@ -136,7 +129,7 @@ include_once "include/page_header.php";
 	for($i=0;$i<=$sizeX;$i+=$sizeX/52){
 		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
 		$period_start=$start+7*24*3600*$j;
-		ImageStringUp($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date("d.M",$period_start) , $black);
+		imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date("d.M",$period_start) , $black);
 		$j++;
 	}
 
@@ -150,46 +143,47 @@ include_once "include/page_header.php";
 	$maxX=900;
 	$minX=0;
 
-	for($i=0;$i<52;$i++){
+	for($i=0;$i<$weeks;$i++){
 		$x1=(900/52)*$sizeX*($i-$minX)/($maxX-$minX);
+		
+//		imagefilledrectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,imagecolorallocate($im,0,0,0)); 	// WHITE
 
-		ImageFilledRectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,ImageColorAllocate($im,200,200,120));
-		$y1=$sizeY*$true[$i]/100;
+		$yt=$sizeY*$true[$i]/100;
+		if($yt > 0) imagefilledrectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$yt+$shiftYup,imagecolorallocate($im,235,120,120));	// RED
 
-		ImageFilledRectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$y1+$shiftYup,ImageColorAllocate($im,200,120,120));
+		$yu=(int)($sizeY*$unknown[$i]/100+0.5);
+		if($yu > 0) imagefilledrectangle($im,$x1+$shiftX,$yt+$shiftYup,$x1+$shiftX+8,$yt+$yu+$shiftYup,imagecolorallocate($im,235,235,235)); 	// UNKNOWN
 
-		$y1=$sizeY*$false[$i]/100;
-		$y1=$sizeY-$y1;
+		$yf=$sizeY*$false[$i]/100;
+		if($yf > 0) imagefilledrectangle($im,$x1+$shiftX,$yt+$yu+$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,imagecolorallocate($im,120,235,120));  // GREEN
 
-		ImageFilledRectangle($im,$x1+$shiftX,$y1+$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,ImageColorAllocate($im,120,200,120));
-
-		ImageRectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,$black);
+//SDI($yt.'+'.$yf.'+'.$yu);
+		if($yt+$yf+$yu > 0) imagerectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,$black);
 	}
 
-	for($i=0;$i<=$sizeY;$i+=$sizeY/10)
-	{
-		ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftYup, $i*($maxY-$minY)/$sizeY+$minY , $darkred);
+	for($i=0;$i<=$sizeY;$i+=$sizeY/10){
+		imagestring($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftYup, $i*($maxY-$minY)/$sizeY+$minY , $darkred);
 	}
 
-	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,ImageColorAllocate($im,120,200,120));
-	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,$black);
-	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*0+35, "FALSE (%)", $black);
+	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,imagecolorallocate($im,120,235,120));
+	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,$black);
+	imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*0+35, "FALSE (%)", $black);
 
-	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+35+9+15*1,ImageColorAllocate($im,200,120,120));
-	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+35*1,$black);
-	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+35, "TRUE (%)", $black);
+	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+35+9+15*1,imagecolorallocate($im,235,120,120));
+	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+35*1,$black);
+	imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+35, "TRUE (%)", $black);
 
-	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,ImageColorAllocate($im,200,200,120));
-	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,$black);
-	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*2+35, "UNKNOWN (%)", $black);
+	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,imagecolorallocate($im,220,220,220));
+	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,$black);
+	imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*2+35, "UNKNOWN (%)", $black);
 
-	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://www.zabbix.com", $gray);
+	imagestringup($im,0,imagesx($im)-10,imagesy($im)-50, "http://www.zabbix.com", $gray);
 
 	$end_time=time(NULL);
-	ImageString($im, 0,imagesx($im)-100,imagesy($im)-12,"Generated in ".($end_time-$start_time)." sec", $gray);
+	imagestring($im, 0,imagesx($im)-100,imagesy($im)-12,"Generated in ".($end_time-$start_time)." sec", $gray);
 
 	ImageOut($im); 
-	ImageDestroy($im); 
+	imagedestroy($im); 
 ?>
 <?php
 
