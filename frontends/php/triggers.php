@@ -19,18 +19,18 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/hosts.inc.php";
-	require_once "include/triggers.inc.php";
-	require_once "include/forms.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/triggers.inc.php');
+	require_once('include/forms.inc.php');
 
 
-	$page["title"] = "S_CONFIGURATION_OF_TRIGGERS";
+	$page['title'] = "S_CONFIGURATION_OF_TRIGGERS";
 	$page["file"] = "triggers.php";
 	$page['hist_arg'] = array('hostid','groupid');
 
-include_once "include/page_header.php";
-
+	
+	include_once('include/page_header.php');
 ?>
 <?php
 
@@ -102,8 +102,7 @@ include_once "include/page_header.php";
 <?php
 	update_profile('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
-
+	$available_triggers = get_accessible_triggers(PERM_READ_WRITE);
 /* FORM ACTIONS */
 
 	if(isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])){
@@ -114,7 +113,7 @@ include_once "include/page_header.php";
 		show_messages();
 		
 		$result = false;
-		$available_triggers = get_accessible_triggers(PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
+		
 		
 		$visible = $_REQUEST['visible'];
 		$dependencies = get_request('dependencies',array());
@@ -208,6 +207,9 @@ include_once "include/page_header.php";
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['triggerid'])){
 		$result = false;
 		
+		if(!uint_in_array($_REQUEST['triggerid'],$available_triggers))
+			access_deny();
+			
 		if($trigger_data = DBfetch(
 			DBselect('SELECT DISTINCT t.triggerid,t.description,t.expression,h.host '.
 				' FROM triggers t '.
@@ -282,8 +284,7 @@ include_once "include/page_header.php";
 	}
 /* GROUP ACTIONS */
 	else if(isset($_REQUEST['group_enable'])&&isset($_REQUEST['g_triggerid'])){
-		$available_triggers  = get_accessible_triggers(PERM_READ_WRITE);
-		
+
 		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
 		
 		DBstart();
@@ -303,7 +304,6 @@ include_once "include/page_header.php";
 
 	}
 	else if(isset($_REQUEST['group_disable'])&&isset($_REQUEST['g_triggerid'])){
-		$available_triggers  = get_accessible_triggers(PERM_READ_WRITE);
 		
 		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
 		
@@ -323,7 +323,6 @@ include_once "include/page_header.php";
 		
 	}
 	else if(isset($_REQUEST['group_delete'])&&isset($_REQUEST['g_triggerid'])){
-		$available_triggers  = get_accessible_triggers(PERM_READ_WRITE);
 		
 		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
 		
@@ -345,6 +344,9 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
+	$available_triggers = get_accessible_triggers(PERM_READ_WRITE,PERM_RES_IDS_ARRAY,null,null,0);
+	
 	$form = new CForm();
 	$form->SetMethod('get');
 	$form->AddItem(new CButton('form',S_CREATE_TRIGGER));
@@ -442,7 +444,8 @@ include_once "include/page_header.php";
 				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
 				' LEFT JOIN items i ON f.itemid=i.itemid '.
 				' LEFT JOIN hosts h ON h.hostid=i.hostid '.
-			' WHERE '.DBin_node('t.triggerid');
+			' WHERE '.DBin_node('t.triggerid').
+				' AND '.DBcondition('t.triggerid',$available_triggers);
 
 		if($showdisabled == 0)
 		    $sql .= ' AND t.status <> '.TRIGGER_STATUS_DISABLED;
@@ -454,39 +457,30 @@ include_once "include/page_header.php";
 
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
-			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid']))
-				continue;
 
 			if(is_null($row['host'])) $row['host'] = '';
 			if(is_null($row['hostid'])) $row['hostid'] = '0';
 
+			$description = array(new CCheckBox('g_triggerid['.$row['triggerid'].']', NULL,NULL,$row["triggerid"]), SPACE);
 
-			$description = array(	new CCheckBox(
-							'g_triggerid['.$row['triggerid'].']',        /* name */
-							NULL,                   /* checked */
-							NULL,                   /* action */
-							$row["triggerid"]),     /* value */
-						SPACE);
-
-			if($row["templateid"]){
-				$real_hosts = get_realhosts_by_triggerid($row["triggerid"]);
+			if($row['templateid']){
+				$real_hosts = get_realhosts_by_triggerid($row['triggerid']);
 				$real_host = DBfetch($real_hosts);
 				if($real_host){
-					$description[] = new CLink($real_host["host"],
-							"triggers.php?&hostid=".$real_host["hostid"], 'unknown');
+					$description[] = new CLink($real_host['host'],'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
 				}
 				else{
-					$description[] = new CSpan("error","on");
+					$description[] = new CSpan('error','on');
 				}
 				$description[] = ':';
 			}
 
-			$description[] = new CLink(expand_trigger_description($row["triggerid"]),
-				"triggers.php?form=update&triggerid=".$row["triggerid"].
-					"&hostid=".$row["hostid"], 'action');
+			$description[] = new CLink(expand_trigger_description($row['triggerid']),
+				'triggers.php?form=update&triggerid='.$row['triggerid'].
+					'&hostid='.$row['hostid'], 'action');
 
 			//add dependencies
-			$deps = get_trigger_dependencies_by_triggerid($row["triggerid"]);
+			$deps = get_trigger_dependencies_by_triggerid($row['triggerid']);
 			if(count($deps) > 0){
 				$description[] = array(BR(),BR(),bold(S_DEPENDS_ON.':'),SPACE,BR());
 				foreach($deps as $val)
@@ -495,44 +489,44 @@ include_once "include/page_header.php";
 				$description[] = BR();
 			}
 	
-			if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
-			elseif($row["priority"]==1)	$priority=new CCol(S_INFORMATION,"information");
-			elseif($row["priority"]==2)	$priority=new CCol(S_WARNING,"warning");
-			elseif($row["priority"]==3)	$priority=new CCol(S_AVERAGE,"average");
-			elseif($row["priority"]==4)	$priority=new CCol(S_HIGH,"high");
-			elseif($row["priority"]==5)	$priority=new CCol(S_DISASTER,"disaster");
-			else $priority=$row["priority"];
+			if($row['priority']==0)		$priority=S_NOT_CLASSIFIED;
+			elseif($row['priority']==1)	$priority=new CCol(S_INFORMATION,'information');
+			elseif($row['priority']==2)	$priority=new CCol(S_WARNING,'warning');
+			elseif($row['priority']==3)	$priority=new CCol(S_AVERAGE,'average');
+			elseif($row['priority']==4)	$priority=new CCol(S_HIGH,'high');
+			elseif($row['priority']==5)	$priority=new CCol(S_DISASTER,'disaster');
+			else $priority=$row['priority'];
 
-			if($row["status"] == TRIGGER_STATUS_DISABLED){
+			if($row['status'] == TRIGGER_STATUS_DISABLED){
 				$status= new CLink(S_DISABLED,
-					"triggers.php?group_enable=1&g_triggerid%5B%5D=".$row["triggerid"].
-						"&hostid=".$row["hostid"],
+					'triggers.php?group_enable=1&g_triggerid%5B%5D='.$row['triggerid'].
+						'&hostid='.$row['hostid'],
 					'disabled');
 			}
-			else if($row["status"] == TRIGGER_STATUS_UNKNOWN){
+			else if($row['status'] == TRIGGER_STATUS_UNKNOWN){
 				$status= new CLink(S_UNKNOWN,
-					"triggers.php?group_disable=1&g_triggerid%5B%5D=".$row["triggerid"].
-						"&hostid=".$row["hostid"],
+					'triggers.php?group_disable=1&g_triggerid%5B%5D='.$row['triggerid'].
+						'&hostid='.$row['hostid'],
 					'unknown');
 			}
-			else if($row["status"] == TRIGGER_STATUS_ENABLED){
+			else if($row['status'] == TRIGGER_STATUS_ENABLED){
 				$status= new CLink(S_ENABLED,
-					"triggers.php?group_disable=1&g_triggerid%5B%5D=".$row["triggerid"].
-						"&hostid=".$row["hostid"],
+					'triggers.php?group_disable=1&g_triggerid%5B%5D='.$row['triggerid'].
+						'&hostid='.$row['hostid'],
 					'enabled');
 			}
 
-			if($row["status"] != TRIGGER_STATUS_UNKNOWN)	$row["error"]=SPACE;
+			if($row['status'] != TRIGGER_STATUS_UNKNOWN)	$row['error']=SPACE;
 
-			if($row["error"]=="")		$row["error"]=SPACE;
+			if($row['error']=='')		$row['error']=SPACE;
 
 			$table->addRow(array(
 				$priority,
 				$status,
-				$_REQUEST["hostid"] > 0 ? NULL : $row["host"],
+				$_REQUEST['hostid'] > 0 ? NULL : $row['host'],
 				$description,
-				explode_exp($row["expression"],1),
-				$row["error"]
+				explode_exp($row['expression'],1),
+				$row['error']
 			));
 		}
 		
@@ -555,6 +549,6 @@ include_once "include/page_header.php";
 
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>
