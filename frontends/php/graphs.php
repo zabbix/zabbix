@@ -27,60 +27,60 @@
 	require_once('include/classes/pie.inc.php');
 	
 
-	$page["title"] = "S_CONFIGURATION_OF_GRAPHS";
-	$page["file"] = "graphs.php";
+	$page['title'] = "S_CONFIGURATION_OF_GRAPHS";
+	$page['file'] = 'graphs.php';
 	$page['hist_arg'] = array();
 	$page['scripts'] = array('graphs.js');
 
-include_once "include/page_header.php";
+include_once 'include/page_header.php';
 
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"groupid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
-		"hostid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
+		'groupid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
+		'hostid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
 
-		"copy_type"	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN("0,1"),'isset({copy})'),
-		"copy_mode"	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN("0"),NULL),
+		'copy_type'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1'),'isset({copy})'),
+		'copy_mode'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),NULL),
 
-		"graphid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-		"name"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save})'),
-		"width"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
-		"height"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
-		"yaxistype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1,2"),		'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
-		"graphtype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1,2,3"),		'isset({save})'),
+		'graphid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
+		'name'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save})'),
+		'width'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
+		'height'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
+		'yaxistype'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		'graphtype'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2,3'),		'isset({save})'),
 		
-		"yaxismin"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
-		"yaxismax"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
-		"graph3d"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
-		"legend"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
+		'yaxismin'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		'graph3d'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
+		'legend'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
 		
-		"items"=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
-		"new_graph_item"=>	array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
-		"group_gid"=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
-		"move_up"=>		array(T_ZBX_INT, O_OPT,  NULL,	null,		null),
-		"move_down"=>		array(T_ZBX_INT, O_OPT,  NULL,	null,		null),
+		'items'=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
+		'new_graph_item'=>	array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
+		'group_gid'=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
+		'move_up'=>		array(T_ZBX_INT, O_OPT,  NULL,	null,		null),
+		'move_down'=>		array(T_ZBX_INT, O_OPT,  NULL,	null,		null),
 		
-		"showworkperiod"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("1"),	NULL),
-		"showtriggers"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("1"),	NULL),
+		'showworkperiod'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('1'),	NULL),
+		'showtriggers'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('1'),	NULL),
 
-		"group_graphid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
-		"copy_targetid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
-		"filter_groupid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
+		'group_graphid'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
+		'copy_targetid'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
+		'filter_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 /* actions */
-		"add_item"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"delete_item"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'add_item'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'delete_item'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		
-		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"clone"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"copy"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'copy'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 /* other */
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		"form_copy_to"=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
+		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'form_copy_to'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
 	check_fields($fields);
@@ -97,14 +97,14 @@ include_once "include/page_header.php";
 	$_REQUEST['legend'] = get_request('legend', 0);
 	
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-	$available_graphs = get_accessible_graphs(PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
+	$available_graphs = get_accessible_graphs(PERM_READ_WRITE);
 
 // ---- <ACTIONS> ----
-	if(isset($_REQUEST["clone"]) && isset($_REQUEST["graphid"])){
-		unset($_REQUEST["graphid"]);
-		$_REQUEST["form"] = "clone";
+	if(isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])){
+		unset($_REQUEST['graphid']);
+		$_REQUEST['form'] = 'clone';
 	}
-	else if(isset($_REQUEST["save"])){
+	else if(isset($_REQUEST['save'])){
 		$items = get_request('items', array());
 		foreach($items as $gitem){
 			$sql = 'SELECT h.hostid '.
@@ -121,80 +121,82 @@ include_once "include/page_header.php";
 			info(S_REQUIRED_ITEMS_FOR_GRAPH);
 		}
 		else{
-			isset($_REQUEST["yaxistype"])?(''):($_REQUEST["yaxistype"]=0);
-			isset($_REQUEST["yaxismin"])?(''):($_REQUEST["yaxismin"]=0);
-			isset($_REQUEST["yaxismax"])?(''):($_REQUEST["yaxismax"]=0);
+			isset($_REQUEST['yaxistype'])?(''):($_REQUEST['yaxistype']=0);
+			isset($_REQUEST['yaxismin'])?(''):($_REQUEST['yaxismin']=0);
+			isset($_REQUEST['yaxismax'])?(''):($_REQUEST['yaxismax']=0);
 			
-			$showworkperiod	= isset($_REQUEST["showworkperiod"]) ? 1 : 0;
-			$showtriggers	= isset($_REQUEST["showtriggers"]) ? 1 : 0;
+			$showworkperiod	= isset($_REQUEST['showworkperiod']) ? 1 : 0;
+			$showtriggers	= isset($_REQUEST['showtriggers']) ? 1 : 0;
 
-			if(isset($_REQUEST["graphid"])){
+			if(isset($_REQUEST['graphid'])){
 				
 				DBstart();
-				update_graph_with_items($_REQUEST["graphid"],
-					$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
-					$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
-					$showworkperiod,$showtriggers,$_REQUEST["graphtype"],
-					$_REQUEST["legend"],$_REQUEST["graph3d"],$items);
+				update_graph_with_items($_REQUEST['graphid'],
+					$_REQUEST['name'],$_REQUEST['width'],$_REQUEST['height'],
+					$_REQUEST['yaxistype'],$_REQUEST['yaxismin'],$_REQUEST['yaxismax'],
+					$showworkperiod,$showtriggers,$_REQUEST['graphtype'],
+					$_REQUEST['legend'],$_REQUEST['graph3d'],$items);
 				$result = DBend();
 				
 				if($result){
-					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
-						"Graph ID [".$_REQUEST["graphid"]."] Graph [".
-						$_REQUEST["name"]."]");
+					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,'Graph ID ['.$_REQUEST['graphid'].'] Graph ['.$_REQUEST['name'].']');
 				}
 				show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 			}
 			else{
 				DBstart();
-				add_graph_with_items($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
-					$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
-					$showworkperiod,$showtriggers,$_REQUEST["graphtype"],
-					$_REQUEST["legend"],$_REQUEST["graph3d"],$items);
+				add_graph_with_items($_REQUEST['name'],$_REQUEST['width'],$_REQUEST['height'],
+					$_REQUEST['yaxistype'],$_REQUEST['yaxismin'],$_REQUEST['yaxismax'],
+					$showworkperiod,$showtriggers,$_REQUEST['graphtype'],
+					$_REQUEST['legend'],$_REQUEST['graph3d'],$items);
 				$result = DBend();
 				
 				if($result){
-					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
-						"Graph [".$_REQUEST["name"]."]");
+					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,'Graph ['.$_REQUEST['name'].']');
 				}
 				show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 			}
 			if($result){
-				unset($_REQUEST["form"]);
+				unset($_REQUEST['form']);
 			}
 		}
 	}
-	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["graphid"])){
-		$graph=get_graph_by_graphid($_REQUEST["graphid"]);
-		
+	else if(isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])){
+		$graph=get_graph_by_graphid($_REQUEST['graphid']);
+		if(!uint_in_array($_REQUEST['graphid'],$available_graphs)){
+			access_deny();
+		}
+
 		DBstart();
-			delete_graph($_REQUEST["graphid"]);
-		$result = DBend();
+			$result = delete_graph($_REQUEST['graphid']);
+		$result = DBend($result);
 		
 		if($result){
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,"Graph [".$graph["name"]."]");
-			unset($_REQUEST["form"]);
+			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,'Graph ['.$graph['name'].']');
+			unset($_REQUEST['form']);
 		}
 		show_messages($result, S_GRAPH_DELETED, S_CANNOT_DELETE_GRAPH);
 	}
-	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["group_graphid"])){
-	
-		$result = true;
-		foreach($_REQUEST["group_graphid"] as $id){
-			$graph=get_graph_by_graphid($id);
-			if($graph["templateid"]<>0)	continue;
-			
-			DBstart();
-			delete_graph($id);
-			$result &= DBend();
-			
-			if($result){
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,"Graph [".$graph["name"]."]");
-			}
+	else if(isset($_REQUEST['delete']) && isset($_REQUEST['group_graphid'])){
+		$group_graphid = $_REQUEST['group_graphid'];
+		$group_graphid = array_intersect($group_graphid,$available_graphs);
+		$result = false;
+		
+		DBstart();
+		foreach($group_graphid as $id => $graphid){
+			$graph=get_graph_by_graphid($graphid);
+			if($graph['templateid']<>0)	continue;
+			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,'Graph ['.$graph['name'].']');
 		}
+		if(!empty($group_graphid)){
+			$result = delete_graph($group_graphid);
+		}
+		
+		$result = DBend($result);
+		
 		show_messages($result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 	}
-	else if(isset($_REQUEST["copy"])&&isset($_REQUEST["group_graphid"])&&isset($_REQUEST["form_copy_to"])){
+	else if(isset($_REQUEST['copy'])&&isset($_REQUEST['group_graphid'])&&isset($_REQUEST['form_copy_to'])){
 		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
 			if(0 == $_REQUEST['copy_type']){ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
@@ -213,12 +215,12 @@ include_once "include/page_header.php";
 				}
 			}
 			DBstart();
-			foreach($_REQUEST["group_graphid"] as $graph_id)
+			foreach($_REQUEST['group_graphid'] as $graph_id)
 				foreach($hosts_ids as $host_id){
 					copy_graph_to_host($graph_id, $host_id, true);
 				}
 			$result = DBend();
-			unset($_REQUEST["form_copy_to"]);
+			unset($_REQUEST['form_copy_to']);
 		}
 		else{
 			error('No target selection.');
@@ -269,24 +271,24 @@ include_once "include/page_header.php";
 		}
 	}
 // ----</ACTIONS>----
-	$available_graphs = get_accessible_graphs(PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
+	$available_graphs = get_accessible_graphs(PERM_READ_WRITE);
 ?>
 <?php
 	$form = new CForm();
 	$form->SetMethod('get');
 	
-	$form->AddItem(new CButton("form",S_CREATE_GRAPH));
+	$form->AddItem(new CButton('form',S_CREATE_GRAPH));
 
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
 	echo SBR;
 
-	if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["group_graphid"])){
-		insert_copy_elements_to_forms("group_graphid");
+	if(isset($_REQUEST['form_copy_to']) && isset($_REQUEST['group_graphid'])){
+		insert_copy_elements_to_forms('group_graphid');
 	}
-	else if(isset($_REQUEST["form"])){
+	else if(isset($_REQUEST['form'])){
 		insert_graph_form();
 		echo SBR;
-		$table = new CTable(NULL,"graph");
+		$table = new CTable(NULL,'graph');
 		if(($_REQUEST['graphtype'] == GRAPH_TYPE_PIE) || ($_REQUEST['graphtype'] == GRAPH_TYPE_EXPLODED)){
 			$table->AddRow(new CImg('chart7.php?period=3600'.url_param('items').
 				url_param('name').url_param('legend').url_param('graph3d').url_param('width').url_param('height').url_param('graphtype')));
@@ -302,8 +304,8 @@ include_once "include/page_header.php";
 	} 
 	else {
 /* Table HEADER */
-		if(isset($_REQUEST["graphid"])&&($_REQUEST["graphid"]==0)){
-			unset($_REQUEST["graphid"]);
+		if(isset($_REQUEST['graphid'])&&($_REQUEST['graphid']==0)){
+			unset($_REQUEST['graphid']);
 		}
 
 		$r_form = new CForm();
@@ -345,7 +347,7 @@ include_once "include/page_header.php";
 		
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
-			$cmbHosts->AddItem($row["hostid"],$row["host"]);
+			$cmbHosts->AddItem($row['hostid'],$row['host']);
 		}
 
 		$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
@@ -355,18 +357,18 @@ include_once "include/page_header.php";
 /* TABLE */
 		$form = new CForm();
 		$form->SetName('graphs');
-		$form->AddVar('hostid',$_REQUEST["hostid"]);
+		$form->AddVar('hostid',$_REQUEST['hostid']);
 
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
 		$table->SetHeader(array(
-			$_REQUEST["hostid"] != 0 ? NULL : S_HOSTS,
-			array(	new CCheckBox("all_graphs",NULL,"CheckAll('".$form->GetName()."','all_graphs');"),
+			$_REQUEST['hostid'] != 0 ? NULL : S_HOSTS,
+			array(	new CCheckBox('all_graphs',NULL,"CheckAll('".$form->GetName()."','all_graphs');"),
 				make_sorting_link(S_NAME,'g.name')),
 			make_sorting_link(S_WIDTH,'g.width'),
 			make_sorting_link(S_HEIGHT,'g.height'),
 			make_sorting_link(S_GRAPH_TYPE,'g.graphtype')));
 
-		if($_REQUEST["hostid"] > 0){
+		if($_REQUEST['hostid'] > 0){
 			$result = DBselect('SELECT DISTINCT g.* '.
 						' FROM graphs g, graphs_items gi,items i '.
 						' WHERE '.DBcondition('g.graphid',$available_graphs).
@@ -383,48 +385,48 @@ include_once "include/page_header.php";
 		}
 		
 		while($row=DBfetch($result)){
-			if($_REQUEST["hostid"] != 0){
+			if($_REQUEST['hostid'] != 0){
 				$host_list = NULL;
 			}
 			else{
 				$host_list = array();
-				$db_hosts = get_hosts_by_graphid($row["graphid"]);
+				$db_hosts = get_hosts_by_graphid($row['graphid']);
 				while($db_host = DBfetch($db_hosts)){
-					array_push($host_list, $db_host["host"]);
+					array_push($host_list, $db_host['host']);
 				}
 				$host_list = implode(',',$host_list);
 			}
 	
-			if($row["templateid"]==0){
-				$name = new CLink($row["name"],
-					"graphs.php?graphid=".$row["graphid"]."&form=update".
-					url_param("groupid").url_param("hostid"),'action');
+			if($row['templateid']==0){
+				$name = new CLink($row['name'],
+					'graphs.php?graphid='.$row['graphid'].'&form=update'.
+					url_param('groupid').url_param('hostid'),'action');
 			} 
 			else {
-				$real_hosts = get_realhosts_by_graphid($row["templateid"]);
+				$real_hosts = get_realhosts_by_graphid($row['templateid']);
 				$real_host = DBfetch($real_hosts);
 				if($real_host){
 					$name = array(
-						new CLink($real_host["host"],"graphs.php?".
-							"hostid=".$real_host["hostid"],
+						new CLink($real_host['host'],'graphs.php?'.
+							'hostid='.$real_host['hostid'],
 							'action'),
-						":",
-						$row["name"]
+						':',
+						$row['name']
 						);
 				}
 				else{
 					array_push($description,
-						new CSpan("error","on"),
-						":",
-						expand_trigger_description($row["triggerid"])
+						new CSpan('error','on'),
+						':',
+						expand_trigger_description($row['triggerid'])
 						);
 				}
 			}
 
-			$chkBox = new CCheckBox('group_graphid['.$row["graphid"].']',NULL,NULL,$row["graphid"]);
-			if($row["templateid"] > 0) $chkBox->SetEnabled(false);
+			$chkBox = new CCheckBox('group_graphid['.$row['graphid'].']',NULL,NULL,$row['graphid']);
+			if($row['templateid'] > 0) $chkBox->SetEnabled(false);
 
-			switch($row["graphtype"]){
+			switch($row['graphtype']){
 				case  GRAPH_TYPE_STACKED:
 					$graphtype = S_STACKED;
 					break;
@@ -442,8 +444,8 @@ include_once "include/page_header.php";
 			$table->AddRow(array(
 				$host_list,
 				array($chkBox, $name),
-				$row["width"],
-				$row["height"],
+				$row['width'],
+				$row['height'],
 				$graphtype
 				));
 		}
@@ -461,6 +463,6 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once 'include/page_footer.php';
 
 ?>

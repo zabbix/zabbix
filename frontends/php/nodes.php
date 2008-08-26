@@ -57,13 +57,12 @@ include_once "include/page_header.php";
 	check_fields($fields);
 	validate_sort_and_sortorder();
 	
-	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
+	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
 
 	if (0 == count($available_nodes) ){
 		access_deny();
 	}
-
-	$available_nodes = implode(',', $available_nodes);
+	
 ?>
 <?php
 	if(isset($_REQUEST['save'])){
@@ -131,7 +130,7 @@ include_once "include/page_header.php";
 
 		$db_nodes = DBselect('SELECT n.* '.
 						' FROM nodes n'.
-						' WHERE n.nodeid in ('.$available_nodes.') '.
+						' WHERE '.DBcondition('n.nodeid',$available_nodes).
 						order_by('n.nodeid,n.name,n.nodetype,n.timezone,n.ip','n.masterid')
 				);
 		while($row=DBfetch($db_nodes)){
