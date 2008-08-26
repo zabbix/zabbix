@@ -63,10 +63,13 @@
 int	send_list_of_active_checks(zbx_sock_t *sock, const char *host)
 {
 	char	s[MAX_STRING_LEN];
+	char	*host_esc;
 	DB_RESULT result;
 	DB_ROW	row;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_list_of_active_checks()");
+
+	host_esc = DBdyn_escape_string(host);
 
 	if (0 != CONFIG_REFRESH_UNSUPPORTED) {
 		result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h"
@@ -74,7 +77,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, const char *host)
 			" and h.proxy_hostid=0 and (i.status=%d or (i.status=%d and i.nextcheck<=%d))" DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,
-			host,
+			host_esc,
 			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED, time(NULL),
 			DBnode_local("h.hostid"));
 	} else {
@@ -83,10 +86,12 @@ int	send_list_of_active_checks(zbx_sock_t *sock, const char *host)
 			" and h.proxy_hostid=0 and i.status=%d" DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,
-			host,
+			host_esc,
 			ITEM_STATUS_ACTIVE,
 			DBnode_local("h.hostid"));
 	}
+
+	zbx_free(host_esc);
 
 	while((row=DBfetch(result)))
 	{
