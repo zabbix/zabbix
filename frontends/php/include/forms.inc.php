@@ -2218,7 +2218,7 @@
 				($limited ? null : new CButton('insert',S_INSERT,
 					"return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->GetName().
 					"&dstfld1=expression&srctbl=expression".
-					"&srcfld1=expression&expression=' + escape(GetSelectedText(this.form.elements['expression'])),700,200);"))
+					"&srcfld1=expression&expression=' + escape(getSelectedText(this.form.elements['expression'])),700,200);"))
 			));
 	/* dependencies */
 		foreach($dependencies as $val){
