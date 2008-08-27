@@ -99,8 +99,7 @@ require_once "include/httptest.inc.php";
 	function update_host_groups_by_groupid($groupid,$hosts=array()){
 		DBexecute("delete from hosts_groups where groupid=$groupid");
 
-		foreach($hosts as $hostid)
-		{
+		foreach($hosts as $hostid){
 			add_host_to_group($hostid, $groupid);
 		}
 	}
@@ -108,8 +107,7 @@ require_once "include/httptest.inc.php";
 	function update_host_groups($hostid,$groups=array()){
 		DBexecute("delete from hosts_groups where hostid=$hostid");
 
-		foreach($groups as $groupid)
-		{
+		foreach($groups as $groupid){
 			add_host_to_group($hostid, $groupid);
 		}
 	}
@@ -231,19 +229,19 @@ require_once "include/httptest.inc.php";
 	return $result;
 	}
 
-	/*
-	 * Function: add_host
-	 *
-	 * Description:
-	 *     Add new  host
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 *     NOTE: templates = array(id => name, id2 => name2, ...)
-	 */
+/*
+ * Function: add_host
+ *
+ * Description:
+ *     Add new  host
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ *     NOTE: templates = array(id => name, id2 => name2, ...)
+ */
 	function add_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$newgroup,$groups){
 		$hostid = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates);
 		if(!$hostid)

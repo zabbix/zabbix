@@ -48,11 +48,11 @@ if(!isset($DB)){
 		}
 		else{
 			switch($DB['TYPE']){
-				case "MYSQL":
+				case 'MYSQL':
 					$mysql_server = $DB['SERVER'].( !empty($DB['PORT']) ? ':'.$DB['PORT'] : '');
 
 					if (!$DB['DB']= mysql_pconnect($mysql_server,$DB['USER'],$DB['PASSWORD'])){
-						$error = "Error connecting to database [".mysql_error()."]";
+						$error = 'Error connecting to database ['.mysql_error().']';
 						$result = false;
 					}
 					else{
@@ -62,7 +62,7 @@ if(!isset($DB)){
 						}
 					}
 					break;
-				case "POSTGRESQL":
+				case 'POSTGRESQL':
 					$pg_connection_string = 
 						( !empty($DB['SERVER']) ? 'host=\''.$DB['SERVER'].'\' ' : '').
 						'dbname=\''.$DB['DATABASE'].'\' '.
@@ -76,15 +76,15 @@ if(!isset($DB)){
 						$result = false;
 					}
 					break;
-				case "ORACLE":
+				case 'ORACLE':
 					$DB['DB']= ociplogon($DB['USER'], $DB['PASSWORD'], $DB['DATABASE']);
 //					$DB['DB']= ociplogon($DB['USER'], $DB['PASSWORD'], '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST='.$DB['SERVER'].')(PORT=1521))(CONNECT_DATA=(SERVICE_NAME='.$DB['DATABASE'].')))');
 					if(!$DB['DB']){
-						$error = "Error connecting to database";
+						$error = 'Error connecting to database';
 						$result = false;
 					}
 					break;
-				case "SQLITE3":
+				case 'SQLITE3':
 					$DB['TRANSACTIONS'] = 0;
 					if(!function_exists('init_db_access')){
 						function init_db_access(){
@@ -131,19 +131,19 @@ if(!isset($DB)){
 					if(file_exists($DB['DATABASE'])){
 						$DB['DB']= sqlite3_open($DB['DATABASE']);
 						if(!$DB['DB']){
-							$error = "Error connecting to database";
+							$error = 'Error connecting to database';
 							$result = false;
 						}
 					}
 					else{
-						$error = "Missed database";
+						$error = 'Missed database';
 						$result = false;
 					}
 
 					init_db_access();
 					break;
 				default:
-					$error = "Unsupported database";
+					$error = 'Unsupported database';
 					$result = false;
 			}
 		}
@@ -159,16 +159,16 @@ if(!isset($DB)){
 
 		if( isset($DB['DB']) && !empty($DB['DB']) ){
 			switch($DB['TYPE']){
-				case "MYSQL":		
+				case 'MYSQL':		
 					$result = mysql_close($DB['DB']);	
 					break;
-				case "POSTGRESQL":
+				case 'POSTGRESQL':
 					$result = pg_close($DB['DB']);
 					break;
-				case "ORACLE":
+				case 'ORACLE':
 					$result = ocilogoff($DB['DB']);
 					break;
-				case "SQLITE3":		
+				case 'SQLITE3':		
 					$result = true; 
 					sqlite3_close($DB['DB']);	
 					free_db_access();
@@ -237,17 +237,17 @@ if(!isset($DB)){
 		$result = false;
 		if(isset($DB['DB']) && !empty($DB['DB']))
 		switch($DB['TYPE']){
-			case "MYSQL":
+			case 'MYSQL':
 				$result = DBexecute('begin');
 				break;
-			case "POSTGRESQL":
+			case 'POSTGRESQL':
 				$result = DBexecute('begin');
 				break;
-			case "ORACLE":
+			case 'ORACLE':
 				$result = true;
 // TODO			OCI_DEFAULT
 				break;
-			case "SQLITE3":				
+			case 'SQLITE3':				
 				if(1 == $DB['TRANSACTIONS']){
 					lock_db_access();
 					$result = DBexecute('begin');
@@ -305,17 +305,17 @@ if(!isset($DB)){
 		$result = false;
 		if( isset($DB['DB']) && !empty($DB['DB']) )
 		switch($DB['TYPE']){
-			case "MYSQL":
+			case 'MYSQL':
 				$result = DBexecute('commit');
 				break;
-			case "POSTGRESQL":
+			case 'POSTGRESQL':
 				$result = DBexecute('commit');
 				break;
-			case "ORACLE":
+			case 'ORACLE':
 				$result = ocicommit($DB['DB']);
 
 				break;
-			case "SQLITE3":
+			case 'SQLITE3':
 				$result = DBexecute('commit');
 				unlock_db_access();
 				break;
@@ -330,16 +330,16 @@ if(!isset($DB)){
 		$result = false;
 		if( isset($DB['DB']) && !empty($DB['DB']) )
 		switch($DB['TYPE']){
-			case "MYSQL":
+			case 'MYSQL':
 				$result = DBexecute('rollback');
 				break;
-			case "POSTGRESQL":
+			case 'POSTGRESQL':
 				$result = DBexecute('rollback');
 				break;
-			case "ORACLE":
+			case 'ORACLE':
 				$result = ocirollback($DB['DB']);
 				break;
-			case "SQLITE3":				
+			case 'SQLITE3':				
 				$result = DBexecute('rollback');
 				unlock_db_access();
 				break;
@@ -374,42 +374,42 @@ if(!isset($DB)){
 		
 		if( isset($DB['DB']) && !empty($DB['DB']) )
 		switch($DB['TYPE']){
-			case "MYSQL":
+			case 'MYSQL':
 				if(zbx_numeric($limit)){
 					$query .= ' limit '.intval($limit);
 				}
 				$result=mysql_query($query,$DB['DB']);
 				if(!$result){
-					error("Error in query [$query] [".mysql_error()."]");
+					error('Error in query ['.$query.'] ['.mysql_error().']');
 				}
 				break;
-			case "POSTGRESQL":
+			case 'POSTGRESQL':
 				if(zbx_numeric($limit)){
 					$query .= ' limit '.intval($limit);
 				}
 				$result = pg_query($DB['DB'],$query);
 				if(!$result){
-					error("Error in query [$query] [".pg_last_error()."]");
+					error('Error in query ['.$query.'] ['.pg_last_error().']');
 				}
 				break;
-			case "ORACLE":
+			case 'ORACLE':
 				if(zbx_numeric($limit)){
 					$query = 'select * from ('.$query.') where rownum<='.intval($limit);
 				}
 				$result = DBexecute($query);
 				if(!$result){
 					$e = ocierror($stid);
-					error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
+					error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 				}
 
 				break;
-			case "SQLITE3":
+			case 'SQLITE3':
 				if(!$DB['TRANSACTIONS']){
 					lock_db_access();
 				}
 				
 				if(!($result = sqlite3_query($DB['DB'],$query))){
-					error("Error in query [$query] [".sqlite3_error($DB['DB'])."]");
+					error('Error in query ['.$query.'] ['.sqlite3_error($DB['DB']).']');
 				}
 				else{
 					$data = array();
@@ -453,43 +453,43 @@ if(!isset($DB)){
 
 		if( isset($DB['DB']) && !empty($DB['DB']) )
 		switch($DB['TYPE']){
-			case "MYSQL":
+			case 'MYSQL':
 				$result=mysql_query($query,$DB['DB']);
 
 				if(!$result){
-					error("Error in query [$query] [".mysql_error()."]");
+					error('Error in query ['.$query.'] ['.mysql_error().']');
 				}
 				break;
-			case "POSTGRESQL":
+			case 'POSTGRESQL':
 				if(!($result = pg_query($DB['DB'],$query))){
-					error("Error in query [$query] [".pg_last_error()."]");
+					error('Error in query ['.$query.'] ['.pg_last_error().']');
 				}
 				break;
-			case "ORACLE":
+			case 'ORACLE':
 				$stid=OCIParse($DB['DB'],$query);
 				if(!$stid){
 					$e=@ocierror();
-					error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
+					error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 				}
 				
 				$result=@OCIExecute($stid,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS));
 				if(!$result){
 					$e=ocierror($stid);
-					error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
+					error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 				}
 				else{
 					$result = $stid;
 				}
 
 				break;
-			case "SQLITE3":
+			case 'SQLITE3':
 				if(!$DB['TRANSACTIONS']){
 					lock_db_access();
 				}
 
 				$result = sqlite3_exec($DB['DB'], $query);
 				if(!$result){
-					error("Error in query [$query] [".sqlite3_error($DB['DB'])."]");
+					error('Error in query ['.$query.'] ['.sqlite3_error($DB['DB']).']');
 				}
 				
 				if(!$DB['TRANSACTIONS']){
@@ -514,13 +514,13 @@ if(!isset($DB)){
 		
 		if(isset($DB['DB']) && !empty($DB['DB']))
 		switch($DB['TYPE']){
-			case "MYSQL":
+			case 'MYSQL':
 				$result = mysql_fetch_assoc($cursor);
 				break;
-			case "POSTGRESQL":
+			case 'POSTGRESQL':
 				$result = pg_fetch_assoc($cursor);
 				break;
-			case "ORACLE":
+			case 'ORACLE':
 				if(ocifetchinto($cursor, $row, (OCI_ASSOC+OCI_RETURN_NULLS))){
 					$result = array();
 					foreach($row as $key => $value){
@@ -528,7 +528,7 @@ if(!isset($DB)){
 					}
 				}
 				break;
-			case "SQLITE3":
+			case 'SQLITE3':
 				if($cursor){
 					$result = array_shift($cursor);
 					if(is_null($result)) $result = false;
@@ -549,7 +549,7 @@ if(!isset($DB)){
 }
 
 /* string value prepearing */
-if(isset($DB['TYPE']) && $DB['TYPE'] == "ORACLE") {
+if(isset($DB['TYPE']) && $DB['TYPE'] == 'ORACLE') {
 	function zbx_dbstr($var)	{
 		return "'".ereg_replace('\'','\'\'',$var)."'";	
 	}
@@ -676,15 +676,15 @@ else {
 		do{
 			global $ZBX_LOCALNODEID;
 
-			$min=bcadd(bcmul($nodeid,"100000000000000"),bcmul($ZBX_LOCALNODEID,"100000000000"));
-			$max=bcadd(bcadd(bcmul($nodeid,"100000000000000"),bcmul($ZBX_LOCALNODEID,"100000000000")),"99999999999");
-			$row = DBfetch(DBselect("select nextid from ids where nodeid=$nodeid and table_name='$table' and field_name='$field'"));
+			$min=bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000'));
+			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999');
+			$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid ." AND table_name='$table' AND field_name='$field'"));
 			if(!$row){
-				$row=DBfetch(DBselect("select max($field) as id from $table where $field>=$min and $field<=$max"));
+				$row=DBfetch(DBselect('SELECT max('.$field.') AS id FROM '.$table.' WHERE '.$field.'>='.$min.' AND '.$field.'<='.$max));
 				if(!$row || is_null($row["id"])){
 				
-					DBexecute("insert into ids (nodeid,table_name,field_name,nextid) ".
-						" values ($nodeid,'$table','$field',$min)");
+					DBexecute('INSERT INTO ids (nodeid,table_name,field_name,nextid) '.
+						" VALUES ($nodeid,'$table','$field',$min)");
 				}
 				else{
 					/*
@@ -694,20 +694,20 @@ else {
 					}
 					*/
 
-					DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values ($nodeid,'$table','$field',".$row["id"].")");
+					DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',".$row["id"].')');
 				}
 				continue;
 			}
 			else{
 				$ret1 = $row["nextid"];
 				if((bccomp($ret1,$min) < 0) || !(bccomp($ret1,$max) < 0)) {
-					DBexecute("delete from ids where nodeid=$nodeid and table_name='$table' and field_name='$field'");
+					DBexecute("DELETE FROM ids WHERE nodeid=$nodeid AND table_name='$table' AND field_name='$field'");
 					continue;
 				}
 	
-				DBexecute("update ids set nextid=nextid+1 where nodeid=$nodeid and table_name='$table' and field_name='$field'");
+				DBexecute("UPDATE ids SET nextid=nextid+1 WHERE nodeid=$nodeid AND table_name='$table' AND field_name='$field'");
 	
-				$row = DBfetch(DBselect("select nextid from ids where nodeid=$nodeid and table_name='$table' and field_name='$field'"));
+				$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid." AND table_name='$table' AND field_name='$field'"));
 				if(!$row || is_null($row["nextid"])){
 					/* Should never be here */
 					continue;
@@ -756,10 +756,7 @@ else {
 			case 'ORACLE':
 				$items = array_chunk($array, 950);
 				foreach($items as $id => $value){
-					if($notin)
-						$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
-					else
-						$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
+					$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
 					$condition.= implode(',',$value);
 				}
 				break;
@@ -767,7 +764,7 @@ else {
 				$condition = implode(',',$array);
 		}
 		
-		if(empty($condition)) $condition = '0';
+		if(zbx_empty($condition)) $condition = '0';
 
 	return '('.$fieldname.$in.'('.$condition.'))';
 	}
