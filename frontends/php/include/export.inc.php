@@ -34,12 +34,6 @@
 				'port'		=> '',
 				'status'	=> '')
 			),
-		XML_TAG_DEPENDENCY => array(
-			'attribures'	=> array(
-				'dependency'	=> 'description'),
-			'elements'	=> array(
-				'depends'		=> '')
-			),
 		XML_TAG_HOSTPROFILE => array(
 			'attribures'	=> array(),
 			'elements'	=> array(
@@ -54,6 +48,12 @@
 				'contact' 	=> '',
 				'location' 	=> '',
 				'notes' 		=> '')
+			),
+		XML_TAG_DEPENDENCY => array(
+			'attribures'	=> array(
+				'dependency'	=> 'description'),
+			'elements'	=> array(
+				'depends'		=> '')
 			),
 		XML_TAG_ITEM => array(
 			'attribures'	=> array(

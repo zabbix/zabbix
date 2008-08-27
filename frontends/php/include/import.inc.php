@@ -482,9 +482,7 @@
 						}
 					}
 					else{
-						$data['expression'] = str_replace('{HOSTNAME}',
-									$this->data[XML_TAG_HOST]['name'],
-									$data['expression']);
+						$data['expression'] = str_replace('{HOSTNAME}',$this->data[XML_TAG_HOST]['name'],$data['expression']);
  
 						$result = DBselect('SELECT DISTINCT t.triggerid,t.templateid,t.expression '.
  							' FROM triggers t,functions f,items i '.
@@ -561,7 +559,7 @@
 					if(!isset($data['yaxismax']))		$data['yaxismax']		= 0;
 					if(!isset($data['show_legend']))	$data['show_legend']	= 0;
 					if(!isset($data['show_3d']))		$data['show_3d']		= 0;
-					if(!isset($data['items']))		$data['items']			= array();
+					if(!isset($data['items']))			$data['items']			= array();
 
 					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid']){
 						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip']){
