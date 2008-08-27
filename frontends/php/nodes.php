@@ -110,7 +110,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
-	
+
 	if(isset($_REQUEST["form"])){
 		insert_node_form();
 	}
@@ -128,11 +128,12 @@ include_once "include/page_header.php";
 			make_sorting_link(S_IP.':'.S_PORT,'n.ip')
 		));
 
-		$db_nodes = DBselect('SELECT n.* '.
-						' FROM nodes n'.
-						' WHERE '.DBcondition('n.nodeid',$available_nodes).
-						order_by('n.nodeid,n.name,n.nodetype,n.timezone,n.ip','n.masterid')
-				);
+		$sql = 'SELECT n.* '.
+				' FROM nodes n'.
+				' WHERE '.DBcondition('n.nodeid',$available_nodes).
+				order_by('n.nodeid,n.name,n.nodetype,n.timezone,n.ip','n.masterid');
+
+		$db_nodes = DBselect($sql);
 		while($row=DBfetch($db_nodes)){
 
 			$node_type = detect_node_type($row);

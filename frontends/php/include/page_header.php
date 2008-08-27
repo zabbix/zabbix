@@ -509,9 +509,10 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 		if(ZBX_DISTRIBUTED){
 			$lst_nodes = new CComboBox('switch_node', get_current_nodeid(false), "submit()");
+			$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
 			$db_nodes = DBselect('SELECT * '.
 						' FROM nodes '.
-						' WHERE '.DBcondition('nodeid',get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST)).
+						' WHERE '.DBcondition('nodeid',$available_nodes).
 						' ORDER BY name ');
 			while($node_data = DBfetch($db_nodes)){
 				$lst_nodes->AddItem($node_data['nodeid'],$node_data['name']);
