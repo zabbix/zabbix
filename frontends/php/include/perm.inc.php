@@ -443,7 +443,7 @@ COpt::counter_up('perm');
 	return $result;
 }
 
-function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=PERM_RES_IDS_ARRAY,$nodeid=null){
+function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=PERM_RES_IDS_ARRAY,$nodeid=null,$cache=1){
 	global $ZBX_LOCALNODEID, $ZBX_NODES_IDS;
 
 	if(is_null($nodeid)) $nodeid = $ZBX_NODES_IDS;
@@ -460,16 +460,15 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=PERM_RES_IDS_A
 //COpt::counter_up('perm');
 
 	if(USER_TYPE_SUPER_ADMIN == $user_type){
-		$nodes = DBselect('SELECT nodeid FROM nodes WHERE '.DBcondition('nodeid', $nodeid));
+		$nodes = DBselect('SELECT nodeid FROM nodes WHERE '.DBcondition('nodeid',$nodeid));
 		while($node = DBfetch($nodes)){
 			$node_data[$node['nodeid']] = $node;
 			$node_data[$node['nodeid']]['permission'] = PERM_READ_WRITE;
 		}
-		
 		if(empty($node_data)) $node_data[0]['nodeid'] = 0;
 	}
 	else{
-		$available_hosts = get_accessible_hosts_by_user($user_data,$perm,PERM_RES_DATA_ARRAY,$nodeid);	
+		$available_hosts = get_accessible_hosts_by_user($user_data,$perm,PERM_RES_DATA_ARRAY,$nodeid,$cache);	
 		foreach($available_hosts as $id => $host){
 			$nodeid = id2nodeid($host['hostid']);
 			$permission = (isset($node_data[$nodeid]) && ($permission < $node_data[$nodeid]['permission']))?$node_data[$nodeid]['permission']:$host['permission'];
