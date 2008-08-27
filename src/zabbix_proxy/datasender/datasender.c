@@ -30,6 +30,8 @@
 #define ZBX_HISTORY_FIELD struct history_field_t
 #define ZBX_HISTORY_TABLE struct history_table_t
 
+#define ZBX_MAX_HRECORDS	1000
+
 struct history_field_t {
 	const char		*field;
 	const char		*tag;
@@ -39,6 +41,7 @@ struct history_field_t {
 
 struct history_table_t {
 	const char		*table, *lastfieldname;
+	int			cidx;	/* index of column 'clock' */
 	ZBX_HISTORY_FIELD	fields[ZBX_MAX_FIELDS];
 };
 
@@ -47,8 +50,8 @@ struct last_ids {
 	zbx_uint64_t		lastid;
 };
 
-static ZBX_HISTORY_TABLE ht[]={
-	{"proxy_history", "history_lastid",
+static ZBX_HISTORY_TABLE ht={
+	"proxy_history", "history_lastid", 0,
 		{
 		{"clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
 		{"timestamp",	ZBX_PROTO_TAG_LOGTIMESTAMP,	ZBX_JSON_TYPE_INT,	"0"},
@@ -57,12 +60,10 @@ static ZBX_HISTORY_TABLE ht[]={
 		{"value",	ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	NULL},
 		{NULL}
 		}
-	},
-	{NULL}
 };
 
-static ZBX_HISTORY_TABLE dht[]={
-	{"proxy_dhistory", "dhistory_lastid",
+static ZBX_HISTORY_TABLE dht={
+	"proxy_dhistory", "dhistory_lastid", 0,
 		{
 		{"clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
 		{"druleid",	ZBX_PROTO_TAG_DRULE,		ZBX_JSON_TYPE_INT,	NULL},
@@ -74,8 +75,6 @@ static ZBX_HISTORY_TABLE dht[]={
 		{"status",	ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	NULL},
 		{NULL}
 		}
-	},
-	{NULL}
 };
 
 #define ZBX_SENDER_TABLE_COUNT 6
@@ -181,7 +180,7 @@ static void	set_lastid(const ZBX_HISTORY_TABLE *ht, const zbx_uint64_t lastid)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
+static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid, int *lastclock)
 {
 	int		offset = 0, f, records = 0;
 	char		sql[MAX_STRING_LEN];
@@ -207,7 +206,7 @@ static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx
 			ht->table,
 			id);
 
-	result = DBselectN(sql, 1000);
+	result = DBselectN(sql, ZBX_MAX_HRECORDS);
 
 	while (NULL != (row = DBfetch(result))) {
 		zbx_json_addobject(j, NULL);
@@ -215,6 +214,7 @@ static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx
 		*lastid = zbx_atoui64(row[0]);
 		zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, row[1], ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(j, ZBX_PROTO_TAG_KEY, row[2], ZBX_JSON_TYPE_STRING);
+		*lastclock = atoi(row[ht->cidx + 3]);
 
 		for (f = 0; ht->fields[f].field != NULL; f ++)
 		{
@@ -249,7 +249,7 @@ static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-static int get_dhistory_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
+static int get_dhistory_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid, int *lastclock)
 {
 	int		offset = 0, f, records = 0;
 	char		sql[MAX_STRING_LEN];
@@ -275,12 +275,13 @@ static int get_dhistory_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zb
 			ht->table,
 			id);
 
-	result = DBselectN(sql, 1000);
+	result = DBselectN(sql, ZBX_MAX_HRECORDS);
 
 	while (NULL != (row = DBfetch(result))) {
 		zbx_json_addobject(j, NULL);
 
 		*lastid = zbx_atoui64(row[0]);
+		*lastclock = atoi(row[ht->cidx + 1]);
 
 		for (f = 0; ht->fields[f].field != NULL; f ++)
 		{
@@ -312,12 +313,12 @@ static int get_dhistory_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zb
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
- * Comments: never returns                                                    *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	history_sender(struct zbx_json *j)
+static void	history_sender(struct zbx_json *j, int *records, int *lastclock)
 {
-	int		i, r, records = 0;
+	int		i;
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
 	struct last_ids li[ZBX_SENDER_TABLE_COUNT];
@@ -325,41 +326,47 @@ static int	history_sender(struct zbx_json *j)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In history_sender()");
 
+	*lastclock = 0;
+
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_HISTORY_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
-	for (i = 0; ht[i].table != NULL; i ++) {
-		if (0 == (r = get_history_data(j, &ht[i], &lastid)))
-			continue;
 
-		li[li_no].ht = &ht[i];
+	if (0 != (*records = get_history_data(j, &ht, &lastid, lastclock)))
+	{
+		li[li_no].ht = &ht;
 		li[li_no].lastid = lastid;
 		li_no++;
-
-		records += r;
 	}
 	zbx_json_close(j);
 
 	zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
-	if (records)
+	if (*records > 0)
 	{
-		if (FAIL == connect_to_server(&sock, 600))	/* alarm !!! */
-			return FAIL;
+retry:
+		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
+		{
+			if (SUCCEED == put_data_to_server(&sock, j))
+			{
+				DBbegin();
+				for (i = 0; i < li_no; i++)
+					set_lastid(li[i].ht, li[i].lastid);
+				DBcommit();
+			}
+			else
+				*records = 0;
 
-		if (SUCCEED == put_data_to_server(&sock, j)) {
-			DBbegin();
-			for (i = 0; i < li_no; i++)
-				set_lastid(li[i].ht, li[i].lastid);
-			DBcommit();
+			disconnect_server(&sock);
 		}
-
-		disconnect_server(&sock);
+		else
+		{
+			sleep(CONFIG_DATASENDER_FREQUENCY);
+			goto retry;
+		}
 	}
-
-	return records;
 }
 
 /******************************************************************************
@@ -370,16 +377,16 @@ static int	history_sender(struct zbx_json *j)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: number of records or FAIL if server is not accessible        * 
+ * Return value:                                                              * 
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
- * Comments: never returns                                                    *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	dhistory_sender(struct zbx_json *j)
+static void	dhistory_sender(struct zbx_json *j, int *records, int *lastclock)
 {
-	int		i, r, records = 0;
+	int		i;
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
 	struct last_ids li[ZBX_SENDER_TABLE_COUNT];
@@ -387,41 +394,47 @@ static int	dhistory_sender(struct zbx_json *j)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In dhistory_sender()");
 
+	*lastclock = 0;
+
 	zbx_json_clean(j);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_DISCOVERY_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
-	for (i = 0; dht[i].table != NULL; i ++) {
-		if (0 == (r = get_dhistory_data(j, &dht[i], &lastid)))
-			continue;
 
-		li[li_no].ht = &dht[i];
+	if (0 != (*records = get_dhistory_data(j, &dht, &lastid, lastclock)))
+	{
+		li[li_no].ht = &dht;
 		li[li_no].lastid = lastid;
 		li_no++;
-
-		records += r;
 	}
 	zbx_json_close(j);
 
 	zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
-	if (records)
+	if (*records > 0)
 	{
-		if (FAIL == connect_to_server(&sock, 600))	/* alarm !!! */
-			return FAIL;
+retry:
+		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
+		{
+			if (SUCCEED == put_data_to_server(&sock, j))
+			{
+				DBbegin();
+				for (i = 0; i < li_no; i++)
+					set_lastid(li[i].ht, li[i].lastid);
+				DBcommit();
+			}
+			else
+				*records = 0;
 
-		if (SUCCEED == put_data_to_server(&sock, j)) {
-			DBbegin();
-			for (i = 0; i < li_no; i++)
-				set_lastid(li[i].ht, li[i].lastid);
-			DBcommit();
+			disconnect_server(&sock);
 		}
-
-		disconnect_server(&sock);
+		else
+		{
+			sleep(CONFIG_DATASENDER_FREQUENCY);
+			goto retry;
+		}
 	}
-
-	return records;
 }
 
 /******************************************************************************
@@ -446,6 +459,7 @@ int	main_datasender_loop()
 				records, r;
 	double			sec;
 	struct zbx_json		j;
+	int			lastclock;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_datasender_loop()");
 
@@ -467,17 +481,25 @@ int	main_datasender_loop()
 		zbx_setproctitle("data sender [sending data]");
 
 		records = 0;
-		if (FAIL != (r = history_sender(&j)))
-			records += r;
-				
-		if (FAIL != (r = dhistory_sender(&j)))
-			records += r;
+retry_history:
+		history_sender(&j, &r, &lastclock);
+		records += r;
+
+		if (r == ZBX_MAX_HRECORDS && lastclock && time(NULL) - lastclock > CONFIG_DATASENDER_FREQUENCY * 2)
+			goto retry_history;
+
+retry_dhistory:
+		dhistory_sender(&j, &r, &lastclock);
+		records += r;
+
+		if (r == ZBX_MAX_HRECORDS && lastclock && time(NULL) - lastclock > CONFIG_DATASENDER_FREQUENCY * 2)
+			goto retry_dhistory;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Datasender spent " ZBX_FS_DBL " seconds while processing %3d values.",
 				zbx_time() - sec,
 				records);
 
-		sleeptime = CONFIG_DATASENDER_FREQUENCY - (time(NULL) - now);
+		sleeptime = CONFIG_DATASENDER_FREQUENCY;
 
 		if (sleeptime > 0) {
 			zbx_setproctitle("data sender [sleeping for %d seconds]",
