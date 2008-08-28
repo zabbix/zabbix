@@ -72,13 +72,12 @@
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 ?>
-
 <?php
 	$_REQUEST['config'] = get_request('config',get_profile('web.config.config',0));
-
+	
 	check_fields($fields);
 
-	update_profile('web.config.config',$_REQUEST['config']);
+	update_profile('web.config.config',$_REQUEST['config'],PROFILE_TYPE_INT);
 
 	$result = 0;
 	if($_REQUEST['config']==3){

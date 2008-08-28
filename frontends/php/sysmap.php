@@ -156,11 +156,9 @@ include_once "include/page_header.php";
 		echo SBR;
 		insert_map_element_form();
 	}
-	else if(isset($_REQUEST["form"]) && ($_REQUEST["form"]=="add_link" || 
-		($_REQUEST["form"]=="update" && isset($_REQUEST["linkid"]))))
-	{
-		$row = DBfetch(DBselect("select count(*) as count from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]));
-		if($row["count"]>1){
+	else if(isset($_REQUEST['form']) && ($_REQUEST['form']=='add_link' || ($_REQUEST['form']=='update' && isset($_REQUEST['linkid'])))){
+		$row = DBfetch(DBselect('select count(*) as count from sysmaps_elements where sysmapid='.$_REQUEST['sysmapid']));
+		if($row['count']>1){
 			show_table_header(S_CONNECTORS);
 			echo SBR;
 			insert_map_link_form();
@@ -174,7 +172,7 @@ include_once "include/page_header.php";
 			"return redirect('".$page["file"]."?form=add_element".url_param("sysmapid")."');"));
 
 		$table = new CTableInfo();
-		$table->SetHeader(array(S_LABEL,S_TYPE,S_X,S_Y,S_ICON_OFF,S_ICON_ON,S_ICON_UNKNOWN,S_ICON_DISABLED));
+		$table->SetHeader(array(S_LABEL,S_TYPE,S_X,S_Y,S_ICON_OK,S_ICON_PROBLEM,S_ICON_UNKNOWN,S_ICON_DISABLED));
 
 		$db_elements = DBselect("select * from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"].
 			" order by label");
