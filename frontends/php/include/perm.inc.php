@@ -460,7 +460,7 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=PERM_RES_IDS_A
 //COpt::counter_up('perm');
 
 	if(USER_TYPE_SUPER_ADMIN == $user_type){
-		$nodes = DBselect('SELECT nodeid FROM nodes WHERE '.DBcondition('nodeid',$nodeid));
+		$nodes = DBselect('SELECT nodeid FROM nodes');// WHERE '.DBcondition('nodeid',$nodeid));
 		while($node = DBfetch($nodes)){
 			$node_data[$node['nodeid']] = $node;
 			$node_data[$node['nodeid']]['permission'] = PERM_READ_WRITE;
