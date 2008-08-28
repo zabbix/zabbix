@@ -19,16 +19,16 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/maps.inc.php";
-	require_once "include/forms.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/maps.inc.php');
+	require_once('include/forms.inc.php');
 
 	$page["title"] = "S_LINK_STATUS_INDICATORS";
 	$page["file"] = "popup_link_tr.php";
 	
 	define('ZBX_PAGE_NO_MENU', 1);
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -153,8 +153,8 @@ else if(isset($_REQUEST['form'])){
 							$btnSelect
 						));
 	
-	$frmCnct->AddRow(S_TYPE.' ('.S_ON.')',$cmbType);
-	$frmCnct->AddRow(S_COLOR.' ('.S_ON.')', new CColor('color',$color));
+	$frmCnct->AddRow(S_TYPE.' ('.S_PROBLEM_BIG.')',$cmbType);
+	$frmCnct->AddRow(S_COLOR.' ('.S_PROBLEM_BIG.')', new CColor('color',$color));
 	
 	$frmCnct->AddItemToBottomRow(new CButton("save",(isset($_REQUEST['triggerid']))?S_SAVE:S_ADD));
 	$frmCnct->AddItemToBottomRow(SPACE);

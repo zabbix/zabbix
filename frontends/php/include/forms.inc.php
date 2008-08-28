@@ -4890,48 +4890,48 @@
 	function insert_map_element_form(){
 		global $USER_DETAILS;
 
-		$frmEl = new CFormTable("New map element","sysmap.php");
-		$frmEl->SetHelp("web.sysmap.host.php");
-		$frmEl->AddVar("sysmapid",$_REQUEST["sysmapid"]);
+		$frmEl = new CFormTable('New map element','sysmap.php');
+		$frmEl->SetHelp('web.sysmap.host.php');
+		$frmEl->AddVar('sysmapid',$_REQUEST['sysmapid']);
 
-		if(isset($_REQUEST["selementid"])){
-			$frmEl->AddVar("selementid",$_REQUEST["selementid"]);
+		if(isset($_REQUEST['selementid'])){
+			$frmEl->AddVar('selementid',$_REQUEST['selementid']);
 
-			$element = get_sysmaps_element_by_selementid($_REQUEST["selementid"]);
-			$frmEl->SetTitle("Map element \"".$element["label"]."\"");
+			$element = get_sysmaps_element_by_selementid($_REQUEST['selementid']);
+			$frmEl->SetTitle('Map element "'.$element['label'].'"');
 		}
 
-		if(isset($_REQUEST["selementid"]) && !isset($_REQUEST["form_refresh"])){
+		if(isset($_REQUEST['selementid']) && !isset($_REQUEST['form_refresh'])){
 		
-			$elementid	= $element["elementid"];
-			$elementtype	= $element["elementtype"];
-			$label		= $element["label"];
-			$x		= $element["x"];
-			$y		= $element["y"];
-			$url		= $element["url"];
-			$iconid_off	= $element["iconid_off"];
-			$iconid_on	= $element["iconid_on"];
-			$iconid_unknown	= $element["iconid_unknown"];
-			$iconid_disabled= $element["iconid_disabled"];
-			$label_location	= $element["label_location"];
+			$elementid	= $element['elementid'];
+			$elementtype	= $element['elementtype'];
+			$label		= $element['label'];
+			$x		= $element['x'];
+			$y		= $element['y'];
+			$url		= $element['url'];
+			$iconid_off	= $element['iconid_off'];
+			$iconid_on	= $element['iconid_on'];
+			$iconid_unknown	= $element['iconid_unknown'];
+			$iconid_disabled= $element['iconid_disabled'];
+			$label_location	= $element['label_location'];
 			if(is_null($label_location)) $label_location = -1;
 		}
 		else{
 		
-			$elementid 	= get_request("elementid", 	0);
-			$elementtype	= get_request("elementtype", 	SYSMAP_ELEMENT_TYPE_HOST);
-			$label		= get_request("label",		"");
-			$x		= get_request("x",		0);
-			$y		= get_request("y",		0);
-			$url		= get_request("url",		"");
-			$iconid_off	= get_request("iconid_off",	0);
-			$iconid_on	= get_request("iconid_on",	0);
-			$iconid_unknown	= get_request("iconid_unknown",	0);
-			$iconid_disabled= get_request("iconid_disabled",0);
-			$label_location	= get_request("label_location",	"-1");
+			$elementid 	= get_request('elementid', 	0);
+			$elementtype	= get_request('elementtype', 	SYSMAP_ELEMENT_TYPE_HOST);
+			$label		= get_request('label',		'');
+			$x		= get_request('x',		0);
+			$y		= get_request('y',		0);
+			$url		= get_request('url',		'');
+			$iconid_off	= get_request('iconid_off',	0);
+			$iconid_on	= get_request('iconid_on',	0);
+			$iconid_unknown	= get_request('iconid_unknown',	0);
+			$iconid_disabled= get_request('iconid_disabled',0);
+			$label_location	= get_request('label_location',	'-1');
 		}
 
-		$cmbType = new CComboBox("elementtype",$elementtype,"submit()");
+		$cmbType = new CComboBox('elementtype',$elementtype,'submit()');
 
 		$available_groups = 	get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 		$available_hosts = 		get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
@@ -4954,9 +4954,9 @@
 
 		$frmEl->AddRow(S_TYPE,$cmbType);
 
-		$frmEl->AddRow(S_LABEL, new CTextBox("label", $label, 32));
+		$frmEl->AddRow(S_LABEL, new CTextBox('label', $label, 32));
 
-		$cmbLocation = new CComboBox("label_location",$label_location);
+		$cmbLocation = new CComboBox('label_location',$label_location);
 		$cmbLocation->AddItem(-1,'-');
 		$cmbLocation->AddItem(0,S_BOTTOM);
 		$cmbLocation->AddItem(1,S_LEFT);
@@ -4969,12 +4969,12 @@
 
 			$host_info = DBfetch(DBselect('SELECT DISTINCT n.name as node_name,h.hostid,h.host '.
 						' FROM hosts h '.
-							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid("h.hostid").
+							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('h.hostid').
 						' WHERE '.DBcondition('h.hostid',$available_hosts).
 							' AND hostid='.$elementid.
 						' ORDER BY node_name,h.host'));
 			if($host_info)
-				$host = $host_info["host"];
+				$host = $host_info['host'];
 			else
 				$elementid=0;
 
@@ -4983,29 +4983,29 @@
 				$elementid = 0;
 			}
 
-			$frmEl->AddVar("elementid",$elementid);
+			$frmEl->AddVar('elementid',$elementid);
 			$frmEl->AddRow(S_HOST, array(
-				new CTextBox("host",$host,32,'yes'),
-				new CButton("btn1",S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
+				new CTextBox('host',$host,32,'yes'),
+				new CButton('btn1',S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
 					"&dstfld1=elementid&dstfld2=host&srctbl=hosts&srcfld1=hostid&srcfld2=host',450,450);",
-					"T")
+					'T')
 			));
 		}
 		else if($elementtype==SYSMAP_ELEMENT_TYPE_MAP){
-			$cmbMaps = new CComboBox("elementid",$elementid);
+			$cmbMaps = new CComboBox('elementid',$elementid);
 			$db_maps = DBselect('SELECT DISTINCT n.name as node_name,s.sysmapid,s.name '.
 								' FROM sysmaps s'.
 									' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('s.sysmapid').
 								' ORDER BY node_name,s.name');
 			while($db_map = DBfetch($db_maps)){
-				if(!sysmap_accessible($db_map["sysmapid"],PERM_READ_ONLY)) continue;
+				if(!sysmap_accessible($db_map['sysmapid'],PERM_READ_ONLY)) continue;
 				$node_name = isset($db_map['node_name']) ? '('.$db_map['node_name'].') ' : '';
-				$cmbMaps->AddItem($db_map["sysmapid"],$node_name.$db_map["name"]);
+				$cmbMaps->AddItem($db_map['sysmapid'],$node_name.$db_map['name']);
 			}
 			$frmEl->AddRow(S_MAP, $cmbMaps);
 		}
 		else if($elementtype==SYSMAP_ELEMENT_TYPE_TRIGGER){
-			$trigger = "";
+			$trigger = '';
 			$trigger_info = DBfetch(DBselect('SELECT DISTINCT n.name as node_name,h.hostid,h.host,t.*'.
 				' FROM triggers t '.
 					' LEFT JOIN functions f on t.triggerid=f.triggerid '.
@@ -5031,7 +5031,7 @@
 				new CTextBox('trigger',$trigger,32,'yes'),
 				new CButton('btn1',S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
 					"&dstfld1=elementid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description');",
-					"T")
+					'T')
 			));
 		}
 		else if($elementtype==SYSMAP_ELEMENT_TYPE_HOST_GROUP){
@@ -5045,138 +5045,138 @@
 								' ORDER BY node_name,g.name'));
 
 			if($group_info)
-				$group = $group_info["name"];
+				$group = $group_info['name'];
 			else
 				$elementid=0;
 
 			if($elementid==0){
-				$group = "";
+				$group = '';
 				$elementid = 0;
 			}
 
-			$frmEl->AddVar("elementid",$elementid);
+			$frmEl->AddVar('elementid',$elementid);
 			$frmEl->AddRow(S_HOST_GROUP, array(
-				new CTextBox("group",$group,32,'yes'),
-				new CButton("btn1",S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
+				new CTextBox('group',$group,32,'yes'),
+				new CButton('btn1',S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
 					"&dstfld1=elementid&dstfld2=group&srctbl=host_group&srcfld1=groupid&srcfld2=name',450,450);",
-					"T")
+					'T')
 			));
 		}
 
-		$cmbIconOff	= new CComboBox("iconid_off",$iconid_off);
-		$cmbIconOn	= new CComboBox("iconid_on",$iconid_on);
+		$cmbIconOff	= new CComboBox('iconid_off',$iconid_off);
+		$cmbIconOn	= new CComboBox('iconid_on',$iconid_on);
 		if ($elementtype != SYSMAP_ELEMENT_TYPE_MAP)
-			$cmbIconUnknown	= new CComboBox("iconid_unknown",$iconid_unknown);
+			$cmbIconUnknown	= new CComboBox('iconid_unknown',$iconid_unknown);
 		if ($elementtype != SYSMAP_ELEMENT_TYPE_HOST_GROUP && $elementtype != SYSMAP_ELEMENT_TYPE_MAP)
-			$cmbIconDisabled= new CComboBox("iconid_disabled",$iconid_disabled);
+			$cmbIconDisabled= new CComboBox('iconid_disabled',$iconid_disabled);
 		
 		$result = DBselect('SELECT * FROM images WHERE imagetype=1 AND '.DBin_node('imageid').' order by name');
 		while($row=DBfetch($result)){
-			$row["name"] = get_node_name_by_elid($row["imageid"]).$row["name"];
+			$row['name'] = get_node_name_by_elid($row['imageid']).$row['name'];
 
-			$cmbIconOff->AddItem($row["imageid"],$row["name"]);
-			$cmbIconOn->AddItem($row["imageid"],$row["name"]);
+			$cmbIconOff->AddItem($row['imageid'],$row['name']);
+			$cmbIconOn->AddItem($row['imageid'],$row['name']);
 			if ($elementtype != SYSMAP_ELEMENT_TYPE_MAP)
-				$cmbIconUnknown->AddItem($row["imageid"],$row["name"]);
+				$cmbIconUnknown->AddItem($row['imageid'],$row['name']);
 			if ($elementtype != SYSMAP_ELEMENT_TYPE_HOST_GROUP && $elementtype != SYSMAP_ELEMENT_TYPE_MAP)
-				$cmbIconDisabled->AddItem($row["imageid"],$row["name"]);
+				$cmbIconDisabled->AddItem($row['imageid'],$row['name']);
 		}
 		
-		$frmEl->AddRow(S_ICON_OFF,$cmbIconOff);
-		$frmEl->AddRow(S_ICON_ON,$cmbIconOn);
+		$frmEl->AddRow(S_ICON_OK,$cmbIconOff);
+		$frmEl->AddRow(S_ICON_PROBLEM,$cmbIconOn);
 		if ($elementtype != SYSMAP_ELEMENT_TYPE_MAP)
 			$frmEl->AddRow(S_ICON_UNKNOWN, $cmbIconUnknown);
 		else
-			$frmEl->AddVar("iconid_unknown", 0);
+			$frmEl->AddVar('iconid_unknown', 0);
 		if ($elementtype != SYSMAP_ELEMENT_TYPE_HOST_GROUP && $elementtype != SYSMAP_ELEMENT_TYPE_MAP)
 			$frmEl->AddRow(S_ICON_DISABLED,$cmbIconDisabled);
 		else
-			$frmEl->AddVar("iconid_disabled", 0);
+			$frmEl->AddVar('iconid_disabled', 0);
 
-		$frmEl->AddRow(S_COORDINATE_X, new CNumericBox("x", $x, 5));
-		$frmEl->AddRow(S_COORDINATE_Y, new CNumericBox("y", $y, 5));
-		$frmEl->AddRow(S_URL, new CTextBox("url", $url, 64));
+		$frmEl->AddRow(S_COORDINATE_X, new CNumericBox('x', $x, 5));
+		$frmEl->AddRow(S_COORDINATE_Y, new CNumericBox('y', $y, 5));
+		$frmEl->AddRow(S_URL, new CTextBox('url', $url, 64));
 
-		$frmEl->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["selementid"])){
+		$frmEl->AddItemToBottomRow(new CButton('save',S_SAVE));
+		if(isset($_REQUEST['selementid'])){
 			$frmEl->AddItemToBottomRow(SPACE);
-			$frmEl->AddItemToBottomRow(new CButtonDelete("Delete element?",url_param("form").
-				url_param("selementid").url_param("sysmapid")));
+			$frmEl->AddItemToBottomRow(new CButtonDelete('Delete element?',url_param('form').
+				url_param('selementid').url_param('sysmapid')));
 		}
 		$frmEl->AddItemToBottomRow(SPACE);
-		$frmEl->AddItemToBottomRow(new CButtonCancel(url_param("sysmapid")));
+		$frmEl->AddItemToBottomRow(new CButtonCancel(url_param('sysmapid')));
 
 		$frmEl->Show();
 	}
 
 	function insert_map_link_form(){
 
-		$frmCnct = new CFormTable("New connector","sysmap.php");
-		$frmCnct->SetHelp("web.sysmap.connector.php");
-		$frmCnct->AddVar("sysmapid",$_REQUEST["sysmapid"]);
+		$frmCnct = new CFormTable('New connector','sysmap.php');
+		$frmCnct->SetHelp('web.sysmap.connector.php');
+		$frmCnct->AddVar('sysmapid',$_REQUEST['sysmapid']);
 
-		if(isset($_REQUEST["linkid"]) && !isset($_REQUEST["form_refresh"])){
-			$frmCnct->AddVar("linkid",$_REQUEST["linkid"]);
+		if(isset($_REQUEST['linkid']) && !isset($_REQUEST['form_refresh'])){
+			$frmCnct->AddVar('linkid',$_REQUEST['linkid']);
 			
-			$db_links = DBselect('SELECT * FROM sysmaps_links WHERE linkid='.$_REQUEST["linkid"]);
+			$db_links = DBselect('SELECT * FROM sysmaps_links WHERE linkid='.$_REQUEST['linkid']);
 			$db_link = DBfetch($db_links);
 			
 
-			$selementid1	= $db_link["selementid1"];
-			$selementid2	= $db_link["selementid2"];
+			$selementid1	= $db_link['selementid1'];
+			$selementid2	= $db_link['selementid2'];
 			$triggers		= array();
-			$drawtype		= $db_link["drawtype"];
-			$color			= $db_link["color"];
+			$drawtype		= $db_link['drawtype'];
+			$color			= $db_link['color'];
 
-			$res = DBselect('SELECT * FROM sysmaps_link_triggers WHERE linkid='.$_REQUEST["linkid"]);
+			$res = DBselect('SELECT * FROM sysmaps_link_triggers WHERE linkid='.$_REQUEST['linkid']);
 			while($rows=DBfetch($res)){
 				$triggers[] = $rows;
 			}
 		}
 		else{
-			if(isset($_REQUEST['linkid'])) $frmCnct->AddVar("linkid",$_REQUEST["linkid"]);
-			$selementid1	= get_request("selementid1",	0);
-			$selementid2	= get_request("selementid2",	0);
-			$triggers		= get_request("triggers",	array());
-			$drawtype		= get_request("drawtype",	0);
-			$color			= get_request("color",	0);
+			if(isset($_REQUEST['linkid'])) $frmCnct->AddVar('linkid',$_REQUEST['linkid']);
+			$selementid1	= get_request('selementid1',	0);
+			$selementid2	= get_request('selementid2',	0);
+			$triggers		= get_request('triggers',	array());
+			$drawtype		= get_request('drawtype',	0);
+			$color			= get_request('color',	0);
 		}
 
 /* START comboboxes preparations */
-		$cmbElements1 = new CComboBox("selementid1",$selementid1);
-		$cmbElements2 = new CComboBox("selementid2",$selementid2);
+		$cmbElements1 = new CComboBox('selementid1',$selementid1);
+		$cmbElements2 = new CComboBox('selementid2',$selementid2);
 		
 		$db_selements = DBselect('SELECT selementid,label,elementid,elementtype '.
 							' FROM sysmaps_elements '.
-							' WHERE sysmapid='.$_REQUEST["sysmapid"]);
+							' WHERE sysmapid='.$_REQUEST['sysmapid']);
 		while($db_selement = DBfetch($db_selements)){
 		
-			$label = $db_selement["label"];
-			if($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST){
-				$db_host = get_host_by_hostid($db_selement["elementid"]);
-				$label .= ":".$db_host["host"];
+			$label = $db_selement['label'];
+			if($db_selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
+				$db_host = get_host_by_hostid($db_selement['elementid']);
+				$label .= ':'.$db_host['host'];
 			}
-			else if($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP){
-				$db_map = get_sysmap_by_sysmapid($db_selement["elementid"]);
-				$label .= ":".$db_map["name"];
+			else if($db_selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP){
+				$db_map = get_sysmap_by_sysmapid($db_selement['elementid']);
+				$label .= ':'.$db_map['name'];
 			}
-			else if($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_TRIGGER){
-				if($db_selement["elementid"]>0){
-					$label .= ":".expand_trigger_description($db_selement["elementid"]);
+			else if($db_selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER){
+				if($db_selement['elementid']>0){
+					$label .= ':'.expand_trigger_description($db_selement['elementid']);
 				}
 			}
-			else if($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
-				if($db_selement["elementid"]>0){
-					$db_group = DBfetch(DBselect('SELECT name FROM groups WHERE groupid='.$db_selement["elementid"]));
-					$label .= ":".$db_group['name'];
+			else if($db_selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
+				if($db_selement['elementid']>0){
+					$db_group = DBfetch(DBselect('SELECT name FROM groups WHERE groupid='.$db_selement['elementid']));
+					$label .= ':'.$db_group['name'];
 				}
 			}
 			
-			$cmbElements1->AddItem($db_selement["selementid"],$label);
-			$cmbElements2->AddItem($db_selement["selementid"],$label);
+			$cmbElements1->AddItem($db_selement['selementid'],$label);
+			$cmbElements2->AddItem($db_selement['selementid'],$label);
 		}
 
-		$cmbType = new CComboBox("drawtype",$drawtype);
+		$cmbType = new CComboBox('drawtype',$drawtype);
 
 		foreach(map_link_drawtypes() as $i){
 			$value = map_link_drawtype2str($i);
@@ -5205,7 +5205,7 @@
 		$table->footerClass = 'footer';
 		
 		$table->SetHeader(array(
-			new CCheckBox("all_triggers",null,"CheckAll('".$frmCnct->GetName()."','all_triggers','triggers');"),
+			new CCheckBox('all_triggers',null,"CheckAll('".$frmCnct->GetName()."','all_triggers','triggers');"),
 			S_TRIGGERS,
 			S_TYPE,
 			S_COLOR));
@@ -5252,8 +5252,8 @@
 
 //----------
 
-		$frmCnct->AddRow(S_TYPE.' ('.S_OFF.')',$cmbType);
-		$frmCnct->AddRow(S_COLOR.' ('.S_OFF.')',new CColor('color',$color));
+		$frmCnct->AddRow(S_TYPE.' ('.S_OK_BIG.')',$cmbType);
+		$frmCnct->AddRow(S_COLOR.' ('.S_OK_BIG.')',new CColor('color',$color));
 
 		$frmCnct->AddItemToBottomRow(new CButton("save_link",S_SAVE));
 		if(isset($_REQUEST["linkid"])){
