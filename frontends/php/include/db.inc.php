@@ -367,143 +367,142 @@ if(!isset($DB)){
 	function &DBselect($query, $limit='NO'){
 		global $DB;
 //COpt::savesqlrequest($query);
-//SDI('SQL: '.$query);
-
-		$DB['SELECT_COUNT']++;
 		$result = false;
 		
-		if( isset($DB['DB']) && !empty($DB['DB']) )
-		switch($DB['TYPE']){
-			case 'MYSQL':
-				if(zbx_numeric($limit)){
-					$query .= ' limit '.intval($limit);
-				}
-				$result=mysql_query($query,$DB['DB']);
-				if(!$result){
-					error('Error in query ['.$query.'] ['.mysql_error().']');
-				}
-				break;
-			case 'POSTGRESQL':
-				if(zbx_numeric($limit)){
-					$query .= ' limit '.intval($limit);
-				}
-				$result = pg_query($DB['DB'],$query);
-				if(!$result){
-					error('Error in query ['.$query.'] ['.pg_last_error().']');
-				}
-				break;
-			case 'ORACLE':
-				if(zbx_numeric($limit)){
-					$query = 'select * from ('.$query.') where rownum<='.intval($limit);
-				}
-				$result = DBexecute($query);
-				if(!$result){
-					$e = ocierror($stid);
-					error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
-				}
-
-				break;
-			case 'SQLITE3':
-				if(!$DB['TRANSACTIONS']){
-					lock_db_access();
-				}
-				
-				if(!($result = sqlite3_query($DB['DB'],$query))){
-					error('Error in query ['.$query.'] ['.sqlite3_error($DB['DB']).']');
-				}
-				else{
-					$data = array();
-
-					while($row = sqlite3_fetch_array($result)){
-						foreach($row as $id => $name){
-							if(!zbx_strstr($id,'.')) continue;
-							$ids = explode('.',$id);
-							$row[array_pop($ids)] = $row[$id];
-							unset($row[$id]);
-						}
-						$data[] = $row;
+		if( isset($DB['DB']) && !empty($DB['DB']) ){
+//SDI('SQL: '.$query);
+			$DB['SELECT_COUNT']++;
+			
+			switch($DB['TYPE']){
+				case 'MYSQL':
+					if(zbx_numeric($limit)){
+						$query .= ' limit '.intval($limit);
 					}
-
-					sqlite3_query_close($result);
-
-					$result = &$data;
-				}
-				if(!$DB['TRANSACTIONS']){
-					unlock_db_access();
-				}
-				break;
-		}
-		
-		if($DB['TRANSACTIONS'] && !$result){
-			$DB['TRANSACTION_STATE'] &= $result;
-//			SDI($query);
-//			SDI($DB['TRANSACTION_STATE']);
-		}
-		
+					$result=mysql_query($query,$DB['DB']);
+					if(!$result){
+						error('Error in query ['.$query.'] ['.mysql_error().']');
+					}
+					break;
+				case 'POSTGRESQL':
+					if(zbx_numeric($limit)){
+						$query .= ' limit '.intval($limit);
+					}
+					$result = pg_query($DB['DB'],$query);
+					if(!$result){
+						error('Error in query ['.$query.'] ['.pg_last_error().']');
+					}
+					break;
+				case 'ORACLE':
+					if(zbx_numeric($limit)){
+						$query = 'select * from ('.$query.') where rownum<='.intval($limit);
+					}
+					$result = DBexecute($query);
+					if(!$result){
+						$e = ocierror($stid);
+						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+					}
+	
+					break;
+				case 'SQLITE3':
+					if(!$DB['TRANSACTIONS']){
+						lock_db_access();
+					}
+					
+					if(!($result = sqlite3_query($DB['DB'],$query))){
+						error('Error in query ['.$query.'] ['.sqlite3_error($DB['DB']).']');
+					}
+					else{
+						$data = array();
+	
+						while($row = sqlite3_fetch_array($result)){
+							foreach($row as $id => $name){
+								if(!zbx_strstr($id,'.')) continue;
+								$ids = explode('.',$id);
+								$row[array_pop($ids)] = $row[$id];
+								unset($row[$id]);
+							}
+							$data[] = $row;
+						}
+	
+						sqlite3_query_close($result);
+	
+						$result = &$data;
+					}
+					if(!$DB['TRANSACTIONS']){
+						unlock_db_access();
+					}
+					break;
+			}
+			
+			if($DB['TRANSACTIONS'] && !$result){
+				$DB['TRANSACTION_STATE'] &= $result;
+	//			SDI($query);
+	//			SDI($DB['TRANSACTION_STATE']);
+			}
+		}		
 		return $result;
 	}
 
 	function DBexecute($query, $skip_error_messages=0){
 		global $DB;
-//SDI('SQL Exec: '.$query);
 //COpt::savesqlrequest($query);
-
-		$DB['EXECUTE_COUNT']++;	// WRONG FOR ORACLE!!
 		$result = false;
 
-		if( isset($DB['DB']) && !empty($DB['DB']) )
-		switch($DB['TYPE']){
-			case 'MYSQL':
-				$result=mysql_query($query,$DB['DB']);
-
-				if(!$result){
-					error('Error in query ['.$query.'] ['.mysql_error().']');
-				}
-				break;
-			case 'POSTGRESQL':
-				if(!($result = pg_query($DB['DB'],$query))){
-					error('Error in query ['.$query.'] ['.pg_last_error().']');
-				}
-				break;
-			case 'ORACLE':
-				$stid=OCIParse($DB['DB'],$query);
-				if(!$stid){
-					$e=@ocierror();
-					error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
-				}
-				
-				$result=@OCIExecute($stid,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS));
-				if(!$result){
-					$e=ocierror($stid);
-					error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
-				}
-				else{
-					$result = $stid;
-				}
-
-				break;
-			case 'SQLITE3':
-				if(!$DB['TRANSACTIONS']){
-					lock_db_access();
-				}
-
-				$result = sqlite3_exec($DB['DB'], $query);
-				if(!$result){
-					error('Error in query ['.$query.'] ['.sqlite3_error($DB['DB']).']');
-				}
-				
-				if(!$DB['TRANSACTIONS']){
-					unlock_db_access();
-				}
-				break;
+		if( isset($DB['DB']) && !empty($DB['DB']) ){
+			$DB['EXECUTE_COUNT']++;	// WRONG FOR ORACLE!!
+//SDI('SQL Exec: '.$query);
+			switch($DB['TYPE']){
+				case 'MYSQL':
+					$result=mysql_query($query,$DB['DB']);
+	
+					if(!$result){
+						error('Error in query ['.$query.'] ['.mysql_error().']');
+					}
+					break;
+				case 'POSTGRESQL':
+					if(!($result = pg_query($DB['DB'],$query))){
+						error('Error in query ['.$query.'] ['.pg_last_error().']');
+					}
+					break;
+				case 'ORACLE':
+					$stid=OCIParse($DB['DB'],$query);
+					if(!$stid){
+						$e=@ocierror();
+						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+					}
+					
+					$result=@OCIExecute($stid,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS));
+					if(!$result){
+						$e=ocierror($stid);
+						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+					}
+					else{
+						$result = $stid;
+					}
+	
+					break;
+				case 'SQLITE3':
+					if(!$DB['TRANSACTIONS']){
+						lock_db_access();
+					}
+	
+					$result = sqlite3_exec($DB['DB'], $query);
+					if(!$result){
+						error('Error in query ['.$query.'] ['.sqlite3_error($DB['DB']).']');
+					}
+					
+					if(!$DB['TRANSACTIONS']){
+						unlock_db_access();
+					}
+					break;
+			}
+			
+			if($DB['TRANSACTIONS'] && !$result){
+				$DB['TRANSACTION_STATE'] &= $result;
+	//			SDI($query);
+	//			SDI($DB['TRANSACTION_STATE']);
+			}
 		}
-		
-		if($DB['TRANSACTIONS'] && !$result){
-			$DB['TRANSACTION_STATE'] &= $result;
-//			SDI($query);
-//			SDI($DB['TRANSACTION_STATE']);
-		}
-
 	return $result;
 	}
 

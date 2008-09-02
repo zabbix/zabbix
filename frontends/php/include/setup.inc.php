@@ -172,8 +172,7 @@
 				);
 		}
 
-		function get_test_result(&$result, $test_name, $test_value, $condition, $fail_message)
-		{
+		function get_test_result(&$result, $test_name, $test_value, $condition, $fail_message){
 			$result &= $condition;
 			
 			$row = new CRow(array(
@@ -189,8 +188,7 @@
 			return $row;
 		}
 
-		function Stage2()
-		{
+		function Stage2(){
 			$final_result = true;
 
 			$table = new CTable(null, 'requirements');
@@ -274,8 +272,7 @@
 
 			/* Check GD existence */
 			$gd_version = S_NO;
-			if(is_callable('gd_info'))
-			{
+			if(is_callable('gd_info')){
 				$gd_info = gd_info();
 				$gd_version = $gd_info['GD Version'];
 			}
@@ -289,13 +286,12 @@
 
 			/* Check supported image formats */
 			$img_formats = array();
-			if(isset($gd_info))
-			{
+			if(isset($gd_info)){
 				//if($gd_info['JPG Support']) array_push($img_formats, 'JPEG');
 				if($gd_info['PNG Support']) array_push($img_formats, 'PNG');
 			}
-			if(count($img_formats) == 0)
-			{
+			
+			if(count($img_formats) == 0){
 				$img_formats = array(S_NO);
 				$no_img_formats = true;
 			}
@@ -307,8 +303,7 @@
 					!isset($no_img_formats),
 					'Required images genetarion support [PNG]'));	
 			
-			if(version_compare(phpversion(), '5.1.0RC1', '>='))
-			{
+			if(version_compare(phpversion(), '5.1.0RC1', '>=')){
 				$tmezone = ini_get('date.timezone');
 				$table->AddRow(
 					$this->get_test_result(
@@ -320,8 +315,7 @@
 				unset($tmezone);
 			}
 
-			if(!$final_result)
-			{
+			if(!$final_result){
 				$this->DISABLE_NEXT_BUTTON = true;
 				
 				$this->AddVar('trouble',true);
@@ -334,8 +328,7 @@
 					new CButton('retry', S_RETRY)
 					);
 			}
-			else
-			{
+			else{
 				$this->DISABLE_NEXT_BUTTON = false;
 				$final_result = new CSpan(S_OK,'ok');
 			}
@@ -343,8 +336,7 @@
 			return array($table, BR(), $final_result);
 		}
 
-		function Stage3()
-		{
+		function Stage3(){
 			global $ZBX_CONFIG;
 
 			$table = new CTable();
@@ -353,8 +345,7 @@
 			$DB['TYPE'] = $this->GetConfig('DB_TYPE');
 
 			$cmbType = new CComboBox('type', $DB['TYPE']);
-			foreach($ZBX_CONFIG['allowed_db'] as $id => $name)
-			{
+			foreach($ZBX_CONFIG['allowed_db'] as $id => $name){
 				$cmbType->AddItem($id, $name);
 			}
 			$table->AddRow(array(S_TYPE, $cmbType));
@@ -378,8 +369,7 @@
 				);
 		}
 
-		function Stage4()
-		{
+		function Stage4(){
 			global $ZBX_CONFIG;
 
 			$table = new CTable();
@@ -433,8 +423,7 @@
 		}
 		*/
 		
-		function Stage5()
-		{
+		function Stage5(){
 			$allowed_db = $this->GetConfig('allowed_db', array());
 			
 			$table = new CTable(null, 'requirements');
@@ -446,8 +435,8 @@
 			$table->AddRow(array('Database user:',		$this->GetConfig('DB_USER',	'unknown')));
 			$table->AddRow(array('Database password:',	ereg_replace('.','*',$this->GetConfig('DB_PASSWORD',	'unknown'))));
 			/* $table->AddRow(array('Distributed monitoring',	$this->GetConfig('distributed', null) ? 'Enabled' : 'Disabled')); */
-			if($this->GetConfig('distributed', null))
-			{
+			
+			if($this->GetConfig('distributed', null)){
 				$table->AddRow(array('Node name',	$this->GetConfig('nodename',	'unknown')));
 				$table->AddRow(array('Node GUID',	$this->GetConfig('nodeid',	'unknown')));
 			}
@@ -464,20 +453,15 @@
 				);
 		}
 
-		function Stage6()
-		{
+		function Stage6(){
 			global $_SERVER, $ZBX_CONFIGURATION_FILE;
 
 			show_messages();
 			/* Write the new contents */
-			if($f = @fopen($ZBX_CONFIGURATION_FILE, 'w'))
-			{
-				if(fwrite($f, $this->GetNewConfigurationFileContent()))
-				{
-					if(fclose($f))
-					{
-						if($this->SetConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile()))
-						{
+			if($f = @fopen($ZBX_CONFIGURATION_FILE, 'w')){
+				if(fwrite($f, $this->GetNewConfigurationFileContent())){
+					if(fclose($f)){
+						if($this->SetConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile())){
 							$this->DISABLE_NEXT_BUTTON = false;
 						}
 					}
@@ -521,16 +505,14 @@
 				);
 		}
 
-		function Stage7()
-		{
+		function Stage7(){
 			return array(
 				'Congratulation with succesfull instalation of ZABBIX frontend.',BR(),BR(),
 				'Press "Finish" button to complete installation'
 				);
 		}
 
-		function CheckConnection()
-		{
+		function CheckConnection(){
 			global $DB;
 
 //			$old_DB		= $DB['DB'];
@@ -540,7 +522,7 @@
 			$old_DB_DATABASE= $DB['DATABASE'];
 			$old_DB_USER	= $DB['USER'];
 			$old_DB_PASSWORD= $DB['PASSWORD'];
-
+			
 			$DB['TYPE']	= $this->GetConfig('DB_TYPE');
 			if(is_null($DB['TYPE']))	return false;
 
@@ -551,20 +533,17 @@
 			$DB['PASSWORD']	= $this->GetConfig('DB_PASSWORD',	'');
 
 			$error = '';
-			if(!($result = DBconnect($error)))
-			{
+			if(!($result = DBconnect($error))){
 				error($error);
 			}
-			else
-			{
+			else{
 				$result = DBexecute('create table zabbix_installation_test ( test_row integer )');
 				$result &= DBexecute('drop table zabbix_installation_test');
 			}
 			
 			DBclose();
 
-			if($DB['TYPE'] == 'SQLITE3' && !zbx_is_callable(array('sem_get','sem_acquire','sem_release','sem_remove')))
-			{
+			if($DB['TYPE'] == 'SQLITE3' && !zbx_is_callable(array('sem_get','sem_acquire','sem_release','sem_remove'))){
 				error('SQLite3 required IPC functions');
 				$result &= false;
 			}
@@ -573,16 +552,16 @@
 			global $DB;
 
 //			$DB['DB']		= $old_DB;
-			$DB['TYPE']	= $old_DB_TYPE;
+			$DB['TYPE']		= $old_DB_TYPE;
 			$DB['SERVER']	= $old_DB_SERVER;
-			$DB['PORT']	= $old_DB_PORT;
+			$DB['PORT']		= $old_DB_PORT;
 			$DB['DATABASE']	= $old_DB_DATABASE;
-			$DB['USER']	= $old_DB_USER;
+			$DB['USER']		= $old_DB_USER;
 			$DB['PASSWORD']	= $old_DB_PASSWORD;
 
 			DBconnect($error);
 
-			return $result;
+		return $result;
 		}
 		
 		/*

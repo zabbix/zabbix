@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-require_once "include/config.inc.php";
-require_once "include/setup.inc.php";
+require_once('include/config.inc.php');
+require_once('include/setup.inc.php');
 
 /* ******** */
 
@@ -70,8 +70,7 @@ if(!defined("PAGE_HEADER_LOADED"))
 <?php
 	global $ZBX_CONFIG;
 
-	if(isset($_REQUEST['cancel']) || isset($_REQUEST['finish']))
-	{
+	if(isset($_REQUEST['cancel']) || isset($_REQUEST['finish'])){
 		zbx_unsetcookie('ZBX_CONFIG');
 		redirect('index.php');
 		exit;
@@ -102,8 +101,8 @@ if(!defined("PAGE_HEADER_LOADED"))
 	{
 		$ZBX_CONFIG['allowed_db']['SQLITE3'] = 'SQLite3';
 	}
-	if(count($ZBX_CONFIG['allowed_db']) == 0)
-	{
+	
+	if(count($ZBX_CONFIG['allowed_db']) == 0){
 		$ZBX_CONFIG['allowed_db']['no'] = 'No';
 	}
 
@@ -115,16 +114,15 @@ if(!defined("PAGE_HEADER_LOADED"))
 
 	zbx_set_post_cookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 	global	$ZBX_CONFIGURATION_FILE;
 
-	if(file_exists($ZBX_CONFIGURATION_FILE))
-	{
+	if(file_exists($ZBX_CONFIGURATION_FILE)){
 		if(isset($_REQUEST['message']))
 			show_error_message($_REQUEST['message']);
 	}
-	
+
 	insert_showhint_javascript();
 
 	echo SBR;
@@ -134,6 +132,6 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-include_once "include/page_footer.php"
+include_once('include/page_footer.php');
 
 ?>
