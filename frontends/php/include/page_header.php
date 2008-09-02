@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-	require_once("include/config.inc.php");
-	require_once("include/perm.inc.php");
+	require_once('include/config.inc.php');
+	require_once('include/perm.inc.php');
 
 	global $USER_DETAILS;
 	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
@@ -74,7 +74,7 @@ COpt::profiling_start("page");
 			if(!isset($page['title'])) $page['title'] = 'ZABBIX';
 			
 			if(defined('ZBX_DISTRIBUTED')){
-				if(isset($DB['DB']) && ($curr_node_data = DBfetch(DBselect('select * from nodes where nodeid='.get_current_nodeid(false)))))
+				if(isset($DB['DB']) && ($curr_node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.get_current_nodeid(false)))))
 					$page['title'] .= ' ('.$curr_node_data['name'].')';
 			}
 			
@@ -462,8 +462,7 @@ COpt::profiling_start("page");
 		
 	}
 
-	if(!defined('ZBX_PAGE_NO_MENU'))
-	{
+	if(!defined('ZBX_PAGE_NO_MENU')){
 COpt::compare_files_with_menu($ZBX_MENU);
 
 		$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.4", "small_font");

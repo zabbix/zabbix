@@ -331,12 +331,15 @@ return $result;
 /************ CONFIG **************/
 
 function select_config(){
+	global $page;
+	
 	$row=DBfetch(DBselect('SELECT * FROM config WHERE '.DBin_node('configid', get_current_nodeid(false))));
 	if($row){
 		return	$row;
 	}
 	else{
-		error("Unable to select configuration");
+		if($page["title"] != S_INSTALLATION)
+			error('Unable to select configuration');
 	}
 	return	$row;
 }
