@@ -2316,12 +2316,12 @@
 
 		$items = get_request('items', array());
 
-		if(isset($_REQUEST["graphid"])){
-			$frmGraph->AddVar("graphid",$_REQUEST["graphid"]);
+		if(isset($_REQUEST['graphid'])){
+			$frmGraph->AddVar('graphid',$_REQUEST['graphid']);
 
-			$result=DBselect("SELECT * FROM graphs WHERE graphid=".$_REQUEST["graphid"]);
+			$result=DBselect('SELECT * FROM graphs WHERE graphid='.$_REQUEST['graphid']);
 			$row=DBfetch($result);
-			$frmGraph->SetTitle(S_GRAPH." \"".$row["name"]."\"");
+			$frmGraph->SetTitle(S_GRAPH.' "'.$row['name'].'"');
 		}
 
 		if(isset($_REQUEST['graphid']) && !isset($_REQUEST['form_refresh'])){
@@ -2336,6 +2336,8 @@
 			$graphtype	= $row['graphtype'];
 			$legend		= $row['show_legend'];
 			$graph3d	= $row['show_3d'];
+			$percent_left	= $row['percent_left'];
+			$percent_right	= $row['percent_right'];
 
 			$db_items = DBselect('SELECT * FROM graphs_items WHERE graphid='.$_REQUEST['graphid']);
 			while($item = DBfetch($db_items)){
@@ -2354,24 +2356,31 @@
 		} 
 		else {
 			$name		= get_request('name'		,'');
-			$graphtype	= get_request("graphtype"	,GRAPH_TYPE_NORMAL);
+			$graphtype	= get_request('graphtype'	,GRAPH_TYPE_NORMAL);
 			
 			if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-				$width		= get_request("width"		,400);
-				$height		= get_request("height"		,300);
+				$width		= get_request('width'		,400);
+				$height		= get_request('height'		,300);
 			}
 			else {
-				$width		= get_request("width"		,900);
-				$height		= get_request("height"		,200);
+				$width		= get_request('width'		,900);
+				$height		= get_request('height'		,200);
 			}
 			
-			$yaxistype	= get_request("yaxistype"	,GRAPH_YAXIS_TYPE_CALCULATED);
-			$yaxismin	= get_request("yaxismin"	,0.00);
-			$yaxismax	= get_request("yaxismax"	,100.00);
-			$showworkperiod = get_request("showworkperiod"	,0);
-			$showtriggers	= get_request("showtriggers"	,0);
-			$legend		= get_request("legend"	,0);
-			$graph3d	= get_request("graph3d"	,0);
+			$yaxistype	= get_request('yaxistype'	,GRAPH_YAXIS_TYPE_CALCULATED);
+			$yaxismin	= get_request('yaxismin'	,0.00);
+			$yaxismax	= get_request('yaxismax'	,100.00);
+			$showworkperiod = get_request('showworkperiod'	,0);
+			$showtriggers	= get_request('showtriggers'	,0);
+			$legend		= get_request('legend'	,0);
+			$graph3d	= get_request('graph3d'	,0);
+			
+			$visible = get_request('visible');
+			$percent_left  = 0;
+			$percent_right = 0;
+			
+			if(isset($visible['percent_left'])) 	$percent_left  = get_request('percent_left', 0);
+			if(isset($visible['percent_right']))	$percent_right = get_request('percent_right', 0);
 		}
 
 		/* reinit $_REQUEST */
@@ -2387,11 +2396,12 @@
 		$_REQUEST['graphtype']		= $graphtype;
 		$_REQUEST['legend']		= $legend;
 		$_REQUEST['graph3d']	= $graph3d;
+		$_REQUEST['percent_left']	= $percent_left;
+		$_REQUEST['percent_right']	= $percent_right;
 		/********************/
 
 		if($graphtype != GRAPH_TYPE_NORMAL){
-			foreach($items as $gid => $gitem)
-			{
+			foreach($items as $gid => $gitem){
 				if($gitem['type'] != GRAPH_ITEM_AGGREGATED) continue;
 				unset($items[$gid]);
 			}
@@ -2401,17 +2411,17 @@
 
 		$group_gid = get_request('group_gid', array());
 	
-		$frmGraph->AddRow(S_NAME,new CTextBox("name",$name,32));
+		$frmGraph->AddRow(S_NAME,new CTextBox('name',$name,32));
 		
-		$g_width = new CNumericBox("width",$width,5);
+		$g_width = new CNumericBox('width',$width,5);
 		$g_width->Addoption('onblur','javascript: submit();');
 		$frmGraph->AddRow(S_WIDTH,$g_width);
 		
-		$g_height = new CNumericBox("height",$height,5);
+		$g_height = new CNumericBox('height',$height,5);
 		$g_height->Addoption('onblur','javascript: submit();');
 		$frmGraph->AddRow(S_HEIGHT,$g_height);
 
-		$cmbGType = new CComboBox("graphtype",$graphtype,'graphs.submit(this)');
+		$cmbGType = new CComboBox('graphtype',$graphtype,'graphs.submit(this)');
 		$cmbGType->AddItem(GRAPH_TYPE_NORMAL,S_NORMAL);
 		$cmbGType->AddItem(GRAPH_TYPE_STACKED,S_STACKED);
 		$cmbGType->AddItem(GRAPH_TYPE_PIE,S_PIE);
@@ -2422,11 +2432,33 @@
 		$frmGraph->AddRow(S_GRAPH_TYPE,$cmbGType);
 
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
-			$frmGraph->AddRow(S_SHOW_WORKING_TIME,new CCheckBox("showworkperiod",$showworkperiod,null,1));
-			$frmGraph->AddRow(S_SHOW_TRIGGERS,new CCheckBox("showtriggers",$showtriggers,null,1));
-		
+			$frmGraph->AddRow(S_SHOW_WORKING_TIME,new CCheckBox('showworkperiod',$showworkperiod,null,1));
+			$frmGraph->AddRow(S_SHOW_TRIGGERS,new CCheckBox('showtriggers',$showtriggers,null,1));
 
-			$cmbYType = new CComboBox("yaxistype",$yaxistype,"graphs.submit(this)");
+			if($graphtype == GRAPH_TYPE_NORMAL){
+				$percent_left = sprintf("%2.2f",$percent_left);
+				$percent_right = sprintf("%2.2f",$percent_right);
+				
+				$pr_left_input = new CTextBox('percent_left',$percent_left,'5');
+				$pr_left_chkbx = new CCheckBox('visible[percent_left]',1,"javascript: ShowHide('percent_left');",1);			
+				if($percent_left == 0){
+					$pr_left_input->AddOption('style','display: none;');
+					$pr_left_chkbx->SetChecked(0);
+				}
+				
+				$pr_right_input = new CTextBox('percent_right',$percent_right,'5');
+				$pr_right_chkbx = new CCheckBox('visible[percent_right]',1,"javascript: ShowHide('percent_right');",1);			
+				if($percent_right == 0){
+					$pr_right_input->AddOption('style','display: none;');
+					$pr_right_chkbx->SetChecked(0);
+				}
+				
+				$frmGraph->AddRow(S_PERCENTILE_LINE.' ('.S_LEFT.')',array($pr_left_chkbx,$pr_left_input));
+						
+				$frmGraph->AddRow(S_PERCENTILE_LINE.' ('.S_RIGHT.')',array($pr_right_chkbx,$pr_right_input));
+			}
+
+			$cmbYType = new CComboBox('yaxistype',$yaxistype,'graphs.submit(this)');
 			$cmbYType->AddItem(GRAPH_YAXIS_TYPE_CALCULATED,S_CALCULATED);
 			$cmbYType->AddItem(GRAPH_YAXIS_TYPE_CALCULATED_0_MIN,S_CALCULATED_0_MIN);
 			$cmbYType->AddItem(GRAPH_YAXIS_TYPE_FIXED,S_FIXED);
@@ -2434,16 +2466,17 @@
 			$frmGraph->AddRow(S_YAXIS_TYPE,$cmbYType);
 
 			if($yaxistype == GRAPH_YAXIS_TYPE_FIXED){
-				$frmGraph->AddRow(S_YAXIS_MIN_VALUE,new CTextBox("yaxismin",$yaxismin,9));
-				$frmGraph->AddRow(S_YAXIS_MAX_VALUE,new CTextBox("yaxismax",$yaxismax,9));
+				$frmGraph->AddRow(S_YAXIS_MIN_VALUE,new CTextBox('yaxismin',$yaxismin,9));
+				$frmGraph->AddRow(S_YAXIS_MAX_VALUE,new CTextBox('yaxismax',$yaxismax,9));
 			}
 			else{
-				$frmGraph->AddVar("yaxismin",$yaxismin);
-				$frmGraph->AddVar("yaxismax",$yaxismax);
-			}
-		} else {
-			$frmGraph->AddRow(S_3D_VIEW,new CCheckBox("graph3d",$graph3d,'javascript: graphs.submit(this);',1));
-			$frmGraph->AddRow(S_LEGEND,new CCheckBox("legend",$legend,'javascript: graphs.submit(this);',1));
+				$frmGraph->AddVar('yaxismin',$yaxismin);
+				$frmGraph->AddVar('yaxismax',$yaxismax);
+			}			
+		} 
+		else {
+			$frmGraph->AddRow(S_3D_VIEW,new CCheckBox('graph3d',$graph3d,'javascript: graphs.submit(this);',1));
+			$frmGraph->AddRow(S_LEGEND,new CCheckBox('legend',$legend,'javascript: graphs.submit(this);',1));
 		}
 
 		$only_hostid = null;
@@ -2453,8 +2486,7 @@
 			$frmGraph->AddVar('items', $items);
 
 			$items_table = new CTableInfo();
-			foreach($items as $gid => $gitem)
-			{
+			foreach($items as $gid => $gitem){
 				if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
 
 				$host = get_host_by_itemid($gitem['itemid']);
@@ -2463,8 +2495,8 @@
 				if($host['status'] == HOST_STATUS_TEMPLATE) $only_hostid = $host['hostid'];
 				else $monitored_hosts = 1;
 
-				if($gitem["type"] == GRAPH_ITEM_AGGREGATED)
-					$color = "-";
+				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
+					$color = '-';
 				else
 					$color = new CColorCell(null,$gitem['color']);
 

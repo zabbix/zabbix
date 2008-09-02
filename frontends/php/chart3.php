@@ -45,6 +45,9 @@ include_once 'include/page_header.php';
 		'yaxismin'=>	array(T_ZBX_DBL, O_OPT,	NULL,		BETWEEN(-65535,65535),	null),
 		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,	null),
 		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,	null),
+		'percent_left'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
+		'percent_right'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
+
 		'items'=>	array(T_ZBX_STR, O_OPT,	NULL,		null,			null)
 	);
 
@@ -84,9 +87,11 @@ include_once 'include/page_header.php';
 	$graph->SetYAxisType(get_request('yaxistype'		,GRAPH_YAXIS_TYPE_CALCULATED));
 	$graph->SetYAxisMin(get_request('yaxismin'		,0.00));
 	$graph->SetYAxisMax(get_request('yaxismax'		,100.00));
+	$graph->setLeftPercentage(get_request('percent_left',0));
+	$graph->setRightPercentage(get_request('percent_right',0));
 
-	foreach($items as $id => $gitem)
-	{
+
+	foreach($items as $id => $gitem){
 		$graph->AddItem(
 			$gitem['itemid'],
 			$gitem['yaxisside'],

@@ -200,6 +200,55 @@ function insert_showhint_javascript(){
 	echo '<script type="text/javascript" src="js/showhint.js"></script>';	
 }
 
+function insert_javascript_for_visibilitybox(){
+	if(defined('CVISIBILITYBOX_JAVASCRIPT_INSERTED')) return;
+	define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);
+	
+	$js = 'function visibility_status_changeds(value, obj_name, replace_to){
+			var obj = document.getElementsByName(obj_name);
+		
+			if(obj.length <= 0){
+				obj = new Array(document.getElementById(obj_name));
+			}
+			
+			if(obj.length <= 0) throw "Can not find objects with name [" + obj_name +"]";
+		
+			for(i = obj.length-1; i>=0; i--){
+				if(replace_to && replace_to != ""){
+					if(obj[i].originalObject){
+						var old_obj = obj[i].originalObject;
+						old_obj.originalObject = obj[i];
+						obj[i].parentNode.replaceChild(old_obj, obj[i]);
+					}
+					else if(!value){
+						try{
+							var new_obj = document.createElement("a");
+							new_obj.setAttribute("name",obj[i].name);
+							new_obj.setAttribute("id",obj[i].id);
+						}
+						catch(e){
+							throw "Can not create new element";
+						}
+		
+						new_obj.style.textDecoration = "none";
+						new_obj.innerHTML = replace_to;
+						new_obj.originalObject = obj[i];
+						obj[i].parentNode.replaceChild(new_obj, obj[i]);
+					}
+					else{
+						throw "Missed originalObject for restoring";
+					}
+				}
+				else{
+					value = value?"visible":"hidden";
+					obj[i].style.visibility = value;
+				}
+			}
+		}';
+
+	insert_js($js);
+}
+
 function redirect($url,$timeout=null){
 	zbx_flush_post_cookies();
 
