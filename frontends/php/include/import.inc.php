@@ -551,15 +551,17 @@
 						break; // case
 					}
 
-					if(!isset($data['yaxistype']))		$data['yaxistype']		= 0;
+					if(!isset($data['yaxistype']))			$data['yaxistype']		= 0;
 					if(!isset($data['show_work_period']))	$data['show_work_period']	= 1;
-					if(!isset($data['show_triggers']))	$data['show_triggers']		= 1;
-					if(!isset($data['graphtype']))		$data['graphtype']		= 0;
-					if(!isset($data['yaxismin']))		$data['yaxismin']		= 0;
-					if(!isset($data['yaxismax']))		$data['yaxismax']		= 0;
-					if(!isset($data['show_legend']))	$data['show_legend']	= 0;
-					if(!isset($data['show_3d']))		$data['show_3d']		= 0;
-					if(!isset($data['items']))			$data['items']			= array();
+					if(!isset($data['show_triggers']))		$data['show_triggers']		= 1;
+					if(!isset($data['graphtype']))			$data['graphtype']		= 0;
+					if(!isset($data['yaxismin']))			$data['yaxismin']		= 0;
+					if(!isset($data['yaxismax']))			$data['yaxismax']		= 0;
+					if(!isset($data['show_legend']))		$data['show_legend']	= 0;
+					if(!isset($data['show_3d']))			$data['show_3d']		= 0;
+					if(!isset($data['percent_left']))		$data['percent_left']		= 0;
+					if(!isset($data['percent_right']))		$data['percent_right']		= 0;
+					if(!isset($data['items']))				$data['items']			= array();
 
 					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid']){
 						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip']){
@@ -601,8 +603,10 @@
 								$data['graphtype'],
 								$data['show_legend'],
 								$data['show_3d'],
+								$data['percent_left'],
+								$data['percent_right'],
 								$graph['templateid']);
-							DBexecute('delete from graphs_items where graphid='.$data['graphid']);
+							DBexecute('DELETE FROM graphs_items WHERE graphid='.$data['graphid']);
 						}
 						else{ /* missed */
 							// continue [add_group]
@@ -626,7 +630,9 @@
 							$data['show_triggers'],
 							$data['graphtype'],
 							$data['show_legend'],
-							$data['show_3d']
+							$data['show_3d'],
+							$data['percent_left'],
+							$data['percent_right']
 							);
 					}
 
