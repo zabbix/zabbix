@@ -95,7 +95,9 @@ include_once 'include/page_header.php';
 	$graph->SetHeader($db_data['host'].':'.$db_data['name']);
 	$graph->SetYAxisType($db_data['yaxistype']);
 	$graph->SetYAxisMin($db_data['yaxismin']);
-	$graph->SetYAxisMax($db_data['yaxismax']);
+	$graph->SetYAxisMax($db_data['yaxismax']);	
+	$graph->setLeftPercentage($db_data['percent_left']);
+	$graph->setRightPercentage($db_data['percent_right']);
 
 	$result = DBselect('SELECT gi.* '.
 		' FROM graphs_items gi '.
@@ -113,7 +115,7 @@ include_once 'include/page_header.php';
 			$db_data['periods_cnt']
 			);
 	}
-	$graph->Draw();
+	$graph->draw();
 ?>
 <?php
 

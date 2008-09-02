@@ -61,15 +61,15 @@
 	'S_EVENT_SOURCE'=>			'Event source',
 
 	'S_NEW_CHECK'=>				'New check',
-	'S_SSH'=>				'SSH',
-	'S_LDAP'=>				'LDAP',
-	'S_SMTP'=>				'SMTP',
-	'S_FTP'=>				'FTP',
-	'S_HTTP'=>				'HTTP',
-	'S_POP'=>				'POP',
-	'S_NNTP'=>				'NNTP',
-	'S_IMAP'=>				'IMAP',
-	'S_TCP'=>				'TCP',
+	'S_SSH'=>					'SSH',
+	'S_LDAP'=>					'LDAP',
+	'S_SMTP'=>					'SMTP',
+	'S_FTP'=>					'FTP',
+	'S_HTTP'=>					'HTTP',
+	'S_POP'=>					'POP',
+	'S_NNTP'=>					'NNTP',
+	'S_IMAP'=>					'IMAP',
+	'S_TCP'=>					'TCP',
 	'S_ICMPPING'=>				'ICMP Ping',
 	'S_PORTS_SMALL'=>			'ports',
 
@@ -602,6 +602,7 @@
 	'S_AGGREGATED_PERIODS_COUNT'=>			'Aggregated periods count',
 
 //	graphs.php
+	'S_PERCENTILE_LINE'=>				'Percentile line',
 	'S_CONFIGURATION_OF_GRAPHS'=>		'Configuration of graphs',
 	'S_CONFIGURATION_OF_GRAPHS_BIG'=>	'CONFIGURATION OF GRAPHS',
 	'S_GRAPH_ADDED'=>			'Graph added',
