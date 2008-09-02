@@ -107,7 +107,9 @@
 				'yaxismin'		=> '',
 				'yaxismax'		=> '',
 				'show_legend'	=> '',
-				'show_3d'		=> '')
+				'show_3d'		=> '',
+				'percent_left'	=> '',
+				'percent_right' => '')
 			),
 		XML_TAG_GRAPH_ELEMENT => array(
 			'attribures'	=> array(

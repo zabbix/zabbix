@@ -418,6 +418,8 @@ FIELD		|show_triggers	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|graphtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_legend	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_3d	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|percent_left	|t_percentage	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|percent_right	|t_percentage	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|graphs_1	|name
 
 TABLE|graphs_items|gitemid|ZBX_SYNC
