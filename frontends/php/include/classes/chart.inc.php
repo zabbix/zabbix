@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once "include/classes/graph.inc.php";
+require_once('include/classes/graph.inc.php');
 
 class Chart extends Graph{
 
@@ -34,6 +34,18 @@ class Chart extends Graph{
 		$this->yaxistype=GRAPH_YAXIS_TYPE_CALCULATED;
 		$this->yaxisright=0;
 		$this->yaxisleft=0;
+		
+		$this->percentile = array(
+				'left' => array(  
+					'percent' => 0,		// draw percentage line 
+					'value'	=> 0		// calculated percentage value left y axis
+				),
+				
+				'right' => array(
+					'percent' => 0,		// draw percentage line 
+					'value'	=> 0		// calculated percentage value right y axis
+				)
+			);
 		
 		$this->m_showWorkPeriod = 1;
 		$this->m_showTriggers = 1;
@@ -75,21 +87,21 @@ class Chart extends Graph{
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 
 		$this->items[$this->num] = get_item_by_itemid($itemid);
-		$this->items[$this->num]["description"]=item_description($this->items[$this->num]["description"],$this->items[$this->num]["key_"]);
-		$host=get_host_by_hostid($this->items[$this->num]["hostid"]);
+		$this->items[$this->num]['description']=item_description($this->items[$this->num]['description'],$this->items[$this->num]['key_']);
+		$host=get_host_by_hostid($this->items[$this->num]['hostid']);
 
-		$this->items[$this->num]["host"] = $host["host"];
-		$this->items[$this->num]["color"] = is_null($color) ? "Dark Green" : $color;
-		$this->items[$this->num]["drawtype"] = is_null($drawtype) ? GRAPH_ITEM_DRAWTYPE_LINE : $drawtype;
-		$this->items[$this->num]["axisside"] = is_null($axis) ? GRAPH_YAXIS_SIDE_RIGHT : $axis;
-		$this->items[$this->num]["calc_fnc"] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
-		$this->items[$this->num]["calc_type"] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
-		$this->items[$this->num]["periods_cnt"] = is_null($periods_cnt) ? 0 : $periods_cnt;
+		$this->items[$this->num]['host'] = $host['host'];
+		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
+		$this->items[$this->num]['drawtype'] = is_null($drawtype) ? GRAPH_ITEM_DRAWTYPE_LINE : $drawtype;
+		$this->items[$this->num]['axisside'] = is_null($axis) ? GRAPH_YAXIS_SIDE_RIGHT : $axis;
+		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
+		$this->items[$this->num]['calc_type'] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
+		$this->items[$this->num]['periods_cnt'] = is_null($periods_cnt) ? 0 : $periods_cnt;
 
-		if($this->items[$this->num]["axisside"] == GRAPH_YAXIS_SIDE_LEFT)
+		if($this->items[$this->num]['axisside'] == GRAPH_YAXIS_SIDE_LEFT)
 			$this->yaxisleft=1;
 
-		if($this->items[$this->num]["axisside"] == GRAPH_YAXIS_SIDE_RIGHT)
+		if($this->items[$this->num]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT)
 			$this->yaxisright=1;
 //		SDI($this->items);
 		
@@ -127,50 +139,58 @@ class Chart extends Graph{
 	function setYAxisType($yaxistype){
 		$this->yaxistype=$yaxistype;
 	}
+	
+	function setLeftPercentage($percentile){
+		$this->percentile['left']['percent'] = $percentile;
+	}
+	
+	function setRightPercentage($percentile){
+		$this->percentile['right']['percent'] = $percentile;
+	}
 
 	function drawGrid(){
 		$this->drawSmallRectangle();
 		$hline_count = round($this->sizeY / $this->gridPixels);
 		for($i=1;$i<=$hline_count;$i++){
-			DashedLine($this->im,
+			dashedline($this->im,
 					$this->shiftXleft,
 					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
 					$this->sizeX+$this->shiftXleft,
 					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
-					$this->GetColor("Gray")
+					$this->GetColor('Gray')
 				);
 		}
 	
 		$vline_count = round($this->sizeX / $this->gridPixels);
 		for($i=1;$i<=$vline_count;$i++){
-			DashedLine($this->im,
+			dashedline($this->im,
 						$i*($this->sizeX/($vline_count+1))+$this->shiftXleft,
 						$this->shiftY,
 						$i*($this->sizeX/($vline_count+1))+$this->shiftXleft,
 						$this->sizeY+$this->shiftY,
-						$this->GetColor("Gray")
+						$this->GetColor('Gray')
 				);
 		}
 
 		$old_day=-1;
 		for($i=0;$i<=($vline_count+1);$i++){
-			ImageStringUp($this->im, 
+			imagestringup($this->im, 
 						1,
 						$i*($this->sizeX/($vline_count+1))+$this->shiftXleft-3, 
 						$this->sizeY+$this->shiftY+57, 
-						date("      H:i",$this->from_time+$i*($this->period/($vline_count+1))), 
-						$this->GetColor("Black No Alpha")
+						date('      H:i',$this->from_time+$i*($this->period/($vline_count+1))), 
+						$this->GetColor('Black No Alpha')
 				);
 
-			$new_day=date("d",$this->from_time+$i*($this->period/($vline_count+1)));
+			$new_day=date('d',$this->from_time+$i*($this->period/($vline_count+1)));
 			if(($old_day != $new_day) || ($i==($vline_count+1))){
 				$old_day=$new_day;
-				ImageStringUp($this->im, 
+				imagestringup($this->im, 
 									1,
 									$i*($this->sizeX/($vline_count+1))+$this->shiftXleft-3, 
 									$this->sizeY+$this->shiftY+57, 
-									date("m.d H:i",$this->from_time+$i*($this->period/($vline_count+1))), 
-									$this->GetColor("Dark Red No Alpha")
+									date('m.d H:i',$this->from_time+$i*($this->period/($vline_count+1))), 
+									$this->GetColor('Dark Red No Alpha')
 							);
 
 			}
@@ -190,12 +210,12 @@ class Chart extends Graph{
 		if(!$periods)
 			return;
 
-		ImageFilledRectangle($this->im,
+		imagefilledrectangle($this->im,
 			$this->shiftXleft+1,
 			$this->shiftY,
 			$this->sizeX+$this->shiftXleft,
 			$this->sizeY+$this->shiftY,
-			$this->GetColor("Not Work Period"));
+			$this->GetColor('Not Work Period'));
 
 		$now = time();
 		if(isset($this->stime)){
@@ -218,13 +238,13 @@ class Chart extends Graph{
 			$x2 = round((($end-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
 			
 			//draw rectangle
-			ImageFilledRectangle(
+			imagefilledrectangle(
 				$this->im,
 				$x1,
 				$this->shiftY,
 				$x2,
 				$this->sizeY+$this->shiftY,
-				$this->GetColor("White"));
+				$this->GetColor('White'));
 
 			$start = find_period_start($periods,$end);
 		}
@@ -241,10 +261,10 @@ class Chart extends Graph{
 		$db_triggers = DBselect('SELECT distinct tr.triggerid,tr.expression,tr.priority '.
 						' FROM triggers tr,functions f,items i'.
 						' WHERE tr.triggerid=f.triggerid '.
-							' AND f.function in ("last","min","max") '.
+							" AND f.function IN ('last','min','max') ".
 							' AND tr.status='.TRIGGER_STATUS_ENABLED.
 							' AND i.itemid=f.itemid '.
-							' AND f.itemid='.$this->items[0]["itemid"].
+							' AND f.itemid='.$this->items[0]['itemid'].
 						' ORDER BY tr.priority');
 
 		while(($trigger = DBfetch($db_triggers)) && ($cnt < $max)){
@@ -260,15 +280,15 @@ class Chart extends Graph{
 			else if(strcasecmp($arr[4],'M') == 0)	$val *= 1048576; //1024*1024;
 			else if(strcasecmp($arr[4],'G') == 0)	$val *= 1073741824; //1024*1024*1024;
 
-			$minY = $this->m_minY[$this->items[0]["axisside"]];
-			$maxY = $this->m_maxY[$this->items[0]["axisside"]];
+			$minY = $this->m_minY[$this->items[0]['axisside']];
+			$maxY = $this->m_maxY[$this->items[0]['axisside']];
 
 			if($val <= $minY || $val >= $maxY)	continue;
 
-			if($trigger['priority'] == 5)		$color = "Priority Disaster";
-			elseif($trigger['priority'] == 4)	$color = "Priority Hight";
-			elseif($trigger['priority'] == 3)	$color = "Priority Average";
-			else 					$color = "Priority";
+			if($trigger['priority'] == 5)		$color = 'Priority Disaster';
+			elseif($trigger['priority'] == 4)	$color = 'Priority Hight';
+			elseif($trigger['priority'] == 3)	$color = 'Priority Average';
+			else 					$color = 'Priority';
 
 			array_push($this->triggers,array(
 				'y' => $this->sizeY - (($val-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY,
@@ -284,7 +304,7 @@ class Chart extends Graph{
 		if($this->num != 1) return; // skip multiple graphs
 
 		foreach($this->triggers as $trigger){
-			DashedLine(
+			dashedline(
 				$this->im,
 				$this->shiftXleft,
 				$trigger['y'],
@@ -300,91 +320,156 @@ class Chart extends Graph{
 		$max_host_len=0;
 		$max_desc_len=0;
 		for($i=0;$i<$this->num;$i++){
-			if(strlen($this->items[$i]["host"])>$max_host_len)		$max_host_len=strlen($this->items[$i]["host"]);
-			if(strlen($this->items[$i]["description"])>$max_desc_len)	$max_desc_len=strlen($this->items[$i]["description"]);
+			if(strlen($this->items[$i]['host'])>$max_host_len)		$max_host_len=strlen($this->items[$i]['host']);
+			if(strlen($this->items[$i]['description'])>$max_desc_len)	$max_desc_len=strlen($this->items[$i]['description']);
 		}
 
-		for($i=0;$i<$this->num;$i++){
-			if($this->items[$i]["calc_type"] == GRAPH_ITEM_AGGREGATED){
-				$fnc_name = "agr(".$this->items[$i]["periods_cnt"].")";
-				$color = $this->GetColor("HistoryMinMax");
+		$units = array( 
+					'left'=>0, 
+					'right'=>0
+				);
+		
+		$i = ($this->type == GRAPH_TYPE_STACKED)?($this->num-1):0;
+//		for($i=0;$i<$this->num;$i++){
+		while(($i>=0) && ($i<$this->num)){
+//SDI($i);
+			if($this->items[$i]['calc_type'] == GRAPH_ITEM_AGGREGATED){
+				$fnc_name = 'agr('.$this->items[$i]['periods_cnt'].')';
+				$color = $this->GetColor('HistoryMinMax');
 			}
 			else{
-				$color = $this->GetColor($this->items[$i]["color"]);
-				switch($this->items[$i]["calc_fnc"]){
-					case CALC_FNC_MIN:	$fnc_name = "min";	break;
-					case CALC_FNC_MAX:	$fnc_name = "max";	break;
-					case CALC_FNC_ALL:	$fnc_name = "all";	break;
+				$color = $this->GetColor($this->items[$i]['color']);
+				switch($this->items[$i]['calc_fnc']){
+					case CALC_FNC_MIN:	$fnc_name = 'min';	break;
+					case CALC_FNC_MAX:	$fnc_name = 'max';	break;
+					case CALC_FNC_ALL:	$fnc_name = 'all';	break;
 					case CALC_FNC_AVG:
-					default:		$fnc_name = "avg";
+					default:		$fnc_name = 'avg';
 				}
 			}
 
-			$data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["calc_type"]];
+			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
 			if(isset($data)&&isset($data->min)){
-				$str=sprintf("%s: %s [%s] [min:%s max:%s last:%s]",
-					str_pad($this->items[$i]["host"],$max_host_len," "),
-					str_pad($this->items[$i]["description"],$max_desc_len," "),
+				if($this->items[$i]['axisside'] == GRAPH_YAXIS_SIDE_LEFT){
+					$units['left'] = $this->items[$i]['units'];
+				}
+				else{
+					$units['right'] = $this->items[$i]['units'];
+				}
+				
+				$str=sprintf('%s: %s [%s] [min:%s max:%s last:%s]',
+					str_pad($this->items[$i]['host'],$max_host_len,' '),
+					str_pad($this->items[$i]['description'],$max_desc_len,' '),
 					$fnc_name,
-					convert_units(min($data->min),$this->items[$i]["units"]),
-					convert_units(max($data->max),$this->items[$i]["units"]),
-					convert_units($this->getLastValue($i),$this->items[$i]["units"]));
+					convert_units(min($data->min),$this->items[$i]['units']),
+					convert_units(max($data->max),$this->items[$i]['units']),
+					convert_units($this->getLastValue($i),$this->items[$i]['units'])
+					);
 			}
 			else{
-				$str=sprintf("%s: %s [ no data ]",
-					str_pad($this->items[$i]["host"],$max_host_len," "),
-					str_pad($this->items[$i]["description"],$max_desc_len," "));
+				$str=sprintf('%s: %s [ no data ]',
+					str_pad($this->items[$i]['host'],$max_host_len,' '),
+					str_pad($this->items[$i]['description'],$max_desc_len,' '));
 			}
 
-			ImageFilledRectangle($this->im,
-							$this->shiftXleft,
-							$this->sizeY+$this->shiftY+62+12*$i,
-							$this->shiftXleft+5
-							,$this->sizeY+$this->shiftY+5+62+12*$i,
-							$color
-						);
-			ImageRectangle($this->im,
+			imagefilledrectangle($this->im,
 							$this->shiftXleft,
 							$this->sizeY+$this->shiftY+62+12*$i,
 							$this->shiftXleft+5,
 							$this->sizeY+$this->shiftY+5+62+12*$i,
-							$this->GetColor("Black No Alpha")
+							$color
+						);
+			imagerectangle($this->im,
+							$this->shiftXleft,
+							$this->sizeY+$this->shiftY+62+12*$i,
+							$this->shiftXleft+5,
+							$this->sizeY+$this->shiftY+5+62+12*$i,
+							$this->GetColor('Black No Alpha')
 						);
 
-			ImageString($this->im, 
+			imagestring($this->im, 
 							2,
 							$this->shiftXleft+9,
 							$this->sizeY+$this->shiftY+(62-5)+12*$i,
 							$str,
-							$this->GetColor("Black No Alpha")
+							$this->GetColor('Black No Alpha')
 						);
+						
+			$i +=($this->type == GRAPH_TYPE_STACKED)?-1:1;
 		}
 
 		if($this->sizeY < 120) return;
 
 		foreach($this->triggers as $trigger){
-			ImageFilledEllipse($this->im,
+			imagefilledellipse($this->im,
 				$this->shiftXleft + 2,
 				$this->sizeY+$this->shiftY+2+62+12*$i,
 				6,
 				6,
-				$this->GetColor($trigger["color"]));
+				$this->GetColor($trigger['color']));
 
-			ImageEllipse($this->im,
+			imageellipse($this->im,
 				$this->shiftXleft + 2,
 				$this->sizeY+$this->shiftY+2+62+12*$i,
 				6,
 				6,
-				$this->GetColor("Black No Alpha"));
+				$this->GetColor('Black No Alpha'));
 
-			ImageString(
+			imagestring(
 				$this->im, 
 				2,
 				$this->shiftXleft+9,
 				$this->sizeY+$this->shiftY+(62-5)+12*$i,
 				$trigger['description'],
-				$this->GetColor("Black No Alpha"));
+				$this->GetColor('Black No Alpha'));
 			++$i;
+		}
+
+// Draw percentile	
+		if($this->type == GRAPH_TYPE_NORMAL){
+			$color = 'FF0000';
+			foreach($this->percentile as $side => $percentile){
+				if(($percentile['percent']>0) && $percentile['value']){
+					$str = '%sth percentile: %s';
+					if(($this->percentile['left']['percent']>0) && $this->percentile['left']['value'] &&
+						($this->percentile['right']['percent']>0) && $this->percentile['right']['value'])
+					{
+//						$str.=' ['.(($side=='left')?S_LEFT:S_RIGHT).']';
+						$str.=' ['.$side.']';
+					}
+
+ 					imagefilledpolygon($this->im,
+							array(
+								$this->shiftXleft+2,$this->sizeY+$this->shiftY+61+12*$i,
+								$this->shiftXleft-2,$this->sizeY+$this->shiftY+67+12*$i,
+								$this->shiftXleft+6,$this->sizeY+$this->shiftY+67+12*$i,
+							),
+							3,
+							$this->GetColor($color)
+						);
+						
+					imagepolygon($this->im,
+							array(
+								$this->shiftXleft+2,$this->sizeY+$this->shiftY+61+12*$i,
+								$this->shiftXleft-2,$this->sizeY+$this->shiftY+67+12*$i,
+								$this->shiftXleft+6,$this->sizeY+$this->shiftY+67+12*$i,
+							),
+							3,
+							$this->GetColor('Black No Alpha')
+						);
+								
+					imagestring(
+						$this->im, 
+						2,
+						$this->shiftXleft+9,
+						$this->sizeY+$this->shiftY+(62-5)+12*$i,
+						sprintf($str,$percentile['percent'],convert_units($percentile['value'],$units[$side])),
+						$this->GetColor('Black No Alpha'));
+						
+					$i++;
+					$color = '00AA00';
+				}
+			}
 		}
 	}
 
@@ -456,8 +541,8 @@ class Chart extends Graph{
 				$a[6] = $x2;		$a[7] = $y2max;
 				
 				ImageFilledPolygon($this->im,$a,4,$minmax_color);
-				ImageLine($this->im,$x1,$y1max,$x2,$y2max,$max_color);
-				ImageLine($this->im,$x1,$y1min,$x2,$y2min,$min_color);
+				imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
+				imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
 				
 				/* don't use break, avg must be drawed in this statement */
 				// break;
@@ -480,11 +565,11 @@ class Chart extends Graph{
 		/* draw main line */
 		switch($drawtype){
 			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:
-				ImageLine($this->im,$x1,$y1+1,$x2,$y2+1,$avg_color);
+				imageline($this->im,$x1,$y1+1,$x2,$y2+1,$avg_color);
 				// break; /* don't use break, must be drawed line also */
 			case GRAPH_ITEM_DRAWTYPE_LINE:
 //SDI(array($this->im,$x1,$y1,$x2,$y2,$avg_color));
-				ImageLine($this->im,$x1,$y1,$x2,$y2,$avg_color);
+				imageline($this->im,$x1,$y1,$x2,$y2,$avg_color);
 				break;
 			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
 				$a[0] = $x1;		$a[1] = $y1;
@@ -497,21 +582,81 @@ class Chart extends Graph{
 				ImageFilledPolygon($this->im,$a,4,$avg_color);
 				break;
 			case GRAPH_ITEM_DRAWTYPE_DOT:
-				ImageFilledRectangle($this->im,$x1-1,$y1-1,$x1+1,$y1+1,$avg_color);
-				ImageFilledRectangle($this->im,$x2-1,$y2-1,$x2+1,$y2+1,$avg_color);
+				imagefilledrectangle($this->im,$x1-1,$y1-1,$x1+1,$y1+1,$avg_color);
+				imagefilledrectangle($this->im,$x2-1,$y2-1,$x2+1,$y2+1,$avg_color);
 				break;
 			case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:
 				if( function_exists('imagesetstyle') ){ 
 					
-					/* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
+					/* Use imagesetstyle+imageline instead of bugged imagedashedline */
 					$style = array($avg_color, $avg_color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
-					ImageSetStyle($this->im, $style);
-					ImageLine($this->im,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
+					imagesetstyle($this->im, $style);
+					imageline($this->im,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
 				}
 				else{
-					ImageDashedLine($this->im,$x1,$y1,$x2,$y2,$avg_color);
+					imagedashedline($this->im,$x1,$y1,$x2,$y2,$avg_color);
 				}
 				break;
+		}
+	}
+
+//Calculates percentages for left & right y axis
+	function calcPercentile(){
+		if($this->type != GRAPH_TYPE_NORMAL){
+			return ;
+		}
+		
+		$values = array(
+			'left' => array(),
+			'right'=> array()
+		);
+		
+		$maxX = $this->sizeX;
+		
+// For each metric
+		for($item = 0; $item < $this->num; $item++){
+			$data = &$this->data[$this->items[$item]['itemid']][$this->items[$item]['calc_type']];
+			
+			if(!isset($data))	continue;
+// For each X
+			for($i = 0; $i < $maxX; $i++){  // new point
+				if(($data->count[$i] == 0) && ($i != ($maxX-1))) continue;
+				
+				$min = $data->min[$i];
+				$max = $data->max[$i];
+				$avg = $data->avg[$i];
+				
+				switch($this->items[$item]['calc_fnc']){
+					case CALC_FNC_MAX:
+						$value = $max;
+						break;
+					case CALC_FNC_MIN:
+						$value = $min;
+						break;
+					case CALC_FNC_ALL:
+					case CALC_FNC_AVG:
+					default:
+						$value = $avg;
+				}
+
+				if($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT){
+					$values['left'][] = $value;
+				}
+				else{
+					$values['right'][] = $value;
+				}
+			}
+		}
+
+		foreach($this->percentile as $side => $percentile){
+			if(($percentile['percent']>0) && !empty($values[$side])){
+				sort($values[$side]);
+				$percent = (int) ((count($values[$side]) * $percentile['percent'] / 100) + 0.5);
+//SDI($percent);
+				$this->percentile[$side]['value'] = $values[$side][$percent];
+				unset($values[$side]);
+			}
+//SDI($side.' : '.$this->percentile[$side]['value']);
 		}
 	}
 	
@@ -527,22 +672,22 @@ class Chart extends Graph{
 			unset($minY);
 			for($i=0;$i<$this->num;$i++){
 			
-				if($this->items[$i]["axisside"] != $side)
+				if($this->items[$i]['axisside'] != $side)
 					continue;
 
 				foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type){
 				
-					if(!isset($this->data[$this->items[$i]["itemid"]][$type]))
+					if(!isset($this->data[$this->items[$i]['itemid']][$type]))
 						continue;
 
-					$data = &$this->data[$this->items[$i]["itemid"]][$type];
+					$data = &$this->data[$this->items[$i]['itemid']][$type];
 
 					if(!isset($data))	continue;
 
 					if($type == GRAPH_ITEM_AGGREGATED)
 						$calc_fnc = CALC_FNC_ALL;
 					else
-						$calc_fnc = $this->items[$i]["calc_fnc"];
+						$calc_fnc = $this->items[$i]['calc_fnc'];
 
 					switch($calc_fnc){
 						case CALC_FNC_ALL:	/* use min */
@@ -608,21 +753,21 @@ class Chart extends Graph{
 
 			unset($maxY);
 			for($i=0;$i<$this->num;$i++){
-				if($this->items[$i]["axisside"] != $side)
+				if($this->items[$i]['axisside'] != $side)
 					continue;
 
 				foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type){
-					if(!isset($this->data[$this->items[$i]["itemid"]][$type]))
+					if(!isset($this->data[$this->items[$i]['itemid']][$type]))
 						continue;
 
-					$data = &$this->data[$this->items[$i]["itemid"]][$type];
+					$data = &$this->data[$this->items[$i]['itemid']][$type];
 
 					if(!isset($data))	continue;
 
 					if($type == GRAPH_ITEM_AGGREGATED)
 						$calc_fnc = CALC_FNC_ALL;
 					else
-						$calc_fnc = $this->items[$i]["calc_fnc"];
+						$calc_fnc = $this->items[$i]['calc_fnc'];
 
 					switch($calc_fnc){
 						case CALC_FNC_ALL:	/* use max */
@@ -677,6 +822,102 @@ class Chart extends Graph{
 		}
 	}
 
+	function calcZero(){
+		$left = GRAPH_YAXIS_SIDE_LEFT;
+		$right = GRAPH_YAXIS_SIDE_RIGHT;
+
+		$this->unit2px[$right] = ($this->m_maxY[$right] - $this->m_minY[$right])/$this->sizeY;
+		$this->unit2px[$left] = ($this->m_maxY[$left] - $this->m_minY[$left])/$this->sizeY;
+
+		if($this->m_minY[$right]>0){
+			$this->zero[$right] = $this->sizeY+$this->shiftY;
+			$this->oxy[$right] = min($this->m_minY[$right],$this->m_maxY[$right]);
+		} 
+		else if($this->m_maxY[$right]<0) {
+			$this->zero[$right] = $this->shiftY;
+			$this->oxy[$right] = max($this->m_minY[$right],$this->m_maxY[$right]);
+		}
+		else{
+			$this->zero[$right] = $this->sizeY+$this->shiftY - (int)abs($this->m_minY[$right]/$this->unit2px[$right]);
+			$this->oxy[$right] = 0;
+		}			
+
+		if($this->m_minY[$left]>0){
+			$this->zero[$left] = $this->sizeY+$this->shiftY;
+			$this->oxy[$left] = min($this->m_minY[$left],$this->m_maxY[$left]);
+		}
+		else if($this->m_maxY[$left]<0){
+			$this->zero[$left] = $this->shiftY;
+			$this->oxy[$left] = max($this->m_minY[$left],$this->m_maxY[$left]);
+		}
+		else{
+			$this->zero[$left] = $this->sizeY+$this->shiftY - (int)abs($this->m_minY[$left]/$this->unit2px[$left]);
+			$this->oxy[$left] = 0;
+		}
+	}
+	
+	function correctMinMax(){
+		$this->gridLinesCount = round($this->sizeY/$this->gridPixels) + 1;
+		
+		$sides = array(GRAPH_YAXIS_SIDE_LEFT,GRAPH_YAXIS_SIDE_RIGHT);
+		foreach($sides as $side){
+//SDI($side);
+			if(!isset($this->axis_valuetype[$side])) continue;
+			
+			if($this->axis_valuetype[$side] == ITEM_VALUE_TYPE_UINT64){
+			
+				$this->m_maxY[$side] = round($this->m_maxY[$side]);
+				$this->m_minY[$side] = (int) $this->m_minY[$side];
+		
+				$value_delta = round($this->m_maxY[$side] - $this->m_minY[$side]);
+				
+				$step = (int) (($value_delta/$this->gridLinesCount) + 1);	// round to top
+				$value_delta2 = $step * $this->gridLinesCount;
+//SDI($value_delta.' <> '.$value_delta2);
+				$first_delta = round(($value_delta2-$value_delta)/2);
+				$second_delta = ($value_delta2-$value_delta) - $first_delta;
+
+//SDI($this->m_maxY[$side].' : '.$first_delta.' --- '.$this->m_minY[$side].' : '.$second_delta);
+				if($this->m_minY[$side] >= 0){
+					if($this->m_minY[$side] < $second_delta){
+						$first_delta += $second_delta - $this->m_minY[$side];
+						$second_delta = $this->m_minY[$side];
+					}
+				}
+				else if(($this->m_maxY[$side] <= 0)){
+					if($this->m_maxY[$side] > $first_delta){
+						$second_delta += $first_delta - $this->m_maxY[$side];
+						$first_delta = $this->m_maxY[$side];
+					}
+				}				
+				
+				$this->m_maxY[$side] += $first_delta;
+				$this->m_minY[$side] -= ($value_delta2-$value_delta) - $first_delta;
+			}
+			else if($this->axis_valuetype[$side] == ITEM_VALUE_TYPE_FLOAT){
+//*
+				if($this->m_maxY[$side]>0){
+			
+					$this->m_maxY[$side] = round($this->m_maxY[$side],1) + round($this->m_maxY[$side],1)*0.2 + 0.05;
+				} 
+				else if($this->m_maxY[$side]<0){
+					$this->m_maxY[$side] = round($this->m_maxY[$side],1) - round($this->m_maxY[$side],1)*0.2 + 0.05;
+				} 				
+				
+				if($this->m_minY[$side]>0){
+					$this->m_minY[$side] = $this->m_minY[$side] - ($this->m_minY[$side] * 0.2) - 0.05;
+				} 
+				else if($this->m_minY[$side]<0){
+					$this->m_minY[$side] = $this->m_minY[$side] + ($this->m_minY[$side] * 0.2) - 0.05;
+				} 
+				
+				$this->m_minY[$side] = round($this->m_minY[$side],1);
+//*/
+			}
+		}
+	}
+
+
 	function selectData(){
 
 		$this->data = array();
@@ -707,10 +948,10 @@ class Chart extends Graph{
 				$this->axis_valuetype[$this->items[$i]['axisside']] = ITEM_VALUE_TYPE_FLOAT;
 			}
 			
-			$type = $this->items[$i]["calc_type"];
+			$type = $this->items[$i]['calc_type'];
 			if($type == GRAPH_ITEM_AGGREGATED) {
 				/* skip current period */
-				$from_time	= $this->from_time - $this->period * $this->items[$i]["periods_cnt"];
+				$from_time	= $this->from_time - $this->period * $this->items[$i]['periods_cnt'];
 				$to_time	= $this->from_time;
 			} 
 			else {
@@ -771,7 +1012,7 @@ class Chart extends Graph{
 				$this->items[$i]['delay'] = max($this->items[$i]['delay'],3600);
 			}
 //SDI($sql_arr);
-			$curr_data = &$this->data[$this->items[$i]["itemid"]][$type];
+			$curr_data = &$this->data[$this->items[$i]['itemid']][$type];
 			$curr_data->count = NULL;
 			$curr_data->min = NULL;
 			$curr_data->max = NULL;
@@ -782,7 +1023,7 @@ class Chart extends Graph{
 				$result=DBselect($sql);
 				
 				while($row=DBfetch($result)){
-					$idx=$row["i"]-1;
+					$idx=$row['i']-1;
 					if($idx<0) continue; 
 /* --------------------------------------------------
 	We are taking graph on 1px more than we need, 
@@ -792,11 +1033,11 @@ class Chart extends Graph{
 	but now we've got the first point.
 --------------------------------------------------*/
 					
-					$curr_data->count[$idx]	= $row["count"];
-					$curr_data->min[$idx]	= $row["min"];
-					$curr_data->max[$idx]	= $row["max"];
-					$curr_data->avg[$idx]	= $row["avg"];
-					$curr_data->clock[$idx]	= $row["clock"];
+					$curr_data->count[$idx]	= $row['count'];
+					$curr_data->min[$idx]	= $row['min'];
+					$curr_data->max[$idx]	= $row['max'];
+					$curr_data->avg[$idx]	= $row['avg'];
+					$curr_data->clock[$idx]	= $row['clock'];
 					$curr_data->shift_min[$idx] = 0;
 					$curr_data->shift_max[$idx] = 0;
 					$curr_data->shift_avg[$idx] = 0;
@@ -879,14 +1120,14 @@ class Chart extends Graph{
 		
 		if($this->type == GRAPH_TYPE_STACKED){
 			for($i=1; $i<$this->num; $i++){
-				$curr_data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["calc_type"]];
+				$curr_data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
 
 				if(!isset($curr_data))	continue;
 
 				for($j = $i-1; $j >= 0; $j--){
-					if($this->items[$j]["axisside"] != $this->items[$i]["axisside"]) continue;
+					if($this->items[$j]['axisside'] != $this->items[$i]['axisside']) continue;
 
-					$prev_data = &$this->data[$this->items[$j]["itemid"]][$this->items[$j]["calc_type"]];
+					$prev_data = &$this->data[$this->items[$j]['itemid']][$this->items[$j]['calc_type']];
 
 					if(!isset($prev_data))	continue;
 
@@ -906,89 +1147,28 @@ class Chart extends Graph{
 		}
 		/* end calculation of stacked graphs */
 	}
-	
-	function correctMinMax(){
-		$this->gridLinesCount = round($this->sizeY/$this->gridPixels) + 1;
-		
-		$sides = array(GRAPH_YAXIS_SIDE_LEFT,GRAPH_YAXIS_SIDE_RIGHT);
-		foreach($sides as $side){
-//SDI($side);
-			if(!isset($this->axis_valuetype[$side])) continue;
-			
-			if($this->axis_valuetype[$side] == ITEM_VALUE_TYPE_UINT64){
-			
-				$this->m_maxY[$side] = round($this->m_maxY[$side]);
-				$this->m_minY[$side] = (int) $this->m_minY[$side];
-		
-				$value_delta = round($this->m_maxY[$side] - $this->m_minY[$side]);
-				
-				$step = (int) (($value_delta/$this->gridLinesCount) + 1);	// round to top
-				$value_delta2 = $step * $this->gridLinesCount;
-//SDI($value_delta.' <> '.$value_delta2);
-				$first_delta = round(($value_delta2-$value_delta)/2);
-				$second_delta = ($value_delta2-$value_delta) - $first_delta;
 
-//SDI($this->m_maxY[$side].' : '.$first_delta.' --- '.$this->m_minY[$side].' : '.$second_delta);
-				if($this->m_minY[$side] >= 0){
-					if($this->m_minY[$side] < $second_delta){
-						$first_delta += $second_delta - $this->m_minY[$side];
-						$second_delta = $this->m_minY[$side];
-					}
-				}
-				else if(($this->m_maxY[$side] <= 0)){
-					if($this->m_maxY[$side] > $first_delta){
-						$second_delta += $first_delta - $this->m_maxY[$side];
-						$first_delta = $this->m_maxY[$side];
-					}
-				}				
-				
-				$this->m_maxY[$side] += $first_delta;
-				$this->m_minY[$side] -= ($value_delta2-$value_delta) - $first_delta;
-			}
-			else if($this->axis_valuetype[$side] == ITEM_VALUE_TYPE_FLOAT){
-//*
-				if($this->m_maxY[$side]>0){
-			
-					$this->m_maxY[$side] = round($this->m_maxY[$side],1) + round($this->m_maxY[$side],1)*0.2 + 0.05;
-				} 
-				else if($this->m_maxY[$side]<0){
-					$this->m_maxY[$side] = round($this->m_maxY[$side],1) - round($this->m_maxY[$side],1)*0.2 + 0.05;
-				} 				
-				
-				if($this->m_minY[$side]>0){
-					$this->m_minY[$side] = $this->m_minY[$side] - ($this->m_minY[$side] * 0.2) - 0.05;
-				} 
-				else if($this->m_minY[$side]<0){
-					$this->m_minY[$side] = $this->m_minY[$side] + ($this->m_minY[$side] * 0.2) - 0.05;
-				} 
-				
-				$this->m_minY[$side] = round($this->m_minY[$side],1);
-//*/
-			}
-		}
-	}
-
-	function DrawLeftSide(){
+	function drawLeftSide(){
 		if($this->yaxisleft == 1){
 			$minY = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT];
 			$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
 
 			for($item=0;$item<$this->num;$item++){
-				if($this->items[$item]["axisside"] == GRAPH_YAXIS_SIDE_LEFT){
-					$units=$this->items[$item]["units"];
+				if($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT){
+					$units=$this->items[$item]['units'];
 					break;
 				}
 			}
 			
 			$hstr_count = $this->gridLinesCount;
 			for($i=0;$i<=$hstr_count;$i++){
-				$str = str_pad(convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units),10," ", STR_PAD_LEFT);
-				ImageString($this->im, 
+				$str = str_pad(convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units),10,' ', STR_PAD_LEFT);
+				imagestring($this->im, 
 							1, 
 							5, 
 							$this->sizeY-$this->sizeY*$i/$hstr_count-4+$this->shiftY, 
 							$str, 
-							$this->GetColor("Dark Red No Alpha")
+							$this->GetColor('Dark Red No Alpha')
 						);
 			}
 			
@@ -1006,26 +1186,26 @@ class Chart extends Graph{
 		}
 	}
 
-	function DrawRightSide(){
+	function drawRightSide(){
 		if($this->yaxisright == 1){
 			$minY = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
 			$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
 
 			for($item=0;$item<$this->num;$item++){
-				if($this->items[$item]["axisside"] == GRAPH_YAXIS_SIDE_RIGHT){
-					$units=$this->items[$item]["units"];
+				if($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT){
+					$units=$this->items[$item]['units'];
 					break;
 				}
 			}
 			$hstr_count = $this->gridLinesCount;
 			for($i=0;$i<=$hstr_count;$i++){
-				$str = str_pad(convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units),10," ");
-				ImageString($this->im, 
+				$str = str_pad(convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units),10,' ');
+				imagestring($this->im, 
 							1, 
 							$this->sizeX+$this->shiftXleft+2, 
 							$this->sizeY-$this->sizeY*$i/$hstr_count-4+$this->shiftY, 
 							$str, 
-							$this->GetColor("Dark Red No Alpha"));
+							$this->GetColor('Dark Red No Alpha'));
 			}
 			
 			if(($this->zero[GRAPH_YAXIS_SIDE_RIGHT] != $this->sizeY+$this->shiftY) && 
@@ -1042,41 +1222,38 @@ class Chart extends Graph{
 		}
 	}
 	
-	function CalcZero(){
-		$left = GRAPH_YAXIS_SIDE_LEFT;
-		$right = GRAPH_YAXIS_SIDE_RIGHT;
+	function drawPercentile(){
+		if($this->type != GRAPH_TYPE_NORMAL){
+			return ;
+		}
 
-		$this->unit2px[$right] = ($this->m_maxY[$right] - $this->m_minY[$right])/$this->sizeY;
-		$this->unit2px[$left] = ($this->m_maxY[$left] - $this->m_minY[$left])/$this->sizeY;
-
-		if($this->m_minY[$right]>0){
-			$this->zero[$right] = $this->sizeY+$this->shiftY;
-			$this->oxy[$right] = min($this->m_minY[$right],$this->m_maxY[$right]);
-		} 
-		else if($this->m_maxY[$right]<0) {
-			$this->zero[$right] = $this->shiftY;
-			$this->oxy[$right] = max($this->m_minY[$right],$this->m_maxY[$right]);
-		}
-		else{
-			$this->zero[$right] = $this->sizeY+$this->shiftY - (int)abs($this->m_minY[$right]/$this->unit2px[$right]);
-			$this->oxy[$right] = 0;
-		}			
-
-		if($this->m_minY[$left]>0){
-			$this->zero[$left] = $this->sizeY+$this->shiftY;
-			$this->oxy[$left] = min($this->m_minY[$left],$this->m_maxY[$left]);
-		}
-		else if($this->m_maxY[$left]<0){
-			$this->zero[$left] = $this->shiftY;
-			$this->oxy[$left] = max($this->m_minY[$left],$this->m_maxY[$left]);
-		}
-		else{
-			$this->zero[$left] = $this->sizeY+$this->shiftY - (int)abs($this->m_minY[$left]/$this->unit2px[$left]);
-			$this->oxy[$left] = 0;
-		}
+		$color = 'FF0000';
+		foreach($this->percentile as $side => $percentile){
+			if(($percentile['percent']>0) && $percentile['value']){
+				if($side == 'left'){
+					$minY = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT];
+					$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
+				}
+				else{
+					$minY = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
+					$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
+				}
+	
+				$y = $this->sizeY - (($percentile['value']-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY;
+				imageline(
+					$this->im,
+					$this->shiftXleft,
+					$y,
+					$this->sizeX+$this->shiftXleft,
+					$y,
+					$this->GetColor($color));
+				
+				$color = '00AA00';
+			}
+		}		
 	}
 
-	function Draw(){
+	function draw(){
 		$start_time=getmicrotime();
 
 		set_image_header();
@@ -1094,12 +1271,20 @@ class Chart extends Graph{
 		
 		$this->updateShifts();
 		$this->calcTriggers();
-		$this->CalcZero();
+		$this->calcZero();
+		$this->calcPercentile();
 		
 		$this->fullSizeX = $this->sizeX+$this->shiftXleft+$this->shiftXright+1;
-		$this->fullSizeY = $this->sizeY+$this->shiftY+62+12*($this->num+ (($this->sizeY < 120) ? 0 : count($this->triggers)))+8;
+		$this->fullSizeY = $this->sizeY+$this->shiftY+62;
+		$this->fullSizeY += 12*($this->num+(($this->sizeY < 120)?0:count($this->triggers)))+8;
 
-		if(function_exists("ImageColorExactAlpha")&&function_exists("ImageCreateTrueColor")&&@imagecreatetruecolor(1,1))
+		foreach($this->percentile as $side => $percentile){
+			if(($percentile['percent']>0) && $percentile['value']){
+				$this->fullSizeY += 12;
+			}
+		}
+		
+		if(function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1,1))
 			$this->im = imagecreatetruecolor($this->fullSizeX,$this->fullSizeY);
 		else
 			$this->im = imagecreate($this->fullSizeX,$this->fullSizeY);
@@ -1118,67 +1303,67 @@ class Chart extends Graph{
 		
 		$maxX = $this->sizeX;
 		
-		// For each metric
+// For each metric
 		for($item = 0; $item < $this->num; $item++){
-			$minY = $this->m_minY[$this->items[$item]["axisside"]];
-			$maxY = $this->m_maxY[$this->items[$item]["axisside"]];
+			$minY = $this->m_minY[$this->items[$item]['axisside']];
+			$maxY = $this->m_maxY[$this->items[$item]['axisside']];
 
-			$data = &$this->data[$this->items[$item]["itemid"]][$this->items[$item]["calc_type"]];
+			$data = &$this->data[$this->items[$item]['itemid']][$this->items[$item]['calc_type']];
 			
 			if(!isset($data))	continue;
 
-			if($this->items[$item]["calc_type"] == GRAPH_ITEM_AGGREGATED){
+			if($this->items[$item]['calc_type'] == GRAPH_ITEM_AGGREGATED){
 				$drawtype	= GRAPH_ITEM_DRAWTYPE_LINE;
 
-				$max_color	= $this->GetColor("HistoryMax");
-				$avg_color	= $this->GetColor("HistoryAvg");
-				$min_color	= $this->GetColor("HistoryMin");
-				$minmax_color	= $this->GetColor("HistoryMinMax");
+				$max_color	= $this->GetColor('HistoryMax');
+				$avg_color	= $this->GetColor('HistoryAvg');
+				$min_color	= $this->GetColor('HistoryMin');
+				$minmax_color	= $this->GetColor('HistoryMinMax');
 
 				$calc_fnc	= CALC_FNC_ALL;
 			}
 			else if($this->type == GRAPH_TYPE_STACKED){
-				$drawtype	= $this->items[$item]["drawtype"];
+				$drawtype	= $this->items[$item]['drawtype'];
 
-				$max_color	= $this->GetColor("ValueMax",GRAPH_STACKED_ALFA);
-				$avg_color	= $this->GetColor($this->items[$item]["color"],GRAPH_STACKED_ALFA);
-				$min_color	= $this->GetColor("ValueMin",GRAPH_STACKED_ALFA);
-				$minmax_color	= $this->GetColor("ValueMinMax",GRAPH_STACKED_ALFA);
+				$max_color	= $this->GetColor('ValueMax',GRAPH_STACKED_ALFA);
+				$avg_color	= $this->GetColor($this->items[$item]['color'],GRAPH_STACKED_ALFA);
+				$min_color	= $this->GetColor('ValueMin',GRAPH_STACKED_ALFA);
+				$minmax_color	= $this->GetColor('ValueMinMax',GRAPH_STACKED_ALFA);
 
-				$calc_fnc = $this->items[$item]["calc_fnc"];					
+				$calc_fnc = $this->items[$item]['calc_fnc'];					
 			}
 			else{
-				$drawtype	= $this->items[$item]["drawtype"];
+				$drawtype	= $this->items[$item]['drawtype'];
 
-				$max_color	= $this->GetColor("ValueMax");
-				$avg_color	= $this->GetColor($this->items[$item]["color"]);
-				$min_color	= $this->GetColor("ValueMin");
-				$minmax_color	= $this->GetColor("ValueMinMax");
+				$max_color	= $this->GetColor('ValueMax');
+				$avg_color	= $this->GetColor($this->items[$item]['color']);
+				$min_color	= $this->GetColor('ValueMin');
+				$minmax_color	= $this->GetColor('ValueMinMax');
 
-				$calc_fnc = $this->items[$item]["calc_fnc"];
+				$calc_fnc = $this->items[$item]['calc_fnc'];
 			}
-			// For each X
+// For each X
 			for($i = 1, $j = 0; $i < $maxX; $i++){  // new point
 			
 				if(($data->count[$i] == 0) && ($i != ($maxX-1))) continue;
 
 				$diff	= abs($data->clock[$i] - $data->clock[$j]);
 				$cell	= ($this->to_time - $this->from_time)/$this->sizeX;
-				$delay	= $this->items[$item]["delay"];
+				$delay	= $this->items[$item]['delay'];
 									
 				if($cell > $delay)
 					$draw = (boolean) ($diff < ZBX_GRAPH_MAX_SKIP_CELL * $cell);
 				else		
 					$draw = (boolean) ($diff < ZBX_GRAPH_MAX_SKIP_DELAY * $delay);
 
-				if($draw == false && $this->items[$item]["calc_type"] == GRAPH_ITEM_AGGREGATED)
+				if(($draw == false) && ($this->items[$item]['calc_type'] == GRAPH_ITEM_AGGREGATED))
 					$draw = $i - $j < 5;
 
-				if($this->items[$item]["type"] == ITEM_TYPE_TRAPPER)
+				if($this->items[$item]['type'] == ITEM_TYPE_TRAPPER)
 					$draw = true;
-//					SDI($draw);
-				if($draw){
+//SDI($draw);
 
+				if($draw){
 					$this->drawElement(
 						$data,
 						$i, $j,
@@ -1193,23 +1378,24 @@ class Chart extends Graph{
 						$this->items[$item]['axisside']
 						);
 				}
-//					echo "\nDraw II \n"; printf("%0.4f",(getmicrotime()-$start_time));
+//echo '\nDraw II \n'; printf('%0.4f',(getmicrotime()-$start_time));
 
 				$j = $i;
 			}
 		}
 		
-		$this->DrawLeftSide();
-		$this->DrawRightSide();
+		$this->drawLeftSide();
+		$this->drawRightSide();
 		$this->drawTriggers();
+		$this->drawPercentile();
 
 		$this->drawLogo();
 
 		$this->drawLegend();
 		
 		$end_time=getmicrotime();
-		$str=sprintf("%0.2f",(getmicrotime()-$start_time));
-		ImageString($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12,"Generated in $str sec", $this->GetColor("Gray"));
+		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
+		imagestring($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12,'Generated in $str sec', $this->GetColor('Gray'));
 
 		unset($this->items, $this->data);
 

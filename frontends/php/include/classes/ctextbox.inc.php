@@ -19,13 +19,11 @@
 **/
 ?>
 <?php
-	class CTextBox extends CTag
-	{
+	class CTextBox extends CTag{
 /* private */
 		//var $caption;
 /* public */
-		function CTextBox($name='textbox',$value="",$size=20,$readonly="no")
-		{
+		function CTextBox($name='textbox',$value="",$size=20,$readonly="no"){
 			$this->caption = null;
 			parent::CTag('input','no');
 			$this->tag_body_start = '';
@@ -36,38 +34,34 @@
 			$this->AddOption('value',$value);
 			$this->SetReadonly($readonly);
 		}
-		function SetReadonly($value='yes')
-		{
+		
+		function SetReadonly($value='yes'){
 			if((is_string($value) && ($value=="yes" || $value=="checked" || $value=="on") || $value=="1") || (is_int($value)&&$value<>0))
 				return $this->options['readonly'] = 'readonly';
 
 			$this->DelOption('readonly');
 		}
-		function SetValue($value=NULL)
-		{
+		
+		function SetValue($value=NULL){
 			$this->options['value'] = $value;
 		}
-		function SetSize($value)
-		{
+		
+		function SetSize($value){
 			$this->options['size'] = $value;
 			
 		}
 	}
 
-	class CPassBox extends CTextBox
-	{
+	class CPassBox extends CTextBox{
 /* public */
-		function CPassBox($name='password',$value='',$size=20)
-		{
+		function CPassBox($name='password',$value='',$size=20){
 			parent::CTextBox($name,$value,$size);
 			$this->options['type'] = 'password';
 		}
 	}
 
-	class CNumericBox extends CTextBox
-	{
-		function CNumericBox($name='number',$value='0',$size=20,$readonly="no",$allowempty=false)
-		{
+	class CNumericBox extends CTextBox{
+		function CNumericBox($name='number',$value='0',$size=20,$readonly="no",$allowempty=false){
 			parent::CTextBox($name,$value,$size,$readonly);
 			$this->AddOption('MaxLength', $size);
 			$this->AddOption('Style', 'text-align: right;');
@@ -82,12 +76,10 @@
 		}
 	}
 
-	class CIpBox
-	{
+	class CIpBox{
 		//var $ip_parts = array();
 		
-		function CIPBox($name='ip',$value)
-		{
+		function CIPBox($name='ip',$value){
 			$this->ip_parts = array();
 
 			if(!is_array($value)) $value = explode('.', $value);
@@ -96,11 +88,9 @@
 			if(!isset($value[2])) $value[2] = 0;
 			if(!isset($value[3])) $value[3] = 0;
 			
-			for($i = 0; $i < 4; $i++)
-			{
+			for($i = 0; $i < 4; $i++){
 				$this->ip_parts[$i] = new CNumericBox($name.'['.$i.']', $value[$i], 3);
-				if($i != 3)
-				{
+				if($i != 3){
 					$this->ip_parts[$i]->tag_end = '';
 					$this->ip_parts[$i]->AddAction('OnKeyDown',
 						' this.maxlength = this.getAttribute("maxlength"); '.
@@ -114,12 +104,10 @@
 			}
 		}
 
-		function ToString($destroy=true)
-		{
+		function ToString($destroy=true){
 			$res = implode('.',$this->ip_parts);
 			
-			if($destroy)
-			{
+			if($destroy){
 ### TODO Problem under PHP 5.0  "Fatal error: Cannot re-assign $this in ..."
 #				$this = null;
 			}
@@ -127,8 +115,7 @@
 			return $res;
 		}
 
-		function Show($destroy=true)
-		{
+		function Show($destroy=true){
 			echo $this->ToString($destroy);
 		}
 	}

@@ -423,14 +423,14 @@
          * Comments: !!! Don't forget sync code with C !!!
          *
          */
-	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$templateid=0)
+	function add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$templateid=0)
 	{
 		$graphid = get_dbid("graphs","graphid");
 
 		$result=DBexecute('INSERT INTO graphs '.
-			' (graphid,name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d) '.
-			" values ($graphid,".zbx_dbstr($name).",$width,$height,$yaxistype,$yaxismin,".
-			" $yaxismax,$templateid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d)");
+			' (graphid,name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d,percent_left,percent_right) '.
+			" VALUES ($graphid,".zbx_dbstr($name).",$width,$height,$yaxistype,$yaxismin,".
+			" $yaxismax,$templateid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right)");
 
 		return ( $result ? $graphid : $result);
 	}
@@ -447,12 +447,11 @@
          * Comments: !!! Don't forget sync code with C !!!
          *
          */
-	function	add_graph_with_items($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$gitems=array(),$templateid=0)
+	function add_graph_with_items($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$gitems=array(),$templateid=0)
 	{
 		$result = false;
 
-		if ( !is_array($gitems) || count($gitems) < 1 )
-		{
+		if(!is_array($gitems) || count($gitems)<1){
 			error('Missed items for graph "'.$name.'"');
 			return $result;
 		}
@@ -465,28 +464,27 @@
 		foreach($gitems as $gitem)
 			$itemid[] = $gitem['itemid'];
 
-		$db_item_hosts = DBselect('select distinct h.hostid,h.host,h.status '.
-				' from items i, hosts h where h.hostid=i.hostid and i.itemid in ('.implode(',', $itemid).')');
-		while($db_item_host = DBfetch($db_item_hosts))
-		{
+		$db_item_hosts = DBselect('SELECT DISTINCT h.hostid,h.host,h.status '.
+							' FROM items i, hosts h '.
+							' WHERE h.hostid=i.hostid '.
+								' AND i.itemid in ('.implode(',', $itemid).')');
+								
+		while($db_item_host = DBfetch($db_item_hosts)){
 			$host_list[] = '"'.$db_item_host['host'].'"';
 
-			if ( HOST_STATUS_TEMPLATE ==  $db_item_host['status'] )
+			if(HOST_STATUS_TEMPLATE ==  $db_item_host['status'])
 				$new_host_is_template = true;
 		}
 
-		if ( isset($new_host_is_template) && count($host_list) > 1 )
-		{
+		if(isset($new_host_is_template) && count($host_list)>1){
 			error('Graph "'.$name.'" with template host can not contain items from other hosts.');
 			return $result;
 		}
 
-		if ( ($graphid = add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$templateid)) )
-		{
+		if($graphid = add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$templateid)){
 			$result = true;
-			foreach($gitems as $gitem)
-			{
-				if ( ! ($result = add_item_to_graph(
+			foreach($gitems as $gitem){
+				if (!$result = add_item_to_graph(
 					$graphid,
 					$gitem['itemid'],
 					$gitem['color'],
@@ -495,7 +493,7 @@
 					$gitem['yaxisside'],
 					$gitem['calc_fnc'],
 					$gitem['type'],
-					$gitem['periods_cnt'])) )
+					$gitem['periods_cnt']))
 				{
 					break;
 				}
@@ -535,20 +533,18 @@
          * Comments: !!! Don't forget sync code with C !!!
          *
          */
-	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$templateid=0)
-	{
+	function update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$templateid=0){
 		$g_graph = get_graph_by_graphid($graphid);
 
 		if ( ($result = DBexecute(
 				'UPDATE graphs '.
 				'SET name='.zbx_dbstr($name).',width='.$width.',height='.$height.
 					',yaxistype='.$yaxistype.',yaxismin='.$yaxismin.',yaxismax='.$yaxismax.',templateid='.$templateid.
-					',show_work_period='.$showworkperiod.',show_triggers='.$showtriggers.',graphtype='.$graphtype.
-					',show_legend='.$legend.',show_3d='.$graph3d.
+					',show_work_period='.$showworkperiod.',show_triggers='.$showtriggers.',graphtype='.$graphtype.',show_legend='.$legend.
+					',show_3d='.$graph3d.',percent_left='.$percent_left.',percent_right='.$percent_right.
 				' WHERE graphid='.$graphid)) )
 		{
-			if($g_graph['graphtype'] != $graphtype && $graphtype == GRAPH_TYPE_STACKED)
-			{
+			if($g_graph['graphtype'] != $graphtype && $graphtype == GRAPH_TYPE_STACKED){
 				$result = DBexecute('UPDATE graphs_items SET calc_fnc='.CALC_FNC_AVG.',drawtype=1,type='.GRAPH_ITEM_SIMPLE.
 					' WHERE graphid='.$graphid);
 			}
@@ -568,12 +564,11 @@
          * Comments: !!! Don't forget sync code with C !!!
          *
          */
-	function	update_graph_with_items($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$gitems=array(),$templateid=0)
+	function update_graph_with_items($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$gitems=array(),$templateid=0)
 	{
 		$result = false;
 
-		if ( !is_array($gitems) || count($gitems) < 1 )
-		{
+		if(!is_array($gitems) || count($gitems) < 1){
 			error('Missed items for graph "'.$name.'"');
 			return $result;
 		}
@@ -581,18 +576,16 @@
 		/* check items for template graph */
 		$tmp_hosts = get_hosts_by_graphid($graphid);
 		$host = DBfetch($tmp_hosts);
-		if ( $host["status"] == HOST_STATUS_TEMPLATE ){
+		if($host["status"] == HOST_STATUS_TEMPLATE ){
 			unset($new_hostid);
 			$itemid = array(0);
 
 			foreach($gitems as $gitem)
 				$itemid[] = $gitem['itemid'];
 
-			$db_item_hosts = DBselect('select distinct hostid from items where itemid in ('.implode(',', $itemid).')');
-			while($db_item = DBfetch($db_item_hosts))
-			{
-				if ( isset($new_hostid) )
-				{
+			$db_item_hosts = DBselect('SELECT DISTINCT hostid from items where itemid in ('.implode(',', $itemid).')');
+			while($db_item = DBfetch($db_item_hosts)){
+				if ( isset($new_hostid) ){
 					error('Can not use multiple host items for template graph "'.$name.'"');
 					return $result;
 				}
@@ -600,8 +593,7 @@
 				$new_hostid = $db_item['hostid'];
 			}
 
-			if ( (bccomp($host['hostid'] ,$new_hostid ) != 0))
-			{
+			if ( (bccomp($host['hostid'] ,$new_hostid ) != 0)){
 				error('You must use items only from host "'.$host['host'].'" for template graph "'.$name.'"');
 				return $result;
 			}
@@ -609,25 +601,24 @@
 
 		/* firstly update child graphs */
 		$chd_graphs = get_graphs_by_templateid($graphid);
-		while($chd_graph = DBfetch($chd_graphs))
-		{
+		while($chd_graph = DBfetch($chd_graphs)){
 			$tmp_hosts = get_hosts_by_graphid($chd_graph['graphid']);
 			$chd_host = DBfetch($tmp_hosts);
-			if ( !($new_gitems = get_same_graphitems_for_host($gitems, $chd_host['hostid'])) )
-			{ /* skip host with missed items */
+			
+			if(!$new_gitems = get_same_graphitems_for_host($gitems, $chd_host['hostid'])){ /* skip host with missed items */
 				error('Can not update graph "'.$name.'" for host "'.$chd_host['host'].'"');
 				return $result;
 			}
 		
-			if ( ! ($result = update_graph_with_items($chd_graph['graphid'], $name, $width, $height,
+			if (!$result = update_graph_with_items($chd_graph['graphid'], $name, $width, $height,
 				$yaxistype, $yaxismin, $yaxismax,
-				$showworkperiod, $showtriggers, $graphtype, $legend, $graph3d, $new_gitems, $graphid)) )
+				$showworkperiod, $showtriggers, $graphtype, $legend, $graph3d, $percent_left, $percent_right, $new_gitems, $graphid))
 			{
 				return $result;
 			}
 		}
 
-		DBexecute('delete from graphs_items where graphid='.$graphid);
+		DBexecute('DELETE FROM graphs_items WHERE graphid='.$graphid);
 
 		foreach($gitems as $gitem){
 			if ( ! ($result = add_item_to_graph(
@@ -646,7 +637,7 @@
 		}
 
 		if ($result = update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,
-						$showtriggers,$graphtype,$legend,$graph3d,$templateid))
+						$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$templateid))
 		{
 			$host_list = array();
 			$db_hosts = get_hosts_by_graphid($graphid);
@@ -911,14 +902,14 @@
 			if(isset($chd_graphid)){
 				$result = update_graph_with_items($chd_graphid, $db_graph['name'], $db_graph['width'], $db_graph['height'],
 					$db_graph['yaxistype'], $db_graph['yaxismin'], $db_graph['yaxismax'],
-					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],
-					$db_graph['show_legend'], $db_graph['show_3d'], $new_gitems, ($copy_mode ? 0: $db_graph['graphid']));
+					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],$db_graph['show_legend'], 
+					$db_graph['show_3d'], $db_graph['percent_left'], $db_graph['percent_right'], $new_gitems, ($copy_mode ? 0: $db_graph['graphid']));
 			}
 			else{
 				$result = add_graph_with_items($db_graph['name'], $db_graph['width'], $db_graph['height'],
 					$db_graph['yaxistype'], $db_graph['yaxismin'], $db_graph['yaxismax'],
-					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],
-					$db_graph['show_legend'], $db_graph['show_3d'], $new_gitems, ($copy_mode ? 0: $db_graph['graphid']));
+					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],$db_graph['show_legend'], 
+					$db_graph['show_3d'], $db_graph['percent_left'], $db_graph['percent_right'], $new_gitems, ($copy_mode ? 0: $db_graph['graphid']));
 			}
 		}
 		else{

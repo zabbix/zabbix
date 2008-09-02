@@ -56,6 +56,10 @@ include_once 'include/page_header.php';
 		'graph3d'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
 		'legend'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
 		
+		'percent_left'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
+		'percent_right'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
+		'visible'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),	null),
+		
 		'items'=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 		'new_graph_item'=>	array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 		'group_gid'=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
@@ -127,6 +131,13 @@ include_once 'include/page_header.php';
 			
 			$showworkperiod	= isset($_REQUEST['showworkperiod']) ? 1 : 0;
 			$showtriggers	= isset($_REQUEST['showtriggers']) ? 1 : 0;
+			
+			$visible = get_request('visible');
+			$percent_left  = 0;
+			$percent_right = 0;
+			
+			if(isset($visible['percent_left'])) 	$percent_left  = get_request('percent_left', 0);
+			if(isset($visible['percent_right']))	$percent_right = get_request('percent_right', 0);
 
 			if(isset($_REQUEST['graphid'])){
 				
@@ -134,8 +145,8 @@ include_once 'include/page_header.php';
 				update_graph_with_items($_REQUEST['graphid'],
 					$_REQUEST['name'],$_REQUEST['width'],$_REQUEST['height'],
 					$_REQUEST['yaxistype'],$_REQUEST['yaxismin'],$_REQUEST['yaxismax'],
-					$showworkperiod,$showtriggers,$_REQUEST['graphtype'],
-					$_REQUEST['legend'],$_REQUEST['graph3d'],$items);
+					$showworkperiod,$showtriggers,$_REQUEST['graphtype'],$_REQUEST['legend'],
+					$_REQUEST['graph3d'],$percent_left,$percent_right,$items);
 				$result = DBend();
 				
 				if($result){
@@ -147,8 +158,8 @@ include_once 'include/page_header.php';
 				DBstart();
 				add_graph_with_items($_REQUEST['name'],$_REQUEST['width'],$_REQUEST['height'],
 					$_REQUEST['yaxistype'],$_REQUEST['yaxismin'],$_REQUEST['yaxismax'],
-					$showworkperiod,$showtriggers,$_REQUEST['graphtype'],
-					$_REQUEST['legend'],$_REQUEST['graph3d'],$items);
+					$showworkperiod,$showtriggers,$_REQUEST['graphtype'],$_REQUEST['legend'],
+					$_REQUEST['graph3d'],$percent_left,$percent_right,$items);
 				$result = DBend();
 				
 				if($result){
@@ -298,7 +309,7 @@ include_once 'include/page_header.php';
 			$table->AddRow(new CImg('chart3.php?period=3600'.url_param('items').
 				url_param('name').url_param('width').url_param('height').url_param('yaxistype').
 				url_param('yaxismin').url_param('yaxismax').url_param('show_work_period').
-				url_param('show_triggers').url_param('graphtype')));
+				url_param('show_triggers').url_param('graphtype').url_param('percent_left').url_param('percent_right')));
 			$table->Show();
 		}
 	} 
