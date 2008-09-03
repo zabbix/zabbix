@@ -1395,7 +1395,7 @@ class Chart extends Graph{
 		
 		$end_time=getmicrotime();
 		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
-		imagestring($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12,'Generated in $str sec', $this->GetColor('Gray'));
+		imagestring($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12,"Generated in $str sec", $this->GetColor('Gray'));
 
 		unset($this->items, $this->data);
 
