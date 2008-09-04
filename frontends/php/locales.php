@@ -233,7 +233,7 @@ else if(isset($_REQUEST['next'])){
 		$value='';
 	}
 	
-	$frmLcls->AddItemToBottomRow(new CButton('prev',S_PREVIOUS));
+	$frmLcls->AddItemToBottomRow(new CButton('prev','<< '.S_PREVIOUS));
 	$frmLcls->AddItemToBottomRow(SPACE);
 
 	$frmLcls->AddItemToBottomRow(new CButton('download',S_DOWNLOAD));
@@ -266,7 +266,7 @@ else{
 
 	$frmLcls->AddRow('New entries', $cmbFill);
 
-	$frmLcls->AddItemToBottomRow(new CButton('next',S_NEXT));
+	$frmLcls->AddItemToBottomRow(new CButton('next',S_NEXT.' >>'));
 	$frmLcls->Show();
 }	
 ?>

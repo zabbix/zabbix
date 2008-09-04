@@ -157,8 +157,8 @@
 	'S_REFRESH'=>				'갱신',
 
 //	admin.php
-	'S_PREVIOUS'=>				'<<이전',
-	'S_NEXT'=>				'다음>>',
+	'S_PREVIOUS'=>				'이전',
+	'S_NEXT'=>				'다음',
 	'S_RETRY'=>				'재실행',
 	'S_FINISH'=>				'종료',
 	'S_FAIL'=>				'실패',
