@@ -105,13 +105,13 @@
 				new CCol($this->GetState(), 'right')
 				), 'center');
 			
-			$next = new CButton('next['.$this->GetStep().']', S_NEXT);
+			$next = new CButton('next['.$this->GetStep().']', S_NEXT.' >>');
 			if($this->DISABLE_NEXT_BUTTON) $next->SetEnabled(false);
 			
 			$table->SetFooter(array(
 				new CCol(new CButton('cancel',S_CANCEL),'left'), 
 				new CCol(array(
-					isset($this->stage[$this->GetStep()-1]) ? new CButton('back['.$this->GetStep().']', S_PREVIOUS) : null,
+					isset($this->stage[$this->GetStep()-1]) ? new CButton('back['.$this->GetStep().']', '<< '.S_PREVIOUS) : null,
 					isset($this->stage[$this->GetStep()+1]) ? $next: new CButton('finish', S_FINISH)
 					) , 'right')
 				),'footer');

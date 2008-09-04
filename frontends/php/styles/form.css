@@ -44,3 +44,15 @@ select{
 .checkbox{
 	cursor: pointer;
 }
+
+/* SPECIAL FOR FILTER */
+table.filter .button{
+	height: 14px;
+	margin: 0px;
+}
+
+table.filter .biginput{
+	font-size: 8px;
+	height: 10px;
+	margin: 0px;
+}

@@ -744,7 +744,9 @@ else {
 		
 		if(!is_array($array)){
 			info('DBcondition Error: ['.$fieldname.'] = '.$array);
-			return ' 1=1 ';
+			$array = explode(',',$array);
+			if(empty($array))
+				return ' 1=1 ';
 		}
 
 		$in = 		$notin?' NOT IN ':' IN ';

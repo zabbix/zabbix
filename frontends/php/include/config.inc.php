@@ -24,12 +24,12 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 ?>
 <?php
-	require_once 	"include/defines.inc.php";
-	require_once	"include/func.inc.php";
-	require_once 	"include/html.inc.php";
-	require_once	"include/copt.lib.php";
-	require_once	"include/profiles.inc.php";
-	require_once	"conf/maintenance.inc.php";
+	require_once('include/defines.inc.php');
+	require_once('include/func.inc.php');
+	require_once('include/html.inc.php');
+	require_once('include/copt.lib.php');
+	require_once('include/profiles.inc.php');
+	require_once('conf/maintenance.inc.php');
 	
 // GLOBALS
 	global $USER_DETAILS, $USER_RIGHTS;
@@ -325,9 +325,9 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	function access_deny(){
 	
-		include_once "include/page_header.php";
+		include_once('include/page_header.php');
 		show_error_message(S_NO_PERMISSIONS);
-		include_once "include/page_footer.php";
+		include_once('include/page_footer.php');
 	}
 	
 	function detect_page_type($default=PAGE_TYPE_HTML){

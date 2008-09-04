@@ -519,7 +519,7 @@ include_once "include/page_header.php";
 		$form->Show();
 	}
 	else if(str_in_array($srctbl,array("host_group"))){
-		$available_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,$nodeid);
+		$available_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,$nodeid);
 
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->SetHeader(array(S_NAME));
