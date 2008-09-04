@@ -55,7 +55,8 @@ include_once('include/page_header.php');
 
 		'next'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		'back'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
-		'navday'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(1,65535),	NULL),
+		'nav_time'=>		array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
+		
 		'load'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 
@@ -64,10 +65,7 @@ include_once('include/page_header.php');
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 		
 		'show_unknown'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
-		
-		'filter_timesince'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
-		'filter_timetill'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
-
+				
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -77,7 +75,7 @@ include_once('include/page_header.php');
 	$_REQUEST['source'] = get_request('source', get_profile('web.events.source', 0));
 
 	check_fields($fields);
-	
+//SDI($_REQUEST);
 /* AJAX */	
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
@@ -93,30 +91,15 @@ include_once('include/page_header.php');
 /* FILTER */
 	if(isset($_REQUEST['filter_rst'])){
 		$_REQUEST['triggerid'] = 0;
-		$_REQUEST['show_unknown'] = 0;
-		
-		$_REQUEST['filter_timesince'] = 0;
-		$_REQUEST['filter_timetill'] = 0;
+		$_REQUEST['show_unknown'] = 0;		
 	}
 	
 	$_REQUEST['triggerid'] = get_request('triggerid',get_profile('web.events.filter.triggerid',0));
 	$show_unknown = get_request('show_unknown',get_profile('web.events.filter.show_unknown',0));
 	
-	$_REQUEST['filter_timesince'] = get_request('filter_timesince',get_profile('web.events.filter.timesince',0));
-	$_REQUEST['filter_timetill'] = get_request('filter_timetill',get_profile('web.events.filter.timetill',0));
-	
-	if(($_REQUEST['filter_timetill'] > 0) && ($_REQUEST['filter_timesince'] > $_REQUEST['filter_timetill'])){
-		$tmp = $_REQUEST['filter_timesince'];
-		$_REQUEST['filter_timesince'] = $_REQUEST['filter_timetill'];
-		$_REQUEST['filter_timetill'] = $tmp;
-	}
-	
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		update_profile('web.events.filter.triggerid',$_REQUEST['triggerid']);
-		update_profile('web.events.filter.show_unknown',$show_unknown, PROFILE_TYPE_INT);
-		
-		update_profile('web.events.filter.timesince',$_REQUEST['filter_timesince'], PROFILE_TYPE_INT);
-		update_profile('web.events.filter.timetill',$_REQUEST['filter_timetill'], PROFILE_TYPE_INT);
+		update_profile('web.events.filter.show_unknown',$show_unknown, PROFILE_TYPE_INT);		
 	}
 // --------------
 
@@ -128,9 +111,9 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-	$_REQUEST['navday'] = get_request('navday', 1);
-	$_REQUEST['navday']+=(isset($_REQUEST['back']))?1:0;
-	$_REQUEST['navday']-=(isset($_REQUEST['next']))?1:0;
+	$_REQUEST['nav_time'] = get_request('nav_time', time());
+	$_REQUEST['nav_time']+=(isset($_REQUEST['next']))?86400:0;
+	$_REQUEST['nav_time']-=(isset($_REQUEST['back']))?86400:0;
 	
 ?>
 <?php
@@ -140,7 +123,7 @@ include_once('include/page_header.php');
 	$r_form->SetMethod('get');	
 	$r_form->AddOption('name','events_menu');
 	
-	$r_form->AddVar('navday',$_REQUEST['navday']);
+	$r_form->AddVar('nav_time',$_REQUEST['nav_time']);
 
 	if(EVENT_SOURCE_TRIGGERS == $source){
 	
@@ -245,31 +228,12 @@ include_once('include/page_header.php');
 //-------------
 
 // Day View Calc
-	$first_event = DBfetch(DBselect('SELECT MIN(e.clock) as clock FROM events e'));
-				
-	if(($_REQUEST['sort'] == 'e.clock') && ($_REQUEST['sortorder'] == ZBX_SORT_UP)){
-		$start = ($_REQUEST['filter_timesince']>0)?$_REQUEST['filter_timesince']:$first_event['clock'];
-//			$start -= ($start % 86400);
-		$start  = mktime(0, 0, 0, date('m',$start)  , date('d',$start), date('Y',$start));
-		$start += 86400 * ($_REQUEST['navday'] - 1);
-		
-		$end = (($_REQUEST['filter_timetill']>0) && (($start+86400)>$_REQUEST['filter_timetill']))?$_REQUEST['filter_timetill']:($start+86400);
-		
-		if($start < $_REQUEST['filter_timesince']){
-			$start = $_REQUEST['filter_timesince'];
-		}			
-	}
-	else{
-		$end = ($_REQUEST['filter_timetill']>0)?$_REQUEST['filter_timetill']:time();
-		$end  = mktime(0, 0, 0, date('m',$end)  , date('d',$end), date('Y',$end));
-		$end -= 86400 * ($_REQUEST['navday']-1);
-		
-		$start = (($_REQUEST['filter_timesince']>0) && (($end-86400)<$_REQUEST['filter_timesince']))?$_REQUEST['filter_timesince']:($end-86400);
-		
-		if(($_REQUEST['filter_timetill'] > 0) && ($end>$_REQUEST['filter_timetill'])){
-			$end = $_REQUEST['filter_timetill'];
-		}
-	}
+
+	$start = $_REQUEST['nav_time'];
+	$start  = mktime(0, 0, 0, date('m',$start)  , date('d',$start), date('Y',$start));
+	$end = $start+86400;
+//SDI('Start: '.date('d m Y',$start));
+//SDI('End: '.date('d m Y',$end));
 // -------------
 	
 	if($source == EVENT_SOURCE_DISCOVERY){
@@ -389,50 +353,47 @@ include_once('include/page_header.php');
 
 /************************* FILTER **************************/
 /***********************************************************/
-	$navday = get_request('navday',1);
+
+// Navigation
+	$nav_time = get_request('nav_time',time());
 	
-	$navForm = new CForm('events.php','get');
+	$navForm = new CForm('events.php');
 	$navForm->AddVar('groupid',$_REQUEST['groupid']);
 	$navForm->AddVar('hostid',$_REQUEST['hostid']);
+//	$navForm->AddVar('nav_time',$_REQUEST['nav_time']);
 	
-	$period = (int)((($_REQUEST['filter_timetill'] - $_REQUEST['filter_timesince']) / 86400) + 0.5);
-	if($period == 0){
-		$period = (int)(((time() - $first_event['clock']) / 86400) + 0.5);
-	}
-
-	$back = new CButton('back',S_DAY.' »');
-	if($navday > ($period-1)) $back->AddOption('disabled','disabled');
+	$back = new CButton('back','« '.S_DAY);
+	$next = new CButton('next',S_DAY.' »');
+	if(($nav_time+86400) > time()) $next->AddOption('disabled','disabled');
 	
-	$next = new CButton('next','« '.S_DAY);
-	if($navday < 2) $next->AddOption('disabled','disabled');
-/*	
-	$script = new CScript("javascript: if(CLNDR['nav_time'].clndr.setSDateFromOuterObj()){". 
-							"$('nav_time').value = parseInt(CLNDR['nav_time'].clndr.sdt.getTime()/1000);}");
+	$script = new CScript("javascript: if(CLNDR['nav_time'].clndr.setSDateFromOuterObj()){".
+							"this.action += '?nav_time='+parseInt(CLNDR['nav_time'].clndr.sdt.getTime()/1000);}"
+							);
 	$navForm->AddAction('onsubmit',$script);
 	
 	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-	$clndr_icon->AddAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['nav_time'].clndr.clndrshow(pos.top,pos.left);");
-
+	$clndr_icon->AddAction('onclick',"javascript: var pos = getPosition(this); pos.top+=14; pos.left-=174; CLNDR['nav_time'].clndr.clndrshow(pos.top,pos.left);");
+	$clndr_icon->AddOption('style','vertical-align: bottom;');
+	
 	$nav_clndr =  array(
 					new CNumericBox('nav_day',(($_REQUEST['nav_time']>0)?date('d',$_REQUEST['nav_time']):''),2),
-					'/',
 					new CNumericBox('nav_month',(($_REQUEST['nav_time']>0)?date('m',$_REQUEST['nav_time']):''),2),
-					'/',
 					new CNumericBox('nav_year',(($_REQUEST['nav_time']>0)?date('Y',$_REQUEST['nav_time']):''),4),
 					$clndr_icon
 				);
 	zbx_add_post_js('create_calendar(null,["nav_day","nav_month","nav_year"],"nav_time");');
-*/
-	$navForm->AddItem(array($next,$navday.' of '.$period.SPACE,$back,new CSpan(' | ','divider'),new CTextbox('navday',$navday,3),new CButton('load',S_SHOW.' »')));
+
+	$navForm->AddItem(array($back,SPACE,$next,new CSpan(' | ','divider'), $nav_clndr, SPACE, new CButton('load',S_SHOW.' »')));
 
 	$navigation = $navForm;
+//------------
 
 	$filterForm = new CFormTable(S_FILTER);//,'events.php?filter_set=1','POST',null,'sform');
 	$filterForm->AddOption('name','zbx_filter');
 	$filterForm->AddOption('id','zbx_filter');
 	$filterForm->SetMethod('get');
 	
-	$filterForm->AddVar('navday',$_REQUEST['navday']);
+	$filterForm->AddVar('nav_time',$_REQUEST['nav_time']);
 
 	if(EVENT_SOURCE_TRIGGERS == $source){
 	
@@ -443,57 +404,12 @@ include_once('include/page_header.php');
 							);
 		$filterForm->AddAction('onsubmit',$script);
 		
-		$filterForm->AddVar('filter_timesince',($_REQUEST['filter_timesince']>0)?$_REQUEST['filter_timesince']:'');
-		$filterForm->AddVar('filter_timetill',($_REQUEST['filter_timetill']>0)?$_REQUEST['filter_timetill']:'');
-//*	
-		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-		$clndr_icon->AddAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['events_since'].clndr.clndrshow(pos.top,pos.left);");
-		
-		$filtertimetab = new CTable();
-		$filtertimetab->AddOption('width','10%');
-		$filtertimetab->SetCellPadding(0);
-		$filtertimetab->SetCellSpacing(0);
-	
-		$filtertimetab->AddRow(array(
-								S_FROM, 
-								new CNumericBox('filter_since_day',(($_REQUEST['filter_timesince']>0)?date('d',$_REQUEST['filter_timesince']):''),2),
-								'/',
-								new CNumericBox('filter_since_month',(($_REQUEST['filter_timesince']>0)?date('m',$_REQUEST['filter_timesince']):''),2),
-								'/',
-								new CNumericBox('filter_since_year',(($_REQUEST['filter_timesince']>0)?date('Y',$_REQUEST['filter_timesince']):''),4),
-								new CNumericBox('filter_since_hour',(($_REQUEST['filter_timesince']>0)?date('H',$_REQUEST['filter_timesince']):''),2),
-								':',
-								new CNumericBox('filter_since_minute',(($_REQUEST['filter_timesince']>0)?date('i',$_REQUEST['filter_timesince']):''),2),
-								$clndr_icon
-						));
-		zbx_add_post_js('create_calendar(null,["filter_since_day","filter_since_month","filter_since_year","filter_since_hour","filter_since_minute"],"events_since");');
-	
-		$clndr_icon->AddAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['events_till'].clndr.clndrshow(pos.top,pos.left);");
-		$filtertimetab->AddRow(array(
-								S_TILL, 
-								new CNumericBox('filter_till_day',(($_REQUEST['filter_timetill']>0)?date('d',$_REQUEST['filter_timetill']):''),2),
-								'/',
-								new CNumericBox('filter_till_month',(($_REQUEST['filter_timetill']>0)?date('m',$_REQUEST['filter_timetill']):''),2),
-								'/',
-								new CNumericBox('filter_till_year',(($_REQUEST['filter_timetill']>0)?date('Y',$_REQUEST['filter_timetill']):''),4),
-								new CNumericBox('filter_till_hour',(($_REQUEST['filter_timetill']>0)?date('H',$_REQUEST['filter_timetill']):''),2),
-								':',
-								new CNumericBox('filter_till_minute',(($_REQUEST['filter_timetill']>0)?date('i',$_REQUEST['filter_timetill']):''),2),
-								$clndr_icon
-						));
-		zbx_add_post_js('create_calendar(null,["filter_till_day","filter_till_month","filter_till_year","filter_till_hour","filter_till_minute"],"events_till");');
-		
-		zbx_add_post_js('addListener($("filter_icon"),"click",CLNDR["events_since"].clndr.clndrhide.bindAsEventListener(CLNDR["events_since"].clndr));'.
-						'addListener($("filter_icon"),"click",CLNDR["events_till"].clndr.clndrhide.bindAsEventListener(CLNDR["events_till"].clndr));'
-						);
-		
-		$filterForm->AddRow(S_PERIOD, $filtertimetab);
-//*/	
 		$filterForm->AddVar('triggerid',$_REQUEST['triggerid']);
 		
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 			$trigger = expand_trigger_description($_REQUEST['triggerid']);
-		} else{
+		} 
+		else{
 			$trigger = "";
 		}
 		$row = new CRow(array(
