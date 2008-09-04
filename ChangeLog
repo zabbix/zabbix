@@ -1,5 +1,6 @@
 Changes for 1.5.5
 
+ - [DEV-208] improved events navigation system (Artem)
  - [DEV-207] implemented percentile line in graphs (Artem)
  - [DEV-423] fixed processing of delta and speed per second values (Sasha)
  - [DEV-199] added user group selection in configuration of users screen (Artem)
