@@ -436,35 +436,37 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 return $table;
 }
 
-function get_history_of_discovery_events($start,$num){
-	$db_events = DBselect('select distinct e.source,e.object,e.objectid,e.clock,e.value from events e'.
-		' where e.source='.EVENT_SOURCE_DISCOVERY.' order by e.clock desc',
-		10*($start+$num)
-		);
+function get_history_of_discovery_events($start,$end){
+
+	$sql_cond=' AND e.clock>'.$start;
+	$sql_cond.=' AND e.clock<'.$end;
+
+	$sql = 'SELECT DISTINCT e.source,e.object,e.objectid,e.clock,e.value '.
+			' FROM events e'.
+			' WHERE e.source='.EVENT_SOURCE_DISCOVERY.
+			$sql_cond.
+			order_by('e.clock');
+	$db_events = DBselect($sql);
    
 	$table = new CTableInfo(S_NO_EVENTS_FOUND); 
 	$table->SetHeader(array(S_TIME, S_IP, S_DESCRIPTION, S_STATUS));
 	$col=0;
 	
-	$skip = $start;
-	while(($event_data = DBfetch($db_events))&&($col<$num)){
-		if($skip > 0){
-			$skip--;
-			continue;
-		}
-
+	while($event_data = DBfetch($db_events)){
 		$value = new CCol(trigger_value2str($event_data['value']), get_trigger_value_style($event_data['value']));
 
 		switch($event_data['object']){
 			case EVENT_OBJECT_DHOST:
-				$object_data = DBfetch(DBselect('select ip from dhosts where dhostid='.$event_data['objectid']));
+				$object_data = DBfetch(DBselect('SELECT ip FROM dhosts WHERE dhostid='.$event_data['objectid']));
 				$description = SPACE;
 				break;
 			case EVENT_OBJECT_DSERVICE:
-				$object_data = DBfetch(DBselect('select h.ip,s.type,s.port from dhosts h,dservices s '.
-					' where h.dhostid=s.dhostid and s.dserviceid='.$event_data['objectid']));
-				$description = S_SERVICE.': '.discovery_check_type2str($object_data['type']).'; '.
-					S_PORT.': '.$object_data['port'];
+				$object_data = DBfetch(DBselect('SELECT h.ip,s.type,s.port '.
+											' FROM dhosts h,dservices s '.
+											' WHERE h.dhostid=s.dhostid '.
+												' AND s.dserviceid='.$event_data['objectid']));
+												
+				$description = S_SERVICE.': '.discovery_check_type2str($object_data['type']).'; '.S_PORT.': '.$object_data['port'];
 				break;
 			default:
 				continue;
@@ -472,9 +474,8 @@ function get_history_of_discovery_events($start,$num){
 
 		if(!$object_data) continue;
 
-
 		$table->AddRow(array(
-			date("Y.M.d H:i:s",$event_data["clock"]),
+			date('Y.M.d H:i:s',$event_data['clock']),
 			$object_data['ip'],
 			$description,
 			$value));

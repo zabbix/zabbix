@@ -157,8 +157,8 @@
 	'S_REFRESH'=>				'更新',
 
 //	admin.php
-	'S_PREVIOUS'=>				'<<戻る',
-	'S_NEXT'=>				'次へ>>',
+	'S_PREVIOUS'=>			'戻る',
+	'S_NEXT'=>				'次へ',
 	'S_RETRY'=>				'再試行',
 	'S_FINISH'=>				'終了',
 	'S_FAIL'=>				'失敗',

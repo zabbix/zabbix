@@ -169,8 +169,8 @@
 	'S_FAILED_SMALL'=>			'failed',
 
 //	admin.php
-	'S_PREVIOUS'=>				'<< Previous',
-	'S_NEXT'=>					'Next >>',
+	'S_PREVIOUS'=>				'Previous',
+	'S_NEXT'=>					'Next',
 	'S_RETRY'=>					'Retry',
 	'S_FINISH'=>				'Finish',
 	'S_FAIL'=>					'Fail',

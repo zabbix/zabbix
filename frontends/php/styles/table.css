@@ -15,8 +15,7 @@ table.nowrap tr td {
 	word-spacing:	0px;
 }
 
-td,tr
-{
+td,tr{
 	font-family:Verdana, Arial, Helvetica, sans-serif;
 	font-size: 8pt;
 	text-decoration: none;
@@ -28,8 +27,7 @@ td.center{
 
 /**************** PAGE TABLE ****************/
 /* header */
-table.page_header
-{
+table.page_header{
 	background-color: #FFFFFF;
 	border-color: #000000;
 	border-width:0px;
@@ -41,21 +39,21 @@ table.page_header
 	padding-left: 0px;
 	width: 100%;
 }
-table.page_header tr td.page_header_l
-{
+
+table.page_header tr td.page_header_l{
 	vertical-align: middle;
 	padding: 0px;
 }
-table.page_header tr td.page_header_r
-{
+
+table.page_header tr td.page_header_r{
 	vertical-align: middle;
 	text-align: right;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 10pt;
 }
 /* footer */
-table.page_footer
-{
+
+table.page_footer{
 	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/table_head.gif') repeat-x top left;
 	border-color: #000000;
@@ -67,15 +65,15 @@ table.page_footer
 	border-top-style: solid;
 	width: 100%;
 }
-table.page_footer tr td.page_footer_l
-{
+
+table.page_footer tr td.page_footer_l{
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:10px;
 	height: 24px;
 	text-align: center;
 }
-table.page_footer tr td.page_footer_r
-{
+
+table.page_footer tr td.page_footer_r{
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:10px;
 	height: 24px;
@@ -113,19 +111,21 @@ table.formtable tr.edit {
 	text-decoration: none;
 	background-color: #F0F0E0;
 }
+
 table.formtable tr.form_odd_row td{
 	text-decoration: none;
 	background-color:#D8D8D8;
 }
+
 table.formtable tr.form_even_row td{
 	text-decoration: none;
 	background-color:#DFDFDF;
 }
-table.formtable tr td.form_row_first
-{
+
+table.formtable tr td.form_row_first{
 	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
 	color: #FFFFFF;
-        font-size:11px;
+	font-size:11px;
 	font-weight: bold;
 	border-top-style: solid;
 	border-left-style: solid;
@@ -134,6 +134,7 @@ table.formtable tr td.form_row_first
 	border-color: #222255;
 	text-align: left;
 }
+
 table.formtable tr td.form_row_last {
 	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
@@ -144,6 +145,7 @@ table.formtable tr td.form_row_last {
 	border-color: #222255;
 	text-align: right;
 }
+
 table.formtable tr td.form_row_l { /* left cell */
 	border-left-style:	solid;
 	border-top-style:	none;
@@ -650,8 +652,7 @@ table.filter a{
 
 /**************** Aknowledges ****************/
 
-table.ack_msgs
-{
+table.ack_msgs{
 	width: 70%;
 	background-color: #EEEEEE;
 	padding: 0px;
@@ -701,27 +702,24 @@ table.ack_msgs tr.msg td{
 table.right_table{
 	width: 100%;
 	border-width: 0px;
-        margin: 0px;
-        padding: 0px;
+	margin: 0px;
+	padding: 0px;
 }
 
-table.right_table tr.header td
-{
+table.right_table tr.header td{
 	font-weight: bold;
 	text-align: left;
 }
 
-table.right_table td
-{
-        margin: 0px;
-        padding: 0px;
+table.right_table td{
+	margin: 0px;
+	padding: 0px;
 	text-align: right;
 	white-space: nowrap;
 	word-spacing:	0px;
 }
 
-table.right_table select
-{
+table.right_table select{
 	width: 200px;
 }
 
@@ -731,16 +729,14 @@ table.right_table tr td.deny 	select.biginput	{ color: #CC0000; width: 320px;}
 
 /**************** GRAPH ****************/
 
-table.graph
-{
+table.graph{
 	width: 100%;
 	text-align: center;
 }
 
 /**************** MAP ****************/
 
-table.map
-{
+table.map{
 	background-color: #CCCCCC;
 	width: 100%;
 	text-align: center;
@@ -751,25 +747,22 @@ table.map
 
 /************* MENU ************/
 
-table.menu
-{
+table.menu{
 	height: 24px;
 	background-color: #FFFFFF;
 	color: #000000;
 	border: 0px solid #000000;
 }
 
-table.menu tr
-{
-        font-family:verdana, arial, helvetica, sans-serif;
-        font-size:10px;
+table.menu tr{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
 	background: #AAAAAA url('../images/gradients/menu_not_active.gif') repeat-x top left;
 	padding-right: 5px;
 	padding-left: 5px;
 }
 
-table.menu td
-{
+table.menu td{
 	border-color: #AAAAAA;
 	border-width:1px;
 	border-top-style: solid;
@@ -777,8 +770,8 @@ table.menu td
 	border-right-style: solid;
 	border-bottom-style: solid;
 }
-table.menu tr td.active
-{
+
+table.menu tr td.active{
 	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/table_head.gif') repeat-x top left;
 	border-width:0px;
@@ -786,8 +779,7 @@ table.menu tr td.active
 
 /************* SUB MENU ************/
 
-table.sub_menu
-{
+table.sub_menu{
 	height: 24px;
 	background-color: #0000FC;
 	color: #000000;
@@ -796,11 +788,10 @@ table.sub_menu
 /*	margin-bottom: 1px;*/
 }
 
-table.sub_menu tr
-{
+table.sub_menu tr{
 	color: #FFFFFF;
-        font-family:verdana, arial, helvetica, sans-serif;
-        font-size:10px;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
 	background: #5C7099 url('../images/gradients/table_head.gif') repeat-x top left;
 	border-color: #000000;
 	border-width:0px;
@@ -812,14 +803,12 @@ table.sub_menu tr
 	padding-left: 5px;
 }
 
-table.sub_menu tr td
-{
+table.sub_menu tr td{
 	padding-top: 0px;
 	padding-bottom: 0px;
 }
 
-table.sub_menu tr td span.active a.highlight
-{
+table.sub_menu tr td span.active a.highlight{
 	color: #ffcc00;
 }
 
@@ -829,6 +818,7 @@ table.triggers_info {
 	background-color: #FFFFFF;
 	border: 1px gray dotted;
 }
+
 table.triggers_info tr td {
 	border: 0px;
 	white-space: nowrap;
@@ -861,6 +851,7 @@ table.hosts_info {
 	background-color: #FFFFFF;
 	border: 1px gray dotted;
 }
+
 table.hosts_info tr td {
 	border: 0px;
 	white-space: nowrap;
@@ -879,16 +870,15 @@ table.hosts_info tr td.header {
 	color: #FFFFFF;
 }
 
-table.hosts_info tr td.avail
-{
+table.hosts_info tr td.avail{
 	background-color: #99F099;
 }
-table.hosts_info tr td.notav
-{
+
+table.hosts_info tr td.notav{
 	background-color: #F09999;
 }
-table.hosts_info tr td.uncn
-{
+
+table.hosts_info tr td.uncn{
 	background-color: #CCCCCC;
 }
 
@@ -898,6 +888,7 @@ table.server_info {
 	background-color: #EFEFEF;
 	border: 1px gray dotted;
 }
+
 table.server_info tr td {
 	border: 0px;
 	padding-left: 5px;
@@ -915,6 +906,7 @@ table.server_info tr td.header {
 	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
 	color: #FFFFFF;
 }
+
 table.server_info tr.status td{
 	white-space: nowrap;
 	word-spacing:	0px;
