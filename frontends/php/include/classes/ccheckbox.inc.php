@@ -57,6 +57,7 @@
 	class CVisibilityBox extends CCheckBox{
 		function CVisibilityBox($name='visibilitybox', $value='yes', $object_name=null, $replace_to=null){
 			$action = '';
+
 			if(!is_array($object_name)) $object_name = array($object_name);
 
 			$this->object_name = $object_name;

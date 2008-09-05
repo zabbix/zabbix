@@ -82,7 +82,12 @@ include_once('include/page_header.php');
 		'contact'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
 		'location'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
 		'notes'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),	
-		
+
+//BEGIN: HOSTS PROFILE EXTANDED Section		
+		'useprofile_ext'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
+		'ext_host_profiles'=> 	array(T_ZBX_STR, O_OPT, NULL,   NULL,   'isset({useprofile_ext})&&!isset({massupdate})'),
+//END:   HOSTS PROFILE EXTANDED Section		
+
 /* mass update*/
 		'massupdate'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'visible'=>			array(T_ZBX_STR, O_OPT,	null, 	null,	null),
@@ -121,7 +126,7 @@ include_once('include/page_header.php');
 		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
-
+//SDI($_REQUEST);
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 	
@@ -298,6 +303,35 @@ include_once('include/page_header.php');
 						$host_profile['location'],$host_profile['notes']);
 				}
 			}
+
+//HOSTS PROFILE EXTANDED Section		
+			if($result && isset($visible['useprofile_ext'])){
+
+				$host_profile_ext=DBfetch(DBselect('SELECT * FROM hosts_profiles_ext WHERE hostid='.$hostid));
+
+				delete_host_profile_ext($hostid);
+//ext_host_profiles
+				$useprofile_ext = get_request('useprofile_ext',false);
+				$ext_host_profiles = get_request('ext_host_profiles',array());
+				
+				if($useprofile_ext && !empty($ext_host_profiles)){
+					$result = add_host_profile_ext($hostid, $ext_host_profiles);
+				}
+				$result = DBend($result);
+				
+				if($useprofile_ext && !empty($ext_host_profiles)){
+					$ext_host_profiles = get_request('ext_host_profiles',array());
+					
+					foreach($host_profile_ext as $key => $value){
+						if(isset($visible[$key])){
+							$host_profile_ext[$key] = $ext_host_profiles[$key];
+						}
+					}
+
+					$result &= add_host_profile_ext($hostid,$host_profile_ext);
+				}
+			}
+//HOSTS PROFILE EXTANDED Section		
 			
 			if($result){
 				add_audit(
@@ -447,6 +481,22 @@ include_once('include/page_header.php');
 			$result	= DBend($result);
 		}
 
+//HOSTS PROFILE EXTANDED Section		
+		if($result){
+			update_profile('HOST_PORT',$_REQUEST['port'], PROFILE_TYPE_INT);
+
+			DBstart();
+			delete_host_profile_ext($hostid);
+
+			$useprofile_ext = get_request('useprofile_ext',false);
+			$ext_host_profiles = get_request('ext_host_profiles',array());
+			
+			if($useprofile_ext && !empty($ext_host_profiles)){
+				$result = add_host_profile_ext($hostid, $ext_host_profiles);
+			}
+			$result = DBend($result);
+		}
+//HOSTS PROFILE EXTANDED Section		
 		
 		show_messages($result, $msg_ok, $msg_fail);
 		

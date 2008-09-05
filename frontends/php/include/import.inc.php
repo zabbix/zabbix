@@ -148,6 +148,7 @@
 					array_push($this->main_node, $name);
 					break;
 				case XML_TAG_HOSTPROFILE:
+				case XML_TAG_HOSTPROFILE_EXT:
 				case XML_TAG_TEMPLATE:
 				case XML_TAG_ITEM:
 				case XML_TAG_TRIGGER:
@@ -231,6 +232,87 @@
 						$data['contact'], $data['location'], $data['notes']))
 					{
 						info('Host Profile ['.$this->data[XML_TAG_HOST]['name'].'] updated');
+					}
+ 					
+ 					break; // case
+//---
+// Extended profiles
+				case XML_TAG_HOSTPROFILE_EXT:
+					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
+						break; //case
+
+					if(!isset($data['device_alias'])) $data['device_alias'] = '';
+					if(!isset($data['device_type'])) $data['device_type'] = '';
+					if(!isset($data['device_chassis'])) $data['device_chassis'] = '';
+					if(!isset($data['device_os'])) $data['device_os'] = '';
+					if(!isset($data['device_os_short'])) $data['device_os_short'] = '';
+					
+					if(!isset($data['device_hw_arch'])) $data['device_hw_arch'] = '';
+					if(!isset($data['device_serial'])) $data['device_serial'] = '';
+					if(!isset($data['device_model'])) $data['device_model'] = '';
+					if(!isset($data['device_tag'])) $data['device_tag'] = '';
+					if(!isset($data['device_vendor'])) $data['device_vendor'] = '';
+					if(!isset($data['device_contract'])) $data['device_contract'] = '';
+					
+					if(!isset($data['device_who'])) $data['device_who'] = '';
+					if(!isset($data['device_status'])) $data['device_status'] = '';
+					if(!isset($data['device_app_01'])) $data['device_app_01'] = '';
+					if(!isset($data['device_app_02'])) $data['device_app_02'] = '';
+					if(!isset($data['device_app_03'])) $data['device_app_03'] = '';
+					if(!isset($data['device_app_04'])) $data['device_app_04'] = '';
+					
+					if(!isset($data['device_app_05'])) $data['device_app_05'] = '';
+					if(!isset($data['device_url_1'])) $data['device_url_1'] = '';
+					if(!isset($data['device_url_2'])) $data['device_url_2'] = '';
+					if(!isset($data['device_url_3'])) $data['device_url_3'] = '';
+					if(!isset($data['device_networks'])) $data['device_networks'] = '';
+					if(!isset($data['device_notes'])) $data['device_notes'] = '';
+					
+					if(!isset($data['device_hardware'])) $data['device_hardware'] = '';
+					if(!isset($data['device_software'])) $data['device_software'] = '';
+					if(!isset($data['ip_subnet_mask'])) $data['ip_subnet_mask'] = '';
+					if(!isset($data['ip_router'])) $data['ip_router'] = '';
+					if(!isset($data['ip_macaddress'])) $data['ip_macaddress'] = '';
+					if(!isset($data['oob_ip'])) $data['oob_ip'] = '';
+					
+					if(!isset($data['oob_subnet_mask'])) $data['oob_subnet_mask'] = '';
+					if(!isset($data['oob_router'])) $data['oob_router'] = '';
+					if(!isset($data['date_hw_buy'])) $data['date_hw_buy'] = '';
+					if(!isset($data['date_hw_install'])) $data['date_hw_install'] = '';
+					if(!isset($data['date_hw_expiry'])) $data['date_hw_expiry'] = '';
+					if(!isset($data['date_hw_decomm'])) $data['date_hw_decomm'] = '';
+					if(!isset($data['site_street_1'])) $data['site_street_1'] = '';
+					
+					if(!isset($data['site_street_2'])) $data['site_street_2'] = '';
+					if(!isset($data['site_street_3'])) $data['site_street_3'] = '';
+					if(!isset($data['site_city'])) $data['site_city'] = '';
+					if(!isset($data['site_state'])) $data['site_state'] = '';
+					if(!isset($data['site_country'])) $data['site_country'] = '';
+					if(!isset($data['site_zip'])) $data['site_zip'] = '';
+					if(!isset($data['site_rack'])) $data['site_rack'] = '';
+					if(!isset($data['site_notes'])) $data['site_notes'] = '';
+					
+					if(!isset($data['poc_1_name'])) $data['poc_1_name'] = '';
+					if(!isset($data['poc_1_email'])) $data['poc_1_email'] = '';
+					if(!isset($data['poc_1_phone_1'])) $data['poc_1_phone_1'] = '';
+					if(!isset($data['poc_1_phone_2'])) $data['poc_1_phone_2'] = '';
+					if(!isset($data['poc_1_cell'])) $data['poc_1_cell'] = '';
+					if(!isset($data['poc_1_screen'])) $data['poc_1_screen'] = '';
+					if(!isset($data['poc_1_notes'])) $data['poc_1_notes'] = '';
+					if(!isset($data['poc_2_name'])) $data['poc_2_name'] = '';
+					
+					if(!isset($data['poc_2_email'])) $data['poc_2_email'] = '';
+					if(!isset($data['poc_2_phone_1'])) $data['poc_2_phone_1'] = '';
+					if(!isset($data['poc_2_phone_2'])) $data['poc_2_phone_2'] = '';
+					if(!isset($data['poc_2_cell'])) $data['poc_2_cell'] = '';
+					if(!isset($data['poc_2_screen'])) $data['poc_2_screen'] = '';
+					if(!isset($data['poc_2_notes'])) $data['poc_2_notes'] = '';
+
+					
+					delete_host_profile_ext($this->data[XML_TAG_HOST]['hostid']);
+					
+					if(add_host_profile_ext($this->data[XML_TAG_HOST]['hostid'], $data)){
+						info('Host Extended Profile ['.$this->data[XML_TAG_HOST]['name'].'] updated');
 					}
  					
  					break; // case
