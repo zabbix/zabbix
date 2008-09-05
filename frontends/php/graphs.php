@@ -282,7 +282,7 @@ include_once 'include/page_header.php';
 		}
 	}
 // ----</ACTIONS>----
-	$available_graphs = get_accessible_graphs(PERM_READ_WRITE);
+	$available_graphs = get_accessible_graphs(PERM_READ_WRITE,null,null,null,0);
 ?>
 <?php
 	$form = new CForm();

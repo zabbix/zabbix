@@ -201,8 +201,7 @@
 		$slide_data = DBfetch(DBselect('select sl.screenid,sl.delay,ss.delay as ss_delay from slides sl,slideshows ss '.
 				       ' where ss.slideshowid='.$slideshowid.' and ss.slideshowid=sl.slideshowid and sl.step='.$curr_step));
 
-		if( $slide_data['delay'] <= 0 )
-		{
+		if( $slide_data['delay'] <= 0 ){
 			$slide_data['delay'] = $slide_data['ss_delay'];
 		}
 
@@ -214,8 +213,7 @@
 	}
 	
 
-	function	slideshow_accessible($slideshowid, $perm)
-	{
+	function slideshow_accessible($slideshowid, $perm){
 		$result = false;
 
 		if(DBselect('select slideshowid from slideshows where slideshowid='.$slideshowid.
@@ -223,16 +221,14 @@
 		{
 			$result = true;
 			$db_slides = DBselect('select distinct screenid from slides where slideshowid='.$slideshowid);
-			while($slide_data = DBfetch($db_slides))
-			{
+			while($slide_data = DBfetch($db_slides)){
 				if( !($result = screen_accessible($slide_data["screenid"], PERM_READ_ONLY)) ) break;
 			}
 		}
-		return $result;
+	return $result;
 	}
 
-	function	get_slideshow_by_slideshowid($slideshowid)
-	{
+	function get_slideshow_by_slideshowid($slideshowid){
 		return DBfetch(DBselect('select * from slideshows where slideshowid='.$slideshowid));
 	}
 

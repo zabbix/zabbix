@@ -263,11 +263,12 @@ function perm_mode2comparator($perm_mode){
 return $perm_mode;
 }
 
-function get_accessible_hosts_by_user(&$user_data,$perm,$perm_res=PERM_RES_IDS_ARRAY,$nodeid=null,$cache=1){
+function get_accessible_hosts_by_user(&$user_data,$perm,$perm_res=null,$nodeid=null,$cache=1){
 //		global $DB;
 	static $available_hosts;
-
-	if($perm == PERM_READ_LIST)	$perm		= PERM_READ_ONLY;
+	
+	if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
+	if($perm == PERM_READ_LIST)	$perm = PERM_READ_ONLY;
 	
 	$result = array();
 
@@ -361,9 +362,10 @@ COpt::counter_up('perm');
 return $result;
 }
 
-function get_accessible_groups_by_user($user_data,$perm,$perm_res=PERM_RES_IDS_ARRAY,$nodeid=null){
+function get_accessible_groups_by_user($user_data,$perm,$perm_res=null,$nodeid=null){
 	global $ZBX_LOCALNODEID;
 
+	if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
 	if(is_null($nodeid)) $nodeid = get_current_nodeid();
 
 	$result = array();
@@ -443,9 +445,10 @@ COpt::counter_up('perm');
 	return $result;
 }
 
-function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=PERM_RES_IDS_ARRAY,$nodeid=null,$cache=1){
+function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=null,$cache=1){
 	global $ZBX_LOCALNODEID, $ZBX_NODES_IDS;
 
+	if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
 	if(is_null($nodeid)) $nodeid = $ZBX_NODES_IDS;
 	if(!is_array($nodeid)) $nodeid = array($nodeid);
 
