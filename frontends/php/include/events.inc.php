@@ -236,10 +236,10 @@ function make_event_details($eventid){
 	}
 
 	if($event["value"] == TRIGGER_VALUE_FALSE){
-		$value=new CCol(S_FALSE_BIG,"off");
+		$value=new CCol(S_OK_BIG,"off");
 	}
 	elseif($event["value"] == TRIGGER_VALUE_TRUE){
-		$value=new CCol(S_TRUE_BIG,"on");
+		$value=new CCol(S_PROBLEM_BIG,"on");
 	}
 	else{
 		$value=new CCol(S_UNKNOWN_BIG,"unknown");

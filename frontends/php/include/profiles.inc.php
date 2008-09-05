@@ -118,7 +118,6 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 	$sql_cond = '';
 	if(zbx_numeric($idx2)) 	$sql_cond = ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
 
-	DBstart();	
 	if(profile_type($type,'array')){
 		
 		$sql='DELETE FROM profiles '.
@@ -126,10 +125,12 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 				' AND idx='.zbx_dbstr($idx).
 				$sql_cond;
 
+		DBstart();
 		DBexecute($sql);
 		foreach($value as $id => $val){
 			insert_profile($idx,$val,$type,$idx2,$source);
 		}
+		$result = DBend();
 	}
 	else{
 		$sql = 'SELECT profileid '.
@@ -141,7 +142,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 		$row = DBfetch(DBselect($sql));
 
 		if(!$row){
-			insert_profile($idx,$value,$type,$idx2,$source);
+			$result = insert_profile($idx,$value,$type,$idx2,$source);
 		}
 		else{
 			$val = array();
@@ -172,11 +173,10 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 					' AND idx='.zbx_dbstr($idx).
 					$sql_cond;
 					
-			DBexecute($sql);
+			$result = DBexecute($sql);
 		}
 	}
-	
-	$result = DBend();
+
 	
 return $result;
 }

@@ -182,12 +182,12 @@
  *     Aly
  *
  */		
-	function get_accessible_triggers($perm,$perm_res=PERM_RES_IDS_ARRAY,$nodeid=null,$hostid=null,$cache=1){
+	function get_accessible_triggers($perm,$perm_res=null,$nodeid=null,$hostid=null,$cache=1){
 		global $USER_DETAILS;
 		static $available_triggers;
 		
 		$result = array();
-
+		if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
 		$nodeid_str =(is_array($nodeid))?implode('',$nodeid):strval($nodeid);
 		$hostid_str =(is_array($hostid))?implode('',$hostid):strval($hostid);
 			
