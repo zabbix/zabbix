@@ -1147,7 +1147,6 @@ include_once('include/page_header.php');
 			show_table_header(S_HOST_GROUPS_BIG);
 
 			$form = new CForm('hosts.php');
-			$form->SetMethod('get');
 			
 			$form->SetName('groups');
 			$form->AddVar("config",get_request("config",0));
