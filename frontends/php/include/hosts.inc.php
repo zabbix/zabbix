@@ -453,6 +453,7 @@ require_once "include/httptest.inc.php";
 
 // delete host profile
 		delete_host_profile($hostids);
+		delete_host_profile_ext($hostids);
 		
 // delete web tests
 		$del_httptests = array();
@@ -620,7 +621,7 @@ require_once "include/httptest.inc.php";
 							' AND '.DBcondition('ht.templateid',$templateids));
 	}
 
-	# Update Host status
+// Update Host status
 
 	function update_host_status($hostids,$status){
 		zbx_value2array($hostids);
@@ -647,18 +648,18 @@ require_once "include/httptest.inc.php";
 		}
 	}
 	
-	/*
-	 * Function: get_templates_by_hostid
-	 *
-	 * Description:
-	 *     Retrive templates for specified host
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
+/*
+ * Function: get_templates_by_hostid
+ *
+ * Description:
+ *     Retrive templates for specified host
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ */
 	function get_templates_by_hostid($hostid){
 		$result = array();
 		$db_templates = DBselect('SELECT DISTINCT h.hostid,h.host '.
@@ -1268,26 +1269,95 @@ require_once "include/httptest.inc.php";
 
 	function add_host_profile($hostid,$devicetype,$name,$os,$serialno,$tag,$macaddress,$hardware,$software,$contact,$location,$notes){
 		
-		$result=DBselect("select * from hosts_profiles where hostid=$hostid");
+		$result=DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$hostid);
 		if(DBfetch($result)){
-			error("Host profile already exists");
+			error('Host profile already exists');
 			return 0;
 		}
 
-		$result=DBexecute("insert into hosts_profiles".
-			" (hostid,devicetype,name,os,serialno,tag,macaddress,hardware,software,contact,".
-			"location,notes) values ($hostid,".zbx_dbstr($devicetype).",".zbx_dbstr($name).",".
-			zbx_dbstr($os).",".zbx_dbstr($serialno).",".zbx_dbstr($tag).",".zbx_dbstr($macaddress).
-			",".zbx_dbstr($hardware).",".zbx_dbstr($software).",".zbx_dbstr($contact).",".
-			zbx_dbstr($location).",".zbx_dbstr($notes).")");
+		$result=DBexecute('INSERT INTO hosts_profiles '.
+			' (hostid,devicetype,name,os,serialno,tag,macaddress,hardware,software,contact,location,notes) '.
+			' VALUES ('.$hostid.','.zbx_dbstr($devicetype).','.zbx_dbstr($name).','.
+			zbx_dbstr($os).','.zbx_dbstr($serialno).','.zbx_dbstr($tag).','.zbx_dbstr($macaddress).
+			','.zbx_dbstr($hardware).','.zbx_dbstr($software).','.zbx_dbstr($contact).','.
+			zbx_dbstr($location).','.zbx_dbstr($notes).')');
 		
 	return	$result;
 	}
+
+/*
+ * Function: add_host_profile_ext
+ *         
+ * Description:
+ *  Add alternate host profile information.
+ *
+ * Author:
+ *	John R Pritchard (john.r.pritchard@gmail.com)
+ * 	modified by Aly
+ * Comments:
+ *  Extend original "add_host_profile" function for new hosts_profiles_ext data.
+ *
+ */
+	function add_host_profile_ext($hostid,$ext_host_profiles=array()){
+	
+		$ext_profiles_fields = array('device_alias','device_type','device_chassis','device_os','device_os_short',
+			'device_hw_arch','device_serial','device_model','device_tag','device_vendor','device_contract',
+			'device_who','device_status','device_app_01','device_app_02','device_app_03','device_app_04',
+			'device_app_05','device_url_1','device_url_2','device_url_3','device_networks','device_notes',
+			'device_hardware','device_software','ip_subnet_mask','ip_router','ip_macaddress','oob_ip',
+			'oob_subnet_mask','oob_router','date_hw_buy','date_hw_install','date_hw_expiry','date_hw_decomm','site_street_1',
+			'site_street_2','site_street_3','site_city','site_state','site_country','site_zip','site_rack','site_notes',
+			'poc_1_name','poc_1_email','poc_1_phone_1','poc_1_phone_2','poc_1_cell','poc_1_screen','poc_1_notes','poc_2_name',
+			'poc_2_email','poc_2_phone_1','poc_2_phone_2','poc_2_cell','poc_2_screen','poc_2_notes');
+
+		$result=DBselect('SELECT * FROM hosts_profiles_ext WHERE hostid='.$hostid);
+		if(DBfetch($result)){
+			error('Host profile already exists');
+			return false;
+		}
+		
+		$sql = 'INSERT INTO hosts_profiles_ext (hostid,';
+		$values = ' VALUES ('.$hostid.',';
+
+		foreach($ext_host_profiles as $field => $value){
+			if(str_in_array($field,$ext_profiles_fields)){
+				$sql.=$field.',';
+				$values.=zbx_dbstr($value).',';
+			}
+		}
+		
+		$sql = rtrim($sql,',').')';
+		$values = rtrim($values,',').')';
+		
+		$result=DBexecute($sql.$values);
+	return  $result;
+	}
+
 
 // Delete Host Profile
 	function delete_host_profile($hostids){
 		zbx_value2array($hostids);
 		$result=DBexecute('DELETE FROM hosts_profiles WHERE '.DBcondition('hostid',$hostids));
+
+	return $result;
+	}
+	
+/*
+ * Function: delete_host_profile_ext
+ *
+ * Description:
+ *     Delete alternate host profile information.
+ *
+ * Author:
+ *     John R Pritchard (john.r.pritchard@gmail.com)
+ *
+ * Comments: 
+ *     Extend original "delete_host_profile" function for new hosts_profiles_ext data.
+ *
+ */
+	function delete_host_profile_ext($hostids){
+		zbx_value2array($hostids);
+		$result=DBexecute('DELETE FROM hosts_profiles_ext WHERE '.DBcondition('hostid',$hostids));
 
 	return $result;
 	}
@@ -1306,6 +1376,7 @@ require_once "include/httptest.inc.php";
 		}
 		insert_js('var menu_hstgrp_all='.zbx_jsvalue($menu_all).";\n");
 	}
+	
 	
 	function host_js_menu($hostid,$link_text = S_SELECT){
 		$hst_grp_all_in = array();

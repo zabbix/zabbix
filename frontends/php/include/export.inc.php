@@ -37,17 +37,81 @@
 		XML_TAG_HOSTPROFILE => array(
 			'attribures'	=> array(),
 			'elements'	=> array(
-				'devicetype'	=> '',
+				'devicetype'=> '',
 				'name'		=> '',
-				'os'			=> '',
+				'os'		=> '',
 				'serialno' 	=> '',
 				'tag' 		=> '',
-				'macaddress' 	=> '',
+				'macaddress'=> '',
 				'hardware' 	=> '',
 				'software' 	=> '',
 				'contact' 	=> '',
 				'location' 	=> '',
-				'notes' 		=> '')
+				'notes' 	=> '')
+			),
+		XML_TAG_HOSTPROFILE_EXT => array(
+			'attribures'	=> array(),
+			'elements'	=> array(
+				'device_alias' 	=> '',
+				'device_type' 	=> '',
+				'device_chassis' 	=> '',
+				'device_os' 	=> '',
+				'device_os_short' 	=> '',
+					
+				'device_hw_arch' 	=> '',
+				'device_serial' 	=> '',
+				'device_model' 	=> '',
+				'device_tag' 	=> '',
+				'device_vendor' 	=> '',
+				'device_contract' 	=> '',
+					
+				'device_who' 	=> '',
+				'device_status' 	=> '',
+				'device_app_01' 	=> '',
+				'device_app_02' 	=> '',
+				'device_app_03' 	=> '',
+				'device_app_04' 	=> '',
+				'device_app_05' 	=> '',
+				'device_url_1' 	=> '',
+				'device_url_2' 	=> '',
+				'device_url_3' 	=> '',
+				'device_networks' 	=> '',
+				'device_notes' 	=> '',
+				'device_hardware' 	=> '',
+				'device_software' 	=> '',
+				'ip_subnet_mask' 	=> '',
+				'ip_router' 	=> '',
+				'ip_macaddress' 	=> '',
+				'oob_ip' 	=> '',
+				'oob_subnet_mask' 	=> '',
+				'oob_router' 	=> '',
+				'date_hw_buy' 	=> '',
+				'date_hw_install' 	=> '',
+				'date_hw_expiry' 	=> '',
+				'date_hw_decomm' 	=> '',
+				'site_street_1' 	=> '',
+				'site_street_2' 	=> '',
+				'site_street_3' 	=> '',
+				'site_city' 	=> '',
+				'site_state' 	=> '',
+				'site_country' 	=> '',
+				'site_zip' 	=> '',
+				'site_rack' 	=> '',
+				'site_notes' 	=> '',
+				'poc_1_name' 	=> '',
+				'poc_1_email' 	=> '',
+				'poc_1_phone_1' 	=> '',
+				'poc_1_phone_2' 	=> '',
+				'poc_1_cell' 	=> '',
+				'poc_1_screen' 	=> '',
+				'poc_1_notes' 	=> '',
+				'poc_2_name' 	=> '',
+				'poc_2_email' 	=> '',
+				'poc_2_phone_1' 	=> '',
+				'poc_2_phone_2' 	=> '',
+				'poc_2_cell' 	=> '',
+				'poc_2_screen' 	=> '',
+				'poc_2_notes' 	=> '')
 			),
 		XML_TAG_DEPENDENCY => array(
 			'attribures'	=> array(
@@ -193,11 +257,12 @@
 				zbx_xmlwriter_write_element($memory, 'valuemap', $valuemap['name']);
 			}
 
-			$db_applications=DBselect('select distinct a.name from applications a,items_applications ia '.
-				       ' where ia.applicationid=a.applicationid and ia.itemid='.$itemid);
+			$db_applications=DBselect('SELECT DISTINCT a.name '.
+						' FROM applications a,items_applications ia '.
+						' WHERE ia.applicationid=a.applicationid and ia.itemid='.$itemid);
 			if($application = DBfetch($db_applications)){
 				zbx_xmlwriter_start_element ($memory,XML_TAG_APPLICATIONS);
-				do {
+				do{
 					zbx_xmlwriter_write_element ($memory, XML_TAG_APPLICATION, $application['name']);
 				} while($application = DBfetch($db_applications));
 				zbx_xmlwriter_end_element($memory); // XML_TAG_APPLICATIONS
@@ -338,9 +403,31 @@
 				zbx_xmlwriter_end_element($memory); // XML_TAG_HOSTPROFILE
 			}
 //--
-			$sql = 'select g.name '.
-					' from groups g, hosts_groups hg '.
-					' where g.groupid=hg.groupid '.
+
+// Extended profiles
+			$data = DBfetch(DBselect('SELECT hpe.* FROM hosts_profiles_ext hpe WHERE hpe.hostid='.$hostid));
+			if($data){
+				zbx_xmlwriter_start_element($memory,XML_TAG_HOSTPROFILE_EXT);
+				
+				$map =& $ZBX_EXPORT_MAP[XML_TAG_HOSTPROFILE_EXT];
+	
+				foreach($map['attribures'] as $db_name => $xml_name){
+					if(empty($xml_name)) $xml_name = $db_name;
+					zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
+				}
+				
+				foreach($map['elements'] as $db_name => $xml_name){
+					if(empty($data[$db_name])) continue;
+					if(empty($xml_name)) $xml_name = $db_name;
+					zbx_xmlwriter_write_element($memory, $xml_name, $data[$db_name]);
+				}
+				
+				zbx_xmlwriter_end_element($memory); // XML_TAG_HOSTPROFILE_EXT
+			}
+//--
+			$sql = 'SELECT g.name '.
+					' FROM groups g, hosts_groups hg '.
+					' WHERE g.groupid=hg.groupid '.
 						' and hg.hostid='.$hostid;
 			if($db_groups = DBselect()){
 				zbx_xmlwriter_start_element ($memory,XML_TAG_GROUPS);
