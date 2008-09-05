@@ -74,35 +74,70 @@ include_once "include/page_header.php";
 <?php
 	if(isset($_REQUEST["hostid"])){
 		echo SBR;
-		insert_host_profile_form();
+//BEGIN: HOSTS PROFILE ALTERNATE Section		
+		// insert_host_profile_form();
+		insert_host_profile_alt_form();
+//END: HOSTS PROFILE ALTERNATE Section
 	}
 	else{
 		$table = new CTableInfo();
 		$table->setHeader(array(
 			is_show_subnodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
-			make_sorting_link(S_HOST,'h.host'),
-			make_sorting_link(S_NAME,'p.name'),
-			make_sorting_link(S_OS,'p.os'),
-			make_sorting_link(S_SERIALNO,'p.serialno'),
-			make_sorting_link(S_TAG,'p.tag'),
-			make_sorting_link(S_MACADDRESS,'p.macaddress'))
+//BEGIN: HOSTS PROFILE ALTERNATE Section		
+//DISABLE legacy INVENTORY DISPLAY and SORTING FIELDS
+			//make_sorting_link(S_HOST,'h.host'),
+			//make_sorting_link(S_NAME,'p.name'),
+			//make_sorting_link(S_OS,'p.os'),
+			//make_sorting_link(S_SERIALNO,'p.serialno'),
+			//make_sorting_link(S_TAG,'p.tag'),
+			//make_sorting_link(S_MACADDRESS,'p.macaddress'))
+//ADD new INVENTORY DISPLAY and SORTING FIELDS
+                        make_sorting_link(S_HOST,'h.host'),
+                       ($_REQUEST["groupid"] > 0)?null:make_sorting_link(S_GROUP,'g.name'),
+                        make_sorting_link(S_DEVICE_OS_SHORT,'pa.device_os_short'),
+                        make_sorting_link(S_DEVICE_HW_ARCH,'pa.device_hw_arch'),
+                        make_sorting_link(S_DEVICE_TYPE,'pa.device_type'),
+			make_sorting_link(S_DEVICE_STATUS,'pa.device_status'))
+//END: HOSTS PROFILE ALTERNATE Section
 		);
 
 		if($_REQUEST["groupid"] > 0){
-			$sql='SELECT h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress'.
-				' FROM hosts h,hosts_profiles p,hosts_groups hg '.
-				' WHERE h.hostid=p.hostid'.
-					' and h.hostid=hg.hostid '.
-					' and hg.groupid='.$_REQUEST['groupid'].
-					' and '.DBcondition('h.hostid',$available_hosts).
-				order_by('h.host,h.hostid,p.name,p.os,p.serialno,p.tag,p.macaddress');
+//BEGIN: HOSTS PROFILE ALTERNATE Section		
+//DISABLE legacy SQL QUERY
+			//$sql='SELECT h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress'.
+			//	' FROM hosts h,hosts_profiles p,hosts_groups hg '.
+			//	' WHERE h.hostid=p.hostid'.
+			//		' and h.hostid=hg.hostid '.
+			//		' and hg.groupid='.$_REQUEST['groupid'].
+			//		' and '.DBcondition('h.hostid',$available_hosts).
+			//	order_by('h.host,h.hostid,p.name,p.os,p.serialno,p.tag,p.macaddress');
+//ADD new SQL QUERY
+                        $sql='SELECT DISTINCT h.hostid,h.host,pa.device_os_short,pa.device_hw_arch,pa.device_type,pa.device_status'.
+                                ' FROM hosts h,hosts_profiles_alt pa,hosts_groups hg,groups g '.
+                                ' WHERE h.hostid=pa.hostid '.
+                                        ' AND h.hostid=hg.hostid '.
+                                        ' AND hg.groupid='.$_REQUEST['groupid'].
+                                        ' AND '.DBcondition('h.hostid',$available_hosts).
+                                order_by('h.host,h.hostid,g.name,pa.device_os_short,pa.device_hw_arch,pa.device_type,pa.device_status');
+//END: HOSTS PROFILE ALTERNATE Section
 		}
 		else{
-			$sql='SELECT h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress'.
-				' FROM hosts h,hosts_profiles p '.
-				' WHERE h.hostid=p.hostid'.
-					' AND '.DBcondition('h.hostid',$available_hosts).
-				order_by('h.host,h.hostid,p.name,p.os,p.serialno,p.tag,p.macaddress');
+//BEGIN: HOSTS PROFILE ALTERNATE Section		
+//DISABLE legacy SQL QUERY
+			//$sql='SELECT h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress'.
+			//	' FROM hosts h,hosts_profiles p '.
+			//	' WHERE h.hostid=p.hostid'.
+			//		' AND '.DBcondition('h.hostid',$available_hosts).
+			//	order_by('h.host,h.hostid,p.name,p.os,p.serialno,p.tag,p.macaddress');
+//ADD new SQL QUERY
+                        $sql='SELECT h.hostid,h.host,g.name,pa.device_os_short,pa.device_hw_arch,pa.device_type,pa.device_status'.
+                                ' FROM hosts h,hosts_profiles_alt pa,hosts_groups hg,groups g '.
+                                ' WHERE h.hostid=pa.hostid'.
+                                        ' AND h.hostid=hg.hostid '.
+                                        ' AND hg.groupid=g.groupid'.
+                                        ' AND '.DBcondition('h.hostid',$available_hosts).
+                                order_by('h.host,h.hostid,g.name,pa.device_os_short,pa.device_hw_arch,pa.device_type,pa.device_status');
+//END: HOSTS PROFILE ALTERNATE Section
 		}
 
 		$result=DBselect($sql);
@@ -110,11 +145,18 @@ include_once "include/page_header.php";
 			$table->AddRow(array(
 				get_node_name_by_elid($row['hostid']),
 				new CLink($row["host"],"?hostid=".$row["hostid"].url_param("groupid"),"action"),
-				$row["name"],
-				$row["os"],
-				$row["serialno"],
-				$row["tag"],
-				$row["macaddress"]
+//BEGIN: HOSTS PROFILE ALTERNATE Section		
+				//$row["name"],
+				//$row["os"],
+				//$row["serialno"],
+				//$row["tag"],
+				//$row["macaddress"]
+				($_REQUEST["groupid"] > 0)?null:$row["name"],
+				$row["device_os_short"],
+				$row["device_hw_arch"],
+				$row["device_type"],
+				$row["device_status"]
+//END: HOSTS PROFILE ALTERNATE Section
 				));
 		}
 		$table->show();
