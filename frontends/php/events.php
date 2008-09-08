@@ -25,19 +25,19 @@
 	require_once('include/actions.inc.php');
 	require_once('include/discovery.inc.php');
 	require_once('include/html.inc.php');
-
+	
 	$page["title"] = "S_LATEST_EVENTS";
 	$page['file'] = 'events.php';
 	$page['hist_arg'] = array('groupid','hostid');
 	$page['scripts'] = array('calendar.js');
-
+	
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	
 	if(PAGE_TYPE_HTML == $page['type']){
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
-
-include_once('include/page_header.php');
+	
+	include_once('include/page_header.php');
 
 ?>
 <?php
@@ -185,13 +185,18 @@ include_once('include/page_header.php');
 		
 		$cmbHosts->AddItem(0,S_ALL_SMALL);
 
+		$sql_from = '';
+		$sql_where = '';
+		if($_REQUEST['groupid'] > 0){
+			$sql_from .= ',hosts_groups hg ';
+			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+		}
 		$sql='SELECT DISTINCT h.hostid,h.host '.
-			' FROM hosts h,items i,hosts_groups hg '.
+			' FROM hosts h,items i'.$sql_from.
 			' WHERE h.status='.HOST_STATUS_MONITORED.
 				' AND h.hostid=i.hostid '.
-				($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
-				' AND hg.hostid=h.hostid '.
 				' AND '.DBcondition('h.hostid',$available_hosts).
+				$sql_where.
 			' ORDER BY h.host';
 			
 		$result=DBselect($sql);

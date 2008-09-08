@@ -392,25 +392,21 @@
 		}
 		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 		
+		$sql_from = '';
+		$sql_where = '';
 		if($_REQUEST['groupid'] > 0){
-			$sql='SELECT h.hostid,h.host '.
-				' FROM hosts h,items i,hosts_groups hg '.
-				' WHERE h.hostid=i.hostid '.
-					' AND hg.groupid='.$_REQUEST['groupid'].
-					' AND hg.hostid=h.hostid'.
-					' AND '.DBcondition('h.hostid',$available_hosts).
-				' GROUP BY h.hostid,h.host '.
-				' ORDER BY h.host';
-		}
-		else{
 			$cmbHosts->AddItem(0,S_ALL_SMALL);
-			$sql='SELECT h.hostid,h.host '.
-				' FROM hosts h,items i '.
-				' WHERE h.hostid=i.hostid '.
-					' AND '.DBcondition('h.hostid',$available_hosts).
-				' GROUP BY h.hostid,h.host '.
-				' ORDER BY h.host';
+			$sql_from .= ',hosts_groups hg ';
+			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
 		}
+			
+		$sql='SELECT h.hostid,h.host '.
+			' FROM hosts h,items i '.$sql_from.
+			' WHERE h.hostid=i.hostid '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
+				$sql_where.
+			' GROUP BY h.hostid,h.host '.
+			' ORDER BY h.host';
 		
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){

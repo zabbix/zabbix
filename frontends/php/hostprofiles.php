@@ -76,7 +76,7 @@ include_once "include/page_header.php";
 		echo SBR;
 //BEGIN: HOSTS PROFILE ALTERNATE Section		
 		// insert_host_profile_form();
-		insert_host_profile_alt_form();
+		insert_host_profile_ext_form();
 //END: HOSTS PROFILE ALTERNATE Section
 	}
 	else{
@@ -94,10 +94,10 @@ include_once "include/page_header.php";
 //ADD new INVENTORY DISPLAY and SORTING FIELDS
                         make_sorting_link(S_HOST,'h.host'),
                        ($_REQUEST["groupid"] > 0)?null:make_sorting_link(S_GROUP,'g.name'),
-                        make_sorting_link(S_DEVICE_OS_SHORT,'pa.device_os_short'),
-                        make_sorting_link(S_DEVICE_HW_ARCH,'pa.device_hw_arch'),
-                        make_sorting_link(S_DEVICE_TYPE,'pa.device_type'),
-			make_sorting_link(S_DEVICE_STATUS,'pa.device_status'))
+                        make_sorting_link(S_DEVICE_OS_SHORT,'hpe.device_os_short'),
+                        make_sorting_link(S_DEVICE_HW_ARCH,'hpe.device_hw_arch'),
+                        make_sorting_link(S_DEVICE_TYPE,'hpe.device_type'),
+			make_sorting_link(S_DEVICE_STATUS,'hpe.device_status'))
 //END: HOSTS PROFILE ALTERNATE Section
 		);
 
@@ -112,13 +112,13 @@ include_once "include/page_header.php";
 			//		' and '.DBcondition('h.hostid',$available_hosts).
 			//	order_by('h.host,h.hostid,p.name,p.os,p.serialno,p.tag,p.macaddress');
 //ADD new SQL QUERY
-                        $sql='SELECT DISTINCT h.hostid,h.host,pa.device_os_short,pa.device_hw_arch,pa.device_type,pa.device_status'.
-                                ' FROM hosts h,hosts_profiles_alt pa,hosts_groups hg,groups g '.
-                                ' WHERE h.hostid=pa.hostid '.
+                        $sql='SELECT DISTINCT h.hostid,h.host,hpe.device_os_short,hpe.device_hw_arch,hpe.device_type,hpe.device_status'.
+                                ' FROM hosts h,hosts_profiles_ext hpe,hosts_groups hg,groups g '.
+                                ' WHERE h.hostid=hpe.hostid '.
                                         ' AND h.hostid=hg.hostid '.
                                         ' AND hg.groupid='.$_REQUEST['groupid'].
                                         ' AND '.DBcondition('h.hostid',$available_hosts).
-                                order_by('h.host,h.hostid,g.name,pa.device_os_short,pa.device_hw_arch,pa.device_type,pa.device_status');
+                                order_by('h.host,h.hostid,g.name,hpe.device_os_short,hpe.device_hw_arch,hpe.device_type,hpe.device_status');
 //END: HOSTS PROFILE ALTERNATE Section
 		}
 		else{
@@ -130,13 +130,13 @@ include_once "include/page_header.php";
 			//		' AND '.DBcondition('h.hostid',$available_hosts).
 			//	order_by('h.host,h.hostid,p.name,p.os,p.serialno,p.tag,p.macaddress');
 //ADD new SQL QUERY
-                        $sql='SELECT h.hostid,h.host,g.name,pa.device_os_short,pa.device_hw_arch,pa.device_type,pa.device_status'.
-                                ' FROM hosts h,hosts_profiles_alt pa,hosts_groups hg,groups g '.
-                                ' WHERE h.hostid=pa.hostid'.
+                        $sql='SELECT h.hostid,h.host,g.name,hpe.device_os_short,hpe.device_hw_arch,hpe.device_type,hpe.device_status'.
+                                ' FROM hosts h,hosts_profiles_ext hpe,hosts_groups hg,groups g '.
+                                ' WHERE h.hostid=hpe.hostid'.
                                         ' AND h.hostid=hg.hostid '.
                                         ' AND hg.groupid=g.groupid'.
                                         ' AND '.DBcondition('h.hostid',$available_hosts).
-                                order_by('h.host,h.hostid,g.name,pa.device_os_short,pa.device_hw_arch,pa.device_type,pa.device_status');
+                                order_by('h.host,h.hostid,g.name,hpe.device_os_short,hpe.device_hw_arch,hpe.device_type,hpe.device_status');
 //END: HOSTS PROFILE ALTERNATE Section
 		}
 

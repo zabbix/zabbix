@@ -446,7 +446,7 @@ include_once 'include/page_header.php';
 	if(0 == $_REQUEST['config']){
 		$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
 		$cmbUGrp->AddItem(0,S_ALL_S);
-		$result = DBselect('SELECT * FROM usrgrp ORDER BY name');
+		$result = DBselect('SELECT usrgrpid, name FROM usrgrp WHERE '.DBin_node('usrgrpid').' ORDER BY name');
 		while($usrgrp = DBfetch($result)){
 			$cmbUGrp->AddItem($usrgrp['usrgrpid'],$usrgrp['name']);
 		}

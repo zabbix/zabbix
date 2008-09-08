@@ -5239,7 +5239,7 @@
 	}
 	
 // BEGIN: HOSTS PROFILE EXTENDED Section
-	function insert_host_profile_alt_form(){
+	function insert_host_profile_ext_form(){
 
 		$frmHostPA = new CFormTable(S_EXTENDED_HOST_PROFILE);
 		$frmHostPA->SetHelp('web.host_profile_alt.php');

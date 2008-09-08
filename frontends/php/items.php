@@ -723,24 +723,20 @@ include_once "include/page_header.php";
 		$form->AddItem(S_GROUP.SPACE);
 		$form->AddItem($cmbGroup);
 
-		if(isset($_REQUEST['groupid']) && $_REQUEST['groupid']>0){
-			$sql='select distinct h.hostid,h.host '.
-				' from hosts h,hosts_groups hg'.
-				' where hg.groupid='.$_REQUEST['groupid'].
-					' and hg.hostid=h.hostid '.
-					' and h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-					' and '.DBcondition('h.hostid',$available_hosts).
-				' group by h.hostid,h.host '.
-				' order by h.host';
+		$sql_from = '';
+		$sql_where = '';
+		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0)){
+			$sql_from .= ',hosts_groups hg ';
+			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
 		}
-		else{
-			$sql='select distinct h.hostid,h.host '.
-				' from hosts h'.
-				' where h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-					' and '.DBcondition('h.hostid',$available_hosts).
-				' group by h.hostid,h.host '.
-				' order by h.host';
-		}
+
+		$sql='SELECT DISTINCT h.hostid,h.host '.
+			' FROM hosts h'.$sql_from.
+			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
+				' AND '.DBcondition('h.hostid',$available_hosts).
+				$sql_where.
+			' GROUP BY h.hostid,h.host '.
+			' ORDER BY h.host';
 
 		$result=DBselect($sql);
 

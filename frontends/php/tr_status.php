@@ -238,17 +238,16 @@ include_once "include/page_header.php";
 	$scripts_by_hosts = get_accessible_scripts_by_hosts($available_hosts);
 
 	$sql = 'SELECT DISTINCT g.groupid,g.name '.
-					' FROM groups g, hosts_groups hg, hosts h, items i '.
-					' WHERE '.DBcondition('g.groupid',$available_groups).
-						' AND hg.groupid=g.groupid '.
-						' AND h.status='.HOST_STATUS_MONITORED.
-						' AND h.hostid=i.hostid '.
-						' AND hg.hostid=h.hostid '.
-						' AND i.status='.ITEM_STATUS_ACTIVE.
-					' ORDER BY g.name';
+			' FROM groups g, hosts_groups hg, hosts h, items i '.
+			' WHERE '.DBcondition('g.groupid',$available_groups).
+				' AND hg.groupid=g.groupid '.
+				' AND h.status='.HOST_STATUS_MONITORED.
+				' AND h.hostid=i.hostid '.
+				' AND hg.hostid=h.hostid '.
+				' AND i.status='.ITEM_STATUS_ACTIVE.
+			' ORDER BY g.name';
 
 	$result=DBselect($sql);
-										
 	while($row=DBfetch($result)){
 		$cmbGroup->AddItem(
 				$row['groupid'],
@@ -258,9 +257,14 @@ include_once "include/page_header.php";
 	}
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 	
-	
+	$sql_from = '';
+	$sql_where = '';
+	if($_REQUEST['groupid'] > 0){
+		$sql_from .= ',hosts_groups hg ';
+		$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+	}
 	$sql='SELECT DISTINCT h.hostid,h.host '.
-		' FROM hosts h, items i, functions f, triggers t '.($_REQUEST['groupid']?', hosts_groups hg ':'').
+		' FROM hosts h, items i, functions f, triggers t '.$sql_from.
 		' WHERE '.DBcondition('t.triggerid',$available_triggers).
 			' AND t.status='.TRIGGER_STATUS_ENABLED.
 			' AND f.triggerid=t.triggerid '.
@@ -268,7 +272,7 @@ include_once "include/page_header.php";
 			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND h.hostid=i.hostid '.												
 			' AND h.status='.HOST_STATUS_MONITORED.
-			($_REQUEST['groupid']?' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid']:'').
+			$sql_where.
 		' ORDER BY h.host';
 
 	$result=DBselect($sql);

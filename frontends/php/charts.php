@@ -248,40 +248,42 @@ include_once 'include/page_header.php';
 	
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 	
+	$sql_from = '';
+	$sql_where = '';
+	if($_REQUEST['groupid'] > 0){
+		$sql_from .= ',hosts_groups hg ';
+		$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+	}
 	$sql = 'SELECT DISTINCT h.hostid,h.host '.
-		' FROM hosts h,items i,hosts_groups hg, graphs_items gi '.
+		' FROM hosts h,items i, graphs_items gi '.$sql_from.
 		' WHERE h.status='.HOST_STATUS_MONITORED.
 			' AND i.itemid=gi.itemid'.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND h.hostid=i.hostid '.
-			' AND hg.hostid=h.hostid '.
-			($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
 			' AND '.DBcondition('gi.graphid',$available_graphs).
-//			' AND '.DBcondition('h.hostid',$available_hosts).
+			$sql_where.
 		' ORDER BY h.host';
 	
 	$result=DBselect($sql);
 	while($row=DBfetch($result)){
 		$cmbHosts->AddItem(
-				$row['hostid'],
-				get_node_name_by_elid($row['hostid']).$row['host']
-				);
+			$row['hostid'],
+			get_node_name_by_elid($row['hostid']).$row['host']
+		);
 	}
 
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 	
 	$sql = 'SELECT DISTINCT g.graphid,g.name '.
-		' FROM graphs g,graphs_items gi,items i,hosts_groups hg,hosts h'.
+		' FROM graphs g,graphs_items gi,items i,hosts h'.$sql_from.
 		' WHERE gi.graphid=g.graphid '.
 			' AND i.itemid=gi.itemid '.
-			' AND hg.hostid=i.hostid '.
 			' AND h.hostid=i.hostid '.
 			' AND h.status='.HOST_STATUS_MONITORED.
-			($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
+			$sql_where.
 			($_REQUEST['hostid']?' AND h.hostid='.$_REQUEST['hostid']:'').
 			' AND '.DBin_node('g.graphid').
 			' AND '.DBcondition('g.graphid',$available_graphs).
-//			' AND '.DBcondition('h.hostid',$available_hosts);
 		' ORDER BY g.name';
 
 	$result = DBselect($sql);

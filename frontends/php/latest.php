@@ -135,27 +135,20 @@ include_once "include/page_header.php";
 	}
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 	
+	$sql_from = '';
+	$sql_where = '';
 	if($_REQUEST['groupid'] > 0){
-		$sql='SELECT DISTINCT h.hostid,h.host '.
-			' FROM hosts h,items i,hosts_groups hg '.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND h.hostid=i.hostid '.
-				' AND hg.groupid='.$_REQUEST['groupid'].
-				' AND hg.hostid=h.hostid'.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-			' ORDER BY h.host';
+		$sql_from .= ',hosts_groups hg ';
+		$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
 	}
-	else{
-		$sql='SELECT DISTINCT h.hostid,h.host '.
-			' FROM hosts h,items i '.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND h.hostid=i.hostid'.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-			' ORDER BY h.host';
-	}
-	
+	$sql='SELECT DISTINCT h.hostid,h.host '.
+		' FROM hosts h,items i '.$sql_from.
+		' WHERE h.status='.HOST_STATUS_MONITORED.
+			' AND h.hostid=i.hostid '.
+			$sql_where.
+			' AND i.status='.ITEM_STATUS_ACTIVE.
+			' AND '.DBcondition('h.hostid',$available_hosts).
+		' ORDER BY h.host';
 	$result=DBselect($sql);
 	while($row=DBfetch($result)){
 		$cmbHosts->AddItem(
