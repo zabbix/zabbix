@@ -1631,12 +1631,8 @@
 
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			'Host profiles',
-	'S_HOST_PROFILES_BIG'=>			'HOST PROFILES',
-// 	BEGIN: HOSTS PROFILE ALTERNATE Section
-        'S_HOST_PROFILES_ALT'=>                 'Alternate Host Profiles',
-        'S_HOST_PROFILES_ALT_BIG'=>             'ALTERNATE HOST PROFILES',
-//	END:   HOSTS PROFILE ALTERNATE Section
-
+	'S_HOST_PROFILES_BIG'=>		'HOST PROFILES',
+	'S_EXTENDED_HOST_PROFILE'=>	'Extended host profile',
 
 //	popup.php
 	'S_EMPTY'=>				'Empty',
