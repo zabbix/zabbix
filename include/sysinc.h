@@ -121,7 +121,7 @@
 #	include <kstat.h>
 #endif
 
-#ifdef HAVE_LDAP_H
+#ifdef HAVE_LDAP
 	#include <ldap.h>
 #endif
 
