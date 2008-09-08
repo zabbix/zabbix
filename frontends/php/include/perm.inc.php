@@ -167,14 +167,15 @@ return $result;
  * Author: Aly
  */
 function  check_perm2system($userid){
-	$sql = 'SELECT COUNT(g.usrgrpid) as grp_count '.
+	$sql = 'SELECT g.usrgrpid '.
 		' FROM usrgrp g, users_groups ug '.
 		' WHERE ug.userid = '.$userid.
 			' AND g.usrgrpid = ug.usrgrpid '.
 			' AND g.users_status = '.GROUP_STATUS_DISABLED;
-	$res = DBfetch(DBSelect($sql));
-
-return ($res['grp_count'] == 0)?true:false;
+	if($res = DBfetch(DBselect($sql,1))){
+		return false;
+	}
+return true;
 }
 
 /* Function: check_perm2login()
