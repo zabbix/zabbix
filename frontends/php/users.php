@@ -19,19 +19,19 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/triggers.inc.php';
-	require_once 'include/media.inc.php';
-	require_once 'include/users.inc.php';
-	require_once 'include/forms.inc.php';
-	require_once 'include/js.inc.php';
+	require_once('include/config.inc.php');
+	require_once('include/triggers.inc.php');
+	require_once('include/media.inc.php');
+	require_once('include/users.inc.php');
+	require_once('include/forms.inc.php');
+	require_once('include/js.inc.php');
 
 	$page['title'] = 'S_USERS';
 	$page['file'] = 'users.php';
 	$page['hist_arg'] = array('config');
 	$page['scripts'] = array('menu_scripts.js');
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -492,71 +492,80 @@ include_once 'include/page_header.php';
 				$cond_from = ', users_groups ug, usrgrp ugrp ';
 				$cond_where = ' AND ug.userid = u.userid '.' AND ug.usrgrpid='.$_REQUEST['filter_usrgrpid'];
 			}
-		
+
+			$users = array();
+			$userids = array();
 			$db_users=DBselect('SELECT DISTINCT u.userid,u.alias,u.name,u.surname,u.type,u.autologout '.
 							' FROM users u '.$cond_from.
 							' WHERE '.DBin_node('u.userid').
 								$cond_where.
 							order_by('u.alias,u.name,u.surname,u.type','u.userid'));
 			while($db_user=DBfetch($db_users)){
-//Log Out 10min or Autologout time
-				$online_time = (($db_user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$db_user['autologout']))?ZBX_USER_ONLINE_TIME:$db_user['autologout'];
-				$online=new CCol(S_NO,'disabled');
-				
-				$sql = 'SELECT s.lastaccess, s.status'.
-						' FROM sessions s, users u'.
-						' WHERE s.userid='.$db_user['userid'].
-							' AND s.userid=u.userid '.
-						' ORDER BY lastaccess DESC';
+				$users[$db_user['userid']] = $db_user;
+				$userids[$db_user['userid']] = $db_user['userid'];
+			}
 
-				$db_sessions = DBselect($sql,1);
-				if($db_ses=DBfetch($db_sessions)){
-					if((ZBX_SESSION_ACTIVE == $db_ses['status']) && (($db_ses['lastaccess']+$online_time) >= time())){
-						$online=new CCol(S_YES.' ('.date('r',$db_ses['lastaccess']).')','enabled');
+			$users_sessions = array();
+			$sql = 'SELECT s.userid, MAX(s.lastaccess) as lastaccess, s.status'.
+					' FROM sessions s, users u'.
+					' WHERE '.DBcondition('s.userid',$userids).
+						' AND s.userid=u.userid '.
+					' GROUP BY s.userid';
+					
+			$db_sessions = DBselect($sql);
+			while($db_ses=DBfetch($db_sessions)){
+				$users_sessions[$db_ses['userid']] = $db_ses;
+			}
+
+			$users_groups = array();
+			$sql = 'SELECT g.name, ug.userid '.
+					' FROM usrgrp g, users_groups ug '.
+					' WHERE g.usrgrpid=ug.usrgrpid '.
+						' AND '.DBcondition('ug.userid',$userids);
+			$db_groups = DBselect($sql);
+			while($db_group = DBfetch($db_groups)){
+				if(!isset($users_groups[$db_group['userid']])) $users_groups[$db_group['userid']] = array();
+				if(!empty($users_groups[$db_group['userid']])) $users_groups[$db_group['userid']][] = BR();
+				$users_groups[$db_group['userid']][] = $db_group['name'];
+			}
+
+			foreach($userids as $id => $userid){
+				$user = &$users[$userid];
+//Log Out 10min or Autologout time
+				$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout']))?ZBX_USER_ONLINE_TIME:$user['autologout'];
+				$online=new CCol(S_NO,'disabled');
+				if(isset($users_sessions[$userid])){
+					$session = &$users_sessions[$userid];
+					if((ZBX_SESSION_ACTIVE == $session['status']) && (($session['lastaccess']+$online_time) >= time())){
+						$online=new CCol(S_YES.' ('.date('r',$session['lastaccess']).')','enabled');
 					}
 					else{
-						$online=new CCol(S_NO.' ('.date('r',$db_ses['lastaccess']).')','disabled');
+						$online=new CCol(S_NO.' ('.date('r',$session['lastaccess']).')','disabled');
 					}
-				}	
-				
-				$user_groups = array();
-				$db_groups = DBselect('SELECT g.name '.
-									' FROM usrgrp g, users_groups ug '.
-									' WHERE g.usrgrpid=ug.usrgrpid '.
-										' and ug.userid='.$db_user['userid']);
-										
-				while($db_group = DBfetch($db_groups))
-					array_push($user_groups,empty($user_groups)?'':BR(),$db_group['name']);
-				
-				$db_user['users_status'] = check_perm2system($db_user['userid']);
-				$db_user['gui_access'] = get_user_auth($db_user['userid']);
-
-				$users_status = ($db_user['users_status'])?S_ENABLED:S_DISABLED;
-				$gui_access = user_auth_type2str($db_user['gui_access']);
-
-				$gui_access = new CSpan($gui_access,($db_user['gui_access'] == GROUP_GUI_ACCESS_DISABLED)?'orange':'green');
-				$users_status = new CSpan($users_status,($db_user['users_status'])?'green':'red');
-
-				$action = get_user_actionmenu($db_user['userid']);				
-/*				if((bccomp($USER_DETAILS['userid'],$db_user['userid']) != 0)){
-					$action = get_user_actionmenu($db_user['userid']);
 				}
-				else{
-					$action = new CSpan(S_SELECT);
-					$action->AddOption('style','color: #888888;');
-				}
-//*/		
+				
+				$user['users_status'] = check_perm2system($userid);
+				$user['gui_access'] = get_user_auth($userid);
+
+				$users_status = ($user['users_status'])?S_ENABLED:S_DISABLED;
+				$gui_access = user_auth_type2str($user['gui_access']);
+
+				$users_status = new CSpan($users_status,($user['users_status'])?'green':'red');
+				$gui_access = new CSpan($gui_access,($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED)?'orange':'green');
+
+				$action = get_user_actionmenu($userid);				
+
 				$table->addRow(array(
 					array(
-						new CCheckBox('group_userid['.$db_user['userid'].']',NULL,NULL,$db_user['userid']),
-						new CLink($db_user['alias'],
+						new CCheckBox('group_userid['.$userid.']',NULL,NULL,$userid),
+						new CLink($user['alias'],
 							'users.php?form=update'.url_param('config').
-							'&userid='.$db_user['userid'].'#form', 'action')
+							'&userid='.$userid.'#form', 'action')
 					),
-					$db_user['name'],
-					$db_user['surname'],
-					user_type2str($db_user['type']),
-					$user_groups,
+					$user['name'],
+					$user['surname'],
+					user_type2str($user['type']),
+					isset($users_groups[$userid])?$users_groups[$userid]:'',
 					$online,
 					$gui_access,
 					$users_status,

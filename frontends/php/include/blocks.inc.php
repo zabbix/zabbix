@@ -270,7 +270,7 @@ function make_system_summary(){
 								' AND t.value='.TRIGGER_VALUE_TRUE.
 								' AND t.priority='.$key.
 							' ORDER BY t.lastchange DESC';
-				$result = DBselect($sql);
+				$result = DBselect($sql,30);
 			
 				while($row_inf=DBfetch($result)){
 			// Check for dependencies
@@ -480,8 +480,7 @@ function make_latest_issues(){
 					' AND t.value='.TRIGGER_VALUE_TRUE.
 				' ORDER BY t.lastchange DESC';
 //SDI($sql);
-	$result = DBselect($sql);
-
+	$result = DBselect($sql,20);
 	while($row=DBfetch($result)){
 // Check for dependencies
 		if(trigger_dependent($row["triggerid"]))	continue;
