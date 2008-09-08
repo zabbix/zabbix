@@ -64,6 +64,9 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 				-l*)
 					SNMP_LDFLAGS="${SNMP_LDFLAGS} $i"
 			;;
+				-L*)
+					SNMP_LDFLAGS="${SNMP_LDFLAGS} $i"
+			;;
 			esac
 		done
 

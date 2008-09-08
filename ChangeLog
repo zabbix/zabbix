@@ -38,6 +38,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.7:
 
+ - [ZBX-430] improved configuration scripts (Sasha)
  - [ZBX-103] fixed escaping in sql queries (Sasha)
  - [ZBX-424] fixed possible server crash while importing XML (Sasha)
  - [ZBX-420] added support of log files in screens (Sasha)
