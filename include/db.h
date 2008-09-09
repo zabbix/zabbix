@@ -537,7 +537,7 @@ int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_
 int	DBremove_escalation(zbx_uint64_t escalationid);
 void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(zbx_uint64_t triggerid);
-int     DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *reason);
+int     DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, const char *reason);
 
 int	DBget_items_count(void);
 int	DBget_items_unsupported_count(void);
