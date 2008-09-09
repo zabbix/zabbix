@@ -413,41 +413,57 @@
 		$el_type =& $db_element["elementtype"];
 
 		$sql = array(
-			SYSMAP_ELEMENT_TYPE_TRIGGER => 'select distinct t.triggerid, t.priority, t.value, t.description, t.expression, h.host '.
-				'from triggers t, items i, functions f, hosts h where t.triggerid='.$db_element['elementid'].
-				' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid '.
-				' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE,
-			SYSMAP_ELEMENT_TYPE_HOST_GROUP => 'select distinct t.triggerid, t.priority, t.value,'.
-				' t.description, t.expression, h.host, g.name as el_name '.
-				' from items i,functions f,triggers t,hosts h,hosts_groups hg,groups g '.
-				' where h.hostid=i.hostid and hg.groupid=g.groupid and g.groupid='.$db_element['elementid'].
-				' and hg.hostid=h.hostid and i.itemid=f.itemid'.
-				' and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
-				' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE,
-			SYSMAP_ELEMENT_TYPE_HOST => 'select distinct t.triggerid, t.priority, t.value,'.
-				' t.description, t.expression, h.host, h.host as el_name'.
-				' from items i,functions f,triggers t,hosts h where h.hostid=i.hostid'.
-				' and i.hostid='.$db_element['elementid'].' and i.itemid=f.itemid'.
-				' and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
-				' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE
+			SYSMAP_ELEMENT_TYPE_TRIGGER => 'SELECT DISTINCT t.triggerid,t.priority,t.value,t.description'.
+				',t.expression,h.host,h.status as h_status,i.status as i_status,t.status as t_status'.
+				' FROM triggers t, items i, functions f, hosts h '.
+				' WHERE t.triggerid='.$db_element['elementid'].
+					' AND h.hostid=i.hostid '.
+					' AND i.itemid=f.itemid '.
+					' AND f.triggerid=t.triggerid ',
+			SYSMAP_ELEMENT_TYPE_HOST_GROUP => 'SELECT DISTINCT t.triggerid, t.priority, t.value, t.description, t.expression, h.host'.
+				' FROM items i,functions f,triggers t,hosts h,hosts_groups hg,groups g '.
+				' WHERE h.hostid=i.hostid '.
+					' AND hg.groupid=g.groupid '.
+					' AND g.groupid='.$db_element['elementid'].
+					' AND hg.hostid=h.hostid '.
+					' AND i.itemid=f.itemid'.
+					' AND f.triggerid=t.triggerid '.
+					' AND t.status='.TRIGGER_STATUS_ENABLED.
+					' AND h.status='.HOST_STATUS_MONITORED.
+					' AND i.status='.ITEM_STATUS_ACTIVE,
+			SYSMAP_ELEMENT_TYPE_HOST => 'SELECT DISTINCT t.triggerid, t.priority, t.value, t.description, t.expression, h.host'.
+				' FROM items i,functions f,triggers t,hosts h WHERE h.hostid=i.hostid'.
+					' AND i.hostid='.$db_element['elementid'].
+					' AND i.itemid=f.itemid'.
+					' AND f.triggerid=t.triggerid '.
+					' AND t.status='.TRIGGER_STATUS_ENABLED.
+					' AND h.status='.HOST_STATUS_MONITORED.
+					' AND i.status='.ITEM_STATUS_ACTIVE
 			);
+
+		$out['triggers'] = array();
+
 		if( isset($sql[$el_type]) )
 		{
 			$db_triggers = DBselect($sql[$el_type]);
 			$trigger = DBfetch($db_triggers);
 			if($trigger)
 			{
-				if(isset($trigger['el_name']))
-				{
-					$el_name = $trigger['el_name'];
-				}
-				else
-				{
+				if ($el_type == SYSMAP_ELEMENT_TYPE_TRIGGER)
 					$el_name = expand_trigger_description_by_data($trigger);
-				}
 
 				do {
-					$type	=& $trigger['value'];
+//					$type	=& $trigger['value'];
+					if ($el_type == SYSMAP_ELEMENT_TYPE_TRIGGER && (
+						$trigger['h_status'] != HOST_STATUS_MONITORED ||
+						$trigger['i_status'] != ITEM_STATUS_ACTIVE ||
+						$trigger['t_status'] != TRIGGER_STATUS_ENABLED))
+					{
+						$type = TRIGGER_VALUE_UNKNOWN;
+						$out['disabled'] = 1;
+					}
+					else
+						$type =& $trigger['value'];
 
 					if(!isset($tr_info[$type]))
 						$tr_info[$type] = array('count' => 0);
@@ -459,37 +475,28 @@
 						if($el_type != SYSMAP_ELEMENT_TYPE_TRIGGER && $type!=TRIGGER_VALUE_UNKNOWN)
 							$tr_info[$type]['info']		= expand_trigger_description_by_data($trigger);
 					}
+
+					if ($type == TRIGGER_VALUE_TRUE)
+						array_push($out['triggers'], $trigger['triggerid']);
 				} while ($trigger = DBfetch($db_triggers));
-			}
-			elseif($el_type == SYSMAP_ELEMENT_TYPE_HOST)
-			{
-				$host = get_host_by_hostid($db_element["elementid"]);
-				$el_name = $host['host'];
-				if($host["status"] == HOST_STATUS_TEMPLATE)
-				{
-					$tr_info[TRIGGER_VALUE_UNKNOWN]['count']	= 1;
-					$tr_info[TRIGGER_VALUE_UNKNOWN]['priority']	= 0;
-					$tr_info[TRIGGER_VALUE_UNKNOWN]['info']		= S_TEMPLATE_SMALL;
-				}
-				else
-				{
-					$tr_info[TRIGGER_VALUE_FALSE]['count']		= 0;
-					$tr_info[TRIGGER_VALUE_FALSE]['priority']	= 0;
-					$tr_info[TRIGGER_VALUE_FALSE]['info']		= S_OK_BIG;
-				}
 			}
 		}
 		elseif($el_type==SYSMAP_ELEMENT_TYPE_MAP)
 		{
-			$db_map = DBfetch(DBselect('select name from sysmaps where sysmapid='.$db_element["elementid"]));
-			$el_name = $db_map['name'];
+			$triggers = array();
 
 			$db_subelements = DBselect("select selementid from sysmaps_elements".
 				" where sysmapid=".$db_element["elementid"]);
 			while($db_subelement = DBfetch($db_subelements))
 			{// recursion
 				$inf = get_info_by_selementid($db_subelement["selementid"]);
+
+				foreach($inf['triggers'] as $id => $triggerid)
+					if (!in_array($triggerid, $triggers))
+						array_push($triggers, $triggerid);
+
 				$type = $inf['type'];
+
 				if(!isset($tr_info[$type]['count'])) $tr_info[$type]['count'] = 0;
 				$tr_info[$type]['count'] += isset($inf['count']) ? $inf['count'] : 1;
 				if(!isset($tr_info[$type]['priority']) || $tr_info[$type]['priority'] < $inf["priority"])
@@ -497,6 +504,66 @@
 					$tr_info[$type]['priority'] = $inf['priority'];
 					$tr_info[$type]['info'] = $inf['info'];
 				}
+			}
+
+			$tr_info[TRIGGER_VALUE_TRUE]['count'] = count($triggers);
+
+			if ($tr_info[TRIGGER_VALUE_TRUE]['count'] == 1)
+			{
+				$db_trigger = DBfetch(DBselect('SELECT DISTINCT t.triggerid,t.priority,t.value,t.description'.
+						',t.expression,h.host FROM triggers t, items i, functions f, hosts h'.
+						' WHERE t.triggerid='.$triggers[0].' AND h.hostid=i.hostid'.
+						' AND i.itemid=f.itemid AND f.triggerid=t.triggerid'));
+				$tr_info[TRIGGER_VALUE_TRUE]['info'] =  expand_trigger_description_by_data($db_trigger);
+			}
+		}
+
+		if ($el_type == SYSMAP_ELEMENT_TYPE_HOST)
+		{
+			$host = get_host_by_hostid($db_element["elementid"]);
+			$el_name = $host['host'];
+
+			if( $host["status"] == HOST_STATUS_TEMPLATE)
+			{
+				$tr_info[TRIGGER_VALUE_UNKNOWN]['count']        = 0;
+				$tr_info[TRIGGER_VALUE_UNKNOWN]['priority']     = 0;
+				$tr_info[TRIGGER_VALUE_UNKNOWN]['info']         = S_TEMPLATE_SMALL;
+			}
+			else if ($host["status"] == HOST_STATUS_NOT_MONITORED)
+			{
+				$tr_info[TRIGGER_VALUE_UNKNOWN]['count']        = 0;
+				$tr_info[TRIGGER_VALUE_UNKNOWN]['priority']     = 0;
+				$out['disabled'] = 1;
+			}
+			else if (!isset($tr_info[TRIGGER_VALUE_FALSE]))
+			{
+				$tr_info[TRIGGER_VALUE_FALSE]['count']          = 0;
+				$tr_info[TRIGGER_VALUE_FALSE]['priority']       = 0;
+				$tr_info[TRIGGER_VALUE_FALSE]['info']           = S_OK_BIG;
+			}
+		}
+		else if ($el_type == SYSMAP_ELEMENT_TYPE_HOST_GROUP)
+		{
+			$group = get_hostgroup_by_groupid($db_element["elementid"]);
+			$el_name = $group['name'];
+
+			if (!isset($tr_info[TRIGGER_VALUE_FALSE]))
+			{
+				$tr_info[TRIGGER_VALUE_FALSE]['count']          = 0;
+				$tr_info[TRIGGER_VALUE_FALSE]['priority']       = 0;
+				$tr_info[TRIGGER_VALUE_FALSE]['info']           = S_OK_BIG;
+			}
+		}
+		else if ($el_type == SYSMAP_ELEMENT_TYPE_MAP)
+		{
+			$db_map = DBfetch(DBselect('select name FROM sysmaps WHERE sysmapid='.$db_element["elementid"]));
+			$el_name = $db_map['name'];
+
+			if (!isset($tr_info[TRIGGER_VALUE_FALSE]))
+			{
+				$tr_info[TRIGGER_VALUE_FALSE]['count']          = 0;
+				$tr_info[TRIGGER_VALUE_FALSE]['priority']       = 0;
+				$tr_info[TRIGGER_VALUE_FALSE]['info']           = S_OK_BIG;
 			}
 		}
 
@@ -526,13 +593,11 @@
 			$out['type'] = TRIGGER_VALUE_UNKNOWN;
 			$out['info'] = S_UNKNOWN_BIG;
 			
-			/* if($inf['count'] > 1)
-				$out['info'] = $inf['count']." ".S_UNKNOWN;
-			else */ if(isset($inf['info']))
-				$out['info'] = $inf['info'];
-
 			$out['color'] = $colors['Gray'];
 			$out['iconid'] = $db_element['iconid_unknown'];
+
+			if (isset($inf['info']))
+				$out['info'] = $inf['info'];
 		}
 		else
 		{

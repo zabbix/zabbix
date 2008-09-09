@@ -187,6 +187,12 @@ include_once "include/page_header.php";
 			$label_line = $el_info['name'];
 		}
 
+		if (isset($el_info['disabled']) && $el_info['disabled'] == 1)
+		{
+			$info_line = S_DISABLED_BIG;
+			$label_color = $gray;
+		}
+
 		unset($el_info);
 
 		if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST)
@@ -195,9 +201,6 @@ include_once "include/page_header.php";
 			
 			if( $label_type==MAP_LABEL_TYPE_IP )
 				$label_line=$host["ip"];
-
-			if( $host["status"] == HOST_STATUS_NOT_MONITORED )
-				$label_color=$darkred;
 		}
 
 		if($label_line=="" && $info_line=="")	continue;
