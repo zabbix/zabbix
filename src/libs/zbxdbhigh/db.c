@@ -546,7 +546,7 @@ static int	trigger_dependent(zbx_uint64_t triggerid)
 	return ret;
 }
 
-int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *reason)
+int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, const char *reason)
 {
 	int	ret = SUCCEED;
 	DB_EVENT	event;
@@ -919,7 +919,10 @@ void	DBproxy_update_host_availability(DB_ITEM *item, int available, int clock)
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error)
 {
-	char	error_esc[MAX_STRING_LEN];
+	char		error_esc[MAX_STRING_LEN];
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_TRIGGER	trigger;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBupdate_item_status_to_notsupported()");
 
@@ -934,6 +937,31 @@ int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *e
 			item->nextcheck,
 			error_esc,
 			item->itemid);
+
+	result = DBselect("select t.triggerid,t.expression,t.description,t.url,t.comments,t.status,t.value,t.priority"
+			" from triggers t,functions f,items i"
+			" where t.triggerid=f.triggerid"
+				" and f.itemid=i.itemid"
+				" and t.status in (%d)"
+				" and t.value not in (%d)"
+				" and i.itemid=" ZBX_FS_UI64,
+		TRIGGER_STATUS_ENABLED,
+		TRIGGER_VALUE_UNKNOWN,
+		item->itemid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		trigger.triggerid 	= zbx_atoui64(row[0]);
+		strscpy(trigger.expression, row[1]);
+		strscpy(trigger.description, row[2]);
+		trigger.url		= row[3];
+		trigger.comments	= row[4];
+		trigger.status		= atoi(row[5]);
+		trigger.value		= atoi(row[6]);
+		trigger.priority	= atoi(row[7]);
+
+		DBupdate_trigger_value(&trigger, TRIGGER_VALUE_UNKNOWN, clock, error);
+	}
 
 	return SUCCEED;
 }
