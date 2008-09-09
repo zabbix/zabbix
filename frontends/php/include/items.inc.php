@@ -316,18 +316,45 @@
 	return $result;
 	}
 
-	# Update Item status
+	function	update_trigger_value_to_unknown_by_itemid($itemid)
+	{
+		$now = time();
+		$result = DBselect('select distinct t.triggerid'.
+				' from triggers t,functions f'.
+				' where f.triggerid=t.triggerid and f.itemid='.$itemid);
 
-	function update_item_status($itemid,$status){
-		if($status==ITEM_STATUS_ACTIVE)
-			$sql="update items set status=$status,error='' where itemid=$itemid";
-		else
-			$sql="update items set status=$status where itemid=$itemid";
+		while ($row = DBfetch($result))
+		{
+			if (!add_event($row['triggerid'], TRIGGER_VALUE_UNKNOWN, $now))
+				continue;
 
-		$result = DBexecute($sql);
-		return $result;
+			DBexecute('update triggers set value='.TRIGGER_VALUE_UNKNOWN.' where triggerid='.$row['triggerid']);
+		}
 	}
 
+	# Update Item status
+
+	function	update_item_status($itemid, $status)
+	{
+		$row = DBfetch(DBselect('select status from items where itemid='.$itemid));
+
+		$old_status=$row["status"];
+
+		if ($status != $old_status)
+		{
+			update_trigger_value_to_unknown_by_itemid($itemid);
+
+			if($status==ITEM_STATUS_ACTIVE)
+				$sql="update items set status=$status,error='',nextcheck=0 where itemid=$itemid";
+			else
+				$sql="update items set status=$status where itemid=$itemid";
+
+			$result = DBexecute($sql);
+		}
+		else
+			return 1;
+	}
+	
 	/******************************************************************************
 	 *                                                                            *
 	 * Comments: !!! Don't forget sync code with C !!!                            *
@@ -412,7 +439,7 @@
 
 		$result=DBexecute(
 			"update items set description=".zbx_dbstr($description).",key_=".zbx_dbstr($key).",".
-			"hostid=$hostid,delay=$delay,history=$history,nextcheck=0,type=$type,status=".$status.','.
+			"hostid=$hostid,delay=$delay,history=$history,type=$type,".
 			"snmp_community=".zbx_dbstr($snmp_community).",snmp_oid=".zbx_dbstr($snmp_oid).",".
 			"value_type=$value_type,trapper_hosts=".zbx_dbstr($trapper_hosts).",".
 			"snmp_port=$snmp_port,units=".zbx_dbstr($units).",multiplier=$multiplier,delta=$delta,".
@@ -423,8 +450,11 @@
 			"formula=".zbx_dbstr($formula).",trends=$trends,logtimefmt=".zbx_dbstr($logtimefmt).",".
 			"valuemapid=$valuemapid,delay_flex=".zbx_dbstr($delay_flex).",params=".zbx_dbstr($params).",".
 			"templateid=$templateid where itemid=$itemid");
-			
-		if($result){
+
+		update_item_status($itemid, $status);
+
+		if($result)
+		{
 			info("Item '".$host["host"].":$key' updated");
 		}
 		
@@ -660,8 +690,7 @@
 			activate_item($chd_items);  // Recursion !!!
 		}
 
-		$result = DBexecute('UPDATE items SET status='.ITEM_STATUS_ACTIVE.",error='',nextcheck=0 ".' WHERE '.DBcondition('itemid',$itemids));
-	return $result;
+		return update_item_status($itemid, ITEM_STATUS_ACTIVE);
 	}
 
 // Disable Item
@@ -678,8 +707,7 @@
 			disable_item($chd_items);  // Recursion !!!
 		}
 
-		$result = DBexecute('UPDATE items SET status='.ITEM_STATUS_DISABLED.' WHERE '.DBcondition('itemid',$itemids));
-	return $result;
+		return update_item_status($itemid, ITEM_STATUS_DISABLED);
 	}
 
 	function get_items_by_hostid($hostids){
