@@ -73,7 +73,7 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 #endif
 			break;
 		case ITEM_TYPE_IPMI:
-#ifdef HAVE_IPMI
+#ifdef HAVE_OPENIPMI
 			res = get_value_ipmi(item, result);
 #else
 			zabbix_log(LOG_LEVEL_WARNING, "Support of IPMI parameters was not compiled in");

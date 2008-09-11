@@ -24,8 +24,6 @@
 
 #include "zbxtypes.h"
 
-#define HAVE_IPMI
-
 #ifdef DEBUG
 #	include "threads.h"
 

@@ -39,6 +39,7 @@
 #include "housekeeper/housekeeper.h"
 #include "../zabbix_server/pinger/pinger.h"
 #include "../zabbix_server/poller/poller.h"
+#include "../zabbix_server/poller/checks_ipmi.h"
 #include "../zabbix_server/trapper/trapper.h"
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
@@ -305,7 +306,7 @@ void	init_config(void)
 #ifndef	HAVE_LIBCURL
 	CONFIG_HTTPPOLLER_FORKS = 0;
 #endif
-#ifndef	HAVE_IPMI
+#ifndef	HAVE_OPENIPMI
 	CONFIG_IPMIPOLLER_FORKS = 0;
 #endif
 }
@@ -360,6 +361,10 @@ int main(int argc, char **argv)
 	init_metrics();
 
 	init_config();
+
+#ifdef HAVE_OPENIPMI
+	init_ipmi_handler();
+#endif
 
 	if(CONFIG_DBSYNCER_FORKS!=0)
 	{
@@ -578,7 +583,7 @@ int MAIN_ZABBIX_ENTRY(void)
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [IPMI Poller]",
 				server_num);
 
-		main_poller_loop(ZBX_PROCESS_PROXY, ZBX_POLLER_TYPE_UNREACHABLE, server_num
+		main_poller_loop(ZBX_PROCESS_PROXY, ZBX_POLLER_TYPE_IPMI, server_num
 				- (CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS
 				+ CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
 				+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
@@ -628,6 +633,11 @@ void	zbx_on_exit()
 	}
 	DBclose();
 /*	zbx_mutex_destroy(&node_sync_access);*/
+
+#ifdef HAVE_OPENIPMI
+	free_ipmi_handler();
+#endif
+
 	zabbix_close_log();
 	
 #ifdef  HAVE_SQLITE3
