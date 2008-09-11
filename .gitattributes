@@ -195,6 +195,7 @@ include/zbxjson.h -text
 include/zbxodbc.h -text
 m4/libiodbc.m4 -text
 m4/libunixodbc.m4 -text
+m4/openipmi.m4 -text
 misc/clock/clock.fla -text
 misc/conf/zabbix_proxy.conf -text
 misc/init.d/fedora/core5/zabbix_agentd -text
@@ -239,6 +240,8 @@ src/zabbix_server/dbsyncer/dbsyncer.h -text
 src/zabbix_server/escalator/Makefile.am -text
 src/zabbix_server/escalator/escalator.c -text
 src/zabbix_server/escalator/escalator.h -text
+src/zabbix_server/poller/checks_ipmi.c -text
+src/zabbix_server/poller/checks_ipmi.h -text
 src/zabbix_server/trapper/nodecommand.c -text
 src/zabbix_server/trapper/nodecommand.h -text
 src/zabbix_server/trapper/proxyconfig.c -text

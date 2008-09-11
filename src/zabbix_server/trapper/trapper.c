@@ -183,7 +183,8 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 				ITEM_TYPE_SNMPv3,
 				ITEM_TYPE_ZABBIX_ACTIVE,
 				ITEM_TYPE_HTTPTEST,
-				ITEM_TYPE_EXTERNAL);
+				ITEM_TYPE_EXTERNAL,
+				ITEM_TYPE_IPMI);
 	}
 
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, " and (");

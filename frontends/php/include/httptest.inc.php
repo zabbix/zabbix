@@ -116,7 +116,7 @@
 			{
 				if (!($itemid = add_item($item['description'], $item['key_'], $hostid, $delay,
 					$history, ITEM_STATUS_ACTIVE, ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost',
-					161, $item['units'], 0, 0, '', 0, '', '', '0', $trends, '', 0, '', '', array($applicationid))))
+					161, $item['units'], 0, 0, '', 0, '', '', '0', $trends, '', 0, '', '', array($applicationid),'')))
 					return false;
 			}
 			else
@@ -126,7 +126,7 @@
 				if (!(update_item($itemid, $item['description'], $item['key_'], $hostid, $delay, $item_data['history'],
 					$item_data['status'], ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost', 161,
 					$item['units'], 0, 0, $item_data['delta'], 0, '', '', '0', $item_data['trends'], '',
-					$item_data['valuemapid'], '', '', array($applicationid))))
+					$item_data['valuemapid'], '', '', array($applicationid),'')))
 					return false;
 			}
 
@@ -268,7 +268,7 @@
 				{
 					if (!($itemid = add_item($item['description'], $item['key_'], $hostid, $delay,
 						$history, ITEM_STATUS_ACTIVE, ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost',
-						161, $item['units'], 0, 0, '', 0, '', '', '0', $trends, '', 0, '', '', array($applicationid))))
+						161, $item['units'], 0, 0, '', 0, '', '', '0', $trends, '', 0, '', '', array($applicationid),'')))
 					{
 						$result = false;
 						break;
@@ -281,7 +281,7 @@
 					if (!(update_item($itemid, $item['description'], $item['key_'], $hostid, $delay, $item_data['history'],
 						$item_data['status'], ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost', 161,
 						$item['units'], 0, 0, $item_data['delta'], 0, '', '', '0', $item_data['trends'], '',
-						$item_data['valuemapid'], '', '', array($applicationid))))
+						$item_data['valuemapid'], '', '', array($applicationid),'')))
 					{
 						$result = false;
 						break;

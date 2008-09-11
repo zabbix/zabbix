@@ -42,6 +42,7 @@
 #include "housekeeper/housekeeper.h"
 #include "pinger/pinger.h"
 #include "poller/poller.h"
+#include "poller/checks_ipmi.h"
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "nodewatcher/nodewatcher.h"
@@ -124,6 +125,7 @@ int	CONFIG_NODEWATCHER_FORKS	= 1;
 int	CONFIG_PINGER_FORKS		= 1;
 int	CONFIG_POLLER_FORKS		= 5;
 int	CONFIG_HTTPPOLLER_FORKS		= 5;
+int	CONFIG_IPMIPOLLER_FORKS		= 0;
 int	CONFIG_TIMER_FORKS		= 1;
 int	CONFIG_TRAPPERD_FORKS		= 5;
 int	CONFIG_UNREACHABLE_POLLER_FORKS	= 1;
@@ -202,6 +204,7 @@ void	init_config(void)
 		{"StartHTTPPollers",&CONFIG_HTTPPOLLER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
 		{"StartPingers",&CONFIG_PINGER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
 		{"StartPollers",&CONFIG_POLLER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
+		{"StartIPMIPollers",&CONFIG_IPMIPOLLER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
 		{"StartPollersUnreachable",&CONFIG_UNREACHABLE_POLLER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
 		{"StartTrappers",&CONFIG_TRAPPERD_FORKS,0,TYPE_INT,PARM_OPT,0,255},
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
@@ -279,6 +282,9 @@ void	init_config(void)
 	}
 #ifndef	HAVE_LIBCURL
 	CONFIG_HTTPPOLLER_FORKS = 0;
+#endif
+#ifndef	HAVE_IPMI
+	CONFIG_IPMIPOLLER_FORKS = 0;
 #endif
 }
 
@@ -840,6 +846,121 @@ ZBX_TEST_HEX expressions[]=
 	printf("Passed OK\n");
 }
 
+void test_ipmi()
+{
+	DB_ITEM		item, item2;
+	AGENT_RESULT	result, result2;
+	char		*s_name[] = {
+		"mb.v_+1v2core",
+		"mb.v_+1v5core",
+		"mb.v_+12v",
+		"mb.v_+2v5core",
+		"mb.v_+3v3",
+		"mb.v_+3v3stby",
+		"mb.v_+5v",
+		"mb.v_-12v",
+		"mb.v_bat",
+		"mb.t_amb",
+		"io.t_amb",
+		"fp.t_amb",
+		"pdb.t_amb",
+		"p0.v_vtt",
+		"p0.v_vddio",
+		"p0.v_vdd",
+		"p0.t_core",
+		"p1.v_vtt",
+		"p1.v_vddio",
+		"p1.v_vdd",
+		"p1.t_core",
+		"ft0.fm0.f0.speed",
+		"ft0.fm1.f0.speed",
+		"ft0.fm2.f0.speed",
+		"ft1.fm0.f0.speed",
+		"ft1.fm1.f0.speed",
+		"ft1.fm2.f0.speed",
+		"ft0.fm0.f1.speed",
+		"ft0.fm1.f1.speed",
+		"ft0.fm2.f1.speed",
+		"ft1.fm0.f1.speed",
+		"ft1.fm1.f1.speed",
+		"ft1.fm2.f1.speed",
+		"sys.fanfail1",
+		"sys.tempfail1",
+		"krivoj sensor",
+		NULL
+	};
+	int		i, j, r;
+
+	memset(&item, 0, sizeof(item));
+	item.useip = 1;
+	item.host_ip = strdup("66.175.123.29");
+	item.host_dns = strdup("");
+	item.useipmi = 1;
+	item.ipmi_port = 623;
+	item.ipmi_authtype = 0;
+	item.ipmi_privilege = 2;
+	item.ipmi_username = strdup("root");
+	item.ipmi_password = strdup("4zabbixonly");
+
+	memset(&item2, 0, sizeof(item2));
+	item2.useip = 1;
+	item2.host_ip = strdup("66.175.123.29");
+	item2.host_dns = strdup("");
+	item2.useipmi = 1;
+	item2.ipmi_port = 623;
+	item2.ipmi_authtype = 0;
+	item2.ipmi_privilege = 2;
+	item2.ipmi_username = strdup("root");
+	item2.ipmi_password = strdup("4zabbixonly");
+
+	for (j = 0; j < 1; j ++)
+	{
+		printf("Start [%d] ...\n", j);
+		for (i = 0; s_name[i] != NULL; i ++)
+		{
+			init_result(&result);
+			init_result(&result2);
+
+			item.ipmi_sensor = strdup(s_name[i]);
+			item2.ipmi_sensor = strdup(s_name[i]);
+
+			r = get_value_ipmi(&item, &result);
+			r = get_value_ipmi(&item2, &result2);
+
+			if (GET_DBL_RESULT(&result))
+				printf("1 => [%d] %s: " ZBX_FS_DBL "\n", r, item.ipmi_sensor, result.dbl);
+			else if (GET_MSG_RESULT(&result))
+				printf("1 => [%d] %s: %s\n", r, item.ipmi_sensor, result.msg);
+			else
+				printf("1 => [%d] %s: -\n", r, item.ipmi_sensor);
+
+			if (GET_DBL_RESULT(&result2))
+				printf("2 => [%d] %s: " ZBX_FS_DBL "\n", r, item2.ipmi_sensor, result2.dbl);
+			else if (GET_MSG_RESULT(&result2))
+				printf("2 => [%d] %s: %s\n", r, item2.ipmi_sensor, result2.msg);
+			else
+				printf("2 => [%d] %s: -\n", r, item2.ipmi_sensor);
+
+			zbx_free(item.ipmi_sensor);
+			zbx_free(item2.ipmi_sensor);
+
+			free_result(&result2);
+		}
+		printf("... done\n");
+		sleep(1);
+	}
+
+	zbx_free(item.host_ip);
+	zbx_free(item.host_dns);
+	zbx_free(item.ipmi_username);
+	zbx_free(item.ipmi_password);
+
+	zbx_free(item2.host_ip);
+	zbx_free(item2.host_dns);
+	zbx_free(item2.ipmi_username);
+	zbx_free(item2.ipmi_password);
+}
+
 void test()
 {
 
@@ -870,6 +991,7 @@ void test()
 /*	test_zbx_tcp_connect( );*/
 /*	test_ip_in_list(); */
 /*	test_binary2hex();*/
+	test_ipmi();
 
 	printf("\n-= Test completed =-\n");
 }
@@ -934,6 +1056,10 @@ int main(int argc, char **argv)
 	init_metrics();
 
 	init_config();
+
+#ifdef HAVE_IPMI
+	init_ipmi_handler();
+#endif
 
 	switch (task) {
 		case ZBX_TASK_CHANGE_NODEID:
@@ -1082,7 +1208,7 @@ int MAIN_ZABBIX_ENTRY(void)
 	threads = calloc(1 + CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
 			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS
-			+ CONFIG_ESCALATOR_FORKS, sizeof(pid_t));
+			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS, sizeof(pid_t));
 
 	if(CONFIG_TRAPPERD_FORKS > 0)
 	{
@@ -1096,7 +1222,7 @@ int MAIN_ZABBIX_ENTRY(void)
 	for ( i = 1; i <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
 			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS
-			+ CONFIG_ESCALATOR_FORKS;
+			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS;
 		i++)
 	{
 		if((pid = zbx_fork()) == 0)
@@ -1243,6 +1369,20 @@ int MAIN_ZABBIX_ENTRY(void)
 
 		main_escalator_loop();
 	}
+	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
+			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
+			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS
+			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [IPMI Poller]",
+				server_num);
+
+		main_poller_loop(ZBX_PROCESS_SERVER, ZBX_POLLER_TYPE_IPMI, server_num - (CONFIG_POLLER_FORKS
+				+ CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
+				+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
+				+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS
+				+ CONFIG_ESCALATOR_FORKS));
+	}
 
 	return SUCCEED;
 }
@@ -1258,7 +1398,7 @@ void	zbx_on_exit()
 		for (i = 1; i <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 				+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
 				+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS
-				+ CONFIG_ESCALATOR_FORKS; i++)
+				+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS; i++)
 		{
 			if (threads[i]) {
 				kill(threads[i], SIGTERM);
@@ -1286,7 +1426,13 @@ void	zbx_on_exit()
 		free_database_cache();
 	}
 	DBclose();
+
 	zbx_mutex_destroy(&node_sync_access);
+
+#ifdef HAVE_IPMI
+	free_ipmi_handler();
+#endif
+
 	zabbix_close_log();
 	
 #ifdef  HAVE_SQLITE3
