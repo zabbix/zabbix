@@ -1805,7 +1805,15 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->host_dns		= row[36];
 	item->params		= row[37];		/* !!! WHAT about CLOB??? */
 
-	item->eventlog_source=NULL;
+	item->eventlog_source	= NULL;
+
+	item->useipmi		= atoi(row[39]);
+	item->ipmi_port		= atoi(row[40]);
+	item->ipmi_authtype	= atoi(row[41]);
+	item->ipmi_privilege	= atoi(row[42]);
+	item->ipmi_username	= row[43];
+	item->ipmi_password	= row[44];
+	item->ipmi_sensor	= row[45];
 }
 
 /*

@@ -17,26 +17,19 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_POLLER_H
-#define ZABBIX_POLLER_H
+#ifndef ZABBIX_CHECKS_IPMI_H
+#define ZABBIX_CHECKS_IPMI_H
 
 #include "common.h"
+
+#ifdef HAVE_IPMI
+
 #include "db.h"
 #include "sysinfo.h"
 
-extern	void	signal_handler(int);
-extern  int     server_num;
+int	init_ipmi_handler();
+int	free_ipmi_handler();
+int	get_value_ipmi(DB_ITEM *item, AGENT_RESULT *value);
 
-extern  int     CONFIG_TIMEOUT;
-extern  int     CONFIG_POLLER_FORKS;
-extern  int     CONFIG_IPMIPOLLER_FORKS;
-extern  int     CONFIG_UNREACHABLE_POLLER_FORKS;
-extern  int     CONFIG_UNAVAILABLE_DELAY;
-extern  int     CONFIG_UNREACHABLE_PERIOD;
-extern  int     CONFIG_UNREACHABLE_DELAY;
-
-void	main_poller_loop(zbx_process_t p, int type, int num);
-
-int	get_value(DB_ITEM *item, AGENT_RESULT *result);
-
-#endif
+#endif	/* HAVE_IPMI */
+#endif	/* ZABBIX_CHECKS_IPMI_H */

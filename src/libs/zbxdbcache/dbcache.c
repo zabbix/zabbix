@@ -717,6 +717,21 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 				break;
 		}
 
+		/* Update item status if required */
+		if (item.status == ITEM_STATUS_NOTSUPPORTED)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s] became supported by agent on host [%s]",
+					item.key,
+					item.host_name);
+			zabbix_syslog("Parameter [%s] became supported by agent on host [%s]",
+					item.key,
+					item.host_name);
+
+			item.status = ITEM_STATUS_ACTIVE;
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ",status=%d,error=''",
+					item.status);
+		}
+
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, " where itemid=" ZBX_FS_UI64 ";\n",
 				item.itemid);
 	}

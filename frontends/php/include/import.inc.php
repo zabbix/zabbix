@@ -117,7 +117,11 @@
 							'', /* dns */
 							'', /* ip */
 							0, /* proxy_hostid */
-							array(),
+							array(), /* templates */
+							0, /* useipmi */
+							623, /* ipmi_port */
+							'', /* ipmi_username */
+							'', /* ipmi_password */
 							null,
 							array());
 							
@@ -202,7 +206,12 @@
 					if(!isset($data['ip']))		$data['ip'] = '';
 
 					if(update_host($data['hostid'], $data['name'], $data['port'], $data['status'],
-						$data['useip'], $data['dns'], $data['ip'], 0, $data['templates'], null, $data['groups']))
+						$data['useip'], $data['dns'], $data['ip'], 0, $data['templates'],
+						0, /* useipmi */
+						623, /* ipmi_port */
+						'', /* ipmi_username */
+						'', /* ipmi_password */
+						null, $data['groups']))
 					{
 						info('Host ['.$data['name'].'] updated');
 					}
@@ -495,6 +504,7 @@
 								$data['applications'],
 								get_applications_by_itemid($item['itemid'])
 								)),
+							$data['ipmi_sensor'],
 							$item['templateid']);
 					}
 					else{ /* missed */
@@ -532,7 +542,8 @@
 							$data['valuemapid'],
 							$data['delay_flex'],
 							$data['params'],
-							$data['applications']);
+							$data['applications'],
+							$data['ipmi_sensor']);
 					}
 
 					break; // case

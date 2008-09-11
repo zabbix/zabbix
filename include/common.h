@@ -24,6 +24,8 @@
 
 #include "zbxtypes.h"
 
+#define HAVE_IPMI
+
 #ifdef DEBUG
 #	include "threads.h"
 
@@ -180,7 +182,8 @@ typedef enum
 	ITEM_TYPE_AGGREGATE,
 	ITEM_TYPE_HTTPTEST,
 	ITEM_TYPE_EXTERNAL,
-	ITEM_TYPE_DB_MONITOR
+	ITEM_TYPE_DB_MONITOR,
+	ITEM_TYPE_IPMI
 } zbx_item_type_t;
 
 /* Event sources */
@@ -504,6 +507,7 @@ typedef enum
 
 #define	ZBX_POLLER_TYPE_NORMAL		0
 #define	ZBX_POLLER_TYPE_UNREACHABLE	1
+#define	ZBX_POLLER_TYPE_IPMI		2
 
 #define	POLLER_TIMEOUT	5
 /* Do not perform more than this number of checks during unavailability period */
