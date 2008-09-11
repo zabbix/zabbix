@@ -630,7 +630,7 @@
 			else if(isset($inf['info']))
 				$out['info'] = $inf['info'];
 
-			if($inf['priority'] > 3)
+			if(isset($inf['priority']) && $inf['priority'] > 3)
 				$out['color'] = $colors['Red'];
 			else
 				$out['color'] = $colors['Dark Red'];
@@ -666,7 +666,7 @@
 		}
 
 		$out['count'] = $inf['count'];
-		$out['priority'] = $inf['priority'];
+		$out['priority'] = isset($inf['priority']) ? $inf['priority'] : 0;
 		$out['name'] = $el_name;
 
 	return $out;
