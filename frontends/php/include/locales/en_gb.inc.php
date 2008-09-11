@@ -978,6 +978,7 @@
 	'S_NO_FLEXIBLE_INTERVALS'=>		'No flexible intervals',
 	'S_PARAMS'=>				'Additional parameters',
 	'S_NEW_APPLICATION'=>		'New application',
+	'S_IPMI_SENSOR'=>			'IPMI sensor',
 
 //	events.php
 	'S_EVENT'=>					'Event',
