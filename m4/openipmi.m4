@@ -20,7 +20,7 @@
 AC_DEFUN([LIBOPENIPMI_CHECK_CONFIG],
 [
   AC_ARG_WITH(openipmi,
-    [If you want to check OPENIPMI devices:
+    [If you want to check IPMI devices:
 AC_HELP_STRING([--with-openipmi@<:@=DIR@:>@],[Include OPENIPMI support @<:@default=no@:>@. DIR is the OPENIPMI base install directory, default is to search through a number of common places for the OPENIPMI files.])
     ],[ if test "$withval" = "no"; then
             want_openipmi="no"
