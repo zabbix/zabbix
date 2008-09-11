@@ -174,7 +174,7 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 	else
 	{
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
-				" and i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d)",
+				" and i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
 				ITEM_TYPE_ZABBIX,
 				ITEM_TYPE_SNMPv1,
 				ITEM_TYPE_TRAPPER,
