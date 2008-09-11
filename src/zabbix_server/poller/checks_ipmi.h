@@ -22,7 +22,7 @@
 
 #include "common.h"
 
-#ifdef HAVE_IPMI
+#ifdef HAVE_OPENIPMI
 
 #include "db.h"
 #include "sysinfo.h"
@@ -31,5 +31,5 @@ int	init_ipmi_handler();
 int	free_ipmi_handler();
 int	get_value_ipmi(DB_ITEM *item, AGENT_RESULT *value);
 
-#endif	/* HAVE_IPMI */
+#endif	/* HAVE_OPENIPMI */
 #endif	/* ZABBIX_CHECKS_IPMI_H */

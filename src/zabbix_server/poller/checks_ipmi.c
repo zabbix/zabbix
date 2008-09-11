@@ -19,7 +19,7 @@
 
 #include "checks_ipmi.h"
 
-#ifdef HAVE_IPMI
+#ifdef HAVE_OPENIPMI
 
 #include "log.h"
 
@@ -143,6 +143,8 @@ static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t
 	ipmi_sensor_get_id(sensor, s->s_name, length);
 	s->next = h->sensors;
 	h->sensors = s;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Sensor %s successfully added", s->s_name);
 
 	return s;
 }
@@ -585,4 +587,4 @@ int	get_value_ipmi(DB_ITEM *item, AGENT_RESULT *value)
 
 	return h->ret;
 }
-#endif	/* HAVE_IPMI */
+#endif	/* HAVE_OPENIPMI */
