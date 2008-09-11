@@ -177,7 +177,8 @@
 	define('ITEM_TYPE_AGGREGATE',8);
 	define('ITEM_TYPE_HTTPTEST',9);
 	define('ITEM_TYPE_EXTERNAL',10);
-	define("ITEM_TYPE_DB_MONITOR",11);
+	define('ITEM_TYPE_DB_MONITOR',11);
+	define('ITEM_TYPE_IPMI',12);
 
 	define('ITEM_VALUE_TYPE_FLOAT',0);
 	define('ITEM_VALUE_TYPE_STR',1);

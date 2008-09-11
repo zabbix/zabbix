@@ -170,8 +170,8 @@ require_once "include/httptest.inc.php";
 	 *
 	 *     NOTE: templates = array(id => name, id2 => name2, ...)
 	 */
-	function db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$hostid=null){
-		
+	function db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_port,$ipmi_username,$ipmi_password,$hostid=null)
+	{
 		if(!eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host)){
 			error("Incorrect characters used for Hostname");
 			return false;
@@ -197,9 +197,9 @@ require_once "include/httptest.inc.php";
 		if(is_null($hostid)){
 			$hostid = get_dbid("hosts","hostid");
 			$result = DBexecute('insert into hosts '.
-				' (hostid,proxy_hostid,host,port,status,useip,dns,ip,disable_until,available) '.
+				' (hostid,proxy_hostid,host,port,status,useip,dns,ip,disable_until,available,useipmi,ipmi_port,ipmi_username,ipmi_password) '.
 				' values ('.$hostid.','.$proxy_hostid.','.zbx_dbstr($host).','.$port.','.$status.','.$useip.','.zbx_dbstr($dns).','.zbx_dbstr($ip).',0,'
-					.HOST_AVAILABLE_UNKNOWN.')');
+					.HOST_AVAILABLE_UNKNOWN.','.($useipmi == 'yes' ? 1 : 0).','.$ipmi_port.','.zbx_dbstr($ipmi_username).','.zbx_dbstr($ipmi_password).')');
 		}
 		else{
 			if(check_circle_host_link($hostid, $templates)){
@@ -213,6 +213,10 @@ require_once "include/httptest.inc.php";
 							',useip='.$useip.
 							',dns='.zbx_dbstr($dns).
 							',ip='.zbx_dbstr($ip).
+							',useipmi='.($useipmi == 'yes' ? 1 : 0).
+							',ipmi_port='.$ipmi_port.
+							',ipmi_username='.zbx_dbstr($ipmi_username).
+							',ipmi_password='.zbx_dbstr($ipmi_password).
 				' WHERE hostid='.$hostid);
 
 			update_host_status($hostid, $status);
@@ -225,8 +229,8 @@ require_once "include/httptest.inc.php";
 		}
 
 		if($result) $result = $hostid;
-		
-	return $result;
+
+		return $result;
 	}
 
 /*
@@ -242,8 +246,9 @@ require_once "include/httptest.inc.php";
  *
  *     NOTE: templates = array(id => name, id2 => name2, ...)
  */
-	function add_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$newgroup,$groups){
-		$hostid = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates);
+	function add_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_port,$ipmi_username,$ipmi_password,$newgroup,$groups)
+	{
+		$hostid = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_port,$ipmi_username,$ipmi_password);
 		if(!$hostid)
 			return $hostid;
 		else
@@ -271,7 +276,8 @@ require_once "include/httptest.inc.php";
 	 *
 	 *     NOTE: templates = array(id => name, id2 => name2, ...)
 	 */	
-	function update_host($hostid,$host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$newgroup,$groups){
+	function update_host($hostid,$host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_port,$ipmi_username,$ipmi_password,$newgroup,$groups)
+	{
 	
 		$old_templates = get_templates_by_hostid($hostid);
 		$unlinked_templates = array_diff($old_templates, $templates);
@@ -284,7 +290,7 @@ require_once "include/httptest.inc.php";
 
 		$new_templates = array_diff($templates, $old_templates);
 
-		$result = (bool) db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$new_templates,$hostid);
+		$result = (bool) db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$new_templates,$useipmi,$ipmi_port,$ipmi_username,$ipmi_password,$hostid);
 		if(!$result)
 			return $result;
 

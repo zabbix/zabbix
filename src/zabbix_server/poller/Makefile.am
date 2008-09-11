@@ -10,4 +10,5 @@ libzbxpoller_a_SOURCES = \
 	checks_db.c checks_db.h \
 	checks_aggregate.c checks_aggregate.h \
 	checks_external.c checks_external.h \
+	checks_ipmi.c checks_ipmi.h \
 	poller.c poller.h

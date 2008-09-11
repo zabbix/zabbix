@@ -34,6 +34,7 @@
 #include "checks_internal.h"
 #include "checks_simple.h"
 #include "checks_snmp.h"
+#include "checks_ipmi.h"
 #include "checks_db.h"
 
 AGENT_RESULT    result;
@@ -45,60 +46,78 @@ int			poller_num;
 
 int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 {
-	int res=FAIL;
+	int	res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_value(key:%s)",
-		item->key);
-
-	alarm(CONFIG_TIMEOUT);
-
-	if(item->type == ITEM_TYPE_ZABBIX)
-	{
-		res=get_value_agent(item, result);
-	}
-	else if( (item->type == ITEM_TYPE_SNMPv1) || (item->type == ITEM_TYPE_SNMPv2c) || (item->type == ITEM_TYPE_SNMPv3))
-	{
-#ifdef HAVE_SNMP
-		res=get_value_snmp(item, result);
-#else
-		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was not compiled in");
-		zabbix_syslog("Support of SNMP parameters was not compiled in. Cannot process [%s:%s]",
-			item->host_name,
 			item->key);
-		res=NOTSUPPORTED;
+
+	switch (item->type) {
+		case ITEM_TYPE_ZABBIX:
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_agent(item, result);
+			alarm(0);
+			break;
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+#ifdef HAVE_SNMP
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_snmp(item, result);
+			alarm(0);
+#else
+			zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was not compiled in");
+			zabbix_syslog("Support of SNMP parameters was not compiled in. Cannot process [%s:%s]",
+					item->host_name,
+					item->key);
+			res = NOTSUPPORTED;
 #endif
+			break;
+		case ITEM_TYPE_IPMI:
+#ifdef HAVE_IPMI
+			res = get_value_ipmi(item, result);
+#else
+			zabbix_log(LOG_LEVEL_WARNING, "Support of IPMI parameters was not compiled in");
+			zabbix_syslog("Support of IPMI parameters was not compiled in. Cannot process [%s:%s]",
+					item->host_name,
+					item->key);
+			res = NOTSUPPORTED;
+#endif
+			break;
+		case ITEM_TYPE_SIMPLE:
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_simple(item, result);
+			alarm(0);
+			break;
+		case ITEM_TYPE_INTERNAL:
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_internal(item, result);
+			alarm(0);
+			break;
+		case ITEM_TYPE_DB_MONITOR:
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_db(item, result);
+			alarm(0);
+			break;
+		case ITEM_TYPE_AGGREGATE:
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_aggregate(item, result);
+			alarm(0);
+			break;
+		case ITEM_TYPE_EXTERNAL:
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_external(item, result);
+			alarm(0);
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_WARNING, "Not supported item type:%d",
+					item->type);
+			zabbix_syslog("Not supported item type:%d",
+					item->type);
+			res = NOTSUPPORTED;
 	}
-	else if(item->type == ITEM_TYPE_SIMPLE)
-	{
-		res=get_value_simple(item, result);
-	}
-	else if(item->type == ITEM_TYPE_INTERNAL)
-	{
-		res=get_value_internal(item, result);
-	}
-	else if(item->type == ITEM_TYPE_DB_MONITOR)
-	{
-		res=get_value_db(item, result);
-	}
-	else if(item->type == ITEM_TYPE_AGGREGATE)
-	{
-		res=get_value_aggregate(item, result);
-	}
-	else if(item->type == ITEM_TYPE_EXTERNAL)
-	{
-		res=get_value_external(item, result);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Not supported item type:%d",
-			item->type);
-		zabbix_syslog("Not supported item type:%d",
-			item->type);
-		res=NOTSUPPORTED;
-	}
-	alarm(0);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End get_value()");
+
 	return res;
 }
 /*
@@ -117,14 +136,14 @@ static int get_minnextcheck(int now)
 	{
 		result = DBselect("select count(*),min(nextcheck) as nextcheck from items i,hosts h"
 				" where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d)"
-				" and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d"
+				" and i.type not in (%d,%d,%d,%d) and h.status=%d and h.disable_until<=%d"
 				" and h.errors_from!=0 and h.hostid=i.hostid and (h.proxy_hostid=0 or i.type in (%d))"
 				" and i.key_ not in ('%s','%s','%s','%s')" DB_NODE " order by nextcheck",
 			CONFIG_UNREACHABLE_POLLER_FORKS,
 			poller_num-1,
 			now,
 			ITEM_STATUS_ACTIVE,
-			ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST,
+			ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_IPMI,
 			HOST_STATUS_MONITORED,
 			now,
 			ITEM_TYPE_INTERNAL,
@@ -143,14 +162,14 @@ static int get_minnextcheck(int now)
 
 		result = DBselect("select count(*),min(nextcheck) from items i,hosts h where " ZBX_SQL_MOD(i.itemid,%d) "=%d"
 				" and h.status=%d and h.disable_until<=%d and h.errors_from=0"
-				" and h.hostid=i.hostid and i.status in (%s) and i.type not in (%d,%d,%d)"
+				" and h.hostid=i.hostid and i.status in (%s) and i.type not in (%d,%d,%d,%d)"
 				" and (h.proxy_hostid=0 or i.type in (%d)) and i.key_ not in ('%s','%s','%s','%s')" DB_NODE,
 				CONFIG_POLLER_FORKS,
 				poller_num-1,
 				HOST_STATUS_MONITORED,
 				now,
 				istatus,
-				ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST,
+				ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_IPMI,
 				ITEM_TYPE_INTERNAL,
 				SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY,
 				DBnode_local("h.hostid"));
@@ -301,9 +320,9 @@ static int get_values(int now, int *nextcheck)
 	AGENT_RESULT	agent;
 	int		stop = 0, items = 0;
 
-	char		*unreachable_hosts = NULL;
-	int		unreachable_hosts_alloc = 128,
-			unreachable_hosts_offset = 0;
+	static char	*unreachable_hosts = NULL;
+	static int	unreachable_hosts_alloc = 32;
+	int		unreachable_hosts_offset = 0;
 
 	char		istatus[16];
 
@@ -315,53 +334,70 @@ static int get_values(int now, int *nextcheck)
 	now = time(NULL);
 	*nextcheck = FAIL;
 
-	unreachable_hosts = zbx_malloc(unreachable_hosts, unreachable_hosts_alloc);
+	if (NULL == unreachable_hosts)
+		unreachable_hosts = zbx_malloc(unreachable_hosts, unreachable_hosts_alloc);
 	*unreachable_hosts = '\0';
 
-	/* Poller for unreachable hosts */
-	if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
-	{
+	if (0 != CONFIG_REFRESH_UNSUPPORTED)
+		zbx_snprintf(istatus, sizeof(istatus), "%d,%d",
+				ITEM_STATUS_ACTIVE,
+				ITEM_STATUS_NOTSUPPORTED);
+	else
+		zbx_snprintf(istatus, sizeof(istatus), "%d",
+				ITEM_STATUS_ACTIVE);
+
+	switch (poller_type) {
+	case ZBX_POLLER_TYPE_UNREACHABLE:
 		result = DBselect("select h.hostid,min(i.itemid) from hosts h,items i"
 				" where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d)"
 				" and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d"
 				" and h.errors_from!=0 and h.hostid=i.hostid and (h.proxy_hostid=0 or i.type in (%d))"
 				" and i.key_ not in ('%s','%s','%s','%s')" DB_NODE " group by h.hostid",
-			CONFIG_UNREACHABLE_POLLER_FORKS,
-			poller_num-1,
-			now + POLLER_DELAY,
-			ITEM_STATUS_ACTIVE,
-			ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST,
-			HOST_STATUS_MONITORED,
-			now + POLLER_DELAY,
-			ITEM_TYPE_INTERNAL,
-			SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY,
-			DBnode_local("h.hostid"));
-	}
-	else
-	{
-		if (0 != CONFIG_REFRESH_UNSUPPORTED)
-			zbx_snprintf(istatus, sizeof(istatus), "%d,%d",
-					ITEM_STATUS_ACTIVE,
-					ITEM_STATUS_NOTSUPPORTED);
-		else
-			zbx_snprintf(istatus, sizeof(istatus), "%d",
-					ITEM_STATUS_ACTIVE);
-
+				CONFIG_UNREACHABLE_POLLER_FORKS,
+				poller_num-1,
+				now + POLLER_DELAY,
+				ITEM_STATUS_ACTIVE,
+				ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST,
+				HOST_STATUS_MONITORED,
+				now,
+				ITEM_TYPE_INTERNAL,
+				SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, SERVER_ZABBIXLOG_KEY,
+				DBnode_local("h.hostid"));
+		break;
+	case ZBX_POLLER_TYPE_IPMI:
 		result = DBselect("select %s where i.nextcheck<=%d and i.status in (%s)"
-				" and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d"
+				" and i.type in (%d) and h.status=%d and h.disable_until<=%d"
+				" and h.errors_from=0 and h.hostid=i.hostid and (h.proxy_hostid=0 or i.type in (%d))"
+				" and " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')"
+				DB_NODE " order by i.nextcheck",
+				ZBX_SQL_ITEM_SELECT,
+				now + POLLER_DELAY,
+				istatus,
+				ITEM_TYPE_IPMI,
+				HOST_STATUS_MONITORED,
+				now,
+				ITEM_TYPE_INTERNAL,
+				CONFIG_IPMIPOLLER_FORKS,
+				poller_num-1,
+				SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, SERVER_ZABBIXLOG_KEY,
+				DBnode_local("h.hostid"));
+		break;
+	default:	/* ZBX_POLLER_TYPE_NORMAL */
+		result = DBselect("select %s where i.nextcheck<=%d and i.status in (%s)"
+				" and i.type not in (%d,%d,%d,%d) and h.status=%d and h.disable_until<=%d"
 				" and h.errors_from=0 and h.hostid=i.hostid and (h.proxy_hostid=0 or i.type in (%d))"
 				" and " ZBX_SQL_MOD(i.itemid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')"
 				DB_NODE " order by i.nextcheck",
 				ZBX_SQL_ITEM_SELECT,
 				now + POLLER_DELAY,
 				istatus,
-				ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST,
+				ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_IPMI,
 				HOST_STATUS_MONITORED,
-				now + POLLER_DELAY,
+				now,
 				ITEM_TYPE_INTERNAL,
 				CONFIG_POLLER_FORKS,
 				poller_num-1,
-				SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY,
+				SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, SERVER_ZABBIXLOG_KEY,
 				DBnode_local("h.hostid"));
 	}
 
@@ -466,7 +502,7 @@ static int get_values(int now, int *nextcheck)
 				DCadd_nextcheck(&item, now, 0, NULL);
 			}
 
-			if (poller_type == ZBX_POLLER_TYPE_NORMAL)
+			if (poller_type == ZBX_POLLER_TYPE_NORMAL || poller_type == ZBX_POLLER_TYPE_IPMI)
 				if (*nextcheck == FAIL || (item.nextcheck != 0 && *nextcheck > item.nextcheck))
 					*nextcheck = item.nextcheck;
 		}
@@ -585,8 +621,6 @@ skip:
 		free_result(&agent);
 	}
 
-	zbx_free(unreachable_hosts);
-
 	DBfree_result(result);
 
 	if (0 != CONFIG_DBSYNCER_FORKS)
@@ -628,14 +662,11 @@ void main_poller_loop(zbx_process_t p, int type, int num)
 		items = get_values(now, &nextcheck);
 		sec = zbx_time() - sec;
 
-/*		nextcheck = get_minnextcheck(now);*/
-
 		if (FAIL == nextcheck)
 			sleeptime = POLLER_DELAY;
 		else
 		{
 			sleeptime = nextcheck - time(NULL);
-/*			sleeptime = now - time(NULL) + 1;*/
 			if (sleeptime < 0)
 				sleeptime = 0;
 			if (sleeptime > POLLER_DELAY)

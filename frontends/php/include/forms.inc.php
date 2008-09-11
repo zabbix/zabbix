@@ -1272,7 +1272,7 @@
 			$cmbType->AddItem(-1, S_ALL_SMALL);
 			foreach(array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_TRAPPER,
-				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST,ITEM_TYPE_DB_MONITOR) as $it)
+				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI) as $it)
 					$cmbType->AddItem($it, item_type2str($it));
 			$form->AddRow(array('with ',bold(S_TYPE)), $cmbType);
 		}
@@ -1415,6 +1415,8 @@
 		$snmpv3_authpassphrase	= get_request('snmpv3_authpassphrase'	,'');
 		$snmpv3_privpassphrase	= get_request('snmpv3_privpassphrase'	,'');
 
+		$ipmi_sensor		= get_request('ipmi_sensor'		,'');
+
 		$formula	= get_request('formula'		,'1');
 		$logtimefmt	= get_request('logtimefmt'	,'');
 
@@ -1461,11 +1463,13 @@
 			$snmpv3_authpassphrase	= $item_data['snmpv3_authpassphrase'];
 			$snmpv3_privpassphrase	= $item_data['snmpv3_privpassphrase'];
 
+			$ipmi_sensor		= $item_data['ipmi_sensor'];
+
 			$formula	= $item_data['formula'];
 			$logtimefmt	= $item_data['logtimefmt'];
 
 			$new_application = get_request('new_application',	'');
-			
+
 			if(!isset($limited) || !isset($_REQUEST['form_refresh'])){
 				$delay		= $item_data['delay'];
 				$history	= $item_data['history'];
@@ -1537,7 +1541,7 @@
 			$cmbType = new CComboBox('type',$type,'submit()');
 			foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3,ITEM_TYPE_TRAPPER,
-				ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR) as $it)
+				ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI) as $it)
 					$cmbType->AddItem($it,item_type2str($it));
 			$frmItem->AddRow(S_TYPE, $cmbType);
 		}
@@ -1593,6 +1597,15 @@
 			$frmItem->AddVar('snmpv3_securitylevel',$snmpv3_securitylevel);
 			$frmItem->AddVar('snmpv3_authpassphrase',$snmpv3_authpassphrase);
 			$frmItem->AddVar('snmpv3_privpassphrase',$snmpv3_privpassphrase);
+		}
+
+		if ($type == ITEM_TYPE_IPMI)
+		{
+			$frmItem->AddRow(S_IPMI_SENSOR, new CTextBox('ipmi_sensor', $ipmi_sensor, 64, $limited));
+		}
+		else
+		{
+			$frmItem->AddVar('ipmi_sensor', $ipmi_sensor);
 		}
 
 		if(isset($limited)){
@@ -4605,6 +4618,11 @@
 		$ip			= get_request('ip',	'0.0.0.0');
 		$proxy_hostid	= get_request('proxy_hostid','');
 
+		$useipmi	= get_request('useipmi','no');
+		$ipmi_port	= get_request('ipmi_port',623);
+		$ipmi_username	= get_request('ipmi_username','');
+		$ipmi_password	= get_request('ipmi_password','');
+
 		$useprofile = get_request('useprofile','no');
 
 		$devicetype	= get_request('devicetype','');
@@ -4646,7 +4664,11 @@
 			$status		= $db_host['status'];
 			$useip		= $db_host['useip'];
 			$dns		= $db_host['dns'];
-			$ip			= $db_host['ip'];
+			$ip		= $db_host['ip'];
+			$useipmi	= $db_host['useipmi'] ? 'yes' : 'no';
+			$ipmi_port	= $db_host['ipmi_port'];
+			$ipmi_username	= $db_host['ipmi_username'];
+			$ipmi_password	= $db_host['ipmi_password'];
 
 // add groups
 			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
@@ -4792,6 +4814,28 @@
 					url_param($templates,false,'existed_templates')."',450,450)",
 					'T')
 				));
+
+		if ($show_only_tmp)
+		{
+			$frmHost->AddVar('useipmi', $useipmi);
+		}
+		else
+		{
+			$frmHost->AddRow(S_USEIPMI, new CCheckBox('useipmi', $useipmi, 'submit()'));
+		}
+
+		if ($useipmi == 'yes')
+		{
+			$frmHost->AddRow(S_IPMI_PORT, new CNumericBox('ipmi_port', $ipmi_port, 5));	
+			$frmHost->AddRow(S_IPMI_USERNAME, new CTextBox('ipmi_username', $ipmi_username, 16));
+			$frmHost->AddRow(S_IPMI_PASSWORD, new CTextBox('ipmi_password', $ipmi_password, 20));
+		}
+		else
+		{
+			$frmHost->AddVar('ipmi_port', $ipmi_port);	
+			$frmHost->AddVar('ipmi_username', $ipmi_username);
+			$frmHost->AddVar('ipmi_password', $ipmi_password);
+		}
 	
 		if($show_only_tmp){
 			$useprofile = 'no';

@@ -460,6 +460,12 @@ FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|inbytes	|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|outbytes	|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|useipmi	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ipmi_port	|t_integer	|'623'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ipmi_authtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ipmi_privilege	|t_integer	|'2'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ipmi_username	|t_varchar(16)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ipmi_password	|t_varchar(20)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
@@ -599,6 +605,7 @@ FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|valuemapid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|delay_flex	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|params		|t_item_param	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ipmi_sensor	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 UNIQUE		|1		|hostid,key_
 INDEX		|2		|nextcheck
 INDEX		|3		|status
@@ -725,7 +732,7 @@ FIELD		|drawtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|color		|t_varchar(6)	|'000000'|NOT NULL	|ZBX_SYNC
 
 TABLE|sysmaps_link_triggers|linktriggerid|ZBX_SYNC
-FIELD		|linktriggerid  |t_id		|'0'	|NOT NULL	|0
+FIELD		|linktriggerid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|linkid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|triggerid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|drawtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC

@@ -793,6 +793,7 @@ have_odbc="no"
 have_web_monitoring="no"
 have_jabber="no"
 have_snmp="no"
+have_ipmi="no"
 have_ipv6="no"
 
 if test "$ipv6" = "yes"; then
@@ -1031,6 +1032,19 @@ fi
 CFLAGS="${CFLAGS} ${LDAP_CPPFLAGS}"
 LDFLAGS="${LDFLAGS} ${LDAP_LDFLAGS}"
 
+found_openipmi="no"
+dnl Check for libOpenIPMI [by default - skip]
+LIBOPENIPMI_CHECK_CONFIG([no])
+if test "x$want_openipmi" = "xyes"; then
+	if test "x$found_openipmi" != "xyes"; then
+		AC_MSG_ERROR([Invalid OPENIPMI directory - unable to find ipmiif.h "${found_openipmi}"])
+	else
+		have_ipmi="openipmi"
+	fi
+fi
+CFLAGS="${CFLAGS} ${OPENIPMI_CPPFLAGS}"
+LDFLAGS="${LDFLAGS} ${OPENIPMI_LDFLAGS}"
+
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
 
@@ -1193,6 +1207,7 @@ echo "  With database:         ${have_db}
   WEB Monitoring via:    ${have_web_monitoring}
   Native Jabber:         ${have_jabber}
   SNMP:                  ${have_snmp}
+  IPMI:                  ${have_ipmi}
   Linker flags:          ${LDFLAGS} ${SERVER_LDFLAGS}
   Libraries:             ${LIBS} ${SERVER_LIBS}"
 
@@ -1206,6 +1221,7 @@ if test "x$proxy" != "xno"; then
 echo "  With database:         ${have_db}
   WEB Monitoring via:    ${have_web_monitoring}
   SNMP:                  ${have_snmp}
+  IPMI:                  ${have_ipmi}
   Linker flags:          ${LDFLAGS} ${PROXY_LDFLAGS}
   Libraries:             ${LIBS} ${PROXY_LIBS}"
 
