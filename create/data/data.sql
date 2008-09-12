@@ -69,28 +69,28 @@ INSERT INTO users_groups VALUES (2,8,2);
 -- Dumping data for table hosts
 --
 
-INSERT INTO hosts VALUES (10001,0,'Template_Linux','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10002,0,'Template_Windows','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10003,0,'Template_App_MySQL','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10004,0,'Template_Standalone','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10007,0,'Template_SNMPv2_Device','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10008,0,'Template_FreeBSD','Template_FreeBSD',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10009,0,'Template_OpenBSD','Template_OpenBSD',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10010,0,'Template_Tru64','Template_Tru64',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10011,0,'Template_Netware','Template_Netware',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10012,0,'Template_AIX','Template_AIX',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10013,0,'Template_HPUX','Template_HPUX',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10014,0,'Template_MacOS_X','Template_MacOS_X',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10015,0,'Template_Solaris','Template_Solaris',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10016,0,'Template_SNMPv1_Device','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10017,0,'ZABBIX Server','',1,'127.0.0.1',10050,1,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10018,0,'Template_Cisco_PIX_525','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10019,0,'Template_Dell_PowerConnect_6248','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10020,0,'Template_APC_Battery','',0,'0.0.0.0',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10021,0,'Template_HP_InsightManager','',0,'127.0.0.1',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10022,0,'Template_Dell_OpenManage','',0,'0.0.0.0',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10023,0,'Template_Cisco_PIX','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
-INSERT INTO hosts VALUES (10024,0,'Template_Dell_PowerEdge','',0,'0.0.0.0',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','');
+INSERT INTO hosts VALUES (10001,0,'Template_Linux','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10002,0,'Template_Windows','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10003,0,'Template_App_MySQL','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10004,0,'Template_Standalone','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10007,0,'Template_SNMPv2_Device','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10008,0,'Template_FreeBSD','Template_FreeBSD',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10009,0,'Template_OpenBSD','Template_OpenBSD',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10010,0,'Template_Tru64','Template_Tru64',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10011,0,'Template_Netware','Template_Netware',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10012,0,'Template_AIX','Template_AIX',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10013,0,'Template_HPUX','Template_HPUX',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10014,0,'Template_MacOS_X','Template_MacOS_X',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10015,0,'Template_Solaris','Template_Solaris',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10016,0,'Template_SNMPv1_Device','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10017,0,'ZABBIX Server','',1,'127.0.0.1',10050,1,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10018,0,'Template_Cisco_PIX_525','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10019,0,'Template_Dell_PowerConnect_6248','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10020,0,'Template_APC_Battery','',0,'0.0.0.0',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10021,0,'Template_HP_InsightManager','',0,'127.0.0.1',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10022,0,'Template_Dell_OpenManage','',0,'0.0.0.0',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10023,0,'Template_Cisco_PIX','',0,'',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
+INSERT INTO hosts VALUES (10024,0,'Template_Dell_PowerEdge','',0,'0.0.0.0',10050,3,0,'',0,0,0,0,0,0,623,0,2,'','',0,0,0,0);
 
 --
 -- Dumping data for table `hosts_templates`
