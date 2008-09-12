@@ -367,7 +367,7 @@ include_once "include/page_header.php";
 					$_REQUEST['snmpv3_securitylevel'],$_REQUEST['snmpv3_authpassphrase'],
 					$_REQUEST['snmpv3_privpassphrase'],$_REQUEST['formula'],$_REQUEST['trends'],
 					$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],$db_delay_flex,$_REQUEST['params'],
-					$applications,$_REQUEST['ipmi_sensor']);
+					$_REQUEST['ipmi_sensor'],$applications);
 			}
 			
 			$result = DBend($result);
@@ -397,7 +397,7 @@ include_once "include/page_header.php";
 					$_REQUEST['snmpv3_securitylevel'],$_REQUEST['snmpv3_authpassphrase'],
 					$_REQUEST['snmpv3_privpassphrase'],$_REQUEST['formula'],$_REQUEST['trends'],
 					$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],$db_delay_flex,$_REQUEST['params'],
-					$applications,$_REQUEST['ipmi_sensor']);
+					$_REQUEST['ipmi_sensor'],$applications);
 			}
 				
 			$result = DBend($itemid);
@@ -459,8 +459,8 @@ include_once "include/page_header.php";
 				get_request('multiplier'),get_request('delta'),get_request('snmpv3_securityname'),
 				get_request('snmpv3_securitylevel'),get_request('snmpv3_authpassphrase'),
 				get_request('snmpv3_privpassphrase'),get_request('formula'),get_request('trends'),
-				get_request('logtimefmt'),get_request('valuemapid'),$db_delay_flex,null,$applications,
-				get_request('ipmi_sensor'));
+				get_request('logtimefmt'),get_request('valuemapid'),$db_delay_flex,null,
+				get_request('ipmi_sensor'),$applications);
 		}
 		$result = DBend($result);
 		
@@ -526,7 +526,7 @@ include_once "include/page_header.php";
 					$_REQUEST['snmpv3_securitylevel'],$_REQUEST['snmpv3_authpassphrase'],
 					$_REQUEST['snmpv3_privpassphrase'],$_REQUEST['formula'],
 					$_REQUEST['trends'],$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],
-					$db_delay_flex, $_REQUEST['params'], $applications,$_REQUEST['ipmi_sensor']);
+					$db_delay_flex, $_REQUEST['params'], $_REQUEST['ipmi_sensor'], $applications);
 					
 				$result = DBend($itemid);
 				show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
@@ -559,7 +559,7 @@ include_once "include/page_header.php";
 						$_REQUEST['snmpv3_securitylevel'],$_REQUEST['snmpv3_authpassphrase'],
 						$_REQUEST['snmpv3_privpassphrase'],$_REQUEST['formula'],
 						$_REQUEST['trends'],$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],
-						$db_delay_flex, $_REQUEST['params'], $applications,$_REQUEST['ipmi_sensor']);
+						$db_delay_flex, $_REQUEST['params'], $_REQUEST['ipmi_sensor'], $applications);
 				$result = DBend($result);
 				
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);

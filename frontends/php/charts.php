@@ -30,7 +30,7 @@
 	
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	if(isset($_REQUEST['graphid']) && ($_REQUEST['graphid'] > 0) && (PAGE_TYPE_HTML == $page['type'])){
+	if(PAGE_TYPE_HTML == $page['type']){
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
 	

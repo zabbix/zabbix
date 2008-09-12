@@ -31,6 +31,10 @@
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	
 	define('ZBX_PAGE_MAIN_HAT','hat_latest');
+	
+	if(PAGE_TYPE_HTML == $page['type']){
+		define('ZBX_PAGE_DO_REFRESH', 1);
+	}
 //	define('ZBX_PAGE_DO_JS_REFRESH', 1);
 	
 include_once "include/page_header.php";
