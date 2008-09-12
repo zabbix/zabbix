@@ -573,7 +573,7 @@ include_once "include/page_header.php";
 					get_severity_style($row['priority'],$row['value'])
 					),
 				$value,
-				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row['lastchange']),'events.php?triggerid='.$row['triggerid'],'action'),
+				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row['lastchange']),'events.php?triggerid='.$row['triggerid'].'&nav_time='.$row['lastchange'],'action'),
 				get_node_name_by_elid($row['triggerid']),
 				$host,
 				$description,

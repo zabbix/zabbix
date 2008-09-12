@@ -83,7 +83,7 @@ var $maxlevel=0;
 		$table->footerClass = 'footer';
 		
 		$table->AddOption('valign','top');
-		$table->AddOption('border','1');
+//		$table->AddOption('border','1');
 		$table->AddRow($this->makeHeaders());
 	
 		foreach($this->tree as $id => $rows){

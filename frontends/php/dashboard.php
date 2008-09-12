@@ -306,7 +306,7 @@ include_once "include/page_header.php";
 	$refresh_menu->AddAction('onclick','javascript: create_dashboard_menu(event,"hat_lastiss");');
 	$refresh_menu->AddOption('title',S_MENU);
 		
-	$right_tab->AddRow(create_hat(S_LATEST_ISSUES,
+	$right_tab->AddRow(create_hat(S_LAST_20_ISSUES,
 			new CSpan(S_LOADING_P,'textcolorstyles'),//make_latest_issues(),
 			array($refresh_menu),
 			'hat_lastiss',

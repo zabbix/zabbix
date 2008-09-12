@@ -109,18 +109,24 @@ include_once 'include/page_header.php';
 	if(!$ZBX_WITH_SUBNODES)	array_push($options,"only_current_node");
 	
 	validate_group_with_host(PERM_READ_ONLY,$options);
-
+	
 	if($_REQUEST['graphid']>0){
-		$result=DBselect('SELECT g.graphid '.
-					' FROM graphs g, graphs_items gi, items i, hosts_groups hg'.
-					' WHERE g.graphid='.$_REQUEST['graphid'].
-						' AND gi.graphid=g.graphid '.
-						' AND i.itemid=gi.itemid '.
-						' AND hg.hostid=i.hostid '.
-						($_REQUEST['hostid']?' AND i.hostid='.$_REQUEST['hostid']:'').
-						($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'')
-					);
+		$sql_from = '';
+		$sql_where = '';
+		if($_REQUEST['groupid'] > 0){
+			$sql_from .= ',hosts_groups hg ';
+			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+		}
+		
+		$sql = 'SELECT g.graphid '.
+				' FROM graphs g, graphs_items gi, items i'.$sql_from.
+				' WHERE g.graphid='.$_REQUEST['graphid'].
+					' AND gi.graphid=g.graphid '.
+					' AND i.itemid=gi.itemid '.
+					$sql_where.
+					($_REQUEST['hostid']?' AND i.hostid='.$_REQUEST['hostid']:'');
 
+		$result=DBselect($sql);
 		if(!DBfetch($result)) $_REQUEST['graphid'] = 0;
 	}
 
