@@ -804,7 +804,6 @@
 	'S_MONITORED_BY_PROXY'=>		'Monitored by proxy',
 
 // BEGIN: HOSTS PROFILE EXTENDED Section
-        'S_EXTANDED_HOST_PROFILE'=>				'EXTENDED HOST PROFILES',
         'S_USE_EXTENDED_PROFILE'=>				'Use extended profile',
         'S_DEVICE_ALIAS'=>                      'Alias',
         'S_DEVICE_TYPE'=>                       'Device Type',
@@ -1639,6 +1638,7 @@
 	'S_HOST_PROFILES'=>			'Host profiles',
 	'S_HOST_PROFILES_BIG'=>		'HOST PROFILES',
 	'S_EXTENDED_HOST_PROFILE'=>	'Extended host profile',
+	'S_EXTENDED'=>				'Extended',
 
 //	popup.php
 	'S_EMPTY'=>				'Empty',
