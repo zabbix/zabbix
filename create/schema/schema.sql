@@ -466,6 +466,10 @@ FIELD		|ipmi_authtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_privilege	|t_integer	|'2'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_username	|t_varchar(16)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_password	|t_varchar(20)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ipmi_disable_until|t_integer	|'0'	|NOT NULL	|0
+FIELD		|ipmi_available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|snmp_disable_until|t_integer	|'0'	|NOT NULL	|0
+FIELD		|snmp_available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
