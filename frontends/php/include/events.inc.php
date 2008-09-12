@@ -274,7 +274,7 @@ function make_small_eventlist($triggerid,&$trigger_data){
 			' FROM events '.
 			' WHERE objectid='.$triggerid.
 				' AND object='.EVENT_OBJECT_TRIGGER.
-			' ORDER BY clock DESC';
+			' ORDER BY object DESC, objectid DESC, eventid DESC';
 
 	$result = DBselect($sql,20);
 
