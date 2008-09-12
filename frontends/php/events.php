@@ -67,9 +67,9 @@
 		'show_unknown'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 				
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
 	$_REQUEST['source'] = get_request('source', get_profile('web.events.source', 0));
@@ -78,7 +78,10 @@
 //SDI($_REQUEST);
 /* AJAX */	
 	if(isset($_REQUEST['favobj'])){
-		if('filter' == $_REQUEST['favobj']){
+		if('hat' == $_REQUEST['favobj']){
+			update_profile('web.events.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
+		else if('filter' == $_REQUEST['favobj']){
 			update_profile('web.events.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}	
