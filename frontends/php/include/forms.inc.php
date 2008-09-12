@@ -2835,12 +2835,12 @@
 			$esc_period		= get_request('esc_period',0);
 			$status 		= get_request('status');
 			
-			$def_shortdata	= get_request('def_shortdata','');
-			$def_longdata	= get_request('def_longdata','');
+			$def_shortdata	= get_request('def_shortdata', ACTION_DEFAULT_MSG);
+			$def_longdata	= get_request('def_longdata', ACTION_DEFAULT_MSG);
 
 			$recovery_msg	= get_request('recovery_msg',0);			
-			$r_shortdata	= get_request('r_shortdata','');
-			$r_longdata		= get_request('r_longdata','');
+			$r_shortdata	= get_request('r_shortdata', ACTION_DEFAULT_MSG);
+			$r_longdata		= get_request('r_longdata', ACTION_DEFAULT_MSG);
 			
 			if(!$esc_period) unset($_REQUEST['escalation']);
 		}

@@ -249,6 +249,8 @@
 	define('MEDIA_TYPE_SMS',2);
 	define('MEDIA_TYPE_JABBER',3);
 
+	define('ACTION_DEFAULT_MSG', '{TRIGGER.NAME}: {STATUS}');
+	
 	define('ACTION_STATUS_ENABLED',0);
 	define('ACTION_STATUS_DISABLED',1);
 
