@@ -354,7 +354,7 @@ include_once 'include/page_header.php';
 				$p_elements,
 				array($icon,$fs_icon),
 				'hat_screens',
-				get_profile('web.charts.hats.hat_screens.state',1)
+				get_profile('web.screens.hats.hat_screens.state',1)
 		);
 		
 		$screens_hat->Show();
