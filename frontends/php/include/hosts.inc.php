@@ -1371,14 +1371,14 @@ require_once "include/httptest.inc.php";
 	function set_hosts_jsmenu_array($hostids = array()){
 		$menu_all = array();
 					
- 		$db_groups = DBselect('SELECT g.groupid, g.name '.
+ 		$db_groups = DBselect('SELECT DISTINCT g.groupid, g.name '.
 		 				' FROM groups g '.
+						' WHERE '.DBin_node('g.groupid').
  						' ORDER BY g.name,g.groupid');
 		
 		while($group=DBfetch($db_groups)){
 			$group['name'] = htmlspecialchars($group['name']);
-			
-			$menu_all[] = $group;			
+			$menu_all[] = $group;
 		}
 		insert_js('var menu_hstgrp_all='.zbx_jsvalue($menu_all).";\n");
 	}
@@ -1387,7 +1387,7 @@ require_once "include/httptest.inc.php";
 	function host_js_menu($hostid,$link_text = S_SELECT){
 		$hst_grp_all_in = array();
 		
-		$db_groups = DBselect('SELECT g.groupid, g.name '.
+		$db_groups = DBselect('SELECT DISTINCT g.groupid, g.name '.
 				' FROM groups g, hosts_groups hg '.
  				' WHERE g.groupid=hg.groupid '.
 					' AND hg.hostid='.$hostid.
