@@ -123,12 +123,12 @@
 	}
 	# Update Item definition for selected group
 
-	function	update_item_in_group($groupid,$itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$applications,$ipmi_sensor)
+	function	update_item_in_group($groupid,$itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications)
 	{
 		$sql="select i.itemid,i.hostid from hosts_groups hg,items i where hg.groupid=$groupid and i.key_=".zbx_dbstr($key)." and hg.hostid=i.hostid";
 		$result=DBexecute($sql);
 		while($row=DBfetch($result)){
-			update_item($row["itemid"],$description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$applications,$ipmi_sensor);
+			update_item($row["itemid"],$description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications);
 		}
 	return 1;
 	}
@@ -162,13 +162,13 @@
 
 	# Add Item definition to selected group
 
-	function	add_item_to_group($groupid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$applications,$ipmi_sensor)
+	function	add_item_to_group($groupid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications)
 	{
 		$sql="select hostid from hosts_groups where groupid=$groupid";
 		$result=DBexecute($sql);
 		while($row=DBfetch($result))
 		{
-			add_item($description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$applications,$ipmi_sensor);
+			add_item($description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications);
 		}
 		return 1;
 	}
@@ -182,7 +182,7 @@
 		$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,
 		$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,
 		$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,
-		$valuemapid,$delay_flex,$params,$applications,$ipmi_sensor,$templateid=0)
+		$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications,$templateid=0)
 	{
 
 		$host=get_host_by_hostid($hostid);
@@ -257,9 +257,9 @@
 				$value_type, $trapper_hosts, $snmp_port, $units, $multiplier,
 				$delta, $snmpv3_securityname, $snmpv3_securitylevel,
 				$snmpv3_authpassphrase, $snmpv3_privpassphrase, $formula,
-				$trends, $logtimefmt, $valuemapid, $delay_flex, $params,
+				$trends, $logtimefmt, $valuemapid, $delay_flex, $params,$ipmi_sensor,
 				get_same_applications_for_host($applications, $db_item['hostid']),
-				$ipmi_sensor,$templateid);
+				$templateid);
 
 			return $result;
 		}
@@ -272,13 +272,13 @@
 					'snmp_port,units,multiplier,'.
 					'delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,'.
 					'snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,'.
-					'delay_flex,params,templateid,ipmi_sensor)'.
+					'delay_flex,params,ipmi_sensor,templateid)'.
 			' VALUES ('.$itemid.','.zbx_dbstr($description).','.zbx_dbstr($key).','.$hostid.','.$delay.','.$history.',0,'.$status.','.$type.','.
 					zbx_dbstr($snmp_community).','.zbx_dbstr($snmp_oid).','.$value_type.','.zbx_dbstr($trapper_hosts).','.
 					$snmp_port.','.zbx_dbstr($units).','.$multiplier.','.
 					$delta.','.zbx_dbstr($snmpv3_securityname).','.$snmpv3_securitylevel.','.zbx_dbstr($snmpv3_authpassphrase).','.
 					zbx_dbstr($snmpv3_privpassphrase).','.zbx_dbstr($formula).','.$trends.','.zbx_dbstr($logtimefmt).','.$valuemapid.','.
-					zbx_dbstr($delay_flex).','.zbx_dbstr($params).','.$templateid.','.zbx_dbstr($ipmi_sensor).')'
+					zbx_dbstr($delay_flex).','.zbx_dbstr($params).','.zbx_dbstr($ipmi_sensor).','.$templateid.')'
 			);
 
 		if(!$result)
@@ -301,9 +301,9 @@
 				$value_type, $trapper_hosts, $snmp_port, $units, $multiplier,
 				$delta, $snmpv3_securityname, $snmpv3_securitylevel,
 				$snmpv3_authpassphrase, $snmpv3_privpassphrase, $formula,
-				$trends, $logtimefmt, $valuemapid,$delay_flex, $params,
+				$trends, $logtimefmt, $valuemapid,$delay_flex, $params, $ipmi_sensor,
 				get_same_applications_for_host($applications, $db_host["hostid"]),
-				$ipmi_sensor,$itemid);
+				$itemid);
 			if(!$result)
 				break;
 		}
@@ -317,43 +317,55 @@
 	return $result;
 	}
 
-	function	update_trigger_value_to_unknown_by_itemid($itemid)
-	{
+	function update_trigger_value_to_unknown_by_itemid($itemids){
+		zbx_value2array($itemids);
+		
 		$now = time();
-		$result = DBselect('select distinct t.triggerid'.
-				' from triggers t,functions f'.
-				' where f.triggerid=t.triggerid and f.itemid='.$itemid);
+		$result = DBselect('SELECT DISTINCT t.triggerid '.
+				' FROM triggers t,functions f '.
+				' WHERE f.triggerid=t.triggerid '.
+					' AND '.DBcondition('f.itemid',$itemids));
 
-		while ($row = DBfetch($result))
-		{
-			if (!add_event($row['triggerid'], TRIGGER_VALUE_UNKNOWN, $now))
+		$triggerids = array();
+		while($row = DBfetch($result)){
+			if(!add_event($row['triggerid'], TRIGGER_VALUE_UNKNOWN, $now))
 				continue;
-
-			DBexecute('update triggers set value='.TRIGGER_VALUE_UNKNOWN.' where triggerid='.$row['triggerid']);
+			$triggerids[$row['triggerid']] = $row['triggerid'];
+		}
+		
+		if(!empty($triggers)){
+			DBexecute('UPDATE triggers SET value='.TRIGGER_VALUE_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids));
 		}
 	}
 
-	# Update Item status
+// Update Item status
 
-	function	update_item_status($itemid, $status)
-	{
-		$row = DBfetch(DBselect('select status from items where itemid='.$itemid));
+	function update_item_status($itemids, $status){
+		zbx_value2array($itemids);
+		$result = true;
+		
+		$db_items = DBselect('SELECT itemid, status FROM items WHERE '.DBcondition('itemid',$itemids));
+		while($row = DBfetch($db_items)){
+			$old_status=$row['status'];
 
-		$old_status=$row["status"];
-
-		if ($status != $old_status)
-		{
-			update_trigger_value_to_unknown_by_itemid($itemid);
-
+			if($status == $old_status){
+				unset($itemids[$row['itemid']]);
+			}
+		}
+		if(!empty($itemids)){
+			update_trigger_value_to_unknown_by_itemid($itemids);
+			
 			if($status==ITEM_STATUS_ACTIVE)
-				$sql="update items set status=$status,error='',nextcheck=0 where itemid=$itemid";
+				$sql='UPDATE items SET status='.$status.",error='',nextcheck=0 ".
+					' WHERE '.DBcondition('itemid',$itemids);
 			else
-				$sql="update items set status=$status where itemid=$itemid";
-
+				$sql='UPDATE items SET status='.$status.
+					' WHERE '.DBcondition('itemid',$itemids);
+					
 			$result = DBexecute($sql);
 		}
-		else
-			return 1;
+
+	return $result;
 	}
 	
 	/******************************************************************************
@@ -364,7 +376,7 @@
 	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,
 		$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,
 		$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,
-		$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$applications,$ipmi_sensor,$templateid=0)
+		$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications,$templateid=0)
 	{
 		$host = get_host_by_hostid($hostid);
 
@@ -408,9 +420,9 @@
 				$value_type, $trapper_hosts, $snmp_port, $units, $multiplier,
 				$delta, $snmpv3_securityname, $snmpv3_securitylevel,
 				$snmpv3_authpassphrase, $snmpv3_privpassphrase, $formula,
-				$trends, $logtimefmt, $valuemapid,$delay_flex, $params,
+				$trends, $logtimefmt, $valuemapid,$delay_flex, $params, $ipmi_sensor,
 				get_same_applications_for_host($applications, $db_tmp_item["hostid"]),
-				$ipmi_sensor,$itemid);
+				$itemid);
 
 
 			if(!$result)
@@ -439,23 +451,25 @@
 			DBexecute("update items set error='' where itemid=$itemid and status<>$status");
 
 		$result=DBexecute(
-			"update items set description=".zbx_dbstr($description).",key_=".zbx_dbstr($key).",".
-			"hostid=$hostid,delay=$delay,history=$history,type=$type,".
-			"snmp_community=".zbx_dbstr($snmp_community).",snmp_oid=".zbx_dbstr($snmp_oid).",".
-			"value_type=$value_type,trapper_hosts=".zbx_dbstr($trapper_hosts).",".
-			"snmp_port=$snmp_port,units=".zbx_dbstr($units).",multiplier=$multiplier,delta=$delta,".
-			"snmpv3_securityname=".zbx_dbstr($snmpv3_securityname).",".
-			"snmpv3_securitylevel=$snmpv3_securitylevel,".
-			"snmpv3_authpassphrase=".zbx_dbstr($snmpv3_authpassphrase).",".
-			"snmpv3_privpassphrase=".zbx_dbstr($snmpv3_privpassphrase).",".
-			"formula=".zbx_dbstr($formula).",trends=$trends,logtimefmt=".zbx_dbstr($logtimefmt).",".
-			"valuemapid=$valuemapid,delay_flex=".zbx_dbstr($delay_flex).",params=".zbx_dbstr($params).",".
-			"templateid=$templateid,ipmi_sensor=".zbx_dbstr($ipmi_sensor)." where itemid=$itemid");
+			'UPDATE items '.
+			' SET description='.zbx_dbstr($description).',key_='.zbx_dbstr($key).','.
+				'hostid='.$hostid.',delay='.$delay.',history='.$history.',type='.$type.','.
+				'snmp_community='.zbx_dbstr($snmp_community).",snmp_oid=".zbx_dbstr($snmp_oid).','.
+				'value_type='.$value_type.',trapper_hosts='.zbx_dbstr($trapper_hosts).','.
+				'snmp_port='.$snmp_port.',units='.zbx_dbstr($units).',multiplier='.$multiplier.',delta='.$delta.','.
+				'snmpv3_securityname='.zbx_dbstr($snmpv3_securityname).','.
+				'snmpv3_securitylevel='.$snmpv3_securitylevel.','.
+				'snmpv3_authpassphrase='.zbx_dbstr($snmpv3_authpassphrase).','.
+				'snmpv3_privpassphrase='.zbx_dbstr($snmpv3_privpassphrase).','.
+				'formula='.zbx_dbstr($formula).",trends=$trends,logtimefmt=".zbx_dbstr($logtimefmt).','.
+				'valuemapid='.$valuemapid.',delay_flex='.zbx_dbstr($delay_flex).',params='.zbx_dbstr($params).','.
+				'ipmi_sensor='.zbx_dbstr($ipmi_sensor).','.
+				'templateid='.$templateid.
+			' WHERE itemid='.$itemid);
 
 		update_item_status($itemid, $status);
 
-		if($result)
-		{
+		if($result){
 			info("Item '".$host["host"].":$key' updated");
 		}
 		
@@ -477,7 +491,7 @@
 	function	smart_update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,
 		$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,
 		$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,
-		$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$applications,$ipmi_sensor)
+		$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications)
 	{
 		$restore_rules= array(
 					"description"		=> array(),
@@ -531,8 +545,9 @@
 			$multiplier,$delta,$snmpv3_securityname,
 			$snmpv3_securitylevel,$snmpv3_authpassphrase,
 			$snmpv3_privpassphrase,$formula,$trends,
-			$logtimefmt,$valuemapid,$delay_flex,$params,$applications,
-			$ipmi_sensor,$item_data['templateid']);
+			$logtimefmt,$valuemapid,$delay_flex,$params,
+			$ipmi_sensor,$applications,
+			$item_data['templateid']);
 	}
 
 	/*
@@ -613,8 +628,8 @@
 			$db_tmp_item["valuemapid"],
 			$db_tmp_item["delay_flex"],
 			$db_tmp_item["params"],
-			get_same_applications_for_host(get_applications_by_itemid($db_tmp_item["itemid"]),$hostid),
 			$db_tmp_item["ipmi_sensor"],
+			get_same_applications_for_host(get_applications_by_itemid($db_tmp_item["itemid"]),$hostid),
 			$copy_mode ? 0 : $db_tmp_item["itemid"]);
 			
 	return $result;
@@ -673,8 +688,8 @@
 				$db_tmp_item["valuemapid"],
 				$db_tmp_item["delay_flex"],
 				$db_tmp_item["params"],
-				get_same_applications_for_host(get_applications_by_itemid($db_tmp_item["itemid"]),$hostid),
 				$db_tmp_item["ipmi_sensor"],
+				get_same_applications_for_host(get_applications_by_itemid($db_tmp_item["itemid"]),$hostid),
 				$copy_mode ? 0 : $db_tmp_item["itemid"]);
 		}
 	}
@@ -694,7 +709,7 @@
 			activate_item($chd_items);  // Recursion !!!
 		}
 
-		return update_item_status($itemid, ITEM_STATUS_ACTIVE);
+	return update_item_status($itemids, ITEM_STATUS_ACTIVE);
 	}
 
 // Disable Item
@@ -711,7 +726,7 @@
 			disable_item($chd_items);  // Recursion !!!
 		}
 
-		return update_item_status($itemid, ITEM_STATUS_DISABLED);
+		return update_item_status($itemids, ITEM_STATUS_DISABLED);
 	}
 
 	function get_items_by_hostid($hostids){
