@@ -405,7 +405,6 @@ table.tabletree .imgnode:hover{
 }
 
 table.tabletree{
-	border: #000 1px solid;
 	empty-cells:show;
 	color: #000000;
 	width: 100%;
@@ -450,7 +449,7 @@ table.tabletree tr.odd_row td			{	background-color: #EEEEEE;}
 table.tabletree tr.odd_row:hover td		{	background-color: #DFDFDF;}
 
 table.tabletree tr.even_row td			{	background-color: #EEEEEE;}
-table.tabletree tr.even_row:hover td		{	background-color: #DFDFDF;}
+table.tabletree tr.even_row:hover td	{	background-color: #DFDFDF;}
 
 .tdtree{
 	width: 22px;

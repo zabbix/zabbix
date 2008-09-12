@@ -862,7 +862,7 @@
 
 		$db_graph = get_graph_by_graphid($graphid);
 
-		if ( ($new_gitems = get_same_graphitems_for_host($gitems, $hostid)) ){
+		if($new_gitems = get_same_graphitems_for_host($gitems, $hostid)){
 			unset($chd_graphid);
 			
 			$chd_graphs = get_graphs_by_hostid($hostid);
@@ -895,7 +895,7 @@
 
 				if(isset($equal) && (count($new_gitems) == $equal)){ 
 /* founded equal graph */
-					$chd_graphid = $chd_graph["graphid"];
+					$chd_graphid = $chd_graph['graphid'];
 					break;
 				}
 			}
