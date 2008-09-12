@@ -115,7 +115,7 @@ include_once 'include/page_header.php';
 		$sql_where = '';
 		if($_REQUEST['groupid'] > 0){
 			$sql_from .= ',hosts_groups hg ';
-			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+			$sql_where.= ' AND hg.hostid=i.hostid AND hg.groupid='.$_REQUEST['groupid'];
 		}
 		
 		$sql = 'SELECT g.graphid '.
