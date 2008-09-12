@@ -473,9 +473,15 @@ return $fav;
 function add2favorites($favobj,$favid,$source=null){
 	$favorites = get_favorites($favobj,get_current_nodeid(true));
 
+	foreach($favorites as $id => $favorite){
+		if(($favorite['source'] == $source) && ($favorite['value'] == $favid)){
+			return true;
+		}
+	}
+	 
 	$favorites[] = array('value' => $favid);
 	
-	$result = update_profile($favobj,$favorites,null,null,$source);
+	$result = update_profile($favobj,$favorites,PROFILE_TYPE_ARRAY_ID,null,$source);
 return $result;
 }
 
@@ -496,7 +502,7 @@ function rm4favorites($favobj,$favid,$favcnt=null,$source=null){
 		$favcnt--;
 	}
 
-	$result = update_profile($favobj,$favorites);
+	$result = update_profile($favobj,$favorites,PROFILE_TYPE_ARRAY_ID);
 return $result;
 }
 

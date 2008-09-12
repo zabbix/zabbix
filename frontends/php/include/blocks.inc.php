@@ -41,7 +41,7 @@ function make_favorite_graphs(){
 			$host = get_host_by_itemid($sourceid);
 			$item["description"] = item_description($item["description"],$item["key_"]);
 			
-			$link = new CLink(get_node_name_by_elid($sourceid).':'.$host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid).$host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$sourceid);
 			$link->SetTarget('blank');
 			
 			$capt = new CSpan($link);
@@ -73,7 +73,7 @@ function make_favorite_graphs(){
 			$capt)
 		));
 	}
-	$td = new CCol(array(new CButton(S_GRAPHS,S_GRAPHS,"javascript: location.href = 'charts.php'; return false;")));
+	$td = new CCol(array(new CLink(S_GRAPHS.' &raquo;','charts.php','highlight')));
 	$td->AddOption('style','text-align: right;');
 
 	$table->SetFooter($td);
@@ -125,7 +125,7 @@ function make_favorite_screens(){
 		));
 	}
 	
-	$td = new CCol(array(new CButton(S_SCREENS,S_SCREENS,"javascript: location.href = 'screens.php'; return false;")));
+	$td = new CCol(array(new CLink(S_SCREENS.' &raquo;','screens.php','highlight')));
 	$td->AddOption('style','text-align: right;');
 
 	$table->SetFooter($td);
@@ -163,7 +163,7 @@ function make_favorite_maps(){
 		));
 	}
 	
-	$td = new CCol(array(new CButton(S_MAPS,S_MAPS,"javascript: location.href = 'maps.php'; return false;")));
+	$td = new CCol(array(new CLink(S_MAPS.' &raquo;','maps.php','highlight')));
 	$td->AddOption('style','text-align: right;');
 
 	$table->SetFooter($td);
@@ -182,7 +182,7 @@ function make_system_summary(){
 	$table = new CTableInfo();
 	$table->SetHeader(array(
 		is_show_subnodes() ? S_NODE : null,
-		S_HOST_GROUPS,
+		S_HOST_GROUP,
 		S_DISASTER,
 		S_HIGH,
 		S_AVERAGE,
@@ -350,16 +350,14 @@ function make_status_of_zbx(){
 		array(
 			new CSpan($status['hosts_count_monitored'],'off'),' / ',
 			new CSpan($status['hosts_count_not_monitored'],'on'),' / ',
-			new CSpan($status['hosts_count_template'],'unknown'),' / ',
-			$status['hosts_count_deleted']
+			new CSpan($status['hosts_count_template'],'unknown')
 		)
 	));
 	$table->AddRow(array(S_NUMBER_OF_ITEMS,$status['items_count'],
 		array(
 			new CSpan($status['items_count_monitored'],'off'),' / ',
 			new CSpan($status['items_count_disabled'],'on'),' / ',
-			new CSpan($status['items_count_not_supported'],'unknown'),
-			SPACE.SPACE.'['.$status['items_count_trapper'].']'
+			new CSpan($status['items_count_not_supported'],'unknown')
 		)
 	));
 	$table->AddRow(array(S_NUMBER_OF_TRIGGERS,$status['triggers_count'],
@@ -536,7 +534,7 @@ function make_latest_issues(){
 //actions								
 			$actions = get_event_actions_stat_hints($row_event['eventid']);
 //--------			
-			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"events.php?triggerid=".$row["triggerid"].'&source=0',"action");
+			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'].'&source=0&nav_time='.$row['lastchange'],'action');
 			
 			$table->AddRow(array(
 				get_node_name_by_elid($row['triggerid']),
