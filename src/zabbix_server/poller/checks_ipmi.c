@@ -38,7 +38,7 @@ typedef struct zbx_ipmi_host {
 	char			*ip;
 	int			port;
 	int			authtype;
-	int			priviledge;
+	int			privilege;
 	char			*username;
 	char			*password;
 	zbx_ipmi_sensor_t	*sensors;
@@ -53,7 +53,7 @@ static zbx_ipmi_host_t	*hosts = NULL;
 static int		host_count = 0;
 static os_handler_t	*os_hnd;
 
-static zbx_ipmi_host_t	*get_ipmi_host(const char *ip, const int port, int authtype, int priviledge,
+static zbx_ipmi_host_t	*get_ipmi_host(const char *ip, const int port, int authtype, int privilege,
 		const char *username, const char *password)
 {
 	int	i;
@@ -61,17 +61,15 @@ static zbx_ipmi_host_t	*get_ipmi_host(const char *ip, const int port, int authty
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_ipmi_host([%s]:%d)", ip, port);
 
 	for (i = 0; i < host_count; i ++)
-	{
 		if (0 == strcmp(ip, hosts[i].ip) && port == hosts[i].port && authtype == hosts[i].authtype
-				&& priviledge == hosts[i].priviledge && 0 == strcmp(username, hosts[i].username)
+				&& privilege == hosts[i].privilege && 0 == strcmp(username, hosts[i].username)
 				&& 0 == strcmp(password, hosts[i].password))
 			return &hosts[i];
-	}
 
 	return NULL;
 }
 
-static zbx_ipmi_host_t  *allocate_ipmi_host(const char *ip, int port, int authtype, int priviledge,
+static zbx_ipmi_host_t  *allocate_ipmi_host(const char *ip, int port, int authtype, int privilege,
 		const char *username, const char *password)
 {
 	size_t		sz;
@@ -94,7 +92,7 @@ static zbx_ipmi_host_t  *allocate_ipmi_host(const char *ip, int port, int authty
 	h->ip = strdup(ip);
 	h->port = port;
 	h->authtype = authtype;
-	h->priviledge = priviledge;
+	h->privilege = privilege;
 	h->username = strdup(username);
 	h->password = strdup(password);
 
@@ -159,6 +157,30 @@ static zbx_ipmi_sensor_t	*allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t
 	return s;
 }
 
+static void	delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
+{
+	int	i;
+	size_t	sz;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In delete_ipmi_sensor()");
+
+	for (i = 0; i < h->sensor_count; i++)
+		if (h->sensors[i].sensor == sensor)
+		{
+			sz = sizeof(zbx_ipmi_sensor_t);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "Sensor %s@[%s]:%d deleted",
+					h->sensors[i].s_name, h->ip, h->port);
+
+			h->sensor_count--;
+			if (h->sensor_count != i)
+				memmove(&h->sensors[i], &h->sensors[i + 1], sz * (h->sensor_count - i));
+			h->sensors = zbx_realloc(h->sensors, sz * h->sensor_count);
+
+			break;
+		}
+}
+
 static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_present_e value_present,
 		unsigned int raw_value, double val, ipmi_states_t *states, void *cb_data)
 {
@@ -169,20 +191,21 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 	zbx_ipmi_host_t 	*h = cb_data;
 	zbx_ipmi_sensor_t	*s;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In got_thresh_reading()");
+
+	if (err) {
+		h->err = zbx_dsprintf(h->err, "Error 0x%x while read threshold sensor", err);
+		h->ret = NETWORK_ERROR;
+		h->done = 1;
+		return;
+	}
+
 	s = get_ipmi_sensor(h, sensor);
 
 	if (NULL == s)
 	{
 		/* this should never happen */
 		h->err = zbx_dsprintf(h->err, "Fatal error");
-		h->ret = NOTSUPPORTED;
-		h->done = 1;
-		return;
-	}
-
-	if (err) {
-		h->err = zbx_dsprintf(h->err, "Error 0x%x while read threshold sensor %s@[%s]:%d",
-				s->s_name, h->ip, h->port);
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
 		return;
@@ -286,6 +309,7 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 			s->s_name, h->ip, h->port);
 
 	h->ret = SUCCEED;
+	h->done = 0;
 
 	type = ipmi_sensor_get_event_reading_type(s->sensor);
 
@@ -314,7 +338,6 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 			}*/
 	}
 
-	h->done = 0;
 	tv.tv_sec = 10;
 	tv.tv_usec = 0;
 	while (0 == h->done)
@@ -327,26 +350,29 @@ static void	sensor_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In sensor_change()");
 
-	if (op == IPMI_ADDED) {
-		switch (ipmi_sensor_get_event_reading_type(sensor)) {
-			case IPMI_EVENT_READING_TYPE_THRESHOLD:
-			case IPMI_EVENT_READING_TYPE_DISCRETE_USAGE:
-			case IPMI_EVENT_READING_TYPE_DISCRETE_STATE:
-			case IPMI_EVENT_READING_TYPE_DISCRETE_PREDICTIVE_FAILURE:
-			case IPMI_EVENT_READING_TYPE_DISCRETE_LIMIT_EXCEEDED:
-			case IPMI_EVENT_READING_TYPE_DISCRETE_PERFORMANCE_MET:
-			case IPMI_EVENT_READING_TYPE_DISCRETE_SEVERITY:
-			case IPMI_EVENT_READING_TYPE_DISCRETE_DEVICE_PRESENCE:
-			case IPMI_EVENT_READING_TYPE_DISCRETE_DEVICE_ENABLE:
-			case IPMI_EVENT_READING_TYPE_DISCRETE_AVAILABILITY:
-			case IPMI_EVENT_READING_TYPE_DISCRETE_REDUNDANCY:
-			case IPMI_EVENT_READING_TYPE_DISCRETE_ACPI_POWER:
+	switch (ipmi_sensor_get_event_reading_type(sensor)) {
+		case IPMI_EVENT_READING_TYPE_THRESHOLD:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_USAGE:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_STATE:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_PREDICTIVE_FAILURE:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_LIMIT_EXCEEDED:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_PERFORMANCE_MET:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_SEVERITY:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_DEVICE_PRESENCE:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_DEVICE_ENABLE:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_AVAILABILITY:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_REDUNDANCY:
+		case IPMI_EVENT_READING_TYPE_DISCRETE_ACPI_POWER:
+			if (op == IPMI_ADDED)
+			{
 				if (NULL == get_ipmi_sensor(h, sensor))
 					allocate_ipmi_sensor(h, sensor);
-				break;
-			case IPMI_EVENT_READING_TYPE_SENSOR_SPECIFIC:
-				;	/* nothing */
-		}
+			}
+			else if (op == IPMI_DELETED)
+				delete_ipmi_sensor(h, sensor);
+			break;
+		case IPMI_EVENT_READING_TYPE_SENSOR_SPECIFIC:
+			;	/* nothing */
 	}
 }
 
@@ -364,12 +390,13 @@ static void	entity_change(enum ipmi_update_e op, ipmi_domain_t *domain, ipmi_ent
 	}
 }
 
-static void domain_closed(void *cb_data)
+static void	domain_closed(void *cb_data)
 {
 	zbx_ipmi_host_t *h = cb_data;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In domain_closed() [%s]:%d", h->ip, h->port);
 
+	h->domain_up = 0;
 	h->done = 1;
 }
 
@@ -379,16 +406,17 @@ static void	setup_done(ipmi_domain_t *domain, int err, unsigned int conn_num, un
 	int		ret;
 	zbx_ipmi_host_t *h = cb_data;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In setup_done() [%s]:%d err:%d", h->ip, h->port, err);
+	zabbix_log(LOG_LEVEL_DEBUG, "In setup_done() [%s]:%d", h->ip, h->port);
 
 	if (err)
 	{
-		h->err = zbx_dsprintf(h->err, "Cannot connect to IPMI host [%s]:%d. Error 0x%x %s",
-				h->ip, h->port, err, strerror(err));
+		h->err = zbx_dsprintf(h->err, "Cannot connect to IPMI host. Error 0x%x %s",
+				err, strerror(err));
 		h->ret = NETWORK_ERROR;
 
 		if (0 != (ret = ipmi_domain_close(domain, domain_closed, h)))
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot close IPMI domain. Error 0x%x", ret);
+		return;
 	}
 
 	if (0 != (ret = ipmi_domain_add_entity_update_handler(domain, entity_change, h)))
@@ -474,7 +502,7 @@ int	free_ipmi_handler()
 	return SUCCEED;
 }
 
-static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, int priviledge, const char *username, const char *password)
+static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, int privilege, const char *username, const char *password)
 {
 	zbx_ipmi_host_t		*h;
 	int			ret;
@@ -484,22 +512,23 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In init_ipmi_host([%s]:%d)", ip, port);
 
-	h = get_ipmi_host(ip, port, authtype, priviledge, username, password);
+	h = get_ipmi_host(ip, port, authtype, privilege, username, password);
 
 	if (NULL != h)
 	{
 		h->ret = SUCCEED;
+		h->done = 0;
 
 		if (1 == h->domain_up)
 			return h;
 	}
 	else
-		h = allocate_ipmi_host(ip, port, authtype, priviledge, username, password);
+		h = allocate_ipmi_host(ip, port, authtype, privilege, username, password);
 
 	addrs[0] = strdup(h->ip);
 	ports[0] = zbx_dsprintf(NULL, "%d", h->port);
 
-	if (0 != (ret = ipmi_ip_setup_con(addrs, ports, 1, h->authtype, h->priviledge, h->username,
+	if (0 != (ret = ipmi_ip_setup_con(addrs, ports, 1, h->authtype, h->privilege, h->username,
 			strlen(h->username), h->password, strlen(h->password), os_hnd, NULL, &h->con)))
 	{
 		h->err = zbx_dsprintf(h->err, "Cannot connect to IPMI host [%s]:%d."
@@ -532,7 +561,6 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 		goto out;
 	}
 
-	h->done = 0;
 	tv.tv_sec = 10;
 	tv.tv_usec = 0;
 	while (0 == h->done)
