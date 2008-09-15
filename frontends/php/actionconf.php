@@ -255,23 +255,24 @@ include_once 'include/page_header.php';
 
 			$_REQUEST['operations'] = get_request('operations',array());
 
-			if($new_operation['esc_step_from'] > $new_operation['esc_step_to']) {
-				$from	= $new_operation['esc_step_to'];
-				$new_operation['esc_step_to']	= $new_operation['esc_step_from'];
-				$new_operation['esc_step_from']	= $from;
-			}
 
-			if(!isset($new_operation['id'])){
-				if(!str_in_array($new_operation,$_REQUEST['operations']))
-					array_push($_REQUEST['operations'],$new_operation);
+			if(($new_operation['esc_step_from'] < $new_operation['esc_step_to']) || ($new_operation['esc_step_to']==0)) {
+
+				if(!isset($new_operation['id'])){
+					if(!str_in_array($new_operation,$_REQUEST['operations']))
+						array_push($_REQUEST['operations'],$new_operation);
+				}
+				else{
+					$id = $new_operation['id'];
+					unset($new_operation['id']);
+					$_REQUEST['operations'][$id] = $new_operation;
+				}
+	
+				unset($_REQUEST['new_operation']);
 			}
 			else{
-				$id = $new_operation['id'];
-				unset($new_operation['id']);
-				$_REQUEST['operations'][$id] = $new_operation;
+				info(S_INCORRECT_STEPS);
 			}
-
-			unset($_REQUEST['new_operation']);
 		}
 	}
 	else if(inarr_isset(array('del_operation','g_operationid'))){
