@@ -132,8 +132,8 @@ function get_accessible_scripts_by_hosts($hosts){
 	$hg_groups[] = 0;	// to ALL host groups
 // --
 
-	$hosts_read_only  = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-	$hosts_read_write = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
+	$hosts_read_only  = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$hosts_read_write = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 
 	$hosts_read_only = array_intersect($hosts,$hosts_read_only);
 	$hosts_read_write = array_intersect($hosts,$hosts_read_write);
@@ -144,14 +144,14 @@ function get_accessible_scripts_by_hosts($hosts){
 	}
 //-----
 	
-	$sql = 'SELECT s.* FROM scripts s'.
+	$sql = 'SELECT s.* '.
+			' FROM scripts s '.
 			' WHERE '.DBin_node('s.scriptid').
 				' AND '.DBcondition('s.groupid',$hg_groups).
 				' AND '.DBcondition('s.usrgrpid',$user_groups).
 			' ORDER BY scriptid ASC';
 
 	$res=DBselect($sql);
-	
 	while($script = DBfetch($res)){
 		$add_to_hosts = array();
 		if(PERM_READ_WRITE == $script['host_access']){
