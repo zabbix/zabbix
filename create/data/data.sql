@@ -27,8 +27,8 @@ INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00',7,1,7,100,'default.cs
 -- Dumping data for table `scripts`
 --
 
-INSERT INTO scripts VALUES (1,'Ping','/bin/ping -c 3 {HOST.CONN}',0,0,0);
-INSERT INTO scripts VALUES (2,'Traceroute','/usr/bin/traceroute {HOST.CONN}',0,0,0);
+INSERT INTO scripts VALUES (1,'Ping','/bin/ping -c 3 {HOST.CONN}',2,0,0);
+INSERT INTO scripts VALUES (2,'Traceroute','/usr/bin/traceroute {HOST.CONN}',2,0,0);
 
 --
 -- Dumping data for table `users`
