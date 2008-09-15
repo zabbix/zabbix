@@ -809,7 +809,7 @@
 // first delete child items
 		$del_cld_items = array();
 		$db_items = DBselect('SELECT itemid FROM items WHERE '.DBcondition('templateid',$itemids));
-		while($db_item = DBfetch($db_items)){// recursion
+		while($db_item = DBfetch($db_items)){		// recursion !!!!
 			$del_cld_items[$db_item['itemid']] = $db_item['itemid'];
 		}
 		if(!empty($del_cld_items)){
