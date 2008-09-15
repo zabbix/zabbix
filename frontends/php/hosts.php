@@ -88,10 +88,8 @@ include_once('include/page_header.php');
 		'location'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
 		'notes'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),	
 
-//BEGIN: HOSTS PROFILE EXTANDED Section		
 		'useprofile_ext'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
-		'ext_host_profiles'=> 	array(T_ZBX_STR, O_OPT, NULL,   NULL,   'isset({useprofile_ext})&&!isset({massupdate})'),
-//END:   HOSTS PROFILE EXTANDED Section		
+		'ext_host_profiles'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,   NULL,   NULL),
 
 /* mass update*/
 		'massupdate'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
@@ -131,7 +129,7 @@ include_once('include/page_header.php');
 		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
-//SDI($_REQUEST);
+
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 	
@@ -994,7 +992,7 @@ include_once('include/page_header.php');
 	}
 
 	$frmForm->AddItem($cmbConf);
-	if(isset($btn)){
+	if(isset($btn) && !isset($_REQUEST['form'])){
 		$frmForm->AddItem(SPACE);
 		$frmForm->AddItem($btn);
 	}
