@@ -767,7 +767,7 @@ else {
 		
 		if(zbx_empty($condition)) $condition = '0';
 
-	return '('.$fieldname.$in.'('.$condition.'))';
+	return ' ('.$fieldname.$in.'('.$condition.')) ';
 	}
 	
 ?>
