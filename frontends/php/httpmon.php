@@ -220,108 +220,134 @@ include_once "include/page_header.php";
 	else
 		$compare_host = ' AND '.DBcondition('h.hostid',$available_hosts);
 	
+	
+	$db_apps = array();
+	$db_appids = array();
+	
 	$sql = 'SELECT DISTINCT h.host,h.hostid,a.* '.
 			' FROM applications a,hosts h '.
 			' WHERE a.hostid=h.hostid '.
 				$compare_host.
 			order_by('a.applicationid,h.host,h.hostid','a.name');
-	$db_applications = DBselect($sql);
-	while($db_app = DBfetch($db_applications)){
+//SDI($sql);
+	$db_app_res = DBselect($sql);
+	while($db_app = DBfetch($db_app_res)){
+		$db_app['scenarios_cnt'] = 0;
+		
+		$db_apps[$db_app['applicationid']] = $db_app;
+		$db_appids[$db_app['applicationid']] = $db_app['applicationid'];
+	}
+
+
+	$sql = 'SELECT wt.*,a.name as application, h.host,h.hostid '.
+		' FROM httptest wt '.
+			' LEFT JOIN applications a on wt.applicationid=a.applicationid '.
+			' LEFT JOIN hosts h on h.hostid=a.hostid '.
+		' WHERE '.DBcondition('a.applicationid',$db_appids).
+			' AND wt.status <> 1 '.
+		order_by('wt.name','h.host');
+//SDI($sql);
+	$db_httptests_res = DBselect($sql);
+	while($httptest_data = DBfetch($db_httptests_res)){
+		$httptest_data['step_cout'] = null;
+		$db_apps[$httptest_data['applicationid']]['scenarios_cnt']++;
+		
+		$db_httptests[$httptest_data['httptestid']] = $httptest_data;
+		$db_httptestids[$httptest_data['httptestid']] = $httptest_data['httptestid'];
+	}
 	
-		$app_rows = array();
-		$httptest_cnt = 0;
+	$sql = 'SELECT hs.httptestid, COUNT(hs.httpstepid) as cnt '.
+			' FROM httpstep hs'.
+			' WHERE '.DBcondition('hs.httptestid',$db_httptestids).
+			' GROUP BY hs.httpstepid';
+	$httpstep_res = DBselect($sql);
+	while($step_cout = DBfetch($httpstep_res)){
+		$db_httptests[$step_cout['httptestid']]['step_cout'] = $step_cout['cnt'];
+	}
 
-		$sql = 'SELECT wt.*,a.name as application,h.host,h.hostid '.
-			' FROM httptest wt '.
-				' LEFT JOIN applications a on wt.applicationid=a.applicationid '.
-				' LEFT JOIN hosts h on h.hostid=a.hostid'.
-			' WHERE a.applicationid='.$db_app["applicationid"].
-				' AND wt.status <> 1'.
-			order_by('wt.name','h.host');
+	$tab_rows = array();	
+	foreach($db_httptests as $httptestid => $httptest_data){
+		$db_app = &$db_apps[$httptest_data['applicationid']];
 
-		$db_httptests = DBselect($sql);
-		while($httptest_data = DBfetch($db_httptests)){
-			++$httptest_cnt;
-			if(!uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
+		if(!isset($tab_rows[$db_app['applicationid']])) $tab_rows[$db_app['applicationid']] = array();
+		$app_rows = &$tab_rows[$db_app['applicationid']];
+		
+		if(!uint_in_array($db_app['applicationid'],$_REQUEST['applications']) && !isset($show_all_apps)) continue;
+				
+		$name = array();
+		array_push($name, new CLink($httptest_data['name'],'httpdetails.php?httptestid='.$httptest_data['httptestid'],'action'));
 
-			$name = array();
+		if(isset($httptest_data['lastcheck']))
+			$lastcheck = date(S_DATE_FORMAT_YMDHMS,$httptest_data['lastcheck']);
+		else
+			$lastcheck = new CCol('-', 'center');
 
-			array_push($name, new CLink($httptest_data["name"],"httpdetails.php?httptestid=".$httptest_data['httptestid'],'action'));
-	
-			$step_cout = DBfetch(DBselect('select count(*) as cnt from httpstep where httptestid='.$httptest_data["httptestid"]));
-			$step_cout = $step_cout['cnt'];
+		if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
+			$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['curstep']);
+			$state = S_IN_CHECK.' "'.$step_data['name'].'" ['.$httptest_data['curstep'].' '.S_OF_SMALL.' '.$httptest_data['step_cout'].']';
 
-			if(isset($httptest_data["lastcheck"]))
-				$lastcheck = date(S_DATE_FORMAT_YMDHMS,$httptest_data["lastcheck"]);
-			else
-				$lastcheck = new CCol('-', 'center');
+			$status['msg'] = S_IN_PROGRESS;
+			$status['style'] = 'orange';
+		}
+		else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] ){
+			$state = S_IDLE_TILL.' '.date(S_DATE_FORMAT_YMDHMS,$httptest_data['nextcheck']);
 
-			if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
-				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['curstep']);
-				$state = S_IN_CHECK.' "'.$step_data['name'].'" ['.$httptest_data['curstep'].' '.S_OF_SMALL.' '.$step_cout.']';
-
-				$status['msg'] = S_IN_PROGRESS;
-				$status['style'] = 'unknown';
-			}
-			else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] ){
-				$state = S_IDLE_TILL." ".date(S_DATE_FORMAT_YMDHMS,$httptest_data['nextcheck']);
-
-				if($httptest_data['lastfailedstep'] > 0){
-					$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep']);
-					$status['msg'] = S_FAILED_ON.' "'.$step_data['name'].'" '.
-						'['.$httptest_data['lastfailedstep'].' '.S_OF_SMALL.' '.$step_cout.'] '.
-						' '.S_ERROR.': '.$httptest_data['error'];
-					$status['style'] = 'disabled';
-				}
-				else{
-					$status['msg'] = S_OK_BIG;
-					$status['style'] = 'enabled';
-				}
+			if($httptest_data['lastfailedstep'] > 0){
+				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep']);
+				$status['msg'] = S_FAILED_ON.' "'.$step_data['name'].'" '.
+					'['.$httptest_data['lastfailedstep'].' '.S_OF_SMALL.' '.$httptest_data['step_cout'].'] '.
+					SPACE.S_ERROR.': '.$httptest_data['error'];
+				$status['style'] = 'disabled';
 			}
 			else{
-				$state = S_IDLE_TILL." ".date(S_DATE_FORMAT_YMDHMS,$httptest_data['nextcheck']);
-				$status['msg'] = S_UNKNOWN;
-				$status['style'] = 'unknown';
+				$status['msg'] = S_OK_BIG;
+				$status['style'] = 'enabled';
 			}
-
-			array_push($app_rows, new CRow(array(
-				is_show_subnodes() ? SPACE : null,
-				$_REQUEST["hostid"] > 0 ? NULL : SPACE,
-				array(str_repeat(SPACE,6), $name),
-				$step_cout,
-				$state,
-				$lastcheck,
-				new CSpan($status['msg'], $status['style'])
-				)));
 		}
-		if($httptest_cnt > 0){
-			if(uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps))
-				$link = new CLink(new CImg("images/general/opened.gif"),
-					"?close=1&applicationid=".$db_app["applicationid"].
-					url_param("groupid").url_param("hostid").url_param("applications").
-					url_param("select"));
-			else
-				$link = new CLink(new CImg("images/general/closed.gif"),
-					"?open=1&applicationid=".$db_app["applicationid"].
-					url_param("groupid").url_param("hostid").url_param("applications").
-					url_param("select"));
+		else{
+			$state = S_IDLE_TILL.' '.date(S_DATE_FORMAT_YMDHMS,$httptest_data['nextcheck']);
+			$status['msg'] = S_UNKNOWN;
+			$status['style'] = 'unknown';
+		}
 
-			$col = new CCol(array($link,SPACE,bold($db_app["name"]),
-				SPACE."(".$httptest_cnt.SPACE.S_SCENARIOS.")"));
-
-			$col->SetColSpan(6);
-
-			$table->AddRow(array(
-					get_node_name_by_elid($db_app['applicationid']),
-					$_REQUEST["hostid"] > 0 ? NULL : $db_app["host"],
-					$col
-				));
-
-			$any_app_exist = true;
+		array_push($app_rows, new CRow(array(
+			is_show_subnodes()?SPACE:NULL,
+			($_REQUEST['hostid']>0)?NULL:SPACE,
+			array(str_repeat(SPACE,6), $name),
+			$step_cout,
+			$state,
+			$lastcheck,
+			new CSpan($status['msg'], $status['style'])
+			)));
+	}
+	
+	foreach($tab_rows as $appid => $app_rows){
+		$db_app = &$db_apps[$appid];
 		
-			foreach($app_rows as $row)
-				$table->AddRow($row);
-		}
+		if(uint_in_array($db_app['applicationid'],$_REQUEST['applications']) || isset($show_all_apps))
+			$link = new CLink(new CImg('images/general/opened.gif'),
+				'?close=1&applicationid='.$db_app['applicationid'].
+				url_param('groupid').url_param('hostid').url_param('applications').
+				url_param('select'));
+		else
+			$link = new CLink(new CImg('images/general/closed.gif'),
+				'?open=1&applicationid='.$db_app['applicationid'].
+				url_param('groupid').url_param('hostid').url_param('applications').
+				url_param('select'));
+
+		$col = new CCol(array($link,SPACE,bold($db_app['name']),SPACE.'('.$db_app['scenarios_cnt'].SPACE.S_SCENARIOS.')'));
+		$col->SetColSpan(6);
+
+		$table->AddRow(array(
+				get_node_name_by_elid($db_app['applicationid']),
+				($_REQUEST['hostid'] > 0)?NULL:$db_app['host'],
+				$col
+			));
+
+		$any_app_exist = true;
+	
+		foreach($app_rows as $row)
+			$table->AddRow($row);
 	}
 
 	$form->AddItem($table);
