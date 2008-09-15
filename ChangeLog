@@ -1,6 +1,6 @@
 Changes for 1.5.5
 
- - [DEV-211] added support of IPMI sensors (Sasha)
+ - [DEV-211] added support of IPMI (Sasha)
  - [DEV-210] added extended host profile (Artem)
  - [DEV-208] improved events navigation system (Artem)
  - [DEV-207] implemented percentile line in graphs (Artem)
