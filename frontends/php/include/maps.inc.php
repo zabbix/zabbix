@@ -558,15 +558,19 @@
 				}
 			}
 
-			$tr_info[TRIGGER_VALUE_TRUE]['count'] = count($triggers);
-
-			if ($tr_info[TRIGGER_VALUE_TRUE]['count'] == 1)
+			$count = count($triggers);
+			if ($count > 0)
 			{
-				$db_trigger = DBfetch(DBselect('SELECT DISTINCT t.triggerid,t.priority,t.value,t.description'.
-						',t.expression,h.host FROM triggers t, items i, functions f, hosts h'.
-						' WHERE t.triggerid='.$triggers[0].' AND h.hostid=i.hostid'.
-						' AND i.itemid=f.itemid AND f.triggerid=t.triggerid'));
-				$tr_info[TRIGGER_VALUE_TRUE]['info'] =  expand_trigger_description_by_data($db_trigger);
+				$tr_info[TRIGGER_VALUE_TRUE]['count'] = $count;
+
+				if ($tr_info[TRIGGER_VALUE_TRUE]['count'] == 1)
+				{
+					$db_trigger = DBfetch(DBselect('SELECT DISTINCT t.triggerid,t.priority,t.value,t.description'.
+							',t.expression,h.host FROM triggers t, items i, functions f, hosts h'.
+							' WHERE t.triggerid='.$triggers[0].' AND h.hostid=i.hostid'.
+							' AND i.itemid=f.itemid AND f.triggerid=t.triggerid'));
+					$tr_info[TRIGGER_VALUE_TRUE]['info'] =  expand_trigger_description_by_data($db_trigger);
+				}
 			}
 		}
 
