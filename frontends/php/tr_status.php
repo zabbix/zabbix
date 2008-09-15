@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/hosts.inc.php";
-	require_once "include/acknow.inc.php";
-	require_once "include/triggers.inc.php";
-	require_once "include/events.inc.php";
-	require_once "include/scripts.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/acknow.inc.php');
+	require_once('include/triggers.inc.php');
+	require_once('include/events.inc.php');
+	require_once('include/scripts.inc.php');
 
 	$page["file"] = "tr_status.php";
 	$page["title"] = "S_STATUS_OF_TRIGGERS";
