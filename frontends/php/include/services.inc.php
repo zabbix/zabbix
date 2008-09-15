@@ -609,13 +609,13 @@ if($serviceid == 1 || $serviceid == 2){
 
 	function algorithm2str($algorithm){
 		if($algorithm == SERVICE_ALGORITHM_NONE){
-			return S_NONE;
+			return S_DO_NOT_CALCULATE;
 		}
 		elseif($algorithm == SERVICE_ALGORITHM_MAX){
-			return S_MAX_OF_CHILDS;
+			return S_PROBLEM_IF_AT_LEAST_ONE;
 		}
 		elseif($algorithm == SERVICE_ALGORITHM_MIN){
-			return S_MIN_OF_CHILDS;
+			return S_PROBLEM_IF_ALL;
 		}
 		return S_UNKNOWN;
 	}

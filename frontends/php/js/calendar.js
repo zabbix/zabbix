@@ -74,7 +74,7 @@ monthname: new Array('January','February','March','April','May','June','July','A
 initialize: function(stime, objects){
 	
 	if(!(this.status=this.checkOuterObj(objects))){
-		throw 'Calendar: constructor expects second parameter to be list of DOM nodes [d,M,Y,hh,i].';
+		throw 'Calendar: constructor expects second parameter to be list of DOM nodes [d,M,Y,H,i].';
 		return false;
 	}
 	
