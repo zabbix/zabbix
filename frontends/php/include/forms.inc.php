@@ -3294,7 +3294,7 @@
 			$esc_steps_txt = null;
 			$esc_period_txt = null;
 			$esc_delay_txt = null;
-			
+
 			if($val['esc_step_from'] < 1) $val['esc_step_from'] = 1;
 			
 			if(isset($_REQUEST['escalation'])){
