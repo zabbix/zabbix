@@ -77,8 +77,7 @@ include_once "include/page_header.php";
 	
 ?>
 <?php
-	if(inarr_isset(array('add_check', 'new_check_type', 'new_check_ports', 'new_check_key', 'new_check_snmp_community')))
-	{
+	if(inarr_isset(array('add_check', 'new_check_type', 'new_check_ports', 'new_check_key', 'new_check_snmp_community'))){
 		$new_dcheck = array(
 			'type' => $_REQUEST['new_check_type'],
 			'ports'=> $_REQUEST['new_check_ports'],
@@ -93,8 +92,7 @@ include_once "include/page_header.php";
 			unset($_REQUEST['dchecks'][$chk_id]);
 	}
 	else if(inarr_isset('save')){
-		if(inarr_isset('druleid'))
-		{ /* update */
+		if(inarr_isset('druleid')){ /* update */
 			$msg_ok = S_DISCOVERY_RULE_UPDATED;
 			$msg_fail = S_CANNOT_UPDATE_DISCOVERY_RULE;
 
@@ -103,8 +101,7 @@ include_once "include/page_header.php";
 
 			$druleid = $_REQUEST["druleid"];
 		}
-		else
-		{ /* add new */
+		else{ /* add new */
 			$msg_ok = S_DISCOVERY_RULE_ADDED;
 			$msg_fail = S_CANNOT_ADD_DISCOVERY_RULE;
 
@@ -116,25 +113,21 @@ include_once "include/page_header.php";
 		
 		show_messages($result, $msg_ok, $msg_fail);
 
-		if($result) // result - OK
-		{
+		if($result){ // result - OK
 			add_audit(!isset($_REQUEST["druleid"]) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
 				AUDIT_RESOURCE_DISCOVERY_RULE, '['.$druleid.'] '.$_REQUEST['name']);
 
 			unset($_REQUEST["form"]);
 		}
 	}
-	else if(inarr_isset(array('clone','druleid')))
-	{
+	else if(inarr_isset(array('clone','druleid'))){
 		unset($_REQUEST["druleid"]);
 		$_REQUEST["form"] = "clone";
 	}
-	else if(inarr_isset(array('delete', 'druleid')))
-	{
+	else if(inarr_isset(array('delete', 'druleid'))){
 		$result = delete_discovery_rule($_REQUEST['druleid']);
 		show_messages($result,S_DISCOVERY_RULE_DELETED,S_CANNOT_DELETE_DISCOVERY_RULE);
-		if($result)
-		{
+		if($result){
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_DISCOVERY_RULE,
 				'['.$_REQUEST['druleid'].']');
 			unset($_REQUEST['form']);
@@ -142,18 +135,14 @@ include_once "include/page_header.php";
 		}
 
 	}
-	else if(inarr_isset('g_druleid'))
-	{
-		if( inarr_isset('group_disable') || inarr_isset('group_enable') )
-		{
+	else if(inarr_isset('g_druleid')){
+		if(inarr_isset('group_disable') || inarr_isset('group_enable')){
 			$status = DRULE_STATUS_ACTIVE;
 			if(isset($_REQUEST['group_disable'])) $status = DRULE_STATUS_DISABLED;
 
 			$result = false;
-			foreach($_REQUEST['g_druleid'] as $drid)
-			{
-				if(set_discovery_rule_status($drid,$status))
-				{
+			foreach($_REQUEST['g_druleid'] as $drid){
+				if(set_discovery_rule_status($drid,$status)){
 					$rule_data = get_discovery_rule_by_druleid($drid);
 					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_DISCOVERY_RULE,
 						'['.$drid.'] '.$rule_data['name']);
@@ -162,13 +151,10 @@ include_once "include/page_header.php";
 			}
 			show_messages($result,S_DISCOVERY_RULES_UPDATED);
 		}
-		else if( inarr_isset('group_delete') )
-		{
+		else if( inarr_isset('group_delete') ){
 			$result = false;
-			foreach($_REQUEST['g_druleid'] as $drid)
-			{
-				if(delete_discovery_rule($drid))
-				{
+			foreach($_REQUEST['g_druleid'] as $drid){
+				if(delete_discovery_rule($drid)){
 					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_DISCOVERY_RULE,
 						'['.$drid.']');
 					$result = true;
@@ -183,17 +169,16 @@ include_once "include/page_header.php";
 	$form = new CForm();
 	$form->SetMethod('get');
 	
-	$form->AddItem(new CButton('form', S_CREATE_RULE));
+	if(!isset($_REQUEST["form"]))
+		$form->AddItem(new CButton('form', S_CREATE_RULE));
 	show_table_header(S_CONFIGURATION_OF_DISCOVERY_BIG, $form);
 	echo SBR;
 
-	if(isset($_REQUEST["form"]))
-	{
+	if(isset($_REQUEST["form"])){
 /* form */
 		insert_drule_form();
 	}
-	else
-	{
+	else{
 		show_table_header(S_DISCOVERY_BIG);
 /* table */
 		$form = new CForm();

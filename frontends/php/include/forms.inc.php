@@ -148,12 +148,11 @@
 
 	function insert_drule_form(){
 
-
 		$frm_title = S_DISCOVERY_RULE;
 			
 		if(isset($_REQUEST['druleid'])){
-			if( ($rule_data = DBfetch(DBselect("SELECT * FROM drules WHERE druleid=".$_REQUEST["druleid"]))))
-				$frm_title = S_DISCOVERY_RULE." \"".$rule_data["name"]."\"";
+			if( ($rule_data = DBfetch(DBselect('SELECT * FROM drules WHERE druleid='.$_REQUEST['druleid']))))
+				$frm_title = S_DISCOVERY_RULE.' "'.$rule_data['name'].'"';
 		}
 		
 		$form = new CFormTable($frm_title, null, 'post');
@@ -173,8 +172,7 @@
 			//TODO init checks
 			$dchecks = array();
 			$db_checks = DBselect('SELECT type,ports,key_,snmp_community FROM dchecks WHERE druleid='.$_REQUEST['druleid']);
-			while($check_data = DBfetch($db_checks))
-			{
+			while($check_data = DBfetch($db_checks)){
 				$dchecks[] = array( 'type' => $check_data['type'], 'ports' => $check_data['ports'] ,
 						'key' => $check_data['key_'], 'snmp_community' => $check_data['snmp_community']);
 			}
@@ -188,6 +186,7 @@
 
 			$dchecks	= get_request('dchecks',array());
 		}
+		
 		$new_check_type	= get_request('new_check_type', SVC_HTTP);
 		$new_check_ports= get_request('new_check_ports', '80');
 		$new_check_key= get_request('new_check_key', '');
@@ -198,9 +197,14 @@
 		$cmbProxy = new CComboBox("proxy_hostid", $proxy_hostid);
 
 		$cmbProxy->AddItem(0, S_NO_PROXY);
-		$db_proxies = DBselect('select hostid,host from hosts'.
-				' where status in ('.HOST_STATUS_PROXY.') and '.DBin_node('hostid'));
-		while ($db_proxy = DBfetch($db_proxies))
+		
+		$sql = 'SELECT hostid,host '.
+				' FROM hosts'.
+				' WHERE status IN ('.HOST_STATUS_PROXY.') '.
+					' AND '.DBin_node('hostid').
+				' ORDER BY host';
+		$db_proxies = DBselect($sql);
+		while($db_proxy = DBfetch($db_proxies))
 			$cmbProxy->AddItem($db_proxy['hostid'], $db_proxy['host']);
 
 		$form->AddRow(S_DISCOVERY_BY_PROXY,$cmbProxy);
