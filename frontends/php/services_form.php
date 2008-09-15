@@ -25,7 +25,8 @@
 	
 	$page["title"] = "S_IT_SERVICES";
 	$page["file"] = "services_form.php";
-	$page['scripts'] = array('services.js');
+	$page['scripts'] = array('services.js','calendar.js');
+
 	define('ZBX_PAGE_NO_MENU', 1);
 
 include_once "include/page_header.php";
@@ -339,25 +340,24 @@ if(isset($_REQUEST['sform'])){
 		$new_service_time['type'] = $_REQUEST["new_service_time"]['type'];
 
 		if($_REQUEST["new_service_time"]['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME){
-			$new_service_time['from'] = strtotime($_REQUEST["new_service_time"]['from']);
-			$new_service_time['to'] = strtotime($_REQUEST["new_service_time"]['to']);
+			$new_service_time['from'] = $_REQUEST['new_service_time']['from'];
+			$new_service_time['to'] = $_REQUEST['new_service_time']['to'];
 			$new_service_time['note'] = $_REQUEST["new_service_time"]['note'];
-		}else{
-			$new_service_time['from'] = strtotime(
-				$_REQUEST["new_service_time"]['from_week'].' '.$_REQUEST["new_service_time"]['from']
-				);
-			$new_service_time['to'] = strtotime(
-				$_REQUEST["new_service_time"]['to_week'].' '.$_REQUEST["new_service_time"]['to']
-				);
+		}
+		else{
+			$new_service_time['from'] = strtotime($_REQUEST["new_service_time"]['from_week'].' '.$_REQUEST["new_service_time"]['from']);
+			$new_service_time['to'] = strtotime($_REQUEST["new_service_time"]['to_week'].' '.$_REQUEST["new_service_time"]['to']);
 			$new_service_time['note'] = $_REQUEST["new_service_time"]['note'];
 		}
 		
-		while($new_service_time['to'] && ($new_service_time['to'] <= $new_service_time['from'])) $new_service_time['to'] += 7*24*3600;
+		while($new_service_time['to'] && ($new_service_time['to'] <= $new_service_time['from'])) 
+			$new_service_time['to'] += 7*24*3600;
 
 
 		if($new_service_time['to'] && !str_in_array($_REQUEST['service_times'], $new_service_time))
 			array_push($_REQUEST['service_times'],$new_service_time);
-	} elseif(isset($_REQUEST["del_service_times"]) && isset($_REQUEST["rem_service_times"])){
+	}
+	else if(isset($_REQUEST["del_service_times"]) && isset($_REQUEST["rem_service_times"])){
 		$_REQUEST["service_times"] = get_request("service_times",array());
 		foreach($_REQUEST["rem_service_times"] as $val){
 			unset($_REQUEST["service_times"][$val]);
@@ -439,35 +439,35 @@ if(isset($_REQUEST['sform'])){
 //---
 	}
 	else{
-		$name		= get_request("name","");
-		$showsla	= get_request("showsla",0);
-		$goodsla	= get_request("goodsla",99.05);
-		$sortorder	= get_request("sortorder",0);
-		$algorithm	= get_request("algorithm",0);
-		$triggerid	= get_request("triggerid",0);
-		$linktrigger	= get_request("linktrigger",0);
+		$name		= get_request('name','');
+		$showsla	= get_request('showsla',0);
+		$goodsla	= get_request('goodsla',99.05);
+		$sortorder	= get_request('sortorder',0);
+		$algorithm	= get_request('algorithm',SERVICE_ALGORITHM_MAX);
+		$triggerid	= get_request('triggerid',0);
+		$linktrigger	= get_request('linktrigger',0);
 //links
-		$parentid = get_request("parentid",0);
-		$parentname = get_request("parentname",'');
+		$parentid = get_request('parentid',0);
+		$parentname = get_request('parentname','');
 
 		$childs = get_request('childs',array());
 //-----
 	}
 
 	if(isset($service)){
-		$frmService->AddVar("serviceid",$service["serviceid"]);
+		$frmService->AddVar('serviceid',$service['serviceid']);
 	}
 	
-	$frmService->AddRow(S_NAME,new CTextBox("name",$name,60));
+	$frmService->AddRow(S_NAME,new CTextBox('name',$name,60));
 	
 //link
 //-------------------------------------------- <LINK> --------------------------------------------
 //parent link
-	$ctb = new CTextBox("parent_name",$parentname,60);
+	$ctb = new CTextBox('parent_name',$parentname,60);
 	$ctb->Addoption('disabled','disabled');
 
-	$frmService->AddVar("parentname",$parentname);
-	$frmService->AddVar("parentid",$parentid);
+	$frmService->AddVar('parentname',$parentname);
+	$frmService->AddVar('parentid',$parentid);
 
 	$cb = new CButton('select_parent',S_CHANGE);
 	$cb->SetType('button');
@@ -488,18 +488,18 @@ if(isset($_REQUEST['sform'])){
 	$table->headerClass = 'header';
 	$table->footerClass = 'footer';
 	
-	$table->SetHeader(array(new CCheckBox("all_child_services",null,"check_childs('".$frmService->GetName()."','childs','all_child_services');"),S_SERVICES,S_SOFT,S_TRIGGER));
+	$table->SetHeader(array(new CCheckBox('all_child_services',null,"check_childs('".$frmService->GetName()."','childs','all_child_services');"),S_SERVICES,S_SOFT,S_TRIGGER));
 
 	$table->AddOption('id','service_childs');
 
 	foreach($childs as $id => $child){
 		$prefix	 = null;
-		$trigger = "-";
+		$trigger = '-';
 		
 		$description = new CLink($child['name'],'services_form.php?sform=1&serviceid='.$child['serviceid'],'action');
 
-		if(isset($child["triggerid"]) && !empty($child["triggerid"])){
-			$trigger = expand_trigger_description($child["triggerid"]);
+		if(isset($child['triggerid']) && !empty($child['triggerid'])){
+			$trigger = expand_trigger_description($child['triggerid']);
 		}
 
 		$table->AddRow(array(
@@ -512,7 +512,7 @@ if(isset($_REQUEST['sform'])){
 					new CVar('childs['.$child['serviceid'].'][name]', $child['name'])
 					),
 				new CCheckBox(
-					'childs['.$child["serviceid"].'][soft]',
+					'childs['.$child['serviceid'].'][soft]',
 					(isset($child['soft']) && !empty($child['soft']))?('checked'):('no'),null,
 					(isset($child['soft']) && !empty($child['soft']))?(1):(0)
 					),
@@ -536,14 +536,14 @@ if(isset($_REQUEST['sform'])){
 //--------------------------------------------- </LINK> -------------------------------------------
 	
 //algorithm
-	$cmbAlg = new CComboBox("algorithm",$algorithm);
-	foreach(array(SERVICE_ALGORITHM_NONE, SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN) as $val)
+	$cmbAlg = new CComboBox('algorithm',$algorithm);
+	foreach(array(SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN, SERVICE_ALGORITHM_NONE) as $val)
 		$cmbAlg->AddItem($val,algorithm2str($val));
 	$frmService->AddRow(S_STATUS_CALCULATION_ALGORITHM, $cmbAlg);
 //-------
 
 //SLA
-	$frmService->AddRow(S_SHOW_SLA, new CCheckBox("showsla",$showsla,"javascript: display_element('sla_row');",1));
+	$frmService->AddRow(S_CALCULATE_SLA, new CCheckBox('showsla',$showsla,"javascript: display_element('sla_row');",1));
 
 	$row = new CRow(array(
 						new CCol(S_ACCEPTABLE_SLA_IN_PERCENT,'form_row_l'),
@@ -613,10 +613,82 @@ if(isset($_REQUEST['sform'])){
 	$div = new Ctag('div','yes');
 	
 	if($new_service_time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME){
-		$time_param->AddRow(array(S_NOTE, new CTextBox('new_service_time[note]','<short description>',40)));
-		$time_param->AddRow(array(S_FROM, new CTextBox('new_service_time[from]','d M Y H:i',20)));
-		$time_param->AddRow(array(S_TILL, new CTextBox('new_service_time[to]','d M Y H:i',20)));
-	}else{
+//		$time_param->AddRow(array(S_NOTE, new CTextBox('new_service_time[note]','<short description>',40)));
+//		$time_param->AddRow(array(S_FROM, new CTextBox('new_service_time[from]','d M Y H:i',20)));
+//		$time_param->AddRow(array(S_TILL, new CTextBox('new_service_time[to]','d M Y H:i',20)));
+		
+
+
+		$script = new CScript("javascript: if(CLNDR['downtime_since'].clndr.setSDateFromOuterObj()){".
+								"$('new_service_time[from]').value = parseInt(CLNDR['downtime_since'].clndr.sdt.getTime()/1000);}".
+							"if(CLNDR['downtime_till'].clndr.setSDateFromOuterObj()){". 
+								"$('new_service_time[to]').value = parseInt(CLNDR['downtime_till'].clndr.sdt.getTime()/1000);}"
+							);
+		$frmService->AddAction('onsubmit',$script);
+		$frmService->AddVar('new_service_time[from]','');
+		$frmService->AddVar('new_service_time[to]','');
+		
+		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
+		$clndr_icon->AddAction('onclick','javascript: var pos = getPosition(this);'.
+											' pos.top-=203; pos.left+=16; '.
+											" CLNDR['downtime_since'].clndr.clndrshow(pos.top,pos.left);"
+								);
+				
+		$filtertimetab = new CTable(null,'calendar');
+		$filtertimetab->AddOption('width','10%');
+		
+		$filtertimetab->SetCellPadding(0);
+		$filtertimetab->SetCellSpacing(0);
+	
+		$td_tmp = new CCol(new CTextBox('new_service_time[note]','<short description>',40));
+		$td_tmp->SetColSpan(10);
+		$filtertimetab->AddRow(array(S_NOTE, $td_tmp));
+		
+		$filtertimetab->AddRow(array(
+								S_FROM, 
+								new CNumericBox('downtime_since_day','',2),
+								'/',
+								new CNumericBox('downtime_since_month','',2),
+								'/',
+								new CNumericBox('downtime_since_year','',4),
+								SPACE,
+								new CNumericBox('downtime_since_hour','',2),
+								':',
+								new CNumericBox('downtime_since_minute','',2),
+								$clndr_icon
+						));
+		zbx_add_post_js('create_calendar('.
+							'null,'.
+							'["downtime_since_day","downtime_since_month","downtime_since_year","downtime_since_hour","downtime_since_minute"],'.
+							'"downtime_since");'
+						);
+
+		$clndr_icon->AddAction('onclick','javascript: var pos = getPosition(this);'.
+											' pos.top-=203; pos.left+=16; '.
+											" CLNDR['downtime_till'].clndr.clndrshow(pos.top,pos.left);"
+								);
+		$filtertimetab->AddRow(array(
+								S_TILL, 
+								new CNumericBox('downtime_till_day','',2),
+								'/',
+								new CNumericBox('downtime_till_month','',2),
+								'/',
+								new CNumericBox('downtime_till_year','',4),
+								SPACE,
+								new CNumericBox('downtime_till_hour','',2),
+								':',
+								new CNumericBox('downtime_till_minute','',2),
+								$clndr_icon
+						));
+		zbx_add_post_js('create_calendar('.
+							'null,'.
+							'["downtime_till_day","downtime_till_month","downtime_till_year","downtime_till_hour","downtime_till_minute"],'.
+							'"downtime_till");'
+						);
+		
+		$time_param->AddRow($filtertimetab);
+	}
+	else{
 		$cmbWeekFrom = new CComboBox('new_service_time[from_week]','Sunday');
 		$cmbWeekTo = new CComboBox('new_service_time[to_week]','Sunday');
 		foreach(array(
@@ -640,7 +712,7 @@ if(isset($_REQUEST['sform'])){
 
 	$frmService->AddRow(S_NEW_SERVICE_TIME, array(
 			$cmbTimeType, BR(), 
-			$time_param, BR(),
+			$time_param,
 			new CButton('add_service_time','add','javascript: document.forms[0].action += \'?sform=1\'; submit();')
 		));
 //trigger
@@ -648,7 +720,8 @@ if(isset($_REQUEST['sform'])){
 
 	if($triggerid > 0){
 		$trigger = expand_trigger_description($triggerid);
-	} else{
+	} 
+	else{
 		$trigger = "";
 	}
 	
