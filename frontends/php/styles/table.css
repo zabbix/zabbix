@@ -175,6 +175,11 @@ table.formtable tr td.form_row_r { /* right cell */
 	text-align: left;
 }
 
+table.formtable tr td.form_row_r table.calendar tr td{ /* right cell */
+	padding-left: 1px;
+	padding-right: 1px;
+}
+
 td.form_row_l_simple { /* left cell simple */
 	border-color:	#222255;
 	text-align:	left;
@@ -217,16 +222,23 @@ table.formlongtable tr.edit {
 	text-decoration: none;
 	background-color: #F0F0E0;
 }
+
 table.formlongtable tr.form_odd_row td{
 	text-decoration: none;
 	background-color:#D8D8D8;
 }
+
 table.formlongtable tr.form_even_row td{
 	text-decoration: none;
 	background-color:#DFDFDF;
 }
-table.formlongtable tr td.form_row_first
-{
+
+table.formlongtable tr td table.calendar tr td{ /* right cell */
+	padding-left: 1px;
+	padding-right: 1px;
+}
+
+table.formlongtable tr td.form_row_first{
 	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
 	color: #FFFFFF;
         font-size:11px;
