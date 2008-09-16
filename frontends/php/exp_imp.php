@@ -188,7 +188,8 @@ include_once "include/page_header.php";
 			$table->SetHeader(array(S_HOST, S_ELEMENTS));
 			$table->ShowStart();
 
-			$db_hosts = DBselect('SELECT * FROM hosts WHERE '.DBcondition('hostid',array_keys($hosts)));
+			$hostids = array_keys($hosts);
+			$db_hosts = DBselect('SELECT * FROM hosts WHERE '.DBcondition('hostid',$hostids));
 			while($host = DBfetch($db_hosts)){
 				$el_table = new CTableInfo(S_ONLY_HOST_INFO);
 				$sqls = array(
