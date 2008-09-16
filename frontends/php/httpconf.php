@@ -302,7 +302,8 @@ include_once "include/page_header.php";
 	
 	$form->AddVar("hostid",$_REQUEST["hostid"]);
 
-	$form->AddItem(new CButton("form",S_CREATE_SCENARIO));
+	if(!isset($_REQUEST['form']))
+		$form->AddItem(new CButton("form",S_CREATE_SCENARIO));
 
 	show_table_header(S_CONFIGURATION_OF_WEB_MONITORING_BIG, $form);
 	echo SBR;
