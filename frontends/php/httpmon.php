@@ -202,20 +202,17 @@ include_once "include/page_header.php";
 		S_STATUS));
 
 	$any_app_exist = false;
-
-	if($_REQUEST['hostid'] > 0)
-		$compare_host = ' AND h.hostid='.$_REQUEST['hostid'];
-	else
-		$compare_host = ' AND '.DBcondition('h.hostid',$available_hosts);
-	
 	
 	$db_apps = array();
 	$db_appids = array();
+	
+	$compare_host = ($_REQUEST['hostid']>0)?' AND h.hostid='.$_REQUEST['hostid']:'';
 	
 	$sql = 'SELECT DISTINCT h.host,h.hostid,a.* '.
 			' FROM applications a,hosts h '.
 			' WHERE a.hostid=h.hostid '.
 				$compare_host.
+				' AND '.DBcondition('h.hostid',$available_hosts).
 			order_by('a.applicationid,h.host,h.hostid','a.name');
 //SDI($sql);
 	$db_app_res = DBselect($sql);
@@ -311,6 +308,8 @@ include_once "include/page_header.php";
 			new CSpan($status['msg'], $status['style'])
 			)));
 	}
+	unset($app_rows);
+	unset($db_app);
 	
 	foreach($tab_rows as $appid => $app_rows){
 		$db_app = &$db_apps[$appid];
