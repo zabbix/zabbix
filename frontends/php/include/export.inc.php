@@ -382,6 +382,19 @@
 				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
 			}
 			
+			$sql = 'SELECT g.name '.
+					' FROM groups g, hosts_groups hg '.
+					' WHERE g.groupid=hg.groupid '.
+						' AND hg.hostid='.$hostid;
+			if($db_groups = DBselect($sql)){
+				zbx_xmlwriter_start_element ($memory,XML_TAG_GROUPS);
+				
+				while($group = DBfetch($db_groups)){
+					zbx_xmlwriter_write_element ($memory, XML_TAG_GROUP, $group['name']);
+				}
+				
+				zbx_xmlwriter_end_element($memory); // XML_TAG_GROUP
+			}
 // based on  mod by scricca
 			$data = DBfetch(DBselect('SELECT hp.* FROM hosts_profiles hp WHERE hp.hostid='.$hostid));
 			if($data){
@@ -425,19 +438,6 @@
 				zbx_xmlwriter_end_element($memory); // XML_TAG_HOSTPROFILE_EXT
 			}
 //--
-			$sql = 'SELECT g.name '.
-					' FROM groups g, hosts_groups hg '.
-					' WHERE g.groupid=hg.groupid '.
-						' and hg.hostid='.$hostid;
-			if($db_groups = DBselect()){
-				zbx_xmlwriter_start_element ($memory,XML_TAG_GROUPS);
-				
-				while($group = DBfetch($db_groups)){
-					zbx_xmlwriter_write_element ($memory, XML_TAG_GROUP, $group['name']);
-				}
-				
-				zbx_xmlwriter_end_element($memory); // XML_TAG_GROUP
-			}
 			
 			if($export_templates){
 				$sql = 'SELECT t.host '.
