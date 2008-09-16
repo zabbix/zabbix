@@ -100,7 +100,9 @@
 	}
 	
 	function create_hat($caption,$items,$addicons=null,$id=null,$state=1){
-	
+// dirty FIX !!!!!!!!!!!!!	 FIX this one
+		global $page;
+//---------------------------------------
 		if(is_null($id)){
 			list($usec, $sec) = explode(' ',microtime());	
 			$id = 'hat_'.((int)($sec % 10)).((int)($usec * 1000));
@@ -119,7 +121,12 @@
 		$icon->AddAction('onclick',new CScript("javascript: change_hat_state(this,'".$id."');"));
 		$icon->AddOption('title',S_SHOW.'/'.S_HIDE);
 
-		$icons_row[] = $icon;
+// dirty FIX !!!!!!!!!!!!!	 FIX this one
+		global $page;
+		if(!str_in_array($page['file'],array('charts.php','screens.php')))
+			$icons_row[] = $icon;
+//---------------------------------------
+//		$icons_row[] = $icon;
 
 		$icon_tab = new CTable();
 		$icon_tab->AddOption('width','100%');
