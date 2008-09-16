@@ -144,6 +144,7 @@ Changes for 1.5:
 
 Changes for 1.4.7:
 
+ - updated Russian locale (Sasha)
  - [ZBX-432] set trigger value to unknown if changed item status (Sahsa)
  - [ZBX-103] fixed escaping in sql queries (Sasha)
  - [ZBX-424] fixed possible server crash while importing XML (Sasha)
