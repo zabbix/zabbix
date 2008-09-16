@@ -4660,17 +4660,17 @@
 		else{
 			$original_templates = array();
 		}
-
+		
 		if(isset($_REQUEST['hostid']) && !isset($_REQUEST['form_refresh'])){
 			$proxy_hostid	= $db_host['proxy_hostid'];
-			$host		= $db_host['host'];
-			$port		= $db_host['port'];
-			$status		= $db_host['status'];
-			$useip		= $db_host['useip'];
-			$dns		= $db_host['dns'];
-			$ip		= $db_host['ip'];
-			$useipmi	= $db_host['useipmi'] ? 'yes' : 'no';
-			$ipmi_port	= $db_host['ipmi_port'];
+			$host			= $db_host['host'];
+			$port			= $db_host['port'];
+			$status			= $db_host['status'];
+			$useip			= $db_host['useip'];
+			$dns			= $db_host['dns'];
+			$ip				= $db_host['ip'];
+			$useipmi		= $db_host['useipmi'] ? 'yes' : 'no';
+			$ipmi_port		= $db_host['ipmi_port'];
 			$ipmi_username	= $db_host['ipmi_username'];
 			$ipmi_password	= $db_host['ipmi_password'];
 
@@ -4707,15 +4707,33 @@
 			}
 
 // BEGIN: HOSTS PROFILE EXTENDED Section
-			$db_profiles_alt = DBselect('SELECT * FROM hosts_profiles_ext		 WHERE hostid='.$_REQUEST['hostid']);
 			$useprofile_ext = 'no';
-
+			
+			$db_profiles_alt = DBselect('SELECT * FROM hosts_profiles_ext		 WHERE hostid='.$_REQUEST['hostid']);
 			if($ext_host_profiles = DBfetch($db_profiles_alt)){
 				$useprofile_ext = 'yes';
+			}
+			else{
+				$ext_host_profiles = array();
 			}
 // END:   HOSTS PROFILE EXTENDED Section
 
 			$templates = $original_templates;
+		}
+		
+		$ext_profiles_fields = array('device_alias','device_type','device_chassis','device_os','device_os_short',
+			'device_hw_arch','device_serial','device_model','device_tag','device_vendor','device_contract',
+			'device_who','device_status','device_app_01','device_app_02','device_app_03','device_app_04',
+			'device_app_05','device_url_1','device_url_2','device_url_3','device_networks','device_notes',
+			'device_hardware','device_software','ip_subnet_mask','ip_router','ip_macaddress','oob_ip',
+			'oob_subnet_mask','oob_router','date_hw_buy','date_hw_install','date_hw_expiry','date_hw_decomm','site_street_1',
+			'site_street_2','site_street_3','site_city','site_state','site_country','site_zip','site_rack','site_notes',
+			'poc_1_name','poc_1_email','poc_1_phone_1','poc_1_phone_2','poc_1_cell','poc_1_screen','poc_1_notes','poc_2_name',
+			'poc_2_email','poc_2_phone_1','poc_2_phone_2','poc_2_cell','poc_2_screen','poc_2_notes');
+
+		
+		foreach($ext_profiles_fields as $id => $field){
+			if(!isset($ext_host_profiles[$field])) $ext_host_profiles[$field] = '';
 		}
 
 		$clear_templates = array_intersect($clear_templates, array_keys($original_templates));
@@ -4819,23 +4837,19 @@
 					'T')
 				));
 
-		if ($show_only_tmp)
-		{
+		if($show_only_tmp){
 			$frmHost->AddVar('useipmi', $useipmi);
 		}
-		else
-		{
+		else{
 			$frmHost->AddRow(S_USEIPMI, new CCheckBox('useipmi', $useipmi, 'submit()'));
 		}
 
-		if ($useipmi == 'yes')
-		{
+		if($useipmi == 'yes'){
 			$frmHost->AddRow(S_IPMI_PORT, new CNumericBox('ipmi_port', $ipmi_port, 5));	
 			$frmHost->AddRow(S_IPMI_USERNAME, new CTextBox('ipmi_username', $ipmi_username, 16));
 			$frmHost->AddRow(S_IPMI_PASSWORD, new CTextBox('ipmi_password', $ipmi_password, 20));
 		}
-		else
-		{
+		else{
 			$frmHost->AddVar('ipmi_port', $ipmi_port);	
 			$frmHost->AddVar('ipmi_username', $ipmi_username);
 			$frmHost->AddVar('ipmi_password', $ipmi_password);
@@ -4851,6 +4865,7 @@
 			$frmHost->AddRow(S_USE_PROFILE,new CCheckBox('useprofile',$useprofile,'submit()'));
 			$frmHost->AddRow(S_USE_EXTENDED_PROFILE,new CCheckBox('useprofile_ext',$useprofile_ext,'submit()'));
 		}
+		
 		if($useprofile=='yes'){
 			$frmHost->AddRow(S_DEVICE_TYPE,new CTextBox("devicetype",$devicetype,61));
 			$frmHost->AddRow(S_NAME,new CTextBox("name",$name,61));
