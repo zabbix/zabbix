@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/hosts.inc.php";
-	require_once "include/items.inc.php";
+	require_once 'include/config.inc.php';
+	require_once 'include/hosts.inc.php';
+	require_once 'include/items.inc.php';
 
-	$page["title"] = "S_LATEST_VALUES";
-	$page["file"] = "latest.php";
+	$page['title'] = "S_LATEST_VALUES";
+	$page['file'] = 'latest.php';
 	$page['hist_arg'] = array('groupid','hostid','show','select','open','applicationid');
 //	$page['scripts'] = array('updater.js');
 	
@@ -37,22 +37,22 @@
 	}
 //	define('ZBX_PAGE_DO_JS_REFRESH', 1);
 	
-include_once "include/page_header.php";
+include_once 'include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"applications"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-		"applicationid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-		"close"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1"),	NULL),
-		"open"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1"),	NULL),
-		"groupbyapp"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1"),	NULL),
+		'applications'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
+		'applicationid'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
+		'close'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
+		'open'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
+		'groupbyapp'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
 
-		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
-		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
-		"select"=>		array(T_ZBX_STR, O_OPT, NULL,	NULL,		NULL),
+		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
+		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
+		'select'=>		array(T_ZBX_STR, O_OPT, NULL,	NULL,		NULL),
 
-		"show"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,		NULL),
+		'show'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,		NULL),
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 		
 //ajax
@@ -110,8 +110,8 @@ include_once "include/page_header.php";
 	$r_form = new CForm();
 	$r_form->SetMethod('get');
 
-//	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
-//	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
+//	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
+//	$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
 
 	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'javascript: submit();');
 	$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'javascript: submit();');
@@ -166,9 +166,9 @@ include_once "include/page_header.php";
 	$l_form = new CForm();
 	$l_form->SetMethod('get');
 	
-	$l_form->AddItem(array(S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE, new CTextBox("select",$_REQUEST["select"],20)));
-	$l_form->AddItem(array(SPACE, new CButton("show",S_SHOW,'javascript: submit();')));
-//	$l_form->AddItem(array(SPACE, new CButton("show",S_SHOW,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);")));
+	$l_form->AddItem(array(S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE, new CTextBox('select',$_REQUEST['select'],20)));
+	$l_form->AddItem(array(SPACE, new CButton('show',S_SHOW,'javascript: submit();')));
+//	$l_form->AddItem(array(SPACE, new CButton('show',S_SHOW,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);")));
 
 	$p_elements[] = get_table_header($l_form,$r_form);
 //-------------
@@ -229,7 +229,7 @@ include_once "include/page_header.php";
 	$table=new CTableInfo();
 	$table->SetHeader(array(
 		is_show_subnodes()?make_sorting_link(S_NODE,'h.hostid') : null,
-		($_REQUEST["hostid"] ==0)?make_sorting_link(S_HOST,'h.host') : NULL,
+		($_REQUEST['hostid'] ==0)?make_sorting_link(S_HOST,'h.host') : NULL,
 		array($link,SPACE,make_sorting_link(S_DESCRIPTION,'i.description')),
 		make_sorting_link(S_LAST_CHECK,'i.lastclock'),
 		S_LAST_VALUE,
@@ -238,234 +238,262 @@ include_once "include/page_header.php";
 		
 //	$table->ShowStart();
 
-	$compare_host = $_REQUEST['hostid']?' AND h.hostid='.$_REQUEST['hostid']:'';
-	$compare_host.= $_REQUEST['groupid']?' AND hg.hostid=h.hostid AND hg.groupid ='.$_REQUEST['groupid']:'';
-
-	$db_applications = DBselect('SELECT DISTINCT h.host,h.hostid,a.* '.
-					' FROM applications a, hosts h'.($_REQUEST['groupid']?', hosts_groups hg ':'').
-					' WHERE a.hostid=h.hostid'.
-						$compare_host.
-						' AND '.DBcondition('h.hostid',$available_hosts).
-						' AND h.status='.HOST_STATUS_MONITORED.
-					order_by('h.host,h.hostid','a.name,a.applicationid'));
-					
-	while($db_app = DBfetch($db_applications)){
-		$db_items = DBselect('SELECT DISTINCT i.* '.
-					' FROM items i,items_applications ia'.
-					' WHERE ia.applicationid='.$db_app['applicationid'].
-						' AND i.itemid=ia.itemid'.
-						' AND i.status='.ITEM_STATUS_ACTIVE.
-					order_by('i.description,i.itemid,i.lastclock'));
-
-		$app_rows = array();
-		$item_cnt = 0;
-		while($db_item = DBfetch($db_items)){
-			$description = item_description($db_item["description"],$db_item["key_"]);
-
-			if(!empty($_REQUEST["select"]) && !zbx_stristr($description, $_REQUEST["select"]) ) continue;
-
-			++$item_cnt;
-			if(!uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
-
-			if(isset($db_item["lastclock"]))
-				$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
-			else
-				$lastclock = new CCol('-', 'center');
-
-			$lastvalue=format_lastvalue($db_item);
-
-			if( isset($db_item["lastvalue"]) && isset($db_item["prevvalue"]) &&
-				($db_item["value_type"] == 0) && ($db_item["lastvalue"]-$db_item["prevvalue"] != 0) )
-			{
-				if($db_item["lastvalue"]-$db_item["prevvalue"]<0){
-					$change=convert_units($db_item["lastvalue"]-$db_item["prevvalue"],$db_item["units"]);
-				}
-				else{
-					$change="+".convert_units($db_item["lastvalue"]-$db_item["prevvalue"],$db_item["units"]);
-				}
-				$change=nbsp($change);
-			}
-			else{
-				$change=new CCol("-","center");
-			}
-			
-			if(($db_item["value_type"]==ITEM_VALUE_TYPE_FLOAT) || ($db_item["value_type"]==ITEM_VALUE_TYPE_UINT64)){
-				$actions=new CLink(S_GRAPH,"history.php?action=showgraph&itemid=".$db_item["itemid"],"action");
-			}
-			else{
-				$actions=new CLink(S_HISTORY,"history.php?action=showvalues&period=3600&itemid=".$db_item["itemid"],"action");
-			}
-			
-			array_push($app_rows, new CRow(array(
-				is_show_subnodes()?SPACE:null,
-				($_REQUEST["hostid"]>0)?NULL:SPACE,
-				str_repeat(SPACE,6).$description,
-				$lastclock,
-				new CCol($lastvalue, $lastvalue=='-' ? 'center' : null),
-				$change,
-				$actions
-				)));
-		}
-
-		if($item_cnt > 0){
-			if(uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps)){					
-				$url = '?close=1&applicationid='.$db_app["applicationid"].
-					url_param('groupid').
-					url_param('hostid').
-					url_param('applications').
-					url_param('fullscreen').
-					url_param('select');
-				$link = new CLink(new CImg('images/general/opened.gif'),$url);
-//				$link = new CLink(new CImg('images/general/opened.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
-			}
-			else{
-				$url = '?open=1&applicationid='.$db_app["applicationid"].
-					url_param('groupid').
-					url_param('hostid').
-					url_param('applications').
-					url_param('fullscreen').
-					url_param('select');
-				$link = new CLink(new CImg('images/general/closed.gif'),$url);
-//				$link = new CLink(new CImg('images/general/closed.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
-			}
-
-			$col = new CCol(array($link,SPACE,bold($db_app["name"]),SPACE.'('.$item_cnt.SPACE.S_ITEMS.')'));
-			$col->SetColSpan(5);
-
-			$table->AddRow(array(
-					get_node_name_by_elid($db_app['hostid']),
-					($_REQUEST["hostid"]>0)?NULL:$db_app["host"],
-					$col
-					));
-
-			foreach($app_rows as $row)	$table->AddRow($row);
-		}
-	}
+	$db_apps = array();
+	$db_appids = array();
 	
+	$sql_where.=($_REQUEST['hostid']>0)?' AND h.hostid='.$_REQUEST['hostid']:'';
+	
+	$sql = 'SELECT DISTINCT h.host,h.hostid, a.* '.
+			' FROM applications a, hosts h '.$sql_from.
+			' WHERE a.hostid=h.hostid'.
+				$sql_where.
+				' AND '.DBcondition('h.hostid',$available_hosts).
+				' AND h.status='.HOST_STATUS_MONITORED.
+			order_by('h.host,h.hostid','a.name,a.applicationid');
+//SDI($sql);
+	$db_app_res = DBselect($sql);
+	while($db_app = DBfetch($db_app_res)){
+		$db_app['item_cnt'] = 0;
+		
+		$db_apps[$db_app['applicationid']] = $db_app;
+		$db_appids[$db_app['applicationid']] = $db_app['applicationid'];
+	}
 
+	$tab_rows = array();
+
+	$sql = 'SELECT DISTINCT i.*, ia.applicationid '.
+			' FROM items i,items_applications ia'.
+			' WHERE '.DBcondition('ia.applicationid',$db_appids).
+				' AND i.itemid=ia.itemid'.
+				' AND i.status='.ITEM_STATUS_ACTIVE.
+			order_by('i.description,i.itemid,i.lastclock');
+//SDI($sql);
+	$db_items = DBselect($sql);
+	while($db_item = DBfetch($db_items)){
+		$description = item_description($db_item['description'],$db_item['key_']);
+
+		if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
+		
+		$db_app = &$db_apps[$db_item['applicationid']];
+
+		if(!isset($tab_rows[$db_app['applicationid']])) $tab_rows[$db_app['applicationid']] = array();
+		$app_rows = &$tab_rows[$db_app['applicationid']];
+
+		$db_app['item_cnt']++;
+		
+		if(!uint_in_array($db_app['applicationid'],$_REQUEST['applications']) && !isset($show_all_apps)) continue;
+
+		if(isset($db_item['lastclock']))
+			$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item['lastclock']);
+		else
+			$lastclock = new CCol('-', 'center');
+
+		$lastvalue=format_lastvalue($db_item);
+
+		if(isset($db_item['lastvalue']) && isset($db_item['prevvalue']) && ($db_item['value_type'] == 0) && ($db_item['lastvalue']-$db_item['prevvalue'] != 0)){
+			if($db_item['lastvalue']-$db_item['prevvalue']<0){
+				$change=convert_units($db_item['lastvalue']-$db_item['prevvalue'],$db_item['units']);
+			}
+			else{
+				$change='+'.convert_units($db_item['lastvalue']-$db_item['prevvalue'],$db_item['units']);
+			}
+			$change=nbsp($change);
+		}
+		else{
+			$change=new CCol('-','center');
+		}
+		
+		if(($db_item['value_type']==ITEM_VALUE_TYPE_FLOAT) || ($db_item['value_type']==ITEM_VALUE_TYPE_UINT64)){
+			$actions=new CLink(S_GRAPH,'history.php?action=showgraph&itemid='.$db_item['itemid'],'action');
+		}
+		else{
+			$actions=new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid'],'action');
+		}
+		
+		array_push($app_rows, new CRow(array(
+			is_show_subnodes()?SPACE:null,
+			($_REQUEST['hostid']>0)?NULL:SPACE,
+			str_repeat(SPACE,6).$description,
+			$lastclock,
+			new CCol($lastvalue, $lastvalue=='-' ? 'center' : null),
+			$change,
+			$actions
+			)));
+	}
+	unset($app_rows);
+	unset($db_app);
+
+	foreach($db_apps as $appid => $db_app){
+		if(!isset($tab_rows[$appid])) continue;
+
+		$app_rows = $tab_rows[$appid];
+
+		if(uint_in_array($db_app['applicationid'],$_REQUEST['applications']) || isset($show_all_apps)){					
+			$url = '?close=1&applicationid='.$db_app['applicationid'].
+				url_param('groupid').url_param('hostid').url_param('applications').
+				url_param('fullscreen').url_param('select');
+				
+			$link = new CLink(new CImg('images/general/opened.gif'),$url);
+//			$link = new CLink(new CImg('images/general/opened.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+		}
+		else{
+			$url = '?open=1&applicationid='.$db_app['applicationid'].
+					url_param('groupid').url_param('hostid').url_param('applications').
+					url_param('fullscreen').url_param('select');
+			$link = new CLink(new CImg('images/general/closed.gif'),$url);
+//			$link = new CLink(new CImg('images/general/closed.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+		}
+
+		$col = new CCol(array($link,SPACE,bold($db_app['name']),SPACE.'('.$db_app['item_cnt'].SPACE.S_ITEMS.')'));
+		$col->SetColSpan(5);
+
+		$table->AddRow(array(
+				get_node_name_by_elid($db_app['applicationid']),
+				($_REQUEST['hostid'] > 0)?NULL:$db_app['host'],
+				$col
+			));
+
+		foreach($app_rows as $row)
+			$table->AddRow($row);
+	}
+
+// OTHER ITEMS (which doesn't linked to application)
+	$db_hosts = array();
+	$db_hostids = array();
+	
 	$sql = 'SELECT DISTINCT h.host,h.hostid '.
-			' FROM hosts h'.($_REQUEST['groupid']?', hosts_groups hg ':'').', items i '.
+			' FROM hosts h'.$sql_from.', items i '.
 				' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
 			' WHERE ia.itemid is NULL '.
-				$compare_host.
+				$sql_where.
 				' AND h.hostid=i.hostid '.
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				' AND '.DBcondition('h.hostid',$available_hosts).
 			' ORDER BY h.host';
+
+	$db_host_res = DBselect($sql);
+	while($db_host = DBfetch($db_host_res)){
+		$db_host['item_cnt'] = 0;
 		
-	$db_appitems = DBselect($sql);
-	
-	while($db_appitem = DBfetch($db_appitems)){
-
-		$sql = 'SELECT h.host,h.hostid,i.* '.
-				' FROM hosts h'.($_REQUEST['groupid']?', hosts_groups hg ':'').', items i '.
-					' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
-				' WHERE ia.itemid is NULL '.
-					$compare_host.
-					' AND h.hostid=i.hostid '.
-					' AND h.status='.HOST_STATUS_MONITORED.
-					' AND i.status='.ITEM_STATUS_ACTIVE.
-					' AND h.hostid='.$db_appitem['hostid'].
-				' ORDER BY i.description,i.itemid';
-				
-		$db_items = DBselect($sql);
-	
-		$app_rows = array();
-		$item_cnt = 0;
-		
-		while($db_item = DBfetch($db_items)){
-			$description = item_description($db_item["description"],$db_item["key_"]);
-	
-			if(!empty($_REQUEST["select"]) && !zbx_stristr($description, $_REQUEST["select"]) ) continue;
-	
-			++$item_cnt;
-
-			if(!uint_in_array(0,$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
-	
-			if(isset($db_item["lastclock"]))
-				$lastclock=zbx_date2str(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
-			else
-				$lastclock = new CCol('-', 'center');
-	
-			$lastvalue=format_lastvalue($db_item);
-	
-			if( isset($db_item["lastvalue"]) && isset($db_item["prevvalue"]) &&
-				($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT || $db_item["value_type"] == ITEM_VALUE_TYPE_UINT64) &&
-				($db_item["lastvalue"]-$db_item["prevvalue"] != 0) )
-			{
-				if($db_item["lastvalue"]-$db_item["prevvalue"]<0){
-					$change=convert_units($db_item["lastvalue"]-$db_item["prevvalue"],$db_item["units"]);
-					$change=nbsp($change);
-				}
-				else{
-					$change="+".convert_units($db_item["lastvalue"]-$db_item["prevvalue"],$db_item["units"]);
-					$change=nbsp($change);
-				}
-			}
-			else{
-				$change=new CCol("-","center");
-			}
-			
-			if(($db_item["value_type"]==ITEM_VALUE_TYPE_FLOAT) || ($db_item["value_type"]==ITEM_VALUE_TYPE_UINT64)){
-				$actions=new CLink(S_GRAPH,"history.php?action=showgraph&itemid=".$db_item["itemid"],"action");
-			}
-			else{
-				$actions=new CLink(S_HISTORY,"history.php?action=showvalues&period=3600&itemid=".$db_item["itemid"],"action");
-			}
-			
-			array_push($app_rows, new CRow(array(
-				is_show_subnodes()?($item_cnt?SPACE:get_node_name_by_elid($db_item['itemid'])):null,
-				$_REQUEST["hostid"]?NULL:($item_cnt?SPACE:$db_item["host"]),
-				str_repeat(SPACE, 6).$description,
-				$lastclock,
-				new CCol($lastvalue, $lastvalue == '-' ? 'center' : null),
-				$change,
-				$actions
-				)));
-		}
-	
-		if($item_cnt > 0){
-
-			if(uint_in_array(0,$_REQUEST["applications"]) || isset($show_all_apps)){
-				$url = '?close=1&applicationid=0'.
-					url_param('groupid').
-					url_param('hostid').
-					url_param('applications').
-					url_param('select');
-				$link = new CLink(new CImg('images/general/opened.gif'),$url);
-//				$link = new CLink(new CImg('images/general/opened.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");				
-			}
-			else{
-				$url = '?open=1&applicationid=0'.
-					url_param('groupid').
-					url_param('hostid').
-					url_param('applications').
-					url_param('select');
-				$link = new CLink(new CImg('images/general/closed.gif'),$url);
-//				$link = new CLink(new CImg('images/general/closed.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
-			}
-
-			$col = new CCol(array($link,SPACE,bold(S_MINUS_OTHER_MINUS),SPACE.'('.$item_cnt.SPACE.S_ITEMS.')'));
-			$col->SetColSpan(5);
-			
-			$table->AddRow(array(
-					get_node_name_by_elid($db_appitem['hostid']),
-					$_REQUEST["hostid"] > 0 ? NULL : $db_appitem["host"],
-					$col
-					));	
-					
-			foreach($app_rows as $row)	$table->AddRow($row);
-		}
+		$db_hosts[$db_host['hostid']] = $db_host;
+		$db_hostids[$db_host['hostid']] = $db_host['hostid'];
 	}
-	
+
+	$tab_rows = array();
+
+	$sql = 'SELECT h.host,h.hostid,i.* '.
+			' FROM hosts h'.$sql_from.', items i '.
+				' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
+			' WHERE ia.itemid is NULL '.
+				$sql_where.
+				' AND h.hostid=i.hostid '.
+				' AND h.status='.HOST_STATUS_MONITORED.
+				' AND i.status='.ITEM_STATUS_ACTIVE.
+				' AND '.DBcondition('h.hostid',$db_hostids).
+			' ORDER BY i.description,i.itemid';
+
+	$db_items = DBselect($sql);
+	while($db_item = DBfetch($db_items)){
+		
+		$description = item_description($db_item['description'],$db_item['key_']);
+
+		if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;		
+
+		$db_host = &$db_hosts[$db_item['hostid']];
+		
+		if(!isset($tab_rows[$db_host['hostid']])) $tab_rows[$db_host['hostid']] = array();
+		$app_rows = &$tab_rows[$db_host['hostid']];
+
+		$db_host['item_cnt']++;
+
+		if(!uint_in_array(0,$_REQUEST['applications']) && !isset($show_all_apps)) continue;
+
+
+		if(isset($db_item['lastclock']))
+			$lastclock=zbx_date2str(S_DATE_FORMAT_YMDHMS,$db_item['lastclock']);
+		else
+			$lastclock = new CCol('-', 'center');
+
+		$lastvalue=format_lastvalue($db_item);
+
+		if( isset($db_item['lastvalue']) && isset($db_item['prevvalue']) &&
+			($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64) &&
+			($db_item['lastvalue']-$db_item['prevvalue'] != 0) )
+		{
+			if($db_item['lastvalue']-$db_item['prevvalue']<0){
+				$change=convert_units($db_item['lastvalue']-$db_item['prevvalue'],$db_item['units']);
+				$change=nbsp($change);
+			}
+			else{
+				$change='+'.convert_units($db_item['lastvalue']-$db_item['prevvalue'],$db_item['units']);
+				$change=nbsp($change);
+			}
+		}
+		else{
+			$change=new CCol('-','center');
+		}
+		
+		if(($db_item['value_type']==ITEM_VALUE_TYPE_FLOAT) || ($db_item['value_type']==ITEM_VALUE_TYPE_UINT64)){
+			$actions=new CLink(S_GRAPH,'history.php?action=showgraph&itemid='.$db_item['itemid'],'action');
+		}
+		else{
+			$actions=new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid'],'action');
+		}
+		
+		array_push($app_rows, new CRow(array(
+			is_show_subnodes()?($item_cnt?SPACE:get_node_name_by_elid($db_item['itemid'])):null,
+			$_REQUEST['hostid']?NULL:($db_host['item_cnt']?SPACE:$db_item['host']),
+			str_repeat(SPACE, 6).$description,
+			$lastclock,
+			new CCol($lastvalue, $lastvalue == '-' ? 'center' : null),
+			$change,
+			$actions
+			)));
+	}
+	unset($app_rows);
+	unset($db_host);
+
+	foreach($db_hosts as $hostid => $db_host){
+
+		if(!isset($tab_rows[$hostid])) continue;
+		$app_rows = $tab_rows[$hostid];
+
+		if(uint_in_array(0,$_REQUEST['applications']) || isset($show_all_apps)){
+			$url = '?close=1&applicationid=0'.
+				url_param('groupid').url_param('hostid').
+				url_param('applications').url_param('select');
+			$link = new CLink(new CImg('images/general/opened.gif'),$url);
+//			$link = new CLink(new CImg('images/general/opened.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");				
+		}
+		else{
+			$url = '?open=1&applicationid=0'.
+				url_param('groupid').url_param('hostid').
+				url_param('applications').url_param('select');
+			$link = new CLink(new CImg('images/general/closed.gif'),$url);
+//			$link = new CLink(new CImg('images/general/closed.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+		}
+
+		$col = new CCol(array($link,SPACE,bold(S_MINUS_OTHER_MINUS),SPACE.'('.$db_host['item_cnt'].SPACE.S_ITEMS.')'));
+		$col->SetColSpan(5);
+		
+		$table->AddRow(array(
+				get_node_name_by_elid($db_host['hostid']),
+				($_REQUEST['hostid'] > 0)?NULL:$db_host['host'],
+				$col
+				));	
+
+		foreach($app_rows as $row)
+			$table->AddRow($row);
+	}
+
 	$p_elements[] = $table;
 
 /*
 // Refresh tab
 	$refresh_tab = array(
 		array('id'	=> ZBX_PAGE_MAIN_HAT,
-				'interval' 	=> $USER_DETAILS["refresh"],
+				'interval' 	=> $USER_DETAILS['refresh'],
 				'url'	=>	zbx_empty($_SERVER['QUERY_STRING'])?'':'?'.$_SERVER['QUERY_STRING'],
 			)
 	);
@@ -491,5 +519,5 @@ include_once "include/page_header.php";
 //	add_refresh_objects($refresh_tab);
 ?>
 <?php
-include_once "include/page_footer.php";
+include_once 'include/page_footer.php';
 ?>

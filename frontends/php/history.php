@@ -142,10 +142,11 @@ include_once "include/page_header.php";
 		access_deny();
 	}
 	
-	$item_data = DBfetch(DBselect('SELECT h.host,i.hostid,i.* '.
-							' FROM items i,hosts h '.
-							' WHERE i.itemid in ('.(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).') '.
-								' AND h.hostid=i.hostid '));
+	$sql = 'SELECT h.host,i.hostid,i.* '.
+			' FROM items i,hosts h '.
+			' WHERE i.itemid in ('.(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).') '.
+				' AND h.hostid=i.hostid ';
+	$item_data = DBfetch(DBselect($sql));
 
 	$item_type = $item_data["value_type"];
 	$l_header = null;
@@ -240,10 +241,10 @@ include_once "include/page_header.php";
 		$cmbAction = new CComboBox("action",$_REQUEST["action"],"submit()");
 
 		if(str_in_array($item_type,array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))){
-			$cmbAction->AddItem("showgraph",S_GRAPH_OF_SPECIFIED_PERIOD);
+			$cmbAction->AddItem("showgraph",S_GRAPH);
 		}
 
-		$cmbAction->AddItem("showvalues",S_VALUES_OF_SPECIFIED_PERIOD);
+		$cmbAction->AddItem("showvalues",S_VALUES);
 		$cmbAction->AddItem("showlatest",S_500_LATEST_VALUES);
 
 		$form->AddItem($cmbAction);
