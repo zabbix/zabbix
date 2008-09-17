@@ -247,6 +247,7 @@ static void run_remote_command(char* host_name, char* command)
 		while (*p == ' ' && *p != '\0')
 			p++;
 
+#ifdef HAVE_OPENIPMI
 		if (0 == strncmp(p, "IPMI", 4))
 		{
 			if (SUCCEED == (ret = parse_ipmi_command(p, &item.ipmi_sensor, &val)))
@@ -254,6 +255,7 @@ static void run_remote_command(char* host_name, char* command)
 		}
 		else
 		{
+#endif
 			zbx_snprintf(item.key, ITEM_KEY_LEN_MAX, "system.run[%s,nowait]", p);
 
 			alarm(CONFIG_TIMEOUT);
@@ -261,7 +263,9 @@ static void run_remote_command(char* host_name, char* command)
 			ret = get_value_agent(&item, &agent_result);
 
 			alarm(0);
+#ifdef HAVE_OPENIPMI
 		}
+#endif
 	}
 	DBfree_result(result);
 	
