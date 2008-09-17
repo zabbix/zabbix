@@ -214,8 +214,8 @@ setSDateFromOuterObj: function(){
 				result = this.setSDateDMY(val[0],val[1],val[2]);
 
 				if(val.length>4){
-					val[3] = parseInt(val[3]);
-					val[4] = parseInt(val[4]);
+					val[3] = parseInt(val[3],10);
+					val[4] = parseInt(val[4],10);
 				
 					if((val[3] > -1) && (val[3] < 24)){
 						this.sdt.setHours(val[3]);
@@ -244,9 +244,9 @@ setSDateFromOuterObj: function(){
 },
 
 setSDateDMY: function(d,m,y){
-	d = parseInt(d);
-	m = parseInt(m);
-	y = parseInt(y);
+	d = parseInt(d,10);
+	m = parseInt(m,10);
+	y = parseInt(y,10);
 
 	var result = false;
 	if((m > 0) && (m < 13)){
@@ -354,7 +354,7 @@ setDateToOuterObj: function(){
 },
 
 setminute: function(){
-	var minute = parseInt(this.clndr_minute.value);
+	var minute = parseInt(this.clndr_minute.value,10);
 	if((minute>-1) && (minute < 60)){
 		this.minute = minute;
 		this.syncSDT();
@@ -365,7 +365,7 @@ setminute: function(){
 },
 
 sethour: function(){
-	var hour = parseInt(this.clndr_hour.value);
+	var hour = parseInt(this.clndr_hour.value,10);
 	if((hour>-1) && (hour < 24)){
 		this.hour = hour;
 		this.syncSDT();
