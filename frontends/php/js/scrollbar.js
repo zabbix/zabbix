@@ -231,7 +231,7 @@ arrowmousedown: function(e){
 	
 	this.arrow = e.originalTarget || e.srcElement;
 	
-	this.arrowmouseStartX = parseInt(this.getmousexy(e).x);
+	this.arrowmouseStartX = parseInt(this.getmousexy(e).x,10);
 	this.prevmouseX = this.arrowmouseStartX;
 	
 	this.barStartX = this.barX;
@@ -265,7 +265,7 @@ arrowmousemove: function(e){
 
 arrowmousemove_L: function(e){
 	var mousexy = this.getmousexy(e);
-	var mouseXdiff = parseInt(mousexy.x) - parseInt(this.arrowmouseStartX);
+	var mouseXdiff = parseInt(mousexy.x,10) - parseInt(this.arrowmouseStartX,10);
 
 	if((this.barW < this.minbarW) && ( mouseXdiff > 0))	return false;
 
@@ -275,17 +275,17 @@ arrowmousemove_L: function(e){
 	var PrevbarX = this.barX;
 	var tmp = (mousexy.x-this.prevmouseX);
 	if((mousexy.x-this.prevmouseX) < 0){
-		this.barX = parseInt(this.barStartX + mouseXdiff);
+		this.barX = parseInt(this.barStartX + mouseXdiff,10);
 		this.barX = this.checkbarX(mousexy.x);
 
 		this.barW = this.barW + (barXtemp - this.barX);
 		this.barW = this.checkbarW(this.prevmouseX);
 	}
 	else{
-		this.barW = parseInt(this.barStartW - mouseXdiff);
+		this.barW = parseInt(this.barStartW - mouseXdiff,10);
 		this.barW = this.checkbarW(mousexy.x);
 		
-		this.barX = parseInt(this.barX+(barWtemp-this.barW));
+		this.barX = parseInt(this.barX+(barWtemp-this.barW),10);
 		this.barX = this.checkbarX(this.prevmouseX);
 	}
 //SDI('LEFT: X:'+this.barX+' Width: '+this.barW+' Diff: '+mouseXdiff+' Mx: '+mousexy.x+'  PMx: '+this.prevmouseX);
@@ -297,9 +297,9 @@ arrowmousemove_L: function(e){
 
 arrowmousemove_R: function(e){
 	var mousexy = this.getmousexy(e);
-	var mouseXdiff = parseInt(mousexy.x) - parseInt(this.arrowmouseStartX);
+	var mouseXdiff = parseInt(mousexy.x,10) - parseInt(this.arrowmouseStartX,10);
 
-	this.barW = parseInt(this.barStartW) + parseInt(mouseXdiff);
+	this.barW = parseInt(this.barStartW,10) + parseInt(mouseXdiff,10);
 	this.barW = this.checkbarW(mousexy.x);
 
 //SDI('RIGHT: X:'+this.barX+' Width: '+this.barW+' Diff: '+mouseXdiff);
@@ -364,9 +364,9 @@ mousemove: function(e){
 	e = e || window.event;
 		
 	var mousexy = this.getmousexy(e);
-	var mouseXdiff = parseInt(mousexy.x) - parseInt(this.mouseStartX);
+	var mouseXdiff = parseInt(mousexy.x,10) - parseInt(this.mouseStartX,10);
 	
-	this.barX = parseInt(this.barStartX + mouseXdiff);
+	this.barX = parseInt(this.barStartX + mouseXdiff,10);
 	this.barX = this.checkbarX(mousexy.x);
 	
 	this.barmovetoX();
@@ -406,7 +406,7 @@ arrowmovelefttoX: function(){
 
 arrowmoverighttoX: function(){
 	var x = this.barX;
-	x += parseInt(this.barW)+17;
+	x += parseInt(this.barW,10)+17;
 	this.scrl_arrowright.setStyle({left: x+'px'});
 },
 //-------------------------------
