@@ -893,6 +893,14 @@ class Chart extends Graph{
 				
 				$this->m_maxY[$side] += $first_delta;
 				$this->m_minY[$side] -= ($value_delta2-$value_delta) - $first_delta;
+				
+				if($this->yaxistype==GRAPH_YAXIS_TYPE_FIXED){
+					$this->m_minY[$side] = $this->yaxismin;
+					$this->m_maxY[$side] = $this->yaxismax;
+				}
+				else if($this->yaxistype==GRAPH_YAXIS_TYPE_CALCULATED_0_MIN){
+					$this->m_minY[$side] = 0;
+				}
 			}
 			else if($this->axis_valuetype[$side] == ITEM_VALUE_TYPE_FLOAT){
 //*
