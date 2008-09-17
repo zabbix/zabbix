@@ -247,7 +247,8 @@ include_once "include/page_header.php";
 	$sql = 'SELECT hs.httptestid, COUNT(hs.httpstepid) as cnt '.
 			' FROM httpstep hs'.
 			' WHERE '.DBcondition('hs.httptestid',$db_httptestids).
-			' GROUP BY hs.httpstepid';
+			' GROUP BY hs.httptestid';
+//SDI($sql);
 	$httpstep_res = DBselect($sql);
 	while($step_cout = DBfetch($httpstep_res)){
 		$db_httptests[$step_cout['httptestid']]['step_cout'] = $step_cout['cnt'];
