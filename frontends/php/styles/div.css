@@ -168,6 +168,17 @@ div.iconmute{
 div.iconmute:hover{
 	cursor:pointer;
 }
+
+div.iconreset{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/reset.png');
+	background-repeat:no-repeat;
+}
+
+div.iconreset:hover{
+	cursor:pointer;
+}
 /********* DIV IMG END *********/
 
 span.footer_sign{
