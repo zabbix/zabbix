@@ -393,12 +393,17 @@ include_once 'include/page_header.php';
 		$fs_icon = new CDiv(SPACE,'fullscreen');
 		$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 		$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+		
+		$rst_icon = new CDiv(SPACE,'iconreset');
+		$rst_icon->AddOption('title',S_RESET);
+		$rst_icon->AddAction('onclick',new CScript("javascript: graphload(SCROLL_BAR.dom_graphs, ".(time()+100000000).", 3600, false);"));
+		
 	}
 	
 	$charts_hat = create_hat(
 			S_GRAPHS_BIG,
 			$p_elements,
-			array($icon,$fs_icon),
+			array($icon,$rst_icon,$fs_icon),
 			'hat_charts',
 			get_profile('web.charts.hats.hat_charts.state',1)
 	);

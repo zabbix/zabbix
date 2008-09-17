@@ -306,6 +306,10 @@ div.iconmute{
 	background-image: url('../images/general/bttn/mute_bb.png');
 }
 
+div.iconreset{
+	background-image: url('../images/general/bttn/reset_bb.png');
+}
+
 div#scrolltableft{
 	color: #0CF;
 }
