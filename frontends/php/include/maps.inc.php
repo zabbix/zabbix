@@ -583,7 +583,7 @@
 			{
 				$tr_info[TRIGGER_VALUE_UNKNOWN]['count']	= 0;
 				$tr_info[TRIGGER_VALUE_UNKNOWN]['priority']	= 0;
-				$tr_info[TRIGGER_VALUE_UNKNOWN]['info']		= S_TEMPLATE_SMALL;
+				$tr_info[TRIGGER_VALUE_UNKNOWN]['info']		= 'template';
 			}
 			else if ($host["status"] == HOST_STATUS_NOT_MONITORED)
 			{
@@ -595,7 +595,7 @@
 			{
 				$tr_info[TRIGGER_VALUE_FALSE]['count']		= 0;
 				$tr_info[TRIGGER_VALUE_FALSE]['priority']	= 0;
-				$tr_info[TRIGGER_VALUE_FALSE]['info']		= S_OK_BIG;
+				$tr_info[TRIGGER_VALUE_FALSE]['info']		= 'OK';
 			}
 		}
 		else if ($el_type == SYSMAP_ELEMENT_TYPE_HOST_GROUP)
@@ -607,7 +607,7 @@
 			{
 				$tr_info[TRIGGER_VALUE_FALSE]['count']		= 0;
 				$tr_info[TRIGGER_VALUE_FALSE]['priority']	= 0;
-				$tr_info[TRIGGER_VALUE_FALSE]['info']		= S_OK_BIG;
+				$tr_info[TRIGGER_VALUE_FALSE]['info']		= 'OK';
 			}
 		}
 		else if ($el_type == SYSMAP_ELEMENT_TYPE_MAP)
@@ -619,7 +619,7 @@
 			{
 				$tr_info[TRIGGER_VALUE_FALSE]['count']		= 0;
 				$tr_info[TRIGGER_VALUE_FALSE]['priority']	= 0;
-				$tr_info[TRIGGER_VALUE_FALSE]['info']		= S_OK_BIG;
+				$tr_info[TRIGGER_VALUE_FALSE]['info']		= 'OK';
 			}
 		}
 
@@ -627,10 +627,10 @@
 			$inf =& $tr_info[TRIGGER_VALUE_TRUE];
 
 			$out['type'] = TRIGGER_VALUE_TRUE;
-			$out['info'] = S_PROBLEM_BIG;
+			$out['info'] = 'PROBLEM';
 
 			if($inf['count'] > 1)
-				$out['info'] = $inf['count'].' '.S_PROBLEMS_SMALL;
+				$out['info'] = $inf['count'].' problems';
 			else if(isset($inf['info']))
 				$out['info'] = $inf['info'];
 
@@ -645,7 +645,7 @@
 			$inf =& $tr_info[TRIGGER_VALUE_UNKNOWN];
 
 			$out['type'] = TRIGGER_VALUE_UNKNOWN;
-			$out['info'] = S_UNKNOWN_BIG;
+			$out['info'] = 'UNKNOWN';
 			
 			$out['color'] = $colors['Gray'];
 			if (isset($out['disabled']) && $out['disabled'] == 1)
@@ -660,10 +660,10 @@
 			$inf =& $tr_info[TRIGGER_VALUE_FALSE];
 
 			$out['type'] = TRIGGER_VALUE_FALSE;
-			$out['info'] = S_OK_BIG;
+			$out['info'] = 'OK';
 			
 			if(isset($inf['info']))
-				$out['info'] = S_OK_BIG;
+				$out['info'] = 'OK';
 
 			$out['color'] = $colors['Dark Green'];
 			$out['iconid'] = $db_element['iconid_off'];
