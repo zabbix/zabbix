@@ -58,12 +58,12 @@ INSERT INTO users_groups VALUES (1,7,1);
 INSERT INTO users_groups VALUES (2,8,2);
 
 --
--- Dumping data for table `rights`
+-- Dumping data for table `media_type`
 --
 
--- INSERT INTO rights VALUES (1,1,0,0);
--- INSERT INTO rights VALUES (2,1,0,0);
--- INSERT INTO rights VALUES (3,2,0,0);
+INSERT INTO media_type VALUES (1,0,'Email','mail.company.com','company.com','zabbix@company.com','','','','');
+INSERT INTO media_type VALUES (2,3,'Jabber','','','','','','jabber@company.com','zabbix');
+INSERT INTO media_type VALUES (3,2,'SMS','','','','','/dev/ttyS0','','');
 
 --
 -- Dumping data for table hosts
