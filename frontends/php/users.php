@@ -506,12 +506,12 @@ include_once('include/page_header.php');
 			}
 
 			$users_sessions = array();
-			$sql = 'SELECT s.userid, MAX(s.lastaccess) as lastaccess, s.status'.
+			$sql = 'SELECT s.userid, MAX(s.lastaccess) as lastaccess, s.status '.
 					' FROM sessions s, users u'.
 					' WHERE '.DBcondition('s.userid',$userids).
 						' AND s.userid=u.userid '.
-					' GROUP BY s.userid';
-					
+					' GROUP BY s.userid,s.status';
+
 			$db_sessions = DBselect($sql);
 			while($db_ses=DBfetch($db_sessions)){
 				$users_sessions[$db_ses['userid']] = $db_ses;
