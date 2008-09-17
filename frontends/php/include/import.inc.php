@@ -445,6 +445,7 @@
 					if(!isset($data['valuemap']))				$data['valuemap']		= '';
 					if(!isset($data['params']))					$data['params']			= '';
 					if(!isset($data['applications']))			$data['applications']		= array();
+					if(!isset($data['ipmi_sensor']))		$data['ipmi_sensor']		= '';
 
 					if(!empty($data['valuemap'])){
 						$sql = 'SELECT valuemapid '.
