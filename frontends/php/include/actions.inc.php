@@ -1052,7 +1052,7 @@ function get_action_cmds_for_event($eventid){
 			S_ERROR
 			));
 			
-	$sql = 'SELECT DISTINCT a.alertid,a.clock,a.esc_step,a.subject,a.message,a.status,a.retries,a.error '.
+	$sql = 'SELECT DISTINCT a.alertid,a.clock,a.sendto,a.esc_step,a.subject,a.message,a.status,a.retries,a.error '.
 			' FROM events e,alerts a'.
 			' WHERE a.eventid='.$eventid.
 				' AND a.alerttype='.ALERT_TYPE_COMMAND.
