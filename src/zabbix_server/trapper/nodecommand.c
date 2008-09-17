@@ -78,6 +78,7 @@ static void	execute_script(zbx_uint64_t hostid, char *command, char **result, in
 	while (*p == ' ' && *p != '\0')
 		p++;
 
+#ifdef HAVE_OPENIPMI
 	if (0 == strncmp(p, "IPMI", 4))
 	{
 		db_result = DBselect("select distinct host,ip,useip,port,dns,useipmi,ipmi_port,ipmi_authtype,"
@@ -142,6 +143,7 @@ static void	execute_script(zbx_uint64_t hostid, char *command, char **result, in
 	}
 	else
 	{
+#endif
 		if(0 != (f = popen(p, "r"))) {
 			zbx_snprintf_alloc(result, result_allocated, &result_offset, 8, "%d%c",
 				SUCCEED,
@@ -164,7 +166,9 @@ static void	execute_script(zbx_uint64_t hostid, char *command, char **result, in
 				command,
 				strerror(errno));
 		}
+#ifdef HAVE_OPENIPMI
 	}
+#endif
 }
 
 /******************************************************************************
