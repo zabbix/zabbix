@@ -418,8 +418,8 @@ FIELD		|show_triggers	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|graphtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_legend	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_3d	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|percent_left	|t_percentage	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|percent_right	|t_percentage	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|percent_left	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|percent_right	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|graphs_1	|name
 
 TABLE|graphs_items|gitemid|ZBX_SYNC
@@ -710,7 +710,7 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|algorithm	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|triggerid	|t_id		|	|		|ZBX_SYNC
 FIELD		|showsla	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|goodsla	|t_percentage	|'99.9'	|NOT NULL	|ZBX_SYNC
+FIELD		|goodsla	|t_double	|'99.9'	|NOT NULL	|ZBX_SYNC
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|services_links|linkid|ZBX_SYNC
