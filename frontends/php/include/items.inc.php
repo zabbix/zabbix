@@ -184,7 +184,6 @@
 		$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,
 		$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications,$templateid=0)
 	{
-
 		$host=get_host_by_hostid($hostid);
 
 		if(($i = array_search(0,$applications)) !== FALSE)
