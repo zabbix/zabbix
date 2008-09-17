@@ -189,7 +189,7 @@ include_once "include/page_header.php";
 
 		if (isset($el_info['disabled']) && $el_info['disabled'] == 1)
 		{
-			$info_line = S_DISABLED_BIG;
+			$info_line = 'DISABLED';
 			$label_color = $gray;
 		}
 

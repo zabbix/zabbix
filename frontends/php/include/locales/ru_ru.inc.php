@@ -113,10 +113,10 @@
 	"S_STATUS"=>				"Статус",
 	"S_DURATION"=>				"Длительность",
 	"S_SUM"=>				"Сумма",
-	"S_TRUE_BIG"=>				"TRUE",
-	"S_FALSE_BIG"=>				"FALSE",
-	"S_DISABLED_BIG"=>			"DISABLED",
-	"S_UNKNOWN_BIG"=>			"UNKNOWN",
+	"S_TRUE_BIG"=>				"ИСТИНА",
+	"S_FALSE_BIG"=>				"ЛОЖЬ",
+	"S_DISABLED_BIG"=>			"ДЕАКТИВИРОВАНО", //FIXME?
+	"S_UNKNOWN_BIG"=>			"НЕИЗВЕСТНО",
 
 //	actions.php
 	"S_HISTORY_OF_ACTIONS_BIG"=>		"ИСТОРИЯ ДЕЙСТВИЙ",

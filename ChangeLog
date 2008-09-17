@@ -1,6 +1,6 @@
 Changes for 1.4.7:
 
- - updated Russian locale (Sasha)
+ - [ZBX-450] fixed showing status of items in maps for non english locale (Sasha)
  - [ZBX-432] set trigger value to unknown if changed item status (Sahsa)
  - [DEV-198] improved displaying of disabled items in the maps (Sasha)
  - [ZBX-430] improved configuration scripts (Sasha)
