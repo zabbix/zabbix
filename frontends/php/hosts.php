@@ -418,7 +418,7 @@ include_once('include/page_header.php');
 		else {
 			$hostid = $result = add_host(
 				$_REQUEST['host'],$_REQUEST['port'],$_REQUEST['status'],$useip,$_REQUEST['dns'],
-				$_REQUEST['ip'],$_REQUEST['proxy_hostid'],$templates,$_REQUEST['useipmi'],
+				$_REQUEST['ip'],$_REQUEST['proxy_hostid'],$templates,$useipmi,
 				$_REQUEST['ipmi_port'],$_REQUEST['ipmi_privilege'],$_REQUEST['ipmi_username'],
 				$_REQUEST['ipmi_password'],$_REQUEST['newgroup'],$groups);
 			
