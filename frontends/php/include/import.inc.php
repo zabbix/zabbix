@@ -120,6 +120,7 @@
 							array(), /* templates */
 							0, /* useipmi */
 							623, /* ipmi_port */
+							2, /* ipmi_privilege */
 							'', /* ipmi_username */
 							'', /* ipmi_password */
 							null,
@@ -209,6 +210,7 @@
 						$data['useip'], $data['dns'], $data['ip'], 0, $data['templates'],
 						0, /* useipmi */
 						623, /* ipmi_port */
+						2, /* ipmi_privilege */
 						'', /* ipmi_username */
 						'', /* ipmi_password */
 						null, $data['groups']))

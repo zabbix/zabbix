@@ -215,7 +215,7 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 	$minutes = (int) ($time / 60);
 	$time -= $minutes*60;
 	
-	if($time > 1){
+	if($time >= 1){
 		$seconds = round($time,2);
 		$ms = 0;
 	}

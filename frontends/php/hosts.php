@@ -72,6 +72,7 @@ include_once('include/page_header.php');
 
 		'useipmi'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,			NULL),
 		'ipmi_port'=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),	'isset({useipmi})&&!isset({massupdate})'),
+		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(1,5),		'isset({useipmi})&&!isset({massupdate})'),
 		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,			'isset({useipmi})&&!isset({massupdate})'),
 		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,			'isset({useipmi})&&!isset({massupdate})'),
 
@@ -186,7 +187,8 @@ include_once('include/page_header.php');
 				$result &= update_host($hostid,
 								$host['host'],$host['port'],$host['status'],$host['useip'],$host['dns'],
 								$host['ip'],$host['proxy_hostid'],$templates_tmp,$host['useipmi'],
-								$host['ipmi_port'],$host['ipmi_username'],$host['ipmi_password'],null,$host_groups);
+								$host['ipmi_port'],$host['ipmi_privilege'],$host['ipmi_username'],
+								$host['ipmi_password'],null,$host_groups);
 			}
 //----------
 			$result = DBend($result);
@@ -285,8 +287,8 @@ include_once('include/page_header.php');
 			$result = update_host($hostid,
 				$db_host['host'],$db_host['port'],$db_host['status'],$db_host['useip'],$db_host['dns'],
 				$db_host['ip'],$db_host['proxy_hostid'],$db_host['templates'],$db_host['useipmi'],
-				$db_host['ipmi_port'],$db_host['ipmi_username'],$db_host['ipmi_password'],
-				$_REQUEST['newgroup'],$db_host['groups']);
+				$db_host['ipmi_port'],$db_host['ipmi_privilege'],$db_host['ipmi_username'],
+				$db_host['ipmi_password'],$_REQUEST['newgroup'],$db_host['groups']);
 
 		
 			if($result && isset($visible['useprofile'])){
@@ -367,6 +369,7 @@ include_once('include/page_header.php');
 	else if(($_REQUEST['config']==0 || $_REQUEST['config']==3) && isset($_REQUEST['save'])){
 		$useip = get_request('useip',0);
 		$groups= get_request('groups',array());
+		$useipmi = get_request('useipmi','no');
 		
 		if(count($groups) > 0){
 			$accessible_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
@@ -402,9 +405,9 @@ include_once('include/page_header.php');
 
 			$result = update_host($_REQUEST['hostid'],
 				$_REQUEST['host'],$_REQUEST['port'],$_REQUEST['status'],$useip,$_REQUEST['dns'],
-				$_REQUEST['ip'],$_REQUEST['proxy_hostid'],$templates,$_REQUEST['useipmi'],
-				$_REQUEST['ipmi_port'],$_REQUEST['ipmi_username'],$_REQUEST['ipmi_password'],
-				$_REQUEST['newgroup'],$groups);
+				$_REQUEST['ip'],$_REQUEST['proxy_hostid'],$templates,$useipmi,
+				$_REQUEST['ipmi_port'],$_REQUEST['ipmi_privilege'],$_REQUEST['ipmi_username'],
+				$_REQUEST['ipmi_password'],$_REQUEST['newgroup'],$groups);
 				
 			$msg_ok 	= S_HOST_UPDATED;
 			$msg_fail 	= S_CANNOT_UPDATE_HOST;
@@ -416,8 +419,8 @@ include_once('include/page_header.php');
 			$hostid = $result = add_host(
 				$_REQUEST['host'],$_REQUEST['port'],$_REQUEST['status'],$useip,$_REQUEST['dns'],
 				$_REQUEST['ip'],$_REQUEST['proxy_hostid'],$templates,$_REQUEST['useipmi'],
-				$_REQUEST['ipmi_port'],$_REQUEST['ipmi_username'],$_REQUEST['ipmi_password'],
-				$_REQUEST['newgroup'],$groups);
+				$_REQUEST['ipmi_port'],$_REQUEST['ipmi_privilege'],$_REQUEST['ipmi_username'],
+				$_REQUEST['ipmi_password'],$_REQUEST['newgroup'],$groups);
 			
 			$msg_ok 	= S_HOST_ADDED;
 			$msg_fail 	= S_CANNOT_ADD_HOST;
