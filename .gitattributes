@@ -280,6 +280,7 @@ upgrades/dbpatches/1.6/mysql/patch/proxy_history.sql -text
 upgrades/dbpatches/1.6/mysql/patch/rights.sql -text
 upgrades/dbpatches/1.6/mysql/patch/screens_items.sql -text
 upgrades/dbpatches/1.6/mysql/patch/scripts.sql -text
+upgrades/dbpatches/1.6/mysql/patch/services.sql -text
 upgrades/dbpatches/1.6/mysql/patch/sessions.sql -text
 upgrades/dbpatches/1.6/mysql/patch/sysmaps_elements.sql -text
 upgrades/dbpatches/1.6/mysql/patch/sysmaps_link_triggers.sql -text
