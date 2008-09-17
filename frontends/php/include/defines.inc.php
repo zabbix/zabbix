@@ -517,6 +517,12 @@ else{
 // Allow for testing 
 	define('ZBX_ALLOW_UNICODE',1);
 	
+// IPMI
+	define('IPMI_PRIVILEGE_CALLBACK', 1);
+	define('IPMI_PRIVILEGE_USER', 2);
+	define('IPMI_PRIVILEGE_OPERATOR', 3);
+	define('IPMI_PRIVILEGE_ADMIN', 4);
+	define('IPMI_PRIVILEGE_OEM', 5);
 
 /* Define if your logs are in non-standard format */
 /*	define('ZBX_LOG_ENCODING_DEFAULT', 'Shift_JIS');*/

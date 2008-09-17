@@ -40,6 +40,7 @@
 
 #include "poller/poller.h"
 #include "poller/checks_agent.h"
+#include "poller/checks_ipmi.h"
 
 /******************************************************************************
  *                                                                            *
@@ -207,12 +208,13 @@ return rtrn;
 
 static void run_remote_command(char* host_name, char* command)
 {
-	int ret = 9;
-	
+	int		ret = 9;
 	AGENT_RESULT	agent_result;
 	DB_ITEM         item;
 	DB_RESULT	result;
 	DB_ROW		row;
+	int		val;
+	char		*p, error[MAX_STRING_LEN];
 	
 	assert(host_name);
 	assert(command);
@@ -221,25 +223,45 @@ static void run_remote_command(char* host_name, char* command)
 		host_name,
 		command);
 
-	result = DBselect("select distinct host,ip,useip,port,dns from hosts where host='%s'" DB_NODE,
+	result = DBselect("select distinct host,ip,useip,port,dns,useipmi,ipmi_port,ipmi_authtype,"
+			"ipmi_privilege,ipmi_username,ipmi_password from hosts where host='%s'" DB_NODE,
 			host_name,
 			DBnode_local("hostid"));
-	row = DBfetch(result);
-	if(row)
-	{
-		item.host_name = row[0];
-		item.host_ip=row[1];
-		item.useip=atoi(row[2]);
-		item.port=atoi(row[3]);
-		item.host_dns=row[4];
-		
-		zbx_snprintf(item.key,ITEM_KEY_LEN_MAX,"system.run[%s,nowait]",command);
-		
-		alarm(CONFIG_TIMEOUT);
-		
-		ret = get_value_agent(&item, &agent_result);
 
-		alarm(0);
+	if (NULL != (row = DBfetch(result)))
+	{
+		item.host_name		= row[0];
+		item.host_ip		= row[1];
+		item.useip		= atoi(row[2]);
+		item.port		= atoi(row[3]);
+		item.host_dns		= row[4];
+
+		item.useipmi		= atoi(row[5]);
+		item.ipmi_port		= atoi(row[6]);
+		item.ipmi_authtype	= atoi(row[7]);
+		item.ipmi_privilege	= atoi(row[8]);
+		item.ipmi_username	= row[9];
+		item.ipmi_password	= row[10];
+
+		p = command;
+		while (*p == ' ' && *p != '\0')
+			p++;
+
+		if (0 == strncmp(p, "IPMI", 4))
+		{
+			if (SUCCEED == (ret = parse_ipmi_command(p, &item.ipmi_sensor, &val)))
+				ret = set_ipmi_control_value(&item, val, error, sizeof(error));
+		}
+		else
+		{
+			zbx_snprintf(item.key, ITEM_KEY_LEN_MAX, "system.run[%s,nowait]", p);
+
+			alarm(CONFIG_TIMEOUT);
+
+			ret = get_value_agent(&item, &agent_result);
+
+			alarm(0);
+		}
 	}
 	DBfree_result(result);
 	
