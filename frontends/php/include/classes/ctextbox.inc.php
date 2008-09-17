@@ -70,8 +70,8 @@
 				' if(event.ctrlKey || c <= 31 || (c >= 48 && c <= 57)) return true; else return false; ');
 			$this->AddAction('onchange',
 					($allowempty ? ' if(this.value.length==0 || this.value==null) this.value = \'\'; else ' : '').
-					' if(isNaN(parseFloat(this.value))) this.value = 0; '.
-					' else this.value = parseFloat(this.value);'
+					' if(isNaN(parseInt(this.value,10))) this.value = 0; '.
+					' else this.value = parseInt(this.value,10);'
 				);
 		}
 	}
