@@ -265,6 +265,7 @@ upgrades/dbpatches/1.6/mysql/patch/escalations.sql -text
 upgrades/dbpatches/1.6/mysql/patch/events.sql -text
 upgrades/dbpatches/1.6/mysql/patch/graphs.sql -text
 upgrades/dbpatches/1.6/mysql/patch/hosts.sql -text
+upgrades/dbpatches/1.6/mysql/patch/hosts_profiles_ext.sql -text
 upgrades/dbpatches/1.6/mysql/patch/httpstep.sql -text
 upgrades/dbpatches/1.6/mysql/patch/httptest.sql -text
 upgrades/dbpatches/1.6/mysql/patch/items.sql -text
