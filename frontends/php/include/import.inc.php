@@ -444,8 +444,8 @@
 					if(!isset($data['snmpv3_privpassphrase']))	$data['snmpv3_privpassphrase']	= '';
 					if(!isset($data['valuemap']))				$data['valuemap']		= '';
 					if(!isset($data['params']))					$data['params']			= '';
+					if(!isset($data['ipmi_sensor']))			$data['ipmi_sensor']	= '';
 					if(!isset($data['applications']))			$data['applications']		= array();
-					if(!isset($data['ipmi_sensor']))		$data['ipmi_sensor']		= '';
 
 					if(!empty($data['valuemap'])){
 						$sql = 'SELECT valuemapid '.
@@ -503,11 +503,11 @@
 							$data['valuemapid'],
 							$data['delay_flex'],
 							$data['params'],
+							$data['ipmi_sensor'],
 							array_unique(array_merge(
 								$data['applications'],
 								get_applications_by_itemid($item['itemid'])
 								)),
-							$data['ipmi_sensor'],
 							$item['templateid']);
 					}
 					else{ /* missed */
@@ -545,8 +545,8 @@
 							$data['valuemapid'],
 							$data['delay_flex'],
 							$data['params'],
-							$data['applications'],
-							$data['ipmi_sensor']);
+							$data['ipmi_sensor'],
+							$data['applications']);
 					}
 
 					break; // case
