@@ -256,7 +256,7 @@ include_once 'include/page_header.php';
 			$_REQUEST['operations'] = get_request('operations',array());
 
 
-			if(($new_operation['esc_step_from'] < $new_operation['esc_step_to']) || ($new_operation['esc_step_to']==0)) {
+			if(($new_operation['esc_step_from'] <= $new_operation['esc_step_to']) || ($new_operation['esc_step_to']==0)) {
 
 				if(!isset($new_operation['id'])){
 					if(!str_in_array($new_operation,$_REQUEST['operations']))
