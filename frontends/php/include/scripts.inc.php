@@ -77,7 +77,7 @@ function execute_script($scriptid,$hostid){
 	}
 	
 	if($res){
-		$send = "Command\255$nodeid\255$command\n";
+		$send = "Command\255$nodeid\255$hostid\255$command\n";
 		socket_write($socket,$send);
 	}
 	

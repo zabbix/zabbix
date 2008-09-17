@@ -4624,6 +4624,7 @@
 
 		$useipmi	= get_request('useipmi','no');
 		$ipmi_port	= get_request('ipmi_port',623);
+		$ipmi_privilege	= get_request('ipmi_privilege',2);
 		$ipmi_username	= get_request('ipmi_username','');
 		$ipmi_password	= get_request('ipmi_password','');
 
@@ -4671,6 +4672,7 @@
 			$ip				= $db_host['ip'];
 			$useipmi		= $db_host['useipmi'] ? 'yes' : 'no';
 			$ipmi_port		= $db_host['ipmi_port'];
+			$ipmi_privilege	= $db_host['ipmi_privilege'];
 			$ipmi_username	= $db_host['ipmi_username'];
 			$ipmi_password	= $db_host['ipmi_password'];
 
@@ -4846,11 +4848,21 @@
 
 		if($useipmi == 'yes'){
 			$frmHost->AddRow(S_IPMI_PORT, new CNumericBox('ipmi_port', $ipmi_port, 5));	
+
+			$cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmi_privilege);
+			$cmbIPMIPrivilege->AddItem(IPMI_PRIVILEGE_CALLBACK,	S_PRIVILEGE_CALLBACK);
+			$cmbIPMIPrivilege->AddItem(IPMI_PRIVILEGE_USER,		S_PRIVILEGE_USER);
+			$cmbIPMIPrivilege->AddItem(IPMI_PRIVILEGE_OPERATOR,	S_PRIVILEGE_OPERATOR);
+			$cmbIPMIPrivilege->AddItem(IPMI_PRIVILEGE_ADMIN,	S_PRIVILEGE_ADMIN);
+			$cmbIPMIPrivilege->AddItem(IPMI_PRIVILEGE_OEM,		S_PRIVILEGE_OEM);
+			$frmHost->AddRow(S_IPMI_PRIVILEGE, $cmbIPMIPrivilege);	
+
 			$frmHost->AddRow(S_IPMI_USERNAME, new CTextBox('ipmi_username', $ipmi_username, 16));
 			$frmHost->AddRow(S_IPMI_PASSWORD, new CTextBox('ipmi_password', $ipmi_password, 20));
 		}
 		else{
 			$frmHost->AddVar('ipmi_port', $ipmi_port);	
+			$frmHost->AddVar('ipmi_privilege', $ipmi_privilege);
 			$frmHost->AddVar('ipmi_username', $ipmi_username);
 			$frmHost->AddVar('ipmi_password', $ipmi_password);
 		}

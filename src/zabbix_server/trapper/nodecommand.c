@@ -39,6 +39,7 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
+#include "../poller/checks_ipmi.h"
 
 #define MVAR_HOST_NAME			"{HOSTNAME}"
 #define MVAR_IPADDRESS			"{IPADDRESS}"
@@ -61,35 +62,108 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	execute_script(const char *command, char **result, int *result_allocated)
+static void	execute_script(zbx_uint64_t hostid, char *command, char **result, int *result_allocated)
 {
 	int		result_offset = 0;
-	char		buffer[MAX_STRING_LEN];
+	char		*p, buffer[MAX_STRING_LEN];
 	FILE		*f;
+	DB_RESULT	db_result;
+	DB_ROW		db_row;
+	DB_ITEM		item;
+	int		ret, val;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In execute_script(command:%s)", command);
 
-	if(0 != (f = popen(command, "r"))) {
-		zbx_snprintf_alloc(result, result_allocated, &result_offset, 8, "%d%c",
-			SUCCEED,
-			ZBX_DM_DELIMITER);
+	p = command;
+	while (*p == ' ' && *p != '\0')
+		p++;
 
-		while (NULL != fgets(buffer, sizeof(buffer)-1, f)) {
-			zbx_snprintf_alloc(result, result_allocated, &result_offset, sizeof(buffer),
-				"%s",
-				buffer);
+	if (0 == strncmp(p, "IPMI", 4))
+	{
+		db_result = DBselect("select distinct host,ip,useip,port,dns,useipmi,ipmi_port,ipmi_authtype,"
+				"ipmi_privilege,ipmi_username,ipmi_password from hosts where hostid=" ZBX_FS_UI64 DB_NODE,
+				hostid,
+				DBnode_local("hostid"));
+
+		if (NULL != (db_row = DBfetch(db_result)))
+		{
+			item.host_name		= db_row[0];
+			item.host_ip		= db_row[1];
+			item.useip		= atoi(db_row[2]);
+			item.port		= atoi(db_row[3]);
+			item.host_dns		= db_row[4];
+
+			item.useipmi		= atoi(db_row[5]);
+			item.ipmi_port		= atoi(db_row[6]);
+			item.ipmi_authtype	= atoi(db_row[7]);
+			item.ipmi_privilege	= atoi(db_row[8]);
+			item.ipmi_username	= db_row[9];
+			item.ipmi_password	= db_row[10];
+
+			if (SUCCEED == (ret = parse_ipmi_command(p, &item.ipmi_sensor, &val)))
+			{
+				if (SUCCEED == (ret = set_ipmi_control_value(&item, val, buffer, sizeof(buffer))))
+				{
+					zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
+							"%d%cNODE %d: IPMI command successfully executed",
+							ret,
+							ZBX_DM_DELIMITER,
+							CONFIG_NODEID);
+				}
+				else
+				{
+					zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
+							"%d%cNODE %d: Cannot execute IPMI command [%s] error: %s",
+							FAIL,
+							ZBX_DM_DELIMITER,
+							CONFIG_NODEID,
+							command,
+							buffer);
+				}
+			}
+			else
+				zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
+						"%d%cNODE %d: Cannot parse IPMI command [%s]",
+						FAIL,
+						ZBX_DM_DELIMITER,
+						CONFIG_NODEID,
+						command);
 		}
-		(*result)[result_offset] = '\0';
+		else
+		{
+			zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
+					"%d%cNODE %d: Cannot execute [%s] error: Invalid hostid",
+					FAIL,
+					ZBX_DM_DELIMITER,
+					CONFIG_NODEID,
+					command);
+		}
+		DBfree_result(db_result);
+	}
+	else
+	{
+		if(0 != (f = popen(p, "r"))) {
+			zbx_snprintf_alloc(result, result_allocated, &result_offset, 8, "%d%c",
+				SUCCEED,
+				ZBX_DM_DELIMITER);
 
-		pclose(f);
-	} else {
-		zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
-			"%d%cNODE %d: Cannot execute [%s] error:%s",
-			FAIL,
-			ZBX_DM_DELIMITER,
-			CONFIG_NODEID,
-			command,
-			strerror(errno));
+			while (NULL != fgets(buffer, sizeof(buffer)-1, f)) {
+				zbx_snprintf_alloc(result, result_allocated, &result_offset, sizeof(buffer),
+					"%s",
+					buffer);
+			}
+			(*result)[result_offset] = '\0';
+
+			pclose(f);
+		} else {
+			zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
+				"%d%cNODE %d: Cannot execute [%s] error:%s",
+				FAIL,
+				ZBX_DM_DELIMITER,
+				CONFIG_NODEID,
+				command,
+				strerror(errno));
+		}
 	}
 }
 
@@ -140,7 +214,6 @@ void	send_script(int nodeid, const char *data, char **result, int *result_alloca
 				"%s",
 				answer);
 			} else {
-				
 				zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
 					"%d%cNODE %d: Error while receiving answer from Node [%d] error: %s",
 					FAIL,
@@ -235,6 +308,7 @@ int	node_process_command(zbx_sock_t *sock, const char *data)
 	int		datalen;
 	int		nodeid, next_nodeid;
 	int		result_offset = 0;
+	zbx_uint64_t	hostid;
 
 	result = zbx_malloc(result, result_allocated);
 	tmp = zbx_malloc(tmp, tmp_allocated);
@@ -247,6 +321,8 @@ int	node_process_command(zbx_sock_t *sock, const char *data)
 	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* Constant 'Command' */
 	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* NodeID */
 	nodeid = atoi(tmp);
+	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* hostid */
+	hostid = zbx_atoui64(tmp);
 	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
 
 	if (nodeid == CONFIG_NODEID) {
@@ -254,7 +330,7 @@ int	node_process_command(zbx_sock_t *sock, const char *data)
 			CONFIG_NODEID,
 			tmp);
 
-		execute_script(tmp, &result, &result_allocated);
+		execute_script(hostid, tmp, &result, &result_allocated);
 	} else if (SUCCEED == get_next_point_to_node(CONFIG_NODEID, nodeid, &next_nodeid)) {
 		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Sending command \"%s\" for nodeid %d"
 			"to node %d",
