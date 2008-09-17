@@ -115,18 +115,21 @@
 			if(!$item_data)
 			{
 				if (!($itemid = add_item($item['description'], $item['key_'], $hostid, $delay,
-					$history, ITEM_STATUS_ACTIVE, ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost',
-					161, $item['units'], 0, 0, '', 0, '', '', '0', $trends, '', 0, '', '', array($applicationid),'')))
+					$history, ITEM_STATUS_ACTIVE, ITEM_TYPE_HTTPTEST, '', '',
+					$item['type'], 'localhost', 161, $item['units'], 0, 0,
+					'', 0, '', '', '0', $trends, '', 0,
+					'', '', '', array($applicationid))))
 					return false;
 			}
 			else
 			{
 				$itemid = $item_data['itemid'];
 
-				if (!(update_item($itemid, $item['description'], $item['key_'], $hostid, $delay, $item_data['history'],
-					$item_data['status'], ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost', 161,
-					$item['units'], 0, 0, $item_data['delta'], 0, '', '', '0', $item_data['trends'], '',
-					$item_data['valuemapid'], '', '', array($applicationid),'')))
+				if (!(update_item($itemid, $item['description'], $item['key_'], $hostid, $delay,
+					$item_data['history'], $item_data['status'], ITEM_TYPE_HTTPTEST, '', '',
+					$item['type'], 'localhost', 161, $item['units'], 0, $item_data['delta'],
+					'', 0, '', '', '0', $item_data['trends'], '', $item_data['valuemapid'],
+					'', '', '', array($applicationid))))
 					return false;
 			}
 
@@ -267,8 +270,10 @@
 				if(!$item_data)
 				{
 					if (!($itemid = add_item($item['description'], $item['key_'], $hostid, $delay,
-						$history, ITEM_STATUS_ACTIVE, ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost',
-						161, $item['units'], 0, 0, '', 0, '', '', '0', $trends, '', 0, '', '', array($applicationid),'')))
+						$history, ITEM_STATUS_ACTIVE, ITEM_TYPE_HTTPTEST, '', '',
+						$item['type'], 'localhost', 161, $item['units'], 0, 0,
+						'', 0, '', '', '0', $trends, '', 0,
+						'', '', '', array($applicationid))))
 					{
 						$result = false;
 						break;
@@ -278,10 +283,11 @@
 				{
 					$itemid = $item_data['itemid'];
 
-					if (!(update_item($itemid, $item['description'], $item['key_'], $hostid, $delay, $item_data['history'],
-						$item_data['status'], ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost', 161,
-						$item['units'], 0, 0, $item_data['delta'], 0, '', '', '0', $item_data['trends'], '',
-						$item_data['valuemapid'], '', '', array($applicationid),'')))
+					if (!(update_item($itemid, $item['description'], $item['key_'], $hostid, $delay,
+						$item_data['history'], $item_data['status'], ITEM_TYPE_HTTPTEST, '', '',
+						$item['type'], 'localhost', 161, $item['units'], 0, $item_data['delta'],
+						'', 0, '', '', '0', $item_data['trends'], '', $item_data['valuemapid'],
+						'', '', '', array($applicationid))))
 					{
 						$result = false;
 						break;
@@ -359,6 +365,16 @@
 		}
 		delete_httpstep($del_httpsteps);
 		
+		$db_httptestitems = DBselect('SELECT httptestitemid, itemid FROM httptestitem WHERE '.
+				DBcondition('httptestid',$httptestids));
+
+		while ($httptestitem_data = DBfetch($db_httptestitems)){
+			if (!DBexecute('DELETE FROM httptestitem WHERE httptestitemid='.$httptestitem_data['httptestitemid']))
+				return false;
+
+			if (!delete_item($httptestitem_data['itemid'])) return false;
+		}
+
 		if(!DBexecute('DELETE FROM httptest WHERE '.DBcondition('httptestid',$httptestids))) return false;
 
 		foreach($httptests as $id => $httptest){

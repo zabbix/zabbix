@@ -545,7 +545,7 @@
 							$data['valuemapid'],
 							$data['delay_flex'],
 							$data['params'],
-							$data['ipmi_sensor'],
+							$data['ipmi_sensor']),
 							$data['applications']);
 					}
 
