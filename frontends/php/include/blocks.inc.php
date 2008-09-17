@@ -373,12 +373,11 @@ function make_status_of_zbx(){
 	$table->AddRow(array(S_NUMBER_OF_ALERTS,$status['alerts_count'],' - '));*/
 
 //Log Out 10min	
-	$sql = 'SELECT DISTINCT u.userid, MAX(s.lastaccess) as lastaccess, u.autologout, s.status '.
+	$sql = 'SELECT DISTINCT u.userid, MAX(s.lastaccess) as lastaccess, MAX(u.autologout) as autologout, s.status '.
 			' FROM users u '.
 				' LEFT JOIN sessions s ON s.userid=u.userid AND s.status='.ZBX_SESSION_ACTIVE.
 			' WHERE '.DBin_node('u.userid').
-			' GROUP BY u.userid';
-
+			' GROUP BY u.userid,s.status';
 	$db_users = DBSelect($sql);
 	
 	$usr_cnt = 0;
