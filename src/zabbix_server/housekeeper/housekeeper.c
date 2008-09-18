@@ -359,7 +359,7 @@ int main_housekeeper_loop()
 /* Transaction is not required here. It causes timeouts under MySQL */
 /*		DBcommit();*/
 
-		DBvacuum();
+/*		DBvacuum();*/
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d hours",
 			CONFIG_HOUSEKEEPING_FREQUENCY);
