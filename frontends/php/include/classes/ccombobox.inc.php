@@ -30,24 +30,24 @@
 
 			$this->AddItem($caption);
 
-			$this->SetSelected($selected);
-			$this->SetEnabled($enabled);
+			$this->setSelected($selected);
+			$this->setEnabled($enabled);
 
 		}
 		
-		function SetValue($value){
+		function setValue($value){
 			return $this->options['value'] = $value;
 		}
 		
-		function GetValue(){
+		function getValue(){
 			return $this->GetOption('value');
 		}
 		
-		function SetCaption($value=NULL){
+		function setCaption($value=NULL){
 			$this->AddItem(nbsp($value));
 		}
 		
-		function SetSelected($value='yes'){
+		function setSelected($value='yes'){
 			if((is_string($value) && ($value == 'yes' || $value == 'selected' || $value=='on'))
 				|| (is_int($value) && $value<>0))
 				return $this->options['selected'] = 'selected';

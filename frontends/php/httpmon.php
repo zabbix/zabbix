@@ -67,7 +67,7 @@ include_once "include/page_header.php";
 
 	validate_sort_and_sortorder('wt.name',ZBX_SORT_DOWN);
 
-	$options = array('allow_all_hosts','monitored_hosts','always_select_first_host');
+	$options = array('allow_all_hosts','monitored_hosts');
 
 	$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.groupid',-1));
 	if($_REQUEST['groupid'] == -1) array_push($options,'always_select_first_host');
@@ -128,14 +128,12 @@ include_once "include/page_header.php";
 			' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
 		' ORDER BY g.name');
 	while($row=DBfetch($result)){
-		if($_REQUEST['groupid'] == -1){
-			$_REQUEST['groupid'] = $row['groupid'];
-		}
+		if($_REQUEST['groupid'] == -1) $_REQUEST['groupid'] = $row['groupid'];
 		$cmbGroup->AddItem(
-			$row['groupid'],
-			get_node_name_by_elid($row['groupid']).$row['name'],
-			($_REQUEST['groupid'] == $row['groupid'])?1:0
-			);
+					$row['groupid'],
+					get_node_name_by_elid($row['groupid']).$row['name'],
+					(bccomp($_REQUEST['groupid'],$row['groupid'])==0)?1:0
+				);
 	}
 
 //	Supposed to be here
@@ -144,8 +142,15 @@ include_once "include/page_header.php";
 	$form->AddItem(S_GROUP.SPACE);
 	$form->AddItem($cmbGroup);
 
-	$_REQUEST['hostid'] = get_request('hostid',0);
-	$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit();');
+	if($_REQUEST['hostid'] > 0){
+		$httptests_by_host = get_httptests_by_hostid($_REQUEST['hostid']);
+		if(!DBfetch($httptests_by_host)){
+			$_REQUEST['hostid'] = -1;
+		}
+	}
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+
+	$cmbHosts = new CComboBox('hostid',null,'submit();');
 	$cmbHosts->AddItem(0,S_ALL_SMALL);
 	
 	$sql_from = '';
@@ -168,10 +173,12 @@ include_once "include/page_header.php";
 
 	$result=DBselect($sql);
 	while($row=DBfetch($result)){
+		if($_REQUEST['hostid'] == -1) $_REQUEST['hostid'] = $row['hostid'];
 		$cmbHosts->AddItem(
-			$row['hostid'],
-			get_node_name_by_elid($row['hostid']).$row['host']
-			);
+					$row['hostid'],
+					get_node_name_by_elid($row['hostid']).$row['host'],
+					(bccomp($_REQUEST['hostid'],$row['hostid'])==0)?1:0
+				);
 	}
 
 	$form->AddItem(SPACE.S_HOST.SPACE);
