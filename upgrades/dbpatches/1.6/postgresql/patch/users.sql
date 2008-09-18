@@ -22,3 +22,5 @@ drop table users;
 alter table users_tmp rename to users;
 
 CREATE INDEX users_1 on users (alias);
+
+update users set passwd='5fce1b3e34b520afeffb37ce08c7cd66' where alias<>'guest' and passwd='d41d8cd98f00b204e9800998ecf8427e';
