@@ -213,9 +213,12 @@ static void run_remote_command(char* host_name, char* command)
 	DB_ITEM         item;
 	DB_RESULT	result;
 	DB_ROW		row;
+	char		*p;
+#ifdef HAVE_OPENIPMI
 	int		val;
-	char		*p, error[MAX_STRING_LEN];
-	
+	char		error[MAX_STRING_LEN];
+#endif
+
 	assert(host_name);
 	assert(command);
 

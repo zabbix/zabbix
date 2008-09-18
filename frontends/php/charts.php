@@ -375,6 +375,7 @@ include_once 'include/page_header.php';
 	
 	$icon = null;
 	$fs_icon = null;
+	$rst_icon = NULL;
 	if($_REQUEST['graphid'] > 0){
 		if(infavorites('web.favorite.graphids',$_REQUEST['graphid'],'graphid')){
 			$icon = new CDiv(SPACE,'iconminus');
