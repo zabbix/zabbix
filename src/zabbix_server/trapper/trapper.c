@@ -382,7 +382,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 	const char		*p;
 	char			info[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
 	int			ret = SUCCEED;
-	int			processed = 0, processed_fail = 0;
+	int			processed = 0;
 	double			sec;
 	time_t			now, proxy_timediff = 0;
 
@@ -481,8 +481,8 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 
 	zbx_snprintf(info, sizeof(info), "Processed %d Failed %d Total %d Seconds spent " ZBX_FS_DBL,
 			processed,
-			processed_fail,
-			processed + processed_fail,
+			value_num - processed,
+			value_num,
 			zbx_time() - sec);
 
 	if (send_result(sock, ret, info) != SUCCEED)
