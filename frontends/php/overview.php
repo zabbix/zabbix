@@ -164,7 +164,8 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	
 	$form_l = new CForm();
 	$form_l->SetMethod('get');
-	
+	$form_l->AddVar('groupid',$_REQUEST['groupid']);
+		
 	$cmbStyle = new CComboBox("view_style",$_REQUEST["view_style"],"submit()");
 	$cmbStyle->AddItem(STYLE_TOP,S_TOP);
 	$cmbStyle->AddItem(STYLE_LEFT,S_LEFT);
