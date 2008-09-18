@@ -325,7 +325,7 @@
 	else if(isset($_REQUEST['group_delete'])&&isset($_REQUEST['g_triggerid'])){
 		
 		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
-		
+
 		DBstart();
 		foreach($_REQUEST['g_triggerid'] as $id => $triggerid){
 			$row = DBfetch(DBselect('SELECT triggerid,templateid FROM triggers t WHERE t.triggerid='.$triggerid));

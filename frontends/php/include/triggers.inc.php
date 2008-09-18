@@ -1303,13 +1303,14 @@
  ******************************************************************************/
 	function delete_trigger($triggerids){
 		zbx_value2array($triggerids);
-		
+
 // first delete child triggers
 		$del_chd_triggers = array();
 		$db_triggers= get_triggers_by_templateid($triggerids);
 		while($db_trigger = DBfetch($db_triggers)){// recursion
 			$del_chd_triggers[$db_trigger['triggerid']] = $db_trigger['triggerid'];
 		}
+
 		if(!empty($del_chd_triggers)){
 			$result = delete_trigger($del_chd_triggers);
 			if(!$result) return  $result;
@@ -1361,6 +1362,7 @@
 			$triggers[$trig_rows['triggerid']] = $trig_rows;
 		}
 // --
+
 		$result = DBexecute('DELETE FROM triggers WHERE '.DBcondition('triggerid',$triggerids));
 
 		if($result){
