@@ -428,7 +428,7 @@ FIELD		|graphid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|drawtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|color		|t_varchar(32)	|'Dark Green'	|NOT NULL	|ZBX_SYNC
+FIELD		|color		|t_varchar(32)	|'009600'	|NOT NULL	|ZBX_SYNC
 FIELD		|yaxisside	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|calc_fnc	|t_integer	|'2'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
