@@ -765,7 +765,7 @@ else {
 				$condition = implode(',',$array);
 		}
 		
-		if(zbx_empty($condition)) $condition = '0';
+		if(zbx_empty($condition)) $condition = '-1';
 
 	return ' ('.$fieldname.$in.'('.$condition.')) ';
 	}
