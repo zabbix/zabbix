@@ -733,9 +733,10 @@ calendarcreate: function(){
 		line_div.className = 'calendartime';
 		
 		this.clndr_hour = document.createElement('input');	
+		this.clndr_hour.setAttribute('type','text');
+	
 	line_div.appendChild(this.clndr_hour);
 	
-		this.clndr_hour.setAttribute('type','text');
 		this.clndr_hour.setAttribute('name','hour');
 		this.clndr_hour.setAttribute('value','hh');
 		this.clndr_hour.setAttribute('maxlength','2');
@@ -744,9 +745,10 @@ calendarcreate: function(){
 	line_div.appendChild(document.createTextNode(' : '));
 		
 		this.clndr_minute = document.createElement('input');	
+		this.clndr_minute.setAttribute('type','text');
+		
 	line_div.appendChild(this.clndr_minute);
 	
-		this.clndr_minute.setAttribute('type','text');
 		this.clndr_minute.setAttribute('name','minute');
 		this.clndr_minute.setAttribute('value','mm');
 		this.clndr_minute.setAttribute('maxlength','2');
