@@ -551,6 +551,10 @@ AC_TRY_LINK(
 #include <sys/types.h>
 #endif /* HAVE_SYS_TYPES_H */
 
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */ 
+
 #include <sys/sysctl.h>
 ],
 [

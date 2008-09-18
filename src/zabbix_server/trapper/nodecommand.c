@@ -67,10 +67,12 @@ static void	execute_script(zbx_uint64_t hostid, char *command, char **result, in
 	int		result_offset = 0;
 	char		*p, buffer[MAX_STRING_LEN];
 	FILE		*f;
+#ifdef HAVE_OPENIPMI
 	DB_RESULT	db_result;
 	DB_ROW		db_row;
 	DB_ITEM		item;
 	int		ret, val;
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In execute_script(command:%s)", command);
 
