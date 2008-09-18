@@ -31,6 +31,9 @@ int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
 
 static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg)
 {
+#ifdef _WINDOWS
+	return parse_cfg_file(cfg_file, cfg);
+#else
 	DIR		*dir;
 	struct stat	sb;
 	struct dirent	*d;
@@ -69,6 +72,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg)
 	}
 
 	return result;
+#endif
 }
 
 /******************************************************************************
