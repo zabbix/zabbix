@@ -365,15 +365,20 @@
 		}
 		delete_httpstep($del_httpsteps);
 		
-		$db_httptestitems = DBselect('SELECT httptestitemid, itemid FROM httptestitem WHERE '.
-				DBcondition('httptestid',$httptestids));
-
-		while ($httptestitem_data = DBfetch($db_httptestitems)){
-			if (!DBexecute('DELETE FROM httptestitem WHERE httptestitemid='.$httptestitem_data['httptestitemid']))
-				return false;
-
-			if (!delete_item($httptestitem_data['itemid'])) return false;
+		$httptestitemids_del = array();
+		$itemids_del = array();
+		$sql = 'SELECT httptestitemid, itemid '.
+				' FROM httptestitem '.
+				' WHERE '.DBcondition('httptestid',$httptestids);
+				
+		$db_httptestitems = DBselect($sql);
+		while($httptestitem_data = DBfetch($db_httptestitems)){
+			$httptestitemids_del[$httptestitem_data['httptestitemid']] = $httptestitem_data['httptestitemid'];
+			$itemids_del[$httptestitem_data['itemid']] = $httptestitem_data['itemid'];
 		}
+		
+		if(!DBexecute('DELETE FROM httptestitem WHERE '.DBcondition('httptestitemid',$httptestitemids_del))) return false;
+		if (!delete_item($itemids_del)) return false;
 
 		if(!DBexecute('DELETE FROM httptest WHERE '.DBcondition('httptestid',$httptestids))) return false;
 
