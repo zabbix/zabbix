@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1257"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="zabbix_sender"
 	ProjectGUID="{0DA34C05-B7CA-4915-8D8B-B2DB8F4D0478}"
 	>
@@ -48,7 +48,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="./,../include/,../../../include/"
-				PreprocessorDefinitions="_WINDOWS;HAVE_LDAP;HAVE_ASSERT_H;WIN32;NDEBUG;_CONSOLE;HAVE_IPV6"
+				PreprocessorDefinitions="_WINDOWS;HAVE_WINLDAP_H;HAVE_ASSERT_H;WIN32;NDEBUG;_CONSOLE;HAVE_IPV6"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
