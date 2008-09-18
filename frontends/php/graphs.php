@@ -288,7 +288,8 @@ include_once 'include/page_header.php';
 	$form = new CForm();
 	$form->SetMethod('get');
 	
-	$form->AddItem(new CButton('form',S_CREATE_GRAPH));
+	if(!isset($_REQUEST['form']))
+		$form->AddItem(new CButton('form',S_CREATE_GRAPH));
 
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
 	echo SBR;
