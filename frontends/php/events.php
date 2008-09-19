@@ -126,6 +126,7 @@
 	$r_form->SetMethod('get');	
 	$r_form->AddOption('name','events_menu');
 	
+	$r_form->AddVar('fullscreen',$_REQUEST['fullscreen']);
 	$r_form->AddVar('nav_time',$_REQUEST['nav_time']);
 
 	if(EVENT_SOURCE_TRIGGERS == $source){
@@ -368,6 +369,7 @@
 	$navForm = new CForm('events.php');
 	$navForm->AddVar('groupid',$_REQUEST['groupid']);
 	$navForm->AddVar('hostid',$_REQUEST['hostid']);
+	$navForm->AddVar('fullscreen',$_REQUEST['fullscreen']);
 //	$navForm->AddVar('nav_time',$_REQUEST['nav_time']);
 	
 	$back = new CButton('back','« '.S_DAY);
