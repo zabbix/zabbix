@@ -1071,7 +1071,7 @@
 
 	function update_trigger_status($triggerids,$status){
 		zbx_value2array($triggerids);
-		
+
 		// first update status for child triggers
 		$upd_chd_triggers = array();
 		$db_chd_triggers = get_triggers_by_templateid($triggerids);
@@ -1082,7 +1082,8 @@
 			update_trigger_status($upd_chd_triggers,$status);
 		}
 
-		$triggerids = add_event($triggerids,TRIGGER_VALUE_UNKNOWN);
+		add_event($triggerids,TRIGGER_VALUE_UNKNOWN);
+		
 	return	DBexecute('UPDATE triggers SET status='.$status.' WHERE '.DBcondition('triggerid',$triggerids));
 	}
 
@@ -1264,7 +1265,7 @@
 				unset($triggerids[$trigger['triggerid']]);
 			}
 		}
-		
+
 		$events = array();
 		foreach($triggerids as $id => $triggerid){
 			$eventid = get_dbid('events','eventid');
