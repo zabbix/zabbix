@@ -1124,7 +1124,8 @@
 			$lst['node']['read_only']	= new CListBox('nodes_read'	,null	,10);
 			$lst['node']['deny']		= new CListBox('nodes_deny'	,null	,10);
 
-			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
+			$nodes = get_accessible_nodes_by_rights($rights, $user_type, null, PERM_RES_DATA_ARRAY);
+//SDI($nodes);
 			foreach($nodes as $node){
 				switch($node['permission']){
 					case PERM_READ_ONLY:	$list_name='read_only';		break;
