@@ -306,7 +306,7 @@
 	else if(isset($_REQUEST['group_disable'])&&isset($_REQUEST['g_triggerid'])){
 		
 		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
-		
+
 		DBstart();
 		$result = update_trigger_status($_REQUEST['g_triggerid'],TRIGGER_STATUS_DISABLED);
 		
