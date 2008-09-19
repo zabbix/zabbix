@@ -154,7 +154,7 @@ include_once('include/page_header.php');
 			$_REQUEST['password1'] = get_request('password1', null);
 			$_REQUEST['password2'] = get_request('password2', null);
 			
-			if($config['authentication_type'] != ZBX_AUTH_INTERNAL){
+			if(($config['authentication_type'] == ZBX_AUTH_HTTP) && zbx_empty($_REQUEST['password1'])){
 				$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
 			}
 
