@@ -1083,7 +1083,7 @@
 		}
 
 		add_event($triggerids,TRIGGER_VALUE_UNKNOWN);
-
+		
 	return	DBexecute('UPDATE triggers SET status='.$status.' WHERE '.DBcondition('triggerid',$triggerids));
 	}
 
