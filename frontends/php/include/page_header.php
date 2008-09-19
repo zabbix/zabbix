@@ -267,8 +267,9 @@ COpt::profiling_start("page");
 		unset($deny);
 		if(!defined('ZBX_PAGE_NO_AUTHERIZATION')){
 			if(isset($sub['user_type'])){
-				if($USER_DETAILS['type'] < $sub['user_type'])
+				if($USER_DETAILS['type'] < $sub['user_type']){
 					$deny = true;
+				}
 			}
 
 			if(isset($sub['node_perm'])){ 

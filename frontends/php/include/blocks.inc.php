@@ -176,6 +176,7 @@ function make_system_summary(){
 	global $USER_DETAILS;
 	$config = select_config();
 	
+	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 		
@@ -194,6 +195,7 @@ function make_system_summary(){
 	$sql = 'SELECT DISTINCT g.groupid,g.name '.
 			' FROM groups g, hosts_groups hg, hosts h, items i, functions f, triggers t '.
 			' WHERE '.DBcondition('h.hostid',$available_hosts).
+				' AND '.DBcondition('g.groupid',$available_groups).
 				' AND hg.groupid=g.groupid '.
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND h.hostid=i.hostid '.
