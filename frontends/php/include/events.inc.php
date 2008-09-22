@@ -398,7 +398,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 				' WHERE (e.object+0)='.EVENT_OBJECT_TRIGGER.
 					' AND '.DBcondition('e.objectid', $trigger_list).
 					$sql_cond.
-				order_by('e.clock');
+				order_by('e.eventid');
 
 		$result = DBselect($sql,10*($start+$num));
 	}
