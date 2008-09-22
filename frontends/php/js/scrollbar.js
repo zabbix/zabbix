@@ -231,7 +231,7 @@ arrowmousedown: function(e){
 	
 	this.arrow = e.originalTarget || e.srcElement;
 	
-	this.arrowmouseStartX = parseInt(this.getmousexy(e).x,10);
+	this.arrowmouseStartX = parseInt(this.getmousexy(e).x);
 	this.prevmouseX = this.arrowmouseStartX;
 	
 	this.barStartX = this.barX;
@@ -265,7 +265,7 @@ arrowmousemove: function(e){
 
 arrowmousemove_L: function(e){
 	var mousexy = this.getmousexy(e);
-	var mouseXdiff = parseInt(mousexy.x,10) - parseInt(this.arrowmouseStartX,10);
+	var mouseXdiff = parseInt(mousexy.x) - parseInt(this.arrowmouseStartX);
 
 	if((this.barW < this.minbarW) && ( mouseXdiff > 0))	return false;
 
@@ -275,20 +275,20 @@ arrowmousemove_L: function(e){
 	var PrevbarX = this.barX;
 	var tmp = (mousexy.x-this.prevmouseX);
 	if((mousexy.x-this.prevmouseX) < 0){
-		this.barX = parseInt(this.barStartX + mouseXdiff,10);
+		this.barX = parseInt(this.barStartX + mouseXdiff);
 		this.barX = this.checkbarX(mousexy.x);
 
 		this.barW = this.barW + (barXtemp - this.barX);
 		this.barW = this.checkbarW(this.prevmouseX);
 	}
 	else{
-		this.barW = parseInt(this.barStartW - mouseXdiff,10);
+		this.barW = parseInt(this.barStartW - mouseXdiff);
 		this.barW = this.checkbarW(mousexy.x);
 		
-		this.barX = parseInt(this.barX+(barWtemp-this.barW),10);
+		this.barX = parseInt(this.barX+(barWtemp-this.barW));
 		this.barX = this.checkbarX(this.prevmouseX);
 	}
-//SDI('LEFT: X:'+this.barX+' Width: '+this.barW+' Diff: '+mouseXdiff+' Mx: '+mousexy.x+'  PMx: '+this.prevmouseX);
+//SDI('LEFT: X:'+this.barX+' Width: '+this.barW+' Diff: '+mouseXdiff+' Mx: '+mousexy.x+'  PMx: '+this.prevmouseX+'  P: '+this.period);
 
 	this.barchangeW();
 	this.barmovetoX();
@@ -297,9 +297,9 @@ arrowmousemove_L: function(e){
 
 arrowmousemove_R: function(e){
 	var mousexy = this.getmousexy(e);
-	var mouseXdiff = parseInt(mousexy.x,10) - parseInt(this.arrowmouseStartX,10);
+	var mouseXdiff = parseInt(mousexy.x) - parseInt(this.arrowmouseStartX);
 
-	this.barW = parseInt(this.barStartW,10) + parseInt(mouseXdiff,10);
+	this.barW = parseInt(this.barStartW) + parseInt(mouseXdiff);
 	this.barW = this.checkbarW(mousexy.x);
 
 //SDI('RIGHT: X:'+this.barX+' Width: '+this.barW+' Diff: '+mouseXdiff);
@@ -364,9 +364,9 @@ mousemove: function(e){
 	e = e || window.event;
 		
 	var mousexy = this.getmousexy(e);
-	var mouseXdiff = parseInt(mousexy.x,10) - parseInt(this.mouseStartX,10);
+	var mouseXdiff = parseInt(mousexy.x) - parseInt(this.mouseStartX);
 	
-	this.barX = parseInt(this.barStartX + mouseXdiff,10);
+	this.barX = parseInt(this.barStartX + mouseXdiff);
 	this.barX = this.checkbarX(mousexy.x);
 	
 	this.barmovetoX();
@@ -415,6 +415,7 @@ arrowmoverighttoX: function(){
 checkbarW: function(msx){
 
 //SDI(this.barX+' : '+this.arrowMouseStartX+' : '+msx+' : '+this.barW);
+//SDI(this.barW+' < '+this.minbarW);
 	if(this.barW < this.minbarW){
 		return this.minbarW;
 	}
@@ -475,7 +476,8 @@ time2px: function(time){
 		var c = (Math.log(time) / this.xp)
 		var cor = this.scrollbarMaxW/1.1 - c;
 		px = c - cor;
-	} 
+	}
+
 return Math.round(px);
 },
 
@@ -485,6 +487,7 @@ px2time: function(px){
 	
 	var c = Math.round(px+cor);
 	var time = Math.round(Math.exp(c*this.xp));
+//SDI(px+' : '+time+' = '+this.time2px(time));
 return parseInt(time);
 },
 
@@ -554,7 +557,7 @@ settabinfo: function(){
 calcperiod: function(){
 	var period = this.px2time(this.barW)
 	period = (period > this.timeline)?(this.timeline):(period);
-	this.getPeriod();
+	period = (period<3600)?3600:period;
 return period;
 },
 
