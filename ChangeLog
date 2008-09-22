@@ -1,3 +1,7 @@
+Changes for 1.6.1
+
+ - [DEV-168] added support of system.cpu.util[] for OpenBSD agents (Sasha)
+
 Changes for 1.5.5
 
  - [DEV-211] added support of IPMI (Sasha)

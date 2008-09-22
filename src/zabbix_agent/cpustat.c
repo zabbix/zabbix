@@ -202,7 +202,14 @@ static int	get_cpustat(
 	static long	cp_time[CPUSTATES];
 	size_t		nlen = sizeof(cp_time);
  	
-    #else /* not HAVE_FUNCTION_SYSCTLBYNAME */
+    #elif defined(HAVE_FUNCTION_SYSCTL_KERN_CPTIME)
+
+	int		mib[3];
+	long		all_states[CPUSTATES];
+	u_int64_t	one_states[CPUSTATES];
+	size_t		sz;
+	
+    #else /* not HAVE_FUNCTION_SYSCTL_KERN_CPTIME */
 
 	return 1;
 	
@@ -279,7 +286,52 @@ static int	get_cpustat(
 	*cpu_interrupt	= (zbx_uint64_t)cp_time[CP_INTR];
 	*cpu_idle	= (zbx_uint64_t)cp_time[CP_IDLE];
 
-    #endif /* HAVE_FUNCTION_SYSCTLBYNAME */
+    #elif defined(HAVE_FUNCTION_SYSCTL_KERN_CPTIME)
+	/* OpenBSD 4.3 */
+
+	if (0 == cpuid)	/* all cpus */
+	{
+		mib[0] = CTL_KERN;
+		mib[1] = KERN_CPTIME;
+
+		sz = sizeof(all_states);
+		if (-1 == sysctl(mib, 2, &all_states, &sz, NULL, 0))
+			return 1;
+
+		if (sz != sizeof(all_states))
+			return 1;
+
+		*cpu_user	= (zbx_uint64_t)all_states[CP_USER];
+		*cpu_nice	= (zbx_uint64_t)all_states[CP_NICE];
+		*cpu_system	= (zbx_uint64_t)all_states[CP_SYS];
+		*cpu_interrupt	= (zbx_uint64_t)all_states[CP_INTR];
+		*cpu_idle	= (zbx_uint64_t)all_states[CP_IDLE];
+	}
+	else if (cpuid > 0)
+	{
+		mib[0] = CTL_KERN;
+		mib[1] = KERN_CPTIME2;
+		mib[2] = cpuid - 1;
+
+		sz = sizeof(one_states);
+		if (-1 == sysctl(mib, 3, &one_states, &sz, NULL, 0))
+			return 1;
+
+		if (sz != sizeof(one_states))
+			return 1;
+
+		*cpu_user	= (zbx_uint64_t)one_states[CP_USER];
+		*cpu_nice	= (zbx_uint64_t)one_states[CP_NICE];
+		*cpu_system	= (zbx_uint64_t)one_states[CP_SYS];
+		*cpu_interrupt	= (zbx_uint64_t)one_states[CP_INTR];
+		*cpu_idle	= (zbx_uint64_t)one_states[CP_IDLE];
+	}
+	else
+	{
+		return 1;
+	}
+
+    #endif /* HAVE_FUNCTION_SYSCTL_KERN_CPTIME */
 
 	return 0;
 }

@@ -620,6 +620,38 @@ AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_MAXPROC,1,[Define to 1 if 'KERN_MAXPROC' exi
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+dnl Check for function sysctl (KERN_CPTIME,KERN_CPTIME2)
+AC_MSG_CHECKING(for function sysctl (KERN_CPTIME,KERN_CPTIME2))
+AC_TRY_COMPILE(
+[
+#include <sys/param.h>
+#include <sys/sysctl.h>
+#include <sys/dkstat.h>
+],
+[
+size_t	sz;
+int	i[] = {CP_USER, CP_NICE, CP_SYS, CP_INTR, CP_IDLE};
+
+{
+	long	states[CPUSTATES];
+	int	mib[2] = {CTL_KERN, KERN_CPTIME};
+
+	sz = sizeof(states);
+	sysctl(mib, 2, &states, &sz, NULL, 0);
+}
+
+{
+	u_int64_t	states[CPUSTATES];
+	int		mib[3] = {CTL_KERN, KERN_CPTIME2, 0};
+
+	sz = sizeof(states);
+	sysctl(mib, 3, &states, &sz, NULL, 0);
+}
+],
+AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_CPTIME,1,[Define to 1 if 'KERN_CPTIME,KERN_CPTIME2' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
 dnl Check for function initgroups()
 AC_MSG_CHECKING(for function initgroups())
 AC_TRY_LINK(

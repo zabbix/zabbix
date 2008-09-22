@@ -25,7 +25,7 @@
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_HW_NCPU
-	/* OpenBSD 4.2 i386 */
+	/* OpenBSD 4.2,4.3 i386 */
 	size_t	len;
 	int	mib[] = {CTL_HW, HW_NCPU}, ncpu;
 	char	mode[MAX_STRING_LEN];
@@ -183,6 +183,13 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		if (0 == strcmp(mode, "avg1")) 		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system1)
 		else if (0 == strcmp(mode, "avg5")) 	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system5)
 		else if (0 == strcmp(mode, "avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system15)
+		else return SYSINFO_RET_FAIL;
+	}
+	else if (0 == strcmp(type, "interrupt"))
+	{
+		if (0 == strcmp(mode, "avg1"))		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].interrupt1)
+		else if (0 == strcmp(mode, "avg5"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].interrupt5)
+		else if (0 == strcmp(mode, "avg15"))	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].interrupt15)
 		else return SYSINFO_RET_FAIL;
 	}
 	else
