@@ -261,7 +261,7 @@ include_once "include/page_header.php";
 		}
 	}
 
-	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, S_ZABBIX_URL, $gray);
+	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, S_ZABICOM_URL, $gray);
 
 	if(!isset($_REQUEST["border"]))
 	{

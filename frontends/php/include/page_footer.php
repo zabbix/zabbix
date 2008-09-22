@@ -59,9 +59,11 @@ function zbxCallPostScripts()
 			$table->SetCellSpacing(0);
 			$table->SetCellPadding(1);
 			$table->AddRow(array(
-				new CCol(new CLink(
-					S_ZABBIX_VER.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
-					"http://www.zabbix.com", "highlight"),
+				new CCol(array(
+							new CLink(S_ZABICOM_BIG, S_ZABICOM_URL, "highlight"),
+							SPACE.S_COPYRIGHT_BY.SPACE,
+							new CLink(S_ZABBIX_BIG, S_ZABBIX_URL, "highlight")
+						),
 					"page_footer_l"),
 				new CCol(array(
 						new CSpan(SPACE.SPACE."|".SPACE.SPACE,"divider"),

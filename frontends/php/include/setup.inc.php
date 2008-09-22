@@ -96,7 +96,7 @@
 			$table = new CTable(null, 'setup_wizard');
 			$table->SetAlign('center');
 			$table->SetHeader(array(
-				new CCol(S_ZABBIX_VER, 'left'), 
+				new CCol(S_ZABICOM_VER, 'left'), 
 				SPACE
 				),'header');
 			$table->AddRow(array(SPACE, new CCol($this->stage[$this->GetStep()]['title'], 'right')),'title');

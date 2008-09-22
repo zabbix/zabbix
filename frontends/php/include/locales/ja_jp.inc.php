@@ -27,21 +27,21 @@
 	"S_DATE_FORMAT_YMD"=>			"Y M d",
 	"S_HTML_CHARSET"=>			"UTF-8",
 
-	"S_INFORMATION_ABOUT_ZABBIX"=>		"ZABBIXの情報 (v1.1beta3)",
-	"S_HOMEPAGE_OF_ZABBIX"=>		"ZABBIXホームページ",
-	"S_HOMEPAGE_OF_ZABBIX_DETAILS"=>	"ZABBIX本家のホームページ",
-	"S_LATEST_ZABBIX_MANUAL"=>		"ZABBIXマニュアル",
-	"S_LATEST_ZABBIX_MANUAL_DETAILS"=>	"最新バージョンのZABBIXマニュアル",
+	"S_INFORMATION_ABOUT_ZABBIX"=>		"ZABICOMの情報 (v1.1beta3)",
+	"S_HOMEPAGE_OF_ZABBIX"=>		"ZABICOMホームページ",
+	"S_HOMEPAGE_OF_ZABBIX_DETAILS"=>	"ZABICOM本家のホームページ",
+	"S_LATEST_ZABBIX_MANUAL"=>		"ZABICOMマニュアル",
+	"S_LATEST_ZABBIX_MANUAL_DETAILS"=>	"最新バージョンのZABICOMマニュアル",
 	"S_DOWNLOADS"=>				"ダウンロード",
-	"S_DOWNLOADS_DETAILS"=>			"最新バージョンのZABBIXリリース",
+	"S_DOWNLOADS_DETAILS"=>			"最新バージョンのZABICOMリリース",
 	"S_FEATURE_REQUESTS"=>			"リクエスト",
 	"S_FEATURE_REQUESTS_DETAILS"=>		"機能追加の要求はこちら",
 	"S_FORUMS"=>				"フォーラム",
-	"S_FORUMS_DETAILS"=>			"ZABBIX本家フォーラム",
+	"S_FORUMS_DETAILS"=>			"ZABICOM本家フォーラム",
 	"S_BUG_REPORTS"=>			"バグレポート",
-	"S_BUG_REPORTS_DETAILS"=>		"ZABBIXのバグはこちら",
+	"S_BUG_REPORTS_DETAILS"=>		"ZABICOMのバグはこちら",
 	"S_MAILING_LISTS"=>			"メーリングリスト",
-	"S_MAILING_LISTS_DETAILS"=>		"ZABBIX本家のメーリングリスト",
+	"S_MAILING_LISTS_DETAILS"=>		"ZABICOM本家のメーリングリスト",
 	
 //	actions.php
 	"S_ACTIONS"=>				"アクション",
@@ -148,8 +148,8 @@
 	"S_YELLOW"=>				"黄",
 
 //	config.php
-	"S_CONFIGURATION_OF_ZABBIX"=>		"ZABBIXの設定",
-	"S_CONFIGURATION_OF_ZABBIX_BIG"=>	"ZABBIXの設定",
+	"S_CONFIGURATION_OF_ZABBIX"=>		"ZABICOMの設定",
+	"S_CONFIGURATION_OF_ZABBIX_BIG"=>	"ZABICOMの設定",
 	"S_CONFIGURATION_UPDATED"=>		"設定を更新しました",
 	"S_CONFIGURATION_WAS_NOT_UPDATED"=>	"設定が更新できません",
 	"S_ADDED_NEW_MEDIA_TYPE"=>		"メディアタイプを追加しました",
@@ -223,9 +223,8 @@
 	"S_COMPARE"=>				"Compare",
 
 //	Footer
-	"S_COPYRIGHT_BY"=>			"Copyright 2001-2006 by ",
+	"S_COPYRIGHT_BY"=>			"Copyright by",
 	"S_CONNECTED_AS"=>			"Connected as",
-	"S_SIA_ZABBIX"=>			"SIA Zabbix",
 
 //	graph.php
 	"S_CONFIGURATION_OF_GRAPH"=>		"グラフ設定",
@@ -368,14 +367,14 @@
 	"S_HISTORY"=>				"ヒストリ",
 	"S_TRENDS"=>				"トレンド",
 	"S_SHORT_NAME"=>			"Short name",
-	"S_ZABBIX_AGENT"=>			"ZABBIX agent",
-	"S_ZABBIX_AGENT_ACTIVE"=>		"ZABBIX agent (active)",
+	"S_ZABBIX_AGENT"=>			"ZABICOM agent",
+	"S_ZABBIX_AGENT_ACTIVE"=>		"ZABICOM agent (active)",
 	"S_SNMPV1_AGENT"=>			"SNMPv1 agent",
-	"S_ZABBIX_TRAPPER"=>			"ZABBIX trapper",
+	"S_ZABBIX_TRAPPER"=>			"ZABICOM trapper",
 	"S_SIMPLE_CHECK"=>			"Simple check",
 	"S_SNMPV2_AGENT"=>			"SNMPv2 agent",
 	"S_SNMPV3_AGENT"=>			"SNMPv3 agent",
-	"S_ZABBIX_INTERNAL"=>			"ZABBIX internal",
+	"S_ZABBIX_INTERNAL"=>			"ZABICOM internal",
 	"S_ZABBIX_UNKNOWN"=>			"不明",
 	"S_ACTIVE"=>				"有効",
 	"S_NOT_ACTIVE"=>			"無効",
@@ -437,7 +436,6 @@
 //	map.php
 	"S_OK_BIG"=>				"正常",
 	"S_PROBLEMS_SMALL"=>			"障害",
-	"S_ZABBIX_URL"=>			"http://www.zabbix.com",
 
 //	maps.php
 	"S_NETWORK_MAPS"=>			"ネットワークマップ",
@@ -483,8 +481,8 @@
 	"S_MENU_SCREENS"=>			"スクリーン",
 	"S_MENU_IT_SERVICES"=>			"ITサービス",
 	"S_MENU_HOME"=>				"ホーム",
-	"S_MENU_ABOUT"=>			"ZABBIXについて",
-	"S_MENU_STATUS_OF_ZABBIX"=>		"ZABBIXの状態",
+	"S_MENU_ABOUT"=>			"ZABICOMについて",
+	"S_MENU_STATUS_OF_ZABBIX"=>		"ZABICOMの状態",
 	"S_MENU_AVAILABILITY_REPORT"=>		"稼動レポート",
 	"S_MENU_CONFIG"=>			"設定",
 	"S_MENU_USERS"=>			"ユーザー",
@@ -514,10 +512,10 @@
 	"S_MORE_THAN_5_MINUTES"=>		"5分以上",
 
 //	report1.php
-	"S_STATUS_OF_ZABBIX"=>			"ZABBIXの状態",
-	"S_STATUS_OF_ZABBIX_BIG"=>		"ZABBIXの状態",
+	"S_STATUS_OF_ZABBIX"=>			"ZABICOMの状態",
+	"S_STATUS_OF_ZABBIX_BIG"=>		"ZABICOMの状態",
 	"S_VALUE"=>				"Value",
-	"S_ZABBIX_SERVER_IS_RUNNING"=>		"ZABBIXサーバーの起動",
+	"S_ZABBIX_SERVER_IS_RUNNING"=>		"ZABICOMサーバーの起動",
 	"S_NUMBER_OF_VALUES_STORED"=>		"監視データ数",
 	"S_NUMBER_OF_TRENDS_STORED"=>		"トレンド数",
 	"S_NUMBER_OF_ALARMS"=>			"アラーム数",
@@ -762,7 +760,6 @@
 	"S_JAPANESE_JP"=>			"Japanese (JP)",
 
 //	index.php
-	"S_ZABBIX_BIG"=>			"ZABBIX",
 
 //	hostprofiles.php
 	"S_HOST_PROFILES"=>			"ホストプロファイル",

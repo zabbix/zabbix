@@ -1,3 +1,7 @@
+Changes fro 1.0.0:
+
+ - [DEV-230] changed ZABBIX notation to ZABICOM (Artem)
+
 Changes for 1.4.j:
 
  - [ZBX-65] fixed bug with applications on items mass update (Artem)

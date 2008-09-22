@@ -388,8 +388,8 @@
 	'S_NEW_MAPPING'=>			'New mapping',
 	'S_NO_MAPPING_DEFINED'=>		'No mapping defined',
 	'S_CREATE_VALUE_MAP'=>			'Create value map',
-	'S_CONFIGURATION_OF_ZABBIX'=>		'Configuration of ZABBIX',
-	'S_CONFIGURATION_OF_ZABBIX_BIG'=>	'CONFIGURATION OF ZABBIX',
+	'S_CONFIGURATION_OF_ZABBIX'=>		'Configuration of ZABICOM',
+	'S_CONFIGURATION_OF_ZABBIX_BIG'=>	'CONFIGURATION OF ZABICOM',
 	'S_CONFIGURATION_UPDATED'=>		'Configuration updated',
 	'S_CONFIGURATION_WAS_NOT_UPDATED'=>	'Configuration was not updated',
 	'S_ADDED_NEW_MEDIA_TYPE'=>		'Added new media type',
@@ -484,10 +484,10 @@
 	'S_COMPARE'=>				'Compare',
 
 //	Footer
-	'S_ZABBIX_VER'=>			'ZABBIX 1.4.j',
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2007 by ',
+	'S_ZABICOM_VER'=>			'ZABICOM 1.0.0',
+	'S_COPYRIGHT_BY'=>			'Copyright by',
 	'S_CONNECTED_AS'=>			'Connected as',
-	'S_SIA_ZABBIX'=>			'SIA Zabbix',
+	'S_SIA_ZABBIX'=>			'SIA ZABBIX',
 
 //	graph.php
 	'S_CONFIGURATION_OF_GRAPH'=>		'Configuration of graph',
@@ -714,15 +714,15 @@
 	'S_HISTORY'=>				'History',
 	'S_TRENDS'=>				'Trends',
 	'S_SHORT_NAME'=>			'Short name',
-	'S_ZABBIX_AGENT'=>			'ZABBIX agent',
-	'S_ZABBIX_AGENT_ACTIVE'=>		'ZABBIX agent (active)',
+	'S_ZABBIX_AGENT'=>			'ZABICOM agent',
+	'S_ZABBIX_AGENT_ACTIVE'=>		'ZABICOM agent (active)',
 	'S_SNMPV1_AGENT'=>			'SNMPv1 agent',
-	'S_ZABBIX_TRAPPER'=>			'ZABBIX trapper',
+	'S_ZABBIX_TRAPPER'=>			'ZABICOM trapper',
 	'S_SIMPLE_CHECK'=>			'Simple check',
 	'S_SNMPV2_AGENT'=>			'SNMPv2 agent',
 	'S_SNMPV3_AGENT'=>			'SNMPv3 agent',
-	'S_ZABBIX_INTERNAL'=>			'ZABBIX internal',
-	'S_ZABBIX_AGGREGATE'=>			'ZABBIX aggregate',
+	'S_ZABBIX_INTERNAL'=>			'ZABICOM internal',
+	'S_ZABBIX_AGGREGATE'=>			'ZABICOM aggregate',
 	'S_EXTERNAL_CHECK'=>			'External check',
 	'S_WEB_MONITORING'=>			'Web monitoring',
 	'S_ZABBIX_UNKNOWN'=>			'Unknown',
@@ -829,6 +829,7 @@
 	'S_OK_BIG'=>				'OK',
 	'S_PROBLEMS_SMALL'=>			'problems',
 	'S_ZABBIX_URL'=>			'http://www.zabbix.com',
+	'S_ZABICOM_URL'=>			'http://www.zabicom.com',
 
 //	maps.php
 	'S_NETWORK_MAPS'=>			'Network maps',
@@ -881,7 +882,7 @@
 	'S_MENU_IT_SERVICES'=>			'IT SERVICES',
 	'S_MENU_HOME'=>				'HOME',
 	'S_MENU_ABOUT'=>			'ABOUT',
-	'S_MENU_STATUS_OF_ZABBIX'=>		'STATUS OF ZABBIX',
+	'S_MENU_STATUS_OF_ZABBIX'=>		'STATUS OF ZABICOM',
 	'S_MENU_AVAILABILITY_REPORT'=>		'AVAILABILITY REPORT',
 	'S_MENU_CONFIG'=>			'CONFIG',
 	'S_MENU_USERS'=>			'USERS',
@@ -917,10 +918,10 @@
 	'S_MORE_THAN_5_MINUTES'=>		'More than 5 minutes',
 
 //	report1.php
-	'S_STATUS_OF_ZABBIX'=>			'Status of ZABBIX',
-	'S_STATUS_OF_ZABBIX_BIG'=>		'STATUS OF ZABBIX',
+	'S_STATUS_OF_ZABBIX'=>			'Status of ZABICOM',
+	'S_STATUS_OF_ZABBIX_BIG'=>		'STATUS OF ZABICOM',
 	'S_VALUE'=>				'Value',
-	'S_ZABBIX_SERVER_IS_RUNNING'=>		'ZABBIX server is running',
+	'S_ZABBIX_SERVER_IS_RUNNING'=>		'ZABICOM server is running',
 	'S_NUMBER_OF_VALUES_STORED'=>		'Number of values stored',
 	'S_VALUES_STORED'=>			'Values stored',
 	'S_NUMBER_OF_TRENDS_STORED'=>		'Number of trends stored',
@@ -1227,9 +1228,9 @@
 	'S_NEVER'=>						'Never',
 
 //	users.php
-	'S_ZABBIX_USER'=>			'ZABBIX User',
-	'S_ZABBIX_ADMIN'=>			'ZABBIX Admin',
-	'S_SUPER_ADMIN'=>			'ZABBIX Super Admin',
+	'S_ZABBIX_USER'=>			'ZABICOM User',
+	'S_ZABBIX_ADMIN'=>			'ZABICOM Admin',
+	'S_SUPER_ADMIN'=>			'ZABICOM Super Admin',
 	'S_USER_TYPE'=>				'User type',
 	'S_USERS'=>				'Users',
 	'S_USER_ADDED'=>			'User added',
@@ -1307,7 +1308,7 @@
 	'S_TOOLS'=>				'Tools',
 	'S_RESULT'=>				'Result',
 	'S_CLOSE'=>				'Close',
-	'S_CONNECT_TO_SERVER_ERROR'=>		'Cannot connect to ZABBIX server',
+	'S_CONNECT_TO_SERVER_ERROR'=>		'Cannot connect to ZABICOM server',
 
 
 //	audit.php
@@ -1345,6 +1346,7 @@
 
 //	index.php
 	'S_ZABBIX_BIG'=>			'ZABBIX',
+	'S_ZABICOM_BIG'=>			'ZABICOM',
 
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			'Host profiles',
