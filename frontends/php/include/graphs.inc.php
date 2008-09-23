@@ -690,13 +690,13 @@
 			$result &= delete_graph($del_chd_graphs);
 		}
 		
-		$result &= DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$graphids).' AND resourcetype='.SCREEN_RESOURCE_GRAPH);
+		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$graphids).' AND resourcetype='.SCREEN_RESOURCE_GRAPH);
 
-		/* delete graph */
-		$result &= DBexecute('DELETE FROM graphs_items WHERE '.DBcondition('graphid',$graphids));
-		$result &= DBexecute('DELETE FROM graphs WHERE '.DBcondition('graphid',$graphids));
-		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='graphid' AND ".DBcondition('value_id',$graphids));
+// delete graph 
+		DBexecute('DELETE FROM graphs_items WHERE '.DBcondition('graphid',$graphids));
+		DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='graphid' AND ".DBcondition('value_id',$graphids));
 		
+		$result = DBexecute('DELETE FROM graphs WHERE '.DBcondition('graphid',$graphids));
 		if($result){
 			foreach($graphs as $graphid => $graph){
 				if(isset($host_list[$graphid]))
