@@ -442,7 +442,7 @@ include_once 'include/page_header.php';
 		}
 		
 		array_push($app_rows, new CRow(array(
-			is_show_subnodes()?($item_cnt?SPACE:get_node_name_by_elid($db_item['itemid'])):null,
+			is_show_subnodes()?($db_host['item_cnt']?SPACE:get_node_name_by_elid($db_item['itemid'])):null,
 			$_REQUEST['hostid']?NULL:($db_host['item_cnt']?SPACE:$db_item['host']),
 			str_repeat(SPACE, 6).$description,
 			$lastclock,
