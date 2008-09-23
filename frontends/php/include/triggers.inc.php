@@ -1366,7 +1366,6 @@
 // --
 
 		$result = DBexecute('DELETE FROM triggers WHERE '.DBcondition('triggerid',$triggerids));
-
 		if($result){
 			foreach($triggers as $triggerid => $trigger){
 				$msg = "Trigger '".$trigger["description"]."' deleted";

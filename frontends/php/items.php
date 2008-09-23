@@ -591,7 +591,7 @@ include_once "include/page_header.php";
 			$group_itemid = $_REQUEST['group_itemid'];			
 
 			DBstart();
-			
+
 			$sql = 'SELECT h.host, i.itemid, i.key_, i.templateid '.
 					' FROM items i, hosts h '.
 					' WHERE '.DBcondition('i.itemid',$group_itemid).
@@ -606,7 +606,7 @@ include_once "include/page_header.php";
 
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');
 			}
-			
+
 			$result = delete_item($group_itemid);
 			$result = DBend($result);
 			show_messages($result, S_ITEMS_DELETED, null);

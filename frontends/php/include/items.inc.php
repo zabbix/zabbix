@@ -820,6 +820,7 @@
 		$result = delete_triggers_by_itemid($itemids);
 		if(!$result)	return	$result;
 //--
+
 // delete graphs
 		$del_graphs = array();
 		$db_gitems = DBselect('SELECT DISTINCT graphid FROM graphs_items WHERE '.DBcondition('itemid',$itemids));
@@ -836,14 +837,12 @@
 		if(!$result)	return	$result;
 
 		$temp_arr = array(SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_PLAIN_TEXT);
-		$result &= DBexecute('DELETE FROM screens_items '.
-							' WHERE '.DBcondition('resourceid',$itemids).
-								' AND '.DBcondition('resourcetype', $temp_arr));
-
-		$result &= DBexecute('DELETE FROM items_applications WHERE '.DBcondition('itemid',$itemids));
-		$result &= DBexecute('DELETE FROM items WHERE '.DBcondition('itemid',$itemids));
-		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='itemid' AND ".DBcondition('value_id',$itemids));
 		
+		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$itemids).' AND '.DBcondition('resourcetype', $temp_arr));
+		DBexecute('DELETE FROM items_applications WHERE '.DBcondition('itemid',$itemids));
+		DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='itemid' AND ".DBcondition('value_id',$itemids));
+		
+		$result = DBexecute('DELETE FROM items WHERE '.DBcondition('itemid',$itemids));
 		if($result){
 			foreach($items as $itemid => $item){
 				info("Item '".$hosts[$itemid]['host'].':'.$item['key_']."' deleted");
