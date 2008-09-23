@@ -1,5 +1,6 @@
 Changes for 1.6.1
 
+ - [ZBX-474] fixed deleting hosts with postgres-backend (Artem)
  - [ZBX-475] added message on missed php-ldap module (Artem)
  - [DEV-168] added support of system.cpu.util[] for OpenBSD agents (Sasha)
 

@@ -442,21 +442,23 @@ require_once "include/httptest.inc.php";
 		DBexecute('DELETE FROM hosts_templates WHERE '.DBcondition('hostid',$hostids));
 
 // disable actions
-		$db_actions = DBselect('SELECT DISTINCT actionid '.
-								' FROM conditions '.
-								' WHERE conditiontype='.CONDITION_TYPE_HOST.
-									' AND '.DBcondition('value',$hostids));	// POSIBLE value type violation!!! Warning !!! Warning !!! Warning !!! 
+
+		$sql = 'SELECT DISTINCT actionid '.
+				' FROM conditions '.
+				' WHERE conditiontype='.CONDITION_TYPE_HOST.
+					' AND '.DBcondition(zbx_dbcast_2bigint('value'),$hostids);	// FIXED[POSIBLE value type violation]!!!
+		$db_actions = DBselect($sql);
 									
 		while($db_action = DBfetch($db_actions)){
 			DBexecute('UPDATE actions '.
 					' SET status='.ACTION_STATUS_DISABLED.
 					' WHERE actionid='.$db_action['actionid']);
 		}
-		
+
 // delete action conditions
 		DBexecute('DELETE FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_HOST.
-						' AND '.DBcondition('value',$hostids));	// POSIBLE value type violation!!! Warning !!! Warning !!! Warning !!! );
+						' AND '.DBcondition(zbx_dbcast_2bigint('value'),$hostids));	// FIXED[POSIBLE value type violation]!!!
 
 // delete host profile
 		delete_host_profile($hostids);
