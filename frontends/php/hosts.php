@@ -429,7 +429,7 @@ include_once('include/page_header.php');
 
 		if(!zbx_empty($hostid) && $clone_hostid && ($_REQUEST['form'] == 'full_clone')){
 // Host items			
-			$sql = 'SELECT DISTINCT i.itemid '.
+			$sql = 'SELECT DISTINCT i.itemid, i.description '.
 					' FROM items i'.
 					' WHERE i.hostid='.$clone_hostid.
 						' AND i.templateid=0 '.
@@ -443,7 +443,7 @@ include_once('include/page_header.php');
 // Host triggers
 			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 			
-			$sql = 'SELECT DISTINCT t.triggerid '.
+			$sql = 'SELECT DISTINCT t.triggerid, t.description '.
 					' FROM triggers t, items i, functions f'.
 					' WHERE i.hostid='.$clone_hostid.
 						' AND f.itemid=i.itemid '.
@@ -460,7 +460,7 @@ include_once('include/page_header.php');
 // Host graphs
 			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 			
-			$sql = 'SELECT DISTINCT g.graphid '.
+			$sql = 'SELECT DISTINCT g.graphid, g.name '.
 						' FROM graphs g, graphs_items gi,items i '.
 						' WHERE '.DBcondition('g.graphid',$available_graphs).
 							' AND gi.graphid=g.graphid '.

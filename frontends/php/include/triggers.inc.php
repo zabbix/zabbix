@@ -1343,18 +1343,19 @@
 		DBexecute('DELETE FROM sysmaps_link_triggers WHERE '.DBcondition('triggerid',$triggerids));
 		
 // disable actions
-		$db_actions = DBselect('SELECT DISTINCT actionid '.
-								' FROM conditions '.
-								' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
-									' AND '.DBcondition('value',$triggerids));   // POSIBLE VALUE TYPE VIOLATION !!!!!!!!!!!!!!!
+		$sql = 'SELECT DISTINCT actionid '.
+				' FROM conditions '.
+				' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
+					' AND '.DBcondition(zbx_dbcast_2bigint('value'),$triggerids);   // FIXED[POSIBLE value type violation]!!!
+		$db_actions = DBselect($sql);
 									
 		while($db_action = DBfetch($db_actions)){
 			DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.
 				' WHERE actionid='.$db_action['actionid']);
 		}
 		
-// delete action conditions		// POSIBLE VALUE TYPE VIOLATION !!!!!!!!!!!!!!!
-		DBexecute('DELETE FROM conditions WHERE conditiontype='.CONDITION_TYPE_TRIGGER.' AND '.DBcondition('value',$triggerids));
+// delete action conditions		// FIXED[POSIBLE value type violation]!!!
+		DBexecute('DELETE FROM conditions WHERE conditiontype='.CONDITION_TYPE_TRIGGER.' AND '.DBcondition(zbx_dbcast_2bigint('value'),$triggerids));
 
 // Get triggers INFO before delete them!
 		$triggers = array();

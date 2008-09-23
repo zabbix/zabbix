@@ -918,27 +918,26 @@
 		
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
+		$sql_from = '';
+		$sql_where = '';
 		if($groupid > 0){
-			$group_where = ',hosts_groups hg '.
-							' WHERE hg.groupid='.$groupid.
-								' AND hg.hostid=h.hostid AND ';
+			$sql_from = ', hosts_groups hg ';
+			$sql_where = ' AND hg.groupid='.$groupid.' AND hg.hostid=h.hostid ';							
 		} 
-		else {
-			$group_where = ' WHERE ';
-		}
 
 COpt::profiling_start('prepare data');
-		$result = DBselect('select distinct h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
+		$result = DBselect('SELECT DISTINCT h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
 				' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
-			' from hosts h,items i '.
-				' left join  functions f on f.itemid=i.itemid '.
-				' left join triggers t on t.triggerid=f.triggerid '.
-			$group_where.
-				DBcondition('h.hostid',$available_hosts).
-				' and h.status='.HOST_STATUS_MONITORED.
-				' and h.hostid=i.hostid '.
-				' and i.status='.ITEM_STATUS_ACTIVE.
-			' order by i.description,i.itemid');
+			' FROM hosts h, items i '.
+				' LEFT JOIN functions f on f.itemid=i.itemid '.
+				' LEFT JOIN triggers t on t.triggerid=f.triggerid '.
+				$sql_from.
+			' WHERE '.DBcondition('h.hostid',$available_hosts).
+				' AND h.status='.HOST_STATUS_MONITORED.
+				' AND h.hostid=i.hostid '.
+				' AND i.status='.ITEM_STATUS_ACTIVE.
+				$sql_where.
+			' ORDER BY i.description,i.itemid');
 
 		unset($items);
 		unset($hosts);
