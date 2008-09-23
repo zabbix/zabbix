@@ -22,7 +22,7 @@
 /************* DYNAMIC REFRESH *************/
 
 function add_refresh_objects($ref_tab){
-	$min = PHP_INT_MAX;
+	$min = 2147483647; // PHP_INT_MAX
 	foreach($ref_tab as $id => $obj){
 		$obj['interval'] = (isset($obj['interval']))?$obj['interval']:60;
 		zbx_add_post_js(get_refresh_obj_script($obj));
