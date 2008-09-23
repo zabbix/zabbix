@@ -434,7 +434,7 @@ include_once('include/page_header.php');
 					' WHERE i.hostid='.$clone_hostid.
 						' AND i.templateid=0 '.
 					' ORDER BY i.description';
-					
+
 			$res = DBselect($sql);
 			while($db_item = DBfetch($res)){
 				$result &= copy_item_to_host($db_item['itemid'], $hostid, true);
@@ -1070,7 +1070,7 @@ include_once('include/page_header.php');
 				S_ACTIONS
 				));
 		
-			$sql='SELECT h.* FROM ';
+			$sql='SELECT DISTINCT h.* FROM ';
 				
 			if(isset($_REQUEST["groupid"])){
 				$sql.= ' hosts h,hosts_groups hg ';
