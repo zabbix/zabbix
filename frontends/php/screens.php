@@ -291,7 +291,7 @@ include_once 'include/page_header.php';
 			zbx_add_post_js('if(typeof(parent) != "undefined") parent.resizeiframe("iframe");
 							else resizeiframe("iframe");'."\n");
 		}
-		
+
 		if($element){
 			$p_elements[] = $element;
 		}
