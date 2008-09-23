@@ -171,27 +171,24 @@
 	
 
 
-	function get_slideshow($slideshowid, $step, $effectiveperiod=NULL)
-	{
-		$slide_data = DBfetch(DBselect('select min(step) as min_step, max(step) as max_step from slides '.
-					' where slideshowid='.$slideshowid));
+	function get_slideshow($slideshowid, $step, $effectiveperiod=NULL){
+		$sql = 'SELECT min(step) as min_step, max(step) as max_step '.
+				' FROM slides '.
+				' WHERE slideshowid='.$slideshowid;
+		$slide_data = DBfetch(DBselect($sql));
 
-		if(!$slide_data || is_null($slide_data['min_step']))
-		{
+		if(!$slide_data || is_null($slide_data['min_step'])){
 			return new CTableInfo(S_NO_SLIDES_DEFINED);
 		}
 
-		if(!isset($step) || $step < $slide_data['min_step'] || $step > $slide_data['max_step'])
-		{
+		if(!isset($step) || $step < $slide_data['min_step'] || $step > $slide_data['max_step']){
 			$curr_step = $slide_data['min_step'];
 		}
-		else
-		{
+		else{
 			$curr_step = $step;
 		}
 		
-		if(!isset($step))
-		{
+		if(!isset($step)){
 			$iframe = new CIFrame('screens.php?config=1&fullscreen=2&elementid='.$slideshowid.'&step='.$curr_step.
 					'&period='.$effectiveperiod.url_param('stime').url_param('from'),'99%');
 					
@@ -209,7 +206,7 @@
 				'&period='.$effectiveperiod.url_param('stime').url_param('from'),
 				$slide_data['delay']);
 
-		return get_screen($slide_data['screenid'],2,$effectiveperiod);
+	return get_screen($slide_data['screenid'],2,$effectiveperiod);
 	}
 	
 
@@ -306,7 +303,7 @@
 	
 
 	# Show screen cell containing plain text values
-	function	get_screen_plaintext($itemid,$elements){
+	function get_screen_plaintext($itemid,$elements){
 
 		if($itemid == 0){
 			$table = new CTableInfo(S_ITEM_NOT_EXISTS);
@@ -352,19 +349,15 @@
 		
 		$table = new CTableInfo();
 		$table->SetHeader(array(S_TIMESTAMP,item_description($host['host'].': '.$item["description"],$item["key_"])));
-		
+
 		while($row=DBfetch($result)){
-			switch($item["value_type"])
-			{
+			switch($item["value_type"]){
 				case ITEM_VALUE_TYPE_TEXT:	
-					if($DB['TYPE'] == "ORACLE")
-					{
-						if(isset($row["value"]))
-						{
+					if($DB['TYPE'] == "ORACLE"){
+						if(isset($row["value"])){
 							$row["value"] = $row["value"]->load();
 						}
-						else
-						{
+						else{
 							$row["value"] = "";
 						}
 					}
@@ -793,11 +786,11 @@
 	}
 
 	// editmode: 0 - view with actions, 1 - edit mode, 2 - view without any actions
-	function get_screen($screenid, $editmode, $effectiveperiod=NULL)
-	{
-		if(!screen_accessible($screenid, $editmode ? PERM_READ_WRITE : PERM_READ_ONLY))
+	function get_screen($screenid, $editmode, $effectiveperiod=NULL){
+
+		if(!screen_accessible($screenid, ($editmode == 1)?PERM_READ_WRITE:PERM_READ_ONLY))
 			access_deny();
-		
+
 		if(is_null($effectiveperiod)) 
 			$effectiveperiod = ZBX_MIN_PERIOD;
 
@@ -805,23 +798,23 @@
 		$row=DBfetch($result);
 		if(!$row) return new CTableInfo(S_NO_SCREENS_DEFINED);
 
-		for($r=0;$r<$row["vsize"];$r++)
-		{
-			for($c=0;$c<$row["hsize"];$c++)
-			{
+		for($r=0;$r<$row["vsize"];$r++){
+			for($c=0;$c<$row["hsize"];$c++){
 				if(isset($skip_field[$r][$c]))	continue;
 
 				$sql="select * from screens_items where screenid=$screenid and x=$c and y=$r";
 				$iresult=DBSelect($sql);
 				$irow=DBfetch($iresult);
-				if($irow)
-				{
+				
+				if($irow){
 					$colspan=$irow["colspan"];
 					$rowspan=$irow["rowspan"];
-				} else {
+				} 
+				else {
 					$colspan=0;
 					$rowspan=0;
 				}
+				
 				for($i=0; $i < $rowspan || $i==0; $i++){
 					for($j=0; $j < $colspan || $j==0; $j++){
 						if($i!=0 || $j!=0)
@@ -835,11 +828,9 @@
 			($editmode == 0 || $editmode == 2) ? "screen_view" : "screen_edit");
 		$table->AddOption('id','iframe');
 	
-		for($r=0;$r<$row["vsize"];$r++)
-		{
+		for($r=0;$r<$row["vsize"];$r++){
 			$new_cols = array();
-			for($c=0;$c<$row["hsize"];$c++)
-			{
+			for($c=0;$c<$row["hsize"];$c++){
 				$item = array();
 				if(isset($skip_field[$r][$c]))		continue;
 				
