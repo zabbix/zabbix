@@ -145,6 +145,11 @@ function ldap_authentication($user,$passwd,$cnf=NULL){
 		}
 	}
 
+	if(!function_exists('ldap_connect')){
+		info('Probably php-ldap module is missing.');
+		return false;
+	}
+	
 	$ldap = new CLdap($cnf);
 	$ldap->connect();
 	
