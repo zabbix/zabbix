@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 if(!isset($DB)){
+	$DB = array();
 	if(isset($DB_TYPE))		$DB['TYPE'] 	= $DB_TYPE;
 	if(isset($DB_SERVER)) 	$DB['SERVER'] 	= $DB_SERVER;
 	if(isset($DB_PORT))		$DB['PORT'] 	= $DB_PORT;
@@ -538,15 +540,6 @@ if(!isset($DB)){
 	return $result;
 	}
 	
-if(!isset($DB)){
-	if(isset($DB_TYPE))	$DB['TYPE'] = $DB_TYPE;
-	if(isset($DB_SERVER)) $DB['SERVER'] = $DB_SERVER;
-	if(isset($DB_PORT))	$DB['PORT'] = $DB_PORT;
-	if(isset($DB_DATABASE))	$DB['DATABASE'] = $DB_DATABASE;
-	if(isset($DB_USER))	$DB['USER'] = $DB_USER;
-	if(isset($DB_PASSWORD))	$DB['PASSWORD'] = $DB_PASSWORD;
-}
-
 /* string value prepearing */
 if(isset($DB['TYPE']) && $DB['TYPE'] == 'ORACLE') {
 	function zbx_dbstr($var)	{
@@ -756,9 +749,9 @@ else {
 			case 'MYSQL':
 			case 'ORACLE':
 				$items = array_chunk($array, 950);
-				foreach($items as $id => $value){
+				foreach($items as $id => $values){
 					$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
-					$condition.= implode(',',$value);
+					$condition.= implode(',',$values);
 				}
 				break;
 			default:
