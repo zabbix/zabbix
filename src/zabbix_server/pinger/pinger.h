@@ -22,10 +22,7 @@
 
 extern	int	CONFIG_PINGER_FORKS;
 extern	int	CONFIG_PINGER_FREQUENCY;
-extern	char	*CONFIG_FPING_LOCATION;
 
-extern	void	signal_handler( int sig );
-
-void main_pinger_loop(int num);
+void	main_pinger_loop(int num);
 
 #endif

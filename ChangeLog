@@ -4,6 +4,7 @@ Changes fro 1.0.0:
 
 Changes for 1.4.j:
 
+ - improved enhanced ICMP monitoring (Sasha)
  - [ZBX-65] fixed bug with applications on items mass update (Artem)
  - added support of encoding parameter for regexp[] and iregexp[]. Integrated patch (Sasha)
  - improved support of macros {ITEM.VALUE} (Sasha)
