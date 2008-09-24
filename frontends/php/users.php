@@ -154,8 +154,15 @@ include_once('include/page_header.php');
 			$_REQUEST['password1'] = get_request('password1', null);
 			$_REQUEST['password2'] = get_request('password2', null);
 			
-			if(($config['authentication_type'] == ZBX_AUTH_HTTP) && zbx_empty($_REQUEST['password1'])){
-				$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
+			if(($config['authentication_type'] != ZBX_AUTH_INTERNAL) && zbx_empty($_REQUEST['password1'])){
+				if(($config['authentication_type'] == ZBX_AUTH_LDAP) && isset($_REQUEST['userid'])){
+					if(GROUP_GUI_ACCESS_INTERNAL != get_user_auth($_REQUEST['userid'])){
+						$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
+					}
+				}
+				else{
+					$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
+				}
 			}
 
 			if($_REQUEST['password1']!=$_REQUEST['password2']){
@@ -511,10 +518,16 @@ include_once('include/page_header.php');
 					' WHERE '.DBcondition('s.userid',$userids).
 						' AND s.userid=u.userid '.
 					' GROUP BY s.userid,s.status';
-
+//SDI($sql);
 			$db_sessions = DBselect($sql);
 			while($db_ses=DBfetch($db_sessions)){
-				$users_sessions[$db_ses['userid']] = $db_ses;
+				if(!isset($users_sessions[$db_ses['userid']])){
+					$users_sessions[$db_ses['userid']] = $db_ses;
+				}
+				
+				if(isset($users_sessions[$db_ses['userid']]) && ($users_sessions[$db_ses['userid']]['lastaccess'] < $db_ses['lastaccess'])){
+					$users_sessions[$db_ses['userid']] = $db_ses;
+				}
 			}
 
 			$users_groups = array();
