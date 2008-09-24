@@ -209,11 +209,11 @@ include_once "include/page_header.php";
 	$prev = 'Prev 100';
 	$next = 'Next 100';
 	if($_REQUEST["start"] > 0){
-		$prev = new Clink('Prev '.PAGE_SIZE, 'audit.php?prev=1'.url_param('start'),'styled');
+		$prev = new Clink('Prev '.PAGE_SIZE, 'audit.php?prev=1'.url_param('start').url_param('config'),'styled');
 	}
 	
 	if($table->GetNumRows() >= PAGE_SIZE){
-		$next = new Clink('Next '.PAGE_SIZE, 'audit.php?next=1'.url_param('start'),'styled');
+		$next = new Clink('Next '.PAGE_SIZE, 'audit.php?next=1'.url_param('start').url_param('config'),'styled');
 	}	
 
 	$filterForm = new CFormTable(S_FILTER);//,'events.php?filter_set=1','POST',null,'sform');
