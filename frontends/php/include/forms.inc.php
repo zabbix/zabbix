@@ -709,23 +709,23 @@
 			$new_group_name = '';
 		}
 		else{
-			$alias		= get_request("alias","");
-			$name		= get_request("name","");
-			$surname	= get_request("surname","");
+			$alias		= get_request('alias','');
+			$name		= get_request('name','');
+			$surname	= get_request('surname','');
 			$password	= null;
-			$password1 	= get_request("password1", null);
-			$password2 	= get_request("password2", null);
-			$url 		= get_request("url","");
-			$autologin	= get_request("autologin",0);
-			$autologout	= get_request("autologout",900);
-			$lang		= get_request("lang","en_gb");
+			$password1 	= get_request('password1', '');
+			$password2 	= get_request('password2', '');
+			$url 		= get_request('url','');
+			$autologin	= get_request('autologin',0);
+			$autologout	= get_request('autologout',900);
+			$lang		= get_request('lang','en_gb');
 			$theme 		= get_request('theme','default.css');
-			$refresh	= get_request("refresh",30);
-			$user_type	= get_request("user_type",USER_TYPE_ZABBIX_USER);;
-			$user_groups	= get_request("user_groups",array());
-			$change_password = get_request("change_password", null);
+			$refresh	= get_request('refresh',30);
+			$user_type	= get_request('user_type',USER_TYPE_ZABBIX_USER);;
+			$user_groups	= get_request('user_groups',array());
+			$change_password = get_request('change_password', null);
 
-			$user_medias		= get_request("user_medias", array());
+			$user_medias		= get_request('user_medias', array());
 
 			$new_group_id	= get_request('new_group_id', 0);
 			$new_group_name = get_request('new_group_name', '');
@@ -749,28 +749,28 @@
 
 		$frmUser = new CFormTable($frm_title);
 		$frmUser->SetName('user_form');
-		$frmUser->SetHelp("web.users.php");
-		$frmUser->AddVar("config",get_request("config",0));
+		$frmUser->SetHelp('web.users.php');
+		$frmUser->AddVar('config',get_request('config',0));
 
-		if(isset($userid))	$frmUser->AddVar("userid",$userid);
+		if(isset($userid))	$frmUser->AddVar('userid',$userid);
 
 		if($profile==0){
-			$frmUser->AddRow(S_ALIAS,	new CTextBox("alias",$alias,40));
-			$frmUser->AddRow(S_NAME,	new CTextBox("name",$name,40));
-			$frmUser->AddRow(S_SURNAME,	new CTextBox("surname",$surname,40));
+			$frmUser->AddRow(S_ALIAS,	new CTextBox('alias',$alias,40));
+			$frmUser->AddRow(S_NAME,	new CTextBox('name',$name,40));
+			$frmUser->AddRow(S_SURNAME,	new CTextBox('surname',$surname,40));
 		}
 
 		$auth_type = (isset($userid))?get_user_system_auth($userid):$config['authentication_type'];
 		
 		if(ZBX_AUTH_INTERNAL == $auth_type){
 			if(!isset($userid) || isset($change_password)){
-				$frmUser->AddRow(S_PASSWORD,	new CPassBox("password1",$password1,20));
-				$frmUser->AddRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox("password2",$password2,20));
+				$frmUser->AddRow(S_PASSWORD,	new CPassBox('password1',$password1,20));
+				$frmUser->AddRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox('password2',$password2,20));
 				if(isset($change_password))
 					$frmUser->AddVar('change_password', $change_password);
 			}
 			else{
-				$passwd_but = new CButton("change_password", S_CHANGE_PASSWORD);
+				$passwd_but = new CButton('change_password', S_CHANGE_PASSWORD);
 				if($alias == ZBX_GUEST_USER){
 					$passwd_but->AddOption('disabled','disabled');
 				}	
