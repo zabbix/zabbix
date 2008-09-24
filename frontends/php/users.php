@@ -511,10 +511,16 @@ include_once('include/page_header.php');
 					' WHERE '.DBcondition('s.userid',$userids).
 						' AND s.userid=u.userid '.
 					' GROUP BY s.userid,s.status';
-
+//SDI($sql);
 			$db_sessions = DBselect($sql);
 			while($db_ses=DBfetch($db_sessions)){
-				$users_sessions[$db_ses['userid']] = $db_ses;
+				if(!isset($users_sessions[$db_ses['userid']])){
+					$users_sessions[$db_ses['userid']] = $db_ses;
+				}
+				
+				if(isset($users_sessions[$db_ses['userid']]) && ($users_sessions[$db_ses['userid']]['lastaccess'] < $db_ses['lastaccess'])){
+					$users_sessions[$db_ses['userid']] = $db_ses;
+				}
 			}
 
 			$users_groups = array();

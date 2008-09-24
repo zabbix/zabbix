@@ -1,5 +1,6 @@
 Changes for 1.6.1
 
+ - [ZBX-468] fixed user online status in administration panel (Artem)
  - [ZBX-492] fixed wrong url "next 100" in audit actions (Artem)
  - [ZBX-490] fixed undefined variable in latest data (Artem)
  - [ZBX-481] fixed permission issue in slideshow (Artem)
