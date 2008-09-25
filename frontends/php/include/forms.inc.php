@@ -4623,6 +4623,7 @@
 		$proxy_hostid	= get_request('proxy_hostid','');
 
 		$useipmi	= get_request('useipmi','no');
+		$ipmi_ip	= get_request('ipmi_ip','');
 		$ipmi_port	= get_request('ipmi_port',623);
 		$ipmi_privilege	= get_request('ipmi_privilege',2);
 		$ipmi_username	= get_request('ipmi_username','');
@@ -4663,18 +4664,36 @@
 		}
 		
 		if(isset($_REQUEST['hostid']) && !isset($_REQUEST['form_refresh'])){
-			$proxy_hostid	= $db_host['proxy_hostid'];
+			$proxy_hostid		= $db_host['proxy_hostid'];
 			$host			= $db_host['host'];
 			$port			= $db_host['port'];
 			$status			= $db_host['status'];
 			$useip			= $db_host['useip'];
-			$dns			= $db_host['dns'];
-			$ip				= $db_host['ip'];
 			$useipmi		= $db_host['useipmi'] ? 'yes' : 'no';
+			if ($useipmi == 'yes')
+			{
+				if ($useip)
+				{
+					$ip	= $db_host['ip'];
+					$dns	= '';
+					$ipmi_ip= $db_host['dns'];
+				}
+				else
+				{
+					$ip	= '0.0.0.0';
+					$dns	= $db_host['dns'];
+					$ipmi_ip= $db_host['ip'];
+				}
+			}
+			else
+			{
+				$ip		= $db_host['ip'];
+				$dns		= $db_host['dns'];
+			}
 			$ipmi_port		= $db_host['ipmi_port'];
-			$ipmi_privilege	= $db_host['ipmi_privilege'];
-			$ipmi_username	= $db_host['ipmi_username'];
-			$ipmi_password	= $db_host['ipmi_password'];
+			$ipmi_privilege		= $db_host['ipmi_privilege'];
+			$ipmi_username		= $db_host['ipmi_username'];
+			$ipmi_password		= $db_host['ipmi_password'];
 
 // add groups
 			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
@@ -4847,6 +4866,10 @@
 		}
 
 		if($useipmi == 'yes'){
+			if(defined('ZBX_HAVE_IPV6'))
+				$frmHost->AddRow(S_IPMI_IP_ADDRESS,new CTextBox('ipmi_ip',$ipmi_ip,'39'));
+			else
+				$frmHost->AddRow(S_IPMI_IP_ADDRESS,new CTextBox('ipmi_ip',$ipmi_ip,'15'));
 			$frmHost->AddRow(S_IPMI_PORT, new CNumericBox('ipmi_port', $ipmi_port, 5));	
 
 			$cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmi_privilege);
@@ -4861,6 +4884,7 @@
 			$frmHost->AddRow(S_IPMI_PASSWORD, new CTextBox('ipmi_password', $ipmi_password, 20));
 		}
 		else{
+			$frmHost->AddVar('ipmi_ip', $ipmi_ip);	
 			$frmHost->AddVar('ipmi_port', $ipmi_port);	
 			$frmHost->AddVar('ipmi_privilege', $ipmi_privilege);
 			$frmHost->AddVar('ipmi_username', $ipmi_username);

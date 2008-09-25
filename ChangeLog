@@ -1,5 +1,6 @@
 Changes for 1.6.1
 
+ - [ZBX-499] fixes problem with IPMI authorization; added field "IPMI IP" (Sasha)
  - [ZBX-464] fixed user creation under ldap (Artem)
  - [ZBX-468] fixed user online status in administration panel (Artem)
  - [ZBX-492] fixed wrong url "next 100" in audit actions (Artem)
