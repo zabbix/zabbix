@@ -126,6 +126,7 @@
 				'value_type'		=> ''),
 			'elements'	=> array(
 				'description'		=> '',
+				'ipmi_sensor'		=> '',
 				'delay'			=> '',
 				'history'		=> '',
 				'trends'		=> '',

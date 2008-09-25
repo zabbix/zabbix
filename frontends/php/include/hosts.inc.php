@@ -170,7 +170,7 @@ require_once "include/httptest.inc.php";
 	 *
 	 *     NOTE: templates = array(id => name, id2 => name2, ...)
 	 */
-	function db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_port,$ipmi_privilege,$ipmi_username,$ipmi_password,$hostid=null)
+	function db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_privilege,$ipmi_username,$ipmi_password,$hostid=null)
 	{
 		if(!eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host)){
 			error("Incorrect characters used for Hostname");
@@ -192,6 +192,14 @@ require_once "include/httptest.inc.php";
 		{
 			error("Host '$host' already exists");
 			return false;
+		}
+
+		if ($useipmi == 'yes')
+		{
+			if ($useip)
+				$dns = $ipmi_ip;
+			else
+				$ip = $ipmi_ip;
 		}
 
 		if(is_null($hostid)){
@@ -247,9 +255,9 @@ require_once "include/httptest.inc.php";
  *
  *     NOTE: templates = array(id => name, id2 => name2, ...)
  */
-	function add_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_port,$ipmi_privilege,$ipmi_username,$ipmi_password,$newgroup,$groups)
+	function add_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_privilege,$ipmi_username,$ipmi_password,$newgroup,$groups)
 	{
-		$hostid = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_port,$ipmi_privilege,$ipmi_username,$ipmi_password);
+		$hostid = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_privilege,$ipmi_username,$ipmi_password);
 		if(!$hostid)
 			return $hostid;
 		else
@@ -277,7 +285,7 @@ require_once "include/httptest.inc.php";
 	 *
 	 *     NOTE: templates = array(id => name, id2 => name2, ...)
 	 */	
-	function update_host($hostid,$host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_port,$ipmi_privilege,$ipmi_username,$ipmi_password,$newgroup,$groups)
+	function update_host($hostid,$host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_privilege,$ipmi_username,$ipmi_password,$newgroup,$groups)
 	{
 	
 		$old_templates = get_templates_by_hostid($hostid);
@@ -291,7 +299,7 @@ require_once "include/httptest.inc.php";
 
 		$new_templates = array_diff($templates, $old_templates);
 
-		$result = (bool) db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$new_templates,$useipmi,$ipmi_port,$ipmi_privilege,$ipmi_username,$ipmi_password,$hostid);
+		$result = (bool) db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$new_templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_privilege,$ipmi_username,$ipmi_password,$hostid);
 		if(!$result)
 			return $result;
 

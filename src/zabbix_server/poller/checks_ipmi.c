@@ -879,8 +879,8 @@ int	get_value_ipmi(DB_ITEM *item, AGENT_RESULT *value)
 		return NOTSUPPORTED;
 	}
 
-	h = init_ipmi_host(item->useip ? item->host_ip : item->host_dns, item->ipmi_port,
-			item->ipmi_authtype, item->ipmi_privilege, item->ipmi_username, item->ipmi_password);
+	h = init_ipmi_host(item->ipmi_ip, item->ipmi_port, (~0)/*item->ipmi_authtype*/,
+			item->ipmi_privilege, item->ipmi_username, item->ipmi_password);
 
 	if (0 == h->domain_up) {
 		if (NULL != h->err)
