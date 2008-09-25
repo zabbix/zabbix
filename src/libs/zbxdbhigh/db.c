@@ -1808,6 +1808,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->eventlog_source	= NULL;
 
 	item->useipmi		= atoi(row[39]);
+	item->ipmi_ip		= item->useip ? item->host_dns : item->host_ip;
 	item->ipmi_port		= atoi(row[40]);
 	item->ipmi_authtype	= atoi(row[41]);
 	item->ipmi_privilege	= atoi(row[42]);

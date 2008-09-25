@@ -118,7 +118,8 @@
 							'', /* ip */
 							0, /* proxy_hostid */
 							array(), /* templates */
-							0, /* useipmi */
+							'no', /* useipmi */
+							'', /* ipmi_ip */
 							623, /* ipmi_port */
 							2, /* ipmi_privilege */
 							'', /* ipmi_username */
@@ -208,7 +209,8 @@
 
 					if(update_host($data['hostid'], $data['name'], $data['port'], $data['status'],
 						$data['useip'], $data['dns'], $data['ip'], 0, $data['templates'],
-						0, /* useipmi */
+						'no', /* useipmi */
+						'', /* ipmi_ip */
 						623, /* ipmi_port */
 						2, /* ipmi_privilege */
 						'', /* ipmi_username */
@@ -423,6 +425,7 @@
 					}
 
 					if(!isset($data['description']))		$data['description']		= '';
+					if(!isset($data['ipmi_sensor']))		$data['ipmi_sensor']		= '';
 					if(!isset($data['delay']))				$data['delay']			= 30;
 					if(!isset($data['history']))			$data['history']		= 90;
 					if(!isset($data['trends']))				$data['trends']			= 365;
