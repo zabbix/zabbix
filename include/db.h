@@ -326,6 +326,7 @@ DB_ITEM
 	char	*params;
 
 	int	useipmi;
+	char	*ipmi_ip;
 	int	ipmi_port;
 	int	ipmi_authtype;
 	int	ipmi_privilege;

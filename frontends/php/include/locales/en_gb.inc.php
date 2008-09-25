@@ -736,6 +736,7 @@
 	'S_IP_ADDRESS'=>			'IP address',
 	'S_LINK_WITH_TEMPLATE'=>		'Link with Template',
 	'S_USEIPMI'=>				'Use IPMI',
+	'S_IPMI_IP_ADDRESS'=>			'IPMI IP address',
 	'S_IPMI_PORT'=>				'IPMI port',
 	'S_IPMI_PRIVILEGE'=>			'IPMI privilege level',
 	'S_PRIVILEGE_CALLBACK'=>		'Callback',
