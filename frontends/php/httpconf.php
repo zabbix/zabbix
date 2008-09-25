@@ -50,6 +50,9 @@ include_once "include/page_header.php";
 		"agent"=>	array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
 		"macros"=>	array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
 		"steps"=>	array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
+		'authentication'=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1'),'isset({save})'),
+		"http_user"=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.')'),
+		"http_password"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.')'),
 		
 		"new_httpstep"=>	array(T_ZBX_STR, O_OPT,  null,	null,null),
 
@@ -191,10 +194,14 @@ include_once "include/page_header.php";
 		$db_delay_flex = trim($db_delay_flex,";");
 		// for future use */
 
+		$_REQUEST['http_user'] = htmlspecialchars($_REQUEST['http_user']);
+		$_REQUEST['http_password'] = htmlspecialchars($_REQUEST['http_password']);
+		
 		if(isset($_REQUEST["httptestid"]))
 		{
 			$result = update_httptest($_REQUEST["httptestid"], $_REQUEST['hostid'], $_REQUEST["application"],
-				$_REQUEST["name"],$_REQUEST["delay"],$_REQUEST["status"],$_REQUEST["agent"],
+				$_REQUEST["name"],$_REQUEST['authentication'],$_REQUEST['http_user'],$_REQUEST['http_password'],
+				$_REQUEST["delay"],$_REQUEST["status"],$_REQUEST["agent"],
 				$_REQUEST["macros"],$_REQUEST["steps"]);
 
 			$httptestid = $_REQUEST["httptestid"];
@@ -205,7 +212,8 @@ include_once "include/page_header.php";
 		else
 		{
 			$httptestid = add_httptest($_REQUEST['hostid'],$_REQUEST["application"],
-				$_REQUEST["name"],$_REQUEST["delay"],$_REQUEST["status"],$_REQUEST["agent"],
+				$_REQUEST["name"],$_REQUEST['authentication'],$_REQUEST['http_user'],$_REQUEST['http_password'],
+				$_REQUEST["delay"],$_REQUEST["status"],$_REQUEST["agent"],
 				$_REQUEST["macros"],$_REQUEST["steps"]);
 
 			$result = $httptestid;

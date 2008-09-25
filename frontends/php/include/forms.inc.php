@@ -367,6 +367,10 @@
 		$agent		= get_request('agent', '');
 		$macros		= get_request('macros', array());
 		$steps		= get_request('steps', array());
+
+		$authentication = get_request('authentication', HTTPTEST_AUTH_NONE); 
+		$http_user 		= get_request('http_user', '');
+		$http_password 	= get_request('http_password', '');
 		
 		if((isset($_REQUEST["httptestid"]) && !isset($_REQUEST["form_refresh"])) || isset($limited))
 		{
@@ -380,6 +384,11 @@
 			$status		= $httptest_data['status'];
 			$agent		= $httptest_data['agent'];
 			$macros		= $httptest_data['macros'];
+			
+			$authentication = $httptest_data['authentication'];
+			$http_user 		= $httptest_data['http_user'];
+			$http_password 	= $httptest_data['http_password'];
+			
 			
 			$steps		= array();
 			$db_steps = DBselect('select * from httpstep where httptestid='.$_REQUEST["httptestid"].' order by no');
@@ -400,7 +409,17 @@
 
 		$form->AddRow(S_NAME, new CTextBox('name', $name, 40));
 		
-		$form->AddRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));
+		$cmbAuth = new CComboBox('authentication',$authentication,'submit();');
+		$cmbAuth->AddItem(HTTPTEST_AUTH_NONE,S_NONE);
+		$cmbAuth->AddItem(HTTPTEST_AUTH_BASIC,S_BASIC_AUTHENTICATION);
+		
+		$form->AddRow(S_BASIC_AUTHENTICATION, $cmbAuth);
+		if($authentication == HTTPTEST_AUTH_BASIC){
+			$form->AddRow(S_USER, new CTextBox('http_user', $http_user, 32));
+			$form->AddRow(S_PASSWORD, new CTextBox('http_password', $http_password, 40));
+		}
+
+		$form->AddRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));		
 		
 		$cmbAgent = new CEditableComboBox('agent', $agent, 80);
 		$cmbAgent->AddItem('Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)',

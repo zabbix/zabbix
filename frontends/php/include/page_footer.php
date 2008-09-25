@@ -60,8 +60,8 @@ function zbxCallPostScripts()
 			$table->SetCellPadding(1);
 			$table->AddRow(array(
 				new CCol(array(
-							new CLink(S_ZABICOM_BIG, S_ZABICOM_URL, "highlight"),
-							SPACE.S_COPYRIGHT_BY.SPACE,
+							new CLink(S_ZABICOM_VER, S_ZABICOM_URL, "highlight"),
+							SPACE.SPACE.S_COPYRIGHT_BY.SPACE.SPACE,
 							new CLink(S_ZABBIX_BIG, S_ZABBIX_URL, "highlight")
 						),
 					"page_footer_l"),

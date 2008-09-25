@@ -355,6 +355,9 @@
 	define('ZBX_FLAG_TRIGGER',	0);
 	define('ZBX_FLAG_EVENT',	1);
 
+	define('HTTPTEST_AUTH_NONE',	0);
+	define('HTTPTEST_AUTH_BASIC',	1);
+
 	define('HTTPTEST_STATUS_ACTIVE',	0);
 	define('HTTPTEST_STATUS_DISABLED',	1);
 

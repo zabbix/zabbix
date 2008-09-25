@@ -148,7 +148,7 @@
 		return $httpstepid;
 	}
 
-	function	db_save_httptest($httptestid, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps)
+	function	db_save_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps)
 	{
 		$history = 30; // TODO !!! Allow user set this parametr
 		$trends = 90; // TODO !!! Allow user set this parametr
@@ -179,10 +179,11 @@
 		
 		if(isset($httptestid))
 		{
-			$result = DBexecute('update httptest set '.
-				' applicationid='.$applicationid.', name='.zbx_dbstr($name).', delay='.$delay.','.
-				' status='.$status.', agent='.zbx_dbstr($agent).', macros='.zbx_dbstr($macros).','.
-				' error='.zbx_dbstr('').', curstate='.HTTPTEST_STATE_UNKNOWN.
+			$result = DBexecute('update httptest'.
+				' set applicationid='.$applicationid.', name='.zbx_dbstr($name).','.
+					' authentication='.$authentication.','.' http_user='.zbx_dbstr($http_user).','.' http_password='.zbx_dbstr($http_password).','.
+					' delay='.$delay.','.' status='.$status.', agent='.zbx_dbstr($agent).', macros='.zbx_dbstr($macros).','.
+					' error='.zbx_dbstr('').', curstate='.HTTPTEST_STATE_UNKNOWN.
 				' where httptestid='.$httptestid);
 		}
 		else
@@ -197,8 +198,9 @@
 			}
 			
 			$result = DBexecute('insert into httptest'.
-				' (httptestid, applicationid, name, delay, status, agent, macros, curstate) '.
+				' (httptestid, applicationid, name, authentication, http_user, http_password, delay, status, agent, macros, curstate) '.
 				' values ('.$httptestid.','.$applicationid.','.zbx_dbstr($name).','.
+				$authentication.','.zbx_dbstr($http_user).','.zbx_dbstr($http_password).','.
 				$delay.','.$status.','.zbx_dbstr($agent).','.zbx_dbstr($macros).','.HTTPTEST_STATE_UNKNOWN.')'
 				);
 
@@ -315,18 +317,18 @@
 		return $result;
 	}
 	
-	function	add_httptest($hostid, $application, $name, $delay, $status, $agent, $macros, $steps)
+	function	add_httptest($hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps)
 	{
-		$result = db_save_httptest(null, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps);
+		$result = db_save_httptest(null, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps);
 		
 		if($result) info("Sceanrio '".$name."' added");
 
 		return $result;
 	}
 	
-	function	update_httptest($httptestid, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps)
+	function	update_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps)
 	{
-		$result = db_save_httptest($httptestid, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps);
+		$result = db_save_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps);
 		
 		if($result)	info("Sceanrio '".$name."' updated");
 
