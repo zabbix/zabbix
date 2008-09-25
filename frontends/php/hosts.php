@@ -136,8 +136,10 @@ include_once('include/page_header.php');
 	
 	if($_REQUEST['config']==4)
 		validate_group_with_host(PERM_READ_WRITE,array('always_select_first_host','only_current_node'),'web.last.conf.groupid', 'web.last.conf.hostid');
-	else if($_REQUEST['config']==0 || $_REQUEST['config']==3)
+	else if($_REQUEST['config']==0)
 		validate_group(PERM_READ_WRITE,array('real_hosts'),'web.last.conf.groupid');
+	else if($_REQUEST['config']==3)
+		validate_group(PERM_READ_WRITE,array('templated_hosts'),'web.last.conf.groupid');
 
 	update_profile('web.hosts.config',$_REQUEST['config'], PROFILE_TYPE_INT);
 ?>
@@ -955,7 +957,6 @@ include_once('include/page_header.php');
 			unset($_REQUEST['disable']);
 	}
 
-
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
 ?>
 <?php
@@ -1018,20 +1019,22 @@ include_once('include/page_header.php');
 				$status_filter = ' AND h.status IN ('.HOST_STATUS_TEMPLATE.') ';
 			else
 				$status_filter = ' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') ';
-				
+
 			$cmbGroups = new CComboBox('groupid',get_request('groupid',0),'submit()');
 			$cmbGroups->AddItem(0,S_ALL_SMALL);
 
-			$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
-							' FROM groups g,hosts_groups hg,hosts h '.
-							' WHERE '.DBcondition('h.hostid',$available_hosts).
-								' AND g.groupid=hg.groupid '.
-								' AND h.hostid=hg.hostid'.
-								$status_filter.
-							' ORDER BY g.name');
+			$sql = 'SELECT DISTINCT g.groupid,g.name '.
+					' FROM groups g,hosts_groups hg,hosts h '.
+					' WHERE '.DBcondition('h.hostid',$available_hosts).
+						' AND g.groupid=hg.groupid '.
+						' AND h.hostid=hg.hostid'.
+						$status_filter.
+					' ORDER BY g.name';
+
+			$result=DBselect($sql);
 			while($row=DBfetch($result)){
 				$cmbGroups->AddItem($row['groupid'],$row['name']);
-				if((bccomp($row['groupid'], $_REQUEST['groupid']) == 0)) $correct_host = 1;
+				if(bccomp($row['groupid'], $_REQUEST['groupid']) == 0) $correct_host = 1;
 			}
 			
 			if(!isset($correct_host)){
