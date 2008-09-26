@@ -963,6 +963,8 @@ int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *e
 		DBupdate_trigger_value(&trigger, TRIGGER_VALUE_UNKNOWN, clock, error);
 	}
 
+	DBfree_result(result);
+
 	return SUCCEED;
 }
 
