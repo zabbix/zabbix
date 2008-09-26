@@ -1,5 +1,6 @@
 Changes for 1.6.1
 
+ - [ZBX-488] fixed memory leak in ZABBIX server code (Alexei)
  - [ZBX-500] added more debug information for icmpping processing (Sasha)
  - [ZBX-499] fixes problem with IPMI authorization; added field "IPMI IP" (Sasha)
  - [ZBX-464] fixed user creation under ldap (Artem)
