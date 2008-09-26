@@ -77,23 +77,22 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, char *error, int
 
 	assert(hosts);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_ping() [hosts_count:%d]",
-			hosts_count);
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_ping()");
 
 	if (NULL != CONFIG_SOURCE_IP)
 		zbx_snprintf(source_ip, sizeof(source_ip), "-S%s ", CONFIG_SOURCE_IP);
 	else
 		*source_ip = '\0';
 
-	zbx_snprintf(filename, sizeof(filename), "%s/zabbix_server_%li.pinger",
-			CONFIG_TMPDIR,
-			zbx_get_thread_id());
-
 	if (access(CONFIG_FPING_LOCATION, F_OK|X_OK) == -1)
 	{
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", CONFIG_FPING_LOCATION, errno, strerror(errno));
 		return NOTSUPPORTED;
 	}
+
+	zbx_snprintf(filename, sizeof(filename), "%s/zabbix_server_%li.pinger",
+			CONFIG_TMPDIR,
+			zbx_get_thread_id());
 
 #ifdef HAVE_IPV6
 	if (access(CONFIG_FPING6_LOCATION, F_OK|X_OK) == -1)
@@ -135,8 +134,13 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, char *error, int
 		return NOTSUPPORTED;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", filename);
+
 	for (i = 0; i < hosts_count; i++)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", hosts[i].addr);
 		fprintf(f, "%s\n", hosts[i].addr);
+	}
 
 	fclose(f);
 
@@ -151,6 +155,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, char *error, int
 	}
 
 	while (NULL != fgets(tmp, sizeof(tmp), f)) {
+		zbx_rtrim(tmp, "\n");
 		zabbix_log(LOG_LEVEL_DEBUG, "Update IP [%s]",
 				tmp);
 
@@ -205,11 +210,17 @@ int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, char *error, int max_error_l
 {
 	int res;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In do_ping() hosts_count=%d",
+			hosts_count);
+
 	if (NOTSUPPORTED == (res = process_ping(hosts, hosts_count, error, max_error_len)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s", error);
 		zabbix_syslog("%s", error);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of do_ping() result=%s",
+			res == NOTSUPPORTED ? "NOTSUPPORTED" : "SUCCEED");
 
 	return res;
 }
