@@ -19,22 +19,19 @@
 **/
 ?>
 <?php
-	class CServerInfo extends CTable
-	{
-		function CServerInfo()
-		{
+	class CServerInfo extends CTable{
+		function CServerInfo(){
 			parent::CTable(NULL,"server_info");
 		}
 
-		function BodyToString()
-		{
+		function BodyToString(){
 			global $USER_DETAILS;
 			global $_SERVER;
 
 			$this->CleanItems();
 
 			$status = get_status();
-
+SDI($status);
 			if($status["zabbix_server"] == S_YES)
 				$server = new CSpan(S_RUNNING,"off");
 			else
@@ -66,8 +63,8 @@
 				new CSpan($status["triggers_count_unknown"],"unknown"),"/",
 				new CSpan($status["triggers_count_off"],"off"),"]"
 				)));
-			$this->AddRow(S_NUMBER_OF_EVENTS.": ".$status["events_count"]);
-			$this->AddRow(S_NUMBER_OF_ALERTS.": ".$status["alerts_count"]);
+//			$this->AddRow(S_NUMBER_OF_EVENTS.": ".$status["events_count"]);
+//			$this->AddRow(S_NUMBER_OF_ALERTS.": ".$status["alerts_count"]);
 
 			return parent::BodyToString();
 		}
