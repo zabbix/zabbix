@@ -31,7 +31,7 @@
 			$this->CleanItems();
 
 			$status = get_status();
-SDI($status);
+			
 			if($status["zabbix_server"] == S_YES)
 				$server = new CSpan(S_RUNNING,"off");
 			else
