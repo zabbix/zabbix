@@ -808,16 +808,13 @@
          * Comments: !!! Don't forget sync code with C !!!
          *
          */
-	function	copy_template_graphs($hostid, $templateid = null /* array format 'arr[id]=name' */, $copy_mode = false)
-	{
-		if($templateid == null)
-		{
+	function copy_template_graphs($hostid, $templateid = null /* array format 'arr[key]=id' */, $copy_mode = false){
+		if($templateid == null){
 			$templateid = get_templates_by_hostid($hostid);
 		}
 		
-		if(is_array($templateid))
-		{
-			foreach($templateid as $id => $name)
+		if(is_array($templateid)){
+			foreach($templateid as $key => $id)
 				copy_template_graphs($hostid, $id, $copy_mode); // attention recursion
 			return;
 		}
