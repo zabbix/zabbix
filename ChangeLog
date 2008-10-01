@@ -1,11 +1,13 @@
-Changes fro 1.0.0:
+Changes for 1.0.0:
 
+ - [DEV-236] added support of net.tcp.dns.query item (Sasha)
+ - [DEV-235] added support of tcp_perf item (Sasha)
+ - [DEV-234] improved enhanced ICMP monitoring (Sasha)
  - [DEV-232] added basic authentication to WEB scenarios (Artem)
  - [DEV-230] changed ZABBIX notation to ZABICOM (Artem)
 
 Changes for 1.4.j:
 
- - improved enhanced ICMP monitoring (Sasha)
  - [ZBX-65] fixed bug with applications on items mass update (Artem)
  - added support of encoding parameter for regexp[] and iregexp[]. Integrated patch (Sasha)
  - improved support of macros {ITEM.VALUE} (Sasha)
