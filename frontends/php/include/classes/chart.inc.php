@@ -867,11 +867,11 @@ class Chart extends Graph{
 			if($this->axis_valuetype[$side] == ITEM_VALUE_TYPE_UINT64){
 			
 				$this->m_maxY[$side] = round($this->m_maxY[$side]);
-				$this->m_minY[$side] = (int) $this->m_minY[$side];
+				$this->m_minY[$side] = floor($this->m_minY[$side]);
 		
 				$value_delta = round($this->m_maxY[$side] - $this->m_minY[$side]);
 				
-				$step = (int) (($value_delta/$this->gridLinesCount) + 1);	// round to top
+				$step = floor((($value_delta/$this->gridLinesCount) + 1));	// round to top
 				$value_delta2 = $step * $this->gridLinesCount;
 //SDI($value_delta.' <> '.$value_delta2);
 				$first_delta = round(($value_delta2-$value_delta)/2);

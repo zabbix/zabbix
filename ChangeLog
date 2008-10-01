@@ -1,5 +1,6 @@
 Changes for 1.6.1
 
+ - [ZBX-471] fixed problem with graphs with big values (Artem)
  - [ZBX-501] fixed undefined values in server info screen (Artem)
  - [ZBX-469] fixed problem with linking extra graph (Artem)
  - [ZBX-495] fixed DB upgrade script when doing 1.1->1.4->1.6 (Alexei)
