@@ -254,6 +254,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 	DB_HTTPSTEP	httpstep;
 	int		err;
 	char		*err_str = NULL, *esc_err_str = NULL;
+	char		auth[HTTPTEST_HTTP_USER_LEN_MAX + HTTPTEST_HTTP_PASSWORD_LEN_MAX];
 	int		now;
 	int		lastfailedstep;
 
@@ -384,6 +385,32 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, httpstep.url)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Cannot set URL [%s]",
+					curl_easy_strerror(err));
+				err_str = strdup(curl_easy_strerror(err));
+				lastfailedstep = httpstep.no;
+			}
+		}
+		if( !err_str )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: Setting HTTPAUTH [%d]", httptest->authentication);
+			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPAUTH,
+					httptest->authentication == HTTPTEST_AUTH_BASIC ? CURLAUTH_BASIC : CURLAUTH_NONE)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Cannot set HTTPAUTH [%s]",
+						curl_easy_strerror(err));
+				err_str = strdup(curl_easy_strerror(err));
+				lastfailedstep = httpstep.no;
+			}
+		}
+		if( !err_str && httptest->authentication == HTTPTEST_AUTH_BASIC)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: Using basic authentication");
+
+			zbx_snprintf(auth, sizeof(auth), "%s:%s", httptest->http_user, httptest->http_password);
+			
+			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Cannot set USERPWD [%s]",
 					curl_easy_strerror(err));
 				err_str = strdup(curl_easy_strerror(err));
 				lastfailedstep = httpstep.no;
@@ -530,7 +557,8 @@ void process_httptests(int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptests()");
 
-	result = DBselect("select httptestid,name,applicationid,nextcheck,status,delay,macros,agent from httptest where status=%d and nextcheck<=%d and " ZBX_SQL_MOD(httptestid,%d) "=%d and " ZBX_COND_NODEID,
+	result = DBselect("select httptestid,name,applicationid,nextcheck,status,delay,macros,agent,authentication,http_user,http_password"
+			" from httptest where status=%d and nextcheck<=%d and " ZBX_SQL_MOD(httptestid,%d) "=%d and " ZBX_COND_NODEID,
 		HTTPTEST_STATUS_MONITORED,
 		now,
 		CONFIG_HTTPPOLLER_FORKS,
@@ -539,13 +567,16 @@ void process_httptests(int now)
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(httptest.httptestid, row[0]);
-		httptest.name=row[1];
+		httptest.name		= row[1];
 		ZBX_STR2UINT64(httptest.applicationid, row[2]);
-		httptest.nextcheck=atoi(row[3]);
-		httptest.status=atoi(row[4]);
-		httptest.delay=atoi(row[5]);
-		httptest.macros=row[6];
-		httptest.agent=row[7];
+		httptest.nextcheck	= atoi(row[3]);
+		httptest.status		= atoi(row[4]);
+		httptest.delay		= atoi(row[5]);
+		httptest.macros		= row[6];
+		httptest.agent		= row[7];
+		httptest.authentication	= atoi(row[8]);
+		httptest.http_user	= row[9];
+		httptest.http_password	= row[10];
 
 		process_httptest(&httptest);
 	}

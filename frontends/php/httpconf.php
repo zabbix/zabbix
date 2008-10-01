@@ -194,13 +194,21 @@ include_once "include/page_header.php";
 		$db_delay_flex = trim($db_delay_flex,";");
 		// for future use */
 
-		$_REQUEST['http_user'] = htmlspecialchars($_REQUEST['http_user']);
-		$_REQUEST['http_password'] = htmlspecialchars($_REQUEST['http_password']);
+		if ($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE)
+		{
+			$http_user = htmlspecialchars($_REQUEST['http_user']);
+			$http_password = htmlspecialchars($_REQUEST['http_password']);
+		}
+		else
+		{
+			$http_user = '';
+			$http_password = '';
+		}
 		
 		if(isset($_REQUEST["httptestid"]))
 		{
 			$result = update_httptest($_REQUEST["httptestid"], $_REQUEST['hostid'], $_REQUEST["application"],
-				$_REQUEST["name"],$_REQUEST['authentication'],$_REQUEST['http_user'],$_REQUEST['http_password'],
+				$_REQUEST["name"],$_REQUEST['authentication'],$http_user,$http_password,
 				$_REQUEST["delay"],$_REQUEST["status"],$_REQUEST["agent"],
 				$_REQUEST["macros"],$_REQUEST["steps"]);
 
@@ -212,7 +220,7 @@ include_once "include/page_header.php";
 		else
 		{
 			$httptestid = add_httptest($_REQUEST['hostid'],$_REQUEST["application"],
-				$_REQUEST["name"],$_REQUEST['authentication'],$_REQUEST['http_user'],$_REQUEST['http_password'],
+				$_REQUEST["name"],$_REQUEST['authentication'],$http_user,$http_password,
 				$_REQUEST["delay"],$_REQUEST["status"],$_REQUEST["agent"],
 				$_REQUEST["macros"],$_REQUEST["steps"]);
 

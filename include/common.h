@@ -531,6 +531,12 @@ typedef enum
 	ZBX_TASK_CHANGE_NODEID
 } zbx_task_t;
 
+typedef enum
+{
+	HTTPTEST_AUTH_NONE = 0,
+	HTTPTEST_AUTH_BASIC
+} zbx_httptest_auth_t;
+
 #define ZBX_TASK_FLAG_MULTIPLE_AGENTS 0x01
 
 #define ZBX_TASK_EX struct zbx_task_ex

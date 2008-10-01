@@ -153,6 +153,11 @@ typedef enum {
 #define DSERVICE_VALUE_LEN		255
 #define DSERVICE_VALUE_LEN_MAX		DSERVICE_VALUE_LEN+1
 
+#define HTTPTEST_HTTP_USER_LEN		64
+#define HTTPTEST_HTTP_USER_LEN_MAX	HTTPTEST_HTTP_USER_LEN+1
+#define HTTPTEST_HTTP_PASSWORD_LEN	64
+#define HTTPTEST_HTTP_PASSWORD_LEN_MAX	HTTPTEST_HTTP_PASSWORD_LEN+1
+
 #define HTTPSTEP_STATUS_LEN		255
 #define HTTPSTEP_STATUS_LEN_MAX		HTTPSTEP_STATUS_LEN+1
 
@@ -437,6 +442,9 @@ DB_HTTPTEST
 	char		*agent;
 	double		speed;
 	double		time;
+	int		authentication;
+	char		*http_user;
+	char		*http_password;
 };
 
 DB_HTTPSTEP
