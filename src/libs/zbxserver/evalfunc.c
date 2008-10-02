@@ -153,179 +153,243 @@ static int evaluate_LOGSEVERITY(char *value, DB_ITEM *item, char *parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int evaluate_COUNT(char *value, DB_ITEM *item, char *parameter)
+static int evaluate_COUNT(char *value, DB_ITEM *item, char *parameter, int flag)
 {
+#define OP_EQ 0
+#define OP_NE 1
+#define OP_GT 2
+#define OP_GE 3
+#define OP_LT 4
+#define OP_LE 5
+#define OP_MAX 6
+
 	DB_RESULT	result;
-	DB_ROW	row;
+	DB_ROW		row;
 
-	char		period[MAX_STRING_LEN+1];
-	char		op[MAX_STRING_LEN+1];
-	char		cmp[MAX_STRING_LEN+1];
-	char		cmp_esc[MAX_STRING_LEN+1];
+	char		tmp[MAX_STRING_LEN];
+	char		*cmp = NULL, *cmp_esc;
 
-	int		now;
-	int		res = SUCCEED;
-
-	char		*table = NULL;
-	char		table_ui64[] = "history_uint";
-	char		table_float[] = "history";
-	char		table_log[] = "history_log";
-	char		table_str[] = "history_str";
+	int		arg1, clock, op = OP_EQ, offset,
+			count, res = SUCCEED;
+	zbx_uint64_t	value_uint64 = 0, dbvalue_uint64;
+	double		value_double = 0, dbvalue_double;
+	static  char	*history_tables[] = {"history", "history_str", "history_log", "history_uint", "history_text"};
+	char		*operators[OP_MAX] = {"=", "<>", ">", ">=", "<", "<="};
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_COUNT(param:%s)",
 		parameter);
 
-
-	switch(item->value_type)
+	switch (item->value_type)
 	{
-		case ITEM_VALUE_TYPE_FLOAT:	table = table_float;	break;
-		case ITEM_VALUE_TYPE_UINT64:	table = table_ui64;	break;
-		case ITEM_VALUE_TYPE_LOG:	table = table_log;	break;
-		case ITEM_VALUE_TYPE_STR:	table = table_str;	break;
-		default:
-			return FAIL;
-	}
-
-	now=time(NULL);
-
-	if(get_param(parameter, 1, period, MAX_STRING_LEN) != 0)
-	{
+	case ITEM_VALUE_TYPE_FLOAT:
+	case ITEM_VALUE_TYPE_UINT64:
+	case ITEM_VALUE_TYPE_LOG:
+	case ITEM_VALUE_TYPE_STR:
+	case ITEM_VALUE_TYPE_TEXT:
+		break;
+	default:
 		return FAIL;
 	}
-	if(get_param(parameter, 2, cmp, MAX_STRING_LEN) != 0)
+
+	if (0 != get_param(parameter, 1, tmp, sizeof(tmp)))
+		return FAIL;
+
+	arg1 = atoi(tmp);
+
+	if (0 == get_param(parameter, 2, tmp, sizeof(tmp)))
 	{
-		result = DBselect("select count(value) from %s where clock>%d and itemid=" ZBX_FS_UI64,
-			table,
-			now-atoi(period),
-			item->itemid);
-		
+		cmp = strdup(tmp);
+
+		if ((item->value_type == ITEM_VALUE_TYPE_UINT64 || item->value_type == ITEM_VALUE_TYPE_FLOAT) &&
+				0 == get_param(parameter, 3, tmp, sizeof(tmp)) && *tmp != '\0')
+		{
+			if (0 == strcmp(tmp, "eq")) op = OP_EQ;
+			else if (0 == strcmp(tmp, "ne")) op = OP_NE;
+			else if (0 == strcmp(tmp, "gt")) op = OP_GT;
+			else if (0 == strcmp(tmp, "ge")) op = OP_GE;
+			else if (0 == strcmp(tmp, "lt")) op = OP_LT;
+			else if (0 == strcmp(tmp, "le")) op = OP_LE;
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Parameter \"%s\" is not supported for function COUNT",
+						tmp);
+				zbx_free(cmp);
+				return FAIL;
+			}
+		}
+
+		switch (item->value_type) {
+		case ITEM_VALUE_TYPE_UINT64:
+			value_uint64 = zbx_atoui64(cmp);
+			break;
+		case ITEM_VALUE_TYPE_FLOAT:
+			value_double = atof(cmp);
+			break;
+		default:
+			;	/* nothing */
+		}
 	}
-	else
+
+	if (flag == ZBX_FLAG_SEC)
+		offset = zbx_snprintf(tmp, sizeof(tmp), "select count(value) from %s where itemid=" ZBX_FS_UI64,
+				history_tables[item->value_type],
+				item->itemid);
+	else	/* ZBX_FLAG_VALUES */
+		offset = zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=" ZBX_FS_UI64,
+				history_tables[item->value_type],
+				item->itemid);
+
+	if (flag == ZBX_FLAG_SEC)
 	{
-		if(get_param(parameter, 3, op, MAX_STRING_LEN) != 0)
-		{
-			strscpy(op,"eq");
-		}
-		DBescape_string(cmp, cmp_esc, sizeof(cmp_esc));
-		/* ITEM_VALUE_TYPE_UINT64 */
-		if( (item->value_type == ITEM_VALUE_TYPE_UINT64) && (strcmp(op,"eq") == 0))
-		{
-			result = DBselect("select count(value) from history_uint where clock>%d and value=" ZBX_FS_UI64 " and itemid=" ZBX_FS_UI64,
-				now-atoi(period),
-				zbx_atoui64(cmp_esc),
-				item->itemid);
-		}
-		else if( (item->value_type == ITEM_VALUE_TYPE_UINT64) && (strcmp(op,"ne") == 0))
-		{
-			result = DBselect("select count(value) from history_uint where clock>%d and value<>" ZBX_FS_UI64 " and itemid=" ZBX_FS_UI64,
-				now-atoi(period),
-				zbx_atoui64(cmp_esc),
-				item->itemid);
-		}
-		else if( (item->value_type == ITEM_VALUE_TYPE_UINT64) && (strcmp(op,"gt") == 0))
-		{
-			result = DBselect("select count(value) from history_uint where clock>%d and value>" ZBX_FS_UI64 " and itemid=" ZBX_FS_UI64,
-				now-atoi(period),
-				zbx_atoui64(cmp_esc),
-				item->itemid);
-		}
-		else if( (item->value_type == ITEM_VALUE_TYPE_UINT64) && (strcmp(op,"lt") == 0))
-		{
-			result = DBselect("select count(value) from history_uint where clock>%d and value<" ZBX_FS_UI64 " and itemid=" ZBX_FS_UI64,
-				now-atoi(period),
-				zbx_atoui64(cmp_esc),
-				item->itemid);
-		}
-		else if( (item->value_type == ITEM_VALUE_TYPE_UINT64) && (strcmp(op,"ge") == 0))
-		{
-			result = DBselect("select count(value) from history_uint where clock>%d and value>=" ZBX_FS_UI64 " and itemid=" ZBX_FS_UI64,
-				now-atoi(period),
-				zbx_atoui64(cmp_esc),
-				item->itemid);
-		}
-		else if( (item->value_type == ITEM_VALUE_TYPE_UINT64) && (strcmp(op,"le") == 0))
-		{
-			result = DBselect("select count(value) from history_uint where clock>%d and value<=" ZBX_FS_UI64 " and itemid=" ZBX_FS_UI64,
-				now-atoi(period),
-				zbx_atoui64(cmp_esc),
-				item->itemid);
-		}
-		/* ITEM_VALUE_TYPE_FLOAT */
-		else if( (item->value_type == ITEM_VALUE_TYPE_FLOAT) && (strcmp(op,"eq") == 0))
-		{
-			result = DBselect("select count(value) from history where clock>%d and value+0.00001>" ZBX_FS_DBL " and value-0.0001<" ZBX_FS_DBL " and itemid=" ZBX_FS_UI64,
-				now-atoi(period),
-				atof(cmp_esc),
-				atof(cmp_esc),
-				item->itemid);
-		}
-		else if( (item->value_type == ITEM_VALUE_TYPE_FLOAT) && (strcmp(op,"ne") == 0))
-		{
-			result = DBselect("select count(value) from history where clock>%d and ((value+0.00001<" ZBX_FS_DBL ") or (value-0.0001>" ZBX_FS_DBL ")) and itemid=" ZBX_FS_UI64,
-				now-atoi(period),
-				atof(cmp_esc),
-				atof(cmp_esc),
-				item->itemid);
-		}
-		else if( (item->value_type == ITEM_VALUE_TYPE_FLOAT) && (strcmp(op,"gt") == 0))
-		{
-			result = DBselect("select count(value) from history where clock>%d and value>" ZBX_FS_DBL " and itemid=" ZBX_FS_UI64,
-				now-atoi(period),
-				atof(cmp_esc),
-				item->itemid);
-		}
-		else if( (item->value_type == ITEM_VALUE_TYPE_FLOAT) && (strcmp(op,"ge") == 0))
-		{
-			result = DBselect("select count(value) from history where clock>=%d and value>" ZBX_FS_DBL " and itemid=" ZBX_FS_UI64,
-				now-atoi(period),
-				atof(cmp_esc),
-				item->itemid);
-		}
-		else if( (item->value_type == ITEM_VALUE_TYPE_FLOAT) && (strcmp(op,"lt") == 0))
-		{
-			result = DBselect("select count(value) from history where clock>%d and value<" ZBX_FS_DBL " and itemid=" ZBX_FS_UI64,
-				now-atoi(period),
-				atof(cmp_esc),
-				item->itemid);
-		}
-		else if( (item->value_type == ITEM_VALUE_TYPE_FLOAT) && (strcmp(op,"le") == 0))
-		{
-			result = DBselect("select count(value) from history where clock>%d and value<=" ZBX_FS_DBL " and itemid=" ZBX_FS_UI64,
-				now-atoi(period),
-				atof(cmp_esc),
-				item->itemid);
-		}
-		else if(item->value_type == ITEM_VALUE_TYPE_LOG)
-		{
-			result = DBselect("select count(value) from history_log where clock>%d and value like '%s' and itemid=" ZBX_FS_UI64,
-				now-atoi(period),
-				cmp_esc,
-				item->itemid);
-		}
+		clock = time(NULL) - arg1;
+
+		if (NULL == cmp)
+			zbx_snprintf(tmp + offset, sizeof(tmp) - offset, " and clock>%d",
+					clock);
 		else
 		{
-			result = DBselect("select count(value) from history_str where clock>%d and value like '%s' and itemid=" ZBX_FS_UI64,
-				now-atoi(period),
-				cmp_esc,
-				item->itemid);
+			switch (item->value_type) {
+			case ITEM_VALUE_TYPE_UINT64:
+				zbx_snprintf(tmp + offset, sizeof(tmp) - offset, " and clock>%d and value%s" ZBX_FS_UI64,
+						clock,
+						operators[op],
+						value_uint64);
+				break;
+			case ITEM_VALUE_TYPE_FLOAT:
+				switch (op) {
+				case OP_EQ:
+					zbx_snprintf(tmp + offset, sizeof(tmp) - offset, " and clock>%d and value>" ZBX_FS_DBL " and value<" ZBX_FS_DBL,
+							clock,
+							value_double - 0.00001,
+							value_double + 0.00001);
+					break;
+				case OP_NE:
+					zbx_snprintf(tmp + offset, sizeof(tmp) - offset, " and clock>%d and not (value>" ZBX_FS_DBL " and value<" ZBX_FS_DBL ")",
+							clock,
+							value_double - 0.00001,
+							value_double + 0.00001);
+					break;
+				default:
+					zbx_snprintf(tmp + offset, sizeof(tmp) - offset, " and clock>%d and value%s" ZBX_FS_DBL,
+							clock,
+							operators[op],
+							value_double);
+				}
+				break;
+			default:
+				cmp_esc = DBdyn_escape_string(cmp);
+				zbx_snprintf(tmp + offset, sizeof(tmp) - offset, " and clock>%d and value like '%s'",
+						clock,
+						cmp_esc);
+				zbx_free(cmp_esc);
+			}
 		}
+
+		result = DBselect("%s", tmp);
+
+		if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+			zbx_snprintf(value, MAX_STRING_LEN, "0");
+		else
+			zbx_snprintf(value, MAX_STRING_LEN, "%s", row[0]);
 	}
-
-
-	row = DBfetch(result);
-
-	if(!row || DBis_null(row[0])==SUCCEED)
+	else	/* ZBX_FLAG_VALUES */
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Result for COUNT is empty" );
-		res = FAIL;
-	}
-	else
-	{
-		strcpy(value,row[0]);
+		switch (item->value_type)
+		{
+		case ITEM_VALUE_TYPE_FLOAT:
+		case ITEM_VALUE_TYPE_UINT64:
+		case ITEM_VALUE_TYPE_STR:
+			zbx_snprintf(tmp + offset, sizeof(tmp) - offset, " order by itemid,clock desc");
+			break;
+		default:
+			zbx_snprintf(tmp + offset, sizeof(tmp) - offset, " order by id desc");
+		}
+
+		result = DBselectN(tmp, arg1);
+		count = 0;
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			if (NULL == cmp)
+				goto count_inc;
+
+			switch (item->value_type) {
+			case ITEM_VALUE_TYPE_UINT64:
+				dbvalue_uint64 = zbx_atoui64(row[0]);
+
+				switch (op) {
+				case OP_EQ:
+					if (dbvalue_uint64 == value_uint64)
+						goto count_inc;
+					break;
+				case OP_NE:
+					if (dbvalue_uint64 != value_uint64)
+						goto count_inc;
+					break;
+				case OP_GT:
+					if (dbvalue_uint64 > value_uint64)
+						goto count_inc;
+					break;
+				case OP_GE:
+					if (dbvalue_uint64 >= value_uint64)
+						goto count_inc;
+					break;
+				case OP_LT:
+					if (dbvalue_uint64 < value_uint64)
+						goto count_inc;
+					break;
+				case OP_LE:
+					if (dbvalue_uint64 <= value_uint64)
+						goto count_inc;
+					break;
+				}
+				break;
+			case ITEM_VALUE_TYPE_FLOAT:
+				dbvalue_double = atof(row[0]);
+
+				switch (op) {
+				case OP_EQ:
+					if (dbvalue_double > value_double - 0.00001 && dbvalue_double < value_double + 0.00001)
+						goto count_inc;
+					break;
+				case OP_NE:
+					if (!(dbvalue_double > value_double - 0.00001 && dbvalue_double < value_double + 0.00001))
+						goto count_inc;
+					break;
+				case OP_GT:
+					if (dbvalue_double > value_double)
+						goto count_inc;
+					break;
+				case OP_GE:
+					if (dbvalue_double >= value_double)
+						goto count_inc;
+					break;
+				case OP_LT:
+					if (dbvalue_double < value_double)
+						goto count_inc;
+					break;
+				case OP_LE:
+					if (dbvalue_double <= value_double)
+						goto count_inc;
+					break;
+				}
+				break;
+			default:
+				if (NULL != strstr(row[0], cmp))
+					goto count_inc;
+				break;
+			}
+
+			continue;
+count_inc:
+			count++;
+		}
+		zbx_snprintf(value, MAX_STRING_LEN, "%d", count);
 	}
 	DBfree_result(result);
+	zbx_free(cmp);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End evaluate_COUNT");
+	zabbix_log(LOG_LEVEL_DEBUG, "End evaluate_COUNT : %s", value);
 
 	return res;
 }
@@ -1201,7 +1265,10 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	}
 	else if(strcmp(function,"count")==0)
 	{
-		ret = evaluate_COUNT(value,item,parameter);
+		if(parameter[0]=='#')
+			ret = evaluate_COUNT(value, item, parameter + 1, ZBX_FLAG_VALUES);
+		else
+			ret = evaluate_COUNT(value, item, parameter, ZBX_FLAG_SEC);
 	}
 	else if(strcmp(function,"delta")==0)
 	{
