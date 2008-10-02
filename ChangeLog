@@ -1,5 +1,7 @@
 Changes for 1.6.1
 
+ - [DEV-238] added support of sec|#num for function count() (Sasha)
+ - [DEV-238] added support of text items for function count() (Sasha)
  - [ZBX-471] fixed problem with graphs with big values (Artem)
  - [ZBX-501] fixed undefined values in server info screen (Artem)
  - [ZBX-469] fixed problem with linking extra graph (Artem)
