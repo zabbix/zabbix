@@ -1,5 +1,7 @@
 Changes for 1.0.0:
 
+ - [DEV-238] added support of sec|#num for function count() (Sasha)
+ - [DEV-238] added support of text items for function count() (Sasha)
  - [DEV-232] added basic authentication for WEB scenarios on server side (Sasha)
  - [DEV-236] added support of net.tcp.dns.query item (Sasha)
  - [DEV-235] added support of tcp_perf item (Sasha)
