@@ -1,5 +1,7 @@
 Changes for 1.6.1
 
+ - [DEV-238] added support of sec|#num for function count() (Sasha)
+ - [DEV-238] added support of text items for function count() (Sasha)
  - [ZBX-495] fixed DB upgrade script when doing 1.1->1.4->1.6 (Alexei)
  - [ZBX-488] fixed memory leak in ZABBIX server code (Alexei)
  - [ZBX-500] added more debug information for icmpping processing (Sasha)
