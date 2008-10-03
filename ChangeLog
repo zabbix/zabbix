@@ -1,13 +1,18 @@
 Changes for 1.6.1
 
+ - [ZBX-519] removed proxy hosts from applications hosts list (Artem)
  - [ZBX-480] fixed patches for sysmaps_links table (Sasha)
  - [ZBX-521] fixed problem in FreeBSD with threads in proc.num and proc.mem items (Sasha)
  - [DEV-238] added support of sec|#num for function count() (Sasha)
  - [DEV-238] added support of text items for function count() (Sasha)
+ - [ZBX-471] fixed problem with graphs with big values (Artem)
+ - [ZBX-501] fixed undefined values in server info screen (Artem)
+ - [ZBX-469] fixed problem with linking extra graph (Artem)
  - [ZBX-495] fixed DB upgrade script when doing 1.1->1.4->1.6 (Alexei)
  - [ZBX-488] fixed memory leak in ZABBIX server code (Alexei)
  - [ZBX-500] added more debug information for icmpping processing (Sasha)
  - [ZBX-499] fixes problem with IPMI authorization; added field "IPMI IP" (Sasha)
+ - [ZBX-484] fixed host-group selection in templates page (Artem)
  - [ZBX-464] fixed user creation under ldap (Artem)
  - [ZBX-468] fixed user online status in administration panel (Artem)
  - [ZBX-492] fixed wrong url "next 100" in audit actions (Artem)
@@ -1873,8 +1878,8 @@ Changes for 1.0beta10:
  - added column items.multiplier (Alexei)
  - added column items.units (Alexei)
  - added table 'stats' (Alexei)
- - support for spaces in trigger expression. Thanks to Sébastien "Slix"
- Liénard. (Alexei)
+ - support for spaces in trigger expression. Thanks to Sbastien "Slix"
+ Linard. (Alexei)
  - dynamic form items.php (Alexei)
  - added zabbix.spec. 'rpm -ta zabbix.tar.gz'. Thanks to Harald Holzer. (Alexei)
  - dynamic form config.php (Alexei)
@@ -1890,7 +1895,7 @@ Changes for 1.0beta9:
 
  - added severity to media definition (Alexei)
  - add media.severity (Alexei)
- - added support for check_service_perf[*]. Thanks to Jürgen Schmitz (Alexei)
+ - added support for check_service_perf[*]. Thanks to Jrgen Schmitz (Alexei)
  - added parameter AlertScriptsPath to zabbix_suckerd (Alexei)
  - added support for alternative medias (Alexei)
  - added src/zabbix_sucker/alerter.h (Alexei)
@@ -1905,8 +1910,8 @@ Changes for 1.0beta9:
  - added support for functions abschange(),change(),delta(),sum(), 
  count() and avg() in trigger expressions (Alexei)
  - fixed plaintext values for string data type. Thanks to
- Sébastien "Slix" Liénard. (Alexei)
- - misc fixes for services.php. Thanks to Sébastien "Slix" Liénard.
+ Sbastien "Slix" Linard. (Alexei)
+ - misc fixes for services.php. Thanks to Sbastien "Slix" Linard.
  (Alexei)
  - different styles for user-defined graphs (Alexei)
  - cached memory in bytes (not in Kb as before) (Alexei)
@@ -2034,8 +2039,8 @@ Changes for 1.0beta7:
  - items.php: "Delay" renamed to "Update interval". (Alexei)
  - fixed precision issues in zabbix_agent(d) and zabbix_suckerd. All floats
    converted to double. (Alexei)
- - fixed selection of icon and host in sysmap.php. Thanks to Sébastien "slix"
-   Liénard. (Alexei)
+ - fixed selection of icon and host in sysmap.php. Thanks to Sbastien "slix"
+   Linard. (Alexei)
  - monitoring of servers without Zabbix agent installed. New item type: Simple
    Check. (Alexei)
  - improved performance of pinger.pl (Alexei)

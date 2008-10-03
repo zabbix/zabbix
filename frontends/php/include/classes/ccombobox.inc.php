@@ -189,7 +189,10 @@
 				}
 			}
 
-			if((is_int($selected) && $selected!=0) || (is_string($selected) && ($selected == 'yes' || $selected == 'selected' || $selected=='on'))){
+			if((is_bool($selected) && $selected) || 
+				(is_int($selected) && ($selected!=0)) || 
+				(is_string($selected) && ($selected == 'yes' || $selected == 'selected' || $selected=='on')))
+			{
 				$this->lbox->AddItem($value,$caption,null,$enabled);
 				$this->form->AddVar($this->varname.'['.$value.']',$value);
 			}

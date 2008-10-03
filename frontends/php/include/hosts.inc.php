@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-require_once "include/graphs.inc.php";
-require_once "include/triggers.inc.php";
-require_once "include/items.inc.php";
-require_once "include/httptest.inc.php";
+require_once('include/graphs.inc.php');
+require_once('include/triggers.inc.php');
+require_once('include/items.inc.php');
+require_once('include/httptest.inc.php');
 
 /* HOST GROUP functions */
 	function add_host_to_group($hostid, $groupid){
@@ -203,10 +203,10 @@ require_once "include/httptest.inc.php";
 		}
 
 		if(is_null($hostid)){
-			$hostid = get_dbid("hosts","hostid");
-			$result = DBexecute('insert into hosts '.
+			$hostid = get_dbid('hosts','hostid');
+			$result = DBexecute('INSERT INTO hosts '.
 				' (hostid,proxy_hostid,host,port,status,useip,dns,ip,disable_until,available,useipmi,ipmi_port,ipmi_privilege,ipmi_username,ipmi_password) '.
-				' values ('.$hostid.','.$proxy_hostid.','.zbx_dbstr($host).','.$port.','.$status.','.$useip.','.zbx_dbstr($dns).','.zbx_dbstr($ip).',0,'
+				' VALUES ('.$hostid.','.$proxy_hostid.','.zbx_dbstr($host).','.$port.','.$status.','.$useip.','.zbx_dbstr($dns).','.zbx_dbstr($ip).',0,'
 					.HOST_AVAILABLE_UNKNOWN.','.($useipmi == 'yes' ? 1 : 0).','.$ipmi_port.','.$ipmi_privilege.','.zbx_dbstr($ipmi_username).','.zbx_dbstr($ipmi_password).')');
 		}
 		else{
@@ -230,16 +230,16 @@ require_once "include/httptest.inc.php";
 
 			update_host_status($hostid, $status);
 		}
-		
+
 		foreach($templates as $id => $name){
 			$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
-			if(!($result = DBexecute('insert into hosts_templates values ('.$hosttemplateid.','.$hostid.','.$id.')')))
+			if(!($result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$hostid.','.$id.')')))
 				break;
 		}
 
 		if($result) $result = $hostid;
 
-		return $result;
+	return $result;
 	}
 
 /*
