@@ -796,21 +796,22 @@
 		}
 	}
 	
-        /*
-         * Function: copy_template_graphs
-         *
-         * Description:
-         *     Copy all graphs to the specified host
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         * Comments: !!! Don't forget sync code with C !!!
-         *
-         */
+/*
+ * Function: copy_template_graphs
+ *
+ * Description:
+ *     Copy all graphs to the specified host
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
 	function copy_template_graphs($hostid, $templateid = null /* array format 'arr[key]=id' */, $copy_mode = false){
 		if($templateid == null){
 			$templateid = get_templates_by_hostid($hostid);
+			$templateid = array_keys($templateid);
 		}
 		
 		if(is_array($templateid)){
