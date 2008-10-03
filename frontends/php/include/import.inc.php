@@ -425,7 +425,6 @@
 					}
 
 					if(!isset($data['description']))		$data['description']		= '';
-					if(!isset($data['ipmi_sensor']))		$data['ipmi_sensor']		= '';
 					if(!isset($data['delay']))				$data['delay']			= 30;
 					if(!isset($data['history']))			$data['history']		= 90;
 					if(!isset($data['trends']))				$data['trends']			= 365;

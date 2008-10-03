@@ -393,6 +393,10 @@
 				);
 	zbx_add_post_js('create_calendar(null,["nav_day","nav_month","nav_year"],"nav_time");');
 
+	zbx_add_post_js('addListener($("hat_events_icon"),'.
+									'"click",'.
+									'CLNDR["nav_time"].clndr.clndrhide.bindAsEventListener(CLNDR["nav_time"].clndr));');
+
 	$navForm->AddItem(array($back,SPACE,$next,new CSpan(' | ','divider'), $nav_clndr, SPACE, new CButton('load',S_SHOW.' »')));
 
 	$navigation = $navForm;

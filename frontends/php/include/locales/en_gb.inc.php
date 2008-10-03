@@ -659,6 +659,75 @@
 	'S_AS_GREEN'=>				'as Green',
 	'S_AS_BLUE'=>				'as Blue',
 
+// maintenance.php
+	'S_MAINTENANCE'=>					'Maintenance',
+	'S_MAINTENANCE_ADDED'=>				'Maintenance added',
+	'S_MAINTENANCE_UPDATED'=>			'Maintenance updated',
+	'S_MAINTENANCE_DELETED'=>			'Maintenance deleted',
+	
+	'S_HOSTS_IN_MAINTENANCE'=>			'Hosts in maintenance',
+	'S_GROUPS_IN_MAINTENANCE'=>			'Groups in maintenance',
+
+	'S_CANNOT_ADD_MAINTENANCE'=>			'Cannot add maintenance',
+	'S_CANNOT_UPDATE_MAINTENANCE'=>			'Cannot update maintenance',
+	'S_CANNOT_DELETE_MAINTENANCE'=>			'Cannot delete maintenance',
+	
+	'S_MAINTENANCE_PERIOD'=>			'Maintenance period',
+	'S_MAINTENANCE_PERIOD_LENGTH'=>		'Maintenance period length',
+	'S_MAINTENANCE_PERIODS'=>			'Maintenance periods',
+	'S_NEW_MAINTENANCE_PERIOD'=>		'New maintenance period',
+	'S_EDIT_MAINTENANCE_PERIOD'=>		'Edit maintenance period',
+	'S_CREATE_MAINTENANCE_PERIOD'=>		'Create maintenance period',
+	'S_MAINTENANCE_TYPE'=>				'Maintenance type',
+
+	'S_NORMAL_PROCESSING'=>				'Normal processing',
+	'S_NO_DATA_PROCESSING'=>			'No data processing',
+	
+	'S_DELETE_MAINTENANCE_PERIOD_Q'=>	'Delete maintenance period?',
+	
+	'S_ACTIVE_SINCE'=>		'Active since',
+	'S_ACTIVE_TILL'=>		'Active till',
+	'S_PERIOD_START'=>		'Period start',
+	'S_PERIOD_END'=>		'Period end',
+	'S_PERIOD_TYPE'=>		'Period type',
+
+	'S_SHEDULE'=>			'Shedule',
+	'S_NEXT_RUN'=>			'Next run',
+	
+	'S_DATE'=>				'Date',
+	'S_ONE_TIME_ONLY'=>		'One time only',
+	
+	'S_DAY_OF_WEEK'=>		'Day of week',
+	'S_DAY_OF_MONTH'=>		'Day of month',
+	
+	'S_EVERY_DAY_S'=>		'Every day(s)',
+	'S_EVERY_WEEK_S'=>		'Every week(s)',
+	'S_EVERY_MONTH_S'=>		'Every month(s)',
+	'S_DAY_OF_WEEK'=>		'Day of week',
+	
+	'S_FIRST'=>				'First',
+	'S_SECOND'=>			'Second',
+	'S_THIRD'=>				'Third',
+	'S_FOURTH'=>			'Fourth',
+	
+	'S_AT'=>				'At',
+	'S_DAY_OF_WEEK'=>		'Day of week',
+	
+	'S_JANUARY'=>			'January',
+	'S_FEBRUARY'=>			'February',
+	'S_MARCH'=>				'March',
+	'S_APRIL'=>				'April',
+	'S_MAY'=>				'May',
+	'S_JUNE'=>				'June',
+	'S_JULY'=>				'July',
+	'S_AUGUST'=>			'August',
+	'S_SEPTEMBER'=>			'September',
+	'S_OCTOBER'=>			'October',
+	'S_NOVEMBER'=>			'November',
+	'S_DECEMBER'=>			'December',
+	
+	'S_INCORRECT_MAINTENANCE_PERIOD'=> 'Incorrect maintenance period',
+	
 //	hosts.php
 	'S_IN'=>					'In',
 	'S_APPLICATION'=>			'Application',
@@ -1193,6 +1262,7 @@
 	'S_PERCENTAGE'=>			'Percentage',
 	'S_SLA'=>				'SLA',
 	'S_HOUR'=>				'Hour',
+	'S_HOURS'=>				'Hours',
 	'S_MINUTE'=>			'Minute',
 	'S_DAY'=>				'Day',
 	'S_MONTH'=>				'Month',

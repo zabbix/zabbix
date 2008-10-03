@@ -25,14 +25,14 @@
 	define('ZBX_AUTH_LDAP',		1);
 	define('ZBX_AUTH_HTTP',		2);
 	
+	define('ZBX_LOGIN_ATTEMPTS', 	5);
+	define('ZBX_LOGIN_BLOCK', 		30); // sec
+	
 	define('PAGE_TYPE_HTML',		0);
 	define('PAGE_TYPE_IMAGE',		1);
 	define('PAGE_TYPE_XML',			2);
 	define('PAGE_TYPE_JS',			3);	//javascript
 	define('PAGE_TYPE_HTML_BLOCK',	4);	//simple block of html (as text)
-	
-	define('ZBX_LOGIN_ATTEMPTS', 	5);
-	define('ZBX_LOGIN_BLOCK', 		30); // sec
 	
 	define('ZBX_SESSION_ACTIVE', 0);
 	define('ZBX_SESSION_PASSIVE', 1);
@@ -108,6 +108,7 @@
 	define('AUDIT_RESOURCE_SLIDESHOW',	24);
 	define('AUDIT_RESOURCE_SCRIPT',		25);
 	define('AUDIT_RESOURCE_PROXY',		26);
+	define('AUDIT_RESOURCE_MAINTENANCE',27);
 
 	define('CONDITION_TYPE_HOST_GROUP',	0);
 	define('CONDITION_TYPE_HOST',		1);
@@ -145,6 +146,14 @@
 	define('HOST_AVAILABLE_UNKNOWN',	0);
 	define('HOST_AVAILABLE_TRUE',		1);
 	define('HOST_AVAILABLE_FALSE',		2);
+	
+	define('MAINTENANCE_TYPE_NORMAL', 	0);
+	define('MAINTENANCE_TYPE_NODATA', 	1);
+	
+	define('TIMEPERIOD_TYPE_ONETIME',	0);
+	define('TIMEPERIOD_TYPE_DAILY',		1);
+	define('TIMEPERIOD_TYPE_WEEKLY',	2);
+	define('TIMEPERIOD_TYPE_MONTHLY',	3);
 
 	define('MAP_LABEL_TYPE_LABEL',0);
 	define('MAP_LABEL_TYPE_IP',1);

@@ -60,7 +60,7 @@ include_once 'include/page_header.php';
 		'conditions'=>		array(null, O_OPT, null, null, null),
 		'g_conditionid'=> 	array(null, O_OPT, null, null, null),
 
-		'new_condition'=>	array(null, 	 O_OPT,  null,	null,	'isset({add_condition})'),
+		'new_condition'=>	array(null, O_OPT,  null,	null,	'isset({add_condition})'),
 		
 		'operations'=>		array(null, O_OPT, null, null, 'isset({save})'),
 		'g_operationid'=>	array(null, O_OPT, null, null, null),

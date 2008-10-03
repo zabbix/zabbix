@@ -123,11 +123,12 @@
 	}
 
 	function get_graphs_by_hostid($hostid){
-		return DBselect('SELECT distinct g.* '.
-						' FROM graphs g, graphs_items gi, items i '.
-						' WHERE g.graphid=gi.graphid '.
-							' AND gi.itemid=i.itemid '.
-							' AND i.hostid='.$hostid);
+		$sql = 'SELECT distinct g.* '.
+				' FROM graphs g, graphs_items gi, items i '.
+				' WHERE g.graphid=gi.graphid '.
+					' AND gi.itemid=i.itemid '.
+					' AND i.hostid='.$hostid;
+	return DBselect($sql);
 	}
 
 	function get_realhosts_by_graphid($graphid){
@@ -808,16 +809,14 @@
          * Comments: !!! Don't forget sync code with C !!!
          *
          */
-	function	copy_template_graphs($hostid, $templateid = null /* array format 'arr[id]=name' */, $copy_mode = false)
-	{
-		if($templateid == null)
-		{
+	function copy_template_graphs($hostid, $templateid = null /* array format 'arr[key]=id' */, $copy_mode = false){
+		if($templateid == null){
 			$templateid = get_templates_by_hostid($hostid);
+			$templateid = array_keys($templateid);
 		}
 		
-		if(is_array($templateid))
-		{
-			foreach($templateid as $id => $name)
+		if(is_array($templateid)){
+			foreach($templateid as $key => $id)
 				copy_template_graphs($hostid, $id, $copy_mode); // attention recursion
 			return;
 		}
@@ -829,18 +828,18 @@
 		}
 	}
 
-        /*
-         * Function: copy_graph_to_host
-         *
-         * Description:
-         *     Copy specified graph to the specified host
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         * Comments: !!! Don't forget sync code with C !!!
-         *
-         */
+/*
+ * Function: copy_graph_to_host
+ *
+ * Description:
+ *     Copy specified graph to the specified host
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
 	function copy_graph_to_host($graphid, $hostid, $copy_mode = false){
 		$result = false;
 

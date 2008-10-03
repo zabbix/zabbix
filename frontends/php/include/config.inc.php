@@ -1010,6 +1010,40 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return $new;
 	}
 
+	function get_str_month($num){
+		$month = '[Wrong value for month: '.$num.']';
+		switch($num){
+			case 1: $month = S_JANUARY; break;
+			case 2: $month = S_FEBRUARY; break;
+			case 3: $month = S_MARCH; break;
+			case 4: $month = S_APRIL; break;
+			case 5: $month = S_MAY; break;
+			case 6: $month = S_JUNE; break;
+			case 7: $month = S_JULY; break;
+			case 8: $month = S_AUGUST; break;
+			case 9: $month = S_SEPTEMBER; break;
+			case 10: $month = S_OCTOBER; break;
+			case 11: $month = S_NOVEMBER; break;
+			case 12: $month = S_DECEMBER; break;
+		}
+	
+	return $month;
+	}
+	
+	function get_str_dayofweek($num){
+		$day = '[Wrong value for day of week: '.$num.']';
+		switch($num){
+			case 1: $day = S_MONDAY; break;
+			case 2: $day = S_TUESDAY; break;
+			case 3: $day = S_WEDNESDAY; break;
+			case 4: $day = S_THURSDAY; break;
+			case 5: $day = S_FRIDAY; break;
+			case 6: $day = S_SATURDAY; break;
+			case 7: $day = S_SUNDAY; break;
+		}
+	
+	return $day;
+	}
 /*************** VALUE MAPPING ******************/
 	function add_mapping_to_valuemap($valuemapid, $mappings){
 		DBexecute("delete FROM mappings WHERE valuemapid=$valuemapid");
@@ -1082,154 +1116,6 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	}
 /*************** END VALUE MAPPING ******************/
 
-/*************** CONVERTING ******************/
-	function zbx_stripslashes($value){
-		if(is_array($value)){
-			foreach($value as $id => $data)
-				$value[$id] = zbx_stripslashes($data); 
-				// $value = array_map('zbx_stripslashes',$value); /* don't use 'array_map' it buggy with indexes */
-		} elseif (is_string($value)){
-			$value = stripslashes($value);
-		}
-		return $value;
-	}
-	
-	function empty2null($var){
-		return ($var == "") ? null : $var;
-	}
-	
-	function str2mem($val){
-		$val = trim($val);
-		$last = strtolower($val{strlen($val)-1});
-		switch($last){
-			// The 'G' modifier is available since PHP 5.1.0
-			case 'g':
-				$val *= 1024;
-			case 'm':
-				$val *= 1024;
-			case 'k':
-				$val *= 1024;
-		}
-
-		return $val;
-	}
-	
-	function mem2str($size){
-		$prefix = 'B';
-		if($size > 1048576) {	$size = $size/1048576;	$prefix = 'M'; }
-		elseif($size > 1024) {	$size = $size/1024;	$prefix = 'K'; }
-		return round($size, 6).$prefix;
-	}
-
-	/* Do not forget to sync it with add_value_suffix in evalfunc.c! */ 
-	function convert_units($value,$units){
-// Special processing for unix timestamps
-		if($units=="unixtime"){
-			$ret=date("Y.m.d H:i:s",$value);
-			return $ret;
-		}
-//Special processing of uptime
-		if($units=="uptime"){
-			$ret="";
-			$days=floor($value/(24*3600));
-			if($days>0){
-				$value=$value-$days*(24*3600);
-			}
-			$hours=floor($value/(3600));
-			if($hours>0){
-				$value=$value-$hours*3600;
-			}
-			$min=floor($value/(60));
-			if($min>0){
-				$value=$value-$min*(60);
-			}
-			if($days==0){
-				$ret = sprintf("%02d:%02d:%02d", $hours, $min, $value);
-			}
-			else{
-				$ret = sprintf("%d days, %02d:%02d:%02d", $days, $hours, $min, $value);
-			}
-			return $ret;
-		}
-// Special processing for seconds
-		if($units=="s"){
-			return zbx_date2age(0,$value,true);	
-		}
-
-		$u="";
-
-// Special processing for bits (kilo=1000, not 1024 for bits)
-		if( ($units=="b") || ($units=="bps")){
-			$abs=abs($value);
-
-			if($abs<1000){
-				$u="";
-			}
-			else if($abs<1000*1000){
-				$u="K";
-				$value=$value/1000;
-			}
-			else if($abs<1000*1000*1000){
-				$u="M";
-				$value=$value/(1000*1000);
-			}
-			else{
-				$u="G";
-				$value=$value/(1000*1000*1000);
-			}
-	
-			if(round($value) == round($value,2)){
-				$s=sprintf("%.0f",$value);
-			}
-			else{
-				$s=sprintf("%.2f",$value);
-			}
-
-			return "$s $u$units";
-		}
-
-
-		if($units==""){
-			if(round($value) == round($value,2)){
-				return sprintf("%.0f",$value);
-			}
-			else{
-				return sprintf("%.2f",$value);
-			}
-		}
-
-		$abs=abs($value);
-
-		if($abs<1024){
-			$u="";
-		}
-		else if($abs<1024*1024){
-			$u="K";
-			$value=$value/1024;
-		}
-		else if($abs<1024*1024*1024){
-			$u="M";
-			$value=$value/(1024*1024);
-		}
-		else if($abs<1024*1024*1024*1024){
-			$u="G";
-			$value=$value/(1024*1024*1024);
-		}
-		else{
-			$u="T";
-			$value=$value/(1024*1024*1024*1024);
-		}
-
-		if(round($value) == round($value,2)){
-			$s=sprintf("%.0f",$value);
-		}
-		else{
-			$s=sprintf("%.2f",$value);
-		}
-
-		return "$s $u$units";
-	}
-/*************** END CONVERTING ******************/
 
 /*************** TABLE SORTING ******************/
 	/* function:

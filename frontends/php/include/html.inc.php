@@ -118,6 +118,7 @@
 		}
 
 		$icon = new CDiv(SPACE,($state)?'arrowup':'arrowdown');
+		$icon->AddOption('id',$id.'_icon');
 		$icon->AddAction('onclick',new CScript("javascript: change_hat_state(this,'".$id."');"));
 		$icon->AddOption('title',S_SHOW.'/'.S_HIDE);
 
