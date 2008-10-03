@@ -300,7 +300,7 @@ include_once "include/page_header.php";
 				*/
 				));
 		
-			$sql = 'SELECT h.* '.
+			$sql = 'SELECT DISTINCT h.* '.
 					' FROM ';
 			if(isset($_REQUEST["groupid"])){
 				$sql .= ' hosts h,hosts_groups hg ';
@@ -370,9 +370,9 @@ include_once "include/page_header.php";
 			
 				/* calculate graphs */
 				$graph_cnt = 0;
-				$db_graphs = DBselect('select gi.graphid, i.hostid, count(distinct i.hostid) as cnt'.
-					' from graphs_items gi, items i '.
-					' where gi.itemid=i.itemid group by gi.graphid, i.hostid');
+				$db_graphs = DBselect('SELECT gi.graphid, i.hostid, count(distinct i.hostid) as cnt'.
+					' FROM graphs_items gi, items i '.
+					' WHERE gi.itemid=i.itemid group by gi.graphid, i.hostid');
 				while($db_tr = DBfetch($db_graphs)) if($db_tr['cnt'] == 1 && (bccomp($db_tr['hostid'] , $row['hostid'])==0)) $graph_cnt++;
 				if($graph_cnt > 0){
 					$graph_cnt = array(new CCheckBox('graphs['.$row['hostid'].']',
