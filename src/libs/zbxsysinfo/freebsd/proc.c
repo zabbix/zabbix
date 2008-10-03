@@ -73,7 +73,7 @@ retry:
  *	proc.mem[<process_name><,user_name><,mode><,command_line>]
  *		<mode> : *sum, avg, max, min
  *
- *	Tested: FreeBSD 7.0
+ *	Tested: FreeBSD 6.2_i386, 7.0_i386;
  */
 
 int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -145,7 +145,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		mib[3] = usrinfo->pw_uid;
 		mibs = 4;
 	} else {
-		mib[2] = KERN_PROC_ALL;
+		mib[2] = KERN_PROC_PROC;
 		mib[3] = 0;
 		mibs = 3;
 	}
@@ -208,7 +208,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
  *	proc.num[<process_name><,user_name><,state><,command_line>]
  *		<state> : *all, sleep, zomb, run
  *
- *	Tested: FreeBSD 7.0
+ *	Tested: FreeBSD 6.2_i386, 7.0_i386;
  */
 
 int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -276,7 +276,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		mib[3] = usrinfo->pw_uid;
 		mibs = 4;
 	} else {
-		mib[2] = KERN_PROC_ALL;
+		mib[2] = KERN_PROC_PROC;
 		mib[3] = 0;
 		mibs = 3;
 	}
