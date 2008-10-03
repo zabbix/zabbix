@@ -1,5 +1,6 @@
 Changes for 1.6.1
 
+ - [ZBX-480] fixed patches for sysmaps_links table (Sasha)
  - [ZBX-521] fixed problem in FreeBSD with threads in proc.num and proc.mem items (Sasha)
  - [ZBX-519] removed proxy hosts from applications hosts list (Artem)
  - [DEV-238] added support of sec|#num for function count() (Sasha)
