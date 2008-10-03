@@ -1951,21 +1951,25 @@
 		$frmItem->AddRow(array( new CVisibilityBox('delay_visible', get_request('delay_visible'), 'delay', S_ORIGINAL),
 			S_UPDATE_INTERVAL_IN_SEC), new CNumericBox('delay',$delay,5));
 
-		$delay_flex_el = new CTag('a', 'yes', $delay_flex_el);
-		$delay_flex_el->AddOption('name', 'delay_flex_list');
-		$delay_flex_el->AddOption('style', 'text-decoration: none');
-		$frmItem->AddRow(array( new CVisibilityBox('delay_flex_visible', get_request('delay_flex_visible'), 
-			array('delay_flex_list', 'new_delay_flex_el'), S_ORIGINAL), S_FLEXIBLE_INTERVALS), $delay_flex_el);
-		$new_delay_flex_el = new CTag('a', 'yes', 
-			array(
-				S_DELAY, SPACE,
-				new CNumericBox("new_delay_flex[delay]","50",5), 
-				S_PERIOD, SPACE,
-				new CTextBox("new_delay_flex[period]","1-7,00:00-23:59",27), BR(),
-				new CButton("add_delay_flex",S_ADD)
-			));
-		$new_delay_flex_el->AddOption('name', 'new_delay_flex_el');
-		$new_delay_flex_el->AddOption('style', 'text-decoration: none');
+		$delay_flex_el = new CSpan($delay_flex_el);
+		$delay_flex_el->AddOption('id', 'delay_flex_list');
+
+		$frmItem->AddRow(array( 
+						new CVisibilityBox('delay_flex_visible', 
+								get_request('delay_flex_visible'), 
+								array('delay_flex_list', 'new_delay_flex_el'), 
+								S_ORIGINAL), 
+						S_FLEXIBLE_INTERVALS), $delay_flex_el);
+			
+		$new_delay_flex_el = new CSpan(array(
+										S_DELAY, SPACE,
+										new CNumericBox("new_delay_flex[delay]","50",5), 
+										S_PERIOD, SPACE,
+										new CTextBox("new_delay_flex[period]","1-7,00:00-23:59",27), BR(),
+										new CButton("add_delay_flex",S_ADD)
+									));
+		$new_delay_flex_el->AddOption('id', 'new_delay_flex_el');
+
 		$frmItem->AddRow(S_NEW_FLEXIBLE_INTERVAL, $new_delay_flex_el, 'new');
 
 		$frmItem->AddRow(array( new CVisibilityBox('history_visible', get_request('history_visible'), 'history', S_ORIGINAL),
