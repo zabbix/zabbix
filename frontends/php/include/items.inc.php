@@ -795,7 +795,8 @@
 	 ******************************************************************************/
 	function delete_item($itemids){
 		zbx_value2array($itemids);
-
+		if(empty($itemids)) return true;
+		
 // Get items INFO before delete them!
 		$items = array();
 		$item_res = DBselect('SELECT itemid, description, key_ FROM items WHERE '.DBcondition('itemid',$itemids));
