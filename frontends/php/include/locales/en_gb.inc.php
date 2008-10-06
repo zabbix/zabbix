@@ -679,7 +679,8 @@
 	'S_EDIT_MAINTENANCE_PERIOD'=>		'Edit maintenance period',
 	'S_CREATE_MAINTENANCE_PERIOD'=>		'Create maintenance period',
 	'S_MAINTENANCE_TYPE'=>				'Maintenance type',
-
+	'S_EXPIRED'=>						'Expired',
+	
 	'S_NORMAL_PROCESSING'=>				'Normal processing',
 	'S_NO_DATA_PROCESSING'=>			'No data processing',
 	
@@ -727,6 +728,7 @@
 	'S_DECEMBER'=>			'December',
 	
 	'S_INCORRECT_MAINTENANCE_PERIOD'=> 'Incorrect maintenance period',
+
 	
 //	hosts.php
 	'S_IN'=>					'In',

@@ -392,14 +392,14 @@ require_once('include/httptest.inc.php');
 	}
 
 	function delete_groups_by_hostid($hostid){
-		$sql="select groupid from hosts_groups where hostid=$hostid";
+		$sql='SELECT groupid FROM hosts_groups WHERE hostid='.$hostid;
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
 		
-			$sql="delete from hosts_groups where hostid=$hostid and groupid=".$row["groupid"];
+			$sql='DELETE FROM hosts_groups WHERE hostid='.$hostid.' AND groupid='.$row['groupid'];
 			DBexecute($sql);
 			
-			$sql="select count(*) as count from hosts_groups where groupid=".$row["groupid"];
+			$sql='SELECT COUNT(*) as count FROM hosts_groups WHERE groupid='.$row['groupid'];
 			$result2=DBselect($sql);
 			$row2=DBfetch($result2);
 			if($row2["count"]==0){
@@ -422,6 +422,7 @@ require_once('include/httptest.inc.php');
  */
 	function delete_host($hostids, $unlink_mode = false){
 		zbx_value2array($hostids);
+		if(empty($hostids)) return true;
 		
 		$ret = false;		
 // unlink child hosts
@@ -436,13 +437,15 @@ require_once('include/httptest.inc.php');
 		while($db_item = DBfetch($db_items)){
 			$del_items[$db_item['itemid']] = $db_item['itemid'];
 		}
-		if(!empty($del_items)){
-			delete_item($del_items);
-		}
+
+		delete_item($del_items);
 
 // delete host from maps
 		delete_sysmaps_elements_with_hostid($hostids);
-		
+
+// delete host from maintenances
+		DBexecute('DELETE FROM maintenances_hosts WHERE '.DBcondition('hostid',$hostids));
+				
 // delete host from group
 		DBexecute('DELETE FROM hosts_groups WHERE '.DBcondition('hostid',$hostids));
 
@@ -486,14 +489,20 @@ require_once('include/httptest.inc.php');
 	return DBexecute('DELETE FROM hosts WHERE '.DBcondition('hostid',$hostids));
 	}
 
-	function delete_host_group($groupid){
-		if(!delete_sysmaps_elements_with_groupid($groupid))
+	function delete_host_group($groupids){
+		zbx_value2array($groupids);
+		if(empty($groupids)) return true;
+
+		if(!delete_sysmaps_elements_with_groupid($groupids))
 			return false;
 		
-		if(!DBexecute("delete from hosts_groups where groupid=$groupid"))
-			return false;
+// delete host from maintenances
+		DBexecute('DELETE FROM maintenances_groups WHERE '.DBcondition('groupid',$groupids));
 
-		return DBexecute("delete from groups where groupid=$groupid");
+// delete host from host groups
+		DBexecute('DELETE FROM hosts_groups WHERE '.DBcondition('groupid',$groupids));
+
+	return DBexecute('DELETE FROM groups WHERE '.DBcondition('groupid',$groupids));
 	}
 
 	function get_hostgroup_by_groupid($groupid){

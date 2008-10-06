@@ -1943,17 +1943,7 @@ include_once('include/page_header.php');
 				$maintenanceids[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
 			}
 			
-			$timeperiods = array();
-			$sql = 'SELECT DISTINCT mw.maintenanceid, tp.* '.
-					' FROM timeperiods tp, maintenances_windows mw '.
-					' WHERE '.DBcondition('mw.maintenanceid',$maintenanceids).
-						' AND tp.timeperiodid=mw.timeperiodid ';
-			$db_timeperiods = DBselect($sql);
-			while($timeperiod = DBfetch($db_timeperiods)){
-				if(!isset($timeperiods[$timeperiod['maintenanceid']])) $timeperiods[$timeperiod['maintenanceid']] = array();
-				$timeperiods[$timeperiod['maintenanceid']][] = $timeperiod;
-			}
-			
+		
 			$form = new CForm(null,'post');
 			$form->SetName('maintenances');
 			
@@ -1964,10 +1954,14 @@ include_once('include/page_header.php');
 					make_sorting_link(S_NAME,'m.name')
 				),
 				S_TYPE,
+				S_STATUS,
 				S_DESCRIPTION
 				));
 				
 			foreach($maintenances as $maintenanceid => $maintenance){
+				
+				if($maintenance['active_till'] < time()) $mnt_status = new CSpan(S_EXPIRED,'red');
+				else $mnt_status = new CSpan(S_ACTIVE,'green');
 				
 				$table->addRow(array(
 					array(
@@ -1977,6 +1971,7 @@ include_once('include/page_header.php');
 							'&maintenanceid='.$maintenance['maintenanceid'].'#form', 'action')
 					),
 					$maintenance['maintenance_type']?S_NO_DATA_PROCESSING:S_NORMAL_PROCESSING,
+					$mnt_status,
 					$maintenance['description']
 					));
 			}
