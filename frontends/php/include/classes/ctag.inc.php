@@ -249,10 +249,13 @@
 			$this->AddAction('onClick', $handle_code);
 		}
 
-		function AddAction($name, $value)
-		{
-			if(!empty($value))
-				$this->options[$name] = htmlentities(str_replace(array("\r", "\n"), '', strval($value)),ENT_COMPAT,S_HTML_CHARSET); 
+		function AddAction($name, $value){
+			if(is_object($value)){
+				$this->options[$name] = unpack_object($value);
+			}
+			else if(!empty($value)){
+				$this->options[$name] = htmlentities(str_replace(array("\r", "\n"), '', strval($value)),ENT_COMPAT,S_HTML_CHARSET);
+			}
 		}
 
 		function AddOption($name, $value)

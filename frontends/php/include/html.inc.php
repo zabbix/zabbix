@@ -19,6 +19,10 @@
 **/
 ?>
 <?php
+	function BR(){
+		return new CTag('br','no');
+	}
+	
 	function	bold($str)
 	{
 		if(is_array($str)){
@@ -142,6 +146,124 @@
 			$result = prepare_url($var,$name);
 		}
 		return $result;
+	}
+	
+	function create_hat($caption,$items,$addicons=null,$id=null,$state=1){
+		if(is_null($id)){
+			list($usec, $sec) = explode(' ',microtime());	
+			$id = 'hat_'.((int)($sec % 10)).((int)($usec * 1000));
+		}
+
+		$td_l = new CCol(SPACE);
+		$td_l->AddOption('width','100%');
+
+		$icons_row = array($td_l);
+		if(!is_null($addicons)){
+			if(!is_array($addicons)) $addicons = array($addicons);
+			foreach($addicons as $value) $icons_row[] = $value;
+		}
+
+		$icon = new CDiv(SPACE,($state)?'arrowup':'arrowdown');
+		$icon->AddOption('id',$id.'_icon');
+		$icon->AddAction('onclick',new CScript("javascript: change_hat_state(this,'".$id."');"));
+		$icon->AddOption('title',S_SHOW.'/'.S_HIDE);
+
+		$icons_row[] = $icon;
+
+		$icon_tab = new CTable();
+		$icon_tab->AddOption('width','100%');
+		
+		$icon_tab->AddRow($icons_row);
+		
+		$table = new CTable();
+		$table->AddOption('width','100%');
+		$table->SetCellPadding(0);
+		$table->SetCellSpacing(0);
+		$table->AddRow(get_table_header($caption,$icon_tab));
+
+		$div = new CDiv($items);
+		$div->AddOption('id',$id);
+		if(!$state) $div->AddOption('style','display: none;');
+		
+		$table->AddRow($div);
+	return $table;
+	}
+	
+	function create_filter($col_l,$col_r,$items,$id='zbx_filter',$state=1){
+
+		if(isset($_REQUEST['print'])) $state = 0;
+		
+		$table = new CTable();
+		$table->AddOption('width','100%');
+		$table->SetCellPadding(0);
+		$table->SetCellSpacing(0);
+		$table->AddOption('border',0);
+		
+		$icon = new CDiv(SPACE,($state)?'filteropened':'filterclosed');
+		$icon->AddAction('onclick',new CScript("javascript: change_filter_state(this,'".$id."');"));
+		$icon->AddOption('title',S_MAXIMIZE.'/'.S_MINIMIZE);
+		$icon->AddAction('id','filter_icon');
+
+		$td_icon = new CCol($icon);
+		$td_icon->AddOption('valign','bottom');
+
+		$icons_row = array($td_icon,SPACE);
+		$icons_row[] = $col_l;
+
+		$icon_tab = new CTable();
+		$icon_tab->SetCellSpacing(0);
+		$icon_tab->SetCellPadding(0);
+		
+		$icon_tab->AddRow($icons_row);
+		
+		$table->AddRow(get_thin_table_header($icon_tab,$col_r));
+
+		$div = new CDiv($items);
+		$div->AddOption('id',$id);
+		if(!$state) $div->AddOption('style','display: none;');
+		
+		$tab = new CTable();
+		$tab->AddRow($div);
+		
+//		$table->AddRow($tab);
+		$table->AddRow($div);
+	return $table;
+	}
+	
+	function create_filter_hat($col_l,$col_r,$items,$id,$state=1){
+		
+		$table = new CTable(NULL,"filter");
+		$table->SetCellSpacing(0);
+		$table->SetCellPadding(1);
+
+
+
+		$td_l = new CCol($icon_tab,"filter_l");
+				
+		$td_r = new CCol($col_r,"filter_r");
+		$td_r->AddOption('align','right');
+				
+		$table->AddRow(array($td_l, $td_r));
+	return $table;
+	}
+	
+	function get_thin_table_header($col1, $col2=SPACE){
+		
+		$table = new CTable(NULL,"filter");
+//		$table->AddOption('border',1);
+		$table->SetCellSpacing(0);
+		$table->SetCellPadding(1);
+		
+		$td_r = new CCol($col2,"filter_r");
+		$td_r->AddOption('align','right');
+		
+		$table->AddRow(array(new CCol($col1,"filter_l"), $td_r));
+	return $table;
+	}
+
+	function	show_thin_table_header($col1, $col2=SPACE){
+		$table = get_thin_table_header($col1, $col2);
+		$table->Show();
 	}
 
 	function table_begin($class="tableinfo")

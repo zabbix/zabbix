@@ -24,9 +24,10 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
 ?>
 <?php
-	require_once 	"include/defines.inc.php";
-	require_once 	"include/html.inc.php";
-	require_once	"include/copt.lib.php";
+	require_once('include/defines.inc.php');
+	require_once('include/func.inc.php');
+	require_once('include/html.inc.php');
+	require_once('include/copt.lib.php');
 
 // GLOBALS
 	global $USER_DETAILS, $USER_RIGHTS;
@@ -60,7 +61,8 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	require_once("include/classes/ciframe.inc.php");
 	require_once("include/classes/cpumenu.inc.php");
 	require_once("include/classes/graph.inc.php");
-require_once('include/classes/ctree.inc.php');
+	require_once('include/classes/ctree.inc.php');
+	require_once('include/classes/cscript.inc.php');
 
 // Include Tactical Overview modules
 
@@ -305,25 +307,22 @@ require_once('include/classes/ctree.inc.php');
 
 		include_once "include/page_footer.php";
 	}
-
-
-	function zbx_stripslashes($value){
-		if(is_array($value)){
-			foreach($value as $id => $data)
-				$value[$id] = zbx_stripslashes($data); 
-				// $value = array_map('zbx_stripslashes',$value); /* don't use 'array_map' it buggy with indexes */
-		} elseif (is_string($value)){
-			$value = stripslashes($value);
+	
+	function detect_page_type($default=PAGE_TYPE_HTML){
+		if(isset($_REQUEST['output'])){
+			switch($_REQUEST['output']){
+				case 'ajax':
+					return PAGE_TYPE_JS;
+					break;
+				case 'json':
+					return PAGE_TYPE_JS;
+					break;
+				case 'html':
+					return PAGE_TYPE_HTML_BLOCK;
+					break;
+			}
 		}
-		return $value;
-	}
-
-	function get_request($name, $def=NULL){
-		global  $_REQUEST;
-		if(isset($_REQUEST[$name]))
-			return $_REQUEST[$name];
-		else
-			return $def;
+	return $default;
 	}
 
 	function info($msg)
@@ -353,17 +352,6 @@ require_once('include/classes/ctree.inc.php');
 		$ZBX_MESSAGES = null;
 	}
 
-	function &asort_by_key(&$array, $key)
-	{
-		if(!is_array($array)) {
-			error('Incorrect type of asort_by_key');
-			return array();
-		}
-		$key = htmlspecialchars($key);
-		uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
-		return $array;
-	}
-
 	function fatal_error($msg)
 	{
 		include_once "include/page_header.php";
@@ -371,208 +359,6 @@ require_once('include/classes/ctree.inc.php');
 		include_once "include/page_footer.php";
 	}
 	
-	function str2mem($val)
-	{
-		$val = trim($val);
-		$last = strtolower($val{strlen($val)-1});
-		switch($last)
-		{
-			// The 'G' modifier is available since PHP 5.1.0
-			case 'g':
-				$val *= 1024;
-			case 'm':
-				$val *= 1024;
-			case 'k':
-				$val *= 1024;
-		}
-
-		return $val;
-	}
-	
-	function mem2str($size)
-	{
-		$prefix = 'B';
-		if($size > 1048576) {	$size = $size/1048576;	$prefix = 'M'; }
-		elseif($size > 1024) {	$size = $size/1024;	$prefix = 'K'; }
-		return round($size, 6).$prefix;
-	}
-
-	function getmicrotime()
-	{
-		list($usec, $sec) = explode(" ",microtime()); 
-		return ((float)$usec + (float)$sec); 
-	}
-
-	/* Do not forget to sync it with add_value_suffix in evalfunc.c! */ 
-	function	convert_units($value,$units)
-	{
-// Special processing for unix timestamps
-		if($units=="unixtime")
-		{
-			$ret=date("Y.m.d H:i:s",$value);
-			return $ret;
-		}
-//Special processing of uptime
-		if($units=="uptime")
-		{
-			$ret="";
-			$days=floor($value/(24*3600));
-			if($days>0)
-			{
-				$value=$value-$days*(24*3600);
-			}
-			$hours=floor($value/(3600));
-			if($hours>0)
-			{
-				$value=$value-$hours*3600;
-			}
-			$min=floor($value/(60));
-			if($min>0)
-			{
-				$value=$value-$min*(60);
-			}
-			if($days==0)
-			{
-				$ret = sprintf("%02d:%02d:%02d", $hours, $min, $value);
-			}
-			else
-			{
-				$ret = sprintf("%d days, %02d:%02d:%02d", $days, $hours, $min, $value);
-			}
-			return $ret;
-		}
-// Special processing for seconds
-		if($units=="s")
-		{
-			$ret="";
-
-			$t=floor($value/(365*24*3600));
-			if($t>0)
-			{
-				$ret=$t."y";
-				$value=$value-$t*(365*24*3600);
-			}
-			$t=floor($value/(30*24*3600));
-			if($t>0)
-			{
-				$ret=$ret.$t."m";
-				$value=$value-$t*(30*24*3600);
-			}
-			$t=floor($value/(24*3600));
-			if($t>0)
-			{
-				$ret=$ret.$t."d";
-				$value=$value-$t*(24*3600);
-			}
-			$t=floor($value/(3600));
-			if($t>0)
-			{
-				$ret=$ret.$t."h";
-				$value=$value-$t*(3600);
-			}
-			$t=floor($value/(60));
-			if($t>0)
-			{
-				$ret=$ret.$t."m";
-				$value=$value-$t*(60);
-			}
-			$ret=$ret.round($value, 2)."s";
-		
-			return $ret;	
-		}
-
-		$u="";
-
-// Special processing for bits (kilo=1000, not 1024 for bits)
-		if( ($units=="b") || ($units=="bps"))
-		{
-			$abs=abs($value);
-
-			if($abs<1000)
-			{
-				$u="";
-			}
-			else if($abs<1000*1000)
-			{
-				$u="K";
-				$value=$value/1000;
-			}
-			else if($abs<1000*1000*1000)
-			{
-				$u="M";
-				$value=$value/(1000*1000);
-			}
-			else
-			{
-				$u="G";
-				$value=$value/(1000*1000*1000);
-			}
-	
-			if(round($value) == round($value,2))
-			{
-				$s=sprintf("%.0f",$value);
-			}
-			else
-			{
-				$s=sprintf("%.2f",$value);
-			}
-
-			return "$s $u$units";
-		}
-
-
-		if($units=="")
-		{
-			if(round($value) == round($value,2))
-			{
-				return sprintf("%.0f",$value);
-			}
-			else
-			{
-				return sprintf("%.2f",$value);
-			}
-		}
-
-		$abs=abs($value);
-
-		if($abs<1024)
-		{
-			$u="";
-		}
-		else if($abs<1024*1024)
-		{
-			$u="K";
-			$value=$value/1024;
-		}
-		else if($abs<1024*1024*1024)
-		{
-			$u="M";
-			$value=$value/(1024*1024);
-		}
-		else if($abs<1024*1024*1024*1024)
-		{
-			$u="G";
-			$value=$value/(1024*1024*1024);
-		}
-		else
-		{
-			$u="T";
-			$value=$value/(1024*1024*1024*1024);
-		}
-
-		if(round($value) == round($value,2))
-		{
-			$s=sprintf("%.0f",$value);
-		}
-		else
-		{
-			$s=sprintf("%.2f",$value);
-		}
-
-		return "$s $u$units";
-	}
-
-
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
 	function	calc_trigger_hash()
 	{
@@ -1009,6 +795,41 @@ require_once('include/classes/ctree.inc.php');
 			DBexecute($sql);
 		}
 	}
+	
+	function get_str_month($num){
+		$month = '[Wrong value for month: '.$num.']';
+		switch($num){
+			case 1: $month = S_JANUARY; break;
+			case 2: $month = S_FEBRUARY; break;
+			case 3: $month = S_MARCH; break;
+			case 4: $month = S_APRIL; break;
+			case 5: $month = S_MAY; break;
+			case 6: $month = S_JUNE; break;
+			case 7: $month = S_JULY; break;
+			case 8: $month = S_AUGUST; break;
+			case 9: $month = S_SEPTEMBER; break;
+			case 10: $month = S_OCTOBER; break;
+			case 11: $month = S_NOVEMBER; break;
+			case 12: $month = S_DECEMBER; break;
+		}
+	
+	return $month;
+	}
+	
+	function get_str_dayofweek($num){
+		$day = '[Wrong value for day of week: '.$num.']';
+		switch($num){
+			case 1: $day = S_MONDAY; break;
+			case 2: $day = S_TUESDAY; break;
+			case 3: $day = S_WEDNESDAY; break;
+			case 4: $day = S_THURSDAY; break;
+			case 5: $day = S_FRIDAY; break;
+			case 6: $day = S_SATURDAY; break;
+			case 7: $day = S_SUNDAY; break;
+		}
+	
+	return $day;
+	}
 
 	# Update configuration
 
@@ -1333,11 +1154,6 @@ require_once('include/classes/ctree.inc.php');
 		return ($var == "" ? 0 : 1);
 	}
 
-	function	empty2null($var)
-	{
-		return ($var == "") ? null : $var;
-	}
-
 
 	function	get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN)
 	{
@@ -1652,19 +1468,6 @@ require_once('include/classes/ctree.inc.php');
 		return $value;
 	}
 
-	function natksort(&$array) {
-		$keys = array_keys($array);
-		natcasesort($keys);
-
-		$new_array = array();
-
-		foreach ($keys as $k) {
-			$new_array[$k] = $array[$k];
-		}
-
-		$array = $new_array;
-		return true;
-	}
 
 	function	set_image_header($format=null)
 	{
@@ -1690,147 +1493,5 @@ require_once('include/classes/ctree.inc.php');
 			ImagePNG($image);
 
 		imagedestroy($image);
-	}
-
-	/* function:
-	 *      get_cookie
-	 *
-	 * description:
-	 *      return cookie value by name,
-	 *      if cookie is not present return $default_value.
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function	get_cookie($name, $default_value=null)
-	{
-		global $_COOKIE;
-		if(isset($_COOKIE[$name]))	return $_COOKIE[$name];
-		// else
-		return $default_value;
-	}
-
-	/* function:
-	 *      zbx_setcookie
-	 *
-	 * description:
-	 *      set cookies.
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function	zbx_setcookie($name, $value, $time=null)
-	{
-		global $_COOKIE;
-
-		setcookie($name, $value, isset($time) ? $time : (0));
-		$_COOKIE[$name] = $value;
-	}
-	
-	/* function:
-	 *      zbx_unsetcookie
-	 *
-	 * description:
-	 *      unset and clear cookies.
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function	zbx_unsetcookie($name)
-	{
-		zbx_setcookie($name, null, -99999);
-	}
-	
-	/* function:
-	 *     zbx_flush_post_cookies
-	 *
-	 * description:
-	 *     set posted cookies.
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function	zbx_flush_post_cookies($unset=false)
-	{
-		global $ZBX_PAGE_COOKIES;
-
-		if(isset($ZBX_PAGE_COOKIES))
-		{
-			foreach($ZBX_PAGE_COOKIES as $cookie)
-			{
-				if($unset)
-					zbx_unsetcookie($cookie[0]);
-				else
-					zbx_setcookie($cookie[0], $cookie[1], $cookie[2]);
-			}
-			unset($ZBX_PAGE_COOKIES);
-		}
-	}
-
-	/* function:
-	 *      zbx_set_post_cookie
-	 *
-	 * description:
-	 *      set cookies after authorisation.
-	 *      require calling 'zbx_flush_post_cookies' function
-	 *	Called from:
-	 *         a) in 'include/page_header.php'
-	 *         b) from 'Redirect()'
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function	zbx_set_post_cookie($name, $value, $time=null)
-	{
-		global $ZBX_PAGE_COOKIES;
-
-		$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time) ? $time : (0));
-	}
-
-	function	inarr_isset($keys, $array=null)
-	{
-		global $_REQUEST;
-
-		if(is_null($array)) $array =& $_REQUEST;
-
-		if(is_array($keys))
-		{
-			foreach($keys as $id => $key)
-			{
-				if( !isset($array[$key]) )
-					return false;
-			}
-			return true;
-		}
-
-		return isset($array[$keys]);
-	}
-
-	/* function:
-	 *      zbx_rksort
-	 *
-	 * description:
-	 *      Recursively sort an array by key
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function	zbx_rksort(&$array, $flags=NULL)
-	{
-		if(is_array($array))
-		{
-			foreach($array as $id => $data)
-				zbx_rksort($array[$id]);
-
-			ksort($array,$flags);
-		}
-		return $array;
-	}
-
-	/* function:
-	 *      zbx_date2str
-	 *
-	 * description:
-	 *      Convert timestamp to string representation. Retun 'Never' if 0.
-	 *
-	 * author: Alexei Vladishev
-	 */
-	function	zbx_date2str($format, $timestamp)
-	{
-		return ($timestamp==0)?S_NEVER:date($format,$timestamp);
 	}
 ?>

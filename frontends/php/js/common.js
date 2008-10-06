@@ -19,10 +19,19 @@
 var agt = navigator.userAgent.toLowerCase();
 var OP = (agt.indexOf("opera") != -1) && window.opera;
 var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
-var SF = (agt.indexOf("safari") != -1)	;
+var SF = (agt.indexOf("safari") != -1);
+var KQ = (agt.indexOf("khtml") != -1) && (!SF);
+var GK = (agt.indexOf("gecko") != -1) && !KQ && !SF;
+var MC = (agt.indexOf('mac') != -1)
 
-function isset(obj){
-	return (typeof(obj) != 'undefined');
+function checkBrowser(){
+	if(OP) SDI('Opera');
+	if(IE) SDI('IE');
+	if(SF) SDI('Safari');
+	if(KQ) SDI('Konqueror');
+	if(MC) SDI('Mac');
+	if(GK) SDI('FireFox');
+return 0;
 }
 
 function empty(obj){
@@ -48,10 +57,8 @@ function is_string(obj){
 }
 
 function is_array(obj) {
-   if (obj.constructor.toString().indexOf("Array") == -1)
-      return false;
-   else
-      return true;
+	return obj != null && typeof obj == "object" &&
+      'splice' in obj && 'join' in obj;	  
 }
 
 if (!Array.prototype.forEach)
@@ -74,6 +81,20 @@ if (!Array.prototype.forEach)
 function SDI(msg)
 {
 	alert("DEBUG INFO: " + msg);
+}
+
+function addListener(element, eventname, expression, bubbling){
+	bubbling = bubbling || false;
+		
+	if(window.addEventListener)	{
+		element.addEventListener(eventname, expression, bubbling);
+		return true;
+	} 
+	else if(window.attachEvent) {
+		element.attachEvent('on'+eventname, expression);
+		return true;
+	} 
+	else return false;
 }
 
 function close_window()
@@ -138,6 +159,7 @@ function get_scroll_pos()
 	}
 	return [ scrOfX, scrOfY ];
 }
+
 function get_cursor_position(e)
 {
 	e = e || window.event;
@@ -290,17 +312,126 @@ function openWinCentered(loc, winname, iwidth, iheight, params){
 	WinObjReferer.focus();
 }
 
-function cancelEvent(event){
-	event = event || window.event;
-
-//SDI(event);
-	if(IE){
-		event.cancelBubble = true;
-		event.returnValue = false;
-	}
-	else{
-		event.stopPropagation();
-		event.preventDefault();
+function cancelEvent(e){
+	if (!e) var e = window.event;	
+//SDI(e);
+	if(e){
+		if(IE){
+			e.cancelBubble = true;
+			e.returnValue = false;
+		}
+		else{
+			e.stopPropagation();
+			e.preventDefault();
+		}
 	}
 return false;
+}
+
+function deselectAll(){
+	if(IE){
+		document.selection.empty();
+	}
+	else if(!KQ){	
+		var sel = window.getSelection();
+		sel.removeAllRanges();
+	}
+}
+
+function ShowHide(obj,style){
+	if(typeof(style) == 'undefined')
+		var style = 'inline';
+	if(is_string(obj))
+		obj = document.getElementById(obj);
+	if(!obj){
+		throw 'ShowHide(): Object not foun.';
+		return false;
+	}
+
+	if(obj.style.display != 'none'){
+		obj.style.display = 'none';
+		return 0;
+	}
+	else{
+		obj.style.display = style;
+		return 1;
+	}
+return false;
+}
+
+function switchElementsClass(obj,class1,class2){
+	obj = $(obj);
+	if(!obj) return false;
+
+	if(obj.className == class1){
+		obj.className = class2;
+		return class2;
+	}
+	else{
+		obj.className = class1;
+		return class1;
+	}
+return false;
+}
+
+function eventTarget(e){
+	var targ = false;
+	
+	if (!e) var e = window.event;
+	if (e.target) targ = e.target;
+	else if (e.srcElement) targ = e.srcElement;
+	
+// defeat Safari bug
+	if (targ.nodeType == 3) targ = targ.parentNode;
+	
+return targ;
+}
+
+function getPosition(obj){
+	var pos = {top: 0, left: 0};
+	if(typeof(obj.offsetParent) != 'undefined') {
+		pos.left = obj.offsetLeft;
+		pos.top = obj.offsetTop;
+		while (obj = obj.offsetParent) {
+			pos.left += obj.offsetLeft;
+			pos.top += obj.offsetTop;
+		}
+	}
+return pos;
+}
+
+function remove_childs(form_name,rmvbyname,tag){
+	tag = tag.toUpperCase();
+	var frmForm = document.forms[form_name];
+	for (var i=0; i < frmForm.length; i++){
+		if(frmForm.elements[i].type != 'checkbox') continue;
+		if(frmForm.elements[i].disabled == true) continue;
+		if(frmForm.elements[i].checked != true) continue;
+		
+		var splt = frmForm.elements[i].name.split('[');
+		var name = splt[0];
+		var serviceid = splt[1];
+
+		if(rmvbyname && rmvbyname != name) continue;
+//		if(frmForm.elements[i].name != rmvbyname+'['+serviceid+'[serviceid]') continue;
+
+		remove_element(frmForm.elements[i],tag);
+		i--;
+	}
+}
+
+function remove_element(elmnt,tag){
+	elmnt = $(elmnt);
+	if(!is_null(elmnt)){
+		if(('undefined' != typeof(elmnt.nodeName)) && (elmnt.nodeName.toLowerCase() == tag.toLowerCase())){
+			elmnt.parentNode.removeChild(elmnt);
+		} 
+		else if(elmnt.nodeType == 9){
+			return false;
+		} 
+		else {
+			remove_element(elmnt.parentNode,tag);
+		}
+	}
+return true;
 }

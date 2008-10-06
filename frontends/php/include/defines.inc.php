@@ -19,6 +19,12 @@
 **/
 ?>
 <?php
+	define('PAGE_TYPE_HTML',		0);
+	define('PAGE_TYPE_IMAGE',		1);
+	define('PAGE_TYPE_XML',			2);
+	define('PAGE_TYPE_JS',			3);	//javascript
+	define('PAGE_TYPE_HTML_BLOCK',	4);	//simple block of html (as text)
+	
 	define('XML_TAG_ZABBIX_EXPORT',		'zabbix_export');
 	define('XML_TAG_HOSTS',			'hosts');
 	define('XML_TAG_HOST',			'host');
@@ -39,10 +45,6 @@
 	define('XML_TAG_SCREEN_ELEMENT',	'screen_element');
 	define('XML_TAG_SCREEN_ELEMENTS',	'screen_elements');
 	
-	define('PAGE_TYPE_HTML',	0);
-	define('PAGE_TYPE_IMAGE',	1);
-	define('PAGE_TYPE_XML',		2);
-
 	define('T_ZBX_STR',			0);
 	define('T_ZBX_INT',			1);
 	define('T_ZBX_DBL',			2);
@@ -103,6 +105,8 @@
 	define('AUDIT_RESOURCE_DISCOVERY_RULE',	23);
 	define('AUDIT_RESOURCE_SLIDESHOW',	24);
 	define('AUDIT_RESOURCE_SCRIPT',		25);
+//	define('AUDIT_RESOURCE_PROXY',		26);
+	define('AUDIT_RESOURCE_MAINTENANCE',27);
 
 	define('CONDITION_TYPE_HOST_GROUP',	0);
 	define('CONDITION_TYPE_HOST',		1);
@@ -136,6 +140,14 @@
 	define('HOST_AVAILABLE_UNKNOWN',	0);
 	define('HOST_AVAILABLE_TRUE',		1);
 	define('HOST_AVAILABLE_FALSE',		2);
+	
+	define('MAINTENANCE_TYPE_NORMAL', 	0);
+	define('MAINTENANCE_TYPE_NODATA', 	1);
+	
+	define('TIMEPERIOD_TYPE_ONETIME',	0);
+	define('TIMEPERIOD_TYPE_DAILY',		1);
+	define('TIMEPERIOD_TYPE_WEEKLY',	2);
+	define('TIMEPERIOD_TYPE_MONTHLY',	3);
 
 	define('MAP_LABEL_TYPE_LABEL',0);
 	define('MAP_LABEL_TYPE_IP',1);

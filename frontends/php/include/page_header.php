@@ -53,6 +53,14 @@ COpt::profiling_start("page");
 			header('Content-Disposition: attachment; filename="'.$page['file'].'"');
 			define('ZBX_PAGE_NO_MENU', 1);
 			break;
+		case PAGE_TYPE_JS:
+			header('Content-Type: application/javascript; charset=UTF-8');
+			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+			break;
+		case PAGE_TYPE_HTML_BLOCK:
+			header('Content-Type: text/plain; charset=UTF-8');
+			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+			break;
 		case PAGE_TYPE_HTML:
 		default:
 			header('Content-Type: text/html; charset='.S_HTML_CHARSET);
@@ -351,17 +359,36 @@ COpt::profiling_start("page");
 	if($page["type"] == PAGE_TYPE_HTML)
 	{
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title><?php echo $page['title'] ?></title>
 <?php if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"]) { ?>
     <meta http-equiv="refresh" content="<?php echo $USER_DETAILS["refresh"]; ?>">
 <?php } ?>
-    <link rel="stylesheet" href="css.css">
-    <meta name="Author" content="ZABBIX SIA">
+<meta name="Author" content="ZABBIX SIA" />
+<link rel="stylesheet" type="text/css" href="css.css" />
+
+	<script type="text/javascript" src="js/prototype.js"></script>
     <script type="text/javascript" src="js/common.js"></script>
-  </head>
+	<script type="text/javascript" src="js/ajax_req.js"></script>
+	<script type="text/javascript" src="js/url.js"></script>
+<?php
+	if(isset($page['scripts']) && is_array($page['scripts'])){
+		foreach($page['scripts'] as $id => $script){
+			if(file_exists('js/'.$script)){
+				echo '    <script type="text/javascript" src="js/'.$script.'"></script>'."\n";
+			} 
+			else if(file_exists($script)){
+				echo '    <script type="text/javascript" src="'.$script.'"></script>'."\n";
+			} 
+			else {
+				echo '<!-- js script "'.$script.'" not found-->'."\n";
+			}
+		}
+	}
+?>
+</head>
 <body onLoad="zbxCallPostScripts();">
 <?php
 	}
@@ -451,10 +478,22 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$sub_menu_table = new CTable(NULL,'sub_menu');
 		$sub_menu_table->SetCellSpacing(0);
 		$sub_menu_table->SetCellPadding(5);
+
+		if(empty($sub_menu_row)) $sub_menu_row = '&nbsp;';
 		$sub_menu_table->AddRow(new CCol($sub_menu_row));
-	
 		$sub_menu_table->Show();
 	}
+	$space = new CTable(NULL);
+	$space->SetCellSpacing(0);
+	$space->SetCellPadding(0);
+	
+	$spacetd = new CCol('');
+	$spacetd->addOption('height',5);
+	
+	$space->addRow($spacetd);
+	$space->Show();
+//	echo BR;
+	
 	unset($ZBX_MENU);
 		
 	unset($table, $top_page_row, $menu_table, $node_form);

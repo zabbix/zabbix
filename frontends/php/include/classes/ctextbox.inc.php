@@ -19,35 +19,34 @@
 **/
 ?>
 <?php
-	class CTextBox extends CTag
-	{
+	class CTextBox extends CTag{
 /* private */
 		//var $caption;
 /* public */
-		function CTextBox($name='textbox',$value="",$size=20,$readonly="no")
-		{
+		function CTextBox($name='textbox',$value="",$size=20,$readonly="no"){
 			$this->caption = null;
 			parent::CTag('input','no');
 			$this->tag_body_start = '';
 			$this->options['class'] = 'biginput';
 			$this->AddOption('name', $name);
+			$this->AddOption('id', $name);
 			$this->AddOption('size', $size);
 			$this->AddOption('value',$value);
 			$this->SetReadonly($readonly);
 		}
-		function SetReadonly($value='yes')
-		{
-			if($value=='yes')
+		
+		function SetReadonly($value='yes'){
+			if((is_string($value) && ($value=="yes" || $value=="checked" || $value=="on") || $value=="1") || (is_int($value)&&$value<>0))
 				return $this->options['readonly'] = 'readonly';
 
 			$this->DelOption('readonly');
 		}
-		function SetValue($value=NULL)
-		{
+		
+		function SetValue($value=NULL){
 			$this->options['value'] = $value;
 		}
-		function SetSize($value)
-		{
+		
+		function SetSize($value){
 			$this->options['size'] = $value;
 			
 		}
@@ -63,20 +62,18 @@
 		}
 	}
 
-	class CNumericBox extends CTextBox
-	{
-		function CNumericBox($name='number',$value='0',$size=20,$readonly="no",$allowempty=false)
-		{
+	class CNumericBox extends CTextBox{
+		function CNumericBox($name='number',$value='0',$size=20,$readonly="no",$allowempty=false){
 			parent::CTextBox($name,$value,$size,$readonly);
 			$this->AddOption('MaxLength', $size);
 			$this->AddOption('Style', 'text-align: right;');
-			$this->AddAction('OnKeyPress',
+			$this->AddAction('onkeypress',
 				' var c = (window.event) ? event.keyCode : event.which;'.
 				' if(event.ctrlKey || c <= 31 || (c >= 48 && c <= 57)) return true; else return false; ');
-			$this->AddAction('OnChange',
+			$this->AddAction('onchange',
 					($allowempty ? ' if(this.value.length==0 || this.value==null) this.value = \'\'; else ' : '').
-					' if(isNaN(parseInt(this.value))) this.value = 0; '.
-					' else this.value = parseInt(this.value);'
+					' if(isNaN(parseInt(this.value,10))) this.value = 0; '.
+					' else this.value = parseInt(this.value,10);'
 				);
 		}
 	}

@@ -445,7 +445,10 @@ require_once "include/items.inc.php";
 
 	// delete host from maps
 		delete_sysmaps_elements_with_hostid($hostid);
-		
+
+// delete host from maintenances
+		DBexecute('DELETE FROM maintenances_hosts WHERE hostid='.$hostid);
+
 	// delete host from group
 		DBexecute("delete from hosts_groups where hostid=$hostid");
 
@@ -474,9 +477,13 @@ require_once "include/items.inc.php";
 	{
 		if(!delete_sysmaps_elements_with_groupid($groupid))
 			return false;
-		
+
 		if(!DBexecute("delete from hosts_groups where groupid=$groupid"))
 			return false;
+
+// delete host from maintenances
+		DBexecute('DELETE FROM maintenances_groups WHERE groupid='.$groupid);
+
 
 		return DBexecute("delete from groups where groupid=$groupid");
 	}

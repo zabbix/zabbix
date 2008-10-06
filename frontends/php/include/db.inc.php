@@ -607,4 +607,52 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 
 		return $ret2;
 	}
+	
+	function check_db_fields(&$db_fields, &$args){
+		if(!is_array($args)) return false;
+		
+		foreach($db_fields as $field => $def){
+			if(!isset($args[$field])){
+				if(is_null($def)){
+					return false;
+				}
+				else{
+					$args[$field] = $def;
+				}
+			}
+		}
+	return true;
+	}
+	
+	function DBcondition($fieldname, &$array, $notin=false){
+		global $DB_TYPE;
+		$condition = '';
+		
+		if(!is_array($array)){
+			info('DBcondition Error: ['.$fieldname.'] = '.$array);
+			$array = explode(',',$array);
+			if(empty($array))
+				return ' 1=1 ';
+		}
+
+		$in = 		$notin?' NOT IN ':' IN ';
+		$concat = 	$notin?' AND ':' OR ';
+
+		switch($DB_TYPE) {
+			case 'MYSQL':
+			case 'ORACLE':
+				$items = array_chunk($array, 950);
+				foreach($items as $id => $values){
+					$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
+					$condition.= implode(',',$values);
+				}
+				break;
+			default:
+				$condition = implode(',',$array);
+		}
+		
+		if(zbx_empty($condition)) $condition = '-1';
+
+	return ' ('.$fieldname.$in.'('.$condition.')) ';
+	}
 ?>

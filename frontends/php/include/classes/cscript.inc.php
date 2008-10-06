@@ -19,37 +19,23 @@
 **/
 ?>
 <?php
-	class CSpan extends CTag
-	{
+class CScript extends CObject{
 /* public */
-		function CSpan($items=NULL,$class=NULL)
-		{
-			parent::CTag("span","yes");
-			$this->SetClass($class);
-			$this->AddItem($items);
-			
-			$this->tag_body_start = "";			
-			$this->tag_start= "";
-			$this->tag_end = "";
-			$this->tag_body_start = "";
-			$this->tag_body_end = "";			
-		}
-	}
 
-	class CDiv extends CTag
-	{
-/* public */
-		function CDiv($items=NULL,$class=NULL)
-		{
-			parent::CTag("div","yes");
-			$this->SetClass($class);
-			$this->AddItem($items);
-
-			$this->tag_body_start = "";
-			$this->tag_start= "";
-			$this->tag_end = "";
-			$this->tag_body_start = "";
-			$this->tag_body_end = "";
+		function CScript($item=NULL){
+			$this->items = array();
+			$this->AddItem($item);
 		}
-	}
+		
+		function AddItem($value){
+			if(is_array($value)){
+				foreach($value as $item){
+					array_push($this->items,unpack_object($item));
+				}
+			}
+			else if(!is_null($value)){
+				array_push($this->items,unpack_object($value));
+			}
+		}
+}
 ?>

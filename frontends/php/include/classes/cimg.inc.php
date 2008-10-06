@@ -19,11 +19,9 @@
 **/
 ?>
 <?php
-	class CImg extends CTag
-	{
+	class CImg extends CTag{
 /* public */
-		function CImg($src,$name=NULL,$width=NULL,$height=NULL,$class=NULL)
-		{
+		function CImg($src,$name=NULL,$width=NULL,$height=NULL,$class=NULL){
 			parent::CTag("img","no");
 
 			$this->tag_start= "";
@@ -35,6 +33,7 @@
 				$name="image";
 
 			$this->AddOption('border',0);
+			$this->AddOption('alt',$name);
 			$this->SetName($name);
 			$this->SetAltText($name);
 			$this->SetSrc($src);
@@ -42,47 +41,46 @@
 			$this->SetHeight($height);
 			$this->SetClass($class);
 		}
-		function SetSrc($value)
-		{
-			if(!is_string($value))
-			{
+		
+		function SetSrc($value){
+			if(!is_string($value)){
 				return $this->error("Incorrect value for SetSrc [$value]");
 			}
-			return $this->AddOption("src",$value);
+		return $this->AddOption("src",$value);
 		}
-		function SetAltText($value=NULL)
-		{
-			if(!is_string($value))
-			{
+		
+		function SetAltText($value=NULL){
+			if(!is_string($value)){
 				return $this->error("Incorrect value for SetText [$value]");
 			}
-			return $this->AddOption("alt",$value);
+		return $this->AddOption("alt",$value);
 		}
-		function SetMap($value=NULL)
-		{
+		
+		function SetMap($value=NULL){
 			if(is_null($value))
-				$this->DeleteOption("usemup");
+				$this->DeleteOption("usemap");
 
-			if(!is_string($value))
-			{
+			if(!is_string($value)){
 				return $this->error("Incorrect value for SetMap [$value]");
 			}
 			
 			$value = '#'.ltrim($value,'#');
-			return $this->AddOption("usemap",$value);
+		return $this->AddOption("usemap",$value);
 		}
+		
 		function SetWidth($value=NULL){
 			if(is_null($value))
 				return $this->DelOption("width");
-			elseif(is_numeric($value)||is_int($value))
+			else if(is_numeric($value)||is_int($value))
 				return $this->AddOption("width",$value);
 			else
 				return $this->error("Incorrect value for SetWidth [$value]");
 		}
+		
 		function SetHeight($value=NULL){
 			if(is_null($value))
 				return $this->DelOption("height");
-			elseif(is_numeric($value)||is_int($value))
+			else if(is_numeric($value)||is_int($value))
 				return $this->AddOption("height",$value);
 			else
 				return $this->error("Incorrect value for SetHeight [$value]");
