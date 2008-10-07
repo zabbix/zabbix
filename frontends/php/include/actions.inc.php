@@ -535,7 +535,7 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 function get_conditions_by_eventsource($eventsource){
 	$conditions[EVENT_SOURCE_TRIGGERS] = array(
 			CONDITION_TYPE_APPLICATION,
-			CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+//			CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 			CONDITION_TYPE_HOST_GROUP,
 			CONDITION_TYPE_HOST_TEMPLATE,
 			CONDITION_TYPE_HOST,
