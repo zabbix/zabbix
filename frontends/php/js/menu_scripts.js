@@ -160,7 +160,14 @@ function create_host_menu(e,hostid,hst_grp_all_in){
 	}
 	
 
+	var now = new Date();
+	
 	var grp_menu = new Array(
+							['Maintenance',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
+								['Set to maintenance','hosts.php?config=6&form=1'+
+								 '&mname=New+Maintenance+period&active_since='+parseInt(now.getTime()/1000)+
+								 '&new_timeperiod[timeperiod_type]=0&new_timeperiod[period]=7200&new_timeperiod[date]='+parseInt(now.getTime()/1000)+
+								 '&hostids['+hostid+']='+hostid,{'tw' : ''}],
 							['Show',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
 								['Items','items.php?hostid='+hostid,{'tw' : ''}],
 								['Triggers','triggers.php?hostid='+hostid,{'tw' : ''}],
