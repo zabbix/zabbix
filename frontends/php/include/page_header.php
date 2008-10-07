@@ -556,7 +556,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$sub_menu_table->SetCellSpacing(0);
 		$sub_menu_table->SetCellPadding(5);
 		
-		(empty($sub_menu_row))?($sub_menu_row = '&nbsp;'):('');
+		if(empty($sub_menu_row)) $sub_menu_row = '&nbsp;';
 		$sub_menu_table->AddRow(new CCol($sub_menu_row));
 		$sub_menu_table->Show();
 	}
