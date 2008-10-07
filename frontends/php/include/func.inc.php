@@ -320,7 +320,8 @@ function zbx_stripslashes($value){
 		foreach($value as $id => $data)
 			$value[$id] = zbx_stripslashes($data); 
 			// $value = array_map('zbx_stripslashes',$value); /* don't use 'array_map' it buggy with indexes */
-	} elseif (is_string($value)){
+	} 
+	else if(is_string($value)){
 		$value = stripslashes($value);
 	}
 	return $value;

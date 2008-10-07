@@ -1218,21 +1218,21 @@ include_once('include/page_header.php');
 			$btn = new CButton('form',S_CREATE_HOST);
 			$frmForm->AddVar('groupid',get_request('groupid',0));
 			break;
+		case 1: 
+			$btn = new CButton('form',S_CREATE_GROUP);
+			break;
+		case 2: 
+			break;
 		case 3:
 			$btn = new CButton('form',S_CREATE_TEMPLATE);
 			$frmForm->AddVar('groupid',get_request('groupid',0));
-			break;
-		case 5:
-			$btn = new CButton('form',S_CREATE_PROXY);
-			break;
-		case 1: 
-			$btn = new CButton('form',S_CREATE_GROUP);
 			break;
 		case 4: 
 			$btn = new CButton('form',S_CREATE_APPLICATION);
 			$frmForm->AddVar('hostid',get_request('hostid',0));
 			break;
-		case 2: 
+		case 5:
+			$btn = new CButton('form',S_CREATE_PROXY);
 			break;
 		case 6:
 			$btn = new CButton('form',S_CREATE_MAINTENANCE_PERIOD);
