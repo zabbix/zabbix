@@ -566,15 +566,14 @@ else{
 	define('XML_TAG_DEPENDS',			'depends');
 
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
-	if (!function_exists('version_compare'))
-	{
+	if(!function_exists('version_compare')){
 		$_GET		= $HTTP_GET_VARS;
 		$_POST		= $HTTP_POST_VARS;
 		$_COOKIE	= $HTTP_COOKIE_VARS;
 	}
 
 /* if magic quotes on then get rid of them */
-	if (get_magic_quotes_gpc()) {
+	if(get_magic_quotes_gpc()){
 		$_GET    = zbx_stripslashes($_GET);
 		$_POST	 = zbx_stripslashes($_POST);
 		$_COOKIE = zbx_stripslashes($_COOKIE);
