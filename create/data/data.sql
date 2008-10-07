@@ -6600,4 +6600,4 @@ INSERT INTO sysmaps VALUES (2,'Local network',980,200,0,2,0);
 -- Dumping data for table `sysmaps_elements`
 --
 
-INSERT INTO sysmaps_elements VALUES (2,2,10017,0,19,19,19,'ZABBIX Server',NULL,100,100,'');
+INSERT INTO sysmaps_elements VALUES (2,2,10017,0,19,19,19,19,'ZABBIX Server',NULL,100,100,'');

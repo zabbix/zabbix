@@ -482,16 +482,18 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		if(empty($sub_menu_row)) $sub_menu_row = '&nbsp;';
 		$sub_menu_table->AddRow(new CCol($sub_menu_row));
 		$sub_menu_table->Show();
+		
+		$space = new CTable(NULL);
+		$space->SetCellSpacing(0);
+		$space->SetCellPadding(0);
+		
+		$spacetd = new CCol('');
+		$spacetd->addOption('height',5);
+		
+		$space->addRow($spacetd);
+		$space->Show();
 	}
-	$space = new CTable(NULL);
-	$space->SetCellSpacing(0);
-	$space->SetCellPadding(0);
-	
-	$spacetd = new CCol('');
-	$spacetd->addOption('height',5);
-	
-	$space->addRow($spacetd);
-	$space->Show();
+
 //	echo BR;
 	
 	unset($ZBX_MENU);

@@ -167,6 +167,7 @@ include_once "include/page_header.php";
 
 		$color		= $darkgreen;
 		$label_color	= $black;
+
 		$info_line	= "";
 		$label_location = $db_element["label_location"];
 		if(is_null($label_location))	$map["label_location"];
@@ -248,7 +249,8 @@ include_once "include/page_header.php";
 				$x_label-2, $y_label,
 				$x_label+ImageFontWidth(2)*strlen($label_line), $y_label+ImageFontHeight(2),
 				$white);
-			ImageStringTTF($im, 2, $x_label, $y_label, $label_line,$label_color);
+				
+			imagestringTTF($im, 2, $x_label, $y_label, $label_line, $label_color);
 		}
 
 		if($info_line!="")
@@ -257,7 +259,7 @@ include_once "include/page_header.php";
 				$x_info-2, $y_info,
 				$x_info+ImageFontWidth(2)*strlen($info_line), $y_info+ImageFontHeight(2),
 				$white);
-			ImageStringTTF($im, 2, $x_info, $y_info, $info_line,$color);
+			ImageStringTTF($im, 2, $x_info, $y_info+2, $info_line,$color);
 		}
 	}
 

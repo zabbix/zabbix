@@ -4496,7 +4496,8 @@ include_once 'include/discovery.inc.php';
 			$url		= $element["url"];
 			$iconid_off	= $element["iconid_off"];
 			$iconid_on	= $element["iconid_on"];
-			$iconid_unknown	= $element["iconid_unknown"];
+			$iconid_unknown		= $element["iconid_unknown"];
+			$iconid_maintenance	= $element["iconid_maintenance"];
 			$label_location	= $element["label_location"];
 			if(is_null($label_location)) $label_location = -1;
 		}
@@ -4510,7 +4511,8 @@ include_once 'include/discovery.inc.php';
 			$url		= get_request("url",		"");
 			$iconid_off	= get_request("iconid_off",	0);
 			$iconid_on	= get_request("iconid_on",	0);
-			$iconid_unknown	= get_request("iconid_unknown",	0);
+			$iconid_unknown		= get_request("iconid_unknown",	0);
+			$iconid_maintenance	= get_request("iconid_maintenance",	0);
 			$label_location	= get_request("label_location",	"-1");
 		}
 
@@ -4647,6 +4649,7 @@ include_once 'include/discovery.inc.php';
 		$cmbIconOff	= new CComboBox("iconid_off",$iconid_off);
 		$cmbIconOn	= new CComboBox("iconid_on",$iconid_on);
 		$cmbIconUnknown	= new CComboBox("iconid_unknown",$iconid_unknown);
+		$cmbIconMaintenance	= new CComboBox("iconid_maintenance",$iconid_maintenance);
 		$result = DBselect('select * from images where imagetype=1 and '.DBin_node('imageid').' order by name');
 		while($row=DBfetch($result))
 		{
@@ -4655,10 +4658,12 @@ include_once 'include/discovery.inc.php';
 			$cmbIconOff->AddItem($row["imageid"],$row["name"]);
 			$cmbIconOn->AddItem($row["imageid"],$row["name"]);
 			$cmbIconUnknown->AddItem($row["imageid"],$row["name"]);
+			$cmbIconMaintenance->AddItem($row["imageid"],$row["name"]);
 		}
 		$frmEl->AddRow(S_ICON_OFF,$cmbIconOff);
 		$frmEl->AddRow(S_ICON_ON,$cmbIconOn);
 		$frmEl->AddRow(S_ICON_UNKNOWN,$cmbIconUnknown);
+		$frmEl->AddRow(S_ICON_MAINTENANCE,$cmbIconMaintenance);
 
 		$frmEl->AddRow("Coordinate X", new CNumericBox("x", $x, 5));
 		$frmEl->AddRow("Coordinate Y", new CNumericBox("y", $y, 5));

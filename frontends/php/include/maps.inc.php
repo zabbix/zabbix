@@ -23,6 +23,7 @@
 	require_once "include/hosts.inc.php";
 	require_once "include/triggers.inc.php";
 	require_once "include/scripts.inc.php";
+	require_once "include/maintenances.inc.php";
 	
         /*
          * Function: map_link_drawtypes
@@ -267,7 +268,8 @@
 	# Add Element to system map
 
 	function add_element_to_sysmap($sysmapid,$elementid,$elementtype,
-						$label,$x,$y,$iconid_off,$iconid_unknown,$iconid_on,$url,$label_location)
+						$label,$x,$y,$iconid_off,$iconid_unknown,$iconid_on,$iconid_maintenance,
+						$url,$label_location)
 	{
 		if($label_location<0) $label_location='null';
 		if(check_circle_elements_link($sysmapid,$elementid,$elementtype))
@@ -279,9 +281,9 @@
 		$selementid = get_dbid("sysmaps_elements","selementid");
 
 		$result=DBexecute("insert into sysmaps_elements".
-			" (selementid,sysmapid,elementid,elementtype,label,x,y,iconid_off,url,iconid_on,label_location,iconid_unknown)".
+			" (selementid,sysmapid,elementid,elementtype,label,x,y,iconid_off,url,iconid_on,label_location,iconid_unknown,iconid_maintenance)".
 			" values ($selementid,$sysmapid,$elementid,$elementtype,".zbx_dbstr($label).",
-			$x,$y,$iconid_off,".zbx_dbstr($url).",$iconid_on,$label_location,$iconid_unknown)");
+			$x,$y,$iconid_off,".zbx_dbstr($url).",$iconid_on,$label_location,$iconid_unknown,$iconid_maintenance)");
 
 		if(!$result)
 			return $result;
@@ -292,7 +294,8 @@
 	# Update Element from system map
 
 	function	update_sysmap_element($selementid,$sysmapid,$elementid,$elementtype,
-						$label,$x,$y,$iconid_off,$iconid_unknown,$iconid_on,$url,$label_location)
+						$label,$x,$y,$iconid_off,$iconid_unknown,$iconid_on,$iconid_maintenance,
+						$url,$label_location)
 	{
 		if($label_location<0) $label_location='null';
 		if(check_circle_elements_link($sysmapid,$elementid,$elementtype))
@@ -303,7 +306,7 @@
 
 		return	DBexecute("update sysmaps_elements set elementid=$elementid,elementtype=$elementtype,".
 			"label=".zbx_dbstr($label).",x=$x,y=$y,iconid_off=$iconid_off,url=".zbx_dbstr($url).
-			",iconid_on=$iconid_on,label_location=$label_location,iconid_unknown=$iconid_unknown".
+			",iconid_on=$iconid_on,label_location=$label_location,iconid_unknown=$iconid_unknown,iconid_maintenance=$iconid_maintenance".
 			" where selementid=$selementid");
 	}
 
@@ -415,38 +418,47 @@
 
 		$sql = array(
 			SYSMAP_ELEMENT_TYPE_TRIGGER => 'select distinct t.triggerid, t.priority, t.value, t.description, t.expression, h.host '.
-				'from triggers t, items i, functions f, hosts h where t.triggerid='.$db_element['elementid'].
-				' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid '.
-				' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE,
+				' from triggers t, items i, functions f, hosts h '.
+				' where t.triggerid='.$db_element['elementid'].
+					' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid '.
+					' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE,
 			SYSMAP_ELEMENT_TYPE_HOST_GROUP => 'select distinct t.triggerid, t.priority, t.value,'.
-				' t.description, t.expression, h.host, g.name as el_name '.
+					' t.description, t.expression, h.host, g.name as el_name '.
 				' from items i,functions f,triggers t,hosts h,hosts_groups hg,groups g '.
 				' where h.hostid=i.hostid and hg.groupid=g.groupid and g.groupid='.$db_element['elementid'].
-				' and hg.hostid=h.hostid and i.itemid=f.itemid'.
-				' and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
-				' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE,
-			SYSMAP_ELEMENT_TYPE_HOST => 'select distinct t.triggerid, t.priority, t.value,'.
-				' t.description, t.expression, h.host, h.host as el_name'.
-				' from items i,functions f,triggers t,hosts h where h.hostid=i.hostid'.
-				' and i.hostid='.$db_element['elementid'].' and i.itemid=f.itemid'.
-				' and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
-				' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE
+					' and hg.hostid=h.hostid and i.itemid=f.itemid'.
+					' and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
+					' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE,
+			SYSMAP_ELEMENT_TYPE_HOST => 'select distinct t.triggerid, t.priority, t.value, '.
+					' t.description, t.expression, h.host, h.host as el_name, h.maintenanceid, h.maintenance_status '.
+				' from items i,functions f,triggers t,hosts h '.
+				' where h.hostid=i.hostid '.
+					' and i.hostid='.$db_element['elementid'].' and i.itemid=f.itemid '.
+					' and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
+					' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE
 			);
 		if( isset($sql[$el_type]) )
 		{
+
 			$db_triggers = DBselect($sql[$el_type]);
 			$trigger = DBfetch($db_triggers);
 			if($trigger)
 			{
-				if(isset($trigger['el_name']))
-				{
+				if(isset($trigger['el_name'])){
 					$el_name = $trigger['el_name'];
 				}
-				else
-				{
+				else{
 					$el_name = expand_trigger_description_by_data($trigger);
 				}
-
+// Host in maintenance
+				if(isset($trigger['maintenance_status']) && ($trigger['maintenance_status'] == 1)){
+					$el_name.=':'.S_IN_MAINTENANCE;
+					if($trigger['maintenanceid'] > 0){
+						$mnt = get_maintenance_by_maintenanceid($trigger['maintenanceid']);
+						$el_name.='['.$mnt['name'].']';
+					}
+				}
+//---
 				do {
 					$type	=& $trigger['value'];
 

@@ -1223,6 +1223,20 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		}
 	}
 
+	function zbx_stripslashes($value){
+		if(is_array($value)){
+			foreach($value as $id => $data)
+				$value[$id] = zbx_stripslashes($data); 
+				// $value = array_map('zbx_stripslashes',$value); /* don't use 'array_map' it buggy with indexes */
+		} 
+		else if(is_string($value)){
+			$value = stripslashes($value);
+		}
+		return $value;
+	}
+
+
+
 
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
 	if(function_exists("imagesetstyle"))

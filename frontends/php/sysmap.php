@@ -44,6 +44,7 @@ include_once "include/page_header.php";
 		"iconid_off"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,		'isset({save})'),
 		"iconid_on"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,		'isset({save})'),
 		"iconid_unknown"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,		'isset({save})'),
+		"iconid_maintenance"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,		'isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,  NULL, NULL,		'isset({save})'),
 		"label_location"=>array(T_ZBX_INT, O_OPT, NULL,	IN("-1,0,1,2,3"),'isset({save})'),
 
@@ -82,7 +83,7 @@ include_once "include/page_header.php";
 			$result=update_sysmap_element($_REQUEST["selementid"],
 				$_REQUEST["sysmapid"],$_REQUEST["elementid"],$_REQUEST["elementtype"],
 				$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
-				$_REQUEST["iconid_off"],$_REQUEST["iconid_unknown"],$_REQUEST["iconid_on"],
+				$_REQUEST["iconid_off"],$_REQUEST["iconid_unknown"],$_REQUEST["iconid_on"],$_REQUEST["iconid_maintenance"],
 				$_REQUEST["url"],$_REQUEST["label_location"]);
 			$selementid = $_REQUEST["selementid"];
 			
@@ -92,7 +93,7 @@ include_once "include/page_header.php";
 		{ // add element
 			$result=add_element_to_sysmap($_REQUEST["sysmapid"],$_REQUEST["elementid"],
 				$_REQUEST["elementtype"],$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
-				$_REQUEST["iconid_off"],$_REQUEST["iconid_unknown"],$_REQUEST["iconid_on"],
+				$_REQUEST["iconid_off"],$_REQUEST["iconid_unknown"],$_REQUEST["iconid_on"],$_REQUEST["iconid_maintenance"],
 				$_REQUEST["url"],$_REQUEST["label_location"]);
 			$selementid = $result;
 

@@ -59,13 +59,11 @@ function popup_menu (a_items, a_tpl, x, y) {
 	this.n_scroll_left = get_scroll_pos()[0];
 	this.n_scroll_top = get_scroll_pos()[1];
 
-	if(document.body.clientWidth)
-	{
+	if(document.body.clientWidth){
 		this.n_scr_width = document.body.clientWidth;
 		this.n_scr_height = document.body.clientHeight;
 	}
-	else
-	{
+	else{
 		this.n_scr_width = document.width;
 		this.n_scr_height = document.height;
 	}
@@ -175,7 +173,8 @@ function menu_collapse (n_id) {
 			}
 		}
 		A_MENUS.splice(this.o_root.n_id);
-	} else {
+	} 
+	else {
 		// hide all items over the level specified
 		for (n_id = 0; n_id < this.a_index.length; n_id++) {
 			var o_curritem = this.a_index[n_id];
@@ -365,23 +364,25 @@ function menu_item (o_parent, n_order) {
 		this.n_x -= this.getprop('width');
 	}
 
-	if(!o_parent.n_y_direction && !n_order)
-	{
-		//alert("w: " +this.getprop('height') +" i:" + (o_parent.a_config.length - item_offset) );
-		// calculate menu direction in first element
-		o_parent.set_y_direction(
-			(this.getprop('height') * (o_parent.a_config.length - item_offset) + o_parent.n_y + this.getprop('block_top') 
-				> o_root.n_scr_height + o_root.n_scroll_top)
-			? -1 : 1
-			);
-	}
+	if(!o_parent.n_y_direction && !n_order){
+//alert("w: " +this.getprop('height') +" i:" + (o_parent.a_config.length - item_offset) );
 
+// calculate menu direction in first element
+/* calculates Wrongly! <c> Aly
+		var mi_height = this.getprop('height') * (o_parent.a_config.length - item_offset) + o_parent.n_y + this.getprop('block_top');
+		var scr_height = o_root.n_scr_height + o_root.n_scroll_top;
+		var mi_direction = (mi_height > scr_height)?-1:1;
+//*/
+		var mi_direction = 1;  //	always show menu in down direction.
+		o_parent.set_y_direction(mi_direction);
+	}
+	
+// TOP
 	this.n_y = n_order
 		? o_parent.a_children[n_order - 1].n_y + this.getprop('top')
 		: o_parent.n_y + this.getprop('block_top') * (o_parent == o_root ? o_parent.get_y_direction() : 1);
 
-	if(-1 == o_parent.get_y_direction() && !n_order)
-	{
+	if(-1 == o_parent.get_y_direction() && !n_order){
 		this.n_y -= this.getprop('height') * (o_parent.a_config.length - item_offset);
 	}
 
@@ -431,8 +432,8 @@ function menu_item (o_parent, n_order) {
 		new menu_item(this, n_order);
 }
 
-function A_MENUS_onclick(){		return A_MENUS[this.o_root_n_id].onclick(this.this_n_id); }
-function A_MENUS_onmouseout(){	return A_MENUS[this.o_root_n_id].onmouseout(this.this_n_id); }
+function A_MENUS_onclick(){	return A_MENUS[this.o_root_n_id].onclick(this.this_n_id); }
+function A_MENUS_onmouseout(){	return A_MENUS[this.o_root_n_id].onmouseout(this.this_n_id); }// false;}// 
 function A_MENUS_onmouseover(){	return A_MENUS[this.o_root_n_id].onmouseover(this.this_n_id); }
 function A_MENUS_onmousedown(){	return A_MENUS[this.o_root_n_id].onmousedown(this.this_n_id); }
 
@@ -471,10 +472,11 @@ function mitem_getstyle (n_pos, n_state) {
 	if (typeof(a_oclass) == 'string')
 		return a_oclass;
 
+
 	// inherit class from previous state if not explicitly defined
-	for (var n_currst = n_state; n_currst >= 0; n_currst--)
-		if (a_oclass[n_currst])
-			return a_oclass[n_currst];
+	for (var n_currst = n_state; n_currst >= 0; n_currst--){
+		if(a_oclass[n_currst]) return a_oclass[n_currst];
+	}
 }
 
 // ------------------------------------------------------------------------------------------

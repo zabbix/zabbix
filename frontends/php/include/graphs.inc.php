@@ -875,7 +875,11 @@
 	function ImageStringTTF($image, $font, $x, $y, $string, $color)
 	{
 		$fontSize = 6;
+// unix
 		$ttf = "/usr/share/fonts/ja/TrueType/kochi-gothic-subst.ttf";
+
+// win
+//		$ttf = "c:\windows\Fonts\kochi-gothic-subst.ttf";
 
 		switch ($font)
 		{
@@ -889,7 +893,9 @@
 		}
 
 		$ar = imagettfbbox($fontSize, 0, $ttf, $string);
-		ImageTTFText($image, $fontSize, 0, $x, $y + abs($ar[1] - $ar[7]), $color, $ttf, $string);
+		$y += abs($ar[1] - $ar[7]);
+		
+		ImageTTFText($image, $fontSize, 0, $x, $y, $color, $ttf, $string);
 
 		return 0;
 	}

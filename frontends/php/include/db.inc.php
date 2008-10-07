@@ -56,7 +56,8 @@
 							$result = false;
 						}
 					}
-					DBexecute("set character set utf8");
+					DBexecute("SET CHARACTER SET 'utf8'");
+					DBexecute("SET NAMES 'utf8'");
 					break;
 				case "POSTGRESQL":
 					$pg_connection_string = 
