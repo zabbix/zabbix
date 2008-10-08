@@ -411,6 +411,7 @@
 
 		$el_name = '';
 		$tr_info = array();
+		$maintenance = array('status'=>false, 'maintenanceid'=>0);
 
 		$db_element = get_sysmaps_element_by_selementid($selementid);
 
@@ -450,15 +451,12 @@
 				else{
 					$el_name = expand_trigger_description_by_data($trigger);
 				}
-// Host in maintenance
+
 				if(isset($trigger['maintenance_status']) && ($trigger['maintenance_status'] == 1)){
-					$el_name.=':'.S_IN_MAINTENANCE;
-					if($trigger['maintenanceid'] > 0){
-						$mnt = get_maintenance_by_maintenanceid($trigger['maintenanceid']);
-						$el_name.='['.$mnt['name'].']';
-					}
+					$maintenance['status'] = true;
+					$maintenance['maintenanceid'] = $trigger['maintenanceid'];
 				}
-//---
+
 				do {
 					$type	=& $trigger['value'];
 
@@ -560,7 +558,17 @@
 			$out['color'] = $colors['Dark Green'];
 			$out['iconid'] = $db_element['iconid_off'];
 		}
+		
+// Host in maintenance
 
+		if($maintenance['status']){
+			$out['info'] = S_IN_MAINTENANCE;
+			if($maintenance['maintenanceid'] > 0){
+				$mnt = get_maintenance_by_maintenanceid($maintenance['maintenanceid']);
+				$out['info'].='['.$mnt['name'].']';
+			}
+		}
+//---
 		$out['count'] = $inf['count'];
 		$out['priority'] = $inf['priority'];
 		$out['name'] = $el_name;

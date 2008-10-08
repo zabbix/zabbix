@@ -259,7 +259,7 @@ include_once "include/page_header.php";
 				$x_info-2, $y_info,
 				$x_info+ImageFontWidth(2)*strlen($info_line), $y_info+ImageFontHeight(2),
 				$white);
-			ImageStringTTF($im, 2, $x_info, $y_info+2, $info_line,$color);
+			ImageStringTTF($im, 2, $x_info, $y_info, $info_line,$color);
 		}
 	}
 
