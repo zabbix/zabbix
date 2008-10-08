@@ -890,7 +890,7 @@
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_GRAPH) )
 				{
 					if($editmode == 0)
-						$action = "charts.php?graphid=$resourceid".url_param("period").url_param("stime");
+						$action = 'charts.php?graphid='.$resourceid.url_param('period').url_param('stime');
 														
 					$graphid = null;						
 					$graphtype = GRAPH_TYPE_NORMAL;
@@ -942,32 +942,30 @@
 						$url= make_url_from_graphid($resourceid,false).$url;
 					}
 //-------------
-					
+					$default = false;
 					if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
 						if(($dynamic==SCREEN_SIMPLE_ITEM) || empty($url)){
-							$url="chart6.php?graphid=$resourceid";
+							$url='chart6.php?graphid='.$resourceid;
+							$default = true;
 						}
-					
-						$item = new CLink(
-							new CImg($url.'&width='.$width.
+						
+						$g_img = new CImg($url.'&width='.$width.
 											'&height='.$height.
 											'&period='.$effectiveperiod.
 											url_param('stime').
 											'&legend='.$legend.
-											'&graph3d='.$graph3d),
-							$action
-							);
+											'&graph3d='.$graph3d);
+											
 					}
 					else {
 						if(($dynamic==SCREEN_SIMPLE_ITEM) || empty($url)){
-							$url="chart2.php?graphid=$resourceid";
+							$url='chart2.php?graphid='.$resourceid;
+							$default = true;
 						}
 						
 						$dom_graph_id = 'graph_'.$screenitemid.'_'.$resourceid;
-						$g_img = new CImg($url."&width=$width&height=$height"."&period=$effectiveperiod".url_param("stime"));
-						$g_img->AddOPtion('id',$dom_graph_id);
-
-						$item = new CLink($g_img,$action);
+						$g_img = new CImg($url.'&width='.$width.'&height='.$height.'&period='.$effectiveperiod.url_param('stime'));
+						$g_img->addOption('id',$dom_graph_id);
 
 						if(!is_null($graphid) && ($editmode != 1)){
 							insert_js('	A_SBOX["'.$dom_graph_id.'"] = new Object;'.
@@ -984,6 +982,13 @@
 							}
 							zbx_add_post_js('graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
 						}
+					}
+					
+					if($default){
+						$item = new CLink($g_img, $action);
+					}
+					else{
+						$item = &$g_img;
 					}
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SIMPLE_GRAPH) )
