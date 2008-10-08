@@ -1,5 +1,6 @@
 Changes for 1.6.1
 
+ - [ZBX-538] fixed wrong theme pick up in login screen issue (Artem)
  - [ZBX-536] fixed problem with "Unable to add performance counter" (Sasha)
  - [ZBX-535] added support of monitoring files larger than 2GB in windows (Sasha)
  - [ZBX-520] removed action condition "event ack" due to not supported (Artem)

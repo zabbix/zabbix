@@ -394,8 +394,8 @@ COpt::profiling_start("page");
 ?>
  
 <meta name="Author" content="ZABBIX SIA" />
-
 <link rel="stylesheet" type="text/css" href="css.css" />
+
 <?php
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
 		$css = false;
@@ -403,8 +403,8 @@ COpt::profiling_start("page");
 		if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
 			$css = $config['default_theme'];
 		}
-		
-		if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS)){
+
+		if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER)){
 			if(file_exists('styles/'.$USER_DETAILS['theme'])){
 				$css = $USER_DETAILS['theme'];
 			}
@@ -423,11 +423,12 @@ COpt::profiling_start("page");
 		}
 	}
 ?>
-	<script type="text/javascript" src="js/prototype.js"></script>
-    <script type="text/javascript" src="js/common.js"></script>
-	<script type="text/javascript" src="js/ajax_req.js"></script>
-	<script type="text/javascript" src="js/url.js"></script>
-	<script type="text/javascript" src="js/chkbxrange.js"></script>
+
+<script type="text/javascript" src="js/prototype.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/ajax_req.js"></script>
+<script type="text/javascript" src="js/url.js"></script>
+<script type="text/javascript" src="js/chkbxrange.js"></script>
 <?php
 	if(isset($page['scripts']) && is_array($page['scripts'])){
 		foreach($page['scripts'] as $id => $script){
@@ -443,7 +444,7 @@ COpt::profiling_start("page");
 		}
 	}
 ?>
-  </head>
+</head>
 <body onload="zbxCallPostScripts();">
 <?php
 	}

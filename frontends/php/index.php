@@ -54,7 +54,7 @@
 		die();
 //		return;
 	}
-	
+
 	$config = select_config();
 	$authentication_type = $config['authentication_type'];
 
@@ -136,7 +136,7 @@
 		if($login){
 			$login = (check_perm2login($row['userid']) && check_perm2system($row['userid']));
 		}
-		
+
 		if($login){
 			$sessionid = md5(time().$password.$name.rand(0,10000000));
 			zbx_setcookie('zbx_sessionid',$sessionid);
