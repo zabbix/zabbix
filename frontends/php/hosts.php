@@ -459,7 +459,7 @@ include_once('include/page_header.php');
 		if(!zbx_empty($hostid) && $clone_hostid && ($_REQUEST['form'] == 'full_clone')){
 // Host items			
 			$sql = 'SELECT DISTINCT i.itemid, i.description '.
-					' FROM items i'.
+					' FROM items i '.
 					' WHERE i.hostid='.$clone_hostid.
 						' AND i.templateid=0 '.
 					' ORDER BY i.description';
