@@ -339,7 +339,8 @@ include_once 'include/page_header.php';
 		$icon->AddOption('id','addrm_fav');
 		
 		$url = '?elementid='.$elementid.($_REQUEST['fullscreen']?'':'&fullscreen=1');
-
+		$url.=url_param('groupid').url_param('hostid');
+		
 		$fs_icon = new CDiv(SPACE,'fullscreen');
 		$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 		$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));	

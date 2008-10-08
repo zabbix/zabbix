@@ -263,7 +263,6 @@ include_once "include/page_header.php";
 		show_history($_REQUEST["itemid"],$_REQUEST["from"],$bstime,$effectiveperiod);
 	}
 	else if($_REQUEST["action"]=="showvalues" || $_REQUEST["action"]=="showlatest"){
-	
 		if($_REQUEST["action"]=="showvalues"){
 			
 			$bstime = isset($_REQUEST['stime'])?$_REQUEST['stime']:date('YmdHi',(time()-$_REQUEST['period']));
@@ -429,7 +428,7 @@ include_once "include/page_header.php";
 
 				$row["value"] = trim($row["value"],"\r\n");
 //				array_push($new_row,htmlspecialchars($row["value"]));
-				array_push($new_row,htmlspecialchars(encode_log($row["value"])));
+				array_push($new_row,encode_log($row["value"]));
 
 				if(!isset($_REQUEST["plaintext"])){
 
@@ -451,7 +450,7 @@ include_once "include/page_header.php";
 				}
 				else{
 					echo date("Y-m-d H:i:s",$row["clock"]);
-					echo "\t".$row["clock"]."\t".$row["value"]."\n";
+					echo "\t".$row["clock"]."\t".htmlspecialchars($row["value"])."\n";
 				}
 			}
 			if(!isset($_REQUEST["plaintext"]))
@@ -516,7 +515,7 @@ COpt::profiling_start("history");
 				}
 				else{
 					echo date("Y-m-d H:i:s",$row["clock"]);
-					echo "\t".$row["clock"]."\t".$row["value"]."\n";
+					echo "\t".$row["clock"]."\t".htmlspecialchars($row["value"])."\n";
 				}
 			}
 			if(!isset($_REQUEST["plaintext"])){
