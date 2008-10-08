@@ -240,7 +240,7 @@ setSDateFromOuterObj: function(){
 						this.sdt.setMinutes(val[4]);
 						result = true;
 					}
-
+					this.sdt.setSeconds(0);
 				}
 			}
 			

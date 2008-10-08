@@ -3003,7 +3003,6 @@
 					$sql_where.
 					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
 				' ORDER BY h.host';
-
 		$db_hosts = DBselect($sql);
 		while($host = DBfetch($db_hosts)){
 			$hostids[$host['hostid']] = $host['hostid'];			
@@ -3103,7 +3102,8 @@
 			$sql = 'SELECT DISTINCT mw.maintenanceid, tp.* '.
 					' FROM timeperiods tp, maintenances_windows mw '.
 					' WHERE mw.maintenanceid='.$_REQUEST['maintenanceid'].
-						' AND tp.timeperiodid=mw.timeperiodid ';
+						' AND tp.timeperiodid=mw.timeperiodid '.
+					' ORDER BY tp.timeperiod_type ASC';
 			$db_timeperiods = DBselect($sql);
 			while($timeperiod = DBfetch($db_timeperiods)){
 				$timeperiods[] = $timeperiod;
