@@ -217,7 +217,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 
 	struct	stat	buf;
 
-	static size_t	old_size = 0;
+	static zbx_uint64_t	old_size = 0;
 
 	char	filename_old[MAX_STRING_LEN];
 #if defined(_WINDOWS)
@@ -277,12 +277,12 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 					}
 				}
 
-				if(old_size > (size_t)(buf.st_size))
+				if (old_size > (zbx_uint64_t)buf.st_size)
 				{
 					redirect_std(log_filename);
 				}
 
-				old_size = buf.st_size;
+				old_size = (zbx_uint64_t)buf.st_size;
 			}
 		}
 

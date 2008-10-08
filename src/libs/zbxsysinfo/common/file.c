@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "log.h"
 
 #include "md5.h"
 
@@ -27,28 +28,25 @@
 int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
-	char	filename[MAX_STRING_LEN];
+	char		filename[MAX_STRING_LEN];
 
         assert(result);
 
         init_result(result);
 
-        if(num_param(param) > 1)
-        {
+        if (num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
-        }
 
-        if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
-        {
+        if (0 != get_param(param, 1, filename, MAX_STRING_LEN))
                 return SYSINFO_RET_FAIL;
-        }
 
-	if(stat(filename,&buf) == 0)
-	{
-		SET_UI64_RESULT(result, buf.st_size);
-		return SYSINFO_RET_OK;
-	}
-	return	SYSINFO_RET_FAIL;
+	if (0 != stat(filename, &buf))
+		return SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, ZBX_FS_UI64, buf.st_size);
+	SET_UI64_RESULT(result, buf.st_size);
+
+	return SYSINFO_RET_OK;
 }
 
 int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

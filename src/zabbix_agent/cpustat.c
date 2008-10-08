@@ -52,7 +52,11 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 	int				i;
 	DWORD				dwSize;
+#endif
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In init_cpu_collector()");
+
+#ifdef _WINDOWS
 	if (ERROR_SUCCESS != (status = PdhOpenQuery(NULL, 0, &pcpus->pdh_query))) {
 		zabbix_log( LOG_LEVEL_ERR, "Call to PdhOpenQuery() failed: %s",
 				strerror_from_module(status, "PDH.DLL"));
@@ -70,7 +74,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		if (i == 0)
 			zbx_strlcpy(cpu, "_Total", sizeof(cpu));
 		else
-			_itoa_s(i, cpu, sizeof(cpu), 10);
+			_itoa_s(i - 1, cpu, sizeof(cpu), 10);
 
 		dwSize = sizeof(counter_path);
 		if (ERROR_SUCCESS != (status = PdhMakeCounterPath(&cpe, counter_path, &dwSize, 0)))
@@ -145,9 +149,12 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 #ifdef _WINDOWS
-
 	int i;
+#endif
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In close_cpu_collector()");
+
+#ifdef _WINDOWS
 	if(pcpus->queue_counter)
 	{
 		PdhRemoveCounter(pcpus->queue_counter);
@@ -439,16 +446,15 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 {
 #ifdef _WINDOWS
 
-	PDH_FMT_COUNTERVALUE 
-		value;
-	PDH_STATUS	
-		status;
-	LONG	sum;
-	int	i,
-		j,
-		n;
+	PDH_FMT_COUNTERVALUE	value;
+	PDH_STATUS		status;
+	LONG			sum;
+	int			i, j, n;
 
-	if(!pcpus->pdh_query) return;
+	if (!pcpus->pdh_query)
+		return;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In collect_cpustat()");
 
 	if ((status = PdhCollectQueryData(pcpus->pdh_query)) != ERROR_SUCCESS)
 	{
@@ -459,8 +465,10 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 	/* Process CPU utilization data */
 	for(i=0; i <= pcpus->count; i++)
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "In collect_cpustat() [0:%d]", i);
 		if(!pcpus->cpu[i].usage_couter)
 			continue;
+		zabbix_log(LOG_LEVEL_DEBUG, "In collect_cpustat() [1:%d]", i);
 
 		PdhGetRawCounterValue(
 			pcpus->cpu[i].usage_couter, 
@@ -493,6 +501,8 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 				pcpus->cpu[i].util5 = ((double)sum)/(double)j;
 			}
 		}
+		zabbix_log(LOG_LEVEL_DEBUG, "In collect_cpustat() [2:%d] " ZBX_FS_DBL " " ZBX_FS_DBL " " ZBX_FS_DBL, i, pcpus->cpu[i].util1, pcpus->cpu[i].util5, pcpus->cpu[i].util15);
+
 
 		/* cpu usage for last fifteen minutes */
 		pcpus->cpu[i].util15 = ((double)sum)/(double)MAX_CPU_HISTORY;

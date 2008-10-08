@@ -290,14 +290,14 @@ void __zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
  ******************************************************************************/
 void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src)
 {
-	size_t	sz;
+	int	sz;
 
 	assert(str && *str);
 	assert(alloc_len);
 	assert(offset);
 	assert(src);
 
-	sz = strlen(src);
+	sz = (int)strlen(src);
 
 	if (*offset + sz >= *alloc_len) {
 		*alloc_len += sz < 32 ? 64 : 2 * sz;
