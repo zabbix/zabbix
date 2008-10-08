@@ -317,7 +317,7 @@ COpt::counter_up('perm');
 			' LEFT JOIN nodes n ON '.DBid2nodeid('h.hostid').'=n.nodeid '.
 		$where.
 		' GROUP BY h.hostid,n.nodeid,n.name,h.host,ug.userid '.
-		' ORDER BY n.name,n.nodeid, h.host, r.permission, ug.userid ';
+		' ORDER BY n.name,n.nodeid, h.host, permission, ug.userid ';
 //SDI($sql);
 	$db_hosts = DBselect($sql);
 
@@ -399,7 +399,7 @@ COpt::counter_up('perm');
 			' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid '.
 		$where.
 		' GROUP BY n.nodeid, n.name, hg.groupid, hg.name, g.userid, g.userid '.
-		' ORDER BY n.name, hg.name, permission ';
+		' ORDER BY node_name, hg.name, permission ';
 
 	$db_groups = DBselect($sql);
 
