@@ -52,11 +52,9 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 	int				i;
 	DWORD				dwSize;
-#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In init_cpu_collector()");
 
-#ifdef _WINDOWS
 	if (ERROR_SUCCESS != (status = PdhOpenQuery(NULL, 0, &pcpus->pdh_query))) {
 		zabbix_log( LOG_LEVEL_ERR, "Call to PdhOpenQuery() failed: %s",
 				strerror_from_module(status, "PDH.DLL"));
@@ -150,11 +148,9 @@ void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 #ifdef _WINDOWS
 	int i;
-#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In close_cpu_collector()");
 
-#ifdef _WINDOWS
 	if(pcpus->queue_counter)
 	{
 		PdhRemoveCounter(pcpus->queue_counter);
