@@ -78,9 +78,13 @@
 					$data['groups'] = array();
 					$data['skip']	= false;
 					
-					if($host_data = DBfetch(DBselect('SELECT hostid FROM hosts'.
+					$sql = 'SELECT hostid '.
+						' FROM hosts'.
 						' WHERE host='.zbx_dbstr($data['name']).
-							' AND '.DBin_node('hostid',get_current_nodeid(false)))))
+							' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'
+							' AND '.DBin_node('hostid',get_current_nodeid(false));
+
+					if($host_data = DBfetch(DBselect($sql)))
 					{ /* exist */
 						if($this->host['exist']==1) /* skip */{
 							$data['skip'] = true;

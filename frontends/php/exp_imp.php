@@ -189,18 +189,23 @@ include_once "include/page_header.php";
 			$table->ShowStart();
 
 			$hostids = array_keys($hosts);
-			$db_hosts = DBselect('SELECT * FROM hosts WHERE '.DBcondition('hostid',$hostids));
+			$sql = 'SELECT * '.
+					' FROM hosts '.
+					' WHERE '.DBcondition('hostid',$hostids).
+						' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
+			$db_hosts = DBselect($sql);
 			while($host = DBfetch($db_hosts)){
 				$el_table = new CTableInfo(S_ONLY_HOST_INFO);
 				$sqls = array(
 					S_TEMPLATE	=> !isset($templates[$host['hostid']]) ? null : 
-								' SELECT MIN(ht.hostid) as hostid, h.host as info, count(distinct ht.hosttemplateid) as cnt '.
+								'SELECT MIN(ht.hostid) as hostid, h.host as info, count(distinct ht.hosttemplateid) as cnt '.
 								' FROM hosts h, hosts_templates ht '.
 								' WHERE ht.templateid = h.hostid '.
 								' GROUP BY h.host',
 					S_ITEM		=> !isset($items[$host['hostid']]) ? null : 
-								' select hostid, description as info, 1 as cnt from items'.
-								' where hostid='.$host['hostid'],
+								'SELECT hostid, description as info, 1 as cnt '.
+								' FROM items'.
+								' WHERE hostid='.$host['hostid'],
 					S_TRIGGER	=> !isset($triggers[$host['hostid']]) ? null :
 								'SELECT i.hostid, t.description as info, count(distinct i.hostid) as cnt, f.triggerid '.
 								' FROM functions f, items i, triggers t'.
@@ -300,18 +305,20 @@ include_once "include/page_header.php";
 				*/
 				));
 		
-			$sql = 'SELECT DISTINCT h.* '.
-					' FROM ';
+		
+			$sql_from = '';
+			$sql_where = '';
 			if(isset($_REQUEST["groupid"])){
-				$sql .= ' hosts h,hosts_groups hg ';
-				$sql .= ' WHERE hg.groupid='.$_REQUEST['groupid'].
-							' AND hg.hostid=h.hostid '.
-							' AND';
+				$sql_from.= ' hosts_groups hg ';
+				$sql_where.= ' AND hg.groupid='.$_REQUEST['groupid'].
+							' AND hg.hostid=h.hostid ';
 			} 
-			else  $sql .= ' hosts h '.
-						' WHERE';
 			
-			$sql .=	DBcondition('h.hostid',$available_hosts).
+			$sql = 'SELECT DISTINCT h.* '.
+					' FROM hosts h '.$sql_from.
+					' WHERE '.DBcondition('h.hostid',$available_hosts).
+						$sql_where.
+						' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
 					order_by('h.host,h.dns,h.ip,h.port,h.status');
 
 			$result=DBselect($sql);
