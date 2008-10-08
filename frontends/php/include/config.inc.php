@@ -157,7 +157,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		define('ZBX_DISTRIBUTED', false);
 		$show_setup = true;
 	}
-	
+
 	if(!defined('ZBX_PAGE_NO_AUTHERIZATION')){
 		check_authorisation();
 		if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){
@@ -175,7 +175,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				'name'  =>'- unknown -',
 				'nodeid'=>0));
 	}
-	
+
 // INIT MB Strings if it's available
 	init_mbstrings();
 /*
