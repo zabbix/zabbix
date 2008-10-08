@@ -1602,7 +1602,7 @@ include_once('include/page_header.php');
 					' WHERE hg.groupid='.$_REQUEST['groupid'].
 						' AND hg.hostid=h.hostid '.
 						' AND '.DBcondition('h.hostid',$available_hosts).
-						' AND h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
+						' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
 					' GROUP BY h.hostid,h.host '.
 					' ORDER BY h.host';
 			}
