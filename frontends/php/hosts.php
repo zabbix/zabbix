@@ -603,7 +603,7 @@ include_once "include/page_header.php";
 					
 			$timeperiods = get_request('timeperiods', array());
 			
-			if(isset($_REQUEST['maintenaceid'])) delete_timeperiods_by_maintenaceid($_REQUEST['maintenaceid']);
+			if(isset($_REQUEST['maintenanceid'])) delete_timeperiods_by_maintenanceid($_REQUEST['maintenanceid']);
 			
 			$timeperiodids = array();
 			foreach($timeperiods as $id => $timeperiod){
