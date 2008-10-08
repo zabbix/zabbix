@@ -35,6 +35,7 @@ function permission2str($group_permission){
 *****************************************/
 
 function check_authorisation(){
+	global	$DB;
 	global	$page;
 	global	$PHP_AUTH_USER,$PHP_AUTH_PW;
 	global	$USER_DETAILS;
@@ -79,7 +80,7 @@ function check_authorisation(){
 			$missed_user_guest = true;
 		}
 	}
-	
+
 	if($login){
 		$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
 	}
@@ -316,7 +317,7 @@ COpt::counter_up('perm');
 			' LEFT JOIN nodes n ON '.DBid2nodeid('h.hostid').'=n.nodeid '.
 		$where.
 		' GROUP BY h.hostid,n.nodeid,n.name,h.host,ug.userid '.
-		' ORDER BY n.name,n.nodeid, h.host, permission, ug.userid ';
+		' ORDER BY n.name,n.nodeid, h.host, r.permission, ug.userid ';
 //SDI($sql);
 	$db_hosts = DBselect($sql);
 
