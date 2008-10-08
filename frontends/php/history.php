@@ -269,12 +269,7 @@ include_once "include/page_header.php";
 			$time = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 			$till = $time + $effectiveperiod;
 			
-			$hours=$effectiveperiod / 3600;
-
-			$l_header = array(S_SHOWING_HISTORY_OF.SPACE.$effectiveperiod.SPACE.S_SECONDS_SMALL.'('.$hours.' h)',
-								BR(),
-								'['.S_FROM_SMALL.': '.date('Y.M.d H:i:s',$time).'] ['.S_TILL_SMALL.': '.date('Y.M.d H:i:s',$till).']'
-							);
+			$l_header = array(S_SHOWING_HISTORY_OF.SPACE.zbx_date2age(0,$effectiveperiod),'['.S_FROM_SMALL.': '.date('Y.M.d H:i:s',$time).']');
 		}
 		else{
 			$l_header = null;
@@ -353,9 +348,9 @@ include_once "include/page_header.php";
 			$sql_filter = '';
 			if(isset($_REQUEST["filter"]) && $_REQUEST["filter"]!=""){
 				if($_REQUEST["filter_task"] == FILTER_TAST_SHOW)
-					$sql_filter = " and h.value like ".zbx_dbstr("%".$_REQUEST["filter"]."%");
+					$sql_filter = ' AND h.value LIKE '.zbx_dbstr("%".$_REQUEST["filter"]."%");
 				else if($_REQUEST["filter_task"] == FILTER_TAST_HIDE)
-					$sql_filter = " and h.value not like ".zbx_dbstr("%".$_REQUEST["filter"]."%");
+					$sql_filter = ' AND h.value NOT LIKE '.zbx_dbstr("%".$_REQUEST["filter"]."%");
 			}
 
 
@@ -370,6 +365,7 @@ include_once "include/page_header.php";
 
 			if(!isset($_REQUEST['plaintext'])){
 				$table = new CTableInfo('...','log_history_table');
+				$table->AddOption('id','graph');
 				$table->SetHeader(array(S_TIMESTAMP,
 					$item_cout > 1 ? S_ITEM : null,
 					S_LOCAL_TIME,S_SOURCE,S_SEVERITY,S_VALUE),"header");
@@ -549,7 +545,7 @@ COpt::profiling_stop("history");
 							
 			zbx_add_post_js($script); 
 
-	//		navigation_bar("history.php",$to_save_request);
+//		navigation_bar("history.php",$to_save_request);
 		}
 	}
 ?>
