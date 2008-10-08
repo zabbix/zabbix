@@ -171,10 +171,7 @@ void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		PdhCloseQuery(pcpus->pdh_query);
 		pcpus->pdh_query = NULL;
 	}
-
 #endif /* _WINDOWS */
-
-	zbx_free(pcpus->cpu);
 }
 
 #if !defined(_WINDOWS)
