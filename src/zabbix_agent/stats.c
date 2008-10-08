@@ -79,6 +79,7 @@ static int	zbx_get_cpu_num(void)
 		goto return_one;
 
 	return (int)(psd.psd_proc_cnt);
+return_one:
 #elif defined(_SC_NPROCESSORS_ONLN)
 	/* Solaris 10 x86 */
 	/* FreeBSD 7.0 x86 */
@@ -88,6 +89,7 @@ static int	zbx_get_cpu_num(void)
 		goto return_one;
 
 	return ncpu;
+return_one:
 #elif defined(HAVE_FUNCTION_SYSCTL_HW_NCPU)
 	/* NetBSD 3.1 x86; NetBSD 4.0 x86 */
 	/* OpenBSD 4.2 x86 */
@@ -101,6 +103,7 @@ static int	zbx_get_cpu_num(void)
 		goto return_one;
 
 	return ncpu;
+return_one:
 #elif defined(HAVE_PROC_CPUINFO)
 	FILE	*f = NULL;
 	int	ncpu = 0;
@@ -120,9 +123,9 @@ static int	zbx_get_cpu_num(void)
 		goto return_one;
 
 	return ncpu;
+return_one:
 #endif
 
-return_one:
 	zabbix_log(LOG_LEVEL_WARNING, "Can not determine number of CPUs, adjust to 1");
 	return 1;
 }
@@ -164,12 +167,10 @@ void	init_collector_data(void)
 
 #ifdef _WINDOWS
 
-	collector = zbx_malloc(collector, sz);
-	memset(collector, 0, sz);
+	collector = zbx_malloc(collector, sz + sz_cpu);
+	memset(collector, 0, sz + sz_cpu);
 
-	collector->cpus.cpu = zbx_malloc(collector->cpus.cpu, sz_cpu);
-	memset(&collector->cpus, 0, sz_cpu);
-
+	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)(collector + 1);
 	collector->cpus.count = cpu_count;
 
 	init_perf_collector(&collector->perfs);
@@ -290,13 +291,14 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
 
-	if ( init_cpu_collector(&(collector->cpus)) )
+	if (0 != init_cpu_collector(&(collector->cpus)))
 		close_cpu_collector(&(collector->cpus));
 
 	while(ZBX_IS_RUNNING)
 	{
 		sec = zbx_time();
-		collect_cpustat(&(collector->cpus));
+		if (CPU_COLLECTOR_STARTED(collector))
+			collect_cpustat(&(collector->cpus));
 #ifdef _WINDOWS
 		collect_perfstat();
 #endif /* _WINDOWS */
@@ -310,7 +312,8 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 #ifdef _WINDOWS
 	close_perf_collector();
 #endif /* _WINDOWS */
-	close_cpu_collector(&(collector->cpus));
+	if (CPU_COLLECTOR_STARTED(collector))
+		close_cpu_collector(&(collector->cpus));
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");
 
