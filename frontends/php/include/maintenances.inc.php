@@ -142,7 +142,7 @@ return $result;
 function delete_maintenance($maintenanceids){
 	zbx_value2array($maintenanceids);
 	
-	delete_timeperiods_by_maintenaceid($maintenanceids);
+	delete_timeperiods_by_maintenanceid($maintenanceids);
 	
 	DBexecute('DELETE FROM maintenances_hosts WHERE '.DBcondition('maintenanceid',$maintenanceids));
 	DBexecute('DELETE FROM maintenances_groups WHERE '.DBcondition('maintenanceid',$maintenanceids));
@@ -205,21 +205,22 @@ function add_timeperiod($timeperiod = array()){
 return $result?$timeperiodid:false;
 }
 
-// function: delete_timeperiods_by_maintenaceid
+// function: delete_timeperiods_by_maintenanceid
 // author: Aly
-function delete_timeperiods_by_maintenaceid($maintenanceids){
+function delete_timeperiods_by_maintenanceid($maintenanceids){
 	zbx_value2array($maintenanceids);
-	
+
 	$timeperiods = array();
 	$sql = 'SELECT DISTINCT mw.maintenanceid, tp.timeperiodid '.
 			' FROM timeperiods tp, maintenances_windows mw '.
 			' WHERE '.DBcondition('mw.maintenanceid',$maintenanceids).
 				' AND tp.timeperiodid=mw.timeperiodid ';
+
 	$db_timeperiods = DBselect($sql);
 	while($timeperiod = DBfetch($db_timeperiods)){
 		$timeperiods[$timeperiod['timeperiodid']] = $timeperiod['timeperiodid'];
 	}
-	
+
 	$result = delete_timeperiod($timeperiods);
 	
 return $result;
@@ -281,9 +282,11 @@ function shedule2str($timeperiod){
 	if($timeperiod['hour'] < 10) 	$timeperiod['hour']='0'.$timeperiod['hour'];
 	if($timeperiod['minute'] < 10) 	$timeperiod['minute']='0'.$timeperiod['minute'];
 	
+	
 	$str = 'At '.$timeperiod['hour'].':'.$timeperiod['minute'].' on ';
+	
 	if($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME){
-		$str.= date(S_DATE_FORMAT_YMD,$timeperiod['date']);
+		$str= 'At '.date('H',$timeperiod['date']).':'.date('i',$timeperiod['date']).' on '.date(S_DATE_FORMAT_YMD,$timeperiod['date']);
 	}
 	else if($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY){
 		$str.= 'every '.(($timeperiod['every']>1)?$timeperiod['every'].' days':'day');
