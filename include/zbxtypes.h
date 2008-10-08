@@ -35,7 +35,7 @@
 
 #	define zbx_pid_t	int
 
-#	define stat		_stat
+#	define stat		_stat64
 #	define snprintf		_snprintf
 #	define vsnprintf	_vsnprintf
 
