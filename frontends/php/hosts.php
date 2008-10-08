@@ -629,7 +629,7 @@ include_once "include/page_header.php";
 			}
 							
 			save_maintenances_windows($maintenanceid, $timeperiodids);
-			
+
 			$hostids = get_request('hostids', array());
 			save_maintenance_host_links($maintenanceid, $hostids);
 
