@@ -284,9 +284,8 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 							(*processed)++;
 
 						/* only for screen Administration|Queue */
-						if (0 != proxy_hostid && item.type != ITEM_TYPE_TRAPPER &&
-								item.type != ITEM_TYPE_ZABBIX_ACTIVE &&
-								item.type != ITEM_TYPE_HTTPTEST &&
+						if (item.type != ITEM_TYPE_TRAPPER && item.type != ITEM_TYPE_HTTPTEST &&
+								item.value_type != ITEM_VALUE_TYPE_LOG &&
 								0 != strcmp(item.key, SERVER_STATUS_KEY) &&
 								0 != strcmp(item.key, SERVER_ICMPPING_KEY) &&
 								0 != strcmp(item.key, SERVER_ICMPPINGSEC_KEY) &&
