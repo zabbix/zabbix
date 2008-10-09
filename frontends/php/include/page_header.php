@@ -203,7 +203,7 @@ COpt::profiling_start("page");
 					array("url"=>"audit.php"	,"label"=>S_AUDIT		),
 					array("url"=>"report4.php"	,"label"=>S_NOTIFICATIONS	),
 					array("url"=>"instal.php"	,"label"=>S_INSTALLATION	,
-						"sub_pages"=>array("setup.php"))
+						"sub_pages"=>array("setup.php",'warning.php'))
 					)
 				),
 		"login"=>array(

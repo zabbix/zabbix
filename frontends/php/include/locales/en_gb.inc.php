@@ -488,6 +488,7 @@
 	'S_IN'=>				'In',
 
 //	Footer
+	'S_ZABICOM_IS_UNAVAILABLE'=>'ZABICOM is unavailable',
 	'S_ZABICOM_VER'=>			'ZABICOM 1.0.0',
 	'S_COPYRIGHT_BY'=>			'Copyright by',
 	'S_CONNECTED_AS'=>			'Connected as',
