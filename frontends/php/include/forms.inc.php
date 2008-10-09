@@ -3194,13 +3194,14 @@
 		if(!isset($new_timeperiod['period_days']))		$new_timeperiod['period_days']	= 0;
 		if(!isset($new_timeperiod['period_hours']))		$new_timeperiod['period_hours']	= 1;
 
-		if(!isset($new_timeperiod['month_date_type']))	$new_timeperiod['month_date_type'] = 1;
+		if(!isset($new_timeperiod['month_date_type']))	$new_timeperiod['month_date_type'] = !(bool)$new_timeperiod['day'];
 
 // START TIME
 		if(isset($new_timeperiod['start_time'])){
 			$new_timeperiod['hour'] = floor($new_timeperiod['start_time'] / 3600);
 			$new_timeperiod['minute'] = floor(($new_timeperiod['start_time'] - ($new_timeperiod['hour'] * 3600)) / 60);
 		}
+//--
 
 // PERIOD
 		if(isset($new_timeperiod['period'])){
@@ -3263,6 +3264,7 @@
 		$new_timeperiod['month_oct'] = $month[9];
 		$new_timeperiod['month_nov'] = $month[10];
 		$new_timeperiod['month_dec'] = $month[11];
+		
 //--	
 
 		$bit_dayofweek = zbx_str_revert($dayofweek);
