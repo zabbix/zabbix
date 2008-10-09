@@ -1,5 +1,6 @@
 Changes for 1.0.0:
 
+ - [DEV-246] ported filter for events screen (Artem)
  - [DEV-238] added support of sec|#num for function count() (Sasha)
  - [DEV-238] added support of text items for function count() (Sasha)
  - [DEV-232] added basic authentication for WEB scenarios on server side (Sasha)

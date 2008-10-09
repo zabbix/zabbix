@@ -870,8 +870,11 @@
 
 //	events.php
 	'S_LATEST_EVENTS'=>			'Latest events',
-	'S_HISTORY_OF_EVENTS_BIG'=>		'HISTORY OF EVENTS',
-	'S_NO_EVENTS_FOUND'=>			'No events found',
+	'S_HISTORY_OF_EVENTS_BIG'=>	'HISTORY OF EVENTS',
+	'S_NO_EVENTS_FOUND'=>		'No events found',
+	'S_RESET'=>					'Reset',
+	'S_MAXIMIZE'=>				'Maximize',
+	'S_MINIMIZE'=>				'Minimize',
 
 //	latest.php
 	'S_LAST_CHECK'=>			'Last check',
