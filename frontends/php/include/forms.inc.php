@@ -5219,7 +5219,7 @@ include_once 'include/discovery.inc.php';
 		if(!isset($new_timeperiod['period_days']))		$new_timeperiod['period_days']	= 0;
 		if(!isset($new_timeperiod['period_hours']))		$new_timeperiod['period_hours']	= 1;
 
-		if(!isset($new_timeperiod['month_date_type']))	$new_timeperiod['month_date_type'] = 1;
+		if(!isset($new_timeperiod['month_date_type']))	$new_timeperiod['month_date_type'] = !(bool)$new_timeperiod['day'];
 
 // START TIME
 		if(isset($new_timeperiod['start_time'])){
