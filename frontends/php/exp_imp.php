@@ -309,7 +309,7 @@ include_once "include/page_header.php";
 			$sql_from = '';
 			$sql_where = '';
 			if(isset($_REQUEST["groupid"])){
-				$sql_from.= ' hosts_groups hg ';
+				$sql_from.= ' ,hosts_groups hg ';
 				$sql_where.= ' AND hg.groupid='.$_REQUEST['groupid'].
 							' AND hg.hostid=h.hostid ';
 			} 

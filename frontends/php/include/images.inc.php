@@ -83,8 +83,8 @@
 						return false;
 					}
 					
-					
-					if(DBend($lobimage->save($image))){
+					$result = DBend($lobimage->save($image));
+					if(!$result){
 						error("Couldn't save image!\n");
 					return false;
 					}
@@ -92,7 +92,7 @@
 					$lobimage->free();
 					OCIFreeStatement($stid);
 
-					return $stid;
+				return $stid;
 				}
 				else if($DB['TYPE'] == "POSTGRESQL"){
 					$image = pg_escape_bytea($image);

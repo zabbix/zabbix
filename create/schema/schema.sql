@@ -862,7 +862,6 @@ FIELD		|every		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|month		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|dayofweek	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|day		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|hour		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|minute		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|start_time	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|period		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|date		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
