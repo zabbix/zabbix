@@ -1053,11 +1053,13 @@ include_once('include/page_header.php');
 			}
 		}
 		else if(isset($_REQUEST['delete'])){
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
+			
 			$maintenanceids = get_request('maintenanceid', array());
 			if(isset($_REQUEST['maintenanceids']))
 				$maintenanceids = $_REQUEST['maintenanceids'];
 			
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
+			zbx_value2array($maintenanceids);
 			
 			$maintenances = array();
 			foreach($maintenanceids as $id => $maintenanceid){
