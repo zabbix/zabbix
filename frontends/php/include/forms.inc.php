@@ -5168,8 +5168,7 @@ include_once 'include/discovery.inc.php';
 			$tblPeriod->AddItem(new Cvar('timeperiods['.$id.'][month]',				$timeperiod['month']));
 			$tblPeriod->AddItem(new Cvar('timeperiods['.$id.'][dayofweek]',			$timeperiod['dayofweek']));
 			$tblPeriod->AddItem(new Cvar('timeperiods['.$id.'][day]',				$timeperiod['day']));
-			$tblPeriod->AddItem(new Cvar('timeperiods['.$id.'][hour]',				$timeperiod['hour']));
-			$tblPeriod->AddItem(new Cvar('timeperiods['.$id.'][minute]',			$timeperiod['minute']));
+			$tblPeriod->AddItem(new Cvar('timeperiods['.$id.'][start_time]',		$timeperiod['start_time']));
 			$tblPeriod->AddItem(new Cvar('timeperiods['.$id.'][date]',				$timeperiod['date']));
 			$tblPeriod->AddItem(new Cvar('timeperiods['.$id.'][period]',			$timeperiod['period']));
 		}
@@ -5221,7 +5220,14 @@ include_once 'include/discovery.inc.php';
 		if(!isset($new_timeperiod['period_hours']))		$new_timeperiod['period_hours']	= 1;
 
 		if(!isset($new_timeperiod['month_date_type']))	$new_timeperiod['month_date_type'] = 1;
-		
+
+// START TIME
+		if(isset($new_timeperiod['start_time'])){
+			$new_timeperiod['hour'] = floor($new_timeperiod['start_time'] / 3600);
+			$new_timeperiod['minute'] = floor(($new_timeperiod['start_time'] - ($new_timeperiod['hour'] * 3600)) / 60);
+		}
+//--
+
 // PERIOD
 		if(isset($new_timeperiod['period'])){
 			$new_timeperiod['period_days'] = floor($new_timeperiod['period'] / 86400);

@@ -109,7 +109,7 @@
 					$lobimage->free();
 					OCIFreeStatement($stid);
 
-					return $stid;
+				return $stid;
 				}
 				else if($DB_TYPE == "POSTGRESQL")
 				{

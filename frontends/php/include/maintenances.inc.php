@@ -178,8 +178,7 @@ function add_timeperiod($timeperiod = array()){
 						'month' =>	 0,
 						'dayofweek' => 0,
 						'day' => 0,
-						'hour' => 0,
-						'minute' => 0,
+						'start_time' => 0,
 						'period' => 3600,
 						'date' => time()
 					);
@@ -188,17 +187,17 @@ function add_timeperiod($timeperiod = array()){
 		error('Incorrect arguments pasted to function [add_timeperiod]');
 		return false;
 	}
-		
+
 	$timeperiodid = get_dbid('timeperiods','timeperiodid');
 
-	$result = DBexecute('INSERT INTO timeperiods (timeperiodid,timeperiod_type,month,dayofweek,day,hour,minute,period,date) '.
+	$result = DBexecute('INSERT INTO timeperiods (timeperiodid,timeperiod_type,every,month,dayofweek,day,start_time,period,date) '.
 				' VALUES ('.$timeperiodid.','.
 						$timeperiod['timeperiod_type'].','.
+						$timeperiod['every'].','.
 						$timeperiod['month'].','.
 						$timeperiod['dayofweek'].','.
 						$timeperiod['day'].','.
-						$timeperiod['hour'].','.
-						$timeperiod['minute'].','.
+						$timeperiod['start_time'].','.
 						$timeperiod['period'].','.
 						$timeperiod['date'].')');
 			
@@ -279,6 +278,10 @@ return $str;
 // function: shedule2str
 // author: Aly
 function shedule2str($timeperiod){
+	
+	$timeperiod['hour'] = floor($timeperiod['start_time'] / 3600);
+	$timeperiod['minute'] = floor(($timeperiod['start_time'] - ($timeperiod['hour'] * 3600)) / 60);
+
 	if($timeperiod['hour'] < 10) 	$timeperiod['hour']='0'.$timeperiod['hour'];
 	if($timeperiod['minute'] < 10) 	$timeperiod['minute']='0'.$timeperiod['minute'];
 	

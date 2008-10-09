@@ -666,6 +666,9 @@ include_once "include/page_header.php";
 		else if(inarr_isset(array('add_timeperiod','new_timeperiod'))){
 			$new_timeperiod = $_REQUEST['new_timeperiod'];
 
+// START TIME
+			$new_timeperiod['start_time'] = ($new_timeperiod['hour'] * 3600) + ($new_timeperiod['minute'] * 60);	
+//--
 
 // PERIOD
 			$new_timeperiod['period'] = ($new_timeperiod['period_days'] * 86400) + ($new_timeperiod['period_hours'] * 3600);
@@ -758,7 +761,7 @@ include_once "include/page_header.php";
 			else{
 				$result = true;
 			}
-			
+
 			if($result){
 				if(!isset($new_timeperiod['id'])){
 					if(!str_in_array($new_timeperiod,$_REQUEST['timeperiods']))
