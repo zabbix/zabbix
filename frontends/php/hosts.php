@@ -106,13 +106,14 @@ include_once "include/page_header.php";
 
 // maintenance
 		'maintenanceid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'(isset({config})&&({config}==6))&&(isset({form})&&({form}=="update"))'),
+		'maintenanceids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		NULL),
 		'mname'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'(isset({config})&&({config}==6))&&isset({save})'),
 		'maintenance_type'=>	array(T_ZBX_INT, O_OPT,  null,	null,		'(isset({config})&&({config}==6))&&isset({save})'),
 
-		'description'=>			array(T_ZBX_STR, O_OPT,	NULL,	null,		'(isset({config})&&({config}==6))&&isset({save})'),
-		'active_since'=>		array(T_ZBX_INT, O_OPT,  null,	null,		'(isset({config})&&({config}==6))&&isset({save})'),
-		'active_till'=>			array(T_ZBX_INT, O_OPT,  null,	null,		'(isset({config})&&({config}==6))&&isset({save})'),
-		
+		'description'=>			array(T_ZBX_STR, O_OPT,	NULL,	null,					'(isset({config})&&({config}==6))&&isset({save})'),
+		'active_since'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,time()*2),	'(isset({config})&&({config}==6))&&isset({save})'),
+		'active_till'=>			array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,time()*2),	'(isset({config})&&({config}==6))&&isset({save})'),
+	
 		'new_timeperiod'=>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({add_timeperiod})'),
 		
 		'timeperiods'=>			array(T_ZBX_STR, O_OPT, null,	null, null),
@@ -646,19 +647,30 @@ include_once "include/page_header.php";
 				unset($_REQUEST['form']);
 			}
 		}
-		else if(inarr_isset(array('delete','maintenanceid'))){
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
-				access_deny();
+		else if(isset($_REQUEST['delete'])){
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
+
+			$maintenanceids = get_request('maintenanceid', array());
+			if(isset($_REQUEST['maintenanceids']))
+				$maintenanceids = $_REQUEST['maintenanceids'];
 			
-			$maintenance = get_maintenance_by_maintenanceid($_REQUEST['maintenanceid']);
+			zbx_value2array($maintenanceids);
+
+			$maintenances = array();
+			foreach($maintenanceids as $id => $maintenanceid){
+				$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
+			}
 			
 			DBstart();
-			delete_maintenance($_REQUEST['maintenanceid']);
-			$result = DBend();
+			$result = delete_maintenance($maintenanceids);
+			$result = DBend($result);
 			
 			show_messages($result,S_MAINTENANCE_DELETED,S_CANNOT_DELETE_MAINTENANCE);
 			if($result){
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MAINTENANCE,'Id ['.$_REQUEST['maintenanceid'].'] '.S_NAME.' ['.$maintenance['name'].']');
+				foreach($maintenances as $maintenanceid => $maintenance){
+					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MAINTENANCE,'Id ['.$maintenanceid.'] '.S_NAME.' ['.$maintenance['name'].']');
+				}
+				
 				unset($_REQUEST['form']);
 				unset($_REQUEST['maintenanceid']);
 			}
@@ -1477,7 +1489,7 @@ include_once "include/page_header.php";
 				
 				$table->addRow(array(
 					array(
-						new CCheckBox('group_maintenanceid['.$maintenance['maintenanceid'].']',NULL,NULL,$maintenance['maintenanceid']),
+						new CCheckBox('maintenanceids['.$maintenance['maintenanceid'].']',NULL,NULL,$maintenance['maintenanceid']),
 						new CLink($maintenance['name'],
 							'hosts.php?form=update'.url_param('config').
 							'&maintenanceid='.$maintenance['maintenanceid'].'#form', 'action')
@@ -1489,7 +1501,12 @@ include_once "include/page_header.php";
 			}
 //			$table->SetFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_USERS_Q)));
 			
+			$table->SetFooter(new CCol(array(
+				new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_GROUPS_Q)
+			)));
+
 			$form->AddItem($table);
+
 			$form->show();
 		}
 	}

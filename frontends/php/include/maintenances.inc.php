@@ -91,7 +91,7 @@ function add_maintenance($maintenance = array()){
 						'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
 						'description'=>	'',
 						'active_since'=> time(),
-						'active_till' => 0
+						'active_till' => time()+86400,
 					);
 					
 	if(!check_db_fields($db_fields, $maintenance)){

@@ -4858,8 +4858,8 @@ include_once 'include/discovery.inc.php';
 			$mname				= get_request('mname','');
 			$maintenance_type	= get_request('maintenance_type',0);
 			
-			$active_since		= get_request('active_since',0);
-			$active_till		= get_request('active_till',0);
+			$active_since		= get_request('active_since',time());
+			$active_till		= get_request('active_till',time()+86400);
 
 			$description		= get_request('description','');
 		}
