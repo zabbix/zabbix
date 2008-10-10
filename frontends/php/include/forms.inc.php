@@ -3048,7 +3048,7 @@ include_once 'include/discovery.inc.php';
 					$rowCondition[] = new CTextBox('new_condition[value]', "1-7,00:00-23:59", 40);
 					break;
 				case CONDITION_TYPE_MAINTENANCE:
-					$rowCondition[] = new CCol(S_MAINTENANCE_SMALL);
+					$rowCondition[] = new CTextBox('',S_MAINTENANCE_SMALL,20,'yes');
 					break;
 				case CONDITION_TYPE_TRIGGER_SEVERITY:
 					$cmbCondVal = new CComboBox('new_condition[value]');
