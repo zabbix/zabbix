@@ -81,7 +81,7 @@
 					$sql = 'SELECT hostid '.
 						' FROM hosts'.
 						' WHERE host='.zbx_dbstr($data['name']).
-							' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'
+							' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
 							' AND '.DBin_node('hostid',get_current_nodeid(false));
 
 					if($host_data = DBfetch(DBselect($sql)))
