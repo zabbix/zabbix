@@ -280,12 +280,15 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 	char		key_esc[MAX_STRING_LEN];
 
 	struct timeb	tp;
+	int		now;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_data([%s],[%s],[%s],[%s])",
 		server,
 		key,
 		value,
 		lastlogsize);
+
+	now = time(NULL);
 
 	init_result(&agent);
 
@@ -346,6 +349,13 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 	{
 		DBfree_result(result);
 		return  FAIL;
+	}
+
+	if (item.maintenance_status == HOST_MAINTENANCE_STATUS_ON && item.maintenance_type == MAINTENANCE_TYPE_NODATA &&
+			item.maintenance_from <= now)
+	{
+		DBfree_result(result);
+		return FAIL;
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Processing [%s]",

@@ -267,7 +267,7 @@ int get_values(void)
 	/* Poller for unreachable hosts */
 	if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
 	{
-		result = DBselect("select h.hostid,min(i.itemid) from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d) and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from!=0 and h.hostid=i.hostid and not i.key_ like '%s' and not i.key_ like '%s%%' and not i.key_ like '%s' and " ZBX_COND_NODEID " group by h.hostid",
+		result = DBselect("select h.hostid,min(i.itemid) from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d) and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from!=0 and h.hostid=i.hostid and not i.key_ like '%s' and not i.key_ like '%s%%' and not i.key_ like '%s' and (h.maintenance_status=%d or h.maintenance_type=%d) and " ZBX_COND_NODEID " group by h.hostid",
 			CONFIG_UNREACHABLE_POLLER_FORKS,
 			poller_num-1,
 			tp.time,
@@ -276,13 +276,14 @@ int get_values(void)
 			HOST_STATUS_MONITORED,
 			tp.time,
 			SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ZABBIXLOG_KEY,
+			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 			LOCAL_NODE("h.hostid"));
 	}
 	else
 	{
 		if(CONFIG_REFRESH_UNSUPPORTED != 0)
 		{
-			result = DBselect("select %s where i.nextcheck<=%d and i.status in (%d,%d) and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from=0 and h.hostid=i.hostid and " ZBX_SQL_MOD(i.itemid,%d) "=%d and not i.key_ like '%s' and not i.key_ like '%s%%' and not i.key_ like '%s' and " ZBX_COND_NODEID " order by i.nextcheck",
+			result = DBselect("select %s where i.nextcheck<=%d and i.status in (%d,%d) and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from=0 and h.hostid=i.hostid and " ZBX_SQL_MOD(i.itemid,%d) "=%d and not i.key_ like '%s' and not i.key_ like '%s%%' and not i.key_ like '%s' and (h.maintenance_status=%d or h.maintenance_type=%d) and " ZBX_COND_NODEID " order by i.nextcheck",
 				ZBX_SQL_ITEM_SELECT,
 				tp.time,
 				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
@@ -292,11 +293,12 @@ int get_values(void)
 				CONFIG_POLLER_FORKS,
 				poller_num-1,
 				SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ZABBIXLOG_KEY,
+				HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 				LOCAL_NODE("h.hostid"));
 		}
 		else
 		{
-			result = DBselect("select %s where i.nextcheck<=%d and i.status in (%d) and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from=0 and h.hostid=i.hostid and " ZBX_SQL_MOD(i.itemid,%d) "=%d and not i.key_ like '%s' and not i.key_ like '%s%%' and not i.key_ like '%s' and " ZBX_COND_NODEID " order by i.nextcheck",
+			result = DBselect("select %s where i.nextcheck<=%d and i.status in (%d) and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from=0 and h.hostid=i.hostid and " ZBX_SQL_MOD(i.itemid,%d) "=%d and not i.key_ like '%s' and not i.key_ like '%s%%' and not i.key_ like '%s' and (h.maintenance_status=%d or h.maintenance_type=%d) and " ZBX_COND_NODEID " order by i.nextcheck",
 				ZBX_SQL_ITEM_SELECT,
 				tp.time,
 				ITEM_STATUS_ACTIVE,
@@ -306,6 +308,7 @@ int get_values(void)
 				CONFIG_POLLER_FORKS,
 				poller_num-1,
 				SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ZABBIXLOG_KEY,
+				HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 				LOCAL_NODE("h.hostid"));
 		}
 	}

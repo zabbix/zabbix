@@ -390,6 +390,8 @@ FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|maintenance_status|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|maintenance_from|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|host
 INDEX		|2		|status
 

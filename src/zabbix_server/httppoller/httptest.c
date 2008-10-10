@@ -63,12 +63,14 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_value(itemid:" ZBX_FS_UI64 ")",
 		itemid);
 
-	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and i.status=%d and i.type=%d and i.itemid=" ZBX_FS_UI64 " and " ZBX_COND_NODEID,
+	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and i.status=%d and i.type=%d and i.itemid=" ZBX_FS_UI64
+			" and (h.maintenance_status=%d or h.maintenance_type=%d) and " ZBX_COND_NODEID,
 		ZBX_SQL_ITEM_SELECT,
 		HOST_STATUS_MONITORED,
 		ITEM_STATUS_ACTIVE,
 		ITEM_TYPE_HTTPTEST,
 		itemid,
+		HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 		LOCAL_NODE("h.hostid"));
 	row=DBfetch(result);
 
