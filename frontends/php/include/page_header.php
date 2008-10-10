@@ -458,19 +458,30 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 					$node_form->AddItem(array(SPACE, S_SHOW, $cmd_show_subnodes));
 				}
-
-// No need for the button anymore
-//				$node_form->AddItem(new CButton('submit',S_SWITCH_NODE));
 			}
 		}
-		
+
+		if(isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)){
+			$tab = new CTable();
+			
+			$td_l = new CCol(new CSpan($ZBX_SERVER_NAME,'textcolorstyles'));
+			if(is_null($node_form))
+				$td_l->addOption('style','padding-right: 5px; vertical-align: bottom;');
+			else
+				$td_l->addOption('style','padding-right: 20px; vertical-align: bottom;');
+			
+			$tab->AddRow(array($td_l, $node_form));
+			$node_form = $tab;
+		}
+
 		$table = new CTable();
 		$table->SetCellSpacing(0);
 		$table->SetCellPadding(0);
-		$table->options['style'] = "width: 100%;";
+		$table->AddOption('style','width: 100%;');
 
 		$r_col = new CCol($node_form);
-		$r_col->options['style'] = "text-align: right;";
+		$r_col->AddOption('align','right');
+//		$r_col->AddOption('style','text-align: right;');
 		
 		$table->AddRow(array($menu_table,$r_col));
 		$table->Show();

@@ -1,5 +1,6 @@
 Changes for 1.0.0:
 
+ - [DEV-244] added Server name to frontend (Artem)
  - [DEV-245] added support of DB down message (Artem)
  - [DEV-246] ported filter for events screen (Artem)
  - [DEV-238] added support of sec|#num for function count() (Sasha)
