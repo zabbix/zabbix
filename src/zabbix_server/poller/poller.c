@@ -352,7 +352,8 @@ static int get_values(int now, int *nextcheck)
 				" where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d)"
 				" and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d"
 				" and h.errors_from!=0 and h.hostid=i.hostid and (h.proxy_hostid=0 or i.type in (%d))"
-				" and i.key_ not in ('%s','%s','%s','%s')" DB_NODE " group by h.hostid",
+				" and i.key_ not in ('%s','%s','%s','%s') and (h.maintenance_status=%d or h.maintenance_type=%d)"
+				DB_NODE " group by h.hostid",
 				CONFIG_UNREACHABLE_POLLER_FORKS,
 				poller_num-1,
 				now + POLLER_DELAY,
@@ -362,6 +363,7 @@ static int get_values(int now, int *nextcheck)
 				now,
 				ITEM_TYPE_INTERNAL,
 				SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, SERVER_ZABBIXLOG_KEY,
+				HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 				DBnode_local("h.hostid"));
 		break;
 	case ZBX_POLLER_TYPE_IPMI:
@@ -369,7 +371,7 @@ static int get_values(int now, int *nextcheck)
 				" and i.type in (%d) and h.status=%d and h.disable_until<=%d"
 				" and h.errors_from=0 and h.hostid=i.hostid and (h.proxy_hostid=0 or i.type in (%d))"
 				" and " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')"
-				DB_NODE " order by i.nextcheck",
+				" and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE " order by i.nextcheck",
 				ZBX_SQL_ITEM_SELECT,
 				now + POLLER_DELAY,
 				istatus,
@@ -380,6 +382,7 @@ static int get_values(int now, int *nextcheck)
 				CONFIG_IPMIPOLLER_FORKS,
 				poller_num-1,
 				SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, SERVER_ZABBIXLOG_KEY,
+				HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 				DBnode_local("h.hostid"));
 		break;
 	default:	/* ZBX_POLLER_TYPE_NORMAL */
@@ -387,7 +390,7 @@ static int get_values(int now, int *nextcheck)
 				" and i.type not in (%d,%d,%d,%d) and h.status=%d and h.disable_until<=%d"
 				" and h.errors_from=0 and h.hostid=i.hostid and (h.proxy_hostid=0 or i.type in (%d))"
 				" and " ZBX_SQL_MOD(i.itemid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')"
-				DB_NODE " order by i.nextcheck",
+				" and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE " order by i.nextcheck",
 				ZBX_SQL_ITEM_SELECT,
 				now + POLLER_DELAY,
 				istatus,
@@ -398,6 +401,7 @@ static int get_values(int now, int *nextcheck)
 				CONFIG_POLLER_FORKS,
 				poller_num-1,
 				SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, SERVER_ZABBIXLOG_KEY,
+				HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 				DBnode_local("h.hostid"));
 	}
 
