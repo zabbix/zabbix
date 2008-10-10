@@ -347,53 +347,37 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	pid_t	pid;
 #endif
 
-	
         assert(result);
 
 	init_result(result);
-	
 
-	if(CONFIG_ENABLE_REMOTE_COMMANDS != 1)
+	if (CONFIG_ENABLE_REMOTE_COMMANDS != 1)
 	{
 		SET_MSG_RESULT(result, strdup("ZBX_NOTSUPPORTED"));
-		return  SYSINFO_RET_FAIL;
-	}
-	
-        if(num_param(param) > 2)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-        
-	if(get_param(param, 1, command, sizeof(command)) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-	if(command[0] == '\0')
-	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Run command '%s'",command);
-	
-	if(get_param(param, 2, flag, sizeof(flag)) != 0)
-        {
-                flag[0] = '\0';
-        }
+        if (num_param(param) > 2)
+                return SYSINFO_RET_FAIL;
 
-	if(flag[0] == '\0')
-	{
-		zbx_snprintf(flag,sizeof(flag),"wait");
-	}
+	if (0 != get_param(param, 1, command, sizeof(command)))
+                return SYSINFO_RET_FAIL;
 
-	if(strcmp(flag,"wait") == 0)
-	{
+	if (*command == '\0')
+		return SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Run command '%s'", command);
+
+	if (0 != get_param(param, 2, flag, sizeof(flag)))
+		*flag = '\0';
+
+	if (*flag == '\0')
+		zbx_snprintf(flag, sizeof(flag), "wait");
+
+	if (0 == strcmp(flag, "wait"))
 		return EXECUTE_STR(cmd,command,flags,result);
-	}
-	else if(strcmp(flag,"nowait") != 0)
-	{
+	else if(0 != strcmp(flag,"nowait"))
 		return SYSINFO_RET_FAIL;
-	}
 	
 #if defined(_WINDOWS)
 
@@ -417,7 +401,6 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	{
 		return SYSINFO_RET_FAIL;
 	}
-
 
 #else /* not _WINDOWS */
 
@@ -443,7 +426,7 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 			 */
 			sleep(3); 
 			/**/
-			
+
 			/* replace thread 2 by the execution of command */
 			if(execl("/bin/sh", "sh", "-c", command, (char *)0))
 			{
@@ -464,6 +447,6 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 #endif /* _WINDOWS */
 
 	SET_UI64_RESULT(result, 1);
-	
-	return	SYSINFO_RET_OK;
+
+	return SYSINFO_RET_OK;
 }
