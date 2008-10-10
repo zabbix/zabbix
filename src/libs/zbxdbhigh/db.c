@@ -1817,6 +1817,10 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->ipmi_username	= row[43];
 	item->ipmi_password	= row[44];
 	item->ipmi_sensor	= row[45];
+
+	item->maintenance_status	= atoi(row[46]);
+	item->maintenance_type		= atoi(row[47]);
+	item->maintenance_from		= atoi(row[48]);
 }
 
 /*

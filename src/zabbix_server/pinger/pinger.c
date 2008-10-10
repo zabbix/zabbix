@@ -78,7 +78,7 @@ static void process_value(char *key, ZBX_FPING_HOST *host, zbx_uint64_t *value_u
 
 	result = DBselect("select %s where " ZBX_SQL_MOD(h.hostid,%d) "=%d and h.status=%d and h.hostid=i.hostid"
 			" and h.proxy_hostid=0 and h.useip=%d and h.%s='%s' and i.key_='%s' and i.status in (%s)"
-			" and i.type=%d and i.nextcheck<=%d" DB_NODE,
+			" and i.type=%d and i.nextcheck<=%d and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE,
 			ZBX_SQL_ITEM_SELECT,
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,
@@ -90,6 +90,7 @@ static void process_value(char *key, ZBX_FPING_HOST *host, zbx_uint64_t *value_u
 			istatus,
 			ITEM_TYPE_SIMPLE,
 			now,
+			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 			DBnode_local("h.hostid"));
 
 	while (NULL != (row = DBfetch(result))) {
@@ -242,7 +243,8 @@ static int	get_pinger_hosts(int now)
 	/* Select hosts monitored by IP */
 	result = DBselect("select distinct h.ip from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d"
 			" and i.hostid=h.hostid and h.proxy_hostid=0 and h.status=%d and i.key_ in ('%s','%s')"
-			" and i.type=%d and i.status in (%s) and h.useip=1 and i.nextcheck<=%d" DB_NODE, 
+			" and i.type=%d and i.status in (%s) and h.useip=1 and i.nextcheck<=%d"
+			" and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE, 
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,
 			HOST_STATUS_MONITORED,
@@ -250,6 +252,7 @@ static int	get_pinger_hosts(int now)
 			ITEM_TYPE_SIMPLE,
 			istatus,
 			now,
+			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 			DBnode_local("h.hostid"));
 
 	while (NULL != (row = DBfetch(result))) {
@@ -271,7 +274,8 @@ static int	get_pinger_hosts(int now)
 	/* Select hosts monitored by hostname */
 	result = DBselect("select distinct h.dns from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d"
 			" and i.hostid=h.hostid and h.proxy_hostid=0 and h.status=%d and i.key_ in ('%s','%s')"
-			" and i.type=%d and i.status in (%s) and h.useip=0 and i.nextcheck<=%d" DB_NODE,
+			" and i.type=%d and i.status in (%s) and h.useip=0 and i.nextcheck<=%d"
+			" and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE,
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,
 			HOST_STATUS_MONITORED,
@@ -279,6 +283,7 @@ static int	get_pinger_hosts(int now)
 			ITEM_TYPE_SIMPLE,
 			istatus,
 			now,
+			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 			DBnode_local("h.hostid"));
 
 	while (NULL != (row = DBfetch(result))) {
@@ -336,13 +341,14 @@ static int get_minnextcheck()
 
 	result = DBselect("select count(*),min(i.nextcheck) from items i,hosts h where " ZBX_SQL_MOD(h.hostid,%d) "=%d"
 			" and h.status=%d and h.hostid=i.hostid and h.proxy_hostid=0 and i.key_ in ('%s','%s')"
-			" and i.type=%d and i.status in (%s)" DB_NODE, 
+			" and i.type=%d and i.status in (%s) and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE, 
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,
 			HOST_STATUS_MONITORED,
 			SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,
 			ITEM_TYPE_SIMPLE,
 			istatus,
+			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 			DBnode_local("h.hostid"));
 
 	if (NULL == (row = DBfetch(result)) || DBis_null(row[0]) == SUCCEED || DBis_null(row[1]) == SUCCEED)
