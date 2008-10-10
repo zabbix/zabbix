@@ -397,6 +397,13 @@ typedef enum
 	TIMEPERIOD_TYPE_MONTHLY
 } zbx_timeperiod_type_t;
 
+typedef enum
+{
+	MAINTENANCE_TYPE_NORMAL = 0,
+	MAINTENANCE_TYPE_NODATA
+} zbx_maintenance_type_t;
+
+
 /* HTTP Tests statuses */
 #define HTTPTEST_STATUS_MONITORED	0
 #define HTTPTEST_STATUS_NOT_MONITORED	1

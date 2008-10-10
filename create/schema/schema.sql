@@ -472,6 +472,8 @@ FIELD		|snmp_disable_until|t_integer	|'0'	|NOT NULL	|0
 FIELD		|snmp_available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|maintenance_status|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|maintenance_from|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
@@ -832,12 +834,12 @@ FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 TABLE|maintenances|maintenanceid|ZBX_SYNC
-FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL 	|ZBX_SYNC
-FIELD		|name		|t_varchar(128)	|''	|NOT NULL 	|ZBX_SYNC
-FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL 	|ZBX_SYNC
+FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|description	|t_blob		|''	|NOT NULL	|ZBX_SYNC
-FIELD		|active_since	|t_integer	|'0'	|NOT NULL 	|ZBX_SYNC
-FIELD		|active_till	|t_integer	|'0'	|NOT NULL 	|ZBX_SYNC
+FIELD		|active_since	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|active_till	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1	|active_since,active_till
 
 TABLE|maintenances_hosts||ZBX_SYNC
