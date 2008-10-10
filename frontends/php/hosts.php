@@ -1432,26 +1432,27 @@ include_once "include/page_header.php";
 			
 			show_table_header(S_MAINTENANCE_PERIODS, $form);
 // ----
+			$available_maintenances = get_accessible_maintenance_by_user(PERM_READ_WRITE);
 
 			$maintenances = array();
 			$maintenanceids = array();
-			
+
 			$sql_from = '';
 			$sql_where = '';
 			
-			$available_maintenances = get_accessible_maintenance_by_user(PERM_READ_WRITE);
-
 			if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
 				$sql_from = ', maintenances_hosts mh, maintenances_groups mg, hosts_groups hg ';
-				$sql_where = ' AND ('.
-								'(hg.hostid='.$_REQUEST['hostid'].' AND mh.hostid=hg.hostid AND m.maintenanceid=mh.maintenanceid)'.
-								' OR (hg.hostid='.$_REQUEST['hostid'].' AND mg.groupid=hg.groupid AND m.maintenanceid=mg.maintenanceid))';
+				$sql_where = ' AND hg.hostid='.$_REQUEST['hostid'].
+							' AND ('.
+								'(mh.hostid=hg.hostid AND m.maintenanceid=mh.maintenanceid) '.
+								' OR (mg.groupid=hg.groupid AND m.maintenanceid=mg.maintenanceid))';
 			}
 			else if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0)){
 				$sql_from = ', maintenances_hosts mh, maintenances_groups mg, hosts_groups hg ';
-				$sql_where = ' AND ('.
-									'(hg.groupid='.$_REQUEST['groupid'].' AND mg.groupid=hg.groupid AND m.maintenanceid=mg.maintenanceid) '.
-									' OR (hg.groupid='.$_REQUEST['groupid'].' AND mh.hostid=hg.hostid AND m.maintenanceid=mh.maintenanceid))';
+				$sql_where = ' AND hg.groupid='.$_REQUEST['groupid'].
+							' AND ('.
+								'(mg.groupid=hg.groupid AND m.maintenanceid=mg.maintenanceid) '.
+								' OR (mh.hostid=hg.hostid AND m.maintenanceid=mh.maintenanceid))';
 			}
 			
 			$sql = 'SELECT m.* '.
@@ -1460,7 +1461,7 @@ include_once "include/page_header.php";
 						' AND '.DBcondition('m.maintenanceid',$available_maintenances).
 						$sql_where.
 					' ORDER BY m.name';
-					
+
 			$db_maintenances = DBselect($sql);
 			while($maintenance = DBfetch($db_maintenances)){
 				$maintenances[$maintenance['maintenanceid']] = $maintenance;
