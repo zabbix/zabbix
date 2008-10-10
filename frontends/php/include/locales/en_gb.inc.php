@@ -220,6 +220,8 @@
 	'S_TRIGGER_VALUE'=>			'Trigger value',
 	'S_TIME_PERIOD'=>			'Time period',
 	'S_TRIGGER_DESCRIPTION'=>		'Trigger description',
+	'S_MAINTENANCE_STATUS'=>		'Maintenance status',
+	'S_MAINTENANCE_SMALL'=>			'maintenance',
 	'S_CONDITIONS'=>			'Conditions',
 	'S_CONDITION'=>				'Condition',
 	'S_NEW_CONDITION'=>			'New condition',

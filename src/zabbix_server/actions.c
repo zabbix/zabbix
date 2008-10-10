@@ -299,6 +299,29 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 				condition->conditionid);
 		}
 	}
+	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_MAINTENANCE)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "CONDITION_TYPE_MAINTENANCE");
+
+		switch (condition->operator) {
+		case CONDITION_OPERATOR_IN:
+		case CONDITION_OPERATOR_NOT_IN:
+			result = DBselect("select count(*) from hosts h,items i,functions f,triggers t "
+					"where h.hostid=i.hostid and h.maintenance_status=%d and "
+					"i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64,
+				condition->operator == CONDITION_OPERATOR_IN ? HOST_MAINTENANCE_STATUS_ON : HOST_MAINTENANCE_STATUS_OFF,
+				event->objectid);
+
+			ret = (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) && atoi(row[0]) != 0) ? SUCCEED : FAIL;
+
+			DBfree_result(result);
+			break;
+		default:
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+				condition->operator,
+				condition->conditionid);
+		}
+	}
 	else if(event->source == EVENT_SOURCE_DISCOVERY &&
 		event->object == EVENT_OBJECT_DSERVICE &&
 		condition->conditiontype == CONDITION_TYPE_DVALUE)
