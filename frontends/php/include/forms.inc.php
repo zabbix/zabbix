@@ -3859,6 +3859,9 @@
 
 				$rowCondition[] = $cmbCondVal;
 				break;
+			case CONDITION_TYPE_MAINTENANCE:
+				$rowCondition[] = new CCol(S_MAINTENANCE_SMALL);
+				break;
 			case CONDITION_TYPE_DHOST_IP:
 				$rowCondition[] = new CTextBox('new_condition[value]', '192.168.0.1-127,192.168.2.1', 50);
 				break;

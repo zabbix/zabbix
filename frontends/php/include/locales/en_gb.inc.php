@@ -235,6 +235,8 @@
 	'S_TRIGGER_SEVERITY'=>			'Trigger severity',
 	'S_TRIGGER_VALUE'=>				'Trigger value',
 	'S_TIME_PERIOD'=>				'Time period',
+	'S_MAINTENANCE_STATUS'=>			'Maintenance status',
+	'S_MAINTENANCE_SMALL'=>				'maintenance',
 	'S_MAX_VALUE_SMALL'=>		'max value',
 	'S_MIN_VALUE_SMALL'=>		'min value',
 	'S_TRIGGER_DESCRIPTION'=>	'Trigger description',
