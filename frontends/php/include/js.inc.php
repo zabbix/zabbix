@@ -206,13 +206,13 @@ function insert_javascript_for_visibilitybox(){
 	
 	$js = 'function visibility_status_changeds(value, obj_name, replace_to){
 			var obj = document.getElementsByName(obj_name);
-		
+
 			if(obj.length <= 0){
 				obj = new Array(document.getElementById(obj_name));
 			}
-			
-			if(obj.length <= 0) throw "Can not find objects with name [" + obj_name +"]";
-		
+
+			if((obj.length <= 0) || is_null(obj[0])) throw "Can not find objects with name [" + obj_name +"]";
+
 			for(i = obj.length-1; i>=0; i--){
 				if(replace_to && replace_to != ""){
 					if(obj[i].originalObject){
