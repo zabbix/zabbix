@@ -355,6 +355,7 @@ function	condition_type2str($conditiontype)
 	$str_type[CONDITION_TYPE_TRIGGER_VALUE]		= S_TRIGGER_VALUE;
 	$str_type[CONDITION_TYPE_TRIGGER_SEVERITY]	= S_TRIGGER_SEVERITY;
 	$str_type[CONDITION_TYPE_TIME_PERIOD]		= S_TIME_PERIOD;
+	$str_type[CONDITION_TYPE_MAINTENANCE]		= S_MAINTENANCE_STATUS;
 	$str_type[CONDITION_TYPE_DHOST_IP]		= S_HOST_IP;
 	$str_type[CONDITION_TYPE_DSERVICE_TYPE]		= S_SERVICE_TYPE;
 	$str_type[CONDITION_TYPE_DSERVICE_PORT]		= S_SERVICE_PORT;
@@ -397,6 +398,9 @@ function	condition_value2str($conditiontype, $value)
 			break;
 		case CONDITION_TYPE_TIME_PERIOD:
 			$str_val = $value;
+			break;
+		case CONDITION_TYPE_MAINTENANCE:
+			$str_val = S_MAINTENANCE_SMALL;
 			break;
 		case CONDITION_TYPE_DHOST_IP:
 			$str_val = $value;
@@ -543,7 +547,8 @@ function get_conditions_by_eventsource($eventsource){
 			CONDITION_TYPE_TRIGGER_NAME,
 			CONDITION_TYPE_TRIGGER_SEVERITY,
 			CONDITION_TYPE_TRIGGER_VALUE,
-			CONDITION_TYPE_TIME_PERIOD
+			CONDITION_TYPE_TIME_PERIOD,
+			CONDITION_TYPE_MAINTENANCE
 		);
 	$conditions[EVENT_SOURCE_DISCOVERY] = array(
 			CONDITION_TYPE_DHOST_IP,
@@ -645,6 +650,10 @@ function	get_operators_by_conditiontype($conditiontype)
 			CONDITION_OPERATOR_EQUAL
 		);
 	$operators[CONDITION_TYPE_TIME_PERIOD] = array(
+			CONDITION_OPERATOR_IN,
+			CONDITION_OPERATOR_NOT_IN
+		);
+	$operators[CONDITION_TYPE_MAINTENANCE] = array(
 			CONDITION_OPERATOR_IN,
 			CONDITION_OPERATOR_NOT_IN
 		);
@@ -778,6 +787,7 @@ function validate_condition($conditiontype, $value)
 		case CONDITION_TYPE_TRIGGER_NAME:
 		case CONDITION_TYPE_TRIGGER_VALUE:
 		case CONDITION_TYPE_TRIGGER_SEVERITY:
+		case CONDITION_TYPE_MAINTENANCE:
 		case CONDITION_TYPE_DUPTIME:
 		case CONDITION_TYPE_DVALUE:
 		case CONDITION_TYPE_APPLICATION:

@@ -1,5 +1,6 @@
 Changes for 1.6.1
 
+ - [DEV-233,DEV-237] added support of scheduled maintenance periods (Artem,Sasha)
  - [ZBX-541] fixed overwriting proxies on host import issue (Artem)
  - [ZBX-542] added processing of nextcheck for active checks (Sasha)
  - [ZBX-504] fixed date selector issue for log items in latest values screen (Artem)
