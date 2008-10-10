@@ -388,6 +388,15 @@ typedef enum
 	ZBX_PROCESS_PROXY
 } zbx_process_t;
 
+/* maintenance */
+typedef enum
+{
+	TIMEPERIOD_TYPE_ONETIME = 0,
+	TIMEPERIOD_TYPE_DAILY,
+	TIMEPERIOD_TYPE_WEEKLY,
+	TIMEPERIOD_TYPE_MONTHLY
+} zbx_timeperiod_type_t;
+
 /* HTTP Tests statuses */
 #define HTTPTEST_STATUS_MONITORED	0
 #define HTTPTEST_STATUS_NOT_MONITORED	1
@@ -403,6 +412,10 @@ typedef enum
 #define HOST_STATUS_TEMPLATE	3
 #define HOST_STATUS_DELETED	4
 #define HOST_STATUS_PROXY	5
+
+/* Host maintenance status */
+#define HOST_MAINTENANCE_STATUS_OFF	0
+#define HOST_MAINTENANCE_STATUS_ON	1
 
 /* Host availability */
 #define HOST_AVAILABLE_UNKNOWN	0
