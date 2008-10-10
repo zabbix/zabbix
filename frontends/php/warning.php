@@ -68,6 +68,8 @@ unset($USER_DETAILS);
 	$warning_msg=(isset($_REQUEST['warning_msg']))?($_REQUEST['warning_msg']):(S_ZABBIX_IS_UNAVAILABLE.'!');
 	
 	$img = new CImg('./images/general/warning16r.gif','warning',16,16,'img');
+	$img->addOption('style','border-width: 0px; vertical-align: bottom;');
+	
 	$msg = new CSpan(bold(SPACE.$warning_msg));
 	$msg->AddOption('style','line-height: 20px; vertical-align: top;');
 	
