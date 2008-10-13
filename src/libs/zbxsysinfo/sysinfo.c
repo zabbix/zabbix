@@ -75,63 +75,60 @@ void	add_metric(ZBX_METRIC *new)
 	}
 }
 
-void	add_user_parameter(char *key,char *command)
+int	add_user_parameter(char *key, char *command)
 {
-	register int i;
-	char	usr_cmd[MAX_STRING_LEN];
-	char	usr_param[MAX_STRING_LEN];
+	register int	i;
+	char		usr_cmd[MAX_STRING_LEN];
+	char		usr_param[MAX_STRING_LEN];
 	unsigned	flag = 0;
 	
-	i = parse_command(key, usr_cmd, MAX_STRING_LEN, usr_param, MAX_STRING_LEN);
-	if(i == 0)
+	if (0 == (i = parse_command(key, usr_cmd, MAX_STRING_LEN, usr_param, MAX_STRING_LEN)))
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Can't parse key!", key);
-		return;
+		return FAIL;
 	} 
-	else if(i == 2) /* with specifed parameters */
+	else if (2 == i)				/* with specifed parameters */
 	{
-		if(strcmp(usr_param,"*")){ /* must be '*' parameters */
+		if (0 != strcmp(usr_param, "*"))	/* must be '*' parameters */
+		{
 			zabbix_log(LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Incorrect key!", key);
-			return;
+			return FAIL;
 		}
 		flag |= CF_USEUPARAM;
 	}
 
-	for(i=0;;i++)
+	for (i = 0; ; i++)
 	{
 		/* Add new parameters */
-		if( commands[i].key == 0)
+		if (0 == commands[i].key)
 		{
 			commands[i].key = strdup(usr_cmd);
 			commands[i].flags = flag;
 			commands[i].function = &EXECUTE_STR;
 			commands[i].main_param = strdup(command);
 			commands[i].test_param = 0;
-			commands = zbx_realloc(commands,(i+2)*sizeof(ZBX_METRIC));
-			commands[i+1].key=NULL;
-
+			commands = zbx_realloc(commands, (i + 2) * sizeof(ZBX_METRIC));
+			commands[i + 1].key = NULL;
 			break;
 		}
 		
 		/* Replace existing parameters */
-		if(strcmp(commands[i].key, key) == 0)
+		if (0 == strcmp(commands[i].key, key))
 		{
-			if(commands[i].key)
-				free(commands[i].key);
-			if(commands[i].main_param)	
-				free(commands[i].main_param);
-			if(commands[i].test_param)	
-				free(commands[i].test_param);
+			if (commands[i].main_param)	
+				zbx_free(commands[i].main_param);
+			if (commands[i].test_param)	
+				zbx_free(commands[i].test_param);
 
-			commands[i].key = strdup(key);
 			commands[i].flags = flag;
 			commands[i].function = &EXECUTE_STR;
 			commands[i].main_param = strdup(command);
 			commands[i].test_param = 0;
-
 			break;
 		}
 	}
+
+	return SUCCEED;
 }
 
 void	init_metrics(void)
