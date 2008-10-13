@@ -541,14 +541,15 @@ COpt::compare_files_with_menu($ZBX_MENU);
 //				$node_form->AddItem(new CButton('submit',S_SWITCH_NODE));
 			}
 		}
-		
+
 		$table = new CTable();
 		$table->SetCellSpacing(0);
 		$table->SetCellPadding(0);
 		$table->AddOption('style','width: 100%;');
 
 		$r_col = new CCol($node_form);
-		$r_col->AddOption('style','text-align: right;');
+		$r_col->AddOption('align','right');
+//		$r_col->AddOption('style','text-align: right;');
 		
 		$table->AddRow(array($menu_table,$r_col));
 		$table->Show();
