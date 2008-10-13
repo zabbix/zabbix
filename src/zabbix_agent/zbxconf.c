@@ -134,19 +134,30 @@ void    load_config()
 	}
 }
 
-static int     add_parameter(char *key)
+static int     add_parameter(const char *param)
 {
-	char    *command;
+	char	key[MAX_STRING_LEN], command[MAX_STRING_LEN];
 
-	command = strstr(key,",");
-	if(NULL == command)
-	{
-		return  FAIL;
-	}
-	command[0]=0;
-	command++;
-	add_user_parameter(key, command);
-	return  SUCCEED;
+	assert(param);
+
+	if (num_param(param) != 2)
+		goto syntax_error;
+
+	if (0 != get_param(param, 1, key, sizeof(key)))
+		goto syntax_error;
+
+        if (0 != get_param(param, 2, command, sizeof(command)))
+		goto syntax_error;
+
+	if (*key == '\0' || *command == '\0')
+		goto syntax_error;
+
+	return add_user_parameter(key, command);
+syntax_error:
+	zabbix_log(LOG_LEVEL_WARNING, "UserParameter \"%s\" FAILED: Invalid format.",
+			param);
+
+	return FAIL;
 }
 
 void    load_user_parameters(void)
