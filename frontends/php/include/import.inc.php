@@ -404,7 +404,8 @@
 					$sql= 'SELECT DISTINCT host, hostid '.
 								' FROM hosts'.
 								' WHERE '.DBin_node('hostid').
-									' AND host='.zbx_dbstr($this->element_data);
+									' AND host='.zbx_dbstr($this->element_data).
+									' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
 					if(!$template = DBfetch(DBselect($sql))){
 						error('Missed template ['.$this->element_data.']');
 						break; // case
