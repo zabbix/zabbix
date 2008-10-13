@@ -496,8 +496,13 @@
 
 		if(count($hosts) == 0) $hosts = array('0');
 
-		return DBselect('select distinct * from hosts where '.DBin_node('hostid', get_current_nodeid(false)).
-			' and host in ('.implode(',',$hosts).')');
+		$sql = 'SELECT DISTINCT * '.
+				' FROM hosts '.
+				' WHERE '.DBin_node('hostid', get_current_nodeid(false)).
+					' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
+					' AND host IN ('.implode(',',$hosts).')';
+					
+	return DBselect($sql);
 	}
 
 /*
@@ -615,9 +620,13 @@
 				$parameter	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
 				
 				/* Check host */
-				$row=DBfetch(DBselect('select count(*) as cnt,min(status) as status,min(hostid) as hostid from hosts h where h.host='.zbx_dbstr($host).
-						' and '.DBin_node('h.hostid', get_current_nodeid(false))
-					));
+				$sql = 'SELECT COUNT(*) as cnt,min(status) as status,min(hostid) as hostid '.
+						' FROM hosts h '.
+						' WHERE h.host='.zbx_dbstr($host).
+							' AND '.DBin_node('h.hostid', get_current_nodeid(false)).
+							' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') ';
+							
+				$row=DBfetch(DBselect($sql));
 				if($row['cnt']==0){
 					error('No such host ('.$host.')');
 					return false;
@@ -630,11 +639,14 @@
 				$h_status[$row['status']][$row['hostid']] = $row['cnt'];
 
 				/* Check key */
-				if ( !($item = DBfetch(DBselect('select i.itemid,i.value_type from hosts h,items i where h.host='.zbx_dbstr($host).
-						' and i.key_='.zbx_dbstr($key).' and h.hostid=i.hostid '.
-						' and '.DBin_node('h.hostid', get_current_nodeid(false))
-					))) )
-				{
+				$sql = 'SELECT i.itemid,i.value_type '.
+						' FROM hosts h,items i '.
+						' WHERE h.host='.zbx_dbstr($host).
+							' AND i.key_='.zbx_dbstr($key).
+							' AND h.hostid=i.hostid '.
+							' AND '.DBin_node('h.hostid', get_current_nodeid(false));
+							
+				if (!$item = DBfetch(DBselect($sql)) ){
 					error('No such monitored parameter ('.$key.') for host ('.$host.')');
 					return false;
 				}
@@ -951,11 +963,11 @@
 					else array_push($exp,'{'.$functionid.'}');
 				}
 				else if(is_numeric($functionid) && 
-					$function_data = DBfetch(DBselect('select h.host,i.key_,f.function,f.parameter,i.itemid,i.value_type'.
-													' from items i,functions f,hosts h'.
-													' where f.functionid='.$functionid.
-														' and i.itemid=f.itemid '.
-														' and h.hostid=i.hostid'
+					$function_data = DBfetch(DBselect('SELECT h.host,i.key_,f.function,f.parameter,i.itemid,i.value_type'.
+													' FROM items i,functions f,hosts h'.
+													' WHERE f.functionid='.$functionid.
+														' AND i.itemid=f.itemid '.
+														' AND h.hostid=i.hostid'
 					)))
 				{
 					if($template) $function_data["host"] = '{HOSTNAME}';
@@ -973,8 +985,8 @@
 				else{
 					if(1 == $html){
 						$font = new CTag('font','yes');
-						$font->AddOption('color','#AA0000');
-						$font->AddItem('*ERROR*');
+						$font->addOption('color','#AA0000');
+						$font->addItem('*ERROR*');
 						array_push($exp,$font);
 					}
 					else{
@@ -1029,10 +1041,11 @@
 				$function	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID];
 				$parameter	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
 
-				$item_res = DBselect('select i.itemid from items i,hosts h'.
-					' where i.key_='.zbx_dbstr($key).
-					' and h.host='.zbx_dbstr($host).
-					' and h.hostid=i.hostid');
+				$item_res = DBselect('SELECT i.itemid '.
+					' FROM items i,hosts h'.
+					' WHERE i.key_='.zbx_dbstr($key).
+						' AND h.host='.zbx_dbstr($host).
+						' AND h.hostid=i.hostid');
 
 				while(($item = DBfetch($item_res)) && (!in_node($item['itemid']))){
 				}
@@ -1494,7 +1507,7 @@
 	function check_right_on_trigger_by_expression($permission,$expression){
 	
 		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission, PERM_RES_IDS_ARRAY);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission);
 
 		$db_hosts = get_hosts_by_expression($expression);
 		while($host_data = DBfetch($db_hosts)){
