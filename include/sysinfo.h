@@ -175,7 +175,7 @@ void	free_metrics(void);
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 
-void    add_user_parameter(char *key,char *command);
+int	add_user_parameter(char *key, char *command);
 void	test_parameters(void);
 void	test_parameter(char* key);
 
