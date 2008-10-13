@@ -42,16 +42,22 @@ include_once "include/page_header.php";
 		"graphid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 		"name"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save})'),
 		"width"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
-		"height"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
-		"yaxistype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"),		'isset({save})'),
+		"height"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),		
 		"graphtype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"),		'isset({save})'),
+		
+		"ymin_type"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1,2"),		'isset({save})'),
+		"ymax_type"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1,2"),		'isset({save})'),
+		
 		"yaxismin"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})'),
 		"yaxismax"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})'),
+		
+		"ymin_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'isset({save})&&isset({ymin_type})&&({ymin_type}==3)'),
+		"ymax_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'isset({save})&&isset({ymax_type})&&({ymax_type}==3)'),
 		
 		"items"=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 		"new_graph_item"=>	array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 		"group_gid"=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
-		"move_up"=>		array(T_ZBX_INT, O_OPT,  NULL,	null,		null),
+		"move_up"=>			array(T_ZBX_INT, O_OPT,  NULL,	null,		null),
 		"move_down"=>		array(T_ZBX_INT, O_OPT,  NULL,	null,		null),
 		
 		"showworkperiod"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("1"),	NULL),
@@ -111,12 +117,21 @@ include_once "include/page_header.php";
 		{
 			$showworkperiod	= isset($_REQUEST["showworkperiod"]) ? 1 : 0;
 			$showtriggers	= isset($_REQUEST["showtriggers"]) ? 1 : 0;
-
+			
+			if($_REQUEST['ymin_itemid'] != 0){
+				$_REQUEST["yaxismin"]=0;
+			}
+			
+			if($_REQUEST['ymax_itemid'] != 0){
+				$_REQUEST["yaxismax"]=0;
+			}
+			
 			if(isset($_REQUEST["graphid"]))
 			{
 				$result = update_graph_with_items($_REQUEST["graphid"],
 					$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
-					$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
+					$_REQUEST["ymin_type"],$_REQUEST["ymax_type"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
+					$_REQUEST['ymin_itemid'],$_REQUEST['ymax_itemid'],
 					$showworkperiod,$showtriggers,$_REQUEST["graphtype"],$items);
 
 				if($result)
@@ -130,7 +145,8 @@ include_once "include/page_header.php";
 			else
 			{
 				$result = add_graph_with_items($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
-					$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
+					$_REQUEST["ymin_type"],$_REQUEST["ymax_type"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
+					$_REQUEST['ymin_itemid'],$_REQUEST['ymax_itemid'],
 					$showworkperiod,$showtriggers,$_REQUEST["graphtype"],$items);
 
 				if($result)
@@ -266,9 +282,10 @@ include_once "include/page_header.php";
 		echo BR;
 		$table = new CTable(NULL,"graph");
 		$table->AddRow(new CImg('chart3.php?period=3600&from=0'.url_param('items').
-			url_param('name').url_param('width').url_param('height').url_param('yaxistype').
-			url_param('yaxismin').url_param('yaxismax').url_param('show_work_period').
-			url_param('show_triggers').url_param('graphtype')));
+			url_param('name').url_param('width').url_param('height').
+			url_param('ymin_type').url_param('ymax_type').url_param('yaxismin').url_param('yaxismax').
+			url_param('ymin_itemid').url_param('ymax_itemid').
+			url_param('show_work_period').url_param('show_triggers').url_param('graphtype')));
 		$table->Show();
 	} else {
 /* Table HEADER */

@@ -81,9 +81,15 @@ include_once "include/page_header.php";
 	$graph->SetWidth($width);
 	$graph->SetHeight($height);
 	$graph->SetHeader($db_data["host"].":".$db_data['name']);
-	$graph->SetYAxisType($db_data["yaxistype"]);
+	
+	$graph->SetYMinAxisType($db_data["ymin_type"]);
+	$graph->SetYMaxAxisType($db_data["ymax_type"]);
+
 	$graph->SetYAxisMin($db_data["yaxismin"]);
 	$graph->SetYAxisMax($db_data["yaxismax"]);
+	
+	$graph->SetYMinItemId($db_data["ymin_itemid"]);
+	$graph->SetYMaxItemId($db_data["ymax_itemid"]);
 
 	$result = DBselect("select gi.* from graphs_items gi ".
 		" where gi.graphid=".$db_data["graphid"].

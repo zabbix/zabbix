@@ -2418,9 +2418,16 @@
 			$name		=$row["name"];
 			$width		=$row["width"];
 			$height		=$row["height"];
-			$yaxistype	=$row["yaxistype"];
+			
+			$ymin_type	=$row["ymin_type"];
+			$ymax_type	=$row["ymax_type"];
+			
 			$yaxismin	=$row["yaxismin"];
 			$yaxismax	=$row["yaxismax"];
+
+			$ymin_itemid	=	$row["ymin_itemid"];
+			$ymax_itemid	=	$row["ymax_itemid"];
+			
 			$showworkperiod = $row["show_work_period"];
 			$showtriggers	= $row["show_triggers"];
 			$graphtype	= $row["graphtype"];
@@ -2440,13 +2447,21 @@
 						'periods_cnt'	=> $item['periods_cnt']
 					));
 			}
-		} else {
+		} 
+		else {
 			$name		= get_request("name"		,"");
 			$width		= get_request("width"		,900);
 			$height		= get_request("height"		,200);
-			$yaxistype	= get_request("yaxistype"	,GRAPH_YAXIS_TYPE_CALCULATED);
+			
+			$ymin_type	= get_request("ymin_type"	,GRAPH_YAXIS_TYPE_CALCULATED);
+			$ymax_type	= get_request("ymax_type"	,GRAPH_YAXIS_TYPE_CALCULATED);
+			
 			$yaxismin	= get_request("yaxismin"	,0.00);
 			$yaxismax	= get_request("yaxismax"	,100.00);
+			
+			$ymin_itemid	= get_request("ymin_itemid"	,0);
+			$ymax_itemid	= get_request("ymax_itemid"	,0);
+			
 			$showworkperiod = get_request("showworkperiod"	,1);
 			$showtriggers	= get_request("showtriggers"	,1);
 			$graphtype	= get_request("graphtype"	,GRAPH_TYPE_NORMAL);
@@ -2457,9 +2472,16 @@
 		$_REQUEST['name']		= $name;
 		$_REQUEST['width']		= $width;
 		$_REQUEST['height']		= $height;
-		$_REQUEST['yaxistype']		= $yaxistype;
+
+		$_REQUEST['ymin_type']		= $ymin_type;
+		$_REQUEST['ymax_type']		= $ymax_type;
+		
 		$_REQUEST['yaxismin']		= $yaxismin;
 		$_REQUEST['yaxismax']		= $yaxismax;
+		
+		$_REQUEST['ymin_itemid']		= $ymin_itemid;
+		$_REQUEST['ymax_itemid']		= $ymax_itemid;
+		
 		$_REQUEST['showworkperiod']	= $showworkperiod;
 		$_REQUEST['showtriggers']	= $showtriggers;
 		$_REQUEST['graphtype']		= $graphtype;
@@ -2477,34 +2499,95 @@
 		asort_by_key($items, 'sortorder');
 
 		$group_gid = get_request('group_gid', array());
+		
+		$frmGraph->addVar('ymin_itemid',$ymin_itemid);
+		$frmGraph->addVar('ymax_itemid',$ymax_itemid);
 	
-		$frmGraph->AddRow(S_NAME,new CTextBox("name",$name,32));
-		$frmGraph->AddRow(S_WIDTH,new CNumericBox("width",$width,5));
-		$frmGraph->AddRow(S_HEIGHT,new CNumericBox("height",$height,5));
+		$frmGraph->addRow(S_NAME,new CTextBox("name",$name,32));
+		$frmGraph->addRow(S_WIDTH,new CNumericBox("width",$width,5));
+		$frmGraph->addRow(S_HEIGHT,new CNumericBox("height",$height,5));
 
 		$cmbGType = new CComboBox("graphtype",$graphtype,'submit()');
-		$cmbGType->AddItem(GRAPH_TYPE_NORMAL,S_NORMAL);
-		$cmbGType->AddItem(GRAPH_TYPE_STACKED,S_STACKED);
-		$frmGraph->AddRow(S_GRAPH_TYPE,$cmbGType);
+		$cmbGType->addItem(GRAPH_TYPE_NORMAL,S_NORMAL);
+		$cmbGType->addItem(GRAPH_TYPE_STACKED,S_STACKED);
+		$frmGraph->addRow(S_GRAPH_TYPE,$cmbGType);
 
-		$frmGraph->AddRow(S_SHOW_WORKING_TIME,new CCheckBox("showworkperiod",$showworkperiod,null,1));
-		$frmGraph->AddRow(S_SHOW_TRIGGERS,new CCheckBox("showtriggers",$showtriggers,null,1));
+		$frmGraph->addRow(S_SHOW_WORKING_TIME,new CCheckBox("showworkperiod",$showworkperiod,null,1));
+		$frmGraph->addRow(S_SHOW_TRIGGERS,new CCheckBox("showtriggers",$showtriggers,null,1));
 
-		$cmbYType = new CComboBox("yaxistype",$yaxistype,"submit()");
-		$cmbYType->AddItem(GRAPH_YAXIS_TYPE_CALCULATED,S_CALCULATED);
-		$cmbYType->AddItem(GRAPH_YAXIS_TYPE_FIXED,S_FIXED);
-		$frmGraph->AddRow(S_YAXIS_TYPE,$cmbYType);
+		$yaxis_min = array();
+		
+		$cmbYType = new CComboBox("ymin_type",$ymin_type,"submit()");
+		$cmbYType->addItem(GRAPH_YAXIS_TYPE_CALCULATED,S_CALCULATED);
+		$cmbYType->addItem(GRAPH_YAXIS_TYPE_FIXED,S_FIXED);
+		$cmbYType->addItem(GRAPH_YAXIS_TYPE_ITEM_VALUE,S_ITEM);
+		
+		$yaxis_min[] = $cmbYType;
 
-		if($yaxistype == GRAPH_YAXIS_TYPE_FIXED)
-		{
-			$frmGraph->AddRow(S_YAXIS_MIN_VALUE,new CTextBox("yaxismin",$yaxismin,9));
-			$frmGraph->AddRow(S_YAXIS_MAX_VALUE,new CTextBox("yaxismax",$yaxismax,9));
+		if($ymin_type == GRAPH_YAXIS_TYPE_FIXED){
+			$yaxis_min[] = new CTextBox("yaxismin",$yaxismin,9);
 		}
-		else
-		{
-			$frmGraph->AddVar("yaxismin",$yaxismin);
-			$frmGraph->AddVar("yaxismax",$yaxismax);
+		else if($ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+			$frmGraph->addVar('yaxismin',$yaxismin);
+			
+			$ymin_name = '';
+			if($min_itemid > 0){
+				$min_host = get_host_by_itemid($ymin_itemid);		
+				$min_item = get_item_by_itemid($ymin_itemid);
+				$ymin_name = $min_host['host'].':'.item_description($min_item["description"],$min_item["key_"]);
+			}
+			
+			$yaxis_min[] = new CTextBox("ymin_name",$ymin_name,80,'yes');
+			$yaxis_min[] = new CButton('yaxis_min',S_SELECT,'javascript: '.
+											"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+												"&dstfld1=ymin_itemid".
+												"&dstfld2=ymin_name".
+												"&srctbl=items".
+												"&srcfld1=itemid".
+												"&srcfld2=description',0,0,'zbx_popup_item');");			
 		}
+		else{
+			$frmGraph->addVar('yaxismin',$yaxismin);
+		}
+		
+		$frmGraph->addRow(S_YAXIS_MIN_VALUE, $yaxis_min);
+
+		$yaxis_max = array();
+		
+		$cmbYType = new CComboBox("ymax_type",$ymax_type,"submit()");
+		$cmbYType->addItem(GRAPH_YAXIS_TYPE_CALCULATED,S_CALCULATED);
+		$cmbYType->addItem(GRAPH_YAXIS_TYPE_FIXED,S_FIXED);
+		$cmbYType->addItem(GRAPH_YAXIS_TYPE_ITEM_VALUE,S_ITEM);
+		
+		$yaxis_max[] = $cmbYType;
+				
+		if($ymax_type == GRAPH_YAXIS_TYPE_FIXED){
+			$yaxis_max[] = new CTextBox("yaxismax",$yaxismax,9);
+		}
+		else if($ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+			$frmGraph->addVar('yaxismax',$yaxismax);
+			
+			$ymax_name = '';
+			if($ymax_itemid > 0){
+				$max_host = get_host_by_itemid($ymax_itemid);
+				$max_item = get_item_by_itemid($ymax_itemid);
+				$ymax_name = $max_host['host'].':'.item_description($max_item["description"],$max_item["key_"]);
+			}
+
+			$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80);
+			$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
+											"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+												"&dstfld1=ymax_itemid".
+												"&dstfld2=ymax_name".
+												"&srctbl=items".
+												"&srcfld1=itemid".
+												"&srcfld2=description',0,0,'zbx_popup_item');");
+		}
+		else{
+			$frmGraph->addVar('yaxismax',$yaxismax);
+		}
+
+		$frmGraph->AddRow(S_YAXIS_MAX_VALUE, $yaxis_max);
 
 		$only_hostid = null;
 		$monitored_hosts = null;

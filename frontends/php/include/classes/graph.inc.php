@@ -22,8 +22,9 @@
 	require_once "include/items.inc.php";
 	require_once "include/hosts.inc.php";
 
-	define("GRAPH_YAXIS_TYPE_CALCULATED",0);
-	define("GRAPH_YAXIS_TYPE_FIXED",1);
+	define("GRAPH_YAXIS_TYPE_CALCULATED",	0);
+	define("GRAPH_YAXIS_TYPE_FIXED",		1);
+	define("GRAPH_YAXIS_TYPE_ITEM_VALUE",	2);
 
 	define("GRAPH_YAXIS_SIDE_LEFT",0);
 	define("GRAPH_YAXIS_SIDE_RIGHT",1);
@@ -133,9 +134,15 @@
 			$this->border=1;
 			$this->num=0;
 			$this->type = $type;
-			$this->yaxistype=GRAPH_YAXIS_TYPE_CALCULATED;
+			
+			$this->ymin_type=GRAPH_YAXIS_TYPE_CALCULATED;
+			$this->ymax_type=GRAPH_YAXIS_TYPE_CALCULATED;
+			
 			$this->yaxisright=0;
 			$this->yaxisleft=0;
+			
+			$this->ymin_itemid = 0;
+			$this->ymax_itemid = 0;
 			
 			$this->m_showWorkPeriod = 1;
 			$this->m_showTriggers = 1;
@@ -268,6 +275,16 @@
 			$this->period=$period;
 		}
 
+		function setYMinAxisType($yaxistype)
+		{
+			$this->ymin_type=$yaxistype;
+		}
+		
+		function setYMaxAxisType($yaxistype)
+		{
+			$this->ymax_type=$yaxistype;
+		}
+
 		function setYAxisMin($yaxismin)
 		{
 			$this->yaxismin=$yaxismin;
@@ -278,9 +295,15 @@
 			$this->yaxismax=$yaxismax;
 		}
 
-		function setYAxisType($yaxistype)
+
+		function setYMinItemId($itemid)
 		{
-			$this->yaxistype=$yaxistype;
+			$this->ymin_itemid=$itemid;
+		}
+		
+		function setYMaxItemId($itemid)
+		{
+			$this->ymax_itemid=$itemid;
 		}
 
 		function SetSTime($stime)
@@ -799,161 +822,163 @@
 // Calculation of maximum Y axis
 		function calculateMinY($side)
 		{
-//			return 0;
-
-			if($this->yaxistype==GRAPH_YAXIS_TYPE_FIXED)
+			if($this->ymin_type==GRAPH_YAXIS_TYPE_FIXED)
 			{
 				return $this->yaxismin;
 			}
-			else
+			else if($this->ymin_type==GRAPH_YAXIS_TYPE_ITEM_VALUE){
+				$item = get_item_by_itemid($this->ymin_itemid);
+				if($item && isset($item['lastvalue']) && !is_null($item['lastvalue']))
+					return $item['lastvalue'];
+			}
+			
+			unset($minY);
+			for($i=0;$i<$this->num;$i++)
 			{
-				unset($minY);
-				for($i=0;$i<$this->num;$i++)
+				if($this->items[$i]["axisside"] != $side)
+					continue;
+
+				foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type)
 				{
-					if($this->items[$i]["axisside"] != $side)
+					if(!isset($this->data[$this->items[$i]["itemid"]][$type]))
 						continue;
 
-					foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type)
+					$data = &$this->data[$this->items[$i]["itemid"]][$type];
+
+					if(!isset($data))	continue;
+
+					if($type == GRAPH_ITEM_AGGREGATED)
+						$calc_fnc = CALC_FNC_ALL;
+					else
+						$calc_fnc = $this->items[$i]["calc_fnc"];
+
+					switch($calc_fnc)
 					{
-						if(!isset($this->data[$this->items[$i]["itemid"]][$type]))
-							continue;
+						case CALC_FNC_ALL:	/* use min */
+						case CALC_FNC_MIN:	$val = $data->min; $shift_val = $data->shift_min; break;
+						case CALC_FNC_MAX:	$val = $data->max; $shift_val = $data->shift_max; break;
+						case CALC_FNC_AVG:
+						default:		$val = $data->avg; $shift_val = $data->shift_avg; 
+					}
 
-						$data = &$this->data[$this->items[$i]["itemid"]][$type];
+					if(!isset($val)) continue;
 
-						if(!isset($data))	continue;
+					if($this->type == GRAPH_TYPE_STACKED)
+						for($ci=0; $ci < min(count($val), count($shift_val)); $ci++) 
+							$val[$ci] -= $shift_val[$ci];
 
-						if($type == GRAPH_ITEM_AGGREGATED)
-							$calc_fnc = CALC_FNC_ALL;
-						else
-							$calc_fnc = $this->items[$i]["calc_fnc"];
-
-						switch($calc_fnc)
+					if(!isset($minY))
+					{
+						if(isset($val) && count($val) > 0)
 						{
-							case CALC_FNC_ALL:	/* use min */
-							case CALC_FNC_MIN:	$val = $data->min; $shift_val = $data->shift_min; break;
-							case CALC_FNC_MAX:	$val = $data->max; $shift_val = $data->shift_max; break;
-							case CALC_FNC_AVG:
-							default:		$val = $data->avg; $shift_val = $data->shift_avg; 
-						}
-
-						if(!isset($val)) continue;
-
-						if($this->type == GRAPH_TYPE_STACKED)
-							for($ci=0; $ci < min(count($val), count($shift_val)); $ci++) 
-								$val[$ci] -= $shift_val[$ci];
-
-						if(!isset($minY))
-						{
-							if(isset($val) && count($val) > 0)
-							{
-								$minY = min($val);
-							}
-						}
-						else
-						{
-							$minY = min($minY, min($val));
+							$minY = min($val);
 						}
 					}
+					else
+					{
+						$minY = min($minY, min($val));
+					}
 				}
-	
-				if(isset($minY)&&($minY>0))
-				{
-					$exp = round(log10($minY));
-					$mant = $minY/pow(10,$exp);
-				}
-				else
-				{
-					$exp=0;
-					$mant=0;
-				}
-	
-				$mant=((round(($mant*11)/6)-1)*6)/10;
-//				$mant=(floor($mant*1.1*10/6)+1)*6/10; /* MAX */
-	
-				$minY = $mant*pow(10,$exp);
-
-				// Do not allow <0. However we may allow it, no problem.
-				$minY = max(0,$minY);
-	
-				return $minY;
-//				return 0;
 			}
+
+			if(isset($minY)&&($minY>0))
+			{
+				$exp = round(log10($minY));
+				$mant = $minY/pow(10,$exp);
+			}
+			else
+			{
+				$exp=0;
+				$mant=0;
+			}
+
+			$mant=((round(($mant*11)/6)-1)*6)/10;
+//				$mant=(floor($mant*1.1*10/6)+1)*6/10; /* MAX */
+
+			$minY = $mant*pow(10,$exp);
+
+			// Do not allow <0. However we may allow it, no problem.
+			$minY = max(0,$minY);
+
+		return $minY;
 		}
 
 // Calculation of maximum Y of a side (left/right)
 		function calculateMaxY($side)
 		{
-			if($this->yaxistype==GRAPH_YAXIS_TYPE_FIXED)
+			if($this->ymax_type==GRAPH_YAXIS_TYPE_FIXED)
 			{
 				return $this->yaxismax;
 			}
-			else
-			{
+			else if($this->ymax_type==GRAPH_YAXIS_TYPE_ITEM_VALUE){
+				$item = get_item_by_itemid($this->ymax_itemid);
+				if($item && isset($item['lastvalue']) && !is_null($item['lastvalue']))
+					 return $item['lastvalue'];
+			}
 
-				unset($maxY);
-				for($i=0;$i<$this->num;$i++)
+			unset($maxY);
+			for($i=0;$i<$this->num;$i++)
+			{
+				if($this->items[$i]["axisside"] != $side)
+					continue;
+
+				foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type)
 				{
-					if($this->items[$i]["axisside"] != $side)
+					if(!isset($this->data[$this->items[$i]["itemid"]][$type]))
 						continue;
 
-					foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type)
+					$data = &$this->data[$this->items[$i]["itemid"]][$type];
+
+					if(!isset($data))	continue;
+
+					if($type == GRAPH_ITEM_AGGREGATED)
+						$calc_fnc = CALC_FNC_ALL;
+					else
+						$calc_fnc = $this->items[$i]["calc_fnc"];
+
+					switch($calc_fnc)
 					{
-						if(!isset($this->data[$this->items[$i]["itemid"]][$type]))
-							continue;
+						case CALC_FNC_ALL:	/* use max */
+						case CALC_FNC_MAX:	$val = $data->max; $shift_val = $data->shift_max; break;
+						case CALC_FNC_MIN:	$val = $data->min; $shift_val = $data->shift_min; break;
+						case CALC_FNC_AVG:
+						default:		$val = $data->avg; $shift_val = $data->shift_avg;
+					}
+					
+					if(!isset($val)) continue;
 
-						$data = &$this->data[$this->items[$i]["itemid"]][$type];
+					for($ci=0; $ci < min(count($val),count($shift_val)); $ci++) $val[$ci] += $shift_val[$ci];
 
-						if(!isset($data))	continue;
-
-						if($type == GRAPH_ITEM_AGGREGATED)
-							$calc_fnc = CALC_FNC_ALL;
-						else
-							$calc_fnc = $this->items[$i]["calc_fnc"];
-
-						switch($calc_fnc)
+					if(!isset($maxY))
+					{
+						if(isset($val) && count($val) > 0)
 						{
-							case CALC_FNC_ALL:	/* use max */
-							case CALC_FNC_MAX:	$val = $data->max; $shift_val = $data->shift_max; break;
-							case CALC_FNC_MIN:	$val = $data->min; $shift_val = $data->shift_min; break;
-							case CALC_FNC_AVG:
-							default:		$val = $data->avg; $shift_val = $data->shift_avg;
-						}
-						
-						if(!isset($val)) continue;
-
-						for($ci=0; $ci < min(count($val),count($shift_val)); $ci++) $val[$ci] += $shift_val[$ci];
-
-						if(!isset($maxY))
-						{
-							if(isset($val) && count($val) > 0)
-							{
-								$maxY = max($val);
-							}
-						}
-						else
-						{
-							$maxY = max($maxY, max($val));
+							$maxY = max($val);
 						}
 					}
+					else
+					{
+						$maxY = max($maxY, max($val));
+					}
 				}
-	
-				if(isset($maxY)&&($maxY>0))
-				{
-					$exp = floor(log10($maxY));
-					$mant = $maxY/pow(10,$exp);
-				}
-				else
-				{
-					$exp=0;
-					$mant=0;
-				}
-	
-				$mant=(floor($mant*1.1*10/6)+1)*6/10;
-	
-				$maxY = $mant*pow(10,$exp);
-	
-				return $maxY;
 			}
+
+			if(isset($maxY)&&($maxY>0))
+			{
+				$exp = floor(log10($maxY));
+				$mant = $maxY/pow(10,$exp);
+			}
+			else
+			{
+				$exp=0;
+				$mant=0;
+			}
+
+			$mant=(floor($mant*1.1*10/6)+1)*6/10;
+
+			$maxY = $mant*pow(10,$exp);
+
+		return $maxY;
 		}
 
 		function selectData()

@@ -237,14 +237,14 @@
          * Comments: !!! Don't forget sync code with C !!!
          *
          */
-	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$templateid=0)
+	function	add_graph($name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$templateid=0)
 	{
 		$graphid = get_dbid("graphs","graphid");
 
 		$result=DBexecute("insert into graphs".
-			" (graphid,name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype)".
-			" values ($graphid,".zbx_dbstr($name).",$width,$height,$yaxistype,$yaxismin,".
-			" $yaxismax,$templateid,$showworkperiod,$showtriggers,$graphtype)");
+			" (graphid,name,width,height,ymin_type,ymax_type,yaxismin,yaxismax,ymin_itemid,ymax_itemid,templateid,show_work_period,show_triggers,graphtype)".
+			" values ($graphid,".zbx_dbstr($name).",$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,".
+			" $templateid,$showworkperiod,$showtriggers,$graphtype)");
 
 		return ( $result ? $graphid : $result);
 	}
@@ -261,7 +261,7 @@
          * Comments: !!! Don't forget sync code with C !!!
          *
          */
-	function	add_graph_with_items($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$gitems=array(),$templateid=0)
+	function	add_graph_with_items($name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$gitems=array(),$templateid=0)
 	{
 		$result = false;
 
@@ -295,7 +295,7 @@
 			return $result;
 		}
 
-		if ( ($graphid = add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$templateid)) )
+		if ( ($graphid = add_graph($name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype,$templateid)) )
 		{
 			$result = true;
 			foreach($gitems as $gitem)
@@ -352,15 +352,25 @@
          * Comments: !!! Don't forget sync code with C !!!
          *
          */
-	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$templateid=0)
+	function	update_graph($graphid,$name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$templateid=0)
 	{
 		$g_graph = get_graph_by_graphid($graphid);
 
-		if ( ($result = DBexecute('update graphs set name='.zbx_dbstr($name).',width='.$width.',height='.$height.','.
-			'yaxistype='.$yaxistype.',yaxismin='.$yaxismin.',yaxismax='.$yaxismax.',templateid='.$templateid.','.
-			'show_work_period='.$showworkperiod.',show_triggers='.$showtriggers.',graphtype='.$graphtype.
-			' where graphid='.$graphid)) )
-		{
+		$sql = 'UPDATE graphs SET '.
+				'name='.zbx_dbstr($name).','.
+				'width='.$width.','.
+				'height='.$height.','.
+				'ymin_type='.$ymin_type.','.
+				'ymax_type='.$ymax_type.','.
+				'yaxismin='.$yaxismin.','.
+				'yaxismax='.$yaxismax.','.
+				'ymin_itemid='.$ymin_itemid.','.
+				'ymax_itemid='.$ymax_itemid.','.
+				'templateid='.$templateid.','.
+				'show_work_period='.$showworkperiod.',show_triggers='.$showtriggers.',graphtype='.$graphtype.
+			' where graphid='.$graphid;
+			
+		if($result = DBexecute($sql)){
 			if($g_graph['graphtype'] != $graphtype && $graphtype == GRAPH_TYPE_STACKED)
 			{
 				$result = DBexecute('update graphs_items set calc_fnc='.CALC_FNC_AVG.',drawtype=1,type='.GRAPH_ITEM_SIMPLE.
@@ -382,7 +392,7 @@
          * Comments: !!! Don't forget sync code with C !!!
          *
          */
-	function	update_graph_with_items($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$gitems=array(),$templateid=0)
+	function	update_graph_with_items($graphid,$name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$gitems=array(),$templateid=0)
 	{
 		$result = false;
 
@@ -433,7 +443,7 @@
 			}
 		
 			if ( ! ($result = update_graph_with_items($chd_graph['graphid'], $name, $width, $height,
-				$yaxistype, $yaxismin, $yaxismax,
+				$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,
 				$showworkperiod, $showtriggers, $graphtype, $new_gitems, $graphid)) )
 			{
 				return $result;
@@ -459,7 +469,7 @@
 			}
 		}
 
-		if ( ($result = update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,
+		if ( ($result = update_graph($graphid,$name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,
 						$showtriggers,$graphtype,$templateid)) )
 		{
 			$host_list = array();
