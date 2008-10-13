@@ -187,6 +187,7 @@ require_once('include/httptest.inc.php');
 				' FROM hosts h '.
 				' WHERE h.host='.zbx_dbstr($host).
 					' AND '.DBin_node('h.hostid', get_current_nodeid(false)).
+					' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
 					(isset($hostid)?' AND h.hostid<>'.$hostid:'')
 			)))
 		{
@@ -535,10 +536,10 @@ require_once('include/httptest.inc.php');
 		}
 	
 		if(is_null($proxyid))
-			$result = DBselect('select * from hosts where status in ('.HOST_STATUS_PROXY.')'.
+			$result = DBselect('SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_PROXY.')'.
 					' and '.DBin_node('hostid').' AND host='.zbx_dbstr($name));
 		else
-			$result = DBselect('select * from hosts where status in ('.HOST_STATUS_PROXY.')'.
+			$result = DBselect('SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_PROXY.')'.
 					' and '.DBin_node('hostid').' AND host='.zbx_dbstr($name).
 					' and hostid<>'.$proxyid);
 		
@@ -549,7 +550,7 @@ require_once('include/httptest.inc.php');
 		
 		if(is_null($proxyid)){
 			$proxyid=get_dbid('hosts','hostid');
-			if(!DBexecute('insert into hosts (hostid,host,status)'.
+			if(!DBexecute('INSERT INTO hosts (hostid,host,status)'.
 				' values ('.$proxyid.','.zbx_dbstr($name).','.HOST_STATUS_PROXY.')'))
 			{
 				return false;
