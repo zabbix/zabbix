@@ -121,12 +121,10 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 			}
 #ifdef	HAVE_MYSQL
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 16,
-				","
-				);
+					",");
 #else
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 16,
-				"||','||"
-				);
+					"||','||");
 #endif
 		}
 
@@ -185,11 +183,12 @@ char *get_config_data(int nodeid, int dest_nodetype)
 	DB_RESULT	result2;
 	DB_ROW		row;
 	DB_ROW		row2;
+	const ZBX_TABLE	*table;
 
-	char	*data = NULL, *hex = NULL, *sql = NULL, c, sync[129], *s, *r[2], *d[2];
+	char	*data = NULL, *hex = NULL, *sql = NULL, c[2], sync[129], *s, *r[2], *d[2];
 	int	data_offset=0, sql_offset = 0;
 	int	data_allocated=1024, hex_allocated=1024, sql_allocated=8*1024;
-	int	t, f, j, rowlen;
+	int	f, j, rowlen;
 	
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_config_data(node:%d,dest_nodetype:%s)",
 		nodeid,
@@ -198,7 +197,8 @@ char *get_config_data(int nodeid, int dest_nodetype)
 	data = zbx_malloc(data, data_allocated);
 	hex = zbx_malloc(hex, hex_allocated);
 	sql = zbx_malloc(sql, sql_allocated);
-	c = '1';
+	c[0] = '1';	/* for new and updated records */
+	c[1] = '2';	/* for deleted records */
 
 	zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "Data%c%d%c%d\n",
 		ZBX_DM_DELIMITER,
@@ -209,38 +209,34 @@ char *get_config_data(int nodeid, int dest_nodetype)
 	/* Find updated records */
 	result = DBselect("select curr.tablename,curr.recordid,prev.cksum,curr.cksum,prev.sync "
 		"from node_cksum curr, node_cksum prev "
-		"where curr.nodeid=%1$d and prev.nodeid=%1$d and "
+		"where curr.nodeid=%d and prev.nodeid=curr.nodeid and "
 		"curr.tablename=prev.tablename and curr.recordid=prev.recordid and "
-		"curr.cksumtype=%3$d and prev.cksumtype=%2$d "
-		/*" and curr.tablename='hosts' "*/
+		"curr.cksumtype=%d and prev.cksumtype=%d "
 		"union all "
 	/* Find new records */
 		"select curr.tablename,curr.recordid,prev.cksum,curr.cksum,curr.sync "
 		"from node_cksum curr left join node_cksum prev "
-		"on prev.nodeid=%1$d and prev.tablename=curr.tablename and "
-		"prev.recordid=curr.recordid and prev.cksumtype=%2$d "
-		"where curr.nodeid=%1$d and curr.cksumtype=%3$d and prev.tablename is null "
-		/*" and curr.tablename='hosts' "*/
+		"on prev.nodeid=curr.nodeid and prev.tablename=curr.tablename and "
+		"prev.recordid=curr.recordid and prev.cksumtype=%d "
+		"where curr.nodeid=%d and curr.cksumtype=%d and prev.tablename is null "
 		"union all "
 	/* Find deleted records */
 		"select prev.tablename,prev.recordid,prev.cksum,curr.cksum,prev.sync "
 		"from node_cksum prev left join node_cksum curr "
-		"on prev.nodeid=curr.nodeid and curr.nodeid=%1$d and curr.tablename=prev.tablename and "
-		"curr.recordid=prev.recordid and curr.cksumtype=%3$d "
-		"where prev.nodeid=%1$d and prev.cksumtype=%2$d and curr.tablename is null"
-		/*" and prev.tablename='hosts' "*/,
-		nodeid,
-		NODE_CKSUM_TYPE_OLD,  /* prev */
-		NODE_CKSUM_TYPE_NEW); /* curr */
+		"on curr.nodeid=prev.nodeid and curr.tablename=prev.tablename and "
+		"curr.recordid=prev.recordid and curr.cksumtype=%d "
+		"where prev.nodeid=%d and prev.cksumtype=%d and curr.tablename is null",
+		nodeid, NODE_CKSUM_TYPE_NEW, NODE_CKSUM_TYPE_OLD,
+		NODE_CKSUM_TYPE_OLD, nodeid, NODE_CKSUM_TYPE_NEW,
+		NODE_CKSUM_TYPE_NEW, nodeid, NODE_CKSUM_TYPE_OLD);
 
-	while (NULL != (row = DBfetch(result))) {
-		for (t = 0; tables[t].table != 0 && strcmp(tables[t].table, row[0]) != 0; t++)
-			;
-
+	while (NULL != (row = DBfetch(result)))
+	{
 		/* Found table */
-		if (tables[t].table == 0) {
-			zabbix_log( LOG_LEVEL_WARNING, "Cannot find table [%s]",
-				row[0]);
+		if (NULL == (table = DBget_table(row[0])))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot find table [%s]",
+					row[0]);
 			continue;
 		}
 
@@ -252,15 +248,17 @@ char *get_config_data(int nodeid, int dest_nodetype)
 		s = sync;
 
 		/* Special (simpler) processing for operation DELETE */
-		if (DBis_null(row[2]) == FAIL && DBis_null(row[3]) == SUCCEED &&
-			((dest_nodetype == ZBX_NODE_SLAVE && *s != c) ||
-			(dest_nodetype == ZBX_NODE_MASTER && *(s+1) != c))) {
-			zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%s%c%s%c%d\n",
-				row[0],
-				ZBX_DM_DELIMITER,
-				row[1],
-				ZBX_DM_DELIMITER,
-				NODE_CONFIGLOG_OP_DELETE);
+		if (DBis_null(row[3]) == SUCCEED)
+		{
+			if((dest_nodetype == ZBX_NODE_SLAVE && *s != c[1]) || (dest_nodetype == ZBX_NODE_MASTER && *(s + 1) != c[1]))
+			{
+				zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%s%c%s%c%d\n",
+					row[0],
+					ZBX_DM_DELIMITER,
+					row[1],
+					ZBX_DM_DELIMITER,
+					NODE_CONFIGLOG_OP_DELETE);
+			}
 			continue;
 		}
 
@@ -271,7 +269,7 @@ char *get_config_data(int nodeid, int dest_nodetype)
 
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "select ");
 		do {
-			while ((tables[t].fields[f].flags & ZBX_SYNC) == 0)
+			while ((table->fields[f].flags & ZBX_SYNC) == 0)
 				f++;
 
 			d[0] = NULL;
@@ -281,11 +279,11 @@ char *get_config_data(int nodeid, int dest_nodetype)
 			if (NULL != r[1] && NULL != (d[1] = strchr(r[1], ',')))
 				*d[1] = '\0';
 
-			if (r[0] == NULL || r[1] == NULL || (dest_nodetype == ZBX_NODE_SLAVE && *s != c) ||
-				(dest_nodetype == ZBX_NODE_MASTER && *(s+1) != c) || strcmp(r[0], r[1]) != 0) {
+			if (r[0] == NULL || r[1] == NULL || (dest_nodetype == ZBX_NODE_SLAVE && *s != c[0]) ||
+				(dest_nodetype == ZBX_NODE_MASTER && *(s+1) != c[0]) || strcmp(r[0], r[1]) != 0) {
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "%s,length(%s),", 
-					tables[t].fields[f].name,
-					tables[t].fields[f].name);
+					table->fields[f].name,
+					table->fields[f].name);
 			}
 			s += 2;
 			f++;
@@ -308,7 +306,7 @@ char *get_config_data(int nodeid, int dest_nodetype)
 		sql_offset--;
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, " from %s where %s=%s",
 			row[0],
-			tables[t].recid,
+			table->recid,
 			row[1]);
 
 		result2 = DBselect("%s", sql);
@@ -329,7 +327,7 @@ char *get_config_data(int nodeid, int dest_nodetype)
 		j = 0;
 
 		do {
-			while ((tables[t].fields[f].flags & ZBX_SYNC) == 0)
+			while ((table->fields[f].flags & ZBX_SYNC) == 0)
 				f++;
 
 			d[0] = NULL;
@@ -339,30 +337,30 @@ char *get_config_data(int nodeid, int dest_nodetype)
 			if (NULL != r[1] && NULL != (d[1] = strchr(r[1], ',')))
 				*d[1] = '\0';
 
-			if (r[0] == NULL || r[1] == NULL || (dest_nodetype == ZBX_NODE_SLAVE && *s != c) ||
-				(dest_nodetype == ZBX_NODE_MASTER && *(s+1) != c) || strcmp(r[0], r[1]) != 0) {
+			if (r[0] == NULL || r[1] == NULL || (dest_nodetype == ZBX_NODE_SLAVE && *s != c[0]) ||
+				(dest_nodetype == ZBX_NODE_MASTER && *(s+1) != c[0]) || strcmp(r[0], r[1]) != 0) {
 
 				zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%c%s%c%d%c",
 					ZBX_DM_DELIMITER,
-					tables[t].fields[f].name,
+					table->fields[f].name,
 					ZBX_DM_DELIMITER,
-					tables[t].fields[f].type,
+					table->fields[f].type,
 					ZBX_DM_DELIMITER);
 
 				/* Fieldname, type, value */
 				if (DBis_null(row2[j*2]) == SUCCEED) {
 					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "NULL");
-				} else if(tables[t].fields[f].type == ZBX_TYPE_INT ||
-					tables[t].fields[f].type == ZBX_TYPE_UINT ||
-					tables[t].fields[f].type == ZBX_TYPE_ID ||
-					tables[t].fields[f].type == ZBX_TYPE_FLOAT) {
+				} else if(table->fields[f].type == ZBX_TYPE_INT ||
+					table->fields[f].type == ZBX_TYPE_UINT ||
+					table->fields[f].type == ZBX_TYPE_ID ||
+					table->fields[f].type == ZBX_TYPE_FLOAT) {
 
 					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%s", row2[j*2]);
 				} else {
 					rowlen = atoi(row2[j*2+1]);
 					zbx_binary2hex((u_char *)row2[j*2], rowlen, &hex, &hex_allocated);
 					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, strlen(hex)+128, "%s", hex);
-/*zabbix_log(LOG_LEVEL_CRIT, "----- [field:%s][type:%d][row:%s][hex:%s]",tables[t].fields[f].name,tables[t].fields[f].type,row2[j*2],hex);*/
+/*zabbix_log(LOG_LEVEL_CRIT, "----- [field:%s][type:%d][row:%s][hex:%s]",table->fields[f].name,table->fields[f].type,row2[j*2],hex);*/
 				}
 				j++;
 			}
@@ -411,20 +409,22 @@ out:
 int update_checksums(int nodeid, int synked_nodetype, int synked, const char *tablename, const zbx_uint64_t id, char *fields)
 {
 	char		*r[2], *d[2], sync[129], *s;
-	char		c, sql[2][256];
+	char		c[2], sql[2][256];
 	char		cksum[32*64+32], *ck;
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		t, f;
+	int		f;
+	const ZBX_TABLE	*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_checksums");
 
-	c = synked == SUCCEED ? '1' : ' ';
+	c[0] = synked == SUCCEED ? '1' : ' ';	/* for new and updated records */
+	c[1] = synked == SUCCEED ? '2' : ' ';	/* for deleted records */
 
 	if (NULL != tablename) {
-		zbx_snprintf(sql[0], sizeof(sql[0]), " and curr.tablename='%s' and curr.recordid="ZBX_FS_UI64,
+		zbx_snprintf(sql[0], sizeof(sql[0]), " and curr.tablename='%s' and curr.recordid=" ZBX_FS_UI64,
 			tablename, id);
-		zbx_snprintf(sql[1], sizeof(sql[1]), " and prev.tablename='%s' and prev.recordid="ZBX_FS_UI64,
+		zbx_snprintf(sql[1], sizeof(sql[1]), " and prev.tablename='%s' and prev.recordid=" ZBX_FS_UI64,
 			tablename, id);
 	} else {
 		*sql[0] = '\0';
@@ -434,37 +434,34 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 	/* Find updated records */
 	result = DBselect("select curr.tablename,curr.recordid,prev.cksum,curr.cksum,prev.sync "
 		"from node_cksum curr, node_cksum prev "
-		"where curr.nodeid=%1$d and prev.nodeid=%1$d and "
+		"where curr.nodeid=%d and prev.nodeid=curr.nodeid and "
 		"curr.tablename=prev.tablename and curr.recordid=prev.recordid and "
-		"curr.cksumtype=%3$d and prev.cksumtype=%2$d%4$s "
+		"curr.cksumtype=%d and prev.cksumtype=%d%s "
 		"union all "
 	/* Find new records */
 		"select curr.tablename,curr.recordid,prev.cksum,curr.cksum,NULL "
 		"from node_cksum curr left join node_cksum prev "
-		"on prev.nodeid=%1$d and prev.tablename=curr.tablename and "
-		"prev.recordid=curr.recordid and prev.cksumtype=%2$d "
-		"where curr.nodeid=%1$d and curr.cksumtype=%3$d and prev.tablename is null%4$s "
+		"on prev.nodeid=curr.nodeid and prev.tablename=curr.tablename and "
+		"prev.recordid=curr.recordid and prev.cksumtype=%d "
+		"where curr.nodeid=%d and curr.cksumtype=%d and prev.tablename is null%s "
 		"union all "
 	/* Find deleted records */
 		"select prev.tablename,prev.recordid,prev.cksum,curr.cksum,prev.sync "
 		"from node_cksum prev left join node_cksum curr "
-		"on prev.nodeid=curr.nodeid and curr.nodeid=%1$d and curr.tablename=prev.tablename and "
-		"curr.recordid=prev.recordid and curr.cksumtype=%3$d "
-		"where prev.nodeid=%1$d and prev.cksumtype=%2$d and curr.tablename is null%5$s",
-		nodeid,
-		NODE_CKSUM_TYPE_OLD,	/* prev */
-		NODE_CKSUM_TYPE_NEW,	/* curr */
-		sql[0],
-		sql[1]);
+		"on curr.nodeid=prev.nodeid and curr.tablename=prev.tablename and "
+		"curr.recordid=prev.recordid and curr.cksumtype=%d "
+		"where prev.nodeid=%d and prev.cksumtype=%d and curr.tablename is null%s",
+		nodeid, NODE_CKSUM_TYPE_NEW, NODE_CKSUM_TYPE_OLD, sql[0],
+		NODE_CKSUM_TYPE_OLD, nodeid, NODE_CKSUM_TYPE_NEW, sql[0],
+		NODE_CKSUM_TYPE_NEW, nodeid, NODE_CKSUM_TYPE_OLD, sql[1]);
 
-	while (NULL != (row = DBfetch(result))) {
-		for (t = 0; tables[t].table != 0 && strcmp(tables[t].table, row[0]) != 0; t++)
-			;
-
+	while (NULL != (row = DBfetch(result)))
+	{
 		/* Found table */
-		if (tables[t].table == 0) {
+		if (NULL == (table = DBget_table(row[0])))
+		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot find table [%s]",
-				row[0]);
+					row[0]);
 			continue;
 		}
 
@@ -479,15 +476,15 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 
 		/* Special (simpler) processing for operation DELETE */
 		if (DBis_null(row[3]) == SUCCEED) {
-			if (*(s+2) != '\0') {
+/*			if (*(s+2) != '\0') {
 				*s = ' ';
-				*(s+1) = ' ';
-			}
+				*(s + 1) = ' ';
+			}*/
 			if (synked == SUCCEED) {
 				if (synked_nodetype == ZBX_NODE_SLAVE)
-					*s = c;
+					*s = c[1];
 				else if (synked_nodetype == ZBX_NODE_MASTER) 
-					*(s+1) = c;
+					*(s + 1) = c[1];
 			}
 			s += 2;
 		} else {
@@ -496,7 +493,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 			f = 0;
 
 			do {
-				while ((tables[t].fields[f].flags & ZBX_SYNC) == 0)
+				while ((table->fields[f].flags & ZBX_SYNC) == 0)
 					f++;
 
 				d[0] = NULL;
@@ -506,23 +503,23 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 				if (NULL != r[1] && NULL != (d[1] = strchr(r[1], ',')))
 					*d[1] = '\0';
 
-				if (NULL == tablename || SUCCEED == str_in_list(fields, tables[t].fields[f].name, ',')) {
+				if (NULL == tablename || SUCCEED == str_in_list(fields, table->fields[f].name, ',')) {
 					ck += zbx_snprintf(ck, 64, "%s,", NULL != r[1] ? r[1] : r[0]);
 
 					if (r[0] == NULL || r[1] == NULL || strcmp(r[0], r[1]) != 0) {
 						if (synked_nodetype == ZBX_NODE_SLAVE) {
-							*s = c;
-							*(s+1) = ' ';
+							*s = c[0];
+							*(s + 1) = ' ';
 						} else if (synked_nodetype == ZBX_NODE_MASTER) {
 							*s = ' ';
-							*(s+1) = c;
+							*(s + 1) = c[0];
 						}
 					} else {
 						if (synked == SUCCEED) {
 							if (synked_nodetype == ZBX_NODE_SLAVE)
-								*s = c;
+								*s = c[0];
 							else if (synked_nodetype == ZBX_NODE_MASTER) 
-								*(s+1) = c;
+								*(s + 1) = c[0];
 						}
 					}
 				} else
@@ -548,8 +545,8 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 		if (DBis_null(row[2]) == SUCCEED || DBis_null(row[3]) == SUCCEED ||
 			strcmp(row[4], sync) != 0 || strcmp(row[2], row[3]) != 0)
 		{
-			DBexecute("update node_cksum set cksumtype=%d,cksum=\'%s\',sync=\'%s\' "
-				"where nodeid=%d and tablename=\'%s\' and recordid=%s and cksumtype=%d",
+			DBexecute("update node_cksum set cksumtype=%d,cksum='%s',sync='%s' "
+				"where nodeid=%d and tablename='%s' and recordid=%s and cksumtype=%d",
 				NODE_CKSUM_TYPE_OLD,
 				cksum,
 				sync,

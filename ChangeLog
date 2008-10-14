@@ -1,5 +1,6 @@
 Changes for 1.6.1
 
+ - [ZBX-540] DM: fixed sql error while processing configuration data (Sasha)
  - [ZBX-557] fixed wrong audit action for items enable/disable (Artem)
  - [ZBX-403] added support of commas in UserParameter's (Sasha)
  - [DEV-233,DEV-237] added support of scheduled maintenance periods (Artem,Sasha)
