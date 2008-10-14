@@ -2933,7 +2933,7 @@
 		$tblMntc->AddRow(array(S_ACTIVE_TILL, $filtertimetab));
 //-------			
 		
-		$tblMntc->AddRow(array(S_DESCRIPTION, new CTextArea('description', $description,50,5)));
+		$tblMntc->AddRow(array(S_DESCRIPTION, new CTextArea('description', $description,66,5)));
 
 
 		$tblMaintenance = new CTableInfo();
