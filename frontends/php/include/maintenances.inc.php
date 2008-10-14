@@ -155,7 +155,12 @@ function save_maintenance_host_links($maintenanceid, $hostids){
 	
 	DBexecute('DELETE FROM maintenances_hosts WHERE maintenanceid='.$maintenanceid);
 	foreach($hostids as $id => $hostid)
-		$result = DBexecute('INSERT INTO maintenances_hosts (maintenanceid,hostid) VALUES ('.$maintenanceid.','.$hostid.')');
+	{
+		$maintenance_hostid = get_dbid('maintenances_hosts','maintenance_hostid');
+
+		$result = DBexecute('INSERT INTO maintenances_hosts (maintenance_hostid,maintenanceid,hostid)'.
+				' VALUES ('.$maintenance_hostid.','.$maintenanceid.','.$hostid.')');
+	}
 		
 return $result;
 }
@@ -165,7 +170,12 @@ function save_maintenance_group_links($maintenanceid, $groupids){
 	
 	DBexecute('DELETE FROM maintenances_groups WHERE maintenanceid='.$maintenanceid);
 	foreach($groupids as $id => $groupid)
-		$result = DBexecute('INSERT INTO maintenances_groups (maintenanceid,groupid) VALUES ('.$maintenanceid.','.$groupid.')');
+	{
+		$maintenance_groupid = get_dbid('maintenances_groups','maintenance_groupid');
+
+		$result = DBexecute('INSERT INTO maintenances_groups (maintenance_groupid,maintenanceid,groupid)'.
+				' VALUES ('.$maintenance_groupid.','.$maintenanceid.','.$groupid.')');
+	}
 		
 return $result;
 
@@ -246,8 +256,9 @@ function save_maintenances_windows($maintenanceid, $timeperiodids){
 	DBexecute('DELETE FROM maintenances_windows WHERE maintenanceid='.$maintenanceid);
 	
 	foreach($timeperiodids as $id => $timeperiodid){
-		$sql = 'INSERT INTO maintenances_windows (timeperiodid,maintenanceid) '.
-				' VALUES ('.$timeperiodid.','.$maintenanceid.')';
+		$maintenance_timeperiodid = get_dbid('maintenances_windows', 'maintenance_timeperiodid');
+		$sql = 'INSERT INTO maintenances_windows (maintenance_timeperiodid,timeperiodid,maintenanceid) '.
+				' VALUES ('.$maintenance_timeperiodid.','.$timeperiodid.','.$maintenanceid.')';
 		$result = DBexecute($sql);
 	}
 return $result;

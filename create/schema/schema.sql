@@ -680,31 +680,34 @@ FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 TABLE|maintenances|maintenanceid|ZBX_SYNC
-FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL 	|ZBX_SYNC
+FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL 	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL 	|ZBX_SYNC
 FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL 	|ZBX_SYNC
 FIELD		|description	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|active_since	|t_integer	|'0'	|NOT NULL 	|ZBX_SYNC
 FIELD		|active_till	|t_integer	|'0'	|NOT NULL 	|ZBX_SYNC
-INDEX		|1	|active_since,active_till
+INDEX		|1		|active_since,active_till
 
-TABLE|maintenances_hosts||ZBX_SYNC
+TABLE|maintenances_hosts|maintenance_hostid|ZBX_SYNC
+FIELD		|maintenance_hostid|t_id	|'0'	|NOT NULL	|0
 FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|1	|maintenanceid,hostid
+INDEX		|1		|maintenanceid,hostid
 
-TABLE|maintenances_groups||ZBX_SYNC
+TABLE|maintenances_groups|maintenance_groupid|ZBX_SYNC
+FIELD		|maintenance_groupid|t_id	|'0'	|NOT NULL	|0
 FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|groupid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|1	|maintenanceid,groupid
+INDEX		|1		|maintenanceid,groupid
 
-TABLE|maintenances_windows||ZBX_SYNC
+TABLE|maintenances_windows|maintenance_timeperiodid|ZBX_SYNC
+FIELD		|maintenance_timeperiodid|t_id	|'0'	|NOT NULL	|0
 FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|timeperiodid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|1	|maintenanceid,timeperiodid
+INDEX		|1		|maintenanceid,timeperiodid
 
 TABLE|timeperiods|timeperiodid|ZBX_SYNC
-FIELD		|timeperiodid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|timeperiodid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|timeperiod_type|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|every		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|month		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
