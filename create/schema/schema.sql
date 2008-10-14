@@ -440,9 +440,9 @@ FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 TABLE|help_items|itemtype,key_|0
-FIELD		|itemtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|itemtype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|0
 
 TABLE|hosts|hostid|ZBX_SYNC
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|0
@@ -495,7 +495,7 @@ FIELD		|location	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|notes		|t_blob		|''	|NOT NULL	|ZBX_SYNC
 
 TABLE|hosts_profiles_ext|hostid|ZBX_SYNC
-FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|hostid		|t_id		|'0'	|NOT NULL	|0
 FIELD		|device_alias	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|device_type	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|device_chassis	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
