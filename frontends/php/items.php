@@ -625,7 +625,7 @@ include_once "include/page_header.php";
 						' AND '.DBcondition('h.hostid',$available_hosts);
 			$item_res = DBselect($sql);
 			while($item = DBfetch($item_res)){
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']'.S_ITEMS_ACTIVATED);
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']'.S_ITEMS_ACTIVATED);
 			}
 			
 			$result = activate_item($group_itemid);
@@ -646,7 +646,7 @@ include_once "include/page_header.php";
 						' AND '.DBcondition('h.hostid',$available_hosts);
 			$item_res = DBselect($sql);
 			while($item = DBfetch($item_res)){
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']'.S_ITEMS_DISABLED);
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']'.S_ITEMS_DISABLED);
 			}
 			
 			$result = disable_item($group_itemid);
