@@ -352,7 +352,9 @@
          * Comments: !!! Don't forget sync code with C !!!
          *
          */
-	function	update_graph($graphid,$name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$templateid=0)
+	function	update_graph($graphid,$name,$width,$height,
+								$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,
+								$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$templateid=0)
 	{
 		$g_graph = get_graph_by_graphid($graphid);
 
@@ -735,14 +737,16 @@
 			if ( isset($chd_graphid) )
 			{
 				$result = update_graph_with_items($chd_graphid, $db_graph['name'], $db_graph['width'], $db_graph['height'],
-					$db_graph['yaxistype'], $db_graph['yaxismin'], $db_graph['yaxismax'],
+					$db_graph['ymin_type'], $db_graph['ymax_type'], $db_graph['yaxismin'], $db_graph['yaxismax'],
+					$db_graph['ymin_itemid'], $db_graph['ymax_itemid'],
 					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],
 					$new_gitems, ($copy_mode ? 0: $db_graph['graphid']));
 			}
 			else
 			{
 				$result = add_graph_with_items($db_graph['name'], $db_graph['width'], $db_graph['height'],
-					$db_graph['yaxistype'], $db_graph['yaxismin'], $db_graph['yaxismax'],
+					$db_graph['ymin_type'], $db_graph['ymax_type'], $db_graph['yaxismin'], $db_graph['yaxismax'],
+					$db_graph['ymin_itemid'], $db_graph['ymax_itemid'],
 					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],
 					$new_gitems, ($copy_mode ? 0: $db_graph['graphid']));
 			}
