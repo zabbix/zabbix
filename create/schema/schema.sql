@@ -440,9 +440,9 @@ FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 TABLE|help_items|itemtype,key_|0
-FIELD		|itemtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|itemtype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|0
 
 TABLE|hosts|hostid|ZBX_SYNC
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|0
@@ -499,7 +499,7 @@ FIELD		|location	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|notes		|t_blob		|''	|NOT NULL	|ZBX_SYNC
 
 TABLE|hosts_profiles_ext|hostid|ZBX_SYNC
-FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|hostid		|t_id		|'0'	|NOT NULL	|0
 FIELD		|device_alias	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|device_type	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|device_chassis	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
@@ -834,7 +834,7 @@ FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 TABLE|maintenances|maintenanceid|ZBX_SYNC
-FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|description	|t_blob		|''	|NOT NULL	|ZBX_SYNC
@@ -842,23 +842,23 @@ FIELD		|active_since	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|active_till	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1	|active_since,active_till
 
-TABLE|maintenances_hosts||ZBX_SYNC
-FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+TABLE|maintenances_hosts||0
+FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|hostid		|t_id		|'0'	|NOT NULL	|0
 INDEX		|1	|maintenanceid,hostid
 
-TABLE|maintenances_groups||ZBX_SYNC
-FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|groupid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+TABLE|maintenances_groups||0
+FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|groupid	|t_id		|'0'	|NOT NULL	|0
 INDEX		|1	|maintenanceid,groupid
 
-TABLE|maintenances_windows||ZBX_SYNC
-FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|timeperiodid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+TABLE|maintenances_windows||0
+FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|timeperiodid	|t_id		|'0'	|NOT NULL	|0
 INDEX		|1	|maintenanceid,timeperiodid
 
 TABLE|timeperiods|timeperiodid|ZBX_SYNC
-FIELD		|timeperiodid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|timeperiodid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|timeperiod_type|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|every		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|month		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
