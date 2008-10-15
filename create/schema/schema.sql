@@ -727,6 +727,6 @@ FIELD		|expressionid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|regexpid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|expression	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|expression_type|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|delimiter	|t_varchar(1)	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|exp_delimiter	|t_varchar(1)	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|case_sensitive	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|regexpid
