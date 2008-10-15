@@ -361,15 +361,17 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 	if (0 == action->esc_period)
 		result = DBselect("select operationid,operationtype,object,objectid,default_msg,shortdata,longdata"
-				",esc_period,evaltype from operations where actionid=" ZBX_FS_UI64,
-				action->actionid);
+				",esc_period,evaltype from operations where actionid=" ZBX_FS_UI64 " and operationtype in (%d,%d)",
+				action->actionid,
+				OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND);
 	else {
 		escalation->esc_step++;
 
 		result = DBselect("select operationid,operationtype,object,objectid,default_msg,shortdata,longdata"
-				",esc_period,evaltype from operations where actionid=" ZBX_FS_UI64
+				",esc_period,evaltype from operations where actionid=" ZBX_FS_UI64 " and operationtype in (%d,%d)",
 				" and esc_step_from<=%d and (esc_step_to=0 or esc_step_to>=%d)",
 				action->actionid,
+				OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
 				escalation->esc_step,
 				escalation->esc_step);
 	}
