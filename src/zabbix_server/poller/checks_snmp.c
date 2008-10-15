@@ -378,11 +378,7 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 	struct variable_list *vars;
 	int status;
 
-	char 	*p, *c;
-
-	unsigned char *ip;
-
-	char error[MAX_STRING_LEN];
+	char		buf[MAX_STRING_LEN];
 
 	int ret=SUCCEED;
 
@@ -410,11 +406,10 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 	}
 	else
 	{
-		zbx_snprintf(error,sizeof(error),"Error in get_value_SNMP. Wrong item type [%d]. Must be SNMP.",
-			item->type);
-		zabbix_log( LOG_LEVEL_ERR, "%s",
-			error);
-		SET_MSG_RESULT(value, strdup(error));
+		zbx_snprintf(buf, sizeof(buf), "Error in get_value_SNMP. Wrong item type [%d]. Must be SNMP.",
+				item->type);
+		zabbix_log(LOG_LEVEL_ERR, "%s", buf);
+		SET_MSG_RESULT(value, strdup(buf));
 
 		return NOTSUPPORTED;
 	}
@@ -483,10 +478,9 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 				session.securityAuthKey,
 				&session.securityAuthKeyLen) != SNMPERR_SUCCESS)
 			{
-				zbx_snprintf(error,sizeof(error),"Error generating Ku from authentication pass phrase.");
-
-				zabbix_log( LOG_LEVEL_ERR, "%s", error);
-				SET_MSG_RESULT(value, strdup(error));
+				zbx_snprintf(buf, sizeof(buf), "Error generating Ku from authentication pass phrase.");
+				zabbix_log(LOG_LEVEL_ERR, "%s", buf);
+				SET_MSG_RESULT(value, strdup(buf));
 
 				return NOTSUPPORTED;
 			}
@@ -506,10 +500,9 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 				session.securityAuthKey,
 				&session.securityAuthKeyLen) != SNMPERR_SUCCESS)
 			{
-				zbx_snprintf(error,sizeof(error),"Error generating Ku from authentication pass phrase.");
-
-				zabbix_log( LOG_LEVEL_ERR, "%s", error);
-				SET_MSG_RESULT(value, strdup(error));
+				zbx_snprintf(buf, sizeof(buf), "Error generating Ku from authentication pass phrase.");
+				zabbix_log(LOG_LEVEL_ERR, "%s", buf);
+				SET_MSG_RESULT(value, strdup(buf));
 
 				return NOTSUPPORTED;
 			}
@@ -525,10 +518,9 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 				session.securityPrivKey,
 				&session.securityPrivKeyLen) != SNMPERR_SUCCESS) 
 			{
-				zbx_snprintf(error,sizeof(error),"Error generating Ku from priv pass phrase.");
-
-				zabbix_log( LOG_LEVEL_ERR, "%s", error);
-				SET_MSG_RESULT(value, strdup(error));
+				zbx_snprintf(buf, sizeof(buf), "Error generating Ku from priv pass phrase.");
+				zabbix_log(LOG_LEVEL_ERR, "%s", buf);
+				SET_MSG_RESULT(value, strdup(buf));
 
 				return NOTSUPPORTED;
 			}
@@ -540,11 +532,10 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 	}
 	else
 	{
-		zbx_snprintf(error,sizeof(error),"Error in get_value_SNMP. Unsupported session.version [%d]",
-			(int)session.version);
-		zabbix_log( LOG_LEVEL_ERR, "%s",
-			error);
-		SET_MSG_RESULT(value, strdup(error));
+		zbx_snprintf(buf, sizeof(buf), "Error in get_value_SNMP. Unsupported session.version [%d]",
+				(int)session.version);
+		zabbix_log(LOG_LEVEL_ERR, "%s", buf);
+		SET_MSG_RESULT(value, strdup(buf));
 		
 		return NOTSUPPORTED;
 	}
@@ -562,10 +553,9 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 	{
 		SOCK_CLEANUP;
 
-		zbx_snprintf(error,sizeof(error),"Error doing snmp_open()");
-		zabbix_log( LOG_LEVEL_ERR, "%s",
-			error);
-		SET_MSG_RESULT(value, strdup(error));
+		zbx_snprintf(buf, sizeof(buf), "Error doing snmp_open()");
+		zabbix_log(LOG_LEVEL_ERR, "%s", buf);
+		SET_MSG_RESULT(value, strdup(buf));
 
 		return NOTSUPPORTED;
 	}
@@ -602,7 +592,6 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 
 		for(vars = response->variables; vars; vars = vars->next_variable)
 		{
-			int count=1;
 			zabbix_log( LOG_LEVEL_DEBUG, "AV loop(%d)", vars->type);
 
 /*			if(	(vars->type == ASN_INTEGER) ||*/
@@ -672,101 +661,42 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 #endif
 			else if(vars->type == ASN_OCTET_STR)
 			{
-				if(item->value_type == ITEM_VALUE_TYPE_FLOAT)
-				{
-					SET_DBL_RESULT(value, strtod((char*)vars->val.string,0));
-				}
-				else if(item->value_type != ITEM_VALUE_TYPE_STR)
-				{
-					zbx_snprintf(error,sizeof(error),"Cannot store SNMP string value (ASN_OCTET_STR) in item having numeric type");
-					zabbix_log( LOG_LEVEL_ERR, "%s",
-						error);
-					SET_MSG_RESULT(value, strdup(error));
+				memset(buf, 0, sizeof(buf));
+				snprint_value(buf, sizeof(buf) - 1, vars->name, vars->name_length, vars);
 
-					ret = NOTSUPPORTED;
+				zabbix_log(LOG_LEVEL_DEBUG, "OID [%s] Type [ASN_OCTET_STR] \"%s\"",
+						snmp_oid, buf);
+
+				if (0 == strncmp(buf, "STRING: ", 8))
+				{
+					SET_STR_RESULT(value, strdup(buf + 8));
+				}
+				else if (0 == strncmp(buf, "Hex-STRING: ", 12))
+				{
+					SET_STR_RESULT(value, strdup(buf + 12));
 				}
 				else
 				{
-					zabbix_log( LOG_LEVEL_DEBUG, "ASN_OCTET_STR [%s]", vars->val.string);
-					zabbix_log( LOG_LEVEL_DEBUG, "ASN_OCTET_STR [%d]", vars->val_len);
-					
-					p = malloc(1024);
-					if(p)
-					{
-						memset(p,0,1024);
-						snprint_value(p, 1023, vars->name, vars->name_length, vars);
-						/* Skip STRING: and STRING_HEX: */
-						c=strchr(p,':');
-						if(c==NULL)
-						{
-							SET_STR_RESULT(value, strdup(p));
-						}
-						else
-						{
-							SET_STR_RESULT(value, strdup(c+1));
-						}
-						zabbix_log( LOG_LEVEL_DEBUG, "ASN_OCTET_STR [%s]", p);
-						free(p);
-					}
-					else
-					{
-						zbx_snprintf(error,MAX_STRING_LEN-1,"Cannot allocate required memory");
-						zabbix_log( LOG_LEVEL_ERR, "%s", error);
-						SET_MSG_RESULT(value, strdup(error));
-					}
-
-/*					p = malloc(vars->val_len+1);
-					if(p)
-					{
-						zabbix_log( LOG_LEVEL_WARNING, "Result [%s] len [%d]",vars->val.string,vars->val_len);
-						memcpy(p, vars->val.string, vars->val_len);
-						p[vars->val_len] = '\0';
-
-						SET_STR_RESULT(value, p);
-					}
-					else
-					{
-						zbx_snprintf(error,sizeof(error),"Cannot allocate required memory");
-						zabbix_log( LOG_LEVEL_ERR, "%s", error);
-						SET_MSG_RESULT(value, strdup(error));
-					}*/
+					SET_STR_RESULT(value, strdup(buf));
 				}
 			}
 			else if(vars->type == ASN_IPADDRESS)
 			{
-				if(item->value_type != ITEM_VALUE_TYPE_STR)
-				{
-					zbx_snprintf(error,sizeof(error),"Cannot store SNMP string value (ASN_IPADDRESS) in item having numeric type");
-					zabbix_log( LOG_LEVEL_ERR, "%s",
-						error);
-					SET_MSG_RESULT(value, strdup(error));
-					ret = NOTSUPPORTED;
-				}
-				else
-				{
-					ip = vars->val.string;
-					SET_STR_RESULT(value, zbx_dsprintf(NULL, "%d.%d.%d.%d",
-						ip[0],
-						ip[1],
-						ip[2],
-						ip[3]));
-				}
+				SET_STR_RESULT(value, zbx_dsprintf(NULL, "%d.%d.%d.%d",
+						vars->val.string[0],
+						vars->val.string[1],
+						vars->val.string[2],
+						vars->val.string[3]));
 			}
 			else
 			{
-/* count is not really used. Has to be removed */ 
-				count++;
+				zbx_snprintf(buf, sizeof(buf), "OID [%s] value has unknow type [%X]",
+						snmp_oid,
+						vars->type);
+				zabbix_log(LOG_LEVEL_ERR, "%s", buf);
+				SET_MSG_RESULT(value, strdup(buf));
 
-				zbx_snprintf(error,sizeof(error),"OID [%s] value #%d has unknow type [%X]",
-					snmp_oid,
-					count,
-					vars->type);
-
-				zabbix_log( LOG_LEVEL_ERR, "%s",
-					error);
-				SET_MSG_RESULT(value, strdup(error));
-
-				ret  = NOTSUPPORTED;
+				ret = NOTSUPPORTED;
 			}
 		}
 	}
@@ -774,53 +704,31 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 	{
 		if (status == STAT_SUCCESS)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "SNMP error in packet. Reason: %s\n",
-				snmp_errstring(response->errstat));
-			if(response->errstat == SNMP_ERR_NOSUCHNAME)
-			{
-				zbx_snprintf(error,sizeof(error),"SNMP error [%s]",
+			zbx_snprintf(buf, sizeof(buf), "SNMP error [%s]",
 					snmp_errstring(response->errstat));
+			zabbix_log(LOG_LEVEL_ERR, "%s", buf);
+			SET_MSG_RESULT(value, strdup(buf));
 
-				zabbix_log( LOG_LEVEL_ERR, "%s",
-					error);
-				SET_MSG_RESULT(value, strdup(error));
-
-				ret=NOTSUPPORTED;
-			}
-			else
-			{
-				zbx_snprintf(error,sizeof(error),"SNMP error [%s]",
-					snmp_errstring(response->errstat));
-
-				zabbix_log( LOG_LEVEL_ERR, "%s",
-					error);
-				SET_MSG_RESULT(value, strdup(error));
-
-				ret=NOTSUPPORTED;
-			}
+			ret = NOTSUPPORTED;
 		}
 		else if(status == STAT_TIMEOUT)
 		{
-			zbx_snprintf(error,sizeof(error),"Timeout while connecting to [%s]",
-				session.peername);
-
+			zbx_snprintf(buf, sizeof(buf), "Timeout while connecting to [%s]",
+					session.peername);
 /*			snmp_sess_perror("snmpget", ss);*/
-			zabbix_log( LOG_LEVEL_ERR, "%s",
-				error);
-			SET_MSG_RESULT(value, strdup(error));
+			zabbix_log(LOG_LEVEL_ERR, "%s", buf);
+			SET_MSG_RESULT(value, strdup(buf));
 
 			ret = NETWORK_ERROR;
 		}
 		else
 		{
-			zbx_snprintf(error,sizeof(error),"SNMP error [%d]",
-				status);
+			zbx_snprintf(buf, sizeof(buf), "SNMP error [%d]",
+					status);
+			zabbix_log(LOG_LEVEL_ERR, "%s", buf);
+			SET_MSG_RESULT(value, strdup(buf));
 
-			zabbix_log( LOG_LEVEL_ERR, "%s",
-				error);
-			SET_MSG_RESULT(value, strdup(error));
-
-			ret=NOTSUPPORTED;
+			ret = NOTSUPPORTED;
 		}
 	}
 
@@ -1023,6 +931,15 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 
 		zabbix_log( LOG_LEVEL_ERR, "%s",
 			error);
+		SET_MSG_RESULT(value, strdup(error));
+
+		ret = NOTSUPPORTED;
+	}
+
+	if (SUCCEED == ret && NULL == get_result_value_by_value_type(value, item->value_type))
+	{
+		zbx_snprintf(error, sizeof(error), "OID [%s] invalid value type", item->snmp_oid);
+		zabbix_log(LOG_LEVEL_ERR, "%s", error);
 		SET_MSG_RESULT(value, strdup(error));
 
 		ret = NOTSUPPORTED;
