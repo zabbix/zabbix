@@ -155,6 +155,7 @@ frontends/php/include/locales/hu_hu.inc.php -text
 frontends/php/include/locales/ko_kr.inc.php -text
 frontends/php/include/locales/pt_br.inc.php -text
 frontends/php/include/maintenances.inc.php -text
+frontends/php/include/regexp.inc.php -text
 frontends/php/include/reports.inc.php -text
 frontends/php/include/scripts.inc.php -text
 frontends/php/js/ajax_req.js -text

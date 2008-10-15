@@ -367,8 +367,11 @@
 	$nav_time = get_request('nav_time',time());
 	
 	$navForm = new CForm('events.php');
-	$navForm->AddVar('groupid',$_REQUEST['groupid']);
-	$navForm->AddVar('hostid',$_REQUEST['hostid']);
+	if(isset($_REQUEST['groupid']))
+		$navForm->AddVar('groupid',$_REQUEST['groupid']);
+	if(isset($_REQUEST['hostid']))
+		$navForm->AddVar('hostid',$_REQUEST['hostid']);
+		
 	$navForm->AddVar('fullscreen',$_REQUEST['fullscreen']);
 //	$navForm->AddVar('nav_time',$_REQUEST['nav_time']);
 	
