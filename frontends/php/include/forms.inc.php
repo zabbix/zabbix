@@ -6785,7 +6785,7 @@
 			
 			if(!empty($test_string)){
 				if($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED){
-					$paterns = explode($expression['delimiter'],$expression['expression']);
+					$paterns = explode($expression['exp_delimiter'],$expression['expression']);
 				}
 
 				if(uint_in_array($expression['expression_type'], array(EXPRESSION_TYPE_TRUE,EXPRESSION_TYPE_FALSE))){
@@ -6825,7 +6825,7 @@
 			
 			$expec_result = expression_type2str($expression['expression_type']);
 			if(EXPRESSION_TYPE_ANY_INCLUDED == $expression['expression_type'])
-				$expec_result.=' ('.S_DELIMITER."='".$expression['delimiter']."')";
+				$expec_result.=' ('.S_DELIMITER."='".$expression['exp_delimiter']."')";
 			
 			$tabExp->addRow(array(
 						$expression['expression'],
@@ -6907,7 +6907,7 @@
 		
 			$exp_result = expression_type2str($expression['expression_type']);
 			if(EXPRESSION_TYPE_ANY_INCLUDED == $expression['expression_type'])
-				$exp_result.=' ('.S_DELIMITER."='".$expression['delimiter']."')";
+				$exp_result.=' ('.S_DELIMITER."='".$expression['exp_delimiter']."')";
 				
 			$tblExp->AddRow(array(
 				new CCheckBox('g_expressionid[]', 'no', null, $id),
@@ -6921,7 +6921,7 @@
 			$tblExp->AddItem(new Cvar('expressions['.$id.'][expression]',		$expression['expression']));
 			$tblExp->AddItem(new Cvar('expressions['.$id.'][expression_type]',	$expression['expression_type']));
 			$tblExp->AddItem(new Cvar('expressions['.$id.'][case_sensitive]',	$expression['case_sensitive']));
-			$tblExp->AddItem(new Cvar('expressions['.$id.'][delimiter]',		$expression['delimiter']));
+			$tblExp->AddItem(new Cvar('expressions['.$id.'][exp_delimiter]',	$expression['exp_delimiter']));
 		}
 
 		$buttons = array();
@@ -6957,7 +6957,7 @@
 		if(!isset($new_expression['expression']))			$new_expression['expression']		= '';
 		if(!isset($new_expression['expression_type']))		$new_expression['expression_type']	= EXPRESSION_TYPE_INCLUDED;
 		if(!isset($new_expression['case_sensitive']))		$new_expression['case_sensitive']	= 0;
-		if(!isset($new_expression['delimiter']))			$new_expression['delimiter']		= ',';
+		if(!isset($new_expression['exp_delimiter']))		$new_expression['exp_delimiter']	= ',';
 		
 		$tblExp->addRow(array(S_EXPRESSION, new CTextBox('new_expression[expression]',$new_expression['expression'],60)));
 		
@@ -6971,7 +6971,7 @@
 		$tblExp->addRow(array(S_EXPRESSION_TYPE,$cmbType));
 		
 		if(EXPRESSION_TYPE_ANY_INCLUDED == $new_expression['expression_type']){
-			$cmbDelimiter = new CComboBox('new_expression[delimiter]',$new_expression['delimiter']);
+			$cmbDelimiter = new CComboBox('new_expression[exp_delimiter]',$new_expression['exp_delimiter']);
 			$cmbDelimiter->addItem(',',',');
 			$cmbDelimiter->addItem('.','.');
 			$cmbDelimiter->addItem('/','/');
@@ -6979,7 +6979,7 @@
 			$tblExp->addRow(array(S_DELIMITER,$cmbDelimiter));
 		}
 		else{
-			$tblExp->AddItem(new Cvar('new_expression[delimiter]',$new_expression['delimiter']));
+			$tblExp->AddItem(new Cvar('new_expression[exp_delimiter]',$new_expression['exp_delimiter']));
 		}
 				
 		$chkbCase = new CCheckBox('new_expression[case_sensitive]', $new_expression['case_sensitive'],null,1);
