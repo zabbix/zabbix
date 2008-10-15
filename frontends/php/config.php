@@ -21,7 +21,9 @@
 <?php
 	require_once('include/config.inc.php');
 	require_once('include/images.inc.php');
+	require_once('include/regexp.inc.php');
 	require_once('include/forms.inc.php');
+	
 
 	$page['title'] = "S_CONFIGURATION_OF_ZABBIX";
 	$page['file'] = 'config.php';
@@ -34,7 +36,7 @@
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
-		'config'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('0,3,5,6,7,8,9'),	NULL),
+		'config'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('0,3,5,6,7,8,9,10'),	NULL),
 
 // other form
 		'alert_history'=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),		'isset({config})&&({config}==0)&&isset({save})'),
@@ -65,8 +67,27 @@
 		'event_ack_enable'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1'),	'isset({config})&&({config}==8)&&isset({save})'),
 		'event_expire'=> 		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,65535),	'isset({config})&&({config}==8)&&isset({save})'),
 		'event_show_max'=> 		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,65535),	'isset({config})&&({config}==8)&&isset({save})'),
+		
 /* Themes */
 		'default_theme'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,				'isset({config})&&({config}==9)&&isset({save})'),
+		
+// regexp
+		'regexpids'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		NULL),
+		'regexpid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({config})&&({config}==10)&&(isset({form})&&({form}=="update"))'),
+		'rename'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'isset({config})&&({config}==10)&&isset({save})'),
+		'test_string'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'isset({config})&&({config}==10)&&isset({save})'),
+		'delete_regexp'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
+		
+		'g_expressionid'=>			array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		null),
+		'expressions'=>				array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==10)&&isset({save})'),
+		'new_expression'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
+		'cancel_new_expression'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
+
+		'clone'=>				array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
+		'add_expression'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
+		'edit_expressionid'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
+		'delete_expression'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
+		
 /* other */
 		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
@@ -150,23 +171,6 @@
 				$msg[] = S_SHOW_EVENTS_MAX.' ['.$val.']';
 
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,implode('; ',$msg));
-		}		
-	}
-	else if(isset($_REQUEST['save']) && ($_REQUEST['config']==9)){
-		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
-			access_deny();
-
-/* OTHER ACTIONS */
-		$configs = array(
-				'default_theme' => get_request('default_theme')
-			);
-		$result=update_config($configs);
-
-		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
-
-		if($result){
-			$msg = S_DEFAULT_THEME.' ['.get_request('default_theme').']';
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,$msg);
 		}		
 	}
 	else if(isset($_REQUEST['save'])&&uint_in_array($_REQUEST['config'],array(0,5,7))){
@@ -278,6 +282,149 @@
 			show_messages($result, S_VALUE_MAP_DELETED, S_CANNNOT_DELETE_VALUE_MAP);
 		}
 	}
+	else if(isset($_REQUEST['save']) && ($_REQUEST['config']==9)){
+		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
+			access_deny();
+
+/* OTHER ACTIONS */
+		$configs = array(
+				'default_theme' => get_request('default_theme')
+			);
+		$result=update_config($configs);
+
+		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
+
+		if($result){
+			$msg = S_DEFAULT_THEME.' ['.get_request('default_theme').']';
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,$msg);
+		}		
+	}
+	else if($_REQUEST['config'] == 10){
+		if(inarr_isset(array('clone','regexpid'))){
+			unset($_REQUEST['regexpid']);
+			$_REQUEST['form'] = 'clone';
+		}
+		else if(isset($_REQUEST['cancel_new_expression'])){
+			unset($_REQUEST['new_expression']);
+		}
+		else if(isset($_REQUEST['save'])){
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
+				access_deny();	
+
+			$regexp = array('name' => $_REQUEST['rename'],
+						'test_string' => $_REQUEST['test_string']
+					);
+								
+			DBstart();
+			if(isset($_REQUEST['regexpid'])){
+				$regexpid=$_REQUEST['regexpid'];
+				
+				delete_expressions_by_regexpid($_REQUEST['regexpid']);					
+				$result = update_regexp($regexpid, $regexp);
+
+				$msg1 = S_REGULAR_EXPRESSION_UPDATED;
+				$msg2 = S_CANNOT_UPDATE_REGULAR_EXPRESSION;
+			} 
+			else {
+				$result = $regexpid = add_regexp($regexp);
+
+				$msg1 = S_REGULAR_EXPRESSION_ADDED;
+				$msg2 = S_CANNOT_ADD_REGULAR_EXPRESSION;
+			}
+			
+			if($result){
+				$expressions = get_request('expressions', array());
+				foreach($expressions as $id => $expression){
+					$expressionid = add_expression($regexpid,$expression);
+				}
+			}
+			
+			$result = Dbend($result);
+			
+			show_messages($result,$msg1,$msg2);
+				
+			if($result){ // result - OK
+				add_audit(!isset($_REQUEST['regexpid'])?AUDIT_ACTION_ADD:AUDIT_ACTION_UPDATE, 
+					AUDIT_RESOURCE_REGEXP, 
+					S_NAME.': '.$_REQUEST['rename']);
+	
+				unset($_REQUEST['form']);
+			}
+		}
+		else if(isset($_REQUEST['delete'])){
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
+
+			$regexpids = get_request('regexpid', array());
+			if(isset($_REQUEST['regexpids']))
+				$regexpids = $_REQUEST['regexpids'];
+			
+			zbx_value2array($regexpids);
+
+			$regexps = array();
+			foreach($regexpids as $id => $regexpid){
+				$regexps[$regexpid] = get_regexp_by_regexpid($regexpid);
+			}
+			
+			DBstart();
+			$result = delete_regexp($regexpids);
+			$result = Dbend($result);
+			
+			show_messages($result,S_REGULAR_EXPRESSION_DELETED,S_CANNOT_DELETE_REGULAR_EXPRESSION);
+			if($result){
+				foreach($regexps as $regexpid => $regexp){
+					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_REGEXP,'Id ['.$regexpid.'] '.S_NAME.' ['.$regexp['name'].']');
+				}
+				
+				unset($_REQUEST['form']);
+				unset($_REQUEST['regexpid']);
+			}
+		}
+		else if(inarr_isset(array('add_expression','new_expression'))){
+			$new_expression = $_REQUEST['new_expression'];
+			
+			if(!isset($new_expression['case_sensitive']))		$new_expression['case_sensitive'] = 0;
+	
+			$result = false;
+			if(zbx_empty($new_expression['expression'])) {
+				info(S_INCORRECT_EXPRESSION);
+			}
+			else{
+				$result = true;
+			}
+
+			if($result){
+				if(!isset($new_expression['id'])){
+					if(!isset($_REQUEST['expressions'])) $_REQUEST['expressions'] = array();
+					
+					if(!str_in_array($new_expression,$_REQUEST['expressions']))
+						array_push($_REQUEST['expressions'],$new_expression);
+				}
+				else{
+					$id = $new_expression['id'];
+					unset($new_expression['id']);
+					$_REQUEST['expressions'][$id] = $new_expression;
+				}
+	
+				unset($_REQUEST['new_expression']);
+			}
+		}
+		else if(inarr_isset(array('del_expression','g_expressionid'))){
+			$_REQUEST['expressions'] = get_request('expressions',array());
+			foreach($_REQUEST['g_expressionid'] as $val){
+				unset($_REQUEST['expressions'][$val]);
+			}
+		}
+		else if(inarr_isset(array('edit_expressionid'))){	
+			$_REQUEST['edit_expressionid'] = array_keys($_REQUEST['edit_expressionid']);
+			$edit_expressionid = $_REQUEST['edit_expressionid'] = array_pop($_REQUEST['edit_expressionid']);
+			$_REQUEST['expressions'] = get_request('expressions',array());
+
+			if(isset($_REQUEST['expressions'][$edit_expressionid])){
+				$_REQUEST['new_expression'] = $_REQUEST['expressions'][$edit_expressionid];
+				$_REQUEST['new_expression']['id'] = $edit_expressionid;
+			}
+		}
+	}
 
 ?>
 
@@ -286,12 +433,13 @@
 	$form = new CForm('config.php');
 	$form->SetMethod('get');
 	$cmbConfig = new CCombobox('config',$_REQUEST['config'],'submit()');
+//	$cmbConfig->AddItem(4,S_AUTOREGISTRATION);
+//	$cmbConfig->AddItem(2,S_ESCALATION_RULES);
 	$cmbConfig->AddItem(8,S_EVENTS);
 	$cmbConfig->AddItem(0,S_HOUSEKEEPER);
-//	$cmbConfig->AddItem(2,S_ESCALATION_RULES);
 	$cmbConfig->AddItem(3,S_IMAGES);
+	$cmbConfig->AddItem(10,S_REGULAR_EXPRESSIONS);
 	$cmbConfig->AddItem(9,S_THEMES);
-//	$cmbConfig->AddItem(4,S_AUTOREGISTRATION);
 	$cmbConfig->AddItem(6,S_VALUE_MAPPING);
 	$cmbConfig->AddItem(7,S_WORKING_TIME);
 	$cmbConfig->AddItem(5,S_OTHER);
@@ -307,27 +455,31 @@
 		break;
 	}
 	show_table_header(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
-	echo SBR;
 ?>
 <?php
 
 	if($_REQUEST['config']==0){
+		echo SBR;
 		insert_housekeeper_form();
 	}
 	else if($_REQUEST['config']==5){
+		echo SBR;
 		insert_other_parameters_form();
 	}
 	else if($_REQUEST['config']==7){
+		echo SBR;
 		insert_work_period_form();
 	}
 	else if($_REQUEST['config']==8){
+		echo SBR;
 		insert_event_ack_form();
 	}
 	else if($_REQUEST['config']==9){
 		insert_themes_form();
 	}
-	else if($_REQUEST['config']==3){
-		if(isset($_REQUEST['form'])){
+	elseif($_REQUEST["config"]==3){
+		echo SBR;
+		if(isset($_REQUEST["form"])){
 			insert_image_form();
 		}
 		else{
@@ -369,7 +521,8 @@
 			$table->show();
 		}
 	}
-	else if($_REQUEST['config']==6){
+	elseif($_REQUEST['config']==6){
+		echo SBR;
 		if(isset($_REQUEST['form'])){
 			insert_value_mapping_form();
 		}
@@ -401,6 +554,157 @@
 			}
 			
 			$table->Show();
+		}
+	}
+	else if($_REQUEST['config'] == 10){
+		if(isset($_REQUEST["form"])){
+
+			$frmRegExp = new CForm('config.php','post');
+			$frmRegExp->setName(S_REGULAR_EXPRESSION);
+			
+			$frmRegExp->addVar('form',get_request('form',1));
+			
+			$from_rfr = get_request('form_refresh',0);
+			$frmRegExp->addVar('form_refresh',$from_rfr+1);
+			
+			$frmRegExp->addVar('config',get_request('config',10));
+			
+			if(isset($_REQUEST['regexpid']))
+				$frmRegExp->addVar('regexpid',$_REQUEST['regexpid']);
+						
+			$left_tab = new CTable();
+			$left_tab->setCellPadding(3);
+			$left_tab->setCellSpacing(3);
+			
+			$left_tab->addOption('border',0);
+			
+			$left_tab->addRow(create_hat(
+					S_REGULAR_EXPRESSION,
+					get_regexp_form(),//null,
+					null,
+					'hat_regexp',
+					get_profile('web.config.hats.hat_regexp.state',1)
+				));
+			
+			$right_tab = new CTable();
+			$right_tab->setCellPadding(3);
+			$right_tab->setCellSpacing(3);
+			
+			$right_tab->addOption('border',0);
+					
+			$right_tab->addRow(create_hat(
+					S_EXPRESSIONS,
+					get_expressions_tab(),//null,
+					null,
+					'hat_expressions',
+					get_profile('web.config.hats.hat_expressions.state',1)
+				));
+
+			if(isset($_REQUEST['new_expression'])){		
+				$right_tab->addRow(create_hat(
+						S_NEW_EXPRESSION,
+						get_expression_form(),//null
+						null,
+						'hat_new_expression',
+						get_profile('web.config.hats.hat_new_expression.state',1)
+					));
+			}
+			
+			
+			$td_l = new CCol($left_tab);
+			$td_l->AddOption('valign','top');
+			
+			$td_r = new CCol($right_tab);
+			$td_r->AddOption('valign','top');
+			
+			$outer_table = new CTable();
+			$outer_table->AddOption('border',0);
+			$outer_table->SetCellPadding(1);
+			$outer_table->SetCellSpacing(1);
+			$outer_table->AddRow(array($td_l,$td_r));
+			
+			$frmRegExp->Additem($outer_table);
+			
+			show_messages();
+			$frmRegExp->Show();
+		}
+		else{
+			echo SBR;
+			$form = new CForm();
+			$form->addVar('config', get_request('config',10));
+			$form->addItem(new CButton('form',S_NEW_REGULAR_EXPRESSION));
+			
+			show_table_header(S_REGULAR_EXPRESSIONS,$form);
+// ----
+			$regexps = array();
+			$regexpids = array();
+			
+			$sql = 'SELECT re.* '.
+					' FROM regexps re '.
+					' WHERE '.DBin_node('re.regexpid').
+					' ORDER BY re.name';
+
+			$db_regexps = DBselect($sql);
+			while($regexp = DBfetch($db_regexps)){
+				$regexp['expressions'] = array();
+				
+				$regexps[$regexp['regexpid']] = $regexp;
+				$regexpids[$regexp['regexpid']] = $regexp['regexpid'];
+			}
+			
+			$count = array();
+			$expressions = array();
+			$sql = 'SELECT e.* '.
+					' FROM expressions e '.
+					' WHERE '.DBin_node('e.expressionid').
+						' AND '.DBcondition('e.regexpid',$regexpids).
+					' ORDER BY e.expression_type';
+
+			$db_exps = DBselect($sql);
+			while($exp = DBfetch($db_exps)){
+				if(!isset($expressions[$exp['regexpid']])) $count[$exp['regexpid']] = 1;
+				else $count[$exp['regexpid']]++;
+								
+				if(!isset($expressions[$exp['regexpid']])) $expressions[$exp['regexpid']] = new CTable();
+
+				$expressions[$exp['regexpid']]->addRow(array($count[$exp['regexpid']], ' &raquo; ', $exp['expression'],' ['.expression_type2str($exp['expression_type']).']'));
+				
+				$regexp[$exp['regexpid']]['expressions'][$exp['expressionid']] = $exp;
+			}
+		
+			$form = new CForm(null,'post');
+			$form->setName('regexp');
+			
+			$table = new CTableInfo();
+			$table->setHeader(array(
+				array(
+					new CCheckBox('all_regexps',NULL,"CheckAll('".$form->GetName()."','all_regexps','group_regexpid');"),
+					S_NAME
+				),
+				S_EXPRESSIONS
+				));
+				
+			foreach($regexps as $regexpid => $regexp){
+				
+				$table->addRow(array(
+					array(
+						new CCheckBox('regexpids['.$regexp['regexpid'].']',NULL,NULL,$regexp['regexpid']),
+						new CLink($regexp['name'],
+							'config.php?form=update'.url_param('config').
+							'&regexpid='.$regexp['regexpid'].'#form', 'action')
+					),
+					isset($expressions[$regexpid])?$expressions[$regexpid]:'-'
+					));
+			}
+//			$table->SetFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_USERS_Q)));
+			
+			$table->SetFooter(new CCol(array(
+				new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_REGULAR_EXPRESSIONS_Q)
+			)));
+
+			$form->AddItem($table);
+
+			$form->show();
 		}
 	}
 ?>
