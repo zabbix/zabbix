@@ -5206,7 +5206,7 @@ include_once 'include/discovery.inc.php';
 	
 	function get_maintenance_periods(){
 		$tblPeriod = new CTableInfo();
-		$tblPeriod->AddOption('style','background-color: #CCC;');
+		$tblPeriod->addStyle('background-color: #CCC;');
 	
 		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST["form_refresh"])){
 			
@@ -5597,7 +5597,8 @@ include_once 'include/discovery.inc.php';
 //			$tabPeriod = new CTable();
 //			$tabPeriod->AddRow(S_DAYS)
 //			$tblPeriod->AddRow(array(S_AT.SPACE.'('.S_HOUR.':'.S_MINUTE.')', $tabTime));
-
+		
+		
 		$td = new CCol(array(
 			new CButton('add_timeperiod', S_SAVE),
 			SPACE,
@@ -5610,5 +5611,280 @@ include_once 'include/discovery.inc.php';
 		$tblPeriod->SetFooter($td);
 
 	return $tblPeriod;
+	}
+	
+	function get_regexp_form(){
+		$frm_title = S_REGULAR_EXPRESSION;
+
+		if(isset($_REQUEST['regexpid']) && !isset($_REQUEST["form_refresh"])){
+			$sql = 'SELECT re.* '.
+				' FROM regexps re '.
+				' WHERE '.DBin_node('re.regexpid').
+					' AND re.regexpid='.$_REQUEST['regexpid'];
+			$regexp = DBfetch(DBSelect($sql));
+
+			$frm_title .= ' ['.$regexp['name'].']';
+
+			$rename			= $regexp['name'];
+			$test_string	= $regexp['test_string'];
+			
+			$expressions = array();
+			$sql = 'SELECT e.* '.
+					' FROM expressions e '.
+					' WHERE '.DBin_node('e.expressionid').
+						' AND e.regexpid='.$regexp['regexpid'].
+					' ORDER BY e.expression_type';
+
+			$db_exps = DBselect($sql);
+			while($exp = DBfetch($db_exps)){
+				$expressions[] = $exp;
+			}
+		}
+		else{
+			$rename			= get_request('rename','');
+			$test_string	= get_request('test_string','');
+			
+			$expressions 	= get_request('expressions',array());
+		}
+
+		$tblRE = new CTable('','nowrap');
+		$tblRE->addStyle('border-left: 1px #AAA solid; border-right: 1px #AAA solid; background-color: #EEE; padding: 2px; padding-left: 6px; padding-right: 6px;');
+		
+		$tblRE->AddRow(array(S_NAME, new CTextBox('rename', $rename, 60)));
+		$tblRE->AddRow(array(S_TEST_STRING, new CTextArea('test_string', $test_string, 66, 5)));
+		
+		$tabExp = new CTableInfo();
+		
+		$td1 = new CCol(S_EXPRESSION);
+		$td1->addStyle('background-color: #CCC;');
+		$td2 = new CCol(S_EXPECTED_RESULT);
+		$td2->addStyle('background-color: #CCC;');
+		$td3 = new CCol(S_RESULT);
+		$td3->addStyle('background-color: #CCC;');
+		
+		$tabExp->setHeader(array($td1,$td2,$td3));
+		
+		$final_result = !empty($test_string);
+
+		foreach($expressions as $id => $expression){
+		
+			$results = array();
+			$paterns = array($expression['expression']);			
+			
+			if(!empty($test_string)){
+				if($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED){
+					$paterns = explode($expression['delimiter'],$expression['expression']);
+				}
+
+				if(uint_in_array($expression['expression_type'], array(EXPRESSION_TYPE_TRUE,EXPRESSION_TYPE_FALSE))){
+					if($expression['case_sensitive'])
+						$results[$id] = ereg($paterns[0],$test_string);
+					else
+						$results[$id] = eregi($paterns[0],$test_string);
+					
+					if($expression['expression_type'] == EXPRESSION_TYPE_TRUE)
+						$final_result &= $results[$id];
+					else
+						$final_result &= !$results[$id];
+				}
+				else{
+					$results[$id] = true;
+					
+					$tmp_result = false;
+					if($expression['case_sensitive']){
+						foreach($paterns as $pid => $patern)
+							$tmp_result |= (zbx_stristr($test_string,$patern) !== false);
+					}
+					else{
+						foreach($paterns as $pid => $patern){
+							$tmp_result |= (zbx_strstr($test_string,$patern) !== false);
+						}
+					}
+					
+					$results[$id] &= $tmp_result;
+					$final_result &= $results[$id];
+				}
+			}
+
+			if(isset($results[$id]) && $results[$id])
+				$exp_res = new CSpan(S_TRUE_BIG,'blue bold');
+			else
+				$exp_res = new CSpan(S_FALSE_BIG,'red bold');
+			
+			$expec_result = expression_type2str($expression['expression_type']);
+			if(EXPRESSION_TYPE_ANY_INCLUDED == $expression['expression_type'])
+				$expec_result.=' ('.S_DELIMITER."='".$expression['delimiter']."')";
+			
+			$tabExp->addRow(array(
+						$expression['expression'],
+						$expec_result,
+						$exp_res
+					));
+		}
+
+		$td = new CCol(S_COMBINED_RESULT,'bold');
+		$td->setColSpan(2);
+
+		if($final_result)
+			$final_result = new CSpan(S_TRUE_BIG,'blue bold');
+		else
+			$final_result = new CSpan(S_FALSE_BIG,'red bold');
+		
+		$tabExp->addRow(array(
+					$td,
+					$final_result
+				));
+				
+		$tblRE->addRow(array(S_RESULT,$tabExp));
+				
+		$tblFoot = new CTableInfo(null);
+
+		$td = new CCol(array(new CButton('save',S_SAVE)));
+		$td->setColSpan(2);
+		$td->addStyle('text-align: right;');
+
+		$td->AddItem(SPACE);
+		$td->AddItem(new CButton('test',S_TEST));
+
+		if(isset($_REQUEST['regexpid'])){
+			$td->AddItem(SPACE);
+			$td->AddItem(new CButtonDelete(S_DELETE_REGULAR_EXPRESSION_Q,url_param('form').url_param('config').url_param('regexpid')));
+		}
+		
+		$td->AddItem(SPACE);
+		$td->AddItem(new CButtonCancel(url_param("regexpid")));
+
+		$tblFoot->SetFooter($td);
+		
+	return array($tblRE,$tblFoot);
+	}
+
+	function get_expressions_tab(){
+	
+		if(isset($_REQUEST['regexpid']) && !isset($_REQUEST["form_refresh"])){
+			$expressions = array();
+			$sql = 'SELECT e.* '.
+					' FROM expressions e '.
+					' WHERE '.DBin_node('e.expressionid').
+						' AND e.regexpid='.$_REQUEST['regexpid'].
+					' ORDER BY e.expression_type';
+
+			$db_exps = DBselect($sql);
+			while($exp = DBfetch($db_exps)){
+				$expressions[] = $exp;
+			}
+		}
+		else{
+			$expressions 	= get_request('expressions',array());
+		}
+		
+		$tblExp = new CTableInfo();
+		$tblExp->setHeader(array(
+				new CCheckBox('all_expressions',null,'CheckAll("'.S_EXPRESSION.'","all_expressions","g_expressionid");'),
+				S_EXPRESSION,
+				S_EXPECTED_RESULT,
+				S_IGNORE_CASE,
+				S_EDIT
+			));
+
+//		zbx_rksort($timeperiods);
+		foreach($expressions as $id => $expression){
+		
+			$exp_result = expression_type2str($expression['expression_type']);
+			if(EXPRESSION_TYPE_ANY_INCLUDED == $expression['expression_type'])
+				$exp_result.=' ('.S_DELIMITER."='".$expression['delimiter']."')";
+				
+			$tblExp->AddRow(array(
+				new CCheckBox('g_expressionid[]', 'no', null, $id),
+				$expression['expression'],
+				$exp_result,
+				$expression['case_sensitive']?S_YES:S_NO,
+				new CButton('edit_expressionid['.$id.']',S_EDIT)
+				));
+				
+				
+			$tblExp->AddItem(new Cvar('expressions['.$id.'][expression]',		$expression['expression']));
+			$tblExp->AddItem(new Cvar('expressions['.$id.'][expression_type]',	$expression['expression_type']));
+			$tblExp->AddItem(new Cvar('expressions['.$id.'][case_sensitive]',	$expression['case_sensitive']));
+			$tblExp->AddItem(new Cvar('expressions['.$id.'][delimiter]',		$expression['delimiter']));
+		}
+
+		$buttons = array();
+		if(!isset($_REQUEST['new_expression'])){
+			$buttons[] = new CButton('new_expression',S_NEW);
+			$buttons[] = new CButton('delete_expression',S_DELETE);
+		}
+		
+		$td = new CCol($buttons);
+		$td->AddOption('colspan','5');
+		$td->AddOption('style','text-align: right;');
+
+		
+		$tblExp->SetFooter($td);
+		
+	return $tblExp;
+	}
+
+	function get_expression_form(){
+		$tblExp = new CTable();
+
+		/* init new_timeperiod variable */
+		$new_expression = get_request('new_expression', array());
+
+		if(is_array($new_expression) && isset($new_expression['id'])){
+			$tblExp->AddItem(new Cvar('new_expression[id]',$new_expression['id']));
+		}
+		
+		if(!is_array($new_expression)){
+			$new_expression = array();
+		}
+
+		if(!isset($new_expression['expression']))			$new_expression['expression']		= '';
+		if(!isset($new_expression['expression_type']))		$new_expression['expression_type']	= EXPRESSION_TYPE_INCLUDED;
+		if(!isset($new_expression['case_sensitive']))		$new_expression['case_sensitive']	= 0;
+		if(!isset($new_expression['delimiter']))			$new_expression['delimiter']		= ',';
+		
+		$tblExp->addRow(array(S_EXPRESSION, new CTextBox('new_expression[expression]',$new_expression['expression'],60)));
+		
+		$cmbType = new CComboBox('new_expression[expression_type]',$new_expression['expression_type'],'javascript: submit();');
+		$cmbType->addItem(EXPRESSION_TYPE_INCLUDED,expression_type2str(EXPRESSION_TYPE_INCLUDED));
+		$cmbType->addItem(EXPRESSION_TYPE_ANY_INCLUDED,expression_type2str(EXPRESSION_TYPE_ANY_INCLUDED));
+		$cmbType->addItem(EXPRESSION_TYPE_NOT_INCLUDED,expression_type2str(EXPRESSION_TYPE_NOT_INCLUDED));
+		$cmbType->addItem(EXPRESSION_TYPE_TRUE,expression_type2str(EXPRESSION_TYPE_TRUE));
+		$cmbType->addItem(EXPRESSION_TYPE_FALSE,expression_type2str(EXPRESSION_TYPE_FALSE));
+
+		$tblExp->addRow(array(S_EXPRESSION_TYPE,$cmbType));
+		
+		if(EXPRESSION_TYPE_ANY_INCLUDED == $new_expression['expression_type']){
+			$cmbDelimiter = new CComboBox('new_expression[delimiter]',$new_expression['delimiter']);
+			$cmbDelimiter->addItem(',',',');
+			$cmbDelimiter->addItem('.','.');
+			$cmbDelimiter->addItem('/','/');
+			
+			$tblExp->addRow(array(S_DELIMITER,$cmbDelimiter));
+		}
+		else{
+			$tblExp->AddItem(new Cvar('new_expression[delimiter]',$new_expression['delimiter']));
+		}
+				
+		$chkbCase = new CCheckBox('new_expression[case_sensitive]', $new_expression['case_sensitive'],null,1);
+		
+		$tblExp->addRow(array(S_IGNORE_CASE,$chkbCase));
+
+
+		$tblExpFooter = new CTableInfo($tblExp);
+		
+		$oper_buttons = array();
+
+		$oper_buttons[] = new CButton('add_expression',isset($new_expression['id'])?S_SAVE:S_ADD);
+		$oper_buttons[] = new CButton('cancel_new_expression',S_CANCEL);
+		
+		$td = new CCol($oper_buttons);
+		$td->AddOption('colspan',2);
+		$td->AddOption('style','text-align: right;');
+
+		$tblExpFooter->SetFooter($td);
+// end of condition list preparation
+	return $tblExpFooter;
 	}
 ?>

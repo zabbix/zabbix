@@ -493,13 +493,6 @@ table.tableinfo tr td {
 	height: 20px;
 }
 
-table.tableinfo tr td.wraptext {
-	white-space:normal;
-}
-
-table.tableinfo tr td.message {
-	text-align: center;
-}
 table.tableinfo tr.header td {
 	white-space: nowrap;
 	word-spacing:	0px;
@@ -507,6 +500,7 @@ table.tableinfo tr.header td {
 	background-color:#CCCCCC;
 	border-width: 0px;
 }
+
 table.tableinfo tr.vertical_header td {
 	padding-left: 0px;
 	padding-right: 0px;
@@ -521,12 +515,7 @@ table.tableinfo tr.vertical_header td {
 	text-align: center;
 	width: 20px;
 }
-table.tableinfo tr.header td {
-	white-space: nowrap;
-	word-spacing:	0px;
-	font-weight: bold; 
-	background-color:#CCCCCC;
-}
+
 table.tableinfo tr.footer td {
 	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
@@ -537,6 +526,15 @@ table.tableinfo tr.footer td {
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:10px;
 }
+
+table.tableinfo tr td.wraptext {
+	white-space:normal;
+}
+
+table.tableinfo tr td.message {
+	text-align: center;
+}
+
 table.tableinfo tr.odd_row td			{	background-color: #DDDDDD; border: 1px #DDDDDD solid; }
 table.tableinfo tr.odd_row:hover td		{	background-color: #DDDDEE; border: 1px #DDDDEE solid; }
 
@@ -589,6 +587,7 @@ table.tableinfo tr:hover td.active		{	background-color: #AAD9AA;	border: 1px #AA
 
 table.tableinfo tr td.inactive			{	background-color: #FF8888;	border: 1px #FF8888 solid; }
 table.tableinfo tr:hover td.inactive		{	background-color: #FA8388;	border: 1px #FA8388 solid; }
+
 /****** HEADER *********/
 
 table.header{

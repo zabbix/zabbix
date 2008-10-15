@@ -633,7 +633,7 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 			info('DBcondition Error: ['.$fieldname.'] = '.$array);
 			$array = explode(',',$array);
 			if(empty($array))
-				return ' 1=1 ';
+				return ' 1=0 ';
 		}
 
 		$in = 		$notin?' NOT IN ':' IN ';

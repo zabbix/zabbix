@@ -467,6 +467,39 @@
 	'S_NOTHING_TO_DO'=>			'Nothing to do',
 	'S_ICORRECT_WORK_PERIOD'=>		'Icorrect work period',
 	
+	'S_REGULAR_EXPRESSIONS'=>		'Regular expressions',
+	'S_REGULAR_EXPRESSION'=>		'Regular expression',
+	'S_EXPRESSIONS'=>				'Expressions',
+	'S_EXPRESSION'=>				'Expression',
+	
+	'S_EXPECTED_RESULT'=>				'Expected result',
+	'S_CHARACTER_STRING_INCLUDED'=>		'Character string included',
+	'S_ANY_CHARACTER_STRING_INCLUDED'=>	'Any character string included',
+	'S_CHARACTER_STRING_NOT_INCLUDED'=>	'Character string not included',
+	'S_RESULT_IS_TRUE'=>				'Result is TRUE',
+	'S_RESULT_IS_FALSE'=>				'Result	is FALSE',
+	
+	'S_EXPRESSION_TYPE'=>				'Expression type',
+	'S_NEW_EXPRESSION'=>				'New expression',
+	'S_IGNORE_CASE'=>					'Ignore case',
+	'S_TEST'=>							'Test',
+	'S_DELIMITER'=>						'Delimiter',
+	'S_TEST_STRING'=>					'Test string',
+	'S_COMBINED_RESULT'=>				'Combined result',
+	
+	'S_NEW_REGULAR_EXPRESSION'=>			'New regular expression',
+	'S_REGULAR_EXPRESSION_ADDED'=>			'Regular expression added',
+	'S_CANNOT_ADD_REGULAR_EXPRESSION'=>		'Cannot add regular expression',
+	
+	'S_REGULAR_EXPRESSION_UPDATED'=>		'Regular expression updated',
+	'S_CANNOT_UPDATE_REGULAR_EXPRESSION'=>	'Cannot update regular expression',
+	
+	'S_REGULAR_EXPRESSION_DELETED'=>		'Regular expression deleted',
+	'S_CANNOT_DELETE_REGULAR_EXPRESSION'=>	'Cannot delete regular expression',
+	
+	'S_DELETE_REGULAR_EXPRESSION_Q'=>			'Delete regular expression?',
+	'S_DELETE_SELECTED_REGULAR_EXPRESSIONS_Q'=>	'Delete selected regular expressions?',
+	
 //	nodes.php
 	'S_NODE'=>				'Node',
 	'S_NODES'=>				'Nodes',
