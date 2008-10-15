@@ -103,7 +103,7 @@ function add_expression($regexpid, $expression = array()){
 	$db_fields = array('expression' => null,
 						'expression_type' => null,
 						'case_sensitive' => 0,
-						'delimiter' => ',',
+						'exp_delimiter' => ',',
 					);
 					
 	if(!check_db_fields($db_fields, $expression)){
@@ -113,13 +113,13 @@ function add_expression($regexpid, $expression = array()){
 		
 	$expressionid = get_dbid('expressions','expressionid');
 	
-	$result = DBexecute('INSERT INTO expressions (expressionid,regexpid,expression,expression_type,case_sensitive,delimiter) '.
+	$result = DBexecute('INSERT INTO expressions (expressionid,regexpid,expression,expression_type,case_sensitive,exp_delimiter) '.
 				' VALUES ('.$expressionid.','.
 						$regexpid.','.
 						zbx_dbstr($expression['expression']).','.
 						$expression['expression_type'].','.
 						$expression['case_sensitive'].','.
-						zbx_dbstr($expression['delimiter']).')');
+						zbx_dbstr($expression['exp_delimiter']).')');
 			
 return $result?$expressionid:false;
 }
