@@ -246,11 +246,12 @@
 			$this->AddAction('onMouseMove',	'update_hint(this,event);');
 		}
 
-		function OnClick($handle_code){
-			$this->AddAction('onclick', $handle_code);
+		function onClick($handle_code)
+		{
+			$this->AddAction('onClick', $handle_code);
 		}
 
-		function AddAction($name, $value){
+		function addAction($name, $value){
 			if(is_object($value)){
 				$this->options[$name] = unpack_object($value);
 			}
@@ -267,6 +268,15 @@
 				$this->options[$name] = htmlspecialchars(strval($value)); 
 			else
 				unset($this->options[$name]);
+		}
+		
+		function addStyle($value){
+			if(!isset($this->options['style'])) $this->options['style'] = '';
+			
+			if(isset($value))
+				$this->options['style'] .= htmlspecialchars(strval($value)); 
+			else
+				unset($this->options['style']);
 		}
 
 		function SetEnabled($value='yes'){
