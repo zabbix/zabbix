@@ -33,13 +33,13 @@ include_once 'include/page_header.php';
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"graphid"=>		array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
-		"period"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
-		"from"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	null,		null),
-		"stime"=>		array(T_ZBX_STR, O_OPT,		P_SYS,		null,		null),
-		"border"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	IN('0,1'),	null),
-		"width"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
-		"height"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
+		'graphid'=>		array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
+		'period'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
+		'from'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	null,		null),
+		'stime'=>		array(T_ZBX_STR, O_OPT,		P_SYS,		null,		null),
+		'border'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	IN('0,1'),	null),
+		'width'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
+		'height'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
 	);
 
 	check_fields($fields);
@@ -93,12 +93,19 @@ include_once 'include/page_header.php';
 	$graph->SetWidth($width);
 	$graph->SetHeight($height);
 	$graph->SetHeader($db_data['host'].':'.$db_data['name']);
-	$graph->SetYAxisType($db_data['yaxistype']);
+
+	$graph->SetYMinAxisType($db_data['ymin_type']);
+	$graph->SetYMaxAxisType($db_data['ymax_type']);
+
 	$graph->SetYAxisMin($db_data['yaxismin']);
-	$graph->SetYAxisMax($db_data['yaxismax']);	
+	$graph->SetYAxisMax($db_data['yaxismax']);
+	
+	$graph->SetYMinItemId($db_data['ymin_itemid']);
+	$graph->SetYMaxItemId($db_data['ymax_itemid']);
+
 	$graph->setLeftPercentage($db_data['percent_left']);
 	$graph->setRightPercentage($db_data['percent_right']);
-
+	
 	$result = DBselect('SELECT gi.* '.
 		' FROM graphs_items gi '.
 		' WHERE gi.graphid='.$db_data['graphid'].
