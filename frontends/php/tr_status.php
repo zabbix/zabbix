@@ -95,9 +95,10 @@ include_once "include/page_header.php";
 		'filter_rst'=>				array(T_ZBX_INT, O_OPT,		P_SYS,	IN(array(0,1)),			NULL),
 		'filter_set'=>				array(T_ZBX_STR, O_OPT,		P_SYS,	null,					NULL),
 
-		'show_triggers'=>	array(T_ZBX_INT, O_OPT,  	null, 	null, 	null),
-		'show_events'=>		array(T_ZBX_INT, O_OPT,		P_SYS,	null,	null),
-		'show_severity'=>	array(T_ZBX_INT, O_OPT,		P_SYS,	null,	null),
+		'show_triggers'=>		array(T_ZBX_INT, O_OPT,  	null, 	null, 	null),
+		'show_events'=>			array(T_ZBX_INT, O_OPT,		P_SYS,	null,	null),
+		'show_severity'=>		array(T_ZBX_INT, O_OPT,		P_SYS,	null,	null),
+		'show_events_status'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	null,	null),
 
 		'show_actions'=>		array(T_ZBX_INT, O_OPT, 	null,	null, 	null),
 		'show_details'=>		array(T_ZBX_INT, O_OPT,  	null,	null, 	null),
@@ -138,9 +139,10 @@ include_once "include/page_header.php";
 		$_REQUEST['show_actions']	= get_request('show_actions',	0);
 		$_REQUEST['show_details'] 	= get_request('show_details',	0);
 		
-		$_REQUEST['show_triggers']	= get_request('show_triggers',	TRIGGERS_OPTION_ONLYTRUE);
-		$_REQUEST['show_events'] 	= get_request('show_events',	EVENTS_OPTION_NOEVENT);
-		$_REQUEST['show_severity'] 	= get_request('show_severity',	-1);
+		$_REQUEST['show_triggers']		= get_request('show_triggers',	TRIGGERS_OPTION_ONLYTRUE);
+		$_REQUEST['show_events'] 		= get_request('show_events',	EVENTS_OPTION_NOEVENT);
+		$_REQUEST['show_events_status']	= get_request('show_events_status', EVENTS_NOFALSEFORB_STATUS_ALL);
+		$_REQUEST['show_severity'] 		= get_request('show_severity',	-1);
 		
 		$_REQUEST['txt_select']	 	= get_request('txt_select',	'');
 		$_REQUEST['inverse_select']	= get_request('inverse_select',	0);
@@ -159,8 +161,9 @@ include_once "include/page_header.php";
 		$_REQUEST['inverse_select']	= get_request('inverse_select',	get_profile('web.tr_status.filter.inverse_select',0));
 	}
 	
-	$_REQUEST['show_triggers']	= get_request('show_triggers',	get_profile('web.tr_status.filter.show_triggers',TRIGGERS_OPTION_ONLYTRUE));
-	$_REQUEST['show_events'] 	= get_request('show_events',	get_profile('web.tr_status.filter.show_events',EVENTS_OPTION_NOEVENT));
+	$_REQUEST['show_triggers']		= get_request('show_triggers',	get_profile('web.tr_status.filter.show_triggers',TRIGGERS_OPTION_ONLYTRUE));
+	$_REQUEST['show_events'] 		= get_request('show_events',	get_profile('web.tr_status.filter.show_events',EVENTS_OPTION_NOEVENT));
+	$_REQUEST['show_events_status']	= get_request('show_events_status',	get_profile('web.tr_status.filter.show_events_status',EVENTS_NOFALSEFORB_STATUS_ALL));
 	
 	$_REQUEST['show_severity'] 	= get_request('show_severity',	get_profile('web.tr_status.filter.show_severity',-1));
 	
@@ -351,11 +354,26 @@ include_once "include/page_header.php";
 	if($show_triggers==TRIGGERS_OPTION_NOFALSEFORB){
 		$ev_select->AddItem(EVENTS_OPTION_NOFALSEFORB,' - ','yes');
 		$ev_select->AddOption('disabled','disabled');
+		
+		$ev_status = new CComboBox('show_events_status',$show_events_status,'javascript: submit();');
+		$ev_status->addItem(EVENTS_NOFALSEFORB_STATUS_ALL, S_SHOW_ALL);
+		$ev_status->addItem(EVENTS_NOFALSEFORB_STATUS_FALSE, S_SHOW_ONLY_FALSE);
+		$ev_status->addItem(EVENTS_NOFALSEFORB_STATUS_TRUE, S_SHOW_ONLY_TRUE);
 	}
 //---
 
-	$filterForm->AddRow(S_TRIGGERS,$tr_select);	
-	$filterForm->AddRow(S_EVENTS,$ev_select);
+	$filterForm->AddRow(S_TRIGGERS,$tr_select);
+	
+// JP
+	if($show_triggers==TRIGGERS_OPTION_NOFALSEFORB){
+		$filterForm->AddRow(S_STATUS,$ev_status);
+		$filterForm->addVar('show_events',$show_events);
+	}
+	else{
+		$filterForm->AddRow(S_EVENTS,$ev_select);
+		$filterForm->addVar('show_events_status',$show_events_status);
+	}
+	
 	
 	$severity_select = new CComboBox('show_severity',$show_severity,'javasctipt: submit();');
 	$severity_select->AddItem(-1, S_ALL_S);
@@ -586,12 +604,15 @@ include_once "include/page_header.php";
 		$res_events = DBSelect($event_sql,$config['event_show_max']*100);
 
 		while($row_event=DBfetch($res_events)){
-			if(($show_events == EVENTS_OPTION_NOFALSEFORB) && ($row_event['value'] == TRIGGER_VALUE_FALSE)){
-				if(!event_initial_time($row_event)){
+			if($show_events == EVENTS_OPTION_NOFALSEFORB){
+				if((EVENTS_NOFALSEFORB_STATUS_FALSE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_FALSE)) continue;
+				if((EVENTS_NOFALSEFORB_STATUS_TRUE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_TRUE)) continue;
+				
+				if(($row_event['value'] == TRIGGER_VALUE_FALSE) && (!event_initial_time($row_event))){
 					continue;
 				}
 			}
-
+			
 			$value = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));	
 
 			if($config['event_ack_enable']){

@@ -1584,6 +1584,8 @@
 	'S_SHOW_NOFALSEFORB'=>				'Show all(no FALSE for B)',
 	'S_SHOW_UNACKNOWLEDGED'=>			'Show unacknowledged',
 	'S_SHOW_PROBLEM_UNACKNOWLEDGED'=>	'Show problem-unacknowledged',
+	'S_SHOW_ONLY_FALSE'=>				'Show only FALSE',
+	'S_SHOW_ONLY_TRUE'=>				'Show only TRUE',
 	'S_NOT_ACKNOWLEDGED'=>				'Not acknowledged',
 	'S_HIDE_DETAILS'=>					'Hide details',
 	'S_SHOW_DETAILS'=>					'Show details',
