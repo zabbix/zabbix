@@ -165,7 +165,10 @@
 				'width'			=> '',
 				'height'		=> ''),
 			'elements'	=> array(
-				'yaxistype'		=> '',
+				'ymin_type'		=> '',
+				'ymax_type'		=> '',
+				'ymin_itemid'		=> '',
+				'ymax_itemid'		=> '',
 				'show_work_period'	=> '',
 				'show_triggers'		=> '',
 				'graphtype'		=> '',

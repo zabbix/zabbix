@@ -22,9 +22,9 @@
 require_once('include/items.inc.php');
 require_once('include/hosts.inc.php');
 
-define('GRAPH_YAXIS_TYPE_CALCULATED',0);
-define('GRAPH_YAXIS_TYPE_FIXED',1);
-define('GRAPH_YAXIS_TYPE_CALCULATED_0_MIN',2);
+define("GRAPH_YAXIS_TYPE_CALCULATED",	0);
+define("GRAPH_YAXIS_TYPE_FIXED",		1);
+define("GRAPH_YAXIS_TYPE_ITEM_VALUE",	2);
 
 define('GRAPH_YAXIS_SIDE_LEFT',0);
 define('GRAPH_YAXIS_SIDE_RIGHT',1);

@@ -48,13 +48,18 @@ include_once 'include/page_header.php';
 		'name'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save})'),
 		'width'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		'height'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
-		'yaxistype'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+
+		'ymin_type'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		'isset({save})'),
+		'ymax_type'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		'isset({save})'),
+
 		'graphtype'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2,3'),		'isset({save})'),
 		
 		'yaxismin'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
 		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
 		'graph3d'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
 		'legend'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
+		"ymin_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'isset({save})&&isset({ymin_type})&&({ymin_type}==3)'),
+		"ymax_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'isset({save})&&isset({ymax_type})&&({ymax_type}==3)'),
 		
 		'percent_left'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
 		'percent_right'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
@@ -125,7 +130,9 @@ include_once 'include/page_header.php';
 			info(S_REQUIRED_ITEMS_FOR_GRAPH);
 		}
 		else{
-			isset($_REQUEST['yaxistype'])?(''):($_REQUEST['yaxistype']=0);
+			isset($_REQUEST["ymin_type"])?(''):($_REQUEST["ymin_type"]=0);
+			isset($_REQUEST["ymax_type"])?(''):($_REQUEST["ymax_type"]=0);
+
 			isset($_REQUEST['yaxismin'])?(''):($_REQUEST['yaxismin']=0);
 			isset($_REQUEST['yaxismax'])?(''):($_REQUEST['yaxismax']=0);
 			
@@ -138,13 +145,22 @@ include_once 'include/page_header.php';
 			
 			if(isset($visible['percent_left'])) 	$percent_left  = get_request('percent_left', 0);
 			if(isset($visible['percent_right']))	$percent_right = get_request('percent_right', 0);
-
+			
+			if($_REQUEST['ymin_itemid'] != 0){
+				$_REQUEST["yaxismin"]=0;
+			}
+			
+			if($_REQUEST['ymax_itemid'] != 0){
+				$_REQUEST["yaxismax"]=0;
+			}
+			
 			if(isset($_REQUEST['graphid'])){
 				
 				DBstart();
 				update_graph_with_items($_REQUEST['graphid'],
 					$_REQUEST['name'],$_REQUEST['width'],$_REQUEST['height'],
-					$_REQUEST['yaxistype'],$_REQUEST['yaxismin'],$_REQUEST['yaxismax'],
+					$_REQUEST["ymin_type"],$_REQUEST["ymax_type"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
+					$_REQUEST['ymin_itemid'],$_REQUEST['ymax_itemid'],
 					$showworkperiod,$showtriggers,$_REQUEST['graphtype'],$_REQUEST['legend'],
 					$_REQUEST['graph3d'],$percent_left,$percent_right,$items);
 				$result = DBend();
@@ -157,7 +173,8 @@ include_once 'include/page_header.php';
 			else{
 				DBstart();
 				add_graph_with_items($_REQUEST['name'],$_REQUEST['width'],$_REQUEST['height'],
-					$_REQUEST['yaxistype'],$_REQUEST['yaxismin'],$_REQUEST['yaxismax'],
+					$_REQUEST["ymin_type"],$_REQUEST["ymax_type"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
+					$_REQUEST['ymin_itemid'],$_REQUEST['ymax_itemid'],
 					$showworkperiod,$showtriggers,$_REQUEST['graphtype'],$_REQUEST['legend'],
 					$_REQUEST['graph3d'],$percent_left,$percent_right,$items);
 				$result = DBend();
@@ -308,9 +325,11 @@ include_once 'include/page_header.php';
 		}
 		else{
 			$table->AddRow(new CImg('chart3.php?period=3600'.url_param('items').
-				url_param('name').url_param('width').url_param('height').url_param('yaxistype').
-				url_param('yaxismin').url_param('yaxismax').url_param('show_work_period').
-				url_param('show_triggers').url_param('graphtype').url_param('percent_left').url_param('percent_right')));
+				url_param('name').url_param('width').url_param('height').
+				url_param('ymin_type').url_param('ymax_type').url_param('yaxismin').url_param('yaxismax').
+				url_param('ymin_itemid').url_param('ymax_itemid').
+				url_param('show_work_period').url_param('show_triggers').url_param('graphtype').
+				url_param('percent_left').url_param('percent_right')));
 			$table->Show();
 		}
 	} 

@@ -40,11 +40,18 @@ include_once 'include/page_header.php';
 		'name'=>	array(T_ZBX_STR, O_OPT,	NULL,		null,			null),
 		'width'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
 		'height'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
-		'yaxistype'=>	array(T_ZBX_INT, O_OPT,	NULL,		IN('0,1,2'),		null),
+
+		'ymin_type'=>	array(T_ZBX_INT, O_OPT,	NULL,		IN('0,1,2'),		null),
+		'ymax_type'=>	array(T_ZBX_INT, O_OPT,	NULL,		IN('0,1,2'),		null),
+
+		'ymin_itemid'=>	array(T_ZBX_INT, O_OPT,	NULL,		DB_ID,	null),
+		'ymax_itemid'=>	array(T_ZBX_INT, O_OPT,	NULL,		DB_ID,	null),
+
 		'graphtype'=>	array(T_ZBX_INT, O_OPT,	NULL,		IN('0,1'),		null),
+
 		'yaxismin'=>	array(T_ZBX_DBL, O_OPT,	NULL,		BETWEEN(-65535,65535),	null),
 		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,	null),
-		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,	null),
+
 		'percent_left'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
 		'percent_right'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
 
@@ -84,12 +91,18 @@ include_once 'include/page_header.php';
 
 	$graph->ShowWorkPeriod(get_request('showworkperiod'	,1));
 	$graph->ShowTriggers(get_request('showtriggers'		,1));
-	$graph->SetYAxisType(get_request('yaxistype'		,GRAPH_YAXIS_TYPE_CALCULATED));
+	
+	$graph->SetYMinAxisType(get_request('ymin_type'		,GRAPH_YAXIS_TYPE_CALCULATED));
+	$graph->SetYMaxAxisType(get_request('ymax_type'		,GRAPH_YAXIS_TYPE_CALCULATED));
+	
 	$graph->SetYAxisMin(get_request('yaxismin'		,0.00));
 	$graph->SetYAxisMax(get_request('yaxismax'		,100.00));
+	
+	$graph->SetYMinItemId(get_request('ymin_itemid'		,0));
+	$graph->SetYMaxItemId(get_request('ymax_itemid'		,0));
+
 	$graph->setLeftPercentage(get_request('percent_left',0));
 	$graph->setRightPercentage(get_request('percent_right',0));
-
 
 	foreach($items as $id => $gitem){
 		$graph->AddItem(

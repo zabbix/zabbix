@@ -1,5 +1,6 @@
 Changes for 1.6.1
 
+ - [DEV-247] added enhancement to the Graph function (Artem)
  - [ZBX-527] fixed possible poller crash (Sasha)
  - [ZBX-533] fixed incorrect SNMP string to float conversion (Sasha)
  - [ZBX-534] fixed problem with email messages for discovery events (Sasha)
