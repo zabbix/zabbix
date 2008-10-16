@@ -441,7 +441,9 @@ static int get_values(int now, int *nextcheck)
 		{
 			if (*nextcheck == FAIL || (item.nextcheck != 0 && *nextcheck > item.nextcheck))
 				*nextcheck = item.nextcheck;
-			goto skip;
+			if (poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
+				DBfree_result(result2);
+			continue;
 		}
 
 		init_result(&agent);
@@ -611,7 +613,7 @@ static int get_values(int now, int *nextcheck)
 		}
 
 		items++;
-skip:
+
 		/* Poller for unreachable hosts */
 		if (poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
 		{
