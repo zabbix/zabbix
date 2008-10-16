@@ -96,8 +96,10 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		"noactions"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
 		"compact"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
 		
-		"show_triggers"=>	array(T_ZBX_INT, O_OPT,  null, null, null),
-		"show_events"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	null,	null),
+		"show_triggers"=>		array(T_ZBX_INT, O_OPT, P_SYS,	null,	null),
+		"show_events"=>			array(T_ZBX_INT, O_OPT,	P_SYS,	null,	null),
+		'show_events_status'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	null,	null),
+		
 		"select"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
 		"txt_select"=>	array(T_ZBX_STR, O_OPT,  null,	null, null),
 		"fullscreen"=>	array(T_ZBX_STR, O_OPT,  null,	null, null),
@@ -122,7 +124,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	update_profile('web.tr_status.compact',$_REQUEST['compact']);
 	
 	$config=select_config();
-	
+
 ?>
 <?php
 	if(isset($audio))
@@ -131,13 +133,14 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	}
 ?>                                                                                                             
 <?php
-	$sort			= get_request('sort',		'lastchange');
-	$noactions		= get_request('noactions',	'true');
-	$compact	 	= get_request('compact',	'true');
-	$show_triggers	= get_request('show_triggers',	TRIGGERS_OPTION_ONLYTRUE);
-	$show_events 	= get_request('show_events',	EVENTS_OPTION_NOEVENT);
-	$select		 	= get_request('select',		'false');
-	$txt_select	 	= get_request('txt_select',	'');
+	$sort				= get_request('sort',		'lastchange');
+	$noactions			= get_request('noactions',	'true');
+	$compact		 	= get_request('compact',	'true');
+	$show_triggers		= get_request('show_triggers',	TRIGGERS_OPTION_ONLYTRUE);
+	$show_events 		= get_request('show_events',	EVENTS_OPTION_NOEVENT);
+	$show_events_status	= get_request('show_events_status', EVENTS_NOFALSEFORB_STATUS_ALL);
+	$select		 		= get_request('select',		'false');
+	$txt_select	 		= get_request('txt_select',	'');
 	
 	if($select == 'false') $txt_select = '';
 
@@ -242,41 +245,57 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		$tr_form->AddVar("noactions",$noactions);
 		$tr_form->AddVar("select",$select);
 		
-		$tr_select = new CComboBox('show_triggers',S_TRIGGERS,'javascript: submit();');
+		$tr_select = new CComboBox('show_triggers',$show_triggers,'javascript: submit();');
 		if(TRIGGERS_OPTION_ONLYTRUE){
-			$tr_select->Additem(TRIGGERS_OPTION_ONLYTRUE,S_SHOW_ONLY_TRUE,(TRIGGERS_OPTION_ONLYTRUE==$show_triggers)?'yes':'no');
+			$tr_select->addItem(TRIGGERS_OPTION_ONLYTRUE,S_SHOW_ONLY_TRUE);
 		}
 		if(TRIGGERS_OPTION_ALL){
-			$tr_select->Additem(TRIGGERS_OPTION_ALL,S_SHOW_ALL,(TRIGGERS_OPTION_ALL==$show_triggers)?'yes':'no');
+			$tr_select->addItem(TRIGGERS_OPTION_ALL,S_SHOW_ALL);
 		}
 		if(TRIGGERS_OPTION_NOFALSEFORB && $config['event_ack_enable']){
-			$tr_select->Additem(TRIGGERS_OPTION_NOFALSEFORB,S_SHOW_NOFALSEFORB,(TRIGGERS_OPTION_NOFALSEFORB==$show_triggers)?'yes':'no');
+			$tr_select->addItem(TRIGGERS_OPTION_NOFALSEFORB,S_SHOW_NOFALSEFORB);
 		}
-		
-		$ev_select = new CComboBox('show_events',S_EVENTS,'javascript: submit();');
+
+		$ev_select = new CComboBox('show_events',$show_events,'javascript: submit();');
 		if(EVENTS_OPTION_NOEVENT){
-			$ev_select->Additem(EVENTS_OPTION_NOEVENT,S_HIDE_ALL,(EVENTS_OPTION_NOEVENT==$show_events)?'yes':'no');
+			$ev_select->addItem(EVENTS_OPTION_NOEVENT,S_HIDE_ALL);
 		}
 		if(EVENTS_OPTION_ALL){
-			$ev_select->Additem(EVENTS_OPTION_ALL,S_SHOW_ALL.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_ALL==$show_events)?'yes':'no');
+			$ev_select->addItem(EVENTS_OPTION_ALL,S_SHOW_ALL.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
 		}
 		if(EVENTS_OPTION_NOT_ACK && $config['event_ack_enable']){
-			$ev_select->Additem(EVENTS_OPTION_NOT_ACK,S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_NOT_ACK==$show_events)?'yes':'no');
+			$ev_select->addItem(EVENTS_OPTION_NOT_ACK,S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
 		}
 		if(EVENTS_OPTION_ONLYTRUE_NOTACK && $config['event_ack_enable']){
-			$ev_select->Additem(EVENTS_OPTION_ONLYTRUE_NOTACK,S_SHOW_TRUE_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_ONLYTRUE_NOTACK==$show_events)?'yes':'no');
+			$ev_select->addItem(EVENTS_OPTION_ONLYTRUE_NOTACK,S_SHOW_TRUE_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
 		}
 //------- JP -------
 		if($show_triggers==TRIGGERS_OPTION_NOFALSEFORB){
-			$ev_select->Additem(EVENTS_OPTION_NOFALSEFORB,' - ','yes');
-			$ev_select->AddOption('disabled','disabled');
+			$ev_select->addItem(EVENTS_OPTION_NOFALSEFORB,' - ','yes');
+			$ev_select->addOption('disabled','disabled');
+			
+			$ev_status = new CComboBox('show_events_status',$show_events_status,'javascript: submit();');
+			$ev_status->addItem(EVENTS_NOFALSEFORB_STATUS_ALL, S_SHOW_ALL);
+			$ev_status->addItem(EVENTS_NOFALSEFORB_STATUS_FALSE, S_SHOW_ONLY_FALSE);
+			$ev_status->addItem(EVENTS_NOFALSEFORB_STATUS_TRUE, S_SHOW_ONLY_TRUE);
 		}
-		
+//------------------
+
 		$tr_form->AddItem(S_TRIGGERS);
 		$tr_form->AddItem($tr_select);
 		
-		$tr_form->AddItem(SPACE.SPACE.S_EVENTS);
-		$tr_form->AddItem($ev_select);
+// JP
+		if($show_triggers==TRIGGERS_OPTION_NOFALSEFORB){
+			$tr_form->addItem(SPACE.SPACE.S_STATUS);
+			$tr_form->addItem($ev_status);
+			$tr_form->addVar('show_events',$show_events);
+		}
+		else{
+			$tr_form->AddItem(SPACE.SPACE.S_EVENTS);
+			$tr_form->AddItem($ev_select);
+			$tr_form->addVar('show_events_status',$show_events_status);
+		}
+
 		
 		array_push($left_col,$tr_form,SPACE);
 			
@@ -410,7 +429,9 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 						' AND t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
 						' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
 						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
-						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.' '.$sort;
+						' AND h.status='.HOST_STATUS_MONITORED.' '.
+						$cond.' '.
+					$sort;
 	$result = DBselect($sql);
 
 	while($row=DBfetch($result)){
@@ -527,8 +548,13 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		$event_limit=0;
 		$res_events = DBSelect($event_sql,$config['event_show_max']*100);
 		while($row_event=DBfetch($res_events)){
-			if(($show_events == EVENTS_OPTION_NOFALSEFORB) && ($row_event['value'] == TRIGGER_VALUE_FALSE)){
-				if(!event_initial_time($row_event)){
+
+			if($show_events == EVENTS_OPTION_NOFALSEFORB){
+
+				if((EVENTS_NOFALSEFORB_STATUS_FALSE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_FALSE)) continue;
+				if((EVENTS_NOFALSEFORB_STATUS_TRUE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_TRUE)) continue;
+				
+				if(($row_event['value'] == TRIGGER_VALUE_FALSE) && (!event_initial_time($row_event))){
 					continue;
 				}
 			}
@@ -593,7 +619,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	zbx_add_post_js('blink.init();');
 	$m_form->AddItem($table);
 
-	$m_form->Additem(get_table_header(array(S_TOTAL.": ",
+	$m_form->addItem(get_table_header(array(S_TOTAL.": ",
 							$table->GetNumRows(),
 							SPACE.SPACE.SPACE,
 							($config['event_ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE)

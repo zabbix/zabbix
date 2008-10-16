@@ -1,5 +1,6 @@
 Changes for 1.0.0:
 
+ - [DEV-243] added monitoring-triggers display option (Artem)
  - DM: fixed dbschema for maintenance_* tables (Sasha)
  - [DEV-247] added enhancement to the Graph function (Artem)
  - [DEV-233,DEV-237] added support of scheduled maintenance periods (Artem,Sasha)

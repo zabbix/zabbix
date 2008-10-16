@@ -1330,6 +1330,8 @@
 	'S_SHOW_NOFALSEFORB'=>			'Show all(no FALSE for B)',
 	'S_SHOW_UNACKNOWLEDGED'=>		'Show unacknowledged',
 	'S_SHOW_TRUE_UNACKNOWLEDGED'=>	'Show true-unacknowledged',
+	'S_SHOW_ONLY_FALSE'=>			'Show only FALSE',
+	'S_SHOW_ONLY_TRUE'=>			'Show only TRUE',
 	'S_HIDE_DETAILS'=>				'Hide details',
 	'S_SHOW_DETAILS'=>				'Show details',
 	'S_SELECT'=>					'Select',

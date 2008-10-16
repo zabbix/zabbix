@@ -315,7 +315,7 @@ include_once "include/page_header.php";
 			
 			$row = array_merge($triggers[$row['triggerid']],$row);
 			if((0 == $show_unknown) && (!event_initial_time($row,$show_unknown))) continue;
-			
+
 			$duration = zbx_date2age($row['clock']);
 			if($next_event = get_next_event($row,$show_unknown)){
 				$duration = zbx_date2age($row['clock'],$next_event['clock']);

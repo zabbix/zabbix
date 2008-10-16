@@ -305,7 +305,6 @@ function get_latest_events($row,$show_unknown=0){
 	$events = array();
 
 // SQL's are optimized that's why it's splited that way	
-// func MOD is used on object for forcing MySQL use different Index!!!
 
 /*******************************************/
 // Check for optimization after changing!  */
@@ -362,7 +361,7 @@ function get_next_event($row,$show_unknown=0){
 	$sql_cond=($show_unknown == 0)?' AND e.value<>'.TRIGGER_VALUE_UNKNOWN:'';
 	
 	if((TRIGGER_MULT_EVENT_ENABLED == $row['type']) && (TRIGGER_VALUE_TRUE == $row['value'])){
-		$sql = 'SELECT e.eventid, e.value '.
+		$sql = 'SELECT e.eventid, e.value, e.clock '.
 			' FROM events e'.
 			' WHERE e.objectid='.$row['triggerid'].
 				' AND e.eventid > '.$row['eventid'].
