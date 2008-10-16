@@ -31,6 +31,16 @@
 #include "../trapper/nodesync.h"
 
 
+static const ZBX_TABLE *DBget_table(const char *tablename)
+{
+	int	t;
+
+	for (t = 0; tables[t].table != 0; t++ )
+		if (0 == strcmp(tables[t].table, tablename))
+			return &tables[t];
+	return NULL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: calculate_checksums                                              *
