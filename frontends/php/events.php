@@ -286,8 +286,7 @@ include_once "include/page_header.php";
 				S_STATUS,
 				S_SEVERITY,
 				S_DURATION,
-				($config['event_ack_enable'])?S_ACK:NULL,
-				S_ACTIONS
+				($config['event_ack_enable'])?S_ACK:NULL
 			));
 
 		if(!empty($triggers)){
@@ -296,7 +295,7 @@ include_once "include/page_header.php";
 					' WHERE (e.object+0)='.EVENT_OBJECT_TRIGGER.
 						' AND '.DBcondition('e.objectid', $trigger_list).
 						$sql_cond.
-					' ORDER BY e.clock';
+					' ORDER BY e.clock DESC';
 //SDI($sql);
 			$result = DBselect($sql,10*($_REQUEST['start']+PAGE_SIZE));
 		}
@@ -321,9 +320,6 @@ include_once "include/page_header.php";
 			if($next_event = get_next_event($row,$show_unknown)){
 				$duration = zbx_date2age($row['clock'],$next_event['clock']);
 			}
-// Actions								
-			$actions= get_event_actions_status($row['eventid']);
-//--------		
 
 			if($config['event_ack_enable']){
 				if($row['acknowledged'] == 1){
@@ -346,8 +342,7 @@ include_once "include/page_header.php";
 				$value,
 				new CCol(get_severity_description($row["priority"]), get_severity_style($row["priority"],$row['value'])),
 				$duration,
-				($config['event_ack_enable'])?$ack:NULL,
-				$actions
+				($config['event_ack_enable'])?$ack:NULL
 			));
 				
 			$col++;
