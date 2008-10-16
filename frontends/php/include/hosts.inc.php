@@ -494,13 +494,32 @@ require_once('include/httptest.inc.php');
 		zbx_value2array($groupids);
 		if(empty($groupids)) return true;
 
+// delete sysmap element
 		if(!delete_sysmaps_elements_with_groupid($groupids))
 			return false;
 		
 // delete host from maintenances
 		DBexecute('DELETE FROM maintenances_groups WHERE '.DBcondition('groupid',$groupids));
+		
+// disable actions
+		$sql = 'SELECT DISTINCT actionid '.
+				' FROM conditions '.
+				' WHERE conditiontype='.CONDITION_TYPE_HOST_GROUP.
+					' AND '.DBcondition(zbx_dbcast_2bigint('value'),$groupids);	// FIXED[POSIBLE value type violation]!!!
+		$db_actions = DBselect($sql);
+									
+		while($db_action = DBfetch($db_actions)){
+			DBexecute('UPDATE actions '.
+					' SET status='.ACTION_STATUS_DISABLED.
+					' WHERE actionid='.$db_action['actionid']);
+		}
 
-// delete host from host groups
+// delete action conditions
+		DBexecute('DELETE FROM conditions '.
+					' WHERE conditiontype='.CONDITION_TYPE_HOST_GROUP.
+						' AND '.DBcondition(zbx_dbcast_2bigint('value'),$groupids));	// FIXED[POSIBLE value type violation]!!!
+
+
 		DBexecute('DELETE FROM hosts_groups WHERE '.DBcondition('groupid',$groupids));
 
 	return DBexecute('DELETE FROM groups WHERE '.DBcondition('groupid',$groupids));
