@@ -487,14 +487,35 @@ require_once "include/httptest.inc.php";
 	return DBexecute('DELETE FROM hosts WHERE '.DBcondition('hostid',$hostids));
 	}
 
-	function delete_host_group($groupid){
-		if(!delete_sysmaps_elements_with_groupid($groupid))
+	function delete_host_group($groupids){
+		zbx_value2array($groupids);
+		
+		if(!delete_sysmaps_elements_with_groupid($groupids))
 			return false;
 		
-		if(!DBexecute("delete from hosts_groups where groupid=$groupid"))
+// disable actions
+
+		$sql = 'SELECT DISTINCT actionid '.
+				' FROM conditions '.
+				' WHERE conditiontype='.CONDITION_TYPE_HOST_GROUP.
+					' AND '.DBcondition(zbx_dbcast_2bigint('value'),$groupids);	// FIXED[POSIBLE value type violation]!!!
+		$db_actions = DBselect($sql);
+									
+		while($db_action = DBfetch($db_actions)){
+			DBexecute('UPDATE actions '.
+					' SET status='.ACTION_STATUS_DISABLED.
+					' WHERE actionid='.$db_action['actionid']);
+		}
+
+// delete action conditions
+		DBexecute('DELETE FROM conditions '.
+					' WHERE conditiontype='.CONDITION_TYPE_HOST_GROUP.
+						' AND '.DBcondition(zbx_dbcast_2bigint('value'),$groupids));	// FIXED[POSIBLE value type violation]!!!
+						
+		if(!DBexecute('DELETE FROM hosts_groups WHERE '.DBcondition('groupid',$groupids)))
 			return false;
 
-		return DBexecute("delete from groups where groupid=$groupid");
+	return DBexecute('DELETE FROM groups WHERE '.DBcondition('groupid',$groupids));
 	}
 
 	function get_hostgroup_by_groupid($groupid){
