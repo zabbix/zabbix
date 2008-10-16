@@ -100,7 +100,7 @@ include_once "include/page_header.php";
 	$graph->SetYAxisMax(get_request("yaxismax"		,100.00));
 	
 	$graph->SetYMinItemId(get_request("ymin_itemid"		,0));
-	$graph->SetYMaxItemId(get_request("ymin_itemid"		,0));
+	$graph->SetYMaxItemId(get_request("ymax_itemid"		,0));
 
 	foreach($items as $id => $gitem)
 	{

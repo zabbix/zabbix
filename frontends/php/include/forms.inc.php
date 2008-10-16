@@ -2531,7 +2531,7 @@
 			$frmGraph->addVar('yaxismin',$yaxismin);
 			
 			$ymin_name = '';
-			if($min_itemid > 0){
+			if($ymin_itemid > 0){
 				$min_host = get_host_by_itemid($ymin_itemid);		
 				$min_item = get_item_by_itemid($ymin_itemid);
 				$ymin_name = $min_host['host'].':'.item_description($min_item["description"],$min_item["key_"]);
