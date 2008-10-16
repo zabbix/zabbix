@@ -550,7 +550,6 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		while($row_event=DBfetch($res_events)){
 
 			if($show_events == EVENTS_OPTION_NOFALSEFORB){
-
 				if((EVENTS_NOFALSEFORB_STATUS_FALSE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_FALSE)) continue;
 				if((EVENTS_NOFALSEFORB_STATUS_TRUE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_TRUE)) continue;
 				

@@ -438,16 +438,22 @@ include_once "include/page_header.php";
 	$cmbConfig->AddItem(7,S_WORKING_TIME);
 	$cmbConfig->AddItem(5,S_OTHER);
 	$form->AddItem($cmbConfig);
-	switch($_REQUEST["config"])
-	{
-	case 3:
-		$form->AddItem(SPACE."|".SPACE);
-		$form->AddItem(new CButton("form",S_CREATE_IMAGE));
-		break;
-	case 6:
-		$form->AddItem(SPACE."|".SPACE);
-		$form->AddItem(new CButton("form",S_CREATE_VALUE_MAP));
-		break;
+	switch($_REQUEST["config"]){
+		case 3:
+			$form->AddItem(SPACE."|".SPACE);
+			$form->AddItem(new CButton("form",S_CREATE_IMAGE));
+			break;
+		case 6:
+			$form->AddItem(SPACE."|".SPACE);
+			$form->AddItem(new CButton("form",S_CREATE_VALUE_MAP));
+			break;
+		case 9:
+			if(!isset($_REQUEST['form'])){
+				$form->addItem(SPACE.'|'.SPACE);
+				$form->addItem(new CButton('form',S_NEW_REGULAR_EXPRESSION));
+			}
+			break;
+
 	}
 	show_table_header(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
 ?>
@@ -621,11 +627,8 @@ include_once "include/page_header.php";
 		}
 		else{
 			echo BR;
-			$form = new CForm();
-			$form->addVar('config', $_REQUEST['config']);
-			$form->addItem(new CButton('form',S_NEW_REGULAR_EXPRESSION));
 			
-			show_table_header(S_REGULAR_EXPRESSIONS,$form);
+			show_table_header(S_REGULAR_EXPRESSIONS);
 // ----
 			$regexps = array();
 			$regexpids = array();
