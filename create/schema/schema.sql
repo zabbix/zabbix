@@ -409,9 +409,12 @@ FIELD		|graphid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|width		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|height		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|yaxistype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ymin_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ymax_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|yaxismin	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|yaxismax	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ymin_itemid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ymax_itemid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_work_period|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_triggers	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC

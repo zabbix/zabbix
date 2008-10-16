@@ -654,7 +654,12 @@
 						break; // case
 					}
 
-					if(!isset($data['yaxistype']))			$data['yaxistype']		= 0;
+					if(!isset($data['ymin_type']))		$data['ymin_type']		= 0;
+					if(!isset($data['ymax_type']))		$data['ymax_type']		= 0;
+
+					if(!isset($data['ymin_itemid']))	$data['ymin_itemid']	= 0;
+					if(!isset($data['ymax_itemid']))	$data['ymax_itemid']	= 0;
+					
 					if(!isset($data['show_work_period']))	$data['show_work_period']	= 1;
 					if(!isset($data['show_triggers']))		$data['show_triggers']		= 1;
 					if(!isset($data['graphtype']))			$data['graphtype']		= 0;
@@ -698,9 +703,12 @@
 								$data['name'],
 								$data['width'],
 								$data['height'],
-								$data['yaxistype'],
+								$data['ymin_type'],
+								$data['ymax_type'],
 								$data['yaxismin'],
 								$data['yaxismax'],
+								$data['ymin_itemid'],
+								$data['ymax_itemid'],
 								$data['show_work_period'],
 								$data['show_triggers'],
 								$data['graphtype'],
@@ -726,9 +734,12 @@
 							$data['name'],
 							$data['width'],
 							$data['height'],
-							$data['yaxistype'],
+							$data['ymin_type'],
+							$data['ymax_type'],
 							$data['yaxismin'],
 							$data['yaxismax'],
+							$data['ymin_itemid'],
+							$data['ymax_itemid'],
 							$data['show_work_period'],
 							$data['show_triggers'],
 							$data['graphtype'],
