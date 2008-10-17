@@ -20,6 +20,7 @@
 ?>
 <?php
 	require_once "include/config.inc.php";
+	require_once "include/events.inc.php";
 	
 	$page["title"] = "S_NETWORK_MAPS";
 	$page["file"] = "maps.php";
@@ -38,7 +39,8 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"sysmapid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,		NULL),
-		"fullscreen"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1"),	NULL)
+		"fullscreen"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1"),	NULL),
+		'show_triggers'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1,2,3"),	NULL),
 	);
 
 	check_fields($fields);
@@ -65,37 +67,51 @@ include_once "include/page_header.php";
 			$row['name'];
 	}
 
-	if(isset($_REQUEST["sysmapid"]) && (!isset($all_maps[$_REQUEST["sysmapid"]]) || $_REQUEST["sysmapid"] == 0))
-	{
-		if(count($all_maps))
-		{
+	if(isset($_REQUEST["sysmapid"]) && (!isset($all_maps[$_REQUEST["sysmapid"]]) || $_REQUEST["sysmapid"] == 0)){
+		if(count($all_maps)){
 			$_REQUEST["sysmapid"] = $all_maps[0];
 		}
-		else
-		{
+		else{
 			unset($_REQUEST["sysmapid"]);
 		}
 	}
 	unset($all_maps[0]);
 	
-	if(isset($_REQUEST["sysmapid"]))
-	{
+	if(isset($_REQUEST["sysmapid"])){
 		update_profile("web.maps.sysmapid",$_REQUEST["sysmapid"]);
 	}
+	
+	$_REQUEST['show_triggers'] = get_request('show_triggers', get_profile('web.tr_status.show_triggers', TRIGGERS_OPTION_ALL));
+	update_profile('web.tr_status.show_triggers',$_REQUEST['show_triggers']);
 ?>
 <?php
 	$text = array(S_NETWORK_MAPS_BIG);
+	
 	if(isset($_REQUEST["sysmapid"]))
 	{
 		$sysmap = get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
 
 		$url = "maps.php?sysmapid=".$_REQUEST["sysmapid"];
-		if(!isset($_REQUEST["fullscreen"]))
-			$url .= "&fullscreen=1";
+		if(!isset($_REQUEST["fullscreen"])){
+			$url_fs = $url.'&fullscreen=1';
+		}
+		else{
+			$url_fs = $url;
+			$url.='&fullscreen='.$_REQUEST["fullscreen"];
+		}
 
-		array_push($text, nbsp(" / "), new CLink($all_maps[$_REQUEST["sysmapid"]],$url));
-	}
+		array_push($text, nbsp(' / '), new CLink($all_maps[$_REQUEST["sysmapid"]],$url_fs));
 
+		if(TRIGGERS_OPTION_NOFALSEFORB == $_REQUEST['show_triggers']){
+			$tr_status_url = new CLink(S_SHOW_ALL,$url.'&show_triggers='.TRIGGERS_OPTION_ALL);
+		}
+		else{
+			$tr_status_url = new CLink(S_SHOW_NOFALSEFORB,$url.'&show_triggers='.TRIGGERS_OPTION_NOFALSEFORB);
+		}
+		
+		array_push($text, SPACE.SPACE.SPACE.SPACE.' [', $tr_status_url,']');
+	}	
+	
 	$form = new CForm();
 	$form->SetMethod('get');
 	
@@ -122,7 +138,7 @@ include_once "include/page_header.php";
 		$action_map = get_action_map_by_sysmapid($_REQUEST["sysmapid"]);
 		$table->AddRow($action_map);
 
-		$imgMap = new CImg("map.php?noedit=1&sysmapid=".$_REQUEST["sysmapid"]);
+		$imgMap = new CImg("map.php?noedit=1&sysmapid=".$_REQUEST["sysmapid"].url_param('show_triggers'));
 		$imgMap->SetMap($action_map->GetName());
 		$table->AddRow($imgMap);
 	}

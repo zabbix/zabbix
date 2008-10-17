@@ -448,7 +448,7 @@
 			$db_triggers = DBselect($sql[$el_type]);
 			$trigger = DBfetch($db_triggers);
 			if($trigger)
-			{
+			{				
 				if(isset($trigger['el_name'])){
 					$el_name = $trigger['el_name'];
 				}
@@ -462,6 +462,18 @@
 				}
 
 				do {
+					if(isset($_REQUEST['show_triggers']) && (TRIGGERS_OPTION_NOFALSEFORB == $_REQUEST['show_triggers'])){
+						$event_sql = 'SELECT e.eventid, e.value, e.clock, e.ms, e.objectid as triggerid, e.acknowledged, t.type '.
+							' FROM events e, triggers t '.
+							' WHERE e.object=0 AND e.objectid='.$trigger['triggerid'].
+								' AND t.triggerid=e.objectid '.
+								' AND e.acknowledged=0 '.
+								' AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))'.
+							' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
+		
+						$trigger = get_row_for_nofalseforb($trigger,$event_sql);
+					}
+					
 					$type	=& $trigger['value'];
 
 					if(!isset($tr_info[$type]))

@@ -21,6 +21,7 @@
 <?php
 	require_once "include/config.inc.php";
 	require_once "include/maps.inc.php";
+	require_once "include/events.inc.php";
 		
 	$page["title"] = "S_MAP";
 	$page["file"] = "map.php";
@@ -32,9 +33,10 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"sysmapid"=>	array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL),
-		"noedit"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),	NULL),
-		"border"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL)
+		"sysmapid"=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL),
+		"noedit"=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),	NULL),
+		"border"=>			array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
+		'show_triggers'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1,2,3"),	NULL),
 	);
 
 	check_fields($fields);

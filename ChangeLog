@@ -1,5 +1,6 @@
 Changes for 1.0.0:
 
+ - [DEV-240] added the type selection function for Triggers message display on MAP (Artem)
  - [DEV-241] added configurable message for displaying problems on maps (Artem)
  - [DEV-243] added monitoring-triggers display option (Artem)
  - DM: fixed dbschema for maintenance_* tables (Sasha)
