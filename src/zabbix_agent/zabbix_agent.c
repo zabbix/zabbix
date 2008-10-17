@@ -156,7 +156,6 @@ int	main(int argc, char **argv)
 
 	load_user_parameters();
 
-
 	/* Do not create debug files */
 	zabbix_open_log(LOG_TYPE_SYSLOG,LOG_LEVEL_EMPTY,NULL);
 
