@@ -623,6 +623,7 @@ FIELD		|height		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|backgroundid	|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|label_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|label_location	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|status_view	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 
