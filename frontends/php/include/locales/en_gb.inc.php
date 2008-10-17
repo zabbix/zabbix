@@ -932,13 +932,15 @@
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	'Configuration of network maps',
 
 //	sysmaps.php
-	'S_MAPS_BIG'=>				'MAPS',
+	'S_MAPS_BIG'=>					'MAPS',
 	'S_NO_MAPS_DEFINED'=>			'No maps defined',
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	'CONFIGURATION OF NETWORK MAPS',
-	'S_CREATE_MAP'=>			'Create Map',
+	'S_CREATE_MAP'=>				'Create Map',
 	'S_ICON_LABEL_LOCATION'=>		'Icon label location',
-	'S_BOTTOM'=>				'Bottom',
-	'S_TOP'=>				'Top',
+	'S_BOTTOM'=>					'Bottom',
+	'S_TOP'=>						'Top',
+	'S_DISPLAY_METHOD_OF_STATUS'=>	'Display method of status',
+	'S_DISPLAY_NO_OF_FAILURES_ONLY'=>'Display No. of failures only',
 
 //	map.php
 	'S_OK_BIG'=>				'OK',

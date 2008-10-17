@@ -40,6 +40,7 @@ include_once "include/page_header.php";
 		"backgroundid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,			"isset({save})"),
 		"label_type"=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,4),		"isset({save})"),
 		"label_location"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,3),		"isset({save})"),
+		'status_view'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 
 /* Actions */
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -64,12 +65,13 @@ include_once "include/page_header.php";
 <?php
 	if(isset($_REQUEST["save"]))
 	{
+		$_REQUEST['status_view'] = get_request('status_view',0);
 		if(isset($_REQUEST["sysmapid"]))
 		{
 			// TODO check permission by new value.
 			$result=update_sysmap($_REQUEST["sysmapid"],$_REQUEST["name"],$_REQUEST["width"],
 				$_REQUEST["height"],$_REQUEST["backgroundid"],$_REQUEST["label_type"],
-				$_REQUEST["label_location"]);
+				$_REQUEST["label_location"],$_REQUEST['status_view']);
 
 			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
 			show_messages($result,"Network map updated","Cannot update network map");
@@ -78,7 +80,7 @@ include_once "include/page_header.php";
 				access_deny();
 
 			$result=add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
-				$_REQUEST["backgroundid"],$_REQUEST["label_type"],$_REQUEST["label_location"]);
+				$_REQUEST["backgroundid"],$_REQUEST["label_type"],$_REQUEST["label_location"],$_REQUEST['status_view']);
 
 			add_audit_if($result,AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
 			show_messages($result,"Network map added","Cannot add network map");

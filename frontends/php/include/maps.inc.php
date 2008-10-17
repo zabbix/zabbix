@@ -181,22 +181,26 @@
 
 	# Update System Map
 
-	function	update_sysmap($sysmapid,$name,$width,$height,$backgroundid,$label_type,$label_location)
-	{
-		return	DBexecute("update sysmaps set name=".zbx_dbstr($name).",width=$width,height=$height,".
-			"backgroundid=".$backgroundid.",label_type=$label_type,".
-			"label_location=$label_location where sysmapid=$sysmapid");
+	function	update_sysmap($sysmapid,$name,$width,$height,$backgroundid,$label_type,$label_location,$status_view){
+		return	DBexecute('UPDATE sysmaps SET '.
+								'name='.zbx_dbstr($name).','.
+								'width='.$width.','.
+								'height='.$height.','.
+								'backgroundid='.$backgroundid.','.
+								'label_type='.$label_type.','.
+								'label_location='.$label_location.','.
+								'status_view='.$status_view.
+							' WHERE sysmapid='.$sysmapid);
 	}
 
 	# Add System Map
 
-	function	add_sysmap($name,$width,$height,$backgroundid,$label_type,$label_location)
+	function	add_sysmap($name,$width,$height,$backgroundid,$label_type,$label_location,$status_view)
 	{
 		$sysmapid=get_dbid("sysmaps","sysmapid");
 
-		$result=DBexecute("insert into sysmaps (sysmapid,name,width,height,backgroundid,label_type,label_location)".
-			" values ($sysmapid,".zbx_dbstr($name).",$width,$height,".$backgroundid.",$label_type,
-			$label_location)");
+		$result=DBexecute("insert into sysmaps (sysmapid,name,width,height,backgroundid,label_type,label_location,status_view)".
+			" values ($sysmapid,".zbx_dbstr($name).",$width,$height,".$backgroundid.",$label_type,$label_location,$status_view)");
 
 		if(!$result)
 			return $result;
@@ -405,7 +409,7 @@
          *     Eugene Grigorjev 
          *
          */
-	function	get_info_by_selementid($selementid)
+	function	get_info_by_selementid($selementid,$view_status=0)
 	{
 		global $colors;
 
@@ -518,7 +522,7 @@
 			$out['type'] = TRIGGER_VALUE_TRUE;
 			$out['info'] = S_TRUE_BIG;
 
-			if($inf['count'] > 1)
+			if(($inf['count'] > 1) || ($view_status == 1))
 				$out['info'] = $inf['count']." ".S_PROBLEMS_SMALL;
 			else if(isset($inf['info']))
 				$out['info'] = $inf['info'];

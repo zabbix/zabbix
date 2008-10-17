@@ -4492,6 +4492,7 @@ include_once 'include/discovery.inc.php';
 			$backgroundid	= $row["backgroundid"];
 			$label_type	= $row["label_type"];
 			$label_location	= $row["label_location"];
+			$status_view = $row['status_view'];
 		}
 		else
 		{
@@ -4501,6 +4502,7 @@ include_once 'include/discovery.inc.php';
 			$backgroundid	= get_request("backgroundid",0);
 			$label_type	= get_request("label_type",0);
 			$label_location	= get_request("label_location",0);
+			$status_view = get_request('status_view',0);
 		}
 
 
@@ -4534,6 +4536,9 @@ include_once 'include/discovery.inc.php';
 		$cmbLabel->AddItem(4,S_NOTHING);
 		$frmMap->AddRow(S_ICON_LABEL_TYPE,$cmbLabel);
 
+		$chkStatus = new CCheckBox('status_view',$status_view,null,1);
+		$frmMap->AddRow(S_DISPLAY_METHOD_OF_STATUS,array($chkStatus,SPACE.S_DISPLAY_NO_OF_FAILURES_ONLY));
+		
 		$cmbLocation = new CComboBox("label_location",$label_location);
 
 		$cmbLocation->AddItem(0,S_BOTTOM);

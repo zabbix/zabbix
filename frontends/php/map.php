@@ -55,6 +55,7 @@ include_once "include/page_header.php";
 	$height		= $map["height"];
 	$backgroundid	= $map["backgroundid"];
 	$label_type	= $map["label_type"];
+	$status_view = $map['status_view'];
 
 	if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
 	{
@@ -174,7 +175,7 @@ include_once "include/page_header.php";
 
 		$label_line = $db_element["label"];
 
-		$el_info = get_info_by_selementid($db_element["selementid"]);
+		$el_info = get_info_by_selementid($db_element["selementid"],$status_view);
 
 		$info_line	= $el_info['info'];
 		$color		= $el_info['color'];
