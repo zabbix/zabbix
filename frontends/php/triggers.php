@@ -440,6 +440,7 @@
 				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
 				' LEFT JOIN items i ON f.itemid=i.itemid '.
 				' LEFT JOIN hosts h ON h.hostid=i.hostid '.
+				(($_REQUEST['groupid']>0)?' LEFT JOIN hosts_groups hg ON hg.hostid=h.hostid ':'').
 			' WHERE '.DBin_node('t.triggerid').
 				' AND '.DBcondition('t.triggerid',$available_triggers);
 
@@ -448,6 +449,9 @@
 
 		if($_REQUEST['hostid'] > 0) 
 			$sql .= ' AND h.hostid='.$_REQUEST['hostid'];
+			
+		if($_REQUEST['groupid'] > 0)
+			$sql .= ' AND hg.groupid='.$_REQUEST['groupid'];
 
 		$sql .= order_by('h.host,t.description,t.priority,t.status');
 

@@ -266,14 +266,13 @@ function make_system_summary(){
 								' AND t.triggerid=f.triggerid '.
 								' AND t.status='.TRIGGER_STATUS_ENABLED.
 								' AND i.status='.ITEM_STATUS_ACTIVE.
-								' AND '.DBin_node('t.triggerid').
 								' AND '.DBcondition('t.triggerid', $available_triggers).
 								' AND h.status='.HOST_STATUS_MONITORED.
 								' AND t.value='.TRIGGER_VALUE_TRUE.
 								' AND t.priority='.$key.
 							' ORDER BY t.lastchange DESC';
 				$result = DBselect($sql,30);
-			
+
 				while($row_inf=DBfetch($result)){
 			// Check for dependencies
 					if(trigger_dependent($row_inf["triggerid"]))	continue;
