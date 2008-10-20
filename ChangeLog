@@ -1,5 +1,6 @@
 Changes for 1.6.1
 
+ - [ZBX-565] fixed filtering of conf->triggers (Artem)
  - [ZBX-563] added support of user parameters with -t option (Sasha)
  - [ZBX-562] fixed improper host group delete action (Artem)
  - [ZBX-527] fixed possible poller crash (Sasha)
