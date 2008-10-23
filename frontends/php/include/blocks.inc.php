@@ -477,7 +477,7 @@ function make_latest_issues(){
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND t.value='.TRIGGER_VALUE_TRUE.
 				' ORDER BY t.lastchange DESC';
-//SDI($sql);
+
 	$result = DBselect($sql,20);
 	while($row=DBfetch($result)){
 // Check for dependencies
