@@ -363,7 +363,7 @@
 					}
 					/* do not use break */
 				case ITEM_VALUE_TYPE_STR:	
-					$value = nl2br(nbsp(htmlspecialchars($row["value"])));
+					$value = zbx_nl2br(nbsp(htmlspecialchars($row['value'])));
 					break;
 				
 				default:
