@@ -404,6 +404,21 @@ typedef enum
 	MAINTENANCE_TYPE_NODATA
 } zbx_maintenance_type_t;
 
+/* regular expressions */
+typedef enum
+{
+	EXPRESSION_TYPE_INCLUDED = 0,
+	EXPRESSION_TYPE_ANY_INCLUDED,
+	EXPRESSION_TYPE_NOT_INCLUDED,
+	EXPRESSION_TYPE_TRUE,
+	EXPRESSION_TYPE_FALSE
+} zbx_expression_type_t;
+
+typedef enum
+{
+	ZBX_CASE_SENSITIVE = 0,
+	ZBX_IGNORE_CASE
+} zbx_case_sensitive_t;
 
 /* HTTP Tests statuses */
 #define HTTPTEST_STATUS_MONITORED	0
@@ -716,10 +731,25 @@ int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastl
 
 int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param, int param_max_len);
 
+typedef struct zbx_regexp_s
+{
+	char			*name;
+	char			*expression;
+	int			expression_type;
+	char			exp_delimiter;
+	zbx_case_sensitive_t	case_sensitive;
+} ZBX_REGEXP;
+
 /* Regular expressions */
 char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
 /* Non case sensitive */
 char    *zbx_iregexp_match(const char *string, const char *pattern, int *len);
+
+void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num);
+void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,
+		const char *name, const char *expression, int expression_type, char exp_delimiter, int case_sensitive);
+int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, const char *pattern,
+		zbx_case_sensitive_t cs);
 
 /* Misc functions */
 int	cmp_double(double a,double b);
@@ -738,6 +768,9 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len );
 /* Time related functions */
 double	time_diff(struct timeval *from, struct timeval *to);
 char	*zbx_age2str(int age);
+
+/* Return the needle in the haystack (or NULL). */
+char	*zbx_strcasestr(const char *haystack, const char *needle);
 
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value);
 int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value);
