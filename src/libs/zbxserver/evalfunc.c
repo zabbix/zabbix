@@ -1142,7 +1142,7 @@ static int evaluate_STR(char *value, DB_ITEM *item, char *function, char *parame
 	}
 
 	rows = 0;
-	if (0 == strcmp(function, "str")) {
+	if (func == ZBX_FUNC_STR) {
 		while (NULL != (row = DBfetch(result))) {
 			if (NULL != strstr(row[0], str)) {
 				rows = 2;
@@ -1150,7 +1150,7 @@ static int evaluate_STR(char *value, DB_ITEM *item, char *function, char *parame
 			}
 			rows = 1;
 		}
-	} else if (0 == strcmp(function, "regexp")) {
+	} else if (func == ZBX_FUNC_REGEXP) {
 		while (NULL != (row = DBfetch(result))) {
 			if (SUCCEED == regexp_match_ex(regexps, regexps_num, row[0], str, ZBX_CASE_SENSITIVE))
 			{
@@ -1159,7 +1159,7 @@ static int evaluate_STR(char *value, DB_ITEM *item, char *function, char *parame
 			}
 			rows = 1;
 		}
-	} else if (0 == strcmp(function, "iregexp")) {
+	} else if (func == ZBX_FUNC_IREGEXP) {
 		while (NULL != (row = DBfetch(result))) {
 			if (SUCCEED == regexp_match_ex(regexps, regexps_num, row[0], str, ZBX_IGNORE_CASE))
 			{
