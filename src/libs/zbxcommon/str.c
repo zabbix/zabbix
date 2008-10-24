@@ -1653,3 +1653,32 @@ char	*zbx_age2str(int age)
 
 	return buffer;
 }
+
+char	*zbx_strcasestr(const char *haystack, const char *needle)
+{
+/*#ifdef HAVE_STRCASESTR
+	return strcasestr(haystack, needle);
+#else*/
+	size_t		sz_h, sz_n;
+	const char	*p;
+
+	if (NULL == needle || '\0' == *needle)
+		return (char *)haystack;
+
+	if (NULL == haystack || '\0' == *haystack)
+		return NULL;
+
+	sz_h = strlen(haystack);
+	sz_n = strlen(needle);
+	if (sz_h < sz_n)
+		return NULL;
+
+	for (p = haystack; p <= &haystack[sz_h - sz_n]; p++)
+	{
+		if (0 == strncasecmp(p, needle, sz_n))
+			return (char *)p;
+	}
+
+	return NULL;
+/*#endif*/
+}

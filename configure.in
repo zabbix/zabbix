@@ -783,6 +783,7 @@ AC_CHECK_FUNCS(vsnprintf)
 AC_CHECK_FUNCS(hstrerror)
 AC_CHECK_FUNCS(atoll)
 AC_CHECK_FUNCS(getopt_long)
+AC_CHECK_FUNCS(strcasestr)
 
 dnl Check if we want to compile everything with static
 AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries],
