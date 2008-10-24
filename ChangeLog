@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-249] added support of advanced regular expressions (Artem,Sasha)
  - [DEV-247] added enhancement to the Graph function (Artem)
  - [DEV-233,DEV-237] added support of scheduled maintenance periods (Artem,Sasha)
 
