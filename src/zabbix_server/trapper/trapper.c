@@ -25,6 +25,7 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
+#include "zbxjson.h"
 
 #include "../functions.h"
 #include "../expression.h"
@@ -54,6 +55,9 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 	char	*result = NULL, *answer;
 
 	int	ret=SUCCEED, res;
+
+	struct 		zbx_json_parse jp;
+	char		value[MAX_STRING_LEN];
 
 	zbx_rtrim(s, " \r\n\0");
 
@@ -141,6 +145,18 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node]");
 					zabbix_syslog("Trapper: error sending confirmation to node");
 				}
+			}
+			return ret;
+		}
+		/* JSON protocol? */
+		else if (SUCCEED == zbx_json_open(s, &jp))
+		{
+			if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value))) {
+				if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
+					ret = send_list_of_active_checks_json(sock, &jp);
+				else
+					zabbix_log(LOG_LEVEL_WARNING, "Unknown request received [%s]",
+							value);
 			}
 			return ret;
 		}

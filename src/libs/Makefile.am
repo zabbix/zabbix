@@ -14,7 +14,8 @@ DIST_SUBDIRS = \
 	zbxsysinfo \
 	zbxplugin \
 	zbxsys \
-	zbxjabber
+	zbxjabber \
+	zbxjson
 
 if SERVER
 SERVER_SUBDIRS = \
@@ -38,6 +39,7 @@ SUBDIRS = \
 	zbxplugin \
 	zbxsys \
 	zbxcomms \
+	zbxjson \
 	$(JABBER_SUBDIRS) \
 	$(SERVER_SUBDIRS)
 

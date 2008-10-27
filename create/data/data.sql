@@ -69,7 +69,7 @@ INSERT INTO users_groups VALUES (2,8,2);
 -- Dumping data for table hosts
 --
 
-INSERT INTO hosts VALUES (10001,'Template_Linux','',0,'',10050,3,0,'',0,0,0,0);
+INSERT INTO hosts VALUES (10001,'Template_Linux','',0,'',10050,3,0,'',0,0,0,0,0,0);
 INSERT INTO hosts VALUES (10002,'Template_Windows','',0,'',10050,3,0,'',0,0,0,0,0,0);
 INSERT INTO hosts VALUES (10003,'Template_App_MySQL','',0,'',10050,3,0,'',0,0,0,0,0,0);
 INSERT INTO hosts VALUES (10004,'Template_Standalone','',0,'',10050,3,0,'',0,0,0,0,0,0);
@@ -6393,7 +6393,7 @@ INSERT INTO dchecks VALUES (2,2,9,'system.uname','','10050');
 -- Dumping data for table graphs
 --
 
-INSERT INTO graphs VALUES (2,'CPU Loads',900,200,0,0,0.0000,100.0000,0,1,1,0);
+INSERT INTO graphs VALUES (2,'CPU Loads',900,200,0,0,0.0000,100.0000,0,0,0,1,1,0);
 INSERT INTO graphs VALUES (3,'CPU Utilization',900,200,0,0,0.0000,100.0000,0,0,0,1,1,1);
 INSERT INTO graphs VALUES (4,'Network utilization',900,200,0,0,0.0000,100.0000,0,0,0,1,1,0);
 INSERT INTO graphs VALUES (5,'Disk usage',900,200,0,0,0.0000,100.0000,0,0,0,1,1,1);
@@ -6442,7 +6442,7 @@ INSERT INTO graphs VALUES (47,'Interface 42 Bandwidth',900,200,0,0,0.0000,100.00
 INSERT INTO graphs VALUES (48,'Interface 43 Bandwidth',900,200,0,0,0.0000,100.0000,0,0,0,1,1,0);
 INSERT INTO graphs VALUES (49,'Interface 44 Bandwidth',900,200,0,0,0.0000,100.0000,0,0,0,1,1,0);
 INSERT INTO graphs VALUES (50,'Interface 45 Bandwidth',900,200,0,0,0.0000,100.0000,0,0,0,1,1,0);
-INSERT INTO graphs VALUES (51,'Interface 46      Bandwidth',900,200,0,0,0.0000,100.0000,0,0,0,1,1,0);
+INSERT INTO graphs VALUES (51,'Interface 46 Bandwidth',900,200,0,0,0.0000,100.0000,0,0,0,1,1,0);
 INSERT INTO graphs VALUES (52,'Interface 47 Bandwidth',900,200,0,0,0.0000,100.0000,0,0,0,1,1,0);
 INSERT INTO graphs VALUES (53,'Interface 48 Bandwidth',900,200,0,0,0.0000,100.0000,0,0,0,1,1,0);
 INSERT INTO graphs VALUES (54,'Interface 49 Bandwidth',900,200,0,0,0.0000,100.0000,0,0,0,1,1,0);

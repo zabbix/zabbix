@@ -23,7 +23,6 @@
 #include "zlog.h"
 
 #include "evalfunc.h"
-#include "iconv.h"
 
 /******************************************************************************
  *                                                                            *
@@ -1030,58 +1029,110 @@ static int evaluate_NODATA(char *value,DB_ITEM	*item,int parameter)
 	return res;
 }
 
-int convertj(char *inputstr, char *outputstr, size_t outputlength, const char *encoding)
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_STR                                                     *
+ *                                                                            *
+ * Purpose: evaluate function 'str' for the item                              *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - <string>[,seconds]                                *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int evaluate_STR(char *value, DB_ITEM *item, char *function, char *parameters)
 {
-#define ZBX_ENCODING struct zbx_encoding_t
-ZBX_ENCODING
-{
-	char	*zbx_encoding;
-	char	*iconv_encoding;
-};
+#define ZBX_FUNC_STR		1
+#define ZBX_FUNC_REGEXP		2
+#define ZBX_FUNC_IREGEXP	3
+	DB_RESULT	result;
+	DB_ROW		row;
 
-ZBX_ENCODING e[]=
-{
-		{"cp932",	"CP932"},
-		{"ujis",	"UJIS"},
-		{"sjis",	"SHIFT-JIS"},
-		{"eucjpms",	"EUC-JP-MS"},
-		{NULL}
-};
-	iconv_t		cd;
-	size_t		inputlength, resultlength;
-	int		i, res = SUCCEED;
-	const char	*from_code = NULL;
-	const char	*to_code = {"UTF-8"};
+	char		str[MAX_STRING_LEN];
+	char		encoding[MAX_STRING_LEN];
+	char		lastvalue_str[MAX_STRING_LEN];
+	int		func;
+	int		res = SUCCEED;
 
-	for (i = 0; e[i].zbx_encoding != NULL; i ++)
-		if (0 == strcmp(encoding, e[i].zbx_encoding)) {
-			from_code = e[i].iconv_encoding;
-			break;
+	ZBX_REGEXP	*regexps = NULL;
+	int		regexps_alloc = 0, regexps_num = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_STR()");
+
+	if (item->value_type != ITEM_VALUE_TYPE_STR && item->value_type==ITEM_VALUE_TYPE_LOG)
+		return FAIL;
+
+	if (item->lastvalue_null != 0)
+		return FAIL;
+
+	if (0 == strcmp(function, "str"))
+		func = ZBX_FUNC_STR;
+	else if (0 == strcmp(function, "regexp"))
+		func = ZBX_FUNC_REGEXP;
+	else if (0 == strcmp(function, "iregexp"))
+		func = ZBX_FUNC_IREGEXP;
+	else
+		return FAIL;
+
+	if (0 == num_param(parameters))
+		return FAIL;
+
+	if (0 != get_param(parameters, 1, str, sizeof(str)))
+		return FAIL;
+
+	*encoding = '\0';
+
+	if (func == ZBX_FUNC_REGEXP || func == ZBX_FUNC_IREGEXP)
+	{
+		get_key_param(item->key, 3, encoding, sizeof(encoding));
+
+/*		if (FAIL == convertj(item->lastvalue_str, lastvalue_str, sizeof(lastvalue_str), encoding))
+			zbx_strlcpy(lastvalue_str, item->lastvalue_str, sizeof(lastvalue_str));
+*/
+		if (*str == '@')
+		{
+			result = DBselect("select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
+					" from regexps r,expressions e where r.regexpid=e.regexpid and r.name='%s'",
+					str + 1);
+
+			while (NULL != (row = DBfetch(result)))
+				add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
+						row[0], row[1], atoi(row[2]), row[3][0], atoi(row[4]));
+			DBfree_result(result);
 		}
-	if (NULL == from_code)
-		return FAIL;
-
-	cd = iconv_open(to_code, from_code);
-	if (cd == (iconv_t)-1) {
-		zabbix_log(LOG_LEVEL_DEBUG, "iconv_open(to_code:%s,from_code:%s) failed",
-				to_code,
-				from_code);
-		return FAIL;
 	}
-		
-	inputlength = strlen(inputstr);
+	else
+		zbx_strlcpy(lastvalue_str, item->lastvalue_str, sizeof(lastvalue_str));
 
-	resultlength = iconv(cd, &inputstr, &inputlength, &outputstr, &outputlength);
-	if (resultlength == (size_t)-1) {
-		zabbix_log(LOG_LEVEL_DEBUG, "iconv(inputstr:%s,to_code:%s,from_code:%s) failed",
-				inputstr,
-				to_code,
-				from_code);
-		res = FAIL;
+	switch (func) {
+	case ZBX_FUNC_STR:
+		if (NULL != strstr(item->lastvalue_str, str))
+			strcpy(value, "1");
+		else
+			strcpy(value, "0");
+		break;
+	case ZBX_FUNC_REGEXP:
+		if (SUCCEED == regexp_match_ex(regexps, regexps_num, item->lastvalue_str, str, ZBX_CASE_SENSITIVE, encoding))
+			strcpy(value, "1");
+		else
+			strcpy(value, "0");
+		break;
+	case ZBX_FUNC_IREGEXP:
+		if (SUCCEED == regexp_match_ex(regexps, regexps_num, item->lastvalue_str, str, ZBX_IGNORE_CASE, encoding))
+			strcpy(value, "1");
+		else
+			strcpy(value, "0");
+		break;
 	}
-	iconv_close(cd);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "convertj() [from_code:%s] [to_code:%s] [inputstr:%s] [outputstr:%s]", from_code, to_code, inputstr, outputstr);
+	if ((func == ZBX_FUNC_REGEXP || func == ZBX_FUNC_IREGEXP) && *str == '@')
+		zbx_free(regexps);
 
 	return res;
 }
@@ -1111,14 +1162,8 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	int	ret  = SUCCEED;
 	time_t  now;
 	struct  tm      *tm;
-	
 	int	fuzlow, fuzhig;
-
 	int	day;
-	int	len;
-
-	char    encoding[MAX_STRING_LEN];
-	char    lastvalue_str[MAX_STRING_LEN];
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_function(%s)",
 		function);
@@ -1385,7 +1430,11 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 			}*/
 		}
 	}
-	else if(strcmp(function,"str")==0)
+	else if(0 == strcmp(function, "str") || 0 == strcmp(function, "regexp") || 0 == strcmp(function, "iregexp"))
+	{
+		ret = evaluate_STR(value, item, function, parameter);
+	}
+/*	else if(strcmp(function,"str")==0)
 	{
 		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
 		{
@@ -1467,7 +1516,7 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 		{
 			ret = FAIL;
 		}
-	}
+	}*/
 	else if(strcmp(function,"now")==0)
 	{
 		now=time(NULL);

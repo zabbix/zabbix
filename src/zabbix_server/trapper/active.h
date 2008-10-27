@@ -24,7 +24,9 @@
 #include "common.h"
 #include "db.h"
 #include "comms.h"
+#include "zbxjson.h"
 
 int	send_list_of_active_checks(zbx_sock_t *sock, const char *host);
+int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp);
 
 #endif

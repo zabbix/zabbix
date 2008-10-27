@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "threads.h"
+#include "iconv.h"
 
 /******************************************************************************
  *                                                                            *
@@ -1571,3 +1572,94 @@ int	str_in_list(char *list, const char *value, const char delimiter)
 	}
 	return ret;
 }
+
+char	*zbx_strcasestr(const char *haystack, const char *needle)
+{
+/*#ifdef HAVE_STRCASESTR
+	return strcasestr(haystack, needle);
+#else*/
+	size_t		sz_h, sz_n;
+	const char	*p;
+
+	if (NULL == needle || '\0' == *needle)
+		return (char *)haystack;
+
+	if (NULL == haystack || '\0' == *haystack)
+		return NULL;
+
+	sz_h = strlen(haystack);
+	sz_n = strlen(needle);
+	if (sz_h < sz_n)
+		return NULL;
+
+	for (p = haystack; p <= &haystack[sz_h - sz_n]; p++)
+	{
+		if (0 == strncasecmp(p, needle, sz_n))
+			return (char *)p;
+	}
+
+	return NULL;
+/*#endif*/
+}
+
+int	convertj(char *inputstr, char *outputstr, size_t outputlength, const char *encoding)
+{
+#define ZBX_ENCODING struct zbx_encoding_t
+ZBX_ENCODING
+{
+	char	*zbx_encoding;
+	char	*iconv_encoding;
+};
+
+ZBX_ENCODING e[]=
+{
+		{"cp932",	"CP932"},
+		{"ujis",	"UJIS"},
+		{"sjis",	"SHIFT-JIS"},
+		{"eucjpms",	"EUC-JP-MS"},
+		{NULL}
+};
+	iconv_t		cd;
+	size_t		inputlength, resultlength;
+	int		i, res = SUCCEED;
+	const char	*from_code = NULL;
+	const char	*to_code = {"UTF-8"};
+
+	for (i = 0; e[i].zbx_encoding != NULL; i ++)
+		if (0 == strcmp(encoding, e[i].zbx_encoding)) {
+			from_code = e[i].iconv_encoding;
+			break;
+		}
+	if (NULL == from_code)
+		return FAIL;
+
+	cd = iconv_open(to_code, from_code);
+	if (cd == (iconv_t)-1) {
+/*		zabbix_log(LOG_LEVEL_DEBUG, "iconv_open(to_code:%s,from_code:%s) failed",
+				to_code,
+				from_code);*/
+		return FAIL;
+	}
+		
+	inputlength = strlen(inputstr);
+
+	outputlength --;
+	resultlength = iconv(cd, &inputstr, &inputlength, &outputstr, &outputlength);
+	if (resultlength == (size_t)(-1))
+	{
+/*		zabbix_log(LOG_LEVEL_DEBUG, "iconv(inputstr:%s,to_code:%s,from_code:%s) failed",
+				inputstr,
+				to_code,
+				from_code);*/
+		res = FAIL;
+	}
+	else
+		outputstr[resultlength] = '\0';
+
+	iconv_close(cd);
+
+/*	zabbix_log(LOG_LEVEL_DEBUG, "convertj() [from_code:%s] [to_code:%s] [inputstr:%s] [outputstr:%s]", from_code, to_code, inputstr, outputstr);*/
+
+	return res;
+}
+

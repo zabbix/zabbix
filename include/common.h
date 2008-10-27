@@ -362,6 +362,21 @@ typedef enum
 	MAINTENANCE_TYPE_NODATA
 } zbx_maintenance_type_t;
 
+/* regular expressions */
+typedef enum
+{
+	EXPRESSION_TYPE_INCLUDED = 0,
+	EXPRESSION_TYPE_ANY_INCLUDED,
+	EXPRESSION_TYPE_NOT_INCLUDED,
+	EXPRESSION_TYPE_TRUE,
+	EXPRESSION_TYPE_FALSE
+} zbx_expression_type_t;
+
+typedef enum
+{
+	ZBX_CASE_SENSITIVE = 0,
+	ZBX_IGNORE_CASE
+} zbx_case_sensitive_t;
 
 /* HTTP Tests statuses */
 #define HTTPTEST_STATUS_MONITORED	0
@@ -587,6 +602,8 @@ int	get_key_param(char *key_param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now);
 int	check_time_period(const char *period, time_t now);
+char	zbx_num2hex(u_char c);
+u_char	zbx_hex2num(char c);
 int	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen);
 int     zbx_hex2binary(char *io);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
@@ -674,10 +691,25 @@ int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastl
 
 int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param, int param_max_len);
 
+typedef struct zbx_regexp_s
+{
+	char			*name;
+	char			*expression;
+	int			expression_type;
+	char			exp_delimiter;
+	zbx_case_sensitive_t	case_sensitive;
+} ZBX_REGEXP;
+
 /* Regular expressions */
 char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
 /* Non case sensitive */
 char    *zbx_iregexp_match(const char *string, const char *pattern, int *len);
+
+void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num);
+void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,
+		const char *name, const char *expression, int expression_type, char exp_delimiter, int case_sensitive);
+int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, char *string, const char *pattern,
+		zbx_case_sensitive_t cs, const char *encoding);
 
 /* Misc functions */
 int	cmp_double(double a,double b);
@@ -690,6 +722,11 @@ int	get_nodeid_by_id(zbx_uint64_t id);
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
 int	ip_in_list(char *list, char *ip);
+
+/* Return the needle in the haystack (or NULL). */
+char	*zbx_strcasestr(const char *haystack, const char *needle);
+
+int	convertj(char *inputstr, char *outputstr, size_t outputlength, const char *encoding);
 
 int MAIN_ZABBIX_ENTRY(void);
 
