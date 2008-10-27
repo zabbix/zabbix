@@ -218,60 +218,60 @@ static int	parse_list_of_checks(char *str)
 
 	clean_regexps_ex(regexps, &regexps_num);
 
-	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_REGEXP, &jp_data))
-		goto json_error;
-
- 	p = NULL;
-	while (NULL != (p = zbx_json_next(&jp_data, p)))
+	if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_REGEXP, &jp_data))
 	{
+	 	p = NULL;
+		while (NULL != (p = zbx_json_next(&jp_data, p)))
+		{
 /* {"regexp":[{"name":"regexp1",...,...},{...},...]} 
  *            ^------------------------^
- */ 		if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
-			goto json_error;
+ */			if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
+				goto json_error;
 
-		if (SUCCEED != zbx_json_value_by_name(&jp_row, "name", name, sizeof(name)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
-					"name");
-			continue;
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, "name", name, sizeof(name)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
+						"name");
+				continue;
+			}
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, "expression", expression, sizeof(expression)) || *expression == '\0')
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
+						"expression");
+				continue;
+			}
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, "expression_type", tmp, sizeof(tmp)) || *tmp == '\0')
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
+						"expression_type");
+				continue;
+			}
+
+			expression_type = atoi(tmp);
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, "exp_delimiter", tmp, sizeof(tmp)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
+						"exp_delimiter");
+				continue;
+			}
+
+			exp_delimiter = tmp[0];
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, "case_sensitive", tmp, sizeof(tmp)) || *tmp == '\0')
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
+						"case_sensitive");
+				continue;
+			}
+
+			case_sensitive = atoi(tmp);
+
+			add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
+					name, expression, expression_type, exp_delimiter, case_sensitive);
 		}
-
-		if (SUCCEED != zbx_json_value_by_name(&jp_row, "expression", expression, sizeof(expression)) || *expression == '\0')
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
-					"expression");
-			continue;
-		}
-
-		if (SUCCEED != zbx_json_value_by_name(&jp_row, "expression_type", tmp, sizeof(tmp)) || *tmp == '\0')
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
-					"expression_type");
-			continue;
-		}
-
-		expression_type = atoi(tmp);
-
-		if (SUCCEED != zbx_json_value_by_name(&jp_row, "exp_delimiter", tmp, sizeof(tmp)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
-					"exp_delimiter");
-			continue;
-		}
-
-		exp_delimiter = tmp[0];
-
-		if (SUCCEED != zbx_json_value_by_name(&jp_row, "case_sensitive", tmp, sizeof(tmp)) || *tmp == '\0')
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
-					"case_sensitive");
-			continue;
-		}
-
-		case_sensitive = atoi(tmp);
-
-		add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-				name, expression, expression_type, exp_delimiter, case_sensitive);
 	}
 
 	return SUCCEED;
