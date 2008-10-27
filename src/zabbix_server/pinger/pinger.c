@@ -87,7 +87,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	i = zbx_snprintf(params, sizeof(params), "-q -C%d", count);
 	if (0 != interval)
-		i += zbx_snprintf(params + i, sizeof(params) - i, " -i%d", interval);
+		i += zbx_snprintf(params + i, sizeof(params) - i, " -p%d", interval);
 	if (0 != size)
 		i += zbx_snprintf(params + i, sizeof(params) - i, " -b%d", size);
 	if (0 != timeout)
