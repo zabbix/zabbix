@@ -754,16 +754,13 @@ require_once('include/httptest.inc.php');
 		else
 			$with_host_status = '';
 
+		$with_items = '';
 		if(str_in_array('with_monitored_items',$options)){
-			$item_table = ',items i';	$with_items = ' AND h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE;
+			$with_items = ' AND EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
 		}
-		else if(str_in_array("with_items",$options)){
-			$item_table = ',items i';	$with_items = ' AND h.hostid=i.hostid';
+		else if(str_in_array('with_items',$options)){
+			$with_items = ' AND EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
 		} 
-		else {
-			$item_table = '';
-			$with_items = '';
-		}
 
 		$with_node = '';
 
@@ -779,23 +776,22 @@ require_once('include/httptest.inc.php');
 				$with_node = ' AND '.DBin_node('g.groupid', get_current_nodeid(!$only_current_node));
 
 				$sql = 'SELECT DISTINCT g.name,g.groupid '.
-								' FROM groups g, hosts_groups hg, hosts h'.$item_table.
-								' WHERE hg.groupid=g.groupid '.
-									' AND h.hostid=hg.hostid '.
-									' AND '.DBcondition('h.hostid',$available_hosts).
-									$with_host_status.
-									$with_items.
-									$with_node.
-								' ORDER BY g.name';
+						' FROM groups g, hosts_groups hg, hosts h '.
+						' WHERE hg.groupid=g.groupid '.
+							' AND h.hostid=hg.hostid '.
+							' AND '.DBcondition('h.hostid',$available_hosts).
+							$with_host_status.
+							$with_node.
+							$with_items.
+						' ORDER BY g.name';
 //SDI($groupid);
 				$groupid=($grp = DBfetch(DBselect($sql,1)))?$grp['groupid']:0;
-//SDI($groupid);
 			}
 			
 			if($groupid > 0){
 				$with_node = ' AND '.DBin_node('g.groupid', get_current_nodeid(!$only_current_node));
 				$sql = 'SELECT DISTINCT g.groupid '.
-						' FROM groups g, hosts_groups hg, hosts h'.$item_table.
+						' FROM groups g, hosts_groups hg, hosts h '.
 						' WHERE hg.groupid=g.groupid '.
 							' AND h.hostid=hg.hostid '.
 							' AND '.DBcondition('h.hostid',$available_hosts).
@@ -830,7 +826,7 @@ require_once('include/httptest.inc.php');
 					$with_node = ' AND '.DBin_node('hg.hostid', get_current_nodeid(!$only_current_node));
 					
 					$sql = 'SELECT hg.hostid '.
-							' FROM hosts_groups hg'.
+							' FROM hosts_groups hg '.
 							' WHERE hg.groupid='.$groupid.
 								' AND hg.hostid='.$hostid.
 								$with_node;
@@ -844,7 +840,7 @@ require_once('include/httptest.inc.php');
 				$with_node = ' AND '.DBin_node('h.hostid',get_current_nodeid(!$only_current_node));
 //SDI('C: '.$a_groupid.' : '.$a_hostid);
 				$sql = 'SELECT DISTINCT h.hostid,h.host '.
-						' FROM hosts h '.$item_table.$group_table.
+						' FROM hosts h '.$group_table.
 						' WHERE '.DBcondition('h.hostid',$available_hosts).
 							$with_host_status.
 							$with_items.
@@ -858,14 +854,15 @@ require_once('include/httptest.inc.php');
 				if($first_hostid_in_group == 0)	$hostid = 0; /* no hosts in selected groupe */
 
 				if($hostid > 0){
-					if(!DBfetch(DBselect('SELECT DISTINCT h.hostid '.
-							' FROM hosts h '.$item_table.
+					$sql = 'SELECT DISTINCT h.hostid '.
+							' FROM hosts h '.
 							' WHERE h.hostid='.$hostid.
 								' AND '.DBcondition('h.hostid',$available_hosts).
 								$with_host_status.
 								$with_items.
-								$with_node)))
-					{
+								$with_node;
+								
+					if(!DBfetch(DBselect($sql))){
 							$hostid = -1;
 					}
 				}
@@ -882,11 +879,11 @@ require_once('include/httptest.inc.php');
 		$group_correct	= (bccomp($groupid ,$a_groupid)==0)?1:0;
 		$host_correct	= (bccomp($hostid ,$a_hostid)==0)?1:0;
 		return array(
-			"groupid"	=> $groupid,
-			"group_correct"	=> $group_correct,
-			"hostid"	=> $hostid,
-			"host_correct"	=> $host_correct,
-			"correct"	=> ($group_correct && $host_correct)?1:0
+			'groupid'	=> $groupid,
+			'group_correct'	=> $group_correct,
+			'hostid'	=> $hostid,
+			'host_correct'	=> $host_correct,
+			'correct'	=> ($group_correct && $host_correct)?1:0
 			);
 	}
 	
@@ -975,7 +972,7 @@ require_once('include/httptest.inc.php');
 	 */
 	function db_save_application($name,$hostid,$applicationid=null,$templateid=0){
 		if(!is_string($name)){
-			error("incorrect parameters for 'db_save_application'");
+			error("Incorrect parameters for 'db_save_application'");
 			return false;
 		}
 	

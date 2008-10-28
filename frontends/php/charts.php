@@ -169,13 +169,13 @@ include_once 'include/page_header.php';
 // Selecting first group,host,graph if it's one of a kind ;)
 	if($_REQUEST['groupid'] == 0){
 		$sql = 'SELECT COUNT(DISTINCT g.groupid) as grpcount, MAX(g.groupid) as groupid'.
-				' FROM groups g, hosts_groups hg, hosts h, items i, graphs_items gi '.
+				' FROM groups g, hosts_groups hg, hosts h '.
 				' WHERE '.DBcondition('g.groupid',$available_groups).
 					' AND hg.groupid=g.groupid '.
+					' AND h.hostid=hg.hostid '.
 					' AND h.status='.HOST_STATUS_MONITORED.
-					' AND h.hostid=i.hostid '.
-					' AND hg.hostid=h.hostid '.
-					' AND i.itemid=gi.itemid ';
+					' AND EXISTS(SELECT DISTINCT i.itemid FROM items i, graphs_items gi WHERE i.hostid=h.hostid AND i.itemid=gi.itemid) ';
+
 		if($cnt_row = DBfetch(DBselect($sql))){
 			if($cnt_row['grpcount'] == 1){
 				$_REQUEST['groupid'] = $cnt_row['groupid'];
@@ -185,17 +185,24 @@ include_once 'include/page_header.php';
 	}
 	
 	if($_REQUEST['hostid'] == 0){
+		
+		$sql_from = '';
+		$sql_where = '';
+		if($_REQUEST['groupid'] > 0){
+			$sql_from .= ',hosts_groups hg ';
+			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+		}
+		
 		$sql = 'SELECT COUNT(DISTINCT h.hostid) as hstcount, MAX(h.hostid) as hostid '.
-			' FROM hosts h,items i,hosts_groups hg, graphs_items gi '.
+			' FROM hosts h '.$sql_from.
 			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND i.itemid=gi.itemid'.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND h.hostid=i.hostid '.
-				' AND hg.hostid=h.hostid '.
-				($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
-				' AND '.DBcondition('gi.graphid',$available_graphs);
-//				' AND '.DBcondition('h.hostid',$available_hosts);
-
+				' AND '.DBcondition('h.hostid',$available_hosts).
+				$sql_where.
+				' AND EXISTS(SELECT DISTINCT i.itemid '.
+							' FROM items i, graphs_items gi '.
+							' WHERE i.hostid=h.hostid '.
+								' AND i.status='.ITEM_STATUS_ACTIVE.
+								' AND i.itemid=gi.itemid ) ';
 
 		if($cnt_row = DBfetch(DBselect($sql))){
 			if($cnt_row['hstcount'] == 1){
@@ -207,18 +214,24 @@ include_once 'include/page_header.php';
 	
 	if($_REQUEST['graphid'] == 0){
 
+		$sql_from = '';
+		$sql_where = '';
+		if($_REQUEST['groupid'] > 0){
+			$sql_from .= ',hosts_groups hg ';
+			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+		}
+		if($_REQUEST['hostid'] > 0){
+			$sql_where.= ' AND h.hostid='.$_REQUEST['hostid'];
+		}
+
 		$sql = 'SELECT COUNT(DISTINCT g.graphid) as grphcount, MAX(g.graphid) as graphid '.
-			' FROM graphs g,graphs_items gi,items i,hosts_groups hg,hosts h'.
-			' WHERE i.itemid=gi.itemid '.
-				' AND g.graphid=gi.graphid '.
-				' AND i.hostid=hg.hostid '.
-				($_REQUEST['groupid']?' AND hg.groupid='.$_REQUEST['groupid']:'').
+			' FROM graphs g,graphs_items gi,items i,hosts h'.$sql_from.
+			' WHERE h.status='.HOST_STATUS_MONITORED.
+				$sql_where.
 				' AND i.hostid=h.hostid '.
-				($_REQUEST['hostid']?' AND h.hostid='.$_REQUEST['hostid']:'').
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND '.DBin_node('g.graphid').
+				' AND i.itemid=gi.itemid '.
+				' AND g.graphid=gi.graphid '.
 				' AND '.DBcondition('g.graphid',$available_graphs);
-//				' AND '.DBcondition('h.hostid',$available_hosts);
 
 		if($cnt_row = DBfetch(DBselect($sql))){
 			if($cnt_row['grphcount'] == 1){
@@ -230,17 +243,16 @@ include_once 'include/page_header.php';
 	
 //----------------------------------------------
 
-	
-	$result=DBselect('SELECT DISTINCT g.groupid, g.name '.
-				' FROM groups g, hosts_groups hg, hosts h, items i, graphs_items gi '.
-				' WHERE '.DBcondition('g.groupid',$available_groups).
-					' AND hg.groupid=g.groupid '.
-					' AND h.status='.HOST_STATUS_MONITORED.
-					' AND h.hostid=i.hostid '.
-					' AND hg.hostid=h.hostid '.
-					' AND i.itemid=gi.itemid '.
-				' ORDER BY g.name');
-				
+	$sql = 'SELECT DISTINCT g.groupid,g.name '.
+			' FROM groups g, hosts_groups hg, hosts h '.
+			' WHERE '.DBcondition('g.groupid',$available_groups).
+				' AND hg.groupid=g.groupid '.
+				' AND h.hostid=hg.hostid '.
+				' AND h.status='.HOST_STATUS_MONITORED.
+				' AND EXISTS(SELECT DISTINCT i.itemid FROM items i, graphs_items gi WHERE i.hostid=h.hostid AND i.itemid=gi.itemid) '.
+			' ORDER BY g.name';	
+			
+	$result=DBselect($sql);
 	while($row=DBfetch($result)){
 		$cmbGroup->AddItem(
 				$row['groupid'],
@@ -250,22 +262,25 @@ include_once 'include/page_header.php';
 	
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 	
+	
 	$sql_from = '';
 	$sql_where = '';
 	if($_REQUEST['groupid'] > 0){
 		$sql_from .= ',hosts_groups hg ';
 		$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
 	}
-	$sql = 'SELECT DISTINCT h.hostid,h.host '.
-		' FROM hosts h,items i, graphs_items gi '.$sql_from.
-		' WHERE h.status='.HOST_STATUS_MONITORED.
-			' AND i.itemid=gi.itemid'.
-			' AND i.status='.ITEM_STATUS_ACTIVE.
-			' AND h.hostid=i.hostid '.
-			' AND '.DBcondition('gi.graphid',$available_graphs).
-			$sql_where.
-		' ORDER BY h.host';
 	
+	$sql='SELECT DISTINCT h.hostid,h.host '.
+		' FROM hosts h '.$sql_from.
+		' WHERE h.status='.HOST_STATUS_MONITORED.
+			' AND '.DBcondition('h.hostid',$available_hosts).
+			$sql_where.
+			' AND EXISTS(SELECT DISTINCT i.itemid '.
+						' FROM items i, graphs_items gi '.
+						' WHERE i.hostid=h.hostid '.
+							' AND i.status='.ITEM_STATUS_ACTIVE.
+							' AND gi.itemid=i.itemid) '.
+		' ORDER BY h.host';	
 	$result=DBselect($sql);
 	while($row=DBfetch($result)){
 		$cmbHosts->AddItem(
