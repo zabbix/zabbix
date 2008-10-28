@@ -640,14 +640,12 @@ require_once "include/httptest.inc.php";
 
 	function get_host_by_hostid($hostid,$no_error_message=0){
 	
-		$sql="select * from hosts where hostid=$hostid";
+		$sql='SELECT * FROM hosts WHERE hostid='.$hostid;
 		$result=DBselect($sql);
 		$row=DBfetch($result);
-		if($row)
-		{
-			if ($row['useipmi'] == 1)
-			{
-				if ($useip)
+		if($row){
+			if ($row['useipmi'] == 1){
+				if($row['useip'])
 					array_merge($row, array('ipmi_ip' => $row['dns']));
 				else
 					array_merge($row, array('ipmi_ip' => $row['ip']));
