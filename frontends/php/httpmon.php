@@ -117,16 +117,20 @@ include_once "include/page_header.php";
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 
-	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
-		' FROM groups g, hosts_groups hg, hosts h, applications a, httptest ht '.
+	$sql = 'SELECT DISTINCT g.groupid,g.name '.
+		' FROM groups g, hosts_groups hg, hosts h '.
 		' WHERE '.DBcondition('g.groupid',$available_groups).
 			' AND hg.groupid=g.groupid '.
+			' AND h.hostid=hg.hostid'.
 			' AND h.status='.HOST_STATUS_MONITORED.
-			' AND h.hostid=a.hostid '.
-			' AND hg.hostid=h.hostid'.
-			' AND ht.applicationid=a.applicationid '.
-			' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
-		' ORDER BY g.name');
+			' AND EXISTS( SELECT a.applicationid '.
+							' FROM applications a, httptest ht '.
+							' WHERE a.hostid=h.hostid '.
+								' AND ht.applicationid=a.applicationid '.
+								' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')'.
+		' ORDER BY g.name';
+
+	$result=DBselect($sql);
 	while($row=DBfetch($result)){
 		if($_REQUEST['groupid'] == -1) $_REQUEST['groupid'] = $row['groupid'];
 		$cmbGroup->AddItem(
@@ -161,13 +165,16 @@ include_once "include/page_header.php";
 	}
 	
 	$sql='SElECT DISTINCT h.hostid,h.host '.
-		' FROM hosts h,applications a,httptest ht '.$sql_from.
+		' FROM hosts h '.$sql_from.
 		' WHERE h.status='.HOST_STATUS_MONITORED.
-			' AND h.hostid=a.hostid '.
 			' AND '.DBcondition('h.hostid',$available_hosts).
-			' AND a.applicationid=ht.applicationid '.
-			' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
 			$sql_where.
+			' AND EXISTS( SELECT a.applicationid '.
+							' FROM applications a, httptest ht '.
+							' WHERE a.hostid=h.hostid '.
+								' AND ht.applicationid=a.applicationid '.
+								' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')'.
+
 		' GROUP BY h.hostid,h.host'.
 		' ORDER BY h.host';
 
