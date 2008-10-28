@@ -218,7 +218,7 @@
 					' FROM services s, services_links sl '.
 					' WHERE s.serviceid = sl.serviceupid '.
 					  ' AND NOT(s.triggerid IS NULL) '.
-					' GROUP BY s.serviceid;';
+					' GROUP BY s.serviceid';
 		$res = DBselect($sql);
 
 		while($rows = DBfetch($res)){

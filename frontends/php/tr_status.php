@@ -238,15 +238,13 @@ include_once "include/page_header.php";
 	$scripts_by_hosts = get_accessible_scripts_by_hosts($available_hosts);
 
 	$sql = 'SELECT DISTINCT g.groupid,g.name '.
-			' FROM groups g, hosts_groups hg, hosts h, items i '.
+			' FROM groups g, hosts_groups hg, hosts h '.
 			' WHERE '.DBcondition('g.groupid',$available_groups).
 				' AND hg.groupid=g.groupid '.
+				' AND h.hostid=hg.hostid '.
 				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND h.hostid=i.hostid '.
-				' AND hg.hostid=h.hostid '.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-			' ORDER BY g.name';
-
+				' AND EXISTS(SELECT i.itemid FROM items i WHERE i.status='.ITEM_STATUS_ACTIVE.' AND i.hostid=h.hostid ) '.
+			' ORDER BY g.name';	
 	$result=DBselect($sql);
 	while($row=DBfetch($result)){
 		$cmbGroup->AddItem(
@@ -265,14 +263,14 @@ include_once "include/page_header.php";
 	}
 	$sql='SELECT DISTINCT h.hostid,h.host '.
 		' FROM hosts h, items i, functions f, triggers t '.$sql_from.
-		' WHERE '.DBcondition('t.triggerid',$available_triggers).
-			' AND t.status='.TRIGGER_STATUS_ENABLED.
-			' AND f.triggerid=t.triggerid '.
-			' AND i.itemid=f.itemid '.
+		' WHERE h.status='.HOST_STATUS_MONITORED.
+			$sql_where.		
+			' AND h.hostid=i.hostid '.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
-			' AND h.hostid=i.hostid '.												
-			' AND h.status='.HOST_STATUS_MONITORED.
-			$sql_where.
+			' AND i.itemid=f.itemid '.
+			' AND f.triggerid=t.triggerid '.
+			' AND t.status='.TRIGGER_STATUS_ENABLED.
+			' AND '.DBcondition('h.hostid',$available_hosts).
 		' ORDER BY h.host';
 
 	$result=DBselect($sql);

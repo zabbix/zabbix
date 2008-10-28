@@ -110,20 +110,24 @@ include_once 'include/page_header.php';
 ?>
 <?php
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY);
+	
 	show_report2_header($config);
 	
-	if( isset($_REQUEST['triggerid']) &&
-		!($trigger_data = DBfetch(DBselect('SELECT DISTINCT t.*, h.host, h.hostid '.
+	if(isset($_REQUEST['triggerid'])){
+		if(uint_in_array($_REQUEST['triggerid'], $available_triggers)){
+			$sql = 'SELECT DISTINCT t.*, h.host, h.hostid '.
 					' FROM triggers t, functions f, items i, hosts h '.
 					' WHERE t.triggerid='.$_REQUEST['triggerid'].
 						' AND t.triggerid=f.triggerid '.
 						' AND f.itemid=i.itemid '.
-						' AND i.hostid=h.hostid '.
-						' AND '.DBcondition('h.hostid',$available_hosts)
-					))) )
-	{
-		unset($_REQUEST['triggerid']);
+						' AND i.hostid=h.hostid ';
+			$trigger_data = DBfetch(DBselect($sql));
+		}
+		else{
+			unset($_REQUEST['triggerid']);
+		}
 	}
 	
 
@@ -226,35 +230,39 @@ include_once 'include/page_header.php';
 		$filter->Show();
 //-------
 
+		$sql_from = '';
+		$sql_where = '';
+
 		if(0 == $config){
 			if($_REQUEST['hostid'] > 0)	
-				$sql_cond = ' AND h.hostid='.$_REQUEST['hostid'];
-			else
-				$sql_cond = '';
+				$sql_where.= ' AND h.hostid='.$_REQUEST['hostid'];
 		}
 		else{
-			$sql_cond = ' AND h.hostid=ht.hostid ';
-			$sql_cond.=(isset($_REQUEST['hostgroupid']) && ($_REQUEST['hostgroupid']>0))?' AND g.groupid ='.$_REQUEST['hostgroupid']:'';
+			if($_REQUEST['groupid'] > 0){
+				$sql_from .= ',hosts_groups hg ';
+				$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+			}
 			
-			if($_REQUEST['hostid'] > 0)	$sql_cond.=' AND ht.templateid='.$_REQUEST['hostid'];
+			if($_REQUEST['hostid'] > 0){
+			
+				$sql_from.=',hosts_templates ht ';
+				$sql_where.=' AND ht.hostid=h.hostid AND ht.templateid='.$_REQUEST['hostid'];
+			}
 			
 			if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
-				$sql_cond.= ' AND t.templateid='.$_REQUEST['tpl_triggerid'];
+				$sql_where.= ' AND t.templateid='.$_REQUEST['tpl_triggerid'];
 		}
 		
 		$result = DBselect('SELECT DISTINCT h.hostid,h.host,t.triggerid,t.expression,t.description,t.value '.
-			' FROM triggers t,hosts h,items i,functions f, hosts_templates ht, groups g, hosts_groups hg '.
-			' WHERE f.itemid=i.itemid '.
-				' AND hg.hostid=h.hostid'.
-				' AND g.groupid=hg.groupid '.
-				' AND h.hostid=i.hostid '.
+			' FROM triggers t,hosts h,items i,functions f '.$sql_from.
+			' WHERE h.status='.HOST_STATUS_MONITORED.
 				' AND '.DBcondition('h.hostid',$available_hosts).
-				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND t.triggerid=f.triggerid '.
-				' AND '.DBin_node('t.triggerid').
+				' AND i.hostid=h.hostid '.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				$sql_cond.
+				' AND f.itemid=i.itemid '.
+				' AND t.triggerid=f.triggerid '.
+				' AND t.status='.TRIGGER_STATUS_ENABLED.
+				$sql_where.
 			' ORDER BY h.host, t.description');
 
 		
@@ -292,9 +300,7 @@ include_once 'include/page_header.php';
 				$actions
 				));
 		}
-		$table->show();
-		
-		
+		$table->show();		
 	}
 
 include_once 'include/page_footer.php';
