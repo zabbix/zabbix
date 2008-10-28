@@ -605,7 +605,7 @@ int	num_param(const char *param);
 int	get_key_param(char *param, int num, char *buf, int maxlen);
 int	num_key_param(char *param);
 int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now);
-int	check_time_period(const char *period, time_t now);
+int	check_time_period(char *period, time_t now);
 char	zbx_num2hex(u_char c);
 u_char	zbx_hex2num(char c);
 int	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen);

@@ -199,6 +199,21 @@
 			return FALSE;
 		}
 
+		if ($delay_flex != '')
+		{
+			$arr_of_delay = explode(';', $delay_flex);
+
+			foreach($arr_of_delay as $one_delay_flex)
+			{
+				$arr = explode('/', $one_delay_flex);
+				if ($arr[0] < 1)
+				{
+					error("Delay cannot be less than 1 second ");
+					return FALSE;
+				}
+			}
+		}
+
 		if( ($snmp_port<1)||($snmp_port>65535)){
 			error("Invalid SNMP port");
 			return FALSE;
@@ -390,6 +405,21 @@
 		if($delay<1){
 			error("Delay cannot be less than 1 second");
 			return FALSE;
+		}
+
+		if ($delay_flex != '')
+		{
+			$arr_of_delay = explode(';', $delay_flex);
+
+			foreach($arr_of_delay as $one_delay_flex)
+			{
+				$arr = explode('/', $one_delay_flex);
+				if ($arr[0] < 1)
+				{
+					error("Delay cannot be less than 1 second ");
+					return FALSE;
+				}
+			}
 		}
 
 		if( ($snmp_port<1)||($snmp_port>65535)){
