@@ -645,6 +645,16 @@ require_once "include/httptest.inc.php";
 		$row=DBfetch($result);
 		if($row)
 		{
+			if ($row['useipmi'] == 1)
+			{
+				if ($useip)
+					array_merge($row, array('ipmi_ip' => $row['dns']));
+				else
+					array_merge($row, array('ipmi_ip' => $row['ip']));
+			}
+			else
+				$row['ipmi_ip'] = '';
+
 			return $row;
 		}
 		if($no_error_message == 0)
