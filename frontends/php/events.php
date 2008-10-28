@@ -169,16 +169,15 @@
 
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 		
-        $result=DBselect('SELECT DISTINCT g.groupid,g.name '.
-						' FROM groups g, hosts_groups hg, hosts h, items i '.
-	                	' WHERE '.DBcondition('g.groupid',$available_groups).
-			                ' AND hg.groupid=g.groupid '.
-							' AND h.status='.HOST_STATUS_MONITORED.
-			                ' AND h.hostid=i.hostid '.
-							' AND hg.hostid=h.hostid '.
-							' AND i.status='.ITEM_STATUS_ACTIVE.
-		                ' ORDER BY g.name');
-
+		$sql = 'SELECT DISTINCT g.groupid,g.name '.
+				' FROM groups g, hosts_groups hg, hosts h '.
+				' WHERE '.DBcondition('g.groupid',$available_groups).
+					' AND hg.groupid=g.groupid '.
+					' AND h.hostid=hg.hostid '.
+					' AND h.status='.HOST_STATUS_MONITORED.
+					' AND EXISTS(SELECT i.itemid FROM items i WHERE i.status='.ITEM_STATUS_ACTIVE.' AND i.hostid=h.hostid ) '.
+				' ORDER BY g.name';	
+        $result=DBselect($sql);
 		while($row=DBfetch($result)){
 			$cmbGroup->AddItem(
 					$row['groupid'],
@@ -195,12 +194,13 @@
 			$sql_from .= ',hosts_groups hg ';
 			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
 		}
+		
 		$sql='SELECT DISTINCT h.hostid,h.host '.
-			' FROM hosts h,items i'.$sql_from.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND h.hostid=i.hostid '.
-				' AND '.DBcondition('h.hostid',$available_hosts).
+			' FROM hosts h '.$sql_from.
+			' WHERE '.DBcondition('h.hostid',$available_hosts).
 				$sql_where.
+				' AND h.status='.HOST_STATUS_MONITORED.
+				' AND EXISTS(SELECT i.itemid FROM items i WHERE i.hostid=h.hostid ) '.
 			' ORDER BY h.host';
 			
 		$result=DBselect($sql);

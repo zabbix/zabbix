@@ -89,9 +89,9 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	
 	if($_REQUEST["type"] == SHOW_TRIGGERS){
 		$from = ', functions f, triggers t ';
-		$where = ' and i.itemid=f.itemid '.
-					' and f.triggerid=t.triggerid '.
-					' and t.status='.TRIGGER_STATUS_ENABLED;
+		$where = ' AND i.itemid=f.itemid '.
+					' AND f.triggerid=t.triggerid '.
+					' AND t.status='.TRIGGER_STATUS_ENABLED;
 	}
 	else{
 		$where = $from = '';
@@ -99,16 +99,20 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 	
-	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
-				' FROM groups g, hosts_groups hg, hosts h, items i'.$from.
+	$sql = 'SELECT DISTINCT g.groupid,g.name '.
+				' FROM groups g, hosts_groups hg, hosts h '.
 				' WHERE '.DBcondition('g.groupid',$available_groups).
 					' AND hg.groupid=g.groupid '.
+					' AND h.hostid=hg.hostid '.
 					' AND h.status='.HOST_STATUS_MONITORED.
-					' AND h.hostid=i.hostid '.
-					' AND hg.hostid=h.hostid '.
-					' AND i.status='.ITEM_STATUS_ACTIVE.
-					$where.
-				' ORDER BY g.name');
+					' AND EXISTS( SELECT i.itemid '.
+									' FROM items i '.$from.
+									' WHERE i.hostid=h.hostid '.
+										' AND i.status='.ITEM_STATUS_ACTIVE.
+										$where.')'.
+				' ORDER BY g.name';
+
+	$result=DBselect($sql);
 	while($row=DBfetch($result)){
 		$cmbGroup->AddItem(
 				$row["groupid"],

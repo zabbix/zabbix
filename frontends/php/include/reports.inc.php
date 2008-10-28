@@ -39,14 +39,15 @@ function show_report2_header($config){
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
 	$status_filter=($config==1)?' AND h.status='.HOST_STATUS_TEMPLATE:' AND h.status='.HOST_STATUS_MONITORED;
+	
 	$sql = 'SELECT DISTINCT g.groupid,g.name '.
-					' FROM groups g,hosts_groups hg,hosts h'.
-					' WHERE '.DBcondition('h.hostid',$available_hosts).
-						' AND '.DBcondition('g.groupid',$available_groups).
-						' AND g.groupid=hg.groupid '.
-						' AND h.hostid=hg.hostid'.
-						$status_filter.
-					' ORDER BY g.name';
+			' FROM groups g,hosts_groups hg,hosts h'.
+			' WHERE '.DBcondition('h.hostid',$available_hosts).
+				' AND '.DBcondition('g.groupid',$available_groups).
+				' AND g.groupid=hg.groupid '.
+				' AND h.hostid=hg.hostid'.
+				$status_filter.
+			' ORDER BY g.name';
 
 	$result=DBselect($sql);
 	while($row=DBfetch($result)){
@@ -54,9 +55,13 @@ function show_report2_header($config){
 	}
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 
+
+	$sql_from = '';
+	$sql_where = '';
+
 	if(0 == $config){
 		$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
-		$sql_cond = ' AND h.status='.HOST_STATUS_MONITORED;
+		$sql_where = ' AND h.status='.HOST_STATUS_MONITORED;
 	}
 	else{
 		$cmbTpls = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
@@ -66,38 +71,29 @@ function show_report2_header($config){
 		$cmbTrigs->AddItem(0,S_ALL_SMALL);
 		$cmbHGrps->AddItem(0,S_ALL_SMALL);
 		
-		$sql_cond = ' AND h.status='.HOST_STATUS_TEMPLATE;		
+		$sql_where = ' AND h.status='.HOST_STATUS_TEMPLATE;		
 	}
 	
 	
 	if($_REQUEST['groupid'] > 0){
-		$sql='SELECT h.hostid,h.host '.
-			' FROM hosts h,items i,hosts_groups hg '.
-			' WHERE h.hostid=i.hostid '.
-				' AND hg.groupid='.$_REQUEST['groupid'].
-				' AND hg.hostid=h.hostid'.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-				$sql_cond.
-			' GROUP BY h.hostid,h.host '.
-			' ORDER BY h.host';
+		$sql_from .= ',hosts_groups hg ';
+		$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
 	}
 	else{
-		$sql='SELECT h.hostid,h.host '.
-			' FROM hosts h,items i '.
-			' WHERE h.hostid=i.hostid '.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-				$sql_cond.
-			' GROUP BY h.hostid,h.host '.
-			' ORDER BY h.host';
-
 		if(0 == $config){
 			$cmbHosts->AddItem(0,S_ALL_SMALL);
 		}
 		else{
 			$cmbTpls->AddItem(0,S_ALL_SMALL);
-		}
-		
+		}		
 	}
+	
+	$sql='SELECT DISTINCT h.hostid,h.host '.
+		' FROM hosts h,items i '.$sql_from.
+		' WHERE '.DBcondition('h.hostid',$available_hosts).
+			$sql_where.
+			' AND i.hostid=h.hostid '.
+		' ORDER BY h.host';
 
 	$result=DBselect($sql);
 	while($row=DBfetch($result)){
@@ -174,6 +170,5 @@ function show_report2_header($config){
 		$rr_form->AddItem(array(S_TRIGGER.SPACE,$cmbTrigs,BR(),S_FILTER,SPACE,S_HOST_GROUP.SPACE,$cmbHGrps));
 		show_table_header(S_AVAILABILITY_REPORT_BIG, array($r_form,$rr_form));
 	}
-
 }
 ?>

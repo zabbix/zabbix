@@ -52,14 +52,14 @@ include_once "include/page_header.php";
 
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
-
+		
 	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
-		' FROM groups g, hosts_groups hg, hosts h, items i '.
+		' FROM groups g, hosts_groups hg, hosts h '.
 		' WHERE '.DBcondition('h.hostid',$available_hosts).
 			' AND hg.groupid=g.groupid '.
 			' AND h.status='.HOST_STATUS_MONITORED.
-			' AND h.hostid=i.hostid '.
 			' AND hg.hostid=h.hostid '.
+			' AND EXISTS (SELECT i.hostid FROM items i WHERE i.hostid=h.hostid) '.
 		' ORDER BY g.name');
 	while($row=DBfetch($result)){
 		$cmbGroup->AddItem(

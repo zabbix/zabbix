@@ -380,13 +380,15 @@
 	
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 		
-		$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
-			' FROM groups g, hosts_groups hg, hosts h, items i '.
-			' WHERE '.DBcondition('h.hostid',$available_hosts).
-				' AND hg.groupid=g.groupid '.
-				' AND h.hostid=i.hostid '.
-				' AND hg.hostid=h.hostid '.
-			' ORDER BY g.name');
+		
+		$sql = 'SELECT DISTINCT g.groupid,g.name '.
+				' FROM groups g, hosts_groups hg, hosts h '.
+				' WHERE '.DBcondition('g.groupid',$available_groups).
+					' AND hg.groupid=g.groupid '.
+					' AND h.hostid=hg.hostid '.
+					' AND EXISTS(SELECT DISTINCT i.itemid FROM items i WHERE i.hostid=h.hostid ) '.
+				' ORDER BY g.name';	
+		$result=DBselect($sql);
 		while($row=DBfetch($result)){
 			$cmbGroup->AddItem($row['groupid'],$row['name']);
 		}
@@ -400,12 +402,11 @@
 			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
 		}
 			
-		$sql='SELECT h.hostid,h.host '.
+		$sql='SELECT DISTINCT h.hostid,h.host '.
 			' FROM hosts h,items i '.$sql_from.
 			' WHERE h.hostid=i.hostid '.
 				' AND '.DBcondition('h.hostid',$available_hosts).
 				$sql_where.
-			' GROUP BY h.hostid,h.host '.
 			' ORDER BY h.host';
 		
 		$result=DBselect($sql);
