@@ -174,62 +174,75 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
  ******************************************************************************/
 int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now)
 {
-	int	i;
-	char	*p;
-	char	delay_period[30];
-	int	delay_val;
+	int	i, delay_val;
+	char	*s, *c = NULL, delay_period[30];
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In calculate_item_nextcheck (" ZBX_FS_UI64 ",%d,%s,%d)",
-		itemid,delay,delay_flex,now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In calculate_item_nextcheck (" ZBX_FS_UI64 ",%d,\"%s\",%d)",
+			itemid, delay, delay_flex, now);
 
-/* Special processing of active items to see better view in queue */
-	if(item_type == ITEM_TYPE_ZABBIX_ACTIVE)
+	if (0 == delay)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "End calculate_item_nextcheck (result:%d)",
-			(((int)now)+delay));
-		return (((int)now)+delay);
+		zabbix_log(LOG_LEVEL_ERR, "Invalid item update interval [%d], using default [%d]", delay, 30);
+		delay = 30;
 	}
 
-
-	if(delay_flex && *delay_flex)
+	/* Special processing of active items to see better view in queue */
+	if (item_type == ITEM_TYPE_ZABBIX_ACTIVE)
 	{
-		do
-		{
-			p = strchr(delay_flex, ';');
-			if(p) *p = '\0';
-			
-			zabbix_log( LOG_LEVEL_DEBUG, "Delay period [%s]", delay_flex);
+		i = (int)now + delay;
+		zabbix_log( LOG_LEVEL_DEBUG, "End calculate_item_nextcheck (result:%d)", i);
 
-			if(sscanf(delay_flex, "%d/%29s",&delay_val,delay_period) == 2)
+		return i;
+	}
+
+	if (NULL != delay_flex && '\0' != *delay_flex)
+	{
+		for (s = delay_flex; '\0' != *s;)
+		{
+			if (NULL != (c = strchr(s, ';')))
+				*c = '\0';
+
+			zabbix_log(LOG_LEVEL_DEBUG, "Delay period [%s]", s);
+
+			if (2 == sscanf(s, "%d/%29s", &delay_val, delay_period))
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "%d sec at %s",delay_val,delay_period);
-				if(check_time_period(delay_period, now))
+				zabbix_log(LOG_LEVEL_DEBUG, "%d sec at %s", delay_val, delay_period);
+
+				if (check_time_period(delay_period, now))
 				{
 					delay = delay_val;
 					break;
 				}
 			}
 			else
+				zabbix_log(LOG_LEVEL_ERR, "Delay period format is wrong [%s]", s);
+
+			if (NULL != c)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "Delay period format is wrong [%s]",delay_flex);
+				*c = ';';
+				s = c + 1;
 			}
-			if(p)
-			{
-				*p = ';'; /* restore source string */
-				delay_flex = p+1;
-			}
-		}while(p);
-		
+			else
+				break;
+		}
+
+		if (NULL != c)
+			*c = ';';
 	}
 
-/*	Old algorithm */
-/*	i=delay*(int)(now/delay);*/
-	
-	i=delay*(int)(now/(time_t)delay)+(int)(itemid % (zbx_uint64_t)delay);
+	if (0 == delay)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Invalid item update interval [%d], using default [%d]", delay, 30);
+		delay = 30;
+	}
 
-	while(i<=now)	i+=delay;
+	i = delay * (int)(now / (time_t)delay) + (int)(itemid % (zbx_uint64_t)delay);
+
+	while (i <= now)
+		i += delay;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End calculate_item_nextcheck (result:%d)", i);
+
 	return i;
 }
 
@@ -751,49 +764,62 @@ int	int_in_list(char *list, int value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	check_time_period(const char *period, time_t now)
+int	check_time_period(char *period, time_t now)
 {
-	char	tmp[MAX_STRING_LEN];
-	char	*s;
-	int	d1,d2,h1,h2,m1,m2;
-	int	day, hour, min;
-	struct  tm      *tm;
-	int	ret = 0;
+	char		*s, *c = NULL;
+	int		d1, d2, h1, h2, m1, m2;
+	int		day, min;
+	struct tm	*tm;
+	int		ret = 0;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In check_time_period(%s)", period);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In check_time_period(%s)",period);
-
-	if(now == (time_t)NULL)	now = time(NULL);
+	if (now == (time_t)NULL)
+		now = time(NULL);
 	
 	tm = localtime(&now);
 
-	day=tm->tm_wday;
-	if(0 == day)	day=7;
-	hour = tm->tm_hour;
-	min = tm->tm_min;
+	day = tm->tm_wday;
+	if(0 == day)
+		day=7;
+	min = 60 * tm->tm_hour + tm->tm_min;
 
-	strscpy(tmp,period);
-       	s=(char *)strtok(tmp,";");
-	while(s!=NULL)
+	zabbix_log(LOG_LEVEL_DEBUG, "%d,%d:%d", day, (int)tm->tm_hour, (int)tm->tm_min);
+
+	for (s = period; '\0' != *s;)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Period [%s]",s);
+		if (NULL != (c = strchr(s, ';')))
+			*c = '\0';
 
-		if(sscanf(s,"%d-%d,%d:%d-%d:%d",&d1,&d2,&h1,&m1,&h2,&m2) == 6)
+		zabbix_log(LOG_LEVEL_DEBUG, "Period [%s]", s);
+
+		if (6 == sscanf(s, "%d-%d,%d:%d-%d:%d", &d1, &d2, &h1, &m1, &h2, &m2))
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "%d-%d,%d:%d-%d:%d",d1,d2,h1,m1,h2,m2);
-			if( (day>=d1) && (day<=d2) && (60*hour+min>=60*h1+m1) && (60*hour+min<=60*h2+m2))
+			zabbix_log(LOG_LEVEL_DEBUG, "%d-%d,%d:%d-%d:%d", d1, d2, h1, m1, h2, m2);
+
+			if (day >= d1 && day <= d2 && min >= 60 * h1 + m1 && min <= 60 * h2 + m2)
 			{
 				ret = 1;
 				break;
 			}
 		}
 		else
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Time period format is wrong [%s]",period);
-		}
+			zabbix_log(LOG_LEVEL_ERR, "Time period format is wrong [%s]", period);
 
-       		s=(char *)strtok(NULL,";");
+		if (NULL != c)
+		{
+			*c = ';';
+			s = c + 1;
+		}
+		else
+			break;
 	}
+
+	if (NULL != c)
+		*c = ';';
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of check_time_period():%s", ret == 1 ? "SUCCEED" : "FAIL");
+
 	return ret;
 }
 
