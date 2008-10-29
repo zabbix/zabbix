@@ -115,7 +115,7 @@ class CLdap{
 		if(!empty($this->cnf['bind_dn']) && !empty($this->cnf['bind_password'])){
 // use superuser credentials
 			if(!ldap_bind($this->ds,$this->cnf['bind_dn'],$this->cnf['bind_password'])){
-				error("LDAP: cannot bind by given DN");
+				error('LDAP: cannot bind by given DN');
 				return false;
 			}
 
@@ -132,7 +132,7 @@ class CLdap{
 		else{
 // Anonymous bind
 			if(!ldap_bind($this->ds)){
-				error("LDAP: can not bind anonymously");
+				error('LDAP: can not bind anonymously');
 				return false;
 			}
 		}
@@ -230,7 +230,7 @@ class CLdap{
 			$sr = ldap_search($this->ds, $base, $filter, array($this->cnf['groupkey']));
 	
 			if(!$sr){
-				error("LDAP: Reading group memberships failed");		
+				error('LDAP: Reading group memberships failed');
 				return false;
 			}
 		
