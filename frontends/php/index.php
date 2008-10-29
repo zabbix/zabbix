@@ -43,14 +43,14 @@
 <?php
 	$sessionid = get_cookie('zbx_sessionid', null);
 	
-	if(isset($_REQUEST["reconnect"]) && isset($sessionid)){
+	if(isset($_REQUEST['reconnect']) && isset($sessionid)){
 		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,'Manual Logout');
 		
 		zbx_unsetcookie('zbx_sessionid');
 		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
 		unset($sessionid);
 
-		redirect("index.php");
+		redirect('index.php');
 		die();
 //		return;
 	}
@@ -62,7 +62,7 @@
 		if(isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])){
 			if(!isset($sessionid)) $_REQUEST['enter'] = 'Enter';
 			
-			$_REQUEST['name'] = $_SERVER["PHP_AUTH_USER"];
+			$_REQUEST['name'] = $_SERVER['PHP_AUTH_USER'];
 			$_REQUEST['password'] = 'zabbix';//$_SERVER["PHP_AUTH_PW"];
 		}
 		else{

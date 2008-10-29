@@ -384,7 +384,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 
 	$table = new CTableInfo(S_NO_EVENTS_FOUND); 
 	$table->SetHeader(array(
-			make_sorting_link(S_TIME,'e.eventid'),
+			S_TIME,
 			is_show_subnodes() ? S_NODE : null,
 			$hostid == 0 ? S_HOST : null,
 			S_DESCRIPTION,
@@ -395,10 +395,10 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 	if(!empty($triggers)){
 		$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.value, e.acknowledged '.
 				' FROM events e '.
-				' WHERE (e.object+0)='.EVENT_OBJECT_TRIGGER.
+				' WHERE e.object='.EVENT_OBJECT_TRIGGER.
 					' AND '.DBcondition('e.objectid', $trigger_list).
 					$sql_cond.
-				order_by('e.eventid');
+				' ORDER BY e.eventid DESC';
 
 		$result = DBselect($sql,10*($start+$num));
 	}
