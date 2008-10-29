@@ -245,6 +245,7 @@ function make_system_summary(){
 		foreach($tab_priority as $key => $value){
 			$normal = $value;
 			if($value){
+				$tr_count = 0;
 //* trigger list
 				$table_inf  = new CTableInfo();
 				$table_inf->AddOption('style', 'width: 400px;');
@@ -272,13 +273,13 @@ function make_system_summary(){
 								' AND t.priority='.$key.
 							' ORDER BY t.lastchange DESC';
 				$result = DBselect($sql,30);
-
-				while($row_inf=DBfetch($result)){
-			// Check for dependencies
+				while($row_inf=DBfetch($result)){	
+// Check for dependencies
 					if(trigger_dependent($row_inf["triggerid"]))	continue;
-
+					
+					$tr_count++;
 					$host = new CSpan($row_inf['host']);
-			
+								
 					$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
 								' FROM events e, triggers t '.
 								' WHERE e.object='.EVENT_SOURCE_TRIGGERS.
@@ -286,10 +287,9 @@ function make_system_summary(){
 									' AND t.triggerid=e.objectid '.
 									' AND e.value='.TRIGGER_VALUE_TRUE.
 								' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
-			
 					$res_events = DBSelect($event_sql,1);
-			
 					while($row_inf_event=DBfetch($res_events)){
+						
 						if($config['event_ack_enable']){
 							if($row_inf_event['acknowledged'] == 1){
 								$ack=new CLink(S_YES,'acknow.php?eventid='.$row_inf_event['eventid'],'action');
@@ -319,9 +319,8 @@ function make_system_summary(){
 					unset($row_inf,$description,$actions);
 				}
 				
-				$value = new CSpan($value);
+				$value = new CSpan($tr_count);
 				$value->SetHint($table_inf);
-				
 //-------------*/
 			}
 			$group_row->AddItem(new CCol($value,get_severity_style($key,$normal)));
