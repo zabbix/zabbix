@@ -125,6 +125,7 @@
 							'no', /* useipmi */
 							'', /* ipmi_ip */
 							623, /* ipmi_port */
+							-1, /* ipmi_authtype */
 							2, /* ipmi_privilege */
 							'', /* ipmi_username */
 							'', /* ipmi_password */
@@ -216,6 +217,7 @@
 						'no', /* useipmi */
 						'', /* ipmi_ip */
 						623, /* ipmi_port */
+						-1, /* ipmi_authtype */
 						2, /* ipmi_privilege */
 						'', /* ipmi_username */
 						'', /* ipmi_password */
