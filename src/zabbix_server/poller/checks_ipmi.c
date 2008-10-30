@@ -817,8 +817,9 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 	addrs[0] = strdup(h->ip);
 	ports[0] = zbx_dsprintf(NULL, "%d", h->port);
 
-	if (0 != (ret = ipmi_ip_setup_con(addrs, ports, 1, h->authtype, h->privilege, h->username,
-			strlen(h->username), h->password, strlen(h->password), os_hnd, NULL, &h->con)))
+	if (0 != (ret = ipmi_ip_setup_con(addrs, ports, 1, h->authtype == -1 ? (unsigned int)(~0) : (unsigned int)h->authtype,
+			(unsigned int)h->privilege, h->username, (unsigned int)strlen(h->username),
+			h->password, (unsigned int)strlen(h->password), os_hnd, NULL, &h->con)))
 	{
 		h->err = zbx_dsprintf(h->err, "Cannot connect to IPMI host [%s]:%d."
 				" ipmi_ip_setup_con() returned error 0x%x",
@@ -879,7 +880,7 @@ int	get_value_ipmi(DB_ITEM *item, AGENT_RESULT *value)
 		return NOTSUPPORTED;
 	}
 
-	h = init_ipmi_host(item->ipmi_ip, item->ipmi_port, (~0)/*item->ipmi_authtype*/,
+	h = init_ipmi_host(item->ipmi_ip, item->ipmi_port, item->ipmi_authtype,
 			item->ipmi_privilege, item->ipmi_username, item->ipmi_password);
 
 	if (0 == h->domain_up) {

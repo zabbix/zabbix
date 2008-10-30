@@ -5410,6 +5410,7 @@
 		$useipmi	= get_request('useipmi','no');
 		$ipmi_ip	= get_request('ipmi_ip','');
 		$ipmi_port	= get_request('ipmi_port',623);
+		$ipmi_authtype	= get_request('ipmi_authtype',-1);
 		$ipmi_privilege	= get_request('ipmi_privilege',2);
 		$ipmi_username	= get_request('ipmi_username','');
 		$ipmi_password	= get_request('ipmi_password','');
@@ -5476,6 +5477,7 @@
 				$dns		= $db_host['dns'];
 			}
 			$ipmi_port		= $db_host['ipmi_port'];
+			$ipmi_authtype		= $db_host['ipmi_authtype'];
 			$ipmi_privilege		= $db_host['ipmi_privilege'];
 			$ipmi_username		= $db_host['ipmi_username'];
 			$ipmi_password		= $db_host['ipmi_password'];
@@ -5657,6 +5659,16 @@
 				$frmHost->AddRow(S_IPMI_IP_ADDRESS,new CTextBox('ipmi_ip',$ipmi_ip,'15'));
 			$frmHost->AddRow(S_IPMI_PORT, new CNumericBox('ipmi_port', $ipmi_port, 5));	
 
+			$cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmi_authtype);
+			$cmbIPMIAuthtype->AddItem(IPMI_AUTHTYPE_DEFAULT,	S_AUTHTYPE_DEFAULT);
+			$cmbIPMIAuthtype->AddItem(IPMI_AUTHTYPE_NONE,		S_AUTHTYPE_NONE);
+			$cmbIPMIAuthtype->AddItem(IPMI_AUTHTYPE_MD2,		S_AUTHTYPE_MD2);
+			$cmbIPMIAuthtype->AddItem(IPMI_AUTHTYPE_MD5,		S_AUTHTYPE_MD5);
+			$cmbIPMIAuthtype->AddItem(IPMI_AUTHTYPE_STRAIGHT,	S_AUTHTYPE_STRAIGHT);
+			$cmbIPMIAuthtype->AddItem(IPMI_AUTHTYPE_OEM,		S_AUTHTYPE_OEM);
+			$cmbIPMIAuthtype->AddItem(IPMI_AUTHTYPE_RMCP_PLUS,	S_AUTHTYPE_RMCP_PLUS);
+			$frmHost->AddRow(S_IPMI_AUTHTYPE, $cmbIPMIAuthtype);	
+
 			$cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmi_privilege);
 			$cmbIPMIPrivilege->AddItem(IPMI_PRIVILEGE_CALLBACK,	S_PRIVILEGE_CALLBACK);
 			$cmbIPMIPrivilege->AddItem(IPMI_PRIVILEGE_USER,		S_PRIVILEGE_USER);
@@ -5671,6 +5683,7 @@
 		else{
 			$frmHost->AddVar('ipmi_ip', $ipmi_ip);	
 			$frmHost->AddVar('ipmi_port', $ipmi_port);	
+			$frmHost->AddVar('ipmi_authtype', $ipmi_authtype);
 			$frmHost->AddVar('ipmi_privilege', $ipmi_privilege);
 			$frmHost->AddVar('ipmi_username', $ipmi_username);
 			$frmHost->AddVar('ipmi_password', $ipmi_password);
