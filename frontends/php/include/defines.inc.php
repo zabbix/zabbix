@@ -540,6 +540,14 @@ else{
 	define('ZBX_ALLOW_UNICODE',1);
 	
 // IPMI
+	define('IPMI_AUTHTYPE_DEFAULT', -1);
+	define('IPMI_AUTHTYPE_NONE', 0);
+	define('IPMI_AUTHTYPE_MD2', 1);
+	define('IPMI_AUTHTYPE_MD5', 2);
+	define('IPMI_AUTHTYPE_STRAIGHT', 4);
+	define('IPMI_AUTHTYPE_OEM', 5);
+	define('IPMI_AUTHTYPE_RMCP_PLUS', 6);
+
 	define('IPMI_PRIVILEGE_CALLBACK', 1);
 	define('IPMI_PRIVILEGE_USER', 2);
 	define('IPMI_PRIVILEGE_OPERATOR', 3);
