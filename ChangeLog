@@ -1,5 +1,6 @@
 Changes for 1.0.0:
 
+ - [DEV-250] added support of vfs.dev.read/write under Linux 2.4/2.6 (Sasha)
  - [DEV-249] added support of advanced regular expressions (Artem,Sasha)
  - [DEV-240] added the type selection function for Triggers message display on MAP (Artem)
  - [DEV-241] added configurable message for displaying problems on maps (Artem)
