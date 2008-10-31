@@ -41,11 +41,6 @@
 #include "zlog.h"
 #include "../poller/checks_ipmi.h"
 
-#define MVAR_HOST_NAME			"{HOSTNAME}"
-#define MVAR_IPADDRESS			"{IPADDRESS}"
-#define MVAR_HOST_CONN			"{HOST.CONN}"
-
-
 /******************************************************************************
  *                                                                            *
  * Function: execute_script                                                   *
