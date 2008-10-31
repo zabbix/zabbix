@@ -21,6 +21,12 @@
 
 #include "sysinfo.h"
 
+int	get_diskstat(const char *devname, time_t *now,
+		zbx_uint64_t *r_oper, zbx_uint64_t *r_sect, zbx_uint64_t *w_oper, zbx_uint64_t *w_sect)
+{
+	return FAIL;
+}
+
 static int get_disk_stats(const char *devname, zbx_uint64_t *rbytes, zbx_uint64_t *wbytes, zbx_uint64_t *roper, zbx_uint64_t *woper)
 {
 	int			ret = SYSINFO_RET_FAIL, mib[2], drive_count;
