@@ -22,6 +22,12 @@
 #include "sysinfo.h"
 
 
+int	get_diskstat(const char *devname, time_t *now,
+		zbx_uint64_t *r_oper, zbx_uint64_t *r_sect, zbx_uint64_t *w_oper, zbx_uint64_t *w_sect)
+{
+	return FAIL;
+}
+
 #if OFF
 /*
  * hidden

@@ -163,6 +163,16 @@ typedef struct zbx_metric_type
 	char		*test_param;
 } ZBX_METRIC;
 
+/* collector */
+#define MAX_COLLECTOR_HISTORY 901 /* 15 min in seconds */
+#define ZBX_AVG1	0
+#define ZBX_AVG5	1
+#define ZBX_AVG15	2
+#define ZBX_AVGMAX	3
+
+int	get_diskstat(const char *devname, time_t *now,
+		zbx_uint64_t *r_oper, zbx_uint64_t *r_sect, zbx_uint64_t *w_oper, zbx_uint64_t *w_sect);
+
 /* flags for command */
 #define CF_USEUPARAM	1	/* use user param */
 
