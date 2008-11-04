@@ -305,7 +305,8 @@ insert into help_items values (3,'nntp&lt;,port&gt;','Checks if NNTP server is r
 insert into help_items values (3,'pop&lt;,port&gt;','Checks if POP server is running and accepting connections	0 - POP server is down 1 - POP server is running');
 insert into help_items values (3,'smtp&lt;,port&gt;','Checks if SMTP server is running and accepting connections	0 - SMTP server is down 1 - SMTP server is running');
 insert into help_items values (3,'ssh&lt;,port&gt;','Checks if SSH server is running and accepting connections	0 - SSH server is down 1 - SSH server is running');
-insert into help_items values (3,'tcp,port','Checks if TCP service is running and accepting connections on port	0 - the serivce on the por t is down 1 - the service is running');
+insert into help_items values (3,'tcp,port','Checks if TCP service is running and accepting connections on port	0 - the serivce on the port is down 1 - the service is running');
+insert into help_items values (3,'tcp_perf,port','Checks if TCP service is running and accepting connections on port	0 - the service on the port is down Otherwise, number of milliseconds spent connecting to TCP service');
 insert into help_items values (3,'ftp_perf&lt;,port&gt;','Checks if FTP server is running and accepting connections	0 - FTP server is down Otherwise, number of milliseconds spent connecting to FTP server');
 insert into help_items values (3,'http_perf&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections	0 - HTTP server is down Otherwise, number of milliseconds spent connecting to HTTP server');
 insert into help_items values (3,'imap_perf&lt;,port&gt;','Checks if IMAP server is running and accepting connections	0 - IMAP server is down Otherwise, number of milliseconds spent connecting to IMAP server');
