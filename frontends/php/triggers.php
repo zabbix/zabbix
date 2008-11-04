@@ -344,6 +344,7 @@
 	}
 ?>
 <?php
+	$available_groups = get_accessible_groups_by_user($USER_DETAILS, PERM_READ_WRITE);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 	$available_triggers = get_accessible_triggers(PERM_READ_WRITE,PERM_RES_IDS_ARRAY,null,null,0);
 	

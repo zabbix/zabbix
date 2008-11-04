@@ -92,7 +92,7 @@ class Chart extends Graph{
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 
 		$this->items[$this->num] = get_item_by_itemid($itemid);
-		$this->items[$this->num]['description']=item_description($this->items[$this->num]['description'],$this->items[$this->num]['key_']);
+		$this->items[$this->num]['description']=item_description($this->items[$this->num]);
 		$host=get_host_by_hostid($this->items[$this->num]['hostid']);
 
 		$this->items[$this->num]['host'] = $host['host'];

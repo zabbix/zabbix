@@ -271,7 +271,8 @@ DB_ITEM
 	zbx_item_type_t	type;
 	zbx_item_status_t	status;
 	char	*description;
-	char	key[ITEM_KEY_LEN_MAX];
+	char	*key;
+	char	*key_orig;
 	char	*host_name;
 	char	*host_ip;
 	char	*host_dns;

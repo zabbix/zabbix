@@ -191,7 +191,7 @@ include_once "include/page_header.php";
 							' AND '.DBcondition('h.hostid',$available_hosts).
 							' AND i.itemid='.$itemid)))
 	{
-		$description = $item_data['host'].':'.item_description($item_data["description"],$item_data["key_"]);
+		$description = $item_data['host'].':'.item_description($item_data);
 	}
 	else{
 		$itemid = 0;
