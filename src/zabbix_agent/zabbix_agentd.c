@@ -254,6 +254,8 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	init_collector_data();
 
+	load_user_parameters();
+
 	/* --- START THREADS ---*/
 
 	if(1 == CONFIG_DISABLE_PASSIVE)
@@ -363,8 +365,6 @@ int	main(int argc, char **argv)
 
 	if (ZBX_TASK_START == t.task || ZBX_TASK_INSTALL_SERVICE == t.task || ZBX_TASK_UNINSTALL_SERVICE == t.task || ZBX_TASK_START_SERVICE == t.task || ZBX_TASK_STOP_SERVICE == t.task)
 		load_config();
-
-	load_user_parameters();
 
 #if defined (_WINDOWS)
 	if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS) {
