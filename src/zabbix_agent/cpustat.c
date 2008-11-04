@@ -458,10 +458,8 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 	/* Process CPU utilization data */
 	for(i=0; i <= pcpus->count; i++)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In collect_cpustat() [0:%d]", i);
 		if(!pcpus->cpu[i].usage_couter)
 			continue;
-		zabbix_log(LOG_LEVEL_DEBUG, "In collect_cpustat() [1:%d]", i);
 
 		PdhGetRawCounterValue(
 			pcpus->cpu[i].usage_couter, 
@@ -494,8 +492,6 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 				pcpus->cpu[i].util5 = ((double)sum)/(double)j;
 			}
 		}
-		zabbix_log(LOG_LEVEL_DEBUG, "In collect_cpustat() [2:%d] " ZBX_FS_DBL " " ZBX_FS_DBL " " ZBX_FS_DBL, i, pcpus->cpu[i].util1, pcpus->cpu[i].util5, pcpus->cpu[i].util15);
-
 
 		/* cpu usage for last fifteen minutes */
 		pcpus->cpu[i].util15 = ((double)sum)/(double)MAX_CPU_HISTORY;
