@@ -39,7 +39,7 @@ function make_favorite_graphs(){
 			if(!$item = get_item_by_itemid($sourceid)) continue;
 	
 			$host = get_host_by_itemid($sourceid);
-			$item["description"] = item_description($item["description"],$item["key_"]);
+			$item["description"] = item_description($item);
 			
 			$link = new CLink(get_node_name_by_elid($sourceid).$host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$sourceid);
 			$link->SetTarget('blank');
@@ -641,7 +641,7 @@ function make_latest_data(){
 		$app_rows = array();
 		$item_cnt = 0;
 		while($db_item = DBfetch($db_items)){
-			$description = item_description($db_item["description"],$db_item["key_"]);
+			$description = item_description($db_item);
 
 			if( '' != $_REQUEST["select"] && !zbx_stristr($description, $_REQUEST["select"]) ) continue;
 
@@ -778,7 +778,7 @@ function make_graph_submenu(){
 			$item_added = true;
 	
 			$host = get_host_by_itemid($sourceid);
-			$item["description"] = item_description($item["description"],$item["key_"]);
+			$item["description"] = item_description($item);
 			
 			$graphids[] = array( 
 							'name'	=>	$host['host'].':'.$item['description'],

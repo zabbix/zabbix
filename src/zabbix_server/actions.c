@@ -227,7 +227,7 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	{
 		tmp_str = zbx_dsprintf(tmp_str, "%s", event->trigger_description);
 		
-		substitute_simple_macros(event, NULL, &tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION);
+		substitute_simple_macros(event, NULL, NULL, &tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION);
 		
 		if(condition->operator == CONDITION_OPERATOR_LIKE)
 		{

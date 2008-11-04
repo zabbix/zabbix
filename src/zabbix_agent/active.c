@@ -115,7 +115,7 @@ static int	get_min_nextcheck()
 	return min;
 }
 
-static void	add_check(char *key, int refresh, long lastlogsize)
+static void	add_check(const char *key, const char *key_orig, int refresh, long lastlogsize)
 {
 	int i;
 
@@ -140,6 +140,7 @@ static void	add_check(char *key, int refresh, long lastlogsize)
 
 	/* add new metric */
 	active_metrics[i].key		= strdup(key);
+	active_metrics[i].key_orig	= strdup(key_orig);
 	active_metrics[i].refresh	= refresh;
 	active_metrics[i].nextcheck	= 0;
 	active_metrics[i].status	= ITEM_STATUS_ACTIVE;
@@ -178,7 +179,7 @@ static void	add_check(char *key, int refresh, long lastlogsize)
 static int	parse_list_of_checks(char *str)
 {
 	const char	*p;
-	char	key[MAX_STRING_LEN], delay[MAX_STRING_LEN], lastlogsize[MAX_STRING_LEN];
+	char	key[MAX_STRING_LEN], key_orig[MAX_STRING_LEN], delay[MAX_STRING_LEN], lastlogsize[MAX_STRING_LEN];
 	char	result[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
@@ -249,6 +250,9 @@ static int	parse_list_of_checks(char *str)
 				continue;
 			}
 
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY_ORIG, key_orig, sizeof(key_orig)) || *key_orig == '\0')
+				zbx_strlcpy(key_orig, key, sizeof(key_orig));
+
 			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DELAY, delay, sizeof(delay)))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
@@ -264,7 +268,7 @@ static int	parse_list_of_checks(char *str)
 			}
 
 			if (*key && *delay && *lastlogsize)
-				add_check(key, atoi(delay), atoi(lastlogsize));
+				add_check(key, key_orig, atoi(delay), atoi(lastlogsize));
 		}
 	}
 
@@ -671,7 +675,7 @@ static void	process_active_checks(char *server, unsigned short port)
 									server,
 									port,
 									CONFIG_HOSTNAME,
-									active_metrics[i].key,
+									active_metrics[i].key_orig,
 									value,
 									&lastlogsize,
 									NULL,
@@ -706,7 +710,7 @@ static void	process_active_checks(char *server, unsigned short port)
 								server,
 								port,
 								CONFIG_HOSTNAME,
-								active_metrics[i].key,
+								active_metrics[i].key_orig,
 								"ZBX_NOTSUPPORTED",
 								&active_metrics[i].lastlogsize,
 								NULL,
@@ -747,7 +751,7 @@ static void	process_active_checks(char *server, unsigned short port)
 									server,
 									port,
 									CONFIG_HOSTNAME,
-									active_metrics[i].key,
+									active_metrics[i].key_orig,
 									value,
 									&lastlogsize,
 									&timestamp,
@@ -783,7 +787,7 @@ static void	process_active_checks(char *server, unsigned short port)
 								server,
 								port,
 								CONFIG_HOSTNAME,
-								active_metrics[i].key,
+								active_metrics[i].key_orig,
 								"ZBX_NOTSUPPORTED",
 								&active_metrics[i].lastlogsize,
 								NULL,
@@ -809,7 +813,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						server,
 						port,
 						CONFIG_HOSTNAME,
-						active_metrics[i].key,
+						active_metrics[i].key_orig,
 						*pvalue,
 						NULL,
 						NULL,

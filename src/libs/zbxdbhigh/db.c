@@ -35,6 +35,7 @@
 #include "common.h"
 #include "events.h"
 #include "threads.h"
+#include "zbxserver.h"
 
 const char *DBnode(const char *fieldid, const int nodeid)
 {
@@ -1695,11 +1696,12 @@ char*	DBdyn_escape_string(const char *src)
 
 void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 {
-	char	*s;
+	char		*s;
+	static char	*key = NULL;
 
 	ZBX_STR2UINT64(item->itemid, row[0]);
 /*	item->itemid=atoi(row[0]); */
-	zbx_snprintf(item->key, ITEM_KEY_LEN_MAX, "%s", row[1]);
+	item->key_orig=row[1];
 	item->host_name=row[2];
 	item->port=atoi(row[3]);
 	item->delay=atoi(row[4]);
@@ -1817,6 +1819,19 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->ipmi_username	= row[43];
 	item->ipmi_password	= row[44];
 	item->ipmi_sensor	= row[45];
+
+	switch (item->type) {
+		case ITEM_TYPE_ZABBIX:
+		case ITEM_TYPE_ZABBIX_ACTIVE:
+		case ITEM_TYPE_SIMPLE:
+		case ITEM_TYPE_EXTERNAL:
+			key = zbx_dsprintf(key, "%s", item->key_orig);
+			substitute_simple_macros(NULL, NULL, item, &key, MACRO_TYPE_ITEM_KEY);
+			item->key	= key;
+			break;
+		default:
+			item->key	= item->key_orig;
+	}
 }
 
 /*

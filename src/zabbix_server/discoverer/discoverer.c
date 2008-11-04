@@ -603,7 +603,7 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
 				memset(&item,0,sizeof(DB_ITEM));
-				strscpy(item.key,check->key_);
+				item.key	= check->key_;
 				item.host_name	= ip;
 				item.host_ip	= ip;
 				item.host_dns	= ip;

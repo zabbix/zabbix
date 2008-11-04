@@ -2527,7 +2527,7 @@
 				$do_down = new CLink(S_DOWN,'#','action');
 				$do_down->OnClick("return create_var('".$frmGraph->GetName()."','move_down',".$gid.", true);");
 
-				$description = new CLink($host['host'].': '.item_description($item["description"],$item["key_"]),'#','action');
+				$description = new CLink($host['host'].': '.item_description($item),'#','action');
 				$description->OnClick(
 						'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->GetName().
 						url_param($only_hostid, false, 'only_hostid').
@@ -2621,8 +2621,8 @@
 
 		$description = '';
 		if($itemid > 0){
-			$description = DBfetch(DBselect("select * FROM items WHERE itemid=".$itemid));
-			$description = item_description($description['description'],$description['key_']);
+			$description = get_item_by_itemid($itemid);
+			$description = item_description($description);
 		}
 		
 		$frmGItem->AddVar('graphid',$graphid);
@@ -5088,7 +5088,7 @@
 					' ORDER BY description';
 			$host_items_res = DBselect($sql);
 			while($host_item = DBfetch($host_items_res)){
-				$item_description = item_description($host_item['description'],$host_item['key_']);
+				$item_description = item_description($host_item);
 				$items_lbx->AddItem($host_item['itemid'],$item_description);
 			}
 			

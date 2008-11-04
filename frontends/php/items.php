@@ -923,7 +923,7 @@ include_once "include/page_header.php";
 
 		while($db_item = DBfetch($db_items)){
 			$description = array();
-			$item_description = item_description($db_item["description"],$db_item["key_"]);
+			$item_description = item_description($db_item);
 
 			if(isset($_REQUEST['filter_description']) && !zbx_stristr($item_description, $_REQUEST['filter_description']) ) continue;
 
@@ -937,7 +937,7 @@ include_once "include/page_header.php";
 			}
 
 			array_push($description, new CLink(
-				item_description($db_item["description"],$db_item["key_"]),
+				item_description($db_item),
 				"?form=update&itemid=".
 				$db_item["itemid"].url_param("hostid").url_param("groupid"),
 				'action'));

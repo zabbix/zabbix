@@ -142,18 +142,18 @@ int	send_list_of_active_checks(zbx_sock_t *sock, const char *host)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *json)
+int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
-	char	host[MAX_STRING_LEN];
-	const	char *pf;
-	DB_RESULT result;
-	DB_ROW	row;
-
-	struct zbx_json response;
+	char		host[MAX_STRING_LEN], tmp[32];
+	const char	*pf;
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_ITEM		item;
+	struct zbx_json	json;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_list_of_active_checks_json()");
 
-	if (NULL == (pf = zbx_json_pair_by_name(json, ZBX_PROTO_TAG_HOST)) ||
+	if (NULL == (pf = zbx_json_pair_by_name(jp, ZBX_PROTO_TAG_HOST)) ||
 			NULL == (pf = zbx_json_decodevalue(pf, host, sizeof(host))))
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "No tag \"%s\" in JSON request",
@@ -164,18 +164,18 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jso
 	zabbix_log( LOG_LEVEL_DEBUG, "Host:%s", host);
 
 	if (0 != CONFIG_REFRESH_UNSUPPORTED) {
-		result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h"
-			" where i.hostid=h.hostid and h.status=%d and i.type=%d and h.host='%s'"
+		result = DBselect("select %s where i.hostid=h.hostid and h.status=%d and i.type=%d and h.host='%s'"
 			" and h.proxy_hostid=0 and (i.status=%d or (i.status=%d and i.nextcheck<=%d))" DB_NODE,
+			ZBX_SQL_ITEM_SELECT,
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			host,
 			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED, time(NULL),
 			DBnode_local("h.hostid"));
 	} else {
-		result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h"
-			" where i.hostid=h.hostid and h.status=%d and i.type=%d and h.host='%s'"
+		result = DBselect("select %s where i.hostid=h.hostid and h.status=%d and i.type=%d and h.host='%s'"
 			" and h.proxy_hostid=0 and i.status=%d" DB_NODE,
+			ZBX_SQL_ITEM_SELECT,
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			host,
@@ -183,30 +183,36 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jso
 			DBnode_local("h.hostid"));
 	}
 
-	zbx_json_init(&response, 8*1024);
-	zbx_json_addstring(&response, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-	zbx_json_addarray(&response, ZBX_PROTO_TAG_DATA);
+	zbx_json_init(&json, 8*1024);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+	zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 
 	while((row=DBfetch(result)))
 	{
-		zbx_json_addobject(&response, NULL);
-		zbx_json_addstring(&response, ZBX_PROTO_TAG_KEY, row[0], ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&response, ZBX_PROTO_TAG_DELAY, row[1], ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&response, ZBX_PROTO_TAG_LOGLASTSIZE, row[2], ZBX_JSON_TYPE_STRING);
-		zbx_json_close(&response);
+		DBget_item_from_db(&item, row);
+
+		zbx_json_addobject(&json, NULL);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, item.key, ZBX_JSON_TYPE_STRING);
+		if (0 != strcmp(item.key, item.key_orig))
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY_ORIG, item.key_orig, ZBX_JSON_TYPE_STRING);
+		zbx_snprintf(tmp, sizeof(tmp), "%d", item.delay);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_DELAY, tmp, ZBX_JSON_TYPE_STRING);
+		zbx_snprintf(tmp, sizeof(tmp), "%d", item.lastlogsize);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json);
 	}
 	DBfree_result(result);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",
-		response.buffer);
+		json.buffer);
 
-	if( zbx_tcp_send_raw(sock, response.buffer) != SUCCEED )
+	if( zbx_tcp_send_raw(sock, json.buffer) != SUCCEED )
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error while sending list of active checks");
 		return  FAIL;
 	}
 
-	zbx_json_free(&response);
+	zbx_json_free(&json);
 
 	return  SUCCEED;
 }
