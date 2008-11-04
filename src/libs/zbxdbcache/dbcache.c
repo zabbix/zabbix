@@ -809,7 +809,7 @@ static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
 	DB_FUNCTION	function;
 	DB_ITEM		item;
 	char		*lastvalue;
-	char		value[MAX_STRING_LEN], value_esc[MAX_STRING_LEN];
+	char		value[MAX_STRING_LEN], *value_esc, *parameter_esc;
 	int		sql_offset = 0, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_function_update()");
@@ -860,14 +860,19 @@ static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
 		/* Update only if lastvalue differs from new one */
 		if (DBis_null(lastvalue) == SUCCEED || strcmp(lastvalue, value) != 0)
 		{
-			DBescape_string(value, value_esc, MAX_STRING_LEN);
+			value_esc = DBdyn_escape_string(value);
+			parameter_esc = DBdyn_escape_string(function.parameter);
+
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
 					"update functions set lastvalue='%s' where itemid=" ZBX_FS_UI64
 					" and function='%s' and parameter='%s';\n",
 					value_esc,
 					function.itemid,
 					function.function,
-					function.parameter);
+					parameter_esc);
+
+			zbx_free(parameter_esc);
+			zbx_free(value_esc);
 		}
 	}
 	DBfree_result(result);

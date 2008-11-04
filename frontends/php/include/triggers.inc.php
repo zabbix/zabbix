@@ -1980,7 +1980,7 @@
 				' where f.itemid=i.itemid and f.triggerid='.$trhosts[$hostname]['triggerid']);
 
 			while($item_data = DBfetch($db_items)){
-				$description = item_description($item_data['description'], $item_data['key_']);
+				$description = item_description($item_data);
 				switch($item_data['value_type']){
 					case ITEM_VALUE_TYPE_UINT64:
 					case ITEM_VALUE_TYPE_FLOAT:

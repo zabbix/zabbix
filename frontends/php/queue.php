@@ -199,7 +199,7 @@ include_once "include/page_header.php";
 					$row["nextcheck"]),
 				get_node_name_by_elid($row['hostid']),
 				$row['host'],
-				item_description($row["description"],$row["key_"])
+				item_description($row)
 				));
 		}
 	}

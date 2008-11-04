@@ -910,8 +910,37 @@
 	return $param;
 	}
 
-	function item_description($description, $key){
-		$descr=$description;
+	function expand_item_key_by_data($item)
+	{
+		$key = $item['key_'];
+
+		if (zbx_strstr($key, '{HOSTNAME}'))
+		{
+			$host = get_host_by_itemid($item['itemid']);
+			$key = str_replace('{HOSTNAME}', $host['host'], $key);
+		}
+		else if (zbx_strstr($key, '{IPADDRESS}'))
+		{
+			$host = get_host_by_itemid($item['itemid']);
+			$key = str_replace('{IPADDRESS}', $host['ip'], $key);
+		}
+		else if (zbx_strstr($key, '{HOST.DNS}'))
+		{
+			$host = get_host_by_itemid($item['itemid']);
+			$key = str_replace('{HOST.DNS}', $host['dns'], $key);
+		}
+		else if (zbx_strstr($key, '{HOST.CONN}'))
+		{
+			$host = get_host_by_itemid($item['itemid']);
+			$key = str_replace('{HOST.CONN}', $host['useip'] ? $host['ip'] : $host['dns'], $key);
+		}
+
+		return $key;
+	}
+
+	function item_description($item){
+		$descr=$item['description'];
+		$key=expand_item_key_by_data($item);
 
 		for($i=9;$i>0;$i--){
 			$descr=str_replace("$$i",get_n_param($key,$i),$descr);
@@ -974,7 +1003,7 @@ COpt::profiling_start('prepare data');
 		// get rid of warnings about $triggers undefined
 		$items = array();
 		while($row = DBfetch($result)){
-			$descr = item_description($row["description"],$row["key_"]);
+			$descr = item_description($row);
 			$row['host'] = get_node_name_by_elid($row['hostid']).$row['host'];
 			$hosts[strtolower($row['host'])] = $row['host'];
 

@@ -270,7 +270,7 @@ include_once 'include/page_header.php';
 //SDI($sql);
 	$db_items = DBselect($sql);
 	while($db_item = DBfetch($db_items)){
-		$description = item_description($db_item['description'],$db_item['key_']);
+		$description = item_description($db_item);
 
 		if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
 		
@@ -396,7 +396,7 @@ include_once 'include/page_header.php';
 	$db_items = DBselect($sql);
 	while($db_item = DBfetch($db_items)){
 		
-		$description = item_description($db_item['description'],$db_item['key_']);
+		$description = item_description($db_item);
 
 		if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;		
 

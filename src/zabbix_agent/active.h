@@ -32,7 +32,7 @@ extern int	CONFIG_BUFFER_SIZE;
 
 typedef struct zbx_active_metric_type
 {
-	char	*key;
+	char	*key, *key_orig;
 	int	refresh;
 	int	nextcheck;
 	int	status;
