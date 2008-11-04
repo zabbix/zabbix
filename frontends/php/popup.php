@@ -765,7 +765,7 @@ include_once "include/page_header.php";
 
 		while($db_item = DBfetch($db_items))
 		{
-			$description = new CLink(item_description($db_item["description"],$db_item["key_"]),"#","action");
+			$description = new CLink(item_description($db_item),"#","action");
 			$description->SetAction("return add_item_variable('".$dstfrm."','".$db_item["itemid"]."');");
 
 			switch($db_item["status"]){
@@ -812,7 +812,7 @@ include_once "include/page_header.php";
 		$result = DBselect($sql);
 		while($row = DBfetch($result))
 		{
-			$row["description"] = item_description($row["description"],$row["key_"]);
+			$row["description"] = item_description($row);
 			
 			$description = new CLink($row["description"],"#","action");
 
@@ -1002,7 +1002,7 @@ include_once "include/page_header.php";
 		$result = DBselect($sql);
 		while($row = DBfetch($result)){
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-			$row["description"] = item_description($row["description"],$row["key_"]);
+			$row["description"] = item_description($row);
 			
 			$description = new CLink($row["description"],"#","action");
 
@@ -1098,7 +1098,7 @@ include_once "include/page_header.php";
 		while($row = DBfetch($result))
 		{
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-			$row["description"] = item_description($row["description"],$row["key_"]);
+			$row["description"] = item_description($row);
 			
 			$description = new CLink($row["description"],"#","action");
 

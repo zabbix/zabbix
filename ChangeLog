@@ -6,6 +6,7 @@ Changes for 1.7.0
 
 Changes for 1.6.1
 
+ - [ZBX-585] added support of macros {HOSTNAME},{HOST.CONN},{IPADDRESS},{HOST.DNS} in item keys (Sasha)
  - [DEV-250] added support of vfs.dev.read/write under Linux 2.4/2.6 (Sasha)
  - [ZBX-576] added IPMI authentication algorithms (Sasha)
  - [ZBX-573] made SQL optimization for PGSQL (Artem)

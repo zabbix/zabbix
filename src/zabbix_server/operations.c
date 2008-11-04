@@ -213,7 +213,7 @@ static void run_remote_command(char* host_name, char* command)
 	DB_ITEM         item;
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*p;
+	char		*p, key[ITEM_KEY_LEN_MAX];
 #ifdef HAVE_OPENIPMI
 	int		val;
 	char		error[MAX_STRING_LEN];
@@ -233,6 +233,8 @@ static void run_remote_command(char* host_name, char* command)
 
 	if (NULL != (row = DBfetch(result)))
 	{
+		*key			= '\0';
+		item.key		= key;
 		item.host_name		= row[0];
 		item.host_ip		= row[1];
 		item.useip		= atoi(row[2]);
@@ -259,7 +261,7 @@ static void run_remote_command(char* host_name, char* command)
 		else
 		{
 #endif
-			zbx_snprintf(item.key, ITEM_KEY_LEN_MAX, "system.run[%s,nowait]", p);
+			zbx_snprintf(key, sizeof(key), "system.run[%s,nowait]", p);
 
 			alarm(CONFIG_TIMEOUT);
 

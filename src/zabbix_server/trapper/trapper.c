@@ -217,7 +217,7 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 
 		for (i = 0; i < value_num; i++)
 		{
-			if (0 == strcmp(item.host_name, values[i].host_name) && 0 == strcmp(item.key, values[i].key)) {
+			if (0 == strcmp(item.host_name, values[i].host_name) && 0 == strcmp(item.key_orig, values[i].key)) {
 /*				zabbix_log(LOG_LEVEL_DEBUG, "Processing [%s@%s: \"%s\"]",
 						item.key,
 						item.host_name,
@@ -226,10 +226,10 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 				if (0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "Active parameter [%s] is not supported by agent on host [%s]",
-							item.key,
+							item.key_orig,
 							item.host_name);
 					zabbix_syslog("Active parameter [%s] is not supported by agent on host [%s]",
-							item.key,
+							item.key_orig,
 							item.host_name);
 
 					DCadd_nextcheck(&item, values[i].clock, proxy_timediff, "Not supported by ZABBIX agent");
@@ -300,11 +300,11 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 					{
 						zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not suitable for [%s@%s]",
 								values[i].value,
-								item.key,
+								item.key_orig,
 								item.host_name);
 						zabbix_syslog("Type of received value [%s] is not suitable for [%s@%s]",
 								values[i].value,
-								item.key,
+								item.key_orig,
 								item.host_name);
 					}
 					free_result(&agent);

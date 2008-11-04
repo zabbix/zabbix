@@ -1107,11 +1107,11 @@ require_once('include/httptest.inc.php');
 			return false;
 		}
  
-		if($info = DBfetch(DBselect('select i.key_, i.description from items_applications ia, items i '.
+		if($info = DBfetch(DBselect('select i.itemid,i.key_,i.description from items_applications ia, items i '.
 			' where i.type='.ITEM_TYPE_HTTPTEST.' and i.itemid=ia.itemid and ia.applicationid='.$applicationid)))
 		{
 			info("Application '".$host["host"].":".$app["name"]."' used by item '".
-				item_description($info['description'], $info['key_'])."'");
+				item_description($info)."'");
 			return false;
 		}
 

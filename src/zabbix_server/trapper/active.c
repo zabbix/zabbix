@@ -144,9 +144,11 @@ int	send_list_of_active_checks(zbx_sock_t *sock, const char *host)
  ******************************************************************************/
 int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
-	char		host[HOST_HOST_LEN_MAX], *name_esc, params[MAX_STRING_LEN], pattern[MAX_STRING_LEN];
+	char		host[HOST_HOST_LEN_MAX], *name_esc, params[MAX_STRING_LEN],
+			pattern[MAX_STRING_LEN], tmp[32];
 	DB_RESULT	result;
 	DB_ROW		row;
+	DB_ITEM		item;
 	struct zbx_json	json;
 	int		res = SUCCEED;
 
@@ -175,9 +177,9 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	name_esc = DBdyn_escape_string(host);
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 512,
-			"select i.key_,i.delay,i.lastlogsize from items i,hosts h "
-			"where i.hostid=h.hostid and h.status=%d and i.type=%d and h.host='%s' and h.proxy_hostid=0",
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 1024,
+			"select %s where i.hostid=h.hostid and h.status=%d and i.type=%d and h.host='%s' and h.proxy_hostid=0",
+			ZBX_SQL_ITEM_SELECT,
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			name_esc);
@@ -204,18 +206,24 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		DBget_item_from_db(&item, row);
+
 		zbx_json_addobject(&json, NULL);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, row[0], ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_DELAY, row[1], ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGLASTSIZE, row[2], ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, item.key, ZBX_JSON_TYPE_STRING);
+		if (0 != strcmp(item.key, item.key_orig))
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY_ORIG, item.key_orig, ZBX_JSON_TYPE_STRING);
+		zbx_snprintf(tmp, sizeof(tmp), "%d", item.delay);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_DELAY, tmp, ZBX_JSON_TYPE_STRING);
+		zbx_snprintf(tmp, sizeof(tmp), "%d", item.lastlogsize);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
 
 		/* Special processing for log[] and eventlog[] items */
 		do {	/* simple try realization */
-			if (0 != strncmp(row[0], "log[", 4) && 0 != strncmp(row[0], "eventlog[", 9))
+			if (0 != strncmp(item.key, "log[", 4) && 0 != strncmp(item.key, "eventlog[", 9))
 				break;
 
-			if (2 != parse_command(row[0], NULL, 0, params, MAX_STRING_LEN))
+			if (2 != parse_command(item.key, NULL, 0, params, MAX_STRING_LEN))
 				break;;
 				
 			if (0 != get_param(params, 2, pattern, sizeof(pattern)))

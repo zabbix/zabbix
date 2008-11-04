@@ -152,7 +152,7 @@ include_once "include/page_header.php";
 	$l_header = null;
 
 	if(!is_array($_REQUEST['itemid'])){
-		$main_header = $item_data['host'].': '.item_description($item_data['description'],$item_data['key_']);
+		$main_header = $item_data['host'].': '.item_description($item_data);
 		
 		if(isset($_REQUEST['plaintext']))
 			echo $main_header.SBR;
@@ -163,7 +163,7 @@ include_once "include/page_header.php";
 		}
 
 		$l_header = array(new CLink($item_data['host'],'latest.php?hostid='.$item_data['hostid']),': ',
-			item_description($item_data['description'],$item_data['key_']));
+			item_description($item_data));
 			
 		if('showgraph' == $_REQUEST['action']){
 			if(infavorites('web.favorite.graphids',$_REQUEST['itemid'],'itemid')){
@@ -213,7 +213,7 @@ include_once "include/page_header.php";
 					}
 					
 					$host = get_host_by_hostid($item['hostid']);
-					$cmbLogList->AddItem($itemid,$host['host'].': '.item_description($item['description'],$item['key_']));
+					$cmbLogList->AddItem($itemid,$host['host'].': '.item_description($item));
 				}
 			}
 			else{
@@ -399,7 +399,7 @@ include_once "include/page_header.php";
 				$new_row = array(nbsp(date("[Y.M.d H:i:s]",$row["clock"])));
 
 				if($item_cout > 1)
-					array_push($new_row,$row["host"].":".item_description($row["description"],$row["key_"]));
+					array_push($new_row,$row["host"].":".item_description($row));
 
 				if($row["timestamp"] == 0){
 					array_push($new_row,new CCol("-","center"));

@@ -348,7 +348,7 @@
 		$host = get_host_by_itemid($itemid);
 		
 		$table = new CTableInfo();
-		$table->SetHeader(array(S_TIMESTAMP,item_description($host['host'].': '.$item["description"],$item["key_"])));
+		$table->SetHeader(array(S_TIMESTAMP,$host['host'].': '.item_description($item)));
 
 		while($row=DBfetch($result)){
 			switch($item["value_type"]){
@@ -518,7 +518,7 @@
 							' AND i.itemid='.$resourceid);
 
 				while($row=DBfetch($result)){
-					$description_=item_description($row['description'],$row['key_']);
+					$description_=item_description($row);
 					$row["node_name"] = isset($row["node_name"]) ? "(".$row["node_name"].") " : '';
 	
 					$caption = $row['node_name'].$row['host'].': '.$description_;
@@ -579,7 +579,7 @@
 							' AND i.itemid='.$resourceid);
 
 				while($row=DBfetch($result)){
-					$description_=item_description($row['description'],$row['key_']);
+					$description_=item_description($row);
 					$row["node_name"] = isset($row["node_name"]) ? '('.$row["node_name"].') ' : '';
 	
 					$caption = $row['node_name'].$row['host'].': '.$description_;
