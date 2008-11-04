@@ -4,7 +4,7 @@ mkdir Win32
 mkdir Win32\zabbix_sender
 mkdir Win32\zabbix_sender\zbxcomms
 
-mc -U -s -h "c:\zabbix\trunk\build\win32\project\\" -r "c:\zabbix\trunk\build\win32\project\\" messages.mc
+mc -U -s -h ".\\" -r ".\\" messages.mc
 
 echo ..\..\..\src\libs\zbxjson\json.c > cl.tmp
 echo ..\..\..\src\libs\zbxcrypto\base64.c >> cl.tmp

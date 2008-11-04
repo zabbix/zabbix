@@ -4,7 +4,7 @@ mkdir Win32
 mkdir Win32\zabbix_get
 mkdir Win32\zabbix_get\zbxcomms
 
-mc -U -s -h "c:\zabbix\trunk\build\win32\project\\" -r "c:\zabbix\trunk\build\win32\project\\" messages.mc
+mc -U -s -h ".\\" -r ".\\" messages.mc
 
 echo ..\..\..\src\libs\zbxsys\threads.c > cl.tmp
 echo ..\..\..\src\libs\zbxsys\symbols.c >> cl.tmp
