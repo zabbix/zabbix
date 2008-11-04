@@ -5,7 +5,7 @@ mkdir Win64\zabbix_agentd
 mkdir Win64\zabbix_agentd\zbxsysinfo
 mkdir Win64\zabbix_agentd\zbxcomms
 
-mc -U -s -h "c:\zabbix\trunk\build\win32\project\\" -r "c:\zabbix\trunk\build\win32\project\\" messages.mc
+mc -U -s -h ".\\" -r ".\\" messages.mc
 
 echo ..\..\..\src\libs\zbxjson\json.c > cl.tmp
 echo ..\..\..\src\libs\zbxplugin\zbxplugin.c >> cl.tmp
