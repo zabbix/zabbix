@@ -92,7 +92,7 @@ function check_authorisation(){
 		$USER_DETAILS = NULL;
 	}
 	
-	if($login && !isset($inocorrect_session)){
+	if($login && !isset($incorrect_session)){
 		zbx_setcookie('zbx_sessionid',$sessionid,$USER_DETAILS['autologin']?(time()+86400*31):0);	//1 month
 		DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE sessionid='.zbx_dbstr($sessionid));
 	}
