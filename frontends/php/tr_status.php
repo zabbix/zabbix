@@ -196,7 +196,6 @@ include_once "include/page_header.php";
 	$show_triggers = $_REQUEST['show_triggers'];
 	$show_events   = $_REQUEST['show_events'];
 	$show_severity = $_REQUEST['show_severity'];
-	$show_events_status = $_REQUEST['show_events_status'];
 // --------------
 
 	validate_sort_and_sortorder('t.lastchange',ZBX_SORT_DOWN);
