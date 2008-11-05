@@ -88,7 +88,7 @@ function check_authorisation(){
 		$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
 	}
 	
-	if(!login){
+	if(!$login){
 		$USER_DETAILS = NULL;
 	}
 	
