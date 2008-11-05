@@ -153,7 +153,7 @@ include_once('include/page_header.php');
 
 			$_REQUEST['password1'] = get_request('password1', null);
 			$_REQUEST['password2'] = get_request('password2', null);
-			
+
 			if(($config['authentication_type'] != ZBX_AUTH_INTERNAL) && zbx_empty($_REQUEST['password1'])){
 				if(($config['authentication_type'] == ZBX_AUTH_LDAP) && isset($_REQUEST['userid'])){
 					if(GROUP_GUI_ACCESS_INTERNAL != get_user_auth($_REQUEST['userid'])){
