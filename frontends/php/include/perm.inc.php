@@ -88,13 +88,15 @@ function check_authorisation(){
 		$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
 	}
 	
-	if($login){
+	if(!$login){
+		$USER_DETAILS = NULL;
+	}
+	
+	if($login && !isset($incorrect_session)){
 		zbx_setcookie('zbx_sessionid',$sessionid,$USER_DETAILS['autologin']?(time()+86400*31):0);	//1 month
-		DBexecute('UPDATE sessions SET lastaccess='.time().', userid='.$USER_DETAILS['userid'].' WHERE sessionid='.zbx_dbstr($sessionid));
+		DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE sessionid='.zbx_dbstr($sessionid));
 	}
 	else{
-		$USER_DETAILS = NULL;
-		
 		zbx_unsetcookie('zbx_sessionid');
 		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
 		unset($sessionid);
