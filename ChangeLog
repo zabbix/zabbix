@@ -1,3 +1,8 @@
+Changes for 1.6.2
+
+ - [ZBX-588] fixed undefined variable in trigger status page (Artem)
+ - [ZBX-587] fixed LDAP test functionality (Artem)
+
 Changes for 1.6.1
 
  - [ZBX-586] added simple check tcp_perf into help_items (Sasha)

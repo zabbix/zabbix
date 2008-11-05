@@ -78,7 +78,7 @@ COpt::profiling_start("page");
 					$page['title'] .= ' ('.$curr_node_data['name'].')';
 			}
 			
-			if((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && $USER_DETAILS["refresh"]){
+			if((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && $USER_DETAILS['refresh']){
 				$page['title'] .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
 			}
 		break; 
