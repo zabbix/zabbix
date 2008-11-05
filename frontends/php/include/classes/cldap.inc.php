@@ -110,7 +110,6 @@ class CLdap{
 // reject empty password
 		if(empty($pass)) return false;
 		if(!$this->connect()) return false;
-
 // indirect user bind
 		if(!empty($this->cnf['bind_dn']) && !empty($this->cnf['bind_password'])){
 // use superuser credentials
@@ -118,7 +117,6 @@ class CLdap{
 				error('LDAP: cannot bind by given DN');
 				return false;
 			}
-
 			$this->bound = 2;
 		}
 		else if(!empty($this->cnf['bind_dn']) && !empty($this->cnf['base_dn']) && !empty($this->cnf['userfilter'])){
@@ -150,7 +148,7 @@ class CLdap{
 		else{
 // See if we can find the user
 			$this->info = $this->getUserData($user);
-		
+
 			if(empty($this->info['dn'])) {
 				return false;
 			} 
@@ -169,7 +167,7 @@ class CLdap{
 			return true;
 		}
 
-		return false;
+	return false;
 	}
 	
 	function getUserData($user) {
@@ -182,7 +180,7 @@ class CLdap{
 			}
 			$this->bound = 2;
 		}
-		
+
 // with no superuser creds we continue as user or anonymous here
 		$info['user'] = $user;
 		$info['host'] = $this->cnf['host'];
@@ -199,10 +197,10 @@ class CLdap{
 
 		$sr     = ldap_search($this->ds, $base, $filter);
 		$result = ldap_get_entries($this->ds, $sr);
-				
+		
 // Don't accept more or less than one response
 		if($result['count'] != 1){
-//			error('User not found.');
+			error('LDAP: User not found');
 			return false;
 		}
 
@@ -248,7 +246,7 @@ class CLdap{
 			$info['grps'][] = $conf['defaultgroup'];
 		}
 	
-		return $info;
+	return $info;
 	}
 	
 	function makeFilter($filter, $placeholders) {

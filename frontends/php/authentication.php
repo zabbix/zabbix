@@ -47,6 +47,7 @@ include_once('include/page_header.php');
 		
 		'authentication_type'=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1,2'),			NULL),
 		
+		'user'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&isset({form_refresh_ldap})&&(isset({authentication_type}) || isset({test}))'),
 		'user_password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&isset({form_refresh_ldap})&&(isset({authentication_type}) || isset({test}))'),
 
 /* actions */
@@ -103,8 +104,10 @@ include_once('include/page_header.php');
 		}
 	}
 	else if($_REQUEST['config']==ZBX_AUTH_LDAP){
-		if(isset($_REQUEST['save'])){
-	
+		if(isset($_REQUEST['save'])){	
+			$alias = get_request('user', $USER_DETAILS['alias']);
+			$passwd = get_request('user_password','');
+
 			$config=select_config();
 			$cur_auth_type = $config['authentication_type'] ;
 			
@@ -120,7 +123,7 @@ include_once('include/page_header.php');
 
 			$result = true;
 			if(ZBX_AUTH_LDAP == $config['authentication_type']){
-				$result=ldap_authentication($USER_DETAILS['alias'],get_request('user_password',''),$ldap_cnf);
+				$result=ldap_authentication($alias,$passwd,$ldap_cnf);
 			}
 			
 // If we do save and auth_type changed, reset all sessions 
@@ -139,6 +142,9 @@ include_once('include/page_header.php');
 			}		
 		}
 		else if(isset($_REQUEST['test'])){
+			$alias = get_request('user', $USER_DETAILS['alias']);
+			$passwd = get_request('user_password','');
+
 			$config=select_config();
 			foreach($config as $id => $value){
 				if(isset($_REQUEST[$id])){
@@ -146,8 +152,8 @@ include_once('include/page_header.php');
 				}
 			}
 
-			$result = ldap_authentication($USER_DETAILS['alias'],get_request('user_password',''),$ldap_cnf);
-			
+			$result = ldap_authentication($alias,$passwd,$ldap_cnf);
+
 			show_messages($result, S_LDAP.SPACE.S_LOGIN.SPACE.S_SUCCESSFUL_SMALL, S_LDAP.SPACE.S_LOGIN.SPACE.S_WAS_NOT.SPACE.S_SUCCESSFUL_SMALL);
 		}
 	}
@@ -235,8 +241,7 @@ include_once('include/page_header.php');
 		$frmAuth->Show();
 	}
 	else if(ZBX_AUTH_LDAP==$_REQUEST['config']){
-
-		if(isset($_REQUEST['form_refresh'])){
+		if(isset($_REQUEST['form_refresh_ldap'])){
 			foreach($config as $id => $value){
 				if(isset($_REQUEST[$id])){
 					$config[$id] = $_REQUEST[$id];

@@ -44,19 +44,21 @@ function check_authorisation(){
 	$USER_DETAILS = NULL;
 	$login = FALSE;
 	
-	$sessionid = get_cookie("zbx_sessionid");
+	$sessionid = get_cookie('zbx_sessionid');
 
 	if(!is_null($sessionid)){
-		$login = $USER_DETAILS = DBfetch(DBselect('SELECT u.*,s.* '.
-					' FROM sessions s,users u'.
-					' WHERE s.sessionid='.zbx_dbstr($sessionid).
-						' AND s.status='.ZBX_SESSION_ACTIVE.
-						' AND s.userid=u.userid'.
-						' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
-						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
+		$sql = 'SELECT u.*,s.* '.
+				' FROM sessions s,users u'.
+				' WHERE s.sessionid='.zbx_dbstr($sessionid).
+					' AND s.status='.ZBX_SESSION_ACTIVE.
+					' AND s.userid=u.userid'.
+					' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
+					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
+					
+		$login = $USER_DETAILS = DBfetch(DBselect($sql));
 
 		if(!$USER_DETAILS){
-			$incorect_session = true;
+			$incorrect_session = true;
 		}
 		else if($login['attempt_failed']){
 			error(new CScript(array(
@@ -72,10 +74,11 @@ function check_authorisation(){
 	}
 
 	if(!$USER_DETAILS){
-		$login = $USER_DETAILS = DBfetch(DBselect('SELECT u.* '.
-									' FROM users u '.
-									' WHERE u.alias='.zbx_dbstr(ZBX_GUEST_USER).
-										' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
+		$sql = 'SELECT u.* '.
+				' FROM users u '.
+				' WHERE u.alias='.zbx_dbstr(ZBX_GUEST_USER).
+					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
+		$login = $USER_DETAILS = DBfetch(DBselect($sql));
 		if(!$USER_DETAILS){
 			$missed_user_guest = true;
 		}
@@ -84,10 +87,10 @@ function check_authorisation(){
 	if($login){
 		$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
 	}
-
+	
 	if($login){
-		zbx_setcookie("zbx_sessionid",$sessionid,$USER_DETAILS['autologin']?(time()+86400*31):0);	//1 month
-		DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE sessionid='.zbx_dbstr($sessionid));
+		zbx_setcookie('zbx_sessionid',$sessionid,$USER_DETAILS['autologin']?(time()+86400*31):0);	//1 month
+		DBexecute('UPDATE sessions SET lastaccess='.time().', userid='.$USER_DETAILS['userid'].' WHERE sessionid='.zbx_dbstr($sessionid));
 	}
 	else{
 		$USER_DETAILS = NULL;
@@ -98,7 +101,7 @@ function check_authorisation(){
 	}
 
 	if($USER_DETAILS){
-		$USER_DETAILS['node'] = DBfetch(DBselect('select * from nodes where nodeid='.id2nodeid($USER_DETAILS['userid'])));
+		$USER_DETAILS['node'] = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.id2nodeid($USER_DETAILS['userid'])));
 		
 		if(empty($USER_DETAILS['node'])){
 			$USER_DETAILS['node']['name'] = '- unknown -';
@@ -107,22 +110,22 @@ function check_authorisation(){
 	}
 	else{
 		$USER_DETAILS = array(
-			"alias"	=>ZBX_GUEST_USER,
-			"userid"=>0,
-			"lang"	=>"en_gb",
-			"type"	=>"0",
-			"node"	=>array(
-				"name"	=>'- unknown -',
-				"nodeid"=>0));
+			'alias'	=>ZBX_GUEST_USER,
+			'userid'=>0,
+			'lang'	=>'en_gb',
+			'type'	=>'0',
+			'node'	=>array(
+				'name'	=>'- unknown -',
+				'nodeid'=>0));
 	}
 	
 	if(!$login || isset($incorrect_session) || isset($missed_user_guest)){
 
-		if(isset($incorrect_session))		$message = "Session was ended, please relogin!";
+		if(isset($incorrect_session))	$message = 'Session was ended, please relogin!';
 		else if(isset($missed_user_guest)){
 			$row = DBfetch(DBselect('SELECT count(u.userid) as user_cnt FROM users u'));
 			if(!$row || $row['user_cnt'] == 0){
-				$message = "Table users is empty. Possible database corruption.";
+				$message = 'Table users is empty. Possible database corruption.';
 			}
 		}
 		
@@ -153,7 +156,7 @@ function ldap_authentication($user,$passwd,$cnf=NULL){
 	
 	$ldap = new CLdap($cnf);
 	$ldap->connect();
-	
+
 	$result = $ldap->checkPass($user,$passwd);
 
 return $result;
