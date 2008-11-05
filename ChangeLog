@@ -4,6 +4,10 @@ Changes for 1.7.0
  - [DEV-247] added enhancement to the Graph function (Artem)
  - [DEV-233,DEV-237] added support of scheduled maintenance periods (Artem,Sasha)
 
+Changes for 1.6.2
+
+ - [ZBX-587] fixed LDAP test functionality (Artem)
+
 Changes for 1.6.1
 
  - [ZBX-586] added simple check tcp_perf into help_items (Sasha)
