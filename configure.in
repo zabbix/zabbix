@@ -51,7 +51,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
-  net/if_mib.h sys/user.h)
+  net/if_mib.h sys/user.h libperfstat.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -70,6 +70,8 @@ AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(__res_query, resolv bind socket)
 #Solaris 8 requires this. It does not have symbol __res_query.
 AC_SEARCH_LIBS(res_query, resolv bind socket)
+#Aix 6.x requires this
+AC_SEARCH_LIBS(perfstat_memory_total, perfstat, [AC_DEFINE([HAVE_LIBPERFSTAT], 1, [Define to 1 if you have the 'libperfstat' library (-lperfstat)])])
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(kvm, main)
 dnl AC_CHECK_LIB(pthread, main)
