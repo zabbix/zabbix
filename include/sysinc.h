@@ -258,6 +258,10 @@
 #	include <sys/vmmeter.h>
 #endif
 
+#ifdef HAVE_LIBPERFSTAT
+#	include <libperfstat.h>
+#endif
+
 #ifdef HAVE_SYS_RESOURCE_H
 #	include <sys/resource.h>
 #endif
