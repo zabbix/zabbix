@@ -300,34 +300,31 @@ int parse_command( /* return value: 0 - error; 1 - command without parameters; 2
 	return ret;
 }
 
-void	test_parameter(char* key)
+void	test_parameter(const char* key, unsigned flags)
 {
 	AGENT_RESULT	result;
 
-	memset(&result, 0, sizeof(AGENT_RESULT));
-	process(key, PROCESS_TEST, &result);
-	if(result.type & AR_DOUBLE)
-	{
+	init_result(&result);
+
+	process(key, flags, &result);
+
+	if (result.type & AR_DOUBLE)
 		printf(" [d|" ZBX_FS_DBL "]", result.dbl);
-	}
-	if(result.type & AR_UINT64)
-	{
+
+	if (result.type & AR_UINT64)
 		printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
-	}
-	if(result.type & AR_STRING)
-	{
+
+	if (result.type & AR_STRING)
 		printf(" [s|%s]", result.str);
-	}
-	if(result.type & AR_TEXT)
-	{
+
+	if (result.type & AR_TEXT)
 		printf(" [t|%s]", result.text);
-	}
-	if(result.type & AR_MESSAGE)
-	{
+
+	if (result.type & AR_MESSAGE)
 		printf(" [m|%s]", result.msg);
-	}
 
 	free_result(&result);
+
 	printf("\n");
 
 	fflush(stdout);
@@ -336,38 +333,9 @@ void	test_parameter(char* key)
 void	test_parameters(void)
 {
 	register int	i;
-	AGENT_RESULT	result;
 
-	memset(&result, 0, sizeof(AGENT_RESULT));
-	
-	for(i=0; 0 != commands[i].key; i++)
-	{
-		process(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM, &result);
-		if(result.type & AR_DOUBLE)
-		{
-			printf(" [d|" ZBX_FS_DBL "]", result.dbl);
-		}
-		if(result.type & AR_UINT64)
-		{
-			printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
-		}
-		if(result.type & AR_STRING)
-		{
-			printf(" [s|%s]", result.str);
-		}
-		if(result.type & AR_TEXT)
-		{
-			printf(" [t|%s]", result.text);
-		}
-		if(result.type & AR_MESSAGE)
-		{
-			printf(" [m|%s]", result.msg);
-		}
-		free_result(&result);
-		printf("\n");
-
-		fflush(stdout);
-	}
+	for (i = 0; 0 != commands[i].key; i++)
+		test_parameter(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM);
 }
 
 int	replace_param(const char *cmd, const char *param, char *out, int outlen)
@@ -462,7 +430,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	
 	if(parse_command(usr_command, usr_cmd, MAX_STRING_LEN, usr_param, MAX_STRING_LEN) != 0)
 	{
-
 		for(i=0; commands[i].key != 0; i++)
 		{
 			if( strcmp(commands[i].key, usr_cmd) == 0)

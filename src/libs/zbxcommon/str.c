@@ -1634,25 +1634,15 @@ ZBX_ENCODING e[]=
 		return FAIL;
 
 	cd = iconv_open(to_code, from_code);
-	if (cd == (iconv_t)-1) {
-/*		zabbix_log(LOG_LEVEL_DEBUG, "iconv_open(to_code:%s,from_code:%s) failed",
-				to_code,
-				from_code);*/
+	if (cd == (iconv_t)-1)
 		return FAIL;
-	}
 		
 	inputlength = strlen(inputstr);
 
 	outputlength --;
 	resultlength = iconv(cd, &inputstr, &inputlength, &outputstr, &outputlength);
 	if (resultlength == (size_t)(-1))
-	{
-/*		zabbix_log(LOG_LEVEL_DEBUG, "iconv(inputstr:%s,to_code:%s,from_code:%s) failed",
-				inputstr,
-				to_code,
-				from_code);*/
 		res = FAIL;
-	}
 	else
 		outputstr[resultlength] = '\0';
 

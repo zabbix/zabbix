@@ -166,6 +166,11 @@ typedef struct zbx_metric_type
 #define ZBX_AVG15	2
 #define ZBX_AVGMAX	3
 
+#define ZBX_PROC_STAT_ALL	0
+#define ZBX_PROC_STAT_RUN	1
+#define ZBX_PROC_STAT_SLEEP	2
+#define ZBX_PROC_STAT_ZOMB	3
+
 int	get_diskstat(const char *devname, time_t *now,
 		zbx_uint64_t *r_oper, zbx_uint64_t *r_sect, zbx_uint64_t *w_oper, zbx_uint64_t *w_sect);
 
@@ -184,7 +189,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 
 void    add_user_parameter(char *key,char *command);
 void	test_parameters(void);
-void	test_parameter(char* key);
+void	test_parameter(const char* key, unsigned flags);
 
 void   	init_result(AGENT_RESULT *result);
 int    	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist);

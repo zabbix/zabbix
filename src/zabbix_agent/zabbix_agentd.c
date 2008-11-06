@@ -386,7 +386,7 @@ int	main(int argc, char **argv)
 			exit(SUCCEED);
 			break;
 		case ZBX_TASK_TEST_METRIC:
-			test_parameter(TEST_METRIC);
+			test_parameter(TEST_METRIC, PROCESS_TEST);
 			exit(SUCCEED);
 			break;
 		case ZBX_TASK_SHOW_USAGE:

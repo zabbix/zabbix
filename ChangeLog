@@ -1,5 +1,7 @@
 Changes for 1.0.0:
 
+ - [DEV-250] added support of vm.memory.size under AIX (Sasha)
+ - [DEV-250] added full support of proc.num/mem under Linux 2.4/2.6, Solaris and AIX (Sasha)
  - [ZBX-586] added simple check tcp_perf into help_items (Sasha)
  - [DEV-250] added support of vfs.dev.read/write under Linux 2.4/2.6 (Sasha)
  - [DEV-249] added support of advanced regular expressions (Artem,Sasha)
