@@ -522,6 +522,26 @@ include_once "include/page_header.php";
 			
 			$description = array($img,SPACE,$description);
 		}
+		unset($img, $dep_table, $dependency);
+		
+		$dependency = false;
+		$dep_table = new CTableInfo();
+		$dep_table->AddOption('style', 'width: 200px;');
+	
+		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.$row['triggerid'];
+		$dep_res = DBselect($sql_dep);
+		while($dep_row = DBfetch($dep_res)){
+			$dep_table->AddRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_down']));
+			$dependency = true;
+		}
+		
+		if($dependency){
+			$img = new Cimg('images/general/trigg_dep.gif','DEP',12,12);
+			$img->AddOption('style','vertical-align: middle; border: 0px;');
+			$img->SetHint($dep_table);
+			
+			$description = array($img,SPACE,$description);
+		}
 		unset($img, $dep_table, $dependency);		
 //------------------------
 
