@@ -6,6 +6,8 @@ Changes for 1.7.0
 
 Changes for 1.6.2
 
+ - [DEV-250] added support of vm.memory.size under AIX (Sasha)
+ - [DEV-250] added full support of proc.num/mem under Linux 2.4/2.6, Solaris and AIX (Sasha)
  - [ZBX-587] fixed LDAP test functionality (Artem)
 
 Changes for 1.6.1
