@@ -1494,7 +1494,6 @@
 	'S_NOTE'=>				'Note',
 	'S_SOFT_LINK'=>				'Soft Link',
 	'S_REMOVE'=>				'Remove',
-	'S_DEPENDS_ON'=>			'Depends on',
 
 	'S_SUNDAY'=>				'Sunday',
 	'S_MONDAY'=>				'Monday',
@@ -1548,6 +1547,7 @@
 	'S_TRIGGER_UPDATED'=>			'Trigger updated',
 	'S_CANNOT_UPDATE_TRIGGER'=>		'Cannot update trigger',
 	'S_DEPENDS_ON'=>			'Depends on',
+	'S_DEPENDENT'=>				'Dependent',
 	'S_URL'=>				'URL',
 	'S_INVALID_URL'=>			'Invalid URL',
 	'S_CREATE_TRIGGER'=>			'Create Trigger',
