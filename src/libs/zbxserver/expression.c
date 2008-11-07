@@ -773,6 +773,7 @@ static void	expand_trigger_description_constants(
 #define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"
 #define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
 #define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
+#define MVAR_TRIGGER_NSEVERITY		"{TRIGGER.NSEVERITY}"
 #define MVAR_TRIGGER_STATUS		"{TRIGGER.STATUS}"
 #define MVAR_TRIGGER_STATUS_OLD		"{STATUS}"
 #define MVAR_TRIGGER_VALUE		"{TRIGGER.VALUE}"
@@ -1450,6 +1451,13 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 			else if(event->trigger_priority == 4)	replace_to = zbx_dsprintf(replace_to, "High");
 			else if(event->trigger_priority == 5)	replace_to = zbx_dsprintf(replace_to, "Disaster");
 			else					replace_to = zbx_dsprintf(replace_to, "Unknown");
+		}
+		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) && 
+			strncmp(pr, MVAR_TRIGGER_NSEVERITY, strlen(MVAR_TRIGGER_NSEVERITY)) == 0)
+		{
+			var_len = strlen(MVAR_TRIGGER_NSEVERITY);
+
+			replace_to = zbx_dsprintf(replace_to, "%d", event->trigger_priority);
 		}
 		else if (macro_type & MACRO_TYPE_ITEM_KEY)
 		{
