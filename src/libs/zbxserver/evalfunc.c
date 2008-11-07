@@ -564,6 +564,8 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 			strcpy(value,row[0]);
 			del_zeroes(value);
 		}
+
+		DBfree_result(result);
 	}
 	else if(flag == ZBX_FLAG_VALUES)
 	{
@@ -586,6 +588,8 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 		{
 			zbx_snprintf(value,MAX_STRING_LEN, ZBX_FS_DBL, sum/(double)rows);
 		}
+
+		DBfree_result(result);
 	}
 	else
 	{
@@ -596,9 +600,120 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 		return	FAIL;
 	}
 
-	DBfree_result(result);
-
 	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_LAST                                                    *
+ *                                                                            *
+ * Purpose: evaluate functions 'last' and 'prev' for the item                 *
+ *                                                                            *
+ * Parameters: value - require size 'MAX_STRING_LEN'                          *
+ *             item - item (performance metric)                               *
+ *             num - Nth last value                                           *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_LAST(char *value, DB_ITEM *item, int num)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL, rows = 0;
+	const char	*table, *key;
+	char		sql[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_LAST(last[#%d])", num);
+
+	switch (item->value_type) {
+	case ITEM_VALUE_TYPE_FLOAT:
+		table = "history";
+		key = "clock";
+		break;
+	case ITEM_VALUE_TYPE_UINT64:
+		table = "history_uint";
+		key = "clock";
+		break;
+	case ITEM_VALUE_TYPE_STR:
+		table = "history_str";
+		key = "clock";
+		break;
+	case ITEM_VALUE_TYPE_TEXT:
+		table = "history_text";
+		key = "id";
+		break;
+	case ITEM_VALUE_TYPE_LOG:
+		table = "history_log";
+		key = "id";
+		break;
+	default:
+		return FAIL;
+	}
+
+	switch (num) {
+	case 1:
+		if (1 != item->lastvalue_null)
+		{
+			switch (item->value_type) {
+			case ITEM_VALUE_TYPE_FLOAT:
+				zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL, item->lastvalue_dbl);
+				del_zeroes(value);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_UI64, item->lastvalue_uint64);
+				break;
+			default:
+				zbx_snprintf(value, MAX_STRING_LEN, "%s", item->lastvalue_str);
+				break;
+			}
+			ret = SUCCEED;
+		}
+		break;
+	case 2:
+		if (1 != item->prevvalue_null)
+		{
+			switch (item->value_type) {
+			case ITEM_VALUE_TYPE_FLOAT:
+				zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL, item->prevvalue_dbl);
+				del_zeroes(value);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_UI64, item->prevvalue_uint64);
+				break;
+			default:
+				zbx_snprintf(value, MAX_STRING_LEN, "%s", item->prevvalue_str);
+				break;
+			}
+			ret = SUCCEED;
+		}
+		break;
+	default:
+		zbx_snprintf(sql, sizeof(sql), "select value, clock from %s where itemid=" ZBX_FS_UI64 " order by %s desc",
+				table,
+				item->itemid,
+				key);
+
+		result = DBselectN(sql, num);
+
+		while (NULL != (row = DBfetch(result)))
+			if (num == ++rows)
+			{
+				zbx_snprintf(value, MAX_STRING_LEN, "%s", row[0]);
+				ret = SUCCEED;
+			}
+
+		DBfree_result(result);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of evaluate_LAST(last[#%d]):%s", num, SUCCEED == ret ? "SUCCEED" : "FAIL");
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1183,57 +1298,19 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	int	ret  = SUCCEED;
 	time_t  now;
 	struct  tm      *tm;
-	
 	int	fuzlow, fuzhig;
-
 	int	day;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_function(%s)",
 		function);
 
-	if(strcmp(function,"last")==0)
+	if (0 == strcmp(function, "last"))
 	{
-		if(item->lastvalue_null==1)
-		{
-			ret = FAIL;
-		}
-		else
-		{
-			switch (item->value_type) {
-				case ITEM_VALUE_TYPE_FLOAT:
-					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_DBL,item->lastvalue_dbl);
-					del_zeroes(value);
-					break;
-				case ITEM_VALUE_TYPE_UINT64:
-					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64,item->lastvalue_uint64);
-					break;
-				default:
-					strcpy(value,item->lastvalue_str);
-					break;
-			}
-		}
+		ret = evaluate_LAST(value, item, '#' == *parameter ? atoi(parameter + 1) : 1);
 	}
-	else if(strcmp(function,"prev")==0)
+	else if(0 == strcmp(function, "prev"))
 	{
-		if(item->prevvalue_null==1)
-		{
-			ret = FAIL;
-		}
-		else
-		{
-			switch (item->value_type) {
-				case ITEM_VALUE_TYPE_FLOAT:
-					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_DBL,item->prevvalue_dbl);
-					del_zeroes(value);
-					break;
-				case ITEM_VALUE_TYPE_UINT64:
-					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64,item->prevvalue_uint64);
-					break;
-				default:
-					strcpy(value,item->prevvalue_str);
-					break;
-			}
-		}
+		ret = evaluate_LAST(value, item, 2);
 	}
 	else if(strcmp(function,"min")==0)
 	{

@@ -1,5 +1,6 @@
 Changes for 1.6.2
 
+ - [DEV-255] added support of #num for function last() (Sasha)
  - [ZBX-593] fixed stop escalations if action is disabled (Sasha)
  - [ZBX-592] fixed incorrect {TRIGGER.STATUS} value in recovery message (Sasha)
  - [DEV-250] added support of vm.memory.size under AIX (Sasha)
