@@ -1314,7 +1314,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 			var_len = strlen(MVAR_TRIGGER_STATUS);
 
 			replace_to = zbx_dsprintf(replace_to, "%s",
-					event->value == TRIGGER_VALUE_TRUE ? "ON" : "OFF");
+					event->value == TRIGGER_VALUE_TRUE ? "PROBLEM" : "OK");
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) && 
 			strncmp(pr, MVAR_TRIGGER_STATUS_OLD, strlen(MVAR_TRIGGER_STATUS_OLD)) == 0)
@@ -1323,7 +1323,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 			var_len = strlen(MVAR_TRIGGER_STATUS_OLD);
 
 			replace_to = zbx_dsprintf(replace_to, "%s",
-					event->value == TRIGGER_VALUE_TRUE ? "ON" : "OFF");
+					event->value == TRIGGER_VALUE_TRUE ? "PROBLEM" : "OK");
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_TRIGGER_ID, strlen(MVAR_TRIGGER_ID)) == 0)
