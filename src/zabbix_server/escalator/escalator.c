@@ -710,7 +710,7 @@ int main_escalator_loop()
 	int			now/*, nextcheck, sleeptime*/;
 	double			sec;
 	struct sigaction	phan;
-zabbix_set_log_level(LOG_LEVEL_DEBUG);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_escalator_loop()");
 
 	phan.sa_handler = child_signal_handler;
