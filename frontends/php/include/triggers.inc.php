@@ -2030,7 +2030,8 @@
 			$dependency = false;
 			$dep_table = new CTableInfo();
 			$dep_table->AddOption('style', 'width: 200px;');
-		
+			$dep_table->addRow(bold(S_DEPENDS_ON.':'));
+			
 			$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.$triggerid;
 			$dep_res = DBselect($sql_dep);
 			while($dep_row = DBfetch($dep_res)){
@@ -2039,7 +2040,7 @@
 			}
 			
 			if($dependency){
-				$img = new Cimg('images/general/trigg_dep.gif','DEP',12,12);
+				$img = new Cimg('images/general/down_icon.png','DEP_DOWN');
 				$img->AddOption('style','vertical-align: middle; border: 0px;');
 				$img->SetHint($dep_table);
 				
@@ -2051,7 +2052,8 @@
 			$dependency = false;
 			$dep_table = new CTableInfo();
 			$dep_table->AddOption('style', 'width: 200px;');
-		
+			$dep_table->addRow(bold(S_DEPENDENT.':'));
+			
 			$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.$triggerid;
 			$dep_res = DBselect($sql_dep);
 			while($dep_row = DBfetch($dep_res)){
@@ -2060,7 +2062,7 @@
 			}
 			
 			if($dependency){
-				$img = new Cimg('images/general/trigg_dep.gif','DEP',12,12);
+				$img = new Cimg('images/general/up_icon.png','DEP_UP');
 				$img->AddOption('style','vertical-align: middle; border: 0px;');
 				$img->SetHint($dep_table);
 				
