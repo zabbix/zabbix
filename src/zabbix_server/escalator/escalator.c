@@ -360,15 +360,18 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 	char		*shortdata, *longdata;
 
 	if (0 == action->esc_period)
+	{
 		result = DBselect("select operationid,operationtype,object,objectid,default_msg,shortdata,longdata"
 				",esc_period,evaltype from operations where actionid=" ZBX_FS_UI64 " and operationtype in (%d,%d)",
 				action->actionid,
 				OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND);
-	else {
+	}
+	else
+	{
 		escalation->esc_step++;
 
 		result = DBselect("select operationid,operationtype,object,objectid,default_msg,shortdata,longdata"
-				",esc_period,evaltype from operations where actionid=" ZBX_FS_UI64 " and operationtype in (%d,%d)",
+				",esc_period,evaltype from operations where actionid=" ZBX_FS_UI64 " and operationtype in (%d,%d)"
 				" and esc_step_from<=%d and (esc_step_to=0 or esc_step_to>=%d)",
 				action->actionid,
 				OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
@@ -460,7 +463,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 	}
 }
 
-static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action)
+static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, DB_ACTION *action)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -470,13 +473,13 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 		result = DBselect("select distinct userid from alerts where actionid=" ZBX_FS_UI64
 				" and eventid=" ZBX_FS_UI64 " and alerttype=%d",
 				action->actionid,
-				event->eventid,
+				escalation->eventid,
 				ALERT_TYPE_MESSAGE);
 
 		while (NULL != (row = DBfetch(result))) {
 			userid = zbx_atoui64(row[0]);
 
-			add_message_alert(escalation, event, action, escalation->r_eventid, userid, action->shortdata, action->longdata);
+			add_message_alert(escalation, r_event, action, escalation->r_eventid, userid, action->shortdata, action->longdata);
 		}
 
 		DBfree_result(result);
@@ -489,11 +492,43 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 }
 
-static void	execute_escalation(DB_ESCALATION *escalation, DB_EVENT *event)
+static int	get_event(zbx_uint64_t eventid, DB_EVENT *event)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		res = FAIL;
+
+	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged"
+			" from events where eventid=" ZBX_FS_UI64,
+			eventid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		memset(event, 0, sizeof(DB_EVENT));
+		event->eventid		= zbx_atoui64(row[0]);
+		event->source		= atoi(row[1]);
+		event->object		= atoi(row[2]);
+		event->objectid		= zbx_atoui64(row[3]);
+		event->clock		= atoi(row[4]);
+		event->value		= atoi(row[5]);
+		event->acknowledged	= atoi(row[6]);
+
+		add_trigger_info(event);
+
+		res = SUCCEED;
+	}
+
+	DBfree_result(result);
+
+	return res;
+}
+
+static void	execute_escalation(DB_ESCALATION *escalation)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ACTION	action;
+	DB_EVENT	event;
 
 	switch (escalation->status) {
 		case ESCALATION_STATUS_ACTIVE:
@@ -520,15 +555,31 @@ static void	execute_escalation(DB_ESCALATION *escalation, DB_EVENT *event)
 		action.longdata		= strdup(row[4]);
 		action.recovery_msg	= atoi(row[5]);
 
-		substitute_macros(event, &action, &action.shortdata);
-		substitute_macros(event, &action, &action.longdata);
+		switch (escalation->status) {
+			case ESCALATION_STATUS_ACTIVE:
+			case ESCALATION_STATUS_RECOVERY:
+			default:
+				break;
+		}
 
 		switch (escalation->status) {
 			case ESCALATION_STATUS_ACTIVE:
-				execute_operations(escalation, event, &action);
+				if (SUCCEED == get_event(escalation->eventid, &event))
+				{
+					substitute_macros(&event, &action, &action.shortdata);
+					substitute_macros(&event, &action, &action.longdata);
+
+					execute_operations(escalation, &event, &action);
+				}
 				break;
 			case ESCALATION_STATUS_RECOVERY:
-				process_recovery_msg(escalation, event, &action);
+				if (SUCCEED == get_event(escalation->r_eventid, &event))
+				{
+					substitute_macros(&event, &action, &action.shortdata);
+					substitute_macros(&event, &action, &action.longdata);
+
+					process_recovery_msg(escalation, &event, &action);
+				}
 				break;
 			default:
 				break;
@@ -550,14 +601,11 @@ static void	process_escalations(int now)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ESCALATION	escalation;
-	DB_EVENT	event;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_escalations()");
 
-	result = DBselect("select e.escalationid,e.actionid,e.r_eventid,e.esc_step,e.status,ev.eventid"
-			",ev.source,ev.object,ev.objectid,ev.clock,ev.value,ev.acknowledged"
-			" from escalations e,events ev where e.eventid=ev.eventid"
-			" and e.status in (%d,%d) and e.nextcheck<=%d" DB_NODE,
+	result = DBselect("select escalationid,actionid,eventid,r_eventid,esc_step,status"
+			" from escalations where status in (%d,%d) and nextcheck<=%d" DB_NODE,
 			ESCALATION_STATUS_ACTIVE,
 			ESCALATION_STATUS_RECOVERY,
 			now,
@@ -567,25 +615,15 @@ static void	process_escalations(int now)
 		memset(&escalation, 0, sizeof(escalation));
 		escalation.escalationid		= zbx_atoui64(row[0]);
 		escalation.actionid		= zbx_atoui64(row[1]);
-		escalation.r_eventid		= zbx_atoui64(row[2]);
-		escalation.esc_step		= atoi(row[3]);
-		escalation.status		= atoi(row[4]);
+		escalation.eventid		= zbx_atoui64(row[2]);
+		escalation.r_eventid		= zbx_atoui64(row[3]);
+		escalation.esc_step		= atoi(row[4]);
+		escalation.status		= atoi(row[5]);
 		escalation.nextcheck		= 0;
-
-		memset(&event, 0, sizeof(event));
-		event.eventid			= zbx_atoui64(row[5]);
-		event.source			= atoi(row[6]);
-		event.object			= atoi(row[7]);
-		event.objectid			= zbx_atoui64(row[8]);
-		event.clock			= atoi(row[9]);
-		event.value			= atoi(row[10]);
-		event.acknowledged		= atoi(row[11]);
-
-		add_trigger_info(&event);
 
 		DBbegin();
 
-		execute_escalation(&escalation, &event);
+		execute_escalation(&escalation);
 
 		if (escalation.status == ESCALATION_STATUS_COMPLETED)
 			DBremove_escalation(escalation.escalationid);
@@ -672,7 +710,7 @@ int main_escalator_loop()
 	int			now/*, nextcheck, sleeptime*/;
 	double			sec;
 	struct sigaction	phan;
-
+zabbix_set_log_level(LOG_LEVEL_DEBUG);
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_escalator_loop()");
 
 	phan.sa_handler = child_signal_handler;
