@@ -533,13 +533,15 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	switch (escalation->status) {
 		case ESCALATION_STATUS_ACTIVE:
 			result = DBselect("select actionid,eventsource,esc_period,def_shortdata,def_longdata,recovery_msg"
-					" from actions where actionid=" ZBX_FS_UI64,
-					escalation->actionid);
+					" from actions where actionid=" ZBX_FS_UI64 " and status=%d",
+					escalation->actionid,
+					ACTION_STATUS_ACTIVE);
 			break;
 		case ESCALATION_STATUS_RECOVERY:
 			result = DBselect("select actionid,eventsource,esc_period,r_shortdata,r_longdata,recovery_msg"
-					" from actions where actionid=" ZBX_FS_UI64,
-					escalation->actionid);
+					" from actions where actionid=" ZBX_FS_UI64 " and status=%d",
+					escalation->actionid,
+					ACTION_STATUS_ACTIVE);
 			break;
 		default:
 			/* Never reached */
