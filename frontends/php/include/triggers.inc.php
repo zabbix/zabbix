@@ -1860,6 +1860,8 @@
 		$triggers = array();
 
 		while($row = DBfetch($result)){
+			if(trigger_dependent($row['triggerid']))	continue;
+			
 			$row['host'] = get_node_name_by_elid($row['hostid']).$row['host'];
 			$row['description'] = expand_trigger_description_constants($row['description'], $row);
 
@@ -1881,7 +1883,7 @@
 					'hostid'	=> $row['hostid'],
 					'triggerid'	=> $row['triggerid'],
 					'value'		=> $row['value'],
-					'lastchange'	=> $row['lastchange'],
+					'lastchange'=> $row['lastchange'],
 					'priority'	=> $row['priority']);
 			}
 		}
@@ -1896,7 +1898,7 @@
 			foreach($hosts as $hostname){
 				$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
 			}
-			$table->SetHeader($header,'vertical_header');
+			$table->setHeader($header,'vertical_header');
 
 			foreach($triggers as $descr => $trhosts){
 				$table_row = array(nbsp($descr));
@@ -1909,14 +1911,13 @@
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($triggers as $descr => $trhosts){
-				$header=array_merge($header,array(new CImg('vtext.php?text='.$descr)));
+				$descr = array(new CImg('vtext.php?text='.$descr));
+				array_push($header,$descr);
 			}
 			$table->SetHeader($header,'vertical_header');
 
 			foreach($hosts as $hostname){
-			
 				$table_row = array(nbsp($hostname));
-				
 				foreach($triggers as $descr => $trhosts){
 					$table_row=get_trigger_overview_cells($table_row,$trhosts,$hostname);
 				}
@@ -2019,8 +2020,58 @@
 
 			unset($item_menu);
 		}
+// dependency
+// TRIGGERS ON WHICH DEPENDS THIS
+		$desc = array();
+		if(isset($trhosts[$hostname])){
 
-		$status_col = new CCol(array(SPACE, $ack),$css_class);
+			$triggerid = $trhosts[$hostname]['triggerid'];
+	
+			$dependency = false;
+			$dep_table = new CTableInfo();
+			$dep_table->AddOption('style', 'width: 200px;');
+			$dep_table->addRow(bold(S_DEPENDS_ON.':'));
+			
+			$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.$triggerid;
+			$dep_res = DBselect($sql_dep);
+			while($dep_row = DBfetch($dep_res)){
+				$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_up']));
+				$dependency = true;
+			}
+			
+			if($dependency){
+				$img = new Cimg('images/general/down_icon.png','DEP_DOWN');
+				$img->AddOption('style','vertical-align: middle; border: 0px;');
+				$img->SetHint($dep_table);
+				
+				array_push($desc,$img);
+			}
+			unset($img, $dep_table, $dependency);
+			
+// TRIGGERS THAT DEPEND ON THIS		
+			$dependency = false;
+			$dep_table = new CTableInfo();
+			$dep_table->AddOption('style', 'width: 200px;');
+			$dep_table->addRow(bold(S_DEPENDENT.':'));
+			
+			$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.$triggerid;
+			$dep_res = DBselect($sql_dep);
+			while($dep_row = DBfetch($dep_res)){
+				$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_down']));
+				$dependency = true;
+			}
+			
+			if($dependency){
+				$img = new Cimg('images/general/up_icon.png','DEP_UP');
+				$img->AddOption('style','vertical-align: middle; border: 0px;');
+				$img->SetHint($dep_table);
+				
+				array_push($desc,$img);
+			}
+			unset($img, $dep_table, $dependency);
+		}
+//------------------------
+		$status_col = new CCol(array($desc, $ack),$css_class);
 		if(isset($style)){
 			$status_col->AddOption('style', $style);
 		}
