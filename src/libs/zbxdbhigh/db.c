@@ -1820,6 +1820,8 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->ipmi_password	= row[44];
 	item->ipmi_sensor	= row[45];
 
+	item->lastlogsize	= atoi(row[46]);
+
 	switch (item->type) {
 		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_ZABBIX_ACTIVE:
