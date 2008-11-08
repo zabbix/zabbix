@@ -1824,6 +1824,8 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->maintenance_type		= atoi(row[47]);
 	item->maintenance_from		= atoi(row[48]);
 
+	item->lastlogsize		= atoi(row[49]);
+
 	switch (item->type) {
 		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_ZABBIX_ACTIVE:
