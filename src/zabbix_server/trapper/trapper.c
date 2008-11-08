@@ -564,7 +564,6 @@ static int	process_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 {
-	char	*line,*host;
 	char	*server,*key,*value_string, *data;
 	char	copy[MAX_STRING_LEN];
 	char	host_dec[MAX_STRING_LEN],key_dec[MAX_STRING_LEN],value_dec[MAX_STRING_LEN];
@@ -589,18 +588,9 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 		s,
 		datalen);
 
-/* Request for list of active checks */
-	if (strncmp(s,"ZBX_GET_ACTIVE_CHECKS", 21) == 0) {
-		line=strtok(s,"\n");
-		host=strtok(NULL,"\n");
-		if(host == NULL)
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "ZBX_GET_ACTIVE_CHECKS: host is null. Ignoring.");
-		}
-		else
-		{
-			ret = send_list_of_active_checks(sock, host);
-		}
+	if (0 == strncmp(s,"ZBX_GET_ACTIVE_CHECKS", 21))	/* Request for list of active checks */
+	{
+		ret = send_list_of_active_checks(sock, s);
 /* Request for last ids */
 	} else if (strncmp(s,"ZBX_GET_HISTORY_LAST_ID", 23) == 0) {
 		send_history_last_id(sock, s);
