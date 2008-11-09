@@ -205,6 +205,10 @@ include_once "include/page_header.php";
 			if( $label_type==MAP_LABEL_TYPE_IP )
 				$label_line=$host["ip"];
 		}
+		if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_IMAGE)
+		{
+			$label_line = $db_element["label"];
+		}
 
 		if($label_line=="" && $info_line=="")	continue;
 
@@ -213,6 +217,7 @@ include_once "include/page_header.php";
 
 		$x_info = $db_element["x"];
 		$y_info = $db_element["y"];
+
 		if($label_location == MAP_LABEL_LOC_TOP)
 		{
 			$x_label += ImageSX($img)/2-ImageFontWidth(2)*strlen($label_line)/2;
