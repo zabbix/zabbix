@@ -5706,6 +5706,7 @@
 
 		$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_TRIGGER,		S_TRIGGER);
 		$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_HOST_GROUP,	S_HOST_GROUP);
+		$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_IMAGE,		S_IMAGE);
 
 		$frmEl->AddRow(S_TYPE,$cmbType);
 
@@ -5817,6 +5818,9 @@
 					'T')
 			));
 		}
+		else if($elementtype==SYSMAP_ELEMENT_TYPE_IMAGE){
+			$frmEl->AddVar('elementid',0);
+		}
 
 		$cmbIconOff	= new CComboBox('iconid_off',$iconid_off);
 		$cmbIconOn	= new CComboBox('iconid_on',$iconid_on);
@@ -5838,12 +5842,16 @@
 		}
 		
 		$frmEl->AddRow(S_ICON_OK,$cmbIconOff);
-		$frmEl->AddRow(S_ICON_PROBLEM,$cmbIconOn);
-		if ($elementtype != SYSMAP_ELEMENT_TYPE_MAP)
+		if ($elementtype != SYSMAP_ELEMENT_TYPE_IMAGE)
+			$frmEl->AddRow(S_ICON_PROBLEM,$cmbIconOn);
+		else
+			$frmEl->AddVar('iconid_on', 0);
+		if ($elementtype != SYSMAP_ELEMENT_TYPE_MAP && $elementtype != SYSMAP_ELEMENT_TYPE_IMAGE)
 			$frmEl->AddRow(S_ICON_UNKNOWN, $cmbIconUnknown);
 		else
 			$frmEl->AddVar('iconid_unknown', 0);
-		if ($elementtype != SYSMAP_ELEMENT_TYPE_HOST_GROUP && $elementtype != SYSMAP_ELEMENT_TYPE_MAP)
+		if ($elementtype != SYSMAP_ELEMENT_TYPE_HOST_GROUP && $elementtype != SYSMAP_ELEMENT_TYPE_MAP &&
+			$elementtype != SYSMAP_ELEMENT_TYPE_IMAGE)
 			$frmEl->AddRow(S_ICON_DISABLED,$cmbIconDisabled);
 		else
 			$frmEl->AddVar('iconid_disabled', 0);

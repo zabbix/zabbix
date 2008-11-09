@@ -669,6 +669,12 @@
 			$out['iconid'] = $db_element['iconid_off'];
 		}
 
+		// No label for Images
+		if ($el_type == SYSMAP_ELEMENT_TYPE_IMAGE)
+		{
+			$out['info'] = '';
+		}
+
 		$out['count'] = $inf['count'];
 		$out['priority'] = isset($inf['priority']) ? $inf['priority'] : 0;
 		$out['name'] = $el_name;
