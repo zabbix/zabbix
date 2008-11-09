@@ -37,8 +37,8 @@ include_once "include/page_header.php";
 		"sysmapid"=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,NULL),
 
 		"selementid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,		NULL),
-		"elementid"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID.'{}>0',	'isset({save})'),
-		"elementtype"=>	array(T_ZBX_INT, O_OPT,  NULL, IN("0,1,2,3"),	'isset({save})'),
+		"elementid"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,	'isset({save})'),
+		"elementtype"=>	array(T_ZBX_INT, O_OPT,  NULL, IN("0,1,2,3,4"),	'isset({save})'),
 		"label"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,	'isset({save})'),
 		"x"=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
 		"y"=>           array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
