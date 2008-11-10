@@ -40,13 +40,28 @@ ZBX_USER_MSG
 	void		*next;
 };
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_perm2system                                                *
+ *                                                                            *
+ * Purpose: Checking user permissions to access system.                       *
+ *                                                                            *
+ * Parameters: userid - user ID                                               *
+ *                                                                            *
+ * Return value: SUCCEED - prermitions is positive, FAIL - otherwise          *
+ *                                                                            *
+ * Author:                                                                    *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_perm2system(zbx_uint64_t userid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		res = SUCCEED;
 
-	result = DBselect( "select count(g.usrgrpid) from usrgrp g, users_groups ug where ug.userid=" ZBX_FS_UI64
+	result = DBselect( "select count(g.usrgrpid) from usrgrp g,users_groups ug where ug.userid=" ZBX_FS_UI64
 			" and g.usrgrpid = ug.usrgrpid and g.users_status=%d",
 			userid,
 			GROUP_STATUS_DISABLED);
@@ -59,11 +74,64 @@ static int	check_perm2system(zbx_uint64_t userid)
 	return res;
 }
 
-static void	add_user_msg(zbx_uint64_t userid, ZBX_USER_MSG **user_msg, char *subject, char *message)
+/******************************************************************************
+ *                                                                            *
+ * Function: get_trigger_permision                                            *
+ *                                                                            *
+ * Purpose: Return user permissions for access to trigger                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: PERM_DENY - if host or user not found,                       *
+ *                   or permission otherwise                                  *
+ *                                                                            *
+ * Author:                                                                    *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_trigger_permision(zbx_uint64_t userid, zbx_uint64_t triggerid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		user_type = -1, perm = PERM_DENY;
+
+	result = DBselect("select type from users where userid=" ZBX_FS_UI64,
+			userid);
+
+	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+		user_type = atoi(row[0]);
+
+	DBfree_result(result);
+
+	if (-1 == user_type)
+		return PERM_DENY;
+
+	if (USER_TYPE_SUPER_ADMIN == user_type)
+		return PERM_MAX;
+
+	result = DBselect("select max(r.permission) from rights r,hosts_groups hg,items i,functions f,users_groups ug"
+			" where r.groupid=ug.usrgrpid and r.id=hg.groupid and hg.hostid=i.hostid"
+			" and i.itemid=f.itemid and f.triggerid=" ZBX_FS_UI64 " and ug.userid=" ZBX_FS_UI64,
+			triggerid,
+			userid);
+
+	if (NULL != (row = DBfetch(result)))
+		perm = atoi(row[0]);
+
+	DBfree_result(result);
+
+	return perm;
+}
+
+static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t triggerid, ZBX_USER_MSG **user_msg, char *subject, char *message)
 {
 	ZBX_USER_MSG	*p;
 
 	if (SUCCEED != check_perm2system(userid))
+		return;
+
+	if (PERM_READ_ONLY > get_trigger_permision(userid, triggerid))
 		return;
 
 	p = *user_msg;
@@ -87,14 +155,14 @@ static void	add_user_msg(zbx_uint64_t userid, ZBX_USER_MSG **user_msg, char *sub
 	}
 }
 
-static void	add_object_msg(DB_OPERATION *operation, ZBX_USER_MSG **user_msg, char *subject, char *message)
+static void	add_object_msg(zbx_uint64_t triggerid, DB_OPERATION *operation, ZBX_USER_MSG **user_msg, char *subject, char *message)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	switch (operation->object) {
 		case OPERATION_OBJECT_USER:
-			add_user_msg(operation->objectid, user_msg, subject, message);
+			add_user_msg(operation->objectid, triggerid, user_msg, subject, message);
 			break;
 		case OPERATION_OBJECT_GROUP:
 			result = DBselect("select ug.userid from users_groups ug,usrgrp g"
@@ -103,7 +171,7 @@ static void	add_object_msg(DB_OPERATION *operation, ZBX_USER_MSG **user_msg, cha
 					GROUP_STATUS_ACTIVE);
 
 			while (NULL != (row = DBfetch(result)))
-				add_user_msg(zbx_atoui64(row[0]), user_msg, subject, message);
+				add_user_msg(zbx_atoui64(row[0]), triggerid, user_msg, subject, message);
 
 			DBfree_result(result);
 			break;
@@ -411,7 +479,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 						longdata = action->longdata;
 					}
 					
-					add_object_msg(&operation, &user_msg, shortdata, longdata);
+					add_object_msg(event->objectid, &operation, &user_msg, shortdata, longdata);
 					break;
 				case	OPERATION_TYPE_COMMAND:
 					add_command_alert(escalation, event, action, operation.longdata);

@@ -489,6 +489,23 @@ typedef enum
 	ZBX_HTTPITEM_TYPE_LASTSTEP
 } zbx_httpitem_type_t;
 
+/* User permitions */
+typedef enum
+{
+	USER_TYPE_ZABBIX_USER = 1,
+	USER_TYPE_ZABBIX_ADMIN,
+	USER_TYPE_SUPER_ADMIN
+} zbx_user_type_t;
+
+typedef enum
+{
+	PERM_DENY = 0,
+	PERM_READ_LIST,
+	PERM_READ_ONLY,
+	PERM_READ_WRITE,
+	PERM_MAX = 3
+} zbx_user_permition_t;
+
 /* Flags */
 #define	ZBX_SYNC		0x01
 #define ZBX_NOTNULL		0x02
