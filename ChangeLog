@@ -6,6 +6,7 @@ Changes for 1.7.0
 
 Changes for 1.6.2
 
+ - [DEV-270] improved trigger configuration view; error string moved to description column (Sasha)
  - [DEV-263] added support of a new map element - simple image (Alexei)
  - [DEV-260] support of macro TRIGGER.NSEVERITY (Alexei)
  - [DEV-255] added support of #num for function last() (Sasha)
