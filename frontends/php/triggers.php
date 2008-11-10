@@ -434,8 +434,7 @@
 					"CheckAll('".$form->GetName()."','all_triggers');")
 				,make_sorting_link(S_NAME,'t.description'),
 			),
-			S_EXPRESSION, 
-			S_ERROR));
+			S_EXPRESSION));
 
 		$sql = 'SELECT DISTINCT h.hostid,h.host,t.*'.
 			' FROM triggers t '.
@@ -484,11 +483,15 @@
 			//add dependencies
 			$deps = get_trigger_dependencies_by_triggerid($row['triggerid']);
 			if(count($deps) > 0){
-				$description[] = array(BR(),BR(),bold(S_DEPENDS_ON.':'),SPACE,BR());
+				$description[] = array(BR(),bold(S_DEPENDS_ON.':'),SPACE);
 				foreach($deps as $val)
-					$description[] = array(expand_trigger_description($val),BR());
+					$description[] = array(BR(),expand_trigger_description($val));
+			}
 
-				$description[] = BR();
+			if ($row['error'] != '')
+			{
+				$description[] = array(BR(), bold(S_ERROR.':'), SPACE);
+				$description[] = array(BR(), new CSpan($row['error'], 'red'));
 			}
 	
 			if($row['priority']==0)		$priority=S_NOT_CLASSIFIED;
@@ -520,15 +523,12 @@
 
 			if($row['status'] != TRIGGER_STATUS_UNKNOWN)	$row['error']=SPACE;
 
-			if($row['error']=='')		$row['error']=SPACE;
-
 			$table->addRow(array(
 				$priority,
 				$status,
 				$_REQUEST['hostid'] > 0 ? NULL : $row['host'],
 				$description,
-				explode_exp($row['expression'],1),
-				$row['error']
+				explode_exp($row['expression'],1)
 			));
 		}
 		
