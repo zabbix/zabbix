@@ -6,6 +6,7 @@ Changes for 1.7.0
 
 Changes for 1.6.2
 
+ - [ZBX-595] improved performance of export screen (Artem)
  - [DEV-269] added permission check when sending notifications (Sasha)
  - [DEV-270] improved trigger configuration view; error string moved to description column (Sasha)
  - [DEV-263] added support of a new map element - simple image (Alexei)
