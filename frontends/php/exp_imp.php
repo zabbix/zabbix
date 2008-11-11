@@ -314,6 +314,8 @@ include_once "include/page_header.php";
 							' AND hg.hostid=h.hostid ';
 			} 
 			
+			$hosts = array();
+			$hostids = array();
 			$sql = 'SELECT DISTINCT h.* '.
 					' FROM hosts h '.$sql_from.
 					' WHERE '.DBcondition('h.hostid',$available_hosts).
@@ -322,94 +324,123 @@ include_once "include/page_header.php";
 					order_by('h.host,h.dns,h.ip,h.port,h.status');
 
 			$result=DBselect($sql);
-		
-			while($row=DBfetch($result)){
+			while($host=DBfetch($result)){
+				$hosts[$host['hostid']] = $host;
+				$hostids[$host['hostid']] = $host['hostid'];
+			}
+// templates
+			$sql = 'SELECT hostid,count(hosttemplateid) as cnt '.
+					' FROM hosts_templates '.
+					' WHERE '.DBcondition('hostid',$hostids).
+					' GROUP BY hostid';
+			$result = DBselect($sql);
+			while($templates=DBfetch($result)){
+				$hosts[$templates['hostid']]['templates_cnt'] = $templates['cnt'];
+			}
+// items
+			$sql = 'SELECT hostid,count(itemid) as cnt '.
+					' FROM items '.
+					' WHERE '.DBcondition('hostid',$hostids).
+					' GROUP BY hostid';
+			$result = DBselect($sql);
+			while($items=DBfetch($result)){
+				$hosts[$items['hostid']]['items_cnt'] = $items['cnt'];
+			}
+// triggers
+			$sql = 'SELECT count(DISTINCT f.triggerid) as cnt, i.hostid '.
+					' FROM functions f, items i '.
+					' WHERE f.itemid=i.itemid '.
+						' AND '.DBcondition('i.hostid',$hostids).
+					' GROUP BY i.hostid';
+			$result = DBselect($sql);
+			while($triggers=DBfetch($result)){
+				$hosts[$triggers['hostid']]['triggers_cnt'] = $triggers['cnt'];
+			}
+// graphs
+			$sql = 'SELECT count(DISTINCT gi.graphid) as cnt, i.hostid '.
+					' FROM graphs_items gi, items i '.
+					' WHERE gi.itemid=i.itemid '.
+						' AND '.DBcondition('i.hostid',$hostids).
+					' GROUP BY i.hostid';
+			$result = DBselect($sql);
+			while($graphs=DBfetch($result)){
+				$hosts[$graphs['hostid']]['graphs_cnt'] = $graphs['cnt'];
+			}
 			
-				$host=new CCol(array(
-					new CCheckBox('hosts['.$row['hostid'].']',
-						isset($hosts[$row['hostid']]) || !isset($update),
+			foreach($hosts as $hostid => $host){
+				$host_name=new CCol(array(
+					new CCheckBox('hosts['.$host['hostid'].']',
+						isset($hosts[$host['hostid']]) || !isset($update),
 						NULL,true),
 					SPACE,
-					$row["host"]
+					$host['host']
 					));
 				
-				$status = new CCol(host_status2str($row['status']),host_status2style($row['status']));
-				
+				$status = new CCol(host_status2str($host['status']),host_status2style($host['status']));
 				
 				/* calculate template */
-				$template_cnt = DBfetch(DBselect('select count(hosttemplateid) as cnt from hosts_templates where hostid='.$row['hostid']));
-				if($template_cnt['cnt'] > 0){
-					$template_cnt = array(new CCheckBox('templates['.$row['hostid'].']',
-							isset($templates[$row['hostid']]) || !isset($update),
+				if(isset($host['templates_cnt']) && ($host['templates_cnt'] > 0)){
+					$template_cnt = array(new CCheckBox('templates['.$host['hostid'].']',
+							isset($templates[$host['hostid']]) || !isset($update),
 							NULL,true),
-						$template_cnt['cnt']);
+						$host['templates_cnt']);
 				}
 				else{
 					$template_cnt = '-';
 				}
 								
 				/* calculate items */
-				$item_cnt = DBfetch(DBselect('select count(itemid) as cnt from items where hostid='.$row['hostid']));
-				if($item_cnt['cnt'] > 0){
-					$item_cnt = array(new CCheckBox('items['.$row['hostid'].']',
-							isset($items[$row['hostid']]) || !isset($update),
+			
+				if(isset($host['items_cnt']) && ($host['items_cnt'] > 0)){
+					$item_cnt = array(new CCheckBox('items['.$host['hostid'].']',
+							isset($items[$host['hostid']]) || !isset($update),
 							NULL,true),
-						$item_cnt['cnt']);
+						$host['items_cnt']);
 				}
 				else{
 					$item_cnt = '-';
 				}
 				
 				/* calculate triggers */
-				$trigger_cnt = 0;
-				$db_triggers = DBselect('select f.triggerid, i.hostid, count(distinct i.hostid) as cnt from functions f, items i '.
-					' where f.itemid=i.itemid group by f.triggerid, i.hostid');
-				while($db_tr = DBfetch($db_triggers)) if($db_tr['cnt'] == 1 && (bccomp($db_tr['hostid'] , $row['hostid'])==0)) $trigger_cnt++;
-				if($trigger_cnt > 0){
-					$trigger_cnt = array(new CCheckBox('triggers['.$row['hostid'].']',
-							isset($triggers[$row['hostid']]) || !isset($update),
+				if(isset($host['triggers_cnt']) && ($host['triggers_cnt'] > 0)){
+					$trigger_cnt = array(new CCheckBox('triggers['.$host['hostid'].']',
+							isset($triggers[$host['hostid']]) || !isset($update),
 							NULL,true),
-						$trigger_cnt);
+						$host['triggers_cnt']);
 				}
 				else{
 					$trigger_cnt = '-';
 				}
 			
 				/* calculate graphs */
-				$graph_cnt = 0;
-				$db_graphs = DBselect('SELECT gi.graphid, i.hostid, count(distinct i.hostid) as cnt'.
-					' FROM graphs_items gi, items i '.
-					' WHERE gi.itemid=i.itemid group by gi.graphid, i.hostid');
-				while($db_tr = DBfetch($db_graphs)) if($db_tr['cnt'] == 1 && (bccomp($db_tr['hostid'] , $row['hostid'])==0)) $graph_cnt++;
-				if($graph_cnt > 0){
-					$graph_cnt = array(new CCheckBox('graphs['.$row['hostid'].']',
-							isset($graphs[$row['hostid']]) || !isset($update),
+				if(isset($host['graphs_cnt']) && ($host['graphs_cnt'] > 0)){
+					$graph_cnt = array(new CCheckBox('graphs['.$host['hostid'].']',
+							isset($graphs[$host['hostid']]) || !isset($update),
 							NULL,true),
-						$graph_cnt);
+						$host['graphs_cnt']);
 				}
 				else{
 					$graph_cnt = '-';
 				}
 				
 				/* $screens = 0; */
-
-				if($row["status"] == HOST_STATUS_TEMPLATE){
+				if($host["status"] == HOST_STATUS_TEMPLATE){
 					$ip = $dns = $port = '-';
 				}
 				else{
-					$ip = (empty($row["ip"]))?'-':$row["ip"];
-					$dns = (empty($row["dns"]))?'-':$row["dns"];
+					$ip = (empty($host["ip"]))?'-':$host["ip"];
+					$dns = (empty($host["dns"]))?'-':$host["dns"];
 
-					if($row["useip"]==1)
+					if($host["useip"]==1)
 						$ip = bold($ip);
 					else
 						$dns = bold($dns);
 
-					$port = (empty($row["port"]))?'-':$row["port"];
+					$port = (empty($host["port"]))?'-':$host["port"];
 				}
 
 				$table->AddRow(array(
-					$host,
+					$host_name,
 					$dns,
 					$ip,
 					$port,
