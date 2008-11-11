@@ -541,6 +541,7 @@ typedef enum
 	PERM_READ_WRITE,
 	PERM_MAX = 3
 } zbx_user_permition_t;
+const char *zbx_permission_string(int perm);
 
 /* Flags */
 #define	ZBX_SYNC		0x01
