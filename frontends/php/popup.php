@@ -120,6 +120,10 @@ include_once "include/page_header.php";
 		'real_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'itemtype'=>	array(T_ZBX_INT, O_OPT, null,   null,		null),
 		
+		'reference'=>	array(T_ZBX_STR, O_OPT, null,   null,		null),
+		'cmapid'=>		array(T_ZBX_INT, O_OPT, null,   null,		'isset({reference})'),
+		'sid'=>			array(T_ZBX_INT, O_OPT, null,   null,		'isset({reference})'),
+		
 		"select"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null)
 	);
 
@@ -136,6 +140,7 @@ include_once "include/page_header.php";
 	$srcfld1	= get_request("srcfld1", '');	// source table field [can be different from fields of source table]
 	$srcfld2	= get_request("srcfld2", null);	// second source table field [can be different from fields of source table]
 	
+	
 	$monitored_hosts = get_request("monitored_hosts", 0);
 	$real_hosts = get_request("real_hosts", 0);
 	$only_hostid	 = get_request("only_hostid", null);
@@ -143,16 +148,24 @@ include_once "include/page_header.php";
 <?php
 	global $USER_DETAILS;
 
-	if($min_user_type > $USER_DETAILS['type'])
-	{
+	if($min_user_type > $USER_DETAILS['type']){
 		access_deny();
 	}
 ?>
 <?php
-	function get_window_opener($frame, $field, $value)
-	{
-		return empty($field) ? "" : "window.opener.document.forms['".addslashes($frame)."'].elements['".addslashes($field)."'].value='".addslashes($value)."';";
-	}
+	function get_window_opener($frame, $field, $value){
+//		return empty($field) ? "" : "window.opener.document.forms['".addslashes($frame)."'].elements['".addslashes($field)."'].value='".addslashes($value)."';";
+		if(empty($field)) return '';
+
+//						"alert(window.opener.document.getElementById('".addslashes($field)."').value);".		
+		$script = 	'try{'.
+						"window.opener.document.getElementById('".addslashes($field)."').value='".addslashes($value)."';".
+					'} catch(e){'.
+						'throw("Error: Target not found");'.
+					'}'."\n";
+					
+	return $script;
+	}	
 ?>
 <?php
 	$frmTitle = new CForm();
@@ -163,12 +176,20 @@ include_once "include/page_header.php";
 	if($real_hosts)
 		$frmTitle->AddVar('real_hosts', 1);
 
-	$frmTitle->AddVar("dstfrm",	$dstfrm);
+	$frmTitle->AddVar("dstfrm",		$dstfrm);
 	$frmTitle->AddVar("dstfld1",	$dstfld1);
 	$frmTitle->AddVar("dstfld2",	$dstfld2);
-	$frmTitle->AddVar("srctbl",	$srctbl);
+	
+	$frmTitle->AddVar("srctbl",		$srctbl);
 	$frmTitle->AddVar("srcfld1",	$srcfld1);
 	$frmTitle->AddVar("srcfld2",	$srcfld2);
+	
+// Optional 
+	if(isset($_REQUEST['reference'])){
+		$frmTitle->addVar('reference',	get_request('reference','0'));
+		$frmTitle->addVar('cmapid',		get_request('cmapid','0'));
+		$frmTitle->addVar('sid',		get_request('sid','0'));
+	}
 
 	if(isset($only_hostid))
 	{
@@ -327,10 +348,24 @@ include_once "include/page_header.php";
 		while($host = DBfetch($db_hosts))
 		{
 			$name = new CLink($host["host"],"#","action");
-			$name->SetAction(
-				get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
-				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]) : '').
-				" close_window(); return false;");
+			if(isset($_REQUEST['reference'])){
+				$cmapid = get_request('cmapid',0);
+				$sid = get_request('sid',0);
+				
+				$action = '';
+				if($_REQUEST['reference'] =='sysmap_element'){
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_element_option($sid,'$dstfld1','$host[$srcfld1]');";
+				}
+				else if($_REQUEST['reference'] =='sysmap_link'){
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,'$dstfld1','$host[$srcfld1]');";
+				}
+			}
+			else{
+				$action = get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
+					(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]) : '');
+			}
+//	
+			$name->setAction($action." close_window(); return false;");
 
 			if($host["status"] == HOST_STATUS_MONITORED)	
 				$status=new CSpan(S_MONITORED,"off");
@@ -485,12 +520,28 @@ include_once "include/page_header.php";
 		while($row = DBfetch($db_groups))
 		{
 			$name = new CLink($row["name"],"#","action");
-			$name->SetAction(
-				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
-				" return close_window();");
+			
 
-			$table->AddRow($name);
+			if(isset($_REQUEST['reference'])){
+				$cmapid = get_request('cmapid',0);
+				$sid = get_request('sid',0);
+				
+				$action = '';
+				if($_REQUEST['reference'] =='sysmap_element'){
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_element_option($sid,'$dstfld1','$row[$srcfld1]');";
+				}
+				else if($_REQUEST['reference'] =='sysmap_link'){
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,'$dstfld1','$row[$srcfld1]');";
+				}
+			}
+			else{
+				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+					(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+			}
+//	
+			$name->setAction($action." close_window(); return false;");
+
+			$table->addRow($name);
 		}
 		$table->Show();
 	}
@@ -615,10 +666,25 @@ include_once "include/page_header.php";
 		{
 			$exp_desc = expand_trigger_description_by_data($row);
 			$description = new CLink($exp_desc,"#","action");
-			$description->SetAction(
-				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-				get_window_opener($dstfrm, $dstfld2, $exp_desc).
-				" close_window(); return false;");
+			
+			if(isset($_REQUEST['reference'])){
+				$cmapid = get_request('cmapid',0);
+				$sid = get_request('sid',0);
+				
+				$action = '';
+				if($_REQUEST['reference'] =='sysmap_element'){
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_element_option($sid,'$dstfld1','$row[$srcfld1]');";
+				}
+				else if($_REQUEST['reference'] =='sysmap_link'){
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,'$dstfld1','$row[$srcfld1]');";
+				}
+			}
+			else{
+				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+					get_window_opener($dstfrm, $dstfld2, $exp_desc);
+			}
+			
+			$description->SetAction($action." close_window(); return false;");
 
 			if($row['dep_count'] > 0)
 			{

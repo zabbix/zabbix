@@ -38,6 +38,7 @@ function zbx_jsvalue($value)
 		return '['.implode(',',$value).']';
 }
 
+
 /* function:
  *     zbx_add_post_js
  *
@@ -181,6 +182,6 @@ function insert_javascript_for_twinbox(){
 }
 
 function insert_js($script){
-print('<script type="text/javascript"><!--'."\n".$script."\n".'--></script>');
+print('<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>');
 }
 ?>

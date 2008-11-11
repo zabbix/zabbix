@@ -12,6 +12,7 @@
 	margin: 0px;
 }
 .pum_o_item:hover {
+	cursor:pointer;
 	text-decoration: underline;
 	background-color: #FDFDFF;
 }
@@ -31,6 +32,7 @@
 	margin: 0px;
 }
 .pum_b_submenu:hover {
+	cursor:pointer;
 	text-decoration: none;
 	background-color: #FDFDFF;
 }
@@ -44,12 +46,12 @@
 	margin: 0px;
 }
 .pum_o_submenu:hover {
+	cursor:pointer;
 	text-decoration: none;
 	background-color: #FDFDFF;
 }
 .pum_i_submenu{
 	margin: 3px 0px 0px 8px;
-
 }
 
 /* menu group header */
@@ -61,6 +63,7 @@
 	margin: 0px;
 }
 .pum_oheader:hover { 
+	cursor:default;
 	text-decoration: none;
 }
 .pum_iheader { 

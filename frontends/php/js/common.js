@@ -78,9 +78,40 @@ if (!Array.prototype.forEach)
   };
 }
 
-function SDI(msg)
-{
+function SDI(msg){
+	var div_help = document.getElementById('div_help');
+
+	if((div_help == 'undefined') || empty(div_help)){
+		var div_help = document.createElement('div');
+		var doc_body = document.getElementsByTagName('body')[0];
+		doc_body.appendChild(div_help);
+		
+		div_help.setAttribute('id','div_help');
+		div_help.setAttribute('style','position: absolute; left: 10px; top: 10px; border: 1px red solid; width: 500px; height: 400px; background-color: white; overflow: auto; z-index: 20;');
+		
+		new Draggable(div_help,{});
+	}
+	
+	div_help.appendChild(document.createTextNode("DEBUG INFO: "));
+	div_help.appendChild(document.createElement("br"));
+	div_help.appendChild(document.createTextNode(msg));
+	div_help.appendChild(document.createElement("br"));
+	div_help.appendChild(document.createElement("br"));
+}
+
+/*
+function SDI(msg){
 	alert("DEBUG INFO: " + msg);
+}
+//*/
+
+function SDJ(obj){
+	var debug = '';
+	for(var key in obj) {
+		var value = obj[key];
+		debug+=key+': '+value+'\n';
+	}
+	SDI('\n'+debug);
 }
 
 function addListener(element, eventname, expression, bubbling){

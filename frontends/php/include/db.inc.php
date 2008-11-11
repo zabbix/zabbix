@@ -410,7 +410,7 @@
 		switch($DB_TYPE)
 		{
 			case "MYSQL":
-				$result = mysql_fetch_assoc($cursor);
+				$result = mysql_fetch_array($cursor);
 				break;
 			case "POSTGRESQL":
 				$result = pg_fetch_array($cursor);

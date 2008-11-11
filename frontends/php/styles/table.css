@@ -747,13 +747,12 @@ table.graph{
 /**************** MAP ****************/
 
 table.map{
-	background-color: #CCCCCC;
-	width: 100%;
-	text-align: center;
+	text-align: left;
 	border-width:0px;
 	padding-top: 1px;
 	padding-bottom: 5px;
 }
+
 
 /************* MENU ************/
 

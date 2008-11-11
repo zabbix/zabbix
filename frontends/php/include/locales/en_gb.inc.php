@@ -630,7 +630,7 @@
 	'S_MAINTENANCE_TYPE'=>				'Maintenance type',
 	'S_EXPIRED'=>						'Expired',
 	
-	'S_NORMAL_PROCESSING'=>				'Normal processing',
+	'S_SUPPRESS_NOTIFICATIONS'=>		'Suppress notifications',
 	'S_NO_DATA_PROCESSING'=>			'No data processing',
 	
 	'S_DELETE_MAINTENANCE_PERIOD_Q'=>	'Delete maintenance period?',
@@ -930,6 +930,9 @@
 	'S_ELEMENT_2'=>				'Element 2',
 	'S_LINK_STATUS_INDICATOR'=>		'Link status indicator',
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	'Configuration of network maps',
+	'S_DISPLAYED_ELEMENTS'=>	'Displayed elements',
+	'S_CONNECTORS'=>			'Connectors',
+	
 
 //	sysmaps.php
 	'S_MAPS_BIG'=>					'MAPS',
@@ -941,6 +944,17 @@
 	'S_TOP'=>						'Top',
 	'S_DISPLAY_METHOD_OF_STATUS'=>	'Display method of status',
 	'S_DISPLAY_NO_OF_FAILURES_ONLY'=>'Display No. of failures only',
+	
+	'S_ADD_ELEMENT'=>			'Add element',
+	'S_REMOVE_ELEMENT'=>		'Remove element',
+	'S_ADD_LINK'=>				'Add link',
+	'S_REMOVE_LINK'=>			'Remove link',
+	
+	'S_UNDEFINED'=>				'Undefined',
+	'S_TYPE_OFF'=>				'Type (OFF)',
+	'S_TYPE_ON'=>				'Type (ON)',
+	'S_COLOR_OFF'=>				'Color (OFF)',
+	'S_COLOR_ON'=>				'Color (ON)',
 
 //	map.php
 	'S_OK_BIG'=>				'OK',

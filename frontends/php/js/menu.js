@@ -219,7 +219,7 @@ function menu_expand (n_id) {
 // --------------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------------
-function menu_onclick (n_id) {
+function menu_onclick(n_id) {
 	// don't go anywhere if item has no link defined
 	// lookup new item's object	
 	if(Boolean(this.a_index[n_id].a_config[1])){
@@ -387,12 +387,18 @@ function menu_item (o_parent, n_order) {
 	}
 
 	// generate item's HMTL
-	var el = document.createElement("a");
-	el.setAttribute('id', 'e' + o_root.n_id + '_' + this.n_id + 'o');
-	el.setAttribute('href', this.a_config[1]);
 
-	if(this.a_config[2] && this.a_config[2]['tw'])
-		el.setAttribute('target', this.a_config[2]['tw']);
+	var el = document.createElement('span');
+	
+	if(this.a_config[2]){
+		addListener(el, 'click', this.a_config[2], false);
+	}
+	else{
+		addListener(el, 'click', function(){ location.href = this.a_config[1]; }, false);
+	}
+	
+	el.setAttribute('id', 'e' + o_root.n_id + '_' + this.n_id + 'o');
+
 
 	el.className = this.getstyle(0, 0);
 	el.style.position = 'absolute';
@@ -401,12 +407,13 @@ function menu_item (o_parent, n_order) {
 	el.style.width = this.getprop('width') + 'px';
 	el.style.height = this.getprop('height') + 'px';
 	el.style.visibility = 'hidden';
-	el.style.zIndex = this.n_depth;
+	el.style.zIndex = this.n_depth+20;
 
 	el.o_root_n_id = o_root.n_id;
 	el.this_n_id = this.n_id;
 
-	el.onclick = A_MENUS_onclick;
+	addListener(el, 'click', A_MENUS_onclick, false);
+//	el.onclick = A_MENUS_onclick;
 	el.onmouseout = A_MENUS_onmouseout;
 	el.onmouseover = A_MENUS_onmouseover;
 	el.onmousedown = A_MENUS_onmousedown;
@@ -433,7 +440,8 @@ function menu_item (o_parent, n_order) {
 }
 
 function A_MENUS_onclick(){	return A_MENUS[this.o_root_n_id].onclick(this.this_n_id); }
-function A_MENUS_onmouseout(){	return A_MENUS[this.o_root_n_id].onmouseout(this.this_n_id); }// false;}// 
+//function A_MENUS_onmouseout(){ return false;}
+function A_MENUS_onmouseout(){	return A_MENUS[this.o_root_n_id].onmouseout(this.this_n_id); }
 function A_MENUS_onmouseover(){	return A_MENUS[this.o_root_n_id].onmouseover(this.this_n_id); }
 function A_MENUS_onmousedown(){	return A_MENUS[this.o_root_n_id].onmousedown(this.this_n_id); }
 

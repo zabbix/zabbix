@@ -35,8 +35,8 @@ div.onajaxload{
 	position: absolute;
 	background-color:#000000; 
 	
-	filter:alpha(opacity=05);
-	opacity:.05;
+	filter:alpha(opacity=15);
+	opacity:.15;
 	
 	cursor:wait;
 	z-index: 50;

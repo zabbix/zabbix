@@ -20,8 +20,8 @@
 
 function send_params(params){
 
-	var uri = new url(location.href);
-	new Ajax.Request(uri.getPath()+"?output=ajax",
+	var uri = new Curl(location.href);
+	new Ajax.Request(uri.getPath()+'?output=ajax',
 					{
 						'method': 'post',
 						'parameters':params,

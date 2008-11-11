@@ -25,7 +25,7 @@
 		
 	$page["title"] = "S_MAP";
 	$page["file"] = "map.php";
-	$page["type"] = PAGE_TYPE_IMAGE;
+	$page["type"] = detect_page_type(PAGE_TYPE_IMAGE);
 
 include_once "include/page_header.php";
 
@@ -34,21 +34,25 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"sysmapid"=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL),
+		
+		'elements'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
+		'links'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
+		
 		"noedit"=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),	NULL),
 		"border"=>			array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
 		'show_triggers'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1,2,3"),	NULL),
+		'noelements'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
+		'nolinks'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
 	);
 
 	check_fields($fields);
 ?>
 <?php
-	if(!sysmap_accessiable($_REQUEST["sysmapid"],PERM_READ_ONLY))
-	{
+	if(!sysmap_accessiable($_REQUEST["sysmapid"],PERM_READ_ONLY)){
 		access_deny();
 	}
-	
-	if(!($map = get_sysmap_by_sysmapid($_REQUEST["sysmapid"])))
-	{
+			
+	if(!$map = get_sysmap_by_sysmapid($_REQUEST['sysmapid'])){
 		include_once "include/page_footer.php";
 	}
 
@@ -80,18 +84,18 @@ include_once "include/page_header.php";
 	$black		= ImageColorAllocate($im,0,0,0); 
 	$gray		= ImageColorAllocate($im,150,150,150);
 
-	$colors["Red"]		= ImageColorAllocate($im,255,0,0); 
-	$colors["Dark Red"]	= ImageColorAllocate($im,150,0,0); 
-	$colors["Green"]	= ImageColorAllocate($im,0,255,0); 
-	$colors["Dark Green"]	= ImageColorAllocate($im,0,150,0); 
-	$colors["Blue"]		= ImageColorAllocate($im,0,0,255); 
-	$colors["Dark Blue"]	= ImageColorAllocate($im,0,0,150); 
-	$colors["Yellow"]	= ImageColorAllocate($im,255,255,0); 
-	$colors["Dark Yellow"]	= ImageColorAllocate($im,150,150,0); 
-	$colors["Cyan"]		= ImageColorAllocate($im,0,255,255); 
 	$colors["Black"]	= ImageColorAllocate($im,0,0,0); 
+	$colors["Blue"]		= ImageColorAllocate($im,0,0,255); 
+	$colors["Cyan"]		= ImageColorAllocate($im,0,255,255); 
+	$colors["Dark Blue"]	= ImageColorAllocate($im,0,0,150); 
+	$colors["Dark Green"]	= ImageColorAllocate($im,0,150,0); 
+	$colors["Dark Red"]	= ImageColorAllocate($im,150,0,0); 
+	$colors["Dark Yellow"]	= ImageColorAllocate($im,150,150,0); 
 	$colors["Gray"]		= ImageColorAllocate($im,150,150,150); 
+	$colors["Green"]	= ImageColorAllocate($im,0,255,0); 
+	$colors["Red"]		= ImageColorAllocate($im,255,0,0); 
 	$colors["White"]	= ImageColorAllocate($im,255,255,255);
+	$colors["Yellow"]	= ImageColorAllocate($im,255,255,0); 
 
 	$x=imagesx($im); 
 	$y=imagesy($im);
@@ -119,31 +123,56 @@ include_once "include/page_header.php";
 
 		for($x=$grid;$x<$width;$x+=$grid)
 		{
-			MyDrawLine($im,$x,0,$x,$height,$black,GRAPH_DRAW_TYPE_DASHEDLINE);
+			MyDrawLine($im,$x,0,$x,$height,$black,MAP_LINK_DRAWTYPE_DASHED_LINE);
 			ImageString($im, 2, $x+2,2, $x , $black);
 		}
 		for($y=$grid;$y<$height;$y+=$grid)
 		{
-			MyDrawLine($im,0,$y,$width,$y,$black,GRAPH_DRAW_TYPE_DASHEDLINE);
+			MyDrawLine($im,0,$y,$width,$y,$black,MAP_LINK_DRAWTYPE_DASHED_LINE);
 			ImageString($im, 2, 2,$y+2, $y , $black);
 		}
 
 		ImageString($im, 2, 1,1, "Y X:" , $black);
 	}
 
-# Draw connectors 
+// ACTION /////////////////////////////////////////////////////////////////////////////
+	
+	if(isset($_REQUEST['elements']) || isset($_REQUEST['noelements'])){
+		$elements = get_request('elements', array());
+	}
+	else{
+		$elements = array();
+		$db_elements = DBselect("select * from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]);
+		while($db_element = DBfetch($db_elements)){
+			$elements[$db_element['selementid']] = $db_element;
+		}
+	}
+	
+	if(isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])){
+		$links = get_request('links',array());
+	}
+	else{
+		$links = array();
+		$db_res = DBselect("select * from sysmaps_links where sysmapid=".$_REQUEST["sysmapid"]);
+		while($link = DBfetch($db_res)){
+			$links[$link['linkid']] = $link;
+		}
+	}
 
-	$links = DBselect("select * from sysmaps_links where sysmapid=".$_REQUEST["sysmapid"]);
-	while($link = DBfetch($links))
-	{
-		list($x1, $y1) = get_icon_center_by_selementid($link["selementid1"]);
-		list($x2, $y2) = get_icon_center_by_selementid($link["selementid2"]);
+//--------------------------------
+// Draw connectors 
+	foreach($links as $linkid => $link){
+	
+		$element = $elements[$link['selementid1']];
+		list($x1, $y1) = get_icon_center_by_selement($element);
 
+		$element = $elements[$link['selementid2']];
+		list($x2, $y2) = get_icon_center_by_selement($element);
+		
 		$drawtype = $link["drawtype_off"];
 		$color = $colors[$link["color_off"]];
 
-		if(!is_null($link["triggerid"]))
-		{
+		if(!is_null($link['triggerid']) && ($link['triggerid'] > 0)){
 			$trigger=get_trigger_by_triggerid($link["triggerid"]);
 //			if($trigger["value"] == TRIGGER_VALUE_TRUE)
 			if($trigger["status"] == TRIGGER_STATUS_ENABLED && $trigger["value"] == TRIGGER_VALUE_TRUE)
@@ -155,15 +184,16 @@ include_once "include/page_header.php";
 		MyDrawLine($im,$x1,$y1,$x2,$y2,$color,$drawtype);
 	}
 
-# Draw elements
-	$icons=array();
-	$db_elements = DBselect("select * from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]);
+//-----------------------
+// Draw elements
 
-	while($db_element = DBfetch($db_elements))
-	{
-		if( ($img = get_png_by_selementid($db_element["selementid"])) )
-		{
-			ImageCopy($im,$img,$db_element["x"],$db_element["y"],0,0,ImageSX($img),ImageSY($img));
+	$icons=array();
+
+	foreach($elements as $elementid => $db_element){
+		$img = get_png_by_selement($db_element);
+		
+		if(!isset($_REQUEST['noelements'])){
+			imagecopy($im,$img,$db_element['x'],$db_element['y'],0,0,ImageSX($img),ImageSY($img));
 		}
 
 		if($label_type==MAP_LABEL_TYPE_NOTHING)	continue;
@@ -171,20 +201,20 @@ include_once "include/page_header.php";
 		$color		= $darkgreen;
 		$label_color	= $black;
 
-		$info_line	= "";
-		$label_location = $db_element["label_location"];
-		if(is_null($label_location))	$map["label_location"];
+		$info_line	= '';
+		$label_location = $db_element['label_location'];
+		if(is_null($label_location))	$map['label_location'];
 
-		$label_line = $db_element["label"];
+		$label_line = $db_element['label'];
 
-		$el_info = get_info_by_selementid($db_element["selementid"],$status_view);
+		$el_info = get_info_by_selement($db_element,$status_view);
 
 		$info_line	= $el_info['info'];
 		$color		= $el_info['color'];
 
 		if($label_type==MAP_LABEL_TYPE_STATUS)
 		{
-			$label_line = "";
+			$label_line = '';
 		}
 		else if($label_type==MAP_LABEL_TYPE_NAME)
 		{
@@ -193,28 +223,27 @@ include_once "include/page_header.php";
 
 		unset($el_info);
 
-		if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST)
-		{
-			$host = get_host_by_hostid($db_element["elementid"]);
+		if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
+			$host = get_host_by_hostid($db_element['elementid']);
 			
 			if( $label_type==MAP_LABEL_TYPE_IP )
-				$label_line=$host["ip"];
+				$label_line=$host['ip'];
 
-			if( $host["status"] == HOST_STATUS_NOT_MONITORED )
+			if( $host['status'] == HOST_STATUS_NOT_MONITORED )
 				$label_color=$darkred;
 		}
 
-		if($label_line=="" && $info_line=="")	continue;
+		if($label_line=='' && $info_line=='')	continue;
 
-		$x_label = $db_element["x"];
-		$y_label = $db_element["y"];
+		$x_label = $db_element['x'];
+		$y_label = $db_element['y'];
 
-		$x_info = $db_element["x"];
-		$y_info = $db_element["y"];
+		$x_info = $db_element['x'];
+		$y_info = $db_element['y'];
 		if($label_location == MAP_LABEL_LOC_TOP)
 		{
 			$x_label += ImageSX($img)/2-ImageFontWidth(2)*strlen($label_line)/2;
-			$y_label -= ImageFontHeight(2)*($info_line == "" ? 1 : 2);
+			$y_label -= ImageFontHeight(2)*($info_line == '' ? 1 : 2);
 
 			$x_info += ImageSX($img)/2-ImageFontWidth(2)*strlen($info_line)/2;
 			$y_info  = $y_label+ImageFontHeight(2);
@@ -223,19 +252,19 @@ include_once "include/page_header.php";
 		{
 			$x_label -= ImageFontWidth(2)*strlen($label_line);
 			$y_label += ImageSY($img)/2-ImageFontHeight(2)/2 - 
-					($info_line == "" ? 0 : ImageFontHeight(2)/2);
+					($info_line == '' ? 0 : ImageFontHeight(2)/2);
 
 			$x_info -= ImageFontWidth(2)*strlen($info_line);
-			$y_info  = $y_label+ImageFontHeight(2) - ($label_line == "" ? ImageFontHeight(2)/2 : 0);
+			$y_info  = $y_label+ImageFontHeight(2) - ($label_line == '' ? ImageFontHeight(2)/2 : 0);
 		}
 		else if($label_location == MAP_LABEL_LOC_RIGHT)
 		{
 			$x_label += ImageSX($img);
 			$y_label += ImageSY($img)/2-ImageFontHeight(2)/2 - 
-					($info_line == "" ? 0 : ImageFontHeight(2)/2);
+					($info_line == '' ? 0 : ImageFontHeight(2)/2);
 
 			$x_info += ImageSX($img);
-			$y_info  = $y_label+ImageFontHeight(2) - ($label_line == "" ? ImageFontHeight(2)/2 : 0);
+			$y_info  = $y_label+ImageFontHeight(2) - ($label_line == '' ? ImageFontHeight(2)/2 : 0);
 		}
 		else
 		{
@@ -243,10 +272,10 @@ include_once "include/page_header.php";
 			$y_label += ImageSY($img);
 
 			$x_info += ImageSX($img)/2-ImageFontWidth(2)*strlen($info_line)/2;
-			$y_info  = $y_label+ ($label_line == "" ? 0 : ImageFontHeight(2));
+			$y_info  = $y_label+ ($label_line == '' ? 0 : ImageFontHeight(2));
 		}
 
-		if($label_line!="")
+		if($label_line!='')
 		{
 			ImageFilledRectangle($im,
 				$x_label-2, $y_label,
@@ -256,7 +285,7 @@ include_once "include/page_header.php";
 			imagestringTTF($im, 2, $x_label, $y_label, $label_line, $label_color);
 		}
 
-		if($info_line!="")
+		if($info_line!='')
 		{
 			ImageFilledRectangle($im,
 				$x_info-2, $y_info,
@@ -265,17 +294,16 @@ include_once "include/page_header.php";
 			ImageStringTTF($im, 2, $x_info, $y_info, $info_line,$color);
 		}
 	}
-
+	
 	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, S_ZABICOM_URL, $gray);
 
-	if(!isset($_REQUEST["border"]))
+	if(!isset($_REQUEST['border']))
 	{
-		ImageRectangle($im,0,0,$width-1,$height-1,$colors["Black"]);
+		ImageRectangle($im,0,0,$width-1,$height-1,$colors['Black']);
 	}
 
 	ImageOut($im);
-
-	ImageDestroy($im);
+	imagedestroy($im);
 ?>
 <?php
 
