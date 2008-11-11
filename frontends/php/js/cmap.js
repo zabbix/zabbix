@@ -87,9 +87,9 @@ mlink: {
 	selementid2:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	triggerid:		0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	drawtype_off:	0,
-	color_off:		'Gray',
+	color_off:		'Green',
 	drawtype_on:	0,
-	color_on:		'Gray',
+	color_on:		'Red',
 	status:			1,				// status of link 1 - active, 2 - passive
 },
 
