@@ -1682,3 +1682,19 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 	return NULL;
 /*#endif*/
 }
+
+const char *zbx_permission_string(int perm)
+{
+	switch (perm) {
+	case PERM_DENY:
+		return "dn";
+	case PERM_READ_LIST:
+		return "rl";
+	case PERM_READ_ONLY:
+		return "ro";
+	case PERM_READ_WRITE:
+		return "rw";
+	default:
+		return "unknown";
+	}
+}
