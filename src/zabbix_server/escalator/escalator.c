@@ -76,6 +76,64 @@ static int	check_perm2system(zbx_uint64_t userid)
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_host_permision                                               *
+ *                                                                            *
+ * Purpose: Return user permissions for access to the host                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: PERM_DENY - if host or user not found,                       *
+ *                   or permission otherwise                                  *
+ *                                                                            *
+ * Author:                                                                    *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_host_permision(zbx_uint64_t userid, zbx_uint64_t hostid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		user_type = -1, perm = PERM_DENY;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_host_permision()");
+
+	result = DBselect("select type from users where userid=" ZBX_FS_UI64,
+			userid);
+
+	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+		user_type = atoi(row[0]);
+
+	DBfree_result(result);
+
+	if (-1 == user_type)
+		goto out;
+
+	if (USER_TYPE_SUPER_ADMIN == user_type)
+	{
+		perm = PERM_MAX;
+		goto out;
+	}
+
+	result = DBselect("select min(r.permission) from rights r,hosts_groups hg,users_groups ug"
+			" where r.groupid=ug.usrgrpid and r.id=hg.groupid"
+			" and hg.hostid=" ZBX_FS_UI64 " and ug.userid=" ZBX_FS_UI64,
+			hostid,
+			userid);
+
+	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+		perm = atoi(row[0]);
+
+	DBfree_result(result);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of get_host_permision():%s",
+			zbx_permission_string(perm));
+
+	return perm;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_trigger_permision                                            *
  *                                                                            *
  * Purpose: Return user permissions for access to trigger                     *
@@ -94,32 +152,28 @@ static int	get_trigger_permision(zbx_uint64_t userid, zbx_uint64_t triggerid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		user_type = -1, perm = PERM_DENY;
+	int		perm = PERM_DENY, host_perm;
+	zbx_uint64_t	hostid;
 
-	result = DBselect("select type from users where userid=" ZBX_FS_UI64,
-			userid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_trigger_permision()");
 
-	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
-		user_type = atoi(row[0]);
+	result = DBselect("select distinct i.hostid from items i,functions f"
+			" where i.itemid=f.itemid and f.triggerid=" ZBX_FS_UI64,
+			triggerid);
 
-	DBfree_result(result);
+	while (NULL != (row = DBfetch(result)))
+	{
+		hostid = zbx_atoui64(row[0]);
+		host_perm = get_host_permision(userid, hostid);
 
-	if (-1 == user_type)
-		return PERM_DENY;
-
-	if (USER_TYPE_SUPER_ADMIN == user_type)
-		return PERM_MAX;
-
-	result = DBselect("select max(r.permission) from rights r,hosts_groups hg,items i,functions f,users_groups ug"
-			" where r.groupid=ug.usrgrpid and r.id=hg.groupid and hg.hostid=i.hostid"
-			" and i.itemid=f.itemid and f.triggerid=" ZBX_FS_UI64 " and ug.userid=" ZBX_FS_UI64,
-			triggerid,
-			userid);
-
-	if (NULL != (row = DBfetch(result)))
-		perm = atoi(row[0]);
+		if (perm < host_perm)
+			perm = host_perm;
+	}
 
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of get_trigger_permision():%s",
+			zbx_permission_string(perm));
 
 	return perm;
 }
@@ -127,6 +181,8 @@ static int	get_trigger_permision(zbx_uint64_t userid, zbx_uint64_t triggerid)
 static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t triggerid, ZBX_USER_MSG **user_msg, char *subject, char *message)
 {
 	ZBX_USER_MSG	*p;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_user_msg()");
 
 	if (SUCCEED != check_perm2system(userid))
 		return;
@@ -551,11 +607,9 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
 		}
 
 		DBfree_result(result);
-	} else {
+	} else
 		zabbix_log(LOG_LEVEL_DEBUG, "Escalation stopped: recovery message not defined",
 				escalation->actionid);
-		DBremove_escalation(escalation->escalationid);
-	}
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 }
@@ -627,13 +681,6 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 
 		switch (escalation->status) {
 			case ESCALATION_STATUS_ACTIVE:
-			case ESCALATION_STATUS_RECOVERY:
-			default:
-				break;
-		}
-
-		switch (escalation->status) {
-			case ESCALATION_STATUS_ACTIVE:
 				if (SUCCEED == get_event(escalation->eventid, &event))
 				{
 					substitute_macros(&event, &action, &action.shortdata);
@@ -660,7 +707,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	} else {
 		zabbix_log(LOG_LEVEL_DEBUG, "Escalation canceled: action [" ZBX_FS_UI64 "] not found",
 				escalation->actionid);
-		DBremove_escalation(escalation->escalationid);
+		escalation->status = ESCALATION_STATUS_COMPLETED;
 	}
 
 	DBfree_result(result);
