@@ -835,12 +835,7 @@
 		$cmapid = get_request('favid',0);
 		
 		$el_menu = array(
-				array('form_key'=>'elementtype',		'value'=> S_TYPE),
-				array('form_key'=>'hostid_hosts', 		'value'=> S_HOST),
-				array('form_key'=>'sysmapid_sysmaps',	'value'=> S_MAP),
-				array('form_key'=>'triggerid_triggers', 'value'=> S_TRIGGER),
-				array('form_key'=>'groupid_host_group', 'value'=> S_HOST_GROUP),
-				
+				array('form_key'=>'elementtype',		'value'=> S_TYPE),				
 				array('form_key'=>'label', 				'value'=> S_LABEL),
 				array('form_key'=>'label_location', 	'value'=> S_LABEL_LOCATION),
 				array('form_key'=>'iconid_off',	 		'value'=> S_ICON_OFF),

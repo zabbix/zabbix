@@ -354,11 +354,13 @@ include_once "include/page_header.php";
 				
 				$action = '';
 				if($_REQUEST['reference'] =='sysmap_element'){
-					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_element_option($sid,'$dstfld1','$host[$srcfld1]');";
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_element_option($sid,".
+									"[{'key':'elementtype','value':'".SYSMAP_ELEMENT_TYPE_HOST."'},".
+										"{'key':'$dstfld1','value':'$host[$srcfld1]'}]);";
 				}
 				else if($_REQUEST['reference'] =='sysmap_link'){
-					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,'$dstfld1','$host[$srcfld1]');";
-				}
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,[{'key':'$dstfld1','value':'$host[$srcfld1]'}]);";
+				}				
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
@@ -528,11 +530,13 @@ include_once "include/page_header.php";
 				
 				$action = '';
 				if($_REQUEST['reference'] =='sysmap_element'){
-					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_element_option($sid,'$dstfld1','$row[$srcfld1]');";
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_element_option($sid,".
+									"[{'key':'elementtype','value':'".SYSMAP_ELEMENT_TYPE_HOST_GROUP."'},".
+										"{'key':'$dstfld1','value':'$row[$srcfld1]'}]);";										
 				}
 				else if($_REQUEST['reference'] =='sysmap_link'){
-					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,'$dstfld1','$row[$srcfld1]');";
-				}
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,[{'key':'$dstfld1','value':'$row[$srcfld1]'}]);";
+				}				
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -673,10 +677,12 @@ include_once "include/page_header.php";
 				
 				$action = '';
 				if($_REQUEST['reference'] =='sysmap_element'){
-					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_element_option($sid,'$dstfld1','$row[$srcfld1]');";
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_element_option($sid,".
+									"[{'key':'elementtype','value':'".SYSMAP_ELEMENT_TYPE_TRIGGER."'},".
+										"{'key':'$dstfld1','value':'$row[$srcfld1]'}]);";										
 				}
 				else if($_REQUEST['reference'] =='sysmap_link'){
-					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,'$dstfld1','$row[$srcfld1]');";
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,[{'key':'$dstfld1','value':'$row[$srcfld1]'}]);";
 				}
 			}
 			else{

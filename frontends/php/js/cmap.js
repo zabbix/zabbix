@@ -356,16 +356,18 @@ add_element: function(selement, update_icon){
 	this.elements[sid] = selement;
 },
 
-update_element_option: function(id, key, value){
+update_element_option: function(id, params){ // params = [{'key': key, 'value':value},{'key': key, 'value':value}]
 	this.debug('update_element_option');
 	
 	if((typeof(this.elementids[id]) != 'undefined') && !is_null(this.elementids[id])){
-//SDI(key+' : '+value);
-		if(key == 'elementtype'){
-			this.elements[this.elementids[id]]['elementid'] = '0';
+		for(var i=0; i < params.length; i++){
+			if(typeof(params[i]) != 'undefined'){
+				var pair = params[i];
+//SDI(pair.key+' : '+pair.value);
+				this.elements[this.elementids[id]][pair.key] = pair.value;
+			}
 		}
 		
-		this.elements[this.elementids[id]][key] = value;
 //SDJ(this.elements[this.elementids[id]]);
 		this.update_element(this.elements[this.elementids[id]],1);
 	}
@@ -481,22 +483,28 @@ add_link: function(mlink, update_map){
 },
 
 
-update_link_option: function(id, key, value){
+update_link_option: function(id, params){ // params = [{'key': key, 'value':value},{'key': key, 'value':value},...]
 	this.debug('update_link_option');
 	
 	if((typeof(this.linkids[id]) != 'undefined') && !is_null(this.linkids[id])){
 //SDI(key+' : '+value);
-		if(key == 'selementid1'){
-			if(this.links[this.linkids[id]]['selementid2'] == value)
-			return false;
+		for(var i=0; i < params.length; i++){
+			if(typeof(params[i]) != 'undefined'){
+				var pair = params[i];
+				if(pair.key == 'selementid1'){
+					if(this.links[this.linkids[id]]['selementid2'] == pair.value)
+					return false;
+				}
+				
+				if(pair.key == 'selementid2'){
+					if(this.links[this.linkids[id]]['selementid1'] == pair.value)
+					return false;
+				}
+				
+				this.links[this.linkids[id]][pair.key] = pair.value;
+			}
 		}
-		
-		if(key == 'selementid2'){
-			if(this.links[this.linkids[id]]['selementid1'] == value)
-			return false;
-		}
-		
-		this.links[this.linkids[id]][key] = value;
+
 		this.update_mapimg();
 	}
 },
@@ -874,59 +882,54 @@ show_element_menu: function(e){
 					{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}
 					]);
 	
+	var elementtypes = ['hostid_hosts','sysmapid_sysmaps','triggerid_triggers','groupid_host_group'];
+	
 	for(var i=0; i<zbx_element_menu.length; i++){
 		var form_key = zbx_element_menu[i]['form_key'];
 		var caption = zbx_element_menu[i]['value'];
-
 //SDI(form_field+' : '+caption);
-		var elementtype = ['hostid_hosts','sysmapid_sysmaps','triggerid_triggers','groupid_host_group'].indexOf(form_key);
-		if(elementtype != -1){
-			if(elementtype != element.elementtype){
-				continue;
-			}
-			var form_field = 'elementid';
-		}
-		else{
-			var form_field = form_key;
-		}
-
 		var sub_menu = new Array(caption,null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']});
 		sub_menu.push([caption,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
-
+		
 		var fields = zbx_element_form_menu[form_key];
 //SDI(form_field);
 		for(var j=0; j < fields.length; j++){
 			if(typeof(fields[j]) != 'undefined'){
 				var values = fields[j];
 //SDI(element[form_field]+' == '+values['key']);
-				if(form_field == 'elementid'){
-					var idx = form_key.indexOf('_');
-					var srcfld1 = form_key.substring(0,idx);
-					var srctbl1 = form_key.substring(idx+1);
+				if((form_key != 'label') && (form_key != 'url')){
+					if((form_key == 'elementtype') && (typeof(elementtypes[values['key']]) != 'undefined')){
+						var form_field = elementtypes[values['key']];
+				
+						var idx = form_field.indexOf('_');
+						var srcfld1 = form_field.substring(0,idx);
+						var srctbl1 = form_field.substring(idx+1);
+						
+						var value_action = 'javascript: '+
+									"PopUp('popup.php?srctbl="+srctbl1+
+										'&reference=sysmap_element'+
+										'&cmapid='+this.id+
+										'&sid='+id+
+										'&dstfrm=null'+
+										'&srcfld1='+srcfld1+
+										"&dstfld1=elementid',800,450); void(0);",
+						value_action = '<span onclick="'+value_action+'">'+values['value']+'</span>';
+					}
+					else{
+						var value_action = "javascript: ZBX_SYSMAPS["+this.id+"].map.update_element_option("+id+",[{'key':'"+form_key+"','value': '"+values['key']+"'}]);";
+						value_action = '<span onclick="'+value_action+'">'+values['value']+'</span>';
+					}
 					
-					var value_action = 'javascript: '+
-								"PopUp('popup.php?srctbl="+srctbl1+
-									'&reference=sysmap_element'+
-									'&cmapid='+this.id+
-									'&sid='+id+
-									'&dstfrm=null'+
-									'&srcfld1='+srcfld1+
-									"&dstfld1=elementid',800,450); void(0);",
-					value_action = '<span onclick="'+value_action+'">'+values['value']+'</span>';					
-					sub_menu.push([value_action,'#',function(){return false;}]);
-				}
-				else if((form_key != 'label') && (form_key != 'url')){
-					var value_action = "javascript: ZBX_SYSMAPS["+this.id+"].map.update_element_option("+id+",'"+form_field+"','"+values['key']+"');";
-					value_action = '<span onclick="'+value_action+'">'+values['value']+'</span>';
-					
-					if(element[form_field] == values['key'])
+					if(element[form_key] == values['key'])
 						sub_menu.push([value_action,'#',null,{'outer' : ['pum_b_submenu'],'inner' : ['pum_i_submenu']}]);
 					else
 						sub_menu.push([value_action,'#',function(){return false;}]);
 				}
 				else{
-					values['key'] = element[form_field];
-					var value_action = "javascript: this.disabled=true; ZBX_SYSMAPS["+this.id+"].map.update_element_option("+id+",'"+form_field+"',this.value);";
+					values['key'] = element[form_key];
+
+//					var value_action = "javascript: this.disabled=true; ZBX_SYSMAPS["+this.id+"].map.update_element_option("+id+",'"+form_key+"',this.value);";
+					var value_action = "javascript: this.disabled=true; ZBX_SYSMAPS["+this.id+"].map.update_element_option("+id+",[{'key':'"+form_key+"','value': this.value}]);";
 					value_action = '<input type="text" value="'+values['key']+'" onchange="'+value_action+'" class="biginput" />';
 					value_action += ' <span class="pointer" onclick="javascript: this.innerHTML=\'Changed\';">Change</span>';
 					sub_menu.push([value_action,null,function(){return false;},{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}]);
@@ -987,7 +990,7 @@ show_link_menu: function(e){
 				if((typeof(this.elementids[j] != 'undefined')) && !is_null(this.elementids[j])){
 					var element = this.elements[this.elementids[j]];
 					
-					var value_action = "javascript: ZBX_SYSMAPS["+this.id+"].map.update_link_option("+id+",'"+form_key+"','"+element['selementid']+"');";
+					var value_action = "javascript: ZBX_SYSMAPS["+this.id+"].map.update_link_option("+id+",[{'key':'"+form_key+"','value':'"+element['selementid']+"'}]);";
 					value_action = '<span onclick="'+value_action+'">'+element['label']+'</span>';
 					
 					if(mlink[form_key] == element['selementid'])
@@ -1003,7 +1006,7 @@ show_link_menu: function(e){
 			for(var j=0; j < fields.length; j++){
 				if(typeof(fields[j]) != 'undefined'){
 					var values = fields[j];
-					var value_action = "javascript: ZBX_SYSMAPS["+this.id+"].map.update_link_option("+id+",'"+form_key+"','"+values['key']+"');";
+					var value_action = "javascript: ZBX_SYSMAPS["+this.id+"].map.update_link_option("+id+",[{'key':'"+form_key+"','value':'"+values['key']+"'}]);";
 					value_action = '<span onclick="'+value_action+'">'+values['value']+'</span>';
 
 					if(mlink[form_key] == values['key'])
