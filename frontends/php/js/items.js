@@ -22,7 +22,7 @@ return p;
 
 function call_menu(evnt,id,name,ltype,menu_options){
  	var tname = 'Create Log Trigger';	
-	if(isset(menu_options)){
+	if(typeof(menu_options) != 'undefined'){
 		show_popup_menu(evnt,
 					[
 						[name,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
@@ -67,7 +67,7 @@ catch(e){
 	for (lp = 0; lp < key_count; lp++) {
 		var key = document.getElementsByName('keys['+lp+'][value]')[0];
 		var typ = document.getElementsByName('keys['+lp+'][type]')[0];
-		if (isset(key) && isset(typ)) {
+		if((typeof(key) != 'undefined') && (typeof(typ) != 'undefined')) {
 			if (expression != '') {
 				expression += ex;
 				expr_v += ex_v;
@@ -191,11 +191,11 @@ function remove_expression(expr_id){
 		var elm_t = document.getElementsByName('expressions['+id+'][type]')[0];	
 		var elm_s = document.getElementsByName('expressions['+id+'][view]')[0];	
 		
-		if(isset(elm_v)) elm_v.parentNode.removeChild(elm_v);
-		if(isset(elm_t)) elm_t.parentNode.removeChild(elm_t);
-		if(isset(elm_s)) elm_s.parentNode.removeChild(elm_s);
+		if(typeof(elm_v) != 'undefined') elm_v.parentNode.removeChild(elm_v);
+		if(typeof(elm_t) != 'undefined') elm_t.parentNode.removeChild(elm_t);
+		if(typeof(elm_s) != 'undefined') elm_s.parentNode.removeChild(elm_s);
 	}
-	if(isset(expr_tr)){
+	if(typeof(expr_tr) != 'undefined'){
 		expr_tr.parentNode.removeChild(expr_tr);
 	}
 }
@@ -215,7 +215,7 @@ function element_up(elementid){
 	var c_obj = document.getElementById(elementid);
 	var p_obj = c_obj.parentNode;
 	
-	if(!isset(p_obj)) return;
+	if(typeof(p_obj) == 'undefined') return;
 
 	var c2_obj = previousObject(c_obj);
 	if(c2_obj && c2_obj.id.length > 0){ 
@@ -228,7 +228,7 @@ function element_down(elementid){
 	var c_obj = document.getElementById(elementid);
 	var p_obj = c_obj.parentNode;
 	
-	if(!isset(p_obj)) return;
+	if(typeof(p_obj) == 'undefined') return;
 
 	var c2_obj = nextObject(c_obj);
 	if(c2_obj && (c2_obj.id.length > 0)){	
@@ -384,10 +384,10 @@ function remove_keyword(key_id){
 		var elm_v = document.getElementsByName('keys['+id+'][value]')[0];
 		var elm_t = document.getElementsByName('keys['+id+'][type]')[0];
 		
-		if(isset(elm_v)) elm_v.parentNode.removeChild(elm_v);
-		if(isset(elm_t)) elm_t.parentNode.removeChild(elm_t);
+		if(typeof(elm_v) == 'undefined') elm_v.parentNode.removeChild(elm_v);
+		if(typeof(elm_t) == 'undefined') elm_t.parentNode.removeChild(elm_t);
 	}
-	if(isset(key_tr)){
+	if(typeof(key_tr) != 'undefined'){
 		key_tr.parentNode.removeChild(key_tr);
 	}
 
@@ -395,12 +395,12 @@ function remove_keyword(key_id){
 	var bData = false;
 	for (lp = 0; lp < key_count; lp++) {
 		var elm_v = document.getElementsByName('keys['+lp+'][value]')[0];
-		if (isset(elm_v)) bData = true;
+		if(typeof(elm_v) != 'undefined') bData = true;
 	}
 	if (!bData) {
 		var bt_and = document.getElementById('add_key_and');
 		var bt_or = document.getElementById('add_key_or');
-		if (isset(bt_and)) bt_and.disabled = false;
-		if (isset(bt_or)) bt_or.disabled = false;
-	}
+		if (typeof(bt_and) != 'undefined') bt_and.disabled = false;
+		if (typeof(bt_or) != 'undefined') bt_or.disabled = false;
+	}	
 }

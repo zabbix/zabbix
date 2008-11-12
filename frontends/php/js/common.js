@@ -326,7 +326,7 @@ function resizeiframe(id){
 	id = id || 'iframe';
 	var iframe = document.getElementById(id);
 	var indoc = (IE)?iframe.contentWindow.document:iframe.contentDocument;
-	if(!isset(indoc)) return;
+	if(typeof(indoc) == 'undefined') return;
 	var height = parseInt(indoc.getElementsByTagName('body')[0].scrollHeight);
 	var height2 = parseInt(indoc.getElementsByTagName('body')[0].offsetHeight);
 	
