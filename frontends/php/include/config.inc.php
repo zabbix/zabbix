@@ -121,13 +121,12 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		$error = '';
 		if(!DBconnect($error))
 		{
-			global	$_REQUEST;
-
 			$_REQUEST['message'] = $error;
-			
+
 			define('ZBX_DISTRIBUTED', false);
 			define('ZBX_PAGE_NO_AUTHERIZATION', true);
-			$show_setup = true;
+			
+			$show_warning = true;			
 		}
 		else
 		{
@@ -151,12 +150,15 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	}
 	else
 	{
-		if(file_exists($ZBX_CONFIGURATION_FILE))
+		if(file_exists($ZBX_CONFIGURATION_FILE)){
 			include $ZBX_CONFIGURATION_FILE;
-
+		}
+		
+		require_once('include/db.inc.php');
+		
 		define('ZBX_PAGE_NO_AUTHERIZATION', true);
 		define('ZBX_DISTRIBUTED', false);
-		$show_setup = true;
+		$show_setup = true;		
 	}
 
 	if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
