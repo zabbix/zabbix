@@ -1,6 +1,5 @@
 Changes for 1.0.0:
 
- - [DEV-248] added enhanced regular expressions for string functions and log monitoring (Artem,Sasha)
  - [DEV-242] added improved map configuration (Artem)
  - [DEV-250] added support of vm.memory.size under AIX (Sasha)
  - [DEV-250] added full support of proc.num/mem under Linux 2.4/2.6, Solaris and AIX (Sasha)
