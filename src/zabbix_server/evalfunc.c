@@ -1056,7 +1056,6 @@ static int evaluate_STR(char *value, DB_ITEM *item, char *function, char *parame
 
 	char		str[MAX_STRING_LEN];
 	char		encoding[MAX_STRING_LEN];
-	char		lastvalue_str[MAX_STRING_LEN];
 	int		func;
 	int		res = SUCCEED;
 
@@ -1065,7 +1064,7 @@ static int evaluate_STR(char *value, DB_ITEM *item, char *function, char *parame
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_STR()");
 
-	if (item->value_type != ITEM_VALUE_TYPE_STR && item->value_type==ITEM_VALUE_TYPE_LOG)
+	if (item->value_type != ITEM_VALUE_TYPE_STR && item->value_type != ITEM_VALUE_TYPE_LOG)
 		return FAIL;
 
 	if (item->lastvalue_null != 0)
@@ -1092,9 +1091,6 @@ static int evaluate_STR(char *value, DB_ITEM *item, char *function, char *parame
 	{
 		get_key_param(item->key, 3, encoding, sizeof(encoding));
 
-/*		if (FAIL == convertj(item->lastvalue_str, lastvalue_str, sizeof(lastvalue_str), encoding))
-			zbx_strlcpy(lastvalue_str, item->lastvalue_str, sizeof(lastvalue_str));
-*/
 		if (*str == '@')
 		{
 			result = DBselect("select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
@@ -1107,8 +1103,6 @@ static int evaluate_STR(char *value, DB_ITEM *item, char *function, char *parame
 			DBfree_result(result);
 		}
 	}
-	else
-		zbx_strlcpy(lastvalue_str, item->lastvalue_str, sizeof(lastvalue_str));
 
 	switch (func) {
 	case ZBX_FUNC_STR:
