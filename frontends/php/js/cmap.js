@@ -908,6 +908,7 @@ show_element_menu: function(e){
 						var value_action = 'javascript: '+
 									"PopUp('popup.php?srctbl="+srctbl1+
 										'&reference=sysmap_element'+
+										'&sysmapid='+this.sysmapid+
 										'&cmapid='+this.id+
 										'&sid='+id+
 										'&dstfrm=null'+
@@ -977,6 +978,7 @@ show_link_menu: function(e){
 			var value_action = 'javascript: '+
 						"PopUp('popup.php?srctbl="+srctbl1+
 							'&reference=sysmap_link'+
+							'&sysmapid='+this.sysmapid+
 							'&cmapid='+this.id+
 							'&sid='+id+
 							'&dstfrm=null'+

@@ -125,8 +125,10 @@ include_once "include/page_header.php";
 		'itemtype'=>	array(T_ZBX_INT, O_OPT, null,   null,		null),
 		
 		'reference'=>	array(T_ZBX_STR, O_OPT, null,   null,		null),
+		'sysmapid'=>	array(T_ZBX_INT, O_OPT, null,   DB_ID,		'isset({reference})'),
 		'cmapid'=>		array(T_ZBX_INT, O_OPT, null,   null,		'isset({reference})'),
 		'sid'=>			array(T_ZBX_INT, O_OPT, null,   null,		'isset({reference})'),
+		
 		
 		"select"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null)
 	);
@@ -191,6 +193,7 @@ include_once "include/page_header.php";
 // Optional 
 	if(isset($_REQUEST['reference'])){
 		$frmTitle->addVar('reference',	get_request('reference','0'));
+		$frmTitle->addVar('sysmapid',	get_request('sysmapid','0'));
 		$frmTitle->addVar('cmapid',		get_request('cmapid','0'));
 		$frmTitle->addVar('sid',		get_request('sid','0'));
 	}
@@ -932,9 +935,11 @@ function add_item_variable(s_formname,x_value)
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->SetHeader(array(S_NAME,S_WIDTH,S_HEIGHT));
 
+		$sysmapid = get_request('sysmapid',0);
 		$result = DBselect('SELECT sysmapid,name,width,height '.
 						' FROM sysmaps '.
 						' WHERE '.DBin_node('sysmapid').
+							' AND sysmapid<>'.$sysmapid.
 						' ORDER BY name');
 		while($row=DBfetch($result)){
 			if(!sysmap_accessiable($row['sysmapid'],PERM_READ_WRITE)) continue;
