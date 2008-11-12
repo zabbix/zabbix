@@ -6999,7 +6999,7 @@
 		
 		$tblExp = new CTableInfo();
 		$tblExp->setHeader(array(
-				new CCheckBox('all_expressions',null,'CheckAll("'.S_EXPRESSION.'","all_expressions","g_expressionid");'),
+				new CCheckBox('all_expressions',null,'CheckAll("Regular expression","all_expressions","g_expressionid");'),
 				S_EXPRESSION,
 				S_EXPECTED_RESULT,
 				S_IGNORE_CASE,
