@@ -1987,7 +1987,7 @@ include_once('include/page_header.php');
 							'hosts.php?form=update'.url_param('config').
 							'&maintenanceid='.$maintenance['maintenanceid'].'#form', 'action')
 					),
-					$maintenance['maintenance_type']?S_NO_DATA_PROCESSING:S_SUPPRESS_NOTIFICATIONS,
+					$maintenance['maintenance_type']?S_NO_DATA_PROCESSING:S_NORMAL_PROCESSING,
 					$mnt_status,
 					$maintenance['description']
 					));
