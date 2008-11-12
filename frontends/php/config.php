@@ -403,7 +403,7 @@ include_once "include/page_header.php";
 				unset($_REQUEST['new_expression']);
 			}
 		}
-		else if(inarr_isset(array('del_expression','g_expressionid'))){
+		else if(inarr_isset(array('delete_expression','g_expressionid'))){
 			$_REQUEST['expressions'] = get_request('expressions',array());
 			foreach($_REQUEST['g_expressionid'] as $val){
 				unset($_REQUEST['expressions'][$val]);
@@ -420,7 +420,6 @@ include_once "include/page_header.php";
 			}
 		}
 	}
-
 ?>
 
 <?php
