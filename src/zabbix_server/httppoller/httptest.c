@@ -392,11 +392,10 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				lastfailedstep = httpstep.no;
 			}
 		}
-		if( !err_str )
+		if( !err_str && httptest->authentication == HTTPTEST_AUTH_BASIC )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: Setting HTTPAUTH [%d]", httptest->authentication);
-			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPAUTH,
-					httptest->authentication == HTTPTEST_AUTH_BASIC ? CURLAUTH_BASIC : CURLAUTH_NONE)))
+			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Cannot set HTTPAUTH [%s]",
 						curl_easy_strerror(err));
