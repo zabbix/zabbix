@@ -74,6 +74,10 @@
 			$page["title"] = "S_SCREENS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
+		case 'sysmaps':
+			$page['title'] = "S_MAPS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			break;
 		case 'nodes':
 			if(ZBX_DISTRIBUTED)
 			{
@@ -523,7 +527,6 @@ include_once "include/page_header.php";
 		{
 			$name = new CLink($row["name"],"#","action");
 			
-
 			if(isset($_REQUEST['reference'])){
 				$cmapid = get_request('cmapid',0);
 				$sid = get_request('sid',0);
@@ -921,6 +924,47 @@ function add_item_variable(s_formname,x_value)
 			$table->AddRow($name);
 		}
 
+		$table->Show();
+	}
+	else if($srctbl == 'sysmaps'){
+		require_once('include/maps.inc.php');
+
+		$table = new CTableInfo(S_NO_MAPS_DEFINED);
+		$table->SetHeader(array(S_NAME,S_WIDTH,S_HEIGHT));
+
+		$result = DBselect('SELECT sysmapid,name,width,height '.
+						' FROM sysmaps '.
+						' WHERE '.DBin_node('sysmapid').
+						' ORDER BY name');
+		while($row=DBfetch($result)){
+			if(!sysmap_accessiable($row['sysmapid'],PERM_READ_WRITE)) continue;
+
+			$name = new CLink($row['name'],'#','action');
+			
+			if(isset($_REQUEST['reference'])){
+				$cmapid = get_request('cmapid',0);
+				$sid = get_request('sid',0);
+				
+				$action = '';
+				if($_REQUEST['reference'] =='sysmap_element'){
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_element_option($sid,".
+									"[{'key':'elementtype','value':'".SYSMAP_ELEMENT_TYPE_MAP."'},".
+										"{'key':'$dstfld1','value':'$row[$srcfld1]'}]);";										
+				}
+			}
+			else{
+				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+					(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+			}
+//	
+			$name->setAction($action.' close_window(); return false;');
+			
+			$table->AddRow(array(
+				$name,
+				$row['width'],
+				$row['height']
+				));
+		}
 		$table->Show();
 	}
 ?>

@@ -226,7 +226,7 @@ include_once "include/page_header.php";
 	show_table_header("CONFIGURATION OF NETWORK MAP");
 	if(!sysmap_accessiable($_REQUEST["sysmapid"],PERM_READ_WRITE)) access_deny();
 	
-	$sysmap = DBfetch(DBselect("select * from sysmaps where sysmapid=".$_REQUEST["sysmapid"]));
+	$sysmap = DBfetch(DBselect('SELECT * FROM sysmaps WHERE sysmapid='.$_REQUEST['sysmapid']));
 ?>
 <?php
 	echo BR;
@@ -289,7 +289,7 @@ include_once "include/page_header.php";
 	$container->addOption('style','position: absolute;');
 	$container->Show();
 	
-	zbx_add_post_js('create_map("sysmap_cnt", 2);');
+	zbx_add_post_js('create_map("sysmap_cnt", "'.$sysmap['sysmapid'].'");');
 	
 	insert_js(get_element_form_menu());
 	insert_js(get_link_form_menu());
