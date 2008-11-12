@@ -18,12 +18,10 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 */
-
 // Title: Cmap class
 // Author: Aly
 
 // [!CDATA[
-
 var ZBX_SYSMAPS = new Array();			// sysmaps obj reference
 
 // sysmapid ALWAYS must be a STRING (js doesn't support uint64) !!!!
@@ -77,7 +75,7 @@ melement: {
 	url:			'',	
 	html_obj:		null,			// reference to html obj
 	html_objid:		null,			// html elements id
-	selected:		0,				// element is not selected
+	selected:		0				// element is not selected
 },
 
 mlink: {
@@ -90,7 +88,7 @@ mlink: {
 	color_off:		'Green',
 	drawtype_on:	0,
 	color_on:		'Red',
-	status:			1,				// status of link 1 - active, 2 - passive
+	status:			1				// status of link 1 - active, 2 - passive
 },
 
 initialize: function(container, sysmapid, id){
@@ -99,7 +97,7 @@ initialize: function(container, sysmapid, id){
 	this.id = id;
 	this.container = $(container);
 
-	if(empty(this.container)){
+	if(is_null(this.container)){
 		this.container = document.body;
 //		this.error('Map initialization failed. Unavailable container.');
 	}
@@ -576,6 +574,7 @@ add_element_img: function(selement){
 		dom_img.setAttribute('alt','element_'+selement.id);
 		dom_img.className = 'pointer';
 		dom_img.style.position = 'absolute';
+		dom_img.style.visibility = 'hidden';
 		
 		this.make_element_dragable(dom_img);
 	}
@@ -584,12 +583,13 @@ add_element_img: function(selement){
 	position.top = parseInt(selement.y,10);// + this.mapimg.offsetTop;
 	position.left = parseInt(selement.x,10);// + this.mapimg.offsetLeft;
 
-//	position.top += parseInt(selement.y)+1;
-//	position.left += parseInt(selement.x)+5;
-
 	dom_img.setAttribute('src','data:image/png;base64,'+selement.image);
-//	dom_img.setAttribute('style','z-index: 10; position: absolute; top: '+position.top+'px; left: '+position.left+'px;');
-	dom_img.setAttribute('style','z-index: 10; position: absolute; top: '+position.top+'px; left: '+position.left+'px;');
+	
+	dom_img.style.zIndex = '10';
+	dom_img.style.position = 'absolute';
+	dom_img.style.top = position.top+'px';
+	dom_img.style.left = position.left+'px';
+	dom_img.style.visibility = 'visible';
 	
 	if(!is_null(selement.selected)){
 		dom_img.style.border = '1px #FF0000 solid';
@@ -627,11 +627,11 @@ make_element_dragable: function(element){
 //	addListener(element, 'click', this.select_element.bindAsEventListener(this), false);
 	addListener(element, 'click', this.show_menu.bindAsEventListener(this), false);
 	addListener(element, 'mousedown', this.activate_menu.bindAsEventListener(this), false);
-	
+
 	new Draggable(element,{
 				ghosting: true,
 				snap: this.get_dragable_dimensions.bind(this),
-				onEnd: this.dragend_sysmap_update.bind(this),
+				onEnd: this.dragend_sysmap_update.bind(this)
 				});
 
 },
@@ -646,7 +646,7 @@ update_mapimg: function(){
 		'output': 'ajax',
 		'sysmapid': this.sysmapid,
 		'noelements':	1,
-		'nolinks':	1,
+		'nolinks':	1
 	}
 
 	params = this.get_update_params(params);
@@ -674,7 +674,7 @@ set_mapimg: function(resp){
 		this.mapimg.setAttribute('id','mapimg_'+this.sysmapid);
 		this.mapimg.className = 'image';
 		
-		this.mapimg.setAttribute('style','z-index: 1;');// position: absolute; top: 0px; left: 0px;');
+		this.mapimg.style.zIndex = '1';
 		
 		addListener(this.mapimg, 'load', this.set_container.bindAsEventListener(this), false);
 		addListener(window, 'resize', this.set_container.bindAsEventListener(this), false);
