@@ -716,7 +716,7 @@
 	'S_MAINTENANCE_TYPE'=>				'Maintenance type',
 	'S_EXPIRED'=>						'Expired',
 	
-	'S_SUPPRESS_NOTIFICATIONS'=>		'Suppress notifications',
+	'S_NORMAL_PROCESSING'=>				'Normal processing',
 	'S_NO_DATA_PROCESSING'=>			'No data processing',
 	
 	'S_DELETE_MAINTENANCE_PERIOD_Q'=>	'Delete maintenance period?',

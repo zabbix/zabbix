@@ -2932,7 +2932,7 @@
 
 /* form row generation */
 		$cmbType =  new CComboBox('maintenance_type', $maintenance_type);
-		$cmbType->AddItem(MAINTENANCE_TYPE_NORMAL, S_SUPPRESS_NOTIFICATIONS);
+		$cmbType->AddItem(MAINTENANCE_TYPE_NORMAL, S_NORMAL_PROCESSING);
 		$cmbType->AddItem(MAINTENANCE_TYPE_NODATA, S_NO_DATA_PROCESSING);
 		$tblMntc->AddRow(array(S_MAINTENANCE_TYPE, $cmbType));
 
