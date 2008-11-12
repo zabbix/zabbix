@@ -92,7 +92,11 @@ include_once "include/page_header.php";
 			switch($_REQUEST['action']){
 				case 'get':
 					$action = '';
-					
+
+					$sql = 'SELECT * FROM sysmaps  WHERE sysmapid='.$sysmapid;
+					$map = DBfetch(DBselect($sql));
+					$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.melement["label_location"]='.$map.'; '."\n";
+										
 					$sql = 'SELECT * FROM sysmaps_elements se WHERE se.sysmapid='.$sysmapid;
 					$res = DBselect($sql);
 					while($element = DBfetch($res)){

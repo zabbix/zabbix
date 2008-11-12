@@ -365,15 +365,24 @@ function menu_item (o_parent, n_order) {
 	}
 
 	if(!o_parent.n_y_direction && !n_order){
-//alert("w: " +this.getprop('height') +" i:" + (o_parent.a_config.length - item_offset) );
-
 // calculate menu direction in first element
-/* calculates Wrongly! <c> Aly
-		var mi_height = this.getprop('height') * (o_parent.a_config.length - item_offset) + o_parent.n_y + this.getprop('block_top');
-		var scr_height = o_root.n_scr_height + o_root.n_scroll_top;
-		var mi_direction = (mi_height > scr_height)?-1:1;
-//*/
-		var mi_direction = 1;  //	always show menu in down direction.
+///* calculates Wrongly! <c> Aly
+		if(item_offset > 0){
+			var mi_direction = 1;
+		}
+		else{			
+			var mi_height = this.getprop('height') * (o_parent.a_config.length - item_offset) + o_parent.n_y + this.getprop('block_top');
+
+			var body_height = (IE)?document.body.offsetHeight:window.innerHeight;
+//SDI(document.body.offsetHeight+' : '+window.innerHeight);
+//			var scr_height = o_root.n_scr_height + o_root.n_scroll_top;
+			var scr_height = body_height+o_root.n_scroll_top;
+
+//SDI(this.getprop('height')+' * ('+o_parent.a_config.length+' - '+item_offset+') + '+o_parent.n_y+' + '+this.getprop('block_top'));
+//SDI("w: " +mi_height +" i:" + scr_height);
+			var mi_direction = (mi_height > scr_height)?-1:1;	//	root direction calculated
+		}
+		
 		o_parent.set_y_direction(mi_direction);
 	}
 	
