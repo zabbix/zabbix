@@ -421,7 +421,9 @@ remove_element_by_id: function(id){
 // Remove related links
 		this.remove_links_by_elementid(elementid);
 // remove icon
-		this.elements[elementid].html_obj.remove();		
+		this.remove_element_img(this.elements[elementid]);
+		
+//		this.elements[elementid].html_obj.remove();		
 // remove element
 		this.elements[elementid] = null;
 		this.elementids[id] = null;
@@ -615,8 +617,8 @@ update_elements_icon: function(){
 remove_element_img: function(selement){
 	this.debug('remove_element_img');
 
-	var dom_id = 'element_'+selement.id;
-	$(dom_id).remove();
+	Draggables.unregister(selement.html_obj);
+	selement.html_obj.remove();	
 },
 
 make_element_dragable: function(element){
