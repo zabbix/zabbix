@@ -388,8 +388,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	$table->SetHeader($header);
 	unset($header);
 
-	switch($sort)
-	{
+	switch($sort){
 		case 'host':		
 			$sort=' order by h.host';
 			if($_REQUEST['hostid'] <= 0)	break; /* else 'description' */
@@ -425,15 +424,17 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, t.expression,t.priority, '.
 							' t.lastchange,t.comments,t.url,t.value,h.host,h.hostid,t.type '.
 					' FROM triggers t,hosts h,items i,functions f '.
-					' WHERE f.itemid=i.itemid AND h.hostid=i.hostid '.
-						' AND t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
-						' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
+					' WHERE f.itemid=i.itemid '.
+						' AND h.hostid=i.hostid '.
+						' AND t.triggerid=f.triggerid '.
+						' AND t.status='.TRIGGER_STATUS_ENABLED.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+						' AND '.DBin_node('t.triggerid').
 						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
 						' AND h.status='.HOST_STATUS_MONITORED.' '.
 						$cond.' '.
 					$sort;
 	$result = DBselect($sql);
-
 	while($row=DBfetch($result)){
 // Check for dependencies
 		if(trigger_dependent($row["triggerid"]))	continue;
@@ -461,11 +462,28 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 
 		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.ms, e.objectid as triggerid, e.acknowledged, t.type '.
 					' FROM events e, triggers t '.
-					' WHERE e.object=0 AND e.objectid='.$row['triggerid'].
-						' AND t.triggerid=e.objectid '.$cond.
+					' WHERE e.object='.EVENT_SOURCE_TRIGGERS.' AND e.objectid='.$row['triggerid'].
+						' AND t.triggerid=e.objectid '.
+						$cond.
 					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 
 		if($show_triggers == TRIGGERS_OPTION_NOFALSEFORB){
+
+			$ev_st_sql = 'SELECT eventid '.
+						' FROM events e '.
+						' WHERE e.object='.EVENT_SOURCE_TRIGGERS.
+							' AND e.objectid='.$row['triggerid'].
+							' AND (('.time().'-e.clock)<'.$event_expire.')';
+
+			if(EVENTS_NOFALSEFORB_STATUS_FALSE == $show_events_status){
+				$ev_st_sql.= ' AND e.value='.TRIGGER_VALUE_FALSE;
+				if(!$ev_st = DBfetch(DBselect($ev_st_sql,1))) continue;
+			}
+			else if(EVENTS_NOFALSEFORB_STATUS_TRUE == $show_events_status){
+				$ev_st_sql.= ' AND e.value='.TRIGGER_VALUE_TRUE;
+				if(!$ev_st = DBfetch(DBselect($ev_st_sql,1))) continue;
+			}
+			
 			if(!$row = get_row_for_nofalseforb($row,$event_sql)){
 				continue;
 			}
