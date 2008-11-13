@@ -777,7 +777,11 @@
 	return imagecreatefromstring($image['image']);
 	}
 	
-	function get_base64_icon($element){
+	function get_base64_icon($element){	
+	return base64_encode(get_element_icon($element));
+	}
+	
+	function get_element_iconid($element){
 		if($element['selementid'] > 0){
 			$info = get_info_by_selement($element);
 //SDI($info);
@@ -799,8 +803,14 @@
 		else{
 			$info['iconid'] = $element['iconid_off'];
 		}
-				
-		$image = get_image_by_imageid($info['iconid']);
+		
+	return $info['iconid'];
+	}
+	
+	function get_element_icon($element){
+		$iconid = get_element_iconid($element);
+		
+		$image = get_image_by_imageid($iconid);
 		$img = imagecreatefromstring($image['image']);
 		
 		unset($image);
@@ -825,7 +835,7 @@
 		$image_txt = ob_get_contents();
 		ob_end_clean();
 		
-	return base64_encode($image_txt);
+	return $image_txt;
 	}
 	
 	function get_element_form_menu(){

@@ -127,6 +127,7 @@ COpt::profiling_start("page");
 						"sub_pages"=>array("report3.php","chart_sla.php","chart5.php")
 						),
 					array("url"=>"vtext.php"),
+					array("url"=>"imgstore.php"),
 					array("url"=>"chart3.php")
 					)
 				),

@@ -103,8 +103,8 @@ include_once "include/page_header.php";
 						foreach($element as $key => $value){
 							if(is_int($key)) unset($element[$key]);
 						}
-
-						$element['image'] = get_base64_icon($element);
+//						$element['image'] = get_base64_icon($element);
+						$element['image'] = get_element_iconid($element);
 						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_element('.zbx_jsvalue($element).'); '."\n";
 					}
 					
@@ -200,8 +200,9 @@ include_once "include/page_header.php";
 					
 					if(!empty($elements)){
 						$element = $elements[0];
-						
-						$element['image'] = get_base64_icon($element);
+//						$element['image'] = get_base64_icon($element);
+						$element['image'] = get_element_iconid($element);
+
 						$action = '';
 						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_element('.zbx_jsvalue($element).',1);';
 						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_mapimg();';

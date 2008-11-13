@@ -1523,6 +1523,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html"); 
 		else					Header( "Content-type:  image/png"); 
 		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
+//		Header( "Expires:  Mon, 17 Aug 2009 12:51:50 GMT"); 
 	}
 	
 	function ImageOut(&$image,$format=NULL){
@@ -1535,7 +1536,13 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 			$image_txt = ob_get_contents();
 			ob_end_clean();
 
-			print(base64_encode($image_txt));
+			session_start();
+			$id = md5($image_txt);
+			$_SESSION['imageid'][$id] = $image_txt;
+			session_write_close();
+			print($id);
+			
+//			print(base64_encode($image_txt));
 		}
 		else{
 			if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;

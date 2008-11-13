@@ -583,7 +583,8 @@ add_element_img: function(selement){
 	position.top = parseInt(selement.y,10);// + this.mapimg.offsetTop;
 	position.left = parseInt(selement.x,10);// + this.mapimg.offsetLeft;
 
-	dom_img.setAttribute('src','data:image/png;base64,'+selement.image);
+//	dom_img.setAttribute('src','data:image/png;base64,'+selement.image);
+	dom_img.setAttribute('src','imgstore.php?iconid='+selement.image);
 	
 	dom_img.style.zIndex = '10';
 	dom_img.style.position = 'absolute';
@@ -680,7 +681,8 @@ set_mapimg: function(resp){
 		addListener(window, 'resize', this.set_container.bindAsEventListener(this), false);
 	}
 	
-	this.mapimg.setAttribute('src','data:image/png;base64,'+resp.responseText);
+//	this.mapimg.setAttribute('src','data:image/png;base64,'+resp.responseText);
+	this.mapimg.setAttribute('src','imgstore.php?imageid='+resp.responseText);
 },
 
 set_container: function(event){
@@ -933,7 +935,7 @@ show_element_menu: function(e){
 
 //					var value_action = "javascript: this.disabled=true; ZBX_SYSMAPS["+this.id+"].map.update_element_option("+id+",'"+form_key+"',this.value);";
 					var value_action = "javascript: this.disabled=true; ZBX_SYSMAPS["+this.id+"].map.update_element_option("+id+",[{'key':'"+form_key+"','value': this.value}]);";
-					value_action = '<input type="text" value="'+values['key']+'" onchange="'+value_action+'" class="biginput" />';
+					value_action = '<input type="text" value="'+values['key']+'" onmouseover="javascript: this.focus();" onchange="'+value_action+'" class="biginput" />';
 					value_action += ' <span class="pointer" onclick="javascript: this.innerHTML=\'Changed\';">Change</span>';
 					sub_menu.push([value_action,null,function(){return false;},{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}]);
 				}
