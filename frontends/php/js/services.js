@@ -4,11 +4,12 @@ function call_menu(evnt,id,name){
 		show_popup_menu(evnt,
 					[
 						[name,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
-						['Add Service',"javascript: openWinCentered('services_form.php?sform=1&parentid="+id+"&parentname="+name+"','ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
-						['Edit Service',"javascript: openWinCentered('services_form.php?sform=1&serviceid="+id+"','ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');",null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
-						['Delete Service',"javascript: if(Confirm('Delete selected services?')){ openWinCentered('services_form.php?saction=1&delete=1&serviceid="+id+"','ServiceForm',400,300,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');}",null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]
+						['Add Service',null, function(){ openWinCentered('services_form.php?sform=1&parentid='+id+'&parentname='+name,'ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');},{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
+						['Edit Service',null, function(){ openWinCentered('services_form.php?sform=1&serviceid='+id,'ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');}, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
+						['Delete Service',null, function(){ if(Confirm('Delete selected services?')){ openWinCentered('services_form.php?saction=1&delete=1&serviceid='+id,'ServiceForm',400,300,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');}},{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]
 					],120);
-	} else {
+	} 
+	else {
 		show_popup_menu(evnt,
 					[
 						[name,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
