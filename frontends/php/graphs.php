@@ -118,12 +118,12 @@ include_once "include/page_header.php";
 			$showworkperiod	= isset($_REQUEST["showworkperiod"]) ? 1 : 0;
 			$showtriggers	= isset($_REQUEST["showtriggers"]) ? 1 : 0;
 			
-			if($_REQUEST['ymin_itemid'] != 0){
-				$_REQUEST["yaxismin"]=0;
+			if(($_REQUEST['ymin_itemid'] != 0) && ($_REQUEST['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
+				$_REQUEST['yaxismin']=0;
 			}
-			
-			if($_REQUEST['ymax_itemid'] != 0){
-				$_REQUEST["yaxismax"]=0;
+
+			if(($_REQUEST['ymax_itemid'] != 0) && ($_REQUEST['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
+				$_REQUEST['yaxismax']=0;
 			}
 			
 			if(isset($_REQUEST["graphid"]))
