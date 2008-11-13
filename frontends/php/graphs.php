@@ -146,12 +146,12 @@ include_once 'include/page_header.php';
 			if(isset($visible['percent_left'])) 	$percent_left  = get_request('percent_left', 0);
 			if(isset($visible['percent_right']))	$percent_right = get_request('percent_right', 0);
 			
-			if($_REQUEST['ymin_itemid'] != 0){
-				$_REQUEST["yaxismin"]=0;
+			if(($_REQUEST['ymin_itemid'] != 0) && ($_REQUEST['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
+				$_REQUEST['yaxismin']=0;
 			}
 			
-			if($_REQUEST['ymax_itemid'] != 0){
-				$_REQUEST["yaxismax"]=0;
+			if(($_REQUEST['ymax_itemid'] != 0)  && ($_REQUEST['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
+				$_REQUEST['yaxismax']=0;
 			}
 			
 			if(isset($_REQUEST['graphid'])){
@@ -159,7 +159,7 @@ include_once 'include/page_header.php';
 				DBstart();
 				update_graph_with_items($_REQUEST['graphid'],
 					$_REQUEST['name'],$_REQUEST['width'],$_REQUEST['height'],
-					$_REQUEST["ymin_type"],$_REQUEST["ymax_type"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
+					$_REQUEST['ymin_type'],$_REQUEST['ymax_type'],$_REQUEST['yaxismin'],$_REQUEST['yaxismax'],
 					$_REQUEST['ymin_itemid'],$_REQUEST['ymax_itemid'],
 					$showworkperiod,$showtriggers,$_REQUEST['graphtype'],$_REQUEST['legend'],
 					$_REQUEST['graph3d'],$percent_left,$percent_right,$items);
@@ -173,7 +173,7 @@ include_once 'include/page_header.php';
 			else{
 				DBstart();
 				add_graph_with_items($_REQUEST['name'],$_REQUEST['width'],$_REQUEST['height'],
-					$_REQUEST["ymin_type"],$_REQUEST["ymax_type"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
+					$_REQUEST['ymin_type'],$_REQUEST['ymax_type'],$_REQUEST['yaxismin'],$_REQUEST['yaxismax'],
 					$_REQUEST['ymin_itemid'],$_REQUEST['ymax_itemid'],
 					$showworkperiod,$showtriggers,$_REQUEST['graphtype'],$_REQUEST['legend'],
 					$_REQUEST['graph3d'],$percent_left,$percent_right,$items);
