@@ -827,8 +827,8 @@ include_once "include/page_header.php";
 					$triggers='';
 				}
 				$menuicon = new CImg('images/general/menuicon.gif','menu',21,18);
-				$menuicon->AddOption('onclick','javascript: call_menu(event, '.zbx_jsvalue($db_item["itemid"]).','.zbx_jsvalue(item_description($db_item["description"],$db_item["key_"])).','.$ltype.$triggers.'); return false;');
-				$menuicon->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
+				$menuicon->addOption('onclick','javascript: call_menu(event, '.zbx_jsvalue($db_item["itemid"]).','.zbx_jsvalue(item_description($db_item["description"],$db_item["key_"])).','.$ltype.$triggers.'); return false;');
+				$menuicon->addOption('onmouseover','javascript: this.style.cursor = "pointer";');
 			} 
 			else {
 				$menuicon = new CImg('images/general/tree/O.gif','zero',21,18);
