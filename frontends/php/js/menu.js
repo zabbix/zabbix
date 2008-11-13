@@ -402,7 +402,7 @@ function menu_item (o_parent, n_order) {
 	if(this.a_config[2]){
 		addListener(el, 'click', this.a_config[2], false);
 	}
-	else{
+	else if(!is_null(this.a_config[1])){
 		addListener(el, 'click', function(){ location.href = this.a_config[1]; }, false);
 	}
 	
