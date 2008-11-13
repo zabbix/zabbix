@@ -264,6 +264,7 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #endif /* not WINDOWS */
 }
 
+#ifndef _WINDOWS
 static char	*decode_type(int q_type)
 {
 	static char buf[16];
@@ -302,7 +303,7 @@ static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char 
 
 	return buffer;
 }
-
+#endif
 int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifndef _WINDOWS
