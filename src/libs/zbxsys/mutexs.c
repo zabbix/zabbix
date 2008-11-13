@@ -114,14 +114,14 @@ lbl_create:
 	}
 	else if(errno == EEXIST)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "ZABBIX semaphores already exist, trying to recreate.");
+		zabbix_log(LOG_LEVEL_WARNING, "ZABICOM semaphores already exist, trying to recreate.");
 
 		ZBX_SEM_LIST_ID = semget(sem_key, 0 /* get reference */, 0666 /* 0022 */);
 
 		if(forced) {
 			if( 0 != semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0))
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "Can't recreate ZABBIX semaphores for IPC key 0x%lx Semaphore ID %ld. %s.",
+				zabbix_log(LOG_LEVEL_CRIT, "Can't recreate ZABICOM semaphores for IPC key 0x%lx Semaphore ID %ld. %s.",
 					sem_key,
 					ZBX_SEM_LIST_ID,
 					strerror(errno));
@@ -130,13 +130,13 @@ lbl_create:
 
 			if ( ++attempts > ZBX_MAX_ATTEMPTS )
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "Can't recreate ZABBIX semaphores for IPC key 0x%lx. [too many attempts]",
+				zabbix_log(LOG_LEVEL_CRIT, "Can't recreate ZABICOM semaphores for IPC key 0x%lx. [too many attempts]",
 					sem_key);
 				exit(1);
 			}
 			if ( attempts > (ZBX_MAX_ATTEMPTS / 2) )
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Wait 1 sec for next attemtion of ZABBIX semaphores creation.");
+				zabbix_log(LOG_LEVEL_DEBUG, "Wait 1 sec for next attemtion of ZABICOM semaphores creation.");
 				zbx_sleep(1);
 			}
 			goto lbl_create;

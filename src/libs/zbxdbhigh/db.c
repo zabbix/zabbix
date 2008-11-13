@@ -859,7 +859,7 @@ void DBupdate_triggers_status_after_restart(void)
 		lastchange=atoi(row2[0]);
 		DBfree_result(result2);
 
-		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,lastchange,0,"ZABBIX was down.");
+		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,lastchange,0,"ZABICOM was down.");
 	}
 
 	DBfree_result(result);

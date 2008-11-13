@@ -120,8 +120,8 @@ static void init_config()
 		recipients[num].mediatype.passwd=strdup(row[9]);
 
 		recipients[num].alert.sendto=strdup(row[13]);
-		recipients[num].alert.subject=strdup("ZABBIX database is down.");
-		recipients[num].alert.message=strdup("ZABBIX database is down.");
+		recipients[num].alert.subject=strdup("ZABICOM database is down.");
+		recipients[num].alert.message=strdup("ZABICOM database is down.");
 
 		num++;
 	}

@@ -100,11 +100,11 @@ char *help_message[] = {
 	"",
 	"Functions:",
 	"",
-	"  -i --install          install ZABBIX agent as service",
-	"  -d --uninstall        uninstall ZABBIX agent from service",
+	"  -i --install          install ZABICOM agent as service",
+	"  -d --uninstall        uninstall ZABICOM agent from service",
 
-	"  -s --start            start ZABBIX agent service",
-	"  -x --stop             stop ZABBIX agent service",
+	"  -s --start            start ZABICOM agent service",
+	"  -x --stop             stop ZABICOM agent service",
 
 	"  -m --multiple-agents  service name will include hostname",
 
@@ -241,7 +241,8 @@ int MAIN_ZABBIX_ENTRY(void)
 		CONFIG_LOG_FILE
 		);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. ZABBIX %s.", ZABBIX_VERSION);
+	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. ZABICOM %s.", ZABBIX_VERSION);
+	zabbix_log( LOG_LEVEL_WARNING, "© 2001-2008 by ZABBIX SIA");
 
 	if( FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT) )
 	{
@@ -329,7 +330,7 @@ void	zbx_on_exit()
 
 	zbx_sleep(2); /* wait for all threads closing */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Agent stopped");
+	zabbix_log(LOG_LEVEL_INFORMATION, "ZABICOM Agent stopped");
 
 	zabbix_close_log();
 

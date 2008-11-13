@@ -369,7 +369,7 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 			zabbix_syslog("Active parameter [%s] is not supported by agent on host [%s]",
 				item.key,
 				item.host_name);
-			DBupdate_item_status_to_notsupported(item.itemid, "Not supported by ZABBIX agent");
+			DBupdate_item_status_to_notsupported(item.itemid, "Not supported by ZABICOM agent");
 	}
 	else
 	{

@@ -35,7 +35,7 @@
  ******************************************************************************/
 static void app_title()
 {
-	printf("%s v%s (%s)\n", title_message, ZABBIX_VERSION, ZABBIX_REVDATE);
+	printf("%s v%s (%s)\n© 2001-2008 by ZABBIX SIA\n", title_message, ZABBIX_VERSION, ZABBIX_REVDATE);
 }
 
 /******************************************************************************

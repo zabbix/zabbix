@@ -350,7 +350,7 @@ static int connect_jabber(const char *jabber_id, const char *password, int use_s
 
 	if (NULL == jsess->acc->resource) {
 		/* user gave no resource name, use the default */
-		buf = zbx_dsprintf (buf, "%s@%s/%s", jsess->acc->user, jsess->acc->server, "ZABBIX");
+		buf = zbx_dsprintf (buf, "%s@%s/%s", jsess->acc->user, jsess->acc->server, "ZABICOM");
 		jsess->acc = iks_id_new (iks_parser_stack (jsess->prs), buf);
 		zbx_free (buf);
 	}

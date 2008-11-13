@@ -141,7 +141,7 @@ void service_start(void)
 	{
 		if(ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == GetLastError())
 		{
-			zbx_error("\n\n\t!!!ATTENTION!!! ZABBIX Agent runned as a console application. !!!ATTENTION!!!\n");
+			zbx_error("\n\n\t!!!ATTENTION!!! ZABICOM Agent runned as a console application. !!!ATTENTION!!!\n");
 			MAIN_ZABBIX_ENTRY();
 		}
 		else

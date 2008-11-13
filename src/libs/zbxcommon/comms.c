@@ -163,7 +163,7 @@ void    *zbx_malloc2(char *filename, int line, void *old, size_t size)
 /*	Old pointer must be NULL */
 	if(old != NULL)
 	{
-		zabbix_log(LOG_LEVEL_CRIT,"[file:%s,line:%d] zbx_malloc: allocating already allocated memory. Please report this to ZABBIX developers.",
+		zabbix_log(LOG_LEVEL_CRIT,"[file:%s,line:%d] zbx_malloc: allocating already allocated memory. Please report this to ZABICOM developers.",
 			filename,
 			line);
 		/* Exit if defined DEBUG. Ignore otherwise. */

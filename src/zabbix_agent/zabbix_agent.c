@@ -29,7 +29,7 @@
 #include "alias.h"
 
 char *progname = NULL;
-char title_message[] = "ZABBIX Agent";
+char title_message[] = "ZABICOM Agent";
 char usage_message[] = "[-Vhp] [-c <file>] [-t <metric>]";
 #ifndef HAVE_GETOPT_LONG
 char *help_message[] = {

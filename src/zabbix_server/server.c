@@ -55,7 +55,7 @@
 #endif
 
 char *progname = NULL;
-char title_message[] = "ZABBIX Server (daemon)";
+char title_message[] = "ZABICOM Server (daemon)";
 char usage_message[] = "[-hV] [-c <file>] [-n <nodeid>]";
 
 #ifndef HAVE_GETOPT_LONG
@@ -786,7 +786,7 @@ void test()
 		zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_DEBUG,CONFIG_LOG_FILE);
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
+	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABICOM %s.", ZABBIX_VERSION);
 
 	printf("-= Test Started =-\n\n");
 
@@ -910,7 +910,8 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 
 /*	zabbix_log( LOG_LEVEL_WARNING, "INFO [%s]", ZBX_SQL_MOD(a,%d)); */
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
+	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABICOM %s.", ZABBIX_VERSION);
+	zabbix_log( LOG_LEVEL_WARNING, "© 2001-2008 by ZABBIX SIA");
 
 	zabbix_log( LOG_LEVEL_WARNING, "**** Enabled features ****");
 #ifdef	HAVE_SNMP
@@ -1144,7 +1145,7 @@ void	zbx_on_exit()
 
 	zbx_sleep(2); /* wait for all threads closing */
 	
-	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Server stopped");
+	zabbix_log(LOG_LEVEL_INFORMATION, "ZABICOM Server stopped");
 	zbx_mutex_destroy(&node_sync_access);
 	zabbix_close_log();
 	

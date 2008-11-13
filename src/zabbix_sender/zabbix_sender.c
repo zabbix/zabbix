@@ -27,7 +27,7 @@
 
 char *progname = NULL;
 
-char title_message[] = "ZABBIX send";
+char title_message[] = "ZABICOM sender";
 
 char usage_message[] = "[-Vhv] {[-zps] -ko | -i <file>} [-c <file>]";
 
@@ -36,7 +36,7 @@ char *help_message[] = {
 	"Options:",
 	"  -c --config <File>                   Specify configuration file"
 	"",
-	"  -z --zabbix-server <Server>          Hostname or IP address of ZABBIX Server",
+	"  -z --zabbix-server <Server>          Hostname or IP address of ZABICOM Server",
 	"  -p --port <Server port>              Specify port number of server trapper running on the server. Default is 10051",
 	"  -s --host <Hostname>                 Specify host name. Host IP address and DNS name will not work.",
 	"",
@@ -58,7 +58,7 @@ char *help_message[] = {
 	"Options:",
 	"  -c <File>                    Specify configuration file"
 	"",
-	"  -z <Server>                  Hostname or IP address of ZABBIX Server.",
+	"  -z <Server>                  Hostname or IP address of ZABICOM Server.",
 	"  -p <Server port>             Specify port number of server trapper running on the server. Default is 10051.",
 	"  -s <Hostname>                Specify hostname or IP address of a host.",
 	"",

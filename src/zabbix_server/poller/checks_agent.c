@@ -80,13 +80,13 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 
 		if( strcmp(buf,"ZBX_NOTSUPPORTED") == 0)
 		{
-			zbx_snprintf(error,sizeof(error),"Not supported by ZABBIX agent");
+			zbx_snprintf(error,sizeof(error),"Not supported by ZABICOM agent");
 			SET_MSG_RESULT(result, strdup(error));
 			ret = NOTSUPPORTED;
 		}
 		else if( strcmp(buf,"ZBX_ERROR") == 0)
 		{
-			zbx_snprintf(error,sizeof(error),"ZABBIX agent non-critical error");
+			zbx_snprintf(error,sizeof(error),"ZABICOM agent non-critical error");
 			SET_MSG_RESULT(result, strdup(error));
 			ret = AGENT_ERROR;
 		}
