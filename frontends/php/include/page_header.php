@@ -57,6 +57,10 @@ COpt::profiling_start("page");
 			header('Content-Type: application/javascript; charset=UTF-8');
 			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
 			break;
+		case PAGE_TYPE_CSS:
+			header('Content-Type: text/css; charset=UTF-8');
+			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+			break;
 		case PAGE_TYPE_HTML_BLOCK:
 			header('Content-Type: text/plain; charset=UTF-8');
 			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
@@ -369,7 +373,7 @@ COpt::profiling_start("page");
 <?php } ?>
 <meta name="Author" content="ZABBIX SIA" />
 <link rel="stylesheet" type="text/css" href="css.css" />
-
+<?php if($page['file'] == 'sysmap.php') print  '<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&output=css" />'?>
 	<script type="text/javascript" src="js/prototype.js"></script>
     <script type="text/javascript" src="js/common.js"></script>
 	<script type="text/javascript" src="js/ajax_req.js"></script>

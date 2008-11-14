@@ -350,6 +350,9 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 				case 'img':
 					return PAGE_TYPE_IMAGE;
 					break;
+				case 'css':
+					return PAGE_TYPE_CSS;
+					break;
 			}
 		}
 	return $default;

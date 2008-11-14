@@ -251,7 +251,7 @@ save_sysmap: function(){
 	}
 	
 	params = this.get_update_params(params);
-
+//SDJ(params);
 	new Ajax.Request(url.getPath()+'?output=ajax',
 					{
 						'method': 'post',
@@ -565,38 +565,39 @@ add_element_img: function(selement){
 
 	var dom_id = 'element_'+selement.id;
 
-	var dom_img = $(dom_id);
-	if(is_null(dom_img)){
-		var dom_img = document.createElement('img');
-		this.container.appendChild(dom_img);
+	var element_div = $(dom_id);
+	if(is_null(element_div)){
+//		var element_div = document.createElement('img');
+		var element_div = document.createElement('div');
+		this.container.appendChild(element_div);
 	
-		dom_img.setAttribute('id',dom_id);
-		dom_img.setAttribute('alt','element_'+selement.id);
-		dom_img.className = 'pointer';
-		dom_img.style.position = 'absolute';
-		dom_img.style.visibility = 'hidden';
+		element_div.setAttribute('id',dom_id);
+//		element_div.setAttribute('alt','element_'+selement.id);
+		element_div.style.position = 'absolute';
+		element_div.style.visibility = 'hidden';
 		
-		this.make_element_dragable(dom_img);
+		this.make_element_dragable(element_div);
 	}
 		
 	var position = {};	
-	position.top = parseInt(selement.y,10);// + this.mapimg.offsetTop;
-	position.left = parseInt(selement.x,10);// + this.mapimg.offsetLeft;
+	position.top = parseInt(selement.y,10);
+	position.left = parseInt(selement.x,10);
 
-//	dom_img.setAttribute('src','data:image/png;base64,'+selement.image);
-	dom_img.setAttribute('src','imgstore.php?iconid='+selement.image);
+//	element_div.setAttribute('src','data:image/png;base64,'+selement.image);
+//	element_div.setAttribute('src','imgstore.php?iconid='+selement.image);
+	element_div.className = 'pointer sysmap_iconid_'+selement.image;
 	
-	dom_img.style.zIndex = '10';
-	dom_img.style.position = 'absolute';
-	dom_img.style.top = position.top+'px';
-	dom_img.style.left = position.left+'px';
-	dom_img.style.visibility = 'visible';
+	element_div.style.zIndex = '10';
+	element_div.style.position = 'absolute';
+	element_div.style.top = position.top+'px';
+	element_div.style.left = position.left+'px';
+	element_div.style.visibility = 'visible';
 	
 	if(!is_null(selement.selected)){
-		dom_img.style.border = '1px #FF0000 solid';
+		element_div.style.border = '1px #FF0000 solid';
 	}
 
-return dom_img;
+return element_div;
 },
 
 update_elements_icon: function(){
@@ -849,15 +850,15 @@ show_menu: function(e){
 	if(this.menu_active != 1) return true;
 	
 	var e = e || window.event;
-	if(e.ctrlKey){
-		var element = eventTarget(e);
-		var element_id = element.id.split('_');
-		var id = element_id[(element_id.length - 1)];
+	var element = eventTarget(e);
+	var element_id = element.id.split('_');
+	var id = element_id[(element_id.length - 1)];
 
+	if(e.ctrlKey){
 		this.select_element(id);
 	}
 	else{
-		if((this.selects.length > 1) && !is_null(this.selects[0]) && !is_null(this.selects[1])){	
+		if((this.selects.length > 1) && !is_null(this.selects[0]) && !is_null(this.selects[1]) && ((this.selects[0] == id) || (this.selects[1] == id))){	
 			this.show_link_menu(e);
 		}
 		else{
@@ -926,7 +927,7 @@ show_element_menu: function(e){
 					}
 					
 					if(element[form_key] == values['key'])
-						sub_menu.push([value_action,'#',null,{'outer' : ['pum_b_submenu'],'inner' : ['pum_i_submenu']}]);
+						sub_menu.push([value_action,'#',function(){return false;},{'outer' : ['pum_b_submenu'],'inner' : ['pum_i_submenu']}]);
 					else
 						sub_menu.push([value_action,'#',function(){return false;}]);
 				}
@@ -1002,7 +1003,7 @@ show_link_menu: function(e){
 					if(mlink[form_key] == element['selementid'])
 						sub_menu.push([value_action,'#',null,{'outer' : ['pum_b_submenu'],'inner' : ['pum_i_submenu']}]);
 					else
-						sub_menu.push([value_action,'#',function(){return false;}]);				
+						sub_menu.push([value_action,'#',function(){return false;}]);
 				}
 			}
 		}

@@ -25,7 +25,7 @@
 	require_once('include/maps.inc.php');
 	
 	$page['file'] = 'imgstore.php';
-	$page['type'] = PAGE_TYPE_IMAGE;
+	$page['type'] = detect_page_type(PAGE_TYPE_IMAGE);
 
 include_once "include/page_header.php";
 
@@ -33,6 +33,7 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
+		'css'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	null,		null),	
 		'imageid'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
 		'iconid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 	);
@@ -40,7 +41,25 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	if(isset($_REQUEST['iconid'])){
+	if(isset($_REQUEST['css'])){
+		$css = '';
+		$sql = 'SELECT * FROM images WHERE imagetype=1';
+		$res = DBselect($sql);
+		while($image = DBfetch($res)){
+			$img = imagecreatefromstring($image['image']);
+			
+			$w=imagesx($img); 
+			$h=imagesy($img);
+			
+			$css.= 'div.sysmap_iconid_'.$image['imageid'].'{'.
+						' height: '.$h.'px; '.
+						' width: '.$w.'px; '.
+						' background-image: url("imgstore.php?iconid='.$image['imageid'].'");'.
+						' background-repeat:no-repeat; }'."\n";
+		}
+		print($css);
+	}
+	else if(isset($_REQUEST['iconid'])){
 		$image = get_image_by_imageid($_REQUEST['iconid']);
 		$img = imagecreatefromstring($image['image']);
 		

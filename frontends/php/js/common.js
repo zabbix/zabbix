@@ -22,6 +22,7 @@ var OP = (agt.indexOf("opera") != -1) && window.opera;
 var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
 var IE8 = (agt.indexOf("msie 8.0") != -1) && document.all && !OP;
 var IE7 = IE && !IE8 && document.all && !OP;
+var IE6 = (agt.indexOf("msie 6.0") != -1) && document.all && !OP;
 var SF = (agt.indexOf("safari") != -1);
 var KQ = (agt.indexOf("khtml") != -1) && (!SF);
 var GK = (agt.indexOf("gecko") != -1) && !KQ && !SF;
