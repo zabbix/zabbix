@@ -310,7 +310,7 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 	{
 		*hosts_alloc += 4;
 		sz = *hosts_alloc * sizeof(ZBX_FPING_HOST);
-		*hosts = zbx_realloc(hosts, sz);
+		*hosts = zbx_realloc(*hosts, sz);
 	}
 
 	h = &(*hosts)[*hosts_count - 1];
