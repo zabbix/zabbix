@@ -71,6 +71,7 @@
 		zbx_uint64_t	h_nice[MAX_CPU_HISTORY];
 		zbx_uint64_t	h_idle[MAX_CPU_HISTORY];
 		zbx_uint64_t	h_interrupt[MAX_CPU_HISTORY];
+		zbx_uint64_t	h_iowait[MAX_CPU_HISTORY];
 
 		/* public */
 		double	user1;
@@ -88,6 +89,9 @@
 		double	interrupt1;
 		double	interrupt5;
 		double	interrupt15;
+		double	iowait1;
+		double	iowait5;
+		double	iowait15;
 
 	} ZBX_SINGLE_CPU_STAT_DATA;
 

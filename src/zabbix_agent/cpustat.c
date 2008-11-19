@@ -183,7 +183,8 @@ static int	get_cpustat(
 		zbx_uint64_t *cpu_system,
 		zbx_uint64_t *cpu_nice,
 		zbx_uint64_t *cpu_idle,
-		zbx_uint64_t *cpu_interrupt
+		zbx_uint64_t *cpu_interrupt,
+		zbx_uint64_t *cpu_iowait
 	)
 {
     #if defined(HAVE_PROC_STAT)
@@ -208,8 +209,14 @@ static int	get_cpustat(
 	long		all_states[CPUSTATES];
 	u_int64_t	one_states[CPUSTATES];
 	size_t		sz;
-	
-    #else /* not HAVE_FUNCTION_SYSCTL_KERN_CPTIME */
+
+    #elif defined(HAVE_LIBPERFSTAT)
+
+	perfstat_cpu_total_t	ps_cpu_total;
+	perfstat_cpu_t		ps_cpu;
+	perfstat_id_t		ps_id;
+
+    #else /* not HAVE_LIBPERFSTAT */
 
 	return 1;
 	
@@ -227,6 +234,7 @@ static int	get_cpustat(
 
 	*cpu_user = *cpu_system = *cpu_nice = *cpu_idle = -1;
 	*cpu_interrupt	= 0;
+	*cpu_iowait	= 0;
 
 	zbx_snprintf(cpu_name, sizeof(cpu_name), "cpu%c ", cpuid > 0 ? '0' + (cpuid - 1) : ' ');
 
@@ -252,6 +260,7 @@ static int	get_cpustat(
 		*cpu_system 	= (zbx_uint64_t)stats.psd_cpu_time[CP_SYS];
 		*cpu_idle 	= (zbx_uint64_t)stats.psd_cpu_time[CP_IDLE];
 		*cpu_interrupt	= 0;
+		*cpu_iowait	= 0;
 	}
 	else if( cpuid > 0 )
 	{
@@ -265,6 +274,7 @@ static int	get_cpustat(
 		*cpu_system 	= (zbx_uint64_t)psp.psp_cpu_time[CP_SYS];
 		*cpu_idle 	= (zbx_uint64_t)psp.psp_cpu_time[CP_IDLE];
 		*cpu_interrupt	= 0;
+		*cpu_iowait	= 0;
 	}
 	else
 	{
@@ -285,6 +295,7 @@ static int	get_cpustat(
 	*cpu_system	= (zbx_uint64_t)cp_time[CP_SYS];
 	*cpu_interrupt	= (zbx_uint64_t)cp_time[CP_INTR];
 	*cpu_idle	= (zbx_uint64_t)cp_time[CP_IDLE];
+	*cpu_iowait	= 0;
 
     #elif defined(HAVE_FUNCTION_SYSCTL_KERN_CPTIME)
 	/* OpenBSD 4.3 */
@@ -306,6 +317,7 @@ static int	get_cpustat(
 		*cpu_system	= (zbx_uint64_t)all_states[CP_SYS];
 		*cpu_interrupt	= (zbx_uint64_t)all_states[CP_INTR];
 		*cpu_idle	= (zbx_uint64_t)all_states[CP_IDLE];
+		*cpu_iowait	= 0;
 	}
 	else if (cpuid > 0)
 	{
@@ -325,13 +337,44 @@ static int	get_cpustat(
 		*cpu_system	= (zbx_uint64_t)one_states[CP_SYS];
 		*cpu_interrupt	= (zbx_uint64_t)one_states[CP_INTR];
 		*cpu_idle	= (zbx_uint64_t)one_states[CP_IDLE];
+		*cpu_iowait	= 0;
 	}
 	else
-	{
 		return 1;
-	}
 
-    #endif /* HAVE_FUNCTION_SYSCTL_KERN_CPTIME */
+   #elif defined(HAVE_LIBPERFSTAT)
+	/* AIX 6.1 */
+
+	if (0 == cpuid)	/* all cpus */
+	{
+		if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
+			return 1;
+
+		*cpu_user	= (zbx_uint64_t)ps_cpu_total.user;
+		*cpu_nice	= (zbx_uint64_t)0;
+		*cpu_system	= (zbx_uint64_t)ps_cpu_total.sys;
+		*cpu_interrupt	= (zbx_uint64_t)0;
+		*cpu_idle	= (zbx_uint64_t)ps_cpu_total.idle;
+		*cpu_iowait	= (zbx_uint64_t)ps_cpu_total.wait;
+	}
+	else if (cpuid > 0)
+	{
+		zbx_snprintf(ps_id.name, sizeof(ps_id.name), "cpu%d", cpuid - 1);
+
+		if (-1 == perfstat_cpu(&ps_id, &ps_cpu, sizeof(ps_cpu), 1))
+			return 1;
+
+		*cpu_user	= (zbx_uint64_t)ps_cpu.user;
+		*cpu_nice	= (zbx_uint64_t)0;
+		*cpu_system	= (zbx_uint64_t)ps_cpu.sys;
+		*cpu_interrupt	= (zbx_uint64_t)0;
+		*cpu_idle	= (zbx_uint64_t)ps_cpu.idle;
+		*cpu_iowait	= (zbx_uint64_t)ps_cpu.wait;
+	}
+	else
+		return 1;
+
+    #endif /* HAVE_LIBPERFSTAT */
 
 	return 0;
 }
@@ -345,7 +388,8 @@ static void	apply_cpustat(
 	zbx_uint64_t cpu_system,
 	zbx_uint64_t cpu_nice,
 	zbx_uint64_t cpu_idle,
-	zbx_uint64_t cpu_interrupt
+	zbx_uint64_t cpu_interrupt,
+	zbx_uint64_t cpu_iowait
 	)
 {
 	register int	i	= 0;
@@ -356,6 +400,7 @@ static void	apply_cpustat(
 			nice = 0, nice1 = 0, nice5 = 0, nice15 = 0,
 			idle = 0, idle1 = 0, idle5 = 0, idle15 = 0,
 			interrupt = 0, interrupt1 = 0, interrupt5 = 0, interrupt15 = 0,
+			iowait = 0, iowait1 = 0, iowait5 = 0, iowait15 = 0,
 			all = 0, all1 = 0, all5 = 0, all15 = 0;
 
 	ZBX_SINGLE_CPU_STAT_DATA
@@ -372,8 +417,9 @@ static void	apply_cpustat(
 		curr_cpu->h_nice[i] = nice = cpu_nice;
 		curr_cpu->h_idle[i] = idle = cpu_idle;
 		curr_cpu->h_interrupt[i] = interrupt = cpu_interrupt;
+		curr_cpu->h_iowait[i] = iowait = cpu_iowait;
 
-		all = cpu_user + cpu_system + cpu_nice + cpu_idle + cpu_interrupt;
+		all = cpu_user + cpu_system + cpu_nice + cpu_idle + cpu_interrupt + cpu_iowait;
 		break;
 	}
 
@@ -384,16 +430,18 @@ static void	apply_cpustat(
 		if (0 == curr_cpu->clock[i])
 			continue;
 
-#define SAVE_CPU_CLOCK_FOR(t)											\
-		if ((curr_cpu->clock[i] >= (now - (t * 60))) && (time ## t > curr_cpu->clock[i]))		\
-		{												\
-			time ## t	= curr_cpu->clock[i];							\
-			user ## t	= curr_cpu->h_user[i];							\
-			system ## t	= curr_cpu->h_system[i];						\
-			nice ## t	= curr_cpu->h_nice[i];							\
-			idle ## t	= curr_cpu->h_idle[i];							\
-			interrupt ## t	= curr_cpu->h_interrupt[i];						\
-			all ## t	= user ## t + system ## t + nice ## t + idle ## t + interrupt ## t;	\
+#define SAVE_CPU_CLOCK_FOR(t)										\
+		if ((curr_cpu->clock[i] >= (now - (t * 60))) && (time ## t > curr_cpu->clock[i]))	\
+		{											\
+			time ## t	= curr_cpu->clock[i];						\
+			user ## t	= curr_cpu->h_user[i];						\
+			system ## t	= curr_cpu->h_system[i];					\
+			nice ## t	= curr_cpu->h_nice[i];						\
+			idle ## t	= curr_cpu->h_idle[i];						\
+			interrupt ## t	= curr_cpu->h_interrupt[i];					\
+			iowait ## t	= curr_cpu->h_iowait[i];					\
+			all ## t	= user ## t + system ## t + nice ## t + idle ## t +		\
+						interrupt ## t + iowait ## t;				\
 		}
 
 		SAVE_CPU_CLOCK_FOR(1);
@@ -431,6 +479,10 @@ static void	apply_cpustat(
 	CALC_CPU_LOAD(interrupt, 1);
 	CALC_CPU_LOAD(interrupt, 5);
 	CALC_CPU_LOAD(interrupt, 15);
+
+	CALC_CPU_LOAD(iowait, 1);
+	CALC_CPU_LOAD(iowait, 5);
+	CALC_CPU_LOAD(iowait, 15);
 }
 
 #endif /* not _WINDOWS */
@@ -550,14 +602,14 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 	register int i = 0;
 	int	now = 0;
 
-	zbx_uint64_t cpu_user, cpu_nice, cpu_system, cpu_idle, cpu_interrupt;
+	zbx_uint64_t cpu_user, cpu_nice, cpu_system, cpu_idle, cpu_interrupt, cpu_iowait;
 
 	for ( i = 0; i <= pcpus->count; i++ )
 	{
-		if(0 != get_cpustat(i, &now, &cpu_user, &cpu_system, &cpu_nice, &cpu_idle, &cpu_interrupt))
+		if(0 != get_cpustat(i, &now, &cpu_user, &cpu_system, &cpu_nice, &cpu_idle, &cpu_interrupt, &cpu_iowait))
 			continue;
 
-		apply_cpustat(pcpus, i, now, cpu_user, cpu_system, cpu_nice, cpu_idle, cpu_interrupt);
+		apply_cpustat(pcpus, i, now, cpu_user, cpu_system, cpu_nice, cpu_idle, cpu_interrupt, cpu_iowait);
 	}
 
 #endif /* _WINDOWS */

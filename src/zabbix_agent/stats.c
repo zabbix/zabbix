@@ -124,6 +124,15 @@ return_one:
 
 	return ncpu;
 return_one:
+#elif defined(HAVE_LIBPERFSTAT)
+	/* AIX 6.1 */
+	perfstat_cpu_total_t	ps_cpu_total;
+
+	if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
+		goto return_one;
+
+	return (int)ps_cpu_total.ncpus;
+return_one:
 #endif
 
 	zabbix_log(LOG_LEVEL_WARNING, "Can not determine number of CPUs, adjust to 1");
@@ -156,7 +165,8 @@ void	init_collector_data(void)
 	key_t	shm_key;
 #endif
 
-#if defined(_WINDOWS) || defined(HAVE_PROC_STAT) || defined(HAVE_SYS_PSTAT_H) || defined(HAVE_FUNCTION_SYSCTL_KERN_CPTIME)
+#if defined(_WINDOWS) || defined(HAVE_PROC_STAT) || defined(HAVE_SYS_PSTAT_H) ||\
+	defined(HAVE_FUNCTION_SYSCTL_KERN_CPTIME) || defined(HAVE_LIBPERFSTAT)
 	cpu_count = zbx_get_cpu_num();
 #else /* HAVE_FUNCTION_SYSCTLBYNAME sysctlbyname("kern.cp_time"...) supported utilization of all CPU only */
 	cpu_count = 0;
@@ -209,7 +219,7 @@ lbl_create:
 	}
 	
 	collector = shmat(shm_id, 0, 0);
-	collector->cpus.cpu = (void *)collector + sz;
+	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)(collector + 1);
 	collector->cpus.count = cpu_count;
 
 	if ((void*)(-1) == collector)
