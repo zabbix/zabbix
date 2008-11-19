@@ -1,5 +1,7 @@
 Changes for 1.6.2
 
+ - [DEV-268] added support of net.if.in/out/total under AIX (Sasha)
+ - [DEV-268] added support of system.cpu.num/util/load/intr/switches, system.uptime under AIX (Sasha)
  - [ZBX-595] improved performance of export screen (Artem)
  - [DEV-269] added permission check when sending notifications (Sasha)
  - [DEV-270] improved trigger configuration view; error string moved to description column (Sasha)
