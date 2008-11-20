@@ -1146,10 +1146,10 @@
 			$rmv_icon = new Cimg('images/general/opened.gif');
 			if(isset($empty_screen_col[$c])){
 				$rmv_col_link = "javascript: if(Confirm('This screen-column is not empty. Delete it?')){".
-									" location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_row=".$c."';}";
+									" location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_col=".$c."';}";
 			}
 			else{
-				$rmv_col_link = "javascript: location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_row=".$c."';";	
+				$rmv_col_link = "javascript: location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_col=".$c."';";	
 			}
 			$rmv_icon->addAction('onclick',$rmv_col_link);
 			array_push($new_cols, new Ccol($rmv_icon));
