@@ -23,9 +23,9 @@
 // Author: Aly
 
 
-var url = Class.create();
+var Curl = Class.create();
 
-url.prototype = {
+Curl.prototype = {
 url: 		'',		//	actually, it's depricated/private variable 
 port:		 -1,
 host: 		'',
@@ -134,6 +134,8 @@ return a;
 },
 
 getUrl: function(){
+	this.formatQuery();
+	
 	var uri = (this.protocol.length > 0)?(this.protocol+'://'):'';
 	uri +=  encodeURI((this.username.length > 0)?(this.username):'');
 	uri +=  encodeURI((this.password.length > 0)?(':'+this.password):'');
@@ -160,7 +162,18 @@ setArgument: function(key,value){
 		}
 	}	
 	if(!valueisset)	this.arguments[this.arguments.length] = new Array(key,value);
-	this.formatQuery();
+},
+
+unsetArgument: function(key){
+	if(typeof(key) == 'undefined') throw 'Invalid argument past for unsetArgument';
+	
+	for(i=0; i < this.arguments.length; i++){
+		if(this.arguments[i][0] == key){
+			this.arguments[i][0] = null;
+			this.arguments[i][1] = null;
+			break;
+		}
+	}	
 },
 
 formatQuery: function(){
@@ -168,7 +181,8 @@ formatQuery: function(){
 	
 	var query = '';
 	for(i=0; i < this.arguments.length; i++){		
-		query+=this.arguments[i][0]+'='+this.arguments[i][1]+'&';
+		if(!empty(this.arguments[i][0]))
+			query+=this.arguments[i][0]+'='+this.arguments[i][1]+'&';
 	}
 	this.query = query.substring(0,query.length-1);
 },
@@ -182,6 +196,7 @@ setPort: function(port){
 },
 
 getQuery: function(){ 
+	this.formatQuery();
 	return this.query;
 },
 

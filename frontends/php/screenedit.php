@@ -19,45 +19,53 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/screens.inc.php";
-	require_once "include/forms.inc.php";
-	require_once "include/nodes.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/screens.inc.php');
+	require_once('include/forms.inc.php');
+	require_once('include/nodes.inc.php');
 
-	$page["title"] = "S_CONFIGURATION_OF_SCREENS";
-	$page["file"] = "screenedit.php";
+	$page['title'] = "S_CONFIGURATION_OF_SCREENS";
+	$page['file'] = 'screenedit.php';
 	$page['hist_arg'] = array('screenid');
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','cscreen.js');
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 	
 ?>
 <?php
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"screenid"=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
+		'screenid'=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 		
-		"screenitemid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))&&(!isset({x})||!isset({y}))'),
-		"resourcetype"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_EVENTS),	'isset({save})'),
-		"resourceid"=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID,			'isset({save})'),
-		"width"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
-		"height"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
-		"colspan"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
-		"rowspan"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
-		"elements"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,65535),	null),
-		"valign"=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(VALIGN_MIDDLE,VALIGN_BOTTOM),		null),
-		"halign"=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(HALIGN_CENTER,HALIGN_RIGHT),		null),
-		"style"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(STYLE_HORISONTAL,STYLE_VERTICAL),	'isset({save})'),
-		"url"=>			array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})'),
-		"dynamic"=>		array(T_ZBX_INT, O_OPT,  null,  null,			null),
-		"x"=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
-		"y"=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
+		'screenitemid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))&&(!isset({x})||!isset({y}))'),
+		'resourcetype'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_EVENTS),	'isset({save})'),
+		'resourceid'=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID,			'isset({save})'),
+		'width'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
+		'height'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
+		'colspan'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
+		'rowspan'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
+		'elements'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,65535),	null),
+		'valign'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(VALIGN_MIDDLE,VALIGN_BOTTOM),		null),
+		'halign'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(HALIGN_CENTER,HALIGN_RIGHT),		null),
+		'style'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(STYLE_HORISONTAL,STYLE_VERTICAL),	'isset({save})'),
+		'url'=>			array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})'),
+		'dynamic'=>		array(T_ZBX_INT, O_OPT,  null,  null,			null),
+		'x'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
+		'y'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
 
-		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
+		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
+		
+		'add_row'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
+		'add_col'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
+		'rmv_row'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
+		'rmv_col'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
+		
+		'sw_pos'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
 	);
 
 	check_fields($fields);
@@ -66,56 +74,132 @@ include_once "include/page_header.php";
 <?php
 	show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
 
-	if(isset($_REQUEST["screenid"]))
-	{
-		if(!screen_accessible($_REQUEST["screenid"], PERM_READ_WRITE))
+	if(isset($_REQUEST['screenid'])){
+		if(!screen_accessible($_REQUEST['screenid'], PERM_READ_WRITE))
 			access_deny();
-
-		$screen = get_screen_by_screenid($_REQUEST["screenid"]);
-
+			
+		$screen = get_screen_by_screenid($_REQUEST['screenid']);
 		echo SBR;
-		if(isset($_REQUEST["save"]))
-		{
-			if(!isset($_REQUEST["elements"]))	$_REQUEST["elements"]=0;
+		if(isset($_REQUEST['save'])){
+			if(!isset($_REQUEST['elements']))	$_REQUEST['elements']=0;
 
-			if(isset($_REQUEST["screenitemid"]))
-			{
-				$result=update_screen_item($_REQUEST["screenitemid"],
-					$_REQUEST["resourcetype"],$_REQUEST["resourceid"],$_REQUEST["width"],
-					$_REQUEST["height"],$_REQUEST["colspan"],$_REQUEST["rowspan"],
-					$_REQUEST["elements"],$_REQUEST["valign"],
-					$_REQUEST["halign"],$_REQUEST["style"],$_REQUEST["url"],$_REQUEST['dynmic']);
+			DBstart();
+			if(isset($_REQUEST['screenitemid'])){
+				$result=update_screen_item($_REQUEST['screenitemid'],
+					$_REQUEST['resourcetype'],$_REQUEST['resourceid'],$_REQUEST['width'],
+					$_REQUEST['height'],$_REQUEST['colspan'],$_REQUEST['rowspan'],
+					$_REQUEST['elements'],$_REQUEST['valign'],
+					$_REQUEST['halign'],$_REQUEST['style'],$_REQUEST['url'],$_REQUEST['dynmic']);
 
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 			}
-			else
-			{
+			else{
 				$result=add_screen_item(
-					$_REQUEST["resourcetype"],$_REQUEST["screenid"],
-					$_REQUEST["x"],$_REQUEST["y"],$_REQUEST["resourceid"],
-					$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["colspan"],
-					$_REQUEST["rowspan"],$_REQUEST["elements"],$_REQUEST["valign"],
-					$_REQUEST["halign"],$_REQUEST["style"],$_REQUEST["url"],$_REQUEST['dynmic']);
+					$_REQUEST['resourcetype'],$_REQUEST['screenid'],
+					$_REQUEST['x'],$_REQUEST['y'],$_REQUEST['resourceid'],
+					$_REQUEST['width'],$_REQUEST['height'],$_REQUEST['colspan'],
+					$_REQUEST['rowspan'],$_REQUEST['elements'],$_REQUEST['valign'],
+					$_REQUEST['halign'],$_REQUEST['style'],$_REQUEST['url'],$_REQUEST['dynmic']);
 
 				show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 			}
+			$result = DBend($result);
+			
 			if($result){
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_SCREEN," Name [".$screen['name']."] cell changed ".
-					(isset($_REQUEST["screenitemid"]) ? "[".$_REQUEST["screenitemid"]."]" : 
-						"[".$_REQUEST["x"].",".$_REQUEST["y"]."]"));
-				unset($_REQUEST["form"]);
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] cell changed '.
+					(isset($_REQUEST['screenitemid']) ? '['.$_REQUEST['screenitemid'].']' : 
+						'['.$_REQUEST['x'].','.$_REQUEST['y'].']'));
+				unset($_REQUEST['form']);
 			}
 		} 
-		elseif(isset($_REQUEST["delete"])) {
-			$result=delete_screen_item($_REQUEST["screenitemid"]);
+		else if(isset($_REQUEST['delete'])){
+			DBstart();
+			$result=delete_screen_item($_REQUEST['screenitemid']);
+			$result = DBend($result);
+			
 			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
-			unset($_REQUEST["x"]);
+			unset($_REQUEST['x']);
+		}
+		else if(isset($_REQUEST['add_row'])){
+			$add_row = get_request('add_row',0);
+			DBexecute('UPDATE screens SET vsize=(vsize+1) WHERE screenid='.$screen['screenid']);
+			if($screen['vsize'] > $add_row){
+				DBexecute('UPDATE screens_items SET y=(y+1) WHERE screenid='.$screen['screenid'].' AND y>='.$add_row);
+			}
+		}
+		else if(isset($_REQUEST['add_col'])){
+			$add_col = get_request('add_col',0);
+			DBexecute('UPDATE screens SET hsize=(hsize+1) WHERE screenid='.$screen['screenid']);
+			if($screen['hsize'] > $add_col){
+				DBexecute('UPDATE screens_items SET x=(x+1) WHERE screenid='.$screen['screenid'].' AND x>='.$add_col);
+			}
+		}
+		else if(isset($_REQUEST['rmv_row'])){
+			$rmv_row = get_request('rmv_row',0);
+			if($screen['vsize'] > 0){
+				DBexecute('UPDATE screens SET vsize=(vsize-1) WHERE screenid='.$screen['screenid']);
+				DBexecute('DELETE FROM screens_items WHERE screenid='.$screen['screenid'].' AND y='.$rmv_row);
+				DBexecute('UPDATE screens_items SET y=(y-1) WHERE screenid='.$screen['screenid'].' AND y>'.$rmv_row);
+			}
+		}
+		else if(isset($_REQUEST['rmv_col'])){
+			$rmv_col = get_request('rmv_col',0);
+			if($screen['hsize'] > 0){
+				DBexecute('UPDATE screens SET hsize=(hsize-1) WHERE screenid='.$screen['screenid']);
+				DBexecute('DELETE FROM screens_items WHERE screenid='.$screen['screenid'].' AND x='.$rmv_col);
+				DBexecute('UPDATE screens_items SET x=(x-1) WHERE screenid='.$screen['screenid'].' AND x>'.$rmv_col);
+			}
+		}
+		else if(isset($_REQUEST['sw_pos'])){
+			$sw_pos = get_request('sw_pos', array());
+			if(count($sw_pos) > 3){
+				$sql = 'SELECT screenitemid '.
+						' FROM screens_items '.
+						' WHERE y='.$sw_pos[0].
+							' AND x='.$sw_pos[1].
+							' AND screenid='.$screen['screenid'];
+				if($screen_item = DBfetch(DBselect($sql))){
+					DBexecute('UPDATE screens_items '.
+								' SET y='.$sw_pos[2].',x='.$sw_pos[3].
+								' WHERE y='.$sw_pos[0].
+									' AND x='.$sw_pos[1].
+									' AND screenid='.$screen['screenid']);
+									
+					DBexecute('UPDATE screens_items '.
+								' SET y='.$sw_pos[0].',x='.$sw_pos[1].
+								' WHERE y='.$sw_pos[2].
+									' AND x='.$sw_pos[3].
+									' AND screenid='.$screen['screenid'].
+									' AND screenitemid<>'.$screen_item['screenitemid']);
+				}
+				else{
+					$sql = 'SELECT screenitemid '.
+							' FROM screens_items '.
+							' WHERE y='.$sw_pos[2].
+								' AND x='.$sw_pos[3].
+								' AND screenid='.$screen['screenid'];
+					if($screen_item = DBfetch(DBselect($sql))){
+						DBexecute('UPDATE screens_items '.
+									' SET y='.$sw_pos[0].',x='.$sw_pos[1].
+									' WHERE y='.$sw_pos[2].
+										' AND x='.$sw_pos[3].
+										' AND screenid='.$screen['screenid']);
+										
+						DBexecute('UPDATE screens_items '.
+									' SET y='.$sw_pos[2].',x='.$sw_pos[3].
+									' WHERE y='.$sw_pos[0].
+										' AND x='.$sw_pos[1].
+										' AND screenid='.$screen['screenid'].
+										' AND screenitemid<>'.$screen_item['screenitemid']);
+					}	
+				}
+			}
 		}
 
-		if($_REQUEST["screenid"] > 0)
-		{
-			$table = get_screen($_REQUEST["screenid"], 1);
+		if($_REQUEST['screenid'] > 0){
+			$table = get_screen($_REQUEST['screenid'], 1);
 			$table->Show();
+			zbx_add_post_js('init_screen("'.$_REQUEST['screenid'].'","iframe","'.$_REQUEST['screenid'].'");');
 		}
 
 	}
@@ -123,6 +207,6 @@ include_once "include/page_header.php";
 
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>
