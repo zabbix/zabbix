@@ -230,7 +230,7 @@ include_once 'include/page_header.php';
 		
 		$reset = new CButton("filter_rst",S_RESET);
 		$reset->SetType('button');
-		$reset->SetAction('javascript: var uri = new url(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+		$reset->SetAction('javascript: var url = new Curl(location.href); url.setArgument("filter_rst",1); location.href = url.getUrl();');
 	
 		$filterForm->AddItemToBottomRow($reset);
 								
