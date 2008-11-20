@@ -203,7 +203,7 @@ function graphload(dom_objects,unix_stime,period,dynamic){
 			G_MENU.setPeriodType();
 //---------
 //alert(url_stime);
-			uri = new url(dom_objects[i].src);
+			uri = new Curl(dom_objects[i].src);
 			uri.setArgument('stime', url_stime);
 			uri.setArgument('period', period);
 			
@@ -211,7 +211,7 @@ function graphload(dom_objects,unix_stime,period,dynamic){
 		}
 	}
 	else{
-		uri = new url(dom_objects[0].href);
+		uri = new Curl(dom_objects[0].href);
 		uri.setArgument('stime', url_stime);
 		uri.setArgument('period', period);
 

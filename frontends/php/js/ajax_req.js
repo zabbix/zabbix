@@ -20,13 +20,13 @@
 
 function send_params(params){
 
-	var uri = new url(location.href);
-	new Ajax.Request(uri.getPath()+"?output=ajax",
+	var url = new Curl(location.href);
+	new Ajax.Request(url.getPath()+"?output=ajax",
 					{
 						'method': 'post',
 						'parameters':params,
 						'onSuccess': function(resp){ },//alert(resp.responseText);
-						'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(params); }
+						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);
 }

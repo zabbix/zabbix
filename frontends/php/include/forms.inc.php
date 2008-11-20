@@ -1367,7 +1367,7 @@
 
 		$reset = new CButton("filter_rst",S_RESET);
 		$reset->SetType('button');
-		$reset->SetAction('javascript: var uri = new url(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+		$reset->SetAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 	
 		$form->AddItemToBottomRow(new CButton("filter_set",S_FILTER));
 		$form->AddItemToBottomRow($reset);

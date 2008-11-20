@@ -220,7 +220,7 @@ include_once "include/page_header.php";
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 	validate_group_with_host(PERM_READ_ONLY,$options,'web.tr_status.groupid','web.tr_status.hostid');
 
-	$mute = get_profile('web.tr_status.mute',0);	
+	$mute = get_profile('web.tr_status.mute',0);
 	if(isset($audio) && !$mute){
 		play_sound($audio);
 	}
@@ -393,7 +393,7 @@ include_once "include/page_header.php";
 
 	$reset = new CButton("filter_rst",S_RESET);
 	$reset->SetType('button');
-	$reset->SetAction('javascript: var uri = new url(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+	$reset->SetAction('javascript: var url = new Curl(location.href); url.setArgument("filter_rst",1); location.href = url.getUrl();');
 
 	$filterForm->AddItemToBottomRow(new CButton("filter_set",S_FILTER));
 	$filterForm->AddItemToBottomRow($reset);
