@@ -832,8 +832,13 @@
 		}
 		$table->addRow($new_cols);
 		
+		
+		$empty_screen_col = array();
+		
 		for($r=0;$r<$row['vsize'];$r++){
 			$new_cols = array();
+			$empty_screen_row = true;
+			
 			$add_row_link = 'screenedit.php?config=1&screenid='.$screenid.'&add_row=';
 			array_push($new_cols, new Ccol(new Clink(new Cimg('images/general/closed.gif'),$add_row_link.$r)));
 			for($c=0;$c<$row['hsize'];$c++){
@@ -873,6 +878,11 @@
 					$dynamic	= 0;
 				}
 
+				if($screenitemid>0){
+					$empty_screen_row = false;
+					$empty_screen_col[$c] = 1;
+				}
+				
 				if($editmode == 1 && $screenitemid!=0){
 					$onclick_action = "ZBX_SCREENS['".$_REQUEST['screenid']."'].screen.element_onclick('screenedit.php?form=update".url_param('screenid').'&screenitemid='.$screenitemid."#form');";
 					$action = 'screenedit.php?form=update'.url_param('screenid').'&screenitemid='.$screenitemid.'#form';
@@ -1115,18 +1125,36 @@
 				array_push($new_cols, $new_col);
 			}
 			
-			$rmv_row_link = 'screenedit.php?config=1&screenid='.$screenid.'&rmv_row=';
-			array_push($new_cols, new Ccol(new Clink(new Cimg('images/general/opened.gif'),$rmv_row_link.$r)));
+			$rmv_icon = new Cimg('images/general/opened.gif');
+			if($empty_screen_row){
+				$rmv_row_link = 'javascript: location.href = '."'screenedit.php?config=1&screenid=".$screenid.'&rmv_row='.$r."';";
+			}
+			else{
+				$rmv_row_link = "javascript: if(Confirm('This screen-row is not empty. Delete it?')){".
+									" location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_row=".$r."';}";
+			}
+			$rmv_icon->addAction('onclick',$rmv_row_link);
+			
+			array_push($new_cols, new Ccol($rmv_icon));
 			$table->AddRow(new CRow($new_cols));
 		}
 		
 		
 		$add_row_link = 'screenedit.php?config=1&screenid='.$screenid.'&add_row=';
-		$rmv_col_link = 'screenedit.php?config=1&screenid='.$screenid.'&rmv_col=';
 		$new_cols = array(new Ccol(new Clink(new Cimg('images/general/closed.gif'), $add_row_link.$row['vsize'])));
 		for($c=0;$c<$row['hsize'];$c++){
-			array_push($new_cols, new Ccol(new Clink(new Cimg('images/general/opened.gif'),$rmv_col_link.$c)));
+			$rmv_icon = new Cimg('images/general/opened.gif');
+			if(isset($empty_screen_col[$c])){
+				$rmv_col_link = "javascript: if(Confirm('This screen-column is not empty. Delete it?')){".
+									" location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_row=".$c."';}";
+			}
+			else{
+				$rmv_col_link = "javascript: location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_row=".$c."';";	
+			}
+			$rmv_icon->addAction('onclick',$rmv_col_link);
+			array_push($new_cols, new Ccol($rmv_icon));
 		}
+		
 		array_push($new_cols, new Ccol(new Cimg('images/general/zero.gif','zero',1,1)));
 		$table->addRow($new_cols);
 	return $table;
