@@ -213,8 +213,6 @@ static void update_key_status(zbx_uint64_t hostid,int host_status)
 			SET_UI64_RESULT(&agent, host_status);
 			process_new_value(&item,&agent);
 			free_result(&agent);
-
-			update_triggers(item.itemid);
 		}
 	}
 	else
@@ -353,9 +351,6 @@ int get_values(void)
 		
 		if(res == SUCCEED )
 		{
-
-			process_new_value(&item,&agent);
-
 /*			if(HOST_STATUS_UNREACHABLE == item.host_status)*/
 			if(HOST_AVAILABLE_TRUE != item.host_available)
 			{
@@ -379,7 +374,7 @@ int get_values(void)
 
 				stop=1;
 			}
-		       	update_triggers(item.itemid);
+			process_new_value(&item,&agent);
 		}
 		else if(res == NOTSUPPORTED || res == AGENT_ERROR)
 		{

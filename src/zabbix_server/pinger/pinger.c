@@ -87,7 +87,6 @@ static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value)
 
 		DBbegin();
 		process_new_value(&item, value);
-		update_triggers(item.itemid);
 		DBcommit();
 	}
 	DBfree_result(result);

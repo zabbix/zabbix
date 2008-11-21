@@ -84,8 +84,6 @@ void __zbx_zabbix_syslog(const char *fmt, ...)
 		SET_STR_RESULT(&agent, strdup(value_str));
 		process_new_value(&item,&agent);
 		free_result(&agent);
-
-		update_triggers(item.itemid);
 	}
 
 	DBfree_result(result);

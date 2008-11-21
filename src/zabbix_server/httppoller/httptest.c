@@ -82,7 +82,6 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 
 	DBbegin();
 	process_new_value(&item,value);
-	update_triggers(item.itemid);
 	DBcommit();
  
 	DBfree_result(result);
