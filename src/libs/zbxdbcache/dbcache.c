@@ -366,10 +366,13 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (history[i].keep_trends == 0)
+		if (0 == history[i].keep_trends)
 			continue;
 
 		if (history[i].value_type != ITEM_VALUE_TYPE_FLOAT && history[i].value_type != ITEM_VALUE_TYPE_UINT64)
+			continue;
+
+		if (0 != history[i].value_null)
 			continue;
 
 		DCadd_trend(&history[i], &sql_offset);
@@ -466,8 +469,9 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			TRIGGER_STATUS_ENABLED);
 
 	for (i = 0; i < history_num; i++)
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
-				history[i].itemid);
+		if (0 == history[i].value_null)
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
+					history[i].itemid);
 
 	if (sql[sql_offset - 1] == ',')
 	{
@@ -609,112 +613,112 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 				h->clock);
 
 		switch (h->value_type) {
-			case ITEM_VALUE_TYPE_FLOAT:
-				switch (item.delta) {
-					case ITEM_STORE_AS_IS:
-						h->value.value_float = h->value_orig.value_float;
-						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-								",prevvalue=lastvalue,lastvalue='" ZBX_FS_DBL "'",
-								h->value_orig.value_float);
-						break;
-					case ITEM_STORE_SPEED_PER_SECOND:
-						if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value_orig.value_float && item.lastclock < h->clock)
-						{
-							h->value.value_float = (h->value_orig.value_float - item.prevorgvalue_dbl)/(h->clock - item.lastclock);
-							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-									",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
-									",lastvalue='" ZBX_FS_DBL "'",
-									h->value_orig.value_float,
-									h->value.value_float);
-						}
-						else
-						{
-							h->keep_history = 0;
-							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-									",prevorgvalue='" ZBX_FS_DBL "'",
-									h->value_orig.value_float);
-						}
-						break;
-					case ITEM_STORE_SIMPLE_CHANGE:
-						if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value_orig.value_float)
-						{
-							h->value.value_float = h->value_orig.value_float - item.prevorgvalue_dbl;
-							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-									",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
-									",lastvalue='" ZBX_FS_DBL "'",
-									h->value_orig.value_float,
-									h->value.value_float);
-						}
-						else
-						{
-							h->keep_history = 0;
-							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-									",prevorgvalue='" ZBX_FS_DBL "'",
-									h->value_orig.value_float);
-						}
-						break;
+		case ITEM_VALUE_TYPE_FLOAT:
+			switch (item.delta) {
+			case ITEM_STORE_AS_IS:
+				h->value.value_float = h->value_orig.value_float;
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+						",prevvalue=lastvalue,lastvalue='" ZBX_FS_DBL "'",
+						h->value_orig.value_float);
+				break;
+			case ITEM_STORE_SPEED_PER_SECOND:
+				if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value_orig.value_float && item.lastclock < h->clock)
+				{
+					h->value.value_float = (h->value_orig.value_float - item.prevorgvalue_dbl) / (h->clock - item.lastclock);
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
+							",lastvalue='" ZBX_FS_DBL "'",
+							h->value_orig.value_float,
+							h->value.value_float);
+				}
+				else
+				{
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+							",prevorgvalue='" ZBX_FS_DBL "'",
+							h->value_orig.value_float);
+					h->value_null = 1;
 				}
 				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				switch (item.delta) {
-					case ITEM_STORE_AS_IS:
-						h->value.value_uint64 = h->value_orig.value_uint64;
-						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-								",prevvalue=lastvalue,lastvalue='" ZBX_FS_UI64 "'",
-								h->value_orig.value_uint64);
-						break;
-					case ITEM_STORE_SPEED_PER_SECOND:
-						if (item.prevorgvalue_null == 0 && item.prevorgvalue_uint64 <= h->value_orig.value_uint64 && item.lastclock < h->clock)
-						{
-							h->value.value_uint64 = (zbx_uint64_t)(h->value_orig.value_uint64 - item.prevorgvalue_uint64)/(h->clock - item.lastclock);
-							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-									",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "'"
-									",lastvalue='" ZBX_FS_UI64 "'",
-									h->value_orig.value_uint64,
-									h->value.value_uint64);
-						}
-						else
-						{
-							h->keep_history = 0;
-							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-									",prevorgvalue='" ZBX_FS_DBL "'",
-									h->value_orig.value_uint64);
-						}
-						break;
-					case ITEM_STORE_SIMPLE_CHANGE:
-						if (item.prevorgvalue_null == 0 && item.prevorgvalue_uint64 <= h->value_orig.value_uint64)
-						{
-							h->value.value_uint64 = h->value_orig.value_uint64 - item.prevorgvalue_uint64;
-							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-									",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "'"
-									",lastvalue='" ZBX_FS_UI64 "'",
-									h->value_orig.value_uint64,
-									h->value.value_uint64);
-						}
-						else
-						{
-							h->keep_history = 0;
-							zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-									",prevorgvalue='" ZBX_FS_UI64 "'",
-									h->value_orig.value_uint64);
-						}
-						break;
+			case ITEM_STORE_SIMPLE_CHANGE:
+				if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value_orig.value_float)
+				{
+					h->value.value_float = h->value_orig.value_float - item.prevorgvalue_dbl;
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
+							",lastvalue='" ZBX_FS_DBL "'",
+							h->value_orig.value_float,
+							h->value.value_float);
+				}
+				else
+				{
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+							",prevorgvalue='" ZBX_FS_DBL "'",
+							h->value_orig.value_float);
+					h->value_null = 1;
 				}
 				break;
-			case ITEM_VALUE_TYPE_STR:
-			case ITEM_VALUE_TYPE_TEXT:
-				DBescape_string(h->value_orig.value_str, value_esc, sizeof(value_esc));
+			}
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			switch (item.delta) {
+			case ITEM_STORE_AS_IS:
+				h->value.value_uint64 = h->value_orig.value_uint64;
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-						",prevvalue=lastvalue,lastvalue='%s'",
-						value_esc);
+						",prevvalue=lastvalue,lastvalue='" ZBX_FS_UI64 "'",
+						h->value_orig.value_uint64);
 				break;
-			case ITEM_VALUE_TYPE_LOG:
-				DBescape_string(h->value_orig.value_str, value_esc, sizeof(value_esc));
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-						",prevvalue=lastvalue,lastvalue='%s',lastlogsize=%d",
-						value_esc,
-						h->lastlogsize);
+			case ITEM_STORE_SPEED_PER_SECOND:
+				if (item.prevorgvalue_null == 0 && item.prevorgvalue_uint64 <= h->value_orig.value_uint64 && item.lastclock < h->clock)
+				{
+					h->value.value_uint64 = (h->value_orig.value_uint64 - item.prevorgvalue_uint64) / (h->clock - item.lastclock);
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "'"
+							",lastvalue='" ZBX_FS_UI64 "'",
+							h->value_orig.value_uint64,
+							h->value.value_uint64);
+				}
+				else
+				{
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+							",prevorgvalue='" ZBX_FS_DBL "'",
+							h->value_orig.value_uint64);
+					h->value_null = 1;
+				}
 				break;
+			case ITEM_STORE_SIMPLE_CHANGE:
+				if (item.prevorgvalue_null == 0 && item.prevorgvalue_uint64 <= h->value_orig.value_uint64)
+				{
+					h->value.value_uint64 = h->value_orig.value_uint64 - item.prevorgvalue_uint64;
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "'"
+							",lastvalue='" ZBX_FS_UI64 "'",
+							h->value_orig.value_uint64,
+							h->value.value_uint64);
+				}
+				else
+				{
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+							",prevorgvalue='" ZBX_FS_UI64 "'",
+							h->value_orig.value_uint64);
+					h->value_null = 1;
+				}
+				break;
+			}
+			break;
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+			DBescape_string(h->value_orig.value_str, value_esc, sizeof(value_esc));
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+					",prevvalue=lastvalue,lastvalue='%s'",
+					value_esc);
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			DBescape_string(h->value_orig.value_str, value_esc, sizeof(value_esc));
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+					",prevvalue=lastvalue,lastvalue='%s',lastlogsize=%d",
+					value_esc,
+					h->lastlogsize);
+			break;
 		}
 
 		/* Update item status if required */
@@ -823,8 +827,9 @@ static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
 			TRIGGER_STATUS_ENABLED);
 
 	for (i = 0; i < history_num; i++)
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
-				history[i].itemid);
+		if (0 == history[i].value_null)
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
+					history[i].itemid);
 
 	if (sql[sql_offset - 1] == ',')
 	{
@@ -926,23 +931,29 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_FLOAT)
-		{
+		if (0 == history[i].keep_history)
+			continue;
+
+		if (history[i].value_type != ITEM_VALUE_TYPE_FLOAT)
+			continue;
+
+		if (0 != history[i].value_null)
+			continue;
+
 #ifdef HAVE_MYSQL
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-					"(" ZBX_FS_UI64 ",%d," ZBX_FS_DBL "),",
-					history[i].itemid,
-					history[i].clock,
-					history[i].value.value_float);
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+				"(" ZBX_FS_UI64 ",%d," ZBX_FS_DBL "),",
+				history[i].itemid,
+				history[i].clock,
+				history[i].value.value_float);
 #else
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-					"insert into history (itemid,clock,value) values "
-					"(" ZBX_FS_UI64 ",%d," ZBX_FS_DBL ");\n",
-					history[i].itemid,
-					history[i].clock,
-					history[i].value.value_float);
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+				"insert into history (itemid,clock,value) values "
+				"(" ZBX_FS_UI64 ",%d," ZBX_FS_DBL ");\n",
+				history[i].itemid,
+				history[i].clock,
+				history[i].value.value_float);
 #endif
-		}
 	}
 
 #ifdef HAVE_MYSQL
@@ -965,25 +976,31 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_FLOAT)
-			{
+			if (0 == history[i].keep_history)
+				continue;
+
+			if (history[i].value_type != ITEM_VALUE_TYPE_FLOAT)
+				continue;
+
+			if (0 != history[i].value_null)
+				continue;
+
 #ifdef HAVE_MYSQL
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-						"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL "),",
-						get_nodeid_by_id(history[i].itemid),
-						history[i].itemid,
-						history[i].clock,
-						history[i].value.value_float);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+					"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL "),",
+					get_nodeid_by_id(history[i].itemid),
+					history[i].itemid,
+					history[i].clock,
+					history[i].value.value_float);
 #else
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-						"insert into history_sync (nodeid,itemid,clock,value) values "
-						"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL ");\n",
-						get_nodeid_by_id(history[i].itemid),
-						history[i].itemid,
-						history[i].clock,
-						history[i].value.value_float);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+					"insert into history_sync (nodeid,itemid,clock,value) values "
+					"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL ");\n",
+					get_nodeid_by_id(history[i].itemid),
+					history[i].itemid,
+					history[i].clock,
+					history[i].value.value_float);
 #endif
-			}
 		}
 
 #ifdef HAVE_MYSQL
@@ -1008,23 +1025,29 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_UINT64)
-		{
+		if (0 == history[i].keep_history)
+			continue;
+
+		if (history[i].value_type != ITEM_VALUE_TYPE_UINT64)
+			continue;
+
+		if (0 != history[i].value_null)
+			continue;
+
 #ifdef HAVE_MYSQL
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-					"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 "),",
-					history[i].itemid,
-					history[i].clock,
-					history[i].value.value_uint64);
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+				"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 "),",
+				history[i].itemid,
+				history[i].clock,
+				history[i].value.value_uint64);
 #else
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-					"insert into history_uint (itemid,clock,value) values "
-					"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ");\n",
-					history[i].itemid,
-					history[i].clock,
-					history[i].value.value_uint64);
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+				"insert into history_uint (itemid,clock,value) values "
+				"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ");\n",
+				history[i].itemid,
+				history[i].clock,
+				history[i].value.value_uint64);
 #endif
-		}
 	}
 
 #ifdef HAVE_MYSQL
@@ -1047,25 +1070,31 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_UINT64)
-			{
+			if (0 == history[i].keep_history)
+				continue;
+
+			if (history[i].value_type != ITEM_VALUE_TYPE_UINT64)
+				continue;
+
+			if (0 != history[i].value_null)
+				continue;
+
 #ifdef HAVE_MYSQL
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-						"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 "),",
-						get_nodeid_by_id(history[i].itemid),
-						history[i].itemid,
-						history[i].clock,
-						history[i].value.value_uint64);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+					"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 "),",
+					get_nodeid_by_id(history[i].itemid),
+					history[i].itemid,
+					history[i].clock,
+					history[i].value.value_uint64);
 #else
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-						"insert into history_uint_sync (nodeid,itemid,clock,value) values "
-						"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ");\n",
-						get_nodeid_by_id(history[i].itemid),
-						history[i].itemid,
-						history[i].clock,
-						history[i].value.value_uint64);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+					"insert into history_uint_sync (nodeid,itemid,clock,value) values "
+					"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ");\n",
+					get_nodeid_by_id(history[i].itemid),
+					history[i].itemid,
+					history[i].clock,
+					history[i].value.value_uint64);
 #endif
-			}
 		}
 
 #ifdef HAVE_MYSQL
@@ -1090,24 +1119,30 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_STR)
-		{
-			DBescape_string(history[i].value_orig.value_str, value_esc, sizeof(value_esc));
+		if (0 == history[i].keep_history)
+			continue;
+
+		if (history[i].value_type != ITEM_VALUE_TYPE_STR)
+			continue;
+
+		if (0 != history[i].value_null)
+			continue;
+
+		DBescape_string(history[i].value_orig.value_str, value_esc, sizeof(value_esc));
 #ifdef HAVE_MYSQL
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-					"(" ZBX_FS_UI64 ",%d,'%s'),",
-					history[i].itemid,
-					history[i].clock,
-					value_esc);
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+				"(" ZBX_FS_UI64 ",%d,'%s'),",
+				history[i].itemid,
+				history[i].clock,
+				value_esc);
 #else
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-					"insert into history_str (itemid,clock,value) values "
-					"(" ZBX_FS_UI64 ",%d,'%s');\n",
-					history[i].itemid,
-					history[i].clock,
-					value_esc);
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+				"insert into history_str (itemid,clock,value) values "
+				"(" ZBX_FS_UI64 ",%d,'%s');\n",
+				history[i].itemid,
+				history[i].clock,
+				value_esc);
 #endif
-		}
 	}
 
 #ifdef HAVE_MYSQL
@@ -1130,26 +1165,32 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_STR)
-			{
-				DBescape_string(history[i].value_orig.value_str, value_esc, sizeof(value_esc));
+			if (0 == history[i].keep_history)
+				continue;
+
+			if (history[i].value_type != ITEM_VALUE_TYPE_STR)
+				continue;
+
+			if (0 != history[i].value_null)
+				continue;
+
+			DBescape_string(history[i].value_orig.value_str, value_esc, sizeof(value_esc));
 #ifdef HAVE_MYSQL
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-						"(%d," ZBX_FS_UI64 ",%d,'%s'),",
-						get_nodeid_by_id(history[i].itemid),
-						history[i].itemid,
-						history[i].clock,
-						value_esc);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+					"(%d," ZBX_FS_UI64 ",%d,'%s'),",
+					get_nodeid_by_id(history[i].itemid),
+					history[i].itemid,
+					history[i].clock,
+					value_esc);
 #else
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-						"insert into history_str_sync (nodeid,itemid,clock,value) values "
-						"(%d," ZBX_FS_UI64 ",%d,'%s');\n",
-						get_nodeid_by_id(history[i].itemid),
-						history[i].itemid,
-						history[i].clock,
-						value_esc);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+					"insert into history_str_sync (nodeid,itemid,clock,value) values "
+					"(%d," ZBX_FS_UI64 ",%d,'%s');\n",
+					get_nodeid_by_id(history[i].itemid),
+					history[i].itemid,
+					history[i].clock,
+					value_esc);
 #endif
-			}
 		}
 
 #ifdef HAVE_MYSQL
@@ -1187,28 +1228,34 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_TEXT)
-			{
-				value_esc_dyn = DBdyn_escape_string(history[i].value_orig.value_str);
+			if (0 == history[i].keep_history)
+				continue;
+
+			if (history[i].value_type != ITEM_VALUE_TYPE_TEXT)
+				continue;
+
+			if (0 != history[i].value_null)
+				continue;
+
+			value_esc_dyn = DBdyn_escape_string(history[i].value_orig.value_str);
 #ifdef HAVE_MYSQL
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s'),",
-						id,
-						history[i].itemid,
-						history[i].clock,
-						value_esc_dyn);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s'),",
+					id,
+					history[i].itemid,
+					history[i].clock,
+					value_esc_dyn);
 #else
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
-						"insert into history_text (id,itemid,clock,value) values "
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s');\n",
-						id,
-						history[i].itemid,
-						history[i].clock,
-						value_esc_dyn);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+					"insert into history_text (id,itemid,clock,value) values "
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s');\n",
+					id,
+					history[i].itemid,
+					history[i].clock,
+					value_esc_dyn);
 #endif
-				zbx_free(value_esc_dyn);
-				id++;
-			}
+			zbx_free(value_esc_dyn);
+			id++;
 		}
 
 #ifdef HAVE_MYSQL
@@ -1237,35 +1284,41 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		for (i = 0; i < history_num; i++)
 		{
-			if (history[i].keep_history && history[i].value_type == ITEM_VALUE_TYPE_LOG)
-			{
-				DBescape_string(history[i].source, value_esc, sizeof(value_esc));
-				value_esc_dyn = DBdyn_escape_string(history[i].value_orig.value_str);
+			if (0 == history[i].keep_history)
+				continue;
+
+			if (history[i].value_type != ITEM_VALUE_TYPE_LOG)
+				continue;
+
+			if (0 != history[i].value_null)
+				continue;
+
+			DBescape_string(history[i].source, value_esc, sizeof(value_esc));
+			value_esc_dyn = DBdyn_escape_string(history[i].value_orig.value_str);
 #ifdef HAVE_MYSQL
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s'),",
-						id,
-						history[i].itemid,
-						history[i].clock,
-						history[i].timestamp,
-						value_esc,
-						history[i].severity,
-						value_esc_dyn);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s'),",
+					id,
+					history[i].itemid,
+					history[i].clock,
+					history[i].timestamp,
+					value_esc,
+					history[i].severity,
+					value_esc_dyn);
 #else
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
-						"insert into history_log (id,itemid,clock,timestamp,source,severity,value) values "
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s');\n",
-						id,
-						history[i].itemid,
-						history[i].clock,
-						history[i].timestamp,
-						value_esc,
-						history[i].severity,
-						value_esc_dyn);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+					"insert into history_log (id,itemid,clock,timestamp,source,severity,value) values "
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s');\n",
+					id,
+					history[i].itemid,
+					history[i].clock,
+					history[i].timestamp,
+					value_esc,
+					history[i].severity,
+					value_esc_dyn);
 #endif
-				zbx_free(value_esc_dyn);
-				id++;
-			}
+			zbx_free(value_esc_dyn);
+			id++;
 		}
 
 #ifdef HAVE_MYSQL
@@ -1817,7 +1870,9 @@ void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock)
 	history->value_type		= ITEM_VALUE_TYPE_FLOAT;
 	history->value_orig.value_float	= value_orig;
 	history->value.value_float	= 0;
+	history->value_null		= 0;
 	history->keep_history		= 0;
+	history->keep_trends		= 0;
 
 	UNLOCK_CACHE;
 }
@@ -1850,7 +1905,9 @@ void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int clock)
 	history->value_type			= ITEM_VALUE_TYPE_UINT64;
 	history->value_orig.value_uint64	= value_orig;
 	history->value.value_uint64		= 0;
+	history->value_null			= 0;
 	history->keep_history			= 0;
+	history->keep_trends			= 0;
 
 	UNLOCK_CACHE;
 }
@@ -1886,8 +1943,10 @@ void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock)
 	history->value_orig.value_str	= cache->last_text;
 	history->value.value_str	= cache->last_text;
 	zbx_strlcpy(cache->last_text, value_orig, len);
+	history->value_null		= 0;
 	cache->last_text		+= len;
 	history->keep_history		= 0;
+	history->keep_trends		= 0;
 
 	UNLOCK_CACHE;
 }
@@ -1923,8 +1982,10 @@ void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock)
 	history->value_orig.value_str	= cache->last_text;
 	history->value.value_str	= cache->last_text;
 	zbx_strlcpy(cache->last_text, value_orig, len);
+	history->value_null		= 0;
 	cache->last_text		+= len;
 	history->keep_history		= 0;
+	history->keep_trends		= 0;
 
 	UNLOCK_CACHE;
 }
@@ -1961,6 +2022,7 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
 	history->value_orig.value_str	= cache->last_text;
 	history->value.value_str	= cache->last_text;
 	zbx_strlcpy(cache->last_text, value_orig, len1);
+	history->value_null		= 0;
 	cache->last_text		+= len1;
 	history->timestamp		= timestamp;
 
@@ -1975,6 +2037,7 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
 	history->severity		= severity;
 	history->lastlogsize		= lastlogsize;
 	history->keep_history		= 0;
+	history->keep_trends		= 0;
 
 	UNLOCK_CACHE;
 }
