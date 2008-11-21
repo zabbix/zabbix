@@ -122,31 +122,22 @@ static void process_value(char *key, ZBX_FPING_HOST *host, zbx_uint64_t *value_u
 			}
 
 			if (0 == CONFIG_DBSYNCER_FORKS)
-			{
 				DBbegin();
-				switch (zbx_process) {
-				case ZBX_PROCESS_SERVER:
-					process_new_value(&item, &value, now);
-					update_triggers(item.itemid);
-					break;
-				case ZBX_PROCESS_PROXY:
-					proxy_process_new_value(&item, &value, now);
-					break;
-				}
+
+			switch (zbx_process) {
+			case ZBX_PROCESS_SERVER:
+				process_new_value(&item, &value, now);
+				break;
+			case ZBX_PROCESS_PROXY:
+				proxy_process_new_value(&item, &value, now);
+				break;
+			}
+
+			if (0 == CONFIG_DBSYNCER_FORKS)
 				DBcommit();
-			}
-			else
-			{
-				switch (zbx_process) {
-				case ZBX_PROCESS_SERVER:
-					process_new_value(&item, &value, now);
-					break;
-				case ZBX_PROCESS_PROXY:
-					proxy_process_new_value(&item, &value, now);
-					break;
-				}
+
+			if (0 != CONFIG_DBSYNCER_FORKS)
 				DCadd_nextcheck(&item, now, 0, NULL);
-			}
 
 			free_result(&value);
 		}

@@ -231,28 +231,13 @@ static void update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 			init_result(&agent);
 			SET_UI64_RESULT(&agent, host_status);
 
-			if (0 == CONFIG_DBSYNCER_FORKS)
-			{
-				switch (zbx_process) {
-				case ZBX_PROCESS_SERVER:
-					process_new_value(&item, &agent, now);
-					update_triggers(item.itemid);
-					break;
-				case ZBX_PROCESS_PROXY:
-					proxy_process_new_value(&item, &agent, now);
-					break;
-				}
-			}
-			else
-			{
-				switch (zbx_process) {
-				case ZBX_PROCESS_SERVER:
-					process_new_value(&item, &agent, now);
-					break;
-				case ZBX_PROCESS_PROXY:
-					proxy_process_new_value(&item, &agent, now);
-					break;
-				}
+			switch (zbx_process) {
+			case ZBX_PROCESS_SERVER:
+				process_new_value(&item, &agent, now);
+				break;
+			case ZBX_PROCESS_PROXY:
+				proxy_process_new_value(&item, &agent, now);
+				break;
 			}
 
 			free_result(&agent);
@@ -476,33 +461,22 @@ static int get_values(int now, int *nextcheck)
 			}
 
 			if (0 == CONFIG_DBSYNCER_FORKS)
-			{
 				DBbegin();
 		
-				switch (zbx_process) {
-				case ZBX_PROCESS_SERVER:
-					process_new_value(&item, &agent, now);
-					update_triggers(item.itemid);
-					break;
-				case ZBX_PROCESS_PROXY:
-					proxy_process_new_value(&item, &agent, now);
-					break;
-				}
+			switch (zbx_process) {
+			case ZBX_PROCESS_SERVER:
+				process_new_value(&item, &agent, now);
+				break;
+			case ZBX_PROCESS_PROXY:
+				proxy_process_new_value(&item, &agent, now);
+				break;
+			}
 
+			if (0 == CONFIG_DBSYNCER_FORKS)
 				DBcommit();
-			}
-			else
-			{
-				switch (zbx_process) {
-				case ZBX_PROCESS_SERVER:
-					process_new_value(&item, &agent, now);
-					break;
-				case ZBX_PROCESS_PROXY:
-					proxy_process_new_value(&item, &agent, now);
-					break;
-				}
+
+			if (0 != CONFIG_DBSYNCER_FORKS)
 				DCadd_nextcheck(&item, now, 0, NULL);
-			}
 
 			if (poller_type == ZBX_POLLER_TYPE_NORMAL || poller_type == ZBX_POLLER_TYPE_IPMI)
 				if (*nextcheck == FAIL || (item.nextcheck != 0 && *nextcheck > item.nextcheck))
