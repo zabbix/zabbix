@@ -50,6 +50,7 @@ ZBX_DC_HISTORY
 	int		value_type;
 	history_value_t	value_orig;
 	history_value_t	value;
+	int		value_null;
 	int		timestamp;
 	char		*source;
 	int		severity;
