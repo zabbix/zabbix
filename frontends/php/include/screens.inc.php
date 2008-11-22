@@ -824,23 +824,26 @@
 			($editmode == 0 || $editmode == 2) ? 'screen_view' : 'screen_edit');
 		$table->addOption('id','iframe');
 	
-
-		$add_col_link = 'screenedit.php?config=1&screenid='.$screenid.'&add_col=';
-		$new_cols = array(new Ccol(new Cimg('images/general/zero.gif','zero',1,1)));
-		for($c=0;$c<$row['hsize']+1;$c++){
-			array_push($new_cols, new Ccol(new Clink(new Cimg('images/general/closed.gif'),$add_col_link.$c)));
+		if($editmode == 1){
+			$add_col_link = 'screenedit.php?config=1&screenid='.$screenid.'&add_col=';
+			$new_cols = array(new Ccol(new Cimg('images/general/zero.gif','zero',1,1)));
+			for($c=0;$c<$row['hsize']+1;$c++){
+				array_push($new_cols, new Ccol(new Clink(new Cimg('images/general/closed.gif'),$add_col_link.$c)));
+			}
+			$table->addRow($new_cols);
 		}
-		$table->addRow($new_cols);
-		
 		
 		$empty_screen_col = array();
 		
 		for($r=0;$r<$row['vsize'];$r++){
 			$new_cols = array();
 			$empty_screen_row = true;
+	
+			if($editmode == 1){
+				$add_row_link = 'screenedit.php?config=1&screenid='.$screenid.'&add_row=';
+				array_push($new_cols, new Ccol(new Clink(new Cimg('images/general/closed.gif'),$add_row_link.$r)));
+			}
 			
-			$add_row_link = 'screenedit.php?config=1&screenid='.$screenid.'&add_row=';
-			array_push($new_cols, new Ccol(new Clink(new Cimg('images/general/closed.gif'),$add_row_link.$r)));
 			for($c=0;$c<$row['hsize'];$c++){
 				$item = array();
 				if(isset($skip_field[$r][$c]))		continue;
@@ -1115,8 +1118,8 @@
 				if($valign == VALIGN_MIDDLE)	$str_valign = 'mdl';
 				if($valign == VALIGN_TOP)		$str_valign = 'top';
 				if($valign == VALIGN_BOTTOM)	$str_valign = 'bttm';
-
-				if(!$item_form){
+				
+				if(($editmode == 1) && !$item_form){
 					$item = new CDiv($item,'draggable');
 					$item->addOption('id','position_'.$r.'_'.$c);
 					if($editmode == 1)	$item->addOption('onclick','javascript: '.$onclick_action);
@@ -1130,38 +1133,43 @@
 				array_push($new_cols, $new_col);
 			}
 			
-			$rmv_icon = new Cimg('images/general/opened.gif');
-			if($empty_screen_row){
-				$rmv_row_link = 'javascript: location.href = '."'screenedit.php?config=1&screenid=".$screenid.'&rmv_row='.$r."';";
-			}
-			else{
-				$rmv_row_link = "javascript: if(Confirm('This screen-row is not empty. Delete it?')){".
+			if($editmode == 1){
+				$rmv_icon = new Cimg('images/general/opened.gif');
+				if($empty_screen_row){
+					$rmv_row_link = 'javascript: location.href = '."'screenedit.php?config=1&screenid=".$screenid.'&rmv_row='.$r."';";
+				}
+				else{
+					$rmv_row_link = "javascript: if(Confirm('This screen-row is not empty. Delete it?')){".
 									" location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_row=".$r."';}";
-			}
-			$rmv_icon->addAction('onclick',$rmv_row_link);
+				}
+				$rmv_icon->addAction('onclick',$rmv_row_link);
 			
-			array_push($new_cols, new Ccol($rmv_icon));
+				array_push($new_cols, new Ccol($rmv_icon));
+			}
 			$table->AddRow(new CRow($new_cols));
 		}
 		
-		
-		$add_row_link = 'screenedit.php?config=1&screenid='.$screenid.'&add_row=';
-		$new_cols = array(new Ccol(new Clink(new Cimg('images/general/closed.gif'), $add_row_link.$row['vsize'])));
-		for($c=0;$c<$row['hsize'];$c++){
-			$rmv_icon = new Cimg('images/general/opened.gif');
-			if(isset($empty_screen_col[$c])){
-				$rmv_col_link = "javascript: if(Confirm('This screen-column is not empty. Delete it?')){".
-									" location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_col=".$c."';}";
+		if($editmode == 1){
+			$add_row_link = 'screenedit.php?config=1&screenid='.$screenid.'&add_row=';
+			$new_cols = array(new Ccol(new Clink(new Cimg('images/general/closed.gif'), $add_row_link.$row['vsize'])));
+			for($c=0;$c<$row['hsize'];$c++){
+				$rmv_icon = new Cimg('images/general/opened.gif');
+				if(isset($empty_screen_col[$c])){
+					$rmv_col_link = "javascript: if(Confirm('This screen-column is not empty. Delete it?')){".
+										" location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_col=".$c."';}";
+				}
+				else{
+					$rmv_col_link = "javascript: location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_col=".$c."';";	
+				}
+				$rmv_icon->addAction('onclick',$rmv_col_link);
+				array_push($new_cols, new Ccol($rmv_icon));
 			}
-			else{
-				$rmv_col_link = "javascript: location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_col=".$c."';";	
-			}
-			$rmv_icon->addAction('onclick',$rmv_col_link);
-			array_push($new_cols, new Ccol($rmv_icon));
+			
+			array_push($new_cols, new Ccol(new Cimg('images/general/zero.gif','zero',1,1)));
+			$table->addRow($new_cols);
 		}
 		
-		array_push($new_cols, new Ccol(new Cimg('images/general/zero.gif','zero',1,1)));
-		$table->addRow($new_cols);
+
 	return $table;
 	}
 ?>
