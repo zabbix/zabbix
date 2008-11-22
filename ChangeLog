@@ -1,3 +1,7 @@
+Changes for 1.0.2
+
+ - [DEV-137] fixed call DBfree_resut before return from send_list_of_active_checks (Sasha)
+
 Changes for 1.0.1:
 
  - [DEV-230] changed ZABBIX notation to ZABICOM (Sasha)
