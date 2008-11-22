@@ -844,6 +844,7 @@
 			for($c=0;$c<$row['hsize'];$c++){
 				$item = array();
 				if(isset($skip_field[$r][$c]))		continue;
+				$item_form = false;
 				
 				$iresult=DBSelect('SELECT * FROM screens_items WHERE screenid='.$screenid.' AND x='.$c.' AND y='.$r);
 				$irow = DBfetch($iresult);
@@ -899,12 +900,14 @@
 					isset($_REQUEST['y']) && $_REQUEST['y']==$r)
 				{ // click on empty field
 					$item = get_screen_item_form();
+					$item_form = true;
 				}
 				else if(($editmode == 1) && isset($_REQUEST['form']) && 
 							isset($_REQUEST['screenitemid']) && 
 							(bccomp($_REQUEST['screenitemid'], $screenitemid)==0))
 				{ // click on element
 					$item = get_screen_item_form();
+					$item_form = true;
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_GRAPH) ){
 					if($editmode == 0)
@@ -1113,9 +1116,11 @@
 				if($valign == VALIGN_TOP)		$str_valign = 'top';
 				if($valign == VALIGN_BOTTOM)	$str_valign = 'bttm';
 
-				$item = new CDiv($item,'draggable');
-				$item->addOption('id','position_'.$r.'_'.$c);
-				if($editmode == 1)	$item->addOption('onclick','javascript: '.$onclick_action);
+				if(!$item_form){
+					$item = new CDiv($item,'draggable');
+					$item->addOption('id','position_'.$r.'_'.$c);
+					if($editmode == 1)	$item->addOption('onclick','javascript: '.$onclick_action);
+				}
 				
 				$new_col = new CCol($item,$str_halign.'_'.$str_valign);
 
