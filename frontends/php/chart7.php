@@ -21,7 +21,7 @@
 <?php
 	require_once "include/config.inc.php";
 	require_once "include/graphs.inc.php";
-	require_once "include/classes/pie.inc.php";
+	require_once "include/classes/cpie.inc.php";
 	
 	$page["file"]	= "chart7.php";
 	$page["title"]	= "S_CHART";
@@ -73,7 +73,7 @@ include_once "include/page_header.php";
 		}
 	}
 	
-	$graph = new Pie(get_request("graphtype"	,GRAPH_TYPE_NORMAL));
+	$graph = new CPie(get_request("graphtype"	,GRAPH_TYPE_NORMAL));
 	$graph->SetHeader($host["host"].":".get_request("name",""));
 	
 	$graph3d = get_request('graph3d',0);
