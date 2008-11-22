@@ -28,7 +28,7 @@
 
 int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 { /* usage: <function name>[ <process name>, <user name>, <mode>, <command> ] */
-
+#if defined(HAVE_PROC_0_PSINFO)
     DIR     *dir;
     struct  dirent *entries;
     struct  stat buf;
@@ -52,11 +52,13 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
     double	memsize = -1;
     int		proccount = 0;
+#endif
 
 	assert(result);
 
 	init_result(result);
 
+#if defined(HAVE_PROC_0_PSINFO)
 	if(num_param(param) > 4)
 	{
 		return SYSINFO_RET_FAIL;
@@ -242,11 +244,14 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	SET_UI64_RESULT(result, memsize);
     }
     return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif
 }
 
 int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 { /* usage: <function name>[ <process name>, <user name>, <process state>, <command> ] */
-
+#if defined(HAVE_PROC_0_PSINFO)
     DIR	*dir;
     struct	dirent *entries;
     struct	stat buf;
@@ -271,11 +276,13 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
     psinfo_t	psinfo;
 
     int		proccount=0;
-   
-        assert(result);
+#endif
 
-        init_result(result);
+	assert(result);
+
+	init_result(result);
  
+#if defined(HAVE_PROC_0_PSINFO)
         if(num_param(param) > 4)
         {
             return SYSINFO_RET_FAIL;
@@ -441,5 +448,8 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 	SET_UI64_RESULT(result, proccount);
         return	SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif
 }
 
