@@ -19,29 +19,29 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/graphs.inc.php";
-	require_once "include/classes/pie.inc.php";
+	require_once 'include/config.inc.php';
+	require_once 'include/graphs.inc.php';
+	require_once 'include/classes/cpie.inc.php';
 	
-	$page["file"]	= "chart6.php";
-	$page["title"]	= "S_CHART";
-	$page["type"]	= PAGE_TYPE_IMAGE;
+	$page['file']	= 'chart6.php';
+	$page['title']	= "S_CHART";
+	$page['type']	= PAGE_TYPE_IMAGE;
 
-include_once "include/page_header.php";
+include_once 'include/page_header.php';
 
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"graphid"=>		array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
-		"period"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
-		"from"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	null,		null),
-		"stime"=>		array(T_ZBX_STR, O_OPT,		P_SYS,		null,		null),
-		"border"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	IN('0,1'),	null),
-		"width"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
-		"height"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
-		"graph3d"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
-		"legend"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null)
+		'graphid'=>		array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
+		'period'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
+		'from'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	null,		null),
+		'stime'=>		array(T_ZBX_STR, O_OPT,		P_SYS,		null,		null),
+		'border'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	IN('0,1'),	null),
+		'width'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
+		'height'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
+		'graph3d'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
+		'legend'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null)
 	);
 
 	check_fields($fields);
@@ -58,33 +58,33 @@ include_once "include/page_header.php";
 	}
 	
 	$sql = 'SELECT g.*,h.host,h.hostid '.
-				' FROM graphs g '.
-					' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
-					' LEFT JOIN items i ON gi.itemid=i.itemid '.
-					' LEFT JOIN hosts h ON i.hostid=h.hostid '.
-				' WHERE g.graphid='.$_REQUEST['graphid'].
-					' AND '.DBcondition('h.hostid',$available_hosts);
+			' FROM graphs g '.
+				' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
+				' LEFT JOIN items i ON gi.itemid=i.itemid '.
+				' LEFT JOIN hosts h ON i.hostid=h.hostid '.
+			' WHERE g.graphid='.$_REQUEST['graphid'].
+				' AND '.DBcondition('h.hostid',$available_hosts);
 					
 	$db_data = DBfetch(DBselect($sql));
 	
-	$graph = new Pie($db_data["graphtype"]);
+	$graph = new CPie($db_data['graphtype']);
 
-	if(isset($_REQUEST["period"]))		$graph->SetPeriod($_REQUEST["period"]);
-	if(isset($_REQUEST["stime"]))		$graph->SetSTime($_REQUEST["stime"]);
-	if(isset($_REQUEST["border"]))		$graph->SetBorder(0);
+	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
+	if(isset($_REQUEST['stime']))		$graph->SetSTime($_REQUEST['stime']);
+	if(isset($_REQUEST['border']))		$graph->SetBorder(0);
 
-	$width = get_request("width", 0);
+	$width = get_request('width', 0);
 
-	if($width <= 0) $width = $db_data["width"];
+	if($width <= 0) $width = $db_data['width'];
 
-	$height = get_request("height", 0);
-	if($height <= 0) $height = $db_data["height"];
+	$height = get_request('height', 0);
+	if($height <= 0) $height = $db_data['height'];
 
 	$graph->SetWidth($width);
 	$graph->SetHeight($height);
-	$graph->SetHeader($db_data["host"].":".$db_data['name']);
+	$graph->SetHeader($db_data['host'].':'.$db_data['name']);
 
-	if($db_data['show_3d'] == 1) $graph->SwitchPie3D();
+	if($db_data['show_3d'] == 1) $graph->switchPie3D();
 	$graph->SwitchLegend($db_data['show_legend']);
 
 	$result = DBselect('SELECT gi.* '.
@@ -95,17 +95,17 @@ include_once "include/page_header.php";
 	while($db_data=DBfetch($result))
 	{
 		$graph->AddItem(
-			$db_data["itemid"],
-			$db_data["calc_fnc"],
-			$db_data["color"],
-			$db_data["type"],
-			$db_data["periods_cnt"]
+			$db_data['itemid'],
+			$db_data['calc_fnc'],
+			$db_data['color'],
+			$db_data['type'],
+			$db_data['periods_cnt']
 			);
 	}
 	$graph->draw();
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once 'include/page_footer.php';
 
 ?>

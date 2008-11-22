@@ -21,9 +21,9 @@
 <?php
 require_once "include/classes/graph.inc.php";
 
-class Pie extends Graph{
+class CPie extends Graph{
 
-function Pie($type = GRAPH_TYPE_PIE){
+function cpie($type = GRAPH_TYPE_PIE){
 	parent::Graph($type);
 	
 	$this->background = false;

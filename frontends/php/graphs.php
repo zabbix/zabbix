@@ -24,7 +24,7 @@
 	require_once('include/graphs.inc.php');
 	require_once('include/forms.inc.php');
 	require_once('include/classes/chart.inc.php');
-	require_once('include/classes/pie.inc.php');
+	require_once('include/classes/cpie.inc.php');
 	
 
 	$page['title'] = "S_CONFIGURATION_OF_GRAPHS";
@@ -49,8 +49,8 @@ include_once 'include/page_header.php';
 		'width'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		'height'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 
-		'ymin_type'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		'isset({save})'),
-		'ymax_type'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		'isset({save})'),
+		'ymin_type'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		null),
+		'ymax_type'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		null),
 
 		'graphtype'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2,3'),		'isset({save})'),
 		

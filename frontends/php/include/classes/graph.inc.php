@@ -33,13 +33,19 @@ define('GRAPH_ITEM_SIMPLE' , 	0);
 define('GRAPH_ITEM_AGGREGATED',	1);
 define('GRAPH_ITEM_SUM',		2);
 
-define('GRAPH_TYPE_NORMAL',	0);
+
+define('GRAPH_TYPE_NORMAL',		0);
 define('GRAPH_TYPE_STACKED',	1);
 
-define('GRAPH_TYPE_PIE', 2);
-define('GRAPH_TYPE_EXPLODED', 3);
-define('GRAPH_TYPE_3D',	4);
-define('GRAPH_TYPE_3D_EXPLODED', 5);
+define('GRAPH_TYPE_PIE',		2);
+define('GRAPH_TYPE_EXPLODED',	3);
+define('GRAPH_TYPE_3D',			4);
+define('GRAPH_TYPE_3D_EXPLODED',5);
+
+define('GRAPH_TYPE_BAR',			6);
+define('GRAPH_TYPE_COLUMN',			7);
+define('GRAPH_TYPE_BAR_STACKED',	8);
+define('GRAPH_TYPE_COLUMN_STACKED',	9);
 
 define('GRAPH_3D_ANGLE', 70);
 
@@ -95,7 +101,6 @@ class Graph{
 		$this->type = $type;			// graph type
 		
 		$this->axis_valuetype = array();		// overal items type (int/float)
-
 	}
 
 
@@ -156,7 +161,7 @@ class Graph{
 	}
 
 
-	function SetSTime($stime){
+	function setSTime($stime){
 		if($stime>200000000000 && $stime<220000000000){
 			$this->stime=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
 		}
@@ -278,7 +283,7 @@ class Graph{
 		imagestringup($this->im,0,$this->fullSizeX-10,$this->fullSizeY-50, 'http://www.zabbix.com', $this->GetColor('Gray'));
 	}
 
-	function GetColor($color,$alfa=50){
+	function getColor($color,$alfa=50){
 	
 		if(isset($this->colors[$color]))
 			return $this->colors[$color];
@@ -301,7 +306,7 @@ class Graph{
 		return imagecolorallocate($this->im,$RGB[0],$RGB[1],$RGB[2]);
 	}
 	
-	function GetShadow($color,$alfa=0){
+	function getShadow($color,$alfa=0){
 		
 		if(isset($this->colorsrgb[$color])){
 			$red = $this->colorsrgb[$color][0];
