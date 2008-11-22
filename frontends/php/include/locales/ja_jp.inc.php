@@ -27,21 +27,12 @@
 	"S_DATE_FORMAT_YMD"=>			"Y M d",
 	"S_HTML_CHARSET"=>			"UTF-8",
 
-	"S_INFORMATION_ABOUT_ZABBIX"=>		"ZABICOMの情報 (v1.1beta3)",
-	"S_HOMEPAGE_OF_ZABBIX"=>		"ZABICOMホームページ",
-	"S_HOMEPAGE_OF_ZABBIX_DETAILS"=>	"ZABICOM本家のホームページ",
-	"S_LATEST_ZABBIX_MANUAL"=>		"ZABICOMマニュアル",
-	"S_LATEST_ZABBIX_MANUAL_DETAILS"=>	"最新バージョンのZABICOMマニュアル",
 	"S_DOWNLOADS"=>				"ダウンロード",
-	"S_DOWNLOADS_DETAILS"=>			"最新バージョンのZABICOMリリース",
 	"S_FEATURE_REQUESTS"=>			"リクエスト",
 	"S_FEATURE_REQUESTS_DETAILS"=>		"機能追加の要求はこちら",
 	"S_FORUMS"=>				"フォーラム",
-	"S_FORUMS_DETAILS"=>			"ZABICOM本家フォーラム",
 	"S_BUG_REPORTS"=>			"バグレポート",
-	"S_BUG_REPORTS_DETAILS"=>		"ZABICOMのバグはこちら",
 	"S_MAILING_LISTS"=>			"メーリングリスト",
-	"S_MAILING_LISTS_DETAILS"=>		"ZABICOM本家のメーリングリスト",
 	
 //	actions.php
 	"S_ACTIONS"=>				"アクション",

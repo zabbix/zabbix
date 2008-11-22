@@ -179,8 +179,8 @@
 	"S_NEW_MAPPING"=>					"Nieuwe afbeelding",
 	"S_NO_MAPPING_DEFINED"=>			"Geen afbeelding gedefineerd",
 	"S_CREATE_VALUE_MAP"=>				"Maak waarde afbeelding",
-	"S_CONFIGURATION_OF_ZABBIX"=>		"Configuratie van ZABBIX",
-	"S_CONFIGURATION_OF_ZABBIX_BIG"=>	"CONFIGURATIE VAN ZABBIX",
+	"S_CONFIGURATION_OF_ZABBIX"=>		"Configuratie van ZABICOM",
+	"S_CONFIGURATION_OF_ZABBIX_BIG"=>	"CONFIGURATIE VAN ZABICOM",
 	"S_CONFIGURATION_UPDATED"=>			"Configuratie bijgewerkt",
 	"S_CONFIGURATION_WAS_NOT_UPDATED"=>	"Configuratie was niet bijgewerkt",
 	"S_ADDED_NEW_MEDIA_TYPE"=>			"Nieuw media type toegevoegd",
@@ -463,15 +463,15 @@
 	"S_HISTORY"=>						"Geschiedenis",
 	"S_TRENDS"=>						"Trends",
 	"S_SHORT_NAME"=>					"Korte naam",
-	"S_ZABBIX_AGENT"=>					"ZABBIX agent",
-	"S_ZABBIX_AGENT_ACTIVE"=>			"ZABBIX agent (actief)",
+	"S_ZABBIX_AGENT"=>					"ZABICOM agent",
+	"S_ZABBIX_AGENT_ACTIVE"=>			"ZABICOM agent (actief)",
 	"S_SNMPV1_AGENT"=>					"SNMPv1 agent",
-	"S_ZABBIX_TRAPPER"=>				"ZABBIX trapper",
+	"S_ZABBIX_TRAPPER"=>				"ZABICOM trapper",
 	"S_SIMPLE_CHECK"=>					"Simple check",
 	"S_SNMPV2_AGENT"=>					"SNMPv2 agent",
 	"S_SNMPV3_AGENT"=>					"SNMPv3 agent",
-	"S_ZABBIX_INTERNAL"=>				"ZABBIX intern",
-	"S_ZABBIX_AGGREGATE"=>				"ZABBIX gezamenlijk",
+	"S_ZABBIX_INTERNAL"=>				"ZABICOM intern",
+	"S_ZABBIX_AGGREGATE"=>				"ZABICOM gezamenlijk",
 	"S_ZABBIX_UNKNOWN"=>				"Onbekend",
 	"S_ACTIVE"=>						"Actief",
 	"S_NOT_ACTIVE"=>					"Niet actief",
@@ -550,7 +550,6 @@
 //	map.php
 	"S_OK_BIG"=>						"OK",
 	"S_PROBLEMS_SMALL"=>				"problemen",
-	"S_ZABBIX_URL"=>					"http://www.zabbix.com",
 
 //	maps.php
 	"S_NETWORK_MAPS"=>					"Netwerk mappen",
@@ -601,7 +600,7 @@
 	"S_MENU_IT_SERVICES"=>				"IT DIENSTEN",
 	"S_MENU_HOME"=>						"THUIS",
 	"S_MENU_ABOUT"=>					"IN OMLOOP",
-	"S_MENU_STATUS_OF_ZABBIX"=>			"STATUS VAN ZABBIX",
+	"S_MENU_STATUS_OF_ZABBIX"=>			"STATUS VAN ZABICOM",
 	"S_MENU_AVAILABILITY_REPORT"=>		"BESCHIKBAARHEIDS REPORT",
 	"S_MENU_CONFIG"=>					"CONFIG",
 	"S_MENU_USERS"=>					"GEBRUIKERS",
@@ -631,10 +630,10 @@
 	"S_MORE_THAN_5_MINUTES"=>			"Meer dan 5 minuten",
 
 //	report1.php
-	"S_STATUS_OF_ZABBIX"=>				"Status van ZABBIX",
-	"S_STATUS_OF_ZABBIX_BIG"=>			"STATUS van ZABBIX",
+	"S_STATUS_OF_ZABBIX"=>				"Status van ZABICOM",
+	"S_STATUS_OF_ZABBIX_BIG"=>			"STATUS van ZABICOM",
 	"S_VALUE"=>							"Waarde",
-	"S_ZABBIX_SERVER_IS_RUNNING"=>		"Zabbix Server Actief",
+	"S_ZABBIX_SERVER_IS_RUNNING"=>		"ZABICOM Server Actief",
 	"S_NUMBER_OF_VALUES_STORED"=>		"Aantal Opgeslagen Waardes",
 	"S_VALUES_STORED"=>					"Waardes Opgeslagen",
 	"S_NUMBER_OF_TRENDS_STORED"=>		"Aantal Opgeslagen Trends",
@@ -942,7 +941,6 @@
 	"S_CHINESE_CN"=>					"Chinese (CN)",
 
 //	index.php
-	"S_ZABBIX_BIG"=>					"ZABBIX",
 
 //	gastheerprofiles.php
 	"S_HOST_PROFILES"=>					"Gastheren profielen",

@@ -1,5 +1,6 @@
 Changes for 1.0.1:
 
+ - [DEV-230] changed ZABBIX notation to ZABICOM (Sasha)
  - [ZBX-602] fixed possible incorrect trigger evaluation if value sotred as "delta" (Sasha)
 
 Changes for 1.0.0:

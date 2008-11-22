@@ -185,8 +185,8 @@
 	"S_NEW_MAPPING"=>			"Ny mappning",
 	"S_NO_MAPPING_DEFINED"=>		"Ingen mappning definierad",
 	"S_CREATE_VALUE_MAP"=>			"Skapa värdeskarta",
-	"S_CONFIGURATION_OF_ZABBIX"=>		"Konfiguration av ZABBIX",
-	"S_CONFIGURATION_OF_ZABBIX_BIG"=>	"KONFIGURATION AV ZABBIX",
+	"S_CONFIGURATION_OF_ZABBIX"=>		"Konfiguration av ZABICOM",
+	"S_CONFIGURATION_OF_ZABBIX_BIG"=>	"KONFIGURATION AV ZABICOM",
 	"S_CONFIGURATION_UPDATED"=>		"Konfiguration uppdaterad",
 	"S_CONFIGURATION_WAS_NOT_UPDATED"=>	"Konfiguration blev inte uppdaterad",
 	"S_ADDED_NEW_MEDIA_TYPE"=>		"Lade till ny mediatyp",
@@ -469,15 +469,15 @@
 	"S_HISTORY"=>				"Historik",
 	"S_TRENDS"=>				"Trender",
 	"S_SHORT_NAME"=>			"Kortnamn",
-	"S_ZABBIX_AGENT"=>			"ZABBIX-agent",
-	"S_ZABBIX_AGENT_ACTIVE"=>		"ZABBIX-agent (aktiv)",
+	"S_ZABBIX_AGENT"=>			"ZABICOM-agent",
+	"S_ZABBIX_AGENT_ACTIVE"=>		"ZABICOM-agent (aktiv)",
 	"S_SNMPV1_AGENT"=>			"SNMPv1-agent",
-	"S_ZABBIX_TRAPPER"=>			"ZABBIX-fångare",
+	"S_ZABBIX_TRAPPER"=>			"ZABICOM-fångare",
 	"S_SIMPLE_CHECK"=>			"Enkel kontroll",
 	"S_SNMPV2_AGENT"=>			"SNMPv2-agent",
 	"S_SNMPV3_AGENT"=>			"SNMPv3-agent",
-	"S_ZABBIX_INTERNAL"=>			"ZABBIX internt",
-	"S_ZABBIX_AGGREGATE"=>			"ZABBIX samlat",
+	"S_ZABBIX_INTERNAL"=>			"ZABICOM internt",
+	"S_ZABBIX_AGGREGATE"=>			"ZABICOM samlat",
 	"S_ZABBIX_UNKNOWN"=>			"Okänd",
 	"S_ACTIVE"=>				"Aktiv",
 	"S_NOT_ACTIVE"=>			"Inte aktiv",
@@ -556,7 +556,6 @@
 //	map.php
 	"S_OK_BIG"=>				"OK",
 	"S_PROBLEMS_SMALL"=>			"problem",
-	"S_ZABBIX_URL"=>			"http://www.zabbix.com",
 
 //	maps.php
 	"S_NETWORK_MAPS"=>			"Nätverkskartor",
@@ -607,7 +606,7 @@
 	"S_MENU_IT_SERVICES"=>			"IT-TJÄNSTER",
 	"S_MENU_HOME"=>				"HEM",
 	"S_MENU_ABOUT"=>			"OM",
-	"S_MENU_STATUS_OF_ZABBIX"=>		"STATUS FÖR ZABBIX",
+	"S_MENU_STATUS_OF_ZABBIX"=>		"STATUS FÖR ZABICOM",
 	"S_MENU_AVAILABILITY_REPORT"=>		"TILLGÄNGLIGHETSRAPPORT",
 	"S_MENU_CONFIG"=>			"KONFIGURATION",
 	"S_MENU_USERS"=>			"ANVÄNDARE",
@@ -637,10 +636,10 @@
 	"S_MORE_THAN_5_MINUTES"=>		"Mer än 5 minuter",
 
 //	report1.php
-	"S_STATUS_OF_ZABBIX"=>			"Status för ZABBIX",
-	"S_STATUS_OF_ZABBIX_BIG"=>		"STATUS FÖR ZABBIX",
+	"S_STATUS_OF_ZABBIX"=>			"Status för ZABICOM",
+	"S_STATUS_OF_ZABBIX_BIG"=>		"STATUS FÖR ZABICOM",
 	"S_VALUE"=>				"Värde",
-	"S_ZABBIX_SERVER_IS_RUNNING"=>		"ZABBIX-server kör",
+	"S_ZABBIX_SERVER_IS_RUNNING"=>		"ZABICOM-server kör",
 	"S_NUMBER_OF_VALUES_STORED"=>		"Antal lagrade värden",
 	"S_VALUES_STORED"=>			"Lagrade värden",
 	"S_NUMBER_OF_TRENDS_STORED"=>		"Antal lagrade trender",
@@ -950,7 +949,6 @@
 	"S_SWEDISH_SV"=>			"Svenska (SV)",
 
 //	index.php
-	"S_ZABBIX_BIG"=>			"ZABBIX",
 
 //	hostprofiles.php
 	"S_HOST_PROFILES"=>			"Värdprofiler",

@@ -128,8 +128,8 @@
 	"S_YELLOW"=>				"Giallo",
 
 //	config.php
-	"S_CONFIGURATION_OF_ZABBIX"=>		"Configurazione di ZABBIX",
-	"S_CONFIGURATION_OF_ZABBIX_BIG"=>	"CONFIGURAZIONE DI ZABBIX",
+	"S_CONFIGURATION_OF_ZABBIX"=>		"Configurazione di ZABICOM",
+	"S_CONFIGURATION_OF_ZABBIX_BIG"=>	"CONFIGURAZIONE DI ZABICOM",
 	"S_CONFIGURATION_UPDATED"=>		"Configurazione aggiornata",
 	"S_CONFIGURATION_WAS_NOT_UPDATED"=>	"La configuration non è stata aggiornat",
 	"S_ADDED_NEW_MEDIA_TYPE"=>		"Nuovo mezzo aggiunto",
@@ -320,14 +320,14 @@
 	"S_HISTORY"=>				"Storico",
 	"S_TRENDS"=>				"Trends (in gg)",
 	"S_SHORT_NAME"=>			"Abbreviazione",
-	"S_ZABBIX_AGENT"=>			"Modulo ZABBIX (PASSIVO)",
-	"S_ZABBIX_AGENT_ACTIVE"=>		"Modulo ZABBIX (ATTIVO)",
+	"S_ZABBIX_AGENT"=>			"Modulo ZABICOM (PASSIVO)",
+	"S_ZABBIX_AGENT_ACTIVE"=>		"Modulo ZABICOM (ATTIVO)",
 	"S_SNMPV1_AGENT"=>			"Modulo SNMPv1",
-	"S_ZABBIX_TRAPPER"=>			"Trapper ZABBIX",
+	"S_ZABBIX_TRAPPER"=>			"Trapper ZABICOM",
 	"S_SIMPLE_CHECK"=>			"Controlli base",
 	"S_SNMPV2_AGENT"=>			"Modulo SNMPv2",
 	"S_SNMPV3_AGENT"=>			"Modulo SNMPv3",
-	"S_ZABBIX_INTERNAL"=>			"ZABBIX interno",
+	"S_ZABBIX_INTERNAL"=>			"ZABICOM interno",
 	"S_ZABBIX_UNKNOWN"=>			"Sconosciuto",
 	"S_ACTIVE"=>				"Attivo",
 	"S_NOT_ACTIVE"=>			"Non attivo",
@@ -386,7 +386,6 @@
 //	map.php
 	"S_OK_BIG"=>				"OK",
 	"S_PROBLEMS_SMALL"=>			"Problemi...",
-	"S_ZABBIX_URL"=>			"http://www.zabbix.com",
 
 //	maps.php
 	"S_NETWORK_MAPS"=>			"Mappe di rete",
@@ -706,7 +705,6 @@
 	"S_ITALIAN_IT"=>			"Italiano (IT)",
 
 //	index.php
-	"S_ZABBIX_BIG"=>			"ZABBIX",
 
 //	bulkloader.php
 	"S_MENU_BULKLOADER"=>			"Bulkloader",

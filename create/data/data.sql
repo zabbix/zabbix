@@ -34,7 +34,7 @@ INSERT INTO scripts VALUES (2,'Traceroute','/usr/bin/traceroute {HOST.CONN}',0);
 -- Dumping data for table `users`
 --
 
-INSERT INTO users VALUES (1,'Admin','Zabbix','Administrator','d41d8cd98f00b204e9800998ecf8427e','',900,'en_gb',30,3);
+INSERT INTO users VALUES (1,'Admin','Zabicom','Administrator','d41d8cd98f00b204e9800998ecf8427e','',900,'en_gb',30,3);
 INSERT INTO users VALUES (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e','',900,'en_gb',30,1);
 
 --
@@ -47,7 +47,7 @@ INSERT INTO usrgrp VALUES (3,'Network administrators');
 INSERT INTO usrgrp VALUES (4,'Security specialists');
 INSERT INTO usrgrp VALUES (5,'WEB administrators');
 INSERT INTO usrgrp VALUES (6,'Head of IT department');
-INSERT INTO usrgrp VALUES (7,'Zabbix administrators');
+INSERT INTO usrgrp VALUES (7,'Zabicom administrators');
 INSERT INTO usrgrp VALUES (8,'Guests');
 
 --
@@ -296,7 +296,7 @@ INSERT INTO hosts_groups VALUES (12,10024,1);
 --
 
 
-insert into help_items values (3,'icmpping','Checks if server is accessible by ICMP ping	0 - ICMP ping fails 1 - ICMP ping successful	One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds.');
+insert into help_items values (3,'icmpping','Checks if server is accessible by ICMP ping	0 - ICMP ping fails 1 - ICMP ping successful	One of ZABICOM server (zabbix_server) processes performs ICMP pings once per PingerFrequency seconds.');
 insert into help_items values (3,'icmppingsec','Return ICMP ping response time	Number of seconds Example: 0.02');
 insert into help_items values (3,'ftp&lt;,port&gt;','Checks if FTP server is running and accepting connections	0 - FTP server is down 1 - FTP server is running');
 insert into help_items values (3,'http&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections	0 - HTTP server is down 1 - HTTP server is running');
@@ -327,7 +327,7 @@ insert into help_items values (5,'zabbix[triggers]','Number of triggers in ZABIC
 insert into help_items values (8,'grpfunc(&lt;Group&gt;,&lt;Key&gt;,&lt;func&gt;,&lt;param&gt;)','Aggregate checks do not require any agent running on a host being monitored. ZABICOM server collects aggregate information by doing direct database queries. See ZABICOM Manual.');
 
 insert into help_items values(0,'agent.ping','Check the agent usability. Always return 1. Can be used as a TCP ping.');
-insert into help_items values(0,'agent.version','Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1');
+insert into help_items values(0,'agent.version','Version of ZABICOM agent (zabbix_agent(d)) running on monitored host. String value. Example of returned value: 1.1');
 insert into help_items values(0,'kernel.maxfiles','Maximum number of opened files supported by OS.');
 insert into help_items values(0,'kernel.maxproc','Maximum number of processes supported by OS.');
 insert into help_items values(0,'net.if.collisions[if]','Out-of-window collision. Collisions count.');
@@ -344,7 +344,7 @@ insert into help_items values(0,'system.cpu.intr','Device interrupts.');
 insert into help_items values(0,'system.cpu.load[&lt;cpu&gt; &lt;,mode&gt;]','CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage.');
 insert into help_items values(0,'system.cpu.switches','Context switches.');
 insert into help_items values(0,'system.cpu.util[&lt;cpu&gt; &lt;,type&gt; &lt;,mode&gt;]','CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used.');
-insert into help_items values(0,'system.hostname','Return host name. String value. Example of returned value: www.zabbix.com');
+insert into help_items values(0,'system.hostname','Return host name. String value. Example of returned value: www.zabicom.com');
 insert into help_items values(0,'system.localtime','System local time. Time in seconds.');
 insert into help_items values(0,'system.swap.in[&lt;swap&gt; &lt;,type&gt;]','Swap in. If type is count - swapins is returned. If type is pages - pages swapped in is returned.	If swap is missing all is used.');
 insert into help_items values(0,'system.swap.out[&lt;swap&gt; &lt;,type&gt;]','Swap out. If type is count - swapouts is returned. If type is pages - pages swapped in is returned.  If swap is missing all is used.');
@@ -356,10 +356,10 @@ insert into help_items values(0,'vfs.dev.read[device &lt;,type&gt; &lt;,mode&gt;
 insert into help_items values(0,'vfs.dev.write[device &lt;,type&gt; &lt;,mode&gt;]','Device write statistics.');
 insert into help_items values(0,'vfs.file.cksum[file]','Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum.	Example: vfs.file.cksum[/etc/passwd]');
 insert into help_items values(0,'vfs.file.exists[file]','Check file existance. 0 - file does not exists, 1 - file exists');
-insert into help_items values(0,'vfs.file.md5sum[file]','Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/etc/zabbix/zabbix_agentd.conf]');
+insert into help_items values(0,'vfs.file.md5sum[file]','Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/etc/passwd]');
 insert into help_items values(0,'vfs.file.regexp[file, user]','');
 insert into help_items values(0,'vfs.file.regmatch[file, user]','');
-insert into help_items values(0,'vfs.file.size[file]','Size of a given file. Size in bytes. File must have read permissions for user zabbix. Example: vfs.file.size[/var/log/syslog]');
+insert into help_items values(0,'vfs.file.size[file]','Size of a given file. Size in bytes. File must have read permissions for user zabicom. Example: vfs.file.size[/var/log/syslog]');
 insert into help_items values(0,'vfs.file.time[file&lt;, mode&gt;]','File time information. Number of seconds.	The mode is optional. If mode is missing modify is used.');
 insert into help_items values(0,'vfs.fs.inode[fs &lt;,mode&gt;]','Number of inodes for a given volume. If mode is missing total is used.');
 insert into help_items values(0,'vfs.fs.size[fs &lt;,mode&gt;]','Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free].');
@@ -419,7 +419,7 @@ INSERT INTO items VALUES (10055,0,'','',161,10001,'Maximum number of processes',
 INSERT INTO items VALUES (10056,0,'','',161,10001,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10057,0,'','',161,10001,'Host name','system.hostname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10058,0,'','',161,10001,'Host information','system.uname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
-INSERT INTO items VALUES (10059,0,'','',161,10001,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
+INSERT INTO items VALUES (10059,0,'','',161,10001,'Version of ZABICOM agent (zabbix_agent(d)) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10060,0,'','',161,10001,'WEB (HTTP) server is running','net.tcp.service[http]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,1,'','');
 INSERT INTO items VALUES (10061,0,'','',161,10001,'Host status','status',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,2,'','');
 INSERT INTO items VALUES (10062,0,'','',161,10001,'Total number of inodes on $1','vfs.fs.inode[/,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
@@ -454,7 +454,7 @@ INSERT INTO items VALUES (10115,0,'','',161,10002,'Total memory','vm.memory.size
 INSERT INTO items VALUES (10119,0,'','',161,10002,'Total swap space','system.swap.size[,total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10137,0,'','',161,10002,'Number of running processes apache','proc_cnt[httpd]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10147,0,'','',161,10002,'Host information','system.uname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
-INSERT INTO items VALUES (10148,0,'','',161,10002,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
+INSERT INTO items VALUES (10148,0,'','',161,10002,'Version of ZABICOM agent (zabbix_agent(d)) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10150,0,'','',161,10002,'Host status','status',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,2,'','');
 INSERT INTO items VALUES (10156,0,'','',161,10002,'Total disk space on $1','vfs.fs.size[c:,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10200,0,'','',161,10003,'MySQL is alive','mysql[ping]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
@@ -722,7 +722,7 @@ INSERT INTO items VALUES (17405,0,'public','interfaces.ifTable.ifEntry.ifInOctet
 INSERT INTO items VALUES (17409,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10002,'Average disk read queue length','perf_counter[\\PhysicalDisk(_Total)\\Avg. Disk Read QUeue Length]',30,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','');
 INSERT INTO items VALUES (17411,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10002,'Average disk write queue length','perf_counter[\\PhysicalDisk(_Total)\\Avg. Disk Write Queue Length]',30,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','');
 INSERT INTO items VALUES (17412,0,'','',161,10008,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
-INSERT INTO items VALUES (17413,0,'','',161,10008,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (17413,0,'','',161,10008,'Version of ZABICOM agent (zabbix_agent(d)) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17414,0,'','',161,10008,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17415,0,'','',161,10008,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17416,0,'','',161,10008,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -824,7 +824,7 @@ INSERT INTO items VALUES (17511,0,'','',161,10008,'Free memory','vm.memory.size[
 INSERT INTO items VALUES (17512,0,'','',161,10008,'Shared memory','vm.memory.size[shared]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17513,0,'','',161,10008,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17514,0,'','',161,10009,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
-INSERT INTO items VALUES (17515,0,'','',161,10009,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (17515,0,'','',161,10009,'Version of ZABICOM agent (zabbix_agent(d)) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17516,0,'','',161,10009,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17517,0,'','',161,10009,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17518,0,'','',161,10009,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -926,7 +926,7 @@ INSERT INTO items VALUES (17613,0,'','',161,10009,'Free memory','vm.memory.size[
 INSERT INTO items VALUES (17614,0,'','',161,10009,'Shared memory','vm.memory.size[shared]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17615,0,'','',161,10009,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17616,0,'','',161,10010,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
-INSERT INTO items VALUES (17617,0,'','',161,10010,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (17617,0,'','',161,10010,'Version of ZABICOM agent (zabbix_agent(d)) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17618,0,'','',161,10010,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17619,0,'','',161,10010,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17620,0,'','',161,10010,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -1028,7 +1028,7 @@ INSERT INTO items VALUES (17715,0,'','',161,10010,'Free memory','vm.memory.size[
 INSERT INTO items VALUES (17716,0,'','',161,10010,'Shared memory','vm.memory.size[shared]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17717,0,'','',161,10010,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17718,0,'','',161,10011,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
-INSERT INTO items VALUES (17719,0,'','',161,10011,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (17719,0,'','',161,10011,'Version of ZABICOM agent (zabbix_agent(d)) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17720,0,'','',161,10011,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17721,0,'','',161,10011,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17722,0,'','',161,10011,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -1130,7 +1130,7 @@ INSERT INTO items VALUES (17817,0,'','',161,10011,'Free memory','vm.memory.size[
 INSERT INTO items VALUES (17818,0,'','',161,10011,'Shared memory','vm.memory.size[shared]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17819,0,'','',161,10011,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17820,0,'','',161,10012,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
-INSERT INTO items VALUES (17821,0,'','',161,10012,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (17821,0,'','',161,10012,'Version of ZABICOM agent (zabbix_agent(d)) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17822,0,'','',161,10012,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17823,0,'','',161,10012,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17824,0,'','',161,10012,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -1232,7 +1232,7 @@ INSERT INTO items VALUES (17919,0,'','',161,10012,'Free memory','vm.memory.size[
 INSERT INTO items VALUES (17920,0,'','',161,10012,'Shared memory','vm.memory.size[shared]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17921,0,'','',161,10012,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17922,0,'','',161,10013,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
-INSERT INTO items VALUES (17923,0,'','',161,10013,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (17923,0,'','',161,10013,'Version of ZABICOM agent (zabbix_agent(d)) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17924,0,'','',161,10013,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17925,0,'','',161,10013,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17926,0,'','',161,10013,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -1334,7 +1334,7 @@ INSERT INTO items VALUES (18021,0,'','',161,10013,'Free memory','vm.memory.size[
 INSERT INTO items VALUES (18022,0,'','',161,10013,'Shared memory','vm.memory.size[shared]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18023,0,'','',161,10013,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18024,0,'','',161,10014,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
-INSERT INTO items VALUES (18025,0,'','',161,10014,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (18025,0,'','',161,10014,'Version of ZABICOM agent (zabbix_agent(d)) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18026,0,'','',161,10014,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18027,0,'','',161,10014,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18028,0,'','',161,10014,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -1436,7 +1436,7 @@ INSERT INTO items VALUES (18123,0,'','',161,10014,'Free memory','vm.memory.size[
 INSERT INTO items VALUES (18124,0,'','',161,10014,'Shared memory','vm.memory.size[shared]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18125,0,'','',161,10014,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18126,0,'','',161,10015,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
-INSERT INTO items VALUES (18127,0,'','',161,10015,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (18127,0,'','',161,10015,'Version of ZABICOM agent (zabbix_agent(d)) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18128,0,'','',161,10015,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18129,0,'','',161,10015,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18130,0,'','',161,10015,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -1745,7 +1745,7 @@ INSERT INTO items VALUES (18432,1,'public','1.3.6.1.4.1.9.2.1.8.0',161,10016,'lm
 INSERT INTO items VALUES (18433,1,'public','1.3.6.1.4.1.9.2.1.1.0',161,10016,'lmemRomID','lmemRomID',60,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18434,1,'public','1.3.6.1.2.1.1.5.0',161,10016,'sysName','sysName',60,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18435,0,'','',161,10017,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10020,1,'','');
-INSERT INTO items VALUES (18436,0,'','',161,10017,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',10059,0,'','');
+INSERT INTO items VALUES (18436,0,'','',161,10017,'Version of ZABICOM agent (zabbix_agent(d)) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',10059,0,'','');
 INSERT INTO items VALUES (18437,0,'','',161,10017,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',10015,0,'','');
 INSERT INTO items VALUES (18438,0,'','',161,10017,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10056,0,'','');
 INSERT INTO items VALUES (18439,0,'','',161,10017,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10055,0,'','');
@@ -2796,13 +2796,13 @@ INSERT INTO triggers VALUES (10034,'{10202}<1','Apache is not running on {HOSTNA
 INSERT INTO triggers VALUES (10035,'{10225}<1','Mysql is not running on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10036,'{10231}<1','Syslogd is not running on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10037,'{10230}<1','Sshd is not running on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
-INSERT INTO triggers VALUES (10038,'{10237}<1','Zabbix_agentd is not running on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
-INSERT INTO triggers VALUES (10039,'{10238}<1','Zabbix_server is not running on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
+INSERT INTO triggers VALUES (10038,'{10237}<1','ZABICOM agent (zabbix_agentd) is not running on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
+INSERT INTO triggers VALUES (10039,'{10238}<1','ZABICOM server (zabbix_server) is not running on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10041,'{10204}<256','Configured max number of processes is too low on {HOSTNAME}','',0,2,1,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10042,'{10203}<512','Configured max number of opened files is too low on {HOSTNAME}','',0,2,1,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10043,'{10208}>0','Hostname was changed on {HOSTNAME}','',0,2,1,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10044,'{10207}>0','Host information was changed on {HOSTNAME}','',0,2,1,0,0,'','',0,0);
-INSERT INTO triggers VALUES (10045,'{10235}>0','Version of zabbix_agent(d) was changed on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
+INSERT INTO triggers VALUES (10045,'{10235}>0','Version of ZABICOM agent (zabbix_agent(d)) was changed on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10046,'{10236}=0','WEB (HTTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10047,'{10228}=2','Server {HOSTNAME} is unreachable','',0,2,4,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10048,'{10048}<10000','Lack of free memory on server {HOSTNAME}','',0,2,3,0,0,'','',0,0);
@@ -2815,7 +2815,7 @@ INSERT INTO triggers VALUES (10061,'{10240}>0','c:\\autoexec.bat has been change
 INSERT INTO triggers VALUES (10068,'{10068}<600','{HOSTNAME} has just been restarted','',0,2,3,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10081,'{10081}<1','Apache is not running on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10091,'{10091}>0','Host information was changed on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
-INSERT INTO triggers VALUES (10092,'{10243}>0','Version of zabbix_agent(d) was changed on {HOSTNAME}','',0,2,1,0,0,'','',0,0);
+INSERT INTO triggers VALUES (10092,'{10243}>0','Version of ZABICOM agent (zabbix_agent(d)) was changed on {HOSTNAME}','',0,2,1,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10094,'{10094}=2','Server {HOSTNAME} is unreachable','',0,2,3,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10163,'{11263}#1','Email (SMTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10164,'{11265}#1','FTP server is down on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
@@ -3068,13 +3068,13 @@ INSERT INTO triggers VALUES (12238,'{11327}<1','Apache is not running on {HOSTNA
 INSERT INTO triggers VALUES (12239,'{11328}<1','Mysql is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12240,'{11329}<1','Syslogd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12241,'{11330}<1','Sshd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12242,'{11331}<1','Zabbix_agentd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12243,'{11332}<1','Zabbix_server is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12242,'{11331}<1','ZABICOM agent (zabbix_agentd) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12243,'{11332}<1','ZABICOM server (zabbix_server) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12244,'{11333}<256','Configured max number of processes is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12245,'{11334}<512','Configured max number of opened files is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12246,'{11335}>0','Hostname was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12247,'{11336}>0','Host information was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12248,'{11337}>0','Version of zabbix_agent(d) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12248,'{11337}>0','Version of ZABICOM agent (zabbix_agent(d)) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12249,'{11338}=0','WEB (HTTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12250,'{11339}=2','Server {HOSTNAME} is unreachable','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12251,'{11340}<10','Low free disk space on {HOSTNAME} volume /tmp','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -3112,13 +3112,13 @@ INSERT INTO triggers VALUES (12282,'{11371}<1','Apache is not running on {HOSTNA
 INSERT INTO triggers VALUES (12283,'{11372}<1','Mysql is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12284,'{11373}<1','Syslogd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12285,'{11374}<1','Sshd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12286,'{11375}<1','Zabbix_agentd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12287,'{11376}<1','Zabbix_server is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12286,'{11375}<1','ZABICOM agent (zabbix_agentd) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12287,'{11376}<1','ZABICOM server (zabbix_server) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12288,'{11377}<256','Configured max number of processes is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12289,'{11378}<512','Configured max number of opened files is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12290,'{11379}>0','Hostname was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12291,'{11380}>0','Host information was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12292,'{11381}>0','Version of zabbix_agent(d) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12292,'{11381}>0','Version of ZABICOM agent (zabbix_agent(d)) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12293,'{11382}=0','WEB (HTTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12294,'{11383}=2','Server {HOSTNAME} is unreachable','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12295,'{11384}<10','Low free disk space on {HOSTNAME} volume /tmp','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -3156,13 +3156,13 @@ INSERT INTO triggers VALUES (12326,'{11415}<1','Apache is not running on {HOSTNA
 INSERT INTO triggers VALUES (12327,'{11416}<1','Mysql is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12328,'{11417}<1','Syslogd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12329,'{11418}<1','Sshd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12330,'{11419}<1','Zabbix_agentd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12331,'{11420}<1','Zabbix_server is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12330,'{11419}<1','ZABICOM agent (zabbix_agentd) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12331,'{11420}<1','ZABICOM server (zabbix_server) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12332,'{11421}<256','Configured max number of processes is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12333,'{11422}<512','Configured max number of opened files is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12334,'{11423}>0','Hostname was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12335,'{11424}>0','Host information was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12336,'{11425}>0','Version of zabbix_agent(d) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12336,'{11425}>0','Version of ZABICOM agent (zabbix_agent(d)) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12337,'{11426}=0','WEB (HTTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12338,'{11427}=2','Server {HOSTNAME} is unreachable','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12339,'{11428}<10','Low free disk space on {HOSTNAME} volume /tmp','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -3200,13 +3200,13 @@ INSERT INTO triggers VALUES (12370,'{11459}<1','Apache is not running on {HOSTNA
 INSERT INTO triggers VALUES (12371,'{11460}<1','Mysql is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12372,'{11461}<1','Syslogd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12373,'{11462}<1','Sshd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12374,'{11463}<1','Zabbix_agentd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12375,'{11464}<1','Zabbix_server is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12374,'{11463}<1','ZABICOM agent (zabbix_agentd) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12375,'{11464}<1','ZABICOM server (zabbix_server) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12376,'{11465}<256','Configured max number of processes is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12377,'{11466}<512','Configured max number of opened files is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12378,'{11467}>0','Hostname was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12379,'{11468}>0','Host information was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12380,'{11469}>0','Version of zabbix_agent(d) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12380,'{11469}>0','Version of ZABICOM agent (zabbix_agent(d)) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12381,'{11470}=0','WEB (HTTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12382,'{11471}=2','Server {HOSTNAME} is unreachable','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12383,'{11472}<10','Low free disk space on {HOSTNAME} volume /tmp','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -3244,13 +3244,13 @@ INSERT INTO triggers VALUES (12414,'{11503}<1','Apache is not running on {HOSTNA
 INSERT INTO triggers VALUES (12415,'{11504}<1','Mysql is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12416,'{11505}<1','Syslogd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12417,'{11506}<1','Sshd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12418,'{11507}<1','Zabbix_agentd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12419,'{11508}<1','Zabbix_server is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12418,'{11507}<1','ZABICOM agent (zabbix_agentd) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12419,'{11508}<1','ZABICOM server (zabbix_server) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12420,'{11509}<256','Configured max number of processes is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12421,'{11510}<512','Configured max number of opened files is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12422,'{11511}>0','Hostname was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12423,'{11512}>0','Host information was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12424,'{11513}>0','Version of zabbix_agent(d) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12424,'{11513}>0','Version of ZABICOM agent (zabbix_agent(d)) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12425,'{11514}=0','WEB (HTTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12426,'{11515}=2','Server {HOSTNAME} is unreachable','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12427,'{11516}<10','Low free disk space on {HOSTNAME} volume /tmp','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -3288,13 +3288,13 @@ INSERT INTO triggers VALUES (12458,'{11547}<1','Apache is not running on {HOSTNA
 INSERT INTO triggers VALUES (12459,'{11548}<1','Mysql is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12460,'{11549}<1','Syslogd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12461,'{11550}<1','Sshd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12462,'{11551}<1','Zabbix_agentd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12463,'{11552}<1','Zabbix_server is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12462,'{11551}<1','ZABICOM agent (zabbix_agentd) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12463,'{11552}<1','ZABICOM server (zabbix_server) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12464,'{11553}<256','Configured max number of processes is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12465,'{11554}<512','Configured max number of opened files is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12466,'{11555}>0','Hostname was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12467,'{11556}>0','Host information was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12468,'{11557}>0','Version of zabbix_agent(d) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12468,'{11557}>0','Version of ZABICOM agent (zabbix_agent(d)) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12469,'{11558}=0','WEB (HTTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12470,'{11559}=2','Server {HOSTNAME} is unreachable','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12471,'{11560}<10','Low free disk space on {HOSTNAME} volume /tmp','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -3332,13 +3332,13 @@ INSERT INTO triggers VALUES (12502,'{11591}<1','Apache is not running on {HOSTNA
 INSERT INTO triggers VALUES (12503,'{11592}<1','Mysql is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12504,'{11593}<1','Syslogd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12505,'{11594}<1','Sshd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12506,'{11595}<1','Zabbix_agentd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12507,'{11596}<1','Zabbix_server is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12506,'{11595}<1','ZABICOM agent (zabbix_agentd) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12507,'{11596}<1','ZABICOM server (zabbix_server) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12508,'{11597}<256','Configured max number of processes is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12509,'{11598}<512','Configured max number of opened files is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12510,'{11599}>0','Hostname was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12511,'{11600}>0','Host information was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12512,'{11601}>0','Version of zabbix_agent(d) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12512,'{11601}>0','Version of ZABICOM agent (zabbix_agent(d)) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12513,'{11602}=0','WEB (HTTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12514,'{11603}=2','Server {HOSTNAME} is unreachable','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12515,'{11604}<10','Low free disk space on {HOSTNAME} volume /tmp','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -3376,13 +3376,13 @@ INSERT INTO triggers VALUES (12546,'{11635}<1','Apache is not running on {HOSTNA
 INSERT INTO triggers VALUES (12547,'{11636}<1','Mysql is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12548,'{11637}<1','Syslogd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12549,'{11638}<1','Sshd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12550,'{11639}<1','Zabbix_agentd is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12551,'{11640}<1','Zabbix_server is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12550,'{11639}<1','ZABICOM agent (zabbix_agentd) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12551,'{11640}<1','ZABICOM server (zabbix_server) is not running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12552,'{11641}<256','Configured max number of processes is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12553,'{11642}<512','Configured max number of opened files is too low on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12554,'{11643}>0','Hostname was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12555,'{11644}>0','Host information was changed on {HOSTNAME}','',0,2,1,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12556,'{11645}>0','Version of zabbix_agent(d) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12556,'{11645}>0','Version of ZABICOM agent (zabbix_agent(d)) was changed on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12557,'{11646}=0','WEB (HTTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12558,'{11647}=2','Server {HOSTNAME} is unreachable','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12559,'{11648}<10','Low free disk space on {HOSTNAME} volume /tmp','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -3594,7 +3594,7 @@ INSERT INTO triggers VALUES (12764,'{11853}>100','icmpOutTimestampReps on {HOSTN
 INSERT INTO triggers VALUES (12765,'{11854}>100','icmpOutAddrMasks on {HOSTNAME} is too High','',0,2,3,0,0,' ','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12766,'{11855}>100','icmpOutAddrMaskReps on {HOSTNAME} is too High','',0,2,3,0,0,' ','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12767,'{11856}>1000','icmpOutRedirects on {HOSTNAME} is too High','',0,2,3,0,0,' ','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12768,'{11857}>0','Version of zabbix_agent(d) was changed on {HOSTNAME}','',0,2,3,0,0,'','',10045,0);
+INSERT INTO triggers VALUES (12768,'{11857}>0','Version of ZABICOM agent (zabbix_agent(d)) was changed on {HOSTNAME}','',0,2,3,0,0,'','',10045,0);
 INSERT INTO triggers VALUES (12769,'{11858}<512','Configured max number of opened files is too low on {HOSTNAME}','',0,2,1,0,0,'','',10042,0);
 INSERT INTO triggers VALUES (12770,'{11859}<256','Configured max number of processes is too low on {HOSTNAME}','',0,2,1,0,0,'','',10041,0);
 INSERT INTO triggers VALUES (12771,'{11860}=0','FTP server is down on {HOSTNAME}','',0,2,3,0,0,'','',10023,0);
@@ -3610,8 +3610,8 @@ INSERT INTO triggers VALUES (12780,'{11869}<1','Inetd is not running on {HOSTNAM
 INSERT INTO triggers VALUES (12781,'{11870}<1','Mysql is not running on {HOSTNAME}','',0,2,3,0,0,'','',10035,0);
 INSERT INTO triggers VALUES (12782,'{11871}<1','Sshd is not running on {HOSTNAME}','',0,2,3,0,0,'','',10037,0);
 INSERT INTO triggers VALUES (12783,'{11872}<1','Syslogd is not running on {HOSTNAME}','',0,2,3,0,0,'','',10036,0);
-INSERT INTO triggers VALUES (12784,'{11873}<1','Zabbix_agentd is not running on {HOSTNAME}','',0,2,3,0,0,'','',10038,0);
-INSERT INTO triggers VALUES (12785,'{11874}<1','Zabbix_server is not running on {HOSTNAME}','',0,2,3,0,0,'','',10039,0);
+INSERT INTO triggers VALUES (12784,'{11873}<1','ZABICOM agent (zabbix_agentd) is not running on {HOSTNAME}','',0,2,3,0,0,'','',10038,0);
+INSERT INTO triggers VALUES (12785,'{11874}<1','ZABICOM server (zabbix_server) is not running on {HOSTNAME}','',0,2,3,0,0,'','',10039,0);
 INSERT INTO triggers VALUES (12786,'{11875}>300','Too many processes on {HOSTNAME}','',0,2,4,0,0,'','',10190,0);
 INSERT INTO triggers VALUES (12787,'{11876}=2','Server {HOSTNAME} is unreachable','',0,2,4,0,0,'','',10047,0);
 INSERT INTO triggers VALUES (12788,'{11877}>5','Processor load is too high on {HOSTNAME}','',0,2,3,0,0,'','',10010,0);

@@ -71,7 +71,7 @@ COpt::profiling_start("page");
 
 			if(isset($page['title']) && defined($page['title']))	$page['title'] = constant($page['title']);
 			
-			if(!isset($page['title'])) $page['title'] = 'ZABBIX';
+			if(!isset($page['title'])) $page['title'] = S_ZABICOM_BIG;
 			
 			if(defined('ZBX_DISTRIBUTED'))
 			{
@@ -413,7 +413,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				array("|", new CLink(S_PROFILE, "profile.php", "small_font")) :
 				null
 			);
-		$logo = new CLink(new CImg("images/general/zabicom.png","ZABBIX"),"http://www.zabicom.com");
+		$logo = new CLink(new CImg("images/general/zabicom.png", S_ZABICOM_BIG), S_ZABBIX_URL);
 		$logo->SetTarget('_blank');
 
 		$top_page_row	= array(new CCol($logo, "page_header_l"), new CCol($page_header_r_col, "page_header_r"));

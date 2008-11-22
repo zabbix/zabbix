@@ -47,7 +47,7 @@
 				1 => array('title' => '2. Licence Agreement'		, 'fnc' => 'Stage1' ),
 				2 => array('title' => '3. Check of pre-requisites'	, 'fnc' => 'Stage2' ),
 				3 => array('title' => '4. Configure DB connection'	, 'fnc' => 'Stage3' ),
-				4 => array('title' => '5. ZABBIX server details'	, 'fnc' => 'Stage4' ),
+				4 => array('title' => '5. ZABICOM server details'	, 'fnc' => 'Stage4' ),
 				//4 => array('title' => '5. Distributed monitoring'	, 'fnc' => 'Stage4' ),
 				5 => array('title' => '6. Pre-Installation Summary'	, 'fnc' => 'Stage5' ),
 				6 => array('title' => '7. Install'			, 'fnc' => 'Stage6' ),
@@ -142,8 +142,8 @@
 		function Stage0()
 		{
 
-			return new CTag('div', 'yes', 'Welcome to the ZABBIX frontend installation wizard.'.BR.BR.
-				'This installation wizard will guide you through the installation of ZABBIX frontend'.BR.BR.
+			return new CTag('div', 'yes', 'Welcome to the ZABICOM frontend installation wizard.'.BR.BR.
+				'This installation wizard will guide you through the installation of ZABICOM frontend'.BR.BR.
 				'Click to "Next" button to proceed to the next screen. If you want to change something '.
 				'on a previous screen, click "Previous" button'.BR.BR.
 				'You may cancel installation at any time by clicking "Cancel" button', 'text');
@@ -349,7 +349,7 @@
 			$table->AddRow(array(S_TYPE, $cmbType));
 			$table->AddRow(array(S_HOST, new CTextBox('server',		$this->GetConfig('DB_SERVER',	'localhost'))));
 			$table->AddRow(array(S_PORT, array(new CNumericBox('port',		$this->GetConfig('DB_PORT',	'0'),5),' 0 - use default port')));
-			$table->AddRow(array(S_NAME, new CTextBox('database',		$this->GetConfig('DB_DATABASE',	'zabbix'))));
+			$table->AddRow(array(S_NAME, new CTextBox('database',		$this->GetConfig('DB_DATABASE',	'zabicom'))));
 			$table->AddRow(array(S_USER, new CTextBox('user',		$this->GetConfig('DB_USER',	'root'))));
 			$table->AddRow(array(S_PASSWORD, new CPassBox('password',	$this->GetConfig('DB_PASSWORD',	''))));
 
@@ -379,7 +379,7 @@
 
 			return array(
 				'Please enter host name or host IP address', BR,
-				'and port number of ZABBIX server', BR, BR,
+				'and port number of ZABICOM server', BR, BR,
 				$table,
 				);
 		}
@@ -443,8 +443,8 @@
 
 			$table1 = new CTable(null, 'requirements');
 			$table1->SetAlign('center');
-			$table1->AddRow(array('ZABBIX server:',		$this->GetConfig('ZBX_SERVER',		'unknown')));
-			$table1->AddRow(array('ZABBIX server port:',	$this->GetConfig('ZBX_SERVER_PORT',	'unknown')));
+			$table1->AddRow(array('ZABICOM server:',		$this->GetConfig('ZBX_SERVER',		'unknown')));
+			$table1->AddRow(array('ZABICOM server port:',	$this->GetConfig('ZBX_SERVER_PORT',	'unknown')));
 			return array(
 				'Please check configuration parameters.', BR,
 				'If all correct press "Next" button, or "Previous" button to change configuration parameters.', BR, BR,
@@ -513,7 +513,7 @@
 		function Stage7()
 		{
 			return array(
-				'Congratulation with succesfull instalation of ZABBIX frontend.',BR,BR,
+				'Congratulation with succesfull instalation of ZABICOM frontend.',BR,BR,
 				'Press "Finish" button to complete installation'
 				);
 		}
@@ -535,7 +535,7 @@
 
 			$DB_SERVER	= $this->GetConfig('DB_SERVER',		'localhost');
 			$DB_PORT	= $this->GetConfig('DB_PORT',		'0');
-			$DB_DATABASE	= $this->GetConfig('DB_DATABASE',	'zabbix');
+			$DB_DATABASE	= $this->GetConfig('DB_DATABASE',	'zabicom');
 			$DB_USER	= $this->GetConfig('DB_USER',		'root');
 			$DB_PASSWORD	= $this->GetConfig('DB_PASSWORD',	'');
 
@@ -546,8 +546,8 @@
 			}
 			else
 			{
-				$result = DBexecute('create table zabbix_installation_test ( test_row integer )');
-				$result &= DBexecute('drop table zabbix_installation_test');
+				$result = DBexecute('create table zabicom_installation_test ( test_row integer )');
+				$result &= DBexecute('drop table zabicom_installation_test');
 			}
 			
 			DBclose();
@@ -765,7 +765,7 @@
 				$this->SetConfig('DB_TYPE',	get_request('type',	$this->GetConfig('DB_TYPE')));
 				$this->SetConfig('DB_SERVER',	get_request('server',	$this->GetConfig('DB_SERVER',	'localhost')));
 				$this->SetConfig('DB_PORT',	get_request('port',	$this->GetConfig('DB_PORT',	'0')));
-				$this->SetConfig('DB_DATABASE',	get_request('database',	$this->GetConfig('DB_DATABASE',	'zabbix')));
+				$this->SetConfig('DB_DATABASE',	get_request('database',	$this->GetConfig('DB_DATABASE',	'zabicom')));
 				$this->SetConfig('DB_USER',	get_request('user',	$this->GetConfig('DB_USER',	'root')));
 				$this->SetConfig('DB_PASSWORD',	get_request('password',	$this->GetConfig('DB_PASSWORD',	'')));
 		

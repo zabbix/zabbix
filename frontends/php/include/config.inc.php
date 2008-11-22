@@ -98,7 +98,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	$ZBX_LOCALNODEID = 0;
 	$ZBX_LOCMASTERID = 0;
 
-	$ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
+	$ZBX_CONFIGURATION_FILE = './conf/zabicom.conf.php';
 
 	$ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).'/'.basename($ZBX_CONFIGURATION_FILE);
 
