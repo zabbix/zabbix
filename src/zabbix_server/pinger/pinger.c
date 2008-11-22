@@ -283,7 +283,6 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 			}
 
 			process_new_value(&item, &value, tp->time, tp->millitm);
-			update_triggers(item.itemid, tp->time, tp->millitm);
 
 			free_result(&value);
 		}

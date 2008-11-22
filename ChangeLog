@@ -1,3 +1,7 @@
+Changes for 1.0.1:
+
+ - [ZBX-602] fixed possible incorrect trigger evaluation if value sotred as "delta" (Sasha)
+
 Changes for 1.0.0:
 
  - [DEV-242] added improved map configuration (Artem)
