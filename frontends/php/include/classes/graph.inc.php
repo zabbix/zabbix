@@ -284,7 +284,6 @@ class Graph{
 	}
 
 	function getColor($color,$alfa=50){
-	
 		if(isset($this->colors[$color]))
 			return $this->colors[$color];
 			
