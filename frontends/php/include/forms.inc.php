@@ -5471,11 +5471,11 @@
 					$ipmi_ip= $db_host['ip'];
 				}
 			}
-			else
-			{
+			else{
 				$ip		= $db_host['ip'];
 				$dns		= $db_host['dns'];
 			}
+			
 			$ipmi_port		= $db_host['ipmi_port'];
 			$ipmi_authtype		= $db_host['ipmi_authtype'];
 			$ipmi_privilege		= $db_host['ipmi_privilege'];
@@ -5557,7 +5557,7 @@
 		if(isset($_REQUEST['hostid']))		$frmHost->AddVar('hostid',$_REQUEST['hostid']);
 		if(isset($_REQUEST['groupid']))		$frmHost->AddVar('groupid',$_REQUEST['groupid']);
 		
-		$frmHost->AddRow(S_NAME,new CTextBox('host',$host,20));
+		$frmHost->AddRow(S_NAME,new CTextBox('host',$host,54));
 
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 		$grp_tb = new CTweenBox($frmHost,'groups',$groups,10);	

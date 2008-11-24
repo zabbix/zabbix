@@ -26,8 +26,8 @@
 	require_once('include/events.inc.php');
 	require_once('include/scripts.inc.php');
 
-	$page["file"] = "tr_status.php";
-	$page["title"] = "S_STATUS_OF_TRIGGERS";
+	$page['file'] = 'tr_status.php';
+	$page['title'] = "S_STATUS_OF_TRIGGERS";
 	$page['scripts'] = array('blink.js');
 	$page['hist_arg'] = array('groupid','hostid');
 	
@@ -417,6 +417,8 @@ include_once "include/page_header.php";
 	$m_form = new CForm('acknow.php');
 	$m_form->SetName('tr_status');
 
+	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
+	
 	$table  = new CTableInfo();
 	$table->ShowStart();
 	
@@ -546,7 +548,7 @@ include_once "include/page_header.php";
 		
 		$dependency = false;
 		$dep_table = new CTableInfo();
-		$dep_table->AddOption('style', 'width: 200px;');
+		$dep_table->addOption('style', 'width: 200px;');
 		$dep_table->addRow(bold(S_DEPENDENT.':'));
 		
 		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.$row['triggerid'];
@@ -577,7 +579,7 @@ include_once "include/page_header.php";
 		$value = new CSpan($tr_status, get_trigger_value_style($row["value"]));
 
 		if($_REQUEST['show_actions']){
-			$actions=array(new CLink(S_CHANGE,'triggers.php?form=update&triggerid='.$row["triggerid"].url_param('hostid'),"action"));
+			$actions=array(new CLink(S_CHANGE,'triggers.php?form=update&triggerid='.$row['triggerid'].url_param('hostid'),'action'));
 		}
 		else{
 			$actions=NULL;
@@ -596,16 +598,19 @@ include_once "include/page_header.php";
 
 			$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 			$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-
+			if($admin_links){
+				$menus.= "['".S_HOST_CONFIGURATION."',\"javascript: redirect('hosts.php?form=update&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+			}
+				
 			$menus = rtrim($menus,',');
 			$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
 			
 			$host = new CSpan($row['host']);
-			$host->AddOption('onclick','javascript: '.$menus);
-			$host->AddOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
+			$host->addOption('onclick','javascript: '.$menus);
+			$host->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 		}
-
-			$table->AddRow(array(
+		
+			$table->addRow(array(
 				($config['event_ack_enable'])?SPACE:NULL,
 				new CCol(
 					get_severity_description($row['priority']),
@@ -616,6 +621,7 @@ include_once "include/page_header.php";
 				get_node_name_by_elid($row['triggerid']),
 				$host,
 				$description,
+//				$admin_links?(new CLink($description, 'triggers.php?form=update&triggerid='.$row['triggerid'].'&hostid='.$row['hostid'])):$description,
 				$actions,
 				($config['event_ack_enable'])?SPACE:NULL,
 				new CLink(zbx_empty($row['comments'])?S_ADD:S_SHOW,'tr_comments.php?triggerid='.$row['triggerid'],'action')
@@ -659,7 +665,7 @@ include_once "include/page_header.php";
 			$description = $font;
 		
 			$description = new CCol($description);
-			$description->AddOption('style','white-space: normal; width: 90%;');
+			$description->addOption('style','white-space: normal; width: 90%;');
 
 			$table->AddRow(array(
 					($config['event_ack_enable'])?(($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid']))):NULL,
