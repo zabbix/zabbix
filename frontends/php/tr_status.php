@@ -599,7 +599,7 @@ include_once "include/page_header.php";
 			$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 			$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			if($admin_links){
-				$menus.= "['".S_HOST_CONFIGURATION."',\"javascript: redirect('hosts.php?form=update&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+//				$menus.= "['".S_HOST_CONFIGURATION."',\"javascript: redirect('hosts.php?form=update&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 				
 			$menus = rtrim($menus,',');

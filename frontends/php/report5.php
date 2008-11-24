@@ -72,37 +72,60 @@ include_once "include/page_header.php";
 		default:	$time_dif=24*3600;	break;
 	}
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-		$sql = 'SELECT h.host, h.hostid, t.triggerid, t.description, t.expression, t.priority, count(distinct e.eventid) as cnt_event '.
-						' FROM hosts h, triggers t, functions f, items i, events e'.
-						' WHERE h.hostid = i.hostid '.
-							' and i.itemid = f.itemid '.
-							' and t.triggerid=f.triggerid '.
-							' and t.triggerid=e.objectid '.
-							' and e.object='.EVENT_OBJECT_TRIGGER.
-							' and e.clock>'.(time()-$time_dif).
-							' and '.DBcondition('h.hostid',$available_hosts).
-							' and '.DBin_node('t.triggerid').
-						' GROUP BY h.host,t.triggerid,t.description,t.expression,t.priority '.
-						' ORDER BY cnt_event desc, h.host, t.description, t.triggerid';
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$scripts_by_hosts = get_accessible_scripts_by_hosts($available_hosts);
 
-        $result=DBselect($sql, 100);
+	$sql = 'SELECT h.host, h.hostid, t.triggerid, t.description, t.expression, t.lastchange, t.priority, count(distinct e.eventid) as cnt_event '.
+					' FROM hosts h, triggers t, functions f, items i, events e'.
+					' WHERE h.hostid = i.hostid '.
+						' and i.itemid = f.itemid '.
+						' and t.triggerid=f.triggerid '.
+						' and t.triggerid=e.objectid '.
+						' and e.object='.EVENT_OBJECT_TRIGGER.
+						' and e.clock>'.(time()-$time_dif).
+						' and '.DBcondition('h.hostid',$available_hosts).
+						' and '.DBin_node('t.triggerid').
+					' GROUP BY h.host,t.triggerid,t.description,t.expression,t.priority '.
+					' ORDER BY cnt_event desc, h.host, t.description, t.triggerid';
 
-        while($row=DBfetch($result)){
-			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $available_hosts))
-				continue;
+	$result=DBselect($sql, 100);
 
-			$description = expand_trigger_description_by_data($row);
-			
-            $table->addRow(array(
-				get_node_name_by_elid($row['triggerid']),
-				$admin_links?(new CLink($row['host'], 'hosts.php?form=update&config=0&hostid='.$row['hostid'])):$row['host'],
-				$admin_links?(new CLink($description, 'triggers.php?form=update&triggerid='.$row['triggerid'].'&hostid='.$row['hostid'])):$description,
-				new CCol(get_severity_description($row["priority"]),get_severity_style($row["priority"])),
-				$row["cnt_event"],
-			));
+	while($row=DBfetch($result)){
+		if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $available_hosts))
+			continue;
+
+		$description = expand_trigger_description_by_data($row);
+		
+		$menus = '';
+		$host_nodeid = id2nodeid($row['hostid']);
+		foreach($scripts_by_hosts[$row['hostid']] as $id => $script){
+			$script_nodeid = id2nodeid($script['scriptid']);
+			if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
+				$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$row['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+		}
+
+		$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+
+		$menus = rtrim($menus,',');
+		$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
+		
+		$host = new CSpan($row['host']);
+		$host->addOption('onclick','javascript: '.$menus);
+		$host->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
+		
+		$table->addRow(array(
+			get_node_name_by_elid($row['triggerid']),
+			$host,
+			new CLink($description, 'events.php?triggerid='.$row['triggerid'].'&nav_time='.$row['lastchange']),
+			new CCol(get_severity_description($row["priority"]),get_severity_style($row["priority"])),
+			$row["cnt_event"],
+		));
 	}
 	$table->show();
+	
+	$jsmenu = new CPUMenu(null,170);
+	$jsmenu->InsertJavaScript();
 ?>
 <?php
 
