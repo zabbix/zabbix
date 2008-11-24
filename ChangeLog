@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-262] added group filtering  for "Trigger info" (Artem)
  - [DEV-259] added internal links (Artem)
  - [DEV-251] added improved screen editing (Artem)
  - [DEV-249] added support of advanced regular expressions (Artem,Sasha)

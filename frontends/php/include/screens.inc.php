@@ -662,7 +662,7 @@
 			
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 		}
-		else if($resourcetype == SCREEN_RESOURCE_HOSTS_INFO){  
+		else if(($resourcetype == SCREEN_RESOURCE_HOSTS_INFO) || ($resourcetype == SCREEN_RESOURCE_TRIGGERS_INFO)){ 
 // HOTS info
 			$caption = '';
 			$id=0;
@@ -695,15 +695,15 @@
 
 			$form->AddVar('resourceid',$id);
 			
-			$textfield = new Ctextbox('caption',$caption,60,'yes');
+			$textfield = new CTextbox('caption',$caption,60,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=host_group_scr&srcfld1=groupid&srcfld2=name',480,450);");
 			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
 			
 			$form->AddRow(S_GROUP,array($textfield,SPACE,$selectbtn));
 		}
 		else{
-// SCREEN_RESOURCE_TRIGGERS_INFO,  SCREEN_RESOURCE_CLOCK
-			$form->AddVar("resourceid",0);
+// SCREEN_RESOURCE_CLOCK
+			$form->addVar('resourceid',0);
 		}
 
 		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_HOSTS_INFO,SCREEN_RESOURCE_TRIGGERS_INFO))){
@@ -891,7 +891,7 @@
 					$onclick_action = "ZBX_SCREENS['".$_REQUEST['screenid']."'].screen.element_onclick('screenedit.php?form=update".url_param('screenid').'&screenitemid='.$screenitemid."#form');";
 					$action = 'screenedit.php?form=update'.url_param('screenid').'&screenitemid='.$screenitemid.'#form';
 				}
-				else if ($editmode == 1 && $screenitemid==0){
+				else if($editmode == 1 && $screenitemid==0){
 					$onclick_action = "ZBX_SCREENS['".$_REQUEST['screenid']."'].screen.element_onclick('screenedit.php?form=update".url_param('screenid').'&x='.$c.'&y='.$r."#form');";
 					$action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r.'#form';
 				}
@@ -1070,7 +1070,10 @@
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_INFO) ){
-					$item = array(new CTriggersInfo($style));
+					$item = new CTriggersInfo($style);
+					if($resourceid > 0)
+						$item->set_host_group($resourceid);
+					$item = array($item);
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SERVER_INFO) ){
