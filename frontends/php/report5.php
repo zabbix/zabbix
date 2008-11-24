@@ -39,7 +39,8 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$_REQUEST["period"] = get_request("period", "day");
-
+	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
+	
 	$form = new CForm();
 	$form->SetMethod('get');
 	
@@ -72,7 +73,7 @@ include_once "include/page_header.php";
 	}
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-		$sql = 'SELECT h.host, t.triggerid, t.description, t.expression, t.priority, count(distinct e.eventid) as cnt_event '.
+		$sql = 'SELECT h.host, h.hostid, t.triggerid, t.description, t.expression, t.priority, count(distinct e.eventid) as cnt_event '.
 						' FROM hosts h, triggers t, functions f, items i, events e'.
 						' WHERE h.hostid = i.hostid '.
 							' and i.itemid = f.itemid '.
@@ -91,10 +92,12 @@ include_once "include/page_header.php";
 			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $available_hosts))
 				continue;
 
+			$description = expand_trigger_description_by_data($row);
+			
             $table->addRow(array(
 				get_node_name_by_elid($row['triggerid']),
-				$row["host"],
-				expand_trigger_description_by_data($row),
+				$admin_links?(new CLink($row['host'], 'hosts.php?form=update&config=0&hostid='.$row['hostid'])):$row['host'],
+				$admin_links?(new CLink($description, 'triggers.php?form=update&triggerid='.$row['triggerid'].'&hostid='.$row['hostid'])):$description,
 				new CCol(get_severity_description($row["priority"]),get_severity_style($row["priority"])),
 				$row["cnt_event"],
 			));

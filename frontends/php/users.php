@@ -531,7 +531,7 @@ include_once('include/page_header.php');
 			}
 
 			$users_groups = array();
-			$sql = 'SELECT g.name, ug.userid '.
+			$sql = 'SELECT g.name, ug.usrgrpid, ug.userid '.
 					' FROM usrgrp g, users_groups ug '.
 					' WHERE g.usrgrpid=ug.usrgrpid '.
 						' AND '.DBcondition('ug.userid',$userids);
@@ -539,7 +539,7 @@ include_once('include/page_header.php');
 			while($db_group = DBfetch($db_groups)){
 				if(!isset($users_groups[$db_group['userid']])) $users_groups[$db_group['userid']] = array();
 				if(!empty($users_groups[$db_group['userid']])) $users_groups[$db_group['userid']][] = BR();
-				$users_groups[$db_group['userid']][] = $db_group['name'];
+				$users_groups[$db_group['userid']][] = new CLink($db_group['name'],'users.php?form=update&config=1&usrgrpid='.$db_group['usrgrpid'].'#form');
 			}
 
 			foreach($userids as $id => $userid){

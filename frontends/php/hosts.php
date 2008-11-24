@@ -1465,10 +1465,10 @@ include_once('include/page_header.php');
 
 		}
 	}
-	else if($_REQUEST["config"]==1){
+	else if($_REQUEST['config']==1){
 		echo SBR;
-		if(isset($_REQUEST["form"])){
-			insert_hostgroups_form(get_request("groupid",NULL));
+		if(isset($_REQUEST['form'])){
+			insert_hostgroups_form(get_request('groupid',NULL));
 		} 
 		else {
 			show_table_header(S_HOST_GROUPS_BIG);
@@ -1476,12 +1476,12 @@ include_once('include/page_header.php');
 			$form = new CForm('hosts.php');
 			
 			$form->SetName('groups');
-			$form->AddVar("config",get_request("config",0));
+			$form->AddVar('config',get_request('config',0));
 
 			$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
 
 			$table->setHeader(array(
-				array(	new CCheckBox("all_groups",NULL,
+				array(	new CCheckBox('all_groups',NULL,
 						"CheckAll('".$form->GetName()."','all_groups');"),
 					SPACE,
 					make_sorting_link(S_NAME,'g.name')),
@@ -1495,34 +1495,42 @@ include_once('include/page_header.php');
 							' WHERE '.DBcondition('g.groupid',$available_groups).
 							order_by('g.name'));
 			while($db_group=DBfetch($db_groups)){
-				$db_hosts = DBselect('SELECT DISTINCT h.host, h.status'.
+				$db_hosts = DBselect('SELECT DISTINCT h.host, h.hostid, h.status'.
 						' FROM hosts h, hosts_groups hg'.
 						' WHERE h.hostid=hg.hostid '.
 							' AND hg.groupid='.$db_group['groupid'].
 							' AND '.DBcondition('h.hostid',$available_hosts).
 							' AND h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
-						' order by host'
+						' ORDER BY h.host'
 						);
 
 				$hosts = array();
 				$count = 0;
 				while($db_host=DBfetch($db_hosts)){
-					$style = $db_host["status"]==HOST_STATUS_MONITORED ? NULL: ( 
-						$db_host["status"]==HOST_STATUS_TEMPLATE ? "unknown" :
-						"on");
+					$link = 'hosts.php?form=update&config=0&hostid='.$db_host['hostid'];
+					switch($db_host['status']){
+						case HOST_STATUS_MONITORED:
+							$style = null;
+							break;
+						case HOST_STATUS_TEMPLATE:
+							$style = 'unknown';
+							break;
+						default:
+							$style = 'on';
+					}
 
-					array_push($hosts, empty($hosts) ? '' : ', ', new CSpan($db_host["host"], $style));
+					array_push($hosts, empty($hosts)?'':', ', new CLink(new CSpan($db_host['host'], $style), $link));
 					$count++;
 				}
 
 				$table->AddRow(array(
 					array(
-						new CCheckBox('groups['.$db_group["groupid"].']',NULL,NULL,$db_group["groupid"]),
+						new CCheckBox('groups['.$db_group['groupid'].']',NULL,NULL,$db_group['groupid']),
 						SPACE,
 						new CLink(
-							$db_group["name"],
-							"hosts.php?form=update&groupid=".$db_group["groupid"].
-							url_param("config"),'action')
+							$db_group['name'],
+							'hosts.php?form=update&groupid='.$db_group['groupid'].
+							url_param('config'),'action')
 					),
 					$count,
 					new CCol((empty($hosts)?'-':$hosts),'wraptext')
@@ -1543,10 +1551,10 @@ include_once('include/page_header.php');
 // Original mod by scricca@vipsnet.net
 // Modified by Aly
 /* this code adds links to Template Names in Template_Linkage page and link them to the form in forms.inc.php */
-	else if($_REQUEST["config"]==2){
+	else if($_REQUEST['config']==2){
 		echo SBR;
-		if(isset($_REQUEST["form"])){
-			insert_template_form(get_request("hostid",NULL));
+		if(isset($_REQUEST['form'])){
+			insert_template_form(get_request('hostid',NULL));
 		} 
 		else{
 	
@@ -1561,17 +1569,28 @@ include_once('include/page_header.php');
 					' ORDER BY h.host');
 			while($template = DBfetch($templates)){
 			
-				$hosts = DBSelect('SELECT h.* '.
+				$hosts = DBSelect('SELECT DISTINCT h.host, h.hostid, h.status '.
 					' FROM hosts h, hosts_templates ht '.
 					' WHERE ht.templateid='.$template['hostid'].
 						' AND ht.hostid=h.hostid '.
 						' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
 						' AND '.DBcondition('h.hostid',$available_hosts).
-					' ORDER BY host');
+					' ORDER BY h.host');
 				$host_list = array();
 				while($host = DBfetch($hosts)){
-					$style = ($host["status"] == HOST_STATUS_MONITORED)?NULL:'on';
-					array_push($host_list, empty($host_list)?'':', ', new CSpan($host["host"], $style));
+					$link = 'hosts.php?form=update&config=0&hostid='.$host['hostid'];
+					switch($host['status']){
+						case HOST_STATUS_MONITORED:
+							$style = null;
+							break;
+						case HOST_STATUS_TEMPLATE:
+							$style = 'unknown';
+							break;
+						default:
+							$style = 'on';
+					}
+
+					array_push($host_list, empty($host_list)?'':', ', new CLink(new CSpan($host['host'], $style), $link));
 				}
 				$table->AddRow(array(		
 					new CCol(array(
@@ -1586,9 +1605,9 @@ include_once('include/page_header.php');
 		}
 //----- END MODE -----
 	}
-	else if($_REQUEST["config"]==4){
+	else if($_REQUEST['config']==4){
 		echo SBR;
-		if(isset($_REQUEST["form"])){
+		if(isset($_REQUEST['form'])){
 			insert_application_form();
 		} 
 		else {
@@ -1596,7 +1615,7 @@ include_once('include/page_header.php');
 			$form = new CForm();
 			$form->SetMethod('get');
 			
-			$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
+			$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit();');
 			$cmbGroup->AddItem(0,S_ALL_SMALL);
 
 			$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
@@ -1606,13 +1625,13 @@ include_once('include/page_header.php');
 							' ORDER BY name');
 							
 			while($row=DBfetch($result)){
-				$cmbGroup->AddItem($row["groupid"],$row["name"]);
+				$cmbGroup->AddItem($row['groupid'],$row['name']);
 			}
 			
 			$form->AddItem(S_GROUP.SPACE);
 			$form->AddItem($cmbGroup);
 
-			if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0){
+			if(isset($_REQUEST['groupid']) && $_REQUEST['groupid']>0){
 				$sql='SELECT DISTINCT h.hostid,h.host '.
 					' FROM hosts h,hosts_groups hg '.
 					' WHERE hg.groupid='.$_REQUEST['groupid'].
@@ -1630,11 +1649,11 @@ include_once('include/page_header.php');
 						' GROUP BY h.hostid,h.host '.
 						' ORDER BY h.host';
 			}
-			$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit();");
+			$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit();');
 
 			$result=DBselect($sql);
 			while($row=DBfetch($result)){
-				$cmbHosts->AddItem($row["hostid"],$row["host"]);
+				$cmbHosts->AddItem($row['hostid'],$row['host']);
 			}
 
 			$form->AddItem(SPACE.S_HOST.SPACE);
@@ -1649,7 +1668,7 @@ include_once('include/page_header.php');
 
 			$table = new CTableInfo();
 			$table->SetHeader(array(
-				array(new CCheckBox("all_applications",NULL,"CheckAll('".$form->GetName()."','all_applications');"),
+				array(new CCheckBox('all_applications',NULL,"CheckAll('".$form->GetName()."','all_applications');"),
 				SPACE,
 				make_sorting_link(S_APPLICATION,'a.name')),
 				S_SHOW
