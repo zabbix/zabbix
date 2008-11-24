@@ -985,21 +985,10 @@ char	*get_ip_by_socket(zbx_sock_t *s)
 {
 #if defined(HAVE_IPV6)
 	struct		sockaddr_storage sa;
-	struct		addrinfo hints, *ai = NULL;
 #else
 	ZBX_SOCKADDR	sa;
-/*	struct		hostent *hp;
-	char		*sip;
-	int		i[4], j[4];*/
 #endif
 	socklen_t	sz;
-
-/*	char	tmp[MAX_STRING_LEN], 
-		sname[MAX_STRING_LEN],
-		*start = NULL,
-		*end = NULL,
-		c = '\0';*/
-
 	static char	buffer[64];
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_ip_by_socket()");
