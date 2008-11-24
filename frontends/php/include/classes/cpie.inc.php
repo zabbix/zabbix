@@ -39,9 +39,11 @@ function switchlegend($type=false){
 	if($type && is_numeric($type)){
 		$this->drawlegendallow = $type;
 		return $this->drawlegendallow;
-	} elseif($this->drawlegendallow == 0){
+	} 
+	else if($this->drawlegendallow == 0){
 		$this->drawlegendallow = 1;
-	} else {
+	} 
+	else {
 		$this->drawlegendallow = 0;
 	}
 return $this->drawlegendallow;
