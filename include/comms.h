@@ -97,6 +97,7 @@ void    zbx_tcp_free(zbx_sock_t *s);
 
 int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags);
 
+char    *get_ip_by_socket(zbx_sock_t *s);
 int	zbx_tcp_check_security(
 	zbx_sock_t *s, 
 	const char *ip_list, 
