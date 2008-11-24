@@ -883,6 +883,7 @@
 	'S_STARTED_BIG'=>			'STARTED!',
 	'S_COMMITED_BIG'=>			'COMMITED!',
 	'S_ROLLBACKED_BIG'=>		'ROLLBACKED!',
+	'S_HOST_CONFIGURATION'=>	'Host configuration',
 	
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
