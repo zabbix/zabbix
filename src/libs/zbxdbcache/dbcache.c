@@ -2026,7 +2026,7 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
 	cache->last_text		+= len1;
 	history->timestamp		= timestamp;
 
-	if (NULL != source) {
+	if (NULL != source && *source != '\0') {
 		history->source		= cache->last_text;
 		zbx_strlcpy(cache->last_text, source, len2);
 		cache->last_text	+= len2;

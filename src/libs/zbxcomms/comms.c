@@ -981,6 +981,40 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 	return	SUCCEED;
 }
 
+char	*get_ip_by_socket(zbx_sock_t *s)
+{
+#if defined(HAVE_IPV6)
+	struct		sockaddr_storage sa;
+#else
+	ZBX_SOCKADDR	sa;
+#endif
+	socklen_t	sz;
+	static char	buffer[64];
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_ip_by_socket()");
+
+	*buffer = '\0';
+
+	sz = sizeof(sa);
+	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&sa, &sz))
+	{
+		zbx_set_tcp_strerror("Connection rejected. getpeername failed [%s]",
+				strerror_from_system(zbx_sock_last_error()));
+		return buffer;
+	}
+
+#if defined(HAVE_IPV6)
+	if (0 != getnameinfo((struct sockaddr*)&sa, sizeof(sa), buffer, sizeof(buffer), NULL, 0, NI_NUMERICHOST))
+	{
+		zbx_set_tcp_strerror("Connection rejected. getnameinfo failed [%s] ",
+				strerror_from_system(zbx_sock_last_error()));
+	}
+#else
+	zbx_snprintf(buffer, sizeof(buffer), "%s", inet_ntoa(sa.sin_addr));
+#endif
+
+	return buffer;
+}
 
 /******************************************************************************
  *                                                                            *

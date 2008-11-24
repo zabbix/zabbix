@@ -723,7 +723,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 		av.severity = atoi(severity);
 
 		process_mass_data(sock, 0, &av, 1, NULL, 0);
-		
+
 		if( zbx_tcp_send_raw(sock, SUCCEED == ret ? "OK" : "NOT OK") != SUCCEED)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Error sending result back");
