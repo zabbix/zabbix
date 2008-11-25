@@ -28,7 +28,7 @@
 
 	$page['file'] = 'tr_status.php';
 	$page['title'] = "S_STATUS_OF_TRIGGERS";
-	$page['scripts'] = array('blink.js');
+	$page['scripts'] = array('menu_scripts.js','blink.js');
 	$page['hist_arg'] = array('groupid','hostid');
 	
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
@@ -457,6 +457,33 @@ include_once "include/page_header.php";
 		$cond.=' AND t.priority>='.$show_severity;
 	}
 
+
+	$event_cond = '';
+	$event_expire = ($config['event_expire']*86400); // days
+	switch($show_events){
+		case EVENTS_OPTION_ALL:
+			$event_cond.=' AND (('.time().'-e.clock)<'.$event_expire.')';
+			break;
+		case EVENTS_OPTION_NOT_ACK:
+			$event_cond.=' AND (('.time().'-e.clock)<'.$event_expire.') '.
+							' AND e.acknowledged=0 ';
+			break;
+		case EVENTS_OPTION_ONLYTRUE_NOTACK:
+			$event_cond.=' AND (('.time().'-e.clock)<'.$event_expire.') '.
+							' AND e.acknowledged=0 AND e.value='.TRIGGER_VALUE_TRUE;
+			break;
+		case EVENTS_OPTION_NOFALSEFORB:
+			$event_cond.=' AND e.acknowledged=0 '.
+							' AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
+			break;
+		case EVENTS_OPTION_NOEVENT:
+		default:
+			$event_cond.=' AND 1=2 ';
+			break;
+	}
+	
+	$triggers = array();
+	$triggerids = array();
 	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, t.expression,t.priority, '.
 					' t.lastchange,t.comments,t.url,t.value,h.host,h.hostid,t.type '.
 			' FROM triggers t,hosts h,items i,functions f '.($_REQUEST['groupid']?', hosts_groups hg ':'').
@@ -468,47 +495,66 @@ include_once "include/page_header.php";
 				' AND h.hostid=i.hostid '.
 				' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.
 			order_by('h.host,h.hostid,t.description,t.priority,t.lastchange');
-
+			
 	$result = DBselect($sql);
 	while($row=DBfetch($result)){
 // Check for dependencies
-		if(trigger_dependent($row["triggerid"]))	continue;
-		
-		$cond = '';
-		$event_expire = ($config['event_expire']*86400); // days
-		switch($show_events){
-			case EVENTS_OPTION_ALL:
-				$cond.=' AND (('.time().'-e.clock)<'.$event_expire.')';
-				break;
-			case EVENTS_OPTION_NOT_ACK:
-				$cond.=' AND (('.time().'-e.clock)<'.$event_expire.') AND e.acknowledged=0 ';
-				break;
-			case EVENTS_OPTION_ONLYTRUE_NOTACK:
-				$cond.=' AND (('.time().'-e.clock)<'.$event_expire.') AND e.acknowledged=0 AND e.value='.TRIGGER_VALUE_TRUE;
-				break;
-			case EVENTS_OPTION_NOFALSEFORB:
-				$cond.=' AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
-				break;
-			case EVENTS_OPTION_NOEVENT:
-			default:
-				$cond.=' AND 1=2 ';
-				break;
-		}
-
-		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
-					' FROM events e, triggers t '.
-					' WHERE e.object=0 '.
-						' AND e.objectid='.$row['triggerid'].
-						' AND t.triggerid=e.objectid '.$cond.
-					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
-
+		if(trigger_dependent($row['triggerid']))	continue;
 		if($show_triggers == TRIGGERS_OPTION_NOFALSEFORB){
+			$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
+				' FROM events e, triggers t '.
+				' WHERE e.object=0 '.
+					' AND e.objectid='.$row['triggerid'].
+					' AND t.triggerid=e.objectid '.
+					$event_cond.
+				' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 			if(!$row = get_row_for_nofalseforb($row,$event_sql)){
 				continue;
 			}
 		}
+		
+		$row['events'] = array();
+		$row['items'] = array();
+		$triggers[$row['triggerid']] = $row;
+		$triggerids[$row['triggerid']] = $row['triggerid'];
+	}
+	
+	$sql = 'SELECT f.triggerid, i.* '.
+			' FROM functions f, items i '.
+			' WHERE '.DBcondition('f.triggerid',$triggerids).
+				' AND i.itemid=f.itemid';
+	$result = DBselect($sql);
+	while($row = DBfetch($result)){
+		$item['itemid'] = $row['itemid'];
+		$item['action'] = str_in_array($row['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
+		$item['description'] = item_description($row);
+		
+		$triggers[$row['triggerid']]['items'][$row['itemid']] = $item;
+	}
+		
+	$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
+				' FROM events e, triggers t '.
+				' WHERE e.object=0 '.
+					' AND '.DBcondition('e.objectid',$triggerids).
+					' AND t.triggerid=e.objectid '.
+					$event_cond.
+				' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
+	
+	$res_events = DBSelect($event_sql,$config['event_show_max']*100);
+	while($row_event=DBfetch($res_events)){
+		if($show_events == EVENTS_OPTION_NOFALSEFORB){
+			if((EVENTS_NOFALSEFORB_STATUS_FALSE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_FALSE)) continue;
+			if((EVENTS_NOFALSEFORB_STATUS_TRUE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_TRUE)) continue;
+			
+			if(($row_event['value'] == TRIGGER_VALUE_FALSE) && (!event_initial_time($row_event))){
+				continue;
+			}
+		}
+		$triggers[$row_event['triggerid']]['events'][$row_event['eventid']] = $row_event;
+	}
+	
+	foreach($triggers as $triggerid => $row){
 		$elements=array();
-
 		$description = expand_trigger_description($row['triggerid']);
 
 		if(!zbx_empty($_REQUEST['txt_select']) && ((bool)zbx_stristr($description, $_REQUEST['txt_select']) == (bool)$_REQUEST['inverse_select'])) continue;
@@ -610,6 +656,11 @@ include_once "include/page_header.php";
 			$host->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 		}
 		
+		$tr_desc = new CSpan($description,'pointer');
+		$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
+										" new Array({'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['lastchange']."'}),".
+										zbx_jsvalue($row['items']).");");
+
 			$table->addRow(array(
 				($config['event_ack_enable'])?SPACE:NULL,
 				new CCol(
@@ -620,7 +671,7 @@ include_once "include/page_header.php";
 				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row['lastchange']),'events.php?triggerid='.$row['triggerid'].'&nav_time='.$row['lastchange'],'action'),
 				get_node_name_by_elid($row['triggerid']),
 				$host,
-				$description,
+				$tr_desc,
 //				$admin_links?(new CLink($description, 'triggers.php?form=update&triggerid='.$row['triggerid'].'&hostid='.$row['hostid'])):$description,
 				$actions,
 				($config['event_ack_enable'])?SPACE:NULL,
@@ -628,18 +679,7 @@ include_once "include/page_header.php";
 				));
 
 		$event_limit=0;
-		$res_events = DBSelect($event_sql,$config['event_show_max']*100);
-
-		while($row_event=DBfetch($res_events)){
-			if($show_events == EVENTS_OPTION_NOFALSEFORB){
-				if((EVENTS_NOFALSEFORB_STATUS_FALSE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_FALSE)) continue;
-				if((EVENTS_NOFALSEFORB_STATUS_TRUE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_TRUE)) continue;
-				
-				if(($row_event['value'] == TRIGGER_VALUE_FALSE) && (!event_initial_time($row_event))){
-					continue;
-				}
-			}
-			
+		foreach($row['events'] as $eventid => $row_event){			
 			$value = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));	
 
 			if($config['event_ack_enable']){
@@ -696,9 +736,8 @@ include_once "include/page_header.php";
 					
 	$m_form->AddItem($table);
 	unset($table);
-//	$m_form->Show();
-	$p_elements[] = $m_form;
 	
+	$p_elements[] = $m_form;
 	$triggers_hat = create_hat(
 			$text,
 			$p_elements,
@@ -709,7 +748,6 @@ include_once "include/page_header.php";
 
 	$triggers_hat->Show();
 
-	
 
 	zbx_add_post_js('blink.init();');	
 	

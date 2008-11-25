@@ -180,8 +180,6 @@ function create_host_menu(e,hostid,hst_grp_all_in){
 //to create a copy of array, but not references!!!!
 //alert(id+' : '+dashboard_menu[id]);
 
-
-
 //alert(dashboard_menu[id]);
 	show_popup_menu(e,grp_menu,280);// JavaScript Document
 }
@@ -202,7 +200,6 @@ show_popup_menu(event,new Array(['Show',null,null,{'outer' : ['pum_oheader'],'in
 							]
 						),null);
 */
-
 
 //------------------------------------------------------
 //					DASHBOARD JS MENU 
@@ -230,4 +227,30 @@ function create_dashboard_menu(e,id){
 	}
 //alert(dashboard_menu[id]);
 	show_popup_menu(e,dbrd_menu,280);// JavaScript Document
+}
+
+//------------------------------------------------------
+//					TRIGGERS JS MENU 
+//------------------------------------------------------
+
+function create_mon_trigger_menu(e, args, items){
+	var tr_menu = new Array(['Triggers',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
+								['Events','events.php?triggerid='+args[0].triggerid+'&nav_time='+args[0].lastchange,null]);
+	
+	tr_menu.push(['Simple graphs',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
+
+//	for(var i=0; i < items.length; i++){
+	for(var itemid in items){
+		if(typeof(items[itemid]) != 'undefined'){
+			tr_menu.push([items[itemid].description,
+									'history.php?action='+items[itemid].action+'&itemid='+items[itemid].itemid,
+									null]);
+		}
+	}
+
+//to create a copy of array, but not references!!!!
+//alert(id+' : '+dashboard_menu[id]);
+
+//alert(dashboard_menu[id]);
+	show_popup_menu(e,tr_menu,280);// JavaScript Document
 }
