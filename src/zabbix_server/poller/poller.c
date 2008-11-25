@@ -56,6 +56,12 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 			alarm(CONFIG_TIMEOUT);
 			res = get_value_agent(item, result);
 			alarm(0);
+
+			if (SUCCEED != res && GET_MSG_RESULT(result))
+				zabbix_log(LOG_LEVEL_WARNING, "%s item [%s] error: %s",
+						zbx_item_type_string(item->type),
+						zbx_host_key_string_by_item(item),
+						result->msg);
 			break;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
@@ -65,21 +71,20 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 			res = get_value_snmp(item, result);
 			alarm(0);
 #else
-			zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was not compiled in");
-			zabbix_syslog("Support of SNMP parameters was not compiled in. Cannot process [%s:%s]",
-					item->host_name,
-					item->key);
+			SET_MSG_RESULT(result, "Support of SNMP parameters was not compiled in");
 			res = NOTSUPPORTED;
 #endif
+			if (SUCCEED != res && GET_MSG_RESULT(result))
+				zabbix_log(LOG_LEVEL_WARNING, "%s item [%s] error: %s",
+						zbx_item_type_string(item->type),
+						zbx_host_key_string_by_item(item),
+						result->msg);
 			break;
 		case ITEM_TYPE_IPMI:
 #ifdef HAVE_OPENIPMI
 			res = get_value_ipmi(item, result);
 #else
-			zabbix_log(LOG_LEVEL_WARNING, "Support of IPMI parameters was not compiled in");
-			zabbix_syslog("Support of IPMI parameters was not compiled in. Cannot process [%s:%s]",
-					item->host_name,
-					item->key);
+			SET_MSG_RESULT(result, "Support of IPMI parameters was not compiled in");
 			res = NOTSUPPORTED;
 #endif
 			break;

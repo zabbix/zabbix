@@ -37,7 +37,7 @@ void	child_signal_handler(int sig)
 	{
 	case SIGALRM:
 /*		signal(SIGALRM , child_signal_handler);*/
-		zabbix_log( LOG_LEVEL_WARNING, "Timeout while answering request");
+		zabbix_log( LOG_LEVEL_DEBUG, "Timeout while answering request");
 		break;
 	case SIGQUIT:
 	case SIGINT:

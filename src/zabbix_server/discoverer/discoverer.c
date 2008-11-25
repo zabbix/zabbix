@@ -625,42 +625,40 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 				item.snmp_community	= check->snmp_community;
 				item.snmp_port		= port;
 
-				if(check->type==SVC_AGENT)
+				if (check->type == SVC_AGENT)
 				{
 					if(SUCCEED == get_value_agent(&item, &value))
 					{
-						if(GET_STR_RESULT(&value))
-						{
+						if (GET_STR_RESULT(&value))
 							strscpy(check->value, value.str);
-						}
-						else ret = FAIL;
+						else
+							ret = FAIL;
 					}
 					else
-					{
 						ret = FAIL;
-					}
 				}
 				else
 #ifdef HAVE_SNMP
 				{
 					if(SUCCEED == get_value_snmp(&item, &value))
 					{
-						if(GET_STR_RESULT(&value))
-						{
+						if (GET_STR_RESULT(&value))
 							strscpy(check->value, value.str);
-						}
-						else ret = FAIL;
+						else
+							ret = FAIL;
 					}
 					else
-					{
 						ret = FAIL;
-					}
 				}
 #else
-				{
 					ret = FAIL;
-				}
 #endif
+
+				if (FAIL == ret && GET_MSG_RESULT(&value))
+					zabbix_log(LOG_LEVEL_DEBUG, "Discovery: %s item [%s] error: %s",
+							zbx_item_type_string(item.type),
+							zbx_host_key_string_by_item(&item),
+							value.msg);
 				break;
 			case SVC_ICMPPING:
 				memset(&host, 0, sizeof(host));
