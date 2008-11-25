@@ -29,7 +29,7 @@
 	$page["title"] = "S_LATEST_EVENTS";
 	$page['file'] = 'events.php';
 	$page['hist_arg'] = array('groupid','hostid');
-	$page['scripts'] = array('calendar.js');
+	$page['scripts'] = array('calendar.js','menu_scripts.js');
 	
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	
@@ -269,7 +269,7 @@
 
 //---
 		$triggers = array();
-		$trigger_list = array();
+		$triggerids = array();
 
 		$sql = 'SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,t.type '.
 				' FROM triggers t, functions f, items i, hosts h '.$sql_from.
@@ -282,10 +282,24 @@
 							
 		$rez = DBselect($sql);
 		while($rowz = DBfetch($rez)){
+			$rowz['items'] = array();
 			$triggers[$rowz['triggerid']] = $rowz;
-			$trigger_list[$rowz['triggerid']] = $rowz['triggerid'];
+			$triggerids[$rowz['triggerid']] = $rowz['triggerid'];
 		}
-				
+		
+		$sql = 'SELECT f.triggerid, i.* '.
+				' FROM functions f, items i '.
+				' WHERE '.DBcondition('f.triggerid',$triggerids).
+					' AND i.itemid=f.itemid';
+		$result = DBselect($sql);
+		while($row = DBfetch($result)){
+			$item['itemid'] = $row['itemid'];
+			$item['action'] = str_in_array($row['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
+			$item['description'] = item_description($row);
+			
+			$triggers[$row['triggerid']]['items'][$row['itemid']] = $item;
+		}
+		
 		$sql_cond=($show_unknown == 0)?(' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.' '):('');
 		$sql_cond.=' AND e.clock>'.$start;
 		$sql_cond.=' AND e.clock<'.$end;
@@ -308,7 +322,7 @@
 			
 			$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.value, e.acknowledged '.
 					' FROM events e '.
-					' WHERE '.DBcondition('e.objectid', $trigger_list).
+					' WHERE '.DBcondition('e.objectid', $triggerids).
 						' AND (e.object+0)='.EVENT_OBJECT_TRIGGER.
 						$sql_cond.
 					order_by('e.clock');
@@ -316,7 +330,7 @@
 			$result = DBselect($sql);
 			while($row=DBfetch($result)){
 				
-				$value = new CCol(trigger_value2str($row['value']), get_trigger_value_style($row["value"]));
+				$value = new CCol(trigger_value2str($row['value']), get_trigger_value_style($row['value']));
 				
 				$row = array_merge($triggers[$row['triggerid']],$row);
 				if((0 == $show_unknown) && (!event_initial_time($row,$show_unknown))) continue;
@@ -338,17 +352,21 @@
 					}
 				}
 	
+				$tr_desc = new CSpan(expand_trigger_description_by_data($row, ZBX_FLAG_EVENT),'pointer');
+				$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
+										" new Array({'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['clock']."'}),".
+										zbx_jsvalue($row['items']).");");
+										
 				$table->AddRow(array(
-					date("Y.M.d H:i:s",$row["clock"]),
-					is_show_subnodes() ? get_node_name_by_elid($row['triggerid']) : null,
-					$_REQUEST["hostid"] == 0 ? $row['host'] : null,
-					new CLink(
-						expand_trigger_description_by_data($row, ZBX_FLAG_EVENT),
-						"tr_events.php?triggerid=".$row["triggerid"].'&eventid='.$row['eventid'],
-						"action"
+					new CLink(date('Y.M.d H:i:s',$row['clock']),
+						'tr_events.php?triggerid='.$row['triggerid'].'&eventid='.$row['eventid'],
+						'action'
 						),
+					is_show_subnodes() ? get_node_name_by_elid($row['triggerid']) : null,
+					$_REQUEST['hostid'] == 0 ? $row['host'] : null,
+					$tr_desc,
 					$value,
-					new CCol(get_severity_description($row["priority"]), get_severity_style($row["priority"],$row['value'])),
+					new CCol(get_severity_description($row['priority']), get_severity_style($row['priority'],$row['value'])),
 					$duration,
 					($config['event_ack_enable'])?$ack:NULL,
 					$actions
@@ -472,6 +490,9 @@
 	);
 
 	$events_hat->Show();
+	
+	$jsmenu = new CPUMenu(null,170);
+	$jsmenu->InsertJavaScript();
 ?>
 <?php
 

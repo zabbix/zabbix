@@ -25,6 +25,7 @@
 	$page["title"]	= "S_TRIGGERS_TOP_100";
 	$page["file"]	= "report5.php";
 	$page['hist_arg'] = array('period');
+	$page['scripts'] = array('menu_scripts.js');
 	
 include_once "include/page_header.php";
 
@@ -73,8 +74,12 @@ include_once "include/page_header.php";
 	}
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$scripts_by_hosts = get_accessible_scripts_by_hosts($available_hosts);
 
+
+	$triggers = array();
+	$triggerids = array();
 	$sql = 'SELECT h.host, h.hostid, t.triggerid, t.description, t.expression, t.lastchange, t.priority, count(distinct e.eventid) as cnt_event '.
 					' FROM hosts h, triggers t, functions f, items i, events e'.
 					' WHERE h.hostid = i.hostid '.
@@ -83,17 +88,32 @@ include_once "include/page_header.php";
 						' and t.triggerid=e.objectid '.
 						' and e.object='.EVENT_OBJECT_TRIGGER.
 						' and e.clock>'.(time()-$time_dif).
-						' and '.DBcondition('h.hostid',$available_hosts).
+						' and '.DBcondition('t.triggerid',$available_triggers).
 						' and '.DBin_node('t.triggerid').
 					' GROUP BY h.host,t.triggerid,t.description,t.expression,t.priority '.
 					' ORDER BY cnt_event desc, h.host, t.description, t.triggerid';
 
 	$result=DBselect($sql, 100);
-
 	while($row=DBfetch($result)){
-		if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $available_hosts))
-			continue;
-
+		$row['items'] = array();
+		$triggers[$row['triggerid']] = $row;
+		$triggerids[$row['triggerid']] = $row['triggerid'];
+	}
+	
+	$sql = 'SELECT f.triggerid, i.* '.
+			' FROM functions f, items i '.
+			' WHERE '.DBcondition('f.triggerid',$triggerids).
+				' AND i.itemid=f.itemid';
+	$result = DBselect($sql);
+	while($row = DBfetch($result)){
+		$item['itemid'] = $row['itemid'];
+		$item['action'] = str_in_array($row['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
+		$item['description'] = item_description($row);
+		
+		$triggers[$row['triggerid']]['items'][$row['itemid']] = $item;
+	}
+	
+	foreach($triggers as $triggerid => $row){
 		$description = expand_trigger_description_by_data($row);
 		
 		$menus = '';
@@ -114,10 +134,15 @@ include_once "include/page_header.php";
 		$host->addOption('onclick','javascript: '.$menus);
 		$host->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 		
+		$tr_desc = new CSpan($description,'pointer');
+		$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
+										" new Array({'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['lastchange']."'}),".
+										zbx_jsvalue($row['items']).");");
+
 		$table->addRow(array(
 			get_node_name_by_elid($row['triggerid']),
 			$host,
-			new CLink($description, 'events.php?triggerid='.$row['triggerid'].'&nav_time='.$row['lastchange']),
+			$tr_desc,
 			new CCol(get_severity_description($row["priority"]),get_severity_style($row["priority"])),
 			$row["cnt_event"],
 		));
