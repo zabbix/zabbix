@@ -1,3 +1,8 @@
+Changes for 1.0.3
+
+ - [NTD-36] fixed template linkage (Artem)
+ - [NTD-28] fixed errors on maps (Artem)
+
 Changes for 1.0.2
 
  - [DEV-137] fixed call DBfree_resut before return from send_list_of_active_checks (Sasha)
