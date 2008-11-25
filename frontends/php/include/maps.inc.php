@@ -459,7 +459,8 @@
 								' AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))'.
 							' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 		
-						$trigger = get_row_for_nofalseforb($trigger,$event_sql);
+						if($trigger_tmp = get_row_for_nofalseforb($trigger,$event_sql))
+							$trigger = $trigger_tmp;
 					}
 					
 					$type	=& $trigger['value'];

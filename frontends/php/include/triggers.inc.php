@@ -819,8 +819,8 @@
 		$db_deps = DBselect("select * from trigger_depends where triggerid_down=".$triggerid);
 		while($db_dep = DBfetch($db_deps))
 				$result[] = $db_dep['triggerid_up'];
-			
-		return $result;
+
+	return $result;
 	}
 
 	/******************************************************************************
@@ -864,6 +864,7 @@
 				$host_trigger["triggerid"],
 				NULL,	// expression
 				$trigger["description"],
+				$trigger['type'],
 				$trigger["priority"],
 				NULL,	// status
 				$trigger["comments"],
@@ -1159,7 +1160,7 @@
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER)
+	function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER)
 	{
 		if($row)
 		{
@@ -1505,7 +1506,7 @@
 		if($event_to_unknown) add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
 		reset_items_nextcheck($triggerid);
 
-		$sql="update triggers set";
+		$sql="update triggers set ";
 		if(!is_null($expression))	$sql .= " expression=".zbx_dbstr($expression).",";
 		if(!is_null($description))	$sql .= " description=".zbx_dbstr($description).",";
 		if(!is_null($type))			$sql .= " type=$type,";
@@ -1781,7 +1782,6 @@
 				copy_template_triggers($hostid, $id, $copy_mode); // attention recursion
 			return;
 		}
-
 		$triggers = get_triggers_by_hostid($templateid);
 		while($trigger = DBfetch($triggers))
 		{
@@ -1810,9 +1810,11 @@
 		{
 			$db_chd_triggers = get_triggers_by_templateid($trigger_data['triggerid']);
 			while($chd_trigger_data = DBfetch($db_chd_triggers))
+					
 				update_trigger($chd_trigger_data['triggerid'],
 					/*$expression*/		NULL,
 					/*$description*/	NULL,
+					/*$type*/			NULL,
 					/*$priority*/		NULL,
 					/*$status*/		NULL,
 					/*$comments*/		NULL,
