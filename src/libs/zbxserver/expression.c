@@ -1685,7 +1685,7 @@ static int	substitute_functions(char **exp, char *error, int maxerrlen)
 
 			if (DBget_function_result(&value, functionid, err, sizeof(err)) != SUCCEED)
 			{
-				zbx_snprintf(error, maxerrlen, "Unable to get function value: %s",
+				zbx_snprintf(error, maxerrlen, "unable to get function value: %s",
 						err);
 				/* It may happen because of functions.lastvalue is NULL, so this is not warning  */
 				level = LOG_LEVEL_DEBUG;

@@ -277,7 +277,7 @@ zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field)
 /*
  * Get function value.
  */ 
-int     DBget_function_result(char **result,char *functionid, char *error, int maxerrlen)
+int     DBget_function_result(char **result, char *functionid, char *error, int maxerrlen)
 {
 	DB_RESULT dbresult;
 	DB_ROW	row;
@@ -291,14 +291,15 @@ int     DBget_function_result(char **result,char *functionid, char *error, int m
 
 	if (!row)
 	{
-		zbx_snprintf(error, maxerrlen, "No function for functionid [%s]",
+		zbx_snprintf(error, maxerrlen, "invalid functionid [%s]",
 				functionid);
 		res = FAIL;
 	}
 	else if(DBis_null(row[1]) == SUCCEED)
 	{
-		zbx_snprintf(error, maxerrlen, "function.lastvalue IS NULL for functionid [%s]",
-				functionid);
+		zbx_snprintf(error, maxerrlen, "lastvalue IS NULL for function [%s][%s]",
+				functionid,
+				zbx_host_key_function_string(zbx_atoui64(functionid)));
 		res = FAIL;
 	}
 	else
@@ -2161,4 +2162,47 @@ void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const ch
 
 	if (num > MAX_EXPRESSIONS)
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, ")");
+}
+
+static char	string[128];
+
+char	*zbx_host_key_string(zbx_uint64_t itemid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect("select i.itemid,h.host,i.key_ from items i,hosts h"
+			" where i.hostid=h.hostid and i.itemid=" ZBX_FS_UI64,
+			itemid);
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+		zbx_snprintf(string, sizeof(string), "%s:%s", row[1], row[2]);
+	else
+		zbx_snprintf(string, sizeof(string), "???");
+
+	return string;
+}
+
+char	*zbx_host_key_string_by_item(DB_ITEM *item)
+{
+	zbx_snprintf(string, sizeof(string), "%s:%s", item->host_name, item->key);
+
+	return string;
+}
+
+char	*zbx_host_key_function_string(zbx_uint64_t functionid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect("select f.functionid,h.host,i.key_,f.function,f.parameter from items i,hosts h,functions f"
+			" where i.hostid=h.hostid and f.itemid=i.itemid and f.functionid=" ZBX_FS_UI64,
+			functionid);
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+		zbx_snprintf(string, sizeof(string), "%s:%s.%s(%s)", row[1], row[2], row[3], row[4]);
+	else
+		zbx_snprintf(string, sizeof(string), "???");
+
+	return string;
 }

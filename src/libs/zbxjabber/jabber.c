@@ -377,13 +377,13 @@ static int connect_jabber(const char *jabber_id, const char *password, int use_s
 		case IKS_OK:
 			break;
 		case IKS_NET_NODNS:
-			zbx_snprintf(error, len, "hostname lookup failed");
+			zbx_snprintf(error, len, "Hostname lookup failed");
 			goto lbl_fail;
 		case IKS_NET_NOCONN:
-			zbx_snprintf(error, len, "connection failed");
+			zbx_snprintf(error, len, "Connection failed: %s", strerror_from_system(errno));
 			goto lbl_fail;
 		default:
-			zbx_snprintf(error, len, "connection error [%i][%i]", iks_error, errno);
+			zbx_snprintf(error, len, "Connection error: %s", strerror_from_system(errno));
 			goto lbl_fail;
 	}
 
@@ -457,7 +457,7 @@ int	send_jabber(char *username, char *passwd, char *sendto, char *message, char 
 		{
 			jsess->status = JABBER_ERROR;
 
-			zbx_snprintf(error, max_error_len, "JABBER: Cannot send message [%i][%s]", iks_error, strerror_from_system(errno));
+			zbx_snprintf(error, max_error_len, "JABBER: Cannot send message: %s", strerror_from_system(errno));
 			zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 		}
 		iks_delete (x);

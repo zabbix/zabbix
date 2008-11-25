@@ -2053,11 +2053,13 @@ int evaluate_function2(char *value,char *host,char *key,char *function,char *par
 
 	row = DBfetch(result);
 
-	if(!row)
+	if (!row)
 	{
         	DBfree_result(result);
-		zabbix_log(LOG_LEVEL_WARNING, "Query returned empty result");
-		zabbix_syslog("Query returned empty result");
+		zabbix_log(LOG_LEVEL_WARNING, "Function [%s:%s.%s(%s)] not found. Query returned empty result",
+				host, key, function, parameter);
+		zabbix_syslog("Function [%s:%s.%s(%s)] not found. Query returned empty result",
+				host, key, function, parameter);
 		return FAIL;
 	}
 
