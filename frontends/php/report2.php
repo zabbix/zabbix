@@ -131,10 +131,7 @@ include_once 'include/page_header.php';
 	}
 	
 
-	if(isset($_REQUEST['triggerid'])){
-		if(!check_right_on_trigger_by_triggerid(PERM_READ_ONLY, $_REQUEST['triggerid']))
-			access_deny();
-		
+	if(isset($_REQUEST['triggerid'])){	
 		show_table_header(array(new CLink($trigger_data['host'],'?hostid='.$trigger_data['hostid']),' : "',expand_trigger_description_by_data($trigger_data),'"'));
 
 		$table = new CTableInfo(null,'graph');

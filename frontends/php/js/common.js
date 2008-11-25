@@ -38,6 +38,8 @@ return 0;
 
 function empty(obj){
 	if(is_null(obj)) return true;
+	if(obj == false) return true;
+	if((obj == 0) || (obj == '0')) return true;
 	if(is_string(obj) && (obj == '')) return true;
 	if(is_array(obj) && (obj.length == 0)) return true;
 return false;
@@ -61,6 +63,23 @@ function is_array(obj) {
       'splice' in obj && 'join' in obj;	  
 }
 
+if (!Array.prototype.forEach)
+{
+  Array.prototype.forEach = function(fun /*, thisp*/)
+  {
+    var len = this.length;
+    if (typeof fun != "function")
+      throw new TypeError();
+
+    var thisp = arguments[1];
+    for (var i = 0; i < len; i++)
+    {
+      if (i in this)
+        fun.call(thisp, this[i], i, this);
+    }
+  };
+}
+
 function SDI(msg){
 	var div_help = document.getElementById('div_help');
 
@@ -71,6 +90,8 @@ function SDI(msg){
 		
 		div_help.setAttribute('id','div_help');
 		div_help.setAttribute('style','position: absolute; left: 10px; top: 10px; border: 1px red solid; width: 500px; height: 400px; background-color: white; overflow: auto; z-index: 20;');
+		
+		new Draggable(div_help,{});
 	}
 	
 	div_help.appendChild(document.createTextNode("DEBUG INFO: "));
@@ -78,6 +99,21 @@ function SDI(msg){
 	div_help.appendChild(document.createTextNode(msg));
 	div_help.appendChild(document.createElement("br"));
 	div_help.appendChild(document.createElement("br"));
+}
+
+/*
+function SDI(msg){
+	alert("DEBUG INFO: " + msg);
+}
+//*/
+
+function SDJ(obj){
+	var debug = '';
+	for(var key in obj) {
+		var value = obj[key];
+		debug+=key+': '+value+'\n';
+	}
+	SDI('\n'+debug);
 }
 
 /// Alpha-Betic sorting
