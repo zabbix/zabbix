@@ -653,6 +653,10 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 					}
 					else
 					{
+						if (GET_MSG_RESULT(&value))
+							zabbix_log(LOG_LEVEL_DEBUG, "Discovery: SNMP item [%s] error: %s",
+									zbx_host_key_string_by_item(&item),
+									value.msg);
 						ret = FAIL;
 					}
 				}
