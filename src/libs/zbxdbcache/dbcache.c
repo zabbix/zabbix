@@ -514,11 +514,15 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 		if (evaluate_expression(&exp_value, &exp, &trigger, error, sizeof(error)) != 0)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated [%s]",
+			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] for item [" ZBX_FS_UI64 "][%s] cannot be evaluated: %s",
 					trigger.expression,
+					itemid,
+					zbx_host_key_string(itemid),
 					error);
-			zabbix_syslog("Expression [%s] cannot be evaluated [%s]",
+			zabbix_syslog("Expression [%s] for item [" ZBX_FS_UI64 "][%s] cannot be evaluated: %s",
 					trigger.expression,
+					itemid,
+					zbx_host_key_string(itemid),
 					error);
 /*			We shouldn't update triggervalue if expressions failed */
 /*			DBupdate_trigger_value(&trigger, exp_value, time(NULL), error);*/

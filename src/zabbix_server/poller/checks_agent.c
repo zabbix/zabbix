@@ -49,7 +49,8 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 	char	*addr,
 		*buf,
 		packet[MAX_STRING_LEN],
-		error[MAX_STRING_LEN];
+		error[MAX_STRING_LEN],
+		tmp[MAX_STRING_LEN], *in, *out;
 
 	int	ret = SUCCEED;
 
@@ -77,56 +78,47 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		zbx_rtrim(buf, " \r\n\0");
 		zbx_ltrim(buf, " ");
 
-		if( strcmp(buf,"ZBX_NOTSUPPORTED") == 0)
+		if (0 == strcmp(buf, "ZBX_NOTSUPPORTED"))
 		{
-			zbx_snprintf(error,sizeof(error),"Not supported by ZABBIX agent");
+			zbx_snprintf(error, sizeof(error), "Not supported by ZABBIX agent");
 			SET_MSG_RESULT(result, strdup(error));
 			ret = NOTSUPPORTED;
 		}
-		else if( strcmp(buf,"ZBX_ERROR") == 0)
+		else if (0 == strcmp(buf, "ZBX_ERROR"))
 		{
-			zbx_snprintf(error,sizeof(error),"ZABBIX agent non-critical error");
+			zbx_snprintf(error, sizeof(error), "ZABBIX agent non-critical error");
 			SET_MSG_RESULT(result, strdup(error));
 			ret = AGENT_ERROR;
 		}
-		/* The section should be improved */
-		else if(buf[0]==0)
+		else if ('\0' == *buf)	/* The section should be improved */
 		{
-			zbx_snprintf(error,sizeof(error),"Got empty string from [%s] IP [%s] Parameter [%s]",
-				item->host_name,
-				item->host_ip,
-				item->key);
-			zabbix_log( LOG_LEVEL_WARNING, "%s",
-				error);
-			zabbix_log( LOG_LEVEL_WARNING, "Assuming that agent dropped connection because of access permissions");
+			zbx_snprintf(error, sizeof(error), "Got empty string from [%s]. Assuming that agent dropped connection because of access permissions",
+					item->useip ? item->host_ip : item->host_dns);
 			SET_MSG_RESULT(result, strdup(error));
 			ret = NETWORK_ERROR;
 		}
-		else if(set_result_type(result, item->value_type, buf) == FAIL)
+		else if (FAIL == set_result_type(result, item->value_type, buf))
 		{
-			zbx_snprintf(error,sizeof(error), "Type of received value [%s] is not sutable for [%s@%s] having type [%d]",
-				buf,
-				item->key,
-				item->host_name,
-				item->value_type);
-			zabbix_log( LOG_LEVEL_WARNING, "%s",
-				error);
-			zabbix_log( LOG_LEVEL_WARNING, "Returning NOTSUPPORTED");
-			result->msg=strdup(error);
+			for (in = buf, out = tmp; *in != '\0'; in ++)
+				*out++ = *in;
+			*out = '\0';
+
+			zbx_snprintf(error, sizeof(error), "Type of received value [%s] is not suitable for value type [%s]",
+					tmp,
+					zbx_item_value_type_string(item->value_type));
+			SET_MSG_RESULT(result, strdup(error));
 			ret = NOTSUPPORTED;
 		}
-
-		zabbix_log( LOG_LEVEL_DEBUG, "End get_value_agent(result:%s)",
-			buf);
-
+		zabbix_log(LOG_LEVEL_DEBUG, "End get_value_agent(result:%s)",
+				buf);
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Get value from agent failed. Error: %s", zbx_tcp_strerror());
-		SET_MSG_RESULT(result, strdup(zbx_tcp_strerror()));
+		zbx_snprintf(error, sizeof(error), "Get value from agent failed: %s",
+				zbx_tcp_strerror());
+		SET_MSG_RESULT(result, strdup(error));
 		ret = NETWORK_ERROR;
-
-	}	
+	}
 	zbx_tcp_close(&s);
 
 	return ret;
