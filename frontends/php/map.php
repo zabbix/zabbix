@@ -174,7 +174,7 @@ include_once "include/page_header.php";
 		$label_location = $db_element["label_location"];
 		if(is_null($label_location))	$map["label_location"];
 
-		$label_line = $db_element["label"];
+		$label_line = expand_map_element_label_by_data($db_element);
 
 		$el_info = get_info_by_selementid($db_element["selementid"]);
 
@@ -207,68 +207,47 @@ include_once "include/page_header.php";
 		}
 		if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_IMAGE)
 		{
-			$label_line = $db_element["label"];
+			$label_line = expand_map_element_label_by_data($db_element);
 		}
 
 		if($label_line=="" && $info_line=="")	continue;
 
-		$x_label = $db_element["x"];
-		$y_label = $db_element["y"];
+		$label_line = str_replace("\r", "", $label_line);
+		$strings = explode("\n", $label_line);
+		array_push($strings, $info_line);
+		$cnt = count($strings);
+		$num = 0;
+
+		$x = $db_element["x"];
+		$y = $db_element["y"];
+		$h = ImageFontHeight(2);
 
 		$x_info = $db_element["x"];
 		$y_info = $db_element["y"];
 
-		if($label_location == MAP_LABEL_LOC_TOP)
-		{
-			$x_label += ImageSX($img)/2-ImageFontWidth(2)*strlen($label_line)/2;
-			$y_label -= ImageFontHeight(2)*($info_line == "" ? 1 : 2);
+		if ($label_location == MAP_LABEL_LOC_TOP)
+			$y -= $h * $cnt;
+		else if ($label_location == MAP_LABEL_LOC_LEFT || $label_location == MAP_LABEL_LOC_RIGHT)
+			$y += ImageSY($img) / 2 - $h * $cnt / 2;
+		else	/* MAP_LABEL_LOC_BOTTOM */
+			$y += ImageSY($img);
 
-			$x_info += ImageSX($img)/2-ImageFontWidth(2)*strlen($info_line)/2;
-			$y_info  = $y_label+ImageFontHeight(2);
-		}
-		else if($label_location == MAP_LABEL_LOC_LEFT)
+		foreach ($strings as $str)
 		{
-			$x_label -= ImageFontWidth(2)*strlen($label_line);
-			$y_label += ImageSY($img)/2-ImageFontHeight(2)/2 - 
-					($info_line == "" ? 0 : ImageFontHeight(2)/2);
+			$num++;
+			$w_label = ImageFontWidth(2) * strlen($str);
 
-			$x_info -= ImageFontWidth(2)*strlen($info_line);
-			$y_info  = $y_label+ImageFontHeight(2) - ($label_line == "" ? ImageFontHeight(2)/2 : 0);
-		}
-		else if($label_location == MAP_LABEL_LOC_RIGHT)
-		{
-			$x_label += ImageSX($img);
-			$y_label += ImageSY($img)/2-ImageFontHeight(2)/2 - 
-					($info_line == "" ? 0 : ImageFontHeight(2)/2);
+			if ($label_location == MAP_LABEL_LOC_TOP || $label_location == MAP_LABEL_LOC_BOTTOM)
+				$x_label = $x + ImageSX($img) / 2 - $w_label / 2;
+			else if ($label_location == MAP_LABEL_LOC_LEFT)
+				$x_label = $x - $w_label;
+			else	/* MAP_LABEL_LOC_RIGHT */
+				$x_label = $x + ImageSX($img);
 
-			$x_info += ImageSX($img);
-			$y_info  = $y_label+ImageFontHeight(2) - ($label_line == "" ? ImageFontHeight(2)/2 : 0);
-		}
-		else
-		{
-			$x_label += ImageSX($img)/2-ImageFontWidth(2)*strlen($label_line)/2;
-			$y_label += ImageSY($img);
+			ImageFilledRectangle($im, $x_label - 2, $y, $x_label + $w_label, $y + $h, $white);
+			ImageString($im, 2, $x_label, $y, $str, $num == $cnt ? $color : $label_color);
 
-			$x_info += ImageSX($img)/2-ImageFontWidth(2)*strlen($info_line)/2;
-			$y_info  = $y_label+ ($label_line == "" ? 0 : ImageFontHeight(2));
-		}
-
-		if($label_line!="")
-		{
-			ImageFilledRectangle($im,
-				$x_label-2, $y_label,
-				$x_label+ImageFontWidth(2)*strlen($label_line), $y_label+ImageFontHeight(2),
-				$white);
-			ImageString($im, 2, $x_label, $y_label, $label_line,$label_color);
-		}
-
-		if($info_line!="")
-		{
-			ImageFilledRectangle($im,
-				$x_info-2, $y_info,
-				$x_info+ImageFontWidth(2)*strlen($info_line), $y_info+ImageFontHeight(2),
-				$white);
-			ImageString($im, 2, $x_info, $y_info, $info_line,$color);
+			$y += $h;
 		}
 	}
 
