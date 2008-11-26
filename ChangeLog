@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-256] improved multiple labels in maps and support of macros (Sasha)
  - [DEV-265] added popups with links to "Status of trigger" & "Events history" pages (Artem)
  - [DEV-262] added group filtering  for "Trigger info" (Artem)
  - [DEV-259] added internal links (Artem)

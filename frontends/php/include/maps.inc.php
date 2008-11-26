@@ -856,4 +856,186 @@
 	return ImageColorAllocate($im,$RGB[0],$RGB[1],$RGB[2]);
 	}
 
+	/*
+	 * Function: expand_map_element_label_by_data
+	 *
+	 * Description: 
+	 *     substitute simple macros {HOSTNAME}, {HOST.CONN}, {HOST.DNS}, {IPADDRESS} and 
+	 *     functions {hostname:key.min/max/avg/last(...)}
+	 *     in data string with real values
+	 *     
+	 * Author: 
+	 *     Aleksander Vladishev
+	 *
+	 */
+	function expand_map_element_label_by_data($db_element)
+	{
+		$label = $db_element['label'];
+
+		if (zbx_strstr($label, '{HOSTNAME}') || zbx_strstr($label, '{HOST.DNS}') ||
+				zbx_strstr($label, '{IPADDRESS}') || zbx_strstr($label, '{HOST.CONN}'))
+		{
+			if ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
+				$sql = 'select * from hosts where hostid='.$db_element['elementid'];
+			else if ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
+				$sql = 'select h.* from hosts h,items i,functions f'.
+						' where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid='.$db_element['elementid'];
+			else
+				return $label;
+
+			$db_hosts = DBselect($sql);
+			if ($db_host = DBfetch($db_hosts))
+			{
+				if (zbx_strstr($label, '{HOSTNAME}'))
+				{
+					$label = str_replace('{HOSTNAME}',
+							$db_host['host'],
+							$label);
+				}
+
+				if (zbx_strstr($label, '{HOST.DNS}'))
+				{
+					$label = str_replace('{HOST.DNS}',
+							$db_host['dns'],
+							$label);
+				}
+
+				if (zbx_strstr($label, '{IPADDRESS}'))
+				{
+					$label = str_replace('{IPADDRESS}',
+							$db_host['ip'],
+							$label);
+				}
+
+				if (zbx_strstr($label, '{HOST.CONN}'))
+				{
+					$label = str_replace('{HOST.CONN}',
+							$db_host['useip'] ? $db_host['ip'] : $db_host['dns'],
+							$label);
+				}
+			}
+		}
+
+		while (FALSE !== ($pos = strpos($label, '{')))
+		{
+			$expr = substr($label, $pos);
+
+			if (FALSE === ($pos = strpos($expr, '}')))
+				break;
+
+			$expr = substr($expr, 1, $pos - 1);
+
+			if (FALSE === ($pos = strpos($expr, ':')))
+			{
+				$label = str_replace('{'.$expr.'}', '???', $label);
+				continue;
+			}
+
+			$host = substr($expr, 0, $pos);
+			$key = substr($expr, $pos + 1);
+
+			if (FALSE === ($pos = strrpos($key, '.')))
+			{
+				$label = str_replace('{'.$expr.'}', '???', $label);
+				continue;
+			}
+
+			$function = substr($key, $pos + 1);
+			$key = substr($key, 0, $pos);
+
+			if (FALSE === ($pos = strpos($function, '(')))
+			{
+				$label = str_replace('{'.$expr.'}', '???', $label);
+				continue;
+			}
+
+			$parameter = substr($function, $pos + 1);
+			$function = substr($function, 0, $pos);
+
+			if (FALSE === ($pos = strrpos($parameter, ')')))
+			{
+				$label = str_replace('{'.$expr.'}', '???', $label);
+				continue;
+			}
+
+			$parameter = substr($parameter, 0, $pos);
+
+			$sql = 'select itemid,value_type,units from items i,hosts h where i.hostid=h.hostid and h.host='.zbx_dbstr($host).
+					' and i.key_='.zbx_dbstr($key);
+			$db_items = DBselect($sql);
+			if (NULL == ($db_item = DBfetch($db_items)))
+			{
+				$label = str_replace('{'.$expr.'}', '???', $label);
+				continue;
+			}
+
+			switch($db_item['value_type']){
+				case ITEM_VALUE_TYPE_FLOAT:
+					$history_table = 'history';
+					$order_field = 'clock';
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					$history_table = 'history_uint';
+					$order_field = 'clock';
+					break;
+				case ITEM_VALUE_TYPE_TEXT:
+					$history_table = 'history_text';
+					$order_field = 'id';
+					break;
+				case ITEM_VALUE_TYPE_LOG:
+					$history_table = 'history_log';
+					$order_field = 'id';
+					break;
+				default:	/* ITEM_VALUE_TYPE_STR */
+					$history_table = 'history_str';
+					$order_field = 'clock';
+			}
+
+			if (0 == strcmp($function, 'last'))
+			{
+				$sql = 'select value from '.$history_table.' where itemid='.$db_item['itemid'].' order by '.$order_field.' desc';
+
+				$result = DBselect($sql, 1);
+				if (NULL == ($row = DBfetch($result)))
+					$label = str_replace('{'.$expr.'}', '('.S_NO_DATA_SMALL.')', $label);
+				else
+				{
+					switch($db_item['value_type']){
+						case ITEM_VALUE_TYPE_FLOAT:
+						case ITEM_VALUE_TYPE_UINT64:
+							$value = convert_units($row['value'], $db_item['units']);
+							break;
+						default:
+							$value = $row['value'];
+					}
+
+					$label = str_replace('{'.$expr.'}', $value, $label);
+				}
+			}
+			else if (0 == strcmp($function, 'min') || 0 == strcmp($function, 'max') || 0 == strcmp($function, 'avg'))
+			{
+				if ($db_item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $db_item['value_type'] != ITEM_VALUE_TYPE_UINT64)
+				{
+					$label = str_replace('{'.$expr.'}', '???', $label);
+					continue;
+				}
+
+				$now = time(NULL) - $parameter;
+				$sql = 'select '.$function.'(value) as value from '.$history_table.' where clock>'.$now.' and itemid='.$db_item['itemid'];
+
+				$result = DBselect($sql);
+				if (NULL == ($row = DBfetch($result)) || is_null($row['value']))
+					$label = str_replace('{'.$expr.'}', '('.S_NO_DATA_SMALL.')', $label);
+				else
+					$label = str_replace('{'.$expr.'}', convert_units($row['value'], $db_item['units']), $label);
+			}
+			else
+			{
+				$label = str_replace('{'.$expr.'}', '???', $label);
+				continue;
+			}
+		}
+
+		return $label;
+	}
 ?>
