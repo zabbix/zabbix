@@ -91,7 +91,7 @@ function SDI(msg){
 		div_help.setAttribute('id','div_help');
 		div_help.setAttribute('style','position: absolute; left: 10px; top: 10px; border: 1px red solid; width: 500px; height: 400px; background-color: white; overflow: auto; z-index: 20;');
 		
-		new Draggable(div_help,{});
+//		new Draggable(div_help,{});
 	}
 	
 	div_help.appendChild(document.createTextNode("DEBUG INFO: "));
