@@ -23,6 +23,8 @@
 	require_once('include/screens.inc.php');
 	require_once('include/forms.inc.php');
 	require_once('include/nodes.inc.php');
+	require_once('include/blocks.inc.php');
+	
 
 	$page['title'] = "S_CONFIGURATION_OF_SCREENS";
 	$page['file'] = 'screenedit.php';
@@ -39,7 +41,7 @@ include_once('include/page_header.php');
 		'screenid'=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 		
 		'screenitemid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))&&(!isset({x})||!isset({y}))'),
-		'resourcetype'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_EVENTS),	'isset({save})'),
+		'resourcetype'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,14),	'isset({save})'),
 		'resourceid'=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID,			'isset({save})'),
 		'width'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
 		'height'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
@@ -53,6 +55,10 @@ include_once('include/page_header.php');
 		'dynamic'=>		array(T_ZBX_INT, O_OPT,  null,  null,			null),
 		'x'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
 		'y'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
+		
+// STATUS OF TRIGGER
+		'tr_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+		'tr_hostid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -204,7 +210,6 @@ include_once('include/page_header.php');
 
 	}
 ?>
-
 <?php
 
 include_once('include/page_footer.php');

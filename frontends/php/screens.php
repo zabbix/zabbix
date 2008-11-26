@@ -22,6 +22,7 @@
 	require_once 'include/config.inc.php';
 	require_once 'include/graphs.inc.php';
 	require_once 'include/screens.inc.php';
+	require_once 'include/blocks.inc.php';
 	require_once 'include/nodes.inc.php';
 
 
@@ -49,6 +50,11 @@ include_once 'include/page_header.php';
 
 		'groupid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
 		'hostid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
+		
+// STATUS OF TRIGGER
+		'tr_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+		'tr_hostid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+
 
 		'elementid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
 		'step'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		BETWEEN(0,65535),NULL),
@@ -354,6 +360,9 @@ include_once 'include/page_header.php';
 		
 		$screens_hat->Show();
 	}
+	
+	$jsmenu = new CPUMenu(null,170);
+	$jsmenu->InsertJavaScript();
 ?>
 <?php
 
