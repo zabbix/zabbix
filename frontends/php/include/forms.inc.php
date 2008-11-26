@@ -6491,7 +6491,7 @@
 
 		$frmEl->AddRow(S_TYPE,$cmbType);
 
-		$frmEl->AddRow(S_LABEL, new CTextBox('label', $label, 32));
+		$frmEl->AddRow(S_LABEL, new CTextArea('label', $label, 32, 4));
 
 		$cmbLocation = new CComboBox('label_location',$label_location);
 		$cmbLocation->AddItem(-1,'-');
