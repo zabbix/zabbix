@@ -605,18 +605,22 @@ table.header{
 }
 
 table.header tr td.header_l{
+	background:none;
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:10px;
 	text-align: left;
 	height: 24px;
 	padding-left: 5px;
+	border-width: 0px;
 }
 table.header tr td.header_r{
+	background:none;
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:10px;
 	text-align: right;
 	height: 24px;
 	padding-right: 5px;
+	border-width: 0px;
 }
 
 table.header a

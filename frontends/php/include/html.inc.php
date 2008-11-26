@@ -253,7 +253,7 @@
 	return $table;
 	}
 
-	function	show_thin_table_header($col1, $col2=SPACE){
+	function show_thin_table_header($col1, $col2=SPACE){
 		$table = get_thin_table_header($col1, $col2);
 		$table->Show();
 	}
@@ -266,20 +266,19 @@
 			if(($col1 == SPACE) && ($col2 == SPACE)) return new CScript('');
 		}
 		
-		$table = new CTable(NULL,"header");
-//		$table->AddOption('border',1);
-		$table->SetCellSpacing(0);
-		$table->SetCellPadding(1);
+		$table = new CTable(NULL,'header');
+//		$table->AddOption('border',0);
+		$table->setCellSpacing(0);
+		$table->setCellPadding(1);
 		
-		$td_r = new CCol($col2,"header_r");
-		$td_r->AddOption('align','right');
+		$td_r = new CCol($col2,'header_r');
+		$td_r->addOption('align','right');
 		
-		$table->AddRow(array(new CCol($col1,"header_l"), $td_r));
+		$table->addRow(array(new CCol($col1,'header_l'), $td_r));
 	return $table;
 	}
 
-	function	show_table_header($col1, $col2=SPACE)
-	{
+	function show_table_header($col1, $col2=SPACE){
 		$table = get_table_header($col1, $col2);
 		$table->Show();
 	}

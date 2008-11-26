@@ -443,7 +443,7 @@ return 	$table;
 }
 
 // author Aly
-function make_latest_issues(){
+function make_latest_issues($params = array()){
 	global $USER_DETAILS;
 	
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
@@ -452,9 +452,29 @@ function make_latest_issues(){
 	$scripts_by_hosts = get_accessible_scripts_by_hosts($available_hosts);
 	$config=select_config();
 	
+	$sql_select = '';
+	$sql_from = '';
+	$sql_where= '';
+	$limit = 20;
+	if(!empty($params)){
+		if(isset($params['limit'])) 
+			$limit = $params['limit'];
+		
+		if(isset($params['groupid']) && ($params['groupid']>0)){
+			$sql_select.=',g.name ';
+			$sql_from.= ',groups g ';
+			$sql_where.= ' AND g.groupid=hg.groupid '.
+							' AND hg.groupid='.$params['groupid'];
+		}
+		
+		if(isset($params['hostid']) && ($params['hostid']>0)) 
+			$sql_where.= ' AND h.hostid='.$params['hostid'];
+	}
+	
 	$table  = new CTableInfo();
-	$table->SetHeader(array(
-		is_show_subnodes() ? S_NODE : null,
+	$table->setHeader(array(
+		is_show_subnodes()?S_NODE:null,
+		(isset($params['groupid']) && ($params['groupid']>0))?S_GROUP:null,
 		S_HOST,
 		S_ISSUE,
 		S_LAST_CHANGE,
@@ -463,21 +483,20 @@ function make_latest_issues(){
 		S_ACTIONS
 		));
 	
-	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, t.priority, t.lastchange,t.value,h.host,h.hostid '.
-				' FROM triggers t,hosts h,items i,functions f, hosts_groups hg '.
+	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description,t.priority,t.lastchange,t.value,h.host,h.hostid '.$sql_select.
+				' FROM triggers t,hosts h,items i,functions f,hosts_groups hg '.$sql_from.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
 					' AND hg.hostid=h.hostid '.
 					' AND t.triggerid=f.triggerid '.
 					' AND t.status='.TRIGGER_STATUS_ENABLED.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
-//					' AND '.DBin_node('t.triggerid').
 					' AND '.DBcondition('t.triggerid',$available_triggers).
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND t.value='.TRIGGER_VALUE_TRUE.
+					$sql_where.
 				' ORDER BY t.lastchange DESC';
-
-	$result = DBselect($sql,20);
+	$result = DBselect($sql,$limit);
 	while($row=DBfetch($result)){
 // Check for dependencies
 		if(trigger_dependent($row["triggerid"]))	continue;
@@ -499,8 +518,8 @@ function make_latest_issues(){
 		$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
 		
 		$host = new CSpan($row['host']);
-		$host->AddOption('onclick','javascript: '.$menus);
-		$host->AddOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
+		$host->addOption('onclick','javascript: '.$menus);
+		$host->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
 					' FROM events e, triggers t '.
@@ -516,10 +535,10 @@ function make_latest_issues(){
 			if($config['event_ack_enable']){
 				if($row_event['acknowledged'] == 1){
 					$ack_info = make_acktab_by_eventid($row_event['eventid']);
-					$ack_info->AddOption('style','width: auto;');
+					$ack_info->addOption('style','width: auto;');
 					
 					$ack=new CLink(S_YES,'acknow.php?eventid='.$row_event['eventid'],'action');
-					$ack->SetHint($ack_info);
+					$ack->setHint($ack_info);
 				}
 				else{
 					$ack= new CLink(S_NO,'acknow.php?eventid='.$row_event['eventid'],'on');
@@ -535,8 +554,9 @@ function make_latest_issues(){
 //--------			
 			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'].'&source=0&nav_time='.$row['lastchange'],'action');
 			
-			$table->AddRow(array(
+			$table->addRow(array(
 				get_node_name_by_elid($row['triggerid']),
+				(isset($params['groupid']) && ($params['groupid']>0))?$row['name']:null,
 				$host,
 				new CCol($description,get_severity_style($row["priority"])),
 				$clock,
@@ -547,7 +567,7 @@ function make_latest_issues(){
 		}
 		unset($row,$description,$actions,$alerts,$hint);
 	}
-	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 return $table;
 }
 

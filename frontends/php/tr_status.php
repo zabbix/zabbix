@@ -651,9 +651,8 @@ include_once "include/page_header.php";
 			$menus = rtrim($menus,',');
 			$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
 			
-			$host = new CSpan($row['host']);
+			$host = new CSpan($row['host'],'pointer');
 			$host->addOption('onclick','javascript: '.$menus);
-			$host->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 		}
 		
 		$tr_desc = new CSpan($description,'pointer');
