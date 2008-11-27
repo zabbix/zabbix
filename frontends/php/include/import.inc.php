@@ -484,40 +484,15 @@
 
 						if(!isset($data['valuemapid']))
 							$data['valuemapid'] = $item['valuemapid'];
-
-						update_item(
-							$item['itemid'],
-							$data['description'],
-							$data['key'],
-							$this->data[XML_TAG_HOST]['hostid'],
-							$data['delay'],
-							$data['history'],
-							$data['status'],
-							$data['type'],
-							$data['snmp_community'],
-							$data['snmp_oid'],
-							$data['value_type'],
-							$data['trapper_hosts'],
-							$data['snmp_port'],
-							$data['units'],
-							$data['multiplier'],
-							$data['delta'],
-							$data['snmpv3_securityname'],
-							$data['snmpv3_securitylevel'],
-							$data['snmpv3_authpassphrase'],
-							$data['snmpv3_privpassphrase'],
-							$data['formula'],
-							$data['trends'],
-							$data['logtimefmt'],
-							$data['valuemapid'],
-							$data['delay_flex'],
-							$data['params'],
-							$data['ipmi_sensor'],
-							array_unique(array_merge(
-								$data['applications'],
-								get_applications_by_itemid($item['itemid'])
-								)),
-							$item['templateid']);
+	
+							$data['key_'] = $data['key'];
+							$data['hostid'] = $this->data[XML_TAG_HOST]['hostid'];
+							$data['applications'] = array_unique(array_merge($data['applications'],get_applications_by_itemid($item['itemid'])));
+							$data['templateid'] = $item['templateid'];
+							
+							check_db_fields($item, $data));
+							
+						update_item($item['itemid'], $data);
 					}
 					else{ /* missed */
 						if($this->item['missed']==1) /* skip */{
@@ -528,34 +503,10 @@
 						if( !isset($data['valuemapid']) )
 							$data['valuemapid'] = 0;
 
-						add_item(
-							$data['description'],
-							$data['key'],
-							$this->data[XML_TAG_HOST]['hostid'],
-							$data['delay'],
-							$data['history'],
-							$data['status'],
-							$data['type'],
-							$data['snmp_community'],
-							$data['snmp_oid'],
-							$data['value_type'],
-							$data['trapper_hosts'],
-							$data['snmp_port'],
-							$data['units'],
-							$data['multiplier'],
-							$data['delta'],
-							$data['snmpv3_securityname'],
-							$data['snmpv3_securitylevel'],
-							$data['snmpv3_authpassphrase'],
-							$data['snmpv3_privpassphrase'],
-							$data['formula'],
-							$data['trends'],
-							$data['logtimefmt'],
-							$data['valuemapid'],
-							$data['delay_flex'],
-							$data['params'],
-							$data['ipmi_sensor'],
-							$data['applications']);
+						$data['hostid'] = $this->data[XML_TAG_HOST]['hostid'];
+						$data['key_'] = $data['key'];
+						
+						add_item($data);
 					}
 
 					break; // case

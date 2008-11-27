@@ -346,6 +346,34 @@ include_once "include/page_header.php";
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		$db_delay_flex = trim($db_delay_flex,';');
 		
+		$item = array(
+				'description'	=> get_request('description'),
+				'key_'			=> get_request('key'),
+				'hostid'		=> get_request('hostid'),
+				'delay'			=> get_request('delay'),
+				'history'		=> get_request('history'),
+				'status'		=> get_request('status'),
+				'type'			=> get_request('type'),
+				'snmp_community'=> get_request('snmp_community'),
+				'snmp_oid'		=> get_request('snmp_oid'),
+				'value_type'	=> get_request('value_type'),
+				'trapper_hosts'	=> get_request('trapper_hosts'),
+				'snmp_port'		=> get_request('snmp_port'),
+				'units'			=> get_request('units'),
+				'multiplier'	=> get_request('multiplier'),
+				'delta'			=> get_request('delta'),
+				'snmpv3_securityname'	=> get_request('snmpv3_securityname'),
+				'snmpv3_securitylevel'	=> get_request('snmpv3_securitylevel'),
+				'snmpv3_authpassphrase'	=> get_request('snmpv3_authpassphrase'),
+				'snmpv3_privpassphrase'	=> get_request('snmpv3_privpassphrase'),
+				'formula'			=> get_request('formula'),
+				'trends'			=> get_request('trends'),
+				'logtimefmt'		=> get_request('logtimefmt'),
+				'valuemapid'		=> get_request('valuemapid'),
+				'delay_flex'		=> $db_delay_flex,
+				'params'			=> get_request('params'),
+				'ipmi_sensor'		=> get_request('ipmi_sensor'));
+				
 		if(isset($_REQUEST['itemid'])){
 			DBstart();
 			
@@ -357,19 +385,19 @@ include_once "include/page_header.php";
 					$applications[$new_appid] = $new_appid;
 			}
 			
-			if($new_appid){				
-				$result = smart_update_item($_REQUEST['itemid'],
-					$_REQUEST['description'],$_REQUEST['key'],$_REQUEST['hostid'],$_REQUEST['delay'],
-					$_REQUEST['history'],$_REQUEST['status'],$_REQUEST['type'],
-					$_REQUEST['snmp_community'],$_REQUEST['snmp_oid'],$_REQUEST['value_type'],
-					$_REQUEST['trapper_hosts'],$_REQUEST['snmp_port'],$_REQUEST['units'],
-					$_REQUEST['multiplier'],$_REQUEST['delta'],$_REQUEST['snmpv3_securityname'],
-					$_REQUEST['snmpv3_securitylevel'],$_REQUEST['snmpv3_authpassphrase'],
-					$_REQUEST['snmpv3_privpassphrase'],$_REQUEST['formula'],$_REQUEST['trends'],
-					$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],$db_delay_flex,$_REQUEST['params'],
-					$_REQUEST['ipmi_sensor'],$applications);
-			}
+			$item['applications'] = $applications;
 			
+			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
+			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
+					
+			foreach($item as $field => $value){
+				if($item[$field] == $db_item[$field]) $item[$field] = null;
+			}
+
+			if($new_appid){
+				$result = smart_update_item($_REQUEST['itemid'],$item);
+			}
+
 			$result = DBend($result);
 
 			$itemid = $_REQUEST['itemid'];
@@ -387,17 +415,10 @@ include_once "include/page_header.php";
 					$applications[$new_appid] = $new_appid;
 			}
 			
+			$item['applications'] = $applications;
+			
 			if($new_appid){
-				$itemid=add_item(
-					$_REQUEST['description'],$_REQUEST['key'],$_REQUEST['hostid'],$_REQUEST['delay'],
-					$_REQUEST['history'],$_REQUEST['status'],$_REQUEST['type'],
-					$_REQUEST['snmp_community'],$_REQUEST['snmp_oid'],$_REQUEST['value_type'],
-					$_REQUEST['trapper_hosts'],$_REQUEST['snmp_port'],$_REQUEST['units'],
-					$_REQUEST['multiplier'],$_REQUEST['delta'],$_REQUEST['snmpv3_securityname'],
-					$_REQUEST['snmpv3_securitylevel'],$_REQUEST['snmpv3_authpassphrase'],
-					$_REQUEST['snmpv3_privpassphrase'],$_REQUEST['formula'],$_REQUEST['trends'],
-					$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],$db_delay_flex,$_REQUEST['params'],
-					$_REQUEST['ipmi_sensor'],$applications);
+				$itemid=add_item($item);
 			}
 				
 			$result = DBend($itemid);
@@ -405,6 +426,7 @@ include_once "include/page_header.php";
 			$action = AUDIT_ACTION_ADD;
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
+
 		if($result){	
 			$host = get_host_by_hostid($_REQUEST['hostid']);
 
@@ -435,8 +457,6 @@ include_once "include/page_header.php";
 		
 	}
 	else if(isset($_REQUEST['update'])&&isset($_REQUEST['group_itemid'])&&isset($_REQUEST['form_mass_update'])){
-		$applications = get_request('applications',array());
-
 		$delay_flex = get_request('delay_flex',array());
 		$db_delay_flex = '';
 		foreach($delay_flex as $val)
@@ -449,18 +469,38 @@ include_once "include/page_header.php";
 		$group_itemid = $_REQUEST['group_itemid'];
 		$result = false;
 		
+		$item = array(
+				'description'	=> null,
+				'key_'			=> null,
+				'hostid'		=> null,
+				'delay'			=> get_request('delay'),
+				'history'		=> get_request('history'),
+				'status'		=> get_request('status'),
+				'type'			=> get_request('type'),
+				'snmp_community'=> get_request('snmp_community'),
+				'snmp_oid'		=> get_request('snmp_oid'),
+				'value_type'	=> get_request('value_type'),
+				'trapper_hosts'	=> get_request('trapper_hosts'),
+				'snmp_port'		=> get_request('snmp_port'),
+				'units'			=> get_request('units'),
+				'multiplier'	=> get_request('multiplier'),
+				'delta'			=> get_request('delta'),
+				'snmpv3_securityname'	=> get_request('snmpv3_securityname'),
+				'snmpv3_securitylevel'	=> get_request('snmpv3_securitylevel'),
+				'snmpv3_authpassphrase'	=> get_request('snmpv3_authpassphrase'),
+				'snmpv3_privpassphrase'	=> get_request('snmpv3_privpassphrase'),
+				'formula'			=> get_request('formula'),
+				'trends'			=> get_request('trends'),
+				'logtimefmt'		=> get_request('logtimefmt'),
+				'valuemapid'		=> get_request('valuemapid'),
+				'delay_flex'		=> $db_delay_flex,
+				'params'			=> null,
+				'ipmi_sensor'		=> get_request('ipmi_sensor'),
+				'applications'		=> get_request('applications',array()));
+				
 		DBstart();
 		foreach($group_itemid as $id){
-			$result |= smart_update_item($id,
-				null,null,null,get_request('delay'),
-				get_request('history'),get_request('status'),get_request('type'),
-				get_request('snmp_community'),get_request('snmp_oid'),get_request('value_type'),
-				get_request('trapper_hosts'),get_request('snmp_port'),get_request('units'),
-				get_request('multiplier'),get_request('delta'),get_request('snmpv3_securityname'),
-				get_request('snmpv3_securitylevel'),get_request('snmpv3_authpassphrase'),
-				get_request('snmpv3_privpassphrase'),get_request('formula'),get_request('trends'),
-				get_request('logtimefmt'),get_request('valuemapid'),$db_delay_flex,null,
-				get_request('ipmi_sensor'),$applications);
+			$result |= smart_update_item($id,$item);
 		}
 		$result = DBend($result);
 		
@@ -504,6 +544,36 @@ include_once "include/page_header.php";
 	else if(isset($_REQUEST['register'])){
 	
 		if($_REQUEST['register']=='do'){
+			$item = array(
+					'description'	=> get_request('description'),
+					'key_'			=> get_request('key'),
+					'hostid'		=> get_request('hostid'),
+					'delay'			=> get_request('delay'),
+					'history'		=> get_request('history'),
+					'status'		=> get_request('status'),
+					'type'			=> get_request('type'),
+					'snmp_community'=> get_request('snmp_community'),
+					'snmp_oid'		=> get_request('snmp_oid'),
+					'value_type'	=> get_request('value_type'),
+					'trapper_hosts'	=> get_request('trapper_hosts'),
+					'snmp_port'		=> get_request('snmp_port'),
+					'units'			=> get_request('units'),
+					'multiplier'	=> get_request('multiplier'),
+					'delta'			=> get_request('delta'),
+					'snmpv3_securityname'	=> get_request('snmpv3_securityname'),
+					'snmpv3_securitylevel'	=> get_request('snmpv3_securitylevel'),
+					'snmpv3_authpassphrase'	=> get_request('snmpv3_authpassphrase'),
+					'snmpv3_privpassphrase'	=> get_request('snmpv3_privpassphrase'),
+					'formula'			=> get_request('formula'),
+					'trends'			=> get_request('trends'),
+					'logtimefmt'		=> get_request('logtimefmt'),
+					'valuemapid'		=> get_request('valuemapid'),
+//					'delay_flex'		=> $db_delay_flex,
+					'params'			=> get_request('params'),
+					'ipmi_sensor'		=> get_request('ipmi_sensor'),
+//					'applications'		=> $applications
+				);
+					
 			if($_REQUEST['action']=='add to group'){
 				$applications = get_request('applications',array());
 				$delay_flex = get_request('delay_flex',array());
@@ -515,18 +585,11 @@ include_once "include/page_header.php";
 				
 				$db_delay_flex = trim($db_delay_flex,';');
 				
+				$item['delay_flex'] = $db_delay_flex;
+				$item['applications'] = $applications;
+				
 				DBstart();
-				$itemid=add_item_to_group(
-					$_REQUEST['add_groupid'],$_REQUEST['description'],$_REQUEST['key'],
-					$_REQUEST['hostid'],$_REQUEST['delay'],$_REQUEST['history'],
-					$_REQUEST['status'],$_REQUEST['type'],$_REQUEST['snmp_community'],
-					$_REQUEST['snmp_oid'],$_REQUEST['value_type'],$_REQUEST['trapper_hosts'],
-					$_REQUEST['snmp_port'],$_REQUEST['units'],$_REQUEST['multiplier'],
-					$_REQUEST['delta'],$_REQUEST['snmpv3_securityname'],
-					$_REQUEST['snmpv3_securitylevel'],$_REQUEST['snmpv3_authpassphrase'],
-					$_REQUEST['snmpv3_privpassphrase'],$_REQUEST['formula'],
-					$_REQUEST['trends'],$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],
-					$db_delay_flex, $_REQUEST['params'], $_REQUEST['ipmi_sensor'], $applications);
+				$itemid=add_item_to_group($_REQUEST['add_groupid'],$item);
 					
 				$result = DBend($itemid);
 				show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
@@ -536,6 +599,7 @@ include_once "include/page_header.php";
 					unset($itemid);
 				}
 			}
+			
 			if($_REQUEST['action']=='update in group'){
 			
 				$applications = get_request('applications',array());
@@ -548,18 +612,11 @@ include_once "include/page_header.php";
 				
 				$db_delay_flex = trim($db_delay_flex,';');
 				
+				$item['delay_flex'] = $db_delay_flex;
+				$item['applications'] = $applications;
+				
 				DBstart();
-					$result = update_item_in_group($_REQUEST['add_groupid'],
-						$_REQUEST['itemid'],$_REQUEST['description'],$_REQUEST['key'],
-						$_REQUEST['hostid'],$_REQUEST['delay'],$_REQUEST['history'],
-						$_REQUEST['status'],$_REQUEST['type'],$_REQUEST['snmp_community'],
-						$_REQUEST['snmp_oid'],$_REQUEST['value_type'],$_REQUEST['trapper_hosts'],
-						$_REQUEST['snmp_port'],$_REQUEST['units'],$_REQUEST['multiplier'],
-						$_REQUEST['delta'],$_REQUEST['snmpv3_securityname'],
-						$_REQUEST['snmpv3_securitylevel'],$_REQUEST['snmpv3_authpassphrase'],
-						$_REQUEST['snmpv3_privpassphrase'],$_REQUEST['formula'],
-						$_REQUEST['trends'],$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],
-						$db_delay_flex, $_REQUEST['params'], $_REQUEST['ipmi_sensor'], $applications);
+					$result = update_item_in_group($_REQUEST['add_groupid'],$_REQUEST['itemid'],$item);
 				$result = DBend($result);
 				
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
@@ -568,6 +625,7 @@ include_once "include/page_header.php";
 					unset($_REQUEST['itemid']);
 				}
 			}
+			
 			if($_REQUEST['action']=='delete from group'){
 				
 				DBstart();

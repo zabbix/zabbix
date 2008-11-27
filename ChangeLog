@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-267] improved item template-update (Artem)
  - [DEV-261] added triggers status to screens (Artem)
  - [DEV-256] improved multiple labels in maps and support of macros (Sasha)
  - [DEV-265] added popups with links to "Status of trigger" & "Events history" pages (Artem)
