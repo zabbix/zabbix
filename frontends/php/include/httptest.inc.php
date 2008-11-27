@@ -46,19 +46,18 @@
 	}
 
 	function db_save_step($hostid, $applicationid, $httptestid, $testname, $name, $no, $timeout, $url, $posts, $required, $status_codes, $delay, $history, $trends){
-		if( $no <= 0 ){
+		if($no <= 0){
 			error('Scenario step number can\'t be less then 1');
 			return false;
 		}
 
-		if (!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)) {
+		if(!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)){
 			error("Scenario step name should contain '0-9a-zA-Z_ .$'- characters only");
 			return false;
 		}
 
-		if(!($httpstep_data = DBfetch(DBselect('select httpstepid from httpstep '.
-			' where httptestid='.$httptestid.' and name='.zbx_dbstr($name)))))
-		{
+		if(!$httpstep_data = DBfetch(DBselect('select httpstepid from httpstep where httptestid='.$httptestid.' and name='.zbx_dbstr($name)))){
+			
 			$httpstepid = get_dbid("httpstep","httpstepid");
 			
 			if (!DBexecute('insert into httpstep'.
@@ -68,8 +67,7 @@
 				zbx_dbstr($posts).','.zbx_dbstr($required).','.zbx_dbstr($status_codes).')'
 				)) return false;
 		}
-		else
-		{
+		else{
 			$httpstepid = $httpstep_data['httpstepid'];
 
 			if (!DBexecute('update httpstep set '.
@@ -99,40 +97,65 @@
 				'httpstepitemtype'=> HTTPSTEP_ITEM_TYPE_RSPCODE),
 			);
 		
-		foreach($monitored_items as $item)
-		{
+		foreach($monitored_items as $item){
 			$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
 				' from items i, httpstepitem hi '.
 				' where hi.httpstepid='.$httpstepid.' and hi.itemid=i.itemid '.
 				' and hi.type='.$item['httpstepitemtype']));
 
-			if(!$item_data)
-			{
+			if(!$item_data){
 				$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
 					' from items i where i.key_='.zbx_dbstr($item['key_']).' and i.hostid='.$hostid));
 			}
 
-			if(!$item_data)
-			{
-				if (!($itemid = add_item($item['description'], $item['key_'], $hostid, $delay,
-					$history, ITEM_STATUS_ACTIVE, ITEM_TYPE_HTTPTEST, '', '',
-					$item['type'], 'localhost', 161, $item['units'], 0, 0,
-					'', 0, '', '', '0', $trends, '', 0,
-					'', '', '', array($applicationid))))
+			$item_args = array(
+				'description'	=> $item['description'],
+				'key_'			=> $item['key_'],
+				'hostid'		=> $hostid,
+				'delay'			=> $delay,
+				'type'			=> ITEM_TYPE_HTTPTEST,
+				'snmp_community'=> '',
+				'snmp_oid'		=> '',
+				'value_type'	=> $item['type'],
+				'trapper_hosts'	=> 'localhost',
+				'snmp_port'		=> 161,
+				'units'			=> $item['units'],
+				'multiplier'	=> 0,
+				'snmpv3_securityname'	=> '',
+				'snmpv3_securitylevel'	=> 0,
+				'snmpv3_authpassphrase'	=> '',
+				'snmpv3_privpassphrase'	=> '',
+				'formula'			=> 0,
+				'logtimefmt'		=> '',
+				'delay_flex'		=> '',
+				'params'			=> '',
+				'ipmi_sensor'		=> '',
+				'applications'		=> array($applicationid));
+				
+			if(!$item_data){
+				$item_args['history'] = $history;
+				$item_args['status'] = ITEM_STATUS_ACTIVE;
+				$item_args['delta'] = 0;
+				$item_args['trends'] = $trends;
+				$item_args['valuemapid'] = 0;
+				
+				if(!$itemid = add_item($item_args)){
 					return false;
+				}
 			}
-			else
-			{
+			else{
 				$itemid = $item_data['itemid'];
 
-				if (!(update_item($itemid, $item['description'], $item['key_'], $hostid, $delay,
-					$item_data['history'], $item_data['status'], ITEM_TYPE_HTTPTEST, '', '',
-					$item['type'], 'localhost', 161, $item['units'], 0, $item_data['delta'],
-					'', 0, '', '', '0', $item_data['trends'], '', $item_data['valuemapid'],
-					'', '', '', array($applicationid))))
+				$item_args['history'] = $item_data['history'];
+				$item_args['status'] = $item_data['status'];
+				$item_args['delta'] = $item_data['delta'];
+				$item_args['trends'] = $item_data['trends'];
+				$item_args['valuemapid'] = $item_data['valuemapid'];
+					
+				if(!update_item($itemid, $item_args)){
 					return false;
+				}
 			}
-
 			
 			$httpstepitemid = get_dbid('httpstepitem', 'httpstepitemid');
 
@@ -148,13 +171,11 @@
 		return $httpstepid;
 	}
 
-	function	db_save_httptest($httptestid, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps)
-	{
+	function	db_save_httptest($httptestid, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps){
 		$history = 30; // TODO !!! Allow user set this parametr
 		$trends = 90; // TODO !!! Allow user set this parametr
 
- 		if (!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)) 
-		{
+ 		if(!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)) {
 			error("Scenario name should contain '0-9a-zA-Z_.$ '- characters only");
 			return false;
 		}
@@ -167,26 +188,22 @@
 		{
 			$applicationid = $applicationid['applicationid'];
 		}
-		else
-		{
+		else{
 			$applicationid = add_application($application, $hostid);
-			if(!$applicationid)
-			{
+			if(!$applicationid){
 				error('Can\'t add new application. ['.$application.']');
 				return false;
 			}
 		}
 		
-		if(isset($httptestid))
-		{
+		if(isset($httptestid)){
 			$result = DBexecute('update httptest set '.
 				' applicationid='.$applicationid.', name='.zbx_dbstr($name).', delay='.$delay.','.
 				' status='.$status.', agent='.zbx_dbstr($agent).', macros='.zbx_dbstr($macros).','.
 				' error='.zbx_dbstr('').', curstate='.HTTPTEST_STATE_UNKNOWN.
 				' where httptestid='.$httptestid);
 		}
-		else
-		{
+		else{
 			$httptestid = get_dbid("httptest","httptestid");
 			
 			if(DBfetch(DBselect('select t.httptestid from httptest t, applications a where t.applicationid=a.applicationid '.
@@ -205,11 +222,9 @@
 			$test_added = true;
 		}
 
-		if($result)
-		{
+		if($result){
 			$httpstepids = array();
-			foreach($steps as $sid => $s)
-			{
+			foreach($steps as $sid => $s){
 				if(!isset($s['name']))		$s['name'] = '';
 				if(!isset($s['timeout']))	$s['timeout'] = 15;
 				if(!isset($s['url']))       	$s['url'] = '';
@@ -225,20 +240,17 @@
 				
 				$httpstepids[$result] = $result;
 			}
-			if($result)
-			{
+			if($result){
 				/* clean unneeded steps */
 				$db_steps = DBselect('select httpstepid from httpstep where httptestid='.$httptestid);
-				while($step_data = DBfetch($db_steps))
-				{
+				while($step_data = DBfetch($db_steps)){
 					if(isset($httpstepids[$step_data['httpstepid']]))	continue;
 					delete_httpstep($step_data['httpstepid']);
 				}
 			}
 		}
 
-		if($result)
-		{
+		if($result){
 			$monitored_items = array(
 				array(
 					'description'	=> 'Download speed for scenario \'$1\'',
@@ -254,41 +266,63 @@
 					'httptestitemtype'=> HTTPSTEP_ITEM_TYPE_LASTSTEP)
 				);
 			
-			foreach($monitored_items as $item)
-			{
+			foreach($monitored_items as $item){
 				$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
 					' from items i, httptestitem hi '.
 					' where hi.httptestid='.$httptestid.' and hi.itemid=i.itemid '.
 					' and hi.type='.$item['httptestitemtype']));
 
-				if(!$item_data)
-				{
+				if(!$item_data){
 					$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
 						' from items i where i.key_='.zbx_dbstr($item['key_']).' and i.hostid='.$hostid));
 				}
 
-				if(!$item_data)
-				{
-					if (!($itemid = add_item($item['description'], $item['key_'], $hostid, $delay,
-						$history, ITEM_STATUS_ACTIVE, ITEM_TYPE_HTTPTEST, '', '',
-						$item['type'], 'localhost', 161, $item['units'], 0, 0,
-						'', 0, '', '', '0', $trends, '', 0,
-						'', '', '', array($applicationid))))
-					{
+				$item_args = array(
+					'description'	=> $item['description'],
+					'key_'			=> $item['key_'],
+					'hostid'		=> $hostid,
+					'delay'			=> $delay,
+					'type'			=> ITEM_TYPE_HTTPTEST,
+					'snmp_community'=> '',
+					'snmp_oid'		=> '',
+					'value_type'	=> $item['type'],
+					'trapper_hosts'	=> 'localhost',
+					'snmp_port'		=> 161,
+					'units'			=> $item['units'],
+					'multiplier'	=> 0,
+					'snmpv3_securityname'	=> '',
+					'snmpv3_securitylevel'	=> 0,
+					'snmpv3_authpassphrase'	=> '',
+					'snmpv3_privpassphrase'	=> '',
+					'formula'			=> 0,
+					'logtimefmt'		=> '',
+					'delay_flex'		=> '',
+					'params'			=> '',
+					'ipmi_sensor'		=> '',
+					'applications'		=> array($applicationid));
+					
+				if(!$item_data){
+					$item_args['history'] = $history;
+					$item_args['status'] = ITEM_STATUS_ACTIVE;
+					$item_args['delta'] = 0;
+					$item_args['trends'] = $trends;
+					$item_args['valuemapid'] = 0;
+					
+					if(!$itemid = add_item($item_args)){
 						$result = false;
 						break;
 					}
 				}
-				else
-				{
+				else{
 					$itemid = $item_data['itemid'];
 
-					if (!(update_item($itemid, $item['description'], $item['key_'], $hostid, $delay,
-						$item_data['history'], $item_data['status'], ITEM_TYPE_HTTPTEST, '', '',
-						$item['type'], 'localhost', 161, $item['units'], 0, $item_data['delta'],
-						'', 0, '', '', '0', $item_data['trends'], '', $item_data['valuemapid'],
-						'', '', '', array($applicationid))))
-					{
+					$item_args['history'] = $item_data['history'];
+					$item_args['status'] = $item_data['status'];
+					$item_args['delta'] = $item_data['delta'];
+					$item_args['trends'] = $item_data['trends'];
+					$item_args['valuemapid'] = $item_data['valuemapid'];
+						
+					if(!update_item($itemid, $item_args)){
 						$result = false;
 						break;
 					}
