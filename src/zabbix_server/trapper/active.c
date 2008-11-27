@@ -164,7 +164,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 
 out:
 	if (FAIL == res)
-		zabbix_log(LOG_LEVEL_WARNING, "Send list of active checks failed [%s]: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "Send list of active checks to [%s] failed: %s",
 				get_ip_by_socket(sock), error);
 
 	return res;
@@ -343,7 +343,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 out:
 	if (FAIL == res)
-		zabbix_log(LOG_LEVEL_WARNING, "Send list of active checks failed [%s]: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "Send list of active checks to [%s] failed: %s",
 				get_ip_by_socket(sock), error);
 
 	return res;

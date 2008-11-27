@@ -55,7 +55,7 @@ void	zbx_db_close(void)
 #endif
 #ifdef	HAVE_ORACLE
 	if (SQLO_SUCCESS != sqlo_finish(oracle))
-		zabbix_log(LOG_LEVEL_ERR, "Cannot finish ORACLE session");
+		zabbix_errlog(ERR_Z3004, 0, "sqlo_finish");
 #endif
 #ifdef	HAVE_SQLITE3
 	sqlite_transaction_started = 0;
@@ -77,45 +77,42 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	char	*p, *path;
 #endif /* HAVE_SQLITE3 */
 
-	/*	zabbix_log(LOG_LEVEL_ERR, "[%s] [%s] [%s]\n",dbname, dbuser, dbpassword ); */
 #ifdef	HAVE_MYSQL
 	/* For MySQL >3.22.00 */
 	/*	if( ! mysql_connect( conn, NULL, dbuser, dbpassword ) )*/
 
 	conn = mysql_init(NULL);
 
-	if( ! mysql_real_connect( conn, host, user, password, dbname, port, dbsocket, CLIENT_MULTI_STATEMENTS) )
+	if (!mysql_real_connect(conn, host, user, password, dbname, port, dbsocket, CLIENT_MULTI_STATEMENTS))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s [%d]",
-			mysql_error(conn), mysql_errno(conn));
+		zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
 		ret = ZBX_DB_FAIL;
 	}
 
-	if(ZBX_DB_OK == ret)
+	if (ZBX_DB_OK == ret)
 	{
-		if( mysql_select_db( conn, dbname ) != 0 )
+		if (0 != mysql_select_db(conn, dbname))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Failed to select database: Error: %s [%d]",
-				mysql_error(conn), mysql_errno(conn));
+			zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
 			ret = ZBX_DB_FAIL;
 		}
 	}
 
-	if(ZBX_DB_OK == ret)
+	if (ZBX_DB_OK == ret)
 		DBexecute("SET CHARACTER SET utf8");
 
-	if(ZBX_DB_FAIL  == ret)
+	if (ZBX_DB_FAIL == ret)
 	{
-		switch(mysql_errno(conn)) {
-			case	CR_SERVER_GONE_ERROR:
-			case	CR_CONNECTION_ERROR:
-			case	CR_SERVER_LOST:
-			case	ER_SERVER_SHUTDOWN:
-			case	ER_UNKNOWN_ERROR:
-				ret = ZBX_DB_DOWN;
-				break;
-			default:
-				break;
+		switch (mysql_errno(conn)) {
+		case CR_SERVER_GONE_ERROR:
+		case CR_CONNECTION_ERROR:
+		case CR_SERVER_LOST:
+		case ER_SERVER_SHUTDOWN:
+		case ER_UNKNOWN_ERROR:
+			ret = ZBX_DB_DOWN;
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -132,14 +129,14 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	zbx_free(cport);
 
-/* check to see that the backend connection was successfully made */
+	/* check to see that the backend connection was successfully made */
 	if (PQstatus(conn) != CONNECTION_OK)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed: %s", dbname, PQerrorMessage(conn));
+		zabbix_errlog(ERR_Z3001, dbname, 0, PQerrorMessage(conn));
 		ret = ZBX_DB_FAIL;
 	}
 
-	result = DBselect("select oid from pg_type where typname = 'bytea'" );
+	result = DBselect("select oid from pg_type where typname = 'bytea'");
 	row = DBfetch(result);
 	if(row)
 	{
@@ -152,30 +149,27 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #ifdef	HAVE_ORACLE
 	char	connect[MAX_STRING_LEN];
 
-	if (SQLO_SUCCESS != sqlo_init(SQLO_OFF, 1, 100)) {
-		zabbix_log(LOG_LEVEL_ERR, "Failed to init libsqlora8");
+	zbx_strlcpy(connect, user, sizeof(connect));
 
+	if (password && *password) {
+		zbx_strlcat(connect, "/", sizeof(connect));
+		zbx_strlcat(connect, password, sizeof(connect));
+
+		if (dbname && *dbname) {
+			zbx_strlcat(connect, "@", sizeof(connect));
+			zbx_strlcat(connect, dbname, sizeof(connect));
+		}
+	}
+
+	if (SQLO_SUCCESS != sqlo_init(SQLO_OFF, 1, 100)) {
+		zabbix_errlog(ERR_Z3001, connect, 0, "Failed to init libsqlora8");
 		ret = ZBX_DB_FAIL;
 	}
 
 	if (ZBX_DB_OK == ret) {
-		zbx_strlcpy(connect, user, sizeof(connect));
-
-		if (password && *password) {
-			zbx_strlcat(connect, "/", sizeof(connect));
-			zbx_strlcat(connect, password, sizeof(connect));
-
-			if (dbname && *dbname) {
-				zbx_strlcat(connect, "@", sizeof(connect));
-				zbx_strlcat(connect, dbname, sizeof(connect));
-			}
-		}
-
 		/* login */ /* TODO: how to use port??? */
 		if (SQLO_SUCCESS != sqlo_connect(&oracle, connect)) {
-			zabbix_log(LOG_LEVEL_ERR, "Cannot login with %s",
-					connect);
-
+			zabbix_errlog(ERR_Z3001, connect, 0, "sqlo_connect");
 			ret = ZBX_DB_FAIL;
 		}
 	}
@@ -186,12 +180,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	return ret;
 #endif
 #ifdef	HAVE_SQLITE3
-	ret = sqlite3_open(dbname, &conn);
-
-/* check to see that the backend connection was successfully made */
-	if (ret) {
-		zabbix_log(LOG_LEVEL_ERR, "Can't open database [%s]: %s\n", dbname, sqlite3_errmsg(conn));
-		DBclose();
+	/* check to see that the backend connection was successfully made */
+	if (SQLITE_OK != (ret = sqlite3_open(dbname, &conn))) {
+		zabbix_errlog(ERR_Z3001, dbname, 0, sqlite3_errmsg(conn));
 		exit(FAIL);
 	}
 
@@ -230,7 +221,7 @@ void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbs
 
 		ret = sqlite3_open(dbname, &conn);
 		if (SQLITE_OK != ret) {
-			zabbix_log(LOG_LEVEL_ERR, "Can't create database \"%s\": %s", dbname, sqlite3_errmsg(conn));
+			zabbix_errlog(ERR_Z3002, dbname, 0, sqlite3_errmsg(conn));
 			exit(FAIL);
 		}
 
@@ -412,6 +403,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 
 #ifdef	HAVE_POSTGRESQL
 	PGresult	*result;
+	char		*error = NULL;
 #endif
 #ifdef	HAVE_SQLITE3
 	char *error=0;
@@ -428,15 +420,14 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 #ifdef	HAVE_MYSQL
 	if(!conn)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query executing require connection to database!");
+		zabbix_errlog(ERR_Z3003);
 		ret = ZBX_DB_FAIL;
 	}
 	else
 	{
-		if ((status = mysql_query(conn,sql)) != 0)
+		if (0 != (status = mysql_query(conn,sql)))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Query failed: [%s] %s [%d]",
-				sql, mysql_error(conn), mysql_errno(conn) );
+			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 			switch(mysql_errno(conn)) {
 				case	CR_SERVER_GONE_ERROR:
 				case	CR_CONNECTION_ERROR:
@@ -467,8 +458,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 
 				/* more results? -1 = no, >0 = error, 0 = yes (keep looping) */
 			        if ((status = mysql_next_result(conn)) > 0)
-					zabbix_log(LOG_LEVEL_ERR, "Query failed: [%s] %s [%d]",
-							sql, mysql_error(conn), mysql_errno(conn));
+					zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 			} while (status == 0);
 		}
 	}
@@ -478,16 +468,16 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 
 	if( result==NULL)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
+		zabbix_errlog(ERR_Z3005, 0, "Result is NULL", sql);
 		ret = ZBX_DB_FAIL;
 	}
 	else if( PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s:%s",
+		error = zbx_dsprintf(error, "%s:%s",
 				PQresStatus(PQresultStatus(result)),
-			 	PQresultErrorMessage(result));
+				PQresultErrorMessage(result));
+		zabbix_errlog(ERR_Z3005, 0, error, sql);
+		zbx_free(error);
 		ret = ZBX_DB_FAIL;
 	}
 
@@ -500,36 +490,33 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 #ifdef	HAVE_ORACLE
 	if ((ret = sqlo_exec(oracle, sql))<0)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(oracle) );
-		zbx_error("Query::%s.",sql);
-		zbx_error("Query failed:%s.", sqlo_geterror(oracle) );
+		zabbix_errlog(ERR_Z3005, 0, sqlo_geterror(oracle), sql);
 		ret = ZBX_DB_FAIL;
 	}
 #endif
 #ifdef	HAVE_SQLITE3
-	if(!sqlite_transaction_started)
+	if (!sqlite_transaction_started)
 	{
 		php_sem_acquire(&sqlite_access);
 	}
 	
 lbl_exec:
-	if(SQLITE_OK != (ret = sqlite3_exec(conn, sql, NULL, 0, &error)))
+	if (SQLITE_OK != (ret = sqlite3_exec(conn, sql, NULL, 0, &error)))
 	{
-		if(ret == SQLITE_BUSY) goto lbl_exec; /* attention deadlock!!! */
-		
-		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed [%i]:%s", ret, error);
+		if (ret == SQLITE_BUSY)
+			goto lbl_exec; /* attention deadlock!!! */
+
+		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		sqlite3_free(error);
 		ret = ZBX_DB_FAIL;
 	}
 
-	if(ret == ZBX_DB_OK)
+	if (ret == ZBX_DB_OK)
 	{
 		ret = sqlite3_changes(conn);
 	}
 
-	if(!sqlite_transaction_started)
+	if (!sqlite_transaction_started)
 	{
 		php_sem_release(&sqlite_access);
 	}
@@ -540,6 +527,7 @@ lbl_exec:
 		zabbix_log( LOG_LEVEL_WARNING, "Long query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);*/
 
 	zbx_free(sql);
+
 	return ret;
 }
 
@@ -651,7 +639,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		return NULL;
 	}
 
-	zabbix_log( LOG_LEVEL_ERR, "Fetch failed:%s\n", sqlo_geterror(oracle) );
+	zabbix_errlog(ERR_Z3006, 0, sqlo_geterror(oracle));
 	exit(FAIL);
 	return NULL;
 #endif
@@ -691,6 +679,9 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 	int ret = FAIL;
 	char *error=NULL;
 #endif
+#ifdef	HAVE_POSTGRESQL
+	char	*error = NULL;
+#endif
 
 /*	sec = zbx_time();*/
 
@@ -701,15 +692,14 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 #ifdef	HAVE_MYSQL
 	if(!conn)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query executing require connection to database!");
+		zabbix_errlog(ERR_Z3003);
 		result = NULL;
 	}
 	else
 	{
 		if(mysql_query(conn,sql) != 0)
 		{
-			zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
-			zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(conn), mysql_errno(conn) );
+			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 			switch(mysql_errno(conn)) {
 				case	CR_SERVER_GONE_ERROR:
 				case	CR_CONNECTION_ERROR:
@@ -737,17 +727,17 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 
 	if(result->pg_result==NULL)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
-		exit( FAIL );
+		zabbix_errlog(ERR_Z3005, 0, "Result is NULL", sql);
+		exit(FAIL);
 	}
 	if( PQresultStatus(result->pg_result) != PGRES_TUPLES_OK)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s:%s",
+		error = zbx_dsprintf(error, "%s:%s",
 				PQresStatus(PQresultStatus(result->pg_result)),
 			 	PQresultErrorMessage(result->pg_result));
-		exit( FAIL );
+		zabbix_errlog(ERR_Z3005, 0, error, sql);
+		zbx_free(error);
+		exit(FAIL);
 	}
 	
 	/* init rownum */	
@@ -757,8 +747,7 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 #ifdef	HAVE_ORACLE
 	if(0 > (sth = (sqlo_open(oracle, sql,0,NULL))))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(oracle));
+		zabbix_errlog(ERR_Z3005, 0, sqlo_geterror(oracle), sql);
 		exit(FAIL);
 	}
 	result = sth;
@@ -776,9 +765,8 @@ lbl_get_table:
 	if(SQLITE_OK != (ret = sqlite3_get_table(conn,sql,&result->data,&result->nrow, &result->ncolumn, &error)))
 	{
 		if(ret == SQLITE_BUSY) goto lbl_get_table; /* attention deadlock!!! */
-		
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed [%i]:%s", ret, error);
+
+		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		sqlite3_free(error);
 		if(!sqlite_transaction_started)
 		{

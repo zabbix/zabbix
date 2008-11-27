@@ -58,8 +58,7 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 			alarm(0);
 
 			if (SUCCEED != res && GET_MSG_RESULT(result))
-				zabbix_log(LOG_LEVEL_WARNING, "%s item [%s] error: %s",
-						zbx_item_type_string(item->type),
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s",
 						zbx_host_key_string_by_item(item),
 						result->msg);
 			break;
@@ -75,8 +74,7 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 			res = NOTSUPPORTED;
 #endif
 			if (SUCCEED != res && GET_MSG_RESULT(result))
-				zabbix_log(LOG_LEVEL_WARNING, "%s item [%s] error: %s",
-						zbx_item_type_string(item->type),
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s",
 						zbx_host_key_string_by_item(item),
 						result->msg);
 			break;
