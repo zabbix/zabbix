@@ -183,7 +183,6 @@ typedef enum
 	ITEM_TYPE_DB_MONITOR,
 	ITEM_TYPE_IPMI
 } zbx_item_type_t;
-char	*zbx_item_type_string(zbx_item_type_t type);
 
 /* Event sources */
 typedef enum

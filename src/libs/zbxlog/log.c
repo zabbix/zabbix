@@ -189,6 +189,32 @@ void zabbix_set_log_level(int level)
 	log_level = level;
 }
 
+void zabbix_errlog(zbx_err_codes_t err, ...)
+{
+#define ERR_STRING_LEN	256
+	const char	*msg;
+	char		*s = NULL;
+	va_list		ap;
+
+	switch (err) {
+	case ERR_Z3001: msg = "Connection to database '%s' failed: [%d] %s"; break;
+	case ERR_Z3002: msg = "Cannot create database '%s': [%d] %s"; break;
+	case ERR_Z3003: msg = "Query executing require connection to database!"; break;
+	case ERR_Z3004: msg = "Cannot close database session: [%d] %s"; break;
+	case ERR_Z3005: msg = "Query execution failed: [%d] %s [%s]"; break;
+	case ERR_Z3006: msg = "Fetch failed: [%d] %s"; break;
+	default: msg = "Unknown error";
+	}
+
+	va_start(ap, err);
+	s = zbx_dvsprintf(s, msg, ap);
+	va_end(ap);
+
+	zabbix_log(LOG_LEVEL_ERR, "[Z%04d] %s", err, s);
+
+	zbx_free(s);
+}
+
 void __zbx_zabbix_log(int level, const char *fmt, ...)
 {
 #ifdef TEST

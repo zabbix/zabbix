@@ -1681,23 +1681,3 @@ char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 	default: return "unknown";
 	}
 }
-
-char	*zbx_item_type_string(zbx_item_type_t type)
-{
-	switch (type) {
-	case ITEM_TYPE_ZABBIX: return "ZABBIX agent";
-	case ITEM_TYPE_SNMPv1: return "SNMPv1 agent";
-	case ITEM_TYPE_TRAPPER: return "ZABBIX trapper";
-	case ITEM_TYPE_SIMPLE: return "Simple check";
-	case ITEM_TYPE_SNMPv2c: return "SNMPv2 agent";
-	case ITEM_TYPE_INTERNAL: return "ZABBIX internal";
-	case ITEM_TYPE_SNMPv3: return "SNMPv3 agent";
-	case ITEM_TYPE_ZABBIX_ACTIVE: return "ZABBIX agent (active)";
-	case ITEM_TYPE_AGGREGATE: return "ZABBIX aggregate";
-	case ITEM_TYPE_HTTPTEST: return "WEB monitoring";
-	case ITEM_TYPE_EXTERNAL: return "External check";
-	case ITEM_TYPE_DB_MONITOR: return "Database monitor";
-	case ITEM_TYPE_IPMI: return "IPMI agent";
-	default: return "unknown";
-	}
-}
