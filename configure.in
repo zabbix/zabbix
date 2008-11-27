@@ -72,6 +72,7 @@ AC_SEARCH_LIBS(__res_query, resolv bind socket)
 AC_SEARCH_LIBS(res_query, resolv bind socket)
 #Aix 6.x requires this
 AC_SEARCH_LIBS(perfstat_memory_total, perfstat, [AC_DEFINE([HAVE_LIBPERFSTAT], 1, [Define to 1 if you have the 'libperfstat' library (-lperfstat)])])
+AC_SEARCH_LIBS(iconv_open, iconv)
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(kvm, main)
 dnl AC_CHECK_LIB(pthread, main)
