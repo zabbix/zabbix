@@ -1735,6 +1735,7 @@
 	'S_GRAPH_ELEMENT'=>			'Graph element',
 	'S_UNKNOWN_RESOURCE'=>			'Unknown resource',
 	'S_ALREADY_EXISTS_SMALL'=>		'already exists',
+	'S_ZABBIX_CONFIG'=>			'ZABBIX config',
 
 //	profile.php
 	'S_USER_PROFILE_BIG'=>			'USER PROFILE',
