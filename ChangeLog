@@ -1,3 +1,7 @@
+Changes for 1.0.5
+
+ - [NTD-34] fixed problem with net.tcp.dns under AIX (Sasha)
+
 Changes for 1.0.4
 
  - [NTD-26] fixed problem with iconv under AIX (Sasha)
