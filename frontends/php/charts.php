@@ -29,6 +29,8 @@
 	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js');
 	
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+	
+//	define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once 'include/page_header.php';
 
