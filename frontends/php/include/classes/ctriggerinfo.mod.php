@@ -52,7 +52,7 @@
 		}
 
 		function BodyToString(){
-			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, $this->nodeid);
+			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid(true));
 			
 			foreach($available_triggers as $id => $triggerid){
 				if(trigger_dependent($triggerid))	unset($available_triggers[$id]);
@@ -67,6 +67,7 @@
 							' WHERE t.status='.TRIGGER_STATUS_ENABLED.
 								' AND f.itemid=i.itemid '.
 								' AND h.hostid=i.hostid '.
+//								' AND '.DBin_node('h.hostid').
 								' AND h.status='.HOST_STATUS_MONITORED.
 								' AND t.triggerid=f.triggerid '.
 								' AND i.status='.ITEM_STATUS_ACTIVE.

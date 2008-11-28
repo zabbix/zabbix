@@ -165,7 +165,7 @@
  */		
 	function graph_accessible($graphid){
 		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY,get_current_nodeid(true));
 		
 		$sql = 	'SELECT g.graphid '.
 				' FROM graphs g, graphs_items gi, items i '.
@@ -227,7 +227,6 @@
 					' AND i.itemid=gi.itemid '.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					(!empty($denied_graphs)?' AND '.DBcondition('g.graphid',$denied_graphs,true):'');
-
 		$db_graphs = DBselect($sql);
 		while($graph = DBfetch($db_graphs)){
 			$result[$graph['graphid']] = $graph['graphid'];
@@ -364,7 +363,7 @@
 		return	false;
 	}
 
-	function	get_graphs_by_templateid($templateids){
+	function get_graphs_by_templateid($templateids){
 		zbx_value2array($templateids);
 	return DBselect('SELECT * FROM graphs WHERE '.DBcondition('templateid',$templateids));
 	}

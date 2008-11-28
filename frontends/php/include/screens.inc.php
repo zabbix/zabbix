@@ -30,7 +30,7 @@
 
 		if(DBfetch(DBselect('SELECT screenid FROM screens WHERE screenid='.$screenid.' AND '.DBin_node('screenid', get_current_nodeid($perm))))){
 			$result = true;
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY);
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
 			
 			$db_result = DBselect('SELECT * FROM screens_items WHERE screenid='.$screenid);
 			while(($ac_data = DBfetch($db_result)) && $result){
@@ -87,8 +87,7 @@
 		return $result;
 	}
 
-        function        add_screen($name,$hsize,$vsize)
-        {
+	function add_screen($name,$hsize,$vsize){
 		$screenid=get_dbid("screens","screenid");
                 $sql="insert into screens (screenid,name,hsize,vsize) values ($screenid,".zbx_dbstr($name).",$hsize,$vsize)";
                 $result=DBexecute($sql);
@@ -96,56 +95,53 @@
 		if(!$result)
 			return $result;
 
-		return $screenid;
-        }
+	return $screenid;
+	}
 
-        function update_screen($screenid,$name,$hsize,$vsize)
-        {
-                $sql="update screens set name=".zbx_dbstr($name).",hsize=$hsize,vsize=$vsize where screenid=$screenid";
-                return  DBexecute($sql);
-        }
+	function update_screen($screenid,$name,$hsize,$vsize){
+			$sql="update screens set name=".zbx_dbstr($name).",hsize=$hsize,vsize=$vsize where screenid=$screenid";
+			return  DBexecute($sql);
+	}
+	
+	function delete_screen($screenid){
+		$result=DBexecute('DELETE FROM screens_items where screenid='.$screenid);
+		$result&=DBexecute('DELETE FROM screens_items where resourceid='.$screenid.' and resourcetype='.SCREEN_RESOURCE_SCREEN);
+		$result&=DBexecute('DELETE FROM slides where screenid='.$screenid);
+		$result&=DBexecute("DELETE FROM profiles WHERE idx='web.favorite.screenids' AND source='screenid' AND value_id=$screenid");
+		$result&=DBexecute('DELETE FROM screens where screenid='.$screenid);	
+	return	$result;
+	}
+	
+	function add_screen_item($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url,$dynamic){
+		$sql='DELETE FROM screens_items WHERE screenid='.$screenid.' and x='.$x.' and y='.$y;
+		DBexecute($sql);
+		
+		$screenitemid=get_dbid("screens_items","screenitemid");
+		$result=DBexecute('INSERT INTO screens_items '.
+							'(screenitemid,resourcetype,screenid,x,y,resourceid,width,height,'.
+							' colspan,rowspan,elements,valign,halign,style,url,dynamic) '.
+						' VALUES '.
+							"($screenitemid,$resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,".
+							"$rowspan,$elements,$valign,$halign,$style,".zbx_dbstr($url).",$dynamic)");
+	
+		if(!$result) return $result;
+	return $screenitemid;
+	}
+	
+	function update_screen_item($screenitemid,$resourcetype,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url,$dynamic){
+		return  DBexecute("UPDATE screens_items SET ".
+							"resourcetype=$resourcetype,"."resourceid=$resourceid,"."width=$width,".
+							"height=$height,colspan=$colspan,rowspan=$rowspan,elements=$elements,".
+							"valign=$valign,halign=$halign,style=$style,url=".zbx_dbstr($url).",dynamic=$dynamic".
+						" WHERE screenitemid=$screenitemid");
+	}
+	
+	function delete_screen_item($screenitemid){
+			$sql="DELETE FROM screens_items where screenitemid=$screenitemid";
+			return  DBexecute($sql);
+	}
 
-        function delete_screen($screenid){
-			$result=DBexecute('DELETE FROM screens_items where screenid='.$screenid);
-			$result&=DBexecute('DELETE FROM screens_items where resourceid='.$screenid.' and resourcetype='.SCREEN_RESOURCE_SCREEN);
-			$result&=DBexecute('DELETE FROM slides where screenid='.$screenid);
-			$result&=DBexecute("DELETE FROM profiles WHERE idx='web.favorite.screenids' AND source='screenid' AND value_id=$screenid");
-			$result&=DBexecute('DELETE FROM screens where screenid='.$screenid);	
-		return	$result;
-        }
-
-        function add_screen_item($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url,$dynamic){
-			$sql='DELETE FROM screens_items WHERE screenid='.$screenid.' and x='.$x.' and y='.$y;
-			DBexecute($sql);
-			
-			$screenitemid=get_dbid("screens_items","screenitemid");
-			$result=DBexecute('INSERT INTO screens_items '.
-								'(screenitemid,resourcetype,screenid,x,y,resourceid,width,height,'.
-								' colspan,rowspan,elements,valign,halign,style,url,dynamic) '.
-							' VALUES '.
-								"($screenitemid,$resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,".
-								"$rowspan,$elements,$valign,$halign,$style,".zbx_dbstr($url).",$dynamic)");
-
-			if(!$result) return $result;
-		return $screenitemid;
-        }
-
-        function update_screen_item($screenitemid,$resourcetype,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url,$dynamic){
-			return  DBexecute("UPDATE screens_items SET ".
-								"resourcetype=$resourcetype,"."resourceid=$resourceid,"."width=$width,".
-								"height=$height,colspan=$colspan,rowspan=$rowspan,elements=$elements,".
-								"valign=$valign,halign=$halign,style=$style,url=".zbx_dbstr($url).",dynamic=$dynamic".
-							" WHERE screenitemid=$screenitemid");
-        }
-
-        function delete_screen_item($screenitemid)
-        {
-                $sql="DELETE FROM screens_items where screenitemid=$screenitemid";
-                return  DBexecute($sql);
-        }
-
-	function	get_screen_by_screenid($screenid)
-	{
+	function get_screen_by_screenid($screenid){
 		$result = DBselect("select * from screens where screenid=$screenid");
 		$row=DBfetch($result);
 		if($row)
@@ -161,8 +157,7 @@
 
 			$db_scr_items = DBselect("select resourceid from screens_items where".
 				" screenid=$child_screenid and resourcetype=".SCREEN_RESOURCE_SCREEN);
-			while($scr_item = DBfetch($db_scr_items))
-			{
+			while($scr_item = DBfetch($db_scr_items)){
 				if(check_screen_recursion($mother_screenid,$scr_item["resourceid"]))
 					return TRUE; 
 			}
@@ -214,12 +209,12 @@
 		$result = false;
 
 		if(DBselect('select slideshowid from slideshows where slideshowid='.$slideshowid.
-			' and '.DBin_node('slideshowid', get_current_nodeid($perm))))
+			' and '.DBin_node('slideshowid', get_current_nodeid(null,$perm))))
 		{
 			$result = true;
 			$db_slides = DBselect('select distinct screenid from slides where slideshowid='.$slideshowid);
 			while($slide_data = DBfetch($db_slides)){
-				if( !($result = screen_accessible($slide_data["screenid"], PERM_READ_ONLY)) ) break;
+				if(!$result = screen_accessible($slide_data["screenid"], PERM_READ_ONLY)) break;
 			}
 		}
 	return $result;
@@ -402,7 +397,7 @@
 	
 	function get_screen_item_form(){
 		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
 		
 		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,'screenedit.php#form');
 		$form->SetHelp('web.screenedit.cell.php');
@@ -454,21 +449,22 @@
 		$form->AddVar("screenid",$_REQUEST["screenid"]);
 
 		$cmbRes = new CCombobox("resourcetype",$resourcetype,"submit()");
-		$cmbRes->AddItem(SCREEN_RESOURCE_GRAPH,		S_GRAPH);
-		$cmbRes->AddItem(SCREEN_RESOURCE_SIMPLE_GRAPH,	S_SIMPLE_GRAPH);
-		$cmbRes->AddItem(SCREEN_RESOURCE_PLAIN_TEXT,	S_PLAIN_TEXT);
-		$cmbRes->AddItem(SCREEN_RESOURCE_MAP,		S_MAP);
-		$cmbRes->AddItem(SCREEN_RESOURCE_SCREEN,	S_SCREEN);
-		$cmbRes->AddItem(SCREEN_RESOURCE_SERVER_INFO,	S_SERVER_INFO);
-		$cmbRes->AddItem(SCREEN_RESOURCE_HOSTS_INFO,	S_HOSTS_INFO);
-		$cmbRes->AddItem(SCREEN_RESOURCE_TRIGGERS_INFO,	S_TRIGGERS_INFO);
-		$cmbRes->AddItem(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,	S_TRIGGERS_OVERVIEW);
-		$cmbRes->AddItem(SCREEN_RESOURCE_DATA_OVERVIEW,		S_DATA_OVERVIEW);
-		$cmbRes->AddItem(SCREEN_RESOURCE_CLOCK,		S_CLOCK);
-		$cmbRes->AddItem(SCREEN_RESOURCE_URL,		S_URL);
-		$cmbRes->AddItem(SCREEN_RESOURCE_ACTIONS,	S_HISTORY_OF_ACTIONS);
-                $cmbRes->AddItem(SCREEN_RESOURCE_EVENTS,       S_HISTORY_OF_EVENTS);
-		$form->AddRow(S_RESOURCE,$cmbRes);
+			$cmbRes->addItem(SCREEN_RESOURCE_GRAPH,		S_GRAPH);
+			$cmbRes->addItem(SCREEN_RESOURCE_SIMPLE_GRAPH,	S_SIMPLE_GRAPH);
+			$cmbRes->addItem(SCREEN_RESOURCE_PLAIN_TEXT,	S_PLAIN_TEXT);
+			$cmbRes->addItem(SCREEN_RESOURCE_MAP,		S_MAP);
+			$cmbRes->addItem(SCREEN_RESOURCE_SCREEN,	S_SCREEN);
+			$cmbRes->addItem(SCREEN_RESOURCE_SERVER_INFO,	S_SERVER_INFO);
+			$cmbRes->addItem(SCREEN_RESOURCE_HOSTS_INFO,	S_HOSTS_INFO);
+			$cmbRes->addItem(SCREEN_RESOURCE_TRIGGERS_INFO,	S_TRIGGERS_INFO);
+			$cmbRes->addItem(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,	S_TRIGGERS_OVERVIEW);
+			$cmbRes->addItem(SCREEN_RESOURCE_DATA_OVERVIEW,		S_DATA_OVERVIEW);
+			$cmbRes->addItem(SCREEN_RESOURCE_CLOCK,		S_CLOCK);
+			$cmbRes->addItem(SCREEN_RESOURCE_URL,		S_URL);
+			$cmbRes->addItem(SCREEN_RESOURCE_ACTIONS,	S_HISTORY_OF_ACTIONS);
+			$cmbRes->addItem(SCREEN_RESOURCE_EVENTS,       S_HISTORY_OF_EVENTS);
+		
+		$form->addRow(S_RESOURCE,$cmbRes);
 
 		if($resourcetype == SCREEN_RESOURCE_GRAPH){
 	// User-defined graph
@@ -493,7 +489,7 @@
 				}
 			}
 
-			$form->AddVar('resourceid',$id);
+			$form->addVar('resourceid',$id);
 			
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");

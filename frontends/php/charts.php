@@ -137,7 +137,7 @@ include_once 'include/page_header.php';
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
 	
-	$available_graphs = get_accessible_graphs(PERM_READ_LIST, PERM_RES_IDS_ARRAY, get_current_nodeid());
+	$available_graphs = get_accessible_graphs(PERM_READ_LIST, PERM_RES_IDS_ARRAY, get_current_nodeid(true));
 
 	if(($_REQUEST['graphid']>0) && ($row=DBfetch(DBselect('SELECT DISTINCT graphid, name FROM graphs WHERE graphid='.$_REQUEST['graphid'])))){
 		if(!graph_accessible($_REQUEST['graphid'])){

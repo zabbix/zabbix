@@ -54,7 +54,7 @@ include_once 'include/page_header.php';
 	check_fields($fields);
 ?>
 <?php
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid(true));
 	
 	$items = get_request('items', array());
 	asort_by_key($items, 'sortorder');
