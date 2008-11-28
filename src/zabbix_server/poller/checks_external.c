@@ -117,7 +117,7 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 		}
 		zabbix_log( LOG_LEVEL_DEBUG, "Result [%s]", msg);
 
-		set_result_type(result,item->value_type,strdup(msg));
+		set_result_type(result, item->value_type, msg);
 	}
 	else
 	{
