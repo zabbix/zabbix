@@ -85,7 +85,7 @@ include_once('include/page_header.php');
 		exit();
 	}
 	
-	$_REQUEST["sysmapid"] = get_request("sysmapid",get_profile("web.maps.sysmapid",0));
+	$_REQUEST['sysmapid'] = get_request('sysmapid',get_profile('web.maps.sysmapid',0));
 
 	$all_maps = array();
 	
@@ -94,7 +94,7 @@ include_once('include/page_header.php');
 						' WHERE '.DBin_node('sysmapid').
 						' ORDER BY name');
 	while($row=DBfetch($result)){
-		if(!sysmap_accessible($row["sysmapid"],PERM_READ_ONLY))
+		if(!sysmap_accessible($row['sysmapid'],PERM_READ_ONLY))
 			continue;
 
 		if(!isset($all_maps[0]))
