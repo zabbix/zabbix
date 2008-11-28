@@ -1,5 +1,6 @@
 Changes for 1.4.7:
 
+ - [ZBX-610] fixed memory leak in external checks (Sasha)
  - [ZBX-604] fixed compilation problems under AIX 2.5.1 (Sasha)
  - [ZBX-602] fixed possible incorrect trigger evaluation if value sotred as "delta" (Sasha)
  - [ZBX-450] fixed showing status of items in maps for non english locale (Sasha)
