@@ -290,7 +290,8 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 					else
 					{
 						for (in = values[i].value, out = tmp; *in != '\0'; in ++)
-							*out++ = *in;
+							if (*in != '\r' && *in != '\n')
+								*out++ = *in;
 						*out = '\0';
 
 						zbx_snprintf(error, sizeof(error), "Item [%s] error: Type of received value [%s] is not suitable for value type [%s]",
