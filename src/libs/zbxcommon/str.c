@@ -503,18 +503,47 @@ void	zbx_ltrim(register char *str, const char *charlist)
 {
 	register char *p;
 
-	if( !str || !charlist || !*str || !*charlist ) return;
+	if (NULL == str || NULL == charlist || '\0' == *str || '\0' == *charlist)
+		return;
 
-	for( p = str; *p && NULL != strchr(charlist,*p); p++ );
+	for (p = str; '\0' != *p && NULL != strchr(charlist, *p); p++)
+		;
 
-	if( p == str )	return;
+	if (p == str)
+		return;
 	
-	while( *p )
-	{
-		*str = *p;
-		str++;
-		p++;
-	}
+	while ('\0' != *p)
+		*str++ = *p++;
+
+	*str = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_remove_chars                                                 *
+ *                                                                            *
+ * Purpose: Remove characters 'charlist' from all string                      *
+ *                                                                            *
+ * Parameters: str - string to processing                                     *
+ *             charlist - null terminated list of characters                  *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_remove_chars(register char *str, const char *charlist)
+{
+	register char *p;
+
+	if (NULL == str || NULL == charlist || '\0' == *str || '\0' == *charlist)
+		return;
+
+	for (p = str; '\0' != *p; p++)
+		if (NULL == strchr(charlist, *p))
+			*str++ = *p;
 
 	*str = '\0';
 }
