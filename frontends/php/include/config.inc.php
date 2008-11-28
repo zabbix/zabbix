@@ -288,7 +288,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		if(!isset($ZBX_CURRENT_NODEID))
 			init_nodes();
 
-		$result = ( is_show_subnodes($forse_with_subnodes) ? $ZBX_CURRENT_SUBNODES : $ZBX_CURRENT_NODEID );
+		$result = is_show_subnodes($forse_with_subnodes)?$ZBX_CURRENT_SUBNODES:$ZBX_CURRENT_NODEID;
 		if(!is_null($perm)){
 			$result = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY, $ZBX_CURRENT_SUBNODES);
 		}
@@ -299,7 +299,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	function get_node_name_by_elid($id_val, $forse_with_subnodes = null){
 		global $ZBX_NODES;
 
-		if ( ! is_show_subnodes($forse_with_subnodes) )
+		if(!is_show_subnodes($forse_with_subnodes))
 			return null;
 
 		$nodeid = id2nodeid($id_val);

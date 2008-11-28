@@ -5687,16 +5687,14 @@
 		}
 
 		$cmbType = new CComboBox('elementtype',$elementtype,'submit()');
-
-		$available_groups = 	get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
-		$available_hosts = 		get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-		$available_triggers = 	get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+		$available_hosts = 		get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
 		
-		$db_hosts = DBselect('SELECT DISTINCT n.name as node_name,h.hostid,h.host '.
-					' FROM hosts h'.
-						' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('h.hostid').
-					' WHERE '.DBcondition('h.hostid',$available_hosts).
-					' ORDER BY node_name,h.host');
+		$sql = 'SELECT DISTINCT n.name as node_name,h.hostid,h.host '.
+				' FROM hosts h'.
+					' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('h.hostid').
+				' WHERE '.DBcondition('h.hostid',$available_hosts).
+				' ORDER BY node_name,h.host';
+		$db_hosts = DBselect($sql);
 		if($db_hosts)
 			$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_HOST,	S_HOST);
 
@@ -5761,6 +5759,8 @@
 			$frmEl->AddRow(S_MAP, $cmbMaps);
 		}
 		else if($elementtype==SYSMAP_ELEMENT_TYPE_TRIGGER){
+			$available_triggers = 	get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY,null,get_current_nodeid(true));
+			
 			$trigger = '';
 			$trigger_info = DBfetch(DBselect('SELECT DISTINCT n.name as node_name,h.hostid,h.host,t.*'.
 				' FROM triggers t '.
@@ -5791,8 +5791,9 @@
 			));
 		}
 		else if($elementtype==SYSMAP_ELEMENT_TYPE_HOST_GROUP){
+			$available_groups = 	get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
+			
 			$group = '';
-
 			$group_info = DBfetch(DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
 								' FROM groups g '.
 									' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('g.groupid').
