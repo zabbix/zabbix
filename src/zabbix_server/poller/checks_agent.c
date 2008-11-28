@@ -100,7 +100,8 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		else if (FAIL == set_result_type(result, item->value_type, buf))
 		{
 			for (in = buf, out = tmp; *in != '\0'; in ++)
-				*out++ = *in;
+				if (*in != '\r' && *in != '\n')
+					*out++ = *in;
 			*out = '\0';
 
 			zbx_snprintf(error, sizeof(error), "Type of received value [%s] is not suitable for value type [%s]",
