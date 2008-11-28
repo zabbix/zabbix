@@ -614,6 +614,7 @@ int	is_double(char *c);
 int	is_uint(char *c);
 void	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(register char *str, const char *charlist);
+void	zbx_remove_chars(register char *str, const char *charlist);
 void	lrtrim_spaces(char *c);
 void	compress_signs(char *str);
 void	ltrim_spaces(char *c);
