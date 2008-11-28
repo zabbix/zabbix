@@ -78,14 +78,14 @@
 
 		$result = false;
 
-		if($db_result = DBselect('SELECT * '.
-						' FROM sysmaps_elements '.
-						' WHERE sysmapid='.$sysmapid.
-							' AND '.DBin_node('sysmapid', get_current_nodeid($perm))))
-		{
+		$sql = 'SELECT * '.
+				' FROM sysmaps_elements '.
+				' WHERE sysmapid='.$sysmapid.
+					' AND '.DBin_node('sysmapid', get_current_nodeid(null,$perm));
+		if($db_result = DBselect($sql)){
 			$result = true;
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY);
-						
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
+//SDI($available_hosts);
 			while(($se_data = DBfetch($db_result)) && $result){
 				switch($se_data['elementtype']){
 					case SYSMAP_ELEMENT_TYPE_HOST:
@@ -110,6 +110,7 @@
 						break;
 				}
 			}
+//SDI($se_data['elementid']);
 		}
 		else{
 			if(DBselect('SELECT sysmapid FROM sysmaps WHERE sysmapid='.$sysmapid.

@@ -49,7 +49,7 @@ include_once 'include/page_header.php';
 		show_error_message(S_NO_GRAPH_DEFINED);
 	}
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY,PERM_RES_IDS_ARRAY, get_current_nodeid(true));
 	
 	if(!graph_accessible($_REQUEST['graphid'])){
 		access_deny();

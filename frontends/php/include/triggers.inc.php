@@ -1507,7 +1507,7 @@
 	function check_right_on_trigger_by_expression($permission,$expression){
 	
 		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission, null, get_current_nodeid(true));
 
 		$db_hosts = get_hosts_by_expression($expression);
 		while($host_data = DBfetch($db_hosts)){

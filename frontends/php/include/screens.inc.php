@@ -30,7 +30,7 @@
 
 		if(DBfetch(DBselect('SELECT screenid FROM screens WHERE screenid='.$screenid.' AND '.DBin_node('screenid', get_current_nodeid($perm))))){
 			$result = true;
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY);
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
 			
 			$db_result = DBselect('SELECT * FROM screens_items WHERE screenid='.$screenid);
 			while(($ac_data = DBfetch($db_result)) && $result){
@@ -210,12 +210,12 @@
 		$result = false;
 
 		if(DBselect('select slideshowid from slideshows where slideshowid='.$slideshowid.
-			' and '.DBin_node('slideshowid', get_current_nodeid($perm))))
+			' and '.DBin_node('slideshowid', get_current_nodeid(null,$perm))))
 		{
 			$result = true;
 			$db_slides = DBselect('select distinct screenid from slides where slideshowid='.$slideshowid);
 			while($slide_data = DBfetch($db_slides)){
-				if( !($result = screen_accessible($slide_data["screenid"], PERM_READ_ONLY)) ) break;
+				if(!$result = screen_accessible($slide_data["screenid"], PERM_READ_ONLY)) break;
 			}
 		}
 	return $result;
@@ -398,7 +398,7 @@
 	
 	function get_screen_item_form(){
 		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
 		
 		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,'screenedit.php#form');
 		$form->SetHelp('web.screenedit.cell.php');
@@ -490,7 +490,7 @@
 				}
 			}
 
-			$form->AddVar('resourceid',$id);
+			$form->addVar('resourceid',$id);
 			
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
