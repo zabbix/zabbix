@@ -30,8 +30,8 @@ function action_accessible($actionid,$perm){
 	if (DBselect('select actionid from actions where actionid='.$actionid.' and '.DBin_node('actionid'))){
 		$result = true;
 		
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
+		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
 		
 		$db_result = DBselect('SELECT * FROM conditions WHERE actionid='.$actionid);
 		while(($ac_data = DBfetch($db_result)) && $result){
@@ -72,9 +72,9 @@ function check_permission_for_action_conditions($conditions){
 
 	$result = true;
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
-	
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
+	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
+
 	foreach($conditions as $ac_data){
 		if($ac_data['operator'] != 0) continue;
 
@@ -704,25 +704,21 @@ function	update_action_status($actionid, $status)
 	return DBexecute("update actions set status=$status where actionid=$actionid");
 }
 
-function validate_condition($conditiontype, $value)
-{
+function validate_condition($conditiontype, $value){
 	global $USER_DETAILS;
 
-	switch($conditiontype)
-	{
+	switch($conditiontype){
 		case CONDITION_TYPE_HOST_GROUP:
-			if(!uint_in_array($value,
-				get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY)))
-			{
+			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
+			if(!uint_in_array($value, $available_groups)){
 				error(S_INCORRECT_GROUP);
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_HOST_TEMPLATE:
-			if(!uint_in_array($value,
-				get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY)))
-			{
-				error(S_INCORRECT_GROUP);
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
+			if(!uint_in_array($value,$available_hosts)){
+				error(S_INCORRECT_HOST);
 				return false;
 			}
 			break;
@@ -735,44 +731,38 @@ function validate_condition($conditiontype, $value)
 			}
 			break;
 		case CONDITION_TYPE_HOST:
-			if(!uint_in_array($value,
-				get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY)))
-			{
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
+			if(!uint_in_array($value,$available_hosts)){
 				error(S_INCORRECT_HOST);
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_TIME_PERIOD:
-			if( !validate_period($value) )
-			{
+			if( !validate_period($value) ){
 				error(S_INCORRECT_PERIOD.' ['.$value.']');
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_DHOST_IP:
-			if( !validate_ip_range($value) )
-			{
+			if( !validate_ip_range($value) ){
 				error(S_INCORRECT_IP.' ['.$value.']');
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_DSERVICE_TYPE:
-			if( S_UNKNOWN == discovery_check_type2str($value) )
-			{
+			if( S_UNKNOWN == discovery_check_type2str($value) ){
 				error(S_INCORRECT_DISCOVERY_CHECK);
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_DSERVICE_PORT:
-			if( !validate_port_list($value) )
-			{
+			if( !validate_port_list($value) ){
 				error(S_INCORRECT_PORT.' ['.$value.']');
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_DSTATUS:
-			if( S_UNKNOWN == discovery_object_status2str($value) )
-			{
+			if( S_UNKNOWN == discovery_object_status2str($value) ){
 				error(S_INCORRECT_DISCOVERY_STATUS);
 				return false;
 			}

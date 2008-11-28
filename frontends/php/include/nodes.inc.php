@@ -80,8 +80,7 @@
 				break;
 		}
 
-		if(DBfetch(DBselect('select nodeid from nodes where nodeid='.$new_nodeid)))
-		{
+		if(DBfetch(DBselect('select nodeid from nodes where nodeid='.$new_nodeid))){
 			error('Node with same ID already exist.');
 			return false;
 		}
@@ -91,8 +90,7 @@
 				$new_nodeid.','.zbx_dbstr($name).','.$timezone.','.zbx_dbstr($ip).','.$port.','.$slave_history.','.$slave_trends.','.
 				$nodetype.','.$masterid.')');
 
-		if($result && $node_type == ZBX_NODE_MASTER)
-		{
+		if($result && $node_type == ZBX_NODE_MASTER){
 			DBexecute('update nodes set masterid='.$new_nodeid.' where nodeid='.get_current_nodeid(false));
 			$ZBX_CURMASTERID = $new_nodeid; /* applay Master node for this script */
 		}
@@ -100,10 +98,8 @@
 		return ($result ? $new_nodeid : $result);
 	}
 
-	function	update_node($nodeid,$new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends)
-	{
-		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) )
-		{
+	function update_node($nodeid,$new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends){
+		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
 			error("Incorrect characters used for Node name");
 			return false;
 		}
@@ -112,11 +108,10 @@
 				'timezone='.$timezone.',ip='.zbx_dbstr($ip).',port='.$port.','.
 				'slave_history='.$slave_history.',slave_trends='.$slave_trends.
 				' where nodeid='.$nodeid);
-		return $result;
+	return $result;
 	}
 
-	function	delete_node($nodeid)
-	{
+	function delete_node($nodeid){
 		$result = false;
 		$node_data = DBfetch(DBselect('select * from nodes where nodeid='.$nodeid));
 

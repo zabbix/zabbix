@@ -49,7 +49,7 @@ include_once "include/page_header.php";
 //		show_message(S_NO_ITEM_DEFINED);
 	}
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY, get_current_nodeid(true));
 	
 	if(!$db_data = DBfetch(DBselect('SELECT i.itemid from items i '.
 					' WHERE '.DBcondition('i.hostid',$available_hosts).

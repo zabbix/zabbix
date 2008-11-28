@@ -246,8 +246,8 @@ include_once "include/page_header.php";
 	}
 
 	$nodeid 			= get_request('nodeid', get_current_nodeid());
-	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
 	$available_hosts	= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,$nodeid);
+	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
 
 	if(isset($only_hostid)){
 		if(!isset($_REQUEST["hostid"]) || (bccomp($_REQUEST["hostid"], $only_hostid) != 0)) access_deny();
@@ -260,8 +260,8 @@ include_once "include/page_header.php";
 		{
 			if(ZBX_DISTRIBUTED){
 				$cmbNode = new CComboBox('nodeid', $nodeid, 'submit()');
+
 				$db_nodes = DBselect('SELECT * FROM nodes WHERE '.DBcondition('nodeid',$available_nodes));
-				
 				while($node_data = DBfetch($db_nodes)){
 					$cmbNode->AddItem($node_data['nodeid'], $node_data['name']);
 					if((bccomp($nodeid , $node_data['nodeid']) == 0)) $ok = true;
@@ -272,7 +272,7 @@ include_once "include/page_header.php";
 		
 		if(!isset($ok)) $nodeid = get_current_nodeid();
 		unset($ok);
-		
+
 		if(str_in_array($srctbl,array('hosts','templates','triggers','logitems','items','applications','host_templates','graphs','simple_graph','plain_text'))){
 			$groupid = get_request('groupid',get_profile('web.popup.groupid',0));
 
@@ -518,17 +518,18 @@ include_once "include/page_header.php";
 		$form->AddItem($table);
 		$form->Show();
 	}
-	else if(str_in_array($srctbl,array("host_group"))){
+	else if(str_in_array($srctbl,array('host_group'))){
 		$available_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,$nodeid);
 
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->SetHeader(array(S_NAME));
 
-		$db_groups = DBselect('SELECT DISTINCT groupid,name '.
-						' FROM groups '.
-						' WHERE '.DBin_node('groupid', $nodeid).
-							' AND '.DBcondition('groupid',$available_groups).
-						' ORDER BY name');
+		$sql = 'SELECT DISTINCT groupid,name '.
+				' FROM groups '.
+				' WHERE '.DBin_node('groupid', $nodeid).
+					' AND '.DBcondition('groupid',$available_groups).
+				' ORDER BY name';
+		$db_groups = DBselect($sql);
 		while($row = DBfetch($db_groups)){
 			$name = new CLink($row["name"],"#","action");
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
@@ -840,8 +841,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	else if($srctbl == "applications")
-	{
+	else if($srctbl == "applications"){
 		$table = new CTableInfo(S_NO_APPLICATIONS_DEFINED);
 		$table->SetHeader(array(
 			(isset($hostid) ? null : S_HOST),
@@ -860,9 +860,7 @@ include_once "include/page_header.php";
 		$sql .= " order by h.host,a.name";
 			
 		$result = DBselect($sql);
-		while($row = DBfetch($result))
-		{
-
+		while($row = DBfetch($result)){
 			$name = new CLink($row["name"],"#","action");
 			
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
@@ -881,15 +879,12 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	else if($srctbl == "nodes")
-	{
+	else if($srctbl == "nodes"){
 		$table = new CTableInfo(S_NO_NODES_DEFINED);
 		$table->SetHeader(S_NAME);
 
 		$result = DBselect('SELECT DISTINCT * from nodes where nodeid in ('.$available_nodes.')');
-		while($row = DBfetch($result))
-		{
-
+		while($row = DBfetch($result)){
 			$name = new CLink($row["name"],"#","action");
 			
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
@@ -917,12 +912,13 @@ include_once "include/page_header.php";
 			S_GRAPH_TYPE
 		));
 		
-		$available_graphs = get_accessible_graphs(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, $nodeid);
+		$available_graphs = get_accessible_graphs(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid(true));
 		$sql = 'SELECT DISTINCT g.graphid,g.name,g.graphtype,h.host '.
 			' FROM graphs g,graphs_items gi,items i,hosts h '.
 			' WHERE gi.graphid=g.graphid '.
 				' AND i.itemid=gi.itemid '.
 				' AND h.hostid=i.hostid '.
+				' AND '.DBin_node('h.hostid').
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND '.DBcondition('g.graphid',$available_graphs);
 
@@ -1266,7 +1262,7 @@ include_once "include/page_header.php";
 		$table->Show();
 	}
 	else if($srctbl == 'host_group_scr'){
-		$available_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+		$available_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,$nodeid);
 
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->SetHeader(array(S_NAME));

@@ -106,7 +106,8 @@ include_once 'include/page_header.php';
 	$_REQUEST['legend'] = get_request('legend', 0);
 	
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-	$available_graphs = get_accessible_graphs(PERM_READ_WRITE);
+	$available_hosts_all_nodes = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,get_current_nodeid(true));
+	$available_graphs = get_accessible_graphs(PERM_READ_WRITE,null,get_current_nodeid(true));
 
 // ---- <ACTIONS> ----
 	if(isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])){
@@ -114,13 +115,14 @@ include_once 'include/page_header.php';
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save'])){
+		
 		$items = get_request('items', array());
 		foreach($items as $gitem){
 			$sql = 'SELECT h.hostid '.
 					' FROM hosts h,items i '.
 					' WHERE h.hostid=i.hostid '.
 						' AND i.itemid='.$gitem['itemid'].
-						' AND '.DBcondition('h.hostid',$available_hosts,true);
+						' AND '.DBcondition('h.hostid',$available_hosts_all_nodes,true);
 			if(DBfetch(DBselect($sql,1))){
 				access_deny();
 			}
@@ -236,7 +238,7 @@ include_once 'include/page_header.php';
 						' FROM hosts h, hosts_groups hg'.
 						' WHERE h.hostid=hg.hostid '.
 							' AND '.DBcondition('hg.groupid',$_REQUEST['copy_targetid']).
-							' AND '.DBcondition('h.hostid',$available_hosts);
+							' AND '.DBcondition('h.hostid',$available_hosts_all_nodes);
 				$db_hosts = DBselect($sql);
 				while($db_host = DBfetch($db_hosts)){
 					array_push($hosts_ids, $db_host['hostid']);
@@ -299,7 +301,7 @@ include_once 'include/page_header.php';
 		}
 	}
 // ----</ACTIONS>----
-	$available_graphs = get_accessible_graphs(PERM_READ_WRITE,null,null,null,0);
+	$available_graphs = get_accessible_graphs(PERM_READ_WRITE,null,get_current_nodeid(true),null,0);
 ?>
 <?php
 	$form = new CForm();
@@ -400,13 +402,15 @@ include_once 'include/page_header.php';
 			make_sorting_link(S_GRAPH_TYPE,'g.graphtype')));
 
 		if($_REQUEST['hostid'] > 0){
-			$result = DBselect('SELECT DISTINCT g.* '.
-						' FROM graphs g, graphs_items gi,items i '.
-						' WHERE '.DBcondition('g.graphid',$available_graphs).
-							' AND gi.graphid=g.graphid '.
-							' AND i.itemid=gi.itemid '.
-							' AND i.hostid='.$_REQUEST['hostid'].
-						order_by('g.name,g.width,g.height,g.graphtype','g.graphid'));
+			$sql = 'SELECT DISTINCT g.* '.
+					' FROM graphs g, graphs_items gi,items i '.
+					' WHERE '.DBcondition('g.graphid',$available_graphs).
+						' AND gi.graphid=g.graphid '.
+						' AND i.itemid=gi.itemid '.
+						' AND i.hostid='.$_REQUEST['hostid'].
+					order_by('g.name,g.width,g.height,g.graphtype','g.graphid');
+
+			$result = DBselect($sql);
 		}
 		else{
 			$result = DBselect('SELECT DISTINCT g.* '.
