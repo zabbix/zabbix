@@ -863,7 +863,7 @@ include_once('include/page_header.php');
 		
 		DBstart();
 		if(isset($_REQUEST['hostid'])){
-			$result &= update_proxy($_REQUEST['hostid'], $_REQUEST['host'], $hosts);
+			$result 	= update_proxy($_REQUEST['hostid'], $_REQUEST['host'], $hosts);
 			$action		= AUDIT_ACTION_UPDATE;
 			$msg_ok		= S_PROXY_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_PROXY;
@@ -873,7 +873,7 @@ include_once('include/page_header.php');
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
 			
-			$hostid	&= add_proxy($_REQUEST['host'], $hosts);
+			$hostid		= add_proxy($_REQUEST['host'], $hosts);
 			$action		= AUDIT_ACTION_ADD;
 			$msg_ok		= S_PROXY_ADDED;
 			$msg_fail	= S_CANNOT_ADD_PROXY;
