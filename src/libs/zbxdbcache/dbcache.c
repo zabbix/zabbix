@@ -816,6 +816,7 @@ static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
 	DB_ROW		row;
 	DB_FUNCTION	function;
 	DB_ITEM		item;
+	ZBX_DC_HISTORY	*h;
 	char		*lastvalue;
 	char		value[MAX_STRING_LEN], *value_esc, *parameter_esc;
 	int		sql_offset = 0, i;
@@ -853,13 +854,27 @@ static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
 	{
 		DBget_item_from_db(&item, row);
 
+		h = NULL;
+
+		for (i = 0; i < history_num; i++)
+		{
+			if (item.itemid == history[i].itemid)
+			{
+				h = &history[i];
+				break;
+			}
+		}
+
+		if (NULL == h)
+			continue;
+
 		function.function	= row[ZBX_SQL_ITEM_FIELDS_NUM];
 		function.parameter	= row[ZBX_SQL_ITEM_FIELDS_NUM + 1];
 		function.itemid		= zbx_atoui64(row[ZBX_SQL_ITEM_FIELDS_NUM + 2]);
 /*		It is not required to check lastvalue for NULL here */
 		lastvalue		= row[ZBX_SQL_ITEM_FIELDS_NUM + 3];
 
-		if (FAIL == evaluate_function(value, &item, function.function, function.parameter))
+		if (FAIL == evaluate_function(value, &item, function.function, function.parameter, h->clock))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Evaluation failed for function:%s",
 					function.function);

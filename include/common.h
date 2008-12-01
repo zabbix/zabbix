@@ -152,6 +152,7 @@ extern char ZABBIX_EVENT_SOURCE[64];
 #define	NETWORK_ERROR	(-3)
 #define	TIMEOUT_ERROR	(-4)
 #define	AGENT_ERROR	(-5)
+char	*zbx_result_string(int result);
 
 /*
 #define ZBX_POLLER

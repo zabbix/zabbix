@@ -1,5 +1,6 @@
 Changes for 1.6.2
 
+ - [ZBX-613] fixed possible incorrect evaluating of trigger functions if using dbcache (Sasha)
  - [ZBX-610] fixed memory leak in external checks (Sasha)
  - [DEV-254] improved server side logging (Sasha)
  - [ZBX-602] fixed possible incorrect trigger evaluation if value sotred as "delta" (Sasha)

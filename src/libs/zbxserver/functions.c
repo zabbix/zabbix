@@ -45,7 +45,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	update_functions(DB_ITEM *item)
+void	update_functions(DB_ITEM *item, time_t now)
 {
 	DB_FUNCTION	function;
 	DB_RESULT	result;
@@ -77,7 +77,7 @@ void	update_functions(DB_ITEM *item)
 			function.function,
 			function.parameter);
 
-		ret = evaluate_function(value,item,function.function,function.parameter);
+		ret = evaluate_function(value, item, function.function, function.parameter, now);
 		if( FAIL == ret)	
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s",
@@ -678,7 +678,7 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 		if (SUCCEED == add_history(item, value, now))
 		{
 			update_item(item, value, now);
-			update_functions(item);
+			update_functions(item, now);
 			update_triggers(item->itemid);
 		}
 		else

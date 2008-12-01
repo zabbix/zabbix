@@ -1710,3 +1710,16 @@ char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 	default: return "unknown";
 	}
 }
+
+char	*zbx_result_string(int result)
+{
+	switch (result) {
+	case SUCCEED: return "SUCCEED";
+	case FAIL: return "FAIL";
+	case NOTSUPPORTED: return "NOTSUPPORTED";
+	case NETWORK_ERROR: return "NETWORK_ERROR";
+	case TIMEOUT_ERROR: return "TIMEOUT_ERROR";
+	case AGENT_ERROR: return "AGENT_ERROR";
+	default: return "unknown";
+	}
+}
