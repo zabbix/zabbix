@@ -34,11 +34,12 @@ function cbar($type = GRAPH_TYPE_COLUMN){
 	$this->background = false;
 	$this->sum = false;
 
-	$this->shiftlegendright = 17*7 + 7 + 10;	// count of static chars * px/char + for color rectangle + space
+	$this->shiftlegendright = 0;	// count of static chars * px/char + for color rectangle + space
 	$this->drawlegendallow = 0;
 	
 	$this->series = array();
-	$this->seriesCaption = array();
+	$this->periodCaption = array();
+	$this->seriesLegend = array();
 	$this->seriesColor = array();
 	$this->seriesCount = 0;
 	$this->columnWidth = 10;					// bar/column width per serie
@@ -56,6 +57,7 @@ function cbar($type = GRAPH_TYPE_COLUMN){
 	
 	$this->gridLinesCount = NULL;				// How many grids to draw
 	$this->gridPixels = 40;						// optimal grid size
+	$this->gridStep = null;						// setted value
 	
 	$this->side_values = ITEM_VALUE_TYPE_UINT64;	// 3 - int, 0 - float
 	
@@ -74,8 +76,8 @@ function setSideValueType($type=ITEM_VALUE_TYPE_UINT64){
 	$this->side_values = $type;
 }
 
-function switchlegend($type=false){
-	if($type && is_numeric($type)){
+function showLegend($type=null){
+	if(!is_null($type)){
 		$this->drawlegendallow = $type;
 		return $this->drawlegendallow;
 	} 
@@ -85,20 +87,37 @@ function switchlegend($type=false){
 	else {
 		$this->drawlegendallow = 0;
 	}
+	
 return $this->drawlegendallow;
 }
 
+function setGridStep($step){
+	$this->gridStep = $step;
+}
+
+// SERIES SETTINGS
 function addSeries($serie){
 	foreach($serie as $key => $value){
-		if(!isset($this->seriesCaption[$key])) $this->seriesCaption[$key] = $key;
+		if(!isset($this->periodCaption[$key])) $this->periodCaption[$key] = $key;
 		$this->series[$key][$this->seriesCount] = $value;
 	}
 	$this->seriesCount++;
+return $this->seriesCount;
 }
 
-function setSeriesCaption($seriesCaption){
-	foreach($seriesCaption as $key => $value){
-		$this->seriesCaption[$key] = $value;
+function setPeriodCaption($periodCaption){
+	foreach($periodCaption as $key => $value){
+		$this->periodCaption[$key] = $value;
+	}
+}
+
+function setSeriesLegend($seriesLegend){
+	foreach($seriesLegend as $key => $value){
+		$this->seriesLegend[$key] = $value;
+		
+
+		$tmp = zbx_strlen($value) * 7 + 8;	// count of chars * font size + color box
+		if($tmp > $this->shiftlegendright) $this->shiftlegendright = $tmp;
 	}
 }
 
@@ -108,99 +127,19 @@ function setSeriesColor($seriesColor){
 	}
 }
 
-function drawLegend(){
-	$shiftY = $this->shiftY + $this->shiftYLegend;
-	
-	$max_host_len=0;
-	$max_desc_len=0;
-	
-	for($i=0;$i<$this->num;$i++){
-		if(strlen($this->items[$i]['host'])>$max_host_len)		$max_host_len=strlen($this->items[$i]['host']);
-		if(strlen($this->items[$i]['description'])>$max_desc_len)	$max_desc_len=strlen($this->items[$i]['description']);
-	}
-
-	for($i=0;$i<$this->num;$i++){
-
-		$color = $this->getColor($this->items[$i]['color']);
-		$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
-		
-		switch($this->items[$i]['calc_fnc']){
-			case CALC_FNC_MIN:	
-				$fnc_name = 'min';
-				$datavalue = $data->min;
-				break;
-			case CALC_FNC_MAX:	
-				$fnc_name = 'max';	
-				$datavalue = $data->max;
-				break;
-			case CALC_FNC_LST:	
-				$fnc_name = 'last';	
-				$datavalue = $data->lst;
-				break;
-			case CALC_FNC_AVG:
-			default:		
-				$fnc_name = 'avg';
-				$datavalue = $data->avg;
-		}
-		
-		$proc = ($datavalue * 100)/ $this->sum;
-//		convert_units($datavalue,$this->items[$i]["units"]),
-		if(isset($data) && isset($datavalue)){
-			$strvalue = sprintf(S_VALUE.': %s ('.((round($proc)!=$proc)?'%0.2f':'%s')."%s)",convert_units($datavalue,$this->items[$i]["units"]),$proc,'%');
-
-			$str = sprintf('%s: %s [%s] ',
-					str_pad($this->items[$i]['host'],$max_host_len,' '),
-					str_pad($this->items[$i]['description'],$max_desc_len,' '),
-					$fnc_name);
-		}
-		else{
-			$strvalue = sprintf(S_VALUE.': '.S_NO_DATA_SMALL);
-			$str=sprintf('%s: %s [ '.S_NO_DATA_SMALL.' ]',
-				str_pad($this->items[$i]['host'],$max_host_len,' '),
-				str_pad($this->items[$i]['description'],$max_desc_len,' '));
-		}
-
-		imagefilledrectangle($this->im,$this->shiftXleft,$this->sizeY+$shiftY+12*$i,$this->shiftXleft+5,$this->sizeY+$shiftY+5+12*$i,$color);
-		imagerectangle($this->im,$this->shiftXleft,$this->sizeY+$shiftY+12*$i,$this->shiftXleft+5,$this->sizeY+$shiftY+5+12*$i,$this->GetColor('Black No Alpha'));
-
-		imagestring($this->im, 2,
-			$this->shiftXleft+9,
-			$this->sizeY+$shiftY-5+12*$i,
-			$str,
-			$this->getColor('Black No Alpha'));
-
-		$shiftX = $this->fullSizeX - $this->shiftlegendright - $this->shiftXright + 10;
-//		SDI($shiftX.','.$this->sizeX);
-		
-		imagefilledrectangle($this->im,$shiftX,$this->shiftY+10+5+12*$i,$shiftX+5,$this->shiftY+10+10+12*$i,$color);
-		imagerectangle($this->im,$shiftX,$this->shiftY+10+5+12*$i,$shiftX+5,$this->shiftY+10+10+12*$i,$this->GetColor('Black No Alpha'));
-		
-		imagestring($this->im, 2,
-			$shiftX+9,
-			$this->shiftY+10+12*$i,
-			$strvalue,
-			$this->GetColor('Black No Alpha'));
-	}
-
-	if($this->sizeY < 120) return;
-}
-
-
 function calcShifts(){
-	if($this->drawlegendallow){
-		$this->shiftXleft = 60;
-		$this->shiftXright = 80;
-	}
-	else{
-		$this->shiftXleft = 60;
-		$this->shiftXright = 10;
+	$this->shiftXleft = 60;
+	$this->shiftXright = 10;
+
+	if(!$this->drawlegendallow){		
+		$this->shiftlegendright = 0;
 	}
 	
 	$this->shiftYLegend = 57;
 }
 
 function calcSeriesWidth(){
-	$serieLength = count($this->seriesCaption);
+	$serieLength = count($this->periodCaption);
 	
 	if($this->column){
 		$seriesSizeX = $this->sizeX - ($this->seriesDistance * $serieLength);
@@ -215,66 +154,6 @@ function calcSeriesWidth(){
 		$this->seriesWidth = floor($seriesSizeY / $serieLength);
 	}
 //SDI($this->columnWidth);
-}
-
-function drawGrid(){
-	$this->drawSmallRectangle();
-	
-	if($this->column){
-		$hline_count = round($this->sizeY / $this->gridPixels);
-		for($i=1;$i<=$hline_count;$i++){
-			dashedline($this->im,
-					$this->shiftXleft,
-					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
-					$this->sizeX+$this->shiftXleft,
-					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
-					$this->getColor('Gray')
-				);
-		}
-
-		$i=0;
-
-		foreach($this->seriesCaption as $key => $caption){
-			$caption = str_pad($caption,10,' ', STR_PAD_LEFT);
-			imagestringup($this->im, 
-						1,
-						$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+round($this->seriesWidth/2), 
-						$this->sizeY+$this->shiftY+$this->shiftYLegend, 
-						$caption,
-						$this->getColor('Black No Alpha')
-				);
-			$i++;
-		}
-
-	}
-	else{
-		$vline_count = round($this->sizeX / $this->gridPixels);
-		for($i=1;$i<=$vline_count;$i++){
-			dashedline($this->im,
-						$i*($this->sizeX/($vline_count+1))+$this->shiftXleft,
-						$this->shiftY,
-						$i*($this->sizeX/($vline_count+1))+$this->shiftXleft,
-						$this->sizeY+$this->shiftY,
-						$this->getColor('Gray')
-				);
-		}
-		
-		$i=0;
-
-		foreach($this->seriesCaption as $key => $caption){
-			$caption = str_pad($caption,10,' ', STR_PAD_LEFT);
-
-			imagestring($this->im, 
-						1,
-						$this->shiftXleft - 57,
-						($this->sizeY + $this->shiftY) - ($i*($this->seriesWidth+$this->seriesDistance)+$this->seriesDistance+round($this->seriesWidth/2)),
-						$caption,
-						$this->getColor('Black No Alpha')
-				);
-			$i++;
-		}
-	}
-	
 }
 
 // Calculation of minimum Y axis
@@ -350,67 +229,177 @@ function calcZero(){
 }
 
 function correctMiniMax(){
-	if($this->column)
-		$this->gridLinesCount = round($this->sizeY/$this->gridPixels) + 1;
-	else
-		$this->gridLinesCount = round($this->sizeX/$this->gridPixels) + 1;
-		
-	$tmp_maxY = $this->maxValue;
-	$tmp_minY = $this->minValue;
+	if(is_null($this->gridStep)){
+		if($this->column)
+			$this->gridLinesCount = round($this->sizeY/$this->gridPixels) + 1;
+		else
+			$this->gridLinesCount = round($this->sizeX/$this->gridPixels) + 1;
+			
+		$tmp_maxY = $this->maxValue;
+		$tmp_minY = $this->minValue;
 //SDI($this->minValue.' : '.$this->maxValue);
-	if($this->side_values == ITEM_VALUE_TYPE_UINT64){
-
-		$this->maxValue = round($this->maxValue);
-		$this->minValue = floor($this->minValue);
-
-		$value_delta = round($this->maxValue - $this->minValue);
-		
-		$step = floor((($value_delta/$this->gridLinesCount) + 1));	// round to top
-		$value_delta2 = $step * $this->gridLinesCount;
-//SDI($value_delta.' <> '.$value_delta2);
-		$first_delta = round(($value_delta2-$value_delta)/2);
-		$second_delta = ($value_delta2-$value_delta) - $first_delta;
-
-//SDI($this->maxValue.' : '.$first_delta.' --- '.$this->minValue.' : '.$second_delta);
-		if($this->minValue >= 0){
-			if($this->minValue < $second_delta){
-				$first_delta += $second_delta - $this->minValue;
-				$second_delta = $this->minValue;
-			}
-		}
-		else if(($this->maxValue <= 0)){
-			if($this->maxValue > $first_delta){
-				$second_delta += $first_delta - $this->maxValue;
-				$first_delta = $this->maxValue;
-			}
-		}				
-
-		$this->maxValue += $first_delta;
-		$this->minValue -= ($value_delta2-$value_delta) - $first_delta;
-//SDI($this->minValue.' : '.$this->maxValue);
-	}
-	else if($this->side_values == ITEM_VALUE_TYPE_FLOAT){
-//*
-		if($this->maxValue>0){
+		if($this->side_values == ITEM_VALUE_TYPE_UINT64){
 	
-			$this->maxValue = round($this->maxValue,1) + round($this->maxValue,1)*0.2 + 0.05;
-		} 
-		else if($this->maxValue<0){
-			$this->maxValue = round($this->maxValue,1) - round($this->maxValue,1)*0.2 + 0.05;
-		} 				
+			$this->maxValue = round($this->maxValue);
+			$this->minValue = floor($this->minValue);
+	
+			$value_delta = round($this->maxValue - $this->minValue);
+			
+			$step = floor((($value_delta/$this->gridLinesCount) + 1));	// round to top
+			$value_delta2 = $step * $this->gridLinesCount;
+//SDI($value_delta.' <> '.$value_delta2);
+			$first_delta = round(($value_delta2-$value_delta)/2);
+			$second_delta = ($value_delta2-$value_delta) - $first_delta;
+	
+//SDI($this->maxValue.' : '.$first_delta.' --- '.$this->minValue.' : '.$second_delta);
+			if($this->minValue >= 0){
+				if($this->minValue < $second_delta){
+					$first_delta += $second_delta - $this->minValue;
+					$second_delta = $this->minValue;
+				}
+			}
+			else if(($this->maxValue <= 0)){
+				if($this->maxValue > $first_delta){
+					$second_delta += $first_delta - $this->maxValue;
+					$first_delta = $this->maxValue;
+				}
+			}				
+	
+			$this->maxValue += $first_delta;
+			$this->minValue -= ($value_delta2-$value_delta) - $first_delta;
+//SDI($this->minValue.' : '.$this->maxValue);
+		}
+		else if($this->side_values == ITEM_VALUE_TYPE_FLOAT){
+//*
+			if($this->maxValue>0){
 		
-		if($this->minValue>0){
-			$this->minValue = $this->minValue - ($this->minValue * 0.2) - 0.05;
-		} 
-		else if($this->minValue<0){
-			$this->minValue = $this->minValue + ($this->minValue * 0.2) - 0.05;
-		} 
-		
-		$this->minValue = round($this->minValue,1);
+				$this->maxValue = round($this->maxValue,1) + round($this->maxValue,1)*0.2 + 0.05;
+			} 
+			else if($this->maxValue<0){
+				$this->maxValue = round($this->maxValue,1) - round($this->maxValue,1)*0.2 + 0.05;
+			} 				
+			
+			if($this->minValue>0){
+				$this->minValue = $this->minValue - ($this->minValue * 0.2) - 0.05;
+			} 
+			else if($this->minValue<0){
+				$this->minValue = $this->minValue + ($this->minValue * 0.2) - 0.05;
+			} 
+			
+			$this->minValue = round($this->minValue,1);
 //*/
-	}	
+		}	
+
+	}
+	else{
+		$this->gridLinesCount = floor($this->maxValue / $this->gridStep) + 1;
+		
+		$this->maxValue = $this->gridStep * $this->gridLinesCount;
+	}
+		
 }
 
+//***************************************************************************
+//									DRAW									*
+//***************************************************************************
+
+function drawGrid(){
+	$this->drawSmallRectangle();
+	
+	if($this->column){
+		$hline_count = $this->gridLinesCount;
+		
+		for($i=1;$i<$hline_count;$i++){
+			dashedline($this->im,
+					$this->shiftXleft,
+					$i*($this->sizeY/$hline_count)+$this->shiftY,
+					$this->sizeX+$this->shiftXleft,
+					$i*($this->sizeY/$hline_count)+$this->shiftY,
+					$this->getColor('Gray')
+				);
+		}
+
+		$i=0;
+
+		foreach($this->periodCaption as $key => $caption){
+			$caption = str_pad($caption,10,' ', STR_PAD_LEFT);
+			imagestringup($this->im, 
+						1,
+						$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+round($this->seriesWidth/2), 
+						$this->sizeY+$this->shiftY+$this->shiftYLegend, 
+						$caption,
+						$this->getColor('Black No Alpha')
+				);
+			$i++;
+		}
+
+	}
+	else{
+		$vline_count = $this->gridLinesCount;
+		
+		for($i=1;$i<$vline_count;$i++){
+			dashedline($this->im,
+						$i*($this->sizeX/$vline_count)+$this->shiftXleft,
+						$this->shiftY,
+						$i*($this->sizeX/$vline_count)+$this->shiftXleft,
+						$this->sizeY+$this->shiftY,
+						$this->getColor('Gray')
+				);
+		}
+		
+		$i=0;
+
+		foreach($this->periodCaption as $key => $caption){
+			$caption = str_pad($caption,10,' ', STR_PAD_LEFT);
+
+			imagestring($this->im, 
+						1,
+						$this->shiftXleft - 57,
+						($this->sizeY + $this->shiftY) - ($i*($this->seriesWidth+$this->seriesDistance)+$this->seriesDistance+round($this->seriesWidth/2)),
+						$caption,
+						$this->getColor('Black No Alpha')
+				);
+			$i++;
+		}
+	}
+	
+}
+
+function drawLegend(){
+
+	$shiftY = $this->shiftY;
+	$shiftX = $this->fullSizeX - $this->shiftlegendright;
+	
+	$count = 0;
+
+	foreach($this->series[0] as $key => $values){
+		$caption = $this->seriesLegend[$key];
+		$color = $this->getColor($this->seriesColor[$key]);
+		
+		imagefilledrectangle($this->im, $shiftX, $shiftY+12*$count, $shiftX+5, $shiftY+5+12*$count, $color);
+		imagerectangle($this->im,$shiftX, $shiftY+12*$count, $shiftX+5, $shiftY+5+12*$count, $this->getColor('Black No Alpha'));
+
+		imagestring($this->im, 2,
+			$shiftX+9,
+			$shiftY-5+12*$count,
+			$caption,
+			$this->getColor('Black No Alpha'));
+/*
+		$shiftX = $this->fullSizeX - $this->shiftlegendright - $this->shiftXright + 10;
+//		SDI($shiftX.','.$this->sizeX);
+		
+		imagefilledrectangle($this->im,$shiftX,$this->shiftY+10+5+12*$count,$shiftX+5,$this->shiftY+10+10+12*$count,$color);
+		imagerectangle($this->im,$shiftX,$this->shiftY+10+5+12*$count,$shiftX+5,$this->shiftY+10+10+12*$count,$this->GetColor('Black No Alpha'));
+		
+		imagestring($this->im, 2,
+			$shiftX+9,
+			$this->shiftY+10+12*$count,
+			$strvalue,
+			$this->GetColor('Black No Alpha'));
+*/
+		$count++;
+	}
+}
 
 function drawSideValues(){
 	$min = $this->minValue;
@@ -468,10 +457,10 @@ function draw(){
 	$this->fullSizeY = $this->sizeY;
 	
 	if(($this->sizeX < 300) || ($this->sizeY < 200)) $this->switchlegend(0);
-
+	
 	$this->calcShifts();
 
-	$this->sizeX -= ($this->shiftXleft+$this->shiftXright);
+	$this->sizeX -= ($this->shiftXleft+$this->shiftXright+$this->shiftlegendright);
 	$this->sizeY -= $this->shiftY + $this->shiftYLegend;
 	
 	$this->calcSeriesWidth();
@@ -495,7 +484,7 @@ function draw(){
 	$this->drawSideValues();
 
 	$this->drawLogo();
-//	$this->drawLegend();
+	$this->drawLegend();
 
 	$count = 0;
 	$start = ($this->column)?($this->shiftXleft+floor($this->seriesDistance/2)):($this->sizeY+$this->shiftY-floor($this->seriesDistance/2));
