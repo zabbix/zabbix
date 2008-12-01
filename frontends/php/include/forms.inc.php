@@ -1206,6 +1206,7 @@
 		$filter_snmpv3_authpassphrase	= $_REQUEST['filter_snmpv3_authpassphrase'];
 		$filter_snmpv3_privpassphrase	= $_REQUEST['filter_snmpv3_privpassphrase'];
 		$filter_value_type				= $_REQUEST['filter_value_type'];
+		$filter_data_type				= $_REQUEST['filter_data_type'];
 		$filter_units					= $_REQUEST['filter_units'];
 		$filter_formula					= $_REQUEST['filter_formula'];
 		$filter_delay					= $_REQUEST['filter_delay'];
@@ -1320,7 +1321,17 @@
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
 			$form->AddRow(array('with ',bold(S_TYPE_OF_INFORMATION)),$cmbValType);
-			
+
+			if ($filter_value_type == ITEM_VALUE_TYPE_UINT64)
+			{
+				$cmbDataType = new CComboBox("filter_data_type", $filter_data_type, "submit()");
+				$cmbDataType->AddItem(-1,				S_ALL_SMALL);
+				$cmbDataType->AddItem(ITEM_DATA_TYPE_DECIMAL,		item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
+				$cmbDataType->AddItem(ITEM_DATA_TYPE_OCTAL,		item_data_type2str(ITEM_DATA_TYPE_OCTAL));
+				$cmbDataType->AddItem(ITEM_DATA_TYPE_HEXADECIMAL, 	item_data_type2str(ITEM_DATA_TYPE_HEXADECIMAL));
+				$form->AddRow(array('with ', bold(S_DATA_TYPE)), $cmbDataType);
+			}
+
 			if( ($filter_value_type==ITEM_VALUE_TYPE_FLOAT) || ($filter_value_type==ITEM_VALUE_TYPE_UINT64))
 			{
 				$form->AddRow(array('with ',bold(S_UNITS)), new CTextBox("filter_units",$filter_units,40));
@@ -1400,6 +1411,7 @@
 		$snmp_oid		= get_request('snmp_oid'	,'interfaces.ifTable.ifEntry.ifInOctets.1');
 		$snmp_port		= get_request('snmp_port'	,161);
 		$value_type		= get_request('value_type'	,ITEM_VALUE_TYPE_UINT64);
+		$data_type		= get_request('data_type'	,ITEM_DATA_TYPE_DECIMAL);
 		$trapper_hosts	= get_request('trapper_hosts'	,'');
 		$units			= get_request('units'		,'');
 		$valuemapid		= get_request('valuemapid'	,0);
@@ -1455,6 +1467,7 @@
 			$snmp_oid		= $item_data['snmp_oid'];
 			$snmp_port		= $item_data['snmp_port'];
 			$value_type		= $item_data['value_type'];
+			$data_type		= $item_data['data_type'];
 			$trapper_hosts	= $item_data['trapper_hosts'];
 			$units			= $item_data['units'];
 			$valuemapid		= $item_data['valuemapid'];
@@ -1644,7 +1657,23 @@
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
 		}
 		$frmItem->AddRow(S_TYPE_OF_INFORMATION,$cmbValType);
-		
+
+		if ($value_type == ITEM_VALUE_TYPE_UINT64) {
+			if(isset($limited)) {
+				$frmItem->AddVar('data_type', $data_type);
+				$cmbDataType = new CTextBox('data_type_name', item_data_type2str($data_type), 20, 'yes');
+			}
+			else {
+				$cmbDataType = new CComboBox('data_type', $data_type, 'submit()');
+				$cmbDataType->AddItem(ITEM_DATA_TYPE_DECIMAL,		item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
+				$cmbDataType->AddItem(ITEM_DATA_TYPE_OCTAL,		item_data_type2str(ITEM_DATA_TYPE_OCTAL));
+				$cmbDataType->AddItem(ITEM_DATA_TYPE_HEXADECIMAL, 	item_data_type2str(ITEM_DATA_TYPE_HEXADECIMAL));
+			}
+			$frmItem->AddRow(S_DATA_TYPE,$cmbDataType);
+		}
+		else
+			$frmItem->AddVar('data_type', $data_type);
+
 		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64)){
 			$frmItem->AddRow(S_UNITS, new CTextBox('units',$units,40, $limited));
 
@@ -1854,6 +1883,7 @@
 		$snmp_oid	= get_request('snmp_oid'	,'interfaces.ifTable.ifEntry.ifInOctets.1');
 		$snmp_port	= get_request('snmp_port'	,161);
 		$value_type	= get_request('value_type'	,ITEM_VALUE_TYPE_UINT64);
+		$data_type	= get_request('data_type'	,ITEM_DATA_TYPE_DECIMAL);
 		$trapper_hosts	= get_request('trapper_hosts'	,'');
 		$units		= get_request('units'		,'');
 		$valuemapid	= get_request('valuemapid'	,0);
@@ -1942,6 +1972,13 @@
 		$frmItem->AddRow(array( new CVisibilityBox('value_type_visible', get_request('value_type_visible'), 'value_type', S_ORIGINAL),
 			S_TYPE_OF_INFORMATION), $cmbValType);
 		
+		$cmbDataType = new CComboBox('data_type',$data_type);
+		$cmbDataType->AddItem(ITEM_DATA_TYPE_DECIMAL,		item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
+		$cmbDataType->AddItem(ITEM_DATA_TYPE_OCTAL,		item_data_type2str(ITEM_DATA_TYPE_OCTAL));
+		$cmbDataType->AddItem(ITEM_DATA_TYPE_HEXADECIMAL, 	item_data_type2str(ITEM_DATA_TYPE_HEXADECIMAL));
+		$frmItem->AddRow(array( new CVisibilityBox('data_type_visible', get_request('data_type_visible'), 'data_type', S_ORIGINAL),
+			S_DATA_TYPE), $cmbDataType);
+
 		$frmItem->AddRow(array( new CVisibilityBox('units_visible', get_request('units_visible'), 'units', S_ORIGINAL), S_UNITS),
 			new CTextBox('units',$units,40));
 

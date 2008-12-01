@@ -77,7 +77,29 @@
 	}
 
 	/*
-	 * Function: item_value_type2str
+	 * Function: item_data_type2str
+	 *
+	 * Description:
+	 *     Represent integer value of item data type as string
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 */
+	function item_data_type2str($data_type){
+		switch($data_type){
+			case ITEM_DATA_TYPE_DECIMAL:		$data_type = S_DECIMAL;		break;
+			case ITEM_DATA_TYPE_OCTAL:		$data_type = S_OCTAL;		break;
+			case ITEM_DATA_TYPE_HEXADECIMAL:	$data_type = S_HEXADECIMAL;	break;
+			default:$data_type = S_UNKNOWN;		break;
+		}
+	return $data_type;
+	}
+
+	/*
+	 * Function: item_status2str
 	 *
 	 * Description:
 	 *     Represent integer value of item status as string
@@ -204,6 +226,7 @@
 				'snmp_community'=> '',
 				'snmp_oid'		=> '',
 				'value_type'	=> ITEM_VALUE_TYPE_STR,
+				'data_type'	=> ITEM_DATA_TYPE_DECIMAL,
 				'trapper_hosts'	=> 'localhost',
 				'snmp_port'		=> 161,
 				'units'			=> '',
@@ -264,6 +287,10 @@
 			$item['delta']=0;
 		}
 
+		if ($item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
+			$item['data_type'] = 0;
+		}
+
 		if(($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT)){
 			error('Value type must be Float for aggregate items');
 			return FALSE;
@@ -318,14 +345,14 @@
 		$itemid=get_dbid('items','itemid');
 		$result=DBexecute('INSERT INTO items '.
 				' (itemid,description,key_,hostid,delay,history,nextcheck,status,type,'.
-					'snmp_community,snmp_oid,value_type,trapper_hosts,'.
+					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,'.
 					'snmp_port,units,multiplier,'.
 					'delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,'.
 					'snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,'.
 					'delay_flex,params,ipmi_sensor,templateid)'.
 			' VALUES ('.$itemid.','.zbx_dbstr($item['description']).','.zbx_dbstr($item['key_']).','.$item['hostid'].','.
 						$item['delay'].','.$item['history'].',0,'.$item['status'].','.$item['type'].','.
-						zbx_dbstr($item['snmp_community']).','.zbx_dbstr($item['snmp_oid']).','.$item['value_type'].','.
+						zbx_dbstr($item['snmp_community']).','.zbx_dbstr($item['snmp_oid']).','.$item['value_type'].','.$item['data_type'].','.
 						zbx_dbstr($item['trapper_hosts']).','.$item['snmp_port'].','.zbx_dbstr($item['units']).','.$item['multiplier'].','.
 						$item['delta'].','.zbx_dbstr($item['snmpv3_securityname']).','.$item['snmpv3_securitylevel'].','.
 						zbx_dbstr($item['snmpv3_authpassphrase']).','.zbx_dbstr($item['snmpv3_privpassphrase']).','.
@@ -475,6 +502,10 @@
 			$item['delta']=0;
 		}
 
+		if ($item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
+			$item['data_type'] = 0;
+		}
+
 		$db_item = DBfetch(DBselect('SELECT itemid FROM items WHERE hostid='.$item['hostid'].' and itemid<>'.$itemid.' and key_='.zbx_dbstr($item['key_'])));
 		if($db_item && $item['templateid'] == 0){
 			error('An item with the same Key already exists for host '.$host['host'].'. The key must be unique.');
@@ -533,6 +564,7 @@
 				'snmp_community='.zbx_dbstr($item['snmp_community']).','.
 				'snmp_oid='.zbx_dbstr($item['snmp_oid']).','.
 				'value_type='.$item['value_type'].','.
+				'data_type='.$item['data_type'].','.
 				'trapper_hosts='.zbx_dbstr($item['trapper_hosts']).','.
 				'snmp_port='.$item['snmp_port'].','.
 				'units='.zbx_dbstr($item['units']).','.
@@ -587,6 +619,7 @@
 					'snmp_community'=> array(),
 					'snmp_oid'		=> array(),
 					'value_type'	=> array(),
+					'data_type'	=> array(),
 					'trapper_hosts'	=> array(),
 					'snmp_port'		=> array(),
 					'units'			=> array(),
@@ -769,7 +802,7 @@
 	
 	function get_item_by_itemid_limited($itemid){
 		$sql = 'SELECT itemid,description,key_,hostid,delay,history,status,type,'.
-					'snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,'.
+					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,snmp_port,units,multiplier,delta,'.
 					'snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,'.
 					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid '.
 			' FROM items '.

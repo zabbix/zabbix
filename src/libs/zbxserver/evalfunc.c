@@ -711,7 +711,8 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, int num)
 		DBfree_result(result);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of evaluate_LAST(last[#%d]):%s", num, SUCCEED == ret ? "SUCCEED" : "FAIL");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of evaluate_LAST(last[#%d]):%s", num,
+			zbx_result_string(ret));
 
 	return ret;
 }

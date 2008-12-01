@@ -210,7 +210,7 @@ int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, char *error, int max_error_l
 {
 	int res;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In do_ping() hosts_count=%d",
+	zabbix_log(LOG_LEVEL_DEBUG, "In do_ping(hosts_count:%d)",
 			hosts_count);
 
 	if (NOTSUPPORTED == (res = process_ping(hosts, hosts_count, error, max_error_len)))
@@ -219,8 +219,8 @@ int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, char *error, int max_error_l
 		zabbix_syslog("%s", error);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of do_ping() result=%s",
-			res == NOTSUPPORTED ? "NOTSUPPORTED" : "SUCCEED");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of do_ping():%s",
+			zbx_result_string(res));
 
 	return res;
 }
