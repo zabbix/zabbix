@@ -52,7 +52,7 @@ static void process_time_functions()
 		DBget_item_from_db(&item, row);
 
 		DBbegin();
-		update_functions(&item);
+		update_functions(&item, (int)time(NULL));
 		update_triggers(item.itemid);
 		DBcommit();
 	}

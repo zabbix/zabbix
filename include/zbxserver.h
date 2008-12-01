@@ -31,9 +31,9 @@
 #define MACRO_TYPE_TRIGGER_EXPRESSION	0x08
 #define MACRO_TYPE_ITEM_KEY		0x10
 
-int	evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter);
+int	evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter, time_t now);
 void    update_triggers (zbx_uint64_t itemid);
-void	update_functions(DB_ITEM *item);
+void	update_functions(DB_ITEM *item, time_t now);
 void	process_new_value(DB_ITEM *item, AGENT_RESULT *value, time_t now);
 void	proxy_process_new_value(DB_ITEM *item, AGENT_RESULT *value, time_t now);
 
