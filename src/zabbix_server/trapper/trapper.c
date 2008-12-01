@@ -257,7 +257,7 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 
 					init_result(&agent);
 
-					if (SUCCEED == set_result_type(&agent, item.value_type, values[i].value))
+					if (SUCCEED == set_result_type(&agent, item.value_type, item.data_type, values[i].value))
 					{
 						if (0 == CONFIG_DBSYNCER_FORKS)
 							DBbegin();

@@ -142,7 +142,6 @@ typedef struct zbx_result_s {
 #define GET_MSG_RESULT(res)	((char**)get_result_value_by_type(res, AR_MESSAGE))
 
 void    *get_result_value_by_type(AGENT_RESULT *result, int require_type);
-void    *get_result_value_by_value_type(AGENT_RESULT *result, int value_type);
 
 extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
 
@@ -199,7 +198,7 @@ void   	init_result(AGENT_RESULT *result);
 int    	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist);
 void   	free_result(AGENT_RESULT *result);
 
-int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
+int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c);
 
 /* external system functions */
 

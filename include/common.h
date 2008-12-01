@@ -152,6 +152,7 @@ extern char ZABBIX_EVENT_SOURCE[64];
 #define	NETWORK_ERROR	(-3)
 #define	TIMEOUT_ERROR	(-4)
 #define	AGENT_ERROR	(-5)
+char	*zbx_result_string(int result);
 
 /*
 #define ZBX_POLLER
@@ -217,6 +218,14 @@ typedef enum
 	ITEM_VALUE_TYPE_TEXT
 } zbx_item_value_type_t;
 char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
+
+/* Item data types */
+typedef enum
+{
+	ITEM_DATA_TYPE_DECIMAL = 0,
+	ITEM_DATA_TYPE_OCTAL,
+	ITEM_DATA_TYPE_HEXADECIMAL
+} zbx_item_data_type_t;
 
 /* HTTP test states */
 typedef enum
@@ -648,6 +657,8 @@ int	find_char(char *str,char c);
 int	is_double_prefix(char *str);
 int	is_double(char *c);
 int	is_uint(char *c);
+int	is_uoct(char *str);
+int	is_uhex(char *str);
 void	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(register char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);

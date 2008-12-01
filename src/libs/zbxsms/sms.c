@@ -256,8 +256,8 @@ int	send_sms(char *device,char *number,char *message, char *error, int max_error
 	tcsetattr(f, TCSANOW, &old_options);
 	close(f);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End of send_sms() [%s]",
-		ret == SUCCEED ? "SUCCEED" : "FAIL" );
+	zabbix_log( LOG_LEVEL_DEBUG, "End of send_sms():%s",
+			zbx_result_string(ret));
 
 	return ret;
 }
