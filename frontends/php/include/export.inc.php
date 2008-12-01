@@ -131,6 +131,7 @@
 				'history'		=> '',
 				'trends'		=> '',
 				'status'		=> '',
+				'data_type'		=> '',
 				'units'			=> '',
 				'multiplier'		=> '',
 				'delta'			=> '',
