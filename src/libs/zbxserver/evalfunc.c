@@ -1086,8 +1086,6 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, int parameter, time_t now
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_NODATA()");
 
-	now = time(NULL);
-
 	if (CONFIG_SERVER_STARTUP_TIME + parameter > now || item->lastclock + parameter > now)
 		strcpy(value,"0");
 	else
