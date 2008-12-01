@@ -45,6 +45,9 @@ function cbar($type = GRAPH_TYPE_COLUMN){
 	$this->columnWidth = 10;					// bar/column width per serie
 	$this->seriesWidth = 10;					// overal per serie bar/column width
 	$this->seriesDistance = 10;
+	
+	$this->xLabel = null;
+	$this->yLabel = null;
 		
 	$this->yaxismin = 0;
 	$this->yaxismax = 100;
@@ -72,6 +75,11 @@ function drawHeader(){
 	imagestring($this->im, $fontnum,$x,1, $str , $this->GetColor('Dark Red No Alpha'));
 }
 
+
+function setGridStep($step){
+	$this->gridStep = $step;
+}
+
 function setSideValueType($type=ITEM_VALUE_TYPE_UINT64){
 	$this->side_values = $type;
 }
@@ -91,8 +99,12 @@ function showLegend($type=null){
 return $this->drawlegendallow;
 }
 
-function setGridStep($step){
-	$this->gridStep = $step;
+function setXLabel($label){
+	$this->xLabel = $label;
+}
+
+function setYLabel($label){
+	$this->yLabel = $label;
 }
 
 // SERIES SETTINGS
@@ -128,14 +140,14 @@ function setSeriesColor($seriesColor){
 }
 
 function calcShifts(){
-	$this->shiftXleft = 60;
+	$this->shiftXleft = 60 + (is_null($this->xLabel)?0:16);
 	$this->shiftXright = 10;
 
-	if(!$this->drawlegendallow){		
+	if(!$this->drawlegendallow){
 		$this->shiftlegendright = 0;
 	}
 	
-	$this->shiftYLegend = 57;
+	$this->shiftYLegend = 57 + (is_null($this->yLabel)?0:16);
 }
 
 function calcSeriesWidth(){
@@ -326,7 +338,7 @@ function drawGrid(){
 			imagestringup($this->im, 
 						1,
 						$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+round($this->seriesWidth/2), 
-						$this->sizeY+$this->shiftY+$this->shiftYLegend, 
+						$this->sizeY+$this->shiftY+57,
 						$caption,
 						$this->getColor('Black No Alpha')
 				);
@@ -365,6 +377,54 @@ function drawGrid(){
 	
 }
 
+function drawSideValues(){
+	$min = $this->minValue;
+	$max = $this->maxValue;
+	
+	$hstr_count = $this->gridLinesCount;
+
+	if($this->column){
+		for($i=0;$i<=$hstr_count;$i++){
+			$str = str_pad(($this->sizeY*$i/$hstr_count*($max-$min)/$this->sizeY+$min),10,' ', STR_PAD_LEFT);
+			imagestring($this->im, 
+						1, 
+						$this->shiftXleft - 57, 
+						$this->sizeY-$this->sizeY*$i/$hstr_count-4+$this->shiftY, 
+						$str, 
+						$this->GetColor('Dark Red No Alpha')
+					);
+		}
+	}
+	else if(in_array($this->type, array(GRAPH_TYPE_BAR, GRAPH_TYPE_BAR_STACKED))){
+		for($i=0;$i<=$hstr_count;$i++){
+			$str = str_pad(($this->sizeX*$i/$hstr_count*($max-$min)/$this->sizeX+$min),10,' ', STR_PAD_LEFT);
+			imagestringup($this->im, 
+						1, 
+						$this->shiftXleft + ($this->sizeX*$i/$hstr_count-4),
+						$this->shiftY + $this->sizeY + 57, 
+						$str, 
+						$this->GetColor('Dark Red No Alpha')
+					);
+		}
+	}
+	
+	if(!is_null($this->xLabel)){
+		imagestring($this->im, 2,
+			$this->shiftXleft + ($this->sizeX/2) - 20,
+			$this->fullSizeY-14,
+			$this->xLabel,
+			$this->getColor('Black No Alpha'));
+	}
+	
+	if(!is_null($this->yLabel)){
+		imagestringup($this->im, 2,
+			0,
+			$this->shiftY + ($this->sizeY/2) + 20,
+			$this->yLabel,
+			$this->getColor('Black No Alpha'));
+	}
+}
+
 function drawLegend(){
 
 	$shiftY = $this->shiftY;
@@ -384,66 +444,9 @@ function drawLegend(){
 			$shiftY-5+12*$count,
 			$caption,
 			$this->getColor('Black No Alpha'));
-/*
-		$shiftX = $this->fullSizeX - $this->shiftlegendright - $this->shiftXright + 10;
-//		SDI($shiftX.','.$this->sizeX);
-		
-		imagefilledrectangle($this->im,$shiftX,$this->shiftY+10+5+12*$count,$shiftX+5,$this->shiftY+10+10+12*$count,$color);
-		imagerectangle($this->im,$shiftX,$this->shiftY+10+5+12*$count,$shiftX+5,$this->shiftY+10+10+12*$count,$this->GetColor('Black No Alpha'));
-		
-		imagestring($this->im, 2,
-			$shiftX+9,
-			$this->shiftY+10+12*$count,
-			$strvalue,
-			$this->GetColor('Black No Alpha'));
-*/
+
 		$count++;
 	}
-}
-
-function drawSideValues(){
-	$min = $this->minValue;
-	$max = $this->maxValue;
-	
-	$hstr_count = $this->gridLinesCount;
-
-	if($this->column){
-		for($i=0;$i<=$hstr_count;$i++){
-			$str = str_pad(($this->sizeY*$i/$hstr_count*($max-$min)/$this->sizeY+$min),10,' ', STR_PAD_LEFT);
-			imagestring($this->im, 
-						1, 
-						5, 
-						$this->sizeY-$this->sizeY*$i/$hstr_count-4+$this->shiftY, 
-						$str, 
-						$this->GetColor('Dark Red No Alpha')
-					);
-		}
-	}
-	else if(in_array($this->type, array(GRAPH_TYPE_BAR, GRAPH_TYPE_BAR_STACKED))){
-		for($i=0;$i<=$hstr_count;$i++){
-			$str = str_pad(($this->sizeX*$i/$hstr_count*($max-$min)/$this->sizeX+$min),10,' ', STR_PAD_LEFT);
-			imagestringup($this->im, 
-						1, 
-						$this->shiftXleft + ($this->sizeX*$i/$hstr_count-4),
-						$this->sizeY + $this->shiftY + 57, 
-						$str, 
-						$this->GetColor('Dark Red No Alpha')
-					);
-		}
-	}
-/*		
-		if(($this->zero[GRAPH_YAXIS_SIDE_LEFT] != $this->sizeY+$this->shiftY) && 
-			($this->zero[GRAPH_YAXIS_SIDE_LEFT] != $this->shiftY))
-		{
-			imageline($this->im,
-						$this->shiftXleft,
-						$this->zero[GRAPH_YAXIS_SIDE_LEFT],
-						$this->shiftXleft+$this->sizeX,
-						$this->zero[GRAPH_YAXIS_SIDE_LEFT],
-						$this->GetColor(GRAPH_ZERO_LINE_COLOR_LEFT)
-					); 
-		}
-//*/
 }
 
 function draw(){
@@ -461,7 +464,7 @@ function draw(){
 	$this->calcShifts();
 
 	$this->sizeX -= ($this->shiftXleft+$this->shiftXright+$this->shiftlegendright);
-	$this->sizeY -= $this->shiftY + $this->shiftYLegend;
+	$this->sizeY -= ($this->shiftY + $this->shiftYLegend);
 	
 	$this->calcSeriesWidth();
 	
