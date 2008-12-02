@@ -288,7 +288,21 @@ function make_system_summary(){
 									' AND e.value='.TRIGGER_VALUE_TRUE.
 								' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 					$res_events = DBSelect($event_sql,1);
-					while($row_inf_event=DBfetch($res_events)){
+				while($row_inf=DBfetch($result)){	
+// Check for dependencies
+					if(trigger_dependent($row_inf["triggerid"]))	continue;
+					
+					$tr_count++;
+					$host = new CSpan($row_inf['host']);
+								
+					$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
+								' FROM events e, triggers t '.
+								' WHERE e.object='.EVENT_SOURCE_TRIGGERS.
+									' AND e.objectid='.$row_inf['triggerid'].
+									' AND t.triggerid=e.objectid '.
+									' AND e.value='.TRIGGER_VALUE_TRUE.
+								' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
+					if($row_inf_event=DBfetch(DBselect($event_sql,1))){
 						
 						if($config['event_ack_enable']){
 							if($row_inf_event['acknowledged'] == 1){
@@ -300,22 +314,29 @@ function make_system_summary(){
 						}
 			
 						$description = expand_trigger_description_by_data(
-								array_merge($row_inf, array("clock"=>$row_inf_event["clock"])),
+								array_merge($row_inf, array('clock'=>$row_inf_event['clock'])),
 								ZBX_FLAG_EVENT);
 						
 //actions								
 						$actions= get_event_actions_status($row_inf_event['eventid']);
-//--------		
-			
-						$table_inf->AddRow(array(
-							get_node_name_by_elid($row_inf['triggerid']),
-							$host,
-							new CCol($description,get_severity_style($row_inf["priority"])),
-							zbx_date2age($row_inf_event['clock']),
-							($config['event_ack_enable'])?(new CCol($ack,"center")):NULL,
-							$actions
-						));			
+//--------				
 					}
+					else{
+						$description = expand_trigger_description_by_data($row_inf, ZBX_FLAG_EVENT);
+						$ack = '-';
+						$actions = S_NO_DATA;
+						$row_inf_event['clock'] = $row_inf['clock'];
+					}
+					
+					$table_inf->addRow(array(
+						get_node_name_by_elid($row_inf['triggerid']),
+						$host,
+						new CCol($description,get_severity_style($row_inf['priority'])),
+						zbx_date2age($row_inf_event['clock']),
+						($config['event_ack_enable'])?(new CCol($ack,'center')):NULL,
+						$actions
+					));
+					
 					unset($row_inf,$description,$actions);
 				}
 				
