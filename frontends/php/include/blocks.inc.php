@@ -287,21 +287,6 @@ function make_system_summary(){
 									' AND t.triggerid=e.objectid '.
 									' AND e.value='.TRIGGER_VALUE_TRUE.
 								' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
-					$res_events = DBSelect($event_sql,1);
-				while($row_inf=DBfetch($result)){	
-// Check for dependencies
-					if(trigger_dependent($row_inf["triggerid"]))	continue;
-					
-					$tr_count++;
-					$host = new CSpan($row_inf['host']);
-								
-					$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
-								' FROM events e, triggers t '.
-								' WHERE e.object='.EVENT_SOURCE_TRIGGERS.
-									' AND e.objectid='.$row_inf['triggerid'].
-									' AND t.triggerid=e.objectid '.
-									' AND e.value='.TRIGGER_VALUE_TRUE.
-								' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 					if($row_inf_event=DBfetch(DBselect($event_sql,1))){
 						
 						if($config['event_ack_enable']){
