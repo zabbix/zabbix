@@ -73,16 +73,29 @@ require_once('include/httptest.inc.php');
 			error("Group '$name' already exists");
 			return false;
 		}
-		
+
 		if(is_null($groupid)){
 			$groupid=get_dbid("groups","groupid");
-			if(!DBexecute("insert into groups (groupid,name) values (".$groupid.",".zbx_dbstr($name).")"))
-				return false;
-			return $groupid;
+			$result = DBexecute("insert into groups (groupid,name) values (".$groupid.",".zbx_dbstr($name).")");
+			if ($result)
+			{
+				$result = $groupid;
+				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groupid, $name, 'groups', NULL, NULL);
+			}
+			return $result;
 
 		}
 		else
-			return DBexecute("update groups set name=".zbx_dbstr($name)." where groupid=$groupid");
+		{
+			$hostgroup_old = get_hostgroup_by_groupid($groupid);
+			$result = DBexecute("update groups set name=".zbx_dbstr($name)." where groupid=$groupid");
+			if ($result)
+			{
+				$hostgroup_new = get_hostgroup_by_groupid($groupid);
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $hostgroup_old['name'], 'groups', $hostgroup_old, $hostgroup_new);
+			}
+			return $result;
+		}
 	}
 
 	function add_group_to_host($hostid,$newgroup=''){
@@ -210,16 +223,21 @@ require_once('include/httptest.inc.php');
 				' VALUES ('.$hostid.','.$proxy_hostid.','.zbx_dbstr($host).','.$port.','.$status.','.$useip.','.zbx_dbstr($dns).','.zbx_dbstr($ip).',0,'
 					.HOST_AVAILABLE_UNKNOWN.','.($useipmi == 'yes' ? 1 : 0).','.$ipmi_port.','.$ipmi_authtype.','.$ipmi_privilege.','.zbx_dbstr($ipmi_username).','
 					.zbx_dbstr($ipmi_password).')');
+			if ($result)
+			{
+				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hostid, $host, 'hosts', NULL, NULL);
+			}
 		}
 		else{
 			if(check_circle_host_link($hostid, $templates)){
 				error("Circle link can't be created");
 				return false;
 			}
+			$host_old = get_host_by_hostid($hostid);
 			$result = DBexecute('UPDATE hosts SET proxy_hostid='.$proxy_hostid.
 							',host='.zbx_dbstr($host).
 							',port='.$port.
-							',status='.$status.
+//							',status='.$status.
 							',useip='.$useip.
 							',dns='.zbx_dbstr($dns).
 							',ip='.zbx_dbstr($ip).
@@ -231,6 +249,11 @@ require_once('include/httptest.inc.php');
 							',ipmi_password='.zbx_dbstr($ipmi_password).
 				' WHERE hostid='.$hostid);
 
+			if ($result)
+			{
+				$host_new = get_host_by_hostid($hostid);
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $hostid, $host_old['host'], 'hosts', $host_old, $host_new);
+			}
 			update_host_status($hostid, $status);
 		}
 
@@ -298,8 +321,6 @@ require_once('include/httptest.inc.php');
 			unlink_template($hostid, $id);
 		}
 		
-		$old_host = get_host_by_hostid($hostid);
-
 		$new_templates = array_diff($templates, $old_templates);
 
 		$result = (bool) db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$new_templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,$hostid);
@@ -489,7 +510,16 @@ require_once('include/httptest.inc.php');
 		}
 
 // delete host
-	return DBexecute('DELETE FROM hosts WHERE '.DBcondition('hostid',$hostids));
+		foreach ($hostids as $id) {	/* The section should be improved */
+			$host_old = get_host_by_hostid($id);
+			$result = DBexecute('DELETE FROM hosts WHERE hostid='.$id);
+			if ($result)
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $id, $host_old['host'], 'hosts', NULL, NULL);
+			else
+				break;
+		}
+
+		return $result;
 	}
 
 	function delete_host_group($groupids){
@@ -524,7 +554,16 @@ require_once('include/httptest.inc.php');
 
 		DBexecute('DELETE FROM hosts_groups WHERE '.DBcondition('groupid',$groupids));
 
-	return DBexecute('DELETE FROM groups WHERE '.DBcondition('groupid',$groupids));
+		foreach ($groupids as $id) {	/* The section should be improved */
+			$hostgroup_old = get_hostgroup_by_groupid($id);
+			$result = DBexecute('DELETE FROM groups WHERE groupid='.$id);
+			if ($result)
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $id, $hostgroup_old['name'], 'groups', NULL, NULL);
+			else
+				break;
+		}
+
+		return $result;
 	}
 
 	function get_hostgroup_by_groupid($groupid){
@@ -672,18 +711,27 @@ require_once('include/httptest.inc.php');
 // Update Host status
 
 	function update_host_status($hostids,$status){
+		$res = true;
 		zbx_value2array($hostids);
 		
-		$hosts = array();
-		$result = DBselect('SELECT host, hostid, status FROM hosts WHERE '.DBcondition('hostid',$hostids));
+//		$hosts = array();
+		$result = DBselect('SELECT * FROM hosts WHERE '.DBcondition('hostid', $hostids).
+				' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
 		while($host=DBfetch($result)){
 			if($status != $host['status']){
-				$hosts[$host['hostid']] = $host['hostid'];
+//				$hosts[$host['hostid']] = $host['hostid'];
+				update_trigger_value_to_unknown_by_hostid($host['hostid']);
+				$res = DBexecute('UPDATE hosts SET status='.$status.' WHERE hostid='.$host['hostid']);
+				if ($res){
+					$host_new = $host;//get_host_by_hostid($host['hostid']);
+					$host_new['status'] = $status;
+					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
+				}
 				info('Updated status of host '.$host['host']);
 			}
 		}
 
-		if(!empty($hosts)){
+/*		if(!empty($hosts)){
 			update_trigger_value_to_unknown_by_hostid($hosts);
 
 			return	DBexecute('UPDATE hosts SET status='.$status.
@@ -693,7 +741,8 @@ require_once('include/httptest.inc.php');
 		}
 		else{
 			return 1;
-		}
+		}*/
+		return $res;
 	}
 	
 /*

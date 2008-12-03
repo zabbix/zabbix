@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-252] improved audit log of host groups,hosts,items and media types (Sasha)
  - [DEV-266] added support of octal and hexadecimal data (Sasha)
  - [DEV-253] improved audit log filtering (Artem)
  - [DEV-267] improved item template-update (Artem)
