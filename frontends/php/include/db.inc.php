@@ -400,7 +400,7 @@ if(!isset($DB)){
 					}
 					$result = DBexecute($query);
 					if(!$result){
-						$e = ocierror($stid);
+						$e = ocierror($result);
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
 	
