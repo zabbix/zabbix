@@ -64,7 +64,7 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST["save"])){
 		if(isset($_REQUEST["mediatypeid"])){
 /* UPDATE */
-			$action = AUDIT_ACTION_UPDATE;
+/*			$action = AUDIT_ACTION_UPDATE;*/
 			$result=update_mediatype($_REQUEST["mediatypeid"],
 				$_REQUEST["type"],$_REQUEST["description"],get_request("smtp_server"),
 				get_request("smtp_helo"),get_request("smtp_email"),get_request("exec_path"),
@@ -74,7 +74,7 @@ include_once "include/page_header.php";
 		}
 		else{
 /* ADD */
-			$action = AUDIT_ACTION_ADD;
+/*			$action = AUDIT_ACTION_ADD;*/
 			$result=add_mediatype(
 				$_REQUEST["type"],$_REQUEST["description"],get_request("smtp_server"),
 				get_request("smtp_helo"),get_request("smtp_email"),get_request("exec_path"),
@@ -84,21 +84,21 @@ include_once "include/page_header.php";
 		}
 		if($result)
 		{
-			add_audit($action,AUDIT_RESOURCE_MEDIA_TYPE,
+/*			add_audit($action,AUDIT_RESOURCE_MEDIA_TYPE,
 				"Media type [".$_REQUEST["description"]."]");
-
+*/
 			unset($_REQUEST["form"]);
 		}
 	} elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["mediatypeid"])) {
 /* DELETE */
-		$mediatype=get_mediatype_by_mediatypeid($_REQUEST["mediatypeid"]);
+/*		$mediatype=get_mediatype_by_mediatypeid($_REQUEST["mediatypeid"]);*/
 		$result=delete_mediatype($_REQUEST["mediatypeid"]);
 		show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
 		if($result)
 		{
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MEDIA_TYPE,
+/*			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MEDIA_TYPE,
 				"Media type [".$mediatype["description"]."]");
-
+*/
 			unset($_REQUEST["form"]);
 		}
 	}

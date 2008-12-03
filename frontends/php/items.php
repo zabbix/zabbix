@@ -334,10 +334,10 @@ include_once "include/page_header.php";
 			$result = DBend($result);
 		}
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
-		if($result){
+/*		if($result){
 			$host = get_host_by_hostid($item['hostid']);
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['host'].']');
-		}
+		}*/
 		unset($_REQUEST['itemid']);
 		unset($_REQUEST['form']);
 	}
@@ -409,7 +409,7 @@ include_once "include/page_header.php";
 			$result = DBend($result);
 
 			$itemid = $_REQUEST['itemid'];
-			$action = AUDIT_ACTION_UPDATE;
+/*			$action = AUDIT_ACTION_UPDATE;*/
 			
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
@@ -431,14 +431,14 @@ include_once "include/page_header.php";
 				
 			$result = DBend($itemid);
 			
-			$action = AUDIT_ACTION_ADD;
+/*			$action = AUDIT_ACTION_ADD;*/
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 
 		if($result){	
-			$host = get_host_by_hostid($_REQUEST['hostid']);
+/*			$host = get_host_by_hostid($_REQUEST['hostid']);
 
-			add_audit($action, AUDIT_RESOURCE_ITEM, S_ITEM.' ['.$_REQUEST['key'].'] ['.$itemid.'] '.S_HOST.' ['.$host['host'].']');
+			add_audit($action, AUDIT_RESOURCE_ITEM, S_ITEM.' ['.$_REQUEST['key'].'] ['.$itemid.'] '.S_HOST.' ['.$host['host'].']');*/
 
 			unset($_REQUEST['itemid']);
 			unset($_REQUEST['form']);
@@ -672,7 +672,7 @@ include_once "include/page_header.php";
 					continue;
 				}
 
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');
+/*				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');*/
 			}
 
 			$result = delete_item($group_itemid);
@@ -686,7 +686,7 @@ include_once "include/page_header.php";
 			$group_itemid = $_REQUEST['group_itemid'];			
 
 			DBstart();
-			$sql = 'SELECT h.host, i.itemid, i.key_ '.
+/*			$sql = 'SELECT h.host, i.itemid, i.key_ '.
 					' FROM items i, hosts h '.
 					' WHERE '.DBcondition('i.itemid',$group_itemid).
 						' AND h.hostid=i.hostid'.
@@ -694,7 +694,7 @@ include_once "include/page_header.php";
 			$item_res = DBselect($sql);
 			while($item = DBfetch($item_res)){
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']'.S_ITEMS_ACTIVATED);
-			}
+			}*/
 			
 			$result = activate_item($group_itemid);
 			$result = DBend($result);
@@ -707,7 +707,7 @@ include_once "include/page_header.php";
 			$group_itemid = $_REQUEST['group_itemid'];			
 
 			DBstart();
-			$sql = 'SELECT h.host, i.itemid, i.key_ '.
+/*			$sql = 'SELECT h.host, i.itemid, i.key_ '.
 					' FROM items i, hosts h '.
 					' WHERE '.DBcondition('i.itemid',$group_itemid).
 						' AND h.hostid=i.hostid'.
@@ -715,7 +715,7 @@ include_once "include/page_header.php";
 			$item_res = DBselect($sql);
 			while($item = DBfetch($item_res)){
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']'.S_ITEMS_DISABLED);
-			}
+			}*/
 			
 			$result = disable_item($group_itemid);
 			$result = DBend($result);
