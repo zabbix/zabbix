@@ -731,7 +731,7 @@ else {
 		return bcmod($id,'100000000000');
 	}
 
-	function DBcondition($fieldname, &$array, $notin=false){
+	function DBcondition($fieldname, &$array, $notin=false, $string=false){
 		global $DB;
 		$condition = '';
 		
@@ -744,6 +744,7 @@ else {
 
 		$in = 		$notin?' NOT IN ':' IN ';
 		$concat = 	$notin?' AND ':' OR ';
+		$glue = 	$string?"','":',';
 
 		switch($DB['TYPE']) {
 			case 'MYSQL':
@@ -751,7 +752,9 @@ else {
 				$items = array_chunk($array, 950);
 				foreach($items as $id => $values){
 					$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
-					$condition.= implode(',',$values);
+					$condition.= implode($glue,$values);
+					
+					if($string) $condition= "'".$condition."'";
 				}
 				break;
 			default:

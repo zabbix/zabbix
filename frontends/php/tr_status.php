@@ -436,6 +436,27 @@ include_once "include/page_header.php";
 		$cond.=' AND t.priority>='.$show_severity;
 	}
 
+	$cond_event = '';
+	$event_expire = ($config['event_expire']*86400); // days
+	switch($show_events){
+		case EVENTS_OPTION_ALL:
+			$cond_event.=' AND (('.time().'-e.clock)<'.$event_expire.')';
+			break;
+		case EVENTS_OPTION_NOT_ACK:
+			$cond_event.=' AND (('.time().'-e.clock)<'.$event_expire.') AND e.acknowledged=0 ';
+			break;
+		case EVENTS_OPTION_ONLYTRUE_NOTACK:
+			$cond_event.=' AND (('.time().'-e.clock)<'.$event_expire.') AND e.acknowledged=0 AND e.value='.TRIGGER_VALUE_TRUE;
+			break;
+		case EVENTS_OPTION_NOFALSEFORB:
+			$cond_event.=' AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
+			break;
+		case EVENTS_OPTION_NOEVENT:
+		default:
+			$cond_event.=' AND 1=2 ';
+			break;
+	}
+
 	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, t.expression,t.priority, '.
 					' t.lastchange,t.comments,t.url,t.value,h.host,h.hostid,t.type '.
 			' FROM triggers t,hosts h,items i,functions f '.($_REQUEST['groupid']?', hosts_groups hg ':'').
@@ -452,33 +473,12 @@ include_once "include/page_header.php";
 	while($row=DBfetch($result)){
 // Check for dependencies
 		if(trigger_dependent($row["triggerid"]))	continue;
-		
-		$cond = '';
-		$event_expire = ($config['event_expire']*86400); // days
-		switch($show_events){
-			case EVENTS_OPTION_ALL:
-				$cond.=' AND (('.time().'-e.clock)<'.$event_expire.')';
-				break;
-			case EVENTS_OPTION_NOT_ACK:
-				$cond.=' AND (('.time().'-e.clock)<'.$event_expire.') AND e.acknowledged=0 ';
-				break;
-			case EVENTS_OPTION_ONLYTRUE_NOTACK:
-				$cond.=' AND (('.time().'-e.clock)<'.$event_expire.') AND e.acknowledged=0 AND e.value='.TRIGGER_VALUE_TRUE;
-				break;
-			case EVENTS_OPTION_NOFALSEFORB:
-				$cond.=' AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
-				break;
-			case EVENTS_OPTION_NOEVENT:
-			default:
-				$cond.=' AND 1=2 ';
-				break;
-		}
 
 		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
 					' FROM events e, triggers t '.
 					' WHERE e.object=0 '.
 						' AND e.objectid='.$row['triggerid'].
-						' AND t.triggerid=e.objectid '.$cond.
+						' AND t.triggerid=e.objectid '.$cond_event.
 					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 
 		if($show_triggers == TRIGGERS_OPTION_NOFALSEFORB){

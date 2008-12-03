@@ -309,7 +309,7 @@ function make_system_summary(){
 					else{
 						$description = expand_trigger_description_by_data($row_inf, ZBX_FLAG_EVENT);
 						$ack = '-';
-						$actions = S_NO_DATA;
+						$actions = S_NO_DATA_SMALL;
 						$row_inf_event['clock'] = $row_inf['clock'];
 					}
 					
