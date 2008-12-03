@@ -360,7 +360,9 @@
 						zbx_dbstr($item['delay_flex']).','.zbx_dbstr($item['params']).','.zbx_dbstr($item['ipmi_sensor']).','.$item['templateid'].')'
 			);
 
-		if(!$result)
+		if ($result)
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ITEM, $itemid, $item['description'], NULL, NULL, NULL);
+		else
 			return $result;
 
 		foreach($item['applications'] as $key => $appid){
@@ -420,15 +422,27 @@
 		zbx_value2array($itemids);
 		$result = true;
 		
-		$db_items = DBselect('SELECT itemid, status FROM items WHERE '.DBcondition('itemid',$itemids));
+		$db_items = DBselect('SELECT * FROM items WHERE '.DBcondition('itemid',$itemids));
 		while($row = DBfetch($db_items)){
 			$old_status=$row['status'];
 
-			if($status == $old_status){
-				unset($itemids[$row['itemid']]);
+			if($status != $old_status){
+/*				unset($itemids[$row['itemid']]);*/
+				if ($status==ITEM_STATUS_ACTIVE)
+					$sql='UPDATE items SET status='.$status.",error='',nextcheck=0 ".
+						' WHERE itemid='.$row['itemid'];
+				else
+					$sql='UPDATE items SET status='.$status.
+						' WHERE itemid='.$row['itemid'];
+					
+				$result &= DBexecute($sql);
+				if ($result){
+					$item_new = get_item_by_itemid($row['itemid']);
+					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $row['itemid'], $row['description'], 'items', $row, $item_new);
+				}
 			}
 		}
-		if(!empty($itemids)){
+/*		if(!empty($itemids)){
 			update_trigger_value_to_unknown_by_itemid($itemids);
 			
 			if($status==ITEM_STATUS_ACTIVE)
@@ -439,7 +453,7 @@
 					' WHERE '.DBcondition('itemid',$itemids);
 					
 			$result = DBexecute($sql);
-		}
+		}*/
 
 	return $result;
 	}
@@ -540,6 +554,7 @@
 			}
 		}
 
+		$item_old = get_item_by_itemid($itemid);
 		DBexecute('UPDATE items SET lastlogsize=0 WHERE itemid='.$itemid.' AND key_<>'.zbx_dbstr($item['key_']));
 
 		if(isset($_REQUEST['applications_visible'])){	
@@ -583,6 +598,11 @@
 				'ipmi_sensor='.zbx_dbstr($item['ipmi_sensor']).','.
 				'templateid='.$item['templateid'].
 			' WHERE itemid='.$itemid);
+
+		if ($result){
+			$item_new = get_item_by_itemid($itemid);
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $itemid, $item_old['description'], 'items', $item_old, $item_new);
+		}
 
 		update_item_status($itemid, $item['status']);
 
@@ -916,7 +936,16 @@
 		DBexecute('DELETE FROM items_applications WHERE '.DBcondition('itemid',$itemids));
 		DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='itemid' AND ".DBcondition('value_id',$itemids));
 		
-		$result = DBexecute('DELETE FROM items WHERE '.DBcondition('itemid',$itemids));
+		foreach ($itemids as $id) {	/* The section should be improved */
+			$item_old = get_item_by_itemid($id);
+			$result = DBexecute('DELETE FROM items WHERE itemid='.$id);
+			if ($result)
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, $id, $item_old['description'], 'items', NULL, NULL);
+			else
+				break;
+		}
+
+/*		$result = DBexecute('DELETE FROM items WHERE '.DBcondition('itemid',$itemids));*/
 		if($result){
 			foreach($items as $itemid => $item){
 				info("Item '".$hosts[$itemid]['host'].':'.$item['key_']."' deleted");

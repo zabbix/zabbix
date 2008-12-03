@@ -154,11 +154,14 @@ include_once 'include/page_header.php';
 		$table->setHeader(array(
 				make_sorting_link(S_TIME,'a.clock'),
 				make_sorting_link(S_USER,'u.alias'),
+				S_IP,
 				S_RESOURCE,
 				S_ACTION,
+				S_ID,
+				S_DESCRIPTION,
 				S_DETAILS));
-		
-		$sql = 'SELECT u.alias,a.clock,a.action,a.resourcetype,a.details '.
+
+		$sql = 'SELECT a.auditid,a.clock,u.alias,a.ip,a.resourcetype,a.action,a.resourceid,a.resourcename,a.details '.
 						' FROM auditlog a, users u '.
 						' WHERE u.userid=a.userid '.
 							$sql_cond.
@@ -194,13 +197,28 @@ include_once 'include/page_header.php';
 				default:
 					$action = S_UNKNOWN_ACTION;
 			}
-	
+
+			if ('' == $row['details'])
+			{
+				$details = array();
+				$db_details = DBselect('select table_name,field_name,oldvalue,newvalue from auditlog_details where auditid='.$row['auditid']);
+				while(NULL != ($db_detail = DBfetch($db_details)))
+				{
+					array_push($details, array($db_detail['table_name'].'.'.$db_detail['field_name'].': '.$db_detail['oldvalue'].' => '.$db_detail['newvalue'],BR()));
+				}
+			}
+			else
+				$details = $row['details'];
+
 			$table->addRow(array(
 				date('Y.M.d H:i:s',$row['clock']),
 				$row['alias'],
+				$row['ip'],
 				audit_resource2str($row['resourcetype']),
 				$action,
-				$row['details']
+				$row['resourceid'],
+				$row['resourcename'],
+				new CCol($details)
 			));
 		}
 			

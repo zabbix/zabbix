@@ -225,13 +225,13 @@ include_once('include/page_header.php');
 			$result = DBend($result);
 			
 			show_messages($result, S_LINK_TO_TEMPLATE, S_CANNOT_LINK_TO_TEMPLATE);
-			if($result){
+/*			if($result){
 				$host=get_host_by_hostid($templateid);
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,
 					'Host ['.$host['host'].'] '.
 					'Mass Linkage '.
 					'Status ['.$host['status'].']');
-			}
+			}*/
 //---		
 			unset($_REQUEST['save']);
 			unset($_REQUEST['hostid']);
@@ -372,13 +372,13 @@ include_once('include/page_header.php');
 			}
 //HOSTS PROFILE EXTANDED Section		
 			
-			if($result){
+/*			if($result){
 				add_audit(
 					AUDIT_ACTION_UPDATE,
 					AUDIT_RESOURCE_HOST,
 					'Host ['.$db_host['host'].'] IP ['.$db_host['ip'].'] '.'Status ['.$db_host['status'].']'
 				);
-			}
+			}*/
 		}
 
 		$result = DBend($result);
@@ -442,7 +442,7 @@ include_once('include/page_header.php');
 				
 			$msg_ok 	= S_HOST_UPDATED;
 			$msg_fail 	= S_CANNOT_UPDATE_HOST;
-			$audit_action 	= AUDIT_ACTION_UPDATE;
+/*			$audit_action 	= AUDIT_ACTION_UPDATE;*/
 
 			$hostid = $_REQUEST['hostid'];
 		} 
@@ -455,7 +455,7 @@ include_once('include/page_header.php');
 			
 			$msg_ok 	= S_HOST_ADDED;
 			$msg_fail 	= S_CANNOT_ADD_HOST;
-			$audit_action 	= AUDIT_ACTION_ADD;
+/*			$audit_action 	= AUDIT_ACTION_ADD;*/
 		}
 
 		if(!zbx_empty($hostid) && $clone_hostid && ($_REQUEST['form'] == 'full_clone')){
@@ -546,9 +546,9 @@ include_once('include/page_header.php');
 		show_messages($result, $msg_ok, $msg_fail);
 		
 		if($result){
-			add_audit($audit_action,AUDIT_RESOURCE_HOST,
+/*			add_audit($audit_action,AUDIT_RESOURCE_HOST,
 				'Host ['.$_REQUEST['host'].'] IP ['.$_REQUEST['ip'].'] '.
-				'Status ['.$_REQUEST['status'].']');
+				'Status ['.$_REQUEST['status'].']');*/
 
 			unset($_REQUEST['form']);
 			unset($_REQUEST['hostid']);
@@ -572,7 +572,7 @@ include_once('include/page_header.php');
 
 			show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 			if($result){
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$host['host'].']');
+/*				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$host['host'].']');*/
 
 				unset($_REQUEST['form']);
 				unset($_REQUEST['hostid']);
@@ -593,7 +593,7 @@ include_once('include/page_header.php');
 			DBstart();
 			while($db_host=DBfetch($db_hosts)){
 				$del_hosts[$db_host['hostid']] = $db_host['hostid'];
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$db_host['host'].']');
+/*				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$db_host['host'].']');*/
 			}
 			
 			$result = delete_host($del_hosts, $unlink_mode);
@@ -649,7 +649,7 @@ include_once('include/page_header.php');
 		DBstart();
 		while($db_host=DBfetch($db_hosts)){
 			$act_hosts[$db_host['hostid']] = $db_host['hostid'];
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,'Host ['.$db_host['host'].']. Old status ['.$db_host['status'].'] '.'New status ['.$status.']');
+/*			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,'Host ['.$db_host['host'].']. Old status ['.$db_host['status'].'] '.'New status ['.$status.']');*/
 		}
 
 		$result = update_host_status($act_hosts,$status);
@@ -667,9 +667,9 @@ include_once('include/page_header.php');
 		$result = DBend($result);
 		
 		show_messages($result,S_HOST_STATUS_UPDATED,S_CANNOT_UPDATE_HOST_STATUS);
-		if($result){
+/*		if($result){
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,'Host ['.$db_host['host'].']. Old status ['.$host['status'].'] New status ['.$_REQUEST['chstatus'].']');
-		}
+		}*/
 		unset($_REQUEST['chstatus']);
 		unset($_REQUEST['hostid']);
 	}
@@ -687,7 +687,7 @@ include_once('include/page_header.php');
 				$result = update_host_group($_REQUEST['groupid'], $_REQUEST['gname'], $hosts);
 			$result = DBend($result);
 			
-			$action 	= AUDIT_ACTION_UPDATE;
+/*			$action 	= AUDIT_ACTION_UPDATE;*/
 			$msg_ok		= S_GROUP_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_GROUP;
 			$groupid = $_REQUEST['groupid'];
@@ -700,13 +700,13 @@ include_once('include/page_header.php');
 				$groupid = add_host_group($_REQUEST['gname'], $hosts);
 			$result = DBend($groupid);
 			
-			$action 	= AUDIT_ACTION_ADD;
+/*			$action 	= AUDIT_ACTION_ADD;*/
 			$msg_ok		= S_GROUP_ADDED;
 			$msg_fail	= S_CANNOT_ADD_GROUP;
 		}
 		show_messages($result, $msg_ok, $msg_fail);
 		if($result){
-			add_audit($action,AUDIT_RESOURCE_HOST_GROUP,S_HOST_GROUP.' ['.$_REQUEST['gname'].'] ['.$groupid.']');
+/*			add_audit($action,AUDIT_RESOURCE_HOST_GROUP,S_HOST_GROUP.' ['.$_REQUEST['gname'].'] ['.$groupid.']');*/
 			unset($_REQUEST['form']);
 		}
 		unset($_REQUEST['save']);
@@ -715,15 +715,15 @@ include_once('include/page_header.php');
 	if(($_REQUEST['config']==1) && isset($_REQUEST['delete'])){
 		if(isset($_REQUEST['groupid'])){
 			$result = false;
-			if($group = get_hostgroup_by_groupid($_REQUEST['groupid'])){
+/*			if($group = get_hostgroup_by_groupid($_REQUEST['groupid'])){*/
 				DBstart();
 				$result = delete_host_group($_REQUEST['groupid']);
 				$result = DBend($result);
-			} 
+/*			} */
 
-			if($result){
+/*			if($result){
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST_GROUP,S_HOST_GROUP.' ['.$group['name'].' ] ['.$group['groupid'].']');
-			}
+			}*/
 			
 			unset($_REQUEST['form']);
 
@@ -741,13 +741,13 @@ include_once('include/page_header.php');
 			while($db_group=DBfetch($db_groups)){
 				if(!uint_in_array($db_group['groupid'],$groups)) continue;
 			
-				if(!$group = get_hostgroup_by_groupid($db_group['groupid'])) continue;
+/*				if(!$group = get_hostgroup_by_groupid($db_group['groupid'])) continue;*/
 				$result &= delete_host_group($db_group['groupid']);
 				
-				if($result){
+/*				if($result){
 					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST_GROUP,
 					S_HOST_GROUP.' ['.$group['name'].' ] ['.$group['groupid'].']');
-				}
+				}*/
 			}
 			$result = DBend($result);
 			show_messages(true, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
@@ -772,8 +772,8 @@ include_once('include/page_header.php');
 			$host=get_host_by_hostid($db_host['hostid']);
 
 			$result &= update_host_status($db_host['hostid'],$status);
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,
-				'Old status ['.$host['status'].'] '.'New status ['.$status.']');
+/*			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,
+				'Old status ['.$host['status'].'] '.'New status ['.$status.']');*/
 		}
 		$result = DBend($result);
 		show_messages($result, S_HOST_STATUS_UPDATED, S_CANNOT_UPDATE_HOST);
@@ -869,14 +869,14 @@ include_once('include/page_header.php');
 
 					if(isset($_REQUEST['activate'])){
 						if($result&=activate_item($item['itemid'])){
-							$host = get_host_by_hostid($item['hostid']);
-							add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_ITEMS_ACTIVATED);
+/*							$host = get_host_by_hostid($item['hostid']);
+							add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_ITEMS_ACTIVATED);*/
 						}
 					}
 					else{
 						if($result&=disable_item($item['itemid'])){
-							$host = get_host_by_hostid($item['hostid']);
-							add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_ITEMS_DISABLED);
+/*							$host = get_host_by_hostid($item['hostid']);
+							add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_ITEMS_DISABLED);*/
 						}
 					}
 			}
@@ -974,7 +974,7 @@ include_once('include/page_header.php');
 				$result &= update_host_status($db_host['hostid'], $status);
 				if(!$result) continue;
 
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,'Old status ['.$old_status.'] '.'New status ['.$status.'] ['.$db_host['hostid'].']');
+/*				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,'Old status ['.$old_status.'] '.'New status ['.$status.'] ['.$db_host['hostid'].']');*/
 			}
 		}
 		$result = DBend($result && !empty($hosts));

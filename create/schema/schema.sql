@@ -298,9 +298,21 @@ FIELD		|userid		|t_id		|'0'	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|action		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|resourcetype	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|details	|t_varchar(128)	|'0'	|NOT NULL	|0
+FIELD		|details	|t_varchar(128) |'0'	|NOT NULL	|0
+FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
+FIELD		|resourceid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|resourcename	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|userid,clock
 INDEX		|2		|clock
+
+TABLE|auditlog_details|auditdetailid|ZBX_HISTORY
+FIELD		|auditdetailid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|auditid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|table_name	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|field_name	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|oldvalue	|t_blob		|''	|NOT NULL	|0
+FIELD		|newvalue	|t_blob		|''	|NOT NULL	|0
+INDEX		|1		|auditid
 
 TABLE|service_alarms|servicealarmid|ZBX_HISTORY
 FIELD		|servicealarmid	|t_id		|'0'	|NOT NULL	|0
