@@ -199,9 +199,9 @@ void zabbix_errlog(zbx_err_codes_t err, ...)
 	switch (err) {
 	case ERR_Z3001: msg = "Connection to database '%s' failed: [%d] %s"; break;
 	case ERR_Z3002: msg = "Cannot create database '%s': [%d] %s"; break;
-	case ERR_Z3003: msg = "Query executing require connection to database!"; break;
-	case ERR_Z3004: msg = "Cannot close database session: [%d] %s"; break;
-	case ERR_Z3005: msg = "Query execution failed: [%d] %s [%s]"; break;
+	case ERR_Z3003: msg = "No connection to the database."; break;
+	case ERR_Z3004: msg = "Cannot close database: [%d] %s"; break;
+	case ERR_Z3005: msg = "Query failed: [%d] %s [%s]"; break;
 	case ERR_Z3006: msg = "Fetch failed: [%d] %s"; break;
 	default: msg = "Unknown error";
 	}
