@@ -16,6 +16,7 @@ Changes for 1.7.0
 
 Changes for 1.6.2
 
+ - [ZBX-619] fixed agent crash for system.uptime under Solaris 2.5.1 (Sasha)
  - [ZBX-613] fixed possible incorrect evaluating of trigger functions if using dbcache (Sasha)
  - [ZBX-610] fixed memory leak in external checks (Sasha)
  - [DEV-254] improved server side logging (Sasha)
