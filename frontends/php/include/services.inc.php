@@ -694,7 +694,7 @@ if($serviceid == 1 || $serviceid == 2){
 		else {
 			$rows['caption'] = new CSpan($rows['caption']);
 			$rows['caption']->AddOption('style','color: #888888;');
-			$temp[$rows['serviceid'].','.$linkid]=$rows;
+			$temp[$rows['serviceid'].'.'.$linkid]=$rows;
 		}
 	return ;
 	}
