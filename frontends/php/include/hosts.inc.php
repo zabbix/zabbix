@@ -477,23 +477,25 @@ require_once('include/httptest.inc.php');
 		DBexecute('DELETE FROM hosts_templates WHERE '.DBcondition('hostid',$hostids));
 
 // disable actions
-
+		$actionids = array();
 		$sql = 'SELECT DISTINCT actionid '.
 				' FROM conditions '.
 				' WHERE conditiontype='.CONDITION_TYPE_HOST.
-					' AND '.DBcondition(zbx_dbcast_2bigint('value'),$hostids);	// FIXED[POSIBLE value type violation]!!!
+					' AND '.DBcondition('value',$hostids, false, true);		// FIXED[POSIBLE value type violation]!!!
 		$db_actions = DBselect($sql);
-									
 		while($db_action = DBfetch($db_actions)){
-			DBexecute('UPDATE actions '.
-					' SET status='.ACTION_STATUS_DISABLED.
-					' WHERE actionid='.$db_action['actionid']);
+			$actionids[$db_action['actionid']] = $db_action['actionid'];
 		}
+
+		DBexecute('UPDATE actions '.
+					' SET status='.ACTION_STATUS_DISABLED.
+					' WHERE '.DBcondition('actionid',$actionids));
+
 
 // delete action conditions
 		DBexecute('DELETE FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_HOST.
-						' AND '.DBcondition(zbx_dbcast_2bigint('value'),$hostids));	// FIXED[POSIBLE value type violation]!!!
+						' AND '.DBcondition('value',$hostids, false, true)); 	// FIXED[POSIBLE value type violation]!!!
 
 // delete host profile
 		delete_host_profile($hostids);
@@ -534,22 +536,24 @@ require_once('include/httptest.inc.php');
 		DBexecute('DELETE FROM maintenances_groups WHERE '.DBcondition('groupid',$groupids));
 		
 // disable actions
+		$actionids = array();
 		$sql = 'SELECT DISTINCT actionid '.
 				' FROM conditions '.
 				' WHERE conditiontype='.CONDITION_TYPE_HOST_GROUP.
-					' AND '.DBcondition(zbx_dbcast_2bigint('value'),$groupids);	// FIXED[POSIBLE value type violation]!!!
+					' AND '.DBcondition('value',$groupids, false, true);		// FIXED[POSIBLE value type violation]!!!
 		$db_actions = DBselect($sql);
-									
 		while($db_action = DBfetch($db_actions)){
-			DBexecute('UPDATE actions '.
-					' SET status='.ACTION_STATUS_DISABLED.
-					' WHERE actionid='.$db_action['actionid']);
+			$actionids[$db_action['actionid']] = $db_action['actionid'];
 		}
+
+		DBexecute('UPDATE actions '.
+					' SET status='.ACTION_STATUS_DISABLED.
+					' WHERE '.DBcondition('actionid',$actionids));
 
 // delete action conditions
 		DBexecute('DELETE FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_HOST_GROUP.
-						' AND '.DBcondition(zbx_dbcast_2bigint('value'),$groupids));	// FIXED[POSIBLE value type violation]!!!
+						' AND '.DBcondition('value',$groupids, false, true));		// FIXED[POSIBLE value type violation]!!!
 
 
 		DBexecute('DELETE FROM hosts_groups WHERE '.DBcondition('groupid',$groupids));

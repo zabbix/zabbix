@@ -659,9 +659,10 @@ if($serviceid == 1 || $serviceid == 2){
 					}
 				}			
 			}
-		} else {
+		} 
+		else {
 			$rows['caption'] = new CSpan($rows['caption'],'unknown');
-			$temp[$rows['serviceid'].','.$linkid]=$rows;
+			$temp[$rows['serviceid'].'.'.$linkid]=$rows;
 		}
 	return ;
 	}
@@ -694,7 +695,7 @@ if($serviceid == 1 || $serviceid == 2){
 		else {
 			$rows['caption'] = new CSpan($rows['caption']);
 			$rows['caption']->AddOption('style','color: #888888;');
-			$temp[$rows['serviceid'].','.$linkid]=$rows;
+			$temp[$rows['serviceid'].'.'.$linkid]=$rows;
 		}
 	return ;
 	}
