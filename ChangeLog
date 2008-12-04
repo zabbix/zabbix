@@ -1,3 +1,9 @@
+Changes for 1.0.6
+
+ - [NTD-37] fixed fonts in the maps (Artem)
+ - [ZBX-619] fixed agent crash for system.uptime under Solaris 2.5.1 (Sasha)
+ - [ZBX-610] fixed memory leak in external checks (Sasha)
+
 Changes for 1.0.5
 
  - [NTD-34] fixed problem with net.tcp.dns under AIX (Sasha)
