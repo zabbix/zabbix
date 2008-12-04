@@ -36,7 +36,7 @@ dbschema:
 	create/schema/gen.pl oracle > create/schema/oracle.sql
 	create/schema/gen.pl c >src/libs/zbxdbhigh/dbschema.c
 	echo -e "\n#ifdef HAVE_MYSQL\nconst char *db_schema= {\"\\" >>src/libs/zbxdbhigh/dbschema.c
-	create/schema/gen.pl mysql|sed -e 's/\t\t*/ /g' -e 's/$$/\\/' >>src/libs/zbxdbhigh/dbschema.c
+	create/schema/gen.pl mysql|sed -e 's/$$/\\/' >>src/libs/zbxdbhigh/dbschema.c
 	echo -e "\"};\n#elif HAVE_POSTGRESQL\nconst char *db_schema = {\"\\" >>src/libs/zbxdbhigh/dbschema.c
 	create/schema/gen.pl postgresql|sed -e 's/\t\t*/ /g' -e 's/$$/\\/' >>src/libs/zbxdbhigh/dbschema.c
 	echo -e "\"};\n#elif HAVE_ORACLE\nconst char *db_schema = {\"\\" >>src/libs/zbxdbhigh/dbschema.c
