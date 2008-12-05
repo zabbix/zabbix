@@ -21,7 +21,6 @@
 <?php
 	require_once "include/config.inc.php";
 	require_once "include/triggers.inc.php";
-	require_once "include/forms.inc.php";
 	require_once "include/js.inc.php";
 	
 	$dstfrm		= get_request("dstfrm",		0);	// destination form
@@ -135,14 +134,141 @@ include_once "include/page_header.php";
 </script>
 <?php
 	}
-	else
-	{
-?>
-<?php
+	else{
 	echo SBR;
 
-	insert_graphitem_form();
+		$frmGItem = new CFormTable(S_NEW_ITEM_FOR_THE_GRAPH);
+		$frmGItem->SetName('graph_item');
+		$frmGItem->SetHelp("web.graph.item.php");
 
+		$frmGItem->AddVar('dstfrm',$_REQUEST['dstfrm']);
+
+		$graphid	= get_request("graphid", 	null);
+		$graphtype	= get_request("graphtype", 	GRAPH_TYPE_NORMAL);
+		$gid		= get_request("gid",	 	null);
+		$list_name	= get_request("list_name", 	null);
+		$itemid		= get_request("itemid", 	0);
+		$color		= get_request("color", 		'009900');
+		$drawtype	= get_request("drawtype",	0);
+		$sortorder	= get_request("sortorder",	0);
+		$yaxisside	= get_request("yaxisside",	1);
+		$calc_fnc	= get_request("calc_fnc",	2);
+		$type		= get_request("type",		0);
+		$periods_cnt	= get_request("periods_cnt",	5);
+		$only_hostid	= get_request("only_hostid",	null);
+		$monitored_hosts = get_request('monitored_hosts', null);
+
+		$description = '';
+		if($itemid > 0){
+			$description = get_item_by_itemid($itemid);
+			$description = item_description($description);
+		}
+		
+		$frmGItem->AddVar('graphid',$graphid);
+		$frmGItem->AddVar('gid',$gid);
+		$frmGItem->AddVar('list_name',$list_name);
+		$frmGItem->AddVar('itemid',$itemid);
+		$frmGItem->AddVar('graphtype',$graphtype);
+		$frmGItem->AddVar('only_hostid',$only_hostid);
+
+		$txtCondVal = new CTextBox('description',$description,50,'yes');
+
+		$host_condition = "";
+		if(isset($only_hostid)){// graph for template must use only one host
+			$host_condition = "&only_hostid=".$only_hostid;
+		}
+		else if(isset($monitored_hosts)){
+			$host_condition = "&monitored_hosts=1";
+		}
+
+		$btnSelect = new CButton('btn1',S_SELECT,
+				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().
+				"&dstfld1=itemid&dstfld2=description&".
+				"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."');",
+				'T');
+		
+		$frmGItem->AddRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
+
+		if($graphtype == GRAPH_TYPE_NORMAL){
+			$cmbType = new CComboBox("type",$type,"submit()");
+			$cmbType->AddItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
+			$cmbType->AddItem(GRAPH_ITEM_AGGREGATED, S_AGGREGATED);
+			$frmGItem->AddRow(S_TYPE, $cmbType);
+		}
+		else if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
+			$cmbType = new CComboBox("type",$type,"submit()");
+			$cmbType->AddItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
+			$cmbType->AddItem(GRAPH_ITEM_SUM, S_GRAPH_SUM);
+			$frmGItem->AddRow(S_TYPE, $cmbType);
+		}
+		else{
+			$frmGItem->AddVar("type",GRAPH_ITEM_SIMPLE);
+		}
+
+		if($type == GRAPH_ITEM_AGGREGATED){
+			$frmGItem->AddRow(S_AGGREGATED_PERIODS_COUNT,	new CTextBox("periods_cnt",$periods_cnt,15)); 
+
+			$frmGItem->AddVar("calc_fnc",$calc_fnc);
+			$frmGItem->AddVar("drawtype",$drawtype);
+			$frmGItem->AddVar("color",$color);
+		}
+		else {
+			if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
+				$frmGItem->AddVar("periods_cnt",$periods_cnt);
+	
+				$cmbFnc = new CComboBox("calc_fnc",$calc_fnc,'submit();');
+	
+				$cmbFnc->AddItem(CALC_FNC_MIN, S_MIN_SMALL);
+				$cmbFnc->AddItem(CALC_FNC_AVG, S_AVG_SMALL);
+				$cmbFnc->AddItem(CALC_FNC_MAX, S_MAX_SMALL);
+				$cmbFnc->AddItem(CALC_FNC_LST, S_LST_SMALL);
+				$frmGItem->AddRow(S_FUNCTION, $cmbFnc);		
+			}
+			else{
+				$frmGItem->AddVar("periods_cnt",$periods_cnt);
+	
+				$cmbFnc = new CComboBox("calc_fnc",$calc_fnc,'submit();');
+	
+				if($graphtype == GRAPH_TYPE_NORMAL)
+					$cmbFnc->AddItem(CALC_FNC_ALL, S_ALL_SMALL);
+	
+				$cmbFnc->AddItem(CALC_FNC_MIN, S_MIN_SMALL);
+				$cmbFnc->AddItem(CALC_FNC_AVG, S_AVG_SMALL);
+				$cmbFnc->AddItem(CALC_FNC_MAX, S_MAX_SMALL);
+				$frmGItem->AddRow(S_FUNCTION, $cmbFnc);
+	
+				if($graphtype == GRAPH_TYPE_NORMAL)
+				{
+					$cmbType = new CComboBox("drawtype",$drawtype);
+					foreach( graph_item_drawtypes() as $i )
+					{
+						$cmbType->AddItem($i,graph_item_drawtype2str($i));
+					}
+					$frmGItem->AddRow(S_DRAW_STYLE, $cmbType);
+				}
+				else
+				{
+					$frmGItem->AddVar("drawtype", 1);
+				}
+			}
+
+			$frmGItem->AddRow(S_COLOR, new CColor('color',$color));
+		}
+		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
+			$cmbYax = new CComboBox("yaxisside",$yaxisside);
+			$cmbYax->AddItem(GRAPH_YAXIS_SIDE_RIGHT, S_RIGHT);
+			$cmbYax->AddItem(GRAPH_YAXIS_SIDE_LEFT,	S_LEFT);
+			$frmGItem->AddRow(S_YAXIS_SIDE, $cmbYax);
+		}
+
+		if($type != GRAPH_ITEM_SUM){
+			$frmGItem->AddRow(S_SORT_ORDER_1_100, new CTextBox("sortorder",$sortorder,3));
+		}
+
+		$frmGItem->AddItemToBottomRow(new CButton("save", isset($gid) ? S_SAVE : S_ADD));
+
+		$frmGItem->AddItemToBottomRow(new CButtonCancel(null,'close_window();'));
+		$frmGItem->Show();
 	}
 ?>
 <?php

@@ -74,7 +74,7 @@ function make_favorite_graphs(){
 		));
 	}
 	$td = new CCol(array(new CLink(S_GRAPHS.' &raquo;','charts.php','highlight')));
-	$td->AddOption('style','text-align: right;');
+	$td->addOption('style','text-align: right;');
 
 	$table->SetFooter($td);
 	
@@ -115,10 +115,10 @@ function make_favorite_screens(){
 			$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
 			
 			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=0&elementid='.$sourceid.'&fullscreen=1');
-			$icon->SetTarget('blank');
+			$icon->setTarget('blank');
 		}
 		
-		$table->AddRow(new CCol(array(
+		$table->addRow(new CCol(array(
 			$icon,
 			SPACE,
 			$capt)
@@ -287,8 +287,7 @@ function make_system_summary(){
 									' AND t.triggerid=e.objectid '.
 									' AND e.value='.TRIGGER_VALUE_TRUE.
 								' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
-					$res_events = DBSelect($event_sql,1);
-					while($row_inf_event=DBfetch($res_events)){
+					if($row_inf_event=DBfetch(DBselect($event_sql,1))){
 						
 						if($config['event_ack_enable']){
 							if($row_inf_event['acknowledged'] == 1){
@@ -300,22 +299,29 @@ function make_system_summary(){
 						}
 			
 						$description = expand_trigger_description_by_data(
-								array_merge($row_inf, array("clock"=>$row_inf_event["clock"])),
+								array_merge($row_inf, array('clock'=>$row_inf_event['clock'])),
 								ZBX_FLAG_EVENT);
 						
 //actions								
 						$actions= get_event_actions_status($row_inf_event['eventid']);
-//--------		
-			
-						$table_inf->AddRow(array(
-							get_node_name_by_elid($row_inf['triggerid']),
-							$host,
-							new CCol($description,get_severity_style($row_inf["priority"])),
-							zbx_date2age($row_inf_event['clock']),
-							($config['event_ack_enable'])?(new CCol($ack,"center")):NULL,
-							$actions
-						));			
+//--------				
 					}
+					else{
+						$description = expand_trigger_description_by_data($row_inf, ZBX_FLAG_EVENT);
+						$ack = '-';
+						$actions = S_NO_DATA_SMALL;
+						$row_inf_event['clock'] = $row_inf['clock'];
+					}
+					
+					$table_inf->addRow(array(
+						get_node_name_by_elid($row_inf['triggerid']),
+						$host,
+						new CCol($description,get_severity_style($row_inf['priority'])),
+						zbx_date2age($row_inf_event['clock']),
+						($config['event_ack_enable'])?(new CCol($ack,'center')):NULL,
+						$actions
+					));
+					
 					unset($row_inf,$description,$actions);
 				}
 				

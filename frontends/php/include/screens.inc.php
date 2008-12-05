@@ -494,7 +494,7 @@
 			
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
-			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
+			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 			
 			$form->AddRow(S_GRAPH_NAME,array($textfield,SPACE,$selectbtn));
 			
@@ -527,7 +527,7 @@
 			
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description',800,450);");
-			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
+			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 			
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 		}
@@ -555,7 +555,7 @@
 			$textfield = new Ctextbox('caption',$caption,60,'yes');
 			
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name',400,450);");
-			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
+			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 			
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 			
@@ -588,7 +588,7 @@
 			
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=plain_text&srcfld1=itemid&srcfld2=description',800,450);");
-			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
+			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 			
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 			$form->AddRow(S_SHOW_LINES, new CNumericBox('elements',$elements,2));
@@ -628,7 +628,7 @@
 			
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=overview&srcfld1=groupid&srcfld2=name',800,450);");
-			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
+			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 			
 			$form->AddRow(S_GROUP,array($textfield,SPACE,$selectbtn));
 		}
@@ -657,7 +657,7 @@
 			
 			$textfield = new Ctextbox('caption',$caption,60,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=screens2&srcfld1=screenid&srcfld2=name&screenid=".$_REQUEST['screenid']."',800,450);");
-			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
+			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 			
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 		}
@@ -696,7 +696,7 @@
 			
 			$textfield = new CTextbox('caption',$caption,60,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=host_group_scr&srcfld1=groupid&srcfld2=name',480,450);");
-			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
+			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 			
 			$form->AddRow(S_GROUP,array($textfield,SPACE,$selectbtn));
 		}
@@ -960,7 +960,7 @@
 						}
 	
 						$url='';
-						if($new_items = get_same_graphitems_for_host($def_items, $_REQUEST['hostid'], false)){
+						if($new_items = get_same_graphitems_for_host($def_items, $_REQUEST['hostid'])){
 							$url.= make_url_from_gitems($new_items);
 						}
 						
@@ -1023,7 +1023,7 @@
 
 // Host feature
 					if(($dynamic == SCREEN_DYNAMIC_ITEM) && isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
-						if($newitemid = get_same_item_for_host($resourceid,$_REQUEST['hostid'],false)){
+						if($newitemid = get_same_item_for_host($resourceid,$_REQUEST['hostid'])){
 							$resourceid = $newitemid;
 						}
 						else{
@@ -1054,7 +1054,7 @@
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_PLAIN_TEXT) ){
 // Host feature
 					if(($dynamic == SCREEN_DYNAMIC_ITEM) && isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
-						if($newitemid = get_same_item_for_host($resourceid,$_REQUEST['hostid'],false)){
+						if($newitemid = get_same_item_for_host($resourceid,$_REQUEST['hostid'])){
 							$resourceid = $newitemid;
 						}
 						else{

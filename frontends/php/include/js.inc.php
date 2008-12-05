@@ -378,6 +378,63 @@ function insert_js_function($fnct_name){
 				return true;
 			}');
 			break;
+		case 'add_bitem':
+			insert_js('function add_bitem(formname,caption,itemid,color,calc_fnc){
+					var form = window.opener.document.forms[formname];
+				
+					if(!form){
+						close_window();
+					return false;
+					}
+					
+					window.opener.create_var(form,"new_graph_item[caption]",caption);	
+					window.opener.create_var(form,"new_graph_item[itemid]",itemid);
+					window.opener.create_var(form,"new_graph_item[color]",color);
+					window.opener.create_var(form,"new_graph_item[calc_fnc]",calc_fnc);
+					
+					form.submit();
+					close_window();
+					return true;
+				}');
+			break;
+		case 'update_bitem':
+			insert_js('function update_bitem(formname,list_name,gid,caption,itemid,color,calc_fnc){
+				var form = window.opener.document.forms[formname];
+			
+				if(!form){
+					close_window();
+				return false;
+				}
+
+				window.opener.create_var(form,list_name + "[" + gid + "][caption]",caption);			
+				window.opener.create_var(form,list_name + "[" + gid + "][itemid]",itemid);
+				window.opener.create_var(form,list_name + "[" + gid + "][color]",color);
+				window.opener.create_var(form,list_name + "[" + gid + "][calc_fnc]",calc_fnc);
+				
+				form.submit();
+				close_window();
+				return true;
+			}');
+			break;
+		case 'add_period':
+			insert_js('function add_period(formname,caption,since,till,color){
+					var form = window.opener.document.forms[formname];
+				
+					if(!form){
+						close_window();
+					return false;
+					}
+					
+					window.opener.create_var(form,"new_period[caption]",caption);	
+					window.opener.create_var(form,"new_period[report_timesince]",since);
+					window.opener.create_var(form,"new_period[report_timetill]",till);
+					window.opener.create_var(form,"new_period[color]",color);
+					
+					form.submit();
+					close_window();
+					return true;
+				}');
+			break;
 		default:
 			break;
 	}

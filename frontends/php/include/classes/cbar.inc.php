@@ -35,6 +35,8 @@ function cbar($type = GRAPH_TYPE_COLUMN){
 	$this->sum = false;
 
 	$this->shiftlegendright = 0;	// count of static chars * px/char + for color rectangle + space
+	$this->shiftCaption = 0;	
+	$this->maxCaption = 0;	
 	$this->drawlegendallow = 0;
 	
 	$this->series = array();
@@ -54,9 +56,6 @@ function cbar($type = GRAPH_TYPE_COLUMN){
 	
 	$this->minValue = 0;
 	$this->maxValue = null;
-	
-	$this->minValueStacked = 0;
-	$this->maxValueStacked = null;
 	
 	$this->gridLinesCount = NULL;				// How many grids to draw
 	$this->gridPixels = 40;						// optimal grid size
@@ -120,14 +119,17 @@ return $this->seriesCount;
 function setPeriodCaption($periodCaption){
 	foreach($periodCaption as $key => $value){
 		$this->periodCaption[$key] = $value;
+
+		$tmp = zbx_strlen($value);
+		if($tmp > $this->maxCaption) $this->maxCaption = $tmp;
 	}
+	$this->shiftCaption = round($this->maxCaption * 5.7);
 }
 
 function setSeriesLegend($seriesLegend){
 	foreach($seriesLegend as $key => $value){
 		$this->seriesLegend[$key] = $value;
 		
-
 		$tmp = zbx_strlen($value) * 7 + 8;	// count of chars * font size + color box
 		if($tmp > $this->shiftlegendright) $this->shiftlegendright = $tmp;
 	}
@@ -140,14 +142,23 @@ function setSeriesColor($seriesColor){
 }
 
 function calcShifts(){
-	$this->shiftXleft = 60 + (is_null($this->xLabel)?0:16);
+	$this->shiftXleft = 10 + (is_null($this->xLabel)?0:16);
 	$this->shiftXright = 10;
 
-	if(!$this->drawlegendallow){
+	if($this->drawlegendallow == 0){
 		$this->shiftlegendright = 0;
 	}
 	
-	$this->shiftYLegend = 57 + (is_null($this->yLabel)?0:16);
+	if($this->column){
+		$this->shiftXCaption = 74;
+		$this->shiftYCaption = $this->shiftCaption;
+	}
+	else{
+		$this->shiftYCaption = 74;
+		$this->shiftXCaption = $this->shiftCaption;
+	}
+	
+	$this->shiftYLegend =  0 + (is_null($this->yLabel)?0:16);
 }
 
 function calcSeriesWidth(){
@@ -323,9 +334,9 @@ function drawGrid(){
 		
 		for($i=1;$i<$hline_count;$i++){
 			dashedline($this->im,
-					$this->shiftXleft,
+					$this->shiftXleft+$this->shiftXCaption,
 					$i*($this->sizeY/$hline_count)+$this->shiftY,
-					$this->sizeX+$this->shiftXleft,
+					$this->sizeX+$this->shiftXleft+$this->shiftXCaption,
 					$i*($this->sizeY/$hline_count)+$this->shiftY,
 					$this->getColor('Gray')
 				);
@@ -333,12 +344,14 @@ function drawGrid(){
 
 		$i=0;
 
-		foreach($this->periodCaption as $key => $caption){
-			$caption = str_pad($caption,10,' ', STR_PAD_LEFT);
+		foreach($this->series as $key => $serie){
+			$caption = $this->periodCaption[$key];
+			$caption = str_pad($caption,$this->maxCaption,' ', STR_PAD_LEFT);
+
 			imagestringup($this->im, 
 						1,
-						$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+round($this->seriesWidth/2), 
-						$this->sizeY+$this->shiftY+57,
+						$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+$this->shiftXCaption+round($this->seriesWidth/2), 
+						$this->sizeY+$this->shiftY+$this->shiftYCaption,
 						$caption,
 						$this->getColor('Black No Alpha')
 				);
@@ -351,9 +364,9 @@ function drawGrid(){
 		
 		for($i=1;$i<$vline_count;$i++){
 			dashedline($this->im,
-						$i*($this->sizeX/$vline_count)+$this->shiftXleft,
+						$i*($this->sizeX/$vline_count)+$this->shiftXleft+$this->shiftXCaption,
 						$this->shiftY,
-						$i*($this->sizeX/$vline_count)+$this->shiftXleft,
+						$i*($this->sizeX/$vline_count)+$this->shiftXleft+$this->shiftXCaption,
 						$this->sizeY+$this->shiftY,
 						$this->getColor('Gray')
 				);
@@ -361,12 +374,13 @@ function drawGrid(){
 		
 		$i=0;
 
-		foreach($this->periodCaption as $key => $caption){
-			$caption = str_pad($caption,10,' ', STR_PAD_LEFT);
+		foreach($this->series as $key => $serie){
+			$caption = $this->periodCaption[$key];
+			$caption = str_pad($caption,$this->maxCaption,' ', STR_PAD_LEFT);
 
 			imagestring($this->im, 
 						1,
-						$this->shiftXleft - 57,
+						$this->shiftXleft,
 						($this->sizeY + $this->shiftY) - ($i*($this->seriesWidth+$this->seriesDistance)+$this->seriesDistance+round($this->seriesWidth/2)),
 						$caption,
 						$this->getColor('Black No Alpha')
@@ -385,10 +399,10 @@ function drawSideValues(){
 
 	if($this->column){
 		for($i=0;$i<=$hstr_count;$i++){
-			$str = str_pad(($this->sizeY*$i/$hstr_count*($max-$min)/$this->sizeY+$min),10,' ', STR_PAD_LEFT);
+			$str = str_pad(($this->sizeY*$i/$hstr_count*($max-$min)/$this->sizeY+$min),14,' ', STR_PAD_LEFT);
 			imagestring($this->im, 
 						1, 
-						$this->shiftXleft - 57, 
+						$this->shiftXleft, 
 						$this->sizeY-$this->sizeY*$i/$hstr_count-4+$this->shiftY, 
 						$str, 
 						$this->GetColor('Dark Red No Alpha')
@@ -397,11 +411,12 @@ function drawSideValues(){
 	}
 	else if(in_array($this->type, array(GRAPH_TYPE_BAR, GRAPH_TYPE_BAR_STACKED))){
 		for($i=0;$i<=$hstr_count;$i++){
-			$str = str_pad(($this->sizeX*$i/$hstr_count*($max-$min)/$this->sizeX+$min),10,' ', STR_PAD_LEFT);
+			$str = str_pad(($this->sizeX*$i/$hstr_count*($max-$min)/$this->sizeX+$min),14,' ', STR_PAD_LEFT);
+
 			imagestringup($this->im, 
 						1, 
-						$this->shiftXleft + ($this->sizeX*$i/$hstr_count-4),
-						$this->shiftY + $this->sizeY + 57, 
+						$this->shiftXleft + ($this->sizeX*$i/$hstr_count-4)+$this->shiftXCaption,
+						$this->shiftY + $this->sizeY + $this->shiftYCaption, 
 						$str, 
 						$this->GetColor('Dark Red No Alpha')
 					);
@@ -426,26 +441,30 @@ function drawSideValues(){
 }
 
 function drawLegend(){
-
+	if(!$this->drawlegendallow) return;
+	
 	$shiftY = $this->shiftY;
 	$shiftX = $this->fullSizeX - $this->shiftlegendright;
 	
 	$count = 0;
-
-	foreach($this->series[0] as $key => $values){
-		$caption = $this->seriesLegend[$key];
-		$color = $this->getColor($this->seriesColor[$key]);
-		
-		imagefilledrectangle($this->im, $shiftX, $shiftY+12*$count, $shiftX+5, $shiftY+5+12*$count, $color);
-		imagerectangle($this->im,$shiftX, $shiftY+12*$count, $shiftX+5, $shiftY+5+12*$count, $this->getColor('Black No Alpha'));
-
-		imagestring($this->im, 2,
-			$shiftX+9,
-			$shiftY-5+12*$count,
-			$caption,
-			$this->getColor('Black No Alpha'));
-
-		$count++;
+	
+	foreach($this->series as $key => $serie){
+		foreach($serie as $num => $value){
+			$caption = $this->seriesLegend[$num];
+			$color = $this->getColor($this->seriesColor[$num]);
+			
+			imagefilledrectangle($this->im, $shiftX, $shiftY+12*$count, $shiftX+5, $shiftY+5+12*$count, $color);
+			imagerectangle($this->im,$shiftX, $shiftY+12*$count, $shiftX+5, $shiftY+5+12*$count, $this->getColor('Black No Alpha'));
+	
+			imagestring($this->im, 2,
+				$shiftX+9,
+				$shiftY-5+12*$count,
+				$caption,
+				$this->getColor('Black No Alpha'));
+	
+			$count++;
+		}
+		break;  //!!!!
 	}
 }
 
@@ -463,8 +482,8 @@ function draw(){
 	
 	$this->calcShifts();
 
-	$this->sizeX -= ($this->shiftXleft+$this->shiftXright+$this->shiftlegendright);
-	$this->sizeY -= ($this->shiftY + $this->shiftYLegend);
+	$this->sizeX -= ($this->shiftXleft+$this->shiftXright+$this->shiftlegendright+$this->shiftXCaption);
+	$this->sizeY -= ($this->shiftY + $this->shiftYLegend + $this->shiftYCaption);
 	
 	$this->calcSeriesWidth();
 	
@@ -490,7 +509,7 @@ function draw(){
 	$this->drawLegend();
 
 	$count = 0;
-	$start = ($this->column)?($this->shiftXleft+floor($this->seriesDistance/2)):($this->sizeY+$this->shiftY-floor($this->seriesDistance/2));
+	$start = ($this->column)?($this->shiftXleft+$this->shiftXCaption+floor($this->seriesDistance/2)):($this->sizeY+$this->shiftY-floor($this->seriesDistance/2));
 //	$start = ($this->column)?($this->shiftXleft + 1):($this->sizeY+$this->shiftY - 1);
 	foreach($this->series as $key => $values){
 		foreach($values as $num => $value){
@@ -512,17 +531,17 @@ function draw(){
 			}
 			else{
 				imagefilledrectangle($this->im,
-									$this->shiftXleft,
+									$this->shiftXleft+$this->shiftXCaption,
 									$start,
-									$this->shiftXleft + round(($this->sizeX/$this->maxValue) * $value),
+									$this->shiftXleft+$this->shiftXCaption + round(($this->sizeX/$this->maxValue) * $value),
 									$start-$this->columnWidth,
 									$this->getColor($this->seriesColor[$num],20));
 									
 
 				imagerectangle($this->im,
-									$this->shiftXleft,
+									$this->shiftXleft+$this->shiftXCaption,
 									$start,
-									$this->shiftXleft + round(($this->sizeX/$this->maxValue) * $value),
+									$this->shiftXleft+$this->shiftXCaption + round(($this->sizeX/$this->maxValue) * $value),
 									$start-$this->columnWidth,
 									$this->getColor('Black No Alpha'));
 			}
@@ -531,7 +550,7 @@ function draw(){
 		
 		$count++;
 		if($this->column){
-			$start=$count*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft + floor($this->seriesDistance/2);
+			$start=$count*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+$this->shiftXCaption + floor($this->seriesDistance/2);
 		}
 		else{
 			$start=($this->sizeY + $this->shiftY) - ($count*($this->seriesWidth+$this->seriesDistance)) - floor($this->seriesDistance/2);

@@ -19,37 +19,37 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/triggers.inc.php";
+	require_once ('include/config.inc.php');
+	require_once ('include/triggers.inc.php');
 
-	$page["title"]	= "S_TRIGGERS_TOP_100";
-	$page["file"]	= "report5.php";
+	$page['title']	= "S_TRIGGERS_TOP_100";
+	$page['file']	= 'report5.php';
 	$page['hist_arg'] = array('period');
-	$page['scripts'] = array('menu_scripts.js');
+	$page['scripts'] = array();
 	
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"period"=>		array(T_ZBX_STR, O_OPT,	P_SYS|P_NZERO,	IN('"day","week","month","year"'),		NULL)
+		'period'=>		array(T_ZBX_STR, O_OPT,	P_SYS|P_NZERO,	IN('"day","week","month","year"'),		NULL)
 	);
 
 	check_fields($fields);
 ?>
 <?php
-	$_REQUEST["period"] = get_request("period", "day");
+	$_REQUEST['period'] = get_request('period', 'day');
 	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
 	
 	$form = new CForm();
 	$form->SetMethod('get');
 	
-	$cmbPeriod = new CComboBox("period",$_REQUEST["period"],"submit()");
-	$cmbPeriod->AddItem("day",S_DAY);
-	$cmbPeriod->AddItem("week",S_WEEK);
-	$cmbPeriod->AddItem("month",S_MONTH);
-	$cmbPeriod->AddItem("year",S_YEAR);
+	$cmbPeriod = new CComboBox('period',$_REQUEST['period'],'submit()');
+	$cmbPeriod->AddItem('day',S_DAY);
+	$cmbPeriod->AddItem('week',S_WEEK);
+	$cmbPeriod->AddItem('month',S_MONTH);
+	$cmbPeriod->AddItem('year',S_YEAR);
 
 	$form->AddItem($cmbPeriod);
 
@@ -65,11 +65,11 @@ include_once "include/page_header.php";
 			S_NUMBER_OF_STATUS_CHANGES
 			));
 
-	switch($_REQUEST["period"]){
-		case "week":	$time_dif=7*24*3600;	break;
-		case "month":	$time_dif=10*24*3600;	break;
-		case "year":	$time_dif=365*24*3600;	break;
-		case "day":
+	switch($_REQUEST['period']){
+		case 'week':	$time_dif=7*24*3600;	break;
+		case 'month':	$time_dif=10*24*3600;	break;
+		case 'year':	$time_dif=365*24*3600;	break;
+		case 'day':
 		default:	$time_dif=24*3600;	break;
 	}
 
@@ -81,17 +81,17 @@ include_once "include/page_header.php";
 	$triggers = array();
 	$triggerids = array();
 	$sql = 'SELECT h.host, h.hostid, t.triggerid, t.description, t.expression, t.lastchange, t.priority, count(distinct e.eventid) as cnt_event '.
-					' FROM hosts h, triggers t, functions f, items i, events e'.
-					' WHERE h.hostid = i.hostid '.
-						' and i.itemid = f.itemid '.
-						' and t.triggerid=f.triggerid '.
-						' and t.triggerid=e.objectid '.
-						' and e.object='.EVENT_OBJECT_TRIGGER.
-						' and e.clock>'.(time()-$time_dif).
-						' and '.DBcondition('t.triggerid',$available_triggers).
-						' and '.DBin_node('t.triggerid').
-					' GROUP BY h.host,t.triggerid,t.description,t.expression,t.priority '.
-					' ORDER BY cnt_event desc, h.host, t.description, t.triggerid';
+			' FROM hosts h, triggers t, functions f, items i, events e'.
+			' WHERE h.hostid = i.hostid '.
+				' and i.itemid = f.itemid '.
+				' and t.triggerid=f.triggerid '.
+				' and t.triggerid=e.objectid '.
+				' and e.object='.EVENT_OBJECT_TRIGGER.
+				' and e.clock>'.(time()-$time_dif).
+				' and '.DBcondition('t.triggerid',$available_triggers).
+				' and '.DBin_node('t.triggerid').
+			' GROUP BY h.host,t.triggerid,t.description,t.expression,t.priority '.
+			' ORDER BY cnt_event desc, h.host, t.description, t.triggerid';
 
 	$result=DBselect($sql, 100);
 	while($row=DBfetch($result)){
@@ -143,8 +143,8 @@ include_once "include/page_header.php";
 			get_node_name_by_elid($row['triggerid']),
 			$host,
 			$tr_desc,
-			new CCol(get_severity_description($row["priority"]),get_severity_style($row["priority"])),
-			$row["cnt_event"],
+			new CCol(get_severity_description($row['priority']),get_severity_style($row['priority'])),
+			$row['cnt_event'],
 		));
 	}
 	$table->show();
@@ -154,6 +154,6 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once 'include/page_footer.php';
 
 ?>

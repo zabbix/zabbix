@@ -59,6 +59,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	require_once('include/classes/ccheckbox.inc.php');
 	require_once('include/classes/cform.inc.php');
 	require_once('include/classes/cformtable.inc.php');
+	require_once('include/classes/chatformtable.inc.php');
 	require_once('include/classes/cmap.inc.php');
 	require_once('include/classes/cflash.inc.php');
 	require_once('include/classes/ciframe.inc.php');

@@ -59,11 +59,11 @@ var $maxlevel=0;
 	/*private*/ function makeHeaders(){
 		$c=0;
 		$tr = new CRow();
-		$tr->AddItem($this->fields['caption']);
-		$tr->SetClass('treeheader');
+		$tr->addItem($this->fields['caption']);
+		$tr->setClass('treeheader');
 		unset($this->fields['caption']);
 		foreach($this->fields as $id => $caption){
-			$tr->AddItem($caption);
+			$tr->addItem($caption);
 			$fields[$c] = $id;
 			$c++;	
 		}
@@ -74,20 +74,20 @@ var $maxlevel=0;
 	/*private*/ function SimpleHTML(){
 		$table = new CTable('','tabletree');
 		
-		$table->SetCellSpacing(0);
-		$table->SetCellPadding(0);
+		$table->setCellSpacing(0);
+		$table->setCellPadding(0);
 	
 		$table->oddRowClass = 'odd_row';
 		$table->evenRowClass = 'even_row';
 		$table->headerClass = 'header';
 		$table->footerClass = 'footer';
 		
-		$table->AddOption('valign','top');
-//		$table->AddOption('border','1');
-		$table->AddRow($this->makeHeaders());
+		$table->addOption('valign','top');
+//		$table->addOption('border','1');
+		$table->addRow($this->makeHeaders());
 	
 		foreach($this->tree as $id => $rows){
-			$table->AddRow($this->makeRow($id));
+			$table->addRow($this->makeRow($id));
 		}
 	return $table;
 	}
@@ -101,29 +101,29 @@ var $maxlevel=0;
 	/*private*/  function makeRow($id){
 		
 		$table = new CTable();
-		$table->SetCellSpacing(0);
-		$table->SetCellPadding(0);
-		$table->AddOption('border','0');
-		$table->AddOption('height','100%');
+		$table->setCellSpacing(0);
+		$table->setCellPadding(0);
+		$table->addOption('border','0');
+		$table->addOption('height','100%');
 
 		$tr = $this->MakeSImgStr($id);
 		
 		$td = new CCol($this->tree[$id]['caption']);
-		$td->AddOption('style','height: 100%; vertical-align: top; white-space: normal; padding-right: 10px; padding-left: 2px;');
-		$tr->AddItem($td);
+		$td->addOption('style','height: 100%; vertical-align: top; white-space: normal; padding-right: 10px; padding-left: 2px;');
+		$tr->addItem($td);
 	
-		$table->AddRow($tr);
+		$table->addRow($tr);
 		
 		$tr = new CRow();
-		$tr->AddItem($table);
-		$tr->AddOption('id','id_'.$id);
-		$tr->AddOption('style',($this->tree[$id]['parentid'] != '0')?('display: none;'):(''));
+		$tr->addItem($table);
+		$tr->addOption('id','id_'.$id);
+		$tr->addOption('style',($this->tree[$id]['parentid'] != '0')?('display: none;'):(''));
 	
 	
 		foreach($this->fields as $key => $value){
 			$td = new CCol($this->tree[$id][$value]);
-			$td->AddOption('style',' padding-right: 10px; padding-left: 2px;');
-			$tr->AddItem($td);
+			$td->addOption('style',' padding-right: 10px; padding-left: 2px;');
+			$tr->addItem($td);
 		}
 		
 		
@@ -138,50 +138,50 @@ var $maxlevel=0;
 		for($i=0; $i<$count; $i++){
 			switch($this->tree[$id]['nodeimg'][$i]){
 				case 'O':
-					$td->AddOption('style','width: 22px');
+					$td->addOption('style','width: 22px');
 					$img= new CImg('images/general/tree/zero.gif','o','22','14');
 					break;
 				case 'I':
-					$td->AddOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
+					$td->addOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 					$img= new CImg('images/general/tree/zero.gif','i','22','14');
 					break;
 				case 'L':
-					$td->AddOption('valign','top');
-//					$td->AddOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
+					$td->addOption('valign','top');
+//					$td->addOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 
 					$div = new CTag('div','yes');
-					$div->AddOption('style','height: 10px; width:22px; background-image:url(images/general/tree/pointc.gif);');
+					$div->addOption('style','height: 10px; width:22px; background-image:url(images/general/tree/pointc.gif);');
 
 					if($this->tree[$id]['nodetype'] == 2){	
 						$img= new CImg('images/general/tree/plus.gif','y','22','14');
-						$img->AddOption('onclick','javascript: tree.closeSNodeX('.$id.',this);');
-						$img->AddOption('id','idi_'.$id);
-						$img->SetClass('imgnode');
+						$img->addOption('onclick','javascript: tree.closeSNodeX('.$id.',this);');
+						$img->addOption('id','idi_'.$id);
+						$img->setClass('imgnode');
 					} 
 					else {
 						$img = new CImg('images/general/tree/pointl.gif','y','22','14');
 					}
-					$div->AddItem($img);
+					$div->addItem($img);
 					$img=$div;
 					break;
 				case 'T':
-					$td->AddOption('valign','top');
+					$td->addOption('valign','top');
 					if($this->tree[$id]['nodetype'] == 2){
-						$td->AddOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
+						$td->addOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 						$img= new CImg('images/general/tree/plus.gif','t','22','14');
 						
-						$img->AddOption('onclick','javascript: tree.closeSNodeX('.$id.',this);');
-						$img->AddOption('id','idi_'.$id);
-						$img->SetClass('imgnode');					
+						$img->addOption('onclick','javascript: tree.closeSNodeX('.$id.',this);');
+						$img->addOption('id','idi_'.$id);
+						$img->setClass('imgnode');					
 					} 
 					else {
-						$td->AddOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
+						$td->addOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 						$img= new CImg('images/general/tree/pointl.gif','t','22','14');
 					}
 					break;
 			}
-			$td->AddItem($img);
-			$tr->AddItem($td);
+			$td->addItem($img);
+			$tr->addItem($td);
 	
 			$td = new CCol();
 		}

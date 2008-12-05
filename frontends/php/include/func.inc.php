@@ -291,6 +291,15 @@ function zbx_rksort(&$array, $flags=NULL){
 
 
 /*************** CONVERTING ******************/
+function rgb2hex($color){			
+	$RGB = array(
+		hexdec('0x'.substr($color, 0,2)),
+		hexdec('0x'.substr($color, 2,2)),
+		hexdec('0x'.substr($color, 4,2))
+		);
+	
+return $RGB[0].$RGB[1].$RGB[2];
+}
 
 function zbx_num2bitstr($num,$rev=false){
 	if(!is_numeric($num)) return 0;

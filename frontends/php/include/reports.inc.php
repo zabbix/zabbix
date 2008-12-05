@@ -27,16 +27,16 @@ function show_report2_header($config){
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	
 	$r_form = new CForm();
-	$r_form->SetMethod('get');
+	$r_form->setMethod('get');
 	
 	$cmbConf = new CComboBox('config',$config,'submit()');
-	$cmbConf->AddItem(0,S_BY_HOST);
-	$cmbConf->AddItem(1,S_BY_TRIGGER_TEMPLATE);
+	$cmbConf->addItem(0,S_BY_HOST);
+	$cmbConf->addItem(1,S_BY_TRIGGER_TEMPLATE);
 
-	$r_form->AddItem(array(S_MODE.SPACE,$cmbConf,SPACE));
+	$r_form->addItem(array(S_MODE.SPACE,$cmbConf,SPACE));
 
 	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
-	$cmbGroup->AddItem(0,S_ALL_SMALL);
+	$cmbGroup->addItem(0,S_ALL_SMALL);
 	
 	$status_filter=($config==1)?' AND h.status='.HOST_STATUS_TEMPLATE:' AND h.status='.HOST_STATUS_MONITORED;
 	
@@ -51,9 +51,9 @@ function show_report2_header($config){
 
 	$result=DBselect($sql);
 	while($row=DBfetch($result)){
-		$cmbGroup->AddItem($row['groupid'],	get_node_name_by_elid($row['groupid']).$row['name']);
+		$cmbGroup->addItem($row['groupid'],	get_node_name_by_elid($row['groupid']).$row['name']);
 	}
-	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
 
 
 	$sql_from = '';
@@ -68,8 +68,8 @@ function show_report2_header($config){
 		$cmbTrigs = new CComboBox('tpl_triggerid',get_request('tpl_triggerid',0),'submit()');
 		$cmbHGrps = new CComboBox('hostgroupid',get_request('hostgroupid',0),'submit()');
 		
-		$cmbTrigs->AddItem(0,S_ALL_SMALL);
-		$cmbHGrps->AddItem(0,S_ALL_SMALL);
+		$cmbTrigs->addItem(0,S_ALL_SMALL);
+		$cmbHGrps->addItem(0,S_ALL_SMALL);
 		
 		$sql_where = ' AND h.status='.HOST_STATUS_TEMPLATE;		
 	}
@@ -81,10 +81,10 @@ function show_report2_header($config){
 	}
 	else{
 		if(0 == $config){
-			$cmbHosts->AddItem(0,S_ALL_SMALL);
+			$cmbHosts->addItem(0,S_ALL_SMALL);
 		}
 		else{
-			$cmbTpls->AddItem(0,S_ALL_SMALL);
+			$cmbTpls->addItem(0,S_ALL_SMALL);
 		}		
 	}
 	
@@ -98,20 +98,20 @@ function show_report2_header($config){
 	$result=DBselect($sql);
 	while($row=DBfetch($result)){
 		if(0 == $config){
-			$cmbHosts->AddItem($row['hostid'],get_node_name_by_elid($row['hostid']).$row['host']);
+			$cmbHosts->addItem($row['hostid'],get_node_name_by_elid($row['hostid']).$row['host']);
 		}
 		else{
-			$cmbTpls->AddItem($row['hostid'],get_node_name_by_elid($row['hostid']).$row['host']);
+			$cmbTpls->addItem($row['hostid'],get_node_name_by_elid($row['hostid']).$row['host']);
 		}
 	}
 
 	
 	if(0 == $config){
-		$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 		show_table_header(S_AVAILABILITY_REPORT_BIG, $r_form);
 	}
 	else{
-		$r_form->AddItem(array(SPACE.S_TEMPLATE.SPACE,$cmbTpls));
+		$r_form->addItem(array(SPACE.S_TEMPLATE.SPACE,$cmbTpls));
 
 		$sql_cond = ' AND h.hostid=ht.hostid ';
 		if($_REQUEST['hostid'] > 0)	$sql_cond.=' AND ht.templateid='.$_REQUEST['hostid'];
@@ -135,7 +135,7 @@ function show_report2_header($config){
 			' ORDER BY g.name');
 
 		while($row=DBfetch($result)){
-			$cmbHGrps->AddItem(
+			$cmbHGrps->addItem(
 				$row['groupid'],
 				get_node_name_by_elid($row['groupid']).$row['name']
 				);
@@ -156,19 +156,577 @@ function show_report2_header($config){
 		$result=DBselect($sql);
 
 		while($row=DBfetch($result)){
-			$cmbTrigs->AddItem(
+			$cmbTrigs->addItem(
 					$row['triggerid'],
 					get_node_name_by_elid($row['triggerid']).expand_trigger_description($row['triggerid'])
 					);
 		}
 		$rr_form = new CForm();
-		$rr_form->SetMethod('get');
-		$rr_form->AddVar('config',$config);
-		$rr_form->AddVar('groupid',$_REQUEST['groupid']);
-		$rr_form->AddVar('hostid',$_REQUEST['hostid']);
+		$rr_form->setMethod('get');
+		$rr_form->addVar('config',$config);
+		$rr_form->addVar('groupid',$_REQUEST['groupid']);
+		$rr_form->addVar('hostid',$_REQUEST['hostid']);
 		
-		$rr_form->AddItem(array(S_TRIGGER.SPACE,$cmbTrigs,BR(),S_FILTER,SPACE,S_HOST_GROUP.SPACE,$cmbHGrps));
+		$rr_form->addItem(array(S_TRIGGER.SPACE,$cmbTrigs,BR(),S_FILTER,SPACE,S_HOST_GROUP.SPACE,$cmbHGrps));
 		show_table_header(S_AVAILABILITY_REPORT_BIG, array($r_form,$rr_form));
 	}
+}
+
+function bar_report_form(){
+	global $USER_DETAILS;
+	
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
+	
+	$config = get_request('config',1);
+	$items = get_request('items',array());
+	$function_type = get_request('function_type',CALC_FNC_AVG);
+	$scaletype = get_request('scaletype',TIMEPERIOD_TYPE_WEEKLY);
+	
+	$title = get_request('title','Report 1');
+	$xlabel = get_request('xlabel','');
+	$ylabel = get_request('ylabel','');
+	
+//	$showLegend = 
+	
+	$report_timesince = get_request('report_timesince',time()-86400);
+	$report_timetill = get_request('report_timetill',time());
+	
+	$reportForm = new CFormTable(S_REPORTS);//,'events.php?report_set=1','POST',null,'sform');
+	$reportForm->addOption('name','zbx_report');
+	$reportForm->addOption('id','zbx_report');
+
+//	$reportForm->setMethod('post');		
+	if(isset($_REQUEST['report_show']) && !empty($items))
+		$reportForm->addVar('report_show','show');
+	
+	$reportForm->addVar('config',$config);	
+	$reportForm->addVar('items',$items);
+	$reportForm->addVar('report_timesince',($report_timesince>0)?$report_timesince:'');
+	$reportForm->addVar('report_timetill',($report_timetill>0)?$report_timetill:'');
+
+	$reportForm->addRow(S_TITLE, new CTextBox('title',$title,40));
+	$reportForm->addRow(S_X.SPACE.S_LABEL, new CTextBox('xlabel',$xlabel,40));
+	$reportForm->addRow(S_Y.SPACE.S_LABEL, new CTextBox('ylabel',$ylabel,40));
+
+	$scale = new CComboBox('scaletype', $scaletype);
+		$scale->addItem(TIMEPERIOD_TYPE_HOURLY, S_HOURLY);
+		$scale->addItem(TIMEPERIOD_TYPE_DAILY, 	S_DAILY);
+		$scale->addItem(TIMEPERIOD_TYPE_WEEKLY,	S_WEEKLY);
+		$scale->addItem(TIMEPERIOD_TYPE_MONTHLY,S_MONTHLY);
+		$scale->addItem(TIMEPERIOD_TYPE_YEARLY,	S_YEARLY);
+	$reportForm->addRow(S_SCALE, $scale);
+	
+//*	
+
+	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
+	$clndr_icon->addAction('onclick','javascript: '.
+										'var pos = getPosition(this); '.
+										'pos.top+=10; '.
+										'pos.left+=16; '.
+										"CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
+	
+	$reporttimetab = new CTable(null,'calendar');
+	$reporttimetab->addOption('width','10%');
+	
+	$reporttimetab->setCellPadding(0);
+	$reporttimetab->setCellSpacing(0);
+
+	$reporttimetab->addRow(array(
+							S_FROM, 
+							new CNumericBox('report_since_day',(($report_timesince>0)?date('d',$report_timesince):''),2),
+							'/',
+							new CNumericBox('report_since_month',(($report_timesince>0)?date('m',$report_timesince):''),2),
+							'/',
+							new CNumericBox('report_since_year',(($report_timesince>0)?date('Y',$report_timesince):''),4),
+							SPACE,
+							new CNumericBox('report_since_hour',(($report_timesince>0)?date('H',$report_timesince):''),2),
+							':',
+							new CNumericBox('report_since_minute',(($report_timesince>0)?date('i',$report_timesince):''),2),
+							$clndr_icon
+					));
+	zbx_add_post_js('create_calendar(null,'.
+					'["report_since_day","report_since_month","report_since_year","report_since_hour","report_since_minute"],'.
+					'"avail_report_since",'.
+					'"report_timesince");');
+
+	$clndr_icon->addAction('onclick','javascript: '.
+										'var pos = getPosition(this); '.
+										'pos.top+=10; '.
+										'pos.left+=16; '.
+										"CLNDR['avail_report_till'].clndr.clndrshow(pos.top,pos.left);");
+										
+	$reporttimetab->addRow(array(
+							S_TILL, 
+							new CNumericBox('report_till_day',(($report_timetill>0)?date('d',$report_timetill):''),2),
+							'/',
+							new CNumericBox('report_till_month',(($report_timetill>0)?date('m',$report_timetill):''),2),
+							'/',
+							new CNumericBox('report_till_year',(($report_timetill>0)?date('Y',$report_timetill):''),4),
+							SPACE,
+							new CNumericBox('report_till_hour',(($report_timetill>0)?date('H',$report_timetill):''),2),
+							':',
+							new CNumericBox('report_till_minute',(($report_timetill>0)?date('i',$report_timetill):''),2),
+							$clndr_icon
+					));
+					
+	zbx_add_post_js('create_calendar(null,'.
+					'["report_till_day","report_till_month","report_till_year","report_till_hour","report_till_minute"],'.
+					'"avail_report_till",'.
+					'"report_timetill");'
+					);
+	
+	zbx_add_post_js('addListener($("filter_icon"),'.
+						'"click",'.
+						'CLNDR[\'avail_report_since\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'avail_report_since\'].clndr));'.
+					'addListener($("filter_icon"),'.
+						'"click",'.
+						'CLNDR[\'avail_report_till\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'avail_report_till\'].clndr));'
+					);
+	
+	$reportForm->addRow(S_PERIOD, $reporttimetab);
+//*/	
+	
+	if(count($items)){
+		
+		$items_table = new CTableInfo();
+		foreach($items as $gid => $gitem){
+
+			$host = get_host_by_itemid($gitem['itemid']);
+			$item = get_item_by_itemid($gitem['itemid']);
+
+			if($host['status'] == HOST_STATUS_TEMPLATE) $only_hostid = $host['hostid'];
+			else $monitored_hosts = 1;
+
+			$color = new CColorCell(null,$gitem['color']);
+
+			$description = new CLink($host['host'].': '.item_description($item),'#','action');
+			$description->onClick(
+					'return PopUp("popup_bitem.php?config=1&list_name=items&dstfrm='.$reportForm->GetName().
+					url_param($gitem, false).
+					url_param($gid,false,'gid').
+					'",550,400,"graph_item_form");');
+
+
+			$items_table->addRow(array(
+					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
+					$gitem['caption'],
+					$description,
+					graph_item_calc_fnc2str($gitem['calc_fnc'],0),
+					$color,
+				));
+		}
+		$delete_button = new CButton('delete_item', S_DELETE_SELECTED);
+	}
+	else{
+		$items_table = $delete_button = null;
+	}
+	
+	$reportForm->addRow(S_ITEMS, 
+				array(
+					$items_table,
+					new CButton('add_item',S_ADD,
+						"return PopUp('popup_bitem.php?config=1&dstfrm=".$reportForm->getName().
+						"',550,400,'graph_item_form');"),
+					$delete_button
+				));
+	unset($items_table, $delete_button);
+	
+	$reportForm->addItemToBottomRow(new CButton('report_show',S_SHOW));
+	
+	$reset = new CButton('reset',S_RESET);
+	$reset->setType('reset');	
+	$reportForm->addItemToBottomRow($reset);
+	
+return $reportForm;
+}
+
+function bar_report_form2(){
+	global $USER_DETAILS;
+	
+	$config = get_request('config',1);
+	
+	$title = get_request('title','Report 2');	
+	$xlabel = get_request('xlabel','');
+	$ylabel = get_request('ylabel','');
+	
+	$sorttype = get_request('sorttype',0);
+
+	$captions = get_request('captions',array());	
+	$items = get_request('items',array());
+	$periods = get_request('periods',array());
+	
+	$showlegend = get_request('showlegend',0);
+	
+	$reportForm = new CFormTable(S_REPORTS);//,'events.php?report_set=1','POST',null,'sform');
+	$reportForm->addOption('name','zbx_report');
+	$reportForm->addOption('id','zbx_report');
+
+//	$reportForm->setMethod('post');		
+	if(isset($_REQUEST['report_show']) && !empty($items))
+		$reportForm->addVar('report_show','show');
+	
+	$reportForm->addVar('config',$config);	
+	$reportForm->addVar('items',$items);
+	$reportForm->addVar('periods',$periods);
+	
+	
+	$reportForm->addRow(S_TITLE, new CTextBox('title',$title,40));
+	$reportForm->addRow(S_X.SPACE.S_LABEL, new CTextBox('xlabel',$xlabel,40));
+	$reportForm->addRow(S_Y.SPACE.S_LABEL, new CTextBox('ylabel',$ylabel,40));
+
+	$reportForm->addRow(S_LEGEND, new CCheckBox('showlegend',$showlegend,null,1));
+	
+	if(count($periods) < 2){
+		$sortCmb = new CComboBox('sorttype', $sorttype);
+			$sortCmb->addItem(0, S_NAME);
+			$sortCmb->addItem(1, S_VALUE);
+		
+		$reportForm->addRow(S_SORT_BY,$sortCmb);
+	}
+	else{
+		$reportForm->addVar('sortorder',0);
+	}
+		
+//*/	
+// PERIODS
+	if(count($periods)){
+		$periods_table = new CTableInfo();
+		foreach($periods as $pid => $period){
+			$color = new CColorCell(null,$period['color']);
+			
+			$periods_table->addRow(array(
+					new CCheckBox('group_pid['.$pid.']'),
+					$period['caption'],
+					date(S_DATE_FORMAT_YMDHMS, $period['report_timesince']),
+					date(S_DATE_FORMAT_YMDHMS, $period['report_timetill']),
+					$color,
+				));
+		}
+		$delete_button = new CButton('delete_period', S_DELETE_SELECTED);
+	}
+	else{
+		$periods_table = $delete_button = null;
+	}
+	
+
+	$reportForm->addRow(S_PERIOD, 
+				array(
+					$periods_table,
+					new CButton('add_period',S_ADD,
+						"return PopUp('popup_period.php?config=2&dstfrm=".$reportForm->getName().
+						"',840,340,'period_form');"),
+					$delete_button
+				));
+	unset($periods_table, $delete_button);
+//-----------
+
+// ITEMS
+	if(count($items)){
+		$items_table = new CTableInfo();
+		foreach($items as $gid => $gitem){
+
+			$host = get_host_by_itemid($gitem['itemid']);
+			$item = get_item_by_itemid($gitem['itemid']);
+
+			if($host['status'] == HOST_STATUS_TEMPLATE) $only_hostid = $host['hostid'];
+			else $monitored_hosts = 1;
+
+			$description = new CLink($host['host'].': '.item_description($item),'#','action');
+			$description->onClick(
+					'return PopUp("popup_bitem.php?config=2&list_name=items&dstfrm='.$reportForm->GetName().
+					url_param($gitem, false).
+					url_param($gid,false,'gid').
+					'",550,400,"graph_item_form");');
+
+
+			$items_table->addRow(array(
+					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
+					$gitem['caption'],
+					$description,
+					graph_item_calc_fnc2str($gitem['calc_fnc'],0),
+				));
+		}
+		$delete_button = new CButton('delete_item', S_DELETE_SELECTED);
+	}
+	else{
+		$items_table = $delete_button = null;
+	}
+	
+	$reportForm->addRow(S_ITEMS, 
+				array(
+					$items_table,
+					new CButton('add_item',S_ADD,
+						"return PopUp('popup_bitem.php?config=2&dstfrm=".$reportForm->getName().
+						"',550,400,'graph_item_form');"),
+					$delete_button
+				));
+	unset($items_table, $delete_button);
+//--------------
+	
+	
+	$reportForm->addItemToBottomRow(new CButton('report_show',S_SHOW));
+	
+	$reset = new CButton('reset',S_RESET);
+	$reset->setType('reset');	
+	$reportForm->addItemToBottomRow($reset);
+	
+return $reportForm;
+}
+
+function bar_report_form3(){
+	global $USER_DETAILS;
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	
+	$config = get_request('config',1);
+	
+	$title = get_request('title','Report 2');	
+	$xlabel = get_request('xlabel','');
+	$ylabel = get_request('ylabel','');
+	
+	$sorttype = get_request('sorttype',0);
+	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
+	$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
+
+	$captions = get_request('captions',array());	
+	$items = get_request('items',array());
+	$periods = get_request('periods',array());
+	
+	$hostids = get_request('hostids', array());
+	$showlegend = get_request('showlegend',0);
+
+	$reportForm = new CFormTable(S_REPORTS);//,'events.php?report_set=1','POST',null,'sform');
+	$reportForm->addOption('name','zbx_report');
+	$reportForm->addOption('id','zbx_report');
+
+//	$reportForm->setMethod('post');		
+	if(isset($_REQUEST['report_show']) && !empty($items))
+		$reportForm->addVar('report_show','show');
+	
+	$reportForm->addVar('config',$config);	
+//	$reportForm->addVar('items',$items); 				//params are set later!!
+//	$reportForm->addVar('periods',$periods);
+	
+	$reportForm->addRow(S_TITLE, new CTextBox('title',$title,40));
+	$reportForm->addRow(S_X.SPACE.S_LABEL, new CTextBox('xlabel',$xlabel,40));
+	$reportForm->addRow(S_Y.SPACE.S_LABEL, new CTextBox('ylabel',$ylabel,40));
+
+	$reportForm->addRow(S_LEGEND, new CCheckBox('showlegend',$showlegend,null,1));
+	$reportForm->addVar('sortorder',0);
+
+// GROUPS
+	$groupids = get_request('groupids', array());
+	$group_tb = new CTweenBox($reportForm,'groupids',null,10);	
+
+	$sql_from = '';
+	$sql_where =  'AND '.DBcondition('g.groupid',$groupids);
+	
+	$sql = 'SELECT DISTINCT g.groupid, g.name '.
+			' FROM hosts h, hosts_groups hg, groups g '.$sql_from.
+			' WHERE hg.groupid=g.groupid'.
+				' AND h.hostid=hg.hostid '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
+				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
+				$sql_where.
+			' ORDER BY g.name';
+//SDI($sql);
+	$db_groups = DBselect($sql);
+	while($group = DBfetch($db_groups)){
+		$groupids[$group['groupid']] = $group['groupid'];			
+		$group_tb->addItem($group['groupid'],$group['name'], true);			
+	}
+
+	$sql = 'SELECT DISTINCT g.* '.
+			' FROM hosts h, hosts_groups hg, groups g '.
+			' WHERE hg.groupid=g.groupid'.
+				' AND h.hostid=hg.hostid '.
+				' AND '.DBcondition('h.hostid',$available_hosts).
+				' AND '.DBcondition('g.groupid',$groupids,true).
+				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
+			' ORDER BY g.name';
+	$db_groups = DBselect($sql);
+	while($group = DBfetch($db_groups)){
+		$group_tb->addItem($group['groupid'],$group['name'], false);			
+	}
+
+	$reportForm->addRow(S_GROUPS, $group_tb->Get(S_SELECTED_GROUPS,S_OTHER.SPACE.S_GROUPS));
+// ----------
+
+// HOSTS
+	validate_group(PERM_READ_ONLY,array('real_hosts'),'web.last.conf.groupid');
+	
+	$cmbGroups = new CComboBox('groupid',get_request('groupid',0),'submit()');
+	$cmbGroups->addItem(0,S_ALL_S);
+	$sql = 'SELECT DISTINCT g.groupid,g.name '.
+			' FROM groups g,hosts_groups hg,hosts h '.
+			' WHERE '.DBcondition('h.hostid',$available_hosts).
+				' AND g.groupid=hg.groupid '.
+				' AND h.hostid=hg.hostid'.
+				' AND h.status IN ('.HOST_STATUS_MONITORED.') '.
+			' ORDER BY g.name';
+
+	$result=DBselect($sql);
+	while($row=DBfetch($result)){
+		$cmbGroups->addItem($row['groupid'],$row['name']);
+	}
+	
+	$td_groups = new CCol(array(S_GROUP,SPACE,$cmbGroups));
+	$td_groups->addOption('style','text-align: right;');
+
+	$host_tb = new CTweenBox($reportForm,'hostids',null,10);	
+
+	$sql_from = '';
+	$sql_where =  'AND '.DBcondition('h.hostid',$hostids);
+	
+	$sql = 'SELECT DISTINCT h.hostid, h.host '.
+			' FROM hosts h '.$sql_from.
+			' WHERE '.DBcondition('h.hostid',$available_hosts).
+				$sql_where.
+				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
+			' ORDER BY h.host';
+	$db_hosts = DBselect($sql);
+	while($host = DBfetch($db_hosts)){
+		$hostids[$host['hostid']] = $host['hostid'];			
+		$host_tb->addItem($host['hostid'],$host['host'], true);			
+	}
+
+
+	$sql_from = '';
+	$sql_where = '';
+	if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0)){
+		$sql_from .= ', hosts_groups hg ';
+		$sql_where .= ' AND hg.groupid='.$_REQUEST['groupid'].
+						' AND h.hostid=hg.hostid ';
+	}
+	
+	$sql = 'SELECT DISTINCT h.* '.
+			' FROM hosts h '.$sql_from.
+			' WHERE '.DBcondition('h.hostid',$available_hosts).
+				' AND '.DBcondition('h.hostid',$hostids,true).
+				' AND h.status IN ('.HOST_STATUS_MONITORED.') '.
+				$sql_where.
+			' ORDER BY h.host';
+	$db_hosts = DBselect($sql);
+	while($host = DBfetch($db_hosts)){
+		$host_tb->addItem($host['hostid'],$host['host'], false);			
+	}
+
+	$reportForm->addRow(S_HOSTS, $host_tb->Get(S_SELECTED_HOSTS,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
+// ----------
+
+		
+//*/	
+// PERIODS
+	if(count($periods)){
+		$periods_table = new CTableInfo();
+		$count = 0;
+		foreach($periods as $pid => $period){
+			if($count > 0){
+				unset($periods[$pid]);
+				continue;
+			}
+			$count++;
+			$color = new CColorCell(null,$period['color']);
+			$periods_table->addRow(array(
+					new CCheckBox('group_pid['.$pid.']'),
+					date(S_DATE_FORMAT_YMDHMS, $period['report_timesince']),
+					date(S_DATE_FORMAT_YMDHMS, $period['report_timetill']),
+				));
+			break;
+		}
+		$add_button = null;
+		$delete_button = new CButton('delete_period', S_DELETE_SELECTED);
+	}
+	else{
+		$add_button = new CButton('add_period',S_ADD,
+						"return PopUp('popup_period.php?config=2&dstfrm=".$reportForm->getName().
+						"',840,340,'period_form');");
+		$periods_table = $delete_button = null;
+	}
+	$reportForm->addVar('periods',$periods);
+
+	$reportForm->addRow(S_PERIOD, 
+				array(
+					$periods_table,
+					$add_button,
+					$delete_button
+				));
+	unset($periods_table, $delete_button);
+//-----------
+
+	$scale = new CComboBox('scaletype', $scaletype);
+		$scale->addItem(TIMEPERIOD_TYPE_HOURLY, S_HOURLY);
+		$scale->addItem(TIMEPERIOD_TYPE_DAILY, 	S_DAILY);
+		$scale->addItem(TIMEPERIOD_TYPE_WEEKLY,	S_WEEKLY);
+		$scale->addItem(TIMEPERIOD_TYPE_MONTHLY,S_MONTHLY);
+		$scale->addItem(TIMEPERIOD_TYPE_YEARLY,	S_YEARLY);
+	$reportForm->addRow(S_SCALE, $scale);
+	
+	$avgcmb = new CComboBox('avgperiod', $avgperiod);
+		$avgcmb->addItem(TIMEPERIOD_TYPE_HOURLY,	S_HOURLY);
+		$avgcmb->addItem(TIMEPERIOD_TYPE_DAILY, 	S_DAILY);
+		$avgcmb->addItem(TIMEPERIOD_TYPE_WEEKLY,	S_WEEKLY);
+		$avgcmb->addItem(TIMEPERIOD_TYPE_MONTHLY, 	S_MONTHLY);
+		$avgcmb->addItem(TIMEPERIOD_TYPE_YEARLY,	S_YEARLY);
+	$reportForm->addRow(S_AVERAGE_BY, $avgcmb);
+
+// ITEMS
+	if(count($items)){
+		$items_table = new CTableInfo();
+		$count = 0;
+		foreach($items as $gid => $gitem){
+			if($count > 0){
+				unset($items[$gid]);
+				continue;
+			}
+			$count++;
+			
+			$host = get_host_by_itemid($gitem['itemid']);
+			$item = get_item_by_itemid($gitem['itemid']);
+
+			if($host['status'] == HOST_STATUS_TEMPLATE) $only_hostid = $host['hostid'];
+			else $monitored_hosts = 1;
+
+			$description = new CLink($host['host'].': '.item_description($item),'#','action');
+			$description->onClick(
+					'return PopUp("popup_bitem.php?config=2&list_name=items&dstfrm='.$reportForm->GetName().
+					url_param($gitem, false).
+					url_param($gid,false,'gid').
+					'",360,400,"graph_item_form");');
+
+
+			$items_table->addRow(array(
+					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
+					$description,
+					$item['key_'],
+				));
+		}
+		$add_button = null;
+		$delete_button = new CButton('delete_item', S_DELETE_SELECTED);
+	}
+	else{
+		$add_button = new CButton('add_item',S_ADD,
+						"return PopUp('popup_bitem.php?config=2&dstfrm=".$reportForm->getName().
+						"',360,400,'graph_item_form');");
+		$items_table = $delete_button = null;
+	}
+	$reportForm->addVar('items',$items);
+
+	$reportForm->addRow(S_ITEMS, 
+				array(
+					$items_table,
+					$add_button,
+					$delete_button
+				));
+	unset($items_table, $delete_button);
+//--------------
+	
+	
+	$reportForm->addItemToBottomRow(new CButton('report_show',S_SHOW));
+	
+	$reset = new CButton('reset',S_RESET);
+	$reset->setType('reset');	
+	$reportForm->addItemToBottomRow($reset);
+	
+return $reportForm;
 }
 ?>
