@@ -257,7 +257,7 @@ include_once 'include/page_header.php';
 				);
 		unset($row);
 	}
-	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
 	
 	$sql_from = '';
 	$sql_where = '';
@@ -644,7 +644,7 @@ include_once 'include/page_header.php';
 
 			$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 			$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-			if($admin_links){
+			if($admin_links){				
 //				$menus.= "['".S_HOST_CONFIGURATION."',\"javascript: redirect('hosts.php?form=update&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 				
@@ -655,9 +655,14 @@ include_once 'include/page_header.php';
 			$host->addOption('onclick','javascript: '.$menus);
 		}
 		
+		$tr_conf_link = 'null';
+		if($admin_links){
+			$tr_conf_link = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$row['triggerid']."&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
+		}
+
 		$tr_desc = new CSpan($description,'pointer');
 		$tr_desc->addAction('onclick',"javascript: create_mon_trigger_menu(event, ".
-										" new Array({'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['lastchange']."'}),".
+										" new Array({'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['lastchange']."'}, ".$tr_conf_link."),".
 										zbx_jsvalue($row['items']).");");
 
 			$table->addRow(array(
