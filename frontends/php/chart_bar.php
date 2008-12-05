@@ -404,7 +404,7 @@ include_once "include/page_header.php";
 			$itemids = get_same_item_for_host($item['itemid'],$hostids);
 			break;
 		}
-		
+
 		$graph = new CBar(GRAPH_TYPE_COLUMN);
 //		$graph = new CBar(GRAPH_TYPE_BAR);
 		$graph->setHeader('REPORT 3');

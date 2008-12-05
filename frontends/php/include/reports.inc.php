@@ -691,7 +691,7 @@ function bar_report_form3(){
 					'return PopUp("popup_bitem.php?config=2&list_name=items&dstfrm='.$reportForm->GetName().
 					url_param($gitem, false).
 					url_param($gid,false,'gid').
-					'",360,400,"graph_item_form");');
+					'",400,400,"graph_item_form");');
 
 
 			$items_table->addRow(array(
@@ -706,7 +706,7 @@ function bar_report_form3(){
 	else{
 		$add_button = new CButton('add_item',S_ADD,
 						"return PopUp('popup_bitem.php?config=2&dstfrm=".$reportForm->getName().
-						"',360,400,'graph_item_form');");
+						"',400,400,'graph_item_form');");
 		$items_table = $delete_button = null;
 	}
 	$reportForm->addVar('items',$items);
