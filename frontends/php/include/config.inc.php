@@ -221,8 +221,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$ZBX_CURRENT_SUBNODES = array();
 		$ZBX_NODES_IDS = array();
 		$ZBX_NODES = array();
+
 		if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED){
-//SDI($_REQUEST);
 			$ZBX_CURRENT_NODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node
 			$ZBX_WITH_SUBNODES = get_cookie('zbx_with_subnodes', false); // Show elements FROM subnodes
 
@@ -240,7 +240,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			if($node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$ZBX_CURRENT_NODEID))){
 				$ZBX_CURMASTERID = $node_data['masterid'];
 			}
-			
+
 			$sql = 'SELECT nodeid,name,masterid FROM nodes';
 			$db_nodes = DBselect($sql);
 
