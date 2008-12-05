@@ -25,7 +25,7 @@
 	$page['title']	= "S_TRIGGERS_TOP_100";
 	$page['file']	= 'report5.php';
 	$page['hist_arg'] = array('period');
-	$page['scripts'] = array();
+	$page['scripts'] = array('menu_scripts.js');
 	
 include_once('include/page_header.php');
 
