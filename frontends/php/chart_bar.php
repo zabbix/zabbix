@@ -341,7 +341,10 @@ include_once "include/page_header.php";
 						$item_data['clock']	= $row['clock'];
 					}
 				}
-				
+
+// fixes bug , due to Zend casting the array key as a numeric and then they are reassigned
+				$itemid = "0$itemid";
+//---
 				switch($item['calc_fnc']){
 					case 0:
 						$graph_data['values'][$itemid] = $item_data['count'];
@@ -360,12 +363,11 @@ include_once "include/page_header.php";
 				$graph_data['captions'][$itemid] = $item['caption'];
 			}
 	
-
 			if(($sorttype == 0) || (count($periods) < 2))
 				array_multisort($graph_data['captions'], $graph_data['values']);
 			else
 				array_multisort($graph_data['values'], SORT_DESC, $graph_data['captions']);
-				
+
 			$graph->addSeries($graph_data['values']);
 		}
 
