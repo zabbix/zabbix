@@ -198,7 +198,7 @@ include_once 'include/page_header.php';
 					$action = S_UNKNOWN_ACTION;
 			}
 
-			if ('' == $row['details'])
+			if ('' == $row['details'] || '0' == $row['details'])
 			{
 				$details = array();
 				$db_details = DBselect('select table_name,field_name,oldvalue,newvalue from auditlog_details where auditid='.$row['auditid']);
