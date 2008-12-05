@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2008 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	class CFormTable extends CForm{
+	class CHatFormTable extends CForm{
 /* private *//*
 		var $align;
 		var $title;
@@ -29,13 +29,14 @@
 		var $center_items = array();
 		var $bottom_items = array();*/
 /* public */
-		function CFormTable($title=null, $action=null, $method=null, $enctype=null, $form_variable=null){
-			global  $_REQUEST;
+
+		function CHatFormTable($title=null, $action=null, $method=null, $enctype=null, $form_variable=null){
 
 			$this->top_items = array();
 			$this->center_items = array();
 			$this->bottom_items = array();
 			$this->tableclass = 'formtable';
+			$this->addOption('name',$title);
 
 			if( null == $method ){
 				$method = 'post';
@@ -46,13 +47,7 @@
 			}
 
 			parent::CForm($action,$method,$enctype);
-			$this->setTitle($title);
 			$this->setAlign('center');
-			$this->setHelp();
-
-//			$frm_link = new CLink();
-//			$frm_link->setName("formtable");
-//			$this->addItemToTopRow($frm_link);
 			
 			$this->addVar($form_variable, get_request($form_variable, 1));
 			$this->addVar('form_refresh',get_request('form_refresh',0)+1);
@@ -87,37 +82,6 @@
 			return $this->align = $value;
 		}
 
-		function setTitle($value=NULL){
-			if(is_null($value)){
-				unset($this->title);
-				return 0;
-			}
-/*
-			elseif(!is_string($value)){
-				return $this->error("Incorrect value for setTitle [$value]");
-			}
-			$this->title = nbsp($value);
-*/
-			$this->title = unpack_object($value);
-		}
-		
-		function setHelp($value=NULL){
-			if(is_null($value)) {
-				$this->help = new CHelp();
-			} 
-			else if(strtolower(get_class($value)) == 'chelp') {
-				$this->help = $value;
-			} 
-			else if(is_string($value)) {
-				$this->help = new CHelp($value);
-				if($this->GetName()==NULL)
-					$this->setName($value);
-			} 
-			else {
-				return $this->error("Incorrect value for setHelp [$value]");
-			}
-			return 0;
-		}
 		
 		function addVar($name, $value){
 			$this->addItemToTopRow(new CVar($name, $value));
@@ -184,28 +148,23 @@
 		function BodyToString(){
 			parent::BodyToString();
 
-			$tbl = new CTable(NULL,$this->tableclass);
-
-			$tbl->setOddRowClass('form_odd_row');
-			$tbl->setEvenRowClass('form_even_row');
-			$tbl->setCellSpacing(0);
-			$tbl->setCellPadding(1);
-			$tbl->setAlign($this->align);
-# add first row
-			$col = new CCol(NULL,'form_row_first');
-			$col->setColSpan(2);
+			$tbl = new CTableInfo();
+			$tbl->addOption('style','width: auto;');
 			
-			if(isset($this->help))			$col->addItem($this->help);
-			if(isset($this->title))		 	$col->addItem($this->title);
-			foreach($this->top_items as $item)	$col->addItem($item);
-			
-			$tbl->setHeader($col);
-# add last row
-			$tbl->setFooter($this->bottom_items);
-# add center rows
-			foreach($this->center_items as $item){
-				$tbl->addRow($item);
+			$tmp_tbl = new CTable('','nowrap');
+// add center rows			
+			foreach($this->center_items as $id => $item){
+				$tmp_tbl->addRow($item);
 			}
+
+			$tbl->addRow($tmp_tbl);
+			
+//	PHP4 fix
+			$footer = $this->bottom_items;
+			$footer->addOption('style','text-align: right;');
+//---
+			$tbl->setFooter($footer);
+
 		return $tbl->ToString();
 		}
 	}

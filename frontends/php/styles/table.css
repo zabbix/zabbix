@@ -94,8 +94,8 @@ table.formtable tr td {
 	padding-left: 5px;
 	padding-right: 5px;
 	color: #000000;
-        font-family:verdana, arial, helvetica, sans-serif;
-        font-size:10px;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
 	border-width: 1px;
 	height: 24px;
 	white-space: nowrap;
@@ -131,7 +131,7 @@ table.formtable tr td.form_row_first{
 	border-left-style: solid;
 	border-right-style: solid;
 	border-bottom-style: solid;
-	border-color: #222255;
+	border-color: #AAAAAA;
 	text-align: left;
 }
 
@@ -142,7 +142,7 @@ table.formtable tr td.form_row_last {
 	border-left-style: solid;
 	border-right-style: solid;
 	border-bottom-style: solid;
-	border-color: #222255;
+	border-color: #AAAAAA;
 	text-align: right;
 }
 
@@ -151,7 +151,7 @@ table.formtable tr td.form_row_l { /* left cell */
 	border-top-style:	none;
 	border-right-style:	none;
 	border-bottom-style:	none;
-	border-color:	#222255;
+	border-color:	#AAAAAA;
 	text-align:	left;
 	white-space:	nowrap;
 	word-spacing:	0px;
@@ -162,7 +162,7 @@ table.formtable tr td.form_row_c { /* center cell */
 	border-left-style: solid;
 	border-top-style: none;
 	border-bottom-style: none;
-	border-color: #222255;
+	border-color: #AAAAAA;
 	color: inherit;
 	text-align: center;
 }
@@ -171,7 +171,7 @@ table.formtable tr td.form_row_r { /* right cell */
 	border-top-style: none;
 	border-left-style: none;
 	border-bottom-style: none;
-	border-color: #222255;
+	border-color: #AAAAAA;
 	text-align: left;
 }
 
@@ -181,7 +181,7 @@ table.formtable tr td.form_row_r table.calendar tr td{ /* right cell */
 }
 
 td.form_row_l_simple { /* left cell simple */
-	border-color:	#222255;
+	border-color:	#AAAAAA;
 	text-align:	left;
 	white-space:	nowrap;
 	word-spacing:	0px;
@@ -189,7 +189,7 @@ td.form_row_l_simple { /* left cell simple */
 }
 
 td.form_row_r_simple { /* right cell simple */
-	border-color: #222255;
+	border-color: #AAAAAA;
 	text-align: left;
 }
 /*-------------- <SERVICES> -----------------*/
@@ -247,7 +247,7 @@ table.formlongtable tr td.form_row_first{
 	border-left-style: solid;
 	border-right-style: solid;
 	border-bottom-style: solid;
-	border-color: #222255;
+	border-color: #AAAAAA;
 	text-align: left;
 }
 table.formlongtable tr td.form_row_last {
@@ -257,7 +257,7 @@ table.formlongtable tr td.form_row_last {
 	border-left-style: solid;
 	border-right-style: solid;
 	border-bottom-style: solid;
-	border-color: #222255;
+	border-color: #AAAAAA;
 	text-align: right;
 }
 table.formlongtable tr td.form_row_l { /* left cell */
@@ -265,7 +265,7 @@ table.formlongtable tr td.form_row_l { /* left cell */
 	border-top-style:	none;
 	border-right-style:	none;
 	border-bottom-style:	none;
-	border-color:	#222255;
+	border-color:	#AAAAAA;
 	text-align:	left;
 	white-space:	nowrap;
 	word-spacing:	0px;
@@ -276,7 +276,7 @@ table.formlongtable tr td.form_row_c { /* center cell */
 	border-left-style: solid;
 	border-top-style: none;
 	border-bottom-style: none;
-	border-color: #222255;
+	border-color: #AAAAAA;
 	color: inherit;
 	text-align: center;
 }
@@ -285,7 +285,7 @@ table.formlongtable tr td.form_row_r { /* right cell */
 	border-top-style: none;
 	border-left-style: none;
 	border-bottom-style: none;
-	border-color: #222255;
+	border-color: #AAAAAA;
 	text-align: left;
 }
 

@@ -88,7 +88,6 @@
 		}
 	return $drawtype;
 	}
-
 /*
  * Function: graph_item_calc_fnc2str
  *
@@ -103,6 +102,7 @@
 		if($type == GRAPH_ITEM_AGGREGATED) return '-';
 		
 		switch($calc_fnc){
+			case 0:					$calc_fnc = S_COUNT; 	       break;		
 			case CALC_FNC_ALL:      $calc_fnc = S_ALL_SMALL;        break;
 			case CALC_FNC_MIN:      $calc_fnc = S_MIN_SMALL;        break;
 			case CALC_FNC_MAX:      $calc_fnc = S_MAX_SMALL;        break;

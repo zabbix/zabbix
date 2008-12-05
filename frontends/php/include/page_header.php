@@ -176,7 +176,12 @@ COpt::profiling_start("page");
 				'pages'=>array(
 					array('url'=>'report1.php',	'label'=>S_STATUS_OF_ZABBIX	),
 					array('url'=>'report2.php',	'label'=>S_AVAILABILITY_REPORT	),
-					array('url'=>'report5.php',	'label'=>S_TRIGGERS_TOP_100	)   
+					array('url'=>'report5.php',	'label'=>S_TRIGGERS_TOP_100	),
+					array(
+							'url'=>'report6.php',	
+							'label'=>S_BAR_REPORTS,
+							'sub_pages'=>array('popup_period.php','popup_bitem.php','chart_bar.php')
+						),
 					)
 				),
 		'config'=>array(
