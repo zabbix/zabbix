@@ -29,7 +29,6 @@
 	$page['scripts'] = array('calendar.js');
 	
 include_once('include/page_header.php');
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
