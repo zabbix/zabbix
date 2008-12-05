@@ -511,27 +511,28 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		if(ZBX_DISTRIBUTED){
 			$lst_nodes = new CComboBox('switch_node', get_current_nodeid(false), "submit()");
 			$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
+
 			$db_nodes = DBselect('SELECT * '.
 						' FROM nodes '.
 						' WHERE '.DBcondition('nodeid',$available_nodes).
 						' ORDER BY name ');
 			while($node_data = DBfetch($db_nodes)){
-				$lst_nodes->AddItem($node_data['nodeid'],$node_data['name']);
+				$lst_nodes->addItem($node_data['nodeid'],$node_data['name']);
 			}
 
-			if($lst_nodes->ItemsCount() > 1){
+			if($lst_nodes->ItemsCount() > 0){
 				$node_form = new CForm();
-				$node_form->AddItem(array(new CSpan(S_CURRENT_NODE,'textcolorstyles'),$lst_nodes));
+				$node_form->addItem(array(new CSpan(S_CURRENT_NODE,'textcolorstyles'),$lst_nodes));
 				unset($lst_nodes);
 
 				if(!defined('ZBX_DISABLE_SUBNODES')){
 					global $ZBX_WITH_SUBNODES;
 
 					$cmd_show_subnodes = new CComboBox('show_subnodes', !empty($ZBX_WITH_SUBNODES) ? 1 : 0, "submit()");
-					$cmd_show_subnodes->AddItem(0, S_CURRENT_NODE_ONLY);
-					$cmd_show_subnodes->AddItem(1, S_WITH_SUBNODES);
+					$cmd_show_subnodes->addItem(0, S_CURRENT_NODE_ONLY);
+					$cmd_show_subnodes->addItem(1, S_WITH_SUBNODES);
 
-					$node_form->AddItem(array(SPACE, new CSpan(S_SHOW,'textcolorstyles'), $cmd_show_subnodes));
+					$node_form->addItem(array(SPACE, new CSpan(S_SHOW,'textcolorstyles'), $cmd_show_subnodes));
 				}
 
 // No need for the button anymore
