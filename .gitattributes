@@ -42,6 +42,7 @@ frontends/php/audio/trigger_on_warning.wav -text
 frontends/php/authentication.php -text
 frontends/php/chart6.php -text
 frontends/php/chart7.php -text
+frontends/php/chart_bar.php -text
 frontends/php/conf/maintenance.inc.php -text
 frontends/php/dashboard.php -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
@@ -152,6 +153,7 @@ frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/blocks.inc.php -text
 frontends/php/include/classes/cbar.inc.php -text
 frontends/php/include/classes/chart.inc.php -text
+frontends/php/include/classes/chatformtable.inc.php -text
 frontends/php/include/classes/cldap.inc.php -text
 frontends/php/include/classes/cpie.inc.php -text
 frontends/php/include/classes/cscript.inc.php -text
@@ -192,7 +194,10 @@ frontends/php/js/showhint.js -text
 frontends/php/js/tree.js -text
 frontends/php/js/updater.js -text
 frontends/php/locales.php -text
+frontends/php/popup_bitem.php -text
 frontends/php/popup_link_tr.php -text
+frontends/php/popup_period.php -text
+frontends/php/report6.php -text
 frontends/php/scripts.php -text
 frontends/php/scripts_exec.php -text
 frontends/php/styles/bar.css -text

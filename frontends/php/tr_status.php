@@ -79,7 +79,7 @@
 
 	define('ZBX_PAGE_DO_REFRESH', 1);
 	
-include_once "include/page_header.php";
+include_once 'include/page_header.php';
 	
 ?>
 <?php
@@ -388,26 +388,26 @@ include_once "include/page_header.php";
 	$filterForm->AddRow(S_SHOW_ACTIONS, new CCheckBox('show_actions',$_REQUEST['show_actions'],null,1));
 	$filterForm->AddRow(S_SHOW_DETAILS, new CCheckBox('show_details',$_REQUEST['show_details'],null,1));
 	
-	$filterForm->AddRow(S_SELECT, new CTextBox("txt_select",$_REQUEST['txt_select'],40));
+	$filterForm->AddRow(S_SELECT, new CTextBox('txt_select',$_REQUEST['txt_select'],40));
 	$filterForm->AddRow(S_INVERSE_SELECT, new CCheckBox('inverse_select',$_REQUEST['inverse_select'],null,1));
 
-	$reset = new CButton("filter_rst",S_RESET);
+	$reset = new CButton('filter_rst',S_RESET);
 	$reset->SetType('button');
 	$reset->SetAction('javascript: var url = new Curl(location.href); url.setArgument("filter_rst",1); location.href = url.getUrl();');
 
-	$filterForm->AddItemToBottomRow(new CButton("filter_set",S_FILTER));
+	$filterForm->AddItemToBottomRow(new CButton('filter_set',S_FILTER));
 	$filterForm->AddItemToBottomRow($reset);
 
 	$p_elements[] = create_filter(S_FILTER,null,$filterForm,'tr_filter',get_profile('web.tr_status.filter.state',0));
 /*************** FILTER END ******************/	
 	
-  	if($_REQUEST["fullscreen"]){
+  	if($_REQUEST['fullscreen']){
 		$triggerInfo = new CTriggersInfo();
 		$triggerInfo->HideHeader();
 		$triggerInfo->Show();
 	}
 
-	if($_REQUEST["fullscreen"]){
+	if($_REQUEST['fullscreen']){
 		$fullscreen='&fullscreen=1';
 	}
 	else{
@@ -425,7 +425,7 @@ include_once "include/page_header.php";
 	$header=array();
 
 	$table->SetHeader(array(
-		($config['event_ack_enable'])?(new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');")): NULL,
+		($config['event_ack_enable'])?(new CCheckBox('all_events',false, "CheckAll('".$m_form->GetName()."','all_events','events');")): NULL,
 		make_sorting_link(S_SEVERITY,'t.priority'),
 		S_STATUS,
 		make_sorting_link(S_LAST_CHANGE,'t.lastchange'),
@@ -567,7 +567,7 @@ include_once "include/page_header.php";
 			$font = new CTag('font','yes');
 			$font->AddOption('color','#000');
 			$font->AddOption('size','-2');
-			$font->AddItem(explode_exp($row["expression"],1));
+			$font->AddItem(explode_exp($row['expression'],1));
 			$description = array($description,BR(), $font);
 		}
 // dependency		
@@ -615,14 +615,14 @@ include_once "include/page_header.php";
 //------------------------
 
 		if((time(NULL)-$row['lastchange'])<TRIGGER_BLINK_PERIOD){
-			$tr_status = new CLink(trigger_value2str($row["value"]));
+			$tr_status = new CLink(trigger_value2str($row['value']));
 			$tr_status->AddOption('name','blink');
 		}
 		else{
-			$tr_status = trigger_value2str($row["value"]);
+			$tr_status = trigger_value2str($row['value']);
 		}
 		
-		$value = new CSpan($tr_status, get_trigger_value_style($row["value"]));
+		$value = new CSpan($tr_status, get_trigger_value_style($row['value']));
 
 		if($_REQUEST['show_actions']){
 			$actions=array(new CLink(S_CHANGE,'triggers.php?form=update&triggerid='.$row['triggerid'].url_param('hostid'),'action'));
@@ -656,7 +656,7 @@ include_once "include/page_header.php";
 		}
 		
 		$tr_desc = new CSpan($description,'pointer');
-		$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
+		$tr_desc->addAction('onclick',"javascript: create_mon_trigger_menu(event, ".
 										" new Array({'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['lastchange']."'}),".
 										zbx_jsvalue($row['items']).");");
 
@@ -685,7 +685,7 @@ include_once "include/page_header.php";
 				if($row_event['acknowledged'] == 1){
 					$acks_cnt = DBfetch(DBselect('SELECT COUNT(*) as cnt FROM acknowledges WHERE eventid='.$row_event['eventid']));
 					$ack=array(
-						new CSpan(S_YES,"off"),
+						new CSpan(S_YES,'off'),
 						SPACE.'('.$acks_cnt['cnt'].SPACE,
 						new CLink(S_SHOW,'acknow.php?eventid='.$row_event['eventid'],'action'),')');
 				}
@@ -695,7 +695,7 @@ include_once "include/page_header.php";
 			}
 
 			$description = expand_trigger_description_by_data(
-					array_merge($row, array("clock"=>$row_event["clock"])),
+					array_merge($row, array('clock'=>$row_event['clock'])),
 					ZBX_FLAG_EVENT);
 
 			$font = new CTag('font','yes');
@@ -706,7 +706,7 @@ include_once "include/page_header.php";
 			$description = new CCol($description);
 			$description->addOption('style','white-space: normal; width: 90%;');
 
-			$table->AddRow(array(
+			$table->addRow(array(
 					($config['event_ack_enable'])?(($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid']))):NULL,
 					new CCol(
 						get_severity_description($row['priority']),
@@ -718,8 +718,8 @@ include_once "include/page_header.php";
 					$host,
 					$description,
 					$actions,
-					($config['event_ack_enable'])?(new CCol($ack,"center")):NULL,
-					new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
+					($config['event_ack_enable'])?(new CCol($ack,'center')):NULL,
+					new CLink(($row['comments'] == '') ? S_ADD : S_SHOW,'tr_comments.php?triggerid='.$row['triggerid'],'action')
 					));
 			$event_limit++;
 			if($event_limit >= $config['event_show_max']) break;
@@ -727,7 +727,7 @@ include_once "include/page_header.php";
 		unset($row,$description, $actions);
 	}
 
-	$table->SetFooter(new CCol(array(S_TOTAL.": ",
+	$table->setFooter(new CCol(array(S_TOTAL.': ',
 							$table->GetNumRows(),
 							SPACE.SPACE.SPACE,
 							($config['event_ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE)
@@ -755,6 +755,6 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once 'include/page_footer.php';
 
 ?>

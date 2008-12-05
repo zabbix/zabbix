@@ -226,7 +226,7 @@
 				'snmp_community'=> '',
 				'snmp_oid'		=> '',
 				'value_type'	=> ITEM_VALUE_TYPE_STR,
-				'data_type'	=> ITEM_DATA_TYPE_DECIMAL,
+				'data_type'		=> ITEM_DATA_TYPE_DECIMAL,
 				'trapper_hosts'	=> 'localhost',
 				'snmp_port'		=> 161,
 				'units'			=> '',
@@ -847,7 +847,8 @@
  * Comments: 
  *		$error= true : rise Error if item doesn't exists(error generated), false: special processing (NO error generated)
  */
-	function get_same_item_for_host($item,$dest_hostid, $error=true){
+	function get_same_item_for_host($item,$dest_hostids){
+		zbx_value2array($dest_hostids);
 	
 		if(!is_array($item)){
 			$itemid = $item;
@@ -856,27 +857,31 @@
 			$itemid = $item['itemid'];
 		}
 		
+		$same_items = array();
 		if(isset($itemid)){
-			$sql = 'SELECT src.itemid '.
+			$sql = 'SELECT src.* '.
 							' FROM items src, items dest '.
 							' WHERE dest.itemid='.$itemid.
 								' AND src.key_=dest.key_ '.
-								' AND src.hostid='.$dest_hostid;
+								' AND '.DBcondition('src.hostid',$dest_hostids);
 								
-			$db_item = DBfetch(DBselect($sql));
-			if (!$db_item && $error){
-				$item = get_item_by_itemid($db_item['itemid']);
-				$host = get_host_by_hostid($dest_hostid);
-				error('Missed key "'.$item['key_'].'" for host "'.$host['host'].'"');
-			}
-			else{
+			$res = DBselect($sql);
+			while($db_item = DBfetch($res)){
 				if(is_array($item)){
-					return get_item_by_itemid($db_item['itemid']);
+					$same_item = $db_item;
+					$same_items[$db_item['itemid']] = $db_item;
 				}
 				else{
-					return $db_item['itemid'];
+					$same_item = $db_item['itemid'];
+					$same_items[$db_item['itemid']] = $db_item['itemid'];
 				}
 			}
+			
+			if(count($dest_hostids) == 1)
+				return $same_item;
+			else
+				return $same_items;
+				
 		}
 	return false;	
 	}

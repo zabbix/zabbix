@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2008 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -386,16 +386,44 @@
 		$form->AddRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));
 		
 		$cmbAgent = new CEditableComboBox('agent', $agent, 80);
+// IE6
 		$cmbAgent->AddItem('Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)',
 			'Internet Explorer 6.0 on Windows XP SP2 with .NET Framework 2.0 installed');
+// IE7			
+		$cmbAgent->AddItem('Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022)', 'Internet Explorer 7.0 on Windows XP SP3 with .NET Framework 3.5 installed');
+// FF 1.5
 		$cmbAgent->AddItem('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7',
 			'Mozilla Firefox 1.5.0.7 on Windows XP');
 		$cmbAgent->AddItem('Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7',
 			'Mozilla Firefox 1.5.0.7 on Linux');
+// FF 2.0	
+		$cmbAgent->AddItem('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.18) Gecko/20081029 Firefox/2.0.0.18',
+			'Mozilla Firefox 2.0.0.18 on Windows XP');
+		$cmbAgent->AddItem('Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.18) Gecko/20081029 Firefox/2.0.0.18',
+			'Mozilla Firefox 2.0.0.18 on Linux');
+// FF 3.0
+		$cmbAgent->AddItem('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1',
+			'Mozilla Firefox 3.0.1 on Windows XP');
+		$cmbAgent->AddItem('Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1',
+			'Mozilla Firefox 3.0.1 on Linux');
+// OP 9.0	
 		$cmbAgent->AddItem('Opera/9.02 (Windows NT 5.1; U; en)',
 			'Opera 9.02 on Windows XP');
 		$cmbAgent->AddItem('Opera/9.02 (X11; Linux i686; U; en)',
 			'Opera 9.02 on Linux');
+// OP 9.6	
+		$cmbAgent->AddItem('Opera/9.61 (Windows NT 5.1; U; en) Presto/2.1.1',
+			'Opera 9.61 on Windows XP');
+		$cmbAgent->AddItem('Opera/9.61 (X11; Linux i686; U; en) Presto/2.1.1',
+			'Opera 9.61 on Linux');
+// SF 3.1
+		$cmbAgent->AddItem('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/525.19 (KHTML, like Gecko) Version/3.1.2 Safari/525.21',
+			'Safari 3.1.2 on Windows XP');
+		$cmbAgent->AddItem('Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_4; en-us) AppleWebKit/527.2+ (KHTML, like Gecko) Version/3.1.2 Safari/525.20.1',
+			'Safari 3.1.2 on Intel Mac OS X 10.5.4');
+		$cmbAgent->AddItem('Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_1 like Mac OS X; fr-fr) AppleWebKit/525.18.1 (KHTML, like Gecko) Mobile/5F136',
+			'Safari on iPhone');
+		
 		$cmbAgent->AddItem('Lynx/2.8.4rel.1 libwww-FM/2.14',
 			'Lynx 2.8.4rel.1 on Linux');
 		$cmbAgent->AddItem('Googlebot/2.1 (+http://www.google.com/bot.html)',
@@ -995,15 +1023,15 @@
 
 		ksort($group_rights);
 
-		$frmUserG = new CFormTable($frm_title,"users.php");
-		$frmUserG->SetHelp("web.users.groups.php");
-		$frmUserG->AddVar("config",get_request("config",1));
+		$frmUserG = new CFormTable($frm_title,'users.php');
+		$frmUserG->SetHelp('web.users.groups.php');
+		$frmUserG->AddVar('config',get_request('config',1));
 
-		if(isset($_REQUEST["usrgrpid"])){
-			$frmUserG->AddVar("usrgrpid",$_REQUEST["usrgrpid"]);
+		if(isset($_REQUEST['usrgrpid'])){
+			$frmUserG->AddVar('usrgrpid',$_REQUEST['usrgrpid']);
 		}
 		
-		$grName = new CTextBox("gname",$name,49);
+		$grName = new CTextBox('gname',$name,49);
 		$grName->options['style'] = 'width: 280px';
 		$frmUserG->AddRow(S_GROUP_NAME,$grName);
 
@@ -2714,144 +2742,6 @@
 		$frmGraph->Show();
 	}
 
-	function	insert_graphitem_form()
-	{
-
-
-		$frmGItem = new CFormTable(S_NEW_ITEM_FOR_THE_GRAPH);
-		$frmGItem->SetName('graph_item');
-		$frmGItem->SetHelp("web.graph.item.php");
-
-		$frmGItem->AddVar('dstfrm',$_REQUEST['dstfrm']);
-
-		$graphid	= get_request("graphid", 	null);
-		$graphtype	= get_request("graphtype", 	GRAPH_TYPE_NORMAL);
-		$gid		= get_request("gid",	 	null);
-		$list_name	= get_request("list_name", 	null);
-		$itemid		= get_request("itemid", 	0);
-		$color		= get_request("color", 		'009900');
-		$drawtype	= get_request("drawtype",	0);
-		$sortorder	= get_request("sortorder",	0);
-		$yaxisside	= get_request("yaxisside",	1);
-		$calc_fnc	= get_request("calc_fnc",	2);
-		$type		= get_request("type",		0);
-		$periods_cnt	= get_request("periods_cnt",	5);
-		$only_hostid	= get_request("only_hostid",	null);
-		$monitored_hosts = get_request('monitored_hosts', null);
-
-		$description = '';
-		if($itemid > 0){
-			$description = get_item_by_itemid($itemid);
-			$description = item_description($description);
-		}
-		
-		$frmGItem->AddVar('graphid',$graphid);
-		$frmGItem->AddVar('gid',$gid);
-		$frmGItem->AddVar('list_name',$list_name);
-		$frmGItem->AddVar('itemid',$itemid);
-		$frmGItem->AddVar('graphtype',$graphtype);
-		$frmGItem->AddVar('only_hostid',$only_hostid);
-
-		$txtCondVal = new CTextBox('description',$description,50,'yes');
-
-		$host_condition = "";
-		if(isset($only_hostid)){// graph for template must use only one host
-			$host_condition = "&only_hostid=".$only_hostid;
-		}
-		else if(isset($monitored_hosts)){
-			$host_condition = "&monitored_hosts=1";
-		}
-
-		$btnSelect = new CButton('btn1',S_SELECT,
-				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().
-				"&dstfld1=itemid&dstfld2=description&".
-				"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."');",
-				'T');
-		
-		$frmGItem->AddRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
-
-		if($graphtype == GRAPH_TYPE_NORMAL){
-			$cmbType = new CComboBox("type",$type,"submit()");
-			$cmbType->AddItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
-			$cmbType->AddItem(GRAPH_ITEM_AGGREGATED, S_AGGREGATED);
-			$frmGItem->AddRow(S_TYPE, $cmbType);
-		}
-		else if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-			$cmbType = new CComboBox("type",$type,"submit()");
-			$cmbType->AddItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
-			$cmbType->AddItem(GRAPH_ITEM_SUM, S_GRAPH_SUM);
-			$frmGItem->AddRow(S_TYPE, $cmbType);
-		}
-		else{
-			$frmGItem->AddVar("type",GRAPH_ITEM_SIMPLE);
-		}
-
-		if($type == GRAPH_ITEM_AGGREGATED){
-			$frmGItem->AddRow(S_AGGREGATED_PERIODS_COUNT,	new CTextBox("periods_cnt",$periods_cnt,15)); 
-
-			$frmGItem->AddVar("calc_fnc",$calc_fnc);
-			$frmGItem->AddVar("drawtype",$drawtype);
-			$frmGItem->AddVar("color",$color);
-		}
-		else {
-			if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-				$frmGItem->AddVar("periods_cnt",$periods_cnt);
-	
-				$cmbFnc = new CComboBox("calc_fnc",$calc_fnc,'submit();');
-	
-				$cmbFnc->AddItem(CALC_FNC_MIN, S_MIN_SMALL);
-				$cmbFnc->AddItem(CALC_FNC_AVG, S_AVG_SMALL);
-				$cmbFnc->AddItem(CALC_FNC_MAX, S_MAX_SMALL);
-				$cmbFnc->AddItem(CALC_FNC_LST, S_LST_SMALL);
-				$frmGItem->AddRow(S_FUNCTION, $cmbFnc);		
-			}
-			else{
-				$frmGItem->AddVar("periods_cnt",$periods_cnt);
-	
-				$cmbFnc = new CComboBox("calc_fnc",$calc_fnc,'submit();');
-	
-				if($graphtype == GRAPH_TYPE_NORMAL)
-					$cmbFnc->AddItem(CALC_FNC_ALL, S_ALL_SMALL);
-	
-				$cmbFnc->AddItem(CALC_FNC_MIN, S_MIN_SMALL);
-				$cmbFnc->AddItem(CALC_FNC_AVG, S_AVG_SMALL);
-				$cmbFnc->AddItem(CALC_FNC_MAX, S_MAX_SMALL);
-				$frmGItem->AddRow(S_FUNCTION, $cmbFnc);
-	
-				if($graphtype == GRAPH_TYPE_NORMAL)
-				{
-					$cmbType = new CComboBox("drawtype",$drawtype);
-					foreach( graph_item_drawtypes() as $i )
-					{
-						$cmbType->AddItem($i,graph_item_drawtype2str($i));
-					}
-					$frmGItem->AddRow(S_DRAW_STYLE, $cmbType);
-				}
-				else
-				{
-					$frmGItem->AddVar("drawtype", 1);
-				}
-			}
-
-			$frmGItem->AddRow(S_COLOR, new CColor('color',$color));
-		}
-		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
-			$cmbYax = new CComboBox("yaxisside",$yaxisside);
-			$cmbYax->AddItem(GRAPH_YAXIS_SIDE_RIGHT, S_RIGHT);
-			$cmbYax->AddItem(GRAPH_YAXIS_SIDE_LEFT,	S_LEFT);
-			$frmGItem->AddRow(S_YAXIS_SIDE, $cmbYax);
-		}
-
-		if($type != GRAPH_ITEM_SUM){
-			$frmGItem->AddRow(S_SORT_ORDER_1_100, new CTextBox("sortorder",$sortorder,3));
-		}
-
-		$frmGItem->AddItemToBottomRow(new CButton("save", isset($gid) ? S_SAVE : S_ADD));
-
-		$frmGItem->AddItemToBottomRow(new CButtonCancel(null,'close_window();'));
-		$frmGItem->Show();
-	}
-
 	function	insert_value_mapping_form()
 	{
 
@@ -3727,7 +3617,6 @@
 		$td->AddOption('style','text-align: right;');
 
 		if(isset($_REQUEST["actionid"])){
-
 			$td->AddItem(SPACE);
 			$td->AddItem(new CButton('clone',S_CLONE));
 			$td->AddItem(SPACE);
@@ -3822,7 +3711,7 @@
 				switch($evaltype){
 					case ACTION_EVAL_TYPE_AND:	$group_op = 		$glog_op = S_AND;	break;
 					case ACTION_EVAL_TYPE_OR:	$group_op = 		$glog_op = S_OR;	break;
-					default:			$group_op = S_OR;	$glog_op = S_AND;	break;
+					default:					$group_op = S_OR;	$glog_op = S_AND;	break;
 				}
 
 				foreach($grouped_conditions as $id => $val)
@@ -7140,7 +7029,7 @@
 		$td->AddOption('colspan',2);
 		$td->AddOption('style','text-align: right;');
 
-		$tblExpFooter->SetFooter($td);
+		$tblExpFooter->setFooter($td);
 // end of condition list preparation
 	return $tblExpFooter;
 	}

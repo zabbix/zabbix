@@ -614,6 +614,7 @@
 	'S_CANNOT_UPDATE_SORT_ORDER'=>		'Cannot update sort order',
 	'S_DISPLAYED_PARAMETERS_BIG'=>		'DISPLAYED PARAMETERS',
 	'S_SORT_ORDER'=>			'Sort order',
+	'S_SORT_BY'=>				'Sort by',
 	'S_PARAMETER'=>				'Parameter',
 	'S_COLOR'=>				'Color',
 	'S_UP'=>				'Up',
@@ -638,6 +639,7 @@
 	'S_AGGREGATED_PERIODS_COUNT'=>			'Aggregated periods count',
 
 //	graphs.php
+	'S_TITLE'=>						'Title',
 	'S_PERCENTILE_LINE'=>				'Percentile line',
 	'S_CONFIGURATION_OF_GRAPHS'=>		'Configuration of graphs',
 	'S_CONFIGURATION_OF_GRAPHS_BIG'=>	'CONFIGURATION OF GRAPHS',
@@ -1317,6 +1319,7 @@
 	'S_DAY'=>				'Day',
 	'S_MONTH'=>				'Month',
 	'S_YEAR'=>				'Year',
+	'S_HOURLY'=>			'Hourly',
 	'S_DAILY'=>				'Daily',
 	'S_WEEKLY'=>				'Weekly',
 	'S_MONTHLY'=>				'Monthly',
@@ -1339,11 +1342,22 @@
 	'S_IT_NOTIFICATIONS'=>			'Notification report',
 
 //	report5.php
-        'S_TRIGGERS_TOP_100'=>			'Most busy triggers top 100',
+	'S_TRIGGERS_TOP_100'=>			'Most busy triggers top 100',
 	'S_TRIGGERS_TOP_100_BIG'=>		'MOST BUSY TRIGGERS TOP 100',
 	'S_NUMBER_OF_STATUS_CHANGES'=>		'Number of status changes',
 	'S_WEEK'=>				'Week',
 	'S_LAST'=>				'Last',
+	
+//	report6.php
+	'S_BAR_REPORTS'=>			'Bar reports',
+	'S_BAR_REPORT_1'=>			'Distribution of values for multiple periods',
+	'S_BAR_REPORT_2'=>			'Distribution of values for multiple items',
+	'S_BAR_REPORT_3'=>			'Compare values for multiple periods',
+	
+	'S_SELECTED_HOSTS'=>		'Selected hosts',
+	'S_SELECTED_GROUPS'=>		'Selected groups',
+	'S_SCALE'=>					'Scale',
+	'S_AVERAGE_BY'=>			'Average by',
  
 //	screenconf.php
 	'S_SCREENS'=>				'Screens',
@@ -1771,6 +1785,7 @@
 	'S_EXTENDED'=>				'Extended',
 
 //	popup.php
+	'S_CAPTION'=>			'Caption',
 	'S_EMPTY'=>				'Empty',
 	'S_STANDARD_ITEMS_BIG'=>		'STANDARD ITEMS',
 	'S_NO_ITEMS'=>				'No items',
@@ -1786,6 +1801,7 @@
 	'S_EVENTS'=>				'Events',
 	'S_EVENTS_BIG'=>			'EVENTS',
 	'S_MAPS'=>				'Maps',
+	'S_REPORT'=>				'Report',
 	'S_REPORTS'=>				'Reports',
 	'S_GENERAL'=>				'General',
 	'S_AUDIT'=>				'Audit',

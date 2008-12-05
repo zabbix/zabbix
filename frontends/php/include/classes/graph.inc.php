@@ -95,6 +95,7 @@ class Graph{
 		$this->sizeY=200;				// default graph size Y
 		$this->shiftXleft=10;
 		$this->shiftXright=60;
+		$this->shiftXCaption=0;
 		$this->shiftY=17;
 		$this->border=1;
 		$this->num=0;
@@ -209,9 +210,9 @@ class Graph{
 
 	function drawSmallRectangle(){
 		dashedrectangle($this->im,
-			$this->shiftXleft-1,
+			$this->shiftXleft+$this->shiftXCaption-1,
 			$this->shiftY-1,
-			$this->sizeX+$this->shiftXleft-1,
+			$this->sizeX+$this->shiftXleft+$this->shiftXCaption-1,
 			$this->sizeY+$this->shiftY+1,
 			$this->GetColor('Black No Alpha')
 			);
