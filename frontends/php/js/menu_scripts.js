@@ -236,7 +236,9 @@ function create_dashboard_menu(e,id){
 function create_mon_trigger_menu(e, args, items){
 	var tr_menu = new Array(['Triggers',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
 								['Events','events.php?triggerid='+args[0].triggerid+'&nav_time='+args[0].lastchange,null]);
-	
+
+	if((args.length > 1) && !is_null(args[1])) tr_menu.push(args[1]);
+
 	tr_menu.push(['Simple graphs',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
 
 //	for(var i=0; i < items.length; i++){
