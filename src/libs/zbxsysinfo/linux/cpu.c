@@ -162,126 +162,51 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	double	load[3];
-
-	assert(result);
-
-	init_result(result);
-		
-	if(getloadavg(load, 3))
-	{
-		SET_DBL_RESULT(result, load[0]);
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;	
-	}
-}
-
-int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	double	load[3];
-
-	assert(result);
-
-	init_result(result);
-		
-	if(getloadavg(load, 3))
-	{
-		SET_DBL_RESULT(result, load[1]);
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;	
-	}
-}
-
-int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	double	load[3];
-
-	assert(result);
-
-	init_result(result);
-
-	if(getloadavg(load, 3))
-	{
-		SET_DBL_RESULT(result, load[2]); 
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;	
-	}
-}
-
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+	char	tmp[32];
+	int	mode;
+	double	load[ZBX_AVGMAX];
 
-#define CPU_FNCLIST struct cpu_fnclist_s
-CPU_FNCLIST
-{
-	char *mode;
-	int (*function)();
-};
-
-	CPU_FNCLIST fl[] = 
-	{
-		{"avg1" ,	SYSTEM_CPU_LOAD1},
-		{"avg5" ,	SYSTEM_CPU_LOAD5},
-		{"avg15",	SYSTEM_CPU_LOAD15},
-		{0,		0}
-	};
-
-	char cpuname[MAX_STRING_LEN];
-	char mode[MAX_STRING_LEN];
-	int i;
-	
 	assert(result);
 
 	init_result(result);
-	
-	if(num_param(param) > 2)
-	{
-		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, cpuname, sizeof(cpuname)) != 0)
-	{
+	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
-	}
-	if(cpuname[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(cpuname, sizeof(cpuname), "all");
-	}
-	if(strncmp(cpuname, "all", sizeof(cpuname)))
-	{
+
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
 		return SYSINFO_RET_FAIL;
-	}
-	
-	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-	{
-		mode[0] = '\0';
-	}
-	if(mode[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "avg1");
-	}
-	for(i=0; fl[i].mode!=0; i++)
-	{
-		if(strncmp(mode, fl[i].mode, sizeof(mode))==0)
-		{
-			return (fl[i].function)(cmd, param, flags, result);
-		}
-	}
-	
-	return SYSINFO_RET_FAIL;
+
+	/* default parameter */
+	if ('\0' == *tmp)
+		zbx_snprintf(tmp, sizeof(tmp), "all");
+
+	if (0 != strcmp(tmp, "all"))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
+		*tmp = '\0';
+
+	/* default parameter */
+	if ('\0' == *tmp)
+		zbx_snprintf(tmp, sizeof(tmp), "avg1");
+
+	if (0 == strcmp(tmp, "avg1"))
+		mode = ZBX_AVG1;
+	else if (0 == strcmp(tmp, "avg5"))
+		mode = ZBX_AVG5;
+	else if (0 == strcmp(tmp, "avg15"))
+		mode = ZBX_AVG15;
+	else
+		return SYSINFO_RET_FAIL;
+
+	if (mode >= getloadavg(load, 3))
+		return SYSINFO_RET_FAIL;
+
+	SET_DBL_RESULT(result, load[mode]);
+
+	return SYSINFO_RET_OK;
 }
 
 int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
