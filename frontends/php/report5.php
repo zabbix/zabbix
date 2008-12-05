@@ -25,7 +25,7 @@
 	$page['title']	= "S_TRIGGERS_TOP_100";
 	$page['file']	= 'report5.php';
 	$page['hist_arg'] = array('period');
-	$page['scripts'] = array('');
+	$page['scripts'] = array('menu_scripts.js');
 	
 include_once('include/page_header.php');
 
@@ -134,9 +134,14 @@ include_once('include/page_header.php');
 		$host->addOption('onclick','javascript: '.$menus);
 		$host->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 		
+		$tr_conf_link = 'null';
+		if($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER)
+			$tr_conf_link = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$row['triggerid']."&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
+
+		
 		$tr_desc = new CSpan($description,'pointer');
 		$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
-										" new Array({'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['lastchange']."'}),".
+										" new Array({'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['lastchange']."'},".$tr_conf_link."),".
 										zbx_jsvalue($row['items']).");");
 
 		$table->addRow(array(

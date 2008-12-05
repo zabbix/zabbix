@@ -342,7 +342,7 @@ include_once "include/page_header.php";
 					}
 				}
 
-// fixes bug , due to Zend casting the array key as a numeric and then they are reassigned
+// fixes bug #21788, due to Zend casting the array key as a numeric and then they are reassigned
 				$itemid = "0$itemid";
 //---
 				switch($item['calc_fnc']){
