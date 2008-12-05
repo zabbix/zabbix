@@ -848,6 +848,7 @@
  *		$error= true : rise Error if item doesn't exists(error generated), false: special processing (NO error generated)
  */
 	function get_same_item_for_host($item,$dest_hostids){
+		$return_array = is_array($dest_hostids);
 		zbx_value2array($dest_hostids);
 	
 		if(!is_array($item)){
@@ -877,11 +878,10 @@
 				}
 			}
 			
-			if(count($dest_hostids) == 1)
-				return $same_item;
-			else
+			if($return_array)
 				return $same_items;
-				
+			else
+				return $same_item;
 		}
 	return false;	
 	}
