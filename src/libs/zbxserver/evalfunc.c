@@ -1144,6 +1144,8 @@ static int	evaluate_ABSCHANGE(char *value, DB_ITEM *item, const char *parameter,
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of evaluate_ABSCHANGE()");
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1194,6 +1196,8 @@ static int	evaluate_CHANGE(char *value, DB_ITEM *item, const char *parameter, ti
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of evaluate_CHANGE()");
+
+	return SUCCEED;
 }
 
 /******************************************************************************
