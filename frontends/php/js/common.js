@@ -207,12 +207,11 @@ function Confirm(msg){
 }
 
 function create_var(form_name, var_name, var_val, subm){
-	
 	var frmForm = (is_string(form_name))?document.forms[form_name]:form_name;
 	if(!frmForm) return false;
 
-	var objVar = document.getElementsByName(var_name);
-	objVar=(objVar.length>0)?objVar[0]:null;
+	var objVar = (typeof(frmForm[var_name]) != 'undefined')?frmForm[var_name]:null;
+//	objVar=(objVar.length>0)?objVar[0]:null;
 
 	if(is_null(objVar)){
 		objVar = document.createElement('input');
@@ -225,9 +224,9 @@ function create_var(form_name, var_name, var_val, subm){
 		objVar.setAttribute('name', 	var_name);
 		objVar.setAttribute('id', 		var_name);
 	}
-	
-	objVar.value = var_val;
 
+	objVar.value = var_val;
+	
 	if(subm)
 		frmForm.submit();
 
