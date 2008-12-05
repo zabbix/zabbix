@@ -513,36 +513,36 @@ function draw(){
 //	$start = ($this->column)?($this->shiftXleft + 1):($this->sizeY+$this->shiftY - 1);
 	foreach($this->series as $key => $values){
 		foreach($values as $num => $value){
-			$color = $this->seriesColor[$num];
+			$color = $this->getColor($this->seriesColor[$num],20);
 			if($this->column){
 				imagefilledrectangle($this->im,
 									$start,
-									$this->sizeY+$this->shiftY,
-									$start+$this->columnWidth,
 									$this->sizeY+$this->shiftY - round(($this->sizeY/$this->maxValue) * $value),
-									$this->getColor($this->seriesColor[$num],20));
+									$start+$this->columnWidth,
+									$this->sizeY+$this->shiftY,
+									$color);
 									
 				imagerectangle($this->im,
 									$start,
-									$this->sizeY+$this->shiftY,
-									$start+$this->columnWidth,
 									$this->sizeY+$this->shiftY - round(($this->sizeY/$this->maxValue) * $value),
+									$start+$this->columnWidth,
+									$this->sizeY+$this->shiftY,
 									$this->getColor('Black No Alpha'));
 			}
 			else{
 				imagefilledrectangle($this->im,
 									$this->shiftXleft+$this->shiftXCaption,
-									$start,
-									$this->shiftXleft+$this->shiftXCaption + round(($this->sizeX/$this->maxValue) * $value),
 									$start-$this->columnWidth,
-									$this->getColor($this->seriesColor[$num],20));
+									$this->shiftXleft+$this->shiftXCaption + round(($this->sizeX/$this->maxValue) * $value),
+									$start,
+									$color);
 									
 
 				imagerectangle($this->im,
 									$this->shiftXleft+$this->shiftXCaption,
-									$start,
-									$this->shiftXleft+$this->shiftXCaption + round(($this->sizeX/$this->maxValue) * $value),
 									$start-$this->columnWidth,
+									$this->shiftXleft+$this->shiftXCaption + round(($this->sizeX/$this->maxValue) * $value),
+									$start,
 									$this->getColor('Black No Alpha'));
 			}
 			$start=($this->column)?($start+$this->columnWidth):($start-$this->columnWidth);	
