@@ -519,7 +519,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				$lst_nodes->AddItem($node_data['nodeid'],$node_data['name']);
 			}
 
-			if($lst_nodes->ItemsCount() > 1){
+			if($lst_nodes->ItemsCount() > 0){
 				$node_form = new CForm();
 				$node_form->AddItem(array(new CSpan(S_CURRENT_NODE,'textcolorstyles'),$lst_nodes));
 				unset($lst_nodes);
