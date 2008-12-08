@@ -524,7 +524,7 @@
 
 //	Footer
 	'S_ZABICOM_IS_UNAVAILABLE'=>'ZABICOM is unavailable',
-	'S_ZABICOM_VER'=>			'ZABICOM 1.0.6',
+	'S_ZABICOM_VER'=>			'ZABICOM 1.0.7',
 	'S_COPYRIGHT_BY'=>			'Copyright by',
 	'S_CONNECTED_AS'=>			'Connected as',
 	'S_SIA_ZABBIX'=>			'SIA ZABBIX',
