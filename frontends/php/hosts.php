@@ -991,9 +991,9 @@ include_once "include/page_header.php";
 
 				$popup_menu_actions = array(
 					array(S_SHOW, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))),
-					array(S_ITEMS, new CScript("function(){ PopUp('items.php?hostid=".$row['hostid']."');}")),
-					array(S_TRIGGERS, new CScript("function(){ PopUp('triggers.php?hostid=".$row['hostid']."');}")),
-					array(S_GRAPHS, new CScript("function(){ PopUp('graphs.php?hostid=".$row['hostid']."');}"))
+					array(S_ITEMS, null, new CScript("function(){ PopUp('items.php?hostid=".$row['hostid']."');}")),
+					array(S_TRIGGERS, null, new CScript("function(){ PopUp('triggers.php?hostid=".$row['hostid']."');}")),
+					array(S_GRAPHS, null, new CScript("function(){ PopUp('graphs.php?hostid=".$row['hostid']."');}"))
 					);
 
 				$db_groups = DBselect('select g.groupid, g.name from groups g left join hosts_groups hg '.

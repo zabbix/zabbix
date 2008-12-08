@@ -122,7 +122,7 @@ function SDJ(obj){
 
 function addListener(element, eventname, expression, bubbling){
 	bubbling = bubbling || false;
-		
+//alert(expression);
 	if(window.addEventListener)	{
 		element.addEventListener(eventname, expression, bubbling);
 		return true;

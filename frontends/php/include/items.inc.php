@@ -915,8 +915,8 @@ COpt::profiling_start('prepare table');
 					$it_ov_menu = array(
 						array(S_VALUES,	null, null, 
 							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))),
-						array(S_500_LATEST_VALUES, 'history.php?action=showlatest&itemid='.$ithosts[$hostname]['itemid'],
-							array('tw'=>'_blank'))
+						array(S_500_LATEST_VALUES, null, 
+								new CScript("function(){ PopUp('history.php?action=showlatest&itemid=".$ithosts[$hostname]['itemid']."'); }"))
 						);
 
 					switch($ithosts[$hostname]['value_type'])
@@ -928,13 +928,13 @@ COpt::profiling_start('prepare table');
 								array(S_GRAPHS, null,  null, 
 									array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
 									),
-								array(S_LAST_HOUR_GRAPH, 'history.php?period=3600&action=showgraph&itemid='.
-									$ithosts[$hostname]['itemid'], array('tw'=>'_blank')),
-								array(S_LAST_WEEK_GRAPH, 'history.php?period=604800&action=showgraph&itemid='.
-									$ithosts[$hostname]['itemid'], array('tw'=>'_blank')),
-								array(S_LAST_MONTH_GRAPH, 'history.php?period=2678400&action=showgraph&itemid='.
-									$ithosts[$hostname]['itemid'], array('tw'=>'_blank'))
-								), $it_ov_menu);
+								array(S_LAST_HOUR_GRAPH, null, 
+									new CScript("function(){ PopUp('history.php?action=showlatest&itemid=".$ithosts[$hostname]['itemid']."'); }")),
+								array(S_LAST_WEEK_GRAPH, null, 
+									new CScript("function(){ PopUp('history.php?period=604800&action=showgraph&itemid=".$ithosts[$hostname]['itemid']."'); }")),
+								array(S_LAST_MONTH_GRAPH, null, 
+									new CScript("function(){ PopUp('history.php?period=2678400&action=showgraph&itemid=".$ithosts[$hostname]['itemid']."'); }"))),
+								 $it_ov_menu);
 							break;
 						default:
 							break;

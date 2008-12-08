@@ -403,7 +403,8 @@ function menu_item (o_parent, n_order) {
 		addListener(el, 'click', this.a_config[2], false);
 	}
 	else if(!is_null(this.a_config[1])){
-		addListener(el, 'click', function(){ location.href = this.a_config[1]; }, false);
+		var tmp_fnc = eval("function(){ location.href = '"+this.a_config[1]+"'; };");
+		addListener(el, 'click', fnc , false);
 	}
 	
 	el.setAttribute('id', 'e' + o_root.n_id + '_' + this.n_id + 'o');

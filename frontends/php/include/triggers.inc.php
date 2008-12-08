@@ -1902,7 +1902,8 @@
 						case TRIGGER_VALUE_TRUE:
 							$css_class = get_severity_style($trhosts[$hostname]['priority']);
 							if( ($ack = get_last_event_by_triggerid($trhosts[$hostname]['triggerid'])) )
-								$ack_menu = array(S_ACKNOWLEDGE, 'acknow.php?eventid='.$ack['eventid'], array('tw'=>'_blank'));
+								$ack_menu = array(S_ACKNOWLEDGE, null, new CScript("function(){ PopUp('acknow.php?eventid=".$ack['eventid']."');}"));
+								
 
 							if ( 1 == $ack['acknowledged'] )
 								$ack = new CImg('images/general/tick.png','ack');
@@ -1934,7 +1935,7 @@
 						array(S_TRIGGER, null,  null, 
 							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
 							),
-						array(S_EVENTS, 'tr_events.php?triggerid='.$trhosts[$hostname]['triggerid'], array('tw'=>'_blank'))
+						array(S_EVENTS, null, new CScript("function(){ PopUp('tr_events.php?triggerid=".$trhosts[$hostname]['triggerid']."');}"))
 						);
 
 					if(isset($ack_menu)) $tr_ov_menu[] = $ack_menu;
@@ -1965,9 +1966,8 @@
 						if(strlen($description) > 25) $description = substr($description,0,22).'...';
 
 						$item_menu[$action][] = array(
-							$description,
-							'history.php?action='.$action.'&itemid='.$item_data['itemid'].'&period=3600',
-							 array('tw'=>'_blank', 'sb'=>$status_bar));
+							$description, null,
+							new CScript("function(){ PopUp('history.php?action=".$action.'&itemid='.$item_data['itemid']."&period=3600');}"));
 					}
 					if(isset($item_menu['showgraph']))
 					{
