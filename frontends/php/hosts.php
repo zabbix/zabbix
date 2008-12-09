@@ -267,7 +267,10 @@ include_once('include/page_header.php');
 
 			foreach($db_host as $key => $value){
 				if(isset($visible[$key])){
-					$db_host[$key] = $_REQUEST[$key];
+					if ($key == 'useipmi')
+						$db_host[$key] = get_request('useipmi', 'no');
+					else
+						$db_host[$key] = $_REQUEST[$key];
 				}
 			}
 			
@@ -1124,9 +1127,15 @@ include_once('include/page_header.php');
 					$port = empty($row['port'])?'-':$row["port"];
 
 					if(1 == $row['useip'])
+					{
 						$ip = bold($ip);
+						$dns = expand_host_ipmi_ip_by_data($dns, $row);
+					}
 					else
+					{
 						$dns = bold($dns);
+						$ip = expand_host_ipmi_ip_by_data($ip, $row);
+					}
 					
 					switch($row['status']){
 						case HOST_STATUS_MONITORED:

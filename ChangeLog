@@ -1,5 +1,7 @@
 Changes for 1.6.2
 
+ - [DEV-273] added mass update for IPMI fields (Sasha)
+ - [DEV-272] added support of {HOSTNAME}, {HOST.CONN}... macros for "IPMI IP address" (Sasha)
  - [ZBX-623] fixed incorrect processing of function abschange() for integers(Sasha)
  - [ZBX-622] fixed broked autocreation of SQLite database (Alexei)
  - [ZBX-621] fixed bad performance of the graph related screen due to missing index (Alexei)

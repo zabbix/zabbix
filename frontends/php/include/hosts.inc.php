@@ -626,6 +626,11 @@ require_once "include/httptest.inc.php";
 
 		$res=DBselect($sql);
 		while($row=DBfetch($res)){
+			if ($row['useipmi'] == 1)
+				$row['ipmi_ip'] = $row['useip'] ? $row['dns'] : $row['ip'];
+			else
+				$row['ipmi_ip'] = '';
+
 			$result = true;
 			$hosts[$row['itemid']] = $row;
 		}
@@ -649,17 +654,14 @@ require_once "include/httptest.inc.php";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 		if($row){
-			if ($row['useipmi'] == 1){
-				if($row['useip'])
-					array_merge($row, array('ipmi_ip' => $row['dns']));
-				else
-					array_merge($row, array('ipmi_ip' => $row['ip']));
-			}
+			if ($row['useipmi'] == 1)
+				$row['ipmi_ip'] = $row['useip'] ? $row['dns'] : $row['ip'];
 			else
 				$row['ipmi_ip'] = '';
 
 			return $row;
 		}
+
 		if($no_error_message == 0)
 			error("No host with hostid=[$hostid]");
 		return	false;
@@ -1449,4 +1451,19 @@ require_once "include/httptest.inc.php";
 		
 	return $action;
 	}
+
+	function expand_host_ipmi_ip_by_data($ipmi_ip, $host)
+	{
+		if (zbx_strstr($ipmi_ip, '{HOSTNAME}'))
+			$ipmi_ip = str_replace('{HOSTNAME}', $host['host'], $ipmi_ip);
+		else if (zbx_strstr($ipmi_ip, '{IPADDRESS}'))
+			$ipmi_ip = str_replace('{IPADDRESS}', $host['ip'], $ipmi_ip);
+		else if (zbx_strstr($ipmi_ip, '{HOST.DNS}'))
+			$ipmi_ip = str_replace('{HOST.DNS}', $host['dns'], $ipmi_ip);
+		else if (zbx_strstr($ipmi_ip, '{HOST.CONN}'))
+			$ipmi_ip = str_replace('{HOST.CONN}', $host['useip'] ? $host['ip'] : $host['dns'], $ipmi_ip);
+
+		return $ipmi_ip;
+	}
+
 ?>

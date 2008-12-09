@@ -1699,6 +1699,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 {
 	char		*s;
 	static char	*key = NULL;
+	static char	*ipmi_ip = NULL;
 
 	ZBX_STR2UINT64(item->itemid, row[0]);
 /*	item->itemid=atoi(row[0]); */
@@ -1831,6 +1832,11 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 			key = zbx_dsprintf(key, "%s", item->key_orig);
 			substitute_simple_macros(NULL, NULL, item, &key, MACRO_TYPE_ITEM_KEY);
 			item->key	= key;
+			break;
+		case ITEM_TYPE_IPMI:
+			ipmi_ip = zbx_dsprintf(ipmi_ip, "%s", item->ipmi_ip);
+			substitute_simple_macros(NULL, NULL, item, &ipmi_ip, MACRO_TYPE_HOST_IPMI_IP);
+			item->ipmi_ip	= ipmi_ip;
 			break;
 		default:
 			item->key	= item->key_orig;
