@@ -1459,7 +1459,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 
 			replace_to = zbx_dsprintf(replace_to, "%d", event->trigger_priority);
 		}
-		else if (macro_type & MACRO_TYPE_ITEM_KEY)
+		else if (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_HOST_IPMI_IP))
 		{
 			if (0 == strncmp(pr, MVAR_HOSTNAME, MVAR_HOSTNAME_LEN))
 			{

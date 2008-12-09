@@ -30,6 +30,7 @@
 #define MACRO_TYPE_MESSAGE_BODY		0x04
 #define MACRO_TYPE_TRIGGER_EXPRESSION	0x08
 #define MACRO_TYPE_ITEM_KEY		0x10
+#define MACRO_TYPE_HOST_IPMI_IP		0x20
 
 int	evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter, time_t now);
 void    update_triggers (zbx_uint64_t itemid);

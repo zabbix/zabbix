@@ -294,7 +294,10 @@ include_once('include/page_header.php');
 
 			foreach($db_host as $key => $value){
 				if(isset($visible[$key])){
-					$db_host[$key] = $_REQUEST[$key];
+					if ($key == 'useipmi')
+						$db_host[$key] = get_request('useipmi', 'no');
+					else
+						$db_host[$key] = $_REQUEST[$key];
 				}
 			}
 			
