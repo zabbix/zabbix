@@ -4764,6 +4764,14 @@
 		$ip			= get_request('ip',	'0.0.0.0');
 		$proxy_hostid	= get_request('proxy_hostid','');
 
+		$useipmi	= get_request('useipmi', 'no');
+		$ipmi_ip	= get_request('ipmi_ip', '');
+		$ipmi_port	= get_request('ipmi_port', 623);
+		$ipmi_authtype	= get_request('ipmi_authtype', -1);
+		$ipmi_privilege	= get_request('ipmi_privilege', 2);
+		$ipmi_username	= get_request('ipmi_username', '');
+		$ipmi_password	= get_request('ipmi_password', '');
+
 		$useprofile = get_request('useprofile','no');
 
 		$devicetype	= get_request('devicetype','');
@@ -4925,6 +4933,58 @@
 					$template_table, 'T'
 				);
 	
+		$frmHost->AddRow(array(
+					new CVisibilityBox('visible[useipmi]', isset($visible['useipmi']), 'useipmi', S_ORIGINAL), S_USEIPMI),
+					new CCheckBox("useipmi", $useipmi, "submit()")
+				);
+
+		if ($useipmi == 'yes')
+		{
+			$frmHost->AddRow(array(
+				new CVisibilityBox('visible[ipmi_ip]', isset($visible['ipmi_ip']), 'ipmi_ip', S_ORIGINAL), S_IPMI_IP_ADDRESS),
+				new CTextBox('ipmi_ip', $ipmi_ip, defined('ZBX_HAVE_IPV6') ? 39 : 15)
+			);
+
+			$frmHost->AddRow(array(
+				new CVisibilityBox('visible[ipmi_port]', isset($visible['ipmi_port']), 'ipmi_port', S_ORIGINAL), S_IPMI_PORT),
+				new CNumericBox('ipmi_port', $ipmi_port, 15)
+			);
+
+			$cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmi_authtype);
+			$cmbIPMIAuthtype->AddItem(IPMI_AUTHTYPE_DEFAULT,	S_AUTHTYPE_DEFAULT);
+			$cmbIPMIAuthtype->AddItem(IPMI_AUTHTYPE_NONE,		S_AUTHTYPE_NONE);
+			$cmbIPMIAuthtype->AddItem(IPMI_AUTHTYPE_MD2,		S_AUTHTYPE_MD2);
+			$cmbIPMIAuthtype->AddItem(IPMI_AUTHTYPE_MD5,		S_AUTHTYPE_MD5);
+			$cmbIPMIAuthtype->AddItem(IPMI_AUTHTYPE_STRAIGHT,	S_AUTHTYPE_STRAIGHT);
+			$cmbIPMIAuthtype->AddItem(IPMI_AUTHTYPE_OEM,		S_AUTHTYPE_OEM);
+			$cmbIPMIAuthtype->AddItem(IPMI_AUTHTYPE_RMCP_PLUS,	S_AUTHTYPE_RMCP_PLUS);
+			$frmHost->AddRow(array(
+				new CVisibilityBox('visible[ipmi_authtype]', isset($visible['ipmi_authtype']), 'ipmi_authtype', S_ORIGINAL), S_IPMI_AUTHTYPE),
+				$cmbIPMIAuthtype
+			);
+
+			$cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmi_privilege);
+			$cmbIPMIPrivilege->AddItem(IPMI_PRIVILEGE_CALLBACK,	S_PRIVILEGE_CALLBACK);
+			$cmbIPMIPrivilege->AddItem(IPMI_PRIVILEGE_USER,		S_PRIVILEGE_USER);
+			$cmbIPMIPrivilege->AddItem(IPMI_PRIVILEGE_OPERATOR,	S_PRIVILEGE_OPERATOR);
+			$cmbIPMIPrivilege->AddItem(IPMI_PRIVILEGE_ADMIN,	S_PRIVILEGE_ADMIN);
+			$cmbIPMIPrivilege->AddItem(IPMI_PRIVILEGE_OEM,		S_PRIVILEGE_OEM);
+			$frmHost->AddRow(array(
+				new CVisibilityBox('visible[ipmi_privilege]', isset($visible['ipmi_privilege']), 'ipmi_privilege', S_ORIGINAL), S_IPMI_PRIVILEGE),
+				$cmbIPMIPrivilege
+			);
+
+			$frmHost->AddRow(array(
+				new CVisibilityBox('visible[ipmi_username]', isset($visible['ipmi_username']), 'ipmi_username', S_ORIGINAL), S_IPMI_USERNAME),
+				new CTextBox('ipmi_username', $ipmi_username, 16)
+			);
+
+			$frmHost->AddRow(array(
+				new CVisibilityBox('visible[ipmi_password]', isset($visible['ipmi_password']), 'ipmi_password', S_ORIGINAL), S_IPMI_PASSWORD),
+				new CTextBox('ipmi_password', $ipmi_password, 20)
+			);
+		}
+
 		$frmHost->AddRow(array(
 					new CVisibilityBox('visible[useprofile]', isset($visible['useprofile']), 'useprofile', S_ORIGINAL),S_USE_PROFILE),
 					new CCheckBox("useprofile",$useprofile,"submit()")
@@ -5382,26 +5442,9 @@
 			$status			= $db_host['status'];
 			$useip			= $db_host['useip'];
 			$useipmi		= $db_host['useipmi'] ? 'yes' : 'no';
-			if ($useipmi == 'yes')
-			{
-				if ($useip)
-				{
-					$ip	= $db_host['ip'];
-					$dns	= '';
-					$ipmi_ip= $db_host['dns'];
-				}
-				else
-				{
-					$ip	= '0.0.0.0';
-					$dns	= $db_host['dns'];
-					$ipmi_ip= $db_host['ip'];
-				}
-			}
-			else{
-				$ip		= $db_host['ip'];
-				$dns		= $db_host['dns'];
-			}
-			
+			$ip			= $db_host['ip'];
+			$dns			= $db_host['dns'];
+			$ipmi_ip		= $db_host['ipmi_ip'];
 			$ipmi_port		= $db_host['ipmi_port'];
 			$ipmi_authtype		= $db_host['ipmi_authtype'];
 			$ipmi_privilege		= $db_host['ipmi_privilege'];
@@ -5579,10 +5622,7 @@
 		}
 
 		if($useipmi == 'yes'){
-			if(defined('ZBX_HAVE_IPV6'))
-				$frmHost->AddRow(S_IPMI_IP_ADDRESS,new CTextBox('ipmi_ip',$ipmi_ip,'39'));
-			else
-				$frmHost->AddRow(S_IPMI_IP_ADDRESS,new CTextBox('ipmi_ip',$ipmi_ip,'15'));
+			$frmHost->AddRow(S_IPMI_IP_ADDRESS, new CTextBox('ipmi_ip', $ipmi_ip, defined('ZBX_HAVE_IPV6') ? 39 : 15));
 			$frmHost->AddRow(S_IPMI_PORT, new CNumericBox('ipmi_port', $ipmi_port, 5));	
 
 			$cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmi_authtype);

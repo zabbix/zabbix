@@ -490,6 +490,7 @@ FIELD		|maintenanceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|maintenance_status|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|maintenance_from|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ipmi_ip	|t_varchar(39)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
