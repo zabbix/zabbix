@@ -817,7 +817,7 @@ include_once "include/page_header.php";
 					$item_count = DBfetch(DBselect('SELECT count(DISTINCT f.itemid) as items FROM functions as f WHERE f.triggerid='.$trigger['triggerid']));
 					if($item_count['items'] > 1) continue;
 					
-					$triggers .= ',["'.$trigger['description']."\",\"javascript: openWinCentered('tr_logform.php?sform=1&itemid=".$db_item["itemid"]."&triggerid=".$trigger['triggerid']."&ltype=".$ltype."','TriggerLog',760,540,'titlebar=no, resizable=yes, scrollbars=yes');\"]";
+					$triggers .= ',["'.$trigger['description'].'", null,'."function(){ openWinCentered('tr_logform.php?sform=1&itemid=".$db_item["itemid"]."&triggerid=".$trigger['triggerid']."&ltype=".$ltype."','TriggerLog',760,540,'titlebar=no, resizable=yes, scrollbars=yes'); }]";
 					$triggers_flag = true;
 				}
 				if($triggers_flag){

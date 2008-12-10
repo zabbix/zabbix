@@ -966,11 +966,13 @@ include_once "include/page_header.php";
 						$status=new CLink(S_MONITORED,"hosts.php?hosts%5B%5D=".$row["hostid"].
 							"&disable=1".url_param("config").url_param("groupid"),
 							"off");
-					} else if($row["status"] == HOST_STATUS_NOT_MONITORED) {
+					} 
+					else if($row["status"] == HOST_STATUS_NOT_MONITORED) {
 						$status=new CLink(S_NOT_MONITORED,"hosts.php?hosts%5B%5D=".$row["hostid"].
 							"&activate=1".url_param("config").url_param("groupid"),
 							"on");
-					} else if($row["status"] == HOST_STATUS_TEMPLATE)
+					} 
+					else if($row["status"] == HOST_STATUS_TEMPLATE)
 						$status=new CCol(S_TEMPLATE,"unknown");
 					else if($row["status"] == HOST_STATUS_DELETED)
 						$status=new CCol(S_DELETED,"unknown");

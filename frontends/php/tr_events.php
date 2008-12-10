@@ -51,9 +51,11 @@ include_once "include/page_header.php";
 
 	$trigger_data = DBfetch(DBselect('SELECT h.host, t.* '.
 						' FROM hosts h, items i, functions f, triggers t '.
-	                        	' WHERE i.itemid=f.itemid AND f.triggerid=t.triggerid '.
-						' AND t.triggerid='.$_REQUEST["triggerid"].
-						' AND h.hostid=i.hostid AND '.DBin_node('t.triggerid')));
+	                    ' WHERE i.itemid=f.itemid '.
+							' AND f.triggerid=t.triggerid '.
+							' AND t.triggerid='.$_REQUEST["triggerid"].
+							' AND h.hostid=i.hostid '.
+							' AND '.DBin_node('t.triggerid')));
 ?>
 <?php
 	$_REQUEST["limit"] = get_request("limit","NO");

@@ -1,3 +1,8 @@
+Changes for 1.0.8
+
+ - [NTD-42] fixed pages error (Artem)
+ - [NTD-39] fixed filter reset button (Artem)
+
 Changes for 1.0.7
 
  - [NTD-41] fixed popup menu (Artem)
