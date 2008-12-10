@@ -159,7 +159,7 @@ typedef enum {
 #define HTTPSTEP_REQUIRED_LEN		255
 #define HTTPSTEP_REQUIRED_LEN_MAX	HTTPSTEP_REQUIRED_LEN+1
 
-#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.errors_from,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status,i.trapper_hosts,i.logtimefmt,i.valuemapid,i.delay_flex,h.dns,i.params,i.trends,h.useipmi,h.ipmi_port,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password,i.ipmi_sensor,h.maintenance_status,h.maintenance_type,h.maintenance_from,i.lastlogsize,i.data_type,i.ipmi_ip"
+#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.errors_from,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status,i.trapper_hosts,i.logtimefmt,i.valuemapid,i.delay_flex,h.dns,i.params,i.trends,h.useipmi,h.ipmi_port,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password,i.ipmi_sensor,h.maintenance_status,h.maintenance_type,h.maintenance_from,i.lastlogsize,i.data_type,h.ipmi_ip"
 #define ZBX_SQL_ITEM_TABLES	"hosts h, items i"
 #define ZBX_SQL_ITEM_FIELDS_NUM	52
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
