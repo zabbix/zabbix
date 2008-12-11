@@ -684,7 +684,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 				else
 				{
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-							",prevorgvalue='" ZBX_FS_DBL "'",
+							",prevorgvalue='" ZBX_FS_UI64 "'",
 							h->value_orig.value_uint64);
 					h->value_null = 1;
 				}
