@@ -18,6 +18,7 @@ Changes for 1.7.0
 
 Changes for 1.6.2
 
+ - [ZBX-625] fixed possible incorrect processing of delta for integers if using dbcache (Sasha)
  - [DEV-273] added mass update for IPMI fields (Sasha)
  - [DEV-272] added support of {HOSTNAME}, {HOST.CONN}... macros for "IPMI IP address" (Sasha)
  - [ZBX-623] fixed incorrect processing of function abschange() for integers(Sasha)
