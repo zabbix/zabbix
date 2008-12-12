@@ -75,6 +75,13 @@ include_once 'include/page_header.php';
 	
 	$graph = new Chart($db_data['graphtype']);
 
+	$chart_header = '';
+	if(id2nodeid($db_data['hostid']) != get_current_nodeid()){
+		$chart_header = get_node_name_by_elid($db_data['hostid'], true);
+	}
+	$chart_header.= $db_data['host'].':'.$db_data['name'];
+	$graph->setHeader($chart_header);
+	
 	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
 	if(isset($_REQUEST['from']))		$graph->SetFrom($_REQUEST['from']);
 	if(isset($_REQUEST['stime']))		$graph->SetSTime($_REQUEST['stime']);
@@ -92,7 +99,7 @@ include_once 'include/page_header.php';
 
 	$graph->SetWidth($width);
 	$graph->SetHeight($height);
-	$graph->SetHeader($db_data['host'].':'.$db_data['name']);
+
 
 	$graph->SetYMinAxisType($db_data['ymin_type']);
 	$graph->SetYMaxAxisType($db_data['ymax_type']);
