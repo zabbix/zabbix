@@ -66,7 +66,7 @@ include_once 'include/page_header.php';
 	$items = get_request('items', array());
 	asort_by_key($items, 'sortorder');
 
-	foreach($items as $gitem){
+	foreach($items as $id => $gitem){
 		if(!$host = DBfetch(DBselect('select h.* from hosts h,items i where h.hostid=i.hostid and i.itemid='.$gitem['itemid']))){
 			fatal_error(S_NO_ITEM_DEFINED);
 		}
@@ -77,7 +77,13 @@ include_once 'include/page_header.php';
 	
 	$graph = new Chart(get_request('graphtype'	,GRAPH_TYPE_NORMAL));
 
-	$graph->SetHeader($host['host'].':'.get_request('name',''));
+	$chart_header = '';
+	if(id2nodeid($host['hostid']) != get_current_nodeid()){
+		$chart_header = get_node_name_by_elid($host['hostid'],true);
+	}
+	$chart_header.= $host['host'].':'.get_request('name','');
+	
+	$graph->setHeader($chart_header);
 
 	unset($host);
 

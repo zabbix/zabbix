@@ -95,8 +95,12 @@ include_once 'include/page_header.php';
 	$config = get_request('config',get_profile('web.avail_report.config',0));
 	update_profile('web.avail_report.config', $config, PROFILE_TYPE_INT);
 	
-	$options = array('allow_all_hosts','always_select_first_host','with_items');
+	$options = array('always_select_first_host','with_items');
 
+	if(isset($_REQUEST['groupid']) && (0 == $_REQUEST['groupid'])){
+		array_push($options,'allow_all_hosts');
+	}
+	
 	if(0 == $config){
 		array_push($options,'monitored_hosts');
 	}
