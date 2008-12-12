@@ -31,8 +31,8 @@ COpt::profiling_start("page");
 	
 	unset($denyed_page_requested);
 
-	if(!isset($page["type"])) $page["type"] = PAGE_TYPE_HTML;
-	if(!isset($page["file"])) $page["file"] = basename($_SERVER['PHP_SELF']);
+	if(!isset($page['type'])) $page['type'] = PAGE_TYPE_HTML;
+	if(!isset($page['file'])) $page['file'] = basename($_SERVER['PHP_SELF']);
 	
 	if($_REQUEST['fullscreen']=get_request('fullscreen', 0)) define('ZBX_PAGE_NO_MENU', 1);
 
@@ -42,7 +42,7 @@ COpt::profiling_start("page");
 	/* Init CURRENT NODE ID */
 
 	init_nodes();
-	
+
 	/* set Page header */
 	switch($page["type"]){
 		case PAGE_TYPE_IMAGE:

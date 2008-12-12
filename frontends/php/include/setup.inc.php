@@ -19,16 +19,14 @@
 **/
 ?>
 <?php
-	function zbx_is_callable($var)
-	{
+	function zbx_is_callable($var){
 		foreach($var as $e)
 			if(!is_callable($e)) return false;
 
 		return true;
 	}
 
-	class CSetupWizard extends CForm
-	{
+	class CSetupWizard extends CForm{
 /* protected *//*
 		var $ZBX_CONFIG;
 		var $DISABLE_NEXT_BUTTON;
@@ -36,8 +34,7 @@
 		*/
 
 /* public */	
-		function CSetupWizard(&$ZBX_CONFIG)
-		{
+		function CSetupWizard(&$ZBX_CONFIG){
 			$this->DISABLE_NEXT_BUTTON = false;
 			
 			$this->ZBX_CONFIG = &$ZBX_CONFIG;
@@ -59,40 +56,35 @@
 			parent::CForm(null, 'post');
 		}
 
-		function GetConfig($name, $default = null)
-		{
+		function getConfig($name, $default = null){
 			return isset($this->ZBX_CONFIG[$name]) ? $this->ZBX_CONFIG[$name] : $default;
 		}
-		function SetConfig($name, $value)
-		{
+		
+		function setConfig($name, $value){
 			return ($this->ZBX_CONFIG[$name] = $value);
 		}
 
-		function GetStep()
-		{
+		function GetStep(){
 			return $this->GetConfig('step', 0);
 		}
-		function DoNext()
-		{
-			if(isset($this->stage[$this->GetStep() + 1]))
-			{
+		
+		function DoNext(){
+			if(isset($this->stage[$this->GetStep() + 1])){
 				$this->ZBX_CONFIG['step']++;
 				return true;
 			}
-			return false;
+		return false;
 		}
-		function DoBack()
-		{
-			if(isset($this->stage[$this->GetStep() - 1]))
-			{
+
+		function DoBack(){
+			if(isset($this->stage[$this->GetStep() - 1])){
 				$this->ZBX_CONFIG['step']--;
 				return true;
 			}
-			return false;
+		return false;
 		}
 
-		function BodyToString($destroy=true)
-		{
+		function BodyToString($destroy=true){
 			$table = new CTable(null, 'setup_wizard');
 			$table->SetAlign('center');
 			$table->SetHeader(array(
@@ -119,29 +111,24 @@
 			return parent::BodyToString($destroy).$table->ToString();
 		}
 
-		function GetList()
-		{
+		function GetList(){
 			$list = new CList();
-			foreach($this->stage as $id => $data)
-			{
+			foreach($this->stage as $id => $data){
 				if($id < $this->GetStep()) $style = 'completed';
-				elseif($id == $this->GetStep()) $style = 'current';
+				else if($id == $this->GetStep()) $style = 'current';
 				else $style = null;
 				
 				$list->AddItem($data['title'], $style);
 			}
-			return $list;
+		return $list;
 		}
 
-		function GetState()
-		{
+		function GetState(){
 			$fnc = $this->stage[$this->GetStep()]['fnc'];
 			return  $this->$fnc();
 		}
 
-		function Stage0()
-		{
-
+		function Stage0(){			
 			return new CTag('div', 'yes', array('Welcome to the ZABBIX frontend installation wizard.',BR(),BR(),
 				'This installation wizard will guide you through the installation of ZABBIX frontend',BR(),BR(),
 				'Click to "Next" button to proceed to the next screen. If you want to change something '.
@@ -149,8 +136,7 @@
 				'You may cancel installation at any time by clicking "Cancel" button'), 'text');
 		}
 
-		function Stage1()
-		{
+		function Stage1(){
 			$LICENCE_FILE = 'conf/COPYING';
 
 			$this->DISABLE_NEXT_BUTTON = !$this->GetConfig('agree', false);
@@ -276,6 +262,7 @@
 				$gd_info = gd_info();
 				$gd_version = $gd_info['GD Version'];
 			}
+			
 			$table->AddRow(
 				$this->get_test_result(
 					$final_result,
@@ -333,7 +320,7 @@
 				$final_result = new CSpan(S_OK,'ok');
 			}
 			
-			return array($table, BR(), $final_result);
+		return array($table, BR(), $final_result);
 		}
 
 		function Stage3(){
@@ -516,29 +503,32 @@
 			global $DB;
 
 //			$old_DB		= $DB['DB'];
-			$old_DB_TYPE	= $DB['TYPE'];
-			$old_DB_SERVER	= $DB['SERVER'];
-			$old_DB_PORT	= $DB['PORT'];
-			$old_DB_DATABASE= $DB['DATABASE'];
-			$old_DB_USER	= $DB['USER'];
-			$old_DB_PASSWORD= $DB['PASSWORD'];
+			if(!empty($DB)){
+				$old_DB			= true;
+				$old_DB_TYPE	= $DB['TYPE'];
+				$old_DB_SERVER	= $DB['SERVER'];
+				$old_DB_PORT	= $DB['PORT'];
+				$old_DB_DATABASE= $DB['DATABASE'];
+				$old_DB_USER	= $DB['USER'];
+				$old_DB_PASSWORD= $DB['PASSWORD'];
+			}
 			
 			$DB['TYPE']	= $this->GetConfig('DB_TYPE');
 			if(is_null($DB['TYPE']))	return false;
 
 			$DB['SERVER']	= $this->GetConfig('DB_SERVER',		'localhost');
-			$DB['PORT']	= $this->GetConfig('DB_PORT',		'0');
+			$DB['PORT']		= $this->GetConfig('DB_PORT',		'0');
 			$DB['DATABASE']	= $this->GetConfig('DB_DATABASE',	'zabbix');
-			$DB['USER']	= $this->GetConfig('DB_USER',		'root');
+			$DB['USER']		= $this->GetConfig('DB_USER',		'root');
 			$DB['PASSWORD']	= $this->GetConfig('DB_PASSWORD',	'');
 
 			$error = '';
-			if(!($result = DBconnect($error))){
+			if(!$result = DBconnect($error)){
 				error($error);
 			}
 			else{
-				$result = DBexecute('create table zabbix_installation_test ( test_row integer )');
-				$result &= DBexecute('drop table zabbix_installation_test');
+				$result = DBexecute('CREATE table zabbix_installation_test ( test_row integer )');
+				$result &= DBexecute('DROP table zabbix_installation_test');
 			}
 			
 			DBclose();
@@ -551,14 +541,15 @@
 			/* restore connection */
 			global $DB;
 
-//			$DB['DB']		= $old_DB;
-			$DB['TYPE']		= $old_DB_TYPE;
-			$DB['SERVER']	= $old_DB_SERVER;
-			$DB['PORT']		= $old_DB_PORT;
-			$DB['DATABASE']	= $old_DB_DATABASE;
-			$DB['USER']		= $old_DB_USER;
-			$DB['PASSWORD']	= $old_DB_PASSWORD;
-
+			if(isset($old_DB)){
+				$DB['TYPE']		= $old_DB_TYPE;
+				$DB['SERVER']	= $old_DB_SERVER;
+				$DB['PORT']		= $old_DB_PORT;
+				$DB['DATABASE']	= $old_DB_DATABASE;
+				$DB['USER']		= $old_DB_USER;
+				$DB['PASSWORD']	= $old_DB_PASSWORD;
+			}
+			
 			DBconnect($error);
 
 		return $result;
@@ -654,23 +645,26 @@
 		{
 			global $DB,$ZBX_SERVER,$ZBX_SERVER_PORT;
 
-//			$old_DB				= $DB['DB'];
-			$old_DB_TYPE		= $DB['TYPE'];
-			$old_DB_SERVER		= $DB['SERVER'];
-			$old_DB_PORT		= $DB['PORT'];
-			$old_DB_DATABASE	= $DB['DATABASE'];
-			$old_DB_USER		= $DB['USER'];
-			$old_DB_PASSWORD	= $DB['PASSWORD'];
-			$old_ZBX_SERVER		= $ZBX_SERVER;
-			$old_ZBX_SERVER_PORT	= $ZBX_SERVER_PORT;
+			if(!empty($DB)){
+				$old_DB				= true;
+				$old_DB_TYPE		= $DB['TYPE'];
+				$old_DB_SERVER		= $DB['SERVER'];
+				$old_DB_PORT		= $DB['PORT'];
+				$old_DB_DATABASE	= $DB['DATABASE'];
+				$old_DB_USER		= $DB['USER'];
+				$old_DB_PASSWORD	= $DB['PASSWORD'];
+				
+				$old_ZBX_SERVER		= $ZBX_SERVER;
+				$old_ZBX_SERVER_PORT	= $ZBX_SERVER_PORT;
+			}
+			
 
 			$error = null;
 			$error_msg = null;
 
 			global $ZBX_CONFIGURATION_FILE;
 						
-			if(file_exists($ZBX_CONFIGURATION_FILE))
-			{
+			if(file_exists($ZBX_CONFIGURATION_FILE)){
 				include $ZBX_CONFIGURATION_FILE;
 
 				if(	isset($DB['TYPE']) && 
@@ -689,69 +683,60 @@
 					$DB['PASSWORD']		== $this->GetConfig('DB_PASSWORD',			null)
 					)
 				{
-					if(!DBconnect($error_msg))
-					{
+					if(!DBconnect($error_msg)){
 						$error_msg = 'Can not connect to database';
 					}
 				}
-				else
-				{
+				else{
 					$error_msg = 'Incorrect configuration file['.$ZBX_CONFIGURATION_FILE.']';
 				}
 				DBclose();
 			}
-			else
-			{
+			else{
 				$error = 'Missing configuration file['.$ZBX_CONFIGURATION_FILE.']';
 			}
 			
-			if(isset($error_msg))
-			{
+			if(isset($error_msg)){
 				error($error_msg);
 			}
 
 			/* restore connection */
 			global $DB;
 
-//			$DB['DB']		= $old_DB;
-			$DB['TYPE']	= $old_DB_TYPE;
-			$DB['SERVER']	= $old_DB_SERVER;
-			$DB['PORT']	= $old_DB_PORT;
-			$DB['DATABASE']	= $old_DB_DATABASE;
-			$DB['USER']	= $old_DB_USER;
-			$DB['PASSWORD']	= $old_DB_PASSWORD;
-			$ZBX_SERVER	= $old_ZBX_SERVER;
-			$ZBX_SERVER_PORT= $old_ZBX_SERVER_PORT;
+			if(isset($old_DB)){
+				$DB['TYPE']		= $old_DB_TYPE;
+				$DB['SERVER']	= $old_DB_SERVER;
+				$DB['PORT']		= $old_DB_PORT;
+				$DB['DATABASE']	= $old_DB_DATABASE;
+				$DB['USER']		= $old_DB_USER;
+				$DB['PASSWORD']	= $old_DB_PASSWORD;
+				
+				$ZBX_SERVER	= $old_ZBX_SERVER;
+				$ZBX_SERVER_PORT= $old_ZBX_SERVER_PORT;
+			}
 
 			DBconnect($error2);
 
 			return !isset($error)&&!isset($error_msg);
 		}
 		
-		function EventHandler()
-		{
-			global $_REQUEST;
-
+		function EventHandler(){
 			if(isset($_REQUEST['back'][$this->GetStep()]))	$this->DoBack();	
 
-			if($this->GetStep() == 1)
-			{
-				if(!isset($_REQUEST['next'][0]) && !isset($_REQUEST['back'][2]))
-				{
-					$this->SetConfig('agree', isset($_REQUEST['agree']));
+			if($this->GetStep() == 1){
+				if(!isset($_REQUEST['next'][0]) && !isset($_REQUEST['back'][2])){
+					$this->setConfig('agree', isset($_REQUEST['agree']));
 				}
 				
-				if(isset($_REQUEST['next'][$this->GetStep()]) && $this->GetConfig('agree', false))
-				{
+				if(isset($_REQUEST['next'][$this->GetStep()]) && $this->GetConfig('agree', false)){
 					$this->DoNext();
 				}
 			}
-			if($this->GetStep() == 2 && isset($_REQUEST['next'][$this->GetStep()]) && !isset($_REQUEST['trouble']))
-			{
+			
+			if($this->GetStep() == 2 && isset($_REQUEST['next'][$this->GetStep()]) && !isset($_REQUEST['trouble'])){
 				$this->DoNext();
 			}
-			if($this->GetStep() == 3)
-			{
+			if($this->GetStep() == 3){
 				$this->SetConfig('DB_TYPE',	get_request('type',	$this->GetConfig('DB_TYPE')));
 				$this->SetConfig('DB_SERVER',	get_request('server',	$this->GetConfig('DB_SERVER',	'localhost')));
 				$this->SetConfig('DB_PORT',	get_request('port',	$this->GetConfig('DB_PORT',	'0')));
@@ -759,15 +744,15 @@
 				$this->SetConfig('DB_USER',	get_request('user',	$this->GetConfig('DB_USER',	'root')));
 				$this->SetConfig('DB_PASSWORD',	get_request('password',	$this->GetConfig('DB_PASSWORD',	'')));
 		
-				if(!$this->CheckConnection())
-				{
+				if(!$this->CheckConnection()){
 					$this->DISABLE_NEXT_BUTTON = true;
 					unset($_REQUEST['next']);
 				}
+				
 				if(isset($_REQUEST['next'][$this->GetStep()]))		$this->DoNext();
 			}
-			if($this->GetStep() == 4)
-			{
+			
+			if($this->GetStep() == 4){
 				$this->SetConfig('ZBX_SERVER',		get_request('zbx_server',	$this->GetConfig('ZBX_SERVER',		'localhost')));
 				$this->SetConfig('ZBX_SERVER_PORT',	get_request('zbx_server_port',	$this->GetConfig('ZBX_SERVER_PORT',	'10051')));
 				if(isset($_REQUEST['next'][$this->GetStep()]))		$this->DoNext();
