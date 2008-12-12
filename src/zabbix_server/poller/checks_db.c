@@ -159,15 +159,8 @@ int	get_value_db(DB_ITEM *item, AGENT_RESULT *result)
 		{
 			if( NULL != (row = odbc_DBfetch(odbc_DBselect(&dbh, db_sql))) )
 			{
-				if( SUCCEED == set_result_type(result, item->value_type, item->data_type, row[0]) )
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "Result accepted with type 0x%02X [%s]", item->value_type, row[0]);
+				if (SUCCEED == set_result_type(result, item->value_type, row[0]))
 					ret = SUCCEED;
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "Cant determine result type [%s]", row[0]);
-				}
 			}
 			else
 			{

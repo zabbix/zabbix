@@ -92,15 +92,8 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, strdup(buffer));
 			ret = NETWORK_ERROR;
 		}
-		else if (FAIL == set_result_type(result, item->value_type, item->data_type, buf))
-		{
-			zbx_remove_chars(buf, "\r\n");
-			zbx_snprintf(buffer, sizeof(buffer), "Type of received value [%s] is not suitable for value type [%s]",
-					buf,
-					zbx_item_value_type_string(item->value_type));
-			SET_MSG_RESULT(result, strdup(buffer));
+		else if (SUCCEED != set_result_type(result, item->value_type, item->data_type, buf))
 			ret = NOTSUPPORTED;
-		}
 	}
 	else
 	{

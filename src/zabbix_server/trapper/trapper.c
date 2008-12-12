@@ -144,7 +144,7 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
-	char		host_esc[MAX_STRING_LEN], key_esc[MAX_STRING_LEN], error[MAX_STRING_LEN];
+	char		host_esc[MAX_STRING_LEN], key_esc[MAX_STRING_LEN];
 	static char	*sql = NULL;
 	static int	sql_allocated = 65536;
 	int		sql_offset = 0, i;
@@ -288,13 +288,10 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 					}
 					else
 					{
-						zbx_remove_chars(values[i].value, "\r\n");
-						zbx_snprintf(error, sizeof(error), "Item [%s] error: Type of received value [%s] is not suitable for value type [%s]",
-								zbx_host_key_string_by_item(&item),
-								values[i].value,
-								zbx_item_value_type_string(item.value_type));
-						zabbix_log(LOG_LEVEL_WARNING, "%s", error);
-						zabbix_syslog("%s", error);
+						if (GET_MSG_RESULT(&agent))
+							zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s",
+									zbx_host_key_string_by_item(&item),
+									agent.msg);
 					}
 					free_result(&agent);
 			 	}
