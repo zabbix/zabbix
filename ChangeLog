@@ -1,5 +1,6 @@
 Changes for 1.6.2
 
+ - [ZBX-611] fixed undefined variables in installation wizard (Artem)
  - [ZBX-612] fixed possible incorrect value for host (Artem)
  - [ZBX-627] fixed items update (Artem)
  - [ZBX-625] fixed possible incorrect processing of delta for integers if using dbcache (Sasha)
