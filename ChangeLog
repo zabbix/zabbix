@@ -1,5 +1,6 @@
 Changes for 1.6.2
 
+ - [ZBX-627] fixed items update (Artem)
  - [ZBX-625] fixed possible incorrect processing of delta for integers if using dbcache (Sasha)
  - [DEV-273] added mass update for IPMI fields (Sasha)
  - [DEV-272] added support of {HOSTNAME}, {HOST.CONN}... macros for "IPMI IP address" (Sasha)

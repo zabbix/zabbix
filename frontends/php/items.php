@@ -913,7 +913,7 @@ include_once "include/page_header.php";
 
 		$from_tables['i'] = 'items i'; /* NOTE: must be added as last element to use left join */
 
-		$sql = 'SELECT DISTINCT th.host as template_host,th.hostid as template_hostid, h.host, i.* '.
+		$sql = 'SELECT DISTINCT th.host as template_host,th.hostid as template_hostid, h.host, h.hostid, i.* '.
 				' FROM '.implode(',', $from_tables).
 					' LEFT JOIN items ti ON i.templateid=ti.itemid '.
 					' LEFT JOIN hosts th ON ti.hostid=th.hostid '.
@@ -938,8 +938,10 @@ include_once "include/page_header.php";
 
 			array_push($description, new CLink(
 				item_description($db_item),
-				"?form=update&itemid=".
-				$db_item["itemid"].url_param("hostid").url_param("groupid"),
+				'?form=update&itemid='.$db_item['itemid'].
+				'&hostid='.$db_item['hostid'],
+//				url_param('hostid').
+//				url_param('groupid'),
 				'action'));
 
 			$status=new CCol(new CLink(item_status2str($db_item["status"]),
