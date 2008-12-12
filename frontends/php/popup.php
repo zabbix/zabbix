@@ -918,7 +918,7 @@ include_once "include/page_header.php";
 			' WHERE gi.graphid=g.graphid '.
 				' AND i.itemid=gi.itemid '.
 				' AND h.hostid=i.hostid '.
-				' AND '.DBin_node('h.hostid').
+				' AND '.DBin_node('h.hostid', $nodeid).
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND '.DBcondition('g.graphid',$available_graphs);
 

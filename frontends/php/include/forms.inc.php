@@ -2971,7 +2971,7 @@
 		$cond_el = new CTable(S_NO_CONDITIONS_DEFINED);
 		$i=0;
 		
-		foreach($conditions as $val){
+		foreach($conditions as $id => $val){
 			if( !isset($val['type']) )	$val['type'] = 0;
 			if( !isset($val['operator']) )	$val['operator'] = 0;
 			if( !isset($val['value']) )	$val['value'] = 0;
@@ -2980,8 +2980,8 @@
 
 			$label = chr(ord('A') + $i);
 			$cond_el->AddRow(array('('.$label.')',array(
-					new CCheckBox("g_conditionid[]", 'no', null,$i),
-					get_condition_desc($val["type"], $val["operator"], $val["value"]))
+					new CCheckBox('g_conditionid[]', 'no', null,$i),
+					get_condition_desc($val['type'], $val['operator'], $val['value']))
 				));
 				
 			$tblCond->AddItem(new CVar("conditions[$i][type]", 	$val["type"]));
