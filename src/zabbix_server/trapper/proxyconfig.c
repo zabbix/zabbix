@@ -79,9 +79,10 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " where t.proxy_hostid=" ZBX_FS_UI64,
 				proxy_hostid);
 	else
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ", %1$s r where t.%2$s=r.%2$s"
-				" and r.proxy_hostid="ZBX_FS_UI64_NO(3),
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ", %s r where t.%s=r.%s"
+				" and r.proxy_hostid=" ZBX_FS_UI64,
 				reltable,
+				relfield,
 				relfield,
 				proxy_hostid);
 

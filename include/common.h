@@ -659,6 +659,7 @@ int	find_char(char *str,char c);
 int	is_double_prefix(char *str);
 int	is_double(char *c);
 int	is_uint(char *c);
+int	is_uint64(register char *str, zbx_uint64_t *value);
 int	is_uoct(char *str);
 int	is_uhex(char *str);
 void	zbx_rtrim(char *str, const char *charlist);

@@ -33,7 +33,6 @@
 #	define ZBX_FS_UI64 "%I64u"
 #	define ZBX_FS_UO64 "%I64o"
 #	define ZBX_FS_UX64 "%I64x"
-#	define ZBX_FS_UI64_NO(n) "%"#n"$I64u"
 
 #	define zbx_pid_t	int
 
@@ -62,19 +61,16 @@
 #		define ZBX_FS_UI64 "%lu"
 #		define ZBX_FS_UO64 "%lo"
 #		define ZBX_FS_UX64 "%lx"
-#		define ZBX_FS_UI64_NO(n) "%"#n"$lu"
 #		define ZBX_OFFSET 10000000000000000UL
 #	else /* __WORDSIZE == 64 */
 #		ifdef HAVE_LONG_LONG_QU
 #			define ZBX_FS_UI64 "%qu"
 #			define ZBX_FS_UO64 "%qo"
 #			define ZBX_FS_UX64 "%qx"
-#			define ZBX_FS_UI64_NO(n) "%"#n"$qu"
 #		else
 #			define ZBX_FS_UI64 "%llu"
 #			define ZBX_FS_UO64 "%llo"
 #			define ZBX_FS_UX64 "%llx"
-#			define ZBX_FS_UI64_NO(n) "%"#n"$llu"
 #		endif
 #		define ZBX_OFFSET 10000000000000000ULL
 #	endif /* __WORDSIZE == 64 */
