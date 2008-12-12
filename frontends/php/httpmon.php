@@ -117,6 +117,7 @@ include_once "include/page_header.php";
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 
+	$correct_group = false;
 	$sql = 'SELECT DISTINCT g.groupid,g.name '.
 		' FROM groups g, hosts_groups hg, hosts h '.
 		' WHERE '.DBcondition('g.groupid',$available_groups).
@@ -129,17 +130,19 @@ include_once "include/page_header.php";
 								' AND ht.applicationid=a.applicationid '.
 								' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')'.
 		' ORDER BY g.name';
-
 	$result=DBselect($sql);
 	while($row=DBfetch($result)){
-		if($_REQUEST['groupid'] == -1) $_REQUEST['groupid'] = $row['groupid'];
+		if($_REQUEST['groupid'] == $row['groupid']) $correct_group = true;
+		else if(!isset($first_group)) $first_group = $row['groupid'];
+		
 		$cmbGroup->AddItem(
 					$row['groupid'],
 					get_node_name_by_elid($row['groupid']).$row['name'],
 					(bccomp($_REQUEST['groupid'],$row['groupid'])==0)?1:0
 				);
 	}
-
+	if(!$correct_group) $_REQUEST['groupid'] = $first_group;
+	
 //	Supposed to be here
 	validate_group_with_host(PERM_READ_ONLY,$options);
 
@@ -147,6 +150,7 @@ include_once "include/page_header.php";
 	$form->AddItem($cmbGroup);
 
 	if($_REQUEST['hostid'] > 0){
+	
 		$httptests_by_host = get_httptests_by_hostid($_REQUEST['hostid']);
 		if(!DBfetch($httptests_by_host)){
 			$_REQUEST['hostid'] = -1;
