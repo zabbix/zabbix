@@ -278,10 +278,10 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 		$ZBX_CURRENT_SUBNODES[$ZBX_CURRENT_NODEID] = $ZBX_CURRENT_NODEID;
 
-		if ( count($ZBX_CURRENT_SUBNODES) < 2 && !defined('ZBX_DISABLE_SUBNODES') )
+		if((count($ZBX_CURRENT_SUBNODES) < 2) && !defined('ZBX_DISABLE_SUBNODES'))
 			define('ZBX_DISABLE_SUBNODES', 1);
-
-		$ZBX_CURRENT_SUBNODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_IDS_ARRAY, $ZBX_CURRENT_SUBNODES);
+		else		
+			$ZBX_CURRENT_SUBNODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_IDS_ARRAY, $ZBX_CURRENT_SUBNODES);
 	}
 
 	function get_current_nodeid($forse_with_subnodes = null, $perm = null){

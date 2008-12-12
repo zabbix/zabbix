@@ -602,7 +602,6 @@ else {
 
 	function DBid2nodeid($id_name){
 		global $DB;
-
 		switch($DB['TYPE']){
 			case "MYSQL":
 				$result = '('.$id_name.' div 100000000000000)';
