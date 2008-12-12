@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-274] added overflow check for uint64 for incoming values (Sasha)
  - [DEV-258] added additional reports based on bar graphs (Artem)
  - [DEV-257] added bar graph class (Artem)
  - [DEV-252] improved audit log of host groups,hosts,items and media types (Sasha)
@@ -18,7 +19,6 @@ Changes for 1.7.0
 
 Changes for 1.6.2
 
- - [DEV-274] added overflow check for uint64 for incoming values (Sasha)
  - [ZBX-611] fixed undefined variables in installation wizard (Artem)
  - [ZBX-612] fixed possible incorrect value for host (Artem)
  - [ZBX-627] fixed items update (Artem)
