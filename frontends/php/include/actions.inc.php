@@ -371,21 +371,24 @@ function	condition_type2str($conditiontype)
 	return S_UNKNOWN;
 }
 	
-function	condition_value2str($conditiontype, $value)
-{
-	switch($conditiontype)
-	{
+function condition_value2str($conditiontype, $value){
+	switch($conditiontype){
 		case CONDITION_TYPE_HOST_GROUP:
-			$str_val = get_hostgroup_by_groupid($value);
-			$str_val = $str_val['name'];
+			$group = get_hostgroup_by_groupid($value);
+			
+			$str_val = '';
+			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true);
+			$str_val.= $group['name'];
 			break;
 		case CONDITION_TYPE_TRIGGER:
 			$str_val = expand_trigger_description($value);
 			break;
 		case CONDITION_TYPE_HOST:
 		case CONDITION_TYPE_HOST_TEMPLATE:
-			$str_val = get_host_by_hostid($value);
-			$str_val = $str_val['host'];
+			$host = get_host_by_hostid($value);			
+			$str_val = '';
+			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true);
+			$str_val.= $host['host'];
 			break;
 		case CONDITION_TYPE_TRIGGER_NAME:
 			$str_val = $value;
@@ -433,8 +436,7 @@ function	condition_value2str($conditiontype, $value)
 	return '"'.$str_val.'"';
 }
 
-function	get_condition_desc($conditiontype, $operator, $value)
-{
+function get_condition_desc($conditiontype, $operator, $value){
 	return condition_type2str($conditiontype).' '.
 		condition_operator2str($operator).' '.
 		condition_value2str($conditiontype, $value);
