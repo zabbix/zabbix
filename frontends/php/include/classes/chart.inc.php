@@ -490,13 +490,7 @@ class Chart extends Graph{
 		}
 	}
 
-	function drawElement(
-		&$data, $from, $to, 
-		$minX, $maxX, $minY, $maxY, 
-		$drawtype, $max_color, $avg_color, $min_color, $minmax_color,
-		$calc_fnc, 
-		$axisside
-		){	
+	function drawElement(&$data, $from, $to, $minX, $maxX, $minY, $maxY, $drawtype, $max_color, $avg_color, $min_color, $minmax_color,$calc_fnc, $axisside){	
 		if(!isset($data->max[$from]) || !isset($data->max[$to])) return;
 
 		$oxy = $this->oxy[$axisside];
@@ -557,7 +551,7 @@ class Chart extends Graph{
 				$a[4] = $x2;		$a[5] = $y2min;
 				$a[6] = $x2;		$a[7] = $y2max;
 				
-				ImageFilledPolygon($this->im,$a,4,$minmax_color);
+				imagefilledpolygon($this->im,$a,4,$minmax_color);
 				imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
 				imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
 				
@@ -578,7 +572,24 @@ class Chart extends Graph{
 		
 		$y1_shift	= $zero - $shift_from/$unit2px;
 		$y2_shift	= $zero - $shift_to/$unit2px;//*/
+		
+		
+// Fixes graph out of bounds problem
+		if( (($y1 > ($this->sizeY+$this->shiftY)) && ($y2 > ($this->sizeY+$this->shiftY))) || (($y1 < $this->shiftY) && ($y2 < $this->shiftY)) ){
+			return true;
+		}
 
+		$y_first = !(($y1 > ($this->sizeY+$this->shiftY)) || ($y1 < $this->shiftY));
+		$y_second = !(($y2 > ($this->sizeY+$this->shiftY)) || ($y2 < $this->shiftY));
+		
+		if(!$y_first){
+			$y1 = ($y1 > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
+		}
+		else if(!$y_second){
+			$y2 = ($y2 > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
+		}
+//--------
+			
 		/* draw main line */
 		switch($drawtype){
 			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:
@@ -596,7 +607,7 @@ class Chart extends Graph{
 				
 //					SDI($a);
 				
-				ImageFilledPolygon($this->im,$a,4,$avg_color);
+				imagefilledpolygon($this->im,$a,4,$avg_color);
 				break;
 			case GRAPH_ITEM_DRAWTYPE_DOT:
 				imagefilledrectangle($this->im,$x1-1,$y1-1,$x1+1,$y1+1,$avg_color);
