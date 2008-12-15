@@ -596,13 +596,19 @@ const char *zbx_permission_string(int perm);
 #define strscpy(x,y) zbx_strlcpy(x,y,sizeof(x))
 #define strnscpy(x,y,n) zbx_strlcpy(x,y,n);
 
-#define	zbx_malloc(old, size) zbx_malloc2(__FILE__,__LINE__,old , size)
+#define	zbx_malloc(old, size) zbx_malloc2(__FILE__, __LINE__, old , size)
+#define	zbx_realloc(old, size) zbx_realloc2(__FILE__, __LINE__, old , size)
 
 void    *zbx_malloc2(char *filename, int line, void *old, size_t size);
-void    *zbx_realloc(void *src, size_t size);
+void    *zbx_realloc2(char *filename, int line, void *src, size_t size);
 
-#define zbx_free(ptr) { if(ptr){ free(ptr); ptr = NULL; } }
-	
+#define zbx_free(ptr)		\
+	if (ptr)		\
+	{			\
+		/*fprintf(stderr, "%-6li => [file:%s,line:%d] zbx_free: %p\n", (long int)getpid(), __FILE__, __LINE__, ptr);*/	\
+		free(ptr);	\
+		ptr = NULL;	\
+	}
 #define zbx_fclose(f) { if(f){ fclose(f); f = NULL; } }
 
 /*#define ZBX_COND_NODEID " %s>=100000000000000*%d and %s<=(100000000000000*%d+99999999999999) "*/

@@ -53,12 +53,10 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	char			buf[MAX_STRING_LEN], *esc;
 	zbx_uint64_t		recid;
 	const char		*pf;
-	static zbx_uint64_t	*new = NULL, *old = NULL;
-	static int		new_alloc = 100, old_alloc = 100;
-	int			new_num = 0, old_num = 0;
-	static char		*sql = NULL;
-	static int		sql_alloc = 4096;
-	int			sql_offset;
+	zbx_uint64_t		*new = NULL, *old = NULL;
+	int			new_alloc = 100, new_num = 0, old_alloc = 100, old_num = 0;
+	char			*sql = NULL;
+	int			sql_alloc = 4096, sql_offset;
 	DB_RESULT		result;
 	DB_ROW			row;
 
@@ -71,12 +69,9 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 		return FAIL;
 	}
 
-	if (NULL == new)
-		new = zbx_malloc(new, new_alloc * sizeof(zbx_uint64_t));
-	if (NULL == old)
-		old = zbx_malloc(old, old_alloc * sizeof(zbx_uint64_t));
-	if (NULL == sql)
-		sql = zbx_malloc(sql, sql_alloc * sizeof(char));
+	new = zbx_malloc(new, new_alloc * sizeof(zbx_uint64_t));
+	old = zbx_malloc(old, old_alloc * sizeof(zbx_uint64_t));
+	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
 
 	result = DBselect("select %s from %s", table->recid, table->table);
 	while (NULL != (row = DBfetch(result)))
@@ -90,10 +85,8 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *                    ^
- */	if (NULL == (p = zbx_json_pair_by_name(&jp_obj, "fields"))) {
-		zabbix_log(LOG_LEVEL_WARNING, "Can't find \"fields\" pair");
-		return FAIL;
-	}
+ */	if (NULL == (p = zbx_json_pair_by_name(&jp_obj, "fields")))
+		goto json_error;
 
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *                    ^-------------------^
@@ -116,17 +109,15 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 		if (NULL == fields[field_count]) {
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid field name \"%s\"",
 					buf);
-			return FAIL;
+			goto db_error;
 		}
 		field_count++;
 	}
 
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *                                                 ^
- */	if (NULL == (p = zbx_json_pair_by_name(&jp_obj, "data"))) {
-		zabbix_log(LOG_LEVEL_WARNING, "Can't find \"data\" pair");
-		return FAIL;
-	}
+ */	if (NULL == (p = zbx_json_pair_by_name(&jp_obj, "data")))
+		goto json_error;
 
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *                                                 ^-----------------------------------^
@@ -137,7 +128,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	sql_offset = 0;
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
 #endif
 
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
@@ -181,7 +172,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 				zabbix_log(LOG_LEVEL_WARNING, "Invalid number of fields \"%.*s\"",
 						jp_row.end - jp_row.start + 1,
 						jp_row.start);
-				return FAIL;
+				goto db_error;
 			}
 
 			if (fields[f]->type == ZBX_TYPE_INT || fields[f]->type == ZBX_TYPE_UINT || fields[f]->type == ZBX_TYPE_ID || fields[f]->type == ZBX_TYPE_FLOAT)
@@ -198,6 +189,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 				esc = DBdyn_escape_string(buf);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(esc) + 8, "'%s',", esc);
+				zbx_free(esc);
 			}
 			f++;
 		}
@@ -207,7 +199,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid number of fields \"%.*s\"",
 					jp_row.end - jp_row.start + 1,
 					jp_row.start);
-			return FAIL;
+			goto db_error;
 		}
 
 		sql_offset--;
@@ -218,11 +210,25 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 					table->recid,
 					recid);
 
+		if (sql_offset > ZBX_MAX_SQL_SIZE)
+		{
+#ifdef HAVE_ORACLE
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+#endif
+			if (ZBX_DB_OK > DBexecute("%s", sql))
+				goto db_error;
+
+			sql_offset = 0;
+#ifdef HAVE_ORACLE
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+#endif
+		}
+
 		uint64_array_add(&new, &new_alloc, &new_num, recid);
 	}
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
 #endif
 
 	if (sql_offset > 16) /* In ORACLE always present begin..end; */
@@ -242,12 +248,20 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_proxyconfig_table()");
 
+	zbx_free(sql);
+	zbx_free(new);
+	zbx_free(old);
+
 	return SUCCEED;
 json_error:
 	zabbix_log(LOG_LEVEL_DEBUG, "Can't proceed table \"%s\". %s",
 			tablename,
 			zbx_json_strerror());
 db_error:
+	zbx_free(sql);
+	zbx_free(new);
+	zbx_free(old);
+
 	return FAIL;
 }
 
@@ -356,7 +370,6 @@ exit:
 void	main_proxyconfig_loop()
 {
 	struct	sigaction phan;
-	int	start, sleeptime;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_proxyconfig_loop()");
 
@@ -366,8 +379,6 @@ void	main_proxyconfig_loop()
 	sigaction(SIGALRM, &phan, NULL);
 
 	for (;;) {
-		start = time(NULL);
-
 		zbx_setproctitle("configuration syncer [connecting to the database]]");
 
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -378,14 +389,10 @@ void	main_proxyconfig_loop()
 
 		DBclose();
 
-		sleeptime = CONFIG_PROXYCONFIG_FREQUENCY - (time(NULL) - start);
-
-		if (sleeptime > 0) {
-			zbx_setproctitle("configuration syncer [sleeping for %d seconds]",
-					sleeptime);
-			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
-					sleeptime);
-			sleep(sleeptime);
-		}
+		zbx_setproctitle("configuration syncer [sleeping for %d seconds]",
+				CONFIG_PROXYCONFIG_FREQUENCY);
+		zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
+				CONFIG_PROXYCONFIG_FREQUENCY);
+		sleep(CONFIG_PROXYCONFIG_FREQUENCY);
 	}
 }
