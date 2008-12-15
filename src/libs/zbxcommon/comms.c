@@ -179,9 +179,13 @@ void    *zbx_malloc2(char *filename, int line, void *old, size_t size)
 		max_attempts--
 	);
 
-	if(ptr) return ptr;
+	if (ptr)
+	{
+/*		fprintf(stderr, "%-6li => [file:%s,line:%d] zbx_malloc: %p %lu bytes\n", (long int)getpid(), filename, line, ptr, size);*/
+		return ptr;
+	}
 
-	zabbix_log(LOG_LEVEL_CRIT,"zbx_malloc: out of memory. requested '%lu' bytes.", size);
+	zabbix_log(LOG_LEVEL_CRIT,"[file:%s,line:%d] zbx_malloc: out of memory. requested '%lu' bytes.", filename, line, size);
 	exit(FAIL);
 
 	/* Program will never reach this point. */
@@ -204,7 +208,7 @@ void    *zbx_malloc2(char *filename, int line, void *old, size_t size)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void    *zbx_realloc(void *src, size_t size)
+void    *zbx_realloc2(char *filename, int line, void *src, size_t size)
 {
 	register int max_attempts;
 	void *ptr = NULL;
@@ -218,9 +222,13 @@ void    *zbx_realloc(void *src, size_t size)
 		max_attempts--
 	);
 
-	if(ptr) return ptr;
+	if (ptr)
+	{
+/*		fprintf(stderr, "%-6li => [file:%s,line:%d] zbx_realloc: %p %lu bytes\n", (long int)getpid(), filename, line, ptr, size);*/
+		return ptr;
+	}
 
-	zabbix_log(LOG_LEVEL_CRIT,"zbx_realloc: out of memory. requested '%lu' bytes.", size);
+	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_realloc: out of memory. requested '%lu' bytes.", filename, line, size);
 	exit(FAIL);
 
 	/* Program will never reach this point. */
