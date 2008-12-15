@@ -141,7 +141,7 @@ include_once "include/page_header.php";
 					(bccomp($_REQUEST['groupid'],$row['groupid'])==0)?1:0
 				);
 	}
-	if(!$correct_group) $_REQUEST['groupid'] = $first_group;
+	if(!$correct_group && isset($first_group)) $_REQUEST['groupid'] = $first_group;
 	
 //	Supposed to be here
 	validate_group_with_host(PERM_READ_ONLY,$options);
