@@ -1,5 +1,6 @@
 Changes for 1.6.2
 
+ - [DEV-271] fixed graphs out of bounds problem (Artem)
  - [ZBX-628] fixed memory leak in proxy module (Sasha)
  - [ZBX-611] fixed undefined variables in installation wizard (Artem)
  - [ZBX-612] fixed possible incorrect value for host (Artem)
