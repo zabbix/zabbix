@@ -883,7 +883,7 @@ include_once "include/page_header.php";
 		$table = new CTableInfo(S_NO_NODES_DEFINED);
 		$table->SetHeader(S_NAME);
 
-		$result = DBselect('SELECT DISTINCT * from nodes where nodeid in ('.$available_nodes.')');
+		$result = DBselect('SELECT DISTINCT * FROM nodes WHERE '.DBcondition('nodeid',$available_nodes));
 		while($row = DBfetch($result)){
 			$name = new CLink($row["name"],"#","action");
 			
