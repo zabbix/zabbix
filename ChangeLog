@@ -19,6 +19,7 @@ Changes for 1.7.0
 
 Changes for 1.6.2
 
+ - [ZBX-630] improved log files view in BB theme (Artem)
  - [ZBX-629] fixed sql error in popup window (Artem)
  - [DEV-271] fixed graphs out of bounds problem (Artem)
  - [ZBX-628] fixed memory leak in proxy module (Sasha)
