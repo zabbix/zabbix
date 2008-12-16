@@ -1774,6 +1774,8 @@ static void DCvacuum_text()
 	if (NULL != first_text)
 	{
 		offset = first_text - cache->text;
+		memmove(cache->text, first_text, ZBX_TEXTBUFFER_SIZE - offset);
+		
 		for (i = 0; i < cache->history_num; i++)
 		{
 			index = (cache->history_first + i) % ZBX_HISTORY_SIZE;
