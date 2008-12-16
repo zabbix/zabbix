@@ -620,15 +620,16 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 		case ITEM_VALUE_TYPE_FLOAT:
 			switch (item.delta) {
 			case ITEM_STORE_AS_IS:
-				h->value.value_float = h->value_orig.value_float;
+				h->value.value_float = DBmultiply_value_float(&item, h->value_orig.value_float);
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-						",prevvalue=lastvalue,lastvalue='" ZBX_FS_DBL "'",
-						h->value_orig.value_float);
+						",prevvalue=lastvalue,prevorgvalue=NULL,lastvalue='" ZBX_FS_DBL "'",
+						h->value.value_float);
 				break;
 			case ITEM_STORE_SPEED_PER_SECOND:
 				if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value_orig.value_float && item.lastclock < h->clock)
 				{
 					h->value.value_float = (h->value_orig.value_float - item.prevorgvalue_dbl) / (h->clock - item.lastclock);
+					h->value.value_float = DBmultiply_value_float(&item, h->value.value_float);
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
 							",lastvalue='" ZBX_FS_DBL "'",
@@ -647,6 +648,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 				if (item.prevorgvalue_null == 0 && item.prevorgvalue_dbl <= h->value_orig.value_float)
 				{
 					h->value.value_float = h->value_orig.value_float - item.prevorgvalue_dbl;
+					h->value.value_float = DBmultiply_value_float(&item, h->value.value_float);
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "'"
 							",lastvalue='" ZBX_FS_DBL "'",
@@ -666,15 +668,16 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 		case ITEM_VALUE_TYPE_UINT64:
 			switch (item.delta) {
 			case ITEM_STORE_AS_IS:
-				h->value.value_uint64 = h->value_orig.value_uint64;
+				h->value.value_uint64 = DBmultiply_value_uint64(&item, h->value_orig.value_uint64);
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-						",prevvalue=lastvalue,lastvalue='" ZBX_FS_UI64 "'",
-						h->value_orig.value_uint64);
+						",prevvalue=lastvalue,prevorgvalue=NULL,lastvalue='" ZBX_FS_UI64 "'",
+						h->value.value_uint64);
 				break;
 			case ITEM_STORE_SPEED_PER_SECOND:
 				if (item.prevorgvalue_null == 0 && item.prevorgvalue_uint64 <= h->value_orig.value_uint64 && item.lastclock < h->clock)
 				{
 					h->value.value_uint64 = (h->value_orig.value_uint64 - item.prevorgvalue_uint64) / (h->clock - item.lastclock);
+					h->value.value_uint64 = DBmultiply_value_uint64(&item, h->value.value_uint64);
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "'"
 							",lastvalue='" ZBX_FS_UI64 "'",
@@ -693,6 +696,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 				if (item.prevorgvalue_null == 0 && item.prevorgvalue_uint64 <= h->value_orig.value_uint64)
 				{
 					h->value.value_uint64 = h->value_orig.value_uint64 - item.prevorgvalue_uint64;
+					h->value.value_uint64 = DBmultiply_value_uint64(&item, h->value.value_uint64);
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 							",prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "'"
 							",lastvalue='" ZBX_FS_UI64 "'",
