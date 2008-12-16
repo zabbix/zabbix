@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-275] changed value processing. Multiplier after delta (Sasha)
  - [DEV-274] added overflow check for uint64 for incoming values (Sasha)
  - [DEV-258] added additional reports based on bar graphs (Artem)
  - [DEV-257] added bar graph class (Artem)
