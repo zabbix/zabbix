@@ -112,21 +112,21 @@ include_once "include/page_header.php";
 	$_REQUEST["action"] = get_request("action", "showgraph");
 
 /*** Prepare page header - start ***/
-	if(is_array($_REQUEST["itemid"])){
-		$_REQUEST["itemid"] = array_unique($_REQUEST["itemid"]);
+	if(is_array($_REQUEST['itemid'])){
+		$_REQUEST['itemid'] = array_unique($_REQUEST['itemid']);
 
-		if(isset($_REQUEST["remove_log"]) && isset($_REQUEST["cmbloglist"])){
-			foreach($_REQUEST["itemid"] as $id => $itemid)
-				if((bccomp($itemid , $_REQUEST["cmbloglist"])==0))
-					unset($_REQUEST["itemid"][$id]);
+		if(isset($_REQUEST['remove_log']) && isset($_REQUEST['cmbloglist'])){
+			foreach($_REQUEST['itemid'] as $id => $itemid)
+				if((bccomp($itemid , $_REQUEST['cmbloglist'])==0))
+					unset($_REQUEST['itemid'][$id]);
 		}
 
-		$items_count = count($_REQUEST["itemid"]);
+		$items_count = count($_REQUEST['itemid']);
 		if($items_count > 1){
-			$main_header = count($_REQUEST["itemid"])." log files";
+			$main_header = count($_REQUEST['itemid']).' log files';
 		}
 		else{
-			$_REQUEST["itemid"] = array_pop($_REQUEST["itemid"]);
+			$_REQUEST['itemid'] = array_pop($_REQUEST['itemid']);
 		}
 	}
 
@@ -134,7 +134,7 @@ include_once "include/page_header.php";
 	
 	$sql = 'SELECT h.host,i.hostid,i.description,i.key_ '.
 			' FROM items i,hosts h '.
-			' WHERE i.itemid IN ('.(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).') '.
+			' WHERE i.itemid IN ('.(is_array($_REQUEST['itemid']) ? implode(',', $_REQUEST['itemid']) : $_REQUEST['itemid']).') '.
 				' AND h.hostid=i.hostid '.
 				' AND '.DBcondition('h.hostid',$available_hosts, true);
 				
@@ -144,11 +144,11 @@ include_once "include/page_header.php";
 	
 	$sql = 'SELECT h.host,i.hostid,i.* '.
 			' FROM items i,hosts h '.
-			' WHERE i.itemid in ('.(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).') '.
+			' WHERE i.itemid in ('.(is_array($_REQUEST['itemid']) ? implode(',', $_REQUEST['itemid']) : $_REQUEST['itemid']).') '.
 				' AND h.hostid=i.hostid ';
 	$item_data = DBfetch(DBselect($sql));
 
-	$item_type = $item_data["value_type"];
+	$item_type = $item_data['value_type'];
 	$l_header = null;
 
 	if(!is_array($_REQUEST['itemid'])){
@@ -168,18 +168,18 @@ include_once "include/page_header.php";
 		if('showgraph' == $_REQUEST['action']){
 			if(infavorites('web.favorite.graphids',$_REQUEST['itemid'],'itemid')){
 				$icon = new CDiv(SPACE,'iconminus');
-				$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
-				$icon->AddAction('onclick',new CScript("javascript: rm4favorites('itemid','".$_REQUEST['itemid']."',0);"));
+				$icon->addOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
+				$icon->addAction('onclick',new CScript("javascript: rm4favorites('itemid','".$_REQUEST['itemid']."',0);"));
 			}
 			else{
 				$icon = new CDiv(SPACE,'iconplus');
-				$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
-				$icon->AddAction('onclick',new CScript("javascript: add2favorites('itemid','".$_REQUEST['itemid']."');"));
+				$icon->addOption('title',S_ADD_TO.' '.S_FAVORITES);
+				$icon->addAction('onclick',new CScript("javascript: add2favorites('itemid','".$_REQUEST['itemid']."');"));
 			}
-			$icon->AddOption('id','addrm_fav');
+			$icon->addOption('id','addrm_fav');
 	
 			$icon_tab = new CTable();
-			$icon_tab->AddRow(array($icon,SPACE,$l_header));
+			$icon_tab->addRow(array($icon,SPACE,$l_header));
 			
 			$l_header = $icon_tab;
 		}
@@ -194,76 +194,76 @@ include_once "include/page_header.php";
 	if( !isset($_REQUEST['plaintext']) && ($_REQUEST['fullscreen']==0) ){
 		if($item_type == ITEM_VALUE_TYPE_LOG){
 			$l_header = new CForm();
-			$l_header->SetName('loglist');
-			$l_header->AddVar('action',$_REQUEST['action']);
-			$l_header->AddVar('from',$_REQUEST['from']);
-			$l_header->AddVar('period',$_REQUEST['period']);
-			$l_header->AddVar('itemid',$_REQUEST['itemid']);
+			$l_header->setName('loglist');
+			$l_header->addVar('action',$_REQUEST['action']);
+			$l_header->addVar('from',$_REQUEST['from']);
+			$l_header->addVar('period',$_REQUEST['period']);
+			$l_header->addVar('itemid',$_REQUEST['itemid']);
 
-			if(isset($_REQUEST['filter_task']))	$l_header->AddVar('filter_task',$_REQUEST['filter_task']);
-			if(isset($_REQUEST['filter']))		$l_header->AddVar('filter',$_REQUEST['filter']);
-			if(isset($_REQUEST['mark_color']))	$l_header->AddVar('mark_color',$_REQUEST['mark_color']);
+			if(isset($_REQUEST['filter_task']))	$l_header->addVar('filter_task',$_REQUEST['filter_task']);
+			if(isset($_REQUEST['filter']))		$l_header->addVar('filter',$_REQUEST['filter']);
+			if(isset($_REQUEST['mark_color']))	$l_header->addVar('mark_color',$_REQUEST['mark_color']);
 
 			$cmbLogList = new CComboBox('cmbloglist');
 			if(is_array($_REQUEST['itemid'])){
-				$cmbLogList->AddItem(0, $main_header);
+				$cmbLogList->addItem(0, $main_header);
 				foreach($_REQUEST['itemid'] as $itemid){
 					if(!($item = get_item_by_itemid($itemid)) || $item['value_type'] != ITEM_VALUE_TYPE_LOG){
 						invalid_url();
 					}
 					
 					$host = get_host_by_hostid($item['hostid']);
-					$cmbLogList->AddItem($itemid,$host['host'].': '.item_description($item));
+					$cmbLogList->addItem($itemid,$host['host'].': '.item_description($item));
 				}
 			}
 			else{
-				$cmbLogList->AddItem($_REQUEST['itemid'], $main_header);
+				$cmbLogList->addItem($_REQUEST['itemid'], $main_header);
 			}
 
-			$l_header->AddItem(array(
-				"Log files list",SPACE,
+			$l_header->addItem(array(
+				'Log files list',SPACE,
 				$cmbLogList,SPACE,
-				new CButton("add_log","Add","return PopUp('popup.php?".
-					"dstfrm=".$l_header->GetName()."&srctbl=logitems&dstfld1=itemid&srcfld1=itemid');"),SPACE,
+				new CButton('add_log','add',"return PopUp('popup.php?".
+					"dstfrm=".$l_header->getName()."&srctbl=logitems&dstfld1=itemid&srcfld1=itemid');"),SPACE,
 				$cmbLogList->ItemsCount() > 1 ? new CButton("remove_log","Remove selected") : null
 				));
 		}
 
 		$form = new CForm();
-		$form->SetMethod('get');
+		$form->setMethod('get');
 		
-		$form->AddVar("itemid",$_REQUEST["itemid"]);
+		$form->addVar('itemid',$_REQUEST['itemid']);
 
-		if(isset($_REQUEST["filter_task"]))	$form->AddVar("filter_task",$_REQUEST["filter_task"]);
-		if(isset($_REQUEST["filter"]))		$form->AddVar("filter",$_REQUEST["filter"]);
-		if(isset($_REQUEST["mark_color"]))	$form->AddVar("mark_color",$_REQUEST["mark_color"]);
+		if(isset($_REQUEST['filter_task']))	$form->addVar('filter_task',$_REQUEST['filter_task']);
+		if(isset($_REQUEST['filter']))		$form->addVar('filter',$_REQUEST['filter']);
+		if(isset($_REQUEST['mark_color']))	$form->addVar('mark_color',$_REQUEST['mark_color']);
 		
-		$cmbAction = new CComboBox("action",$_REQUEST["action"],"submit()");
+		$cmbAction = new CComboBox('action',$_REQUEST['action'],'submit()');
 
 		if(str_in_array($item_type,array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))){
-			$cmbAction->AddItem("showgraph",S_GRAPH);
+			$cmbAction->addItem('showgraph',S_GRAPH);
 		}
 
-		$cmbAction->AddItem("showvalues",S_VALUES);
-		$cmbAction->AddItem("showlatest",S_500_LATEST_VALUES);
+		$cmbAction->addItem('showvalues',S_VALUES);
+		$cmbAction->addItem('showlatest',S_500_LATEST_VALUES);
 
-		$form->AddItem($cmbAction);
+		$form->addItem($cmbAction);
 
-		if($_REQUEST["action"]!="showgraph") 
-			$form->AddItem(array(SPACE,new CButton("plaintext",S_AS_PLAIN_TEXT)));
+		if($_REQUEST['action']!='showgraph') 
+			$form->addItem(array(SPACE,new CButton('plaintext',S_AS_PLAIN_TEXT)));
 
 		show_table_header($l_header, $form);
 	}
 ?>
 <?php
-	if($_REQUEST["action"]=="showgraph" && $item_type != ITEM_VALUE_TYPE_LOG){
+	if($_REQUEST['action']=='showgraph' && $item_type != ITEM_VALUE_TYPE_LOG){
 		$dom_graph_id = 'graph';
 
 		$bstime = isset($_REQUEST['stime'])?$_REQUEST['stime']:date('YmdHi',(time()-$_REQUEST['period']));
-		show_history($_REQUEST["itemid"],$_REQUEST["from"],$bstime,$effectiveperiod);
+		show_history($_REQUEST['itemid'],$_REQUEST['from'],$bstime,$effectiveperiod);
 	}
-	else if($_REQUEST["action"]=="showvalues" || $_REQUEST["action"]=="showlatest"){
-		if($_REQUEST["action"]=="showvalues"){
+	else if($_REQUEST['action']=='showvalues' || $_REQUEST['action']=='showlatest'){
+		if($_REQUEST['action']=='showvalues'){
 			
 			$bstime = isset($_REQUEST['stime'])?$_REQUEST['stime']:date('YmdHi',(time()-$_REQUEST['period']));
 			$time = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
@@ -275,41 +275,41 @@ include_once "include/page_header.php";
 			$l_header = null;
 		}
 
-		if(!isset($_REQUEST["plaintext"])){
+		if(!isset($_REQUEST['plaintext'])){
 			if($item_type==ITEM_VALUE_TYPE_LOG){
-				$to_save_request = array("filter_task", "filter", "mark_color");
+				$to_save_request = array('filter_task', 'filter', 'mark_color');
 
-				$filter_task = get_request("filter_task",0);
-				$filter = get_request("filter","");
-				$mark_color = get_request("mark_color",0);
+				$filter_task = get_request('filter_task',0);
+				$filter = get_request('filter','');
+				$mark_color = get_request('mark_color',0);
 
 				$r_header = new CForm();
-				$r_header->SetMethod('get');
+				$r_header->setMethod('get');
 				
-				$r_header->AddVar("action",$_REQUEST["action"]);
-				$r_header->AddVar("from",$_REQUEST["from"]);
-				$r_header->AddVar("period",$_REQUEST["period"]);
-				$r_header->AddVar("itemid",$_REQUEST["itemid"]);
+				$r_header->addVar('action',$_REQUEST['action']);
+				$r_header->addVar('from',$_REQUEST['from']);
+				$r_header->addVar('period',$_REQUEST['period']);
+				$r_header->addVar('itemid',$_REQUEST['itemid']);
 
-				$cmbFTask = new CComboBox("filter_task",$filter_task,"submit()");
-				$cmbFTask->AddItem(FILTER_TAST_SHOW,S_SHOW_SELECTED);
-				$cmbFTask->AddItem(FILTER_TAST_HIDE,S_HIDE_SELECTED);
-				$cmbFTask->AddItem(FILTER_TAST_MARK,S_MARK_SELECTED);
-				$cmbFTask->AddItem(FILTER_TAST_INVERT_MARK,S_MARK_OTHERS);
+				$cmbFTask = new CComboBox('filter_task',$filter_task,'submit()');
+				$cmbFTask->addItem(FILTER_TAST_SHOW,S_SHOW_SELECTED);
+				$cmbFTask->addItem(FILTER_TAST_HIDE,S_HIDE_SELECTED);
+				$cmbFTask->addItem(FILTER_TAST_MARK,S_MARK_SELECTED);
+				$cmbFTask->addItem(FILTER_TAST_INVERT_MARK,S_MARK_OTHERS);
 
-				$r_header->AddItem(array(
+				$r_header->addItem(array(
 					S_SELECT_ROWS_WITH_VALUE_LIKE,SPACE,
-					new CTextBox("filter",$filter,25),
+					new CTextBox('filter',$filter,25),
 					$cmbFTask,SPACE));
 
 				if(str_in_array($filter_task,array(FILTER_TAST_MARK,FILTER_TAST_INVERT_MARK))){
-					$cmbColor = new CComboBox("mark_color",$mark_color);
-					$cmbColor->AddItem(MARK_COLOR_RED,S_AS_RED);
-					$cmbColor->AddItem(MARK_COLOR_GREEN,S_AS_GREEN);
-					$cmbColor->AddItem(MARK_COLOR_BLUE,S_AS_BLUE);
-					$r_header->AddItem(array($cmbColor,SPACE));
+					$cmbColor = new CComboBox('mark_color',$mark_color);
+					$cmbColor->addItem(MARK_COLOR_RED,S_AS_RED);
+					$cmbColor->addItem(MARK_COLOR_GREEN,S_AS_GREEN);
+					$cmbColor->addItem(MARK_COLOR_BLUE,S_AS_BLUE);
+					$r_header->addItem(array($cmbColor,SPACE));
 				}
-				$r_header->AddItem(new CButton("select","Select"));
+				$r_header->addItem(new CButton('select','Select'));
 			}
 			else{
 				$r_header = null;
@@ -324,142 +324,145 @@ include_once "include/page_header.php";
 			echo "\n";
 		}
 
-		$cond_clock = "";
-		$limit = "NO";
-		if($_REQUEST["action"]=="showlatest"){
+		$cond_clock = '';
+		$limit = 'NO';
+		if($_REQUEST['action']=='showlatest'){
 			$limit = 500;
 		} 
-		else if($_REQUEST["action"]=="showvalues"){
+		else if($_REQUEST['action']=='showvalues'){
 			$cond_clock = " and h.clock>$time and h.clock<$till";
 		}
 
 		if($item_type==ITEM_VALUE_TYPE_LOG){
 			$itemid_lst = '';
 			
-			if(is_array($_REQUEST["itemid"])){
-				$itemid_lst = implode(',',$_REQUEST["itemid"]);
-				$item_cout = count($_REQUEST["itemid"]);
+			if(is_array($_REQUEST['itemid'])){
+				$itemid_lst = implode(',',$_REQUEST['itemid']);
+				$item_cout = count($_REQUEST['itemid']);
 			}
 			else{
-				$itemid_lst = $_REQUEST["itemid"];
+				$itemid_lst = $_REQUEST['itemid'];
 				$item_cout = 1;
 			}
 
 			$sql_filter = '';
-			if(isset($_REQUEST["filter"]) && $_REQUEST["filter"]!=""){
-				if($_REQUEST["filter_task"] == FILTER_TAST_SHOW)
-					$sql_filter = ' AND h.value LIKE '.zbx_dbstr("%".$_REQUEST["filter"]."%");
-				else if($_REQUEST["filter_task"] == FILTER_TAST_HIDE)
-					$sql_filter = ' AND h.value NOT LIKE '.zbx_dbstr("%".$_REQUEST["filter"]."%");
+			if(isset($_REQUEST['filter']) && $_REQUEST['filter']!=''){
+				if($_REQUEST['filter_task'] == FILTER_TAST_SHOW)
+					$sql_filter = ' AND h.value LIKE '.zbx_dbstr('%'.$_REQUEST['filter'].'%');
+				else if($_REQUEST['filter_task'] == FILTER_TAST_HIDE)
+					$sql_filter = ' AND h.value NOT LIKE '.zbx_dbstr('%'.$_REQUEST['filter'].'%');
 			}
 
-
-			$sql = 'SELECT hst.host,i.itemid,i.key_,i.description,h.clock,h.value,i.valuemapid,h.timestamp,h.source,h.severity'.
-					' FROM history_log h, items i, hosts hst'.
+			$sql = 'SELECT hst.host,i.itemid,i.key_,i.description,h.clock,h.value,i.valuemapid,h.timestamp,h.source,h.severity '.
+					' FROM history_log h, items i, hosts hst '.
 					' WHERE hst.hostid=i.hostid '.
 						' AND h.itemid=i.itemid'.$sql_filter.
 						' AND i.itemid in ('.$itemid_lst.')'.$cond_clock.
-					' ORDER BY h.clock desc, h.id desc';
-
+					' ORDER BY h.clock desc, h.id DESC';
 			$result=DBselect($sql,$limit);
-
+			
 			if(!isset($_REQUEST['plaintext'])){
 				$table = new CTableInfo('...','log_history_table');
-				$table->AddOption('id','graph');
-				$table->SetHeader(array(S_TIMESTAMP,
-					$item_cout > 1 ? S_ITEM : null,
-					S_LOCAL_TIME,S_SOURCE,S_SEVERITY,S_VALUE),"header");
+				$table->addOption('id','graph');
+				$table->setHeader(array(S_TIMESTAMP,
+						($item_cout>1)?S_ITEM:null,
+						S_LOCAL_TIME,
+						S_SOURCE,
+						S_SEVERITY,
+						S_VALUE),'header');
 
 				$table->ShowStart(); // to solve memory leak we call 'Show' method by steps
 			}
 			else{
-				echo "<pre>\n";
+				echo '<span class="textcolorstyles"><pre>'."\n";
 			}
 
 			while($row=DBfetch($result)){
-				$color_style = null;
+//				$color_style = null;
+				$color_style = 'textcolorstyles';
 
-				if(isset($_REQUEST["filter"]) && $_REQUEST["filter"]!=""){
-					$contain = zbx_stristr($row["value"],$_REQUEST["filter"]) ? TRUE : FALSE;
+				if(isset($_REQUEST['filter']) && $_REQUEST['filter']!=''){
+					$contain = zbx_stristr($row['value'],$_REQUEST['filter']) ? TRUE : FALSE;
 
-					if(!isset($_REQUEST["mark_color"])) $_REQUEST["mark_color"] = MARK_COLOR_RED;
+					if(!isset($_REQUEST['mark_color'])) $_REQUEST['mark_color'] = MARK_COLOR_RED;
 
-					if(($contain) && ($_REQUEST["filter_task"] == FILTER_TAST_MARK))
-						$color_style = $_REQUEST["mark_color"];
-					if((!$contain) && ($_REQUEST["filter_task"] == FILTER_TAST_INVERT_MARK))
-						$color_style = $_REQUEST["mark_color"];
+					if(($contain) && ($_REQUEST['filter_task'] == FILTER_TAST_MARK))
+						$color_style = $_REQUEST['mark_color'];
+					if((!$contain) && ($_REQUEST['filter_task'] == FILTER_TAST_INVERT_MARK))
+						$color_style = $_REQUEST['mark_color'];
 
 					switch($color_style){
-						case MARK_COLOR_RED:	$color_style="mark_as_red"; break;
-						case MARK_COLOR_GREEN:	$color_style="mark_as_green"; break;
-						case MARK_COLOR_BLUE:	$color_style="mark_as_blue"; break;
+						case MARK_COLOR_RED:	$color_style='mark_as_red'; break;
+						case MARK_COLOR_GREEN:	$color_style='mark_as_green'; break;
+						case MARK_COLOR_BLUE:	$color_style='mark_as_blue'; break;
 					}
 				}
 
-				$new_row = array(nbsp(date("[Y.M.d H:i:s]",$row["clock"])));
+				$new_row = array(nbsp(date('[Y.M.d H:i:s]',$row['clock'])));
 
 				if($item_cout > 1)
-					array_push($new_row,$row["host"].":".item_description($row));
+					array_push($new_row,$row['host'].':'.item_description($row));
 
-				if($row["timestamp"] == 0){
-					array_push($new_row,new CCol("-","center"));
+				if($row['timestamp'] == 0){
+					array_push($new_row,new CCol('-','center'));
 				}
 				else{
-					array_push($new_row,date("Y.M.d H:i:s",$row["timestamp"]));
+					array_push($new_row,date('Y.M.d H:i:s',$row['timestamp']));
 				}
-				
-				if($row["source"] == ""){
-					array_push($new_row,new CCol("-","center"));
+
+				if($row['source'] == ''){
+					array_push($new_row,new CCol('-','center'));
 				}
 				else{
-					array_push($new_row,$row["source"]);
+					array_push($new_row,$row['source']);
 				}
 
 				array_push($new_row, 
 						new CCol(
-							get_severity_description($row["severity"]),
-							get_severity_style($row["severity"])
+							get_severity_description($row['severity']),
+							get_severity_style($row['severity'])
 							)
 					);
 
-				$row["value"] = trim($row["value"],"\r\n");
-//				array_push($new_row,htmlspecialchars($row["value"]));
-				array_push($new_row,encode_log($row["value"]));
+				$row['value'] = trim($row['value'],"\r\n");
+//				array_push($new_row,htmlspecialchars($row['value']));
+				array_push($new_row,encode_log($row['value']));
 
-				if(!isset($_REQUEST["plaintext"])){
+				if(!isset($_REQUEST['plaintext'])){
 
 					$crow = new CRow($new_row); 
 
-					if(is_null($color_style) && is_array($_REQUEST["itemid"])){
+					if(is_null($color_style) && is_array($_REQUEST['itemid'])){
 						$min_color = 0x98;
 						$max_color = 0xF8;
-						$int_color = ($max_color - $min_color) / count($_REQUEST["itemid"]);
-						$int_color *= array_search($row["itemid"],$_REQUEST["itemid"]);
+						$int_color = ($max_color - $min_color) / count($_REQUEST['itemid']);
+						$int_color *= array_search($row['itemid'],$_REQUEST['itemid']);
 						$int_color += $min_color;
-						$crow->AddOption("style","background-color: ".sprintf("#%X%X%X",$int_color,$int_color,$int_color));
+						$crow->addOption('style','background-color: '.sprintf("#%X%X%X",$int_color,$int_color,$int_color));
 					} 
 					else {
-						$crow->SetClass($color_style);
+						$crow->setClass($color_style);
 					}
 
 					$crow->Show();	// to solve memory leak we call 'Show' method for each element
 				}
 				else{
-					echo date("Y-m-d H:i:s",$row["clock"]);
-					echo "\t".$row["clock"]."\t".htmlspecialchars($row["value"])."\n";
+					echo date('Y-m-d H:i:s',$row['clock']);
+					echo "\t".$row['clock']."\t".htmlspecialchars($row['value'])."\n";
 				}
 			}
-			if(!isset($_REQUEST["plaintext"]))
+			
+			if(!isset($_REQUEST['plaintext']))
 				$table->ShowEnd();	// to solve memory leak we call 'Show' method by steps
 			else
-				echo "</pre>";
+				echo '</pre></span>';
 		}
 		else{
 			switch($item_type){
-				case ITEM_VALUE_TYPE_FLOAT:	$h_table = "history";		break;
-				case ITEM_VALUE_TYPE_UINT64:	$h_table = "history_uint";	break;
-				case ITEM_VALUE_TYPE_TEXT:	$h_table = "history_text";	break;
-				default:			$h_table = "history_str";
+				case ITEM_VALUE_TYPE_FLOAT:	$h_table = 'history';		break;
+				case ITEM_VALUE_TYPE_UINT64:	$h_table = 'history_uint';	break;
+				case ITEM_VALUE_TYPE_TEXT:	$h_table = 'history_text';	break;
+				default:			$h_table = 'history_str';
 			}
 
 			$result = DBselect('SELECT h.clock,h.value,i.valuemapid '.
@@ -470,66 +473,67 @@ include_once "include/page_header.php";
 							' ORDER BY clock desc',
 				$limit);
 
-			if(!isset($_REQUEST["plaintext"])){
+			if(!isset($_REQUEST['plaintext'])){
 				$table = new CTableInfo();
-				$table->SetHeader(array(S_TIMESTAMP, S_VALUE));
-				$table->AddOption('id','graph');
+				$table->setHeader(array(S_TIMESTAMP, S_VALUE));
+				$table->addOption('id','graph');
 				$table->ShowStart(); // to solve memory leak we call 'Show' method by steps
 			}
 			else{
-				echo "<pre>\n";
+				echo '<span class="textcolorstyles"><pre>'."\n";
 			}
 
-COpt::profiling_start("history");
+COpt::profiling_start('history');
 			while($row=DBfetch($result)){
 				
-				if($DB['TYPE'] == "ORACLE" && $item_type == ITEM_VALUE_TYPE_TEXT){
-					if(isset($row["value"]))
-						$row["value"] = $row["value"]->load();
+				if($DB['TYPE'] == 'ORACLE' && $item_type == ITEM_VALUE_TYPE_TEXT){
+					if(isset($row['value']))
+						$row['value'] = $row['value']->load();
 					else
-						$row["value"] = "";
+						$row['value'] = '';
 				}
 
-				if($row["valuemapid"] > 0)
-					$value = replace_value_by_map($row["value"], $row["valuemapid"]);
+				if($row['valuemapid'] > 0)
+					$value = replace_value_by_map($row['value'], $row['valuemapid']);
 				else
-					$value = $row["value"]; 
+					$value = $row['value']; 
 
-				$new_row = array(date("Y.M.d H:i:s",$row["clock"]));
+				$new_row = array(date('Y.M.d H:i:s',$row['clock']));
 				if(str_in_array($item_type,array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))){
 					array_push($new_row,$value);
 				}
 				else{
 					$pre = new CTag('pre','yes');
-					$pre->AddItem($value);
+					$pre->addItem($value);
 					
 					array_push($new_row,$pre);
 				}
 				
-				if(!isset($_REQUEST["plaintext"])){
+				if(!isset($_REQUEST['plaintext'])){
 					$table->ShowRow($new_row);
 				}
 				else{
-					echo date("Y-m-d H:i:s",$row["clock"]);
-					echo "\t".$row["clock"]."\t".htmlspecialchars($row["value"])."\n";
+					echo date('Y-m-d H:i:s',$row['clock']);
+					echo "\t".$row['clock']."\t".htmlspecialchars($row['value'])."\n";
 				}
 			}
-			if(!isset($_REQUEST["plaintext"])){
+			
+			if(!isset($_REQUEST['plaintext'])){
 				$table->ShowEnd();	// to solve memory leak we call 'Show' method by steps
 				echo SBR;
 			}
 			else{
-				echo "</pre>";
+				echo '</pre></span>';
 			}
-COpt::profiling_stop("history");
+COpt::profiling_stop('history');
 		}
 	}
 
-	if(!isset($_REQUEST["plaintext"])){
+	if(!isset($_REQUEST['plaintext'])){
 	
-		if(str_in_array($_REQUEST["action"],array("showvalues","showgraph"))){
+		if(str_in_array($_REQUEST['action'],array('showvalues','showgraph'))){
 			
-			$stime = get_min_itemclock_by_itemid($_REQUEST["itemid"]);
+			$stime = get_min_itemclock_by_itemid($_REQUEST['itemid']);
 			$stime = (is_null($stime))?0:$stime;
 			$bstime = time()-$effectiveperiod;
 			

@@ -63,13 +63,13 @@ body{
 .on		{	color: #AA0000;	}
 .off		{	color: #00AA00;	}
 
-.disaster	{	background-color: #FF0000;	}
-.high		{	background-color: #FF8888;	}
-.average	{	background-color: #DDAAAA;	}
-.warning	{	background-color: #EFEFCC;	}
-.information	{	background-color: #CCE2CC;	}
-.unknown_trigger{	background-color: #BCBCBC;	}
-.normal		{	background-color: #AADDAA;	}
+.disaster	{	background-color: #FF0000;	color: #222222;}
+.high		{	background-color: #FF8888;	color: #222222;}
+.average	{	background-color: #DDAAAA;	color: #222222;}
+.warning	{	background-color: #EFEFCC;	color: #222222;}
+.information	{	background-color: #CCE2CC;	color: #222222;}
+.unknown_trigger{	background-color: #BCBCBC;	color: #222222;}
+.normal		{	background-color: #AADDAA;	color: #222222;}
 
 .img 		{	border-color:black; border-width:1px;	}
 img.top		{	vertical-align:text-top;}
