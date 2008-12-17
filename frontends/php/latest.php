@@ -286,7 +286,7 @@ include_once 'include/page_header.php';
 		if(isset($db_item['lastclock']))
 			$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item['lastclock']);
 		else
-			$lastclock = new CCol('-', 'center');
+			$lastclock = new CCol(' - ');
 
 		$lastvalue=format_lastvalue($db_item);
 
@@ -300,7 +300,7 @@ include_once 'include/page_header.php';
 			$change=nbsp($change);
 		}
 		else{
-			$change=new CCol('-','center');
+			$change=new CCol(' - ');
 		}
 		
 		if(($db_item['value_type']==ITEM_VALUE_TYPE_FLOAT) || ($db_item['value_type']==ITEM_VALUE_TYPE_UINT64)){
@@ -315,7 +315,7 @@ include_once 'include/page_header.php';
 			($_REQUEST['hostid']>0)?NULL:SPACE,
 			str_repeat(SPACE,6).$description,
 			$lastclock,
-			new CCol($lastvalue, $lastvalue=='-' ? 'center' : null),
+			new CCol($lastvalue),
 			$change,
 			$actions
 			)));
@@ -413,7 +413,7 @@ include_once 'include/page_header.php';
 		if(isset($db_item['lastclock']))
 			$lastclock=zbx_date2str(S_DATE_FORMAT_YMDHMS,$db_item['lastclock']);
 		else
-			$lastclock = new CCol('-', 'center');
+			$lastclock = new CCol(' - ');
 
 		$lastvalue=format_lastvalue($db_item);
 
@@ -431,7 +431,7 @@ include_once 'include/page_header.php';
 			}
 		}
 		else{
-			$change=new CCol('-','center');
+			$change=new CCol(' - ');
 		}
 		
 		if(($db_item['value_type']==ITEM_VALUE_TYPE_FLOAT) || ($db_item['value_type']==ITEM_VALUE_TYPE_UINT64)){
@@ -446,7 +446,7 @@ include_once 'include/page_header.php';
 			$_REQUEST['hostid']?NULL:($db_host['item_cnt']?SPACE:$db_item['host']),
 			str_repeat(SPACE, 6).$description,
 			$lastclock,
-			new CCol($lastvalue, $lastvalue == '-' ? 'center' : null),
+			new CCol($lastvalue),
 			$change,
 			$actions
 			)));
