@@ -404,14 +404,14 @@ include_once "include/page_header.php";
 					array_push($new_row,$row['host'].':'.item_description($row));
 
 				if($row['timestamp'] == 0){
-					array_push($new_row,new CCol('-','center'));
+					array_push($new_row,new CCol(' - '));
 				}
 				else{
 					array_push($new_row,date('Y.M.d H:i:s',$row['timestamp']));
 				}
 
 				if($row['source'] == ''){
-					array_push($new_row,new CCol('-','center'));
+					array_push($new_row,new CCol(' - '));
 				}
 				else{
 					array_push($new_row,$row['source']);

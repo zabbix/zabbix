@@ -1,5 +1,6 @@
 Changes for 1.6.2
 
+ - [ZBX-632] fixed sql query in map elements configuration form (Artem)
  - [ZBX-631] fixed incorrect incoming string values if using dbcache (Sasha)
  - [ZBX-630] improved log files view in BB theme (Artem)
  - [ZBX-629] fixed sql error in popup window (Artem)
