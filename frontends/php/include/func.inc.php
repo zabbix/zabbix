@@ -42,7 +42,7 @@ return 'updater.setObj4Update("'.$obj['id'].'",'.$obj['interval'].',"'.$obj['url
 function make_refresh_menu($id,$cur_interval,&$menu,&$submenu){
 
 	$menu['menu_'.$id][] = array(S_REFRESH, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
-	$intervals = array('10','30','60', '120','600','900');
+	$intervals = array('10','30','60','120','600','900');
 	
 	foreach($intervals as $key => $value){
 		$menu['menu_'.$id][] = array(

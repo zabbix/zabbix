@@ -6506,8 +6506,8 @@
 			$frmEl->AddRow(S_MAP, $cmbMaps);
 		}
 		else if($elementtype==SYSMAP_ELEMENT_TYPE_TRIGGER){
-			$available_triggers = 	get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY,null,get_current_nodeid(true));
-			
+			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid(true));
+
 			$trigger = '';
 			$trigger_info = DBfetch(DBselect('SELECT DISTINCT n.name as node_name,h.hostid,h.host,t.*'.
 				' FROM triggers t '.
