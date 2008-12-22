@@ -491,6 +491,7 @@ DB_ESCALATION
 {
 	zbx_uint64_t		escalationid;
 	zbx_uint64_t		actionid;
+	zbx_uint64_t		triggerid;
 	zbx_uint64_t		eventid;
 	zbx_uint64_t		r_eventid;
 	int			esc_step;
