@@ -452,6 +452,9 @@ require_once "include/httptest.inc.php";
 // delete host from template linkages
 		DBexecute('DELETE FROM hosts_templates WHERE '.DBcondition('hostid',$hostids));
 
+// delete host applications
+		DBexecute('DELETE FROM applications WHERE '.DBcondition('hostid',$hostids));
+		
 // disable actions
 		$actionids = array();
 		$sql = 'SELECT DISTINCT actionid '.
@@ -1252,9 +1255,9 @@ require_once "include/httptest.inc.php";
 
 		while($db_tmp_app = DBfetch($db_tmp_applications)){
 			add_application(
-				$db_tmp_app["name"],
+				$db_tmp_app['name'],
 				$hostid,
-				$copy_mode ? 0 : $db_tmp_app["applicationid"]);
+				$copy_mode?0:$db_tmp_app['applicationid']);
 		}
 	}
 
