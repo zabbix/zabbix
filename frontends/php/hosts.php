@@ -683,7 +683,7 @@ include_once('include/page_header.php');
 		unset($_REQUEST['groupid']);
 		$_REQUEST['form'] = 'clone';
 	}
-	else if($_REQUEST['config']==1&&isset($_REQUEST['save'])){
+	else if(($_REQUEST['config']==1) && isset($_REQUEST['save'])){
 		$hosts = get_request('hosts',array());
 		if(isset($_REQUEST['groupid'])){
 			DBstart();
@@ -1296,21 +1296,21 @@ include_once('include/page_header.php');
 
 			$result=DBselect($sql);
 			while($row=DBfetch($result)){
-				$cmbGroups->AddItem($row['groupid'],$row['name']);
+				$cmbGroups->addItem($row['groupid'],$row['name']);
 				if(bccomp($row['groupid'], $_REQUEST['groupid']) == 0) $correct_host = 1;
 			}
 			
 			if(!isset($correct_host)){
 				$_REQUEST['groupid'] = 0;
-				$cmbGroups->SetValue($_REQUEST['groupid']);
+				$cmbGroups->setValue($_REQUEST['groupid']);
 			}
 
 			$frmForm = new CForm();
-			$frmForm->SetMethod('get');
+			$frmForm->setMethod('get');
 
-			$frmForm->AddVar('config',$_REQUEST['config']);
-			$frmForm->AddItem(S_GROUP.SPACE);
-			$frmForm->AddItem($cmbGroups);
+			$frmForm->addVar('config',$_REQUEST['config']);
+			$frmForm->addItem(S_GROUP.SPACE);
+			$frmForm->addItem($cmbGroups);
 			show_table_header($show_only_tmp ? S_TEMPLATES_BIG : S_HOSTS_BIG, $frmForm);
 
 	/* table HOSTS */
@@ -1319,8 +1319,8 @@ include_once('include/page_header.php');
 
 			$form = new CForm();
 			
-			$form->SetName('hosts');
-			$form->AddVar('config',get_request('config',0));
+			$form->setName('hosts');
+			$form->addVar('config',get_request('config',0));
 
 			$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 			$table->setHeader(array(
@@ -1363,7 +1363,7 @@ include_once('include/page_header.php');
 			
 				array_push($description, new CLink($row["host"], "hosts.php?form=update&hostid=".$row["hostid"].url_param("groupid").url_param("config"), 'action'));
 
-				$templates = get_templates_by_hostid($row["hostid"]);
+				$templates = get_templates_by_hostid($row['hostid']);
 				
 				$host=new CCol(array(
 					new CCheckBox('hosts['.$row["hostid"].']',NULL,NULL,$row["hostid"]),
@@ -1384,10 +1384,12 @@ include_once('include/page_header.php');
 					$ip = empty($row['ip'])?'-':$row['ip'];
 					$port = empty($row['port'])?'-':$row["port"];
 
-					if(1 == $row['useip'])
+					if(1 == $row['useip']){
 						$ip = bold($ip);
-					else
+					}
+					else{
 						$dns = bold($dns);
+					}
 					
 					switch($row['status']){
 						case HOST_STATUS_MONITORED:
@@ -1421,7 +1423,6 @@ include_once('include/page_header.php');
 						$error = new CCol('-',"off");
 					else 
 						$error = new CCol($row["error"],"on");
-
 				}
 
 

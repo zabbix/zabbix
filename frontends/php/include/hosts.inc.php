@@ -749,17 +749,18 @@ require_once('include/httptest.inc.php');
  *     Retrive templates for specified host
  *
  * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *		Eugene Grigorjev (eugene.grigorjev@zabbix.com)
  *
  * Comments:
- *
+ *		mod by Aly
  */
 	function get_templates_by_hostid($hostid){
 		$result = array();
 		$db_templates = DBselect('SELECT DISTINCT h.hostid,h.host '.
 				' FROM hosts_templates ht '.
 					' LEFT JOIN hosts h ON h.hostid=ht.templateid '.
-				' WHERE ht.hostid='.$hostid);
+				' WHERE ht.hostid='.$hostid.
+				' ORDER BY h.host');
 				
 		while($template_data = DBfetch($db_templates)){
 			$result[$template_data['hostid']] = $template_data['host'];
@@ -775,10 +776,10 @@ require_once('include/httptest.inc.php');
  *     Retrive correct relations for group and host
  *
  * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *		Eugene Grigorjev (eugene.grigorjev@zabbix.com)
  *
  * Comments:
- *
+ *		mod by Aly
  */
 	function get_correct_group_and_host($a_groupid=null, $a_hostid=null, $perm=PERM_READ_WRITE, $options = array()){
 		if(!is_array($options)){
@@ -943,10 +944,10 @@ require_once('include/httptest.inc.php');
  *     and check current group an host relations
  *
  * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *		Eugene Grigorjev (eugene.grigorjev@zabbix.com)
  *
  * Comments:
- *	   mod by Aly
+ *		mod by Aly
  */
 	function validate_group_with_host($perm, $options = array(),$group_var=null,$host_var=null){
 		if(is_null($group_var)) $group_var = 'web.latest.groupid';
