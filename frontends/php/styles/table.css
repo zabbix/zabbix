@@ -1164,7 +1164,6 @@ table.msgok td.msg{
 table.msgerr{
 	width: 100%;
 	border: 1px #CC4444 solid;
-	margin-bottom: 2px;
 }
 
 table.msgerr tr{

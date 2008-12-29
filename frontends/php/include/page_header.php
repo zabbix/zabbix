@@ -457,10 +457,10 @@ COpt::profiling_start("page");
 		$req = substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'print')-1);
 		
 		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req, 'small_font');
-		$link->AddOption('style','padding-left: 10px;');
+		$link->addOption('style','padding-left: 10px;');
 		
 		$printview = new CDiv($link,'printless');
-		$printview->AddOption('style','border: 1px #333 dotted;');
+		$printview->addOption('style','border: 1px #333 dotted;');
 		$printview->Show();
 		
 	}
@@ -468,49 +468,49 @@ COpt::profiling_start("page");
 	if(!defined('ZBX_PAGE_NO_MENU')){
 COpt::compare_files_with_menu($ZBX_MENU);
 
-		$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.4", "small_font");
-		$help->SetTarget('_blank');
-		$support = new CLink(S_GET_SUPPORT, "http://www.zabbix.com/support.php", "small_font");
-		$support->SetTarget('_blank');
+		$help = new CLink(S_HELP, 'http://www.zabbix.com/documentation.php', 'small_font');
+		$help->setTarget('_blank');
+		$support = new CLink(S_GET_SUPPORT, 'http://www.zabbix.com/support.php', 'small_font');
+		$support->setTarget('_blank');
 		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font');
 		
 		$page_header_r_col = array($help,'|',$support,'|',$printview);
 
-		if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
-			$page_header_r_col[] = array("|", 
-						new CLink(S_PROFILE, "profile.php", "small_font"),"|", 
-						new CLink(S_LOGOUT, "index.php?reconnect=1", "small_font"));
+		if($USER_DETAILS['alias']!=ZBX_GUEST_USER){
+			$page_header_r_col[] = array('|', 
+						new CLink(S_PROFILE, 'profile.php', 'small_font'),'|', 
+						new CLink(S_LOGOUT, 'index.php?reconnect=1', 'small_font'));
 		} 
 		else {
-			$page_header_r_col[] = array("|", new CLink(S_LOGIN, "index.php?reconnect=1", "small_font"));
+			$page_header_r_col[] = array('|', new CLink(S_LOGIN, 'index.php?reconnect=1', 'small_font'));
 		}
 
-		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),"http://www.zabbix.com");
-		$logo->SetTarget('_blank');
+		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),'http://www.zabbix.com');
+		$logo->setTarget('_blank');
 //		$logo = new CDiv(SPACE,'zabbix_logo');
 //		$logo->AddAction('onclick',"javascript: document.location = 'http://www.zabbix.com';");		
 		
-		$td_r = new CCol($page_header_r_col, "page_header_r");
-		$td_r->AddOption('width','100%');
+		$td_r = new CCol($page_header_r_col, 'page_header_r');
+		$td_r->addOption('width','100%');
 
-		$top_page_row	= array(new CCol($logo, "page_header_l"), $td_r);
+		$top_page_row	= array(new CCol($logo, 'page_header_l'), $td_r);
 		unset($logo, $page_header_r_col, $help, $support);
 
-		$table = new CTable(NULL,"page_header");
-		$table->SetCellSpacing(0);
-		$table->SetCellPadding(5);
-		$table->AddRow($top_page_row);
+		$table = new CTable(NULL,'page_header');
+		$table->setCellSpacing(0);
+		$table->setCellPadding(5);
+		$table->addRow($top_page_row);
 		$table->Show();
 
 		$menu_table = new CTable(NULL,'menu');
-		$menu_table->SetCellSpacing(0);
-		$menu_table->SetCellPadding(5);
-		$menu_table->AddRow($main_menu_row);
+		$menu_table->setCellSpacing(0);
+		$menu_table->setCellPadding(5);
+		$menu_table->addRow($main_menu_row);
 
 		$node_form = null;
 
 		if(ZBX_DISTRIBUTED){
-			$lst_nodes = new CComboBox('switch_node', get_current_nodeid(false), "submit()");
+			$lst_nodes = new CComboBox('switch_node', get_current_nodeid(false), 'submit()');
 			$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
 
 			$db_nodes = DBselect('SELECT * '.
@@ -529,7 +529,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				if(!defined('ZBX_DISABLE_SUBNODES')){
 					global $ZBX_WITH_SUBNODES;
 
-					$cmd_show_subnodes = new CComboBox('show_subnodes', !empty($ZBX_WITH_SUBNODES) ? 1 : 0, "submit()");
+					$cmd_show_subnodes = new CComboBox('show_subnodes', !empty($ZBX_WITH_SUBNODES) ? 1 : 0, 'submit()');
 					$cmd_show_subnodes->addItem(0, S_CURRENT_NODE_ONLY);
 					$cmd_show_subnodes->addItem(1, S_WITH_SUBNODES);
 
@@ -542,42 +542,42 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		}
 
 		$table = new CTable();
-		$table->SetCellSpacing(0);
-		$table->SetCellPadding(0);
-		$table->AddOption('style','width: 100%;');
+		$table->setCellSpacing(0);
+		$table->setCellPadding(0);
+		$table->addOption('style','width: 100%;');
 
 		$r_col = new CCol($node_form);
 		$r_col->AddOption('align','right');
 //		$r_col->AddOption('style','text-align: right;');
 		
-		$table->AddRow(array($menu_table,$r_col));
+		$table->addRow(array($menu_table,$r_col));
 		$table->Show();
 		
 		$sub_menu_table = new CTable(NULL,'sub_menu');
-		$sub_menu_table->SetCellSpacing(0);
-		$sub_menu_table->SetCellPadding(5);
+		$sub_menu_table->setCellSpacing(0);
+		$sub_menu_table->setCellPadding(5);
 		
 		if(empty($sub_menu_row)) $sub_menu_row = '&nbsp;';
-		$sub_menu_table->AddRow(new CCol($sub_menu_row));
+		$sub_menu_table->addRow(new CCol($sub_menu_row));
 		$sub_menu_table->Show();
 	}
 //------------------------------------- <HISTORY> ---------------------------------------
-	if(isset($page['hist_arg']) && ($USER_DETAILS["alias"] != ZBX_GUEST_USER) && ($page["type"] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
+	if(isset($page['hist_arg']) && ($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
 		$table = new CTable();
-		$table->SetClass('history');
+		$table->setClass('history');
 		
-		$table->SetCellSpacing(0);
-		$table->SetCellPadding(0);
+		$table->setCellSpacing(0);
+		$table->setCellPadding(0);
 
 		$history = get_user_history();
 
 		$tr = new CRow(new CCol('History:','caption'));
-		$tr->AddItem($history);
+		$tr->addItem($history);
 		
-		$table->AddRow($tr);
+		$table->addRow($tr);
 		$table->Show();
 	} 
-	else if(($page["type"] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')) {
+	else if(($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')) {
 		echo SBR;
 	}
 //------------------------------------ </HISTORY> ---------------------------------------
