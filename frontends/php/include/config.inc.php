@@ -378,20 +378,20 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				case PAGE_TYPE_HTML:
 				default:
 					$msg_tab = new CTable($msg,($bool?'msgok':'msgerr'));
-					$msg_tab->SetCellPadding(0);
-					$msg_tab->SetCellSpacing(0);
+					$msg_tab->setCellPadding(0);
+					$msg_tab->setCellSpacing(0);
 					
 					$msg_col = new CCol(bold($msg),'msg');
-					$msg_col->AddOption('id','page_msg');
+					$msg_col->addOption('id','page_msg');
 					
 					$msg_details = SPACE;
 					if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
-						$msg_details = new CDiv(S_DETAILS,'pointer');
-						$msg_details->AddAction('onclick',new CScript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
-						$msg_details->AddOption('title',S_MAXIMIZE.'/'.S_MINIMIZE);
+						$msg_details = new CDiv(array(S_DETAILS),'pointer');
+						$msg_details->addAction('onclick',new CScript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
+						$msg_details->addOption('title',S_MAXIMIZE.'/'.S_MINIMIZE);
 					}
 					
-					$msg_tab->AddRow(array(new CCol($msg_details,'clr'),$msg_col));
+					$msg_tab->addRow(array(new CCol($msg_details,'clr'),$msg_col));
 					$msg_tab->Show();
 					break;
 			}
@@ -399,7 +399,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 
 		if(isset($ZBX_MESSAGES)){
-			if($page["type"] == PAGE_TYPE_IMAGE){
+			if($page['type'] == PAGE_TYPE_IMAGE){
 				$msg_font = 2;
 				foreach($ZBX_MESSAGES as $msg){
 					if($msg['type'] == 'error'){
@@ -427,7 +427,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				$lst_error = new CList(null,'messages');
 
 				foreach($ZBX_MESSAGES as $msg){
-					$lst_error->AddItem($msg['message'], $msg['type']);
+					$lst_error->addItem($msg['message'], $msg['type']);
 					$bool &= ('error' != strtolower($msg['type']));
 				}
 //message scroll if needed

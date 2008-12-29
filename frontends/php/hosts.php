@@ -462,6 +462,12 @@ include_once('include/page_header.php');
 		}
 
 		if(!zbx_empty($hostid) && $clone_hostid && ($_REQUEST['form'] == 'full_clone')){
+// Host applications
+			$res = get_applications_by_hostid($clone_hostid);
+			while($db_app = DBfetch($res)){
+				add_application($db_app['name'], $hostid, 0);
+			}
+						
 // Host items			
 			$sql = 'SELECT DISTINCT i.itemid, i.description '.
 					' FROM items i '.
