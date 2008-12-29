@@ -1,5 +1,6 @@
 Changes for 1.6.2
 
+ - [ZBX-608] added sorting to templates column in hosts screen (Artem)
  - [ZBX-635] improved escalations to stop if host, item or trigger is disabled (Sasha)
  - [ZBX-632] fixed sql query in map elements configuration form (Artem)
  - [ZBX-631] fixed incorrect incoming string values if using dbcache (Sasha)
