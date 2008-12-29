@@ -116,11 +116,11 @@ function create_user_menu(e,userid,usr_grp_all_in,usr_grp_gui_in,usr_grp_status_
 					);
 
 //to create a copy of array, but not references!!!!
-//alert(id+' : '+dashboard_menu[id]);
+//alert(id+' : '+page_menu[id]);
 
 
 
-//alert(dashboard_menu[id]);
+//alert(page_menu[id]);
 	show_popup_menu(e,grp_menu,280);// JavaScript Document
 }
 //---------------------------------------------------------------
@@ -178,9 +178,9 @@ function create_host_menu(e,hostid,hst_grp_all_in){
 							);
 
 //to create a copy of array, but not references!!!!
-//alert(id+' : '+dashboard_menu[id]);
+//alert(id+' : '+page_menu[id]);
 
-//alert(dashboard_menu[id]);
+//alert(page_menu[id]);
 	show_popup_menu(e,grp_menu,280);// JavaScript Document
 }
 /*
@@ -205,27 +205,27 @@ show_popup_menu(event,new Array(['Show',null,null,{'outer' : ['pum_oheader'],'in
 //					DASHBOARD JS MENU 
 //------------------------------------------------------
 
-function create_dashboard_menu(e,id){
+function create_page_menu(e,id){
 	if(!e) var e = window.event;
 	id='menu_'+id;
 
 	var dbrd_menu = new Array();
 	
 //to create a copy of array, but not references!!!!
-//alert(id+' : '+dashboard_menu[id]);
-	for(var i=0; i < dashboard_menu[id].length; i++){
-		if((typeof(dashboard_menu[id][i]) != 'undefined') && !empty(dashboard_menu[id][i]))
-			dbrd_menu[i] = dashboard_menu[id][i].clone();
+//alert(id+' : '+page_menu[id]);
+	for(var i=0; i < page_menu[id].length; i++){
+		if((typeof(page_menu[id][i]) != 'undefined') && !empty(page_menu[id][i]))
+			dbrd_menu[i] = page_menu[id][i].clone();
 	}
 
-	for(var i=0; i < dashboard_submenu[id].length; i++){
-		if((typeof(dashboard_submenu[id][i]) != 'undefined') && !empty(dashboard_submenu[id][i])){
-			var row = dashboard_submenu[id][i];
+	for(var i=0; i < page_submenu[id].length; i++){
+		if((typeof(page_submenu[id][i]) != 'undefined') && !empty(page_submenu[id][i])){
+			var row = page_submenu[id][i];
 			var menu_row = new Array(row.name,"javascript: rm4favorites('"+row.favobj+"','"+row.favid+"','"+i+"');");
 			dbrd_menu[dbrd_menu.length-1].push(menu_row);
 		}
 	}
-//alert(dashboard_menu[id]);
+//alert(page_menu[id]);
 	show_popup_menu(e,dbrd_menu,280);// JavaScript Document
 }
 
@@ -251,8 +251,8 @@ function create_mon_trigger_menu(e, args, items){
 	}
 
 //to create a copy of array, but not references!!!!
-//alert(id+' : '+dashboard_menu[id]);
+//alert(id+' : '+page_menu[id]);
 
-//alert(dashboard_menu[id]);
+//alert(page_menu[id]);
 	show_popup_menu(e,tr_menu,280);// JavaScript Document
 }

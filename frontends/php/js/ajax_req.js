@@ -25,24 +25,24 @@ function send_params(params){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(resp){ },//alert(resp.responseText);
+						'onSuccess': function(resp){ },
+//						'onSuccess': function(resp){ alert(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);
 }
 
 
-function setRefreshRate(id,interval){
+function setRefreshRate(id,interval,params){
 	if(typeof(Ajax) == 'undefined'){
 		throw("Prototype.js lib is required!");
 		return false;
 	}
-
-	var params = {
-		'favobj': 	'set_rf_rate',
-		'favid': 	id,
-		'favcnt':	interval
-	}
+	
+	if((typeof(params) == 'undefined') || is_null(params))  var params = {};
+	params['favobj'] = 'set_rf_rate';
+	params['favid'] = 	id;
+	params['favcnt'] = 	interval;
 
 	send_params(params);
 }

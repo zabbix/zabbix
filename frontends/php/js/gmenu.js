@@ -252,6 +252,11 @@ gmenushow: function(period, bstime){
 			this.setPeriodType();
 		}
 		
+		var gmenu_icon_pos = getPosition($('scroll_calendar'));
+		
+		this.gm_gmenu.style.top = (gmenu_icon_pos.top-96)+'px'; // 110 = G_MENU height
+		this.gm_gmenu.style.left = gmenu_icon_pos.left+'px';
+
 		this.gm_gmenu.show();
 		this.visible = 1;
 	}

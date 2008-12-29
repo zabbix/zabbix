@@ -136,16 +136,16 @@ return a;
 getUrl: function(){
 	this.formatQuery();
 	
-	var uri = (this.protocol.length > 0)?(this.protocol+'://'):'';
-	uri +=  encodeURI((this.username.length > 0)?(this.username):'');
-	uri +=  encodeURI((this.password.length > 0)?(':'+this.password):'');
-	uri +=  (this.host.length > 0)?(this.host):'';
-	uri +=  (this.port.length > 0)?(':'+this.port):'';
-	uri +=  encodeURI((this.path.length > 0)?(this.path):'');
-	uri +=  encodeURI((this.query.length > 0)?('?'+this.query):'');
-	uri +=  encodeURI((this.reference.length > 0)?('#'+this.reference):'');
-//	alert(uri.getProtocol()+' : '+uri.getHost()+' : '+uri.getPort()+' : '+uri.getPath()+' : '+uri.getQuery());
-return uri;
+	var url = (this.protocol.length > 0)?(this.protocol+'://'):'';
+	url +=  encodeURI((this.username.length > 0)?(this.username):'');
+	url +=  encodeURI((this.password.length > 0)?(':'+this.password):'');
+	url +=  (this.host.length > 0)?(this.host):'';
+	url +=  (this.port.length > 0)?(':'+this.port):'';
+	url +=  encodeURI((this.path.length > 0)?(this.path):'');
+	url +=  encodeURI((this.query.length > 0)?('?'+this.query):'');
+	url +=  encodeURI((this.reference.length > 0)?('#'+this.reference):'');
+//	alert(url.getProtocol()+' : '+url.getHost()+' : '+url.getPort()+' : '+url.getPath()+' : '+url.getQuery());
+return url;
 },
 
 setArgument: function(key,value){

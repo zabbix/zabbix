@@ -45,7 +45,7 @@ img.bar_arrow{
 }
 
 div#scroll{
-	position:absolute;
+	position: relative;
 /*	display:none; */
 	height:17px;
 }
