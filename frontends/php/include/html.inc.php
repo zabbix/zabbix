@@ -124,7 +124,7 @@
 
 // dirty FIX !!!!!!!!!!!!!	 FIX this one
 		global $page;
-		if(!str_in_array($page['file'],array('charts.php','screens.php')))
+		if(!str_in_array($page['file'],array('charts.php','screens.php','slides.php')))
 			$icons_row[] = $icon;
 //---------------------------------------
 //		$icons_row[] = $icon;

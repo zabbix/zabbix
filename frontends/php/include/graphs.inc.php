@@ -329,7 +329,6 @@
 		$table->AddRow($tr);
 		
 		$table->Show();
-		echo SBR;
 	}
 
 	function get_graphitem_by_gitemid($gitemid){

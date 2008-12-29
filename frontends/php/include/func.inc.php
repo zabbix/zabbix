@@ -36,10 +36,14 @@ function get_refresh_obj_script($obj){
 	$obj['url'] = isset($obj['url'])?$obj['url']:'';
 	$obj['url'].= (zbx_empty($obj['url'])?'?':'&').'output=html';
 	
-return 'updater.setObj4Update("'.$obj['id'].'",'.$obj['interval'].',"'.$obj['url'].'",{"favobj": "refresh", "favid": "'.$obj['id'].'"});';
+	if(!isset($obj['params'])) $obj['params'] = array();
+	$obj['params']['favobj'] = 'refresh';
+	$obj['params']['favid'] = $obj['id'];
+	
+return 'updater.setObj4Update("'.$obj['id'].'",'.$obj['interval'].',"'.$obj['url'].'",'.zbx_jsvalue($obj['params']).');';
 }
 
-function make_refresh_menu($id,$cur_interval,&$menu,&$submenu){
+function make_refresh_menu($id,$cur_interval,$params=null,&$menu,&$submenu){
 
 	$menu['menu_'.$id][] = array(S_REFRESH, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$intervals = array('10','30','60','120','600','900');
@@ -47,7 +51,7 @@ function make_refresh_menu($id,$cur_interval,&$menu,&$submenu){
 	foreach($intervals as $key => $value){
 		$menu['menu_'.$id][] = array(
 					S_EVERY.SPACE.$value.SPACE.S_SECONDS_SMALL, 
-					'javascript: setRefreshRate("'.$id.'",'.$value.');'.
+					'javascript: setRefreshRate("'.$id.'",'.$value.','.zbx_jsvalue($params).');'.
 					'void(0);',	
 					null, 
 					array('outer' => ($value == $cur_interval)?'pum_b_submenu':'pum_o_submenu', 'inner'=>array('pum_i_submenu')

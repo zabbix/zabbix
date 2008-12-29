@@ -165,42 +165,32 @@
 	return FALSE;
 	}
 	
-
-
 	function get_slideshow($slideshowid, $step, $effectiveperiod=NULL){
 		$sql = 'SELECT min(step) as min_step, max(step) as max_step '.
 				' FROM slides '.
 				' WHERE slideshowid='.$slideshowid;
 		$slide_data = DBfetch(DBselect($sql));
-
 		if(!$slide_data || is_null($slide_data['min_step'])){
 			return new CTableInfo(S_NO_SLIDES_DEFINED);
 		}
 
+		$step = $step % ($slide_data['max_step']+1);
 		if(!isset($step) || $step < $slide_data['min_step'] || $step > $slide_data['max_step']){
 			$curr_step = $slide_data['min_step'];
 		}
 		else{
 			$curr_step = $step;
 		}
-		
-		if(!isset($step)){
-			$iframe = new CIFrame('screens.php?config=1&fullscreen=2&elementid='.$slideshowid.'&step='.$curr_step.
-					'&period='.$effectiveperiod.url_param('stime').url_param('from'),'99%');
-					
-			return $iframe;
-		}
 
-		$slide_data = DBfetch(DBselect('select sl.screenid,sl.delay,ss.delay as ss_delay from slides sl,slideshows ss '.
-				       ' where ss.slideshowid='.$slideshowid.' and ss.slideshowid=sl.slideshowid and sl.step='.$curr_step));
-
-		if( $slide_data['delay'] <= 0 ){
+		$sql = 'SELECT sl.screenid,sl.delay,ss.delay as ss_delay '.
+				' FROM slides sl,slideshows ss '.
+				' WHERE ss.slideshowid='.$slideshowid.
+					' and ss.slideshowid=sl.slideshowid '.
+					' and sl.step='.$curr_step;
+		$slide_data = DBfetch(DBselect($sql));
+		if($slide_data['delay'] <= 0){
 			$slide_data['delay'] = $slide_data['ss_delay'];
 		}
-
-		simple_js_redirect('screens.php?config=1&fullscreen=2&elementid='.$slideshowid.'&step='.($curr_step + 1).
-				'&period='.$effectiveperiod.url_param('stime').url_param('from'),
-				$slide_data['delay']);
 
 	return get_screen($slide_data['screenid'],2,$effectiveperiod);
 	}
@@ -387,11 +377,21 @@
 *		Aly
 */
 
-	function check_dynamic_items($screenid){
-		$sql = 'SELECT screenitemid '.
+	function check_dynamic_items($elid, $config=0){
+		if($config == 0){
+			$sql = 'SELECT screenitemid '.
 			' FROM screens_items '.
-			' WHERE screenid='.$screenid.
+			' WHERE screenid='.$elid.
 				' AND dynamic='.SCREEN_DYNAMIC_ITEM;
+		}
+		else{
+			$sql = 'SELECT si.screenitemid '.
+			' FROM slides s, screens_items si '.
+			' WHERE s.slideshowid='.$elid.
+				' AND si.screenid=s.screenid'.
+				' AND si.dynamic='.SCREEN_DYNAMIC_ITEM;
+		}
+		
 		if(DBfetch(DBselect($sql,1))) return TRUE;
 	return FALSE;
 	}
@@ -915,7 +915,7 @@
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_GRAPH) ){
 					if($editmode == 0)
 						$action = 'charts.php?graphid='.$resourceid.url_param('period').url_param('stime');
-														
+
 					$graphid = null;						
 					$graphtype = GRAPH_TYPE_NORMAL;
 					$yaxis = 0;
@@ -1005,7 +1005,15 @@
 							else{
 								$stime = 'null';
 							}
-							zbx_add_post_js('graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
+							
+							global $page;
+							if($page['type'] == PAGE_TYPE_HTML){
+								zbx_add_post_js('graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
+							}
+							else{
+								$g_img->addOption('onload','javascript: graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
+//								insert_js('graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
+							}
 						}
 					}
 					

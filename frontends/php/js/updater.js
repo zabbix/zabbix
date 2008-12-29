@@ -28,13 +28,23 @@ inloadobj:		new Array(),			// array containing updated obj and statuses
 	setObj4Update: function(id,frequency,url,params){
 		var obj = document.getElementById(id);
 		if((typeof(obj) == 'undefined')) return false; 
-	
+
+		var lastupdate = 0;
+		if(typeof(params['lastupdate']) != 'undefined'){
+			lastupdate = params['lastupdate'];
+		}
+		else{
+			delete(params['lastupdate']);
+		}
+
+		if(typeof(params['upd_counter']) == 'undefined') params['upd_counter'] = 0;		
+
 		var obj4update = {
 			'id': 		id,
 			'url': 		url,
 			'params': 	params,
 			'interval': frequency,
-			'lastupdate': 0,
+			'lastupdate': lastupdate,
 			'ready': true
 		}
 		
@@ -51,7 +61,7 @@ inloadobj:		new Array(),			// array containing updated obj and statuses
 			
 			for(var i=0; i < this.objlist.length; i++){
 				if((typeof(this.optlist[this.objlist[i]]) != 'undefined') && !empty(this.optlist[this.objlist[i]])){
-	//				alert(Math.abs(now - this.optlist[this.objlist[i]].lastupdate));
+//				alert(Math.abs(now - this.optlist[this.objlist[i]].lastupdate));
 					if(this.optlist[this.objlist[i]].ready && (this.optlist[this.objlist[i]].interval <= Math.abs(now - this.optlist[this.objlist[i]].lastupdate))){
 						this.update(this.optlist[this.objlist[i]],now);
 					}
@@ -63,6 +73,7 @@ inloadobj:		new Array(),			// array containing updated obj and statuses
 	
 	update: function(obj4update,time){
 		obj4update.ready = false;
+		obj4update.params.upd_counter++;
 		
 		var uri = new Curl(obj4update.url);
 		new Ajax.Updater(obj4update.id, obj4update.url,
@@ -77,12 +88,13 @@ inloadobj:		new Array(),			// array containing updated obj and statuses
 							resp.responseText = $(obj4update.id).innerHTML;
 //							return false;
 						}
+//						SDI(resp.responseText);
 						
 						obj4update.lastupdate = time; 
 						obj4update.ready = true;
-					},	//SDI(resp.responseText);
+					},
 				'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(obj4update.params); }
-			});	
+			});
 	},
 	
 	onetime_update: function(obj, url_path, params){
@@ -101,7 +113,7 @@ inloadobj:		new Array(),			// array containing updated obj and statuses
 				
 		if('undefined' != typeof(this.optlist[obj.id])){
 			var dt = new Date();
-			this.optlist[obj.id].lastupdate = parseInt(dt.getTime()/1000)
+			this.optlist[obj.id].lastupdate = parseInt(dt.getTime()/1000);
 			this.optlist[obj.id].url = update_url+(empty(update_url)?'?':'&')+Object.toQueryString(params);
 		}
 //SDI_json(params);

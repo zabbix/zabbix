@@ -256,7 +256,7 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
-	if($_REQUEST['action']=='showgraph' && $item_type != ITEM_VALUE_TYPE_LOG){
+	if($_REQUEST['action']=='showgraph' && ($item_type != ITEM_VALUE_TYPE_LOG)){
 		$dom_graph_id = 'graph';
 
 		$bstime = isset($_REQUEST['stime'])?$_REQUEST['stime']:date('YmdHi',(time()-$_REQUEST['period']));
@@ -549,6 +549,10 @@ COpt::profiling_stop('history');
 							
 			zbx_add_post_js($script); 
 
+			$scroll_div = new CDiv();
+			$scroll_div->addOption('id','scroll_cntnr');
+			$scroll_div->addOption('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
+			$scroll_div->show();
 //		navigation_bar("history.php",$to_save_request);
 		}
 	}

@@ -27,9 +27,9 @@
 
 
 	$page['title'] = "S_CUSTOM_SCREENS";
-	$page['file'] = 'screens.php';
+	$page['file'] = 'slides.php';
 	$page['hist_arg'] = array('config','elementid');
-	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js'); //do not change order!!!
+	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js','updater.js','menu_scripts.js'); //do not change order!!!
 
 	$_REQUEST['config'] = get_request('config',get_profile('web.screens.config',0));
 
@@ -58,18 +58,20 @@ include_once 'include/page_header.php';
 
 		'elementid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
 		'step'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		BETWEEN(0,65535),NULL),
-		'from'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
 		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
 
 		'reset'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1,2'),		NULL),
+		
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,			null),
 
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL)
+		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
+		'upd_counter'=> array(T_ZBX_INT, O_OPT, P_ACT,  null,		null),
 	);
 
 	check_fields($fields);
@@ -100,6 +102,45 @@ include_once 'include/page_header.php';
 				print('switchElementsClass("addrm_fav","iconminus","iconplus");');
 			}
 		}
+		
+		if('refresh' == $_REQUEST['favobj']){
+			switch($_REQUEST['favid']){
+				case 'hat_slides':
+					$elementid = $_REQUEST['elementid'];
+
+					$effectiveperiod = navigation_bar_calc();
+					$step = get_request('upd_counter');
+//					$element = new CTableInfo(S_NO_SLIDESHOWS_DEFINED);
+
+					$element = get_slideshow($elementid, $step, $effectiveperiod);
+					$element->Show();
+					
+//					$element = get_slideshow($elementid, get_request('step', null), $effectiveperiod);
+					break;
+			}
+		}
+		
+		if('set_rf_rate' == $_REQUEST['favobj']){
+			if(str_in_array($_REQUEST['favid'],array('hat_slides'))){
+				$elementid = $_REQUEST['elementid'];
+				
+				update_profile('web.slides.rf_rate.'.$_REQUEST['favid'],$_REQUEST['favcnt'], PROFILE_TYPE_INT);
+				$_REQUEST['favcnt'] = get_profile('web.slides.rf_rate.'.$_REQUEST['favid'],30);
+
+				$refresh_el = array('id' => 'hat_slides',
+							'interval' => get_profile('web.slides.rf_rate.hat_slides',30),
+							'url' => 'slides.php?elementid='.$elementid.url_param('stime').url_param('period'),
+							);
+				print get_refresh_obj_script($refresh_el);
+				
+				$menu = array();
+				$submenu = array();
+				
+				make_refresh_menu($_REQUEST['favid'],$_REQUEST['favcnt'],array('elementid'=> $elementid),$menu,$submenu);
+				
+				print 'page_menu["menu_'.$_REQUEST['favid'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favid']]).';';
+			}
+		}
 	}	
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
@@ -107,7 +148,7 @@ include_once 'include/page_header.php';
 	}
 ?>
 <?php
-	$config = $_REQUEST['config'] = get_request('config', 0);
+	$config = $_REQUEST['config'] = get_request('config', 1);
 
 	if( 2 != $_REQUEST['fullscreen'] )
 		update_profile('web.screens.config', $_REQUEST['config'],PROFILE_TYPE_INT);
@@ -127,38 +168,37 @@ include_once 'include/page_header.php';
 	$elementid = get_request('elementid', null);
 	if($elementid <= 0) $elementid = null;
 
-	$p_elements = array();
-	
-	$text = null;
-	
+	$text = S_SLIDESHOWS;
+		
 	$form = new CForm();
-	$form->SetMethod('get');
+	$form->setMethod('get');
+	$form->addVar('config',S_SLIDESHOWS);	
+	$form->addVar('fullscreen',$_REQUEST['fullscreen']);
 	
-	$form->AddVar('fullscreen',$_REQUEST['fullscreen']);
-	if(isset($_REQUEST['period']))	$form->AddVar('period', $_REQUEST['period']);
-	if(isset($_REQUEST['stime']))	$form->AddVar('stime', $_REQUEST['stime']);
+	if(isset($_REQUEST['period']))	$form->addVar('period', $_REQUEST['period']);
+	if(isset($_REQUEST['stime']))	$form->addVar('stime', $_REQUEST['stime']);
 
-	$cmbConfig = new CComboBox('config', $config, "javascript: redirect('slides.php?config=1');");
-	$cmbConfig->AddItem(0, S_SCREENS);
-	$cmbConfig->AddItem(1, S_SLIDESHOWS);
+	$cmbConfig = new CComboBox('config', $config, "javascript: redirect('screens.php?config=0');");
+	$cmbConfig->addItem(0, S_SCREENS);
+	$cmbConfig->addItem(1, S_SLIDESHOWS);
 
-	$form->AddItem(array(S_SHOW.SPACE,$cmbConfig));
+	$form->addItem(array(S_SHOW.SPACE,$cmbConfig));
 
 	$cmbElements = new CComboBox('elementid',$elementid,'submit()');
 	unset($screen_correct);
 	unset($first_screen);
 
 
-	$result = DBselect('SELECT screenid as elementid, name '.
-			' FROM screens '.
-			' WHERE '.DBin_node('screenid').
+	$result = DBselect('SELECT slideshowid as elementid,name '.
+			' FROM slideshows '.
+			' WHERE '.DBin_node('slideshowid').
 			' ORDER BY name'
 			);
 	while($row=DBfetch($result)){
-		if(!screen_accessible($row['elementid'], PERM_READ_ONLY))
+		if(!slideshow_accessible($row['elementid'], PERM_READ_ONLY))
 			continue;
 
-		$cmbElements->AddItem(
+		$cmbElements->addItem(
 				$row['elementid'],
 				get_node_name_by_elid($row['elementid']).$row['name']
 				);
@@ -166,22 +206,17 @@ include_once 'include/page_header.php';
 		if(!isset($first_element)) $first_element = $row['elementid'];
 	}
 
+
 	if(!isset($element_correct) && isset($first_element)){
 		$elementid = $first_element;
 	}
 
-	if(isset($elementid)){
-		if(!screen_accessible($elementid, PERM_READ_ONLY)) access_deny();
-		$element = get_screen_by_screenid($elementid);
-		
-		if($element ){
-			$text = $element['name'];
-		}
-	}
+	if(isset($elementid) && !slideshow_accessible($elementid, PERM_READ_ONLY)) access_deny();
 
-	if($cmbElements->ItemsCount() > 0) $form->AddItem(array(SPACE.S_SCREENS.SPACE,$cmbElements));
-		
-	if((2 != $_REQUEST['fullscreen']) && !empty($elementid) && check_dynamic_items($elementid, 0)){
+	if($cmbElements->ItemsCount() > 0) $form->addItem(array(SPACE.S_SLIDESHOW.SPACE,$cmbElements));
+	
+	
+	if((2 != $_REQUEST['fullscreen']) && !empty($elementid) && check_dynamic_items($elementid, 1)){
 		if(!isset($_REQUEST['hostid'])){
 			$_REQUEST['groupid'] = $_REQUEST['hostid'] = 0;
 		}
@@ -225,6 +260,7 @@ include_once 'include/page_header.php';
 			$sql_from .= ',hosts_groups hg ';
 			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
 		}
+		
 		$sql='SELECT DISTINCT h.hostid,h.host '.
 			' FROM hosts h '.$sql_from.
 			' WHERE '.DBcondition('h.hostid',$available_hosts).
@@ -232,7 +268,6 @@ include_once 'include/page_header.php';
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND EXISTS(SELECT i.itemid FROM items i WHERE i.status='.ITEM_STATUS_ACTIVE.' AND i.hostid=h.hostid ) '.
 			' ORDER BY h.host';
-
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
 			$cmbHosts->addItem(
@@ -248,50 +283,26 @@ include_once 'include/page_header.php';
 		show_table_header($text,$form);
 	}
 ?>
-<?php
+<?php	
+	$slide_name = S_SLIDESHOW;
 	if(isset($elementid)){
-		$effectiveperiod = navigation_bar_calc();
-		
-
-		if($element = get_screen($elementid, 0, $effectiveperiod)){
-			$p_elements[] = $element;
-		}
-		
-		$_REQUEST['elementid'] = $elementid;
-
-		if( 2 != $_REQUEST['fullscreen'] ){
-		
-			$stime = time() - (31536000); // ~1year
-			$bstime = time()-$effectiveperiod;
-			
-			if(isset($_REQUEST['stime'])){
-				$bstime = $_REQUEST['stime'];
-				$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-			}
-			
- 			$script = 	'scrollinit(0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');
-						 showgraphmenu("iframe");';
-							
-			zbx_add_post_js($script); 
-//			navigation_bar('screens.php',array('config','elementid'));
+		if($element = get_slideshow_by_slideshowid($elementid)){
+			$slide_name = $element['name'];
 		}
 	}
-	else{
-		$p_elements[] = new CTableInfo(S_NO_SCREENS_DEFINED);
-	}
-	
+
 	$icon = null;
 	$fs_icon = null;
-	if(isset($elementid) && $element ){
-		if(infavorites('web.favorite.screenids',$elementid,'screenid')){
+	if(isset($elementid) && $element){
+		if(infavorites('web.favorite.screenids',$elementid,'slideshowid')){
 			$icon = new CDiv(SPACE,'iconminus');
 			$icon->addOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
-			$icon->addAction('onclick',new CScript("javascript: rm4favorites('screenid','".$elementid."',0);"));
+			$icon->addAction('onclick',new CScript("javascript: rm4favorites('slideshowid','".$elementid."',0);"));
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
 			$icon->addOption('title',S_ADD_TO.' '.S_FAVORITES);
-			$icon->addAction('onclick',new CScript("javascript: add2favorites('screenid','".$elementid."');"));
+			$icon->addAction('onclick',new CScript("javascript: add2favorites('slideshowid','".$elementid."');"));
 		}
 		$icon->addOption('id','addrm_fav');
 		
@@ -303,31 +314,84 @@ include_once 'include/page_header.php';
 		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));	
 	}
 	
-	if( 2 == $_REQUEST['fullscreen']){
-		echo unpack_object($p_elements);
+	$menu = array();
+	$submenu = array();
+
+// js menu arrays	
+	make_refresh_menu('hat_slides',get_profile('web.slides.rf_rate.hat_slides',30),array('elementid'=> $elementid),$menu,$submenu);
+
+	insert_js('var page_menu='.zbx_jsvalue($menu).";\n".
+			 'var page_submenu='.zbx_jsvalue($submenu).";\n"
+		);	
+// --------------
+	
+	$tab = new CTable();
+	$tab->setCellPadding(0);
+	$tab->setCellSpacing(0);
+
+	$tab->addOption('border',0);
+	$tab->addOption('width','100%');
+
+// Refresh tab
+
+	$refresh_tab = array(
+		array('id' => 'hat_slides',
+				'interval' => get_profile('web.slides.rf_rate.hat_slides',30),
+				'url' => 'slides.php?elementid='.$elementid.url_param('stime').url_param('period').url_param('groupid').url_param('hostid'),
+				'params'=> array('lastupdate' => time()),
+			));
+	add_refresh_objects($refresh_tab);
+	
+	$refresh_icon = new CDiv(SPACE,'iconmenu');
+	$refresh_icon->addAction('onclick','javascript: create_page_menu(event,"hat_slides");');
+	$refresh_icon->addOption('title',S_MENU);
+	
+	if(isset($elementid)){
+		$effectiveperiod = navigation_bar_calc();
+		if( 2 != $_REQUEST['fullscreen'] ){		
+			$stime = time() - 31536000; // ~1year
+			$bstime = time()-$effectiveperiod;
+			
+			if(isset($_REQUEST['stime'])){
+				$bstime = $_REQUEST['stime'];
+				$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+			}
+
+			zbx_add_post_js('onload_update_scroll("iframe",0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');');
+		}
+		$element = get_slideshow($elementid, 0, $effectiveperiod);
 	}
 	else{
-		$screens_hat = create_hat(
-				S_SCREENS_BIG,
-				$p_elements,
-				array($icon,$fs_icon),
-				'hat_screens',
-				get_profile('web.screens.hats.hat_screens.state',1)
-		);
-		
-		$screens_hat->Show();
+		$element = new CSpan(S_LOADING_P,'textcolorstyles');
 	}
+
+	$tab->addRow(create_hat(
+			$slide_name,
+			$element,
+			array($icon,$fs_icon,$refresh_icon),
+			'hat_slides',
+			get_profile('web.slides.hats.hat_slides.state',1)
+		),'center');
+	
+
+	$tab->show();
 	
 	$scroll_div = new CDiv();
 	$scroll_div->addOption('id','scroll_cntnr');
 	$scroll_div->addOption('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
 	$scroll_div->show();
 	
+/*	
+	$img = new CImg('images/general/tree/zero.gif','space','20','20');
+	$elements = array($img,BR());
+	print(unpack_object($elements));
+//*/
+
 	$jsmenu = new CPUMenu(null,170);
-	$jsmenu->InsertJavaScript();
+	$jsmenu->InsertJavaScript();	
 ?>
 <?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>

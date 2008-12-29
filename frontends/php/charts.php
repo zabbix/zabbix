@@ -384,7 +384,6 @@ include_once 'include/page_header.php';
 	}
 	
 	$p_elements[] = $table;
-	$p_elements[] = BR();
 	
 	$icon = null;
 	$fs_icon = null;
@@ -409,8 +408,8 @@ include_once 'include/page_header.php';
 		$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 		
 		$rst_icon = new CDiv(SPACE,'iconreset');
-		$rst_icon->AddOption('title',S_RESET);
-		$rst_icon->AddAction('onclick',new CScript("javascript: graphload(SCROLL_BAR.dom_graphs, ".(time()+100000000).", 3600, false);"));
+		$rst_icon->addOption('title',S_RESET);
+		$rst_icon->addAction('onclick',new CScript("javascript: graphload(SCROLL_BAR.dom_graphs, ".(time()+100000000).", 3600, false);"));
 		
 	}
 	
@@ -441,6 +440,11 @@ include_once 'include/page_header.php';
 		}
 
 		zbx_add_post_js($script);
+		
+		$scroll_div = new CDiv();
+		$scroll_div->addOption('id','scroll_cntnr');
+		$scroll_div->addOption('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
+		$scroll_div->show();
 //		navigation_bar('charts.php',array('groupid','hostid','graphid'));
 //-------------
 	}

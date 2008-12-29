@@ -22,6 +22,7 @@
 // Author: Aly
 
 var _PE_SB = null;
+var graphmenu_activated = false;
 
 function hidegraphmenu(pe){
 	if(is_null(_PE_SB)) return;
@@ -34,6 +35,8 @@ function hidegraphmenu(pe){
 }
 
 function showgraphmenu(obj_id){
+//	if(graphmenu_activated) return;
+//	else graphmenu_activated = true;
 	
 	var obj = $(obj_id);
 	if((typeof(obj) == 'undefined')) return false;
@@ -44,16 +47,10 @@ function showgraphmenu(obj_id){
 		addListener(obj,'load',function(){SCROLL_BAR.disabled=0;});
 		period_exec = 0.01;
 	}
-
-	var pos = getPosition(obj);
-	pos.top+=obj.offsetHeight+18;
 	
-	SCROLL_BAR.scrl_scroll.style.top = pos.top+"px"; // 110 = G_MENU height
-	SCROLL_BAR.scrl_scroll.style.left = 1+"px";
-	
-	G_MENU.gm_gmenu.style.top = (pos.top-108)+"px"; // 110 = G_MENU height
-	G_MENU.gm_gmenu.style.left = 1+"px";
-	
+	SCROLL_BAR.scrl_scroll.style.top = '20px'; // 110 = G_MENU height
+	SCROLL_BAR.scrl_scroll.style.left = '1px';
+		
 	SCROLL_BAR.onchange = function(){
 		if(is_null(_PE_SB)){
 			_PE_SB = new PeriodicalExecuter(hidegraphmenu,period_exec);
@@ -98,23 +95,23 @@ function showgraphmenu(obj_id){
 function graph_zoom_init(graph_id,stime,period,width,height, dynamic){
 	if((typeof(graph_id) == 'undefined') || empty(graph_id)) return;
 	dynamic = dynamic || 0;
-	
+		
 	A_SBOX[graph_id].sbox = sbox_init(stime,period);
 	A_SBOX[graph_id].sbox.sbox_id = graph_id;
 	A_SBOX[graph_id].sbox.dynamic = dynamic;
 	
-	var igraph = $(graph_id);	
+	var igraph = $(graph_id);
 	var boxongraph = create_box_on_obj(igraph.parentNode);
 	
 	A_SBOX[graph_id].sbox.dom_obj = boxongraph;
-	
+
 	A_SBOX[graph_id].sbox.moveSBoxByObj(igraph);
 
 	width = width || 900;
 	height = height || 200;
 	
 	if(empty(width)) width = 900;
-	if(empty(height)) height = 900;
+	if(empty(height)) height = 200;
 	
 	A_SBOX[graph_id].sbox.obj.width = width-1;
 	A_SBOX[graph_id].sbox.obj.height = height;
@@ -123,19 +120,15 @@ function graph_zoom_init(graph_id,stime,period,width,height, dynamic){
 	boxongraph.style.width = A_SBOX[graph_id].sbox.obj.width+'px';
 
 // Listeners
-	addListener(window,'resize',A_SBOX[graph_id].sbox.moveSBoxByObj.bindAsEventListener(A_SBOX[graph_id].sbox,graph_id));
+	addListener(window,'resize',moveSBoxes);
 	
 	if(IE){
 		igraph.attachEvent('onmousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox));
 		igraph.onmousemove = A_SBOX[graph_id].sbox.mousemove.bind(A_SBOX[graph_id].sbox);
 	}
-	else if(OP){
-		boxongraph.addEventListener('mousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox),false);
-		boxongraph.onmousemove = A_SBOX[graph_id].sbox.mousemove.bind(A_SBOX[graph_id].sbox);
-	}
 	else{
-		boxongraph.addEventListener('mousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox),false);		
-		boxongraph.addEventListener('mousemove',A_SBOX[graph_id].sbox.mousemove.bindAsEventListener(A_SBOX[graph_id].sbox),false);	
+		addListener(boxongraph,'mousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox),false);
+		addListener(boxongraph,'mousemove',A_SBOX[graph_id].sbox.mousemove.bindAsEventListener(A_SBOX[graph_id].sbox),false);
 	}
 	
 	addListener(document,'mouseup',A_SBOX[graph_id].sbox.mouseup.bindAsEventListener(A_SBOX[graph_id].sbox),true);
@@ -168,13 +161,13 @@ function graphload(dom_objects,unix_stime,period,dynamic){
 	
 	dynamic = dynamic || 0;
 	var src = '';
-	var uri = '';
+	var url = '';
 	
 	if(!is_array(dom_objects)) dom_objects = new Array($(dom_objects));
 
 	if(dynamic){
 		for(var i=0; i<dom_objects.length; i++){
-			if((typeof(dom_objects[i].nodeName) == 'undefined') && (dom_objects[i].nodeName.toLowerCase() != 'img')){
+			if((typeof(dom_objects[i].nodeName) == 'undefined') || (dom_objects[i].nodeName.toLowerCase() != 'img')){
 				continue;
 			}
 // SBOX			
@@ -203,19 +196,21 @@ function graphload(dom_objects,unix_stime,period,dynamic){
 			G_MENU.setPeriodType();
 //---------
 //alert(url_stime);
-			uri = new Curl(dom_objects[i].src);
-			uri.setArgument('stime', url_stime);
-			uri.setArgument('period', period);
+			url = new Curl(dom_objects[i].src);
+			url.setArgument('stime', url_stime);
+			url.setArgument('period', period);
 			
-			dom_objects[i].src = uri.getUrl();
+			dom_objects[i].src = url.getUrl();
 		}
 	}
 	else{
-		uri = new Curl(dom_objects[0].href);
-		uri.setArgument('stime', url_stime);
-		uri.setArgument('period', period);
+		url = new Curl(dom_objects[0].href);
+		url.setArgument('stime', url_stime);
+		url.setArgument('period', period);
+		url.unsetArgument('output');
 
-		dom_objects[0].href = uri.getUrl();
+		var str_url = url.getUrl();
+		dom_objects[0].href = str_url;
 	}	
 }
 
