@@ -140,7 +140,8 @@ COpt::profiling_start("page");
 						),
 					array(
 							'url'=>'screens.php',
-							'label'=>S_SCREENS	
+							'label'=>S_SCREENS,
+							'sub_pages'=>array('slides.php')
 						),
 					array(
 							'url'=>'maps.php',

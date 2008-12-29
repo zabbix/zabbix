@@ -132,6 +132,20 @@ function addListener(element, eventname, expression, bubbling){
 	else return false;
 }
 
+function removeListener(element, eventname, expression, bubbling){
+	bubbling = bubbling || false;
+	
+	if(window.removeEventListener)	{
+		element.removeEventListener(eventname, expression, bubbling);
+		return true;
+	} 
+	else if(window.detachEvent) {
+		element.detachEvent('on'+eventname, expression);
+		return true;
+	} 
+	else return false;
+}
+
 function add_variable(o_el, s_name, x_value, s_formname, o_document){
 	var form;
 	
@@ -277,12 +291,21 @@ return targ;
 
 function getPosition(obj){
 	var pos = {top: 0, left: 0};
-	if(typeof(obj.offsetParent) != 'undefined') {
+	if(!is_null(obj) && (typeof(obj.offsetParent) != 'undefined')){
 		pos.left = obj.offsetLeft;
 		pos.top = obj.offsetTop;
-		while (obj = obj.offsetParent) {
-			pos.left += obj.offsetLeft;
-			pos.top += obj.offsetTop;
+		try{
+			while(!is_null(obj.offsetParent)){
+				obj=obj.offsetParent;
+				pos.left += obj.offsetLeft;
+				pos.top += obj.offsetTop;
+				
+				if(IE && (obj.offsetParent.toString() == 'unknown')){
+//					alert(obj.offsetParent.toString());
+					break;
+				}
+			}
+		} catch(e){
 		}
 	}
 return pos;
@@ -426,30 +449,26 @@ function remove_element(elmnt,tag){
 return true;
 }
 
-function resizeiframe(id){
-	id = id || 'iframe';
-	var iframe = document.getElementById(id);
-	var indoc = (IE)?iframe.contentWindow.document:iframe.contentDocument;
-	if(typeof(indoc) == 'undefined') return;
-	var height = parseInt(indoc.getElementsByTagName('body')[0].scrollHeight);
-	var height2 = parseInt(indoc.getElementsByTagName('body')[0].offsetHeight);
-	
-	if(height2 > height){
-		height = height2;
+function onload_update_scroll(id,w,period,stime,timel,bar_stime){
+	var obj = $(id);
+	if((typeof(obj) == 'undefined') || is_null(obj)){
+		setTimeout('onload_update_scroll("'+id+'",'+w+','+period+','+stime+','+timel+','+bar_stime+');',1000);
+		return;
 	}
-
-	iframe.style.height = (height)+'px';
-	
+//	eval('var fnc = function(){ onload_update_scroll("'+id+'",'+w+','+period+','+stime+','+timel+','+bar_stime+');}');
+	scrollinit(w,period,stime,timel,bar_stime);
 	if(!is_null($('scroll')) && showgraphmenu){
-		showgraphmenu('iframe');
+		showgraphmenu(id);
 	}
+//	addListener(window,'resize', fnc );
 }
 
 function ShowHide(obj,style){
-	if(typeof(style) == 'undefined')
-		var style = 'inline';
+	if(typeof(style) == 'undefined') var style = 'inline';
+	
 	if(is_string(obj))
 		obj = document.getElementById(obj);
+		
 	if(!obj){
 		throw 'ShowHide(): Object not foun.';
 		return false;

@@ -240,7 +240,6 @@ include_once "include/page_header.php";
 		,'center')));
 
 	$form->Show();
-	echo SBR.SBR;
 	
 
 	$period = get_request('period',3600);
@@ -260,6 +259,11 @@ include_once "include/page_header.php";
 				graph_zoom_init("graph_2",'.$bstime.','.$period.',ZBX_G_WIDTH, 150, false);';
 					
 	zbx_add_post_js($script); 
+
+	$scroll_div = new CDiv();
+	$scroll_div->addOption('id','scroll_cntnr');
+	$scroll_div->addOption('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
+	$scroll_div->show();
 
 //	navigation_bar("#", array('httptestid'));
 ?>

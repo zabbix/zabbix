@@ -200,6 +200,7 @@ frontends/php/popup_period.php -text
 frontends/php/report6.php -text
 frontends/php/scripts.php -text
 frontends/php/scripts_exec.php -text
+frontends/php/slides.php -text
 frontends/php/styles/bar.css -text
 frontends/php/styles/calendar.css -text
 frontends/php/styles/css_bb.css -text
