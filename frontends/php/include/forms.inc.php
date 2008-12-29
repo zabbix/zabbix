@@ -1694,7 +1694,11 @@
 			(!isset($_REQUEST['itemid'])) ? null :
 				new CButtonQMessage('del_history',S_CLEAN_HISTORY,S_HISTORY_CLEANING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q)
 			));
-		$frmItem->AddRow(S_KEEP_TRENDS_IN_DAYS, new CNumericBox('trends',$trends,8));
+			
+		if(uint_in_array($value_type, array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)))
+			$frmItem->addRow(S_KEEP_TRENDS_IN_DAYS, new CNumericBox('trends',$trends,8));
+		else
+			$frmItem->addVar('trends',0);
 
 		$cmbStatus = new CComboBox('status',$status);
 		foreach(array(ITEM_STATUS_ACTIVE,ITEM_STATUS_DISABLED,ITEM_STATUS_NOTSUPPORTED) as $st)
