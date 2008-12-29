@@ -404,7 +404,7 @@ COpt::profiling_start("page");
 	{
 COpt::compare_files_with_menu($ZBX_MENU);
 
-		$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.4", "small_font");
+		$help = new CLink(S_HELP, "http://www.zabbix.com/documentation.php", "small_font");
 		$help->SetTarget('_blank');
 		$support = new CLink(S_GET_SUPPORT, "http://www.zabbix.com/support.php", "small_font");
 		$support->SetTarget('_blank');

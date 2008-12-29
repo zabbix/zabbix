@@ -1,3 +1,7 @@
+Changes for 1.0.9
+
+ - [NTD-43] fixed wrong help links by pointing to correct page with manual (Artem)
+
 Changes for 1.0.8
 
  - [NTD-42] fixed pages error (Artem)
