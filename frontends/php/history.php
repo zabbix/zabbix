@@ -425,8 +425,9 @@ include_once "include/page_header.php";
 					);
 
 				$row['value'] = trim($row['value'],"\r\n");
+				$row['value'] = encode_log($row['value']);
 //				array_push($new_row,htmlspecialchars($row['value']));
-				array_push($new_row,encode_log($row['value']));
+				array_push($new_row, zbx_nl2br($row['value']));
 
 				if(!isset($_REQUEST['plaintext'])){
 

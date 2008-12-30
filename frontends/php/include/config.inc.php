@@ -1113,20 +1113,22 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	function delete_valuemap($valuemapid){
 		DBexecute('DELETE FROM mappings WHERE valuemapid='.$valuemapid);
 		DBexecute('DELETE FROM valuemaps WHERE valuemapid='.$valuemapid);
-		return TRUE;
+	return TRUE;
 	}
 
 	function replace_value_by_map($value, $valuemapid){
 		if($valuemapid < 1) return $value;
 
-		$result = DBselect('SELECT newvalue FROM mappings '.
-						' WHERE valuemapid='.$valuemapid.
-							' AND value='.zbx_dbstr($value));
+		$sql = 'SELECT newvalue '.
+				' FROM mappings '.
+				' WHERE valuemapid='.$valuemapid.
+					' AND value='.zbx_dbstr($value);
+		$result = DBselect($sql);
 		$row = DBfetch($result);
 		if($row){
 			return $row["newvalue"]." "."($value)";
 		}
-		return $value;
+	return $value;
 	}
 /*************** END VALUE MAPPING ******************/
 
