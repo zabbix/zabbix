@@ -211,9 +211,26 @@
 					if(!isset($data['useip']))	$data['useip'] = 0;
 					if(!isset($data['dns']))	$data['dns'] = '';
 					if(!isset($data['ip']))		$data['ip'] = '';
+					if(!isset($data['proxy']))	$data['proxy'] = '';
+					
+					if(!zbx_empty($data['proxy'])){
+						$sql = 'SELECT hostid '.
+								' FROM hosts '.
+								' WHERE host='.zbx_dbstr($data['proxy']).
+									' AND status='.HOST_STATUS_PROXY.
+									' AND '.DBin_node('hostid',get_current_nodeid(false));
+									
+						if($host_data = DBfetch(DBselect($sql)))
+							$data['proxy'] = $host_data['hostid'];
+						else
+							$data['proxy'] = 0;						
+					}
+					else{
+						$data['proxy'] = 0;
+					}
 
 					if(update_host($data['hostid'], $data['name'], $data['port'], $data['status'],
-						$data['useip'], $data['dns'], $data['ip'], 0, $data['templates'],
+						$data['useip'], $data['dns'], $data['ip'], $data['proxy'], $data['templates'],
 						'no', /* useipmi */
 						'', /* ipmi_ip */
 						623, /* ipmi_port */
