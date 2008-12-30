@@ -154,7 +154,9 @@ function graphload(dom_objects,unix_stime,period,dynamic){
 	var date = datetoarray(unix_stime);
 	var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
 	
+
 	if((typeof(SCROLL_BAR) != 'undefined') && SCROLL_BAR.changed){
+//alert((SCROLL_BAR.dt.getTime()-(SCROLL_BAR.period * 1000))+' == '+SCROLL_BAR.sdt.getTime());
 		if((SCROLL_BAR.dt.getTime()-(SCROLL_BAR.period * 1000)) == SCROLL_BAR.sdt.getTime()){
 			url_stime=parseInt(url_stime)+100000000;
 		}
@@ -221,8 +223,8 @@ function graphload(dom_objects,unix_stime,period,dynamic){
 
 function graphsubmit(){
 	SCROLL_BAR.disabled = 1;
-	SCROLL_BAR.changed = 0;
 	graphload(SCROLL_BAR.dom_graphs, SCROLL_BAR.getsTimeInUnix(), SCROLL_BAR.getPeriod(), (SCROLL_BAR.dom_graphs.length > 0));
+	SCROLL_BAR.changed = 0;
 }
 
 function gmenuload(){
