@@ -1,5 +1,6 @@
 Changes for 1.6.2
 
+ - [ZBX-443] removed excess space after detail messages (Artem)
  - [ZBX-526] fixed graphs on screens not getting refreshed issue (Artem)
  - [ZBX-531] fixed plain text line wrapping (Artem)
  - [ZBX-551] updated german language file (Artem)
