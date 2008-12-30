@@ -346,14 +346,14 @@
 		$table->SetHeader(array(S_TIMESTAMP,$host['host'].': '.item_description($item)));
 
 		while($row=DBfetch($result)){
-			switch($item["value_type"]){
+			switch($item['value_type']){
 				case ITEM_VALUE_TYPE_TEXT:	
-					if($DB['TYPE'] == "ORACLE"){
-						if(isset($row["value"])){
-							$row["value"] = $row["value"]->load();
+					if($DB['TYPE'] == 'ORACLE'){
+						if(isset($row['value'])){
+							$row['value'] = $row['value']->load();
 						}
 						else{
-							$row["value"] = "";
+							$row['value'] = '';
 						}
 					}
 					/* do not use break */
@@ -361,16 +361,19 @@
 					$value = nbsp(htmlspecialchars($row['value']));
 					$value = zbx_nl2br($value);
 					break;
-				
+				case ITEM_VALUE_TYPE_LOG:	
+					$value = nbsp(htmlspecialchars($row['value']));
+					$value = zbx_nl2br($value);
+					break;
 				default:
-					$value = $row["value"];
+					$value = $row['value'];
 					break;
 			}
 
-			if($row["valuemapid"] > 0)
-				$value = replace_value_by_map($value, $row["valuemapid"]);
+			if($row['valuemapid'] > 0)
+				$value = replace_value_by_map($value, $row['valuemapid']);
 
-			$table->AddRow(array(date(S_DATE_FORMAT_YMDHMS,$row["clock"]),	$value));
+			$table->AddRow(array(date(S_DATE_FORMAT_YMDHMS,$row['clock']),	$value));
 		}
 		return $table;
 	}
@@ -402,53 +405,53 @@
 		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,'screenedit.php#form');
 		$form->SetHelp('web.screenedit.cell.php');
 
-		if(isset($_REQUEST["screenitemid"])){
+		if(isset($_REQUEST['screenitemid'])){
 			$iresult=DBSelect('SELECT * FROM screens_items'.
 							' WHERE screenid='.$_REQUEST['screenid'].
 								' AND screenitemid='.$_REQUEST['screenitemid']
 							);
 
-			$form->AddVar("screenitemid",$_REQUEST["screenitemid"]);
+			$form->AddVar('screenitemid',$_REQUEST['screenitemid']);
 		} 
 		else{
-			$form->AddVar("x",$_REQUEST["x"]);
-			$form->AddVar("y",$_REQUEST["y"]);
+			$form->AddVar('x',$_REQUEST['x']);
+			$form->AddVar('y',$_REQUEST['y']);
 		}
 
-		if(isset($_REQUEST["screenitemid"]) && !isset($_REQUEST["form_refresh"])){
+		if(isset($_REQUEST['screenitemid']) && !isset($_REQUEST['form_refresh'])){
 		
 			$irow = DBfetch($iresult);
-			$resourcetype	= $irow["resourcetype"];
-			$resourceid	= $irow["resourceid"];
-			$width		= $irow["width"];
-			$height		= $irow["height"];
-			$colspan	= $irow["colspan"];
-			$rowspan	= $irow["rowspan"];
-			$elements	= $irow["elements"];
-			$valign		= $irow["valign"];
-			$halign		= $irow["halign"];
-			$style		= $irow["style"];
-			$url		= $irow["url"];
+			$resourcetype	= $irow['resourcetype'];
+			$resourceid	= $irow['resourceid'];
+			$width		= $irow['width'];
+			$height		= $irow['height'];
+			$colspan	= $irow['colspan'];
+			$rowspan	= $irow['rowspan'];
+			$elements	= $irow['elements'];
+			$valign		= $irow['valign'];
+			$halign		= $irow['halign'];
+			$style		= $irow['style'];
+			$url		= $irow['url'];
 			$dynamic	= $irow['dynamic'];
 		}
 		else{
-			$resourcetype	= get_request("resourcetype",	0);
-			$resourceid	= get_request("resourceid",	0);
-			$width		= get_request("width",		500);
-			$height		= get_request("height",		100);
-			$colspan	= get_request("colspan",	0);
-			$rowspan	= get_request("rowspan",	0);
-			$elements	= get_request("elements",	25);
-			$valign		= get_request("valign",		VALIGN_DEFAULT);
-			$halign		= get_request("halign",		HALIGN_DEFAULT);
-			$style		= get_request("style",		0);
-			$url		= get_request("url",		"");
-			$dynamic	= get_request("dynamic",	SCREEN_SIMPLE_ITEM);
+			$resourcetype	= get_request('resourcetype',	0);
+			$resourceid	= get_request('resourceid',	0);
+			$width		= get_request('width',		500);
+			$height		= get_request('height',		100);
+			$colspan	= get_request('colspan',	0);
+			$rowspan	= get_request('rowspan',	0);
+			$elements	= get_request('elements',	25);
+			$valign		= get_request('valign',		VALIGN_DEFAULT);
+			$halign		= get_request('halign',		HALIGN_DEFAULT);
+			$style		= get_request('style',		0);
+			$url		= get_request('url',		'');
+			$dynamic	= get_request('dynamic',	SCREEN_SIMPLE_ITEM);
 		}
 
-		$form->AddVar("screenid",$_REQUEST["screenid"]);
+		$form->AddVar('screenid',$_REQUEST['screenid']);
 
-		$cmbRes = new CCombobox("resourcetype",$resourcetype,"submit()");
+		$cmbRes = new CCombobox('resourcetype',$resourcetype,'submit()');
 			$cmbRes->addItem(SCREEN_RESOURCE_GRAPH,		S_GRAPH);
 			$cmbRes->addItem(SCREEN_RESOURCE_SIMPLE_GRAPH,	S_SIMPLE_GRAPH);
 			$cmbRes->addItem(SCREEN_RESOURCE_PLAIN_TEXT,	S_PLAIN_TEXT);
@@ -483,8 +486,8 @@
 						' WHERE g.graphid='.$resourceid);
 
 				while($row=DBfetch($result)){
-					$row["node_name"] = isset($row["node_name"]) ? "(".$row["node_name"].") " : '';
-					$caption = $row["node_name"].$row["host"].":".$row["name"];
+					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
+					$caption = $row['node_name'].$row['host'].':'.$row['name'];
 					$id = $resourceid;
 				}
 			}
