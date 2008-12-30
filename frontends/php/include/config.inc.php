@@ -358,8 +358,9 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$message = array();
 		$width = 0;
 		$height= 0;
+		$img_space = null;
 
-		if(!$bool && !is_null($errmsg))		$msg="ERROR: ".$errmsg;
+		if(!$bool && !is_null($errmsg))		$msg='ERROR: '.$errmsg;
 		else if($bool && !is_null($okmsg))	$msg=$okmsg;
 
 		if(isset($msg)){
@@ -393,10 +394,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					
 					$msg_tab->addRow(array(new CCol($msg_details,'clr'),$msg_col));
 					$msg_tab->Show();
+					
+					$img_space = new CImg('images/general/tree/zero.gif','space','100','2');
 					break;
 			}
 		}
-
 
 		if(isset($ZBX_MESSAGES)){
 			if($page['type'] == PAGE_TYPE_IMAGE){
@@ -418,7 +420,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					$height += imagefontheight($msg_font) + 1;
 				}
 			}
-			else if($page["type"] == PAGE_TYPE_XML){
+			else if($page['type'] == PAGE_TYPE_XML){
 				foreach($ZBX_MESSAGES as $msg){
 					echo '['.$msg['type'].'] '.$msg['message']."\n";
 				}
@@ -443,47 +445,49 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 				$tab = new CTable(null,($bool?'msgok':'msgerr'));
 				
-				$tab->SetCellPadding(0);
-				$tab->SetCellSpacing(0);
+				$tab->setCellPadding(0);
+				$tab->setCellSpacing(0);
 
-				$tab->AddOption('id','msg_messages');
-				$tab->AddOption('style','width: 100%;');
+				$tab->addOption('id','msg_messages');
+				$tab->addOption('style','width: 100%;');
 				
 				if(isset($msg_tab)){
-					$tab->AddOption('style','display: none;');
+					$tab->addOption('style','display: none;');
 				}
 				
-				$tab->AddRow(new CCol($lst_error,'msg'));
+				$tab->addRow(new CCol($lst_error,'msg'));
 				$tab->Show();
 //---
 			}
 			$ZBX_MESSAGES = null;
 		}
 		
-		if($page["type"] == PAGE_TYPE_IMAGE && count($message) > 0){
+		if(!is_null($img_space)) print(unpack_object($img_space));
+		
+		if($page['type'] == PAGE_TYPE_IMAGE && count($message) > 0){
 			$width += 2;
 			$height += 2;
 			$canvas = imagecreate($width, $height);
-			ImageFilledRectangle($canvas,0,0,$width,$height, ImageColorAllocate($canvas, 255, 255, 255));
+			imagefilledrectangle($canvas,0,0,$width,$height, imagecolorallocate($canvas, 255, 255, 255));
 
 			foreach($message as $id => $msg){
 			
 				$message[$id]['y'] = 1 + (isset($previd) ? $message[$previd]['y'] + $message[$previd]['h'] : 0 );
 				$message[$id]['h'] = imagefontheight($msg['font']);
 				
-				ImageString(
+				imagestring(
 					$canvas,
 					$msg['font'],
 					1,
 					$message[$id]['y'],
 					$msg['text'],
-					ImageColorAllocate($canvas, $msg['color']['R'], $msg['color']['G'], $msg['color']['B'])
+					imagecolorallocate($canvas, $msg['color']['R'], $msg['color']['G'], $msg['color']['B'])
 					);
 				
 				$previd = $id;
 			}
-			ImageOut($canvas);
-			ImageDestroy($canvas);
+			imageOut($canvas);
+			imagedestroy($canvas);
 		}
 	}
 
