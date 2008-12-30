@@ -28,6 +28,7 @@
 			'attribures'	=> array(
 				'host'		=> 'name'),
 			'elements'	=> array(
+				'proxy'		=> '',
 				'useip'		=> '',
 				'dns'		=> '',
 				'ip'		=> '',
@@ -369,8 +370,18 @@
 		function export_host(&$memory, $hostid, $export_templates, $export_items, $export_triggers, $export_graphs){
 			global $ZBX_EXPORT_MAP;
 
-			$data = DBfetch(DBselect('select * from hosts where hostid='.$hostid));
-			if(!$data) return false;
+			$data = DBfetch(DBselect('SELECT * FROM hosts WHERE hostid='.$hostid));
+			if(!$data){
+				return false;
+			}
+			else if($data['proxy_hostid'] > 0){
+				if($proxy = DBfetch(DBselect('SELECT host FROM hosts WHERE hostid='.$data['proxy_hostid'].' AND status='.HOST_STATUS_PROXY))){
+					$data['proxy'] = $proxy['host'];
+				}
+				else{
+					$data['proxy'] = '';
+				}
+			}
 			
 			zbx_xmlwriter_start_element ($memory,XML_TAG_HOST);
 			
@@ -472,7 +483,6 @@
 				zbx_xmlwriter_end_element($memory); // XML_TAG_ITEMS
 			}
 			
-			
 			if($export_triggers){
 				zbx_xmlwriter_start_element ($memory,XML_TAG_TRIGGERS);
 				
@@ -487,6 +497,7 @@
 				
 				zbx_xmlwriter_end_element($memory); // XML_TAG_TRIGGERS
 			}
+			
 			if($export_graphs){
 				zbx_xmlwriter_start_element ($memory, XML_TAG_GRAPHS);
 				
