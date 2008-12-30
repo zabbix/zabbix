@@ -21,6 +21,7 @@ Changes for 1.7.0
 
 Changes for 1.6.2
 
+ - [ZBX-554] added proxy host info in export/import (Artem)
  - [ZBX-638] fixed deleting applications on host remove (Artem)
  - [ZBX-636] removed "Keep trends (in days)" from Item Configuration form if "Type of information" is Character, Log or Text (Artem)
  - [ZBX-608] added sorting to templates column in hosts screen (Artem)
