@@ -337,14 +337,14 @@
 		$table->SetHeader(array(S_TIMESTAMP,$host['host'].': '.item_description($item)));
 
 		while($row=DBfetch($result)){
-			switch($item["value_type"]){
+			switch($item['value_type']){
 				case ITEM_VALUE_TYPE_TEXT:	
-					if($DB['TYPE'] == "ORACLE"){
-						if(isset($row["value"])){
-							$row["value"] = $row["value"]->load();
+					if($DB['TYPE'] == 'ORACLE'){
+						if(isset($row['value'])){
+							$row['value'] = $row['value']->load();
 						}
 						else{
-							$row["value"] = "";
+							$row['value'] = '';
 						}
 					}
 					/* do not use break */
@@ -352,16 +352,19 @@
 					$value = nbsp(htmlspecialchars($row['value']));
 					$value = zbx_nl2br($value);
 					break;
-				
+				case ITEM_VALUE_TYPE_LOG:	
+					$value = nbsp(htmlspecialchars($row['value']));
+					$value = zbx_nl2br($value);
+					break;
 				default:
-					$value = $row["value"];
+					$value = $row['value'];
 					break;
 			}
 
-			if($row["valuemapid"] > 0)
-				$value = replace_value_by_map($value, $row["valuemapid"]);
+			if($row['valuemapid'] > 0)
+				$value = replace_value_by_map($value, $row['valuemapid']);
 
-			$table->AddRow(array(date(S_DATE_FORMAT_YMDHMS,$row["clock"]),	$value));
+			$table->AddRow(array(date(S_DATE_FORMAT_YMDHMS,$row['clock']),	$value));
 		}
 		return $table;
 	}
