@@ -2030,8 +2030,7 @@
 		$frmItem->Show();
 	}
 
-	function	insert_copy_elements_to_forms($elements_array_name)
-	{
+	function insert_copy_elements_to_forms($elements_array_name){
 		
 		$copy_type = get_request("copy_type", 0);
 		$copy_mode = get_request("copy_mode", 0);
@@ -2053,23 +2052,23 @@
 		$cmbCopyType->AddItem(1,S_HOST_GROUPS);
 		$frmCopy->AddRow(S_TARGET_TYPE, $cmbCopyType);
 
-		$target_sql = 'SELECT DISTINCT g.groupid as target_id, g.name as target_name'.
-			' FROM groups g, hosts_groups hg'.
-			' WHERE hg.groupid=g.groupid';
+		$target_sql = 'SELECT DISTINCT g.groupid as target_id, g.name as target_name '.
+			' FROM groups g, hosts_groups hg '.
+			' WHERE hg.groupid=g.groupid '.
+			' ORDER BY g.name';
 
 		if(0 == $copy_type){
 			$cmbGroup = new CComboBox('filter_groupid',$filter_groupid,'submit()');
 			$cmbGroup->AddItem(0,S_ALL_SMALL);
 			$groups = DBselect($target_sql);
-			while($group = DBfetch($groups))
-			{
+			while($group = DBfetch($groups)){
 				$cmbGroup->AddItem($group["target_id"],$group["target_name"]);
 			}
+			
 			$frmCopy->AddRow('Group', $cmbGroup);
 
 			$target_sql = 'SELECT h.hostid as target_id, h.host as target_name FROM hosts h';
-			if($filter_groupid > 0)
-			{
+			if($filter_groupid > 0){
 				$target_sql .= ', hosts_groups hg WHERE hg.hostid=h.hostid AND hg.groupid='.$filter_groupid;
 			}
 		}
