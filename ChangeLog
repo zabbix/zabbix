@@ -1,5 +1,6 @@
 Changes for 1.6.2
 
+ - [ZBX-395] fixed item list for simple graph (Artem)
  - [ZBX-334] added sorting to group list in elements copy form (Artem)
  - [ZBX-509] fixed problem with user rights to hostgroup without any host (Artem)
  - [ZBX-564] added more descriptive message on conflict of templates (Artem)
