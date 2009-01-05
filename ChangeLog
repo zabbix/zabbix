@@ -21,6 +21,7 @@ Changes for 1.7.0
 
 Changes for 1.6.2
 
+ - [ZBX-564] added more descriptive message on conflict of templates (Artem)
  - [ZBX-443] removed excess space after detail messages (Artem)
  - [ZBX-526] fixed graphs on screens not getting refreshed issue (Artem)
  - [ZBX-531] fixed plain text line wrapping (Artem)
