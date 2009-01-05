@@ -1280,22 +1280,35 @@ require_once "include/httptest.inc.php";
 		if(count($templateid_list)<2)	return true;
 		
 		$result = true;
-		$db_cnt = DBfetch(DBselect('select key_,type,count(*) as cnt from items '.
+		
+		$sql = 'SELECT key_,type,count(*) as cnt '.
+			' FROM items '.
 			' WHERE '.DBcondition('hostid',$templateid_list).
-			' group by key_,type order by cnt desc'
-			));
+			' GROUP BY key_,type '.
+			' ORDER BY cnt DESC';
+		$res = DBselect($sql);
+		while($db_cnt = DBfetch($res)){
+			if($db_cnt['cnt']>1){
+				$result &= false;
+				error('Template with item key ['.htmlspecialchars($db_cnt['key_']).'] already linked to the host');
+			}
+		}
 
-		$result &= $db_cnt['cnt'] > 1 ? false : true;
 
-		$db_cnt = DBfetch(DBselect('SELECT name,count(*) as cnt '.
+		$sql = 'SELECT name,count(*) as cnt '.
 			' FROM applications '.
 			' WHERE '.DBcondition('hostid',$templateid_list).
-			' group by name order by cnt desc'
-			));
+			' GROUP BY name '.
+			' ORDER BY cnt DESC';
+		$res = DBselect($sql);
+		while($db_cnt = DBfetch($res)){
+			if($db_cnt['cnt']>1){
+				$result &= false;
+				error('Template with application ['.htmlspecialchars($db_cnt['name']).'] already linked to the host');
+			}
+		}
 
-		$result &= $db_cnt['cnt'] > 1 ? false : true;
-
-		return $result;
+	return $result;
 	}
 				
 	function host_status2str($status){
