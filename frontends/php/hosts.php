@@ -54,7 +54,7 @@ include_once('include/page_header.php');
 		// 0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications; 5 - Proxies; 6 - maintenance
 		'config'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1,2,3,4,5,6'),	NULL), 
 
-/* ARAYS */
+/* ARRAYS */
 		'hosts'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'groups'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'hostids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
