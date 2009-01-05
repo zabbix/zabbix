@@ -987,6 +987,7 @@ include_once "include/page_header.php";
 				' WHERE h.hostid=i.hostid '.
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
+					' AND i.value_type IN ('.ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64.') '.
 					' AND '.DBin_node('i.itemid', $nodeid).
 					' AND '.DBcondition('h.hostid',$available_hosts);
 
@@ -998,11 +999,11 @@ include_once "include/page_header.php";
 		$result = DBselect($sql);
 		while($row = DBfetch($result)){
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-			$row["description"] = item_description($row);
+			$row['description'] = item_description($row);
 			
-			$description = new CLink($row["description"],"#","action");
+			$description = new CLink($row['description'],'#','action');
 
-			$row["description"] = $row['node_name'].$row['host'].':'.$row["description"];
+			$row['description'] = $row['node_name'].$row['host'].':'.$row['description'];
 
 			if(isset($_REQUEST['reference'])){
 				if($_REQUEST['reference'] =='dashboard'){
@@ -1021,7 +1022,7 @@ include_once "include/page_header.php";
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]);
 			}
 			
-			$description->SetAction($action." close_window(); return false;");
+			$description->SetAction($action.' close_window(); return false;');
 			
 			$table->AddRow(array(
 				(isset($hostid) ? null : $row['host']),
@@ -1033,7 +1034,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	else if($srctbl == "sysmaps")
+	else if($srctbl == 'sysmaps')
 	{
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->SetHeader(array(S_NAME));
@@ -1047,7 +1048,7 @@ include_once "include/page_header.php";
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
 		
-			if(!sysmap_accessible($row["sysmapid"],PERM_READ_ONLY)) continue;
+			if(!sysmap_accessible($row['sysmapid'],PERM_READ_ONLY)) continue;
 			
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 			$name = $row['node_name'].$row['name'];
@@ -1064,7 +1065,7 @@ include_once "include/page_header.php";
 					get_window_opener($dstfrm, $dstfld2, $name);
 			}
 			
-			$description->SetAction($action." close_window(); return false;");
+			$description->SetAction($action.' close_window(); return false;');
 			
 			$table->AddRow($description);
 
@@ -1072,7 +1073,7 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	else if($srctbl == "plain_text"){
+	else if($srctbl == 'plain_text'){
 	
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 		$table->SetHeader(array(
@@ -1101,11 +1102,11 @@ include_once "include/page_header.php";
 		while($row = DBfetch($result))
 		{
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-			$row["description"] = item_description($row);
+			$row['description'] = item_description($row);
 			
-			$description = new CLink($row["description"],"#","action");
+			$description = new CLink($row['description'],'#','action');
 
-			$row["description"] = $row['node_name'].$row['host'].':'.$row["description"];
+			$row['description'] = $row['node_name'].$row['host'].':'.$row['description'];
 
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
@@ -1117,7 +1118,7 @@ include_once "include/page_header.php";
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]);
 			}
 			
-			$description->SetAction($action." close_window(); return false;");
+			$description->SetAction($action.' close_window(); return false;');
 			
 			$table->AddRow(array(
 				(isset($hostid) ? null : $row['host']),
@@ -1131,17 +1132,17 @@ include_once "include/page_header.php";
 	}
 	else if('slides' == $srctbl)
 	{
-		require_once "include/screens.inc.php";
+		require_once 'include/screens.inc.php';
 
 		$table = new CTableInfo(S_NO_NODES_DEFINED);
 		$table->SetHeader(S_NAME);
 
 		$result = DBselect('select slideshowid,name from slideshows where '.DBin_node('slideshowid',$nodeid).' ORDER BY name');
 		while($row=DBfetch($result)){
-			if(!slideshow_accessible($row["slideshowid"], PERM_READ_ONLY))
+			if(!slideshow_accessible($row['slideshowid'], PERM_READ_ONLY))
 				continue;
 
-			$name = new CLink($row["name"],"#","action");
+			$name = new CLink($row['name'],'#','action');
 			
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
