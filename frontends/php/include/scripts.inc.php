@@ -137,7 +137,8 @@ function get_accessible_scripts_by_hosts($hosts){
 
 	$hosts_read_only = array_intersect($hosts,$hosts_read_only);
 	$hosts_read_write = array_intersect($hosts,$hosts_read_write);
-
+	
+	$scripts_by_host = array();
 // initialize array 
 	foreach($hosts as $id => $hostid){
 		$scripts_by_host[$hostid] = array();

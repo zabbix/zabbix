@@ -372,6 +372,7 @@ COpt::counter_up('perm');
 	}
 
 	$available_hosts[$userid][$perm][$perm_res][$nodeid_str] = $result;
+
 return $result;
 }
 
@@ -455,7 +456,7 @@ COpt::counter_up('perm');
 			$result = implode(',',$result);
 	}
 
-	return $result;
+return $result;
 }
 
 function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=null,$cache=1){
@@ -484,10 +485,11 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 		if(empty($node_data)) $node_data[0]['nodeid'] = 0;
 	}
 	else{
-		$available_hosts = get_accessible_hosts_by_user($user_data,$perm,PERM_RES_DATA_ARRAY,$nodeid,$cache);	
-		foreach($available_hosts as $id => $host){
-			$nodeid = id2nodeid($host['hostid']);
-			$permission = (isset($node_data[$nodeid]) && ($permission < $node_data[$nodeid]['permission']))?$node_data[$nodeid]['permission']:$host['permission'];
+		$available_groups = get_accessible_groups_by_user($user_data,$perm,PERM_RES_DATA_ARRAY,$nodeid,$cache);	
+
+		foreach($available_groups as $id => $group){
+			$nodeid = id2nodeid($group['groupid']);
+			$permission = (isset($node_data[$nodeid]) && ($permission < $node_data[$nodeid]['permission']))?$node_data[$nodeid]['permission']:$group['permission'];
 
 			$node_data[$nodeid]['nodeid'] = $nodeid;
 			$node_data[$nodeid]['permission'] = $permission;
@@ -692,7 +694,20 @@ function get_accessible_nodes_by_rights(&$rights,$user_type,$perm,$perm_res=null
 	
 //COpt::counter_up('perm_nodes['.$userid.','.$perm.','.$perm_mode.','.$perm_res.','.$nodeid.']');
 //COpt::counter_up('perm');
-//SDI(get_accessible_hosts_by_rights($rights,$user_type,$perm,PERM_RES_DATA_ARRAY,$nodeid));
+//SDI(get_accessible_groups_by_rights($rights,$user_type,$perm,PERM_RES_DATA_ARRAY,$nodeid));
+	$available_groups = get_accessible_groups_by_rights($rights,$user_type,$perm,PERM_RES_DATA_ARRAY,$nodeid);
+	foreach($available_groups as $id => $group){
+		$nodeid = id2nodeid($group['groupid']);
+		$permission = $group['permission'];
+		
+		if(isset($node_data[$nodeid]) && ($permission < $node_data[$nodeid]['permission'])){
+			$permission = $node_data[$nodeid]['permission'];
+		} 
+
+		$node_data[$nodeid]['nodeid'] = $nodeid;
+		$node_data[$nodeid]['permission'] = $permission;
+	}
+	
 	$available_hosts = get_accessible_hosts_by_rights($rights,$user_type,$perm,PERM_RES_DATA_ARRAY,$nodeid);	
 	foreach($available_hosts as $id => $host){
 		$nodeid = id2nodeid($host['hostid']);
