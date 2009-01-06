@@ -109,7 +109,7 @@
 		}
 
 		$td_l = new CCol(SPACE);
-		$td_l->AddOption('width','100%');
+		$td_l->addOption('width','100%');
 
 		$icons_row = array($td_l);
 		if(!is_null($addicons)){
@@ -118,8 +118,8 @@
 		}
 
 		$icon = new CDiv(SPACE,($state)?'arrowup':'arrowdown');
-		$icon->AddAction('onclick',new CScript("javascript: change_hat_state(this,'".$id."');"));
-		$icon->AddOption('title',S_SHOW.'/'.S_HIDE);
+		$icon->addAction('onclick',new CScript("javascript: change_hat_state(this,'".$id."');"));
+		$icon->addOption('title',S_SHOW.'/'.S_HIDE);
 
 // dirty FIX !!!!!!!!!!!!!	 FIX this one
 		global $page;
@@ -129,21 +129,21 @@
 //		$icons_row[] = $icon;
 
 		$icon_tab = new CTable();
-		$icon_tab->AddOption('width','100%');
+		$icon_tab->addOption('width','100%');
 		
-		$icon_tab->AddRow($icons_row);
+		$icon_tab->addRow($icons_row);
 		
 		$table = new CTable();
-		$table->AddOption('width','100%');
-		$table->SetCellPadding(0);
-		$table->SetCellSpacing(0);
-		$table->AddRow(get_table_header($caption,$icon_tab));
+		$table->addOption('width','100%');
+		$table->setCellPadding(0);
+		$table->setCellSpacing(0);
+		$table->addRow(get_table_header($caption,$icon_tab));
 
 		$div = new CDiv($items);
-		$div->AddOption('id',$id);
+		$div->addOption('id',$id);
 		if(!$state) $div->AddOption('style','display: none;');
 		
-		$table->AddRow($div);
+		$table->addRow($div);
 	return $table;
 	}
 	
