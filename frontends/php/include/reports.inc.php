@@ -191,7 +191,7 @@ function bar_report_form(){
 	$report_timesince = get_request('report_timesince',time()-86400);
 	$report_timetill = get_request('report_timetill',time());
 	
-	$reportForm = new CFormTable(S_REPORTS);//,'events.php?report_set=1','POST',null,'sform');
+	$reportForm = new CFormTable(S_REPORTS,null,'get');//,'events.php?report_set=1','POST',null,'sform');
 	$reportForm->addOption('name','zbx_report');
 	$reportForm->addOption('id','zbx_report');
 
@@ -357,7 +357,7 @@ function bar_report_form2(){
 	
 	$showlegend = get_request('showlegend',0);
 	
-	$reportForm = new CFormTable(S_REPORTS);//,'events.php?report_set=1','POST',null,'sform');
+	$reportForm = new CFormTable(S_REPORTS,null,'get');//,'events.php?report_set=1','POST',null,'sform');
 	$reportForm->addOption('name','zbx_report');
 	$reportForm->addOption('id','zbx_report');
 
@@ -494,7 +494,7 @@ function bar_report_form3(){
 	$hostids = get_request('hostids', array());
 	$showlegend = get_request('showlegend',0);
 
-	$reportForm = new CFormTable(S_REPORTS);//,'events.php?report_set=1','POST',null,'sform');
+	$reportForm = new CFormTable(S_REPORTS,null,'get');//,'events.php?report_set=1','POST',null,'sform');
 	$reportForm->addOption('name','zbx_report');
 	$reportForm->addOption('id','zbx_report');
 
