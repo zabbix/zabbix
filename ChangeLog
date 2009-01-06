@@ -21,6 +21,7 @@ Changes for 1.7.0
 
 Changes for 1.6.2
 
+ - [DEV-276] added support of HTML text in plaintext view in screens (Artem)
  - [ZBX-395] fixed item list for simple graph (Artem)
  - [ZBX-334] added sorting to group list in elements copy form (Artem)
  - [ZBX-509] fixed problem with user rights to hostgroup without any host (Artem)

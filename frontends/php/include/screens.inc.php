@@ -288,12 +288,12 @@
 	}
 	
 
-	# Show screen cell containing plain text values
-	function get_screen_plaintext($itemid,$elements){
+//Show screen cell containing plain text values
+	function get_screen_plaintext($itemid,$elements,$style=0){
 
 		if($itemid == 0){
 			$table = new CTableInfo(S_ITEM_NOT_EXISTS);
-			$table->SetHeader(array(S_TIMESTAMP,S_ITEM));
+			$table->setHeader(array(S_TIMESTAMP,S_ITEM));
 			return $table;
 		}
 
@@ -334,7 +334,7 @@
 		$host = get_host_by_itemid($itemid);
 		
 		$table = new CTableInfo();
-		$table->SetHeader(array(S_TIMESTAMP,$host['host'].': '.item_description($item)));
+		$table->setHeader(array(S_TIMESTAMP,$host['host'].': '.item_description($item)));
 
 		while($row=DBfetch($result)){
 			switch($item['value_type']){
@@ -348,13 +348,23 @@
 						}
 					}
 					/* do not use break */
-				case ITEM_VALUE_TYPE_STR:	
-					$value = nbsp(htmlspecialchars($row['value']));
-					$value = zbx_nl2br($value);
+				case ITEM_VALUE_TYPE_STR:
+					if($style){
+						$value = new CScript($row['value']);
+					}
+					else{
+						$value = nbsp(htmlspecialchars($row['value']));
+						$value = zbx_nl2br($value);						
+					}
 					break;
 				case ITEM_VALUE_TYPE_LOG:	
-					$value = nbsp(htmlspecialchars($row['value']));
-					$value = zbx_nl2br($value);
+					if($style){
+						$value = new CScript($row['value']);
+					}
+					else{
+						$value = nbsp(htmlspecialchars($row['value']));
+						$value = zbx_nl2br($value);
+					}
 					break;
 				default:
 					$value = $row['value'];
@@ -593,8 +603,9 @@
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=plain_text&srcfld1=itemid&srcfld2=description',800,450);");
 			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 			
-			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
-			$form->AddRow(S_SHOW_LINES, new CNumericBox('elements',$elements,2));
+			$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
+			$form->addRow(S_SHOW_LINES, new CNumericBox('elements',$elements,2));
+			$form->addRow(S_SHOW_TEXT_AS_HTML, new CCheckBox('style',$style,null,1));
 		}
 		else if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_EVENTS,SCREEN_RESOURCE_STATUS_OF_TRIGGERS,SCREEN_RESOURCE_ACTIONS))){
 // History of actions
@@ -1073,7 +1084,7 @@
 						}
 					}
 //-------------
-					$item = array(get_screen_plaintext($resourceid,$elements));
+					$item = array(get_screen_plaintext($resourceid,$elements,$style));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_STATUS_OF_TRIGGERS)){					
