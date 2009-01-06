@@ -1,3 +1,7 @@
+Changes for 1.0.10
+
+ - [ZBX-623] fixed incorrect processing of function abschange() for integers (Sasha)
+
 Changes for 1.0.9
 
  - [NTD-43] fixed wrong help links by pointing to correct page with manual (Artem)
