@@ -1401,6 +1401,7 @@
 	'S_NO_SLIDES_DEFINED'=>			'No slides defined',
 	'S_SLIDES'=>				'Slides',
 	'S_NEW_SLIDE'=>				'New slide',
+	'S_SHOW_TEXT_AS_HTML'=>		'Show text as HTML',
 
 //	screenedit.php
 	'S_MAP'=>					'Map',
