@@ -25,6 +25,7 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 /*
  *  FreeBSD 7.0 i386
  */
+#ifdef XSWDEV_VERSION	/* defined in <vm/vm_param.h> */
 	char		swapdev[64], mode[64];
 	int		mib[16], *mib_dev;
 	size_t		sz, mib_sz;
@@ -89,6 +90,9 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif
 }
 
 int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
