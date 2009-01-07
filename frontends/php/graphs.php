@@ -209,7 +209,7 @@ include_once 'include/page_header.php';
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['group_graphid'])){
 		$group_graphid = $_REQUEST['group_graphid'];
-		$group_graphid = array_intersect($group_graphid,$available_graphs);
+		$group_graphid = zbx_uint_array_intersect($group_graphid,$available_graphs);
 		$result = false;
 		
 		DBstart();

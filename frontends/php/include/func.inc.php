@@ -358,13 +358,13 @@ function mem2str($size){
 /* Do not forget to sync it with add_value_suffix in evalfunc.c! */ 
 function convert_units($value,$units){
 // Special processing for unix timestamps
-	if($units=="unixtime"){
-		$ret=date("Y.m.d H:i:s",$value);
+	if($units=='unixtime'){
+		$ret=date('Y.m.d H:i:s',$value);
 		return $ret;
 	}
 //Special processing of uptime
-	if($units=="uptime"){
-		$ret="";
+	if($units=='uptime'){
+		$ret='';
 		$days=floor($value/(24*3600));
 		if($days>0){
 			$value=$value-$days*(24*3600);
@@ -386,82 +386,82 @@ function convert_units($value,$units){
 		return $ret;
 	}
 // Special processing for seconds
-	if($units=="s"){
+	if($units=='s'){
 		return zbx_date2age(0,$value,true);	
 	}
 
 	$u='';
 
 // Special processing for bits (kilo=1000, not 1024 for bits)
-	if( ($units=="b") || ($units=="bps")){
+	if( ($units=='b') || ($units=='bps')){
 		$abs=abs($value);
 
 		if($abs<1000){
 			$u="";
 		}
 		else if($abs<1000*1000){
-			$u="K";
+			$u='K';
 			$value=$value/1000;
 		}
 		else if($abs<1000*1000*1000){
-			$u="M";
+			$u='M';
 			$value=$value/(1000*1000);
 		}
 		else{
-			$u="G";
+			$u='G';
 			$value=$value/(1000*1000*1000);
 		}
 
 		if(round($value) == round($value,2)){
-			$s=sprintf("%.0f",$value);
+			$s=sprintf('%.0f',$value);
 		}
 		else{
-			$s=sprintf("%.2f",$value);
+			$s=sprintf('%.2f',$value);
 		}
 
-		return "$s $u$units";
+		return '$s $u$units';
 	}
 
 
-	if($units==""){
+	if($units==''){
 		if(round($value) == round($value,2)){
-			return sprintf("%.0f",$value);
+			return sprintf('%.0f',$value);
 		}
 		else{
-			return sprintf("%.2f",$value);
+			return sprintf('%.2f',$value);
 		}
 	}
 
 	$abs=abs($value);
 
 	if($abs<1024){
-		$u="";
+		$u='';
 	}
 	else if($abs<1024*1024){
-		$u="K";
+		$u='K';
 		$value=$value/1024;
 	}
 	else if($abs<1024*1024*1024){
-		$u="M";
+		$u='M';
 		$value=$value/(1024*1024);
 	}
 	else if($abs<1024*1024*1024*1024){
-		$u="G";
+		$u='G';
 		$value=$value/(1024*1024*1024);
 	}
 	else{
-		$u="T";
+		$u='T';
 		$value=$value/(1024*1024*1024*1024);
 	}
 
 	if(round($value) == round($value,2)){
-		$s=sprintf("%.0f",$value);
+		$s=sprintf('%.0f',$value);
 	}
 	else{
-		$s=sprintf("%.2f",$value);
+		$s=sprintf('%.2f',$value);
 	}
 
-	return "$s $u$units";
+	return '$s $u$units';
 }
 
 /*************** END CONVERTING ******************/
@@ -532,11 +532,17 @@ function zbx_str_revert(&$str){
 return $result;
 }
 
-
 function uint_in_array($needle,$haystack){
 	foreach($haystack as $id => $value)
 		if(bccomp($needle,$value) == 0) return true;
 return false;
+}
+
+function zbx_uint_array_intersect(&$array1, &$array2){
+	$result = array();
+	foreach($array1 as $key => $value)
+		if(uint_in_array($value, $array2)) $result[$key] = $value;
+return $result;
 }
 
 function str_in_array($needle,$haystack,$strict=false){

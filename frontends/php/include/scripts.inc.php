@@ -135,8 +135,8 @@ function get_accessible_scripts_by_hosts($hosts){
 	$hosts_read_only  = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	$hosts_read_write = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 
-	$hosts_read_only = array_intersect($hosts,$hosts_read_only);
-	$hosts_read_write = array_intersect($hosts,$hosts_read_write);
+	$hosts_read_only = zbx_uint_array_intersect($hosts,$hosts_read_only);
+	$hosts_read_write = zbx_uint_array_intersect($hosts,$hosts_read_write);
 	
 	$scripts_by_host = array();
 // initialize array 
@@ -157,13 +157,13 @@ function get_accessible_scripts_by_hosts($hosts){
 		$add_to_hosts = array();
 		if(PERM_READ_WRITE == $script['host_access']){
 			if($script['groupid'] > 0)
-				$add_to_hosts = array_intersect($hosts_read_write, $hosts_groups[$script['groupid']]);
+				$add_to_hosts = zbx_uint_array_intersect($hosts_read_write, $hosts_groups[$script['groupid']]);
 			else 
 				$add_to_hosts = $hosts_read_write;
 		}
 		else if(PERM_READ_ONLY == $script['host_access']){
 			if($script['groupid'] > 0)
-				$add_to_hosts = array_intersect($hosts_read_only, $hosts_groups[$script['groupid']]);
+				$add_to_hosts = zbx_uint_array_intersect($hosts_read_only, $hosts_groups[$script['groupid']]);
 			else 
 				$add_to_hosts = $hosts_read_only;
 		}

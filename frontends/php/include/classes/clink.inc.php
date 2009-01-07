@@ -19,8 +19,7 @@
 **/
 ?>
 <?php
-	class CLink extends CTag
-	{
+	class CLink extends CTag{
 /* public */
 		function CLink($item=NULL,$url=NULL,$class=NULL,$action=NULL){
 			parent::CTag('a','yes');
