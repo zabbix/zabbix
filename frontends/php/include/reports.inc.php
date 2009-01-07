@@ -394,12 +394,23 @@ function bar_report_form2(){
 		foreach($periods as $pid => $period){
 			$color = new CColorCell(null,$period['color']);
 			
+			$edit_link = 'popup_period.php?period_id='.$pid.
+							'&config=2'.
+							'&dstfrm='.$reportForm->getName().
+							'&caption='.$period['caption'].
+							'&report_timesince='.$period['report_timesince'].
+							'&report_timetill='.$period['report_timetill'].
+							'&color='.$period['color'];
+			$edit = new CSpan(S_EDIT, 'link');
+			$edit->addAction('onclick', "return PopUp('".$edit_link."',840,340,'period_form');");
+			
 			$periods_table->addRow(array(
 					new CCheckBox('group_pid['.$pid.']'),
 					$period['caption'],
 					date(S_DATE_FORMAT_YMDHMS, $period['report_timesince']),
 					date(S_DATE_FORMAT_YMDHMS, $period['report_timetill']),
 					$color,
+					$edit,
 				));
 		}
 		$delete_button = new CButton('delete_period', S_DELETE_SELECTED);
@@ -407,14 +418,13 @@ function bar_report_form2(){
 	else{
 		$periods_table = $delete_button = null;
 	}
-	
+
 
 	$reportForm->addRow(S_PERIOD, 
 				array(
 					$periods_table,
 					new CButton('add_period',S_ADD,
-						"return PopUp('popup_period.php?config=2&dstfrm=".$reportForm->getName().
-						"',840,340,'period_form');"),
+						"return PopUp('popup_period.php?config=2&dstfrm=".$reportForm->getName()."',840,340,'period_form');"),
 					$delete_button
 				));
 	unset($periods_table, $delete_button);

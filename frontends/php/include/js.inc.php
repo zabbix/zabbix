@@ -435,6 +435,24 @@ function insert_js_function($fnct_name){
 					return true;
 				}');
 			break;
+		case 'update_period':
+			insert_js('function update_period(pid, formname,caption,since,till,color){
+				var form = window.opener.document.forms[formname];
+			
+				if(!form){
+					close_window();
+				return false;
+				}
+
+				window.opener.create_var(form,"periods["+pid+"][caption]",caption);	
+				window.opener.create_var(form,"periods["+pid+"][report_timesince]",since);
+				window.opener.create_var(form,"periods["+pid+"][report_timetill]",till);
+				window.opener.create_var(form,"periods["+pid+"][color]",color);
+
+				form.submit();
+				close_window();
+				return true;
+			}');
 		default:
 			break;
 	}

@@ -1160,6 +1160,13 @@
 					
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
+				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SYSTEM_STATUS)){
+										
+					$item = array(get_table_header(array(S_SYSTEM_STATUSBIG,SPACE,date('[H:i:s]',time()))));
+					$item[] = make_system_summary();
+					
+					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
+				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_HOSTS_INFO) ){
 					$item = array(new CHostsInfo($resourceid, $style));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
