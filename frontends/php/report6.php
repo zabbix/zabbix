@@ -148,7 +148,7 @@ include_once('include/page_header.php');
 	
 // Header
 	$r_form = new CForm();
-	$r_form->addVar('items', get_request('items',array()));
+//	$r_form->addVar('items', get_request('items',array()));
 	$cnfCmb = new CComboBox('config', $config, 'submit();');
 		$cnfCmb->addItem(1, S_BAR_REPORT_1);
 		$cnfCmb->addItem(2, S_BAR_REPORT_2);
