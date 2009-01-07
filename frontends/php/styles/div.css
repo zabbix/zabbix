@@ -192,6 +192,14 @@ div.iconreset:hover{
 }
 /********* DIV IMG END *********/
 
+span.link{
+}
+
+span.link:hover{
+	cursor: pointer;
+	text-decoration: underline;
+}
+
 span.footer_sign{
 	padding-right: 5px;
 	padding-left: 5px;

@@ -172,17 +172,30 @@ return $table;
 }
 
 // Author: Aly
-function make_system_summary(){
+function make_system_summary($args = array()){
 	global $USER_DETAILS;
 	$config = select_config();
 	
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-		
+	
+	if(isset($args['hosts']) && !empty($args['hosts'])){
+		$available_hosts = zbx_uint_array_intersect($args['hosts'], $available_hosts);
+	}
+	
+	if(isset($args['groups']) && !empty($args['groups'])){
+		$available_groups = zbx_uint_array_intersect($args['groups'], $available_groups);
+	}
+	
+	$sql_where = '';
+	if(isset($args['severity']) && ctype_digit($args['severity'])){
+		$sql_where = ' AND t.priority>='.$args['severity'];
+	}
+	
 	$table = new CTableInfo();
-	$table->SetHeader(array(
-		is_show_subnodes() ? S_NODE : null,
+	$table->setHeader(array(
+		is_show_subnodes()?S_NODE:null,
 		S_HOST_GROUP,
 		S_DISASTER,
 		S_HIGH,
@@ -400,53 +413,6 @@ function make_status_of_zbx(){
 return $table;
 }
 
-function make_discovery_status(){
-	$drules = array();
-	
-	$db_drules = DBselect('select distinct * from drules where '.DBin_node('druleid').' order by name');
-	while($drule_data = DBfetch($db_drules)){
-		$drules[$drule_data['druleid']] = $drule_data;
-		$drules[$drule_data['druleid']]['up'] = 0;
-		$drules[$drule_data['druleid']]['down'] = 0;
-	}
-
-	$db_dhosts = DBselect('SELECT d.* '.
-					' FROM dhosts d '.
-					' ORDER BY d.dhostid,d.status,d.ip');
-
-	$services = array();
-	$discovery_info = array();
-
-	while($drule_data = DBfetch($db_dhosts)){
-		if(DHOST_STATUS_DISABLED == $drule_data['status']){
-			$drules[$drule_data['druleid']]['down']++;		}
-		else{
-			$drules[$drule_data['druleid']]['up']++;
-		}
-	}
-
-	$header = array(
-		is_show_subnodes() ? new CCol(S_NODE, 'center') : null,
-		new CCol(S_DISCOVERY_RULE, 'center'),
-		new CCol(S_UP),
-		new CCol(S_DOWN)
-		);
-
-	$table  = new CTableInfo();
-	$table->SetHeader($header,'vertical_header');
-
-	foreach($drules as $druleid => $drule){
-		$table->AddRow(array(
-			get_node_name_by_elid($druleid),
-			new CLink(get_node_name_by_elid($drule['druleid']).$drule['name'],'discovery.php?druleid='.$druleid),
-			new CSpan($drule['up'],'green'),
-			new CSpan($drule['down'],($drule['down'] > 0)?'red':'green')
-		));
-	}
-	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
-
-return 	$table;
-}
 
 // author Aly
 function make_latest_issues($params = array()){
@@ -649,6 +615,55 @@ function make_webmon_overview(){
 	}
 	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 return $table;	
+}
+
+// Author: Aly
+function make_discovery_status(){
+	$drules = array();
+	
+	$db_drules = DBselect('select distinct * from drules where '.DBin_node('druleid').' order by name');
+	while($drule_data = DBfetch($db_drules)){
+		$drules[$drule_data['druleid']] = $drule_data;
+		$drules[$drule_data['druleid']]['up'] = 0;
+		$drules[$drule_data['druleid']]['down'] = 0;
+	}
+
+	$db_dhosts = DBselect('SELECT d.* '.
+					' FROM dhosts d '.
+					' ORDER BY d.dhostid,d.status,d.ip');
+
+	$services = array();
+	$discovery_info = array();
+
+	while($drule_data = DBfetch($db_dhosts)){
+		if(DHOST_STATUS_DISABLED == $drule_data['status']){
+			$drules[$drule_data['druleid']]['down']++;		}
+		else{
+			$drules[$drule_data['druleid']]['up']++;
+		}
+	}
+
+	$header = array(
+		is_show_subnodes() ? new CCol(S_NODE, 'center') : null,
+		new CCol(S_DISCOVERY_RULE, 'center'),
+		new CCol(S_UP),
+		new CCol(S_DOWN)
+		);
+
+	$table  = new CTableInfo();
+	$table->SetHeader($header,'vertical_header');
+
+	foreach($drules as $druleid => $drule){
+		$table->AddRow(array(
+			get_node_name_by_elid($druleid),
+			new CLink(get_node_name_by_elid($drule['druleid']).$drule['name'],'discovery.php?druleid='.$druleid),
+			new CSpan($drule['up'],'green'),
+			new CSpan($drule['down'],($drule['down'] > 0)?'red':'green')
+		));
+	}
+	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+
+return 	$table;
 }
 
 function make_latest_data(){

@@ -119,7 +119,7 @@
 		$dependencies = get_request('dependencies',array());
 		
 		$triggers = $_REQUEST['g_triggerid'];
-		$triggers = array_intersect($triggers, $available_triggers);
+		$triggers = zbx_uint_array_intersect($triggers, $available_triggers);
 
 		DBstart();
 		foreach($triggers as $id => $triggerid){

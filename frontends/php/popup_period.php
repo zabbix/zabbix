@@ -39,6 +39,7 @@ include_once 'include/page_header.php';
 		'dstfrm'=>			array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null),
 		'config'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1,2,3'),		NULL),
 
+		'period_id'=>			array(T_ZBX_INT, O_OPT,  null,	null,				null),
 		'caption'=>				array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,			'isset({save})'),
 		'report_timesince'=>	array(T_ZBX_INT, O_OPT,  null,	null,				'isset({save})'),
 		'report_timetill'=>		array(T_ZBX_INT, O_OPT,  null,	null,				'isset({save})'),
@@ -55,22 +56,26 @@ include_once 'include/page_header.php';
 	check_fields($fields);
 	
 	insert_js_function('add_period');
+	insert_js_function('update_period');
 
 	if(isset($_REQUEST['save'])){
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-<?php
-		echo "add_period('".
-			$_REQUEST['dstfrm']."','".
-			$_REQUEST['caption']."','".
-			$_REQUEST['report_timesince']."','".
-			$_REQUEST['report_timetill']."','".
-			$_REQUEST['color']."');\n";
-?>
--->
-</script>
-<?php
+		if(isset($_REQUEST['period_id'])){
+			insert_js("update_period('".
+				$_REQUEST['period_id']."','".
+				$_REQUEST['dstfrm']."','".
+				$_REQUEST['caption']."','".
+				$_REQUEST['report_timesince']."','".
+				$_REQUEST['report_timetill']."','".
+				$_REQUEST['color']."');\n");		
+		}
+		else{
+			insert_js("add_period('".
+				$_REQUEST['dstfrm']."','".
+				$_REQUEST['caption']."','".
+				$_REQUEST['report_timesince']."','".
+				$_REQUEST['report_timetill']."','".
+				$_REQUEST['color']."');\n");
+		}
 	}
 	else{
 		echo SBR;
@@ -91,6 +96,8 @@ include_once 'include/page_header.php';
 		$frmPd->addVar('config',$config);
 		$frmPd->addVar('report_timesince',$report_timesince);
 		$frmPd->addVar('report_timetill',$report_timetill);
+		if(isset($_REQUEST['period_id']))
+			$frmPd->addVar('period_id',$_REQUEST['period_id']);
 
 		$frmPd->addRow(S_CAPTION, new CTextBox('caption',$caption,10));
 		
@@ -162,7 +169,7 @@ include_once 'include/page_header.php';
 			$frmPd->addVar('color',$color);
 
 
-		$frmPd->addItemToBottomRow(new CButton('save', S_ADD));
+		$frmPd->addItemToBottomRow(new CButton('save', isset($_REQUEST['period_id'])?S_UPDATE:S_ADD));
 
 		$frmPd->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
 		$frmPd->Show();
