@@ -61,40 +61,23 @@ include_once 'include/page_header.php';
 	insert_js_function('update_bitem');
 
 	if(isset($_REQUEST['save']) && !isset($_REQUEST['gid'])){
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-<?php
-		echo "add_bitem('".
+		insert_js("add_bitem('".
 			$_REQUEST['dstfrm']."','".
 			$_REQUEST['caption']."','".
 			$_REQUEST['itemid']."','".
 			$_REQUEST['color']."',".
-			$_REQUEST['calc_fnc'].");\n";
-?>
--->
-</script>
-<?php
+			$_REQUEST['calc_fnc'].");\n");
 	}
 	
 	if(isset($_REQUEST['save']) && isset($_REQUEST['gid'])){
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-<?php
-				
-		echo "update_bitem('".
+		insert_js("update_bitem('".
 			$_REQUEST['dstfrm']."','".
 			$_REQUEST['list_name']."','".
 			$_REQUEST['gid']."','".
 			$_REQUEST['caption']."','".
 			$_REQUEST['itemid']."','".
 			$_REQUEST['color']."',".
-			$_REQUEST['calc_fnc'].");\n";
-?>
--->
-</script>
-<?php
+			$_REQUEST['calc_fnc'].");\n");
 	}
 	else{
 		echo SBR;
@@ -125,7 +108,7 @@ include_once 'include/page_header.php';
 		$frmGItem->addVar('itemid',$itemid);
 
 		$frmGItem->addRow(S_CAPTION, new CTextBox('caption',$caption,10));
-		
+
 		$txtCondVal = new CTextBox('description',$description,50,'yes');
 
 		$btnSelect = new CButton('btn1',S_SELECT,
@@ -152,7 +135,7 @@ include_once 'include/page_header.php';
 			$frmGItem->addVar('color',$color);
 
 
-		$frmGItem->addItemToBottomRow(new CButton('save', isset($gid) ? S_SAVE : S_ADD));
+		$frmGItem->addItemToBottomRow(new CButton('save', isset($gid)?S_SAVE:S_ADD));
 
 		$frmGItem->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
 		$frmGItem->Show();

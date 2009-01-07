@@ -379,16 +379,14 @@ include_once "include/page_header.php";
 		$items = get_request('items',array());
 		$hostids = get_request('hostids',array());
 		$groupids = get_request('groupids',array());
-		$periods = get_request('periods',array());
 				
 		$title = get_request('title','Report 2');	
 		$xlabel = get_request('xlabel','');
 		$ylabel = get_request('ylabel','');
 		
+		
 		$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 		$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
-	
-		$showlegend = 1;
 		
 		if(!empty($groupids)){
 			$sql = 'SELECT DISTINCT hg.hostid '.
@@ -402,8 +400,10 @@ include_once "include/page_header.php";
 
 		$itemids = array();
 		foreach($items as $num => $item){
-			$itemids = get_same_item_for_host($item['itemid'],$hostids);
-			break;
+			if($item['itemid'] > 0){
+				$itemids = get_same_item_for_host($item['itemid'],$hostids);
+				break;
+			}
 		}
 
 		$graph = new CBar(GRAPH_TYPE_COLUMN);
@@ -417,85 +417,83 @@ include_once "include/page_header.php";
 		$graph_data['values'] = array();
 		$graph_data['legend'] = array();
 		
-		foreach($periods as $pid => $period){
-			$timesince = $period['report_timesince'];
-			$timetill = $period['report_timetill'];
-			
-//SDI(date('Y.m.d H:i:s',$timesince).' - '.date('Y.m.d H:i:s',$timetill));
-			$str_since['hour'] = date('H',$timesince);
-			$str_since['day'] = date('d',$timesince);
-			$str_since['weekday'] = date('w',$timesince);
-			if($str_since['weekday'] == 0) $str_since['weekday'] = 7;
-			
-			$str_since['mon'] = date('m',$timesince);
-			$str_since['year'] = date('Y',$timesince);
-			
-			$str_till['hour'] = date('H',$timetill);
-			$str_till['day'] = date('d',$timetill);
-			$str_till['weekday'] = date('w',$timetill);
-			if($str_till['weekday'] == 0) $str_till['weekday'] = 7;
-			
-			$str_till['mon'] = date('m',$timetill);
-			$str_till['year'] = date('Y',$timetill);
-			
-			switch($scaletype){
-				case TIMEPERIOD_TYPE_HOURLY: 
-					$scaleperiod = 3600;
-					$str = $str_since['year'].'-'.$str_since['mon'].'-'.$str_since['day'].' '.$str_since['hour'].':00:00';
-					$timesince = strtotime($str);
-					
-					$str = $str_till['year'].'-'.$str_till['mon'].'-'.$str_till['day'].' '.$str_till['hour'].':00:00';
-					$timetill = strtotime($str) + $scaleperiod;
-					
-					break;
-				case TIMEPERIOD_TYPE_DAILY: 
-					$scaleperiod = 86400;
-					$str = $str_since['year'].'-'.$str_since['mon'].'-'.$str_since['day'].' 00:00:00';
-					$timesince = strtotime($str);
-					
-					$str = $str_till['year'].'-'.$str_till['mon'].'-'.$str_till['day'].' 00:00:00';
-					$timetill = strtotime($str) + $scaleperiod;
-					
-					break;
-				case TIMEPERIOD_TYPE_WEEKLY: 
-					$scaleperiod = 86400 * 7;
-					$str = $str_since['year'].'-'.$str_since['mon'].'-'.$str_since['day'].' 00:00:00';
-					$timesince = strtotime($str);
-					$timesince-= ($str_since['weekday']-1)*86400;
 
-					$str = $str_till['year'].'-'.$str_till['mon'].'-'.$str_till['day'].' 00:00:00';
-					$timetill = strtotime($str);
-					$timetill-= ($str_till['weekday']-1)*86400;
-
-					$timetill+= $scaleperiod;
-					
-					break;
-				case TIMEPERIOD_TYPE_MONTHLY: 
-					$scaleperiod = 86400 * 30;
-					$str = $str_since['year'].'-'.$str_since['mon'].'-01 00:00:00';
-					$timesince = strtotime($str);
-					
-					$str = $str_till['year'].'-'.$str_till['mon'].'-01 00:00:00';
-					$timetill = strtotime($str);
-					$timetill = strtotime('+1 month',$timetill);
-					
-					break;
-				case TIMEPERIOD_TYPE_YEARLY: 
-					$scaleperiod = 86400 * 365;
-					$str = $str_since['year'].'-01-01 00:00:00';
-					$timesince = strtotime($str);
-					
-					$str = $str_till['year'].'-01-01 00:00:00';
-					$timetill = strtotime($str);
-					$timetill = strtotime('+1 year',$timetill);
-					
-					break;
-			}
-// updating 
-						
+		$timesince = get_request('report_timesince',time()-86400);
+		$timetill = get_request('report_timetill',time());
+		
 //SDI(date('Y.m.d H:i:s',$timesince).' - '.date('Y.m.d H:i:s',$timetill));
-			break;
+		$str_since['hour'] = date('H',$timesince);
+		$str_since['day'] = date('d',$timesince);
+		$str_since['weekday'] = date('w',$timesince);
+		if($str_since['weekday'] == 0) $str_since['weekday'] = 7;
+		
+		$str_since['mon'] = date('m',$timesince);
+		$str_since['year'] = date('Y',$timesince);
+		
+		$str_till['hour'] = date('H',$timetill);
+		$str_till['day'] = date('d',$timetill);
+		$str_till['weekday'] = date('w',$timetill);
+		if($str_till['weekday'] == 0) $str_till['weekday'] = 7;
+		
+		$str_till['mon'] = date('m',$timetill);
+		$str_till['year'] = date('Y',$timetill);
+		
+		switch($scaletype){
+			case TIMEPERIOD_TYPE_HOURLY: 
+				$scaleperiod = 3600;
+				$str = $str_since['year'].'-'.$str_since['mon'].'-'.$str_since['day'].' '.$str_since['hour'].':00:00';
+				$timesince = strtotime($str);
+				
+				$str = $str_till['year'].'-'.$str_till['mon'].'-'.$str_till['day'].' '.$str_till['hour'].':00:00';
+				$timetill = strtotime($str) + $scaleperiod;
+				
+				break;
+			case TIMEPERIOD_TYPE_DAILY: 
+				$scaleperiod = 86400;
+				$str = $str_since['year'].'-'.$str_since['mon'].'-'.$str_since['day'].' 00:00:00';
+				$timesince = strtotime($str);
+				
+				$str = $str_till['year'].'-'.$str_till['mon'].'-'.$str_till['day'].' 00:00:00';
+				$timetill = strtotime($str) + $scaleperiod;
+				
+				break;
+			case TIMEPERIOD_TYPE_WEEKLY: 
+				$scaleperiod = 86400 * 7;
+				$str = $str_since['year'].'-'.$str_since['mon'].'-'.$str_since['day'].' 00:00:00';
+				$timesince = strtotime($str);
+				$timesince-= ($str_since['weekday']-1)*86400;
+
+				$str = $str_till['year'].'-'.$str_till['mon'].'-'.$str_till['day'].' 00:00:00';
+				$timetill = strtotime($str);
+				$timetill-= ($str_till['weekday']-1)*86400;
+
+				$timetill+= $scaleperiod;
+				
+				break;
+			case TIMEPERIOD_TYPE_MONTHLY: 
+				$scaleperiod = 86400 * 30;
+				$str = $str_since['year'].'-'.$str_since['mon'].'-01 00:00:00';
+				$timesince = strtotime($str);
+				
+				$str = $str_till['year'].'-'.$str_till['mon'].'-01 00:00:00';
+				$timetill = strtotime($str);
+				$timetill = strtotime('+1 month',$timetill);
+				
+				break;
+			case TIMEPERIOD_TYPE_YEARLY: 
+				$scaleperiod = 86400 * 365;
+				$str = $str_since['year'].'-01-01 00:00:00';
+				$timesince = strtotime($str);
+				
+				$str = $str_till['year'].'-01-01 00:00:00';
+				$timetill = strtotime($str);
+				$timetill = strtotime('+1 year',$timetill);
+				
+				break;
 		}
+// updating 
+					
+//SDI(date('Y.m.d H:i:s',$timesince).' - '.date('Y.m.d H:i:s',$timetill));
 
 		switch($avgperiod){
 			case TIMEPERIOD_TYPE_HOURLY: 
