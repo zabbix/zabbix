@@ -185,6 +185,7 @@ function bar_report_form(){
 	$title = get_request('title','Report 1');
 	$xlabel = get_request('xlabel','');
 	$ylabel = get_request('ylabel','');
+	$showlegend = get_request('showlegend',0);
 	
 //	$showLegend = 
 	
@@ -207,6 +208,7 @@ function bar_report_form(){
 	$reportForm->addRow(S_TITLE, new CTextBox('title',$title,40));
 	$reportForm->addRow(S_X.SPACE.S_LABEL, new CTextBox('xlabel',$xlabel,40));
 	$reportForm->addRow(S_Y.SPACE.S_LABEL, new CTextBox('ylabel',$ylabel,40));
+	$reportForm->addRow(S_LEGEND, new CCheckBox('showlegend',$showlegend,null,1));
 
 	$scale = new CComboBox('scaletype', $scaletype);
 		$scale->addItem(TIMEPERIOD_TYPE_HOURLY, S_HOURLY);
