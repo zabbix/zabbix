@@ -157,10 +157,13 @@ include_once "include/page_header.php";
 		$graph->setHeader($title);
 		
 		$graph_data['colors'] = array();
+		$graph_data['legend'] = array();
 		$db_values = array();
 		foreach($items as $num => $item){
 			$itemid = $item['itemid'];
 			$item_data = &$db_values[$itemid];
+			
+			$graph_data['legend'][] = $item['caption'];
 			
 			$sql_arr = array();
 			array_push($sql_arr,
@@ -370,8 +373,6 @@ include_once "include/page_header.php";
 
 			$graph->addSeries($graph_data['values']);
 		}
-
-		$graph->setSeriesLegend($graph_data['legend']);
 	}
 	else if($config == 3){
 
@@ -604,9 +605,9 @@ include_once "include/page_header.php";
 			$graph->addSeries($item_data);
 		}
 //----
-		$graph->setSeriesLegend($graph_data['legend']);
 	}
 	
+	$graph->setSeriesLegend($graph_data['legend']);
 	$graph->setPeriodCaption($graph_data['captions']);
 	
 	$graph->setHeader($title);
