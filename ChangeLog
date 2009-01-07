@@ -1,3 +1,7 @@
+Changes for 1.0.11
+
+ - [NTD-44] fixed compilation problems under FreeBSD 4.2 (Sasha)
+
 Changes for 1.0.10
 
  - [NTD-48] added support of system.swap.size under FreeBSD (Sasha)

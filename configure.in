@@ -72,7 +72,6 @@ AC_SEARCH_LIBS(__res_query, resolv bind socket)
 AC_SEARCH_LIBS(res_query, resolv bind socket)
 #Aix 6.x requires this
 AC_SEARCH_LIBS(perfstat_memory_total, perfstat, [AC_DEFINE([HAVE_LIBPERFSTAT], 1, [Define to 1 if you have the 'libperfstat' library (-lperfstat)])])
-AC_SEARCH_LIBS(iconv_open, iconv)
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(kvm, main)
 dnl AC_CHECK_LIB(pthread, main)
@@ -859,6 +858,17 @@ if test "x$want_ldap" = "xyes"; then
 fi
 CFLAGS="${CFLAGS} ${LDAP_CPPFLAGS}"
 LDFLAGS="${LDFLAGS} ${LDAP_LDFLAGS}"
+
+found_iconv="no"
+dnl Check for libiconv [by default - skip]
+LIBICONV_CHECK_CONFIG([no])
+if test "x$found_iconv" != "xyes"; then
+	AC_MSG_ERROR([Invalid ICONV directory - unable to find iconv.h "${found_iconv}"])
+fi
+CFLAGS="${CFLAGS} ${ICONV_CFLAGS}"
+LDFLAGS="${LDFLAGS} ${ICONV_LDFLAGS}"
+
+AC_SEARCH_LIBS(iconv_open, iconv)
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
