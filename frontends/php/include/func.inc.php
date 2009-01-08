@@ -423,7 +423,7 @@ function convert_units($value,$units){
 			$s=sprintf('%.2f',$value);
 		}
 
-		return '$s $u$units';
+	return "$s $u$units";
 	}
 
 
@@ -465,7 +465,7 @@ function convert_units($value,$units){
 		$s=sprintf('%.2f',$value);
 	}
 
-	return '$s $u$units';
+return "$s $u$units";
 }
 
 /*************** END CONVERTING ******************/
