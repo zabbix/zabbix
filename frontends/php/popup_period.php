@@ -36,18 +36,18 @@ include_once 'include/page_header.php';
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'dstfrm'=>			array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null),
+		'dstfrm'=>			array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,			null),
 		'config'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1,2,3'),		NULL),
 
-		'period_id'=>			array(T_ZBX_INT, O_OPT,  null,	null,				null),
-		'caption'=>				array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,			'isset({save})'),
-		'report_timesince'=>	array(T_ZBX_INT, O_OPT,  null,	null,				'isset({save})'),
-		'report_timetill'=>		array(T_ZBX_INT, O_OPT,  null,	null,				'isset({save})'),
+		'period_id'=>			array(T_ZBX_INT, O_OPT,  null,	null,			null),
+		'caption'=>				array(T_ZBX_STR, O_OPT,  null,	null,			null),
+		'report_timesince'=>	array(T_ZBX_INT, O_OPT,  null,	null,		'isset({save})'),
+		'report_timetill'=>		array(T_ZBX_INT, O_OPT,  null,	null,		'isset({save})'),
 		
-		'color'=>				array(T_ZBX_CLR, O_OPT,  null,	null,				'isset({save})'),
+		'color'=>				array(T_ZBX_CLR, O_OPT,  null,	null,		'isset({save})'),
 
 /* actions */
-		'save'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 /* other */
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form_refresh'=>	array(T_ZBX_STR, O_OPT, null,	null,	null)
@@ -58,6 +58,12 @@ include_once 'include/page_header.php';
 	insert_js_function('add_period');
 	insert_js_function('update_period');
 
+	$_REQUEST['caption'] = get_request('caption','');
+	if(zbx_empty($_REQUEST['caption']) && isset($_REQUEST['report_timesince']) && isset($_REQUEST['report_timetill'])){
+		$_REQUEST['caption'] = date(S_DATE_FORMAT_YMDHMS,  $_REQUEST['report_timesince']).' - '.
+								date(S_DATE_FORMAT_YMDHMS, $_REQUEST['report_timetill']);
+	}
+	
 	if(isset($_REQUEST['save'])){
 		if(isset($_REQUEST['period_id'])){
 			insert_js("update_period('".
@@ -87,7 +93,7 @@ include_once 'include/page_header.php';
 
 		$config		= get_request('config',	 	1);
 
-		$caption	= get_request('caption', 	S_PERIOD);
+		$caption	= get_request('caption', 	'');
 		$color		= get_request('color', 		'009900');
 
 		$report_timesince = get_request('report_timesince',time()-86400);
@@ -99,7 +105,11 @@ include_once 'include/page_header.php';
 		if(isset($_REQUEST['period_id']))
 			$frmPd->addVar('period_id',$_REQUEST['period_id']);
 
-		$frmPd->addRow(S_CAPTION, new CTextBox('caption',$caption,10));
+
+		$frmPd->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', S_DEFAULT), 
+			S_CAPTION), new CTextBox('caption',$caption,10));
+			
+//		$frmPd->addRow(S_CAPTION, new CTextBox('caption',$caption,10));
 		
 //*
 		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
