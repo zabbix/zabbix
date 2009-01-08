@@ -601,10 +601,15 @@ include_once "include/page_header.php";
 				$count++;
 			}
 		}
+		
 		foreach($db_values as $num => $item_data){
 			$graph->addSeries($item_data);
 		}
 //----
+	}
+	if(isset($itemid) && ($itemid > 0)){
+		$tmp_item = get_item_by_itemid($itemid);
+		$graph->setUnits($tmp_item['units']);
 	}
 	
 	$graph->setSeriesLegend($graph_data['legend']);
