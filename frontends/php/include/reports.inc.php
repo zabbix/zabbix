@@ -356,7 +356,7 @@ function bar_report_form2(){
 	$captions = get_request('captions',array());	
 	$items = get_request('items',array());
 	$periods = get_request('periods',array());
-	
+
 	$showlegend = get_request('showlegend',0);
 	
 	$reportForm = new CFormTable(S_REPORTS,null,'get');//,'events.php?report_set=1','POST',null,'sform');
@@ -369,8 +369,7 @@ function bar_report_form2(){
 	
 	$reportForm->addVar('config',$config);	
 	$reportForm->addVar('items',$items);
-	$reportForm->addVar('periods',$periods);
-	
+// periods add later
 	
 	$reportForm->addRow(S_TITLE, new CTextBox('title',$title,40));
 	$reportForm->addRow(S_X.SPACE.S_LABEL, new CTextBox('xlabel',$xlabel,40));
@@ -393,7 +392,7 @@ function bar_report_form2(){
 // PERIODS
 	if(count($periods)){
 		$periods_table = new CTableInfo();
-		foreach($periods as $pid => $period){
+		foreach($periods as $pid => $period){			
 			$color = new CColorCell(null,$period['color']);
 			
 			$edit_link = 'popup_period.php?period_id='.$pid.
@@ -403,16 +402,16 @@ function bar_report_form2(){
 							'&report_timesince='.$period['report_timesince'].
 							'&report_timetill='.$period['report_timetill'].
 							'&color='.$period['color'];
-			$edit = new CSpan(S_EDIT, 'link');
-			$edit->addAction('onclick', "return PopUp('".$edit_link."',840,340,'period_form');");
+				
+			$caption = new CSpan($period['caption'], 'link');
+			$caption->addAction('onclick', "return PopUp('".$edit_link."',840,340,'period_form');");
 			
 			$periods_table->addRow(array(
 					new CCheckBox('group_pid['.$pid.']'),
-					$period['caption'],
+					$caption,
 					date(S_DATE_FORMAT_YMDHMS, $period['report_timesince']),
 					date(S_DATE_FORMAT_YMDHMS, $period['report_timetill']),
 					$color,
-					$edit,
 				));
 		}
 		$delete_button = new CButton('delete_period', S_DELETE_SELECTED);
@@ -420,7 +419,8 @@ function bar_report_form2(){
 	else{
 		$periods_table = $delete_button = null;
 	}
-
+	
+	$reportForm->addVar('periods',$periods);
 
 	$reportForm->addRow(S_PERIOD, 
 				array(
