@@ -64,6 +64,8 @@ function cbar($type = GRAPH_TYPE_COLUMN){
 	$this->side_values = ITEM_VALUE_TYPE_UINT64;	// 3 - int, 0 - float
 	
 	$this->column = null;
+	
+	$this->units = '';							// Units for values
 }
 
 function drawHeader(){
@@ -74,9 +76,12 @@ function drawHeader(){
 	imagestring($this->im, $fontnum,$x,1, $str , $this->GetColor('Dark Red No Alpha'));
 }
 
-
 function setGridStep($step){
 	$this->gridStep = $step;
+}
+
+function setUnits($units=''){
+	$this->units = $units;
 }
 
 function setSideValueType($type=ITEM_VALUE_TYPE_UINT64){
@@ -399,7 +404,7 @@ function drawSideValues(){
 
 	if($this->column){
 		for($i=0;$i<=$hstr_count;$i++){
-			$str = str_pad(($this->sizeY*$i/$hstr_count*($max-$min)/$this->sizeY+$min),14,' ', STR_PAD_LEFT);
+			$str = str_pad(convert_units(($this->sizeY*$i/$hstr_count*($max-$min)/$this->sizeY+$min),$this->units),14,' ', STR_PAD_LEFT);
 			imagestring($this->im, 
 						1, 
 						$this->shiftXleft, 
@@ -411,7 +416,7 @@ function drawSideValues(){
 	}
 	else if(in_array($this->type, array(GRAPH_TYPE_BAR, GRAPH_TYPE_BAR_STACKED))){
 		for($i=0;$i<=$hstr_count;$i++){
-			$str = str_pad(($this->sizeX*$i/$hstr_count*($max-$min)/$this->sizeX+$min),14,' ', STR_PAD_LEFT);
+			$str = str_pad(convert_units(($this->sizeX*$i/$hstr_count*($max-$min)/$this->sizeX+$min),$this->units),14,' ', STR_PAD_LEFT);
 
 			imagestringup($this->im, 
 						1, 
