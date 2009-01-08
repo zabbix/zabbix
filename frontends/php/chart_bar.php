@@ -592,13 +592,15 @@ include_once "include/page_header.php";
 //SDI($count.' : '.$itemid);
 				$db_values[$count][$itemid] = is_null($item_data)?0:$item_data;
 
-				$graph_data['colors'][$count] = rgb2hex((11*$count).''.(11*$count).''.(11*$count));
+				$tmp_color = get_next_color(true);
+
+				if(!isset($graph_data['colors'][$count]))
+					$graph_data['colors'][$count] = rgb2hex($tmp_color);
 				$graph_data['legend'][$count] = date('Y.m.d', $start);
 				
 				$count++;
 			}
 		}
-		
 		foreach($db_values as $num => $item_data){
 			$graph->addSeries($item_data);
 		}
@@ -611,7 +613,7 @@ include_once "include/page_header.php";
 	$graph->setHeader($title);
 	$graph->setXLabel($xlabel);
 	$graph->setYLabel($ylabel);
-	
+
 	$graph->setSeriesColor($graph_data['colors']);
 
 	$graph->showLegend($showlegend);
