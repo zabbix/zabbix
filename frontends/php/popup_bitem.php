@@ -113,8 +113,8 @@ include_once 'include/page_header.php';
 
 		$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().
-				"&dstfld1=itemid&dstfld2=description&".
-				"srctbl=items&srcfld1=itemid&srcfld2=description&monitored_hosts=1');",
+				'&dstfld1=itemid&dstfld2=description&srctbl=items'.
+				"&srcfld1=itemid&srcfld2=description&monitored_hosts=1');",
 				'T');
 		
 		$frmGItem->addRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
@@ -126,9 +126,9 @@ include_once 'include/page_header.php';
 		$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
 		$cmbFnc->addItem(CALC_FNC_MAX, S_MAX_SMALL);
 		$cmbFnc->addItem(0, S_COUNT);
-		
+
 		$frmGItem->addRow(S_FUNCTION, $cmbFnc);
-		
+
 		if($config == 1)
 			$frmGItem->addRow(S_COLOR, new CColor('color',$color));
 		else
