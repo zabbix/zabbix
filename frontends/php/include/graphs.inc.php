@@ -720,20 +720,19 @@
 	return $result;
 	}
 
-        /*
-         * Function: cmp_graphitems
-         *
-         * Description:
-         *     Compare two graph items
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         * Comments: !!! Don't forget sync code with C !!!
-         *
-         */
-	function	cmp_graphitems(&$gitem1, &$gitem2)
-	{
+/*
+ * Function: cmp_graphitems
+ *
+ * Description:
+ *     Compare two graph items
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
+	function	cmp_graphitems(&$gitem1, &$gitem2){
 		if($gitem1["drawtype"]	!= $gitem2["drawtype"])		return 1;
 		if($gitem1["sortorder"] != $gitem2["sortorder"])	return 2;
 		if($gitem1["color"]	!= $gitem2["color"])		return 3;
@@ -747,18 +746,18 @@
 		return 0;
 	}
 
-        /*
-         * Function: add_item_to_graph
-         *
-         * Description:
-         *     Add item to graph
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         * Comments: !!! Don't forget sync code with C !!!
-         *
-         */
+/*
+ * Function: add_item_to_graph
+ *
+ * Description:
+ *     Add item to graph
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
 	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt)
 	{
 		$gitemid = get_dbid('graphs_items','gitemid');
@@ -958,110 +957,20 @@
 	return $_REQUEST["period"];
 	}
 
-	function navigation_bar($url,$ext_saved_request=NULL){
-		$saved_request = array("screenid","itemid","action","from","fullscreen");
-
-		if(is_array($ext_saved_request))
-			$saved_request = array_merge($saved_request, $ext_saved_request);
-		elseif(is_string($ext_saved_request))
-			array_push($saved_request,$ext_saved_request);
-
-		$form = new CForm($url);
-		$form->SetMethod('get');	
-		
-		$form->AddItem(S_PERIOD.SPACE);
-
-		$period = get_request('period',ZBX_PERIOD_DEFAULT);
-
-		if(uint_in_array($period,array(3600,2*3600,4*3600,8*3600,12*3600,24*3600,7*24*3600,31*24*3600,365*24*3600)))
-			$custom_per = ZBX_MIN_PERIOD;
-		else
-			$custom_per = $period;
-
-		$cmbPeriod = new CComboBox("period",$period,"submit()");
-		$cmbPeriod->AddItem($custom_per,"custom");
-		$cmbPeriod->AddItem(3600,"1h");
-		$cmbPeriod->AddItem(2*3600,"2h");
-		$cmbPeriod->AddItem(4*3600,"4h");
-		$cmbPeriod->AddItem(8*3600,"8h");
-		$cmbPeriod->AddItem(12*3600,"12h");
-		$cmbPeriod->AddItem(24*3600,"24h");
-		$cmbPeriod->AddItem(7*24*3600,"week");
-		$cmbPeriod->AddItem(31*24*3600,"month");
-		$cmbPeriod->AddItem(365*24*3600,"year");
-		$form->AddItem($cmbPeriod);
-
-		$cmbDec = new CComboBox("dec",0,"submit()");
-		$cmbDec->AddItem(0,S_DECREASE);
-		$cmbDec->AddItem(3600,"-1h");
-		$cmbDec->AddItem(4*3600,"-4h");
-		$cmbDec->AddItem(24*3600,"-24h");
-		$cmbDec->AddItem(7*24*3600,"-week");
-		$cmbDec->AddItem(31*24*3600,"-month");
-		$cmbDec->AddItem(365*24*3600,"-year");
-		$form->AddItem($cmbDec);
-
-		$cmbInc = new CComboBox("inc",0,"submit()");
-		$cmbInc->AddItem(0,S_INCREASE);
-		$cmbInc->AddItem(3600,"+1h");
-		$cmbInc->AddItem(4*3600,"+4h");
-		$cmbInc->AddItem(24*3600,"+24h");
-		$cmbInc->AddItem(7*24*3600,"+week");
-		$cmbInc->AddItem(31*24*3600,"+month");
-		$cmbInc->AddItem(365*24*3600,"+year");
-		$form->AddItem($cmbInc);
-
-		$form->AddItem(SPACE.S_MOVE.SPACE);
-
-		$cmbLeft = new CComboBox("left",0,"submit()");
-		$cmbLeft->AddItem(0,S_LEFT_DIR);
-		$cmbLeft->AddItem(1,"-1h");
-		$cmbLeft->AddItem(4,"-4h");
-		$cmbLeft->AddItem(24,"-24h");
-		$cmbLeft->AddItem(7*24,"-week");
-		$cmbLeft->AddItem(31*24,"-month");
-		$cmbLeft->AddItem(365*24,"-year");
-		$form->AddItem($cmbLeft);
-
-		$cmbRight = new CComboBox("right",0,"submit()");
-		$cmbRight->AddItem(0,S_RIGHT_DIR);
-		$cmbRight->AddItem(1,"+1h");
-		$cmbRight->AddItem(4,"+4h");
-		$cmbRight->AddItem(24,"+24h");
-		$cmbRight->AddItem(7*24,"+week");
-		$cmbRight->AddItem(31*24,"+month");
-		$cmbRight->AddItem(365*24,"+year");
-		$form->AddItem($cmbRight);
-
-		$form->AddItem(array(SPACE,
-			new CTextBox("stime","yyyymmddhhmm",12),SPACE,
-			new CButton("action","go"),
-			new CButton("reset","reset")));
-
-		foreach($saved_request as $item)
-			if(isset($_REQUEST[$item]))
-				$form->AddVar($item,$_REQUEST[$item]);
-
-		show_table_header(
-			S_NAVIGATE,
-			$form);
-
-		return;
-	}
 	
-	/*
-	 * Function: 
-	 *		make_array_from_gitems
-	 *
-	 * Description:
-	 *     Creates array with items params for preapare_url function
-	 *
-	 * Author:
-	 *     Aly
-	 *
-	 * Comments
-	 *	
-	 */	
+/*
+ * Function: 
+ *		make_array_from_gitems
+ *
+ * Description:
+ *     Creates array with items params for preapare_url function
+ *
+ * Author:
+ *     Aly
+ *
+ * Comments
+ *	
+ */	
 	function make_url_from_gitems($gitems){
 
 		$gurl=array();
@@ -1087,19 +996,19 @@
 	return prepare_url($gurl);
 	}
 	
-	/*
-	 * Function: 
-	 *		make_array_from_graphid
-	 *
-	 * Description:
-	 *     Creates array with graph params for preapare_url function
-	 *
-	 * Author:
-	 *     Aly
-	 *
-	 * Comments
-	 *	$full= false: for screens(WITHOUT width && height), true=all params
-	 */	
+/*
+ * Function: 
+ *		make_array_from_graphid
+ *
+ * Description:
+ *     Creates array with graph params for preapare_url function
+ *
+ * Author:
+ *     Aly
+ *
+ * Comments
+ *	$full= false: for screens(WITHOUT width && height), true=all params
+ */	
 	function make_url_from_graphid($graphid,$full=false){
 
 		$gurl=array();
@@ -1125,5 +1034,32 @@
 			$url=((($gurl['graphtype']==GRAPH_TYPE_PIE) || ($gurl['graphtype']==GRAPH_TYPE_EXPLODED))?'chart7.php?':'chart3.php?').trim($url,'&');
 		}
 	return $url;
+	}
+	
+//Author:	Aly
+	function get_next_color($array = false){
+		static $prev_color = array('dark'=>true, 'color'=>0, 'grad'=>0);
+		$grad = array(255,200,150,100,50,0);
+		$set_grad = $grad[$prev_color['grad']];
+		
+//		$r = $g = $b = $prev_color['dark']?0:250;
+		$r = $g = $b = (100<$set_grad)?0:255;
+		
+		switch($prev_color['color']){
+			case 0: $r = $set_grad; break;
+			case 1: $g = $set_grad; break;
+			case 2:	$b = $set_grad;	break;
+			case 3:	$r = $b = $set_grad; break;
+			case 4: $g = $b = $set_grad; break;
+			case 5: $r = $g = $set_grad; break;
+			case 6: $r = $g = $b = $set_grad; break;
+		}
+//SDI($prev_color);
+		$prev_color['dark'] = $prev_color['dark']?false:true;
+		if($prev_color['color'] == 6) $prev_color['grad'] = ($prev_color['grad']+1) % 6 ;
+		$prev_color['color'] = ($prev_color['color']+1) % 7;
+		
+		$res = $array?array($r,$g,$b):($r.$g.$b);
+	return $res;
 	}
 ?>
