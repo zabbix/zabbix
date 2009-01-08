@@ -296,13 +296,17 @@ function zbx_rksort(&$array, $flags=NULL){
 
 /*************** CONVERTING ******************/
 function rgb2hex($color){			
-	$RGB = array(
-		hexdec('0x'.substr($color, 0,2)),
-		hexdec('0x'.substr($color, 2,2)),
-		hexdec('0x'.substr($color, 4,2))
-		);
+	$HEX = array(
+		dechex($color[0]),
+		dechex($color[1]),
+		dechex($color[2])
+	);
 	
-return $RGB[0].$RGB[1].$RGB[2];
+	foreach($HEX as $id => $value){
+		if(strlen($value) != 2) $HEX[$id] = '0'.$value;
+	}
+	
+return $HEX[0].$HEX[1].$HEX[2];
 }
 
 function zbx_num2bitstr($num,$rev=false){
