@@ -1,3 +1,7 @@
+Changes for 1.0.12
+
+ - [NTD-49,NTD-53,NTD-30,NTD-51] fixed problem with "Too many open files" by agent under Solaris and AIX (Sasha)
+
 Changes for 1.0.11
 
  - [NTD-44] fixed compilation problems under FreeBSD 4.2 (Sasha)
