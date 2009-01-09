@@ -262,12 +262,14 @@ function correctMiniMax(){
 			$this->gridLinesCount = round($this->sizeY/$this->gridPixels) + 1;
 		else
 			$this->gridLinesCount = round($this->sizeX/$this->gridPixels) + 1;
-			
+		
 		$tmp_maxY = $this->maxValue;
 		$tmp_minY = $this->minValue;
+
 //SDI($this->minValue.' : '.$this->maxValue);
 		if($this->side_values == ITEM_VALUE_TYPE_UINT64){
-	
+			if($this->maxValue < $this->gridLinesCount) return true;
+			
 			$this->maxValue = round($this->maxValue);
 			$this->minValue = floor($this->minValue);
 	
@@ -301,10 +303,10 @@ function correctMiniMax(){
 //*
 			if($this->maxValue>0){
 		
-				$this->maxValue = round($this->maxValue,1) + round($this->maxValue,1)*0.2 + 0.05;
+				$this->maxValue = round($this->maxValue,1) + round($this->maxValue,1)*0.1 + 0.05;
 			} 
 			else if($this->maxValue<0){
-				$this->maxValue = round($this->maxValue,1) - round($this->maxValue,1)*0.2 + 0.05;
+				$this->maxValue = round($this->maxValue,1) - round($this->maxValue,1)*0.1 + 0.05;
 			} 				
 			
 			if($this->minValue>0){
@@ -324,7 +326,6 @@ function correctMiniMax(){
 		
 		$this->maxValue = $this->gridStep * $this->gridLinesCount;
 	}
-		
 }
 
 //***************************************************************************
