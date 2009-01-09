@@ -609,7 +609,9 @@ include_once "include/page_header.php";
 	}
 	if(isset($itemid) && ($itemid > 0)){
 		$tmp_item = get_item_by_itemid($itemid);
+		
 		$graph->setUnits($tmp_item['units']);
+		$graph->setSideValueType($tmp_item['value_type']);
 	}
 	
 	$graph->setSeriesLegend($graph_data['legend']);
