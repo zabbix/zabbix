@@ -22,6 +22,7 @@ Changes for 1.7.0
 
 Changes for 1.6.2
 
+ - [ZBX-649] fixed problem with "Too many open files" by agent under Solaris and AIX (Sasha)
  - [DEV-268] added support of system.swap.size under FreeBSD (Sasha)
  - [DEV-276] added support of HTML text in plaintext view in screens (Artem)
  - [ZBX-395] fixed item list for simple graph (Artem)
