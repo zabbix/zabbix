@@ -272,9 +272,11 @@ include_once "include/page_header.php";
 			$graph_data['colors'][] = $item['color'];
 			
 			if(!isset($graph_data['captions'])){
+				$date_caption = ($scaletype == TIMEPERIOD_TYPE_HOURLY)?'Y.m.d H:i':'Y.m.d';
+				
 				$graph_data['captions'] = array();
 				foreach($item_data['clock'] as $id => $clock){
-					$graph_data['captions'][$id] = date('Y.m.d',$clock);
+					$graph_data['captions'][$id] = date($date_caption,$clock);
 				}
 			}
 		}
@@ -594,9 +596,12 @@ include_once "include/page_header.php";
 
 				$tmp_color = get_next_color(true);
 
-				if(!isset($graph_data['colors'][$count]))
+				if(!isset($graph_data['colors'][$count])){
 					$graph_data['colors'][$count] = rgb2hex($tmp_color);
-				$graph_data['legend'][$count] = date('Y.m.d', $start);
+				}
+				
+				$date_caption = ($scaletype == TIMEPERIOD_TYPE_HOURLY)?'Y.m.d H:i':'Y.m.d';
+				$graph_data['legend'][$count] = date($date_caption, $start);
 				
 				$count++;
 			}
