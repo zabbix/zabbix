@@ -301,17 +301,18 @@ function bar_report_form(){
 
 			$color = new CColorCell(null,$gitem['color']);
 
-			$description = new CLink($host['host'].': '.item_description($item),'#','action');
-			$description->onClick(
+			$caption = new CSpan($gitem['caption'], 'link');
+			$caption->onClick(
 					'return PopUp("popup_bitem.php?config=1&list_name=items&dstfrm='.$reportForm->GetName().
 					url_param($gitem, false).
 					url_param($gid,false,'gid').
 					'",550,400,"graph_item_form");');
 
+			$description = $host['host'].': '.item_description($item);
 
 			$items_table->addRow(array(
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-					$gitem['caption'],
+					$caption,
 					$description,
 					graph_item_calc_fnc2str($gitem['calc_fnc'],0),
 					$color,
@@ -443,17 +444,18 @@ function bar_report_form2(){
 			if($host['status'] == HOST_STATUS_TEMPLATE) $only_hostid = $host['hostid'];
 			else $monitored_hosts = 1;
 
-			$description = new CLink($host['host'].': '.item_description($item),'#','action');
-			$description->onClick(
+			$caption = new CSpan($gitem['caption'], 'link');
+			$caption->onClick(
 					'return PopUp("popup_bitem.php?config=2&list_name=items&dstfrm='.$reportForm->GetName().
 					url_param($gitem, false).
 					url_param($gid,false,'gid').
 					'",550,400,"graph_item_form");');
 
+			$description = $host['host'].': '.item_description($item);
 
 			$items_table->addRow(array(
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-					$gitem['caption'],
+					$caption,
 					$description,
 					graph_item_calc_fnc2str($gitem['calc_fnc'],0),
 				));

@@ -42,7 +42,7 @@ include_once 'include/page_header.php';
 		'gid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
 
 		'list_name'=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,			'isset({save})&&isset({gid})'),
-		'caption'=>		array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,			'isset({save})&&isset({gid})'),
+		'caption'=>		array(T_ZBX_STR, O_OPT,  null,	null,			null),
 		'itemid'=>		array(T_ZBX_INT, O_OPT,  null,	DB_ID.'({}!=0)',	'isset({save})'),
 		'color'=>		array(T_ZBX_CLR, O_OPT,  null,	null,				'isset({save})'),
 		'calc_fnc'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,4,7,9'),	'isset({save})'),
@@ -56,6 +56,11 @@ include_once 'include/page_header.php';
 	);
 
 	check_fields($fields);
+	
+	$_REQUEST['caption'] = get_request('caption','');
+	if(zbx_empty($_REQUEST['caption']) && isset($_REQUEST['itemid']) && ($_REQUEST['itemid'] > 0)){
+		$_REQUEST['caption'] = item_description(get_item_by_itemid($_REQUEST['itemid']));
+	}
 	
 	insert_js_function('add_bitem');
 	insert_js_function('update_bitem');
@@ -91,7 +96,7 @@ include_once 'include/page_header.php';
 		$config		= get_request('config',	 	1);
 		$gid		= get_request('gid',	 	null);
 		$list_name	= get_request('list_name', 	null);
-		$caption	= get_request('caption', 	'item');
+		$caption	= get_request('caption', 	'');
 		$itemid		= get_request('itemid', 	0);
 		$color		= get_request('color', 		'009900');
 		$calc_fnc	= get_request('calc_fnc',	2);
@@ -107,7 +112,10 @@ include_once 'include/page_header.php';
 		$frmGItem->addVar('list_name',$list_name);
 		$frmGItem->addVar('itemid',$itemid);
 
-		$frmGItem->addRow(S_CAPTION, new CTextBox('caption',$caption,10));
+		$frmGItem->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', S_DEFAULT), 
+			S_CAPTION), new CTextBox('caption',$caption,32));
+
+//		$frmGItem->addRow(S_CAPTION, new CTextBox('caption',$caption,10));
 
 		$txtCondVal = new CTextBox('description',$description,50,'yes');
 
