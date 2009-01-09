@@ -863,12 +863,11 @@ found_iconv="no"
 dnl Check for libiconv [by default - skip]
 LIBICONV_CHECK_CONFIG([no])
 if test "x$found_iconv" != "xyes"; then
-	AC_MSG_ERROR([Invalid ICONV directory - unable to find iconv.h "${found_iconv}"])
+	AC_MSG_ERROR([Unable to find iconv.h "${found_iconv}"])
 fi
 CFLAGS="${CFLAGS} ${ICONV_CFLAGS}"
 LDFLAGS="${LDFLAGS} ${ICONV_LDFLAGS}"
-
-AC_SEARCH_LIBS(iconv_open, iconv)
+LIBS="${LIBS} ${ICONV_LIBS}"
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
