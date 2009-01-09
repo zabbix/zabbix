@@ -1,3 +1,7 @@
+Changes for 1.0.13
+
+ - [NTD-58] fixed cleanup of open file descriptor (Sasha)
+
 Changes for 1.0.12
 
  - [NTD-35] fixed compilation problems under Solaris 6/8 (Sasha)

@@ -1111,7 +1111,7 @@ static int	DBdelete_graph(
 		{ /* recursion */
 			ZBX_STR2UINT64(graphid, element_data[0]);
 			if( SUCCEED != (result = DBdelete_graph(graphid)) )
-				return result;
+				break;
 		}
 
 		DBfree_result(db_elements);
@@ -1334,11 +1334,12 @@ static int	DBupdate_graph_with_items(
 		}
 
 		if ( SUCCEED != result )
-		{
-			return result;
-		}
+			break;
 	}
 	DBfree_result(chd_graphs);
+
+	if (SUCCEED != result)
+		return result;
 
 	DBexecute("delete from graphs_items where graphid=" ZBX_FS_UI64, graphid);
 
