@@ -48,6 +48,8 @@ static int getPROC2(char *file, char *param, int fieldno, unsigned flags, int ty
 		}
 	}
 
+	zbx_fclose(f);
+
 	if (!found) return SYSINFO_RET_FAIL;
 
 	/* find field */
@@ -56,8 +58,6 @@ static int getPROC2(char *file, char *param, int fieldno, unsigned flags, int ty
 	{
 		res = (char *)strtok(NULL," ");
 	}
-
-	zbx_fclose(f);
 
 	if ( res == NULL )
 	{
