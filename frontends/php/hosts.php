@@ -661,9 +661,7 @@ include_once "include/page_header.php";
 				$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
 			}
 			
-			DBstart();
 			$result = delete_maintenance($maintenanceids);
-			$result = DBend($result);
 			
 			show_messages($result,S_MAINTENANCE_DELETED,S_CANNOT_DELETE_MAINTENANCE);
 			if($result){

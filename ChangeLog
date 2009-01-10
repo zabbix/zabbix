@@ -1,5 +1,6 @@
 Changes for 1.0.13
 
+ - [NTD-57] fixed wrong message on delete of maintenance period (Sasha)
  - [NTD-58] fixed cleanup of open file descriptor (Sasha)
 
 Changes for 1.0.12
