@@ -243,6 +243,7 @@ src/libs/zbxserver/Makefile.am -text
 src/libs/zbxsysinfo/freebsd/boottime.c -text
 src/libs/zbxsysinfo/netbsd/boottime.c -text
 src/libs/zbxsysinfo/openbsd/boottime.c -text
+src/libs/zbxsysinfo/solaris/boottime.c -text
 src/zabbix_proxy/Makefile.am -text
 src/zabbix_proxy/datasender/Makefile.am -text
 src/zabbix_proxy/datasender/datasender.c -text
