@@ -1,5 +1,8 @@
 Changes for 1.6.2
 
+ - [ZBX-650] DM: fixed memory leak in synchronization of node configuration (Sasha)
+ - [ZBX-650] fixed rare race condition in DBimplode_exp (Sasha)
+ - [ZBX-650] fixed cleanup of open file descriptor (Sasha)
  - [ZBX-649] fixed problem with "Too many open files" by agent under Solaris and AIX (Sasha)
  - [DEV-268] added support of system.swap.size under FreeBSD (Sasha)
  - [DEV-276] added support of HTML text in plaintext view in screens (Artem)

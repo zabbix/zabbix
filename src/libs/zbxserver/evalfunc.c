@@ -1909,36 +1909,34 @@ int	replace_value_by_map(char *value, zbx_uint64_t valuemapid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+	char		new_value[MAX_STRING_LEN], orig_value[MAX_STRING_LEN];
+	int		ret = FAIL;
 
-	char new_value[MAX_STRING_LEN];
-	char sql[MAX_STRING_LEN];
-	char *or_value;
+	zabbix_log(LOG_LEVEL_DEBUG, "In replace_value_by_map()");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In replace_value_by_map()" );
-	
-	if(valuemapid == 0)	return FAIL;
-	
+	if (valuemapid == 0)
+		return FAIL;
+
 	result = DBselect("select newvalue from mappings where valuemapid=" ZBX_FS_UI64 " and value='%s'",
 			valuemapid,
 			value);
-	row = DBfetch(result);
+	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+	{
+		strcpy(new_value, row[0]);
 
-	if(!row || DBis_null(row[0])==SUCCEED)		return FAIL;
+		del_zeroes(new_value);
+		zbx_strlcpy(orig_value, value, MAX_STRING_LEN);
 
-	strcpy(new_value,row[0]);
+		zbx_snprintf(value, MAX_STRING_LEN, "%s (%s)",
+				new_value,
+				orig_value);
+		zabbix_log(LOG_LEVEL_DEBUG, "End replace_value_by_map(result:%s)",
+				value);
+		ret = SUCCEED;
+	}
 	DBfree_result(result);
 
-	del_zeroes(new_value);
-	or_value = sql;	/* sql variarbvle used as tmp - original value */
-	zbx_strlcpy(sql,value,MAX_STRING_LEN);
-	
-	zbx_snprintf(value, MAX_STRING_LEN, "%s (%s)",
-		new_value,
-		or_value);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End replace_value_by_map(result:%s)",
-		value);
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
