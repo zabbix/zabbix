@@ -3115,15 +3115,15 @@ static char*	DBimplode_exp (
 			/* determine key and function */
 			p = parameter-1; /* position of '(' character */
 			*p = '\0';
-			do { /* simple try for C */
-				key = host + host_len + 1;
-				if( NULL == (p = strrchr(key, '.'))) break; /* simpla throw for C */
-				key_len = p - key;
 
-				function = p + 1;
-				function_len = parameter - 1 - function;
+			key = host + host_len + 1;
+			if( NULL == (p = strrchr(key, '.'))) break; /* simpla throw for C */
+			key_len = p - key;
 
-			} while(0); /* simpla finally for C */
+			function = p + 1;
+			function_len = parameter - 1 - function;
+
+			p = parameter-1; /* position of '(' character */
 			*p = '(';
 
 		} while(0);/* simpla finally for C */
