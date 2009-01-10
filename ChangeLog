@@ -1,5 +1,7 @@
 Changes for 1.0.13
 
+ - [NTD-55] added support od system.boottime under Solaris (Sasha)
+ - [NTD-56] added support od system.cpu.load under Solaris 2.6 (Sasha)
  - [NTD-59] DM: fixed memory leak in synchronization of node configuration (Sasha)
  - [NTD-60] fixed rare race condition in DBimplode_exp (Sasha)
  - [NTD-57] fixed wrong message on delete of maintenance period (Sasha)
