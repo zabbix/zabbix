@@ -67,7 +67,7 @@ include_once "include/page_header.php";
 	$config = get_request('config', 0);
 	$update = get_request('update', null);
 	
-	update_profile("web.exp_imp.config", $config);
+	update_profile("web.exp_imp.config", $config, PROFILE_TYPE_INT);
 ?>
 <?php
 	if($config == 1){

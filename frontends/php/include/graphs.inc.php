@@ -1039,7 +1039,7 @@
 //Author:	Aly
 	function get_next_color($array = false){
 		static $prev_color = array('dark'=>true, 'color'=>0, 'grad'=>0);
-		$grad = array(255,200,150,100,50,0);
+		$grad = array(200,150,255,100,50,0);
 		$set_grad = $grad[$prev_color['grad']];
 		
 //		$r = $g = $b = $prev_color['dark']?0:250;
