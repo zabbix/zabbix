@@ -158,6 +158,8 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 	if (SUCCEED == res && DBexecute("%s", sql) < ZBX_DB_OK)
 		res = FAIL;
 
+	zbx_free(sql);
+
 	return res;
 }
 
