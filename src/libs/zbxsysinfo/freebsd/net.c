@@ -21,24 +21,12 @@
 
 #include "sysinfo.h"
 
-static struct nlist kernel_symbols[] = 
-{
-	{"_ifnet", N_UNDF, 0, 0, 0},
-	{"_tcbtable", N_UNDF, 0, 0, 0},
-	{NULL, 0, 0, 0, 0}
-};
+static struct ifmibdata ifmd;
 
-#define IFNET_ID 0
-
-static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *ipackets, zbx_uint64_t *ierrors, zbx_uint64_t *idropped,
-						zbx_uint64_t *obytes, zbx_uint64_t *opackets, zbx_uint64_t *oerrors,
-						zbx_uint64_t *tbytes, zbx_uint64_t *tpackets, zbx_uint64_t *terrors, zbx_uint64_t *tdropped,
-						zbx_uint64_t *icollisions)
+static int get_ifmib_general(char *if_name)
 {
-	int			mib[6], ifnum;
-	size_t			len;
-	struct ifmibdata	ifdata;
-	int 			ret = SYSINFO_RET_FAIL;
+	int	ifcount, mib[6];
+	size_t	sz;
 
 	mib[0] = CTL_NET;
 	mib[1] = PF_LINK;
@@ -46,148 +34,33 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 	mib[3] = IFMIB_SYSTEM;
 	mib[4] = IFMIB_IFCOUNT;
 
-	len = sizeof(ifnum);
-	if (0 != sysctl(mib, 5, &ifnum, &len, NULL, 0))
-		return SYSINFO_RET_FAIL;
+	sz = sizeof(ifcount);
+	if (-1 == sysctl(mib, 5, &ifcount, &sz, 0, 0))
+		return FAIL;
 
 	mib[3] = IFMIB_IFDATA;
-	mib[4] = 0;
 	mib[5] = IFDATA_GENERAL;
 
-	len = sizeof(ifdata);
-
-	if (ibytes)
-		*ibytes = 0;
-	if (ipackets)
-		*ipackets = 0;
-	if (ierrors)
-		*ierrors = 0;
-	if (idropped)
-		*idropped = 0;
-	if (obytes)
-		*obytes = 0;
-	if (opackets)
-		*opackets = 0;
-	if (oerrors)
-		*oerrors = 0;
-	if (tbytes)
-		*tbytes = 0;
-	if (tpackets)
-		*tpackets = 0;
-	if (terrors)
-		*terrors = 0;
-	if (tdropped)
-		*tdropped = 0;
-	if (icollisions)
-		*icollisions = 0;
-
-	for (; ifnum > 0; ifnum--) {
-		mib[4] = ifnum;
-
-		if (0 != sysctl(mib, 6, &ifdata, &len, NULL, 0))
-			continue;
-
-		if (*if_name == '\0' || 0 == strcmp(if_name, ifdata.ifmd_name)) {
-			if (ibytes)
-				*ibytes += ifdata.ifmd_data.ifi_ibytes;
-			if (ipackets)
-				*ipackets += ifdata.ifmd_data.ifi_ipackets;
-			if (ierrors)
-				*ierrors += ifdata.ifmd_data.ifi_ierrors;
-			if (idropped)
-				*idropped += ifdata.ifmd_data.ifi_iqdrops;
-			if (obytes)
-				*obytes += ifdata.ifmd_data.ifi_obytes;
-			if (opackets)
-				*opackets += ifdata.ifmd_data.ifi_opackets;
-			if (oerrors)
-				*oerrors += ifdata.ifmd_data.ifi_oerrors;
-			if (tbytes)
-				*tbytes += ifdata.ifmd_data.ifi_ibytes + ifdata.ifmd_data.ifi_obytes;
-			if (tpackets)
-				*tpackets += ifdata.ifmd_data.ifi_ipackets + ifdata.ifmd_data.ifi_opackets;
-			if (terrors)
-				*terrors += ifdata.ifmd_data.ifi_ierrors + ifdata.ifmd_data.ifi_oerrors;
-			if (tdropped)
-				*tdropped += ifdata.ifmd_data.ifi_iqdrops;
-			if (icollisions)
-				*icollisions += ifdata.ifmd_data.ifi_collisions;
-			ret = SYSINFO_RET_OK;
+	sz = sizeof(ifmd);
+	for (mib[4] = 1; mib[4] <= ifcount; mib[4]++)
+	{
+		if (-1 == sysctl(mib, 6, &ifmd, &sz, 0, 0))
+		{
+			if (errno == ENOENT)
+				continue;
+			break;
 		}
+
+		if (0 == strcmp(ifmd.ifmd_name, if_name))
+			return SUCCEED;
 	}
 
-	return ret;
-}
-
-static int	NET_IF_IN_BYTES(const char *if_name, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value;
-
-	if (SYSINFO_RET_OK != get_ifdata(if_name, &value, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	NET_IF_IN_PACKETS(const char *if_name, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value;
-
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, &value, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	NET_IF_IN_ERRORS(const char *if_name, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value;
-
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, &value, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	NET_IF_IN_DROPPED(const char *if_name, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value;
-
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, &value, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
+	return FAIL;
 }
 
 int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define NET_FNCLIST struct net_fnclist_s
-NET_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	NET_FNCLIST fl[] =
-	{
-		{"bytes",	NET_IF_IN_BYTES},
-		{"packets",	NET_IF_IN_PACKETS},
-		{"errors",	NET_IF_IN_ERRORS},
-		{"dropped",	NET_IF_IN_DROPPED},
-		{0,		0}
-	};
-
-	char	if_name[MAX_STRING_LEN];
-	char	mode[MAX_STRING_LEN];
-	int	i;
+	char	if_name[MAX_STRING_LEN], mode[32];
 
 	assert(result);
 
@@ -197,79 +70,39 @@ NET_FNCLIST
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
-		*if_name = '\0';
+		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
 
-	/* default parameter */
-	if (*mode == '\0')
-		zbx_snprintf(mode, sizeof(mode), "bytes");
-
-	for (i = 0; fl[i].mode != 0; i++)
-		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
-			return (fl[i].function)(if_name, result);
-
-	return SYSINFO_RET_FAIL;
-}
-
-static int	NET_IF_OUT_BYTES(const char *if_name, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value;
-
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, &value, NULL, NULL, NULL, NULL, NULL, NULL, NULL))
+	if (FAIL == get_ifmib_general(if_name))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int      NET_IF_OUT_PACKETS(const char *if_name, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value;
-
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, &value, NULL, NULL, NULL, NULL, NULL, NULL))
+	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
+	{
+		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_ibytes);
+	}
+	else if (0 == strcmp(mode, "packets"))
+	{
+		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_ipackets);
+	}
+	else if (0 == strcmp(mode, "errors"))
+	{
+		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_ierrors);
+	}
+	else if (0 == strcmp(mode, "dropped"))
+	{
+		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_iqdrops);
+	}
+	else
 		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int      NET_IF_OUT_ERRORS(const char *if_name, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value;
-
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, &value, NULL, NULL, NULL, NULL, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define NET_FNCLIST struct net_fnclist_s
-NET_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	NET_FNCLIST fl[] =
-	{
-		{"bytes",	NET_IF_OUT_BYTES},
-		{"packets",	NET_IF_OUT_PACKETS},
-		{"errors",	NET_IF_OUT_ERRORS},
-/*		{"dropped",	NET_IF_OUT_DROPPED},*/
-		{0,		0}
-	};
-
-	char	if_name[MAX_STRING_LEN];
-	char	mode[MAX_STRING_LEN];
-	int	i;
+	char	if_name[MAX_STRING_LEN], mode[32];
 
 	assert(result);
 
@@ -279,91 +112,35 @@ NET_FNCLIST
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
-		*if_name = '\0';
+		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
 
-	/* default parameter */
-	if (*mode == '\0')
-		zbx_snprintf(mode, sizeof(mode), "bytes");
-
-	for (i = 0; fl[i].mode != 0; i++)
-		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
-			return (fl[i].function)(if_name, result);
-
-	return SYSINFO_RET_FAIL;
-}
-
-static int	NET_IF_TOTAL_BYTES(const char *if_name, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value;
-
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &value, NULL, NULL, NULL, NULL))
+	if (FAIL == get_ifmib_general(if_name))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	NET_IF_TOTAL_PACKETS(const char *if_name, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value;
-
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &value, NULL, NULL, NULL))
+	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
+	{
+		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_obytes);
+	}
+	else if (0 == strcmp(mode, "packets"))
+	{
+		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_opackets);
+	}
+	else if (0 == strcmp(mode, "errors"))
+	{
+		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_oerrors);
+	}
+	else
 		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	NET_IF_TOTAL_ERRORS(const char *if_name, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value;
-
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &value, NULL, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	NET_IF_TOTAL_DROPPED(const char *if_name, AGENT_RESULT *result)
-{
-	zbx_uint64_t	value;
-
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &value, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define NET_FNCLIST struct net_fnclist_s
-NET_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	NET_FNCLIST fl[] =
-	{
-		{"bytes",	NET_IF_TOTAL_BYTES},
-		{"packets",	NET_IF_TOTAL_PACKETS},
-		{"errors",	NET_IF_TOTAL_ERRORS},
-		{"dropped",	NET_IF_TOTAL_DROPPED},
-		{0,		0}
-	};
-
-	char	if_name[MAX_STRING_LEN];
-	char	mode[MAX_STRING_LEN];
-	int	i;
+	char	if_name[MAX_STRING_LEN], mode[32];
 
 	assert(result);
 
@@ -373,35 +150,48 @@ NET_FNCLIST
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
-		*if_name = '\0';
+		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
 
-	/* default parameter */
-	if (*mode == '\0')
-		zbx_snprintf(mode, sizeof(mode), "bytes");
+	if (FAIL == get_ifmib_general(if_name))
+		return SYSINFO_RET_FAIL;
 
-	for (i = 0; fl[i].mode != 0; i++)
-		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
-			return (fl[i].function)(if_name, result);
+	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
+	{
+		SET_UI64_RESULT(result, (zbx_uint64_t)ifmd.ifmd_data.ifi_ibytes + (zbx_uint64_t)ifmd.ifmd_data.ifi_obytes);
+	}
+	else if (0 == strcmp(mode, "packets"))
+	{
+		SET_UI64_RESULT(result, (zbx_uint64_t)ifmd.ifmd_data.ifi_ipackets + (zbx_uint64_t)ifmd.ifmd_data.ifi_opackets);
+	}
+	else if (0 == strcmp(mode, "errors"))
+	{
+		SET_UI64_RESULT(result, (zbx_uint64_t)ifmd.ifmd_data.ifi_ierrors + (zbx_uint64_t)ifmd.ifmd_data.ifi_oerrors);
+	}
+	else if (0 == strcmp(mode, "dropped"))
+	{
+		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_iqdrops);
+	}
+	else
+		return SYSINFO_RET_FAIL;
 
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }
 
 int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	assert(result);
+        assert(result);
 
-	init_result(result);
+        init_result(result);
 	
 	return SYSINFO_RET_FAIL;
 }
 
 int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	zbx_uint64_t	value;
-	char		if_name[MAX_STRING_LEN];
+	char	if_name[MAX_STRING_LEN], mode[32];
 
 	assert(result);
 
@@ -411,12 +201,13 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
-		*if_name = '\0';
-
-	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &value))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, value);
+	if (FAIL == get_ifmib_general(if_name))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_collisions);
 
 	return SYSINFO_RET_OK;
 }
+
