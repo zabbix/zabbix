@@ -315,6 +315,7 @@ function bar_report_form(){
 					$caption,
 					$description,
 					graph_item_calc_fnc2str($gitem['calc_fnc'],0),
+					($gitem['axisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
 					$color,
 				));
 		}
@@ -457,7 +458,7 @@ function bar_report_form2(){
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
 					$caption,
 					$description,
-					graph_item_calc_fnc2str($gitem['calc_fnc'],0),
+					graph_item_calc_fnc2str($gitem['calc_fnc'],0)
 				));
 		}
 		$delete_button = new CButton('delete_item', S_DELETE_SELECTED);
