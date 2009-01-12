@@ -46,6 +46,7 @@ include_once 'include/page_header.php';
 		'itemid'=>		array(T_ZBX_INT, O_OPT,  null,	DB_ID.'({}!=0)',	'isset({save})'),
 		'color'=>		array(T_ZBX_CLR, O_OPT,  null,	null,				'isset({save})'),
 		'calc_fnc'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,4,7,9'),	'isset({save})'),
+		'axisside'=>	array(T_ZBX_INT, O_OPT,	 null,	IN(GRAPH_YAXIS_SIDE_LEFT.','.GRAPH_YAXIS_SIDE_RIGHT),	null),
 
 /* actions */
 		'add'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -58,6 +59,7 @@ include_once 'include/page_header.php';
 	check_fields($fields);
 	
 	$_REQUEST['caption'] = get_request('caption','');
+	$_REQUEST['axisside'] = get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 	if(zbx_empty($_REQUEST['caption']) && isset($_REQUEST['itemid']) && ($_REQUEST['itemid'] > 0)){
 		$_REQUEST['caption'] = item_description(get_item_by_itemid($_REQUEST['itemid']));
 	}
@@ -71,7 +73,8 @@ include_once 'include/page_header.php';
 			$_REQUEST['caption']."','".
 			$_REQUEST['itemid']."','".
 			$_REQUEST['color']."',".
-			$_REQUEST['calc_fnc'].");\n");
+			$_REQUEST['calc_fnc'].",".
+			$_REQUEST['axisside'].");\n");
 	}
 	
 	if(isset($_REQUEST['save']) && isset($_REQUEST['gid'])){
@@ -82,7 +85,9 @@ include_once 'include/page_header.php';
 			$_REQUEST['caption']."','".
 			$_REQUEST['itemid']."','".
 			$_REQUEST['color']."',".
-			$_REQUEST['calc_fnc'].");\n");
+			$_REQUEST['calc_fnc'].",".
+			$_REQUEST['axisside'].");\n");
+
 	}
 	else{
 		echo SBR;
@@ -100,6 +105,7 @@ include_once 'include/page_header.php';
 		$itemid		= get_request('itemid', 	0);
 		$color		= get_request('color', 		'009900');
 		$calc_fnc	= get_request('calc_fnc',	2);
+		$axisside	= get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 
 		$description = '';
 		if($itemid > 0){
@@ -126,16 +132,23 @@ include_once 'include/page_header.php';
 				'T');
 		
 		$frmGItem->addRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
-
-
+		
 		$cmbFnc = new CComboBox('calc_fnc',$calc_fnc);
-
-		$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
-		$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
-		$cmbFnc->addItem(CALC_FNC_MAX, S_MAX_SMALL);
-		$cmbFnc->addItem(0, S_COUNT);
+			$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
+			$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
+			$cmbFnc->addItem(CALC_FNC_MAX, S_MAX_SMALL);
+			$cmbFnc->addItem(0, S_COUNT);
 
 		$frmGItem->addRow(S_FUNCTION, $cmbFnc);
+
+		if($config == 1){
+			$cmbAxis = new CComboBox('axisside',$axisside);
+				$cmbAxis->addItem(GRAPH_YAXIS_SIDE_LEFT, S_LEFT);
+				$cmbAxis->addItem(GRAPH_YAXIS_SIDE_RIGHT, S_RIGHT);
+
+			$frmGItem->addRow(S_AXIS_SIDE, $cmbAxis);
+		}
+
 
 		if($config == 1)
 			$frmGItem->addRow(S_COLOR, new CColor('color',$color));
