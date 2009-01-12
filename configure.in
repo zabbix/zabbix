@@ -80,6 +80,9 @@ dnl Check for function res_query
 AC_MSG_CHECKING(for function res_query)
 AC_TRY_COMPILE(
 [
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
 #ifdef HAVE_NETINET_IN_H
 #	include <netinet/in.h>
 #endif
