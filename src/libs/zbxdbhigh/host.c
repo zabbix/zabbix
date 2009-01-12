@@ -247,6 +247,7 @@ static void	DBclear_parents_from_trigger(
 					" SET s.triggerid = null "
 					" WHERE s.serviceid = " ZBX_FS_UI64, serviceid);
 		}
+		DBfree_result(res);
 	}
 }
 
