@@ -256,21 +256,27 @@ include_once "include/page_header.php";
 	
 			switch($item['calc_fnc']){
 				case 0:
-					$graph->addSeries($item_data['count']);
+					$tmp_value = $item_data['count'];
 					break;
 				case CALC_FNC_MIN:
-					$graph->addSeries($item_data['min']);
+					$tmp_value = $item_data['min'];
 					break;
 				case CALC_FNC_AVG:
-					$graph->addSeries($item_data['avg']);
+					$tmp_value = $item_data['avg'];
 					break;
 				case CALC_FNC_MAX:
-					$graph->addSeries($item_data['max']);
+					$tmp_value = $item_data['max'];
 					break;
 			}
+			$graph->addSeries($tmp_value,$item['axisside']);
 			
 			$graph_data['colors'][] = $item['color'];
 			
+			if($db_item = get_item_by_itemid($item['itemid'])){
+				$graph->setUnits($db_item['units'],$item['axisside']);
+				$graph->setSideValueType($db_item['value_type'],$item['axisside']);
+			}
+
 			if(!isset($graph_data['captions'])){
 				$date_caption = ($scaletype == TIMEPERIOD_TYPE_HOURLY)?'Y.m.d H:i':'Y.m.d';
 				
@@ -286,7 +292,7 @@ include_once "include/page_header.php";
 		$periods = get_request('periods',array());
 	
 		$graph = new CBar(GRAPH_TYPE_COLUMN);
-	//	$graph = new CBar(GRAPH_TYPE_BAR);
+//		$graph = new CBar(GRAPH_TYPE_BAR);
 		$graph->setHeader('REPORT 1');
 		
 		$graph_data = array();
@@ -364,10 +370,15 @@ include_once "include/page_header.php";
 						$graph_data['values'][$itemid] = $item_data['max'];
 						break;
 				}
-				
+
 				$graph_data['captions'][$itemid] = $item['caption'];
+
+				if($db_item = get_item_by_itemid($item['itemid'])){
+					$graph->setUnits($db_item['units'],$item['axisside']);
+					$graph->setSideValueType($db_item['value_type'],$item['axisside']);
+				}
 			}
-	
+
 			if(($sorttype == 0) || (count($periods) < 2))
 				array_multisort($graph_data['captions'], $graph_data['values']);
 			else
@@ -610,13 +621,12 @@ include_once "include/page_header.php";
 		foreach($db_values as $num => $item_data){
 			$graph->addSeries($item_data);
 		}
-//----
-	}
-	if(isset($itemid) && ($itemid > 0)){
-		$tmp_item = get_item_by_itemid($itemid);
 		
-		$graph->setUnits($tmp_item['units']);
-		$graph->setSideValueType($tmp_item['value_type']);
+		if(isset($itemid) && ($db_item = get_item_by_itemid($itemid))){
+			$graph->setUnits($db_item['units']);
+			$graph->setSideValueType($db_item['value_type']);
+		}
+//----
 	}
 	
 	$graph->setSeriesLegend($graph_data['legend']);

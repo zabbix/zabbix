@@ -379,7 +379,7 @@ function insert_js_function($fnct_name){
 			}');
 			break;
 		case 'add_bitem':
-			insert_js('function add_bitem(formname,caption,itemid,color,calc_fnc){
+			insert_js('function add_bitem(formname,caption,itemid,color,calc_fnc,axisside){
 					var form = window.opener.document.forms[formname];
 				
 					if(!form){
@@ -391,14 +391,14 @@ function insert_js_function($fnct_name){
 					window.opener.create_var(form,"new_graph_item[itemid]",itemid);
 					window.opener.create_var(form,"new_graph_item[color]",color);
 					window.opener.create_var(form,"new_graph_item[calc_fnc]",calc_fnc);
-					
+					window.opener.create_var(form,"new_graph_item[axisside]",axisside);
 					form.submit();
 					close_window();
 					return true;
 				}');
 			break;
 		case 'update_bitem':
-			insert_js('function update_bitem(formname,list_name,gid,caption,itemid,color,calc_fnc){
+			insert_js('function update_bitem(formname,list_name,gid,caption,itemid,color,calc_fnc,axisside){
 				var form = window.opener.document.forms[formname];
 			
 				if(!form){
@@ -410,6 +410,7 @@ function insert_js_function($fnct_name){
 				window.opener.create_var(form,list_name + "[" + gid + "][itemid]",itemid);
 				window.opener.create_var(form,list_name + "[" + gid + "][color]",color);
 				window.opener.create_var(form,list_name + "[" + gid + "][calc_fnc]",calc_fnc);
+				window.opener.create_var(form,list_name + "[" + gid + "][axisside]",axisside);
 				
 				form.submit();
 				close_window();
