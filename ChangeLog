@@ -1,5 +1,6 @@
 Changes for 1.0.14
 
+ - [NTD-50] added support of net.if.in/out/total/collisions under FreeBSD (Sasha)
  - [NTD-52] fixed configuration script for net.tcp.dns* check processing (Sasha)
  - [NTD-61] fixed possible memory leak in autodiscovery actions (Sasha)
 

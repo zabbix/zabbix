@@ -274,6 +274,10 @@
 #	include <net/if.h>
 #endif
 
+#ifdef HAVE_NET_IF_MIB_H
+#	include <net/if_mib.h>
+#endif
+
 #ifdef HAVE_KVM_H
 #	include <kvm.h>
 #endif
