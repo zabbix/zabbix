@@ -1,5 +1,6 @@
 Changes for 1.6.2
 
+ - [ZBX-651] fixed possible memory leak in autodiscovery actions (Sasha)
  - [DEV-268] added support of system.boottime under Solaris (Sasha)
  - [DEV-268] added support of system.cpu.load under Solaris 2.6 (Sasha)
  - [ZBX-650] DM: fixed memory leak in synchronization of node configuration (Sasha)
