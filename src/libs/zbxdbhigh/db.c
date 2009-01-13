@@ -1486,6 +1486,27 @@ int	DBget_queue_count(void)
 	return res;
 }
 
+double	DBget_requiredperformance(void)
+{
+	double		qps_total = 0;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBget_requiredperformance()");
+
+	/* !!! Don't forget sync code with PHP !!! */
+	result = DBselect("select i.type,i.delay,count(*)/i.delay from hosts h,items i"
+			" where h.hostid=i.hostid and h.status=%d and i.status=%d"
+			" group by i.type,i.delay",
+			HOST_STATUS_MONITORED,
+			ITEM_STATUS_ACTIVE);
+	while (NULL != (row = DBfetch(result)))
+		qps_total += atof(row[2]);
+	DBfree_result(result);
+
+	return qps_total;
+}
+
 zbx_uint64_t DBget_proxy_lastaccess(const char *hostname)
 {
 	zbx_uint64_t	res;
