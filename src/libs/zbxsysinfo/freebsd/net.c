@@ -182,11 +182,15 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-        assert(result);
+	char	command[MAX_STRING_LEN];
 
-        init_result(result);
-	
-	return SYSINFO_RET_FAIL;
+	assert(result);
+
+	init_result(result);
+
+	zbx_snprintf(command, sizeof(command), "netstat -an | grep '*.%s' | wc -l", param);
+
+	return EXECUTE_INT(NULL, command, flags, result);
 }
 
 int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -210,4 +214,3 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
 
 	return SYSINFO_RET_OK;
 }
-
