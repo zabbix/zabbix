@@ -510,6 +510,9 @@ function bar_report_form3(){
 
 	$hostids = get_request('hostids', array());
 	$showlegend = get_request('showlegend',0);
+	
+	$palette = get_request('palette',0);
+	$palettetype = get_request('palettetype',0);
 
 	$reportForm = new CFormTable(S_REPORTS,null,'get');//,'events.php?report_set=1','POST',null,'sform');
 	$reportForm->addOption('name','zbx_report');
@@ -739,7 +742,20 @@ function bar_report_form3(){
 			'T');
 			
 	$reportForm->addRow(S_ITEM , array($txtCondVal,$btnSelect));
-			
+	
+	
+	$paletteCmb = new CComboBox('palette', $palette);
+		$paletteCmb->addItem(0, S_PALETTE.' #1');
+		$paletteCmb->addItem(1, S_PALETTE.' #2');
+		$paletteCmb->addItem(2, S_PALETTE.' #3');
+		$paletteCmb->addItem(3, S_PALETTE.' #4');
+		
+	$paletteTypeCmb = new CComboBox('palettetype', $palettetype);
+		$paletteTypeCmb->addItem(0, S_MIDDLE);
+		$paletteTypeCmb->addItem(1, S_DARKEN);
+		$paletteTypeCmb->addItem(2, S_BRIGHTEN);
+		
+	$reportForm->addRow(S_PALETTE , array($paletteCmb,$paletteTypeCmb));
 //--------------
 	
 	

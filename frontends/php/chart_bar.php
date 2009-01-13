@@ -56,6 +56,8 @@ include_once "include/page_header.php";
 		'report_timesince'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
 		'report_timetill'=>		array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
 	
+		'palette'=>			array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
+		'palettetype'=>		array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
 	);
 
 	check_fields($fields);
@@ -397,7 +399,9 @@ include_once "include/page_header.php";
 		$xlabel = get_request('xlabel','');
 		$ylabel = get_request('ylabel','');
 		
-		
+		$palette = get_request('palette',0);
+		$palettetype = get_request('palettetype',0);
+
 		$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 		$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
 		
@@ -605,7 +609,8 @@ include_once "include/page_header.php";
 //SDI($count.' : '.$itemid);
 				$db_values[$count][$itemid] = is_null($item_data)?0:$item_data;
 
-				$tmp_color = get_next_color(true);
+//				$tmp_color = get_next_color($palettetype);
+				$tmp_color = get_next_palette($palette,$palettetype);
 
 				if(!isset($graph_data['colors'][$count])){
 					$graph_data['colors'][$count] = rgb2hex($tmp_color);

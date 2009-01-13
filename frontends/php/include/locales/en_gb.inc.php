@@ -1359,6 +1359,10 @@
 	'S_SELECTED_GROUPS'=>		'Selected groups',
 	'S_SCALE'=>					'Scale',
 	'S_AVERAGE_BY'=>			'Average by',
+	'S_PALETTE'=>				'Palette',
+	'S_DARKEN'=>				'Darken',
+	'S_BRIGHTEN'=>				'Brighten',
+	'S_AUTO'=>					'Auto',
  
 //	screenconf.php
 	'S_SCREENS'=>				'Screens',
