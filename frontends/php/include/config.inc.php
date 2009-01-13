@@ -857,6 +857,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 							' AND u.autologout=0');
 		while(DBfetch($result))		$status['users_online']++;
 
+		/* Comments: !!! Don't forget sync code with C !!! */
 		$result=DBselect('SELECT i.type, i.delay, count(*),count(*)/i.delay as qps '.
 							' FROM items i,hosts h '.
 							' WHERE i.status='.ITEM_STATUS_ACTIVE.

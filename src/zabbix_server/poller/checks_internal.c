@@ -113,6 +113,13 @@ int	get_value_internal(DB_ITEM *item, AGENT_RESULT *result)
 		i = DBget_queue_count();
 		SET_UI64_RESULT(result, i);
 	}
+	else if (0 == strcmp(tmp, "requiredperformance"))	/* zabbix["requiredperformance"] */
+	{
+		if (1 != nparams)
+			goto not_supported;
+
+		SET_DBL_RESULT(result, DBget_requiredperformance());
+	}
 	else if (0 == strcmp(tmp, "uptime"))		/* zabbix["uptime"] */
 	{
 		if (1 != nparams)
