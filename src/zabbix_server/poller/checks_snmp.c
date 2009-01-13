@@ -632,44 +632,37 @@ static ZBX_MIB_NORM mibs[]=
 	{"ifInDiscards",	"1.3.6.1.2.1.2.2.1.13"},
 	{"ifInErrors",		"1.3.6.1.2.1.2.2.1.14"},
 	{"ifInUnknownProtos",	"1.3.6.1.2.1.2.2.1.15"},
-	{"ifOutOctets",		"1.3.6.1.2.1.2.2.1.17"},
+	{"ifOutOctets",		"1.3.6.1.2.1.2.2.1.16"},
+	{"ifOutUcastPkts",	"1.3.6.1.2.1.2.2.1.17"},
 	{"ifOutNUcastPkts",	"1.3.6.1.2.1.2.2.1.18"},
 	{"ifOutDiscards",	"1.3.6.1.2.1.2.2.1.19"},
 	{"ifOutErrors",		"1.3.6.1.2.1.2.2.1.20"},
 	{"ifOutQLen",		"1.3.6.1.2.1.2.2.1.21"},
 	{NULL}
 };
-	int found = 0;
-	int i;
+	int	found = 0, i;
+	size_t	sz;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In snmp_normalize(oid:%s)",
-		oid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In snmp_normalize(oid:%s)",
+			oid);
 
-	for(i=0;mibs[i].mib!=NULL;i++)
+	for (i = 0; mibs[i].mib != NULL; i++)
 	{
-		if(strncmp(mibs[i].mib,oid,strlen(mibs[i].mib)) == 0)
+		sz = strlen(mibs[i].mib);
+		if (0 == strncmp(mibs[i].mib, oid, sz))
 		{
 			found = 1;
-			if(strlen(mibs[i].mib) == strlen(oid))
-			{
-				zbx_strlcpy(buf, mibs[i].replace, maxlen);
-			}
-			else
-			{
-				zbx_snprintf(buf, maxlen, "%s%s",
+			zbx_snprintf(buf, maxlen, "%s%s",
 					mibs[i].replace,
-					oid+strlen(mibs[i].mib));
-			}
+					oid + sz);
 			break;
 		} 
 	}
-	if(0 == found)
-	{
+	if (0 == found)
 		zbx_strlcpy(buf, oid, maxlen);
-	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End of snmp_normalize(result:%s)",
-		buf);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of snmp_normalize(result:%s)",
+			buf);
 }
 
 int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
