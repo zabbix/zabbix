@@ -57,6 +57,8 @@ include_once('include/page_header.php');
 		'new_period'=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 		'group_pid'=>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
 
+		'palette'=>			array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
+		'palettetype'=>		array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
 		
 // actions
 		'delete_item'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -190,7 +192,9 @@ include_once('include/page_header.php');
 					url_param('periods').
 					url_param('items').
 					url_param('hostids').
-					url_param('groupids');
+					url_param('groupids').
+					url_param('palette').
+					url_param('palettetype');
 					
 		$rep_tab->addRow(create_hat(
 				S_REPORT,

@@ -481,8 +481,6 @@
 	
 	define('AVAILABLE_NOCACHE',	0);		// take available objects not from cache
 	
-	
-//	define('BR',	"<br/>\n");
 	define('SBR',	"<br/>\n");
 	define('SPACE',	'&nbsp;');
 	define('RARR',	'&rArr;');
