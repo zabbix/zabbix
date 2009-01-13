@@ -1037,9 +1037,16 @@
 	}
 	
 //Author:	Aly
-	function get_next_color($array = false){
+	function get_next_color($palettetype=0){
 		static $prev_color = array('dark'=>true, 'color'=>0, 'grad'=>0);
-		$grad = array(200,150,255,100,50,0);
+		
+		switch($palettetype){
+			case 1: $grad = array(200,150,255,100,50,0); break;
+			case 2: $grad = array(100,50,200,150,250,0); break;
+			case 0:
+			default: $grad = array(255,200,150,100,50,0); break;
+		}
+		
 		$set_grad = $grad[$prev_color['grad']];
 		
 //		$r = $g = $b = $prev_color['dark']?0:250;
@@ -1059,7 +1066,50 @@
 		if($prev_color['color'] == 6) $prev_color['grad'] = ($prev_color['grad']+1) % 6 ;
 		$prev_color['color'] = ($prev_color['color']+1) % 7;
 		
-		$res = $array?array($r,$g,$b):($r.$g.$b);
-	return $res;
+	return array($r,$g,$b);
+	}
+	
+//Author:	Aly
+	function get_next_palette($palette=0,$palettetype=0){
+		static $prev_color = array(0,0,0,0);
+		
+		switch($palette){
+			case 0: $palettes = array(array(150,0,0), array(0,100,150), array(170,180,180), array(152,100,0), 
+									array(130,0,150), array(0,0,150), array(200,100,50),
+									array(250,40,40), array(50,150,150), array(100,150,0));
+				break;
+			case 1: $palettes = array(array(0,100,150), array(153,0,30), array(100,150,0),
+									array(130,0,150), array(0,0,100), array(200,100,50), array(152,100,0),
+									array(0,100,0), array(170,180,180), array(50,150,150));
+				break;
+			case 2: $palettes = array( array(170,180,180), array(152,100,0), array(50,200,200),
+									array(153,0,30), array(0,0,100), array(100,150,0), array(130,0,150),
+									array(0,100,150), array(200,100,50), array(0,100,0),);
+				break;
+			case 3:
+			default: 
+				return get_next_color($palettetype);
+		}
+
+		if(isset($palettes[$prev_color[$palette]]) )
+			$result = $palettes[$prev_color[$palette]];
+		else
+			return get_next_color($palettetype);
+				
+		switch($palettetype){
+			case 0: $diff = 0; break;
+			case 1:	$diff = -50; break;
+			case 2:	$diff = 50; break;
+		}
+		
+		foreach($result as $n => $color){
+			if(($color + $diff) < 0) $result[$n] = 0;
+			else if(($color + $diff) > 255) $result[$n] = 255;
+			else $result[$n] += $diff;
+		}
+		
+		$prev_color[$palette]++;
+
+	return $result;
 	}
 ?>
