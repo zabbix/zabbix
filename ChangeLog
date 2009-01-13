@@ -22,6 +22,7 @@ Changes for 1.7.0
 
 Changes for 1.6.2
 
+ - [ZBX-506] fixed duplicate UnavailableDelay in zabbix_server.conf (Sasha)
  - [ZBX-428] added internal check zabbix[requiredperformance] (Sasha)
  - [ZBX-639] fixed numeric snmp oid for ifOutOctets. Thanks to Alexandr Kovalenko. (Sasha)
  - [DEV-268] added support of net.tcp.listen under FreeBSD (Sasha)
