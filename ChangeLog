@@ -1,5 +1,6 @@
 Changes for 1.6.2
 
+ - [ZBX-639] fixed numeric snmp oid for ifOutOctets. Thanks to Alexandr Kovalenko. (Sasha)
  - [DEV-268] added support of net.tcp.listen under FreeBSD (Sasha)
  - [ZBX-651] fixed possible memory leak in autodiscovery actions (Sasha)
  - [DEV-268] added support of system.boottime under Solaris (Sasha)
