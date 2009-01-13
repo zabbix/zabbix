@@ -1,5 +1,6 @@
 Changes for 1.0.14
 
+ - [ZBX-506] fixed duplicate UnavailableDelay in zabbix_server.conf (Sasha)
  - [NTD-50] added support of net.tcp.listen under FreeBSD (Sasha)
  - [NTD-50] added support of net.if.in/out/total/collisions under FreeBSD (Sasha)
  - [NTD-52] fixed configuration script for net.tcp.dns* check processing (Sasha)
