@@ -304,7 +304,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 		switch (item->delta) {			/* Should we store delta or original value? */
 		case ITEM_STORE_AS_IS:
 			if (item->history > 0)
-				DBadd_history(item->itemid, value->dbl, now);
+				DBadd_history(item->itemid, DBmultiply_value_float(item, value->dbl), now);
 			ret = SUCCEED;
 			break;
 		case ITEM_STORE_SPEED_PER_SECOND:	/* Delta as speed of change */
@@ -313,7 +313,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 				if (item->history > 0)
 				{
 					value_double = (value->dbl - item->prevorgvalue_dbl) / (now - item->lastclock);
-					DBadd_history(item->itemid, value_double, now);
+					DBadd_history(item->itemid, DBmultiply_value_float(item, value_double), now);
 				}
 				ret = SUCCEED;
 			}
@@ -322,7 +322,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 			if (0 == item->prevorgvalue_null && item->prevorgvalue_dbl <= value->dbl)
 			{
 				if (item->history > 0)
-					DBadd_history(item->itemid, (value->dbl - item->prevorgvalue_dbl), now);
+					DBadd_history(item->itemid, DBmultiply_value_float(item, value->dbl - item->prevorgvalue_dbl), now);
 				ret = SUCCEED;
 			}
 			break;
@@ -342,7 +342,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 		switch (item->delta) {			/* Should we store delta or original value? */
 		case ITEM_STORE_AS_IS:
 			if (item->history > 0)
-				DBadd_history_uint(item->itemid, value->ui64, now);
+				DBadd_history_uint(item->itemid, DBmultiply_value_uint64(item, value->ui64), now);
 			ret = SUCCEED;
 			break;
 		case ITEM_STORE_SPEED_PER_SECOND:	/* Delta as speed of change */
@@ -351,7 +351,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 				if (item->history > 0)
 				{
 					value_uint64 = (zbx_uint64_t)(value->ui64 - item->prevorgvalue_uint64) / (now - item->lastclock);
-					DBadd_history_uint(item->itemid, value_uint64, now);
+					DBadd_history_uint(item->itemid, DBmultiply_value_uint64(item, value_uint64), now);
 				}
 				ret = SUCCEED;
 			}
@@ -360,7 +360,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 			if (0 == item->prevorgvalue_null && item->prevorgvalue_uint64 <= value->ui64)
 			{
 				if (item->history > 0)
-					DBadd_history_uint(item->itemid, value->ui64 - item->prevorgvalue_uint64, now);
+					DBadd_history_uint(item->itemid, DBmultiply_value_uint64(item, value->ui64 - item->prevorgvalue_uint64), now);
 				ret = SUCCEED;
 			}
 			break;
@@ -445,12 +445,14 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 
 		switch (item->delta) {			/* Should we store delta or original value? */
 		case ITEM_STORE_AS_IS:
-			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='" ZBX_FS_DBL "',lastclock=%d"
-					" where itemid=" ZBX_FS_UI64,
+			value_double = DBmultiply_value_float(item, value->dbl);
+			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=NULL,"
+					"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
 					item->nextcheck,
-					value->dbl,
+					value_double,
 					(int)now,
 					item->itemid);
+			SET_DBL_RESULT(value, value_double);
 			break;
 		case ITEM_STORE_SPEED_PER_SECOND:	/* Delta as speed of change */
 			if (0 == item->prevorgvalue_null && item->prevorgvalue_dbl <= value->dbl)
@@ -462,6 +464,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 				else
 					value_double = value->dbl - item->prevorgvalue_dbl;
 
+				value_double = DBmultiply_value_float(item, value_double);
 				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "',"
 						"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
 						item->nextcheck,
@@ -483,7 +486,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 		case ITEM_STORE_SIMPLE_CHANGE:		/* Real delta: simple difference between values */
 			if (0 == item->prevorgvalue_null && item->prevorgvalue_dbl <= value->dbl)
 			{
-				value_double = value->dbl - item->prevorgvalue_dbl;
+				value_double = DBmultiply_value_float(item, value->dbl - item->prevorgvalue_dbl);
 				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "',"
 						"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
 						item->nextcheck,
@@ -510,12 +513,14 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 
 		switch (item->delta) {			/* Should we store delta or original value? */
 		case ITEM_STORE_AS_IS:
-			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='" ZBX_FS_UI64 "',lastclock=%d"
-					" where itemid=" ZBX_FS_UI64,
+			value_uint64 = DBmultiply_value_uint64(item, value->ui64);
+			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=NULL,"
+					"lastvalue='" ZBX_FS_UI64 "',lastclock=%d where itemid=" ZBX_FS_UI64,
 					item->nextcheck,
-					value->ui64,
+					value_uint64,
 					(int)now,
 					item->itemid);
+			SET_UI64_RESULT(value, value_uint64);
 			break;
 		case ITEM_STORE_SPEED_PER_SECOND:	/* Delta as speed of change */
 			if (0 == item->prevorgvalue_null && item->prevorgvalue_uint64 <= value->ui64)
@@ -525,6 +530,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 				else
 					value_uint64 = value->ui64 - item->prevorgvalue_uint64;
 
+				value_uint64 = DBmultiply_value_uint64(item, value_uint64);
 				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',"
 						"lastvalue='" ZBX_FS_UI64 "',lastclock=%d where itemid=" ZBX_FS_UI64,
 						item->nextcheck,
@@ -546,7 +552,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 		case ITEM_STORE_SIMPLE_CHANGE:		/* Real delta: simple difference between values */
 			if (0 == item->prevorgvalue_null && item->prevorgvalue_uint64 <= value->ui64)
 			{
-				value_uint64 = value->ui64 - item->prevorgvalue_uint64;
+				value_uint64 = DBmultiply_value_uint64(item, value->ui64 - item->prevorgvalue_uint64);
 				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',"
 						"lastvalue='" ZBX_FS_UI64 "',lastclock=%d where itemid=" ZBX_FS_UI64,
 						item->nextcheck,
@@ -645,33 +651,6 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 {
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value(%s)",
 		item->key);
-
-	if( ITEM_MULTIPLIER_USE == item->multiplier )
-	{
-		if( ITEM_VALUE_TYPE_FLOAT == item->value_type )
-		{
-			if(GET_DBL_RESULT(value))
-			{
-				UNSET_RESULT_EXCLUDING(value, AR_DOUBLE);
-				SET_DBL_RESULT(value, value->dbl * strtod(item->formula, NULL));
-			}
-		}
-		else if( ITEM_VALUE_TYPE_UINT64 == item->value_type )
-		{
-			if(GET_UI64_RESULT(value))
-			{
-				UNSET_RESULT_EXCLUDING(value, AR_UINT64);
-				if(is_uint(item->formula) == SUCCEED)
-				{
-					SET_UI64_RESULT(value, value->ui64 * zbx_atoui64((item->formula)));
-				}
-				else
-				{
-					SET_UI64_RESULT(value, (zbx_uint64_t)((double)value->ui64 * strtod(item->formula, NULL)));
-				}
-			}
-		}
-	}
 
 	if (0 == CONFIG_DBSYNCER_FORKS)
 	{

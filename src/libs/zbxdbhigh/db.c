@@ -2229,3 +2229,37 @@ char	*zbx_host_key_function_string(zbx_uint64_t functionid)
 
 	return string;
 }
+
+double	DBmultiply_value_float(DB_ITEM *item, double value)
+{
+	double	value_double;
+
+	if (ITEM_MULTIPLIER_USE != item->multiplier)
+		return value;
+
+	value_double = value * atof(item->formula);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "DBmultiply_value_float() " ZBX_FS_DBL ",%s " ZBX_FS_DBL,
+			value, item->formula, value_double);
+
+	return value_double;
+}
+
+zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
+{
+	zbx_uint64_t	formula_uint64, value_uint64;
+
+	if (ITEM_MULTIPLIER_USE != item->multiplier)
+		return value;
+
+	if (SUCCEED == is_uint64(item->formula, &formula_uint64))
+		value_uint64 = value * formula_uint64;
+	else
+		value_uint64 = (zbx_uint64_t)((double)value * atof(item->formula));
+
+	zabbix_log(LOG_LEVEL_DEBUG, "DBmultiply_value_float() " ZBX_FS_UI64 ",%s " ZBX_FS_UI64,
+			value, item->formula, value_uint64);
+
+	return value_uint64;
+}
+

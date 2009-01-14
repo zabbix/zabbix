@@ -80,11 +80,11 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 		}
 		else    ret = NOTSUPPORTED;
 	}
-	else
+
+	if (ret == NOTSUPPORTED)
 	{
-		zbx_snprintf(error,MAX_STRING_LEN-1,"External check [%s] is not supported", item->key);
-		zabbix_log( LOG_LEVEL_DEBUG, "%s", error);
-		SET_STR_RESULT(result, strdup(error));
+		zbx_snprintf(error, sizeof(error), "External check is not supported");
+		SET_MSG_RESULT(result, strdup(error));
 		return NOTSUPPORTED;
 	}
 
@@ -97,9 +97,8 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 	zabbix_log( LOG_LEVEL_DEBUG, "%s", cmd );
 	if (NULL == (fp = popen(cmd, "r"))) 
 	{
-		zbx_snprintf(error,MAX_STRING_LEN-1,"External check [%s] is not supported, failed execution", item->key);
-		zabbix_log( LOG_LEVEL_DEBUG, "%s", error);
-		SET_STR_RESULT(result, strdup(error));
+		zbx_snprintf(error, sizeof(error), "External check is not supported, failed execution");
+		SET_MSG_RESULT(result, strdup(error));
 		return NOTSUPPORTED;
 	}
 
@@ -117,15 +116,15 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 		}
 		zabbix_log( LOG_LEVEL_DEBUG, "Result [%s]", msg);
 
-		set_result_type(result, item->value_type, msg);
+		if (SUCCEED != set_result_type(result, item->value_type, msg))
+			ret = NOTSUPPORTED;
 	}
 	else
 	{
-		zbx_snprintf(error,MAX_STRING_LEN-1,"Script %s/%s returned nothing.",
+		zbx_snprintf(error, sizeof(error), "Script %s/%s returned nothing.",
 			CONFIG_EXTERNALSCRIPTS,
 			scriptname);
-		zabbix_log( LOG_LEVEL_WARNING, "%s", error);
-		SET_STR_RESULT(result, strdup(error));
+		SET_MSG_RESULT(result, strdup(error));
 		ret = NOTSUPPORTED;
 	}
 

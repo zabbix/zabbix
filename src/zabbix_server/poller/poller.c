@@ -70,7 +70,7 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 			res = get_value_snmp(item, result);
 			alarm(0);
 #else
-			SET_MSG_RESULT(result, "Support of SNMP parameters was not compiled in");
+			SET_MSG_RESULT(result, strdup("Support of SNMP parameters was not compiled in"));
 			res = NOTSUPPORTED;
 #endif
 			if (SUCCEED != res && GET_MSG_RESULT(result))
@@ -82,7 +82,7 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 #ifdef HAVE_OPENIPMI
 			res = get_value_ipmi(item, result);
 #else
-			SET_MSG_RESULT(result, "Support of IPMI parameters was not compiled in");
+			SET_MSG_RESULT(result, strdup("Support of IPMI parameters was not compiled in"));
 			res = NOTSUPPORTED;
 #endif
 			break;
@@ -100,6 +100,11 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 			alarm(CONFIG_TIMEOUT);
 			res = get_value_db(item, result);
 			alarm(0);
+
+			if (SUCCEED != res && GET_MSG_RESULT(result))
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s",
+						zbx_host_key_string_by_item(item),
+						result->msg);
 			break;
 		case ITEM_TYPE_AGGREGATE:
 			alarm(CONFIG_TIMEOUT);
@@ -110,6 +115,11 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 			alarm(CONFIG_TIMEOUT);
 			res = get_value_external(item, result);
 			alarm(0);
+
+			if (SUCCEED != res && GET_MSG_RESULT(result))
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s",
+						zbx_host_key_string_by_item(item),
+						result->msg);
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_WARNING, "Not supported item type:%d",

@@ -526,46 +526,53 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 {
-	int ret = FAIL;
+	int		ret = FAIL;
+	zbx_uint64_t	value;
 
 	assert(result);
 
-	if(value_type == ITEM_VALUE_TYPE_UINT64)
-	{
+	switch (value_type) {
+	case ITEM_VALUE_TYPE_UINT64:
+		zbx_rtrim(c, " \"");
+		zbx_ltrim(c, " \"");
 		del_zeroes(c);
-		if(is_uint(c) == SUCCEED)
+		if (SUCCEED == is_uint64(c, &value))
 		{
-			SET_UI64_RESULT(result, zbx_atoui64(c));
+			SET_UI64_RESULT(result, value);
 			ret = SUCCEED;
 		}
-	}
-	else if(value_type == ITEM_VALUE_TYPE_FLOAT)
-	{
-		if(is_double(c) == SUCCEED)
+		break;
+	case ITEM_VALUE_TYPE_FLOAT:
+		zbx_rtrim(c, " \"");
+		zbx_ltrim(c, " \"");
+
+		if (SUCCEED == is_double(c))
 		{
 			SET_DBL_RESULT(result, atof(c));
 			ret = SUCCEED;
 		}
-		else if(is_uint(c) == SUCCEED)
+		else if (SUCCEED == is_uint(c))	/* ??? */
 		{
 			SET_DBL_RESULT(result, strtod(c, NULL));
 			ret = SUCCEED;
 		}
-	}
-	else if(value_type == ITEM_VALUE_TYPE_STR)
-	{
+		break;
+	case ITEM_VALUE_TYPE_STR:
+	case ITEM_VALUE_TYPE_LOG:
 		SET_STR_RESULT(result, strdup(c));
 		ret = SUCCEED;
-	}
-	else if(value_type == ITEM_VALUE_TYPE_TEXT)
-	{
+		break;
+	case ITEM_VALUE_TYPE_TEXT:
 		SET_TEXT_RESULT(result, strdup(c));
 		ret = SUCCEED;
+		break;
 	}
-	else if(value_type == ITEM_VALUE_TYPE_LOG)
+
+	if (SUCCEED != ret)
 	{
-		SET_STR_RESULT(result, strdup(c));
-		ret = SUCCEED;
+		zbx_remove_chars(c, "\r\n");
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Type of received value [%s] is not suitable for value type [%s]",
+				c, zbx_item_value_type_string(value_type)));
 	}
 
 	return ret;
@@ -573,6 +580,8 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 
 static zbx_uint64_t* get_result_ui64_value(AGENT_RESULT *result)
 {
+	zbx_uint64_t	value;
+
 	assert(result);
 
 	if(ISSET_UI64(result))
@@ -585,16 +594,24 @@ static zbx_uint64_t* get_result_ui64_value(AGENT_RESULT *result)
 	}
 	else if(ISSET_STR(result))
 	{
-		if (SUCCEED == is_uint(result->str))
+		zbx_rtrim(result->str, " \"");
+		zbx_ltrim(result->str, " \"");
+		del_zeroes(result->str);
+
+		if (SUCCEED == is_uint64(result->str, &value))
 		{
-			SET_UI64_RESULT(result, zbx_atoui64(result->str));
+			SET_UI64_RESULT(result, value);
 		}
 	}
 	else if(ISSET_TEXT(result))
 	{
-		if (SUCCEED == is_uint(result->text))
+		zbx_rtrim(result->text, " \"");
+		zbx_ltrim(result->text, " \"");
+		del_zeroes(result->text);
+
+		if (SUCCEED == is_uint64(result->text, &value))
 		{
-			SET_UI64_RESULT(result, zbx_atoui64(result->text));
+			SET_UI64_RESULT(result, value);
 		}
 	}
 	/* skip AR_MESSAGE - it is information field */
