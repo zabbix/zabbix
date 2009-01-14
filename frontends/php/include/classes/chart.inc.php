@@ -559,8 +559,9 @@ class Chart extends Graph{
 		
 // Fixes graph out of bounds problem
 		if( (($y1 > ($this->sizeY+$this->shiftY)) && ($y2 > ($this->sizeY+$this->shiftY))) || (($y1 < $this->shiftY) && ($y2 < $this->shiftY)) ){
-			return true;
+			if($this->type != GRAPH_TYPE_STACKED) return true;
 		}
+
 
 		$y_first = !(($y1 > ($this->sizeY+$this->shiftY)) || ($y1 < $this->shiftY));
 		$y_second = !(($y2 > ($this->sizeY+$this->shiftY)) || ($y2 < $this->shiftY));
@@ -568,7 +569,8 @@ class Chart extends Graph{
 		if(!$y_first){
 			$y1 = ($y1 > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
 		}
-		else if(!$y_second){
+		
+		if(!$y_second){
 			$y2 = ($y2 > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
 		}
 //--------
