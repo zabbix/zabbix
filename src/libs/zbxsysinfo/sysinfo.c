@@ -527,7 +527,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c)
 {
 	int		ret = FAIL;
-	char		buffer[MAX_STRING_LEN];
 	zbx_uint64_t	value;
 
 	assert(result);
@@ -592,10 +591,8 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 	if (SUCCEED != ret)
 	{
 		zbx_remove_chars(c, "\r\n");
-		zbx_snprintf(buffer, sizeof(buffer), "Type of received value [%s] is not suitable for value type [%s]",
-				c,
-				zbx_item_value_type_string(value_type));
-		SET_MSG_RESULT(result, strdup(buffer));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Type of received value [%s] is not suitable for value type [%s]",
+				c, zbx_item_value_type_string(value_type)));
 	}
 
 	return ret;
