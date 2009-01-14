@@ -2,8 +2,6 @@ Changes for 1.7.0
 
  - [ZBX-643] fixed no print data for bar reports (Artem)
  - [DEV-231] improved dynamic graph usability in slideshow screen (Artem)
- - [DEV-275] changed value processing. Multiplier after delta (Sasha)
- - [DEV-274] added overflow check for uint64 for incoming values (Sasha)
  - [DEV-258] added additional reports based on bar graphs (Artem)
  - [DEV-257] added bar graph class (Artem)
  - [DEV-252] improved audit log of host groups,hosts,items and media types (Sasha)
@@ -22,6 +20,8 @@ Changes for 1.7.0
 
 Changes for 1.6.2
 
+ - [DEV-275] changed value processing. Multiplier after delta (Sasha)
+ - [DEV-274] added overflow check for uint64 for incoming values (Sasha)
  - [ZBX-506] fixed duplicate UnavailableDelay in zabbix_server.conf (Sasha)
  - [ZBX-428] added internal check zabbix[requiredperformance] (Sasha)
  - [ZBX-639] fixed numeric snmp oid for ifOutOctets. Thanks to Alexandr Kovalenko. (Sasha)

@@ -70,7 +70,7 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 			res = get_value_snmp(item, result);
 			alarm(0);
 #else
-			SET_MSG_RESULT(result, "Support of SNMP parameters was not compiled in");
+			SET_MSG_RESULT(result, strdup("Support of SNMP parameters was not compiled in"));
 			res = NOTSUPPORTED;
 #endif
 			if (SUCCEED != res && GET_MSG_RESULT(result))
@@ -82,7 +82,7 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 #ifdef HAVE_OPENIPMI
 			res = get_value_ipmi(item, result);
 #else
-			SET_MSG_RESULT(result, "Support of IPMI parameters was not compiled in");
+			SET_MSG_RESULT(result, strdup("Support of IPMI parameters was not compiled in"));
 			res = NOTSUPPORTED;
 #endif
 			break;
