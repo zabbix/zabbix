@@ -5666,7 +5666,7 @@
 		}
 		else{
 			$frmHost->AddRow(S_USE_PROFILE,new CCheckBox('useprofile',$useprofile,'submit()'));
-			$frmHost->AddRow(S_USE_EXTENDED_PROFILE,new CCheckBox('useprofile_ext',$useprofile_ext,'submit()'));
+			$frmHost->AddRow(S_USE_EXTENDED_PROFILE,new CCheckBox('useprofile_ext',$useprofile_ext,'submit()','yes'));
 		}
 		
 		if($useprofile=='yes'){
