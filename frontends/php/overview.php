@@ -70,24 +70,23 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	
 	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
 
-	$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.last.groupid', null, PROFILE_TYPE_ID));
+	$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.last.groupid', null));
+
 	if(is_null($_REQUEST['groupid'])){
 		array_push($options,'always_select_first_group');
-		validate_group(PERM_READ_ONLY, $options, 'web.overview.groupid');
 	}	
-
 	validate_group(PERM_READ_ONLY,$options,'web.overview.groupid');
 
-	$_REQUEST["type"] = get_request("type",get_profile("web.overview.type",SHOW_TRIGGERS));
-	update_profile("web.overview.type",$_REQUEST["type"],PROFILE_TYPE_INT);
+	$_REQUEST['type'] = get_request('type',get_profile('web.overview.type',SHOW_TRIGGERS));
+	update_profile('web.overview.type',$_REQUEST['type'],PROFILE_TYPE_INT);
 
 	$form = new CForm();
 	$form->SetMethod('get');
 
-	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
+	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
-	if($_REQUEST["type"] == SHOW_TRIGGERS){
+	if($_REQUEST['type'] == SHOW_TRIGGERS){
 		$from = ', functions f, triggers t ';
 		$where = ' AND i.itemid=f.itemid '.
 					' AND f.triggerid=t.triggerid '.
@@ -114,24 +113,24 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 
 	$result=DBselect($sql);
 	while($row=DBfetch($result)){
-		$cmbGroup->AddItem(
-				$row["groupid"],
-				get_node_name_by_elid($row["groupid"]).$row["name"]
+		$cmbGroup->addItem(
+				$row['groupid'],
+				get_node_name_by_elid($row['groupid']).$row['name']
 				);
 	}
 	
-	$form->AddItem(array(S_GROUP.SPACE,$cmbGroup,SPACE));
+	$form->addItem(array(S_GROUP.SPACE,$cmbGroup,SPACE));
 
-	$cmbType = new CComboBox("type",$_REQUEST["type"],"submit()");
-	$cmbType->AddItem(SHOW_TRIGGERS,S_TRIGGERS);
-	$cmbType->AddItem(SHOW_DATA,	S_DATA);
-	$form->AddItem(array(S_TYPE.SPACE,$cmbType));
+	$cmbType = new CComboBox('type',$_REQUEST['type'],'submit()');
+	$cmbType->addItem(SHOW_TRIGGERS,S_TRIGGERS);
+	$cmbType->addItem(SHOW_DATA,	S_DATA);
+	$form->addItem(array(S_TYPE.SPACE,$cmbType));
 
 	$help = new CHelp('web.view.php','right');
 	$help_table = new CTableInfo();
-	$help_table->AddOption('style', 'width: 200px');
+	$help_table->addOption('style', 'width: 200px');
 	
-	if($_REQUEST["type"]==SHOW_TRIGGERS){
+	if($_REQUEST['type']==SHOW_TRIGGERS){
 		$help_table->AddRow(array(new CCol(SPACE, 'normal'), S_DISABLED));
 	}
 	
@@ -140,7 +139,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		
 	$help_table->AddRow(array(new CCol(SPACE, 'unknown_trigger'), S_UNKNOWN));
 	
-	if($_REQUEST["type"]==SHOW_TRIGGERS){
+	if($_REQUEST['type']==SHOW_TRIGGERS){
 		$col = new CCol(SPACE, 'unknown_trigger');
 		$col->AddOption('style','background-image: url(images/gradients/blink1.gif); '.
 			'background-position: top left; background-repeat: repeate;');
