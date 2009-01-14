@@ -542,10 +542,10 @@ include_once('include/page_header.php');
 			DBstart();
 			delete_host_profile_ext($hostid);
 
-			$useprofile_ext = get_request('useprofile_ext',false);
+			$useprofile_ext = get_request('useprofile_ext','no');
 			$ext_host_profiles = get_request('ext_host_profiles',array());
-			
-			if($useprofile_ext && !empty($ext_host_profiles)){
+
+			if(($useprofile_ext == 'yes') && !empty($ext_host_profiles)){
 				$result = add_host_profile_ext($hostid, $ext_host_profiles);
 			}
 			$result = DBend($result);
