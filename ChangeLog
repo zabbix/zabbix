@@ -1,5 +1,6 @@
 Changes for 1.6.2
 
+ - [ZBX-652] improved support of SNMP items (Sasha)
  - [ZBX-589] added processing of quoted numbers ("0.5" => float 0.5) (Sasha)
  - [DEV-275] changed value processing. Multiplier after delta (Sasha)
  - [DEV-274] added overflow check for uint64 for incoming values (Sasha)

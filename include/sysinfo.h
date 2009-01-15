@@ -40,6 +40,66 @@ typedef struct zbx_result_s {
 #define AR_MESSAGE	8
 #define AR_TEXT		16
 
+/* CHECK RESULT */
+
+#define ISSET_DBL(res)		((res)->type & AR_DOUBLE)
+#define ISSET_UI64(res)		((res)->type & AR_UINT64)
+#define ISSET_STR(res)		((res)->type & AR_STRING)
+#define ISSET_TEXT(res)		((res)->type & AR_TEXT)
+#define ISSET_MSG(res)		((res)->type & AR_MESSAGE)
+#define ISSET_RESULT(res)	((res)->type & (AR_DOUBLE | AR_UINT64 | AR_STRING | AR_TEXT | AR_MESSAGE))
+
+/* UNSER RESULT */
+
+#define UNSET_DBL_RESULT(res)				\
+	{						\
+		(res)->dbl = (double)(0);		\
+		(res)->type &= ~AR_DOUBLE;		\
+	}
+
+#define UNSET_UI64_RESULT(res)				\
+	{						\
+		(res)->ui64 = (zbx_uint64_t)__UINT64_C(0);\
+		(res)->type &= ~AR_UINT64;		\
+	}
+
+#define UNSET_STR_RESULT(res)				\
+	{						\
+		if (ISSET_STR(res))			\
+		{					\
+			zbx_free((res)->str);		\
+			(res)->type &= ~AR_STRING;	\
+		}					\
+	}
+
+#define UNSET_TEXT_RESULT(res)				\
+	{						\
+		if (ISSET_TEXT(res))			\
+		{					\
+			zbx_free((res)->text);		\
+			(res)->type &= ~AR_TEXT;	\
+		}					\
+	}
+
+#define UNSET_MSG_RESULT(res)				\
+	{						\
+		if (ISSET_MSG(res))			\
+		{					\
+			zbx_free((res)->msg);		\
+			(res)->type &= ~AR_MESSAGE;	\
+		}					\
+	}						\
+
+#define UNSET_RESULT_EXCLUDING(res, exc_type) 				\
+	{								\
+		if (!(exc_type & AR_DOUBLE))	UNSET_DBL_RESULT(res)	\
+		if (!(exc_type & AR_UINT64))	UNSET_UI64_RESULT(res)	\
+		if (!(exc_type & AR_STRING))	UNSET_STR_RESULT(res)	\
+		if (!(exc_type & AR_TEXT))	UNSET_TEXT_RESULT(res)	\
+		if (!(exc_type & AR_MESSAGE))	UNSET_MSG_RESULT(res)	\
+	}
+
+
 
 /* SET RESULT */
 
@@ -58,6 +118,7 @@ typedef struct zbx_result_s {
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_STR_RESULT(res, val) \
 	{ \
+	UNSET_STR_RESULT(res) \
 	(res)->type |= AR_STRING; \
 	(res)->str = (char*)(val); \
 	} 
@@ -65,6 +126,7 @@ typedef struct zbx_result_s {
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_TEXT_RESULT(res, val) \
 	{ \
+	UNSET_TEXT_RESULT(res) \
 	(res)->type |= AR_TEXT; \
 	(res)->text = (char*)(val); \
 	} 
@@ -72,66 +134,10 @@ typedef struct zbx_result_s {
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_MSG_RESULT(res, val) \
 	{ \
+	UNSET_MSG_RESULT(res) \
 	(res)->type |= AR_MESSAGE; \
 	(res)->msg = (char*)(val); \
 	}
-
-/* CHECK RESULT */
-
-#define ISSET_UI64(res)	((res)->type & AR_UINT64)
-#define ISSET_DBL(res)	((res)->type & AR_DOUBLE)
-#define ISSET_STR(res)	((res)->type & AR_STRING)
-#define ISSET_TEXT(res)	((res)->type & AR_TEXT)
-#define ISSET_MSG(res)	((res)->type & AR_MESSAGE)
-
-/* UNSER RESULT */
-
-#define UNSET_DBL_RESULT(res)           \
-	{                               \
-	(res)->type &= ~AR_DOUBLE;      \
-	(res)->dbl = (double)(0);        \
-	}
-
-#define UNSET_UI64_RESULT(res)             \
-	{                                  \
-	(res)->type &= ~AR_UINT64;         \
-	(res)->ui64 = (zbx_uint64_t)(0); \
-	}
-
-#define UNSET_STR_RESULT(res)                      \
-	{                                          \
-		if((res)->type & AR_STRING){       \
-			zbx_free((res)->str);      \
-			(res)->type &= ~AR_STRING; \
-		}                                  \
-	}
-
-#define UNSET_TEXT_RESULT(res)                   \
-	{                                        \
-		if((res)->type & AR_TEXT){       \
-			zbx_free((res)->text);   \
-			(res)->type &= ~AR_TEXT; \
-		}                                \
-	}
-
-#define UNSET_MSG_RESULT(res)                       \
-	{                                           \
-		if((res)->type & AR_MESSAGE){       \
-			zbx_free((res)->msg);       \
-			(res)->type &= ~AR_MESSAGE; \
-		}                                   \
-	}
-
-#define UNSET_RESULT_EXCLUDING(res, exc_type) 				\
-	{								\
-		if(!(exc_type & AR_DOUBLE))	UNSET_DBL_RESULT(res)	\
-		if(!(exc_type & AR_UINT64))	UNSET_UI64_RESULT(res)	\
-		if(!(exc_type & AR_STRING))	UNSET_STR_RESULT(res)	\
-		if(!(exc_type & AR_TEXT))	UNSET_TEXT_RESULT(res)	\
-		if(!(exc_type & AR_MESSAGE))	UNSET_MSG_RESULT(res)	\
-	}
-
-
 
 /* RETRIVE RESULT VALUE */
 

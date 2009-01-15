@@ -469,9 +469,6 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 			session.remote_port);
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "OID [%s]",
-		snmp_oid);
-
 	if (NULL != CONFIG_SOURCE_IP)
 		session.localname = CONFIG_SOURCE_IP;
 
@@ -486,7 +483,6 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 		SET_MSG_RESULT(value, strdup(buf));
 		return NOTSUPPORTED;
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 0.2");
 
 	pdu = snmp_pdu_create(SNMP_MSG_GET);
 /* Changed to snmp_parse_oid */
@@ -500,29 +496,35 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 #endif
 
 	snmp_add_null_var(pdu, anOID, anOID_len);
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 0.3");
   
 	status = snmp_synch_response(ss, pdu, &response);
 	zabbix_log( LOG_LEVEL_DEBUG, "Status send [%d]", status);
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 0.4");
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 1");
 
 	if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
 	{
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 2");
-/*		for(vars = response->variables; vars; vars = vars->next_variable)
-		{
-			print_variable(vars->name, vars->name_length, vars);
-		}*/
-
 		for(vars = response->variables; vars; vars = vars->next_variable)
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "AV loop(%d)", vars->type);
+			memset(buf, '\0', sizeof(buf));
+			snprint_value(buf, sizeof(buf) - 1, vars->name, vars->name_length, vars);
+			zabbix_log(LOG_LEVEL_DEBUG, "AV loop OID [%s] Type [0x%02X] %s",
+					snmp_oid, vars->type, buf);
 
-/*			if(	(vars->type == ASN_INTEGER) ||*/
-			if(	(vars->type == ASN_UINTEGER)||
+			if (vars->type == ASN_OCTET_STR)
+			{
+				if (0 == strncmp(buf, "STRING: ", 8))
+				{
+					SET_STR_RESULT(value, strdup(buf + 8));
+				}
+				else if (0 == strncmp(buf, "Hex-STRING: ", 12))
+				{
+					SET_STR_RESULT(value, strdup(buf + 12));
+				}
+				else
+				{
+					SET_STR_RESULT(value, strdup(buf));
+				}
+			}
+			else if((vars->type == ASN_UINTEGER)||
 				(vars->type == ASN_COUNTER) ||
 #ifdef OPAQUE_SPECIAL_TYPES
 				(vars->type == ASN_UNSIGNED64) ||
@@ -586,27 +588,6 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 				SET_DBL_RESULT(value, *vars->val.doubleVal);
 			}
 #endif
-			else if(vars->type == ASN_OCTET_STR)
-			{
-				memset(buf, 0, sizeof(buf));
-				snprint_value(buf, sizeof(buf) - 1, vars->name, vars->name_length, vars);
-
-				zabbix_log(LOG_LEVEL_DEBUG, "OID [%s] Type [ASN_OCTET_STR] \"%s\"",
-						snmp_oid, buf);
-
-				if (0 == strncmp(buf, "STRING: ", 8))
-				{
-					SET_STR_RESULT(value, strdup(buf + 8));
-				}
-				else if (0 == strncmp(buf, "Hex-STRING: ", 12))
-				{
-					SET_STR_RESULT(value, strdup(buf + 12));
-				}
-				else
-				{
-					SET_STR_RESULT(value, strdup(buf));
-				}
-			}
 			else if(vars->type == ASN_IPADDRESS)
 			{
 				SET_STR_RESULT(value, zbx_dsprintf(NULL, "%d.%d.%d.%d",
@@ -617,38 +598,37 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 			}
 			else
 			{
-				zbx_snprintf(buf, sizeof(buf), "OID [%s] value has unknow type [%X]",
+				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "OID [%s] value has unknow type [%X]",
 						snmp_oid,
-						vars->type);
-				SET_MSG_RESULT(value, strdup(buf));
-				ret = NOTSUPPORTED;
+						vars->type));
 			}
 		}
+
+		if (ISSET_RESULT(value))
+		{
+			UNSET_MSG_RESULT(value);
+		}
+		else
+			ret = NOTSUPPORTED;
 	}
 	else
 	{
 		if (status == STAT_SUCCESS)
 		{
-			zbx_snprintf(buf, sizeof(buf), "SNMP error [%s]",
-					snmp_errstring(response->errstat));
-			SET_MSG_RESULT(value, strdup(buf));
-			ret = NOTSUPPORTED;
+			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "SNMP error [%s]",
+					snmp_errstring(response->errstat)));
 		}
 		else if(status == STAT_TIMEOUT)
 		{
-			zbx_snprintf(buf, sizeof(buf), "Timeout while connecting to [%s]",
-					session.peername);
-/*			snmp_sess_perror("snmpget", ss);*/
-			SET_MSG_RESULT(value, strdup(buf));
-			ret = NETWORK_ERROR;
+			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [%s]",
+					session.peername));
 		}
 		else
 		{
-			zbx_snprintf(buf, sizeof(buf), "SNMP error [%d]",
-					status);
-			SET_MSG_RESULT(value, strdup(buf));
-			ret = NOTSUPPORTED;
+			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "SNMP error [%d]",
+					status));
 		}
+		ret = NOTSUPPORTED;
 	}
 
 	if (response)
