@@ -379,8 +379,8 @@
 	'S_NEW_MAPPING'=>			'Novo mapeamento',
 	'S_NO_MAPPING_DEFINED'=>		'Nenhum mapeamento definido',
 	'S_CREATE_VALUE_MAP'=>			'Criar mapeamento de valor',
-	'S_CONFIGURATION_OF_ZABBIX'=>		'Configuração do ZABBIX',
-	'S_CONFIGURATION_OF_ZABBIX_BIG'=>	'CONFIGURAÇÃO DO ZABBIX',
+	'S_CONFIGURATION_OF_ZABBIX'=>		'Configuração do ZABICOM',
+	'S_CONFIGURATION_OF_ZABBIX_BIG'=>	'CONFIGURAÇÃO DO ZABICOM',
 	'S_CONFIGURATION_UPDATED'=>		'Configuração atualizada',
 	'S_CONFIGURATION_WAS_NOT_UPDATED'=>	'Configuração não foi atualizada',
 	'S_ADDED_NEW_MEDIA_TYPE'=>		'Adicionar novo tipo de mídia',
@@ -475,7 +475,6 @@
 	'S_COMPARE'=>				'Comparar',
 
 //	Footer
-	'S_ZABBIX_VER'=>			'ZABBIX 1.4.2',
 	'S_COPYRIGHT_BY'=>			'Copyright 2001-2007 by ',
 	'S_CONNECTED_AS'=>			'Conectado como',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
@@ -702,15 +701,15 @@
 	'S_HISTORY'=>				'Histórico',
 	'S_TRENDS'=>				'Estatísticas',
 	'S_SHORT_NAME'=>			'Nome curto',
-	'S_ZABBIX_AGENT'=>			'Agente ZABBIX',
-	'S_ZABBIX_AGENT_ACTIVE'=>		'Agente ZABBIX (ativo)',
+	'S_ZABBIX_AGENT'=>			'Agente ZABICOM',
+	'S_ZABBIX_AGENT_ACTIVE'=>		'Agente ZABICOM (ativo)',
 	'S_SNMPV1_AGENT'=>			'Agente SNMPv1',
-	'S_ZABBIX_TRAPPER'=>			'ZABBIX trapper',
+	'S_ZABBIX_TRAPPER'=>			'ZABICOM trapper',
 	'S_SIMPLE_CHECK'=>			'Monitoração simples',
 	'S_SNMPV2_AGENT'=>			'Agente SNMPv2',
 	'S_SNMPV3_AGENT'=>			'Agente SNMPv3',
-	'S_ZABBIX_INTERNAL'=>			'ZABBIX interno',
-	'S_ZABBIX_AGGREGATE'=>			'ZABBIX agregado',
+	'S_ZABBIX_INTERNAL'=>			'ZABICOM interno',
+	'S_ZABBIX_AGGREGATE'=>			'ZABICOM agregado',
 	'S_EXTERNAL_CHECK'=>			'Monitoramento externo',
 	'S_WEB_MONITORING'=>			'Monitoramento Web',
 	'S_ZABBIX_UNKNOWN'=>			'Desconhecido',
@@ -815,7 +814,6 @@
 //	map.php
 	'S_OK_BIG'=>				'OK',
 	'S_PROBLEMS_SMALL'=>			'problemas',
-	'S_ZABBIX_URL'=>			'http://www.zabbix.com',
 
 //	maps.php
 	'S_NETWORK_MAPS'=>			'Mapas de rede',
@@ -867,7 +865,7 @@
 	'S_MENU_IT_SERVICES'=>			'SERVIÇOS IT',
 	'S_MENU_HOME'=>				'HOME',
 	'S_MENU_ABOUT'=>			'SOBRE',
-	'S_MENU_STATUS_OF_ZABBIX'=>		'STATUS DO ZABBIX',
+	'S_MENU_STATUS_OF_ZABBIX'=>		'STATUS DO ZABICOM',
 	'S_MENU_AVAILABILITY_REPORT'=>		'RELATÓRIO DE DISPONIBILIDADE',
 	'S_MENU_CONFIG'=>			'CONFIGURAÇÃO',
 	'S_MENU_USERS'=>			'USUÁRIOS',
@@ -904,10 +902,10 @@
 	'S_MORE_THAN_5_MINUTES'=>		'Mais de 5 minutos',
 
 //	report1.php
-	'S_STATUS_OF_ZABBIX'=>			'Status do ZABBIX',
-	'S_STATUS_OF_ZABBIX_BIG'=>		'STATUS DO ZABBIX',
+	'S_STATUS_OF_ZABBIX'=>			'Status do ZABICOM',
+	'S_STATUS_OF_ZABBIX_BIG'=>		'STATUS DO ZABICOM',
 	'S_VALUE'=>				'Valor',
-	'S_ZABBIX_SERVER_IS_RUNNING'=>		'ZABBIX está rodando',
+	'S_ZABBIX_SERVER_IS_RUNNING'=>		'ZABICOM está rodando',
 	'S_NUMBER_OF_VALUES_STORED'=>		'Número de valores armazenados',
 	'S_VALUES_STORED'=>			'Valores armazenados',
 	'S_NUMBER_OF_TRENDS_STORED'=>		'Número de estatísticas armazenadas',
@@ -1201,9 +1199,9 @@
 	'S_NEVER'=>				'Nunca',
 
 //	users.php
-	'S_ZABBIX_USER'=>			'Usuário ZABBIX',
-	'S_ZABBIX_ADMIN'=>			'Administrador ZABBIX',
-	'S_SUPER_ADMIN'=>			'Super Administrador ZABBIX',
+	'S_ZABBIX_USER'=>			'Usuário ZABICOM',
+	'S_ZABBIX_ADMIN'=>			'Administrador ZABICOM',
+	'S_SUPER_ADMIN'=>			'Super Administrador ZABICOM',
 	'S_USER_TYPE'=>				'Tipo de usuário',
 	'S_USERS'=>				'Usuários',
 	'S_USER_ADDED'=>			'Usuário incluído',
@@ -1292,7 +1290,6 @@
 	'S_DUTCH_NL'=>				'Holandês (NL)',
 
 //	index.php
-	'S_ZABBIX_BIG'=>			'ZABBIX',
 
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			'Dados do host',

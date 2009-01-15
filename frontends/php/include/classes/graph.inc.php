@@ -590,7 +590,7 @@
 
 		function drawLogo()
 		{
-			ImageStringUp($this->im,0,$this->fullSizeX-10,$this->fullSizeY-50, "http://www.zabbix.com", $this->GetColor("Gray"));
+			ImageStringUp($this->im,0,$this->fullSizeX-10,$this->fullSizeY-50, S_ZABBIX_URL, $this->GetColor("Gray"));
 		}
 
 		function GetColor($color,$alfa=50)

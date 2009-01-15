@@ -187,10 +187,6 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #if !defined(_WINDOWS)
 #ifdef HAVE_RES_QUERY
 
-#if !defined(PACKETSZ)
-#	define PACKETSZ 512
-#endif /* PACKETSZ */
-
 #if !defined(C_IN) 
 #	define C_IN 	ns_c_in
 #endif /* C_IN */
@@ -203,10 +199,12 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	int	res;
 	char	ip[MAX_STRING_LEN];
 	char	zone[MAX_STRING_LEN];
-#ifdef	PACKETSZ
+#if defined(NS_PACKETSZ)
+	char	respbuf[NS_PACKETSZ];
+#elif defined(PACKETSZ)
 	char	respbuf[PACKETSZ];
 #else
-	char	respbuf[NS_PACKETSZ];
+	char	respbuf[512];
 #endif
 	struct	in_addr in;
 
@@ -390,7 +388,13 @@ int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	typedef union {
 		HEADER		h;
+#if defined(NS_PACKETSZ)
 		unsigned char	buffer[NS_PACKETSZ];
+#elif defined(PACKETSZ)
+		unsigned char	buffer[PACKETSZ];
+#else
+		unsigned char	buffer[512];
+#endif
 	} answer_t;
 
 	char		zone[MAX_STRING_LEN], tmp[MAX_STRING_LEN], *name,

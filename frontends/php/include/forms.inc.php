@@ -532,7 +532,7 @@
 	{
 		$type		= get_request('type',		'MYSQL');
 		$server		= get_request('server',		'localhost');
-		$database	= get_request('database',	'zabbix');
+		$database	= get_request('database',	'zabicom');
 		$user		= get_request('user',		'root');
 		$password	= get_request('password',	'');
 		
@@ -3429,7 +3429,7 @@ include_once 'include/discovery.inc.php';
 		$description	= get_request("description","");
 		$smtp_server	= get_request("smtp_server","localhost");
 		$smtp_helo	= get_request("smtp_helo","localhost");
-		$smtp_email	= get_request("smtp_email","zabbix@localhost");
+		$smtp_email	= get_request("smtp_email","zabicom@localhost");
 		$exec_path	= get_request("exec_path","");
 		$gsm_modem	= get_request("gsm_modem","/dev/ttyS0");
 		$username	= get_request("username","user@server");

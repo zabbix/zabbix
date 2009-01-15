@@ -26,7 +26,7 @@
 	{
 		$EXPORT_DATA = true;
         	$page["type"] = PAGE_TYPE_XML;
-        	$page["file"] = "zabbix_export.xml";
+        	$page["file"] = "zabicom_export.xml";
 	}
 	else
 	{

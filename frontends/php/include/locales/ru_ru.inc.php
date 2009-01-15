@@ -185,8 +185,8 @@
 	"S_NEW_MAPPING"=>			"Новое преобразование",
 	"S_NO_MAPPING_DEFINED"=>		"Преобразования не определены",
 	"S_CREATE_VALUE_MAP"=>			"Создать преобразование значения",
-	"S_CONFIGURATION_OF_ZABBIX"=>		"Настройка ZABBIX",
-	"S_CONFIGURATION_OF_ZABBIX_BIG"=>	"НАСТРОЙКА ZABBIX",
+	"S_CONFIGURATION_OF_ZABBIX"=>		"Настройка ZABICOM",
+	"S_CONFIGURATION_OF_ZABBIX_BIG"=>	"НАСТРОЙКА ZABICOM",
 	"S_CONFIGURATION_UPDATED"=>		"Настройки обновлены",
 	"S_CONFIGURATION_WAS_NOT_UPDATED"=>	"Настройки не обновлены",
 	"S_ADDED_NEW_MEDIA_TYPE"=>		"Добавлен новый тип средства передачи",
@@ -280,7 +280,6 @@
 	"S_COMPARE"=>				"Сравнить",
 
 //	Footer
-	"S_ZABBIX_VER"=>			"ZABBIX 1.1.5",
 	"S_COPYRIGHT_BY"=>			"Copyright 2001-2006 by ",
 	"S_CONNECTED_AS"=>			"Подключен как",
 	"S_SIA_ZABBIX"=>			"SIA Zabbix",
@@ -483,15 +482,15 @@
 	"S_HISTORY"=>				"История",
 	"S_TRENDS"=>				"Динамика изменений",
 	"S_SHORT_NAME"=>			"Краткое название",
-	"S_ZABBIX_AGENT"=>			"ZABBIX агент", //FIXME?
-	"S_ZABBIX_AGENT_ACTIVE"=>		"ZABBIX агент (активный)", //FIXME?
+	"S_ZABBIX_AGENT"=>			"ZABICOM агент", //FIXME?
+	"S_ZABBIX_AGENT_ACTIVE"=>		"ZABICOM агент (активный)", //FIXME?
 	"S_SNMPV1_AGENT"=>			"SNMPv1 агент", //FIXME?
-	"S_ZABBIX_TRAPPER"=>			"ZABBIX trapper", //FIXME
+	"S_ZABBIX_TRAPPER"=>			"ZABICOM trapper", //FIXME
 	"S_SIMPLE_CHECK"=>			"Простая проверка",
 	"S_SNMPV2_AGENT"=>			"SNMPv2 агент", //FIXME?
 	"S_SNMPV3_AGENT"=>			"SNMPv3 агент", //FIXME?
-	"S_ZABBIX_INTERNAL"=>			"ZABBIX internal", //FIXME
-	"S_ZABBIX_AGGREGATE"=>			"ZABBIX aggregate", //FIXME
+	"S_ZABBIX_INTERNAL"=>			"ZABICOM internal", //FIXME
+	"S_ZABBIX_AGGREGATE"=>			"ZABICOM aggregate", //FIXME
 	"S_ZABBIX_UNKNOWN"=>			"Неизвестно",
 	"S_ACTIVE"=>				"Активен",
 	"S_NOT_ACTIVE"=>			"Неактивен",
@@ -572,7 +571,6 @@
 //	map.php
 	"S_OK_BIG"=>				"OK", //FIXME?
 	"S_PROBLEMS_SMALL"=>			"проблемы", //FIXME?
-	"S_ZABBIX_URL"=>			"http://www.zabbix.com",
 
 //	maps.php
 	"S_NETWORK_MAPS"=>			"Карты сетей",
@@ -623,7 +621,7 @@
 	"S_MENU_IT_SERVICES"=>			"УСЛУГИ ИТ",
 	"S_MENU_HOME"=>				"В НАЧАЛО",
 	"S_MENU_ABOUT"=>			"О ПРОГРАММЕ",
-	"S_MENU_STATUS_OF_ZABBIX"=>		"СТАТУС ZABBIX",
+	"S_MENU_STATUS_OF_ZABBIX"=>		"СТАТУС ZABICOM",
 	"S_MENU_AVAILABILITY_REPORT"=>		"ОТЧЕТЫ О ДОСТУПНОСТИ",
 	"S_MENU_CONFIG"=>			"НАСТРОЙКА",
 	"S_MENU_USERS"=>			"ПОЛЬЗОВАТЕЛИ",
@@ -653,10 +651,10 @@
 	"S_MORE_THAN_5_MINUTES"=>		"Больше 5 минут",
 
 //	report1.php
-	"S_STATUS_OF_ZABBIX"=>			"Статус ZABBIX",
-	"S_STATUS_OF_ZABBIX_BIG"=>		"СТАТУС ZABBIX",
+	"S_STATUS_OF_ZABBIX"=>			"Статус ZABICOM",
+	"S_STATUS_OF_ZABBIX_BIG"=>		"СТАТУС ZABICOM",
 	"S_VALUE"=>				"Значение",
-	"S_ZABBIX_SERVER_IS_RUNNING"=>		"ZABBIX сервер запущен",
+	"S_ZABBIX_SERVER_IS_RUNNING"=>		"ZABICOM сервер запущен",
 	"S_NUMBER_OF_VALUES_STORED"=>		"Количество сохраненных значений",
 	"S_VALUES_STORED"=>			"Количество сохраненных значений",
 	"S_NUMBER_OF_TRENDS_STORED"=>		"Количество сохраненных динамик изменений",
@@ -969,7 +967,6 @@
 	"S_DUTCH_NL"=>				"Dutch (NL)",
 
 //	index.php
-	"S_ZABBIX_BIG"=>			"ZABBIX",
 
 //	hostprofiles.php
 	"S_HOST_PROFILES"=>			"Профили узлов сети",

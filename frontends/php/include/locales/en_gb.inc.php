@@ -1321,6 +1321,7 @@
 	'S_HIDE_DISABLED_TRIGGERS'=>		'Hide disabled triggers',
 
 //	tr_logform.php
+	'S_TRIGGER_LOG'=>			'Trigger log',
 	'S_EXCLUDE'=>				'Exclude',
 	'S_INCLUDE'=>				'Include',
 	'S_POSITION'=>				'Position',

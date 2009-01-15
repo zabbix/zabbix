@@ -26,7 +26,7 @@
 	define('PAGE_TYPE_HTML_BLOCK',	4);	//simple block of html (as text)
 	define('PAGE_TYPE_CSS',			5);
 	
-	define('XML_TAG_ZABBIX_EXPORT',		'zabbix_export');
+	define('XML_TAG_ZABBIX_EXPORT',		'zabicom_export');
 	define('XML_TAG_HOSTS',			'hosts');
 	define('XML_TAG_HOST',			'host');
 	define('XML_TAG_GROUPS',		'groups');

@@ -132,8 +132,8 @@
 	"S_YELLOW"=>				"Yellow",
 
 //	config.php
-	"S_CONFIGURATION_OF_ZABBIX"=>		"ZABBIX配置",
-	"S_CONFIGURATION_OF_ZABBIX_BIG"=>	"ZABBIX配置类型",
+	"S_CONFIGURATION_OF_ZABBIX"=>		"ZABICOM配置",
+	"S_CONFIGURATION_OF_ZABBIX_BIG"=>	"ZABICOM配置类型",
 	"S_CONFIGURATION_UPDATED"=>		"Configuration updated",
 	"S_CONFIGURATION_WAS_NOT_UPDATED"=>	"Configuration was not updated",
 	"S_ADDED_NEW_MEDIA_TYPE"=>		"Added new media type",
@@ -358,14 +358,14 @@
 	"S_HISTORY"=>				"保存记录d",
 	"S_TRENDS"=>				"Trends",
 	"S_SHORT_NAME"=>			"Short name",
-	"S_ZABBIX_AGENT"=>			"ZABBIX agent",
-	"S_ZABBIX_AGENT_ACTIVE"=>		"ZABBIX agent (active)",
+	"S_ZABBIX_AGENT"=>			"ZABICOM agent",
+	"S_ZABBIX_AGENT_ACTIVE"=>		"ZABICOM agent (active)",
 	"S_SNMPV1_AGENT"=>			"SNMPv1 agent",
-	"S_ZABBIX_TRAPPER"=>			"ZABBIX trapper",
+	"S_ZABBIX_TRAPPER"=>			"ZABICOM trapper",
 	"S_SIMPLE_CHECK"=>			"Simple check",
 	"S_SNMPV2_AGENT"=>			"SNMPv2 agent",
 	"S_SNMPV3_AGENT"=>			"SNMPv3 agent",
-	"S_ZABBIX_INTERNAL"=>			"ZABBIX internal",
+	"S_ZABBIX_INTERNAL"=>			"ZABICOM internal",
 	"S_ZABBIX_UNKNOWN"=>			"未知",
 	"S_ACTIVE"=>				"活跃",
 	"S_NOT_ACTIVE"=>			"不活跃",
@@ -425,7 +425,6 @@
 //	map.php
 	"S_OK_BIG"=>				"OK",
 	"S_PROBLEMS_SMALL"=>			"problems",
-	"S_ZABBIX_URL"=>			"http://www.zabbix.com",
 
 //	maps.php
 	"S_NETWORK_MAPS"=>			"网络结构图",
@@ -472,7 +471,7 @@
 	"S_MENU_IT_SERVICES"=>			"IT服务",
 	"S_MENU_HOME"=>				"HOME",
 	"S_MENU_ABOUT"=>			"ABOUT",
-	"S_MENU_STATUS_OF_ZABBIX"=>		"ZABBIX系统状态",
+	"S_MENU_STATUS_OF_ZABBIX"=>		"ZABICOM系统状态",
 	"S_MENU_AVAILABILITY_REPORT"=>		"AVAILABILITY REPORT",
 	"S_MENU_CONFIG"=>			"CONFIG",
 	"S_MENU_USERS"=>			"用户",
@@ -502,17 +501,17 @@
 	"S_MORE_THAN_5_MINUTES"=>		"多于5分",
 
 //	report1.php
-	"S_STATUS_OF_ZABBIX"=>			"ZABBIX状态",
-	"S_STATUS_OF_ZABBIX_BIG"=>		"ZABBIX系统状态",
+	"S_STATUS_OF_ZABBIX"=>			"ZABICOM状态",
+	"S_STATUS_OF_ZABBIX_BIG"=>		"ZABICOM系统状态",
 	"S_VALUE"=>				"值",
-	"S_ZABBIX_SERVER_IS_RUNNING"=>		"ZABBIX server 的状态",
+	"S_ZABBIX_SERVER_IS_RUNNING"=>		"ZABICOM server 的状态",
 	"S_NUMBER_OF_VALUES_STORED"=>		"已保存的信息数",
 	"S_NUMBER_OF_TRENDS_STORED"=>		"已保存的trends数",
 	"S_NUMBER_OF_ALARMS"=>			"alarms示警数量",
 	"S_NUMBER_OF_ALERTS"=>			"alerts数量",
 	"S_NUMBER_OF_TRIGGERS_ENABLED_DISABLED"=>"触发器数量(活跃/不活跃)",
 	"S_NUMBER_OF_ITEMS_ACTIVE_TRAPPER"=>	"统计的条目数量 (活跃/trapper/不活跃/不支持)",
-	"S_NUMBER_OF_USERS"=>			"ZABBIX系统用户数量",
+	"S_NUMBER_OF_USERS"=>			"ZABICOM系统用户数量",
 	"S_NUMBER_OF_HOSTS_MONITORED"=>		"主机数量(检测中/未检测/模板主机/已删除)",
 	"S_YES"=>				"Yes",
 	"S_NO"=>				"No",
@@ -752,7 +751,6 @@
 	"S_SPANISH_SP"=>			"Spanish (SP)",
 	
 //	index.php
-	"S_ZABBIX_BIG"=>			"ZABBIX",
 
 //	hostprofiles.php
 	"S_HOST_PROFILES"=>			"Host profiles",

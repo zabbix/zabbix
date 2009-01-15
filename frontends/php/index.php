@@ -22,7 +22,7 @@
 	require_once "include/config.inc.php";
 	require_once "include/forms.inc.php";
 
-	$page["title"]	= "S_ZABBIX_BIG";
+	$page["title"]	= "S_ZABICOM_BIG";
 	$page["file"]	= "index.php";
 	
 ?>

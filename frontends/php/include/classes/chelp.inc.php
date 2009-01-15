@@ -22,7 +22,7 @@
 	class CHelp extends CLink
 	{
 /* public */
-		function CHelp($url="index.php",$side=null)
+		function CHelp($url='index.php',$side=null)
 		{
 			if(is_null($side)) $side = 'right';
 			if($side == 'right')
@@ -35,7 +35,7 @@
 				$pside = 'right';
 			}
 
-			parent::CLink(new CImg('images/general/help.gif','?'), 'http://www.zabbix.com/manual/v1.1/'.$url);
+			parent::CLink(new CImg('images/general/help.gif','?'), 'http://www.zabbix.com/documentation.php');//'http://www.zabbix.com/manual/v1.1/'.$url);
 			$this->options['style'] = 'padding-'.$pside.': 5px; float:'.$side;
 			$this->options['target'] = '_blank';
 		}

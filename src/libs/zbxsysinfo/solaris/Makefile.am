@@ -15,4 +15,5 @@ libspecsysinfo_a_SOURCES = \
 	proc.c \
 	sensors.c \
 	swap.c \
+	boottime.c \
 	uptime.c

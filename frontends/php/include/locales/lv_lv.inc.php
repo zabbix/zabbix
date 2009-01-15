@@ -126,8 +126,8 @@
 	"S_YELLOW"=>				"Yellow",
 
 //	config.php
-	"S_CONFIGURATION_OF_ZABBIX"=>		"Configuration of ZABBIX",
-	"S_CONFIGURATION_OF_ZABBIX_BIG"=>	"CONFIGURATION OF ZABBIX",
+	"S_CONFIGURATION_OF_ZABBIX"=>		"Configuration of ZABICOM",
+	"S_CONFIGURATION_OF_ZABBIX_BIG"=>	"CONFIGURATION OF ZABICOM",
 	"S_CONFIGURATION_UPDATED"=>		"Configuration updated",
 	"S_CONFIGURATION_WAS_NOT_UPDATED"=>	"Configuration was not updated",
 	"S_ADDED_NEW_MEDIA_TYPE"=>		"Added new media type",
@@ -318,14 +318,14 @@
 	"S_HISTORY"=>				"History",
 	"S_TRENDS"=>				"Trends",
 	"S_SHORT_NAME"=>			"Short name",
-	"S_ZABBIX_AGENT"=>			"ZABBIX agent",
-	"S_ZABBIX_AGENT_ACTIVE"=>		"ZABBIX agent (active)",
+	"S_ZABBIX_AGENT"=>			"ZABICOM agent",
+	"S_ZABBIX_AGENT_ACTIVE"=>		"ZABICOM agent (active)",
 	"S_SNMPV1_AGENT"=>			"SNMPv1 agent",
-	"S_ZABBIX_TRAPPER"=>			"ZABBIX trapper",
+	"S_ZABBIX_TRAPPER"=>			"ZABICOM trapper",
 	"S_SIMPLE_CHECK"=>			"Simple check",
 	"S_SNMPV2_AGENT"=>			"SNMPv2 agent",
 	"S_SNMPV3_AGENT"=>			"SNMPv3 agent",
-	"S_ZABBIX_INTERNAL"=>			"ZABBIX internal",
+	"S_ZABBIX_INTERNAL"=>			"ZABICOM internal",
 	"S_ZABBIX_UNKNOWN"=>			"Unknown",
 	"S_ACTIVE"=>				"Active",
 	"S_NOT_ACTIVE"=>			"Not active",
@@ -384,7 +384,6 @@
 //	map.php
 	"S_OK_BIG"=>				"OK",
 	"S_PROBLEMS_SMALL"=>			"problems",
-	"S_ZABBIX_URL"=>			"http://www.zabbix.com",
 
 //	maps.php
 	"S_NETWORK_MAPS"=>			"Network maps",
@@ -431,7 +430,7 @@
 	"S_MENU_IT_SERVICES"=>			"IT SERVICES",
 	"S_MENU_HOME"=>				"HOME",
 	"S_MENU_ABOUT"=>			"ABOUT",
-	"S_MENU_STATUS_OF_ZABBIX"=>		"STATUS OF ZABBIX",
+	"S_MENU_STATUS_OF_ZABBIX"=>		"STATUS OF ZABICOM",
 	"S_MENU_AVAILABILITY_REPORT"=>		"AVAILABILITY REPORT",
 	"S_MENU_CONFIG"=>			"CONFIG",
 	"S_MENU_USERS"=>			"USERS",
@@ -461,10 +460,10 @@
 	"S_MORE_THAN_5_MINUTES"=>		"More than 5 minutes",
 
 //	report1.php
-	"S_STATUS_OF_ZABBIX"=>			"Status of ZABBIX",
-	"S_STATUS_OF_ZABBIX_BIG"=>		"STATUS OF ZABBIX",
+	"S_STATUS_OF_ZABBIX"=>			"Status of ZABICOM",
+	"S_STATUS_OF_ZABBIX_BIG"=>		"STATUS OF ZABICOM",
 	"S_VALUE"=>				"Value",
-	"S_ZABBIX_SERVER_IS_RUNNING"=>		"ZABBIX server is running",
+	"S_ZABBIX_SERVER_IS_RUNNING"=>		"ZABICOM server is running",
 	"S_NUMBER_OF_VALUES_STORED"=>		"Number of values stored",
 	"S_NUMBER_OF_TRENDS_STORED"=>		"Number of trends stored",
 	"S_NUMBER_OF_ALARMS"=>			"Number of alarms",
@@ -703,7 +702,6 @@
 	"S_RUSSIAN_RU"=>			"Russian (RU)",
 
 //	index.php
-	"S_ZABBIX_BIG"=>			"ZABBIX",
 
 //	bulkloader.php
 	"S_MENU_BULKLOADER"=>			"Bulkloader",

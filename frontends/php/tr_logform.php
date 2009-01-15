@@ -336,11 +336,8 @@ if(isset($_REQUEST['sform'])){
 		$expr_v = split(" [&|] ",$expr_v);
 
 		foreach($expression as $id => $expr){
-
 			$expr = preg_replace("/^\((.*)\)$/u","$1",$expr);
-
 			$value = preg_replace("/\((.*)\)[=|#]0/U","$1",$expr);
-
 			$value = preg_replace("/^\((.*)\)$/u","$1",$value);
 
 			$expressions[$id]['value']=trim($value);

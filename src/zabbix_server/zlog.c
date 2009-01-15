@@ -89,8 +89,6 @@ void __zbx_zabbix_syslog(const char *fmt, ...)
 		ftime(&tp);
 		process_new_value(&item, &agent, tp.time, tp.millitm);
 		free_result(&agent);
-
-		update_triggers(item.itemid, tp.time, tp.millitm);
 	}
 
 	DBfree_result(result);
