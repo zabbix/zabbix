@@ -72,7 +72,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, char *error, int
 	ZBX_FPING_HOST	*host;
 #ifdef HAVE_IPV6
 	char		*fping;
-	int		family;
+	int		family = 0;
 #endif
 
 	assert(hosts);

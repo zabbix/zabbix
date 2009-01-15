@@ -746,7 +746,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					if (!value) /* EOF */
 						break;
 
-					if (!pattern || NULL != zbx_regexp_match(value, pattern, NULL)) {
+					if ('\0' == *pattern || NULL != zbx_regexp_match(value, pattern, NULL)) {
 						send_err = process_value(
 									server,
 									port,
