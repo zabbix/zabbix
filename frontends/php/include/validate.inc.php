@@ -198,19 +198,21 @@
 		return $ret;
 	}
 
-	function	calc_exp($fields,$field,$expression){
+	function calc_exp($fields,$field,$expression){
 //SDI("$field - expression: ".$expression);
 
-		if(zbx_strstr($expression,"{}") && !isset($_REQUEST[$field]))
+		if(zbx_strstr($expression,'{}') && !isset($_REQUEST[$field]))
 			return FALSE;
 
-		if(zbx_strstr($expression,"{}") && !is_array($_REQUEST[$field]))
-			$expression = str_replace("{}",'$_REQUEST["'.$field.'"]',$expression);
+		if(zbx_strstr($expression,'{}') && !is_array($_REQUEST[$field]))
+			$expression = str_replace('{}','$_REQUEST["'.$field.'"]',$expression);
 
-		if(zbx_strstr($expression,"{}") && is_array($_REQUEST[$field])){
+		if(zbx_strstr($expression,'{}') && is_array($_REQUEST[$field])){
 			foreach($_REQUEST[$field] as $key => $val){
-				$expression2 = str_replace("{}",'$_REQUEST["'.$field.'"]["'.$key.'"]',$expression);
-				if(calc_exp2($fields,$field,$expression2)==FALSE)
+				if(!ereg('^[a-zA-Z0-9_]+$',$key)) return FALSE;
+
+				$expression2 = str_replace('{}','$_REQUEST["'.$field.'"]["'.$key.'"]',$expression);
+				if(calc_exp2($fields,$field,$expression2)==FALSE) 
 					return FALSE;
 			}	
 			return TRUE;
@@ -219,7 +221,7 @@
 		return calc_exp2($fields,$field,$expression);
 	}
 
-	function	unset_not_in_list(&$fields){
+	function unset_not_in_list(&$fields){
 		foreach($_REQUEST as $key => $val){
 			if(!isset($fields[$key])){
 				unset_request($key,'unset_not_in_list');
@@ -382,7 +384,7 @@
 		}
 	}
 
-	function	check_field(&$fields, &$field, $checks){
+	function check_field(&$fields, &$field, $checks){
 		list($type,$opt,$flags,$validation,$exception)=$checks;
 
 		if($flags&P_UNSET_EMPTY && isset($_REQUEST[$field]) && $_REQUEST[$field]==''){
@@ -473,9 +475,7 @@
 		include_once "include/page_footer.php";
 	}
 	
-	function	check_fields(&$fields, $show_messages=true){
-
-		global	$_REQUEST;
+	function check_fields(&$fields, $show_messages=true){
 		global	$system_fields;
 
 		$err = ZBX_VALID_OK;
