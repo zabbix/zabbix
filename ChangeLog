@@ -1,5 +1,6 @@
 Changes for 1.6.2
 
+ - [ZBX-653] fixes for postgresql (Artem)
  - [DEV-137] fixed compilation warnings (Sasha)
  - [ZBX-652] improved support of SNMP items (Sasha)
  - [ZBX-589] added processing of quoted numbers ("0.5" => float 0.5) (Sasha)
@@ -1971,8 +1972,8 @@ Changes for 1.0beta10:
  - added column items.multiplier (Alexei)
  - added column items.units (Alexei)
  - added table 'stats' (Alexei)
- - support for spaces in trigger expression. Thanks to Sébastien "Slix"
- Liénard. (Alexei)
+ - support for spaces in trigger expression. Thanks to S?bastien "Slix"
+ Li?nard. (Alexei)
  - dynamic form items.php (Alexei)
  - added zabbix.spec. 'rpm -ta zabbix.tar.gz'. Thanks to Harald Holzer. (Alexei)
  - dynamic form config.php (Alexei)
@@ -1988,7 +1989,7 @@ Changes for 1.0beta9:
 
  - added severity to media definition (Alexei)
  - add media.severity (Alexei)
- - added support for check_service_perf[*]. Thanks to Jürgen Schmitz (Alexei)
+ - added support for check_service_perf[*]. Thanks to J?rgen Schmitz (Alexei)
  - added parameter AlertScriptsPath to zabbix_suckerd (Alexei)
  - added support for alternative medias (Alexei)
  - added src/zabbix_sucker/alerter.h (Alexei)
@@ -2003,8 +2004,8 @@ Changes for 1.0beta9:
  - added support for functions abschange(),change(),delta(),sum(), 
  count() and avg() in trigger expressions (Alexei)
  - fixed plaintext values for string data type. Thanks to
- Sébastien "Slix" Liénard. (Alexei)
- - misc fixes for services.php. Thanks to Sébastien "Slix" Liénard.
+ S?bastien "Slix" Li?nard. (Alexei)
+ - misc fixes for services.php. Thanks to S?bastien "Slix" Li?nard.
  (Alexei)
  - different styles for user-defined graphs (Alexei)
  - cached memory in bytes (not in Kb as before) (Alexei)
@@ -2132,8 +2133,8 @@ Changes for 1.0beta7:
  - items.php: "Delay" renamed to "Update interval". (Alexei)
  - fixed precision issues in zabbix_agent(d) and zabbix_suckerd. All floats
    converted to double. (Alexei)
- - fixed selection of icon and host in sysmap.php. Thanks to Sébastien "slix"
-   Liénard. (Alexei)
+ - fixed selection of icon and host in sysmap.php. Thanks to S?bastien "slix"
+   Li?nard. (Alexei)
  - monitoring of servers without Zabbix agent installed. New item type: Simple
    Check. (Alexei)
  - improved performance of pinger.pl (Alexei)

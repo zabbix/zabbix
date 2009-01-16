@@ -746,8 +746,11 @@ else {
 		$glue = 	$string?"','":',';
 
 		switch($DB['TYPE']) {
+			case 'SQLITE3':
 			case 'MYSQL':
+			case 'POSTGRESQL':
 			case 'ORACLE':
+			default:
 				$items = array_chunk($array, 950);
 				foreach($items as $id => $values){
 					$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
@@ -756,11 +759,9 @@ else {
 					if($string) $condition= "'".$condition."'";
 				}
 				break;
-			default:
-				$condition = implode(',',$array);
 		}
 		
-		if(zbx_empty($condition)) $condition = '-1';
+		if(zbx_empty($condition)) $condition = $string?"'-1'":'-1';
 
 	return ' ('.$fieldname.$in.'('.$condition.')) ';
 	}
