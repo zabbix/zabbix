@@ -1,3 +1,7 @@
+Changes for 1.6.3
+
+ - [DEV-282] fixes frontend vulnerabilities (Artem)
+
 Changes for 1.6.2
 
  - [ZBX-653] fixes for postgresql (Artem)

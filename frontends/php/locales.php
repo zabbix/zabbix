@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-include_once "include/config.inc.php";
+include_once('include/config.inc.php');
 
 if(isset($_REQUEST['download'])){
-	$page["type"] = PAGE_TYPE_XML;
-	$page["file"] = "new_locale.inc.php";
+	$page['type'] = PAGE_TYPE_XML;
+	$page['file'] = 'new_locale.inc.php';
 }
 else{
 	$page['title'] = "S_LOCALES";
@@ -181,26 +181,25 @@ else if(isset($_REQUEST['next'])){
 	$frmLcls->AddOption('id','locales');
 	$frmLcls->SetHelp($help);
 	
-	$fileFrom = 'include/locales/'.$_REQUEST['srclang'].".inc.php";
-	if(file_exists($fileFrom)){
-		include($fileFrom);
 	
+	$fileFrom = 'include/locales/'.$_REQUEST['srclang'].'.inc.php';
+	if(ereg('^[A-Za-z0-9_]+$', $_REQUEST['srclang']) && file_exists($fileFrom)){
+		include($fileFrom);	
 		if(!isset($TRANSLATION) || !is_array($TRANSLATION)){
-			error("Passed SOURCE is NOT valid PHP file.");
+			error('Passed SOURCE is NOT valid PHP file.');
 		}
 		$transFrom = $TRANSLATION;
 	}
 	unset($TRANSLATION);
 	
-	$frmLcls->AddVar('extlang',$_REQUEST['extlang']);
-	
-	if($_REQUEST['extlang'] != 'new'){
-		$fileTo = 'include/locales/'.$_REQUEST['extlang'].".inc.php";
+	$frmLcls->addVar('extlang',$_REQUEST['extlang']);
+	if(ereg('^[A-Za-z0-9_]+$', $_REQUEST['srclang']) && ($_REQUEST['extlang'] != 'new')){
+		$fileTo = 'include/locales/'.$_REQUEST['extlang'].'.inc.php';
 		if(file_exists($fileTo)){
 			include($fileTo);
 			
 			if(!isset($TRANSLATION) || !is_array($TRANSLATION)){
-				error("Passed DEST is NOT valid PHP file.");
+				error('Passed DEST is NOT valid PHP file.');
 			}
 			$transTo = $TRANSLATION;
 //			header('Content-Type: text/html; charset='.$TRANSLATION['S_HTML_CHARSET']);
