@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "zbxjson.h"
-#include "log.h"
 
 #define ZBX_JSON_READABLE
 
