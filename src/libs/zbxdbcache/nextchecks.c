@@ -52,9 +52,10 @@ void	DCinit_nextchecks()
 	nextcheck_num = 0;
 }
 
-static int	DCget_nextcheck_nearestindex(time_t clock)
+static int	DCget_nextcheck_nearestindex(time_t clock, zbx_uint64_t itemid)
 {
-	int	first_index, last_index, index;
+	int			first_index, last_index, index, c;
+	ZBX_DC_NEXTCHECK	*nc;
 
 	if (nextcheck_num == 0)
 		return 0;
@@ -65,15 +66,17 @@ static int	DCget_nextcheck_nearestindex(time_t clock)
 	{
 		index = first_index + (last_index - first_index) / 2;
 
-		if (nextchecks[index].clock == clock)
+		nc = &nextchecks[index];
+		c = (NULL != nc->error_msg) ? 0 : nc->clock;
+		if (c == clock && nc->itemid == itemid)
 			return index;
 		else if (last_index == first_index)
 		{
-			if (nextchecks[index].clock < clock)
+			if (c < clock || (c == clock && nc->itemid < itemid))
 				index++;
 			return index;
 		}
-		else if (nextchecks[index].clock < clock)
+		else if (c < clock || (c == clock && nc->itemid < itemid))
 			first_index = index + 1;
 		else
 			last_index = index;
@@ -97,15 +100,10 @@ static int	DCget_nextcheck_nearestindex(time_t clock)
  ******************************************************************************/
 void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *error_msg)
 {
-	int	index;
+	int	i;
+	size_t	sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCadd_nextcheck()");
-
-	if (nextcheck_allocated == nextcheck_num)
-	{
-		nextcheck_allocated *= 2;
-		nextchecks = zbx_realloc(nextchecks, nextcheck_allocated * sizeof(ZBX_DC_NEXTCHECK));
-	}
 
 	if (NULL != error_msg)
 	{
@@ -116,13 +114,39 @@ void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *err
 		item->nextcheck = calculate_item_nextcheck(item->itemid, item->type, item->delay,
 				item->delay_flex, now - timediff) + timediff;
 
-	index = DCget_nextcheck_nearestindex(item->nextcheck);
+	sz = sizeof(ZBX_DC_NEXTCHECK);
 
-	memmove(&nextchecks[index + 1], &nextchecks[index], sizeof(ZBX_DC_NEXTCHECK) * (nextcheck_num - index));
+	/* item exists? */
+	for (i = 0; i < nextcheck_num; i ++)
+	{
+		if (nextchecks[i].itemid == item->itemid)
+		{
+			if (nextchecks[i].clock < item->nextcheck)
+			{
+				/* delete item */
+				memmove(&nextchecks[i], &nextchecks[i + 1], sz * (nextcheck_num - (i + 1)));
+				nextcheck_num --;
+				break;
+			}
+			else
+				return;
+		}
+	}
 
-	nextchecks[index].itemid = item->itemid;
-	nextchecks[index].clock = item->nextcheck;
-	nextchecks[index].error_msg = (NULL != error_msg) ? strdup(error_msg) : NULL;
+	if (nextcheck_allocated == nextcheck_num)
+	{
+		nextcheck_allocated *= 2;
+		nextchecks = zbx_realloc(nextchecks, nextcheck_allocated * sz);
+	}
+
+	i = DCget_nextcheck_nearestindex((NULL != error_msg) ? 0 : item->nextcheck, item->itemid);
+
+	/* insert new item */
+	memmove(&nextchecks[i + 1], &nextchecks[i], sz * (nextcheck_num - i));
+
+	nextchecks[i].itemid = item->itemid;
+	nextchecks[i].clock = item->nextcheck;
+	nextchecks[i].error_msg = (NULL != error_msg) ? strdup(error_msg) : NULL;
 
 	nextcheck_num ++;
 }
@@ -144,41 +168,27 @@ void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *err
  ******************************************************************************/
 void	DCflush_nextchecks()
 {
-	int			i, sql_offset = 0;
-	static char		*sql = NULL;
-	static int		sql_allocated = 4096;
+	int			i, sql_offset = 0, sql_allocated = 1024;
+	char			*sql = NULL;
 	time_t			last_clock = -1;
+	zbx_uint64_t		last_itemid = 0;
 	char			error_esc[ITEM_ERROR_LEN_MAX * 2];
-	static zbx_uint64_t	*ids = NULL;
-	static int		ids_alloc = 20;
-	int			ids_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCflush_nextchecks()");
 
 	if (nextcheck_num == 0)
 		return;
 
-	if (sql == NULL)
-		sql = zbx_malloc(sql, sql_allocated);
+	sql = zbx_malloc(sql, sql_allocated);
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
 #endif
 
-	if (NULL == ids)
-		ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
-
-	ids_num = 0;
-
-	for (i = nextcheck_num - 1; i >= 0; i--)
+	for (i = 0; i < nextcheck_num; i++)
 	{
 		if (NULL != nextchecks[i].error_msg)
 			continue;
-
-		if (SUCCEED == uint64_array_exists(ids, ids_num, nextchecks[i].itemid))
-			continue;
-
-		uint64_array_add(&ids, &ids_alloc, &ids_num, nextchecks[i].itemid);
 
 		if (last_clock != nextchecks[i].clock) {
 			if (last_clock != -1)
@@ -187,15 +197,30 @@ void	DCflush_nextchecks()
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ");\n");
 			}
 
+			if (last_itemid > nextchecks[i].itemid)
+			{
+#ifdef HAVE_ORACLE
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
+#endif
+				DBbegin();
+				DBexecute("%s", sql);
+				DBcommit();
+
+				sql_offset = 0;
+#ifdef HAVE_ORACLE
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
+#endif
+			}
+
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
 					"update items set nextcheck=%d where itemid in (",
 					(int)nextchecks[i].clock);
-
 			last_clock = nextchecks[i].clock;
 		}
 
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
 				nextchecks[i].itemid);
+		last_itemid = nextchecks[i].itemid;
 	}
 
 	if (sql_offset > 8)
@@ -204,17 +229,25 @@ void	DCflush_nextchecks()
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ");\n");
 	}
 
-	ids_num = 0;
-
-	for (i = 0; i < nextcheck_num; i++ )
+	for (i = 0; i < nextcheck_num; i++)
 	{
 		if (NULL == nextchecks[i].error_msg) /* not supported items */
 			continue;
 
-		if (SUCCEED == uint64_array_exists(ids, ids_num, nextchecks[i].itemid))
-			continue;
+		if (last_itemid > nextchecks[i].itemid)
+		{
+#ifdef HAVE_ORACLE
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
+#endif
+			DBbegin();
+			DBexecute("%s", sql);
+			DBcommit();
 
-		uint64_array_add(&ids, &ids_alloc, &ids_num, nextchecks[i].itemid);
+			sql_offset = 0;
+#ifdef HAVE_ORACLE
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
+#endif
+		}
 
 		DBescape_string(nextchecks[i].error_msg, error_esc, sizeof(error_esc));
 		zbx_free(nextchecks[i].error_msg);
@@ -227,6 +260,7 @@ void	DCflush_nextchecks()
 				(int)(nextchecks[i].clock + CONFIG_REFRESH_UNSUPPORTED),
 				error_esc,
 				nextchecks[i].itemid);
+		last_itemid = nextchecks[i].itemid;
 	}
 
 #ifdef HAVE_ORACLE
@@ -239,4 +273,6 @@ void	DCflush_nextchecks()
 		DBexecute("%s", sql);
 		DBcommit();
 	}
+
+	zbx_free(sql);
 }
