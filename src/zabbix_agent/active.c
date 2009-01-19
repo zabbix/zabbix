@@ -308,7 +308,7 @@ static int	refresh_active_checks(
 
 	zabbix_log( LOG_LEVEL_DEBUG, "refresh_active_checks('%s',%u)", host, port);
 
-	zbx_json_init(&json, 8*1024);
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
@@ -444,7 +444,7 @@ static int	send_buffer(
 		return ret;
 	}
 
-	zbx_json_init(&json, 8*1024);
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_AGENT_DATA, ZBX_JSON_TYPE_STRING);
 
