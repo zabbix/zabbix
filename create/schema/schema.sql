@@ -449,6 +449,7 @@ FIELD		|calc_fnc	|t_integer	|'2'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|periods_cnt	|t_integer	|'5'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|itemid
+INDEX		|2		|graphid
 
 TABLE|groups|groupid|ZBX_SYNC
 FIELD		|groupid	|t_id		|'0'	|NOT NULL	|0
