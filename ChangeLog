@@ -20,6 +20,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-656] fixed warning zbx_malloc: allocating already allocated memory in json.c (Sasha)
  - [DEV-282] fixes frontend vulnerabilities (Artem)
 
 Changes for 1.6.2
