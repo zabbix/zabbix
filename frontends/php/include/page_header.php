@@ -44,7 +44,7 @@ COpt::profiling_start("page");
 	init_nodes();
 
 	/* set Page header */
-	switch($page["type"]){
+	switch($page['type']){
 		case PAGE_TYPE_IMAGE:
 			set_image_header();
 			define('ZBX_PAGE_NO_MENU', 1);
@@ -339,7 +339,6 @@ COpt::profiling_start("page");
 
 		if(isset($menu_url)){ /* active menu */
 			$class = 'active';
-
 			update_profile('web.menu.'.$label.'.last', $menu_url, PROFILE_TYPE_STR);
 
 			if(isset($deny)){
@@ -364,7 +363,10 @@ COpt::profiling_start("page");
 
 			$class = 'horizontal_menu_n';
 
-			$menu_url = get_profile('web.menu.'.$label.'.last',false);
+			if(ZBX_DISABLE_MENU_CACHE == 0)
+				$menu_url = get_profile('web.menu.'.$label.'.last',false);
+			else
+				$menu_url = false;
 
 			if(!$menu_url)
 				$menu_url = $sub['pages'][$sub['default_page_id']]['url'];
