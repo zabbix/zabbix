@@ -59,23 +59,28 @@ include_once "include/page_header.php";
 	}
 
 	$graph = new Chart();
-	
-	$effectiveperiod = navigation_bar_calc();
 
+//	$_REQUEST['stime'] = get_request('stime',get_profile('web.item.graph.stime', null, PROFILE_TYPE_STR, $_REQUEST['itemid']));
 	$_REQUEST['period'] = get_request('period',get_profile('web.item.graph.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['itemid']));
-	if($_REQUEST['period'] >= ZBX_MIN_PERIOD){
-		update_profile('web.item.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['itemid']);
-	}
+	
+	if($_REQUEST['itemid']>0){
+		if(isset($_REQUEST['stime'])) 
+			update_profile('web.item.graph.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $_REQUEST['itemid']);
 
+		if($_REQUEST['period'] >= ZBX_MIN_PERIOD)
+			update_profile('web.item.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['itemid']);			
+	}
 	
-	if(isset($_REQUEST["period"]))		$graph->SetPeriod($_REQUEST["period"]);
-	if(isset($_REQUEST["from"]))		$graph->SetFrom($_REQUEST["from"]);
-	if(isset($_REQUEST["width"]))		$graph->SetWidth($_REQUEST["width"]);
-	if(isset($_REQUEST["height"]))		$graph->SetHeight($_REQUEST["height"]);
-	if(isset($_REQUEST["border"]))		$graph->SetBorder(0);
-	if(isset($_REQUEST["stime"]))		$graph->setSTime($_REQUEST["stime"]);
+	$_REQUEST['period'] = navigation_bar_calc();
 	
-	$graph->AddItem($_REQUEST["itemid"], GRAPH_YAXIS_SIDE_RIGHT, CALC_FNC_ALL);
+	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
+	if(isset($_REQUEST['from']))		$graph->SetFrom($_REQUEST['from']);
+	if(isset($_REQUEST['width']))		$graph->SetWidth($_REQUEST['width']);
+	if(isset($_REQUEST['height']))		$graph->SetHeight($_REQUEST['height']);
+	if(isset($_REQUEST['border']))		$graph->SetBorder(0);
+	if(isset($_REQUEST['stime']))		$graph->setSTime($_REQUEST['stime']);
+	
+	$graph->AddItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_RIGHT, CALC_FNC_ALL);
 
 	$graph->Draw();
 ?>

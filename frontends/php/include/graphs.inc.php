@@ -315,20 +315,20 @@
 				url_param($from,false,'from').
 				url_param($stime,false,'stime').
 				url_param($period,false,'period')));
-		$td->AddOption('align','center');
+		$td->addOption('align','center');
 		
 		$tr = new CRow($td);
-		$tr->AddOption('bgcolor','#dddddd');
+		$tr->addOption('bgcolor','#dddddd');
 		
 		$table = new CTable();
-		$table->AddOption('width','100%');
-		$table->AddOption('bgcolor','#cccccc');
-		$table->AddOption('cellspacing','1');
-		$table->AddOption('cellpadding','3');
+		$table->addOption('width','100%');
+		$table->addOption('bgcolor','#cccccc');
+		$table->addOption('cellspacing','1');
+		$table->addOption('cellpadding','3');
 		
-		$table->AddRow($tr);
+		$table->addRow($tr);
 		
-		$table->Show();
+		$table->show();
 	}
 
 	function get_graphitem_by_gitemid($gitemid){
@@ -934,9 +934,9 @@
 	}
 
 	function navigation_bar_calc(){
-		if(!isset($_REQUEST["period"]))	$_REQUEST["period"]=ZBX_PERIOD_DEFAULT;
-		if(!isset($_REQUEST["from"]))	$_REQUEST["from"]=0;
-		if(!isset($_REQUEST["stime"]))	$_REQUEST["stime"]=null;
+		if(!isset($_REQUEST['period']))	$_REQUEST['period']=ZBX_PERIOD_DEFAULT;
+		if(!isset($_REQUEST['from']))	$_REQUEST['from']=0;
+		if(!isset($_REQUEST['stime']))	$_REQUEST['stime']=null;
 
 		if($_REQUEST['period']<ZBX_MIN_PERIOD){
 			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MIN_VALUE_SMALL.': '.ZBX_MIN_PERIOD.' ('.(int)(ZBX_MIN_PERIOD/3600).'h)');
@@ -948,13 +948,13 @@
 			$_REQUEST['period'] = ZBX_MAX_PERIOD;			
 		}
 
-		if(isset($_REQUEST["stime"])){
+		if(isset($_REQUEST['stime'])){
 			$bstime = $_REQUEST['stime'];
 			$time = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 			if(($time+$_REQUEST['period']) > time()) unset($_REQUEST['stime']);
 		}
 		
-	return $_REQUEST["period"];
+	return $_REQUEST['period'];
 	}
 
 	
