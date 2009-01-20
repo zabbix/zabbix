@@ -557,23 +557,27 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 	char		value_esc[ITEM_LASTVALUE_LEN_MAX];
 	int		sql_offset = 0, i;
 	ZBX_DC_HISTORY	*h;
+	zbx_uint64_t	*ids = NULL;
+	int		ids_alloc = 1024, ids_num = 0;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DCmass_update_item()");
 
+	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
+
+	for (i = 0; i < history_num; i++)
+		uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid);
+
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
-			"select %s where h.hostid = i.hostid and i.itemid in (",
+			"select %s where h.hostid = i.hostid and",
 			ZBX_SQL_ITEM_SELECT,
 			TRIGGER_STATUS_ENABLED);
 
-	for (i = 0; i < history_num; i++)
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
-				history[i].itemid);
+	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "i.itemid", ids, ids_num);
 
-	if (sql[sql_offset - 1] == ',')
-	{
-		sql_offset--;
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ")");
-	}
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32,
+			" order by i.itemid");
+
+	zbx_free(ids);
 
 	result = DBselect("%s", sql);
 
@@ -746,6 +750,18 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, " where itemid=" ZBX_FS_UI64 ";\n",
 				item.itemid);
+
+		if (sql_offset > ZBX_MAX_SQL_SIZE)
+		{
+#ifdef HAVE_ORACLE
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+#endif
+			DBexecute("%s", sql);
+			sql_offset = 0;
+#ifdef HAVE_ORACLE
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+#endif
+		}
 	}
 	DBfree_result(result);
 
@@ -773,28 +789,65 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 static void	DCmass_proxy_update_item(ZBX_DC_HISTORY *history, int history_num)
 {
-	int	sql_offset = 0, i;
+	int		sql_offset = 0, i, j;
+	zbx_uint64_t	*ids = NULL;
+	int		ids_alloc = 1024, ids_num = 0;
+	int		lastlogsize;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In DCmass_proxy_update_item()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_proxy_update_item()");
+
+	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
+
+	for (i = 0; i < history_num; i++)
+		if (history[i].value_type == ITEM_VALUE_TYPE_LOG)
+			uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid);
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
 #endif
 
-	for (i = 0; i < history_num; i++)
+	for (i = 0; i < ids_num; i++)
 	{
-		if (history[i].value_type == ITEM_VALUE_TYPE_LOG)
+		lastlogsize = -1;
+
+		for (j = 0; j < history_num; j++)
 		{
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
-					"update items set lastlogsize=%d where itemid=" ZBX_FS_UI64 ";\n",
-					history[i].lastlogsize,
-					history[i].itemid);
+			if (history[j].itemid != ids[i])
+				continue;
+
+			if (history[j].value_type != ITEM_VALUE_TYPE_LOG)
+				continue;
+
+			if (lastlogsize < history[j].lastlogsize)
+				lastlogsize = history[j].lastlogsize;
+		}
+
+		if (-1 == lastlogsize)
+			continue;
+
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
+				"update items set lastlogsize=%d where itemid=" ZBX_FS_UI64 ";\n",
+				lastlogsize,
+				ids[i]);
+
+		if (sql_offset > ZBX_MAX_SQL_SIZE)
+		{
+#ifdef HAVE_ORACLE
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+#endif
+			DBexecute("%s", sql);
+			sql_offset = 0;
+#ifdef HAVE_ORACLE
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+#endif
 		}
 	}
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
 #endif
+
+	zbx_free(ids);
 
 	if (sql_offset > 16) /* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
