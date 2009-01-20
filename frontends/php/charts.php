@@ -98,8 +98,9 @@ include_once 'include/page_header.php';
 	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0, PROFILE_TYPE_ID));
 	if(!in_node($_REQUEST['graphid'])) $_REQUEST['graphid'] = 0;
 
-	$_REQUEST["keep"] 	=	get_request('keep', 1); // possible excessed REQUEST variable !!!
-	$_REQUEST["period"] =	get_request('period',get_profile('web.graph.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['graphid']));
+//	$_REQUEST["keep"] 	=	get_request('keep', 1); // possible excessed REQUEST variable !!!
+//	$_REQUEST['stime'] =	get_request('stime',get_profile('web.graph.stime', null, PROFILE_TYPE_STR, $_REQUEST['graphid']));
+	$_REQUEST['period'] =	get_request('period',get_profile('web.graph.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['graphid']));
 	
 	$effectiveperiod = navigation_bar_calc();
 	
@@ -128,8 +129,12 @@ include_once 'include/page_header.php';
 		if(!DBfetch($result)) $_REQUEST['graphid'] = 0;
 	}
 
-	if(($_REQUEST['graphid']>0) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD)){
-		update_profile('web.graph.period',$_REQUEST['period'],PROFILE_TYPE_INT,$_REQUEST['graphid']);
+	if($_REQUEST['graphid']>0){
+		if(isset($_REQUEST['stime'])) 
+			update_profile('web.graph.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $_REQUEST['graphid']);
+
+		if($_REQUEST['period'] >= ZBX_MIN_PERIOD)
+			update_profile('web.graph.period',$_REQUEST['period'],PROFILE_TYPE_INT,$_REQUEST['graphid']);			
 	}
 
 	update_profile('web.charts.graphid',$_REQUEST['graphid']);
