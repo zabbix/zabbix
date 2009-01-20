@@ -157,7 +157,7 @@ include_once('include/page_header.php');
 			if(($config['authentication_type'] != ZBX_AUTH_INTERNAL) && zbx_empty($_REQUEST['password1'])){
 				if(($config['authentication_type'] == ZBX_AUTH_LDAP) && isset($_REQUEST['userid'])){
 					if(GROUP_GUI_ACCESS_INTERNAL != get_user_auth($_REQUEST['userid'])){
-						$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
+//						$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
 					}
 				}
 				else{
