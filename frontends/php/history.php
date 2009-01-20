@@ -161,7 +161,7 @@ include_once "include/page_header.php";
 		if($_REQUEST['period'] >= ZBX_MIN_PERIOD){
 			update_profile('web.item.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['itemid']);
 		}
-
+		
 		$l_header = array(new CLink($item_data['host'],'latest.php?hostid='.$item_data['hostid']),': ',
 			item_description($item_data));
 			
@@ -259,13 +259,19 @@ include_once "include/page_header.php";
 	if($_REQUEST['action']=='showgraph' && $item_type != ITEM_VALUE_TYPE_LOG){
 		$dom_graph_id = 'graph';
 
-		$bstime = isset($_REQUEST['stime'])?$_REQUEST['stime']:date('YmdHi',(time()-$_REQUEST['period']));
+		$bstime = $_REQUEST['stime'] = get_request('stime',
+										get_profile('web.item.graph.stime',date('YmdHi',(time()-$_REQUEST['period'])),
+										PROFILE_TYPE_STR,
+										$_REQUEST['itemid']));
 		show_history($_REQUEST['itemid'],$_REQUEST['from'],$bstime,$effectiveperiod);
 	}
 	else if($_REQUEST['action']=='showvalues' || $_REQUEST['action']=='showlatest'){
 		if($_REQUEST['action']=='showvalues'){
-			
-			$bstime = isset($_REQUEST['stime'])?$_REQUEST['stime']:date('YmdHi',(time()-$_REQUEST['period']));
+		
+			$bstime = $_REQUEST['stime'] = get_request('stime',
+											get_profile('web.item.graph.stime',date('YmdHi',(time()-$_REQUEST['period'])),
+											PROFILE_TYPE_STR,
+											$_REQUEST['itemid']));
 			$time = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 			$till = $time + $effectiveperiod;
 			
