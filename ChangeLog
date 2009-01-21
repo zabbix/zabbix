@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-662] fixed support of quotation marks in command in UserParameter's (Sasha)
  - [ZBX-658] fixed deadlocks in dbcache module (Sasha)
  - [ZBX-659] added define for menu caching (Artem)
  - [ZBX-581] fixed latest data auto-refresh cripples filter viewing issue (Artem)
