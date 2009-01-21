@@ -27,7 +27,6 @@
 			$this->setAction($action);
 			$this->setEnctype($enctype);
 			
-			$this->addVar('zbx_form', 'action');
 			$this->addVar('sessionid', $_COOKIE['zbx_sessionid']);
 		}
 		

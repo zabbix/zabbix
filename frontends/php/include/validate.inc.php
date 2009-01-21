@@ -432,7 +432,7 @@
 			if(!isset($_REQUEST[$field])){
 				return ZBX_VALID_OK;
 			}
-			else if(($flags&P_ACT) && !isset($_REQUEST['zbx_form'])){
+			else if(($flags&P_ACT) && !isset($_REQUEST['sessionid'])){
 				return ZBX_VALID_ERROR;
 			}
 		}
@@ -465,8 +465,7 @@
 
 //		VAR							TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$system_fields=array(
-		'sessionid'=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	HEX(), 'isset({zbx_form})'),
-		'zbx_form'=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY, NULL),
+		'sessionid'=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	HEX(), NULL),
 // 
 		'switch_node'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
 		'triggers_hash'=>	array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,NULL),
