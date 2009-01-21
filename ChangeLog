@@ -1,5 +1,6 @@
 Changes for 1.0.1
 
+ - [NTD-62] fixed runtime error is occurred by Configuration-Actions (Artem)
  - [ZBX-656] fixed possible warning in server log zbx_malloc: allocating already allocated memory in json.c (Sasha)
 
 Changes for 1.0.0

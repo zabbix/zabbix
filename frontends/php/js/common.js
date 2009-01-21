@@ -173,8 +173,21 @@ function add_variable(o_el, s_name, x_value, s_formname, o_document)
         return true;
 }
 
-function get_scroll_pos()
-{
+function get_bodywidth(){
+	var w = parseInt(document.body.scrollWidth);
+	var w2 = parseInt(document.body.offsetWidth);
+
+	if(KQ){
+		w = (w2 < w)?w2:w;
+		w-=16;
+	}
+	else{
+		w = (w2 > w)?w2:w;
+	}
+return w;
+}
+
+function get_scroll_pos(){
 	var scrOfX = 0, scrOfY = 0;
 	if( typeof( window.pageYOffset ) == 'number' )
 	{	//Netscape compliant
