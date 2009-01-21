@@ -94,8 +94,7 @@ include_once('include/page_header.php');
 		'set_gui_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'), null),
 
 /* actions */
-		'register'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	
-					IN('"add permission","delete permission"'), null),
+		'register'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"add permission","delete permission"'), null),
 
 		'save'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),

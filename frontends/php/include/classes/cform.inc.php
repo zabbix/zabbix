@@ -22,46 +22,44 @@
 	class CForm extends CTag{
 /* public */
 		function CForm($action=NULL, $method='post', $enctype=NULL){
-			parent::CTag("form","yes");
-			$this->SetMethod($method);
-			$this->SetAction($action);
-			$this->SetEnctype($enctype);
+			parent::CTag('form','yes');
+			$this->setMethod($method);
+			$this->setAction($action);
+			$this->setEnctype($enctype);
+			
+			$this->addVar('zbx_form', 'action');
+			$this->addVar('sessionid', $_COOKIE['zbx_sessionid']);
 		}
 		
-		function SetMethod($value='post'){
+		function setMethod($value='post'){
 			return $this->options['method'] = $value;
 		}
 		
-		function SetAction($value){
+		function setAction($value){
 			global $page;
 
 			if(is_null($value)){
-				if(isset($page['file'])){
-					$value = $page['file'];
-				}
-				else{
-					$value = "#";
-				}
+				$value = isset($page['file'])?$page['file']:'#';
 			}
 			
 		return $this->options['action'] = $value;
 		}
 		
-		function SetEnctype($value=NULL){
+		function setEnctype($value=NULL){
 			if(is_null($value)){
-				return $this->DelOption("enctype");
+				return $this->DelOption('enctype');
 			}
 			else if(!is_string($value)){
 				return $this->error("Incorrect value for SetEnctype [$value]");
 			}
 			
-		return $this->AddOption("enctype",$value);
+		return $this->addOption('enctype',$value);
 		}
 
-		function AddVar($name, $value){
+		function addVar($name, $value){
 			if(empty($value) && $value != 0)	return $value;
 
-		return $this->AddItem(new CVar($name, $value));
+		return $this->addItem(new CVar($name, $value));
 		}
 	}
 ?>
