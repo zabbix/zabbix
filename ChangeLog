@@ -20,6 +20,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-662] fixed support of quotation marks in command in UserParameter's (Sasha)
  - [ZBX-658] fixed deadlocks in dbcache module (Sasha)
  - [ZBX-581] fixed latest data auto-refresh cripples filter viewing issue (Artem)
  - [ZBX-657] improved performance of the graph related screen due to missing index (Sasha)
