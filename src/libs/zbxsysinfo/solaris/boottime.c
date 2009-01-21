@@ -21,12 +21,11 @@
 
 #include "sysinfo.h"
 
-int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_BOOTTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	kstat_ctl_t	*kc;
 	kstat_t		*kp;
 	kstat_named_t	*kn;
-	time_t		now;
 	int		ret = SYSINFO_RET_FAIL;
 
 	assert(result);
@@ -42,8 +41,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		{
 			if (NULL != (kn = (kstat_named_t*)kstat_data_lookup(kp, "boot_time")))
 			{
-				time(&now);
-				SET_UI64_RESULT(result, difftime(now, (time_t) kn->value.ul));
+				SET_UI64_RESULT(result, (zbx_uint64_t)kn->value.ul);
 				ret = SYSINFO_RET_OK;
 			}
 		}

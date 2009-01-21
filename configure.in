@@ -51,7 +51,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
-  libperfstat.h)
+  libperfstat.h net/if_mib.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -80,6 +80,15 @@ dnl Check for function res_query
 AC_MSG_CHECKING(for function res_query)
 AC_TRY_COMPILE(
 [
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#	include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_NAMESER_H
+#	include <arpa/nameser.h>
+#endif
 #include <resolv.h>
 #if !defined(C_IN)
 #       define C_IN     ns_c_in
@@ -852,6 +861,16 @@ if test "x$want_ldap" = "xyes"; then
 fi
 CFLAGS="${CFLAGS} ${LDAP_CPPFLAGS}"
 LDFLAGS="${LDFLAGS} ${LDAP_LDFLAGS}"
+
+found_iconv="no"
+dnl Check for libiconv [by default - skip]
+LIBICONV_CHECK_CONFIG([no])
+if test "x$found_iconv" != "xyes"; then
+	AC_MSG_ERROR([Unable to find iconv.h "${found_iconv}"])
+fi
+CFLAGS="${CFLAGS} ${ICONV_CFLAGS}"
+LDFLAGS="${LDFLAGS} ${ICONV_LDFLAGS}"
+LIBS="${LIBS} ${ICONV_LIBS}"
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)

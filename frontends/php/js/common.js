@@ -67,18 +67,15 @@ function is_array(obj) {
       'splice' in obj && 'join' in obj;	  
 }
 
-if (!Array.prototype.forEach)
-{
-  Array.prototype.forEach = function(fun /*, thisp*/)
-  {
+if (!Array.prototype.forEach){
+  Array.prototype.forEach = function(fun /*, thisp*/){
     var len = this.length;
     if (typeof fun != "function")
       throw new TypeError();
 
     var thisp = arguments[1];
-    for (var i = 0; i < len; i++)
-    {
-      if (i in this)
+    for (var i = 0; i < len; i++){
+      if(i in this)
         fun.call(thisp, this[i], i, this);
     }
   };
@@ -95,7 +92,7 @@ function SDI(msg){
 		div_help.setAttribute('id','div_help');
 		div_help.setAttribute('style','position: absolute; left: 10px; top: 10px; border: 1px red solid; width: 500px; height: 400px; background-color: white; overflow: auto; z-index: 20;');
 		
-		new Draggable(div_help,{});
+//		new Draggable(div_help,{});
 	}
 	
 	div_help.appendChild(document.createTextNode("DEBUG INFO: "));
@@ -122,7 +119,7 @@ function SDJ(obj){
 
 function addListener(element, eventname, expression, bubbling){
 	bubbling = bubbling || false;
-		
+//alert(expression);
 	if(window.addEventListener)	{
 		element.addEventListener(eventname, expression, bubbling);
 		return true;
@@ -176,8 +173,21 @@ function add_variable(o_el, s_name, x_value, s_formname, o_document)
         return true;
 }
 
-function get_scroll_pos()
-{
+function get_bodywidth(){
+	var w = parseInt(document.body.scrollWidth);
+	var w2 = parseInt(document.body.offsetWidth);
+
+	if(KQ){
+		w = (w2 < w)?w2:w;
+		w-=16;
+	}
+	else{
+		w = (w2 > w)?w2:w;
+	}
+return w;
+}
+
+function get_scroll_pos(){
 	var scrOfX = 0, scrOfY = 0;
 	if( typeof( window.pageYOffset ) == 'number' )
 	{	//Netscape compliant
@@ -250,8 +260,8 @@ function Confirm(msg){
 }
 
 function PopUp(url,width,height,form_name){
-	if(!width) width = 600;
-	if(!height) height = 450;
+	if(!width) width = 800;
+	if(!height) height = 600;
 	if(!form_name) form_name = 'zbx_popup';
 
 	var left = (screen.width-(width+150))/2; 

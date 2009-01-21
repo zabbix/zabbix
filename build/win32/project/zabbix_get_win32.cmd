@@ -18,10 +18,10 @@ echo ..\..\..\src\libs\zbxcommon\str.c >> cl.tmp
 echo ..\..\..\src\libs\zbxcommon\misc.c >> cl.tmp
 echo ..\..\..\src\libs\zbxcommon\comms.c >> cl.tmp
 echo ..\..\..\src\zabbix_get\zabbix_get.c >> cl.tmp
-cl.exe /O2 /Ob1 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_get" /D "_WINDOWS" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "HAVE_IPV6" /D "_VC80_UPGRADE=0x0600" /D "_MBCS" /GF /FD /EHsc /MT /Gy /Fp"Win32\zabbix_get\zabbix_get.pch" /Fo"Win32\zabbix_get\\" /Fd"Win32\zabbix_get\\" /FR"Win32\zabbix_get\\" /W3 /c /TC @cl.tmp /nologo
+cl.exe /O2 /Ob1 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_get" /D "_WINDOWS" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_VC80_UPGRADE=0x0600" /D "_MBCS" /GF /FD /EHsc /MT /Gy /Fp"Win32\zabbix_get\zabbix_get.pch" /Fo"Win32\zabbix_get\\" /Fd"Win32\zabbix_get\\" /FR"Win32\zabbix_get\\" /W3 /c /TC @cl.tmp /nologo
 
 echo ..\..\..\src\libs\zbxcomms\comms.c > cl.tmp
-cl.exe /O2 /Ob1 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_get" /D "_WINDOWS" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "HAVE_IPV6" /D "_VC80_UPGRADE=0x0600" /D "_MBCS" /GF /FD /EHsc /MT /Gy /Fp"Win32\zabbix_get\zabbix_get.pch" /Fo"Win32\zabbix_get\zbxcomms\\" /Fd"Win32\zabbix_get\zbxcomms\\" /FR"Win32\zabbix_get\\" /W3 /c /TC @cl.tmp /nologo
+cl.exe /O2 /Ob1 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_get" /D "_WINDOWS" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_VC80_UPGRADE=0x0600" /D "_MBCS" /GF /FD /EHsc /MT /Gy /Fp"Win32\zabbix_get\zabbix_get.pch" /Fo"Win32\zabbix_get\zbxcomms\\" /Fd"Win32\zabbix_get\zbxcomms\\" /FR"Win32\zabbix_get\\" /W3 /c /TC @cl.tmp /nologo
 
 echo ".\Win32\zabbix_get\zabbix_get.obj" > link.tmp
 echo ".\Win32\zabbix_get\comms.obj" >> link.tmp

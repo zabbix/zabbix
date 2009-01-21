@@ -1031,6 +1031,110 @@ static int evaluate_NODATA(char *value,DB_ITEM	*item,int parameter)
 
 /******************************************************************************
  *                                                                            *
+ * Function: evaluate_ABSCHANGE                                               *
+ *                                                                            *
+ * Purpose: evaluate function 'abschange' for the item                        *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameter - number of seconds                                  *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_ABSCHANGE(char *value, DB_ITEM *item, const char *parameter)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_ABSCHANGE()");
+
+	if (item->lastvalue_null == 1 || item->prevvalue_null == 1)
+		return FAIL;
+
+	switch (item->value_type) {
+		case ITEM_VALUE_TYPE_FLOAT:
+			zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL,
+					(double)abs(item->lastvalue_dbl - item->prevvalue_dbl));
+			del_zeroes(value);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			/* To avoid overflow */
+			if (item->lastvalue_uint64 >= item->prevvalue_uint64)
+				zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_UI64,
+						item->lastvalue_uint64 - item->prevvalue_uint64);
+			else
+				zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_UI64,
+						item->prevvalue_uint64 - item->lastvalue_uint64);
+			break;
+		default:
+			if (0 == strcmp(item->lastvalue_str, item->prevvalue_str))
+				zbx_snprintf(value, MAX_STRING_LEN, "%d", 0);
+			else
+				zbx_snprintf(value, MAX_STRING_LEN, "%d", 1);
+			break;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of evaluate_ABSCHANGE()");
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_CHANGE                                                  *
+ *                                                                            *
+ * Purpose: evaluate function 'abschange' for the item                        *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameter - number of seconds                                  *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_CHANGE(char *value, DB_ITEM *item, const char *parameter)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_CHANGE()");
+
+	if (item->lastvalue_null == 1 || item->prevvalue_null == 1)
+		return FAIL;
+
+	switch (item->value_type) {
+		case ITEM_VALUE_TYPE_FLOAT:
+			zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL,
+					item->lastvalue_dbl - item->prevvalue_dbl);
+			del_zeroes(value);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			/* To avoid overflow */
+			if (item->lastvalue_uint64 >= item->prevvalue_uint64)
+				zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_UI64,
+						item->lastvalue_uint64 - item->prevvalue_uint64);
+			else
+				zbx_snprintf(value, MAX_STRING_LEN, "-" ZBX_FS_UI64,
+						item->prevvalue_uint64 - item->lastvalue_uint64);
+			break;
+		default:
+			if (0 == strcmp(item->lastvalue_str, item->prevvalue_str))
+				zbx_snprintf(value, MAX_STRING_LEN, "%d", 0);
+			else
+				zbx_snprintf(value, MAX_STRING_LEN, "%d", 1);
+			break;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of evaluate_CHANGE()");
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: evaluate_STR                                                     *
  *                                                                            *
  * Purpose: evaluate function 'str' for the item                              *
@@ -1282,83 +1386,11 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	}
 	else if(strcmp(function,"abschange")==0)
 	{
-		if((item->lastvalue_null==1)||(item->prevvalue_null==1))
-		{
-			ret = FAIL;
-		}
-		else
-		{
-			switch (item->value_type) {
-				case ITEM_VALUE_TYPE_FLOAT:
-					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_DBL,
-						(double)abs(item->lastvalue_dbl-item->prevvalue_dbl));
-					del_zeroes(value);
-					break;
-				case ITEM_VALUE_TYPE_UINT64:
-					/* To avoid overflow */
-					if(item->lastvalue_uint64>=item->prevvalue_uint64)
-					{
-						zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64,
-							labs(item->lastvalue_uint64-item->prevvalue_uint64));
-					}
-					else
-					{
-						zbx_snprintf(value,MAX_STRING_LEN,"-" ZBX_FS_UI64,
-							labs(item->prevvalue_uint64 - item->lastvalue_uint64));
-					}
-					break;
-				default:
-					if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
-					{
-						strcpy(value,"0");
-					}
-					else
-					{
-						strcpy(value,"1");
-					}
-					break;
-			}
-		}
+		ret = evaluate_ABSCHANGE(value, item, parameter);
 	}
 	else if(strcmp(function,"change")==0)
 	{
-		if((item->lastvalue_null==1)||(item->prevvalue_null==1))
-		{
-			ret = FAIL;
-		}
-		else
-		{
-			switch (item->value_type) {
-				case ITEM_VALUE_TYPE_FLOAT:
-					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_DBL,
-						item->lastvalue_dbl-item->prevvalue_dbl);
-					del_zeroes(value);
-					break;
-				case ITEM_VALUE_TYPE_UINT64:
-					/* To avoid overflow */
-					if(item->lastvalue_uint64>=item->prevvalue_uint64)
-					{
-						zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64,
-							item->lastvalue_uint64-item->prevvalue_uint64);
-					}
-					else
-					{
-						zbx_snprintf(value,MAX_STRING_LEN,"-" ZBX_FS_UI64,
-							item->prevvalue_uint64 - item->lastvalue_uint64);
-					}
-					break;
-				default:
-					if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
-					{
-						strcpy(value,"0");
-					}
-					else
-					{
-						strcpy(value,"1");
-					}
-					break;
-			}
-		}
+		ret = evaluate_CHANGE(value, item, parameter);
 	}
 	else if(strcmp(function,"diff")==0)
 	{
@@ -1921,36 +1953,34 @@ int	replace_value_by_map(char *value, zbx_uint64_t valuemapid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+	char		new_value[MAX_STRING_LEN], orig_value[MAX_STRING_LEN];
+	int		ret = FAIL;
 
-	char new_value[MAX_STRING_LEN];
-	char sql[MAX_STRING_LEN];
-	char *or_value;
+	zabbix_log(LOG_LEVEL_DEBUG, "In replace_value_by_map()");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In replace_value_by_map()" );
-	
-	if(valuemapid == 0)	return FAIL;
-	
+	if (valuemapid == 0)
+		return FAIL;
+
 	result = DBselect("select newvalue from mappings where valuemapid=" ZBX_FS_UI64 " and value='%s'",
 			valuemapid,
 			value);
-	row = DBfetch(result);
+	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+	{
+		strcpy(new_value, row[0]);
 
-	if(!row || DBis_null(row[0])==SUCCEED)		return FAIL;
+		del_zeroes(new_value);
+		zbx_strlcpy(orig_value, value, MAX_STRING_LEN);
 
-	strcpy(new_value,row[0]);
+		zbx_snprintf(value, MAX_STRING_LEN, "%s (%s)",
+				new_value,
+				orig_value);
+		zabbix_log(LOG_LEVEL_DEBUG, "End replace_value_by_map(result:%s)",
+				value);
+		ret = SUCCEED;
+	}
 	DBfree_result(result);
 
-	del_zeroes(new_value);
-	or_value = sql;	/* sql variarbvle used as tmp - original value */
-	zbx_strlcpy(sql,value,MAX_STRING_LEN);
-	
-	zbx_snprintf(value, MAX_STRING_LEN, "%s (%s)",
-		new_value,
-		or_value);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End replace_value_by_map(result:%s)",
-		value);
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************

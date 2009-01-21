@@ -26,6 +26,7 @@
 #define DO_MIN 2
 #define DO_AVG 3
 
+#if defined(HAVE_PROC_0_PSINFO)
 static int	check_procstate(psinfo_t *psinfo, int zbx_proc_stat)
 {
 	if (zbx_proc_stat == ZBX_PROC_STAT_ALL)
@@ -42,9 +43,11 @@ static int	check_procstate(psinfo_t *psinfo, int zbx_proc_stat)
 
 	return FAIL;
 }
+#endif
 
 int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#if defined(HAVE_PROC_0_PSINFO)
 	char		tmp[MAX_STRING_LEN],
 			procname[MAX_STRING_LEN],
 			proccomm[MAX_STRING_LEN];
@@ -58,11 +61,13 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	int		do_task;
 	double		memsize = 0;
 	zbx_uint64_t	proccount = 0;
+#endif
 
 	assert(result);
 
 	init_result(result);
 
+#if defined(HAVE_PROC_0_PSINFO)
 	if (num_param(param) > 4)
 		return SYSINFO_RET_FAIL;
 
@@ -108,7 +113,7 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	while (NULL != (entries = readdir(dir)))
 	{
-		if (-1 == fd)
+		if (-1 != fd)
 		{
 			close(fd);
 			fd = -1;
@@ -151,7 +156,7 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	}
 
 	closedir(dir);
-	if (-1 == fd)
+	if (-1 != fd)
 		close(fd);
 
 	if (do_task == DO_AVG)
@@ -164,10 +169,14 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	}
 
 	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif
 }
 
 int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#if defined(HAVE_PROC_0_PSINFO)
 	char		tmp[MAX_STRING_LEN],
 			procname[MAX_STRING_LEN],
 			proccomm[MAX_STRING_LEN];
@@ -179,11 +188,13 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	int		fd = -1;
 	int		zbx_proc_stat;
 	zbx_uint64_t	proccount = 0;
+#endif
    
 	assert(result);
 
 	init_result(result);
  
+#if defined(HAVE_PROC_0_PSINFO)
 	if (num_param(param) > 4)
 		return SYSINFO_RET_FAIL;
     
@@ -225,7 +236,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 	while (NULL != (entries = readdir(dir)))
 	{
-		if (-1 == fd)
+		if (-1 != fd)
 		{
 			close(fd);
 			fd = -1;
@@ -258,10 +269,13 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	}
 
 	closedir(dir);
-	if (-1 == fd)
+	if (-1 != fd)
 		close(fd);
 
 	SET_UI64_RESULT(result, proccount);
 
 	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif
 }

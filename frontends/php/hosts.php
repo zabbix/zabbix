@@ -661,9 +661,7 @@ include_once "include/page_header.php";
 				$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
 			}
 			
-			DBstart();
 			$result = delete_maintenance($maintenanceids);
-			$result = DBend($result);
 			
 			show_messages($result,S_MAINTENANCE_DELETED,S_CANNOT_DELETE_MAINTENANCE);
 			if($result){
@@ -966,11 +964,13 @@ include_once "include/page_header.php";
 						$status=new CLink(S_MONITORED,"hosts.php?hosts%5B%5D=".$row["hostid"].
 							"&disable=1".url_param("config").url_param("groupid"),
 							"off");
-					} else if($row["status"] == HOST_STATUS_NOT_MONITORED) {
+					} 
+					else if($row["status"] == HOST_STATUS_NOT_MONITORED) {
 						$status=new CLink(S_NOT_MONITORED,"hosts.php?hosts%5B%5D=".$row["hostid"].
 							"&activate=1".url_param("config").url_param("groupid"),
 							"on");
-					} else if($row["status"] == HOST_STATUS_TEMPLATE)
+					} 
+					else if($row["status"] == HOST_STATUS_TEMPLATE)
 						$status=new CCol(S_TEMPLATE,"unknown");
 					else if($row["status"] == HOST_STATUS_DELETED)
 						$status=new CCol(S_DELETED,"unknown");
@@ -991,9 +991,9 @@ include_once "include/page_header.php";
 
 				$popup_menu_actions = array(
 					array(S_SHOW, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))),
-					array(S_ITEMS, 'items.php?hostid='.$row['hostid'], array('tw'=>'_blank')),
-					array(S_TRIGGERS, 'triggers.php?hostid='.$row['hostid'], array('tw'=>'_blank')),
-					array(S_GRAPHS, 'graphs.php?hostid='.$row['hostid'], array('tw'=>'_blank')),
+					array(S_ITEMS, null, new CScript("function(){ PopUp('items.php?hostid=".$row['hostid']."');}")),
+					array(S_TRIGGERS, null, new CScript("function(){ PopUp('triggers.php?hostid=".$row['hostid']."');}")),
+					array(S_GRAPHS, null, new CScript("function(){ PopUp('graphs.php?hostid=".$row['hostid']."');}"))
 					);
 
 				$db_groups = DBselect('select g.groupid, g.name from groups g left join hosts_groups hg '.
@@ -1037,15 +1037,21 @@ include_once "include/page_header.php";
 				$popup_menu_actions = array_merge(
 					$popup_menu_actions,
 					array(
-					array("Agent control", null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))),
-					array("Start", 'hosts.php?command=start&hostid='.$row['hostid'], array('tw'=>'_blank')),
-					array("Stop", 'hosts.php?command=stop&hostid='.$row['hostid'], array('tw'=>'_blank')),
-					array("Restart", 'hosts.php?command=restart&hostid='.$row['hostid'], array('tw'=>'_blank'))
-				));
+						array("Agent control", null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))),
+						array("Start", null, new CScript("function(){ PopUp('hosts.php?command=start&hostid=".$row['hostid']."');}")),
+						
+						array("Stop", null, new CScript("function(){ PopUp('hosts.php?command=stop&hostid=".$row['hostid']."');}")),
+						array("Restart", null, new CScript("function(){ PopUp('hosts.php?command=restart&hostid=".$row['hostid']."');}"))
+					));
+					
+			$menus="show_popup_menu(event,".zbx_jsvalue($popup_menu_actions).",180);";
+			
+			$show = new CSpan(S_SELECT,'pointer');
+			$show->addOption('onclick','javascript: '.$menus);
 
-				$mnuActions = new CPUMenu($popup_menu_actions);
+//				$mnuActions = new CPUMenu($popup_menu_actions);
 
-				$show = new CLink(S_SELECT, '#', 'action', $mnuActions->GetOnActionJS());
+//				$show = new CLink(S_SELECT, '#', 'action', $mnuActions->GetOnActionJS());
 
 				$table->addRow(array(
 					$host,
@@ -1058,7 +1064,10 @@ include_once "include/page_header.php";
 					$error,
 					$show));
 			}
-
+			
+			$jsmenu = new CPUMenu(null,170);
+			$jsmenu->InsertJavaScript();
+			
 			$footerButtons = array(
 				$show_only_tmp ? NULL : new CButtonQMessage('activate',S_ACTIVATE_SELECTED,S_ACTIVATE_SELECTED_HOSTS_Q),
 				$show_only_tmp ? NULL : SPACE,

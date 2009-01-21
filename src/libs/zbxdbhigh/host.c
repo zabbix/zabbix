@@ -247,6 +247,7 @@ static void	DBclear_parents_from_trigger(
 					" SET s.triggerid = null "
 					" WHERE s.serviceid = " ZBX_FS_UI64, serviceid);
 		}
+		DBfree_result(res);
 	}
 }
 
@@ -1111,7 +1112,7 @@ static int	DBdelete_graph(
 		{ /* recursion */
 			ZBX_STR2UINT64(graphid, element_data[0]);
 			if( SUCCEED != (result = DBdelete_graph(graphid)) )
-				return result;
+				break;
 		}
 
 		DBfree_result(db_elements);
@@ -1334,11 +1335,12 @@ static int	DBupdate_graph_with_items(
 		}
 
 		if ( SUCCEED != result )
-		{
-			return result;
-		}
+			break;
 	}
 	DBfree_result(chd_graphs);
+
+	if (SUCCEED != result)
+		return result;
 
 	DBexecute("delete from graphs_items where graphid=" ZBX_FS_UI64, graphid);
 
@@ -3114,15 +3116,15 @@ static char*	DBimplode_exp (
 			/* determine key and function */
 			p = parameter-1; /* position of '(' character */
 			*p = '\0';
-			do { /* simple try for C */
-				key = host + host_len + 1;
-				if( NULL == (p = strrchr(key, '.'))) break; /* simpla throw for C */
-				key_len = p - key;
 
-				function = p + 1;
-				function_len = parameter - 1 - function;
+			key = host + host_len + 1;
+			if( NULL == (p = strrchr(key, '.'))) break; /* simpla throw for C */
+			key_len = p - key;
 
-			} while(0); /* simpla finally for C */
+			function = p + 1;
+			function_len = parameter - 1 - function;
+
+			p = parameter-1; /* position of '(' character */
 			*p = '(';
 
 		} while(0);/* simpla finally for C */

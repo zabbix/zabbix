@@ -65,6 +65,7 @@ int	create_pid_file(const char *pidfile)
 		{
 			zbx_error("File [%s] exists and locked. Is this process already running ?", pidfile);
 			zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists and locked. Is this process already running ?", pidfile);
+			close(fd);
 			return FAIL;
 		}
 		close(fd);

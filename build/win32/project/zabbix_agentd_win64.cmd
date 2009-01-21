@@ -54,17 +54,17 @@ echo ..\..\..\src\zabbix_agent\eventlog.c >> cl.tmp
 echo ..\..\..\src\zabbix_agent\diskdevices.c >> cl.tmp
 echo ..\..\..\src\zabbix_agent\cpustat.c >> cl.tmp
 echo ..\..\..\src\zabbix_agent\active.c >> cl.tmp
-cl.exe /O2 /Ob1 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "NDEBUG" /D "_WIN64" /D "_WINDOWS" /D "HAVE_WINLDAP_H" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /D "WITH_SIMPLE_METRICS" /D "HAVE_IPV6" /D "_VC80_UPGRADE=0x0600" /D "_MBCS" /GF /FD /EHsc /MT /Gy /Fp"Win64\zabbix_agentd\zabbix_agentd.pch" /Fo"Win64\zabbix_agentd\\" /Fd"Win64\zabbix_agentd\\" /FR"Win64\zabbix_agentd\\" /W3 /c /TC @cl.tmp /nologo
+cl.exe /O2 /Ob1 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "NDEBUG" /D "_WIN64" /D "_WINDOWS" /D "HAVE_WINLDAP_H" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /D "WITH_SIMPLE_METRICS" /D "_VC80_UPGRADE=0x0600" /D "_MBCS" /GF /FD /EHsc /MT /Gy /Fp"Win64\zabbix_agentd\zabbix_agentd.pch" /Fo"Win64\zabbix_agentd\\" /Fd"Win64\zabbix_agentd\\" /FR"Win64\zabbix_agentd\\" /W3 /c /TC @cl.tmp /nologo
 
 echo ..\..\..\src\libs\zbxcomms\comms.c > cl.tmp
-cl.exe /O2 /Ob1 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "NDEBUG" /D "_WIN64" /D "_WINDOWS" /D "HAVE_WINLDAP_H" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /D "WITH_SIMPLE_METRICS" /D "HAVE_IPV6" /D "_VC80_UPGRADE=0x0600" /D "_MBCS" /GF /FD /EHsc /MT /Gy /Fp"Win64\zabbix_agentd\zabbix_agentd.pch" /Fo"Win64\zabbix_agentd\zbxcomms\\" /Fd"Win64\zabbix_agentd\zbxcomms\\" /FR"Win64\zabbix_agentd\\" /W3 /c /TC @cl.tmp /nologo
+cl.exe /O2 /Ob1 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "NDEBUG" /D "_WIN64" /D "_WINDOWS" /D "HAVE_WINLDAP_H" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /D "WITH_SIMPLE_METRICS" /D "_VC80_UPGRADE=0x0600" /D "_MBCS" /GF /FD /EHsc /MT /Gy /Fp"Win64\zabbix_agentd\zabbix_agentd.pch" /Fo"Win64\zabbix_agentd\zbxcomms\\" /Fd"Win64\zabbix_agentd\zbxcomms\\" /FR"Win64\zabbix_agentd\\" /W3 /c /TC @cl.tmp /nologo
 
 echo ..\..\..\src\libs\zbxsysinfo\common\system.c > cl.tmp
 echo ..\..\..\src\libs\zbxsysinfo\common\net.c >> cl.tmp
 echo ..\..\..\src\libs\zbxsysinfo\common\http.c >> cl.tmp
 echo ..\..\..\src\libs\zbxsysinfo\common\file.c >> cl.tmp
 echo ..\..\..\src\libs\zbxsysinfo\common\common.c >> cl.tmp
-cl.exe /O2 /Ob1 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "NDEBUG" /D "_WIN64" /D "_WINDOWS" /D "HAVE_WINLDAP_H" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /D "WITH_SIMPLE_METRICS" /D "HAVE_IPV6" /D "_VC80_UPGRADE=0x0600" /D "_MBCS" /GF /FD /EHsc /MT /Gy /Fp"Win64\zabbix_agentd\zabbix_agentd.pch" /Fo"Win64\zabbix_agentd\zbxsysinfo\\" /Fd"Win64\zabbix_agentd\zbxsysinfo\\" /FR"Win64\zabbix_agentd\\" /W3 /c /TC @cl.tmp /nologo
+cl.exe /O2 /Ob1 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "NDEBUG" /D "_WIN64" /D "_WINDOWS" /D "HAVE_WINLDAP_H" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /D "WITH_SIMPLE_METRICS" /D "_VC80_UPGRADE=0x0600" /D "_MBCS" /GF /FD /EHsc /MT /Gy /Fp"Win64\zabbix_agentd\zabbix_agentd.pch" /Fo"Win64\zabbix_agentd\zbxsysinfo\\" /Fd"Win64\zabbix_agentd\zbxsysinfo\\" /FR"Win64\zabbix_agentd\\" /W3 /c /TC @cl.tmp /nologo
 
 rc.exe /d "NDEBUG" /d "_VC80_UPGRADE=0x0600" /l 0x419 /fo"Win64\resource.res" .\resource.rc
 

@@ -459,7 +459,8 @@
 								' AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))'.
 							' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 		
-						$trigger = get_row_for_nofalseforb($trigger,$event_sql);
+						if($trigger_tmp = get_row_for_nofalseforb($trigger,$event_sql))
+							$trigger = $trigger_tmp;
 					}
 					
 					$type	=& $trigger['value'];
@@ -667,9 +668,9 @@
 				foreach($scripts_by_hosts[$db_element["elementid"]] as $id => $script){
 					$script_nodeid = id2nodeid($script['scriptid']);
 					if( $host_nodeid == $script_nodeid )
-						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$db_element["elementid"]."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+						$menus.= "['".$script['name']."',null, function(){openWinCentered('scripts_exec.php?execute=1&hostid=".$db_element["elementid"]."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');},{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
-				$menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: Redirect('".$url."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				$menus.= "['".S_STATUS_OF_TRIGGERS."', '".$url."', null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				
 				$menus = trim($menus,',');
 				$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180); cancelEvent(event);";

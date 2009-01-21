@@ -524,7 +524,7 @@
 
 //	Footer
 	'S_ZABICOM_IS_UNAVAILABLE'=>'ZABICOM is unavailable',
-	'S_ZABICOM_VER'=>			'ZABICOM 1.0.0',
+	'S_ZABICOM_VER'=>			'ZABICOM 1.0.1',
 	'S_COPYRIGHT_BY'=>			'Copyright by',
 	'S_CONNECTED_AS'=>			'Connected as',
 	'S_SIA_ZABBIX'=>			'SIA ZABBIX',
@@ -1321,6 +1321,7 @@
 	'S_HIDE_DISABLED_TRIGGERS'=>		'Hide disabled triggers',
 
 //	tr_logform.php
+	'S_TRIGGER_LOG'=>			'Trigger log',
 	'S_EXCLUDE'=>				'Exclude',
 	'S_INCLUDE'=>				'Include',
 	'S_POSITION'=>				'Position',

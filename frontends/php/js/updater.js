@@ -92,6 +92,10 @@ inloadobj:		new Array(),			// array containing updated obj and statuses
 			var url_path = new Curl(location.href);
 			url_path = url_path.getPath();
 		}
+		
+		if(typeof(params) == 'undefined'){
+			var params = {};
+		}
 						
 		this.setLoadingImg(obj);
 				

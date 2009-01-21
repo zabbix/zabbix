@@ -392,7 +392,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		include_once "include/page_footer.php";
 	}
 	
-//	The hash has form <md5sum of triggerid>,<sum of priorities>
+//	The hash has form <sum of priorities>,<md5sum of triggerids>
 	function	calc_trigger_hash()
 	{
 
@@ -415,8 +415,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
 		$priorities=0;
 		for($i=0;$i<=5;$i++)	$priorities += pow(100,$i)*$priority[$i];
-
-		return	"$priorities,$md5sum";
+	return	"$priorities,$md5sum";
 	}
 
 	function	select_config()

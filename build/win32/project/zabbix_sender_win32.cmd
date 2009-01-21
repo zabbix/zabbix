@@ -21,10 +21,10 @@ echo ..\..\..\src\libs\zbxcommon\alias.c >> cl.tmp
 echo ..\..\..\src\libs\zbxconf\cfg.c >> cl.tmp
 echo ..\..\..\src\libs\zbxlog\log.c >> cl.tmp
 echo ..\..\..\src\libs\zbxsys\threads.c >> cl.tmp
-cl.exe /O2 /Ob1 /I "./" /I "../include/" /I "../../../include/" /D "_WINDOWS" /D "HAVE_WINLDAP_H" /D "HAVE_ASSERT_H" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "HAVE_IPV6" /D "_VC80_UPGRADE=0x0600" /D "_MBCS" /GF /FD /EHsc /MT /Gy /Fp"Win32\zabbix_sender\zabbix_sender.pch" /Fo"Win32\zabbix_sender\\" /Fd"Win32\zabbix_sender\\" /FR"Win32\zabbix_sender\\" /W3 /c /TC @cl.tmp /nologo
+cl.exe /O2 /Ob1 /I "./" /I "../include/" /I "../../../include/" /D "_WINDOWS" /D "HAVE_WINLDAP_H" /D "HAVE_ASSERT_H" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_VC80_UPGRADE=0x0600" /D "_MBCS" /GF /FD /EHsc /MT /Gy /Fp"Win32\zabbix_sender\zabbix_sender.pch" /Fo"Win32\zabbix_sender\\" /Fd"Win32\zabbix_sender\\" /FR"Win32\zabbix_sender\\" /W3 /c /TC @cl.tmp /nologo
 
 echo ..\..\..\src\libs\zbxcomms\comms.c > cl.tmp
-cl.exe /O2 /Ob1 /I "./" /I "../include/" /I "../../../include/" /D "_WINDOWS" /D "HAVE_WINLDAP_H" /D "HAVE_ASSERT_H" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "HAVE_IPV6" /D "_VC80_UPGRADE=0x0600" /D "_MBCS" /GF /FD /EHsc /MT /Gy /Fp"Win32\zabbix_sender\zabbix_sender.pch" /Fo"Win32\zabbix_sender\zbxcomms\\" /Fd"Win32\zabbix_sender\zbxcomms\\" /FR"Win32\zabbix_sender\\" /W3 /c /TC @cl.tmp /nologo
+cl.exe /O2 /Ob1 /I "./" /I "../include/" /I "../../../include/" /D "_WINDOWS" /D "HAVE_WINLDAP_H" /D "HAVE_ASSERT_H" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_VC80_UPGRADE=0x0600" /D "_MBCS" /GF /FD /EHsc /MT /Gy /Fp"Win32\zabbix_sender\zabbix_sender.pch" /Fo"Win32\zabbix_sender\zbxcomms\\" /Fd"Win32\zabbix_sender\zbxcomms\\" /FR"Win32\zabbix_sender\\" /W3 /c /TC @cl.tmp /nologo
 
 echo ".\Win32\zabbix_sender\zabbix_sender.obj" > link.tmp
 echo ".\Win32\zabbix_sender\mutexs.obj" >> link.tmp
