@@ -754,12 +754,12 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 		if (sql_offset > ZBX_MAX_SQL_SIZE)
 		{
 #ifdef HAVE_ORACLE
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
 #endif
 			DBexecute("%s", sql);
 			sql_offset = 0;
 #ifdef HAVE_ORACLE
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
 #endif
 		}
 	}
@@ -833,12 +833,12 @@ static void	DCmass_proxy_update_item(ZBX_DC_HISTORY *history, int history_num)
 		if (sql_offset > ZBX_MAX_SQL_SIZE)
 		{
 #ifdef HAVE_ORACLE
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
 #endif
 			DBexecute("%s", sql);
 			sql_offset = 0;
 #ifdef HAVE_ORACLE
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
 #endif
 		}
 	}
