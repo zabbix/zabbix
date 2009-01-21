@@ -110,7 +110,7 @@
 			} 
 			else if(is_string($value)) {
 				$this->help = new CHelp($value);
-				if($this->GetName()==NULL)
+				if($this->getName()==NULL)
 					$this->setName($value);
 			} 
 			else {
