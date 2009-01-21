@@ -46,48 +46,48 @@
 			}
 
 			parent::CForm($action,$method,$enctype);
-			$this->SetTitle($title);
-			$this->SetAlign('center');
-			$this->SetHelp();
+			$this->setTitle($title);
+			$this->setAlign('center');
+			$this->setHelp();
 
 //			$frm_link = new CLink();
-//			$frm_link->SetName("formtable");
-//			$this->AddItemToTopRow($frm_link);
+//			$frm_link->setName("formtable");
+//			$this->addItemToTopRow($frm_link);
 			
-			$this->AddVar($form_variable, get_request($form_variable, 1));
-			$this->AddVar('form_refresh',get_request('form_refresh',0)+1);
+			$this->addVar($form_variable, get_request($form_variable, 1));
+			$this->addVar('form_refresh',get_request('form_refresh',0)+1);
 
 			$this->bottom_items = new CCol(SPACE,'form_row_last');
-		        $this->bottom_items->SetColSpan(2);
+		        $this->bottom_items->setColSpan(2);
 		}
 		
-		function SetAction($value){
+		function setAction($value){
 			
 			if(is_string($value))
-				return parent::SetAction($value);
+				return parent::setAction($value);
 			elseif(is_null($value))
-				return parent::SetAction($value);
+				return parent::setAction($value);
 			else
 				return $this->error("Incorrect value for SetAction [$value]");
 		}
 		
-		function SetName($value){
+		function setName($value){
 			if(!is_string($value)){
 				return $this->error("Incorrect value for SetAlign [$value]");
 			}
-			$this->AddOption('name',$value);
-			$this->AddOption('id',$value);
+			$this->addOption('name',$value);
+			$this->addOption('id',$value);
 		return true;
 		}
 		
-		function SetAlign($value){
+		function setAlign($value){
 			if(!is_string($value)){
 				return $this->error("Incorrect value for SetAlign [$value]");
 			}
 			return $this->align = $value;
 		}
 
-		function SetTitle($value=NULL){
+		function setTitle($value=NULL){
 			if(is_null($value)){
 				unset($this->title);
 				return 0;
@@ -101,7 +101,7 @@
 			$this->title = unpack_object($value);
 		}
 		
-		function SetHelp($value=NULL){
+		function setHelp($value=NULL){
 			if(is_null($value)) {
 				$this->help = new CHelp();
 			} 
@@ -110,8 +110,8 @@
 			} 
 			else if(is_string($value)) {
 				$this->help = new CHelp($value);
-				if($this->GetName()==NULL)
-					$this->SetName($value);
+				if($this->getName()==NULL)
+					$this->setName($value);
 			} 
 			else {
 				return $this->error("Incorrect value for SetHelp [$value]");
@@ -119,21 +119,21 @@
 			return 0;
 		}
 		
-		function AddVar($name, $value){
-			$this->AddItemToTopRow(new CVar($name, $value));
+		function addVar($name, $value){
+			$this->addItemToTopRow(new CVar($name, $value));
 		}
 		
-		function AddItemToTopRow($value){
+		function addItemToTopRow($value){
 			array_push($this->top_items, $value);
 		}
 		
-		function AddRow($item1, $item2=NULL, $class=NULL){
+		function addRow($item1, $item2=NULL, $class=NULL){
 			if(strtolower(get_class($item1)) == 'crow'){
 			
 			} 
 			else if(strtolower(get_class($item1)) == 'ctable'){
 				$td = new CCol($item1,'form_row_c');
-				$td->SetColSpan(2);
+				$td->setColSpan(2);
 				
 				$item1 = new CRow($td);
 			} 
@@ -157,7 +157,7 @@
 			array_push($this->center_items, $item1);
 		}
 		
-		function AddSpanRow($value, $class=NULL){
+		function addSpanRow($value, $class=NULL){
 			if(is_string($value))
 				$item1=nbsp($value);
 
@@ -165,16 +165,16 @@
 			if(is_null($class)) $class = 'form_row_c';
 
 			$col = new CCol($value,$class);
-		        $col->SetColSpan(2);
+		        $col->setColSpan(2);
 			array_push($this->center_items,new CRow($col));
 		}
 		
 		
-		function AddItemToBottomRow($value){
-			$this->bottom_items->AddItem($value);
+		function addItemToBottomRow($value){
+			$this->bottom_items->addItem($value);
 		}
 
-		function SetTableClass($class){
+		function setTableClass($class){
 			if(is_string($class)){
 				$this->tableclass = $class;
 			}
@@ -186,25 +186,25 @@
 
 			$tbl = new CTable(NULL,$this->tableclass);
 
-			$tbl->SetOddRowClass('form_odd_row');
-			$tbl->SetEvenRowClass('form_even_row');
-			$tbl->SetCellSpacing(0);
-			$tbl->SetCellPadding(1);
-			$tbl->SetAlign($this->align);
+			$tbl->setOddRowClass('form_odd_row');
+			$tbl->setEvenRowClass('form_even_row');
+			$tbl->setCellSpacing(0);
+			$tbl->setCellPadding(1);
+			$tbl->setAlign($this->align);
 # add first row
 			$col = new CCol(NULL,'form_row_first');
-			$col->SetColSpan(2);
+			$col->setColSpan(2);
 			
-			if(isset($this->help))			$col->AddItem($this->help);
-			if(isset($this->title))		 	$col->AddItem($this->title);
-			foreach($this->top_items as $item)	$col->AddItem($item);
+			if(isset($this->help))			$col->addItem($this->help);
+			if(isset($this->title))		 	$col->addItem($this->title);
+			foreach($this->top_items as $item)	$col->addItem($item);
 			
-			$tbl->SetHeader($col);
+			$tbl->setHeader($col);
 # add last row
-			$tbl->SetFooter($this->bottom_items);
+			$tbl->setFooter($this->bottom_items);
 # add center rows
 			foreach($this->center_items as $item){
-				$tbl->AddRow($item);
+				$tbl->addRow($item);
 			}
 		return $tbl->ToString();
 		}

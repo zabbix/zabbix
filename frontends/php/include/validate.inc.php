@@ -27,7 +27,7 @@
 	define('ZBX_VALID_ERROR',	1);
 	define('ZBX_VALID_WARNING',	2);
 
-	function	is_int_range($value){
+	function is_int_range($value){
 		if( !empty($value) ) foreach(explode(',',$value) as $int_range){
 			$int_range = explode('-', $int_range);
 			if(count($int_range) > 2) return false;
@@ -38,35 +38,35 @@
 		return true;
 	}
 	
-	function	is_hex_color($value){
+	function is_hex_color($value){
 		return eregi('^[0-9,A-F]{6}$', $value);
 	}
 	
-	function	BETWEEN($min,$max,$var=NULL){
+	function BETWEEN($min,$max,$var=NULL){
 		return "({".$var."}>=".$min."&&{".$var."}<=".$max.")&&";
 	}
 
-	function	GT($value,$var=''){
+	function GT($value,$var=''){
 		return "({".$var."}>=".$value.")&&";
 	}
 
-	function	IN($array,$var=''){
+	function IN($array,$var=''){
 		if(is_array($array)) $array = implode(',', $array);
 
 		return "str_in_array({".$var."},array(".$array."))&&";
 	}
-	function	HEX($var=NULL){
+	function HEX($var=NULL){
 		return "ereg(\"^[a-zA-Z0-9]{1,}$\",{".$var."})&&";
 	}
-	function	KEY_PARAM($var=NULL){
+	function KEY_PARAM($var=NULL){
 		return 'ereg(\'^([0-9a-zA-Z\_\.[.'.ZBX_EREG_MINUS_SYMB.'.]\$ ]+)$\',{'.$var.'})&&';
 	}
-	function	validate_ipv4($str,&$arr){
+	function validate_ipv4($str,&$arr){
 		if( !ereg('^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$', $str, $arr) )	return false;
 		for($i=1; $i<=4; $i++)	if( !is_numeric($arr[$i]) || $arr[$i] > 255 || $arr[$i] < 0 )	return false;
 		return true;
 	}
-	function	validate_ipv6($str,&$arr){
+	function validate_ipv6($str,&$arr){
 		$pattern1 = '([A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}';
 		$pattern2 = ':(:[A-Fa-f0-9]{1,4}){1,7}';
 		$pattern3 = '[A-Fa-f0-9]{1,4}::([A-Fa-f0-9]{1,4}:){0,5}[A-Fa-f0-9]{1,4}';
@@ -82,7 +82,7 @@
 		return true;
 	}
 
-	function	validate_ip($str,&$arr){
+	function validate_ip($str,&$arr){
 		if(validate_ipv4($str,$arr))
 			return true;
 		if(defined('ZBX_HAVE_IPV6')){
@@ -91,7 +91,7 @@
 		return false;
 	}
 
-/*	function	validate_ip_range($str){
+/*	function validate_ip_range($str){
 		foreach(explode(',',$str) as $ip_range){
 			$ip_parts = explode('.', $ip_range);
 			if(count($ip_parts) != 4) return false;
@@ -111,7 +111,7 @@
 		return true;
 	}
 */
-	function	validate_ip_range($str){
+	function validate_ip_range($str){
 		foreach(explode(',',$str) as $ip_range){
 			$parts = explode('-', $ip_range);
 			$parts_count = count($parts);
@@ -158,7 +158,7 @@
 		return false;
 	}
 */
-	function	validate_port_list($str){
+	function validate_port_list($str){
 		foreach(explode(',',$str) as $port_range){
 			$port_range = explode('-', $port_range);
 			if(count($port_range) > 2) return false;
@@ -170,12 +170,12 @@
 	}
 
 
-	define("NOT_EMPTY","({}!='')&&");
-	define("DB_ID","({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
+	define('NOT_EMPTY',"({}!='')&&");
+	define('DB_ID',"({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
-	function	calc_exp2($fields,$field,$expression){
+	function calc_exp2($fields,$field,$expression){
 		foreach($fields as $f => $checks){
 /*
 			// If an unset variable used in expression, return FALSE
@@ -189,8 +189,9 @@
 			$expression = str_replace('{'.$f.'}','$_REQUEST["'.$f.'"]',$expression);
 //$debug .= $f." = ".$_REQUEST[$f].SBR;
 		}
-		$expression = trim($expression,"& ");
-		$exec = "return (".$expression.") ? 1 : 0;";
+
+		$expression = trim($expression,'& ');
+		$exec = 'return ('.$expression.')?1:0;';
 		$ret = eval($exec);
 //echo $debug;
 //echo "$field - result: ".$ret." exec: $exec".SBR.SBR;
@@ -200,7 +201,6 @@
 
 	function calc_exp($fields,$field,$expression){
 //SDI("$field - expression: ".$expression);
-
 		if(zbx_strstr($expression,'{}') && !isset($_REQUEST[$field]))
 			return FALSE;
 
@@ -217,6 +217,7 @@
 			}	
 			return TRUE;
 		}
+
 //SDI("$field - expression: ".$expression);
 		return calc_exp2($fields,$field,$expression);
 	}
@@ -229,7 +230,7 @@
 		}
 	}
 
-	function	unset_if_zero($fields){
+	function unset_if_zero($fields){
 		foreach($fields as $field => $checks){
 			list($type,$opt,$flags,$validation,$exception)=$checks;
 
@@ -240,7 +241,7 @@
 	}
 
 
-	function	unset_action_vars($fields){
+	function unset_action_vars($fields){
 		foreach($fields as $field => $checks){
 			list($type,$opt,$flags,$validation,$exception)=$checks;
 			
@@ -250,13 +251,13 @@
 		}
 	}
 
-	function	unset_all(){
+	function unset_all(){
 		foreach($_REQUEST as $key => $val){
 			unset_request($key,'unset_all');
 		}
 	}
 
-	function 	check_type(&$field, $flags, &$var, $type){
+	function check_type(&$field, $flags, &$var, $type){
 		if(is_array($var) && $type != T_ZBX_IP){
 			$err = ZBX_VALID_OK;
 			foreach($var as $el){
@@ -373,7 +374,7 @@
 		return ZBX_VALID_OK;
 	}
 
-	function	check_trim(&$var){
+	function check_trim(&$var){
 		if(is_string($var)) {
 			$var = trim($var);
 		}
@@ -428,8 +429,12 @@
 			}
 		}
 		else if($opt == O_OPT){
-			if(!isset($_REQUEST[$field]))
+			if(!isset($_REQUEST[$field])){
 				return ZBX_VALID_OK;
+			}
+			else if(($flags&P_ACT) && !isset($_REQUEST['zbx_form'])){
+				return ZBX_VALID_ERROR;
+			}
 		}
 
 		check_trim($_REQUEST[$field]);
@@ -458,17 +463,21 @@
 		return ZBX_VALID_OK;
 	}
 
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//		VAR							TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$system_fields=array(
-		"sessionid"=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	HEX(),NULL),
-		"switch_node"=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
-		"triggers_hash"=>	array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,NULL),
-		'print'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN("1"),NULL),
+		'sessionid'=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	HEX(), 'isset({zbx_form})'),
+		'zbx_form'=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY, NULL),
+// 
+		'switch_node'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
+		'triggers_hash'=>	array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,NULL),
+		'print'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('1'),NULL),
+		
+// table sorting
 		'sort'=>			array(T_ZBX_STR, O_OPT,	 P_SYS,	NULL,NULL),
 		'sortorder'=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	NULL,NULL)
 	);
 
-	function	invalid_url(){
+	function invalid_url(){
 		include_once "include/page_header.php";
 		unset_all();
 		show_error_message(S_INVALID_URL);
