@@ -27,7 +27,8 @@
 			$this->setAction($action);
 			$this->setEnctype($enctype);
 			
-			$this->addVar('sessionid', $_COOKIE['zbx_sessionid']);
+			if(isset($_COOKIE['zbx_sessionid']))
+				$this->addVar('sessionid', $_COOKIE['zbx_sessionid']);
 		}
 		
 		function setMethod($value='post'){
