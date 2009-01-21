@@ -74,9 +74,11 @@ inloadobj:		new Array(),			// array containing updated obj and statuses
 	update: function(obj4update,time){
 		obj4update.ready = false;
 		obj4update.params.upd_counter++;
-		
-		var uri = new Curl(obj4update.url);
-		new Ajax.Updater(obj4update.id, obj4update.url,
+
+		var uri = new url(obj4update.url);
+		uri.setArgument('sessionid', cookie.read('zbx_sessionid'));
+
+		new Ajax.Updater(obj4update.id, uri.getUrl(),//obj4update.url,
 			{
 				method: 'post',
 				'parameters':	obj4update.params,

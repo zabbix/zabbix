@@ -171,10 +171,9 @@ frontends/php/js/blink.js -text
 frontends/php/js/calendar.js -text
 frontends/php/js/chkbxrange.js -text
 frontends/php/js/common.js -text
-frontends/php/js/cookies.js -text
 frontends/php/js/cscreen.js -text
-frontends/php/js/curl.js -text
 frontends/php/js/gmenu.js -text
+frontends/php/js/gpc.js -text
 frontends/php/js/graphs.js -text
 frontends/php/js/menu.js -text
 frontends/php/js/menu_scripts.js -text

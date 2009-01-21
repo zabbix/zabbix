@@ -213,8 +213,7 @@ var $maxlevel=0;
 	/*public*/ function CreateJS(){
 	global $page;
 		$js = '
-		<script src="js/tree.js" type="text/javascript"></script>
-		<script src="js/cookies.js" type="text/javascript"></script>	
+		<script src="js/tree.js" type="text/javascript"></script>	
 		<script type="text/javascript"> 
 				var treenode = new Array(0);
 				var tree_name = "tree_'.$this->getUserAlias().'_'.$page["file"].'";
