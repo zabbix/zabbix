@@ -42,8 +42,8 @@ include_once "include/page_header.php";
 		'view_style'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 		'type'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 		
-		'output'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'jsscriptid'=>	array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'output'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,			NULL),
+		'jsscriptid'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,			NULL),
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 		
 //ajax
@@ -56,7 +56,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
-	
+
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 // ACTION /////////////////////////////////////////////////////////////////////////////
 	if(isset($_REQUEST['favobj'])){

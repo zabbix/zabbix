@@ -33,8 +33,8 @@
 		"password"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({enter})'),
 		"sessionid"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		NULL),
 		"message"=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		NULL),
-		"reconnect"=>		array(T_ZBX_INT, O_OPT,	P_ACT, BETWEEN(0,65535),NULL),
-		"enter"=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,    NULL,   NULL),
+		"reconnect"=>		array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(0,65535),NULL),
+		"enter"=>			array(T_ZBX_STR, O_OPT, P_SYS,    NULL,   NULL),
 		"form"=>			array(T_ZBX_STR, O_OPT, P_SYS,  NULL,   	NULL),
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT, NULL,   NULL,   	NULL)
 	);

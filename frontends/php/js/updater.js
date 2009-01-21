@@ -27,7 +27,7 @@ inloadobj:		new Array(),			// array containing updated obj and statuses
 
 	setObj4Update: function(id,frequency,url,params){
 		var obj = document.getElementById(id);
-		if((typeof(obj) == 'undefined')) return false; 
+		if(typeof(obj) == 'undefined') return false; 
 	
 		var obj4update = {
 			'id': 		id,
@@ -65,7 +65,9 @@ inloadobj:		new Array(),			// array containing updated obj and statuses
 		obj4update.ready = false;
 		
 		var uri = new url(obj4update.url);
-		new Ajax.Updater(obj4update.id, obj4update.url,
+		uri.setArgument('sessionid', cookie.read('zbx_sessionid'));
+
+		new Ajax.Updater(obj4update.id, uri.getUrl(),//obj4update.url,
 			{
 				method: 'post',
 				'parameters':	obj4update.params,

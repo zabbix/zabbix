@@ -19,6 +19,8 @@
 **/
 
 function send_params(params){
+	if(typeof(params) == 'undefined') var params = new Array();
+	params['sessionid'] = cookie.read('zbx_sessionid');
 
 	var uri = new url(location.href);
 	new Ajax.Request(uri.getPath()+"?output=ajax",

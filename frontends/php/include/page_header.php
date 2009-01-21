@@ -428,8 +428,8 @@ COpt::profiling_start("page");
 
 <script type="text/javascript" src="js/prototype.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript" src="js/gpc.js"></script>
 <script type="text/javascript" src="js/ajax_req.js"></script>
-<script type="text/javascript" src="js/url.js"></script>
 <script type="text/javascript" src="js/chkbxrange.js"></script>
 <?php
 	if(isset($page['scripts']) && is_array($page['scripts'])){
