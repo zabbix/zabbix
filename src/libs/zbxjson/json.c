@@ -103,6 +103,7 @@ static void	__zbx_json_realloc(struct zbx_json *j, size_t need)
 
 	if (1 == realloc) {
 		if (j->buffer == j->buf_stat) {
+			j->buffer = NULL;
 			j->buffer = zbx_malloc(j->buffer, j->buffer_allocated);
 			memcpy(j->buffer, j->buf_stat, sizeof(j->buf_stat));
 		} else
