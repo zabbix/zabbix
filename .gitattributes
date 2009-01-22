@@ -177,6 +177,7 @@ frontends/php/js/gpc.js -text
 frontends/php/js/graphs.js -text
 frontends/php/js/menu.js -text
 frontends/php/js/menu_scripts.js -text
+frontends/php/js/pmaster.js -text
 frontends/php/js/prototype.js -text
 frontends/php/js/sbinit.js -text
 frontends/php/js/sbox.js -text
@@ -191,7 +192,6 @@ frontends/php/js/scrollbar.js -text
 frontends/php/js/services.js -text
 frontends/php/js/showhint.js -text
 frontends/php/js/tree.js -text
-frontends/php/js/updater.js -text
 frontends/php/locales.php -text
 frontends/php/popup_bitem.php -text
 frontends/php/popup_link_tr.php -text
