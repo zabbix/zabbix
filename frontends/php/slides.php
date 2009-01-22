@@ -29,7 +29,7 @@
 	$page['title'] = "S_CUSTOM_SCREENS";
 	$page['file'] = 'slides.php';
 	$page['hist_arg'] = array('config','elementid');
-	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js','updater.js','menu_scripts.js'); //do not change order!!!
+	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js','pmaster.js','menu_scripts.js'); //do not change order!!!
 
 	$_REQUEST['config'] = get_request('config',get_profile('web.screens.config',0));
 
@@ -68,6 +68,7 @@ include_once 'include/page_header.php';
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,			null),
+		'pmasterid'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	null,			NULL),
 
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
@@ -77,9 +78,12 @@ include_once 'include/page_header.php';
 	check_fields($fields);
 
 	if(isset($_REQUEST['favobj'])){
+		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
+		
 		if('hat' == $_REQUEST['favobj']){
 			update_profile('web.screens.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
+		
 		if(in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
@@ -127,16 +131,16 @@ include_once 'include/page_header.php';
 				update_profile('web.slides.rf_rate.'.$_REQUEST['favid'],$_REQUEST['favcnt'], PROFILE_TYPE_INT);
 				$_REQUEST['favcnt'] = get_profile('web.slides.rf_rate.'.$_REQUEST['favid'],30);
 
-				$refresh_el = array('id' => 'hat_slides',
-							'interval' => get_profile('web.slides.rf_rate.hat_slides',30),
-							'url' => 'slides.php?elementid='.$elementid.url_param('stime').url_param('period'),
-							);
-				print get_refresh_obj_script($refresh_el);
+				$script = get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $_REQUEST['favcnt']);
+				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'url', 'slides.php?elementid='.$elementid.url_param('stime').url_param('period'));
+				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'stopDoll');
+				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'startDoll');
+				print $script;
 				
 				$menu = array();
 				$submenu = array();
 				
-				make_refresh_menu($_REQUEST['favid'],$_REQUEST['favcnt'],array('elementid'=> $elementid),$menu,$submenu);
+				make_refresh_menu('mainpage', $_REQUEST['favid'],$_REQUEST['favcnt'],array('elementid'=> $elementid),$menu,$submenu);
 				
 				print 'page_menu["menu_'.$_REQUEST['favid'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favid']]).';';
 			}
@@ -318,7 +322,7 @@ include_once 'include/page_header.php';
 	$submenu = array();
 
 // js menu arrays	
-	make_refresh_menu('hat_slides',get_profile('web.slides.rf_rate.hat_slides',30),array('elementid'=> $elementid),$menu,$submenu);
+	make_refresh_menu('mainpage','hat_slides',get_profile('web.slides.rf_rate.hat_slides',30),array('elementid'=> $elementid),$menu,$submenu);
 
 	insert_js('var page_menu='.zbx_jsvalue($menu).";\n".
 			 'var page_submenu='.zbx_jsvalue($submenu).";\n"
@@ -336,11 +340,11 @@ include_once 'include/page_header.php';
 
 	$refresh_tab = array(
 		array('id' => 'hat_slides',
-				'interval' => get_profile('web.slides.rf_rate.hat_slides',30),
+				'frequency' => get_profile('web.slides.rf_rate.hat_slides',30),
 				'url' => 'slides.php?elementid='.$elementid.url_param('stime').url_param('period').url_param('groupid').url_param('hostid'),
 				'params'=> array('lastupdate' => time()),
 			));
-	add_refresh_objects($refresh_tab);
+	add_doll_objects($refresh_tab);
 	
 	$refresh_icon = new CDiv(SPACE,'iconmenu');
 	$refresh_icon->addAction('onclick','javascript: create_page_menu(event,"hat_slides");');
