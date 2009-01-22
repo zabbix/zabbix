@@ -136,7 +136,6 @@ debug: function(str){
 		if(this.debug_status == 2){
 			SDI(str);
 		}
-	}
-	
+	}	
 }
 }

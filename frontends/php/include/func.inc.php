@@ -20,44 +20,58 @@
 ?>
 <?php
 /************* DYNAMIC REFRESH *************/
-
-function add_refresh_objects($ref_tab){
-	$min = 2147483647; // PHP_INT_MAX
-	foreach($ref_tab as $id => $obj){
-		$obj['interval'] = (isset($obj['interval']))?$obj['interval']:60;
-		zbx_add_post_js(get_refresh_obj_script($obj));
+function add_doll_objects($ref_tab, $pmid='mainpage'){	
+	$upd_script = array();
+	foreach($ref_tab as $id => $doll){
+		$upd_script[$doll['id']] = format_doll_init($doll);
+	}		
 		
-		$min = ($min < $obj['interval'])?$min:$obj['interval'];
+	zbx_add_post_js('initPMaster('.zbx_jsvalue($pmid).','.zbx_jsvalue($upd_script).');');
+}
+
+function format_doll_init($doll){
+	global $USER_DETAILS;
+	
+	$args = array('frequency' => 60,
+					'url' => '',
+					'counter' => 0,
+					'darken' => 0,
+					'params' => array()
+				);
+	
+	foreach($args as $key => $def){
+		if(isset($doll[$key])) $obj[$key] = $doll[$key];
+		else $obj[$key] = $def;
 	}
-	zbx_add_post_js('updater.interval = 10; updater.check4Update();');
-}
-
-function get_refresh_obj_script($obj){
-	$obj['url'] = isset($obj['url'])?$obj['url']:'';
-	$obj['url'].= (zbx_empty($obj['url'])?'?':'&').'output=html';
 	
-	if(!isset($obj['params'])) $obj['params'] = array();
+	$obj['url'].= (zbx_empty($obj['url'])?'?':'&').'output=html&sessionid='.$USER_DETAILS['sessionid'];
+	
 	$obj['params']['favobj'] = 'refresh';
-	$obj['params']['favid'] = $obj['id'];
+	$obj['params']['favid'] = $doll['id'];
 	
-return 'updater.setObj4Update("'.$obj['id'].'",'.$obj['interval'].',"'.$obj['url'].'",'.zbx_jsvalue($obj['params']).');';
+return $obj;
 }
 
-function make_refresh_menu($id,$cur_interval,$params=null,&$menu,&$submenu){
+function get_update_doll_script($pmasterid, $dollid, $key, $value=''){
+	$script = 'PMasters['.zbx_jsvalue($pmasterid).'].dolls['.zbx_jsvalue($dollid).'].'.$key.'('.zbx_jsvalue($value).');';
+return $script;
+}
 
-	$menu['menu_'.$id][] = array(S_REFRESH, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
+function make_refresh_menu($pmid,$dollid,$cur_interval,$params=null,&$menu,&$submenu){
+
+	$menu['menu_'.$dollid][] = array(S_REFRESH, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$intervals = array('10','30','60','120','600','900');
 	
 	foreach($intervals as $key => $value){
-		$menu['menu_'.$id][] = array(
+		$menu['menu_'.$dollid][] = array(
 					S_EVERY.SPACE.$value.SPACE.S_SECONDS_SMALL, 
-					'javascript: setRefreshRate("'.$id.'",'.$value.','.zbx_jsvalue($params).');'.
+					'javascript: setRefreshRate('.zbx_jsvalue($pmid).','.zbx_jsvalue($dollid).','.$value.','.zbx_jsvalue($params).');'.
 					'void(0);',	
 					null, 
 					array('outer' => ($value == $cur_interval)?'pum_b_submenu':'pum_o_submenu', 'inner'=>array('pum_i_submenu')
 			));
 	}
-	$submenu['menu_'.$id][] = array();
+	$submenu['menu_'.$dollid][] = array();
 }
 
 /************* END REFRESH *************/

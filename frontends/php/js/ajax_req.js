@@ -35,16 +35,17 @@ function send_params(params){
 }
 
 
-function setRefreshRate(id,interval,params){
+function setRefreshRate(pmasterid,dollid,interval,params){
 	if(typeof(Ajax) == 'undefined'){
 		throw("Prototype.js lib is required!");
 		return false;
 	}
 	
-	if((typeof(params) == 'undefined') || is_null(params))  var params = {};
-	params['favobj'] = 'set_rf_rate';
-	params['favid'] = 	id;
-	params['favcnt'] = 	interval;
+	if((typeof(params) == 'undefined') || is_null(params))  var params = new Array();
+	params['favobj'] = 		'set_rf_rate';
+	params['pmasterid'] = 	pmasterid;
+	params['favid'] = 		dollid;
+	params['favcnt'] = 		interval;
 
 	send_params(params);
 }
