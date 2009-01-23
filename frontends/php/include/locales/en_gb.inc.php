@@ -1646,7 +1646,8 @@
 	'S_CHINESE_CN'=>			'Chinese (CN)',
 	'S_DUTCH_NL'=>				'Dutch (NL)',
 	'S_HUNGARY_HU'=>			'Hungary (HU)',
-
+	'S_POLISH_PL'=>				'Polish (PL)',
+	
 //	index.php
 	'S_ZABBIX_BIG'=>			'ZABBIX',
 

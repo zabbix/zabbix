@@ -43,14 +43,14 @@
 <?php
 	$sessionid = get_cookie('zbx_sessionid', null);
 	
-	if(isset($_REQUEST["reconnect"]) && isset($sessionid)){
+	if(isset($_REQUEST['reconnect']) && isset($sessionid)){
 		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,'Manual Logout');
 		
 		zbx_unsetcookie('zbx_sessionid');
 		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
 		unset($sessionid);
 
-		redirect("index.php");
+		redirect('index.php');
 		die();
 //		return;
 	}
@@ -62,7 +62,7 @@
 		if(isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])){
 			if(!isset($sessionid)) $_REQUEST['enter'] = 'Enter';
 			
-			$_REQUEST['name'] = $_SERVER["PHP_AUTH_USER"];
+			$_REQUEST['name'] = $_SERVER['PHP_AUTH_USER'];
 			$_REQUEST['password'] = 'zabbix';//$_SERVER["PHP_AUTH_PW"];
 		}
 		else{
@@ -143,16 +143,16 @@
 			
 			DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.$row['userid'].','.time().','.ZBX_SESSION_ACTIVE.')');
 
-			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,"Correct login [".$name."]");
+			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,'Correct login ['.$name.']');
 			
-			if(empty($row["url"])){
+			if(empty($row['url'])){
 				$USER_DETAILS['alias'] = $row['alias'];
 				$USER_DETAILS['userid'] = $row['userid'];
 				
-				$row["url"] = get_profile('web.menu.view.last','index.php');
+				$row['url'] = get_profile('web.menu.view.last','index.php');
 				unset($USER_DETAILS);
 			}
-			redirect($row["url"]);
+			redirect($row['url']);
 			die();
 //			return;
 		}
@@ -193,7 +193,7 @@ include_once "include/page_header.php";
 				$frmLogin->AddItemToBottomRow(new CButton('enter','Enter'));
 				$frmLogin->Show(false);
 		
-				SetFocus($frmLogin->GetName(),"name");
+				SetFocus($frmLogin->GetName(),'name');
 				
 				$frmLogin->Destroy();
 		}

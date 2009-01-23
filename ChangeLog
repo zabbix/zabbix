@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-672] added polish locale (Artem)
  - [ZBX-671] removed net-snmp debug messages from server logs (Sasha)
  - [ZBX-662] fixed support of quotation marks in command in UserParameter's (Sasha)
  - [ZBX-658] fixed deadlocks in dbcache module (Sasha)
