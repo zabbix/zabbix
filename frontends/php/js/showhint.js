@@ -1,15 +1,23 @@
 // JavaScript Document
-function GetPos(obj)
-{
-	var left = obj.offsetLeft;
-	var top  = obj.offsetTop;;
-	while (obj = obj.offsetParent)
-	{
-		left	+= obj.offsetLeft
-		top	+= obj.offsetTop
-	}
-	return [left,top];
-}
+/*
+** ZABBIX
+** Copyright (C) 2000-2007 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**
+*/
 
 var hint_box = null;
 
@@ -30,23 +38,32 @@ function show_hint_ext(obj, e, hint_text, width, class_name)
 {
 	if(!hint_box) return;
 
-	var cursor = get_cursor_position(e);
-	
-	if(class_name != "")
-	{
+	if(class_name != ""){
 		hint_text = "<span class=" + class_name + ">" + hint_text + "</"+"span>";
 	}
 
 	hint_box.innerHTML = hint_text;
 	hint_box.style.width = width;
 
-	var pos = GetPos(obj);
+	var cursor = get_cursor_position(e);
+	var pos = getPosition(obj);
 
-	hint_box.x	= pos[0];
-	hint_box.y	= pos[1];
+	var body_width = get_bodywidth();
 
-	hint_box.style.left	= cursor.x + 10 + "px";
-	//hint_box.style.left	= hint_box.x + obj.offsetWidth + 10 + "px";
+	if(parseInt(cursor.x+10+hint_box.offsetWidth) > body_width){
+		cursor.x-=parseInt(hint_box.offsetWidth);
+		cursor.x-=10;
+		cursor.x=(cursor.x < 0)?0:cursor.x;
+	}
+	else{
+		cursor.x+=10;
+	}
+
+	hint_box.x	= cursor.x;
+	hint_box.y	= pos.top;
+
+	hint_box.style.left = cursor.x + "px";
+//	hint_box.style.left	= hint_box.x + obj.offsetWidth + 10 + "px";
 	hint_box.style.top	= hint_box.y + obj.offsetHeight + "px";
 
 	hint_box.style.visibility = "visible";
@@ -56,12 +73,22 @@ function show_hint_ext(obj, e, hint_text, width, class_name)
 function update_hint(obj, e)
 {
 	if(!hint_box) return;
+	if('undefined' == typeof(hint_box.y)) return;
 
 	var cursor = get_cursor_position(e);
+	var body_width = get_bodywidth();
+	
+	if(parseInt(cursor.x+10+hint_box.offsetWidth) > body_width){
+		cursor.x-=parseInt(hint_box.offsetWidth);
+		cursor.x-=10;
+		cursor.x=(cursor.x < 0)?0:cursor.x;
+	}
+	else{
+		cursor.x+=10;
+	}
 
-	var pos = GetPos(obj);
-
-	hint_box.style.left     = cursor.x + 10 + "px";
+	hint_box.style.left     = cursor.x + "px";
+//	hint_box.style.left		= hint_box.x + obj.offsetWidth + 10 + "px";
 	hint_box.style.top      = hint_box.y + obj.offsetHeight + "px";
 }
 
