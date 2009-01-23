@@ -110,6 +110,7 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 
 		AC_DEFINE(HAVE_NETSNMP,1,[Define to 1 if NET-SNMP should be enabled.])
 		AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
+		AC_DEFINE([SNMP_NO_DEBUGGING],[],[Disabling debugging messages from NET-SNMP library])
 
 		found_netsnmp="yes"
 	else
