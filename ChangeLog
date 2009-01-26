@@ -20,6 +20,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-675] fixed wrong result of function "nodata" after server restart (Sasha)
  - [ZBX-672] added polish locale (Artem)
  - [ZBX-671] removed net-snmp debug messages from server logs (Sasha)
  - [ZBX-662] fixed support of quotation marks in command in UserParameter's (Sasha)
