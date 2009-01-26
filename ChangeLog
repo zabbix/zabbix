@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [ZBX-675] fixed wrong result of function "nodata" after server restart (Sasha)
  - [NTD-62] fixed runtime error is occurred by Configuration-Actions (Artem)
  - [ZBX-656] fixed possible warning in server log zbx_malloc: allocating already allocated memory in json.c (Sasha)
  - [ZBX-506] fixed duplicate UnavailableDelay in zabbix_server.conf (Sasha)
