@@ -1082,18 +1082,21 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, int parameter, int flag, t
  ******************************************************************************/
 static int	evaluate_NODATA(char *value, DB_ITEM *item, int parameter, time_t now)
 {
-	int	res = SUCCEED;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_NODATA()");
 
-	if (CONFIG_SERVER_STARTUP_TIME + parameter > now || item->lastclock + parameter > now)
+	if (item->lastclock + parameter > now)
 		strcpy(value,"0");
 	else
+	{
+		if (CONFIG_SERVER_STARTUP_TIME + parameter > now)
+			return FAIL;
+
 		strcpy(value,"1");
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of evaluate_NODATA()");
 
-	return res;
+	return SUCCEED;
 }
 
 /******************************************************************************
