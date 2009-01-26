@@ -1,5 +1,6 @@
 Changes for 1.4.7:
 
+ - [ZBX-675] fixed wrong result of function "nodata" after server restart (Sasha)
  - [ZBX-623] fixed incorrect processing of function abschange() for integers(Sasha)
  - [ZBX-619] fixed agent crash for system.uptime under Solaris 2.5.1 (Sasha)
  - [ZBX-610] fixed memory leak in external checks (Sasha)
