@@ -770,9 +770,9 @@ else {
 				$items = array_chunk($array, 950);
 				foreach($items as $id => $values){
 					$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
-					$condition.= implode($glue,$values);
 					
-					if($string) $condition= "'".$condition."'";
+					if($string)	$condition.= "'".implode($glue,$values)."'";
+					else		$condition.= implode($glue,$values);
 				}
 				break;
 		}
