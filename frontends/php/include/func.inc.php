@@ -179,7 +179,7 @@ function zbx_flush_post_cookies($unset=false){
 function zbx_set_post_cookie($name, $value, $time=null){
 	global $ZBX_PAGE_COOKIES;
 
-	$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time) ? $time : (0));
+	$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time)?$time:0);
 }
 
 /************ END COOKIES ************/
