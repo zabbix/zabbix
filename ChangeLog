@@ -20,6 +20,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-678] default number of HTTP pollers was decreased to one (Sasha)
  - [ZBX-676] fixed sql problem with deletion of many hosts (Artem)
  - [ZBX-675] fixed wrong result of function "nodata" after server restart (Sasha)
  - [ZBX-672] added polish locale (Artem)
