@@ -886,7 +886,7 @@
 					$action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r.'#form';
 				else
 					$action = NULL;
-
+					
 				if($editmode == 1 && isset($_REQUEST["form"]) && 
 					isset($_REQUEST["x"]) && $_REQUEST["x"]==$c &&
 					isset($_REQUEST["y"]) && $_REQUEST["y"]==$r)

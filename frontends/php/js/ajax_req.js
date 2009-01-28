@@ -20,14 +20,16 @@
 
 function send_params(params){
 	if(typeof(params) == 'undefined') var params = new Array();
-	params['sessionid'] = cookie.read('zbx_sessionid');
 
 	var uri = new url(location.href);
-	new Ajax.Request(uri.getPath()+"?output=ajax",
+	uri.setQuery('?output=ajax');
+
+	new Ajax.Request(uri.getUrl(),
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(resp){ },//alert(resp.responseText);
+						'onSuccess': function(resp){ },
+//						'onSuccess': function(resp){ alert(resp.responseText); },
 						'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);

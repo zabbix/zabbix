@@ -44,7 +44,7 @@ function check_authorisation(){
 	$USER_DETAILS = NULL;
 	$login = FALSE;
 	
-	$sessionid = get_request('sessionid',get_cookie('zbx_sessionid'));
+	$sessionid = get_cookie('zbx_sessionid');
 
 	if(!is_null($sessionid)){
 		$sql = 'SELECT u.*,s.* '.

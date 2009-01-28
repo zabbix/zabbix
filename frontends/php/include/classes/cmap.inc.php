@@ -19,78 +19,75 @@
 **/
 ?>
 <?php
-	class CMap extends CTag
-	{
+class CMap extends CTag{
 /* public */
-		function CMap($name="")
-		{
-			parent::CTag("map","yes");
-			$this->SetName($name);
-		}
-		function AddRectArea($x1,$y1,$x2,$y2,$href,$alt)
-		{ 
-			return $this->AddArea(array($x1,$y1,$x2,$y2),$href,$alt,'rect'); 
-		}
-		function AddArea($coords,$href,$alt,$shape)
-		{
-			return $this->AddItem(new CArea($coords,$href,$alt,$shape));
-		}
-		function AddItem($value)
-		{
-			if(strtolower(get_class($value)) != 'carea')
-				return $this->error("Incorrect value for AddItem [$value]");
+	function CMap($name=''){
+		parent::CTag('map','yes');
+		$this->setName($name);
+	}
+	
+	function addRectArea($x1,$y1,$x2,$y2,$href,$alt){ 
+		return $this->addArea(array($x1,$y1,$x2,$y2),$href,$alt,'rect'); 
+	}
+	
+	function addArea($coords,$href,$alt,$shape){
+		return $this->addItem(new CArea($coords,$href,$alt,$shape));
+	}
+	
+	function addItem($value){
+		if(strtolower(get_class($value)) != 'carea')
+			return $this->error('Incorrect value for addItem ['.$value.']');
 
-			return parent::AddItem($value);
+		return parent::addItem($value);
+	}
+}
+
+class CArea extends CTag{
+	function CArea($coords,$href,$alt,$shape){
+		parent::CTag('area','no');
+		$this->setCoords($coords);
+		$this->setShape($shape);
+		$this->setHref($href);
+		$this->setAlt($alt);
+	}
+	
+	function setCoords($value){
+		if(!is_array($value))
+			return $this->error('Incorrect value for setCoords ['.$value.']');
+		if(count($value)<3)
+			return $this->error('Incorrect values count for setCoords ['.count($value).']');
+
+		$str_val = '';
+		foreach($value as $val){
+			if(!is_numeric($val))
+				return $this->error('Incorrect value for setCoords ['.$val.']');
+
+			$str_val .= $val.',';
 		}
+		$this->addOption('coords',trim($str_val,','));
 	}
 
-	class CArea extends CTag
-	{
-		function CArea($coords,$href,$alt,$shape)
-		{
-			parent::CTag("area","no");
-			$this->SetCoords($coords);
-			$this->SetShape($shape);
-			$this->SetHref($href);
-			$this->SetAlt($alt);
-		}
-		function SetCoords($value)
-		{
-			if(!is_array($value))
-				return $this->error("Incorrect value for SetCoords [$value]");
-			if(count($value)<3)
-				return $this->error("Incorrect values count for SetCoords [".count($value)."]");
+	function setShape($value){
+		if(!is_string($value))
+			return $this->error('Incorrect value for setShape ['.$value.']');
 
-			$str_val = "";
-			foreach($value as $val)
-			{
-				if(!is_numeric($val))
-					return $this->error("Incorrect value for SetCoords [$val]");
-
-				$str_val .= $val.",";
-			}
-			$this->AddOption("coords",trim($str_val,','));
-		}
-		function SetShape($value)
-		{
-			if(!is_string($value))
-				return $this->error("Incorrect value for SetShape [$value]");
-
-			$this->AddOption("shape",$value);
-		}
-		function SetHref($value)
-		{
-			if(!is_string($value))
-				return $this->error("Incorrect value for SetHref [$value]");
-
-			$this->AddOption("href",$value);
-		}
-		function SetAlt($value)
-		{
-			if(!is_string($value))
-				return $this->error("Incorrect value for SetAlt [$value]");
-
-			$this->AddOption("alt",$value);
-		}
+		$this->addOption('shape',$value);
 	}
+
+	function setHref($value){
+		if(!is_string($value))
+			return $this->error('Incorrect value for setHref ['.$value.']');
+		$url = new Curl($value);
+		$value = $url->getUrl();
+		
+		$this->addOption('href',$value);
+	}
+	
+	function setAlt($value){
+		if(!is_string($value))
+			return $this->error('Incorrect value for setAlt ['.$value.']');
+
+		$this->addOption('alt',$value);
+	}
+}
 ?>

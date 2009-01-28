@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,272 +19,258 @@
 **/
 ?>
 <?php
-	function destroy_objects()
-	{
-		global $GLOBALS;
+function destroy_objects(){
+	if(isset($GLOBALS)) foreach($GLOBALS as $name => $value){
+		if(!is_object($GLOBALS[$name])) continue;
+		unset($GLOBALS[$name]);
+	}
+}
 
-		if(isset($GLOBALS)) foreach($GLOBALS as $name => $value)
-		{
-			if(!is_object($GLOBALS[$name])) continue;
-			unset($GLOBALS[$name]);
+function unpack_object(&$item){
+	$res = '';
+
+	if(is_object($item)){
+		$res = $item->toString(false);
+	}
+	else if(is_array($item)){
+		foreach($item as $id => $dat)	
+			$res .= unpack_object($item[$id]); // Attention, recursion !!!
+	}
+	else if(!is_null($item)){
+		$res = strval($item);
+		unset($item);
+	}
+return $res;
+}
+
+function implode_objects($glue, &$pieces){
+	if( !is_array($pieces) )	return unpack_object($pieces);
+
+	foreach($pieces as $id => $piece)
+		$pieces[$id] = unpack_object($piece);
+
+return implode($glue, $pieces);
+}
+
+class CObject{
+	function CObject($items=null){
+		$this->items = array();
+		if(isset($items)){
+			$this->addItem($items);
 		}
 	}
 	
-	function unpack_object(&$item)
-	{
-		$res = "";
-
-		if(is_object($item))
-		{
-			$res = $item->ToString(false);
-		}
-		elseif(is_array($item))
-		{
-			foreach($item as $id => $dat)	
-				$res .= unpack_object($item[$id]); // Attention, recursion !!!
-		}
-		elseif(!is_null($item))
-		{
-			$res = strval($item);
-			unset($item);
-		}
+	function toString($destroy=true){
+		$res = implode('',$this->items);
+		if($destroy) $this->destroy();
 		return $res;
 	}
 
-	function implode_objects($glue, &$pieces)
-	{
-		if( !is_array($pieces) )	return unpack_object($pieces);
-
-		foreach($pieces as $id => $piece)
-			$pieces[$id] = unpack_object($piece);
-
-		return implode($glue, $pieces);
+	function show($destroy=true){
+		echo $this->toString($destroy);			
 	}
 
-	class CObject
-	{
-		function CObject($items=null)
-		{
-			$this->items = array();
-			if(isset($items))
-			{
-				$this->AddItem($items);
-			}
-		}
-		
-		function ToString($destroy=true)
-		{
-			$res = implode('',$this->items);
-			if($destroy) $this->Destroy();
-			return $res;
-		}
-
-		function Show($destroy=true){
-			echo $this->ToString($destroy);			
-		}
-
-		function Destroy()
-		{
+	function destroy(){
 // TODO Problem under PHP 5.0  "Fatal error: Cannot re-assign $this in ..."
 //			$this = null;
-			$this->CleanItems();
-		}
-
-		function CleanItems(){	
-			$this->items = array();	
-		}
-		
-		function ItemsCount(){	
-			return count($this->items);	
-		}
-		
-		function AddItem($value){
-		
-			if(is_object($value)){
-				array_push($this->items,unpack_object($value));
-			}
-			else if(is_string($value)){
-				array_push($this->items,str_replace(array('<','>','"'),array('&lt;','&gt;','&quot;'),$value));
-//				array_push($this->items,htmlspecialchars($value));
-			}
-			else if(is_array($value)){
-				foreach($value as $item){
-					$this->AddItem($item);			 // Attention, recursion !!!
-				}
-			}
-			else if(!is_null($value)){
-				array_push($this->items,unpack_object($value));
-			}
-		}
+		$this->cleanItems();
 	}
 
-	class CTag extends CObject{
-/* private *//*
-		var $tagname;
-		var $options = array();
-		var $paired;*/
-/* protected *//*
-		var $items = array();
+	function cleanItems(){	
+		$this->items = array();	
+	}
+	
+	function itemsCount(){	
+		return count($this->items);	
+	}
+	
+	function addItem($value){
+	
+		if(is_object($value)){
+			array_push($this->items,unpack_object($value));
+		}
+		else if(is_string($value)){
+			array_push($this->items,str_replace(array('<','>','"'),array('&lt;','&gt;','&quot;'),$value));
+//				array_push($this->items,htmlspecialchars($value));
+		}
+		else if(is_array($value)){
+			foreach($value as $item){
+				$this->addItem($item);			 // Attention, recursion !!!
+			}
+		}
+		else if(!is_null($value)){
+			array_push($this->items,unpack_object($value));
+		}
+	}
+}
 
-		var $tag_body_start;
-		var $tag_body_end;
-		var $tag_start;
-		var $tag_end;*/
+class CTag extends CObject{
+/* private *//*
+	var $tagname;
+	var $options = array();
+	var $paired;*/
+/* protected *//*
+	var $items = array();
+
+	var $tag_body_start;
+	var $tag_body_end;
+	var $tag_start;
+	var $tag_end;*/
 
 /* public */
-		function CTag($tagname=NULL, $paired='no', $body=NULL, $class=null){
-			parent::CObject();
+	function CTag($tagname=NULL, $paired='no', $body=NULL, $class=null){
+		parent::CObject();
 
-			$this->options = array();
+		$this->options = array();
 
-			if(!is_string($tagname)){
-				return $this->error('Incorrect tagname for CTag ['.$tagname.']');
-			}
-			
-			$this->tagname = $tagname;
-			$this->paired = $paired;
-
-			$this->tag_start = $this->tag_end = $this->tag_body_start = $this->tag_body_end = '';
-
-			if(is_null($body)){
-				$this->tag_end = $this->tag_body_start = "\n";
-			}
-			else{
-				CTag::AddItem($body);
-			}
-
-			$this->SetClass($class);
+		if(!is_string($tagname)){
+			return $this->error('Incorrect tagname for CTag ['.$tagname.']');
 		}
 		
-		function ShowStart()	{	echo $this->StartToString();	}
-		function ShowBody()	{	echo $this->BodyToString();	}
-		function ShowEnd()	{	echo $this->EndToString();	}
+		$this->tagname = $tagname;
+		$this->paired = $paired;
 
-		function StartToString(){
-			$res = $this->tag_start.'<'.$this->tagname;
-			foreach($this->options as $key => $value){
-				$res .= ' '.$key.'="'.$value.'"';
-			}
-			$res .= ($this->paired=='yes')?'>':' />';
-		return $res;
+		$this->tag_start = $this->tag_end = $this->tag_body_start = $this->tag_body_end = '';
+
+		if(is_null($body)){
+			$this->tag_end = $this->tag_body_start = "\n";
+		}
+		else{
+			CTag::addItem($body);
 		}
 
-		function BodyToString(){
-			$res = $this->tag_body_start;
-		return $res.parent::ToString(false);
-			
-			/*foreach($this->items as $item)
-				$res .= $item;
-			return $res;*/
+		$this->setClass($class);
+	}
+	
+	function showStart()	{	echo $this->startToString();	}
+	function showBody()	{	echo $this->bodyToString();	}
+	function showEnd()	{	echo $this->endToString();	}
+
+	function startToString(){
+		$res = $this->tag_start.'<'.$this->tagname;
+		foreach($this->options as $key => $value){
+			$res .= ' '.$key.'="'.$value.'"';
 		}
+		$res .= ($this->paired=='yes')?'>':' />';
+	return $res;
+	}
+
+	function bodyToString(){
+		$res = $this->tag_body_start;
+	return $res.parent::ToString(false);
 		
-		function EndToString(){
-			$res = ($this->paired=='yes') ? $this->tag_body_end.'</'.$this->tagname.'>' : '';
-			$res .= $this->tag_end;
-		return $res;
+		/*foreach($this->items as $item)
+			$res .= $item;
+		return $res;*/
+	}
+	
+	function endToString(){
+		$res = ($this->paired=='yes') ? $this->tag_body_end.'</'.$this->tagname.'>' : '';
+		$res .= $this->tag_end;
+	return $res;
+	}
+	
+	function toString($destroy=true){
+		$res  = $this->startToString();
+		$res .= $this->bodyToString();
+		$res .= $this->endToString();
+
+		if($destroy) $this->Destroy();
+
+	return $res;
+	}
+	
+	function setName($value){
+		if(is_null($value)) return $value;
+
+		if(!is_string($value)){
+			return $this->error("Incorrect value for setName [$value]");
 		}
-		
-		function ToString($destroy=true){
-			$res  = $this->StartToString();
-			$res .= $this->BodyToString();
-			$res .= $this->EndToString();
+	return $this->addOption("name",$value);
+	}
+	
+	function getName(){
+		if(isset($this->options['name']))
+			return $this->options['name'];
+	return NULL;
+	}
+	
+	function setClass($value){
+		if(isset($value))
+			$this->options['class'] = $value;
+		else
+			unset($this->options['class']);
 
-			if($destroy) $this->Destroy();
+	return $value;
+	}
+	
+	function DelOption($name){
+		unset($this->options[$name]);
+	}
+	
+	function getOption($name){
+		$ret = NULL;
+		if(isset($this->options[$name]))
+			$ret =& $this->options[$name];
+	return $ret;
+	}
 
-		return $res;
+	function setHint($text, $width='', $class=''){
+		if(empty($text)) return false;
+
+		insert_showhint_javascript();
+
+		$text = unpack_object($text);
+		if($width != '' || $class != ''){
+			$code = "show_hint_ext(this,event,'".$text."','".$width."','".$class."');";
 		}
-		
-		function SetName($value){
-			if(is_null($value)) return $value;
-
-			if(!is_string($value)){
-				return $this->error("Incorrect value for SetName [$value]");
-			}
-		return $this->AddOption("name",$value);
-		}
-		
-		function GetName(){
-			if(isset($this->options['name']))
-				return $this->options['name'];
-		return NULL;
-		}
-		
-		function SetClass($value){
-			if(isset($value))
-				$this->options['class'] = $value;
-			else
-				unset($this->options['class']);
-
-		return $value;
-		}
-		
-		function DelOption($name){
-			unset($this->options[$name]);
-		}
-		
-		function GetOption($name){
-			$ret = NULL;
-			if(isset($this->options[$name]))
-				$ret =& $this->options[$name];
-		return $ret;
-		}
-
-		function SetHint($text, $width='', $class=''){
-			if(empty($text)) return false;
-
-			insert_showhint_javascript();
-
-			$text = unpack_object($text);
-			if($width != '' || $class != ''){
-				$code = "show_hint_ext(this,event,'".$text."','".$width."','".$class."');";
-			}
-			else{
-				$code = "show_hint(this,event,'".$text."');";
-			}
-
-			$this->AddAction('onMouseOver',	$code);
-			$this->AddAction('onMouseMove',	'update_hint(this,event);');
-		}
-
-		function OnClick($handle_code){
-			$this->AddAction('onclick', $handle_code);
+		else{
+			$code = "show_hint(this,event,'".$text."');";
 		}
 
-		function AddAction($name, $value){
-			if(is_object($value)){
-				$this->options[$name] = unpack_object($value);
-			}
-			else if(!empty($value)){
-				$this->options[$name] = htmlentities(str_replace(array("\r", "\n"), '', strval($value)),ENT_COMPAT,S_HTML_CHARSET);
-			}
-		}
+		$this->addAction('onMouseOver',	$code);
+		$this->addAction('onMouseMove',	'update_hint(this,event);');
+	}
 
-		function AddOption($name, $value){
-			if(is_object($value)){
-				$this->options[$name] = unpack_object($value);
-			}
-			else if(isset($value))
-				$this->options[$name] = htmlspecialchars(strval($value)); 
-			else
-				unset($this->options[$name]);
-		}
+	function onClick($handle_code){
+		$this->addAction('onclick', $handle_code);
+	}
 
-		function SetEnabled($value='yes'){
-			if((is_string($value) && ($value == 'yes' || $value == 'enabled' || $value=='on') || $value=='1')
-				|| (is_int($value) && $value<>0))
-			{
-				unset($this->options['disabled']);
-			}
-			else if((is_string($value) && ($value == 'no' || $value == 'disabled' || $value=='off') || $value=='0')
-				|| (is_int($value) && $value==0))
-			{
-				$this->options['disabled'] = 'disabled';
-			}
+	function addAction($name, $value){
+		if(is_object($value)){
+			$this->options[$name] = unpack_object($value);
 		}
-		
-		function error($value){
-			error('class('.get_class($this).') - '.$value);
-			return 1;
+		else if(!empty($value)){
+			$this->options[$name] = htmlentities(str_replace(array("\r", "\n"), '', strval($value)),ENT_COMPAT,S_HTML_CHARSET);
 		}
 	}
+
+	function addOption($name, $value){
+		if(is_object($value)){
+			$this->options[$name] = unpack_object($value);
+		}
+		else if(isset($value))
+			$this->options[$name] = htmlspecialchars(strval($value)); 
+		else
+			unset($this->options[$name]);
+	}
+
+	function setEnabled($value='yes'){
+		if((is_string($value) && ($value == 'yes' || $value == 'enabled' || $value=='on') || $value=='1')
+			|| (is_int($value) && $value<>0))
+		{
+			unset($this->options['disabled']);
+		}
+		else if((is_string($value) && ($value == 'no' || $value == 'disabled' || $value=='off') || $value=='0')
+			|| (is_int($value) && $value==0))
+		{
+			$this->options['disabled'] = 'disabled';
+		}
+	}
+	
+	function error($value){
+		error('class('.get_class($this).') - '.$value);
+		return 1;
+	}
+}
 ?>

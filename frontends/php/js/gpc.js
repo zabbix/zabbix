@@ -96,7 +96,7 @@ filr:		'',
 reference:	'',
 path:		'',
 query:		'',
-arguments: new Array(),
+arguments:  {},
 
 initialize: function(url){
 	this.url=unescape(url);
@@ -116,7 +116,8 @@ initialize: function(url){
 			if(colonIndex>=0){
 				this.username=credentials.substring(0,colonIndex);
 				this.password=credentials.substring(colonIndex);
-			}else{
+			}
+			else{
 				this.username=credentials;
 			}
 			this.host=this.host.substring(atIndex+1);
@@ -144,9 +145,11 @@ initialize: function(url){
 		}
 		this.file=this.url.substring(protocolSepIndex+3);
 		this.file=this.file.substring(this.file.indexOf('/'));
-	}else{
+	}
+	else{
 		this.file=this.url;
 	}
+	
 	if(this.file.indexOf('?')>=0) this.file=this.file.substring(0, this.file.indexOf('?'));
 
 	var refSepIndex=url.indexOf('#');
@@ -157,40 +160,49 @@ initialize: function(url){
 	this.path=this.file;
 	if(this.query.length>0) this.file+='?'+this.query;
 	if(this.reference.length>0) this.file+='#'+this.reference;
-	if(this.query.length > 0)	this.getArguments();
+	if(this.query.length > 0)	this.formatArguments();
+	
+	var sid = cookie.read('zbx_sessionid');
+	this.setArgument('sid', sid.substring(16));
+},
+
+
+formatQuery: function(){
+	if(this.arguments.lenght < 1) return;
+	
+	var query = '';
+	for(var key in this.arguments){
+		if(typeof(this.arguments[key]) != 'undefined'){
+			query+=key+'='+this.arguments[key]+'&';
+		}
+	}
+	this.query = query.substring(0,query.length-1);
+},
+
+formatArguments: function(){
+	var args=this.query.split('&');
+	var keyval='';
+
+	if(args.length<1) return;
+	
+	for(i=0; i<args.length; i++){
+		keyval = args[i].split('=');
+		this.arguments[keyval[0]] = (keyval.length>1)?keyval[1]:'';
+	}
+},
+
+setArgument: function(key,value){
+	this.arguments[key] = value;
+	this.formatQuery();
+},
+
+getArgument: function(key){
+	if(typeof(this.arguments[key]) != 'undefined') return this.arguments[key];
+	else return null;
 },
 
 getArguments: function(){
-	var args=this.query.split('&');
-	var keyval='';
-	
-	if(args.length<1) return;
-	
-	for(i=0;i<args.length;i++){
-		keyval=args[i].split('=');
-		this.arguments[i] = new Array(keyval[0],(keyval.length==1)?keyval[0]:keyval[1]);
-	}
-},
-
-getArgumentValue: function(key){
-	if(key.length<1) return '';
-	for(i=0; i < this.arguments.length; i++){
-		if(this.arguments[i][0] == key) return this.arguments[i][1];
-	}
-	
-return '';
-},
-
-getArgumentValues: function(){
-	var a=new Array();
-	var b=this.query.split('&');
-	var c='';
-	if(b.length<1) return a;
-	for(i=0;i<b.length;i++){
-		c=b[i].split('=');
-		a[i]=new Array(c[0],((c.length==1)?c[0]:c[1]));
-	}
-return a;
+	return this.arguments;
 },
 
 getUrl: function(){
@@ -206,49 +218,28 @@ getUrl: function(){
 return uri;
 },
 
-setArgument: function(key,value){
-
-	var valueisset = false;
-	if(typeof(key) == 'undefined') throw 'Invalid argument past for setArgument';
-	
-	value =('undefined' != typeof(value))?value:'';
-
-	for(i=0; i < this.arguments.length; i++){
-		if(this.arguments[i][0] == key){
-			valueisset = true;
-			this.arguments[i][1] = value;
-		}
-	}	
-	if(!valueisset)	this.arguments[this.arguments.length] = new Array(key,value);
-	this.formatQuery();
-},
-
-formatQuery: function(){
-	if(this.arguments.lenght < 1) return;
-	
-	var query = '';
-	for(i=0; i < this.arguments.length; i++){		
-		query+=this.arguments[i][0]+'='+this.arguments[i][1]+'&';
-	}
-	this.query = query.substring(0,query.length-1);
+setPort: function(port){
+	this.port = port;
 },
 
 getPort: function(){ 
 	return this.port;
 },
 
-setPort: function(port){
-	this.port = port;
+setQuery: function(query){ 
+	this.query = query;
+	if(this.query.indexOf('?')>=0){
+		this.query= this.query.substring(this.query.indexOf('?')+1);
+	}
+	
+	this.formatArguments();
+	
+	var sid = cookie.read('zbx_sessionid');
+	this.setArgument('sid', sid.substring(16));
 },
 
 getQuery: function(){ 
 	return this.query;
-},
-
-setQuery: function(query){ 
-	this.query = query;
-	this.getArgumentValues();
-	this.formatQuery();
 },
 
 /* Returns the protocol of this URL, i.e. 'http' in the url 'http://server/' */
@@ -264,7 +255,7 @@ getHost: function(){
 	return this.host;
 },
 
-setHost: function(set){
+setHost: function(host){
 	this.host = host;
 },
 
@@ -288,7 +279,7 @@ setPassword: function(password){
 
 /* Returns the file part of this url, i.e. everything after the host name. */
 getFile: function(){
-	return this.file = file;
+	return this.file;
 },
 
 setFile: function(file){

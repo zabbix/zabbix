@@ -344,6 +344,18 @@ function zbx_stristr($haystack,$needle){
 return $pos;
 }
 
+function zbx_substring($haystack, $start, $end=null){
+	if($end < $start) return '';
+	
+	$len = zbx_strlen($haystack);
+	if(is_null($end))
+		$result = substr($haystack, $start);
+	else
+		$result = substr($haystack, $start, ($end - $start));
+
+return $result;
+}
+
 function uint_in_array($needle,$haystack){
 	foreach($haystack as $id => $value)
 		if(bccomp($needle,$value) == 0) return true;

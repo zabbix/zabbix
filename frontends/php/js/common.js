@@ -82,6 +82,16 @@ function SDI(msg){
 	div_help.appendChild(document.createElement("br"));
 }
 
+function SDJ(obj){
+	var debug = '';
+	for(var key in obj) {
+		var value = obj[key];
+		debug+=key+': '+value+'\n';
+	}
+	SDI('\n'+debug);
+}
+
+
 /// Alpha-Betic sorting
 
 function addListener(element, eventname, expression, bubbling){

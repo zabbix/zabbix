@@ -54,7 +54,7 @@ include_once "include/page_header.php";
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
 	);
-
+	
 	check_fields($fields);
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
@@ -179,11 +179,11 @@ include_once "include/page_header.php";
 	$p_elements = array();
 // Header	
 
-	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+	$url = new Curl('?fullscreen='.($_REQUEST['fullscreen']?'0':'1'));
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url->getUrl()."';"));
 //-------------
 
 	$left_tab = new CTable();

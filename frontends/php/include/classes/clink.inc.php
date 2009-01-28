@@ -19,12 +19,14 @@
 **/
 ?>
 <?php
-	class CLink extends CTag
-	{
+	class CLink extends CTag{
 /* public */
 		function CLink($item=NULL,$url=NULL,$class=NULL,$action=NULL){
 			parent::CTag('a','yes');
-
+			
+			$uri = new Curl($url);
+			$url = $uri->getUrl();
+			
 			$this->tag_start= '';
 			$this->tag_end = '';
 			$this->tag_body_start = '';
@@ -36,14 +38,14 @@
 			if(!is_null($action))	$this->SetAction($action);
 		}
 		
-		function SetAction($value=NULL){
+		function setAction($value=NULL){
 			if(is_null($value))
 				return $this->options['action'] = $page['file'];
 
 			return parent::AddAction('onclick', $value);
 		}
 		
-		function SetUrl($value){
+		function setUrl($value){
 			$this->AddOption('href', $value);
 		}
 		
@@ -54,7 +56,7 @@
 				return null;
 		}
 		
-		function SetTarget($value=NULL){
+		function setTarget($value=NULL){
 			if(is_null($value)){
 				unset($this->options['target']);
 			}
