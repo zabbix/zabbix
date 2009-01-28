@@ -297,7 +297,7 @@ update: function(){
 	var url = new Curl(this._url);
 	url.setArgument('upd_counter', this.counter());
 	url.setArgument('pmasterid', this.pmasterid());
-	
+
 	new Ajax.Request(url.getUrl(),
 					{
 						'method': 'post',
