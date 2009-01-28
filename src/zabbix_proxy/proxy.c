@@ -45,9 +45,6 @@
 #include "datasender/datasender.h"
 #include "heart/heart.h"
 
-/*
-#define       LISTENQ 1024
-*/
 char *progname = NULL;
 char title_message[] = "ZABBIX Proxy (daemon)";
 char usage_message[] = "[-hV] [-c <file>]";
