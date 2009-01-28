@@ -44,7 +44,7 @@ function format_doll_init($doll){
 		else $obj[$key] = $def;
 	}
 	
-	$obj['url'].= (zbx_empty($obj['url'])?'?':'&').'output=html&sessionid='.$USER_DETAILS['sessionid'];
+	$obj['url'].= (zbx_empty($obj['url'])?'?':'&').'output=html';
 	
 	$obj['params']['favobj'] = 'refresh';
 	$obj['params']['favid'] = $doll['id'];
@@ -538,6 +538,18 @@ function zbx_stristr($haystack,$needle){
 		$pos = substr($haystack,$pos);
 	}
 return $pos;
+}
+
+function zbx_substring($haystack, $start, $end=null){
+	if($end < $start) return '';
+	
+	$len = zbx_strlen($haystack);
+	if(is_null($end))
+		$result = substr($haystack, $start);
+	else
+		$result = substr($haystack, $start, ($end - $start));
+
+return $result;
 }
 
 function zbx_str_revert(&$str){

@@ -64,7 +64,7 @@ function create_user_menu(e,userid,usr_grp_all_in,usr_grp_gui_in,usr_grp_status_
 	for(var i=0; i < menu_usrgrp_gui.length; i++){
 		if((typeof(menu_usrgrp_gui[i]) != 'undefined') && !empty(menu_usrgrp_gui[i])){
 			var row = menu_usrgrp_gui[i];
-			var menu_row = new Array(row.name,"users.php?config=0&form=update&grpaction=1&userid="+userid+"&usrgrpid="+row.usrgrpid);
+			var menu_row = new Array(row.name,'users.php?config=0&form=update&grpaction=1&userid='+userid+'&usrgrpid='+row.usrgrpid);
 			grp_gui_add_to.push(menu_row);
 		}
 	}
@@ -73,7 +73,7 @@ function create_user_menu(e,userid,usr_grp_all_in,usr_grp_gui_in,usr_grp_status_
 	for(var i=0; i < usr_grp_gui_in.length; i++){
 		if((typeof(usr_grp_all_in[i]) != 'undefined') && !empty(usr_grp_gui_in[i])){
 			var row = usr_grp_gui_in[i];
-			var menu_row = new Array(row.name,"users.php?config=0&form=update&grpaction=0&userid="+userid+"&usrgrpid="+row.usrgrpid);
+			var menu_row = new Array(row.name,'users.php?config=0&form=update&grpaction=0&userid='+userid+'&usrgrpid='+row.usrgrpid);
 			grp_gui_rmv_frm.push(menu_row);
 		}
 	}
@@ -89,7 +89,7 @@ function create_user_menu(e,userid,usr_grp_all_in,usr_grp_gui_in,usr_grp_status_
 	for(var i=0; i < menu_usrgrp_status.length; i++){
 		if((typeof(menu_usrgrp_status[i]) != 'undefined') && !empty(menu_usrgrp_status[i])){
 			var row = menu_usrgrp_status[i];
-			var menu_row = new Array(row.name,"users.php?config=0&form=update&grpaction=1&userid="+userid+"&usrgrpid="+row.usrgrpid);
+			var menu_row = new Array(row.name,'users.php?config=0&form=update&grpaction=1&userid='+userid+'&usrgrpid='+row.usrgrpid);
 			grp_status_add_to.push(menu_row);
 		}
 	}
@@ -98,7 +98,7 @@ function create_user_menu(e,userid,usr_grp_all_in,usr_grp_gui_in,usr_grp_status_
 	for(var i=0; i < usr_grp_status_in.length; i++){
 		if((typeof(usr_grp_status_in[i]) != 'undefined') && !empty(usr_grp_status_in[i])){
 			var row = usr_grp_status_in[i];
-			var menu_row = new Array(row.name,"users.php?config=0&form=update&grpaction=0&userid="+userid+"&usrgrpid="+row.usrgrpid);
+			var menu_row = new Array(row.name,'users.php?config=0&form=update&grpaction=0&userid='+userid+'&usrgrpid='+row.usrgrpid);
 			grp_status_rmv_frm.push(menu_row);
 		}
 	}

@@ -157,6 +157,7 @@ frontends/php/include/classes/chatformtable.inc.php -text
 frontends/php/include/classes/cldap.inc.php -text
 frontends/php/include/classes/cpie.inc.php -text
 frontends/php/include/classes/cscript.inc.php -text
+frontends/php/include/classes/curl.inc.php -text
 frontends/php/include/func.inc.php -text
 frontends/php/include/js.inc.php -text
 frontends/php/include/locales/hu_hu.inc.php -text

@@ -385,8 +385,13 @@ function menu_item (o_parent, n_order) {
 		this.n_y -= this.getprop('height') * (o_parent.a_config.length - item_offset);
 	}
 
+	if(!is_null(this.a_config[1]) && (this.a_config[1].indexOf('javascript') == -1)){
+		var uri = new url(this.a_config[1]);
+		this.a_config[1] = uri.getUrl();
+	}
+	
 	// generate item's HMTL
-	var el = document.createElement("a");
+	var el = document.createElement('a');
 	el.setAttribute('id', 'e' + o_root.n_id + '_' + this.n_id + 'o');
 	el.setAttribute('href', this.a_config[1]);
 
