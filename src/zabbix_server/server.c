@@ -50,8 +50,6 @@
 #include "utils/nodechange.h"
 #include "escalator/escalator.h"
 
-#define       LISTENQ 1024
-
 #ifdef ZABBIX_TEST
 #include <time.h>
 #endif
