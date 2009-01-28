@@ -1016,16 +1016,17 @@ include_once "include/page_header.php";
 //				url_param('groupid'),
 				'action'));
 
-			$status=new CCol(new CLink(item_status2str($db_item["status"]),
-					"?group_itemid%5B%5D=".$db_item["itemid"].
-					"&group_task=".($db_item["status"] ? "Activate+selected" : "Disable+selected"),
-					item_status2style($db_item["status"])));
+			$status=new CCol(new CLink(item_status2str($db_item['status']),
+//					'?sessionid='.$USER_DETAILS['sessionid'].
+					'?group_itemid%5B%5D='.$db_item['itemid'].
+					'&group_task='.($db_item['status']?'Activate+selected':'Disable+selected'),
+					item_status2style($db_item['status'])));
 	
-			if($db_item["error"] == ''){
-				$error=new CCol('-',"off");
+			if($db_item['error'] == ''){
+				$error=new CCol('-','off');
 			}
 			else{
-				$error=new CCol($db_item["error"],"on");
+				$error=new CCol($db_item['error'],'on');
 			}
 			
 			$applications = $show_applications ? implode(', ', get_applications_by_itemid($db_item["itemid"], 'name')) : null;

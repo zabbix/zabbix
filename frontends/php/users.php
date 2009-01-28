@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 	require_once('include/media.inc.php');
 	require_once('include/users.inc.php');
 	require_once('include/forms.inc.php');
+	require_once('include/classes/curl.inc.php');
 	require_once('include/js.inc.php');
 
 	$page['title'] = 'S_USERS';
@@ -32,7 +33,6 @@
 	$page['scripts'] = array('menu_scripts.js');
 
 include_once('include/page_header.php');
-
 ?>
 <?php
 	$_REQUEST['config']=get_request('config',get_profile('web.users.config',0));

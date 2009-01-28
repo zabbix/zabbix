@@ -66,6 +66,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	require_once('include/classes/cpumenu.inc.php');
 	require_once('include/classes/graph.inc.php');
 	require_once('include/classes/cscript.inc.php');
+	require_once('include/classes/curl.inc.php');
 
 // Include Tactical Overview modules
 

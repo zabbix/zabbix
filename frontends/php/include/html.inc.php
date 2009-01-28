@@ -58,7 +58,7 @@
 	}
 
 	function prepare_url(&$var, $varname=null){
-		$result = "";
+		$result = '';
 
 		if(is_array($var)){
 			foreach($var as $id => $par)
