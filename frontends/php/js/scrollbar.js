@@ -617,6 +617,12 @@ scrollcreate: function(w){
 	img.setAttribute('border','0');
 	img.setAttribute('alt','cal');
 	img.setAttribute('id','scroll_calendar');
+	
+	if(IE){
+// tnx to Palmertree ;)
+		var div = document.createElement('div');
+		this.scrl_scroll.appendChild(div);
+	}
 
 	this.scrl_tabinforight = document.createElement('div');
 	this.scrl_scroll.appendChild(this.scrl_tabinforight);

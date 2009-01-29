@@ -19,14 +19,13 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/forms.inc.php";
 
-	$page["title"]	= "S_ZABBIX_BIG";
-	$page["file"]	= "index.php";
-	
-?>
-<?php
+require_once "include/config.inc.php";
+require_once "include/forms.inc.php";
+
+$page["title"]	= "S_ZABBIX_BIG";
+$page['file']	= "index.php";
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"name"=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({enter})'),
@@ -52,7 +51,6 @@
 
 		redirect('index.php');
 		die();
-//		return;
 	}
 
 	$config = select_config();
@@ -152,9 +150,9 @@
 				$row['url'] = get_profile('web.menu.view.last','index.php');
 				unset($USER_DETAILS);
 			}
+
 			redirect($row['url']);
 			die();
-//			return;
 		}
 		else{
 			$row = NULL;
@@ -193,7 +191,7 @@ include_once "include/page_header.php";
 				$frmLogin->AddItemToBottomRow(new CButton('enter','Enter'));
 				$frmLogin->Show(false);
 		
-				SetFocus($frmLogin->GetName(),'name');
+				setFocus($frmLogin->GetName(),'name');
 				
 				$frmLogin->Destroy();
 		}

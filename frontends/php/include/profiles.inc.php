@@ -337,11 +337,10 @@ function select_config(){
 	if($row){
 		return	$row;
 	}
-	else{
-		if($page["title"] != S_INSTALLATION)
+	else if($page['title'] != S_INSTALLATION){
 			error('Unable to select configuration');
 	}
-	return	$row;
+return	$row;
 }
 
 function update_config($configs){
