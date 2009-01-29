@@ -43,9 +43,8 @@ function check_authorisation(){
 
 	$USER_DETAILS = NULL;
 	$login = FALSE;
-	
-	$sessionid = get_cookie('zbx_sessionid');
 
+	$sessionid = get_cookie('zbx_sessionid');
 	if(!is_null($sessionid)){
 		$sql = 'SELECT u.*,s.* '.
 				' FROM sessions s,users u'.
@@ -54,9 +53,8 @@ function check_authorisation(){
 					' AND s.userid=u.userid'.
 					' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
 					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
-					
-		$login = $USER_DETAILS = DBfetch(DBselect($sql));
 
+		$login = $USER_DETAILS = DBfetch(DBselect($sql));
 		if(!$USER_DETAILS){
 			$incorrect_session = true;
 		}
@@ -73,7 +71,7 @@ function check_authorisation(){
 		}
 	}
 
-	if(!$USER_DETAILS){
+	if(!$USER_DETAILS && !isset($_SERVER['PHP_AUTH_USER'])){
 		$sql = 'SELECT u.* '.
 				' FROM users u '.
 				' WHERE u.alias='.zbx_dbstr(ZBX_GUEST_USER).
@@ -120,7 +118,7 @@ function check_authorisation(){
 				'name'	=>'- unknown -',
 				'nodeid'=>0));
 	}
-	
+
 	if(!$login || isset($incorrect_session) || isset($missed_user_guest)){
 
 		if(isset($incorrect_session))	$message = 'Session was ended, please relogin!';
@@ -130,7 +128,7 @@ function check_authorisation(){
 				$message = 'Table users is empty. Possible database corruption.';
 			}
 		}
-		
+
 		if(!isset($_REQUEST['message']) && isset($message)) $_REQUEST['message'] = $message;
 		
 		include('index.php');
@@ -460,9 +458,8 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 
 	$node_data = array();
 	$result = array();
-	
-//COpt::counter_up('perm');
 
+//COpt::counter_up('perm');
 	if(USER_TYPE_SUPER_ADMIN == $user_type){
 		$nodes = DBselect('SELECT nodeid FROM nodes');// WHERE '.DBcondition('nodeid',$nodeid));
 		while($node = DBfetch($nodes)){
