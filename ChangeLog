@@ -20,6 +20,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-683] removed "Step" field for recovery messages from Event details (Sasha)
  - [ZBX-680] fixed login while entering any page with HTTP auth enabled (Artem)
  - [ZBX-678] default number of HTTP pollers was decreased to one (Sasha)
  - [ZBX-676] fixed sql problem with deletion of many hosts (Artem)

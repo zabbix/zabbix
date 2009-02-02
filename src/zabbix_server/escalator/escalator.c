@@ -592,22 +592,26 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	userid;
-	
-	if (1 == action->recovery_msg) {
+
+	if (1 == action->recovery_msg)
+	{
 		result = DBselect("select distinct userid from alerts where actionid=" ZBX_FS_UI64
 				" and eventid=" ZBX_FS_UI64 " and alerttype=%d",
 				action->actionid,
 				escalation->eventid,
 				ALERT_TYPE_MESSAGE);
 
-		while (NULL != (row = DBfetch(result))) {
+		while (NULL != (row = DBfetch(result)))
+		{
 			userid = zbx_atoui64(row[0]);
 
+			escalation->esc_step = 0;
 			add_message_alert(escalation, r_event, action, escalation->r_eventid, userid, action->shortdata, action->longdata);
 		}
 
 		DBfree_result(result);
-	} else
+	}
+	else
 		zabbix_log(LOG_LEVEL_DEBUG, "Escalation stopped: recovery message not defined",
 				escalation->actionid);
 
