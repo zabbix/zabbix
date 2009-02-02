@@ -54,12 +54,12 @@ if(!defined("PAGE_HEADER_LOADED"))
 		"nodename"=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
 		"nodeid"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,999),		null),
 /* actions */
-		"save_config"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"retry"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"finish"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"next"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"back"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"save_config"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"retry"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"finish"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"next"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"back"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 /* other */
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
