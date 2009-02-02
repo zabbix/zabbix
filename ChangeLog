@@ -1,5 +1,8 @@
 Changes for 1.0.0
 
+ - [NTD-38] added limit of 500 lines per events log (Artem)
+ - [NTD-64] fixed query error on events screen (Artem)
+ - [NTD-63] fixed page error in triggers status page (Artem)
  - [ZBX-675] fixed wrong result of function "nodata" after server restart (Sasha)
  - [NTD-62] fixed runtime error is occurred by Configuration-Actions (Artem)
  - [ZBX-656] fixed possible warning in server log zbx_malloc: allocating already allocated memory in json.c (Sasha)

@@ -290,7 +290,7 @@ include_once "include/page_header.php";
 			));
 
 		if(!empty($triggers)){
-			$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.value, e.acknowledged '.
+			$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.ms, e.value, e.acknowledged '.
 					' FROM events e '.
 					' WHERE (e.object+0)='.EVENT_OBJECT_TRIGGER.
 						' AND '.DBcondition('e.objectid', $trigger_list).

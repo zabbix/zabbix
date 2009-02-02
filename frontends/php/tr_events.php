@@ -33,7 +33,7 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"triggerid"=>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
-		"limit"=>		array(T_ZBX_STR, O_OPT,	null,	IN('"100","NO"'),	null),
+		"limit"=>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, 1000),	null),
 		"show_unknown"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	null),
 
 	/* actions */
@@ -58,7 +58,7 @@ include_once "include/page_header.php";
 							' AND '.DBin_node('t.triggerid')));
 ?>
 <?php
-	$_REQUEST["limit"] = get_request("limit","NO");
+	$_REQUEST["limit"] = get_request("limit", 500);
 
 	$expression	= explode_exp($trigger_data["expression"],1);
 	$description	= expand_trigger_description_by_data($trigger_data);
@@ -75,8 +75,8 @@ include_once "include/page_header.php";
 	$form->AddItem(array(S_SHOW_UNKNOWN, SPACE, $chkbox,SPACE, SPACE));
 
 	$cmbLimit = new CComboBox("limit",$_REQUEST["limit"],"submit()");
-	$cmbLimit->AddItem('NO',S_SHOW_ALL);
-	$cmbLimit->AddItem("100",S_SHOW_ONLY_LAST_100);
+	$cmbLimit->AddItem('500',S_SHOW_ALL);
+	$cmbLimit->AddItem('100',S_SHOW_ONLY_LAST_100);
 	$form->AddItem($cmbLimit);
 
 
