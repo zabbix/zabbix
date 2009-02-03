@@ -796,7 +796,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 {
 
 	char
-		*pl = NULL,
+		*pl = *data,
 		*pr = NULL,
 		*str_out = NULL,
 		*replace_to = NULL;
@@ -825,8 +825,10 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 		expand_trigger_description_constants(data, event->objectid);
 	}
 
-	pl = *data;
-	while((pr = strchr(pl, '{')))
+	if (NULL == (pr = strchr(pl, '{')))
+		return;
+
+	for ( ; NULL != pr; pr = strchr(pl, '{'))
 	{
 		pr[0] = '\0';
 /*zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);*/
