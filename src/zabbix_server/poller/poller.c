@@ -43,7 +43,6 @@ static zbx_process_t	zbx_process;
 int			poller_type;
 int			poller_num;
 
-
 int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 {
 	int	res = FAIL;
