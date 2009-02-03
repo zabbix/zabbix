@@ -212,7 +212,7 @@ void	DCflush_nextchecks()
 #endif
 			}
 
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
 					"update items set nextcheck=%d where itemid in (",
 					(int)nextchecks[i].clock);
 			last_clock = nextchecks[i].clock;
@@ -252,7 +252,7 @@ void	DCflush_nextchecks()
 		DBescape_string(nextchecks[i].error_msg, error_esc, sizeof(error_esc));
 		zbx_free(nextchecks[i].error_msg);
 
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128 + strlen(error_esc),
 				"update items set status=%d,lastclock=%d,nextcheck=%d,error='%s'"
 				" where itemid=" ZBX_FS_UI64 ";\n",
 				ITEM_STATUS_NOTSUPPORTED,
