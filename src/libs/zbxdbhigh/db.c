@@ -1724,6 +1724,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 
 	ZBX_STR2UINT64(item->itemid, row[0]);
 /*	item->itemid=atoi(row[0]); */
+	item->key	= row[1];
 	item->key_orig=row[1];
 	item->host_name=row[2];
 	item->port=atoi(row[3]);
@@ -1860,7 +1861,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 			item->ipmi_ip	= ipmi_ip;
 			break;
 		default:
-			item->key	= item->key_orig;
+			/* nothing */;
 	}
 }
 
