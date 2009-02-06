@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-690] fixed memory leak if trigger evaluation fails (Sasha)
  - [DEV-285] added configurable the first dropdown selection (Artem)
  - [ZBX-689] allowed processing of non-agent based checks for unreachable hosts (Sasha)
  - [ZBX-683] removed "Step" field for recovery messages from Event details (Sasha)

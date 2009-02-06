@@ -2188,8 +2188,23 @@ void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const ch
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, ")");
 }
 
-static char	string[128];
+static char	string[640];
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_host_key_string                                              *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: <host>:<key> or "???" if item not found                      *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  * 
+ *                                                                            *
+ ******************************************************************************/
 char	*zbx_host_key_string(zbx_uint64_t itemid)
 {
 	DB_RESULT	result;
@@ -2204,9 +2219,26 @@ char	*zbx_host_key_string(zbx_uint64_t itemid)
 	else
 		zbx_snprintf(string, sizeof(string), "???");
 
+	DBfree_result(result);
+
 	return string;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_host_key_string_by_item                                      *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: <host>:<key>                                                 *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  * 
+ *                                                                            *
+ ******************************************************************************/
 char	*zbx_host_key_string_by_item(DB_ITEM *item)
 {
 	zbx_snprintf(string, sizeof(string), "%s:%s", item->host_name, item->key);
@@ -2214,6 +2246,23 @@ char	*zbx_host_key_string_by_item(DB_ITEM *item)
 	return string;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_host_key_function_string                                     *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: function name in format:                                     *
+ *                                    <host>:<key>.<function>(<parameters>)   *
+ *                             or "???" if function not found                 *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  * 
+ *                                                                            *
+ ******************************************************************************/
 char	*zbx_host_key_function_string(zbx_uint64_t functionid)
 {
 	DB_RESULT	result;
@@ -2227,6 +2276,8 @@ char	*zbx_host_key_function_string(zbx_uint64_t functionid)
 		zbx_snprintf(string, sizeof(string), "%s:%s.%s(%s)", row[1], row[2], row[3], row[4]);
 	else
 		zbx_snprintf(string, sizeof(string), "???");
+
+	DBfree_result(result);
 
 	return string;
 }
