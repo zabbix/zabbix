@@ -344,7 +344,7 @@ COpt::counter_up('perm');
 				$result[$host_data['hostid']] = $host_data; 
 				break;
 			default:
-				$result[$host_data['hostid']] = $host_data["hostid"]; 
+				$result[$host_data['hostid']] = $host_data['hostid']; 
 		}
 	}
 

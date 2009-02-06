@@ -123,95 +123,61 @@
 	$source = get_request('source', EVENT_SOURCE_TRIGGERS);
 
 	$r_form = new CForm();
-	$r_form->SetMethod('get');	
-	$r_form->AddOption('name','events_menu');
+	$r_form->setMethod('get');	
+	$r_form->addOption('name','events_menu');
 	
-	$r_form->AddVar('fullscreen',$_REQUEST['fullscreen']);
-	$r_form->AddVar('nav_time',$_REQUEST['nav_time']);
+	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
+	$r_form->addVar('nav_time',$_REQUEST['nav_time']);
 
-	if(EVENT_SOURCE_TRIGGERS == $source){
-	
-	    $available_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
-		
-		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_DATA_ARRAY, get_current_nodeid());
-
+	if(EVENT_SOURCE_TRIGGERS == $source){	
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
-			$sql = 'SELECT DISTINCT h.hostid '.
-					' FROM hosts h, functions f, items i'.
+			$sql = 'SELECT DISTINCT hg.groupid, hg.hostid '.
+					' FROM hosts_groups hg, functions f, items i'.
 					' WHERE i.itemid=f.itemid '.
-						' AND h.hostid=i.hostid '.
-						' AND '.DBcondition('f.triggerid', $available_triggers).
+						' AND hg.hostid=i.hostid '.
 						' AND f.triggerid='.$_REQUEST['triggerid'];
-						
-			if($host = DBfetch(DBselect($sql,1))){
-				$_REQUEST['hostid'] = $host['hostid'];
-				
-				$sql = 'SELECT DISTINCT hg.groupid '.
-						' FROM hosts_groups hg '.
-						' WHERE hg.hostid='.$_REQUEST['hostid'].
-							' AND '.DBcondition('hg.hostid',$available_hosts);
-							
-				if($group = DBfetch(DBselect($sql))){
-					$_REQUEST['groupid'] = $group['groupid'];
-				}
+			if($host_group = DBfetch(DBselect($sql,1))){
+				$_REQUEST['groupid'] = $host_group['groupid'];
+				$_REQUEST['hostid'] = $host_group['hostid'];
 			}
 			else{
 				unset($_REQUEST['triggerid']);
 			}
 		}
+
+		$options = array('allow_all_hosts','monitored_hosts','with_items');
+		if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
 		
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
-		validate_group_with_host(PERM_READ_ONLY, array('allow_all_hosts','monitored_hosts','with_items','always_select_first_host'));
-
-		$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
-		$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
-
-		$cmbGroup->AddItem(0,S_ALL_SMALL);
+		$params = array();
+		foreach($options as $option) $params[$option] = 1;
+		$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+		$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+		validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);		
+	
+	    $available_groups= $PAGE_GROUPS['groupids'];
+		$available_hosts = $PAGE_HOSTS['hostids'];
 		
-		$sql = 'SELECT DISTINCT g.groupid,g.name '.
-				' FROM groups g, hosts_groups hg, hosts h '.
-				' WHERE '.DBcondition('g.groupid',$available_groups).
-					' AND hg.groupid=g.groupid '.
-					' AND h.hostid=hg.hostid '.
-					' AND h.status='.HOST_STATUS_MONITORED.
-					' AND EXISTS(SELECT i.itemid FROM items i WHERE i.status='.ITEM_STATUS_ACTIVE.' AND i.hostid=h.hostid ) '.
-				' ORDER BY g.name';	
-        $result=DBselect($sql);
-		while($row=DBfetch($result)){
-			$cmbGroup->AddItem(
-					$row['groupid'],
-					get_node_name_by_elid($row['groupid']).$row['name']
-					);
-		}
-		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
-		
-		$cmbHosts->AddItem(0,S_ALL_SMALL);
+		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $PAGE_HOSTS['hostids'], PERM_RES_DATA_ARRAY, get_current_nodeid());
 
-		$sql_from = '';
-		$sql_where = '';
-		if($_REQUEST['groupid'] > 0){
-			$sql_from .= ',hosts_groups hg ';
-			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0) && !isset($available_triggers[$_REQUEST['triggerid']])){
+			unset($_REQUEST['triggerid']);
 		}
 		
-		$sql='SELECT DISTINCT h.hostid,h.host '.
-			' FROM hosts h '.$sql_from.
-			' WHERE '.DBcondition('h.hostid',$available_hosts).
-				$sql_where.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND EXISTS(SELECT i.itemid FROM items i WHERE i.hostid=h.hostid ) '.
-			' ORDER BY h.host';
-			
-		$result=DBselect($sql);
-		while($row=DBfetch($result)){
-			$cmbHosts->AddItem(
-					$row['hostid'],
-					get_node_name_by_elid($row['hostid']).$row['host']
-					);
+		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
+	
+		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
+		}	
+		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
+			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
 		}
-
-		$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+	
+		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));	
 	}
 	
 	if($allow_discovery){

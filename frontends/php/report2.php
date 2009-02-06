@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2008 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,32 +95,41 @@ include_once 'include/page_header.php';
 	$config = get_request('config',get_profile('web.avail_report.config',0));
 	update_profile('web.avail_report.config',$config, PROFILE_TYPE_INT);
 	
-	$options = array('always_select_first_host','with_items');
+	$params = array();
+	$options = array('allow_all_hosts','with_items');
+	if(0 == $config) array_push($options,'monitored_hosts');
+	else array_push($options,'templated_hosts');
 
-	if(isset($_REQUEST['groupid']) && (0 == $_REQUEST['groupid'])){
-		array_push($options,'allow_all_hosts');
-	}
+	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');	
+	foreach($options as $option) $params[$option] = 1;
 	
-	if(0 == $config){
-		array_push($options,'monitored_hosts');
-	}
-	else{
-		array_push($options,'templated_hosts');
-	}
-		
-	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
-	
-	validate_group_with_host(PERM_READ_LIST,$options);	
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 ?>
 <?php
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY);
+	if(0 == $config){
+		$available_groups = $PAGE_GROUPS['groupids'];
+		$available_hosts = $PAGE_HOSTS['hostids'];
+	}
+	else{
+		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+		if($PAGE_HOSTS['selected'] != 0)
+			$PAGE_HOSTS['hostids'] = $available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+		else
+			$available_hosts = $PAGE_HOSTS['hostids'];
+	}
 	
-	show_report2_header($config);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,$available_hosts);
+	
+	show_report2_header($config, $PAGE_GROUPS, $PAGE_HOSTS);
 	
 	if(isset($_REQUEST['triggerid'])){
-		if(uint_in_array($_REQUEST['triggerid'], $available_triggers)){
+		if(isset($available_triggers[$_REQUEST['triggerid']])){
 			$sql = 'SELECT DISTINCT t.*, h.host, h.hostid '.
 					' FROM triggers t, functions f, items i, hosts h '.
 					' WHERE t.triggerid='.$_REQUEST['triggerid'].
@@ -142,50 +151,38 @@ include_once 'include/page_header.php';
 		show_table_header(array(new CLink($trigger_data['host'],'?hostid='.$trigger_data['hostid']),' : "',expand_trigger_description_by_data($trigger_data),'"'));
 
 		$table = new CTableInfo(null,'graph');
-		$table->AddRow(new CImg('chart4.php?triggerid='.$_REQUEST['triggerid']));
-		$table->Show();
+		$table->addRow(new CImg('chart4.php?triggerid='.$_REQUEST['triggerid']));
+		$table->show();
 	}
 	else if(isset($_REQUEST['hostid'])){
 		
-/*
-		if($_REQUEST['hostid'] > 0){
-			$row	= DBfetch(DBselect('SELECT host FROM hosts WHERE hostid='.$_REQUEST['hostid']));
-			show_table_header($row['host']);
-		}
-		else{
-			if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
-				show_table_header(expand_trigger_description($_REQUEST['tpl_triggerid']));
-			else
-				show_table_header(S_ALL_HOSTS_BIG);				
-		}
-//*/
 /************************* FILTER *************************/
 /***********************************************************/	
 		$filterForm = new CFormTable(S_FILTER);//,'events.php?filter_set=1','POST',null,'sform');
-		$filterForm->AddOption('name','zbx_filter');
-		$filterForm->AddOption('id','zbx_filter');
-		$filterForm->SetMethod('get');
+		$filterForm->addOption('name','zbx_filter');
+		$filterForm->addOption('id','zbx_filter');
+		$filterForm->setMethod('get');
 	
 		$script = new CScript("javascript: if(CLNDR['avail_report_since'].clndr.setSDateFromOuterObj()){". 
 								"$('filter_timesince').value = parseInt(CLNDR['avail_report_since'].clndr.sdt.getTime()/1000);}".
 							"if(CLNDR['avail_report_till'].clndr.setSDateFromOuterObj()){". 
 								"$('filter_timetill').value = parseInt(CLNDR['avail_report_till'].clndr.sdt.getTime()/1000);}"
 							);
-		$filterForm->AddAction('onsubmit',$script);
+		$filterForm->addAction('onsubmit',$script);
 		
-		$filterForm->AddVar('filter_timesince',($_REQUEST['filter_timesince']>0)?$_REQUEST['filter_timesince']:'');
-		$filterForm->AddVar('filter_timetill',($_REQUEST['filter_timetill']>0)?$_REQUEST['filter_timetill']:'');
+		$filterForm->addVar('filter_timesince',($_REQUEST['filter_timesince']>0)?$_REQUEST['filter_timesince']:'');
+		$filterForm->addVar('filter_timetill',($_REQUEST['filter_timetill']>0)?$_REQUEST['filter_timetill']:'');
 	//*	
 		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-		$clndr_icon->AddAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
+		$clndr_icon->addAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
 		
 		$filtertimetab = new CTable(null,'calendar');
-		$filtertimetab->AddOption('width','10%');
+		$filtertimetab->addOption('width','10%');
 		
-		$filtertimetab->SetCellPadding(0);
-		$filtertimetab->SetCellSpacing(0);
+		$filtertimetab->setCellPadding(0);
+		$filtertimetab->setCellSpacing(0);
 	
-		$filtertimetab->AddRow(array(
+		$filtertimetab->addRow(array(
 								S_FROM, 
 								new CNumericBox('filter_since_day',(($_REQUEST['filter_timesince']>0)?date('d',$_REQUEST['filter_timesince']):''),2),
 								'/',
@@ -200,8 +197,8 @@ include_once 'include/page_header.php';
 						));
 		zbx_add_post_js('create_calendar(null,["filter_since_day","filter_since_month","filter_since_year","filter_since_hour","filter_since_minute"],"avail_report_since");');
 	
-		$clndr_icon->AddAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['avail_report_till'].clndr.clndrshow(pos.top,pos.left);");
-		$filtertimetab->AddRow(array(
+		$clndr_icon->addAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['avail_report_till'].clndr.clndrshow(pos.top,pos.left);");
+		$filtertimetab->addRow(array(
 								S_TILL, 
 								new CNumericBox('filter_till_day',(($_REQUEST['filter_timetill']>0)?date('d',$_REQUEST['filter_timetill']):''),2),
 								'/',
@@ -220,35 +217,35 @@ include_once 'include/page_header.php';
 						'addListener($("filter_icon"),"click",CLNDR[\'avail_report_till\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'avail_report_till\'].clndr));'
 						);
 		
-		$filterForm->AddRow(S_PERIOD, $filtertimetab);
+		$filterForm->addRow(S_PERIOD, $filtertimetab);
 	//*/	
-		$filterForm->AddItemToBottomRow(new CButton("filter_set",S_FILTER));
+		$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
 		
-		$reset = new CButton("filter_rst",S_RESET);
-		$reset->SetType('button');
-		$reset->SetAction('javascript: var uri = new url(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+		$reset = new CButton('filter_rst',S_RESET);
+		$reset->setType('button');
+		$reset->setAction('javascript: var uri = new url(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 	
-		$filterForm->AddItemToBottomRow($reset);
+		$filterForm->addItemToBottomRow($reset);
 								
 		$filter = create_filter(S_FILTER,NULL,$filterForm,'tr_filter',get_profile('web.avail_report.filter.state',0));
-		$filter->Show();
+		$filter->show();
 //-------
 
 		$sql_from = '';
 		$sql_where = '';
 
 		if(0 == $config){
-			if($_REQUEST['hostid'] > 0)	
-				$sql_where.= ' AND h.hostid='.$_REQUEST['hostid'];
-		}
-		else{
 			if($_REQUEST['groupid'] > 0){
 				$sql_from .= ',hosts_groups hg ';
 				$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
 			}
 			
 			if($_REQUEST['hostid'] > 0){
-			
+				$sql_where.= ' AND h.hostid='.$_REQUEST['hostid'];
+			}
+		}
+		else{
+			if($_REQUEST['hostid'] > 0){
 				$sql_from.=',hosts_templates ht ';
 				$sql_where.=' AND ht.hostid=h.hostid AND ht.templateid='.$_REQUEST['hostid'];
 			}
@@ -270,8 +267,6 @@ include_once 'include/page_header.php';
 			' ORDER BY h.host, t.description');
 
 		
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-
 		$table = new CTableInfo();
 		$table->setHeader(
 				array(is_show_subnodes()?S_NODE : null,

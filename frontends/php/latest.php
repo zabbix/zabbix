@@ -67,21 +67,18 @@ include_once 'include/page_header.php';
 	$_REQUEST['select'] = get_request('select',get_profile('web.latest.filter.select', ''));
 	update_profile('web.latest.filter.select', $_REQUEST['select'], PROFILE_TYPE_STR);
 
-	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items','always_select_first_host');
-	
-	$_REQUEST['hostid'] = get_request('hostid',get_profile('web.latest.last.hostid', null));
-	if(is_null($_REQUEST['hostid'])){
-		array_push($options,'always_select_first_host');
-		
-		$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.last.groupid', null));
-		if(is_null($_REQUEST['groupid'])){
-			validate_group(PERM_READ_ONLY,$options,'web.latest.last.groupid');
-		}
-	}
-
+	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
 	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
+	
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+	$params = array();
+	foreach($options as  $option) $params[$option] = 1;
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 
-	validate_group_with_host(PERM_READ_ONLY,$options,'web.latest.last.groupid','web.latest.last.hostid');
 //----------------
 ?>
 <?php
@@ -112,32 +109,22 @@ include_once 'include/page_header.php';
 
 //	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
 //	$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
-
-	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'javascript: submit();');
-	$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'javascript: submit();');
-
-	$cmbGroup->AddItem(0,S_ALL_SMALL);
-	$cmbHosts->AddItem(0,S_ALL_SMALL);
 	
-	$available_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
+	$available_groups = $PAGE_GROUPS['groupids'];
+	$available_hosts = $PAGE_HOSTS['hostids'];
 
-	$sql = 'SELECT DISTINCT g.groupid,g.name '.
-			' FROM groups g, hosts_groups hg, hosts h '.
-			' WHERE '.DBcondition('g.groupid',$available_groups).
-				' AND hg.groupid=g.groupid '.
-				' AND h.hostid=hg.hostid '.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND EXISTS(SELECT DISTINCT i.itemid FROM items i WHERE i.status='.ITEM_STATUS_ACTIVE.' AND i.hostid=h.hostid ) '.
-			' ORDER BY g.name';	
-	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		$cmbGroup->AddItem(
-				$row['groupid'],
-				get_node_name_by_elid($row['groupid']).$row['name']
-				);
+	$cmbGroup = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+	$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
+
+	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+		$cmbGroup->addItem($groupid, get_node_name_by_elid($groupid).$name);
 	}
-	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
+		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
+	}
+	
+	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
+	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));	
 	
 	$sql_from = '';
 	$sql_where = '';
@@ -145,23 +132,7 @@ include_once 'include/page_header.php';
 		$sql_from .= ',hosts_groups hg ';
 		$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
 	}
-	$sql='SELECT DISTINCT h.hostid,h.host '.
-		' FROM hosts h '.$sql_from.
-		' WHERE '.DBcondition('h.hostid',$available_hosts).
-			$sql_where.
-			' AND h.status='.HOST_STATUS_MONITORED.
-			' AND EXISTS(SELECT i.itemid FROM items i WHERE i.status='.ITEM_STATUS_ACTIVE.' AND i.hostid=h.hostid ) '.
-		' ORDER BY h.host';
-
-	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		$cmbHosts->AddItem(
-				$row['hostid'],
-				get_node_name_by_elid($row['hostid']).$row['host']
-				);
-	}
-
-	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+//---
 	
 	$l_form = new CForm();
 	$l_form->SetMethod('get');

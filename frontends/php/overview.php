@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,10 +18,10 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-require_once "include/config.inc.php";
-require_once "include/hosts.inc.php";
-require_once "include/triggers.inc.php";
-require_once "include/items.inc.php";
+require_once 'include/config.inc.php';
+require_once 'include/hosts.inc.php';
+require_once 'include/triggers.inc.php';
+require_once 'include/items.inc.php';
 
 $page['title'] = "S_OVERVIEW";
 $page['file'] = 'overview.php';
@@ -68,58 +68,34 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$_REQUEST['view_style'] = get_request('view_style',get_profile('web.overview.view.style',STYLE_TOP));
 	update_profile('web.overview.view.style',$_REQUEST['view_style'],PROFILE_TYPE_INT);
 	
-	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
-
-	$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.last.groupid', null));
-
-	if(is_null($_REQUEST['groupid'])){
-		array_push($options,'always_select_first_group');
-	}	
-	validate_group(PERM_READ_ONLY,$options,'web.overview.groupid');
-
 	$_REQUEST['type'] = get_request('type',get_profile('web.overview.type',SHOW_TRIGGERS));
 	update_profile('web.overview.type',$_REQUEST['type'],PROFILE_TYPE_INT);
+	
+	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
+	if($_REQUEST['type'] == SHOW_TRIGGERS) array_push($options,'with_monitored_triggers');
+	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
+
+//SDI($_REQUEST['groupid']);
+	$params = array();
+	foreach($options as  $option) $params[$option] = 1;
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+//SDI($_REQUEST['groupid']);
+	validate_group($PAGE_GROUPS, $PAGE_HOSTS);
+//SDI($_REQUEST['groupid']);
+
 
 	$form = new CForm();
-	$form->SetMethod('get');
+	$form->setMethod('get');
 
-	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
-	$cmbGroup->AddItem(0,S_ALL_SMALL);
-	
-	if($_REQUEST['type'] == SHOW_TRIGGERS){
-		$from = ', functions f, triggers t ';
-		$where = ' AND i.itemid=f.itemid '.
-					' AND f.triggerid=t.triggerid '.
-					' AND t.status='.TRIGGER_STATUS_ENABLED;
-	}
-	else{
-		$where = $from = '';
-	}
-	
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
-	
-	$sql = 'SELECT DISTINCT g.groupid,g.name '.
-				' FROM groups g, hosts_groups hg, hosts h '.
-				' WHERE '.DBcondition('g.groupid',$available_groups).
-					' AND hg.groupid=g.groupid '.
-					' AND h.hostid=hg.hostid '.
-					' AND h.status='.HOST_STATUS_MONITORED.
-					' AND EXISTS( SELECT i.itemid '.
-									' FROM items i '.$from.
-									' WHERE i.hostid=h.hostid '.
-										' AND i.status='.ITEM_STATUS_ACTIVE.
-										$where.')'.
-				' ORDER BY g.name';
+	$available_groups = $PAGE_GROUPS['groupids'];
 
-	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		$cmbGroup->addItem(
-				$row['groupid'],
-				get_node_name_by_elid($row['groupid']).$row['name']
-				);
+	$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+
+	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 	}
 	
-	$form->addItem(array(S_GROUP.SPACE,$cmbGroup,SPACE));
+	$form->addItem(array(S_GROUP.SPACE,$cmbGroups,SPACE));
 
 	$cmbType = new CComboBox('type',$_REQUEST['type'],'submit()');
 	$cmbType->addItem(SHOW_TRIGGERS,S_TRIGGERS);
@@ -131,27 +107,27 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$help_table->addOption('style', 'width: 200px');
 	
 	if($_REQUEST['type']==SHOW_TRIGGERS){
-		$help_table->AddRow(array(new CCol(SPACE, 'normal'), S_DISABLED));
+		$help_table->addRow(array(new CCol(SPACE, 'normal'), S_DISABLED));
 	}
 	
 	foreach(array(1,2,3,4,5) as $tr_severity)
-		$help_table->AddRow(array(new CCol(get_severity_description($tr_severity),get_severity_style($tr_severity)),S_ENABLED));
+		$help_table->addRow(array(new CCol(get_severity_description($tr_severity),get_severity_style($tr_severity)),S_ENABLED));
 		
-	$help_table->AddRow(array(new CCol(SPACE, 'unknown_trigger'), S_UNKNOWN));
+	$help_table->addRow(array(new CCol(SPACE, 'unknown_trigger'), S_UNKNOWN));
 	
 	if($_REQUEST['type']==SHOW_TRIGGERS){
 		$col = new CCol(SPACE, 'unknown_trigger');
-		$col->AddOption('style','background-image: url(images/gradients/blink1.gif); '.
+		$col->addOption('style','background-image: url(images/gradients/blink1.gif); '.
 			'background-position: top left; background-repeat: repeate;');
-		$help_table->AddRow(array($col, S_5_MIN));
+		$help_table->addRow(array($col, S_5_MIN));
 		$col = new CCol(SPACE, 'unknown_trigger');
-		$col->AddOption('style','background-image: url(images/gradients/blink2.gif); '.
+		$col->addOption('style','background-image: url(images/gradients/blink2.gif); '.
 			'background-position: top left; background-repeat: repeate;');
-		$help_table->AddRow(array($col, S_15_MIN));
-		$help_table->AddRow(array(new CCol(SPACE), S_NO_TRIGGER));
+		$help_table->addRow(array($col, S_15_MIN));
+		$help_table->addRow(array(new CCol(SPACE), S_NO_TRIGGER));
 	}
 	else{
-		$help_table->AddRow(array(new CCol(SPACE), S_DISABLED.' '.S_OR.' '.S_NO_TRIGGER));
+		$help_table->addRow(array(new CCol(SPACE), S_DISABLED.' '.S_OR.' '.S_NO_TRIGGER));
 	}
 
 	$help->SetHint($help_table);
@@ -162,18 +138,18 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$url = 'overview.php?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 	
 	$form_l = new CForm();
-	$form_l->SetMethod('get');
-	$form_l->AddVar('groupid',$_REQUEST['groupid']);
+	$form_l->setMethod('get');
+	$form_l->addVar('groupid',$_REQUEST['groupid']);
 		
-	$cmbStyle = new CComboBox("view_style",$_REQUEST["view_style"],"submit()");
-	$cmbStyle->AddItem(STYLE_TOP,S_TOP);
-	$cmbStyle->AddItem(STYLE_LEFT,S_LEFT);
+	$cmbStyle = new CComboBox('view_style',$_REQUEST['view_style'],'submit()');
+	$cmbStyle->addItem(STYLE_TOP,S_TOP);
+	$cmbStyle->addItem(STYLE_LEFT,S_LEFT);
 	
-	$form_l->Additem(array(S_HOSTS_LOCATION.SPACE,$cmbStyle));
+	$form_l->additem(array(S_HOSTS_LOCATION.SPACE,$cmbStyle));
 
 	$p_elements[] = get_table_header($form_l,$form);
 
@@ -181,17 +157,19 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	
 ?>
 <?php
-	if($_REQUEST["type"]==SHOW_DATA){
-	
-COpt::profiling_start("get_items_data_overview");
-		$table = get_items_data_overview($_REQUEST["groupid"],$_REQUEST['view_style']);
-COpt::profiling_stop("get_items_data_overview");
+	if($_REQUEST['type']==SHOW_DATA){
+COpt::profiling_start('get_items_data_overview');
+
+		$table = get_items_data_overview($_REQUEST['groupid'],$_REQUEST['view_style']);
+		
+COpt::profiling_stop('get_items_data_overview');
 	}
-	else if($_REQUEST["type"]==SHOW_TRIGGERS){
-	
-COpt::profiling_start("get_triggers_overview");
-		$table = get_triggers_overview($_REQUEST["groupid"],$_REQUEST['view_style']);
-COpt::profiling_stop("get_triggers_overview");
+	else if($_REQUEST['type']==SHOW_TRIGGERS){
+COpt::profiling_start('get_triggers_overview');
+
+		$table = get_triggers_overview($_REQUEST['groupid'],$_REQUEST['view_style']);
+		
+COpt::profiling_stop('get_triggers_overview');
 	}
 
 	$p_elements[] = $table;
@@ -208,5 +186,5 @@ COpt::profiling_stop("get_triggers_overview");
 //	$table->Show();
 //	unset($table);
 
-include_once "include/page_footer.php";
+include_once 'include/page_footer.php';
 ?>

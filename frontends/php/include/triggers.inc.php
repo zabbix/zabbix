@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-	require_once "maps.inc.php";
-	require_once "acknow.inc.php";
-	require_once "services.inc.php";
+	require_once('maps.inc.php');
+	require_once('acknow.inc.php');
+	require_once('services.inc.php');
 
 	/*
 	 * Function: INIT_TRIGGER_EXPRESSION_STRUCTURES
@@ -182,17 +182,19 @@
  *     Aly
  *
  */		
-	function get_accessible_triggers($perm,$perm_res=null,$nodeid=null,$hostid=null,$cache=1){
+	function get_accessible_triggers($perm,$hostids,$perm_res=null,$nodeid=null,$cache=1){
 		global $USER_DETAILS;
 		static $available_triggers;
+		zbx_value2array($hostids);
 		
 		$result = array();
 		if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
 		$nodeid_str =(is_array($nodeid))?implode('',$nodeid):strval($nodeid);
-		$hostid_str =(is_array($hostid))?implode('',$hostid):strval($hostid);
-			
-		if($cache && isset($available_triggers[$perm][$perm_res][$nodeid_str][$hostid_str])){
-			return $available_triggers[$perm][$perm_res][$nodeid_str][$hostid_str];
+		$hostid_str = implode('',$hostids);
+
+		$cache_hash = md5($perm.$perm_res.$nodeid_str.$hostid_str);
+		if($cache && isset($available_triggers[$cache_hash])){
+			return $available_triggers[$cache_hash];
 		}
 
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid);
@@ -200,23 +202,30 @@
 		$denied_triggers = array();
 		$available_triggers = array();
 		
+		$sql_where = '';
+		if(!empty($hostids)){
+			$sql_where.= ' AND '.DBcondition('i.hostid',$hostids);
+		}		
 		$sql = 	'SELECT DISTINCT t.triggerid '.
 				' FROM triggers t, functions f, items i '.
 				' WHERE t.triggerid=f.triggerid '.
 					' AND f.itemid=i.itemid'.
-					(!empty($hostid)?' AND i.hostid='.$hostid:'').
-					' AND '.DBcondition('i.hostid',$available_hosts,true);
+					' AND '.DBcondition('i.hostid',$available_hosts,true).
+					$sql_where;
 		$db_triggers = DBselect($sql);
 		while($trigger = DBfetch($db_triggers)){
 			$denied_triggers[] = $trigger['triggerid'];
+		}
+
+		if(!empty($denied_triggers)){
+			$sql_where.= ' AND '.DBcondition('t.triggerid',$denied_triggers,true);
 		}
 
 		$sql = 	'SELECT DISTINCT t.triggerid '.
 				' FROM triggers t, functions f, items i '.
 				' WHERE t.triggerid=f.triggerid '.
 					' AND f.itemid=i.itemid'.
-					(!empty($hostid)?' AND i.hostid='.$hostid:'').
-					(!empty($denied_triggers)?' AND '.DBcondition('t.triggerid',$denied_triggers,true):'');
+					$sql_where;
 		$db_triggers = DBselect($sql);
 		while($trigger = DBfetch($db_triggers)){
 			$result[$trigger['triggerid']] = $trigger['triggerid'];
@@ -229,7 +238,7 @@
 				$result = implode(',',$result);
 		}
 		
-		$available_triggers[$perm][$perm_res][$nodeid_str][$hostid_str] = $result;
+		$available_triggers[$cache_hash] = $result;
 		
 	return $result;
 	}
@@ -1510,13 +1519,12 @@
 	}
 
 	function check_right_on_trigger_by_expression($permission,$expression){
-	
 		global $USER_DETAILS;
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission, null, get_current_nodeid(true));
 
 		$db_hosts = get_hosts_by_expression($expression);
 		while($host_data = DBfetch($db_hosts)){
-			if(!uint_in_array($host_data['hostid'], $available_hosts)) return false;
+			if(!isset($available_hosts[$host_data['hostid']])) return false;
 		}
 
 		return true;
@@ -1822,22 +1830,26 @@
 		}
 	}
 
-	/*
-	 * Function: get_triggers_overview
-	 *
-	 * Description: 
-	 *     Retrive table with overview of triggers
-	 *     
-	 * Author: 
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 */
+/*
+ * Function: get_triggers_overview
+ *
+ * Description: 
+ *     Retrive table with overview of triggers
+ *     
+ * Author: 
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
 	function get_triggers_overview($groupid,$view_style=null){
 		global $USER_DETAILS;
 		
-		$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+		$hostids = array();
+		$res = DBselect('SELECT DISTINCT hg.hostid FROM hosts_groups hg WHERE hg.groupid='.$groupid);
+		while($host = DBfetch($res)) $hostids[$host['hostid']] = $host['hostid'];
+		
+		$available_triggers = get_accessible_triggers(PERM_READ_ONLY,$hostids);
 		
 		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
 		

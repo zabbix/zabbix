@@ -172,7 +172,6 @@ include_once "include/page_header.php";
 		exit();
 	}
 
-//	validate_group(PERM_READ_ONLY,array("allow_all_hosts","monitored_hosts","with_monitored_items"));
 //	$time = new CSpan(date("[H:i:s]",time()));
 //	$time->AddOption('id','refreshed');
 

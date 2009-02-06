@@ -45,6 +45,9 @@
 	define('ZBX_MAX_PERIOD', 12*31*24*3600);		// ~1 year
 	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
 
+	define('ZBX_DROPDOWN_FIRST_ENTRY',		0);		// 0 - NONE, 1 - ALL
+	define('ZBX_DROPDOWN_FIRST_REMEMBER',	1);		// 0 - do NOT remember, 1 - do remember
+
 	define('ZBX_DISABLE_MENU_CACHE',		0);		// set 1 to disable
 	
 /* END OF USERS DEFINES */
@@ -61,6 +64,9 @@
 	
 	define('ZBX_SESSION_ACTIVE', 0);
 	define('ZBX_SESSION_PASSIVE', 1);
+	
+	define('ZBX_DROPDOWN_FIRST_NONE',		0);
+	define('ZBX_DROPDOWN_FIRST_ALL',		1);
 
 	define('T_ZBX_STR',			0);
 	define('T_ZBX_INT',			1);

@@ -335,10 +335,10 @@
 		$form = new CFormTable(S_SCENARIO, null, 'post');
 		$form->SetHelp("web.webmon.httpconf.php");
 		
-		if(isset($_REQUEST["groupid"]))
-			$form->AddVar("groupid",$_REQUEST["groupid"]);
+		if($_REQUEST['groupid']>0)
+			$form->AddVar('groupid',$_REQUEST['groupid']);
 			
-		$form->AddVar("hostid",$_REQUEST["hostid"]);
+		$form->AddVar("hostid",$_REQUEST['hostid']);
 			
 		if(isset($_REQUEST["httptestid"])){
 			$form->AddVar("httptestid",$_REQUEST["httptestid"]);
@@ -514,10 +514,7 @@
 		$form->Show();
 	}
 	
-	function	insert_node_form()
-	{
-
-
+	function insert_node_form(){
 		global $ZBX_CURMASTERID;
 		
 		$frm_title = S_NODE;
@@ -529,7 +526,7 @@
 
 			$masterid	= $node_data['masterid'];
 
-			$frm_title = S_NODE." \"".$node_data["name"]."\"";
+			$frm_title = S_NODE.' "'.$node_data['name'].'"';
 		}
 		
 		$frmNode= new CFormTable($frm_title);
@@ -606,8 +603,7 @@
 		$frmNode->Show();
 	}
 	
-	function insert_new_message_form($events,$bulk)
-	{
+	function insert_new_message_form($events,$bulk){
 		global $USER_DETAILS;
 
 	
@@ -630,7 +626,7 @@
 			}
 		}
 
-		$frmMsg= new CFormTable($title." \"".$USER_DETAILS["alias"]."\"");
+		$frmMsg= new CFormTable($title.' "'.$USER_DETAILS["alias"].'"');
 		$frmMsg->SetHelp("manual.php");
 
 		if($bulk) $frmMsg->AddVar('bulkacknowledge',1);
@@ -1383,7 +1379,8 @@
 		$frmItem->SetHelp('web.items.item.php');
 
 		$frmItem->AddVar('config',get_request('config',0));
-		if(isset($_REQUEST['groupid']))
+		if($_REQUEST['groupid']>0) 
+			$frmItem->AddVar('groupid',$_REQUEST['groupid']);
 
 		$frmItem->AddVar('hostid',$_REQUEST['hostid']);
 		$frmItem->AddVar('applications_visible',1);
@@ -1842,7 +1839,7 @@
 
 		$frmItem->AddVar('group_itemid',get_request('group_itemid',array()));
 		$frmItem->AddVar('config',get_request('config',0));
-		if(isset($_REQUEST['groupid']))
+		if($_REQUEST['groupid']>0)
 			$frmItem->AddVar('groupid',$_REQUEST['groupid']);
 
 		$frmItem->AddVar('hostid',$_REQUEST['hostid']);
@@ -2017,7 +2014,7 @@
 		$cmbApps = new CListBox('applications[]',$applications,6);
 		$cmbApps->AddItem(0,"-".S_NONE."-");
 		$db_applications = DBselect("SELECT DISTINCT applicationid,name FROM applications".
-			" WHERE hostid=".$_REQUEST["hostid"]." order by name");
+			" WHERE hostid=".$_REQUEST['hostid']." order by name");
 		while($db_app = DBfetch($db_applications)){
 			$cmbApps->AddItem($db_app["applicationid"],$db_app["name"]);
 		}
@@ -2025,7 +2022,7 @@
 			S_ORIGINAL), S_APPLICATIONS),$cmbApps);
 
 		$frmItem->AddItemToBottomRow(array(new CButton("update",S_UPDATE),
-			SPACE, new CButtonCancel(url_param("groupid").url_param("hostid").url_param("config"))));
+			SPACE, new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
 
 		$frmItem->Show();
 	}
@@ -2062,18 +2059,19 @@
 			$cmbGroup->AddItem(0,S_ALL_SMALL);
 			$groups = DBselect($target_sql);
 			while($group = DBfetch($groups)){
-				$cmbGroup->AddItem($group["target_id"],$group["target_name"]);
+				$cmbGroup->addItem($group["target_id"],$group["target_name"]);
 			}
 			
-			$frmCopy->AddRow('Group', $cmbGroup);
+			$frmCopy->addRow('Group', $cmbGroup);
 
-			$target_sql = 'SELECT h.hostid as target_id, h.host as target_name FROM hosts h';
+			$target_sql = 'SELECT h.hostid as target_id, h.host as target_name FROM hosts h ';
 			if($filter_groupid > 0){
 				$target_sql .= ', hosts_groups hg WHERE hg.hostid=h.hostid AND hg.groupid='.$filter_groupid;
 			}
+			$target_sql.=' ORDER BY target_name';
 		}
 
-		$db_targets = DBselect($target_sql.' order by target_name');
+		$db_targets = DBselect($target_sql);
 		$target_list = array();
 		while($target = DBfetch($db_targets)){
 			array_push($target_list,array(
@@ -2087,17 +2085,17 @@
 				));
 		}
 
-		$frmCopy->AddRow(S_TARGET, $target_list);
+		$frmCopy->addRow(S_TARGET, $target_list);
 
 		$cmbCopyMode = new CComboBox('copy_mode',$copy_mode);
-		$cmbCopyMode->AddItem(0, S_UPDATE_EXISTING_NON_LINKED_ITEMS);
-		$cmbCopyMode->AddItem(1, S_SKIP_EXISTING_ITEMS);
-		$cmbCopyMode->SetEnabled(false);
-		$frmCopy->AddRow(S_MODE, $cmbCopyMode);
+		$cmbCopyMode->addItem(0, S_UPDATE_EXISTING_NON_LINKED_ITEMS);
+		$cmbCopyMode->addItem(1, S_SKIP_EXISTING_ITEMS);
+		$cmbCopyMode->setEnabled(false);
+		$frmCopy->addRow(S_MODE, $cmbCopyMode);
 
-		$frmCopy->AddItemToBottomRow(new CButton("copy",S_COPY));
+		$frmCopy->addItemToBottomRow(new CButton("copy",S_COPY));
 		$frmCopy->AddItemToBottomRow(array(SPACE,
-			new CButtonCancel(url_param("groupid").url_param("hostid").url_param("config"))));
+			new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
 
 		$frmCopy->Show();
 	}
@@ -2187,8 +2185,8 @@
 		$frmTrig = new CFormTable(S_TRIGGER,"triggers.php");
 		$frmTrig->SetHelp("config_triggers.php");
 
-		if(isset($_REQUEST["hostid"])){
-			$frmTrig->AddVar("hostid",$_REQUEST["hostid"]);
+		if($_REQUEST['hostid']>0){
+			$frmTrig->AddVar("hostid",$_REQUEST['hostid']);
 		}
 
 		$dep_el=array();
@@ -2200,7 +2198,7 @@
 			$frmTrig->AddVar("triggerid",$_REQUEST["triggerid"]);
 			$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
 
-			$frmTrig->SetTitle(S_TRIGGER." \"".htmlspecialchars($trigger["description"])."\"");
+			$frmTrig->SetTitle(S_TRIGGER.' "'.htmlspecialchars($trigger["description"]).'"');
 
 			$limited = $trigger['templateid'] ? 'yes' : null;
 		}
@@ -2303,12 +2301,12 @@
 			$frmTrig->AddItemToBottomRow(SPACE);
 			if( !$limited ){
 				$frmTrig->AddItemToBottomRow(new CButtonDelete("Delete trigger?",
-					url_param("form").url_param("groupid").url_param("hostid").
+					url_param("form").url_param('groupid').url_param("hostid").
 					url_param("triggerid")));
 			}
 		}
 		$frmTrig->AddItemToBottomRow(SPACE);
-		$frmTrig->AddItemToBottomRow(new CButtonCancel(url_param("groupid").url_param("hostid")));
+		$frmTrig->AddItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
 		$frmTrig->Show();
 	}
 
@@ -2321,7 +2319,7 @@
 				' AND f.itemid=i.itemid '.
 				' AND i.hostid=h.hostid '));
 
-		$frmComent = new CFormTable(S_COMMENTS." for ".$trigger['host']." : \"".expand_trigger_description_by_data($trigger)."\"");
+		$frmComent = new CFormTable(S_COMMENTS." for ".$trigger['host']." : \"".expand_trigger_description_by_data($trigger).'"');
 		$frmComent->SetHelp("web.tr_comments.comments.php");
 		$frmComent->AddVar("triggerid",$triggerid);
 		$frmComent->AddRow(S_COMMENTS,new CTextArea("comments",$trigger["comments"],100,25));
@@ -2589,10 +2587,10 @@
 			$frmGraph->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmGraph->AddItemToBottomRow(SPACE);
 			$frmGraph->AddItemToBottomRow(new CButtonDelete(S_DELETE_GRAPH_Q,url_param("graphid").
-				url_param("groupid").url_param("hostid")));
+				url_param('groupid').url_param("hostid")));
 		}
 		$frmGraph->AddItemToBottomRow(SPACE);
-		$frmGraph->AddItemToBottomRow(new CButtonCancel(url_param("groupid").url_param("hostid")));
+		$frmGraph->AddItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
 
 		$frmGraph->Show();
 	}
@@ -2750,7 +2748,7 @@
 
 			$db_valuemap = DBfetch($db_valuemaps);
 
-			$frmValmap->SetTitle(S_VALUE_MAP." \"".$db_valuemap["name"]."\"");
+			$frmValmap->SetTitle(S_VALUE_MAP.' "'.$db_valuemap["name"].'"');
 		}
 
 		if(isset($_REQUEST["valuemapid"]) && !isset($_REQUEST["form_refresh"])){
@@ -4669,7 +4667,7 @@
 
 		$frmHost->AddItemToBottomRow(new CButton("save",S_SAVE));		
 		$frmHost->AddItemToBottomRow(SPACE);
-		$frmHost->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param("groupid")));
+		$frmHost->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param('groupid')));
 		$frmHost->Show();
 	}
 
@@ -4721,7 +4719,7 @@
 
 		$frm_title	= $show_only_tmp ? S_TEMPLATE : S_HOST;
 
-		if(isset($_REQUEST['hostid'])){
+		if($_REQUEST['hostid']>0){
 			$db_host=get_host_by_hostid($_REQUEST['hostid']);
 			$frm_title	.= SPACE.' ['.$db_host['host'].']';
 
@@ -4731,33 +4729,30 @@
 			$original_templates = array();
 		}
 		
-		if(isset($_REQUEST['hostid']) && !isset($_REQUEST['form_refresh'])){
-			$proxy_hostid		= $db_host['proxy_hostid'];
+		if(($_REQUEST['hostid']>0) && !isset($_REQUEST['form_refresh'])){
+			$proxy_hostid	= $db_host['proxy_hostid'];
 			$host			= $db_host['host'];
 			$port			= $db_host['port'];
 			$status			= $db_host['status'];
 			$useip			= $db_host['useip'];
 			$useipmi		= $db_host['useipmi'] ? 'yes' : 'no';
-			if ($useipmi == 'yes')
-			{
-				if ($useip)
-				{
+			if($useipmi == 'yes'){
+				if($useip){
 					$ip	= $db_host['ip'];
 					$dns	= '';
 					$ipmi_ip= $db_host['dns'];
 				}
-				else
-				{
+				else{
 					$ip	= '0.0.0.0';
 					$dns	= $db_host['dns'];
 					$ipmi_ip= $db_host['ip'];
 				}
 			}
-			else
-			{
+			else{
 				$ip		= $db_host['ip'];
 				$dns		= $db_host['dns'];
 			}
+
 			$ipmi_port		= $db_host['ipmi_port'];
 			$ipmi_authtype		= $db_host['ipmi_authtype'];
 			$ipmi_privilege		= $db_host['ipmi_privilege'];
@@ -4836,8 +4831,8 @@
 
 		$frmHost->AddVar('clear_templates',$clear_templates);
 
-		if(isset($_REQUEST['hostid']))		$frmHost->AddVar('hostid',$_REQUEST['hostid']);
-		if(isset($_REQUEST['groupid']))		$frmHost->AddVar('groupid',$_REQUEST['groupid']);
+		if($_REQUEST['hostid']>0)		$frmHost->addVar('hostid',$_REQUEST['hostid']);
+		if($_REQUEST['groupid']>0)		$frmHost->addVar('groupid',$_REQUEST['groupid']);
 		
 		$frmHost->AddRow(S_NAME,new CTextBox('host',$host,20));
 
@@ -5209,7 +5204,7 @@
 		}
 		
 		$frmHost->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["hostid"]) && ($_REQUEST['form'] != 'full_clone')){
+		if(($_REQUEST['hostid']>0) && ($_REQUEST['form'] != 'full_clone')){
 			$frmHost->AddItemToBottomRow(SPACE);
 			$frmHost->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmHost->AddItemToBottomRow(SPACE);
@@ -5219,7 +5214,7 @@
 			$frmHost->AddItemToBottomRow(
 				new CButtonDelete(S_DELETE_SELECTED_HOST_Q,
 					url_param("form").url_param("config").url_param("hostid").
-					url_param("groupid")
+					url_param('groupid')
 				));
 
 			if($show_only_tmp){
@@ -5229,29 +5224,29 @@
 						'Delete AND clear',
 						S_DELETE_SELECTED_HOSTS_Q,
 						url_param("form").url_param("config").url_param("hostid").
-						url_param("groupid")
+						url_param('groupid')
 					)
 				);
 			}
 		}
 		$frmHost->AddItemToBottomRow(SPACE);
-		$frmHost->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param("groupid")));
+		$frmHost->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param('groupid')));
 		$frmHost->Show();
 	}
 
-	# Insert form for Host Groups
+// Insert form for Host Groups
 	function insert_hostgroups_form(){
 		global	$USER_DETAILS;
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
-		$hosts = get_request("hosts",array());
+		$hosts = get_request('hosts',array());
 		$frm_title = S_HOST_GROUP;
-		if(isset($_REQUEST["groupid"])){
-			$group = get_hostgroup_by_groupid($_REQUEST["groupid"]);
+		if($_REQUEST['groupid']>0){
+			$group = get_hostgroup_by_groupid($_REQUEST['groupid']);
 			$frm_title = S_HOST_GROUP.' ['.$group["name"].']';
 		}
 		
-		if(isset($_REQUEST["groupid"]) && !isset($_REQUEST["form_refresh"])){
+		if(($_REQUEST['groupid']>0) && !isset($_REQUEST["form_refresh"])){
 			$name=$group["name"];
 			$db_hosts=DBselect('SELECT DISTINCT h.hostid,host '.
 					' FROM hosts h, hosts_groups hg '.
@@ -5260,8 +5255,8 @@
 						' AND hg.groupid='.$_REQUEST['groupid'].
 					' ORDER BY host');
 			while($db_host=DBfetch($db_hosts)){
-				if(uint_in_array($db_host["hostid"],$hosts)) continue;
-				array_push($hosts, $db_host["hostid"]);
+				if(uint_in_array($db_host['hostid'],$hosts)) continue;
+				array_push($hosts, $db_host['hostid']);
 			}
 		}
 		else{
@@ -5272,8 +5267,8 @@
 		$frmHostG->SetHelp("web.hosts.group.php");
 		$frmHostG->AddVar("config",get_request("config",1));
 		
-		if(isset($_REQUEST["groupid"])){
-			$frmHostG->AddVar("groupid",$_REQUEST["groupid"]);
+		if($_REQUEST['groupid']>0){
+			$frmHostG->AddVar('groupid',$_REQUEST['groupid']);
 		}
 
 		$frmHostG->AddRow(S_GROUP_NAME,new CTextBox("gname",$name,48));
@@ -5287,20 +5282,20 @@
 				
 		while($db_host=DBfetch($db_hosts)){
 			$cmbHosts->AddItem(
-					$db_host["hostid"],
+					$db_host['hostid'],
 					get_node_name_by_elid($db_host['hostid']).$db_host["host"]
 					);
 		}
 		$frmHostG->AddRow(S_HOSTS,$cmbHosts->Get(S_HOSTS.SPACE.S_IN,S_OTHER.SPACE.S_HOSTS));
 
 		$frmHostG->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["groupid"])){
+		if($_REQUEST['groupid']>0){
 			$frmHostG->AddItemToBottomRow(SPACE);
 			$frmHostG->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmHostG->AddItemToBottomRow(SPACE);
 			$frmHostG->AddItemToBottomRow(
 				new CButtonDelete("Delete selected group?",
-					url_param("form").url_param("config").url_param("groupid")
+					url_param("form").url_param("config").url_param('groupid')
 				)
 			);
 		}
@@ -5317,12 +5312,12 @@
 		$hosts = array();
 		$frm_title = S_PROXY;
 		
-		if(isset($_REQUEST["hostid"])){
-			$proxy = get_host_by_hostid($_REQUEST["hostid"]);
+		if($_REQUEST['hostid']>0){
+			$proxy = get_host_by_hostid($_REQUEST['hostid']);
 			$frm_title = S_PROXY.' ['.$proxy["host"].']';
 		}
 		
-		if(isset($_REQUEST["hostid"]) && !isset($_REQUEST["form_refresh"])){
+		if(($_REQUEST['hostid']>0) && !isset($_REQUEST["form_refresh"])){
 			$name=$proxy["host"];
 			$db_hosts=DBselect('SELECT hostid '.
 				' FROM hosts '.
@@ -5330,7 +5325,7 @@
 					' AND proxy_hostid='.$_REQUEST['hostid']);
 					
 			while($db_host=DBfetch($db_hosts))
-				array_push($hosts, $db_host["hostid"]);
+				array_push($hosts, $db_host['hostid']);
 		}
 		else{
 			$name=get_request("host","");
@@ -5340,8 +5335,8 @@
 		$frmHostG->SetHelp("web.proxy.php");
 		$frmHostG->AddVar("config",get_request("config",5));
 		
-		if(isset($_REQUEST["hostid"])){
-			$frmHostG->AddVar("hostid",$_REQUEST["hostid"]);
+		if($_REQUEST['hostid']>0){
+			$frmHostG->AddVar("hostid",$_REQUEST['hostid']);
 		}
 
 		$frmHostG->AddRow(S_PROXY_NAME,new CTextBox("host",$name,30));
@@ -5353,15 +5348,15 @@
 								' AND '.DBcondition('hostid',$available_hosts).
 							' ORDER BY host');
 		while($db_host=DBfetch($db_hosts)){
-			$cmbHosts->AddItem($db_host["hostid"],
-					get_node_name_by_elid($db_host["hostid"]).$db_host["host"],
+			$cmbHosts->AddItem($db_host['hostid'],
+					get_node_name_by_elid($db_host['hostid']).$db_host["host"],
 					NULL,
-					($db_host["proxy_hostid"] == 0 || isset($_REQUEST["hostid"]) && ($db_host["proxy_hostid"] == $_REQUEST["hostid"])));
+					($db_host["proxy_hostid"] == 0 || ($_REQUEST['hostid']>0) && ($db_host["proxy_hostid"] == $_REQUEST['hostid'])));
 		}
 		$frmHostG->AddRow(S_HOSTS,$cmbHosts->Get(S_PROXY.SPACE.S_HOSTS,S_OTHER.SPACE.S_HOSTS));
 
 		$frmHostG->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["hostid"])){
+		if($_REQUEST['hostid']>0){
 			$frmHostG->AddItemToBottomRow(SPACE);
 			$frmHostG->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmHostG->AddItemToBottomRow(SPACE);
@@ -5382,7 +5377,7 @@
 		$frmHostP = new CFormTable(S_HOST_PROFILE);
 		$frmHostP->SetHelp("web.host_profile.php");
 
-		$result=DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$_REQUEST["hostid"]);
+		$result=DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid']);
 
 		$row=DBfetch($result);
 		if($row){
@@ -5413,7 +5408,7 @@
 		else{
 			$frmHostP->AddSpanRow("Profile for this host is missing","form_row_c");
 		}
-		$frmHostP->AddItemToBottomRow(new CButtonCancel(url_param("groupid")));
+		$frmHostP->AddItemToBottomRow(new CButtonCancel(url_param('groupid')));
 		$frmHostP->Show();
 	}
 	
@@ -5504,12 +5499,12 @@
 		
  		$frm_title = S_TEMPLATE_LINKAGE;
 
- 		if(isset($_REQUEST["hostid"])){
- 			$template = get_host_by_hostid($_REQUEST["hostid"]);
+ 		if($_REQUEST['hostid']>0){
+ 			$template = get_host_by_hostid($_REQUEST['hostid']);
  			$frm_title.= ' ['.$template['host'].']';
  		}
 		
- 		if(isset($_REQUEST['hostid']) && !isset($_REQUEST["form_refresh"])){
+ 		if(($_REQUEST['hostid']>0) && !isset($_REQUEST["form_refresh"])){
  			$name=$template['host'];
  		}
  		else{
@@ -5519,8 +5514,8 @@
  		$frmHostT = new CFormTable($frm_title,"hosts.php");
  		$frmHostT->SetHelp("web.hosts.group.php");
  		$frmHostT->AddVar("config",get_request("config",2));
- 		if(isset($_REQUEST["hostid"])){
- 			$frmHostT->AddVar("hostid",$_REQUEST["hostid"]);
+ 		if($_REQUEST['hostid']>0){
+ 			$frmHostT->AddVar("hostid",$_REQUEST['hostid']);
  		}
  
  		$frmHostT->AddRow(S_TEMPLATE,new CTextBox("tname",$name,60,'yes'));
@@ -5572,7 +5567,7 @@
 		
 		if(isset($_REQUEST["applicationid"]) && !isset($_REQUEST["form_refresh"])){
 			$appname = $row["name"];
-			$apphostid = $row["hostid"];
+			$apphostid = $row['hostid'];
 		}
 		else{
 			$appname = get_request("appname","");
@@ -5613,12 +5608,12 @@
 		if(isset($_REQUEST["applicationid"])){
 			$frmApp->AddItemToBottomRow(SPACE);
 			$frmApp->AddItemToBottomRow(new CButtonDelete("Delete this application?",
-					url_param("config").url_param("hostid").url_param("groupid").
+					url_param("config").url_param("hostid").url_param('groupid').
 					url_param("form").url_param("applicationid")));
 		}
 		
 		$frmApp->AddItemToBottomRow(SPACE);
-		$frmApp->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param("hostid").url_param("groupid")));
+		$frmApp->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param("hostid").url_param('groupid')));
 
 		$frmApp->Show();
 
@@ -5630,7 +5625,7 @@
 		if(isset($_REQUEST["sysmapid"])){
 			$result=DBselect("SELECT * FROM sysmaps WHERE sysmapid=".$_REQUEST["sysmapid"]);
 			$row=DBfetch($result);
-			$frm_title = "System map: \"".$row["name"]."\"";
+			$frm_title = "System map: \"".$row["name"].'"';
 		}
 		
 		if(isset($_REQUEST["sysmapid"]) && !isset($_REQUEST["form_refresh"])){

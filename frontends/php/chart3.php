@@ -63,7 +63,7 @@ include_once 'include/page_header.php';
 		if(!$host = DBfetch(DBselect('select h.* from hosts h,items i where h.hostid=i.hostid and i.itemid='.$gitem['itemid']))){
 			fatal_error(S_NO_ITEM_DEFINED);
 		}
-		if(!uint_in_array($host['hostid'], $available_hosts)){
+		if(!isset($available_hosts[$host['hostid']])){
 			access_deny();
 		}
 	}
