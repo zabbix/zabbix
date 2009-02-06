@@ -347,14 +347,14 @@ static int get_values(int now, int *nextcheck)
 	case ZBX_POLLER_TYPE_UNREACHABLE:
 		result = DBselect("select h.hostid,min(i.itemid) from hosts h,items i"
 				" where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d)"
-				" and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d"
+				" and i.type in (%d,%d,%d,%d,%d) and h.status=%d and h.disable_until<=%d"
 				" and h.errors_from!=0 and h.hostid=i.hostid and (h.proxy_hostid=0 or i.type in (%d))"
 				" and i.key_ not in ('%s','%s','%s','%s')" DB_NODE " group by h.hostid",
 				CONFIG_UNREACHABLE_POLLER_FORKS,
 				poller_num-1,
 				now + POLLER_DELAY,
 				ITEM_STATUS_ACTIVE,
-				ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST,
+				ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI,
 				HOST_STATUS_MONITORED,
 				now,
 				ITEM_TYPE_INTERNAL,
@@ -380,17 +380,18 @@ static int get_values(int now, int *nextcheck)
 				DBnode_local("h.hostid"));
 		break;
 	default:	/* ZBX_POLLER_TYPE_NORMAL */
-		result = DBselect("select %s where i.nextcheck<=%d and i.status in (%s)"
-				" and i.type not in (%d,%d,%d,%d) and h.status=%d and h.disable_until<=%d"
-				" and h.errors_from=0 and h.hostid=i.hostid and (h.proxy_hostid=0 or i.type in (%d))"
+		result = DBselect("select %s where i.nextcheck<=%d and h.hostid=i.hostid and h.status=%d and i.status in (%s)"
+				" and ((h.disable_until<=%d and h.errors_from=0 and i.type in (%d,%d,%d,%d)) or i.type in (%d,%d,%d,%d,%d))"
+				" and (h.proxy_hostid=0 or i.type in (%d))"
 				" and " ZBX_SQL_MOD(i.itemid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')"
 				DB_NODE " order by i.nextcheck",
 				ZBX_SQL_ITEM_SELECT,
 				now + POLLER_DELAY,
-				istatus,
-				ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_IPMI,
 				HOST_STATUS_MONITORED,
+				istatus,
 				now,
+				ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
+				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
 				ITEM_TYPE_INTERNAL,
 				CONFIG_POLLER_FORKS,
 				poller_num-1,
