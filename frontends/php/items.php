@@ -173,7 +173,7 @@ include_once 'include/page_header.php';
 	
 	check_fields($fields);
 	validate_sort_and_sortorder('i.description',ZBX_SORT_UP);
-	
+
 /* AJAX */	
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
@@ -297,7 +297,8 @@ include_once 'include/page_header.php';
 	$showdisabled = get_request('showdisabled', 0);
 	
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-	if(isset($_REQUEST['hostid']) && !isset($available_hosts[$_REQUEST['hostid']])){
+	
+	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0) && !isset($available_hosts[$_REQUEST['hostid']])){
 		unset($_REQUEST['hostid']);
 	}
 
@@ -706,10 +707,10 @@ include_once 'include/page_header.php';
 	
 	$options = array('only_current_node');
 	foreach($options as $option) $params[$option] = 1;
-	
+
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
-	
+SDI($PAGE_HOSTS['selected']);
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 	
 	$available_groups = $PAGE_GROUPS['groupids'];
@@ -723,7 +724,8 @@ include_once 'include/page_header.php';
 	$form->addVar('hostid',$_REQUEST['hostid']);
 	$form->addVar('groupid',$_REQUEST['groupid']);
 
-	$form->addItem(new CButton('form',S_CREATE_ITEM));
+	if($PAGE_HOSTS['selected'] > 0)
+		$form->addItem(new CButton('form',S_CREATE_ITEM));
 
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	echo SBR;

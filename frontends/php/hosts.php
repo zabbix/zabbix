@@ -427,9 +427,10 @@ include_once('include/page_header.php');
 			$audit_action 	= AUDIT_ACTION_ADD;
 		}
 
-		if(!zbx_empty($hostid) && $clone_hostid && ($_REQUEST['form'] == 'full_clone')){
+		if(!zbx_empty($hostid) && $hostid && $clone_hostid && ($_REQUEST['form'] == 'full_clone')){
 // Host applications
-			$res = get_applications_by_hostid($clone_hostid);
+			$sql = 'SELECT * FROM applications WHERE hostid='.$clone_hostid.' AND templateid=0';
+			$res = DBselect($sql);
 			while($db_app = DBfetch($res)){
 				add_application($db_app['name'], $hostid, 0);
 			}
@@ -462,7 +463,7 @@ include_once('include/page_header.php');
 			while($db_trig = DBfetch($res)){
 				$result &= copy_trigger_to_host($db_trig['triggerid'], $hostid, true);
 			}
-		
+
 // Host graphs
 			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, array($clone_hostid), PERM_RES_IDS_ARRAY);
 			
