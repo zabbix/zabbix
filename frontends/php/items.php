@@ -710,7 +710,7 @@ include_once 'include/page_header.php';
 
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
-SDI($PAGE_HOSTS['selected']);
+
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 	
 	$available_groups = $PAGE_GROUPS['groupids'];
