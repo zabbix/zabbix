@@ -907,7 +907,6 @@ function get_history_of_actions($start,$num,$sql_cond=''){
 				' AND '.DBcondition('e.objectid',$available_triggers).
 				' AND '.DBin_node('a.alertid').
 			order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries');
-
 	$result=DBselect($sql,10*$start+$num);
 		
 	$col=0;
@@ -958,7 +957,16 @@ function get_history_of_actions($start,$num,$sql_cond=''){
 	
 // Author: Aly
 function get_action_msgs_for_event($eventid){
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+	$hostids = array();
+	$sql = 'SELECT DISTINCT i.hostid '.
+			' FROM events e, functions f, items i '.
+			' WHERE e.eventid='.$eventid.
+				' AND f.triggerid=e.objectid'.$_REQUEST['triggerid'].
+				' AND i.itemid=f.itemid';
+	if($host = DBfetch(DBselect($sql,1))){
+		$hostids[$host['hostid']] = $host['hostid'];
+	}
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(
@@ -1033,7 +1041,16 @@ return $table;
 
 // Author: Aly
 function get_action_cmds_for_event($eventid){
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+	$hostids = array();
+	$sql = 'SELECT DISTINCT i.hostid '.
+			' FROM events e, functions f, items i '.
+			' WHERE e.eventid='.$eventid.
+				' AND f.triggerid=e.objectid'.$_REQUEST['triggerid'].
+				' AND i.itemid=f.itemid';
+	if($host = DBfetch(DBselect($sql,1))){
+		$hostids[$host['hostid']] = $host['hostid'];
+	}
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(
@@ -1096,7 +1113,16 @@ return $table;
 
 // Author: Aly
 function get_actions_hint_by_eventid($eventid,$status=NULL){
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+	$hostids = array();
+	$sql = 'SELECT DISTINCT i.hostid '.
+			' FROM events e, functions f, items i '.
+			' WHERE e.eventid='.$eventid.
+				' AND f.triggerid=e.objectid'.$_REQUEST['triggerid'].
+				' AND i.itemid=f.itemid';
+	if($host = DBfetch(DBselect($sql,1))){
+		$hostids[$host['hostid']] = $host['hostid'];
+	}
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
 	
 	$tab_hint = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$tab_hint->AddOption('style', 'width: 300px;');
