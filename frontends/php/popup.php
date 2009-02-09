@@ -298,15 +298,15 @@ include_once "include/page_header.php";
 				$cmbTypes->AddItem($type, item_type2str($type));
 			$frmTitle->AddItem(array(S_TYPE,SPACE,$cmbTypes));
 		}
-		
+
 		if(str_in_array($srctbl,array('triggers','logitems','items','applications','graphs','simple_graph','plain_text'))){
 			$hostid = $PAGE_HOSTS['selected'];
+
 			$cmbHosts = new CComboBox('hostid',$hostid,'javascript: submit();');
-		
-			foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-				$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
+			foreach($PAGE_HOSTS['hosts'] as $tmp_hostid => $name){
+				$cmbHosts->addItem($tmp_hostid, get_node_name_by_elid($tmp_hostid).$name);
 			}
-						
+
 			$frmTitle->addItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
 			update_profile('web.popup.hostid',$hostid);
 		}
@@ -779,8 +779,7 @@ include_once "include/page_header.php";
 					' AND '.DBin_node('i.itemid', $nodeid).
 					' AND '.DBcondition('h.hostid',$available_hosts).
 					' AND h.status in ('.implode(',', $host_status).')';
-
-		if(isset($hostid)) 
+		if($hostid > 0) 
 			$sql .= ' AND h.hostid='.$hostid;
 
 		$sql .= " order by h.host, i.description, i.key_, i.itemid";
