@@ -617,18 +617,20 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 		{
 			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "SNMP error [%s]",
 					snmp_errstring(response->errstat)));
+			ret = NOTSUPPORTED;
 		}
 		else if(status == STAT_TIMEOUT)
 		{
 			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [%s]",
 					session.peername));
+			ret = NETWORK_ERROR;
 		}
 		else
 		{
 			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "SNMP error [%d]",
 					status));
+			ret = NOTSUPPORTED;
 		}
-		ret = NOTSUPPORTED;
 	}
 
 	if (response)
