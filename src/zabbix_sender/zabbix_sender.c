@@ -360,7 +360,7 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 				break;
 		}
 
-	if(ZABBIX_SERVER == NULL)
+	if (NULL == ZABBIX_SERVER && NULL == CONFIG_FILE)
 	{
 		usage();
 		exit(FAIL);
