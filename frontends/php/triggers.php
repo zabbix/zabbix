@@ -388,7 +388,7 @@
 	$available_triggers = get_accessible_triggers(PERM_READ_WRITE,$PAGE_HOSTS['hostids'],PERM_RES_IDS_ARRAY,null,0);
 ?>
 <?php
-	
+
 	$form = new CForm();
 	$form->setMethod('get');
 	$form->addItem(new CButton('form',S_CREATE_TRIGGER));
@@ -462,6 +462,7 @@
 				' LEFT JOIN hosts h ON h.hostid=i.hostid '.
 			' WHERE '.DBin_node('t.triggerid').
 				$sql_where.
+				' AND h.hostid='.$PAGE_HOSTS['selected'].
 				' AND '.DBcondition('t.triggerid',$available_triggers).
 			order_by('h.host,t.description,t.priority,t.status');
 

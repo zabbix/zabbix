@@ -447,7 +447,7 @@ include_once('include/page_header.php');
 			}
 						
 // Host triggers
-			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($clone_hostid), PERM_RES_IDS_ARRAY);
 			
 			$sql = 'SELECT DISTINCT t.triggerid, t.description '.
 					' FROM triggers t, items i, functions f'.
@@ -464,7 +464,7 @@ include_once('include/page_header.php');
 			}
 		
 // Host graphs
-			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, array($clone_hostid), PERM_RES_IDS_ARRAY);
 			
 			$sql = 'SELECT DISTINCT g.graphid, g.name '.
 						' FROM graphs g, graphs_items gi,items i '.

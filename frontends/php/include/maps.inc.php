@@ -97,7 +97,7 @@
 						$result = sysmap_accessible($se_data['elementid'], $perm);
 						break;
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						$available_triggers = get_accessible_triggers($perm, PERM_RES_IDS_ARRAY);
+						$available_triggers = get_accessible_triggers($perm, array(), PERM_RES_IDS_ARRAY);
 						if(!isset($available_triggers[$se_data['elementid']])){
 							$result = false;
 						}

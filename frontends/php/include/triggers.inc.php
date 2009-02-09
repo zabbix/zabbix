@@ -1842,28 +1842,16 @@
  * Comments: !!! Don't forget sync code with C !!!
  *
  */
-	function get_triggers_overview($groupid,$view_style=null){
-		global $USER_DETAILS;
-		
-		$hostids = array();
-		$res = DBselect('SELECT DISTINCT hg.hostid FROM hosts_groups hg WHERE hg.groupid='.$groupid);
-		while($host = DBfetch($res)) $hostids[$host['hostid']] = $host['hostid'];
-		
+	function get_triggers_overview($hostids,$view_style=null){		
 		$available_triggers = get_accessible_triggers(PERM_READ_ONLY,$hostids);
 		
 		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
 		
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
-		if($groupid > 0){
-			$group_where = ',hosts_groups hg WHERE hg.groupid='.$groupid.' AND hg.hostid=h.hostid AND ';
-		} 
-		else {
-			$group_where = ' WHERE ';
-		}
 
 		$result=DBselect('SELECT DISTINCT t.triggerid,t.description,t.expression,t.value,t.priority,t.lastchange,h.hostid,h.host'.
 			' FROM hosts h,items i,triggers t, functions f '.
-			$group_where.' h.status='.HOST_STATUS_MONITORED.
+			' WHERE h.status='.HOST_STATUS_MONITORED.
 				' AND h.hostid=i.hostid '.
 				' AND i.itemid=f.itemid '.
 				' AND f.triggerid=t.triggerid'.

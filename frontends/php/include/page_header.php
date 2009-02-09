@@ -488,7 +488,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$page_header_r_col[] = array('|', new CLink(S_LOGIN, 'index.php?reconnect=1', 'small_font'));
 		}
 
-		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),'http://www.zabbix.com');
+		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),'http://www.zabbix.com/');
 		$logo->setTarget('_blank');
 //		$logo = new CDiv(SPACE,'zabbix_logo');
 //		$logo->AddAction('onclick',"javascript: document.location = 'http://www.zabbix.com';");		

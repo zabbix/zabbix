@@ -79,10 +79,9 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$params = array();
 	foreach($options as  $option) $params[$option] = 1;
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
-//SDI($_REQUEST['groupid']);
-	validate_group($PAGE_GROUPS, $PAGE_HOSTS);
-//SDI($_REQUEST['groupid']);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
 
+	validate_group($PAGE_GROUPS, $PAGE_HOSTS);
 
 	$form = new CForm();
 	$form->setMethod('get');
@@ -160,14 +159,14 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	if($_REQUEST['type']==SHOW_DATA){
 COpt::profiling_start('get_items_data_overview');
 
-		$table = get_items_data_overview($_REQUEST['groupid'],$_REQUEST['view_style']);
+		$table = get_items_data_overview($PAGE_HOSTS['hostids'],$_REQUEST['view_style']);
 		
 COpt::profiling_stop('get_items_data_overview');
 	}
 	else if($_REQUEST['type']==SHOW_TRIGGERS){
 COpt::profiling_start('get_triggers_overview');
 
-		$table = get_triggers_overview($_REQUEST['groupid'],$_REQUEST['view_style']);
+		$table = get_triggers_overview($PAGE_HOSTS['hostids'],$_REQUEST['view_style']);
 		
 COpt::profiling_stop('get_triggers_overview');
 	}

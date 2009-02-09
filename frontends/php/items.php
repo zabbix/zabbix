@@ -921,6 +921,7 @@ include_once 'include/page_header.php';
 					' LEFT JOIN items ti ON i.templateid=ti.itemid '.
 					' LEFT JOIN hosts th ON ti.hostid=th.hostid '.
 				' WHERE '.implode(' AND ', $where_case).
+					' AND h.hostid='.$PAGE_HOSTS['selected'].
 				order_by('h.host,i.description,i.key_,i.delay,i.history,i.trends,i.type,i.status','i.itemid');
 		$db_items = DBselect($sql);
 		while($db_item = DBfetch($db_items)){

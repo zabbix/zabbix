@@ -885,7 +885,7 @@ return $delays;
 }
 
 function get_history_of_actions($start,$num,$sql_cond=''){
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(

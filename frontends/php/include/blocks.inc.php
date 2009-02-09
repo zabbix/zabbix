@@ -178,7 +178,7 @@ function make_system_summary(){
 	
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,array(),PERM_RES_IDS_ARRAY);
 		
 	$table = new CTableInfo();
 	$table->SetHeader(array(
@@ -453,7 +453,7 @@ function make_latest_issues(){
 	global $USER_DETAILS;
 	
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
 	$scripts_by_hosts = get_accessible_scripts_by_hosts($available_hosts);
 	$config=select_config();

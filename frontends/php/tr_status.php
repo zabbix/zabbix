@@ -437,7 +437,6 @@ include_once "include/page_header.php";
 						' AND e.objectid='.$row['triggerid'].
 						' AND t.triggerid=e.objectid '.$cond_event.
 					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
-
 		if($show_triggers == TRIGGERS_OPTION_NOFALSEFORB){
 			if(!$row = get_row_for_nofalseforb($row,$event_sql)){
 				continue;

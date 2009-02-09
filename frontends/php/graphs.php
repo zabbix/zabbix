@@ -405,24 +405,14 @@ include_once 'include/page_header.php';
 			make_sorting_link(S_HEIGHT,'g.height'),
 			make_sorting_link(S_GRAPH_TYPE,'g.graphtype')));
 
-		if($_REQUEST['hostid'] > 0){
-			$sql = 'SELECT DISTINCT g.* '.
-					' FROM graphs g, graphs_items gi,items i '.
-					' WHERE '.DBcondition('g.graphid',$available_graphs).
-						' AND gi.graphid=g.graphid '.
-						' AND i.itemid=gi.itemid '.
-						' AND i.hostid='.$_REQUEST['hostid'].
-					order_by('g.name,g.width,g.height,g.graphtype','g.graphid');
-
-			$result = DBselect($sql);
-		}
-		else{
-			$result = DBselect('SELECT DISTINCT g.* '.
-						' FROM graphs g '.
-						' WHERE '.DBcondition('g.graphid',$available_graphs).
-						order_by('g.name,g.width,g.height,g.graphtype','g.graphid'));
-		}
-		
+		$sql = 'SELECT DISTINCT g.* '.
+				' FROM graphs g, graphs_items gi,items i '.
+				' WHERE '.DBcondition('g.graphid',$available_graphs).
+					' AND gi.graphid=g.graphid '.
+					' AND i.itemid=gi.itemid '.
+					' AND i.hostid='.$PAGE_HOSTS['selected'].
+				order_by('g.name,g.width,g.height,g.graphtype','g.graphid');
+		$result = DBselect($sql);
 		while($row=DBfetch($result)){
 			if($_REQUEST['hostid'] != 0){
 				$host_list = NULL;

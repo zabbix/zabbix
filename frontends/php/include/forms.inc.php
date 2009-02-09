@@ -5154,8 +5154,8 @@
 			$frmHost->AddRow(S_ITEMS, $items_lbx);
 			
 // Host triggers
-			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
-			
+			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
+
 			$trig_lbx = new CListBox('triggers',null,8);
 			$trig_lbx->AddOption('disabled','disabled');
 
@@ -5178,7 +5178,7 @@
 			$frmHost->AddRow(S_TRIGGERS, $trig_lbx);
 		
 // Host graphs
-			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
 			
 			$graphs_lbx = new CListBox('graphs',null,8);
 			$graphs_lbx->AddOption('disabled','disabled');
@@ -5817,7 +5817,7 @@
 			$frmEl->AddRow(S_MAP, $cmbMaps);
 		}
 		else if($elementtype==SYSMAP_ELEMENT_TYPE_TRIGGER){
-			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid(true));
+			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY, get_current_nodeid(true));
 
 			$trigger = '';
 			$trigger_info = DBfetch(DBselect('SELECT DISTINCT n.name as node_name,h.hostid,h.host,t.*'.
