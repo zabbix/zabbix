@@ -553,7 +553,6 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 					snmp_errstring(response->errstat));
 			SET_MSG_RESULT(value, strdup(error));
 			ret = NOTSUPPORTED;
-			ret = NOTSUPPORTED;
 		}
 		else if(status == STAT_TIMEOUT)
 		{
@@ -561,14 +560,12 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 					session.peername);
 			SET_MSG_RESULT(value, strdup(error));
 			ret = NETWORK_ERROR;
-			ret = NETWORK_ERROR;
 		}
 		else
 		{
 			zbx_snprintf(error, sizeof(error), "SNMP error [%d]",
 					status);
 			SET_MSG_RESULT(value, strdup(error));
-			ret = NOTSUPPORTED;
 			ret = NOTSUPPORTED;
 		}
 	}
