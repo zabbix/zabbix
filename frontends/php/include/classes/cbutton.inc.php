@@ -21,35 +21,35 @@
 <?php
 	class CButton extends CTag{
 /* public */
-		function CButton($name="button", $caption="", $action=NULL, $accesskey=NULL){
+		function CButton($name='button', $caption='', $action=NULL, $accesskey=NULL){
 			parent::CTag('input','no');
 			$this->tag_body_start = '';
 			$this->options['type'] = 'submit';
-			$this->AddOption('value', $caption);
+			$this->addOption('value', $caption);
 			$this->options['class'] = 'button';
-			$this->SetName($name);
-			$this->SetAction($action);
-			$this->SetAccessKey($accesskey);
+			$this->setName($name);
+			$this->setAction($action);
+			$this->setAccessKey($accesskey);
 		}
 		
-		function SetAction($value=null){
-			$this->AddAction('onclick', $value);
+		function setAction($value=null){
+			$this->addAction('onclick', $value);
 		}
 		
-		function SetTitle($value='button title'){
-			$this->AddOption('title', $value);
+		function setTitle($value='button title'){
+			$this->addOption('title', $value);
 		}
 		
-		function SetAccessKey($value='B'){
+		function setAccessKey($value='B'){
 			if(isset($value))
 				if(!isset($this->options['title']))
-					$this->SetTitle($this->options['value'].' [Alt+'.$value.']');
+					$this->setTitle($this->options['value'].' [Alt+'.$value.']');
 
-			return $this->AddOption('accessKey', $value);
+			return $this->addOption('accessKey', $value);
 		}
 		
-		function SetType($type="button"){
-			$this->AddOption('type',$type);
+		function setType($type='button'){
+			$this->addOption('type',$type);
 		}
 	}
 
@@ -57,23 +57,23 @@
 		function CButtonCancel($vars=NULL,$action=NULL){
 			parent::CButton('cancel',S_CANCEL);
 			$this->options['type'] = 'button';
-			$this->SetVars($vars);
-			$this->SetAction($action);
+			$this->setVars($vars);
+			$this->setAction($action);
 		}
-		function SetVars($value=NULL){
+		function setVars($value=NULL){
 			global $page;
 
-			$url = "?cancel=1";
+			$url = '?cancel=1';
+			if(!is_null($value)) $url.= $value;
 
-			if(!is_null($value))
-				$url = $url.$value;
-
-			return parent::SetAction("return redirect('$url')");
+			$uri = new Curl($url);
+			$url = $uri->getUrl();
+			
+			return parent::setAction("javascript: return redirect('".$url."');");
 		}
 	}
 
-	class CButtonQMessage extends CButton
-	{
+	class CButtonQMessage extends CButton{
 		/*
 		var $vars;
 		var $msg;
@@ -86,52 +86,52 @@
 			
 			parent::CButton($name,$caption);
 
-			$this->SetMessage($msg);
-			$this->SetVars($vars);
-			$this->SetAction(NULL);
+			$this->setMessage($msg);
+			$this->setVars($vars);
+			$this->setAction(NULL);
 		}
-		function SetVars($value=NULL){
+		
+		function setVars($value=NULL){
 			if(!is_string($value) && !is_null($value)){
-				return $this->error("Incorrect value for SetVars [$value]");
+				return $this->error('Incorrect value for setVars ['.$value.']');
 			}
 			$this->vars = $value;
-			$this->SetAction(NULL);
+			$this->setAction(NULL);
 		}
-		function SetMessage($value=NULL){
+		
+		function setMessage($value=NULL){
 			if(is_null($value))
-				$value = "Are You Sure?";
+				$value = 'Are You Sure?';
 
 			if(!is_string($value)){
-				return $this->error("Incorrect value for SetMessage [$value]");
+				return $this->error('Incorrect value for setMessage ['.$value.']');
 			}
 			$this->msg = $value;
-			$this->SetAction(NULL);
+			$this->setAction(NULL);
 		}
-		function SetAction($value=null){
+		
+		function setAction($value=null){
 			if(!is_null($value))
-				return parent::SetAction($value);
+				return parent::setAction($value);
 
 			global $page;
 
 			$confirmation = "Confirm('".$this->msg."')";
 			
-			if(isset($this->vars))
-			{
+			if(isset($this->vars)){
 				$action = "redirect('".$page["file"]."?".$this->name."=1".$this->vars."')";
 			}
-			else
-			{
+			else{
 				$action = 'true';
 			}
 			
-			return parent::SetAction("if(".$confirmation.") return ".$action."; else return false;");
+			return parent::setAction('if('.$confirmation.') return '.$action.'; else return false;');
 		}
 	}
 
-	class CButtonDelete extends CButtonQMessage
-	{
+	class CButtonDelete extends CButtonQMessage{
 		function CButtonDelete($msg=NULL, $vars=NULL){
-			parent::CButtonQMessage("delete",S_DELETE,$msg,$vars);
+			parent::CButtonQMessage('delete',S_DELETE,$msg,$vars);
 		}
 	}
 ?>

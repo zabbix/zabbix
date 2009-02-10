@@ -57,7 +57,7 @@
 		}
 
 		function BodyToString(){
-			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid(true));
+			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY, get_current_nodeid(true));
 			
 			foreach($available_triggers as $id => $triggerid){
 				if(trigger_dependent($triggerid))	unset($available_triggers[$id]);

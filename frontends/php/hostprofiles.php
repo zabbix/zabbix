@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,47 +40,41 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
-	validate_group(PERM_READ_ONLY, array("allow_all_hosts","always_select_first_host","monitored_hosts","with_items"));
+
+	$params = array();
+	$options = array('allow_all_hosts','monitored_hosts','with_items');
+	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');	
+	foreach($options as $option) $params[$option] = 1;
 	
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+	validate_group($PAGE_GROUPS, $PAGE_HOSTS, false);
+
 	$prof_type = get_request('prof_type',0);
 ?>
 <?php
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,PERM_RES_IDS_ARRAY);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	
 	$r_form = new CForm();
-	$r_form->SetMethod('get');
+	$r_form->setMethod('get');
 
-	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
-	$cmbGroup->AddItem(0,S_ALL_SMALL);
-		
-	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
-		' FROM groups g, hosts_groups hg, hosts h '.
-		' WHERE '.DBcondition('h.hostid',$available_hosts).
-			' AND hg.groupid=g.groupid '.
-			' AND h.status='.HOST_STATUS_MONITORED.
-			' AND hg.hostid=h.hostid '.
-			' AND EXISTS (SELECT i.hostid FROM items i WHERE i.hostid=h.hostid) '.
-		' ORDER BY g.name');
-	while($row=DBfetch($result)){
-		$cmbGroup->AddItem(
-				$row['groupid'],
-				get_node_name_by_elid($row['groupid']).$row['name']
-				);
+	$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 	}
-	
-	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 	
 	$cmbProf = new CComboBox('prof_type',$prof_type,'javascript: submit();');
-	$cmbProf->Additem(0, S_NORMAL);
-	$cmbProf->Additem(1, S_EXTENDED);
+	$cmbProf->additem(0, S_NORMAL);
+	$cmbProf->additem(1, S_EXTENDED);
 	
-	$r_form->AddItem(array(SPACE.S_HOST_PROFILES.SPACE,$cmbProf));
+	$r_form->addItem(array(SPACE.S_HOST_PROFILES.SPACE,$cmbProf));
 	
 	show_table_header(S_HOST_PROFILES_BIG, $r_form);
 ?>
 
 <?php
-	if(isset($_REQUEST["hostid"])){
+	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
 		echo SBR;
 
 		if($prof_type){
@@ -96,14 +90,14 @@ include_once "include/page_header.php";
 			$table->setHeader(array(
 				is_show_subnodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
 				make_sorting_link(S_HOST,'h.host'),
-			   ($_REQUEST["groupid"] > 0)?null:make_sorting_link(S_GROUP,'g.name'),
+			   ($_REQUEST['groupid'] > 0)?null:make_sorting_link(S_GROUP,'g.name'),
 				make_sorting_link(S_DEVICE_OS_SHORT,'hpe.device_os_short'),
 				make_sorting_link(S_DEVICE_HW_ARCH,'hpe.device_hw_arch'),
 				make_sorting_link(S_DEVICE_TYPE,'hpe.device_type'),
 				make_sorting_link(S_DEVICE_STATUS,'hpe.device_status'))
 			);
 			
-			if($_REQUEST["groupid"] > 0){
+			if($_REQUEST['groupid'] > 0){
 				$sql='SELECT DISTINCT h.hostid,h.host,hpe.device_os_short,hpe.device_hw_arch,hpe.device_type,hpe.device_status'.
 					' FROM hosts h,hosts_profiles_ext hpe,hosts_groups hg,groups g '.
 					' WHERE h.hostid=hpe.hostid '.
