@@ -386,8 +386,8 @@ function menu_item (o_parent, n_order) {
 	}
 
 	if(!is_null(this.a_config[1]) && (this.a_config[1].indexOf('javascript') == -1)){
-		var uri = new url(this.a_config[1]);
-		this.a_config[1] = uri.getUrl();
+		var url = new Curl(this.a_config[1]);
+		this.a_config[1] = url.getUrl();
 	}
 	
 	// generate item's HMTL
