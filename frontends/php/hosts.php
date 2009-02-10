@@ -987,13 +987,13 @@ include_once('include/page_header.php');
 			$options = array('only_current_node','templated_hosts');
 			foreach($options as $option) $params[$option] = 1;
 			$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
-					
+
 			$params = array();	
 			$options = array('only_current_node','not_proxy_hosts');
 			foreach($options as $option) $params[$option] = 1;
 			$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $available_groups, $params);	// more hosts
 
-			validate_group($PAGE_GROUPS, $PAGE_HOSTS);
+			validate_group($PAGE_GROUPS, $PAGE_HOSTS, false);
 			break;
 		case 3:
 			$options = array('only_current_node','allow_all','templated_hosts');
@@ -1324,7 +1324,7 @@ include_once('include/page_header.php');
 	else if($_REQUEST['config']==2){
 	
 		if(isset($_REQUEST['form'])){
-			insert_template_form(get_request('hostid',NULL));
+			insert_template_form($PAGE_HOSTS['hostids']);
 		} 
 		else{
 			$frmForm = new CForm();
@@ -1370,7 +1370,7 @@ include_once('include/page_header.php');
 				$table->addRow(array(		
 					new CCol(array(
 						new CLink($template['host'],'hosts.php?form=update&hostid='.
-							$template['hostid'].url_param('hostid').url_param('config'), 'action')
+							$template['hostid'].url_param('groupid').url_param('config'), 'action')
 						),'unknown'),
 					empty($host_list)?'-':new CCol($host_list,'wraptext')
 				));

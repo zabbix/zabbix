@@ -5493,10 +5493,7 @@
 	}
 // END:   HOSTS PROFILE EXTENDED Section
 
- 	function insert_template_form(){
- 		global	$USER_DETAILS;
- 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
-		
+ 	function insert_template_form($available_hosts){
  		$frm_title = S_TEMPLATE_LINKAGE;
 
  		if($_REQUEST['hostid']>0){
@@ -5511,24 +5508,23 @@
  			$name=get_request("tname",'');
  		}
 		
- 		$frmHostT = new CFormTable($frm_title,"hosts.php");
- 		$frmHostT->SetHelp("web.hosts.group.php");
- 		$frmHostT->AddVar("config",get_request("config",2));
+ 		$frmHostT = new CFormTable($frm_title,'hosts.php');
+ 		$frmHostT->setHelp('web.hosts.group.php');
+ 		$frmHostT->addVar('config',get_request('config',2));
  		if($_REQUEST['hostid']>0){
- 			$frmHostT->AddVar("hostid",$_REQUEST['hostid']);
+ 			$frmHostT->addVar('hostid',$_REQUEST['hostid']);
  		}
  
- 		$frmHostT->AddRow(S_TEMPLATE,new CTextBox("tname",$name,60,'yes'));
+ 		$frmHostT->addRow(S_TEMPLATE,new CTextBox('tname',$name,60,'yes'));
  
 		$hosts_in_tpl = array();
 		$sql = 'SELECT DISTINCT h.hostid,h.host '.
 			' FROM hosts h,hosts_templates ht'.
  			' WHERE ht.templateid='.$_REQUEST['hostid'].
 				' AND h.hostid=ht.hostid'.
-				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
+				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
  				' AND '.DBcondition('h.hostid',$available_hosts).
  			' ORDER BY h.host';
-
  		$db_hosts=DBselect($sql);
  		while($db_host=DBfetch($db_hosts)){
 			$hosts_in_tpl[$db_host['hostid']] = $db_host['hostid'];
@@ -5537,10 +5533,9 @@
  		$cmbHosts = new CTweenBox($frmHostT,'hosts',$hosts_in_tpl,6);
 		$sql = 'SELECT DISTINCT h.hostid,h.host '.
 			' FROM hosts h'.
- 			' WHERE ( h.status='.HOST_STATUS_MONITORED.' OR h.status='.HOST_STATUS_NOT_MONITORED.' ) '.
+ 			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
  				' AND '.DBcondition('h.hostid',$available_hosts).
  			' ORDER BY h.host';
-			
  		$db_hosts=DBselect($sql);
 			
  		while($db_host=DBfetch($db_hosts)){
@@ -5551,16 +5546,16 @@
 		
  		$frmHostT->AddItemToBottomRow(new CButton('save',S_SAVE));
  		$frmHostT->AddItemToBottomRow(SPACE);
- 		$frmHostT->AddItemToBottomRow(new CButtonCancel(url_param("config")));
+ 		$frmHostT->AddItemToBottomRow(new CButtonCancel(url_param('config')));
  		$frmHostT->Show();
 	}
 
 
 	function insert_application_form(){
-		$frm_title = "New Application";
+		$frm_title = 'New Application';
 
-		if(isset($_REQUEST["applicationid"])){
-			$result=DBselect("SELECT * FROM applications WHERE applicationid=".$_REQUEST["applicationid"]);
+		if(isset($_REQUEST['applicationid'])){
+			$result=DBselect('SELECT * FROM applications WHERE applicationid='.$_REQUEST['applicationid']);
 			$row=DBfetch($result);
 			$frm_title = 'Application: "'.$row['name'].'"';
 		}
