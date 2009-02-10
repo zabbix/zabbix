@@ -51,18 +51,21 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$sql = 'SELECT * '.
+			' FROM items i, functions f '.
+			' WHERE i.itemid=f.itemid '.
+				' AND f.triggerid='.$_REQUEST['triggerid'].
+				' AND '.DBin_node('f.triggerid');				
+	if(!$db_data = DBfetch(DBselect($sql))){
+		fatal_error(S_NO_TRIGGER_DEFINED);
+	}
 	
-	if(!$db_data = DBfetch(DBselect('SELECT * '.
-							' FROM items i, functions f '.
-	                        ' WHERE i.itemid=f.itemid '.
-								' AND f.triggerid='.$_REQUEST["triggerid"].
-								' AND '.DBcondition('f.triggerid',$available_triggers).
-								' AND '.DBin_node('f.triggerid')
-				)))
-	{
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($db_data['hostid']));
+	
+	if(!isset($available_triggers[$_REQUEST['triggerid'])){
 		access_deny();
 	}
+	
 	$trigger_hostid = $db_data['hostid'];
 	
 	if(isset($_REQUEST["save"])){

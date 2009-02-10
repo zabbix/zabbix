@@ -18,8 +18,8 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-	require_once "include/config.inc.php";
-	require_once "include/forms.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/forms.inc.php');
 ?>
 <?php
 	if(isset($_REQUEST['export']) && isset($_REQUEST['hosts'])){
@@ -79,9 +79,16 @@ include_once "include/page_header.php";
 
 	}
 	else{
-		validate_group(PERM_READ_ONLY);
-	
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,get_current_nodeid());
+		$params=array();
+		$options = array('only_current_node');
+		foreach($options as $option) $params[$option] = 1;
+		
+		$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+		$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+		
+		validate_group($PAGE_GROUPS,$PAGE_HOSTS, false);
+
+		$available_hosts = $PAGE_HOSTS['hostids'];
 
 		$hosts		= get_request('hosts', array());
 		$templates	= get_request('templates', array());
@@ -127,12 +134,12 @@ include_once "include/page_header.php";
 	}
 
 	$form = new CForm();
-	$form->SetMethod('get');
+	$form->setMethod('get');
 	
 	$cmbConfig = new CComboBox('config', $config, 'submit()');
-	$cmbConfig->AddItem(0, S_EXPORT);
-	$cmbConfig->AddItem(1, S_IMPORT);
-	$form->AddItem($cmbConfig);
+	$cmbConfig->addItem(0, S_EXPORT);
+	$cmbConfig->addItem(1, S_IMPORT);
+	$form->addItem($cmbConfig);
 
 	show_table_header($title, $form);
 	if($config == 1){
@@ -142,7 +149,7 @@ include_once "include/page_header.php";
 			DBstart();
 			
 			$importer = new CZabbixXMLImport();
-			$importer->SetRules($rules['host'],$rules['template'],$rules['item'],$rules['trigger'],$rules['graph']);
+			$importer->setRules($rules['host'],$rules['template'],$rules['item'],$rules['trigger'],$rules['graph']);
 			$result = $importer->Parse($_FILES['import_file']['tmp_name']);
 
 			unset($importer);
@@ -185,8 +192,8 @@ include_once "include/page_header.php";
 		echo SBR;
 		if($preview){
 			$table = new CTableInfo(S_NO_DATA_FOR_EXPORT);
-			$table->SetHeader(array(S_HOST, S_ELEMENTS));
-			$table->ShowStart();
+			$table->setHeader(array(S_HOST, S_ELEMENTS));
+			$table->showStart();
 
 			$hostids = array_keys($hosts);
 			$sql = 'SELECT * '.
@@ -235,56 +242,43 @@ include_once "include/page_header.php";
 			}
 			
 			$form = new CForm(null,'post');
-			$form->SetName('hosts');
-			$form->AddVar("config",		$config);
-			$form->AddVar('update',		true);
-			$form->AddVar('hosts',		$hosts);
-			$form->AddVar('templates',	$templates);
-			$form->AddVar('items', 		$items);
-			$form->AddVar('graphs', 	$graphs);
-			$form->AddVar('triggers',	$triggers);
+			$form->setName('hosts');
+			$form->addVar("config",		$config);
+			$form->addVar('update',		true);
+			$form->addVar('hosts',		$hosts);
+			$form->addVar('templates',	$templates);
+			$form->addVar('items', 		$items);
+			$form->addVar('graphs', 	$graphs);
+			$form->addVar('triggers',	$triggers);
 
-			$form->AddItem(array(
+			$form->addItem(array(
 				new CButton('back', S_BACK),
 				new CButton('preview', S_REFRESH),
 				new CButton('export', S_EXPORT)
 				));
 			
-			$table->SetFooter(new CCol($form));
+			$table->setFooter(new CCol($form));
 			
-			$table->ShowEnd();
+			$table->showEnd();
 		}
 		else{
 	/* table HOSTS */
 			$form = new CForm(null,'post');
 			$form->SetName('hosts');
-			$form->AddVar("config",$config);
+			$form->AddVar('config',$config);
 			$form->AddVar('update', true);
 			
-			$cmbGroups = new CComboBox("groupid",get_request("groupid",0),"submit()");
-			$cmbGroups->AddItem(0,S_ALL_SMALL);
-			$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
-					' FROM groups g,hosts_groups hg,hosts h '.
-					' WHERE '.DBcondition('h.hostid',$available_hosts).
-						' AND g.groupid=hg.groupid '.
-						' AND h.hostid=hg.hostid '.
-					' ORDER BY g.name');
-			while($row=DBfetch($result)){
-				$cmbGroups->AddItem($row["groupid"],$row["name"]);
-				if((bccomp($row["groupid"] , $_REQUEST["groupid"])==0)) $correct_host = 1;
-			}
-			
-			if(!isset($correct_host)){
-				unset($_REQUEST["groupid"]);
-				$cmbGroups->SetValue(0);
+			$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');		
+			foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+				$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 			}
 			
 			$header = get_table_header(S_HOSTS_BIG, array(S_GROUP.SPACE, $cmbGroups));
 
-			$form->AddItem($header);
+			$form->addItem($header);
 
 			$table = new CTableInfo(S_NO_HOSTS_DEFINED);
-			$table->SetHeader(array(
+			$table->setHeader(array(
 				array(	new CCheckBox("all_hosts",true, "CheckAll('".$form->GetName()."','all_hosts','hosts');"),
 					make_sorting_link(S_NAME,'h.host')),
 				make_sorting_link(S_DNS,'h.dns'),

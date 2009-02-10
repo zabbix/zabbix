@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-	include_once "include/config.inc.php";
-	require_once "include/hosts.inc.php";
-	require_once "include/scripts.inc.php";
-	require_once "include/users.inc.php";
+	include_once('include/config.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/scripts.inc.php');
+	require_once('include/users.inc.php');
 
 	$page['title'] = "S_SCRIPTS";
 	$page['file'] = 'scripts.php';
@@ -126,9 +126,9 @@ if(isset($_REQUEST['form'])){
 	echo SBR;
 	
 	$frmScr = new CFormTable(S_SCRIPT,'scripts.php','POST',null,'form');
-	$frmScr->AddOption('id','scripts');
+	$frmScr->addOption('id','scripts');
 	
-	if(isset($_REQUEST['scriptid'])) $frmScr->AddVar('scriptid',$_REQUEST['scriptid']);
+	if(isset($_REQUEST['scriptid'])) $frmScr->addVar('scriptid',$_REQUEST['scriptid']);
 	
 	if(!isset($_REQUEST['scriptid']) || isset($_REQUEST['form_refresh'])){
 		$name = get_request('name','');
@@ -140,7 +140,7 @@ if(isset($_REQUEST['form'])){
 		$access = get_request('access',	PERM_READ_ONLY);
 	}
 	if(isset($_REQUEST['scriptid']) && !isset($_REQUEST['form_refresh'])){
-		$frmScr->AddVar('form_refresh',get_request('form_refresh',1));
+		$frmScr->addVar('form_refresh',get_request('form_refresh',1));
 		
 		if($script = get_script_by_scriptid($_REQUEST['scriptid'])){
 			$name = $script['name'];
@@ -153,25 +153,26 @@ if(isset($_REQUEST['form'])){
 		}
 	}
 	
-	$frmScr->AddRow(S_NAME,new CTextBox('name',$name,80));
-	$frmScr->AddRow(S_COMMAND,new CTextBox('command',$command,80));
+	$frmScr->addRow(S_NAME,new CTextBox('name',$name,80));
+	$frmScr->addRow(S_COMMAND,new CTextBox('command',$command,80));
 	
 	$usr_groups = new CCombobox('usrgrpid',$usrgrpid);
-		$usr_groups->AddItem(0,S_ALL_S);
+		$usr_groups->addItem(0,S_ALL_S);
 	
 	$sql = 'SELECT DISTINCT ug.name, ug.usrgrpid '.
 			' FROM usrgrp ug '.
+				' WHERE '.DBin_node('ug.usrgrpid').
 			' ORDER BY ug.name';
 			
 	$usrgrp_result = DBselect($sql);
 	while($usr_group=DBfetch($usrgrp_result)){
-		$usr_groups->AddItem($usr_group['usrgrpid'],$usr_group['name']);
+		$usr_groups->addItem($usr_group['usrgrpid'],$usr_group['name']);
 	}
 	
-	$frmScr->AddRow(S_USER_GROUPS,$usr_groups);
+	$frmScr->addRow(S_USER_GROUPS,$usr_groups);
 		
 	$host_groups = new CCombobox('groupid',$groupid);
-		$host_groups->AddItem(0,S_ALL_S);
+		$host_groups->addItem(0,S_ALL_S);
 		
 	$sql = 'SELECT DISTINCT g.name, g.groupid '.
 			' FROM groups g '.
@@ -180,29 +181,29 @@ if(isset($_REQUEST['form'])){
 			
 	$grp_result = DBselect($sql);
 	while($group=DBfetch($grp_result)){
-		$host_groups->AddItem($group['groupid'],$group['name']);
+		$host_groups->addItem($group['groupid'],$group['name']);
 	}
 		
-	$frmScr->AddRow(S_HOST_GROUPS,$host_groups);
+	$frmScr->addRow(S_HOST_GROUPS,$host_groups);
 	
 	$select_acc = new CCombobox('access',$access);
-		$select_acc->AddItem(PERM_READ_ONLY,S_READ);
-		$select_acc->AddItem(PERM_READ_WRITE,S_WRITE);
+		$select_acc->addItem(PERM_READ_ONLY,S_READ);
+		$select_acc->addItem(PERM_READ_WRITE,S_WRITE);
 		
-	$frmScr->AddRow(S_REQUIRED_HOST.SPACE.S_PERMISSIONS_SMALL,$select_acc);
+	$frmScr->addRow(S_REQUIRED_HOST.SPACE.S_PERMISSIONS_SMALL,$select_acc);
 
-	$frmScr->AddItemToBottomRow(new CButton('save',S_SAVE,"javascript: document.getElementById('scripts').action+='?action=1'; "));
-	$frmScr->AddItemToBottomRow(SPACE);
+	$frmScr->addItemToBottomRow(new CButton('save',S_SAVE,"javascript: document.getElementById('scripts').action+='?action=1'; "));
+	$frmScr->addItemToBottomRow(SPACE);
 
-	$frmScr->AddItemToBottomRow(new CButtonCancel());
+	$frmScr->addItemToBottomRow(new CButtonCancel());
 	$frmScr->Show();
 }
 else {
 	validate_sort_and_sortorder('s.name',ZBX_SORT_UP);
 	
 	$form = new CForm();
-	$form->SetName('scripts');
-	$form->AddOption('id','scripts');
+	$form->setName('scripts');
+	$form->addOption('id','scripts');
 	
 	show_table_header(S_SCRIPTS);
 	
@@ -250,7 +251,7 @@ else {
 			));
 	}
 	$qbutton = new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_SCRIPTS_Q,'1');
-	$qbutton->SetAction("javascript: document.getElementById('scripts').action+='?action=1';");
+	$qbutton->setAction("javascript: document.getElementById('scripts').action+='?action=1';");
 	
 	$tr = new CCol(
 				array(
@@ -260,12 +261,12 @@ else {
 				)
 			);
 	
-	$table->SetFooter($tr);
+	$table->setFooter($tr);
 	
-	$form->AddItem($table);
+	$form->addItem($table);
 	$form->show();
 }
 ?>
 <?php
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 ?>

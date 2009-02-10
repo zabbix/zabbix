@@ -68,7 +68,7 @@ include_once "include/page_header.php";
         }
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
 
 	if(isset($_REQUEST["serviceid"]) && $_REQUEST["serviceid"] > 0){
 		$sql = 'SELECT s.serviceid '.
@@ -169,7 +169,7 @@ include_once "include/page_header.php";
 				
 
 				$stat = calculate_service_availability($row["serviceid"],$period_start,$period_end);
-				
+
 				if($row["goodsla"] > $stat["ok"]){
 					$sla_style='red';
 				} 
@@ -177,7 +177,7 @@ include_once "include/page_header.php";
 					$sla_style='green';
 				}
 				
-				$row['sla2'] = array(new CSpan(round($row["goodsla"],3),'green'),'/', new CSpan(round($stat["ok"],3),$sla_style));
+				$row['sla2'] = array(new CSpan(sprintf("%.2f",$row['goodsla']),'green'),'/', new CSpan(sprintf("%.2f",$stat['ok']),$sla_style));
 			} 
 			else {
 				$row['sla']= "-";

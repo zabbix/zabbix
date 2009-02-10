@@ -62,7 +62,7 @@ include_once "include/page_header.php";
 //$bulk = (count($events) > 1);
 ?>
 <?php
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid());
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY, get_current_nodeid());
 		
 	$db_data = DBfetch(DBselect('SELECT COUNT(DISTINCT  e.eventid) as cnt'.
 			' FROM events e'.

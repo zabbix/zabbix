@@ -90,43 +90,45 @@ include_once 'include/page_header.php';
 		exit();
 	}
 	
-
-	if(isset($_REQUEST["graphid"]) && !isset($_REQUEST["hostid"])){
-		$_REQUEST["groupid"] = $_REQUEST["hostid"] = 0;
-	}
-
 	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0, PROFILE_TYPE_ID));
 	if(!in_node($_REQUEST['graphid'])) $_REQUEST['graphid'] = 0;
 
-//	$_REQUEST["keep"] 	=	get_request('keep', 1); // possible excessed REQUEST variable !!!
 //	$_REQUEST['stime'] =	get_request('stime',get_profile('web.graph.stime', null, PROFILE_TYPE_STR, $_REQUEST['graphid']));
 	$_REQUEST['period'] =	get_request('period',get_profile('web.graph.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['graphid']));
 	
 	$effectiveperiod = navigation_bar_calc();
-	
-	$options = array('allow_all_hosts','monitored_hosts','with_items','always_select_first_host');
-	if(!$ZBX_WITH_SUBNODES)	array_push($options,"only_current_node");
-	
-	validate_group_with_host(PERM_READ_ONLY,$options);
-	
+		
 	if($_REQUEST['graphid']>0){
 		$sql_from = '';
 		$sql_where = '';
-		if($_REQUEST['groupid'] > 0){
-			$sql_from .= ',hosts_groups hg ';
-			$sql_where.= ' AND hg.hostid=i.hostid AND hg.groupid='.$_REQUEST['groupid'];
+		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0)){
+			$sql_where.= ' AND hg.groupid='.$_REQUEST['groupid'];
 		}
 		
-		$sql = 'SELECT g.graphid '.
-				' FROM graphs g, graphs_items gi, items i'.$sql_from.
+		if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0)){
+			$sql_where.= ' AND hg.hostid='.$_REQUEST['hostid'];
+		}
+		
+		$sql = 'SELECT DISTINCT hg.groupid, hg.hostid '.
+				' FROM hosts_groups hg, hosts h, graphs g, graphs_items gi, items i '.
 				' WHERE g.graphid='.$_REQUEST['graphid'].
 					' AND gi.graphid=g.graphid '.
 					' AND i.itemid=gi.itemid '.
+					' AND hg.hostid=i.hostid '.
 					$sql_where.
-					($_REQUEST['hostid']?' AND i.hostid='.$_REQUEST['hostid']:'');
-
-		$result=DBselect($sql);
-		if(!DBfetch($result)) $_REQUEST['graphid'] = 0;
+					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
+		if($host_group = DBfetch(DBselect($sql,1))){
+			if(!isset($_REQUEST['groupid']) || !isset($_REQUEST['hostid'])){
+				$_REQUEST['groupid'] = $host_group['groupid'];
+				$_REQUEST['hostid'] = $host_group['hostid'];
+			}
+			else if(($_REQUEST['groupid']!=$host_group['groupid']) || ($_REQUEST['hostid']!=$host_group['hostid'])){
+				$_REQUEST['graphid'] = 0;
+			}
+		}
+		else{
+			$_REQUEST['graphid'] = 0;
+		}
 	}
 
 	if($_REQUEST['graphid']>0){
@@ -141,10 +143,20 @@ include_once 'include/page_header.php';
 
 	$h1 = array();
 	
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
+	$options = array('allow_all_hosts','monitored_hosts','wih_graphs');
+	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
+		
+	$params = array();
+	foreach($options as $option) $params[$option] = 1;
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);		
+
+	$available_groups= $PAGE_GROUPS['groupids'];
+	$available_hosts = $PAGE_HOSTS['hostids'];
 	
-	$available_graphs = get_accessible_graphs(PERM_READ_LIST, PERM_RES_IDS_ARRAY, get_current_nodeid(true));
+	$available_graphs = get_accessible_graphs(PERM_READ_LIST, $available_hosts, PERM_RES_IDS_ARRAY, get_current_nodeid(true));
 
 	if(($_REQUEST['graphid']>0) && ($row=DBfetch(DBselect('SELECT DISTINCT graphid, name FROM graphs WHERE graphid='.$_REQUEST['graphid'])))){
 		if(!graph_accessible($_REQUEST['graphid'])){
@@ -161,114 +173,26 @@ include_once 'include/page_header.php';
 	$p_elements = array();
 
 	$r_form = new CForm();
-	$r_form->SetMethod('get');
+	$r_form->setMethod('get');
 	
-	$r_form->AddVar('fullscreen', $_REQUEST['fullscreen']);
+	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
-	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
-	$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
-	$cmbGraph = new CComboBox('graphid',$_REQUEST['graphid'],'submit()');
-
-	$cmbGroup->AddItem(0,S_ALL_SMALL);
-	$cmbHosts->AddItem(0,S_ALL_SMALL);
-	$cmbGraph->AddItem(0,S_SELECT_GRAPH_DOT_DOT_DOT);
+	$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+	$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
 	
-// Selecting first group,host,graph if it's one of a kind ;)
-	if($_REQUEST['groupid'] == 0){
-		$sql = 'SELECT COUNT(DISTINCT g.groupid) as grpcount, MAX(g.groupid) as groupid'.
-				' FROM groups g, hosts_groups hg, hosts h '.
-				' WHERE '.DBcondition('g.groupid',$available_groups).
-					' AND hg.groupid=g.groupid '.
-					' AND h.hostid=hg.hostid '.
-					' AND h.status='.HOST_STATUS_MONITORED.
-					' AND EXISTS(SELECT DISTINCT i.itemid FROM items i, graphs_items gi WHERE i.hostid=h.hostid AND i.itemid=gi.itemid) ';
-
-		if($cnt_row = DBfetch(DBselect($sql))){
-			if($cnt_row['grpcount'] == 1){
-				$_REQUEST['groupid'] = $cnt_row['groupid'];
-				$cmbGroup->SetValue($_REQUEST['groupid']);
-			}
-		}
+	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 	}
-	
-	if($_REQUEST['hostid'] == 0){
+	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
+		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
+	}
+
+	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));	
 		
-		$sql_from = '';
-		$sql_where = '';
-		if($_REQUEST['groupid'] > 0){
-			$sql_from .= ',hosts_groups hg ';
-			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
-		}
-		
-		$sql = 'SELECT COUNT(DISTINCT h.hostid) as hstcount, MAX(h.hostid) as hostid '.
-			' FROM hosts h '.$sql_from.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-				$sql_where.
-				' AND EXISTS(SELECT DISTINCT i.itemid '.
-							' FROM items i, graphs_items gi '.
-							' WHERE i.hostid=h.hostid '.
-								' AND i.status='.ITEM_STATUS_ACTIVE.
-								' AND i.itemid=gi.itemid ) ';
-
-		if($cnt_row = DBfetch(DBselect($sql))){
-			if($cnt_row['hstcount'] == 1){
-				$_REQUEST['hostid'] = $cnt_row['hostid'];
-				$cmbHosts->SetValue($_REQUEST['hostid']);
-			}
-		}
-	}
-	
-	if($_REQUEST['graphid'] == 0){
-
-		$sql_from = '';
-		$sql_where = '';
-		if($_REQUEST['groupid'] > 0){
-			$sql_from .= ',hosts_groups hg ';
-			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
-		}
-		if($_REQUEST['hostid'] > 0){
-			$sql_where.= ' AND h.hostid='.$_REQUEST['hostid'];
-		}
-
-		$sql = 'SELECT COUNT(DISTINCT g.graphid) as grphcount, MAX(g.graphid) as graphid '.
-			' FROM graphs g,graphs_items gi,items i,hosts h'.$sql_from.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				$sql_where.
-				' AND i.hostid=h.hostid '.
-				' AND i.itemid=gi.itemid '.
-				' AND g.graphid=gi.graphid '.
-				' AND '.DBcondition('g.graphid',$available_graphs);
-
-		if($cnt_row = DBfetch(DBselect($sql))){
-			if($cnt_row['grphcount'] == 1){
-				$_REQUEST['graphid'] = $cnt_row['graphid'];
-				$cmbGraph->SetValue($_REQUEST['graphid']);
-			}
-		}
-	}
-	
-//----------------------------------------------
-
-	$sql = 'SELECT DISTINCT g.groupid,g.name '.
-			' FROM groups g, hosts_groups hg, hosts h '.
-			' WHERE '.DBcondition('g.groupid',$available_groups).
-				' AND hg.groupid=g.groupid '.
-				' AND h.hostid=hg.hostid '.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND EXISTS(SELECT DISTINCT i.itemid FROM items i, graphs_items gi WHERE i.hostid=h.hostid AND i.itemid=gi.itemid) '.
-			' ORDER BY g.name';	
-			
-	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		$cmbGroup->AddItem(
-				$row['groupid'],
-				get_node_name_by_elid($row['groupid']).$row["name"]
-				);
-	}
-	
-	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
-	
+//---------------------------------------------_
+	$cmbGraphs = new CComboBox('graphid',$_REQUEST['graphid'],'submit()');
+	$cmbGraphs->addItem(0,S_SELECT_GRAPH_DOT_DOT_DOT);
 	
 	$sql_from = '';
 	$sql_where = '';
@@ -276,27 +200,9 @@ include_once 'include/page_header.php';
 		$sql_from .= ',hosts_groups hg ';
 		$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
 	}
-	
-	$sql='SELECT DISTINCT h.hostid,h.host '.
-		' FROM hosts h '.$sql_from.
-		' WHERE h.status='.HOST_STATUS_MONITORED.
-			' AND '.DBcondition('h.hostid',$available_hosts).
-			$sql_where.
-			' AND EXISTS(SELECT DISTINCT i.itemid '.
-						' FROM items i, graphs_items gi '.
-						' WHERE i.hostid=h.hostid '.
-							' AND i.status='.ITEM_STATUS_ACTIVE.
-							' AND gi.itemid=i.itemid) '.
-		' ORDER BY h.host';	
-	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		$cmbHosts->AddItem(
-			$row['hostid'],
-			get_node_name_by_elid($row['hostid']).$row['host']
-		);
+	if($_REQUEST['hostid'] > 0){
+		$sql_where.= ' AND h.hostid='.$_REQUEST['hostid'];
 	}
-
-	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 	
 	$sql = 'SELECT DISTINCT g.graphid,g.name '.
 		' FROM graphs g,graphs_items gi,items i,hosts h'.$sql_from.
@@ -305,20 +211,20 @@ include_once 'include/page_header.php';
 			' AND h.hostid=i.hostid '.
 			' AND h.status='.HOST_STATUS_MONITORED.
 			$sql_where.
-			($_REQUEST['hostid']?' AND h.hostid='.$_REQUEST['hostid']:'').
+			
 			' AND '.DBin_node('g.graphid').
 			' AND '.DBcondition('g.graphid',$available_graphs).
 		' ORDER BY g.name';
 
 	$result = DBselect($sql);
 	while($row=DBfetch($result)){
-		$cmbGraph->AddItem(
+		$cmbGraphs->addItem(
 				$row['graphid'],
 				get_node_name_by_elid($row['graphid']).$row['name']
 				);
 	}
 	
-	$r_form->AddItem(array(SPACE.S_GRAPH.SPACE,$cmbGraph));
+	$r_form->addItem(array(SPACE.S_GRAPH.SPACE,$cmbGraphs));
 	
 	$p_elements[] = get_table_header($h1, $r_form);
 ?>
@@ -385,7 +291,7 @@ include_once 'include/page_header.php';
 				</script>'."\n";
 		}
 		
-		$table->AddRow(new CScript($row));
+		$table->addRow(new CScript($row));
 	}
 	
 	$p_elements[] = $table;
@@ -396,21 +302,21 @@ include_once 'include/page_header.php';
 	if($_REQUEST['graphid'] > 0){
 		if(infavorites('web.favorite.graphids',$_REQUEST['graphid'],'graphid')){
 			$icon = new CDiv(SPACE,'iconminus');
-			$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
-			$icon->AddAction('onclick',new CScript("javascript: rm4favorites('graphid','".$_REQUEST['graphid']."',0);"));
+			$icon->addOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
+			$icon->addAction('onclick',new CScript("javascript: rm4favorites('graphid','".$_REQUEST['graphid']."',0);"));
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
-			$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
-			$icon->AddAction('onclick',new CScript("javascript: add2favorites('graphid','".$_REQUEST['graphid']."');"));
+			$icon->addOption('title',S_ADD_TO.' '.S_FAVORITES);
+			$icon->addAction('onclick',new CScript("javascript: add2favorites('graphid','".$_REQUEST['graphid']."');"));
 		}
-		$icon->AddOption('id','addrm_fav');
+		$icon->addOption('id','addrm_fav');
 		
 		$url = '?graphid='.$_REQUEST['graphid'].($_REQUEST['fullscreen']?'':'&fullscreen=1');
 
 		$fs_icon = new CDiv(SPACE,'fullscreen');
-		$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+		$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 		
 		$rst_icon = new CDiv(SPACE,'iconreset');
 		$rst_icon->addOption('title',S_RESET);

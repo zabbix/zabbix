@@ -589,6 +589,7 @@
 	'S_ALL_BIG'=>					'ALL',
 	'S_MINUS_ALL_MINUS'=>			'- all -',
 	'S_MINUS_OTHER_MINUS'=>			'- other -',
+	'S_NOT_SELECTED_SMALL'=>		'not selected',
 	'S_DESCRIPTION_LARGE'=>			'DESCRIPTION',
 	'S_DESCRIPTION_SMALL'=>			'Description',
 	'S_NO_DESCRIPTION'=>			'No description',

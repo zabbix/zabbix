@@ -24,29 +24,29 @@
 		function CLink($item=NULL,$url=NULL,$class=NULL,$action=NULL){
 			parent::CTag('a','yes');
 			
-			$uri = new Curl($url);
-			$url = $uri->getUrl();
-			
 			$this->tag_start= '';
 			$this->tag_end = '';
 			$this->tag_body_start = '';
 			$this->tag_body_end = '';
 
-			if(!is_null($class))	$this->SetClass($class);
-			if(!is_null($item))	$this->AddItem($item);
-			if(!is_null($url))	$this->SetUrl($url);
-			if(!is_null($action))	$this->SetAction($action);
+			if(!is_null($class))	$this->setClass($class);
+			if(!is_null($item))		$this->addItem($item);
+			if(!is_null($url))		$this->setUrl($url);
+			if(!is_null($action))	$this->setAction($action);
 		}
 		
 		function setAction($value=NULL){
 			if(is_null($value))
 				return $this->options['action'] = $page['file'];
 
-			return parent::AddAction('onclick', $value);
+			return parent::addAction('onclick', $value);
 		}
 		
 		function setUrl($value){
-			$this->AddOption('href', $value);
+			$uri = new Curl($value);
+			$url = $uri->getUrl();
+
+			$this->addOption('href', $url);
 		}
 		
 		function getUrl(){

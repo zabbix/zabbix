@@ -271,7 +271,7 @@ COpt::profiling_start("page");
 	$main_menu_row	= array();
 	$sub_menu_row	= array();
 
-	foreach($ZBX_MENU as $label=>$sub){
+	foreach($ZBX_MENU as $label => $sub){
 // Check permissions for main menu
 		unset($deny);
 		if(!defined('ZBX_PAGE_NO_AUTHERIZATION')){
@@ -326,6 +326,7 @@ COpt::profiling_start("page");
 				}
 				
 				$page_exist = true;
+				$page['menu'] = $label;
 				$sub['pages'][$id]['active'] = true; /* mark as active */
 			}
 			else if(isset($sub_pages['sub_pages'])){
@@ -334,12 +335,13 @@ COpt::profiling_start("page");
 						$menu_url = $sub_pages['url'];
 					}
 					$page_exist = true;
+					$page['menu'] = $label;
 					$sub['pages'][$id]['active'] = true; /* mark as active */
 				}					
 			}
 
-			if (isset($page_exist) &&
-				( isset($sub['forse_disable_subnodes']) || isset($sub_pages['forse_disable_subnodes']) ) &&
+			if(isset($page_exist) &&
+				(isset($sub['forse_disable_subnodes']) || isset($sub_pages['forse_disable_subnodes'])) && 
 				!defined('ZBX_DISABLE_SUBNODES'))
 			{
 					define('ZBX_DISABLE_SUBNODES', 1);
@@ -485,7 +487,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$page_header_r_col[] = array('|', new CLink(S_LOGIN, 'index.php?reconnect=1', 'small_font'));
 		}
 
-		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),'http://www.zabbix.com');
+		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),'http://www.zabbix.com/');
 		$logo->setTarget('_blank');
 //		$logo = new CDiv(SPACE,'zabbix_logo');
 //		$logo->AddAction('onclick',"javascript: document.location = 'http://www.zabbix.com';");		

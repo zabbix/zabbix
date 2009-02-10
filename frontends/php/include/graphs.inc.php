@@ -192,16 +192,17 @@
  *     Aly
  *
  */		
-	function get_accessible_graphs($perm,$perm_res=null,$nodeid=null,$hostid=null,$cache=1){
+	function get_accessible_graphs($perm,$hostids,$perm_res=null,$nodeid=null,$cache=1){
 		global $USER_DETAILS;
 		static $available_graphs;
 		
 		if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
 		$nodeid_str =(is_array($nodeid))?implode('',$nodeid):strval($nodeid);
-		$hostid_str =(is_array($hostid))?implode('',$hostid):strval($hostid);
+		$hostid_str = implode('',$hostids);
 		
-		if($cache && isset($available_graphs[$perm][$perm_res][$nodeid_str][$hostid_str])){
-			return $available_graphs[$perm][$perm_res][$nodeid_str][$hostid_str];
+		$cache_hash = md5($perm.$perm_res.$nodeid_str.$hostid_str);
+		if($cache && isset($available_graphs[$cache_hash])){
+			return $available_graphs[$cache_hash];
 		}
 		
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid);
@@ -209,11 +210,15 @@
 		$denied_graphs = array();
 		$result = array();
 		
+		$sql_where = '';
+		if(!empty($hostids)){
+			$sql_where.= ' AND '.DBcondition('i.hostid',$hostids);
+		}		
 		$sql = 	'SELECT DISTINCT g.graphid '.
 				' FROM graphs g, graphs_items gi, items i '.
 				' WHERE g.graphid=gi.graphid '.
-					(!empty($hostid)?' AND i.hostid='.$hostid:'').
 					' AND i.itemid=gi.itemid '.
+					$sql_where.
 					' AND '.DBcondition('i.hostid',$available_hosts, true);
 
 		$db_graphs = DBselect($sql);
@@ -224,9 +229,9 @@
 		$sql = 	'SELECT DISTINCT g.graphid '.
 				' FROM graphs g, graphs_items gi, items i '.
 				' WHERE g.graphid=gi.graphid '.
-					(!empty($hostid)?' AND i.hostid='.$hostid:'').
 					' AND i.itemid=gi.itemid '.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
+					$sql_where.
 					(!empty($denied_graphs)?' AND '.DBcondition('g.graphid',$denied_graphs,true):'');
 		$db_graphs = DBselect($sql);
 		while($graph = DBfetch($db_graphs)){
@@ -240,7 +245,7 @@
 				$result = implode(',',$result);
 		}
 
-		$available_graphs[$perm][$perm_res][$nodeid_str][$hostid_str] = $result;
+		$available_graphs[$cache_hash] = $result;
 
 	return $result;
 	}

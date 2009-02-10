@@ -22,14 +22,14 @@ function send_params(params){
 	if(typeof(params) == 'undefined') var params = new Array();
 
 	var url = new Curl(location.href);
-	uri.setQuery('?output=ajax');
+	url.setQuery('?output=ajax');
 
 	new Ajax.Request(url.getUrl(),
 					{
 						'method': 'post',
 						'parameters':params,
-//						'onSuccess': function(resp){ },
-						'onSuccess': function(resp){ alert(resp.responseText); },
+						'onSuccess': function(resp){ },
+//						'onSuccess': function(resp){ alert(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);

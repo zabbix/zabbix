@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -201,24 +201,21 @@ include_once 'include/page_header.php';
 	$show_severity = $_REQUEST['show_severity'];
 	$show_events_status = $_REQUEST['show_events_status'];
 // --------------
-
 	validate_sort_and_sortorder('t.lastchange',ZBX_SORT_DOWN);
 
-	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items','always_select_first_host'); //always_select_first_host
-	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
-	
-	$_REQUEST['hostid'] = get_request('hostid',get_profile('web.tr_status.hostid', null, PROFILE_TYPE_ID));
-	if(!isset($_REQUEST['hostid'])){
-		array_push($options,'always_select_first_host');
-		
-		$_REQUEST['groupid'] = get_request('groupid',get_profile('web.tr_status.groupid', null, PROFILE_TYPE_ID));
-		if(!isset($_REQUEST['groupid'])){
-			validate_group(PERM_READ_ONLY,array('allow_all_hosts','monitored_hosts','with_monitored_items','always_select_first_group'),'web.tr_status.groupid');
-		}
-	}
-
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
-	validate_group_with_host(PERM_READ_ONLY,$options,'web.tr_status.groupid','web.tr_status.hostid');
+
+	$params = array();
+	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
+	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');	
+	foreach($options as $option) $params[$option] = 1;
+	
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 
 	$mute = get_profile('web.tr_status.mute',0);
 	if(isset($audio) && !$mute){
@@ -227,69 +224,30 @@ include_once 'include/page_header.php';
 ?>                                                                                                             
 <?php
 	$r_form = new CForm();
-	$r_form->SetMethod('get');
+	$r_form->setMethod('get');
 
-	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
-	$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
+//	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+//	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 
-	$cmbGroup->AddItem(0,S_ALL_SMALL);
-	$cmbHosts->AddItem(0,S_ALL_SMALL);
+	$available_groups = $PAGE_GROUPS['groupids'];
+	$available_hosts = $PAGE_HOSTS['hostids'];
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,$PAGE_HOSTS['hostids']);
+
+	$scripts_by_hosts = get_accessible_scripts_by_hosts($PAGE_HOSTS['hostids']);
+
+	$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+	$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
+
+	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
+	}
+	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
+		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
+	}
 	
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-
-	$scripts_by_hosts = get_accessible_scripts_by_hosts($available_hosts);
-
-	$sql = 'SELECT DISTINCT g.groupid,g.name '.
-			' FROM groups g, hosts_groups hg, hosts h '.
-			' WHERE '.DBcondition('g.groupid',$available_groups).
-				' AND hg.groupid=g.groupid '.
-				' AND h.hostid=hg.hostid '.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND EXISTS(SELECT i.itemid FROM items i WHERE i.status='.ITEM_STATUS_ACTIVE.' AND i.hostid=h.hostid ) '.
-			' ORDER BY g.name';	
-	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		$cmbGroup->AddItem(
-				$row['groupid'],
-				get_node_name_by_elid($row['groupid']).$row['name']
-				);
-		unset($row);
-	}
-	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
-	
-	$sql_from = '';
-	$sql_where = '';
-	if($_REQUEST['groupid'] > 0){
-		$sql_from .= ',hosts_groups hg ';
-		$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
-	}
-	$sql='SELECT DISTINCT h.hostid,h.host '.
-		' FROM hosts h, items i, functions f, triggers t '.$sql_from.
-		' WHERE h.status='.HOST_STATUS_MONITORED.
-			$sql_where.		
-			' AND h.hostid=i.hostid '.
-			' AND i.status='.ITEM_STATUS_ACTIVE.
-			' AND i.itemid=f.itemid '.
-			' AND f.triggerid=t.triggerid '.
-			' AND t.status='.TRIGGER_STATUS_ENABLED.
-			' AND '.DBcondition('h.hostid',$available_hosts).
-		' ORDER BY h.host';
-
-	$result=DBselect($sql);
-	$flag = false;
-	while($row=DBfetch($result)){
-		$flag |= (bccomp($_REQUEST['hostid'] , $row['hostid']) == 0);
-		$cmbHosts->AddItem(
-				$row['hostid'],
-				get_node_name_by_elid($row['hostid']).$row['host']
-				);
-	}
-	if(!$flag) $_REQUEST['hostid'] = 0;
-
-	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-	$r_form->AddVar('fullscreen',$_REQUEST['fullscreen']);
+	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 
 	$p_elemetns = array();
 	
@@ -430,16 +388,14 @@ include_once 'include/page_header.php';
 		S_STATUS,
 		make_sorting_link(S_LAST_CHANGE,'t.lastchange'),
 		is_show_subnodes()?make_sorting_link(S_NODE,'h.hostid'):null,
-		($_REQUEST["hostid"]>0)?null:make_sorting_link(S_HOST,'h.host'),
+		($_REQUEST['hostid']>0)?null:make_sorting_link(S_HOST,'h.host'),
 		make_sorting_link(S_NAME,'t.description'),
 		$_REQUEST['show_actions']?S_ACTIONS:NULL,
 		$config['event_ack_enable']?S_ACKNOWLEDGED:NULL,
 		S_COMMENTS
 		));
 	
-	$cond =($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid'].' ':'';
-	$cond.=($_REQUEST['groupid']> 0)?' AND hg.hostid=h.hostid AND hg.groupid ='.$_REQUEST['groupid']:'';
-	
+	$cond =($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid'].' ':'';	
 	switch($show_triggers){
 		case TRIGGERS_OPTION_ALL:
 			$cond.='';
@@ -486,20 +442,22 @@ include_once 'include/page_header.php';
 	$triggerids = array();
 	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, t.expression,t.priority, '.
 					' t.lastchange,t.comments,t.url,t.value,h.host,h.hostid,t.type '.
-			' FROM triggers t,hosts h,items i,functions f '.($_REQUEST['groupid']?', hosts_groups hg ':'').
+			' FROM triggers t,hosts h,items i,functions f '.
 			' WHERE '.DBcondition('t.triggerid',$available_triggers).
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				' AND f.triggerid=t.triggerid '.			
 				' AND i.itemid=f.itemid '.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				' AND h.hostid=i.hostid '.
-				' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.
+				' AND h.status='.HOST_STATUS_MONITORED.
+				$cond.
 			order_by('h.host,h.hostid,t.description,t.priority,t.lastchange');
 			
 	$result = DBselect($sql);
 	while($row=DBfetch($result)){
 // Check for dependencies
 		if(trigger_dependent($row['triggerid']))	continue;
+
 		if($show_triggers == TRIGGERS_OPTION_NOFALSEFORB){
 			$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
 				' FROM events e, triggers t '.

@@ -347,7 +347,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 	$sql_from = $sql_cond = '';
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_DATA_ARRAY, get_current_nodeid());
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_DATA_ARRAY, get_current_nodeid());
 	
 	if($hostid > 0){
 		$sql_cond = ' AND h.hostid='.$hostid;

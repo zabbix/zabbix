@@ -20,11 +20,13 @@
 ?>
 <?php
 
-function show_report2_header($config){
+function show_report2_header($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 	global $USER_DETAILS;
-	
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$available_groups = $PAGE_GROUPS['groupids'];
+	$available_hosts = $PAGE_HOSTS['hostids'];
+
+//	$available_groups = $PAGE_GROUPS['groupids'];
+//	$available_hosts = $PAGE_HOSTS['hostids'];
 	
 	$r_form = new CForm();
 	$r_form->setMethod('get');
@@ -35,84 +37,31 @@ function show_report2_header($config){
 
 	$r_form->addItem(array(S_MODE.SPACE,$cmbConf,SPACE));
 
-	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
-	$cmbGroup->addItem(0,S_ALL_SMALL);
-	
-	$status_filter=($config==1)?' AND h.status='.HOST_STATUS_TEMPLATE:' AND h.status='.HOST_STATUS_MONITORED;
-	
-	$sql = 'SELECT DISTINCT g.groupid,g.name '.
-			' FROM groups g,hosts_groups hg,hosts h'.
-			' WHERE '.DBcondition('h.hostid',$available_hosts).
-				' AND '.DBcondition('g.groupid',$available_groups).
-				' AND g.groupid=hg.groupid '.
-				' AND h.hostid=hg.hostid'.
-				$status_filter.
-			' ORDER BY g.name';
+	$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+	$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
 
-	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		$cmbGroup->addItem($row['groupid'],	get_node_name_by_elid($row['groupid']).$row['name']);
+	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 	}
-	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
-
-
-	$sql_from = '';
-	$sql_where = '';
-
-	if(0 == $config){
-		$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
-		$sql_where = ' AND h.status='.HOST_STATUS_MONITORED;
+	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
+		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
 	}
-	else{
-		$cmbTpls = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
+	
+	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+
+	if(1 == $config){
 		$cmbTrigs = new CComboBox('tpl_triggerid',get_request('tpl_triggerid',0),'submit()');
 		$cmbHGrps = new CComboBox('hostgroupid',get_request('hostgroupid',0),'submit()');
 		
 		$cmbTrigs->addItem(0,S_ALL_SMALL);
 		$cmbHGrps->addItem(0,S_ALL_SMALL);
-		
-		$sql_where = ' AND h.status='.HOST_STATUS_TEMPLATE;		
 	}
-	
-	
-	if($_REQUEST['groupid'] > 0){
-		$sql_from .= ',hosts_groups hg ';
-		$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
-	}
-	else{
-		if(0 == $config){
-			$cmbHosts->addItem(0,S_ALL_SMALL);
-		}
-		else{
-			$cmbTpls->addItem(0,S_ALL_SMALL);
-		}		
-	}
-	
-	$sql='SELECT DISTINCT h.hostid,h.host '.
-		' FROM hosts h,items i '.$sql_from.
-		' WHERE '.DBcondition('h.hostid',$available_hosts).
-			$sql_where.
-			' AND i.hostid=h.hostid '.
-		' ORDER BY h.host';
-
-	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		if(0 == $config){
-			$cmbHosts->addItem($row['hostid'],get_node_name_by_elid($row['hostid']).$row['host']);
-		}
-		else{
-			$cmbTpls->addItem($row['hostid'],get_node_name_by_elid($row['hostid']).$row['host']);
-		}
-	}
-
 	
 	if(0 == $config){
-		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 		show_table_header(S_AVAILABILITY_REPORT_BIG, $r_form);
 	}
 	else{
-		$r_form->addItem(array(SPACE.S_TEMPLATE.SPACE,$cmbTpls));
-
 		$sql_cond = ' AND h.hostid=ht.hostid ';
 		if($_REQUEST['hostid'] > 0)	$sql_cond.=' AND ht.templateid='.$_REQUEST['hostid'];
 		
@@ -575,7 +524,7 @@ function bar_report_form3(){
 // ----------
 
 // HOSTS
-	validate_group(PERM_READ_ONLY,array('real_hosts'),'web.last.conf.groupid');
+//	validate_group(PERM_READ_ONLY,array('real_hosts'),'web.last.conf.groupid');
 	
 	$cmbGroups = new CComboBox('groupid',get_request('groupid',0),'submit()');
 	$cmbGroups->addItem(0,S_ALL_S);
