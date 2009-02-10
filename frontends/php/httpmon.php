@@ -64,15 +64,19 @@ include_once "include/page_header.php";
 		exit();
 	}
 //--------
-
 	validate_sort_and_sortorder('wt.name',ZBX_SORT_DOWN);
 
-	$options = array('allow_all_hosts','monitored_hosts');
-
-	$_REQUEST['groupid'] = get_request('groupid',get_profile('web.latest.groupid',-1));
-	if($_REQUEST['groupid'] == -1) array_push($options,'always_select_first_host');
+	$options = array('allow_all_hosts','monitored_hosts','with_monitored_httptests');
+	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
 	
-//	validate_group_with_host(PERM_READ_ONLY,array('allow_all_hosts','always_select_first_host','monitored_hosts'));
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+	$params = array();
+	foreach($options as  $option) $params[$option] = 1;
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 ?>
 <?php
 	$_REQUEST['applications'] = get_request('applications',get_profile('web.httpmon.applications',array(),PROFILE_TYPE_ARRAY_ID));
@@ -109,92 +113,24 @@ include_once "include/page_header.php";
 	
 // Table HEADER
 	$form = new CForm();
-	$form->SetMethod('get');
-	
-	$cmbGroup = new CComboBox('groupid',null,'submit();');
-	$cmbGroup->AddItem(0,S_ALL_SMALL);
+	$form->setMethod('get');
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST);
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
+	$available_groups = $PAGE_GROUPS['groupids'];
+	$available_hosts = $PAGE_HOSTS['hostids'];
 
-	$correct_group = false;
-	$sql = 'SELECT DISTINCT g.groupid,g.name '.
-		' FROM groups g, hosts_groups hg, hosts h '.
-		' WHERE '.DBcondition('g.groupid',$available_groups).
-			' AND hg.groupid=g.groupid '.
-			' AND h.hostid=hg.hostid'.
-			' AND h.status='.HOST_STATUS_MONITORED.
-			' AND EXISTS( SELECT a.applicationid '.
-							' FROM applications a, httptest ht '.
-							' WHERE a.hostid=h.hostid '.
-								' AND ht.applicationid=a.applicationid '.
-								' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')'.
-		' ORDER BY g.name';
-	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		if($_REQUEST['groupid'] == $row['groupid']) $correct_group = true;
-		else if(!isset($first_group)) $first_group = $row['groupid'];
-		
-		$cmbGroup->AddItem(
-					$row['groupid'],
-					get_node_name_by_elid($row['groupid']).$row['name'],
-					(bccomp($_REQUEST['groupid'],$row['groupid'])==0)?1:0
-				);
+	$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+	$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
+
+	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 	}
-	if(!$correct_group && isset($first_group)) $_REQUEST['groupid'] = $first_group;
-	
-//	Supposed to be here
-	validate_group_with_host(PERM_READ_ONLY,$options);
-
-	$form->AddItem(S_GROUP.SPACE);
-	$form->AddItem($cmbGroup);
-
-	if($_REQUEST['hostid'] > 0){
-	
-		$httptests_by_host = get_httptests_by_hostid($_REQUEST['hostid']);
-		if(!DBfetch($httptests_by_host)){
-			$_REQUEST['hostid'] = -1;
-		}
-	}
-//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
-
-	$cmbHosts = new CComboBox('hostid',null,'submit();');
-	$cmbHosts->AddItem(0,S_ALL_SMALL);
-	
-	$sql_from = '';
-	$sql_where = '';
-	if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0)){
-		$sql_from .= ',hosts_groups hg ';
-		$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
+		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
 	}
 	
-	$sql='SElECT DISTINCT h.hostid,h.host '.
-		' FROM hosts h '.$sql_from.
-		' WHERE h.status='.HOST_STATUS_MONITORED.
-			' AND '.DBcondition('h.hostid',$available_hosts).
-			$sql_where.
-			' AND EXISTS( SELECT a.applicationid '.
-							' FROM applications a, httptest ht '.
-							' WHERE a.hostid=h.hostid '.
-								' AND ht.applicationid=a.applicationid '.
-								' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')'.
-
-		' GROUP BY h.hostid,h.host'.
-		' ORDER BY h.host';
-
-	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		if($_REQUEST['hostid'] == -1) $_REQUEST['hostid'] = $row['hostid'];
-		$cmbHosts->AddItem(
-					$row['hostid'],
-					get_node_name_by_elid($row['hostid']).$row['host'],
-					(bccomp($_REQUEST['hostid'],$row['hostid'])==0)?1:0
-				);
-	}
-
-	$form->AddItem(SPACE.S_HOST.SPACE);
-	$form->AddItem($cmbHosts);
-	
+	$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+	$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+			
 	$p_elements[] = get_table_header(SPACE, $form);
 
 // TABLE

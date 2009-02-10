@@ -32,18 +32,22 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"triggerid"=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL)
+		'triggerid'=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL)
 	);
 
 	check_fields($fields);
 ?>
 <?php
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY);
-
-	if(!DBfetch(DBselect('SELECT DISTINCT t.triggerid FROM triggers t WHERE t.triggerid='.$_REQUEST['triggerid']))){
+	$sql = 'SELECT DISTINCT i.hostid '.
+			' FROM functions f, items i '.
+			' WHERE f.triggerid='.$_REQUEST['triggerid'].
+				' AND i.itemid=f.itemid';
+	if(!$host = DBfetch(DBselect($sql))){
 		fatal_error(S_NO_TRIGGER_DEFINED);
 	}
-					
+	
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($host['hostid']));
+				
 	$sql = 'SELECT DISTINCT t.triggerid,t.description,t.expression, h.host,h.hostid '.
 			' FROM hosts h, items i, functions f, triggers t'.
 			' WHERE h.hostid=i.hostid '.

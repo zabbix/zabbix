@@ -1034,32 +1034,23 @@
 	return get_host_by_itemid($itemid);
 	}
 
-	/*
-	 * Function: get_items_data_overview
-	 *
-	 * Description:
-	 *     Retrive overview table object for items
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
-	function get_items_data_overview($groupid,$view_style=null){
-		global	$USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+/*
+ * Function: get_items_data_overview
+ *
+ * Description:
+ *     Retrive overview table object for items
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ */
+	function get_items_data_overview($hostids,$view_style=null){
 
 		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
 		
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
-
-		$sql_from = '';
-		$sql_where = '';
-		if($groupid > 0){
-			$sql_from = ', hosts_groups hg ';
-			$sql_where = ' AND hg.groupid='.$groupid.' AND hg.hostid=h.hostid ';							
-		} 
 
 COpt::profiling_start('prepare data');
 		$result = DBselect('SELECT DISTINCT h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
@@ -1067,12 +1058,10 @@ COpt::profiling_start('prepare data');
 			' FROM hosts h, items i '.
 				' LEFT JOIN functions f on f.itemid=i.itemid '.
 				' LEFT JOIN triggers t on t.triggerid=f.triggerid '.
-				$sql_from.
-			' WHERE '.DBcondition('h.hostid',$available_hosts).
+			' WHERE '.DBcondition('h.hostid',$hostids).
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND h.hostid=i.hostid '.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
-				$sql_where.
 			' ORDER BY i.description,i.itemid');
 
 		unset($items);

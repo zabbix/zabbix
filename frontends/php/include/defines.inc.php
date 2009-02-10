@@ -20,13 +20,40 @@
 ?>
 <?php
 	define('ZABBIX_VERSION','1.7');
+/* USER DEFINES */	
+
+	define('ZBX_LOGIN_ATTEMPTS', 	5);
+	define('ZBX_LOGIN_BLOCK', 		30); // sec
 	
+	define('TRIGGERS_OPTION_DISABLED',		0);		// reserved
+	define('TRIGGERS_OPTION_ONLYTRUE',		1);		// use 0 to disable
+	define('TRIGGERS_OPTION_ALL',			2);		// use 0 to disable
+	define('TRIGGERS_OPTION_NOFALSEFORB',	0);		// use 0 to disable
+	
+	define('TRIGGER_FALSE_PERIOD', 			1800);	// 30min,  0 - disable
+	define('TRIGGER_BLINK_PERIOD',			1800);	// 30min,  0 - disable
+
+	define('EVENTS_OPTION_DISABLED',		0);		//	reserved
+	define('EVENTS_OPTION_NOEVENT',			1);		//	use 0 to disable
+	define('EVENTS_OPTION_ALL',				2);		//	use 0 to disable
+	define('EVENTS_OPTION_NOT_ACK',			3);		//	use 0 to disable
+	define('EVENTS_OPTION_ONLYTRUE_NOTACK',	4);		//	use 0 to disable
+	define('EVENTS_OPTION_NOFALSEFORB',		5);		//  reserved for TRIGGERS_OPTION_NOFALSEFORB, to disable set TRIGGERS_OPTION_NOFALSEFORB to 0
+
+	define('ZBX_MIN_PERIOD', 3600);					// ~1 hour
+	define('ZBX_MAX_PERIOD', 12*31*24*3600);		// ~1 year
+	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
+
+	define('ZBX_DROPDOWN_FIRST_ENTRY',		0);		// 0 - NONE, 1 - ALL
+	define('ZBX_DROPDOWN_FIRST_REMEMBER',	1);		// 0 - do NOT remember, 1 - do remember
+
+	define('ZBX_DISABLE_MENU_CACHE',		0);		// set 1 to disable
+	
+/* END OF USERS DEFINES */
+
 	define('ZBX_AUTH_INTERNAL',	0);
 	define('ZBX_AUTH_LDAP',		1);
 	define('ZBX_AUTH_HTTP',		2);
-	
-	define('ZBX_LOGIN_ATTEMPTS', 	5);
-	define('ZBX_LOGIN_BLOCK', 		30); // sec
 	
 	define('PAGE_TYPE_HTML',		0);
 	define('PAGE_TYPE_IMAGE',		1);
@@ -36,6 +63,9 @@
 	
 	define('ZBX_SESSION_ACTIVE', 0);
 	define('ZBX_SESSION_PASSIVE', 1);
+	
+	define('ZBX_DROPDOWN_FIRST_NONE',		0);
+	define('ZBX_DROPDOWN_FIRST_ALL',		1);
 
 	define('T_ZBX_STR',			0);
 	define('T_ZBX_INT',			1);
@@ -234,17 +264,9 @@
 	define('TRIGGER_STATUS_DISABLED',1);
 	define('TRIGGER_STATUS_UNKNOWN',2);
 	
-	define('TRIGGERS_OPTION_DISABLED',		0);	// reserved
-	define('TRIGGERS_OPTION_ONLYTRUE',		1);	// use 0 to disable
-	define('TRIGGERS_OPTION_ALL',			2);	// use 0 to disable
-	define('TRIGGERS_OPTION_NOFALSEFORB',	0);	// use 0 to disable
-
 	define('TRIGGER_VALUE_FALSE',0);
 	define('TRIGGER_VALUE_TRUE',1);
 	define('TRIGGER_VALUE_UNKNOWN',2);
-
-	define('TRIGGER_FALSE_PERIOD', 			1800);	
-	define('TRIGGER_BLINK_PERIOD',			1800);
 
 	define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
 	define('TRIGGER_SEVERITY_INFORMATION',		1);
@@ -391,13 +413,6 @@
 	define('PERM_RES_IDS_ARRAY',	1); /* return array of nodes id - array(1,2,3,4) */
 	define('PERM_RES_DATA_ARRAY',	2); 
 
-	define('PERM_MODE_NE',	5);
-	define('PERM_MODE_EQ',	4);
-	define('PERM_MODE_GT',	3);
-	define('PERM_MODE_LT',	2);
-	define('PERM_MODE_LE',	1);
-	define('PERM_MODE_GE',	0);
-
 	define('RESOURCE_TYPE_NODE',		0);
 	define('RESOURCE_TYPE_GROUP',		1);
 
@@ -426,6 +441,10 @@
 	define('EVENT_ACK_DISABLED','0');
 	define('EVENT_ACK_ENABLED','1');
 
+	define('EVENTS_NOFALSEFORB_STATUS_ALL',		0);	//	used with TRIGGERS_OPTION_NOFALSEFORB
+	define('EVENTS_NOFALSEFORB_STATUS_FALSE',	1);	//	used with TRIGGERS_OPTION_NOFALSEFORB
+	define('EVENTS_NOFALSEFORB_STATUS_TRUE',	2);	//	used with TRIGGERS_OPTION_NOFALSEFORB
+	
 	define('EVENT_SOURCE_TRIGGERS',		0);
 	define('EVENT_SOURCE_DISCOVERY',	1);
 
@@ -433,24 +452,6 @@
 	define('EVENT_OBJECT_DHOST',		1);
 	define('EVENT_OBJECT_DSERVICE',		2);
 	
-	define('EVENTS_OPTION_DISABLED',		0);		//	reserved
-	define('EVENTS_OPTION_NOEVENT',			1);		//	use 0 to disable
-	define('EVENTS_OPTION_ALL',				2);		//	use 0 to disable
-	define('EVENTS_OPTION_NOT_ACK',			3);		//	use 0 to disable
-	define('EVENTS_OPTION_ONLYTRUE_NOTACK',	4);		//	use 0 to disable
-	define('EVENTS_OPTION_NOFALSEFORB',		5);		//  reserved for TRIGGERS_OPTION_NOFALSEFORB, to disable set TRIGGERS_OPTION_NOFALSEFORB to 0
-	
-	define('EVENTS_NOFALSEFORB_STATUS_ALL',		0);	//	used with TRIGGERS_OPTION_NOFALSEFORB
-	define('EVENTS_NOFALSEFORB_STATUS_FALSE',	1);	//	used with TRIGGERS_OPTION_NOFALSEFORB
-	define('EVENTS_NOFALSEFORB_STATUS_TRUE',	2);	//	used with TRIGGERS_OPTION_NOFALSEFORB
-	
-	define('EXPRESSION_TYPE_INCLUDED',		0);
-	define('EXPRESSION_TYPE_ANY_INCLUDED',	1);
-	define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
-	define('EXPRESSION_TYPE_TRUE',			3);
-	define('EXPRESSION_TYPE_FALSE',			4);
-	
-
 	define('DOBJECT_STATUS_UP',		0);
 	define('DOBJECT_STATUS_DOWN',		1);
 	define('DOBJECT_STATUS_DISCOVER',	2); /* only for events,           */
@@ -531,10 +532,6 @@ else{
 	define('ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID', 2);
 	define('ZBX_EXPRESSION_MACRO_ID', 13);
 	define('ZBX_EXPRESSION_RIGHT_ID', 14);
-
-	define('ZBX_MIN_PERIOD', 3600);				// ~1 hour
-	define('ZBX_MAX_PERIOD', 12*31*24*3600);	// ~1 year
-	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
 	
 	define('ZBX_HISTORY_COUNT',5);
 	

@@ -89,7 +89,7 @@
 			while(($se_data = DBfetch($db_result)) && $result){
 				switch($se_data['elementtype']){
 					case SYSMAP_ELEMENT_TYPE_HOST:
-						if(!uint_in_array($se_data['elementid'],$available_hosts)){
+						if(!isset($available_hosts[$se_data['elementid']])){
 							$result = false;
 						}
 						break;
@@ -97,14 +97,14 @@
 						$result = sysmap_accessible($se_data['elementid'], $perm);
 						break;
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						$available_triggers = get_accessible_triggers($perm, PERM_RES_IDS_ARRAY);
-						if(!uint_in_array($se_data['elementid'],$available_triggers)){
+						$available_triggers = get_accessible_triggers($perm, array(), PERM_RES_IDS_ARRAY);
+						if(!isset($available_triggers[$se_data['elementid']])){
 							$result = false;
 						}
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 						$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm);
-						if(!uint_in_array($se_data['elementid'],$available_groups)){
+						if(!isset($available_groups[$se_data['elementid']])){
 							$result = false;
 						}
 						break;

@@ -49,7 +49,7 @@ include_once "include/page_header.php";
 		fatal_error(S_NO_IT_SERVICE_DEFINED);
 	}
 	
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
 	
 	$sql = 'SELECT s.* '.
 			' FROM services s '.

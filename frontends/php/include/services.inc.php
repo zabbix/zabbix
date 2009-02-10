@@ -252,7 +252,7 @@
 		return	FALSE;
 	}
 
-	function	service_has_parent($serviceid){
+	function service_has_parent($serviceid){
 		$row = DBfetch(DBselect('SELECT linkid FROM services_links WHERE servicedownid='.$serviceid));
 		if($row && !zbx_empty($row['linkid'])){
 			return	TRUE;
@@ -261,8 +261,7 @@
 	}
 
 // Seems not used ant more!
-	function	service_has_no_this_parent($parentid,$serviceid)
-	{
+	function service_has_no_this_parent($parentid,$serviceid){
 		$row = DBfetch(DBselect('SELECT linkid FROM services_links WHERE serviceupid='.$parentid.' AND servicedownid='.$serviceid));
 		if($row && !zbx_empty($row['linkid'])){
 			return	FALSE;
@@ -270,7 +269,7 @@
 		return	TRUE;
 	}
 
-	function	add_service_link($servicedownid,$serviceupid,$softlink){
+	function add_service_link($servicedownid,$serviceupid,$softlink){
 		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==true) ){
 			error("cannot link hardlinked service.");
 			return	false;
@@ -292,7 +291,7 @@
 		return $linkid;
 	}
 	
-	function	update_service_link($linkid,$servicedownid,$serviceupid,$softlink){
+	function update_service_link($linkid,$servicedownid,$serviceupid,$softlink){
 		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==true) ){
 			return	false;
 		}
@@ -315,28 +314,25 @@
 		DBExecute($query);
 	}
 	
-	function	get_last_service_value($serviceid,$clock){
+	function get_last_service_value($serviceid,$clock){
 	       	$sql="SELECT count(*) as cnt,max(clock) as maxx FROM service_alarms WHERE serviceid=$serviceid and clock<=$clock";
 //		echo " $sql<br>";
 		
 	        $result=DBselect($sql);
 		$row=DBfetch($result);
-		if($row["cnt"]>0)
-		{
+		if($row["cnt"]>0){
 	       		$sql="SELECT value FROM service_alarms WHERE serviceid=$serviceid and clock=".$row["maxx"];
 		        $result2=DBselect($sql);
 // Assuring that we get very latest service value. There could be several with the same timestamp
 //			$value=DBget_field($result2,0,0);
-			while($row2=DBfetch($result2))
-			{
+			while($row2=DBfetch($result2)){
 				$value=$row2["value"];
 			}
 		}
-		else
-		{
+		else{
 			$value=0;
 		}
-		return $value;
+	return $value;
 	}
 /*	
 function VDI($time,$show=1){
@@ -559,7 +555,7 @@ if($serviceid == 1 || $serviceid == 2){
 	return $sla_time;
 	}
 
-	function	get_service_status_description($status){
+	function get_service_status_description($status){
 		$desc=new CSpan(S_OK_BIG,'green');
 		if(TRIGGER_SEVERITY_DISASTER == $status){
 			$desc=new CTag('div','yes',S_DISASTER,'disaster');
@@ -579,11 +575,10 @@ if($serviceid == 1 || $serviceid == 2){
 	return $desc;
 	}
 
-	function	get_num_of_service_childs($serviceid)
-	{
+	function get_num_of_service_childs($serviceid){
 		$row = DBfetch(DBselect("SELECT count(distinct servicedownid) as cnt FROM services_links ".
 					" WHERE serviceupid=".$serviceid));
-		return	$row["cnt"];
+	return	$row["cnt"];
 	}
 
 	function	get_service_by_serviceid($serviceid)

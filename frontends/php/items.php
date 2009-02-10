@@ -24,11 +24,11 @@
 	require_once('include/items.inc.php');
 	require_once('include/forms.inc.php');
 
-	$page["title"] = "S_CONFIGURATION_OF_ITEMS";
-	$page["file"] = "items.php";
+	$page['title'] = "S_CONFIGURATION_OF_ITEMS";
+	$page['file'] = 'items.php';
 	$page['hist_arg'] = array();
 
-include_once "include/page_header.php";
+include_once 'include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -177,7 +177,7 @@ include_once "include/page_header.php";
 	
 	check_fields($fields);
 	validate_sort_and_sortorder('i.description',ZBX_SORT_UP);
-	
+
 /* AJAX */	
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
@@ -303,14 +303,11 @@ include_once "include/page_header.php";
 // --------------
 	$showdisabled = get_request('showdisabled', 0);
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
-
-	if(isset($_REQUEST['hostid']) && !uint_in_array($_REQUEST['hostid'], $available_hosts)){
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
+	
+	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0) && !isset($available_hosts[$_REQUEST['hostid']])){
 		unset($_REQUEST['hostid']);
 	}
-	
-	$options = array('always_select_first_group','always_select_first_host','only_current_node');
-	validate_group_with_host(PERM_READ_WRITE, $options, 'web.last.conf.groupid', 'web.last.conf.hostid');
 
 	update_profile('web.items.showdisabled',$showdisabled, PROFILE_TYPE_INT);
 ?>
@@ -746,14 +743,57 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
+	if(isset($_REQUEST['itemid']) && ($_REQUEST['itemid']>0)){
+		$sql_from = '';
+		$sql_where = '';
+		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0)){
+			$sql_where.= ' AND hg.groupid='.$_REQUEST['groupid'];
+		}
+		
+		if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0)){
+			$sql_where.= ' AND hg.hostid='.$_REQUEST['hostid'];
+		}
+		
+		$sql = 'SELECT DISTINCT hg.groupid, hg.hostid '.
+				' FROM hosts_groups hg, items i '.
+				' WHERE i.itemid='.$_REQUEST['itemid'].
+					' AND hg.hostid=i.hostid '.
+					$sql_where;
+		if($host_group = DBfetch(DBselect($sql,1))){
+			if(!isset($_REQUEST['groupid']) || !isset($_REQUEST['hostid'])){
+				$_REQUEST['groupid'] = $host_group['groupid'];
+				$_REQUEST['hostid'] = $host_group['hostid'];
+			}
+			else if(($_REQUEST['groupid']!=$host_group['groupid']) || ($_REQUEST['hostid']!=$host_group['hostid'])){
+				$_REQUEST['itemid'] = 0;
+			}
+		}
+		else{
+			$_REQUEST['itemid'] = 0;
+		}
+	}
+	
+	$options = array('only_current_node');
+	foreach($options as $option) $params[$option] = 1;
+
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
+
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+	
+	$available_groups = $PAGE_GROUPS['groupids'];
+	$available_hosts = $PAGE_HOSTS['hostids'];
+?>
+<?php
 	$form = new CForm();
-	$form->SetMethod('get');
-	$form->SetName('hdrform');
+	$form->setMethod('get');
+	$form->setName('hdrform');
 
-	$form->AddVar('hostid',$_REQUEST['hostid']);
-	$form->AddVar('groupid',$_REQUEST['groupid']);
+	$form->addVar('hostid',$_REQUEST['hostid']);
+	$form->addVar('groupid',$_REQUEST['groupid']);
 
-	$form->AddItem(new CButton('form',S_CREATE_ITEM));
+	if($PAGE_HOSTS['selected'] > 0)
+		$form->addItem(new CButton('form',S_CREATE_ITEM));
 
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	echo SBR;
@@ -767,7 +807,7 @@ include_once "include/page_header.php";
 	else if (!isset($_REQUEST['form']) ||  !str_in_array($_REQUEST['form'],array(S_CREATE_ITEM,'update','clone'))) {
 // Table HEADER
 		$form = new CForm();
-		$form->SetMethod('get');
+		$form->setMethod('get');
 		
 		$where_case = array();
 		$from_tables['h'] = 'hosts h';
@@ -775,25 +815,24 @@ include_once "include/page_header.php";
 		$where_case[] =  DBcondition('h.hostid',$available_hosts);
 		
 // Items Header
- 		$form->AddItem(array('[', 
+ 		$form->addItem(array('[', 
 			new CLink($showdisabled ? S_HIDE_DISABLED_ITEMS : S_SHOW_DISABLED_ITEMS,
-				'?showdisabled='.($showdisabled ? 0 : 1),null),
+				'?showdisabled='.($showdisabled?0:1).url_param('groupid').url_param('hostid'),null),
 			']', SPACE));
 
-		$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit();');
-		$cmbGroup->AddItem(0,S_ALL_SMALL);
-
-		$result=DBselect('select distinct g.groupid,g.name '.
-					' from groups g,hosts_groups hg '.
-					' where g.groupid=hg.groupid '.
-						' and '.DBcondition('hg.hostid',$available_hosts).
-					' order by name');
-		while($row=DBfetch($result)){
-			$cmbGroup->AddItem($row['groupid'],$row['name']);
+		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
+	
+		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 		}
-		$form->AddItem(S_GROUP.SPACE);
-		$form->AddItem($cmbGroup);
-
+		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
+			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
+		}
+		
+		$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+		$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+		
 		$sql_from = '';
 		$sql_where = '';
 		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0)){
@@ -801,40 +840,6 @@ include_once "include/page_header.php";
 			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
 		}
 
-		$sql='SELECT DISTINCT h.hostid,h.host '.
-			' FROM hosts h'.$sql_from.
-			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-				$sql_where.
-			' GROUP BY h.hostid,h.host '.
-			' ORDER BY h.host';
-
-		$result=DBselect($sql);
-
-		$_REQUEST['hostid'] = get_request('hostid',0);
-		$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit();');
-
-		unset($correct_hostid);
-		$first_hostid = -1;
-		while($row=DBfetch($result)){
-			$cmbHosts->AddItem($row['hostid'],$row['host']);
-
-			if($_REQUEST['hostid']!=0){
-				if(bccomp($_REQUEST['hostid'], $row['hostid']) == 0)
-					$correct_hostid = 'ok';
-			}
-			if($first_hostid <= 0)
-				$first_hostid = $row['hostid'];
-		}
-		if(!isset($correct_hostid))
-			$_REQUEST['hostid'] = $first_hostid;
-
-		$form->AddItem(SPACE.S_HOST.SPACE);
-		$form->AddItem($cmbHosts);
-
-//			if($host_info = DBfetch(DBselect('select host from hosts where hostid='.$_REQUEST['hostid']))){
-//				$form->AddVar('filter_host', $host_info['host']);
-//			}
 		if(!$filter_enabled){
 			$where_case[] = 'i.hostid='.$_REQUEST['hostid'];
 			$show_applications = 1;
@@ -966,10 +971,10 @@ include_once "include/page_header.php";
 
 // TABLE
 		$form = new CForm();
-		$form->SetName('items');
+		$form->setName('items');
 
 		$table  = new CTableInfo();
-		$table->SetHeader(array(
+		$table->setHeader(array(
 			$show_host ? make_sorting_link(S_HOST,'h.host') : null,
 			array(	new CCheckBox('all_items',null,
 					"CheckAll('".$form->GetName()."','all_items');"),
@@ -989,35 +994,33 @@ include_once "include/page_header.php";
 				' FROM '.implode(',', $from_tables).
 					' LEFT JOIN items ti ON i.templateid=ti.itemid '.
 					' LEFT JOIN hosts th ON ti.hostid=th.hostid '.
-				' WHERE '.implode(' and ', $where_case).
+				' WHERE '.implode(' AND ', $where_case).
+					' AND h.hostid='.$PAGE_HOSTS['selected'].
 				order_by('h.host,i.description,i.key_,i.delay,i.history,i.trends,i.type,i.status','i.itemid');
 		$db_items = DBselect($sql);
-
 		while($db_item = DBfetch($db_items)){
 			$description = array();
 			$item_description = item_description($db_item);
 
 			if(isset($_REQUEST['filter_description']) && !zbx_stristr($item_description, $_REQUEST['filter_description']) ) continue;
 
-			if($db_item["templateid"]){
-				$template_host = get_realhost_by_itemid($db_item["templateid"]);
+			if($db_item['templateid']){
+				$template_host = get_realhost_by_itemid($db_item['templateid']);
 				array_push($description,		
-					new CLink($template_host["host"],"?".
-						"hostid=".$template_host["hostid"],
+					new CLink($template_host['host'],'?'.
+						'hostid='.$template_host['hostid'],
 						'unknown'),
-					":");
+					':');
 			}
 
 			array_push($description, new CLink(
 				item_description($db_item),
 				'?form=update&itemid='.$db_item['itemid'].
+//				url_param('groupid').
 				'&hostid='.$db_item['hostid'],
-//				url_param('hostid').
-//				url_param('groupid'),
 				'action'));
 
 			$status=new CCol(new CLink(item_status2str($db_item['status']),
-//					'?sessionid='.$USER_DETAILS['sessionid'].
 					'?group_itemid%5B%5D='.$db_item['itemid'].
 					'&group_task='.($db_item['status']?'Activate+selected':'Disable+selected'),
 					item_status2style($db_item['status'])));
@@ -1029,18 +1032,18 @@ include_once "include/page_header.php";
 				$error=new CCol($db_item['error'],'on');
 			}
 			
-			$applications = $show_applications ? implode(', ', get_applications_by_itemid($db_item["itemid"], 'name')) : null;
+			$applications = $show_applications ? implode(', ', get_applications_by_itemid($db_item['itemid'], 'name')) : null;
 			if(!is_null($applications) && empty($applications)) $applications = ' - ';
 			
-			$chkBox = new CCheckBox('group_itemid['.$db_item["itemid"].']',null,null,$db_item["itemid"]);
-			//if($db_item["templateid"] > 0) $chkBox->SetEnabled(false);
-			$table->AddRow(array(
+			$chkBox = new CCheckBox('group_itemid['.$db_item['itemid'].']',null,null,$db_item['itemid']);
+			//if($db_item['templateid'] > 0) $chkBox->setEnabled(false);
+			$table->addRow(array(
 				$show_host ? $db_item['host'] : null,
 				array($chkBox, $description),
-				$db_item["key_"],
-				$db_item["delay"],
-				$db_item["history"],
-				$db_item["trends"],
+				$db_item['key_'],
+				$db_item['delay'],
+				$db_item['history'],
+				$db_item['trends'],
 				item_type2str($db_item['type']),
 				$status,
 				$applications,
@@ -1061,21 +1064,23 @@ include_once "include/page_header.php";
 		array_push($footerButtons, new CButton('form_copy_to',S_COPY_SELECTED_TO));
 		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('form_mass_update',S_MASS_UPDATE));
-		$table->SetFooter(new CCol($footerButtons));
+		$table->setFooter(new CCol($footerButtons));
 
-		$form->AddItem($table);
+		$form->addItem($table);
 		$form->Show();
 	}
 
-	if(isset($_REQUEST["form"]) && (str_in_array($_REQUEST["form"],array(S_CREATE_ITEM,"update","clone")) ||
-		($_REQUEST["form"]=="mass_update" && isset($_REQUEST['group_itemid']))))
-	{
+	if(isset($_REQUEST['form'])){
 // FORM
-		insert_item_form();
+		if(str_in_array($_REQUEST['form'],array(S_CREATE_ITEM,'update','clone')) || 
+			(($_REQUEST['form']=='mass_update') && isset($_REQUEST['group_itemid'])))
+		{
+			insert_item_form();
+		}
 	}
 ?>
 <?php
 
-include_once "include/page_footer.php"
+include_once('include/page_footer.php');
 
 ?>

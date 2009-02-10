@@ -22,6 +22,7 @@ Changes for 1.6.3
 
  - [ZBX-677] fixed handling of -c parameter in zabbix_sender. Thanks to Jakov Sosic (Sasha)
  - [ZBX-690] fixed memory leak if trigger evaluation fails (Sasha)
+ - [DEV-285] added configurable the first dropdown selection (Artem)
  - [ZBX-689] allowed processing of non-agent based checks for unreachable hosts (Sasha)
  - [ZBX-683] removed "Step" field for recovery messages from Event details (Sasha)
  - [ZBX-680] fixed login while entering any page with HTTP auth enabled (Artem)

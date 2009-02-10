@@ -30,8 +30,8 @@ function action_accessible($actionid,$perm){
 	if (DBselect('select actionid from actions where actionid='.$actionid.' and '.DBin_node('actionid'))){
 		$result = true;
 		
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
-		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,null,get_current_nodeid(true));
+		$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm,null,get_current_nodeid(true));
 		
 		$db_result = DBselect('SELECT * FROM conditions WHERE actionid='.$actionid);
 		while(($ac_data = DBfetch($db_result)) && $result){
@@ -39,13 +39,13 @@ function action_accessible($actionid,$perm){
 
 			switch($ac_data['conditiontype']){
 				case CONDITION_TYPE_HOST_GROUP:
-					if(!uint_in_array($ac_data['value'],$available_groups)){
+					if(!isset($available_groups[$ac_data['value']])){
 						$result = false;
 					}
 					break;
 				case CONDITION_TYPE_HOST:
 				case CONDITION_TYPE_HOST_TEMPLATE:
-					if(!uint_in_array($ac_data['value'],$available_hosts)){
+					if(!isset($available_hosts[$ac_data['value']])){
 						$result = false;
 					}
 					break;
@@ -80,14 +80,14 @@ function check_permission_for_action_conditions($conditions){
 
 		switch($ac_data['type']){
 			case CONDITION_TYPE_HOST_GROUP:
-				if(!uint_in_array($ac_data['value'],$available_groups)){
+				if(!isset($available_groups[$ac_data['value']])){
 					error(S_INCORRECT_GROUP);
 					$result = false;
 				}
 				break;
 			case CONDITION_TYPE_HOST:
 			case CONDITION_TYPE_HOST_TEMPLATE:
-				if(!uint_in_array($ac_data['value'],$available_hosts)){
+				if(!isset($available_hosts[$ac_data['value']])){
 					error(S_INCORRECT_HOST);
 					$result = false;
 				}
@@ -712,14 +712,14 @@ function validate_condition($conditiontype, $value){
 	switch($conditiontype){
 		case CONDITION_TYPE_HOST_GROUP:
 			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
-			if(!uint_in_array($value, $available_groups)){
+			if(!isset($available_groups[$value])){
 				error(S_INCORRECT_GROUP);
 				return false;
 			}
 			break;
 		case CONDITION_TYPE_HOST_TEMPLATE:
 			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
-			if(!uint_in_array($value,$available_hosts)){
+			if(!isset($available_hosts[$value])){
 				error(S_INCORRECT_HOST);
 				return false;
 			}
@@ -734,7 +734,7 @@ function validate_condition($conditiontype, $value){
 			break;
 		case CONDITION_TYPE_HOST:
 			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
-			if(!uint_in_array($value,$available_hosts)){
+			if(!isset($available_hosts[$value])){
 				error(S_INCORRECT_HOST);
 				return false;
 			}
@@ -895,7 +895,7 @@ return $delays;
 }
 
 function get_history_of_actions($start,$num,$sql_cond=''){
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(
@@ -917,7 +917,6 @@ function get_history_of_actions($start,$num,$sql_cond=''){
 				' AND '.DBcondition('e.objectid',$available_triggers).
 				' AND '.DBin_node('a.alertid').
 			order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries');
-
 	$result=DBselect($sql,10*$start+$num);
 		
 	$col=0;
@@ -968,7 +967,16 @@ function get_history_of_actions($start,$num,$sql_cond=''){
 	
 // Author: Aly
 function get_action_msgs_for_event($eventid){
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+	$hostids = array();
+	$sql = 'SELECT DISTINCT i.hostid '.
+			' FROM events e, functions f, items i '.
+			' WHERE e.eventid='.$eventid.
+				' AND f.triggerid=e.objectid'.$_REQUEST['triggerid'].
+				' AND i.itemid=f.itemid';
+	if($host = DBfetch(DBselect($sql,1))){
+		$hostids[$host['hostid']] = $host['hostid'];
+	}
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(
@@ -1043,7 +1051,16 @@ return $table;
 
 // Author: Aly
 function get_action_cmds_for_event($eventid){
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+	$hostids = array();
+	$sql = 'SELECT DISTINCT i.hostid '.
+			' FROM events e, functions f, items i '.
+			' WHERE e.eventid='.$eventid.
+				' AND f.triggerid=e.objectid'.$_REQUEST['triggerid'].
+				' AND i.itemid=f.itemid';
+	if($host = DBfetch(DBselect($sql,1))){
+		$hostids[$host['hostid']] = $host['hostid'];
+	}
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(
@@ -1106,7 +1123,16 @@ return $table;
 
 // Author: Aly
 function get_actions_hint_by_eventid($eventid,$status=NULL){
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+	$hostids = array();
+	$sql = 'SELECT DISTINCT i.hostid '.
+			' FROM events e, functions f, items i '.
+			' WHERE e.eventid='.$eventid.
+				' AND f.triggerid=e.objectid'.$_REQUEST['triggerid'].
+				' AND i.itemid=f.itemid';
+	if($host = DBfetch(DBselect($sql,1))){
+		$hostids[$host['hostid']] = $host['hostid'];
+	}
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
 	
 	$tab_hint = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$tab_hint->AddOption('style', 'width: 300px;');

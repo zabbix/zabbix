@@ -95,14 +95,11 @@
 			access_deny();
 
 	$showdisabled = get_request('showdisabled', 0);
-
-	$options = array('allow_all_hosts','always_select_first_host','with_items','only_current_node');
-	validate_group_with_host(PERM_READ_WRITE,$options,'web.last.conf.groupid','web.last.conf.hostid');
 ?>
 <?php
 	update_profile('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
 
-	$available_triggers = get_accessible_triggers(PERM_READ_WRITE);
+	$available_triggers = get_accessible_triggers(PERM_READ_WRITE, array());			// OPTIMIZE!!!
 /* FORM ACTIONS */
 
 	if(isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])){
@@ -207,7 +204,7 @@
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['triggerid'])){
 		$result = false;
 		
-		if(!uint_in_array($_REQUEST['triggerid'],$available_triggers))
+		if(!isset($available_triggers[$_REQUEST['triggerid']]))
 			access_deny();
 			
 		if($trigger_data = DBfetch(
@@ -271,14 +268,14 @@
 		if(!isset($_REQUEST['dependencies']))
 			$_REQUEST['dependencies'] = array();
 
-		if(!uint_in_array($_REQUEST["new_dependence"], $_REQUEST["dependencies"]))
-			array_push($_REQUEST["dependencies"], $_REQUEST["new_dependence"]);
+		if(!uint_in_array($_REQUEST['new_dependence'], $_REQUEST['dependencies']))
+			array_push($_REQUEST['dependencies'], $_REQUEST['new_dependence']);
 	}
-	else if(isset($_REQUEST["del_dependence"])&&isset($_REQUEST["rem_dependence"])){
-		if(isset($_REQUEST["dependencies"])){
-			foreach($_REQUEST["dependencies"]as $key => $val){
-				if(!uint_in_array($val, $_REQUEST["rem_dependence"]))	continue;
-				unset($_REQUEST["dependencies"][$key]);
+	else if(isset($_REQUEST['del_dependence'])&&isset($_REQUEST['rem_dependence'])){
+		if(isset($_REQUEST['dependencies'])){
+			foreach($_REQUEST['dependencies'] as $key => $val){
+				if(!uint_in_array($val, $_REQUEST['rem_dependence']))	continue;
+				unset($_REQUEST['dependencies'][$key]);
 			}
 		}
 	}
@@ -344,13 +341,57 @@
 	}
 ?>
 <?php
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS, PERM_READ_WRITE);
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-	$available_triggers = get_accessible_triggers(PERM_READ_WRITE,PERM_RES_IDS_ARRAY,null,null,0);
+	if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
+		$sql_from = '';
+		$sql_where = '';
+		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0)){
+			$sql_where.= ' AND hg.groupid='.$_REQUEST['groupid'];
+		}
+		
+		if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0)){
+			$sql_where.= ' AND hg.hostid='.$_REQUEST['hostid'];
+		}
+		
+		$sql = 'SELECT DISTINCT hg.groupid, hg.hostid '.
+				' FROM hosts_groups hg '.
+				' WHERE EXISTS( SELECT i.itemid '.
+								' FROM items i, functions f'.
+								' WHERE i.hostid=hg.hostid '.
+									' AND f.itemid=i.itemid '.
+									' AND f.triggerid='.$_REQUEST['triggerid'].')'.
+						$sql_where;
+		if($host_group = DBfetch(DBselect($sql,1))){
+			if(!isset($_REQUEST['groupid']) || !isset($_REQUEST['hostid'])){
+				$_REQUEST['groupid'] = $host_group['groupid'];
+				$_REQUEST['hostid'] = $host_group['hostid'];
+			}
+			else if(($_REQUEST['groupid']!=$host_group['groupid']) || ($_REQUEST['hostid']!=$host_group['hostid'])){
+				$_REQUEST['triggerid'] = 0;
+			}
+		}
+		else{
+			$_REQUEST['triggerid'] = 0;
+		}
+	}
 	
+	$params=array();
+	$options = array('with_items','only_current_node');
+	foreach($options as $option) $params[$option] = 1;
+	
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
+	
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+	
+	$available_groups = $PAGE_GROUPS['groupids'];
+	$available_hosts = $PAGE_HOSTS['hostids'];
+	$available_triggers = get_accessible_triggers(PERM_READ_WRITE,$PAGE_HOSTS['hostids'],PERM_RES_IDS_ARRAY,null,0);
+?>
+<?php
+
 	$form = new CForm();
-	$form->SetMethod('get');
-	$form->AddItem(new CButton('form',S_CREATE_TRIGGER));
+	$form->setMethod('get');
+	$form->addItem(new CButton('form',S_CREATE_TRIGGER));
 
 	show_table_header(S_CONFIGURATION_OF_TRIGGERS_BIG,$form);
 	echo SBR;
@@ -370,59 +411,31 @@
 	else{
 /* TABLE */
 		$r_form = new CForm();
-		$r_form->SetMethod('get');
-		$r_form->AddItem(array('[', 
+		$r_form->setMethod('get');
+		$r_form->addItem(array('[', 
 			new CLink($showdisabled ? S_HIDE_DISABLED_TRIGGERS : S_SHOW_DISABLED_TRIGGERS,
 				'triggers.php?showdisabled='.($showdisabled ? 0 : 1),NULL),
 			']', SPACE));
 	
-		$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
-		$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
+		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
 	
-		$cmbGroup->AddItem(0,S_ALL_SMALL);
-		
-		
-		$sql = 'SELECT DISTINCT g.groupid,g.name '.
-				' FROM groups g, hosts_groups hg, hosts h '.
-				' WHERE '.DBcondition('g.groupid',$available_groups).
-					' AND hg.groupid=g.groupid '.
-					' AND h.hostid=hg.hostid '.
-					' AND EXISTS(SELECT DISTINCT i.itemid FROM items i WHERE i.hostid=h.hostid ) '.
-				' ORDER BY g.name';	
-		$result=DBselect($sql);
-		while($row=DBfetch($result)){
-			$cmbGroup->AddItem($row['groupid'],$row['name']);
+		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 		}
-		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
-		
-		$sql_from = '';
-		$sql_where = '';
-		if($_REQUEST['groupid'] > 0){
-			$cmbHosts->AddItem(0,S_ALL_SMALL);
-			$sql_from .= ',hosts_groups hg ';
-			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
+			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
 		}
-			
-		$sql='SELECT DISTINCT h.hostid,h.host '.
-			' FROM hosts h,items i '.$sql_from.
-			' WHERE h.hostid=i.hostid '.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-				$sql_where.
-			' ORDER BY h.host';
 		
-		$result=DBselect($sql);
-		while($row=DBfetch($result)){
-			$cmbHosts->AddItem($row['hostid'],$row['host']);
-		}
-	
-		$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-	
+		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+				
 		show_table_header(S_TRIGGERS_BIG, $r_form);
 			
 		$form = new CForm('triggers.php');
-		$form->SetName('triggers');
-		$form->SetMethod('post');
-		$form->AddVar('hostid',$_REQUEST['hostid']);
+		$form->setName('triggers');
+		$form->setMethod('post');
+		$form->addVar('hostid',$_REQUEST['hostid']);
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->setHeader(array(
@@ -436,25 +449,22 @@
 			),
 			S_EXPRESSION));
 
+		$sql_from = '';
+		$sql_where = '';	
+		if($showdisabled == 0){
+		    $sql_where.= ' AND t.status <> '.TRIGGER_STATUS_DISABLED;
+		}
+			
 		$sql = 'SELECT DISTINCT h.hostid,h.host,t.*'.
 			' FROM triggers t '.
 				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
 				' LEFT JOIN items i ON f.itemid=i.itemid '.
 				' LEFT JOIN hosts h ON h.hostid=i.hostid '.
-				(($_REQUEST['groupid']>0)?' LEFT JOIN hosts_groups hg ON hg.hostid=h.hostid ':'').
 			' WHERE '.DBin_node('t.triggerid').
-				' AND '.DBcondition('t.triggerid',$available_triggers);
-
-		if($showdisabled == 0)
-		    $sql .= ' AND t.status <> '.TRIGGER_STATUS_DISABLED;
-
-		if($_REQUEST['hostid'] > 0) 
-			$sql .= ' AND h.hostid='.$_REQUEST['hostid'];
-			
-		if($_REQUEST['groupid'] > 0)
-			$sql .= ' AND hg.groupid='.$_REQUEST['groupid'];
-
-		$sql .= order_by('h.host,t.description,t.priority,t.status');
+				$sql_where.
+				' AND h.hostid='.$PAGE_HOSTS['selected'].
+				' AND '.DBcondition('t.triggerid',$available_triggers).
+			order_by('h.host,t.description,t.priority,t.status');
 
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
@@ -462,7 +472,7 @@
 			if(is_null($row['host'])) $row['host'] = '';
 			if(is_null($row['hostid'])) $row['hostid'] = '0';
 
-			$description = array(new CCheckBox('g_triggerid['.$row['triggerid'].']', NULL,NULL,$row["triggerid"]), SPACE);
+			$description = array(new CCheckBox('g_triggerid['.$row['triggerid'].']', NULL,NULL,$row['triggerid']), SPACE);
 
 			if($row['templateid']){
 				$real_hosts = get_realhosts_by_triggerid($row['triggerid']);
