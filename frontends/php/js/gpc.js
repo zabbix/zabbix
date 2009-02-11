@@ -193,6 +193,11 @@ setArgument: function(key,value){
 	this.formatQuery();
 },
 
+unsetArgument: function(key){
+	delete(this.arguments[key]);
+	this.formatQuery();
+},
+
 getArgument: function(key){
 	if(typeof(this.arguments[key]) != 'undefined') return this.arguments[key];
 	else return null;

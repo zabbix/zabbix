@@ -1005,8 +1005,9 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	$def_options = array_merge($def_options, $options);
 
 	$dd_first_entry = ZBX_DROPDOWN_FIRST_ENTRY;
-//	if($page['menu'] == 'config') $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
+	if($page['menu'] == 'config') $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
 	if($def_options['allow_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
+	if(($groupid == 0) && (ZBX_DROPDOWN_FIRST_ENTRY == ZBX_DROPDOWN_FIRST_ALL)) $dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
 
 	$result = array('selected'=>0, 'hosts'=> array(), 'hostids'=> array());
 	$hosts = &$result['hosts'];
@@ -1158,6 +1159,9 @@ return $result;
 		global $page;
 		
 		$dd_first_entry = ZBX_DROPDOWN_FIRST_ENTRY;
+		if($page['menu'] == 'config') $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
+		if(($PAGE_GROUPS['selected'] == 0) && (ZBX_DROPDOWN_FIRST_ENTRY == ZBX_DROPDOWN_FIRST_ALL)) $dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
+
 //		if($page['menu'] == 'config') $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
 
 		$group_var = 'web.latest.groupid';
@@ -1188,7 +1192,7 @@ return $result;
 		$PAGE_GROUPS['selected'] = $_REQUEST['groupid'];
 		$PAGE_HOSTS['selected'] = $_REQUEST['hostid'];
 		
-		if(($PAGE_HOSTS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) && $reset_hosts){
+		if(($PAGE_HOSTS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) && $reset_host){
 			$PAGE_HOSTS['hostids'] = array(0);
 		}
 		
