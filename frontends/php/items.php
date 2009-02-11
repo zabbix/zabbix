@@ -675,6 +675,15 @@ include_once 'include/page_header.php';
 	}
 ?>
 <?php
+	if(isset($_REQUEST['hostid']) && !isset($_REQUEST['groupid']) && !isset($_REQUEST['itemid'])){
+		$sql = 'SELECT DISTINCT hg.groupid '.
+				' FROM hosts_groups hg '.
+				' WHERE hg.hostid='.$_REQUEST['hostid'];
+		if($group=DBfetch(DBselect($sql, 1))){
+			$_REQUEST['groupid'] = $group['groupid'];
+		}
+	}
+	
 	if(isset($_REQUEST['itemid']) && ($_REQUEST['itemid']>0)){
 		$sql_from = '';
 		$sql_where = '';
@@ -913,10 +922,11 @@ include_once 'include/page_header.php';
 
 		$from_tables['i'] = 'items i'; /* NOTE: must be added as last element to use left join */
 
-		$sql = 'SELECT DISTINCT th.host as template_host,th.hostid as template_hostid, h.host, h.hostid, i.* '.
+		$sql = 'SELECT DISTINCT th.host as template_host,th.hostid as template_hostid, h.host, h.hostid, hg.groupid, i.* '.
 				' FROM '.implode(',', $from_tables).
 					' LEFT JOIN items ti ON i.templateid=ti.itemid '.
 					' LEFT JOIN hosts th ON ti.hostid=th.hostid '.
+					' LEFT JOIN hosts_groups hg ON hg.hostid=th.hostid '.
 				' WHERE '.implode(' AND ', $where_case).
 				order_by('h.host,i.description,i.key_,i.delay,i.history,i.trends,i.type,i.status','i.itemid');
 		$db_items = DBselect($sql);
@@ -938,7 +948,6 @@ include_once 'include/page_header.php';
 			array_push($description, new CLink(
 				item_description($db_item),
 				'?form=update&itemid='.$db_item['itemid'].
-//				url_param('groupid').
 				'&hostid='.$db_item['hostid'],
 				'action'));
 
