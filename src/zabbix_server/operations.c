@@ -213,7 +213,7 @@ static void run_remote_command(char* host_name, char* command)
 	DB_ITEM         item;
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*p, key[ITEM_KEY_LEN_MAX];
+	char		*p, *host_esc, key[ITEM_KEY_LEN_MAX];
 #ifdef HAVE_OPENIPMI
 	int		val;
 	char		error[MAX_STRING_LEN];
@@ -226,10 +226,12 @@ static void run_remote_command(char* host_name, char* command)
 		host_name,
 		command);
 
+	host_esc = DBdyn_escape_string(host_name);
 	result = DBselect("select distinct host,ip,useip,port,dns,useipmi,ipmi_port,ipmi_authtype,"
 			"ipmi_privilege,ipmi_username,ipmi_password from hosts where host='%s'" DB_NODE,
-			host_name,
+			host_esc,
 			DBnode_local("hostid"));
+	zbx_free(host_esc);
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -389,7 +391,7 @@ void	op_run_commands(char *cmd_list)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*alias, *command;
+	char		*alias, *alias_esc, *command;
 	int		is_group;
 
 	assert(cmd_list);
@@ -401,10 +403,12 @@ void	op_run_commands(char *cmd_list)
 			continue;
 
 		if (is_group) {
+			alias_esc = DBdyn_escape_string(alias);
 			result = DBselect("select distinct h.host from hosts_groups hg,hosts h,groups g"
 					" where hg.hostid=h.hostid and hg.groupid=g.groupid and g.name='%s'" DB_NODE,
-					alias,
+					alias_esc,
 					DBnode_local("h.hostid"));
+			zbx_free(alias_esc);
 
 			while (NULL != (row = DBfetch(result)))
 				run_remote_command(row[0], command);
@@ -515,7 +519,7 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 	DB_ROW		row2;
 	zbx_uint64_t	hostid = 0, proxy_hostid;
 	char		*ip;
-	char		host[MAX_STRING_LEN], host_esc[MAX_STRING_LEN];
+	char		host[MAX_STRING_LEN], *host_esc, *ip_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_discovered_host(dhostid:" ZBX_FS_UI64 ")",
 			dhostid);
@@ -532,10 +536,11 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 		zbx_gethost_by_ip(ip, host, sizeof(host));
 		alarm(0);
 
-		DBescape_string(host, host_esc, sizeof(host_esc));
+		host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
+		ip_esc = DBdyn_escape_string_len(ip, HOST_IP_LEN);
 
 		result2 = DBselect("select hostid from hosts where ip='%s'" DB_NODE,
-				ip,
+				ip_esc,
 				DBnode_local("hostid"));
 
 		if (NULL == (row2 = DBfetch(result2)) || DBis_null(row2[0]) == SUCCEED) {
@@ -544,8 +549,8 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',1,'%s','%s')",
 					hostid,
 					proxy_hostid,
-					(host[0] != '\0' ? host_esc : ip), /* Use host name if exists, IP otherwise */
-					ip,
+					(*host != '\0' ? host_esc : ip_esc), /* Use host name if exists, IP otherwise */
+					ip_esc,
 					host_esc);
 		} else {
 			ZBX_STR2UINT64(hostid, row2[0]);
@@ -556,6 +561,9 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 			}
 		}
 		DBfree_result(result2);
+
+		zbx_free(host_esc);
+		zbx_free(ip_esc);
 	}
 	DBfree_result(result);
 

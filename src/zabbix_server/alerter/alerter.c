@@ -249,7 +249,7 @@ int main_alerter_loop()
 					alert.alertid);
 				zabbix_syslog("Error sending alert ID [" ZBX_FS_UI64 "]",
 					alert.alertid);
-				error_esc = DBdyn_escape_string(error);
+				error_esc = DBdyn_escape_string_len(error, ALERT_ERROR_LEN);
 
 				alert.retries++;
 				if(alert.retries < ALERT_MAX_RETRIES)

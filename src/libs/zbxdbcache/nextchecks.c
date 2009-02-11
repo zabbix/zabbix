@@ -172,7 +172,7 @@ void	DCflush_nextchecks()
 	char			*sql = NULL;
 	time_t			last_clock = -1;
 	zbx_uint64_t		last_itemid = 0;
-	char			error_esc[ITEM_ERROR_LEN_MAX * 2];
+	char			*error_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCflush_nextchecks()");
 
@@ -249,7 +249,7 @@ void	DCflush_nextchecks()
 #endif
 		}
 
-		DBescape_string(nextchecks[i].error_msg, error_esc, sizeof(error_esc));
+		error_esc = DBdyn_escape_string_len(nextchecks[i].error_msg, ITEM_ERROR_LEN);
 		zbx_free(nextchecks[i].error_msg);
 
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128 + strlen(error_esc),
@@ -261,6 +261,8 @@ void	DCflush_nextchecks()
 				error_esc,
 				nextchecks[i].itemid);
 		last_itemid = nextchecks[i].itemid;
+
+		zbx_free(error_esc);
 	}
 
 #ifdef HAVE_ORACLE

@@ -111,7 +111,7 @@ int change_nodeid(int old_id, int new_id)
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		new_expression[MAX_STRING_LEN];
-	char		new_expression_esc[MAX_STRING_LEN];
+	char		*new_expression_esc;
 	zbx_uint64_t	prefix;
 
 	if(old_id!=0)
@@ -169,10 +169,11 @@ int change_nodeid(int old_id, int new_id)
 			{
 				memset(new_expression, 0, MAX_STRING_LEN);
 				convert_trigger_expression(old_id, new_id, prefix, row[0], new_expression);
-				DBescape_string(new_expression, new_expression_esc,MAX_STRING_LEN);
+				new_expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
 				DBexecute("update triggers set expression='%s' where triggerid=%s",
 						new_expression_esc,
 						row[1]);
+				zbx_free(new_expression_esc);
 			}
 			DBfree_result(result);
 
