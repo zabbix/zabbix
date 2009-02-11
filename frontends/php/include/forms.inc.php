@@ -5501,7 +5501,7 @@
  			$frm_title.= ' ['.$template['host'].']';
  		}
 		
- 		if(($_REQUEST['hostid']>0) && !isset($_REQUEST["form_refresh"])){
+ 		if(($_REQUEST['hostid']>0) && !isset($_REQUEST['form_refresh'])){
  			$name=$template['host'];
  		}
  		else{

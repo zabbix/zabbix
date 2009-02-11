@@ -704,15 +704,15 @@ include_once 'include/page_header.php';
 			$_REQUEST['itemid'] = 0;
 		}
 	}
-	
+
 	$options = array('only_current_node');
 	foreach($options as $option) $params[$option] = 1;
 
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
 
-	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
-	
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS, false);
+
 	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 ?>
@@ -765,17 +765,13 @@ include_once 'include/page_header.php';
 		$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 		$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 		
-		$sql_from = '';
-		$sql_where = '';
-		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0)){
-			$sql_from .= ',hosts_groups hg ';
-			$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
-		}
+		if($PAGE_HOSTS['selected'] > 0)
+			$where_case[] = 'i.hostid='.$PAGE_HOSTS['selected'];
+		
+		$show_host = (($PAGE_HOSTS['selected'] == 0) && (ZBX_DROPDOWN_FIRST_ENTRY == ZBX_DROPDOWN_FIRST_ALL));
 
 		if(!$filter_enabled){
-			$where_case[] = 'i.hostid='.$_REQUEST['hostid'];
 			$show_applications = 1;
-			$show_host = 0;
 		}
 
 		if($showdisabled == 0) $where_case[] = 'i.status <> 1';
@@ -893,7 +889,6 @@ include_once 'include/page_header.php';
 			}
 
 			$show_applications = 0;
-			$show_host = 1;
 		}
 //--------------------------
 
@@ -923,7 +918,6 @@ include_once 'include/page_header.php';
 					' LEFT JOIN items ti ON i.templateid=ti.itemid '.
 					' LEFT JOIN hosts th ON ti.hostid=th.hostid '.
 				' WHERE '.implode(' AND ', $where_case).
-					' AND h.hostid='.$PAGE_HOSTS['selected'].
 				order_by('h.host,i.description,i.key_,i.delay,i.history,i.trends,i.type,i.status','i.itemid');
 		$db_items = DBselect($sql);
 		while($db_item = DBfetch($db_items)){

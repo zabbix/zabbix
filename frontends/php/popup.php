@@ -34,6 +34,7 @@
 		case 'templates':
 			$page["title"] = "S_TEMPLATES_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			$templated_hosts = true;
 			break;
 		case 'hosts':
 			$page["title"] = "S_HOSTS_BIG";
@@ -171,9 +172,9 @@ include_once "include/page_header.php";
 	$srcfld1	= get_request("srcfld1", '');	// source table field [can be different from fields of source table]
 	$srcfld2	= get_request("srcfld2", null);	// second source table field [can be different from fields of source table]
 	
-	$monitored_hosts	= get_request("monitored_hosts", 0);
-	$real_hosts			= get_request("real_hosts", 0);
-	$only_hostid		= get_request("only_hostid", null);
+	$monitored_hosts	= get_request('monitored_hosts', 0);
+	$real_hosts			= get_request('real_hosts', 0);
+	$only_hostid		= get_request('only_hostid', null);
 
 	$host_status = array();
 	if ($monitored_hosts)
@@ -214,12 +215,12 @@ include_once "include/page_header.php";
 	if($real_hosts)
 		$frmTitle->AddVar('real_hosts', 1);
 
-	$frmTitle->AddVar("dstfrm",	$dstfrm);
-	$frmTitle->AddVar("dstfld1",	$dstfld1);
-	$frmTitle->AddVar("dstfld2",	$dstfld2);
-	$frmTitle->AddVar("srctbl",	$srctbl);
-	$frmTitle->AddVar("srcfld1",	$srcfld1);
-	$frmTitle->AddVar("srcfld2",	$srcfld2);
+	$frmTitle->addVar("dstfrm",	$dstfrm);
+	$frmTitle->addVar("dstfld1",	$dstfld1);
+	$frmTitle->addVar("dstfld2",	$dstfld2);
+	$frmTitle->addVar("srctbl",	$srctbl);
+	$frmTitle->addVar("srcfld1",	$srcfld1);
+	$frmTitle->addVar("srcfld2",	$srcfld2);
 	if(isset($_REQUEST['reference']))
 		$frmTitle->AddVar("reference",	$_REQUEST['reference']);
 
@@ -229,13 +230,10 @@ include_once "include/page_header.php";
 		unset($_REQUEST["groupid"],$_REQUEST["nodeid"]);
 	}
 	
-	$validation_param = array('allow_all_hosts');
-
-	if($monitored_hosts)
-		array_push($validation_param, 'monitored_hosts');
-		
-	if($real_hosts)
-		array_push($validation_param, 'real_hosts');
+	$validation_param = array();
+	if($monitored_hosts) array_push($validation_param, 'monitored_hosts');
+	if($real_hosts) 	array_push($validation_param, 'real_hosts');
+	if(isset($templated_hosts)) array_push($validation_param, 'templated_hosts');
 
 	$nodeid = get_request('nodeid', get_current_nodeid());
 
@@ -283,8 +281,8 @@ include_once "include/page_header.php";
 		
 			$groupid = $PAGE_GROUPS['selected'];
 			$cmbGroups = new CComboBox('groupid',$groupid,'javascript: submit();');		
-			foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-				$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
+			foreach($PAGE_GROUPS['groups'] as $slct_groupid => $name){
+				$cmbGroups->addItem($slct_groupid, get_node_name_by_elid($slct_groupid).$name);
 			}
 			
 			$frmTitle->addItem(array(S_GROUP,SPACE,$cmbGroups));
@@ -327,7 +325,7 @@ include_once "include/page_header.php";
 <?php
 	if($srctbl == 'hosts'){
 		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
-		$table->SetHeader(array(S_HOST,S_DNS,S_IP,S_PORT,S_STATUS,S_AVAILABILITY));
+		$table->setHeader(array(S_HOST,S_DNS,S_IP,S_PORT,S_STATUS,S_AVAILABILITY));
 
 		$sql_from = '';
 		$sql_where = '';
@@ -407,8 +405,9 @@ include_once "include/page_header.php";
 		}
 		$table->Show();
 	}
-	else if($srctbl == "templates"){
+	else if($srctbl == 'templates'){
 		$existed_templates = get_request('existed_templates', array());
+		
 		$templates = get_request('templates', array());
 		$templates = $templates + $existed_templates;
 
@@ -418,8 +417,7 @@ include_once "include/page_header.php";
 		else if(isset($_REQUEST['select'])){
 			$new_templates = array_diff($templates, $existed_templates);
 			if(count($new_templates) > 0) {
-				foreach($new_templates as $id => $name)
-				{
+				foreach($new_templates as $id => $name){
 ?>
 
 <script language="JavaScript" type="text/javascript">
@@ -448,29 +446,30 @@ include_once "include/page_header.php";
 		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
 		$table->SetHeader(array(S_NAME));
 
-		$sql = "SELECT DISTINCT h.* from hosts h";
-		if(isset($groupid))
-			$sql .= ",hosts_groups hg where hg.groupid=".$groupid.
-				" AND h.hostid=hg.hostid AND ";
-		else
-			$sql .= " where ";
-
-		$sql .= DBin_node('h.hostid', $nodeid).
-				' AND '.DBcondition('h.hostid',$available_hosts).
-				' AND h.status='.HOST_STATUS_TEMPLATE.
-				' order by h.host,h.hostid';
-
+		$sql_from = '';
+		$sql_where = '';
+		if($groupid > 0){
+			$sql_from.= ',hosts_groups hg ';
+			$sql_where.=' AND hg.groupid='.$groupid.
+						' AND h.hostid=hg.hostid ';
+		}
+		$sql = 'SELECT DISTINCT h.* '.
+				' FROM hosts h'.$sql_from.
+				' WHERE '.DBin_node('h.hostid', $nodeid).
+					' AND '.DBcondition('h.hostid',$available_hosts).
+					' AND h.status='.HOST_STATUS_TEMPLATE.
+					$sql_where.
+				' ORDER BY h.host,h.hostid';
 		$db_hosts = DBselect($sql);
-		while($host = DBfetch($db_hosts))
-		{
-			$chk = new CCheckBox('templates['.$host["hostid"].']',isset($templates[$host["hostid"]]),
-					null,$host["host"]);
-			$chk->SetEnabled(!isset($existed_templates[$host["hostid"]]));
+		while($host = DBfetch($db_hosts)){
+			$chk = new CCheckBox('templates['.$host['hostid'].']',isset($templates[$host['hostid']]),
+					null,$host['host']);
+			$chk->setEnabled(!isset($existed_templates[$host['hostid']]));
 
-			$table->AddRow(array(
+			$table->addRow(array(
 				array(
 					$chk,
-					$host["host"])
+					$host['host'])
 				));
 
 			unset($host);
@@ -527,17 +526,20 @@ include_once "include/page_header.php";
 		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
 		$table->SetHeader(array(S_NAME));
 
-		$sql = 'SELECT DISTINCT h.* from hosts h';
-		if(isset($groupid))
-			$sql .= ',hosts_groups hg where hg.groupid='.$groupid.
-				' AND h.hostid=hg.hostid AND ';
-		else
-			$sql .= ' WHERE ';
-
-		$sql .= DBin_node('h.hostid',$nodeid).
-					' AND h.status='.HOST_STATUS_TEMPLATE.
+		$sql_from = '';
+		$sql_where = '';
+		if($groupid > 0){
+			$sql_from.= ',hosts_groups hg ';
+			$sql_where.=' AND hg.groupid='.$groupid.
+						' AND h.hostid=hg.hostid ';
+		}
+		$sql = 'SELECT DISTINCT h.* '.
+				' FROM hosts h'.$sql_from.
+				' WHERE '.DBin_node('h.hostid', $nodeid).
 					' AND '.DBcondition('h.hostid',$available_hosts).
-				' ORDER BY h.host,h.hostid';
+					' AND h.status='.HOST_STATUS_TEMPLATE.
+					$sql_where.
+				' ORDER BY h.host,h.hostid';				
 		$db_hosts = DBselect($sql);
 		while($row = DBfetch($db_hosts)){
 			$name = new CLink($row['host'],'#','action');
@@ -551,15 +553,15 @@ include_once "include/page_header.php";
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 			}
 			
-			$name->SetAction($action." close_window(); return false;");
+			$name->setAction($action." close_window(); return false;");
 
-			$table->AddRow($name);
+			$table->addRow($name);
 		}
-		$table->Show();
+		$table->show();
 	}
 	else if($srctbl == "usrgrp"){
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
-		$table->SetHeader(array(S_NAME));
+		$table->setHeader(array(S_NAME));
 
 		$result = DBselect('select * from usrgrp where '.DBin_node('usrgrpid').' order by name');
 		while($row = DBfetch($result)){
@@ -579,15 +581,15 @@ include_once "include/page_header.php";
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 			}
 			
-			$name->SetAction($action." close_window(); return false;");			
+			$name->setAction($action." close_window(); return false;");			
 
-			$table->AddRow($name);
+			$table->addRow($name);
 		}
-		$table->Show();
+		$table->show();
 	}
 	else if($srctbl == "users"){
 		$table = new CTableInfo(S_NO_USERS_DEFINED);
-		$table->SetHeader(array(S_NAME));
+		$table->setHeader(array(S_NAME));
 
 		$result = DBselect('select * from users where '.DBin_node('userid').' order by name');
 		while($row = DBfetch($result)){
