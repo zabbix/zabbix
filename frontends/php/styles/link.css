@@ -1,9 +1,9 @@
 /* CSS Document */
 A {font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt;}
 
-a.highlight { font-family: Verdana, Arial, sans-serif;	font-size:10px; 	font-weight: bold; }
+a.highlight 		{	font-family: Verdana, Arial, sans-serif;	font-size:10px; 	font-weight: bold; }
 a.highlight:link 	{ 	text-decoration: none;		color: #ffffff; }
-a.highlight:visited 	{	text-decoration: none;		color: #ffffff; }
+a.highlight:visited {	text-decoration: none;		color: #ffffff; }
 a.highlight:hover	{	text-decoration: underline;	color: #ffcc00; }
 
 A.enabled:link		{	color:#00AA00;	text-decoration: none; }

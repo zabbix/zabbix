@@ -788,9 +788,6 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 	global $USER_DETAILS;
 	global $page;
 	
-	$dd_first_entry = ZBX_DROPDOWN_FIRST_ENTRY;
-	if($page['menu'] == 'config') $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
-
 	$def_sql = array(
 				'from' =>	array('groups g'),
 				'where' =>	array(),
@@ -814,7 +811,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 	$def_options = array_merge($def_options, $options);
 	
 	$dd_first_entry = ZBX_DROPDOWN_FIRST_ENTRY;
-	if($page['menu'] == 'config') $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
+//	if($page['menu'] == 'config') $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
 	if($def_options['allow_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
 
 	$result = array('selected'=>0, 'groups'=> array(), 'groupids'=> array());
@@ -1008,7 +1005,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	$def_options = array_merge($def_options, $options);
 
 	$dd_first_entry = ZBX_DROPDOWN_FIRST_ENTRY;
-	if($page['menu'] == 'config') $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
+//	if($page['menu'] == 'config') $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
 	if($def_options['allow_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
 
 	$result = array('selected'=>0, 'hosts'=> array(), 'hostids'=> array());
@@ -1161,7 +1158,7 @@ return $result;
 		global $page;
 		
 		$dd_first_entry = ZBX_DROPDOWN_FIRST_ENTRY;
-		if($page['menu'] == 'config') $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
+//		if($page['menu'] == 'config') $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
 
 		$group_var = 'web.latest.groupid';
 		$host_var = 'web.latest.hostid';
@@ -1176,7 +1173,7 @@ return $result;
 					$_REQUEST['hostid'] = 0;
 				}
 			}
-			else{
+			else if($reset_host){
 				$_REQUEST['hostid'] = 0;
 			}
 		}
@@ -1191,7 +1188,7 @@ return $result;
 		$PAGE_GROUPS['selected'] = $_REQUEST['groupid'];
 		$PAGE_HOSTS['selected'] = $_REQUEST['hostid'];
 		
-		if(($PAGE_HOSTS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)){
+		if(($PAGE_HOSTS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) && $reset_hosts){
 			$PAGE_HOSTS['hostids'] = array(0);
 		}
 		

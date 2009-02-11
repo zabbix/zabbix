@@ -24,10 +24,10 @@ class CScript extends CObject{
 
 		function CScript($item=NULL){
 			$this->items = array();
-			$this->AddItem($item);
+			$this->addItem($item);
 		}
 		
-		function AddItem($value){
+		function addItem($value){
 			if(is_array($value)){
 				foreach($value as $item){
 					array_push($this->items,unpack_object($item));
