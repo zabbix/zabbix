@@ -20,6 +20,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-311] fixed PostgreSQL errors with out of range string data (Sasha)
  - [ZBX-696] fixed import of triggers with {HOSTNAME} macro (Sasha)
  - [ZBX-677] fixed handling of -c parameter in zabbix_sender. Thanks to Jakov Sosic (Sasha)
  - [ZBX-690] fixed memory leak if trigger evaluation fails (Sasha)

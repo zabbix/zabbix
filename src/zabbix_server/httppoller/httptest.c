@@ -489,7 +489,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 	}
 	DBfree_result(result);
 
-	esc_err_str = DBdyn_escape_string(err_str);
+	esc_err_str = DBdyn_escape_string_len(err_str, HTTPTEST_ERROR_LEN);
 	zbx_free(err_str);
 
 	(void)curl_easy_cleanup(easyhandle);

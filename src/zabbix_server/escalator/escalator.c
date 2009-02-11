@@ -246,10 +246,9 @@ static void	add_command_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 {
 	zbx_uint64_t	alertid;
 	int		now;
-	char		*command_esc	= NULL;
+	char		*command_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_command_alert()");
-/*	zabbix_log(LOG_LEVEL_DEBUG,"----- COMMAND\n\tcommand: %s", command);*/
 
 	alertid		= DBget_maxid("alerts", "alertid");
 	now		= time(NULL);
@@ -277,17 +276,14 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 	DB_ROW		row;
 	zbx_uint64_t	alertid, mediatypeid;
 	int		now, severity, medias = 0;
-	char		*sendto_esc	= NULL;
-	char		*subject_esc	= NULL;
-	char		*message_esc	= NULL;
-	char		*error_esc	= NULL;
+	char		*sendto_esc, *subject_esc, *message_esc, *error_esc;
 	char		error[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_message_alert()");
 /*	zabbix_log(LOG_LEVEL_DEBUG,"MESSAGE\n\tuserid : " ZBX_FS_UI64 "\n\tsubject: %s\n\tmessage: %s", userid, subject, message);*/
 
 	now		= time(NULL);
-	subject_esc	= DBdyn_escape_string(subject);
+	subject_esc	= DBdyn_escape_string_len(subject, ALERT_SUBJECT_LEN);
 	message_esc	= DBdyn_escape_string(message);
 
 	result = DBselect("select mediatypeid,sendto,severity,period from media"
@@ -317,7 +313,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 		}
 
 		alertid		= DBget_maxid("alerts", "alertid");
-		sendto_esc	= DBdyn_escape_string(row[1]);
+		sendto_esc	= DBdyn_escape_string_len(row[1], ALERT_SENDTO_LEN);
 
 		DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock"
 				",mediatypeid,sendto,subject,message,status,alerttype,esc_step)"
