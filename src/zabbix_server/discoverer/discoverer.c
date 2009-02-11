@@ -86,11 +86,11 @@ static void	add_event(int object, zbx_uint64_t objectid, int value)
  ******************************************************************************/
 static void	update_dservice(DB_DSERVICE *service)
 {
-	char	value_esc[MAX_STRING_LEN];
+	char	*value_esc;
 
 	assert(service);
 
-	DBescape_string(service->value, value_esc, sizeof(value_esc));
+	value_esc = DBdyn_escape_string_len(service->value, DSERVICE_VALUE_LEN);
 
 	DBexecute("update dservices set status=%d,lastup=%d,lastdown=%d,value='%s' where dserviceid=" ZBX_FS_UI64,
 			service->status,
@@ -98,6 +98,7 @@ static void	update_dservice(DB_DSERVICE *service)
 			service->lastdown,
 			value_esc,
 			service->dserviceid);
+	zbx_free(value_esc);
 }
 
 /******************************************************************************
@@ -117,15 +118,16 @@ static void	update_dservice(DB_DSERVICE *service)
  ******************************************************************************/
 static void	update_dservice_value(DB_DSERVICE *service)
 {
-	char	value_esc[MAX_STRING_LEN];
+	char	*value_esc;
 
 	assert(service);
 
-	DBescape_string(service->value, value_esc, sizeof(value_esc));
+	value_esc = DBdyn_escape_string_len(service->value, DSERVICE_VALUE_LEN);
 
 	DBexecute("update dservices set value='%s' where dserviceid=" ZBX_FS_UI64,
 			value_esc,
 			service->dserviceid);
+	zbx_free(value_esc);
 }
 
 /******************************************************************************
@@ -173,7 +175,7 @@ static void	register_service(DB_DSERVICE *service, const char *ip, int port, int
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		key_esc[MAX_STRING_LEN];
+	char		*key_esc;
 
 	assert(service);
 	assert(ip);
@@ -183,7 +185,7 @@ static void	register_service(DB_DSERVICE *service, const char *ip, int port, int
 			port,
 			service->key_);
 
-	DBescape_string(service->key_, key_esc, sizeof(key_esc));
+	key_esc = DBdyn_escape_string_len(service->key_, DSERVICE_KEY_LEN);
 
 	result = DBselect("select dserviceid,status,lastup,lastdown,value"
 			" from dservices where dhostid=" ZBX_FS_UI64 " and type=%d and port=%d and key_='%s'",
@@ -221,6 +223,8 @@ static void	register_service(DB_DSERVICE *service, const char *ip, int port, int
 	}
 	DBfree_result(result);
 
+	zbx_free(key_esc);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End register_service()");
 }
 
@@ -243,7 +247,7 @@ void	register_host(DB_DHOST *dhost, const char *ip, int status)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		ip_esc[MAX_STRING_LEN];
+	char		*ip_esc;
 
 	assert(dhost);
 	assert(ip);
@@ -251,7 +255,7 @@ void	register_host(DB_DHOST *dhost, const char *ip, int status)
 	zabbix_log(LOG_LEVEL_DEBUG, "In register_host(ip:%s)",
 			ip);
 
-	DBescape_string(ip, ip_esc, sizeof(ip_esc));
+	ip_esc = DBdyn_escape_string_len(ip, DHOST_IP_LEN);
 
 	result = DBselect("select dhostid,ip,status,lastup,lastdown from dhosts"
 			" where druleid=" ZBX_FS_UI64 " and ip='%s'" DB_NODE,
@@ -285,6 +289,8 @@ void	register_host(DB_DHOST *dhost, const char *ip, int status)
 		strscpy(dhost->ip, row[1]);
 	}
 	DBfree_result(result);
+
+	zbx_free(ip_esc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End register_host()");
 }
@@ -451,16 +457,14 @@ void update_service(DB_DHOST *dhost, DB_DCHECK *check, char *ip, int port, int n
  ******************************************************************************/
 static void proxy_update_service(DB_DCHECK *check, char *ip, int port, int now)
 {
-	char	ip_esc[MAX_STRING_LEN],
-		key_esc[MAX_STRING_LEN],
-		value_esc[MAX_STRING_LEN];
+	char	*ip_esc, *key_esc, *value_esc;
 
 	assert(check);
 	assert(ip);
 
-	DBescape_string(ip, ip_esc, sizeof(ip_esc));
-	DBescape_string(check->key_, key_esc, sizeof(key_esc));
-	DBescape_string(check->value, value_esc, sizeof(value_esc));
+	ip_esc = DBdyn_escape_string_len(ip, PROXY_DHISTORY_IP_LEN);
+	key_esc = DBdyn_escape_string_len(check->key_, PROXY_DHISTORY_KEY_LEN);
+	value_esc = DBdyn_escape_string_len(check->value, PROXY_DHISTORY_VALUE_LEN);
 
 	DBexecute("insert into proxy_dhistory (clock,druleid,type,ip,port,key_,value,status)"
 			" values (%d," ZBX_FS_UI64 ",%d,'%s',%d,'%s','%s',%d)",
@@ -472,6 +476,10 @@ static void proxy_update_service(DB_DCHECK *check, char *ip, int port, int now)
 			key_esc,
 			value_esc,	
 			check->status);
+
+	zbx_free(ip_esc);
+	zbx_free(key_esc);
+	zbx_free(value_esc);
 }
 
 /******************************************************************************
@@ -491,11 +499,11 @@ static void proxy_update_service(DB_DCHECK *check, char *ip, int port, int now)
  ******************************************************************************/
 static void proxy_update_host(zbx_uint64_t druleid, char *ip, int status, int now)
 {
-	char	ip_esc[MAX_STRING_LEN];
+	char	*ip_esc;
 
 	assert(ip);
 
-	DBescape_string(ip, ip_esc, sizeof(ip_esc));
+	ip_esc = DBdyn_escape_string_len(ip, PROXY_DHISTORY_IP_LEN);
 
 	DBexecute("insert into proxy_dhistory (clock,druleid,type,ip,status)"
 			" values (%d," ZBX_FS_UI64 ",-1,'%s',%d)",
@@ -503,6 +511,8 @@ static void proxy_update_host(zbx_uint64_t druleid, char *ip, int status, int no
 			druleid,
 			ip_esc,
 			status);
+
+	zbx_free(ip_esc);
 }
 
 /******************************************************************************

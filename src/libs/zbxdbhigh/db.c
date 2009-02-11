@@ -555,6 +555,7 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, const ch
 	int		event_last_status;
 	int		event_prev_status;
 	int		update_status;
+	char		*reason_esc;
 
 	if(reason==NULL)
 	{
@@ -612,11 +613,13 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, const ch
 			}
 			else
 			{
+				reason_esc = DBdyn_escape_string_len(reason, TRIGGER_ERROR_LEN);
 				DBexecute("update triggers set value=%d,lastchange=%d,error='%s' where triggerid=" ZBX_FS_UI64,
 					new_value,
 					now,
-					reason,
+					reason_esc,
 					trigger->triggerid);
+				zbx_free(reason_esc);
 			}
 		}
 
@@ -809,7 +812,7 @@ void DBupdate_triggers_status_after_restart(void)
 
 void DBupdate_host_availability(DB_ITEM *item, int available, int clock, const char *error)
 {
-	char	error_esc[MAX_STRING_LEN], error_msg[MAX_STRING_LEN];
+	char	*error_esc, error_msg[MAX_STRING_LEN];
 	int	log_level = LOG_LEVEL_WARNING;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_host_availability()");
@@ -818,11 +821,12 @@ void DBupdate_host_availability(DB_ITEM *item, int available, int clock, const c
 	{
 		if (available == HOST_AVAILABLE_FALSE)
 		{
-			DBescape_string(error, error_esc, sizeof(error_esc));
+			error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
 			DBexecute("update hosts set error='%s',disable_until=%d where hostid=" ZBX_FS_UI64,
 					error_esc,
 					clock + CONFIG_UNAVAILABLE_DELAY,
 					item->hostid);
+			zbx_free(error_esc);
 		}
 		return;
 	}
@@ -845,12 +849,13 @@ void DBupdate_host_availability(DB_ITEM *item, int available, int clock, const c
 				item->host_name,
 				CONFIG_UNAVAILABLE_DELAY);
 
-		DBescape_string(error, error_esc, sizeof(error_esc));
+		error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
 		DBexecute("update hosts set available=%d,error='%s',disable_until=%d where hostid=" ZBX_FS_UI64,
 				available,
 				error_esc,
 				clock + CONFIG_UNAVAILABLE_DELAY,
 				item->hostid);
+		zbx_free(error_esc);
 
 		update_triggers_status_to_unknown(item->hostid, clock, "Host is unavailable.");
 	}
@@ -921,24 +926,24 @@ void	DBproxy_update_host_availability(DB_ITEM *item, int available, int clock)
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error)
 {
-	char		error_esc[MAX_STRING_LEN];
+	char		*error_esc;
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_TRIGGER	trigger;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBupdate_item_status_to_notsupported()");
 
-	DBescape_string(error, error_esc, sizeof(error_esc));
-
 	item->status	= ITEM_STATUS_NOTSUPPORTED;
 	item->nextcheck	= clock + CONFIG_REFRESH_UNSUPPORTED;
 
+	error_esc = DBdyn_escape_string_len(error, ITEM_ERROR_LEN);
 	DBexecute("update items set status=%d,lastclock=%d,nextcheck=%d,error='%s' where itemid=" ZBX_FS_UI64,
 			item->status,
 			clock,
 			item->nextcheck,
 			error_esc,
 			item->itemid);
+	zbx_free(error_esc);
 
 	result = DBselect("select t.triggerid,t.expression,t.description,t.url,t.comments,t.status,t.value,t.priority"
 			" from triggers t,functions f,items i"
@@ -1124,12 +1129,11 @@ int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 
 int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock)
 {
-	char	value_esc[MAX_STRING_LEN];
+	char	*value_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
-	DBescape_string(value,value_esc,MAX_STRING_LEN);
-
+	value_esc = DBdyn_escape_string_len(value, HISTORY_STR_VALUE_LEN);
 	DBexecute("insert into history_str (clock,itemid,value) values (%d," ZBX_FS_UI64 ",'%s')",
 			clock,
 			itemid,
@@ -1143,6 +1147,7 @@ int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock)
 				itemid,
 				value_esc);
 	}
+	zbx_free(value_esc);
 
 	return SUCCEED;
 }
@@ -1151,14 +1156,11 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 {
 #ifdef HAVE_ORACLE
 	char		sql[MAX_STRING_LEN];
-	char		*value_esc = NULL;
-	int		value_esc_max_len = 0;
+	int		value_esc_max_len;
 	int		ret = FAIL;
-	zbx_uint64_t	id;
-#else
-	char		*value_esc = NULL;
-	zbx_uint64_t	id;
 #endif
+	char		*value_esc;
+	zbx_uint64_t	id;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_text()");
 
@@ -1168,10 +1170,7 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 
 	sqlo_autocommit_off(oracle);
 
-	value_esc_max_len = strlen(value)+1024;
-	value_esc = zbx_malloc(value_esc, value_esc_max_len);
-
-	DBescape_string(value, value_esc, value_esc_max_len-1);
+	value_esc = DBdyn_escape_string(value);
 	value_esc_max_len = strlen(value_esc);
 
 	/* alloate the lob descriptor */
@@ -1259,12 +1258,12 @@ lbl_exit:
 
 int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, int lastlogsize)
 {
-	char		*value_esc = NULL, source_esc[MAX_STRING_LEN];
+	char		*value_esc, *source_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_log()");
 
 	value_esc = DBdyn_escape_string(value);
-	DBescape_string(source, source_esc, sizeof(source_esc));
+	source_esc = DBdyn_escape_string_len(source, HISTORY_LOG_SOURCE_LEN);
 
 	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity)"
 			" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",
@@ -1276,6 +1275,7 @@ int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp
 			source_esc,
 			severity);
 
+	zbx_free(source_esc);
 	zbx_free(value_esc);
 
 	return SUCCEED;
@@ -1512,12 +1512,15 @@ zbx_uint64_t DBget_proxy_lastaccess(const char *hostname)
 	zbx_uint64_t	res;
 	DB_RESULT	result;
 	DB_ROW		row;
+	char		*host_esc;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In D()");
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_proxy_lastaccess()");
 
+	host_esc = DBdyn_escape_string(hostname);
 	result = DBselect("select lastaccess from hosts where host='%s' and status in (%d)",
-			hostname,
+			host_esc,
 			HOST_STATUS_PROXY);
+	zbx_free(host_esc);
 
 	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0])) {
 		zabbix_log(LOG_LEVEL_ERR, "Proxy \"%s\" not exists",
@@ -1538,33 +1541,17 @@ zbx_uint64_t DBget_proxy_lastaccess(const char *hostname)
 int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t eventid,  zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message)
 {
 	int	now;
-	
-	char	*sendto_esc	= NULL;
-	char	*subject_esc	= NULL;
-	char	*message_esc	= NULL;
-	
-	int	size;
+	char	*sendto_esc, *subject_esc, *message_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_alert(eventid:" ZBX_FS_UI64 ")",
 		eventid);
 
 	now = time(NULL);
 
-	size = strlen(sendto) * 3 / 2 + 1;
-	sendto_esc = zbx_malloc(sendto_esc, size);
-	memset(sendto_esc, 0, size);
-	DBescape_string(sendto, sendto_esc, size);
+	sendto_esc = DBdyn_escape_string_len(sendto, ALERT_SENDTO_LEN);
+	subject_esc = DBdyn_escape_string_len(subject, ALERT_SUBJECT_LEN);
+	message_esc = DBdyn_escape_string(message);
 
-	size = strlen(subject) * 3 / 2 + 1;
-	subject_esc = zbx_malloc(subject_esc, size);
-	memset(subject_esc, 0, size);
-	DBescape_string(subject,subject_esc,size);
-	
-	size = strlen(message) * 3 / 2 + 1;
-	message_esc = zbx_malloc(message_esc,size);
-	memset(message_esc, 0, size);
-	DBescape_string(message,message_esc,size);
-	
 	DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock,mediatypeid,sendto,subject,message,status,retries)"
 		" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s','%s','%s',0,0)",
 		DBget_maxid("alerts","alertid"),
@@ -1707,6 +1694,56 @@ char*	DBdyn_escape_string(const char *src)
 			len++;
 		}
 		len++;
+	}
+
+	dst = zbx_malloc(dst, len);
+
+	DBescape_string(src, dst, len);
+
+	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdyn_escape_string_len                                          *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: escaped string                                               *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments: sync changes with 'DBdyn_escape_string'                          *
+ *                                                                            *
+ ******************************************************************************/
+char*	DBdyn_escape_string_len(const char *src, int max_src_len)
+{
+	const char	*s;
+	char		*dst = NULL;
+	int		len = 0;
+
+	len++;	/* '\0' */
+
+	for (s = src; s && *s; s++)
+	{
+		if (max_src_len <= 0)
+			break;
+
+		if (*s == '\r')
+			continue;
+
+		if (*s == '\'' 
+#if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
+			|| *s == '\\'
+#endif
+			)
+		{
+			len++;
+		}
+		len++;
+		max_src_len--;
 	}
 
 	dst = zbx_malloc(dst, len);
@@ -2109,16 +2146,18 @@ void	DBproxy_add_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock
 
 void	DBproxy_add_history_str(zbx_uint64_t itemid, char *value, int clock)
 {
-	char	value_esc[MAX_STRING_LEN];
+	char	*value_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_str()");
 
-	DBescape_string(value, value_esc, sizeof(value_esc));
+	value_esc = DBdyn_escape_string(value);
 
 	DBexecute("insert into proxy_history (itemid,clock,value) values (" ZBX_FS_UI64 ",%d,'%s')",
 			itemid,
 			clock,
 			value_esc);
+
+	zbx_free(value_esc);
 }
 
 void	DBproxy_add_history_text(zbx_uint64_t itemid, char *value, int clock)
@@ -2139,11 +2178,11 @@ void	DBproxy_add_history_text(zbx_uint64_t itemid, char *value, int clock)
 
 void	DBproxy_add_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, int lastlogsize)
 {
-	char		source_esc[MAX_STRING_LEN], *value_esc;
+	char		*source_esc, *value_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_log()");
 
-	DBescape_string(source, source_esc, sizeof(source_esc));
+	source_esc = DBdyn_escape_string_len(source, HISTORY_LOG_SOURCE_LEN);
 	value_esc = DBdyn_escape_string(value);
 
 	DBexecute("insert into proxy_history (itemid,clock,timestamp,source,severity,value)"
@@ -2156,6 +2195,7 @@ void	DBproxy_add_history_log(zbx_uint64_t itemid, char *value, int clock, int ti
 			value_esc);
 
 	zbx_free(value_esc);
+	zbx_free(source_esc);
 }
 
 void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num)
