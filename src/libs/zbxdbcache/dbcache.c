@@ -554,7 +554,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
-	char		value_esc[ITEM_LASTVALUE_LEN_MAX];
+	char		*value_esc;
 	int		sql_offset = 0, i;
 	ZBX_DC_HISTORY	*h;
 	zbx_uint64_t	*ids = NULL;
@@ -719,17 +719,19 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			DBescape_string(h->value_orig.value_str, value_esc, sizeof(value_esc));
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+			value_esc = DBdyn_escape_string_len(h->value_orig.value_str, ITEM_LASTVALUE_LEN);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 576,
 					",prevvalue=lastvalue,lastvalue='%s'",
 					value_esc);
+			zbx_free(value_esc);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			DBescape_string(h->value_orig.value_str, value_esc, sizeof(value_esc));
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+			value_esc = DBdyn_escape_string_len(h->value_orig.value_str, ITEM_LASTVALUE_LEN);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 576,
 					",prevvalue=lastvalue,lastvalue='%s',lastlogsize=%d",
 					value_esc,
 					h->lastlogsize);
+			zbx_free(value_esc);
 			break;
 		}
 
@@ -875,7 +877,7 @@ static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
 	DB_ITEM		item;
 	ZBX_DC_HISTORY	*h;
 	char		*lastvalue;
-	char		value[MAX_STRING_LEN], *value_esc, *parameter_esc;
+	char		value[MAX_STRING_LEN], *value_esc, *function_esc, *parameter_esc;
 	int		sql_offset = 0, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_function_update()");
@@ -941,18 +943,20 @@ static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
 		/* Update only if lastvalue differs from new one */
 		if (DBis_null(lastvalue) == SUCCEED || strcmp(lastvalue, value) != 0)
 		{
-			value_esc = DBdyn_escape_string(value);
+			value_esc = DBdyn_escape_string_len(value, FUNCTION_LASTVALUE_LEN);
+			function_esc = DBdyn_escape_string(function.function);
 			parameter_esc = DBdyn_escape_string(function.parameter);
 
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1280,
 					"update functions set lastvalue='%s' where itemid=" ZBX_FS_UI64
 					" and function='%s' and parameter='%s';\n",
 					value_esc,
 					function.itemid,
-					function.function,
+					function_esc,
 					parameter_esc);
 
 			zbx_free(parameter_esc);
+			zbx_free(function_esc);
 			zbx_free(value_esc);
 		}
 	}
@@ -983,7 +987,7 @@ static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
 static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		sql_offset = 0, i;
-	char		value_esc[MAX_STRING_LEN], *value_esc_dyn;
+	char		*value_esc, *source_esc;
 	int		history_text_num, history_log_num;
 	zbx_uint64_t	id;
 #ifdef HAVE_MYSQL
@@ -1204,7 +1208,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		if (0 != history[i].value_null)
 			continue;
 
-		DBescape_string(history[i].value_orig.value_str, value_esc, sizeof(value_esc));
+		value_esc = DBdyn_escape_string_len(history[i].value_orig.value_str, HISTORY_STR_VALUE_LEN);
 #ifdef HAVE_MYSQL
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 				"(" ZBX_FS_UI64 ",%d,'%s'),",
@@ -1219,6 +1223,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 				history[i].clock,
 				value_esc);
 #endif
+		zbx_free(value_esc);
 	}
 
 #ifdef HAVE_MYSQL
@@ -1250,7 +1255,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			if (0 != history[i].value_null)
 				continue;
 
-			DBescape_string(history[i].value_orig.value_str, value_esc, sizeof(value_esc));
+			value_esc = DBdyn_escape_string_len(history[i].value_orig.value_str, HISTORY_STR_VALUE_LEN);
 #ifdef HAVE_MYSQL
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 					"(%d," ZBX_FS_UI64 ",%d,'%s'),",
@@ -1267,6 +1272,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					history[i].clock,
 					value_esc);
 #endif
+			zbx_free(value_esc);
 		}
 
 #ifdef HAVE_MYSQL
@@ -1313,24 +1319,24 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			if (0 != history[i].value_null)
 				continue;
 
-			value_esc_dyn = DBdyn_escape_string(history[i].value_orig.value_str);
+			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
 #ifdef HAVE_MYSQL
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s'),",
 					id,
 					history[i].itemid,
 					history[i].clock,
-					value_esc_dyn);
+					value_esc);
 #else
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"insert into history_text (id,itemid,clock,value) values "
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s');\n",
 					id,
 					history[i].itemid,
 					history[i].clock,
-					value_esc_dyn);
+					value_esc);
 #endif
-			zbx_free(value_esc_dyn);
+			zbx_free(value_esc);
 			id++;
 		}
 
@@ -1369,31 +1375,32 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			if (0 != history[i].value_null)
 				continue;
 
-			DBescape_string(history[i].source, value_esc, sizeof(value_esc));
-			value_esc_dyn = DBdyn_escape_string(history[i].value_orig.value_str);
+			source_esc = DBdyn_escape_string_len(history[i].source, HISTORY_LOG_SOURCE_LEN);
+			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
 #ifdef HAVE_MYSQL
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s'),",
 					id,
 					history[i].itemid,
 					history[i].clock,
 					history[i].timestamp,
-					value_esc,
+					source_esc,
 					history[i].severity,
-					value_esc_dyn);
+					value_esc);
 #else
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"insert into history_log (id,itemid,clock,timestamp,source,severity,value) values "
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s');\n",
 					id,
 					history[i].itemid,
 					history[i].clock,
 					history[i].timestamp,
-					value_esc,
+					source_esc,
 					history[i].severity,
-					value_esc_dyn);
+					value_esc);
 #endif
-			zbx_free(value_esc_dyn);
+			zbx_free(value_esc);
+			zbx_free(source_esc);
 			id++;
 		}
 
@@ -1437,7 +1444,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		sql_offset = 0, i;
-	char		value_esc[MAX_STRING_LEN], *value_esc_dyn;
+	char		*value_esc, *source_esc;
 #ifdef HAVE_MYSQL
 	int		tmp_offset;
 #endif
@@ -1532,7 +1539,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		if (history[i].value_type == ITEM_VALUE_TYPE_STR)
 		{
-			DBescape_string(history[i].value_orig.value_str, value_esc, sizeof(value_esc));
+			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
 #ifdef HAVE_MYSQL
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 					"(" ZBX_FS_UI64 ",%d,'%s'),",
@@ -1547,6 +1554,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 					history[i].clock,
 					value_esc);
 #endif
+			zbx_free(value_esc);
 		}
 	}
 
@@ -1570,22 +1578,22 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		if (history[i].value_type == ITEM_VALUE_TYPE_TEXT)
 		{
-			value_esc_dyn = DBdyn_escape_string(history[i].value_orig.value_str);
+			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
 #ifdef HAVE_MYSQL
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"(" ZBX_FS_UI64 ",%d,'%s'),",
 					history[i].itemid,
 					history[i].clock,
-					value_esc_dyn);
+					value_esc);
 #else
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"insert into proxy_history (itemid,clock,value) values "
 					"(" ZBX_FS_UI64 ",%d,'%s');\n",
 					history[i].itemid,
 					history[i].clock,
-					value_esc_dyn);
+					value_esc);
 #endif
-			zbx_free(value_esc_dyn);
+			zbx_free(value_esc);
 		}
 	}
 
@@ -1609,29 +1617,30 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		if (history[i].value_type == ITEM_VALUE_TYPE_LOG)
 		{
-			DBescape_string(history[i].source, value_esc, sizeof(value_esc));
-			value_esc_dyn = DBdyn_escape_string(history[i].value_orig.value_str);
+			source_esc = DBdyn_escape_string_len(history[i].source, HISTORY_LOG_SOURCE_LEN);
+			value_esc = DBdyn_escape_string(history[i].value_orig.value_str);
 #ifdef HAVE_MYSQL
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"(" ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s'),",
 					history[i].itemid,
 					history[i].clock,
 					history[i].timestamp,
-					value_esc,
+					source_esc,
 					history[i].severity,
-					value_esc_dyn);
+					value_esc);
 #else
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc_dyn),
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"insert into proxy_history (itemid,clock,timestamp,source,severity,value) values "
 					"(" ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s');\n",
 					history[i].itemid,
 					history[i].clock,
 					history[i].timestamp,
-					value_esc,
+					source_esc,
 					history[i].severity,
-					value_esc_dyn);
+					value_esc);
 #endif
-			zbx_free(value_esc_dyn);
+			zbx_free(value_esc);
+			zbx_free(source_esc);
 		}
 	}
 

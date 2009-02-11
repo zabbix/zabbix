@@ -1084,7 +1084,7 @@ static int	DBadd_item_to_graph(
 
 	gitemid = DBget_maxid("graphs_items","gitemid");
 
-	color_esc = DBdyn_escape_string(color);
+	color_esc = DBdyn_escape_string_len(color, GRAPH_ITEM_COLOR_LEN);
 
 	DBexecute("insert into graphs_items"
 		" (gitemid,graphid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt)"
@@ -1209,7 +1209,7 @@ static int	DBupdate_graph(
 	}
 	DBfree_result(db_graphs);
 
-	name_esc = DBdyn_escape_string(name);
+	name_esc = DBdyn_escape_string_len(name, GRAPH_NAME_LEN);
 
 	DBexecute("update graphs set name='%s',width=%i,height=%i,"
 		"yaxistype=%i,yaxismin=%i,yaxismax=%i,templateid=" ZBX_FS_UI64 ","
@@ -1447,7 +1447,7 @@ static int	DBadd_graph(
 
 	assert(name);
 
-	name_esc = DBdyn_escape_string(name);
+	name_esc = DBdyn_escape_string_len(name, GRAPH_NAME_LEN);
 
 	DBexecute("insert into graphs"
 		" (graphid,name,width,height,yaxistype,yaxismin,yaxismax,show_work_period,show_triggers,graphtype,show_legend,show_3d,templateid)"
@@ -2114,13 +2114,13 @@ static int	DBdb_save_application(
 			elementid,
 			db_hostid;
 
-	char	*name_esc = NULL;
+	char	*name_esc;
 
 	int	result = SUCCEED;
 
 	assert(name);
 
-	name_esc = DBdyn_escape_string(name);
+	name_esc = DBdyn_escape_string_len(name, APPLICATION_NAME_LEN);
 
 	if( 0 == applicationid )
 		db_elements = DBselect("select distinct applicationid from applications "
@@ -2398,7 +2398,7 @@ static int	DBupdate_item(
 
 	if( (host_data = DBfetch(db_hosts)) )
 	{
-		key_esc	= DBdyn_escape_string(key);
+		key_esc	= DBdyn_escape_string_len(key, ITEM_KEY_LEN);
 
 		if( ITEM_VALUE_TYPE_STR == value_type )
 		{
@@ -2478,17 +2478,17 @@ static int	DBupdate_item(
 						itemappid, itemid, apps[i]);
 				}
 
-				description_esc			= DBdyn_escape_string(description);
-				snmp_community_esc		= DBdyn_escape_string(snmp_community);
-				snmp_oid_esc			= DBdyn_escape_string(snmp_oid);
-				trapper_hosts_esc		= DBdyn_escape_string(trapper_hosts);
-				units_esc			= DBdyn_escape_string(units);
-				snmpv3_securityname_esc		= DBdyn_escape_string(snmpv3_securityname);
-				snmpv3_authpassphrase_esc	= DBdyn_escape_string(snmpv3_authpassphrase);
-				snmpv3_privpassphrase_esc	= DBdyn_escape_string(snmpv3_privpassphrase);
-				formula_esc			= DBdyn_escape_string(formula);
-				logtimefmt_esc			= DBdyn_escape_string(logtimefmt);
-				delay_flex_esc			= DBdyn_escape_string(delay_flex);
+				description_esc			= DBdyn_escape_string_len(description, ITEM_DESCRIPTION_LEN);
+				snmp_community_esc		= DBdyn_escape_string_len(snmp_community, ITEM_SNMP_COMMUNITY_LEN);
+				snmp_oid_esc			= DBdyn_escape_string_len(snmp_oid, ITEM_SNMP_OID_LEN);
+				trapper_hosts_esc		= DBdyn_escape_string_len(trapper_hosts, ITEM_TRAPPER_HOSTS_LEN);
+				units_esc			= DBdyn_escape_string_len(units, ITEM_UNITS_LEN);
+				snmpv3_securityname_esc		= DBdyn_escape_string_len(snmpv3_securityname, ITEM_SNMPV3_SECURITYNAME_LEN);
+				snmpv3_authpassphrase_esc	= DBdyn_escape_string_len(snmpv3_authpassphrase, ITEM_SNMPV3_AUTHPASSPHRASE_LEN);
+				snmpv3_privpassphrase_esc	= DBdyn_escape_string_len(snmpv3_privpassphrase, ITEM_SNMPV3_PRIVPASSPHRASE_LEN);
+				formula_esc			= DBdyn_escape_string_len(formula, ITEM_FORMULA_LEN);
+				logtimefmt_esc			= DBdyn_escape_string_len(logtimefmt, ITEM_LOGTIMEFMT_LEN);
+				delay_flex_esc			= DBdyn_escape_string_len(delay_flex, ITEM_DELAY_FLEX_LEN);
 				params_esc			= DBdyn_escape_string(params);
 
 				DBexecute(
@@ -2663,7 +2663,7 @@ static int	DBadd_item(
 
 	if( (host_data = DBfetch(db_hosts)) )
 	{
-		key_esc	= DBdyn_escape_string(key);
+		key_esc	= DBdyn_escape_string_len(key, ITEM_KEY_LEN);
 
 		if( ITEM_VALUE_TYPE_STR == value_type )
 		{
@@ -2710,17 +2710,17 @@ static int	DBadd_item(
 			// first add mother item
 			itemid = DBget_maxid("items","itemid");
 
-			description_esc			= DBdyn_escape_string(description);
-			snmp_community_esc		= DBdyn_escape_string(snmp_community);
-			snmp_oid_esc			= DBdyn_escape_string(snmp_oid);
-			trapper_hosts_esc		= DBdyn_escape_string(trapper_hosts);
-			units_esc			= DBdyn_escape_string(units);
-			snmpv3_securityname_esc		= DBdyn_escape_string(snmpv3_securityname);
-			snmpv3_authpassphrase_esc	= DBdyn_escape_string(snmpv3_authpassphrase);
-			snmpv3_privpassphrase_esc	= DBdyn_escape_string(snmpv3_privpassphrase);
-			formula_esc			= DBdyn_escape_string(formula);
-			logtimefmt_esc			= DBdyn_escape_string(logtimefmt);
-			delay_flex_esc			= DBdyn_escape_string(delay_flex);
+			description_esc			= DBdyn_escape_string_len(description, ITEM_DESCRIPTION_LEN);
+			snmp_community_esc		= DBdyn_escape_string_len(snmp_community, ITEM_SNMP_COMMUNITY_LEN);
+			snmp_oid_esc			= DBdyn_escape_string_len(snmp_oid, ITEM_SNMP_OID_LEN);
+			trapper_hosts_esc		= DBdyn_escape_string_len(trapper_hosts, ITEM_TRAPPER_HOSTS_LEN);
+			units_esc			= DBdyn_escape_string_len(units, ITEM_UNITS_LEN);
+			snmpv3_securityname_esc		= DBdyn_escape_string_len(snmpv3_securityname, ITEM_SNMPV3_SECURITYNAME_LEN);
+			snmpv3_authpassphrase_esc	= DBdyn_escape_string_len(snmpv3_authpassphrase, ITEM_SNMPV3_AUTHPASSPHRASE_LEN);
+			snmpv3_privpassphrase_esc	= DBdyn_escape_string_len(snmpv3_privpassphrase, ITEM_SNMPV3_PRIVPASSPHRASE_LEN);
+			formula_esc			= DBdyn_escape_string_len(formula, ITEM_FORMULA_LEN);
+			logtimefmt_esc			= DBdyn_escape_string_len(logtimefmt, ITEM_LOGTIMEFMT_LEN);
+			delay_flex_esc			= DBdyn_escape_string_len(delay_flex, ITEM_DELAY_FLEX_LEN);
 			params_esc			= DBdyn_escape_string(params);
 
 			DBexecute("insert into items (itemid,description,key_,hostid,delay,history,status,type,"
@@ -3221,13 +3221,13 @@ static char*	DBimplode_exp (
 						functionid, itemid, triggerid);
 				/* adding function */
 				function[function_len] = '\0';
-				str_esc = DBdyn_escape_string(function);
+				str_esc = DBdyn_escape_string_len(function, FUNCTION_FUNCTION_LEN);
 				sql = zbx_strdcatf(sql, "'%s',", str_esc);
 				zbx_free(str_esc);
 				function[function_len] = '(';
 				/* adding parameter */
 				parameter[parameter_len] = '\0';
-				str_esc = DBdyn_escape_string(parameter);
+				str_esc = DBdyn_escape_string_len(parameter, FUNCTION_PARAMETER_LEN);
 				sql = zbx_strdcatf(sql, "'%s')", str_esc);
 				zbx_free(str_esc);
 				parameter[parameter_len] = ')';
@@ -3523,14 +3523,14 @@ static int	DBupdate_trigger(
 
 		if( expression ) {
 			short_expression = DBimplode_exp(expression, triggerid);
-			str_esc = DBdyn_escape_string(short_expression);
+			str_esc = DBdyn_escape_string_len(short_expression, TRIGGER_EXPRESSION_LEN);
 			sql = zbx_strdcatf(sql, " expression='%s',", str_esc);
 			zbx_free(str_esc);
 			zbx_free(short_expression);
 
 		}
 		if( description ) {
-			str_esc = DBdyn_escape_string(description);
+			str_esc = DBdyn_escape_string_len(description, TRIGGER_DESCRIPTION_LEN);
 			sql = zbx_strdcatf(sql, " description='%s',", str_esc);
 			zbx_free(str_esc);
 		}
@@ -3543,7 +3543,7 @@ static int	DBupdate_trigger(
 			zbx_free(str_esc);
 		}
 		if( url ) {
-			str_esc = DBdyn_escape_string(url);
+			str_esc = DBdyn_escape_string_len(url, TRIGGER_URL_LEN);
 			sql = zbx_strdcatf(sql, " url='%s',", str_esc);
 			zbx_free(str_esc);
 		}
@@ -3762,9 +3762,9 @@ static int	DBcopy_trigger_to_host(
 
 			new_triggerid = DBget_maxid("triggers","triggerid");
 
-			description_esc = DBdyn_escape_string(trigger_data[0]);
+			description_esc = DBdyn_escape_string_len(trigger_data[0], TRIGGER_DESCRIPTION_LEN);
 			comments_esc = DBdyn_escape_string(trigger_data[3]);
-			url_esc = DBdyn_escape_string(trigger_data[4]);
+			url_esc = DBdyn_escape_string_len(trigger_data[4], TRIGGER_URL_LEN);
 
 			DBexecute("insert into triggers"
 				" (triggerid,description,priority,status,comments,url,type,value,expression,templateid)"
@@ -3793,8 +3793,8 @@ static int	DBcopy_trigger_to_host(
 				ZBX_STR2UINT64(itemid, function_data[0]);
 				ZBX_STR2UINT64(functionid, function_data[3]);
 
-				function_esc = DBdyn_escape_string(function_data[1]);
-				parameter_esc = DBdyn_escape_string(function_data[2]);
+				function_esc = DBdyn_escape_string_len(function_data[1], FUNCTION_FUNCTION_LEN);
+				parameter_esc = DBdyn_escape_string_len(function_data[2], FUNCTION_PARAMETER_LEN);
 
 				search = zbx_dsprintf(NULL, "{" ZBX_FS_UI64 "}", functionid);
 
@@ -3845,8 +3845,8 @@ static int	DBcopy_trigger_to_host(
 
 			if( SUCCEED == result )
 			{
-				new_expression_esc = DBdyn_escape_string(new_expression);
-				DBexecute("update triggers set expression='%s' where triggerid=" ZBX_FS_UI64, new_expression, new_triggerid);
+				new_expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
+				DBexecute("update triggers set expression='%s' where triggerid=" ZBX_FS_UI64, new_expression_esc, new_triggerid);
 				zbx_free(new_expression_esc);
 
 				/* copy dependences */

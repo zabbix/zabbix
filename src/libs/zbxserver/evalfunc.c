@@ -1912,7 +1912,7 @@ int	replace_value_by_map(char *value, zbx_uint64_t valuemapid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		new_value[MAX_STRING_LEN], orig_value[MAX_STRING_LEN];
+	char		new_value[MAX_STRING_LEN], orig_value[MAX_STRING_LEN], *value_esc;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In replace_value_by_map()");
@@ -1920,9 +1920,11 @@ int	replace_value_by_map(char *value, zbx_uint64_t valuemapid)
 	if (valuemapid == 0)
 		return FAIL;
 
+	value_esc = DBdyn_escape_string(value);
 	result = DBselect("select newvalue from mappings where valuemapid=" ZBX_FS_UI64 " and value='%s'",
 			valuemapid,
-			value);
+			value_esc);
+	zbx_free(value_esc);
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 	{
 		strcpy(new_value, row[0]);

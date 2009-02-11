@@ -51,7 +51,7 @@ void	update_functions(DB_ITEM *item, time_t now)
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		value[MAX_STRING_LEN];
-	char		*value_esc, *parameter_esc;
+	char		*value_esc, *function_esc, *parameter_esc;
 	char		*lastvalue;
 	int		ret=SUCCEED;
 
@@ -89,16 +89,18 @@ void	update_functions(DB_ITEM *item, time_t now)
 			/* Update only if lastvalue differs from new one */
 			if (DBis_null(lastvalue) == SUCCEED || 0 != strcmp(lastvalue, value))
 			{
-				value_esc = DBdyn_escape_string(value);
+				value_esc = DBdyn_escape_string_len(value, FUNCTION_LASTVALUE_LEN);
+				function_esc = DBdyn_escape_string(function.function);
 				parameter_esc = DBdyn_escape_string(function.parameter);
 
 				DBexecute("update functions set lastvalue='%s' where itemid=" ZBX_FS_UI64 " and function='%s' and parameter='%s'",
 						value_esc,
 						function.itemid,
-						function.function,
+						function_esc,
 						parameter_esc);
 
 				zbx_free(parameter_esc);
+				zbx_free(function_esc);
 				zbx_free(value_esc);
 			}
 			else
@@ -429,13 +431,12 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
  ******************************************************************************/
 static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 {
-	char		value_esc[MAX_STRING_LEN];
+	char		*value_esc;
 	zbx_uint64_t	value_uint64;
 	double		value_double;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_item()");
 
-	*value_esc	= '\0';
 	item->nextcheck	= calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now);
 
 	switch (item->value_type) {
@@ -578,19 +579,20 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 		if (NULL == GET_STR_RESULT(value))
 			break;
 
-		DBescape_string(value->str, value_esc, sizeof(value_esc));
+		value_esc = DBdyn_escape_string_len(value->str, ITEM_LASTVALUE_LEN);
 		DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d"
 				" where itemid=" ZBX_FS_UI64,
 				item->nextcheck,
 				value_esc,
 				(int)now,
 				item->itemid);
+		zbx_free(value_esc);
 		break;
 	case ITEM_VALUE_TYPE_LOG:
 		if (NULL == GET_STR_RESULT(value))
 			break;
 
-		DBescape_string(value->str, value_esc, sizeof(value_esc));
+		value_esc = DBdyn_escape_string_len(value->str, ITEM_LASTVALUE_LEN);
 		DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d,lastlogsize=%d"
 				" where itemid=" ZBX_FS_UI64,
 				item->nextcheck,
@@ -598,6 +600,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 				(int)now,
 				item->lastlogsize,
 				item->itemid);
+		zbx_free(value_esc);
 		break;
 	}
 

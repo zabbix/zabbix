@@ -47,7 +47,7 @@ typedef struct zbx_result_s {
 #define ISSET_STR(res)		((res)->type & AR_STRING)
 #define ISSET_TEXT(res)		((res)->type & AR_TEXT)
 #define ISSET_MSG(res)		((res)->type & AR_MESSAGE)
-#define ISSET_RESULT(res)	((res)->type & (AR_DOUBLE | AR_UINT64 | AR_STRING | AR_TEXT | AR_MESSAGE))
+#define ISSET_RESULT(res)	((res)->type & (AR_DOUBLE | AR_UINT64 | AR_STRING | AR_TEXT))
 
 /* UNSER RESULT */
 
