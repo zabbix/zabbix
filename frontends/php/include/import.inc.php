@@ -555,7 +555,7 @@
 						}
 					}
 					else{
-						$data['expression'] = str_replace('{HOSTNAME}',$this->data[XML_TAG_HOST]['name'],$data['expression']);
+						$data['expression'] = str_replace('{{HOSTNAME}:','{'.$this->data[XML_TAG_HOST]['name'].':',$data['expression']);
  
 						$result = DBselect('SELECT DISTINCT t.triggerid,t.templateid,t.expression '.
  							' FROM triggers t,functions f,items i '.
