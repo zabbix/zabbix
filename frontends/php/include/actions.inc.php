@@ -961,7 +961,8 @@ function get_action_msgs_for_event($eventid){
 	$sql = 'SELECT DISTINCT i.hostid '.
 			' FROM events e, functions f, items i '.
 			' WHERE e.eventid='.$eventid.
-				' AND f.triggerid=e.objectid'.$_REQUEST['triggerid'].
+				' AND e.objectid='.EVENT_SOURCE_TRIGGERS.
+				' AND f.triggerid='.$_REQUEST['triggerid'].
 				' AND i.itemid=f.itemid';
 	if($host = DBfetch(DBselect($sql,1))){
 		$hostids[$host['hostid']] = $host['hostid'];
@@ -1045,7 +1046,8 @@ function get_action_cmds_for_event($eventid){
 	$sql = 'SELECT DISTINCT i.hostid '.
 			' FROM events e, functions f, items i '.
 			' WHERE e.eventid='.$eventid.
-				' AND f.triggerid=e.objectid'.$_REQUEST['triggerid'].
+				' AND e.objectid='.EVENT_SOURCE_TRIGGERS.
+				' AND f.triggerid='.$_REQUEST['triggerid'].
 				' AND i.itemid=f.itemid';
 	if($host = DBfetch(DBselect($sql,1))){
 		$hostids[$host['hostid']] = $host['hostid'];
@@ -1117,7 +1119,8 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 	$sql = 'SELECT DISTINCT i.hostid '.
 			' FROM events e, functions f, items i '.
 			' WHERE e.eventid='.$eventid.
-				' AND f.triggerid=e.objectid'.$_REQUEST['triggerid'].
+				' AND e.objectid='.EVENT_SOURCE_TRIGGERS.
+				' AND f.triggerid='.$_REQUEST['triggerid'].
 				' AND i.itemid=f.itemid';
 	if($host = DBfetch(DBselect($sql,1))){
 		$hostids[$host['hostid']] = $host['hostid'];
