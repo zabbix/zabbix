@@ -766,15 +766,18 @@ table.menu{
 }
 
 table.menu tr{
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10px;
 	background: #AAAAAA url('../images/gradients/menu_not_active.gif') repeat-x top left;
 	padding-right: 5px;
 	padding-left: 5px;
 }
 
 table.menu td{
-	border-color: #AAAAAA;
+	color: #ffffff;
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	font-weight: bold;
+
+	border-color: #aaaaaa;
 	border-width:1px;
 	border-top-style: solid;
 	border-left-style: solid;
@@ -782,10 +785,13 @@ table.menu td{
 	border-bottom-style: solid;
 }
 
+table.menu tr td:hover{
+	cursor: pointer; 
+}
+
 table.menu tr td.active{
-	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/table_head.gif') repeat-x top left;
-	border-width:0px;
+	border-color: #6666AA;
 }
 
 /************* SUB MENU ************/
