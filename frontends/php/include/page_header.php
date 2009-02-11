@@ -44,7 +44,7 @@ COpt::profiling_start("page");
 	init_nodes();
 
 	/* set Page header */
-	switch($page["type"]){
+	switch($page['type']){
 		case PAGE_TYPE_IMAGE:
 			set_image_header();
 			define('ZBX_PAGE_NO_MENU', 1);
@@ -102,6 +102,7 @@ COpt::profiling_start("page");
 	$ZBX_MENU = array(
 		'view'=>array(
 				'label'			=> S_MONITORING,
+				'user_type'		=> USER_TYPE_ZABBIX_USER,
 				'node_perm'		=> PERM_READ_LIST,
 				'default_page_id'	=> 0,
 				'pages'=>array(
@@ -164,6 +165,7 @@ COpt::profiling_start("page");
 				),
 		'cm'=>array(
 				'label'			=> S_INVENTORY,
+				'user_type'		=> USER_TYPE_ZABBIX_USER,
 				'node_perm'		=> PERM_READ_LIST,
 				'default_page_id'	=> 0,
 				'pages'=>array(
@@ -172,6 +174,7 @@ COpt::profiling_start("page");
 				),
 		'reports'=>array(
 				'label'			=> S_REPORTS,
+				'user_type'		=> USER_TYPE_ZABBIX_USER,
 				'node_perm'		=> PERM_READ_LIST,
 				'default_page_id'	=> 0,
 				'pages'=>array(
@@ -217,17 +220,21 @@ COpt::profiling_start("page");
 							'sub_pages'=>array('popup_trexpr.php')
 						),
 					array('url'=>'actionconf.php'	,'label'=>S_ACTIONS),
-					array('url'=>'graphs.php'	,'label'=>S_GRAPHS,
-						'sub_pages'=>array('popup_gitem.php')
+					array('url'=>'graphs.php',
+							'label'=>S_GRAPHS,
+							'sub_pages'=>array('popup_gitem.php')
 						),
-					array('url'=>'screenconf.php'	,'label'=>S_SCREENS,
-						'sub_pages'=>array('screenedit.php')
+					array('url'=>'screenconf.php',
+							'label'=>S_SCREENS,
+							'sub_pages'=>array('screenedit.php')
 						),
-					array('url'=>'sysmaps.php'	,'label'=>S_MAPS,
-						'sub_pages'=>array('sysmap.php','popup_link_tr.php')
+					array('url'=>'sysmaps.php',
+							'label'=>S_MAPS,
+							'sub_pages'=>array('sysmap.php','popup_link_tr.php')
 						),
-					array('url'=>'services.php'	,'label'=>S_IT_SERVICES,
-						'sub_pages'=>array('services_form.php')	
+					array('url'=>'services.php',
+							'label'=>S_IT_SERVICES,
+							'sub_pages'=>array('services_form.php')	
 						),
 					array('url'=>'discoveryconf.php','label'=>S_DISCOVERY),
 					array('url'=>'exp_imp.php'	,'label'=>S_EXPORT_IMPORT),
@@ -241,158 +248,133 @@ COpt::profiling_start("page");
 				'default_page_id'	=> 1,
 				'forse_disable_subnodes'=> true,
 				'pages'=>array(
-					ZBX_DISTRIBUTED ? array('url'=>'nodes.php'	,'label'=>S_NODES) : null ,
+					ZBX_DISTRIBUTED?array('url'=>'nodes.php','label'=>S_NODES):null,
 					array('url'=>'authentication.php'	,'label'=>S_AUTHENTICATION),
-					array('url'=>'users.php'	,'label'=>S_USERS		,
+					array('url'=>'users.php',
+						'label'=>S_USERS,
 						'sub_pages'=>array('popup_media.php','popup_usrgrp.php','popup_right.php','popup_users.php')
 						),
-					array('url'=>'media_types.php'	,'label'=>S_MEDIA_TYPES		),
+					array('url'=>'media_types.php'	,'label'=>S_MEDIA_TYPES),
 					array('url'=>'scripts.php'	,'label'=>S_SCRIPTS),
-					array('url'=>'audit.php'	,'label'=>S_AUDIT		),
-					array('url'=>'queue.php'	,'label'=>S_QUEUE	),
-					array('url'=>'report4.php'	,'label'=>S_NOTIFICATIONS	),
+					array('url'=>'audit.php'	,'label'=>S_AUDIT),
+					array('url'=>'queue.php'	,'label'=>S_QUEUE),
+					array('url'=>'report4.php'	,'label'=>S_NOTIFICATIONS),
 					array('url'=>'locales.php'	,'label'=>S_LOCALES	),
-					array('url'=>'instal.php'	,'label'=>S_INSTALLATION	,
+					array('url'=>'instal.php'	,'label'=>S_INSTALLATION,
 						'sub_pages'=>array('setup.php','warning.php'))
 					)
 				),
 		'login'=>array(
 				'label'			=> S_LOGIN,
+				'user_type'		=> 	0,
 				'default_page_id'	=> 0,
 				'forse_disable_subnodes'=> true,
 				'pages'=>array(
-					array('url'=>'index.php',
-						'sub_pages'=>array('profile.php')
-						)
+					array('url'=>'index.php','sub_pages'=>array('profile.php'))
 					)
 				)
 		);
+//SDI($USER_DETAILS);
+	$deny = !defined('ZBX_PAGE_NO_AUTHERIZATION');
+	$main_menu	= array();
+	$sub_menus	= array();
+	foreach($ZBX_MENU as $label => $menu){
+// Check to show menu or not
+		$show_menu = true;
 
-	$main_menu_row	= array();
-	$sub_menu_row	= array();
-
-	foreach($ZBX_MENU as $label => $sub){
-// Check permissions for main menu
-		unset($deny);
-		if(!defined('ZBX_PAGE_NO_AUTHERIZATION')){
-			if(isset($sub['user_type'])){
-				if($USER_DETAILS['type'] < $sub['user_type']){
-					$deny = true;
-				}
-			}
-
-			if(isset($sub['node_perm'])){ 
-				if(0 == count(get_accessible_nodes_by_user($USER_DETAILS,$sub['node_perm']))){
-					$deny = true;
-				}
-			}
-
-			if($label=='login'){
-				$deny = true;				
-/*				if(isset($USER_DETAILS['sessionid']))
-					$sub['label'] = S_LOGOUT;
-				else
-					unset($deny);
-*/
-			}
+		if(isset($menu['user_type'])){
+			$show_menu &= ($menu['user_type'] <= $USER_DETAILS['type']);
 		}
 
-// End of main menu permissions checking
+		if(isset($menu['node_perm'])){
+			$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,$menu['node_perm']);
+			$show_menu &= (0 < count($available_nodes));
+		}
 
-		unset($menu_url);
-		foreach($sub['pages'] as $id => $sub_pages){
+		if($label == 'login'){
+			$show_menu = false;
+		}
 
-			if(!defined('ZBX_PAGE_NO_AUTHERIZATION')){
-				if(isset($sub_pages['user_type'])){
-					if($USER_DETAILS['type'] < $sub_pages['user_type']){
-						unset($sub['pages'][$id]);
-						continue;
-					}
-				}
+//---
+		$menu_class = 'horizontal_menu_n';
+		
+		$page_exists = false;
+		$sub_menus[$label] = array();
+		foreach($menu['pages'] as $id => $sub_page){
+			$show_sub_menu = true;
+// show check
+			if(!isset($sub_page['label'])) $show_sub_menu = false;
 
-				if(isset($sub_pages['node_perm'])){
-					if ( 0 == count(get_accessible_nodes_by_user($USER_DETAILS,$sub_pages['node_perm']))){
-						unset($sub['pages'][$id]);
-						continue;
-					}
-				}
+			if(isset($sub_page['user_type']) && ($USER_DETAILS['type'] < $sub_page['user_type'])){
+				$show_sub_menu = false;
 			}
 
-			if(isset($page_exist)) continue; 
-				
-			if($page['file'] == $sub_pages['url']){
-				if(isset($sub_pages['label'])){
-					$menu_url = $sub_pages['url'];
+			if(isset($sub_pages['node_perm'])){
+				$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,$sub_page['node_perm']);				
+				if(0 == count($available_nodes)){
+					$show_sub_menu = false;
 				}
-				
-				$page_exist = true;
+			}
+//----------
+			$row = array('menu_text' => isset($sub_page['label'])?$sub_page['label']:'', 
+							'menu_url'=> $sub_page['url'],
+							'class'=> 'highlight',
+							'selected'=> false);
+
+			$sub_menu_active = ($page['file'] == $sub_page['url']);
+			$sub_menu_active |=  (isset($sub_page['sub_pages']) && str_in_array($page['file'], $sub_page['sub_pages']));
+
+			if($sub_menu_active){
+// PERMISSION CHECK
+				$deny &= ($USER_DETAILS['type'] < $menu['user_type']);
+// END OF PERMISSION CHECK 
+				$menu_class = 'active';
+				$page_exists = true;
 				$page['menu'] = $label;
-				$sub['pages'][$id]['active'] = true; /* mark as active */
+				$row['selected'] = true;
+				update_profile('web.menu.'.$label.'.last', $sub_page['url'], PROFILE_TYPE_STR);
 			}
-			else if(isset($sub_pages['sub_pages'])){
-				if(str_in_array($page['file'], $sub_pages['sub_pages'])){
-					if(isset($sub_pages['label'])){
-						$menu_url = $sub_pages['url'];
-					}
-					$page_exist = true;
-					$page['menu'] = $label;
-					$sub['pages'][$id]['active'] = true; /* mark as active */
-				}					
-			}
-
-			if(isset($page_exist) &&
-				(isset($sub['forse_disable_subnodes']) || isset($sub_pages['forse_disable_subnodes'])) && 
-				!defined('ZBX_DISABLE_SUBNODES'))
-			{
-					define('ZBX_DISABLE_SUBNODES', 1);
-			}
+			
+			if($show_sub_menu) $sub_menus[$label][] = $row;
+		}
+		
+		if($page_exists && !defined('ZBX_DISABLE_SUBNODES') && 
+			(isset($sub['forse_disable_subnodes']) || isset($sub_pages['forse_disable_subnodes'])))
+		{
+			define('ZBX_DISABLE_SUBNODES', 1);
+		}
+//SDI($label.' : '.$show_menu.' : '.$deny);
+		if($page_exists && $deny){
+			$denyed_page_requested = true;
 		}
 
-		if(isset($menu_url)){ /* active menu */
-			$class = 'active';
-
-			update_profile('web.menu.'.$label.'.last', $menu_url, PROFILE_TYPE_STR);
-
-			if(isset($deny)){
-				$denyed_page_requested = true;
-				continue;
-			}
-
-			foreach($sub['pages'] as $sub_pages){
-				if(!isset($sub_pages['label'])) continue;
-
-				$label = new CLink($sub_pages['label'], $sub_pages['url'],'highlight');
-				if(isset($sub_pages['active'])) $label = new CSpan($label, 'active');
-				
-				array_push($sub_menu_row, 
-					$label,
-					new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider')
-					);
-			}
+		if(!$show_menu){
+			unset($sub_menus[$label]);
+			continue;
 		}
-		else{
-			if(isset($deny)) continue;
-
-			$class = 'horizontal_menu_n';
-
+		
+		if(ZBX_DISABLE_MENU_CACHE == 0)
 			$menu_url = get_profile('web.menu.'.$label.'.last',false);
+		else
+			$menu_url = $menu['pages'][$sub['default_page_id']]['url'];
 
-			if(!$menu_url)
-				$menu_url = $sub['pages'][$sub['default_page_id']]['url'];
-		}
 
-		array_push($main_menu_row, new CCol(new CLink($sub['label'], $menu_url, 'highlight'),$class));
-		unset($menu_url, $class);
+		$mmenu_entry = new CCol($menu['label'], $menu_class);
+		$mmenu_entry->addOption('id', $label);
+		$mmenu_entry->addAction('onclick', "javascript: location.href = '$menu_url';");
+		$mmenu_entry->addAction('onmouseover', 'javascript: MMenu.mouseOver("'.$label.'");');
+		$mmenu_entry->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
+		
+		array_push($main_menu, $mmenu_entry);
 	}
 
-	if((!isset($page_exist) && $page['type']!=PAGE_TYPE_XML)){
+	if(!isset($page_exists) && ($page['type']!=PAGE_TYPE_XML)){
 		$denyed_page_requested = true;
 	}
 
 	zbx_flush_post_cookies(isset($denyed_page_requested));
 
-	if($page['type'] == PAGE_TYPE_HTML)
-	{
+	if($page['type'] == PAGE_TYPE_HTML){
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -489,8 +471,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),'http://www.zabbix.com/');
 		$logo->setTarget('_blank');
-//		$logo = new CDiv(SPACE,'zabbix_logo');
-//		$logo->AddAction('onclick',"javascript: document.location = 'http://www.zabbix.com';");		
 		
 		$td_r = new CCol($page_header_r_col, 'page_header_r');
 		$td_r->addOption('width','100%');
@@ -502,15 +482,14 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(5);
 		$table->addRow($top_page_row);
-		$table->Show();
+		$table->show();
 
 		$menu_table = new CTable(NULL,'menu');
 		$menu_table->setCellSpacing(0);
 		$menu_table->setCellPadding(5);
-		$menu_table->addRow($main_menu_row);
-
+		$menu_table->addRow($main_menu);
+		
 		$node_form = null;
-
 		if(ZBX_DISTRIBUTED){
 			$lst_nodes = new CComboBox('switch_node', get_current_nodeid(false), 'submit()');
 			$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
@@ -537,9 +516,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 					$node_form->addItem(array(SPACE, new CSpan(S_SHOW,'textcolorstyles'), $cmd_show_subnodes));
 				}
-
-// No need for the button anymore
-//				$node_form->AddItem(new CButton('submit',S_SWITCH_NODE));
 			}
 		}
 
@@ -553,15 +529,56 @@ COpt::compare_files_with_menu($ZBX_MENU);
 //		$r_col->AddOption('style','text-align: right;');
 		
 		$table->addRow(array($menu_table,$r_col));
-		$table->Show();
 		
+		$page_menu = new CDiv();
+		$page_menu->addoption('id','mmenu');
+		$page_menu->addItem($table);
+		
+		$menu_selected = false;
+		foreach($sub_menus as $label => $sub_menu){
+			$sub_menu_table = new CTable(NULL,'sub_menu');
+			$sub_menu_table->setCellSpacing(0);
+			$sub_menu_table->setCellPadding(5);
+			
+			$sub_menu_row = array();
+			foreach($sub_menu as $id => $sub_page){
+				if(empty($sub_page['menu_text'])) $sub_page['menu_text'] = SPACE;
+				
+				$sub_menu_item = new CLink($sub_page['menu_text'], $sub_page['menu_url'], $sub_page['class']);
+				if($sub_page['selected']) $sub_menu_item = new CSpan($sub_menu_item, 'active');
+				$sub_menu_row[] = $sub_menu_item;
+				$sub_menu_row[] = new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider');	
+			}
+			$sub_menu_table->addRow(new CCol($sub_menu_row));
+			
+			$sub_menu_div = new CDiv($sub_menu_table);
+			$sub_menu_div->addOption('id', 'sub_'.$label);
+			$sub_menu_div->addAction('onmouseover','javascript: MMenu.submenu_mouseOver();');
+			$sub_menu_div->addAction('onmouseout','javascript: MMenu.mouseOut();');
+
+			if(isset($page['menu']) && ($page['menu'] == $label)){
+				$menu_selected = true;
+				$sub_menu_div->addOption('style','display: block;');
+				zbx_add_post_js('MMenu.def_label = '.zbx_jsvalue($label));
+			}
+			else{
+				$sub_menu_div->addOption('style','display: none;');
+			}
+			
+			$page_menu->addItem($sub_menu_div);
+		}
+
 		$sub_menu_table = new CTable(NULL,'sub_menu');
 		$sub_menu_table->setCellSpacing(0);
 		$sub_menu_table->setCellPadding(5);
+		$sub_menu_table->addRow(SPACE);
 		
-		if(empty($sub_menu_row)) $sub_menu_row = '&nbsp;';
-		$sub_menu_table->addRow(new CCol($sub_menu_row));
-		$sub_menu_table->Show();
+		$sub_menu_div = new CDiv($sub_menu_table);
+		$sub_menu_div->addOption('id', 'sub_empty');
+		$sub_menu_div->addOption('style','display: '.($menu_selected?'none;':'block;'));
+		$page_menu->addItem($sub_menu_div);
+		
+		$page_menu->show();
 	}
 //------------------------------------- <HISTORY> ---------------------------------------
 	if(isset($page['hist_arg']) && ($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
@@ -589,7 +606,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 	unset($table, $top_page_row, $menu_table, $node_form);
 	unset($main_menu_row);
 	unset($db_nodes, $node_data);
-	unset($sub_menu_table, $sub_menu_row);
+	unset($sub_menu_table, $sub_menu_rows);
 
 	if(isset($denyed_page_requested)){
 		access_deny();

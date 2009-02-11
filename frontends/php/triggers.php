@@ -382,7 +382,7 @@
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
 	
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
-	
+
 	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 	$available_triggers = get_accessible_triggers(PERM_READ_WRITE,$PAGE_HOSTS['hostids'],PERM_RES_IDS_ARRAY,null,0);
@@ -442,7 +442,7 @@
 			make_sorting_link(S_SEVERITY,'t.priority'), 
 			make_sorting_link(S_STATUS,'t.status'), 
 
-			$_REQUEST['hostid'] > 0 ? NULL : make_sorting_link(S_HOST,'h.host'),
+			($_REQUEST['hostid'] > 0)?NULL:make_sorting_link(S_HOST,'h.host'),
 			array(	new CCheckBox('all_triggers',NULL,
 					"CheckAll('".$form->GetName()."','all_triggers');")
 				,make_sorting_link(S_NAME,'t.description'),
@@ -454,7 +454,10 @@
 		if($showdisabled == 0){
 		    $sql_where.= ' AND t.status <> '.TRIGGER_STATUS_DISABLED;
 		}
-			
+
+		if($PAGE_HOSTS['selected'] > 0)
+			$sql_where.= ' AND h.hostid='.$PAGE_HOSTS['selected'];
+	
 		$sql = 'SELECT DISTINCT h.hostid,h.host,t.*'.
 			' FROM triggers t '.
 				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
@@ -462,7 +465,6 @@
 				' LEFT JOIN hosts h ON h.hostid=i.hostid '.
 			' WHERE '.DBin_node('t.triggerid').
 				$sql_where.
-				' AND h.hostid='.$PAGE_HOSTS['selected'].
 				' AND '.DBcondition('t.triggerid',$available_triggers).
 			order_by('h.host,t.description,t.priority,t.status');
 

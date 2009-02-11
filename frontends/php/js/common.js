@@ -89,7 +89,7 @@ function SDI(msg){
 		doc_body.appendChild(div_help);
 		
 		div_help.setAttribute('id','div_help');
-		div_help.setAttribute('style','position: absolute; left: 10px; top: 10px; border: 1px red solid; width: 500px; height: 400px; background-color: white; overflow: auto; z-index: 20;');
+		div_help.setAttribute('style','position: absolute; left: 10px; top: 100px; border: 1px red solid; width: 500px; height: 400px; background-color: white; overflow: auto; z-index: 20;');
 		
 //		new Draggable(div_help,{});
 	}
@@ -470,7 +470,7 @@ function ShowHide(obj,style){
 		obj = document.getElementById(obj);
 		
 	if(!obj){
-		throw 'ShowHide(): Object not foun.';
+		throw 'ShowHide(): Object not found.';
 		return false;
 	}
 
@@ -482,7 +482,6 @@ function ShowHide(obj,style){
 		obj.style.display = style;
 		return 1;
 	}
-return false;
 }
 
 function switchElementsClass(obj,class1,class2){
@@ -518,4 +517,45 @@ function insert_sizeable_graph(graph_id,url){
 	if((typeof(ZBX_G_WIDTH) != 'undefined')) url += "&amp;width="+ZBX_G_WIDTH;
 
 	document.write('<img id="'+graph_id+'" src="'+url+'" alt="graph" /><br />');
+}
+
+/************************************************************************************/
+/*									MAIN MENU stuff									*/
+/************************************************************************************/
+
+var MMenu = {
+menus:			{'empty': 0, 'view': 0, 'cm': 0, 'reports': 0, 'config': 0, 'admin': 0},
+def_label:		null,
+sub_active: 	false,
+timeout: 		null,
+
+mouseOver: function(show_label){
+	clearTimeout(this.timeout);
+	MMenu.showSubMenu(show_label);
+},
+
+submenu_mouseOver: function(){
+	clearTimeout(this.timeout);
+},
+
+mouseOut: function(){
+	this.timeout = setTimeout('MMenu.showSubMenu("'+this.def_label+'")', 2000);
+},
+
+showSubMenu: function(show_label){
+	var menu_div  = $('sub_'+show_label);
+	if(!is_null(menu_div)){
+		$(show_label).className = 'active';
+		menu_div.show();
+		for(var key in this.menus){
+			if(key == show_label) continue;
+
+			var menu_cell = $(key);
+			if(!is_null(menu_cell)) menu_cell.className = '';
+			
+			var sub_menu_cell = $('sub_'+key);
+			if(!is_null(sub_menu_cell)) sub_menu_cell.hide();
+		}
+	}
+}
 }
