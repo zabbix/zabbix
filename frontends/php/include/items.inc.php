@@ -1027,9 +1027,9 @@
 	}
 	
 	function get_realhost_by_itemid($itemid){
-		$itme = get_item_by_itemid($itemid);
-		if($itme["templateid"] <> 0)
-			return get_realhost_by_itemid($itme["templateid"]);
+		$item = get_item_by_itemid($itemid);
+		if($item['templateid'] <> 0)
+			return get_realhost_by_itemid($item['templateid']);
 
 	return get_host_by_itemid($itemid);
 	}
