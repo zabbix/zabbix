@@ -119,7 +119,10 @@
 			$confirmation = "Confirm('".$this->msg."')";
 			
 			if(isset($this->vars)){
-				$action = "redirect('".$page["file"]."?".$this->name."=1".$this->vars."')";
+				$link = $page['file'].'?'.$this->name.'=1'.$this->vars;
+				$url = new Curl($link);
+				
+				$action = "redirect('".$url->getUrl()."')";
 			}
 			else{
 				$action = 'true';
