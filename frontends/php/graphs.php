@@ -290,6 +290,15 @@ include_once 'include/page_header.php';
 // ----</ACTIONS>----
 ?>
 <?php
+	if(isset($_REQUEST['hostid']) && !isset($_REQUEST['groupid']) && !isset($_REQUEST['graphid'])){
+		$sql = 'SELECT DISTINCT hg.groupid '.
+				' FROM hosts_groups hg '.
+				' WHERE hg.hostid='.$_REQUEST['hostid'];
+		if($group=DBfetch(DBselect($sql, 1))){
+			$_REQUEST['groupid'] = $group['groupid'];
+		}
+	}
+	
 	if(isset($_REQUEST['graphid']) && ($_REQUEST['graphid']>0)){
 		$sql_from = '';
 		$sql_where = '';
