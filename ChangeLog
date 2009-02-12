@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-700] fixed possible server crash when using {TRIGGER.NAME} for notifications (Sasha)
  - [DEV-286] improved zabbix main menu (Artem)
  - [ZBX-311] fixed PostgreSQL errors with out of range string data (Sasha)
  - [ZBX-696] fixed import of triggers with {HOSTNAME} macro (Sasha)
