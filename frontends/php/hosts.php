@@ -1553,7 +1553,7 @@ include_once('include/page_header.php');
 				$count = 0;
 				$hosts = array();
 
-				$sql = 'SELECT DISTINCT h.host, h.status'.
+				$sql = 'SELECT DISTINCT h.host, h.hostid, h.status'.
 						' FROM hosts h, hosts_groups hg'.
 						' WHERE h.hostid=hg.hostid '.
 							' AND hg.groupid='.$db_group['groupid'].
