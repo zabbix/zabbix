@@ -317,7 +317,7 @@ include_once 'include/page_header.php';
 		if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0)){
 			$sql_where.= ' AND hg.hostid='.$_REQUEST['hostid'];
 		}
-		
+	
 		$sql = 'SELECT DISTINCT hg.groupid, hg.hostid '.
 				' FROM hosts_groups hg '.
 				' WHERE EXISTS( SELECT DISTINCT i.itemid '.
@@ -336,7 +336,7 @@ include_once 'include/page_header.php';
 			}
 		}
 		else{
-			$_REQUEST['graphid'] = 0;
+//			$_REQUEST['graphid'] = 0;
 		}
 	}
 	
@@ -352,7 +352,6 @@ include_once 'include/page_header.php';
 	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 	$available_graphs = get_accessible_graphs(PERM_READ_WRITE,$available_hosts,null,get_current_nodeid(true),null,0);
-
 ?>
 <?php
 	$form = new CForm();
@@ -388,7 +387,7 @@ include_once 'include/page_header.php';
 	} 
 	else {
 /* Table HEADER */
-		if(isset($_REQUEST['graphid'])&&($_REQUEST['graphid']==0)){
+		if(isset($_REQUEST['graphid']) && ($_REQUEST['graphid']==0)){
 			unset($_REQUEST['graphid']);
 		}
 
@@ -452,8 +451,7 @@ include_once 'include/page_header.php';
 	
 			if($row['templateid']==0){
 				$name = new CLink($row['name'],
-					'graphs.php?graphid='.$row['graphid'].'&form=update'.
-					url_param('groupid').url_param('hostid'),'action');
+					'graphs.php?graphid='.$row['graphid'].'&form=update','action');
 			} 
 			else {
 				$real_hosts = get_realhosts_by_graphid($row['templateid']);
@@ -494,7 +492,7 @@ include_once 'include/page_header.php';
 					break;
 			}
 
-			$table->AddRow(array(
+			$table->addRow(array(
 				$host_list,
 				array($chkBox, $name),
 				$row['width'],
