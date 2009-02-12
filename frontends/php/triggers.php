@@ -370,7 +370,7 @@
 			}
 		}
 		else{
-			$_REQUEST['triggerid'] = 0;
+//			$_REQUEST['triggerid'] = 0;
 		}
 	}
 	

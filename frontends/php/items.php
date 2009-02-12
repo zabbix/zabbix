@@ -710,7 +710,7 @@ include_once 'include/page_header.php';
 			}
 		}
 		else{
-			$_REQUEST['itemid'] = 0;
+//			$_REQUEST['itemid'] = 0;
 		}
 	}
 
