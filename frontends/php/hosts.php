@@ -1219,6 +1219,7 @@ include_once('include/page_header.php');
 	switch($_REQUEST['config']){
 		case 0:
 			$options = array('only_current_node','allow_all','real_hosts');
+			if(isset($_REQUEST['form']) || isset($_REQUEST['massupdate'])) array_push($options,'do_not_select_if_empty');
 			
 			foreach($options as $option) $params[$option] = 1;
 			$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
@@ -1228,6 +1229,7 @@ include_once('include/page_header.php');
 			break;
 		case 1:
 			$options = array('only_current_node');
+			if(isset($_REQUEST['form']) || isset($_REQUEST['massupdate'])) array_push($options,'do_not_select_if_empty');
 			
 			foreach($options as $option) $params[$option] = 1;
 			$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
@@ -1237,6 +1239,8 @@ include_once('include/page_header.php');
 			break;
 		case 2:
 			$options = array('only_current_node','templated_hosts');
+			if(isset($_REQUEST['form']) || isset($_REQUEST['massupdate'])) array_push($options,'do_not_select_if_empty');
+			
 			foreach($options as $option) $params[$option] = 1;
 			$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
 
@@ -1249,6 +1253,7 @@ include_once('include/page_header.php');
 			break;
 		case 3:
 			$options = array('only_current_node','allow_all','templated_hosts');
+			if(isset($_REQUEST['form']) || isset($_REQUEST['massupdate'])) array_push($options,'do_not_select_if_empty');
 			
 			foreach($options as $option) $params[$option] = 1;
 			$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
@@ -1258,6 +1263,7 @@ include_once('include/page_header.php');
 			break;
 		case 5:
 			$options = array('only_current_node');
+			if(isset($_REQUEST['form']) || isset($_REQUEST['massupdate'])) array_push($options,'do_not_select_if_empty');
 			
 			foreach($options as $option) $params[$option] = 1;
 			$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
@@ -1276,6 +1282,7 @@ include_once('include/page_header.php');
 			break;
 		default:
 			$options = array('only_current_node');
+			if(isset($_REQUEST['form']) || isset($_REQUEST['massupdate'])) array_push($options,'do_not_select_if_empty');
 			
 			foreach($options as $option) $params[$option] = 1;
 			$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
