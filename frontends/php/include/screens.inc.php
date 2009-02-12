@@ -787,12 +787,12 @@
 
 		$form->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["screenitemid"])){
-			$form->AddItemToBottomRow(SPACE);
-			$form->AddItemToBottomRow(new CButtonDelete(null,
+			$form->addItemToBottomRow(SPACE);
+			$form->addItemToBottomRow(new CButtonDelete(null,
 				url_param("form").url_param("screenid").url_param("screenitemid")));
 		}
-		$form->AddItemToBottomRow(SPACE);
-		$form->AddItemToBottomRow(new CButtonCancel(url_param("screenid")));
+		$form->addItemToBottomRow(SPACE);
+		$form->addItemToBottomRow(new CButtonCancel(url_param("screenid")));
 		return $form;
 	}
 
