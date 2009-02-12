@@ -1,5 +1,5 @@
 Changes for 1.7.0
-
+ - [ZBX-646] audit log entries added for screen edit actions (alexei)
  - [ZBX-645] after new installation, filter for audit log is set not to filter anything (alexei)
  - [ZBX-643] fixed no print data for bar reports (Artem)
  - [DEV-231] improved dynamic graph usability in slideshow screen (Artem)
