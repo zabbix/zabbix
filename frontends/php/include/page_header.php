@@ -339,7 +339,7 @@ COpt::profiling_start("page");
 		}
 		
 		if($page_exists && !defined('ZBX_DISABLE_SUBNODES') && 
-			(isset($sub['forse_disable_subnodes']) || isset($sub_pages['forse_disable_subnodes'])))
+			(isset($menu['forse_disable_subnodes']) || isset($sub_page['forse_disable_subnodes'])))
 		{
 			define('ZBX_DISABLE_SUBNODES', 1);
 		}
