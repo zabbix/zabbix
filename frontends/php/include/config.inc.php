@@ -226,7 +226,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED){
 			$ZBX_CURRENT_NODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node
 			$ZBX_WITH_SUBNODES = get_cookie('zbx_with_subnodes', false); // Show elements FROM subnodes
-
+			
 			if(isset($_REQUEST['switch_node'])){
 				if($node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$_REQUEST['switch_node']))){
 					$ZBX_CURRENT_NODEID = $_REQUEST['switch_node'];
@@ -242,15 +242,25 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				$ZBX_CURMASTERID = $node_data['masterid'];
 			}
 
-			$sql = 'SELECT nodeid,name,masterid FROM nodes';
-			$db_nodes = DBselect($sql);
+			if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
+				$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid FROM nodes n';
+			}
+			else{
+				$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid '.
+					' FROM nodes n, groups hg,rights r, users_groups g '.
+					' WHERE r.id=hg.groupid '.
+					 	' AND r.groupid=g.usrgrpid '.
+					 	' AND g.userid='.$USER_DETAILS['userid'].
+					 	' AND (hg.groupid div 100000000000000)=n.nodeid;';
+			}
 
+			$db_nodes = DBselect($sql);
 			while($node = DBfetch($db_nodes)){
 				$ZBX_NODES_IDS[$node['nodeid']] = $node['nodeid'];
 				$ZBX_NODES[$node['nodeid']] = $node;
 			}
 
-			if ( !isset($ZBX_NODES[$ZBX_CURRENT_NODEID]) ){
+			if( !isset($ZBX_NODES[$ZBX_CURRENT_NODEID])){
 				$denyed_page_requested = true;
 				$ZBX_CURRENT_NODEID = $ZBX_LOCALNODEID;
 				$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
@@ -259,7 +269,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			foreach($ZBX_NODES as $nodeid => $node_data ){
 				$curr_node = &$node_data;
 
-				while(($curr_node['masterid']!=0) && (bccomp($curr_node['masterid'],$ZBX_CURRENT_NODEID)!=0)){
+				if(($curr_node['masterid']!=0) && (bccomp($curr_node['masterid'],$ZBX_CURRENT_NODEID)!=0)){
 					$curr_node = &$ZBX_NODES[$curr_node['masterid']];
 				}
 
