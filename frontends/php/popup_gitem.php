@@ -19,46 +19,46 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/triggers.inc.php";
-	require_once "include/js.inc.php";
+	require_once 'include/config.inc.php';
+	require_once 'include/triggers.inc.php';
+	require_once 'include/js.inc.php';
 	
-	$dstfrm		= get_request("dstfrm",		0);	// destination form
+	$dstfrm		= get_request('dstfrm',		0);	// destination form
 
-	$page["title"] = "S_GRAPH_ITEM";
-	$page["file"] = "popup_gitem.php";
+	$page['title'] = "S_GRAPH_ITEM";
+	$page['file'] = 'popup_gitem.php';
 
 	define('ZBX_PAGE_NO_MENU', 1);
 	
-include_once "include/page_header.php";
+include_once 'include/page_header.php';
 
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null),
+		'dstfrm'=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null),
 
-		"graphid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
-		"gid"=>			array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
-		"graphtype"=>	array(T_ZBX_INT, O_OPT,	 null,	IN("0,1,2,3"),		'isset({save})'),
-		"list_name"=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,			'isset({save})&&isset({gid})'),
-		"itemid"=>		array(T_ZBX_INT, O_OPT,  null,	DB_ID.'({}!=0)',	'isset({save})'),
-		"color"=>		array(T_ZBX_CLR, O_OPT,  null,	null,				'isset({save})'),
-		"drawtype"=>	array(T_ZBX_INT, O_OPT,  null,	IN(graph_item_drawtypes()),'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
-		"sortorder"=>	array(T_ZBX_INT, O_OPT,  null,	BETWEEN(0,65535),	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
-		"yaxisside"=>	array(T_ZBX_INT, O_OPT,  null,	IN("0,1"),			'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
-		"calc_fnc"=>	array(T_ZBX_INT, O_OPT,	 null,	IN("1,2,4,7,9"),	'isset({save})'),
-		"type"=>		array(T_ZBX_INT, O_OPT,	 null,	IN("0,1,2"),		'isset({save})'),
-		"periods_cnt"=>	array(T_ZBX_INT, O_OPT,	 null,	BETWEEN(0,360),		'isset({save})'),
+		'graphid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
+		'gid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
+		'graphtype'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,3'),		'isset({save})'),
+		'list_name'=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,			'isset({save})&&isset({gid})'),
+		'itemid'=>		array(T_ZBX_INT, O_OPT,  null,	DB_ID.'({}!=0)',	'isset({save})'),
+		'color'=>		array(T_ZBX_CLR, O_OPT,  null,	null,				'isset({save})'),
+		'drawtype'=>	array(T_ZBX_INT, O_OPT,  null,	IN(graph_item_drawtypes()),'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		'sortorder'=>	array(T_ZBX_INT, O_OPT,  null,	BETWEEN(0,65535),	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		'yaxisside'=>	array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),			'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		'calc_fnc'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('1,2,4,7,9'),	'isset({save})'),
+		'type'=>		array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2'),		'isset({save})'),
+		'periods_cnt'=>	array(T_ZBX_INT, O_OPT,	 null,	BETWEEN(0,360),		'isset({save})'),
 
-		"only_hostid"=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,			null),
-		"monitored_hosts"=>array(T_ZBX_INT, O_OPT,  null,	IN("0,1"),	null),
+		'only_hostid'=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,			null),
+		'monitored_hosts'=>array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
 /* actions */
-		"add"=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'add'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 /* other */
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_refresh"=>array(T_ZBX_STR, O_OPT, null,	null,	null)
+		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_refresh'=>array(T_ZBX_STR, O_OPT, null,	null,	null)
 	);
 
 	check_fields($fields);
@@ -138,10 +138,10 @@ include_once "include/page_header.php";
 	echo SBR;
 
 		$frmGItem = new CFormTable(S_NEW_ITEM_FOR_THE_GRAPH);
-		$frmGItem->SetName('graph_item');
-		$frmGItem->SetHelp("web.graph.item.php");
+		$frmGItem->setName('graph_item');
+		$frmGItem->setHelp("web.graph.item.php");
 
-		$frmGItem->AddVar('dstfrm',$_REQUEST['dstfrm']);
+		$frmGItem->addVar('dstfrm',$_REQUEST['dstfrm']);
 
 		$graphid	= get_request("graphid", 	null);
 		$graphtype	= get_request("graphtype", 	GRAPH_TYPE_NORMAL);
@@ -164,16 +164,16 @@ include_once "include/page_header.php";
 			$description = item_description($description);
 		}
 		
-		$frmGItem->AddVar('graphid',$graphid);
-		$frmGItem->AddVar('gid',$gid);
-		$frmGItem->AddVar('list_name',$list_name);
-		$frmGItem->AddVar('itemid',$itemid);
-		$frmGItem->AddVar('graphtype',$graphtype);
-		$frmGItem->AddVar('only_hostid',$only_hostid);
+		$frmGItem->addVar('graphid',$graphid);
+		$frmGItem->addVar('gid',$gid);
+		$frmGItem->addVar('list_name',$list_name);
+		$frmGItem->addVar('itemid',$itemid);
+		$frmGItem->addVar('graphtype',$graphtype);
+		$frmGItem->addVar('only_hostid',$only_hostid);
 
 		$txtCondVal = new CTextBox('description',$description,50,'yes');
 
-		$host_condition = "";
+		$host_condition = '';
 		if(isset($only_hostid)){// graph for template must use only one host
 			$host_condition = "&only_hostid=".$only_hostid;
 		}
@@ -187,92 +187,90 @@ include_once "include/page_header.php";
 				"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."');",
 				'T');
 		
-		$frmGItem->AddRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
+		$frmGItem->addRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
 
 		if($graphtype == GRAPH_TYPE_NORMAL){
-			$cmbType = new CComboBox("type",$type,"submit()");
-			$cmbType->AddItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
-			$cmbType->AddItem(GRAPH_ITEM_AGGREGATED, S_AGGREGATED);
-			$frmGItem->AddRow(S_TYPE, $cmbType);
+			$cmbType = new CComboBox('type',$type,'submit()');
+			$cmbType->addItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
+			$cmbType->addItem(GRAPH_ITEM_AGGREGATED, S_AGGREGATED);
+			$frmGItem->addRow(S_TYPE, $cmbType);
 		}
 		else if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-			$cmbType = new CComboBox("type",$type,"submit()");
-			$cmbType->AddItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
-			$cmbType->AddItem(GRAPH_ITEM_SUM, S_GRAPH_SUM);
-			$frmGItem->AddRow(S_TYPE, $cmbType);
+			$cmbType = new CComboBox('type',$type,'submit()');
+			$cmbType->addItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
+			$cmbType->addItem(GRAPH_ITEM_SUM, S_GRAPH_SUM);
+			$frmGItem->addRow(S_TYPE, $cmbType);
 		}
 		else{
-			$frmGItem->AddVar("type",GRAPH_ITEM_SIMPLE);
+			$frmGItem->addVar('type',GRAPH_ITEM_SIMPLE);
 		}
 
 		if($type == GRAPH_ITEM_AGGREGATED){
-			$frmGItem->AddRow(S_AGGREGATED_PERIODS_COUNT,	new CTextBox("periods_cnt",$periods_cnt,15)); 
+			$frmGItem->addRow(S_AGGREGATED_PERIODS_COUNT,	new CTextBox('periods_cnt',$periods_cnt,15)); 
 
-			$frmGItem->AddVar("calc_fnc",$calc_fnc);
-			$frmGItem->AddVar("drawtype",$drawtype);
-			$frmGItem->AddVar("color",$color);
+			$frmGItem->addVar('calc_fnc',$calc_fnc);
+			$frmGItem->addVar('drawtype',$drawtype);
+			$frmGItem->addVar('color',$color);
 		}
 		else {
 			if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-				$frmGItem->AddVar("periods_cnt",$periods_cnt);
+				$frmGItem->addVar('periods_cnt',$periods_cnt);
 	
-				$cmbFnc = new CComboBox("calc_fnc",$calc_fnc,'submit();');
+				$cmbFnc = new CComboBox('calc_fnc',$calc_fnc,'submit();');
 	
-				$cmbFnc->AddItem(CALC_FNC_MIN, S_MIN_SMALL);
-				$cmbFnc->AddItem(CALC_FNC_AVG, S_AVG_SMALL);
-				$cmbFnc->AddItem(CALC_FNC_MAX, S_MAX_SMALL);
-				$cmbFnc->AddItem(CALC_FNC_LST, S_LST_SMALL);
-				$frmGItem->AddRow(S_FUNCTION, $cmbFnc);		
+				$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
+				$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
+				$cmbFnc->addItem(CALC_FNC_MAX, S_MAX_SMALL);
+				$cmbFnc->addItem(CALC_FNC_LST, S_LST_SMALL);
+				$frmGItem->addRow(S_FUNCTION, $cmbFnc);		
 			}
 			else{
-				$frmGItem->AddVar("periods_cnt",$periods_cnt);
+				$frmGItem->addVar('periods_cnt',$periods_cnt);
 	
-				$cmbFnc = new CComboBox("calc_fnc",$calc_fnc,'submit();');
-	
-				if($graphtype == GRAPH_TYPE_NORMAL)
-					$cmbFnc->AddItem(CALC_FNC_ALL, S_ALL_SMALL);
-	
-				$cmbFnc->AddItem(CALC_FNC_MIN, S_MIN_SMALL);
-				$cmbFnc->AddItem(CALC_FNC_AVG, S_AVG_SMALL);
-				$cmbFnc->AddItem(CALC_FNC_MAX, S_MAX_SMALL);
-				$frmGItem->AddRow(S_FUNCTION, $cmbFnc);
+				$cmbFnc = new CComboBox('calc_fnc',$calc_fnc,'submit();');
 	
 				if($graphtype == GRAPH_TYPE_NORMAL)
-				{
-					$cmbType = new CComboBox("drawtype",$drawtype);
+					$cmbFnc->addItem(CALC_FNC_ALL, S_ALL_SMALL);
+	
+				$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
+				$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
+				$cmbFnc->addItem(CALC_FNC_MAX, S_MAX_SMALL);
+				$frmGItem->addRow(S_FUNCTION, $cmbFnc);
+	
+				if($graphtype == GRAPH_TYPE_NORMAL){
+					$cmbType = new CComboBox('drawtype',$drawtype);
 					foreach( graph_item_drawtypes() as $i )
 					{
-						$cmbType->AddItem($i,graph_item_drawtype2str($i));
+						$cmbType->addItem($i,graph_item_drawtype2str($i));
 					}
-					$frmGItem->AddRow(S_DRAW_STYLE, $cmbType);
+					$frmGItem->addRow(S_DRAW_STYLE, $cmbType);
 				}
-				else
-				{
-					$frmGItem->AddVar("drawtype", 1);
+				else{
+					$frmGItem->addVar('drawtype', 1);
 				}
 			}
 
-			$frmGItem->AddRow(S_COLOR, new CColor('color',$color));
+			$frmGItem->addRow(S_COLOR, new CColor('color',$color));
 		}
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
-			$cmbYax = new CComboBox("yaxisside",$yaxisside);
-			$cmbYax->AddItem(GRAPH_YAXIS_SIDE_RIGHT, S_RIGHT);
-			$cmbYax->AddItem(GRAPH_YAXIS_SIDE_LEFT,	S_LEFT);
-			$frmGItem->AddRow(S_YAXIS_SIDE, $cmbYax);
+			$cmbYax = new CComboBox('yaxisside',$yaxisside);
+			$cmbYax->addItem(GRAPH_YAXIS_SIDE_RIGHT, S_RIGHT);
+			$cmbYax->addItem(GRAPH_YAXIS_SIDE_LEFT,	S_LEFT);
+			$frmGItem->addRow(S_YAXIS_SIDE, $cmbYax);
 		}
 
 		if($type != GRAPH_ITEM_SUM){
-			$frmGItem->AddRow(S_SORT_ORDER_1_100, new CTextBox("sortorder",$sortorder,3));
+			$frmGItem->addRow(S_SORT_ORDER_1_100, new CTextBox('sortorder',$sortorder,3));
 		}
 
-		$frmGItem->AddItemToBottomRow(new CButton("save", isset($gid) ? S_SAVE : S_ADD));
+		$frmGItem->addItemToBottomRow(new CButton('save', isset($gid) ? S_SAVE : S_ADD));
 
-		$frmGItem->AddItemToBottomRow(new CButtonCancel(null,'close_window();'));
+		$frmGItem->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
 		$frmGItem->Show();
 	}
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once 'include/page_footer.php';
 
 ?>

@@ -2743,9 +2743,7 @@
 		$frmGraph->Show();
 	}
 
-	function	insert_value_mapping_form()
-	{
-
+	function insert_value_mapping_form(){
 
 		$frmValmap = new CFormTable(S_VALUE_MAP);
 		$frmValmap->SetHelp("web.mapping.php");

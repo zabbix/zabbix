@@ -22,8 +22,7 @@
 ?>
 <?php
 
-	function insert_show_color_picker_javascript()
-	{
+	function insert_show_color_picker_javascript(){
 		global $SHOW_COLOR_PICKER_SCRIPT_ISERTTED;
 
 		if($SHOW_COLOR_PICKER_SCRIPT_ISERTTED) return;
@@ -38,8 +37,7 @@ var color_table = <?php
 	$table .= '<table cellspacing="0" cellpadding="1">';
 	$table .= '<tr>';
 	/* gray colors */
-	foreach(array('0','3','6','8','9','A','C','E','F') as $c)
-	{
+	foreach(array('0','1','2','3','4','5','6','7','8','9','A','b','C','D','E','F') as $c){
 		$color = $c.$c.$c.$c.$c.$c;
 		$table .= '<td>'.unpack_object(new CColorCell(null, $color, 'set_color(\\\''.$color.'\\\')')).'</td>';
 	}
@@ -57,21 +55,26 @@ var color_table = <?php
 	
 	$brigs  = array(
 		array(0 => '0', 1 => '3'),
+		array(0 => '0', 1 => '4'),
+		array(0 => '0', 1 => '5'),
 		array(0 => '0', 1 => '6'),
+		array(0 => '0', 1 => '7'),
+		array(0 => '0', 1 => '8'),
 		array(0 => '0', 1 => '9'),
+		array(0 => '0', 1 => 'A'),
+		array(0 => '0', 1 => 'B'),
 		array(0 => '0', 1 => 'C'),
-		array(0 => '0', 1 => 'F'),
+		array(0 => '0', 1 => 'D'),
+		array(0 => '0', 1 => 'E'),
 		array(0 => '3', 1 => 'F'),
 		array(0 => '6', 1 => 'F'),
 		array(0 => '9', 1 => 'F'),
 		array(0 => 'C', 1 => 'F')
 		);
 
-	foreach($colors as $c)
-	{
+	foreach($colors as $c){
 		$table .= '<tr>';
-		foreach($brigs as $br)
-		{
+		foreach($brigs as $br){
 			$r = $br[$c['r']];
 			$g = $br[$c['g']];
 			$b = $br[$c['b']];
@@ -83,17 +86,16 @@ var color_table = <?php
 		$table .= '</tr>';
 	}
 	$table .= '</table>';
-	$cancel = '<a href="javascript:hide_color_picker()">'.S_CANCEL.'</a>';
-	echo '\''.$table.$cancel.'\'';
+	$cancel = '<a onclick="javascript:hide_color_picker();">'.S_CANCEL.'</a>';
+	echo "'".$table.$cancel."'";
 	unset($table);
 ?>
 
-function GetPos(obj)
-{
+function GetPos(obj){
 	var left = obj.offsetLeft;
-	var top  = obj.offsetTop;;
-	while (obj = obj.offsetParent)
-	{
+	var top  = obj.offsetTop;
+	
+	while (obj = obj.offsetParent){
 		left	+= obj.offsetLeft
 		top	+= obj.offsetTop
 	}
@@ -104,8 +106,7 @@ var color_picker = null;
 var curr_lbl = null;
 var curr_txt = null;
 
-function hide_color_picker()
-{
+function hide_color_picker(){
 	if(!color_picker) return;
 
 	color_picker.style.visibility="hidden"
@@ -115,8 +116,7 @@ function hide_color_picker()
 	curr_txt = null;
 }
 
-function show_color_picker(name)
-{
+function show_color_picker(name){
 	if(!color_picker) return;
 
 	curr_lbl = document.getElementById('lbl_' + name);
@@ -133,8 +133,7 @@ function show_color_picker(name)
 	color_picker.style.visibility = "visible";
 }
 
-function create_color_picker()
-{
+function create_color_picker(){
 	if(color_picker) return;
 
 	color_picker = document.createElement("div");
@@ -145,74 +144,59 @@ function create_color_picker()
 	hide_color_picker();
 }
 
-function set_color(color)
-{
+function set_color(color){
 	if(curr_lbl)	curr_lbl.style.background = curr_lbl.style.color = '#' + color;
 	if(curr_txt)	curr_txt.value = color;
 
 	hide_color_picker();
 }
 
-function set_color_by_name(name, color)
-{
+function set_color_by_name(name, color){
 	curr_lbl = document.getElementById('lbl_' + name);
 	curr_txt = document.getElementById(name);
 	
 	set_color(color);
 }
 
-if (window.addEventListener)
-{
-	window.addEventListener("load", create_color_picker, false);
-}
-else if (window.attachEvent)
-{
-	window.attachEvent("onload", create_color_picker);
-}
-else if (document.getElementById)
-{
-	window.onload	= create_color_picker;
-}
+addListener(window, "load", create_color_picker, false);
 
 //-->
 </script>
 <?php
 	}
 
-	class CColorCell extends CLink
-	{
-		function	CColorCell($name, $value, $action=null)
-		{
-			parent::CLink(SPACE.SPACE.SPACE, null);
-			$this->SetName($name);
-			$this->AddOption('id', $name);
-			$this->AddOption('title', '#'.$value);
-			$this->AddOption('style', 'text-decoration: none; outline: 1px solid black; background-color: #'.$value);
-			$this->SetAction($action);
+	class CColorCell extends CDiv{
+		function CColorCell($name, $value, $action=null){
+			parent::CDiv(SPACE.SPACE.SPACE, null);
+			$this->setName($name);
+			$this->addOption('id', $name);
+			$this->addOption('title', '#'.$value);
+			$this->addOption('class', 'pointer');
+			$this->addOption('style', 'display: inline; width: 10px; height: 10px; text-decoration: none; outline: 1px solid black; background-color: #'.$value);
+			
+			$this->setAction($action);
 		}
-		function	SetAction($action=null)
-		{
+		
+		function setAction($action=null){
 			if(!isset($action)) return false;
 			
-			return $this->SetUrl('javascript:'.$action);
+			return $this->addAction('onclick', 'javascript:'.$action);
 		}
 	}
 
-	class CColor extends CObject
-	{
+	class CColor extends CObject{
 /* public */
-		function CColor($name,$value)
-		{
+		function CColor($name,$value){
 			parent::CObject();
 
 			$lbl = new CColorCell('lbl_'.$name, $value, 'show_color_picker(\''.$name.'\')');
 
 			$txt = new CTextBox($name,$value,7);
-			$txt->AddOption('maxlength', 6);
-			$txt->AddOption('id', $name);
-			$txt->AddAction('onchange', 'set_color_by_name(\''.$name.'\',this.value)');
-			$txt->AddOption('style', 'margin-top: 0px; margin-bottom: 0px');
-			$this->AddItem(array($txt, $lbl));
+			$txt->addOption('maxlength', 6);
+			$txt->addOption('id', $name);
+			$txt->addAction('onchange', 'set_color_by_name(\''.$name.'\',this.value)');
+			$txt->addOption('style', 'margin-top: 0px; margin-bottom: 0px');
+			$this->addItem(array($txt, $lbl));
 			
 			insert_show_color_picker_javascript();
 		}
