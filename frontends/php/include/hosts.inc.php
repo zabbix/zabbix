@@ -755,6 +755,8 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 			
 	$def_options = array(
 				'allow_all' =>				0,
+				'do_not_select' =>			0,
+				'do_not_select_if_empty' =>	0,
 				'monitored_hosts' =>		0,
 				'templated_hosts' =>		0,
 				'real_hosts' =>				0,
@@ -908,18 +910,26 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 		if(bccomp($_REQUEST['groupid'],$group['groupid']) == 0) $result['selected'] = $group['groupid'];
 	}
 
-//-----	
-	if(ZBX_DROPDOWN_FIRST_REMEMBER){
-		if($_REQUEST['groupid'] == -1) $_REQUEST['groupid'] = get_profile('web.'.$page['menu'].'.groupid', '0', PROFILE_TYPE_ID);
-		if(uint_in_array($_REQUEST['groupid'], $groupids)){
-			$result['selected'] = $_REQUEST['groupid'];
+//-----
+	if($def_options['do_not_select']){
+		$result['selected'] = $_REQUEST['groupid'] = 0;
+	}
+	else if($def_options['do_not_select_if_empty'] && ($_REQUEST['groupid'] == -1)){
+		$result['selected'] = $_REQUEST['groupid'] = 0;
+	}
+	else{
+		if(ZBX_DROPDOWN_FIRST_REMEMBER){
+			if($_REQUEST['groupid'] == -1) $_REQUEST['groupid'] = get_profile('web.'.$page['menu'].'.groupid', '0', PROFILE_TYPE_ID);
+			if(uint_in_array($_REQUEST['groupid'], $groupids)){
+				$result['selected'] = $_REQUEST['groupid'];
+			}
+			else{
+				$_REQUEST['groupid'] = $result['selected'];
+			}
 		}
 		else{
 			$_REQUEST['groupid'] = $result['selected'];
 		}
-	}
-	else{
-		$_REQUEST['groupid'] = $result['selected'];
 	}
 
 return $result;
@@ -948,6 +958,8 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 
 	$def_options = array(
 				'allow_all' =>				0,
+				'do_not_select' =>			0,
+				'do_not_select_if_empty' =>	0,
 				'monitored_hosts' =>		0,
 				'templated_hosts' =>		0,
 				'real_hosts' =>				0,
@@ -1086,19 +1098,27 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 		if(bccomp($_REQUEST['hostid'],$host['hostid']) == 0) $result['selected'] = $host['hostid'];
 	}
 //-----	
-	if(ZBX_DROPDOWN_FIRST_REMEMBER){
-		if($_REQUEST['hostid'] == -1) $_REQUEST['hostid'] = get_profile('web.'.$page['menu'].'.hostid', '0', PROFILE_TYPE_ID);
-		if(uint_in_array($_REQUEST['hostid'], $hostids)){
-			$result['selected'] = $_REQUEST['hostid'];
+
+	if($def_options['do_not_select']){
+		$_REQUEST['hostid'] = $result['selected'] = 0;	
+	}
+	else if($def_options['do_not_select_if_empty'] && ($_REQUEST['hostid'] == -1)){
+		$_REQUEST['hostid'] = $result['selected'] = 0;	
+	}
+	else{
+		if(ZBX_DROPDOWN_FIRST_REMEMBER){
+			if($_REQUEST['hostid'] == -1) $_REQUEST['hostid'] = get_profile('web.'.$page['menu'].'.hostid', '0', PROFILE_TYPE_ID);
+			if(uint_in_array($_REQUEST['hostid'], $hostids)){
+				$result['selected'] = $_REQUEST['hostid'];
+			}
+			else{
+				$_REQUEST['hostid'] = $result['selected'];
+			}
 		}
 		else{
 			$_REQUEST['hostid'] = $result['selected'];
 		}
 	}
-	else{
-		$_REQUEST['hostid'] = $result['selected'];
-	}
-		
 return $result;
 }
 	
