@@ -19,7 +19,7 @@ Changes for 1.7.0
  - [DEV-233,DEV-237] added support of scheduled maintenance periods (Artem,Sasha)
 
 Changes for 1.6.3
-
+ - [ZBX-647] fixed audit log record for graph update action "added" -> "updated" (alexei)
  - [ZBX-700] fixed possible server crash when using {TRIGGER.NAME} for notifications (Sasha)
  - [DEV-286] improved zabbix main menu (Artem)
  - [ZBX-311] fixed PostgreSQL errors with out of range string data (Sasha)
