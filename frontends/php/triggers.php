@@ -341,6 +341,16 @@
 	}
 ?>
 <?php
+
+	if(isset($_REQUEST['hostid']) && !isset($_REQUEST['groupid']) && !isset($_REQUEST['triggerid'])){
+		$sql = 'SELECT DISTINCT hg.groupid '.
+				' FROM hosts_groups hg '.
+				' WHERE hg.hostid='.$_REQUEST['hostid'];
+		if($group=DBfetch(DBselect($sql, 1))){
+			$_REQUEST['groupid'] = $group['groupid'];
+		}
+	}
+	
 	if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 		$sql_from = '';
 		$sql_where = '';
