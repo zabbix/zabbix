@@ -377,11 +377,12 @@ function get_accessible_groups_by_user($user_data,$perm,$perm_res=null,$nodeid=n
 COpt::counter_up('perm_group['.$userid.','.$perm.','.$perm_res.','.$nodeid.']');
 COpt::counter_up('perm');
 
+	$processed = array();
 	$where = array();
 
-	if(!is_null($nodeid))
+	if(!is_null($nodeid)){
 		array_push($where, DBin_node('hg.groupid', $nodeid));
-
+	}
 	$where = count($where)?' WHERE '.implode(' AND ',$where):'';
 
 	$sql = 'SELECT n.nodeid as nodeid,n.name as node_name,hg.groupid,hg.name,min(r.permission) as permission,g.userid'.
@@ -392,10 +393,7 @@ COpt::counter_up('perm');
 		$where.
 		' GROUP BY n.nodeid, n.name, hg.groupid, hg.name, g.userid, g.userid '.
 		' ORDER BY node_name, hg.name, permission ';
-
 	$db_groups = DBselect($sql);
-
-	$processed = array();
 	while($group_data = DBfetch($db_groups)){
 		if(zbx_empty($group_data['nodeid'])) $group_data['nodeid'] = id2nodeid($group_data['groupid']);
 

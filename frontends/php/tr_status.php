@@ -130,7 +130,6 @@ include_once "include/page_header.php";
 		exit();
 	}
 //--------
-
 	$config=select_config();
 
 /* FILTER */
