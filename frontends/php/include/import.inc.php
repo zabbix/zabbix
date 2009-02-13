@@ -447,6 +447,9 @@
 					if(!isset($data['ymin_type']))		$data['ymin_type']		= 0;
 					if(!isset($data['ymax_type']))		$data['ymax_type']		= 0;
 
+					if(!isset($data['ymin_item_key']))	$data['ymin_item_key']	= '';
+					if(!isset($data['ymax_item_key']))	$data['ymax_item_key']	= '';
+
 					if(!isset($data['ymin_itemid']))	$data['ymin_itemid']	= 0;
 					if(!isset($data['ymax_itemid']))	$data['ymax_itemid']	= 0;
 					
@@ -457,23 +460,69 @@
 					if(!isset($data['yaxismax']))		$data['yaxismax']		= 0;
 					if(!isset($data['items']))		$data['items']			= array();
 
-					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
-					{
-						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip'])
-						{
+					if(!empty($data['ymin_item_key'])){
+						$data['ymin_item_key'] = explode(':', $data['ymin_item_key']);
+						if(count($data['ymin_item_key']) < 2){
+							$this->data[XML_TAG_GRAPH]['error'] = true;
+							error('Incorrect y min item for graph ['.$data['name'].']');
+							break; // case
+						}
+	
+						$data['host']	= array_shift($data['ymin_item_key']);
+						$data['ymin_item_key']	= implode(':', $data['ymin_item_key']);
+	
+						if(isset($this->data[XML_TAG_HOST]['name'])){
+							$data['host'] = str_replace('{HOSTNAME}',$this->data[XML_TAG_HOST]['name'],$data['host']);
+						}
+
+						if(!$itemid = get_itemid_by_key($data['ymin_item_key'], $data['host'])){
+							$this->data[XML_TAG_GRAPH]['error'] = true;
+
+							error('Missed item ['.$data['ymin_item_key'].'] for host ['.$data['host'].']');
+							break; // case							
+						}
+
+						$data['ymin_itemid'] = $itemid;
+					}
+
+					if(!empty($data['ymax_item_key'])){
+						$data['ymax_item_key'] = explode(':', $data['ymax_item_key']);
+						if(count($data['ymax_item_key']) < 2){
+							$this->data[XML_TAG_GRAPH]['error'] = true;
+							error('Incorrect y max item for graph ['.$data['name'].']');
+							break; // case
+						}
+	
+						$data['host']	= array_shift($data['ymax_item_key']);
+						$data['ymax_item_key']	= implode(':', $data['ymax_item_key']);
+	
+						if(isset($this->data[XML_TAG_HOST]['name'])){
+							$data['host'] = str_replace('{HOSTNAME}',$this->data[XML_TAG_HOST]['name'],$data['host']);
+						}
+						
+						if(!$itemid = get_itemid_by_key($data['ymax_item_key'], $data['host'])){
+							$this->data[XML_TAG_GRAPH]['error'] = true;
+
+							error('Missed item ['.$data['ymax_item_key'].'] for host ['.$data['host'].']');
+							break; // case							
+						}
+						$data['ymax_itemid'] = $itemid;
+					}
+
+					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid']){
+						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip']){
 							info('Graph ['.$data['name'].'] skipped - user rule for host');
 							break; // case
 						}
 						foreach($data['items'] as $id)
 
-						if(strstr($data['name'],'{HOSTNAME}'))
-						{
+						if(strstr($data['name'],'{HOSTNAME}')){
 							error('Graph ['.$data['name'].'] skipped - missed host');
 							break; // case
 						}
 					}
-					else
-					{
+					else{
+						
 						if($graph = DBfetch(DBselect('select distinct g.graphid, g.templateid'.
 							' from graphs g, graphs_items gi, items i'.
 							' where g.graphid=gi.graphid and gi.itemid=i.itemid'.
@@ -511,11 +560,9 @@
 							// continue [add_group]
 						}
 					}
-					
-					if(!isset($data['graphid']))
-					{
-						if($this->graph['missed']==1) /* skip */
-						{
+
+					if(!isset($data['graphid'])){
+						if($this->graph['missed']==1) /* skip */{
 							info('Graph ['.$data['name'].'] skipped - user rule');
 							break; // case
 						}
@@ -577,17 +624,14 @@
 					if(!isset($data['type']))		$data['type']		= 0;
 					if(!isset($data['periods_cnt']))	$data['periods_cnt']	= 5;
 
-					if(!($item = DBfetch(DBselect('select i.itemid from items i,hosts h'.
-						' where h.hostid=i.hostid and i.key_='.zbx_dbstr($data['key']).
-						' and h.host='.zbx_dbstr($data['host'])))))
-					{
+					if(!$itemid = get_itemid_by_key($data['key'], $data['host'])){
 						$this->data[XML_TAG_GRAPH]['error'] = true;
 
 						error('Missed item ['.$data['key'].'] for host ['.$data['host'].']');
 						break; // case
 					}
 
-					$data['itemid'] = $item['itemid'];
+					$data['itemid'] = $itemid;
 
 					array_push($this->data[XML_TAG_GRAPH]['items'], $data);
 
