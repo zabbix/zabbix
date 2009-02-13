@@ -270,7 +270,7 @@ static void	add_command_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 	zbx_free(command_esc);
 }
 
-static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action, zbx_uint64_t eventid, zbx_uint64_t userid, char *subject, char *message)
+static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action, zbx_uint64_t userid, char *subject, char *message)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -321,7 +321,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 				"," ZBX_FS_UI64 ",'%s','%s','%s',%d,%d,%d)",
 				alertid,
 				action->actionid,
-				eventid,
+				event->eventid,
 				userid,
 				now,
 				mediatypeid,
@@ -360,7 +360,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 				",'%s','%s',%d,%d,'%s',%d)",
 				alertid,
 				action->actionid,
-				eventid,
+				event->eventid,
 				userid,
 				ALERT_MAX_RETRIES,
 				now,
@@ -515,8 +515,8 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		if (SUCCEED == check_operation_conditions(event, &operation)) {
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
 
-			substitute_macros(event, action, &operation.shortdata);
-			substitute_macros(event, action, &operation.longdata);
+			substitute_macros(event, action, NULL, &operation.shortdata);
+			substitute_macros(event, action, NULL, &operation.longdata);
 
 			if (0 == esc_period || esc_period > operation.esc_period)
 				esc_period = operation.esc_period;
@@ -554,7 +554,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		p = user_msg;
 		user_msg = user_msg->next;
 
-		add_message_alert(escalation, event, action, event->eventid, p->userid, p->subject, p->message);
+		add_message_alert(escalation, event, action, p->userid, p->subject, p->message);
 
 		zbx_free(p->subject);
 		zbx_free(p->message);
@@ -602,7 +602,7 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
 			userid = zbx_atoui64(row[0]);
 
 			escalation->esc_step = 0;
-			add_message_alert(escalation, r_event, action, escalation->r_eventid, userid, action->shortdata, action->longdata);
+			add_message_alert(escalation, r_event, action, userid, action->shortdata, action->longdata);
 		}
 
 		DBfree_result(result);
@@ -614,11 +614,29 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 }
 
-static int	get_event(zbx_uint64_t eventid, DB_EVENT *event)
+/******************************************************************************
+ *                                                                            *
+ * Function: get_event_info                                                   *
+ *                                                                            *
+ * Purpose: get event and trigger info to event structure                     *
+ *                                                                            *
+ * Parameters: eventid - [IN] requested event id                              *
+ *             event   - [OUT] event data                                     *
+ *                                                                            *
+ * Return value: SUCCEED if processed successfully, FAIL - otherwise          *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: use 'free_event_info' function to clear allocated memory         *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		res = FAIL;
+
+	memset(event, 0, sizeof(DB_EVENT));
 
 	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged"
 			" from events where eventid=" ZBX_FS_UI64,
@@ -626,23 +644,58 @@ static int	get_event(zbx_uint64_t eventid, DB_EVENT *event)
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		memset(event, 0, sizeof(DB_EVENT));
-		event->eventid		= zbx_atoui64(row[0]);
+		ZBX_STR2UINT64(event->eventid, row[0]);
 		event->source		= atoi(row[1]);
 		event->object		= atoi(row[2]);
-		event->objectid		= zbx_atoui64(row[3]);
+		ZBX_STR2UINT64(event->objectid, row[3]);
 		event->clock		= atoi(row[4]);
 		event->value		= atoi(row[5]);
 		event->acknowledged	= atoi(row[6]);
-
-		add_trigger_info(event);
 
 		res = SUCCEED;
 	}
 
 	DBfree_result(result);
 
+	if (res == SUCCEED && event->object == EVENT_OBJECT_TRIGGER)
+	{
+		result = DBselect("select description,priority,comments,url,type"
+				" from triggers where triggerid=" ZBX_FS_UI64,
+				event->objectid);
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			zbx_strlcpy(event->trigger_description, row[0], sizeof(event->trigger_description));
+			event->trigger_priority = atoi(row[1]);
+			event->trigger_comments	= strdup(row[2]);
+			event->trigger_url	= strdup(row[3]);
+			event->trigger_type	= atoi(row[4]);
+		}
+
+		DBfree_result(result);
+	}
 	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: free_event_info                                                  *
+ *                                                                            *
+ * Purpose: clean allocated memory by function 'get_event_info'               *
+ *                                                                            *
+ * Parameters: event - [IN] event data                                        *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	free_event_info(DB_EVENT *event)
+{
+	zbx_free(event->trigger_comments);
+	zbx_free(event->trigger_url);
 }
 
 static void	execute_escalation(DB_ESCALATION *escalation)
@@ -730,22 +783,24 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 
 		switch (escalation->status) {
 			case ESCALATION_STATUS_ACTIVE:
-				if (SUCCEED == get_event(escalation->eventid, &event))
+				if (SUCCEED == get_event_info(escalation->eventid, &event))
 				{
-					substitute_macros(&event, &action, &action.shortdata);
-					substitute_macros(&event, &action, &action.longdata);
+					substitute_macros(&event, &action, NULL, &action.shortdata);
+					substitute_macros(&event, &action, NULL, &action.longdata);
 
 					execute_operations(escalation, &event, &action);
 				}
+				free_event_info(&event);
 				break;
 			case ESCALATION_STATUS_RECOVERY:
-				if (SUCCEED == get_event(escalation->r_eventid, &event))
+				if (SUCCEED == get_event_info(escalation->r_eventid, &event))
 				{
-					substitute_macros(&event, &action, &action.shortdata);
-					substitute_macros(&event, &action, &action.longdata);
+					substitute_macros(&event, &action, escalation, &action.shortdata);
+					substitute_macros(&event, &action, escalation, &action.longdata);
 
 					process_recovery_msg(escalation, &event, &action);
 				}
+				free_event_info(&event);
 				break;
 			default:
 				break;
