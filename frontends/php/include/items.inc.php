@@ -709,6 +709,26 @@
 		return DBselect("select * from items where hostid=$hostid"); 
 	}
 
+	function get_itemid_by_key($key,$host=''){
+		$itemid = 0;
+
+		$sql_from = '';
+		$sql_where = '';
+		if(!empty($host)){
+			$sql_from = ',hosts h ';
+			$sql_where = ' AND h.host='.zbx_dbstr($host).' AND i.hostid=h.hostid ';
+		}
+		$sql = 'SELECT DISTINCT i.itemid '.
+			' FROM items i '.$sql_from.
+			' WHERE i.key_='.zbx_dbstr($key).
+				$sql_where;
+		if($item = DBfetch(DBselect($sql))){
+			$itemid = $item['itemid'];
+		}
+	return $itemid;
+	}
+	
+
 	function	get_item_by_itemid($itemid)
 	{
 		$row = DBfetch(DBselect("select * from items where itemid=$itemid")); 
