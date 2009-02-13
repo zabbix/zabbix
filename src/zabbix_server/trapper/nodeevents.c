@@ -113,7 +113,7 @@ static int	process_record(int nodeid, char *record)
  ******************************************************************************/
 int	node_events(char *data)
 {
-	char	*s;
+	char	*s, *c = NULL;
 	int	firstline=1;
 	int	nodeid=0;
 	int	sender_nodeid=0;
@@ -126,9 +126,12 @@ int	node_events(char *data)
 		datalen);
 
 	DBbegin();
-       	s=(char *)strtok(data,"\n");
-	while(s!=NULL)
+
+	for (s = data; '\0' != *s;)
 	{
+		if (NULL != (c = strchr(s, '\n')))
+			*c = '\0';
+
 		if(firstline == 1)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "First line [%s]", s); */
@@ -149,8 +152,18 @@ int	node_events(char *data)
 			process_record(nodeid, s);
 		}
 
-       		s=(char *)strtok(NULL,"\n");
+		if (NULL != c)
+		{
+			*c = '\n';
+			s = c + 1;
+		}
+		else
+			break;
 	}
+
+	if (NULL != c)
+		*c = '\n';
+
 	DBcommit();
 	return SUCCEED;
 }

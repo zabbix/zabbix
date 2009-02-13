@@ -750,10 +750,9 @@ int	int_in_list(char *list, int value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	check_time_period(const char *period, time_t now)
+int	check_time_period(char *period, time_t now)
 {
-	char	tmp[MAX_STRING_LEN];
-	char	*s;
+	char	*s, *c = NULL;
 	int	d1,d2,h1,h2,m1,m2;
 	int	day, hour, min;
 	struct  tm      *tm;
@@ -771,10 +770,11 @@ int	check_time_period(const char *period, time_t now)
 	hour = tm->tm_hour;
 	min = tm->tm_min;
 
-	strscpy(tmp,period);
-       	s=(char *)strtok(tmp,";");
-	while(s!=NULL)
+	for (s = period; '\0' != *s;)
 	{
+		if (NULL != (c = strchr(s, ';')))
+			*c = '\0';
+
 		zabbix_log( LOG_LEVEL_DEBUG, "Period [%s]",s);
 
 		if(sscanf(s,"%d-%d,%d:%d-%d:%d",&d1,&d2,&h1,&m1,&h2,&m2) == 6)
@@ -791,8 +791,18 @@ int	check_time_period(const char *period, time_t now)
 			zabbix_log( LOG_LEVEL_ERR, "Time period format is wrong [%s]",period);
 		}
 
-       		s=(char *)strtok(NULL,";");
+		if (NULL != c)
+		{
+			*c = ';';
+			s = c + 1;
+		}
+		else
+			break;
 	}
+
+	if (NULL != c)
+		*c = ';';
+
 	return ret;
 }
 

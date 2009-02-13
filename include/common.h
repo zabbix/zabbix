@@ -550,7 +550,7 @@ void	delete_reol(char *c);
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now);
-int	check_time_period(const char *period, time_t now);
+int	check_time_period(char *period, time_t now);
 void	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen);
 int     zbx_hex2binary(char *io);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
