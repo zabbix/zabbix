@@ -227,7 +227,7 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	{
 		tmp_str = zbx_dsprintf(tmp_str, "%s", event->trigger_description);
 		
-		substitute_simple_macros(event, NULL, NULL, &tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION);
+		substitute_simple_macros(event, NULL, NULL, NULL, &tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION);
 		
 		if(condition->operator == CONDITION_OPERATOR_LIKE)
 		{
@@ -776,21 +776,23 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 	zabbix_log( LOG_LEVEL_DEBUG, "In execute_operations(actionid:" ZBX_FS_UI64 ")",
 		action->actionid);
 
-	result = DBselect("select operationid,actionid,operationtype,object,objectid,shortdata,longdata from operations where actionid=" ZBX_FS_UI64,
-			action->actionid);
+	result = DBselect("select operationid,actionid,operationtype,object,objectid from operations where actionid=" ZBX_FS_UI64,
+			action->actionid);	/* ,shortdata,longdata */
 	while((row=DBfetch(result)))
 	{
+		memset(&operation, 0, sizeof(operation));
+
 		ZBX_STR2UINT64(operation.operationid,	row[0]);
 		ZBX_STR2UINT64(operation.actionid,	row[1]);
 		operation.operationtype			= atoi(row[2]);
 		operation.object			= atoi(row[3]);
 		ZBX_STR2UINT64(operation.objectid,	row[4]);
 
-		operation.shortdata		= strdup(row[5]);
+/*		operation.shortdata		= strdup(row[5]);
 		operation.longdata		= strdup(row[6]);
 
 		substitute_macros(event, action, &operation.shortdata);
-		substitute_macros(event, action, &operation.longdata);
+		substitute_macros(event, action, &operation.longdata);*/
 
 		switch(operation.operationtype)
 		{
@@ -822,8 +824,8 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 				break;
 		}
 	
-		zbx_free(operation.shortdata);
-		zbx_free(operation.longdata);
+/*		zbx_free(operation.shortdata);
+		zbx_free(operation.longdata);*/
 	}
 	DBfree_result(result);
 }
