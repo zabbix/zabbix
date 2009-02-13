@@ -62,7 +62,7 @@
  * Comments: use 'free_trigger_info' function to clear allocated memory     *
  *                                                                            *
  ******************************************************************************/
-void	add_trigger_info(DB_EVENT *event)
+static void	add_trigger_info(DB_EVENT *event)
 {
 	DB_RESULT	result;
 	DB_ROW		row;

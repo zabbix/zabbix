@@ -777,12 +777,58 @@ static char	*get_host_profile_value_by_triggerid(char *dst, zbx_uint64_t trigger
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_host_value_by_triggerid                                      *
+ *                                                                            *
+ * Purpose: request host value by triggerid and field name                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: returns requested host value                                 *
+ *                      or *UNKNOWN* if profile is not defined                *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static char	*get_host_value_by_triggerid(char *dst, zbx_uint64_t triggerid, const char *fieldname)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect("select distinct h.%s from triggers t,functions f,items i,hosts h"
+			" where t.triggerid=" ZBX_FS_UI64 " and t.triggerid=f.triggerid and i.itemid=f.itemid"
+			" and h.hostid=i.hostid",
+			fieldname,
+			triggerid);
+
+	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "No HOST.%s in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
+				fieldname,
+				triggerid);
+
+		dst = zbx_dsprintf(dst, "%s", STR_UNKNOWN_VARIABLE);
+	}
+	else
+		dst = zbx_dsprintf(dst, "%s", row[0]);
+
+	DBfree_result(result);
+
+	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: substitute_simple_macros                                         *
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
  *                                                                            *
  * Parameters: trigger - trigger structure                                    *
  *             action - action structure (NULL if unknown)                    *
+ *             escalation - escalation structure. used for recovery           *
+ *                          messages in {ESC.HISTORY} macro.                  *
+ *                          (NULL for other cases)                            * 
  *             data - data string                                             *
  *                                                                            *
  * Return value:                                                              *
@@ -795,22 +841,16 @@ static char	*get_host_profile_value_by_triggerid(char *dst, zbx_uint64_t trigger
  ******************************************************************************/
 /* definition of macros variables */
 #define MVAR_DATE			"{DATE}"
-#define MVAR_DATE_LEN			6
 #define MVAR_EVENT_ID			"{EVENT.ID}"
 #define MVAR_EVENT_DATE			"{EVENT.DATE}"
 #define MVAR_EVENT_TIME			"{EVENT.TIME}"
 #define MVAR_EVENT_AGE			"{EVENT.AGE}"
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_HOSTNAME			"{HOSTNAME}"
-#define MVAR_HOSTNAME_LEN		10
 #define MVAR_IPADDRESS			"{IPADDRESS}"
-#define MVAR_IPADDRESS_LEN		11
 #define MVAR_HOST_DNS			"{HOST.DNS}"
-#define MVAR_HOST_DNS_LEN		10
 #define MVAR_HOST_CONN			"{HOST.CONN}"
-#define MVAR_HOST_CONN_LEN		11
 #define MVAR_TIME			"{TIME}"
-#define MVAR_TIME_LEN			6
 #define MVAR_ITEM_LASTVALUE		"{ITEM.LASTVALUE}"
 #define MVAR_ITEM_NAME			"{ITEM.NAME}"
 #define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"
@@ -835,7 +875,7 @@ static char	*get_host_profile_value_by_triggerid(char *dst, zbx_uint64_t trigger
 #define MVAR_PROFILE_LOCATION		"{PROFILE.LOCATION}"
 #define MVAR_PROFILE_NOTES		"{PROFILE.NOTES}"
 
-void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, char **data, int macro_type)
+void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, DB_ESCALATION *escalation, char **data, int macro_type)
 {
 
 	char
@@ -846,7 +886,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 
 	char	tmp[MAX_STRING_LEN], *buf = NULL;
 	int	buf_offset, buf_allocated = MAX_STRING_LEN;
-	int	status;
+	int	status, esc_step;
 	int	var_len;
 
 	time_t  now;
@@ -887,124 +927,87 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 			strncmp(pr, MVAR_TRIGGER_NAME, strlen(MVAR_TRIGGER_NAME)) == 0)
 		{
 			var_len = strlen(MVAR_TRIGGER_NAME);
-
-			zabbix_log(LOG_LEVEL_DEBUG, "Before replace_to [%s]", replace_to);
-
 			replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_description);
 			/* Why it was here? *//* For substituting macros in trigger description :) */
-			substitute_simple_macros(event, action, item, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION);
-
-			zabbix_log(LOG_LEVEL_DEBUG, "After replace_to [%s]", replace_to);
+			substitute_simple_macros(event, action, item, escalation, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION);
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_TRIGGER_COMMENT, strlen(MVAR_TRIGGER_COMMENT)) == 0)
 		{
 			var_len = strlen(MVAR_TRIGGER_COMMENT);
-
 			replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_comments);
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_PROFILE_DEVICETYPE, strlen(MVAR_PROFILE_DEVICETYPE)) == 0)
 		{
 			var_len = strlen(MVAR_PROFILE_DEVICETYPE);
-
 			replace_to = get_host_profile_value_by_triggerid(replace_to, event->objectid, "devicetype");
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_PROFILE_NAME, strlen(MVAR_PROFILE_NAME)) == 0)
 		{
 			var_len = strlen(MVAR_PROFILE_NAME);
-
 			replace_to = get_host_profile_value_by_triggerid(replace_to, event->objectid, "name");
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_PROFILE_OS, strlen(MVAR_PROFILE_OS)) == 0)
 		{
 			var_len = strlen(MVAR_PROFILE_OS);
-
 			replace_to = get_host_profile_value_by_triggerid(replace_to, event->objectid, "os");
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_PROFILE_SERIALNO, strlen(MVAR_PROFILE_SERIALNO)) == 0)
 		{
 			var_len = strlen(MVAR_PROFILE_SERIALNO);
-
 			replace_to = get_host_profile_value_by_triggerid(replace_to, event->objectid, "serialno");
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_PROFILE_TAG, strlen(MVAR_PROFILE_TAG)) == 0)
 		{
 			var_len = strlen(MVAR_PROFILE_TAG);
-
 			replace_to = get_host_profile_value_by_triggerid(replace_to, event->objectid, "tag");
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_PROFILE_MACADDRESS, strlen(MVAR_PROFILE_MACADDRESS)) == 0)
 		{
 			var_len = strlen(MVAR_PROFILE_MACADDRESS);
-
 			replace_to = get_host_profile_value_by_triggerid(replace_to, event->objectid, "macaddress");
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_PROFILE_HARDWARE, strlen(MVAR_PROFILE_HARDWARE)) == 0)
 		{
 			var_len = strlen(MVAR_PROFILE_HARDWARE);
-
 			replace_to = get_host_profile_value_by_triggerid(replace_to, event->objectid, "hardware");
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_PROFILE_SOFTWARE, strlen(MVAR_PROFILE_SOFTWARE)) == 0)
 		{
 			var_len = strlen(MVAR_PROFILE_SOFTWARE);
-
 			replace_to = get_host_profile_value_by_triggerid(replace_to, event->objectid, "software");
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_PROFILE_CONTACT, strlen(MVAR_PROFILE_CONTACT)) == 0)
 		{
 			var_len = strlen(MVAR_PROFILE_CONTACT);
-
 			replace_to = get_host_profile_value_by_triggerid(replace_to, event->objectid, "contact");
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_PROFILE_LOCATION, strlen(MVAR_PROFILE_LOCATION)) == 0)
 		{
 			var_len = strlen(MVAR_PROFILE_LOCATION);
-
 			replace_to = get_host_profile_value_by_triggerid(replace_to, event->objectid, "location");
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_PROFILE_NOTES, strlen(MVAR_PROFILE_NOTES)) == 0)
 		{
 			var_len = strlen(MVAR_PROFILE_NOTES);
-
 			replace_to = get_host_profile_value_by_triggerid(replace_to, event->objectid, "notes");
 		}
 		else if ((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY | MACRO_TYPE_TRIGGER_DESCRIPTION)) &&
-				0 == strncmp(pr, MVAR_HOSTNAME, MVAR_HOSTNAME_LEN))
+				0 == strncmp(pr, MVAR_HOSTNAME, strlen(MVAR_HOSTNAME)))
 		{
-			var_len = MVAR_HOSTNAME_LEN;
-
-			result = DBselect("select distinct h.host from triggers t, functions f,items i, hosts h "
-				"where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid",
-				event->objectid);
-
-			row = DBfetch(result);
-
-			if(!row || DBis_null(row[0])==SUCCEED)
-			{
-				zabbix_log( LOG_LEVEL_DEBUG, "No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
-					event->objectid);
-
-				replace_to = zbx_dsprintf(replace_to, "%s",
-					STR_UNKNOWN_VARIABLE);
-			}
-			else
-			{
-				replace_to = zbx_dsprintf(replace_to, "%s",
-					row[0]);
-			}
-			DBfree_result(result);
+			var_len = strlen(MVAR_HOSTNAME);
+			replace_to = get_host_value_by_triggerid(replace_to, event->objectid, "host");
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_ITEM_NAME, strlen(MVAR_ITEM_NAME)) == 0)
@@ -1095,36 +1098,15 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 			DBfree_result(result);
 		}
 		else if ((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
-				0 == strncmp(pr, MVAR_IPADDRESS, MVAR_IPADDRESS_LEN))
+				0 == strncmp(pr, MVAR_IPADDRESS, strlen(MVAR_IPADDRESS)))
 		{
-			var_len = MVAR_IPADDRESS_LEN;
-
-			result = DBselect("select distinct h.ip from triggers t, functions f,items i, hosts h"
-				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid",
-				event->objectid);
-
-			row = DBfetch(result);
-
-			if(!row || DBis_null(row[0])==SUCCEED)
-			{
-				zabbix_log( LOG_LEVEL_DEBUG, "No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
-					event->objectid);
-
-				replace_to = zbx_dsprintf(replace_to, "%s",
-					STR_UNKNOWN_VARIABLE);
-			}
-			else
-			{
-				replace_to = zbx_dsprintf(replace_to, "%s",
-					row[0]);
-			}
-			DBfree_result(result);
+			var_len = strlen(MVAR_IPADDRESS);
+			replace_to = get_host_value_by_triggerid(replace_to, event->objectid, "ip");
 		}
 		else if ((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
-				0 == strncmp(pr, MVAR_DATE, MVAR_DATE_LEN))
+				0 == strncmp(pr, MVAR_DATE, strlen(MVAR_DATE)))
 		{
-			var_len	= MVAR_DATE_LEN;
-
+			var_len	= strlen(MVAR_DATE);
 			now	= time(NULL);
 			tm	= localtime(&now);
 			replace_to = zbx_dsprintf(replace_to, "%.4d.%.2d.%.2d",
@@ -1133,10 +1115,9 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 					tm->tm_mday);
 		}
 		else if ((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
-				0 == strncmp(pr, MVAR_TIME, MVAR_TIME_LEN))
+				0 == strncmp(pr, MVAR_TIME, strlen(MVAR_TIME)))
 		{
-			var_len	= MVAR_TIME_LEN;
-
+			var_len	= strlen(MVAR_TIME);
 			now	= time(NULL);
 			tm	= localtime(&now);
 			replace_to = zbx_dsprintf(replace_to, "%.2d:%.2d:%.2d",
@@ -1150,7 +1131,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 		{
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS_OLD block */
 			var_len = strlen(MVAR_TRIGGER_STATUS);
-
 			replace_to = zbx_dsprintf(replace_to, "%s",
 					event->value == TRIGGER_VALUE_TRUE ? "PROBLEM" : "OK");
 		}
@@ -1159,7 +1139,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 		{
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_TRIGGER_STATUS_OLD);
-
 			replace_to = zbx_dsprintf(replace_to, "%s",
 					event->value == TRIGGER_VALUE_TRUE ? "PROBLEM" : "OK");
 		}
@@ -1168,7 +1147,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 		{
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_TRIGGER_ID);
-
 			replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64,
 				event->objectid);
 		}
@@ -1176,7 +1154,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 			strncmp(pr, MVAR_TRIGGER_VALUE, strlen(MVAR_TRIGGER_VALUE)) == 0)
 		{
 			var_len = strlen(MVAR_TRIGGER_VALUE);
-
 			replace_to = zbx_dsprintf(replace_to, "%d",
 				event->value);
 		}
@@ -1185,7 +1162,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 		{
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_TRIGGER_URL);
-
 			replace_to = zbx_dsprintf(replace_to, "%s",
 				event->trigger_url);
 		}
@@ -1194,7 +1170,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 		{
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_EVENT_ID);
-
 			replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64,
 				event->eventid);
 		}
@@ -1203,7 +1178,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 		{
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_EVENT_DATE);
-
 			now	= event->clock;
 			tm	= localtime(&now);
 			replace_to = zbx_dsprintf(replace_to, "%.4d.%.2d.%.2d",
@@ -1216,7 +1190,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 		{
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_EVENT_TIME);
-
 			now	= event->clock;
 			tm	= localtime(&now);
 			replace_to = zbx_dsprintf(replace_to, "%.2d:%.2d:%.2d",
@@ -1229,7 +1202,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 		{
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_EVENT_AGE);
-
 			now		= time(NULL) - event->clock;
 			replace_to	= zbx_dsprintf(replace_to, "%s", zbx_age2str(now));
 		}
@@ -1244,16 +1216,40 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 			buf_offset	= 0;
 			*buf		= '\0';
 
-			result = DBselect("select a.clock,a.status,m.description,a.sendto,a.error"
+			result = DBselect("select clock from events where eventid=" ZBX_FS_UI64,
+					escalation != NULL ? escalation->eventid : event->eventid);
+
+			if (NULL != (row = DBfetch(result)))
+			{
+				now	= (time_t)atoi(row[0]);
+				tm	= localtime(&now);
+				zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 64,
+						"Problem started: %.4d.%.2d.%.2d %.2d:%.2d:%.2d Age: %s\n",
+						tm->tm_year + 1900,
+						tm->tm_mon + 1,
+						tm->tm_mday,
+						tm->tm_hour,
+						tm->tm_min,
+						tm->tm_sec,
+						zbx_age2str(time(NULL) - now));
+			}
+
+			DBfree_result(result);
+
+			result = DBselect("select a.clock,a.status,m.description,a.sendto,a.error,a.esc_step"
 					" from alerts a left join media_type m on m.mediatypeid = a.mediatypeid"
 					" where a.eventid=" ZBX_FS_UI64 " and a.alerttype=%d order by a.clock",
-					event->eventid,
+					escalation != NULL ? escalation->eventid : event->eventid,
 					ALERT_TYPE_MESSAGE);
 
 			while (NULL != (row = DBfetch(result))) {
-				now	= atoi(row[0]);
-				tm	= localtime(&now);
-				status	= atoi(row[1]);
+				now	 = atoi(row[0]);
+				tm	 = localtime(&now);
+				status	 = atoi(row[1]);
+				esc_step = atoi(row[5]);
+
+				if (esc_step != 0)
+					zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 16, "%d. ", esc_step);
 
 				zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 256,
 						"%.4d.%.2d.%.2d %.2d:%.2d:%.2d %-11s %s %s %s\n",
@@ -1269,12 +1265,27 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 						row[3],
 						row[4]);
 			}
+
+			DBfree_result(result);
+
+			if (escalation != NULL && escalation->r_eventid == event->eventid)
+			{
+				now	= (time_t)event->clock;
+				tm	= localtime(&now);
+				zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 64,
+						"Problem ended: %.4d.%.2d.%.2d %.2d:%.2d:%.2d\n",
+						tm->tm_year + 1900,
+						tm->tm_mon + 1,
+						tm->tm_mday,
+						tm->tm_hour,
+						tm->tm_min,
+						tm->tm_sec);
+			}
+
 			if (0 != buf_offset)
 				buf[--buf_offset] = '\0';
 
 			replace_to = zbx_dsprintf(replace_to, "%s", buf);
-
-			DBfree_result(result);
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) && 
 			strncmp(pr, MVAR_TRIGGER_SEVERITY, strlen(MVAR_TRIGGER_SEVERITY)) == 0)
@@ -1293,29 +1304,28 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 			strncmp(pr, MVAR_TRIGGER_NSEVERITY, strlen(MVAR_TRIGGER_NSEVERITY)) == 0)
 		{
 			var_len = strlen(MVAR_TRIGGER_NSEVERITY);
-
 			replace_to = zbx_dsprintf(replace_to, "%d", event->trigger_priority);
 		}
 		else if (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_HOST_IPMI_IP))
 		{
-			if (0 == strncmp(pr, MVAR_HOSTNAME, MVAR_HOSTNAME_LEN))
+			if (0 == strncmp(pr, MVAR_HOSTNAME, strlen(MVAR_HOSTNAME)))
 			{
-				var_len = MVAR_HOSTNAME_LEN;
+				var_len = strlen(MVAR_HOSTNAME);
 				replace_to = zbx_dsprintf(replace_to, "%s", item->host_name);
 			}
-			else if (0 == strncmp(pr, MVAR_IPADDRESS, MVAR_IPADDRESS_LEN))
+			else if (0 == strncmp(pr, MVAR_IPADDRESS, strlen(MVAR_IPADDRESS)))
 			{
-				var_len = MVAR_IPADDRESS_LEN;
+				var_len = strlen(MVAR_IPADDRESS);
 				replace_to = zbx_dsprintf(replace_to, "%s", item->host_ip);
 			}
-			else if (0 == strncmp(pr, MVAR_HOST_DNS, MVAR_HOST_DNS_LEN))
+			else if (0 == strncmp(pr, MVAR_HOST_DNS, strlen(MVAR_HOST_DNS)))
 			{
-				var_len = MVAR_HOST_DNS_LEN;
+				var_len = strlen(MVAR_HOST_DNS);
 				replace_to = zbx_dsprintf(replace_to, "%s", item->host_dns);
 			}
-			else if (0 == strncmp(pr, MVAR_HOST_CONN, MVAR_HOST_CONN_LEN))
+			else if (0 == strncmp(pr, MVAR_HOST_CONN, strlen(MVAR_HOST_CONN)))
 			{
-				var_len = MVAR_HOST_CONN_LEN;
+				var_len = strlen(MVAR_HOST_CONN);
 				replace_to = zbx_dsprintf(replace_to, "%s", item->useip ? item->host_ip : item->host_dns);
 			}
 		}
@@ -1348,6 +1358,9 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
  *                                                                            *
  * Parameters: trigger - trigger structure                                    *
  *             action - action structure                                      *
+ *             escalation - escalation structure. used for recovery           *
+ *                          messages in {ESC.HISTORY} macro.                  *
+ *                          (NULL for other cases)                            * 
  *             data - data string                                             *
  *                                                                            *
  * Return value:                                                              *
@@ -1357,7 +1370,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
  * Comments: example: "{127.0.0.1:system[procload].last(0)}" to "1.34"        *
  *                                                                            *
  ******************************************************************************/
-void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char **data)
+void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escalation, char **data)
 {
 	char	
 		*str_out = NULL,
@@ -1382,7 +1395,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char **data)
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros(data:\"%s\")",
 			*data);
 
-	substitute_simple_macros(event, action, NULL, data, MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY);
+	substitute_simple_macros(event, action, NULL, escalation, data, MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY);
 
 	pl = *data;
 	while((pr = strchr(pl, '{')))
@@ -1588,7 +1601,7 @@ int	evaluate_expression(int *result,char **expression, DB_TRIGGER *trigger, char
 	memset(&action,0,sizeof(DB_ACTION));	
 	event.value = trigger->value;
 
-	substitute_simple_macros(&event, &action, NULL, expression, MACRO_TYPE_TRIGGER_EXPRESSION);
+	substitute_simple_macros(&event, &action, NULL, NULL, expression, MACRO_TYPE_TRIGGER_EXPRESSION);
 
 	/* Evaluate expression */
 	delete_spaces(*expression);

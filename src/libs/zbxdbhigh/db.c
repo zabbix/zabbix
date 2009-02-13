@@ -1894,12 +1894,12 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 		case ITEM_TYPE_SIMPLE:
 		case ITEM_TYPE_EXTERNAL:
 			key = zbx_dsprintf(key, "%s", item->key_orig);
-			substitute_simple_macros(NULL, NULL, item, &key, MACRO_TYPE_ITEM_KEY);
+			substitute_simple_macros(NULL, NULL, item, NULL, &key, MACRO_TYPE_ITEM_KEY);
 			item->key	= key;
 			break;
 		case ITEM_TYPE_IPMI:
 			ipmi_ip = zbx_dsprintf(ipmi_ip, "%s", item->ipmi_ip);
-			substitute_simple_macros(NULL, NULL, item, &ipmi_ip, MACRO_TYPE_HOST_IPMI_IP);
+			substitute_simple_macros(NULL, NULL, item, NULL, &ipmi_ip, MACRO_TYPE_HOST_IPMI_IP);
 			item->ipmi_ip	= ipmi_ip;
 			break;
 		default:
