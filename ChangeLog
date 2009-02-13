@@ -1,4 +1,5 @@
 Changes for 1.7.0
+
  - [ZBX-646] audit log entries added for screen edit actions (alexei)
  - [ZBX-645] after new installation, filter for audit log is set not to filter anything (alexei)
  - [ZBX-643] fixed no print data for bar reports (Artem)
@@ -20,6 +21,8 @@ Changes for 1.7.0
  - [DEV-233,DEV-237] added support of scheduled maintenance periods (Artem,Sasha)
 
 Changes for 1.6.3
+
+ - [ZBX-705] improved {ESC.HISTORY} macro in recovery notifications (Sasha)
  - [ZBX-647] fixed audit log record for graph update action "added" -> "updated" (alexei)
  - [ZBX-700] fixed possible server crash when using {TRIGGER.NAME} for notifications (Sasha)
  - [DEV-286] improved zabbix main menu (Artem)
