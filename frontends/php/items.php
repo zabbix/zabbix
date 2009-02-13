@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -73,7 +73,7 @@ include_once 'include/page_header.php';
 		'delay_flex'=>	array(T_ZBX_STR, O_OPT,  null,  '',null),
 		'history'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})'),
 		'status'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})'),
-		'type'=>	array(T_ZBX_INT, O_OPT,  null,  
+		'type'=>	array(T_ZBX_INT, O_OPT,  null,
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 					ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_AGGREGATE,ITEM_TYPE_HTTPTEST,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI)),'isset({save})'),
@@ -100,7 +100,7 @@ include_once 'include/page_header.php';
 
 		'formula'=>	array(T_ZBX_DBL, O_OPT,  null,  null,			'isset({save})&&(isset({multiplier})&&({multiplier}==1))'),
 		'logtimefmt'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({value_type})&&({value_type}==2))'),
-                 
+
 		'group_itemid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
 		'copy_targetid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
 		'filter_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
@@ -108,7 +108,7 @@ include_once 'include/page_header.php';
 		'applications'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
 
 		'showdisabled'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null),
-		
+
 		'del_history'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'add_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -130,16 +130,16 @@ include_once 'include/page_header.php';
 // filter
 		"filter_rst"=>				array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		"filter_set"=>				array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
-		
+
 		'selection_mode'=>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		null),
-		
+
 		'filter_node'=>				array(T_ZBX_STR, O_OPT,  null,	null,		null),
 		'filter_group'=>			array(T_ZBX_STR, O_OPT,  null,	null,		null),
 		'filter_host'=>				array(T_ZBX_STR, O_OPT,  null,	null,		null),
 		'filter_hostid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
 		'filter_application'=>		array(T_ZBX_STR, O_OPT,  null,	null,		null),
 		'filter_description'=>		array(T_ZBX_STR, O_OPT,  null,	null,		null),
-		'filter_type'=>				array(T_ZBX_INT, O_OPT,  null,  
+		'filter_type'=>				array(T_ZBX_INT, O_OPT,  null,
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
 				ITEM_TYPE_AGGREGATE,ITEM_TYPE_HTTPTEST,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI)),null),
@@ -161,7 +161,7 @@ include_once 'include/page_header.php';
 		'filter_logtimefmt'=>		array(T_ZBX_STR, O_OPT,  null,  null, null),
 		'filter_delta'=>			array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,2'), null),
 		'filter_trapper_hosts'=>	array(T_ZBX_STR, O_OPT,  null,  null, null),
-		
+
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -170,16 +170,16 @@ include_once 'include/page_header.php';
 	);
 
 	$_REQUEST['showdisabled'] = get_request('showdisabled', get_profile('web.items.showdisabled', 0));
-	
+
 	check_fields($fields);
 	validate_sort_and_sortorder('i.description',ZBX_SORT_UP);
 
-/* AJAX */	
+/* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
 			update_profile('web.items.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
-	}	
+	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 		exit();
@@ -187,18 +187,18 @@ include_once 'include/page_header.php';
 //--------
 
 /* FILTER */
-	
-	if(isset($_REQUEST['filter_set'])) 
+
+	if(isset($_REQUEST['filter_set']))
 		update_profile('web.items.filter.enabled',1, PROFILE_TYPE_INT);
 
 	if(isset($_REQUEST['filter_rst']))
 		update_profile('web.items.filter.enabled',0, PROFILE_TYPE_INT);
-		
+
 	$filter_enabled = get_profile('web.items.filter.enabled',0);
-	
+
 	$prev_selection_mode = get_profile('web.items.filter.selection_mode', 0);
 	$_REQUEST['selection_mode']	= get_request('selection_mode' ,get_profile('web.items.filter.selection_mode', 0));
-	
+
 	if(isset($_REQUEST['filter_rst']) || ($_REQUEST['selection_mode'] == 0)){
 		$_REQUEST['filter_node'] = null;
 		$_REQUEST['filter_group'] = null;
@@ -251,7 +251,7 @@ include_once 'include/page_header.php';
 		$_REQUEST['filter_delta']			= empty2null(get_request('filter_delta'				,get_profile('web.items.filter.delta')));
 		$_REQUEST['filter_trapper_hosts']	= empty2null(get_request('filter_trapper_hosts'		,get_profile('web.items.filter.trapper_hosts')));
 	}
-	
+
 	if(isset($_REQUEST['filter_rst'])){
 		$_REQUEST['filter_host'] = null;
 		$_REQUEST['filter_description'] = null;
@@ -262,10 +262,10 @@ include_once 'include/page_header.php';
 		$_REQUEST['filter_description']	= empty2null(get_request('filter_description'	,get_profile('web.items.filter.description')));
 		$_REQUEST['filter_key']			= empty2null(get_request('filter_key'			,get_profile('web.items.filter.key')));
 	}
-	
+
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst']) || ($prev_selection_mode != $_REQUEST['selection_mode'])){
 		update_profile('web.items.filter.selection_mode'            , $_REQUEST['selection_mode'], PROFILE_TYPE_STR);
-							        			     			
+
 		update_profile('web.items.filter.node'                 , $_REQUEST['filter_node'], PROFILE_TYPE_STR);
 		update_profile('web.items.filter.group'                , $_REQUEST['filter_group'], PROFILE_TYPE_STR);
 		update_profile('web.items.filter.host'                 , $_REQUEST['filter_host'], PROFILE_TYPE_STR);
@@ -290,14 +290,14 @@ include_once 'include/page_header.php';
 		update_profile('web.items.filter.logtimefmt'           , $_REQUEST['filter_logtimefmt'], PROFILE_TYPE_STR);
 		update_profile('web.items.filter.delta'                , $_REQUEST['filter_delta'], PROFILE_TYPE_STR);
 		update_profile('web.items.filter.trapper_hosts'        , $_REQUEST['filter_trapper_hosts'], PROFILE_TYPE_STR);
-	}	
+	}
 
 	if(!empty($_REQUEST['filter_hostid'])) $_REQUEST['hostid'] = $_REQUEST['filter_hostid'];
 // --------------
 	$showdisabled = get_request('showdisabled', 0);
-	
+
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-	
+
 	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0) && !isset($available_hosts[$_REQUEST['hostid']])){
 		unset($_REQUEST['hostid']);
 	}
@@ -342,19 +342,19 @@ include_once 'include/page_header.php';
 		foreach($delay_flex as $val)
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		$db_delay_flex = trim($db_delay_flex,';');
-		
+
 		if(isset($_REQUEST['itemid'])){
 			DBstart();
-			
+
 			$new_appid = true;
 			$result = false;
-			
+
 			if(!zbx_empty($_REQUEST['new_application'])){
 				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['hostid']))
 					$applications[$new_appid] = $new_appid;
 			}
-			
-			if($new_appid){				
+
+			if($new_appid){
 				$result = smart_update_item($_REQUEST['itemid'],
 					$_REQUEST['description'],$_REQUEST['key'],$_REQUEST['hostid'],$_REQUEST['delay'],
 					$_REQUEST['history'],$_REQUEST['status'],$_REQUEST['type'],
@@ -366,24 +366,24 @@ include_once 'include/page_header.php';
 					$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],$db_delay_flex,$_REQUEST['params'],
 					$_REQUEST['ipmi_sensor'],$applications);
 			}
-			
+
 			$result = DBend($result);
 
 			$itemid = $_REQUEST['itemid'];
 			$action = AUDIT_ACTION_UPDATE;
-			
+
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		else{
 			DBstart();
-			
+
 			$new_appid = true;
 			$itemid = false;
 			if(!zbx_empty($_REQUEST['new_application'])){
 				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['hostid']))
 					$applications[$new_appid] = $new_appid;
 			}
-			
+
 			if($new_appid){
 				$itemid=add_item(
 					$_REQUEST['description'],$_REQUEST['key'],$_REQUEST['hostid'],$_REQUEST['delay'],
@@ -396,13 +396,13 @@ include_once 'include/page_header.php';
 					$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],$db_delay_flex,$_REQUEST['params'],
 					$_REQUEST['ipmi_sensor'],$applications);
 			}
-				
+
 			$result = DBend($itemid);
-			
+
 			$action = AUDIT_ACTION_ADD;
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
-		if($result){	
+		if($result){
 			$host = get_host_by_hostid($_REQUEST['hostid']);
 
 			add_audit($action, AUDIT_RESOURCE_ITEM, S_ITEM.' ['.$_REQUEST['key'].'] ['.$itemid.'] '.S_HOST.' ['.$host['host'].']');
@@ -418,18 +418,18 @@ include_once 'include/page_header.php';
 				$result = delete_history_by_itemid($_REQUEST['itemid']);
 			$result = DBend($result);
 		}
-		
+
 		if($result){
 			DBexecute('UPDATE items SET nextcheck=0,lastvalue=null,lastclock=null,prevvalue=null '.
 				' WHERE itemid='.$_REQUEST['itemid']);
-			
+
 			$host = get_host_by_hostid($_REQUEST['hostid']);
 
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
 				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEANED);
 		}
 		show_messages($result, S_HISTORY_CLEANED, S_CANNOT_CLEAN_HISTORY);
-		
+
 	}
 	else if(isset($_REQUEST['update'])&&isset($_REQUEST['group_itemid'])&&isset($_REQUEST['form_mass_update'])){
 		$applications = get_request('applications',array());
@@ -439,13 +439,13 @@ include_once 'include/page_header.php';
 		foreach($delay_flex as $val)
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		$db_delay_flex = trim($db_delay_flex,';');
-		
+
 		if(!is_null(get_request('formula',null))) $_REQUEST['multiplier']=1;
 		if('0' === get_request('formula',null)) $_REQUEST['multiplier']=0;
 
 		$group_itemid = $_REQUEST['group_itemid'];
 		$result = false;
-		
+
 		DBstart();
 		foreach($group_itemid as $id){
 			$result |= smart_update_item($id,
@@ -460,7 +460,7 @@ include_once 'include/page_header.php';
 				get_request('ipmi_sensor'),$applications);
 		}
 		$result = DBend($result);
-		
+
 		show_messages($result, S_ITEMS_UPDATED);
 		unset($_REQUEST['group_itemid'], $_REQUEST['form_mass_update'], $_REQUEST['update']);
 	}
@@ -481,14 +481,14 @@ include_once 'include/page_header.php';
 					array_push($hosts_ids, $db_host['hostid']);
 				}
 			}
-			
+
 			$result = false;
 			DBstart();
 			foreach($_REQUEST['group_itemid'] as $item_id)
 				foreach($hosts_ids as $host_id){
 					$result |= copy_item_to_host($item_id, $host_id, true);
 				}
-				
+
 			$result = DBend($result);
 			show_messages($result, S_ITEMS_COPIED, S_CANNOT_COPY_ITEMS);
 			unset($_REQUEST['form_copy_to']);
@@ -499,19 +499,19 @@ include_once 'include/page_header.php';
 		show_messages();
 	}
 	else if(isset($_REQUEST['register'])){
-	
+
 		if($_REQUEST['register']=='do'){
 			if($_REQUEST['action']=='add to group'){
 				$applications = get_request('applications',array());
 				$delay_flex = get_request('delay_flex',array());
 				$db_delay_flex = '';
-				
+
 				foreach($delay_flex as $val){
 					$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 				}
-				
+
 				$db_delay_flex = trim($db_delay_flex,';');
-				
+
 				DBstart();
 				$itemid=add_item_to_group(
 					$_REQUEST['add_groupid'],$_REQUEST['description'],$_REQUEST['key'],
@@ -524,7 +524,7 @@ include_once 'include/page_header.php';
 					$_REQUEST['snmpv3_privpassphrase'],$_REQUEST['formula'],
 					$_REQUEST['trends'],$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],
 					$db_delay_flex, $_REQUEST['params'], $_REQUEST['ipmi_sensor'], $applications);
-					
+
 				$result = DBend($itemid);
 				show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 				if($result){
@@ -534,17 +534,17 @@ include_once 'include/page_header.php';
 				}
 			}
 			if($_REQUEST['action']=='update in group'){
-			
+
 				$applications = get_request('applications',array());
 				$delay_flex = get_request('delay_flex',array());
 				$db_delay_flex = '';
-				
+
 				foreach($delay_flex as $val){
 					$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 				}
-				
+
 				$db_delay_flex = trim($db_delay_flex,';');
-				
+
 				DBstart();
 					$result = update_item_in_group($_REQUEST['add_groupid'],
 						$_REQUEST['itemid'],$_REQUEST['description'],$_REQUEST['key'],
@@ -558,7 +558,7 @@ include_once 'include/page_header.php';
 						$_REQUEST['trends'],$_REQUEST['logtimefmt'],$_REQUEST['valuemapid'],
 						$db_delay_flex, $_REQUEST['params'], $_REQUEST['ipmi_sensor'], $applications);
 				$result = DBend($result);
-				
+
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 				if($result){
 					unset($_REQUEST['form']);
@@ -566,11 +566,11 @@ include_once 'include/page_header.php';
 				}
 			}
 			if($_REQUEST['action']=='delete from group'){
-				
+
 				DBstart();
 					$result = delete_item_from_group($_REQUEST['add_groupid'],$_REQUEST['itemid']);
 				$result = DBend($result);
-				
+
 				show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 				if($result){
 					unset($_REQUEST['form']);
@@ -585,7 +585,7 @@ include_once 'include/page_header.php';
 			global $USER_DETAILS;
 			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 
-			$group_itemid = $_REQUEST['group_itemid'];			
+			$group_itemid = $_REQUEST['group_itemid'];
 
 			DBstart();
 
@@ -612,7 +612,7 @@ include_once 'include/page_header.php';
 			global $USER_DETAILS;
 			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 
-			$group_itemid = $_REQUEST['group_itemid'];			
+			$group_itemid = $_REQUEST['group_itemid'];
 
 			DBstart();
 			$sql = 'SELECT h.host, i.itemid, i.key_ '.
@@ -624,7 +624,7 @@ include_once 'include/page_header.php';
 			while($item = DBfetch($item_res)){
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']'.S_ITEMS_ACTIVATED);
 			}
-			
+
 			$result = activate_item($group_itemid);
 			$result = DBend($result);
 			show_messages($result, S_ITEMS_ACTIVATED, null);
@@ -633,7 +633,7 @@ include_once 'include/page_header.php';
 			global $USER_DETAILS;
 			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 
-			$group_itemid = $_REQUEST['group_itemid'];			
+			$group_itemid = $_REQUEST['group_itemid'];
 
 			DBstart();
 			$sql = 'SELECT h.host, i.itemid, i.key_ '.
@@ -645,7 +645,7 @@ include_once 'include/page_header.php';
 			while($item = DBfetch($item_res)){
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']'.S_ITEMS_DISABLED);
 			}
-			
+
 			$result = disable_item($group_itemid);
 			$result = DBend($result);
 			show_messages($result, S_ITEMS_DISABLED, null);
@@ -653,7 +653,7 @@ include_once 'include/page_header.php';
 		else if($_REQUEST['group_task']==S_CLEAN_HISTORY_SELECTED_ITEMS){
 			$result = false;
 			$group_itemid = $_REQUEST['group_itemid'];
-			
+
 			DBstart();
 			foreach($group_itemid as $id){
 				if(!$item = get_item_by_itemid($id))	continue;
@@ -663,7 +663,7 @@ include_once 'include/page_header.php';
 
 				if($cur_result){
 					DBexecute('update items set nextcheck=0,lastvalue=null,lastclock=null,prevvalue=null where itemid='.$id);
-					
+
 					$host = get_host_by_hostid($item['hostid']);
 					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
 						S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEANED);
@@ -683,18 +683,18 @@ include_once 'include/page_header.php';
 			$_REQUEST['groupid'] = $group['groupid'];
 		}
 	}
-	
+
 	if(isset($_REQUEST['itemid']) && ($_REQUEST['itemid']>0)){
 		$sql_from = '';
 		$sql_where = '';
 		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0)){
 			$sql_where.= ' AND hg.groupid='.$_REQUEST['groupid'];
 		}
-		
+
 		if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0)){
 			$sql_where.= ' AND hg.hostid='.$_REQUEST['hostid'];
 		}
-		
+
 		$sql = 'SELECT DISTINCT hg.groupid, hg.hostid '.
 				' FROM hosts_groups hg, items i '.
 				' WHERE i.itemid='.$_REQUEST['itemid'].
@@ -738,45 +738,46 @@ include_once 'include/page_header.php';
 
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	echo SBR;
-	
+
 	if(isset($_REQUEST['form_mass_update']) && isset($_REQUEST['group_itemid'])){
 		insert_mass_update_item_form('group_itemid');
-	} 
+	}
 	else if(isset($_REQUEST['form_copy_to']) && isset($_REQUEST['group_itemid'])){
 		insert_copy_elements_to_forms('group_itemid');
-	} 
+	}
 	else if (!isset($_REQUEST['form']) ||  !str_in_array($_REQUEST['form'],array(S_CREATE_ITEM,'update','clone'))) {
 // Table HEADER
 		$form = new CForm();
 		$form->setMethod('get');
-		
+
 		$where_case = array();
 		$from_tables['h'] = 'hosts h';
+
 		$where_case[] = 'i.hostid=h.hostid';
 		$where_case[] =  DBcondition('h.hostid',$available_hosts);
-		
+
 // Items Header
- 		$form->addItem(array('[', 
+ 		$form->addItem(array('[',
 			new CLink($showdisabled ? S_HIDE_DISABLED_ITEMS : S_SHOW_DISABLED_ITEMS,
 				'?showdisabled='.($showdisabled?0:1).url_param('groupid').url_param('hostid'),null),
 			']', SPACE));
 
 		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
-	
+
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
 			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 		}
 		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
 			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
 		}
-		
+
 		$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 		$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-		
+
 		if($PAGE_HOSTS['selected'] > 0)
 			$where_case[] = 'h.hostid='.$PAGE_HOSTS['selected'];
-		
+
 		$show_host = (($PAGE_HOSTS['selected'] == 0) && (ZBX_DROPDOWN_FIRST_ENTRY == ZBX_DROPDOWN_FIRST_ALL));
 
 		if(!$filter_enabled){
@@ -784,13 +785,13 @@ include_once 'include/page_header.php';
 		}
 
 		if($showdisabled == 0) $where_case[] = 'i.status <> 1';
-		
+
 		show_table_header(S_ITEMS_BIG, $form);
 // ----------------
 
 // Items Filter
 		$filterForm = get_item_filter_form();
-		
+
 		$filter = create_filter(S_FILTER,null,$filterForm,'item_filter',get_profile('web.items.filter.state',0));
 		$filter->Show();
 
@@ -800,19 +801,19 @@ include_once 'include/page_header.php';
 				$where_case[] = 'n.nodeid='.DBid2nodeid('i.itemid');
 				$where_case[] = 'n.name like '.zbx_dbstr('%'.$_REQUEST['filter_node'].'%');
 			}
-			
+
 			if(isset($_REQUEST['filter_group'])){
-				$from_tables['hg'] = 'hosts_groups hg';
+                $from_tables['hg'] = 'hosts_groups hg';
 				$from_tables['g'] = 'groups g';
 				$where_case[] = 'i.hostid=hg.hostid';
 				$where_case[] = 'g.groupid=hg.groupid';
 				$where_case[] = 'g.name like '.zbx_dbstr('%'.$_REQUEST['filter_group'].'%');
 			}
-			
+
 			if(isset($_REQUEST['filter_host'])){
 				$where_case[] = 'h.host like '.zbx_dbstr('%'.$_REQUEST['filter_host'].'%');
 			}
-			
+
 			if(isset($_REQUEST['filter_application'])){
 				$from_tables['a'] = 'applications a';
 				$from_tables['ia'] = 'items_applications ia';
@@ -820,79 +821,79 @@ include_once 'include/page_header.php';
 				$where_case[] = 'ia.applicationid=a.applicationid';
 				$where_case[] = 'a.name like '.zbx_dbstr('%'.$_REQUEST['filter_application'].'%');
 			}
-			
+
 			if(isset($_REQUEST['filter_type']) && $_REQUEST['filter_type'] != -1){
 				$where_case[] = 'i.type='.$_REQUEST['filter_type'];
 			}
-			
+
 			if(isset($_REQUEST['filter_key'])){
 				$where_case[] = 'i.key_ like '.zbx_dbstr('%'.$_REQUEST['filter_key'].'%');
 			}
-			
+
 			if(isset($_REQUEST['filter_snmp_community'])){
 				$where_case[] = 'i.snmp_community like '.zbx_dbstr('%'.$_REQUEST['filter_snmp_community'].'%');
 			}
-			
+
 			if(isset($_REQUEST['filter_snmp_oid'])){
 				$where_case[] = 'i.snmp_oid like '.zbx_dbstr('%'.$_REQUEST['filter_snmp_oid'].'%');
 			}
-			
+
 			if(isset($_REQUEST['filter_snmp_port'])){
 				$where_case[] = 'i.snmp_port='.$_REQUEST['filter_snmp_port'];
 			}
-			
+
 			if(isset($_REQUEST['filter_snmpv3_securityname'])){
 				$where_case[] = 'i.snmpv3_securityname like '.zbx_dbstr('%'.$_REQUEST['filter_snmpv3_securityname'].'%');
 			}
-			
+
 			if(isset($_REQUEST['filter_snmpv3_securitylevel']) && $_REQUEST['filter_snmpv3_securitylevel'] != -1){
 				$where_case[] = 'i.snmpv3_securitylevel='.$_REQUEST['filter_snmpv3_securitylevel'];
 			}
-			
+
 			if(isset($_REQUEST['filter_snmpv3_authpassphrase'])){
 				$where_case[] = 'i.snmpv3_authpassphrase like '.zbx_dbstr('%'.$_REQUEST['filter_snmpv3_authpassphrase'].'%');
 			}
-			
+
 			if(isset($_REQUEST['filter_snmpv3_privpassphrase'])){
 				$where_case[] = 'i.snmpv3_privpassphrase like '.zbx_dbstr('%'.$_REQUEST['filter_snmpv3_privpassphrase'].'%');
 			}
-			
+
 			if(isset($_REQUEST['filter_value_type']) && $_REQUEST['filter_value_type'] != -1){
 				$where_case[] = 'i.value_type='.$_REQUEST['filter_value_type'];
 			}
-			
+
 			if(isset($_REQUEST['filter_units'])){
 				$where_case[] = 'i.units='.zbx_dbstr($_REQUEST['filter_units']);
 			}
-			
+
 			if(isset($_REQUEST['filter_formula'])){
 				$where_case[] = 'i.formula like '.zbx_dbstr('%'.$_REQUEST['filter_formula'].'%');
 			}
-			
+
 			if(isset($_REQUEST['filter_delay'])){
 				$where_case[] = 'i.delay='.$_REQUEST['filter_delay'];
 			}
-			
+
 			if(isset($_REQUEST['filter_history'])){
 				$where_case[] = 'i.history='.$_REQUEST['filter_history'];
 			}
-			
+
 			if(isset($_REQUEST['filter_trends'])){
 				$where_case[] = 'i.trends='.$_REQUEST['filter_trends'];
 			}
-			
+
 			if(isset($_REQUEST['filter_status']) && $_REQUEST['filter_status'] != -1){
 				$where_case[] = 'i.status='.$_REQUEST['filter_status'];
 			}
-			
+
 			if(isset($_REQUEST['filter_logtimefmt'])){
 				$where_case[] = 'i.logtimefmt='.zbx_dbstr($_REQUEST['filter_logtimefmt']);
 			}
-			
+
 			if(isset($_REQUEST['filter_delta']) && $_REQUEST['filter_delta'] != -1){
 				$where_case[] = 'i.delta='.$_REQUEST['filter_delta'];
 			}
-			
+
 			if(isset($_REQUEST['filter_trapper_hosts'])){
 				$where_case[] = 'i.trapper_hosts like '.zbx_dbstr('%'.$_REQUEST['filter_trapper_hosts'].'%');
 			}
@@ -922,11 +923,11 @@ include_once 'include/page_header.php';
 
 		$from_tables['i'] = 'items i'; /* NOTE: must be added as last element to use left join */
 
-		$sql = 'SELECT DISTINCT th.host as template_host,th.hostid as template_hostid, h.host, h.hostid, hg.groupid, i.* '.
+		$sql = 'SELECT DISTINCT th.host as template_host,th.hostid as template_hostid, h.host, h.hostid, hgg.groupid, i.* '.
 				' FROM '.implode(',', $from_tables).
 					' LEFT JOIN items ti ON i.templateid=ti.itemid '.
 					' LEFT JOIN hosts th ON ti.hostid=th.hostid '.
-					' LEFT JOIN hosts_groups hg ON hg.hostid=th.hostid '.
+					' LEFT JOIN hosts_groups hgg ON hgg.hostid=th.hostid '.
 				' WHERE '.implode(' AND ', $where_case).
 				order_by('h.host,i.description,i.key_,i.delay,i.history,i.trends,i.type,i.status','i.itemid');
 		$db_items = DBselect($sql);
@@ -938,7 +939,7 @@ include_once 'include/page_header.php';
 
 			if($db_item['templateid']){
 				$template_host = get_realhost_by_itemid($db_item['templateid']);
-				array_push($description,		
+				array_push($description,
 					new CLink($template_host['host'],'?'.
 						'hostid='.$template_host['hostid'],
 						'unknown'),
@@ -955,17 +956,17 @@ include_once 'include/page_header.php';
 					'?group_itemid%5B%5D='.$db_item['itemid'].
 					'&group_task='.($db_item['status']?'Activate+selected':'Disable+selected'),
 					item_status2style($db_item['status'])));
-	
+
 			if($db_item['error'] == ''){
 				$error=new CCol('-','off');
 			}
 			else{
 				$error=new CCol($db_item['error'],'on');
 			}
-			
+
 			$applications = $show_applications ? implode(', ', get_applications_by_itemid($db_item['itemid'], 'name')) : null;
 			if(!is_null($applications) && empty($applications)) $applications = ' - ';
-			
+
 			$chkBox = new CCheckBox('group_itemid['.$db_item['itemid'].']',null,null,$db_item['itemid']);
 			//if($db_item['templateid'] > 0) $chkBox->setEnabled(false);
 			$table->addRow(array(
@@ -1003,7 +1004,7 @@ include_once 'include/page_header.php';
 
 	if(isset($_REQUEST['form'])){
 // FORM
-		if(str_in_array($_REQUEST['form'],array(S_CREATE_ITEM,'update','clone')) || 
+		if(str_in_array($_REQUEST['form'],array(S_CREATE_ITEM,'update','clone')) ||
 			(($_REQUEST['form']=='mass_update') && isset($_REQUEST['group_itemid'])))
 		{
 			insert_item_form();
