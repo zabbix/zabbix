@@ -228,7 +228,7 @@
 					else{
 						$data['proxy'] = 0;
 					}
-SDI($data['groups']);
+
 					if(update_host($data['hostid'], $data['name'], $data['port'], $data['status'],
 						$data['useip'], $data['dns'], $data['ip'], $data['proxy'], $data['templates'],
 						'no', /* useipmi */
