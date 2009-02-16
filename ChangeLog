@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-710] fixed duplicating entries in hosts groups after import (Artem)
  - [ZBX-709] improved item graph exporting (Artem)
  - [ZBX-712] fixed simple/advanced item filter switch (Alexei)
  - [ZBX-707] fixed sql error when filter items by host group (Alexei)
