@@ -97,7 +97,7 @@ arguments:  {},
 
 initialize: function(url){
 	this.url=unescape(url);
-	
+
 	this.query=(this.url.indexOf('?')>=0)?this.url.substring(this.url.indexOf('?')+1):'';
 	if(this.query.indexOf('#')>=0) this.query=this.query.substring(0,this.query.indexOf('#'));
 	
@@ -158,7 +158,7 @@ initialize: function(url){
 	if(this.query.length>0) this.file+='?'+this.query;
 	if(this.reference.length>0) this.file+='#'+this.reference;
 	if(this.query.length > 0)	this.formatArguments();
-	
+
 	var sid = cookie.read('zbx_sessionid');
 	this.setArgument('sid', sid.substring(16));
 },
