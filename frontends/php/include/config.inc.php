@@ -17,7 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-ini_set('precision', 22);
+
 function SDI($msg="SDI") { echo "DEBUG INFO: "; var_dump($msg); echo SBR; } // DEBUG INFO!!!
 function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
 function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
@@ -30,7 +30,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	require_once('include/copt.lib.php');
 	require_once('include/profiles.inc.php');
 	require_once('conf/maintenance.inc.php');
-	
+
 // GLOBALS
 	global $USER_DETAILS, $USER_RIGHTS;
 
@@ -89,9 +89,9 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 //		show_messages();
 //		die();
 	}
-	
+
 	/********** START INITIALIZATION *********/
-	
+
 	set_error_handler('zbx_err_handler');
 
 	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
@@ -105,11 +105,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	$ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).'/'.basename($ZBX_CONFIGURATION_FILE);
 
 	unset($show_setup);
-	
-	
+
+
 	if(defined('ZBX_DENY_GUI_ACCESS')){
 		if(isset($ZBX_GUI_ACCESS_IP_RANGE) && is_array($ZBX_GUI_ACCESS_IP_RANGE)){
-			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?($_SERVER['HTTP_X_FORWARDED_FOR']):($_SERVER['REMOTE_ADDR']);	
+			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?($_SERVER['HTTP_X_FORWARDED_FOR']):($_SERVER['REMOTE_ADDR']);
 			if(!str_in_array($user_ip,$ZBX_GUI_ACCESS_IP_RANGE)) $DENY_GUI = TRUE;
 		}
 		else{
@@ -120,14 +120,14 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	if(file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !isset($DENY_GUI)){
 		include $ZBX_CONFIGURATION_FILE;
 		require_once('include/db.inc.php');
-		
+
 		$error = '';
 		if(!DBconnect($error)){
 			$_REQUEST['message'] = $error;
 
 			define('ZBX_DISTRIBUTED', false);
 			define('ZBX_PAGE_NO_AUTHERIZATION', true);
-			
+
 			$show_warning = true;
 		}
 		else{
@@ -151,9 +151,9 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		if(file_exists($ZBX_CONFIGURATION_FILE)){
 			include $ZBX_CONFIGURATION_FILE;
 		}
-		
+
 		require_once('include/db.inc.php');
-		
+
 		define('ZBX_PAGE_NO_AUTHERIZATION', true);
 		define('ZBX_DISTRIBUTED', false);
 		$show_setup = true;
@@ -193,7 +193,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		exit();
 	}
 //---
-	
+
 	if(isset($DENY_GUI)){
 		unset($show_warning);
 		include_once('warning.php');
@@ -226,7 +226,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 //SDI($_REQUEST);
 			$ZBX_CURRENT_NODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node
 			$ZBX_WITH_SUBNODES = get_cookie('zbx_with_subnodes', false); // Show elements FROM subnodes
-			
+
 			if(isset($_REQUEST['switch_node'])){
 				if($node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$_REQUEST['switch_node']))){
 					$ZBX_CURRENT_NODEID = $_REQUEST['switch_node'];
@@ -338,12 +338,12 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	}
 
 	function access_deny(){
-	
+
 		include_once('include/page_header.php');
 		show_error_message(S_NO_PERMISSIONS);
 		include_once('include/page_footer.php');
 	}
-	
+
 	function detect_page_type($default=PAGE_TYPE_HTML){
 		if(isset($_REQUEST['output'])){
 			switch($_REQUEST['output']){
@@ -360,7 +360,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		}
 	return $default;
 	}
-	
+
 	function show_messages($bool=TRUE,$okmsg=NULL,$errmsg=NULL){
 		global	$page, $ZBX_MESSAGES;
 
@@ -385,29 +385,29 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 						'font'	=> 2));
 					$width = max($width, ImageFontWidth(2) * strlen($msg) + 1);
 					$height += imagefontheight(2) + 1;
-					break;			
+					break;
 				case PAGE_TYPE_XML:
 					echo htmlspecialchars($msg)."\n";
-					break;			
+					break;
 				case PAGE_TYPE_HTML:
 				default:
 					$msg_tab = new CTable($msg,($bool?'msgok':'msgerr'));
 					$msg_tab->setCellPadding(0);
 					$msg_tab->setCellSpacing(0);
-					
+
 					$msg_col = new CCol(bold($msg),'msg');
 					$msg_col->addOption('id','page_msg');
-					
+
 					$msg_details = SPACE;
 					if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
 						$msg_details = new CDiv(array(S_DETAILS),'pointer');
 						$msg_details->addAction('onclick',new CScript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
 						$msg_details->addOption('title',S_MAXIMIZE.'/'.S_MINIMIZE);
 					}
-					
+
 					$msg_tab->addRow(array(new CCol($msg_details,'clr'),$msg_col));
 					$msg_tab->Show();
-					
+
 					$img_space = new CImg('images/general/tree/zero.gif','space','100','2');
 					break;
 			}
@@ -449,34 +449,34 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				$msg_show = 6;
 				$msg_font_size = 6;
 				$msg_count = count($ZBX_MESSAGES) + 1;
-				
+
 				if($msg_count > $msg_show) $msg_count = $msg_show;
 
 				$msg_count = ($msg_count * $msg_font_size * 4);
 				$lst_error->AddOption('style','font-size: '.$msg_font_size.'pt; height: '.$msg_count.'px;');
-				
+
 
 				$tab = new CTable(null,($bool?'msgok':'msgerr'));
-				
+
 				$tab->setCellPadding(0);
 				$tab->setCellSpacing(0);
 
 				$tab->addOption('id','msg_messages');
 				$tab->addOption('style','width: 100%;');
-				
+
 				if(isset($msg_tab)){
 					$tab->addOption('style','display: none;');
 				}
-				
+
 				$tab->addRow(new CCol($lst_error,'msg'));
 				$tab->Show();
 //---
 			}
 			$ZBX_MESSAGES = null;
 		}
-		
+
 		if(!is_null($img_space)) print(unpack_object($img_space));
-		
+
 		if($page['type'] == PAGE_TYPE_IMAGE && count($message) > 0){
 			$width += 2;
 			$height += 2;
@@ -484,10 +484,10 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			imagefilledrectangle($canvas,0,0,$width,$height, imagecolorallocate($canvas, 255, 255, 255));
 
 			foreach($message as $id => $msg){
-			
+
 				$message[$id]['y'] = 1 + (isset($previd) ? $message[$previd]['y'] + $message[$previd]['h'] : 0 );
 				$message[$id]['h'] = imagefontheight($msg['font']);
-				
+
 				imagestring(
 					$canvas,
 					$msg['font'],
@@ -496,7 +496,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					$msg['text'],
 					imagecolorallocate($canvas, $msg['color']['R'], $msg['color']['G'], $msg['color']['B'])
 					);
-				
+
 				$previd = $id;
 			}
 			imageOut($canvas);
@@ -541,7 +541,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		show_error_message($msg);
 		include_once "include/page_footer.php";
 	}
-	
+
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
 	function calc_trigger_hash(){
 
@@ -783,7 +783,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 // alerts
 /*		$row=DBfetch(DBselect('SELECT COUNT(alertid) as cnt from alerts"));
 		$status["alerts_count"]=$row["cnt"];*/
-		
+
 // triggers
 		$sql = 'SELECT COUNT(DISTINCT t.triggerid) as cnt '.
 				' FROM triggers t, functions f, items i, hosts h'.
@@ -792,7 +792,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					' AND i.hostid=h.hostid '.
 					' AND h.status='.HOST_STATUS_MONITORED;
-					
+
 		$row=DBfetch(DBselect($sql));
 		$status['triggers_count']=$row['cnt'];
 
@@ -810,13 +810,13 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 		$row=DBfetch(DBselect($sql.' and t.status=0 and t.value=2'));
 		$status['triggers_count_unknown']=$row['cnt'];
-		
-// items 
+
+// items
 		$sql = 'SELECT COUNT(DISTINCT i.itemid) as cnt '.
 				' FROM items i, hosts h '.
 				' WHERE i.hostid=h.hostid '.
 					' AND h.status='.HOST_STATUS_MONITORED;
-					
+
 		$row=DBfetch(DBselect($sql));
 		$status['items_count']=$row['cnt'];
 
@@ -831,7 +831,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 		$row=DBfetch(DBselect($sql.' and i.type=2'));
 		$status['items_count_trapper']=$row['cnt'];
-		
+
 // hosts
 		$sql = 'SELECT COUNT(hostid) as cnt '.
 				' FROM hosts '.
@@ -850,20 +850,20 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 		$row=DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_DELETED));
 		$status['hosts_count_deleted']=$row['cnt'];
-		
+
 // users
 		$row=DBfetch(DBselect('SELECT COUNT(userid) as cnt FROM users'));
 		$status['users_count']=$row['cnt'];
-		
+
 		$status['users_online']=0;
 		$sql = 'SELECT DISTINCT s.userid '.
 				' FROM sessions s, users u '.
 				' WHERE u.userid=s.userid '.
 					' AND u.autologout>0 '.
 					' AND (s.lastaccess+u.autologout)>'.time();
-		$result=DBselect($sql);	
+		$result=DBselect($sql);
 		while(DBfetch($result))		$status['users_online']++;
-		
+
 		$result=DBselect('SELECT DISTINCT s.userid '.
 						' FROM sessions s, users u '.
 						' WHERE u.userid=s.userid '.
@@ -998,19 +998,19 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		global $IMAGE_FORMAT_DEFAULT;
 
 		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
-		
-		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg"); 
-		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html"); 
-		else								Header( "Content-type:  image/png"); 
-		
-		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
+
+		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg");
+		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html");
+		else								Header( "Content-type:  image/png");
+
+		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
 	}
-	
+
 	function ImageOut($image,$format=NULL){
 		global $IMAGE_FORMAT_DEFAULT;
 
 		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
-		
+
 		if(IMAGE_FORMAT_JPEG == $format)
 			ImageJPEG($image);
 		else
@@ -1050,7 +1050,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		if(!is_array($mappings))	return FALSE;
 
 		$valuemapid = get_dbid("valuemaps","valuemapid");
-		
+
 		$result = DBexecute("insert into valuemaps (valuemapid,name) values ($valuemapid,".zbx_dbstr($name).")");
 		if(!$result)
 			return $result;
@@ -1107,18 +1107,18 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	function zbx_stripslashes($value){
 		if(is_array($value)){
 			foreach($value as $id => $data)
-				$value[$id] = zbx_stripslashes($data); 
+				$value[$id] = zbx_stripslashes($data);
 				// $value = array_map('zbx_stripslashes',$value); /* don't use 'array_map' it buggy with indexes */
 		} elseif (is_string($value)){
 			$value = stripslashes($value);
 		}
 		return $value;
 	}
-	
+
 	function empty2null($var){
 		return ($var == "") ? null : $var;
 	}
-	
+
 	function str2mem($val){
 		$val = trim($val);
 		$last = strtolower($val{strlen($val)-1});
@@ -1134,7 +1134,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 		return $val;
 	}
-	
+
 	function mem2str($size){
 		$prefix = 'B';
 		if($size > 1048576) {	$size = $size/1048576;	$prefix = 'M'; }
@@ -1142,7 +1142,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return round($size, 6).$prefix;
 	}
 
-	/* Do not forget to sync it with add_value_suffix in evalfunc.c! */ 
+	/* Do not forget to sync it with add_value_suffix in evalfunc.c! */
 	function convert_units($value,$units){
 // Special processing for unix timestamps
 		if($units=="unixtime"){
@@ -1174,7 +1174,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		}
 // Special processing for seconds
 		if($units=="s"){
-			return zbx_date2age(0,$value,true);	
+			return zbx_date2age(0,$value,true);
 		}
 
 		$u="";
@@ -1198,7 +1198,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				$u="G";
 				$value=$value/(1000*1000*1000);
 			}
-	
+
 			if(round($value) == round($value,2)){
 				$s=sprintf("%.0f",$value);
 			}
@@ -1263,10 +1263,10 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 */
 	function validate_sort_and_sortorder($sort=NULL,$sortorder=ZBX_SORT_UP){
 		global $page;
-		
+
 		$_REQUEST['sort'] = get_request('sort',get_profile('web.'.$page["file"].'.sort',$sort));
 		$_REQUEST['sortorder'] = get_request('sortorder',get_profile('web.'.$page["file"].'.sortorder',$sortorder));
-		
+
 		if(!is_null($_REQUEST['sort'])){
 			$_REQUEST['sort'] = eregi_replace('[^a-z\.\_]','',$_REQUEST['sort']);
 			update_profile('web.'.$page["file"].'.sort',		$_REQUEST['sort']);
@@ -1288,15 +1288,15 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 */
 	function make_sorting_link($obj,$tabfield,$url=''){
 		global $page;
-		
+
 		$sortorder = (isset($_REQUEST['sortorder']) && ($_REQUEST['sortorder'] == ZBX_SORT_UP))?ZBX_SORT_DOWN:ZBX_SORT_UP;
-		
+
 		if(empty($url)){
 			$url='?';
 			$url_params = explode('&',$_SERVER['QUERY_STRING']);
 			foreach($url_params as $id => $param){
 				if(zbx_empty($param)) continue;
-				
+
 				list($name,$value) = explode('=',$param);
 				if(zbx_empty($name) || ($name == 'sort') || (($name == 'sortorder'))) continue;
 				$url.=$param.'&';
@@ -1305,16 +1305,16 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		else{
 			$url.='&';
 		}
-		
+
 		$url.='sort='.$tabfield.'&sortorder='.$sortorder;
-		
+
 		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
 			$link = new CLink($obj,$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
 		}
 		else{
 			$link = new CLink($obj,$url);
 		}
-		
+
 		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
 			if($sortorder == ZBX_SORT_UP){
 				$img = new CImg('images/general/sort_downw.gif','down',10,10);
@@ -1322,22 +1322,22 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			else{
 				$img = new CImg('images/general/sort_upw.gif','up',10,10);
 			}
-			
+
 			$img->AddOption('style','line-height: 18px; vertical-align: middle;');
 			$link = array($link,SPACE,$img);
-		}		
-		
+		}
+
 	return $link;
 	}
-	
+
 	function order_by($def,$allways=''){
 		global $page;
-	
+
 		if(!empty($allways)) $allways = ','.$allways;
 		$sortable = explode(',',$def);
-		
+
 		$tabfield = get_request('sort',get_profile('web.'.$page["file"].'.sort',null));
-		
+
 		if(is_null($tabfield)) return ' ORDER BY '.$def.$allways;
 		if(!str_in_array($tabfield,$sortable)) return ' ORDER BY '.$def.$allways;
 
