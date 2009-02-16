@@ -249,6 +249,9 @@ include_once "include/page_header.php";
 		validate_group($PAGE_GROUPS, $PAGE_HOSTS);
 	}
 	
+	$groupid = 0;
+	$hostid = 0;
+	
 	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
 	$available_groups	= $PAGE_GROUPS['groupids'];
 	$available_hosts	= $PAGE_HOSTS['hostids'];
@@ -329,7 +332,7 @@ include_once "include/page_header.php";
 
 		$sql_from = '';
 		$sql_where = '';
-		if(isset($groupid)){
+		if($groupid>0){
 			$sql_from.= ',hosts_groups hg ';
 			$sql_where.= ' AND hg.groupid='.$groupid.
 					 ' AND h.hostid=hg.hostid ';
@@ -660,7 +663,7 @@ include_once "include/page_header.php";
 					' AND '.DBcondition('t.triggerid',$available_triggers).
 					' AND h.status in ('.implode(',', $host_status).')';
 
-		if(isset($hostid)) 
+		if($hostid>0) 
 			$sql .= ' AND h.hostid='.$hostid;
 
 		$sql .= ' GROUP BY h.host, t.triggerid, t.description, t.expression, t.priority, t.status'.
@@ -727,7 +730,7 @@ include_once "include/page_header.php";
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 		$table->SetHeader(array(
-			!isset($hostid) ? S_HOST : null,
+			($hostid>0)?null:S_HOST,
 			S_DESCRIPTION,S_KEY,nbsp(S_UPDATE_INTERVAL),
 			S_STATUS));
 
@@ -736,7 +739,7 @@ include_once "include/page_header.php";
 					' WHERE i.value_type='.ITEM_VALUE_TYPE_LOG.
 						' AND h.hostid=i.hostid '.
 						' AND '.DBin_node('i.itemid', $nodeid).
-						(isset($hostid)?' AND '.$hostid.'=i.hostid ':'').
+						(($hostid>0)?' AND '.$hostid.'=i.hostid ':'').
 						' and '.DBcondition('h.hostid',$available_hosts).
 						' and h.status in ('.implode(',', $host_status).')'.
 					' ORDER BY h.host,i.description, i.key_, i.itemid');
@@ -754,7 +757,7 @@ include_once "include/page_header.php";
 			}
 
 			$table->AddRow(array(
-				!isset($hostid) ? $db_item["host"] : null,
+				($hostid>0)?null:$db_item['host'],
 				$description,
 				$db_item["key_"],
 				$db_item["delay"],
@@ -769,7 +772,7 @@ include_once "include/page_header.php";
 	{
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->SetHeader(array(
-			(isset($hostid) ? null : S_HOST),
+			($hostid>0)?null:S_HOST,
 			S_DESCRIPTION,
 			S_TYPE,
 			S_TYPE_OF_INFORMATION,
@@ -808,7 +811,7 @@ include_once "include/page_header.php";
 			$description->SetAction($action." close_window(); return false;");
 			
 			$table->AddRow(array(
-				(isset($hostid) ? null : $row['host']),
+				($hostid>0)?null:$row['host'],
 				$description,
 				item_type2str($row['type']),
 				item_value_type2str($row['value_type']),
@@ -820,7 +823,7 @@ include_once "include/page_header.php";
 	else if($srctbl == "applications"){
 		$table = new CTableInfo(S_NO_APPLICATIONS_DEFINED);
 		$table->SetHeader(array(
-			(isset($hostid) ? null : S_HOST),
+			($hostid>0)?null:S_HOST,
 			S_NAME));
 
 		$sql = 'SELECT DISTINCT h.host,a.* '.
@@ -830,7 +833,7 @@ include_once "include/page_header.php";
 					' and '.DBcondition('h.hostid',$available_hosts).
 					' and h.status in ('.implode(',', $host_status).')';
 
-		if(isset($hostid)) 
+		if($hostid>0) 
 			$sql .= ' AND h.hostid='.$hostid;
 
 		$sql .= " order by h.host,a.name";
@@ -851,7 +854,7 @@ include_once "include/page_header.php";
 			
 			$name->SetAction($action." close_window(); return false;");
 			
-			$table->AddRow(array(isset($hostid) ? null : $row['host'], $name));
+			$table->AddRow(array(($hostid>0)?null:$row['host'], $name));
 		}
 		$table->Show();
 	}
@@ -883,7 +886,7 @@ include_once "include/page_header.php";
 	
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
 		$table->SetHeader(array(
-			isset($hostid)?null:S_HOST,
+			($hostid>0)?null:S_HOST,
 			S_NAME,
 			S_GRAPH_TYPE
 		));
@@ -898,7 +901,7 @@ include_once "include/page_header.php";
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND '.DBcondition('g.graphid',$available_graphs);
 
-		if(isset($hostid)) 
+		if($hostid>0) 
 			$sql .= ' AND h.hostid='.$hostid;
 
 		$sql .= ' ORDER BY h.host,g.name';
@@ -937,7 +940,7 @@ include_once "include/page_header.php";
 			}
 			
 			$table->AddRow(array(
-				isset($hostid)?null:$row['host'],
+				($hostid>0)?null:$row['host'],
 				$description,
 				$graphtype
 			));
@@ -950,7 +953,7 @@ include_once "include/page_header.php";
 	
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 		$table->SetHeader(array(
-			(isset($hostid) ? null : S_HOST),
+			($hostid>0)?null:S_HOST,
 			S_DESCRIPTION,
 			S_TYPE,
 			S_TYPE_OF_INFORMATION,
@@ -967,7 +970,7 @@ include_once "include/page_header.php";
 					' AND '.DBin_node('i.itemid', $nodeid).
 					' AND '.DBcondition('h.hostid',$available_hosts);
 
-		if(isset($hostid)) 
+		if($hostid>0) 
 			$sql .= ' AND h.hostid='.$hostid;
 
 		$sql .= ' ORDER BY h.host, i.description, i.key_, i.itemid';
@@ -994,7 +997,7 @@ include_once "include/page_header.php";
 			$description->SetAction($action.' close_window(); return false;');
 			
 			$table->AddRow(array(
-				(isset($hostid) ? null : $row['host']),
+				($hostid>0)?null:$row['host'],
 				$description,
 				item_type2str($row['type']),
 				item_value_type2str($row['value_type']),
@@ -1046,7 +1049,7 @@ include_once "include/page_header.php";
 	
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 		$table->SetHeader(array(
-			(isset($hostid) ? null : S_HOST),
+			($hostid>0)?null:S_HOST,
 			S_DESCRIPTION,
 			S_TYPE,
 			S_TYPE_OF_INFORMATION,
@@ -1062,7 +1065,7 @@ include_once "include/page_header.php";
 					' AND '.DBin_node('i.itemid', $nodeid).
 					' AND '.DBcondition('h.hostid',$available_hosts);
 
-		if(isset($hostid)) 
+		if($hostid>0) 
 			$sql .= ' AND h.hostid='.$hostid;
 
 		$sql .= ' ORDER BY h.host, i.description, i.key_, i.itemid';
@@ -1090,7 +1093,7 @@ include_once "include/page_header.php";
 			$description->SetAction($action.' close_window(); return false;');
 			
 			$table->AddRow(array(
-				(isset($hostid) ? null : $row['host']),
+				($hostid>0)?null:$row['host'],
 				$description,
 				item_type2str($row['type']),
 				item_value_type2str($row['value_type']),
