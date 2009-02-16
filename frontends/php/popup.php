@@ -242,10 +242,10 @@ include_once "include/page_header.php";
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params, $nodeid);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params, $nodeid);
 
-	if(str_in_array($srctbl,array('graphs','screens','triggers','logitems','items'))){
+	if(str_in_array($srctbl, array('graphs','applications','screens','triggers','logitems','items','simple_graph','plain_text'))){
 		validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 	}
-	else if(str_in_array($srctbl,array('hosts','templates','host_templates'))){
+	else if(str_in_array($srctbl,array('host_group','hosts','templates','host_templates'))){
 		validate_group($PAGE_GROUPS, $PAGE_HOSTS);
 	}
 
