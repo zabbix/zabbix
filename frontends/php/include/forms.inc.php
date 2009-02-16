@@ -2628,7 +2628,7 @@
 					$ymax_name = $max_host['host'].':'.item_description($max_item);
 				}
 
-				$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80);
+				$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80,'yes');
 				$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
 												"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
 													"&dstfld1=ymax_itemid".
