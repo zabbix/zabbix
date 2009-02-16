@@ -297,20 +297,20 @@ INSERT INTO mappings VALUES (12,3,'255','No such service');
 -- Dumping data for table valuemaps
 --
 
+INSERT INTO valuemaps VALUES (1,'Service state');
+INSERT INTO valuemaps VALUES (2,'Host status');
+INSERT INTO valuemaps VALUES (3,'Windows service state');
 INSERT INTO valuemaps VALUES (4,'APC Battery Replacement Status');
 INSERT INTO valuemaps VALUES (5,'APC Battery Status');
-INSERT INTO valuemaps VALUES (7,'Dell Open Manage System Status');
-INSERT INTO valuemaps VALUES (2,'Host status');
 INSERT INTO valuemaps VALUES (6,'HP Insight System Status');
-INSERT INTO valuemaps VALUES (1,'Service state');
-INSERT INTO valuemaps VALUES (3,'Windows service state');
+INSERT INTO valuemaps VALUES (7,'Dell Open Manage System Status');
 
 --
 -- Dumping data for table `groups`
 --
 
-INSERT INTO groups VALUES (2,'Linux servers');
 INSERT INTO groups VALUES (1,'Templates');
+INSERT INTO groups VALUES (2,'Linux servers');
 INSERT INTO groups VALUES (3,'Windows servers');
 INSERT INTO groups VALUES (4,'ZABBIX Servers');
 
@@ -322,29 +322,45 @@ INSERT INTO hosts_groups VALUES (1,10001,1);
 INSERT INTO hosts_groups VALUES (2,10002,1);
 INSERT INTO hosts_groups VALUES (3,10003,1);
 INSERT INTO hosts_groups VALUES (4,10004,1);
-INSERT INTO hosts_groups VALUES (5,10007,1);
-INSERT INTO hosts_groups VALUES (6,10017,4);
-INSERT INTO hosts_groups VALUES (7,10018,1);
-INSERT INTO hosts_groups VALUES (8,10019,1);
-INSERT INTO hosts_groups VALUES (9,10020,1);
-INSERT INTO hosts_groups VALUES (10,10021,1);
-INSERT INTO hosts_groups VALUES (11,10022,1);
-INSERT INTO hosts_groups VALUES (12,10024,1);
-INSERT INTO hosts_groups VALUES (15,10027,1);
-INSERT INTO hosts_groups VALUES (16,10031,1);
-INSERT INTO hosts_groups VALUES (19,10032,1);
-INSERT INTO hosts_groups VALUES (22,10033,1);
-INSERT INTO hosts_groups VALUES (23,10034,1);
-INSERT INTO hosts_groups VALUES (24,10035,1);
-INSERT INTO hosts_groups VALUES (26,10036,1);
-INSERT INTO hosts_groups VALUES (28,10038,1);
-INSERT INTO hosts_groups VALUES (29,10039,1);
-INSERT INTO hosts_groups VALUES (41,10040,1);
-INSERT INTO hosts_groups VALUES (42,10041,1);
-INSERT INTO hosts_groups VALUES (37,10042,1);
-INSERT INTO hosts_groups VALUES (38,10043,1);
-INSERT INTO hosts_groups VALUES (43,10044,1);
+INSERT INTO hosts_groups VALUES (7,10007,1);
+INSERT INTO hosts_groups VALUES (8,10008,1);
+INSERT INTO hosts_groups VALUES (9,10009,1);
+INSERT INTO hosts_groups VALUES (10,10010,1);
+INSERT INTO hosts_groups VALUES (11,10011,1);
+INSERT INTO hosts_groups VALUES (12,10012,1);
+INSERT INTO hosts_groups VALUES (13,10013,1);
+INSERT INTO hosts_groups VALUES (14,10014,1);
+INSERT INTO hosts_groups VALUES (15,10015,1);
+INSERT INTO hosts_groups VALUES (16,10016,1);
+INSERT INTO hosts_groups VALUES (17,10017,4);
+INSERT INTO hosts_groups VALUES (18,10018,1);
+INSERT INTO hosts_groups VALUES (19,10019,1);
+INSERT INTO hosts_groups VALUES (20,10020,1);
+INSERT INTO hosts_groups VALUES (21,10021,1);
+INSERT INTO hosts_groups VALUES (22,10022,1);
+INSERT INTO hosts_groups VALUES (23,10023,1);
+INSERT INTO hosts_groups VALUES (24,10024,1);
+INSERT INTO hosts_groups VALUES (25,10025,1);
+INSERT INTO hosts_groups VALUES (26,10026,1);
+INSERT INTO hosts_groups VALUES (27,10027,1);
+INSERT INTO hosts_groups VALUES (28,10028,1);
+INSERT INTO hosts_groups VALUES (29,10029,1);
+INSERT INTO hosts_groups VALUES (30,10030,1);
+INSERT INTO hosts_groups VALUES (31,10031,1);
+INSERT INTO hosts_groups VALUES (32,10032,1);
+INSERT INTO hosts_groups VALUES (33,10033,1);
+INSERT INTO hosts_groups VALUES (34,10034,1);
+INSERT INTO hosts_groups VALUES (35,10035,1);
+INSERT INTO hosts_groups VALUES (36,10036,1);
+INSERT INTO hosts_groups VALUES (38,10038,1);
+INSERT INTO hosts_groups VALUES (39,10039,1);
+INSERT INTO hosts_groups VALUES (40,10040,1);
+INSERT INTO hosts_groups VALUES (41,10041,1);
+INSERT INTO hosts_groups VALUES (42,10042,1);
+INSERT INTO hosts_groups VALUES (43,10043,1);
+INSERT INTO hosts_groups VALUES (44,10044,1);
 INSERT INTO hosts_groups VALUES (45,10045,1);
+INSERT INTO hosts_groups VALUES (46,10046,1);
 
 --
 -- Dumping data for table `help_items`
