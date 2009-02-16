@@ -353,7 +353,7 @@ include_once 'include/page_header.php';
 
 	$tab_rows = array();
 
-	$sql = 'SELECT h.host,h.hostid,i.* '.
+	$sql = 'SELECT DISTINCT h.host,h.hostid,i.* '.
 			' FROM hosts h'.$sql_from.', items i '.
 				' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
 			' WHERE ia.itemid is NULL '.
@@ -363,7 +363,6 @@ include_once 'include/page_header.php';
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				' AND '.DBcondition('h.hostid',$db_hostids).
 			' ORDER BY i.description,i.itemid';
-
 	$db_items = DBselect($sql);
 	while($db_item = DBfetch($db_items)){
 		

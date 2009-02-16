@@ -288,7 +288,7 @@ check4Update: function(){
 
 update: function(){
 	this.debug('update');
-	
+
 	this._ready = false;
 	
 	if(this._counter == 1) this.pexec.stop();
@@ -303,7 +303,7 @@ update: function(){
 						'method': 'post',
 						'parameters': this._params,
 						'onSuccess': this.onSuccess.bind(this),
-						'onFailure': this.onFailure.bind(this),
+						'onFailure': this.onFailure.bind(this)
 					}
 	);
 
