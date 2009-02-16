@@ -22,6 +22,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-712] fixed simple/advanced item filter switch (Alexei)
  - [ZBX-707] fixed sql error when filter items by host group (Alexei)
  - [ZBX-706] fixed element validation in sysmap elements (Artem)
  - [ZBX-705] improved {ESC.HISTORY} macro in recovery notifications (Sasha)
