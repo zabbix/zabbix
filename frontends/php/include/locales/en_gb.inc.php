@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -31,7 +31,7 @@
 	'S_DISABLE_SELECTED'=>			'Disable selected',
 	'S_DELETE_SELECTED'=>			'Delete selected',
 	'S_COPY_SELECTED_TO'=>			'Copy selected to ...',
-	
+
 //	dicoveryconf.php
 	'S_HOST_IP'=>				'Host ip',
 	'S_SERVICE_TYPE'=>			'Service type',
@@ -140,7 +140,7 @@
 	'S_POST'=>				'Post',
 	'S_REQUIRED'=>				'Required',
 	'S_STEP_OF_SCENARIO'=>			'Step of scenario',
-	
+
 //	exp_imp.php
 	'S_ELEMENT'=>				'Element',
 	'S_ELEMENTS'=>				'Elements',
@@ -181,7 +181,7 @@
 	'S_INSTALLATION_UPDATE'=>		'Installation/Update',
 	'S_ZABBIX_IS_UNAVAILABLE'=>		'ZABBIX is temporary unavailable',
 	'S_REQUIRE_MB_STRING_MODULE'=>	'Require Multibyte String module to run FrontEnd',
-	
+
 //	node.php
 	'S_TIME_ZONE'=>				'Time zone',
 	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>	'Do not keep history older than (in days)',
@@ -198,7 +198,7 @@
 	'S_CURRENT_NODE'=>			'Current node',
 	'S_CURRENT_NODE_ONLY'=>			'Current node only',
 	'S_WITH_SUBNODES'=>			'With subnodes',
-	
+
 //	acknow.php
 	'S_NO_EVENTS_TO_ACKNOWLEDGE'=>	'No events to acknowledge',
 	'S_ACKNOWLEDGES'=>				'Acknowledges',
@@ -296,7 +296,7 @@
 	'S_RECOVERY_SUBJECT'=>					'Recovery subject',
 	'S_DEFAULT_MESSAGE'=>					'Default message',
 	'S_DEFAULT_SUBJECT'=>					'Default subject',
-	'S_MESSAGE'=>					'Message',	
+	'S_MESSAGE'=>					'Message',
 	'S_ON'=>						'ON',
 	'S_OFF'=>						'OFF',
 	'S_NO_ACTIONS_DEFINED'=>		'No actions defined',
@@ -371,7 +371,7 @@
 	'S_BOLD_LINE'=>				'Bold line',
 	'S_DOT'=>					'Dot',
 	'S_DASHED_LINE'=>			'Dashed line',
-	
+
 //	charts.php
 	'S_CUSTOM_GRAPHS'=>				'Custom graphs',
 	'S_GRAPHS_BIG'=>				'GRAPHS',
@@ -520,14 +520,14 @@
 	'S_INCORRECT_GROUP'=>			'Incorrect group',
 	'S_NOTHING_TO_DO'=>			'Nothing to do',
 	'S_ICORRECT_WORK_PERIOD'=>		'Icorrect work period',
-	
+
 //	nodes.php
 	'S_NODE'=>					'Node',
 	'S_NODES'=>					'Nodes',
 	'S_NODES_BIG'=>				'NODES',
 	'S_NEW_NODE'=>				'New node',
 	'S_NO_NODES_DEFINED'=>		'No nodes defined',
-	
+
 //  Authentication
 	'S_AUTHENTICATION'=>				'Authentication',
 	'S_AUTHENTICATION_TO_ZABBIX'=>		'Authentication to ZABBIX',
@@ -543,7 +543,7 @@
 	'S_HTTP_AUTH'=>						'HTTP Authentication',
 	'S_ZABBIX_INTERNAL_AUTH'=>			'ZABBIX Internal authentication',
 	'S_DEFAULT_AUTHENTICATION'=>		'Default authentication',
-	
+
 
 //	Latest values
 	'S_LATEST_VALUES'=>			'Latest values',
@@ -585,6 +585,7 @@
 	'S_UP'=>				'Up',
 	'S_DOWN'=>				'Down',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>		'New item for the graph',
+	'S_UPD_ITEM_FOR_THE_GRAPH'=>		'Update item for the graph',
 	'S_SORT_ORDER_1_100'=>			'Sort order (0->100)',
 	'S_YAXIS_SIDE'=>			'Y axis side',
 	'S_LEFT'=>				'Left',
@@ -665,7 +666,7 @@
 	'S_APPLICATION'=>			'Application',
 	'S_APPLICATIONS'=>			'Applications',
 	'S_APPLICATIONS_BIG'=>			'APPLICATIONS',
-	'S_CREATE_APPLICATION'=>		'Create application',	
+	'S_CREATE_APPLICATION'=>		'Create application',
 	'S_DELETE_SELECTED_APPLICATIONS_Q'=>	'Delete selected applications?',
 	'S_DISABLE_ITEMS_FROM_SELECTED_APPLICATIONS_Q'=>'Disable items from selected applications?',
 	'S_ACTIVATE_ITEMS'=>			'Activate Items',
@@ -773,12 +774,12 @@
 	'S_CREATE_PROXY'=>			'Create Proxy',
 	'S_PROXY_NAME'=>			'Proxy name',
 	'S_LASTSEEN_AGE'=>			'Last seen (age)',
-	
+
 	'S_TRANSACTION'=>			'Transaction',
 	'S_STARTED_BIG'=>			'STARTED!',
 	'S_COMMITED_BIG'=>			'COMMITED!',
 	'S_ROLLBACKED_BIG'=>		'ROLLBACKED!',
-	
+
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
 	'S_DEVICE_TYPE'=>			'Device type',
@@ -1233,7 +1234,7 @@
 	'S_NUMBER_OF_STATUS_CHANGES'=>		'Number of status changes',
 	'S_WEEK'=>				'Week',
 	'S_LAST'=>				'Last',
- 
+
 //	screenconf.php
 	'S_SCREENS'=>				'Screens',
 	'S_SCREEN'=>				'Screen',
@@ -1352,7 +1353,7 @@
 	'S_STATUS_CALCULATION_ALGORITHM'=>	'Status calculation algorithm',
 	'S_NONE'=>				'None',
 	'S_PROBLEM_IF_AT_LEAST_ONE'=>	'Problem, if at least one child has a problem',
-	'S_PROBLEM_IF_ALL'=>			'Problem, if all children have problems',	
+	'S_PROBLEM_IF_ALL'=>			'Problem, if all children have problems',
 	'S_SERVICE_1'=>				'Service 1',
 	'S_SERVICE_2'=>				'Service 2',
 	'S_SOFT_HARD_LINK'=>			'Soft/hard link',
@@ -1461,7 +1462,7 @@
 
 	'S_MULTIPLE_EVENTS'=>		'Multiple events',
 	'S_EVENT_GENERATION'=>		'Event generation',
-	
+
 	'S_TRIGGERS_MASSUPDATE'=>	'Triggers massupdate',
 	'S_TRIGGER_DEPENDENCIES'=>	'Trigger dependencies',
 	'S_INCORRECT_DEPENDENCY'=>	'Incorrect dependency',
@@ -1648,7 +1649,7 @@
 	'S_DUTCH_NL'=>				'Dutch (NL)',
 	'S_HUNGARY_HU'=>			'Hungary (HU)',
 	'S_POLISH_PL'=>				'Polish (PL)',
-	
+
 //	index.php
 	'S_ZABBIX_BIG'=>			'ZABBIX',
 

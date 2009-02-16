@@ -2597,12 +2597,6 @@
 
 	function insert_graphitem_form(){
 
-		$frmGItem = new CFormTable(S_NEW_ITEM_FOR_THE_GRAPH);
-		$frmGItem->SetName('graph_item');
-		$frmGItem->SetHelp('web.graph.item.php');
-
-		$frmGItem->AddVar('dstfrm',$_REQUEST['dstfrm']);
-
 		$graphid	= get_request('graphid', 	null);
 		$graphtype	= get_request('graphtype', 	GRAPH_TYPE_NORMAL);
 		$gid		= get_request('gid',	 	null);
@@ -2617,6 +2611,13 @@
 		$periods_cnt	= get_request('periods_cnt',	5);
 		$only_hostid	= get_request('only_hostid',	null);
 		$monitored_hosts = get_request('monitored_hosts', null);
+
+		$caption = ($itemid) ? S_UPD_ITEM_FOR_THE_GRAPH : S_NEW_ITEM_FOR_THE_GRAPH;
+		$frmGItem = new CFormTable($caption);
+		$frmGItem->SetName('graph_item');
+		$frmGItem->SetHelp('web.graph.item.php');
+
+		$frmGItem->AddVar('dstfrm',$_REQUEST['dstfrm']);
 
 		$description = '';
 		if($itemid > 0){
