@@ -390,11 +390,12 @@
 	
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
-	
+
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 
 	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
+
 	$available_triggers = get_accessible_triggers(PERM_READ_WRITE,$PAGE_HOSTS['hostids'],PERM_RES_IDS_ARRAY,null,0);
 ?>
 <?php

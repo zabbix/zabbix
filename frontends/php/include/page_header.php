@@ -323,7 +323,9 @@ COpt::profiling_start("page");
 				$page_exists = true;
 				$page['menu'] = $label;
 				$row['selected'] = true;
-				update_profile('web.menu.'.$label.'.last', $sub_page['url'], PROFILE_TYPE_STR);
+				
+				if(!defined('ZBX_PAGE_NO_MENU'))
+					update_profile('web.menu.'.$label.'.last', $sub_page['url'], PROFILE_TYPE_STR);
 			}
 			
 			if($show_sub_menu) $sub_menus[$label][] = $row;
