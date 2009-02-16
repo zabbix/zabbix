@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -31,7 +31,7 @@
 	'S_DISABLE_SELECTED'=>			'Disable selected',
 	'S_DELETE_SELECTED'=>			'Delete selected',
 	'S_COPY_SELECTED_TO'=>			'Copy selected to ...',
-	
+
 //	dicoveryconf.php
 	'S_HOST_IP'=>				'Host ip',
 	'S_SERVICE_TYPE'=>			'Service type',
@@ -140,7 +140,7 @@
 	'S_POST'=>				'Post',
 	'S_REQUIRED'=>				'Required',
 	'S_STEP_OF_SCENARIO'=>			'Step of scenario',
-	
+
 //	exp_imp.php
 	'S_ELEMENT'=>				'Element',
 	'S_ELEMENTS'=>				'Elements',
@@ -181,7 +181,7 @@
 	'S_INSTALLATION_UPDATE'=>		'Installation/Update',
 	'S_ZABBIX_IS_UNAVAILABLE'=>		'ZABBIX is temporary unavailable',
 	'S_REQUIRE_MB_STRING_MODULE'=>	'Require Multibyte String module to run FrontEnd',
-	
+
 //	node.php
 	'S_TIME_ZONE'=>				'Time zone',
 	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>	'Do not keep history older than (in days)',
@@ -198,7 +198,7 @@
 	'S_CURRENT_NODE'=>			'Current node',
 	'S_CURRENT_NODE_ONLY'=>			'Current node only',
 	'S_WITH_SUBNODES'=>			'With subnodes',
-	
+
 //	acknow.php
 	'S_NO_EVENTS_TO_ACKNOWLEDGE'=>	'No events to acknowledge',
 	'S_ACKNOWLEDGES'=>				'Acknowledges',
@@ -298,7 +298,7 @@
 	'S_RECOVERY_SUBJECT'=>					'Recovery subject',
 	'S_DEFAULT_MESSAGE'=>					'Default message',
 	'S_DEFAULT_SUBJECT'=>					'Default subject',
-	'S_MESSAGE'=>					'Message',	
+	'S_MESSAGE'=>					'Message',
 	'S_ON'=>						'ON',
 	'S_OFF'=>						'OFF',
 	'S_NO_ACTIONS_DEFINED'=>		'No actions defined',
@@ -373,7 +373,7 @@
 	'S_BOLD_LINE'=>				'Bold line',
 	'S_DOT'=>					'Dot',
 	'S_DASHED_LINE'=>			'Dashed line',
-	
+
 //	charts.php
 	'S_CUSTOM_GRAPHS'=>				'Custom graphs',
 	'S_GRAPHS_BIG'=>				'GRAPHS',
@@ -522,19 +522,19 @@
 	'S_INCORRECT_GROUP'=>			'Incorrect group',
 	'S_NOTHING_TO_DO'=>			'Nothing to do',
 	'S_ICORRECT_WORK_PERIOD'=>		'Icorrect work period',
-	
+
 	'S_REGULAR_EXPRESSIONS'=>		'Regular expressions',
 	'S_REGULAR_EXPRESSION'=>		'Regular expression',
 	'S_EXPRESSIONS'=>				'Expressions',
 	'S_EXPRESSION'=>				'Expression',
-	
+
 	'S_EXPECTED_RESULT'=>				'Expected result',
 	'S_CHARACTER_STRING_INCLUDED'=>		'Character string included',
 	'S_ANY_CHARACTER_STRING_INCLUDED'=>	'Any character string included',
 	'S_CHARACTER_STRING_NOT_INCLUDED'=>	'Character string not included',
 	'S_RESULT_IS_TRUE'=>				'Result is TRUE',
 	'S_RESULT_IS_FALSE'=>				'Result	is FALSE',
-	
+
 	'S_EXPRESSION_TYPE'=>				'Expression type',
 	'S_NEW_EXPRESSION'=>				'New expression',
 	'S_IGNORE_CASE'=>					'Ignore case',
@@ -542,27 +542,27 @@
 	'S_DELIMITER'=>						'Delimiter',
 	'S_TEST_STRING'=>					'Test string',
 	'S_COMBINED_RESULT'=>				'Combined result',
-	
+
 	'S_NEW_REGULAR_EXPRESSION'=>			'New regular expression',
 	'S_REGULAR_EXPRESSION_ADDED'=>			'Regular expression added',
 	'S_CANNOT_ADD_REGULAR_EXPRESSION'=>		'Cannot add regular expression',
-	
+
 	'S_REGULAR_EXPRESSION_UPDATED'=>		'Regular expression updated',
 	'S_CANNOT_UPDATE_REGULAR_EXPRESSION'=>	'Cannot update regular expression',
-	
+
 	'S_REGULAR_EXPRESSION_DELETED'=>		'Regular expression deleted',
 	'S_CANNOT_DELETE_REGULAR_EXPRESSION'=>	'Cannot delete regular expression',
-	
+
 	'S_DELETE_REGULAR_EXPRESSION_Q'=>			'Delete regular expression?',
 	'S_DELETE_SELECTED_REGULAR_EXPRESSIONS_Q'=>	'Delete selected regular expressions?',
-	
+
 //	nodes.php
 	'S_NODE'=>					'Node',
 	'S_NODES'=>					'Nodes',
 	'S_NODES_BIG'=>				'NODES',
 	'S_NEW_NODE'=>				'New node',
 	'S_NO_NODES_DEFINED'=>		'No nodes defined',
-	
+
 //  Authentication
 	'S_AUTHENTICATION'=>				'Authentication',
 	'S_AUTHENTICATION_TO_ZABBIX'=>		'Authentication to ZABBIX',
@@ -578,7 +578,7 @@
 	'S_HTTP_AUTH'=>						'HTTP Authentication',
 	'S_ZABBIX_INTERNAL_AUTH'=>			'ZABBIX Internal authentication',
 	'S_DEFAULT_AUTHENTICATION'=>		'Default authentication',
-	
+
 
 //	Latest values
 	'S_LATEST_VALUES'=>			'Latest values',
@@ -621,6 +621,7 @@
 	'S_UP'=>				'Up',
 	'S_DOWN'=>				'Down',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>		'New item for the graph',
+	'S_UPD_ITEM_FOR_THE_GRAPH'=>		'Update item for the graph',
 	'S_SORT_ORDER_1_100'=>			'Sort order (0->100)',
 	'S_YAXIS_SIDE'=>			'Y axis side',
 	'S_AXIS_SIDE'=>				'Axis side',
@@ -703,14 +704,14 @@
 	'S_MAINTENANCE_ADDED'=>				'Maintenance added',
 	'S_MAINTENANCE_UPDATED'=>			'Maintenance updated',
 	'S_MAINTENANCE_DELETED'=>			'Maintenance deleted',
-	
+
 	'S_HOSTS_IN_MAINTENANCE'=>			'Hosts in maintenance',
 	'S_GROUPS_IN_MAINTENANCE'=>			'Groups in maintenance',
 
 	'S_CANNOT_ADD_MAINTENANCE'=>			'Cannot add maintenance',
 	'S_CANNOT_UPDATE_MAINTENANCE'=>			'Cannot update maintenance',
 	'S_CANNOT_DELETE_MAINTENANCE'=>			'Cannot delete maintenance',
-	
+
 	'S_MAINTENANCE_PERIOD'=>			'Maintenance period',
 	'S_MAINTENANCE_PERIOD_LENGTH'=>		'Maintenance period length',
 	'S_MAINTENANCE_PERIODS'=>			'Maintenance periods',
@@ -719,12 +720,12 @@
 	'S_CREATE_MAINTENANCE_PERIOD'=>		'Create maintenance period',
 	'S_MAINTENANCE_TYPE'=>				'Maintenance type',
 	'S_EXPIRED'=>						'Expired',
-	
+
 	'S_NORMAL_PROCESSING'=>				'Normal processing',
 	'S_NO_DATA_PROCESSING'=>			'No data processing',
-	
+
 	'S_DELETE_MAINTENANCE_PERIOD_Q'=>	'Delete maintenance period?',
-	
+
 	'S_ACTIVE_SINCE'=>		'Active since',
 	'S_ACTIVE_TILL'=>		'Active till',
 	'S_PERIOD_START'=>		'Period start',
@@ -733,26 +734,26 @@
 
 	'S_SHEDULE'=>			'Shedule',
 	'S_NEXT_RUN'=>			'Next run',
-	
+
 	'S_DATE'=>				'Date',
 	'S_ONE_TIME_ONLY'=>		'One time only',
-	
+
 	'S_DAY_OF_WEEK'=>		'Day of week',
 	'S_DAY_OF_MONTH'=>		'Day of month',
-	
+
 	'S_EVERY_DAY_S'=>		'Every day(s)',
 	'S_EVERY_WEEK_S'=>		'Every week(s)',
 	'S_EVERY_MONTH_S'=>		'Every month(s)',
 	'S_DAY_OF_WEEK'=>		'Day of week',
-	
+
 	'S_FIRST'=>				'First',
 	'S_SECOND'=>			'Second',
 	'S_THIRD'=>				'Third',
 	'S_FOURTH'=>			'Fourth',
-	
+
 	'S_AT'=>				'At',
 	'S_DAY_OF_WEEK'=>		'Day of week',
-	
+
 	'S_JANUARY'=>			'January',
 	'S_FEBRUARY'=>			'February',
 	'S_MARCH'=>				'March',
@@ -765,16 +766,16 @@
 	'S_OCTOBER'=>			'October',
 	'S_NOVEMBER'=>			'November',
 	'S_DECEMBER'=>			'December',
-	
+
 	'S_INCORRECT_MAINTENANCE_PERIOD'=> 'Incorrect maintenance period',
 
-	
+
 //	hosts.php
 	'S_IN'=>					'In',
 	'S_APPLICATION'=>			'Application',
 	'S_APPLICATIONS'=>			'Applications',
 	'S_APPLICATIONS_BIG'=>			'APPLICATIONS',
-	'S_CREATE_APPLICATION'=>		'Create application',	
+	'S_CREATE_APPLICATION'=>		'Create application',
 	'S_DELETE_SELECTED_APPLICATIONS_Q'=>	'Delete selected applications?',
 	'S_DISABLE_ITEMS_FROM_SELECTED_APPLICATIONS_Q'=>'Disable items from selected applications?',
 	'S_ACTIVATE_ITEMS'=>			'Activate Items',
@@ -882,13 +883,13 @@
 	'S_CREATE_PROXY'=>			'Create Proxy',
 	'S_PROXY_NAME'=>			'Proxy name',
 	'S_LASTSEEN_AGE'=>			'Last seen (age)',
-	
+
 	'S_TRANSACTION'=>			'Transaction',
 	'S_STARTED_BIG'=>			'STARTED!',
 	'S_COMMITED_BIG'=>			'COMMITED!',
 	'S_ROLLBACKED_BIG'=>		'ROLLBACKED!',
 	'S_HOST_CONFIGURATION'=>	'Host configuration',
-	
+
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
 	'S_DEVICE_TYPE'=>			'Device type',
@@ -1349,13 +1350,13 @@
 	'S_NUMBER_OF_STATUS_CHANGES'=>		'Number of status changes',
 	'S_WEEK'=>				'Week',
 	'S_LAST'=>				'Last',
-	
+
 //	report6.php
 	'S_BAR_REPORTS'=>			'Bar reports',
 	'S_BAR_REPORT_1'=>			'Distribution of values for multiple periods',
 	'S_BAR_REPORT_2'=>			'Distribution of values for multiple items',
 	'S_BAR_REPORT_3'=>			'Compare values for multiple periods',
-	
+
 	'S_SELECTED_HOSTS'=>		'Selected hosts',
 	'S_SELECTED_GROUPS'=>		'Selected groups',
 	'S_SCALE'=>					'Scale',
@@ -1364,7 +1365,7 @@
 	'S_DARKEN'=>				'Darken',
 	'S_BRIGHTEN'=>				'Brighten',
 	'S_AUTO'=>					'Auto',
- 
+
 //	screenconf.php
 	'S_SCREENS'=>				'Screens',
 	'S_SCREEN'=>				'Screen',
@@ -1483,7 +1484,7 @@
 	'S_STATUS_CALCULATION_ALGORITHM'=>	'Status calculation algorithm',
 	'S_NONE'=>				'None',
 	'S_PROBLEM_IF_AT_LEAST_ONE'=>	'Problem, if at least one child has a problem',
-	'S_PROBLEM_IF_ALL'=>			'Problem, if all children have problems',	
+	'S_PROBLEM_IF_ALL'=>			'Problem, if all children have problems',
 	'S_SERVICE_1'=>				'Service 1',
 	'S_SERVICE_2'=>				'Service 2',
 	'S_SOFT_HARD_LINK'=>			'Soft/hard link',
@@ -1592,7 +1593,7 @@
 
 	'S_MULTIPLE_EVENTS'=>		'Multiple events',
 	'S_EVENT_GENERATION'=>		'Event generation',
-	
+
 	'S_TRIGGERS_MASSUPDATE'=>	'Triggers massupdate',
 	'S_TRIGGER_DEPENDENCIES'=>	'Trigger dependencies',
 	'S_INCORRECT_DEPENDENCY'=>	'Incorrect dependency',
@@ -1782,7 +1783,7 @@
 	'S_DUTCH_NL'=>				'Dutch (NL)',
 	'S_HUNGARY_HU'=>			'Hungary (HU)',
 	'S_POLISH_PL'=>				'Polish (PL)',
-	
+
 //	index.php
 	'S_ZABBIX_BIG'=>			'ZABBIX',
 
