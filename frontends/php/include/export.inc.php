@@ -312,7 +312,7 @@
 			$data = DBfetch(DBselect($sql));
 			if(!$data) return false;
 
-			$data['item'] = '{HOSTNAME}:'.$data['key_'];
+			$data['item'] = $data['host'].':'.$data['key_'];
 			
 			zbx_xmlwriter_start_element ($memory,XML_TAG_GRAPH_ELEMENT);
 			

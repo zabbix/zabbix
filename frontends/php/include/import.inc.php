@@ -797,10 +797,7 @@
 					if(!isset($data['type']))		$data['type']		= 0;
 					if(!isset($data['periods_cnt']))	$data['periods_cnt']	= 5;
 
-					if(!($item = DBfetch(DBselect('select i.itemid from items i,hosts h'.
-						' where h.hostid=i.hostid and i.key_='.zbx_dbstr($data['key']).
-						' and h.host='.zbx_dbstr($data['host'])))))
-					{
+					if(!$item = get_item_by_key($data['key'], $data['host'])){
 						$this->data[XML_TAG_GRAPH]['error'] = true;
 
 						error('Missed item ['.$data['key'].'] for host ['.$data['host'].']');
