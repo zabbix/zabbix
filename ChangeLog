@@ -23,6 +23,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-717] all templates linked to group Templates in default config (Sasha)
  - [ZBX-715] fixed "Invalid URL" error when choose History from history submenu (Vedmak)
  - [ZBX-713] fixed "values per second" having too many decimal places (Vedmak)
  - [ZBX-710] fixed duplicating entries in hosts groups after import (Artem)
