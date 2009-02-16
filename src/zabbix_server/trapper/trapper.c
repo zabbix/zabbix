@@ -245,7 +245,14 @@ void	process_trapper_child(zbx_sock_t *sock)
 
 void	child_trapper_main(int i, zbx_sock_t *s)
 {
+	struct	sigaction phan;
+
 	zabbix_log( LOG_LEVEL_DEBUG, "In child_trapper_main()");
+
+	phan.sa_handler = child_signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+	sigaction(SIGALRM, &phan, NULL);
 
 	zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Trapper]", i);
 
