@@ -372,7 +372,7 @@
 						break; // case
 					}
 
-					array_push($this->data[XML_TAG_HOST]['groups'], $group["groupid"]);
+					$this->data[XML_TAG_HOST]['groups'][$group['groupid']] = $group['groupid'];
 
 					break; // case
 				case XML_TAG_DEPENDENCY:
