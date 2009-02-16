@@ -806,11 +806,49 @@
 		return update_item_status($itemids, ITEM_STATUS_DISABLED);
 	}
 
+	function get_item_by_key($key,$host=''){
+		$item = false;
+
+		$sql_from = '';
+		$sql_where = '';
+		if(!empty($host)){
+			$sql_from = ',hosts h ';
+			$sql_where = ' AND h.host='.zbx_dbstr($host).' AND i.hostid=h.hostid ';
+		}
+		$sql = 'SELECT DISTINCT i.* '.
+			' FROM items i '.$sql_from.
+			' WHERE i.key_='.zbx_dbstr($key).
+				$sql_where;
+		if($item = DBfetch(DBselect($sql))){
+			$item = $item;
+		}
+	return $item;
+	}
+
 	function get_items_by_hostid($hostids){
 		zbx_value2array($hostids);
 	return DBselect('SELECT * FROM items WHERE '.DBcondition('hostid',$hostids));
 	}
 
+	function get_item_by_key($key,$host=''){
+		$item = false;
+
+		$sql_from = '';
+		$sql_where = '';
+		if(!empty($host)){
+			$sql_from = ',hosts h ';
+			$sql_where = ' AND h.host='.zbx_dbstr($host).' AND i.hostid=h.hostid ';
+		}
+		$sql = 'SELECT DISTINCT i.* '.
+			' FROM items i '.$sql_from.
+			' WHERE i.key_='.zbx_dbstr($key).
+				$sql_where;
+		if($item = DBfetch(DBselect($sql))){
+			$item = $item;
+		}
+	return $item;
+	}
+	
 	function get_item_by_itemid($itemid){
 		$row = DBfetch(DBselect('select * from items where itemid='.$itemid)); 
 		if($row){
