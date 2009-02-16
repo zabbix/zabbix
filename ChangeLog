@@ -22,6 +22,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-713] fixed "values per second" having too many decimal places (Alexei)
  - [ZBX-710] fixed duplicating entries in hosts groups after import (Artem)
  - [ZBX-709] improved item graph exporting (Artem)
  - [ZBX-712] fixed simple/advanced item filter switch (Alexei)
