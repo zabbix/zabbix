@@ -783,6 +783,7 @@ include_once 'include/page_header.php';
 	}
 
 	$options = array('only_current_node');
+	if($filter_enabled) array_push($options,'allow_all');
 	foreach($options as $option) $params[$option] = 1;
 
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
