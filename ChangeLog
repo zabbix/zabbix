@@ -23,6 +23,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-301] fixed minor GUI text errors 
  - [ZBX-716] fixed wrong caption for graph item editing form (Vedmak)
  - [ZBX-717] all templates linked to group Templates in default config (Sasha)
  - [ZBX-715] fixed "Invalid URL" error when choose History from history submenu (Vedmak)
