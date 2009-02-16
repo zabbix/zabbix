@@ -1457,7 +1457,7 @@
 	'S_SHOW_DISABLED_TRIGGERS'=>		'Show disabled triggers',
 	'S_HIDE_DISABLED_TRIGGERS'=>		'Hide disabled triggers',
 	'S_THE_TRIGGER_DEPENDS_ON'=>		'The trigger depends on',
-	'S_NO_DEPENDENCES_DEFINED'=>		'No dependences defined',
+	'S_NO_DEPENDENCES_DEFINED'=>		'No dependencies defined',
 	'S_NEW_DEPENDENCY'=>			'New dependency',
 
 	'S_MULTIPLE_EVENTS'=>		'Multiple events',
