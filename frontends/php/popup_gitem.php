@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -22,14 +22,14 @@
 	require_once 'include/config.inc.php';
 	require_once 'include/triggers.inc.php';
 	require_once 'include/js.inc.php';
-	
+
 	$dstfrm		= get_request('dstfrm',		0);	// destination form
 
 	$page['title'] = "S_GRAPH_ITEM";
 	$page['file'] = 'popup_gitem.php';
 
 	define('ZBX_PAGE_NO_MENU', 1);
-	
+
 include_once 'include/page_header.php';
 
 ?>
@@ -62,7 +62,7 @@ include_once 'include/page_header.php';
 	);
 
 	check_fields($fields);
-	
+
 	insert_js_function('add_graph_item');
 	insert_js_function('update_graph_item');
 
@@ -87,14 +87,14 @@ include_once 'include/page_header.php';
 			}
 		}
 	}
-	
+
 	if(isset($_REQUEST['save']) && !isset($_REQUEST['gid']))
 	{
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
 <?php
-		
+
 		echo "add_graph_item('".
 			$_REQUEST['dstfrm']."','".
 			$_REQUEST['itemid']."','".
@@ -116,7 +116,7 @@ include_once 'include/page_header.php';
 <script language="JavaScript" type="text/javascript">
 <!--
 <?php
-				
+
 		echo "update_graph_item('".
 			$_REQUEST['dstfrm']."','".
 			$_REQUEST['list_name']."','".
@@ -137,12 +137,6 @@ include_once 'include/page_header.php';
 	else{
 	echo SBR;
 
-		$frmGItem = new CFormTable(S_NEW_ITEM_FOR_THE_GRAPH);
-		$frmGItem->setName('graph_item');
-		$frmGItem->setHelp("web.graph.item.php");
-
-		$frmGItem->addVar('dstfrm',$_REQUEST['dstfrm']);
-
 		$graphid	= get_request("graphid", 	null);
 		$graphtype	= get_request("graphtype", 	GRAPH_TYPE_NORMAL);
 		$gid		= get_request("gid",	 	null);
@@ -158,12 +152,20 @@ include_once 'include/page_header.php';
 		$only_hostid	= get_request("only_hostid",	null);
 		$monitored_hosts = get_request('monitored_hosts', null);
 
+        $caption = ($itemid) ? S_UPD_ITEM_FOR_THE_GRAPH : S_NEW_ITEM_FOR_THE_GRAPH;
+		$frmGItem = new CFormTable($caption);
+
+		$frmGItem->setName('graph_item');
+		$frmGItem->setHelp("web.graph.item.php");
+
+		$frmGItem->addVar('dstfrm',$_REQUEST['dstfrm']);
+
 		$description = '';
 		if($itemid > 0){
 			$description = get_item_by_itemid($itemid);
 			$description = item_description($description);
 		}
-		
+
 		$frmGItem->addVar('graphid',$graphid);
 		$frmGItem->addVar('gid',$gid);
 		$frmGItem->addVar('list_name',$list_name);
@@ -186,7 +188,7 @@ include_once 'include/page_header.php';
 				"&dstfld1=itemid&dstfld2=description&".
 				"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."');",
 				'T');
-		
+
 		$frmGItem->addRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
 
 		if($graphtype == GRAPH_TYPE_NORMAL){
@@ -206,7 +208,7 @@ include_once 'include/page_header.php';
 		}
 
 		if($type == GRAPH_ITEM_AGGREGATED){
-			$frmGItem->addRow(S_AGGREGATED_PERIODS_COUNT,	new CTextBox('periods_cnt',$periods_cnt,15)); 
+			$frmGItem->addRow(S_AGGREGATED_PERIODS_COUNT,	new CTextBox('periods_cnt',$periods_cnt,15));
 
 			$frmGItem->addVar('calc_fnc',$calc_fnc);
 			$frmGItem->addVar('drawtype',$drawtype);
@@ -215,28 +217,28 @@ include_once 'include/page_header.php';
 		else {
 			if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
 				$frmGItem->addVar('periods_cnt',$periods_cnt);
-	
+
 				$cmbFnc = new CComboBox('calc_fnc',$calc_fnc,'submit();');
-	
+
 				$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
 				$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
 				$cmbFnc->addItem(CALC_FNC_MAX, S_MAX_SMALL);
 				$cmbFnc->addItem(CALC_FNC_LST, S_LST_SMALL);
-				$frmGItem->addRow(S_FUNCTION, $cmbFnc);		
+				$frmGItem->addRow(S_FUNCTION, $cmbFnc);
 			}
 			else{
 				$frmGItem->addVar('periods_cnt',$periods_cnt);
-	
+
 				$cmbFnc = new CComboBox('calc_fnc',$calc_fnc,'submit();');
-	
+
 				if($graphtype == GRAPH_TYPE_NORMAL)
 					$cmbFnc->addItem(CALC_FNC_ALL, S_ALL_SMALL);
-	
+
 				$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
 				$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
 				$cmbFnc->addItem(CALC_FNC_MAX, S_MAX_SMALL);
 				$frmGItem->addRow(S_FUNCTION, $cmbFnc);
-	
+
 				if($graphtype == GRAPH_TYPE_NORMAL){
 					$cmbType = new CComboBox('drawtype',$drawtype);
 					foreach( graph_item_drawtypes() as $i )
