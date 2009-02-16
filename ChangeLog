@@ -1,8 +1,8 @@
 Changes for 1.7.0
 
- - [ZBX-714] fixed "No groups defined" message in items list when group is defined (Alexei)
- - [ZBX-646] audit log entries added for screen edit actions (alexei)
- - [ZBX-645] after new installation, filter for audit log is set not to filter anything (alexei)
+ - [ZBX-714] fixed "No groups defined" message in items list when group is defined (Vedmak)
+ - [ZBX-646] audit log entries added for screen edit actions (Vedmak)
+ - [ZBX-645] after new installation, filter for audit log is set not to filter anything (Vedmak)
  - [ZBX-643] fixed no print data for bar reports (Artem)
  - [DEV-231] improved dynamic graph usability in slideshow screen (Artem)
  - [DEV-258] added additional reports based on bar graphs (Artem)
@@ -23,6 +23,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-716] fixed wrong caption for graph item editing form (Vedmak)
  - [ZBX-717] all templates linked to group Templates in default config (Sasha)
  - [ZBX-715] fixed "Invalid URL" error when choose History from history submenu (Vedmak)
  - [ZBX-713] fixed "values per second" having too many decimal places (Vedmak)
