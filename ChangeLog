@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-699] fixed recursion detection in Include directive for config files (Sasha)
  - [ZBX-301] fixed minor GUI text errors 
  - [ZBX-716] fixed wrong caption for graph item editing form (Vedmak)
  - [ZBX-717] all templates linked to group Templates in default config (Sasha)
