@@ -493,7 +493,7 @@ function make_latest_issues($params = array()){
 		$host->addOption('onclick','javascript: '.$menus);
 		$host->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
-		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
+		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type, t.url '.
 					' FROM events e, triggers t '.
 					' WHERE e.object='.EVENT_SOURCE_TRIGGERS.
 						' AND e.objectid='.$row['triggerid'].
@@ -526,8 +526,7 @@ function make_latest_issues($params = array()){
 //--------			
 			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'].'&source=0&nav_time='.$row['lastchange'],'action');
 			
-			$table->addRow(array(
-				get_node_name_by_elid($row['triggerid']),
+						$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action') : $description;						$table->AddRow(array(				get_node_name_by_elid($row['triggerid']),
 				(isset($params['groupid']) && ($params['groupid']>0))?$row['name']:null,
 				$host,
 				new CCol($description,get_severity_style($row["priority"])),
