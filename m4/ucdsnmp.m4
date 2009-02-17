@@ -79,6 +79,31 @@ AC_DEFUN([LIBSNMP_CHECK_CONFIG],
                 SNMP_CPPFLAGS=-I$SNMP_INCDIR
                 SNMP_LDFLAGS="-L$SNMP_LIBDIR $SNMP_LFLAGS -lsnmp $SNMP_LIBS"
 
+		_save_udcsnmp_libs="${LIBS}"
+		_save_udcsnmp_ldflags="${LDFLAGS}"
+		_save_udcsnmp_cflags="${CFLAGS}"
+		LIBS="${LIBS} ${SNMP_LIBS}"
+		LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
+		CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
+
+		dnl Check for localname in struct snmp_session
+		AC_MSG_CHECKING(for localname in struct snmp_session)
+		AC_TRY_COMPILE([#include <ucd-snmp/ucd-snmp-config.h>
+		#include <ucd-snmp/ucd-snmp-includes.h>],
+		[struct snmp_session session;
+		session.localname = "";
+		],
+		AC_DEFINE(HAVE_SNMP_SESSION_LOCALNAME,1,[Define to 1 if 'session.localname' exist.])
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+
+		LIBS="${_save_udcsnmp_libs}"
+		LDFLAGS="${_save_udcsnmp_ldflags}"
+		CFLAGS="${_save_udcsnmp_cflags}"
+		unset _save_udcsnmp_libs
+		unset _save_udcsnmp_ldflags
+		unset _save_udcsnmp_cflags
+
                 AC_DEFINE(HAVE_UCDSNMP,1,[Define to 1 if UCD-SNMP should be enabled.])
                 AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
 	fi
