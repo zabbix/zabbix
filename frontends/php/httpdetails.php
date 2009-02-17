@@ -227,6 +227,7 @@ include_once "include/page_header.php";
 		get_dynamic_chart('graph_1','chart3.php?'.url_param('period').url_param('from').
 			url_param($httptest_data['name'], false,'name').
 			url_param(150, false,'height').
+			url_param($_REQUEST['stime'], false,'stime').
 			url_param($items[HTTPSTEP_ITEM_TYPE_IN], false, 'items').
 			url_param(GRAPH_TYPE_STACKED, false, 'graphtype'),'-128')
 		, 'center')));
@@ -235,6 +236,7 @@ include_once "include/page_header.php";
 		get_dynamic_chart('graph_2','chart3.php?'.url_param('period').url_param('from').
 			url_param($httptest_data['name'], false,'name').
 			url_param(150, false,'height').
+			url_param($_REQUEST['stime'], false,'stime').
 			url_param($items[HTTPSTEP_ITEM_TYPE_TIME], false, 'items').
 			url_param(GRAPH_TYPE_STACKED, false, 'graphtype'),'-128')
 		,'center')));
@@ -252,7 +254,6 @@ include_once "include/page_header.php";
 		$bstime = $_REQUEST['stime'];
 		$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 	}
-	
 	$script = 	'scrollinit(0,'.$period.','.$stime.',0,'.$bstime.');
 				showgraphmenu("graph");
 				graph_zoom_init("graph_1",'.$bstime.','.$period.',ZBX_G_WIDTH, 150, false);
