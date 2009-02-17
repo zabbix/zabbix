@@ -176,8 +176,10 @@ static int snmp_get_index(DB_ITEM * item, char *OID, char *value, int *idx, char
 
 	zabbix_log (LOG_LEVEL_DEBUG, "OID [%s]", OID);
 
+#ifdef HAVE_SNMP_SESSION_LOCALNAME
 	if (NULL != CONFIG_SOURCE_IP)
 		session.localname = CONFIG_SOURCE_IP;
+#endif
 
 	SOCK_STARTUP;
 	ss = snmp_open (&session);
@@ -440,8 +442,10 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 				session.remote_port);
 	}
 
+#ifdef HAVE_SNMP_SESSION_LOCALNAME
 	if (NULL != CONFIG_SOURCE_IP)
 		session.localname = CONFIG_SOURCE_IP;
+#endif
 
 	SOCK_STARTUP;
 	ss = snmp_open(&session);
