@@ -101,6 +101,17 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 		       	AC_MSG_ERROR([Not found NET-SNMP library])
 			])
 
+		dnl Check for localname in struct snmp_session
+		AC_MSG_CHECKING(for localname in struct snmp_session)
+		AC_TRY_COMPILE([#include <net-snmp/net-snmp-config.h>
+		#include <net-snmp/net-snmp-includes.h>],
+		[struct snmp_session session;
+		session.localname = "";
+		],
+		AC_DEFINE(HAVE_SNMP_SESSION_LOCALNAME,1,[Define to 1 if 'session.localname' exist.])
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+
 		LIBS="${_save_netsnmp_libs}"
 		LDFLAGS="${_save_netsnmp_ldflags}"
 		CFLAGS="${_save_netsnmp_cflags}"
