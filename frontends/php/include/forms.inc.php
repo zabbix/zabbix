@@ -303,10 +303,10 @@
 		$form->SetHelp("web.webmon.httpconf.php");
 
 		$form->AddVar('dstfrm', get_request('dstfrm', null));
-		$form->AddVar('sid', get_request('sid', null));
+		$form->AddVar('stepid', get_request('stepid', null));
 		$form->AddVar('list_name', get_request('list_name', null));
 
-		$sid = get_request('sid', null);
+		$stepid = get_request('stepid', null);
 		$name = get_request('name', '');
 		$url = get_request('url', '');
 		$posts = get_request('posts', '');
@@ -321,16 +321,14 @@
 		$form->AddRow(S_REQUIRED, new CTextBox('required', $required, 80));
 		$form->AddRow(S_STATUS_CODES, new CTextBox('status_codes', $status_codes, 80));
 
-		$form->AddItemToBottomRow(new CButton("save", isset($sid) ? S_SAVE : S_ADD));
+		$form->AddItemToBottomRow(new CButton("save", isset($stepid) ? S_SAVE : S_ADD));
 
 		$form->AddItemToBottomRow(new CButtonCancel(null,'close_window();'));
 
 		$form->show();
 	}
 
-	function	insert_httptest_form()
-	{
-
+	function insert_httptest_form(){
 
 		$form = new CFormTable(S_SCENARIO, null, 'post');
 		$form->SetHelp("web.webmon.httpconf.php");
@@ -415,7 +413,7 @@
 			$first = min(array_keys($steps));
 			$last = max(array_keys($steps));
 		}
-		foreach($steps as $sid => $s){
+		foreach($steps as $stepid => $s){
 			if(!isset($s['name']))		$s['name'] = '';
 			if(!isset($s['timeout']))	$s['timeout'] = 15;
 			if(!isset($s['url']))       	$s['url'] = '';
@@ -423,22 +421,22 @@
 			if(!isset($s['required']))       $s['required'] = '';
 
 			$up = null;
-			if($sid != $first)
+			if($stepid != $first)
 			{
 				$up = new CLink(S_UP,'#','action');
-				$up->OnClick("return create_var('".$form->GetName()."','move_up',".$sid.", true);");
+				$up->OnClick("return create_var('".$form->GetName()."','move_up',".$stepid.", true);");
 			}
 
 			$down = null;
-			if($sid != $last)
+			if($stepid != $last)
 			{
 				$down = new CLink(S_DOWN,'#','action');
-				$down->OnClick("return create_var('".$form->GetName()."','move_down',".$sid.", true);");
+				$down->OnClick("return create_var('".$form->GetName()."','move_down',".$stepid.", true);");
 			}
 
 			$name = new CLink($s['name'],'#','action');
 			$name->OnClick('return PopUp("popup_httpstep.php?dstfrm='.$form->GetName().
-				'&list_name=steps&sid='.$sid.
+				'&list_name=steps&stepid='.$stepid.
 				url_param($s['name'],false,'name').
 				url_param($s['timeout'],false,'timeout').
 				url_param($s['url'],false,'url').
@@ -456,7 +454,7 @@
 			}
 
 			$tblSteps->AddRow(array(
-				array(new CCheckBox('sel_step[]',null,null,$sid), $name),
+				array(new CCheckBox('sel_step[]',null,null,$stepid), $name),
 				$s['timeout'].SPACE.S_SEC_SMALL,
 				$url,
 				$s['required'],

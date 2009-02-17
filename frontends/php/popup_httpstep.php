@@ -38,8 +38,8 @@ include_once "include/page_header.php";
 	$fields=array(
 		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null),
 
-		"sid"=>		array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
-		"list_name"=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,		'isset({save})&&isset({sid})'),
+		"stepid"=>		array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
+		"list_name"=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,		'isset({save})&&isset({stepid})'),
 		
 		"name"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY.KEY_PARAM(),'isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
@@ -73,7 +73,7 @@ function add_var_to_opener_obj(obj,name,value)
 -->
 </script>
 <?php
-	if(isset($_REQUEST['save']) && !isset($_REQUEST['sid']))
+	if(isset($_REQUEST['save']) && !isset($_REQUEST['stepid']))
 	{
 ?>
 <script language="JavaScript" type="text/javascript">
@@ -115,40 +115,38 @@ function add_httpstep(formname,name,timeout,url,posts,required,status_codes)
 </script>
 <?php
 	}
-	if(isset($_REQUEST['save']) && isset($_REQUEST['sid']))
+	if(isset($_REQUEST['save']) && isset($_REQUEST['stepid']))
 	{
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
 
-function update_httpstep(formname,list_name,sid,name,timeout,url,posts,required,status_codes)
-{
-        var form = window.opener.document.forms[formname];
-
-        if(!form)
-        {
-                close_window();
+function update_httpstep(formname,list_name,stepid,name,timeout,url,posts,required,status_codes){
+	var form = window.opener.document.forms[formname];
+	
+	if(!form){
+		close_window();
 		return false;
-        }
+	}
 
-	add_var_to_opener_obj(form,list_name + '[' + sid + '][name]',name);
-	add_var_to_opener_obj(form,list_name + '[' + sid + '][timeout]',timeout);
-	add_var_to_opener_obj(form,list_name + '[' + sid + '][url]',url);
-	add_var_to_opener_obj(form,list_name + '[' + sid + '][posts]',posts);
-	add_var_to_opener_obj(form,list_name + '[' + sid + '][required]',required);
-	add_var_to_opener_obj(form,list_name + '[' + sid + '][status_codes]',status_codes);
+	add_var_to_opener_obj(form,list_name + '[' + stepid + '][name]',name);
+	add_var_to_opener_obj(form,list_name + '[' + stepid + '][timeout]',timeout);
+	add_var_to_opener_obj(form,list_name + '[' + stepid + '][url]',url);
+	add_var_to_opener_obj(form,list_name + '[' + stepid + '][posts]',posts);
+	add_var_to_opener_obj(form,list_name + '[' + stepid + '][required]',required);
+	add_var_to_opener_obj(form,list_name + '[' + stepid + '][status_codes]',status_codes);
 	
 	
 	form.submit();
 	close_window();
-	return true;
+return true;
 }
 
 <?php
 		echo "update_httpstep(".
 			zbx_jsvalue($_REQUEST['dstfrm']).",".
 			zbx_jsvalue($_REQUEST['list_name']).",".
-			zbx_jsvalue($_REQUEST['sid']).",".
+			zbx_jsvalue($_REQUEST['stepid']).",".
 			zbx_jsvalue($_REQUEST['name']).",".
 			zbx_jsvalue($_REQUEST['timeout']).",".
 			zbx_jsvalue($_REQUEST['url']).",".
