@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-473] fixed SNMP-related compilation problem with undefined 'localname' under some platforms (Sasha)
  - [ZBX-718] fixed web graphs start time not changing (Vedmak)
  - [ZBX-699] fixed recursion detection in Include directive for config files (Sasha)
  - [ZBX-301] fixed minor GUI text errors  (Vedmak)
