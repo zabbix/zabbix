@@ -508,7 +508,7 @@ function make_latest_issues(){
 		$host->AddOption('onclick','javascript: '.$menus);
 		$host->AddOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
-		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
+		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type, t.url '.
 					' FROM events e, triggers t '.
 					' WHERE e.object='.EVENT_SOURCE_TRIGGERS.
 						' AND e.objectid='.$row['triggerid'].
@@ -540,6 +540,9 @@ function make_latest_issues(){
 			$actions = get_event_actions_stat_hints($row_event['eventid']);
 //--------			
 			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'].'&source=0&nav_time='.$row['lastchange'],'action');
+			
+			
+			$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action') : $description;
 			
 			$table->AddRow(array(
 				get_node_name_by_elid($row['triggerid']),

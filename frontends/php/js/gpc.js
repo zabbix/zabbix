@@ -282,10 +282,6 @@ getFile: function(){
 	return this.file;
 },
 
-setFile: function(file){
-	this.file = file;
-},
-
 /* Returns the reference of this url, i.e. 'bookmark' in the url 'http://server/file.html#bookmark' */
 getReference: function(){
 	return this.reference;

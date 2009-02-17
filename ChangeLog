@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-697] trigger description in "Last 20 issues" is link to the URL defined in trigger parameters + minor GUI typos fix (Vedmak)
  - [ZBX-473] fixed SNMP-related compilation problem with undefined 'localname' under some platforms (Sasha)
  - [ZBX-718] fixed web graphs start time not changing (Vedmak)
  - [ZBX-699] fixed recursion detection in Include directive for config files (Sasha)
