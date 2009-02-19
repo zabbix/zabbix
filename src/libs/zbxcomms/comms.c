@@ -926,21 +926,27 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 
 
 		/* fill static buffer */
-		while(	read_bytes < expected_len && left > 0
-			&& ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, left)))
-		{
+		if ( s->buf_stat[ read_bytes - 1 ] != '\n' ) /* Not try to read from an empty socket. */
+		{	
+			while(	read_bytes < expected_len && left > 0
+				&& ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, left)))
+			{
 
-			read_bytes += nbytes;
+				read_bytes += nbytes;
 
-			if( flags & ZBX_TCP_READ_UNTIL_CLOSE ) {
-				if(nbytes == 0)	break;
-			} else {
-				if(nbytes < left) break;
+				if( flags & ZBX_TCP_READ_UNTIL_CLOSE ) 
+				{
+					if(nbytes == 0)	break;
+				} 
+				else 
+				{
+					if(nbytes < left) break;
+				}
+
+				left -= nbytes;
 			}
-
-			left -= nbytes;
 		}
-
+		
 		s->buf_stat[read_bytes] = '\0';
 		if( (sizeof(s->buf_stat) - 1) == read_bytes) /* static buffer is full */
 		{
