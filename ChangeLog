@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [ZBX-615] fixed processing of four-character-long item keys (Dmitry)
  - [NTD-67] added timeout handler for server incoming connections (Sasha)
  - [NTD-65] improved graph min,max item exporting (Artem)
  - [NTD-38] added limit of 500 lines per events log (Artem)
