@@ -28,7 +28,7 @@
 
 	$page['file'] = 'tr_status.php';
 	$page['title'] = "S_STATUS_OF_TRIGGERS";
-	$page['scripts'] = array('menu_scripts.js','blink.js');
+	$page['scripts'] = array('menu_scripts.js');
 	$page['hist_arg'] = array('groupid','hostid');
 	
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
@@ -163,9 +163,9 @@ include_once 'include/page_header.php';
 	$_REQUEST['show_triggers']		= get_request('show_triggers',	get_profile('web.tr_status.filter.show_triggers',TRIGGERS_OPTION_ONLYTRUE));
 	$_REQUEST['show_events'] 		= get_request('show_events',	get_profile('web.tr_status.filter.show_events',EVENTS_OPTION_NOEVENT));
 	$_REQUEST['show_events_status']	= get_request('show_events_status',	get_profile('web.tr_status.filter.show_events_status',EVENTS_NOFALSEFORB_STATUS_ALL));
-	
+
 	$_REQUEST['show_severity'] 	= get_request('show_severity',	get_profile('web.tr_status.filter.show_severity',-1));
-	
+
 	$_REQUEST['txt_select']	 	= get_request('txt_select',	get_profile('web.tr_status.filter.select',''));
 	
 // if trigger option is NOFALSEFORB than only 1 option avalable for events and we are setting it!!!
@@ -188,7 +188,7 @@ include_once 'include/page_header.php';
 		
 		update_profile('web.tr_status.filter.show_triggers',$_REQUEST['show_triggers'], PROFILE_TYPE_INT);
 		update_profile('web.tr_status.filter.show_events',$_REQUEST['show_events'], 	PROFILE_TYPE_INT);
-		
+
 		update_profile('web.tr_status.filter.show_severity',$_REQUEST['show_severity'], 	PROFILE_TYPE_INT);
 		
 		update_profile('web.tr_status.filter.txt_select',$_REQUEST['txt_select'], PROFILE_TYPE_STR);
@@ -250,7 +250,7 @@ include_once 'include/page_header.php';
 
 	$p_elemetns = array();
 	
-	$text = array(S_STATUS_OF_TRIGGERS_BIG,SPACE,date('[H:i:s]',time()));
+	$text = array(S_STATUS_OF_TRIGGERS_BIG,SPACE);
 	
 	$url = 'tr_status.php'.($_REQUEST['fullscreen']?'':'?fullscreen=1');
 
@@ -262,7 +262,14 @@ include_once 'include/page_header.php';
 	$mute_icon->AddOption('title',S_SOUND.' '.S_ON.'/'.S_OFF);
 	$mute_icon->AddAction('onclick',new CScript("javascript: switch_mute(this);"));
 	
-	$p_elements[] = get_table_header(S_TRIGGERS,$r_form);
+	$tr_numrows = new CSpan(null,'info');
+	$tr_numrows->addOption('name','tr_numrows');
+	$p_elements[] = get_table_header(array(S_TRIGGERS,
+								new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+								S_FOUND.': ',$tr_numrows,
+								SPACE.SPACE.SPACE.
+								S_UPDATED.': ',new CSpan(date(S_DATE_FORMAT_YMDHMS),'info'),
+							),$r_form);
 
 /************************* FILTER **************************/
 /***********************************************************/
@@ -319,7 +326,7 @@ include_once 'include/page_header.php';
 //---
 
 	$filterForm->AddRow(S_TRIGGERS,$tr_select);
-	
+
 // JP
 	if($show_triggers==TRIGGERS_OPTION_NOFALSEFORB){
 		$filterForm->AddRow(S_STATUS,$ev_status);
@@ -355,7 +362,12 @@ include_once 'include/page_header.php';
 	$filterForm->AddItemToBottomRow(new CButton('filter_set',S_FILTER));
 	$filterForm->AddItemToBottomRow($reset);
 
-	$p_elements[] = create_filter(S_FILTER,null,$filterForm,'tr_filter',get_profile('web.tr_status.filter.state',0));
+	$p_elements[] = create_filter(S_FILTER,
+			array(),
+			$filterForm,
+			'tr_filter',
+			get_profile('web.tr_status.filter.state',0)
+		);
 /*************** FILTER END ******************/	
 	
   	if($_REQUEST['fullscreen']){
@@ -380,9 +392,10 @@ include_once 'include/page_header.php';
 	$table->ShowStart();
 	
 	$header=array();
+	$show_event_col = ($config['event_ack_enable'] && ($show_events != EVENTS_OPTION_NOEVENT));
 
 	$table->SetHeader(array(
-		($config['event_ack_enable'])?(new CCheckBox('all_events',false, "CheckAll('".$m_form->GetName()."','all_events','events');")): NULL,
+		$show_event_col?(new CCheckBox('all_events',false, "CheckAll('".$m_form->GetName()."','all_events','events');")):NULL,
 		make_sorting_link(S_SEVERITY,'t.priority'),
 		S_STATUS,
 		make_sorting_link(S_LAST_CHANGE,'t.lastchange'),
@@ -390,7 +403,7 @@ include_once 'include/page_header.php';
 		($_REQUEST['hostid']>0)?null:make_sorting_link(S_HOST,'h.host'),
 		make_sorting_link(S_NAME,'t.description'),
 		$_REQUEST['show_actions']?S_ACTIONS:NULL,
-		$config['event_ack_enable']?S_ACKNOWLEDGED:NULL,
+		$show_event_col?S_ACKNOWLEDGED:NULL,
 		S_COMMENTS
 		));
 	
@@ -412,7 +425,7 @@ include_once 'include/page_header.php';
 		$cond.=' AND t.priority>='.$show_severity;
 	}
 
-
+	$triggers_num = 0;
 	$event_cond = '';
 	$event_expire = ($config['event_expire']*86400); // days
 	switch($show_events){
@@ -468,7 +481,8 @@ include_once 'include/page_header.php';
 			if(!$row = get_row_for_nofalseforb($row,$event_sql)){
 				continue;
 			}
-		}
+		}		
+		$triggers_num++;
 		
 		$row['events'] = array();
 		$row['items'] = array();
@@ -623,7 +637,7 @@ include_once 'include/page_header.php';
 										zbx_jsvalue($row['items']).");");
 
 			$table->addRow(array(
-				($config['event_ack_enable'])?SPACE:NULL,
+				$show_event_col?SPACE:NULL,
 				new CCol(
 					get_severity_description($row['priority']),
 					get_severity_style($row['priority'],$row['value'])
@@ -635,7 +649,7 @@ include_once 'include/page_header.php';
 				$tr_desc,
 //				$admin_links?(new CLink($description, 'triggers.php?form=update&triggerid='.$row['triggerid'].'&hostid='.$row['hostid'])):$description,
 				$actions,
-				($config['event_ack_enable'])?SPACE:NULL,
+				$show_event_col?SPACE:NULL,
 				new CLink(zbx_empty($row['comments'])?S_ADD:S_SHOW,'tr_comments.php?triggerid='.$row['triggerid'],'action')
 				));
 
@@ -689,11 +703,7 @@ include_once 'include/page_header.php';
 		unset($row,$description, $actions);
 	}
 
-	$table->setFooter(new CCol(array(S_TOTAL.': ',
-							$table->GetNumRows(),
-							SPACE.SPACE.SPACE,
-							($config['event_ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE)
-					)));
+	$table->setFooter(new CCol(array(($config['event_ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE))));
 					
 	$m_form->AddItem($table);
 	unset($table);
@@ -708,7 +718,7 @@ include_once 'include/page_header.php';
 	);
 
 	$triggers_hat->Show();
-
+	zbx_add_post_js('insert_in_element("tr_numrows","'.$triggers_num.'");');
 
 	zbx_add_post_js('blink.init();');	
 	

@@ -1637,6 +1637,7 @@
 	'S_ACK'=>							'Ack',
 	'S_NOT_ACK'=>						'Not Ack',
 	'S_NEVER'=>							'Never',
+	'S_FOUND'=>							'Found',
 
 //	users.php
 	'S_ZABBIX_USER'=>			'ZABBIX User',
