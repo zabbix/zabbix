@@ -1080,6 +1080,8 @@ include_once('include/page_header.php');
 	echo SBR;
 ?>
 <?php
+	$row_count = 0;
+	
 	if($_REQUEST['config']==0 || $_REQUEST['config']==3){
 		$show_only_tmp=($_REQUEST['config'] == 3)?1:0;
 
@@ -1102,7 +1104,16 @@ include_once('include/page_header.php');
 			}
 			
 			$frmForm->addItem(array(S_GROUP.SPACE,$cmbGroups));
-			show_table_header($show_only_tmp?S_TEMPLATES_BIG:S_HOSTS_BIG, $frmForm);
+			
+			$numrows = new CSpan(null,'info');
+			$numrows->addOption('name','numrows');
+			$header_name = ($show_only_tmp) ? S_TEMPLATES_BIG : S_HOSTS_BIG;
+	
+			$header = get_table_header(array($header_name,
+							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+							S_FOUND.': ',$numrows,)
+							);							
+			show_table_header($header, $frmForm);
 
 /* table HOSTS */			
 			$form = new CForm();
@@ -1231,6 +1242,8 @@ include_once('include/page_header.php');
 					$available,
 					$error,
 					$show));
+					
+				$row_count++;
 
 				$jsmenu = new CPUMenu(null,270);
 				$jsmenu->InsertJavaScript();
@@ -1263,7 +1276,14 @@ include_once('include/page_header.php');
 			insert_hostgroups_form($_REQUEST['groupid']);
 		} 
 		else {
-			show_table_header(S_HOST_GROUPS_BIG);
+		
+			$numrows = new CSpan(null,'info');
+			$numrows->addOption('name','numrows');	
+			$header = get_table_header(array(S_HOST_GROUPS_BIG,
+							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+							S_FOUND.': ',$numrows,)
+							);						
+			show_table_header($header );
 
 			$form = new CForm('hosts.php');
 			
@@ -1312,6 +1332,7 @@ include_once('include/page_header.php');
 					$count,
 					new CCol((empty($hosts)?'-':$hosts),'wraptext')
 					));
+					$row_count++;
 			}
 			$table->SetFooter(new CCol(array(
 				new CButtonQMessage('activate',S_ACTIVATE_SELECTED,S_ACTIVATE_SELECTED_HOSTS_Q),
@@ -1345,7 +1366,14 @@ include_once('include/page_header.php');
 			}
 			
 			$frmForm->addItem(array(S_GROUP.SPACE,$cmbGroups));
-			show_table_header(S_TEMPLATE_LINKAGE_BIG, $frmForm);
+			
+			$numrows = new CSpan(null,'info');
+			$numrows->addOption('name','numrows');
+			$header = get_table_header(array(S_TEMPLATE_LINKAGE_BIG,
+							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+							S_FOUND.': ',$numrows,)
+							);							
+			show_table_header($header);
 		
 			$table = new CTableInfo(S_NO_LINKAGES);
 			$table->setHeader(array(S_TEMPLATES,S_HOSTS));
@@ -1381,6 +1409,7 @@ include_once('include/page_header.php');
 						),'unknown'),
 					empty($host_list)?'-':new CCol($host_list,'wraptext')
 				));
+				$row_count++;
 			}
 			
 			$table->Show();
@@ -1409,7 +1438,13 @@ include_once('include/page_header.php');
 			$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 			$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 			
-			show_table_header(S_APPLICATIONS_BIG, $form);
+			$numrows = new CSpan(null,'info');
+			$numrows->addOption('name','numrows');
+			$header = get_table_header(array(S_APPLICATIONS_BIG,
+							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+							S_FOUND.': ',$numrows,)
+							);							
+			show_table_header($header, $form);
 
 /* TABLE */
 
@@ -1455,6 +1490,7 @@ include_once('include/page_header.php');
 					array(new CLink(S_ITEMS,'items.php?hostid='.$db_app['hostid'],'action'),
 					SPACE.'('.$rows.')')
 					));
+				$row_count++;
 			}
 			$table->setFooter(new CCol(array(
 				new CButtonQMessage('activate',S_ACTIVATE_ITEMS,S_ACTIVATE_ITEMS_FROM_SELECTED_APPLICATIONS_Q),
@@ -1471,9 +1507,15 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['form'])){
 			insert_proxies_form(get_request('hostid',NULL));
 		} 
-		else {
-			show_table_header(S_PROXIES_BIG);
-
+		else {		
+			$numrows = new CSpan(null,'info');
+			$numrows->addOption('name','numrows');
+			$header = get_table_header(array(S_PROXIES_BIG,
+							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+							S_FOUND.': ',$numrows,)
+							);							
+			show_table_header($header);
+			
 			$form = new CForm('hosts.php');
 			$form->setMethod('get');
 			
@@ -1531,6 +1573,7 @@ include_once('include/page_header.php');
 					$count,
 					new CCol((empty($hosts)?'-':$hosts), 'wraptext')
 					));
+				$row_count++;
 			}
 			
 			$table->setFooter(new CCol(array(
@@ -1545,6 +1588,8 @@ include_once('include/page_header.php');
 			$form->show();
 		}
 	}
+	
+zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 
 ?>
 <?php

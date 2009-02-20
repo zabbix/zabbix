@@ -488,7 +488,15 @@ include_once 'include/page_header.php';
 		$cmbSource->AddItem(EVENT_SOURCE_DISCOVERY,S_DISCOVERY);
 		$form->AddItem(array(S_EVENT_SOURCE, SPACE, $cmbSource));
 
-		show_table_header(S_ACTIONS_BIG, $form);
+		$row_count = 0;
+		$numrows = new CSpan(null,'info');
+		$numrows->addOption('name','numrows');	
+		$header = get_table_header(array(S_ACTIONS_BIG,
+						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+						S_FOUND.': ',$numrows,)
+						);			
+		show_table_header($header, $form);
+
 		unset($form, $cmbSource);
 /* table */
 		$form = new CForm();
@@ -556,6 +564,7 @@ include_once 'include/page_header.php';
 				$operations,
 				$status
 				));	
+			$row_count++;
 		}
 
 		$tblActions->SetFooter(new CCol(array(
@@ -569,6 +578,8 @@ include_once 'include/page_header.php';
 		$form->AddItem($tblActions);
 		$form->Show();
 	}
+	zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+
 ?>
 <?php
 	include_once "include/page_footer.php";

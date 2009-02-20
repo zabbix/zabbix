@@ -786,8 +786,15 @@ include_once 'include/page_header.php';
 		}
 
 		if($showdisabled == 0) $where_case[] = 'i.status <> 1';
-
-		show_table_header(S_ITEMS_BIG, $form);
+		
+		$row_count = 0;
+		$numrows = new CSpan(null,'info');
+		$numrows->addOption('name','numrows');	
+		$header = get_table_header(array(S_ITEMS_BIG,
+						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+						S_FOUND.': ',$numrows,)
+						);			
+		show_table_header($header, $form);
 // ----------------
 
 // Items Filter
@@ -982,6 +989,7 @@ include_once 'include/page_header.php';
 				$applications,
 				$error
 				));
+			$row_count++;
 		}
 
 		$footerButtons = array();
@@ -1011,6 +1019,7 @@ include_once 'include/page_header.php';
 			insert_item_form();
 		}
 	}
+	zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 ?>
 <?php
 

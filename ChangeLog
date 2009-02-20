@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-555] added entity counts on interfaces (Vedmak)
  - [ZBX-724] improved queries in "Graphs" page (Artem)
  - [ZBX-725] added new default user group "Disabled" (Vedmak)
  - [ZBX-723] fixed Wrong URL when add rights to user group (Vedmak)
