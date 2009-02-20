@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-725] added new default user group "Disabled"
  - [ZBX-723] fixed Wrong URL when add rights to user group (Vedmak)
  - [ZBX-720] edited configure.in file to make some error messages more sensible (Dmitry)
  - [ZBX-665] corrected some typos in misc/conf/zabbix_server.conf (Dmitry)

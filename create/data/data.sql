@@ -49,6 +49,7 @@ INSERT INTO usrgrp VALUES (5,'WEB administrators',0,0);
 INSERT INTO usrgrp VALUES (6,'Head of IT department',0,0);
 INSERT INTO usrgrp VALUES (7,'Zabbix administrators',0,0);
 INSERT INTO usrgrp VALUES (8,'Guests',0,0);
+INSERT INTO usrgrp VALUES (9,'Disabled',0,1);
 
 --
 -- Dumping data for table `users_groups`
