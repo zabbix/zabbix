@@ -1065,7 +1065,7 @@ dnl Check for libLDAP [by default - skip]
 LIBLDAP_CHECK_CONFIG([no])
 if test "x$want_ldap" = "xyes"; then
 	if test "x$found_ldap" != "xyes"; then
-		AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h "${found_ldap}"])
+		AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h])
 	fi
 fi
 CFLAGS="${CFLAGS} ${LDAP_CPPFLAGS}"
@@ -1076,7 +1076,7 @@ dnl Check for libOpenIPMI [by default - skip]
 LIBOPENIPMI_CHECK_CONFIG([no])
 if test "x$want_openipmi" = "xyes"; then
 	if test "x$found_openipmi" != "xyes"; then
-		AC_MSG_ERROR([Invalid OPENIPMI directory - unable to find ipmiif.h "${found_openipmi}"])
+		AC_MSG_ERROR([Invalid OPENIPMI directory - unable to find ipmiif.h])
 	else
 		have_ipmi="openipmi"
 	fi
