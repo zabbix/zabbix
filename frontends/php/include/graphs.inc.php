@@ -261,22 +261,56 @@
  *
  */	
 	function get_min_itemclock_by_graphid($graphid){
-		$min = 0;
-		$row = DBfetch(DBselect('SELECT MIN(t.clock) as clock '.
-						' FROM graphs_items gi, trends t '.
-						' WHERE gi.graphid='.$graphid.
-						  ' AND t.itemid = gi.itemid')); 
-						  
-		if(!empty($row) && $row && $row['clock']) 
+		$itemids = array();
+		$sql = 'SELECT DISTINCT gi.itemid '.
+				' FROM graphs_items gi '.
+				' WHERE gi.graphid='.$graphid;
+		$res = DBselect($sql);
+		while($item = DBfetch($res)){
+			$itemids[$item['itemid']] = $item['itemid'];
+		}
+		
+		$min = null;
+// TRENDS
+		$sql = 'SELECT t.itemid, t.clock FROM trends t WHERE '.DBcondition('t.itemid', $itemids).' ORDER BY t.itemid, t.clock';
+		$row = DBfetch(DBselect($sql,1)); 
+		if(!empty($row) && $row && $row['clock']){
 			$min = $row['clock'];
+		}
 
-		$row = DBfetch(DBselect('SELECT MIN(t.clock) as clock '.
-						' FROM graphs_items gi, trends_uint t '.
-						' WHERE gi.graphid='.$graphid.
-						  ' AND t.itemid = gi.itemid')); 
-						  
-		if(!empty($row) && $row && $row['clock']) 
-			$min = $min == 0 ? $row['clock'] : min($min, $row['clock']);
+		$sql = 'SELECT t.itemid, t.clock FROM trends_uint t WHERE '.DBcondition('t.itemid', $itemids).' ORDER BY t.itemid, t.clock';
+		$row = DBfetch(DBselect($sql,1)); 
+		if(!empty($row) && $row && $row['clock']){
+			$min = is_null($min)?$row['clock']:min($min, $row['clock']);
+		}
+
+		if(is_null($min)){
+// HISTORY
+			$sql = 'SELECT h.itemid, h.clock FROM history h WHERE '.DBcondition('h.itemid', $itemids).' ORDER BY h.itemid, h.clock';
+			$row = DBfetch(DBselect($sql,1)); 
+			if(!empty($row) && $row && $row['clock']){
+				$min = $row['clock'];
+			}
+	
+			$sql = 'SELECT h.itemid, h.clock FROM history_uint h WHERE '.DBcondition('h.itemid', $itemids).' ORDER BY h.itemid, h.clock';
+			$row = DBfetch(DBselect($sql,1)); 
+			if(!empty($row) && $row && $row['clock']){
+				$min = is_null($min)?$row['clock']:min($min, $row['clock']);
+			}
+		}
+
+///////
+		if(is_null($min)){
+			$min = 0;
+			$sql = 'SELECT DISTINCT MAX(i.history) as history, MAX(i.trends) as trends '.
+					' FROM items i '.
+					' WHERE '.DBcondition('i.itemid', $itemids);
+			if($item = DBfetch(DBselect($sql))){
+				$time = max($item['trends'],$item['history']) * 86400;
+				$min = time() - $time;
+			}
+		}
+/////
 
 	return $min;
 	}
