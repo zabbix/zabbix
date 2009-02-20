@@ -227,12 +227,20 @@ include_once "include/page_header.php";
 	show_table_header(0 == $config ? S_CONFIGURATION_OF_SCREENS_BIG : S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
 	echo SBR;
 
+	$row_count = 0;
 	if( 0 == $config ){
 		if(isset($_REQUEST["form"])){
 			insert_screen_form();
 		}
 		else{
-			show_table_header(S_SCREENS_BIG);
+			
+			$numrows = new CSpan(null,'info');
+			$numrows->addOption('name','numrows');	
+			$header = get_table_header(array(S_SCREENS_BIG,
+							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+							S_FOUND.': ',$numrows,)
+							);			
+			show_table_header($header);
 
 			$table = new CTableInfo(S_NO_SCREENS_DEFINED);
 			$table->SetHeader(array(
@@ -254,6 +262,7 @@ include_once "include/page_header.php";
 					$row["hsize"]." x ".$row["vsize"],
 					new CLink(S_EDIT,"screenedit.php?screenid=".$row["screenid"])
 					));
+				$row_count++;
 			}
 			$table->Show();
 		}
@@ -263,7 +272,15 @@ include_once "include/page_header.php";
 			insert_slideshow_form();
 		}
 		else{
-			show_table_header(S_SLIDESHOWS_BIG);
+			$row_count = 0;
+			$numrows = new CSpan(null,'info');
+			$numrows->addOption('name','numrows');	
+			$header = get_table_header(array(S_SLIDESHOWS_BIG,
+							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+							S_FOUND.': ',$numrows,)
+							);			
+			show_table_header($header);
+
 
 			$table = new CTableInfo(S_NO_SLIDESHOWS_DEFINED);
 			$table->SetHeader(array(
@@ -288,11 +305,14 @@ include_once "include/page_header.php";
 					$slide_data['delay'],
 					$slide_data['cnt']
 					));
+				$row_count++;
 			}
 			$table->Show();
 		}
 
 	}
+	zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+
 
 include_once "include/page_footer.php";
 ?>

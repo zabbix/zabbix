@@ -119,6 +119,7 @@ if(isset($_REQUEST['action'])){
 	}
 }
 
+$row_count = 0;
 if(isset($_REQUEST['form'])){
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 	
@@ -204,8 +205,14 @@ else {
 	$form = new CForm();
 	$form->setName('scripts');
 	$form->addOption('id','scripts');
-	
-	show_table_header(S_SCRIPTS);
+			
+	$numrows = new CSpan(null,'info');
+	$numrows->addOption('name','numrows');	
+	$header = get_table_header(array(S_SCRIPTS,
+					new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+					S_FOUND.': ',$numrows,)
+					);			
+	show_table_header($header);
 	
 	$table=new CTableInfo(S_NO_SCRIPTS_DEFINED);
 	$table->setHeader(array(
@@ -249,6 +256,7 @@ else {
 			$host_group_name,
 			((PERM_READ_WRITE == $script['host_access'])?S_WRITE:S_READ)
 			));
+		$row_count++;
 	}
 	$qbutton = new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_SCRIPTS_Q,'1');
 	$qbutton->setAction("javascript: document.getElementById('scripts').action+='?action=1';");
@@ -265,6 +273,8 @@ else {
 	
 	$form->addItem($table);
 	$form->show();
+	zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+
 }
 ?>
 <?php

@@ -412,7 +412,14 @@ include_once 'include/page_header.php';
 		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
-		show_table_header(S_GRAPHS_BIG, $r_form);
+		$row_count = 0;
+		$numrows = new CSpan(null,'info');
+		$numrows->addOption('name','numrows');
+		$header = get_table_header(array(S_GRAPHS_BIG,
+						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+						S_FOUND.': ',$numrows,)
+						);							
+		show_table_header($header, $r_form);
 
 /* TABLE */
 		$form = new CForm();
@@ -504,6 +511,7 @@ include_once 'include/page_header.php';
 				$row['height'],
 				$graphtype
 				));
+			$row_count++;
 		}
 
 		$table->SetFooter(new CCol(array(
@@ -515,7 +523,8 @@ include_once 'include/page_header.php';
 		$form->AddItem($table);
 		$form->Show();
 	}
-
+	
+	zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 ?>
 <?php
 
