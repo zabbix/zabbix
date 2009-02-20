@@ -259,6 +259,9 @@
  * Author:
  *     Aly
  *
+ * Comment:
+ *	   sql is splited to many sql's to optimize search on history tables
+ *
  */	
 	function get_min_itemclock_by_graphid($graphid){
 		$itemids = array();
@@ -269,7 +272,10 @@
 		while($item = DBfetch($res)){
 			$itemids[$item['itemid']] = $item['itemid'];
 		}
-		
+
+// OPTIMIZED SQL!!!
+// sql is splited to optimize search on history tables
+
 		$min = null;
 // TRENDS
 		$sql = 'SELECT t.itemid, t.clock FROM trends t WHERE '.DBcondition('t.itemid', $itemids).' ORDER BY t.itemid, t.clock';
@@ -300,6 +306,7 @@
 		}
 
 ///////
+// if no entry is found in history
 		if(is_null($min)){
 			$min = 0;
 			$sql = 'SELECT DISTINCT MAX(i.history) as history, MAX(i.trends) as trends '.
