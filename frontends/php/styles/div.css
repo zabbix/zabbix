@@ -240,3 +240,8 @@ span.orange{
 span.blue{
 	color:		#0033FF;
 }
+
+span.info{
+	font-weight: bold;
+	color:#DDDDDD;
+}
