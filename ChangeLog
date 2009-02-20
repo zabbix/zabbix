@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-720] edited configure.in file to make some error messages more sensible (Dmitry)
  - [ZBX-665] corrected some typos in misc/conf/zabbix_server.conf (Dmitry)
  - corrected some typos in test/env/standalone/conf/template_server.conf (Dmitry)
  - [ZBX-615] fixed processing of four-character-long item keys (Dmitry)
