@@ -414,7 +414,7 @@ COpt::profiling_start("page");
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/gpc.js"></script>
 <script type="text/javascript" src="js/ajax_req.js"></script>
-<script type="text/javascript" src="js/chkbxrange.js"></script>
+
 <?php
 	if(isset($page['scripts']) && is_array($page['scripts'])){
 		foreach($page['scripts'] as $id => $script){
@@ -546,7 +546,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				$sub_menu_item = new CLink($sub_page['menu_text'], $sub_page['menu_url'], $sub_page['class']);
 				if($sub_page['selected']) $sub_menu_item = new CSpan($sub_menu_item, 'active');
 				$sub_menu_row[] = $sub_menu_item;
-				$sub_menu_row[] = new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider');	
+				$sub_menu_row[] = new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider');
 			}
 			$sub_menu_table->addRow(new CCol($sub_menu_row));
 			

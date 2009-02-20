@@ -225,3 +225,8 @@ span.red{
 span.orange{
 	color:		#EE6000;
 }
+
+span.info{
+	font-weight: bold;
+	color:#DDDDDD;
+}
