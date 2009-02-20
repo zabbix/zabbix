@@ -97,7 +97,7 @@
 		function CTable($message=NULL,$class=NULL){
 			parent::CTag("table","yes");
 			$this->SetClass($class);
-				
+			
 			$this->rownum = 0;
 			$this->oddRowClass = NULL;
 			$this->evenRowClass = NULL;
@@ -211,6 +211,6 @@
 			$ret .= $this->footer;
 			$ret .= parent::EndToString();
 			return $ret;
-		}
+		}		
 	}
 ?>

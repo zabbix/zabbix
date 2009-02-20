@@ -319,7 +319,11 @@ div#scrolltabright{
 }
 
 span.green{
-	color:		#0088FF;
+	color:	#0088FF;
+}
+
+span.info{
+	color:	#0088FF;
 }
 
 /*////////////////	FORMS	////////////////////*/

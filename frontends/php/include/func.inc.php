@@ -488,7 +488,7 @@ return "$s $u$units";
 /************* ZBX MISC *************/
 if(!function_exists('ctype_digit')){
 	function ctype_digit($x){ 
-		return preg_match('/^\\d+$/',$x); 
+		return preg_match('/^\\d+$/',$x);
 	}
 }
 
@@ -497,7 +497,8 @@ function zbx_numeric($value){
 	if(zbx_empty($value)) return false;
 	
 	$value = strval($value);
-return ctype_digit($value);
+
+return preg_match('/^[-|+]?\\d+$/',$value);
 }
 
 function zbx_empty($value){

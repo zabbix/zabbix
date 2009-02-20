@@ -310,15 +310,17 @@ function profile_value_by_type(&$value,$type){
 				$result = false;
 		}
 	}
-	else{			
+	else{
 		switch($type){	
 			case PROFILE_TYPE_ID:
+				$result = ctype_digit($value);
+				break;
 			case PROFILE_TYPE_INT:
 				$result = zbx_numeric($value)?$value:false;
-			break;
+				break;
 			case PROFILE_TYPE_STR:
 				$result = strval($value);
-			break;
+				break;
 			default:
 				$result = false;
 		}
