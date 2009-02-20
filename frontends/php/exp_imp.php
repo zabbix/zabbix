@@ -85,7 +85,7 @@ include_once "include/page_header.php";
 		
 		$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 		$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
-		
+
 		validate_group($PAGE_GROUPS,$PAGE_HOSTS, false);
 
 		$available_hosts = $PAGE_HOSTS['hostids'];
@@ -302,7 +302,7 @@ include_once "include/page_header.php";
 		
 			$sql_from = '';
 			$sql_where = '';
-			if(isset($_REQUEST["groupid"])){
+			if($_REQUEST['groupid']>0){
 				$sql_from.= ' ,hosts_groups hg ';
 				$sql_where.= ' AND hg.groupid='.$_REQUEST['groupid'].
 							' AND hg.hostid=h.hostid ';
