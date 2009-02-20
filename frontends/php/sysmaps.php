@@ -116,7 +116,15 @@ include_once "include/page_header.php";
 		insert_map_form();
 	}
 	else{
-		show_table_header(S_MAPS_BIG);
+		$row_count = 0;
+		$numrows = new CSpan(null,'info');
+		$numrows->addOption('name','numrows');	
+		$header = get_table_header(array(S_MAPS_BIG,
+						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+						S_FOUND.': ',$numrows,)
+						);			
+		show_table_header($header);
+
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->SetHeader(array(
 			make_sorting_link(S_NAME,'sm.name'),
@@ -140,9 +148,12 @@ include_once "include/page_header.php";
 				$row["height"],
 				new CLink(S_EDIT,"sysmap.php?sysmapid=".$row["sysmapid"])
 				));
+			$row_count++;
 		}
 		$table->Show();
 	}
+	zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+
 ?>
 <?php
 

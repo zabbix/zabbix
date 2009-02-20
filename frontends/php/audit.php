@@ -148,7 +148,7 @@ include_once 'include/page_header.php';
 
 //	show_table_header(S_AUDIT_BIG, $frmForm);
 
-
+	$row_count = 0;
 	if(0 == $config){
 		$table = new CTableInfo();
 		$table->setHeader(array(
@@ -220,14 +220,19 @@ include_once 'include/page_header.php';
 				$row['resourcename'],
 				new CCol($details)
 			));
+			$row_count++;
 		}
-
-		show_table_header(S_AUDIT_LOGS, $frmForm);
-	}
+						$numrows = new CSpan(null,'info');		$numrows->addOption('name','numrows');			$header = get_table_header(array(S_AUDIT_LOGS,						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),						S_FOUND.': ',$numrows,)						);					show_table_header($header, $frmForm);	}
 	else if(1 == $config){
 		$table = get_history_of_actions($_REQUEST['start'], PAGE_SIZE, $sql_cond);
 
-		show_table_header(S_AUDIT_ACTIONS, $frmForm);
+		$numrows = new CSpan(null,'info');
+		$numrows->addOption('name','numrows');	
+		$header = get_table_header(array(S_AUDIT_ACTIONS,
+						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+						S_FOUND.': ',$numrows,)
+						);			
+		show_table_header($header, $frmForm);
 	}
 
 /************************* FILTER **************************/
@@ -364,6 +369,7 @@ include_once 'include/page_header.php';
 	zbx_add_post_js('addListener($("filter_icon"),"click",CLNDR[\'audit_since\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'audit_since\'].clndr));'.
 					'addListener($("filter_icon"),"click",CLNDR[\'audit_till\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'audit_till\'].clndr));'
 					);
+	$row_count++;
 
 	$filterForm->addRow(S_PERIOD, $filtertimetab);
 //*/
@@ -386,6 +392,8 @@ include_once 'include/page_header.php';
 	$table->show();
 
 	show_thin_table_header(SPACE,$navigation);
+	zbx_add_post_js('insert_in_element("numrows","'.--$row_count.'");');
+
 ?>
 
 <?php

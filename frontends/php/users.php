@@ -466,6 +466,7 @@ include_once('include/page_header.php');
 	echo SBR; 
 ?>
 <?php
+	$row_count = 0;
 	if($_REQUEST['config']==0){
 		if(isset($_REQUEST['form'])){
 			insert_user_form(get_request('userid',null));
@@ -473,8 +474,15 @@ include_once('include/page_header.php');
 		else{
 			$form = new CForm(null,'post');
 			$form->SetName('users');
+		
+			$numrows = new CSpan(null,'info');
+			$numrows->addOption('name','numrows');	
+			$header = get_table_header(array(S_USERS_BIG,
+							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+							S_FOUND.': ',$numrows,)
+							);			
+			show_table_header($header);
 
-			show_table_header(S_USERS_BIG);
 			$table=new CTableInfo(S_NO_USERS_DEFINED);
 			$table->setHeader(array(
 				array(new CCheckBox('all_users',NULL,
@@ -583,6 +591,7 @@ include_once('include/page_header.php');
 					$users_status,
 					$action
 					));
+				$row_count++;
 			}
 			$table->SetFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_USERS_Q)));
 
@@ -600,7 +609,13 @@ include_once('include/page_header.php');
 			insert_usergroups_form();
 		}
 		else{
-			show_table_header(S_USER_GROUPS_BIG);
+			$numrows = new CSpan(null,'info');
+			$numrows->addOption('name','numrows');	
+			$header = get_table_header(array(S_USER_GROUPS_BIG,
+							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+							S_FOUND.': ',$numrows,)
+							);			
+			show_table_header($header);
 			$form = new CForm();
 
 			$table = new CTableInfo(S_NO_USER_GROUPS_DEFINED);
@@ -671,6 +686,7 @@ include_once('include/page_header.php');
 					),
 					new CCol($users,'wraptext')
 					));
+				$row_count++;
 			}
 			$table->SetFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_GROUPS_Q)));
 
@@ -678,6 +694,8 @@ include_once('include/page_header.php');
 			$form->Show();
 		}
 	}
+	zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+
 ?>
 <?php
 
