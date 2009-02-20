@@ -62,7 +62,7 @@ include_once "include/page_header.php";
 	
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($db_data['hostid']));
 	
-	if(!isset($available_triggers[$_REQUEST['triggerid'])){
+	if(!isset($available_triggers[$_REQUEST['triggerid']])){
 		access_deny();
 	}
 	
