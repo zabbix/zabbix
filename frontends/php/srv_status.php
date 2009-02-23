@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-	require_once("include/config.inc.php");
-	require_once("include/services.inc.php");
-	require_once('include/classes/ctree.inc.php');
+	require_once('include/config.inc.php');
+	require_once('include/triggers.inc.php');
+	require_once('include/services.inc.php');
 		
 	$page["title"] = "S_IT_SERVICES";
 	$page["file"] = "srv_status.php";

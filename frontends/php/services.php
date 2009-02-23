@@ -18,9 +18,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-require_once("include/config.inc.php");
-require_once("include/services.inc.php");
-require_once('include/classes/ctree.inc.php');
+require_once('include/config.inc.php');
+require_once('include/services.inc.php');
+require_once('include/triggers.inc.php');
 require_once('include/html.inc.php');
 
 $page["title"] = "S_CONFIGURATION_OF_IT_SERVICES";

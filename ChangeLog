@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-287] support of PHP4 is removed from source (Artem)
  - [ZBX-714] fixed "No groups defined" message in items list when group is defined (Vedmak)
  - [ZBX-646] audit log entries added for screen edit actions (Vedmak)
  - [ZBX-645] after new installation, filter for audit log is set not to filter anything (Vedmak)

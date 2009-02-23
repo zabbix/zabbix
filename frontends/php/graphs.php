@@ -23,9 +23,6 @@
 	require_once('include/hosts.inc.php');
 	require_once('include/graphs.inc.php');
 	require_once('include/forms.inc.php');
-	require_once('include/classes/chart.inc.php');
-	require_once('include/classes/cpie.inc.php');
-
 
 	$page['title'] = "S_CONFIGURATION_OF_GRAPHS";
 	$page['file'] = 'graphs.php';

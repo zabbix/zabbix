@@ -486,12 +486,6 @@ return "$s $u$units";
 
 
 /************* ZBX MISC *************/
-if(!function_exists('ctype_digit')){
-	function ctype_digit($x){ 
-		return preg_match('/^\\d+$/',$x);
-	}
-}
-
 function zbx_numeric($value){
 	if(is_array($value)) return false;
 	if(zbx_empty($value)) return false;

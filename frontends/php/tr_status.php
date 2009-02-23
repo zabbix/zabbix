@@ -255,12 +255,12 @@ include_once 'include/page_header.php';
 	$url = 'tr_status.php'.($_REQUEST['fullscreen']?'':'?fullscreen=1');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 
 	$mute_icon = new CDiv(SPACE,$mute?'iconmute':'iconsound');
-	$mute_icon->AddOption('title',S_SOUND.' '.S_ON.'/'.S_OFF);
-	$mute_icon->AddAction('onclick',new CScript("javascript: switch_mute(this);"));
+	$mute_icon->addOption('title',S_SOUND.' '.S_ON.'/'.S_OFF);
+	$mute_icon->addAction('onclick',new CScript("javascript: switch_mute(this);"));
 	
 	$tr_numrows = new CSpan(null,'info');
 	$tr_numrows->addOption('name','tr_numrows');
@@ -275,48 +275,48 @@ include_once 'include/page_header.php';
 /***********************************************************/
 
 	$filterForm = new CFormTable(S_FILTER);//,'tr_status.php?filter_set=1','POST',null,'sform');
-	$filterForm->AddOption('name','zbx_filter');
-	$filterForm->AddOption('id','zbx_filter');
+	$filterForm->addOption('name','zbx_filter');
+	$filterForm->addOption('id','zbx_filter');
 	$filterForm->SetMethod('post');
 
-	$filterForm->AddVar('fullscreen',$_REQUEST['fullscreen']);
-	$filterForm->AddVar('groupid',$_REQUEST['groupid']);
-	$filterForm->AddVar('hostid',$_REQUEST['hostid']);
+	$filterForm->addVar('fullscreen',$_REQUEST['fullscreen']);
+	$filterForm->addVar('groupid',$_REQUEST['groupid']);
+	$filterForm->addVar('hostid',$_REQUEST['hostid']);
 
 	$tr_select = new CComboBox('show_triggers',$show_triggers,'javasctipt: submit();');
 	if(TRIGGERS_OPTION_ONLYTRUE){
-		$tr_select->Additem(TRIGGERS_OPTION_ONLYTRUE,S_SHOW_ONLY_PROBLEMS);
+		$tr_select->additem(TRIGGERS_OPTION_ONLYTRUE,S_SHOW_ONLY_PROBLEMS);
 	}
 	
 	if(TRIGGERS_OPTION_ALL){
-		$tr_select->AddItem(TRIGGERS_OPTION_ALL,S_SHOW_ALL);
+		$tr_select->addItem(TRIGGERS_OPTION_ALL,S_SHOW_ALL);
 	}
 	
 	if(TRIGGERS_OPTION_NOFALSEFORB && $config['event_ack_enable']){
-		$tr_select->AddItem(TRIGGERS_OPTION_NOFALSEFORB,S_SHOW_NOFALSEFORB);
+		$tr_select->addItem(TRIGGERS_OPTION_NOFALSEFORB,S_SHOW_NOFALSEFORB);
 	}
 	
 	$ev_select = new CComboBox('show_events',$show_events,'javasctipt: submit();');
 	if(EVENTS_OPTION_NOEVENT){
-		$ev_select->AddItem(EVENTS_OPTION_NOEVENT,S_HIDE_ALL);
+		$ev_select->addItem(EVENTS_OPTION_NOEVENT,S_HIDE_ALL);
 	}
 	
 	if(EVENTS_OPTION_ALL){
-		$ev_select->AddItem(EVENTS_OPTION_ALL,S_SHOW_ALL.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
+		$ev_select->addItem(EVENTS_OPTION_ALL,S_SHOW_ALL.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
 	}
 	
 	if(EVENTS_OPTION_NOT_ACK && $config['event_ack_enable']){
-		$ev_select->AddItem(EVENTS_OPTION_NOT_ACK,S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
+		$ev_select->addItem(EVENTS_OPTION_NOT_ACK,S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
 	}
 	
 	if(EVENTS_OPTION_ONLYTRUE_NOTACK && $config['event_ack_enable']){
-		$ev_select->AddItem(EVENTS_OPTION_ONLYTRUE_NOTACK,S_SHOW_PROBLEM_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
+		$ev_select->addItem(EVENTS_OPTION_ONLYTRUE_NOTACK,S_SHOW_PROBLEM_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
 	}
 
 //------- JP -------
 	if($show_triggers==TRIGGERS_OPTION_NOFALSEFORB){
-		$ev_select->AddItem(EVENTS_OPTION_NOFALSEFORB,' - ','yes');
-		$ev_select->AddOption('disabled','disabled');
+		$ev_select->addItem(EVENTS_OPTION_NOFALSEFORB,' - ','yes');
+		$ev_select->addOption('disabled','disabled');
 		
 		$ev_status = new CComboBox('show_events_status',$show_events_status,'javascript: submit();');
 		$ev_status->addItem(EVENTS_NOFALSEFORB_STATUS_ALL, S_SHOW_ALL);
@@ -325,42 +325,42 @@ include_once 'include/page_header.php';
 	}
 //---
 
-	$filterForm->AddRow(S_TRIGGERS,$tr_select);
+	$filterForm->addRow(S_TRIGGERS,$tr_select);
 
 // JP
 	if($show_triggers==TRIGGERS_OPTION_NOFALSEFORB){
-		$filterForm->AddRow(S_STATUS,$ev_status);
+		$filterForm->addRow(S_STATUS,$ev_status);
 		$filterForm->addVar('show_events',$show_events);
 	}
 	else{
-		$filterForm->AddRow(S_EVENTS,$ev_select);
+		$filterForm->addRow(S_EVENTS,$ev_select);
 		$filterForm->addVar('show_events_status',$show_events_status);
 	}
 	
 	
 	$severity_select = new CComboBox('show_severity',$show_severity,'javasctipt: submit();');
-	$severity_select->AddItem(-1, S_ALL_S);
-	$severity_select->AddItem(TRIGGER_SEVERITY_NOT_CLASSIFIED, 	S_NOT_CLASSIFIED);
-	$severity_select->AddItem(TRIGGER_SEVERITY_INFORMATION,		S_INFORMATION);
-	$severity_select->AddItem(TRIGGER_SEVERITY_WARNING,			S_WARNING);
-	$severity_select->AddItem(TRIGGER_SEVERITY_AVERAGE,			S_AVERAGE);
-	$severity_select->AddItem(TRIGGER_SEVERITY_HIGH,			S_HIGH);
-	$severity_select->AddItem(TRIGGER_SEVERITY_DISASTER,		S_DISASTER);
+	$severity_select->addItem(-1, S_ALL_S);
+	$severity_select->addItem(TRIGGER_SEVERITY_NOT_CLASSIFIED, 	S_NOT_CLASSIFIED);
+	$severity_select->addItem(TRIGGER_SEVERITY_INFORMATION,		S_INFORMATION);
+	$severity_select->addItem(TRIGGER_SEVERITY_WARNING,			S_WARNING);
+	$severity_select->addItem(TRIGGER_SEVERITY_AVERAGE,			S_AVERAGE);
+	$severity_select->addItem(TRIGGER_SEVERITY_HIGH,			S_HIGH);
+	$severity_select->addItem(TRIGGER_SEVERITY_DISASTER,		S_DISASTER);
 
-	$filterForm->AddRow(S_MIN_SEVERITY,$severity_select);
+	$filterForm->addRow(S_MIN_SEVERITY,$severity_select);
 	
-	$filterForm->AddRow(S_SHOW_ACTIONS, new CCheckBox('show_actions',$_REQUEST['show_actions'],null,1));
-	$filterForm->AddRow(S_SHOW_DETAILS, new CCheckBox('show_details',$_REQUEST['show_details'],null,1));
+	$filterForm->addRow(S_SHOW_ACTIONS, new CCheckBox('show_actions',$_REQUEST['show_actions'],null,1));
+	$filterForm->addRow(S_SHOW_DETAILS, new CCheckBox('show_details',$_REQUEST['show_details'],null,1));
 	
-	$filterForm->AddRow(S_SELECT, new CTextBox('txt_select',$_REQUEST['txt_select'],40));
-	$filterForm->AddRow(S_INVERSE_SELECT, new CCheckBox('inverse_select',$_REQUEST['inverse_select'],null,1));
+	$filterForm->addRow(S_SELECT, new CTextBox('txt_select',$_REQUEST['txt_select'],40));
+	$filterForm->addRow(S_INVERSE_SELECT, new CCheckBox('inverse_select',$_REQUEST['inverse_select'],null,1));
 
 	$reset = new CButton('filter_rst',S_RESET);
 	$reset->SetType('button');
 	$reset->SetAction('javascript: var url = new Curl(location.href); url.setArgument("filter_rst",1); location.href = url.getUrl();');
 
-	$filterForm->AddItemToBottomRow(new CButton('filter_set',S_FILTER));
-	$filterForm->AddItemToBottomRow($reset);
+	$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
+	$filterForm->addItemToBottomRow($reset);
 
 	$p_elements[] = create_filter(S_FILTER,
 			array(),
@@ -536,27 +536,27 @@ include_once 'include/page_header.php';
 
 		if($_REQUEST['show_details']){
 			$font = new CTag('font','yes');
-			$font->AddOption('color','#000');
-			$font->AddOption('size','-2');
-			$font->AddItem(explode_exp($row['expression'],1));
+			$font->addOption('color','#000');
+			$font->addOption('size','-2');
+			$font->addItem(explode_exp($row['expression'],1));
 			$description = array($description,BR(), $font);
 		}
 // dependency		
 		$dependency = false;
 		$dep_table = new CTableInfo();
-		$dep_table->AddOption('style', 'width: 200px;');
+		$dep_table->addOption('style', 'width: 200px;');
 		$dep_table->addRow(bold(S_DEPENDS_ON.':'));
 		
 		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.$row['triggerid'];
 		$dep_res = DBselect($sql_dep);
 		while($dep_row = DBfetch($dep_res)){
-			$dep_table->AddRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_up']));
+			$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_up']));
 			$dependency = true;
 		}
 		
 		if($dependency){
 			$img = new Cimg('images/general/down_icon.png','DEP_DOWN');
-			$img->AddOption('style','vertical-align: middle; border: 0px;');
+			$img->addOption('style','vertical-align: middle; border: 0px;');
 			$img->SetHint($dep_table);
 			
 			$description = array($img,SPACE,$description);
@@ -571,13 +571,13 @@ include_once 'include/page_header.php';
 		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.$row['triggerid'];
 		$dep_res = DBselect($sql_dep);
 		while($dep_row = DBfetch($dep_res)){
-			$dep_table->AddRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_down']));
+			$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_down']));
 			$dependency = true;
 		}
 		
 		if($dependency){
 			$img = new Cimg('images/general/up_icon.png','DEP_UP');
-			$img->AddOption('style','vertical-align: middle; border: 0px;');
+			$img->addOption('style','vertical-align: middle; border: 0px;');
 			$img->SetHint($dep_table);
 			
 			$description = array($img,SPACE,$description);
@@ -587,7 +587,7 @@ include_once 'include/page_header.php';
 
 		if((time(NULL)-$row['lastchange'])<TRIGGER_BLINK_PERIOD){
 			$tr_status = new CLink(trigger_value2str($row['value']));
-			$tr_status->AddOption('name','blink');
+			$tr_status->addOption('name','blink');
 		}
 		else{
 			$tr_status = trigger_value2str($row['value']);
@@ -675,8 +675,8 @@ include_once 'include/page_header.php';
 					ZBX_FLAG_EVENT);
 
 			$font = new CTag('font','yes');
-			$font->AddOption('color','#808080');
-			$font->AddItem(array('&nbsp;-&nbsp;',$description));
+			$font->addOption('color','#808080');
+			$font->addItem(array('&nbsp;-&nbsp;',$description));
 			$description = $font;
 		
 			$description = new CCol($description);
@@ -705,7 +705,7 @@ include_once 'include/page_header.php';
 
 	$table->setFooter(new CCol(array(($config['event_ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE))));
 					
-	$m_form->AddItem($table);
+	$m_form->addItem($table);
 	unset($table);
 	
 	$p_elements[] = $m_form;

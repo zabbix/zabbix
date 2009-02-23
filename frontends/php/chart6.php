@@ -21,7 +21,6 @@
 <?php
 	require_once 'include/config.inc.php';
 	require_once 'include/graphs.inc.php';
-	require_once 'include/classes/cpie.inc.php';
 	
 	$page['file']	= 'chart6.php';
 	$page['title']	= "S_CHART";

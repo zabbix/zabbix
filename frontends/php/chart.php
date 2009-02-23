@@ -19,26 +19,25 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/classes/chart.inc.php";
+	require_once('include/config.inc.php');
 	
-	$page["file"]	= "chart.php";
-	$page["title"]	= "S_CHART";
-	$page["type"]	= PAGE_TYPE_IMAGE;
+	$page['file']	= 'chart.php';
+	$page['title']	= "S_CHART";
+	$page['type']	= PAGE_TYPE_IMAGE;
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"itemid"=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		null),
-		"period"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
-		"from"=>		array(T_ZBX_INT, O_OPT,	null,	'{}>=0',	null),
-		"width"=>		array(T_ZBX_INT, O_OPT,	null,	'{}>0',		null),
-		"height"=>		array(T_ZBX_INT, O_OPT,	null,	'{}>0',		null),
-		"border"=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
-		"stime"=>               array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null)
+		'itemid'=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		null),
+		'period'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
+		'from'=>		array(T_ZBX_INT, O_OPT,	null,	'{}>=0',	null),
+		'width'=>		array(T_ZBX_INT, O_OPT,	null,	'{}>0',		null),
+		'height'=>		array(T_ZBX_INT, O_OPT,	null,	'{}>0',		null),
+		'border'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+		'stime'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null)
 	);
 
 	check_fields($fields);
@@ -58,7 +57,7 @@ include_once "include/page_header.php";
 		access_deny();
 	}
 
-	$graph = new Chart();
+	$graph = new CChart();
 
 //	$_REQUEST['stime'] = get_request('stime',get_profile('web.item.graph.stime', null, PROFILE_TYPE_STR, $_REQUEST['itemid']));
 	$_REQUEST['period'] = get_request('period',get_profile('web.item.graph.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['itemid']));
@@ -80,12 +79,12 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST['border']))		$graph->SetBorder(0);
 	if(isset($_REQUEST['stime']))		$graph->setSTime($_REQUEST['stime']);
 	
-	$graph->AddItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_RIGHT, CALC_FNC_ALL);
+	$graph->addItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_RIGHT, CALC_FNC_ALL);
 
-	$graph->Draw();
+	$graph->draw();
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

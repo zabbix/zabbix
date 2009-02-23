@@ -332,7 +332,7 @@ include_once 'include/page_header.php';
 			get_profile('web.charts.hats.hat_charts.state',1)
 	);
 
-	$charts_hat->Show();
+	$charts_hat->show();
 	
 	if($_REQUEST['graphid'] > 0){
 // NAV BAR

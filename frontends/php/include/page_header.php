@@ -286,7 +286,7 @@ COpt::profiling_start("page");
 			$show_menu &= ($menu['user_type'] <= $USER_DETAILS['type']);
 		}
 
-		if(isset($menu['node_perm'])){
+		if(isset($menu['node_perm']) && isset($DB['DB']) && !is_null($DB['DB'])){
 			$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,$menu['node_perm']);
 			$show_menu &= (0 < count($available_nodes));
 		}
@@ -309,7 +309,7 @@ COpt::profiling_start("page");
 				$show_sub_menu = false;
 			}
 
-			if(isset($sub_pages['node_perm'])){
+			if(isset($sub_pages['node_perm']) && isset($DB['DB']) && !is_null($DB['DB'])){
 				$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,$sub_page['node_perm']);				
 				if(0 == count($available_nodes)){
 					$show_sub_menu = false;
@@ -582,6 +582,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		
 		$page_menu->show();
 	}
+
 //------------------------------------- <HISTORY> ---------------------------------------
 	if(isset($page['hist_arg']) && ($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
 		$table = new CTable();
@@ -622,6 +623,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		}
 		unset($tmezone);
 	}
-	
+
 	show_messages();
 ?>

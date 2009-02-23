@@ -20,7 +20,6 @@
 ?>
 <?php
 	require_once ('include/config.inc.php');
-	require_once ('include/classes/cbar.inc.php');
 	require_once ('include/reports.inc.php');
 
 	$page['title']	= "S_BAR_REPORTS";
