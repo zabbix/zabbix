@@ -19,15 +19,14 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/graphs.inc.php';
-	require_once 'include/classes/chart.inc.php';
+	require_once('include/config.inc.php');
+	require_once('include/graphs.inc.php');
 	
 	$page['file']	= 'chart2.php';
 	$page['title']	= 'S_CHART';
 	$page['type']	= PAGE_TYPE_IMAGE;
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -73,7 +72,7 @@ include_once 'include/page_header.php';
 					
 	$db_data = DBfetch(DBselect($sql));
 	
-	$graph = new Chart($db_data['graphtype']);
+	$graph = new CChart($db_data['graphtype']);
 
 	$chart_header = '';
 	if(id2nodeid($db_data['hostid']) != get_current_nodeid()){
@@ -94,21 +93,21 @@ include_once 'include/page_header.php';
 	$height = get_request('height', 0);
 	if($height <= 0) $height = $db_data['height'];
 
-	$graph->ShowWorkPeriod($db_data['show_work_period']);
-	$graph->ShowTriggers($db_data['show_triggers']);
+	$graph->showWorkPeriod($db_data['show_work_period']);
+	$graph->showTriggers($db_data['show_triggers']);
 
-	$graph->SetWidth($width);
-	$graph->SetHeight($height);
+	$graph->setWidth($width);
+	$graph->setHeight($height);
 
 
-	$graph->SetYMinAxisType($db_data['ymin_type']);
-	$graph->SetYMaxAxisType($db_data['ymax_type']);
+	$graph->setYMinAxisType($db_data['ymin_type']);
+	$graph->setYMaxAxisType($db_data['ymax_type']);
 
-	$graph->SetYAxisMin($db_data['yaxismin']);
-	$graph->SetYAxisMax($db_data['yaxismax']);
+	$graph->setYAxisMin($db_data['yaxismin']);
+	$graph->setYAxisMax($db_data['yaxismax']);
 	
-	$graph->SetYMinItemId($db_data['ymin_itemid']);
-	$graph->SetYMaxItemId($db_data['ymax_itemid']);
+	$graph->setYMinItemId($db_data['ymin_itemid']);
+	$graph->setYMaxItemId($db_data['ymax_itemid']);
 
 	$graph->setLeftPercentage($db_data['percent_left']);
 	$graph->setRightPercentage($db_data['percent_right']);
@@ -119,7 +118,7 @@ include_once 'include/page_header.php';
 		' ORDER BY gi.sortorder, gi.itemid DESC');
 
 	while($db_data=DBfetch($result)){
-		$graph->AddItem(
+		$graph->addItem(
 			$db_data['itemid'],
 			$db_data['yaxisside'],
 			$db_data['calc_fnc'],
@@ -133,6 +132,6 @@ include_once 'include/page_header.php';
 ?>
 <?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>

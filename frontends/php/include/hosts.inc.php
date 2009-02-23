@@ -1161,7 +1161,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	}
 	else if(($def_options['select_first_host']) || 
 			($def_options['select_first_host_if_empty'] && ($_REQUEST['hostid'] == -1)) || 
-			($def_options['select_host_on_group_switch'] && (bccomp($_REQUEST['hostid'],$result['selected']) != 0)))
+			($def_options['select_host_on_group_switch'] && ($_REQUEST['hostid'] != -1) && (bccomp($_REQUEST['hostid'],$result['selected']) != 0)))
 	{
 		$first_hostid = next($hostids);
 		reset($hostids);
@@ -1175,6 +1175,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	else{
 		if(ZBX_DROPDOWN_FIRST_REMEMBER){
 			if($_REQUEST['hostid'] == -1) $_REQUEST['hostid'] = get_profile('web.'.$page['menu'].'.hostid', '0', PROFILE_TYPE_ID);
+
 			if(uint_in_array($_REQUEST['hostid'], $hostids)){
 				$result['selected'] = $_REQUEST['hostid'];
 			}

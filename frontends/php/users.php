@@ -24,7 +24,6 @@
 	require_once('include/media.inc.php');
 	require_once('include/users.inc.php');
 	require_once('include/forms.inc.php');
-	require_once('include/classes/curl.inc.php');
 	require_once('include/js.inc.php');
 
 	$page['title'] = 'S_USERS';

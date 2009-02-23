@@ -112,6 +112,8 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 
 	if(profile_type($type,'unknown')) $type = profile_type_by_value($value);
 	else $value = profile_value_by_type($value,$type);
+	
+//if($idx == 'web.view.hostid') SDI('PROF: '.value);
 
 	if($value === false) return false;
 
@@ -313,7 +315,7 @@ function profile_value_by_type(&$value,$type){
 	else{
 		switch($type){	
 			case PROFILE_TYPE_ID:
-				$result = ctype_digit($value);
+				$result = ctype_digit($value)?$value:false;
 				break;
 			case PROFILE_TYPE_INT:
 				$result = zbx_numeric($value)?$value:false;

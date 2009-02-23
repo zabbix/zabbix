@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/triggers.inc.php";
+	require_once 'include/config.inc.php';
+	require_once 'include/triggers.inc.php';
 
-	$page["file"]	= "chart4.php";
-	$page["title"]	= "S_CHART";
-	$page["type"]	= PAGE_TYPE_IMAGE;
+	$page['file']	= 'chart4.php';
+	$page['title']	= "S_CHART";
+	$page['type']	= PAGE_TYPE_IMAGE;
 
-include_once "include/page_header.php";
+include_once 'include/page_header.php';
 
 ?>
 <?php
@@ -93,7 +93,7 @@ include_once "include/page_header.php";
 
 	$str = expand_trigger_description_by_data($db_data);
 
-	$str = $str." (year ".date("Y").")";
+	$str = $str.' (year '.date('Y').')';
 	$x = imagesx($im)/2-imagefontwidth(4)*strlen($str)/2;
 	imagestring($im, 4,$x,1, $str , $darkred);
 
@@ -104,10 +104,10 @@ include_once "include/page_header.php";
 	$false = array();
 	$unknown = array();
 
-	$year=date("Y");
+	$year=date('Y');
 	$start=mktime(0,0,0,1,1,$year);
 
-	$wday=date("w",$start);
+	$wday=date('w',$start);
 	if($wday==0) $wday=7;
 	$start=$start-($wday-1)*24*3600;
 	
@@ -133,7 +133,7 @@ include_once "include/page_header.php";
 	for($i=0;$i<=$sizeX;$i+=$sizeX/52){
 		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
 		$period_start=$start+7*24*3600*$j;
-		imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date("d.M",$period_start) , $black);
+		imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date('d.M',$period_start) , $black);
 		$j++;
 	}
 
@@ -171,26 +171,26 @@ include_once "include/page_header.php";
 
 	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,imagecolorallocate($im,120,235,120));
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,$black);
-	imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*0+35, "FALSE (%)", $black);
+	imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*0+35, 'FALSE (%)', $black);
 
 	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+35+9+15*1,imagecolorallocate($im,235,120,120));
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+35*1,$black);
-	imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+35, "TRUE (%)", $black);
+	imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+35, 'TRUE (%)', $black);
 
 	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,imagecolorallocate($im,220,220,220));
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,$black);
-	imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*2+35, "UNKNOWN (%)", $black);
+	imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*2+35, 'UNKNOWN (%)', $black);
 
-	imagestringup($im,0,imagesx($im)-10,imagesy($im)-50, "http://www.zabbix.com", $gray);
+	imagestringup($im,0,imagesx($im)-10,imagesy($im)-50, 'http://www.zabbix.com', $gray);
 
 	$end_time=time(NULL);
-	imagestring($im, 0,imagesx($im)-100,imagesy($im)-12,"Generated in ".($end_time-$start_time)." sec", $gray);
+	imagestring($im, 0,imagesx($im)-100,imagesy($im)-12,'Generated in '.($end_time-$start_time).' sec', $gray);
 
 	ImageOut($im); 
 	imagedestroy($im); 
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once 'include/page_footer.php';
 
 ?>

@@ -22,6 +22,7 @@
 
 	include_once "include/config.inc.php";
 	include_once "include/services.inc.php";
+	include_once "include/triggers.inc.php";
 	
 	$page["title"] = "S_IT_SERVICES";
 	$page["file"] = "services_form.php";
@@ -480,17 +481,17 @@ if(isset($_REQUEST['sform'])){
 
 	$table = new CTable();
 	
-	$table->SetClass('tableinfo');
-	$table->oddRowClass = 'even_row';
-	$table->evenRowClass = 'even_row';
+	$table->setClass('tableinfo');
+	$table->setOddRowClass('even_row');
+	$table->setEvenRowClass('even_row');
 	$table->options['cellpadding'] = 3;
 	$table->options['cellspacing'] = 1;
 	$table->headerClass = 'header';
 	$table->footerClass = 'footer';
 	
-	$table->SetHeader(array(new CCheckBox('all_child_services',null,"check_childs('".$frmService->GetName()."','childs','all_child_services');"),S_SERVICES,S_SOFT,S_TRIGGER));
+	$table->setHeader(array(new CCheckBox('all_child_services',null,"check_childs('".$frmService->GetName()."','childs','all_child_services');"),S_SERVICES,S_SOFT,S_TRIGGER));
 
-	$table->AddOption('id','service_childs');
+	$table->addOption('id','service_childs');
 
 	foreach($childs as $id => $child){
 		$prefix	 = null;

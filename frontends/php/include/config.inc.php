@@ -17,10 +17,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-//ini_set('precision', 22);function SDI($msg="SDI") { echo "DEBUG INFO: "; var_dump($msg); echo SBR; } // DEBUG INFO!!!
-function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
-function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
-
+function SDI($msg='SDI') { echo 'DEBUG INFO: '; var_dump($msg); echo SBR; } // DEBUG INFO!!!
+function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
+function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
+function __autoload($class_name) { require_once('include/classes/class.'.$class_name.'.php'); }
 ?>
 <?php
 	require_once('include/defines.inc.php');
@@ -30,6 +30,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	require_once('include/profiles.inc.php');
 	require_once('conf/maintenance.inc.php');
 
+	require_once('include/hosts.inc.php');
+	
 // GLOBALS
 	global $USER_DETAILS, $USER_RIGHTS;
 
@@ -37,52 +39,16 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	$USER_RIGHTS	= array();
 // END OF GLOBALS
 
-// Include Classes
-	require_once('include/classes/ctag.inc.php');
-	require_once('include/classes/cvar.inc.php');
-	require_once('include/classes/cspan.inc.php');
-	require_once('include/classes/cimg.inc.php');
-	require_once('include/classes/ccolor.inc.php');
-	require_once('include/classes/cldap.inc.php');
-	require_once('include/classes/clink.inc.php');
-	require_once('include/classes/chelp.inc.php');
-	require_once('include/classes/cbutton.inc.php');
-	require_once('include/classes/clist.inc.php');
-	require_once('include/classes/ccombobox.inc.php');
-	require_once('include/classes/ctable.inc.php');
-	require_once('include/classes/ctableinfo.inc.php');
-	require_once('include/classes/ctextarea.inc.php');
-	require_once('include/classes/ctextbox.inc.php');
-	require_once('include/classes/cform.inc.php');
-	require_once('include/classes/cfile.inc.php');
-	require_once('include/classes/ccheckbox.inc.php');
-	require_once('include/classes/cform.inc.php');
-	require_once('include/classes/cformtable.inc.php');
-	require_once('include/classes/chatformtable.inc.php');
-	require_once('include/classes/cmap.inc.php');
-	require_once('include/classes/cflash.inc.php');
-	require_once('include/classes/ciframe.inc.php');
-	require_once('include/classes/cpumenu.inc.php');
-	require_once('include/classes/graph.inc.php');
-	require_once('include/classes/cscript.inc.php');
-	require_once('include/classes/curl.inc.php');
-
 // Include Tactical Overview modules
-
-	require_once 	'include/locales.inc.php';
-
-	include_once('include/classes/chostsinfo.mod.php');
-	include_once('include/classes/ctriggerinfo.mod.php');
-	include_once('include/classes/cserverinfo.mod.php');
-	include_once('include/classes/cflashclock.mod.php');
-
-	require_once 	'include/perm.inc.php';
-	require_once 	'include/audit.inc.php';
-	require_once 	'include/js.inc.php';
+	require_once('include/locales.inc.php');
+	
+	require_once('include/perm.inc.php');
+	require_once('include/audit.inc.php');
+	require_once('include/js.inc.php');
 
 // Include Validation
 
-	require_once 	'include/validate.inc.php';
+	require_once('include/validate.inc.php');
 
 	function zbx_err_handler($errno, $errstr, $errfile, $errline){
 		error($errstr.'['.$errfile.':'.$errline.']');
