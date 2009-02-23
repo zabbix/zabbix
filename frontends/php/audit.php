@@ -263,6 +263,7 @@ include_once 'include/page_header.php';
 
 	$filterForm->addVar('filter_timesince',($_REQUEST['filter_timesince']>0)?$_REQUEST['filter_timesince']:'');
 	$filterForm->addVar('filter_timetill',($_REQUEST['filter_timetill']>0)?$_REQUEST['filter_timetill']:'');
+	$filterForm->addVar('config',$_REQUEST['config']);
 
 	$filterForm->addVar('userid',$_REQUEST['userid']);
 
