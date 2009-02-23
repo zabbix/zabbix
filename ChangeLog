@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTD-78] fixed number of problems for "No false for B" on maps (Artem)
  - [NTD-81] added rule to prioritize deny rule (Artem)
  - [NTD-68] fixed possible agent crash when processing eventlog[] (Sasha)
  - [ZBX-615] fixed processing of four-character-long item keys (Dmitry)
