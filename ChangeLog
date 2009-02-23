@@ -24,6 +24,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-732] fixed wrong action count in audit log (Vedmak)
  - [ZBX-731] fixed resetting of web graph periods (Vedmak)
  - [ZBX-730] fixed possible Windows agent crash when processing eventlog[] (Sasha)
  - [ZBX-555] added entity counts on interfaces (Vedmak)
