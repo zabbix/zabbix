@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-734] fixed evaluation of {ITEM.LASTVALUE} if the trigger expression consists of several items (Sasha)
  - [ZBX-732] fixed wrong action count in audit log (Vedmak)
  - [ZBX-731] fixed resetting of web graph periods (Vedmak)
  - [ZBX-730] fixed possible Windows agent crash when processing eventlog[] (Sasha)
