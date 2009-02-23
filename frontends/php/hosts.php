@@ -1985,7 +1985,13 @@ include_once('include/page_header.php');
 			$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 			$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 			
-			show_table_header(S_MAINTENANCE_PERIODS, $form);
+			$numrows = new CSpan(null,'info');
+			$numrows->addOption('name','numrows');
+			$header = get_table_header(array(S_MAINTENANCE_PERIODS,
+							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+							S_FOUND.': ',$numrows,)
+							);							
+			show_table_header($header, $form);
 // ----
 			$available_maintenances = get_accessible_maintenance_by_user(PERM_READ_WRITE);
 
@@ -2053,6 +2059,7 @@ include_once('include/page_header.php');
 					$mnt_status,
 					$maintenance['description']
 					));
+				$row_count++;
 			}
 //			$table->SetFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_USERS_Q)));
 			
