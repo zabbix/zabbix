@@ -207,7 +207,7 @@ include_once "include/page_header.php";
 	}
 	else if(1 == $config){
 		$table = get_history_of_actions($_REQUEST["start"], PAGE_SIZE, $sql_cond);
-				
+		$row_count = $table->GetNumRows();		
 		$numrows = new CSpan(null,'info');
 		$numrows->addOption('name','numrows');	
 		$header = get_table_header(array(S_AUDIT_ACTIONS,
