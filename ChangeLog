@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-730] fixed possible Windows agent crash when processing eventlog[] (Sasha)
  - [ZBX-555] added entity counts on interfaces (Vedmak)
  - [ZBX-724] improved queries in "Graphs" page (Artem)
  - [ZBX-725] added new default user group "Disabled" (Vedmak)
