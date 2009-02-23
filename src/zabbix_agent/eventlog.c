@@ -125,6 +125,7 @@ static long    zbx_get_eventlog_message(
 	*out_message	= NULL;
 	*out_severity	= 0;
 	*out_timestamp	= 0;
+	memset(aInsertStrs, 0, sizeof(aInsertStrs));
 
 	if (!eventlog_handle)        return(0);
 
@@ -202,8 +203,7 @@ static long    zbx_get_eventlog_message(
 
 			if (ExpandEnvironmentStrings(pFile, MsgDll, MAX_PATH))
 			{
-				hLib = LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE);
-				if(hLib)
+				if (NULL != (hLib = LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE)))
 				{
 					/* Format the message from the message DLL with the insert strings */
 					FormatMessage(
@@ -215,7 +215,7 @@ static long    zbx_get_eventlog_message(
 						pELR->EventID,                      /* message ID */
 						MAKELANGID(LANG_NEUTRAL, SUBLANG_ENGLISH_US),	/* language ID */
 						(LPTSTR) &msgBuf,                   /* address of pointer to buffer for message */
-						MAX_MSG_LENGTH,                     /* maximum size of the message buffer */
+						0,
 						aInsertStrs);                       /* array of insert strings for the message */
 
 					if(msgBuf)
