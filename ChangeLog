@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-731] fixed resetting of web graph periods (Vedmak)
  - [ZBX-730] fixed possible Windows agent crash when processing eventlog[] (Sasha)
  - [ZBX-555] added entity counts on interfaces (Vedmak)
  - [ZBX-724] improved queries in "Graphs" page (Artem)

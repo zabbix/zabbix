@@ -215,19 +215,23 @@ include_once "include/page_header.php";
 	$table->Show();
 
 	echo SBR;
-
+	
+	if( isset($_REQUEST['period']) && $_REQUEST['period'] != ZBX_MIN_PERIOD ) {
+		update_profile('web.httptest.period', $_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['httptestid']);
+	}
+	$_REQUEST['period'] = get_profile('web.httptest.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['httptestid']);
+				
 	show_table_header(array(S_HISTORY.' "',
 						bold($httptest_data['name']),
 						'"')
 					);
 	$form = new CTableInfo();
 	$form->AddOption('id','graph');
-	
 	$form->AddRow(array(bold(S_SPEED) , new CCol(
 		get_dynamic_chart('graph_1','chart3.php?'.url_param('period').url_param('from').
 			url_param($httptest_data['name'], false,'name').
 			url_param(150, false,'height').
-			url_param($_REQUEST['stime'], false,'stime').
+			url_param(get_request('stime',0), false,'stime').
 			url_param($items[HTTPSTEP_ITEM_TYPE_IN], false, 'items').
 			url_param(GRAPH_TYPE_STACKED, false, 'graphtype'),'-128')
 		, 'center')));
@@ -236,7 +240,7 @@ include_once "include/page_header.php";
 		get_dynamic_chart('graph_2','chart3.php?'.url_param('period').url_param('from').
 			url_param($httptest_data['name'], false,'name').
 			url_param(150, false,'height').
-			url_param($_REQUEST['stime'], false,'stime').
+			url_param(get_request('stime',0), false,'stime').
 			url_param($items[HTTPSTEP_ITEM_TYPE_TIME], false, 'items').
 			url_param(GRAPH_TYPE_STACKED, false, 'graphtype'),'-128')
 		,'center')));

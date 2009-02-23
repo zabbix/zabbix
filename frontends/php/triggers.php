@@ -237,7 +237,7 @@
 			if(0 == $_REQUEST['copy_type']){ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
 			}
-			else{ /* groups */
+			else{ /* groups */ 
 				$hosts_ids = array();
 				$group_ids = $_REQUEST['copy_targetid'];
 
@@ -578,8 +578,8 @@
 		$form->AddItem($table);
 		$form->Show();
 	}
-	
-	zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+	if(isset($row_count))
+		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 
 ?>
 
