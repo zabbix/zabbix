@@ -578,7 +578,8 @@ include_once 'include/page_header.php';
 		$form->AddItem($tblActions);
 		$form->Show();
 	}
-	zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+	if(isset($row_count))
+		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 
 ?>
 <?php

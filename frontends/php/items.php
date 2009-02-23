@@ -1019,7 +1019,8 @@ include_once 'include/page_header.php';
 			insert_item_form();
 		}
 	}
-	zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+	if(isset($row_count))
+		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 ?>
 <?php
 
