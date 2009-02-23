@@ -1179,20 +1179,22 @@
 			$description = str_replace("{HOSTNAME}", $row["host"],$description);
 
 			if(zbx_strstr($description,"{ITEM.LASTVALUE}")){
-				$row2=DBfetch(DBselect('SELECT i.lastvalue, i.value_type, i.itemid '.
-										' FROM items i, triggers t, functions f '.
-										' WHERE i.itemid=f.itemid '.
-											' AND f.triggerid=t.triggerid '.
-											' AND t.triggerid='.$row['triggerid']));
+				$functionid=trigger_get_N_functionid($row["expression"], 1);
+				if (isset($functionid)){
+					$row2=DBfetch(DBselect('SELECT i.lastvalue, i.value_type, i.itemid '.
+									' FROM items i, functions f '.
+									' WHERE i.itemid=f.itemid '.
+										' AND f.functionid='.$functionid));
 
-				if($row2['value_type']!=ITEM_VALUE_TYPE_LOG){
-					$description = str_replace('{ITEM.LASTVALUE}', $row2['lastvalue'],$description);
-				}
-				else{
-					$row3=DBfetch(DBselect("select max(clock) as max from history_log where itemid=".$row2["itemid"]));
-					if($row3 && !is_null($row3["max"])){
-						$row4=DBfetch(DBselect("select value from history_log where itemid=".$row2["itemid"]." and clock=".$row3["max"]));
-						$description = str_replace("{ITEM.LASTVALUE}", $row4["value"],$description);
+					if($row2['value_type']!=ITEM_VALUE_TYPE_LOG){
+						$description = str_replace('{ITEM.LASTVALUE}', $row2['lastvalue'],$description);
+					}
+					else{
+						$row3=DBfetch(DBselect("select max(clock) as max from history_log where itemid=".$row2["itemid"]));
+						if($row3 && !is_null($row3["max"])){
+							$row4=DBfetch(DBselect("select value from history_log where itemid=".$row2["itemid"]." and clock=".$row3["max"]));
+							$description = str_replace("{ITEM.LASTVALUE}", $row4["value"],$description);
+						}
 					}
 				}
 			}
