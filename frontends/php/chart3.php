@@ -19,15 +19,14 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/graphs.inc.php';
-	require_once 'include/classes/chart.inc.php';
+	require_once('include/config.inc.php');
+	require_once('include/graphs.inc.php');
 	
 	$page['file']	= 'chart3.php';
 	$page['title']	= 'S_CHART';
 	$page['type']	= PAGE_TYPE_IMAGE;
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -75,7 +74,7 @@ include_once 'include/page_header.php';
 		}
 	}
 	
-	$graph = new Chart(get_request('graphtype'	,GRAPH_TYPE_NORMAL));
+	$graph = new CChart(get_request('graphtype'	,GRAPH_TYPE_NORMAL));
 
 	$chart_header = '';
 	if(id2nodeid($host['hostid']) != get_current_nodeid()){
@@ -87,31 +86,31 @@ include_once 'include/page_header.php';
 
 	unset($host);
 
-	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
-	if(isset($_REQUEST['from']))		$graph->SetFrom($_REQUEST['from']);
-	if(isset($_REQUEST['stime']))		$graph->SetSTime($_REQUEST['stime']);
-	if(isset($_REQUEST['border']))		$graph->SetBorder(0);
+	if(isset($_REQUEST['period']))		$graph->setPeriod($_REQUEST['period']);
+	if(isset($_REQUEST['from']))		$graph->setFrom($_REQUEST['from']);
+	if(isset($_REQUEST['stime']))		$graph->setSTime($_REQUEST['stime']);
+	if(isset($_REQUEST['border']))		$graph->etBorder(0);
 
-	$graph->SetWidth(get_request('width',		900));
-	$graph->SetHeight(get_request('height',		200));
+	$graph->setWidth(get_request('width',		900));
+	$graph->setHeight(get_request('height',		200));
 
-	$graph->ShowWorkPeriod(get_request('showworkperiod'	,1));
-	$graph->ShowTriggers(get_request('showtriggers'		,1));
+	$graph->showWorkPeriod(get_request('showworkperiod'	,1));
+	$graph->showTriggers(get_request('showtriggers'		,1));
 	
-	$graph->SetYMinAxisType(get_request('ymin_type'		,GRAPH_YAXIS_TYPE_CALCULATED));
-	$graph->SetYMaxAxisType(get_request('ymax_type'		,GRAPH_YAXIS_TYPE_CALCULATED));
+	$graph->setYMinAxisType(get_request('ymin_type'		,GRAPH_YAXIS_TYPE_CALCULATED));
+	$graph->setYMaxAxisType(get_request('ymax_type'		,GRAPH_YAXIS_TYPE_CALCULATED));
 	
-	$graph->SetYAxisMin(get_request('yaxismin'		,0.00));
-	$graph->SetYAxisMax(get_request('yaxismax'		,100.00));
+	$graph->setYAxisMin(get_request('yaxismin'		,0.00));
+	$graph->setYAxisMax(get_request('yaxismax'		,100.00));
 	
-	$graph->SetYMinItemId(get_request('ymin_itemid'		,0));
-	$graph->SetYMaxItemId(get_request('ymax_itemid'		,0));
+	$graph->setYMinItemId(get_request('ymin_itemid'		,0));
+	$graph->setYMaxItemId(get_request('ymax_itemid'		,0));
 
 	$graph->setLeftPercentage(get_request('percent_left',0));
 	$graph->setRightPercentage(get_request('percent_right',0));
 
 	foreach($items as $id => $gitem){
-		$graph->AddItem(
+		$graph->addItem(
 			$gitem['itemid'],
 			$gitem['yaxisside'],
 			$gitem['calc_fnc'],
@@ -123,10 +122,10 @@ include_once 'include/page_header.php';
 
 		unset($items[$id]);
 	}
-	$graph->Draw();
+	$graph->draw();
 ?>
 <?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>

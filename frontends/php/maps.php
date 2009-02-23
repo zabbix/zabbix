@@ -20,6 +20,7 @@
 ?>
 <?php
 	require_once('include/config.inc.php');
+	require_once('include/maps.inc.php');
 	
 	$page['title'] = "S_NETWORK_MAPS";
 	$page['file'] = 'maps.php';
