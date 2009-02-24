@@ -169,7 +169,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
 	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
-	
+
 	$scripts_by_hosts = get_accessible_scripts_by_hosts(explode(',',$availiable_hosts));
 
 	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i, functions f, triggers t ".

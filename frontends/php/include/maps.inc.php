@@ -413,22 +413,31 @@
 			SYSMAP_ELEMENT_TYPE_TRIGGER => 'select distinct t.triggerid, t.priority, t.value, t.description, t.expression, h.host '.
 				' from triggers t, items i, functions f, hosts h '.
 				' where t.triggerid='.$element['elementid'].
-					' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid '.
-					' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE,
+					' and h.hostid=i.hostid '.
+					' and i.itemid=f.itemid '.
+					' and f.triggerid=t.triggerid '.
+					' and h.status='.HOST_STATUS_MONITORED.
+					' and i.status='.ITEM_STATUS_ACTIVE,
 			SYSMAP_ELEMENT_TYPE_HOST_GROUP => 'select distinct t.triggerid, t.priority, t.value,'.
 					' t.description, t.expression, h.host, g.name as el_name '.
 				' from items i,functions f,triggers t,hosts h,hosts_groups hg,groups g '.
 				' where h.hostid=i.hostid and hg.groupid=g.groupid and g.groupid='.$element['elementid'].
-					' and hg.hostid=h.hostid and i.itemid=f.itemid'.
-					' and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
-					' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE,
+					' and hg.hostid=h.hostid'.
+					' and i.itemid=f.itemid'.
+					' and f.triggerid=t.triggerid'.
+					' and t.status='.TRIGGER_STATUS_ENABLED.
+					' and h.status='.HOST_STATUS_MONITORED.
+					' and i.status='.ITEM_STATUS_ACTIVE,
 			SYSMAP_ELEMENT_TYPE_HOST => 'select distinct t.triggerid, t.priority, t.value, '.
 					' t.description, t.expression, h.host, h.host as el_name, h.maintenanceid, h.maintenance_status '.
 				' from items i,functions f,triggers t,hosts h '.
 				' where h.hostid=i.hostid '.
-					' and i.hostid='.$element['elementid'].' and i.itemid=f.itemid '.
-					' and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
-					' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE
+					' and i.hostid='.$element['elementid'].
+					' and i.itemid=f.itemid '.
+					' and f.triggerid=t.triggerid '.
+					' and t.status='.TRIGGER_STATUS_ENABLED.
+					' and h.status='.HOST_STATUS_MONITORED.
+					' and i.status='.ITEM_STATUS_ACTIVE
 			);
 		if( isset($sql[$el_type]) )
 		{
@@ -450,7 +459,7 @@
 				}
 
 				do {
-					if(isset($_REQUEST['show_triggers']) && (TRIGGERS_OPTION_NOFALSEFORB == $_REQUEST['show_triggers'])){
+					if(isset($_REQUEST['show_triggers']) && (TRIGGERS_OPTION_NOFALSEFORB == $_REQUEST['show_triggers'])){								
 						$event_sql = 'SELECT e.eventid, e.value, e.clock, e.ms, e.objectid as triggerid, e.acknowledged, t.type '.
 							' FROM events e, triggers t '.
 							' WHERE e.object=0 AND e.objectid='.$trigger['triggerid'].
@@ -458,9 +467,11 @@
 								' AND e.acknowledged=0 '.
 								' AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))'.
 							' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
-		
-						if($trigger_tmp = get_row_for_nofalseforb($trigger,$event_sql))
-							$trigger = $trigger_tmp;
+						if($trigger_tmp = get_row_for_nofalseforb($trigger,$event_sql)){
+//							$trigger = array_merge($trigger,$trigger_tmp);
+							$trigger['value'] = TRIGGER_VALUE_TRUE;
+						}
+
 					}
 					
 					$type	=& $trigger['value'];
