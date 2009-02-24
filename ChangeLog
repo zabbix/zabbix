@@ -24,7 +24,10 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
- - [ZBX-735] fixed filter in audit filtering only logs (Vedmak)
+ - [ZBX-728] fixed displaying "no status update" error for template triggers (Vedmak) 
+ - [ZBX-738] fixed processing of existing data when -n parameter is used for zabbix_server (Sasha) 
+ - [ZBX-736] fixed "Undefined index error" during frontend installation (Vedmak) 
+ - [ZBX-735] fixed filter in audit filtering only logs (Vedmak)  
  - [ZBX-734] fixed evaluation of {ITEM.LASTVALUE} if the trigger expression consists of several items (Sasha) 
  - [ZBX-732] fixed wrong action count in audit log (Vedmak) 
  - [ZBX-731] fixed resetting of web graph periods (Vedmak) 

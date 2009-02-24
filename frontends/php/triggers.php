@@ -476,7 +476,7 @@
 		if($PAGE_HOSTS['selected'] > 0)
 			$sql_where.= ' AND h.hostid='.$PAGE_HOSTS['selected'];
 	
-		$sql = 'SELECT DISTINCT h.hostid,h.host,t.*'.
+		$sql = 'SELECT DISTINCT h.hostid,h.host,h.status as hoststatus,t.*'.
 			' FROM triggers t '.
 				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
 				' LEFT JOIN items i ON f.itemid=i.itemid '.
@@ -517,8 +517,8 @@
 				foreach($deps as $val)
 					$description[] = array(BR(),expand_trigger_description($val));
 			}
-
-			if ($row['error'] != '')
+			
+			if ( ($row['error'] != '') && ($row['hoststatus'] != 3) ) //host status 3 means Template
 			{
 				$description[] = array(BR(), bold(S_ERROR.':'), SPACE);
 				$description[] = array(BR(), new CSpan($row['error'], 'red'));
