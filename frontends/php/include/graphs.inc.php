@@ -890,10 +890,10 @@
 	{
 		$fontSize = 6;
 // unix
-		$ttf = "/usr/share/fonts/ja/TrueType/kochi-gothic-subst.ttf";
+//		$ttf = "/usr/share/fonts/ja/TrueType/kochi-gothic-subst.ttf";
 
 // win
-//		$ttf = "c:\windows\Fonts\kochi-gothic-subst.ttf";
+		$ttf = "c:\windows\Fonts\kochi-gothic-subst.ttf";
 
 		switch ($font){
 			case 0: $fontSize = 6; break;

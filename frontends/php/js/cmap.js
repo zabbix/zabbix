@@ -936,7 +936,7 @@ show_element_menu: function(e){
 
 //					var value_action = "javascript: this.disabled=true; ZBX_SYSMAPS["+this.id+"].map.update_element_option("+id+",'"+form_key+"',this.value);";
 					var value_action = "javascript: this.disabled=true; ZBX_SYSMAPS["+this.id+"].map.update_element_option("+id+",[{'key':'"+form_key+"','value': this.value}]);";
-					value_action = '<input type="text" value="'+values['key']+'" onmouseover="javascript: this.focus();" onchange="'+value_action+'" class="biginput" />';
+					value_action = '<input type="text" value="'+values['key']+'" onmouseover="javascript: this.focus();" onchange="'+value_action+'" class="biginput"  size="45" />';
 					value_action += ' <span class="pointer" onclick="javascript: this.innerHTML=\'Changed\';">Change</span>';
 					sub_menu.push([value_action,null,function(){return false;},{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}]);
 				}
@@ -946,7 +946,7 @@ show_element_menu: function(e){
 		el_menu.push(sub_menu);
 	}
 	
-	show_popup_menu(e,el_menu,280);// JavaScript Document
+	show_popup_menu(e,el_menu,320);// JavaScript Document
 },
 
 show_link_menu: function(e){
