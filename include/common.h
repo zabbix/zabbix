@@ -313,7 +313,8 @@ typedef enum
 	SYSMAP_ELEMENT_TYPE_HOST = 0,
 	SYSMAP_ELEMENT_TYPE_MAP,
 	SYSMAP_ELEMENT_TYPE_TRIGGER,
-	SYSMAP_ELEMENT_TYPE_HOST_GROUP
+	SYSMAP_ELEMENT_TYPE_HOST_GROUP,
+	SYSMAP_ELEMENT_TYPE_IMAGE
 } zbx_sysmap_element_types_t;
 
 /* Special item key used for storing server status */

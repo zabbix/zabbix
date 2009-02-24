@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-738] fixed processing of existing data when -n parameter is used for zabbix_server (Sasha)
  - [ZBX-736] fixed "Undefined index error" during frontend installation (Vedmak)
  - [ZBX-735] fixed filter in audit filtering only logs (Vedmak) 
  - [ZBX-734] fixed evaluation of {ITEM.LASTVALUE} if the trigger expression consists of several items (Sasha) 
