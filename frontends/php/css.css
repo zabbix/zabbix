@@ -1,4 +1,5 @@
 /* CSS Document */
+@charset "utf-8";
 @import "styles/default.css";
 @import "styles/div.css";
 @import "styles/link.css";
@@ -7,7 +8,5 @@
 @import "styles/ul.css";
 @import "styles/p.css";
 @import "styles/popupmenu.css";
-@import "styles/bar.css";
-@import "styles/gmenu.css";
-@import "styles/sbox.css";
+@import "styles/blocks.css";
 @import "styles/calendar.css";
