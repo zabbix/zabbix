@@ -59,20 +59,22 @@
 	function add_audit($action,$resourcetype,$details){
 		global $USER_DETAILS;
 
-		if(!isset($USER_DETAILS["userid"]))	check_authorisation();
+		if(!isset($USER_DETAILS['userid']))	check_authorisation();
 		
-		$auditid	= get_dbid("auditlog","auditid");
+		$auditid = get_dbid('auditlog','auditid');
 
 		if(strlen($details) > 128)
 			$details = substr($details, 0, 125).'...';
 
-		if(($result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,action,resourcetype,details) '.
-			" values ($auditid,".$USER_DETAILS["userid"].",".time().",$action,$resourcetype,".zbx_dbstr($details).")")))
+		if(($result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,action,resourcetype,details,ip) '.
+			' VALUES ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.
+						$action.','.$resourcetype.','.zbx_dbstr($details).','.
+						zbx_dbstr($USER_DETAILS['userip']).')')))
 		{
 			$result = $auditid;
 		}
 
-		return $result;
+	return $result;
 	}
 
 	function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $table_name, $values_old, $values_new)
