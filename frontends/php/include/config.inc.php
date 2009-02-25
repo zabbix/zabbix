@@ -20,7 +20,7 @@
 function SDI($msg='SDI') { echo 'DEBUG INFO: '; var_dump($msg); echo SBR; } // DEBUG INFO!!!
 function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
 function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
-function __autoload($class_name) { require_once('include/classes/class.'.$class_name.'.php'); }
+function __autoload($class_name) { require_once('include/classes/class.'.strtolower($class_name).'.php'); }
 ?>
 <?php
 	require_once('include/defines.inc.php');
