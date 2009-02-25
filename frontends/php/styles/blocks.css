@@ -50,7 +50,7 @@ img.bar_arrow{
 }
 
 div#scroll{
-	position:absolute;
+	position: relative;
 /*	display:none; */
 	height:17px;
 }
@@ -196,7 +196,6 @@ div#bar_right{
 /************************************************************/
 /*						GMENU STYLES						*/
 /************************************************************/
-
 
 img{
 	border: 0px;
@@ -601,9 +600,10 @@ div#selection_box{
 
 div.box_on{
 	position: absolute;
+	z-index:2;	
 /*	border: 1px red solid;
-/*	background-color:#FF0000;*/
-	z-index:2;
+/*	background-color:#FF0000;
+/**/
 }
 
 span#period_span{

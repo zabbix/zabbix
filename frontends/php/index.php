@@ -171,7 +171,7 @@ $page['file']	= "index.php";
 		}
 	}
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 	if(isset($_REQUEST['message'])) show_error_message($_REQUEST['message']);
 
@@ -183,16 +183,16 @@ include_once "include/page_header.php";
 			case ZBX_AUTH_INTERNAL:
 			default:
 //	konqueror bug #138024; adding useless param(login=1) to the form's action path to avoid bug!!
-				$frmLogin = new CFormTable('Login','index.php?login=1',"post","multipart/form-data");
-				$frmLogin->SetHelp('web.index.login');
-				$frmLogin->AddRow('Login name', new CTextBox('name'));
-				$frmLogin->AddRow('Password', new CPassBox('password'));
-				$frmLogin->AddItemToBottomRow(new CButton('enter','Enter'));
-				$frmLogin->Show(false);
+				$frmLogin = new CFormTable('Login','index.php?login=1','post','multipart/form-data');
+				$frmLogin->setHelp('web.index.login');
+				$frmLogin->addRow('Login name', new CTextBox('name'));
+				$frmLogin->addRow('Password', new CPassBox('password'));
+				$frmLogin->addItemToBottomRow(new CButton('enter','Enter'));
+				$frmLogin->show(false);
 		
-				setFocus($frmLogin->GetName(),'name');
+				setFocus($frmLogin->getName(),'name');
 				
-				$frmLogin->Destroy();
+				$frmLogin->destroy();
 		}
 
 	}
