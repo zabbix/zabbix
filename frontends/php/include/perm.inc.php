@@ -43,7 +43,7 @@ function check_authorisation(){
 
 	$USER_DETAILS = NULL;
 	$login = FALSE;
-
+	
 	$sessionid = get_cookie('zbx_sessionid');
 	if(!is_null($sessionid)){
 		$sql = 'SELECT u.*,s.* '.
@@ -119,6 +119,9 @@ function check_authorisation(){
 				'nodeid'=>0));
 	}
 
+	$userip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
+	$USER_DETAILS['userip'] = $userip;
+	
 	if(!$login || isset($incorrect_session) || isset($missed_user_guest)){
 
 		if(isset($incorrect_session))	$message = 'Session was ended, please relogin!';
