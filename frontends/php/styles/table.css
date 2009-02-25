@@ -1168,11 +1168,7 @@ table.msgerr{
 	border: 1px #CC4444 solid;
 }
 
-table.msgerr tr{
-	height: 26px;
-}
-
-table.msgerr td{
+table.msgerr tr td{
 	color:#333;
 	font-family: Verdana, Helvetica, Geneva;
 	font-size:11px;
