@@ -225,7 +225,7 @@ sub process_field
 	local $line=$_[0];
 
 	newstate("field");
-	($name,$type,$default,$null,$flags)=split(/\|/, $line,5);
+	($name,$type,$default,$null,$flags,$rel)=split(/\|/, $line,6);
 	($type_short)=split(/\(/, $type,2);
 	if($output{"type"} eq "code")
 	{
@@ -241,7 +241,12 @@ sub process_field
 		for ($flags) {
 			s/,/ \| /;
 		}
-		print "\t\t{\"${name}\",\t$type,\t${flags}}";
+		if ($rel) {
+			$rel = "\"${rel}\"";
+		} else {
+			$rel = "NULL";
+		}
+		print "\t\t{\"${name}\",\t$type,\t${flags},\t${rel}}";
 	}
 	else
 	{

@@ -27,6 +27,7 @@ ZBX_FIELD
 	char    *name;
 	int	type;
 	int	flags;
+	char	*rel;
 };
 
 #define ZBX_MAX_FIELDS 64
