@@ -27,6 +27,7 @@
 
 	$page['title'] = "S_GRAPH_ITEM";
 	$page['file'] = 'popup_gitem.php';
+	$page['scripts'] = array();
 
 	define('ZBX_PAGE_NO_MENU', 1);
 
@@ -88,14 +89,8 @@ include_once 'include/page_header.php';
 		}
 	}
 
-	if(isset($_REQUEST['save']) && !isset($_REQUEST['gid']))
-	{
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-<?php
-
-		echo "add_graph_item('".
+	if(isset($_REQUEST['save']) && !isset($_REQUEST['gid'])){
+		$script = "add_graph_item('".
 			$_REQUEST['dstfrm']."','".
 			$_REQUEST['itemid']."','".
 			$_REQUEST['color']."',".
@@ -105,19 +100,11 @@ include_once 'include/page_header.php';
 			$_REQUEST['calc_fnc'].",".
 			$_REQUEST['type'].",".
 			$_REQUEST['periods_cnt'].");\n";
-?>
--->
-</script>
-<?php
+		insert_js($script);
 	}
-	if(isset($_REQUEST['save']) && isset($_REQUEST['gid']))
-	{
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-<?php
-
-		echo "update_graph_item('".
+	
+	if(isset($_REQUEST['save']) && isset($_REQUEST['gid'])){
+		$script = "update_graph_item('".
 			$_REQUEST['dstfrm']."','".
 			$_REQUEST['list_name']."','".
 			$_REQUEST['gid']."','".
@@ -129,13 +116,10 @@ include_once 'include/page_header.php';
 			$_REQUEST['calc_fnc'].",".
 			$_REQUEST['type'].",".
 			$_REQUEST['periods_cnt'].");\n";
-?>
--->
-</script>
-<?php
+		insert_js($script);
 	}
 	else{
-	echo SBR;
+		echo SBR;
 
 		$graphid	= get_request("graphid", 	null);
 		$graphtype	= get_request("graphtype", 	GRAPH_TYPE_NORMAL);
@@ -254,6 +238,7 @@ include_once 'include/page_header.php';
 
 			$frmGItem->addRow(S_COLOR, new CColor('color',$color));
 		}
+
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
 			$cmbYax = new CComboBox('yaxisside',$yaxisside);
 			$cmbYax->addItem(GRAPH_YAXIS_SIDE_RIGHT, S_RIGHT);
@@ -268,7 +253,7 @@ include_once 'include/page_header.php';
 		$frmGItem->addItemToBottomRow(new CButton('save', isset($gid) ? S_SAVE : S_ADD));
 
 		$frmGItem->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
-		$frmGItem->Show();
+		$frmGItem->show();
 	}
 ?>
 <?php

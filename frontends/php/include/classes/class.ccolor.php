@@ -103,7 +103,7 @@ function insert_show_color_picker_javascript(){
 				var curr_lbl = null;
 				var curr_txt = null;'."\n";
 	
-	$script.= 'var color_table = "'.$table.$cancel.'"'."\n";
+	$script.= "var color_table = '".$table.$cancel."'\n";
 	insert_js($script);
 	print('<script type="text/javascript" src="js/color_picker.js"></script>');
 
