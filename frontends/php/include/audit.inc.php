@@ -46,14 +46,14 @@
 		if(isset($str_resource[$resource_type]))
 			return $str_resource[$resource_type];
 
-		return S_UNKNOWN_RESOURCE;
+	return S_UNKNOWN_RESOURCE;
 	}
 
 	function add_audit_if($condition,$action,$resourcetype,$details){
 		if($condition) 
 			return add_audit($action,$resourcetype,$details);
 
-		return false;
+	return false;
 	}
 	
 	function add_audit($action,$resourcetype,$details){
@@ -77,18 +77,15 @@
 	return $result;
 	}
 
-	function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $table_name, $values_old, $values_new)
-	{
+	function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $table_name, $values_old, $values_new){
 		global $USER_DETAILS;
 
 		if (!isset($USER_DETAILS["userid"]))
 			check_authorisation();
 
-		if ($action == AUDIT_ACTION_UPDATE)
-		{
+		if ($action == AUDIT_ACTION_UPDATE){
 			$values_diff = array();
-			foreach ($values_new as $id => $value)
-			{
+			foreach ($values_new as $id => $value){
 				if ($values_old[$id] !== $value)
 					array_push($values_diff, $id);
 			}
@@ -107,10 +104,8 @@
 				' values ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.zbx_dbstr($ip).
 				','.$action.','.$resourcetype.','.$resourceid.','.zbx_dbstr($resourcename).')');
 
-		if ($result && $action == AUDIT_ACTION_UPDATE)
-		{
-			foreach ($values_diff as $id)
-			{
+		if($result && $action == AUDIT_ACTION_UPDATE){
+			foreach ($values_diff as $id){
 				$auditdetailid = get_dbid('auditlog_details', 'auditdetailid');
 				$result &= DBexecute('insert into auditlog_details (auditdetailid,auditid,table_name,field_name,oldvalue,newvalue)'.
 						' values ('.$auditdetailid.','.$auditid.','.zbx_dbstr($table_name).','.
@@ -121,6 +116,6 @@
 		if ($result)
 			$result = $auditid;
 
-		return $result;
+	return $result;
 	}
 ?>

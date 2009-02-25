@@ -412,13 +412,14 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 				}
 //message scroll if needed
 				$msg_show = 6;
-				$msg_font_size = 6;
-				$msg_count = count($ZBX_MESSAGES) + 1;
+				$msg_count = count($ZBX_MESSAGES);
 
-				if($msg_count > $msg_show) $msg_count = $msg_show;
+				if($msg_count > $msg_show){
+					$msg_count = $msg_show;
 
-				$msg_count = ($msg_count * $msg_font_size * 4);
-				$lst_error->AddOption('style','font-size: '.$msg_font_size.'pt; height: '.$msg_count.'px;');
+					$msg_count = ($msg_count * 16);
+					$lst_error->AddOption('style','height: '.$msg_count.'px;');
+				}
 
 
 				$tab = new CTable(null,($bool?'msgok':'msgerr'));
