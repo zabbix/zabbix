@@ -261,20 +261,22 @@ int MAIN_ZABBIX_ENTRY(void)
 	if(1 == CONFIG_DISABLE_PASSIVE)
 	{
 		/* Only main process and active checks will be started */
-		CONFIG_ZABBIX_FORKS = 2;
+		CONFIG_ZABBIX_FORKS = 0;/* Listeners won't be needed for passive checks. */
 	}
 
-	threads = calloc(CONFIG_ZABBIX_FORKS, sizeof(ZBX_THREAD_HANDLE));
+	/* Allocate memory for a collector, all listeners and an active check. */	
+	threads = calloc(1 + CONFIG_ZABBIX_FORKS + ((0 == CONFIG_DISABLE_ACTIVE) ? 1 : 0), sizeof(ZBX_THREAD_HANDLE));
 
+	/* Start the collector thread. */
 	threads[i=0] = zbx_thread_start(collector_thread, NULL);
 
 	/* start listeners */
-	for(i++; i < CONFIG_ZABBIX_FORKS - ((0 == CONFIG_DISABLE_ACTIVE) ? 1 : 0); i++)
+	for(i++; i <= CONFIG_ZABBIX_FORKS; i++)
 	{
 		threads[i] = zbx_thread_start(listener_thread, &listen_sock);
 	}
 
-	/* start active chack */
+	/* start active check */
 	if(0 == CONFIG_DISABLE_ACTIVE)
 	{
 		activechk_args.host = CONFIG_HOSTS_ALLOWED;
@@ -287,7 +289,7 @@ int MAIN_ZABBIX_ENTRY(void)
 	init_main_process();
 
 	/* wait for all threads exiting */
-	for(i = 0; i < CONFIG_ZABBIX_FORKS; i++)
+	for(i = 0; i < 1 + CONFIG_ZABBIX_FORKS +((0 == CONFIG_DISABLE_ACTIVE) ? 1 : 0); i++)
 	{
 		if(threads && threads[i])
 		{
@@ -314,7 +316,7 @@ void	zbx_on_exit()
 
 	if(threads != NULL)
 	{
-		for(i = 0; i<CONFIG_ZABBIX_FORKS ; i++)
+		for(i = 0; i < 1 + CONFIG_ZABBIX_FORKS + ((0 == CONFIG_DISABLE_ACTIVE) ? 1 : 0); i++)
 		{
 			if(threads[i]) {
 				zbx_thread_kill(threads[i]);

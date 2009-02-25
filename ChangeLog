@@ -1,5 +1,6 @@
 Changes for 1.6.3
-
+ 
+ - [ZBX-599] the purpose of the configuration parameter StartAgents precised (Dmitry)
  - [ZBX-728] fixed displaying "no status update" error for template triggers (Vedmak)
  - [ZBX-738] fixed processing of existing data when -n parameter is used for zabbix_server (Sasha)
  - [ZBX-736] fixed "Undefined index error" during frontend installation (Vedmak)

@@ -22,7 +22,7 @@
 #include "log.h"
 
 char	*CONFIG_FILE			= NULL;
-int	CONFIG_ZABBIX_FORKS		= 5;
+int	CONFIG_ZABBIX_FORKS		= 3;
 
 char	*CONFIG_LOG_FILE		= NULL;
 int	CONFIG_LOG_FILE_SIZE		= 1;

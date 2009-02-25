@@ -34,7 +34,7 @@
 #define AF_USE_EVENT_LOG            0x0002
 #define AF_LOG_UNRESOLVED_SYMBOLS   0x0004
 
-extern int	CONFIG_ZABBIX_FORKS;
+extern int	CONFIG_ZABBIX_FORKS;/* Contains a number of listeners for processing passive checks. */
 extern char	*CONFIG_FILE;
 
 extern char	*CONFIG_LOG_FILE;
