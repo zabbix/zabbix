@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTD-73] fixed problem with "Too many open files" by agent under Solaris 2.5, 2.6 (Sasha)
  - [NTD-82] size of the box for element label in maps is increased (Artem)
  - [NTD-78] fixed number of problems for "No false for B" on maps (Artem)
  - [NTD-81] added rule to prioritize deny rule (Artem)
