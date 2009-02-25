@@ -19,8 +19,7 @@
 **/
 ?>
 <?php
-	function	audit_resource2str($resource_type)
-	{
+	function audit_resource2str($resource_type){
 		$str_resource[AUDIT_RESOURCE_USER] 		= S_USER;
 		$str_resource[AUDIT_RESOURCE_ZABBIX_CONFIG] 	= S_CONFIGURATION_OF_ZABBIX;
 		$str_resource[AUDIT_RESOURCE_MEDIA_TYPE] 	= S_MEDIA_TYPE;

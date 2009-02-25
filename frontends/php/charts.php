@@ -115,12 +115,15 @@ include_once 'include/page_header.php';
 					' AND hg.hostid=i.hostid '.
 					$sql_where.
 					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
+
 		if($host_group = DBfetch(DBselect($sql,1))){
 			if(!isset($_REQUEST['groupid']) || !isset($_REQUEST['hostid'])){
 				$_REQUEST['groupid'] = $host_group['groupid'];
 				$_REQUEST['hostid'] = $host_group['hostid'];
 			}
-			else if(($_REQUEST['groupid']!=$host_group['groupid']) || ($_REQUEST['hostid']!=$host_group['hostid'])){
+			else if((($_REQUEST['groupid']!=$host_group['groupid']) && ($_REQUEST['groupid'] > 0)) || 
+					(($_REQUEST['hostid']!=$host_group['hostid']) && ($_REQUEST['hostid'] > 0)))
+			{
 				$_REQUEST['graphid'] = 0;
 			}
 		}
