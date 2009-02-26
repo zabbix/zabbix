@@ -214,7 +214,7 @@ span.divider{
 }
 
 /********** REQUIREMENTS TABLE *************/
-span.ok{
+span.link{	color:#333399;	cursor: pointer;}span.link:hover{	text-decoration: underline;}span.ok{
 	white-space: normal;
 	color:		#00AA00;
 	font-weight:	bold;
