@@ -196,10 +196,10 @@ span.divider{
 /********** REQUIREMENTS TABLE *************/
 span.link{
 	color:#333399;
+	cursor: pointer;
 }
 
 span.link:hover{
-	cursor: pointer;
 	text-decoration: underline;
 }
 
