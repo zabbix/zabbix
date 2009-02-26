@@ -183,14 +183,22 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	command[MAX_STRING_LEN];
+	int	res;
 
 	assert(result);
 
 	init_result(result);
 
-	zbx_snprintf(command, sizeof(command), "netstat -an | grep '*.%s' | wc -l", param);
+	zbx_snprintf(command, sizeof(command), "netstat -an | grep '*.%s\\>' | wc -l", param);
 
-	return EXECUTE_INT(NULL, command, flags, result);
+	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(NULL, command, flags, result)))
+		return res;
+
+	if (NULL != GET_DBL_RESULT(result))
+		if (result->dbl > 1)
+			result->dbl = 1;
+
+	return res;
 }
 
 int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
