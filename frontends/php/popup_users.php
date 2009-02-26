@@ -88,8 +88,8 @@ function add_user(formname,user_id,alias)
 	$result = DBselect('select * from users where '.DBin_node('userid').' order by name');
 	while($row = DBfetch($result))
 	{
-		$name = new CLink($row["alias"],"#","action");
-		$name->SetAction('return add_user("'.$dstfrm.'","'.$row['userid'].'","'.$row['alias'].'");');
+		$name = new CSpan($row["alias"],'link');
+		$name->addAction('onclick', 'javascript: return add_user("'.$dstfrm.'","'.$row['userid'].'","'.$row['alias'].'");');
 		$table->addRow(array($name, $row['name'], $row['surname'], user_type2str($row['type'])));
 	}
 	$table->show();
