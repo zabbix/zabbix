@@ -23,6 +23,8 @@ Changes for 1.7.0
  - [DEV-233,DEV-237] added support of scheduled maintenance periods (Artem,Sasha)
 
 Changes for 1.6.3
+
+ - [ZBX-743] fixed problem with "Too many open files" by agent under Solaris 2.5, 2.6 (Sasha)
  - [ZBX-599] the purpose of the configuration parameter StartAgents precised (Dmitry)
  - [ZBX-738] fixed processing of existing data when -n parameter is used for zabbix_server (Sasha)
  - [ZBX-728] fixed displaying "no status update" error for template triggers (Vedmak) 
