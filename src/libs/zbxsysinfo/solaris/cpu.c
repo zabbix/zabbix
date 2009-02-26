@@ -249,6 +249,8 @@ static int	get_kstat_system_misc(char *s, int *value)
 		return FAIL;
 	}
 
+	kstat_close(kc);
+
 	*value = kn->value.ul;
 
 	return SUCCEED;
