@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-745] fixed "invalid URL" when use small popup menus like ping etc (Vedmak)
  - [ZBX-744] fixed "invalid URL" when add user to user group (Vedmak)
  - [ZBX-743] fixed problem with "Too many open files" by agent under Solaris 2.5, 2.6 (Sasha)
  - [ZBX-728] fixed displaying "no status update" error for template triggers (Vedmak)
