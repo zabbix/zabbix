@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTD-79] updated list of supported items in item configuration form (Sasha)
  - [NTD-76] fixed incorrect processing of net.tcp.listen (Sasha)
  - [NTD-73] fixed problem with "Too many open files" by agent under Solaris 2.5, 2.6 (Sasha)
  - [NTD-82] size of the box for element label in maps is increased (Artem)
