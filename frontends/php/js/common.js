@@ -382,6 +382,9 @@ function get_scroll_pos(){
 
 
 function openWinCentered(loc, winname, iwidth, iheight, params){
+		var uri = new Curl(loc);
+		loc = uri.getUrl();
+
 		tp=Math.ceil((screen.height-iheight)/2);
 		lf=Math.ceil((screen.width-iwidth)/2);
 		if (params.length > 0){
@@ -408,8 +411,10 @@ function PopUp(url,width,height,form_name){
 	return false;
 }
 
-function redirect(url) {
-	window.location = url;
+function redirect(uri) {
+	uri = new Curl(uri);
+	var loc = uri.getUrl();
+	window.location = loc;
 	return false;
 }
 
