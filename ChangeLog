@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [ZBX-752] fixed wrong audit logs for trigger actions (Vedmak)
  - [ZBX-483] added sorting to selection box (Artem)
  - [DEV-287] support of PHP4 is removed from source (Artem)
  - [ZBX-714] fixed "No groups defined" message in items list when group is defined (Vedmak)
