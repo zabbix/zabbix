@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-747] fixed template linkage not working properly (Vedmak)
  - [ZBX-746] fixed incorrect processing of net.tcp.listen (Sasha)
  - [ZBX-745] fixed "invalid URL" when use small popup menus like ping etc (Vedmak)
  - [ZBX-744] fixed "invalid URL" when add user to user group (Vedmak)
