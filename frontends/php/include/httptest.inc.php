@@ -53,12 +53,6 @@
 			return false;
 		}
 
-		if (!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)) 
-		{
-			error("Scenario step name should contain '0-9a-zA-Z_ .$'- characters only");
-			return false;
-		}
-
 		if(!($httpstep_data = DBfetch(DBselect('select httpstepid from httpstep '.
 			' where httptestid='.$httptestid.' and name='.zbx_dbstr($name)))))
 		{
@@ -148,17 +142,11 @@
 		return $httpstepid;
 	}
 
-	function	db_save_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps)
+	function db_save_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps)
 	{
 		$history = 30; // TODO !!! Allow user set this parametr
 		$trends = 90; // TODO !!! Allow user set this parametr
 
- 		if (!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)) 
-		{
-			error("Scenario name should contain '0-9a-zA-Z_.$ '- characters only");
-			return false;
-		}
-		
 		DBstart();
 		
 		if($applicationid = DBfetch(DBselect('select applicationid from applications '.

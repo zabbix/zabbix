@@ -39,39 +39,39 @@ include_once "include/page_header.php";
 		"close"=>		array(T_ZBX_INT, O_OPT,	null,	IN("1"),	null),
 		"open"=>		array(T_ZBX_INT, O_OPT,	null,	IN("1"),	null),
 
-		"groupid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,null),
-		"hostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({form})||isset({save})'),
+		"groupid"=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,		null),
+		"hostid"=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,		'isset({form})||isset({save})'),
 
-		"httptestid"=>	array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
-		"application"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save})'),
-		"name"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY.KEY_PARAM(),'isset({save})'),
-		"delay"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),'isset({save})'),
-		"status"=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1'),'isset({save})'),
-		"agent"=>	array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
-		"macros"=>	array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
-		"steps"=>	array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
-		'authentication'=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1'),'isset({save})'),
-		"http_user"=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.')'),
-		"http_password"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.')'),
+		"httptestid"=>	array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,				'(isset({form})&&({form}=="update"))'),
+		"application"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,			'isset({save})'),
+		"name"=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		"delay"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),	'isset({save})'),
+		"status"=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1'),			'isset({save})'),
+		"agent"=>		array(T_ZBX_STR, O_OPT,  null,	null,				'isset({save})'),
+		"macros"=>		array(T_ZBX_STR, O_OPT,  null,	null,				'isset({save})'),
+		"steps"=>		array(T_ZBX_STR, O_OPT,  null,	null,				'isset({save})'),
+		'authentication'=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1'),	'isset({save})'),
+		"http_user"=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.')'),
+		"http_password"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.')'),
 		
-		"new_httpstep"=>	array(T_ZBX_STR, O_OPT,  null,	null,null),
+		"new_httpstep"=>	array(T_ZBX_STR, O_OPT,  null,	null,		null),
 
-		"move_up"=>		array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
+		"move_up"=>			array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
 		"move_down"=>		array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
 		
-		"sel_step"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65534), null),
+		"sel_step"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65534),	 null),
 
-		"group_httptestid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
+		"group_httptestid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		
-		"showdisabled"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	null),
+		"showdisabled"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),		null),
 
 		"group_task"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"clone"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"del_sel_step"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"clone"=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"save"=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"delete"=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"del_sel_step"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"cancel"=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"form"=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
 	);
 
