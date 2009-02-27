@@ -23,7 +23,7 @@ class CEditableComboBox extends CComboBox{
 	public function __construct($name='editablecombobox',$value=NULL,$size=0,$action=NULL){
 		inseret_javascript_for_editable_combobox();
 
-		parent::CComboBox($name,$value,$action);
+		parent::__construct($name,$value,$action);
 		parent::addAction('onfocus','CEditableComboBoxInit(this);');
 		parent::addAction('onchange','CEditableComboBoxOnChange(this,'.$size.');');
 	}

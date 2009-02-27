@@ -20,7 +20,7 @@
 ?>
 <?php
 class CComboBox extends CTag{
- private $value;
+ public $value;
 
 	public function __construct($name='combobox',$value=NULL,$action=NULL){
 		parent::__construct('select','yes');
