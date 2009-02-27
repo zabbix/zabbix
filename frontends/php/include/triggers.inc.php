@@ -797,7 +797,10 @@
 			}
 			return $result;
 		}
-
+		
+		if($result)
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$description, NULL,	NULL, NULL);
+				
 		return $triggerid;
 	}
 
@@ -924,7 +927,7 @@
 		}
 
 		info("Added trigger '".$trigger["description"]."' to host '".$host["host"]."'");
-
+		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $newtriggerid, $trigger["description"], NULL, NULL, NULL);
 // Copy triggers to the child hosts
 		$child_hosts = get_hosts_by_templateid($hostid);
 		while($child_host = DBfetch($child_hosts)){
@@ -1105,8 +1108,8 @@
 		}
 
 		add_event($triggerids,TRIGGER_VALUE_UNKNOWN);
-		
-	return	DBexecute('UPDATE triggers SET status='.$status.' WHERE '.DBcondition('triggerid',$triggerids));
+	
+	return DBexecute('UPDATE triggers SET status='.$status.' WHERE '.DBcondition('triggerid',$triggerids));
 	}
 
 	/*
@@ -1509,6 +1512,11 @@
 			}
 			info($msg);
 		}
+		if($result) {
+			$trigger_new = get_trigger_by_triggerid($triggerid);
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$trigger["description"], 'triggers', $trigger, $trigger_new);
+		}
+		
 	return $result;
 	}
 
