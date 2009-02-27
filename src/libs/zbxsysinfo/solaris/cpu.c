@@ -20,6 +20,7 @@
 #include "common.h"
 
 #include "sysinfo.h"
+#include "stats.h"
 
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
@@ -63,161 +64,76 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	return SYSINFO_RET_OK;
 }
 
-static int get_cpu_data(
-	const char* cpuname,
-	unsigned long long *idle,
-	unsigned long long *system,
-	unsigned long long *user,
-	unsigned long long *iowait)
-{
-	kstat_ctl_t	*kc;
-	kstat_t		*k;
-	cpu_stat_t	*cpu;
-
-	static int			first_run = 1;
-	static unsigned long long	old_cpu[CPU_STATES];
-	unsigned long long		new_cpu[CPU_STATES];
-
-	char ks_name[MAX_STRING_LEN];
-
-	int cpu_count = 0, i;
-
-	assert(cpuname);
-	assert(idle);
-	assert(system);
-	assert(user);
-	assert(iowait);
-
-	if(first_run)    for(i = 0; i < CPU_STATES; old_cpu[i++] = 0LL);
-
-	for(i = 0; i < CPU_STATES; new_cpu[i++] = 0LL);
-
-        zbx_snprintf(ks_name, sizeof(ks_name), "cpu_stat%s", cpuname);
-
-	kc = kstat_open();
-	if (kc)
-	{
-		k = kc->kc_chain;
-		while (k)
-		{
-			if ((strncmp(k->ks_name, ks_name, strlen(ks_name)) == 0)
-				&& (kstat_read(kc, k, NULL) != -1)
-				)
-			{
-				cpu = (cpu_stat_t *) k->ks_data;
-
-				for(i = 0; i < CPU_STATES; i++)
-					new_cpu[i] += cpu->cpu_sysinfo.cpu[i];
-
-				cpu_count += 1;
-			}
-			k = k->ks_next;
-		}
-		kstat_close(kc);
-	}
-    
-	if(first_run)
-	{
-		*idle = *system = *iowait = *user = 0LL;
-		first_run = 0;
-	}
-	else
-	{
-		*idle	=  new_cpu[CPU_IDLE]	- old_cpu[CPU_IDLE];
-		*system =  new_cpu[CPU_KERNEL]	- old_cpu[CPU_KERNEL];
-		*iowait =  new_cpu[CPU_WAIT]	- old_cpu[CPU_WAIT];
-		*user	=  new_cpu[CPU_USER]	- old_cpu[CPU_USER];
-	}
-	
-	for(i = 0; i < CPU_STATES; i++)	old_cpu[i] = new_cpu[i];
-	
-	return cpu_count;
-}
-
-#define CPU_I 0
-#define CPU_U 1
-#define CPU_K 2
-#define CPU_W 3
-
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-    unsigned long long cpu_val[4];
-    unsigned long long interval_size;
+	char				cpuname[8], type[8], mode[8];
+	int				cpu_num;
+	ZBX_SINGLE_CPU_STAT_DATA	*cpu;
 
-    char cpuname[MAX_STRING_LEN];
-    char mode[MAX_STRING_LEN];
-    
-    int info_id = 0;
-    
-    int ret = SYSINFO_RET_FAIL;
-
-    if(num_param(param) > 2)
-    {
-        return SYSINFO_RET_FAIL;
-    }
-
-    if(get_param(param, 1, cpuname, sizeof(cpuname)) != 0)
-    {
-	cpuname[0] = '\0';
-    }
-    if(cpuname[0] == '\0')
-    {
-	/* default parameter */
-        zbx_snprintf(cpuname, sizeof(cpuname), "all");
-    }
-
-    if(0 == strncmp(cpuname, "all", MAX_STRING_LEN))
-    {
-	    cpuname[0] = '\0';
-    }
-    
-    if(get_param(param, 2, mode, sizeof(mode)) != 0)
-    {
-	mode[0] = '\0';
-    }
-    
-    if(mode[0] == '\0')
-    {
-	/* default parameter */
-        zbx_snprintf(mode, sizeof(mode),"idle");
-    }
-    
-    if(strcmp(mode,"idle") == 0)
-    {
-        info_id = CPU_I;
-    }
-    else if(strcmp(mode,"user") == 0)
-    {
-        info_id = CPU_U;
-    }
-    else if(strcmp(mode,"kernel") == 0)
-    {
-        info_id = CPU_K;
-    }
-    else if(strcmp(mode,"wait") == 0)
-    {
-	info_id = CPU_W;
-    }
-    else
-    {
-	return SYSINFO_RET_FAIL;
-    }
-    
-    if (get_cpu_data(cpuname,&cpu_val[CPU_I], &cpu_val[CPU_K], &cpu_val[CPU_U], &cpu_val[CPU_W]))
-    {
-        interval_size =	cpu_val[CPU_I] + cpu_val[CPU_K] + cpu_val[CPU_U] + cpu_val[CPU_W];
-        
-	if (interval_size > 0)
+	if (!CPU_COLLECTOR_STARTED(collector))
 	{
-		SET_DBL_RESULT(result, (cpu_val[info_id] * 100.0)/interval_size);
-        }
+		SET_MSG_RESULT(result, strdup("Collector is not started!"));
+		return SYSINFO_RET_OK;
+	}
+
+	if (num_param(param) > 3)
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, cpuname, sizeof(cpuname)))
+		*cpuname = '\0';
+
+	if ('\0' == *cpuname || 0 == strcmp(cpuname, "all"))	/* default parameter */
+		cpu_num = 0;
 	else
 	{
-		SET_DBL_RESULT(result, 0);
+		if (FAIL == is_uint(cpuname))
+			return SYSINFO_RET_FAIL;
+
+		cpu_num = atoi(cpuname) + 1;
+		if (cpu_num < 1 || cpu_num > collector->cpus.count)
+			return SYSINFO_RET_FAIL;
 	}
-    ret = SYSINFO_RET_OK;
-    }
-    return ret;
+
+	if (0 != get_param(param, 2, type, sizeof(type)))
+		*type = '\0';
+
+	if (0 != get_param(param, 3, mode, sizeof(mode)))
+		*mode = '\0';
+
+	cpu = &collector->cpus.cpu[cpu_num];
+
+	if ('\0' == *type || 0 == strcmp(type, "idle"))	/* default parameter */
+	{
+		if ('\0' == *mode || 0 == strcmp(mode, "avg1"))	SET_DBL_RESULT(result, cpu->idle1)
+		else if (0 == strcmp(mode, "avg5"))		SET_DBL_RESULT(result, cpu->idle5)
+		else if (0 == strcmp(mode, "avg15"))		SET_DBL_RESULT(result, cpu->idle15)
+		else return SYSINFO_RET_FAIL;
+	}
+	else if (0 == strcmp(type, "user"))
+	{
+		if ('\0' == *mode || 0 == strcmp(mode, "avg1"))	SET_DBL_RESULT(result, cpu->user1)
+		else if (0 == strcmp(mode, "avg5"))		SET_DBL_RESULT(result, cpu->user5)
+		else if (0 == strcmp(mode, "avg15"))		SET_DBL_RESULT(result, cpu->user15)
+		else return SYSINFO_RET_FAIL;
+	}
+	else if (0 == strcmp(type, "kernel"))
+	{
+		if ('\0' == *mode || 0 == strcmp(mode, "avg1"))	SET_DBL_RESULT(result, cpu->system1)
+		else if (0 == strcmp(mode, "avg5"))		SET_DBL_RESULT(result, cpu->system5)
+		else if (0 == strcmp(mode, "avg15"))		SET_DBL_RESULT(result, cpu->system15)
+		else return SYSINFO_RET_FAIL;
+	}
+	else if (0 == strcmp(type, "wait"))
+	{
+		if ('\0' == *mode || 0 == strcmp(mode, "avg1"))	SET_DBL_RESULT(result, cpu->nice1)
+		else if (0 == strcmp(mode, "avg5"))		SET_DBL_RESULT(result, cpu->nice5)
+		else if (0 == strcmp(mode, "avg15"))		SET_DBL_RESULT(result, cpu->nice15)
+		else return SYSINFO_RET_FAIL;
+	}
+	else
+		return SYSINFO_RET_FAIL;
+
+	return SYSINFO_RET_OK;
 }
 
 #ifdef HAVE_KSTAT_H
