@@ -41,7 +41,7 @@ include_once "include/page_header.php";
 		"sid"=>		array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
 		"list_name"=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,		'isset({save})&&isset({sid})'),
 		
-		"name"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY.KEY_PARAM(),'isset({save})'),
+		"name"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
 		"posts"=>	array(T_ZBX_STR, O_OPT,  null,	null,			'isset({save})'),
 		"timeout"=>	array(T_ZBX_INT, O_OPT,  null,	BETWEEN(0,65535),	'isset({save})'),

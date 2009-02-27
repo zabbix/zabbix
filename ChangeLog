@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-5] allowed multibyte chars in web scenarios (Artem)
  - [NTD-79] updated list of supported items in item configuration form (Sasha)
  - [NTD-76] fixed incorrect processing of net.tcp.listen (Sasha)
  - [NTD-73] fixed problem with "Too many open files" by agent under Solaris 2.5, 2.6 (Sasha)
