@@ -161,15 +161,13 @@ function insert_javascript_for_twinbox(){
 			from = $(from);
 			to = $(to);
 			
-			for(i = 0; i < from.options.length; i++) {
+			var j = 0;
+			var i = 0;
+			while(i<from.options.length){
+		
 				if(from.options[i].selected == true) {
-/*			
-					var temp = document.createElement("option");
-					temp.setAttribute("value",from.options[i].value);
-					
-					var caption = IE?from.options[i].innerText:from.options[i].textContent;
-					temp.appendChild(document.createTextNode(caption));
-*/
+					//	from.options[i].selected = false;
+		
 					var temp = from.options[i].cloneNode(true);
 					
 					if(action.toLowerCase() == "add"){
@@ -177,13 +175,30 @@ function insert_javascript_for_twinbox(){
 					}
 					else if(action.toLowerCase() == "rmv"){
 						result &= remove_element(objname+"["+from.options[i].value+"]","input");
-					}
-					
-					from.removeChild(from.options[i]);
+					}			
 		
-					to.appendChild(temp);
-					i--;
+					while(true){
+						if(to.options.length == 0){
+							$(to).insert(from.options[i]);
+							break;
+						}
+
+						if(from.options[i].innerHTML.toLowerCase() < to.options[j].innerHTML.toLowerCase()){
+							$(to.options[j]).insert({before:from.options[i]});
+							break;
+						}
+						
+						if((typeof(to.options[j+1]) == "undefined") || is_null(to.options[j+1])){  // is_null 4 IE =)
+							$(to.options[j]).insert({after:from.options[i]});
+							break;
+						}
+						
+						j++;
+					}
+		
+					continue;
 				}
+				i++;
 			}
 		
 		return result;
