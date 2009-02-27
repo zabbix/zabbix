@@ -706,7 +706,6 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 	}
 
 	function get_status(){
-//		global $DB;
 		$status = array();
 // server
 		if( (exec('ps -ef|grep zabbix_server|grep -v grep|wc -l')>0) || (exec('ps -ax|grep zabbix_server|grep -v grep|wc -l')>0) ){
@@ -715,40 +714,6 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 		else{
 			$status["zabbix_server"] = S_NO;
 		}
-// history & trends
-/*		if ($DB['DB_TYPE'] == "MYSQL"){
-			$row=DBfetch(DBselect('show table status like "history"'));
-			$status["history_count"]  = $row["Rows"];
-			$row=DBfetch(DBselect('show table status like "history_log"'));
-			$status["history_count"] += $row["Rows"];
-			$row=DBfetch(DBselect('show table status like "history_str"'));
-			$status["history_count"] += $row["Rows"];
-			$row=DBfetch(DBselect('show table status like "history_uint"'));
-			$status["history_count"] += $row["Rows"];
-
-			$row=DBfetch(DBselect('show table status like "trends"'));
-			$status["trends_count"] = $row["Rows"];
-		}
-		else{
-			$row=DBfetch(DBselect('SELECT COUNT(itemid) as cnt from history'));
-			$status["history_count"]  = $row["cnt"];
-			$row=DBfetch(DBselect('SELECT COUNT(itemid) as cnt from history_log'));
-			$status["history_count"] += $row["cnt"];
-			$row=DBfetch(DBselect('SELECT COUNT(itemid) as cnt from history_str'));
-			$status["history_count"] += $row["cnt"];
-			$row=DBfetch(DBselect('SELECT COUNT(itemid) as cnt from history_uint'));
-			$status["history_count"] += $row["cnt"];
-
-			$result=DBselect('SELECT COUNT(itemid) as cnt from trends');
-			$row=DBfetch($result);
-			$status["trends_count"]=$row["cnt"];
-		}*/
-// events
-/*		$row=DBfetch(DBselect('SELECT COUNT(eventid) as cnt from events'));
-		$status["events_count"]=$row["cnt"];*/
-// alerts
-/*		$row=DBfetch(DBselect('SELECT COUNT(alertid) as cnt from alerts"));
-		$status["alerts_count"]=$row["cnt"];*/
 
 // triggers
 		$sql = 'SELECT COUNT(DISTINCT t.triggerid) as cnt '.

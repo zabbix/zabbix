@@ -354,22 +354,20 @@
 		return $result;
 	}
 	
-	function	add_httptest($hostid, $application, $name, $delay, $status, $agent, $macros, $steps)
-	{
+	function add_httptest($hostid, $application, $name, $delay, $status, $agent, $macros, $steps){
 		$result = db_save_httptest(null, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps);
 		
 		if($result) info("Sceanrio '".$name."' added");
 
-		return $result;
+	return $result;
 	}
 	
-	function	update_httptest($httptestid, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps)
-	{
+	function update_httptest($httptestid, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps){
 		$result = db_save_httptest($httptestid, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps);
 		
 		if($result)	info("Sceanrio '".$name."' updated");
 
-		return $result;
+	return $result;
 	}
 	
 	function delete_httpstep($httpstepids){
