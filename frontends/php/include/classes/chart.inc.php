@@ -984,7 +984,7 @@ class Chart extends Graph{
 			
 			$sql_arr = array();
 	
-			if((($real_item['history']*86400) > (time()-($from_time+$this->period/2))) &&				// should pick data from history or trends
+			if((($real_item['history']*86400) > (time()-($this->from_time+$this->period/2))) &&				// should pick data from history or trends
 				(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))		// is reasonable to take data from history?
 			{
 				array_push($sql_arr,
