@@ -1650,54 +1650,75 @@ include_once('include/page_header.php');
 							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 							S_FOUND.': ',$numrows,)
 							);							
-			show_table_header($header);
+			show_table_header($header, $frmForm);
 		
 			$table = new CTableInfo(S_NO_LINKAGES);
 			$table->setHeader(array(S_TEMPLATES,S_HOSTS));
 		
-			$sql = 'SELECT h.* '.
-					' FROM hosts h, hosts_groups hg '.
-					' WHERE hg.groupid='.$_REQUEST['groupid'].
-						' AND h.hostid=hg.hostid '.
-						' AND '.DBcondition('h.hostid',$available_hosts).
-					' ORDER BY h.host';
-			$templates = DBSelect($sql);
-			while($template = DBfetch($templates)){
-			
-				$hosts = DBSelect('SELECT DISTINCT h.host, h.hostid, h.status '.
-					' FROM hosts h, hosts_templates ht '.
-					' WHERE ht.templateid='.$template['hostid'].
-						' AND ht.hostid=h.hostid '.
-						' AND '.DBcondition('h.hostid',$available_hosts).
-					' ORDER BY h.host');
-				$host_list = array();
-				while($host = DBfetch($hosts)){
-					$link = 'hosts.php?form=update&config=0&hostid='.$host['hostid'];
-					switch($host['status']){
-						case HOST_STATUS_MONITORED:
-							$style = null;
-							break;
-						case HOST_STATUS_TEMPLATE:
-							$style = 'unknown';
-							break;
-						default:
-							$style = 'on';
-					}
+			$sql_from = '';
+			$sql_where = '';
+			if($_REQUEST['groupid'] > 0){
+				$sql_from.= ',hosts_groups hg ';
+				$sql_where.= ' AND hg.groupid='.$_REQUEST['groupid'].' AND hg.hostid=h.hostid ';
+			} 
 
-					array_push($host_list, empty($host_list)?'':', ', new CLink(new CSpan($host['host'], $style), $link));
+			$templates = array();
+			$templateids = array();
+			$sql = 'SELECT h.hostid, h.host '.
+					' FROM hosts h '.$sql_from.
+					' WHERE '.DBcondition('h.hostid',$available_hosts).
+						$sql_where.
+					' ORDER BY h.host';
+			$result = DBSelect($sql);
+			while($template = DBfetch($result)) {
+				$templateids[$template['hostid']] = $template['hostid'];
+				$templates[$template['hostid']] = $template; 
+			}
+			
+			$allowed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
+			
+			$sql = 'SELECT h.host, h.hostid, h.status, ht.templateid '.
+					' FROM hosts h, hosts_templates ht '.
+					' WHERE ht.hostid=h.hostid '.
+						' AND '.DBcondition('h.hostid', $allowed_hosts).
+						' AND '.DBcondition('ht.templateid', $templateids).
+					' ORDER BY host';
+			$result = DBSelect($sql);
+			while($host = DBfetch($result)){
+				if(!isset($templates[$host['templateid']]['hosts'])) $templates[$host['templateid']]['hosts'] = array(); 
+				$templates[$host['templateid']]['hosts'][] = $host;
+			}
+			
+			foreach($templates as $templateid => $template) {
+				$host_list = array();
+				
+				if(isset($template['hosts'])) {
+					foreach($template['hosts'] as $host) {
+						switch($host['status']) {
+							case HOST_STATUS_NOT_MONITORED:
+								$style = 'on';
+								break;
+							case HOST_STATUS_TEMPLATE:
+								$style = 'unknown';
+								break;
+							default:
+								$style = null;
+						}	
+						$link = 'hosts.php?form=update&config=0&hostid='.$host['hostid'];
+						array_push($host_list, empty($host_list)?'':', ', new CLink(new CSpan($host['host'], $style), $link));
+					}
 				}
 				
 				$table->addRow(array(		
 					new CCol(array(
 						new CLink($template['host'],'hosts.php?form=update&hostid='.
 							$template['hostid'].url_param('groupid').url_param('config'), 'action')
-						),'unknown'),
+						), 'unknown'),
 					empty($host_list)?'-':new CCol($host_list,'wraptext')
 				));
-				$row_count++;
-			}
-			
-			$table->Show();
+			}	
+			$table->show();
+			$row_count = $table->getNumRows();
 		}
 //----- END MODE -----
 	}
