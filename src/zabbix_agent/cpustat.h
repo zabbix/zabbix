@@ -22,7 +22,6 @@
 
 #if defined (_WINDOWS)
 
-	#define MAX_CPU	16
 	#define MAX_CPU_HISTORY 900 /* 15 min in seconds */
 
 	typedef struct s_single_cpu_stat_data
@@ -41,7 +40,7 @@
 
 	typedef struct s_cpus_stat_data
 	{
-		ZBX_SINGLE_CPU_STAT_DATA cpu[MAX_CPU+1];
+		ZBX_SINGLE_CPU_STAT_DATA *cpu;
 		int	count;
 
 		double	load1;
@@ -61,7 +60,6 @@
 
 #else /* not _WINDOWS */
 
-	#define MAX_CPU	16
 	#define MAX_CPU_HISTORY 900 /* 15 min in seconds */
 
 	typedef struct s_single_cpu_stat_data
@@ -91,7 +89,7 @@
 
 	typedef struct s_cpus_stat_data
 	{
-		ZBX_SINGLE_CPU_STAT_DATA cpu[MAX_CPU+1];
+		ZBX_SINGLE_CPU_STAT_DATA *cpu;
 		int	count;
 
 	} ZBX_CPUS_STAT_DATA;

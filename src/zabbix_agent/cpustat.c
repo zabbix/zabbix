@@ -28,83 +28,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_cpu_num                                                  *
- *                                                                            *
- * Purpose: returns the number of processors which are currently inline       *
- *          (i.e., available).                                                *
- *                                                                            *
- * Return value: number of CPUs                                               *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_get_cpu_num(void)
-{
-#if defined(_WINDOWS)
-
-	SYSTEM_INFO	sysInfo;
-
-	GetSystemInfo(&sysInfo);
-
-	return (int)(sysInfo.dwNumberOfProcessors);
-
-#elif defined(HAVE_SYS_PSTAT_H)
-
-	struct pst_dynamic psd;
-
-	if ( -1 == pstat_getdynamic(&psd, sizeof(struct pst_dynamic), 1, 0) )
-	{
-		zabbix_log(LOG_LEVEL_WARNING , "Failed pstat_getdynamic to determine number of CPUs, adjust to 1");
-		return 1;
-	}
-	return (int)(psd.psd_proc_cnt);
-
-#elif defined(_SC_NPROCESSORS_ONLN)
-	int ncpu = 0;
-
-	if ( -1 == (ncpu = sysconf(_SC_NPROCESSORS_ONLN)) && EINVAL == errno )
-	{
-		zabbix_log(LOG_LEVEL_WARNING , "Failed sysconf to determine number of CPUs, adjust to 1");
-		return 1;
-	}
-
-	return ncpu;
-
-#elif defined(HAVE_PROC_CPUINFO)
-
-	FILE *f = NULL;
-	int ncpu = 0;
-
-	if(NULL == (file = fopen("/proc/cpuinfo","r") ))
-	{
-		zabbix_log(LOG_LEVEL_WARNING , "Cannot open [/proc/cpuinfo] to determine number of CPUs, adjust to 1 [%s]",strerror(errno));
-		return 1;
-	}
-
-	while(fgets(line,1024,file) != NULL)
-	{
-		if(strstr(line,"processor") == NULL) continue;
-		ncpu++;
-	}
-	zbx_fclose(file);
-
-	if ( ncpu <= 0 )
-	{
-		zabbix_log(LOG_LEVEL_DEBUG , "Can not find [processor] lines in [/proc/cpuinfo] to determine number of CPUs, adjust to 1");
-		return 1;
-	}
-
-	return ncpu;
-#else
-	zabbix_log(LOG_LEVEL_DEBUG , "Can not determine number of CPUs, adjust to 1");
-	return 1;
-#endif
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: init_cpu_collector                                               *
  *                                                                            *
  * Purpose: Initialize statistic structure and prepare state                  *
@@ -131,8 +54,6 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	char		counter_path[MAX_COUNTER_PATH];
 
 	memset(pcpus, 0, sizeof(ZBX_CPUS_STAT_DATA));
-
-	pcpus->count = zbx_get_cpu_num();
 
 	if (PdhOpenQuery(NULL,0,&pcpus->pdh_query)!=ERROR_SUCCESS)
 	{
@@ -185,21 +106,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		return 2;
 	}
 
-#else /* not _WINDOWS */
-
-	memset(pcpus, 0, sizeof(ZBX_CPUS_STAT_DATA));
-
-	pcpus->count = zbx_get_cpu_num();
-
-
 #endif /* _WINDOWS */
-
-	if ( pcpus->count > MAX_CPU )
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Not supported count of CPUs found %i, allowed %i", pcpus->count, MAX_CPU );
-		pcpus->count = MAX_CPU;
-	}
-
 
 	return 0;
 }
@@ -233,7 +140,7 @@ void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		pcpus->queue_counter = NULL;
 	}
 
-	for(i=0; i < MAX_CPU; i++)
+	for(i=0; i < pcpus->count; i++)
 	{
 		if(pcpus->cpu[i].usage_couter)
 		{
@@ -279,8 +186,14 @@ static int	get_cpustat(
 
 	static long	cp_time[5];
 	size_t		nlen = sizeof(cp_time);
- 	
-    #else /* not HAVE_FUNCTION_SYSCTLBYNAME */
+
+    #elif defined(HAVE_KSTAT_H)
+
+	kstat_ctl_t	*kc;
+	kstat_t		*k;
+	cpu_stat_t	*cpu;
+
+    #else /* not HAVE_KSTAT_H */
 
 	return 1;
 	
@@ -351,12 +264,61 @@ static int	get_cpustat(
 	*cpu_nice = (zbx_uint64_t)cp_time[1];
 	*cpu_system = (zbx_uint64_t)cp_time[2];
 	*cpu_idle = (zbx_uint64_t)cp_time[4];
- 	
+
+    #elif defined(HAVE_KSTAT_H)
+
+	/* Solaris */
+
+	*cpu_idle = *cpu_user = *cpu_system = *cpu_nice = 0;
+
+	if (NULL == (kc = kstat_open()))
+		return 1;
+
+	if (cpuid == 0)	/* all cpus */
+	{
+		k = kc->kc_chain;
+		while (k)
+		{
+			if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
+			{
+				cpu = (cpu_stat_t *)k->ks_data;
+
+				*cpu_idle	+= cpu->cpu_sysinfo.cpu[CPU_IDLE];
+				*cpu_user	+= cpu->cpu_sysinfo.cpu[CPU_USER];
+				*cpu_system	+= cpu->cpu_sysinfo.cpu[CPU_KERNEL];
+				*cpu_nice	+= cpu->cpu_sysinfo.cpu[CPU_WAIT];
+			}
+			k = k->ks_next;
+		}
+	}
+	else	/* single cpu */
+	{
+		if (NULL == (k = kstat_lookup(kc, "cpu_stat", cpuid - 1, NULL)))
+		{
+			kstat_close(kc);
+			return 1;
+		}
+
+		if (-1 == kstat_read(kc, k, NULL))
+		{
+			kstat_close(kc);
+			return 1;
+		}
+
+		cpu = (cpu_stat_t *)k->ks_data;
+
+		*cpu_idle	= cpu->cpu_sysinfo.cpu[CPU_IDLE];
+		*cpu_user	= cpu->cpu_sysinfo.cpu[CPU_USER];
+		*cpu_system	= cpu->cpu_sysinfo.cpu[CPU_KERNEL];
+		*cpu_nice	= cpu->cpu_sysinfo.cpu[CPU_WAIT];
+	}
+
+	kstat_close(kc);
+
     #endif /* HAVE_FUNCTION_SYSCTLBYNAME */
 
 	return 0;
 }
-
 
 static void	apply_cpustat(
 	ZBX_CPUS_STAT_DATA *pcpus,

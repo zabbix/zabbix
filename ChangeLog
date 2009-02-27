@@ -1,5 +1,7 @@
 Changes for 1.0.0
 
+ - [NTD-75] added support of <mode> for system.cpu.util under Solaris (Sasha)
+ - [NTD-75] fixed processing of system.cpu.util under Solaris (Sasha)
  - [NTP-5] allowed multibyte chars in web scenarios (Artem)
  - [NTD-79] updated list of supported items in item configuration form (Sasha)
  - [NTD-76] fixed incorrect processing of net.tcp.listen (Sasha)
