@@ -1179,6 +1179,7 @@
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SERVER_INFO) ){
+//					$item = array(get_table_header(S_STATUS_OF_ZABBIX_BIG),make_status_of_zbx());
 					$item = array(new CServerInfo());
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}

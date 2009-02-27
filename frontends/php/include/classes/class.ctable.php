@@ -94,7 +94,7 @@ class CTable extends CTag{
 	return $item;
 	}
 
-	public function setHeader($value=NULL,$class=NULL){
+	public function setHeader($value=NULL,$class='header'){
 		if(isset($_REQUEST['print'])) hide_form_items($value);
 		if(is_null($class)) $class = $this->headerClass;
 
@@ -109,7 +109,7 @@ class CTable extends CTag{
 		$this->header = $value->toString();
 	}
 
-	public function setFooter($value=NULL,$class=NULL){
+	public function setFooter($value=NULL,$class='footer'){
 		if(isset($_REQUEST['print'])) hide_form_items($value);
 		if(is_null($class)) $class = $this->footerClass;
 

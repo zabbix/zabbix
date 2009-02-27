@@ -39,7 +39,7 @@ include_once "include/page_header.php";
 	show_table_header(S_STATUS_OF_ZABBIX_BIG);
 	
 	$status = make_status_of_zbx();
-	$status->Show();
+	$status->show();
 ?>
 <?php
 

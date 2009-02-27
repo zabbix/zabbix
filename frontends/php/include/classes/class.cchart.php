@@ -548,7 +548,7 @@ class CChart extends CGraph{
 				$a[2] = $x1;		$a[3] = $y1min;
 				$a[4] = $x2;		$a[5] = $y2min;
 				$a[6] = $x2;		$a[7] = $y2max;
-				
+//SDI('2: '.$x2.' - '.$x1.' : '.$y2min.' - '.$y1min);
 				imagefilledpolygon($this->im,$a,4,$minmax_color);
 				imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
 				imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
@@ -999,8 +999,8 @@ class CChart extends CGraph{
 			$calc_field = 'round('.$x.'*(mod('.zbx_dbcast_2bigint('clock').'+'.$z.','.$p.'))/('.$p.'),0)';  /* required for 'group by' support of Oracle */
 			
 			$sql_arr = array();
-	
-			if((($real_item['history']*86400) > (time()-($from_time+$this->period/2))) &&				// should pick data from history or trends
+
+			if((($real_item['history']*86400) > (time()-($this->from_time+$this->period/2))) &&				// should pick data from history or trends
 				(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))		// is reasonable to take data from history?
 			{
 				array_push($sql_arr,
@@ -1346,7 +1346,7 @@ class CChart extends CGraph{
 			$maxY = $this->m_maxY[$this->items[$item]['axisside']];
 
 			$data = &$this->data[$this->items[$item]['itemid']][$this->items[$item]['calc_type']];
-			
+
 			if(!isset($data))	continue;
 
 			if($this->items[$item]['calc_type'] == GRAPH_ITEM_AGGREGATED){
@@ -1381,7 +1381,6 @@ class CChart extends CGraph{
 			}
 // For each X
 			for($i = 1, $j = 0; $i < $maxX; $i++){  // new point
-			
 				if(($data->count[$i] == 0) && ($i != ($maxX-1))) continue;
 
 				$diff	= abs($data->clock[$i] - $data->clock[$j]);

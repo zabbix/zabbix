@@ -25,6 +25,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-740] fixed wrong aggregate graph drawing (Artem)
  - [ZBX-747] fixed template linkage not working properly (Vedmak)
  - [ZBX-746] fixed incorrect processing of net.tcp.listen (Sasha)
  - [ZBX-745] fixed "invalid URL" when use small popup menus like ping etc (Vedmak)

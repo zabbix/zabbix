@@ -42,13 +42,13 @@ function make_favorite_graphs(){
 			$item["description"] = item_description($item);
 			
 			$link = new CLink(get_node_name_by_elid($sourceid).$host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$sourceid);
-			$link->SetTarget('blank');
+			$link->setTarget('blank');
 			
 			$capt = new CSpan($link);
-			$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
+			$capt->addOption('style','line-height: 14px; vertical-align: middle;');
 			
 			$icon = new CLink(new CImg('images/general/chart.png','chart',18,18,'borderless'),'history.php?action=showgraph&itemid='.$sourceid.'&fullscreen=1');
-			$icon->SetTarget('blank');
+			$icon->setTarget('blank');
 		}
 		else{
 			if(!$graph = get_graph_by_graphid($sourceid)) continue;
@@ -58,16 +58,16 @@ function make_favorite_graphs(){
 			$ghost = DBFetch($result);
 	
 			$link = new CLink(get_node_name_by_elid($sourceid).$ghost['host'].':'.$graph['name'],'charts.php?graphid='.$sourceid);
-			$link->SetTarget('blank');
+			$link->setTarget('blank');
 	
 			$capt = new CSpan($link);
-			$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
+			$capt->addOption('style','line-height: 14px; vertical-align: middle;');
 			
 			$icon = new CLink(new CImg('images/general/chart.png','chart',18,18,'borderless'),'charts.php?graphid='.$sourceid.'&fullscreen=1');
-			$icon->SetTarget('blank');
+			$icon->setTarget('blank');
 		}
 		
-		$table->AddRow(new CCol(array(
+		$table->addRow(new CCol(array(
 			$icon,
 			SPACE,
 			$capt)
@@ -76,7 +76,7 @@ function make_favorite_graphs(){
 	$td = new CCol(array(new CLink(S_GRAPHS.' &raquo;','charts.php','highlight')));
 	$td->addOption('style','text-align: right;');
 
-	$table->SetFooter($td);
+	$table->setFooter($td);
 	
 return $table;
 }
@@ -96,23 +96,23 @@ function make_favorite_screens(){
 			if(!slideshow_accessible($sourceid, PERM_READ_ONLY)) continue;
 
 			$link = new CLink(get_node_name_by_elid($sourceid).$slide['name'],'screens.php?config=1&elementid='.$sourceid);
-			$link->SetTarget('blank');
+			$link->setTarget('blank');
 		
 			$capt = new CSpan($link);
-			$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
+			$capt->addOption('style','line-height: 14px; vertical-align: middle;');
 			
 			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=1&elementid='.$sourceid.'&fullscreen=1');
-			$icon->SetTarget('blank');
+			$icon->setTarget('blank');
 		}
 		else{
 			if(!$screen = get_screen_by_screenid($sourceid)) continue;
 			if(!screen_accessible($sourceid, PERM_READ_ONLY)) continue;
 		
 			$link = new CLink(get_node_name_by_elid($sourceid).$screen['name'],'screens.php?config=0&elementid='.$sourceid);
-			$link->SetTarget('blank');
+			$link->setTarget('blank');
 			
 			$capt = new CSpan($link);
-			$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
+			$capt->addOption('style','line-height: 14px; vertical-align: middle;');
 			
 			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=0&elementid='.$sourceid.'&fullscreen=1');
 			$icon->setTarget('blank');
@@ -126,9 +126,9 @@ function make_favorite_screens(){
 	}
 	
 	$td = new CCol(array(new CLink(S_SCREENS.' &raquo;','screens.php','highlight')));
-	$td->AddOption('style','text-align: right;');
+	$td->addOption('style','text-align: right;');
 
-	$table->SetFooter($td);
+	$table->setFooter($td);
 
 return $table;
 }
@@ -148,15 +148,15 @@ function make_favorite_maps(){
 		if(!sysmap_accessible($sourceid,PERM_READ_ONLY)) continue;
 		
 		$link = new CLink(get_node_name_by_elid($sourceid).$sysmap['name'],'maps.php?sysmapid='.$sourceid);
-		$link->SetTarget('blank');
+		$link->setTarget('blank');
 
 		$capt = new CSpan($link);
-		$capt->AddOption('style','line-height: 14px; vertical-align: middle;');
+		$capt->addOption('style','line-height: 14px; vertical-align: middle;');
 		
 		$icon = new CLink(new CImg('images/general/chart.png','map',18,18,'borderless'),'maps.php?sysmapid='.$sourceid.'&fullscreen=1');
-		$icon->SetTarget('blank');
+		$icon->setTarget('blank');
 
-		$table->AddRow(new CCol(array(
+		$table->addRow(new CCol(array(
 			$icon,
 			SPACE,
 			$capt)
@@ -164,9 +164,9 @@ function make_favorite_maps(){
 	}
 	
 	$td = new CCol(array(new CLink(S_MAPS.' &raquo;','maps.php','highlight')));
-	$td->AddOption('style','text-align: right;');
+	$td->addOption('style','text-align: right;');
 
-	$table->SetFooter($td);
+	$table->setFooter($td);
 
 return $table;
 }
@@ -223,11 +223,11 @@ function make_system_summary($args = array()){
 	while($group = DBFetch($gr_result)){
 		$group_row = new CRow();
 		if(is_show_subnodes())
-			$group_row->AddItem(get_node_name_by_elid($group['groupid']));
+			$group_row->addItem(get_node_name_by_elid($group['groupid']));
 		
 		$name = new CLink($group['name'],'tr_status.php?groupid='.$group['groupid'].'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
-		$name->SetTarget('blank');
-		$group_row->AddItem($name);
+		$name->setTarget('blank');
+		$group_row->addItem($name);
 		
 		$tab_priority[TRIGGER_SEVERITY_DISASTER] = 0;
 		$tab_priority[TRIGGER_SEVERITY_HIGH] = 0;
@@ -261,8 +261,8 @@ function make_system_summary($args = array()){
 				$tr_count = 0;
 //* trigger list
 				$table_inf  = new CTableInfo();
-				$table_inf->AddOption('style', 'width: 400px;');
-				$table_inf->SetHeader(array(
+				$table_inf->addOption('style', 'width: 400px;');
+				$table_inf->setHeader(array(
 					is_show_subnodes() ? S_NODE : null,
 					S_HOST,
 					S_ISSUE,
@@ -339,23 +339,22 @@ function make_system_summary($args = array()){
 				}
 				
 				$value = new CSpan($tr_count);
-				$value->SetHint($table_inf);
+				$value->setHint($table_inf);
 //-------------*/
 			}
-			$group_row->AddItem(new CCol($value,get_severity_style($key,$normal)));
+			$group_row->addItem(new CCol($value,get_severity_style($key,$normal)));
 			unset($table_inf);
 		}		
-		$table->AddRow($group_row);
+		$table->addRow($group_row);
 	}
-	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 return $table;
 }
 
 // Author: Aly
 function make_status_of_zbx(){
 	$table = new CTableInfo();
-
-	$table->SetHeader(array(
+	$table->setHeader(array(
 		S_PARAMETER,
 		S_VALUE,
 		S_DETAILS
@@ -363,23 +362,23 @@ function make_status_of_zbx(){
 
 	$status=get_status();
 
-	$table->AddRow(array(S_ZABBIX_SERVER_IS_RUNNING,new CSpan($status['zabbix_server'], ($status['zabbix_server'] == S_YES ? 'off' : 'on')),' - '));
-//	$table->AddRow(array(S_VALUES_STORED,$status['history_count']));$table->AddRow(array(S_TRENDS_STORED,$status['trends_count']));
-	$table->AddRow(array(S_NUMBER_OF_HOSTS,$status['hosts_count'],
+	$table->addRow(array(S_ZABBIX_SERVER_IS_RUNNING,new CSpan($status['zabbix_server'], ($status['zabbix_server'] == S_YES ? 'off' : 'on')),' - '));
+//	$table->addRow(array(S_VALUES_STORED,$status['history_count']));$table->addRow(array(S_TRENDS_STORED,$status['trends_count']));
+	$table->addRow(array(S_NUMBER_OF_HOSTS,$status['hosts_count'],
 		array(
 			new CSpan($status['hosts_count_monitored'],'off'),' / ',
 			new CSpan($status['hosts_count_not_monitored'],'on'),' / ',
 			new CSpan($status['hosts_count_template'],'unknown')
 		)
 	));
-	$table->AddRow(array(S_NUMBER_OF_ITEMS,$status['items_count'],
+	$table->addRow(array(S_NUMBER_OF_ITEMS,$status['items_count'],
 		array(
 			new CSpan($status['items_count_monitored'],'off'),' / ',
 			new CSpan($status['items_count_disabled'],'on'),' / ',
 			new CSpan($status['items_count_not_supported'],'unknown')
 		)
 	));
-	$table->AddRow(array(S_NUMBER_OF_TRIGGERS,$status['triggers_count'],
+	$table->addRow(array(S_NUMBER_OF_TRIGGERS,$status['triggers_count'],
 		array(
 			$status['triggers_count_enabled'],' / ',
 			$status['triggers_count_disabled'].SPACE.SPACE.'[',
@@ -388,8 +387,8 @@ function make_status_of_zbx(){
 			new CSpan($status['triggers_count_off'],'off'),']'
 		)
 	));
-/*	$table->AddRow(array(S_NUMBER_OF_EVENTS,$status['events_count'],' - '));
-	$table->AddRow(array(S_NUMBER_OF_ALERTS,$status['alerts_count'],' - '));*/
+/*	$table->addRow(array(S_NUMBER_OF_EVENTS,$status['events_count'],' - '));
+	$table->addRow(array(S_NUMBER_OF_ALERTS,$status['alerts_count'],' - '));*/
 
 //Log Out 10min	
 	$sql = 'SELECT DISTINCT u.userid, MAX(s.lastaccess) as lastaccess, MAX(u.autologout) as autologout, s.status '.
@@ -407,9 +406,9 @@ function make_status_of_zbx(){
 		$usr_cnt++;
 	}
 
-	$table->AddRow(array(S_NUMBER_OF_USERS,$usr_cnt,new CSpan($online_cnt,'green')));
-	$table->AddRow(array(S_REQUIRED_SERVER_PERFORMANCE_NVPS,$status['qps_total'],' - '));
-	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+	$table->addRow(array(S_NUMBER_OF_USERS,$usr_cnt,new CSpan($online_cnt,'green')));
+	$table->addRow(array(S_REQUIRED_SERVER_PERFORMANCE_NVPS,$status['qps_total'],' - '));
+	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 return $table;
 }
 
@@ -526,7 +525,7 @@ function make_latest_issues($params = array()){
 //--------			
 			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'].'&source=0&nav_time='.$row['lastchange'],'action');
 			
-						$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action') : $description;						$table->AddRow(array(				get_node_name_by_elid($row['triggerid']),
+						$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action') : $description;						$table->addRow(array(				get_node_name_by_elid($row['triggerid']),
 				(isset($params['groupid']) && ($params['groupid']>0))?$row['name']:null,
 				$host,
 				new CCol($description,get_severity_style($row["priority"])),
@@ -549,7 +548,7 @@ function make_webmon_overview(){
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
 	$table  = new CTableInfo();
-	$table->SetHeader(array(
+	$table->setHeader(array(
 		is_show_subnodes() ? S_NODE : null,
 		S_HOST_GROUP,
 		S_OK,
@@ -603,7 +602,7 @@ function make_webmon_overview(){
 			}
 		}
 		
-		$table->AddRow(array(
+		$table->addRow(array(
 			is_show_subnodes() ? get_node_name_by_elid($group['groupid']) : null,
 			$group['name'],
 			new CSpan($apps['ok'],'off'),
@@ -612,7 +611,7 @@ function make_webmon_overview(){
 			new CSpan($apps[HTTPTEST_STATE_UNKNOWN],'unknown')
 		));
 	}
-	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 return $table;	
 }
 
@@ -650,17 +649,17 @@ function make_discovery_status(){
 		);
 
 	$table  = new CTableInfo();
-	$table->SetHeader($header,'vertical_header');
+	$table->setHeader($header,'vertical_header');
 
 	foreach($drules as $druleid => $drule){
-		$table->AddRow(array(
+		$table->addRow(array(
 			get_node_name_by_elid($druleid),
 			new CLink(get_node_name_by_elid($drule['druleid']).$drule['name'],'discovery.php?druleid='.$druleid),
 			new CSpan($drule['up'],'green'),
 			new CSpan($drule['down'],($drule['down'] > 0)?'red':'green')
 		));
 	}
-	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 
 return 	$table;
 }
@@ -742,7 +741,7 @@ function make_latest_data(){
 
 			$col = new CCol(array($link,SPACE,bold($db_app["name"]),
 				SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
-			$col->SetColSpan(5);
+			$col->setColSpan(5);
 
 			$table->ShowRow(array(
 					get_node_name_by_elid($db_app['hostid']),
