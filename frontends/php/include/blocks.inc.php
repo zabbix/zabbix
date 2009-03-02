@@ -352,21 +352,27 @@ function make_status_of_zbx(){
 
 	$table->AddRow(array(S_ZABBIX_SERVER_IS_RUNNING,new CSpan($status['zabbix_server'], ($status['zabbix_server'] == S_YES ? 'off' : 'on')),' - '));
 //	$table->AddRow(array(S_VALUES_STORED,$status['history_count']));$table->AddRow(array(S_TRENDS_STORED,$status['trends_count']));
-	$table->AddRow(array(S_NUMBER_OF_HOSTS,$status['hosts_count'],
+	$title = new CSpan(S_NUMBER_OF_HOSTS);
+	$title->addOption('title', 'asdad');
+	$table->AddRow(array(S_NUMBER_OF_HOSTS ,$status['hosts_count'],
 		array(
 			new CSpan($status['hosts_count_monitored'],'off'),' / ',
 			new CSpan($status['hosts_count_not_monitored'],'on'),' / ',
 			new CSpan($status['hosts_count_template'],'unknown')
 		)
 	));
-	$table->AddRow(array(S_NUMBER_OF_ITEMS,$status['items_count'],
+	$title = new CSpan(S_NUMBER_OF_ITEMS);
+	$title->addOption('title', S_NUMBER_OF_ITEMS_TOOLTIP);
+	$table->AddRow(array($title, $status['items_count'],
 		array(
 			new CSpan($status['items_count_monitored'],'off'),' / ',
 			new CSpan($status['items_count_disabled'],'on'),' / ',
 			new CSpan($status['items_count_not_supported'],'unknown')
 		)
 	));
-	$table->AddRow(array(S_NUMBER_OF_TRIGGERS,$status['triggers_count'],
+	$title = new CSpan(S_NUMBER_OF_TRIGGERS);
+	$title->addOption('title', S_NUMBER_OF_TRIGGERS_TOOLTIP);
+	$table->AddRow(array($title,$status['triggers_count'],
 		array(
 			$status['triggers_count_enabled'],' / ',
 			$status['triggers_count_disabled'].SPACE.SPACE.'[',

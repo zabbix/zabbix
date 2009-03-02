@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-756] added tooltip in "status of ZABBIX" report for number of items and triggers parameter (Vedmak)
  - [ZBX-740] fixed wrong aggregate graph drawing (Artem)
  - [ZBX-747] fixed template linkage not working properly (Vedmak)
  - [ZBX-746] fixed incorrect processing of net.tcp.listen (Sasha)
