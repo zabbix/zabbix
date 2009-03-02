@@ -42,11 +42,11 @@ int	get_fs_size_stat(char *fs, zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint
 
 #ifdef HAVE_SYS_STATVFS_H
         if(total)
-                (*total) = (zbx_uint64_t)(s.f_blocks * (s.f_frsize / 1024.0));
+                (*total) = (zbx_uint64_t)(s.f_blocks * (s.f_bsize / 1024.0));
         if(free)
-                (*free)  = (zbx_uint64_t)(s.f_bavail * (s.f_frsize / 1024.0));
+                (*free)  = (zbx_uint64_t)(s.f_bavail * (s.f_bsize / 1024.0));
         if(usage)
-                (*usage) = (zbx_uint64_t)((s.f_blocks - s.f_bavail) * (s.f_frsize / 1024.0));
+                (*usage) = (zbx_uint64_t)((s.f_blocks - s.f_bfree) * (s.f_bsize / 1024.0));
 #else
         if(total)
                 (*total) = (zbx_uint64_t)(s.f_blocks * (s.f_bsize / 1024.0));
