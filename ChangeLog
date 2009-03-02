@@ -28,6 +28,8 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-737] the behaviour of the agent's key "vfs.fs.size" improved to be similar to the "df" command (Dmitry)
+ - [ZBX-599] the purpose of the configuration parameter StartAgents precised (Dmitry)
  - [ZBX-756] added tooltip in "status of ZABBIX" report for number of items and triggers parameter (Vedmak)
  - [ZBX-740] fixed wrong aggregate graph drawing (Artem)
  - [ZBX-747] fixed template linkage not working properly (Vedmak)
