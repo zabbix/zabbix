@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [ZBX-757] fixed "Bar reports" add item permission problem for users (Vedmak)
  - [ZBX-752] fixed wrong audit logs for trigger actions (Vedmak)
  - [ZBX-483] added sorting to selection box (Artem)
  - [DEV-287] support of PHP4 is removed from source (Artem)
