@@ -334,7 +334,7 @@
 		} 
 		else if ($db_item && $item['templateid'] != 0){
 			$item['hostid'] = $db_item['hostid'];
-			$item['applications'] = get_same_applications_for_host($applications, $db_item['hostid']);
+			$item['applications'] = get_same_applications_for_host($item['applications'], $db_item['hostid']);
 
 			$result = update_item($db_item['itemid'], $item);
 
