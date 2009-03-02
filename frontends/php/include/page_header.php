@@ -186,7 +186,8 @@ COpt::profiling_start("page");
 							'label'=>S_BAR_REPORTS,
 							'sub_pages'=>array('popup_period.php','popup_bitem.php','chart_bar.php')
 						),
-					)
+					),
+					array('url'=>'popup.php')
 				),
 		'config'=>array(
 				'label'			=> S_CONFIGURATION,
@@ -237,8 +238,7 @@ COpt::profiling_start("page");
 							'sub_pages'=>array('services_form.php')	
 						),
 					array('url'=>'discoveryconf.php','label'=>S_DISCOVERY),
-					array('url'=>'exp_imp.php'	,'label'=>S_EXPORT_IMPORT),
-					array('url'=>'popup.php')
+					array('url'=>'exp_imp.php'	,'label'=>S_EXPORT_IMPORT)
 					)
 				),
 		'admin'=>array(
@@ -296,19 +296,16 @@ COpt::profiling_start("page");
 		}
 
 //---
-		$menu_class = 'horizontal_menu_n';
-		
+		$menu_class = 'horizontal_menu_n';	
 		$page_exists = false;
 		$sub_menus[$label] = array();
 		foreach($menu['pages'] as $id => $sub_page){
 			$show_sub_menu = true;
 // show check
 			if(!isset($sub_page['label'])) $show_sub_menu = false;
-
 			if(isset($sub_page['user_type']) && ($USER_DETAILS['type'] < $sub_page['user_type'])){
 				$show_sub_menu = false;
 			}
-
 			if(isset($sub_pages['node_perm']) && isset($DB['DB']) && !is_null($DB['DB'])){
 				$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,$sub_page['node_perm']);				
 				if(0 == count($available_nodes)){
@@ -323,7 +320,6 @@ COpt::profiling_start("page");
 
 			$sub_menu_active = ($page['file'] == $sub_page['url']);
 			$sub_menu_active |=  (isset($sub_page['sub_pages']) && str_in_array($page['file'], $sub_page['sub_pages']));
-
 			if($sub_menu_active){
 // PERMISSION CHECK
 				$deny &= ($USER_DETAILS['type'] < $menu['user_type']);
