@@ -165,12 +165,7 @@ void	init_collector_data(void)
 	key_t	shm_key;
 #endif
 
-#if defined(_WINDOWS) || defined(HAVE_PROC_STAT) || defined(HAVE_SYS_PSTAT_H) ||\
-	defined(HAVE_FUNCTION_SYSCTL_KERN_CPTIME) || defined(HAVE_LIBPERFSTAT)
 	cpu_count = zbx_get_cpu_num();
-#else /* HAVE_FUNCTION_SYSCTLBYNAME sysctlbyname("kern.cp_time"...) supported utilization of all CPU only */
-	cpu_count = 0;
-#endif
 
 	sz = sizeof(ZBX_COLLECTOR_DATA);
 	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
