@@ -216,7 +216,13 @@ static int	get_cpustat(
 	perfstat_cpu_t		ps_cpu;
 	perfstat_id_t		ps_id;
 
-    #else /* not HAVE_LIBPERFSTAT */
+    #elif defined(HAVE_KSTAT_H)
+
+	kstat_ctl_t	*kc;
+	kstat_t		*k;
+	cpu_stat_t	*cpu;
+
+    #else /* not HAVE_KSTAT_H */
 
 	return 1;
 	
@@ -296,6 +302,56 @@ static int	get_cpustat(
 	*cpu_interrupt	= (zbx_uint64_t)cp_time[CP_INTR];
 	*cpu_idle	= (zbx_uint64_t)cp_time[CP_IDLE];
 	*cpu_iowait	= 0;
+
+    #elif defined(HAVE_KSTAT_H)
+
+	/* Solaris */
+
+	*cpu_idle = *cpu_user = *cpu_system = *cpu_nice = *cpu_interrupt = *cpu_iowait = 0;
+
+	if (NULL == (kc = kstat_open()))
+		return 1;
+
+	if (cpuid == 0)	/* all cpus */
+	{
+		k = kc->kc_chain;
+		while (k)
+		{
+			if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
+			{
+				cpu = (cpu_stat_t *)k->ks_data;
+
+				*cpu_idle	+= cpu->cpu_sysinfo.cpu[CPU_IDLE];
+				*cpu_user	+= cpu->cpu_sysinfo.cpu[CPU_USER];
+				*cpu_system	+= cpu->cpu_sysinfo.cpu[CPU_KERNEL];
+				*cpu_nice	+= cpu->cpu_sysinfo.cpu[CPU_WAIT];
+			}
+			k = k->ks_next;
+		}
+	}
+	else	/* single cpu */
+	{
+		if (NULL == (k = kstat_lookup(kc, "cpu_stat", cpuid - 1, NULL)))
+		{
+			kstat_close(kc);
+			return 1;
+		}
+
+		if (-1 == kstat_read(kc, k, NULL))
+		{
+			kstat_close(kc);
+			return 1;
+		}
+
+		cpu = (cpu_stat_t *)k->ks_data;
+
+		*cpu_idle	= cpu->cpu_sysinfo.cpu[CPU_IDLE];
+		*cpu_user	= cpu->cpu_sysinfo.cpu[CPU_USER];
+		*cpu_system	= cpu->cpu_sysinfo.cpu[CPU_KERNEL];
+		*cpu_nice	= cpu->cpu_sysinfo.cpu[CPU_WAIT];
+	}
+
+	kstat_close(kc);
 
     #elif defined(HAVE_FUNCTION_SYSCTL_KERN_CPTIME)
 	/* OpenBSD 4.3 */
@@ -378,7 +434,6 @@ static int	get_cpustat(
 
 	return 0;
 }
-
 
 static void	apply_cpustat(
 	ZBX_CPUS_STAT_DATA *pcpus,
