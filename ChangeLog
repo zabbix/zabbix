@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [ZBX-760] historical data is now available for "not supported" items (Vedmak)
  - [ZBX-758] fixed wrong template linking (amach)
  - [ZBX-757] fixed "Bar reports" add item permission problem for users (Vedmak)
  - [ZBX-752] fixed wrong audit logs for trigger actions (Vedmak)
