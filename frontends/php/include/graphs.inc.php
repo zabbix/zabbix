@@ -230,7 +230,6 @@
 				' FROM graphs g, graphs_items gi, items i '.
 				' WHERE g.graphid=gi.graphid '.
 					' AND i.itemid=gi.itemid '.
-					' AND i.status='.ITEM_STATUS_ACTIVE.
 					$sql_where.
 					(!empty($denied_graphs)?' AND '.DBcondition('g.graphid',$denied_graphs,true):'');
 		$db_graphs = DBselect($sql);

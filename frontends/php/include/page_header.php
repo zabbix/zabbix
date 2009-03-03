@@ -186,8 +186,8 @@ COpt::profiling_start("page");
 							'label'=>S_BAR_REPORTS,
 							'sub_pages'=>array('popup_period.php','popup_bitem.php','chart_bar.php')
 						),
-					),
 					array('url'=>'popup.php')
+					),
 				),
 		'config'=>array(
 				'label'			=> S_CONFIGURATION,
