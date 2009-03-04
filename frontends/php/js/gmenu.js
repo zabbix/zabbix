@@ -810,7 +810,7 @@ function gmenucreate(top,left){
 	
 	Element.extend(div_gmenu);
 	div_gmenu.setAttribute('id','gmenu');
-	div_gmenu.setStyle({top: top+'px', left: left+'px',display: 'none'});
+	div_gmenu.setStyle({'top': top+'px', 'left': left+'px','display': 'none'});
 	
 ////////////////////////////////////////////// BSDATE
 

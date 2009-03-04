@@ -377,7 +377,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		else if($bool && !is_null($okmsg))	$msg=$okmsg;
 
 		if(isset($msg)){
-			switch($page["type"]){
+			switch($page['type']){
 				case PAGE_TYPE_IMAGE:
 					array_push($message, array(
 						'text'	=> $msg,
@@ -395,7 +395,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					$msg_tab->setCellPadding(0);
 					$msg_tab->setCellSpacing(0);
 
-					$msg_col = new CCol(bold($msg),'msg');
+					$msg_col = new CCol(bold($msg),'msg_main msg');
 					$msg_col->addOption('id','page_msg');
 
 					$msg_details = SPACE;
@@ -453,7 +453,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					$msg_count = $msg_show;
 
 					$msg_count = ($msg_count * 16);
-					$lst_error->AddOption('style','height: '.$msg_count.'px;');
+					$lst_error->addOption('style','height: '.$msg_count.'px;');
 				}
 
 
