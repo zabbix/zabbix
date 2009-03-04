@@ -21,6 +21,7 @@ ul.messages{
 ul.messages li{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 8pt;
+	height: 18px;
 }
 
 ul.messages li.info{
