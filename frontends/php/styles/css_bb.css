@@ -10,6 +10,7 @@
 @media screen {
 	body{
 		background-color:#353535;
+		color: #0088FF;
 	} 
 }
 
@@ -113,6 +114,10 @@ A.styled:active 	{	color:#0BF;	 }
 
 
 /*////////////////	TABLES	////////////////////*/
+table{
+	color: #000000;
+}
+
 table.page_header tr td.page_header_r{
 /*
 	background-position:right;
@@ -159,15 +164,16 @@ td.form_row_r_simple { /* right cell simple */
 	border-color: #222; 
 }
 
-table.formlongtable tr td.form_row_first
-{
+table.formlongtable tr td.form_row_first{
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 	border-color: #222; 
 }
+
 table.formlongtable tr td.form_row_last {
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 	border-color: #222; 
 }
+
 table.formlongtable tr td.form_row_l { /* left cell */
 	border-color:	#222;
 }
@@ -183,7 +189,9 @@ table.tabletree tr.footer td {
 }
 
 table.tableinfo{
+	border-spacing: 1px; 
 	background-color: #5A5A5A;
+	border: 0px #5A5A5A solid; 
 }
 
 table.tableinfo tr td.normal			{	background-color: #AADDDD;	border: 1px #AADDDD solid; }
@@ -200,6 +208,12 @@ table.tableinfo tr.footer td {
 
 table.header{
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
+}
+table.header tr td.header_l{
+	height: 24px;
+}
+table.header tr td.header_r{
+	height: 24px;
 }
 
 table.filter{
@@ -238,8 +252,15 @@ table.hosts_info tr td.header {
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
+table.server_info{
+	border: 1px #555555 solid;
+}
 
 table.server_info tr td.header {
+	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
+}
+
+table.server_info tr.footer td {
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
@@ -252,12 +273,29 @@ table.msgok{
 	border: 1px #0088FF solid;
 }
 
-table.msgok td.clr{
+table.msgok tr td.clr{
 	background-color:#0088FF;
 }
 
-table.msgok td.msg{
+table.msgok tr td.msg{
 	background-color:#BBBBFF;
+}
+
+/*  SCREENS */
+table.screen_edit{
+	background-color: #333333;
+}
+
+table.screen_edit td{
+	background-color: #333333;
+}
+
+table.screen_view{
+	background-color: #333333;
+}
+
+table.screen_view td{
+	background-color: #333333;
 }
 /*----------*/
 
