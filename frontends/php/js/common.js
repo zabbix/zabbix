@@ -21,14 +21,17 @@
 var agt = navigator.userAgent.toLowerCase();
 var OP = (agt.indexOf("opera") != -1) && window.opera;
 var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
+var CR = (agt.indexOf('chrome') != -1);
 var SF = (agt.indexOf("safari") != -1);
 var KQ = (agt.indexOf("khtml") != -1) && (!SF);
 var GK = (agt.indexOf("gecko") != -1) && !KQ && !SF;
 var MC = (agt.indexOf('mac') != -1)
 
+
 function checkBrowser(){
 	if(OP) SDI('Opera');
 	if(IE) SDI('IE');
+	if(CR) SDI('Chrome');
 	if(SF) SDI('Safari');
 	if(KQ) SDI('Konqueror');
 	if(MC) SDI('Mac');
@@ -121,11 +124,11 @@ function SDJ(obj){
 function addListener(element, eventname, expression, bubbling){
 	bubbling = bubbling || false;
 	
-	if(window.addEventListener)	{
+	if(window.addEventListener){
 		element.addEventListener(eventname, expression, bubbling);
 		return true;
 	} 
-	else if(window.attachEvent) {
+	else if(window.attachEvent){
 		element.attachEvent('on'+eventname, expression);
 		return true;
 	} 
@@ -135,11 +138,11 @@ function addListener(element, eventname, expression, bubbling){
 function removeListener(element, eventname, expression, bubbling){
 	bubbling = bubbling || false;
 	
-	if(window.removeEventListener)	{
+	if(window.removeEventListener){
 		element.removeEventListener(eventname, expression, bubbling);
 		return true;
 	} 
-	else if(window.detachEvent) {
+	else if(window.detachEvent){
 		element.detachEvent('on'+eventname, expression);
 		return true;
 	} 

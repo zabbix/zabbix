@@ -370,15 +370,13 @@ table.screen_edit tr td.right_top {	text-align: right;	vertical-align: top;		}
 table.screen_edit tr td.right_mdl {	text-align: right;	vertical-align: middle;		}
 table.screen_edit tr td.right_bttm {	text-align: right;	vertical-align: bottom;		}
 
-table.screen_view
-{
+table.screen_view{
 	background-color: #FFFFFF;
 	width: 100%;
 	border: 1px #DDDDDD;
 }
 
-table.screen_view td
-{
+table.screen_view td{
 	background-color: #FFFFFF;
 	border: 1px #DDDDDD;
 	text-align: center;
@@ -476,8 +474,7 @@ table.tableinfo{
 	color: #000000;
 	width: 100%; 
 	background-color: #AAAAAA;
-	border-spacing:	1px; /* cellspacing */
-	border-width: 0px;
+	border: 1px #AAAAAA dotted;
 }
 
 table.tableinfo tr td {
@@ -623,8 +620,7 @@ table.header tr td.header_r{
 	border-width: 0px;
 }
 
-table.header a
-{
+table.header a{
 	color: #FFFFFF;
 }
 
@@ -913,7 +909,6 @@ table.server_info tr td {
 	border: 0px;
 	padding-left: 5px;
 	padding-right: 5px;
-	font-weight: bold;
 	text-align: left;
 	font-family: Verdana, Helvetica, Geneva;
 	font-size: 11px;
@@ -931,7 +926,6 @@ table.server_info tr.status td{
 	white-space: nowrap;
 	word-spacing:	0px;
 }
-
 /**************** WARNING ***********/
 
 table.warning{
@@ -1144,25 +1138,26 @@ table.msgok{
 	border: 1px #44CC44 solid;
 }
 
-table.msgok tr{
-	height: 26px;
-}
-
-table.msgok td{
+table.msgok tr td{
 	color:#333;
 	font-family: Verdana, Helvetica, Geneva;
 	font-size:11px;
 	text-align:center;
 }
 
-table.msgok td.clr{
+table.msgok tr td.clr{
 	width: 60px;
 	background-color:#44CC44;
 	font-size:10px;
 	font-weight: bold;
 }
 
-table.msgok td.msg{
+
+table.msgok tr td.msg_main{
+	height: 26px;
+}
+
+table.msgok tr td.msg{
 	background-color:#BBFFBB;
 }
 
@@ -1178,14 +1173,18 @@ table.msgerr tr td{
 	text-align:center;
 }
 
-table.msgerr td.clr{
+table.msgerr tr td.clr{
 	width: 60px;
 	background-color:#CC4444;
 	font-size:10px;
 	font-weight: bold;
 }
 
-table.msgerr td.msg{
+table.msgerr tr td.msg_main{
+	height: 26px;
+}
+
+table.msgerr tr td.msg{
 	background-color:#FFBBBB;
 }
 /**************** </MESSAGE> *****************/
