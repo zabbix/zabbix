@@ -205,6 +205,7 @@ function graphload(dom_objects,unix_stime,period,dynamic){
 			G_MENU.setPeriodType();
 //---------
 //alert(url_stime);
+
 			uri = new url(dom_objects[i].src);
 			uri.setArgument('stime', url_stime);
 			uri.setArgument('period', period);
@@ -216,7 +217,8 @@ function graphload(dom_objects,unix_stime,period,dynamic){
 		uri = new url(dom_objects[0].href);
 		uri.setArgument('stime', url_stime);
 		uri.setArgument('period', period);
-
+		uri.setArgument('output', null);
+//	alert(uri.getUrl());
 		dom_objects[0].href = uri.getUrl();
 	}	
 }
