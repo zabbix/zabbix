@@ -25,12 +25,15 @@
 #define ZBX_DC_HISTORY struct zbx_dc_history_type
 #define ZBX_DC_TREND struct zbx_dc_trend_type
 #define ZBX_DC_NEXTCHECK struct zbx_dc_nextcheck_type
+#define ZBX_DC_ID struct zbx_dc_id_type
+#define ZBX_DC_IDS struct zbx_dc_ids_type
 
 #define	ZBX_HISTORY_SIZE	100000
 /* Must be less than ZBX_HISTORY_SIZE */
 #define	ZBX_SYNC_MAX		1000
 #define	ZBX_TREND_SIZE		100000
 #define	ZBX_TEXTBUFFER_SIZE	16384*1024
+#define ZBX_IDS_SIZE		2
 
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1
@@ -42,6 +45,17 @@ typedef union{
 	zbx_uint64_t	value_uint64;
 	char		*value_str;
 } history_value_t;
+
+ZBX_DC_ID
+{
+	char		table_name[64], field_name[64];
+	zbx_uint64_t	lastid;
+};
+
+ZBX_DC_IDS
+{
+	ZBX_DC_ID	id[ZBX_IDS_SIZE];
+};
 
 ZBX_DC_HISTORY
 {
@@ -57,6 +71,7 @@ ZBX_DC_HISTORY
 	int		lastlogsize;
 	int		keep_history;
 	int		keep_trends;
+	int		functions;
 };
 
 ZBX_DC_TREND
@@ -102,5 +117,7 @@ void	free_database_cache(void);
 void	DCinit_nextchecks();
 void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *error_msg);
 void	DCflush_nextchecks();
+
+zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int num);
 
 #endif

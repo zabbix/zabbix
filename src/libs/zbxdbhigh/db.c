@@ -36,6 +36,7 @@
 #include "events.h"
 #include "threads.h"
 #include "zbxserver.h"
+#include "dbcache.h"
 
 const char *DBnode(const char *fieldid, const int nodeid)
 {
@@ -1973,9 +1974,13 @@ zbx_uint64_t DBget_maxid_num(char *tablename, char *fieldname, int num)
 	int		found  = FAIL, dbres, nodeid;
 	const ZBX_TABLE	*table;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_maxid \"%s\".\"%s\"",
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_maxid %s.%s",
 			tablename,
 			fieldname);
+
+	if ((0 == strcmp(tablename, "history_log") || 0 == strcmp(tablename, "history_text")) &&
+		       0 == strcmp(fieldname, "id"))
+		return DCget_nextid(tablename, fieldname, num);
 
 	table = DBget_table(tablename);
 	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;

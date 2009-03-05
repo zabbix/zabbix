@@ -43,8 +43,9 @@
 #	define ZBX_MUTEX_LOG		0
 #	define ZBX_MUTEX_NODE_SYNC	1
 #	define ZBX_MUTEX_CACHE		2
+#	define ZBX_MUTEX_CACHE_IDS	3
 /* This has to be the last MUTEX in the list with MAX number */
-#	define ZBX_MUTEX_COUNT		3
+#	define ZBX_MUTEX_COUNT		4
 
 #	define ZBX_MUTEX_MAX_TRIES	20 /* seconds */
 
