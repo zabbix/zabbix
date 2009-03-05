@@ -29,6 +29,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-762] improved performance of processing of log and text items (Sasha)
  - [ZBX-749] details box is open by default if any error occured (Vedmak)
  - [ZBX-751] expanded details box added for triggers copying messages (Vedmak)
  - [DEV-268] added support of <mode> for system.cpu.util under Solaris (Sasha)
