@@ -211,8 +211,8 @@ function graphload(dom_objects,unix_stime,period,dynamic){
 		url.setArgument('period', period);
 		url.unsetArgument('output');
 
-		var str_url = url.getUrl();
-		dom_objects[0].href = str_url;
+//	alert(uri.getUrl());
+		dom_objects[0].href = url.getUrl();
 	}	
 }
 

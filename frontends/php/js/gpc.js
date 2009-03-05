@@ -169,7 +169,7 @@ formatQuery: function(){
 	
 	var query = '';
 	for(var key in this.arguments){
-		if(typeof(this.arguments[key]) != 'undefined'){
+		if((typeof(this.arguments[key]) != 'undefined') && !is_null(this.arguments[key])){
 			query+=key+'='+this.arguments[key]+'&';
 		}
 	}
