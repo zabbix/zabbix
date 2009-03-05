@@ -28,6 +28,7 @@
 #include "zlog.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
+#include "dbcache.h"
 
 #include "functions.h"
 #include "expression.h"
@@ -968,6 +969,8 @@ int MAIN_ZABBIX_ENTRY(void)
 		exit(FAIL);
 	}
 
+	init_database_cache();
+
 /*#define CALC_TREND*/
 
 #ifdef CALC_TREND
@@ -1146,6 +1149,9 @@ void	zbx_on_exit()
 	zbx_sleep(2); /* wait for all threads closing */
 	
 	zabbix_log(LOG_LEVEL_INFORMATION, "ZABICOM Server stopped");
+
+	free_database_cache();
+
 	zbx_mutex_destroy(&node_sync_access);
 	zabbix_close_log();
 	

@@ -22,7 +22,8 @@ SERVER_SUBDIRS = \
 	zbxdb \
 	zbxdbhigh \
 	zbxemail \
-	zbxsms
+	zbxsms \
+	zbxdbcache
 endif
 
 if JABBER
