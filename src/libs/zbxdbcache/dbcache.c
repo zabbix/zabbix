@@ -29,6 +29,8 @@
 
 #define	LOCK_CACHE	zbx_mutex_lock(&cache_lock)
 #define	UNLOCK_CACHE	zbx_mutex_unlock(&cache_lock)
+#define	LOCK_CACHE_IDS		zbx_mutex_lock(&cache_ids_lock)
+#define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(&cache_ids_lock)
 
 #define ZBX_GET_SHM_DBCACHE_KEY(smk_key) 								\
 	{if( -1 == (shm_key = ftok(CONFIG_FILE, (int)'c') )) 						\
@@ -43,7 +45,10 @@
         }}
 
 ZBX_DC_CACHE		*cache = NULL;
+ZBX_DC_IDS		*ids = NULL;
+
 static ZBX_MUTEX	cache_lock;
+static ZBX_MUTEX	cache_ids_lock;
 
 static char		*sql = NULL;
 static int		sql_allocated = 65536;
@@ -469,7 +474,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			TRIGGER_STATUS_ENABLED);
 
 	for (i = 0; i < history_num; i++)
-		if (0 == history[i].value_null)
+		if (0 != history[i].functions)
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
 					history[i].itemid);
 
@@ -477,6 +482,11 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	{
 		sql_offset--;
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ")");
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "No items with triggers");
+		return;
 	}
 
 	result = DBselect("%s", sql);
@@ -891,9 +901,12 @@ static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
 			TRIGGER_STATUS_ENABLED);
 
 	for (i = 0; i < history_num; i++)
+	{
+		history[i].functions = 0;
 		if (0 == history[i].value_null)
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
 					history[i].itemid);
+	}
 
 	if (sql[sql_offset - 1] == ',')
 	{
@@ -926,6 +939,8 @@ static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
 
 		if (NULL == h)
 			continue;
+
+		h->functions		= 1;
 
 		function.function	= row[ZBX_SQL_ITEM_FIELDS_NUM];
 		function.parameter	= row[ZBX_SQL_ITEM_FIELDS_NUM + 1];
@@ -2151,13 +2166,21 @@ void	init_database_cache(zbx_process_t p)
 
 	key_t	shm_key;
 	int	shm_id;
+	size_t	sz;
+	void	*ptr;
 
 	zbx_process = p;
 
 	ZBX_GET_SHM_DBCACHE_KEY(shm_key);
 
+	sz = sizeof(ZBX_DC_IDS);
+	if (0 != CONFIG_DBSYNCER_FORKS)
+		sz += sizeof(ZBX_DC_CACHE);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In init_database_cache() size:%d", (int)sz);
+
 lbl_create:
-	if ( -1 == (shm_id = shmget(shm_key, sizeof(ZBX_DC_CACHE), IPC_CREAT | IPC_EXCL | 0666 /* 0022 */)) )
+	if ( -1 == (shm_id = shmget(shm_key, sz, IPC_CREAT | IPC_EXCL | 0666 /* 0022 */)) )
 	{
 		if( EEXIST == errno )
 		{
@@ -2185,9 +2208,9 @@ lbl_create:
 		}
 	}
 	
-	cache = shmat(shm_id, 0, 0);
+	ptr = shmat(shm_id, 0, 0);
 
-	if ((void*)(-1) == cache)
+	if ((void*)(-1) == ptr)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Can't attach shared memory for database cache. [%s]",strerror(errno));
 		exit(FAIL);
@@ -2199,11 +2222,27 @@ lbl_create:
 		exit(FAIL);
 	}
 
-	cache->last_text = cache->text;
+	if(ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
+	{
+		zbx_error("Unable to create mutex for database cache");
+		exit(FAIL);
+	}
+
+	if (0 != CONFIG_DBSYNCER_FORKS)
+	{
+		cache = ptr;
+		cache->history_first = 0;
+		cache->history_num = 0;
+		cache->trends_num = 0;
+		cache->last_text = cache->text;
+
+		ptr += sizeof(ZBX_DC_CACHE);
+	}
+	ids = ptr;
+	memset(ids, 0, sizeof(ZBX_DC_IDS));
 
 	if (NULL == sql)
 		sql = zbx_malloc(sql, sql_allocated);
-
 }
 
 /******************************************************************************
@@ -2248,18 +2287,16 @@ static void	DCsync_all()
  ******************************************************************************/
 void	free_database_cache()
 {
-
 	key_t	shm_key;
 	int	shm_id;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In free_database_cache()");
 
-	if (NULL == cache)
-		return;
-
-	DCsync_all();
+	if (0 != CONFIG_DBSYNCER_FORKS)
+		DCsync_all();
 
 	LOCK_CACHE;
+	LOCK_CACHE_IDS;
 	
 	ZBX_GET_SHM_DBCACHE_KEY(shm_key);
 
@@ -2276,8 +2313,104 @@ void	free_database_cache()
 	cache = NULL;
 
 	UNLOCK_CACHE;
+	UNLOCK_CACHE_IDS;
 
 	zbx_mutex_destroy(&cache_lock);
+	zbx_mutex_destroy(&cache_ids_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG,"End of free_database_cache()");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_maxid                                                      *
+ *                                                                            *
+ * Purpose: Return next id for requested table                                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int num)
+{
+	int		i, nodeid;
+	DB_RESULT	result;
+	DB_ROW		row;
+	const ZBX_TABLE	*table;
+	ZBX_DC_ID	*id;
+	zbx_uint64_t	min, max, nextid;
+
+	LOCK_CACHE_IDS;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In DCget_nextid %s.%s [%d]",
+			table_name, field_name, num);
+
+	for (i = 0; i < ZBX_IDS_SIZE; i++)
+	{
+		id = &ids->id[i];
+		if ('\0' == *id->table_name)
+			break;
+
+		if (0 == strcmp(id->table_name, table_name) && 0 == strcmp(id->field_name, field_name))
+		{
+			nextid = id->lastid + 1;
+			id->lastid += num;
+			UNLOCK_CACHE_IDS;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "End of DCget_nextid %s.%s [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
+					table_name, field_name, nextid, id->lastid);
+			return nextid;
+		}
+	}
+
+	if (i == ZBX_IDS_SIZE)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory");
+		exit(-1);
+	}
+
+	zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
+	zbx_strlcpy(id->field_name, field_name, sizeof(id->field_name));
+
+	table = DBget_table(table_name);
+	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;
+
+	min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
+	max = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
+
+	if (table->flags & ZBX_SYNC)
+	{
+		min += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)nodeid;
+		max += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)nodeid + (zbx_uint64_t)__UINT64_C(99999999999);
+	}
+	else
+		max += (zbx_uint64_t)__UINT64_C(99999999999999);
+
+	result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
+			field_name,
+			table_name,
+			field_name,
+			min, max);
+
+	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+		id->lastid = min + 1;
+	else
+		ZBX_STR2UINT64(id->lastid, row[0]);
+
+	nextid = id->lastid + 1;
+	id->lastid += num;
+
+	DBfree_result(result);
+
+	UNLOCK_CACHE_IDS;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of DCget_nextid %s.%s [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
+			table_name, field_name, nextid, id->lastid);
+
+	return nextid;
 }
