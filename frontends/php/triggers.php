@@ -261,7 +261,7 @@
 		else{
 			error('No target selection.');
 		}
-		show_messages();
+		show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
 /* DEPENDENCE ACTIONS */
 	else if(isset($_REQUEST['add_dependence'])&&isset($_REQUEST['new_dependence'])){
