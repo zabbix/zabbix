@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-749] details box is open by default if any error occured (Vedmak)
  - [ZBX-751] expanded details box added for triggers copying messages (Vedmak)
  - [DEV-268] added support of <mode> for system.cpu.util under Solaris (Sasha)
  - [ZBX-737] the behaviour of the agent's key "vfs.fs.size" improved to be similar to the "df" command (Dmitry)
