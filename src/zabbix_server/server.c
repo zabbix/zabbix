@@ -1078,8 +1078,7 @@ int MAIN_ZABBIX_ENTRY(void)
 		exit(FAIL);
 	}
 
-	if (CONFIG_DBSYNCER_FORKS != 0)
-		init_database_cache(ZBX_PROCESS_SERVER);
+	init_database_cache(ZBX_PROCESS_SERVER);
 
 /*#define CALC_TREND*/
 
@@ -1302,11 +1301,7 @@ void	zbx_on_exit()
 	zbx_sleep(2); /* wait for all threads closing */
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
-	
-	if(CONFIG_DBSYNCER_FORKS!=0)
-	{
-		free_database_cache();
-	}
+	free_database_cache();
 	DBclose();
 
 	zbx_mutex_destroy(&node_sync_access);
