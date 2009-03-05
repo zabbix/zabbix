@@ -37,6 +37,7 @@
 #include "events.h"
 #include "threads.h"
 #include "dbsync.h"
+#include "dbcache.h"
 
 void	DBclose(void)
 {
@@ -1148,7 +1149,7 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock, int ms)
 		goto lbl_exit;
 	}
 
-	id = DBget_maxid("history_text", "id");
+	id = DCget_nextid("history_text", "id");
 	zbx_snprintf(sql, sizeof(sql), "insert into history_text (id,clock,ms,itemid,value)"
 		" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ", EMPTY_CLOB()) returning value into :1",
 		id,
@@ -1221,7 +1222,7 @@ lbl_exit:
 	sql_max_len = value_esc_max_len+100;
 
 	DBescape_string(value,value_esc,value_esc_max_len);
-	id = DBget_maxid("history_text", "id");
+	id = DCget_nextid("history_text", "id");
 	DBexecute("insert into history_text (id,clock,ms,itemid,value) "
 		"values ("ZBX_FS_UI64",%d,%d,"ZBX_FS_UI64",'%s')",
 		id,
@@ -1246,7 +1247,7 @@ int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clo
 	DBescape_string(value,value_esc,MAX_STRING_LEN);
 	DBescape_string(source,source_esc,MAX_STRING_LEN);
 	if(id == 0)
-		id = DBget_maxid("history_log", "id");
+		id = DCget_nextid("history_log", "id");
 
 	if(encoding!=NULL && (
 		strcmp(encoding,"sjis")==0 ||
