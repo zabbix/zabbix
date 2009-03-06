@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-312] fixed wrong selection of selection box on graph border (amach)
  - [ZBX-760] historical data is now available for "not supported" items (Vedmak)
  - [ZBX-758] fixed wrong template linking (amach)
  - [ZBX-757] fixed "Bar reports" add item permission problem for users (Vedmak)
