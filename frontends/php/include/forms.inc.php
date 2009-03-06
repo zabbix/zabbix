@@ -712,6 +712,14 @@
 			$url 		= get_request('url','');
 			$autologin	= get_request('autologin',0);
 			$autologout	= get_request('autologout',900);
+			
+			// Check if autologout is between 90 and 3600 seconds
+			if ($autologout < 90) {
+				$autologout = 90;
+			} else if ($autologout > 3600) {
+				$autologout = 3600;
+			}
+			
 			$lang		= get_request('lang','en_gb');
 			$theme 		= get_request('theme','default.css');
 			$refresh	= get_request('refresh',30);

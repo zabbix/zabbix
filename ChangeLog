@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-603] fixed min autologout value to 90 seconds
  - [ZBX-762] improved performance of processing of log and text items (Sasha)
  - [ZBX-749] details box is open by default if any error occured (Vedmak)
  - [ZBX-751] expanded details box added for triggers copying messages (Vedmak)
