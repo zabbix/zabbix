@@ -15,7 +15,8 @@ DIST_SUBDIRS = \
 	zbxplugin \
 	zbxsys \
 	zbxjabber \
-	zbxjson
+	zbxjson \
+	zbxdbcache
 
 if SERVER
 SERVER_SUBDIRS = \
