@@ -87,7 +87,7 @@ $page['file']	= "index.php";
 		if(($name!=ZBX_GUEST_USER) && zbx_empty($passwd)){
 			$login = $attempt = false;
 		}
-		
+
 		if($login){
 			if($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS){
 				sleep(ZBX_LOGIN_BLOCK);

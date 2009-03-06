@@ -196,7 +196,7 @@ resizebox: function(){
 //		this.dom_box.style.height = height+'px';
 //		this.box.height = height;
 
-		// fix wrong selection box
+// 		fix wrong selection box
 		if (this.mouse_event.left > (this.obj.width + this.obj.left)) {
 			this.moveright(this.obj.width - (this.start_event.left - this.obj.left));
 		} else if (this.mouse_event.left < this.obj.left) {

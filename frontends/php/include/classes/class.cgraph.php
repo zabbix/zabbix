@@ -300,6 +300,5 @@ class CGraph{
 		
 		return imagecolorallocate($this->im,$RGB[0],$RGB[1],$RGB[2]);
 	}
-
 }
 ?>
