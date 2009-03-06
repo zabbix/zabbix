@@ -558,7 +558,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			if(isset($page['menu']) && ($page['menu'] == $label)){
 				$menu_selected = true;
 				$sub_menu_div->addOption('style','display: block;');
-				zbx_add_post_js('MMenu.def_label = '.zbx_jsvalue($label));
+				insert_js('MMenu.def_label = '.zbx_jsvalue($label));
 			}
 			else{
 				$sub_menu_div->addOption('style','display: none;');
