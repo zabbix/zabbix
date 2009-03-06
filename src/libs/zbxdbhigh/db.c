@@ -1978,8 +1978,12 @@ zbx_uint64_t DBget_maxid_num(char *tablename, char *fieldname, int num)
 			tablename,
 			fieldname);
 
-	if ((0 == strcmp(tablename, "history_log") || 0 == strcmp(tablename, "history_text")) &&
-		       0 == strcmp(fieldname, "id"))
+	if ((0 == strcmp(tablename, "history_log") && 0 == strcmp(fieldname, "id")) ||
+			(0 == strcmp(tablename, "history_text") && 0 == strcmp(fieldname, "id")) ||
+			(0 == strcmp(tablename, "dservices") && 0 == strcmp(fieldname, "dserviceid")) ||
+			(0 == strcmp(tablename, "dhosts") && 0 == strcmp(fieldname, "dhostid")) ||
+			(0 == strcmp(tablename, "alerts") && 0 == strcmp(fieldname, "alertid")) ||
+			(0 == strcmp(tablename, "escalations") && 0 == strcmp(fieldname, "escalationid")))
 		return DCget_nextid(tablename, fieldname, num);
 
 	table = DBget_table(tablename);
