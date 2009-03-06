@@ -195,13 +195,21 @@ resizebox: function(){
 //		height = this.obj.height;
 //		this.dom_box.style.height = height+'px';
 //		this.box.height = height;
+
+		// fix wrong selection box
+		if (this.mouse_event.left > (this.obj.width + this.obj.left)) {
+			this.moveright(this.obj.width - (this.start_event.left - this.obj.left));
+		} else if (this.mouse_event.left < this.obj.left) {
+			this.moveleft(0, this.start_event.left - this.obj.left);
+		}
 		
 		var width = this.validateW(this.mouse_event.left - this.start_event.left);
+		
 		if(width>0){
 			this.moveright(width);
 		}
 		else if(width<0){
-			this.moveleft(width);
+			this.moveleft(this.mouse_event.left - this.obj.left, width);
 		}
 
 		this.period = this.calcperiod();
@@ -209,8 +217,9 @@ resizebox: function(){
 	}
 },
 
-moveleft: function(width){
-	this.box.left = this.mouse_event.left - this.obj.left;
+moveleft: function(left, width){
+	//this.box.left = this.mouse_event.left - this.obj.left;
+	this.box.left = left;
 	this.dom_box.style.left = this.box.left+'px';
 
 	this.box.width = Math.abs(width);

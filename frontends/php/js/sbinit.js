@@ -128,7 +128,7 @@ function graph_zoom_init(graph_id,stime,period,width,height, dynamic){
 	}
 	else{
 		addListener(boxongraph,'mousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox),false);
-		addListener(boxongraph,'mousemove',A_SBOX[graph_id].sbox.mousemove.bindAsEventListener(A_SBOX[graph_id].sbox),false);
+		addListener(document,'mousemove',A_SBOX[graph_id].sbox.mousemove.bindAsEventListener(A_SBOX[graph_id].sbox),false);
 	}
 	
 	addListener(document,'mouseup',A_SBOX[graph_id].sbox.mouseup.bindAsEventListener(A_SBOX[graph_id].sbox),true);
