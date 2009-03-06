@@ -48,8 +48,6 @@ class CPie extends CGraph{
 	}
 	
 	public function addItem($itemid, $calc_fnc=CALC_FNC_AVG,$color=null, $type=null, $periods_cnt=null){
-		if($this->type == GRAPH_TYPE_STACKED /* stacked graph */)
-			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 	
 		$this->items[$this->num] = get_item_by_itemid($itemid);
 		$this->items[$this->num]['description']=item_description($this->items[$this->num]);
