@@ -117,11 +117,11 @@ if(isset($_REQUEST['make'])){
 		define('S_NEW_LOCALE_STEP_4_4','You can set "display_like" value in your locale file by adding it to your locale file or you can leave it hardcoded string.');
 		define('S_NEW_LOCALE_STEP_4_5','For example see implementation of other locales.');
 		
-		$frmLcls->AddRow(S_STEP.SPACE.'1:',S_NEW_LOCALE_STEP_1);
-		$frmLcls->AddRow(S_STEP.SPACE.'2:',S_NEW_LOCALE_STEP_2);
-		$frmLcls->AddRow(S_STEP.SPACE.'3:',array(S_NEW_LOCALE_STEP_3_1,BR(),
+		$frmLcls->addRow(S_STEP.SPACE.'1:',S_NEW_LOCALE_STEP_1);
+		$frmLcls->addRow(S_STEP.SPACE.'2:',S_NEW_LOCALE_STEP_2);
+		$frmLcls->addRow(S_STEP.SPACE.'3:',array(S_NEW_LOCALE_STEP_3_1,BR(),
 												S_NEW_LOCALE_STEP_3_2));
-		$frmLcls->AddRow(S_STEP.SPACE.'4:',array(S_NEW_LOCALE_STEP_4_1,BR(),
+		$frmLcls->addRow(S_STEP.SPACE.'4:',array(S_NEW_LOCALE_STEP_4_1,BR(),
 												S_NEW_LOCALE_STEP_4_2,BR(),
 												S_NEW_LOCALE_STEP_4_3,BR(),
 												S_NEW_LOCALE_STEP_4_4,BR(),
@@ -129,20 +129,20 @@ if(isset($_REQUEST['make'])){
 	}
 	else{
 	
-		$frmLcls->AddRow(S_STEP.SPACE.'1:','Download newly created locale file by pressing "Download".');
-		$frmLcls->AddRow(S_STEP.SPACE.'2:','Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales".');
-		$frmLcls->AddRow(S_STEP.SPACE.'3:','Replace previous locale file with one you have downloaded.');
+		$frmLcls->addRow(S_STEP.SPACE.'1:','Download newly created locale file by pressing "Download".');
+		$frmLcls->addRow(S_STEP.SPACE.'2:','Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales".');
+		$frmLcls->addRow(S_STEP.SPACE.'3:','Replace previous locale file with one you have downloaded.');
 	}
 	
 	$lang = serialize($_REQUEST['langTo']);
-	$frmLcls->AddVar('lang',$lang);
-	$frmLcls->AddItemToBottomRow(new CButton('download',S_DOWNLOAD,'PopUp("locales")'));
+	$frmLcls->addVar('lang',$lang);
+	$frmLcls->addItemToBottomRow(new CButton('download',S_DOWNLOAD,'PopUp("locales")'));
 	$frmLcls->Show();
 }
 else if(isset($_REQUEST['next'])){
 	$help = new CHelp('web.view.php','left');
 	$help_table = new CTableInfo();
-	$help_table->AddOption('style', 'width: 600px;');
+	$help_table->addOption('style', 'width: 600px;');
 	
 	if($_REQUEST['extlang'] == 'new'){
 		define('S_NEW_LOCALE_STEP_1','Download newly created locale file by pressing "Download".');
@@ -155,11 +155,11 @@ else if(isset($_REQUEST['next'])){
 		define('S_NEW_LOCALE_STEP_4_4','You can set "display_like" value in new locale file by adding it or You may leave it as hardcoded string.');
 		define('S_NEW_LOCALE_STEP_4_5','For example see implementation of other locales.');
 		
-		$help_table->AddRow(array(S_STEP.SPACE.'1:',S_NEW_LOCALE_STEP_1));
-		$help_table->AddRow(array(S_STEP.SPACE.'2:',S_NEW_LOCALE_STEP_2));
-		$help_table->AddRow(array(S_STEP.SPACE.'3:',array(S_NEW_LOCALE_STEP_3_1,BR(),
+		$help_table->addRow(array(S_STEP.SPACE.'1:',S_NEW_LOCALE_STEP_1));
+		$help_table->addRow(array(S_STEP.SPACE.'2:',S_NEW_LOCALE_STEP_2));
+		$help_table->addRow(array(S_STEP.SPACE.'3:',array(S_NEW_LOCALE_STEP_3_1,BR(),
 												S_NEW_LOCALE_STEP_3_2)));
-		$help_table->AddRow(array(S_STEP.SPACE.'4:',array(S_NEW_LOCALE_STEP_4_1,BR(),
+		$help_table->addRow(array(S_STEP.SPACE.'4:',array(S_NEW_LOCALE_STEP_4_1,BR(),
 												S_NEW_LOCALE_STEP_4_2,BR(),
 												S_NEW_LOCALE_STEP_4_3,BR(),
 												S_NEW_LOCALE_STEP_4_4,BR(),
@@ -167,9 +167,9 @@ else if(isset($_REQUEST['next'])){
 	}
 	else{
 	
-		$help_table->AddRow(array(S_STEP.SPACE.'1:','Download newly created locale file by pressing "Download".'));
-		$help_table->AddRow(array(S_STEP.SPACE.'2:','Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales".'));
-		$help_table->AddRow(array(S_STEP.SPACE.'3:','Replace previous locale file with one you have downloaded.'));
+		$help_table->addRow(array(S_STEP.SPACE.'1:','Download newly created locale file by pressing "Download".'));
+		$help_table->addRow(array(S_STEP.SPACE.'2:','Place it to "/PATH_TO_ZABBIX_FRONTEND/include/locales".'));
+		$help_table->addRow(array(S_STEP.SPACE.'3:','Replace previous locale file with one you have downloaded.'));
 	}
 
 	$help->SetHint($help_table);
@@ -178,12 +178,11 @@ else if(isset($_REQUEST['next'])){
 	echo SBR;
 	
 	$frmLcls = new CFormTable(S_CREATE.SPACE.S_LOCALE_SMALL.SPACE.S_FROM_SMALL.SPACE.$ZBX_LOCALES[$_REQUEST['srclang']],'locales.php?action=1','post',null,'form');
-	$frmLcls->AddOption('id','locales');
+	$frmLcls->addOption('id','locales');
 	$frmLcls->SetHelp($help);
-	
-	
+
 	$fileFrom = 'include/locales/'.$_REQUEST['srclang'].'.inc.php';
-	if(ereg('^[A-Za-z0-9_]+$', $_REQUEST['srclang']) && file_exists($fileFrom)){
+	if(preg_match('/^[a-z0-9_]+$/i', $_REQUEST['srclang']) && file_exists($fileFrom)){
 		include($fileFrom);	
 		if(!isset($TRANSLATION) || !is_array($TRANSLATION)){
 			error('Passed SOURCE is NOT valid PHP file.');
@@ -193,7 +192,7 @@ else if(isset($_REQUEST['next'])){
 	unset($TRANSLATION);
 	
 	$frmLcls->addVar('extlang',$_REQUEST['extlang']);
-	if(ereg('^[A-Za-z0-9_]+$', $_REQUEST['extlang']) && ($_REQUEST['extlang'] != 'new')){
+	if(preg_match('/^[a-z0-9_]+$/i', $_REQUEST['extlang']) && ($_REQUEST['extlang'] != 'new')){
 		$fileTo = 'include/locales/'.$_REQUEST['extlang'].'.inc.php';
 		if(file_exists($fileTo)){
 			include($fileTo);
@@ -228,14 +227,14 @@ else if(isset($_REQUEST['next'])){
 			$valueTo = mb_convert_encoding($valueTo,'UTF-8',mb_detect_encoding($valueTo));
 		}
 		
-		$frmLcls->AddRow($value, new Ctextbox('langTo['.$key.']',$valueTo,80));
+		$frmLcls->addRow($value, new Ctextbox('langTo['.$key.']',$valueTo,80));
 		$value='';
 	}
 	
-	$frmLcls->AddItemToBottomRow(new CButton('prev','<< '.S_PREVIOUS));
-	$frmLcls->AddItemToBottomRow(SPACE);
+	$frmLcls->addItemToBottomRow(new CButton('prev','<< '.S_PREVIOUS));
+	$frmLcls->addItemToBottomRow(SPACE);
 
-	$frmLcls->AddItemToBottomRow(new CButton('download',S_DOWNLOAD));
+	$frmLcls->addItemToBottomRow(new CButton('download',S_DOWNLOAD));
 	$frmLcls->Show();
 }
 else{	
@@ -243,29 +242,29 @@ else{
 	echo SBR;
 	
 	$frmLcls = new CFormTable(S_CREATE.SPACE.S_LOCALE_SMALL,'locales.php','post',null,'form');
-	$frmLcls->AddOption('id','locales');
+	$frmLcls->addOption('id','locales');
 	
 	$cmbLang = new CComboBox('srclang',get_request('srclang','en_gb'));
 	foreach($ZBX_LOCALES as $id => $name){
-		$cmbLang->AddItem($id,$name);
+		$cmbLang->addItem($id,$name);
 	}
-	$frmLcls->AddRow('Take for default locale',$cmbLang);
+	$frmLcls->addRow('Take for default locale',$cmbLang);
 	
 	$cmbExtLang = new CComboBox('extlang',get_request('extlang','new'));
-	$cmbExtLang->AddItem('new',S_CREATE.SPACE.S_NEW_SMALL);
+	$cmbExtLang->addItem('new',S_CREATE.SPACE.S_NEW_SMALL);
 	foreach($ZBX_LOCALES as $id => $name){
-		$cmbExtLang->AddItem($id,$name);
+		$cmbExtLang->addItem($id,$name);
 	}
-	$frmLcls->AddRow('Locale to extend',$cmbExtLang);
+	$frmLcls->addRow('Locale to extend',$cmbExtLang);
 	
 	$cmbFill = new CComboBox('fill',get_request('fill',1));
-		$cmbFill->AddItem('0',S_DO_NOT_ADD);
-		$cmbFill->AddItem('1',S_LEAVE_EMPTY);
-		$cmbFill->AddItem('2',S_FILL_WITH_DEFAULT_VALUE);
+		$cmbFill->addItem('0',S_DO_NOT_ADD);
+		$cmbFill->addItem('1',S_LEAVE_EMPTY);
+		$cmbFill->addItem('2',S_FILL_WITH_DEFAULT_VALUE);
 
-	$frmLcls->AddRow('New entries', $cmbFill);
+	$frmLcls->addRow('New entries', $cmbFill);
 
-	$frmLcls->AddItemToBottomRow(new CButton('next',S_NEXT.' >>'));
+	$frmLcls->addItemToBottomRow(new CButton('next',S_NEXT.' >>'));
 	$frmLcls->Show();
 }	
 ?>
