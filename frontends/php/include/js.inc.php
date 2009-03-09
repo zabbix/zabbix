@@ -150,7 +150,7 @@ function inseret_javascript_for_editable_combobox(){
 	insert_js($js);
 }
 
-function insert_javascript_for_twinbox(){
+function insert_javascript_for_tweenbox(){
 	global $page;
 	if(defined('SHOW_TWINBOX_SCRIPT_INSERTTED') || (PAGE_TYPE_HTML != $page['type'])) return;	
 	define('SHOW_TWINBOX_SCRIPT_INSERTTED', 1);
