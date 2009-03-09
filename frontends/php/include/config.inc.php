@@ -706,15 +706,11 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 	}
 
 	function get_status(){
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;		
 		$status = array();
 // server
-		if( (exec('ps -ef|grep zabbix_server|grep -v grep|wc -l')>0) || (exec('ps -ax|grep zabbix_server|grep -v grep|wc -l')>0) ){
-			$status["zabbix_server"] = S_YES;
-		}
-		else{
-			$status["zabbix_server"] = S_NO;
-		}
-
+		$checkport = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, 2);				
+		$status["zabbix_server"] = ($checkport) ? S_YES : S_NO;
 // triggers
 		$sql = 'SELECT COUNT(DISTINCT t.triggerid) as cnt '.
 				' FROM triggers t, functions f, items i, hosts h'.
