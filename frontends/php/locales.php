@@ -193,7 +193,7 @@ else if(isset($_REQUEST['next'])){
 	unset($TRANSLATION);
 	
 	$frmLcls->addVar('extlang',$_REQUEST['extlang']);
-	if(ereg('^[A-Za-z0-9_]+$', $_REQUEST['srclang']) && ($_REQUEST['extlang'] != 'new')){
+	if(ereg('^[A-Za-z0-9_]+$', $_REQUEST['extlang']) && ($_REQUEST['extlang'] != 'new')){
 		$fileTo = 'include/locales/'.$_REQUEST['extlang'].'.inc.php';
 		if(file_exists($fileTo)){
 			include($fileTo);
