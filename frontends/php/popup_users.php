@@ -23,79 +23,87 @@
 	require_once "include/users.inc.php";
 
 	$page["title"] = "S_USERS";
-	$page["file"] = "popup_usrgrp.php";
+	$page["file"] = "popup_users.php";
 
 	define('ZBX_PAGE_NO_MENU', 1);
 	
 include_once "include/page_header.php";
 
-?>
-<?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
-		"list_name"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
-		"var_name"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL)
+		'dstfrm'=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
+		'groupid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL)
 	);
 
 	check_fields($fields);
 
-	$dstfrm		= get_request("dstfrm",		0);	// destination form
-	$list_name	= get_request("list_name",	0);	// output field on destination form
-	$var_name	= get_request("var_name",	0);	// second output field on destination form
-?>
-<?php
-	show_table_header(S_GROUPS);
+	$dstfrm		= get_request("dstfrm", 0);	// destination form
+	$groupid 	= get_request("groupid", 0);
 ?>
 
 <script language="JavaScript" type="text/javascript">
 <!--
-function add_var_to_opener_obj(obj,name,value)
-{
-        new_variable = window.opener.document.createElement('input');
-        new_variable.type = 'hidden';
-        new_variable.name = name;
-        new_variable.value = value;
+function add_users(formname) {
+	var parent_document = window.opener.document;
 
-        obj.appendChild(new_variable);
-}
-
-function add_user(formname,user_id,alias)
-{
-        var form = window.opener.document.forms[formname];
-
-        if(!form)
-        {
-                close_window();
-		return false;
-        }
-
-	add_var_to_opener_obj(form,'new_user[userid]',user_id);
-	add_var_to_opener_obj(form,'new_user[alias]',alias);
-
-	form.submit();
-	close_window();
-	return true;
+	if(!parent_document) return close_window();
+	
+	$('usersid_left').immediateDescendants().each( 
+		function(e){ 
+			add_variable('input', 'new_user['+e.value+']', e.text, formname, parent_document);
+		});
+	parent_document.forms[formname].submit();
+	close_window();	
 }
 -->
 </script>
 
+<?php 
+	$comboform = new CForm();
+	$comboform->addVar('dstfrm',$dstfrm);
 
-<?php
-	$table = new CTableInfo(S_NO_USERS_DEFINED);
-	$table->SetHeader(array(S_NAME, S_NAME, S_SURNAME, S_TYPE));
-
-	$result = DBselect('select * from users where '.DBin_node('userid').' order by name');
-	while($row = DBfetch($result))
-	{
-		$name = new CSpan($row["alias"],'link');
-		$name->addAction('onclick', 'javascript: return add_user("'.$dstfrm.'","'.$row['userid'].'","'.$row['alias'].'");');
-		$table->addRow(array($name, $row['name'], $row['surname'], user_type2str($row['type'])));
+// create table header +
+	$cmbGroups = new CComboBox('groupid', $groupid, 'submit()');
+	$cmbGroups->addItem(0,S_ALL_S);
+	
+	$sql = 'SELECT usrgrpid, name FROM usrgrp WHERE '.DBin_node('usrgrpid').' ORDER BY name';
+	$result=DBselect($sql);
+	
+	while($row=DBfetch($result)){
+		$cmbGroups->addItem($row['usrgrpid'], $row['name']);
 	}
-	$table->show();
-?>
-<?php
+	$comboform->addItem($cmbGroups);
+	show_table_header(S_USERS, $comboform);
+// - 
+	
+// create user twinbox +
+	$form = new CForm('users.php');
+	$form->addOption('id', 'users');
+	
+	$user_tb = new CTweenBox($form, 'usersid', null, 10);
+
+	$from = '';
+	$where = '';
+	if($groupid > 0) {
+		$from = ', users_groups g ';
+		$where = ' AND u.userid=g.userid AND g.usrgrpid='.$groupid;
+	}
+	$sql = 'SELECT u.userid, u.alias FROM users u '.$from.
+	' WHERE '.DBin_node('u.userid').$where.
+	' ORDER BY name';
+	$result=DBselect($sql);
+
+	while($row=DBfetch($result)){
+		$user_tb->addItem($row['userid'], $row['alias'], false);
+	}
+
+	$form->addItem($user_tb->get('asdasda','asdasdasdas'));
+// -
+	$button = new CButton('select', S_SELECT, 'add_users("'.$dstfrm.'")');
+	$button->setType('button');
+	
+	$form->addItem($button);
+	$form->show();
 
 include_once "include/page_footer.php";
-
 ?>

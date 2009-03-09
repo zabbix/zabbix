@@ -46,7 +46,7 @@ include_once('include/page_header.php');
 		'userid'=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({config})&&({config}==0))&&(isset({form})&&({form}=="update"))'),
 		'group_userid'=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 		'filter_usrgrpid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
-		
+
 		'alias'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
 		'name'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
 		'surname'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
@@ -77,13 +77,13 @@ include_once('include/page_header.php');
 /* group */
 		'usrgrpid'=>	array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({config})&&(({config}==1) || isset({grpaction})))&&(isset({form})&&({form}=="update"))'),
 		'group_groupid'=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
+		'selusrgrp'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 
 		'gname'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==1))&&isset({save})'),
 		'users'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	null),
 		'users_status'=>array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	'(isset({config})&&({config}==1))&&isset({save})'),
 		'gui_access'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'),	'(isset({config})&&({config}==1))&&isset({save})'),
 		'new_right'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
-		'new_user'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
 		'right_to_del'=>array(T_ZBX_STR, O_OPT,	null,	null,	null),
 		'group_users_to_del'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
 		'group_users'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
@@ -118,9 +118,9 @@ include_once('include/page_header.php');
 		'form_refresh'=>array(T_ZBX_STR, O_OPT, null,	null,	null)
 	);
 
-
 	check_fields($fields);
 	validate_sort_and_sortorder('u.alias',ZBX_SORT_UP);	
+
 ?>
 <?php
 	if($_REQUEST['config']==0){
@@ -330,21 +330,13 @@ include_once('include/page_header.php');
 		}
 		else if(isset($_REQUEST['new_right'])){
 			$_REQUEST['group_rights'] = get_request('group_rights', array());
-			foreach(array('id', 'permission') as $fld_name)
-				$_REQUEST['group_rights'][$_REQUEST['new_right']['name']][$fld_name] = $_REQUEST['new_right'][$fld_name];
-		}
-		else if(isset($_REQUEST['new_user'])){
-			$_REQUEST['group_users'] = get_request('group_users', array());
-			$_REQUEST['group_users'][$_REQUEST['new_user']['userid']] = $_REQUEST['new_user']['alias'];
-		}
-		else if(isset($_REQUEST['del_group_user'])&&isset($_REQUEST['group_users_to_del'])){
-			foreach($_REQUEST['group_users_to_del'] as $userid)
-				if(isset($_REQUEST['group_users'][$userid]))
-					unset($_REQUEST['group_users'][$userid]);
+			foreach($_REQUEST['new_right'] as $id => $right) {
+				$_REQUEST['group_rights'][$right['name']] = array('id' => $id, 'permission' => $right['permission']);
+			}
 		}
 		else if(isset($_REQUEST['save'])){
-			$group_users	= get_request('group_users', array());;
-			$group_rights	= get_request('group_rights', array());;
+			$group_users	= get_request('group_users', array());
+			$group_rights	= get_request('group_rights', array());
 
 			if(isset($_REQUEST['usrgrpid'])){
 				$action = AUDIT_ACTION_UPDATE;
