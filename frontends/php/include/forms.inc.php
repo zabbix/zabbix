@@ -712,27 +712,26 @@
 			$url 		= get_request('url','');
 			$autologin	= get_request('autologin',0);
 			$autologout	= get_request('autologout',900);
-			
-			// Check if autologout is between 90 and 3600 seconds
-			if ($autologout < 90) {
-				$autologout = 90;
-			} else if ($autologout > 3600) {
-				$autologout = 3600;
-			}
-			
 			$lang		= get_request('lang','en_gb');
 			$theme 		= get_request('theme','default.css');
 			$refresh	= get_request('refresh',30);
 			$user_type	= get_request('user_type',USER_TYPE_ZABBIX_USER);;
 			$user_groups	= get_request('user_groups',array());
 			$change_password = get_request('change_password', null);
-
 			$user_medias		= get_request('user_medias', array());
-
 			$new_group_id	= get_request('new_group_id', 0);
 			$new_group_name = get_request('new_group_name', '');
 		}
-
+		
+		if ($autologin > 0) {
+			$autologout = 0;
+			zbx_add_post_js("document.getElementById('autologout_visible').disabled = true;");
+		} else if (isset($_REQUEST['autologout'])) {
+			if ($autologout >= 0 && $autologout < 90) {
+				$autologout = 90;
+			}
+		}
+		
 		$perm_details	= get_request('perm_details',0);
 
 		$media_types = array();
@@ -875,16 +874,23 @@
 
 		$frmUser->AddRow(S_THEME, $cmbTheme);
 
-		$chkbx_autologin = new CCheckBox("autologin",
-							$autologin,
-							new CScript(" var autologout = document.getElementById('autologout'); autologout.value = 0; autologout.readOnly=this.checked; autologout.disabled=false;"),
-							1);
+		$chkbx_autologin = new CCheckBox("autologin", $autologin, new CScript("var autologout_visible = document.getElementById('autologout_visible');
+																				var autologout = document.getElementById('autologout');
+																				if (this.checked) {
+																					if (autologout_visible.checked) {
+																						autologout_visible.checked = false;
+																						autologout_visible.onclick();
+																					}
+																					autologout_visible.disabled = true;
+																				} else {
+																					autologout_visible.disabled = false;
+																				}"), 1);
 		$chkbx_autologin->AddOption('autocomplete','off');
-
 		$frmUser->AddRow(S_AUTO_LOGIN,	$chkbx_autologin);
-		$frmUser->AddRow(S_AUTO_LOGOUT,	array(new CNumericBox("autologout",$autologout,4,$autologin),S_SECONDS));
+		$frmUser->AddRow(S_AUTO_LOGOUT, array(new CVisibilityBox('autologout_visible', (isset($autologout) && $autologout != 0) ? 'yes' : 'no', 'autologout', S_DISABLED), new CNumericBox("autologout", $autologout, 4)));
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
+
 
 		if(0 == $profile){
 			$frmUser->AddVar('perm_details', $perm_details);

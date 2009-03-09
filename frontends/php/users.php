@@ -65,7 +65,7 @@ include_once('include/page_header.php');
 		'lang'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
 		'theme'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
 		'autologin'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
-		'autologout'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(90,3600),'(isset({config})&&({config}==0))&&isset({save})'),
+		'autologout'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(90,10000), null),
 		'url'=>			array(T_ZBX_STR, O_OPT,	null,	null,		'(isset({config})&&({config}==0))&&isset({save})'),
 		'refresh'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'(isset({config})&&({config}==0))&&isset({save})'),
 
@@ -119,9 +119,8 @@ include_once('include/page_header.php');
 		'form_refresh'=>array(T_ZBX_STR, O_OPT, null,	null,	null)
 	);
 
-
 	check_fields($fields);
-	validate_sort_and_sortorder('u.alias',ZBX_SORT_UP);	
+	validate_sort_and_sortorder('u.alias',ZBX_SORT_UP);
 ?>
 <?php
 	if($_REQUEST['config']==0){
@@ -182,7 +181,7 @@ include_once('include/page_header.php');
 					DBstart();
 					$result=update_user($_REQUEST['userid'],
 						$_REQUEST['name'],$_REQUEST['surname'],$_REQUEST['alias'],
-						$_REQUEST['password1'],$_REQUEST['url'],get_request('autologin',0),$_REQUEST['autologout'],
+						$_REQUEST['password1'],$_REQUEST['url'],get_request('autologin',0),get_request('autologout',0),
 						$_REQUEST['lang'],$_REQUEST['theme'],$_REQUEST['refresh'],$_REQUEST['user_type'],
 						$user_groups, $user_medias);
 						
