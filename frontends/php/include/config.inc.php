@@ -741,16 +741,15 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	}
 
 	function get_status(){
-//		global $DB;
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
 		$status = array();
 // server
-		if( (exec('ps -ef|grep zabbix_server|grep -v grep|wc -l')>0) || (exec('ps -ax|grep zabbix_server|grep -v grep|wc -l')>0) ){
-			$status["zabbix_server"] = S_YES;
-		}
-		else{
-			$status["zabbix_server"] = S_NO;
-		}
-// history & trends
+		$checkport = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, 2);
+		
+		$status["zabbix_server"] = ($checkport) ? S_YES : S_NO;
+
+		// history & trends
 /*		if ($DB['DB_TYPE'] == "MYSQL"){
 			$row=DBfetch(DBselect('show table status like "history"'));
 			$status["history_count"]  = $row["Rows"];
