@@ -739,7 +739,7 @@
 			$password2 	= get_request('password2', '');
 			$url 		= get_request('url','');
 			$autologin	= get_request('autologin',0);
-			$autologout	= get_request('autologout',900);\
+			$autologout	= get_request('autologout',900);
 			
 			// Check if autologout is between 90 and 3600 seconds
 			if ($autologout < 90) {
@@ -987,14 +987,15 @@
 			$gui_access = $usrgrp['gui_access'];
 
 			$group_users = array();
-			$db_users=DBselect('SELECT DISTINCT u.userid,u.alias '.
+			$sql = 'SELECT DISTINCT u.userid '.
 						' FROM users u,users_groups ug '.
 						' WHERE u.userid=ug.userid '.
-							' AND ug.usrgrpid='.$_REQUEST['usrgrpid'].
-						' ORDER BY alias');
+							' AND ug.usrgrpid='.$_REQUEST['usrgrpid'];
+							
+			$db_users=DBselect($sql);
 
 			while($db_user=DBfetch($db_users))
-				$group_users[$db_user["userid"]] = $db_user['alias'];
+				$group_users[$db_user["userid"]] = $db_user["userid"];
 
 			$group_rights = array();
 			$sql = 'SELECT r.*, n.name as node_name, g.name as name '.
@@ -1017,7 +1018,7 @@
 		else{
 			$name			= get_request('gname','');
 			$users_status 	= get_request('users_status',GROUP_STATUS_ENABLED);
-			$gui_access 	= get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);
+			$gui_access 	= get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);			
 			$group_users	= get_request("group_users",array());
 			$group_rights	= get_request("group_rights",array());
 		}
@@ -1039,8 +1040,46 @@
 
 		$frmUserG->addVar('group_rights', $group_rights);
 
-		$frmUserG->addVar('group_users', $group_users);
+/////////////////
 
+// create table header +
+
+	$selusrgrp = get_request('selusrgrp', 0);
+	$cmbGroups = new CComboBox('selusrgrp', $selusrgrp, 'submit()');
+	$cmbGroups->addItem(0,S_ALL_S);
+	
+	$sql = 'SELECT usrgrpid, name FROM usrgrp WHERE '.DBin_node('usrgrpid').' ORDER BY name';
+	$result=DBselect($sql);
+	while($row=DBfetch($result)){
+		$cmbGroups->addItem($row['usrgrpid'], $row['name']);
+	}
+// - 
+	
+// create user twinbox +
+	$user_tb = new CTweenBox($frmUserG, 'group_users', $group_users, 10);
+	
+	$sql_from = '';
+	$sql_where = '';
+	if($selusrgrp > 0) {
+		$sql_from = ', users_groups g ';
+		$sql_where = ' AND u.userid=g.userid AND g.usrgrpid='.$selusrgrp;
+	}
+	$sql = 'SELECT DISTINCT u.userid, u.alias '.
+			' FROM users u '.$sql_from.
+			' WHERE '.DBcondition('u.userid', $group_users).
+			' OR ('.DBin_node('u.userid').
+				$sql_where.
+			' ) ORDER BY u.alias';
+	$result=DBselect($sql);
+	while($row=DBfetch($result)){
+		$user_tb->addItem($row['userid'], $row['alias']);
+	}
+	
+	$frmUserG->addRow(S_USERS, $user_tb->get(S_IN.SPACE.S_GROUP,array(S_OTHER.SPACE.S_GROUPS.SPACE.'|'.SPACE, $cmbGroups)));
+// -
+	
+/////////////////
+/*
 		$lstUsers = new CListBox('group_users_to_del[]');
 		$lstUsers->options['style'] = 'width: 280px';
 
@@ -1054,9 +1093,11 @@
 				BR(),
 				new CButton('add_user',S_ADD,
 					"return PopUp('popup_users.php?dstfrm=".$frmUserG->GetName().
-					"&list_name=group_users_to_del[]&var_name=group_users',450,450);"),
+					"&list_name=group_users_to_del[]&var_name=group_users',600,300);"),
 				(count($group_users) > 0) ? new CButton('del_group_user',S_DELETE_SELECTED) : null
 			));
+*/
+/////////////////
 
 		$granted = true;
 		if(isset($_REQUEST['usrgrpid'])){
@@ -2997,10 +3038,6 @@
 		while($row=DBfetch($result)){
 			$cmbGroups->addItem($row['groupid'],$row['name']);
 		}
-
-		$td_groups = new CCol(array(S_GROUP,SPACE,$cmbGroups));
-		$td_groups->addOption('style','text-align: right;');
-//		$tblHlink->addRow($td_groups);
 
 		$hostids = get_request('hostids', array());
 

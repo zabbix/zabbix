@@ -21,7 +21,7 @@
 <?php
 class CTweenBox{
 	public function __construct(&$form,$name,$value=null,$size=10){
-		insert_javascript_for_twinbox();
+		insert_javascript_for_tweenbox();
 		
 		$this->form = &$form;
 		$this->name = $name.'_tweenbox';
@@ -57,7 +57,6 @@ class CTweenBox{
 				$selected = 1;
 			}
 		}
-
 		if((is_bool($selected) && $selected) || 
 			(is_int($selected) && ($selected!=0)) || 
 			(is_string($selected) && ($selected == 'yes' || $selected == 'selected' || $selected=='on')))

@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-313] added User Group configuration window GUI improvements (Vedmak)
  - [DEV-312] fixed wrong selection of selection box on graph border (amach)
  - [ZBX-760] historical data is now available for "not supported" items (Vedmak)
  - [ZBX-758] fixed wrong template linking (amach)

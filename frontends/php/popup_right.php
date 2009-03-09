@@ -28,8 +28,6 @@
 	
 include_once "include/page_header.php";
 
-?>
-<?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"dstfrm"=>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		NULL),
@@ -44,38 +42,7 @@ include_once "include/page_header.php";
 	$nodeid		= get_request('nodeid', 	get_profile('web.popup_right.nodeid.last',get_current_nodeid(false)));
 
 	update_profile('web.popup_right.nodeid.last', $nodeid);
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
 
-function add_var_to_opener_obj(obj,name,value){
-	new_variable = window.opener.document.createElement('input');
-	new_variable.type = 'hidden';
-	new_variable.name = name;
-	new_variable.value = value;
-	
-	obj.appendChild(new_variable);
-}
-
-function add_right(formname,id,permission,name){
-	var form = window.opener.document.forms[formname];
-	
-	if(!form){
-		close_window();
-	return false;
-	}
-
-	add_var_to_opener_obj(form,'new_right[id]',id);
-	add_var_to_opener_obj(form,'new_right[permission]',permission);
-	add_var_to_opener_obj(form,'new_right[name]',name);
-
-	form.submit();
-	close_window();
-	return true;
-}
--->
-</script>
-<?php
 	$frmTitle = new CForm();
 	$frmTitle->AddVar('dstfrm',$dstfrm);
 	$frmTitle->AddVar('permission', $permission);
@@ -97,31 +64,61 @@ function add_right(formname,id,permission,name){
 
 	show_table_header(permission2str($permission),$frmTitle);
 
-	$table = new CTableInfo(S_NO_RESOURCES_DEFINED);
-	$table->SetHeader(array(S_NAME));
-	
-	$db_resources = null;
+	$form = new CForm();
+	$form->addOption('id', 'groups');
 
-	$db_resources = DBselect('SELECT n.name as node_name, g.name as name, g.groupid as id'.
+	$table = new CTableInfo(S_NO_RESOURCES_DEFINED);
+	$table->SetHeader(new CCol(array(new CCheckBox("all_groups", NULL, 'check_all(this.checked)'),S_NAME)));
+	
+
+	$result = DBselect('SELECT n.name as node_name, g.name as name, g.groupid as id'.
 					' FROM groups g '.
 						' LEFT JOIN nodes n on '.DBid2nodeid('g.groupid').'=n.nodeid '.
 					($nodeid?' WHERE nodeid='.$nodeid:'').
 					' ORDER BY n.name, g.name');
-
-	while($db_resource = DBfetch($db_resources)){
-		if(isset($db_resource['node_name']))
-			$db_resource['name'] = $db_resource['node_name'].':'.$db_resource['name'];
-
-		$name = new CSpan($db_resource['name'],'link');
-		$name->addAction('onclick', "return add_right('".$dstfrm."','".$db_resource['id']."','".$permission."','".$db_resource['name']."');");
-
-		$table->AddRow(array($name));
+	
+	$grouplist = array();
+	while($row = DBfetch($result)){
+		if(isset($row['node_name']))
+			$row['name'] = $row['node_name'].':'.$row['name'];
+			
+		$grouplist[$row['id']] = array('name' => $row['name'], 'permission' => $permission);
+		$table->addRow(	new CCol(array(new CCheckBox('groups['.$row['id'].']', NULL, NULL, $row['id']), $row['name'])));
 	}
+	
+	insert_js('var grouplist = '.zbx_jsvalue($grouplist).';');
+	
+	$button = new CButton('select', S_SELECT, 'add_groups("'.$dstfrm.'")');
+	$button->setType('button');
+	$table->setFooter(new CCol($button,'right'));
+	
+	$form->addItem($table);
+	$form->show();
 
-	$table->Show();
-?>
+	?>
+<script language="JavaScript" type="text/javascript">
+<!--
+function add_groups(formname) {
+	var parent_document = window.opener.document;
+
+	if(!parent_document) return close_window();
+
+	$('groups').getInputs("checkbox").each( 
+		function(e){
+			if(e.checked && (e.name != "all_groups")){
+				add_variable('input', 'new_right['+e.value+'][permission]', grouplist[e.value].permission, formname, parent_document);
+				add_variable('input', 'new_right['+e.value+'][name]', grouplist[e.value].name, formname, parent_document);
+			}
+		});
+	parent_document.forms[formname].submit();
+	close_window();	
+}
+
+function check_all(value) {
+	$("groups").getInputs("checkbox").each(function(e){ e.checked = value });
+}
+-->
+</script>
 <?php
-
 include_once "include/page_footer.php";
-
 ?>
