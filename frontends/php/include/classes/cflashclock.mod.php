@@ -47,7 +47,7 @@
 		function BodyToString()
 		{
 			if($this->timetype == TIME_TYPE_SERVER)
-				$this->SetSrc($this->src."&timestamp=".time());
+				$this->setSrc($this->src.'&timestamp='.(time() + date('Z')));
 
 			return parent::BodyToString();	
 		}
