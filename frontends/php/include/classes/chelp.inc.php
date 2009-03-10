@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	class CHelp extends CLink{
+	class CHelp extends CSpan{
 /* public */
 		function CHelp($url='index.php',$side=null){
 			if(is_null($side)) $side = 'right';
@@ -31,9 +31,10 @@
 				$pside = 'right';
 			}
 
-			parent::CLink(new CDiv(SPACE,'iconhelp'), 'http://www.zabbix.com/documentation.php' );//'http://www.zabbix.com/manual/v1.1/'.$url);
+			parent::CSpan(new CDiv(SPACE,'iconhelp') );//'http://www.zabbix.com/manual/v1.1/'.$url);
+			parent::onClick('window.open("http://www.zabbix.com/documentation.php");');
 			$this->options['style'] = 'padding-'.$pside.': 5px; float:'.$side.';text-decoration: none;';
-			$this->options['target'] = '_blank';
+//			$this->options['target'] = '_blank';
 		}
 	}
 ?>

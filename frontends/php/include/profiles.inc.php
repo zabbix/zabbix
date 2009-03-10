@@ -313,7 +313,7 @@ function profile_value_by_type(&$value,$type){
 	else{
 		switch($type){	
 			case PROFILE_TYPE_ID:
-				$result = ctype_digit($value);
+				$result = ctype_digit($value)?$value:false;
 				break;
 			case PROFILE_TYPE_INT:
 				$result = zbx_numeric($value)?$value:false;

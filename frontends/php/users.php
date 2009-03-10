@@ -437,11 +437,9 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid',get_profile('web.users.filter.usrgrpid',0));
-	update_profile('web.users.filter.usrgrpid',$_REQUEST['filter_usrgrpid'],PROFILE_TYPE_ID);
-	
+	update_profile('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROFILE_TYPE_ID);
 	$frmForm = new CForm();
 	$frmForm->SetMethod('get');
-	
 	$cmbConf = new CComboBox('config',$_REQUEST['config'],'submit()');
 	$cmbConf->AddItem(0,S_USERS);
 	$cmbConf->AddItem(1,S_USER_GROUPS);

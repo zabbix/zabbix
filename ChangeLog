@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [DEV-314] fixed: step count in web monitoring; sid removed from help links; HG, UG comboboxes values are remembered correctly (Vedmak)
  - [ZBX-448] fixed zabbix server status when frontend and backend are on different servers (Vedmak)
  - [ZBX-660] fixed screen clock set to server time showed local time (Artem)
  - [ZBX-603] fixed min autologout value to 90 seconds (amach)
