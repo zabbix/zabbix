@@ -60,6 +60,7 @@ include_once "include/page_header.php";
 	$r_form->SetMethod('get');
 	
 	$druleid = get_request('druleid', 0);
+	$fullscreen = get_request('fullscreen', 0);
 
 	$cmbDRules = new CComboBox('druleid',$druleid,'submit()');
 	$cmbDRules->AddItem(0,S_ALL_SMALL);
@@ -69,12 +70,13 @@ include_once "include/page_header.php";
 				$drule['druleid'],
 				get_node_name_by_elid($drule['druleid']).$drule['name']
 				);
+	$r_form->addVar('fullscreen', $fullscreen);
 	$r_form->AddItem(array(S_DISCOVERY_RULE.SPACE,$cmbDRules));
 
 // Header	
 	$text = array(SPACE);
 	
-	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1').'&amp;druleid='.$druleid;
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
