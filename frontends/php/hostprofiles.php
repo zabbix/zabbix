@@ -73,7 +73,6 @@ include_once "include/page_header.php";
 ?>
 
 <?php
-SDI($_REQUEST['hostid']);
 	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
 		echo SBR;
 

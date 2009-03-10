@@ -778,7 +778,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 //	if($page['menu'] == 'config') $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
 	if($def_options['allow_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
 
-	$result = array('selected'=>0, 'groups'=> array(), 'groupids'=> array());
+	$result = array('original'=> -1, 'selected'=>0, 'groups'=> array(), 'groupids'=> array());
 	$groups = &$result['groups'];
 	$groupids = &$result['groupids'];
 	
@@ -786,7 +786,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 	$groups['0'] = $first_entry;
 	$groupids['0'] = '0';
 	
-	$_REQUEST['groupid'] = get_request('groupid', -1);
+	$_REQUEST['groupid'] = $result['original'] = get_request('groupid', -1);
 	$_REQUEST['hostid'] = get_request('hostid', -1);
 //-----
 	
@@ -995,7 +995,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	if($def_options['allow_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
 	if($dd_first_entry == ZBX_DROPDOWN_FIRST_ALL) $def_options['select_host_on_group_switch'] = 1;
 
-	$result = array('selected'=>0, 'hosts'=> array(), 'hostids'=> array());
+	$result = array('original'=> -1, 'selected'=>0, 'hosts'=> array(), 'hostids'=> array());
 	$hosts = &$result['hosts'];
 	$hostids = &$result['hostids'];
 	
@@ -1016,7 +1016,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 		$def_sql['where'][] = 'hg.hostid=h.hostid';
 	}
 	
-	$_REQUEST['hostid'] = get_request('hostid', -1);
+	$_REQUEST['hostid'] = $result['original'] = get_request('hostid', -1);
 //-----
 	
 	$nodeid = is_null($nodeid)?get_current_nodeid(!$def_options['only_current_node']):$nodeid;
@@ -1199,8 +1199,12 @@ return $result;
 			$PAGE_HOSTS['hostids'] = array(0);
 		}
 		
-		update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
-		update_profile('web.'.$page['menu'].'.hostid', $_REQUEST['hostid'], PROFILE_TYPE_ID);
+		if($PAGE_GROUPS['original'] > -1)
+			update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
+			
+		if($PAGE_HOSTS['original'] > -1)
+			update_profile('web.'.$page['menu'].'.hostid', $_REQUEST['hostid'], PROFILE_TYPE_ID);
+
 		update_profile($group_var, $_REQUEST['groupid'], PROFILE_TYPE_ID);
 		update_profile($host_var, $_REQUEST['hostid'], PROFILE_TYPE_ID);
 	}
@@ -1234,9 +1238,13 @@ return $result;
 		}
 		
 		$PAGE_GROUPS['selected'] = $_REQUEST['groupid'];
-				
-		update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
-		update_profile('web.'.$page['menu'].'.hostid', $_REQUEST['hostid'], PROFILE_TYPE_ID);
+
+		if($PAGE_GROUPS['original'] > -1)
+			update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
+			
+		if($PAGE_HOSTS['original'] > -1)
+			update_profile('web.'.$page['menu'].'.hostid', $_REQUEST['hostid'], PROFILE_TYPE_ID);
+
 		update_profile($group_var, $_REQUEST['groupid'], PROFILE_TYPE_ID);
 		update_profile($host_var, $_REQUEST['hostid'], PROFILE_TYPE_ID);
 	}
