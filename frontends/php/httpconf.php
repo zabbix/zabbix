@@ -378,7 +378,7 @@ include_once 'include/page_header.php';
 			' WHERE a.hostid=h.hostid '.
 				$sql_where.
 				' AND '.DBcondition('h.hostid',$available_hosts).
-			' ORDER BY a.name,a.applicationid,h.host';
+			order_by('a.applicationid,h.host,h.hostid','a.name');
 //SDI($sql);
 	$db_app_res = DBselect($sql);
 	while($db_app = DBfetch($db_app_res)){
