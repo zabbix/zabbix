@@ -336,7 +336,7 @@
 		if($_REQUEST['groupid']>0)
 			$form->AddVar('groupid',$_REQUEST['groupid']);
 
-		$form->AddVar("hostid",$_REQUEST['hostid']);
+		$form->addVar('hostid',$_REQUEST['hostid']);
 
 		if(isset($_REQUEST["httptestid"])){
 			$form->AddVar("httptestid",$_REQUEST["httptestid"]);
