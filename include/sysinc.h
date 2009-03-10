@@ -109,6 +109,14 @@
 #	include <dirent.h>
 #endif
 
+#ifdef HAVE_SYS_DKSTAT_H
+#	include <sys/dkstat.h>
+#endif
+
+#ifdef HAVE_DEVSTAT_H
+#	include <devstat.h>
+#endif
+
 #ifdef HAVE_FCNTL_H
 #	include <fcntl.h>
 #endif
@@ -208,10 +216,6 @@
 
 #ifdef HAVE_SYS_DISK_H
 #	include <sys/disk.h>
-#endif
-
-#ifdef HAVE_SYS_DKSTAT_H
-#	include <sys/dkstat.h>
 #endif
 
 #ifdef HAVE_SYS_SOCKET_H

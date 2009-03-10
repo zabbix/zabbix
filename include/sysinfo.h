@@ -174,8 +174,23 @@ typedef struct zbx_metric_type
 #define ZBX_PROC_STAT_SLEEP	2
 #define ZBX_PROC_STAT_ZOMB	3
 
-int	get_diskstat(const char *devname, time_t *now,
-		zbx_uint64_t *r_oper, zbx_uint64_t *r_sect, zbx_uint64_t *w_oper, zbx_uint64_t *w_sect);
+#define ZBX_DSTAT_TYPE_SECT	0
+#define ZBX_DSTAT_TYPE_OPER	1
+#define ZBX_DSTAT_TYPE_BYTE	2
+#define ZBX_DSTAT_TYPE_SPS	3
+#define ZBX_DSTAT_TYPE_OPS	4
+#define ZBX_DSTAT_TYPE_BPS	5
+
+/* Disk statistics */
+#define ZBX_DSTAT_R_SECT	0
+#define ZBX_DSTAT_R_OPER	1
+#define ZBX_DSTAT_R_BYTE	2
+#define ZBX_DSTAT_W_SECT	3
+#define ZBX_DSTAT_W_OPER	4
+#define ZBX_DSTAT_W_BYTE	5
+#define ZBX_DSTAT_MAX		6
+void	refresh_diskdevices();
+int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 
 /* flags for command */
 #define CF_USEUPARAM	1	/* use user param */
