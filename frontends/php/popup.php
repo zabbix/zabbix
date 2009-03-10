@@ -190,6 +190,7 @@ include_once "include/page_header.php";
 	if($min_user_type > $USER_DETAILS['type']){
 		access_deny();
 	}
+
 ?>
 <?php
 	function get_window_opener($frame, $field, $value){
@@ -210,24 +211,24 @@ include_once "include/page_header.php";
 	$frmTitle = new CForm();
 
 	if($monitored_hosts)
-		$frmTitle->AddVar('monitored_hosts', 1);
+		$frmTitle->addVar('monitored_hosts', 1);
 
 	if($real_hosts)
-		$frmTitle->AddVar('real_hosts', 1);
+		$frmTitle->addVar('real_hosts', 1);
 
-	$frmTitle->addVar("dstfrm",	$dstfrm);
-	$frmTitle->addVar("dstfld1",	$dstfld1);
-	$frmTitle->addVar("dstfld2",	$dstfld2);
-	$frmTitle->addVar("srctbl",	$srctbl);
-	$frmTitle->addVar("srcfld1",	$srcfld1);
-	$frmTitle->addVar("srcfld2",	$srcfld2);
+	$frmTitle->addVar('dstfrm',	$dstfrm);
+	$frmTitle->addVar('dstfld1',	$dstfld1);
+	$frmTitle->addVar('dstfld2',	$dstfld2);
+	$frmTitle->addVar('srctbl',	$srctbl);
+	$frmTitle->addVar('srcfld1',	$srcfld1);
+	$frmTitle->addVar('srcfld2',	$srcfld2);
 	if(isset($_REQUEST['reference']))
-		$frmTitle->AddVar("reference",	$_REQUEST['reference']);
+		$frmTitle->addVar('reference',	$_REQUEST['reference']);
 
 	if(isset($only_hostid)){
 		$_REQUEST['hostid'] = $only_hostid;
-		$frmTitle->AddVar("only_hostid",$only_hostid);
-		unset($_REQUEST["groupid"],$_REQUEST["nodeid"]);
+		$frmTitle->addVar('only_hostid',$only_hostid);
+		unset($_REQUEST['groupid'],$_REQUEST['nodeid']);
 	}
 
 	$validation_param = array();
@@ -257,8 +258,10 @@ include_once "include/page_header.php";
 	$available_hosts	= $PAGE_HOSTS['hostids'];
 
 	if(isset($only_hostid)){
-		if(!isset($_REQUEST["hostid"]) || (bccomp($_REQUEST["hostid"], $only_hostid) != 0)) access_deny();
-		$hostid = $only_hostid;
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
+		if(!isset($available_hosts[$only_hostid])) access_deny();
+
+		$hostid = $_REQUEST['hostid'] = $only_hostid;
 	}
 	else{
 		if(str_in_array($srctbl,array('hosts','host_group','triggers','logitems','items',
@@ -270,10 +273,10 @@ include_once "include/page_header.php";
 
 				$db_nodes = DBselect('SELECT * FROM nodes WHERE '.DBcondition('nodeid',$available_nodes));
 				while($node_data = DBfetch($db_nodes)){
-					$cmbNode->AddItem($node_data['nodeid'], $node_data['name']);
+					$cmbNode->addItem($node_data['nodeid'], $node_data['name']);
 					if((bccomp($nodeid , $node_data['nodeid']) == 0)) $ok = true;
 				}
-				$frmTitle->AddItem(array(SPACE,S_NODE,SPACE,$cmbNode));
+				$frmTitle->addItem(array(SPACE,S_NODE,SPACE,$cmbNode));
 			}
 		}
 
@@ -296,8 +299,8 @@ include_once "include/page_header.php";
 			$itemtype = get_request('itemtype',get_profile('web.popup.itemtype',0));
 			$cmbTypes = new CComboBox('itemtype',$itemtype,'javascript: submit();');
 			foreach($allowed_item_types as $type)
-				$cmbTypes->AddItem($type, item_type2str($type));
-			$frmTitle->AddItem(array(S_TYPE,SPACE,$cmbTypes));
+				$cmbTypes->addItem($type, item_type2str($type));
+			$frmTitle->addItem(array(S_TYPE,SPACE,$cmbTypes));
 		}
 
 		if(str_in_array($srctbl,array('triggers','logitems','items','applications','graphs','simple_graph','plain_text'))){
@@ -395,7 +398,7 @@ include_once "include/page_header.php";
 
 			}
 
-			$table->AddRow(array(
+			$table->addRow(array(
 				$name,
 				$dns,
 				$ip,
@@ -479,20 +482,20 @@ include_once "include/page_header.php";
 		}
 		$table->SetFooter(new CButton('select',S_SELECT));
 		$form = new CForm();
-		$form->AddVar('existed_templates',$existed_templates);
+		$form->addVar('existed_templates',$existed_templates);
 
 		if($monitored_hosts)
-			$form->AddVar('monitored_hosts', 1);
+			$form->addVar('monitored_hosts', 1);
 
 		if($real_hosts)
-			$form->AddVar('real_hosts', 1);
+			$form->addVar('real_hosts', 1);
 
-		$form->AddVar('dstfrm',$dstfrm);
-		$form->AddVar('dstfld1',$dstfld1);
-		$form->AddVar('srctbl',$srctbl);
-		$form->AddVar('srcfld1',$srcfld1);
-		$form->AddVar('srcfld2',$srcfld2);
-		$form->AddItem($table);
+		$form->addVar('dstfrm',$dstfrm);
+		$form->addVar('dstfld1',$dstfld1);
+		$form->addVar('srctbl',$srctbl);
+		$form->addVar('srcfld1',$srcfld1);
+		$form->addVar('srcfld2',$srcfld2);
+		$form->addItem($table);
 		$form->Show();
 	}
 	else if(str_in_array($srctbl,array('host_group'))){
@@ -521,7 +524,7 @@ include_once "include/page_header.php";
 
 			$name->SetAction($action." close_window(); return false;");
 
-			$table->AddRow($name);
+			$table->addRow($name);
 		}
 		$table->Show();
 	}
@@ -613,7 +616,7 @@ include_once "include/page_header.php";
 
 			$name->SetAction($action." close_window(); return false;");
 
-			$table->AddRow($name);
+			$table->addRow($name);
 		}
 		$table->Show();
 	}
@@ -637,7 +640,7 @@ include_once "include/page_header.php";
 
 			$name->SetAction($action." close_window(); return false;");
 
-			$table->AddRow(array(
+			$table->addRow(array(
 				$name,
 				$row["description"]
 				));
@@ -713,7 +716,7 @@ include_once "include/page_header.php";
 
 			if($row["error"]=="")		$row["error"]=SPACE;
 
-			$table->AddRow(array(
+			$table->addRow(array(
 				$description,
 				new CCol(get_severity_description($row['priority']),get_severity_style($row['priority'])),
 				$status,
@@ -756,7 +759,7 @@ include_once "include/page_header.php";
 				default:$status=S_UNKNOWN;
 			}
 
-			$table->AddRow(array(
+			$table->addRow(array(
 				($hostid>0)?null:$db_item['host'],
 				$description,
 				$db_item["key_"],
@@ -790,8 +793,7 @@ include_once "include/page_header.php";
 		$sql .= " ORDER BY h.host, i.description, i.key_, i.itemid";
 
 		$result = DBselect($sql);
-		while($row = DBfetch($result))
-		{
+		while($row = DBfetch($result)){
 			$row["description"] = item_description($row);
 
 			$description = new CLink($row["description"],"#","action");
@@ -808,9 +810,9 @@ include_once "include/page_header.php";
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 			}
 
-			$description->SetAction($action." close_window(); return false;");
+			$description->setAction($action." close_window(); return false;");
 
-			$table->AddRow(array(
+			$table->addRow(array(
 				($hostid>0)?null:$row['host'],
 				$description,
 				item_type2str($row['type']),
@@ -818,25 +820,26 @@ include_once "include/page_header.php";
 				new CSpan(item_status2str($row['status']),item_status2style($row['status']))
 				));
 		}
-		$table->Show();
+		$table->show();
 	}
-	else if($srctbl == "applications"){
+	else if($srctbl == 'applications'){
 		$table = new CTableInfo(S_NO_APPLICATIONS_DEFINED);
-		$table->SetHeader(array(
+		$table->setHeader(array(
 			($hostid>0)?null:S_HOST,
 			S_NAME));
 
+		$sql_where = '';
+		if($hostid>0){
+			$sql_where = ' AND h.hostid='.$hostid;
+		}
 		$sql = 'SELECT DISTINCT h.host,a.* '.
 				' FROM hosts h,applications a '.
 				' WHERE h.hostid=a.hostid '.
 					' AND '.DBin_node('a.applicationid', $nodeid).
-					' and '.DBcondition('h.hostid',$available_hosts).
-					' and h.status in ('.implode(',', $host_status).')';
-
-		if($hostid>0) 
-			$sql .= ' AND h.hostid='.$hostid;
-
-		$sql .= " ORDER BY h.host,a.name";
+					' AND '.DBcondition('h.hostid',$available_hosts).
+					' AND h.status in ('.implode(',', $host_status).')'.
+					$sql_where.
+					' ORDER BY h.host,a.name';
 
 		$result = DBselect($sql);
 		while($row = DBfetch($result)){
@@ -854,7 +857,7 @@ include_once "include/page_header.php";
 
 			$name->SetAction($action." close_window(); return false;");
 
-			$table->AddRow(array(($hostid>0)?null:$row['host'], $name));
+			$table->addRow(array(($hostid>0)?null:$row['host'], $name));
 		}
 		$table->Show();
 	}
@@ -878,7 +881,7 @@ include_once "include/page_header.php";
 
 			$name->SetAction($action." close_window(); return false;");
 
-			$table->AddRow($name);
+			$table->addRow($name);
 		}
 		$table->Show();
 	}
@@ -939,7 +942,7 @@ include_once "include/page_header.php";
 					break;
 			}
 
-			$table->AddRow(array(
+			$table->addRow(array(
 				($hostid>0)?null:$row['host'],
 				$description,
 				$graphtype
@@ -1003,7 +1006,7 @@ include_once "include/page_header.php";
 
 			$description->SetAction($action.' close_window(); return false;');
 
-			$table->AddRow(array(
+			$table->addRow(array(
 				($hostid>0)?null:$row['host'],
 				$description,
 				item_type2str($row['type']),
@@ -1046,7 +1049,7 @@ include_once "include/page_header.php";
 
 			$description->SetAction($action.' close_window(); return false;');
 
-			$table->AddRow($description);
+			$table->addRow($description);
 
 			unset($description);
 		}
@@ -1099,7 +1102,7 @@ include_once "include/page_header.php";
 
 			$description->SetAction($action.' close_window(); return false;');
 
-			$table->AddRow(array(
+			$table->addRow(array(
 				($hostid>0)?null:$row['host'],
 				$description,
 				item_type2str($row['type']),
@@ -1135,7 +1138,7 @@ include_once "include/page_header.php";
 
 			$name->SetAction($action." close_window(); return false;");
 
-			$table->AddRow($name);
+			$table->addRow($name);
 		}
 
 		$table->Show();
@@ -1167,7 +1170,7 @@ include_once "include/page_header.php";
 
 			$name->SetAction($action." close_window(); return false;");
 
-			$table->AddRow($name);
+			$table->addRow($name);
 		}
 
 		$table->Show();
@@ -1206,7 +1209,7 @@ include_once "include/page_header.php";
 
 			$name->SetAction($action." close_window(); return false;");
 
-			$table->AddRow($name);
+			$table->addRow($name);
 		}
 
 		$table->Show();
