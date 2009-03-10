@@ -290,10 +290,10 @@ function zbx_rksort(&$array, $flags=NULL){
 /************* END SORT *************/
 
 /************* ZBX MISC *************/
-if(!function_exists('ctype_digit')){
-	function ctype_digit($x){ 
-		return preg_match('/^\\d+$/',$x);
-	}
+
+// accepts parametr as integer either
+function zbx_ctype_digit($x){ 
+	return preg_match('/^\\d+$/',$x);
 }
 
 function zbx_numeric($value){

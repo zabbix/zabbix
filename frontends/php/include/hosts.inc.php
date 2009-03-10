@@ -944,7 +944,6 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 			$_REQUEST['groupid'] = $result['selected'];
 		}
 	}
-
 return $result;
 }
 
@@ -1111,6 +1110,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 		
 		if(bccomp($_REQUEST['hostid'],$host['hostid']) == 0) $result['selected'] = $host['hostid'];
 	}
+
 //-----	
 	if($def_options['do_not_select']){
 		$_REQUEST['hostid'] = $result['selected'] = 0;	
@@ -1120,11 +1120,11 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	}
 	else if(($def_options['select_first_host']) || 
 			($def_options['select_first_host_if_empty'] && ($_REQUEST['hostid'] == -1)) || 
-			($def_options['select_host_on_group_switch'] && (bccomp($_REQUEST['hostid'],$result['selected']) != 0)))
+			($def_options['select_host_on_group_switch'] && ($_REQUEST['hostid'] != -1) && (bccomp($_REQUEST['hostid'],$result['selected']) != 0)))
 	{
 		$first_hostid = next($hostids);
 		reset($hostids);
-		
+
 		if($first_hostid !== FALSE)
 			$_REQUEST['hostid'] = $result['selected'] = $first_hostid;
 		else 

@@ -930,14 +930,22 @@ include_once 'include/page_header.php';
 			S_ERROR));
 
 		$from_tables['i'] = 'items i'; /* NOTE: must be added as last element to use left join */
-
+/*
 		$sql = 'SELECT DISTINCT th.host as template_host,th.hostid as template_hostid, h.host, h.hostid, hgg.groupid, i.* '.
+				' FROM '.implode(',', $from_tables).
+					' LEFT JOIN hosts_groups hgg ON hgg.hostid=i.hostid '.
+					' LEFT JOIN items ti ON i.templateid=ti.itemid '.
+					' LEFT JOIN hosts th ON ti.hostid=th.hostid '.
+				' WHERE '.implode(' AND ', $where_case).
+				order_by('h.host,i.description,i.key_,i.delay,i.history,i.trends,i.type,i.status','i.itemid');
+*/			
+		$sql = 'SELECT DISTINCT th.host as template_host,th.hostid as template_hostid, h.host, h.hostid, i.* '.
 				' FROM '.implode(',', $from_tables).
 					' LEFT JOIN items ti ON i.templateid=ti.itemid '.
 					' LEFT JOIN hosts th ON ti.hostid=th.hostid '.
-					' LEFT JOIN hosts_groups hgg ON hgg.hostid=th.hostid '.
-				' WHERE '.implode(' AND ', $where_case).
+				' WHERE '.implode(' and ', $where_case).
 				order_by('h.host,i.description,i.key_,i.delay,i.history,i.trends,i.type,i.status','i.itemid');
+
 		$db_items = DBselect($sql);
 		while($db_item = DBfetch($db_items)){
 			$description = array();
