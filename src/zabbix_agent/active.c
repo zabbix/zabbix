@@ -384,7 +384,7 @@ static int	check_response(char *response)
 	{
 		if(SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Info from server: %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "Info from server: %s",
 				info);
 		}
 	}
@@ -483,15 +483,15 @@ static int	send_buffer(
 		{
 			if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "JSON back [%s]",
-					buf);
+				zabbix_log(LOG_LEVEL_DEBUG, "JSON back [%s]",
+						buf);
 				if( !buf || check_response(buf) != SUCCEED )
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "NOT OK");
+					zabbix_log(LOG_LEVEL_DEBUG, "NOT OK");
 				}
 				else
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "OK");
+					zabbix_log(LOG_LEVEL_DEBUG, "OK");
 				}
 			} else
 				zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [recv] %s", zbx_tcp_strerror());
