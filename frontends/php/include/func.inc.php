@@ -257,6 +257,27 @@ function getmicrotime(){
 	return ((float)$usec + (float)$sec); 
 }
 
+function getDateStringByType($type, $timestamp){
+	$str = 'Wrong type';
+	switch($type){
+		case TIMEPERIOD_TYPE_HOURLY:
+			$str = date('H:i', $timestamp);
+			break;
+		case TIMEPERIOD_TYPE_DAILY:
+			$str = date('D H:i', $timestamp);
+			break;
+		case TIMEPERIOD_TYPE_WEEKLY:
+			$str = S_WEEK.' '.date('W', $timestamp);
+			break;
+		case TIMEPERIOD_TYPE_MONTHLY:
+			$str = date('M', $timestamp);
+			break;
+		case TIMEPERIOD_TYPE_YEARLY:
+			$str = date('Y', $timestamp);
+			break;
+	}
+return $str;
+}
 /************* END DATE *************/
 
 
@@ -486,6 +507,12 @@ return "$s $u$units";
 
 
 /************* ZBX MISC *************/
+
+// accepts parametr as integer either
+function zbx_ctype_digit($x){ 
+	return preg_match('/^\\d+$/',$x);
+}
+
 function zbx_numeric($value){
 	if(is_array($value)) return false;
 	if(zbx_empty($value)) return false;
