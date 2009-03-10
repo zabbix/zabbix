@@ -135,10 +135,10 @@ include_once "include/page_header.php";
 
 // TABLE
 	$form = new CForm();
-	$form->SetMethod('get');
+	$form->setMethod('get');
 	
-	$form->SetName('scenarios');
-	$form->AddVar('hostid',$_REQUEST['hostid']);
+	$form->setName('scenarios');
+	$form->addVar('hostid',$_REQUEST['hostid']);
 
 	if(isset($show_all_apps))
 		$link = new CLink(new CImg('images/general/opened.gif'),'?close=1'.url_param('groupid').url_param('hostid'));
@@ -160,14 +160,17 @@ include_once "include/page_header.php";
 	$db_apps = array();
 	$db_appids = array();
 	
-	$compare_host = ($_REQUEST['hostid']>0)?' AND h.hostid='.$_REQUEST['hostid']:'';
+	$sql_where = '';
+	if($_REQUEST['hostid']>0){
+		$sql_where = ' AND h.hostid='.$_REQUEST['hostid'];	
+	}
 	
 	$sql = 'SELECT DISTINCT h.host,h.hostid,a.* '.
 			' FROM applications a,hosts h '.
 			' WHERE a.hostid=h.hostid '.
-				$compare_host.
+				$sql_where.
 				' AND '.DBcondition('h.hostid',$available_hosts).
-			order_by('a.applicationid,h.host,h.hostid','a.name');
+			' ORDER BY a.name,a.applicationid,h.host';
 //SDI($sql);
 	$db_app_res = DBselect($sql);
 	while($db_app = DBfetch($db_app_res)){
@@ -283,7 +286,7 @@ include_once "include/page_header.php";
 		$col = new CCol(array($link,SPACE,bold($db_app['name']),SPACE.'('.$db_app['scenarios_cnt'].SPACE.S_SCENARIOS.')'));
 		$col->SetColSpan(6);
 
-		$table->AddRow(array(
+		$table->addRow(array(
 				get_node_name_by_elid($db_app['applicationid']),
 				($_REQUEST['hostid'] > 0)?NULL:$db_app['host'],
 				$col
@@ -292,10 +295,10 @@ include_once "include/page_header.php";
 		$any_app_exist = true;
 	
 		foreach($app_rows as $row)
-			$table->AddRow($row);
+			$table->addRow($row);
 	}
 
-	$form->AddItem($table);
+	$form->addItem($table);
 	
 	$p_elements[] = $form;
 	
