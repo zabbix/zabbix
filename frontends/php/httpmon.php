@@ -257,7 +257,7 @@ include_once "include/page_header.php";
 			is_show_subnodes()?SPACE:NULL,
 			($_REQUEST['hostid']>0)?NULL:SPACE,
 			array(str_repeat(SPACE,6), $name),
-			$step_cout,
+			$httptest_data['step_cout'],
 			$state,
 			$lastcheck,
 			new CSpan($status['msg'], $status['style'])
