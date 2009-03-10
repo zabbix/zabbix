@@ -21,8 +21,6 @@
 #include "sysinfo.h"
 #include "log.h"
 
-#include <sys/sysctl.h>
-
 #define DO_SUM 0
 #define DO_MAX 1
 #define DO_MIN 2
