@@ -194,7 +194,7 @@ include_once('include/page_header.php');
 					DBstart();
 					$result=add_user(
 						$_REQUEST['name'],$_REQUEST['surname'],$_REQUEST['alias'],
-						$_REQUEST['password1'],$_REQUEST['url'],get_request('autologin',0),$_REQUEST['autologout'],
+						$_REQUEST['password1'],$_REQUEST['url'],get_request('autologin',0),get_request('autologout',0),
 						$_REQUEST['lang'],$_REQUEST['theme'],$_REQUEST['refresh'],$_REQUEST['user_type'],
 						$user_groups, $user_medias);
 						
