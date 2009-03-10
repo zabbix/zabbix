@@ -1104,7 +1104,6 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 			' WHERE '.DBcondition('h.hostid',$available_hosts).
 				$sql_where.
 			' ORDER BY h.host';	
-//SDI($sql);
 	$res = DBselect($sql);
 	while($host = DBfetch($res)){
 		$hosts[$host['hostid']] = $host['host'];
@@ -1130,7 +1129,6 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 			$_REQUEST['hostid'] = $result['selected'] = $first_hostid;
 		else 
 			$_REQUEST['hostid'] = $result['selected'] = 0;
-
 	}
 	else{
 		if(ZBX_DROPDOWN_FIRST_REMEMBER){
