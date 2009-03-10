@@ -33,6 +33,24 @@
 #define ZBX_PROC_STAT_SLEEP 2
 #define ZBX_PROC_STAT_ZOMB 3
 
+#if(__FreeBSD_version > 500000)
+#	define ZBX_COMMLEN	COMMLEN
+#	define ZBX_PROC_PID	ki_pid
+#	define ZBX_PROC_COMM	ki_comm
+#	define ZBX_PROC_STAT	ki_stat
+#	define ZBX_PROC_TSIZE	ki_tsize
+#	define ZBX_PROC_DSIZE	ki_dsize
+#	define ZBX_PROC_SSIZE	ki_ssize
+#else
+#	define ZBX_COMMLEN	MAXCOMLEN
+#	define ZBX_PROC_PID	kp_proc.p_pid
+#	define ZBX_PROC_COMM	kp_proc.p_comm
+#	define ZBX_PROC_STAT	kp_proc.p_stat
+#	define ZBX_PROC_TSIZE	kp_eproc.e_vm.vm_tsize
+#	define ZBX_PROC_DSIZE	kp_eproc.e_vm.vm_dsize
+#	define ZBX_PROC_SSIZE	kp_eproc.e_vm.vm_ssize
+#endif
+
 static char	*get_commandline(struct kinfo_proc *proc)
 {
 	int		mib[4], i;
@@ -46,7 +64,7 @@ static char	*get_commandline(struct kinfo_proc *proc)
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_PROC;
 	mib[2] = KERN_PROC_ARGS;
-	mib[3] = proc->ki_pid;
+	mib[3] = proc->ZBX_PROC_PID;
 retry:
 	sz = (size_t)args_alloc;
 	if (-1 == sysctl(mib, 4, args, &sz, NULL, 0))
@@ -64,7 +82,7 @@ retry:
 			args[i] = ' ';
 
 	if (sz == 0)
-		zbx_strlcpy(args, proc->ki_comm, args_alloc);
+		zbx_strlcpy(args, proc->ZBX_PROC_COMM, args_alloc);
 
 	return args;
 }
@@ -103,8 +121,8 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if (0 != get_param(param, 1, procname, sizeof(procname)))
 		*procname = '\0';
-	else if (strlen(procname) > COMMLEN)
-		procname[COMMLEN] = '\0';
+	else if (strlen(procname) > ZBX_COMMLEN)
+		procname[ZBX_COMMLEN] = '\0';
 
 	if (0 != get_param(param, 2, buffer, sizeof(buffer)))
 		*buffer = '\0';
@@ -145,7 +163,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		mib[3] = usrinfo->pw_uid;
 		mibs = 4;
 	} else {
-		mib[2] = KERN_PROC_PROC;
+		mib[2] = KERN_PROC_ALL;
 		mib[3] = 0;
 		mibs = 3;
 	}
@@ -163,9 +181,14 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	count = sz / sizeof(struct kinfo_proc);
 
 	for (i = 0; i < count; i++) {
+#if(__FreeBSD_version > 500000)
+		if (proc[i].ki_flag & P_KTHREAD)	/* skip a system thread */
+			continue;
+#endif
+
 		proc_ok = 0;
 		comm_ok = 0;
-		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ki_comm))
+		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
 			proc_ok = 1;
 
 		if (*proccomm != '\0') {
@@ -176,9 +199,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 			comm_ok = 1;
 
 		if (proc_ok && comm_ok) {
-			value = proc[i].ki_tsize
-				+ proc[i].ki_dsize
-				+ proc[i].ki_ssize;
+			value = proc[i].ZBX_PROC_TSIZE + proc[i].ZBX_PROC_DSIZE + proc[i].ZBX_PROC_SSIZE;
 			value *= pagesize;
 
 			if (0 == proccount++)
@@ -236,8 +257,8 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 	if (0 != get_param(param, 1, procname, sizeof(procname)))
 		*procname = '\0';
-	else if (strlen(procname) > COMMLEN)
-		procname[COMMLEN] = '\0';
+	else if (strlen(procname) > ZBX_COMMLEN)
+		procname[ZBX_COMMLEN] = '\0';
 
 	if (0 != get_param(param, 2, buffer, sizeof(buffer)))
 		*buffer = '\0';
@@ -276,7 +297,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		mib[3] = usrinfo->pw_uid;
 		mibs = 4;
 	} else {
-		mib[2] = KERN_PROC_PROC;
+		mib[2] = KERN_PROC_ALL;
 		mib[3] = 0;
 		mibs = 3;
 	}
@@ -294,25 +315,30 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	count = sz / sizeof(struct kinfo_proc);
 
 	for (i = 0; i < count; i++) {
+#if(__FreeBSD_version > 500000)
+		if (proc[i].ki_flag & P_KTHREAD)	/* skip a system thread */
+			continue;
+#endif
+
 		proc_ok = 0;
 		stat_ok = 0;
 		comm_ok = 0;
 
-		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ki_comm))
+		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
 			proc_ok = 1;
 
 		if (zbx_proc_stat != ZBX_PROC_STAT_ALL) {
 			switch (zbx_proc_stat) {
 			case ZBX_PROC_STAT_RUN:
-				if (proc[i].ki_stat == SRUN)
+				if (proc[i].ZBX_PROC_STAT == SRUN)
 					stat_ok = 1;
 				break;
 			case ZBX_PROC_STAT_SLEEP:
-				if (proc[i].ki_stat == SSLEEP)
+				if (proc[i].ZBX_PROC_STAT == SSLEEP)
 					stat_ok = 1;
 				break;
 			case ZBX_PROC_STAT_ZOMB:
-				if (proc[i].ki_stat == SZOMB)
+				if (proc[i].ZBX_PROC_STAT == SZOMB)
 					stat_ok = 1;
 				break;
 			}

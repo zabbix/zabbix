@@ -22,11 +22,10 @@
 #include "stats.h"
 #include "log.h"
 
-static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now,
-		zbx_uint64_t r_oper, zbx_uint64_t r_sect, zbx_uint64_t w_oper, zbx_uint64_t w_sect)
+static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_uint64_t *dstat)
 {
 	register int	i;
-	int		clock[ZBX_AVGMAX], index[ZBX_AVGMAX];
+	int		clock[ZBX_AVGMAX], index[ZBX_AVGMAX], sec;
 
 	assert(device);
 
@@ -36,10 +35,12 @@ static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now,
 		device->index = 0;
 
 	device->clock[device->index] = now;
-	device->r_oper[device->index] = r_oper;
-	device->r_sect[device->index] = r_sect;
-	device->w_oper[device->index] = w_oper;
-	device->w_sect[device->index] = w_sect;
+	device->r_sect[device->index] = dstat[ZBX_DSTAT_R_SECT];
+	device->r_oper[device->index] = dstat[ZBX_DSTAT_R_OPER];
+	device->r_byte[device->index] = dstat[ZBX_DSTAT_R_BYTE];
+	device->w_sect[device->index] = dstat[ZBX_DSTAT_W_SECT];
+	device->w_oper[device->index] = dstat[ZBX_DSTAT_W_OPER];
+	device->w_byte[device->index] = dstat[ZBX_DSTAT_W_BYTE];
 
 	clock[ZBX_AVG1] = clock[ZBX_AVG5] = clock[ZBX_AVG15] = now + 1;
 	index[ZBX_AVG1] = index[ZBX_AVG5] = index[ZBX_AVG15] = -1;
@@ -64,17 +65,22 @@ static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now,
 #define SAVE_DISKSTAT(t)\
 	if (-1 == index[ZBX_AVG ## t] || 0 == now - device->clock[index[ZBX_AVG ## t]])\
 	{\
-		device->r_ops[ZBX_AVG ## t] = 0;\
 		device->r_sps[ZBX_AVG ## t] = 0;\
-		device->w_ops[ZBX_AVG ## t] = 0;\
+		device->r_ops[ZBX_AVG ## t] = 0;\
+		device->r_bps[ZBX_AVG ## t] = 0;\
 		device->w_sps[ZBX_AVG ## t] = 0;\
+		device->w_ops[ZBX_AVG ## t] = 0;\
+		device->w_bps[ZBX_AVG ## t] = 0;\
 	}\
 	else\
 	{\
-		device->r_ops[ZBX_AVG ## t] = (r_oper - device->r_oper[index[ZBX_AVG ## t]]) / (now - device->clock[index[ZBX_AVG ## t]]);\
-		device->r_sps[ZBX_AVG ## t] = (r_sect - device->r_sect[index[ZBX_AVG ## t]]) / (now - device->clock[index[ZBX_AVG ## t]]);\
-		device->w_ops[ZBX_AVG ## t] = (w_oper - device->w_oper[index[ZBX_AVG ## t]]) / (now - device->clock[index[ZBX_AVG ## t]]);\
-		device->w_sps[ZBX_AVG ## t] = (w_sect - device->w_sect[index[ZBX_AVG ## t]]) / (now - device->clock[index[ZBX_AVG ## t]]);\
+		sec = now - device->clock[index[ZBX_AVG ## t]];\
+		device->r_sps[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_R_SECT] - device->r_sect[index[ZBX_AVG ## t]]) / (double)sec;\
+		device->r_ops[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_R_OPER] - device->r_oper[index[ZBX_AVG ## t]]) / (double)sec;\
+		device->r_bps[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_R_BYTE] - device->r_byte[index[ZBX_AVG ## t]]) / (double)sec;\
+		device->w_sps[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_W_SECT] - device->w_sect[index[ZBX_AVG ## t]]) / (double)sec;\
+		device->w_ops[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_W_OPER] - device->w_oper[index[ZBX_AVG ## t]]) / (double)sec;\
+		device->w_bps[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_W_BYTE] - device->w_byte[index[ZBX_AVG ## t]]) / (double)sec;\
 	}
 
 	SAVE_DISKSTAT(1);
@@ -84,18 +90,24 @@ static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now,
 
 static void	process_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device)
 {
-	time_t		now = 0;
-	zbx_uint64_t	r_oper, r_sect, w_oper, w_sect;
+	time_t		now;
+	zbx_uint64_t	dstat[ZBX_DSTAT_MAX];
 
-	if (FAIL == get_diskstat(device->name, &now, &r_oper, &r_sect, &w_oper, &w_sect))
+	now = time(NULL);
+	if (FAIL == get_diskstat(device->name, dstat))
 		return;
 
-	apply_diskstat(device, now, r_oper, r_sect, w_oper, w_sect);
+	apply_diskstat(device, now, dstat);
 }
 
 void	collect_stats_diskdevices(ZBX_DISKDEVICES_DATA *diskdevices)
 {
+	static int	s = 0;
 	register int	i;
+
+	s = s % 60;
+	if (0 == s++)	/* refresh device list each 60 seconds */
+		refresh_diskdevices();
 
 	for (i = 0; i < diskdevices->count; i++)
 		process_diskstat(&diskdevices->device[i]);
