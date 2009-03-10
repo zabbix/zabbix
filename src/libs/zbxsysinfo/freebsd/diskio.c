@@ -37,9 +37,9 @@ void	refresh_diskdevices()
 	{
 		si = (struct statinfo *)zbx_malloc(si, sizeof(struct statinfo));
 		si->dinfo = (struct devinfo *)zbx_malloc(NULL, sizeof(struct devinfo));
+		memset(si->dinfo, 0, sizeof(struct devinfo));
 	}
 
-	memset(si->dinfo, 0, sizeof(struct devinfo));
 #if DEVSTAT_USER_API_VER >= 5
 	if (-1 == devstat_getdevs(NULL, si))
 #else
@@ -70,9 +70,9 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	{
 		si = (struct statinfo *)zbx_malloc(si, sizeof(struct statinfo));
 		si->dinfo = (struct devinfo *)zbx_malloc(NULL, sizeof(struct devinfo));
+		memset(si->dinfo, 0, sizeof(struct devinfo));
 	}
 
-	memset(si->dinfo, 0, sizeof(struct devinfo));
 #if DEVSTAT_USER_API_VER >= 5
 	if (-1 == devstat_getdevs(NULL, si))
 #else
