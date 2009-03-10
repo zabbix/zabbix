@@ -394,7 +394,7 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 							'color'	=> array('R'=>155,'G'=>155,'B'=>55),
 							'font'	=> $msg_font));
 					}
-					$width = max($width, ImageFontWidth($msg_font) * strlen($msg['message']) + 1);
+					$width = max($width, imagefontwidth($msg_font) * strlen($msg['message']) + 1);
 					$height += imagefontheight($msg_font) + 1;
 				}
 			}
@@ -408,8 +408,9 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 
 				foreach($ZBX_MESSAGES as $msg){
 					$lst_error->addItem($msg['message'], $msg['type']);
-					$bool &= ('error' != strtolower($msg['type']));
+					$bool = ($bool && ('error' != strtolower($msg['type'])));
 				}
+
 //message scroll if needed
 				$msg_show = 6;
 				$msg_count = count($ZBX_MESSAGES);

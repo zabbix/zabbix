@@ -19,84 +19,82 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/users.inc.php";
-	require_once "include/forms.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/users.inc.php');
+	require_once('include/forms.inc.php');
 
-	$page["title"] = "S_USER_PROFILE";
-	$page["file"] = "profile.php";
+	$page['title'] = "S_USER_PROFILE";
+	$page['file'] = 'profile.php';
 	$page['hist_arg'] = array();
 
-include_once "include/page_header.php";
+include_once 'include/page_header.php';
 
 ?>
 <?php
-	if($USER_DETAILS["alias"]==ZBX_GUEST_USER)
-	{
+	if($USER_DETAILS['alias']==ZBX_GUEST_USER){
 		access_deny();
 	}
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"password1"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
-		"password2"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
-		"lang"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
-		"theme"=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
+		'password1'=>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
+		'password2'=>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
+		'lang'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
+		'theme'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
 		'autologin'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
-		"autologout"=>  array(T_ZBX_INT, O_OPT, null,   BETWEEN(90,10000), null),
-		"url"=>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-		"refresh"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'isset({save})'),
-		"change_password"=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
+		'autologout'=>  array(T_ZBX_INT, O_OPT, null,   BETWEEN(90,10000), null),
+		'url'=>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+		'refresh'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'isset({save})'),
+		'change_password'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
 /* actions */
-		"save"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"cancel"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'save'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel'=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 /* other */
-		"form"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_refresh"=>array(T_ZBX_STR, O_OPT, null,	null,	null)
+		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_refresh'=>array(T_ZBX_STR, O_OPT, null,	null,	null)
 	);
 
 
 	check_fields($fields);
 ?>
 <?php
-	if(isset($_REQUEST["cancel"])){
+	if(isset($_REQUEST['cancel'])){
 		$url = get_profile('web.menu.view.last', 'index.php');
 		redirect($url);
 	}
-	else if(isset($_REQUEST["save"])){
-		$_REQUEST["password1"] = get_request("password1", null);
-		$_REQUEST["password2"] = get_request("password2", null);
+	else if(isset($_REQUEST['save'])){
+		$_REQUEST['password1'] = get_request('password1', null);
+		$_REQUEST['password2'] = get_request('password2', null);
 
-		if(isset($_REQUEST["password1"]) && $_REQUEST["password1"] == ""){
+		if(isset($_REQUEST['password1']) && $_REQUEST['password1'] == ''){
 			show_error_message(S_ONLY_FOR_GUEST_ALLOWED_EMPTY_PASSWORD);
 		}
-		else if($_REQUEST["password1"]==$_REQUEST["password2"]){
-			$result=update_user_profile($USER_DETAILS["userid"],$_REQUEST["password1"],
-									$_REQUEST["url"],get_request("autologin",0),$_REQUEST["autologout"],
-									$_REQUEST["lang"],$_REQUEST['theme'],$_REQUEST["refresh"]
+		else if($_REQUEST['password1']==$_REQUEST['password2']){
+			$result=update_user_profile($USER_DETAILS['userid'],$_REQUEST['password1'],
+									$_REQUEST['url'],get_request('autologin',0),get_request('autologout',0),
+									$_REQUEST['lang'],$_REQUEST['theme'],$_REQUEST['refresh']
 					);
 					
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			if($result)
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,
-					"User alias [".$USER_DETAILS["alias"].
-					"] name [".$USER_DETAILS["name"]."] surname [".
-					$USER_DETAILS["surname"]."] profile id [".$USER_DETAILS["userid"]."]");
+					'User alias ['.$USER_DETAILS['alias'].
+					'] name ['.$USER_DETAILS['name'].'] surname ['.
+					$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
 		}
-		else
-		{
+		else{
 			show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
 		}
 	}
 ?>
 <?php
-	show_table_header(S_USER_PROFILE_BIG." : ".$USER_DETAILS["name"]." ".$USER_DETAILS["surname"]);
-	echo "<br>";
-	insert_user_form($USER_DETAILS["userid"],1);
+	show_table_header(S_USER_PROFILE_BIG.' : '.$USER_DETAILS['name'].' '.$USER_DETAILS['surname']);
+	echo '<br>';
+	insert_user_form($USER_DETAILS['userid'],1);
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once 'include/page_footer.php';
 
 ?>

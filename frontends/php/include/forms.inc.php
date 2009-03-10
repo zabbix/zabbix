@@ -674,7 +674,7 @@
 		$frmMsg->Destroy();
 	}
 
-	# Insert form for User
+// Insert form for User
 	function insert_user_form($userid,$profile=0){
 		global $ZBX_LOCALES;
 		global $USER_DETAILS;
@@ -686,23 +686,23 @@
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
 
 			$user=get_user_by_userid($userid);
-			$frm_title = S_USER.' "'.$user["alias"].'"';
+			$frm_title = S_USER.' "'.$user['alias'].'"';
 		}
 
-		if(isset($userid) && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"]))){
-			$alias		= $user["alias"];
-			$name		= $user["name"];
-			$surname	= $user["surname"];
+		if(isset($userid) && (!isset($_REQUEST['form_refresh']) || isset($_REQUEST['register']))){
+			$alias		= $user['alias'];
+			$name		= $user['name'];
+			$surname	= $user['surname'];
 			$password	= null;
 			$password1	= null;
 			$password2	= null;
-			$url		= $user["url"];
-			$autologin	= $user["autologin"];
-			$autologout	= $user["autologout"];
-			$lang		= $user["lang"];
+			$url		= $user['url'];
+			$autologin	= $user['autologin'];
+			$autologout	= $user['autologout'];
+			$lang		= $user['lang'];
 			$theme 		= $user['theme'];
-			$refresh	= $user["refresh"];
-			$user_type	= $user["type"];
+			$refresh	= $user['refresh'];
+			$user_type	= $user['type'];
 
 			$user_groups	= array();
 			$user_medias		= array();
@@ -739,7 +739,7 @@
 			$password2 	= get_request('password2', '');
 			$url 		= get_request('url','');
 			$autologin	= get_request('autologin',0);
-			$autologout	= get_request('autologout',900);
+			$autologout	= get_request('autologout',0);
 			$lang		= get_request('lang','en_gb');
 			$theme 		= get_request('theme','default.css');
 			$refresh	= get_request('refresh',30);
@@ -751,13 +751,12 @@
 			$new_group_name = get_request('new_group_name', '');
 		}
 		
-		if ($autologin > 0) {
+		if($autologin){
 			$autologout = 0;
 			zbx_add_post_js("document.getElementById('autologout_visible').disabled = true;");
-		} else if (isset($_REQUEST['autologout'])) {
-			if ($autologout >= 0 && $autologout < 90) {
-				$autologout = 90;
-			}
+		} 
+		else if(isset($_REQUEST['autologout']) && ($autologout < 90)){
+			$autologout = 90;
 		}
 		
 		$perm_details	= get_request('perm_details',0);
@@ -902,22 +901,20 @@
 
 		$frmUser->addRow(S_THEME, $cmbTheme);
 
-		$chkbx_autologin = new CCheckBox("autologin", $autologin, new CScript("var autologout_visible = document.getElementById('autologout_visible');
-																				var autologout = document.getElementById('autologout');
-																				if (this.checked) {
-																					if (autologout_visible.checked) {
-																						autologout_visible.checked = false;
-																						autologout_visible.onclick();
-																					}
-																					autologout_visible.disabled = true;
-																				} else {
-																					autologout_visible.disabled = false;
-																				}"), 1);
+		$js = 'javascript: $(autologout_visible).disabled = this.checked; '.
+				' if($(autologout_visible).checked){ '.
+					'$(autologout_visible).checked = false; '.
+					' $(autologout_visible).onclick();}';
+		$chkbx_autologin = new CCheckBox('autologin', $autologin, $js, 1);
+		
 		$chkbx_autologin->addOption('autocomplete','off');
 		$frmUser->AddRow(S_AUTO_LOGIN,	$chkbx_autologin);
-		$frmUser->AddRow(S_AUTO_LOGOUT, array(new CVisibilityBox('autologout_visible', (isset($autologout) && $autologout != 0) ? 'yes' : 'no', 'autologout', S_DISABLED), new CNumericBox("autologout", $autologout, 4)));
-		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
-		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
+		$frmUser->AddRow(S_AUTO_LOGOUT, array(new CVisibilityBox('autologout_visible', 
+													(isset($autologout) && $autologout != 0)?'yes':'no', 
+													'autologout', S_DISABLED), 
+												new CNumericBox('autologout', $autologout, 4)));
+		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox('url',$url,50));
+		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox('refresh',$refresh,4));
 
 
 		if(0 == $profile){
