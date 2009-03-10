@@ -507,6 +507,7 @@ include_once('include/page_header.php');
 			
 			$_REQUEST['hostid'] = $clone_hostid;
 		}
+		
 		$result	= DBend($result);
 		
 		if($result){
@@ -542,7 +543,7 @@ include_once('include/page_header.php');
 			$result = DBend($result);
 		}
 //HOSTS PROFILE EXTANDED Section		
-		
+
 		show_messages($result, $msg_ok, $msg_fail);
 		
 		if($result){

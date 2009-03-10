@@ -704,11 +704,11 @@ table.ack_msgs tr.msg td{
 .right_header {
 	font-weight: bold; 
 	text-align: center;
-	border-top-style: solid;
+
 	border-left-style: solid;
 	border-right-style: solid;
 	border-bottom-style: none;
-	border-color: #222255;
+	border-color: #AAAAAA;
 }
 
 table.right_table{
