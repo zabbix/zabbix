@@ -44,11 +44,13 @@
 	define('ZBX_MAX_PERIOD', 12*31*24*3600);		// ~1 year
 	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
 
-	define('ZBX_DROPDOWN_FIRST_ENTRY',		1);		// 0 - NONE, 1 - ALL
+	define('ZBX_DROPDOWN_FIRST_ENTRY',		1);		// 0 - NONE, 1 - ALL, 2 - SIMILAR ZBX 1.6.2 (compatibility mode)
 	define('ZBX_DROPDOWN_FIRST_REMEMBER',	1);		// 0 - do NOT remember, 1 - do remember
 
 	define('ZBX_DISABLE_MENU_CACHE',		0);		// set 1 to disable
 	
+	putenv('GDFONTPATH='.realpath('fonts/'));		// where to search for font  (GD > 2.0.18)
+	define('ZBX_GRAPH_FONT_NAME',	'kochi-gothic-subst');	// font file name
 /* END OF USERS DEFINES */
 
 	define('ZBX_AUTH_INTERNAL',	0);
@@ -66,6 +68,7 @@
 	
 	define('ZBX_DROPDOWN_FIRST_NONE',		0);
 	define('ZBX_DROPDOWN_FIRST_ALL',		1);
+	define('ZBX_DROPDOWN_FIRST_ZBX162',		2);
 
 	define('T_ZBX_STR',			0);
 	define('T_ZBX_INT',			1);
@@ -456,21 +459,19 @@
 	define('GRAPH_YAXIS_TYPE_FIXED',		1);
 	define('GRAPH_YAXIS_TYPE_ITEM_VALUE',	2);
 	
-	define('GRAPH_YAXIS_SIDE_LEFT',0);
-	define('GRAPH_YAXIS_SIDE_RIGHT',1);
+	define('GRAPH_YAXIS_SIDE_LEFT',		0);
+	define('GRAPH_YAXIS_SIDE_RIGHT',	1);
 	
 	define('GRAPH_ITEM_SIMPLE' , 	0);
 	define('GRAPH_ITEM_AGGREGATED',	1);
 	define('GRAPH_ITEM_SUM',		2);
 	
-	define('GRAPH_TYPE_NORMAL',		0);
-	define('GRAPH_TYPE_STACKED',	1);
-	
-	define('GRAPH_TYPE_PIE',		2);
-	define('GRAPH_TYPE_EXPLODED',	3);
-	define('GRAPH_TYPE_3D',			4);
-	define('GRAPH_TYPE_3D_EXPLODED',5);
-	
+	define('GRAPH_TYPE_NORMAL',			0);
+	define('GRAPH_TYPE_STACKED',		1);
+	define('GRAPH_TYPE_PIE',			2);
+	define('GRAPH_TYPE_EXPLODED',		3);
+	define('GRAPH_TYPE_3D',				4);
+	define('GRAPH_TYPE_3D_EXPLODED',	5);
 	define('GRAPH_TYPE_BAR',			6);
 	define('GRAPH_TYPE_COLUMN',			7);
 	define('GRAPH_TYPE_BAR_STACKED',	8);
