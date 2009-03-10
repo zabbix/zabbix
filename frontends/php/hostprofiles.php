@@ -37,27 +37,26 @@ include_once "include/page_header.php";
 		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 		'prof_type'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	null,	NULL),
 	);
-
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
-
+	
+	$reset_hostid = (isset($_REQUEST['hostid'])) ? false : true;
+	
 	$params = array();
-	$options = array('allow_all_hosts','monitored_hosts','with_items');
+	$options = array('allow_all_hosts','real_hosts');
 	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');	
 	foreach($options as $option) $params[$option] = 1;
-	
+
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
-	validate_group($PAGE_GROUPS, $PAGE_HOSTS, false);
-
+	validate_group($PAGE_GROUPS, $PAGE_HOSTS, $reset_hostid);
 	$prof_type = get_request('prof_type',0);
 ?>
 <?php
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$available_hosts = $PAGE_HOSTS['hostids'];
 	
 	$r_form = new CForm();
 	$r_form->setMethod('get');
-
 	$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
 		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
@@ -74,6 +73,7 @@ include_once "include/page_header.php";
 ?>
 
 <?php
+SDI($_REQUEST['hostid']);
 	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
 		echo SBR;
 
