@@ -173,12 +173,26 @@ include_once "include/page_header.php";
 				);
 			foreach($services as $name => $foo){
 				$class = null; $time = SPACE;
+				
+				$hint = new CDiv(SPACE, $class);
+				$hintTable = new CTableInfo();
+				$hintTable->addOption('border',0);
+
 
 				if(isset($h_data['services'][$name])){
 					$class = $h_data['services'][$name]['class'];
 					$time = $h_data['services'][$name]['time'];
+					if ($class == 'active') {
+						$hintTable->setHeader(S_LAST_UP);
+					} else if ($class == 'inactive') {
+						$hintTable->setHeader(S_LAST_UP);
+					}
+					$timeColumn = new CCol(zbx_date2age($h_data['services'][$name]['time']), $class);
+					$hintTable->addRow($timeColumn);
+					$hint->setHint($hintTable);
 				}
-				$table_row[] = new CCol(SPACE, $class);
+				
+				$table_row[] = new CCol($hint, $class);
 			}
 			$table->AddRow($table_row);
 		}
