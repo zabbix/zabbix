@@ -28,7 +28,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
 	int	name;
 	long	ncpu;
-	char	mode[MAX_STRING_LEN];
+	char	mode[16];
 
 	assert(result);
 
@@ -40,11 +40,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	if (0 != get_param(param, 1, mode, sizeof(mode)))
 		*mode = '\0';
 
-	/* default parameter */
-	if (*mode == '\0')
-		zbx_snprintf(mode, sizeof(mode), "online");
-
-	if (0 == strcmp(mode, "online"))
+	if ('\0' == *mode || 0 == strcmp(mode, "online"))	/* default parameter */
 		name = _SC_NPROCESSORS_ONLN;
 	else if(0 == strcmp(mode, "max"))
 		name = _SC_NPROCESSORS_CONF;
@@ -61,7 +57,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
 	size_t	len;
 	int	mib[] = {CTL_HW, HW_NCPU}, ncpu;
-	char	mode[MAX_STRING_LEN];
+	char	mode[16];
 
 	assert(result);
 
@@ -73,11 +69,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	if (0 != get_param(param, 1, mode, sizeof(mode)))
 		*mode = '\0';
 
-	/* default parameter */
-	if (*mode == '\0')
-		zbx_snprintf(mode, sizeof(mode), "online");
-
-	if (0 != strcmp(mode, "online"))
+	if ('\0' != *mode && 0 != strcmp(mode, "online"))	/* default parameter */
 		return SYSINFO_RET_FAIL;
 
 	len = sizeof(ncpu);
