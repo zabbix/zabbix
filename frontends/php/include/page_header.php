@@ -346,11 +346,8 @@ COpt::profiling_start("page");
 			continue;
 		}
 		
-		if(ZBX_DISABLE_MENU_CACHE == 0)
-			$menu_url = get_profile('web.menu.'.$label.'.last',false);
-		else
-			$menu_url = $menu['pages'][$sub['default_page_id']]['url'];
-
+		$menu_url = get_profile('web.menu.'.$label.'.last',false);			
+//		if(ZBX_DISABLE_MENU_CACHE == 1) $menu_url = $menu['pages'][$sub_menus['default_page_id']]['url'];
 
 		$mmenu_entry = new CCol($menu['label'], $menu_class);
 		$mmenu_entry->addOption('id', $label);

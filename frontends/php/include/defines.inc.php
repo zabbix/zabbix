@@ -47,8 +47,6 @@
 
 	define('ZBX_DROPDOWN_FIRST_ENTRY',		2);		// 0 - NONE, 1 - ALL, 2 - SIMILAR ZBX 1.6.2 (compatibility mode)
 	define('ZBX_DROPDOWN_FIRST_REMEMBER',	1);		// 0 - do NOT remember, 1 - do remember
-
-	define('ZBX_DISABLE_MENU_CACHE',		0);		// set 1 to disable
 	
 /* END OF USERS DEFINES */
 
