@@ -524,19 +524,49 @@ CPU_FNCLIST
 
 int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-        assert(result);
+#if defined(HAVE_FUNCTION_SYSCTLBYNAME)
+	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	u_int	v_swtch;
+	size_t	len;
 
-        init_result(result);
+	assert(result);
+
+	init_result(result);
 	
+	len = sizeof(v_swtch);
+
+	if (0 != sysctlbyname("vm.stats.sys.v_swtch", &v_swtch, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, v_swtch);
+
+	return SYSINFO_RET_OK;
+#else
 	return SYSINFO_RET_FAIL;
+#endif /* HAVE_FUNCTION_SYSCTLBYNAME */
 }
 
 int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-        assert(result);
+#if defined(HAVE_FUNCTION_SYSCTLBYNAME)
+	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	u_int	v_intr;
+	size_t	len;
 
-        init_result(result);
+	assert(result);
+
+	init_result(result);
 	
+	len = sizeof(v_intr);
+
+	if (0 != sysctlbyname("vm.stats.sys.v_intr", &v_intr, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, v_intr);
+
+	return SYSINFO_RET_OK;
+#else
 	return SYSINFO_RET_FAIL;
+#endif /* HAVE_FUNCTION_SYSCTLBYNAME */
 }
 

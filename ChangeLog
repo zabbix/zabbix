@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTD-47] added support of system.cpu.intr/switches under FreeBSD (Sasha)
  - [NTP-6] fixed duplicate id's in processing of log and text items (Sasha)
  - [NTD-54] added support of vfs.dev.read/write under FreeBSD (Sasha)
  - [NTD-86] fixed configuration scripts (Sasha)
