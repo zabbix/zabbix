@@ -46,8 +46,6 @@
 
 	define('ZBX_DROPDOWN_FIRST_ENTRY',		1);		// 0 - NONE, 1 - ALL, 2 - SIMILAR ZBX 1.6.2 (compatibility mode)
 	define('ZBX_DROPDOWN_FIRST_REMEMBER',	1);		// 0 - do NOT remember, 1 - do remember
-
-	define('ZBX_DISABLE_MENU_CACHE',		0);		// set 1 to disable
 	
 	putenv('GDFONTPATH='.realpath('fonts/'));		// where to search for font  (GD > 2.0.18)
 	define('ZBX_GRAPH_FONT_NAME',	'kochi-gothic-subst');	// font file name
@@ -138,10 +136,10 @@
 	define('AUDIT_RESOURCE_NODE',			21);
 	define('AUDIT_RESOURCE_SCENARIO',		22);
 	define('AUDIT_RESOURCE_DISCOVERY_RULE',	23);
-	define('AUDIT_RESOURCE_SLIDESHOW',	24);
-	define('AUDIT_RESOURCE_SCRIPT',		25);
-	define('AUDIT_RESOURCE_PROXY',		26);
-	define('AUDIT_RESOURCE_MAINTENANCE',27);
+	define('AUDIT_RESOURCE_SLIDESHOW',		24);
+	define('AUDIT_RESOURCE_SCRIPT',			25);
+	define('AUDIT_RESOURCE_PROXY',			26);
+	define('AUDIT_RESOURCE_MAINTENANCE',	27);
 	define('AUDIT_RESOURCE_REGEXP',			28);
 
 	define('CONDITION_TYPE_HOST_GROUP',	0);
