@@ -677,7 +677,7 @@ include_once('include/page_header.php');
 					));
 				$row_count++;
 			}
-			$table->SetFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_GROUPS_Q)));
+			//$table->SetFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_GROUPS_Q)));
 
 			$form->AddItem($table);
 			$form->Show();
