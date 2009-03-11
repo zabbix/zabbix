@@ -601,7 +601,8 @@ include_once 'include/page_header.php';
 		else{
 			$actions=NULL;
 		}
-	
+
+// JS menu
 		$host = null;
 		if($_REQUEST['hostid'] < 1){
 			$menus = '';
@@ -625,7 +626,7 @@ include_once 'include/page_header.php';
 			$host = new CSpan($row['host'],'pointer');
 			$host->addOption('onclick','javascript: '.$menus);
 		}
-		
+
 		$tr_conf_link = 'null';
 		if($admin_links){
 			$tr_conf_link = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$row['triggerid']."&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
@@ -635,6 +636,7 @@ include_once 'include/page_header.php';
 		$tr_desc->addAction('onclick',"javascript: create_mon_trigger_menu(event, ".
 										" new Array({'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['lastchange']."'}, ".$tr_conf_link."),".
 										zbx_jsvalue($row['items']).");");
+//--
 
 			$table->addRow(array(
 				$show_event_col?SPACE:NULL,
