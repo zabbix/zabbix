@@ -88,8 +88,8 @@
 	'S_LOST'=>				'Lost',
 	
 //	discovery.php
-	'S_LAST_UP' => 'Last up',
-	'S_LAST_DOWN' => 'Last down',
+	'S_UP_TIME' => 'Uptime',
+	'S_DOWN_TIME' => 'Downtime',
 
 //	httpdetails.php
 	'S_DETAILS_OF_SCENARIO'=>		'Details of scenario',
