@@ -271,7 +271,7 @@ function make_system_summary($args = array()){
 					S_ACTIONS
 					));
 				
-				$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, t.priority, t.lastchange,t.value,h.host,h.hostid '.
+				$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.value,h.host,h.hostid '.
 							' FROM triggers t,hosts h,items i,functions f, hosts_groups hg '.
 							' WHERE f.itemid=i.itemid '.
 								' AND hg.groupid='.$group['groupid'].
@@ -461,7 +461,7 @@ function make_latest_issues($params = array()){
 		S_ACTIONS
 		));
 	
-	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description,t.priority,t.lastchange,t.value,h.host,h.hostid '.$sql_select.
+	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.value,h.host,h.hostid '.$sql_select.
 				' FROM triggers t,hosts h,items i,functions f,hosts_groups hg '.$sql_from.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
@@ -523,9 +523,9 @@ function make_latest_issues($params = array()){
 				}
 			}
 
-			$description = expand_trigger_description_by_data(
-					array_merge($row, array("clock"=>$row_event["clock"])),
-					ZBX_FLAG_EVENT);
+//			$description = expand_trigger_description($row['triggerid']);
+
+			$description = expand_trigger_description_by_data(array_merge($row, array('clock'=>$row_event['clock'])),ZBX_FLAG_EVENT);
 					
 //actions								
 			$actions = get_event_actions_stat_hints($row_event['eventid']);
