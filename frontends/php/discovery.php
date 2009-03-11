@@ -183,9 +183,9 @@ include_once "include/page_header.php";
 					$class = $h_data['services'][$name]['class'];
 					$time = $h_data['services'][$name]['time'];
 					if ($class == 'active') {
-						$hintTable->setHeader(S_LAST_UP);
+						$hintTable->setHeader(S_UP_TIME);
 					} else if ($class == 'inactive') {
-						$hintTable->setHeader(S_LAST_UP);
+						$hintTable->setHeader(S_DOWN_TIME);
 					}
 					$timeColumn = new CCol(zbx_date2age($h_data['services'][$name]['time']), $class);
 					$hintTable->addRow($timeColumn);
