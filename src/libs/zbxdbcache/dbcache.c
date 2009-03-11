@@ -76,7 +76,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name)
 	DB_ROW		row;
 	const ZBX_TABLE	*table;
 	ZBX_DC_IDS	*id;
-	zbx_uint64_t	min, max;
+	zbx_uint64_t	min, max, lastid;
 
 	LOCK_CACHE;
 
@@ -88,10 +88,11 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name)
 
 		if (0 == strcmp(id->table_name, table_name) && 0 == strcmp(id->field_name, field_name))
 		{
-			id->lastid++;
+			lastid = ++id->lastid;
+
 			UNLOCK_CACHE;
-			zabbix_log(LOG_LEVEL_CRIT, "===> [1] %s:%s" ZBX_FS_UI64, table_name, field_name, id->lastid);
-			return id->lastid;
+
+			return lastid;
 		}
 	}
 
@@ -129,15 +130,13 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name)
 	else
 		ZBX_STR2UINT64(id->lastid, row[0]);
 
-	id->lastid++;
+	lastid = ++id->lastid;
 
 	DBfree_result(result);
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_CRIT, "===> [2]  %s:%s" ZBX_FS_UI64, table_name, field_name, id->lastid);
-
-	return id->lastid;
+	return lastid;
 }
 
 /******************************************************************************
