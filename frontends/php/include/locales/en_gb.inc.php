@@ -1729,6 +1729,7 @@
 	'S_INTERNAL_S'=>						'Internal',
 
 //scripts.php
+    'S_SCRIPTS_CONFIGURATION' => 'Confinguration of scripts',
 	'S_SCRIPTS'=>				'Scripts',
 	'S_SCRIPT'=>				'Script',
 	'S_COMMAND'=>				'Command',
@@ -1739,6 +1740,7 @@
 	'S_NO_SCRIPTS_DEFINED'=>		'No scripts defined',
 	'S_HOST_ACCESS'=>			'Host access',
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
+	'S_DELETE_SCRIPTS_Q'=>		'Delete script?',
 	'S_ADD_SCRIPT'=>			'Add script',
 	'S_SCRIPT_ADDED'=>			'Script added',
 	'S_CANNOT_ADD_SCRIPT'=>			'Cannot add script',
