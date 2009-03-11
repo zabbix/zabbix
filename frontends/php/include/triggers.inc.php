@@ -1175,25 +1175,29 @@
 		if($row){
 			$description = expand_trigger_description_constants($row['description'], $row);
 
-			if(is_null($row["host"])) $row["host"] = "{HOSTNAME}";
-			$description = str_replace("{HOSTNAME}", $row["host"],$description);
+			if(is_null($row['host'])) $row['host'] = '{HOSTNAME}';
+			$description = str_replace('{HOSTNAME}', $row['host'],$description);
 
-			if(zbx_strstr($description,"{ITEM.LASTVALUE}")){
-				$functionid=trigger_get_N_functionid($row["expression"], 1);
-				if (isset($functionid)){
-					$row2=DBfetch(DBselect('SELECT i.lastvalue, i.value_type, i.itemid '.
-									' FROM items i, functions f '.
-									' WHERE i.itemid=f.itemid '.
-										' AND f.functionid='.$functionid));
+			if(zbx_strstr($description,'{ITEM.LASTVALUE}')){
+			
+				$functionid=trigger_get_N_functionid($row['expression'], 1);
 
+				if(isset($functionid)){
+					$sql = 'SELECT i.lastvalue, i.value_type, i.itemid '.
+							' FROM items i, functions f '.
+							' WHERE i.itemid=f.itemid '.
+								' AND f.functionid='.$functionid;
+					$row2=DBfetch(DBselect($sql));
 					if($row2['value_type']!=ITEM_VALUE_TYPE_LOG){
-						$description = str_replace('{ITEM.LASTVALUE}', $row2['lastvalue'],$description);
+						$description = str_replace('{ITEM.LASTVALUE}', $row2['lastvalue'], $description);
 					}
 					else{
-						$row3=DBfetch(DBselect("select max(clock) as max from history_log where itemid=".$row2["itemid"]));
-						if($row3 && !is_null($row3["max"])){
-							$row4=DBfetch(DBselect("select value from history_log where itemid=".$row2["itemid"]." and clock=".$row3["max"]));
-							$description = str_replace("{ITEM.LASTVALUE}", $row4["value"],$description);
+						$sql = 'SELECT MAX(clock) as max FROM history_log WHERE itemid='.$row2['itemid'];
+						$row3=DBfetch(DBselect($sql));
+						if($row3 && !is_null($row3['max'])){
+							$sql = 'SELECT value FROM history_log WHERE itemid='.$row2['itemid'].' AND clock='.$row3['max'];
+							$row4=DBfetch(DBselect($sql));
+							$description = str_replace('{ITEM.LASTVALUE}', $row4['value'], $description);
 						}
 					}
 				}
@@ -1201,21 +1205,21 @@
 
 			if(zbx_strstr($description,'{ITEM.VALUE}')){
 				$value=($flag==ZBX_FLAG_TRIGGER)?
-						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,1,1):
-						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,1,$row['clock']);
+						trigger_get_func_value($row['expression'],ZBX_FLAG_TRIGGER,1,1):
+						trigger_get_func_value($row['expression'],ZBX_FLAG_EVENT,1,$row['clock']);
 						
-				$description = str_replace("{ITEM.VALUE}",
+				$description = str_replace('{ITEM.VALUE}',
 						$value,
 						$description);
 			}
 
 			for($i=1; $i<10; $i++){
-				if(zbx_strstr($description,"{ITEM.VALUE$i}")){
+				if(zbx_strstr($description,'{ITEM.VALUE'.$i.'}')){
 					$value=($flag==ZBX_FLAG_TRIGGER)?
-							trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,$i,1):
-							trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,$i,$row['clock']);
+							trigger_get_func_value($row['expression'],ZBX_FLAG_TRIGGER,$i,1):
+							trigger_get_func_value($row['expression'],ZBX_FLAG_EVENT,$i,$row['clock']);
 							
-					$description = str_replace("{ITEM.VALUE$i}",
+					$description = str_replace('{ITEM.VALUE'.$i.'}',
 							$value,
 							$description);
 				}
@@ -1223,22 +1227,20 @@
 			}
 		}
 		else{
-			$description = "*ERROR*";
+			$description = '*ERROR*';
 		}
 	return $description;
 	}
 	
 	function expand_trigger_description_simple($triggerid){
-		return expand_trigger_description_by_data(
-			DBfetch(
-				DBselect('SELECT DISTINCT t.description,h.host,t.expression,t.triggerid '.
-					' FROM triggers t '.
-						' LEFT JOIN functions f on t.triggerid=f.triggerid '.
-						' LEFT JOIN items i on f.itemid=i.itemid '.
-						' LEFT JOIN hosts h on i.hostid=h.hostid '.
-					' WHERE t.triggerid='.$triggerid)
-				)
-			);
+		$sql = 'SELECT DISTINCT t.description,h.host,t.expression,t.triggerid '.
+				' FROM triggers t '.
+					' LEFT JOIN functions f on t.triggerid=f.triggerid '.
+					' LEFT JOIN items i on f.itemid=i.itemid '.
+					' LEFT JOIN hosts h on i.hostid=h.hostid '.
+				' WHERE t.triggerid='.$triggerid;
+
+	return expand_trigger_description_by_data(DBfetch(DBselect($sql)));
 	}
 
 	function expand_trigger_description($triggerid){
@@ -1408,7 +1410,7 @@
 	return $result;
 	}
 
-	# Update Trigger definition
+// Update Trigger definition
 
 	/******************************************************************************
 	 *                                                                            *

@@ -224,34 +224,34 @@
 	define('ITEM_STATUS_NOTSUPPORTED',3);
 
 	define('ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV',0);
-	define('ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV',1);
-	define('ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV',2);
+	define('ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV',	1);
+	define('ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV',	2);
 
-	define('GRAPH_ITEM_DRAWTYPE_LINE',		0);
+	define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
 	define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
 	define('GRAPH_ITEM_DRAWTYPE_BOLD_LINE',		2);
-	define('GRAPH_ITEM_DRAWTYPE_DOT',		3);
+	define('GRAPH_ITEM_DRAWTYPE_DOT',			3);
 	define('GRAPH_ITEM_DRAWTYPE_DASHED_LINE',	4);
 
-	define('MAP_LINK_DRAWTYPE_LINE',		0);
+	define('MAP_LINK_DRAWTYPE_LINE',			0);
 	define('MAP_LINK_DRAWTYPE_BOLD_LINE',		2);
-	define('MAP_LINK_DRAWTYPE_DOT',			3);
+	define('MAP_LINK_DRAWTYPE_DOT',				3);
 	define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
 
-	define('SERVICE_ALGORITHM_NONE',0);
-	define('SERVICE_ALGORITHM_MAX',1);
-	define('SERVICE_ALGORITHM_MIN',2);
+	define('SERVICE_ALGORITHM_NONE',	0);
+	define('SERVICE_ALGORITHM_MAX',		1);
+	define('SERVICE_ALGORITHM_MIN',		2);
 	
 	define('TRIGGER_MULT_EVENT_DISABLED',0);
-	define('TRIGGER_MULT_EVENT_ENABLED',1);
+	define('TRIGGER_MULT_EVENT_ENABLED'	,1);
 	
-	define('TRIGGER_STATUS_ENABLED',0);
+	define('TRIGGER_STATUS_ENABLED'	,0);
 	define('TRIGGER_STATUS_DISABLED',1);
-	define('TRIGGER_STATUS_UNKNOWN',2);
+	define('TRIGGER_STATUS_UNKNOWN'	,2);
 	
-	define('TRIGGER_VALUE_FALSE',0);
-	define('TRIGGER_VALUE_TRUE',1);
-	define('TRIGGER_VALUE_UNKNOWN',2);
+	define('TRIGGER_VALUE_FALSE'	,0);
+	define('TRIGGER_VALUE_TRUE'		,1);
+	define('TRIGGER_VALUE_UNKNOWN'	,2);
 
 	define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
 	define('TRIGGER_SEVERITY_INFORMATION',		1);
@@ -342,8 +342,8 @@
 	define('STYLE_TOP', 1);
 
 /* time module tipe */
-        define('TIME_TYPE_LOCAL',	0);
-        define('TIME_TYPE_SERVER',	1);
+	define('TIME_TYPE_LOCAL',	0);
+	define('TIME_TYPE_SERVER',	1);
 
 	define('FILTER_TAST_SHOW',	0);
 	define('FILTER_TAST_HIDE',	1);
@@ -380,17 +380,17 @@
 	define('GROUP_STATUS_DISABLED', 1);	
 	define('GROUP_STATUS_ENABLED', 0);
 	
-// IMPORTANT!!!    by priority	DESC
+// IMPORTANT!!!    by priority	ASC
 	define('GROUP_GUI_ACCESS_SYSTEM', 	0);
 	define('GROUP_GUI_ACCESS_INTERNAL', 1);
 	define('GROUP_GUI_ACCESS_DISABLED', 2);	
 	
 
-	define('PERM_MAX',		3);
+	define('PERM_MAX',			3);
 	define('PERM_READ_WRITE',	3);
 	define('PERM_READ_ONLY',	2);
 	define('PERM_READ_LIST',	1);
-	define('PERM_DENY',		0);
+	define('PERM_DENY',			0);
 	
 	define('PERM_RES_STRING_LINE',	0); /* return string of nodes id - '1,2,3,4,5' */
 	define('PERM_RES_IDS_ARRAY',	1); /* return array of nodes id - array(1,2,3,4) */

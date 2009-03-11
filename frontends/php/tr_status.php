@@ -534,7 +534,8 @@ include_once "include/page_header.php";
 		else{
 			$actions=NULL;
 		}
-	
+
+// JS menu
 		$host = null;
 		if($_REQUEST['hostid'] < 1){
 			$menus = '';
@@ -557,7 +558,9 @@ include_once "include/page_header.php";
 			$host->AddOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 		}
 
-			$table->AddRow(array(
+
+			$table->addRow(array(
+
 				$show_event_col?SPACE:NULL,
 				new CCol(
 					get_severity_description($row['priority']),
