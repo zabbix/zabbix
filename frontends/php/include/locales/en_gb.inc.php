@@ -86,6 +86,10 @@
 
 	'S_DISCOVER'=>				'Discover',
 	'S_LOST'=>				'Lost',
+	
+//	discovery.php
+	'S_LAST_UP' => 'Last up',
+	'S_LAST_DOWN' => 'Last down',
 
 //	httpdetails.php
 	'S_DETAILS_OF_SCENARIO'=>		'Details of scenario',
