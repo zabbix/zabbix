@@ -2360,10 +2360,12 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int nu
 		{
 			nextid = id->lastid + 1;
 			id->lastid += num;
-			UNLOCK_CACHE_IDS;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "End of DCget_nextid %s.%s [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
 					table_name, field_name, nextid, id->lastid);
+
+			UNLOCK_CACHE_IDS;
+
 			return nextid;
 		}
 	}
@@ -2407,10 +2409,10 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int nu
 
 	DBfree_result(result);
 
-	UNLOCK_CACHE_IDS;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of DCget_nextid %s.%s [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
 			table_name, field_name, nextid, id->lastid);
+
+	UNLOCK_CACHE_IDS;
 
 	return nextid;
 }
