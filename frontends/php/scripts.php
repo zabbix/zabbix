@@ -57,7 +57,7 @@ $fields=array(
 check_fields($fields);
 $frmForm = new CForm();
 $frmForm->SetMethod('get');
-$frmForm->addItem(new CButton('form',S_ADD_SCRIPT,"javascript: redirect('scripts.php?form=1');"));
+$frmForm->addItem(new CButton('form',S_CREATE_SCRIPT,"javascript: redirect('scripts.php?form=1');"));
 show_table_header(S_SCRIPTS_CONFIGURATION, $frmForm);
 echo SBR; 
 if(isset($_REQUEST['action'])){

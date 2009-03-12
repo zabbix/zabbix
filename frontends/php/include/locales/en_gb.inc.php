@@ -1741,7 +1741,7 @@
 	'S_HOST_ACCESS'=>			'Host access',
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
 	'S_DELETE_SCRIPTS_Q'=>		'Delete script?',
-	'S_ADD_SCRIPT'=>			'Add script',
+	'S_CREATE_SCRIPT'=>			'Create script',
 	'S_SCRIPT_ADDED'=>			'Script added',
 	'S_CANNOT_ADD_SCRIPT'=>			'Cannot add script',
 	'S_SCRIPT_UPDATED'=>			'Script updated',
