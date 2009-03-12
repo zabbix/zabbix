@@ -181,21 +181,107 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	return ret;
 }
 
+#ifndef _WINDOWS
+#ifdef HAVE_RES_QUERY
+
+#ifndef C_IN
+#	define C_IN	ns_c_in
+#endif	/* C_IN */
+
+#ifndef T_A
+#	define T_A	ns_t_a
+#endif
+#ifndef T_NS
+#	define T_NS	ns_t_ns
+#endif	/* T_NS */
+#ifndef T_MD
+#	define T_MD	ns_t_md
+#endif	/* T_MD */
+#ifndef T_MF
+#	define T_MF	ns_t_mf
+#endif	/* T_MF */
+#ifndef T_CNAME
+#	define T_CNAME	ns_t_cname
+#endif	/* T_CNAME */
+#ifndef T_SOA
+#	define T_SOA	ns_t_soa
+#endif	/* T_SOA */
+#ifndef T_MB
+#	define T_MB	ns_t_mb
+#endif	/* T_MB */
+#ifndef T_MG
+#	define T_MG	ns_t_mg
+#endif	/* T_MG */
+#ifndef T_MR
+#	define T_MR	ns_t_mr
+#endif	/* T_MR */
+#ifndef T_NULL
+#	define T_NULL	ns_t_null
+#endif	/* T_NULL */
+#ifndef T_WKS
+#	define T_WKS	ns_t_wks
+#endif	/* T_WKS */
+#ifndef T_PTR
+#	define T_PTR	ns_t_ptr
+#endif	/* T_PTR */
+#ifndef T_HINFO
+#	define T_HINFO	ns_t_hinfo
+#endif	/* T_HINFO */
+#ifndef T_MINFO
+#	define T_MINFO	ns_t_minfo
+#endif	/* T_MINFO */
+#ifndef T_MX
+#	define T_MX	ns_t_mx
+#endif	/* T_MX */
+#ifndef T_TXT
+#	define T_TXT	ns_t_txt
+#endif	/* T_TXT */
+
+static char	*decode_type(int q_type)
+{
+	static char buf[16];
+	switch (q_type) {
+		case T_A:	return "A";	/* "address"; */
+		case T_NS:	return "NS";	/* "name server"; */
+		case T_MD:	return "MD";	/* "mail forwarder"; */
+		case T_MF:	return "MF";	/* "mail forwarder"; */
+		case T_CNAME:	return "CNAME";	/* "canonical name"; */
+		case T_SOA:	return "SOA";	/* "start of authority"; */
+		case T_MB:	return "MB";	/* "mailbox"; */
+		case T_MG:	return "MG";	/* "mail group member"; */
+		case T_MR:	return "MR";	/* "mail rename"; */
+		case T_NULL:	return "NULL";	/* "null"; */
+		case T_WKS:	return "WKS";	/* "well-known service"; */
+		case T_PTR:	return "PTR";	/* "domain name pointer"; */
+		case T_HINFO:	return "HINFO";	/* "host information"; */
+		case T_MINFO:	return "MINFO";	/* "mailbox information"; */
+		case T_MX:	return "MX";	/* "mail exchanger"; */
+		case T_TXT:	return "TXT";	/* "text"; */
+		default:
+			zbx_snprintf(buf, sizeof(buf), "T_%d", q_type);
+			return buf;
+	}
+}
+
+static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char **msg_ptr)
+{
+	int		res;
+	static char	buffer[MAX_STRING_LEN];
+
+	if ((res = dn_expand(msg, msg_end, *msg_ptr, buffer, sizeof(buffer))) < 0)
+		return NULL;
+
+	*msg_ptr += res;
+
+	return buffer;
+}
+#endif /* HAVE_RES_QUERY */
+#endif /* not _WINDOWS */
 
 int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if !defined(_WINDOWS)
 #ifdef HAVE_RES_QUERY
-
-#if !defined(C_IN) 
-#	define C_IN 	ns_c_in
-#endif /* C_IN */
-
-#if !defined(T_SOA)
-#	define T_SOA	ns_t_soa
-#endif /* T_SOA */
-
-
 	int	res;
 	char	ip[MAX_STRING_LEN];
 	char	zone[MAX_STRING_LEN];
@@ -262,104 +348,10 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #endif /* not WINDOWS */
 }
 
-#ifndef _WINDOWS
-static char	*decode_type(int q_type)
-{
-	static char buf[16];
-	switch (q_type) {
-		case T_A:	return "A";	/* "address"; */
-		case T_NS:	return "NS";	/* "name server"; */
-		case T_MD:	return "MD";	/* "mail forwarder"; */
-		case T_MF:	return "MF";	/* "mail forwarder"; */
-		case T_CNAME:	return "CNAME";	/* "canonical name"; */
-		case T_SOA:	return "SOA";	/* "start of authority"; */
-		case T_MB:	return "MB";	/* "mailbox"; */
-		case T_MG:	return "MG";	/* "mail group member"; */
-		case T_MR:	return "MR";	/* "mail rename"; */
-		case T_NULL:	return "NULL";	/* "null"; */
-		case T_WKS:	return "WKS";	/* "well-known service"; */
-		case T_PTR:	return "PTR";	/* "domain name pointer"; */
-		case T_HINFO:	return "HINFO";	/* "host information"; */
-		case T_MINFO:	return "MINFO";	/* "mailbox information"; */
-		case T_MX:	return "MX";	/* "mail exchanger"; */
-		case T_TXT:	return "TXT";	/* "text"; */
-		default:
-			zbx_snprintf(buf, sizeof(buf), "T_%d", q_type);
-			return buf;
-	}
-}
-
-static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char **msg_ptr)
-{
-	int		res;
-	static char	buffer[MAX_STRING_LEN];
-
-	if ((res = dn_expand(msg, msg_end, *msg_ptr, buffer, sizeof(buffer))) < 0)
-		return NULL;
-
-	*msg_ptr += res;
-
-	return buffer;
-}
-#endif
 int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifndef _WINDOWS
 #ifdef HAVE_RES_QUERY
-
-#ifndef C_IN
-#	define C_IN	ns_c_in
-#endif	/* C_IN */
-
-#ifndef T_A
-#	define T_A	ns_t_a
-#endif
-#ifndef T_NS
-#	define T_NS	ns_t_ns
-#endif	/* T_NS */
-#ifndef T_MD
-#	define T_MD	ns_t_md
-#endif	/* T_MD */
-#ifndef T_MF
-#	define T_MF	ns_t_mf
-#endif	/* T_MF */
-#ifndef T_CNAME
-#	define T_CNAME	ns_t_cname
-#endif	/* T_CNAME */
-#ifndef T_SOA
-#	define T_SOA	ns_t_soa
-#endif	/* T_SOA */
-#ifndef T_MB
-#	define T_MB	ns_t_mb
-#endif	/* T_MB */
-#ifndef T_MG
-#	define T_MG	ns_t_mg
-#endif	/* T_MG */
-#ifndef T_MR
-#	define T_MR	ns_t_mr
-#endif	/* T_MR */
-#ifndef T_NULL
-#	define T_NULL	ns_t_null
-#endif	/* T_NULL */
-#ifndef T_WKS
-#	define T_WKS	ns_t_wks
-#endif	/* T_WKS */
-#ifndef T_PTR
-#	define T_PTR	ns_t_ptr
-#endif	/* T_PTR */
-#ifndef T_HINFO
-#	define T_HINFO	ns_t_hinfo
-#endif	/* T_HINFO */
-#ifndef T_MINFO
-#	define T_MINFO	ns_t_minfo
-#endif	/* T_MINFO */
-#ifndef T_MX
-#	define T_MX	ns_t_mx
-#endif	/* T_MX */
-#ifndef T_TXT
-#	define T_TXT	ns_t_txt
-#endif	/* T_TXT */
-
 	typedef struct resolv_querytype_s {
 		char	*name;
 		int	type;
