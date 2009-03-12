@@ -151,10 +151,8 @@ include_once "include/page_header.php";
 			$importer = new CZabbixXMLImport();
 			$importer->setRules($rules['host'],$rules['template'],$rules['item'],$rules['trigger'],$rules['graph']);
 			$result = $importer->Parse($_FILES['import_file']['tmp_name']);
-
 			unset($importer);
 			$result = DBend($result);
-			
 			show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
 		}
 		

@@ -873,7 +873,7 @@
 			$this->sub_node		= null;
 			$this->data		= null;
 
-			return true;
+			return $this->root;
 		}
 
 		function SetRules($host, $template, $item, $trigger, $graph){

@@ -431,7 +431,7 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 				$tab->addOption('id','msg_messages');
 				$tab->addOption('style','width: 100%;');
 
-				if(isset($msg_tab) && is_null($errmsg)){					
+				if(isset($msg_tab) && $bool){					
 					$tab->addOption('style','display: none;');
 				}
 
