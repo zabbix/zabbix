@@ -532,9 +532,7 @@ function make_latest_issues($params = array()){
 //--------			
 			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'].'&source=0&nav_time='.$row['lastchange'],'action');
 			
-						$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action') : $description;						$table->addRow(array(				get_node_name_by_elid($row['triggerid']),
-				(isset($params['groupid']) && ($params['groupid']>0))?$row['name']:null,
-				$host,
+						$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action', null, true) : $description;						$table->AddRow(array(				get_node_name_by_elid($row['triggerid']),				$host,
 				new CCol($description,get_severity_style($row["priority"])),
 				$clock,
 				zbx_date2age($row_event['clock']),

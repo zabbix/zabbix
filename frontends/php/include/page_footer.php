@@ -66,7 +66,7 @@ catch(e){
 			$table->AddRow(array(
 				new CCol(new CLink(
 					S_ZABBIX_VER.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
-					"http://www.zabbix.com", "highlight"),
+					"http://www.zabbix.com", "highlight", null, true),
 					"page_footer_l"),
 				new CCol(array(
 						new CSpan(SPACE.SPACE."|".SPACE.SPACE,"divider"),

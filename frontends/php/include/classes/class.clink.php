@@ -20,13 +20,14 @@
 ?>
 <?php
 class CLink extends CTag{
-	public function __construct($item=NULL,$url=NULL,$class=NULL,$action=NULL){
+	public function __construct($item=NULL,$url=NULL,$class=NULL,$action=NULL, $nosid=NULL){
 		parent::__construct('a','yes');
 		
 		$this->tag_start= '';
 		$this->tag_end = '';
 		$this->tag_body_start = '';
 		$this->tag_body_end = '';
+		$this->nosid = $nosid;
 
 		if(!is_null($class))	$this->setClass($class);
 		if(!is_null($item))		$this->addItem($item);
@@ -42,9 +43,13 @@ class CLink extends CTag{
 	}
 	
 	public function setUrl($value){
-		$uri = new Curl($value);
-		$url = $uri->getUrl();
-
+		if(is_null($this->nosid)) {
+			$uri = new Curl($value);
+			$url = $uri->getUrl();
+		}
+		else {
+			$url = $value;
+		}
 		$this->addOption('href', $url);
 	}
 	
