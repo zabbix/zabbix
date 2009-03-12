@@ -750,7 +750,8 @@
 			$new_group_id	= get_request('new_group_id', 0);
 			$new_group_name = get_request('new_group_name', '');
 		}
-		
+
+
 		if($autologin){
 			$autologout = 0;
 			zbx_add_post_js("document.getElementById('autologout_visible').disabled = true;");
@@ -909,13 +910,7 @@
 		
 		$chkbx_autologin->addOption('autocomplete','off');
 		$frmUser->AddRow(S_AUTO_LOGIN,	$chkbx_autologin);
-		$frmUser->AddRow(S_AUTO_LOGOUT, array(new CVisibilityBox('autologout_visible', 
-													(isset($autologout) && $autologout != 0)?'yes':'no', 
-													'autologout', S_DISABLED), 
-												new CNumericBox('autologout', $autologout, 4)));
-		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox('url',$url,50));
-		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox('refresh',$refresh,4));
-
+		$frmUser->AddRow(S_AUTO_LOGOUT, array(new CVisibilityBox('autologout_visible', (isset($autologout) && $autologout != 0) ? 'yes' : 'no', 'autologout', S_DISABLED), new CNumericBox("autologout", ($autologout==0)?900:$autologout, 4)));		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
 
 		if(0 == $profile){
 			$frmUser->addVar('perm_details', $perm_details);
