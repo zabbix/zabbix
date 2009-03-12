@@ -548,7 +548,7 @@ function make_latest_issues(){
 			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'].'&source=0&nav_time='.$row['lastchange'],'action');
 			
 			
-			$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action') : $description;
+			$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action', null, true) : $description;
 			
 			$table->AddRow(array(
 				get_node_name_by_elid($row['triggerid']),
