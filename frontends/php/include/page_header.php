@@ -447,9 +447,9 @@ COpt::profiling_start("page");
 	if(!defined('ZBX_PAGE_NO_MENU')){
 COpt::compare_files_with_menu($ZBX_MENU);
 
-		$help = new CLink(S_HELP, 'http://www.zabbix.com/documentation.php', 'small_font');
+		$help = new CLink(S_HELP, 'http://www.zabbix.com/documentation.php', 'small_font', null, true);
 		$help->setTarget('_blank');
-		$support = new CLink(S_GET_SUPPORT, 'http://www.zabbix.com/support.php', 'small_font');
+		$support = new CLink(S_GET_SUPPORT, 'http://www.zabbix.com/support.php', 'small_font', null, true);
 		$support->setTarget('_blank');
 		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font');
 		
