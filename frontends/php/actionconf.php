@@ -373,10 +373,12 @@ include_once 'include/page_header.php';
 	$form->AddVar('eventsource', $_REQUEST['eventsource']);
 	if(!isset($_REQUEST['form'])){
 		$form->AddItem(new CButton('form',S_CREATE_ACTION));
-	}
+	} else {
+
+    }
 		
 	show_table_header(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
-
+    echo SBR;
 	if(isset($_REQUEST['form'])){
 /* form */
 //		insert_action_form();
