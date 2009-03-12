@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-774] display correct error message if file import fails (Vedmak)
  - [ZBX-777] default autologout time is set to 900 (Vedmak)
  - [DEV-268] added support of vfs.dev.read/write under FreeBSD (Sasha)
  - [ZBX-448] fixed zabbix server status when frontend and backend are on different servers (Vedmak)
