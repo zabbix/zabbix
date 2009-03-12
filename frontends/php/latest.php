@@ -136,7 +136,8 @@ include_once 'include/page_header.php';
 	
 	$l_form = new CForm();
 	$l_form->SetMethod('get');
-	
+	$l_form->addVar('groupid',$_REQUEST['groupid']);
+	$l_form->addVar('hostid',$_REQUEST['hostid']);
 	$l_form->AddItem(array(S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE, new CTextBox('select',$_REQUEST['select'],20)));
 	$l_form->AddItem(array(SPACE, new CButton('show',S_SHOW,'javascript: submit();')));
 //	$l_form->AddItem(array(SPACE, new CButton('show',S_SHOW,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);")));
