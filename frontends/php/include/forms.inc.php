@@ -2842,10 +2842,15 @@
 			$frmValmap->addVar("valuemap[$i][newvalue]",$value["newvalue"]);
 			$i++;
 		}
-		if(count($valuemap_el)==0)
+
+        $saveButton = new CButton('save', S_SAVE);
+
+		if(count($valuemap_el)==0) {
 			array_push($valuemap_el, S_NO_MAPPING_DEFINED);
-		else
+            $saveButton->addOption('disabled', 'true');
+        } else {
 			array_push($valuemap_el, new CButton('del_map','delete selected'));
+        }
 
 		$frmValmap->addRow(S_MAPPING, $valuemap_el);
 		$frmValmap->addRow(S_NEW_MAPPING, array(
@@ -2856,7 +2861,9 @@
 			new CButton("add_map",S_ADD)
 			),'new');
 
-		$frmValmap->addItemToBottomRow(new CButton('save',S_SAVE));
+
+
+		$frmValmap->addItemToBottomRow($saveButton);
 		if(isset($_REQUEST["valuemapid"])){
 			$frmValmap->addItemToBottomRow(SPACE);
 			$frmValmap->addItemToBottomRow(new CButtonDelete("Delete selected value mapping?",
