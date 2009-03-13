@@ -1160,7 +1160,7 @@
 			}
 		}
 
-	return $description;
+		return $description;
 	}
 	/*
 	 * Function: expand_trigger_description_by_data
@@ -1242,15 +1242,13 @@
 					' LEFT JOIN items i on f.itemid=i.itemid '.
 					' LEFT JOIN hosts h on i.hostid=h.hostid '.
 				' WHERE t.triggerid='.$triggerid;
-
-	return expand_trigger_description_by_data(DBfetch(DBselect($sql)));
+		return expand_trigger_description_by_data(DBfetch(DBselect($sql)));
 	}
 
 	function expand_trigger_description($triggerid){
 		$description=expand_trigger_description_simple($triggerid);
 		$description=htmlspecialchars($description);
-
-	return $description;
+		return $description;
 	}
 
 	function update_trigger_value_to_unknown_by_hostid($hostids){

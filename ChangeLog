@@ -31,6 +31,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-782] added host name of deppending trigger (amach)
  - [ZBX-786] fixed undefined argument on graph delete (Artem)
  - [ZBX-776] changed disabled auto-logout indication (amach)
  - [ZBX-784] added extension to hosts when importing graph to template (Artem)
