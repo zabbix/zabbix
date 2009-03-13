@@ -711,7 +711,7 @@
 			$password2 	= get_request('password2', '');
 			$url 		= get_request('url','');
 			$autologin	= get_request('autologin',0);
-			$autologout	= get_request('autologout',900);
+			$autologout	= get_request('autologout',90);
 			$lang		= get_request('lang','en_gb');
 			$theme 		= get_request('theme','default.css');
 			$refresh	= get_request('refresh',30);
@@ -902,7 +902,7 @@
 		if (isset($autologout) && $autologout == 0) {
 			zbx_add_post_js('document.getElementById("autologout").disabled = true;');
 		}
-		$autologoutTextBox = new CNumericBox("autologout", ($autologout == 0) ? '900' : $autologout, 4);
+		$autologoutTextBox = new CNumericBox("autologout", ($autologout == 0) ? '90' : $autologout, 4);
 		$frmUser->AddRow(S_AUTO_LOGOUT, array($autologoutCheckBox, $autologoutTextBox));
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
