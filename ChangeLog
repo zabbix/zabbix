@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-776] changed disabled auto-logout indication
  - [ZBX-784] added extension to hosts when importing graph to template (Artem)
  - [ZBX-774] display correct error message if file import fails (Vedmak)
  - [ZBX-777] default autologout time is set to 900 (Vedmak)
