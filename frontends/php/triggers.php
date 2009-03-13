@@ -514,8 +514,13 @@
 			$deps = get_trigger_dependencies_by_triggerid($row['triggerid']);
 			if(count($deps) > 0){
 				$description[] = array(BR(),bold(S_DEPENDS_ON.':'),SPACE);
-				foreach($deps as $val)
-					$description[] = array(BR(),expand_trigger_description($val));
+				foreach($deps as $val) {
+					// shows host name of depending trigger
+					$hosts = get_hosts_by_triggerid($val);
+					while ($host = DBfetch($hosts)) {
+						$description[] = array(BR(), $host['host'].':', expand_trigger_description($val));
+					}
+				}
 			}
 			
 			if ( ($row['error'] != '') && ($row['hoststatus'] != 3) ) //host status 3 means Template
