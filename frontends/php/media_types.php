@@ -82,8 +82,7 @@ include_once "include/page_header.php";
 
 			show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
 		}
-		if($result)
-		{
+		if($result){
 /*			add_audit($action,AUDIT_RESOURCE_MEDIA_TYPE,
 				"Media type [".$_REQUEST["description"]."]");
 */

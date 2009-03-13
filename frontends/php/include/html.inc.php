@@ -99,10 +99,7 @@
 		return new CTag('br','no');
 	}
 	
-	function create_hat($caption,$items,$addicons=null,$id=null,$state=1){
-// dirty FIX !!!!!!!!!!!!!	 FIX this one
-		global $page;
-//---------------------------------------
+	function create_hat($caption,$items,$addicons=null,$id=null,$state=null){
 		if(is_null($id)){
 			list($usec, $sec) = explode(' ',microtime());	
 			$id = 'hat_'.((int)($sec % 10)).((int)($usec * 1000));
@@ -117,17 +114,16 @@
 			foreach($addicons as $value) $icons_row[] = $value;
 		}
 
-		$icon = new CDiv(SPACE,($state)?'arrowup':'arrowdown');
-		$icon->addOption('id',$id.'_icon');
-		$icon->addAction('onclick',new CScript("javascript: change_hat_state(this,'".$id."');"));
-		$icon->addOption('title',S_SHOW.'/'.S_HIDE);
-
-// dirty FIX !!!!!!!!!!!!!	 FIX this one
-		global $page;
-		if(!str_in_array($page['file'],array('charts.php','screens.php','slides.php')))
+		if(!is_null($state)){
+			$icon = new CDiv(SPACE,($state)?'arrowup':'arrowdown');
+			$icon->addOption('id',$id.'_icon');
+			$icon->addAction('onclick',new CScript("javascript: change_hat_state(this,'".$id."');"));
+			$icon->addOption('title',S_SHOW.'/'.S_HIDE);
 			$icons_row[] = $icon;
-//---------------------------------------
-//		$icons_row[] = $icon;
+		}
+		else{
+			$state = true;
+		}
 
 		$icon_tab = new CTable();
 		$icon_tab->addOption('width','100%');

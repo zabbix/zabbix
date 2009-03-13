@@ -19,144 +19,145 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/hosts.inc.php";
-	require_once "include/triggers.inc.php";
-	require_once "include/items.inc.php";
-	require_once "include/users.inc.php";
-	require_once "include/nodes.inc.php";
-	require_once "include/js.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/triggers.inc.php');
+	require_once('include/items.inc.php');
+	require_once('include/users.inc.php');
+	require_once('include/nodes.inc.php');
+	require_once('include/js.inc.php');
 
 	$srctbl		= get_request("srctbl",  '');	// source table name
 
 	switch($srctbl){
 		case 'host_templates':
 		case 'templates':
-			$page["title"] = "S_TEMPLATES_BIG";
+			$page['title'] = "S_TEMPLATES_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			$templated_hosts = true;
 			break;
 		case 'hosts':
-			$page["title"] = "S_HOSTS_BIG";
+			$page['title'] = "S_HOSTS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'applications':
-			$page["title"] = "S_APPLICATIONS_BIG";
+			$page['title'] = "S_APPLICATIONS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'host_group':
-			$page["title"] = "S_HOST_GROUPS_BIG";
+			$page['title'] = "S_HOST_GROUPS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'triggers':
-			$page["title"] = "S_TRIGGERS_BIG";
+			$page['title'] = "S_TRIGGERS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'logitems':
-			$page["title"] = "S_ITEMS_BIG";
+			$page['title'] = "S_ITEMS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'usrgrp':
-			$page["title"] = "S_GROUPS";
+			$page['title'] = "S_GROUPS";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'users':
-			$page["title"] = "S_USERS";
+			$page['title'] = "S_USERS";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'items':
-			$page["title"] = "S_ITEMS_BIG";
+			$page['title'] = "S_ITEMS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'help_items':
-			$page["title"] = "S_STANDARD_ITEMS_BIG";
+			$page['title'] = "S_STANDARD_ITEMS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'screens':
-			$page["title"] = "S_SCREENS_BIG";
+			$page['title'] = "S_SCREENS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'slides':
-			$page["title"] = "S_SLIDESHOWS_BIG";
+			$page['title'] = "S_SLIDESHOWS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'graphs':
-			$page["title"] = "S_GRAPHS_BIG";
+			$page['title'] = "S_GRAPHS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'simple_graph':
-			$page["title"] = "S_SIMPLE_GRAPH_BIG";
+			$page['title'] = "S_SIMPLE_GRAPH_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'sysmaps':
-			$page["title"] = "S_MAPS_BIG";
+			$page['title'] = "S_MAPS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'plain_text':
-			$page["title"] = "S_PLAIN_TEXT_BIG";
+			$page['title'] = "S_PLAIN_TEXT_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'screens2':
-			$page["title"] = "S_SCREENS_BIG";
+			$page['title'] = "S_SCREENS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'overview':
-			$page["title"] = "S_OVERVIEW_BIG";
+			$page['title'] = "S_OVERVIEW_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'host_group_scr':
-			$page["title"] = "S_HOST_GROUPS_BIG";
+			$page['title'] = "S_HOST_GROUPS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'nodes':
 			if(ZBX_DISTRIBUTED){
-				$page["title"] = "S_NODES_BIG";
+				$page['title'] = "S_NODES_BIG";
 				$min_user_type = USER_TYPE_ZABBIX_USER;
 				break;
 			}
 		default:
-			$page["title"] = "S_ERROR";
+			$page['title'] = "S_ERROR";
 			$error = true;
 			break;
 	}
 
-	$page["file"] = "popup.php";
+	$page['file'] = "popup.php";
 	$page['scripts'] = array('prototype.js');
 
 	define('ZBX_PAGE_NO_MENU', 1);
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 	if(isset($error)){
 		invalid_url();
 	}
 
-	if(defined($page["title"]))     $page["title"] = constant($page["title"]);
+	if(defined($page['title']))     $page['title'] = constant($page['title']);
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"dstfrm" =>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
-		"dstfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
-		"dstfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	null,		null),
-		"srctbl" =>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
-		"srcfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
-		"srcfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	null,		null),
-		"nodeid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-		"groupid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-		"hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-		"screenid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-		"templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
-		"host_templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
-		"existed_templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
-		"only_hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-		"monitored_hosts"=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+		'dstfrm' =>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
+		'dstfld1'=>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
+		'dstfld2'=>		array(T_ZBX_STR, O_OPT,P_SYS,	null,		null),
+		'srctbl' =>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
+		'srcfld1'=>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
+		'srcfld2'=>		array(T_ZBX_STR, O_OPT,P_SYS,	null,		null),
+		'nodeid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		'groupid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		'hostid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		'screenid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		'templates'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
+		'host_templates'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
+		'existed_templates'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
+		
+		'only_hostid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		'monitored_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'real_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'itemtype'=>	array(T_ZBX_INT, O_OPT, null,   null,		null),
 
 		'reference'=>	array(T_ZBX_STR, O_OPT, null,   null,		null),
 
-		"select"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null)
+		'select'=>		array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null)
 	);
 
 	$allowed_item_types = array(ITEM_TYPE_ZABBIX,ITEM_TYPE_SIMPLE,ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE);
@@ -166,11 +167,11 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
-	$dstfrm		= get_request("dstfrm",  '');	// destination form
-	$dstfld1	= get_request("dstfld1", '');	// output field on destination form
-	$dstfld2	= get_request("dstfld2", '');	// second output field on destination form
-	$srcfld1	= get_request("srcfld1", '');	// source table field [can be different from fields of source table]
-	$srcfld2	= get_request("srcfld2", null);	// second source table field [can be different from fields of source table]
+	$dstfrm		= get_request('dstfrm',  '');	// destination form
+	$dstfld1	= get_request('dstfld1', '');	// output field on destination form
+	$dstfld2	= get_request('dstfld2', '');	// second output field on destination form
+	$srcfld1	= get_request('srcfld1', '');	// source table field [can be different from fields of source table]
+	$srcfld2	= get_request('srcfld2', null);	// second source table field [can be different from fields of source table]
 
 	$monitored_hosts	= get_request('monitored_hosts', 0);
 	$real_hosts			= get_request('real_hosts', 0);
@@ -1145,7 +1146,7 @@ include_once "include/page_header.php";
 	}
 	else if($srctbl == 'screens')
 	{
-		require_once "include/screens.inc.php";
+		require_once('include/screens.inc.php');
 
 		$table = new CTableInfo(S_NO_NODES_DEFINED);
 		$table->SetHeader(S_NAME);
@@ -1177,7 +1178,7 @@ include_once "include/page_header.php";
 	}
 	else if($srctbl == 'screens2')
 	{
-		require_once "include/screens.inc.php";
+		require_once('include/screens.inc.php');
 
 		$table = new CTableInfo(S_NO_NODES_DEFINED);
 		$table->SetHeader(S_NAME);

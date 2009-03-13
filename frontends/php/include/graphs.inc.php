@@ -512,7 +512,7 @@
 		$db_item_hosts = DBselect('SELECT DISTINCT h.hostid,h.host,h.status '.
 							' FROM items i, hosts h '.
 							' WHERE h.hostid=i.hostid '.
-								' AND i.itemid in ('.implode(',', $itemid).')');
+								' AND '.DBcondition('i.itemid',$itemid));
 								
 		while($db_item_host = DBfetch($db_item_hosts)){
 			$host_list[] = '"'.$db_item_host['host'].'"';
@@ -1156,5 +1156,17 @@
 		$prev_color[$palette]++;
 
 	return $result;
+	}
+	
+	
+// Text Image
+	function imageStringTTF($image, $fontsize, $angle, $x, $y, $color, $string){
+
+		$ar = imagettfbbox($fontSize, 0, ZBX_GRAPH_FONT_NAME, $string);
+		$y += abs($ar[1] - $ar[7]);
+		
+		imagettftext($image, $fontSize, 0, $x, $y, $color, ZBX_GRAPH_FONT_NAME, $string);
+
+	return $ar;
 	}
 ?>
