@@ -362,12 +362,12 @@ function make_status_of_zbx(){
 
 	$status=get_status();
 
-	$table->AddRow(array(S_ZABBIX_SERVER_IS_RUNNING,
+	$table->addRow(array(S_ZABBIX_SERVER_IS_RUNNING,
 	new CSpan($status['zabbix_server'], ($status['zabbix_server'] == S_YES ? 'off' : 'on')),' - '));
-	//	$table->AddRow(array(S_VALUES_STORED,$status['history_count']));$table->AddRow(array(S_TRENDS_STORED,$status['trends_count']));	
+	//	$table->addRow(array(S_VALUES_STORED,$status['history_count']));$table->addRow(array(S_TRENDS_STORED,$status['trends_count']));	
 	$title = new CSpan(S_NUMBER_OF_HOSTS);	
 	$title->addOption('title', 'asdad');	
-	$table->AddRow(array(S_NUMBER_OF_HOSTS ,$status['hosts_count'],		
+	$table->addRow(array(S_NUMBER_OF_HOSTS ,$status['hosts_count'],		
 		array(
 			new CSpan($status['hosts_count_monitored'],'off'),' / ',
 			new CSpan($status['hosts_count_not_monitored'],'on'),' / ',
@@ -376,7 +376,7 @@ function make_status_of_zbx(){
 	));
 	$title = new CSpan(S_NUMBER_OF_ITEMS);	
 	$title->addOption('title', S_NUMBER_OF_ITEMS_TOOLTIP);	
-	$table->AddRow(array($title, $status['items_count'],		
+	$table->addRow(array($title, $status['items_count'],		
 		array(
 			new CSpan($status['items_count_monitored'],'off'),' / ',
 			new CSpan($status['items_count_disabled'],'on'),' / ',
@@ -385,7 +385,7 @@ function make_status_of_zbx(){
 	));
 	$title = new CSpan(S_NUMBER_OF_TRIGGERS);	
 	$title->addOption('title', S_NUMBER_OF_TRIGGERS_TOOLTIP);	
-	$table->AddRow(array($title,$status['triggers_count'],		
+	$table->addRow(array($title,$status['triggers_count'],		
 		array(
 			$status['triggers_count_enabled'],' / ',
 			$status['triggers_count_disabled'].SPACE.SPACE.'[',
@@ -532,7 +532,11 @@ function make_latest_issues($params = array()){
 //--------			
 			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'].'&source=0&nav_time='.$row['lastchange'],'action');
 			
-						$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action', null, true) : $description;						$table->AddRow(array(				get_node_name_by_elid($row['triggerid']),				$host,
+			$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action', null, true) : $description;
+			
+			$table->addRow(array(
+				get_node_name_by_elid($row['triggerid']),
+				$host,
 				new CCol($description,get_severity_style($row["priority"])),
 				$clock,
 				zbx_date2age($row_event['clock']),

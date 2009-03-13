@@ -298,7 +298,7 @@ class CGraph{
 				return imagecolorexactalpha($this->im,$RGB[0],$RGB[1],$RGB[2],$alfa);
 		}
 		
-		return imagecolorallocate($this->im,$RGB[0],$RGB[1],$RGB[2]);
+	return imagecolorallocate($this->im,$RGB[0],$RGB[1],$RGB[2]);
 	}
 }
 ?>
