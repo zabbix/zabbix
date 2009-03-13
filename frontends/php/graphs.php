@@ -211,7 +211,7 @@ include_once 'include/page_header.php';
 
 		$result = DBend($result);
 
-		show_messages($result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
+		show_messages($result, S_GRAPHS_DELETED, S_CANNOT_DELETE_GRAPHS);
 	}
 	else if(isset($_REQUEST['copy'])&&isset($_REQUEST['group_graphid'])&&isset($_REQUEST['form_copy_to'])){
 		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){

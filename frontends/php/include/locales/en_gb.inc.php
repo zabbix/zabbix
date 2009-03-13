@@ -613,6 +613,8 @@
 	'S_CANNOT_UPDATE_GRAPH'=>		'Cannot update graph',
 	'S_GRAPH_DELETED'=>			'Graph deleted',
 	'S_CANNOT_DELETE_GRAPH'=>		'Cannot delete graph',
+	'S_GRAPHS_DELETED'=>			'Graphs deleted',
+	'S_CANNOT_DELETE_GRAPHS'=>		'Cannot delete graphs',
 	'S_CANNOT_ADD_GRAPH'=>			'Cannot add graph',
 	'S_ANOTHER_ITEM_SUM'=>			'Cannot add onemore item with type "Graph sum"',
 	'S_ID'=>				'Id',
