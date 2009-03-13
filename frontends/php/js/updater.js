@@ -63,7 +63,7 @@ inloadobj:		new Array(),			// array containing updated obj and statuses
 	
 	update: function(obj4update,time){
 		obj4update.ready = false;
-		
+
 		var uri = new url(obj4update.url);
 		new Ajax.Updater(obj4update.id, uri.getUrl(),//obj4update.url,
 			{
@@ -84,7 +84,7 @@ inloadobj:		new Array(),			// array containing updated obj and statuses
 				'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(obj4update.params); }
 			});	
 	},
-	
+
 	onetime_update: function(obj,update_url){
 		obj = $(obj);
 		

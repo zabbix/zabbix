@@ -513,7 +513,7 @@
 		$db_item_hosts = DBselect('SELECT DISTINCT h.hostid,h.host,h.status '.
 							' FROM items i, hosts h '.
 							' WHERE h.hostid=i.hostid '.
-								' AND i.itemid in ('.implode(',', $itemid).')');
+								' AND '.DBcondition('i.itemid',$itemid));
 								
 		while($db_item_host = DBfetch($db_item_hosts)){
 			$host_list[] = '"'.$db_item_host['host'].'"';

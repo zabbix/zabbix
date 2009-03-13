@@ -711,24 +711,24 @@
 							}
 
 							$data['graphid'] = $graph['graphid'];
-
-							update_graph(
-								$data['graphid'],
-								$data['name'],
-								$data['width'],
-								$data['height'],
-								$data['yaxistype'],
-								$data['yaxismin'],
-								$data['yaxismax'],
-								$data['show_work_period'],
-								$data['show_triggers'],
-								$data['graphtype'],
-								$data['show_legend'],
-								$data['show_3d'],
-								$data['percent_left'],
-								$data['percent_right'],
-								$graph['templateid']);
-							DBexecute('DELETE FROM graphs_items WHERE graphid='.$data['graphid']);
+					
+							update_graph_with_items(
+									$data['graphid'],
+									$data['name'],
+									$data['width'],
+									$data['height'],
+									$data['yaxistype'],
+									$data['yaxismin'],
+									$data['yaxismax'],
+									$data['show_work_period'],
+									$data['show_triggers'],
+									$data['graphtype'],
+									$data['show_legend'],
+									$data['show_3d'],
+									$data['percent_left'],
+									$data['percent_right'],
+									$data['items'],
+									$graph['templateid']);
 						}
 						else{ /* missed */
 							// continue [add_group]
@@ -740,36 +740,25 @@
 							info('Graph ['.$data['name'].'] skipped - user rule');
 							break; // case
 						}
-
-						$data['graphid'] = add_graph(
-							$data['name'],
-							$data['width'],
-							$data['height'],
-							$data['yaxistype'],
-							$data['yaxismin'],
-							$data['yaxismax'],
-							$data['show_work_period'],
-							$data['show_triggers'],
-							$data['graphtype'],
-							$data['show_legend'],
-							$data['show_3d'],
-							$data['percent_left'],
-							$data['percent_right']
-							);
+						
+						$data['graphid'] = add_graph_with_items(
+												$data['name'],
+												$data['width'],
+												$data['height'],
+												$data['yaxistype'],
+												$data['yaxismin'],
+												$data['yaxismax'],
+												$data['show_work_period'],
+												$data['show_triggers'],
+												$data['graphtype'],
+												$data['show_legend'],
+												$data['show_3d'],
+												$data['percent_left'],
+												$data['percent_right'],
+												$data['items']
+											);
 					}
 
-					foreach($data['items'] as $item){
-						add_item_to_graph(
-							$data['graphid'],
-							$item['itemid'],
-							$item['color'],
-							$item['drawtype'],
-							$item['sortorder'],
-							$item['yaxisside'],
-							$item['calc_fnc'],
-							$item['type'],
-							$item['periods_cnt']);
-					}
 					break; // case
 				case XML_TAG_GRAPH_ELEMENT:
 					if(!isset($this->data[XML_TAG_GRAPH]))
