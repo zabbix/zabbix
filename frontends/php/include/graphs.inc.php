@@ -728,16 +728,17 @@
 		$result = true;
 		
 		$graphs = array();
-		$host_lists = array();
+		$host_list = array();
 		foreach($graphids as $id => $graphid){
-			$graphs[] = get_graph_by_graphid($graphid);
+			$graphs[$graphid] = get_graph_by_graphid($graphid);
 	
 			$host_list[$graphid] = array();
 			$db_hosts = get_hosts_by_graphid($graphid);
 			while($db_host = DBfetch($db_hosts)){
 				$host_list[$graphid] = '"'.$db_host['host'].'"';
 			}
-		}		
+		}
+
 // firstly remove child graphs 
 		$del_chd_graphs = array();
 		$chd_graphs = get_graphs_by_templateid($graphids);
@@ -758,7 +759,7 @@
 		if($result){
 			foreach($graphs as $graphid => $graph){
 				if(isset($host_list[$graphid]))
-					info('Graph "'.$graph['name'].'" deleted from hosts '.implode(',',$host_list[$graphid]));
+					info('Graph "'.$graph['name'].'" deleted from hosts '.implode(',',$host_list));
 			}
 		}
 

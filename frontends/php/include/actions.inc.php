@@ -27,7 +27,7 @@ function action_accessible($actionid,$perm){
 
 	$result = false;
 
-	if (DBselect('select actionid from actions where actionid='.$actionid.' and '.DBin_node('actionid'))){
+	if(DBselect('select actionid from actions where actionid='.$actionid.' and '.DBin_node('actionid'))){
 		$result = true;
 		
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,null,get_current_nodeid(true));
@@ -950,7 +950,7 @@ function get_history_of_actions($start,$num,$sql_cond=''){
 		else{
 			$error=new CSpan($row["error"],"on");
 		}
-		$table->AddRow(array(
+		$table->addRow(array(
 			get_node_name_by_elid($row['alertid']),
 			new CCol($time, 'top'),
 			new CCol($row["description"], 'top'),
@@ -1036,7 +1036,7 @@ function get_action_msgs_for_event($eventid){
 			$error=new CSpan($row["error"],"on");
 		}
 		
-		$table->AddRow(array(
+		$table->addRow(array(
 			get_node_name_by_elid($row['alertid']),
 			new CCol($time, 'top'),
 			new CCol($row["description"], 'top'),
@@ -1112,7 +1112,7 @@ function get_action_cmds_for_event($eventid){
 			$error=new CSpan($row["error"],"on");
 		}
 		
-		$table->AddRow(array(
+		$table->addRow(array(
 			get_node_name_by_elid($row['alertid']),
 			new CCol($time, 'top'),
 			new CCol($status, 'top'),
@@ -1138,7 +1138,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
 	
 	$tab_hint = new CTableInfo(S_NO_ACTIONS_FOUND);
-	$tab_hint->AddOption('style', 'width: 300px;');
+	$tab_hint->addOption('style', 'width: 300px;');
 	$tab_hint->SetHeader(array(
 			is_show_subnodes() ? S_NODES : null,
 			S_USER,
@@ -1169,7 +1169,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 				' AND '.DBcondition('e.objectid',$available_triggers).
 				' AND '.DBin_node('a.alertid').
 			' ORDER BY a.alertid';
-	$result=DBselect($sql);
+	$result=DBselect($sql,30);
 
 	while($row=DBfetch($result)){
 
@@ -1201,7 +1201,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 				$message = '-';
 		}
 		
-		$tab_hint->AddRow(array(
+		$tab_hint->addRow(array(
 			get_node_name_by_elid($row['alertid']),
 			empty($row['alias'])?' - ':$row['alias'],
 			$message,
@@ -1266,15 +1266,15 @@ function get_event_actions_status($eventid){
 		}
 		else{
 			$tdl = new CCol(($alerts['sent'])?(new CSpan($alerts['sent'],'green')):SPACE);
-			$tdl->AddOption('width','10');
+			$tdl->addOption('width','10');
 			
 			$tdr = new CCol(($alerts['failed'])?(new CSpan($alerts['failed'],'red')):SPACE);
-			$tdr->AddOption('width','10');
+			$tdr->addOption('width','10');
 
 			$status = new CRow(array($tdl,$tdr));
 		}
 
-		$actions->AddRow($status);
+		$actions->addRow($status);
 	}
 	
 return $actions;
@@ -1306,7 +1306,7 @@ function get_event_actions_stat_hints($eventid){
 			$alert_cnt->SetHint($hint);
 		}
 		$tdl = new CCol(($alerts['sent'])?$alert_cnt:SPACE);
-		$tdl->AddOption('width','10');
+		$tdl->addOption('width','10');
 
 		$sql='SELECT COUNT(a.alertid) as inprogress '.
 				' FROM alerts a '.
@@ -1319,10 +1319,10 @@ function get_event_actions_stat_hints($eventid){
 		$alert_cnt = new CSpan($alerts['inprogress'],'orange');
 		if($alerts['inprogress']){
 			$hint=get_actions_hint_by_eventid($eventid,ALERT_STATUS_NOT_SENT);
-			$alert_cnt->SetHint($hint);
+			$alert_cnt->setHint($hint);
 		}
 		$tdc = new CCol(($alerts['inprogress'])?$alert_cnt:SPACE);
-		$tdc->AddOption('width','10');
+		$tdc->addOption('width','10');
 
 		$sql='SELECT COUNT(a.alertid) as failed '.
 				' FROM alerts a '.
@@ -1335,13 +1335,13 @@ function get_event_actions_stat_hints($eventid){
 		$alert_cnt = new CSpan($alerts['failed'],'red');
 		if($alerts['failed']){
 			$hint=get_actions_hint_by_eventid($eventid,ALERT_STATUS_FAILED);
-			$alert_cnt->SetHint($hint);
+			$alert_cnt->setHint($hint);
 		}
 
 		$tdr = new CCol(($alerts['failed'])?$alert_cnt:SPACE);
-		$tdr->AddOption('width','10');
+		$tdr->addOption('width','10');
 		
-		$actions->AddRow(array($tdl,$tdc,$tdr));
+		$actions->addRow(array($tdl,$tdc,$tdr));
 	}
 return $actions;
 }
