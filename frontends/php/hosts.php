@@ -1302,13 +1302,13 @@ include_once('include/page_header.php');
 	$frmForm->setMethod('get');
 	
 	$cmbConf = new CComboBox('config',$_REQUEST['config'],'submit()');
-	$cmbConf->AddItem(1,S_HOST_GROUPS);
-	$cmbConf->AddItem(0,S_HOSTS);
-	$cmbConf->AddItem(3,S_TEMPLATES);
-	$cmbConf->AddItem(2,S_TEMPLATE_LINKAGE);
-	$cmbConf->AddItem(5,S_PROXIES);
-	$cmbConf->AddItem(6,S_MAINTENANCE);
-	$cmbConf->AddItem(4,S_APPLICATIONS);
+	$cmbConf->addItem(1,S_HOST_GROUPS);
+	$cmbConf->addItem(0,S_HOSTS);
+	$cmbConf->addItem(3,S_TEMPLATES);
+	$cmbConf->addItem(2,S_TEMPLATE_LINKAGE);
+	$cmbConf->addItem(5,S_PROXIES);
+	$cmbConf->addItem(6,S_MAINTENANCE);
+	$cmbConf->addItem(4,S_APPLICATIONS);
 
 
 	switch($_REQUEST['config']){
@@ -1528,10 +1528,10 @@ include_once('include/page_header.php');
 				$show_only_tmp ? new CButtonQMessage('delete_and_clear',S_DELETE_SELECTED_WITH_LINKED_ELEMENTS,S_DELETE_SELECTED_HOSTS_Q) : NULL
 				);
 
-			$table->SetFooter(new CCol($footerButtons));
+			$table->setFooter(new CCol($footerButtons));
 
-			$form->AddItem($table);
-			$form->Show();
+			$form->addItem($table);
+			$form->show();
 
 		}
 	}
@@ -1612,7 +1612,7 @@ include_once('include/page_header.php');
 					));
 					$row_count++;
 			}
-			$table->SetFooter(new CCol(array(
+			$table->setFooter(new CCol(array(
 				new CButtonQMessage('activate',S_ACTIVATE_SELECTED,S_ACTIVATE_SELECTED_HOSTS_Q),
 				SPACE,
 				new CButtonQMessage('disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_HOSTS_Q),
@@ -1620,8 +1620,8 @@ include_once('include/page_header.php');
 				new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_GROUPS_Q)
 			)));
 
-			$form->AddItem($table);
-			$form->Show();
+			$form->addItem($table);
+			$form->show();
 		}
 	}
 // Original mod by scricca@vipsnet.net
@@ -1742,7 +1742,7 @@ include_once('include/page_header.php');
 			foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
 				$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
 			}
-			$form->AddItem($cmbHosts);
+			$form->addItem($cmbHosts);
 			
 			$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 			$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
@@ -1758,10 +1758,10 @@ include_once('include/page_header.php');
 /* TABLE */
 
 			$form = new CForm();
-			$form->SetName('applications');
+			$form->setName('applications');
 
 			$table = new CTableInfo();
-			$table->SetHeader(array(
+			$table->setHeader(array(
 				array(new CCheckBox('all_applications',NULL,"CheckAll('".$form->GetName()."','all_applications');"),
 				SPACE,
 				make_sorting_link(S_APPLICATION,'a.name')),
@@ -1900,99 +1900,94 @@ include_once('include/page_header.php');
 	}
 	else if($_REQUEST['config'] == 6){		if(isset($_REQUEST["form"])){
 			$frmMaintenance = new CForm('hosts.php','post');
-			$frmMaintenance->SetName(S_MAINTENANCE);
+			$frmMaintenance->setName(S_MAINTENANCE);
 			
-			$frmMaintenance->AddVar('form',get_request('form',1));
+			$frmMaintenance->addVar('form',get_request('form',1));
 			
 			$from_rfr = get_request('form_refresh',0);
-			$frmMaintenance->AddVar('form_refresh',$from_rfr+1);
+			$frmMaintenance->addVar('form_refresh',$from_rfr+1);
 			
-			$frmMaintenance->AddVar('config',get_request('config',6));
+			$frmMaintenance->addVar('config',get_request('config',6));
 			
 			if(isset($_REQUEST['maintenanceid']))
-				$frmMaintenance->AddVar('maintenanceid',$_REQUEST['maintenanceid']);
+				$frmMaintenance->addVar('maintenanceid',$_REQUEST['maintenanceid']);
 						
 			$left_tab = new CTable();
-			$left_tab->SetCellPadding(3);
-			$left_tab->SetCellSpacing(3);
+			$left_tab->setCellPadding(3);
+			$left_tab->setCellSpacing(3);
 			
-			$left_tab->AddOption('border',0);
+			$left_tab->addOption('border',0);
 			
-			$left_tab->AddRow(create_hat(
+			$left_tab->addRow(create_hat(
 					S_MAINTENANCE,
 					get_maintenance_form(),//null,
 					null,
-					'hat_maintenance',
-					get_profile('web.hosts.hats.hat_maintenance.state',1)
+					'hat_maintenance'
 				));
 					
-			$left_tab->AddRow(create_hat(
+			$left_tab->addRow(create_hat(
 					S_MAINTENANCE_PERIODS,
 					get_maintenance_periods(),//null
 					null,
-					'hat_timeperiods',
-					get_profile('web.hosts.hats.hat_timeperiods.state',1)
+					'hat_timeperiods'
 				));
 				
 			if(isset($_REQUEST['new_timeperiod'])){
 				$new_timeperiod = $_REQUEST['new_timeperiod'];
 
-				$left_tab->AddRow(create_hat(
+				$left_tab->addRow(create_hat(
 						(is_array($new_timeperiod) && isset($new_timeperiod['id']))?S_EDIT_MAINTENANCE_PERIOD:S_NEW_MAINTENANCE_PERIOD,
 						get_timeperiod_form(),//nulls
 						null,
-						'hat_new_timeperiod',
-						get_profile('web.actionconf.hats.hat_new_timeperiod.state',1)
+						'hat_new_timeperiod'
 					));
 			}
 			
 			$right_tab = new CTable();
-			$right_tab->SetCellPadding(3);
-			$right_tab->SetCellSpacing(3);
+			$right_tab->setCellPadding(3);
+			$right_tab->setCellSpacing(3);
 			
-			$right_tab->AddOption('border',0);
+			$right_tab->addOption('border',0);
 					
-			$right_tab->AddRow(create_hat(
+			$right_tab->addRow(create_hat(
 					S_HOSTS_IN_MAINTENANCE,
 					get_maintenance_hosts_form($frmMaintenance),//null,
 					null,
-					'hat_host_link',
-					get_profile('web.hosts.hats.hat_host_link.state',1)
+					'hat_host_link'
 				));
 				
-			$right_tab->AddRow(create_hat(
+			$right_tab->addRow(create_hat(
 					S_GROUPS_IN_MAINTENANCE,
 					get_maintenance_groups_form($frmMaintenance),//null,
 					null,
-					'hat_group_link',
-					get_profile('web.hosts.hats.hat_group_link.state',1)
+					'hat_group_link'
 				));
 
 			
 			
 			$td_l = new CCol($left_tab);
-			$td_l->AddOption('valign','top');
+			$td_l->addOption('valign','top');
 			
 			$td_r = new CCol($right_tab);
-			$td_r->AddOption('valign','top');
+			$td_r->addOption('valign','top');
 			
 			$outer_table = new CTable();
-			$outer_table->AddOption('border',0);
-			$outer_table->SetCellPadding(1);
-			$outer_table->SetCellSpacing(1);
-			$outer_table->AddRow(array($td_l,$td_r));
+			$outer_table->addOption('border',0);
+			$outer_table->setCellPadding(1);
+			$outer_table->setCellSpacing(1);
+			$outer_table->addRow(array($td_l,$td_r));
 			
-			$frmMaintenance->Additem($outer_table);
+			$frmMaintenance->additem($outer_table);
 			
 			show_messages();
-			$frmMaintenance->Show();
+			$frmMaintenance->show();
 //			insert_maintenance_form();
 		} 
 		else {
 			echo SBR;
 	// Table HEADER
 			$form = new CForm();
-			$form->SetMethod('get');
+			$form->setMethod('get');
 			
 			$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 			$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
@@ -2052,7 +2047,7 @@ include_once('include/page_header.php');
 			
 		
 			$form = new CForm(null,'post');
-			$form->SetName('maintenances');
+			$form->setName('maintenances');
 			
 			$table = new CTableInfo();
 			$table->setHeader(array(
@@ -2083,13 +2078,13 @@ include_once('include/page_header.php');
 					));
 				$row_count++;
 			}
-//			$table->SetFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_USERS_Q)));
+//			$table->setFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_USERS_Q)));
 			
-			$table->SetFooter(new CCol(array(
+			$table->setFooter(new CCol(array(
 				new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_GROUPS_Q)
 			)));
 
-			$form->AddItem($table);
+			$form->addItem($table);
 
 			$form->show();
 		}

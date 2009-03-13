@@ -283,8 +283,7 @@ include_once 'include/page_header.php';
 				S_SCREENS_BIG,
 				$p_elements,
 				array($icon,$fs_icon),
-				'hat_screens',
-				get_profile('web.screens.hats.hat_screens.state',1)
+				'hat_screens'
 		);
 		
 		$screens_hat->Show();
