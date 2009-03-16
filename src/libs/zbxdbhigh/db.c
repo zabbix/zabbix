@@ -40,7 +40,7 @@
 
 const char *DBnode(const char *fieldid, const int nodeid)
 {
-	static char	dbnode[256];
+	static char	dbnode[128];
 
 	if (nodeid == -1)
 		*dbnode = '\0';

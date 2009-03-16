@@ -48,15 +48,20 @@
  ******************************************************************************/
 int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id)
 {
-	char		*sql = NULL;
-	int		sql_allocated = 16*1024, sql_offset = 0;
-	int		t, f, res = SUCCEED;
+	char	*sql = NULL;
+	int	sql_allocated = 2*1024, sql_offset = 0;
+	int	t, f, res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In calculate_checksums");
 
+	if (ZBX_DB_OK > DBexecute("delete from node_cksum where nodeid=%d and cksumtype=%d",
+			nodeid,
+			NODE_CKSUM_TYPE_NEW))
+		return FAIL;
+
 	sql = zbx_malloc(sql, sql_allocated);
 
-	for (t = 0; tables[t].table != 0; t++) {
+	for (t = 0; 0 != tables[t].table && SUCCEED == res; t++) {
 		/* Do not sync some of tables */
 		if ((tables[t].flags & ZBX_SYNC) == 0)
 			continue;
@@ -64,22 +69,16 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 		if (NULL != tablename && 0 != strcmp(tablename, tables[t].table))
 			continue;
 
-#ifdef	HAVE_MYSQL
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-			"%s select %d,'%s',%s,%d,concat_ws(',',",
-			sql_offset > 0 ? "union all" : "insert into node_cksum (nodeid,tablename,recordid,cksumtype,cksum)",
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 256,
+			"insert into node_cksum (nodeid,tablename,recordid,cksumtype,cksum)"
+			" select %d,'%s',%s,%d,",
 			nodeid,
 			tables[t].table,
 			tables[t].recid,
 			NODE_CKSUM_TYPE_NEW);
-#else
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-			"%s select %d,'%s',%s,%d,",
-			sql_offset > 0 ? "union all" : "insert into node_cksum (nodeid,tablename,recordid,cksumtype,cksum)",
-			nodeid,
-			tables[t].table,
-			tables[t].recid,
-			NODE_CKSUM_TYPE_NEW);
+#ifdef HAVE_MYSQL
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 16, "concat_ws(',',");
 #endif
 
 		for (f = 0; tables[t].fields[f].name != 0; f ++) {
@@ -91,14 +90,12 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 				case ZBX_TYPE_ID	:
 				case ZBX_TYPE_INT	:
 				case ZBX_TYPE_UINT	:
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
-						"%s",
-						tables[t].fields[f].name);
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "%s",
+							tables[t].fields[f].name);
 					break;
 				default	:
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
-						"md5(%s)",
-						tables[t].fields[f].name);
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "md5(%s)",
+							tables[t].fields[f].name);
 					break;
 				}
 			} else {
@@ -106,57 +103,53 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 				case ZBX_TYPE_ID	:
 				case ZBX_TYPE_INT	:
 				case ZBX_TYPE_UINT	:
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
-						"case when %s is null then 'NULL' else %s end",
-						tables[t].fields[f].name,
-						tables[t].fields[f].name);
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 192,
+							"case when %s is null then 'NULL' else %s end",
+							tables[t].fields[f].name,
+							tables[t].fields[f].name);
 					break;
 				default	:
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
-						"case when %s is null then 'NULL' else md5(%s) end",
-						tables[t].fields[f].name,
-						tables[t].fields[f].name);
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 192,
+							"case when %s is null then 'NULL' else md5(%s) end",
+							tables[t].fields[f].name,
+							tables[t].fields[f].name);
 					break;
 				}
 			}
-#ifdef	HAVE_MYSQL
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 16,
+#ifdef HAVE_MYSQL
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 2,
 					",");
 #else
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 16,
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8,
 					"||','||");
 #endif
 		}
 
 		/* remove last delimiter */
 		if (f > 0) {
-#ifdef	HAVE_MYSQL
+#ifdef HAVE_MYSQL
 			sql_offset --;
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 16, ")");
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 2, ")");
 #else
 			sql_offset -= 7;
 #endif
 		}
 
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-			" from %s where 1=1" DB_NODE,
-			tables[t].table,
-			DBnode(tables[t].recid, nodeid));
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 256,
+				" from %s where 1=1" DB_NODE,
+				tables[t].table,
+				DBnode(tables[t].recid, nodeid));
 
 		if (0 != id) {
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
-				" and %s="ZBX_FS_UI64,
-				tables[t].recid,
-				id);
+					" and %s="ZBX_FS_UI64,
+					tables[t].recid,
+					id);
 		}
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "\n");
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			res = FAIL;
 	}
-	if (SUCCEED == res && DBexecute("delete from node_cksum where nodeid=%d and cksumtype=%d",
-		nodeid,
-		NODE_CKSUM_TYPE_NEW) < ZBX_DB_OK)
-		res = FAIL;
-	if (SUCCEED == res && DBexecute("%s", sql) < ZBX_DB_OK)
-		res = FAIL;
 
 	zbx_free(sql);
 

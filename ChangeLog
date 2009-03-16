@@ -31,6 +31,8 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-537] Distributed monitoring: added update of Last chack and Last value fields (Sasha)
+ - [ZBX-537] Distributed monitoring: fixed deadlocks (Sasha)
  - [ZBX-760] historical data is now available for "not supported" items (Vedmak)
  - [ZBX-789] fixed error when try to remove trigger comment (Vedmak)
  - [ZBX-782] added host name of deppending trigger (amach)
