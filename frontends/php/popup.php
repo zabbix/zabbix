@@ -137,6 +137,7 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'dstfrm' =>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
+		'dstact'=>		array(T_ZBX_STR, O_OPT,	null,	null,	'isset({multiselect})'),
 		'dstfld1'=>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
 		'dstfld2'=>		array(T_ZBX_STR, O_OPT,P_SYS,	null,		null),
 		'srctbl' =>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
@@ -149,6 +150,7 @@ include_once('include/page_header.php');
 		'templates'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		'host_templates'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		'existed_templates'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
+		'multiselect'=>		array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
 		
 		'only_hostid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'monitored_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
@@ -172,6 +174,10 @@ include_once('include/page_header.php');
 	$dstfld2	= get_request('dstfld2', '');	// second output field on destination form
 	$srcfld1	= get_request('srcfld1', '');	// source table field [can be different from fields of source table]
 	$srcfld2	= get_request('srcfld2', null);	// second source table field [can be different from fields of source table]
+	$multiselect = get_request('multiselect', false); //if create popup with checkboxes
+	$dstact 	= get_request('dstact', ''); 
+
+
 
 	$monitored_hosts	= get_request('monitored_hosts', 0);
 	$real_hosts			= get_request('real_hosts', 0);
@@ -217,12 +223,14 @@ include_once('include/page_header.php');
 	if($real_hosts)
 		$frmTitle->addVar('real_hosts', 1);
 
-	$frmTitle->addVar('dstfrm',	$dstfrm);
-	$frmTitle->addVar('dstfld1',	$dstfld1);
-	$frmTitle->addVar('dstfld2',	$dstfld2);
-	$frmTitle->addVar('srctbl',	$srctbl);
-	$frmTitle->addVar('srcfld1',	$srcfld1);
-	$frmTitle->addVar('srcfld2',	$srcfld2);
+	$frmTitle->addVar('dstfrm', $dstfrm);
+	$frmTitle->addVar('dstact', $dstact);
+	$frmTitle->addVar('dstfld1', $dstfld1);
+	$frmTitle->addVar('dstfld2', $dstfld2);
+	$frmTitle->addVar('srctbl', $srctbl);
+	$frmTitle->addVar('srcfld1', $srcfld1);
+	$frmTitle->addVar('srcfld2', $srcfld2);
+	$frmTitle->addVar('multiselect', $multiselect);
 	if(isset($_REQUEST['reference']))
 		$frmTitle->addVar('reference',	$_REQUEST['reference']);
 
@@ -648,15 +656,29 @@ include_once('include/page_header.php');
 		}
 		$table->Show();
 	}
-	else if($srctbl == 'triggers'){
+	else if($srctbl == 'triggers'){	
+		
 		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $available_hosts, PERM_RES_IDS_ARRAY, $nodeid);
 
+		$form = new CForm();
+		$form->addOption('id', S_TRIGGERS);
+		
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
-		$table->SetHeader(array(
-			S_NAME,
-			S_SEVERITY,
-			S_STATUS));
-
+		
+		if($multiselect) {
+			insert_js_function('add_selected_values');
+			insert_js_function('check_all');	
+			$header = array(new CCol(array(new CCheckBox("check", NULL, 'check_all("'.S_TRIGGERS.'", this.checked);'), S_NAME)), S_SEVERITY, S_STATUS);
+			$button = new CButton('select', S_SELECT, 'add_selected_values("'.S_TRIGGERS.'", "'.$dstfrm.'", "'.$dstfld1.'", "'.$dstact.'")');
+			$button->setType('button');
+			$table->setFooter(new CCol($button,'right'));
+		}
+		else {
+			insert_js_function('add_value');
+			$header = array(S_NAME, S_SEVERITY,	S_STATUS);
+		}
+		$table->SetHeader($header);
+		
 		$sql = 'SELECT h.host,t.triggerid,t.description,t.expression,t.priority,t.status,count(d.triggerid_up) as dep_count '.
 				' FROM hosts h,items i,functions f, triggers t'.
 					' LEFT JOIN trigger_depends d ON d.triggerid_down=t.triggerid '.
@@ -666,29 +688,22 @@ include_once('include/page_header.php');
 					' AND '.DBin_node('t.triggerid', $nodeid).
 					' AND '.DBcondition('t.triggerid',$available_triggers).
 					' AND h.status in ('.implode(',', $host_status).')';
-
 		if($hostid>0) 
 			$sql .= ' AND h.hostid='.$hostid;
-
 		$sql .= ' GROUP BY h.host, t.triggerid, t.description, t.expression, t.priority, t.status'.
 				' ORDER BY h.host,t.description';
-
 		$result=DBselect($sql);
-		while($row=DBfetch($result)){
+		
+		while($row = DBfetch($result)) {
 			$exp_desc = expand_trigger_description_by_data($row);
-			$description = new CLink($exp_desc,'#','action');
-
-			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
-					get_window_opener($dstfrm, $dstfld2, $exp_desc).
-					"window.opener.setTimeout('add2favorites();', 1000);";
+			$description = new CSpan($exp_desc, 'link');
+			if($multiselect) {
+				$js_action = 'add_selected_values("'.S_TRIGGERS.'", "'.$dstfrm.'", "'.$dstfld1.'", "'.$dstact.'", "'.$row["triggerid"].'");';
 			}
-			else{
-				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-					get_window_opener($dstfrm, $dstfld2, $exp_desc);
+			else {
+				$js_action = 'add_value("'.$dstfld1.'", "'.$dstfld2.'", "'.$row["triggerid"].'", "'.$exp_desc.'");';
 			}
-
-			$description->SetAction($action." close_window(); return false;");
+			$description->onClick($js_action);
 
 			if($row['dep_count'] > 0){
 				$description = array(
@@ -696,37 +711,40 @@ include_once('include/page_header.php');
 					BR(),BR(),
 					bold(S_DEPENDS_ON),
 					BR());
-
 				$deps = get_trigger_dependencies_by_triggerid($row["triggerid"]);
-
 				foreach($deps as $val)
 					$description[] = array(expand_trigger_description($val),BR());
 			}
-
-			if($row["status"] == TRIGGER_STATUS_DISABLED){
-				$status= new CSpan(S_DISABLED, 'disabled');
+			switch($row["status"]) {
+				case TRIGGER_STATUS_DISABLED: 
+					$status = new CSpan(S_DISABLED, 'disabled');
+				break;
+				case TRIGGER_STATUS_UNKNOWN: 
+					$status = new CSpan(S_UNKNOWN, 'unknown');
+				break;
+				case TRIGGER_STATUS_ENABLED:
+					$status = new CSpan(S_ENABLED, 'enabled');
+				break;
 			}
-			else if($row["status"] == TRIGGER_STATUS_UNKNOWN){
-				$status= new CSpan(S_UNKNOWN, 'unknown');
+			//if($row["status"] != TRIGGER_STATUS_UNKNOWN) $row["error"]=SPACE;
+			//if($row["error"]=="") $row["error"]=SPACE;
+			
+			if($multiselect){
+				$description = new CCol(array(new CCheckBox('trigger['.$row['triggerid'].']', NULL, NULL, $row['triggerid']),	$description));
 			}
-			else if($row["status"] == TRIGGER_STATUS_ENABLED){
-				$status= new CSpan(S_ENABLED, 'enabled');
-			}
-
-			if($row["status"] != TRIGGER_STATUS_UNKNOWN)	$row["error"]=SPACE;
-
-			if($row["error"]=="")		$row["error"]=SPACE;
-
+			
 			$table->addRow(array(
 				$description,
-				new CCol(get_severity_description($row['priority']),get_severity_style($row['priority'])),
-				$status,
+				new CCol(get_severity_description($row['priority']), get_severity_style($row['priority'])),
+				$status
 			));
+			
 
 			unset($description);
 			unset($status);
 		}
-		$table->Show();
+		$form->addItem($table);
+		$form->show();
 	}
 	else if($srctbl == "logitems"){
 		insert_js_function('add_item_variable');
@@ -1302,6 +1320,20 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 ?>
+<script language="JavaScript" type="text/javascript">
+<!--
+function add_trigger(formname, triggerid) {
+	var parent_document = window.opener.document;
+
+	if(!parent_document) return close_window();
+	
+	add_variable('input', 'new_dependence['+triggerid+']', triggerid, formname, parent_document);
+	add_variable('input', 'add_dependence', 1, formname, parent_document);
+	
+	parent_document.forms[formname].submit();
+	close_window();	
+}
+</script>
 <?php
 
 include_once 'include/page_footer.php';
