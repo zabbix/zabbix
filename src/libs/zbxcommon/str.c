@@ -1359,7 +1359,7 @@ int	zbx_hex2binary(char *io)
  * Parameters:                                                                *
  *	input - null terminated hexadecimal string                            *
  *	output - pointer to buffer                                            *
- *	olen - length of returned buffer                                      *
+ *	olen - size of returned buffer                                        *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -1368,7 +1368,7 @@ int	zbx_hex2binary(char *io)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen)
+int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen)
 {
 	const u_char	*i;
 	char		*o;
@@ -1428,6 +1428,8 @@ void	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen
 		i++;
 	}
 	*o = '\0';
+
+	return len - 1;
 }
 
 /******************************************************************************
