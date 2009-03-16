@@ -34,7 +34,7 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"triggerid"=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null),
-		"comments"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save})'),
+		"comments"=>	array(T_ZBX_STR, O_OPT,  null,	null, 'isset({save})'),
 
 /* actions */
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),

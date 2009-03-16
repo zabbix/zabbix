@@ -32,6 +32,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-789] fixed error when try to remove trigger comment (Vedmak)
  - [ZBX-782] added host name of deppending trigger (amach)
  - [ZBX-786] fixed undefined argument on graph delete (Artem)
  - [ZBX-776] changed disabled auto-logout indication (amach)
