@@ -2241,14 +2241,13 @@
 		$priority 		= get_request('priority',	'');
 		$dependencies	= get_request('dependencies',array());
 
-		$frm_title	= S_TRIGGERS_MASSUPDATE;
-
 		$original_templates = array();
 
 		asort($dependencies);
 
-		$frmMTrig = new CFormTable($frm_title,'triggers.php');
+		$frmMTrig = new CFormTable(S_TRIGGERS_MASSUPDATE, 'triggers.php');
 		$frmMTrig->addVar('massupdate',get_request('massupdate',1));
+		$frmMTrig->addOption('id', 'massupdate');
 
 		$triggers = $_REQUEST['g_triggerid'];
 		foreach($triggers as $id => $triggerid){
@@ -2283,17 +2282,15 @@
 //		$frmMTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
 /* end dependencies */
 /* new dependence */
-		$frmMTrig->addVar('new_dependence','0');
+		//$frmMTrig->addVar('new_dependence','0');
 
-		$txtCondVal = new CTextBox('trigger','',75,'yes');
-
-		$btnSelect = new CButton('btn1', S_SELECT,
-				"return PopUp('popup.php?dstfrm=".S_TRIGGERS_MASSUPDATE.
-				"&dstfld1=new_dependence&dstfld2=trigger&srctbl=triggers".
-				"&srcfld1=triggerid&srcfld2=description',600,450);",
+		$btnSelect = new CButton('btn1', S_ADD,
+				"return PopUp('popup.php?dstfrm=massupdate&dstact=add_dependence".
+				"&dstfld1=new_dependence[]&srctbl=triggers&objname=triggers&srcfld1=1&multiselect=1".
+				"',600,450);",
 				'T');
 
-		array_push($dep_el, array(br(),$txtCondVal,$btnSelect,br(),new CButton("add_dependence",S_ADD)));
+		array_push($dep_el, array(br(),$btnSelect));
 
 		$dep_div = new CDiv($dep_el);
 		$dep_div->addOption('id','dependency_box');
@@ -2393,21 +2390,18 @@
 	/* end dependencies */
 
 	/* new dependence */
-		$frmTrig->addVar('new_dependence','0');
+//		$frmTrig->addVar('new_dependence','0');
 
-		$txtCondVal = new CTextBox('trigger','',75,'yes');
+//		$txtCondVal = new CTextBox('trigger','',75,'yes');
 
-		$btnSelect = new CButton('btn1',S_SELECT,
+		$btnSelect = new CButton('btn1',S_ADD,
 				"return PopUp('popup.php?dstfrm=".$frmTrig->GetName().
-				"&dstfld1=new_dependence&dstfld2=trigger&srctbl=triggers".
-				"&srcfld1=triggerid&srcfld2=description',600,450);",
+				"&dstfld1=new_dependence[]&srctbl=triggers&multiselect=1&dstact=add_dependence&objname=triggers&srcfld1=1".
+				"',750,450);",
 				'T');
 
 
-		$frmTrig->addRow(S_NEW_DEPENDENCY,array($txtCondVal,
-			$btnSelect, BR(),
-			new CButton("add_dependence",S_ADD)
-			),'new');
+		$frmTrig->addRow(S_NEW_DEPENDENCY, $btnSelect, 'new');
 	/* end new dependence */
 
 		$type_select = new CComboBox('type');
@@ -3904,6 +3898,7 @@
 				break;
 			case CONDITION_TYPE_TRIGGER:
 				$tblCond->addItem(new CVar('new_condition[value]','0'));
+				
 				$rowCondition[] = array(
 					new CTextBox('trigger','',20,'yes'),
 					new CButton('btn1',S_SELECT,
@@ -6599,8 +6594,7 @@
 				new CTextBox('trigger',$trigger,32,'yes'),
 				new CButton('btn1',S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
 					"&dstfld1=elementid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description');",
-					'T')
-			));
+					'T')			));
 		}
 		else if($elementtype==SYSMAP_ELEMENT_TYPE_HOST_GROUP){
 			$available_groups = 	get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
@@ -6773,8 +6767,8 @@
 		$table = new CTable();
 
 		$table->SetClass('tableinfo');
-		$table->oddRowClass = 'even_row';
-		$table->evenRowClass = 'even_row';
+		$table->setOddRowClass('even_row');
+		$table->setEvenRowClass('even_row');
 		$table->options['cellpadding'] = 3;
 		$table->options['cellspacing'] = 1;
 		$table->headerClass = 'header';

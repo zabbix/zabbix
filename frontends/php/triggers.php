@@ -101,7 +101,6 @@
 
 	$available_triggers = get_accessible_triggers(PERM_READ_WRITE, array());			// OPTIMIZE!!!
 /* FORM ACTIONS */
-
 	if(isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])){
 		unset($_REQUEST['triggerid']);
 		$_REQUEST['form'] = 'clone';
@@ -111,9 +110,8 @@
 		
 		$result = false;
 		
-		
 		$visible = get_request('visible',array());
-		$dependencies = get_request('dependencies',array());
+		$_REQUEST['dependencies'] = get_request('dependencies',array());
 		
 		$triggers = $_REQUEST['g_triggerid'];
 		$triggers = zbx_uint_array_intersect($triggers, $available_triggers);
@@ -256,8 +254,10 @@
 		if(!isset($_REQUEST['dependencies']))
 			$_REQUEST['dependencies'] = array();
 
-		if(!uint_in_array($_REQUEST['new_dependence'], $_REQUEST['dependencies']))
-			array_push($_REQUEST['dependencies'], $_REQUEST['new_dependence']);
+			foreach($_REQUEST['new_dependence'] as $triggerid) {
+			if(!uint_in_array($triggerid, $_REQUEST['dependencies']))
+				array_push($_REQUEST['dependencies'], $triggerid);
+		}
 	}
 	else if(isset($_REQUEST['del_dependence'])&&isset($_REQUEST['rem_dependence'])){
 		if(isset($_REQUEST['dependencies'])){
