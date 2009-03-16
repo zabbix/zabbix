@@ -3,7 +3,6 @@ Changes for 1.7.0
  - [ZBX-750] added multiple choice for trigger dependencies (Vedmak)
  - [DEV-313] added User Group configuration window GUI improvements (Vedmak)
  - [DEV-312] fixed wrong selection of selection box on graph border (amach)
- - [ZBX-760] historical data is now available for "not supported" items (Vedmak)
  - [ZBX-758] fixed wrong template linking (amach)
  - [ZBX-757] fixed "Bar reports" add item permission problem for users (Vedmak)
  - [ZBX-752] fixed wrong audit logs for trigger actions (Vedmak)
@@ -32,6 +31,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-760] historical data is now available for "not supported" items (Vedmak)
  - [ZBX-789] fixed error when try to remove trigger comment (Vedmak)
  - [ZBX-782] added host name of deppending trigger (amach)
  - [ZBX-786] fixed undefined argument on graph delete (Artem)
