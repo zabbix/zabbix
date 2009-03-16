@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-792] fixed server memory leak in processing remote commands in actions (Dmitry)
  - [ZBX-537] Distributed monitoring: added update of Last chack and Last value fields (Sasha)
  - [ZBX-537] Distributed monitoring: fixed deadlocks (Sasha)
  - [ZBX-760] historical data is now available for "not supported" items (Vedmak)
