@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTD-89] increased graphs max skip cell and max skip delay values (Artem)
  - [NTD-87] fixed compilation problems under AIX (Sasha)
  - [NTD-47] added support of system.cpu.intr/switches under FreeBSD (Sasha)
  - [NTP-6] fixed duplicate id's in processing of log and text items (Sasha)
