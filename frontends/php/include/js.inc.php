@@ -469,6 +469,55 @@ function insert_js_function($fnct_name){
 				close_window();
 				return true;
 			}');
+		break;
+		case 'add_selected_values':
+			insert_js('
+				function add_selected_values(objname, formname, dstfld, dstact, value) {
+					value = typeof(value) != "undefined" ? value : null;
+					dstact = ((typeof(dstact) != "undefined") && dstact) ? dstact : null;
+					
+					var parent_document = window.opener.document;
+					
+					if(!parent_document) return close_window();
+					
+					if(is_null(value)) {
+						$(objname).getInputs("checkbox").each( 
+							function(e){
+								if(e.checked && e.name != "check"){
+									add_variable("input", dstfld, e.value, formname, parent_document);
+								}
+							});	
+					}
+					else { 
+						add_variable("input", dstfld, value, formname, parent_document);
+					}
+
+					if(dstact) 
+						add_variable("input", dstact, 1, formname, parent_document);			
+					
+					parent_document.forms[formname].submit();
+					close_window();	
+				}');
+		break;
+		case 'add_value':
+			insert_js('
+				function add_value(dstfld1, dstfld2, value1, value2) {					
+					var parent_document = window.opener.document;
+				
+					if(!parent_document) return close_window();
+					
+					parent_document.getElementById(dstfld1).value = value1;
+					parent_document.getElementById(dstfld2).value = value2;
+
+					close_window();	
+				}');
+		break;
+		case 'check_all':
+			insert_js('
+				function check_all(objname, value) {
+					$(objname).getInputs("checkbox").each(function(e){ e.checked = value });	
+				}');
+		break;
 		default:
 			break;
 	}
