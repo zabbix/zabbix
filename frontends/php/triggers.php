@@ -514,11 +514,24 @@
 			$deps = get_trigger_dependencies_by_triggerid($row['triggerid']);
 			if(count($deps) > 0){
 				$description[] = array(BR(),bold(S_DEPENDS_ON.':'),SPACE);
-				foreach($deps as $val) {
+				foreach($deps as $num => $dep_triggerid) {
 					// shows host name of depending trigger
-					$hosts = get_hosts_by_triggerid($val);
-					while ($host = DBfetch($hosts)) {
-						$description[] = array(BR(), $host['host'].':', expand_trigger_description($val));
+					$description[] = BR();
+
+					$hosts = get_hosts_by_triggerid($dep_triggerid);
+					if(($host = DBfetch($hosts)) && ($host['hostid'] != $row['hostid'])){
+						$description[] = $host['host'].':';
+					}
+					$description[] = expand_trigger_description($dep_triggerid);
+
+					$dep_trigger_desc = '';
+					while($host = DBfetch($hosts)) {
+						$dep_trigger_desc.= $host['host'].',';
+					}
+					trim($dep_trigger_desc,',');
+					
+					if(!zbx_empty($dep_trigger_desc)){
+						$description[] = $dep_trigger_desc;
 					}
 				}
 			}
