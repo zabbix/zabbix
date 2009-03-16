@@ -37,8 +37,8 @@
 
 	define('ZBX_MAX_TREND_DIFF', 3600);
 	
-	define('ZBX_GRAPH_MAX_SKIP_CELL', 16);
-	define('ZBX_GRAPH_MAX_SKIP_DELAY', 4);
+	define('ZBX_GRAPH_MAX_SKIP_CELL', 32);
+	define('ZBX_GRAPH_MAX_SKIP_DELAY', 16);
 
 	class	Graph
 	{
