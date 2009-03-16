@@ -67,7 +67,7 @@ include_once 'include/page_header.php';
 	$_REQUEST['select'] = get_request('select',get_profile('web.latest.filter.select', ''));
 	update_profile('web.latest.filter.select', $_REQUEST['select'], PROFILE_TYPE_STR);
 
-	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
+	$options = array('allow_all_hosts','monitored_hosts','with_historical_items');
 	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
 	
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
@@ -236,8 +236,8 @@ include_once 'include/page_header.php';
 	$sql = 'SELECT DISTINCT i.*, ia.applicationid '.
 			' FROM items i,items_applications ia'.
 			' WHERE '.DBcondition('ia.applicationid',$db_appids).
-				' AND i.itemid=ia.itemid'.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
+				' AND i.itemid=ia.itemid AND i.lastvalue IS NOT NULL'.
+				' AND (i.status='.ITEM_STATUS_ACTIVE. ' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
 			order_by('i.description,i.itemid,i.lastclock');
 //SDI($sql);
 	$db_items = DBselect($sql);
@@ -258,7 +258,7 @@ include_once 'include/page_header.php';
 		if(isset($db_item['lastclock']))
 			$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item['lastclock']);
 		else
-			$lastclock = new CCol(' - ');
+			$lastclock = ' - ';
 
 		$lastvalue=format_lastvalue($db_item);
 
@@ -272,7 +272,7 @@ include_once 'include/page_header.php';
 			$change=nbsp($change);
 		}
 		else{
-			$change=new CCol(' - ');
+			$change = ' - ';
 		}
 		
 		if(($db_item['value_type']==ITEM_VALUE_TYPE_FLOAT) || ($db_item['value_type']==ITEM_VALUE_TYPE_UINT64)){
@@ -282,13 +282,15 @@ include_once 'include/page_header.php';
 			$actions=new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid'],'action');
 		}
 		
+		$item_status = $db_item['status']==3?'unknown': null;
+		
 		array_push($app_rows, new CRow(array(
 			is_show_subnodes()?SPACE:null,
 			($_REQUEST['hostid']>0)?NULL:SPACE,
-			str_repeat(SPACE,6).$description,
-			$lastclock,
-			new CCol($lastvalue),
-			$change,
+			new CCol(str_repeat(SPACE,6).$description, $item_status),
+			new CCol($lastclock, $item_status),
+			new CCol($lastvalue, $item_status),
+			new CCol($change, $item_status),
 			$actions
 			)));
 	}

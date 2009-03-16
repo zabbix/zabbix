@@ -765,6 +765,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 				'not_proxy_hosts' =>			0,
 				'with_items' =>					0,
 				'with_monitored_items' =>		0,
+				'with_historical_items'=>		0,
 				'with_triggers' =>				0,
 				'with_monitored_triggers'=>		0,
 				'with_httptests' =>				0,
@@ -828,6 +829,12 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
 		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
+	}
+	else if($def_options['with_historical_items']){
+		$def_sql['from'][] = 'hosts_groups hg';
+
+		$def_sql['where'][] = 'hg.groupid=g.groupid';
+		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
 	}
 
 // triggers
@@ -986,6 +993,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 				'not_proxy_hosts' =>			0,
 				'with_items' =>					0,
 				'with_monitored_items' =>		0,
+				'with_historical_items'=>		0,
 				'with_triggers' =>				0,
 				'with_monitored_triggers'=>		0,
 				'with_httptests' =>				0,
@@ -1049,6 +1057,10 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	else if($def_options['with_monitored_items']){
 		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
 	}
+	else if($def_options['with_historical_items']){
+		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
+	}
+	
 		
 // triggers
 	if($def_options['with_triggers']){

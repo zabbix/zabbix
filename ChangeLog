@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-760] historical data is now available for "not supported" items (Vedmak)
  - [ZBX-789] fixed error when try to remove trigger comment (Vedmak)
  - [ZBX-782] added host name of deppending trigger (amach)
  - [ZBX-786] fixed undefined argument on graph delete (Artem)
