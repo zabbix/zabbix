@@ -660,8 +660,8 @@ dnl Check for function initgroups()
 AC_MSG_CHECKING(for function initgroups())
 AC_TRY_LINK(
 [
-	#include <sys/types.h>
-	#include <grp.h>
+#include <sys/types.h>
+#include <grp.h>
 ],
 [
 	char	*user = "zabbix";
@@ -675,8 +675,8 @@ dnl Check for function seteuid()
 AC_MSG_CHECKING(for function seteuid())
 AC_TRY_LINK(
 [
-	#include <sys/types.h>
-	#include <unistd.h>
+#include <sys/types.h>
+#include <unistd.h>
 ],
 [
 	seteuid(0);
@@ -690,8 +690,8 @@ dnl Check for function setproctitle()
 AC_MSG_CHECKING(for function setproctitle())
 AC_TRY_LINK(
 [
-	#include <sys/types.h>
-	#include <unistd.h>
+#include <sys/types.h>
+#include <unistd.h>
 ],
 [
 	setproctitle("Test %d", 1);
