@@ -30,7 +30,12 @@ ZBX_FIELD
 	char	*rel;
 };
 
-#define ZBX_MAX_FIELDS 64
+#define ZBX_MAX_FIELDS		64
+#define ZBX_TABLENAME_LEN	64
+#define ZBX_TABLENAME_LEN_MAX	ZBX_TABLENAME_LEN + 1
+#define ZBX_FIELDNAME_LEN	64
+#define ZBX_FIELDNAME_LEN_MAX	ZBX_FIELDNAME_LEN + 1
+
 #define ZBX_TABLE struct zbx_table_type
 ZBX_TABLE
 {

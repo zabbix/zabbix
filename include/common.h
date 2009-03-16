@@ -641,7 +641,7 @@ int	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen);
 int     zbx_hex2binary(char *io);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
 #ifdef HAVE_POSTGRESQL
-void	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen);
+int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen);
 int	zbx_pg_unescape_bytea(u_char *io);
 #endif
 int	zbx_get_next_field(const char **line, char **output, int *olen, char separator);
