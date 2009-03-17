@@ -90,11 +90,11 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 				case ZBX_TYPE_ID	:
 				case ZBX_TYPE_INT	:
 				case ZBX_TYPE_UINT	:
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "%s",
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 1, "%s",
 							tables[t].fields[f].name);
 					break;
 				default	:
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "md5(%s)",
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 6, "md5(%s)",
 							tables[t].fields[f].name);
 					break;
 				}
@@ -104,7 +104,7 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 				case ZBX_TYPE_INT	:
 				case ZBX_TYPE_UINT	:
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 192,
-							"case when %s is null then 'NULL' else %s end",
+							"case when %s is null then 'NULL' else cast(%s as char) end",
 							tables[t].fields[f].name,
 							tables[t].fields[f].name);
 					break;
