@@ -73,7 +73,7 @@ include_once "include/page_header.php";
 		}
 		else if($_REQUEST["password1"]==$_REQUEST["password2"]){
 			$result=update_user_profile($USER_DETAILS["userid"],$_REQUEST["password1"],
-									$_REQUEST["url"],get_request("autologin",0),$_REQUEST["autologout"],
+									$_REQUEST["url"],get_request("autologin",0),get_request("autologout",0),
 									$_REQUEST["lang"],$_REQUEST['theme'],$_REQUEST["refresh"]
 					);
 					
