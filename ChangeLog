@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTD-77] added availability to add several links between map elements (Artem)
  - [NTD-78] changed the number of problems shown in maps at state "No False For B" (Artem)
  - [ZBX-792] fixed server memory leak in processing remote commands in actions (Dmitry)
  - [NTD-89] increased graphs max skip cell and max skip delay values (Artem)

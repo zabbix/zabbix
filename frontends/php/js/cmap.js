@@ -62,7 +62,7 @@ debug_info: '',						// debug string
 melement: {
 	id:				null,			// internal element id
 	selementid: 	0,			// ALWAYS must be a STRING (js doesn't support uint64) 
-	elementtype:	4,			// UNDEFINED
+	elementtype:	4,			// 4-UNDEFINED
 	elementid: 		0,			// ALWAYS must be a STRING (js doesn't support uint64) 
 	iconid_on:		19,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_off:		19,			// ALWAYS must be a STRING (js doesn't support uint64)
@@ -220,13 +220,7 @@ add_empty_link: function(){
 		this.info('Elements are not selected');
 		return false;
 	}
-	
-	var id = this.get_linkid_by_elementids(selementid1,selementid2);
-	
-	if(id !== false){
-		return false;		
-	}
-	
+		
 	var mlink = new Array();
 	for(var key in this.mlink){
 		mlink[key] = this.mlink[key];
@@ -433,20 +427,26 @@ remove_element_by_id: function(id){
 
 get_linkid_by_elementids: function(selementid1,selementid2){
 	this.debug('get_linkid_by_elementids');
+
+	var result = false;
+	var links = {};
 	var linkid = 0;
 	for(var i=0; i < this.linkids.length; i++){
 		linkid = this.linkids[i];
 
 		if((typeof(this.links[linkid]) != 'undefined') && !is_null(this.links[linkid])){
 			if((this.links[linkid].selementid1 == selementid1) && (this.links[linkid].selementid2 == selementid2)){
-				return i;
+				links[i] = i;
+				result = links;
 			}
 			else if((this.links[linkid].selementid1 == selementid2) && (this.links[linkid].selementid2 == selementid1)){
-				return i;
+				links[i] = i;
+				result = links;
 			}
 		}
 	}
-return false;
+	
+	return result;
 },
 
 add_link: function(mlink, update_map){
@@ -516,10 +516,12 @@ remove_links: function(){
 		var selementid1 = this.elementids[this.selects[0]];
 		var selementid2 = this.elementids[this.selects[1]];
 		
-		var id = this.get_linkid_by_elementids(selementid1,selementid2);
-		if(id !== false){
-			if(Confirm('Delete Link between selected elements?')){
-				this.remove_link_by_id(id);
+		var link_ids = this.get_linkid_by_elementids(selementid1,selementid2);
+		if(link_ids !== false){
+			if(Confirm('Delete Links between selected elements?')){			
+				for(var id in link_ids){
+					this.remove_link_by_id(id);
+				}
 				this.update_mapimg();
 			}
 		}
@@ -955,79 +957,83 @@ show_link_menu: function(e){
 	var selementid1 = this.elementids[this.selects[0]];
 	var selementid2 = this.elementids[this.selects[1]];
 
-	var id = this.get_linkid_by_elementids(selementid1,selementid2);
+	var link_ids = this.get_linkid_by_elementids(selementid1,selementid2);
 	
-	if(id === false){
+	if(link_ids === false){
 		this.show_element_menu(e);
 		return false;
 	}
-	
-	var mlink = this.links[this.linkids[id]];
-
 	var ln_menu = new Array();
-	ln_menu.push(['Link menu',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
-	
-	for(var i=0; i<zbx_link_menu.length; i++){
-		var form_key = zbx_link_menu[i]['form_key'];
-		var caption = zbx_link_menu[i]['value'];
+	ln_menu.push(['Links menu',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
 
-		var sub_menu = new Array(caption,null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']});
-		sub_menu.push([caption,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
+	var link_count = 0;
+	for(var id in link_ids){
+		link_count++;
+		var mlink = this.links[this.linkids[id]];
 		
-		if(form_key == 'triggerid'){
-			var values = zbx_link_form_menu[form_key][0];
+		var link_menu = new Array('Link '+link_count,null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']});
+		link_menu.push(['Link '+link_count,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
+		
+		for(var i=0; i<zbx_link_menu.length; i++){
+			var form_key = zbx_link_menu[i]['form_key'];
+			var caption = zbx_link_menu[i]['value'];
+	
+			var sub_menu = new Array(caption,null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']});
+			sub_menu.push([caption,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
 			
-			var srctbl1 = 'triggers';
-			var srcfld1 = form_key;
-
-			var value_action = 'javascript: '+
-						"PopUp('popup.php?srctbl="+srctbl1+
-							'&reference=sysmap_link'+
-							'&sysmapid='+this.sysmapid+
-							'&cmapid='+this.id+
-							'&sid='+id+
-							'&dstfrm=null'+
-							'&srcfld1='+srcfld1+
-							"&dstfld1="+srcfld1+"',800,450); void(0);",
-			value_action = '<span onclick="'+value_action+'">'+values['value']+'</span>';					
-			sub_menu.push([value_action,'#',function(){return false;}]);
-		}
-		else if((form_key == 'selementid1') || (form_key == 'selementid2')){
-			for(var j=0; j<this.elementids.length; j++){
-				if((typeof(this.elementids[j] != 'undefined')) && !is_null(this.elementids[j])){
-					var element = this.elements[this.elementids[j]];
-					
-					var value_action = "javascript: ZBX_SYSMAPS["+this.id+"].map.update_link_option("+id+",[{'key':'"+form_key+"','value':'"+element['selementid']+"'}]);";
-					value_action = '<span onclick="'+value_action+'">'+element['label']+'</span>';
-					
-					if(mlink[form_key] == element['selementid'])
-						sub_menu.push([value_action,'#',null,{'outer' : ['pum_b_submenu'],'inner' : ['pum_i_submenu']}]);
-					else
-						sub_menu.push([value_action,'#',function(){return false;}]);
-				}
-			}
-		}
-		else{
-			var fields = zbx_link_form_menu[form_key];
-
-			for(var j=0; j < fields.length; j++){
-				if(typeof(fields[j]) != 'undefined'){
-					var values = fields[j];
-					var value_action = "javascript: ZBX_SYSMAPS["+this.id+"].map.update_link_option("+id+",[{'key':'"+form_key+"','value':'"+values['key']+"'}]);";
-					value_action = '<span onclick="'+value_action+'">'+values['value']+'</span>';
-
-					if(mlink[form_key] == values['key'])
-						sub_menu.push([value_action,'#',null,{'outer' : ['pum_b_submenu'],'inner' : ['pum_i_submenu']}]);
-					else
-						sub_menu.push([value_action,'#',function(){return false;}]);
-				}
-			}
-		}
-
-		
-		ln_menu.push(sub_menu);
-	}
+			if(form_key == 'triggerid'){
+				var values = zbx_link_form_menu[form_key][0];
+				
+				var srctbl1 = 'triggers';
+				var srcfld1 = form_key;
 	
+				var value_action = 'javascript: '+
+							"PopUp('popup.php?srctbl="+srctbl1+
+								'&reference=sysmap_link'+
+								'&sysmapid='+this.sysmapid+
+								'&cmapid='+this.id+
+								'&sid='+id+
+								'&dstfrm=null'+
+								'&srcfld1='+srcfld1+
+								"&dstfld1="+srcfld1+"',800,450); void(0);",
+				value_action = '<span onclick="'+value_action+'">'+values['value']+'</span>';					
+				sub_menu.push([value_action,'#',function(){return false;}]);
+			}
+			else if((form_key == 'selementid1') || (form_key == 'selementid2')){
+				for(var j=0; j<this.elementids.length; j++){
+					if((typeof(this.elementids[j] != 'undefined')) && !is_null(this.elementids[j])){
+						var element = this.elements[this.elementids[j]];
+						
+						var value_action = "javascript: ZBX_SYSMAPS["+this.id+"].map.update_link_option("+id+",[{'key':'"+form_key+"','value':'"+element['selementid']+"'}]);";
+						value_action = '<span onclick="'+value_action+'">'+element['label']+'</span>';
+						
+						if(mlink[form_key] == element['selementid'])
+							sub_menu.push([value_action,'#',null,{'outer' : ['pum_b_submenu'],'inner' : ['pum_i_submenu']}]);
+						else
+							sub_menu.push([value_action,'#',function(){return false;}]);
+					}
+				}
+			}
+			else{
+				var fields = zbx_link_form_menu[form_key];
+	
+				for(var j=0; j < fields.length; j++){
+					if(typeof(fields[j]) != 'undefined'){
+						var values = fields[j];
+						var value_action = "javascript: ZBX_SYSMAPS["+this.id+"].map.update_link_option("+id+",[{'key':'"+form_key+"','value':'"+values['key']+"'}]);";
+						value_action = '<span onclick="'+value_action+'">'+values['value']+'</span>';
+	
+						if(mlink[form_key] == values['key'])
+							sub_menu.push([value_action,'#',null,{'outer' : ['pum_b_submenu'],'inner' : ['pum_i_submenu']}]);
+						else
+							sub_menu.push([value_action,'#',function(){return false;}]);
+					}
+				}
+			}
+			link_menu.push(sub_menu);
+		}
+		ln_menu.push(link_menu);
+	}
 	show_popup_menu(e,ln_menu,280);// JavaScript Document
 },
 // ---------- DEBUG ------------------------------------------------------------------------------------
