@@ -1338,7 +1338,7 @@
 
 			$cmbValType = new CComboBox("filter_value_type",$filter_value_type,"submit()");
 			$cmbValType->AddItem(-1,	S_ALL_SMALL);
-			$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UINT64);
+			$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
@@ -1662,7 +1662,7 @@
 		}
 		else{
 			$cmbValType = new CComboBox('value_type',$value_type,'submit()');
-			$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UINT64);
+			$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
@@ -1963,7 +1963,7 @@
 			new CNumericBox('snmp_port',$snmp_port,5));
 
 		$cmbValType = new CComboBox('value_type',$value_type);
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UINT64);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);
 		$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
 		$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
 		$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);

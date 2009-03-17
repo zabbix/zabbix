@@ -742,7 +742,7 @@
 	'S_TYPE_OF_INFORMATION'=>		'데이터형',
 	'S_STORE_VALUE'=>			'보존 시 계산',
 	'S_SHOW_VALUE'=>			'값 매핑 사용',
-	'S_NUMERIC_UINT64'=>			'숫자(integer 64bit)',
+	'S_NUMERIC_UNSIGNED'=>			'숫자(integer 64bit)',
 	'S_NUMERIC_FLOAT'=>			'숫자(float)',
 	'S_CHARACTER'=>				'문자',
 	'S_LOG'=>				'로그',

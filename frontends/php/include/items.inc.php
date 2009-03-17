@@ -66,7 +66,7 @@
 	 */
 	function item_value_type2str($value_type){
 		switch($value_type){
-			case ITEM_VALUE_TYPE_UINT64:	$value_type = S_NUMERIC_UINT64;		break;
+			case ITEM_VALUE_TYPE_UINT64:	$value_type = S_NUMERIC_UNSIGNED;		break;
 			case ITEM_VALUE_TYPE_FLOAT:	$value_type = S_NUMERIC_FLOAT;		break;
 			case ITEM_VALUE_TYPE_STR:	$value_type = S_CHARACTER;		break;
 			case ITEM_VALUE_TYPE_LOG:	$value_type = S_LOG;			break;

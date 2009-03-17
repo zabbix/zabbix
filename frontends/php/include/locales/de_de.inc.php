@@ -851,7 +851,7 @@
 	'S_TYPE_OF_INFORMATION'=>			'Informationstyp',
 	'S_STORE_VALUE'=>			'Wert speichern',
 	'S_SHOW_VALUE'=>			'Wert anzeigen',
-	'S_NUMERIC_UINT64'=>			'nummerisch (integer 64bit)',
+	'S_NUMERIC_UNSIGNED'=>			'nummerisch (integer 64bit)',
 	'S_NUMERIC_FLOAT'=>			'nummerisch (float)',
 	'S_CHARACTER'=>			'Buchstabe',
 	'S_LOG'=>			'Log',

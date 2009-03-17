@@ -305,7 +305,7 @@
 	'S_KEEP_TRENDS_IN_DAYS'=>			'Trend da mantenere (in gg)',
 	'S_TYPE_OF_INFORMATION'=>			'Tipo di dato',
 	'S_STORE_VALUE'=>			'Memorizza il valore',
-	'S_NUMERIC_UINT64'=>			'Numerico (integer 64bit)',
+	'S_NUMERIC_UNSIGNED'=>			'Numerico (integer 64bit)',
 	'S_NUMERIC_FLOAT'=>			'Numerico (float)',
 	'S_CHARACTER'=>			'Alfabetico',
 	'S_LOG'=>			'Log',
