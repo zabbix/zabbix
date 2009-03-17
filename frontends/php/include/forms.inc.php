@@ -1405,14 +1405,7 @@
 
 
 			$cmbValType = new CComboBox("filter_value_type",$filter_value_type,"submit()");
-			$cmbValType->addItem(-1,	S_ALL_SMALL);
-			$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UINT64);
-			$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
-			$cmbValType->addItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
-			$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
-			$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
-			$form->addRow(array('with ',bold(S_TYPE_OF_INFORMATION)),$cmbValType);
-
+			$cmbValType->AddItem(-1,	S_ALL_SMALL);			$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);			$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);			$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);			$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);			$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);			$form->AddRow(array('with ',bold(S_TYPE_OF_INFORMATION)),$cmbValType);
 			if ($filter_value_type == ITEM_VALUE_TYPE_UINT64)
 			{
 				$cmbDataType = new CComboBox("filter_data_type", $filter_data_type, "submit()");
@@ -1742,12 +1735,7 @@
 		}
 		else{
 			$cmbValType = new CComboBox('value_type',$value_type,'submit()');
-			$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UINT64);
-			$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
-			$cmbValType->addItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
-			$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
-			$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
-		}
+			$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);			$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);			$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);			$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);			$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);		}
 		$frmItem->addRow(S_TYPE_OF_INFORMATION,$cmbValType);
 
 		if ($value_type == ITEM_VALUE_TYPE_UINT64) {
@@ -2060,13 +2048,7 @@
 			new CNumericBox('snmp_port',$snmp_port,5));
 
 		$cmbValType = new CComboBox('value_type',$value_type);
-		$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UINT64);
-		$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
-		$cmbValType->addItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
-		$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
-		$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
-		$frmItem->addRow(array( new CVisibilityBox('value_type_visible', get_request('value_type_visible'), 'value_type', S_ORIGINAL),
-			S_TYPE_OF_INFORMATION), $cmbValType);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);		$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);		$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);		$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);		$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);		$frmItem->AddRow(array( new CVisibilityBox('value_type_visible', get_request('value_type_visible'), 'value_type', S_ORIGINAL),			S_TYPE_OF_INFORMATION), $cmbValType);
 
 		$cmbDataType = new CComboBox('data_type',$data_type);
 		$cmbDataType->addItem(ITEM_DATA_TYPE_DECIMAL,		item_data_type2str(ITEM_DATA_TYPE_DECIMAL));

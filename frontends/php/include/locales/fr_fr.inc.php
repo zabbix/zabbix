@@ -659,7 +659,7 @@
 	'S_TYPE_OF_INFORMATION'=>			'Type d\'information',
 	'S_STORE_VALUE'=>			'Stocker valeur',
 	'S_SHOW_VALUE'=>			'Montrer valeur',
-	'S_NUMERIC_UINT64'=>			'Numérique (integer 64bit)',
+	'S_NUMERIC_UNSIGNED'=>			'Numérique (integer 64bit)',
 	'S_NUMERIC_FLOAT'=>			'Numérique (float)',
 	'S_CHARACTER'=>			'Caractère',
 	'S_LOG'=>			'Journal',

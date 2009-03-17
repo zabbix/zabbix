@@ -1065,7 +1065,7 @@
 	'S_HEXADECIMAL'=>			'Hexadecimal',
 	'S_STORE_VALUE'=>			'Store value',
 	'S_SHOW_VALUE'=>			'Show value',
-	'S_NUMERIC_UINT64'=>			'Numeric (integer 64bit)',
+	'S_NUMERIC_UNSIGNED'=>			'Numeric (unsigned)',
 	'S_NUMERIC_FLOAT'=>			'Numeric (float)',
 	'S_CHARACTER'=>				'Character',
 	'S_LOG'=>				'Log',

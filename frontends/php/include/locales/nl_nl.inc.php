@@ -451,7 +451,7 @@
 	'S_TYPE_OF_INFORMATION'=>			'Type informatie',
 	'S_STORE_VALUE'=>			'Bewaar waarde',
 	'S_SHOW_VALUE'=>			'Toon waarde',
-	'S_NUMERIC_UINT64'=>			'Numeriek (integer 64bit)',
+	'S_NUMERIC_UNSIGNED'=>			'Numeriek (integer 64bit)',
 	'S_NUMERIC_FLOAT'=>			'Numeriek (zwevend)',
 	'S_CHARACTER'=>			'Karakter',
 	'S_LOG'=>			'Log',
