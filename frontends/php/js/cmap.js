@@ -964,8 +964,14 @@ show_link_menu: function(e){
 		return false;
 	}
 	var ln_menu = new Array();
-	ln_menu.push(['Links menu',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
+	ln_menu.push(['Links menu',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);	
+	ln_menu.push(['<span onclick="javascript: ZBX_SYSMAPS['+this.id+'].map.add_empty_link();">Add Link</span>', 
+					'#', 
+					function(){return false;},
+					{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}
+					]);
 
+	
 	var link_count = 0;
 	for(var id in link_ids){
 		link_count++;
@@ -1032,6 +1038,12 @@ show_link_menu: function(e){
 			}
 			link_menu.push(sub_menu);
 		}
+
+		link_menu.push(['<span onclick="javascript: ZBX_SYSMAPS['+this.id+'].map.remove_link_by_id('+id+');">Remove Link</span>', 
+					'#', 
+					function(){return false;},
+					{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}
+					]);
 		ln_menu.push(link_menu);
 	}
 	show_popup_menu(e,ln_menu,280);// JavaScript Document
