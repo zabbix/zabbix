@@ -859,7 +859,7 @@
 	'S_TYPE_OF_INFORMATION'=>			'Typ informacji',
 	'S_STORE_VALUE'=>				'Zachowaj wartość',
 	'S_SHOW_VALUE'=>				'Pokaż wartość',
-	'S_NUMERIC_UINT64'=>				'Numerycznie (całkowita 64bit)',
+	'S_NUMERIC_UNSIGNED'=>				'Numerycznie (całkowita 64bit)',
 	'S_NUMERIC_FLOAT'=>				'Numerycznie (zmiennoprzecinkowo)',
 	'S_CHARACTER'=>					'Znak',
 	'S_LOG'=>					'Log',

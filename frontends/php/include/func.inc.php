@@ -221,8 +221,11 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 	$years = (int) ($time / (365*86400));
 	$time -= $years*365*86400;
 
-	$months = (int ) ($time / (30*86400));
-	$time -= $months*30*86400;
+	//$months = (int ) ($time / (30*86400));
+	//$time -= $months*30*86400;
+	 
+	$weeks = (int ) ($time / (7*86400));
+	$time -= $weeks*7*86400;
 	 
 	$days = (int) ($time / 86400);
 	$time -= $days*86400;
@@ -243,13 +246,13 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 	}
 	
 	$str =  (($years)?$years.'y ':'').
-			(($months)?$months.'m ':'').
+//			(($months)?$months.'m ':'').
+			(($weeks)?$weeks.'w ':'').
 			(($days)?$days.'d ':'').
 			(($hours && !$years)?$hours.'h ':'').
-			(($minutes && !$years && !$months)?$minutes.'m ':'').
-			((!$years && !$months && !$days && $seconds && (!$ms || $seconds))?$seconds.'s ':'').
-			(($ms && !$years && !$months && !$days && !$hours)?$ms.'ms':'');
-return $str;
+			(($minutes && !$years && !$weeks)?$minutes.'m ':'').			
+			((!$years && !$weeks && !$days && (!$ms || $seconds))?$seconds.'s ':'').			
+			(($ms && !$years && !$weeks && !$days && !$hours)?$ms.'ms':'');return $str;
 }
 
 function getmicrotime(){

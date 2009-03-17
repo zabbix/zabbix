@@ -742,7 +742,7 @@
 	'S_TYPE_OF_INFORMATION'=>		'データ型',
 	'S_STORE_VALUE'=>			'保存時の計算',
 	'S_SHOW_VALUE'=>			'値のマッピングの使用',
-	'S_NUMERIC_UINT64'=>			'数値(整数)',
+	'S_NUMERIC_UNSIGNED'=>			'数値(整数)',
 	'S_NUMERIC_FLOAT'=>			'数値 (浮動小数)',
 	'S_CHARACTER'=>				'文字',
 	'S_LOG'=>				'ログ',

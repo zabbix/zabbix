@@ -670,7 +670,7 @@
 	'S_TYPE_OF_INFORMATION'=>			'Type of information',
 	'S_STORE_VALUE'=>			'Store value',
 	'S_SHOW_VALUE'=>			'Show value',
-	'S_NUMERIC_UINT64'=>			'Numeric (integer 64bit)',
+	'S_NUMERIC_UNSIGNED'=>			'Numeric (integer 64bit)',
 	'S_NUMERIC_FLOAT'=>			'Numeric (float)',
 	'S_CHARACTER'=>			'Character',
 	'S_LOG'=>			'Log',
