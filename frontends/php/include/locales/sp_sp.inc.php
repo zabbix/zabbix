@@ -670,7 +670,7 @@
 	'S_TYPE_OF_INFORMATION'=>			'Tipo de información',
 	'S_STORE_VALUE'=>			'Valor almacenado',
 	'S_SHOW_VALUE'=>			'Mostrar valor',
-	'S_NUMERIC_UINT64'=>			'Numérico (entero de 64 bits)',
+	'S_NUMERIC_UNSIGNED'=>			'Numérico (entero de 64 bits)',
 	'S_NUMERIC_FLOAT'=>			'Numérico (coma flotante)',
 	'S_CHARACTER'=>			'Carácter',
 	'S_LOG'=>			'Registro',

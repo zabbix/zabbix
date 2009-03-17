@@ -451,7 +451,7 @@
 	'S_TYPE_OF_INFORMATION'=>			'Typ av information',
 	'S_STORE_VALUE'=>			'Lagra värde',
 	'S_SHOW_VALUE'=>			'Visa värde',
-	'S_NUMERIC_UINT64'=>			'Numerisk (heltal 64-bit)',
+	'S_NUMERIC_UNSIGNED'=>			'Numerisk (heltal 64-bit)',
 	'S_NUMERIC_FLOAT'=>			'Numerisk (flyttal)',
 	'S_CHARACTER'=>			'Tecken',
 	'S_LOG'=>			'Logg',
