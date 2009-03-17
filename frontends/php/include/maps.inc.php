@@ -402,7 +402,8 @@
 
 	function get_info_by_selement($element,$view_status=0){
 		global $colors;
-
+		$config=select_config();
+		
 		$el_name = '';
 		$tr_info = array();
 		$maintenance = array('status'=>false, 'maintenanceid'=>0);
@@ -459,7 +460,8 @@
 				}
 
 				do {
-					if(isset($_REQUEST['show_triggers']) && (TRIGGERS_OPTION_NOFALSEFORB == $_REQUEST['show_triggers'])){								
+					$orig_trig_value = $trigger['value'];
+					if(isset($_REQUEST['show_triggers']) && (TRIGGERS_OPTION_NOFALSEFORB == $_REQUEST['show_triggers'])){
 						$event_sql = 'SELECT e.eventid, e.value, e.clock, e.ms, e.objectid as triggerid, e.acknowledged, t.type '.
 							' FROM events e, triggers t '.
 							' WHERE e.object=0 AND e.objectid='.$trigger['triggerid'].
@@ -471,15 +473,30 @@
 //							$trigger = array_merge($trigger,$trigger_tmp);
 							$trigger['value'] = TRIGGER_VALUE_TRUE;
 						}
-
 					}
-					
+
 					$type	=& $trigger['value'];
 
 					if(!isset($tr_info[$type]))
 						$tr_info[$type] = array('count' => 0);
 
-					$tr_info[$type]['count']++;
+					if(isset($_REQUEST['show_triggers']) && (TRIGGERS_OPTION_NOFALSEFORB == $_REQUEST['show_triggers'])){
+						if($orig_trig_value == TRIGGER_VALUE_TRUE) $tr_info[$type]['count']++;
+						
+						$event_limit=0;
+						$res_events = DBSelect($event_sql,$config['event_show_max']*100);
+						while($row_event=DBfetch($res_events)){
+							$event_limit++;
+							if($row_event['value'] != TRIGGER_VALUE_TRUE) continue;
+
+							$tr_info[$type]['count']++;
+							if($event_limit >= $config['event_show_max']) break;
+						}
+					}
+					else{
+						$tr_info[$type]['count']++;
+					}
+
 					if(!isset($tr_info[$type]['priority']) || $tr_info[$type]['priority'] < $trigger["priority"])
 					{
 						$tr_info[$type]['priority']	= $trigger["priority"];

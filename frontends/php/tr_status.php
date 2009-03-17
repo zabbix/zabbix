@@ -432,6 +432,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 						' AND h.status='.HOST_STATUS_MONITORED.' '.
 						$cond.' '.
 					$sort;
+//SDI($sql);
 	$result = DBselect($sql);
 	while($row=DBfetch($result)){
 // Check for dependencies
@@ -460,7 +461,8 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 
 		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.ms, e.objectid as triggerid, e.acknowledged, t.type '.
 					' FROM events e, triggers t '.
-					' WHERE e.object='.EVENT_SOURCE_TRIGGERS.' AND e.objectid='.$row['triggerid'].
+					' WHERE e.object='.EVENT_SOURCE_TRIGGERS.
+						' AND e.objectid='.$row['triggerid'].
 						' AND t.triggerid=e.objectid '.
 						$cond.
 					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
@@ -562,9 +564,9 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				));
 
 		$event_limit=0;
+
 		$res_events = DBSelect($event_sql,$config['event_show_max']*100);
 		while($row_event=DBfetch($res_events)){
-
 			if($show_events == EVENTS_OPTION_NOFALSEFORB){
 				if((EVENTS_NOFALSEFORB_STATUS_FALSE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_FALSE)) continue;
 				if((EVENTS_NOFALSEFORB_STATUS_TRUE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_TRUE)) continue;
