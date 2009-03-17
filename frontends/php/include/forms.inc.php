@@ -4188,7 +4188,7 @@
 						$cmbConnectBy
 					);
 
-		$frmHost->AddRow(array(new CVisibilityBox('visible[port]', isset($visible['port']), 'port', S_ORIGINAL),S_PORT),
+		$frmHost->AddRow(array(new CVisibilityBox('visible[port]', isset($visible['port']), 'port', S_ORIGINAL),S_AGENT_PORT),
 						new CNumericBox('port',$port,5)
 					);
 
@@ -4904,7 +4904,7 @@
 			$frmHost->AddVar('status',$status);
 		}
 		else{
-			$frmHost->AddRow(S_PORT,new CNumericBox('port',$port,5));
+			$frmHost->AddRow(S_AGENT_PORT,new CNumericBox('port',$port,5));
 
 //Proxy
 			$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);

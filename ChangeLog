@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-794] fixed SQL error on login screen when postgre is used, small GUI typos fix (Vedmak)
  - [ZBX-702] events duration now counts weeks instead of months, small GUI typos fix (Vedmak)
  - [ZBX-537] Distributed monitoring: PosrgeSQL related fixes (Sasha)
  - [ZBX-792] fixed server memory leak in processing remote commands in actions (Dmitry)

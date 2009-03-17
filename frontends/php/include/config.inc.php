@@ -245,13 +245,13 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
 				$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid FROM nodes n';
 			}
-			else{
+			else{ 
 				$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid '.
 					' FROM nodes n, groups hg,rights r, users_groups g '.
 					' WHERE r.id=hg.groupid '.
 					 	' AND r.groupid=g.usrgrpid '.
 					 	' AND g.userid='.$USER_DETAILS['userid'].
-					 	' AND (hg.groupid div 100000000000000)=n.nodeid;';
+					 	' AND '.DBid2nodeid('hg.groupid').'=n.nodeid;';
 			}
 
 			$db_nodes = DBselect($sql);
