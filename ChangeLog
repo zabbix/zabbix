@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-673] fixed problem with adding the graphs on an autodiscovered hosts (Sasha)
  - [ZBX-795] fixed SQL error when try to activate auto-login in profile (Vedmak)
  - [ZBX-794] fixed SQL error on login screen when postgre is used, small GUI typos fix (Vedmak)
  - [ZBX-702] events duration now counts weeks instead of months, small GUI typos fix (Vedmak)
