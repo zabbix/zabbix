@@ -1256,6 +1256,8 @@ static int	DBupdate_graph_with_items(
 		int		graphtype,
 		int		show_legend,
 		int		show_3d,
+		double		percent_left,
+		double		percent_right,
 		ZBX_GRAPH_ITEMS	*gitems,
 		zbx_uint64_t	templateid
 	)
@@ -1366,7 +1368,7 @@ static int	DBupdate_graph_with_items(
 			result = DBupdate_graph_with_items(chd_graphid, name, width, height,
 				yaxistype, yaxismin, yaxismax,
 				show_work_period, show_triggers, graphtype, show_legend,
-				show_3d, new_gitems, graphid);
+				show_3d, percent_left, percent_right, new_gitems, graphid);
 
 			zbx_free_gitems(new_gitems);
 		}
@@ -1435,6 +1437,8 @@ static int	DBadd_graph(
 		int		graphtype,
 		int		show_legend,
 		int		show_3d,
+		double		percent_left,
+		double		percent_right,
 		zbx_uint64_t	templateid
 	)
 {
@@ -1450,8 +1454,10 @@ static int	DBadd_graph(
 	name_esc = DBdyn_escape_string_len(name, GRAPH_NAME_LEN);
 
 	DBexecute("insert into graphs"
-		" (graphid,name,width,height,yaxistype,yaxismin,yaxismax,show_work_period,show_triggers,graphtype,show_legend,show_3d,templateid)"
-		" values (" ZBX_FS_UI64 ",'%s',%i,%i,%i,%i,%i,%i,%i,%i,%i,%i," ZBX_FS_UI64 ")",
+			" (graphid,name,width,height,yaxistype,yaxismin,yaxismax,show_work_period,show_triggers,"
+			"graphtype,show_legend,show_3d,percent_left,percent_right,templateid)"
+			" values (" ZBX_FS_UI64 ",'%s',%d,%d,%d,%d,%d,%d,%d,"
+			"%d,%d,%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_UI64 ")",
 				graphid,
 				name_esc,
 				width,
@@ -1464,6 +1470,8 @@ static int	DBadd_graph(
 				graphtype,
 				show_legend,
 				show_3d,
+				percent_left,
+				percent_right,
 				templateid);
 	zbx_free(name_esc);
 
@@ -1506,6 +1514,8 @@ static int	DBadd_graph_with_items(
 		int		graphtype,
 		int		show_legend,
 		int		show_3d,
+		double		percent_left,
+		double		percent_right,
 		ZBX_GRAPH_ITEMS *gitems,
 		zbx_uint64_t	templateid
 	)
@@ -1559,7 +1569,8 @@ static int	DBadd_graph_with_items(
 	}
 
 
-	if ( SUCCEED == (result = DBadd_graph(new_graphid, name,width,height,yaxistype,yaxismin,yaxismax,show_work_period,show_triggers,graphtype,show_legend,show_3d,templateid)) )
+	if (SUCCEED == (result = DBadd_graph(new_graphid,name,width,height,yaxistype,yaxismin,yaxismax,show_work_period,show_triggers,
+					graphtype,show_legend,show_3d,percent_left,percent_right,templateid)))
 	{
 		for ( i=0; gitems[i].itemid != 0; i++ )
 		{
@@ -4061,7 +4072,6 @@ static int	DBcopy_graph_to_host(
 
 	ZBX_GRAPH_ITEMS chd_gitem;
 	ZBX_GRAPH_ITEMS *gitems = NULL;
-	ZBX_GRAPH_ITEMS *new_gitems = NULL;
 
 	zbx_uint64_t	chd_graphid = 0;
 	zbx_uint64_t	chd_templateid = 0;
@@ -4079,9 +4089,13 @@ static int	DBcopy_graph_to_host(
 	gitems[0].itemid = 0;
 	gitems_count = 0;
 
-	db_items = DBselect("select gi.itemid,gi.color,gi.drawtype,gi.sortorder,gi.yaxisside,gi.calc_fnc,gi.type,gi.periods_cnt "
-			"from graphs_items gi where gi.graphid=" ZBX_FS_UI64, graphid);
-	while ( (db_item_data = DBfetch(db_items)) )
+	db_items = DBselect("select dst.itemid,gi.color,gi.drawtype,gi.sortorder,gi.yaxisside,gi.calc_fnc,gi.type,gi.periods_cnt "
+			"from graphs_items gi,items i,items dst where gi.itemid=i.itemid and i.key_=dst.key_"
+			" and dst.hostid=" ZBX_FS_UI64 " and gi.graphid=" ZBX_FS_UI64,
+				hostid,
+				graphid);
+
+	while (NULL != (db_item_data = DBfetch(db_items)))
 	{
 		ZBX_STR2UINT64(gitems[gitems_count].itemid, db_item_data[0]);
 
@@ -4101,11 +4115,11 @@ static int	DBcopy_graph_to_host(
 	DBfree_result(db_items);
 
 	db_graphs = DBselect("select name,width,height,yaxistype,yaxismin,yaxismax,show_work_period,"
-			"show_triggers,graphtype,show_legend,show_3d from graphs where graphid=" ZBX_FS_UI64, graphid);
+			"show_triggers,graphtype,show_legend,show_3d,percent_left,percent_right from graphs where graphid=" ZBX_FS_UI64, graphid);
 
 	db_graph_data = DBfetch(db_graphs);
 
-	if ( (new_gitems = DBget_same_graphitems_for_host(gitems, hostid)) )
+	if (NULL != gitems)
 	{
 		chd_graphid = 0;
 		chd_graphs = DBselect("select distinct g.graphid,g.name,g.width,g.height,g.yaxistype,g.yaxismin,g.yaxismax,g.show_work_period,"
@@ -4113,11 +4127,11 @@ static int	DBcopy_graph_to_host(
 				" where g.graphid=gi.graphid and gi.itemid=i.itemid and i.hostid=" ZBX_FS_UI64, hostid);
 		while( !chd_graphid && (chd_graph_data = DBfetch(chd_graphs)))
 		{ /* compare graphs */
-			ZBX_STR2UINT64(chd_graphid, chd_graph_data[0]);
 			ZBX_STR2UINT64(chd_templateid, chd_graph_data[12]);
 
 			if ( chd_templateid != 0 ) continue;
 
+			ZBX_STR2UINT64(chd_graphid, chd_graph_data[0]);
 			equal = 0;
 			db_items = DBselect("select gi.itemid,gi.color,gi.drawtype,gi.sortorder,"
 					"gi.yaxisside,gi.calc_fnc,gi.type,gi.periods_cnt "
@@ -4135,9 +4149,9 @@ static int	DBcopy_graph_to_host(
 				chd_gitem.periods_cnt	= atoi(db_item_data[7]);
 
 				gitem_equal = 0;
-				for ( i = 0; new_gitems[i].itemid != 0; i++ )
+				for ( i = 0; gitems[i].itemid != 0; i++ )
 				{
-					if(DBcmp_graphitems(&new_gitems[i], &chd_gitem))	continue;
+					if(DBcmp_graphitems(&gitems[i], &chd_gitem))	continue;
 
 					gitem_equal = 1;
 					break;
@@ -4180,7 +4194,9 @@ static int	DBcopy_graph_to_host(
 				atoi(db_graph_data[8]),	/* graphtype */
 				atoi(db_graph_data[9]),	/* show_legend */
 				atoi(db_graph_data[10]),/* show_3d */
-				new_gitems,
+				atof(db_graph_data[11]),/* percent_left */
+				atof(db_graph_data[12]),/* percent_right */
+				gitems,
 				copy_mode ? 0 : graphid);
 		}
 		else
@@ -4198,11 +4214,11 @@ static int	DBcopy_graph_to_host(
 				atoi(db_graph_data[8]),	/* graphtype */
 				atoi(db_graph_data[9]),	/* show_legend */
 				atoi(db_graph_data[10]),/* show_3d */
-				new_gitems,
+				atof(db_graph_data[11]),/* percent_left */
+				atof(db_graph_data[12]),/* percent_right */
+				gitems,
 				copy_mode ? 0 : graphid);
 		}
-
-		zbx_free_gitems(new_gitems);
 	}
 	else
 	{
@@ -4251,7 +4267,7 @@ static int	DBcopy_template_graphs(
 
 	if( 0 == templateid)
 	{ /* sync with all linkage templates */
-		db_elements = DBselect("select templateid from hosts_templates where hostid=" ZBX_FS_UI64, hostid);
+		db_elements = DBselect("select templateid from graphs where hostid=" ZBX_FS_UI64, hostid);
 
 		while( (element_data = DBfetch(db_elements)) )
 		{
@@ -4259,7 +4275,7 @@ static int	DBcopy_template_graphs(
 			if( 0 == elementid ) continue;
 
 			/* recursion */
-			if( SUCCEED != (result = DBcopy_template_triggers(hostid, elementid, copy_mode)) )
+			if( SUCCEED != (result = DBcopy_template_graphs(hostid, elementid, copy_mode)) )
 				break;
 		}
 
@@ -4442,7 +4458,7 @@ static int	DBdelete_sysmaps_elements_with_hostid(
 
 	int	result = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In DBsync_host_with_templates(%d)", hostid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBsync_host_with_templates(" ZBX_FS_UI64 ")", hostid);
 
 	db_templates = DBselect("select templateid,items,triggers,graphs from hosts_templates where hostid=" ZBX_FS_UI64, hostid);
 
