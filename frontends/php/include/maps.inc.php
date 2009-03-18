@@ -481,28 +481,30 @@
 						$tr_info[$type] = array('count' => 0);
 
 					if(isset($_REQUEST['show_triggers']) && (TRIGGERS_OPTION_NOFALSEFORB == $_REQUEST['show_triggers'])){
-						if($orig_trig_value == TRIGGER_VALUE_TRUE) $tr_info[$type]['count']++;
-						
+						$trig_ack = 0;
 						$event_limit=0;
 						$res_events = DBSelect($event_sql,$config['event_show_max']*100);
 						while($row_event=DBfetch($res_events)){
 							$event_limit++;
 							if($row_event['value'] != TRIGGER_VALUE_TRUE) continue;
 
+							$trig_ack = 1;
 							$tr_info[$type]['count']++;
 							if($event_limit >= $config['event_show_max']) break;
 						}
+						
+						if($orig_trig_value == TRIGGER_VALUE_TRUE) $tr_info[$type]['count']+=$trig_ack;
 					}
 					else{
 						$tr_info[$type]['count']++;
 					}
-
-					if(!isset($tr_info[$type]['priority']) || $tr_info[$type]['priority'] < $trigger["priority"])
-					{
+					
+					if(!isset($tr_info[$type]['priority']) || $tr_info[$type]['priority'] < $trigger["priority"]){
 						$tr_info[$type]['priority']	= $trigger["priority"];
 						if($el_type != SYSMAP_ELEMENT_TYPE_TRIGGER && $type!=TRIGGER_VALUE_UNKNOWN)
 							$tr_info[$type]['info']		= expand_trigger_description_by_data($trigger);
 					}
+
 				} while ($trigger = DBfetch($db_triggers));
 			}
 			elseif($el_type == SYSMAP_ELEMENT_TYPE_HOST)
@@ -544,6 +546,11 @@
 			}
 		}
 
+		if(isset($tr_info[TRIGGER_VALUE_TRUE]) && ($tr_info[TRIGGER_VALUE_TRUE]['count'] == 0)){
+			$tr_info[TRIGGER_VALUE_FALSE] = $tr_info[TRIGGER_VALUE_TRUE];
+			unset($tr_info[TRIGGER_VALUE_TRUE]);
+		}
+		
 		if(isset($tr_info[TRIGGER_VALUE_TRUE])){
 			$inf =& $tr_info[TRIGGER_VALUE_TRUE];
 

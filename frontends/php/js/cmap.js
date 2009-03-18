@@ -1039,7 +1039,7 @@ show_link_menu: function(e){
 			link_menu.push(sub_menu);
 		}
 
-		link_menu.push(['<span onclick="javascript: ZBX_SYSMAPS['+this.id+'].map.remove_link_by_id('+id+');">Remove Link</span>', 
+		link_menu.push(['<span onclick="javascript: ZBX_SYSMAPS['+this.id+'].map.remove_link_by_id('+id+'); ZBX_SYSMAPS['+this.id+'].map.update_mapimg(); ">Remove Link</span>', 
 					'#', 
 					function(){return false;},
 					{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}
