@@ -89,17 +89,24 @@ include_once('include/page_header.php');
 					$_REQUEST['iconid_disabled'],$_REQUEST['url'],$_REQUEST['label_location']);
 				$selementid = $_REQUEST['selementid'];
 			}
-
+			else{
+				info('Map element is not selected');
+			}
+			
 			show_messages($result,'Element updated','Cannot update element');
 		}
 		else{ // add element
-		
-			$result=add_element_to_sysmap($_REQUEST['sysmapid'],$_REQUEST['elementid'],
-				$_REQUEST['elementtype'],$_REQUEST['label'],$_REQUEST['x'],$_REQUEST['y'],
-				$_REQUEST['iconid_off'],$_REQUEST['iconid_unknown'],$_REQUEST['iconid_on'],
-				$_REQUEST['iconid_disabled'],$_REQUEST['url'],$_REQUEST['label_location']);
-			$selementid = $result;
-
+			if(($_REQUEST['elementid']>0) || ($_REQUEST['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)){
+				$result=add_element_to_sysmap($_REQUEST['sysmapid'],$_REQUEST['elementid'],
+					$_REQUEST['elementtype'],$_REQUEST['label'],$_REQUEST['x'],$_REQUEST['y'],
+					$_REQUEST['iconid_off'],$_REQUEST['iconid_unknown'],$_REQUEST['iconid_on'],
+					$_REQUEST['iconid_disabled'],$_REQUEST['url'],$_REQUEST['label_location']);
+				$selementid = $result;
+			}
+			else{
+				info('Map element is not selected');
+			}
+			
 			show_messages($result,'Element added','Cannot add element');
 		}
 		add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].'] Element ['.$selementid.'] updated ');
