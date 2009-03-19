@@ -93,11 +93,12 @@ filr:		'',
 reference:	'',
 path:		'',
 query:		'',
-arguments:  {},
+args:  null,
 
 initialize: function(url){
 	this.url=unescape(url);
-
+	this.args = {};
+	
 	this.query=(this.url.indexOf('?')>=0)?this.url.substring(this.url.indexOf('?')+1):'';
 	if(this.query.indexOf('#')>=0) this.query=this.query.substring(0,this.query.indexOf('#'));
 	
@@ -165,12 +166,12 @@ initialize: function(url){
 
 
 formatQuery: function(){
-	if(this.arguments.lenght < 1) return;
+	if(this.args.lenght < 1) return;
 	
 	var query = '';
-	for(var key in this.arguments){
-		if((typeof(this.arguments[key]) != 'undefined') && !is_null(this.arguments[key])){
-			query+=key+'='+this.arguments[key]+'&';
+	for(var key in this.args){
+		if((typeof(this.args[key]) != 'undefined') && !is_null(this.args[key])){
+			query+=key+'='+this.args[key]+'&';
 		}
 	}
 	this.query = query.substring(0,query.length-1);
@@ -184,27 +185,27 @@ formatArguments: function(){
 	
 	for(i=0; i<args.length; i++){
 		keyval = args[i].split('=');
-		this.arguments[keyval[0]] = (keyval.length>1)?keyval[1]:'';
+		this.args[keyval[0]] = (keyval.length>1)?keyval[1]:'';
 	}
 },
 
 setArgument: function(key,value){
-	this.arguments[key] = value;
+	this.args[key] = value;
 	this.formatQuery();
 },
 
 unsetArgument: function(key){
-	delete(this.arguments[key]);
+	delete(this.args[key]);
 	this.formatQuery();
 },
 
 getArgument: function(key){
-	if(typeof(this.arguments[key]) != 'undefined') return this.arguments[key];
+	if(typeof(this.args[key]) != 'undefined') return this.args[key];
 	else return null;
 },
 
 getArguments: function(){
-	return this.arguments;
+	return this.args;
 },
 
 getUrl: function(){

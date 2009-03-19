@@ -108,12 +108,12 @@ return $result;
 //----------- ADD/EDIT USERPROFILE -------------
 function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$source=null){
 	global $USER_DETAILS;
-	if($USER_DETAILS["alias"]==ZBX_GUEST_USER) return false;
+	if($USER_DETAILS['alias']==ZBX_GUEST_USER) return false;
 
 	if(profile_type($type,'unknown')) $type = profile_type_by_value($value);
 	else $value = profile_value_by_type($value,$type);
 	
-//if($idx == 'web.view.hostid') SDI('PROF: '.value);
+//if($idx == 'web.audit.filter.action') SDI('PROF: v='.$value.'  t='.$type);
 
 	if($value === false) return false;
 
@@ -149,7 +149,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 		else{
 			$val = array();
 			$value_type = profile_field_by_type($type);
-			
+
 			$val['value_id'] = 0;
 			$val['value_int'] = 0;
 			$val['value_str'] = '';
@@ -174,7 +174,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 				' WHERE userid='.$USER_DETAILS["userid"].
 					' AND idx='.zbx_dbstr($idx).
 					$sql_cond;
-					
+//if($idx == 'web.audit.filter.action') SDI($sql);
 			$result = DBexecute($sql);
 		}
 	}
@@ -280,7 +280,8 @@ function profile_type_by_value($value,$type=PROFILE_TYPE_UNKNOWN){
 		}
 	}
 	else{
-		if(zbx_numeric($value)) $type = PROFILE_TYPE_ID;
+		if(zbx_ctype_digit($value)) $type = PROFILE_TYPE_ID;
+		else if(zbx_numeric($value)) $type = PROFILE_TYPE_INT;
 		else $type = PROFILE_TYPE_STR;
 	}
 return $type;
