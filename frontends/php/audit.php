@@ -74,7 +74,7 @@ include_once "include/page_header.php";
 /* AJAX */	
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.audit.filter.state',$_REQUEST['state']);
+			update_profile('web.audit.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}	
 
@@ -105,13 +105,13 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		update_profile('web.audit.filter.userid',$_REQUEST['userid']);
 		
-		update_profile('web.audit.filter.timesince',$_REQUEST['filter_timesince']);
-		update_profile('web.audit.filter.timetill',$_REQUEST['filter_timetill']);
+		update_profile('web.audit.filter.timesince',$_REQUEST['filter_timesince'], PROFILE_TYPE_INT);
+		update_profile('web.audit.filter.timetill',$_REQUEST['filter_timetill'], PROFILE_TYPE_INT);
 	}
 // --------------
 
 	$config = $_REQUEST["config"];
-	update_profile("web.hosts.config",$_REQUEST["config"]);
+	update_profile("web.audit.config",$_REQUEST["config"], PROFILE_TYPE_INT);
 	
 	
 	$_REQUEST["start"] = get_request("start", 0);
@@ -310,7 +310,9 @@ include_once "include/page_header.php";
 
 	$reset = new CButton("filter_rst",S_RESET);
 	$reset->SetType('button');
-	$reset->SetAction('javascript: var uri = new url(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+	$reset->SetAction("javascript: var uri = new url(location.href); ".
+							"uri.setArgument('filter_rst',1);  ".
+							"location.href = uri.getUrl();");
 
 	$filterForm->AddItemToBottomRow(new CButton("filter_set",S_FILTER));
 	$filterForm->AddItemToBottomRow($reset);

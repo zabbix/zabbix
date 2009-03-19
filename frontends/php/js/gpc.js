@@ -79,8 +79,6 @@ erase: function (name) {
 
 cookie.init();
 
-
-
 // Title: url manipulation class
 // Author: Aly
 var url = Class.create();
@@ -96,14 +94,15 @@ filr:		'',
 reference:	'',
 path:		'',
 query:		'',
-arguments:  {},
+args: 		null,
 
 initialize: function(url){
 	this.url=unescape(url);
-	
+	this.args = {};
+
 	this.query=(this.url.indexOf('?')>=0)?this.url.substring(this.url.indexOf('?')+1):'';
 	if(this.query.indexOf('#')>=0) this.query=this.query.substring(0,this.query.indexOf('#'));
-	
+
 	var protocolSepIndex=this.url.indexOf('://');
 	if(protocolSepIndex>=0){
 		this.protocol=this.url.substring(0,protocolSepIndex).toLowerCase();
@@ -149,7 +148,7 @@ initialize: function(url){
 	else{
 		this.file=this.url;
 	}
-	
+
 	if(this.file.indexOf('?')>=0) this.file=this.file.substring(0, this.file.indexOf('?'));
 
 	var refSepIndex=url.indexOf('#');
@@ -157,23 +156,26 @@ initialize: function(url){
 		this.file=this.file.substring(0,refSepIndex);
 		this.reference=this.url.substring(this.url.indexOf('#'));
 	}
+
 	this.path=this.file;
 	if(this.query.length>0) this.file+='?'+this.query;
 	if(this.reference.length>0) this.file+='#'+this.reference;
 	if(this.query.length > 0)	this.formatArguments();
-	
+
 	var sid = cookie.read('zbx_sessionid');
 	this.setArgument('sid', sid.substring(16));
+
+//	this.setArgument('output', null);
 },
 
 
 formatQuery: function(){
-	if(this.arguments.lenght < 1) return;
+	if(this.args.lenght < 1) return;
 	
 	var query = '';
-	for(var key in this.arguments){
-		if((typeof(this.arguments[key]) != 'undefined') && !is_null(this.arguments[key])){
-			query+=key+'='+this.arguments[key]+'&';
+	for(var key in this.args){
+		if((typeof(this.args[key]) != 'undefined') && !is_null(this.args[key])){
+			query+=key+'='+this.args[key]+'&';
 		}
 	}
 	this.query = query.substring(0,query.length-1);
@@ -187,22 +189,22 @@ formatArguments: function(){
 	
 	for(i=0; i<args.length; i++){
 		keyval = args[i].split('=');
-		this.arguments[keyval[0]] = (keyval.length>1)?keyval[1]:'';
+		this.args[keyval[0]] = (keyval.length>1)?keyval[1]:'';
 	}
 },
 
 setArgument: function(key,value){
-	this.arguments[key] = value;
+	this.args[key] = value;
 	this.formatQuery();
 },
 
 getArgument: function(key){
-	if(typeof(this.arguments[key]) != 'undefined') return this.arguments[key];
+	if(typeof(this.args[key]) != 'undefined') return this.args[key];
 	else return null;
 },
 
 getArguments: function(){
-	return this.arguments;
+	return this.args;
 },
 
 getUrl: function(){

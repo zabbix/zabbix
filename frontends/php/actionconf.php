@@ -108,7 +108,7 @@ include_once 'include/page_header.php';
 /* AJAX */	
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.audit.filter.state',$_REQUEST['state']);
+			update_profile('web.audit.filter.state',$_REQUEST['state'],PROFILE_TYPE_INT);
 		}
 	}	
 
@@ -122,7 +122,7 @@ include_once 'include/page_header.php';
 	}
 ?>
 <?php
-	update_profile('web.actionconf.eventsource',$_REQUEST['eventsource']);
+	update_profile('web.actionconf.eventsource',$_REQUEST['eventsource'], PROFILE_TYPE_INT);
 ?>
 <?php
 	if(inarr_isset(array('clone','actionid'))){

@@ -23,12 +23,11 @@ function send_params(params){
 
 	var uri = new url(location.href);
 	uri.setQuery('?output=ajax');
-
 	new Ajax.Request(uri.getUrl(),
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(resp){ },
+						'onSuccess': function(resp){},
 //						'onSuccess': function(resp){ alert(resp.responseText); },
 						'onFailure': function(){ document.location = uri.getPath()+'?'+Object.toQueryString(params); }
 					}
