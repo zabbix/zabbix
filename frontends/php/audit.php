@@ -76,7 +76,7 @@ include_once 'include/page_header.php';
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.audit.filter.state',$_REQUEST['state']);
+			update_profile('web.audit.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
@@ -97,6 +97,7 @@ include_once 'include/page_header.php';
 
 	$_REQUEST['userid'] = get_request('userid',get_profile('web.audit.filter.userid',0));
 	$_REQUEST['action'] = get_request('action',get_profile('web.audit.filter.action',-1));
+SDI($_REQUEST['action']);
 	$_REQUEST['resourcetype'] = get_request('resourcetype',get_profile('web.audit.filter.resourcetype',-1));
 
 	$_REQUEST['filter_timesince'] = get_request('filter_timesince',get_profile('web.audit.filter.timesince',0));
@@ -110,16 +111,16 @@ include_once 'include/page_header.php';
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		update_profile('web.audit.filter.userid',$_REQUEST['userid']);
-		update_profile('web.audit.filter.action',$_REQUEST['action']);
-		update_profile('web.audit.filter.resourcetype',$_REQUEST['resourcetype']);
+		update_profile('web.audit.filter.action',$_REQUEST['action'], PROFILE_TYPE_INT);
+		update_profile('web.audit.filter.resourcetype',$_REQUEST['resourcetype'], PROFILE_TYPE_INT);
 
-		update_profile('web.audit.filter.timesince',$_REQUEST['filter_timesince']);
-		update_profile('web.audit.filter.timetill',$_REQUEST['filter_timetill']);
+		update_profile('web.audit.filter.timesince',$_REQUEST['filter_timesince'], PROFILE_TYPE_INT);
+		update_profile('web.audit.filter.timetill',$_REQUEST['filter_timetill'], PROFILE_TYPE_INT);
 	}
 // --------------
 
 	$config = $_REQUEST['config'];
-	update_profile('web.hosts.config',$_REQUEST['config']);
+	update_profile('web.audit.config',$_REQUEST['config'], PROFILE_TYPE_INT);
 
 
 	$_REQUEST['start'] = get_request('start', 0);
@@ -222,7 +223,12 @@ include_once 'include/page_header.php';
 			));
 			$row_count++;
 		}
-						$numrows = new CSpan(null,'info');		$numrows->addOption('name','numrows');			$header = get_table_header(array(S_AUDIT_LOGS,						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),						S_FOUND.': ',$numrows,)						);					show_table_header($header, $frmForm);	}
+
+		$numrows = new CSpan(null,'info');
+		$numrows->addOption('name','numrows');
+		$header = get_table_header(array(S_AUDIT_LOGS, new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'), S_FOUND.': ',$numrows,));
+		show_table_header($header, $frmForm);	
+	}
 	else if(1 == $config){
 		$table = get_history_of_actions($_REQUEST["start"], PAGE_SIZE, $sql_cond);		
 		$row_count = $table->GetNumRows();	
@@ -232,7 +238,7 @@ include_once 'include/page_header.php';
 		$header = get_table_header(array(S_AUDIT_ACTIONS,
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 						S_FOUND.': ',$numrows,)
-						);			
+						);
 		show_table_header($header, $frmForm);
 	}
 
