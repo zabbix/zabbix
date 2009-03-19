@@ -89,10 +89,13 @@ require_once "include/httptest.inc.php";
 		if(zbx_empty($newgroup))
 			 return true;
 
-		$groupid = db_save_group($newgroup);
-		if(!$groupid)
-			return	$groupid;
-		
+		$group = DBfetch(DBselect('SELECT groupid FROM groups WHERE name='.zbx_dbstr($newgroup)));
+		$groupid = $group['groupid'];
+		if(!$groupid) {
+			$groupid = db_save_group($newgroup);
+			if(!$groupid)
+				return	$groupid;
+		}		
 		return add_host_to_group($hostid, $groupid);
 	}
 
