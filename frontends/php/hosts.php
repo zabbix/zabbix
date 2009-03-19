@@ -318,16 +318,19 @@ include_once('include/page_header.php');
 			if($result && isset($visible['useprofile'])){
 				
 				$host_profile=DBfetch(DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$hostid));
-				
+				$host_profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag',
+					'macaddress', 'hardware', 'software', 'contact', 'location', 'notes');
+
 				delete_host_profile($hostid);			
 				
 				if(get_request('useprofile','no') == 'yes'){				
-					foreach($host_profile as $key => $value){
-						if(isset($visible[$key])){
-							$host_profile[$key] = $_REQUEST[$key];
-						}
+					foreach($host_profile_fields as $field){
+						if(isset($visible[$field])) 
+							$host_profile[$field] = $_REQUEST[$field];
+						elseif(!isset($host_profile[$field])) 
+							$host_profile[$field] = '';								
 					}
-
+					
 					$result &= add_host_profile($hostid,
 						$host_profile['devicetype'],$host_profile['name'],$host_profile['os'],
 						$host_profile['serialno'],$host_profile['tag'],$host_profile['macaddress'],
@@ -340,23 +343,27 @@ include_once('include/page_header.php');
 			if($result && isset($visible['useprofile_ext'])){
 
 				$host_profile_ext=DBfetch(DBselect('SELECT * FROM hosts_profiles_ext WHERE hostid='.$hostid));
-
+				$host_profile_ext_fields = array('device_alias','device_type','device_chassis','device_os','device_os_short',
+					'device_hw_arch','device_serial','device_model','device_tag','device_vendor','device_contract',
+					'device_who','device_status','device_app_01','device_app_02','device_app_03','device_app_04',
+					'device_app_05','device_url_1','device_url_2','device_url_3','device_networks','device_notes',
+					'device_hardware','device_software','ip_subnet_mask','ip_router','ip_macaddress','oob_ip',
+					'oob_subnet_mask','oob_router','date_hw_buy','date_hw_install','date_hw_expiry','date_hw_decomm','site_street_1',
+					'site_street_2','site_street_3','site_city','site_state','site_country','site_zip','site_rack','site_notes',
+					'poc_1_name','poc_1_email','poc_1_phone_1','poc_1_phone_2','poc_1_cell','poc_1_screen','poc_1_notes','poc_2_name',
+					'poc_2_email','poc_2_phone_1','poc_2_phone_2','poc_2_cell','poc_2_screen','poc_2_notes');
+				
 				delete_host_profile_ext($hostid);
 //ext_host_profiles
 				$useprofile_ext = get_request('useprofile_ext',false);
 				$ext_host_profiles = get_request('ext_host_profiles',array());
-				
-				if($useprofile_ext && !empty($ext_host_profiles)){
-					$result = add_host_profile_ext($hostid, $ext_host_profiles);
-				}
-				$result = DBend($result);
-				
+							
 				if($useprofile_ext && !empty($ext_host_profiles)){
 					$ext_host_profiles = get_request('ext_host_profiles',array());
 					
-					foreach($host_profile_ext as $key => $value){
-						if(isset($visible[$key])){
-							$host_profile_ext[$key] = $ext_host_profiles[$key];
+					foreach($host_profile_ext_fields as $field){
+						if(isset($visible[$field])){
+							$host_profile_ext[$field] = $ext_host_profiles[$field];
 						}
 					}
 
