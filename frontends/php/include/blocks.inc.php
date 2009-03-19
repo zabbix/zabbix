@@ -243,9 +243,8 @@ function make_system_summary(){
 		}
 
 		foreach($tab_priority as $key => $value){
-			$normal = $value;
+			$tr_count = 0;
 			if($value){
-				$tr_count = 0;
 //* trigger list
 				$table_inf  = new CTableInfo();
 				$table_inf->AddOption('style', 'width: 400px;');
@@ -329,7 +328,7 @@ function make_system_summary(){
 				$value->SetHint($table_inf);
 //-------------*/
 			}
-			$group_row->AddItem(new CCol($value,get_severity_style($key,$normal)));
+			$group_row->AddItem(new CCol($value,get_severity_style($key,$tr_count)));
 			unset($table_inf);
 		}		
 		$table->AddRow($group_row);
