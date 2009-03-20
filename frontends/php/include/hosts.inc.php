@@ -460,6 +460,8 @@ require_once "include/httptest.inc.php";
 		
 // disable actions
 		$actionids = array();
+		
+// conditions
 		$sql = 'SELECT DISTINCT actionid '.
 				' FROM conditions '.
 				' WHERE conditiontype='.CONDITION_TYPE_HOST.
@@ -472,6 +474,21 @@ require_once "include/httptest.inc.php";
 		DBexecute('UPDATE actions '.
 					' SET status='.ACTION_STATUS_DISABLED.
 					' WHERE '.DBcondition('actionid',$actionids));
+// operations		
+		$sql = 'SELECT DISTINCT o.actionid '.
+				' FROM operations o '.
+				' WHERE o.operationtype IN ('.OPERATION_TYPE_GROUP_ADD.','.OPERATION_TYPE_GROUP_REMOVE.') '.
+					' AND '.DBcondition('o.objectid',$hostids);
+		$db_actions = DBselect($sql);
+		while($db_action = DBfetch($db_actions)){
+			$actionids[$db_action['actionid']] = $db_action['actionid'];
+		}
+		
+		if(!empty($actionids)){
+			DBexecute('UPDATE actions '.
+					' SET status='.ACTION_STATUS_DISABLED.
+					' WHERE '.DBcondition('actionid',$actionids));
+		}
 
 
 // delete action conditions
@@ -479,6 +496,13 @@ require_once "include/httptest.inc.php";
 					' WHERE conditiontype='.CONDITION_TYPE_HOST.
 						' AND '.DBcondition('value',$hostids, false, true)); 	// FIXED[POSIBLE value type violation]!!!
 
+
+// delete action operations
+		DBexecute('DELETE FROM operations '.
+					' WHERE operationtype IN ('.OPERATION_TYPE_TEMPLATE_ADD.','.OPERATION_TYPE_TEMPLATE_REMOVE.') '.
+						' AND '.DBcondition('objectid',$hostids));
+						
+						
 // delete host profile
 		delete_host_profile($hostids);
 		delete_host_profile_ext($hostids);
@@ -505,23 +529,43 @@ require_once "include/httptest.inc.php";
 		
 // disable actions
 		$actionids = array();
-		$sql = 'SELECT DISTINCT actionid '.
-				' FROM conditions '.
-				' WHERE conditiontype='.CONDITION_TYPE_HOST_GROUP.
-					' AND '.DBcondition('value',$groupids, false, true);		// FIXED[POSIBLE value type violation]!!!
+		
+// conditions
+		$sql = 'SELECT DISTINCT c.actionid '.
+				' FROM conditions c '.
+				' WHERE c.conditiontype='.CONDITION_TYPE_HOST_GROUP.
+					' AND '.DBcondition('c.value',$groupids, false, true);
 		$db_actions = DBselect($sql);
 		while($db_action = DBfetch($db_actions)){
 			$actionids[$db_action['actionid']] = $db_action['actionid'];
 		}
 
-		DBexecute('UPDATE actions '.
+// operations		
+		$sql = 'SELECT DISTINCT o.actionid '.
+				' FROM operations o '.
+				' WHERE o.operationtype IN ('.OPERATION_TYPE_GROUP_ADD.','.OPERATION_TYPE_GROUP_REMOVE.') '.
+					' AND '.DBcondition('o.objectid',$groupids);
+		$db_actions = DBselect($sql);
+		while($db_action = DBfetch($db_actions)){
+			$actionids[$db_action['actionid']] = $db_action['actionid'];
+		}
+		
+		if(!empty($actionids)){
+			DBexecute('UPDATE actions '.
 					' SET status='.ACTION_STATUS_DISABLED.
 					' WHERE '.DBcondition('actionid',$actionids));
+		}
+		
 
 // delete action conditions
-		DBexecute('DELETE FROM conditions '.
+		DBexecute('DELETE FROM conditions'.
 					' WHERE conditiontype='.CONDITION_TYPE_HOST_GROUP.
-						' AND '.DBcondition('value',$groupids, false, true));		// FIXED[POSIBLE value type violation]!!!
+						' AND '.DBcondition('value',$groupids, false, true));
+
+// delete action operations
+		DBexecute('DELETE FROM operations '.
+					' WHERE operationtype IN ('.OPERATION_TYPE_GROUP_ADD.','.OPERATION_TYPE_GROUP_REMOVE.') '.
+						' AND '.DBcondition('objectid',$groupids));
 						
 		if(!DBexecute('DELETE FROM hosts_groups WHERE '.DBcondition('groupid',$groupids)))
 			return false;
