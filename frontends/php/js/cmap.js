@@ -84,6 +84,7 @@ mlink: {
 	selementid1:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	selementid2:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	triggerid:		0,				// ALWAYS must be a STRING (js doesn't support uint64)
+	tr_desc:		'Select',		// default trigger caption
 	drawtype_off:	0,
 	color_off:		'Green',
 	drawtype_on:	0,
@@ -992,7 +993,7 @@ show_link_menu: function(e){
 				
 				var srctbl1 = 'triggers';
 				var srcfld1 = form_key;
-	
+
 				var value_action = 'javascript: '+
 							"PopUp('popup.php?srctbl="+srctbl1+
 								'&reference=sysmap_link'+
@@ -1002,7 +1003,8 @@ show_link_menu: function(e){
 								'&dstfrm=null'+
 								'&srcfld1='+srcfld1+
 								"&dstfld1="+srcfld1+"',800,450); void(0);",
-				value_action = '<span onclick="'+value_action+'">'+values['value']+'</span>';					
+				value_action = '<span onclick="'+value_action+'">'+mlink['tr_desc']+'</span>';
+
 				sub_menu.push([value_action,'#',function(){return false;}]);
 			}
 			else if((form_key == 'selementid1') || (form_key == 'selementid2')){

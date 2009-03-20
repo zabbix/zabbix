@@ -115,6 +115,15 @@ include_once "include/page_header.php";
 							if(is_int($key)) unset($link[$key]);
 						}
 
+						$description = S_SELECT;
+						if(isset($link['triggerid']) && !empty($link['triggerid'])){
+							$hosts = get_hosts_by_triggerid($link['triggerid']);
+							if($host = DBfetch($hosts)){
+								$description = $host['host'].':'.expand_trigger_description($link['triggerid']);
+							}
+						}
+						$link['tr_desc'] = $description;
+						
 						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_link('.zbx_jsvalue($link).'); '."\n";
 					}
 					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_mapimg(); '."\n";
