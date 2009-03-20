@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [DEV-315] when graph shows current time values, ">>" character is shown near end time (Vedmak)
  - [DEV-311] added caching of dynamic SNMP indexes (Sasha)
  - [ZBX-685] fixed "System status" cell colors with 0 active triggers (Vedmak) 
  - [ZBX-799] fixed hosts massupdate with "new group" and "use profile" (Vedmak)
