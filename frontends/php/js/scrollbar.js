@@ -155,7 +155,7 @@ initialize: function(stime,period,bar_stime,width){ // where to put bar on start
 
 		this.barX = this.time2px(bar_stime - this.starttime);
 		this.barX = this.checkbarX(0);
-//SDI(this.xp+' : '+this.period+' : '+bar_stime+' : '+this.starttime+" ---||--- "+this.barX+' : '+this.barW+' : '+this.scrollbarMaxW);		
+//SDI(this.xp+' : '+this.period+' : '+bar_stime+' : '+this.starttime+" ---||--- "+this.barX+' : '+this.barW+' : '+this.scrollbarMaxW);
 		this.barchangeW();
 		this.movescroll();
 
@@ -551,6 +551,14 @@ settabinfo: function(){
 	
 	var date = datetoarray((this.sdt.getTime() / 1000) + this.period);
 	this.scrl_tabinforight.innerHTML = date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4]+':'+date[5];
+
+	if((this.barX + this.barW) == this.scrollbarMaxW) {
+		this.scrl_tabinforight_flag.show();
+	}
+	else {
+		this.scrl_tabinforight_flag.hide();
+	}
+
 },
 
 calcperiod: function(){
@@ -631,6 +639,12 @@ scrollcreate: function(w){
 	this.scrl_tabinforight.setAttribute('id','scrolltabright');
 	this.scrl_tabinforight.appendChild(document.createTextNode('0'));
 	
+	this.scrl_tabinforight_flag = document.createElement('div');
+	this.scrl_scroll.appendChild(this.scrl_tabinforight_flag);
+	
+	Element.extend(this.scrl_tabinforight_flag);
+	this.scrl_tabinforight_flag.setAttribute('id','scrolltabright_flag');
+	this.scrl_tabinforight_flag.innerHTML = '&raquo;';
 
 	this.scrl_arrowleft = document.createElement('div');
 	this.scrl_scroll.appendChild(this.scrl_arrowleft);
