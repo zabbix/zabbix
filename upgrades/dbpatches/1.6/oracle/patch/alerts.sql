@@ -17,7 +17,12 @@ CREATE TABLE alerts_tmp (
         PRIMARY KEY (alertid)
 );
 
-insert into alerts_tmp select a.alertid,a.actionid,e.eventid,a.userid,a.clock,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,a.error,a.nextcheck,0,0 from alerts a, events e where a.triggerid=e.objectid and e.object=0;
+alter table alerts add eventid bigint DEFAULT '0' NOT NULL;
+
+update alerts a set eventid = (select min(e.eventid) from events e where e.objectid = a.triggerid and e.object = 0 and e.clock = a.clock) where a.eventid = 0;
+update alerts a set eventid = (select min(e.eventid) from events e where e.objectid = a.triggerid and e.object = 0 and e.clock = a.clock + 1) where a.eventid = 0;
+
+insert into alerts_tmp (alertid,actionid,eventid,userid,clock,mediatypeid,sendto,subject,message,status,retries,error,nextcheck) select alertid,actionid,eventid,userid,clock,mediatypeid,sendto,subject,message,status,retries,error,nextcheck from alerts;
 
 drop table alerts;
 alter table alerts_tmp rename to alerts;
