@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-805] fixed problem with lost actions when upgrading database to 1.6.x (Sasha)
  - [ZBX-772] trailing newline added in the end of exported xml (Vedmak)
  - [DEV-315] when graph shows current time values, ">>" character is shown near end time (Vedmak)
  - [DEV-311] added caching of dynamic SNMP indexes (Sasha)
