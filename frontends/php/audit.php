@@ -97,7 +97,6 @@ include_once 'include/page_header.php';
 
 	$_REQUEST['userid'] = get_request('userid',get_profile('web.audit.filter.userid',0));
 	$_REQUEST['action'] = get_request('action',get_profile('web.audit.filter.action',-1));
-SDI($_REQUEST['action']);
 	$_REQUEST['resourcetype'] = get_request('resourcetype',get_profile('web.audit.filter.resourcetype',-1));
 
 	$_REQUEST['filter_timesince'] = get_request('filter_timesince',get_profile('web.audit.filter.timesince',0));
