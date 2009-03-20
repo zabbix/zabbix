@@ -17,7 +17,12 @@ CREATE TABLE alerts_tmp (
         PRIMARY KEY (alertid)
 ) with OIDS;
 
-insert into alerts_tmp (alertid,actionid,userid,clock,mediatypeid,sendto,subject,message,status,retries,error,nextcheck) select alertid,actionid,userid,clock,mediatypeid,sendto,subject,message,status,retries,error,nextcheck from alerts;
+alter table alerts add eventid bigint DEFAULT '0' NOT NULL;
+
+update alerts set eventid = e.eventid from events e where e.objectid = alerts.triggerid and e.object = 0 and alerts.eventid = 0 and e.clock = alerts.clock;
+update alerts set eventid = e.eventid from events e where e.objectid = alerts.triggerid and e.object = 0 and alerts.eventid = 0 and e.clock = alerts.clock + 1;
+
+insert into alerts_tmp (alertid,actionid,eventid,userid,clock,mediatypeid,sendto,subject,message,status,retries,error,nextcheck) select alertid,actionid,eventid,userid,clock,mediatypeid,sendto,subject,message,status,retries,error,nextcheck from alerts;
 update alerts_tmp set status=3 where retries>=2;
 
 drop table alerts;
