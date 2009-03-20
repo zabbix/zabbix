@@ -31,6 +31,7 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-772] trailing newline added in the end of exported xml (Vedmak)
  - [DEV-315] when graph shows current time values, ">>" character is shown near end time (Vedmak)
  - [DEV-311] added caching of dynamic SNMP indexes (Sasha)
  - [ZBX-685] fixed "System status" cell colors with 0 active triggers (Vedmak) 
