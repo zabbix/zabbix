@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [DEV-311] added caching of dynamic SNMP indexes (Sasha)
  - [ZBX-685] fixed "System status" cell colors with 0 active triggers (Vedmak) 
  - [ZBX-799] fixed hosts massupdate with "new group" and "use profile" (Vedmak)
  - [ZBX-673] fixed problem with adding the graphs on an autodiscovered hosts (Sasha)
