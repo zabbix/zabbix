@@ -366,7 +366,13 @@ include_once "include/page_header.php";
 										"{'key':'$dstfld1','value':'$host[$srcfld1]'}]);";
 				}
 				else if($_REQUEST['reference'] =='sysmap_link'){
+//					$params = array(
+//								array('key'=> $dstfld1, 'value'=>'$host[$srcfld1]'),
+//							);
+//					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,".zbx_jsvalue($params).");";
+
 					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,[{'key':'$dstfld1','value':'$host[$srcfld1]'}]);";
+
 				}				
 			}
 			else{
@@ -672,8 +678,7 @@ include_once "include/page_header.php";
 			" order by h.host,t.description";
 
 		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			$exp_desc = expand_trigger_description_by_data($row);
 			$description = new CLink($exp_desc,"#","action");
 			
@@ -688,7 +693,13 @@ include_once "include/page_header.php";
 										"{'key':'$dstfld1','value':'$row[$srcfld1]'}]);";										
 				}
 				else if($_REQUEST['reference'] =='sysmap_link'){
-					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,[{'key':'$dstfld1','value':'$row[$srcfld1]'}]);";
+					$params = array(array('key'=> $dstfld1, 'value'=> $row[$srcfld1]));
+
+					if($dstfld1 == 'triggerid'){
+						$params[] = array('key'=> 'tr_desc', 'value'=> $row['host'].':'.$exp_desc);
+					}
+
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,".zbx_jsvalue($params).");";
 				}
 			}
 			else{
