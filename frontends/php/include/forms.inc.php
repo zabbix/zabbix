@@ -3691,9 +3691,11 @@
 			$evaltype	= $action['evaltype'];
 
 			/* prepare conditions */
-			$db_conditions = DBselect('select conditiontype, operator, value FROM conditions'.
-				' WHERE actionid='.$_REQUEST['actionid'].' order by conditiontype,conditionid');
-
+			$sql = 'SELECT conditiontype, operator, value '.
+					' FROM conditions '.
+					' WHERE actionid='.$_REQUEST['actionid'].
+					' ORDER BY conditiontype,conditionid';
+			$db_conditions = DBselect($sql);
 			while($condition_data = DBfetch($db_conditions)){
 				$condition_data = array(
 					'type' =>		$condition_data['conditiontype'],

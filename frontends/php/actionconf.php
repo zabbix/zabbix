@@ -251,6 +251,7 @@ include_once 'include/page_header.php';
 	}
 	else if(inarr_isset(array('add_operation','new_operation'))){
 		$new_operation = $_REQUEST['new_operation'];
+
 		if(validate_operation($new_operation)){
 			zbx_rksort($new_operation);
 
