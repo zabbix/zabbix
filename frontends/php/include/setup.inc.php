@@ -131,7 +131,7 @@
 		function stage0(){			
 			return new CTag('div', 'yes', array('Welcome to the ZABBIX frontend installation wizard.',BR(),BR(),
 				'This installation wizard will guide you through the installation of ZABBIX frontend',BR(),BR(),
-				'Click to "Next" button to proceed to the next screen. If you want to change something '.
+				'Click the "Next" button to proceed to the next screen. If you want to change something '.
 				'on a previous screen, click "Previous" button',BR(),BR(),
 				'You may cancel installation at any time by clicking "Cancel" button'), 'text');
 		}
@@ -211,7 +211,7 @@
 					'PHP max execution time:',
 					ini_get('max_execution_time').' sec',
 					ini_get('max_execution_time') >= 300,
-					'300 sec is a maximal limitation on execution of PHP scripts'));
+					'300 sec is a minimal limitation on execution time of PHP scripts'));
 			
 			/* Check supporteds databases */
 			global $ZBX_CONFIG;
@@ -222,7 +222,7 @@
 					'PHP Databases support: ',
 					new CScript(implode(SBR, $ZBX_CONFIG['allowed_db'])),
 					!isset($ZBX_CONFIG['allowed_db']['no']),
-					'Required any databases support [MySQL or PostgreSQL or Oracle]'));
+					'Requires any database support [MySQL or PostgreSQL or Oracle]'));
 
 /* Check BC math */
 			$bcmath_fnc_exist = 
@@ -243,7 +243,7 @@
 					'PHP BC math support',
 					$bcmath_fnc_exist ? 'yes' : 'no',
 					$bcmath_fnc_exist,
-					'Required bcmath module [configured PHP with --enable-bcmath]'));
+					'Requires bcmath module [configure PHP with --enable-bcmath]'));
 					
 /* Check mb-strings 
 			$mbstrings_fnc_exist = mbstrings_available();
@@ -288,7 +288,7 @@
 					'Image formats:', 
 					$img_formats,
 					!isset($no_img_formats),
-					'Required images genetarion support [PNG]'));	
+					'Requires images generation support [PNG]'));	
 			
 			if(version_compare(phpversion(), '5.1.0RC1', '>=')){
 				$tmezone = ini_get('date.timezone');
@@ -310,7 +310,7 @@
 				$final_result = array(
 					new CSpan(S_FAIL,'fail'),
 					BR(), BR(),
-					'Please correct all issuse and press "Retry" button',
+					'Please correct all issues and press "Retry" button',
 					BR(), BR(),
 					new CButton('retry', S_RETRY)
 					);
@@ -343,10 +343,10 @@
 			$table->addRow(array(S_PASSWORD, new CPassBox('password',	$this->getConfig('DB_PASSWORD',	''))));
 
 			return array(
-				'Please create database manually.', BR(),
-				'And set the configuration parameters of connection to this database.',
+				'Please create database manually,', BR(),
+				'and set the configuration parameters for connection to this database.',
 				BR(),BR(),
-				'And press "Test connection" button.',
+				'Press "Test connection" button when done.',
 				BR(),BR(),
 				$table,
 				BR(),
@@ -434,7 +434,7 @@
 			$table1->addRow(array('ZABBIX server port:',	$this->getConfig('ZBX_SERVER_PORT',	'unknown')));
 			return array(
 				'Please check configuration parameters.', BR(),
-				'If all correct press "Next" button, or "Previous" button to change configuration parameters.', BR(), BR(),
+				'If all is correct, press "Next" button, or "Previous" button to change configuration parameters.', BR(), BR(),
 				$table, BR(),
 				$table1
 				);
@@ -459,7 +459,7 @@
 			$table = new CTable(null, 'requirements');
 			$table->setAlign('center');
 
-			$table->addRow(array('Configuration file:',  $this->getConfig('ZBX_CONFIG_FILE_CORRECT', false) ? 
+			$table->addRow(array('Configuration file: ',  $this->getConfig('ZBX_CONFIG_FILE_CORRECT', false) ? 
 									new CSpan(S_OK,'ok') :
 									new CSpan(S_FAIL,'fail')
 										));
@@ -480,15 +480,15 @@
 				$table, BR(),
 				$this->DISABLE_NEXT_BUTTON ? array(new CButton('retry', S_RETRY), BR(),BR()) : null,
 				!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false) ? 
-					array('Please install configuration file manualy.',BR(),BR(),
-						'By pressing "Save configuration file" button download configuration file ',
-						'and place them into the ',BR(),
+					array('Please install configuration file manualy, or fix permissions on 'conf' directory.',BR(),BR(),
+						'Press "Save configuration file" button, download configuration file ',
+						'and save it as ',BR(),
 						'"'.$ZBX_CONFIGURATION_FILE.'"',BR(),BR(),
 						new CButton('save_config',"Save configuration file"),
 						BR(),BR()
 						)
 					: null,
-				'Press the '.($this->DISABLE_NEXT_BUTTON ? '"Retry"' : '"Next"').' button'
+				'When done, press the '.($this->DISABLE_NEXT_BUTTON ? '"Retry"' : '"Next"').' button'
 				);
 		}
 

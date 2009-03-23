@@ -291,7 +291,7 @@ void	init_config(void)
  *                                                                            *
  * Function: test                                                             *
  *                                                                            *
- * Purpose: test a custom developed functions                                 *
+ * Purpose: test custom developed functions                                   *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *

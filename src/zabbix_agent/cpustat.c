@@ -35,8 +35,8 @@
  * Parameters:  pcpus - pointer to the structure                              *
  *                      of ZBX_CPUS_STAT_DATA type                            *
  *                                                                            *
- * Return value: If the function succeeds, the return 0,                      *
- *               great than 0 on an error                                     *
+ * Return value: If the function succeeds, return 0,                          *
+ *               bigger than 0 on an error                                    *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -131,7 +131,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
  *                                                                            *
  * Function: close_cpu_collector                                              *
  *                                                                            *
- * Purpose: Cleare state of data calculation                                  *
+ * Purpose: Clear state of data calculation                                   *
  *                                                                            *
  * Parameters:  pcpus - pointer to the structure                              *
  *                      of ZBX_CPUS_STAT_DATA type                            *
