@@ -6112,34 +6112,23 @@
 
 		$frmHostP = new CFormTable(S_HOST_PROFILE);
 		$frmHostP->SetHelp("web.host_profile.php");
-
-		$result=DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid']);
-
-		$row=DBfetch($result);
-		if($row){
-			$devicetype=$row["devicetype"];
-			$name=$row["name"];
-			$os=$row["os"];
-			$serialno=$row["serialno"];
-			$tag=$row["tag"];
-			$macaddress=$row["macaddress"];
-			$hardware=$row["hardware"];
-			$software=$row["software"];
-			$contact=$row["contact"];
-			$location=$row["location"];
-			$notes=$row["notes"];
-
-			$frmHostP->addRow(S_DEVICE_TYPE,new CTextBox("devicetype",$devicetype,61,'yes'));
-			$frmHostP->addRow(S_NAME,new CTextBox("name",$name,61,'yes'));
-			$frmHostP->addRow(S_OS,new CTextBox("os",$os,61,'yes'));
-			$frmHostP->addRow(S_SERIALNO,new CTextBox("serialno",$serialno,61,'yes'));
-			$frmHostP->addRow(S_TAG,new CTextBox("tag",$tag,61,'yes'));
-			$frmHostP->addRow(S_MACADDRESS,new CTextBox("macaddress",$macaddress,61,'yes'));
-			$frmHostP->addRow(S_HARDWARE,new CTextArea("hardware",$hardware,60,4,'yes'));
-			$frmHostP->addRow(S_SOFTWARE,new CTextArea("software",$software,60,4,'yes'));
-			$frmHostP->addRow(S_CONTACT,new CTextArea("contact",$contact,60,4,'yes'));
-			$frmHostP->addRow(S_LOCATION,new CTextArea("location",$location,60,4,'yes'));
-			$frmHostP->addRow(S_NOTES,new CTextArea("notes",$notes,60,4,'yes'));
+		
+		$table_titles = array(
+				'devicetype' => S_DEVICE_TYPE, 'name' => S_NAME, 'os' => S_OS, 'serialno' => S_SERIALNO,
+				'tag' => S_TAG, 'macaddress' => S_MACADDRESS, 'hardware' => S_HARDWARE, 'software' => S_SOFTWARE, 
+				'contact' => S_CONTACT, 'location' => S_LOCATION, 'notes' => S_NOTES);
+				
+		$sql_fields = implode(', ', array_keys($table_titles)); //generate string of fields to get from DB
+		
+		$sql = 'SELECT '.$sql_fields.' FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid'];
+		$result = DBselect($sql);
+					
+		if($row=DBfetch($result)) {
+			foreach($row as $key => $value) {
+				if(!zbx_empty($value)) {
+					$frmHostP->addRow($table_titles[$key], new CTextBox($key, $value, 61, 'yes'));
+				}
+			}
 		}
 		else{
 			$frmHostP->addSpanRow("Profile for this host is missing","form_row_c");
@@ -6153,73 +6142,34 @@
 
 		$frmHostPA = new CFormTable(S_EXTENDED_HOST_PROFILE);
 		$frmHostPA->SetHelp('web.host_profile_alt.php');
-
-		$result=DBselect('SELECT * FROM hosts_profiles_ext WHERE hostid='.$_REQUEST['hostid']);
-		if($row=DBfetch($result)){
-			$frmHostPA->addRow(S_DEVICE_ALIAS,new CTextBox('ext_host_profiles[device_alias]',$row['device_alias'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_TYPE,new CTextBox('ext_host_profiles[device_type]',$row['device_type'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_CHASSIS,new CTextBox('ext_host_profiles[device_chassis]',$row['device_chassis'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_OS,new CTextBox('ext_host_profiles[device_os]',$row['device_os'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_OS_SHORT,new CTextBox('ext_host_profiles[device_os_short]',$row['device_os_short'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_HW_ARCH,new CTextBox('ext_host_profiles[device_hw_arch]',$row['device_hw_arch'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_SERIAL,new CTextBox('ext_host_profiles[device_serial]',$row['device_serial'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_MODEL,new CTextBox('ext_host_profiles[device_model]',$row['device_model'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_TAG,new CTextBox('ext_host_profiles[device_tag]',$row['device_tag'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_VENDOR,new CTextBox('ext_host_profiles[device_vendor]',$row['device_vendor'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_CONTRACT,new CTextBox('ext_host_profiles[device_contract]',$row['device_contract'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_WHO,new CTextBox('ext_host_profiles[device_who]',$row['device_who'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_STATUS,new CTextBox('ext_host_profiles[device_status]',$row['device_status'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_APP_01,new CTextBox('ext_host_profiles[device_app_01]',$row['device_app_01'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_APP_02,new CTextBox('ext_host_profiles[device_app_02]',$row['device_app_02'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_APP_03,new CTextBox('ext_host_profiles[device_app_03]',$row['device_app_03'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_APP_04,new CTextBox('ext_host_profiles[device_app_04]',$row['device_app_04'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_APP_05,new CTextBox('ext_host_profiles[device_app_05]',$row['device_app_05'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_URL_1,new CTextBox('ext_host_profiles[device_url_1]',$row['device_url_1'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_URL_2,new CTextBox('ext_host_profiles[device_url_2]',$row['device_url_2'],61,'yes'));
-			$frmHostPA->addRow(S_DEVICE_URL_3,new CTextBox('ext_host_profiles[device_url_3]',$row['device_url_3'],61,'yes'));
-
-			$frmHostPA->addRow(S_DEVICE_NETWORKS,new CTextArea('ext_host_profiles[device_networks]',$row['device_networks'],50,5,'yes'));
-			$frmHostPA->addRow(S_DEVICE_NOTES,new CTextArea('ext_host_profiles[device_notes]',$row['device_notes'],50,5,'yes'));
-			$frmHostPA->addRow(S_DEVICE_HARDWARE,new CTextArea('ext_host_profiles[device_hardware]',$row['device_hardware'],50,5,'yes'));
-			$frmHostPA->addRow(S_DEVICE_SOFTWARE,new CTextArea('ext_host_profiles[device_software]',$row['device_software'],50,5,'yes'));
-
-			$frmHostPA->addRow(S_IP_SUBNET_MASK,new CTextBox('ext_host_profiles[ip_subnet_mask]',$row['ip_subnet_mask'],61,'yes'));
-			$frmHostPA->addRow(S_IP_ROUTER,new CTextBox('ext_host_profiles[ip_router]',$row['ip_router'],61,'yes'));
-			$frmHostPA->addRow(S_IP_MACADDRESS,new CTextBox('ext_host_profiles[ip_macaddress]',$row['ip_macaddress'],61,'yes'));
-			$frmHostPA->addRow(S_OOB_IP,new CTextBox('ext_host_profiles[oob_ip]',$row['oob_ip'],61,'yes'));
-			$frmHostPA->addRow(S_OOB_SUBNET_MASK,new CTextBox('ext_host_profiles[oob_subnet_mask]',$row['oob_subnet_mask'],61,'yes'));
-			$frmHostPA->addRow(S_OOB_ROUTER,new CTextBox('ext_host_profiles[oob_router]',$row['oob_router'],61,'yes'));
-
-			$frmHostPA->addRow(S_DATE_HW_BUY,new CTextBox('ext_host_profiles[date_hw_buy]',$row['date_hw_buy'],15,'yes'));
-			$frmHostPA->addRow(S_DATE_HW_INSTALL,new CTextBox('ext_host_profiles[date_hw_install]',$row['date_hw_install'],15,'yes'));
-			$frmHostPA->addRow(S_DATE_HW_EXPIRY,new CTextBox('ext_host_profiles[date_hw_expiry]',$row['date_hw_expiry'],15,'yes'));
-			$frmHostPA->addRow(S_DATE_HW_DECOMM,new CTextBox('ext_host_profiles[date_hw_decomm]',$row['date_hw_decomm'],15,'yes'));
-
-			$frmHostPA->addRow(S_SITE_STREET_1,new CTextBox('ext_host_profiles[site_street_1]',$row['site_street_1'],61,'yes'));
-			$frmHostPA->addRow(S_SITE_STREET_2,new CTextBox('ext_host_profiles[site_street_2]',$row['site_street_2'],61,'yes'));
-			$frmHostPA->addRow(S_SITE_STREET_3,new CTextBox('ext_host_profiles[site_street_3]',$row['site_street_3'],61,'yes'));
-			$frmHostPA->addRow(S_SITE_CITY,new CTextBox('ext_host_profiles[site_city]',$row['site_city'],61,'yes'));
-			$frmHostPA->addRow(S_SITE_STATE,new CTextBox('ext_host_profiles[site_state]',$row['site_state'],61,'yes'));
-			$frmHostPA->addRow(S_SITE_COUNTRY,new CTextBox('ext_host_profiles[site_country]',$row['site_country'],61,'yes'));
-			$frmHostPA->addRow(S_SITE_ZIP,new CTextBox('ext_host_profiles[site_zip]',$row['site_zip'],61,'yes'));
-			$frmHostPA->addRow(S_SITE_RACK,new CTextBox('ext_host_profiles[site_rack]',$row['site_rack'],61,'yes'));
-			$frmHostPA->addRow(S_SITE_NOTES,new CTextArea('ext_host_profiles[site_notes]',$row['site_notes'],50,5,'yes'));
-
-			$frmHostPA->addRow(S_POC_1_NAME,new CTextBox('ext_host_profiles[poc_1_name]',$row['poc_1_name'],61,'yes'));
-			$frmHostPA->addRow(S_POC_1_EMAIL,new CTextBox('ext_host_profiles[poc_1_email]',$row['poc_1_email'],61,'yes'));
-			$frmHostPA->addRow(S_POC_1_PHONE_1,new CTextBox('ext_host_profiles[poc_1_phone_1]',$row['poc_1_phone_1'],61,'yes'));
-			$frmHostPA->addRow(S_POC_1_PHONE_2,new CTextBox('ext_host_profiles[poc_1_phone_2]',$row['poc_1_phone_2'],61,'yes'));
-			$frmHostPA->addRow(S_POC_1_CELL,new CTextBox('ext_host_profiles[poc_1_cell]',$row['poc_1_cell'],61,'yes'));
-			$frmHostPA->addRow(S_POC_1_SCREEN,new CTextBox('ext_host_profiles[poc_1_screen]',$row['poc_1_screen'],61,'yes'));
-			$frmHostPA->addRow(S_POC_1_NOTES,new CTextArea('ext_host_profiles[poc_1_notes]',$row['poc_1_notes'],50,5,'yes'));
-
-			$frmHostPA->addRow(S_POC_2_NAME,new CTextBox('ext_host_profiles[poc_2_name]',$row['poc_2_name'],61,'yes'));
-			$frmHostPA->addRow(S_POC_2_EMAIL,new CTextBox('ext_host_profiles[poc_2_email]',$row['poc_2_email'],61,'yes'));
-			$frmHostPA->addRow(S_POC_2_PHONE_1,new CTextBox('ext_host_profiles[poc_2_phone_1]',$row['poc_2_phone_1'],61,'yes'));
-			$frmHostPA->addRow(S_POC_2_PHONE_2,new CTextBox('ext_host_profiles[poc_2_phone_2]',$row['poc_2_phone_2'],61,'yes'));
-			$frmHostPA->addRow(S_POC_2_CELL,new CTextBox('ext_host_profiles[poc_2_cell]',$row['poc_2_cell'],61,'yes'));
-			$frmHostPA->addRow(S_POC_2_SCREEN,new CTextBox('ext_host_profiles[poc_2_screen]',$row['poc_2_screen'],61,'yes'));
-			$frmHostPA->addRow(S_POC_2_NOTES,new CTextArea('ext_host_profiles[poc_2_notes]',$row['poc_2_notes'],50,5,'yes'));
+		
+		$table_titles = array(
+				'device_alias' => S_DEVICE_ALIAS, 'device_type' => S_DEVICE_TYPE, 'device_chassis' => S_DEVICE_CHASSIS, 'device_os' => S_DEVICE_OS,
+				'device_os_short' => S_DEVICE_OS_SHORT, 'device_hw_arch' => S_DEVICE_HW_ARCH, 'device_serial' => S_DEVICE_SERIAL, 
+				'device_model' => S_DEVICE_MODEL, 'device_tag' => S_DEVICE_TAG, 'device_vendor' => S_DEVICE_VENDOR, 'device_contract' => S_DEVICE_CONTRACT, 
+				'device_who' => S_DEVICE_WHO, 'device_status' => S_DEVICE_STATUS, 'device_app_01' => S_DEVICE_APP_01, 'device_app_02' => S_DEVICE_APP_02, 
+				'device_app_03' => S_DEVICE_APP_03, 'device_app_04' => S_DEVICE_APP_04, 'device_app_05' => S_DEVICE_APP_05, 'device_url_1' => S_DEVICE_URL_1, 
+				'device_url_2' => S_DEVICE_URL_2, 'device_url_3' => S_DEVICE_URL_3, 'device_networks' => S_DEVICE_NETWORKS, 'device_notes' => S_DEVICE_NOTES, 
+				'device_hardware' => S_DEVICE_HARDWARE, 'device_software' => S_DEVICE_SOFTWARE, 'ip_subnet_mask' => S_IP_SUBNET_MASK, 'ip_router' => S_IP_ROUTER, 
+				'ip_macaddress' => S_IP_MACADDRESS, 'oob_ip' => S_OOB_IP, 'oob_subnet_mask' => S_OOB_SUBNET_MASK, 'oob_router' => S_OOB_ROUTER, 
+				'date_hw_buy' => S_DATE_HW_BUY, 'date_hw_install' => S_DATE_HW_INSTALL, 'date_hw_expiry' => S_DATE_HW_EXPIRY, 'date_hw_decomm' => S_DATE_HW_DECOMM, 
+				'site_street_1' => S_SITE_STREET_1, 'site_street_2' => S_SITE_STREET_2, 'site_street_3' => S_SITE_STREET_3, 'site_city' => S_SITE_CITY, 
+				'site_state' => S_SITE_STATE, 'site_country' => S_SITE_COUNTRY, 'site_zip' => S_SITE_ZIP, 'site_rack' => S_SITE_RACK, 
+				'site_notes' => S_SITE_NOTES, 'poc_1_name' => S_POC_1_NAME, 'poc_1_email' => S_POC_1_EMAIL, 'poc_1_phone_1' => S_POC_1_PHONE_1, 
+				'poc_1_phone_2' => S_POC_1_PHONE_2, 'poc_1_cell' => S_POC_1_CELL, 'poc_1_notes' => S_POC_1_NOTES, 'poc_2_name' => S_POC_2_NAME, 
+				'poc_2_email' => S_POC_2_EMAIL, 'poc_2_phone_1' => S_POC_2_PHONE_1, 'poc_2_phone_2' => S_POC_2_PHONE_2, 'poc_2_cell' => S_POC_2_CELL, 
+				'poc_2_screen' => S_POC_2_SCREEN, 'poc_2_notes' => S_POC_2_NOTES);
+				
+		$sql_fields = implode(', ', array_keys($table_titles)); //generate string of fields to get from DB
+		
+		$result=DBselect('SELECT '.$sql_fields.' FROM hosts_profiles_ext WHERE hostid='.$_REQUEST['hostid']);
+		
+		if($row=DBfetch($result)) {
+			foreach($row as $key => $value) {
+				if(!zbx_empty($value)) {
+					$frmHostPA->addRow($table_titles[$key], new CTextBox('ext_host_profiles['.$key.']', $value, 61, 'yes'));
+				}
+			}
 		}
 		else{
 			$frmHostPA->addSpanRow('Extended Profile for this host is missing','form_row_c');
