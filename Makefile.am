@@ -26,7 +26,7 @@ dist-hook:
 	rm -f $(top_distdir)/splint
 	rm -rf $(top_distdir)/test
 	rm -f $(top_distdir)/TODO
-##TODO  makdir $(top_distdir)/docs
+##TODO  mkdir $(top_distdir)/docs
 ##TODO  cp ?????/ZABBIX Manual v1.4.pdf $(top_distdir)/docs/
 
 dbschema:

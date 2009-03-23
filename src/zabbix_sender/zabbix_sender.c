@@ -272,7 +272,7 @@ static void    init_config(const char* config_file)
 
 		if (NULL != config_source_ip_from_conf)
 		{
-			if (NULL == CONFIG_SOURCE_IP)	/* apply parameter only if unsetted */
+			if (NULL == CONFIG_SOURCE_IP)	/* apply parameter only if unset */
 			{
 				CONFIG_SOURCE_IP = strdup(config_source_ip_from_conf);
 			}
@@ -282,7 +282,7 @@ static void    init_config(const char* config_file)
 		if( zabbix_server_from_conf )
 		{
 			if( !ZABBIX_SERVER )
-			{ /* apply parameter only if unsetted */
+			{ /* apply parameter only if unset */
 				if( (c = strchr(zabbix_server_from_conf, ',')) )
 				{ /* get only first server */
 					*c = '\0';
@@ -293,14 +293,14 @@ static void    init_config(const char* config_file)
 		}
 
 		if( !ZABBIX_SERVER_PORT && zabbix_server_port_from_conf )
-		{ /* apply parameter only if unsetted */
+		{ /* apply parameter only if unset */
 			ZABBIX_SERVER_PORT = zabbix_server_port_from_conf;
 		}
 
 		if( zabbix_hostname_from_conf )
 		{
 			if( !ZABBIX_HOSTNAME )
-			{ /* apply parameter only if unsetted */
+			{ /* apply parameter only if unset */
 				ZABBIX_HOSTNAME = strdup(zabbix_hostname_from_conf);
 			}
 			zbx_free(zabbix_hostname_from_conf);

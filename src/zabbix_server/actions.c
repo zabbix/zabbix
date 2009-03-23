@@ -663,11 +663,11 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
  *                                                                            *
  * Function: check_action_conditions                                          *
  *                                                                            *
- * Purpose: check if actions has to be processed for the event                *
- *          (check all condition of the action)                               *
+ * Purpose: check if actions have to be processed for the event               *
+ *          (check all conditions of the action)                              *
  *                                                                            *
  * Parameters: event - event to check                                         *
- *             actionid - action ID for matching                             *
+ *             actionid - action ID for matching                              *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
