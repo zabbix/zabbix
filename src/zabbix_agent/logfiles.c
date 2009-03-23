@@ -38,7 +38,7 @@
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
- *    This function allocate memory for 'value', because use zbx_free.        *
+ *    This function allocates memory for 'value', because use zbx_free.       *
  *    Return SUCCEED and NULL value if end of file received.                  *
  *                                                                            *
  *                                                                            *

@@ -46,7 +46,7 @@
  *                                                                            *
  * Function: send_to_user_medias                                              *
  *                                                                            *
- * Purpose: send notifications to user's medias (email, sms, whatever)        *
+ * Purpose: send notifications to user's media (email, sms, whatever)         *
  *                                                                            *
  * Parameters: trigger - trigger data                                         *
  *             action  - action data                                          *
@@ -107,7 +107,7 @@
  *                                                                            *
  * Function: check_user_active                                                *
  *                                                                            *
- * Purpose: checks if user in any users_disabled group                        *
+ * Purpose: checks if user is in any users_disabled group                     *
  *                                                                            *
  * Parameters: userid - user id                                               *
  *                                                                            *
@@ -138,7 +138,7 @@ return rtrn;
  *                                                                            *
  * Function: op_notify_user                                                   *
  *                                                                            *
- * Purpose: send notifications to user or user groupd                         *
+ * Purpose: send notifications to user or user group                          *
  *                                                                            *
  * Parameters: trigger - trigger data                                         *
  *             action  - action data                                          *

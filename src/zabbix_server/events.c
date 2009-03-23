@@ -59,7 +59,7 @@
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: use 'free_trigger_info' function to clear allocated memory     *
+ * Comments: use 'free_trigger_info' function to clear allocated memory       *
  *                                                                            *
  ******************************************************************************/
 static void	add_trigger_info(DB_EVENT *event)
@@ -127,7 +127,7 @@ static void	add_trigger_info(DB_EVENT *event)
 
 /******************************************************************************
  *                                                                            *
- * Function: free_trigger_info                                              *
+ * Function: free_trigger_info                                                *
  *                                                                            *
  * Purpose: clean allocated memory by function 'add_trigger_info'             *
  *                                                                            *
