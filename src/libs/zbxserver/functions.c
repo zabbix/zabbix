@@ -732,7 +732,7 @@ static void	proxy_add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
 			if (GET_TEXT_RESULT(value))
-				DBproxy_add_history_text(item->itemid, value->str, now);
+				DBproxy_add_history_text(item->itemid, value->text, now);
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
