@@ -681,7 +681,8 @@ include_once "include/page_header.php";
 //--
 
 // PERIOD
-			$new_timeperiod['period'] = ($new_timeperiod['period_days'] * 86400) + ($new_timeperiod['period_hours'] * 3600);
+			$new_timeperiod['period'] = ($new_timeperiod['period_days'] * 86400) + ($new_timeperiod['period_hours'] * 3600) +
+					($new_timeperiod['period_minutes'] * 60);
 //--
 
 // DAYSOFWEEK
@@ -734,7 +735,7 @@ include_once "include/page_header.php";
 			$_REQUEST['timeperiods'] = get_request('timeperiods',array());
 			
 			$result = false;
-			if($new_timeperiod['period'] < 3600) {
+			if($new_timeperiod['period'] < 300) {	/* 5 min */
 				info(S_INCORRECT_PERIOD);
 			}
 			else if(($new_timeperiod['hour'] > 23) || ($new_timeperiod['minute'] > 59)){
