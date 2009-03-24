@@ -2357,7 +2357,7 @@
 		foreach($dependencies as $val){
 			array_push($dep_el,
 				array(
-					new CCheckBox("rem_dependence[]", 'no', null, strval($val)),
+					new CCheckBox('rem_dependence['.$val.']', 'no', null, strval($val)),
 					expand_trigger_description($val)
 				),
 				BR());

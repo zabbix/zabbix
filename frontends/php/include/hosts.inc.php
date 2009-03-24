@@ -188,6 +188,12 @@ require_once('include/httptest.inc.php');
 	 */
 	function db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,$hostid=null)
 	{
+		// check if templetes to link, doesn't contain dependencies on other templates.
+		if(HOST_STATUS_TEMPLATE == $status) {
+			if(!check_templates_trigger_dependencies($templates))
+				return false;
+		}
+		
 		if(!eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host)){
 			error("Incorrect characters used for Hostname");
 			return false;
@@ -279,6 +285,7 @@ require_once('include/httptest.inc.php');
  */
 	function add_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,$newgroup,$groups)
 	{
+
 		$hostid = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password);
 		if(!$hostid)
 			return $hostid;
@@ -309,27 +316,26 @@ require_once('include/httptest.inc.php');
 	 */	
 	function update_host($hostid,$host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,$newgroup,$groups)
 	{
-	
 		$old_templates = get_templates_by_hostid($hostid);
+		$new_templates = array_diff($templates, $old_templates);
+		
 		$unlinked_templates = array_diff($old_templates, $templates);
 		
 		foreach($unlinked_templates as $id => $name){
 			unlink_template($hostid, $id);
 		}
 		
-		$new_templates = array_diff($templates, $old_templates);
-
 		$result = (bool) db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$new_templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,$hostid);
 		if(!$result)
 			return $result;
-
+			
 		update_host_groups($hostid, $groups);
 		add_group_to_host($hostid,$newgroup);
 
 		if(count($new_templates) > 0){
 			sync_host_with_templates($hostid,array_keys($new_templates));
 		}
-
+	
 	return	$result;
 	}
 
