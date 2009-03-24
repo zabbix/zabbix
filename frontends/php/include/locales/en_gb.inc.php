@@ -1092,6 +1092,7 @@
 	'S_HOUR'=>				'Hour',
 	'S_HOURS'=>				'Hours',
 	'S_MINUTE'=>			'Minute',
+	'S_MINUTES'=>			'Minutes',
 	'S_DAY'=>				'Day',
 	'S_MONTH'=>				'Month',
 	'S_YEAR'=>				'Year',

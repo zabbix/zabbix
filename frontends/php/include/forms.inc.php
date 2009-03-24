@@ -4965,6 +4965,7 @@ include_once 'include/discovery.inc.php';
 		
 		if(!isset($new_timeperiod['period_days']))		$new_timeperiod['period_days']	= 0;
 		if(!isset($new_timeperiod['period_hours']))		$new_timeperiod['period_hours']	= 1;
+		if(!isset($new_timeperiod['period_minutes']))		$new_timeperiod['period_minutes']	= 0;
 
 		if(!isset($new_timeperiod['month_date_type']))	$new_timeperiod['month_date_type'] = !(bool)$new_timeperiod['day'];
 
@@ -4979,6 +4980,8 @@ include_once 'include/discovery.inc.php';
 		if(isset($new_timeperiod['period'])){
 			$new_timeperiod['period_days'] = floor($new_timeperiod['period'] / 86400);
 			$new_timeperiod['period_hours'] = floor(($new_timeperiod['period'] - ($new_timeperiod['period_days'] * 86400)) / 3600);
+			$new_timeperiod['period_minutes'] = floor(($new_timeperiod['period'] - $new_timeperiod['period_days'] * 86400 -
+					$new_timeperiod['period_hours'] * 3600) / 60);
 		}
 //--
 
@@ -5247,13 +5250,19 @@ include_once 'include/discovery.inc.php';
 		for($i=0; $i < 25; $i++){
 			$perHours->AddItem($i,$i.SPACE);
 		}
+		$perMinutes = new CComboBox('new_timeperiod[period_minutes]',$new_timeperiod['period_minutes']);
+		for($i=0; $i < 60; $i++){
+			$perMinutes->AddItem($i,$i.SPACE);
+		}
 		$tblPeriod->addRow(array(
 							S_MAINTENANCE_PERIOD_LENGTH,
 							array(
 								new CNumericBox('new_timeperiod[period_days]',$new_timeperiod['period_days'],3),
 								S_DAYS.SPACE.SPACE,
 								$perHours,
-								SPACE.S_HOURS
+								SPACE.S_HOURS,
+								$perMinutes,
+								SPACE.S_MINUTES
 							)));
 //			$tabPeriod = new CTable();
 //			$tabPeriod->AddRow(S_DAYS)
