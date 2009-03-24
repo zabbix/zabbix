@@ -735,11 +735,52 @@
 		return true;
 	}
 
+	// Deny adding dependency between templates if they are not high level templates
+	function validate_trigger_dependency($expression, $deps) {
+		$result = true;
+		
+		if(!empty($deps)){
+			$templates = array();
+			$triggerids = array();
+			$db_triggerhosts = get_hosts_by_expression($expression);
+			while($triggerhost = DBfetch($db_triggerhosts)) {
+				if($triggerhost['status'] == HOST_STATUS_TEMPLATE) { //template
+					$templates[$triggerhost['hostid']] = $triggerhost;
+					$triggerids[$triggerhost['hostid']] = $triggerhost['hostid'];
+				}	
+			}
+			$dep_tplids = array();
+			$db_dephosts = get_hosts_by_triggerid($deps);
+			while($dephost = DBfetch($db_dephosts)) {
+				if($dephost['status'] == HOST_STATUS_TEMPLATE) { //template
+					$templates[$dephost['hostid']] = $dephost;
+					$dep_tplids[$dephost['hostid']] = $dephost['hostid'];
+				}	
+			}
+			if(!empty($triggerids) && !empty($dep_tplids)) {
+				$tpls = array_merge($triggerids, $dep_tplids);
+				$sql = 'SELECT DISTINCT h.host, h.hostid, ht.templateid '.
+						' FROM hosts h, hosts_templates ht '.
+						' WHERE h.hostid=ht.hostid '.
+							' AND h.status='.HOST_STATUS_TEMPLATE.
+							' AND '.DBcondition('ht.templateid', $tpls);
+SDI($sql);							
+				$db_lowlvltpl = DBselect($sql);			
+				while($lovlvltpl = DBfetch($db_lowlvltpl)) {					
+					error($templates[$lovlvltpl['templateid']]['host'].' is not the highest level template');
+					$result = false;	
+				}	
+			}
+		}
+		return $result;
+	}
 
 	function add_trigger($expression, $description, $type, $priority, $status, $comments, $url, $deps=array(), $templateid=0){
 		if( !validate_expression($expression) )
 			return false;
-
+		if ( !validate_trigger_dependency($expression, $deps))
+			return false;
+			
 		$triggerid=get_dbid("triggers","triggerid");
 		
 		$result=DBexecute('INSERT INTO triggers '.
@@ -756,6 +797,7 @@
 		if( null == ($expression = implode_exp($expression,$triggerid)) ){
 			$result = false;
 		}
+		
 
 		if($result){
 			DBexecute("update triggers set expression=".zbx_dbstr($expression)." where triggerid=$triggerid");
@@ -817,6 +859,36 @@
 				$result[] = $db_dep['triggerid_up'];
 			
 	return $result;
+	}
+	
+	// Deny linking templates with dependency on other template
+	function check_templates_trigger_dependencies($templates) {
+		$result = true;
+		
+		foreach($templates as $tplid => $tplname) {	
+		
+			$triggerids = array();
+			$db_triggers = get_triggers_by_hostid($tplid);
+			while($trigger = DBfetch($db_triggers)) {
+				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
+			}		
+			
+			$sql = 'SELECT DISTINCT h.hostid, h.host '.
+					' FROM trigger_depends td, functions f, items i, hosts h '.
+					' WHERE (('.DBcondition('td.triggerid_down',$triggerids).' AND f.triggerid=triggerid_up) '.
+						' OR ('.DBcondition('td.triggerid_up',$triggerids).' AND f.triggerid=triggerid_down)) '.
+						' AND i.itemid=f.itemid '.
+						' AND h.hostid=i.hostid '.
+						' AND h.hostid<>'.$tplid.
+						' AND h.status='.HOST_STATUS_TEMPLATE;
+			
+			$db_dephosts = DBselect($sql);
+			while($db_dephost = DBfetch($db_dephosts)) {
+				error('Trigger in template "'.$tplname.'" has dependency with trigger in template : '.$db_dephost['host']);
+				$result = false;
+			}		
+		}
+		return $result;
 	}
 
 	/******************************************************************************
@@ -1436,7 +1508,9 @@
 		
 		if ( !validate_expression($expression) )
 			return false;
-
+		if ( !validate_trigger_dependency($expression, $deps))
+			return false;
+			
 		$exp_hosts 	= get_hosts_by_expression($expression);
 		
 		if( $exp_hosts ){
