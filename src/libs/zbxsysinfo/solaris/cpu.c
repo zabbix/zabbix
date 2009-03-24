@@ -104,30 +104,30 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if ('\0' == *type || 0 == strcmp(type, "idle"))	/* default parameter */
 	{
-		if ('\0' == *mode || 0 == strcmp(mode, "avg1"))	SET_DBL_RESULT(result, cpu->idle1)
-		else if (0 == strcmp(mode, "avg5"))		SET_DBL_RESULT(result, cpu->idle5)
-		else if (0 == strcmp(mode, "avg15"))		SET_DBL_RESULT(result, cpu->idle15)
+		if ('\0' == *mode || 0 == strcmp(mode, "avg1"))	SET_DBL_RESULT(result, cpu->idle[ZBX_AVG1])
+		else if (0 == strcmp(mode, "avg5"))		SET_DBL_RESULT(result, cpu->idle[ZBX_AVG5])
+		else if (0 == strcmp(mode, "avg15"))		SET_DBL_RESULT(result, cpu->idle[ZBX_AVG15])
 		else return SYSINFO_RET_FAIL;
 	}
 	else if (0 == strcmp(type, "user"))
 	{
-		if ('\0' == *mode || 0 == strcmp(mode, "avg1"))	SET_DBL_RESULT(result, cpu->user1)
-		else if (0 == strcmp(mode, "avg5"))		SET_DBL_RESULT(result, cpu->user5)
-		else if (0 == strcmp(mode, "avg15"))		SET_DBL_RESULT(result, cpu->user15)
+		if ('\0' == *mode || 0 == strcmp(mode, "avg1"))	SET_DBL_RESULT(result, cpu->user[ZBX_AVG1])
+		else if (0 == strcmp(mode, "avg5"))		SET_DBL_RESULT(result, cpu->user[ZBX_AVG5])
+		else if (0 == strcmp(mode, "avg15"))		SET_DBL_RESULT(result, cpu->user[ZBX_AVG15])
 		else return SYSINFO_RET_FAIL;
 	}
 	else if (0 == strcmp(type, "kernel"))
 	{
-		if ('\0' == *mode || 0 == strcmp(mode, "avg1"))	SET_DBL_RESULT(result, cpu->system1)
-		else if (0 == strcmp(mode, "avg5"))		SET_DBL_RESULT(result, cpu->system5)
-		else if (0 == strcmp(mode, "avg15"))		SET_DBL_RESULT(result, cpu->system15)
+		if ('\0' == *mode || 0 == strcmp(mode, "avg1"))	SET_DBL_RESULT(result, cpu->system[ZBX_AVG1])
+		else if (0 == strcmp(mode, "avg5"))		SET_DBL_RESULT(result, cpu->system[ZBX_AVG5])
+		else if (0 == strcmp(mode, "avg15"))		SET_DBL_RESULT(result, cpu->system[ZBX_AVG15])
 		else return SYSINFO_RET_FAIL;
 	}
 	else if (0 == strcmp(type, "wait"))
 	{
-		if ('\0' == *mode || 0 == strcmp(mode, "avg1"))	SET_DBL_RESULT(result, cpu->nice1)
-		else if (0 == strcmp(mode, "avg5"))		SET_DBL_RESULT(result, cpu->nice5)
-		else if (0 == strcmp(mode, "avg15"))		SET_DBL_RESULT(result, cpu->nice15)
+		if ('\0' == *mode || 0 == strcmp(mode, "avg1"))	SET_DBL_RESULT(result, cpu->nice[ZBX_AVG1])
+		else if (0 == strcmp(mode, "avg5"))		SET_DBL_RESULT(result, cpu->nice[ZBX_AVG5])
+		else if (0 == strcmp(mode, "avg15"))		SET_DBL_RESULT(result, cpu->nice[ZBX_AVG15])
 		else return SYSINFO_RET_FAIL;
 	}
 	else
