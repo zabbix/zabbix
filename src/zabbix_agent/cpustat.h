@@ -20,6 +20,8 @@
 #ifndef ZABBIX_CPUSTAT_H
 #define ZABBIX_CPUSTAT_H
 
+#include "sysinfo.h"
+
 #if defined (_WINDOWS)
 
 	#define MAX_CPU_HISTORY 900 /* 15 min in seconds */
@@ -72,27 +74,18 @@
 		zbx_uint64_t	h_idle[MAX_CPU_HISTORY];
 		zbx_uint64_t	h_interrupt[MAX_CPU_HISTORY];
 		zbx_uint64_t	h_iowait[MAX_CPU_HISTORY];
+		zbx_uint64_t	h_softirq[MAX_CPU_HISTORY];
+		zbx_uint64_t	h_steal[MAX_CPU_HISTORY];
 
 		/* public */
-		double	user1;
-		double	user5;
-		double	user15;
-		double	system1;
-		double	system5;
-		double	system15;
-		double	nice1;
-		double	nice5;
-		double	nice15;
-		double	idle1;
-		double	idle5;
-		double	idle15;
-		double	interrupt1;
-		double	interrupt5;
-		double	interrupt15;
-		double	iowait1;
-		double	iowait5;
-		double	iowait15;
-
+		double	user[ZBX_AVGMAX];
+		double	system[ZBX_AVGMAX];
+		double	nice[ZBX_AVGMAX];
+		double	idle[ZBX_AVGMAX];
+		double	interrupt[ZBX_AVGMAX];
+		double	iowait[ZBX_AVGMAX];
+		double	softirq[ZBX_AVGMAX];
+		double	steal[ZBX_AVGMAX];
 	} ZBX_SINGLE_CPU_STAT_DATA;
 
 	typedef struct s_cpus_stat_data

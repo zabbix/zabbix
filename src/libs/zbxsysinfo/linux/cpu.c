@@ -55,10 +55,8 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	tmp[32],
-		type[32];
-	int	cpu_num,
-		mode;
+	char	tmp[32], type[32];
+	int	cpu_num, mode;
 
 	assert(result);
 
@@ -101,30 +99,21 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *type || 0 == strcmp(type, "user"))	/* default parameter */
-	{
-		if (ZBX_AVG1 == mode) 		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user1)
-		else if (ZBX_AVG5 == mode) 	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user5)
-		else if (ZBX_AVG15 == mode)	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user15)
-	}
-	else if( 0 == strcmp(type,"idle"))
-	{
-		if (ZBX_AVG1 == mode)		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle1)
-		else if (ZBX_AVG5 == mode)	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle5)
-		else if (ZBX_AVG15 == mode)	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle15)
-
-	}
-	else if( 0 == strcmp(type,"nice"))
-	{
-		if (ZBX_AVG1 == mode) 		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice1)
-		else if (ZBX_AVG5 == mode) 	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice5)
-		else if (ZBX_AVG15 == mode)	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice15)
-	}
-	else if( 0 == strcmp(type,"system"))
-	{
-		if (ZBX_AVG1 == mode) 		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system1)
-		else if (ZBX_AVG5 == mode) 	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system5)
-		else if (ZBX_AVG15 == mode)	SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system15)
-	}
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].user[mode])
+	else if (0 == strcmp(type, "nice"))
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].nice[mode])
+	else if (0 == strcmp(type, "system"))
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].system[mode])
+	else if (0 == strcmp(type, "idle"))
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].idle[mode])
+	else if (0 == strcmp(type, "iowait"))
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].iowait[mode])
+	else if (0 == strcmp(type, "interrupt"))
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].interrupt[mode])
+	else if (0 == strcmp(type, "softirq"))
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].softirq[mode])
+	else if (0 == strcmp(type, "steal"))
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].steal[mode])
 	else
 		return SYSINFO_RET_FAIL;
 
