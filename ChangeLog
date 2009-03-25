@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [ZBX-812] fixed Windows agent crash when using incorrect third parameter in proc_info metric (Sasha)
  - [ZBX-809] fixed memory leak while processing proc.num metric under Win2008 (Sasha)
  - [NTD-80] changed the minimal maintenance time from 1 hour to 5 minutes (Sasha)
  - [NTD-77] added availability to add several links between map elements (Artem)
