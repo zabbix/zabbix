@@ -1,5 +1,6 @@
 Changes for 1.4.7:
 
+ - [ZBX-809] fixed memory leak while processing proc.num metric under Win2008 (Sasha)
  - [ZBX-708] DM: fixed possible server crash while synchronizing events between nodes (Sasha)
  - [ZBX-675] fixed wrong result of function "nodata" after server restart (Sasha)
  - [ZBX-623] fixed incorrect processing of function abschange() for integers(Sasha)
