@@ -129,7 +129,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			else
 				proc_ok = 1;
 
-			if (/*0 != proc_ok && */'\0' != *userName)
+			if (0 != proc_ok && '\0' != *userName)
 			{
 				if (0 != GetProcessUsername(hProcess, uname))
 					if (0 == stricmp(uname, userName))
@@ -296,133 +296,74 @@ static double GetProcessAttribute(HANDLE hProcess,int attr,int type,int count,do
  */
 
 
-int	    PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	DWORD	*procList, dwSize;
-	HMODULE *modList;
+	DWORD		*procList, dwSize;
+	HMODULE		*modList;
+	HANDLE		hProcess;
+	char		proc_name[MAX_PATH],
+			attr[MAX_PATH],
+			type[MAX_PATH],
+			baseName[MAX_PATH];
+	const char	*attrList[] = {"vmsize", "wkset", "pf", "ktime", "utime", "gdiobj", "userobj", "io_read_b", "io_read_op",
+					"io_write_b", "io_write_op", "io_other_b", "io_other_op", NULL},
+			*typeList[] = {"min", "max", "avg", "sum", NULL};
+	double		value;
+	int		i, proc_cnt, counter, attr_id, type_id, ret = SYSINFO_RET_OK;
 
-	char
-		proc_name[MAX_PATH],
-		attr[MAX_PATH],
-		type[MAX_PATH];
-
-	const char *attrList[]=
-	{
-		"vmsize",
-		"wkset",
-		"pf",
-		"ktime",
-		"utime",
-		"gdiobj",
-		"userobj",
-		"io_read_b",
-		"io_read_op",
-		"io_write_b",
-		"io_write_op",
-		"io_other_b",
-		"io_other_op",
-		NULL
-	};
-
-	const char *typeList[]={ "min","max","avg","sum" };
-
-	double	value;
-	int	
-		i,
-		proc_cnt,
-		counter,
-		attr_id,
-		type_id,
-		ret = SYSINFO_RET_OK;
-
-	if(num_param(param) > 3)
-	{
+	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, proc_name, sizeof(proc_name)) != 0)
-	{
-		proc_name[0] = '\0';
-	}
+	if (0 != get_param(param, 1, proc_name, sizeof(proc_name)))
+		*proc_name = '\0';
 
-	if(proc_name[0] == '\0')
-	{
+	if ('\0' == *proc_name)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 2, attr, sizeof(attr)) != 0)
-	{
-		attr[0] = '\0';
-	}
+	if (0 != get_param(param, 2, attr, sizeof(attr)))
+		*attr = '\0';
 
-	if(attr[0] == '\0')
-	{
-		/* default parameter */
+	if ('\0' == *attr)	/* default parameter */
 		zbx_snprintf(attr, sizeof(attr), "%s", attrList[0]);
-	}
 
-	if(get_param(param, 3, type, sizeof(type)) != 0)
-	{
-		type[0] = '\0';
-	}
+	if (0 != get_param(param, 3, type, sizeof(type)))
+		*type = '\0';
 
-	if(type[0] == '\0')
-	{
-		/* default parameter */
+	if ('\0' == *type)	/* default parameter */
 		zbx_snprintf(type, sizeof(type), "%s", typeList[2]);
-	}
 
 	/* Get attribute code from string */
-	for(attr_id = 0; NULL != attrList[attr_id] && strcmp(attrList[attr_id], attr); attr_id++);
+	for (attr_id = 0; NULL != attrList[attr_id] && 0 != strcmp(attrList[attr_id], attr); attr_id++)
+		;
 
-	if (attrList[attr_id]==NULL)
-	{
-		return SYSINFO_RET_FAIL;     /* Unsupported attribute */
-	}
+	if (NULL == attrList[attr_id])     /* Unsupported attribute */
+		return SYSINFO_RET_FAIL;
 
 	/* Get type code from string */
-	for(type_id = 0; NULL != typeList[type_id] && strcmp(typeList[type_id], type); type_id++);
+	for (type_id = 0; NULL != typeList[type_id] && 0 != strcmp(typeList[type_id], type); type_id++)
+		;
 
-	if (typeList[type_id]==NULL)
-	{
+	if (NULL == typeList[type_id])
 		return SYSINFO_RET_FAIL;     /* Unsupported type */
-	}
 
-	procList = (DWORD *)malloc(MAX_PROCESSES*sizeof(DWORD));
-	modList = (HMODULE *)malloc(MAX_MODULES*sizeof(HMODULE));
+	procList = (DWORD *)malloc(MAX_PROCESSES * sizeof(DWORD));
+	modList = (HMODULE *)malloc(MAX_MODULES * sizeof(HMODULE));
 
-	EnumProcesses(procList, sizeof(DWORD)*MAX_PROCESSES, &dwSize);
+	EnumProcesses(procList, sizeof(DWORD) * MAX_PROCESSES, &dwSize);
 
 	proc_cnt = dwSize / sizeof(DWORD);
+	counter = 0;
+	value = 0;
 
-	for(i=0, counter=0, value=0; i < proc_cnt; i++)
+	for (i = 0; i < proc_cnt; i++)
 	{
-		HANDLE hProcess;
-
-		if (NULL != (hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE, procList[i])) )
+		if (NULL != (hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE, procList[i])))
 		{
-			if (EnumProcessModules(hProcess, modList, sizeof(HMODULE)*MAX_MODULES, &dwSize))
-			{
-				if (dwSize >= sizeof(HMODULE))     /* At least one module exist */
-				{
-					char baseName[MAX_PATH];
-
-					GetModuleBaseName(hProcess,modList[0],baseName,sizeof(baseName));
-					if (stricmp(baseName, proc_name) == 0)
-					{
-						if(SYSINFO_RET_OK != GetProcessAttribute(
-							hProcess, 
-							attr_id, 
-							type_id, 
-							++counter, /* Number of processes with specific name */
-							&value))
-						{
-							ret = SYSINFO_RET_FAIL;
+			if (0 != EnumProcessModules(hProcess, modList, sizeof(HMODULE) * MAX_MODULES, &dwSize))
+				if (0 != GetModuleBaseName(hProcess,modList[0],baseName,sizeof(baseName)))
+					if (0 == stricmp(baseName, proc_name))
+						if (SYSINFO_RET_OK != (ret = GetProcessAttribute(hProcess, attr_id, type_id, ++counter, &value)))
 							break;
-						}
-					}
-				}
-			}
 			CloseHandle(hProcess);
 		}
 	}
@@ -430,10 +371,8 @@ int	    PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	free(procList);
 	free(modList);
 
-	if(SYSINFO_RET_OK == ret)
-	{
-		SET_DBL_RESULT(result, value);
-	}
+	if (SYSINFO_RET_OK == ret)
+		SET_DBL_RESULT(result, value)
 
 	return ret;
 }
