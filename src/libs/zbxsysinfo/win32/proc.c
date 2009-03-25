@@ -22,53 +22,59 @@
 #include "sysinfo.h"
 
 #include "symbols.h"
+#include "log.h"
 
-#define MAX_PROCESSES         4096
-#define MAX_MODULES           512
+#define MAX_PROCESSES		4096
+#define MAX_MODULES		512
+#define MAX_NAME		256
 
-static int GetProcessUsername(HANDLE hProcess, char *userName, int userNameLen) {
-	HANDLE		tok = 0;
-	TOKEN_USER	*ptu;
-
-	DWORD
-		nlen, 
-		dlen;
-
-	char
-		name[300],
-		dom[300],
-		tubuf[300];
-
-	int iUse;
+/* function 'GetProcessUsername' require 'userName' with size 'MAX_NAME' */
+static int GetProcessUsername(HANDLE hProcess, char *userName)
+{
+	HANDLE		tok;
+	TOKEN_USER	*ptu = NULL;
+	DWORD		sz = 0, nlen, dlen;
+	char		name[MAX_NAME], dom[MAX_NAME];
+	int		iUse, res = 0;
 
 	assert(userName);
-	
+
 	//clean result;
 	*userName = '\0';
 
 	//open the processes token
-	if (!OpenProcessToken(hProcess,TOKEN_QUERY,&tok)) goto lbl_err;;
+	if (0 == OpenProcessToken(hProcess, TOKEN_QUERY, &tok))
+		return res;
 
-	//get the SID of the token
-	ptu = (TOKEN_USER*)tubuf;
-	if (!GetTokenInformation(tok,(TOKEN_INFORMATION_CLASS)1,ptu,300,&nlen)) goto lbl_err;
+	// Get required buffer size and allocate the TOKEN_USER buffer
+	if (0 == GetTokenInformation(tok, (TOKEN_INFORMATION_CLASS)1, (LPVOID)ptu, 0, &sz)) 
+	{
+		if (GetLastError() != ERROR_INSUFFICIENT_BUFFER) 
+			goto lbl_err;
+		ptu = (PTOKEN_USER)zbx_malloc(ptu, sz);
+	}
+
+	// Get the token user information from the access token.
+	if (0 == GetTokenInformation(tok, (TOKEN_INFORMATION_CLASS)1, (LPVOID)ptu, sz, &sz)) 
+		goto lbl_err;
 
 	//get the account/domain name of the SID
-	dlen = 300;	nlen = 300;
-	if (!LookupAccountSid(0, ptu->User.Sid, name, &nlen, dom, &dlen, (PSID_NAME_USE)&iUse)) goto lbl_err;
+	nlen = sizeof(name);
+	dlen = sizeof(dom);
+	if (0 == LookupAccountSid(NULL, ptu->User.Sid, name, &nlen, dom, &dlen, (PSID_NAME_USE)&iUse))
+		goto lbl_err;
 
-	nlen = min(userNameLen-1,(int)nlen);
+	zbx_strlcpy(userName, name, MAX_NAME);
 
-	zbx_strlcpy(userName, name, nlen);
-
-	return 1;
-
+	res = 1;
 lbl_err:
-	if (tok) CloseHandle(tok);
-	return 0;
+	zbx_free(ptu);
+
+	CloseHandle(tok);
+
+	return res;
 }
 
-				    
 int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 { /* usage: <function name>[ <process name>, <user name>, <mode>, <command> ] */
 	#ifdef TODO
@@ -82,75 +88,58 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 { /* usage: <function name>[ <process name>, <user name>] */
 	HANDLE	hProcess;
 	HMODULE	hMod;
-	DWORD	procList[MAX_PROCESSES];
-
-	DWORD dwSize=0;
-
-	int 
-		i = 0,
-		proccount = 0,
-		max_proc_cnt = 0,
+	DWORD	procList[MAX_PROCESSES], dwSize;
+	int	i, proccount, max_proc_cnt,
 		proc_ok = 0,
 		user_ok = 0;
-
-	char 
-		procName[MAX_PATH],
+	char	procName[MAX_PATH],
 		userName[MAX_PATH],
 		baseName[MAX_PATH], 
-		uname[300];
+		uname[MAX_NAME];
 
-	if(num_param(param) > 2)
-	{
+	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, procName, sizeof(procName)) != 0)
-	{
+	if (0 != get_param(param, 1, procName, sizeof(procName)))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 2, userName, sizeof(userName)) != 0)
-	{
-		userName[0] = '\0';
-	}
+	if (0 != get_param(param, 2, userName, sizeof(userName)))
+		*userName = '\0';
 
+	if (0 == EnumProcesses(procList, sizeof(DWORD) * MAX_PROCESSES, &dwSize))
+		return SYSINFO_RET_FAIL;
 
-	EnumProcesses(procList,sizeof(DWORD)*MAX_PROCESSES,&dwSize);
+	max_proc_cnt = dwSize / sizeof(DWORD);
+	proccount = 0;
 
-	for(i=0,proccount=0,max_proc_cnt=dwSize/sizeof(DWORD); i < max_proc_cnt; i++)
+	for (i = 0; i < max_proc_cnt; i++)
 	{
 		proc_ok = 0;
 		user_ok = 0;
 
-		hProcess=OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE,procList[i]);
-		if (hProcess!=NULL)
+		if (NULL != (hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, procList[i])))
 		{
-			if (procName[0] != 0) 
+			if ('\0' != *procName) 
 			{
-				if (EnumProcessModules(hProcess,&hMod,sizeof(hMod),&dwSize))
-				{
-					GetModuleBaseName(hProcess,hMod,baseName,sizeof(baseName));
-					if (stricmp(baseName,procName) == 0)
-					{
-						proc_ok = 1;
-					}
-				}
-			} else {
+				if (0 != EnumProcessModules(hProcess, &hMod, sizeof(hMod), &dwSize))
+					if (0 != GetModuleBaseName(hProcess, hMod, baseName, sizeof(baseName)))
+						if (0 == stricmp(baseName, procName))
+							proc_ok = 1;
+			}
+			else
 				proc_ok = 1;
-			}
 
-			if(userName[0] != '\0')
+			if (/*0 != proc_ok && */'\0' != *userName)
 			{
-				if(GetProcessUsername(hProcess, uname, 300))
-				{
-					if (stricmp(uname,userName) == 0)
+				if (0 != GetProcessUsername(hProcess, uname))
+					if (0 == stricmp(uname, userName))
 						user_ok = 1;
-				}
-			} else {
-				user_ok = 1;
 			}
+			else
+				user_ok = 1;
 
-			if(user_ok && proc_ok)		proccount++;
+			if (0 != user_ok && 0 != proc_ok)
+				proccount++;
 
 			CloseHandle(hProcess);
 		}
@@ -160,8 +149,6 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	return SYSINFO_RET_OK;
 }
-
-
 
 /************ PROC INFO ****************/
 
