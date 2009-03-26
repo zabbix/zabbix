@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-814] fixed bad performance of the string functions - added two database indexes (Sasha)
  - [ZBX-804] added support of text items for functions str, regexp and iregexp (Sasha)
  - [ZBX-668] "Cannot open Json object" message replaced with a better one in agent log (Sasha)
  - [ZBX-812] fixed Windows agent crash when using incorrect third parameter in proc_info metric (Sasha)
