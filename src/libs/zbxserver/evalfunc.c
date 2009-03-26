@@ -53,7 +53,7 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, char *parameter)
 	if (item->value_type != ITEM_VALUE_TYPE_LOG)
 		return FAIL;
 
-	zbx_snprintf(sql, sizeof(sql), "select source from history_log where itemid=" ZBX_FS_UI64 " order by clock desc",
+	zbx_snprintf(sql, sizeof(sql), "select source from history_log where itemid=" ZBX_FS_UI64 " order by id desc",
 			item->itemid);
 
 	result = DBselectN(sql, 1);
@@ -105,7 +105,7 @@ static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, char *parameter)
 	if (item->value_type != ITEM_VALUE_TYPE_LOG)
 		return	FAIL;
 
-	zbx_snprintf(sql, sizeof(sql), "select severity from history_log where itemid=" ZBX_FS_UI64 " order by clock desc",
+	zbx_snprintf(sql, sizeof(sql), "select severity from history_log where itemid=" ZBX_FS_UI64 " order by id desc",
 			item->itemid);
 
 	result = DBselectN(sql, 1);
