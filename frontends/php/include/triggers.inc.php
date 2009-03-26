@@ -103,7 +103,8 @@
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp']= array('args' => array( 0 => array('type' => 'str','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_STR,
-				ITEM_VALUE_TYPE_LOG
+				ITEM_VALUE_TYPE_LOG,
+				ITEM_VALUE_TYPE_TEXT
 				)
 			);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['last']	= array('args' => null,
@@ -139,7 +140,8 @@
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['str']	= array('args' => array( 0 => array('type' => 'str','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_STR,
-				ITEM_VALUE_TYPE_LOG
+				ITEM_VALUE_TYPE_LOG,
+				ITEM_VALUE_TYPE_TEXT
 				)
 			);
 
@@ -164,7 +166,8 @@
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['regexp']= array('args' => array( 0 => array('type' => 'str','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_STR,
-				ITEM_VALUE_TYPE_LOG
+				ITEM_VALUE_TYPE_LOG,
+				ITEM_VALUE_TYPE_TEXT
 				)
 			);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['time']	= array('args' => null, 'item_types' => null );
