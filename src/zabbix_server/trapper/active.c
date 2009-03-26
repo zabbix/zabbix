@@ -203,11 +203,11 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "%s", zbx_json_strerror());
-		goto out;
+		goto error;
 	}
 
 	if (FAIL == get_hostid_by_host(host, &hostid, error))
-		goto out;
+		goto error;
 
 	if (0 != CONFIG_REFRESH_UNSUPPORTED) {
 		result = DBselect("select %s where i.hostid=h.hostid and h.status=%d and i.type=%d and h.hostid=" ZBX_FS_UI64
@@ -247,8 +247,8 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	}
 	DBfree_result(result);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",
-		json.buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]",
+			json.buffer);
 
 	if (SUCCEED != zbx_tcp_send_raw(sock, json.buffer))
 		zbx_snprintf(error, MAX_STRING_LEN, "%s", zbx_tcp_strerror());
@@ -257,10 +257,21 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	zbx_json_free(&json);
 
-out:
-	if (FAIL == res)
-		zabbix_log(LOG_LEVEL_WARNING, "Send list of active checks to [%s] failed: %s",
-				get_ip_by_socket(sock), error);
+	return res;
+error:
+	zabbix_log(LOG_LEVEL_WARNING, "Send list of active checks to [%s] failed: %s",
+			get_ip_by_socket(sock), error);
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, error, ZBX_JSON_TYPE_STRING);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]",
+			json.buffer);
+
+	res = zbx_tcp_send_raw(sock, json.buffer);
+
+	zbx_json_free(&json);
 
 	return res;
 }

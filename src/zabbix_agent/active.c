@@ -191,40 +191,44 @@ static int	parse_list_of_checks(char *str)
 
 	disable_all_metrics();
 
-	if(SUCCEED == ret && SUCCEED != zbx_json_open(str, &jp))
+	if (SUCCEED == ret && SUCCEED != zbx_json_open(str, &jp))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Can't open jason object");
 		ret = FAIL;
 	}
 
-	if(SUCCEED == ret && SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, result, sizeof(result)))
+	if (SUCCEED == ret && SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, result, sizeof(result)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s",
 			zbx_json_strerror());
 		ret = FAIL;
 	}
 
-	if(SUCCEED == ret && 0 != strcmp(result,ZBX_PROTO_VALUE_SUCCESS))
+	if (SUCCEED == ret && 0 != strcmp(result, ZBX_PROTO_VALUE_SUCCESS))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Unsucesfull response received from server");
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, result, sizeof(result)))
+			zabbix_log(LOG_LEVEL_WARNING, "No active checks on server: %s",
+					result);
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "No active checks on server");
 		ret = FAIL;
 	}
 
-	if(SUCCEED == ret && NULL == (p = zbx_json_pair_by_name(&jp, ZBX_PROTO_TAG_DATA)))
+	if (SUCCEED == ret && NULL == (p = zbx_json_pair_by_name(&jp, ZBX_PROTO_TAG_DATA)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Can't find \"%s\" tag",
 			ZBX_PROTO_TAG_DATA);
 		ret = FAIL;
 	}
 
-	if(SUCCEED == ret && FAIL == zbx_json_brackets_open(p, &jp_data))
+	if (SUCCEED == ret && FAIL == zbx_json_brackets_open(p, &jp_data))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Can't proceed jason request. %s",
 				zbx_json_strerror());
 		ret = FAIL;
 	}
 
-	if(SUCCEED == ret)
+	if (SUCCEED == ret)
 	{
 	 	p = NULL;
 		while (SUCCEED == ret && NULL != (p = zbx_json_next(&jp_data, p)))
