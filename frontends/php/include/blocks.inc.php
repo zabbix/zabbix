@@ -689,41 +689,41 @@ function make_latest_data(){
 		while($db_item = DBfetch($db_items)){
 			$description = item_description($db_item);
 
-			if( '' != $_REQUEST["select"] && !zbx_stristr($description, $_REQUEST["select"]) ) continue;
+			if( !zbx_empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
 
 			++$item_cnt;
-			if(!uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
+			if(!uint_in_array($db_app['applicationid'],$_REQUEST['applications']) && !isset($show_all_apps)) continue;
 
-			if(isset($db_item["lastclock"]))
-				$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
+			if(isset($db_item['lastclock']))
+				$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item['lastclock']);
 			else
 				$lastclock = new CCol('-', 'center');
 
 			$lastvalue=format_lastvalue($db_item);
 
-			if( isset($db_item["lastvalue"]) && isset($db_item["prevvalue"]) &&
-				($db_item["value_type"] == 0) && ($db_item["lastvalue"]-$db_item["prevvalue"] != 0) )
+			if( isset($db_item['lastvalue']) && isset($db_item['prevvalue']) &&
+				($db_item['value_type'] == 0) && ($db_item['lastvalue']-$db_item['prevvalue'] != 0) )
 			{
-				if($db_item["lastvalue"]-$db_item["prevvalue"]<0){
-					$change=convert_units($db_item["lastvalue"]-$db_item["prevvalue"],$db_item["units"]);
+				if($db_item['lastvalue']-$db_item['prevvalue']<0){
+					$change=convert_units($db_item['lastvalue']-$db_item['prevvalue'],$db_item['units']);
 				}
 				else{
-					$change="+".convert_units($db_item["lastvalue"]-$db_item["prevvalue"],$db_item["units"]);
+					$change='+'.convert_units($db_item['lastvalue']-$db_item['prevvalue'],$db_item['units']);
 				}
 				$change=nbsp($change);
 			}
 			else{
-				$change=new CCol("-","center");
+				$change=new CCol('-','center');
 			}
-			if(($db_item["value_type"]==ITEM_VALUE_TYPE_FLOAT) ||($db_item["value_type"]==ITEM_VALUE_TYPE_UINT64)){
-				$actions=new CLink(S_GRAPH,"history.php?action=showgraph&itemid=".$db_item["itemid"],"action");
+			if(($db_item['value_type']==ITEM_VALUE_TYPE_FLOAT) ||($db_item['value_type']==ITEM_VALUE_TYPE_UINT64)){
+				$actions=new CLink(S_GRAPH,'history.php?action=showgraph&itemid='.$db_item['itemid'],'action');
 			}
 			else{
-				$actions=new CLink(S_HISTORY,"history.php?action=showvalues&period=3600&itemid=".$db_item["itemid"],"action");
+				$actions=new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid'],'action');
 			}
 			array_push($app_rows, new CRow(array(
 				is_show_subnodes() ? SPACE : null,
-				$_REQUEST["hostid"] > 0 ? NULL : SPACE,
+				$_REQUEST['hostid'] > 0 ? NULL : SPACE,
 				str_repeat(SPACE,6).$description,
 				$lastclock,
 				new CCol($lastvalue, $lastvalue=='-' ? 'center' : null),
@@ -733,26 +733,26 @@ function make_latest_data(){
 		}
 		
 		if($item_cnt > 0){
-			if(uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps)){
-				$link = new CLink(new CImg("images/general/opened.gif"),
-					"?close=1&applicationid=".$db_app["applicationid"].
-					url_param("groupid").url_param("hostid").url_param("applications").
-					url_param("select"));
+			if(uint_in_array($db_app['applicationid'],$_REQUEST['applications']) || isset($show_all_apps)){
+				$link = new CLink(new CImg('images/general/opened.gif'),
+					'?close=1&applicationid='.$db_app['applicationid'].
+					url_param('groupid').url_param('hostid').url_param('applications').
+					url_param('select'));
 			}
 			else{
-				$link = new CLink(new CImg("images/general/closed.gif"),
-					"?open=1&applicationid=".$db_app["applicationid"].
-					url_param("groupid").url_param("hostid").url_param("applications").
-					url_param("select"));
+				$link = new CLink(new CImg('images/general/closed.gif'),
+					'?open=1&applicationid='.$db_app['applicationid'].
+					url_param('groupid').url_param('hostid').url_param('applications').
+					url_param('select'));
 			}
 
-			$col = new CCol(array($link,SPACE,bold($db_app["name"]),
-				SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
+			$col = new CCol(array($link,SPACE,bold($db_app['name']),
+				SPACE.'('.$item_cnt.SPACE.S_ITEMS.')'));
 			$col->setColSpan(5);
 
 			$table->ShowRow(array(
 					get_node_name_by_elid($db_app['hostid']),
-					$_REQUEST["hostid"] > 0 ? NULL : $db_app["host"],
+					$_REQUEST['hostid'] > 0 ? NULL : $db_app['host'],
 					$col
 					));
 
@@ -781,7 +781,7 @@ function make_graph_menu(&$menu,&$submenu){
 					'dstfld2=favid&'.
 					'srcfld1=name&'.
 					"srcfld2=graphid',800,450);".
-				"void(0);",
+				'void(0);',
 				null, 
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))
 		);
