@@ -174,7 +174,11 @@ static int	parse_list_of_checks(char *str)
 
 	if (0 != strcmp(tmp, ZBX_PROTO_VALUE_SUCCESS))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Unsucesfull response received from server");
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, tmp, sizeof(tmp)))
+			zabbix_log(LOG_LEVEL_WARNING, "No active checks on server: %s",
+					tmp);
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "No active checks on server");
 		return FAIL;
 	}
 
