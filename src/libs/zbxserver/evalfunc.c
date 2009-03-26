@@ -1233,24 +1233,21 @@ static int	evaluate_STR(char *value, DB_ITEM *item, char *function, char *parame
 
 	char		*table = NULL;
 	char		*key = NULL;
-	char		table_str[] = "history_str", key_str[] = "clock";
-	char		table_text[] = "history_text", key_text[] = "id";
-	char		table_log[] = "history_log", key_log[] = "id";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_STR()");
 
 	switch (item->value_type) {
 		case ITEM_VALUE_TYPE_STR:
-			table = table_str;
-			key = key_str;
+			table = "history_str";
+			key = "clock";
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
-			table = table_text;
-			key = key_text;
+			table = "history_text";
+			key = "id";
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			table = table_log;
-			key = key_log;
+			table = "history_log";
+			key = "id";
 			break;
 		default:
 			return FAIL;
