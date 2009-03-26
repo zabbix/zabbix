@@ -730,6 +730,22 @@ else {
 		return bcmod($id,'100000000000');
 	}
 
+	function check_db_fields(&$db_fields, &$args){
+		if(!is_array($args)) return false;
+		
+		foreach($db_fields as $field => $def){
+			if(!isset($args[$field])){
+				if(is_null($def)){
+					return false;
+				}
+				else{
+					$args[$field] = $def;
+				}
+			}
+		}
+	return true;
+	}
+	
 	function DBcondition($fieldname, &$array, $notin=false, $string=false){
 		global $DB;
 		$condition = '';
