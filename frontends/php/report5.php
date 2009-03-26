@@ -65,7 +65,7 @@ include_once "include/page_header.php";
 	switch($_REQUEST["period"])
 	{
 		case "week":	$time_dif=7*24*3600;	break;
-		case "month":	$time_dif=10*24*3600;	break;
+		case "month":	$time_dif=30*24*3600;	break;
 		case "year":	$time_dif=365*24*3600;	break;
 		case "day":
 		default:	$time_dif=24*3600;	break;
