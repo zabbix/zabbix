@@ -3918,8 +3918,7 @@ static int DBupdate_template_dependencies_for_host(
 	DB_ROW		trigger_data;
 	DB_ROW		dependency_data;
 
-	int		result = SUCCEED,
-			alloc = 16, count = 0, i,
+	int		alloc = 16, count = 0, i,
 			flag_down,
 			flag_up;
 
