@@ -601,11 +601,10 @@ class CChart extends CGraph{
 				$a[0] = $x1;		$a[1] = $y1;
 				$a[2] = $x1;		$a[3] = $y1_shift;
 				$a[4] = $x2;		$a[5] = $y2_shift;
-				$a[6] = $x2;		$a[7] = $y2;
-				
-//					SDI($a);
-				
+				$a[6] = $x2;		$a[7] = $y2;	
+//SDI($a);
 				imagefilledpolygon($this->im,$a,4,$avg_color);
+//				imageline($this->im,$x1,$y1,$x2,$y2,$this->getShadow('333333',50));
 				break;
 			case GRAPH_ITEM_DRAWTYPE_DOT:
 				imagefilledrectangle($this->im,$x1-1,$y1-1,$x1+1,$y1+1,$avg_color);
@@ -1352,30 +1351,30 @@ class CChart extends CGraph{
 			if($this->items[$item]['calc_type'] == GRAPH_ITEM_AGGREGATED){
 				$drawtype	= GRAPH_ITEM_DRAWTYPE_LINE;
 
-				$max_color	= $this->GetColor('HistoryMax');
-				$avg_color	= $this->GetColor('HistoryAvg');
-				$min_color	= $this->GetColor('HistoryMin');
-				$minmax_color	= $this->GetColor('HistoryMinMax');
+				$max_color	= $this->getColor('HistoryMax');
+				$avg_color	= $this->getColor('HistoryAvg');
+				$min_color	= $this->getColor('HistoryMin');
+				$minmax_color	= $this->getColor('HistoryMinMax');
 
 				$calc_fnc	= CALC_FNC_ALL;
 			}
 			else if($this->type == GRAPH_TYPE_STACKED){
 				$drawtype	= $this->items[$item]['drawtype'];
 
-				$max_color	= $this->GetColor('ValueMax',GRAPH_STACKED_ALFA);
-				$avg_color	= $this->GetColor($this->items[$item]['color'],GRAPH_STACKED_ALFA);
-				$min_color	= $this->GetColor('ValueMin',GRAPH_STACKED_ALFA);
-				$minmax_color	= $this->GetColor('ValueMinMax',GRAPH_STACKED_ALFA);
+				$max_color	= $this->getColor('ValueMax',GRAPH_STACKED_ALFA);
+				$avg_color	= $this->getColor($this->items[$item]['color'],GRAPH_STACKED_ALFA);
+				$min_color	= $this->getColor('ValueMin',GRAPH_STACKED_ALFA);
+				$minmax_color	= $this->getColor('ValueMinMax',GRAPH_STACKED_ALFA);
 
 				$calc_fnc = $this->items[$item]['calc_fnc'];					
 			}
 			else{
 				$drawtype	= $this->items[$item]['drawtype'];
 
-				$max_color	= $this->GetColor('ValueMax');
-				$avg_color	= $this->GetColor($this->items[$item]['color']);
-				$min_color	= $this->GetColor('ValueMin');
-				$minmax_color	= $this->GetColor('ValueMinMax');
+				$max_color	= $this->getColor('ValueMax');
+				$avg_color	= $this->getColor($this->items[$item]['color']);
+				$min_color	= $this->getColor('ValueMin');
+				$minmax_color	= $this->getColor('ValueMinMax');
 
 				$calc_fnc = $this->items[$item]['calc_fnc'];
 			}

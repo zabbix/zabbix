@@ -24,7 +24,7 @@
 
 	$page["title"] = "S_QUEUE_BIG";
 	$page["file"] = "queue.php";
-	$page['hist_arg'] = array('show');
+	$page['hist_arg'] = array('config');
 	
 	define('ZBX_PAGE_DO_REFRESH', 1);
 
@@ -34,7 +34,7 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"show"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2"),	NULL)
+		"config"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2"),	NULL)
 	);
 
 	check_fields($fields);
@@ -43,12 +43,13 @@ include_once "include/page_header.php";
 ?>
 
 <?php
-	$_REQUEST["show"] = get_request("show", 0);
+	$_REQUEST['config'] = get_request('config', get_profile('web.queue.config', 0));
+	update_profile('web.queue.config',$_REQUEST['config'], PROFILE_TYPE_INT);
 
 	$form = new CForm();
 	$form->SetMethod('get');
 	
-	$cmbMode = new CComboBox("show", $_REQUEST["show"], "submit();");
+	$cmbMode = new CComboBox("config", $_REQUEST["config"], "submit();");
 	$cmbMode->AddItem(0, S_OVERVIEW);
 	$cmbMode->AddItem(1, S_OVERVIEW_BY_PROXY);
 	$cmbMode->AddItem(2, S_DETAILS);
@@ -89,7 +90,7 @@ include_once "include/page_header.php";
 
 	$table = new CTableInfo(S_THE_QUEUE_IS_EMPTY);
 
-	if($_REQUEST["show"]==0){
+	if($_REQUEST["config"]==0){
 
 		foreach($item_types as $type){
 			$sec_10[$type]=0;
@@ -125,7 +126,7 @@ include_once "include/page_header.php";
 			$table->addRow($elements);
 		}
 	}
-	else if ($_REQUEST["show"] == 1)
+	else if ($_REQUEST["config"] == 1)
 	{
 		$db_proxies = DBselect('select hostid from hosts where status='.HOST_STATUS_PROXY);
 
@@ -185,7 +186,7 @@ include_once "include/page_header.php";
 		);
 		$table->addRow($elements);
 	}
-	else if ($_REQUEST["show"] == 2)
+	else if ($_REQUEST["config"] == 2)
 	{
 		$table->SetHeader(array(
 				S_NEXT_CHECK,
@@ -206,7 +207,7 @@ include_once "include/page_header.php";
 
 	$table->Show();
 
-	if($_REQUEST["show"]!=0){
+	if($_REQUEST["config"]!=0){
 		show_table_header(S_TOTAL.": ".$table->GetNumRows());
 	}
 ?>

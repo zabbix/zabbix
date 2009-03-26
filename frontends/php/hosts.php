@@ -516,6 +516,7 @@ include_once('include/page_header.php');
 		}
 		
 		$result	= DBend($result);
+//		$result	= DBend(false);
 		
 		if($result){
 			update_profile('HOST_PORT',$_REQUEST['port'], PROFILE_TYPE_INT);
