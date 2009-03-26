@@ -36,16 +36,9 @@
 			while(($ac_data = DBfetch($db_result)) && $result){
 				switch($ac_data['resourcetype']){
 					case SCREEN_RESOURCE_GRAPH:
-						$itemid = array();
-
-						$db_gitems = DBselect('SELECT DISTINCT itemid '.
-										' FROM graphs_items '.
-										' WHERE graphid='.$ac_data['resourceid']);
-						
-						while($gitem_data = DBfetch($db_gitems)) array_push($itemid, $gitem_data['itemid']);
-						
-						if(count($itemid) == 0) $itemid = array(-1);
-						// break; /* use same processing as items */
+						$graphids = get_accessible_graphs($perm,array());
+						$result &= isset($graphids[$ac_data['resourceid']]);
+					break;
 					case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						// break; /* use same processing as items */
 					case SCREEN_RESOURCE_PLAIN_TEXT:
