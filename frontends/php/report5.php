@@ -64,11 +64,11 @@ include_once "include/page_header.php";
 			));
 
 	switch($_REQUEST["period"]){
-		case "week":	$time_dif=7*24*3600;	break;
-		case "month":	$time_dif=10*24*3600;	break;
-		case "year":	$time_dif=365*24*3600;	break;
+		case "week":	$time_dif=7*86400;	break;
+		case "month":	$time_dif=30*86400;	break;
+		case "year":	$time_dif=365*86400;	break;
 		case "day":
-		default:	$time_dif=24*3600;	break;
+		default:	$time_dif=86400;	break;
 	}
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
