@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-330] extended template trigger dependencies functionality (Artem)
  - [DEV-137] changed the minimal maintenance time from 1 hour to 5 minutes (Sasha)
  - [DEV-319] empty fields aren't shown in hosts inventory (Vedmak)  
  - [ZBX-750] added multiple choice for trigger dependencies (Vedmak)

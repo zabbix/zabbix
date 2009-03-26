@@ -3895,7 +3895,7 @@ static int	DBcopy_trigger_to_host(
 
 /******************************************************************************
  *                                                                            *
- * Function: DBupdate_template_dependences_for_host                           *
+ * Function: DBupdate_template_dependencies_for_host                           *
  *                                                                            *
  * Purpose: update trigger dependences for specified host                     *
  *                                                                            *
@@ -3908,62 +3908,96 @@ static int	DBcopy_trigger_to_host(
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static int	DBupdate_template_dependences_for_host(
-		zbx_uint64_t hostid
-	)
+static int DBupdate_template_dependencies_for_host(
+		  zbx_uint64_t hostid
+		   )
 {
 	DB_RESULT	db_triggers;
-	DB_RESULT	db_chd_triggers;
+	DB_RESULT	db_dependencies;
 
 	DB_ROW		trigger_data;
-	DB_ROW		chd_trigger_data;
+	DB_ROW		dependency_data;
 
-	int	result = SUCCEED;
+	int		result = SUCCEED,
+			alloc = 16, count = 0, i,
+			flag_down,
+			flag_up;
 
-	zbx_uint64_t
-		triggerid,
-		chd_triggerid,
-		dependences[ZBX_MAX_DEPENDENCES],
-		new_dependences[ZBX_MAX_DEPENDENCES];
+	zbx_uint64_t	*tpl_triggerids = NULL,
+			*hst_triggerids = NULL,
+			templateid,
+			triggerid,
+			templateid_up,
+			templateid_down;
 
-	db_triggers = DBselect("select distinct t.triggerid from triggers t, functions f, items i"
-		" where i.hostid=" ZBX_FS_UI64 " and f.itemid=i.itemid and f.triggerid=t.triggerid", hostid);
+	tpl_triggerids = zbx_malloc(tpl_triggerids, alloc * sizeof(zbx_uint64_t));
+	hst_triggerids = zbx_malloc(hst_triggerids, alloc * sizeof(zbx_uint64_t));
+
+	db_triggers = DBselect("select distinct t.triggerid, t.templateid "
+							"from triggers t, functions f, items i"
+							" where i.hostid=" ZBX_FS_UI64 
+								" and f.itemid=i.itemid "
+								" and f.triggerid=t.triggerid"
+								" and t.templateid > 0", hostid);
 
 	while( (trigger_data = DBfetch(db_triggers)) )
 	{
+		ZBX_STR2UINT64(templateid, trigger_data[1]);
 		ZBX_STR2UINT64(triggerid, trigger_data[0]);
+		DBdelete_dependencies_by_triggerid(triggerid);
 
-		db_chd_triggers = DBselect("select distinct triggerid from triggers where templateid=" ZBX_FS_UI64, triggerid);
-
-		while( (chd_trigger_data = DBfetch(db_chd_triggers)) )
+		if (alloc == count)
 		{
-			ZBX_STR2UINT64(chd_triggerid, chd_trigger_data[0]);
-
-			DBget_trigger_dependences_by_triggerid(triggerid, dependences, sizeof(dependences) / sizeof(zbx_uint64_t));
-			DBreplace_template_dependences(dependences, hostid, new_dependences, sizeof(new_dependences) / sizeof(zbx_uint64_t));
-
-			if( SUCCEED != (result = DBupdate_trigger(
-				chd_triggerid,
-				/* expression */         NULL,
-				/* description */        NULL,
-				/* priority */           -1,
-				/* status */             -1,
-				/* comments */           NULL,
-				/* url */                NULL,
-				/* type */               -1,
-				new_dependences,
-				triggerid)) )
-					break;
+			alloc += 16;
+			tpl_triggerids = zbx_realloc(tpl_triggerids, alloc * sizeof(zbx_uint64_t));
+			hst_triggerids = zbx_realloc(hst_triggerids, alloc * sizeof(zbx_uint64_t));
 		}
 
-		DBfree_result(db_chd_triggers);
-
-		if( SUCCEED != result ) break;
+		tpl_triggerids[count] = templateid;
+		hst_triggerids[count] = triggerid;
+		count++;
 	}
 
 	DBfree_result(db_triggers);
 
-	return result;
+	db_dependencies = DBselect("SELECT DISTINCT td.triggerdepid, td.triggerid_down, td.triggerid_up "
+			"FROM items i, functions f, triggers t, trigger_depends td "
+			" WHERE i.hostid=" ZBX_FS_UI64 
+				" AND f.itemid=i.itemid "
+				" AND t.triggerid=f.triggerid "
+				" AND ( (td.triggerid_up=t.templateid) OR (td.triggerid_down=t.templateid) )", hostid);
+
+	while( (dependency_data = DBfetch(db_dependencies)) )
+	{
+		flag_down=0;
+		flag_up=0;
+
+		ZBX_STR2UINT64(templateid_down, dependency_data[1]);
+		ZBX_STR2UINT64(templateid_up, dependency_data[2]);
+
+		for (i = 0; i < count; i++)
+		{
+			if (tpl_triggerids[i] == templateid_down)
+				flag_down = i;
+			if (tpl_triggerids[i] == templateid_up)
+				flag_up = i;
+
+			if (flag_down && flag_up)
+				break;
+		}
+
+		if (flag_down && flag_up)
+		{
+			DBinsert_dependency(hst_triggerids[flag_down], hst_triggerids[flag_up]);
+		}
+	}
+
+	DBfree_result(db_dependencies);
+
+	zbx_free(tpl_triggerids);
+	zbx_free(hst_triggerids);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -4031,7 +4065,7 @@ static int	DBcopy_template_triggers(
 		DBfree_result(db_elements);
 
 		if( SUCCEED == result)
-			result = DBupdate_template_dependences_for_host(hostid);
+			result = DBupdate_template_dependencies_for_host(hostid);
 	}
 
 	return result;
