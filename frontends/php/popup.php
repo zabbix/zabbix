@@ -174,7 +174,7 @@ include_once('include/page_header.php');
 	$dstfld2	= get_request('dstfld2', '');	// second output field on destination form
 	$srcfld1	= get_request('srcfld1', '');	// source table field [can be different from fields of source table]
 	$srcfld2	= get_request('srcfld2', null);	// second source table field [can be different from fields of source table]
-	$multiselect = get_request('multiselect', false); //if create popup with checkboxes
+	$multiselect = get_request('multiselect', 0); //if create popup with checkboxes
 	$dstact 	= get_request('dstact', ''); 
 
 
@@ -752,9 +752,7 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 		$table->SetHeader(array(
-			($hostid>0)?null:S_HOST,
-			S_DESCRIPTION,S_KEY,nbsp(S_UPDATE_INTERVAL),
-			S_STATUS));
+			($hostid>0)?null:S_HOST, S_DESCRIPTION, S_KEY,nbsp(S_UPDATE_INTERVAL), S_STATUS));
 
 		$db_items = DBselect('SELECT DISTINCT h.host,i.* '.
 					' FROM items i,hosts h'.
@@ -768,16 +766,16 @@ include_once('include/page_header.php');
 
 		while($db_item = DBfetch($db_items))
 		{
-			$description = new CLink(item_description($db_item),"#","action");
-			$description->SetAction("return add_item_variable('".$dstfrm."','".$db_item["itemid"]."');");
-
+			$description = new CSpan(item_description($db_item),'link');
+			$description->onClick("return add_item_variable('".$dstfrm."','".$db_item["itemid"]."');");
+			
 			switch($db_item["status"]){
 				case 0: $status=new CCol(S_ACTIVE,"enabled");		break;
 				case 1: $status=new CCol(S_DISABLED,"disabled");	break;
 				case 3: $status=new CCol(S_NOT_SUPPORTED,"unknown");	break;
 				default:$status=S_UNKNOWN;
 			}
-
+			
 			$table->addRow(array(
 				($hostid>0)?null:$db_item['host'],
 				$description,
