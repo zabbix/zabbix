@@ -295,14 +295,14 @@ function insert_js_function($fnct_name){
 	switch($fnct_name){
 		case 'add_item_variable':
 			insert_js('function add_item_variable(s_formname,x_value){
-				if(add_variable(null, "itemid[]", x_value, s_formname, window.opener.document)){
+				if(add_variable(null, "itemid["+x_value+"]", x_value, s_formname, window.opener.document)){
 					var o_form;
 			
 					if( !(o_form = window.opener.document.forms[s_formname]) )
 						 throw "Missed form with name ["+s_formname+"].";
 			
 					var element = o_form.elements["itemid"];
-					if(element) element.name = "itemid[]";
+					if(element) element.name = "itemid["+element.value+"]";
 			
 					o_form.submit();
 				}

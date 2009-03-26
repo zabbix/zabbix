@@ -185,8 +185,6 @@ include_once "include/page_header.php";
 		}
 	}
 
-	$effectiveperiod = navigation_bar_calc();
-
 	unset($item_data);
 
 	$to_save_request = null;
@@ -195,8 +193,9 @@ include_once "include/page_header.php";
 		if($item_type == ITEM_VALUE_TYPE_LOG){
 			$l_header = new CForm();
 			$l_header->setName('loglist');
+			$l_header->setMethod('get');
 			$l_header->addVar('action',$_REQUEST['action']);
-			$l_header->addVar('from',$_REQUEST['from']);
+			$l_header->addVar('from',get_request('from', 0));
 			$l_header->addVar('period',$_REQUEST['period']);
 			$l_header->addVar('itemid',$_REQUEST['itemid']);
 
@@ -256,31 +255,25 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
-	if($_REQUEST['action']=='showgraph' && $item_type != ITEM_VALUE_TYPE_LOG){
-		$dom_graph_id = 'graph';
-
+	$effectiveperiod = navigation_bar_calc();
 		$bstime = $_REQUEST['stime'] = get_request('stime',
 										get_profile('web.item.graph.stime',date('YmdHi',(time()-$_REQUEST['period'])),
 										PROFILE_TYPE_STR,
 										$_REQUEST['itemid']));
+	update_profile('web.item.graph.stime', $_REQUEST['stime'], PROFILE_TYPE_STR);
+
+	if($_REQUEST['action']=='showgraph' && ($item_type != ITEM_VALUE_TYPE_LOG)){
+		$dom_graph_id = 'graph';
 		show_history($_REQUEST['itemid'],$_REQUEST['from'],$bstime,$effectiveperiod);
 	}
 	else if($_REQUEST['action']=='showvalues' || $_REQUEST['action']=='showlatest'){
-		if($_REQUEST['action']=='showvalues'){
-
-			$bstime = $_REQUEST['stime'] = get_request('stime',
-											get_profile('web.item.graph.stime',date('YmdHi',(time()-$_REQUEST['period'])),
-											PROFILE_TYPE_STR,
-											$_REQUEST['itemid']));
+	
+		if($_REQUEST['action']=='showvalues') {
 			$time = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 			$till = $time + $effectiveperiod;
-
-			$l_header = array(S_SHOWING_HISTORY_OF.SPACE.zbx_date2age(0,$effectiveperiod),'['.S_FROM_SMALL.': '.date('Y.M.d H:i:s',$time).']');
 		}
-		else{
 			$l_header = null;
-		}
-
+		
 		if(!isset($_REQUEST['plaintext'])){
 			if($item_type==ITEM_VALUE_TYPE_LOG){
 				$to_save_request = array('filter_task', 'filter', 'mark_color');
@@ -363,7 +356,8 @@ include_once "include/page_header.php";
 					' FROM history_log h, items i, hosts hst '.
 					' WHERE hst.hostid=i.hostid '.
 						' AND h.itemid=i.itemid'.$sql_filter.
-						' AND i.itemid in ('.$itemid_lst.')'.$cond_clock.
+						' AND i.itemid in ('.$itemid_lst.')'.
+						$cond_clock.
 					' ORDER BY h.clock desc, h.id DESC';
 			$result=DBselect($sql,$limit);
 
@@ -472,14 +466,13 @@ include_once "include/page_header.php";
 				default:			$h_table = 'history_str';
 			}
 
-			$result = DBselect('SELECT h.clock,h.value,i.valuemapid '.
+			$sql = 'SELECT h.clock,h.value,i.valuemapid '.
 							' FROM '.$h_table.' h, items i '.
 							' WHERE h.itemid=i.itemid '.
 								' AND i.itemid='.$_REQUEST['itemid'].
 								$cond_clock.
-							' ORDER BY clock desc',
-				$limit);
-
+							' ORDER BY clock desc';
+			$result = DBselect($sql,$limit);
 			if(!isset($_REQUEST['plaintext'])){
 				$table = new CTableInfo();
 				$table->setHeader(array(S_TIMESTAMP, S_VALUE));
@@ -539,24 +532,21 @@ COpt::profiling_stop('history');
 	if(!isset($_REQUEST['plaintext'])){
 
 		if(str_in_array($_REQUEST['action'],array('showvalues','showgraph'))){
-
+		
 			$stime = get_min_itemclock_by_itemid($_REQUEST['itemid']);
 			$stime = (is_null($stime))?0:$stime;
 			$bstime = time()-$effectiveperiod;
-
+			
 			if(isset($_REQUEST['stime'])){
 				$bstime = $_REQUEST['stime'];
 				$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 			}
-
- 			$script = 	'scrollinit(0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');
-						showgraphmenu("graph");';
+		
+ 			$script = 'scrollinit(0,'.$effectiveperiod.','.$stime.',0,'.$bstime.'); showgraphmenu("graph");';
 			if(isset($dom_graph_id))
-						$script.='graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH, 200, true);';
-
+				$script.='graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH, 200, true);';
 			zbx_add_post_js($script);
-
-//		navigation_bar("history.php",$to_save_request);
+			//		navigation_bar("history.php",$to_save_request);		}
 		}
 	}
 ?>

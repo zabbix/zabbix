@@ -271,53 +271,7 @@
 			$itemids[$item['itemid']] = $item['itemid'];
 		}
 
-// OPTIMIZED SQL!!!
-// sql is splited to optimize search on history tables
-
-		$min = null;
-// TRENDS
-		$sql = 'SELECT t.itemid, t.clock FROM trends t WHERE '.DBcondition('t.itemid', $itemids).' ORDER BY t.itemid, t.clock';
-		$row = DBfetch(DBselect($sql,1)); 
-		if(!empty($row) && $row && $row['clock']){
-			$min = $row['clock'];
-		}
-
-		$sql = 'SELECT t.itemid, t.clock FROM trends_uint t WHERE '.DBcondition('t.itemid', $itemids).' ORDER BY t.itemid, t.clock';
-		$row = DBfetch(DBselect($sql,1)); 
-		if(!empty($row) && $row && $row['clock']){
-			$min = is_null($min)?$row['clock']:min($min, $row['clock']);
-		}
-
-		if(is_null($min)){
-// HISTORY
-			$sql = 'SELECT h.itemid, h.clock FROM history h WHERE '.DBcondition('h.itemid', $itemids).' ORDER BY h.itemid, h.clock';
-			$row = DBfetch(DBselect($sql,1)); 
-			if(!empty($row) && $row && $row['clock']){
-				$min = $row['clock'];
-			}
-	
-			$sql = 'SELECT h.itemid, h.clock FROM history_uint h WHERE '.DBcondition('h.itemid', $itemids).' ORDER BY h.itemid, h.clock';
-			$row = DBfetch(DBselect($sql,1)); 
-			if(!empty($row) && $row && $row['clock']){
-				$min = is_null($min)?$row['clock']:min($min, $row['clock']);
-			}
-		}
-
-///////
-// if no entry is found in history
-		if(is_null($min)){
-			$min = 0;
-			$sql = 'SELECT DISTINCT MAX(i.history) as history, MAX(i.trends) as trends '.
-					' FROM items i '.
-					' WHERE '.DBcondition('i.itemid', $itemids);
-			if($item = DBfetch(DBselect($sql))){
-				$time = max($item['trends'],$item['history']) * 86400;
-				$min = time() - $time;
-			}
-		}
-/////
-
-	return $min;
+	return get_min_itemclock_by_itemid($itemids);
 	}
 
 /*
@@ -330,23 +284,69 @@
  *     Aly
  *
  */	
-	function get_min_itemclock_by_itemid($itemid){
-		$min = 0;
-		$row = DBfetch(DBselect('SELECT MIN(t.clock) as clock '.
-						' FROM trends t '.
-						' WHERE t.itemid='.$itemid)); 
-						  
-		if(!empty($row) && $row && $row['clock']) 
-			$min = $row['clock'];
+	function get_min_itemclock_by_itemid($itemids){
+		zbx_value2array($itemids);
+		$min = null;
+		$result = time() - 86400*365;
+		
+		$items_by_type = array(ITEM_VALUE_TYPE_FLOAT => array(), ITEM_VALUE_TYPE_STR =>  array(), ITEM_VALUE_TYPE_LOG => array(), 
+						ITEM_VALUE_TYPE_UINT64 => array(), ITEM_VALUE_TYPE_TEXT => array());
+						
+		$sql = 'SELECT i.itemid, i.value_type '.
+				' FROM items i WHERE '.DBcondition('i.itemid', $itemids);
+		$db_result = DBselect($sql);
+		
+		while($item = DBfetch($db_result)) {
+			$items_by_type[$item['value_type']][$item['itemid']] = $item['itemid'];
+		}
+		
+		// data for ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64 can be stored in trends tables or history table
+		// get max trends and history values for such type items to find out in what tables to look for data
+		$sql_from = 'history';
+		$sql_from_num = '';
+		if(!empty($items_by_type[ITEM_VALUE_TYPE_FLOAT]) || !empty($items_by_type[ITEM_VALUE_TYPE_UINT64])) {
+			$itemids_numeric = array_merge($items_by_type[ITEM_VALUE_TYPE_FLOAT], $items_by_type[ITEM_VALUE_TYPE_UINT64]);
+			$sql = 'SELECT MAX(i.history) as history, MAX(i.trends) as trends FROM items i WHERE '.DBcondition('i.itemid', $itemids_numeric);
 
-		$row = DBfetch(DBselect('SELECT MIN(t.clock) as clock '.
-						' FROM trends_uint t '.
-						' WHERE t.itemid='.$itemid)); 
-						  
-		if(!empty($row) && $row && $row['clock']) 
-			$min = $min == 0 ? $row['clock'] : min($min, $row['clock']);
-
-	return $min;
+			if($table_for_numeric = DBfetch(DBselect($sql))){
+				$sql_from_num = ($table_for_numeric['history'] > $table_for_numeric['trends']) ? 'history' : 'trends';
+				$result = time() - (86400 * max($table_for_numeric['history'],$table_for_numeric['trends']));
+			}
+		}
+		foreach($items_by_type as $type => $items) {
+			if(empty($items)) continue;
+			switch($type) {
+				case ITEM_VALUE_TYPE_FLOAT: // 0
+					$sql_from = $sql_from_num;
+				break;
+				case ITEM_VALUE_TYPE_STR: // 1
+					$sql_from = 'history_str';
+				break;
+				case ITEM_VALUE_TYPE_LOG: // 2
+					$sql_from = 'history_log';
+				break;
+				case ITEM_VALUE_TYPE_UINT64: // 3
+					$sql_from = $sql_from_num.'_uint';
+				break;
+				case ITEM_VALUE_TYPE_TEXT: // 4
+					$sql_from = 'history_text';
+				break;
+				default:
+					$sql_from = 'history';
+			}
+			foreach($items as $itemid) {
+				$sql = 'SELECT ht.clock '.
+						' FROM '.$sql_from.' ht '.
+						' WHERE ht.itemid='.$itemid.
+						' ORDER BY ht.itemid, ht.clock ';
+				if($min_tmp = DBfetch(DBselect($sql,1))){
+					$min = (is_null($min)) ? $min_tmp['clock'] : min($min, $min_tmp['clock']);
+				}
+			}			
+		}
+		$result = is_null($min)?$result:$min;
+		
+	return $result;
 	}
 	
 // Show History Graph
@@ -965,9 +965,9 @@
 	}
 
 	function navigation_bar_calc(){
-		if(!isset($_REQUEST['period']))	$_REQUEST['period']=ZBX_PERIOD_DEFAULT;
-		if(!isset($_REQUEST['from']))	$_REQUEST['from']=0;
-		if(!isset($_REQUEST['stime']))	$_REQUEST['stime']=null;
+		$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
+		$_REQUEST['from'] = get_request('from', 0);
+		$_REQUEST['stime'] = get_request('stime', null);
 
 		if($_REQUEST['period']<ZBX_MIN_PERIOD){
 			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MIN_VALUE_SMALL.': '.ZBX_MIN_PERIOD.' ('.(int)(ZBX_MIN_PERIOD/3600).'h)');
@@ -982,9 +982,10 @@
 		if(isset($_REQUEST['stime'])){
 			$bstime = $_REQUEST['stime'];
 			$time = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-			if(($time+$_REQUEST['period']) > time()) unset($_REQUEST['stime']);
+			if(($time+$_REQUEST['period']) > time()) {
+				$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);
+			}
 		}
-		
 	return $_REQUEST['period'];
 	}
 

@@ -166,12 +166,11 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
-	$dstfrm		= get_request("dstfrm",  '');	// destination form
-	$dstfld1	= get_request("dstfld1", '');	// output field on destination form
-	$dstfld2	= get_request("dstfld2", '');	// second output field on destination form
-	$srcfld1	= get_request("srcfld1", '');	// source table field [can be different from fields of source table]
-	$srcfld2	= get_request("srcfld2", null);	// second source table field [can be different from fields of source table]
-	
+	$dstfrm		= get_request("dstfrm",  '');	// destination form	
+	$dstfld1	= get_request("dstfld1", '');	// output field on destination form	
+	$dstfld2	= get_request("dstfld2", '');	// second output field on destination form	
+	$srcfld1	= get_request("srcfld1", '');	// source table field [can be different from fields of source table]	
+	$srcfld2	= get_request("srcfld2", null);	// second source table field [can be different from fields of source table]		
 	$monitored_hosts	= get_request('monitored_hosts', 0);
 	$real_hosts			= get_request('real_hosts', 0);
 	$only_hostid		= get_request('only_hostid', null);
@@ -733,9 +732,7 @@ include_once "include/page_header.php";
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 		$table->SetHeader(array(
-			($hostid>0)?null:S_HOST,
-			S_DESCRIPTION,S_KEY,nbsp(S_UPDATE_INTERVAL),
-			S_STATUS));
+			($hostid>0)?null:S_HOST, S_DESCRIPTION, S_KEY,nbsp(S_UPDATE_INTERVAL), S_STATUS));
 
 		$db_items = DBselect('SELECT DISTINCT h.host,i.* '.
 					' FROM items i,hosts h'.
@@ -749,16 +746,16 @@ include_once "include/page_header.php";
 
 		while($db_item = DBfetch($db_items))
 		{
-			$description = new CLink(item_description($db_item),"#","action");
-			$description->SetAction("return add_item_variable('".$dstfrm."','".$db_item["itemid"]."');");
-
+			$description = new CSpan(item_description($db_item),'link');
+			$description->onClick("return add_item_variable('".$dstfrm."','".$db_item["itemid"]."');");
+			
 			switch($db_item["status"]){
 				case 0: $status=new CCol(S_ACTIVE,"enabled");		break;
 				case 1: $status=new CCol(S_DISABLED,"disabled");	break;
 				case 3: $status=new CCol(S_NOT_SUPPORTED,"unknown");	break;
 				default:$status=S_UNKNOWN;
 			}
-
+			
 			$table->addRow(array(
 				($hostid>0)?null:$db_item['host'],
 				$description,
