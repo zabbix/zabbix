@@ -21,7 +21,6 @@ Changes for 1.7.0
  - [DEV-252] improved audit log of host groups,hosts,items and media types (Sasha)
  - [DEV-266] added support of octal and hexadecimal data (Sasha)
  - [DEV-253] improved audit log filtering (Artem)
- - [DEV-267] improved item template-update (Artem)
  - [DEV-261] added triggers status to screens (Artem)
  - [DEV-256] improved multiple labels in maps and support of macros (Sasha)
  - [DEV-265] added popups with links to "Status of trigger" & "Events history" pages (Artem)
@@ -34,6 +33,8 @@ Changes for 1.7.0
 
 Changes for 1.6.3
 
+ - [ZBX-815] fixed month representation in seconds in most busy triggers report (Artem)
+ - [DEV-267] improved item template-update (Artem)
  - [ZBX-814] fixed bad performance of the string functions - added two database indexes (Sasha)
  - [ZBX-804] added support of text items for functions str, regexp and iregexp (Sasha)
  - [ZBX-668] "Cannot open Json object" message replaced with a better one in agent log (Sasha)
