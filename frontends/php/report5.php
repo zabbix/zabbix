@@ -46,12 +46,12 @@ include_once('include/page_header.php');
 	$form->SetMethod('get');
 	
 	$cmbPeriod = new CComboBox('period',$_REQUEST['period'],'submit()');
-	$cmbPeriod->AddItem('day',S_DAY);
-	$cmbPeriod->AddItem('week',S_WEEK);
-	$cmbPeriod->AddItem('month',S_MONTH);
-	$cmbPeriod->AddItem('year',S_YEAR);
+	$cmbPeriod->addItem('day',S_DAY);
+	$cmbPeriod->addItem('week',S_WEEK);
+	$cmbPeriod->addItem('month',S_MONTH);
+	$cmbPeriod->addItem('year',S_YEAR);
 
-	$form->AddItem($cmbPeriod);
+	$form->addItem($cmbPeriod);
 
 	show_table_header(S_TRIGGERS_TOP_100_BIG, $form);
 ?>
@@ -66,15 +66,15 @@ include_once('include/page_header.php');
 			));
 
 	switch($_REQUEST['period']){
-		case 'week':	$time_dif=7*24*3600;	break;
-		case 'month':	$time_dif=10*24*3600;	break;
-		case 'year':	$time_dif=365*24*3600;	break;
+		case 'week':	$time_dif=7*86400;	break;
+		case 'month':	$time_dif=30*86400;	break;
+		case 'year':	$time_dif=365*86400;	break;
 		case 'day':
-		default:	$time_dif=24*3600;	break;
+		default:	$time_dif=86400;	break;
 	}
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 	$scripts_by_hosts = get_accessible_scripts_by_hosts($available_hosts);
 
 
@@ -92,7 +92,6 @@ include_once('include/page_header.php');
 				' and '.DBin_node('t.triggerid').
 			' GROUP BY h.host,t.triggerid,t.description,t.expression,t.priority '.
 			' ORDER BY cnt_event desc, h.host, t.description, t.triggerid';
-
 	$result=DBselect($sql, 100);
 	while($row=DBfetch($result)){
 		$row['items'] = array();
