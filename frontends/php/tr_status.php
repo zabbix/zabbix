@@ -456,7 +456,6 @@ include_once "include/page_header.php";
 			}
 		}
 		
-		$triggers_num++;
 		$elements=array();
 
 		$description = expand_trigger_description($row['triggerid']);
@@ -575,7 +574,6 @@ include_once "include/page_header.php";
 				$show_event_col?SPACE:NULL,
 				new CLink(zbx_empty($row['comments'])?S_ADD:S_SHOW,'tr_comments.php?triggerid='.$row['triggerid'],'action')
 				));
-
 		$event_limit=0;
 		$res_events = DBSelect($event_sql,$config['event_show_max']*100);
 
@@ -635,7 +633,9 @@ include_once "include/page_header.php";
 	}
 
 	$table->SetFooter(new CCol(array($show_event_col?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):SPACE)));
-					
+	
+	$triggers_num = $table->GetNumRows();
+	
 	$m_form->AddItem($table);
 	unset($table);
 //	$m_form->Show();
@@ -650,6 +650,7 @@ include_once "include/page_header.php";
 	);
 
 	$triggers_hat->Show();
+	
 	zbx_add_post_js('insert_in_element("tr_numrows","'.$triggers_num.'");');
 	
 
