@@ -84,9 +84,7 @@ include_once "include/page_header.php";
 							' and '.DBin_node('t.triggerid').
 						' GROUP BY h.host,t.triggerid,t.description,t.expression,t.priority '.
 						' ORDER BY cnt_event desc, h.host, t.description, t.triggerid';
-
         $result=DBselect($sql, 100);
-
         while($row=DBfetch($result)){
 			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $available_hosts))
 				continue;
