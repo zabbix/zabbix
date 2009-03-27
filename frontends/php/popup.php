@@ -794,9 +794,7 @@ include_once "include/page_header.php";
 			$row["description"] = item_description($row);
 			
 			$description = new CLink($row["description"],"#","action");
-
-			$row["description"] = $row['host'].':'.$row["description"];
-
+			
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).

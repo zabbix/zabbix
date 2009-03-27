@@ -1,5 +1,6 @@
 Changes for 1.6.3
 
+ - [ZBX-818] In configuration->items, if selected Host All, items hosts are shown in table (Vedmak)
  - [ZBX-815] fixed month representation in seconds in most busy triggers report (Artem)
  - [DEV-267] improved item template-update (Artem)
  - [ZBX-814] fixed bad performance of the string functions - added two database indexes (Sasha)

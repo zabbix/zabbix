@@ -771,15 +771,19 @@ include_once 'include/page_header.php';
 //			$_REQUEST['itemid'] = 0;
 		}
 	}
-
+	
+	$reset = true;
 	$options = array('only_current_node');
-	if($filter_enabled) array_push($options,'allow_all');
+	if($filter_enabled){
+		array_push($options,'allow_all');
+		$reset = false;
+	}
 	foreach($options as $option) $params[$option] = 1;
 
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
 
-	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS, $reset);
 
 	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
@@ -837,7 +841,7 @@ include_once 'include/page_header.php';
 		if($PAGE_HOSTS['selected'] > 0)
 			$where_case[] = 'h.hostid='.$PAGE_HOSTS['selected'];
 
-		$show_host = (($PAGE_HOSTS['selected'] == 0) && (ZBX_DROPDOWN_FIRST_ENTRY == ZBX_DROPDOWN_FIRST_ALL));
+		$show_host = ($PAGE_HOSTS['selected'] == 0);
 
 		if(!$filter_enabled){
 			$show_applications = 1;
@@ -996,14 +1000,15 @@ include_once 'include/page_header.php';
 					' LEFT JOIN hosts th ON ti.hostid=th.hostid '.
 				' WHERE '.implode(' AND ', $where_case).
 				order_by('h.host,i.description,i.key_,i.delay,i.history,i.trends,i.type,i.status','i.itemid');
-*/			
+//*/			
+//*
 		$sql = 'SELECT DISTINCT th.host as template_host,th.hostid as template_hostid, h.host, h.hostid, i.* '.
 				' FROM '.implode(',', $from_tables).
 					' LEFT JOIN items ti ON i.templateid=ti.itemid '.
 					' LEFT JOIN hosts th ON ti.hostid=th.hostid '.
 				' WHERE '.implode(' and ', $where_case).
 				order_by('h.host,i.description,i.key_,i.delay,i.history,i.trends,i.type,i.status','i.itemid');
-
+//*/
 		$db_items = DBselect($sql);
 		while($db_item = DBfetch($db_items)){
 			$description = array();
