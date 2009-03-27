@@ -76,8 +76,6 @@ include_once('include/page_header.php');
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 	$scripts_by_hosts = get_accessible_scripts_by_hosts($available_hosts);
-
-
 	$triggers = array();
 	$triggerids = array();
 	$sql = 'SELECT h.host, h.hostid, t.triggerid, t.description, t.expression, t.lastchange, t.priority, count(distinct e.eventid) as cnt_event '.

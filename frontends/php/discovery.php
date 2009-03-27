@@ -64,7 +64,12 @@ include_once "include/page_header.php";
 
 	$cmbDRules = new CComboBox('druleid',$druleid,'submit()');
 	$cmbDRules->AddItem(0,S_ALL_SMALL);
-	$db_drules = DBselect('select distinct druleid,name from drules where '.DBin_node('druleid').' order by name');
+	$sql = 'SELECT DISTINCT druleid,name '.
+			' FROM drules '.
+			' WHERE '.DBin_node('druleid').
+				' AND status='.DRULE_STATUS_ACTIVE.
+			' ORDER BY name';
+	$db_drules = DBselect($sql);
 	while($drule = DBfetch($db_drules))
 		$cmbDRules->AddItem(
 				$drule['druleid'],
@@ -88,10 +93,17 @@ include_once "include/page_header.php";
 
 	$services = array();
 
-	$db_dservices = DBselect('SELECT s.type,s.port,s.key_ FROM dservices s,dhosts h'.
+	$sql_where='';
+	if($druleid>0){
+		$sql_where = ' AND h.druleid='.$druleid;
+	}
+
+	$sql = 'SELECT s.type,s.port,s.key_ '.
+			' FROM dservices s,dhosts h '.
 			' WHERE '.DBin_node('s.dserviceid').
-			' AND s.dhostid=h.dhostid'.
-			($druleid > 0 ? ' AND h.druleid='.$druleid : ''));
+				' AND s.dhostid=h.dhostid'.
+				$sql_where;
+	$db_dservices = DBselect($sql);
 	while ($dservice = DBfetch($db_dservices)) {
 		$service_name = discovery_check_type2str($dservice['type']).
 				discovery_port2str($dservice['type'], $dservice['port']).
@@ -114,9 +126,17 @@ include_once "include/page_header.php";
 	$table  = new CTableInfo();
 	$table->SetHeader($header,'vertical_header');
 
-	$db_drules = DBselect('select distinct druleid,name from drules where '.DBin_node('druleid').
-			($druleid > 0 ? ' and druleid='.$druleid : '').
-			' order by name');
+	$sql_where='';
+	if($druleid>0){
+		$sql_where = ' AND druleid='.$druleid;
+	}
+	$sql = 'SELECT DISTINCT druleid,name '.
+			' FROM drules '.
+			' WHERE '.DBin_node('druleid').
+				$sql_where.
+				' AND status='.DRULE_STATUS_ACTIVE.
+			' ORDER BY name';
+	$db_drules = DBselect($sql);
 	while($drule = DBfetch($db_drules)) {
 		$discovery_info = array();
 
