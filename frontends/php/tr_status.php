@@ -490,41 +490,39 @@ include_once 'include/page_header.php';
 		$triggerids[$row['triggerid']] = $row['triggerid'];
 	}
 	
-	$sql = 'SELECT f.triggerid, i.* '.
-			' FROM functions f, items i '.
-			' WHERE '.DBcondition('f.triggerid',$triggerids).
-				' AND i.itemid=f.itemid';
+	$sql = 'SELECT f.triggerid, i.* '.			
+			' FROM functions f, items i '.			
+			' WHERE '.DBcondition('f.triggerid',$triggerids).				
+				' AND i.itemid=f.itemid';	
 	$result = DBselect($sql);
-	while($row = DBfetch($result)){
-		$item['itemid'] = $row['itemid'];
-		$item['action'] = str_in_array($row['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
-		$item['description'] = item_description($row);
-		
-		$triggers[$row['triggerid']]['items'][$row['itemid']] = $item;
-	}
-		
-	$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
-				' FROM events e, triggers t '.
-				' WHERE e.object=0 '.
-					' AND '.DBcondition('e.objectid',$triggerids).
-					' AND t.triggerid=e.objectid '.
-					$event_cond.
-				' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 	
-	$res_events = DBSelect($event_sql,$config['event_show_max']*100);
-	while($row_event=DBfetch($res_events)){
-		if($show_events == EVENTS_OPTION_NOFALSEFORB){
-			if((EVENTS_NOFALSEFORB_STATUS_FALSE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_FALSE)) continue;
-			if((EVENTS_NOFALSEFORB_STATUS_TRUE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_TRUE)) continue;
-			
-			if(($row_event['value'] == TRIGGER_VALUE_FALSE) && (!event_initial_time($row_event))){
-				continue;
-			}
-		}
-		$triggers[$row_event['triggerid']]['events'][$row_event['eventid']] = $row_event;
+	while($row = DBfetch($result)){		
+		$item['itemid'] = $row['itemid'];		
+		$item['action'] = str_in_array($row['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';		
+		$item['description'] = item_description($row);				
+		$triggers[$row['triggerid']]['items'][$row['itemid']] = $item;	
 	}
 	
-	foreach($triggers as $triggerid => $row){
+	$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.				
+			' FROM events e, triggers t '.				
+			' WHERE e.object=0 '.					
+				' AND '.DBcondition('e.objectid',$triggerids).					
+				' AND t.triggerid=e.objectid '.					
+				$event_cond.				
+			' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';	
+	
+	$res_events = DBSelect($event_sql,$config['event_show_max']*100);	
+	while($row_event=DBfetch($res_events)){		
+		if($show_events == EVENTS_OPTION_NOFALSEFORB){			
+			if((EVENTS_NOFALSEFORB_STATUS_FALSE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_FALSE)) continue;			
+			if((EVENTS_NOFALSEFORB_STATUS_TRUE == $show_events_status) && ($row_event['value'] != TRIGGER_VALUE_TRUE)) continue;						
+			if(($row_event['value'] == TRIGGER_VALUE_FALSE) && (!event_initial_time($row_event))){				
+				continue;			
+			}		
+		}		
+		$triggers[$row_event['triggerid']]['events'][$row_event['eventid']] = $row_event;	
+	}		
+	foreach($triggers as $triggerid => $row){		
 		$elements=array();
 		$description = expand_trigger_description($row['triggerid']);
 
@@ -654,7 +652,6 @@ include_once 'include/page_header.php';
 				$show_event_col?SPACE:NULL,
 				new CLink(zbx_empty($row['comments'])?S_ADD:S_SHOW,'tr_comments.php?triggerid='.$row['triggerid'],'action')
 				));
-
 		$event_limit=0;
 		foreach($row['events'] as $eventid => $row_event){			
 			$value = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));	
@@ -707,8 +704,8 @@ include_once 'include/page_header.php';
 
 	$table->setFooter(new CCol(array(($config['event_ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE))));
 					
-	$m_form->addItem($table);
-	unset($table);
+	$triggers_num = $table->GetNumRows();		
+	$m_form->AddItem($table);	unset($table);
 	
 	$p_elements[] = $m_form;
 	$triggers_hat = create_hat(
@@ -720,6 +717,7 @@ include_once 'include/page_header.php';
 	);
 
 	$triggers_hat->Show();
+	
 	zbx_add_post_js('insert_in_element("tr_numrows","'.$triggers_num.'");');
 
 	zbx_add_post_js('blink.init();');	
