@@ -507,7 +507,7 @@
 							$data['applications'] = array_unique(array_merge($data['applications'],get_applications_by_itemid($item['itemid'])));
 							$data['templateid'] = $item['templateid'];
 							
-							check_db_fields($item, $data));
+							check_db_fields($item, $data);
 							
 						update_item($item['itemid'], $data);
 					}
