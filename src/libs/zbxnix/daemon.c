@@ -47,7 +47,7 @@ void	child_signal_handler(int sig)
 		exit( FAIL );
 		break;
 	case SIGPIPE:
-		zabbix_log( LOG_LEVEL_WARNING, "Got SIGPIPE. Where it came from???");
+		zabbix_log( LOG_LEVEL_DEBUG, "Got SIGPIPE. Where it came from???");
 		break;
 	default:
 		zabbix_log( LOG_LEVEL_WARNING, "Got signal [%d]. Ignoring ...", sig);
