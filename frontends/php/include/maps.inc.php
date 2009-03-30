@@ -464,14 +464,16 @@
 					if(isset($_REQUEST['show_triggers']) && (TRIGGERS_OPTION_NOFALSEFORB == $_REQUEST['show_triggers'])){
 						$event_sql = 'SELECT e.eventid, e.value, e.clock, e.ms, e.objectid as triggerid, e.acknowledged, t.type '.
 							' FROM events e, triggers t '.
-							' WHERE e.object=0 AND e.objectid='.$trigger['triggerid'].
+							' WHERE e.object='.EVENT_SOURCE_TRIGGERS.
+								' AND e.objectid='.$trigger['triggerid'].
 								' AND t.triggerid=e.objectid '.
 								' AND e.acknowledged=0 '.
 								' AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))'.
 							' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
+
 						if($trigger_tmp = get_row_for_nofalseforb($trigger,$event_sql)){
-//							$trigger = array_merge($trigger,$trigger_tmp);
 							$trigger['value'] = TRIGGER_VALUE_TRUE;
+							$orig_trig_value = $trigger_tmp['value'];
 						}
 					}
 
@@ -485,11 +487,13 @@
 						$event_limit=0;
 						$res_events = DBSelect($event_sql,$config['event_show_max']*100);
 						while($row_event=DBfetch($res_events)){
+
 							$event_limit++;
 							if($row_event['value'] != TRIGGER_VALUE_TRUE) continue;
 
 							$trig_ack = 1;
 							$tr_info[$type]['count']++;
+
 							if($event_limit >= $config['event_show_max']) break;
 						}
 						
