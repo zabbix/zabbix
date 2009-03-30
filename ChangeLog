@@ -1,5 +1,6 @@
 Changes for 1.6.4
 
+ - [ZBX-821] fixed dashboard context menu "Latest data" does not show required host (Vedmak)
  - [ZBX-819] Error in import script (Artem)
  - [ZBX-818] In configuration->items, if selected Host All, items hosts are shown in table (Vedmak)
 
