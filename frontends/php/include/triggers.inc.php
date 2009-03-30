@@ -2380,7 +2380,7 @@
 	}
 	
 	function get_row_for_nofalseforb($row,$sql){
-		$res_events = DBSelect($sql,1);
+		$res_events = DBselect($sql,1);
 
 		if(!$e_row=DBfetch($res_events)){
 			return false;
