@@ -634,7 +634,7 @@
 	'S_LEGEND'=>				'Legend',
 	'S_GRAPH_SUM'=>		'Graph sum',
 	'S_GRAPH_ITEM'=>			'Graph item',
-	'S_REQUIRED_ITEMS_FOR_GRAPH'=>		'Required items for graph',
+	'S_REQUIRED_ITEMS_FOR_GRAPH'=>		'Items required for graph',
 
 //	history.php
 	'S_SECONDS_SMALL'=>				'seconds',

@@ -128,6 +128,7 @@ include_once 'include/page_header.php';
 
 		if(count($items) <= 0){
 			info(S_REQUIRED_ITEMS_FOR_GRAPH);
+			$result = false;
 		}
 		else{
 			isset($_REQUEST['yaxistype'])?(''):($_REQUEST['yaxistype']=0);
@@ -157,7 +158,6 @@ include_once 'include/page_header.php';
 				if($result){
 					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_GRAPH,'Graph ID ['.$_REQUEST['graphid'].'] Graph ['.$_REQUEST['name'].']');
 				}
-				show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 			}
 			else{
 				DBstart();
@@ -170,11 +170,16 @@ include_once 'include/page_header.php';
 				if($result){
 					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,'Graph ['.$_REQUEST['name'].']');
 				}
-				show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 			}
 			if($result){
 				unset($_REQUEST['form']);
 			}
+		}
+		if(isset($_REQUEST['graphid'])){
+			show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
+		}
+		else {
+			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 		}
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])){
