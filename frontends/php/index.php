@@ -135,19 +135,12 @@ $page['file']	= "index.php";
 		}
 
 		if($login){
-			$sessionid = md5(time().$password.$name.rand(0,10000000));
-			zbx_setcookie('zbx_sessionid',$sessionid);
-			
-			DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.$row['userid'].','.time().','.ZBX_SESSION_ACTIVE.')');
+			$sessionid = zbx_session_start($row['userid'], $name, $password);
 
 			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,'Correct login ['.$name.']');
 			
 			if(empty($row['url'])){
-				$USER_DETAILS['alias'] = $row['alias'];
-				$USER_DETAILS['userid'] = $row['userid'];
-				
 				$row['url'] = get_profile('web.menu.view.last','index.php');
-				unset($USER_DETAILS);
 			}
 
 			redirect($row['url']);
@@ -175,7 +168,7 @@ include_once "include/page_header.php";
 
 	if(isset($_REQUEST['message'])) show_error_message($_REQUEST['message']);
 
-	if(!isset($sessionid)){
+	if(!isset($sessionid) || ($USER_DETAILS['alias'] == ZBX_GUEST_USER)){
 		switch($authentication_type){
 			case ZBX_AUTH_HTTP:
 				break;

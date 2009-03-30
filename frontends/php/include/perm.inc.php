@@ -19,6 +19,16 @@
 **/
 ?>
 <?php
+
+function zbx_session_start($userid, $name, $password){
+	$sessionid = md5(time().$password.$name.rand(0,10000000));
+	zbx_setcookie('zbx_sessionid',$sessionid);
+	
+	DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.$userid.','.time().','.ZBX_SESSION_ACTIVE.')');
+	
+return $sessionid;
+}
+
 function permission2str($group_permission){
 	$str_perm[PERM_READ_WRITE]	= S_READ_WRITE;
 	$str_perm[PERM_READ_ONLY]	= S_READ_ONLY;
@@ -79,6 +89,9 @@ function check_authorisation(){
 		$login = $USER_DETAILS = DBfetch(DBselect($sql));
 		if(!$USER_DETAILS){
 			$missed_user_guest = true;
+		}
+		else{
+			$sessionid = zbx_session_start($USER_DETAILS['userid'], ZBX_GUEST_USER, '');
 		}
 	}
 
