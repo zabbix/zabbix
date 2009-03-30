@@ -19,6 +19,16 @@
 **/
 ?>
 <?php
+
+function zbx_session_start($userid, $name, $password){
+	$sessionid = md5(time().$password.$name.rand(0,10000000));
+	zbx_setcookie('zbx_sessionid',$sessionid);
+	
+	DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.$userid.','.time().','.ZBX_SESSION_ACTIVE.')');
+	
+return $sessionid;
+}
+
 function permission2str($group_permission){
 	$str_perm[PERM_READ_WRITE]	= S_READ_WRITE;
 	$str_perm[PERM_READ_ONLY]	= S_READ_ONLY;
@@ -80,6 +90,9 @@ function check_authorisation(){
 		if(!$USER_DETAILS){
 			$missed_user_guest = true;
 		}
+		else{
+			$sessionid = zbx_session_start($USER_DETAILS['userid'], ZBX_GUEST_USER, '');
+		}
 	}
 
 	if($login){
@@ -89,8 +102,8 @@ function check_authorisation(){
 	if(!$login){
 		$USER_DETAILS = NULL;
 	}
-	
-	if($login && !isset($incorrect_session)){
+
+	if($login && $sessionid && !isset($incorrect_session)){
 		zbx_setcookie('zbx_sessionid',$sessionid,$USER_DETAILS['autologin']?(time()+86400*31):0);	//1 month
 		DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE sessionid='.zbx_dbstr($sessionid));
 	}
@@ -138,7 +151,7 @@ function check_authorisation(){
 		exit;
 	}
 }
-	
+
 /*****************************************
 	LDAP AUTHENTICATION
 *****************************************/
