@@ -480,7 +480,7 @@
 				$table, BR(),
 				$this->DISABLE_NEXT_BUTTON ? array(new CButton('retry', S_RETRY), BR(),BR()) : null,
 				!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false) ? 
-					array('Please install configuration file manualy, or fix permissions on 'conf' directory.',BR(),BR(),
+					array('Please install configuration file manualy, or fix permissions on conf directory.',BR(),BR(),
 						'Press "Save configuration file" button, download configuration file ',
 						'and save it as ',BR(),
 						'"'.$ZBX_CONFIGURATION_FILE.'"',BR(),BR(),
