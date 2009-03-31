@@ -36,7 +36,7 @@
 			while(($ac_data = DBfetch($db_result)) && $result){
 				switch($ac_data['resourcetype']){
 					case SCREEN_RESOURCE_GRAPH:
-						$graphids = get_accessible_graphs($perm,array());
+						$graphids = get_accessible_graphs($perm,array(),null,get_current_nodeid(true));
 						$result &= isset($graphids[$ac_data['resourceid']]);
 					break;
 					case SCREEN_RESOURCE_SIMPLE_GRAPH:
