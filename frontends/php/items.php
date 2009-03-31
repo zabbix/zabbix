@@ -1033,7 +1033,7 @@ include_once 'include/page_header.php';
 
 			$status=new CCol(new CLink(item_status2str($db_item['status']),
 					'?group_itemid%5B%5D='.$db_item['itemid'].
-					'&group_task='.($db_item['status']?'Activate+selected':'Disable+selected'),
+					'&group_task='.($db_item['status']?S_ACTIVATE_SELECTED:S_DISABLE_SELECTED),
 					item_status2style($db_item['status'])));
 
 			if($db_item['error'] == ''){

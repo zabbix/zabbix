@@ -1,5 +1,7 @@
 Changes for 1.6.4
 
+ - [ZBX-826] fixed problem displaying disabled web checks (Artem)
+ - [ZBX-825] fixed problem with changing item status in configuration web and items screens (Artem)
  - [ZBX-822] fixed dashboard when logged in as guest (Artem)
  - [ZBX-763] fixed warning message displayed at the bottom when saving graphs without items (Vedmak)  
  - [ZBX-821] fixed dashboard context menu "Latest data" does not show required host (Vedmak)

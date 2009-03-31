@@ -30,7 +30,7 @@ private $host = 		'';
 private $protocol = 	'';
 private $username =		'';
 private $password =		'';
-private $filr =			'';
+private $file =			'';
 private $reference =	'';
 private $path =			'';
 private $query =		'';
@@ -40,16 +40,16 @@ private $arguments = 	array();
 function curl($url=null){
 	global $USER_DETAILS;
 	
-	$this->url = 		null;		//	actually, it's depricated/private variable 
-	$this->port =		null;
-	$this->host = 		null;
-	$this->protocol = 	null;
-	$this->username =	null;
-	$this->password =	null;
-	$this->file =		null;
-	$this->reference =	null;
-	$this->path =		null;
-	$this->query =		null;
+	$this->url = 		'';		//	actually, it's depricated/private variable 
+	$this->port =		false;
+	$this->host = 		'';
+	$this->protocol = 	'';
+	$this->username =	'';
+	$this->password =	'';
+	$this->file =		'';
+	$this->reference =	'';
+	$this->path =		'';
+	$this->query =		'';
 	$this->arguments = 	array();
 
 	if(empty($url)){
@@ -59,29 +59,88 @@ function curl($url=null){
 	else{
 		$this->url=urldecode($url);
 
-		$url = parse_url($this->url);
-		
-		$this->protocol = isset($url['scheme']) ? $url['scheme'] : null;
-		$this->host = isset($url['host']) ? $url['host'] : null;
-		$this->port = isset($url['port']) ? $url['port'] : null;
-		$this->username = isset($url['user']) ? $url['user'] : null;
-		$this->password = isset($url['pass']) ? $url['pass'] : null;
-		$this->path = isset($url['path']) ? $url['path'] : null;
-		$this->query = isset($url['query']) ? $url['query'] : '';
-		$this->reference = isset($url['fragment']) ? $url['fragment'] : null;
-		
+		$tmp_pos = strpos($this->url,'?');
+		$this->query=($tmp_pos!==false)?(substr($this->url,$tmp_pos+1)):'';
+
+		$tmp_pos = strpos($this->query,'#');
+		if($tmp_pos!==false) $this->query=zbx_substring($this->query,0,$tmp_pos);
+
 		$this->formatArguments($this->query);
-	
 	}
-		if(isset($_COOKIE['zbx_sessionid']))
-			$this->setArgument('sid', substr($_COOKIE['zbx_sessionid'],16,16));
+
+	$protocolSepIndex=strpos($this->url,'://');	
+	if($protocolSepIndex!==false){
+		$this->protocol= strtolower(zbx_substring($this->url,0,$protocolSepIndex));
+		
+		$this->host=substr($this->url, $protocolSepIndex+3);
+		
+		$tmp_pos = strpos($this->host,'/');
+		if($tmp_pos!==false) $this->host=zbx_substring($this->host,0,$tmp_pos);
+		
+		$atIndex=strpos($this->host,'@');
+		if($atIndex!==false){
+			$credentials=zbx_substring($this->host,0,$atIndex);
+			
+			$colonIndex=strpos(credentials,':');
+			if($colonIndex!==false){
+				$this->username=zbx_substring($credentials,0,$colonIndex);
+				$this->password=substr($credentials,$colonIndex);
+			}
+			else{
+				$this->username=$credentials;
+			}
+			$this->host=substr($this->host,$atIndex+1);
+		}
+		
+		$host_ipv6 = strpos($this->host,']');
+		if($host_ipv6!==false){
+			if($host_ipv6 < (zbx_strlen($this->host)-1)){
+				$host_ipv6++;
+				$host_less = substr($this->host,$host_ipv6);
+
+				$portColonIndex=strpos($host_less,':');
+				if($portColonIndex!==false){
+					$this->host=zbx_substring($this->host,0,$host_ipv6);
+					$this->port=substr($host_less,$portColonIndex+1);
+				}
+			}
+		}
+		else{
+			$portColonIndex=strpos($this->host,':');
+			if($portColonIndex!==false){
+				$this->host=zbx_substring($this->host,0,$portColonIndex);
+				$this->port=substr($this->host,$portColonIndex+1);
+			}
+		}
+		
+		$this->file = substr($this->url,$protocolSepIndex+3);
+		$this->file = substr($this->file, strpos($this->file,'/'));
+	}
+	else{
+		$this->file = $this->url;
+	}
 	
+	$tmp_pos = strpos($this->file,'?');
+	if($tmp_pos!==false) $this->file=zbx_substring($this->file, 0, $tmp_pos);
+
+	$refSepIndex=strpos($url,'#');
+	if($refSepIndex!==false){
+		$this->file = zbx_substring($this->file,0,$refSepIndex);
+		$this->reference = substr($url,strpos($url,'#')+1);
+	}
+	
+	$this->path=$this->file;
+	if(zbx_strlen($this->query)>0) 		$this->file.='?'.$this->query;
+	if(zbx_strlen($this->reference)>0)	$this->file.='#'.$this->reference;
+
+	if(isset($_COOKIE['zbx_sessionid']))
+		$this->setArgument('sid', substr($_COOKIE['zbx_sessionid'],16,16));
 }
 
 function formatQuery(){
 	$query = '';
 	foreach($this->arguments as $key => $value){
-		$query.= $key.'='.$value.'&';
+		$query.= $key.'='.urlencode($value).'&';
 	}
 	$this->query = rtrim($query,'&');
 }
@@ -91,10 +150,11 @@ function formatArguments($query=null){
 		$this->arguments = $_REQUEST;
 	}
 	else{
-		//$query=ltrim($query,'?');
+		$query=ltrim($query,'?');
 		$args = explode('&',$query);
 		foreach($args as $id => $arg){
 			if(empty($arg)) continue;
+
 			$tmp = explode('=',$arg);
 			$this->arguments[$tmp[0]] = isset($tmp[1])?$tmp[1]:'';
 		}
@@ -103,14 +163,15 @@ function formatArguments($query=null){
 }
 
 function getUrl(){
-		$url = $this->protocol ? $this->protocol.'://' : '';
-		$url .= $this->username ? $this->username : '';
-		$url .= $this->password ? ':'.$this->password : '';
-		$url .= $this->host ? $this->host : '';
-		$url .= $this->port ? ':'.$this->port : '';
-		$url .= $this->path ? $this->path : '';
-		$url .= $this->query ? '?'.$this->query : '';
-		$url .= $this->reference ? '#'.urlencode($this->reference) : '';
+	$url = (zbx_strlen($this->protocol) > 0)?($this->protocol.'://'):'';
+	$url .=  (zbx_strlen($this->username) > 0)?$this->username:'';
+	$url .=  (zbx_strlen($this->password) > 0)?':'.$this->password:'';
+	$url .=  (zbx_strlen($this->host) > 0)?$this->host:'';
+	$url .=  $this->port?(':'.$this->port):'';
+	$url .=  (zbx_strlen($this->path) > 0)?$this->path:'';
+	$url .=  (zbx_strlen($this->query) > 0)?('?'.$this->query):'';
+	$url .=  (zbx_strlen($this->reference) > 0)?('#'.urlencode($this->reference)):'';
+	
 //SDI($this->getProtocol().' : '.$this->getHost().' : '.$this->getPort().' : '.$this->getPath().' : '.$this->getQuery());
 return $url;
 }
@@ -179,12 +240,13 @@ function getPassword(){
 	return $this->password;
 }
 
+function setFile($file){
+	$this->file = $file;
+}
+
 /* Returns the file part of $this url, i.e. everything after the host name. */
 function getFile(){
-	$url .= $this->path ? $this->path : '';
-	$url .= $this->query ? '?'.$this->query : '';
-	$url .= $this->reference ? '#'.urlencode($this->reference) : '';
-	return $url;	
+	return $this->file;
 }
 
 function setReference($reference){
