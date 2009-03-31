@@ -55,23 +55,82 @@ class Curl{
 		else{
 			$this->url=urldecode($url);
 	
-			$url = parse_url($this->url);
-			
-			$this->protocol = isset($url['scheme']) ? $url['scheme'] : null;
-			$this->host = isset($url['host']) ? $url['host'] : null;
-			$this->port = isset($url['port']) ? $url['port'] : null;
-			$this->username = isset($url['user']) ? $url['user'] : null;
-			$this->password = isset($url['pass']) ? $url['pass'] : null;
-			$this->path = isset($url['path']) ? $url['path'] : null;
-			$this->query = isset($url['query']) ? $url['query'] : '';
-			$this->reference = isset($url['fragment']) ? $url['fragment'] : null;
-			
+			$tmp_pos = strpos($this->url,'?');
+			$this->query=($tmp_pos!==false)?(substr($this->url,$tmp_pos+1)):'';
+	
+			$tmp_pos = strpos($this->query,'#');
+			if($tmp_pos!==false) $this->query=zbx_substring($this->query,0,$tmp_pos);
+	
 			$this->formatArguments($this->query);
-		
 		}
-			if(isset($_COOKIE['zbx_sessionid']))
-				$this->setArgument('sid', substr($_COOKIE['zbx_sessionid'],16,16));
+	
+		$protocolSepIndex=strpos($this->url,'://');	
+		if($protocolSepIndex!==false){
+			$this->protocol= strtolower(zbx_substring($this->url,0,$protocolSepIndex));
+			
+			$this->host=substr($this->url, $protocolSepIndex+3);
+			
+			$tmp_pos = strpos($this->host,'/');
+			if($tmp_pos!==false) $this->host=zbx_substring($this->host,0,$tmp_pos);
+			
+			$atIndex=strpos($this->host,'@');
+			if($atIndex!==false){
+				$credentials=zbx_substring($this->host,0,$atIndex);
+				
+				$colonIndex=strpos(credentials,':');
+				if($colonIndex!==false){
+					$this->username=zbx_substring($credentials,0,$colonIndex);
+					$this->password=substr($credentials,$colonIndex);
+				}
+				else{
+					$this->username=$credentials;
+				}
+				$this->host=substr($this->host,$atIndex+1);
+			}
+			
+			$host_ipv6 = strpos($this->host,']');
+			if($host_ipv6!==false){
+				if($host_ipv6 < (zbx_strlen($this->host)-1)){
+					$host_ipv6++;
+					$host_less = substr($this->host,$host_ipv6);
+	
+					$portColonIndex=strpos($host_less,':');
+					if($portColonIndex!==false){
+						$this->host=zbx_substring($this->host,0,$host_ipv6);
+						$this->port=substr($host_less,$portColonIndex+1);
+					}
+				}
+			}
+			else{
+				$portColonIndex=strpos($this->host,':');
+				if($portColonIndex!==false){
+					$this->host=zbx_substring($this->host,0,$portColonIndex);
+					$this->port=substr($this->host,$portColonIndex+1);
+				}
+			}
+			
+			$this->file = substr($this->url,$protocolSepIndex+3);
+			$this->file = substr($this->file, strpos($this->file,'/'));
+		}
+		else{
+			$this->file = $this->url;
+		}
 		
+		$tmp_pos = strpos($this->file,'?');
+		if($tmp_pos!==false) $this->file=zbx_substring($this->file, 0, $tmp_pos);
+	
+		$refSepIndex=strpos($url,'#');
+		if($refSepIndex!==false){
+			$this->file = zbx_substring($this->file,0,$refSepIndex);
+			$this->reference = substr($url,strpos($url,'#')+1);
+		}
+		
+		$this->path=$this->file;
+		if(zbx_strlen($this->query)>0) 		$this->file.='?'.$this->query;
+		if(zbx_strlen($this->reference)>0)	$this->file.='#'.$this->reference;
+	
+		if(isset($_COOKIE['zbx_sessionid']))
+			$this->setArgument('sid', substr($_COOKIE['zbx_sessionid'],16,16));
 	}
 	
 	public function formatQuery(){
