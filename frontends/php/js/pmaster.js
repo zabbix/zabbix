@@ -125,7 +125,7 @@ stopAllDolls: function(){
 },
 
 clear: function(){
-	this.debug('stopAllDolls');
+	this.debug('clear');
 	
 	for(domid in this.dolls){
 		this.rmvDoll(domid);

@@ -378,7 +378,7 @@
 		while($db_host = DBfetch($db_hosts)){
 // recursion
 			$item['hostid'] = $db_host['hostid'];
-			$item['applications'] = get_same_applications_for_host($applications, $db_host['hostid']);
+			$item['applications'] = get_same_applications_for_host($item['applications'], $db_host['hostid']);
 			$item['templateid'] = $itemid;
 			
 			$result = add_item($item);
