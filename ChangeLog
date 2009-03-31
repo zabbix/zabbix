@@ -1,5 +1,6 @@
 Changes for 1.6.4
 
+ - [ZBX-827] fixed possible bug in actions hints (Artem)
  - [ZBX-826] fixed problem displaying disabled web checks (Artem)
  - [ZBX-825] fixed problem with changing item status in configuration web and items screens (Artem)
  - [ZBX-822] fixed dashboard when logged in as guest (Artem)
