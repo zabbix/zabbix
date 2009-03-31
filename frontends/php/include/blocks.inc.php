@@ -525,7 +525,7 @@ function make_latest_issues($params = array()){
 
 			$description = expand_trigger_description_by_data(array_merge($row, array('clock'=>$row_event['clock'])),ZBX_FLAG_EVENT);
 					
-//actions								
+//actions
 			$actions = get_event_actions_stat_hints($row_event['eventid']);
 //--------			
 			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'].'&source=0&nav_time='.$row['lastchange'],'action');
