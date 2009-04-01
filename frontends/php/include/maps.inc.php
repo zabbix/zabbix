@@ -411,7 +411,7 @@
 		$el_type =& $element["elementtype"];
 
 		$sql = array(
-			SYSMAP_ELEMENT_TYPE_TRIGGER => 'select distinct t.triggerid, t.priority, t.value, t.description, t.expression, h.host '.
+			SYSMAP_ELEMENT_TYPE_TRIGGER => 'select distinct t.triggerid, t.priority, t.value, t.description, t.expression, t.type, h.host '.
 				' from triggers t, items i, functions f, hosts h '.
 				' where t.triggerid='.$element['elementid'].
 					' and h.hostid=i.hostid '.
@@ -419,7 +419,7 @@
 					' and f.triggerid=t.triggerid '.
 					' and h.status='.HOST_STATUS_MONITORED.
 					' and i.status='.ITEM_STATUS_ACTIVE,
-			SYSMAP_ELEMENT_TYPE_HOST_GROUP => 'select distinct t.triggerid, t.priority, t.value,'.
+			SYSMAP_ELEMENT_TYPE_HOST_GROUP => 'select distinct t.triggerid, t.priority, t.value, t.type, '.
 					' t.description, t.expression, h.host, g.name as el_name '.
 				' from items i,functions f,triggers t,hosts h,hosts_groups hg,groups g '.
 				' where h.hostid=i.hostid and hg.groupid=g.groupid and g.groupid='.$element['elementid'].
@@ -429,7 +429,7 @@
 					' and t.status='.TRIGGER_STATUS_ENABLED.
 					' and h.status='.HOST_STATUS_MONITORED.
 					' and i.status='.ITEM_STATUS_ACTIVE,
-			SYSMAP_ELEMENT_TYPE_HOST => 'select distinct t.triggerid, t.priority, t.value, '.
+			SYSMAP_ELEMENT_TYPE_HOST => 'select distinct t.triggerid, t.priority, t.value, t.type, '.
 					' t.description, t.expression, h.host, h.host as el_name, h.maintenanceid, h.maintenance_status '.
 				' from items i,functions f,triggers t,hosts h '.
 				' where h.hostid=i.hostid '.
@@ -473,7 +473,7 @@
 
 						if($trigger_tmp = get_row_for_nofalseforb($trigger,$event_sql)){
 							$trigger['value'] = TRIGGER_VALUE_TRUE;
-							$orig_trig_value = $trigger_tmp['value'];
+//							$orig_trig_value = $trigger_tmp['value'];
 						}
 					}
 
@@ -497,7 +497,7 @@
 							if($event_limit >= $config['event_show_max']) break;
 						}
 						
-						if($orig_trig_value == TRIGGER_VALUE_TRUE) $tr_info[$type]['count']+=$trig_ack;
+						if((TRIGGER_VALUE_TRUE == $orig_trig_value) && (TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])) $tr_info[$type]['count']+=$trig_ack;
 					}
 					else{
 						$tr_info[$type]['count']++;
