@@ -32,6 +32,7 @@ Changes for 1.7.0
  
  Changes for 1.6.4 
 
+ - [DEV-137] DM: improved performance of historical data synchronization (Sasha)
  - [ZBX-826] fixed problem displaying disabled web checks (Artem)
  - [ZBX-825] fixed problem with changing item status in configuration web and items screens (Artem)
  - [ZBX-822] fixed dashboard when logged in as guest (Artem)
