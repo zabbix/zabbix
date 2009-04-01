@@ -976,7 +976,7 @@ int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *e
 	return SUCCEED;
 }
 
-static int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
+int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1030,7 +1030,7 @@ static int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 	return SUCCEED;
 }
 
-static int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
+int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
