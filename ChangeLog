@@ -1,5 +1,6 @@
 Changes for 1.6.4
 
+ - [ZBX-831] DM: fixed synchronization of trends data (Sasha)
  - [DEV-137] DM: improved performance of historical data synchronization (Sasha)
  - [ZBX-827] fixed possible bug in actions hints (Artem)
  - [ZBX-826] fixed problem displaying disabled web checks (Artem)
