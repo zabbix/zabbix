@@ -268,7 +268,7 @@ FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|object,objectid,eventid
 INDEX		|2		|clock
 
-TABLE|trends|itemid,clock|ZBX_HISTORY_TRENDS
+TABLE|trends|itemid,clock|
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0			|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|num		|t_integer	|'0'	|NOT NULL	|0
@@ -276,7 +276,7 @@ FIELD		|value_min	|t_double	|'0.0000'|NOT NULL	|0
 FIELD		|value_avg	|t_double	|'0.0000'|NOT NULL	|0
 FIELD		|value_max	|t_double	|'0.0000'|NOT NULL	|0
 
-TABLE|trends_uint|itemid,clock|ZBX_HISTORY_TRENDS
+TABLE|trends_uint|itemid,clock|
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0			|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|num		|t_integer	|'0'	|NOT NULL	|0
