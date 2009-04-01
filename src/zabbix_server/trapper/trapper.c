@@ -577,9 +577,6 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 	} else if (strncmp(s,"ZBX_GET_HISTORY_LAST_ID", 23) == 0) {
 		send_history_last_id(sock, s);
 		return ret;
-	} else if (strncmp(s,"ZBX_GET_TRENDS_LAST_ID", 22) == 0) {
-		send_trends_last_id(sock, s);
-		return ret;
 /* Process information sent by zabbix_sender */
 	} else {
 		/* Command? */

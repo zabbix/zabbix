@@ -81,63 +81,6 @@ disconnect:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_trends_lastid:                                               *
- *                                                                            *
- * Purpose: get last history lastid and lastclock from master node            *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              * 
- *                                                                            *
- * Author: Aleksander Vladishev                                               *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int get_trends_lastid(int master_nodeid, int nodeid, ZBX_TABLE *table, zbx_uint64_t *lastid, int *lastclock)
-{
-	zbx_sock_t	sock;
-	char		data[MAX_STRING_LEN], *answer, *ptr;
-	int		res = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_trends_lastclock()");
-
-	if (SUCCEED == connect_to_node(master_nodeid, &sock)) {
-		zbx_snprintf(data, sizeof(data), "ZBX_GET_TRENDS_LAST_ID%c%d%c%d\n%s",
-			ZBX_DM_DELIMITER, CONFIG_NODEID,
-			ZBX_DM_DELIMITER, nodeid,
-			table->table);
-
-		if (FAIL == send_data_to_node(master_nodeid, &sock, data))
-			goto disconnect;
-
-		if (FAIL == recv_data_from_node(master_nodeid, &sock, &answer))
-			goto disconnect;
-
-		if (0 == strncmp(answer, "FAIL", 4)) {
-			zabbix_log( LOG_LEVEL_ERR, "NODE %d: get_trends_lastid() FAIL from node %d for node %d",
-				CONFIG_NODEID,
-				master_nodeid,
-				nodeid);
-			goto disconnect;
-		}
-
-		if (NULL != (ptr = strchr(answer, ZBX_DM_DELIMITER))) {
-			*ptr++ = '\0';
-
-			ZBX_STR2UINT64(*lastid, answer);
-			*lastclock = atoi(ptr);
-
-			res = SUCCEED;
-		}
-disconnect:
-		disconnect_node(&sock);
-	}
-	return res;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function : process_hstory_table_data:                                      *
  *                                                                            *
  * Purpose: process new history data                                          *
@@ -159,15 +102,12 @@ void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
 	int		data_allocated = 1024*1024, tmp_allocated = 4096, tmp_offset, data_offset, f, fld, len;
 	int		data_found = 0;
 	zbx_uint64_t	lastid;
-	int		lastclock = 0, clock;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_history_table_data()");
 
 	DBbegin();
 
 	if ((table->flags & ZBX_HISTORY) && FAIL == get_history_lastid(master_nodeid, nodeid, table, &lastid))
-		return;
-	if ((table->flags & ZBX_HISTORY_TRENDS) && FAIL == get_trends_lastid(master_nodeid, nodeid, table, &lastid, &lastclock))
 		return;
 
 	data = zbx_malloc(data, data_allocated);
@@ -187,7 +127,7 @@ void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
 	if (table->flags & ZBX_HISTORY_SYNC) {
 		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 128, "select %s,",
 			table->recid);
-	} else { /* ZBX_HISTORY, ZBX_HISTORY_TRENDS */
+	} else { /* ZBX_HISTORY */
 		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 16, "select ");
 	}
 
@@ -205,16 +145,6 @@ void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
 			table->table,
 			nodeid,
 			table->recid);
-	} else if (table->flags & ZBX_HISTORY_TRENDS) {
-		clock = time(NULL) - 600; /* -10min */
-		clock -= clock % 3600;
-
-		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 1024, " from %s where"
-			" (itemid>"ZBX_FS_UI64" or (itemid="ZBX_FS_UI64" and clock>%d)) and clock<%d"
-			DB_NODE " order by itemid,clock",
-			table->table,
-			lastid, lastid, lastclock, clock,
-			DBnode("itemid", nodeid));
 	} else { /* ZBX_HISTORY */
 		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 1024, " from %s where %s>"ZBX_FS_UI64
 			DB_NODE " order by %s",
@@ -239,6 +169,8 @@ void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
 			if ((table->flags & ZBX_HISTORY_SYNC) && 0 == (table->fields[f].flags & ZBX_HISTORY_SYNC))
 				continue;
 
+			len = (int)strlen(row[fld]);
+
 			if (table->fields[f].type == ZBX_TYPE_INT ||
 				table->fields[f].type == ZBX_TYPE_UINT ||
 				table->fields[f].type == ZBX_TYPE_ID ||
@@ -247,7 +179,6 @@ void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
 				zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%s%c",
 					row[fld], ZBX_DM_DELIMITER);
 			} else { /* ZBX_TYPE_CHAR ZBX_TYPE_BLOB ZBX_TYPE_TEXT */
-				len = (int)strlen(row[fld]);
 				len = zbx_binary2hex((u_char *)row[fld], len, &tmp, &tmp_allocated);
 				zbx_snprintf_alloc(&data, &data_allocated, &data_offset, len + 8, "%s%c",
 					tmp, ZBX_DM_DELIMITER);
@@ -300,7 +231,7 @@ static void process_history_tables(int master_nodeid, int nodeid)
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_history_tables()");
 
 	for (t = 0; tables[t].table != 0; t++) {
-		if (tables[t].flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC | ZBX_HISTORY_TRENDS))
+		if (tables[t].flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC))
 			process_history_table_data(&tables[t], master_nodeid, nodeid);
 	}
 
