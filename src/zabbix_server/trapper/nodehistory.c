@@ -358,10 +358,12 @@ static int	process_items(char **sql, int *sql_allocated, int *sql_offset, int se
 		const char *record, int lastrecord)
 {
 	const char	*r;
-	int		f, len;
-	int		res = FAIL;
+	int		f, len, res = FAIL;
 	zbx_uint64_t	itemid = 0;
 	char		*value_esc;
+	int		clock, value_type = -1;
+	double		value_double;
+	zbx_uint64_t	value_uint64;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_items()");
 
@@ -392,11 +394,22 @@ static int	process_items(char **sql, int *sql_allocated, int *sql_offset, int se
 				table->fields[f].type == ZBX_TYPE_FLOAT)
 		{
 			if (0 == strcmp(table->fields[f].name, "clock"))
+			{
 				zbx_snprintf_alloc(sql, sql_allocated, sql_offset, len + 16, ",lastclock=%s",
 						buffer);
+				clock = atoi(buffer);
+			}
 			else if (0 == strcmp(table->fields[f].name, "value"))
-				zbx_snprintf_alloc(sql, sql_allocated, sql_offset, len + 16, ",lastvalue='%s'",
+			{
+				zbx_snprintf_alloc(sql, sql_allocated, sql_offset, len + 16, ",lastvalue=%s",
 						buffer);
+
+				value_type = table->fields[f].type;
+				if (value_type == ZBX_TYPE_FLOAT)
+					value_double = atof(buffer);
+				else if (value_type == ZBX_TYPE_UINT)
+					ZBX_STR2UINT64(value_uint64, buffer)
+			}
 		}
 		else	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR */
 		{
@@ -413,6 +426,11 @@ static int	process_items(char **sql, int *sql_allocated, int *sql_offset, int se
 			}
 		}
 	}
+
+	if (value_type == ZBX_TYPE_FLOAT)
+		DBadd_trend(itemid, value_double, clock);
+	else if (value_type == ZBX_TYPE_UINT)
+		DBadd_trend_uint(itemid, value_double, clock);
 
 	zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 40, " where itemid=" ZBX_FS_UI64 ";\n",
 			itemid);
