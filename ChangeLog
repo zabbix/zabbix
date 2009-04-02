@@ -1,5 +1,6 @@
 Changes for 1.6.4
 
+ - [ZBX-837] removed sid from Zabbix logo link (Vedmak)
  - [ZBX-589] fixed processing of quoted floating point values (Sasha)
  - [ZBX-836] fixed probem with permissions of proxy shared memory (Sasha)
  - [ZBX-833] fixed link from maps element to trigger status page (Artem)
