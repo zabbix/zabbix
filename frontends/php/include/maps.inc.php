@@ -753,7 +753,7 @@
 				
 				$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 
-				$menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?hostid=".$db_element['elementid']."&noactions=true&onlytrue=true&compact=true')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				$menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?groupid=0&hostid=".$db_element['elementid']."&noactions=true&onlytrue=true&compact=true')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 				if(!empty($db_element["url"])){
 					$menus.= "['".S_MAP.SPACE.S_URL."',\"javascript: redirect('".$url."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
