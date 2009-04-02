@@ -363,7 +363,6 @@ int main(int argc, char **argv)
 	init_ipmi_handler();
 #endif
 
-	init_database_cache(ZBX_PROCESS_PROXY);
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }
 

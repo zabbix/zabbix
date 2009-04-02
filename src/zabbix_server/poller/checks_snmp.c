@@ -681,6 +681,10 @@ int	get_snmp(DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 			zabbix_log(LOG_LEVEL_DEBUG, "AV loop OID [%s] Type [0x%02X] %s",
 					snmp_oid, vars->type, temp);
 
+			vars->val.string[vars->val_len] = 0; 
+			zabbix_log(LOG_LEVEL_DEBUG, "AV loop OID [%s] Type [0x%02X] %s",
+					snmp_oid, vars->type, (char*)vars->val.string);
+			
 			if (vars->type == ASN_OCTET_STR)
 			{
 				if (0 == strncmp(temp, "STRING: ", 8))
