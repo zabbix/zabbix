@@ -640,7 +640,6 @@ static double* get_result_dbl_value(AGENT_RESULT *result)
 	{
 		zbx_rtrim(result->str, " \"");
 		zbx_ltrim(result->str, " \"");
-		del_zeroes(result->str);
 
 		if (SUCCEED == is_double(result->str))
 		{
@@ -651,7 +650,6 @@ static double* get_result_dbl_value(AGENT_RESULT *result)
 	{
 		zbx_rtrim(result->text, " \"");
 		zbx_ltrim(result->text, " \"");
-		del_zeroes(result->text);
 
 		if (SUCCEED == is_double(result->text))
 		{
