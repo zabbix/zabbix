@@ -638,6 +638,10 @@ static double* get_result_dbl_value(AGENT_RESULT *result)
 	}
 	else if(ISSET_STR(result))
 	{
+		zbx_rtrim(result->str, " \"");
+		zbx_ltrim(result->str, " \"");
+		del_zeroes(result->str);
+
 		if (SUCCEED == is_double(result->str))
 		{
 			SET_DBL_RESULT(result, atof(result->str));
@@ -645,6 +649,10 @@ static double* get_result_dbl_value(AGENT_RESULT *result)
 	}
 	else if(ISSET_TEXT(result))
 	{
+		zbx_rtrim(result->text, " \"");
+		zbx_ltrim(result->text, " \"");
+		del_zeroes(result->text);
+
 		if (SUCCEED == is_double(result->text))
 		{
 			SET_DBL_RESULT(result, atof(result->text));
