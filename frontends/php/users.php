@@ -123,8 +123,8 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	if($_REQUEST['config']==0){
-		if(isset($_REQUEST['new_group'])){
+	if($_REQUEST['config']==0) {
+		if(isset($_REQUEST['new_group'])) {
 			$_REQUEST['user_groups'] = get_request('user_groups', array());
 			foreach($_REQUEST['new_group'] as $id => $val)
 				$_REQUEST['user_groups'][$id] = $val;
@@ -146,9 +146,6 @@ include_once('include/page_header.php');
 		else if(isset($_REQUEST['save'])){
 			$config = select_config();
 			
-			$user_groups = get_request('user_groups', array());
-			$user_medias = get_request('user_medias', array());
-
 			$_REQUEST['password1'] = get_request('password1', null);
 			$_REQUEST['password2'] = get_request('password2', null);
 
@@ -162,7 +159,6 @@ include_once('include/page_header.php');
 					$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
 				}
 			}
-
 			if($_REQUEST['password1']!=$_REQUEST['password2']){
 				if(isset($_REQUEST['userid']))
 					show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
@@ -176,30 +172,37 @@ include_once('include/page_header.php');
 				show_error_message(S_PASSWORD_SHOULD_NOT_BE_EMPTY);
 			}
 			else {
+				$user = array();
+				$user['name'] = get_request('name');
+				$user['surname'] = get_request('surname');
+				$user['alias'] = get_request('alias');
+				$user['passwd'] = get_request('password1');
+				$user['url'] = get_request('url');
+				$user['autologin'] = get_request('autologin', 0);
+				$user['autologout'] = get_request('autologout', 0);
+				$user['lang'] = get_request('lang');
+				$user['theme'] = get_request('theme');
+				$user['refresh'] = get_request('refresh');
+				$user['type'] = get_request('user_type');
+				$user['user_groups'] = get_request('user_groups', array());
+				$user['user_medias'] = get_request('user_medias', array());
+				
 				if(isset($_REQUEST['userid'])){
 					$action = AUDIT_ACTION_UPDATE;
+					
 					DBstart();
-					$result=update_user($_REQUEST['userid'],
-						$_REQUEST['name'],$_REQUEST['surname'],$_REQUEST['alias'],
-						$_REQUEST['password1'],$_REQUEST['url'],get_request('autologin',0),get_request('autologout',0),
-						$_REQUEST['lang'],$_REQUEST['theme'],$_REQUEST['refresh'],$_REQUEST['user_type'],
-						$user_groups, $user_medias);
-						
+					$result = update_user($_REQUEST['userid'], $user);
 					$result = DBend($result);
 					
 					show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 				} 
 				else {
 					$action = AUDIT_ACTION_ADD;
+					
 					DBstart();
-					$result=add_user(
-						$_REQUEST['name'],$_REQUEST['surname'],$_REQUEST['alias'],
-						$_REQUEST['password1'],$_REQUEST['url'],get_request('autologin',0),get_request('autologout',0),
-						$_REQUEST['lang'],$_REQUEST['theme'],$_REQUEST['refresh'],$_REQUEST['user_type'],
-						$user_groups, $user_medias);
-						
+					$result = add_user($user);
 					$result = DBend($result);
-
+					
 					show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 				}
 				if($result){
@@ -232,8 +235,7 @@ include_once('include/page_header.php');
 			DBstart();
 			foreach($group_userid as $userid){
 				if(!($user_data = get_user_by_userid($userid))) continue;
-
-
+				
 				$result |= delete_user($userid);
 				
 				if($result){

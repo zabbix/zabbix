@@ -738,8 +738,8 @@
 			$password1 	= get_request('password1', '');
 			$password2 	= get_request('password2', '');
 			$url 		= get_request('url','');
-			$autologin	= get_request('autologin',0);
-			$autologout	= get_request('autologout',90);
+			$autologin	= get_request('autologin', 0);
+			$autologout	= get_request('autologout', 0);
 			$lang		= get_request('lang','en_gb');
 			$theme 		= get_request('theme','default.css');
 			$refresh	= get_request('refresh',30);
@@ -750,16 +750,15 @@
 			$new_group_id	= get_request('new_group_id', 0);
 			$new_group_name = get_request('new_group_name', '');
 		}
-
-
+		
 		if($autologin){
 			$autologout = 0;
-			zbx_add_post_js("document.getElementById('autologout_visible').disabled = true;");
+//			zbx_add_post_js("document.getElementById('autologout_visible').disabled = true;");
 		} 
 		else if(isset($_REQUEST['autologout']) && ($autologout < 90)){
 			$autologout = 90;
 		}
-		
+	
 		$perm_details	= get_request('perm_details',0);
 
 		$media_types = array();
@@ -814,8 +813,7 @@
 		}
 
 		if($profile==0){
-			global $USER_DETAILS;
-
+		
 			$frmUser->addVar('user_groups',$user_groups);
 
 			if(isset($userid) && (bccomp($USER_DETAILS['userid'], $userid)==0)){
@@ -845,48 +843,10 @@
 						'&list_name=user_groups_to_del[]&var_name=user_groups",450, 450);'),
 					SPACE,
 					(count($user_groups) > 0)?new CButton('del_user_group',S_DELETE_SELECTED):null
-				));
-
-			$frmUser->addVar('user_medias', $user_medias);
-
-			$media_table = new CTableInfo(S_NO_MEDIA_DEFINED);
-			foreach($user_medias as $id => $one_media){
-				if(!isset($one_media["active"]) || $one_media["active"]==0){
-					$status = new CLink(S_ENABLED,'#','enabled');
-					$status->OnClick("return create_var('".$frmUser->GetName()."','disable_media',".$id.", true);");
-				}
-				else{
-					$status = new CLink(S_DISABLED,'#','disabled');
-					$status->OnClick("return create_var('".$frmUser->GetName()."','enable_media',".$id.", true);");
-				}
-
-				$media_url = '?dstfrm='.$frmUser->GetName().
-								'&media='.$id.
-								'&mediatypeid='.$one_media['mediatypeid'].
-								'&sendto='.$one_media['sendto'].
-								'&period='.$one_media['period'].
-								'&severity='.$one_media['severity'].
-								'&active='.$one_media['active'];
-
-				$media_table->addRow(array(
-					new CCheckBox('user_medias_to_del['.$id.']',null,null,$id),
-					new CSpan($media_types[$one_media['mediatypeid']], 'nowrap'),
-					new CSpan($one_media['sendto'], 'nowrap'),
-					new CSpan($one_media['period'], 'nowrap'),
-					media_severity2str($one_media['severity']),
-					$status,
-					new CButton('edit_media',S_EDIT,'javascript: return PopUp("popup_media.php'.$media_url.'",550,400);'))
-				);
-			}
-
-			$frmUser->addRow(
-						S_MEDIA,
-						array($media_table,
-							new CButton('add_media',S_ADD,'javascript: return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'",550,400);'),
-							SPACE,
-							(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
-						));
+				));	
 		}
+		
+
 
 		$cmbLang = new CComboBox('lang',$lang);
 		foreach($ZBX_LOCALES as $loc_id => $loc_name){
@@ -918,22 +878,69 @@
 		$chkbx_autologin->AddOption('autocomplete','off');
 		$frmUser->AddRow(S_AUTO_LOGIN,	$chkbx_autologin);
 		$autologoutCheckBox = new CCheckBox('autologout_visible', 
-											(isset($autologout) && $autologout != 0) ? 'yes' : 'no', 
+											($autologout == 0) ? 'no' : 'yes', 
 											new CScript("var autologout = document.getElementById('autologout');
 														if (this.checked) {
 															autologout.disabled = false;
 														} else {
 															autologout.disabled = true;
 														}"));
-		// if autologout is disabled
-		if (isset($autologout) && $autologout == 0) {
-			zbx_add_post_js('document.getElementById("autologout").disabled = true;');
-		}
+		
 		$autologoutTextBox = new CNumericBox("autologout", ($autologout == 0) ? '90' : $autologout, 4);
-		$frmUser->AddRow(S_AUTO_LOGOUT, array($autologoutCheckBox, $autologoutTextBox));
-		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
-		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
+		// if autologout is disabled
+		if ($autologout == 0) {
+			$autologoutTextBox->addOption('disabled','disabled');
+		}
+		if($autologin != 0) {
+			$autologoutCheckBox->addOption('disabled','disabled');
+		}
 
+		$frmUser->AddRow(S_AUTO_LOGOUT, array($autologoutCheckBox, $autologoutTextBox));
+		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
+		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
+
+//view Media Settings for users above "User" +++
+		if(uint_in_array($USER_DETAILS['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))) {
+			$frmUser->addVar('user_medias', $user_medias);
+			$media_table = new CTableInfo(S_NO_MEDIA_DEFINED);
+			foreach($user_medias as $id => $one_media){
+				if(!isset($one_media["active"]) || $one_media["active"]==0){
+					$status = new CLink(S_ENABLED,'#','enabled');
+					$status->OnClick("return create_var('".$frmUser->GetName()."','disable_media',".$id.", true);");
+				}
+				else{
+					$status = new CLink(S_DISABLED,'#','disabled');
+					$status->OnClick("return create_var('".$frmUser->GetName()."','enable_media',".$id.", true);");
+				}
+				
+				$media_url = '?dstfrm='.$frmUser->GetName().
+								'&media='.$id.
+								'&mediatypeid='.$one_media['mediatypeid'].
+								'&sendto='.$one_media['sendto'].
+								'&period='.$one_media['period'].
+								'&severity='.$one_media['severity'].
+								'&active='.$one_media['active'];
+								
+				$media_table->addRow(array(
+					new CCheckBox('user_medias_to_del['.$id.']',null,null,$id),
+					new CSpan($media_types[$one_media['mediatypeid']], 'nowrap'),
+					new CSpan($one_media['sendto'], 'nowrap'),
+					new CSpan($one_media['period'], 'nowrap'),
+					media_severity2str($one_media['severity']),
+					$status,
+					new CButton('edit_media',S_EDIT,'javascript: return PopUp("popup_media.php'.$media_url.'",550,400);'))
+				);
+			}
+			
+			$frmUser->addRow(
+						S_MEDIA,
+						array($media_table,
+							new CButton('add_media',S_ADD,'javascript: return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'",550,400);'),
+							SPACE,
+							(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
+						));
+		}
+		
 		if(0 == $profile){
 			$frmUser->addVar('perm_details', $perm_details);
 
@@ -972,7 +979,7 @@
 				$frmUser->addSpanRow(get_rights_of_elements_table($user_rights, $user_type));
 			}
 		}
-
+		
 		$frmUser->addItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($userid) && $profile == 0){
 			$frmUser->addItemToBottomRow(SPACE);
@@ -980,7 +987,7 @@
 			if(bccomp($USER_DETAILS['userid'],$userid) == 0){
 				$delete_b->addOption('disabled','disabled');
 			}
-
+			
 			$frmUser->addItemToBottomRow($delete_b);
 		}
 		$frmUser->addItemToBottomRow(SPACE);
