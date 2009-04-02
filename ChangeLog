@@ -30,9 +30,10 @@ Changes for 1.7.0
  - [DEV-249] added support of advanced regular expressions (Artem,Sasha)
  - [DEV-247] added enhancement to the Graph function (Artem)
  - [DEV-233,DEV-237] added support of scheduled maintenance periods (Artem,Sasha)
- 
- Changes for 1.6.4 
 
+Changes for 1.6.4 
+
+ - [ZBX-589] fixed processing of quoted floating point values (Sasha)
  - [ZBX-836] fixed probem with permissions of proxy shared memory (Sasha)
  - [ZBX-833] fixed link from maps element to trigger status page (Artem)
  - [ZBX-831] DM: fixed synchronization of trends data (Sasha)
