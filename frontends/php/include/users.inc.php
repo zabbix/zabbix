@@ -48,113 +48,146 @@
 	
 
 // Add User definition
-	function add_user($name,$surname,$alias,$passwd,$url,$autologin,$autologout,$lang,$theme,$refresh,$user_type,$user_groups,$user_medias){
+	function add_user($user){
 		global $USER_DETAILS;
 
 		if($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN){
 			error("Insufficient permissions");
-			return 0;
+			return false;
 		}
 		
-		if(DBfetch(DBselect("select * from users where alias=".zbx_dbstr($alias)." and ".DBin_node('userid', get_current_nodeid(false))))){
-			error('User "'.$alias.'" already exists');
-			return 0;
+		if(DBfetch(DBselect("SELECT * FROM users WHERE alias=".zbx_dbstr($user['alias'])."AND ".DBin_node('userid', get_current_nodeid(false))))){
+			error('User "'.$user['alias'].'" already exists');
+			return false;
 		}
 
-		$userid = get_dbid("users","userid");
-
-		$result =  DBexecute('insert into users (userid,name,surname,alias,passwd,url,autologin,autologout,lang,theme,refresh,type)'.
-			' values ('.$userid.','.zbx_dbstr($name).','.zbx_dbstr($surname).','.zbx_dbstr($alias).','.
-			zbx_dbstr(md5($passwd)).','.zbx_dbstr($url).','.$autologin.','.$autologout.','.zbx_dbstr($lang).','.zbx_dbstr($theme).','.$refresh.','.$user_type.')');
+		$userid = get_dbid('users', 'userid');
 		
+		$result = DBexecute('INSERT INTO users (userid,name,surname,alias,passwd,url,autologin,autologout,lang,theme,refresh,type) VALUES ('.
+			$userid.','.
+			zbx_dbstr($user['name']).','.
+			zbx_dbstr($user['surname']).','.
+			zbx_dbstr($user['alias']).','.
+			zbx_dbstr(md5($user['passwd'])).','.
+			zbx_dbstr($user['url']).','.
+			$user['autologin'].','.
+			$user['autologout'].','.
+			zbx_dbstr($user['lang']).','.
+			zbx_dbstr($user['theme']).','.
+			$user['refresh'].','.
+			$user['type'].
+			')');
+			
 		if($result){
-			DBexecute('delete from users_groups where userid='.$userid);
-			foreach($user_groups as $groupid => $grou_pname){
-				$users_groups_id = get_dbid("users_groups","id");
-				$result = DBexecute('insert into users_groups (id,usrgrpid,userid)'.
-					'values('.$users_groups_id.','.$groupid.','.$userid.')');
-
+//			$result = DBexecute('DELETE FROM users_groups WHERE userid='.$userid);
+			foreach($user['user_groups'] as $groupid => $group_pname){
 				if(!$result) break;
+				$users_groups_id = get_dbid("users_groups","id");
+				$result = DBexecute('INSERT INTO users_groups (id,usrgrpid,userid)'.
+					'values('.$users_groups_id.','.$groupid.','.$userid.')');				
 			}
-			if($result)
+		}
+			
+		if($result) {
+//			$result = DBexecute('DELETE FROM media WHERE userid='.$userid);
+			foreach($user['user_medias'] as $mediaid => $media_data)
 			{
-				DBexecute('delete from media where userid='.$userid);
-				foreach($user_medias as $mediaid => $media_data)
-				{
-					$mediaid = get_dbid("media","mediaid");
-					$result = DBexecute('insert into media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
-						' values ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
-						zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
-						zbx_dbstr($media_data['period']).')');
-
-					if(!$result) break;
-				}
-			}
-		}
-
-		return $result;
-	}
-
-	# Update User definition
-
-	function update_user($userid,$name,$surname,$alias,$passwd,$url,$autologin,$autologout,$lang,$theme,$refresh,$user_type,$user_groups,$user_medias){
-		if(DBfetch(DBselect("select * from users where alias=".zbx_dbstr($alias)." and userid<>$userid and ".DBin_node('userid', get_current_nodeid(false))))){
-			error("User '$alias' already exists");
-			return 0;
-		}
-
-		$result = DBexecute('UPDATE users SET '.
-						' name='.zbx_dbstr($name).
-						' ,surname='.zbx_dbstr($surname).
-						' ,alias='.zbx_dbstr($alias).
-						(isset($passwd)?(',passwd='.zbx_dbstr(md5($passwd))):'').
-						' ,url='.zbx_dbstr($url).
-						' ,autologin='.$autologin.
-						' ,autologout='.$autologout.
-						' ,lang='.zbx_dbstr($lang).
-						' ,theme='.zbx_dbstr($theme).
-						' ,refresh='.$refresh.
-						' ,type='.$user_type.
-					' WHERE userid='.$userid);
-
-		if($result){
-			DBexecute('delete from users_groups where userid='.$userid);
-			foreach($user_groups as $groupid => $grou_pname){
-				$users_groups_id = get_dbid("users_groups","id");
-				$result = DBexecute('insert into users_groups (id,usrgrpid,userid)'.
-					'values('.$users_groups_id.','.$groupid.','.$userid.')');
-
 				if(!$result) break;
-			}
-			if($result){
-				DBexecute('delete from media where userid='.$userid);
-				foreach($user_medias as $mediaid => $media_data)
-				{
-					$mediaid = get_dbid("media","mediaid");
-					$result = DBexecute('insert into media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
-						' values ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
-						zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
-						zbx_dbstr($media_data['period']).')');
-
-					if(!$result) break;
-				}
+				$mediaid = get_dbid("media","mediaid");
+				$result = DBexecute('INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
+					' VALUES ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
+					zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
+					zbx_dbstr($media_data['period']).')');
 			}
 		}
+		
+		return $result;
+	}
 
+	# Update User definition
+
+	function update_user($userid, $user) {
+	
+		$result = true;
+		
+		$sql = 'SELECT DISTINCT * '.
+			' FROM users '.
+			' WHERE ( alias='.zbx_dbstr($user['alias']).' OR userid='.$userid.' ) '.
+				' AND '.DBin_node('userid', get_current_nodeid(false));
+		$db_users = DBselect($sql);
+		while($db_user = DBfetch($db_users)){
+			if($db_user['userid'] != $userid){
+				error('User '.$user['alias'].' already exists');
+				return false;
+			}				
+			$user_db_fields = $db_user;
+		}
+		
+		if(!isset($user_db_fields)) {
+			return false;
+		}
+			
+		if(isset($user['passwd'])) {
+			$user['passwd'] = md5($user['passwd']);
+		}
+		
+		if(!check_db_fields($user_db_fields, $user)){
+			error('Incorrect arguments pasted to function [update_user]');
+			return false;
+		}
+		
+		$sql = 'UPDATE users SET '.
+				' name='.zbx_dbstr($user['name']).
+				' ,surname='.zbx_dbstr($user['surname']).
+				' ,alias='.zbx_dbstr($user['alias']).
+				' ,passwd='.zbx_dbstr($user['passwd']).
+				' ,url='.zbx_dbstr($user['url']).
+				' ,autologin='.$user['autologin'].
+				' ,autologout='.$user['autologout'].
+				' ,lang='.zbx_dbstr($user['lang']).
+				' ,theme='.zbx_dbstr($user['theme']).
+				' ,refresh='.$user['refresh'].
+				' ,type='.$user['type'].
+				' WHERE userid='.$userid;
+		$result = DBexecute($sql);
+
+		if($result && !is_null($user['user_groups'])){
+			$result = DBexecute('DELETE FROM users_groups WHERE userid='.$userid);
+			foreach($user['user_groups'] as $groupid => $group_name){
+				if(!$result) break;
+				$users_groups_id = get_dbid('users_groups', 'id');
+				$result = DBexecute('INSERT INTO users_groups (id, usrgrpid, userid)'.
+					'values('.$users_groups_id.','.$groupid.','.$userid.')');	
+			}
+		}
+			
+		if($result && !is_null($user['user_medias'])){
+			$result = DBexecute('DELETE FROM media WHERE userid='.$userid);
+			foreach($user['user_medias'] as $mediaid => $media_data) {
+				if(!$result) break;
+				$mediaid = get_dbid('media', 'mediaid');
+				$result = DBexecute('INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period)'.
+					' values ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
+					zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
+					zbx_dbstr($media_data['period']).')');	
+			}
+		}
+				
 		return $result;
 	}
 
 
 	# Update User definition
 
-	function	update_user_profile($userid,$passwd,$url,$autologin,$autologout,$lang,$theme,$refresh){
+	function update_user_profile($userid, $passwd,$url, $autologin, $autologout, $lang, $theme, $refresh, $user_medias){
 		global $USER_DETAILS;
 
 		if((bccomp($userid,$USER_DETAILS["userid"]) != 0)){
 			access_deny();
 		}
-
-		return DBexecute('update users set '.
+		
+		DBbegin();
+		$result = DBexecute('update users set '.
 						' url='.zbx_dbstr($url).
 						' ,autologin='.$autologin.
 						' ,autologout='.$autologout.
@@ -163,6 +196,18 @@
 						(isset($passwd) ? (' ,passwd='.zbx_dbstr(md5($passwd))) : '').
 						' ,refresh='.$refresh.
 					' where userid='.$userid);
+					
+		$result = DBexecute('delete from media where userid='.$userid);
+			foreach($user_medias as $mediaid => $media_data)
+			{
+				$mediaid = get_dbid("media","mediaid");
+				$result = DBexecute('insert into media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
+					' values ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
+					zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
+					zbx_dbstr($media_data['period']).')');
+
+				if(!$result) break;
+			}
 	}
 
 	# Delete User definition

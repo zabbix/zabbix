@@ -22,7 +22,8 @@
 	require_once('include/config.inc.php');
 	require_once('include/users.inc.php');
 	require_once('include/forms.inc.php');
-
+	require_once('include/media.inc.php');
+	
 	$page['title'] = "S_USER_PROFILE";
 	$page['file'] = 'profile.php';
 	$page['hist_arg'] = array();
@@ -31,60 +32,118 @@ include_once 'include/page_header.php';
 
 ?>
 <?php
-	if($USER_DETAILS['alias']==ZBX_GUEST_USER){
+	if($USER_DETAILS['alias'] == ZBX_GUEST_USER) {
 		access_deny();
 	}
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'password1'=>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
-		'password2'=>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
-		'lang'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
-		'theme'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
-		'autologin'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
-		'autologout'=>  array(T_ZBX_INT, O_OPT, null,   BETWEEN(90,10000), null),
-		'url'=>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-		'refresh'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'isset({save})'),
-		'change_password'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
+$fields=array(
+	'password1'=>		array(T_ZBX_STR, O_OPT,	null, null, 'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
+	'password2'=>		array(T_ZBX_STR, O_OPT,	null, null, 'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
+	'lang'=>			array(T_ZBX_STR, O_OPT,	null, NOT_EMPTY, 'isset({save})'),
+	'theme'=>			array(T_ZBX_STR, O_OPT,	null, NOT_EMPTY, 'isset({save})'),
+	'autologin'=>		array(T_ZBX_INT, O_OPT,	null, IN('0,1'), null),
+	'autologout'=>		array(T_ZBX_INT, O_OPT, null, BETWEEN(90,10000), null),
+	'url'=>				array(T_ZBX_STR, O_OPT, null, null, 'isset({save})'),
+	'refresh'=>			array(T_ZBX_INT, O_OPT, null, BETWEEN(0,3600), 'isset({save})'),
+	'change_password'=>	array(T_ZBX_STR, O_OPT, null, null, null),
+	'user_medias'=>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, null),
+	'user_medias_to_del'=>	array(T_ZBX_STR, O_OPT, null, DB_ID, null),
+	'new_media'=>		array(T_ZBX_STR, O_OPT, null, null, null),
+	'enable_media'=>	array(T_ZBX_INT, O_OPT, null, null, null),
+	'disable_media'=>	array(T_ZBX_INT, O_OPT, null, null, null),
 /* actions */
-		'save'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'cancel'=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+	'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS, null, null),
+	'del_user_media'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 /* other */
-		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		'form_refresh'=>array(T_ZBX_STR, O_OPT, null,	null,	null)
-	);
-
+	'form'=>			array(T_ZBX_STR, O_OPT, P_SYS, null, null),
+	'form_refresh'=>	array(T_ZBX_STR, O_OPT, null, null, null)
+);
 
 	check_fields($fields);
 ?>
 <?php
-	if(isset($_REQUEST['cancel'])){
+//Secondary Actions
+	if(isset($_REQUEST['new_media'])){
+		$_REQUEST['user_medias'] = get_request('user_medias', array());
+		array_push($_REQUEST['user_medias'], $_REQUEST['new_media']);
+	}
+	elseif(isset($_REQUEST['user_medias']) && isset($_REQUEST['enable_media'])){
+		if(isset($_REQUEST['user_medias'][$_REQUEST['enable_media']])){
+			$_REQUEST['user_medias'][$_REQUEST['enable_media']]['active'] = 0;
+		}
+	}
+	elseif(isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])){
+		if(isset($_REQUEST['user_medias'][$_REQUEST['disable_media']])){
+			$_REQUEST['user_medias'][$_REQUEST['disable_media']]['active'] = 1;
+		}
+	}
+	elseif(isset($_REQUEST['del_user_media'])){
+		$user_medias_to_del = get_request('user_medias_to_del', array());
+		foreach($user_medias_to_del as $mediaid){
+			if(isset($_REQUEST['user_medias'][$mediaid]))
+				unset($_REQUEST['user_medias'][$mediaid]);
+		}
+	}
+//Primary Actions
+	elseif(isset($_REQUEST['cancel'])){
 		$url = get_profile('web.menu.view.last', 'index.php');
 		redirect($url);
 	}
-	else if(isset($_REQUEST['save'])){
+	elseif(isset($_REQUEST['save'])){
 		$_REQUEST['password1'] = get_request('password1', null);
 		$_REQUEST['password2'] = get_request('password2', null);
-
-		if(isset($_REQUEST['password1']) && $_REQUEST['password1'] == ''){
-			show_error_message(S_ONLY_FOR_GUEST_ALLOWED_EMPTY_PASSWORD);
+		
+		if(($config['authentication_type'] != ZBX_AUTH_INTERNAL) && zbx_empty($_REQUEST['password1'])) {
+			if(($config['authentication_type'] == ZBX_AUTH_LDAP) && isset($_REQUEST['userid'])) {
+				if(GROUP_GUI_ACCESS_INTERNAL != get_user_auth($_REQUEST['userid'])) {
+//					$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
+				}
+			}
+			else{
+				$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
+			}
 		}
-		else if($_REQUEST['password1']==$_REQUEST['password2']){
-			$result=update_user_profile($USER_DETAILS['userid'],$_REQUEST['password1'],
-									$_REQUEST['url'],get_request('autologin',0),get_request('autologout',0),
-									$_REQUEST['lang'],$_REQUEST['theme'],$_REQUEST['refresh']
-					);
-					
+		if($_REQUEST['password1'] != $_REQUEST['password2']) {
+			show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
+		}
+		else if(isset($_REQUEST['password1']) && ($_REQUEST['alias']==ZBX_GUEST_USER) && !zbx_empty($_REQUEST['password1'])) {
+			show_error_message(S_FOR_GUEST_PASSWORD_MUST_BE_EMPTY);
+		}
+		else if(isset($_REQUEST['password1']) && ($_REQUEST['alias']!=ZBX_GUEST_USER) && zbx_empty($_REQUEST['password1'])) {
+			show_error_message(S_PASSWORD_SHOULD_NOT_BE_EMPTY);
+		}
+		else {
+			
+			$userid = $USER_DETAILS['userid'];
+			$user = array();
+//			$user['name'] = $USER_DETAILS['name'];
+//			$user['surname'] = $USER_DETAILS['surname'];
+			$user['alias'] = $USER_DETAILS['alias'];
+			$user['passwd'] = get_request('password1');
+			$user['url'] = get_request('url');
+			$user['autologin'] = get_request('autologin', 0);
+			$user['autologout'] = get_request('autologout', 0);
+			$user['lang'] = get_request('lang');
+			$user['theme'] = get_request('theme');
+			$user['refresh'] = get_request('refresh');
+//			$user['user_type'] = $USER_DETAILS['type'];
+			$user['user_groups'] = null;
+			$user['user_medias'] = get_request('user_medias');
+			
+			DBstart();
+			$result = update_user($userid, $user);
+			$result = DBend($result);
+			
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
+
 			if($result)
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,
 					'User alias ['.$USER_DETAILS['alias'].
 					'] name ['.$USER_DETAILS['name'].'] surname ['.
 					$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
-		}
-		else{
-			show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
 		}
 	}
 ?>

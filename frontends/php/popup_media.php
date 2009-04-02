@@ -86,7 +86,7 @@ include_once "include/page_header.php";
 		
 		$severity = array();
 		for($i=0; $i<6; $i++){
-			if($rq_severity & exp(log(2)*$i)) $severity[$i] = $i;
+			if($rq_severity & (1 << $i)) $severity[$i] = $i;
 		}
 	}
 	else{
