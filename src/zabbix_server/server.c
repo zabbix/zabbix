@@ -1286,6 +1286,7 @@ void	zbx_on_exit()
 				threads[i] = (ZBX_THREAD_HANDLE)0;
 			}
 		}
+		zbx_free(threads);
 	}
 	
 #endif /* not _WINDOWS */

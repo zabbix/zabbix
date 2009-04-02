@@ -363,11 +363,7 @@ int main(int argc, char **argv)
 	init_ipmi_handler();
 #endif
 
-	if(CONFIG_DBSYNCER_FORKS!=0)
-	{
-		init_database_cache(ZBX_PROCESS_PROXY);
-	}
-
+	init_database_cache(ZBX_PROCESS_PROXY);
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }
 
@@ -428,6 +424,8 @@ int MAIN_ZABBIX_ENTRY(void)
 #endif /* HAVE_SQLITE3 */
 
 	DBinit();
+
+	init_database_cache(ZBX_PROCESS_PROXY);
 
 	threads = calloc(1 + CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
@@ -592,6 +590,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 void	zbx_on_exit()
 {
+	zabbix_log(LOG_LEVEL_INFORMATION, "zbx_on_exit()");
 #if !defined(_WINDOWS)
 	
 	int i = 0;
@@ -608,6 +607,7 @@ void	zbx_on_exit()
 				threads[i] = (ZBX_THREAD_HANDLE)0;
 			}
 		}
+		zbx_free(threads);
 	}
 	
 #endif /* not _WINDOWS */
@@ -623,11 +623,7 @@ void	zbx_on_exit()
 	zbx_sleep(2); /* wait for all threads closing */
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
-	
-	if(CONFIG_DBSYNCER_FORKS!=0)
-	{
-		free_database_cache();
-	}
+	free_database_cache();
 	DBclose();
 /*	zbx_mutex_destroy(&node_sync_access);*/
 
@@ -641,7 +637,7 @@ void	zbx_on_exit()
 	php_sem_remove(&sqlite_access);
 #endif /* HAVE_SQLITE3 */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Server stopped. ZABBIX %s.", ZABBIX_VERSION);
+	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Proxy stopped. ZABBIX %s.", ZABBIX_VERSION);
 
 	exit(SUCCEED);
 }

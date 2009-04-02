@@ -2289,6 +2289,7 @@ void	free_database_cache()
 {
 	key_t	shm_key;
 	int	shm_id;
+	size_t	sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In free_database_cache()");
 
@@ -2300,7 +2301,11 @@ void	free_database_cache()
 	
 	ZBX_GET_SHM_DBCACHE_KEY(shm_key);
 
-	shm_id = shmget(shm_key, sizeof(ZBX_DC_CACHE), 0);
+	sz = sizeof(ZBX_DC_IDS);
+	if (0 != CONFIG_DBSYNCER_FORKS)
+		sz += sizeof(ZBX_DC_CACHE);
+
+	shm_id = shmget(shm_key, sz, 0);
 
 	if (-1 == shm_id)
 	{

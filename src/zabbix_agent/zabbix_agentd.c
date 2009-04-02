@@ -323,10 +323,9 @@ void	zbx_on_exit()
 				threads[i] = (ZBX_THREAD_HANDLE)0;
 			}
 		}
+		zbx_free(threads);
 	}
-	
-	zbx_free(threads);
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called.");
 
 #ifdef USE_PID_FILE

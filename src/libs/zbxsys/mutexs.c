@@ -96,7 +96,7 @@ int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char fo
 	}			
 
 lbl_create:
-	if ( -1 != (ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, IPC_CREAT | IPC_EXCL | 0666 /* 0022 */)) )
+	if (-1 != ZBX_SEM_LIST_ID || -1 != (ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, IPC_CREAT | IPC_EXCL | 0666 /* 0022 */)) )
 	{
 		/* set default semaphore value */
 		semopts.val = 1;
@@ -114,7 +114,7 @@ lbl_create:
 	}
 	else if(errno == EEXIST)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "ZABBIX semaphores already exist, trying to recreate.");
+		zabbix_log(LOG_LEVEL_DEBUG, "ZABBIX semaphores already exist, trying to recreate.");
 
 		ZBX_SEM_LIST_ID = semget(sem_key, 0 /* get reference */, 0666 /* 0022 */);
 

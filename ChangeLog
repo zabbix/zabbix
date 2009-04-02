@@ -1,5 +1,6 @@
 Changes for 1.6.4
 
+ - [ZBX-836] fixed probem with permissions of proxy shared memory (Sasha)
  - [ZBX-833] fixed link from maps element to trigger status page (Artem)
  - [ZBX-831] DM: fixed synchronization of trends data (Sasha)
  - [DEV-137] DM: improved performance of historical data synchronization (Sasha)
