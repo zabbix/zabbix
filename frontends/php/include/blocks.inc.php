@@ -459,7 +459,7 @@ function make_latest_issues($params = array()){
 		S_ACTIONS
 		));
 	
-	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.value,h.host,h.hostid '.$sql_select.
+	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.value,h.host,h.hostid '.$sql_select.				
 				' FROM triggers t,hosts h,items i,functions f,hosts_groups hg '.$sql_from.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
@@ -497,7 +497,7 @@ function make_latest_issues($params = array()){
 		$host->addOption('onclick','javascript: '.$menus);
 		$host->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
-		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type, t.url '.
+		$event_sql = 'SELECT DISTINCT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type, t.url '.
 					' FROM events e, triggers t '.
 					' WHERE e.object='.EVENT_SOURCE_TRIGGERS.
 						' AND e.objectid='.$row['triggerid'].
@@ -505,7 +505,7 @@ function make_latest_issues($params = array()){
 						' AND e.value='.TRIGGER_VALUE_TRUE.
 					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 		$res_events = DBSelect($event_sql,1);
-
+				
 		while($row_event=DBfetch($res_events)){
 			$ack = NULL;
 			if($config['event_ack_enable']){
@@ -526,15 +526,16 @@ function make_latest_issues($params = array()){
 					
 //actions
 			$actions = get_event_actions_stat_hints($row_event['eventid']);
-//--------			
-			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'].'&source=0&show_unknown=1&nav_time='.$row_event['clock'],'action');
+
+			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'].'&source=0&show_unknown=1&nav_time='.$row_event['clock'],'action');			
 			
 			$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action', null, true) : $description;
-			
+			$description = new CCol($description,get_severity_style($row["priority"]));
+			$description->setHint(make_popup_eventlist($row_event['eventid'], $row['type']));
 			$table->addRow(array(
 				get_node_name_by_elid($row['triggerid']),
 				$host,
-				new CCol($description,get_severity_style($row["priority"])),
+				$description,
 				$clock,
 				zbx_date2age($row_event['clock']),
 				$ack,
