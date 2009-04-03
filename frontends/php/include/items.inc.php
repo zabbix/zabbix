@@ -1365,4 +1365,109 @@ COpt::profiling_stop('prepare table');
 		}
 		return $value;
 	}
+
+	/*
+	 *
+	 * Function: check_time_period
+	 *
+	 * Purpose: check if current time is within given period
+	 *
+	 * Parameters: period - time period in format [d1-d2,hh:mm-hh:mm]*
+	 *             now    - timestamp for comporation
+	 *
+	 * Return value: 0 - out of period, 1 - within the period
+	 *
+	 * Author: Alexander Vladishev
+	 *
+	 * Comments:
+	 *        !!! Don't forget sync code with PHP !!!
+	 *
+	 */
+	function	check_time_period($period, $now)
+	{
+		$tm = localtime($now, TRUE);
+
+		$day = $tm['tm_wday'];
+		if (0 == $day)
+			$day = 7;
+		$min = 60 * $tm['tm_hour'] + $tm['tm_min'];
+
+		$arr_of_period = explode(';', $period);
+
+		foreach($arr_of_period as $one_period)
+		{
+			list($d1, $d2, $h1, $m1, $h2, $m2) = sscanf($one_period, "%d-%d,%d:%d-%d:%d");
+			if ($day >= $d1 && $day <= $d2 && $min >= 60 * $h1 + $m1 && $min <= 60 * $h2 + $m2)
+			{
+				return 1;
+			}
+		}
+
+		return 0;
+	}
+
+	/*
+	 * Function: calculate_item_nextcheck
+	 *
+	 * Description:
+	 *     calculate nextcheck timespamp for item
+	 *
+	 * Peremeters:
+	 *     itemid - item ID
+	 *     item_type - item type
+	 *     delay - item's refresh rate in sec
+	 *     delay_flex - item's flexible refresh rate
+	 *     now - current timestamp
+	 *
+	 * Author:
+	 *     Alexander Vladishev
+	 *
+	 * Comments:
+	 *     !!! Don't forget sync code with C !!!
+	 *
+	 */
+	function calculate_item_nextcheck($itemid, $item_type, $delay, $delay_flex, $now)
+	{
+		if (0 == $delay)
+		{
+			$delay = 30;
+/*			info('Invalid item update interval ['.$delay.'], using default [30]');*/
+		}
+
+		/* Special processing of active items to see better view in queue */
+		if ($item_type == ITEM_TYPE_ZABBIX_ACTIVE)
+		{
+			return $now + $delay;
+		}
+
+		if (!is_null($delay_flex) && $delay_flex != '')
+		{
+			$arr_of_delay = explode(';', $delay_flex);
+
+			foreach($arr_of_delay as $one_delay_flex)
+			{
+				$arr = explode('/', $one_delay_flex);
+				if (check_time_period($arr[1], $now))
+				{
+					$delay = $arr[0];
+					break;
+				}
+			}
+		}
+
+		if (0 == $delay)
+		{
+/*			info('Invalid item update interval ['.$delay.'], using default [30]');*/
+			$delay = 30;
+		}
+
+		$nextcheck = $delay * floor($now / $delay) + ($itemid % $delay);
+
+		while ($nextcheck <= $now)
+		{
+			$nextcheck += $delay;
+		}
+
+		return $nextcheck;
+	}
 ?>

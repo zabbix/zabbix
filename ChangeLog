@@ -1,5 +1,6 @@
 Changes for 1.6.4
 
+ - [ZBX-845] fixed calculation of delayed items for non-local nodes in Queue screen (Sasha)
  - [ZBX-842] fixed duplicate triggers in "Last 20 issues" in dashboard (Artem)
  - [DEV-323] removed master nodes from dropdown (Artem)
  - [ZBX-837] removed sid from Zabbix logo link (Vedmak)

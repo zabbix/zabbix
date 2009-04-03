@@ -170,6 +170,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
  *                                                                            *
  * Comments: Old algorithm: now+delay                                         *
  *           New one: preserve period, if delay==5, nextcheck = 0,5,10,15,... *
+ *           !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
 int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now)
@@ -762,6 +763,7 @@ int	int_in_list(char *list, int value)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments:                                                                  *
+ *        !!! Don't forget sync code with PHP !!!                             *
  *                                                                            *
  ******************************************************************************/
 int	check_time_period(char *period, time_t now)
