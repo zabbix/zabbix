@@ -265,17 +265,15 @@ function make_event_details($eventid){
 return $table;
 }
 
-function make_small_eventlist($triggerid,&$trigger_data){
+function make_small_eventlist($eventid, $trigger_data){
 	
 	$table = new CTableInfo();
 	$table->SetHeader(array(S_TIME,S_STATUS,S_DURATION, S_AGE, S_ACK, S_ACTIONS));
 
 	$sql = 'SELECT * '.
 			' FROM events '.
-			' WHERE objectid='.$triggerid.
-				' AND object='.EVENT_OBJECT_TRIGGER.
-			' ORDER BY object DESC, objectid DESC, eventid DESC';
-
+			' WHERE eventid<='.$eventid.
+			' ORDER BY eventid DESC';
 	$result = DBselect($sql,20);
 
 	$rows = array();
@@ -301,12 +299,11 @@ function make_small_eventlist($triggerid,&$trigger_data){
 	foreach($rows as $id => $row){
 		$lclock=$clock;
 		$clock=$row["clock"];
-		
 		$duration = zbx_date2age($lclock,$clock);
 
 		$value = new CCol(trigger_value2str($row['value']), get_trigger_value_style($row["value"]));
 	
-		$ack = '-';
+		$ack = new CSpan(S_NO, 'on');
 		if(1 == $row['acknowledged']){
 			$db_acks = get_acknowledges_by_eventid($row['eventid']);
 			$rows=0;
@@ -335,6 +332,61 @@ function make_small_eventlist($triggerid,&$trigger_data){
 			$actions
 			));
 	}
+return $table;
+}
+
+function make_popup_eventlist($eventid, $trigger_type) {
+
+	$table = new CTableInfo();
+	$table->SetHeader(array(S_TIME,S_STATUS,S_DURATION, S_AGE, S_ACK));
+
+	$sql = 'SELECT * '.
+			' FROM events '.
+			' WHERE eventid<='.$eventid.
+			' ORDER BY eventid DESC';
+	$db_events = DBselect($sql, 20);
+
+
+	$event_list = array();
+	$count = 0;
+	while($event = DBfetch($db_events)) {		
+		if(!empty($event_list) && ($event_list[$count]['value'] != $event['value'])) {
+			$count++;
+		}
+		elseif(!empty($event_list) && 
+				($event_list[$count]['value'] == $event['value']) && 
+				($trigger_type == TRIGGER_MULT_EVENT_ENABLED) && 
+				($event['value'] == TRIGGER_VALUE_TRUE)
+				) {
+			$count++;
+		}
+		$event_list[$count] = $event;
+	}
+
+	$clock = time();
+	foreach($event_list as $id => $event) {
+		$lclock = $clock;
+		$clock = $event["clock"];
+		
+		$duration = zbx_date2age($lclock, $event["clock"]);
+		
+		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event["value"]));
+		
+// ack +++
+		$ack = new CSpan(S_NO,'on');
+		if($event['acknowledged']) {
+			$ack=new CSpan(S_YES,'action');			
+		}
+// ---
+		$table->AddRow(array(
+			date('Y.M.d H:i:s',$event['clock']),
+			$value,
+			$duration,
+			zbx_date2age($event['clock']),
+			$ack
+		));
+	}
+	
 return $table;
 }
 
