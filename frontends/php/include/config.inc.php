@@ -100,7 +100,7 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 			global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
 
 			/* Init LOCAL NODE ID */
-			if($local_node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodetype=1 order by nodeid'))){
+			if($local_node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodetype=1 ORDER BY nodeid'))){
 				$ZBX_LOCALNODEID = $local_node_data['nodeid'];
 				$ZBX_LOCMASTERID = $local_node_data['masterid'];
 
@@ -208,7 +208,7 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 			}
 
 			if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
-				$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid FROM nodes n';
+				$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid FROM nodes n ';
 			}
 			else{ 
 				$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid '.
@@ -216,14 +216,21 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 					' WHERE r.id=hg.groupid '.
 					 	' AND r.groupid=g.usrgrpid '.
 					 	' AND g.userid='.$USER_DETAILS['userid'].
-					 	' AND '.DBid2nodeid('hg.groupid').'=n.nodeid;';
+					 	' AND n.nodeid='.DBid2nodeid('hg.groupid');
 			}
 
 			$db_nodes = DBselect($sql);
 			while($node = DBfetch($db_nodes)){
-				$ZBX_NODES_IDS[$node['nodeid']] = $node['nodeid'];
 				$ZBX_NODES[$node['nodeid']] = $node;
 			}
+
+// REMOVING PARENT NODES 
+			$ZBX_NODES = get_tree_by_parentid($ZBX_LOCALNODEID,$ZBX_NODES,'masterid');
+
+			foreach($ZBX_NODES as $nodeid => $NODE){
+				$ZBX_NODES_IDS[$nodeid] = $nodeid;
+			}
+//------
 
 			if( !isset($ZBX_NODES[$ZBX_CURRENT_NODEID])){
 				$denyed_page_requested = true;
@@ -507,6 +514,24 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 		include_once "include/page_header.php";
 		show_error_message($msg);
 		include_once "include/page_footer.php";
+	}
+	
+	function get_tree_by_parentid($parentid,&$tree,$parent_field, $level=0){
+		if(empty($tree)) return $tree;
+
+		$level++;
+		if($level > 32) return array();
+
+		$result = array();
+		$result[$parentid] = $tree[$parentid];
+		foreach($tree as $id => $child){
+			if($child[$parent_field] == $parentid){
+				$result[$id] = $child;
+				$childs = get_tree_by_parentid($id,$tree,$parent_field, $level); // RECURSION !!!
+				$result += $childs;	
+			}
+		}
+	return $result;
 	}
 
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
