@@ -856,6 +856,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 	$def_sql = array(
 				'from' =>	array('groups g'),
 				'where' =>	array(),
+				'order' =>	array(),
 			);
 			
 	$def_options = array(
@@ -903,6 +904,13 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 	$nodeid = is_null($nodeid)?get_current_nodeid(!$def_options['only_current_node']):$nodeid;
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,$nodeid,AVAILABLE_NOCACHE);
 
+// nodes
+	if(ZBX_DISTRIBUTED){
+		$def_sql['from'][] = 'nodes n';
+		$def_sql['where'][] = 'n.nodeid='.DBid2nodeid('g.groupid');
+		$def_sql['order'][] = 'n.name';
+	}
+	
 // hosts
 	if($def_options['monitored_hosts'])
 		$def_sql['where'][] = 'h.status='.HOST_STATUS_MONITORED;
@@ -999,6 +1007,8 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 	}
 	
 //-----
+	$def_sql['order'][] = 'g.name';
+	
 	foreach($sql as $key => $value){
 		zbx_value2array($value);
 
@@ -1008,17 +1018,20 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 	
 	$def_sql['from'] = array_unique($def_sql['from']);
 	$def_sql['where'] = array_unique($def_sql['where']);
+	$def_sql['order'] = array_unique($def_sql['order']);
 
 	$sql_from = '';
 	$sql_where = '';
+	$sql_order = '';
 	if(!empty($def_sql['from'])) $sql_from.= implode(',',$def_sql['from']);
 	if(!empty($def_sql['where'])) $sql_where.= ' AND '.implode(' AND ',$def_sql['where']);
+	if(!empty($def_sql['order'])) $sql_order.= implode(',',$def_sql['order']);
 
-	$sql = 'SELECT DISTINCT g.groupid,g.name '.
+	$sql = 'SELECT DISTINCT n.nodeid, g.groupid,g.name '.
 			' FROM '.$sql_from.
 			' WHERE '.DBcondition('g.groupid',$available_groups).
 				$sql_where.
-			' ORDER BY g.name';
+			' ORDER BY '.$sql_order;
 //SDI($sql);
 	$res = DBselect($sql);
 	while($group = DBfetch($res)){
@@ -1083,6 +1096,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	$def_sql = array(
 				'from' =>	array('hosts h'),
 				'where' =>	array(),
+				'order' =>	array(),
 			);
 
 	$def_options = array(
@@ -1143,7 +1157,14 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	
 	$nodeid = is_null($nodeid)?get_current_nodeid(!$def_options['only_current_node']):$nodeid;
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,$nodeid,AVAILABLE_NOCACHE);
-	
+
+// nodes
+	if(ZBX_DISTRIBUTED){
+		$def_sql['from'][] = 'nodes n';
+		$def_sql['where'][] = 'n.nodeid='.DBid2nodeid('h.hostid');
+		$def_sql['order'][] = 'n.name';
+	}
+
 // hosts
 	if($def_options['monitored_hosts'])
 		$def_sql['where'][] = 'h.status='.HOST_STATUS_MONITORED;
@@ -1208,7 +1229,8 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 										' AND i.itemid=gi.itemid)';
 	}
 //------
-
+	$def_sql['order'][] = 'h.host';
+	
 	foreach($sql as $key => $value){
 		zbx_value2array($value);
 
@@ -1218,17 +1240,20 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	
 	$def_sql['from'] = array_unique($def_sql['from']);
 	$def_sql['where'] = array_unique($def_sql['where']);
+	$def_sql['order'] = array_unique($def_sql['order']);
 
 	$sql_from = '';
 	$sql_where = '';
+	$sql_order = '';
 	if(!empty($def_sql['from'])) $sql_from.= implode(',',$def_sql['from']);
 	if(!empty($def_sql['where'])) $sql_where.= ' AND '.implode(' AND ',$def_sql['where']);
+	if(!empty($def_sql['order'])) $sql_order.= implode(',',$def_sql['order']);
 	
 	$sql = 'SELECT DISTINCT h.hostid, h.host '.
 			' FROM '.$sql_from.
 			' WHERE '.DBcondition('h.hostid',$available_hosts).
 				$sql_where.
-			' ORDER BY h.host';	
+			' ORDER BY '.$sql_order;	
 	$res = DBselect($sql);
 	while($host = DBfetch($res)){
 		$hosts[$host['hostid']] = $host['host'];
