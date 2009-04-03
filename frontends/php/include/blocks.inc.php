@@ -474,7 +474,7 @@ function make_latest_issues(){
 		S_ACTIONS
 		));
 	
-	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.value,h.host,h.hostid, hg.groupid '.
+	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.value,h.host,h.hostid '.
 				' FROM triggers t,hosts h,items i,functions f, hosts_groups hg '.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
@@ -504,7 +504,7 @@ function make_latest_issues(){
 		}
 
 		$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?groupid=".$row['groupid']."&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?groupid=0&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 		$menus = rtrim($menus,',');
 		$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
@@ -544,7 +544,7 @@ function make_latest_issues(){
 //actions								
 			$actions = get_event_actions_stat_hints($row_event['eventid']);
 //--------			
-			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'].'&source=0&nav_time='.$row['lastchange'],'action');
+			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'].'&source=0&show_unknown=1&nav_time='.$row_event['clock'],'action');
 			
 			
 			$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action', null, true) : $description;

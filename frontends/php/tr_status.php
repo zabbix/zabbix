@@ -207,8 +207,8 @@ include_once "include/page_header.php";
 	
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+	
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
-
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 
