@@ -796,6 +796,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 	global $page;
 	
 	$def_sql = array(
+				'select' =>	array('g.groupid','g.name'),
 				'from' =>	array('groups g'),
 				'where' =>	array(),
 				'order' =>	array(),
@@ -848,6 +849,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 
 // nodes
 	if(ZBX_DISTRIBUTED){
+		$def_sql['select'][] = 'n.name';
 		$def_sql['from'][] = 'nodes n';
 		$def_sql['where'][] = 'n.nodeid='.DBid2nodeid('g.groupid');
 		$def_sql['order'][] = 'n.name';
@@ -958,18 +960,21 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 		else $def_sql[$key] = $value;
 	}
 	
+	$def_sql['select'] = array_unique($def_sql['select']);
 	$def_sql['from'] = array_unique($def_sql['from']);
 	$def_sql['where'] = array_unique($def_sql['where']);
 	$def_sql['order'] = array_unique($def_sql['order']);
 
+	$sql_select = '';
 	$sql_from = '';
 	$sql_where = '';
 	$sql_order = '';
+	if(!empty($def_sql['select'])) $sql_select.= implode(',',$def_sql['select']);
 	if(!empty($def_sql['from'])) $sql_from.= implode(',',$def_sql['from']);
 	if(!empty($def_sql['where'])) $sql_where.= ' AND '.implode(' AND ',$def_sql['where']);
 	if(!empty($def_sql['order'])) $sql_order.= implode(',',$def_sql['order']);
 
-	$sql = 'SELECT DISTINCT n.nodeid, g.groupid,g.name '.
+	$sql = 'SELECT DISTINCT '.$sql_select.
 			' FROM '.$sql_from.
 			' WHERE '.DBcondition('g.groupid',$available_groups).
 				$sql_where.
@@ -1036,6 +1041,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	global $page;
 
 	$def_sql = array(
+				'select' =>	array('h.hostid','h.host'),
 				'from' =>	array('hosts h'),
 				'where' =>	array(),
 				'order' =>	array(),
@@ -1102,6 +1108,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 
 // nodes
 	if(ZBX_DISTRIBUTED){
+		$def_sql['select'][] = 'n.name';
 		$def_sql['from'][] = 'nodes n';
 		$def_sql['where'][] = 'n.nodeid='.DBid2nodeid('h.hostid');
 		$def_sql['order'][] = 'n.name';
@@ -1180,18 +1187,21 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 		else $def_sql[$key] = $value;
 	}
 	
+	$def_sql['select'] = array_unique($def_sql['select']);
 	$def_sql['from'] = array_unique($def_sql['from']);
 	$def_sql['where'] = array_unique($def_sql['where']);
 	$def_sql['order'] = array_unique($def_sql['order']);
 
+	$sql_select = '';
 	$sql_from = '';
 	$sql_where = '';
 	$sql_order = '';
+	if(!empty($def_sql['select'])) $sql_select.= implode(',',$def_sql['select']);
 	if(!empty($def_sql['from'])) $sql_from.= implode(',',$def_sql['from']);
 	if(!empty($def_sql['where'])) $sql_where.= ' AND '.implode(' AND ',$def_sql['where']);
 	if(!empty($def_sql['order'])) $sql_order.= implode(',',$def_sql['order']);
 	
-	$sql = 'SELECT DISTINCT h.hostid, h.host '.
+	$sql = 'SELECT DISTINCT '.$sql_select.
 			' FROM '.$sql_from.
 			' WHERE '.DBcondition('h.hostid',$available_hosts).
 				$sql_where.
