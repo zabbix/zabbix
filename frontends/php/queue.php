@@ -216,7 +216,7 @@ include_once "include/page_header.php";
 			array_push($arr, array($nextcheck, $row['hostid'], $row['host'], item_description($row)));
 		}
 
-		rsort($arr);
+		sort($arr);
 		foreach($arr as $r){
 			$table->AddRow(array(
 				date("m.d.Y H:i:s",
