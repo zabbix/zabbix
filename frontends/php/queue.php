@@ -74,19 +74,19 @@ include_once "include/page_header.php";
 			//ITEM_TYPE_HTTPTEST,
 			ITEM_TYPE_EXTERNAL);
 
-	$result = DBselect('SELECT i.itemid,i.nextcheck,i.description,i.key_,i.type,h.host,h.hostid,h.proxy_hostid '.
+	$result = DBselect('SELECT i.itemid,i.lastclock,i.description,i.key_,i.type,h.host,h.hostid,h.proxy_hostid,i.delay,i.delay_flex '.
 		' FROM items i,hosts h '.
 		' WHERE i.status='.ITEM_STATUS_ACTIVE.
 			' AND i.type in ('.implode(',',$item_types).') '.
 			' AND ((h.status='.HOST_STATUS_MONITORED.' AND h.available != '.HOST_AVAILABLE_FALSE.') '.
 				' OR (h.status='.HOST_STATUS_MONITORED.' AND h.available='.HOST_AVAILABLE_FALSE.' AND h.disable_until<='.$now.')) '.
 			' AND i.hostid=h.hostid '.
-			' AND i.nextcheck + 5 <'.$now.
+/*			' AND i.nextcheck + 5 <'.$now.*/
 			' AND i.key_ NOT IN ('.zbx_dbstr('status').','.zbx_dbstr('icmpping').','.zbx_dbstr('icmppingsec').','.zbx_dbstr('zabbix[log]').') '.
 			' AND i.value_type not in ('.ITEM_VALUE_TYPE_LOG.') '.
 			' AND '.DBcondition('h.hostid',$available_hosts).
 			' AND '.DBin_node('h.hostid', get_current_nodeid()).
-		' ORDER BY i.nextcheck,h.host,i.description,i.key_');
+		' ORDER BY i.lastclock,h.host,i.description,i.key_');
 
 	$table = new CTableInfo(S_THE_QUEUE_IS_EMPTY);
 
@@ -102,12 +102,18 @@ include_once "include/page_header.php";
 		}
 
 		while($row=DBfetch($result)){
-			if($now-$row["nextcheck"]<=10)			$sec_10[$row["type"]]++;
-			else if($now-$row["nextcheck"]<=30)		$sec_30[$row["type"]]++;
-			else if($now-$row["nextcheck"]<=60)		$sec_60[$row["type"]]++;
-			else if($now-$row["nextcheck"]<=300)		$sec_300[$row["type"]]++;
-			else if($now-$row["nextcheck"]<=600)		$sec_600[$row["type"]]++;
-			else	$sec_rest[$row["type"]]++;
+			$nextcheck = is_null($row['lastclock']) ? 0 : calculate_item_nextcheck($row['itemid'], $row['type'],
+					$row['delay'], $row['delay_flex'], $row['lastclock']);
+			$diff = $now - $nextcheck;
+			if ($diff <= 5)
+				continue;
+
+			if ($diff <= 10)	$sec_10[$row['type']]++;
+			else if ($diff <= 30)	$sec_30[$row['type']]++;
+			else if ($diff <= 60)	$sec_60[$row['type']]++;
+			else if ($diff <= 300)	$sec_300[$row['type']]++;
+			else if ($diff <= 600)	$sec_600[$row['type']]++;
+			else	$sec_rest[$row['type']]++;
 
 		}
 		
@@ -148,7 +154,11 @@ include_once "include/page_header.php";
 
 		while ($row = DBfetch($result))
 		{
-			$diff = $now - $row['nextcheck'];
+			$nextcheck = is_null($row['lastclock']) ? 0 : calculate_item_nextcheck($row['itemid'], $row['type'],
+					$row['delay'], $row['delay_flex'], $row['lastclock']);
+			$diff = $now - $nextcheck;
+			if ($diff <= 5)
+				continue;
 
 			if ($diff <= 10)	$sec_10[$row['proxy_hostid']]++;
 			else if ($diff <= 30)	$sec_30[$row['proxy_hostid']]++;
@@ -188,6 +198,8 @@ include_once "include/page_header.php";
 	}
 	else if ($_REQUEST["config"] == 2)
 	{
+		$arr = array();
+
 		$table->SetHeader(array(
 				S_NEXT_CHECK,
 				is_show_subnodes() ? S_NODE : null,
@@ -195,12 +207,23 @@ include_once "include/page_header.php";
 				S_DESCRIPTION
 				));
 		while($row=DBfetch($result)){
+			$nextcheck = is_null($row['lastclock']) ? 0 : calculate_item_nextcheck($row['itemid'], $row['type'],
+					$row['delay'], $row['delay_flex'], $row['lastclock']);
+			$diff = $now - $nextcheck;
+			if ($diff <= 5)
+				continue;
+
+			array_push($arr, array($nextcheck, $row['hostid'], $row['host'], item_description($row)));
+		}
+
+		rsort($arr);
+		foreach($arr as $r){
 			$table->AddRow(array(
 				date("m.d.Y H:i:s",
-					$row["nextcheck"]),
-				get_node_name_by_elid($row['hostid']),
-				$row['host'],
-				item_description($row)
+					$r[0]),
+				get_node_name_by_elid($r[1]),
+				$r[2],
+				$r[3]
 				));
 		}
 	}
