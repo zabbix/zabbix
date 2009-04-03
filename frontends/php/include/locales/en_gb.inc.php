@@ -1320,6 +1320,10 @@
 	'S_MULTIPLE_TRUE_EVENTS'=>	'Multiple TRUE events',
 	'S_SHOW_DISABLED_TRIGGERS'=>		'Show disabled triggers',
 	'S_HIDE_DISABLED_TRIGGERS'=>		'Hide disabled triggers',
+    'S_TEST'=>              'Test',
+    'S_TOGGLE_INPUT_METHOD'=>               'Toggle input method',
+    'S_INSERT_MACRO'=>          'Insert macro',
+    'S_REPLACE'=>               'Replace',
 
 //	tr_logform.php
 	'S_TRIGGER_LOG'=>			'Trigger log',
@@ -1494,6 +1498,37 @@
 	'S_EMPTY'=>				'Empty',
 	'S_STANDARD_ITEMS_BIG'=>		'STANDARD ITEMS',
 	'S_NO_ITEMS'=>				'No items',
+
+//  popup_trexpr.php
+    'S_CLEAR'=>             'Clear',
+    'S_FNC_DESCRIPTION_ABSCHANGE'=>     'Absolute difference between last and previous value {OP} N.',
+    'S_FNC_DESCRIPTION_AVG'=>       'Average value for period of T times {OP} N.',
+    'S_FNC_DESCRIPTION_DELTA'=>     'Difference between MAX and MIN value of T times {OP} N.',
+    'S_FNC_DESCRIPTION_CHANGE'=>        'Difference between last and previous value {OP} N.',
+    'S_FNC_DESCRIPTION_COUNT'=>     'Number of successfully retrieved values V for period of time T {OP} N.',
+    'S_FNC_DESCRIPTION_DIFF'=>      'N {OP} X, where X is 1 - if last and previous values differs, 0 - otherwise.',
+    'S_FNC_DESCRIPTION_LAST'=>      'Last value {OP} N.',
+    'S_FNC_DESCRIPTION_MAX'=>       'Maximal value for period of time T {OP} N.',
+    'S_FNC_DESCRIPTION_MIN'=>       'Minimal value for period of time T {OP} N.',
+    'S_FNC_DESCRIPTION_PREV'=>      'Previous value {OP} N.',
+    'S_FNC_DESCRIPTION_STR'=>       'Find string V last value. N {OP} X, where X is 1 - if found, 0 - otherwise.',
+    'S_FNC_DESCRIPTION_SUM'=>       'Sum of values for period of time T {OP} N.',
+    'S_FNC_DESCRIPTION_DATE'=>      'X(current date in YYYYMMDD format) {OP} N',
+    'S_FNC_DESCRIPTION_DAYOFWEEK'=>     'X(day of week in range of 1 - Mon to 7 - Sun) {OP} N.',
+    'S_FNC_DESCRIPTION_FUZZYTIME'=>     'X(1 - if timestamp - item value does not differ from ZABBIX server time for more than T seconds, 0 - otherwise) {OP} N.',
+    'S_FNC_DESCRIPTION_IREGEXP'=>       'X(1 - last value matches regular expression, 0 - otherwise) {OP} N not case-sensitive.',
+    'S_FNC_DESCRIPTION_LOGSERVERITY'=>  'X(log severity of the last log entry) {OP} N.',
+    'S_FNC_DESCRIPTION_LOGSOURCE'=>     'X(1 - log source of the last log entry matches parameter, 0 - otherwise) {OP} N.',
+    'S_FNC_DESCRIPTION_NODATA'=>        'X(1 - no data received during period of time in seconds, 0 - otherwise) {OP} N.',
+    'S_FNC_DESCRIPTION_NOW'=>       'X(number of seconds since 00:00:00 UTC, January 1, 1970) {OP} N.',
+    'S_FNC_DESCRIPTION_REGEXP'=>        'X(1 - last value matches regular expression, 0 - otherwise) {OP} N case-sensitive.',
+    'S_FNC_DESCRIPTION_TIME'=>      'X(current time in HHMMSS format) {OP} N.',
+
+//  tr_testexpr.php
+    'S_TEST_DATA'=>                 'Test data',
+    'S_ITEM_FUNCTION'=>             'Item / Function',
+    'S_RESULT_TYPE'=>               'Result type',
+    'S_COMBINED_RESULT'=>           'Combined result',
 
 //	Menu
 

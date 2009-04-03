@@ -386,6 +386,7 @@
 	"S_NUMERIC_UINT64"=>			"数値 (integer 64 bit)",
 	"S_CHARACTER"=>				"文字列",
 	"S_LOG"=>				"ログ",
+	'S_TEXT'=>				'テキスト',
 	"S_AS_IS"=>				"なし",
 	"S_DELTA_SPEED_PER_SECOND"=>		"差分/時間",
 	"S_DELTA_SIMPLE_CHANGE"=>		"差分",
@@ -403,6 +404,7 @@
 	"S_USE_MULTIPLIER"=>			"乗数を使用",
 	"S_SELECT_HOST_DOT_DOT_DOT"=>		"選択",
 	"S_LOG_TIME_FORMAT"=>			"ログの時間形式",
+	'S_TARGET'=>				'対象',
 	'S_KEYWORD'=>		     		'キーワード',	
 
 //	latestalarms.php
@@ -564,6 +566,7 @@
 	"S_WIDTH"=>				"幅",
 	"S_HEIGHT"=>				"高さ",
 	"S_EMPTY"=>				"空白",
+	'S_EDIT'=>				'編集',
 
 //	screenedit.php
 	"S_MAP"=>				"マップ",
@@ -652,6 +655,10 @@
 	"S_TRIGGER_UPDATED"=>			"トリガーを更新しました",
 	"S_CANNOT_UPDATE_TRIGGER"=>		"トリガーを更新できません",
 	"S_DEPENDS_ON"=>			"依存関係",
+	'S_TEST'=>				'テスト',
+	'S_TOGGLE_INPUT_METHOD'=>				'入力方法切替',
+	'S_INSERT_MACRO'=>			'マクロ挿入',
+	'S_REPLACE'=>				'置換',
 
 //	tr_comments.php
 	"S_TRIGGER_COMMENTS"=>			"トリガーのコメント",
@@ -724,6 +731,10 @@
 	"S_URL_AFTER_LOGIN"=>			"URL (ログイン後)",
 	"S_AUTO_LOGOUT_IN_SEC"=>		"自動ログアウト (秒)",
 
+//	scripts.php
+	'S_RESULT'=>				'結果',
+	'S_CLOSE'=>				'閉じる',
+
 //	audit.php
 	"S_AUDIT_LOG"=>				"変更履歴",
 	"S_AUDIT_LOG_BIG"=>			"変更履歴",
@@ -772,6 +783,37 @@
 	"S_BULKLOADER_IMPORT_TRIGGERS"=>	"Import Triggers",
 	"S_BULKLOADER_IMPORT_ACTIONS"=>		"Import Actions",
 	"S_BULKLOADER_IMPORT_ITSERVICES"=>	"Import IT Services",
+
+//	popup_trexpr.php
+	'S_CLEAR'=>				'クリア',
+	'S_FNC_DESCRIPTION_ABSCHANGE'=>		'最新と前値の差の絶対値 {OP} N',
+	'S_FNC_DESCRIPTION_AVG'=>		'直近T秒（またはT個）の平均値 {OP} N',
+	'S_FNC_DESCRIPTION_DELTA'=>		'直近T秒（またはT個）の最大値と最小値の差 {OP} N',
+	'S_FNC_DESCRIPTION_CHANGE'=>		'最新と前値の差 {OP} N',
+	'S_FNC_DESCRIPTION_COUNT'=>		'直近T秒（またはT個）にVが含まれる数 {OP} N',
+	'S_FNC_DESCRIPTION_DIFF'=>		'X {OP} N（最新と前値が異なる場合Xは1、同値の場合Xは0）',
+	'S_FNC_DESCRIPTION_LAST'=>		'最新値 {OP} N',
+	'S_FNC_DESCRIPTION_MAX'=>		'直近T秒（またはT個）の最大値 {OP} N.',
+	'S_FNC_DESCRIPTION_MIN'=>		'直近T秒（またはT個）の最小値 {OP} N.',
+	'S_FNC_DESCRIPTION_PREV'=>		'前値 {OP} N',
+	'S_FNC_DESCRIPTION_STR'=>		'X {OP} N （最新値に文字列Vが含まれる場合Xは1、含まれない場合Xは0）',
+	'S_FNC_DESCRIPTION_SUM'=>		'直近T秒（またはT個）の合計値 {OP} N',
+	'S_FNC_DESCRIPTION_DATE'=>		'X {OP} N （Xはシステム日付 YYYYMMDD）',
+	'S_FNC_DESCRIPTION_DAYOFWEEK'=>		'X {OP} N （システム日付が月曜日の場合Xは1、日曜日の場合Xは7）',
+	'S_FNC_DESCRIPTION_FUZZYTIME'=>		'X {OP} N （最終値のタイムスタンプがシステム日付から過去T秒以内の場合Xは1、それ以外の場合Xは0）',
+	'S_FNC_DESCRIPTION_IREGEXP'=>		'X {OP} N （最終値に大文字小文字同一視で正規表現Rがマッチした場合Xは1、それ以外の場合Xは0）',
+	'S_FNC_DESCRIPTION_LOGSERVERITY'=>	'X {OP} N （Xは最終Windowsイベントログのイベント種別値）',
+	'S_FNC_DESCRIPTION_LOGSOURCE'=>		'X {OP} N （最終Windowsイベントログに文字列Vが含まれる場合Xは1、含まれない場合Xは0）',
+	'S_FNC_DESCRIPTION_NODATA'=>		'X {OP} N （直近T秒以内にデータがない場合Xは1、ある場合Xは0）',
+	'S_FNC_DESCRIPTION_NOW'=>		'X {OP} N （Xは1970/01/01 0:00:00からの経過秒数）',
+	'S_FNC_DESCRIPTION_REGEXP'=>		'X {OP} N （最終値に正規表現Rがマッチした場合Xは1、マッチしなかった場合Xは0）',
+	'S_FNC_DESCRIPTION_TIME'=>		'X {OP} N （Xはシステム時刻 HHMMSS）',
+
+//	tr_testexpr.php
+	'S_TEST_DATA'=>					'テストデータ',
+	'S_ITEM_FUNCTION'=>				'アイテム / 関数',
+	'S_RESULT_TYPE'=>				'戻り値型',
+	'S_COMBINED_RESULT'=>			'総合結果',
 
 //	Menu
 

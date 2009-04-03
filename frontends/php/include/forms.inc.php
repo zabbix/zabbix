@@ -26,6 +26,10 @@
 	require_once 	"include/users.inc.php";
 	require_once 	"include/db.inc.php";
 
+    define('IM_FORCED', 0);
+    define('IM_ESTABLISHED', 1);
+    define('IM_TREE', 2);
+
 	function	insert_slideshow_form()
 	{
 		global $_REQUEST;
@@ -2268,6 +2272,7 @@
 			$limited = $trigger['templateid'] ? 'yes' : null;
 		}
 
+        $expr_temp  = get_request("expr_temp"   ,"");
 		$expression	= get_request("expression"	,"");
 		$description	= get_request("description"	,"");
 		$type = get_request('type', 0);
@@ -2275,6 +2280,7 @@
 		$status		= get_request("status"		,0);
 		$comments	= get_request("comments"	,"");
 		$url		= get_request("url"		,"");
+        $input_method = get_request("input_method"  ,IM_TREE);
 
 		if((isset($_REQUEST["triggerid"]) && !isset($_REQUEST["form_refresh"]))  || isset($limited))
 		{
@@ -2300,14 +2306,120 @@
 		}
 
 		$frmTrig->AddRow(S_NAME, new CTextBox("description",$description,90, $limited));
-		$frmTrig->AddRow(S_EXPRESSION, array(
-				new CTextBox("expression",$expression,75, $limited),
-				($limited ? null : new CButton('insert',S_INSERT,
-					"return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->GetName().
-					"&dstfld1=expression&srctbl=expression".
-					"&srcfld1=expression&expression=' + escape(GetSelectedText(this.form.elements['expression'])),700,200);"))
-			));
 
+        if ($input_method == IM_TREE)
+        {
+            $alz = analyze_expression($expression);
+            if ($alz !== false)
+            {
+                list($outline, $node, $map) = $alz;
+                if (isset($_REQUEST['expr_action']) && $node != null)
+                {
+                    $new_expr = remake_expression($node, $_REQUEST['expr_target'], $_REQUEST['expr_action'], $expr_temp, $map);
+                    if ($new_expr !== false)
+                    {
+                        $expression = $new_expr;
+                        list($outline, $node, $map) = analyze_expression($expression);
+                        $expr_temp = '';
+                    }
+                    else show_messages();
+                }
+
+                $tree = array();
+                create_node_list($node, $tree);
+
+                $frmTrig->AddVar('expression',$expression);
+                $exprfname = 'expr_temp';
+                $exprtxt = new CTextBox($exprfname,$expr_temp,65,'yes');
+                $macrobtn = new CButton('insert_macro', S_INSERT_MACRO, 'return call_menu(event);');
+                $exprparam = "this.form.elements['$exprfname'].value";
+            }
+            else $input_method = IM_FORCED;
+        }
+
+        if ($input_method != IM_TREE)
+        {
+            $exprfname = 'expression';
+            $exprtxt = new CTextBox($exprfname,$expression,75,$limited);
+            $exprparam = "GetSelectedText(this.form.elements['$exprfname'])";
+        }
+
+        $row = array($exprtxt,
+                     new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_SELECT,
+                                 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->GetName().
+                                 "&dstfld1=${exprfname}&srctbl=expression".
+                                 "&srcfld1=expression&expression=' + escape($exprparam),800,200);"));
+        if (isset($macrobtn)) array_push($row, $macrobtn);
+        if ($input_method == IM_TREE)
+        {
+            array_push($row, BR);
+            if (empty($outline)) array_push($row, new CButton('add_expression', S_ADD, ""));
+            else
+            {
+                array_push($row, new CButton('and_expression', S_AND_BIG, ""));
+                array_push($row, new CButton('or_expression', S_OR_BIG, ""));
+                array_push($row, new CButton('replace_expression', S_REPLACE, ""));
+            }
+        }
+        $frmTrig->AddVar('input_method', $input_method);
+        $frmTrig->AddVar('toggle_input_method', '');
+        $exprtitle = array(S_EXPRESSION);
+        if ($input_method != IM_FORCED)
+        {
+            $btn_im = new CLink(S_TOGGLE_INPUT_METHOD,'#','action',
+                                'document.getElementsByName("toggle_input_method")[0].value="1";' .
+                                'document.getElementsByName("input_method")[0].value=' .
+                                ($input_method == IM_TREE ? IM_ESTABLISHED : IM_TREE) . ';' .
+                                'document.forms["config_triggers.php"].submit(); return false;');
+            array_push($exprtitle, SPACE, '(', $btn_im, ')');
+        }
+        $frmTrig->AddRow($exprtitle, $row);
+
+        if ($input_method == IM_TREE)
+        {
+            $exp_table = new CTable();
+            $exp_table->SetClass('tableinfo');
+            $exp_table->AddOption('id','exp_list');
+            $exp_table->oddRowClass = 'even_row';
+            $exp_table->evenRowClass = 'even_row';
+            $exp_table->options['cellpadding'] = 3;
+            $exp_table->options['cellspacing'] = 1;
+            $exp_table->headerClass = 'header';
+            $exp_table->footerClass = 'footer';
+            $exp_table->SetHeader(array(S_TARGET, S_EXPRESSION, S_DELETE));
+
+            if ($node != null)
+            {
+                $exprs = make_disp_tree($tree, $map, true);
+                foreach ($exprs as $i => $e)
+                {
+                    $tgt_chk = new CCheckbox('expr_target', $i == 0 ? 'yes' : 'no', 'check_target(this);', $e['id']);
+                    $del_url = new CLink(S_DELETE,'#','action',
+                                         'javascript: if(confirm("Delete expression?")) { delete_expression('.
+                                         $e['id'] .'); document.forms["config_triggers.php"].submit(); } return false;');
+                    $row = new CRow(array($tgt_chk, $e['expr'], $del_url));
+                    $exp_table->AddRow($row);
+                }
+            }
+            else $outline = '';
+
+            $frmTrig->AddVar('remove_expression', '');
+
+            $btn_test = new CButton('test_expression', S_TEST,
+                                    "openWinCentered(" .
+                                    "'tr_testexpr.php?expression=' + escape(this.form.elements['expression'].value)
+" .
+                                    ",'ExpressionTest'" .
+                                    ",750,600" .
+                                    ",'titlebar=no, resizable=yes, scrollbars=yes'); " .
+                                    "return false;");
+            if (empty($outline)) $btn_test->AddOption('disabled', 'yes');
+            $frmTrig->AddRow(SPACE, array($outline,
+                                          BR,
+                                          BR,
+                                          $exp_table,
+                                          $btn_test));
+        }
 	/* dependences */
 		foreach($dependences as $val){
 			array_push($dep_el,
@@ -2376,6 +2488,9 @@
 		$frmTrig->AddItemToBottomRow(SPACE);
 		$frmTrig->AddItemToBottomRow(new CButtonCancel(url_param("groupid").url_param("hostid")));
 		$frmTrig->Show();
+
+        $jsmenu = new CPUMenu(null,170);
+        $jsmenu->InsertJavaScript();
 	}
 
 	function insert_trigger_comment_form($triggerid)

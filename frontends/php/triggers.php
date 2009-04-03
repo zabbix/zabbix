@@ -30,6 +30,7 @@
 	$page['hist_arg'] = array('hostid','groupid');
 
 include_once "include/page_header.php";
+echo '<script type="text/javascript" src="js/triggers.js"></script>';
 
 ?>
 <?php
@@ -46,6 +47,9 @@ include_once "include/page_header.php";
 
 		'type'=>	array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	'isset({save})'),
 		"description"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
+        "input_method"=>    array(T_ZBX_INT, O_OPT,  NULL,  NOT_EMPTY,'isset({toggle_input_method})'),
+        'expr_temp'=>   array(T_ZBX_STR, O_OPT,  NULL,  NOT_EMPTY,'(isset({add_expression})||isset({and_expression})||isset({or_expression})||isset({replace_expression}))'),
+        'expr_target'=> array(T_ZBX_STR, O_OPT,  NULL,  NOT_EMPTY,'(isset({and_expression})||isset({or_expression})||isset({replace_expression}))'),
 		"expression"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
 		"priority"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4,5"),'isset({save})'),
 		"comments"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
@@ -63,6 +67,14 @@ include_once "include/page_header.php";
 		"showdisabled"=>	array(T_ZBX_INT, O_OPT, P_SYS, IN("0,1"),	NULL),
 		
 /* actions */
+        "toggle_input_method"=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,    NULL,   NULL),
+        "add_expression"=>  array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,    NULL,   NULL),
+        "and_expression"=>  array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,    NULL,   NULL),
+        "or_expression"=>   array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,    NULL,   NULL),
+        "replace_expression"=>  array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,    NULL,   NULL),
+        "remove_expression"=>   array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,    NULL,   NULL),
+        "test_expression"=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,    NULL,   NULL),
+
 		"add_dependence"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"del_dependence"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"group_enable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -217,6 +229,29 @@ include_once "include/page_header.php";
 			error('No target selection.');
 		}
 		show_messages();
+	}
+/* EXPRESSION ACTIONS */
+    elseif(isset($_REQUEST['add_expression']))
+    {
+		$_REQUEST['expression'] = $_REQUEST['expr_temp'];
+		$_REQUEST['expr_temp'] = '';
+	}
+    elseif(isset($_REQUEST['and_expression']))
+    {
+		$_REQUEST['expr_action'] = '&';
+	}
+    elseif(isset($_REQUEST['or_expression']))
+    {
+		$_REQUEST['expr_action'] = '|';
+	}
+    elseif(isset($_REQUEST['replace_expression']))
+    {
+		$_REQUEST['expr_action'] = 'r';
+	}
+    elseif(isset($_REQUEST['remove_expression']) && strlen($_REQUEST['remove_expression']))
+    {
+		$_REQUEST['expr_action'] = 'R';
+		$_REQUEST['expr_target'] = $_REQUEST['remove_expression'];
 	}
 /* DEPENDENCE ACTIONS */
 	elseif(isset($_REQUEST["add_dependence"])&&isset($_REQUEST["new_dependence"]))
