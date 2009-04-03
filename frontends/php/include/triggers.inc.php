@@ -582,6 +582,389 @@
 		return $params;
 	}
 
+    /*
+	 * Function: analyze_expression
+	 *
+	 * Description:
+	 *     analyze trigger expression
+	 *
+	 * Author:
+	 *     KANEKO, Kenshi (ken.kaneko@nttct.co.jp)
+	 *
+	 * Comments:
+	 *
+	 */
+    function    analyze_expression($expression)
+    {
+		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
+
+		if (empty($expression)) return array('', null, null);
+
+		$temp = array();
+		$expr = $expression;
+
+		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
+		while (mb_ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT_MB, $expr, $arr))
+		{
+			if ($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_ALLOWED_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]))
+			{
+				error('Unknown macro [' . $arr[ZBX_EXPRESSION_MACRO_ID].']');
+				return array('', null, null);
+			}
+			elseif (!$arr[ZBX_EXPRESSION_MACRO_ID])
+			{
+				array_push($temp, $arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID]);
+			}
+			else array_push($temp, $arr[ZBX_EXPRESSION_MACRO_ID]);
+
+			$expr = $arr[ZBX_EXPRESSION_LEFT_ID] . $ZBX_TR_EXPR_REPLACE_TO . $arr[ZBX_EXPRESSION_RIGHT_ID];
+		}
+
+		/* Replace all '$ZBX_TR_EXPR_REPLACE_TO $ZBX_EREG_SIGN $ZBX_EREG_NUMBER' number with '$expr_full_replace_to' */
+		$expr_full_replace_to = $ZBX_TR_EXPR_REPLACE_TO . '_full';
+        $expr_full_token = '^([[:print:]]*)(' . $ZBX_TR_EXPR_REPLACE_TO .
+            ZBX_EREG_SPACES . ZBX_EREG_SIGN . ZBX_EREG_SPACES . ZBX_EREG_NUMBER . ')([[:print:]]*)$';
+        while (mb_ereg($expr_full_token, $expr, $arr))
+        {
+            array_push($temp, array('sign' => $arr[4], 'value' => $arr[6]));
+            $expr = $arr[1] . $expr_full_replace_to . $arr[7];
+        }
+
+        /* outline */
+        $outline = $expr;
+        $mark = ord('A');
+        while (($pos = strpos($outline, $expr_full_replace_to)) !== false) {
+            $outline = substr_replace($outline, chr($mark++), $pos, strlen($expr_full_replace_to));
+        }
+        if (strpos($outline, $ZBX_TR_EXPR_REPLACE_TO) !== false) return false; /* analyze failure */
+
+        /* tree */
+        $expr = str_replace(' ', '', $outline);
+        $nodeid = 0;
+        $root = array('id' => $nodeid++, 'expr' => $expr);
+        make_expression_tree($root, $nodeid);
+
+        /* mark => expression map */
+        $map = array();
+        for ($i = 0, $size = $mark - ord('A'); $i < $size; ++$i)
+        {
+            $map[chr($i + ord('A'))] = array('expression'   => $temp[$size - $i - 1],
+                                             'sign'         => $temp[$size * 2 - $i - 1]['sign'],
+                                             'value'        => $temp[$size * 2 - $i - 1]['value']);
+        }
+
+        return array($outline, $root, $map);
+    }
+
+    /*
+	 * Function: make_expression_tree
+	 *
+	 * Description:
+	 *
+	 *
+	 * Author:
+	 *     KANEKO, Kenshi (ken.kaneko@nttct.co.jp)
+	 *
+	 * Comments:
+	 *
+	 */
+    function make_expression_tree(&$node, &$nodeid)
+    {
+		$expr = $node['expr'];
+		$pos = find_divide_pos($expr);
+		if ($pos === false) return;
+
+		$node['expr'] = substr($expr, $pos, 1);
+
+		/* left */
+		$left = substr($expr, 0, $pos);
+		$node['left'] = array('parent' => $node['id'], 'id' => $nodeid++, 'expr' => trim_extra_bracket($left));
+		make_expression_tree($node['left'], $nodeid);
+
+		/* right */
+		$right = substr($expr, $pos + 1);
+		$node['right'] = array('parent' => $node['id'], 'id' => $nodeid++, 'expr' => trim_extra_bracket($right));
+		make_expression_tree($node['right'], $nodeid);
+	}
+
+    /*
+	 * Function: find_divide_pos
+	 *
+	 * Description:
+	 *
+	 *
+	 * Author:
+	 *     KANEKO, Kenshi (ken.kaneko@nttct.co.jp)
+	 *
+	 * Comments:
+	 *
+	 */
+    function find_divide_pos($expr)
+    {
+		if (empty($expr)) return false;
+
+		$candidate = PHP_INT_MAX;
+		$depth = 0;
+		$pos = 0;
+		$priority = 0;
+		foreach (str_split($expr) as $i => $c)
+		{
+			$priority = false;
+			switch ($c)
+			{
+			case '|': $priority = 1; break;
+			case '&': $priority = 2; break;
+			case '(': ++$depth; break;
+			case ')': --$depth; break;
+			default: break;
+			}
+			if ($priority === false) continue;
+
+			$priority += $depth * 10;
+
+			if ($priority < $candidate)
+			{
+				$candidate = $priority;
+				$pos = $i;
+			}
+		}
+
+		return $pos == 0 ? false : $pos;
+	}
+
+    /*
+	 * Function: trim_extra_bracket
+	 *
+	 * Description:
+	 *
+	 *
+	 * Author:
+	 *     KANEKO, Kenshi (ken.kaneko@nttct.co.jp)
+	 *
+	 * Comments:
+	 *
+	 */
+    function trim_extra_bracket($expr)
+    {
+		$len = strlen($expr);
+
+		if ($expr[0] == '(' || $expr[$len - 1] == ')')
+		{
+			$open = substr_count($expr, '(');
+			$close = substr_count($expr, ')');
+
+			if ($expr[0] == '(' && $open > $close) $expr = substr($expr, 1);
+			elseif ($expr[$len - 1] == ')' && $close > $open) $expr = substr($expr, 0, $len - 1);
+			elseif ($expr[0] == '(' && $expr[$len - 1] == ')' && $open == $close) $expr = substr($expr, 1, $len - 1);
+			else return $expr;
+
+			do { $bak = $expr; } while (($expr = trim_extra_bracket($expr)) != $bak);
+		}
+
+		return $expr;
+	}
+
+    /*
+	 * Function: create_node_list
+	 *
+	 * Description:
+	 *
+	 *
+	 * Author:
+	 *     KANEKO, Kenshi (ken.kaneko@nttct.co.jp)
+	 *
+	 * Comments:
+	 *
+	 */
+    function create_node_list($node, &$arr, $depth = 0, $parent_expr = null)
+    {
+		$add = 0;
+		if ($parent_expr != $node['expr'])
+		{
+			$expr = $node['expr'];
+			$expr = $expr == '&' ? S_AND_BIG : ($expr == '|' ? S_OR_BIG : $expr);
+			array_push($arr, array('id' => $node['id'], 'expr' => $expr, 'depth' => $depth));
+			$add = 1;
+		}
+
+		if (isset($node['left']))
+		{
+			create_node_list($node['left'], $arr, $depth + $add, $node['expr']);
+			create_node_list($node['right'], $arr, $depth + $add, $node['expr']);
+		}
+	}
+
+    function make_disp_tree($tree, $map, $action = false)
+    {
+		$finder = create_function('$a, $i, $d',
+                                  'for (; $i < count($a); ++$i)' .
+                                  '    if ($a[$i]["depth"] == $d) return true; ' .
+                                  '    elseif ($a[$i]["depth"] < $d) return false;' .
+								  'return false;');
+		$res = array();
+		foreach ($tree as $i => $n)
+		{
+			$expr = array();
+			for ($j = 0; $j < $n['depth']; ++$j)
+			{
+				$next = $finder($tree, $i + 1, $j + 1);
+				if ($j + 1 == $n['depth']) array_push($expr, new CImg('images/general/tr_' .
+																	  ($next ? 'top_right_bottom' : 'top_right') .
+																	  '.gif','tr', 12, 12));
+				else array_push($expr, new CImg('images/general/tr_' .
+												($next ? 'top_bottom' : 'space') . '.gif', 'tr', 12, 12));
+			}
+
+			$key = null;
+			if (strlen($n['expr']) == 1)
+			{
+				$key = $n['expr'];
+				$tgt = $map[$key];
+				array_push($expr, SPACE, '<strong>' . $n['expr'] . '</strong>:&nbsp;');
+
+				$e = htmlspecialchars($tgt['expression'] . $tgt['sign'] . $tgt['value']);
+				if ($action)
+				{
+					$url = new CLink($e, '#', 'action',
+									 'javascript: copy_expression("expr'. $n['id'] .'"); return false;');
+					$url->AddOption('id', 'expr' . $n['id']);
+					array_push($expr, $url);
+				}
+				else array_push($expr, $e);
+			}
+			else array_push($expr, SPACE, '<i>' . $n['expr'] . '</i>');
+
+			array_push($res, array('id' => $n['id'], 'expr' => $expr, 'key' => $key));
+		}
+
+		return $res;
+	}
+
+    /*
+	 * Function: remake_expression
+	 *
+	 * Description:
+	 *
+	 *
+	 * Author:
+	 *     KANEKO, Kenshi (ken.kaneko@nttct.co.jp)
+	 *
+	 * Comments:
+	 *
+	 */
+    function remake_expression($node, $nodeid, $action, $new_expr, $map)
+    {
+		$target = &find_node($node, $nodeid);
+		if (!is_array($target)) return false;
+
+		/* AND, OR */
+		if ($action == '&' || $action == '|')
+		{
+			$map['new'] = array('expression' => $new_expr, 'sign' => '', 'value' => '');
+
+			$bak = $target;
+			$target['expr'] = $action;
+			$target['left'] = $bak;
+			$target['right'] = array('expr' => 'new');
+		}
+		/* Replace */
+		elseif ($action == 'r')
+		{
+			if ($target['expr'] == '&' || $target['expr'] == '|')
+			{
+				info('Specify the conditional expression for the target.');
+				return false;
+			}
+			$map[$target['expr']] = array('expression' => $new_expr, 'sign' => '', 'value' => '');
+		}
+		/* remove */
+		elseif ($action == 'R')
+		{
+			if (!isset($target['parent'])) $node = array();
+			else
+			{
+				$parent = &find_node($node, $target['parent']);
+				if ($parent['left']['id'] == $target['id']) $other = $parent['right'];
+				else $other = $parent['left'];
+
+				$parent['expr'] = $other['expr'];
+				if (isset($other['left']))
+				{
+					$parent['left'] = $other['left'];
+					$parent['right'] = $other['right'];
+				}
+				else
+				{
+					unset($parent['left']);
+					unset($parent['right']);
+				}
+			}
+		}
+        /* ? */
+        else return false;
+
+        return make_expression($node, $map);
+    }
+
+    /*
+	 * Function: find_node
+	 *
+	 * Description:
+	 *
+	 *
+	 * Author:
+	 *     KANEKO, Kenshi (ken.kaneko@nttct.co.jp)
+	 *
+	 * Comments:
+	 *
+	 */
+    function &find_node(&$node, $nodeid)
+    {
+		if ($node['id'] == $nodeid) return $node;
+
+		if (isset($node['left']))
+		{
+			$res = &find_node($node['left'], $nodeid);
+			if (!is_array($res)) $res = &find_node($node['right'], $nodeid);
+
+			return $res;
+		}
+
+		return $nodeid;
+	}
+
+    /*
+	 * Function: make_expression
+	 *
+	 * Description:
+	 *
+	 *
+	 * Author:
+	 *     KANEKO, Kenshi (ken.kaneko@nttct.co.jp)
+	 *
+	 * Comments:
+	 *
+	 */
+    function make_expression($node, &$map, $parent_expr = null)
+    {
+		$expr = '';
+
+		if (isset($node['left']))
+		{
+			$left = make_expression($node['left'], $map, $node['expr']);
+			$right = make_expression($node['right'], $map, $node['expr']);
+			$expr = $left . ' ' . $node['expr'] . ' ' . $right;
+			if ($node['expr'] != $parent_expr && isset($node['parent'])) $expr = '(' . $expr . ')';
+		}
+		elseif (isset($node['expr']))
+		{
+			$i = $map[$node['expr']];
+			$expr = $i['expression'] . $i['sign'] . $i['value'];
+		}
+
+		return $expr;
+	}
+
 	/*
 	 * Function: validate_expression 
 	 *

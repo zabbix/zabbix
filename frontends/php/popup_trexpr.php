@@ -26,6 +26,7 @@
 	$page["file"] = "popup_trexpr.php";
 
 	define('ZBX_PAGE_NO_MENU', 1);
+    define('ITEM_VALUE_TYPE_ANY', -99);
 	
 include_once "include/page_header.php";
 
@@ -44,6 +45,12 @@ include_once "include/page_header.php";
 		PARAM_TYPE_SECONDS => S_SECONDS,
 		PARAM_TYPE_COUNTS => S_COUNT);
 
+    $param1_sec = array(
+		    array(
+				'C' => S_LAST_OF.' T',  /* caption */
+				'T' => T_ZBX_INT
+				));
+
 	$param1_sec_count = array(
 			array(
 				'C' => S_LAST_OF.' T',	/* caption */
@@ -53,9 +60,15 @@ include_once "include/page_header.php";
 	
 	$param1_str = array(
 			array(
-				'C' => 'T',		/* caption */
+				'C' => 'V',		/* caption */
 				'T' => T_ZBX_STR,
 			     ));
+
+    $param1_regexp = array(
+		    array(
+				'C' => 'R',     /* caption */
+				'T' => T_ZBX_STR,
+				));
 
 	$param2_sec_val = array(
 			array(
@@ -69,64 +82,133 @@ include_once "include/page_header.php";
 
 	$functions = array(
 		'abschange'	=> array(
-			'description'	=> 'Absolute difference between last and previous value {OP} N',
+			'description'	=> S_FNC_DESCRIPTION_ABSCHANGE,
+			'value_types'   => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT),
 			'operators'	=> $operators
 			),
 		'avg'		=> array(
-			'description'	=> 'Average value for period of T times {OP} N',
+			'description'	=> S_FNC_DESCRIPTION_AVG,
+			'value_types'   => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64),
 			'operators'	=> $operators,
 			'params'	=> $param1_sec_count
 			),
 		'delta'		=> array(
-			'description'	=> 'Difference between MAX and MIN value of T times {OP} N',
+			'description'	=> S_FNC_DESCRIPTION_DELTA,
+            'value_types'   => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64),
 			'operators'	=> $operators,
 			'params'	=> $param1_sec_count
 			),
 		'change'	=> array(
-			'description'	=> 'Difference between last and previous value of T times {OP} N.',
+			'description'	=> S_FNC_DESCRIPTION_CHANGE,
+            'value_types'   => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT),
 			'operators'	=> $operators
 			),
 		'count'		=> array(
-			'description'	=> 'Number of successfully retrieved values V for period of time T {OP} N.',
+			'description'	=> S_FNC_DESCRIPTION_COUNT,
+            'value_types'   => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64),
 			'operators'     => $operators,
 			'params'	=> $param2_sec_val
 			),
 		'diff'		=> array(
-			'description'	=> 'N {OP} X, where X is 1 - if last and previous values differs, 0 - otherwise.',
+			'description'	=> S_FNC_DESCRIPTION_DIFF,
+            'value_types'   => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT),
 			'operators'     => $limited_operators
 			),
 		'last'	=> array(
-			'description'	=> 'Last value {OP} N',
+			'description'	=> S_FNC_DESCRIPTION_LAST,
+            'value_types'   => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64),
 			'operators'	=> $operators
 			),
 		'max'		=> array(
-			'description'	=> 'Maximal value for period of time T {OP} N.',
+			'description'	=> S_FNC_DESCRIPTION_MAX,
+            'value_types'   => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64),
 			'operators'     => $operators,
 			'params'	=> $param1_sec_count
 			),
 		'min'		=> array(
-			'description'	=> 'Minimal value for period of time T {OP} N.',
+			'description'	=> S_FNC_DESCRIPTION_MIN,
+            'value_types'   => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64),
 			'operators'     => $operators,
 			'params'	=> $param1_sec_count
 			),
 		'prev'		=> array(
-			'description'	=> 'Previous value {OP} N.',
+			'description'	=> S_FNC_DESCRIPTION_PREV,
+            'value_types'   => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64),
 			'operators'     => $operators
 			),
 		'str'		=> array(
-			'description'	=> 'Find string T last value. N {OP} X, where X is 1 - if found, 0 - otherwise',
+			'description'	=> S_FNC_DESCRIPTION_STR,
+            'value_types'   => array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG),
 			'operators'     => $limited_operators,
 			'params'	=> $param1_str
 			),
 		'sum'		=> array(
-			'description'	=> 'Sum of values for period of time T {OP} N',
+			'description'	=> S_FNC_DESCRIPTION_SUM,
+            'value_types'   => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64),
 			'operators'     => $operators,
 			'params'	=> $param1_sec_count
-			)
-		
+			),
+        'date'  => array(
+            'description'   => S_FNC_DESCRIPTION_DATE,
+            'value_types'   => array(ITEM_VALUE_TYPE_ANY),
+            'operators' => $operators
+            ),
+        'dayofweek' => array(
+            'description'   => S_FNC_DESCRIPTION_DAYOFWEEK,
+            'value_types'   => array(ITEM_VALUE_TYPE_ANY),
+            'operators' => $operators
+            ),
+        'fuzzytime' => array(
+            'description'   => S_FNC_DESCRIPTION_FUZZYTIME,
+            'value_types'   => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64),
+            'operators' => $limited_operators,
+            'params'    => $param1_sec
+            ),
+        'iregexp'   => array(
+            'description'   => S_FNC_DESCRIPTION_IREGEXP,
+            'value_types'   => array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG),
+            'operators' => $limited_operators,
+            'params'    => $param1_regexp
+            ),
+        'logserverity'  => array(
+            'description'   => S_FNC_DESCRIPTION_LOGSERVERITY,
+            'value_types'   => array(ITEM_VALUE_TYPE_LOG),
+            'operators' => $operators
+            ),
+        'logsource' => array(
+            'description'   => S_FNC_DESCRIPTION_LOGSOURCE,
+            'value_types'   => array(ITEM_VALUE_TYPE_LOG),
+            'operators' => $limited_operators,
+            'params'    => $param1_str
+            ),
+        'nodata'    => array(
+            'description'   => S_FNC_DESCRIPTION_NODATA,
+            'value_types'   => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT),
+            'operators' => $limited_operators,
+            'params'    => $param1_sec
+            ),
+        'now'   => array(
+            'description'   => S_FNC_DESCRIPTION_NOW,
+            'value_types'   => array(ITEM_VALUE_TYPE_ANY),
+            'operators' => $operators
+            ),
+        'regexp'    => array(
+            'description'   => S_FNC_DESCRIPTION_REGEXP,
+            'value_types'   => array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG),
+            'operators' => $limited_operators,
+            'params'    => $param1_regexp
+            ),
+        'time'  => array(
+            'description'   => S_FNC_DESCRIPTION_TIME,
+            'value_types'   => array(ITEM_VALUE_TYPE_ANY),
+            'operators' => $operators
+            )
+
 	);
-	
+    $special_functions = array();
+    foreach ($functions as  $id => $f) if (in_array(ITEM_VALUE_TYPE_ANY, $f['value_types'])) array_push($special_functions, $id);	
 		
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
@@ -138,7 +220,7 @@ include_once "include/page_header.php";
 		"expr_type"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,					'isset({insert})'),
 		"param"=>	array(T_ZBX_STR, O_OPT,	null,	0,						'isset({insert})'),
 		"paramtype"=>	array(T_ZBX_INT, O_OPT, null,	IN(PARAM_TYPE_SECONDS.','.PARAM_TYPE_COUNTS),	'isset({insert})'),
-		"value"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,					'isset({insert})'),
+		"value"=>	array(T_ZBX_STR, O_OPT,	null,	'mb_ereg("^'.ZBX_EREG_NUMBER.'$",{})',		'isset({insert})'),
 
 		"insert"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null)
 	);
@@ -190,14 +272,18 @@ include_once "include/page_header.php";
 		" and i.itemid=".$itemid)))
 	{
 		$description = $item_data['host'].':'.item_description($item_data["description"],$item_data["key_"]);
+        $item_key = $item_data["key_"];
+        $value_type = $item_data['value_type'];
 	}
 	else
 	{
 		$itemid = 0;
 		$description = '';
+        $item_key = '';
+        $value_type = -1;
 	}
 
-	$expr_type	= get_request("expr_type",	'last[=]');
+    $expr_type  = get_request("expr_type",  $value_type == ITEM_VALUE_TYPE_LOG ? 'regexp[=]' : 'last[=]');
 	if(eregi('^([a-z]{1,})\[(['.implode('',array_keys($operators)).'])\]$',$expr_type,$expr_res))
 	{
 		$function = $expr_res[1];
@@ -207,7 +293,7 @@ include_once "include/page_header.php";
 	}
 	unset($expr_res);
 
-	if(!isset($function))	$function = 'last';
+    if(!isset($function))   $function = $value_type == ITEM_VALUE_TYPE_LOG ? 'regexp' : 'last';
 		
 	if(!in_array($operator, array_keys($functions[$function]['operators'])))	unset($operator);
 	if(!isset($operator))	$operator = '=';
@@ -245,6 +331,7 @@ function add_var_to_opener_obj(obj,name,value)
 
 function InsertText(obj, value)
 {
+    <?php if ($dstfld1 == 'expression') { ?>
 	if (navigator.appName == "Microsoft Internet Explorer") {
 		obj.focus();
 		var s = window.opener.document.selection.createRange();
@@ -256,6 +343,9 @@ function InsertText(obj, value)
 	} else {
 		obj.value += value;
 	}
+    <?php } else { ?>
+	obj.value = value;
+	<?php } ?>
 }
 -->
 </script>
@@ -306,12 +396,24 @@ if(form)
 		new CTextBox('description', $description, 50, 'yes'),
 		new CButton('select', S_SELECT, "return PopUp('popup.php?dstfrm=".$form->GetName().
 				"&dstfld1=itemid&dstfld2=description&".
-				"srctbl=items&srcfld1=itemid&srcfld2=description',0,0,'zbx_popup_item');")
+                "srctbl=items&srcfld1=itemid&srcfld2=description&".
+				"dstsubmit=1',0,0,'zbx_popup_item');"),
+        new CButton('clear', S_CLEAR, "document.getElementsByName('description')[0].value = ''; document.getElementsByName('itemid')[0].value = 0;")
 		));
 
 	$cmbFnc = new CComboBox('expr_type', $expr_type	, 'submit()');
 	foreach($functions as  $id => $f)
 	{
+        if (!in_array($value_type, $f['value_types']) && !(in_array($id, $special_functions) && $item_key == 'status'))
+        {
+            if ($id == substr($expr_type, 0, strlen($id)))
+            {
+                $expr_type = 'last[=]';
+                $cmbFnc->SetValue($expr_type);
+                $function = 'last';
+            }
+            continue;
+        }
 		foreach($f['operators'] as $op => $txt_op)
 		{
 			$cmbFnc->AddItem($id.'['.$op.']', str_replace('{OP}', $txt_op, $f['description']));

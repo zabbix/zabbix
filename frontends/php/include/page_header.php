@@ -171,7 +171,7 @@ COpt::profiling_start("page");
 						"sub_pages"=>array("tr_logform.php")		
 						),
 					array("url"=>"triggers.php"	,"label"=>S_TRIGGERS,
-						"sub_pages"=>array("popup_trexpr.php")
+						"sub_pages"=>array("popup_trexpr.php","tr_testexpr.php")
 						),
 					array("url"=>"actionconf.php"	,"label"=>S_ACTIONS),
 					array("url"=>"sysmaps.php"	,"label"=>S_MAPS,

@@ -113,7 +113,8 @@ include_once "include/page_header.php";
 		"srctbl" =>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
 		"srcfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
 		"srcfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	null,		null),
-		"nodeid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+        "dstsubmit"=>   array(T_ZBX_INT, O_OPT,P_SYS,   NOT_EMPTY,  null),
+ 		"nodeid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		"groupid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		"hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		"templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
@@ -145,7 +146,7 @@ include_once "include/page_header.php";
 	$dstfld2	= get_request("dstfld2", '');	// second output field on destination form
 	$srcfld1	= get_request("srcfld1", '');	// source table field [can be different from fields of source table]
 	$srcfld2	= get_request("srcfld2", null);	// second source table field [can be different from fields of source table]
-	
+    $dstsubmit  = get_request("dstsubmit", 0);  // submit destination from after close window
 	
 	$monitored_hosts = get_request("monitored_hosts", 0);
 	$real_hosts = get_request("real_hosts", 0);
@@ -189,7 +190,9 @@ include_once "include/page_header.php";
 	$frmTitle->AddVar("srctbl",		$srctbl);
 	$frmTitle->AddVar("srcfld1",	$srcfld1);
 	$frmTitle->AddVar("srcfld2",	$srcfld2);
-	
+
+    $frmTitle->AddVar("dstsubmit",  $dstsubmit);
+
 // Optional 
 	if(isset($_REQUEST['reference'])){
 		$frmTitle->addVar('reference',	get_request('reference','0'));
@@ -518,6 +521,7 @@ include_once "include/page_header.php";
 		$form->AddVar('srctbl',$srctbl);
 		$form->AddVar('srcfld1',$srcfld1);
 		$form->AddVar('srcfld2',$srcfld2);
+        $form->AddVar('dstsubmit',$dstsubmit);
 		$form->AddItem($table);
 		$form->Show();
 	}
@@ -851,7 +855,9 @@ function add_item_variable(s_formname,x_value)
 			$description->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
-				" close_window(); return false;");
+                " close_window();".
+                ($dstsubmit == 1 ? " window.opener.document.forms['".$dstfrm."'].submit();" : '').
+                " return false;");
 
 			$table->AddRow(array(
 				(isset($hostid) ? null : $row['host']),
