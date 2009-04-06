@@ -735,8 +735,14 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;		
 		$status = array();
 // server
-		$checkport = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, 2);				
-		$status["zabbix_server"] = ($checkport) ? S_YES : S_NO;
+		$checkport = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, 2);
+		if(!$checkport) {
+			clear_messages();
+			$status['zabbix_server'] = S_NO;
+		}
+		else {
+			$status['zabbix_server'] = S_YES;
+		}
 // triggers
 		$sql = 'SELECT COUNT(DISTINCT t.triggerid) as cnt '.
 				' FROM triggers t, functions f, items i, hosts h'.
