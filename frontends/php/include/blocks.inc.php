@@ -347,6 +347,7 @@ function make_status_of_zbx(){
 		S_DETAILS
 	));
 
+	show_messages(); //because in function get_status(); function clear_messages() is called when fsockopen() fails.
 	$status=get_status();
 
 	$table->AddRow(array(S_ZABBIX_SERVER_IS_RUNNING,new CSpan($status['zabbix_server'], ($status['zabbix_server'] == S_YES ? 'off' : 'on')),' - '));

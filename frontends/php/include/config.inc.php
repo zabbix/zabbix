@@ -772,8 +772,13 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$status = array();
 // server
 		$checkport = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, 2);
-		
-		$status["zabbix_server"] = ($checkport) ? S_YES : S_NO;
+		if(!$checkport) { 
+			clear_messages();
+			$status['zabbix_server'] = S_NO;
+		}
+		else {
+			$status['zabbix_server'] = S_YES;
+		}
 
 		// history & trends
 /*		if ($DB['DB_TYPE'] == "MYSQL"){
