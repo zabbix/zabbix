@@ -71,7 +71,8 @@ include_once "include/page_header.php";
 	$table->SetHeader(new CCol(array(new CCheckBox("all_groups", NULL, 'check_all(this.checked)'),S_NAME)));
 	
 
-	$result = DBselect('SELECT n.name as node_name, g.name as name, g.groupid as id'.
+	$count=0;
+	$result = DBselect('SELECT n.name as node_name, g.name as name, g.groupid '.
 					' FROM groups g '.
 						' LEFT JOIN nodes n on '.DBid2nodeid('g.groupid').'=n.nodeid '.
 					($nodeid?' WHERE nodeid='.$nodeid:'').
@@ -82,10 +83,11 @@ include_once "include/page_header.php";
 		if(isset($row['node_name']))
 			$row['name'] = $row['node_name'].':'.$row['name'];
 			
-		$grouplist[$row['id']] = array('name' => $row['name'], 'permission' => $permission);
-		$table->addRow(	new CCol(array(new CCheckBox('groups['.$row['id'].']', NULL, NULL, $row['id']), $row['name'])));
+		$grouplist[$count] = array('groupid' => $row['groupid'], 'name' => $row['name'], 'permission' => $permission);
+		$table->addRow(	new CCol(array(new CCheckBox('groups['.$count.']', NULL, NULL, $count), $row['name'])));
+		$count++;
 	}
-	
+
 	insert_js('var grouplist = '.zbx_jsvalue($grouplist).';');
 	
 	$button = new CButton('select', S_SELECT, 'add_groups("'.$dstfrm.'")');
@@ -104,10 +106,11 @@ function add_groups(formname) {
 	if(!parent_document) return close_window();
 
 	$('groups').getInputs("checkbox").each( 
-		function(e){
-			if(e.checked && (e.name != "all_groups")){
-				add_variable('input', 'new_right['+e.value+'][permission]', grouplist[e.value].permission, formname, parent_document);
-				add_variable('input', 'new_right['+e.value+'][name]', grouplist[e.value].name, formname, parent_document);
+		function(box){
+			if(box.checked && (box.name != "all_groups")){
+				var groupid = grouplist[box.value].groupid;
+				add_variable('input', 'new_right['+groupid+'][permission]', grouplist[box.value].permission, formname, parent_document);
+				add_variable('input', 'new_right['+groupid+'][name]', grouplist[box.value].name, formname, parent_document);
 			}
 		});
 	parent_document.forms[formname].submit();
