@@ -678,7 +678,7 @@
 						$data['host']	= array_shift($data['ymax_item_key']);
 						$data['ymax_item_key']	= implode(':', $data['ymax_item_key']);
 	
-						if(!$item = get_itemid_by_key($data['ymax_item_key'], $data['host'])){
+						if(!$item = get_item_by_key($data['ymax_item_key'], $data['host'])){
 							$this->data[XML_TAG_GRAPH]['error'] = true;
 
 							error('Missed item ['.$data['ymax_item_key'].'] for host ['.$data['host'].']');

@@ -237,7 +237,7 @@ require_once('include/httptest.inc.php');
 			$result = DBexecute('UPDATE hosts SET proxy_hostid='.$proxy_hostid.
 							',host='.zbx_dbstr($host).
 							',port='.$port.
-//							',status='.$status.
+							',status='.$status.
 							',useip='.$useip.
 							',dns='.zbx_dbstr($dns).
 							',ip='.zbx_dbstr($ip).
