@@ -1,8 +1,9 @@
 Changes for 1.6.5
 
+ - [ZBX-849] fixed permissions problem for users in dashboard (Artem)
  - [ZBX-797] fixed possible manual deletion of web items (Vedmak)
  - [ZBX-847] fixed error in "Status of ZABBIX" when server is not running (Vedmak)
- - [ZBX-864] fixed node names instead of group names (Artem)
+ - [ZBX-846] fixed node names instead of group names (Artem)
 
 Changes for 1.6.4
 

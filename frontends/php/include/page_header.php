@@ -159,7 +159,8 @@ COpt::profiling_start("page");
 							'sub_pages'=>array('report3.php','report7.php','chart_sla.php','chart5.php')
 						),
 					array('url'=>'vtext.php'),
-					array('url'=>'chart3.php')
+					array('url'=>'chart3.php'),
+					array('url'=>'popup.php')
 					)
 				),
 		'cm'=>array(
@@ -228,8 +229,7 @@ COpt::profiling_start("page");
 							'sub_pages'=>array('services_form.php')	
 						),
 					array('url'=>'discoveryconf.php','label'=>S_DISCOVERY),
-					array('url'=>'exp_imp.php'	,'label'=>S_EXPORT_IMPORT),
-					array('url'=>'popup.php')
+					array('url'=>'exp_imp.php'	,'label'=>S_EXPORT_IMPORT)
 					)
 				),
 		'admin'=>array(
