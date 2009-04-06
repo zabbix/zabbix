@@ -849,10 +849,10 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 
 // nodes
 	if(ZBX_DISTRIBUTED){
-		$def_sql['select'][] = 'n.name';
+		$def_sql['select'][] = 'n.name as node_name';
 		$def_sql['from'][] = 'nodes n';
 		$def_sql['where'][] = 'n.nodeid='.DBid2nodeid('g.groupid');
-		$def_sql['order'][] = 'n.name';
+		$def_sql['order'][] = 'node_name';
 	}
 	
 // hosts
