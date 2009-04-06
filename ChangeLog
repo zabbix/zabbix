@@ -1,6 +1,6 @@
 Changes for 1.7.0
 
- - [DEV-341] added hint with previous 20 events in Dashboard's widget "Last 20 issues" on mouse-over. 
+ - [DEV-341] added hint with previous 20 events in Dashboard's widget "Last 20 issues" on mouse-over (Vedmak)
  - [DEV-326] admins are allowed to change Medias in user profile (Vedmak)
  - [DEV-330] extended template trigger dependencies functionality (Artem)
  - [DEV-137] changed the minimal maintenance time from 1 hour to 5 minutes (Sasha)
@@ -34,6 +34,7 @@ Changes for 1.7.0
 
 Changes for 1.6.5
 
+ - [ZBX-847] fixed error in "Status of ZABBIX" when server is not running (Vedmak)
  - [ZBX-864] fixed node names instead of group names (Artem)
 
 
