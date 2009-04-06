@@ -1,3 +1,7 @@
+Changes for 1.6.5
+
+ - [ZBX-864] fixed node names instead of group names (Artem)
+
 Changes for 1.6.4
 
  - [ZBX-845] fixed calculation of delayed items for non-local nodes in Queue screen (Sasha)
