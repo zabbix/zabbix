@@ -997,6 +997,8 @@
 	'S_PARAMS'=>				'Additional parameters',
 	'S_NEW_APPLICATION'=>		'New application',
 	'S_IPMI_SENSOR'=>			'IPMI sensor',
+	'S_TEMPLATED_ITEM'=>		'Templated item',
+	'S_WEB_ITEM'=>				'Web item',
 
 //	events.php
 	'S_EVENT'=>					'Event',

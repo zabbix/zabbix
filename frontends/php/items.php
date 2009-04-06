@@ -644,27 +644,35 @@ include_once 'include/page_header.php';
 			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 
 			$group_itemid = $_REQUEST['group_itemid'];
-
-			DBstart();
-
-			$sql = 'SELECT h.host, i.itemid, i.key_, i.templateid '.
+		
+			$sql = 'SELECT h.host, i.itemid, i.key_, i.templateid, i.type'.
 					' FROM items i, hosts h '.
 					' WHERE '.DBcondition('i.itemid',$group_itemid).
 						' AND h.hostid=i.hostid'.
 						' AND '.DBcondition('h.hostid',$available_hosts);
-			$item_res = DBselect($sql);
-			while($item = DBfetch($item_res)){
-				if($item['templateid']<>0){
+			$db_items = DBselect($sql);
+			while($item = DBfetch($db_items)) {
+				if($item['templateid'] != 0) {
 					unset($group_itemid[$item['itemid']]);
+					info(S_ITEM.SPACE."'".$item['host'].':'.$item['itemid']."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
 					continue;
 				}
-
+				elseif($item['type'] == 9) {
+					unset($group_itemid[$item['itemid']]);
+					info(S_ITEM.SPACE."'".$item['host'].':'.$item['itemid']."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
+					continue;
+				}				
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');
 			}
 
-			$result = delete_item($group_itemid);
-			$result = DBend($result);
-			show_messages($result, S_ITEMS_DELETED, null);
+			$result = !empty($group_itemid);
+			if($result) {
+				DBstart();
+				$result = delete_item($group_itemid);
+				$result = DBend($result);
+			}
+			show_messages($result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
+			
 		}
 		else if($_REQUEST['group_task']==S_ACTIVATE_SELECTED){
 			global $USER_DETAILS;
