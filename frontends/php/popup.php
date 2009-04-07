@@ -580,11 +580,7 @@ include_once('include/page_header.php');
 
 		$result = DBselect('select * from usrgrp where '.DBin_node('usrgrpid').' ORDER BY name');
 		while($row = DBfetch($result)){
-			$name = new CLink(
-					get_node_name_by_elid($row['usrgrpid']).$row['name'],
-					'#',
-					'action'
-					);
+			$name = new CSpan(get_node_name_by_elid($row['usrgrpid']).$row['name'],'link');
 
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
@@ -595,8 +591,8 @@ include_once('include/page_header.php');
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 			}
-
-			$name->setAction($action." close_window(); return false;");
+			
+			$name->onClick($action.' close_window(); return false;');
 
 			$table->addRow($name);
 		}
@@ -604,15 +600,11 @@ include_once('include/page_header.php');
 	}
 	else if($srctbl == "users"){
 		$table = new CTableInfo(S_NO_USERS_DEFINED);
-		$table->setHeader(array(S_NAME));
+		$table->setHeader(array(S_ALIAS, S_NAME, S_SURNAME));
 
-		$result = DBselect('select * from users where '.DBin_node('userid').' ORDER BY name');
-		while($row = DBfetch($result)){
-			$name = new CLink(
-					get_node_name_by_elid($row['userid']).$row['alias'],
-					'#',
-					'action'
-					);
+		$result = DBselect('SELECT * FROM users WHERE '.DBin_node('userid').' ORDER BY alias');
+		while($row = DBfetch($result)){			
+
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
@@ -622,10 +614,10 @@ include_once('include/page_header.php');
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 			}
+			$alias = new CSpan(get_node_name_by_elid($row['userid']).$row['alias'], 'link');
+			$alias->onClick($action.' close_window(); return false;');
 
-			$name->SetAction($action." close_window(); return false;");
-
-			$table->addRow($name);
+			$table->addRow(array($alias, $row['name'], $row['surname']));
 		}
 		$table->Show();
 	}
