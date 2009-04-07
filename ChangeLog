@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-11] added sorting by alias in users popup (Artem)
  - [NTD-84] added the enhanced trigger editing (Sasha)
  - [NTD-90] message "Got SIGPIPE ..." won't be displayed with default settings in log file (Sasha)
  - [NTP-10] fixed month representation in seconds in most busy triggers report (Artem)
