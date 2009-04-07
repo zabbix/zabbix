@@ -34,11 +34,11 @@ Changes for 1.7.0
 
 Changes for 1.6.5
 
+ - [ZBX-855] fixed processing of eventlogs timestamps on server side (Sasha)
  - [ZBX-851] changed sorting of users  to alias in popup (Artem)
  - [ZBX-797] fixed possible manual deletion of web items (Vedmak)
  - [ZBX-847] fixed error in "Status of ZABBIX" when server is not running (Vedmak)
  - [ZBX-864] fixed node names instead of group names (Artem)
-
 
 Changes for 1.6.4 
 

@@ -105,6 +105,7 @@ static void	calc_timestamp(char *line,int *timestamp, char *format)
 		tm.tm_mday=dd;
 		tm.tm_mon=MM-1;
 		tm.tm_year=yyyy-1900;
+		tm.tm_isdst=-1;
 
 		t=mktime(&tm);
 		if(t>0)
