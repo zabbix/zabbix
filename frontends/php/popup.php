@@ -618,9 +618,9 @@ include_once "include/page_header.php";
 	elseif($srctbl == "users")
 	{
 		$table = new CTableInfo(S_NO_USERS_DEFINED);
-		$table->SetHeader(array(S_NAME));
+		$table->SetHeader(array(S_ALIAS, S_NAME, S_SURNAME));
 
-		$result = DBselect('select * from users where '.DBin_node('userid').' order by name');
+		$result = DBselect('select * from users where '.DBin_node('userid').' order by alias');
 		while($row = DBfetch($result))
 		{
 			$name = new CLink(
@@ -633,7 +633,7 @@ include_once "include/page_header.php";
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
 				" close_window(); return false;");
 
-			$table->AddRow($name);
+			$table->AddRow(array($name, $row['name'], $row['surname']));
 		}
 		$table->Show();
 	}
