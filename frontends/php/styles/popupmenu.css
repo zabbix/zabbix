@@ -10,12 +10,20 @@
 	background-color: #ECECFF;
 	border: black 1px solid;
 	margin: 0px;
+	cursor:pointer;
 }
+
 .pum_o_item:hover {
+	text-decoration: underline;
+	background-color: #FDFDFF;
+}
+
+.iehover {
 	cursor:pointer;
 	text-decoration: underline;
 	background-color: #FDFDFF;
 }
+
 .pum_i_item {
 	margin: 3px 0px 0px 8px;
 

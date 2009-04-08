@@ -430,8 +430,11 @@ function menu_item (o_parent, n_order) {
 	el.onmouseout = A_MENUS_onmouseout;
 	el.onmouseover = A_MENUS_onmouseover;
 	el.onmousedown = A_MENUS_onmousedown;
-
+	
+	if(IE6 && (el.className == 'pum_o_item')) attach_iehover(el);
+	
 	el.innerHTML = '<div  id="e' + o_root.n_id + '_' + this.n_id +'i" class="' + this.getstyle(1, 0) + '">' + this.a_config[0] + '</div>';
+
 //	console.log(el,el.innerHTML);
 	document.body.appendChild(el);
 
