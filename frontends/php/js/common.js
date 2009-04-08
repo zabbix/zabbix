@@ -28,6 +28,10 @@ var KQ = (agt.indexOf("khtml") != -1) && (!SF);
 var GK = (agt.indexOf("gecko") != -1) && !KQ && !SF;
 var MC = (agt.indexOf('mac') != -1)
 
+if(IE6){
+	document.write('<script type="text/javascript" src="js/ie_hover.js"><\/script>');
+}
+
 function checkBrowser(){
 	if(OP) alert('Opera');
 	if(IE) alert('IE');

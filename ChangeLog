@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-12] fixed styles in menu for IE6 (Artem)
  - [NTP-11] added sorting by alias in users popup (Artem)
  - [NTD-84] added the enhanced trigger editing (Sasha)
  - [NTD-90] message "Got SIGPIPE ..." won't be displayed with default settings in log file (Sasha)
