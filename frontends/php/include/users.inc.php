@@ -56,14 +56,40 @@
 			return false;
 		}
 		
-		if(DBfetch(DBselect("SELECT * FROM users WHERE alias=".zbx_dbstr($user['alias'])."AND ".DBin_node('userid', get_current_nodeid(false))))){
+		$sql = 'SELECT * '.
+				' FROM users '.
+				' WHERE alias='.zbx_dbstr($user['alias']).
+					' AND '.DBin_node('userid', get_current_nodeid(false));
+		if(DBfetch(DBselect($sql))){
 			error('User "'.$user['alias'].'" already exists');
+			return false;
+		}
+		
+		$user_db_fields = array(
+			'name' => 'ZABBIX',
+			'surname' => 'USER',
+			'alias' => null,
+			'passwd' => 'zabbix',
+			'url' => '',
+			'autologin' => 0,
+			'autologout' => 900,
+			'lang' => 'en_gb',
+			'theme' => 'default.css',
+			'refresh' => 30,
+			'rows_per_page' => 50,
+			'type' => USER_TYPE_ZABBIX_USER,
+			'user_groups' => array(),
+			'user_medias' => array(),
+		);
+
+		if(!check_db_fields($user_db_fields, $user)){
+			error('Incorrect arguments pasted to function [add_user]');
 			return false;
 		}
 
 		$userid = get_dbid('users', 'userid');
 		
-		$result = DBexecute('INSERT INTO users (userid,name,surname,alias,passwd,url,autologin,autologout,lang,theme,refresh,type) VALUES ('.
+		$result = DBexecute('INSERT INTO users (userid,name,surname,alias,passwd,url,autologin,autologout,lang,theme,refresh,rows_per_page,type) VALUES ('.
 			$userid.','.
 			zbx_dbstr($user['name']).','.
 			zbx_dbstr($user['surname']).','.
@@ -75,6 +101,7 @@
 			zbx_dbstr($user['lang']).','.
 			zbx_dbstr($user['theme']).','.
 			$user['refresh'].','.
+			$user['rows_per_page'].','.
 			$user['type'].
 			')');
 			
@@ -90,8 +117,7 @@
 			
 		if($result) {
 //			$result = DBexecute('DELETE FROM media WHERE userid='.$userid);
-			foreach($user['user_medias'] as $mediaid => $media_data)
-			{
+			foreach($user['user_medias'] as $mediaid => $media_data){
 				if(!$result) break;
 				$mediaid = get_dbid("media","mediaid");
 				$result = DBexecute('INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
@@ -104,8 +130,7 @@
 		return $result;
 	}
 
-	# Update User definition
-
+// Update User definition
 	function update_user($userid, $user) {
 	
 		$result = true;
@@ -113,7 +138,8 @@
 		$sql = 'SELECT DISTINCT * '.
 			' FROM users '.
 			' WHERE ( alias='.zbx_dbstr($user['alias']).' OR userid='.$userid.' ) '.
-				' AND '.DBin_node('userid', get_current_nodeid(false));
+				' AND '.DBin_node('userid', id2nodeid($userid));
+
 		$db_users = DBselect($sql);
 		while($db_user = DBfetch($db_users)){
 			if($db_user['userid'] != $userid){
@@ -147,6 +173,7 @@
 				' ,lang='.zbx_dbstr($user['lang']).
 				' ,theme='.zbx_dbstr($user['theme']).
 				' ,refresh='.$user['refresh'].
+				' ,rows_per_page='.$user['rows_per_page'].
 				' ,type='.$user['type'].
 				' WHERE userid='.$userid;
 		$result = DBexecute($sql);
@@ -177,8 +204,7 @@
 	}
 
 
-	# Update User definition
-
+// Update User definition
 	function update_user_profile($userid, $passwd,$url, $autologin, $autologout, $lang, $theme, $refresh, $user_medias){
 		global $USER_DETAILS;
 
