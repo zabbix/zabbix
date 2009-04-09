@@ -1678,6 +1678,7 @@ include_once('include/page_header.php');
 					' FROM hosts h '.$sql_from.
 					' WHERE '.DBcondition('h.hostid',$available_hosts).
 						$sql_where.
+						' AND h.status='.HOST_STATUS_TEMPLATE.
 					' ORDER BY h.host';
 			$result = DBSelect($sql);
 			while($template = DBfetch($result)) {
@@ -1751,7 +1752,6 @@ include_once('include/page_header.php');
 			foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
 				$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
 			}
-			$form->addItem($cmbHosts);
 			
 			$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 			$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
