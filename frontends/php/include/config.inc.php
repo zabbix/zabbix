@@ -257,15 +257,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			$db_nodes = DBselect($sql);
 			while($node = DBfetch($db_nodes)){
 				$ZBX_NODES[$node['nodeid']] = $node;
+				$ZBX_NODES_IDS[$node['nodeid']] = $node['nodeid'];
 			}
-
-// REMOVING PARENT NODES 
-			$ZBX_NODES = get_tree_by_parentid($ZBX_LOCALNODEID,$ZBX_NODES,'masterid');
-
-			foreach($ZBX_NODES as $nodeid => $NODE){
-				$ZBX_NODES_IDS[$nodeid] = $nodeid;
-			}
-//------
 
 			if( !isset($ZBX_NODES[$ZBX_CURRENT_NODEID])){
 				$denyed_page_requested = true;

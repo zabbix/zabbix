@@ -18,9 +18,8 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 ?>
-<?php
-	function	detect_node_type($node_data)
-	{
+<?php	
+	function detect_node_type($node_data){
 		global $ZBX_CURMASTERID;
 
 		if(bccomp($node_data['nodeid'],get_current_nodeid(false)) == 0)		$node_type = ZBX_NODE_LOCAL;
@@ -31,11 +30,9 @@
 	return $node_type;
 	}
 
-	function	node_type2str($node_type)
-	{
+	function node_type2str($node_type){
 		$result = '';
-		switch($node_type)
-		{
+		switch($node_type){
 			case ZBX_NODE_REMOTE:	$result = S_REMOTE;	break;
 			case ZBX_NODE_MASTER:	$result = S_MASTER;	break;
 			case ZBX_NODE_LOCAL:	$result = S_LOCAL;	break;
@@ -45,18 +42,15 @@
 		return $result;
 	}
 
-	function	add_node($new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends,$node_type)
-	{
+	function add_node($new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends,$node_type){
 		global $ZBX_CURMASTERID;
 
-		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) )
-		{
+		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
 			error("Incorrect characters used for Node name");
 			return false;
 		}
 
-		switch($node_type)
-		{
+		switch($node_type){
 			case ZBX_NODE_REMOTE:
 				$masterid = get_current_nodeid(false);
 				$nodetype = 0;
@@ -117,12 +111,10 @@
 
 		$node_type = detect_node_type($node_data);
 
-		if($node_type == ZBX_NODE_LOCAL)
-		{
+		if($node_type == ZBX_NODE_LOCAL){
 			error('Unable to remove local node');
 		}
-		else
-		{
+		else{
 			$housekeeperid = get_dbid('housekeeper','housekeeperid');
 			$result = (
 				DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
@@ -135,21 +127,18 @@
 		return $result;
 	}
 
-	function	get_node_by_nodeid($nodeid)
-	{
+	function get_node_by_nodeid($nodeid){
 		return DBfetch(DBselect('select * from nodes where nodeid='.$nodeid));
 	}
 
-	function	get_node_path($nodeid, $result='/')
-	{
-		if($node_data = get_node_by_nodeid($nodeid))
-		{
-			if($node_data['masterid'])
-			{
+	function get_node_path($nodeid, $result='/'){
+		if($node_data = get_node_by_nodeid($nodeid)){
+			if($node_data['masterid']){
 				$result = get_node_path($node_data['masterid'],$result);
 			}
 			$result .= $node_data['name'].'/';
 		}
-		return $result;
+
+	return $result;
 	}
 ?>

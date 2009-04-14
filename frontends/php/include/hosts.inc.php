@@ -780,6 +780,38 @@ require_once "include/httptest.inc.php";
 	}
 
 /*
+ * Function: get_viewed_nodes
+ *
+ * Description:
+ *     Retrive nodes for dropdown
+ *
+ * Author:
+ *		Artem "Aly" Suharev
+ *
+ * Comments:
+ *	
+ */
+	function get_viewed_nodes(){
+		global $USER_DETAILS;
+		global $ZBX_NODES;
+		global $ZBX_LOCALNODEID;
+		
+		$result = array('selected'=>0, 'nodes'=> array(), 'nodeids'=> array());
+		
+		$result['selected'] = get_current_nodeid(false);
+
+		$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_DATA_ARRAY);
+		$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID,$available_nodes,'masterid');
+		
+		foreach($available_nodes as $key => $node){
+			$result['nodes'][$node['nodeid']] = $node;
+			$result['nodeids'][$node['nodeid']] = $node['nodeid'];
+		}
+		
+	return $result;
+	}
+
+/*
  * Function: get_viewed_groups
  *
  * Description:

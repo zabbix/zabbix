@@ -239,6 +239,7 @@ include_once "include/page_header.php";
 
 	$params = array();
 	foreach($validation_param as  $option) $params[$option] = 1;
+	$PAGE_NODES = get_viewed_nodes();
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params, $nodeid);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params, $nodeid);
 
@@ -252,7 +253,8 @@ include_once "include/page_header.php";
 	$groupid = 0;
 	$hostid = 0;
 	
-	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
+//	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
+	$available_nodes	= $PAGE_NODES['nodeids'];
 	$available_groups	= $PAGE_GROUPS['groupids'];
 	$available_hosts	= $PAGE_HOSTS['hostids'];
 

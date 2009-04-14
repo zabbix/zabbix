@@ -80,13 +80,13 @@ function add_right(formname,id,permission,name){
 	$frmTitle->AddVar('dstfrm',$dstfrm);
 	$frmTitle->AddVar('permission', $permission);
 
+	$PAGE_NODES = get_viewed_nodes();
 	if(ZBX_DISTRIBUTED){
-		$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
 
 		$cmbResourceNode = new CComboBox('nodeid',$nodeid,'submit();');
 		$cmbResourceNode->AddItem(0, S_ALL_S);
 		
-		$sql = 'SELECT name,nodeid FROM nodes WHERE '.DBcondition('nodeid',$available_nodes);
+		$sql = 'SELECT name,nodeid FROM nodes WHERE '.DBcondition('nodeid',$PAGE_NODES['nodeids']);
 		$db_nodes = DBselect($sql);
 		while($node = DBfetch($db_nodes)){
 			$cmbResourceNode->AddItem($node['nodeid'], $node['name']);
@@ -102,12 +102,13 @@ function add_right(formname,id,permission,name){
 	
 	$db_resources = null;
 
-	$db_resources = DBselect('SELECT n.name as node_name, g.name as name, g.groupid as id'.
-					' FROM groups g '.
-						' LEFT JOIN nodes n on '.DBid2nodeid('g.groupid').'=n.nodeid '.
-					($nodeid?' WHERE nodeid='.$nodeid:'').
-					' ORDER BY n.name, g.name');
-
+	$sql = 'SELECT n.name as node_name, g.name as name, g.groupid as id '.
+			' FROM groups g '.
+				' LEFT JOIN nodes n on '.DBid2nodeid('g.groupid').'=n.nodeid '.
+			' WHERE '.DBcondition('n.nodeid', $PAGE_NODES['nodeids']).
+				($nodeid?' AND nodeid='.$nodeid:'').
+			' ORDER BY n.name, g.name';
+	$db_resources = DBselect($sql);
 	while($db_resource = DBfetch($db_resources)){
 		if(isset($db_resource['node_name']))
 			$db_resource['name'] = $db_resource['node_name'].':'.$db_resource['name'];
