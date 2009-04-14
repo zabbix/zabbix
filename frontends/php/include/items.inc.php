@@ -949,7 +949,7 @@ COpt::profiling_start('prepare table');
 									array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
 									),
 								array(S_LAST_HOUR_GRAPH, null, 
-									new CScript("function(){ PopUp('history.php?action=showlatest&itemid=".$ithosts[$hostname]['itemid']."'); }")),
+									new CScript("function(){ PopUp('history.php?period=3600&action=showgraph&itemid=".$ithosts[$hostname]['itemid']."'); }")),
 								array(S_LAST_WEEK_GRAPH, null, 
 									new CScript("function(){ PopUp('history.php?period=604800&action=showgraph&itemid=".$ithosts[$hostname]['itemid']."'); }")),
 								array(S_LAST_MONTH_GRAPH, null, 
