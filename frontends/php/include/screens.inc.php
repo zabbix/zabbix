@@ -34,6 +34,8 @@
 			
 			$db_result = DBselect('SELECT * FROM screens_items WHERE screenid='.$screenid);
 			while(($ac_data = DBfetch($db_result)) && $result){
+				if($ac_data['resourceid'] == 0) continue;
+
 				switch($ac_data['resourcetype']){
 					case SCREEN_RESOURCE_GRAPH:
 						$graphids = get_accessible_graphs($perm,array(),null,get_current_nodeid(true));
