@@ -472,8 +472,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			$ev_st_sql = 'SELECT eventid '.
 						' FROM events e '.
 						' WHERE e.object='.EVENT_SOURCE_TRIGGERS.
-							' AND e.objectid='.$row['triggerid'].
-							' AND (('.time().'-e.clock)<'.$event_expire.')';
+							' AND e.objectid='.$row['triggerid'];
 
 			if(EVENTS_NOFALSEFORB_STATUS_FALSE == $show_events_status){
 				$ev_st_sql.= ' AND e.value='.TRIGGER_VALUE_FALSE;
