@@ -219,7 +219,7 @@ include_once "include/page_header.php";
 		sort($arr);
 		foreach($arr as $r){
 			$table->AddRow(array(
-				date("m.d.Y H:i:s",
+				date(S_DATE_FORMAT_YMDHMS,
 					$r[0]),
 				get_node_name_by_elid($r[1]),
 				$r[2],
