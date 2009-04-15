@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-864] fixed problem when saving screen item without selected item (Artem)
  - [ZBX-856] fixed email sending if tcp packets from smtp server are segmented (Sasha)
  - [ZBX-855] fixed processing of eventlogs timestamps on server side (Sasha)
  - [ZBX-851] changed sorting of users  to alias in popup (Artem)
