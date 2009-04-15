@@ -143,6 +143,8 @@ initialize: function(url){
 		}
 		this.file=this.url.substring(protocolSepIndex+3);
 		this.file=this.file.substring(this.file.indexOf('/'));
+		
+		if(this.file == this.host) this.file = '';
 	}
 	else{
 		this.file=this.url;
