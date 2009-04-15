@@ -1257,7 +1257,7 @@ include_once('include/page_header.php');
 			$params = array();	
 			$options = array('only_current_node','not_proxy_hosts');
 			foreach($options as $option) $params[$option] = 1;
-			$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $available_groups, $params);	// more hosts
+			$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);	// more hosts
 
 			validate_group($PAGE_GROUPS, $PAGE_HOSTS, false);
 			break;
@@ -1680,6 +1680,7 @@ include_once('include/page_header.php');
 						$sql_where.
 						' AND h.status='.HOST_STATUS_TEMPLATE.
 					' ORDER BY h.host';
+
 			$result = DBSelect($sql);
 			while($template = DBfetch($result)) {
 				$templateids[$template['hostid']] = $template['hostid'];
