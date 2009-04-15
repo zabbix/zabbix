@@ -115,6 +115,8 @@ function curl($url=null){
 		
 		$this->file = substr($this->url,$protocolSepIndex+3);
 		$this->file = substr($this->file, strpos($this->file,'/'));
+		
+		if($this->file == $this->host) $this->file = '';
 	}
 	else{
 		$this->file = $this->url;

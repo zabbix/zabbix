@@ -144,6 +144,8 @@ initialize: function(url){
 		}
 		this.file=this.url.substring(protocolSepIndex+3);
 		this.file=this.file.substring(this.file.indexOf('/'));
+
+		if(this.file == this.host) this.file = '';
 	}
 	else{
 		this.file=this.url;
@@ -216,7 +218,7 @@ getUrl: function(){
 	uri +=  encodeURI((this.path.length > 0)?(this.path):'');
 	uri +=  encodeURI((this.query.length > 0)?('?'+this.query):'');
 	uri +=  encodeURI((this.reference.length > 0)?('#'+this.reference):'');
-//	alert(uri.getProtocol()+' : '+uri.getHost()+' : '+uri.getPort()+' : '+uri.getPath()+' : '+uri.getQuery());
+//	alert(this.getProtocol()+' : '+this.getHost()+' : '+this.getPort()+' : '+this.getPath()+' : '+this.getQuery());
 return uri;
 },
 
