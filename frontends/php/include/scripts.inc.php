@@ -60,44 +60,38 @@ function script_make_command($scriptid,$hostid){
 }
 
 function execute_script($scriptid,$hostid){
-	$res = 1;
+	global $ZBX_SERVER, $ZBX_SERVER_PORT;
+	
+	$res = true;
+	$message = array();	
 
 	$command = script_make_command($scriptid,$hostid);
 	$nodeid = id2nodeid($hostid);
 
-	$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-
-	if(!$socket){
-		$res = 0;
+	if(!$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)){
+		return false;
 	}
 	
-	if($res){
-		global $ZBX_SERVER, $ZBX_SERVER_PORT;
-		$res = socket_connect($socket, $ZBX_SERVER, $ZBX_SERVER_PORT);
-	}
+	$res = socket_connect($socket, $ZBX_SERVER, $ZBX_SERVER_PORT);
 	
 	if($res){
 		$send = "Command\255$nodeid\255$hostid\255$command\n";
 		socket_write($socket,$send);
-	}
-	
-	if($res){
+
 		$res = socket_read($socket,65535);
 	}
-	
+
 	if($res){
 		list($flag,$msg)=split("\255",$res);
-		$message["flag"]=$flag;
-		$message["message"]=$msg;
+		$message['flag']=$flag;
+		$message['message']=$msg;
 	}
 	else{
-		$message["flag"]=-1;
-		$message["message"] = S_CONNECT_TO_SERVER_ERROR.' ['.$ZBX_SERVER.':'.$ZBX_SERVER_PORT.'] ['.socket_strerror(socket_last_error()).']';
+		$message['flag']=-1;
+		$message['message'] = S_CONNECT_TO_SERVER_ERROR.' ['.$ZBX_SERVER.':'.$ZBX_SERVER_PORT.'] ['.socket_strerror(socket_last_error()).']';
 	}
-	
-	if($socket){
-		socket_close($socket);
-	}
+
+	socket_close($socket);
 return $message;
 }
 
