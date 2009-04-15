@@ -84,7 +84,7 @@ function execute_script($scriptid,$hostid){
 	if($res){
 		$res = socket_read($socket,65535);
 	}
-	
+
 	if($res){
 		list($flag,$msg)=split("\255",$res);
 		$message["flag"]=$flag;
@@ -94,7 +94,7 @@ function execute_script($scriptid,$hostid){
 		$message["flag"]=-1;
 		$message["message"] = S_CONNECT_TO_SERVER_ERROR.' ['.$ZBX_SERVER.':'.$ZBX_SERVER_PORT.'] ['.socket_strerror(socket_last_error()).']';
 	}
-	
+
 	if($socket){
 		socket_close($socket);
 	}
