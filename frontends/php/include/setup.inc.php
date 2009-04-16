@@ -162,7 +162,7 @@
 			$result &= $condition;
 			
 			$row = new CRow(array(
-					$test_name,
+					new CCol($test_name,'header'),
 					$test_value,
 					$condition ? new CSpan(S_OK,'ok') : new CSpan(S_FAIL,'fail')
 				),
@@ -185,16 +185,16 @@
 				$final_result,
 				'PHP version: ',
 				phpversion(),
-				version_compare(phpversion(), '4.3.0', '>='),
-				'Minimal version of PHP is 4.3.0'));
+				version_compare(phpversion(), '5.1.0', '>='),
+				'Minimal version of PHP is 5.1.0'));
 
 			$memory_limit = str2mem(ini_get('memory_limit'));
 			$table->addRow($this->get_test_result(
 				$final_result,
 				'PHP Memory limit:',
 				function_exists('memory_get_usage') ? mem2str($memory_limit) : 'unlimited',
-				$memory_limit >= 8*1024*1024 || !function_exists('memory_get_usage'),
-				'8M is a minimal PHP memory limitation'));
+				$memory_limit >= 128*1024*1024 || !function_exists('memory_get_usage'),
+				'128M is a minimal PHP memory limitation'));
 
 			$memory_limit = str2mem(ini_get('post_max_size'));
 			$table->addRow(
@@ -202,8 +202,8 @@
 					$final_result,
 					'PHP post max size:',
 					mem2str($memory_limit),
-					$memory_limit >= 8*1024*1024,
-					'8M is minimum size of PHP post'));
+					$memory_limit >= 16*1024*1024,
+					'16M is minimum size of PHP post'));
 
 			$table->addRow(
 				$this->get_test_result(
@@ -212,8 +212,19 @@
 					ini_get('max_execution_time').' sec',
 					ini_get('max_execution_time') >= 300,
 					'300 sec is a minimal limitation on execution time of PHP scripts'));
-			
-			/* Check supporteds databases */
+					
+			if(version_compare(phpversion(), '5.1.0', '>=')){
+				$tmezone = ini_get('date.timezone');
+				$table->addRow(
+					$this->get_test_result(
+						$final_result,
+						'PHP Timezone:', 
+						empty($tmezone) ? 'n/a' : $tmezone,
+						!empty($tmezone),
+						'Timezone for PHP is not set. Please set "date.timezone" option in php.ini.'));
+				unset($tmezone);
+			}			
+/* Check supporteds databases */
 			global $ZBX_CONFIG;
 
 			$table->addRow(
@@ -232,18 +243,30 @@
 				function_exists('bcmod') &&
 				function_exists('bcmul') &&
 				function_exists('bcpow') &&
-/* This function is supported by PHP5 only */
-/*				function_exists('bcpowmod') &&*/
+				function_exists('bcpowmod') &&
 				function_exists('bcscale') &&
 				function_exists('bcsqrt') &&
 				function_exists('bcsub');
 			$table->addRow(
 				$this->get_test_result(
 					$final_result,
-					'PHP BC math support',
+					'PHP BC math support:',
 					$bcmath_fnc_exist ? 'yes' : 'no',
 					$bcmath_fnc_exist,
 					'Requires bcmath module [configure PHP with --enable-bcmath]'));
+					
+					
+//* Check sockets lib
+			$sockets_fnc_exist = function_exists('socket_create');
+			$table->addRow(
+				$this->get_test_result(
+					$final_result,
+					'PHP Sockets support',
+					$sockets_fnc_exist?'yes':'no',
+					$sockets_fnc_exist,
+					'Required Sockets module [configured PHP with --enable-sockets]'));
+//*/
+
 					
 /* Check mb-strings 
 			$mbstrings_fnc_exist = mbstrings_available();
@@ -289,18 +312,6 @@
 					$img_formats,
 					!isset($no_img_formats),
 					'Requires images generation support [PNG]'));	
-			
-			if(version_compare(phpversion(), '5.1.0RC1', '>=')){
-				$tmezone = ini_get('date.timezone');
-				$table->addRow(
-					$this->get_test_result(
-						$final_result,
-						'PHP Timezone:', 
-						empty($tmezone) ? 'n/a' : $tmezone,
-						!empty($tmezone),
-						'Timezone for PHP is not set. Please set "date.timezone" option in php.ini.'));
-				unset($tmezone);
-			}
 
 			if(!$final_result){
 				$this->DISABLE_NEXT_BUTTON = true;
@@ -326,7 +337,7 @@
 		function stage3(){
 			global $ZBX_CONFIG;
 
-			$table = new CTable();
+			$table = new CTable(null, 'requirements');
 			$table->setAlign('center');
 			
 			$DB['TYPE'] = $this->getConfig('DB_TYPE');
@@ -335,12 +346,12 @@
 			foreach($ZBX_CONFIG['allowed_db'] as $id => $name){
 				$cmbType->addItem($id, $name);
 			}
-			$table->addRow(array(S_TYPE, $cmbType));
-			$table->addRow(array(S_HOST, new CTextBox('server',		$this->getConfig('DB_SERVER',	'localhost'))));
-			$table->addRow(array(S_PORT, array(new CNumericBox('port',		$this->getConfig('DB_PORT',	'0'),5),' 0 - use default port')));
-			$table->addRow(array(S_NAME, new CTextBox('database',		$this->getConfig('DB_DATABASE',	'zabbix'))));
-			$table->addRow(array(S_USER, new CTextBox('user',		$this->getConfig('DB_USER',	'root'))));
-			$table->addRow(array(S_PASSWORD, new CPassBox('password',	$this->getConfig('DB_PASSWORD',	''))));
+			$table->addRow(array(new CCol(S_TYPE,'header'), $cmbType));
+			$table->addRow(array(new CCol(S_HOST,'header'), new CTextBox('server',		$this->getConfig('DB_SERVER',	'localhost'))));
+			$table->addRow(array(new CCol(S_PORT,'header'), array(new CNumericBox('port',		$this->getConfig('DB_PORT',	'0'),5),' 0 - use default port')));
+			$table->addRow(array(new CCol(S_NAME,'header'), new CTextBox('database',		$this->getConfig('DB_DATABASE',	'zabbix'))));
+			$table->addRow(array(new CCol(S_USER,'header'), new CTextBox('user',		$this->getConfig('DB_USER',	'root'))));
+			$table->addRow(array(new CCol(S_PASSWORD,'header'), new CPassBox('password',	$this->getConfig('DB_PASSWORD',	''))));
 
 			return array(
 				'Please create database manually,', BR(),
@@ -359,11 +370,11 @@
 		function stage4(){
 			global $ZBX_CONFIG;
 
-			$table = new CTable();
+			$table = new CTable(null, 'requirements');
 			$table->setAlign('center');
 			
-			$table->addRow(array(S_HOST, new CTextBox('zbx_server',		$this->getConfig('ZBX_SERVER',		'localhost'))));
-			$table->addRow(array(S_PORT, new CNumericBox('zbx_server_port',	$this->getConfig('ZBX_SERVER_PORT',	'10051'),5)));
+			$table->addRow(array(new CCol(S_HOST,'header'), new CTextBox('zbx_server',		$this->getConfig('ZBX_SERVER',		'localhost'))));
+			$table->addRow(array(new CCol(S_PORT,'header'), new CNumericBox('zbx_server_port',	$this->getConfig('ZBX_SERVER_PORT',	'10051'),5)));
 
 			return array(
 				'Please enter host name or host IP address', BR(),
@@ -415,28 +426,27 @@
 
 			$table = new CTable(null, 'requirements');
 			$table->setAlign('center');
-			$table->addRow(array('Database type:',		$allowed_db[$this->getConfig('DB_TYPE',	'unknown')]));
-			$table->addRow(array('Database server:',	$this->getConfig('DB_SERVER',	'unknown')));
-			$table->addRow(array('Database port:',		$this->getConfig('DB_PORT',	'0')));
-			$table->addRow(array('Database name:',		$this->getConfig('DB_DATABASE',	'unknown')));
-			$table->addRow(array('Database user:',		$this->getConfig('DB_USER',	'unknown')));
-			$table->addRow(array('Database password:',	ereg_replace('.','*',$this->getConfig('DB_PASSWORD',	'unknown'))));
-			/* $table->addRow(array('Distributed monitoring',	$this->getConfig('distributed', null) ? 'Enabled' : 'Disabled')); */
+			$table->addRow(array(new CCol('Database type:','header'),		$allowed_db[$this->getConfig('DB_TYPE',	'unknown')]));
+			$table->addRow(array(new CCol('Database server:','header'),	$this->getConfig('DB_SERVER',	'unknown')));
+			$table->addRow(array(new CCol('Database port:','header'),		$this->getConfig('DB_PORT',	'0')));
+			$table->addRow(array(new CCol('Database name:','header'),		$this->getConfig('DB_DATABASE',	'unknown')));
+			$table->addRow(array(new CCol('Database user:','header'),		$this->getConfig('DB_USER',	'unknown')));
+			$table->addRow(array(new CCol('Database password:','header'),	ereg_replace('.','*',$this->getConfig('DB_PASSWORD',	'unknown'))));
+			/* $table->addRow(array(new CCol('Distributed monitoring','header'),	$this->getConfig('distributed', null) ? 'Enabled' : 'Disabled')); */
 			
 			if($this->getConfig('distributed', null)){
-				$table->addRow(array('Node name',	$this->getConfig('nodename',	'unknown')));
-				$table->addRow(array('Node GUID',	$this->getConfig('nodeid',	'unknown')));
+				$table->addRow(array(new CCol('Node name','header'),	$this->getConfig('nodename',	'unknown')));
+				$table->addRow(array(new CCol('Node GUID','header'),	$this->getConfig('nodeid',	'unknown')));
 			}
+			
+			$table->addRow(BR());
 
-			$table1 = new CTable(null, 'requirements');
-			$table1->setAlign('center');
-			$table1->addRow(array('ZABBIX server:',		$this->getConfig('ZBX_SERVER',		'unknown')));
-			$table1->addRow(array('ZABBIX server port:',	$this->getConfig('ZBX_SERVER_PORT',	'unknown')));
+			$table->addRow(array(new CCol('ZABBIX server:','header'),		$this->getConfig('ZBX_SERVER',		'unknown')));
+			$table->addRow(array(new CCol('ZABBIX server port:','header'),	$this->getConfig('ZBX_SERVER_PORT',	'unknown')));
 			return array(
 				'Please check configuration parameters.', BR(),
 				'If all is correct, press "Next" button, or "Previous" button to change configuration parameters.', BR(), BR(),
-				$table, BR(),
-				$table1
+				$table
 				);
 		}
 
