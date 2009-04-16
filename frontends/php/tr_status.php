@@ -112,8 +112,10 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	$_REQUEST['noactions']		=	get_request('noactions', get_profile('web.tr_status.noactions', 'true'));
 	$_REQUEST['compact']		=	get_request('compact', get_profile('web.tr_status.compact', 'true'));
 
-	validate_group_with_host(PERM_READ_ONLY,array('allow_all_hosts','always_select_first_host','monitored_hosts','with_monitored_items'),
-		'web.tr_status.groupid','web.tr_status.hostid');
+	validate_group_with_host(PERM_READ_ONLY,
+					array('allow_all_hosts','always_select_first_host','monitored_hosts','with_monitored_items'),
+					'web.tr_status.groupid',
+					'web.tr_status.hostid');
 
 	update_profile('web.tr_status.show_triggers',$_REQUEST['show_triggers']);
 	update_profile('web.tr_status.show_events',$_REQUEST['show_events']);

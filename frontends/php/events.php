@@ -170,7 +170,7 @@ include_once "include/page_header.php";
 		}
 		
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
-		validate_group_with_host(PERM_READ_ONLY, array('allow_all_hosts','monitored_hosts','with_items','always_select_first_host'));
+		validate_group_with_host(PERM_READ_ONLY, array('allow_all_hosts','always_select_first_host','monitored_hosts','with_items'));
 
 		$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
 		$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
@@ -195,7 +195,8 @@ include_once "include/page_header.php";
 		}
 		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 		
-		$cmbHosts->AddItem(0,S_ALL_SMALL);
+		if($_REQUEST['groupid'] == 0)
+			$cmbHosts->AddItem(0,S_ALL_SMALL);
 
 		$sql='SELECT DISTINCT h.hostid,h.host '.
 			' FROM hosts h,items i,hosts_groups hg '.
