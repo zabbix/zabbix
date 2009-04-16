@@ -1,13 +1,16 @@
 /* CSS Document */
-table
-{
+table{
 	border-spacing:	0px; /* cellspacing */
 }
 
-table.home
-{
+table.whitetext {
+	border-spacing:	0px; /* cellspacing */
+	color: #CCCCCC;
+}
+
+table.home{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 8pt;
+	font-size:10px;
 }
 
 table.nowrap tr td {
@@ -17,12 +20,20 @@ table.nowrap tr td {
 
 td,tr{
 	font-family:Verdana, Arial, Helvetica, sans-serif;
-	font-size: 8pt;
+	font-size:10px;
 	text-decoration: none;
 }
 
 td.center{
 	text-align: center;
+}
+
+td.left{
+	text-align: left;
+}
+
+td.right{
+	text-align: right;
 }
 
 /**************** PAGE TABLE ****************/
@@ -205,8 +216,8 @@ table.formlongtable tr td {
 	padding-left: 5px;
 	padding-right: 5px;
 	color: #000000;
-        font-family:verdana, arial, helvetica, sans-serif;
-        font-size:10px;
+    font-family:verdana, arial, helvetica, sans-serif;
+    font-size:10px;
 	border-width: 1px;
 	height: 24px;
 	white-space: nowrap;
@@ -330,23 +341,20 @@ table.log_history_table tr td.message {
 }
 
 /************* CHART TABLE ***************/
-table.chart
-{
+table.chart{
 	width: 100%;
 	background-color: #DDDDDD;
 	text-align: center;
 }
 
 /************* SCREEN TABLE ***************/
-table.screen_edit
-{
+table.screen_edit{
 	background-color: #FFFFFF;
 	width: 100%;
 	border: 1px outset #DDDDDD;
 }
 
-table.screen_edit td
-{
+table.screen_edit td{
 	background-color: #FFFFFF;
 	border: 1px inset #DDDDDD;
 	text-align: center;
@@ -639,6 +647,15 @@ table.filter{
 	border-right-style: solid;
 	border-bottom-style: solid;
 	vertical-align:middle;
+}
+
+table.filter tr td.filter_c{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	height: 16px;
+	padding-left: 4px;
+	padding-right: 4px;
+	line-height: 12px;
 }
 
 table.filter tr td.filter_l{
@@ -1190,3 +1207,21 @@ table.msgerr tr td.msg{
 	background-color:#FFBBBB;
 }
 /**************** </MESSAGE> *****************/
+
+/********** <REQUIREMENTS> *************/
+table.requirements{
+	text-align: left;
+	border-spacing: 1px; 
+}
+
+table.requirements tr td.header{
+	font-weight: bold;
+}
+
+table.requirements tr td{
+	padding-left: 5px;
+	padding-right: 15px;
+	background-color: #FFFFFF;
+}
+
+/********** </REQUIREMENTS> ************/
