@@ -47,6 +47,7 @@ $fields=array(
 	'autologout'=>		array(T_ZBX_INT, O_OPT, null, BETWEEN(90,10000), null),
 	'url'=>				array(T_ZBX_STR, O_OPT, null, null, 'isset({save})'),
 	'refresh'=>			array(T_ZBX_INT, O_OPT, null, BETWEEN(0,3600), 'isset({save})'),
+	'rows_per_page'=>	array(T_ZBX_INT, O_OPT,	null, BETWEEN(0,1000), 'isset({save})'),
 	'change_password'=>	array(T_ZBX_STR, O_OPT, null, null, null),
 	'user_medias'=>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, null),
 	'user_medias_to_del'=>	array(T_ZBX_STR, O_OPT, null, DB_ID, null),
@@ -109,10 +110,10 @@ $fields=array(
 		if($_REQUEST['password1'] != $_REQUEST['password2']) {
 			show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
 		}
-		else if(isset($_REQUEST['password1']) && ($_REQUEST['alias']==ZBX_GUEST_USER) && !zbx_empty($_REQUEST['password1'])) {
+		else if(isset($_REQUEST['password1']) && ($USER_DETAILS['alias']==ZBX_GUEST_USER) && !zbx_empty($_REQUEST['password1'])) {
 			show_error_message(S_FOR_GUEST_PASSWORD_MUST_BE_EMPTY);
 		}
-		else if(isset($_REQUEST['password1']) && ($_REQUEST['alias']!=ZBX_GUEST_USER) && zbx_empty($_REQUEST['password1'])) {
+		else if(isset($_REQUEST['password1']) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER) && zbx_empty($_REQUEST['password1'])) {
 			show_error_message(S_PASSWORD_SHOULD_NOT_BE_EMPTY);
 		}
 		else {
