@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-868] fixed incorrect processing of not supported internal checks (Alexei)
  - [ZBX-867] added php sockets check to installation wizard (Artem)
  - [ZBX-865] fixed displaying templates without groups in tempalte linkage page (Artem)
  - [ZBX-857] changed queue details timestamp to timestamp defined in locale file (Artem)

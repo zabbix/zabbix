@@ -165,7 +165,7 @@ not_supported:
 	zabbix_log(LOG_LEVEL_WARNING, "%s",
 			tmp);
 
-	SET_STR_RESULT(result, strdup(tmp));
+	SET_MSG_RESULT(result, strdup(tmp));
 
 	return NOTSUPPORTED;
 }
