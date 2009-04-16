@@ -162,7 +162,7 @@
 			$result &= $condition;
 			
 			$row = new CRow(array(
-					$test_name,
+					new CCol($test_name,'header'),
 					$test_value,
 					$condition ? new CSpan(S_OK,'ok') : new CSpan(S_FAIL,'fail')
 				),
@@ -240,10 +240,23 @@
 			$table->AddRow(
 				$this->get_test_result(
 					$final_result,
-					'PHP BC math support',
+					'PHP BC math support:',
 					$bcmath_fnc_exist ? 'yes' : 'no',
 					$bcmath_fnc_exist,
 					'Required bcmath module [configured PHP with --enable-bcmath]'));
+					
+					
+//* Check sockets lib
+			$sockets_fnc_exist = function_exists('socket_create');
+			$table->AddRow(
+				$this->get_test_result(
+					$final_result,
+					'PHP Sockets support',
+					$sockets_fnc_exist?'yes':'no',
+					$sockets_fnc_exist,
+					'Required Sockets module [configured PHP with --enable-sockets]'));
+//*/
+
 					
 /* Check mb-strings 
 			$mbstrings_fnc_exist = mbstrings_available();
@@ -326,7 +339,7 @@
 		function Stage3(){
 			global $ZBX_CONFIG;
 
-			$table = new CTable();
+			$table = new CTable(null, 'requirements');
 			$table->SetAlign('center');
 			
 			$DB['TYPE'] = $this->GetConfig('DB_TYPE');
@@ -359,7 +372,7 @@
 		function Stage4(){
 			global $ZBX_CONFIG;
 
-			$table = new CTable();
+			$table = new CTable(null, 'requirements');
 			$table->SetAlign('center');
 			
 			$table->AddRow(array(S_HOST, new CTextBox('zbx_server',		$this->GetConfig('ZBX_SERVER',		'localhost'))));
@@ -415,28 +428,27 @@
 			
 			$table = new CTable(null, 'requirements');
 			$table->SetAlign('center');
-			$table->AddRow(array('Database type:',		$allowed_db[$this->GetConfig('DB_TYPE',	'unknown')]));
-			$table->AddRow(array('Database server:',	$this->GetConfig('DB_SERVER',	'unknown')));
-			$table->AddRow(array('Database port:',		$this->GetConfig('DB_PORT',	'0')));
-			$table->AddRow(array('Database name:',		$this->GetConfig('DB_DATABASE',	'unknown')));
-			$table->AddRow(array('Database user:',		$this->GetConfig('DB_USER',	'unknown')));
-			$table->AddRow(array('Database password:',	ereg_replace('.','*',$this->GetConfig('DB_PASSWORD',	'unknown'))));
-			/* $table->AddRow(array('Distributed monitoring',	$this->GetConfig('distributed', null) ? 'Enabled' : 'Disabled')); */
+			$table->AddRow(array(new CCol('Database type:','header'),		$allowed_db[$this->GetConfig('DB_TYPE',	'unknown')]));
+			$table->AddRow(array(new CCol('Database server:','header'),	$this->GetConfig('DB_SERVER',	'unknown')));
+			$table->AddRow(array(new CCol('Database port:','header'),		$this->GetConfig('DB_PORT',	'0')));
+			$table->AddRow(array(new CCol('Database name:','header'),		$this->GetConfig('DB_DATABASE',	'unknown')));
+			$table->AddRow(array(new CCol('Database user:','header'),		$this->GetConfig('DB_USER',	'unknown')));
+			$table->AddRow(array(new CCol('Database password:','header'),	ereg_replace('.','*',$this->GetConfig('DB_PASSWORD',	'unknown'))));
+			/* $table->AddRow(array(new CCol('Distributed monitoring','header'),	$this->GetConfig('distributed', null) ? 'Enabled' : 'Disabled')); */
 			
 			if($this->GetConfig('distributed', null)){
-				$table->AddRow(array('Node name',	$this->GetConfig('nodename',	'unknown')));
-				$table->AddRow(array('Node GUID',	$this->GetConfig('nodeid',	'unknown')));
+				$table->AddRow(array(new CCol('Node name','header'),	$this->GetConfig('nodename',	'unknown')));
+				$table->AddRow(array(new CCol('Node GUID','header'),	$this->GetConfig('nodeid',	'unknown')));
 			}
+			
+			$table->AddRow(BR());
 
-			$table1 = new CTable(null, 'requirements');
-			$table1->SetAlign('center');
-			$table1->AddRow(array('ZABBIX server:',		$this->GetConfig('ZBX_SERVER',		'unknown')));
-			$table1->AddRow(array('ZABBIX server port:',	$this->GetConfig('ZBX_SERVER_PORT',	'unknown')));
+			$table->AddRow(array(new CCol('ZABBIX server:','header'),		$this->GetConfig('ZBX_SERVER',		'unknown')));
+			$table->AddRow(array(new CCol('ZABBIX server port:','header'),	$this->GetConfig('ZBX_SERVER_PORT',	'unknown')));
 			return array(
 				'Please check configuration parameters.', BR(),
 				'If all correct press "Next" button, or "Previous" button to change configuration parameters.', BR(), BR(),
-				$table, BR(),
-				$table1
+				$table
 				);
 		}
 

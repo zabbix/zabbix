@@ -1187,3 +1187,21 @@ table.msgerr tr td.msg{
 	background-color:#FFBBBB;
 }
 /**************** </MESSAGE> *****************/
+
+/********** <REQUIREMENTS> *************/
+table.requirements{
+	text-align: left;
+	border-spacing: 1px; 
+}
+
+table.requirements tr td.header{
+	font-weight: bold;
+}
+
+table.requirements tr td{
+	padding-left: 5px;
+	padding-right: 15px;
+	background-color: #FFFFFF;
+}
+
+/********** </REQUIREMENTS> ************/
