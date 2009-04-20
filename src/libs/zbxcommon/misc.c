@@ -157,6 +157,145 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_flexible_interval                                            *
+ *                                                                            *
+ * Purpose: check for flexible delay value                                    *
+ *                                                                            *
+ * Parameters: delay_flex - [IN] separeated flexible intervals                *
+ *                          [dd/d1-d2,hh:mm-hh:mm;]                           *
+ *             delay_val - [OUT] delay value                                  *
+ *                                                                            *
+ * Return value: nextcheck value                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev, Alexander Vladishev                              *
+ *                                                                            *
+ ******************************************************************************/
+static int get_flexible_interval(char *delay_flex, int *delay_val, time_t now)
+{
+	char	*s, *c = NULL, delay_period[30];
+	int	delay, ret = FAIL;
+
+	if (NULL == delay_flex || '\0' == *delay_flex)
+		return FAIL;
+
+	for (s = delay_flex; '\0' != *s;)
+	{
+		if (NULL != (c = strchr(s, ';')))
+			*c = '\0';
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Delay period [%s]", s);
+
+		if (2 == sscanf(s, "%d/%29s", &delay, delay_period))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%d sec at %s", delay, delay_period);
+
+			if (0 != check_time_period(delay_period, now))
+			{
+				*delay_val = delay;
+				ret = SUCCEED;
+				break;
+			}
+		}
+		else
+			zabbix_log(LOG_LEVEL_ERR, "Delay period format is wrong [%s]", s);
+
+		if (NULL != c)
+		{
+			*c = ';';
+			s = c + 1;
+		}
+		else
+			break;
+	}
+
+	if (NULL != c)
+		*c = ';';
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_next_flexible_interval                                       *
+ *                                                                            *
+ * Purpose: return time of next flexible interval                             *
+ *                                                                            *
+ * Parameters: delay_flex - [IN] ';' separeated flexible intervals            *
+ *                          [dd/d1-d2,hh:mm-hh:mm]                            *
+ *             now = [IN] current time                                        *
+ *                                                                            *
+ * Return value: start of next interval                                       *
+ *                                                                            *
+ * Author: Alexei Vladishev, Alexander Vladishev                              *
+ *                                                                            *
+ ******************************************************************************/
+static time_t	get_next_flexible_interval(char *delay_flex, time_t now)
+{
+	char		*s, *c = NULL;
+	struct tm	*tm;
+	int		day, sec, sec1, sec2, delay, d1, d2, h1, h2, m1, m2;
+	time_t		next = 0;
+
+	if (NULL == delay_flex || '\0' == *delay_flex)
+		return FAIL;
+
+	next = 0;
+
+	tm = localtime(&now);
+	day = 0 == tm->tm_wday ? 7 : tm->tm_wday;
+	sec = 3600 * tm->tm_hour + 60 * tm->tm_min + tm->tm_sec;
+
+	for (s = delay_flex; '\0' != *s;)
+	{
+		if (NULL != (c = strchr(s, ';')))
+			*c = '\0';
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Delay period [%s]", s);
+
+		if (7 == sscanf(s, "%d/%d-%d,%d:%d-%d:%d", &delay, &d1, &d2, &h1, &m1, &h2, &m2))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%d/%d-%d,%d:%d-%d:%d", delay, d1, d2, h1, m1, h2, m2);
+
+			sec1 = 3600 * h1 + 60 * m1;
+			sec2 = 3600 * h2 + 60 * m2;
+
+			if (day >= d1 && day <= d2 && sec >= sec1 && sec <= sec2)	/* working period */
+			{
+				if (next == 0 || next > now - sec + sec2)
+					next = now - sec + sec2;
+				break;
+			}
+
+			if (day >= d1 && day <= d2 && sec < sec1)			/* next period, same day */
+			{
+				if (next == 0 || next > now - sec + sec1)
+					next = now - sec + sec1;
+			}
+			else if (day + 1 >= d1 && day + 1 <= d2 && sec < sec1)		/* next period, next  day */
+			{
+				if (next == 0 || next > now - sec + sec1)
+					next = now - sec + 86400 + sec1;
+			}
+		}
+		else
+			zabbix_log(LOG_LEVEL_ERR, "Delay period format is wrong [%s]", s);
+
+		if (NULL != c)
+		{
+			*c = ';';
+			s = c + 1;
+		}
+		else
+			break;
+	}
+
+	if (NULL != c)
+		*c = ';';
+
+	return next ? next : now;
+}
+/******************************************************************************
+ *                                                                            *
  * Function: calculate_item_nextcheck                                         *
  *                                                                            *
  * Purpose: calculate nextcheck timespamp for item                            *
@@ -175,8 +314,8 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
  ******************************************************************************/
 int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now)
 {
-	int	i, delay_val;
-	char	*s, *c = NULL, delay_period[30];
+	int	i, flex_delay2 = delay, flex_delay = delay;
+	time_t	next;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In calculate_item_nextcheck (" ZBX_FS_UI64 ",%d,\"%s\",%d)",
 			itemid, delay, delay_flex, now);
@@ -196,47 +335,24 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
 		return i;
 	}
 
-	if (NULL != delay_flex && '\0' != *delay_flex)
+	get_flexible_interval(delay_flex, &flex_delay, now);
+	next = get_next_flexible_interval(delay_flex, now);
+
+	if (now + flex_delay > next)
 	{
-		for (s = delay_flex; '\0' != *s;)
-		{
-			if (NULL != (c = strchr(s, ';')))
-				*c = '\0';
+		get_flexible_interval(delay_flex, &flex_delay2, next + 1);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "Delay period [%s]", s);
-
-			if (2 == sscanf(s, "%d/%29s", &delay_val, delay_period))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%d sec at %s", delay_val, delay_period);
-
-				if (check_time_period(delay_period, now))
-				{
-					delay = delay_val;
-					break;
-				}
-			}
-			else
-				zabbix_log(LOG_LEVEL_ERR, "Delay period format is wrong [%s]", s);
-
-			if (NULL != c)
-			{
-				*c = ';';
-				s = c + 1;
-			}
-			else
-				break;
-		}
-
-		if (NULL != c)
-			*c = ';';
+		now = next;
+		flex_delay = MIN(flex_delay, flex_delay2);
 	}
 
-	if (0 == delay)
+	if (0 == flex_delay)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Invalid item update interval [%d], using default [%d]", delay, 30);
-		delay = 30;
+		zabbix_log(LOG_LEVEL_ERR, "Invalid item update interval [%d], using default [%d]", flex_delay, 30);
+		flex_delay = 30;
 	}
 
+	delay = flex_delay;
 	i = delay * (int)(now / (time_t)delay) + (int)(itemid % (zbx_uint64_t)delay);
 
 	while (i <= now)
@@ -770,7 +886,7 @@ int	check_time_period(char *period, time_t now)
 {
 	char		*s, *c = NULL;
 	int		d1, d2, h1, h2, m1, m2;
-	int		day, min;
+	int		day, sec;
 	struct tm	*tm;
 	int		ret = 0;
 
@@ -784,7 +900,7 @@ int	check_time_period(char *period, time_t now)
 	day = tm->tm_wday;
 	if(0 == day)
 		day=7;
-	min = 60 * tm->tm_hour + tm->tm_min;
+	sec = 3600 * tm->tm_hour + 60 * tm->tm_min + tm->tm_sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%d,%d:%d", day, (int)tm->tm_hour, (int)tm->tm_min);
 
@@ -799,7 +915,7 @@ int	check_time_period(char *period, time_t now)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%d-%d,%d:%d-%d:%d", d1, d2, h1, m1, h2, m2);
 
-			if (day >= d1 && day <= d2 && min >= 60 * h1 + m1 && min <= 60 * h2 + m2)
+			if (day >= d1 && day <= d2 && sec >= 3600 * h1 + 60 * m1 && sec <= 3600 * h2 + 60 * m2)
 			{
 				ret = 1;
 				break;
