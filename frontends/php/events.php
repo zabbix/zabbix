@@ -146,7 +146,7 @@
 		}
 
 		$options = array('allow_all_hosts','monitored_hosts','with_items');
-		if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
+		if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
 		
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 		$params = array();
@@ -273,7 +273,7 @@
 		$table = new CTableInfo(S_NO_EVENTS_FOUND); 
 		$table->SetHeader(array(
 				make_sorting_link(S_TIME,'e.clock'),
-				is_show_subnodes() ? S_NODE : null,
+				is_show_all_nodes() ? S_NODE : null,
 				$_REQUEST['hostid'] == 0 ? S_HOST : null,
 				S_DESCRIPTION,
 				S_STATUS,
@@ -328,7 +328,7 @@
 						'tr_events.php?triggerid='.$row['triggerid'].'&eventid='.$row['eventid'],
 						'action'
 						),
-					is_show_subnodes() ? get_node_name_by_elid($row['triggerid']) : null,
+					is_show_all_nodes() ? get_node_name_by_elid($row['triggerid']) : null,
 					$_REQUEST['hostid'] == 0 ? $row['host'] : null,
 					$tr_desc,
 					$value,

@@ -195,7 +195,7 @@ function make_system_summary($args = array()){
 	
 	$table = new CTableInfo();
 	$table->setHeader(array(
-		is_show_subnodes()?S_NODE:null,
+		is_show_all_nodes()?S_NODE:null,
 		S_HOST_GROUP,
 		S_DISASTER,
 		S_HIGH,
@@ -222,7 +222,7 @@ function make_system_summary($args = array()){
 					
 	while($group = DBFetch($gr_result)){
 		$group_row = new CRow();
-		if(is_show_subnodes())
+		if(is_show_all_nodes())
 			$group_row->addItem(get_node_name_by_elid($group['groupid']));
 		
 		$name = new CLink($group['name'],'tr_status.php?groupid='.$group['groupid'].'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
@@ -262,7 +262,7 @@ function make_system_summary($args = array()){
 				$table_inf  = new CTableInfo();
 				$table_inf->addOption('style', 'width: 400px;');
 				$table_inf->setHeader(array(
-					is_show_subnodes() ? S_NODE : null,
+					is_show_all_nodes() ? S_NODE : null,
 					S_HOST,
 					S_ISSUE,
 					S_AGE,
@@ -450,7 +450,7 @@ function make_latest_issues($params = array()){
 	
 	$table  = new CTableInfo();
 	$table->setHeader(array(
-		is_show_subnodes()?S_NODE:null,
+		is_show_all_nodes()?S_NODE:null,
 		(isset($params['groupid']) && ($params['groupid']>0))?S_GROUP:null,
 		S_HOST,
 		S_ISSUE,
@@ -557,7 +557,7 @@ function make_webmon_overview(){
 
 	$table  = new CTableInfo();
 	$table->setHeader(array(
-		is_show_subnodes() ? S_NODE : null,
+		is_show_all_nodes() ? S_NODE : null,
 		S_HOST_GROUP,
 		S_OK,
 		S_FAILED,
@@ -611,7 +611,7 @@ function make_webmon_overview(){
 		}
 		
 		$table->addRow(array(
-			is_show_subnodes() ? get_node_name_by_elid($group['groupid']) : null,
+			is_show_all_nodes() ? get_node_name_by_elid($group['groupid']) : null,
 			$group['name'],
 			new CSpan($apps['ok'],'off'),
 			new CSpan($apps['failed'],$apps['failed']?'on':'off'),
@@ -650,7 +650,7 @@ function make_discovery_status(){
 	}
 
 	$header = array(
-		is_show_subnodes() ? new CCol(S_NODE, 'center') : null,
+		is_show_all_nodes() ? new CCol(S_NODE, 'center') : null,
 		new CCol(S_DISCOVERY_RULE, 'center'),
 		new CCol(S_UP),
 		new CCol(S_DOWN)
@@ -723,7 +723,7 @@ function make_latest_data(){
 				$actions=new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid'],'action');
 			}
 			array_push($app_rows, new CRow(array(
-				is_show_subnodes() ? SPACE : null,
+				is_show_all_nodes() ? SPACE : null,
 				$_REQUEST['hostid'] > 0 ? NULL : SPACE,
 				str_repeat(SPACE,6).$description,
 				$lastclock,

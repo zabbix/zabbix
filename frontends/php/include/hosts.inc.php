@@ -901,8 +901,11 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 	$_REQUEST['groupid'] = $result['original'] = get_request('groupid', -1);
 	$_REQUEST['hostid'] = get_request('hostid', -1);
 //-----
-	
-	$nodeid = is_null($nodeid)?get_current_nodeid(!$def_options['only_current_node']):$nodeid;
+	if(is_null($nodeid)){
+		if(!$def_options['only_current_node']) $nodeid = get_current_nodeid();
+		else $nodeid = get_current_nodeid(false);
+	}
+//	$nodeid = is_null($nodeid)?get_current_nodeid(!$def_options['only_current_node']):$nodeid;
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,$nodeid,AVAILABLE_NOCACHE);
 
 // nodes
@@ -1160,8 +1163,12 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	
 	$_REQUEST['hostid'] = $result['original'] = get_request('hostid', -1);
 //-----
+	if(is_null($nodeid)){
+		if(!$def_options['only_current_node']) $nodeid = get_current_nodeid();
+		else $nodeid = get_current_nodeid(false);
+	}
 	
-	$nodeid = is_null($nodeid)?get_current_nodeid(!$def_options['only_current_node']):$nodeid;
+	//$nodeid = is_null($nodeid)?get_current_nodeid($opt):$nodeid; 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,$nodeid,AVAILABLE_NOCACHE);
 
 // nodes

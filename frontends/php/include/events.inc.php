@@ -437,7 +437,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 	$table = new CTableInfo(S_NO_EVENTS_FOUND); 
 	$table->SetHeader(array(
 			S_TIME,
-			is_show_subnodes() ? S_NODE : null,
+			is_show_all_nodes() ? S_NODE : null,
 			$hostid == 0 ? S_HOST : null,
 			S_DESCRIPTION,
 			S_VALUE,

@@ -356,7 +356,7 @@ include_once 'include/page_header.php';
 	
 		$table  = new CTableInfo();
 		$table->setHeader(array(
-			is_show_subnodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
+			is_show_all_nodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
 			$_REQUEST['hostid'] ==0 ? make_sorting_link(S_HOST,'h.host') : NULL,
 			array($link, SPACE, new CCheckBox('all_httptests',null, "CheckAll('".$form->getName()."','all_httptests');"),  make_sorting_link(S_NAME,'wt.name')),
 			S_NUMBER_OF_STEPS,
@@ -448,7 +448,7 @@ include_once 'include/page_header.php';
 			$step_cout = $step_cout['cnt'];
 	
 			array_push($app_rows, new CRow(array(
-				is_show_subnodes()?SPACE:NULL,
+				is_show_all_nodes()?SPACE:NULL,
 				($_REQUEST['hostid']>0)?NULL:SPACE,
 				array(str_repeat(SPACE,4),$chkBox, $name),
 				$step_cout,

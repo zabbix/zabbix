@@ -23,13 +23,12 @@
 	require_once('include/perm.inc.php');
 
 	global $USER_DETAILS;
-	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
+	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_VIEWED_NODES, $ZBX_AVAILABLE_NODES;
 	global $ZBX_CURMASTERID;
 	global $page;
 
 COpt::profiling_start("page");
 	
-	unset($denyed_page_requested);
 
 	if(!isset($page['type'])) $page['type'] = PAGE_TYPE_HTML;
 	if(!isset($page['file'])) $page['file'] = basename($_SERVER['PHP_SELF']);
@@ -39,11 +38,15 @@ COpt::profiling_start("page");
 	include_once('include/locales/en_gb.inc.php');
 	process_locales();
 	set_zbx_locales();
+	
+	require_once('include/menu.inc.php');	
+	
+	zbx_menu_check_disable_all_nodes();
+
 	/* Init CURRENT NODE ID */
-
 	init_nodes();
-
-	/* set Page header */
+	
+	/* switch($page["type"]) */	
 	switch($page['type']){
 		case PAGE_TYPE_IMAGE:
 			set_image_header();
@@ -74,8 +77,8 @@ COpt::profiling_start("page");
 			if(!isset($page['title'])) $page['title'] = 'ZABBIX';
 			
 			if(defined('ZBX_DISTRIBUTED')){
-				if(isset($DB['DB']) && ($curr_node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.get_current_nodeid(false)))))
-					$page['title'] .= ' ('.$curr_node_data['name'].')';
+				if(!empty($ZBX_NODES))
+					$page['title'] .= ' ('.$ZBX_NODES[$ZBX_CURRENT_NODEID]['name'].')';
 			}
 			
 			if((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && $USER_DETAILS['refresh']){
@@ -83,290 +86,12 @@ COpt::profiling_start("page");
 			}
 		break; 
 	} 
-
-	/* switch($page["type"]) */
-
-	/* NOTE - menu array format:
-		first level:
-			'label' 		= main menu title.
-			'default_page_id	= default page url from 'pages' then opened menu.
-			'pages'			= collection of pages whitch displayed from this menu
-						this pages are saved a last visited submenu of main menu.
-
-		second level (pages):
-			'url'	= 	real url for this page
-			'label'	= 	submenu title, if missed menu skipped, but remmembed as last visited page.
-			'sub_pages'	= collection of pages for displaying but dont remember as last visited.
-	*/
 	
-	$ZBX_MENU = array(
-		'view'=>array(
-				'label'			=> S_MONITORING,
-				'user_type'		=> USER_TYPE_ZABBIX_USER,
-				'node_perm'		=> PERM_READ_LIST,
-				'default_page_id'	=> 0,
-				'pages'=>array(
-					array(
-							'url'=>'dashboard.php',
-							'label'=>S_DASHBOARD,
-						),
-					array(
-							'url'=>'overview.php',
-							'label'=>S_OVERVIEW	
-						),
-					array(
-							'url'=>'httpmon.php',
-							'label'=>S_WEB,
-							'sub_pages'=>array('httpdetails.php')
-						),
-					array(
-							'url'=>'latest.php',
-							'label'=>S_LATEST_DATA,
-							'sub_pages'=>array('history.php','chart.php')
-						),
-					array(
-							'url'=>'tr_status.php',
-							'label'=>S_TRIGGERS,
-							'sub_pages'=>array('acknow.php','tr_comments.php','chart4.php','scripts_exec.php')
-						),
-					array(
-							'url'=>'events.php',
-							'label'=>S_EVENTS,
-							'sub_pages'=>array('tr_events.php')
-						),
-					array(
-							'url'=>'charts.php',
-							'label'=>S_GRAPHS,
-							'sub_pages'=>array('chart2.php','chart3.php','chart6.php','chart7.php')
-						),
-					array(
-							'url'=>'screens.php',
-							'label'=>S_SCREENS,
-							'sub_pages'=>array('slides.php')
-						),
-					array(
-							'url'=>'maps.php',
-							'label'=>S_MAPS,
-							'sub_pages'=>array('map.php')
-						),
-					array(
-							'url'=>'discovery.php',
-							'label'=>S_DISCOVERY, 
-							'user_type'=>USER_TYPE_ZABBIX_ADMIN),
-					array(
-							'url'=>'srv_status.php',
-							'label'=>S_IT_SERVICES,
-							'forse_disable_subnodes' => true,
-							'sub_pages'=>array('report3.php','report7.php','chart_sla.php','chart5.php')
-						),
-					array('url'=>'vtext.php'),
-					array('url'=>'chart3.php')
-					)
-				),
-		'cm'=>array(
-				'label'			=> S_INVENTORY,
-				'user_type'		=> USER_TYPE_ZABBIX_USER,
-				'node_perm'		=> PERM_READ_LIST,
-				'default_page_id'	=> 0,
-				'pages'=>array(
-					array('url'=>'hostprofiles.php'	,'label'=>S_HOSTS	)
-					)
-				),
-		'reports'=>array(
-				'label'			=> S_REPORTS,
-				'user_type'		=> USER_TYPE_ZABBIX_USER,
-				'node_perm'		=> PERM_READ_LIST,
-				'default_page_id'	=> 0,
-				'pages'=>array(
-					array('url'=>'report1.php',	'label'=>S_STATUS_OF_ZABBIX	),
-					array('url'=>'report2.php',	'label'=>S_AVAILABILITY_REPORT	),
-					array('url'=>'report5.php',	'label'=>S_TRIGGERS_TOP_100	),
-					array(
-							'url'=>'report6.php',	
-							'label'=>S_BAR_REPORTS,
-							'sub_pages'=>array('popup_period.php','popup_bitem.php','chart_bar.php')
-						),
-					array('url'=>'popup.php')
-					),
-				),
-		'config'=>array(
-				'label'			=> S_CONFIGURATION,
-				'user_type'		=> USER_TYPE_ZABBIX_ADMIN,
-				'node_perm'		=> PERM_READ_LIST,
-				'default_page_id'	=> 0,
-				'forse_disable_subnodes'=> true,
-				'pages'=>array(
-					array(
-							'url'=>'config.php',
-							'label'=>S_GENERAL,
-							'sub_pages'=>array('image.php')
-						),
-					array(
-							'url'=>'httpconf.php',
-							'label'=>S_WEB,
-							'sub_pages'=>array('popup_httpstep.php')
-						),
-					array(
-							'url'=>'hosts.php',
-							'label'=>S_HOSTS
-						),
-					array(
-							'url'=>'items.php',
-							'label'=>S_ITEMS,
-							'sub_pages'=>array('tr_logform.php')		
-						),
-					array(
-							'url'=>'triggers.php',
-							'label'=>S_TRIGGERS,
-							'sub_pages'=>array('popup_trexpr.php')
-						),
-					array('url'=>'actionconf.php'	,'label'=>S_ACTIONS),
-					array('url'=>'graphs.php',
-							'label'=>S_GRAPHS,
-							'sub_pages'=>array('popup_gitem.php')
-						),
-					array('url'=>'screenconf.php',
-							'label'=>S_SCREENS,
-							'sub_pages'=>array('screenedit.php')
-						),
-					array('url'=>'sysmaps.php',
-							'label'=>S_MAPS,
-							'sub_pages'=>array('sysmap.php','popup_link_tr.php')
-						),
-					array('url'=>'services.php',
-							'label'=>S_IT_SERVICES,
-							'sub_pages'=>array('services_form.php')	
-						),
-					array('url'=>'discoveryconf.php','label'=>S_DISCOVERY),
-					array('url'=>'exp_imp.php'	,'label'=>S_EXPORT_IMPORT)
-					)
-				),
-		'admin'=>array(
-				'label'			=> S_ADMINISTRATION,
-				'user_type'		=> USER_TYPE_SUPER_ADMIN,
-				'node_perm'		=> PERM_READ_WRITE,
-				'default_page_id'	=> 1,
-				'forse_disable_subnodes'=> true,
-				'pages'=>array(
-					ZBX_DISTRIBUTED?array('url'=>'nodes.php','label'=>S_NODES):null,
-					array('url'=>'authentication.php'	,'label'=>S_AUTHENTICATION),
-					array('url'=>'users.php',
-						'label'=>S_USERS,
-						'sub_pages'=>array('popup_media.php','popup_usrgrp.php','popup_right.php','popup_users.php')
-						),
-					array('url'=>'media_types.php'	,'label'=>S_MEDIA_TYPES),
-					array('url'=>'scripts.php'	,'label'=>S_SCRIPTS),
-					array('url'=>'audit.php'	,'label'=>S_AUDIT),
-					array('url'=>'queue.php'	,'label'=>S_QUEUE),
-					array('url'=>'report4.php'	,'label'=>S_NOTIFICATIONS),
-					array('url'=>'locales.php'	,'label'=>S_LOCALES	),
-					array('url'=>'instal.php'	,'label'=>S_INSTALLATION,
-						'sub_pages'=>array('setup.php','warning.php'))
-					)
-				),
-		'login'=>array(
-				'label'			=> S_LOGIN,
-				'user_type'		=> 	0,
-				'default_page_id'	=> 0,
-				'forse_disable_subnodes'=> true,
-				'pages'=>array(
-					array('url'=>'index.php','sub_pages'=>array('profile.php'))
-					)
-				)
-		);
-//SDI($USER_DETAILS);
-	$deny = !defined('ZBX_PAGE_NO_AUTHERIZATION');
+	// construc menu
 	$main_menu	= array();
 	$sub_menus	= array();
-	foreach($ZBX_MENU as $label => $menu){
-// Check to show menu or not
-		$show_menu = true;
-
-		if(isset($menu['user_type'])){
-			$show_menu &= ($menu['user_type'] <= $USER_DETAILS['type']);
-		}
-
-		if(isset($menu['node_perm']) && isset($DB['DB']) && !is_null($DB['DB'])){
-			$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,$menu['node_perm']);
-			$show_menu &= (0 < count($available_nodes));
-		}
-
-		if($label == 'login'){
-			$show_menu = false;
-		}
-
-//---
-		$menu_class = 'horizontal_menu_n';	
-		$page_exists = false;
-		$sub_menus[$label] = array();
-		foreach($menu['pages'] as $id => $sub_page){
-			$show_sub_menu = true;
-// show check
-			if(!isset($sub_page['label'])) $show_sub_menu = false;
-			if(isset($sub_page['user_type']) && ($USER_DETAILS['type'] < $sub_page['user_type'])){
-				$show_sub_menu = false;
-			}
-			if(isset($sub_pages['node_perm']) && isset($DB['DB']) && !is_null($DB['DB'])){
-				$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,$sub_page['node_perm']);				
-				if(0 == count($available_nodes)){
-					$show_sub_menu = false;
-				}
-			}
-//----------
-			$row = array('menu_text' => isset($sub_page['label'])?$sub_page['label']:'', 
-							'menu_url'=> $sub_page['url'],
-							'class'=> 'highlight',
-							'selected'=> false);
-
-			$sub_menu_active = ($page['file'] == $sub_page['url']);
-			$sub_menu_active |=  (isset($sub_page['sub_pages']) && str_in_array($page['file'], $sub_page['sub_pages']));
-			if($sub_menu_active){
-// PERMISSION CHECK
-				$deny &= ($USER_DETAILS['type'] < $menu['user_type']);
-// END OF PERMISSION CHECK 
-				$menu_class = 'active';
-				$page_exists = true;
-				$page['menu'] = $label;
-				$row['selected'] = true;
-				
-				if(!defined('ZBX_PAGE_NO_MENU'))
-					update_profile('web.menu.'.$label.'.last', $sub_page['url'], PROFILE_TYPE_STR);
-			}
-			
-			if($show_sub_menu) $sub_menus[$label][] = $row;
-		}
-		
-		if($page_exists && !defined('ZBX_DISABLE_SUBNODES') && 
-			(isset($menu['forse_disable_subnodes']) || isset($sub_page['forse_disable_subnodes'])))
-		{
-			define('ZBX_DISABLE_SUBNODES', 1);
-		}
-//SDI($label.' : '.$show_menu.' : '.$deny);
-		if($page_exists && $deny){
-			$denyed_page_requested = true;
-		}
-
-		if(!$show_menu){
-			unset($sub_menus[$label]);
-			continue;
-		}
-		
-		$menu_url = get_profile('web.menu.'.$label.'.last',false);			
-//		if(ZBX_DISABLE_MENU_CACHE == 1) $menu_url = $menu['pages'][$sub_menus['default_page_id']]['url'];
-
-		$mmenu_entry = new CCol($menu['label'], $menu_class);
-		$mmenu_entry->addOption('id', $label);
-		$mmenu_entry->addAction('onclick', "javascript: location.href = '$menu_url';");
-		$mmenu_entry->addAction('onmouseover', 'javascript: MMenu.mouseOver("'.$label.'");');
-		$mmenu_entry->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
-		
-		array_push($main_menu, $mmenu_entry);
-	}
-
-	if(!isset($page_exists) && ($page['type']!=PAGE_TYPE_XML)){
-		$denyed_page_requested = true;
-	}
-
+	$denyed_page_requested = zbx_construct_menu($main_menu, $sub_menus);
+	
 	zbx_flush_post_cookies(isset($denyed_page_requested));
 
 	if($page['type'] == PAGE_TYPE_HTML){
@@ -485,32 +210,74 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$menu_table->addRow($main_menu);
 		
 		$node_form = null;
-		if(ZBX_DISTRIBUTED){
-			$lst_nodes = new CComboBox('switch_node', get_current_nodeid(false), 'submit()');
-			$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
-
-			$db_nodes = DBselect('SELECT * '.
-						' FROM nodes '.
-						' WHERE '.DBcondition('nodeid',$available_nodes).
-						' ORDER BY name ');
-			while($node_data = DBfetch($db_nodes)){
-				$lst_nodes->addItem($node_data['nodeid'],$node_data['name']);
-			}
-
-			if($lst_nodes->ItemsCount() > 0){
+		if(ZBX_DISTRIBUTED) {
+			insert_js_function('check_all');
+			
+			$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
+			$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); //remove parent nodes
+			
+			if(!empty($available_nodes)) {
+				
 				$node_form = new CForm();
-				$node_form->addItem(array(new CSpan(S_CURRENT_NODE,'textcolorstyles'),$lst_nodes));
-				unset($lst_nodes);
-
-				if(!defined('ZBX_DISABLE_SUBNODES')){
-					global $ZBX_WITH_SUBNODES;
-
-					$cmd_show_subnodes = new CComboBox('show_subnodes', !empty($ZBX_WITH_SUBNODES) ? 1 : 0, 'submit()');
-					$cmd_show_subnodes->addItem(0, S_CURRENT_NODE_ONLY);
-					$cmd_show_subnodes->addItem(1, S_WITH_SUBNODES);
-
-					$node_form->addItem(array(SPACE, new CSpan(S_SHOW,'textcolorstyles'), $cmd_show_subnodes));
+				$node_form->addOption('id', 'node_form');
+				
+// +++ create Combo Box with selected nodes +++
+				$combo_node_list = null;
+				if(count($ZBX_VIEWED_NODES['nodes']) > 1) {
+					$combo_node_list = new CComboBox('switch_node', $ZBX_VIEWED_NODES['selected'], 'submit()');
+					
+					foreach($ZBX_VIEWED_NODES['nodes'] as $nodeid => $nodedata) {
+						$combo_node_list->addItem($nodeid, $nodedata['name']);
+					}
 				}
+// --- ---
+				$jscript = 'javascript : '. 
+					"var pos = getPosition('button_show_tree');".
+					"ShowHide('div_node_tree','block');".
+					'pos.top += 20;'.
+					"\$('div_node_tree').setStyle({top: pos.top+'px'});";
+				$button_show_tree = new CButton('show_node_tree', S_SELECT_NODES, $jscript); //sdelatj konstatntu!
+				$button_show_tree->setType('button');
+				$button_show_tree->addOption('id', 'button_show_tree');				
+					
+// +++ Create node tree +++
+				$combo_check_all = new CCheckbox('check_all_nodes', null, "javascript : check_all('node_form', this.checked);");
+				
+				$node_tree = array();
+				$node_tree[0] = array('id' => 0, 'caption' => S_ALL_S, 'combo_select_node' => $combo_check_all, 'parentid' => 0); //root
+				
+				foreach($available_nodes as $num => $node) {
+					$checked = uint_in_array($node['nodeid'], $ZBX_VIEWED_NODES['nodeids']);
+					$combo_select_node = new CCheckbox('selected_nodes['.$node['nodeid'].']', $checked, null, $node['nodeid']);
+					
+					// If not exist parent for node, link it to root (0)
+					if(!isset($available_nodes[$node['masterid']])) $node['masterid'] = 0; 
+					
+					$node_tree[$node['nodeid']] = array(
+					'id' => $node['nodeid'], 
+					'caption' => $node['name'], 
+					'combo_select_node' => $combo_select_node,
+					'parentid' => $node['masterid']);
+				}
+				
+				$node_tree_captions = array('caption' => bold(S_NODE), 'combo_select_node' => SPACE); 
+				
+				$node_tree = new CTree('nodes', $node_tree, $node_tree_captions);
+// --- ---
+				
+				$div_node_tree = new CDiv();
+				$div_node_tree->additem($node_tree->getHTML());
+				
+				$div_node_tree->additem(new CButton('select_nodes', S_SELECT, "javascript: \$('div_node_tree').setStyle({display:'none'});"));
+				
+				$div_node_tree->addOption('id', 'div_node_tree');
+				$div_node_tree->addStyle('display: none');
+				
+				
+				$node_form->addItem(array(new CSpan(S_CURRENT_NODE,'textcolorstyles'), $combo_node_list));
+				$node_form->addItem($button_show_tree);
+				$node_form->addItem($div_node_tree);
+				unset($combo_node_list);	
 			}
 		}
 
@@ -604,7 +371,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 	unset($db_nodes, $node_data);
 	unset($sub_menu_table, $sub_menu_rows);
 
-	if(isset($denyed_page_requested)){
+	if($denyed_page_requested){
 		access_deny();
 	}
 

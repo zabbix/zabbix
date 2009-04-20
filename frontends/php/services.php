@@ -124,7 +124,7 @@ if(isset($_REQUEST['msg']) && !empty($_REQUEST['msg'])){
 
 //show_table_header(S_IT_SERVICES_BIG);
 
-$tree = new CTree($treeServ,array('caption' => bold(S_SERVICE),'algorithm' => bold(S_STATUS_CALCULATION), 'description' => bold(S_TRIGGER)));
+$tree = new CTree('service_conf_tree', $treeServ,array('caption' => bold(S_SERVICE),'algorithm' => bold(S_STATUS_CALCULATION), 'description' => bold(S_TRIGGER)));
 if($tree){
 	
 	$tab = create_hat(

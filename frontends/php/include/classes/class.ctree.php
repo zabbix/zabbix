@@ -30,13 +30,13 @@ class CTree{
  private $maxlevel;
 
 /*public*/
-	public function __construct($value=array(),$fields=array()){
+	public function __construct($treename, $value=array(),$fields=array()){
 	
 		$this->maxlevel=0;
 
 		$this->tree = $value;
 		$this->fields = $fields;
-		$this->treename = $this->fields['caption'];
+		$this->treename = $treename;
 		
 		$this->size = count($value);
 		unset($value);
@@ -153,7 +153,7 @@ class CTree{
 
 					if($this->tree[$id]['nodetype'] == 2){	
 						$img= new CImg('images/general/tree/plus.gif','y','22','14');
-						$img->addOption('onclick','javascript: tree.closeSNodeX('.$id.',this);');
+						$img->addOption('onclick','javascript: '.$this->treename.'.closeSNodeX('.$id.',this);');
 						$img->addOption('id','idi_'.$id);
 						$img->setClass('imgnode');
 					} 
@@ -169,7 +169,7 @@ class CTree{
 						$td->addOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 						$img= new CImg('images/general/tree/plus.gif','t','22','14');
 						
-						$img->addOption('onclick','javascript: tree.closeSNodeX('.$id.',this);');
+						$img->addOption('onclick','javascript: '.$this->treename.'.closeSNodeX('.$id.',this);');
 						$img->addOption('id','idi_'.$id);
 						$img->setClass('imgnode');					
 					} 
@@ -210,13 +210,9 @@ class CTree{
 	
 	
 	public function createJS(){
-		global $page;
 		
-		$js = '<script src="js/tree.js" type="text/javascript"></script>	
-				<script type="text/javascript"> 
-					var treenode = new Array(0);
-					var tree_name = "tree_'.$this->getUserAlias().'_'.$page["file"].'";
-				';
+		$js = '<script src="js/tree.js" type="text/javascript"></script>'."\n".	
+				'<script type="text/javascript">  var '.$this->treename.'_tree = new Array(0);';
 				
 		foreach($this->tree as $id => $rows){
 			$parentid = $rows['parentid'];
@@ -225,10 +221,15 @@ class CTree{
 		
 		foreach($this->tree as $id => $rows){
 			if($rows['nodetype'] == '2'){
-				$js .= 'treenode['.$id.'] = { status: \'close\',  nodelist : \''.$rows['nodelist'].'\', parentid : \''.$rows['parentid'].'\'};';
+				$js .= $this->treename.'_tree['.$id.'] = { status: \'close\',  nodelist : \''.$rows['nodelist'].'\', parentid : \''.$rows['parentid'].'\'};';
+				$js .= "\n";
 			}
 		}
-		$js.='window.onload = function(){tree.init()}; </script>';
+		
+		$js.= 'var '.$this->treename.' = null';
+		$js.= '</script>'."\n";
+		
+		zbx_add_post_js($this->treename.' = new CTree("tree_'.$this->getUserAlias().'_'.$this->treename.'", '.$this->treename.'_tree);');
 		
 	return new CScript($js);
 	}
