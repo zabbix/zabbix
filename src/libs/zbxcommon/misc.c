@@ -239,8 +239,6 @@ static time_t	get_next_flexible_interval(char *delay_flex, time_t now)
 	if (NULL == delay_flex || '\0' == *delay_flex)
 		return FAIL;
 
-	next = 0;
-
 	tm = localtime(&now);
 	day = 0 == tm->tm_wday ? 7 : tm->tm_wday;
 	sec = 3600 * tm->tm_hour + 60 * tm->tm_min + tm->tm_sec;
@@ -292,7 +290,7 @@ static time_t	get_next_flexible_interval(char *delay_flex, time_t now)
 	if (NULL != c)
 		*c = ';';
 
-	return next ? next : now;
+	return next ? next : FAIL;
 }
 /******************************************************************************
  *                                                                            *
@@ -336,9 +334,8 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
 	}
 
 	get_flexible_interval(delay_flex, &flex_delay, now);
-	next = get_next_flexible_interval(delay_flex, now);
 
-	if (now + flex_delay > next)
+	if (FAIL != (next = get_next_flexible_interval(delay_flex, now)) && now + flex_delay > next)
 	{
 		get_flexible_interval(delay_flex, &flex_delay2, next + 1);
 
