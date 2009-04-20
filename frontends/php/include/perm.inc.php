@@ -509,7 +509,7 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 	foreach($node_data as $nodeid => $node){
 		switch($perm_res){
 			case PERM_RES_DATA_ARRAY:
-				$db_node = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$nodeid));
+				$db_node = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$nodeid.' ORDER BY name'));
 				
 				if(!ZBX_DISTRIBUTED){
 					if(!$node){

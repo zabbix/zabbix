@@ -58,7 +58,7 @@ include_once('include/page_header.php');
 <?php
 	$table = new CTableInfo();
 	$table->setHeader(array(
-			is_show_subnodes() ? S_NODE : null,
+			is_show_all_nodes() ? S_NODE : null,
 			S_HOST,
 			S_TRIGGER,
 			S_SEVERITY,

@@ -202,7 +202,7 @@ include_once "include/page_header.php";
 
 		$table->SetHeader(array(
 				S_NEXT_CHECK,
-				is_show_subnodes() ? S_NODE : null,
+				is_show_all_nodes() ? S_NODE : null,
 				S_HOST,
 				S_DESCRIPTION
 				));

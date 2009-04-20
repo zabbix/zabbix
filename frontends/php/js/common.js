@@ -293,6 +293,7 @@ return targ;
 }
 
 function getPosition(obj){
+	obj = $(obj);
 	var pos = {top: 0, left: 0};
 	if(!is_null(obj) && (typeof(obj.offsetParent) != 'undefined')){
 		pos.left = obj.offsetLeft;
