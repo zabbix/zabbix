@@ -202,6 +202,7 @@
 	'S_CURRENT_NODE'=>			'Current node',
 	'S_CURRENT_NODE_ONLY'=>			'Current node only',
 	'S_WITH_SUBNODES'=>			'With subnodes',
+	'S_SELECT_NODES'=>			'Select Nodes',
 
 //	acknow.php
 	'S_NO_EVENTS_TO_ACKNOWLEDGE'=>	'No events to acknowledge',

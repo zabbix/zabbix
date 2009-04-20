@@ -100,7 +100,7 @@ include_once 'include/page_header.php';
 	if(0 == $config) array_push($options,'monitored_hosts');
 	else array_push($options,'templated_hosts');
 
-	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');	
+	if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');	
 	foreach($options as $option) $params[$option] = 1;
 	
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
@@ -274,7 +274,7 @@ include_once 'include/page_header.php';
 		
 		$table = new CTableInfo();
 		$table->setHeader(
-				array(is_show_subnodes()?S_NODE : null,
+				array(is_show_all_nodes()?S_NODE : null,
 				(($_REQUEST['hostid'] == 0) || (1 == $config))?S_HOST:NULL, 
 				S_NAME,
 				S_TRUE,

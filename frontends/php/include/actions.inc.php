@@ -899,7 +899,7 @@ function get_history_of_actions($start,$num,$sql_cond=''){
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(
-			is_show_subnodes() ? make_sorting_link(S_NODES,'a.alertid') : null,
+			is_show_all_nodes() ? make_sorting_link(S_NODES,'a.alertid') : null,
 			make_sorting_link(S_TIME,'a.clock'),
 			make_sorting_link(S_TYPE,'mt.description'),
 			make_sorting_link(S_STATUS,'a.status'),
@@ -981,7 +981,7 @@ function get_action_msgs_for_event($eventid){
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(
-			is_show_subnodes() ? make_sorting_link(S_NODES,'a.alertid') : null,
+			is_show_all_nodes() ? make_sorting_link(S_NODES,'a.alertid') : null,
 			make_sorting_link(S_TIME,'a.clock'),
 			make_sorting_link(S_TYPE,'mt.description'),
 			make_sorting_link(S_STATUS,'a.status'),
@@ -1067,7 +1067,7 @@ function get_action_cmds_for_event($eventid){
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(
-			is_show_subnodes()?S_NODES:null,
+			is_show_all_nodes()?S_NODES:null,
 			S_TIME,
 			S_STATUS,
 			S_COMMAND,
@@ -1141,7 +1141,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 	$tab_hint = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$tab_hint->addOption('style', 'width: 300px;');
 	$tab_hint->SetHeader(array(
-			is_show_subnodes() ? S_NODES : null,
+			is_show_all_nodes() ? S_NODES : null,
 			S_USER,
 			S_DETAILS,
 			S_STATUS

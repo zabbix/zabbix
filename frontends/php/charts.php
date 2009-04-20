@@ -147,7 +147,7 @@ include_once 'include/page_header.php';
 	$h1 = array();
 	
 	$options = array('allow_all_hosts','monitored_hosts','with_graphs');
-	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
+	if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
 		
 	$params = array();
 	foreach($options as $option) $params[$option] = 1;

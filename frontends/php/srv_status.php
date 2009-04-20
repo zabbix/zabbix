@@ -123,6 +123,8 @@ include_once "include/page_header.php";
 		while($row = DBFetch($result)){
 			$row['id'] = $row['serviceid'];
 		
+			$row['caption'] = array(get_node_name_by_elid($row['serviceid']), $row['caption']);
+			
 			(empty($row['serviceupid']))?($row['serviceupid']='0'):('');
 			(empty($row['description']))?($row['description']='None'):('');
 			$row['graph'] = new CLink(S_SHOW,"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1".url_param('path'),"action");
@@ -130,7 +132,7 @@ include_once "include/page_header.php";
 			if(isset($row["triggerid"]) && !empty($row["triggerid"])){
 
 				$url = new CLink(expand_trigger_description($row['triggerid']),'events.php?triggerid='.$row['triggerid']);
-				$row['caption'] = array($row['caption'].' [',$url,']');
+				$row['caption'] = array($row['caption'],' [',$url,']');
 
 			}
 			
@@ -204,7 +206,7 @@ include_once "include/page_header.php";
 		//permission issue
 		$treeServ = del_empty_nodes($treeServ);
 
-		$tree = new CTree($treeServ,array('caption' => bold(S_SERVICE),
+		$tree = new CTree('service_status_tree', $treeServ,array('caption' => bold(S_SERVICE),
 						'status' => bold(S_STATUS), 
 						'reason' => bold(S_REASON),
 						'sla' => bold(S_SLA_LAST_7_DAYS),

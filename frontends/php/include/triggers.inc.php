@@ -2503,7 +2503,7 @@
 	function make_trigger_details($triggerid,&$trigger_data){
 		$table = new CTableInfo();
 		
-		if(is_show_subnodes()){
+		if(is_show_all_nodes()){
 			$table->addRow(array(S_NODE, get_node_name_by_elid($triggerid)));
 		}
 	

@@ -40,7 +40,7 @@ $page['file']	= 'index.php';
 ?>
 <?php
 	$sessionid = get_cookie('zbx_sessionid', null);
-	
+
 	if(isset($_REQUEST['reconnect']) && isset($sessionid)){
 		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,'Manual Logout');
 		
@@ -53,6 +53,7 @@ $page['file']	= 'index.php';
 	}
 
 	$config = select_config();
+
 	$authentication_type = $config['authentication_type'];
 
 	if($authentication_type == ZBX_AUTH_HTTP){

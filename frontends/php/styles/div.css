@@ -269,3 +269,12 @@ span.info{
 	font-weight: bold;
 	color:#DDDDDD;
 }
+
+/*********** Node Tree ****************/
+
+div #div_node_tree {	
+	background-color: gray;	
+	position: absolute;	
+	border: 2px solid black;
+	right: 0px;
+}

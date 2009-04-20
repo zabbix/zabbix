@@ -206,7 +206,7 @@ include_once 'include/page_header.php';
 
 	$params = array();
 	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
-	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');	
+	if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');	
 	foreach($options as $option) $params[$option] = 1;
 	
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
@@ -399,7 +399,7 @@ include_once 'include/page_header.php';
 		make_sorting_link(S_SEVERITY,'t.priority'),
 		S_STATUS,
 		make_sorting_link(S_LAST_CHANGE,'t.lastchange'),
-		is_show_subnodes()?make_sorting_link(S_NODE,'h.hostid'):null,
+		is_show_all_nodes()?make_sorting_link(S_NODE,'h.hostid'):null,
 		($_REQUEST['hostid']>0)?null:make_sorting_link(S_HOST,'h.host'),
 		make_sorting_link(S_NAME,'t.description'),
 		$_REQUEST['show_actions']?S_ACTIONS:NULL,

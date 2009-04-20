@@ -68,7 +68,7 @@ include_once 'include/page_header.php';
 	update_profile('web.latest.filter.select', $_REQUEST['select'], PROFILE_TYPE_STR);
 
 	$options = array('allow_all_hosts','monitored_hosts','with_historical_items');
-	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
+	//if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
 	
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 	$params = array();
@@ -200,7 +200,7 @@ include_once 'include/page_header.php';
 	
 	$table=new CTableInfo();
 	$table->SetHeader(array(
-		is_show_subnodes()?make_sorting_link(S_NODE,'h.hostid') : null,
+		is_show_all_nodes()?make_sorting_link(S_NODE,'h.hostid') : null,
 		($_REQUEST['hostid'] ==0)?make_sorting_link(S_HOST,'h.host') : NULL,
 		array($link,SPACE,make_sorting_link(S_DESCRIPTION,'i.description')),
 		make_sorting_link(S_LAST_CHECK,'i.lastclock'),
@@ -285,7 +285,7 @@ include_once 'include/page_header.php';
 		$item_status = $db_item['status']==3?'unknown': null;
 		
 		array_push($app_rows, new CRow(array(
-			is_show_subnodes()?SPACE:null,
+			is_show_all_nodes()?SPACE:null,
 			($_REQUEST['hostid']>0)?NULL:SPACE,
 			new CCol(str_repeat(SPACE,6).$description, $item_status),
 			new CCol($lastclock, $item_status),
@@ -415,7 +415,7 @@ include_once 'include/page_header.php';
 		}
 		
 		array_push($app_rows, new CRow(array(
-			is_show_subnodes()?($db_host['item_cnt']?SPACE:get_node_name_by_elid($db_item['itemid'])):null,
+			is_show_all_nodes()?($db_host['item_cnt']?SPACE:get_node_name_by_elid($db_item['itemid'])):null,
 			$_REQUEST['hostid']?NULL:($db_host['item_cnt']?SPACE:$db_item['host']),
 			str_repeat(SPACE, 6).$description,
 			$lastclock,

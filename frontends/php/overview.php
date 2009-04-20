@@ -73,7 +73,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	
 	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
 	if($_REQUEST['type'] == SHOW_TRIGGERS) array_push($options,'with_monitored_triggers');
-	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
+	if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
 
 //SDI($_REQUEST['groupid']);
 	$params = array();

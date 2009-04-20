@@ -114,7 +114,7 @@ include_once "include/page_header.php";
 	ksort($services);
 
 	$header = array(
-			is_show_subnodes() ? new CCol(S_NODE, 'center') : null,
+			is_show_all_nodes() ? new CCol(S_NODE, 'center') : null,
 			new CCol(make_sorting_link(S_HOST,'ip'), 'center'),
 			new CCol(array(S_UPTIME.'/',S_DOWNTIME),'center')
 			);

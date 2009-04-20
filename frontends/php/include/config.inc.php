@@ -23,6 +23,7 @@ function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
 function __autoload($class_name) { require_once('include/classes/class.'.strtolower($class_name).'.php'); }
 ?>
 <?php
+
 	require_once('include/defines.inc.php');
 	require_once('include/func.inc.php');
 	require_once('include/html.inc.php');
@@ -178,39 +179,27 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 
 	function init_nodes(){
 		/* Init CURRENT NODE ID */
-		global	$USER_DETAILS,
-			$ZBX_LOCALNODEID, $ZBX_LOCMASTERID,
-			$ZBX_CURRENT_NODEID, $ZBX_CURRENT_SUBNODES, $ZBX_CURMASTERID,
-			$ZBX_NODES,$ZBX_NODES_IDS,
-			$ZBX_WITH_SUBNODES;
+		if(defined('ZBX_NODES_INITIALIZED')) return;
+		
+		global $USER_DETAILS;
+		global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID,
+			$ZBX_CURRENT_NODEID, $ZBX_CURMASTERID,  
+			$ZBX_NODES, $ZBX_NODES_IDS,
+			$ZBX_AVAILABLE_NODES, $ZBX_VIEWED_NODES,
+			$ZBX_WITH_ALL_NODES;
 
-		$ZBX_CURRENT_SUBNODES = array();
+		$ZBX_AVAILABLE_NODES = array();
 		$ZBX_NODES_IDS = array();
 		$ZBX_NODES = array();
+		
+		$ZBX_WITH_ALL_NODES = !defined('ZBX_NOT_ALLOW_ALL_NODES');
+		
+		if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED) {
 
-		if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED){
-			$ZBX_CURRENT_NODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node
-			$ZBX_WITH_SUBNODES = get_cookie('zbx_with_subnodes', false); // Show elements FROM subnodes
-
-			if(isset($_REQUEST['switch_node'])){
-				if($node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$_REQUEST['switch_node']))){
-					$ZBX_CURRENT_NODEID = $_REQUEST['switch_node'];
-				}
-				unset($node_data);
-			}
-
-			if(isset($_REQUEST['show_subnodes'])){
-				$ZBX_WITH_SUBNODES = !empty($_REQUEST['show_subnodes']);
-			}
-
-			if($node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.$ZBX_CURRENT_NODEID))){
-				$ZBX_CURMASTERID = $node_data['masterid'];
-			}
-
-			if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
+			if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN) {
 				$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid FROM nodes n ';
 			}
-			else{ 
+			else { 
 				$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid '.
 					' FROM nodes n, groups hg,rights r, users_groups g '.
 					' WHERE r.id=hg.groupid '.
@@ -218,95 +207,165 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 					 	' AND g.userid='.$USER_DETAILS['userid'].
 					 	' AND n.nodeid='.DBid2nodeid('hg.groupid');
 			}
-
 			$db_nodes = DBselect($sql);
-			while($node = DBfetch($db_nodes)){
+			while($node = DBfetch($db_nodes)) {
 				$ZBX_NODES[$node['nodeid']] = $node;
+				$ZBX_NODES_IDS[$node['nodeid']] = $node['nodeid'];
 			}
-
-// REMOVING PARENT NODES 
-			$ZBX_NODES = get_tree_by_parentid($ZBX_LOCALNODEID,$ZBX_NODES,'masterid');
-
-			foreach($ZBX_NODES as $nodeid => $NODE){
-				$ZBX_NODES_IDS[$nodeid] = $nodeid;
+			
+			$ZBX_AVAILABLE_NODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_IDS_ARRAY, $ZBX_NODES_IDS);
+			
+			$ZBX_VIEWED_NODES = get_viewed_nodes();
+			$ZBX_CURRENT_NODEID = $ZBX_VIEWED_NODES['selected'];
+			
+			if(empty($ZBX_CURRENT_NODEID)) 
+				$ZBX_CURRENT_NODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node		
+			
+			if($node_data = DBfetch(DBselect('SELECT masterid FROM nodes WHERE nodeid='.$ZBX_CURRENT_NODEID))){
+				$ZBX_CURMASTERID = $node_data['masterid'];
 			}
-//------
-
-			if( !isset($ZBX_NODES[$ZBX_CURRENT_NODEID])){
+			
+			if( !isset($ZBX_NODES[$ZBX_CURRENT_NODEID])) {
 				$denyed_page_requested = true;
 				$ZBX_CURRENT_NODEID = $ZBX_LOCALNODEID;
 				$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
 			}
-
-			foreach($ZBX_NODES as $nodeid => $node_data ){
-				$curr_node = &$node_data;
-
-				if(($curr_node['masterid']!=0) && (bccomp($curr_node['masterid'],$ZBX_CURRENT_NODEID)!=0)){
-					$curr_node = &$ZBX_NODES[$curr_node['masterid']];
-				}
-
-				if(bccomp($curr_node['masterid'],$ZBX_CURRENT_NODEID)==0){
-					$ZBX_CURRENT_SUBNODES[$nodeid] = $nodeid;
-				}
-			}
-
-			zbx_set_post_cookie('zbx_current_nodeid',$ZBX_CURRENT_NODEID);
-			zbx_set_post_cookie('zbx_with_subnodes',$ZBX_WITH_SUBNODES);
+			
+			if(isset($_REQUEST['select_nodes']))
+				update_profile('web.nodes.selected', $ZBX_VIEWED_NODES['nodeids'], PROFILE_TYPE_ARRAY_ID);
+			if(isset($_REQUEST['switch_node']))
+				update_profile('web.nodes.switch_node', $ZBX_VIEWED_NODES['selected'], PROFILE_TYPE_ID);
 		}
-		else{
+		else {
 			$ZBX_CURRENT_NODEID = $ZBX_LOCALNODEID;
 			$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
-			$ZBX_WITH_SUBNODES = false;
 		}
-
-		$ZBX_CURRENT_SUBNODES[$ZBX_CURRENT_NODEID] = $ZBX_CURRENT_NODEID;
-
-		if((count($ZBX_CURRENT_SUBNODES) < 2) && !defined('ZBX_DISABLE_SUBNODES')){
-			define('ZBX_DISABLE_SUBNODES', 1);
-		}
-		else{
-			$ZBX_CURRENT_SUBNODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_IDS_ARRAY, $ZBX_CURRENT_SUBNODES);
-		}
+		
+		zbx_set_post_cookie('zbx_current_nodeid', $ZBX_CURRENT_NODEID);
+		define('ZBX_NODES_INITIALIZED', 1);
 	}
 
-	function get_current_nodeid($forse_with_subnodes = null, $perm = null){
-		global $USER_DETAILS, $ZBX_CURRENT_NODEID, $ZBX_CURRENT_SUBNODES, $ZBX_WITH_SUBNODES;
-		if(!isset($ZBX_CURRENT_NODEID))
+	function get_current_nodeid($forse_all_nodes = null, $perm = null){
+		global $USER_DETAILS, $ZBX_CURRENT_NODEID, $ZBX_AVAILABLE_NODES, $ZBX_VIEWED_NODES;
+		if(!isset($ZBX_CURRENT_NODEID)) {
 			init_nodes();
-
-		$result = is_show_subnodes($forse_with_subnodes)?$ZBX_CURRENT_SUBNODES:$ZBX_CURRENT_NODEID;
+		}	
+		
 		if(!is_null($perm)){
-			$result = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY, $ZBX_CURRENT_SUBNODES);
+			return get_accessible_nodes_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $ZBX_AVAILABLE_NODES);
 		}
+		elseif(is_null($forse_all_nodes)){
+			if($ZBX_VIEWED_NODES['selected'] == 0) {
+				$result = $ZBX_VIEWED_NODES['nodeids'];
+			}
+			else {
+				$result = $ZBX_VIEWED_NODES['selected'];
+			} 
+			if(empty($result)){
+				$result = $USER_DETAILS['node']['nodeid'];
+			}
+		}
+		elseif($forse_all_nodes) {
+			$result = $ZBX_AVAILABLE_NODES;
+		}
+		else {
+			$result = $ZBX_CURRENT_NODEID;
+		}
+		
+	return $result;
+	}
+	
+	function get_viewed_nodes($options=array()) {
+		global $USER_DETAILS;
+		global $ZBX_LOCALNODEID, $ZBX_AVAILABLE_NODES;
+		
+		$def_options = array(
+			'allow_all' => 0
+		);	
+		$options = array_merge($def_options, $options);
+		
+		$result = array('selected' => 0, 'nodes' => array(), 'nodeids' => array());
+		
+		$dd_first_entry = ZBX_DROPDOWN_FIRST_ENTRY;
+		if($dd_first_entry == ZBX_DROPDOWN_FIRST_ZBX162){
+			$dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
+		}
+		if($options['allow_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
+		
+		if(!defined('ZBX_NOT_ALLOW_ALL_NODES')){
+			if($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)
+				$result['nodes'][0] = array('nodeid' => 0, 'name' => S_NONE);
+			else // ALL
+				$result['nodes'][0] = array('nodeid' => 0, 'name' => S_ALL_S);
+		}
+		
+		$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
+		$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); //remove parent nodes
+		
+		$selected_nodeids = get_request('selected_nodes', get_profile('web.nodes.selected', array($USER_DETAILS['node']['nodeid'])));
+		
+// nodes +++	
+		$nodes = array();
+		$nodeids = array();
+		foreach($selected_nodeids as $nodeid) {
+			if(isset($available_nodes[$nodeid])) {
+				$result['nodes'][$nodeid] = array(
+					'nodeid' => $available_nodes[$nodeid]['nodeid'], 
+					'name' => $available_nodes[$nodeid]['name'], 
+					'masterid' => $available_nodes[$nodeid]['masterid']);
+				$nodeids[$nodeid] = $nodeid;
+			}
+		}
+// ---
 
+		$switch_node = get_request('switch_node', get_profile('web.nodes.switch_node', -1));
+		if(!isset($available_nodes[$switch_node]) || !uint_in_array($switch_node, $selected_nodeids)) { //check switch_node
+			$switch_node = 0;
+		}
+		if(!defined('ZBX_NOT_ALLOW_ALL_NODES')) {		
+			switch($dd_first_entry) {	
+				case ZBX_DROPDOWN_FIRST_NONE: // NONE
+					if($switch_node == 0) {	
+						$result['nodeids'] = array();
+					}
+				break;
+				case ZBX_DROPDOWN_FIRST_ALL:
+				default: // ALL
+					$result['nodeids'] = $nodeids;
+				break;
+			}
+			$result['selected'] = $switch_node;
+		}
+		else {
+			$result['nodeids'] = $nodeids;
+			$result['selected'] = ($switch_node > 0) ? $switch_node : key(array_slice($nodeids, 0, 1, true));
+		}
 	return $result;
 	}
 
-	function get_node_name_by_elid($id_val, $forse_with_subnodes = null){
-		global $ZBX_NODES;
+	function get_node_name_by_elid($id_val, $forse_with_all_nodes = null){
+		global $ZBX_NODES, $ZBX_VIEWED_NODES;
 
-		if(!is_show_subnodes($forse_with_subnodes))
+	if($forse_with_all_nodes === false || (is_null($forse_with_all_nodes) && ($ZBX_VIEWED_NODES['selected'] != 0))) {
 			return null;
+		} 
 
-		$nodeid = id2nodeid($id_val);
-
+	$nodeid = id2nodeid($id_val);
+//SDI($nodeid.' - '.$ZBX_NODES[$nodeid]['name']);
 		if ( !isset($ZBX_NODES[$nodeid]) )
 			return null;
 
 		return '['.$ZBX_NODES[$nodeid]['name'].'] ';
 	}
 
-	function is_show_subnodes($forse_with_subnodes = null){
-		global	$ZBX_WITH_SUBNODES;
+	function is_show_all_nodes(){
+		global	$ZBX_VIEWED_NODES;
 
-		if(is_null($forse_with_subnodes)){
-			if(defined('ZBX_DISABLE_SUBNODES'))
-				$forse_with_subnodes = false;
-			else
-				$forse_with_subnodes = $ZBX_WITH_SUBNODES;
-		}
-
-	return $forse_with_subnodes;
+		if($ZBX_VIEWED_NODES['selected'] == 0) 
+			return true;
+		else 
+			return false;			
+		
 	}
 
 	function access_deny(){

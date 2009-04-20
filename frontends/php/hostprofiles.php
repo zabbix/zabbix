@@ -44,7 +44,7 @@ include_once "include/page_header.php";
 	
 	$params = array();
 	$options = array('allow_all_hosts','real_hosts');
-	if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');	
+	if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');	
 	foreach($options as $option) $params[$option] = 1;
 
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
@@ -133,7 +133,7 @@ include_once "include/page_header.php";
 		$table = new CTableInfo();
 		if($prof_type){
 			$table->setHeader(array(
-				is_show_subnodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
+				is_show_all_nodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
 				make_sorting_link(S_HOST,'h.host'),
 			   ($_REQUEST['groupid'] > 0)?null:make_sorting_link(S_GROUP,'g.name'),
 				make_sorting_link(S_DEVICE_OS_SHORT,'hpe.device_os_short'),
@@ -170,7 +170,7 @@ include_once "include/page_header.php";
 		}
 		else{
 			$table->setHeader(array(
-				is_show_subnodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
+				is_show_all_nodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
 				make_sorting_link(S_HOST,'h.host'),
 				make_sorting_link(S_NAME,'p.name'),
 				make_sorting_link(S_OS,'p.os'),

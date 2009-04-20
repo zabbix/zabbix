@@ -48,6 +48,7 @@ function get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN,$idx2=n
 			$value_type = profile_field_by_type($type);
 
 			if(profile_type($type,'array')){
+				$result = array();
 				$result[] = $profile[$value_type];
 				while($profile=DBfetch($db_profiles)){
 					$result[] = $profile[$value_type];
@@ -113,7 +114,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 	if(profile_type($type,'unknown')) $type = profile_type_by_value($value);
 	else $value = profile_value_by_type($value,$type);
 	
-//if($idx == 'web.audit.filter.action') SDI('PROF: v='.$value.'  t='.$type);
+//if($idx == 'web.nodes.selected') SDI('PROF: v='.$value.'  t='.$type);
 
 	if($value === false) return false;
 
@@ -121,7 +122,6 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 	if(zbx_numeric($idx2)) 	$sql_cond = ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
 
 	if(profile_type($type,'array')){
-		
 		$sql='DELETE FROM profiles '.
 			' WHERE userid='.$USER_DETAILS["userid"].
 				' AND idx='.zbx_dbstr($idx).
@@ -133,6 +133,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 			insert_profile($idx,$val,$type,$idx2,$source);
 		}
 		$result = DBend();
+		
 	}
 	else{
 		$sql = 'SELECT profileid '.
@@ -337,8 +338,9 @@ return $result;
 
 function select_config(){
 	global $page;
-	
+
 	$row=DBfetch(DBselect('SELECT * FROM config WHERE '.DBin_node('configid', get_current_nodeid(false))));
+
 	if($row){
 		return	$row;
 	}

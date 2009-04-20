@@ -187,7 +187,7 @@ include_once 'include/page_header.php';
 		}
 		
 		$options = array('allow_all_hosts','monitored_hosts','with_items');
-		if(!$ZBX_WITH_SUBNODES)	array_push($options,'only_current_node');
+		if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
 		
 		$params = array();
 		foreach($options as  $option) $params[$option] = 1;
