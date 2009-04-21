@@ -1018,12 +1018,12 @@ include_once('include/page_header.php');
 			validate_group($PAGE_GROUPS, $PAGE_HOSTS, false);
 			break;
 		case 5:
-			$options = array('only_current_node');
+			$options = array('only_current_node', 'allow_all');
 			if(isset($_REQUEST['form']) || isset($_REQUEST['massupdate'])) array_push($options,'do_not_select_if_empty');
 			
 			foreach($options as $option) $params[$option] = 1;
 			$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
-			$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
+			$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, 0, $params);
 	
 			validate_group($PAGE_GROUPS, $PAGE_HOSTS, false);
 			break;
