@@ -1386,24 +1386,113 @@ COpt::profiling_stop('prepare table');
 	function	check_time_period($period, $now)
 	{
 		$tm = localtime($now, TRUE);
-
-		$day = $tm['tm_wday'];
-		if (0 == $day)
-			$day = 7;
-		$min = 60 * $tm['tm_hour'] + $tm['tm_min'];
+		$day = (0 == $tm['tm_wday']) ? 7 : $tm['tm_wday'];
+		$sec = 3600 * $tm['tm_hour'] + 60 * $tm['tm_min'] + $tm['tm_sec'];
 
 		$arr_of_period = explode(';', $period);
 
 		foreach($arr_of_period as $one_period)
 		{
 			list($d1, $d2, $h1, $m1, $h2, $m2) = sscanf($one_period, "%d-%d,%d:%d-%d:%d");
-			if ($day >= $d1 && $day <= $d2 && $min >= 60 * $h1 + $m1 && $min <= 60 * $h2 + $m2)
+			if ($day >= $d1 && $day <= $d2 && $sec >= 3600 * $h1 + 60 * $m1 && $sec <= 3600 * $h2 + 60 * $m2)
 			{
 				return 1;
 			}
 		}
 
 		return 0;
+	}
+
+	/*
+	 *
+	 * Function: get_flexible_interval
+	 *
+	 * Purpose: check for flexible delay value
+	 *
+	 * Parameters: delay_flex - [IN] separeated flexible intervals
+	 *                          [dd/d1-d2,hh:mm-hh:mm;]
+	 *             delay_val - [OUT] delay value
+	 *
+	 * Return value:
+	 *
+	 * Author: Alexander Vladishev
+	 *
+	 */
+	function	get_flexible_interval($delay_flex, &$delay_val, $now)
+	{
+		if (is_null($delay_flex) || $delay_flex == '')
+			return false;
+
+		$arr_of_delay = explode(';', $delay_flex);
+
+		foreach($arr_of_delay as $one_delay_flex)
+		{
+			$arr = explode('/', $one_delay_flex);
+			if (check_time_period($arr[1], $now))
+			{
+				$delay_val = $arr[0];
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/*
+	 *
+	 * Function: get_next_flexible_interval
+	 *
+	 * Purpose: return time of next flexible interval
+	 *
+	 * Parameters: delay_flex - [IN] ';' separeated flexible intervals
+	 *                          [dd/d1-d2,hh:mm-hh:mm]
+	 *             now = [IN] current time
+	 *
+	 * Return value: start of next interval
+	 *
+	 * Author: Alexei Vladishev, Alexander Vladishev
+	 *
+	 */
+	function	get_next_flexible_interval($delay_flex, $now)
+	{
+		if (is_null($delay_flex) || $delay_flex == '')
+			return -1;
+
+		$tm = localtime($now, TRUE);
+		$day = (0 == $tm['tm_wday']) ? 7 : $tm['tm_wday'];
+		$sec = 3600 * $tm['tm_hour'] + 60 * $tm['tm_min'] + $tm['tm_sec'];
+		$next = 0;
+
+		$arr_of_delay_flex = explode(';', $delay_flex);
+
+		foreach($arr_of_delay_flex as $one_delay_flex)
+		{
+			if (7 == sscanf($one_delay_flex, "%d/%d-%d,%d:%d-%d:%d", $delay, $d1, $d2, $h1, $m1, $h2, $m2))
+			{
+				$sec1 = 3600 * $h1 + 60 * $m1;
+				$sec2 = 3600 * $h2 + 60 * $m2;
+
+				if ($day >= $d1 && $day <= $d2 && $sec >= $sec1 && $sec <= $sec2)	/* working period */
+				{
+					if ($next == 0 || $next > $now - $sec + $sec2)
+						$next = $now - $sec + $sec2;
+					break;
+				}
+
+				if ($day >= $d1 && $day <= $d2 && $sec < $sec1)				/* next period, same day */
+				{
+					if ($next == 0 || $next > $now - $sec + $sec1)
+						$next = $now - $sec + $sec1;
+				}
+				else if ($day + 1 >= $d1 && $day + 1 <= $d2 && $sec < $sec1)		/* next period, next  day */
+				{
+					if ($next == 0 || $next > $now - $sec + $sec1)
+						$next = $now - $sec + 86400 + $sec1;
+				}
+			}
+		}
+
+		return $next ? $next : -1;
 	}
 
 	/*
@@ -1440,27 +1529,26 @@ COpt::profiling_stop('prepare table');
 			return $now + $delay;
 		}
 
-		if (!is_null($delay_flex) && $delay_flex != '')
-		{
-			$arr_of_delay = explode(';', $delay_flex);
+		$flex_delay = $delay;
+		$flex_delay2 = $delay;
 
-			foreach($arr_of_delay as $one_delay_flex)
-			{
-				$arr = explode('/', $one_delay_flex);
-				if (check_time_period($arr[1], $now))
-				{
-					$delay = $arr[0];
-					break;
-				}
-			}
+		get_flexible_interval($delay_flex, &$flex_delay, $now);
+
+		if (-1 != ($next = get_next_flexible_interval($delay_flex, $now)) && $now + $flex_delay > $next)
+		{
+			get_flexible_interval($delay_flex, &$flex_delay2, $next + 1);
+
+			$now = $next;
+			$flex_delay = min($flex_delay, $flex_delay2);
 		}
 
-		if (0 == $delay)
+		if (0 == $flex_delay)
 		{
 /*			info('Invalid item update interval ['.$delay.'], using default [30]');*/
-			$delay = 30;
+			$flex_delay = 30;
 		}
 
+		$delay = $flex_delay;
 		$nextcheck = $delay * floor($now / $delay) + ($itemid % $delay);
 
 		while ($nextcheck <= $now)

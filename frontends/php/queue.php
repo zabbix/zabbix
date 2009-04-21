@@ -68,6 +68,7 @@ include_once "include/page_header.php";
 			//ITEM_TYPE_TRAPPER,
 			ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_SNMPV3,
+			ITEM_TYPE_IPMI,
 			ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_INTERNAL,
 			ITEM_TYPE_AGGREGATE,
