@@ -233,7 +233,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 // --- ---
 				$jscript = 'javascript : '. 
 					"var pos = getPosition('button_show_tree');".
-					"ShowHide('div_node_tree','block');".
+					"ShowHide('div_node_tree',IE6?'block':'table');".
 					'pos.top += 20;'.
 					"\$('div_node_tree').setStyle({top: pos.top+'px'});";
 				$button_show_tree = new CButton('show_node_tree', S_SELECT_NODES, $jscript); //sdelatj konstatntu!
