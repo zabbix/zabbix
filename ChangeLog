@@ -1,6 +1,6 @@
 Changes for 1.7.0
 
- - [ZBX-609] changed node management interface (Vedmak)
+ - [DEV-355] changed node management interface (Vedmak)
  - [DEV-341] added hint with previous 20 events in Dashboard's widget "Last 20 issues" on mouse-over (Vedmak)
  - [DEV-326] admins are allowed to change Medias in user profile (Vedmak)
  - [DEV-330] extended template trigger dependencies functionality (Artem)
@@ -35,6 +35,7 @@ Changes for 1.7.0
 
 Changes for 1.6.5
 
+ - [ZBX-879] fixed maximum 30 issues shown in Dahsboard system status (Vedmak)
  - [ZBX-876] removed unused files (Artem)
  - [ZBX-872] fixed group selected in another section of Hosts affects shown proxy members, and proxies shown in Items host dropdown (Vedmak)
  - [ZBX-874] fixed evaluation of items nextcheck for flexible intervals (Sasha) 
