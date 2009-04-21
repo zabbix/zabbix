@@ -407,6 +407,8 @@ FIELD		|ldap_base_dn	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|ldap_bind_dn	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|ldap_bind_password|t_varchar(128)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|ldap_search_attribute|t_varchar(128)|''|NOT NULL	|ZBX_SYNC
+FIELD		|dropdown_first_entry|t_integer	|1	|NOT NULL	|ZBX_SYNC
+FIELD		|dropdown_first_remember|t_integer|1	|NOT NULL	|ZBX_SYNC
 
 TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|'0'	|NOT NULL	|0
@@ -834,6 +836,7 @@ FIELD		|theme		|t_varchar(128)	|'default.css'|NOT NULL	|ZBX_SYNC
 FIELD		|attempt_failed	|t_integer	|0	|NOT NULL	|ZBX_SYNC
 FIELD		|attempt_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|attempt_clock	|t_integer	|0	|NOT NULL	|ZBX_SYNC
+FIELD		|rows_per_page	|t_integer	|50	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|alias
 
 TABLE|usrgrp|usrgrpid|ZBX_SYNC
