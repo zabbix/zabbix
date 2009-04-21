@@ -271,12 +271,15 @@ function make_system_summary(){
 								' AND t.value='.TRIGGER_VALUE_TRUE.
 								' AND t.priority='.$key.
 							' ORDER BY t.lastchange DESC';
-				$result = DBselect($sql,30);
+				$result = DBselect($sql);
 				while($row_inf=DBfetch($result)){	
 // Check for dependencies
 					if(trigger_dependent($row_inf["triggerid"]))	continue;
 					
 					$tr_count++;
+					
+					if($tr_count > 30) continue;
+					
 					$host = new CSpan($row_inf['host']);
 								
 					$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
