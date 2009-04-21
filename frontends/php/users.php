@@ -40,54 +40,58 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'config'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
-		'perm_details'=>array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+		'config'=>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+		'perm_details'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 /* user */
-		'userid'=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({config})&&({config}==0))&&(isset({form})&&({form}=="update"))'),
-		'group_userid'=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
+		'userid'=>			array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({config})&&({config}==0))&&(isset({form})&&({form}=="update"))'),
+		'group_userid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 		'filter_usrgrpid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 
-		'alias'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
-		'name'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
-		'surname'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
-		'password1'=>	array(T_ZBX_STR, O_OPT,	null,	null,		'(isset({config})&&({config}==0))&&isset({save})&&(isset({form})&&({form}!="update"))&&isset({change_password})'),
-		"password2"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'(isset({config})&&({config}==0))&&isset({save})&&(isset({form})&&({form}!="update"))&&isset({change_password})'),
-		'user_type'=>	array(T_ZBX_INT, O_OPT,	null,	IN('1,2,3'),	'(isset({config})&&({config}==0))&&isset({save})'),
-		'user_groups'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),//'(isset({config})&&({config}==0))&&isset({save})'),
-		'user_groups_to_del'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
-		'user_medias'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
-		'user_medias_to_del'=>	array(T_ZBX_STR, O_OPT,	null,	DB_ID,	null),
-		'new_group'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
-		'new_media'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
-		'enable_media'=>array(T_ZBX_INT, O_OPT,	null,	null,		null),
-		'disable_media'=>array(T_ZBX_INT, O_OPT,null,	null,		null),
-		'lang'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
-		'theme'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
-		'autologin'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
-		'autologout'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(90,10000), null),
-		'url'=>			array(T_ZBX_STR, O_OPT,	null,	null,		'(isset({config})&&({config}==0))&&isset({save})'),
-		'refresh'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'(isset({config})&&({config}==0))&&isset({save})'),
-
-		'right'=>		array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY, 		'(isset({register})&&({register}=="add permission"))&&isset({userid})'),
-		'permission'=>	array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY, 		'(isset({register})&&({register}=="add permission"))&&isset({userid})'),
-		'id'=>			array(T_ZBX_INT, O_NO,	null,	DB_ID, 			'(isset({register})&&({register}=="add permission"))&&isset({userid})'),
-		'rightid'=>		array(T_ZBX_INT, O_NO,	null,   DB_ID,			'(isset({register})&&({register}=="delete permission"))&&isset({userid})'),
+		'alias'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
+		'name'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
+		'surname'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
 		
-		'grpaction'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
-/* group */
-		'usrgrpid'=>	array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({config})&&(({config}==1) || isset({grpaction})))&&(isset({form})&&({form}=="update"))'),
-		'group_groupid'=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
-		'selusrgrp'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
+		'password1'=>		array(T_ZBX_STR, O_OPT,	null,	null,		'(isset({config})&&({config}==0))&&isset({save})&&(isset({form})&&({form}!="update"))&&isset({change_password})'),
+		"password2"=>		array(T_ZBX_STR, O_OPT,	null,	null,		'(isset({config})&&({config}==0))&&isset({save})&&(isset({form})&&({form}!="update"))&&isset({change_password})'),
+		
+		'user_type'=>			array(T_ZBX_INT, O_OPT,	null,	IN('1,2,3'),	'(isset({config})&&({config}==0))&&isset({save})'),
+		'user_groups'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),//'(isset({config})&&({config}==0))&&isset({save})'),
+		'user_groups_to_del'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
+		'user_medias'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
+		'user_medias_to_del'=>	array(T_ZBX_STR, O_OPT,	null,	DB_ID,	null),
+		
+		'new_group'=>		array(T_ZBX_STR, O_OPT,	null,	null,	null),
+		'new_media'=>		array(T_ZBX_STR, O_OPT,	null,	null,	null),
+		'enable_media'=>	array(T_ZBX_INT, O_OPT,	null,	null,		null),
+		'disable_media'=>	array(T_ZBX_INT, O_OPT,null,	null,		null),
+		'lang'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
+		'theme'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
+		'autologin'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+		'autologout'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(90,10000), null),
+		'url'=>				array(T_ZBX_STR, O_OPT,	null,	null,		'(isset({config})&&({config}==0))&&isset({save})'),
+		'refresh'=>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'(isset({config})&&({config}==0))&&isset({save})'),
+		'rows_per_page'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,1000),'(isset({config})&&({config}==0))&&isset({save})'),
 
-		'gname'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==1))&&isset({save})'),
-		'users'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	null),
-		'users_status'=>array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	'(isset({config})&&({config}==1))&&isset({save})'),
-		'gui_access'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'),	'(isset({config})&&({config}==1))&&isset({save})'),
-		'new_right'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
-		'right_to_del'=>array(T_ZBX_STR, O_OPT,	null,	null,	null),
+		'right'=>			array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY, 		'(isset({register})&&({register}=="add permission"))&&isset({userid})'),
+		'permission'=>		array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY, 		'(isset({register})&&({register}=="add permission"))&&isset({userid})'),
+		'id'=>				array(T_ZBX_INT, O_NO,	null,	DB_ID, 			'(isset({register})&&({register}=="add permission"))&&isset({userid})'),
+		'rightid'=>			array(T_ZBX_INT, O_NO,	null,   DB_ID,			'(isset({register})&&({register}=="delete permission"))&&isset({userid})'),
+		
+		'grpaction'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+/* group */
+		'usrgrpid'=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({config})&&(({config}==1) || isset({grpaction})))&&(isset({form})&&({form}=="update"))'),
+		'group_groupid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
+		'selusrgrp'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
+
+		'gname'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==1))&&isset({save})'),
+		'users'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	null),
+		'users_status'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	'(isset({config})&&({config}==1))&&isset({save})'),
+		'gui_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'),	'(isset({config})&&({config}==1))&&isset({save})'),
+		'new_right'=>		array(T_ZBX_STR, O_OPT,	null,	null,	null),
+		'right_to_del'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
 		'group_users_to_del'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
-		'group_users'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
-		'group_rights'=>array(T_ZBX_STR, O_OPT,	null,	null,	null),
+		'group_users'=>		array(T_ZBX_STR, O_OPT,	null,	null,	null),
+		'group_rights'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
 		
 		'set_users_status'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
 		'set_gui_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'), null),
@@ -95,8 +99,8 @@ include_once('include/page_header.php');
 /* actions */
 		'register'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"add permission","delete permission"'), null),
 
-		'save'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'delete'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete_selected'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_user_group'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_user_media'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -183,6 +187,7 @@ include_once('include/page_header.php');
 				$user['lang'] = get_request('lang');
 				$user['theme'] = get_request('theme');
 				$user['refresh'] = get_request('refresh');
+				$user['rows_per_page'] = get_request('rows_per_page');
 				$user['type'] = get_request('user_type');
 				$user['user_groups'] = get_request('user_groups', array());
 				$user['user_medias'] = get_request('user_medias', array());
