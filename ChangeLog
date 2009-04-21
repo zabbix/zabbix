@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-876] removed unused files (Artem)
  - [ZBX-872] fixed group selected in another section of Hosts affects shown proxy members, and proxies shown in Items host dropdown (Vedmak)
  - [ZBX-874] fixed evaluation of items nextcheck for flexible intervals (Sasha) 
  - [ZBX-868] fixed incorrect processing of not supported internal checks (Alexei)
