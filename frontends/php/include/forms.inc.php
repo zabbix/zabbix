@@ -702,6 +702,7 @@
 			$lang		= $user['lang'];
 			$theme 		= $user['theme'];
 			$refresh	= $user['refresh'];
+			$rows_per_page = $user['rows_per_page'];
 			$user_type	= $user['type'];
 
 			$user_groups	= array();
@@ -743,6 +744,8 @@
 			$lang		= get_request('lang','en_gb');
 			$theme 		= get_request('theme','default.css');
 			$refresh	= get_request('refresh',30);
+			$rows_per_page = get_request('rows_per_page',50);
+			
 			$user_type	= get_request('user_type',USER_TYPE_ZABBIX_USER);;
 			$user_groups	= get_request('user_groups',array());
 			$change_password = get_request('change_password', null);
@@ -896,7 +899,9 @@
 		}
 
 		$frmUser->AddRow(S_AUTO_LOGOUT, array($autologoutCheckBox, $autologoutTextBox));
-		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
+		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox('refresh',$refresh,4));
+		
+		$frmUser->AddRow(S_ROWS_PER_PAGE,	new CNumericBox('rows_per_page',$rows_per_page,3));
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 
 //view Media Settings for users above "User" +++

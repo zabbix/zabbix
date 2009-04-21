@@ -21,7 +21,7 @@
 -- Dumping data for table `config`
 --
 
-INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00',7,1,7,100,'default.css',0,'',389,'','','','');
+INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00',7,1,7,100,'default.css',0,'',389,'','','','',1,1);
 
 --
 -- Dumping data for table `scripts`
@@ -34,8 +34,8 @@ INSERT INTO scripts VALUES (2,'Traceroute','/usr/bin/traceroute {HOST.CONN}',2,0
 -- Dumping data for table `users`
 --
 
-INSERT INTO users VALUES (1,'Admin','Zabbix','Administrator','5fce1b3e34b520afeffb37ce08c7cd66','',0, 900,'en_gb',30,3,'default.css',0,'',0);
-INSERT INTO users VALUES (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e','',0,900,'en_gb',30,1,'default.css',0,'',0);
+INSERT INTO users VALUES (1,'Admin','Zabbix','Administrator','5fce1b3e34b520afeffb37ce08c7cd66','',0, 900,'en_gb',30,3,'default.css',0,'',0,50);
+INSERT INTO users VALUES (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e','',0,900,'en_gb',30,1,'default.css',0,'',0,50);
 
 --
 -- Dumping data for table `usrgrp`
