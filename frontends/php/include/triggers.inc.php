@@ -1206,19 +1206,21 @@
 	}
 	
 	function expand_trigger_description_simple($triggerid){
-		$sql = 'SELECT DISTINCT t.description,h.host,t.expression,t.triggerid '.
-				' FROM triggers t '.
-					' LEFT JOIN functions f on t.triggerid=f.triggerid '.
-					' LEFT JOIN items i on f.itemid=i.itemid '.
-					' LEFT JOIN hosts h on i.hostid=h.hostid '.
+		$sql = 'SELECT DISTINCT h.host,t.description,t.expression,t.triggerid '.
+				' FROM triggers t, functions f, items i, hosts h '.
+				' WHERE f.triggerid=t.triggerid '.
+					' AND i.itemid=f.itemid '.
+					' AND h.hostid=i.hostid '.
 				' WHERE t.triggerid='.$triggerid;
-		return expand_trigger_description_by_data(DBfetch(DBselect($sql)));
+		$trigger = DBfetch(DBselect($sql));
+		
+	return expand_trigger_description_by_data($trigger);
 	}
 
 	function expand_trigger_description($triggerid){
 		$description=expand_trigger_description_simple($triggerid);
 		$description=htmlspecialchars($description);
-		return $description;
+	return $description;
 	}
 
 	function update_trigger_value_to_unknown_by_hostid($hostids){
