@@ -1241,7 +1241,7 @@
 				' WHERE f.triggerid=t.triggerid '.
 					' AND i.itemid=f.itemid '.
 					' AND h.hostid=i.hostid '.
-				' WHERE t.triggerid='.$triggerid;
+					' AND t.triggerid='.$triggerid;
 		$trigger = DBfetch(DBselect($sql));
 		
 	return expand_trigger_description_by_data($trigger);
