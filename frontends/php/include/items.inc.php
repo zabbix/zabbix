@@ -1532,11 +1532,11 @@ COpt::profiling_stop('prepare table');
 		$flex_delay = $delay;
 		$flex_delay2 = $delay;
 
-		get_flexible_interval($delay_flex, &$flex_delay, $now);
+		get_flexible_interval($delay_flex, $flex_delay, $now);
 
-		if (-1 != ($next = get_next_flexible_interval($delay_flex, $now)) && $now + $flex_delay > $next)
+		if (-1 != ($next = get_next_flexible_interval($delay_flex, $now)) && (($now + $flex_delay) > $next))
 		{
-			get_flexible_interval($delay_flex, &$flex_delay2, $next + 1);
+			get_flexible_interval($delay_flex, $flex_delay2, $next + 1);
 
 			$now = $next;
 			$flex_delay = min($flex_delay, $flex_delay2);

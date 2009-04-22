@@ -60,32 +60,29 @@ include_once "include/page_header.php";
 //--------
 ?>
 <?php
-        if(isset($_REQUEST['serviceid']) && 
-			($_REQUEST['serviceid']>0) && 
-			!DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST['serviceid'])))
-		{
-                unset($_REQUEST['serviceid']);
-        }
-
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
 
-	if(isset($_REQUEST["serviceid"]) && $_REQUEST["serviceid"] > 0){
-		$sql = 'SELECT s.serviceid '.
-					' FROM services s '.
-					' WHERE (s.triggerid is NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
-						' AND s.serviceid='.$_REQUEST['serviceid'];
-
-		if(!$service = DBfetch(DBselect($sql,1))){
-			access_deny();
+	if(isset($_REQUEST['serviceid'])){
+		$sql = 'SELECT DISTINCT serviceid, triggerid '.
+				' FROM services '.
+				' WHERE serviceid='.$_REQUEST['serviceid'];		
+		if($service = DBfetch(DBselect($sql))){
+			if(isset($service['triggerid']) && !isset($available_triggers[$service['triggerid']])){
+				access_deny();
+			}
+		}
+		else{
+			unset($service);
 		}
 	}
+	
 	unset($_REQUEST['serviceid']);
 ?>
 <?php
 //	show_table_header(S_IT_SERVICES_BIG);
 
-	if(isset($service)&&isset($_REQUEST['showgraph'])){
+	if(isset($service) && isset($_REQUEST['showgraph'])){
 		$table  = new CTable(null,'chart');
 		$table->AddRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')));
 		$table->Show();
@@ -123,8 +120,9 @@ include_once "include/page_header.php";
 		while($row = DBFetch($result)){
 			$row['id'] = $row['serviceid'];
 		
-			(empty($row['serviceupid']))?($row['serviceupid']='0'):('');
-			(empty($row['description']))?($row['description']='None'):('');
+			if(empty($row['serviceupid'])) $row['serviceupid']='0';
+			if(empty($row['description'])) $row['description']='None';
+			
 			$row['graph'] = new CLink(S_SHOW,"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1".url_param('path'),"action");
 			
 			if(isset($row["triggerid"]) && !empty($row["triggerid"])){
