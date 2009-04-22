@@ -1638,8 +1638,10 @@ include_once('include/page_header.php');
 /* this code adds links to Template Names in Template_Linkage page and link them to the form in forms.inc.php */
 	else if($_REQUEST['config']==2){
 		echo SBR;
+		$all_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
+		
 		if(isset($_REQUEST['form'])){
-			insert_template_form($PAGE_HOSTS['hostids']);
+			insert_template_form($all_hosts);
 		} 
 		else{
 			$frmForm = new CForm();
@@ -1687,12 +1689,10 @@ include_once('include/page_header.php');
 				$templates[$template['hostid']] = $template; 
 			}
 			
-			$allowed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
-			
 			$sql = 'SELECT h.host, h.hostid, h.status, ht.templateid '.
 					' FROM hosts h, hosts_templates ht '.
 					' WHERE ht.hostid=h.hostid '.
-						' AND '.DBcondition('h.hostid', $allowed_hosts).
+						' AND '.DBcondition('h.hostid', $all_hosts).
 						' AND '.DBcondition('ht.templateid', $templateids).
 					' ORDER BY host';
 			$result = DBSelect($sql);
