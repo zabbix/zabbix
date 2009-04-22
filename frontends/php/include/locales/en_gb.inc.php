@@ -1124,8 +1124,10 @@
 	'S_EVENT_DETAILS'=>			'Event details',
 	'S_LIST'=>					'List',
 	'S_LATEST_EVENTS'=>			'Latest events',
-	'S_HISTORY_OF_EVENTS_BIG'=>		'HISTORY OF EVENTS',
-	'S_NO_EVENTS_FOUND'=>			'No events found',
+	'S_HISTORY_OF_EVENTS_BIG'=>	'HISTORY OF EVENTS',
+	'S_NO_EVENTS_FOUND'=>		'No events found',
+	'S_START_DATE'=>			'Start date',
+	
 
 //	latest.php
 	'S_LAST_CHECK'=>			'Last check',
@@ -1734,6 +1736,7 @@
 	'S_REMOVE_FROM'=>					'Remove from',
 	'S_STATUS_DISABLED'=>				'Status disabled',
 	'S_INTERNAL_S'=>						'Internal',
+	'S_ROWS_PER_PAGE'=>					'Rows per page',
 
 //scripts.php
     'S_SCRIPTS_CONFIGURATION' => 'Confinguration of scripts',
