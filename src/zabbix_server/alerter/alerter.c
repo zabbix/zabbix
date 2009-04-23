@@ -68,17 +68,22 @@ int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max
 
 	if(mediatype->type==MEDIA_TYPE_EMAIL)
 	{
+		alarm(40);
 		res = send_email(mediatype->smtp_server,mediatype->smtp_helo,mediatype->smtp_email,alert->sendto,alert->subject,
 			alert->message, error, max_error_len);
+		alarm(0);
 	}
 #if defined (HAVE_JABBER)
 	else if(mediatype->type==MEDIA_TYPE_JABBER)
 	{
-		res = send_jabber(mediatype->username, mediatype->passwd, alert->sendto, alert->message, error, max_error_len);
+		/* Jabber uses its own timeouts */
+		res = send_jabber(mediatype->username, mediatype->passwd, alert->sendto, alert->subject,
+				alert->message, error, max_error_len);
 	}
 #endif /* HAVE_JABBER */
 	else if(mediatype->type==MEDIA_TYPE_SMS)
 	{
+		/* SMS uses its own timeouts */
 		res = send_sms(mediatype->gsm_modem,alert->sendto,alert->message, error, max_error_len);
 	}
 	else if(mediatype->type==MEDIA_TYPE_EXEC)
@@ -228,12 +233,8 @@ int main_alerter_loop()
 
 			alert.retries		= atoi(row[16]);
 
-			/* Hardcoded value */
-			/* SMS uses its own timeouts */
-			alarm(40);
 			*error = '\0';
 			res = execute_action(&alert, &mediatype, error, sizeof(error));
-			alarm(0);
 
 			if (res == SUCCEED)
 			{
