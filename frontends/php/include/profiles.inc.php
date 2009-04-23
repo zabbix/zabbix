@@ -336,18 +336,23 @@ return $result;
 
 /************ CONFIG **************/
 
-function select_config(){
+function select_config($cache = true){
 	global $page;
-
-	$row=DBfetch(DBselect('SELECT * FROM config WHERE '.DBin_node('configid', get_current_nodeid(false))));
-
+	static $config;
+	
+	if($cache && isset($config))
+		return $config;
+		
+	$row = DBfetch(DBselect('SELECT * FROM config WHERE '.DBin_node('configid', get_current_nodeid(false))));
+		
 	if($row){
-		return	$row;
+		$config = $row;
+		return $row;
 	}
-	else if($page['title'] != S_INSTALLATION){
-			error('Unable to select configuration');
+	elseif($page['title'] != S_INSTALLATION){
+		error('Unable to select configuration');
 	}
-return	$row;
+return $row;
 }
 
 function update_config($configs){
