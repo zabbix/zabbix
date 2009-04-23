@@ -20,13 +20,24 @@ SERVER_SUBDIRS = zabbix_server
 endif
 
 if PROXY
+if SERVER
 PROXY_SUBDIRS = \
-	zabbix_proxy \
-	zabbix_server/pinger
+	zabbix_proxy
+else
+PROXY_SUBDIRS = \
+	zabbix_server/dbsyncer \
+	zabbix_server/discoverer \
+	zabbix_server/httppoller \
+	zabbix_server/pinger \
+	zabbix_server/poller \
+	zabbix_server/trapper \
+	zabbix_server/nodewatcher \
+	zabbix_proxy
+endif
 endif
 
 SUBDIRS = \
 	libs \
 	$(AGENT_SUBDIRS) \
-	$(PROXY_SUBDIRS) \
-	$(SERVER_SUBDIRS)
+	$(SERVER_SUBDIRS) \
+	$(PROXY_SUBDIRS)

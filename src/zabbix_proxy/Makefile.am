@@ -2,15 +2,8 @@
 
 SUBDIRS = \
 	heart \
-	../zabbix_server/dbsyncer \
-	../zabbix_server/discoverer \
 	housekeeper \
-	../zabbix_server/httppoller \
 	proxyconfig \
-	../zabbix_server/pinger \
-	../zabbix_server/poller \
-	../zabbix_server/trapper \
-	../zabbix_server/nodewatcher \
 	datasender
 
 sbin_PROGRAMS = zabbix_proxy
