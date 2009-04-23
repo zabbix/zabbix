@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-460] fixed processing `distclean' target of `Makefile' for zabbix_proxy (Dmitry)
  - [ZBX-882] fixed template linkage form (Artem)
  - [ZBX-879] fixed maximum 30 issues shown in Dahsboard system status (Vedmak)
  - [ZBX-876] removed unused files (Artem)
