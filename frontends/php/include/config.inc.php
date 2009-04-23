@@ -191,6 +191,7 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 		$ZBX_AVAILABLE_NODES = array();
 		$ZBX_NODES_IDS = array();
 		$ZBX_NODES = array();
+		$ZBX_CURRENT_NODEID = $ZBX_LOCALNODEID;
 		
 		$ZBX_WITH_ALL_NODES = !defined('ZBX_NOT_ALLOW_ALL_NODES');
 		
@@ -217,16 +218,12 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 			
 			$ZBX_VIEWED_NODES = get_viewed_nodes();
 			$ZBX_CURRENT_NODEID = $ZBX_VIEWED_NODES['selected'];
-			
-			if(empty($ZBX_CURRENT_NODEID)) 
-				$ZBX_CURRENT_NODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node		
-			
+					
 			if($node_data = DBfetch(DBselect('SELECT masterid FROM nodes WHERE nodeid='.$ZBX_CURRENT_NODEID))){
 				$ZBX_CURMASTERID = $node_data['masterid'];
 			}
 			
-			if( !isset($ZBX_NODES[$ZBX_CURRENT_NODEID])) {
-				$denyed_page_requested = true;
+			if(!isset($ZBX_NODES[$ZBX_CURRENT_NODEID])) {
 				$ZBX_CURRENT_NODEID = $ZBX_LOCALNODEID;
 				$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
 			}
@@ -241,7 +238,7 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 			$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
 		}
 		
-		zbx_set_post_cookie('zbx_current_nodeid', $ZBX_CURRENT_NODEID);
+		// zbx_set_post_cookie('zbx_current_nodeid', $ZBX_CURRENT_NODEID);
 		define('ZBX_NODES_INITIALIZED', 1);
 	}
 
@@ -254,7 +251,7 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 		if(!is_null($perm)){
 			return get_accessible_nodes_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $ZBX_AVAILABLE_NODES);
 		}
-		elseif(is_null($forse_all_nodes)){
+		else if(is_null($forse_all_nodes)){
 			if($ZBX_VIEWED_NODES['selected'] == 0) {
 				$result = $ZBX_VIEWED_NODES['nodeids'];
 			}
@@ -265,7 +262,7 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 				$result = $USER_DETAILS['node']['nodeid'];
 			}
 		}
-		elseif($forse_all_nodes) {
+		else if($forse_all_nodes) {
 			$result = $ZBX_AVAILABLE_NODES;
 		}
 		else {
@@ -279,6 +276,8 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 		global $USER_DETAILS;
 		global $ZBX_LOCALNODEID, $ZBX_AVAILABLE_NODES;
 		
+		$config = select_config();
+		
 		$def_options = array(
 			'allow_all' => 0
 		);	
@@ -286,7 +285,8 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 		
 		$result = array('selected' => 0, 'nodes' => array(), 'nodeids' => array());
 		
-		$dd_first_entry = ZBX_DROPDOWN_FIRST_ENTRY;
+		//$config['dropdown_first_entry'] =1;
+		$dd_first_entry = $config['dropdown_first_entry'];
 		if($dd_first_entry == ZBX_DROPDOWN_FIRST_ZBX162){
 			$dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
 		}
@@ -304,7 +304,7 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 		
 		$selected_nodeids = get_request('selected_nodes', get_profile('web.nodes.selected', array($USER_DETAILS['node']['nodeid'])));
 		
-// nodes +++	
+// +++ Fill $result['NODEIDS'], $result['NODES'] +++	
 		$nodes = array();
 		$nodeids = array();
 		foreach($selected_nodeids as $nodeid) {
@@ -316,7 +316,7 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 				$nodeids[$nodeid] = $nodeid;
 			}
 		}
-// ---
+// --- ---
 
 		$switch_node = get_request('switch_node', get_profile('web.nodes.switch_node', -1));
 		if(!isset($available_nodes[$switch_node]) || !uint_in_array($switch_node, $selected_nodeids)) { //check switch_node

@@ -22,6 +22,9 @@
 require_once('include/config.inc.php');
 require_once('include/forms.inc.php');
 
+define('ZBX_NOT_ALLOW_ALL_NODES', 1);
+define('ZBX_HIDE_NODE_SELECTION', 1);
+
 $page['title']	= "S_ZABBIX_BIG";
 $page['file']	= 'index.php';
 
@@ -53,7 +56,7 @@ $page['file']	= 'index.php';
 	}
 
 	$config = select_config();
-
+	
 	$authentication_type = $config['authentication_type'];
 
 	if($authentication_type == ZBX_AUTH_HTTP){
