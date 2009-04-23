@@ -21,7 +21,7 @@
 #ifndef ZABBIX_JABBER_H
 #define ZABBIX_JABBER_H
 
-int	send_jabber(char *username, char *passwd, char *sendto, char *message, char *error, int max_error_len);
+int	send_jabber(char *username, char *passwd, char *sendto, char *subject, char *message, char *error, int max_error_len);
 
 #endif /* ZABBIX_JABBER_H */
 

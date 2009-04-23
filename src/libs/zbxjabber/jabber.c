@@ -35,7 +35,8 @@ zbx_io_close (void *socket)
         close (*sock);
 }
 
-static int	zbx_j_sock = -1;
+static int		zbx_j_sock = -1;
+static const char	*__module_name = "JABBER";
 
 static int
 zbx_io_connect (iksparser *prs, void **socketptr, const char *server, int port)
@@ -165,11 +166,19 @@ typedef struct jabber_session {
 } jabber_session_t, *jabber_session_p;
 
 static jabber_session_p jsess = NULL;
+static char		*jabber_error = NULL;
+static int		jabber_error_len = 0;
 
-static int on_result (jabber_session_p sess, ikspak *pak)
+static int on_result(jabber_session_p sess, ikspak *pak)
 {
-	zabbix_log (LOG_LEVEL_DEBUG, "JABBER: ready");
+	const char	*__function_name = "on_result";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s()", __module_name, __function_name);
+
 	sess->status = JABBER_READY;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s()", __module_name, __function_name);
+
 	return IKS_FILTER_EAT;
 }
 
@@ -190,10 +199,12 @@ static int on_result (jabber_session_p sess, ikspak *pak)
  ******************************************************************************/
 static int disconnect_jabber()
 {
-	if ( JABBER_DISCONNECTED != jsess->status)
-		iks_disconnect(jsess->prs);
+	const char	*__function_name = "disconnect_jabber";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s()", __module_name, __function_name);
 	
-	zabbix_log(LOG_LEVEL_INFORMATION, "JABBER: disconnecting");
+	if (JABBER_DISCONNECTED != jsess->status)
+		iks_disconnect(jsess->prs);
 	
 	if (jsess->my_filter)
 	{
@@ -213,89 +224,111 @@ static int disconnect_jabber()
 
 	jsess->status = JABBER_DISCONNECTED;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s()", __module_name, __function_name);
+
 	return SUCCEED;
 }
 
-static int on_stream (jabber_session_p sess, int type, iks *node)
+static int on_stream(jabber_session_p sess, int type, iks *node)
 {
-	iks *x = NULL;
-	ikspak *pak = NULL;
+	const char	*__function_name = "on_stream";
+	iks		*x = NULL;
+	ikspak		*pak = NULL;
+	int		ret = IKS_OK;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s()", __module_name, __function_name);
 
 	switch (type) {
 		case IKS_NODE_START:
-			if (sess->opt_use_tls && !iks_is_secure (sess->prs)) {
-				iks_start_tls (sess->prs);
-				break;
-			}
-			if (!sess->opt_use_sasl) {
-				x = iks_make_auth (sess->acc, sess->pass, iks_find_attrib (node, "id"));
-				iks_insert_attrib (x, "id", "auth");
-				iks_send (sess->prs, x);
-				iks_delete (x);
-			}
 			break;
-
 		case IKS_NODE_NORMAL:
-			if (strcmp ("stream:features", iks_name (node)) == 0) {
-				sess->features = iks_stream_features (node);
-				if (sess->opt_use_sasl) {
-					if (sess->opt_use_tls && !iks_is_secure (sess->prs)) break;
-					if (sess->status == JABBER_AUTHORIZED) {
-						if (sess->features & IKS_STREAM_BIND) {
-							x = iks_make_resource_bind (sess->acc);
-							iks_send (sess->prs, x);
-							iks_delete (x);
+			if (0 == strcmp("stream:features", iks_name(node)))
+			{
+				sess->features = iks_stream_features(node);
+
+				if (IKS_STREAM_STARTTLS == (sess->features & IKS_STREAM_STARTTLS))
+					iks_start_tls (sess->prs);
+				else
+				{
+					if (sess->status == JABBER_AUTHORIZED)
+					{
+						if (IKS_STREAM_BIND == (sess->features & IKS_STREAM_BIND))
+						{
+							x = iks_make_resource_bind(sess->acc);
+							iks_send(sess->prs, x);
+							iks_delete(x);
 						}
-						if (sess->features & IKS_STREAM_SESSION) {
+						if (IKS_STREAM_SESSION == (sess->features & IKS_STREAM_SESSION))
+						{
 							x = iks_make_session ();
-							iks_insert_attrib (x, "id", "auth");
-							iks_send (sess->prs, x);
-							iks_delete (x);
+							iks_insert_attrib(x, "id", "auth");
+							iks_send(sess->prs, x);
+							iks_delete(x);
 						}
-					} else {
-						if (sess->features & IKS_STREAM_SASL_MD5)
-							iks_start_sasl (sess->prs, IKS_SASL_DIGEST_MD5, sess->acc->user, sess->pass);
-						else if (sess->features & IKS_STREAM_SASL_PLAIN)
-							iks_start_sasl (sess->prs, IKS_SASL_PLAIN, sess->acc->user, sess->pass);
+					}
+					else
+					{
+						if (IKS_STREAM_SASL_MD5 == (sess->features & IKS_STREAM_SASL_MD5))
+							iks_start_sasl(sess->prs, IKS_SASL_DIGEST_MD5, sess->acc->user, sess->pass);
+						else if (IKS_STREAM_SASL_PLAIN == (sess->features & IKS_STREAM_SASL_PLAIN))
+							iks_start_sasl(sess->prs, IKS_SASL_PLAIN, sess->acc->user, sess->pass);
 					}
 				}
-			} else if (strcmp ("failure", iks_name (node)) == 0) {
-				zabbix_log (LOG_LEVEL_WARNING, "JABBER: sasl authentication failed");
-			} else if (strcmp ("success", iks_name (node)) == 0) {
-				zabbix_log (LOG_LEVEL_DEBUG, "JABBER: authorized");
+			}
+			else if (strcmp("failure", iks_name(node)) == 0)
+			{
+				zbx_snprintf(jabber_error, jabber_error_len, "sasl authentication failed");
+				jsess->status = JABBER_ERROR;
+				ret = IKS_HOOK;
+			}
+			else if (strcmp("success", iks_name(node)) == 0)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s: authorized",
+						__module_name);
 				sess->status = JABBER_AUTHORIZED;
-				iks_send_header (sess->prs, sess->acc->server);
-			} else {
-				pak = iks_packet (node);
-				iks_filter_packet (sess->my_filter, pak);
+				iks_send_header(sess->prs, sess->acc->server);
+			}
+			else
+			{
+				pak = iks_packet(node);
+				iks_filter_packet(sess->my_filter, pak);
+				if (JABBER_READY == jsess->status)
+					ret = IKS_HOOK;
 			}
 			break;
-
 		case IKS_NODE_STOP:
-			zabbix_log (LOG_LEVEL_WARNING, "JABBER: server disconnected");
-			disconnect_jabber();
+			zbx_snprintf(jabber_error, jabber_error_len, "server disconnected");
+			jsess->status = JABBER_ERROR;
+			ret = IKS_HOOK;
 			break;
 		case IKS_NODE_ERROR:
-			zabbix_log (LOG_LEVEL_WARNING, "JABBER: stream error");
+			zbx_snprintf(jabber_error, jabber_error_len, "stream error");
 			jsess->status = JABBER_ERROR;
+			ret = IKS_HOOK;
 	}
 
-	if (node) iks_delete (node);
-	return IKS_OK;
+	if (node)
+	       iks_delete(node);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s()", __module_name, __function_name);
+
+	return ret;
 }
 
 static int on_error (void *user_data, ikspak *pak)
 {
-	zabbix_log (LOG_LEVEL_WARNING, "JABBER: authorization failed");
+	zbx_snprintf(jabber_error, jabber_error_len, "authorization failed");
 
 	jsess->status = JABBER_ERROR;
+
 	return IKS_FILTER_EAT;
 }
 
 #ifdef DEBUG
 static void on_log (jabber_session_p sess, const char *data, size_t size, int is_incoming)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "%s%s [%s]\n", iks_is_secure (sess->prs) ? "Sec" : "", is_incoming ? "RECV" : "SEND", data);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: %s%s: %s",
+			__module_name, iks_is_secure (sess->prs) ? "Sec" : "", is_incoming ? "RECV" : "SEND", data);
 }
 #endif
 
@@ -315,97 +348,116 @@ static void on_log (jabber_session_p sess, const char *data, size_t size, int is
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int connect_jabber(const char *jabber_id, const char *password, int use_sasl, int port, char *error, int len)
+static int connect_jabber(const char *jabber_id, const char *password, int use_sasl, int port)
 {
-	char *buf = NULL;
-
-	int iks_error = IKS_OK;
+	const char	*__function_name = "connect_jabber";
+	char		*buf = NULL;
+	int		iks_error, timeout, ret = FAIL;
 		
-	zabbix_log(LOG_LEVEL_DEBUG, "JABBER: connecting as %s", jabber_id);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s('%s')",
+			__module_name, __function_name, jabber_id);
 
-	if(NULL == jsess)
+	if (NULL == jsess)
 	{
 		jsess = zbx_malloc(jsess, sizeof (jabber_session_t));
 		memset (jsess, 0, sizeof (jabber_session_t));
 	}
-	else
-	{
+	else if (JABBER_DISCONNECTED != jsess->status)
 		disconnect_jabber();
+
+	if (NULL == (jsess->prs = iks_stream_new(IKS_NS_CLIENT, jsess, (iksStreamHook *)on_stream)))
+	{
+		zbx_snprintf(jabber_error, jabber_error_len, "Cannot create iksemel parser: %s",
+				strerror(errno));
+		goto lbl_fail;
+	}
+
+#ifdef DEBUG
+	iks_set_log_hook (jsess->prs, (iksLogHook *)on_log);
+#endif /* DEBUG */
+
+	jsess->acc = iks_id_new(iks_parser_stack(jsess->prs), jabber_id);
+
+	if (NULL == jsess->acc->resource) {
+		/* user gave no resource name, use the default */
+		buf = zbx_dsprintf(buf, "%s@%s/%s", jsess->acc->user, jsess->acc->server, "ZABBIX");
+		jsess->acc = iks_id_new(iks_parser_stack (jsess->prs), buf);
+		zbx_free(buf);
 	}
 
 	jsess->pass = strdup(password);
 	jsess->opt_use_sasl = use_sasl;
 
-	if ( !(jsess->prs = iks_stream_new (IKS_NS_CLIENT, jsess, (iksStreamHook *) on_stream)) )
+	if (NULL == (jsess->my_filter = iks_filter_new()))
 	{
-		zbx_snprintf(error, len, "Cannot create iksemel parser [%s]", strerror(errno));
+		zbx_snprintf(jabber_error, jabber_error_len, "Cannot create filter: %s",
+				strerror(errno));
 		goto lbl_fail;
 	}
 
-#ifdef DEBUG
-	iks_set_log_hook (jsess->prs, (iksLogHook *) on_log);
-#endif /* DEBUG */
-
-	jsess->acc = iks_id_new (iks_parser_stack (jsess->prs), jabber_id);
-
-	if (NULL == jsess->acc->resource) {
-		/* user gave no resource name, use the default */
-		buf = zbx_dsprintf (buf, "%s@%s/%s", jsess->acc->user, jsess->acc->server, "ZABBIX");
-		jsess->acc = iks_id_new (iks_parser_stack (jsess->prs), buf);
-		zbx_free (buf);
-	}
-
-	if( !(jsess->my_filter = iks_filter_new ()) )
-	{
-		zbx_snprintf(error, len, "Cannot create filter [%s]", strerror(errno));
-		goto lbl_fail;
-	}
-
-	iks_filter_add_rule (jsess->my_filter, (iksFilterHook *) on_result, jsess,
+	iks_filter_add_rule(jsess->my_filter, (iksFilterHook *)on_result, jsess,
 		IKS_RULE_TYPE, IKS_PAK_IQ,
 		IKS_RULE_SUBTYPE, IKS_TYPE_RESULT,
 		IKS_RULE_ID, "auth",
 		IKS_RULE_DONE);
 
-	iks_filter_add_rule (jsess->my_filter, on_error, jsess,
+	iks_filter_add_rule(jsess->my_filter, on_error, jsess,
 		IKS_RULE_TYPE, IKS_PAK_IQ,
 		IKS_RULE_SUBTYPE, IKS_TYPE_ERROR,
 		IKS_RULE_ID, "auth",
 		IKS_RULE_DONE);
 
-	switch (iks_error = iks_connect_with(jsess->prs, jsess->acc->server, port, jsess->acc->server, &zbx_iks_transport) ) {
+	switch (iks_connect_with(jsess->prs, jsess->acc->server, port, jsess->acc->server, &zbx_iks_transport))
+/*	switch (iks_connect_via(jsess->prs, jsess->acc->server, port, jsess->acc->server))*/
+	{
 		case IKS_OK:
 			break;
 		case IKS_NET_NODNS:
-			zbx_snprintf(error, len, "Hostname lookup failed");
+			zbx_snprintf(jabber_error, jabber_error_len, "Hostname lookup failed");
 			goto lbl_fail;
 		case IKS_NET_NOCONN:
-			zbx_snprintf(error, len, "Connection failed: %s", strerror_from_system(errno));
+			zbx_snprintf(jabber_error, jabber_error_len, "Connection failed: %s",
+					strerror_from_system(errno));
 			goto lbl_fail;
 		default:
-			zbx_snprintf(error, len, "Connection error: %s", strerror_from_system(errno));
+			zbx_snprintf(jabber_error, jabber_error_len, "Connection error: %s",
+					strerror_from_system(errno));
 			goto lbl_fail;
 	}
 
-	while (jsess->status != JABBER_READY) {
-		switch (iks_error = iks_recv (jsess->prs, 5)) {
-			case IKS_OK:
-			case IKS_HOOK:
-				break;
-			case IKS_NET_TLSFAIL:
-				zbx_snprintf(error, len, "tls handshake failed");
-				goto lbl_fail;
-			default:
-				zbx_snprintf(error, len, "receiving error [%i][%i]", iks_error, errno);
-				goto lbl_fail;
+	timeout = 30;
+	while (JABBER_READY != jsess->status && JABBER_ERROR != jsess->status) {
+		iks_error = iks_recv(jsess->prs, 1);
+
+		if (IKS_HOOK == iks_error)
+			break;
+
+		if (IKS_NET_TLSFAIL == iks_error)
+		{
+			zbx_snprintf(jabber_error, jabber_error_len, "tls handshake failed");
+			break;
 		}
+
+		if (IKS_OK != iks_error)
+		{
+			zbx_snprintf(jabber_error, jabber_error_len, "receiving error [%i][%i]",
+					iks_error, errno);
+			break;
+		}
+
+		if (--timeout == 0)
+			break;
 	}
 
-	return SUCCEED;
+	if (JABBER_READY == jsess->status)
+		ret = SUCCEED;
 
 lbl_fail:
-	disconnect_jabber();
-	return FAIL;
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s():%s",
+			__module_name, __function_name,
+			zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -424,49 +476,66 @@ lbl_fail:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	send_jabber(char *username, char *passwd, char *sendto, char *message, char *error, int max_error_len)
+int	send_jabber(char *username, char *passwd, char *sendto, char *subject, char *message, char *error, int max_error_len)
 {
-	iks *x = NULL;
-	int ret = FAIL;
-	int iks_error = IKS_OK;
+	const char	*__function_name = "send_jabber";
+	iks		*x;
+	int		ret = FAIL, iks_error = IKS_OK;
 
 	assert(error);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "JABBER: sending message");
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s()",
+			__module_name, __function_name);
 
 	*error = '\0';
 
-	if (NULL == jsess || jsess->status == JABBER_DISCONNECTED || jsess->status == JABBER_ERROR) {
-		if (SUCCEED != connect_jabber(username, passwd, 1, IKS_JABBER_PORT,  error, max_error_len))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "JABBER: %s", error);
-			return FAIL;
-		}
-	}
+	jabber_error = error;
+	jabber_error_len = max_error_len;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "JABBER: sending");
-	if( (x = iks_make_msg(IKS_TYPE_NONE, sendto, message)) )
+	if (SUCCEED != connect_jabber(username, passwd, 1, IKS_JABBER_PORT))
+		goto lbl_fail;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: sending",
+			__module_name);
+
+	if (NULL != (x = iks_make_msg(IKS_TYPE_NONE, sendto, message)))
 	{
+		iks_insert_cdata(iks_insert(x, "subject"), subject, 0);
 		iks_insert_attrib(x, "from", username);
-		if ( IKS_OK == (iks_error = iks_send (jsess->prs, x)) )
+		if (IKS_OK == (iks_error = iks_send(jsess->prs, x)))
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "JABBER: message sent");
+			zabbix_log(LOG_LEVEL_DEBUG, "%s: message sent",
+					__module_name);
 			ret = SUCCEED;
 		}
 		else
 		{
 			jsess->status = JABBER_ERROR;
 
-			zbx_snprintf(error, max_error_len, "JABBER: Cannot send message: %s", strerror_from_system(errno));
-			zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+			zbx_snprintf(error, max_error_len, "Cannot send message: %s",
+					strerror_from_system(errno));
 		}
-		iks_delete (x);
+		iks_delete(x);
 	}
 	else
-	{
-		zbx_snprintf(error, max_error_len, "JABBER: Cannot create message");
-		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
-	}
+		zbx_snprintf(error, max_error_len, "Cannot create message");
+
+lbl_fail:
+	if (NULL != jsess && JABBER_DISCONNECTED != jsess->status)
+		disconnect_jabber();
+
+	jabber_error = NULL;
+	jabber_error_len = 0;
+
+	if ('\0' != *error)
+		zabbix_log(LOG_LEVEL_WARNING, "%s: [%s] %s",
+				__module_name,
+				username,
+				error);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: End of %s():%s",
+			__module_name, __function_name,
+			zbx_result_string(ret));
 
 	return ret;
 }
