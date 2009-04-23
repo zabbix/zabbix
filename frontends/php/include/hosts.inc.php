@@ -882,7 +882,9 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 			);	
 	$def_options = array_merge($def_options, $options);
 	
-	$dd_first_entry = ZBX_DROPDOWN_FIRST_ENTRY;
+	$config = select_config();
+	
+	$dd_first_entry = $config['dropdown_first_entry'];
 	if($dd_first_entry == ZBX_DROPDOWN_FIRST_ZBX162){
 		$def_options['select_first_group_if_empty'] = 1;
 		$dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
@@ -1069,7 +1071,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 			$_REQUEST['groupid'] = $result['selected'] = 0;
 	}
 	else{
-		if(ZBX_DROPDOWN_FIRST_REMEMBER){
+		if($config['dropdown_first_remember']){
 			if($_REQUEST['groupid'] == -1) $_REQUEST['groupid'] = is_null($profile_groupid)?'0':$profile_groupid;
 			if(uint_in_array($_REQUEST['groupid'], $groupids)){
 				$result['selected'] = $_REQUEST['groupid'];
@@ -1132,7 +1134,9 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 			
 	$def_options = array_merge($def_options, $options);
 
-	$dd_first_entry = ZBX_DROPDOWN_FIRST_ENTRY;
+	$config = select_config();
+	
+	$dd_first_entry = $config['dropdown_first_entry'];
 	if($dd_first_entry == ZBX_DROPDOWN_FIRST_ZBX162){
 		$def_options['select_first_host_if_empty'] = 1;
 		$dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
@@ -1301,7 +1305,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 			$_REQUEST['hostid'] = $result['selected'] = 0;
 	}
 	else{
-		if(ZBX_DROPDOWN_FIRST_REMEMBER){
+		if($config['dropdown_first_remember']){
 			if($_REQUEST['hostid'] == -1) $_REQUEST['hostid'] = is_null($profile_hostid)?'0':$profile_hostid;
 
 			if(uint_in_array($_REQUEST['hostid'], $hostids)){
@@ -1334,7 +1338,9 @@ return $result;
 	function validate_group_with_host(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host=true){
 		global $page;
 		
-		$dd_first_entry = ZBX_DROPDOWN_FIRST_ENTRY;
+		$config = select_config();
+		
+		$dd_first_entry = $config['dropdown_first_entry'];
 		if($dd_first_entry == ZBX_DROPDOWN_FIRST_ZBX162){
 			$dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
 		}

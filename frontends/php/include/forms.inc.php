@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2008 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2798,90 +2798,6 @@
 		$frmGraph->Show();
 	}
 
-	function insert_value_mapping_form(){
-
-		$frmValmap = new CFormTable(S_VALUE_MAP);
-		$frmValmap->SetHelp("web.mapping.php");
-		$frmValmap->addVar("config",get_request("config",6));
-
-		if(isset($_REQUEST["valuemapid"])){
-			$frmValmap->addVar("valuemapid",$_REQUEST["valuemapid"]);
-			$db_valuemaps = DBselect("select * FROM valuemaps".
-				" WHERE valuemapid=".$_REQUEST["valuemapid"]);
-
-			$db_valuemap = DBfetch($db_valuemaps);
-
-			$frmValmap->SetTitle(S_VALUE_MAP.' "'.$db_valuemap["name"].'"');
-		}
-
-		if(isset($_REQUEST["valuemapid"]) && !isset($_REQUEST["form_refresh"])){
-			$valuemap = array();
-			$mapname = $db_valuemap["name"];
-			$mappings = DBselect("select * FROM mappings WHERE valuemapid=".$_REQUEST["valuemapid"]);
-			while($mapping = DBfetch($mappings))
-			{
-				$value = array(
-					"value" => $mapping["value"],
-					"newvalue" => $mapping["newvalue"]);
-
-				array_push($valuemap, $value);
-			}
-		}
-		else{
-			$mapname = get_request("mapname","");
-			$valuemap = get_request("valuemap",array());
-		}
-
-		$frmValmap->addRow(S_NAME, new CTextBox("mapname",$mapname,40));
-
-		$i = 0;
-		$valuemap_el = array();
-		foreach($valuemap as $value){
-			array_push($valuemap_el,
-				array(
-					new CCheckBox("rem_value[]", 'no', null, $i),
-					$value["value"].SPACE.RARR.SPACE.$value["newvalue"]
-				),
-				BR());
-			$frmValmap->addVar("valuemap[$i][value]",$value["value"]);
-			$frmValmap->addVar("valuemap[$i][newvalue]",$value["newvalue"]);
-			$i++;
-		}
-
-        $saveButton = new CButton('save', S_SAVE);
-
-		if(count($valuemap_el)==0) {
-			array_push($valuemap_el, S_NO_MAPPING_DEFINED);
-            $saveButton->addOption('disabled', 'true');
-        } else {
-			array_push($valuemap_el, new CButton('del_map','delete selected'));
-        }
-
-		$frmValmap->addRow(S_MAPPING, $valuemap_el);
-		$frmValmap->addRow(S_NEW_MAPPING, array(
-			new CTextBox("add_value","",10),
-			new CSpan(RARR,"rarr"),
-			new CTextBox("add_newvalue","",10),
-			SPACE,
-			new CButton("add_map",S_ADD)
-			),'new');
-
-
-
-		$frmValmap->addItemToBottomRow($saveButton);
-		if(isset($_REQUEST["valuemapid"])){
-			$frmValmap->addItemToBottomRow(SPACE);
-			$frmValmap->addItemToBottomRow(new CButtonDelete("Delete selected value mapping?",
-				url_param("form").url_param("valuemapid").url_param("config")));
-		}
-		else {
-		}
-		$frmValmap->addItemToBottomRow(SPACE);
-		$frmValmap->addItemToBottomRow(new CButtonCancel(url_param("config")));
-
-		$frmValmap->Show();
-	}
-
 	function get_maintenance_form(){
 		$frm_title = S_MAINTENANCE;
 
@@ -4614,61 +4530,6 @@
 		$frmMeadia->Show();
 	}
 
-
-	function insert_image_form(){
-
-		$frmImages = new CFormTable(S_IMAGE,'config.php','post','multipart/form-data');
-		$frmImages->SetHelp('web.config.images.php');
-		$frmImages->addVar('config',get_request('config',3));
-
-		if(isset($_REQUEST['imageid'])){
-			$result=DBselect('SELECT imageid,imagetype,name '.
-						' FROM images '.
-						' WHERE imageid='.$_REQUEST['imageid']);
-
-			$row=DBfetch($result);
-			$frmImages->SetTitle(S_IMAGE.' "'.$row['name'].'"');
-			$frmImages->addVar('imageid',$_REQUEST['imageid']);
-		}
-
-		if(isset($_REQUEST['imageid']) && !isset($_REQUEST['form_refresh'])){
-			$name		= $row['name'];
-			$imagetype	= $row['imagetype'];
-			$imageid	= $row['imageid'];
-		}
-		else{
-			$name		= get_request('name','');
-			$imagetype	= get_request('imagetype',1);
-			$imageid	= get_request('imageid',0);
-		}
-
-		$frmImages->addRow(S_NAME,new CTextBox('name',$name,64));
-
-		$cmbImg = new CComboBox('imagetype',$imagetype);
-		$cmbImg->addItem(IMAGE_TYPE_ICON,S_ICON);
-		$cmbImg->addItem(IMAGE_TYPE_BACKGROUND,S_BACKGROUND);
-
-		$frmImages->addRow(S_TYPE,$cmbImg);
-
-		$frmImages->addRow(S_UPLOAD,new CFile('image'));
-
-		if($imageid > 0){
-			$frmImages->addRow(S_IMAGE,new CLink(
-				new CImg('image.php?width=640&height=480&imageid='.$imageid,'no image',null),'image.php?imageid='.$row['imageid']));
-		}
-
-		$frmImages->addItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($_REQUEST['imageid'])){
-			$frmImages->addItemToBottomRow(SPACE);
-			$frmImages->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_IMAGE,
-				url_param('form').url_param('config').url_param('imageid')));
-		}
-
-		$frmImages->addItemToBottomRow(SPACE);
-		$frmImages->addItemToBottomRow(new CButtonCancel(url_param('config')));
-		$frmImages->Show();
-	}
-
 	function insert_screen_form(){
 
 		$frm_title = S_SCREEN;
@@ -4714,106 +4575,6 @@
 		$frmScr->addItemToBottomRow(new CButtonCancel());
 		$frmScr->Show();
 	}
-
- 	function insert_housekeeper_form(){
-		$config=select_config();
-
-		$frmHouseKeep = new CFormTable(S_HOUSEKEEPER,"config.php");
-		$frmHouseKeep->SetHelp("web.config.housekeeper.php");
-		$frmHouseKeep->addVar("config",get_request("config",0));
-
-		$frmHouseKeep->addRow(S_DO_NOT_KEEP_ACTIONS_OLDER_THAN,
-			new CNumericBox("alert_history",$config["alert_history"],5));
-
-		$frmHouseKeep->addRow(S_DO_NOT_KEEP_EVENTS_OLDER_THAN,
-			new CNumericBox("event_history",$config["event_history"],5));
-
-		$frmHouseKeep->addItemToBottomRow(new CButton("save",S_SAVE));
-		$frmHouseKeep->Show();
-	}
-
-	function insert_work_period_form(){
-		$config=select_config();
-
-		$frmHouseKeep = new CFormTable(S_WORKING_TIME,"config.php");
-		$frmHouseKeep->SetHelp("web.config.workperiod.php");
-		$frmHouseKeep->addVar("config",get_request("config",7));
-
-		$frmHouseKeep->addRow(S_WORKING_TIME,
-			new CTextBox("work_period",$config["work_period"],35));
-
-		$frmHouseKeep->addItemToBottomRow(new CButton("save",S_SAVE));
-		$frmHouseKeep->Show();
-	}
-
-	function insert_themes_form(){
-		$config=select_config();
-
-		$frmThemes = new CFormTable(S_THEMES,"config.php");
-		$frmThemes->addVar("config",get_request("config",9));
-
-		$cmbTheme = new CComboBox('default_theme',$config['default_theme']);
-			$cmbTheme->addItem('css_ob.css',S_ORIGINAL_BLUE);
-			$cmbTheme->addItem('css_bb.css',S_BLACK_AND_BLUE);
-
-		$frmThemes->addRow(S_DEFAULT_THEME,$cmbTheme);
-
-		$frmThemes->addItemToBottomRow(new CButton("save",S_SAVE));
-		$frmThemes->Show();
-	}
-
-	function insert_event_ack_form()
-	{
-		$config=select_config();
-
-		$frmEventAck = new CFormTable(S_EVENTS,"config.php");
-//		$frmEventAck->SetHelp("web.config.workperiod.php");
-		$frmEventAck->addVar("config",get_request("config",8));
-
-		$exp_select = new CComboBox('event_ack_enable');
-
-		$exp_select->addItem(EVENT_ACK_ENABLED,S_ENABLED,$config['event_ack_enable']?'yes':'no');
-		$exp_select->addItem(EVENT_ACK_DISABLED,S_DISABLED,$config['event_ack_enable']?'no':'yes');
-
-		$frmEventAck->addRow(S_EVENT_ACKNOWLEDGES,$exp_select);
-
-		$frmEventAck->addRow(S_SHOW_EVENTS_NOT_OLDER.SPACE.'('.S_DAYS.')',
-			new CTextBox('event_expire',$config['event_expire'],5));
-
-		$frmEventAck->addRow(S_MAX_COUNT_OF_EVENTS,
-			new CTextBox('event_show_max',$config['event_show_max'],5));
-
-		$frmEventAck->addItemToBottomRow(new CButton("save",S_SAVE));
-		$frmEventAck->Show();
-	}
-
-	function	insert_other_parameters_form()
-	{
-		$config=select_config();
-
-		$frmHouseKeep = new CFormTable(S_OTHER_PARAMETERS,'config.php');
-		$frmHouseKeep->SetHelp('web.config.other.php');
-		$frmHouseKeep->addVar('config',get_request('config',5));
-
-		$frmHouseKeep->addRow(S_REFRESH_UNSUPPORTED_ITEMS,
-			new CNumericBox('refresh_unsupported',$config['refresh_unsupported'],5));
-
-		$cmbUsrGrp = new CComboBox('alert_usrgrpid', $config['alert_usrgrpid']);
-		$cmbUsrGrp->addItem(0, S_NONE);
-		$result=DBselect('SELECT usrgrpid,name FROM usrgrp'.
-				' WHERE '.DBin_node('usrgrpid').
-				' order by name');
-		while($row=DBfetch($result))
-			$cmbUsrGrp->addItem(
-					$row['usrgrpid'],
-					get_node_name_by_elid($row['usrgrpid']).$row['name']
-					);
-		$frmHouseKeep->addRow(S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE,$cmbUsrGrp);
-
-		$frmHouseKeep->addItemToBottomRow(new CButton('save',S_SAVE));
-		$frmHouseKeep->Show();
-	}
-
 
 // HOSTS
 	function insert_mass_update_host_form(){//$elements_array_name){
@@ -7068,7 +6829,6 @@
 		$chkbCase = new CCheckBox('new_expression[case_sensitive]', $new_expression['case_sensitive'],null,1);
 
 		$tblExp->addRow(array(S_IGNORE_CASE,$chkbCase));
-
 
 		$tblExpFooter = new CTableInfo($tblExp);
 
