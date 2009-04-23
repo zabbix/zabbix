@@ -41,7 +41,7 @@ COpt::profiling_start("page");
 	
 	require_once('include/menu.inc.php');	
 	
-	zbx_menu_check_disable_all_nodes();
+	zbx_define_menu_restrictions();
 
 	/* Init CURRENT NODE ID */
 	init_nodes();
@@ -210,7 +210,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$menu_table->addRow($main_menu);
 		
 		$node_form = null;
-		if(ZBX_DISTRIBUTED) {
+		if(ZBX_DISTRIBUTED && !defined('ZBX_HIDE_NODE_SELECTION')) {
 			insert_js_function('check_all');
 			
 			$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
@@ -219,11 +219,12 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			if(!empty($available_nodes)) {
 				
 				$node_form = new CForm();
+				$node_form->setMethod('get');
 				$node_form->addOption('id', 'node_form');
 				
 // +++ create Combo Box with selected nodes +++
 				$combo_node_list = null;
-				if(count($ZBX_VIEWED_NODES['nodes']) > 1) {
+				if(count($ZBX_VIEWED_NODES['nodes']) > 0) {
 					$combo_node_list = new CComboBox('switch_node', $ZBX_VIEWED_NODES['selected'], 'submit()');
 					
 					foreach($ZBX_VIEWED_NODES['nodes'] as $nodeid => $nodedata) {
@@ -274,7 +275,8 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				$div_node_tree->addStyle('display: none');
 				
 				
-				$node_form->addItem(array(new CSpan(S_CURRENT_NODE,'textcolorstyles'), $combo_node_list));
+				if(!is_null($combo_node_list)) 
+					$node_form->addItem(array(new CSpan(S_CURRENT_NODE,'textcolorstyles'), $combo_node_list));
 				$node_form->addItem($button_show_tree);
 				$node_form->addItem($div_node_tree);
 				unset($combo_node_list);	
