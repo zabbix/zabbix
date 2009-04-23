@@ -429,6 +429,10 @@
 	'S_DASHED_LINE'=>			'Dashed line',
 
 //	config.php
+	'S_GUI'=>						'GUI',
+	'S_ZBX162_MODE'=>				'ZABBIX 1.6.2 comp. mode',
+	'S_DROPDOWN_FIRST_ENTRY'=>		'Dropdown first entry',
+	'S_DROPDOWN_REMEMBER_SELECTED'=>	'remember selected',
 	'S_THEMES'=>					'Themes',
 	'S_SYSTEM_DEFAULT'=>			'System default',
 	'S_BLACK_AND_BLUE'=>			'Black & Blue',
