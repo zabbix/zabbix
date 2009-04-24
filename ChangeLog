@@ -35,6 +35,7 @@ Changes for 1.7.0
 
 Changes for 1.6.5
 
+ - [ZBX-888] more supported GSM modems (ignoring AT+CMEE command) (Sasha)
  - [ZBX-884] fixed sudden stop of Jabber notifications (Sasha)
  - [ZBX-884] added subject field for Jabber notifications (Sasha)
  - [ZBX-460] fixed processing `distclean' target of `Makefile' for zabbix_proxy (Dmitry)
