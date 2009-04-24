@@ -67,23 +67,68 @@ static int write_gsm(int fd, char *str, char *error, int max_error_len)
 	return ret;
 }
 
+static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char *expect, char *error, int max_error_len)
+{
+	const char	*__function_name = "check_modem_result";
+	char		rcv[0xff];
+	int		i, len, ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	strcpy(rcv, *sbuf);
+
+	do
+	{
+		len = *ebuf - *sbuf;
+		for (i = 0; i < len && (*sbuf)[i] != '\n' && (*sbuf)[i] != '\r'; i++)
+			; /* find first '\r' & '\n' */
+
+		if (i < len)
+			(*sbuf)[i++] = '\0';
+
+		ret = (NULL == strstr(*sbuf, expect)) ? FAIL : SUCCEED;
+	
+		*sbuf += i;
+
+		if (*sbuf != buffer)
+		{
+			memmove(buffer, *sbuf, *ebuf - *sbuf + 1); /* +1 for '\0' */
+			*ebuf -= *sbuf - buffer;
+			*sbuf = buffer;
+		}
+	} while (*sbuf < *ebuf && ret == FAIL);
+
+	if (ret == FAIL && error)
+	{
+		zbx_snprintf(error, max_error_len, "Expected [%s] received [%s]",
+				expect,
+				rcv);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
 int read_gsm(int fd, const char *expect, char *error, int max_error_len, int timeout_sec)
 {
+	const char	*__function_name = "read_gsm";
 	static char	buffer[0xff];
 	static char	*ebuf = buffer;
 	static char	*sbuf = buffer;
-	char		rcv[0xff];
-
 	fd_set		fdset;
 	struct timeval  tv;
+	int		i, nbytes, ret = SUCCEED;
 
-	int	i, nbytes, len;
-	int	ret = SUCCEED;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s] [%s] [%s] [%s]", __function_name, expect, ebuf != buffer ? buffer : "NULL", ebuf != buffer ? ebuf : "NULL", ebuf != buffer ? sbuf : "NULL");
 
-	if( timeout_sec == 0 )
+/*	if (timeout_sec == 0)
 	{
 		goto check_result;
-	}
+	}*/
+	if ('\0' != *expect && ebuf != buffer &&
+			SUCCEED == check_modem_result(buffer, &ebuf, &sbuf, expect, error, max_error_len))
+		goto out;
 
 	tv.tv_sec  = timeout_sec;
 	tv.tv_usec = 0;
@@ -97,9 +142,10 @@ int read_gsm(int fd, const char *expect, char *error, int max_error_len, int tim
 			if ( EINTR == errno )	continue;
 		
 			zabbix_log(LOG_LEVEL_DEBUG, "Error select() for GSM modem. [%s]", strerror(errno));
-			if ( error ) zbx_snprintf(error,max_error_len, "Error select() for GSM modem. [%s]", strerror(errno));
-
-			return FAIL;
+			if (error)
+				zbx_snprintf(error,max_error_len, "Error select() for GSM modem. [%s]", strerror(errno));
+			ret = FAIL;
+			goto out;
 		}
 		else if ( i == 0 ) /*( 1 != i )*/
 		{
@@ -117,52 +163,23 @@ int read_gsm(int fd, const char *expect, char *error, int max_error_len, int tim
 
 	/* read characters into our string buffer */
 	while ((nbytes = read(fd, ebuf, buffer + sizeof(buffer) - 1 - ebuf)) > 0)
-	{
 		ebuf += nbytes;
-	}
 	/* nul terminate the string and see if we got an OK response */
 check_result:
 	*ebuf = '\0';
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Read from GSM modem [%s]", sbuf);
-	strcpy(rcv, sbuf);
 
-	if( '\0' == *expect ) /* empty */
+	if ('\0' == *expect) /* empty */
 	{
 		sbuf = ebuf = buffer;
 		*ebuf = '\0';
-		return ret;
+		goto out;
 	}
 
-	do
-	{
-		len = ebuf - sbuf;
-		for( i = 0; i < len && (sbuf[i] != '\n' && sbuf[i] != '\r'); i++ )
-			; /* find first '\r' & '\n' */
-
-		if(i < len)
-		{
-			sbuf[i++] = '\0';
-		}
-
-		ret = ( strstr(sbuf, expect) == NULL ) ? FAIL : SUCCEED;
-	
-		sbuf += i;
-
-		if ( sbuf != buffer )
-		{
-			memmove(buffer, sbuf, ebuf - sbuf + 1); /* +1 for '\0' */
-			ebuf -= sbuf - buffer;
-			sbuf = buffer;
-		}
-	} while( (sbuf < ebuf) && (ret == FAIL) );
-
-	if ( ret == FAIL && error )
-	{
-		zbx_snprintf(error, max_error_len, "Expected [%s] received [%s]",
-			expect,
-			rcv);
-	}
+	ret = check_modem_result(buffer, &ebuf, &sbuf, expect, error, max_error_len);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -175,12 +192,13 @@ typedef struct {
 
 int	send_sms(char *device,char *number,char *message, char *error, int max_error_len)
 {
+	const char	*__function_name = "send_sms";
 #define	ZBX_AT_ESC	"\x1B"
 #define ZBX_AT_CTRL_Z	"\x1A"
 
 	zbx_sms_scenario scenario[] = {
 /*  0  */	{ZBX_AT_ESC	, NULL		, 0	},	/* Send <ESC> */
-/*  1  */	{"AT+CMEE=2\r"	, "OK"		, 5	},	/* verbose error values */
+/*  1  */	{"AT+CMEE=2\r"	, ""/*"OK"*/	, 5	},	/* verbose error values */
 /*  1  */	{"ATE0\r"	, "OK"		, 5	},	/* Turn off echo */
 /*  2  */	{"AT\r"		, "OK"		, 5	},	/* Init modem */
 /*  3  */	{"AT+CMGF=1\r"	, "OK"		, 5	},	/* Switch to text mode */
@@ -202,7 +220,7 @@ int	send_sms(char *device,char *number,char *message, char *error, int max_error
 	int	f,
 		ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In send_sms()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In %s()", __function_name);
 	
 	if ( -1 == (f = open(device, O_RDWR | O_NOCTTY | O_NDELAY)) )
 	{
@@ -256,8 +274,7 @@ int	send_sms(char *device,char *number,char *message, char *error, int max_error
 	tcsetattr(f, TCSANOW, &old_options);
 	close(f);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End of send_sms() [%s]",
-		ret == SUCCEED ? "SUCCEED" : "FAIL" );
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
