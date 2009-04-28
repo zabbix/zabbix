@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-356] moved dropdown configuration from defines to frontend (Vedmak)
  - [DEV-355] changed node management interface (Vedmak)
  - [DEV-341] added hint with previous 20 events in Dashboard's widget "Last 20 issues" on mouse-over (Vedmak)
  - [DEV-326] admins are allowed to change Medias in user profile (Vedmak)
@@ -35,6 +36,7 @@ Changes for 1.7.0
 
 Changes for 1.6.5
 
+ - [ZBX-893] fixed error creating trigger when in Host dropdown selected All (Vedmak)
  - [ZBX-888] more supported GSM modems (ignoring AT+CMEE command) (Sasha)
  - [ZBX-884] fixed sudden stop of Jabber notifications (Sasha)
  - [ZBX-884] added subject field for Jabber notifications (Sasha)
