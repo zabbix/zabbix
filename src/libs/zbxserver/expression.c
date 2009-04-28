@@ -33,6 +33,203 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: trigger_get_N_functionid                                         *
+ *                                                                            *
+ * Purpose: explode short trigger expression to normal mode                   *
+ *          {11}=1 explode to {hostX:keyY.functionZ(parameterN)}=1            *
+ *                                                                            *
+ * Parameters: short_expression - null terminated trigger expression          *
+ *                                {11}=1 & {2346734}>5                        *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	trigger_get_N_functionid(char *short_expression, int n, zbx_uint64_t *functionid)
+{
+	const char	*__function_name = "trigger_get_N_functionid";
+
+	typedef enum {
+		EXP_NONE,
+		EXP_FUNCTIONID
+	} parsing_state_t;
+
+	parsing_state_t	state = EXP_NONE;
+	int		num = 1;
+	char		*p_functionid = NULL;
+	register char	*c;
+
+	assert(short_expression);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() short_expression:'%s' n:%d)", __function_name, short_expression, n);
+
+	for (c = short_expression; '\0' != *c; c++)
+	{
+		if ('{' == *c)
+		{
+			state = EXP_FUNCTIONID;
+			p_functionid = c + 1;
+		}
+		else if ('}' == *c && EXP_FUNCTIONID == state && p_functionid)
+		{
+			*c = '\0';
+
+			if (SUCCEED == is_uint64(p_functionid, functionid))
+			{
+				if (num == n)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() functionid:" ZBX_FS_UI64, __function_name, *functionid);
+					zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(SUCCEED));
+					return SUCCEED;
+				}
+				num++;
+			}
+
+			*c = '}';
+			state = EXP_NONE;
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(FAIL));
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_trigger_expression_by_triggerid                            *
+ *                                                                            *
+ * Purpose: retrive trigger expression by triggerid                           *
+ *                                                                            *
+ * Parameters: triggerid - trigger identificator from database                *
+ *             expression - result buffer                                     *
+ *             max_expression_len - size of result buffer                     *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_trigger_expression_by_triggerid(zbx_uint64_t triggerid, char *expression, size_t max_expression_len)
+{
+	const char	*__function_name = "DBget_trigger_expression_by_triggerid";
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	assert(expression);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64, __function_name, triggerid);
+
+	result = DBselect("select expression from triggers where triggerid=" ZBX_FS_UI64,
+			triggerid);
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	{
+		zbx_strlcpy(expression, row[0], max_expression_len);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __function_name, expression);
+		ret = SUCCEED;
+	}
+
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_item_lastvalue_by_functionid                               *
+ *                                                                            *
+ * Purpose: retrive item lastvalue by functionid                              *
+ *                                                                            *
+ * Parameters: functionid - function identificator from database              *
+ *             lastvalue - pointer to result buffer. Must be NULL             *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_item_lastvalue_by_functionid(zbx_uint64_t functionid, char **lastvalue)
+{
+	const char	*__function_name = "DBget_item_lastvalue_by_functionid";
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_RESULT	h_result;
+	DB_ROW		h_row;
+	zbx_uint64_t	itemid, valuemapid;
+	int		value_type, ret = FAIL;
+	char		tmp[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionid:" ZBX_FS_UI64, __function_name, functionid);
+
+	result = DBselect("select i.itemid,i.value_type,i.valuemapid,i.units,i.lastvalue from items i,functions f"
+			" where i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
+			functionid);
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	{
+		ZBX_STR2UINT64(itemid, row[0]);
+		value_type = atoi(row[1]);
+		ZBX_STR2UINT64(valuemapid, row[2]);
+
+		switch (value_type) {
+			case ITEM_VALUE_TYPE_LOG:
+			case ITEM_VALUE_TYPE_TEXT:
+				zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=" ZBX_FS_UI64 " order by id desc",
+						value_type == ITEM_VALUE_TYPE_LOG ? "history_log" : "history_text",
+						itemid);
+
+				h_result = DBselectN(tmp, 1);
+
+				if (NULL != (h_row = DBfetch(h_result)) && SUCCEED != DBis_null(h_row[0]))
+					*lastvalue = zbx_dsprintf(*lastvalue, "%s", h_row[0]);
+				else
+					*lastvalue = zbx_dsprintf(*lastvalue, "%s", row[4]);
+
+				DBfree_result(h_result);
+				break;
+			case ITEM_VALUE_TYPE_STR:
+				zbx_strlcpy(tmp, row[4], sizeof(tmp));
+
+				replace_value_by_map(tmp, valuemapid);
+
+				*lastvalue = zbx_dsprintf(*lastvalue, "%s", tmp);
+				break;
+			default:
+				zbx_strlcpy(tmp, row[4], sizeof(tmp));
+
+				if (SUCCEED != replace_value_by_map(tmp, valuemapid))
+					add_value_suffix(tmp, sizeof(tmp), row[3], value_type);
+
+				*lastvalue = zbx_dsprintf(*lastvalue, "%s", tmp);
+				break;
+		}
+		ret = SUCCEED;
+	}
+
+	DBfree_result(result);
+
+	if (NULL != *lastvalue)
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() lastvalue:'%s'", __function_name, *lastvalue);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: str2double                                                       *
  *                                                                            *
  * Purpose: convert string to double                                          *
@@ -884,7 +1081,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 		*str_out = NULL,
 		*replace_to = NULL;
 
-	char	tmp[MAX_STRING_LEN], *buf = NULL;
+	char	*buf = NULL;
 	int	buf_offset, buf_allocated = MAX_STRING_LEN;
 	int	status, esc_step;
 	int	var_len;
@@ -1037,37 +1234,27 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 
 			DBfree_result(result);
 		}
-		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY | MACRO_TYPE_TRIGGER_DESCRIPTION)) &&
-			strncmp(pr, MVAR_ITEM_LASTVALUE, strlen(MVAR_ITEM_LASTVALUE)) == 0)
+		else if ((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY | MACRO_TYPE_TRIGGER_DESCRIPTION)) &&
+				0 == strncmp(pr, MVAR_ITEM_LASTVALUE, strlen(MVAR_ITEM_LASTVALUE)))
 		{
+			char		expression[TRIGGER_EXPRESSION_LEN_MAX];
+			zbx_uint64_t	functionid;
+			int		ret = SUCCEED;
+
 			var_len = strlen(MVAR_ITEM_LASTVALUE);
 
-			result = DBselect("select distinct i.lastvalue,i.units,i.value_type"
-				" from triggers t, functions f,items i, hosts h"
-				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid",
-				event->objectid);
-
-			row=DBfetch(result);
-
-			if(!row || DBis_null(row[0])==SUCCEED)
+			if (SUCCEED == ret)
+				ret = DBget_trigger_expression_by_triggerid(event->objectid, expression, sizeof(expression));
+			if (SUCCEED == ret)
+				ret = trigger_get_N_functionid(expression, 1, &functionid);
+			if (SUCCEED == ret)
+				ret = DBget_item_lastvalue_by_functionid(functionid, &replace_to);
+			if (FAIL == ret)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "No ITEM.LASTVALUE in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
-					event->objectid);
-
-				replace_to = zbx_dsprintf(replace_to, "%s",
-					STR_UNKNOWN_VARIABLE);
+				zabbix_log(LOG_LEVEL_DEBUG, "No ITEM.LASTVALUE in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
+						event->objectid);
+				replace_to = zbx_dsprintf(replace_to, "%s", STR_UNKNOWN_VARIABLE);
 			}
-			else
-			{
-				strscpy(tmp, row[0]);
-
-				add_value_suffix(tmp, sizeof(tmp), row[1], atoi(row[2]));
-
-				replace_to = zbx_dsprintf(replace_to, "%s",
-					tmp);
-			}
-
-			DBfree_result(result);
 		}
 		else if((macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)) &&
 			strncmp(pr, MVAR_TRIGGER_KEY, strlen(MVAR_TRIGGER_KEY)) == 0)
