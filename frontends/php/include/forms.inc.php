@@ -2213,7 +2213,7 @@
 		$frmTrig = new CFormTable(S_TRIGGER,"triggers.php");
 		$frmTrig->SetHelp("config_triggers.php");
 
-		if($_REQUEST['hostid']>0){
+		if(isset($_REQUEST['hostid'])){
 			$frmTrig->AddVar("hostid",$_REQUEST['hostid']);
 		}
 
