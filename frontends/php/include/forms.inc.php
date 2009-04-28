@@ -2308,8 +2308,8 @@
 		$frmTrig = new CFormTable(S_TRIGGER,"triggers.php");
 		$frmTrig->SetHelp("config_triggers.php");
 
-		if($_REQUEST['hostid']>0){
-			$frmTrig->addVar("hostid",$_REQUEST['hostid']);
+		if(isset($_REQUEST['hostid'])){			
+			$frmTrig->AddVar("hostid",$_REQUEST['hostid']);		
 		}
 
 		$dep_el=array();
