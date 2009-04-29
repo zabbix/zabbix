@@ -465,33 +465,26 @@ void	DBupdate_services(
 		int status
 	)
 {
-	DB_ROW	row;
+	DB_RESULT	result;
+	DB_ROW		row;
 	zbx_uint64_t	serviceid;
 
-	DB_RESULT result;
+	result = DBselect("select serviceid from services where triggerid=" ZBX_FS_UI64,
+			triggerid);
 
-	DBexecute("update services set status=%d where triggerid=" ZBX_FS_UI64,
-		status,
-		triggerid);
-
-	result = DBselect("select serviceid,algorithm from services where triggerid=" ZBX_FS_UI64,
-		triggerid);
-
-	while((row=DBfetch(result)))
+	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(serviceid,row[0]);
+		ZBX_STR2UINT64(serviceid, row[0]);
 		
-		DBadd_service_alarm(
-			serviceid,
-			status,
-			time(NULL)
-			);
+		DBexecute("update services set status=%d where serviceid=" ZBX_FS_UI64,
+				status,
+				serviceid);
 
+		DBadd_service_alarm(serviceid, status, time(NULL));
 		DBupdate_services_rec(serviceid);
 	}
 
 	DBfree_result(result);
-	return;
 }
 
 /******************************************************************************
