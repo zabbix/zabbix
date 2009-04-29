@@ -716,6 +716,7 @@ FIELD		|triggerid	|t_id		|	|		|ZBX_SYNC		|triggers
 FIELD		|showsla	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|goodsla	|t_double	|'99.9'	|NOT NULL	|ZBX_SYNC
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+INDEX		|1		|triggerid
 
 TABLE|services_links|linkid|ZBX_SYNC
 FIELD		|linkid		|t_id		|'0'	|NOT NULL	|0
