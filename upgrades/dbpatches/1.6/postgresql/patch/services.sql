@@ -13,3 +13,5 @@ CREATE TABLE services_tmp (
 insert into services_tmp select * from services;
 drop table services;
 alter table services_tmp rename to services;
+
+CREATE INDEX services_1 on services (triggerid);
