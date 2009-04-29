@@ -397,6 +397,7 @@ upgrades/dbpatches/1.6/oracle/patch/proxy_history.sql -text
 upgrades/dbpatches/1.6/oracle/patch/rights.sql -text
 upgrades/dbpatches/1.6/oracle/patch/screens_items.sql -text
 upgrades/dbpatches/1.6/oracle/patch/scripts.sql -text
+upgrades/dbpatches/1.6/oracle/patch/services.sql -text
 upgrades/dbpatches/1.6/oracle/patch/sessions.sql -text
 upgrades/dbpatches/1.6/oracle/patch/sysmaps_elements.sql -text
 upgrades/dbpatches/1.6/oracle/patch/sysmaps_link_triggers.sql -text
