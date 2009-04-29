@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [DEV-137] fixed incorrect comment for TrapperTimeout option in zabbix_server.conf (Sasha)
  - [ZBX-894] fixed processing of {ITEM.LASTVALUE} for alerts if the trigger expression consists of several items (Sasha) 
  - [ZBX-893] fixed error creating trigger when in Host dropdown selected All (Vedmak)
  - [ZBX-888] more supported GSM modems (ignoring AT+CMEE command) (Sasha)
