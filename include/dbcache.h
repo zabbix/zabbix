@@ -99,7 +99,7 @@ ZBX_DC_CACHE
 ZBX_DC_NEXTCHECK
 {
 	zbx_uint64_t	itemid;
-	time_t		clock;
+	time_t		now, nextcheck;
 	/* for not supported items */
 	char		*error_msg;
 };
