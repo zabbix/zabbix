@@ -43,9 +43,6 @@
 	define('ZBX_MIN_PERIOD', 3600);					// ~1 hour
 	define('ZBX_MAX_PERIOD', 12*31*24*3600);		// ~1 year
 	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
-
-	// define('ZBX_DROPDOWN_FIRST_ENTRY',		1);		// 0 - NONE, 1 - ALL, 2 - SIMILAR ZBX 1.6.2 (compatibility mode)
-	// define('ZBX_DROPDOWN_FIRST_REMEMBER',	1);		// 0 - do NOT remember, 1 - do remember
 	
 	putenv('GDFONTPATH='.realpath('fonts/'));		// where to search for font  (GD > 2.0.18)
 	define('ZBX_GRAPH_FONT_NAME',	'kochi-gothic-subst');	// font file name
@@ -514,6 +511,12 @@
 
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);
+	
+	define('EXPRESSION_TYPE_INCLUDED',		0);
+	define('EXPRESSION_TYPE_ANY_INCLUDED',	1);
+	define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
+	define('EXPRESSION_TYPE_TRUE',			3);
+	define('EXPRESSION_TYPE_FALSE',			4);
 	
 	define('AVAILABLE_NOCACHE',	0);		// take available objects not from cache
 	
