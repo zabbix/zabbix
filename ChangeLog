@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-897] fixed user groups rights adding for host groups (Vedmak)
  - [ZBX-896] improved performance of processing of IT services. Added database index (Sasha)
  - [DEV-137] fixed incorrect comment for TrapperTimeout option in zabbix_server.conf (Sasha)
  - [ZBX-894] fixed processing of {ITEM.LASTVALUE} for alerts if the trigger expression consists of several items (Sasha) 

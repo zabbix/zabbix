@@ -81,6 +81,8 @@ function add_right(formname,id,permission,name){
 	$frmTitle->AddVar('permission', $permission);
 
 	$PAGE_NODES = get_viewed_nodes();
+	$sql_where = '';
+	
 	if(ZBX_DISTRIBUTED){
 
 		$cmbResourceNode = new CComboBox('nodeid',$nodeid,'submit();');
@@ -93,6 +95,9 @@ function add_right(formname,id,permission,name){
 		}
 		
 		$frmTitle->AddItem(array(S_NODE, SPACE, $cmbResourceNode));
+		
+		$sql_where = ' WHERE '.DBcondition('n.nodeid', $PAGE_NODES['nodeids']).
+				($nodeid?' AND nodeid='.$nodeid:'');
 	}
 
 	show_table_header(permission2str($permission),$frmTitle);
@@ -101,13 +106,13 @@ function add_right(formname,id,permission,name){
 	$table->SetHeader(array(S_NAME));
 	
 	$db_resources = null;
-
+	
 	$sql = 'SELECT n.name as node_name, g.name as name, g.groupid as id '.
 			' FROM groups g '.
 				' LEFT JOIN nodes n on '.DBid2nodeid('g.groupid').'=n.nodeid '.
-			' WHERE '.DBcondition('n.nodeid', $PAGE_NODES['nodeids']).
-				($nodeid?' AND nodeid='.$nodeid:'').
+			$sql_where.
 			' ORDER BY n.name, g.name';
+			
 	$db_resources = DBselect($sql);
 	while($db_resource = DBfetch($db_resources)){
 		if(isset($db_resource['node_name']))
