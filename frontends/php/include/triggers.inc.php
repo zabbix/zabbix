@@ -1178,10 +1178,24 @@
 		if($row){
 			$description = expand_trigger_description_constants($row['description'], $row);
 
-			if(is_null($row['host'])) $row['host'] = '{HOSTNAME}';
-			$description = str_replace('{HOSTNAME}', $row['host'],$description);
+			if (zbx_strstr($description, '{HOSTNAME}')) {
 
-			if(zbx_strstr($description,'{ITEM.LASTVALUE}')){
+				$functionid = trigger_get_N_functionid($row['expression'], 1);
+
+				if (isset($functionid)) {
+					$sql = 'SELECT DISTINCT h.host'.
+							' FROM functions f,items i,hosts h'.
+							' WHERE f.itemid=i.itemid'.
+								' AND i.hostid=h.hostid'.
+								' AND f.functionid='.$functionid;
+					$host = DBfetch(DBselect($sql));
+					if (is_null($host['host']))
+						$host['host'] = '{HOSTNAME}';
+					$description = str_replace('{HOSTNAME}', $host['host'], $description);
+				}
+			}
+
+			if(zbx_strstr($description, '{ITEM.LASTVALUE}')){
 			
 				$functionid=trigger_get_N_functionid($row['expression'], 1);
 
