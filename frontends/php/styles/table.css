@@ -1,11 +1,9 @@
 /* CSS Document */
-table
-{
+table{
 	border-spacing:	0px; /* cellspacing */
 }
 
-table.home
-{
+table.home{
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 8pt;
 }

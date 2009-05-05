@@ -335,12 +335,12 @@
 		
 		$grant = true;
 		if(($gui_access == GROUP_GUI_ACCESS_DISABLED) || ($users_status == GROUP_STATUS_DISABLED)){
-			$grant = (!uint_in_array($USER_DETAILS['userid'],$users));
+			$grant = !uint_in_array($USER_DETAILS['userid'],$users);
 		}
 		if($grant){
 			$result = DBexecute('DELETE FROM users_groups WHERE usrgrpid='.$usrgrpid);
 			foreach($users as $userid => $name){
-				$result &= add_user_to_group($userid,$usrgrpid);
+				$result = add_user_to_group($userid,$usrgrpid);
 				if(!$result)	return	$result;
 			}
 		}
@@ -352,7 +352,7 @@
 		$result=DBexecute('DELETE FROM rights WHERE groupid='.$usrgrpid);
 		foreach($rights as $right){
 			$id = get_dbid('rights','rightid');
-			$result=DBexecute('INSERT INTO rights (rightid,groupid,permission,id)'.
+			$result = DBexecute('INSERT INTO rights (rightid,groupid,permission,id)'.
 				' VALUES ('.$id.','.$usrgrpid.','.$right['permission'].','.$right['id'].')');
 				
 			if(!$result)	return	$result;

@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-900] fixed adding several user to group with Oracle DB (Artem)
  - [ZBX-894] fixed processing of {HOSTNAME} for trigger name if the trigger expression consists of several items (Sasha)
  - [ZBX-894] fixed processing of {ITEM.NAME},{HOSTNAME},{IPADDRESS} and {TRIGGER.KEY} for alerts if the trigger expression consists of several items (Sasha)
  - [ZBX-897] fixed user groups rights adding for host groups (Vedmak)

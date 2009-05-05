@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	function	event_source2str($sourceid){
+	function event_source2str($sourceid){
 		switch($sourceid){
 			case EVENT_SOURCE_TRIGGERS:	return S_TRIGGERS;
 			case EVENT_SOURCE_DISCOVERY:	return S_DISCOVERY;
