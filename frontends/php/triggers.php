@@ -36,8 +36,8 @@
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
-		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({save})'),
+		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID, null),
+		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID, null),
 
 		'triggerid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
 
@@ -50,7 +50,7 @@
 		'priority'=>		array(T_ZBX_INT, O_OPT,  NULL,  IN('0,1,2,3,4,5'),'isset({save})'),
 		'comments'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
 		'url'=>				array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
-		'status'=>			array(T_ZBX_STR, O_OPT,  NULL,	NULL,NULL),
+		'status'=>			array(T_ZBX_STR, O_OPT,  NULL,	NULL, NULL),
 
 		'dependencies'=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
 		'new_dependence'=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID.'{}>0','isset({add_dependence})'),
@@ -148,9 +148,8 @@
 		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST['expression']))
 			access_deny();
 
-		$now=time();
-		if(isset($_REQUEST['status'])){ $status=TRIGGER_STATUS_DISABLED; }
-		else{ $status=TRIGGER_STATUS_ENABLED; }
+		$now = time();
+		$status = isset($_REQUEST['status'])?TRIGGER_STATUS_DISABLED:TRIGGER_STATUS_ENABLED;
 
 		$type = $_REQUEST['type'];
 
@@ -520,19 +519,20 @@
 				}
 			}
 			
-			if ( ($row['error'] != '') && ($row['hoststatus'] != 3) ) //host status 3 means Template
-			{
+			if(($row['error'] != '') && ($row['hoststatus'] != HOST_STATUS_TEMPLATE)){
 				$description[] = array(BR(), bold(S_ERROR.':'), SPACE);
 				$description[] = array(BR(), new CSpan($row['error'], 'red'));
 			}
 	
-			if($row['priority']==0)		$priority=S_NOT_CLASSIFIED;
-			elseif($row['priority']==1)	$priority=new CCol(S_INFORMATION,'information');
-			elseif($row['priority']==2)	$priority=new CCol(S_WARNING,'warning');
-			elseif($row['priority']==3)	$priority=new CCol(S_AVERAGE,'average');
-			elseif($row['priority']==4)	$priority=new CCol(S_HIGH,'high');
-			elseif($row['priority']==5)	$priority=new CCol(S_DISASTER,'disaster');
-			else $priority=$row['priority'];
+			switch($row['priority']){
+				case 0: $priority=S_NOT_CLASSIFIED; 				break;
+				case 1: $priority=new CCol(S_INFORMATION,'information'); 	break;
+				case 2: $priority=new CCol(S_WARNING,'warning'); 	break;
+				case 3: $priority=new CCol(S_AVERAGE,'average'); 	break;
+				case 4: $priority=new CCol(S_HIGH,'high'); 			break;
+				case 5: $priority=new CCol(S_DISASTER,'disaster'); 	break;
+				default:$priority=$row['priority'];
+			}
 
 			if($row['status'] == TRIGGER_STATUS_DISABLED){
 				$status= new CLink(S_DISABLED,
