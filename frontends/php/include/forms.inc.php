@@ -2178,6 +2178,7 @@
 		$target_sql = 'SELECT DISTINCT g.groupid as target_id, g.name as target_name '.
 			' FROM groups g, hosts_groups hg '.
 			' WHERE hg.groupid=g.groupid '.
+				' AND '.DBin_node('g.groupid').
 			' ORDER BY g.name';
 
 		if(0 == $copy_type){
@@ -2305,45 +2306,45 @@
 	function insert_trigger_form(){
 		global $USER_DETAILS;
 
-		$frmTrig = new CFormTable(S_TRIGGER,"triggers.php");
-		$frmTrig->SetHelp("config_triggers.php");
+		$frmTrig = new CFormTable(S_TRIGGER,'triggers.php');
+		$frmTrig->SetHelp('config_triggers.php');
 
-		if(isset($_REQUEST['hostid'])){			
-			$frmTrig->AddVar("hostid",$_REQUEST['hostid']);		
+		if(isset($_REQUEST['hostid'])){
+			$frmTrig->addVar('hostid',$_REQUEST['hostid']);		
 		}
 
 		$dep_el=array();
-		$dependencies = get_request("dependencies",array());
+		$dependencies = get_request('dependencies',array());
 
 		$limited = null;
 
-		if(isset($_REQUEST["triggerid"])){
-			$frmTrig->addVar("triggerid",$_REQUEST["triggerid"]);
-			$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
+		if(isset($_REQUEST['triggerid'])){
+			$frmTrig->addVar('triggerid',$_REQUEST['triggerid']);
+			$trigger=get_trigger_by_triggerid($_REQUEST['triggerid']);
 
-			$frmTrig->SetTitle(S_TRIGGER.' "'.htmlspecialchars($trigger["description"]).'"');
+			$frmTrig->SetTitle(S_TRIGGER.' "'.htmlspecialchars($trigger['description']).'"');
 
 			$limited = $trigger['templateid'] ? 'yes' : null;
 		}
 
-		$expression		= get_request("expression"	,"");
-		$description	= get_request("description"	,"");
+		$expression		= get_request('expression'	,'');
+		$description	= get_request('description'	,'');
 		$type 			= get_request('type', 0);
-		$priority		= get_request("priority"	,0);
-		$status			= get_request("status"		,0);
-		$comments		= get_request("comments"	,"");
-		$url			= get_request("url"		,"");
+		$priority		= get_request('priority'	,0);
+		$status			= get_request('status'		,0);
+		$comments		= get_request('comments'	,'');
+		$url			= get_request('url'		,'');
 
-		if((isset($_REQUEST["triggerid"]) && !isset($_REQUEST["form_refresh"]))  || isset($limited)){
-			$description	= $trigger["description"];
-			$expression	= explode_exp($trigger["expression"],0);
+		if((isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh']))  || isset($limited)){
+			$description	= $trigger['description'];
+			$expression	= explode_exp($trigger['expression'],0);
 
-			if(!isset($limited) || !isset($_REQUEST["form_refresh"])){
+			if(!isset($limited) || !isset($_REQUEST['form_refresh'])){
 				$type = $trigger['type'];
-				$priority	= $trigger["priority"];
-				$status		= $trigger["status"];
-				$comments	= $trigger["comments"];
-				$url		= $trigger["url"];
+				$priority	= $trigger['priority'];
+				$status		= $trigger['status'];
+				$comments	= $trigger['comments'];
+				$url		= $trigger['url'];
 
 				$trigs=DBselect('SELECT t.triggerid,t.description,t.expression '.
 							' FROM triggers t,trigger_depends d '.
@@ -2351,19 +2352,22 @@
 								' AND d.triggerid_down='.$_REQUEST['triggerid']);
 
 				while($trig=DBfetch($trigs)){
-					if(uint_in_array($trig["triggerid"],$dependencies))	continue;
-					array_push($dependencies,$trig["triggerid"]);
+					if(uint_in_array($trig['triggerid'],$dependencies))	continue;
+					array_push($dependencies,$trig['triggerid']);
 				}
 			}
 		}
 
-		$frmTrig->addRow(S_NAME, new CTextBox("description",$description,90, $limited));
+		$frmTrig->addRow(S_NAME, new CTextBox('description',$description,90, $limited));
 		$frmTrig->addRow(S_EXPRESSION, array(
-				new CTextBox("expression",$expression,75, $limited),
+				new CTextBox('expression',$expression,75, $limited),
 				($limited ? null : new CButton('insert',S_INSERT,
 					"return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->GetName().
-					"&dstfld1=expression&srctbl=expression".
-					"&srcfld1=expression&expression=' + escape(getSelectedText(this.form.elements['expression'])),700,200);"))
+								'&dstfld1=expression'.
+								'&srctbl=expression'.
+								'&srcfld1=expression'.
+								"&expression=' + escape(getSelectedText(this.form.elements['expression']".
+							')),700,200);'))
 			));
 	/* dependencies */
 		foreach($dependencies as $val){
@@ -2373,7 +2377,7 @@
 					expand_trigger_description($val)
 				),
 				BR());
-			$frmTrig->addVar("dependencies[]",strval($val));
+			$frmTrig->addVar('dependencies[]',strval($val));
 		}
 
 		if(count($dep_el)==0)
@@ -2390,9 +2394,13 @@
 
 		$btnSelect = new CButton('btn1',S_ADD,
 				"return PopUp('popup.php?dstfrm=".$frmTrig->GetName().
-				"&dstfld1=new_dependence[]&srctbl=triggers&multiselect=1&dstact=add_dependence&objname=triggers&srcfld1=1".
-				"',750,450);",
-				'T');
+							'&dstfld1=new_dependence[]'.
+							'&srctbl=triggers'.
+							'&multiselect=1'.
+							'&dstact=add_dependence'.
+							'&objname=triggers'.
+							'&srcfld1=1'.
+						"',750,450);",'T');
 
 
 		$frmTrig->addRow(S_NEW_DEPENDENCY, $btnSelect, 'new');
@@ -2404,7 +2412,7 @@
 
 		$frmTrig->addRow(S_EVENT_GENERATION,$type_select);
 
-		$cmbPrior = new CComboBox("priority",$priority);
+		$cmbPrior = new CComboBox('priority',$priority);
 		for($i = 0; $i <= 5; $i++){
 			$cmbPrior->addItem($i,get_severity_description($i));
 		}
@@ -3978,9 +3986,13 @@
 			));
 
 		$allowed_operations = get_operations_by_eventsource($eventsource);
-
-		zbx_rksort($operations);
-
+		
+		$objects_tmp = array();
+		foreach($operations as $id => $val){
+			$objects_tmp[$id] = $val['object'];
+		}
+		array_multisort($objects_tmp, SORT_DESC, $operations);
+		
 		$delay = count_operations_delay($operations,$esc_period);
 		foreach($operations as $id => $val){
 			if( !str_in_array($val['operationtype'], $allowed_operations) )	continue;
