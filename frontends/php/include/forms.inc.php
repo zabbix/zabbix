@@ -2080,6 +2080,7 @@
 		$target_sql = 'SELECT DISTINCT g.groupid as target_id, g.name as target_name '.
 			' FROM groups g, hosts_groups hg '.
 			' WHERE hg.groupid=g.groupid '.
+				' AND '.DBin_node('g.groupid').
 			' ORDER BY g.name';
 
 		if(0 == $copy_type){
@@ -3315,9 +3316,13 @@
 			));
 
 		$allowed_operations = get_operations_by_eventsource($eventsource);
-
-		zbx_rksort($operations);
-
+		
+		$objects_tmp = array();
+		foreach($operations as $id => $val){
+			$objects_tmp[$id] = $val['object'];
+		}
+		array_multisort($objects_tmp, SORT_DESC, $operations);
+		
 		$delay = count_operations_delay($operations,$esc_period);
 		foreach($operations as $id => $val){
 			if( !str_in_array($val['operationtype'], $allowed_operations) )	continue;
