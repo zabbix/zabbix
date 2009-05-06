@@ -20,7 +20,20 @@
 function SDI($msg='SDI') { echo 'DEBUG INFO: '; var_dump($msg); echo SBR; } // DEBUG INFO!!!
 function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
 function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
-function __autoload($class_name) { require_once('include/classes/class.'.strtolower($class_name).'.php'); }
+function __autoload($class_name){ 
+	$class_name = strtolower($class_name);	
+	$api = array('chostgroup' => 1,
+				'chost' => 1,
+				'ctemplate' => 1,
+				'cproxy' => null,
+				'citem' => null,
+				'ctrigger' => null,
+				'cusergroup' => null,
+				'cuser' => null);
+
+	if(isset($api[$class_name])) require_once('api/classes/class.'.$class_name.'.php');
+	else require_once('include/classes/class.'.$class_name.'.php');
+}
 ?>
 <?php
 
@@ -218,7 +231,7 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 			
 			$ZBX_VIEWED_NODES = get_viewed_nodes();
 			$ZBX_CURRENT_NODEID = $ZBX_VIEWED_NODES['selected'];
-					
+
 			if($node_data = DBfetch(DBselect('SELECT masterid FROM nodes WHERE nodeid='.$ZBX_CURRENT_NODEID))){
 				$ZBX_CURMASTERID = $node_data['masterid'];
 			}
@@ -319,6 +332,7 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 // --- ---
 
 		$switch_node = get_request('switch_node', get_profile('web.nodes.switch_node', -1));
+
 		if(!isset($available_nodes[$switch_node]) || !uint_in_array($switch_node, $selected_nodeids)) { //check switch_node
 			$switch_node = 0;
 		}
@@ -336,10 +350,11 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 			}
 			$result['selected'] = $switch_node;
 		}
-		else {
+		else if(!empty($nodeids)){
 			$result['nodeids'] = $nodeids;
-			$result['selected'] = ($switch_node > 0) ? $switch_node : key(array_slice($nodeids, 0, 1, true));
+			$result['selected'] = ($switch_node > 0)?$switch_node:array_shift($nodeids);
 		}
+
 	return $result;
 	}
 
@@ -359,13 +374,9 @@ function __autoload($class_name) { require_once('include/classes/class.'.strtolo
 	}
 
 	function is_show_all_nodes(){
-		global	$ZBX_VIEWED_NODES;
+		global $ZBX_VIEWED_NODES;
 
-		if($ZBX_VIEWED_NODES['selected'] == 0) 
-			return true;
-		else 
-			return false;			
-		
+	return (ZBX_DISTRIBUTED && ($ZBX_VIEWED_NODES['selected'] == 0));
 	}
 
 	function access_deny(){
