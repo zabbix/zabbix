@@ -122,6 +122,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	char		*cport = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
+	int		sversion;
 
 	if( port )	cport = zbx_dsprintf(cport, "%i", port);
 
@@ -143,6 +144,19 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ZBX_PG_BYTEAOID = atoi(row[0]);
 	}
 	DBfree_result(result);
+
+#ifdef	HAVE_FUNCTION_PQSERVERVERSION
+	sversion = PQserverVersion(conn);
+	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", sversion);
+#else
+	sversion = 0;
+#endif	/* HAVE_FUNCTION_PQSERVERVERSION */
+
+	if (sversion >= 80100)
+	{
+		/* disable "nonstandard use of \' in a string literal" warning */
+		DBexecute("set escape_string_warning to off");
+	}
 
 	return ret;
 #endif

@@ -1663,7 +1663,11 @@ void    DBescape_string(const char *src, char *dst, int len)
 		{
 			if (len < 2)
 				break;
+#if defined(HAVE_POSTGRESQL)
+			*d++ = *s;
+#else
 			*d++ = ZBX_DB_ESC_CH;
+#endif
 			len--;
 		}
 		*d++ = *s;

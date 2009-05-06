@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-779] removed PostgreSQL warning message "nonstandard use of ..." (Sasha)
  - [ZBX-901] fixed possible bug on trigger creation (Artem)
  - [ZBX-900] fixed adding several user to group with Oracle DB (Artem)
  - [ZBX-894] fixed processing of {HOSTNAME} for trigger name if the trigger expression consists of several items (Sasha)

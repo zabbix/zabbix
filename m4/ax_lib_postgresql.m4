@@ -100,6 +100,33 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
     fi
 
     dnl
+    dnl Check for function PQserverVersion()
+    dnl
+
+    _save_postgresql_ldflags="${LDFLAGS}"
+    _save_postgresql_cflags="${CFLAGS}"
+    LDFLAGS="${LDFLAGS} ${POSTGRESQL_LDFLAGS}"
+    CFLAGS="${CFLAGS} ${POSTGRESQL_CPPFLAGS}"
+
+    AC_MSG_CHECKING(for function PQserverVersion())
+    AC_TRY_LINK(
+[
+#include <libpq-fe.h>
+],
+[
+PGconn	*conn = NULL;
+PQserverVersion(conn);
+],
+    AC_DEFINE(HAVE_FUNCTION_PQSERVERVERSION,1,[Define to 1 if 'PQserverVersion' exist.])
+    AC_MSG_RESULT(yes),
+    AC_MSG_RESULT(no))
+
+    LDFLAGS="${_save_postgresql_ldflags}"
+    CFLAGS="${_save_postgresql_cflags}"
+    unset _save_postgresql_ldflags
+    unset _save_postgresql_cflags
+
+    dnl
     dnl Check if required version of PostgreSQL is available
     dnl
 
