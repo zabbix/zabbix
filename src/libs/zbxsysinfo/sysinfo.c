@@ -524,10 +524,35 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	return ret;
 }
 
+static int	DBchk_uint64(zbx_uint64_t value)
+{
+#if defined(HAVE_POSTGRESQL)
+	register zbx_uint64_t	pg_max_bigint = (zbx_uint64_t)__UINT64_C(0x7FFFFFFFFFFFFFFF);
+
+	if (value > pg_max_bigint)
+		return FAIL;
+#endif
+	return SUCCEED;
+}
+
+static int	DBchk_double(double value)
+{
+#if defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE) || defined(HAVE_SQLITE3)
+	/* field with precision 16, scale 4 [NUMERIC(16,4)] */
+	register double	pg_min_numeric = (double)-1E12;
+	register double	pg_max_numeric = (double)1E12;
+
+	if (value <= pg_min_numeric || value >= pg_max_numeric)
+		return FAIL;
+#endif
+	return SUCCEED;
+}
+
 int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 {
 	int		ret = FAIL;
-	zbx_uint64_t	value;
+	zbx_uint64_t	value_uint64;
+	double		value_double;
 
 	assert(result);
 
@@ -536,26 +561,27 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 		zbx_rtrim(c, " \"");
 		zbx_ltrim(c, " \"");
 		del_zeroes(c);
-		if (SUCCEED == is_uint64(c, &value))
-		{
-			SET_UI64_RESULT(result, value);
-			ret = SUCCEED;
-		}
+
+		if (SUCCEED != is_uint64(c, &value_uint64))
+			break;
+		if (SUCCEED != DBchk_uint64(value_uint64))
+			break;
+
+		SET_UI64_RESULT(result, value_uint64)
+		ret = SUCCEED;
 		break;
 	case ITEM_VALUE_TYPE_FLOAT:
 		zbx_rtrim(c, " \"");
 		zbx_ltrim(c, " \"");
 
-		if (SUCCEED == is_double(c))
-		{
-			SET_DBL_RESULT(result, atof(c));
-			ret = SUCCEED;
-		}
-		else if (SUCCEED == is_uint(c))	/* ??? */
-		{
-			SET_DBL_RESULT(result, strtod(c, NULL));
-			ret = SUCCEED;
-		}
+		if (SUCCEED != is_double(c))
+			break;
+		value_double = atof(c);
+		if (SUCCEED != DBchk_double(value_double))
+			break;
+
+		SET_DBL_RESULT(result, value_double)
+		ret = SUCCEED;
 		break;
 	case ITEM_VALUE_TYPE_STR:
 	case ITEM_VALUE_TYPE_LOG:
@@ -598,10 +624,12 @@ static zbx_uint64_t* get_result_ui64_value(AGENT_RESULT *result)
 		zbx_ltrim(result->str, " \"");
 		del_zeroes(result->str);
 
-		if (SUCCEED == is_uint64(result->str, &value))
-		{
-			SET_UI64_RESULT(result, value);
-		}
+		if (SUCCEED != is_uint64(result->str, &value))
+			return NULL;
+		if (SUCCEED != DBchk_uint64(value))
+			return NULL;
+
+		SET_UI64_RESULT(result, value)
 	}
 	else if(ISSET_TEXT(result))
 	{
@@ -609,10 +637,12 @@ static zbx_uint64_t* get_result_ui64_value(AGENT_RESULT *result)
 		zbx_ltrim(result->text, " \"");
 		del_zeroes(result->text);
 
-		if (SUCCEED == is_uint64(result->text, &value))
-		{
-			SET_UI64_RESULT(result, value);
-		}
+		if (SUCCEED != is_uint64(result->text, &value))
+			return NULL;
+		if (SUCCEED != DBchk_uint64(value))
+			return NULL;
+
+		SET_UI64_RESULT(result, value)
 	}
 	/* skip AR_MESSAGE - it is information field */
 
@@ -626,6 +656,8 @@ static zbx_uint64_t* get_result_ui64_value(AGENT_RESULT *result)
 
 static double* get_result_dbl_value(AGENT_RESULT *result)
 {
+	double	value;
+
 	assert(result);
 
 	if(ISSET_DBL(result))
@@ -641,20 +673,26 @@ static double* get_result_dbl_value(AGENT_RESULT *result)
 		zbx_rtrim(result->str, " \"");
 		zbx_ltrim(result->str, " \"");
 
-		if (SUCCEED == is_double(result->str))
-		{
-			SET_DBL_RESULT(result, atof(result->str));
-		}
+		if (SUCCEED != is_double(result->str))
+			return NULL;
+		value = atof(result->str);
+		if (SUCCEED != DBchk_double(value))
+			return NULL;
+
+		SET_DBL_RESULT(result, value)
 	}
 	else if(ISSET_TEXT(result))
 	{
 		zbx_rtrim(result->text, " \"");
 		zbx_ltrim(result->text, " \"");
 
-		if (SUCCEED == is_double(result->text))
-		{
-			SET_DBL_RESULT(result, atof(result->text));
-		}
+		if (SUCCEED != is_double(result->text))
+			return NULL;
+		value = atof(result->text);
+		if (SUCCEED != DBchk_double(value))
+			return NULL;
+
+		SET_DBL_RESULT(result, value)
 	}
 	/* skip AR_MESSAGE - it is information field */
 
