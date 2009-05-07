@@ -735,27 +735,25 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 #endif
 #ifdef	HAVE_POSTGRESQL
 	result = zbx_malloc(NULL, sizeof(ZBX_PG_DB_RESULT));
-	result->pg_result = PQexec(conn,sql);
+	result->pg_result = PQexec(conn, sql);
 	result->values = NULL;
 	result->cursor = 0;
+	result->row_num = 0;
 
-	if(result->pg_result==NULL)
+	if (NULL == result->pg_result)
 	{
 		zabbix_errlog(ERR_Z3005, 0, "Result is NULL", sql);
-		exit(FAIL);
 	}
-	if( PQresultStatus(result->pg_result) != PGRES_TUPLES_OK)
+	if (PGRES_TUPLES_OK != PQresultStatus(result->pg_result))
 	{
 		error = zbx_dsprintf(error, "%s:%s",
 				PQresStatus(PQresultStatus(result->pg_result)),
 			 	PQresultErrorMessage(result->pg_result));
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		zbx_free(error);
-		exit(FAIL);
 	}
-	
-	/* init rownum */	
-	result->row_num = PQntuples(result->pg_result);
+	else	/* init rownum */
+		result->row_num = PQntuples(result->pg_result);
 
 #endif
 #ifdef	HAVE_ORACLE
