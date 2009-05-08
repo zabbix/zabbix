@@ -1124,7 +1124,6 @@
 	'S_CREATE_USER'=>			'Új felhasználó',
 	'S_CREATE_GROUP'=>			'Új csoport',
 	'S_DELETE_SELECTED_USERS_Q'=>			'Kiválasztott felhasználó(kat) törli?',
-	'S_NO_ACCESSIBLE_RESOURCES'=>			'No accessibles resources',
 	'S_AUDIT_LOG'=>			'Audit log',
 	'S_AUDIT_LOG_BIG'=>			'AUDIT LOG',
 	'S_ACTION'=>			'Eljárás',
