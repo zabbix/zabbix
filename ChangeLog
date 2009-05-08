@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-887] fixed typo in "Not accessible resources" (Alexei)
  - [DEV-329] fixed server crash if PostgreSQL transaction fails (Sasha)
  - [ZBX-902] fixed wrongly updated operation in action in several circumstances (Artem)
  - [ZBX-779] removed PostgreSQL warning message "nonstandard use of ..." (Sasha)

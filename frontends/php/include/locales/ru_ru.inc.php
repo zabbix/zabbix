@@ -1515,7 +1515,6 @@
 	'S_CREATE_USER'=>			'Создать пользователя',
 	'S_CREATE_GROUP'=>			'Создать группу',
 	'S_DELETE_SELECTED_USERS_Q'=>			'Удалить выбранных пользователей',
-	'S_NO_ACCESSIBLE_RESOURCES'=>			'No accessibles resources',
 	'S_ADD_TO'=>			'Добавить в',
 	'S_REMOVE_FROM'=>			'Удалить из',
 	'S_STATUS_DISABLED'=>			'Состояние отключено',
