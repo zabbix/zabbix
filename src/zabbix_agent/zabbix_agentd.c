@@ -347,8 +347,6 @@ void	zbx_on_exit()
 	exit(SUCCEED);
 }
 
-#ifndef ZABBIX_TEST
-
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t;
@@ -411,60 +409,3 @@ int	main(int argc, char **argv)
 
 	exit(SUCCEED);
 }
-
-#else /* ZABBIX_TEST */
-/* #	define ENABLE_CHECK_MEMOTY 1 */
-
-#if defined(_WINDOWS)
-#	include "messages.h"
-#endif /* _WINDOWS */
-
-int main()
-{
-#if OFF
-	int res, val;
-
-	if(FAIL == zbx_sock_init())
-	{
-		return 1;
-	}
-
-
-	res = check_ntp("142.3.100.15",123,&val);
-
-	zbx_error("check_ntp result '%i' value '%i'", res, val);
-
-#elif OFF
-
-	zbx_error("%s",strerror_from_module(MSG_ZABBIX_MESSAGE, NULL));
-
-#elif OFF
-	
-	char buffer[100*1024];
-
-	get_http_page("www.zabbix.com", "", 80, buffer, 100*1024);
-
-	printf("Back [%d] [%s]\n", strlen(buffer), buffer);
-	
-#elif OFF
-
-	char s[] = "ABCDEFGH";
-	char p[] = "D(.){0,}E";
-	int len=2;
-
-	printf("String: \t %s\n", s);
-	printf("Pattern:\t %s\n", p);
-	printf("Result: \t [%s] [%d]\n", zbx_regexp_match(s, p, &len), len);
-/*
-#elif OFF or ON
-
-Place your test code HERE!!!
-*/
-
-#endif /* 0 */
-
-	return 0;
-}
-
-#endif /* not ZABBIX_TEST */
-

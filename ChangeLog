@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-885] removed unused test code from Zabbix agent (Alexei)
  - [ZBX-887] fixed typo in "Not accessible resources" (Alexei)
  - [DEV-329] fixed server crash if PostgreSQL transaction fails (Sasha)
  - [ZBX-902] fixed wrongly updated operation in action in several circumstances (Artem)
