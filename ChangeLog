@@ -1,5 +1,8 @@
 Changes for 1.6.5
 
+ - [ZBX-910] Queue/Details screen now has "Delayed at" column (Sasha)
+ - [ZBX-910] Queue/Details screen now displays only 500 records (Sasha)
+ - [ZBX-910] fixed incorrect values for proxy items in the Queue in case of time difference between server and the proxy (Sasha)
  - [ZBX-885] removed unused test code from Zabbix agent (Alexei)
  - [ZBX-887] fixed typo in "Not accessible resources" (Alexei)
  - [DEV-329] fixed server crash if PostgreSQL transaction fails (Sasha)

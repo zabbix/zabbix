@@ -90,6 +90,7 @@ include_once "include/page_header.php";
 		' ORDER BY i.lastclock,h.host,i.description,i.key_');
 
 	$table = new CTableInfo(S_THE_QUEUE_IS_EMPTY);
+	$truncated = 0;
 
 	if($_REQUEST["config"]==0){
 
@@ -103,9 +104,11 @@ include_once "include/page_header.php";
 		}
 
 		while($row=DBfetch($result)){
-			$nextcheck = is_null($row['lastclock']) ? 0 : calculate_item_nextcheck($row['itemid'], $row['type'],
-					$row['delay'], $row['delay_flex'], $row['lastclock']);
-			$diff = $now - $nextcheck;
+			$res = calculate_item_nextcheck($row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
+			if (0 != $row['proxy_hostid'])
+				$res['nextcheck'] = $row['lastclock'] + $res['delay'];
+
+			$diff = $now - $res['nextcheck'];
 			if ($diff <= 5)
 				continue;
 
@@ -155,9 +158,11 @@ include_once "include/page_header.php";
 
 		while ($row = DBfetch($result))
 		{
-			$nextcheck = is_null($row['lastclock']) ? 0 : calculate_item_nextcheck($row['itemid'], $row['type'],
-					$row['delay'], $row['delay_flex'], $row['lastclock']);
-			$diff = $now - $nextcheck;
+			$res = calculate_item_nextcheck($row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
+			if (0 != $row['proxy_hostid'])
+				$res['nextcheck'] = $row['lastclock'] + $res['delay'];
+
+			$diff = $now - $res['nextcheck'];
 			if ($diff <= 5)
 				continue;
 
@@ -203,25 +208,37 @@ include_once "include/page_header.php";
 
 		$table->SetHeader(array(
 				S_NEXT_CHECK,
+				S_DELAYED_BY,
 				is_show_subnodes() ? S_NODE : null,
 				S_HOST,
 				S_DESCRIPTION
 				));
 		while($row=DBfetch($result)){
-			$nextcheck = is_null($row['lastclock']) ? 0 : calculate_item_nextcheck($row['itemid'], $row['type'],
-					$row['delay'], $row['delay_flex'], $row['lastclock']);
-			$diff = $now - $nextcheck;
+			$res = calculate_item_nextcheck($row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
+			if (0 != $row['proxy_hostid'])
+				$res['nextcheck'] = $row['lastclock'] + $res['delay'];
+
+			$diff = $now - $res['nextcheck'];
 			if ($diff <= 5)
 				continue;
 
-			array_push($arr, array($nextcheck, $row['hostid'], $row['host'], item_description($row)));
+			array_push($arr, array($res['nextcheck'], $row['hostid'], $row['host'], item_description($row)));
 		}
 
+		$rows = 0;
 		sort($arr);
 		foreach($arr as $r){
+			$rows++;
+			if ($rows > 500)
+			{
+				$truncated = 1;
+				break;
+			}
+
 			$table->AddRow(array(
 				date(S_DATE_FORMAT_YMDHMS,
 					$r[0]),
+				zbx_date2age($r[0]),
 				get_node_name_by_elid($r[1]),
 				$r[2],
 				$r[3]
@@ -232,7 +249,7 @@ include_once "include/page_header.php";
 	$table->Show();
 
 	if($_REQUEST["config"]!=0){
-		show_table_header(S_TOTAL.": ".$table->GetNumRows());
+		show_table_header(S_TOTAL.": ".$table->GetNumRows().($truncated ? ' ('.S_TRUNCATED.')' : ''));
 	}
 ?>
 <?php

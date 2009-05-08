@@ -1163,6 +1163,8 @@
 	'S_1_MINUTE'=>				'1 minute',
 	'S_5_MINUTES'=>				'5 minutes',
 	'S_MORE_THAN_10_MINUTES'=>		'More than 10 minutes',
+	'S_TRUNCATED'=>				'Truncated',
+	'S_DELAYED_BY'=>			'Delayed by',
 
 //	report1.php
 	'S_STATUS_OF_ZABBIX'=>			'Status of ZABBIX',
