@@ -1479,17 +1479,18 @@ COpt::profiling_stop('prepare table');
 	 *
 	 * Parameters: delay_flex - [IN] separeated flexible intervals
 	 *                          [dd/d1-d2,hh:mm-hh:mm;]
-	 *             delay_val - [OUT] delay value
+	 *             delay - [IN] default delay
 	 *
-	 * Return value:
+	 * Return value: flexible delay or $delay if $delay_flex is not defined
+	 *             
 	 *
 	 * Author: Alexander Vladishev
 	 *
 	 */
-	function	get_flexible_interval($delay_flex, &$delay_val, $now)
+	function	get_flexible_interval($delay_flex, $delay, $now)
 	{
 		if (is_null($delay_flex) || $delay_flex == '')
-			return false;
+			return $delay;
 
 		$arr_of_delay = explode(';', $delay_flex);
 
@@ -1498,12 +1499,11 @@ COpt::profiling_stop('prepare table');
 			$arr = explode('/', $one_delay_flex);
 			if (check_time_period($arr[1], $now))
 			{
-				$delay_val = $arr[0];
-				return true;
+				return $arr[0];
 			}
 		}
 
-		return false;
+		return $delay;
 	}
 
 	/*
@@ -1594,17 +1594,14 @@ COpt::profiling_stop('prepare table');
 		/* Special processing of active items to see better view in queue */
 		if ($item_type == ITEM_TYPE_ZABBIX_ACTIVE)
 		{
-			return $now + $delay;
+			return array('nextcheck' => $now + $delay, 'delay' => $delay);
 		}
 
-		$flex_delay = $delay;
-		$flex_delay2 = $delay;
-
-		get_flexible_interval($delay_flex, $flex_delay, $now);
+		$flex_delay = get_flexible_interval($delay_flex, $delay, $now);
 
 		if (-1 != ($next = get_next_flexible_interval($delay_flex, $now)) && (($now + $flex_delay) > $next))
 		{
-			get_flexible_interval($delay_flex, $flex_delay2, $next + 1);
+			$flex_delay2 = get_flexible_interval($delay_flex, $delay, $next + 1);
 
 			$now = $next;
 			$flex_delay = min($flex_delay, $flex_delay2);
@@ -1624,6 +1621,6 @@ COpt::profiling_stop('prepare table');
 			$nextcheck += $delay;
 		}
 
-		return $nextcheck;
+		return array('nextcheck' => $nextcheck, 'delay' => $delay);
 	}
 ?>
