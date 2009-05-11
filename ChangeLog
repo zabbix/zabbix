@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-914] fixed SQL error while updating configuration tables on the proxy side (Sasha)
  - [ZBX-910] Queue/Details screen now has "Delayed at" column (Sasha)
  - [ZBX-910] Queue/Details screen now displays only 500 records (Sasha)
  - [ZBX-910] fixed incorrect values for proxy items in the Queue in case of time difference between server and the proxy (Sasha)
