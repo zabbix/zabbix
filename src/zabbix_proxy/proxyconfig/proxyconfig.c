@@ -44,26 +44,29 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tablename, const char *p)
+static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tablename, struct zbx_json_parse *jp_obj)
 {
 	int			f, field_count, insert;
 	const ZBX_TABLE		*table = NULL;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
-	struct zbx_json_parse	jp_obj, jp_data, jp_row;
+	struct zbx_json_parse	jp_data, jp_row;
 	char			buf[MAX_STRING_LEN], *esc;
 	zbx_uint64_t		recid;
-	const char		*pf;
+	const char		*p, *pf;
 	zbx_uint64_t		*new = NULL, *old = NULL;
 	int			new_alloc = 100, new_num = 0, old_alloc = 100, old_num = 0;
 	char			*sql = NULL;
 	int			sql_alloc = 4096, sql_offset;
+	char			*sq2 = NULL;
+	int			sq2_alloc = 512, sq2_offset;
 	DB_RESULT		result;
 	DB_ROW			row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_proxyconfig_table() [tablename:%s]",
 			tablename);
 
-	if (NULL == (table = DBget_table(tablename))) {
+	if (NULL == (table = DBget_table(tablename)))
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "Invalid table name \"%s\"",
 				tablename);
 		return FAIL;
@@ -72,6 +75,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	new = zbx_malloc(new, new_alloc * sizeof(zbx_uint64_t));
 	old = zbx_malloc(old, old_alloc * sizeof(zbx_uint64_t));
 	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
+	sq2 = zbx_malloc(sq2, sq2_alloc * sizeof(char));
 
 	result = DBselect("select %s from %s", table->recid, table->table);
 	while (NULL != (row = DBfetch(result)))
@@ -79,34 +83,27 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	DBfree_result(result);
 
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
- *          ^---------------------------------------------------------------------------^
- */	if (FAIL == zbx_json_brackets_open(p, &jp_obj))
-		goto json_error;
-
-/* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
- *                    ^
- */	if (NULL == (p = zbx_json_pair_by_name(&jp_obj, "fields")))
-		goto json_error;
-
-/* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *                    ^-------------------^
- */	if (FAIL == zbx_json_brackets_open(p, &jp_data))
+ */	if (FAIL == zbx_json_brackets_by_name(jp_obj, "fields", &jp_data))
 		goto json_error;
 
 	p = NULL;
 	field_count = 0;
-	while (NULL != (p = zbx_json_next(&jp_data, p))) {
+	while (NULL != (p = zbx_json_next(&jp_data, p)))
+	{
 		if (NULL == (p = zbx_json_decodevalue(p, buf, sizeof(buf))))
 			goto json_error;
 
 		fields[field_count] = NULL;
 		for(f = 0; table->fields[f].name != NULL; f++)
-			if (0 == strcmp(table->fields[f].name, buf)) {
+			if (0 == strcmp(table->fields[f].name, buf))
+			{
 				fields[field_count] = &table->fields[f];
 				break;
 			}
 
-		if (NULL == fields[field_count]) {
+		if (NULL == fields[field_count])
+		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid field name \"%s\"",
 					buf);
 			goto db_error;
@@ -115,14 +112,21 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	}
 
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
- *                                                 ^
- */	if (NULL == (p = zbx_json_pair_by_name(&jp_obj, "data")))
+ *                                                 ^-----------------------------------^
+ */	if (FAIL == zbx_json_brackets_by_name(jp_obj, "data", &jp_data))
 		goto json_error;
 
-/* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
- *                                                 ^-----------------------------------^
- */	if (FAIL == zbx_json_brackets_open(p, &jp_data))
-		goto json_error;
+	/* Special preprocessing for 'items' table. */
+	/* In order to eliminate the conflicts in the 'hostid,key_' unique index */
+	if (0 == strcmp(tablename, "items"))
+	{
+#ifdef HAVE_MYSQL
+		if (ZBX_DB_OK > DBexecute("update items set key_=concat('#',itemid)"))
+#else
+		if (ZBX_DB_OK > DBexecute("update items set key_='#'||itemid"))
+#endif
+			goto db_error;
+	}
 
 	p = NULL;
 	sql_offset = 0;
@@ -133,7 +137,8 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *                                                  ^
- */	while (NULL != (p = zbx_json_next(&jp_data, p))) {
+ */	while (NULL != (p = zbx_json_next(&jp_data, p)))
+	{
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *                                                  ^-------------^
  */		if (FAIL == zbx_json_brackets_open(p, &jp_row))
@@ -175,7 +180,8 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 				goto db_error;
 			}
 
-			if (fields[f]->type == ZBX_TYPE_INT || fields[f]->type == ZBX_TYPE_UINT || fields[f]->type == ZBX_TYPE_ID || fields[f]->type == ZBX_TYPE_FLOAT)
+			if (fields[f]->type == ZBX_TYPE_INT || fields[f]->type == ZBX_TYPE_UINT || fields[f]->type == ZBX_TYPE_ID ||
+					fields[f]->type == ZBX_TYPE_FLOAT)
 		       	{
 				if (0 == insert)
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "%s=", fields[f]->name);
@@ -231,23 +237,24 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
 #endif
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
-		if (ZBX_DB_OK > DBexecute("%s", sql))
-			goto db_error;
-
 	uint64_array_rm(old, &old_num, new, new_num);
 
 	if (old_num > 0)
 	{
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "delete from %s where", table->table);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid, old, old_num);
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		sq2_offset = 0;
+		zbx_snprintf_alloc(&sq2, &sq2_alloc, &sq2_offset, 128, "delete from %s where", table->table);
+		DBadd_condition_alloc(&sq2, &sq2_alloc, &sq2_offset, table->recid, old, old_num);
+		if (ZBX_DB_OK > DBexecute("%s", sq2))
 			goto db_error;
 	}
 
+	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto db_error;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_proxyconfig_table()");
 
+	zbx_free(sq2);
 	zbx_free(sql);
 	zbx_free(new);
 	zbx_free(old);
@@ -258,6 +265,7 @@ json_error:
 			tablename,
 			zbx_json_strerror());
 db_error:
+	zbx_free(sq2);
 	zbx_free(sql);
 	zbx_free(new);
 	zbx_free(old);
@@ -283,10 +291,11 @@ db_error:
  ******************************************************************************/
 static void	process_proxyconfig(struct zbx_json_parse *jp)
 {
-	char		buf[MAX_STRING_LEN];
-	size_t		len = sizeof(buf);
-	const char	*p = NULL;
-	int		res = SUCCEED;
+	char			buf[MAX_STRING_LEN];
+	size_t			len = sizeof(buf);
+	const char		*p = NULL;
+	struct zbx_json_parse	jp_obj;
+	int			res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_proxyconfig()");
 
@@ -294,16 +303,20 @@ static void	process_proxyconfig(struct zbx_json_parse *jp)
 /*
  * {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *          ^
- */	while (NULL != (p = zbx_json_pair_next(jp, p, buf, len)) && res == SUCCEED) {
-		if (ZBX_JSON_TYPE_OBJECT != zbx_json_type(p)) {
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid type of data for table \"%s\" \"%.40s...\"",
+ */	while (NULL != (p = zbx_json_pair_next(jp, p, buf, len)) && res == SUCCEED)
+	{
+/* {"items":{"fields":["itemid","hostid",...],"data":[[1,1,...],[2,1,...],...]},...} 
+ *          ^-----------------------------------------------------------------^
+ */		if (FAIL == zbx_json_brackets_open(p, &jp_obj))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Can't proceed table \"%s\". %s",
 					buf,
-					p);
+					zbx_json_strerror());
 			res = FAIL;
 			break;
 		}
 
-		res = process_proxyconfig_table(jp, buf, p);
+		res = process_proxyconfig_table(jp, buf, &jp_obj);
 	}
 	if (res == SUCCEED)
 		DBcommit();
