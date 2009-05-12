@@ -924,7 +924,7 @@ function get_history_of_actions($limit,&$last_clock,$sql_cond=''){
 		$clock[] = $row['clock'];
 	}
 	
-	$last_clock = max($clock);
+	$last_clock = !empty($clock)?max($clock):null;
 	
 	order_result($alerts, 'clock', ZBX_SORT_DOWN);
 	
