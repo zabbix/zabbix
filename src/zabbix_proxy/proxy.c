@@ -405,7 +405,9 @@ int MAIN_ZABBIX_ENTRY(void)
 #       define IPV6_FEATURE_STATUS " NO"
 #endif
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_proxy. ZABBIX %s.", ZABBIX_VERSION);
+	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_proxy. ZABBIX %s (revision %s).",
+			ZABBIX_VERSION,
+			ZABBIX_REVISION);
 
 	zabbix_log( LOG_LEVEL_WARNING, "**** Enabled features ****");
 	zabbix_log( LOG_LEVEL_WARNING, "SNMP monitoring:       " SNMP_FEATURE_STATUS	);
@@ -636,7 +638,9 @@ void	zbx_on_exit()
 	php_sem_remove(&sqlite_access);
 #endif /* HAVE_SQLITE3 */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Proxy stopped. ZABBIX %s.", ZABBIX_VERSION);
+	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Proxy stopped. ZABBIX %s (revision %s).",
+		ZABBIX_VERSION,
+		ZABBIX_REVISION);
 
 	exit(SUCCEED);
 }
