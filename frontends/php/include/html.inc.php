@@ -143,44 +143,6 @@
 		$table->addRow($div);
 	return $table;
 	}
-	
-	function create_filter($caption,$items,$id='zbx_filter',$state=1){
-
-		if(isset($_REQUEST['print'])) $state = 0;
-		
-		$table = new CTable();
-		$table->addOption('width','100%');
-		$table->setCellPadding(0);
-		$table->setCellSpacing(0);
-		$table->addOption('border',0);
-		
-		$icon_l = new CDiv(SPACE.SPACE, $state?'dbl_arrow_up':'dbl_arrow_down');
-		$icon_l->addOption('title',S_MAXIMIZE.'/'.S_MINIMIZE);
-		$icon_l->addOption('id','filter_icon_l');
-
-		$icon_r = new CDiv(SPACE.SPACE, $state?'dbl_arrow_up':'dbl_arrow_down');
-		$icon_r->addOption('title',S_MAXIMIZE.'/'.S_MINIMIZE);				
-		$icon_r->addOption('id','filter_icon_r');
-		
-		$icons_row = new CTable(null,'whitetext');
-		$icons_row->addRow(array($icon_l,SPACE,$caption,SPACE,$icon_r));
-//		$icons_row->addStyle('display: inline;');
-//		$icons_row = array($icon,SPACE,$caption,SPACE,$icon);
-//		$icons_row = new CRow(array(new CCol($icon,'left'),new CCol($caption,'center'),new CCol($icon,'right')));
-		
-		$thin_tab = get_thin_table_header($icons_row);
-		$thin_tab->addAction('onclick',new CScript("javascript: change_flicker_state('".$id."');"));
-		$thin_tab->addOption('id','filter_icon');
-		
-		$table->addRow($thin_tab,'textcolorstyles link pointer');
-
-		$div = new CDiv($items);
-		$div->addOption('id',$id);
-		if(!$state) $div->addOption('style','display: none;');
-		
-		$table->addRow($div);
-	return $table;
-	}
 		
 	
 /* Function: 
