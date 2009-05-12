@@ -1,5 +1,7 @@
 Changes for 1.7.0
 
+ - [DEV-137] now SNMP keys with dynamic indexes use only one connection (Sasha)
+ - [ZBX-921] fixed processing of SNMP strings (Sasha)
  - [DEV-341] rework of events history, as consequences changes in audit screen, some reports and other pages (Artem)
  - [DEV-356] moved dropdown configuration from defines to frontend (Vedmak)
  - [DEV-355] changed node management interface (Vedmak)
