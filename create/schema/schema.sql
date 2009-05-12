@@ -225,7 +225,7 @@ FIELD		|source		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value		|t_history_log	|''	|NOT NULL	|0
 INDEX		|1		|itemid,clock
-INDEX		|2		|itemid,id
+UNIQUE		|2		|itemid,id
 
 TABLE|history_text|id|ZBX_HISTORY
 FIELD		|id		|t_id		|'0'	|NOT NULL	|0
@@ -233,7 +233,7 @@ FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0			|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_history_text	|''	|NOT NULL	|0
 INDEX		|1		|itemid,clock
-INDEX		|2		|itemid,id
+UNIQUE		|2		|itemid,id
 
 TABLE|proxy_history|id|0
 FIELD		|id		|t_serial	|	|NOT NULL	|0
