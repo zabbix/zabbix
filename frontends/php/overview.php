@@ -18,10 +18,10 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-require_once 'include/config.inc.php';
-require_once 'include/hosts.inc.php';
-require_once 'include/triggers.inc.php';
-require_once 'include/items.inc.php';
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/triggers.inc.php');
+require_once('include/items.inc.php');
 
 $page['title'] = "S_OVERVIEW";
 $page['file'] = 'overview.php';
@@ -32,11 +32,11 @@ define('ZBX_PAGE_DO_REFRESH', 1);
 define('SHOW_TRIGGERS',0);
 define('SHOW_DATA',1);
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
-	unset($_REQUEST["groupid"]);
-	unset($_REQUEST["hostid"]);
+	unset($_REQUEST['groupid']);
+	unset($_REQUEST['hostid']);
 }
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -129,17 +129,19 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		$help_table->addRow(array(new CCol(SPACE), S_DISABLED.' '.S_OR.' '.S_NO_TRIGGER));
 	}
 
-	$help->SetHint($help_table);
+	$help->setHint($help_table);
 	
+	$over_wdgt = new CWidget();
 // Header	
-	$text = array(S_OVERVIEW_BIG);
-	
 	$url = 'overview.php?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 	
+	$over_wdgt->addHeader(S_OVERVIEW_BIG, array($fs_icon, $help));
+	
+// 2nd heder
 	$form_l = new CForm();
 	$form_l->setMethod('get');
 	$form_l->addVar('groupid',$_REQUEST['groupid']);
@@ -150,8 +152,9 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	
 	$form_l->additem(array(S_HOSTS_LOCATION.SPACE,$cmbStyle));
 
-	$p_elements[] = get_table_header($form_l,$form);
-
+	$over_wdgt->addHeader($form_l, $form);
+	
+//	show_table_header(S_OVERVIEW_BIG,$form);
 //-------------
 	
 ?>
@@ -171,19 +174,9 @@ COpt::profiling_start('get_triggers_overview');
 COpt::profiling_stop('get_triggers_overview');
 	}
 
-	$p_elements[] = $table;
-	
-	$overview_hat = create_hat(
-			$text,
-			$p_elements,
-			array($help,$fs_icon),
-			'hat_overview',
-			get_profile('web.overview.hats.hat_overview.state',1)
-	);
+	$over_wdgt->addItem($table);
 
-	$overview_hat->Show();	
-//	$table->Show();
-//	unset($table);
+	$over_wdgt->show();	
 
 include_once 'include/page_footer.php';
 ?>

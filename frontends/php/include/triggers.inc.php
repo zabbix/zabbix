@@ -1034,12 +1034,12 @@
 				
 				if(!$item) return null;
 
-				$item = $item['itemid'];
+				$itemid = $item['itemid'];
 
 				$functionid = get_dbid('functions','functionid');
 
 				if ( !DBexecute('insert into functions (functionid,itemid,triggerid,function,parameter)'.
-					' values ('.$functionid.','.$item.','.$triggerid.','.zbx_dbstr($function).','.
+					' values ('.$functionid.','.$itemid.','.$triggerid.','.zbx_dbstr($function).','.
 					zbx_dbstr($parameter).')'))
 				{
 					return	null;

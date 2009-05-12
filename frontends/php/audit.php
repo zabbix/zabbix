@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/audit.inc.php';
-	require_once 'include/actions.inc.php';
-	require_once 'include/users.inc.php';
+	require_once('include/config.inc.php');
+	require_once('include/audit.inc.php');
+	require_once('include/actions.inc.php');
+	require_once('include/users.inc.php');
 
 	$page['title'] = "S_AUDIT";
 	$page['file'] = 'audit.php';
 	$page['hist_arg'] = array('prev','next');
-	$page['scripts'] = array('calendar.js');
+	$page['scripts'] = array('calendar.js','scriptaculous.js?load=effects');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -35,11 +35,9 @@
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
 
-	define('PAGE_SIZE', 100);
-
 	$_REQUEST['config'] = get_request('config',get_profile('web.audit.config',0));
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -49,9 +47,13 @@ include_once 'include/page_header.php';
 // actions
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
 		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
-		'start'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535).'({}%'.PAGE_SIZE.'==0)',	NULL),
-		'next'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
-		'prev'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
+		
+		'next_page'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
+		'prev_page'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
+
+		'prev_clock'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	null,	NULL),
+		'curr_clock'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	null,	NULL),
+		'next_clock'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	null,	NULL),
 
 // filter
 		'action'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(-1,6),	NULL),
@@ -62,7 +64,6 @@ include_once 'include/page_header.php';
 		'userid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 
 		'filter_timesince'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
-		'filter_timetill'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
 
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
@@ -84,6 +85,7 @@ include_once 'include/page_header.php';
 		exit();
 	}
 //--------
+ini_set('max_execution_time',10);
 
 /* FILTER */
 	if(isset($_REQUEST['filter_rst'])){
@@ -91,22 +93,14 @@ include_once 'include/page_header.php';
 		$_REQUEST['action'] = -1;
 		$_REQUEST['resourcetype'] = -1;
 
-		$_REQUEST['filter_timesince'] = 0;
-		$_REQUEST['filter_timetill'] = 0;
+		$_REQUEST['filter_timesince'] = time();
 	}
 
 	$_REQUEST['userid'] = get_request('userid',get_profile('web.audit.filter.userid',0));
 	$_REQUEST['action'] = get_request('action',get_profile('web.audit.filter.action',-1));
 	$_REQUEST['resourcetype'] = get_request('resourcetype',get_profile('web.audit.filter.resourcetype',-1));
 
-	$_REQUEST['filter_timesince'] = get_request('filter_timesince',get_profile('web.audit.filter.timesince',0));
-	$_REQUEST['filter_timetill'] = get_request('filter_timetill',get_profile('web.audit.filter.timetill',0));
-
-	if(($_REQUEST['filter_timetill'] > 0) && ($_REQUEST['filter_timesince'] > $_REQUEST['filter_timetill'])){
-		$tmp = $_REQUEST['filter_timesince'];
-		$_REQUEST['filter_timesince'] = $_REQUEST['filter_timetill'];
-		$_REQUEST['filter_timetill'] = $tmp;
-	}
+	$_REQUEST['filter_timesince'] = get_request('filter_timesince',get_profile('web.audit.filter.timesince',time()));
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		update_profile('web.audit.filter.userid',$_REQUEST['userid']);
@@ -114,7 +108,6 @@ include_once 'include/page_header.php';
 		update_profile('web.audit.filter.resourcetype',$_REQUEST['resourcetype'], PROFILE_TYPE_INT);
 
 		update_profile('web.audit.filter.timesince',$_REQUEST['filter_timesince'], PROFILE_TYPE_INT);
-		update_profile('web.audit.filter.timetill',$_REQUEST['filter_timetill'], PROFILE_TYPE_INT);
 	}
 // --------------
 
@@ -122,41 +115,87 @@ include_once 'include/page_header.php';
 	update_profile('web.audit.config',$_REQUEST['config'], PROFILE_TYPE_INT);
 
 
-	$_REQUEST['start'] = get_request('start', 0);
-	$_REQUEST['start']-=(isset($_REQUEST['prev']))?PAGE_SIZE:0;
-	$_REQUEST['start']+=(isset($_REQUEST['next']))?PAGE_SIZE:0;
-	$_REQUEST['start']=($_REQUEST['start'])?$_REQUEST['start']:0;
+// Navigation initialization
+	$nav_time = $_REQUEST['filter_timesince'];
+	
+	$page_start = null;
 
+	$prev_clock = get_request('prev_clock', array());
+	$next_clock = get_request('next_clock', null);
+	$curr_clock = get_request('curr_clock', $nav_time);
+	
+	$prev_page = get_request('prev_page', false);
+	$next_page = get_request('next_page', false);
+	
+//SDI(array($prev_page, $next_page, $nav_time));
+//SDI(array($prev_clock, $curr_clock, $next_clock));
+	if($next_page){
+		$prev_clock[] = $curr_clock;
+		$page_start = $next_clock;
+	}
+	else if($prev_page){
+		$next_clock = $curr_clock;
+		$page_start = array_pop($prev_clock);
+	}
+	else if($nav_time){
+		$prev_clock = array();
+		$page_start = $nav_time;
+	}
+	else{
+		$page_start  = $curr_clock;
+	}
 
-
+	$curr_clock = $page_start;	
+	$limit = $USER_DETAILS['rows_per_page'];
+	
+//SDI(array($prev_clock, $curr_clock, $next_clock, $page_start));
+// end of navigation initialization
+// -------------
 ?>
 <?php
-	$sql_cond=($_REQUEST['userid'])?(' AND a.userid='.$_REQUEST['userid'].' '):('');
-	$sql_cond.=(($_REQUEST['action']>-1) && ($config == 0))?(' AND a.action='.$_REQUEST['action'].' '):('');
-	$sql_cond.=(($_REQUEST['resourcetype']>-1) && ($config == 0))?(' AND a.resourcetype='.$_REQUEST['resourcetype'].' '):('');
-	$sql_cond.=($_REQUEST['filter_timesince'])?' AND a.clock>'.$_REQUEST['filter_timesince']:' AND a.clock>100';
-	$sql_cond.=($_REQUEST['filter_timetill'])?' AND a.clock<'.$_REQUEST['filter_timetill']:'';
-
+	
+	$audit_wdgt = new CWidget();
+	
+// HEADER
+	$header =($config == 0)?S_AUDIT_LOGS:S_AUDIT_ACTIONS;
+	
 	$frmForm = new CForm();
-	$frmForm->SetMethod('get');
+	$frmForm->setMethod('get');
 
 	$cmbConf = new CComboBox('config',$_REQUEST['config'],'submit()');
 	$cmbConf->addItem(0,S_AUDIT_LOGS);
 	$cmbConf->addItem(1,S_AUDIT_ACTIONS);
 
 	$frmForm->addItem($cmbConf);
+	
+	$audit_wdgt->addHeader($header, $frmForm);
+//--------
+	$sql_cond = '';
+	if($_REQUEST['userid'])
+		$sql_cond.=' AND a.userid='.$_REQUEST['userid'].' ';
 
-//	show_table_header(S_AUDIT_BIG, $frmForm);
+	if(($_REQUEST['action']>-1) && ($config == 0))
+		$sql_cond.=' AND a.action='.$_REQUEST['action'].' ';
+		
+	if(($_REQUEST['resourcetype']>-1) && ($config == 0)) 
+		$sql_cond.=' AND a.resourcetype='.$_REQUEST['resourcetype'].' ';
+		
+	$sql_cond.=' AND a.clock>'.$page_start.' AND a.clock<'.time();
 
-	$row_count = 0;
 	if(0 == $config){
+		$count = 0;
+		$last_clock = null;
+
+		$actions = array();
+		$clock = array();
+		
 		$table = new CTableInfo();
 		$table->setHeader(array(
-				make_sorting_link(S_TIME,'a.clock'),
-				make_sorting_link(S_USER,'u.alias'),
-				S_IP,
-				S_RESOURCE,
-				S_ACTION,
+				make_sorting_link(S_TIME,'clock'),
+				make_sorting_link(S_USER,'alias'),
+				make_sorting_link(S_IP,'ip'),
+				make_sorting_link(S_RESOURCE,'resourcetype'),
+				make_sorting_link(S_ACTION,'action'),
 				S_ID,
 				S_DESCRIPTION,
 				S_DETAILS));
@@ -166,108 +205,111 @@ include_once 'include/page_header.php';
 						' WHERE u.userid=a.userid '.
 							$sql_cond.
 							' AND '.DBin_node('u.userid', get_current_nodeid(null, PERM_READ_ONLY)).
-						order_by('a.clock,u.alias');
-
-		$result = DBselect($sql,$_REQUEST['start']+PAGE_SIZE);
-		for($i=0; $row=DBfetch($result); $i++){
-			if($i<$_REQUEST['start'])	continue;
-
+						' ORDER BY a.clock ASC';
+		$result = DBselect($sql, $limit);
+		while($row=DBfetch($result)){	
 			switch($row['action']){
-				case AUDIT_ACTION_ADD:
-					$action = S_ADDED;
-					break;
-				case AUDIT_ACTION_UPDATE:
-					$action = S_UPDATED;
-					break;
-				case AUDIT_ACTION_DELETE:
-					$action = S_DELETED;
-					break;
-				case AUDIT_ACTION_LOGIN:
-					$action = S_LOGIN;
-					break;
-				case AUDIT_ACTION_LOGOUT:
-					$action = S_LOGOUT;
-					break;
-				case AUDIT_ACTION_ENABLE:
-					$action = S_ENABLED;
-					break;
-				case AUDIT_ACTION_DISABLE:
-					$action = S_DISABLED;
-					break;
-				default:
-					$action = S_UNKNOWN_ACTION;
+				case AUDIT_ACTION_ADD: 		$action = S_ADDED; break;
+				case AUDIT_ACTION_UPDATE:	$action = S_UPDATED; break;
+				case AUDIT_ACTION_DELETE:	$action = S_DELETED; break;
+				case AUDIT_ACTION_LOGIN:	$action = S_LOGIN;	break;
+				case AUDIT_ACTION_LOGOUT:	$action = S_LOGOUT; break;
+				case AUDIT_ACTION_ENABLE:	$action = S_ENABLED; break;
+				case AUDIT_ACTION_DISABLE:	$action = S_DISABLED; break;
+				default: $action = S_UNKNOWN_ACTION;
 			}
 
-			if ('' == $row['details'] || '0' == $row['details'])
-			{
+			$row['action'] = $action;
+			$row['resourcetype'] = audit_resource2str($row['resourcetype']);
+			
+			$count++;
+			$clock[] = $row['clock'];
+			$actions[] = $row;
+		}
+		$last_clock = max($clock);
+
+		order_result($actions, 'clock', ZBX_SORT_DOWN);
+		
+		foreach($actions as $num => $row){
+			if(empty($row['details'])){
 				$details = array();
-				$db_details = DBselect('select table_name,field_name,oldvalue,newvalue from auditlog_details where auditid='.$row['auditid']);
-				while(NULL != ($db_detail = DBfetch($db_details)))
-				{
-					array_push($details, array($db_detail['table_name'].'.'.$db_detail['field_name'].': '.$db_detail['oldvalue'].' => '.$db_detail['newvalue'],BR()));
+				$sql = 'SELECT table_name,field_name,oldvalue,newvalue '.
+						' FROM auditlog_details '.
+						' WHERE auditid='.$row['auditid'];
+				$db_details = DBselect($sql);
+				while($db_detail = DBfetch($db_details)){
+					$details[] = array($db_detail['table_name'].'.'.
+										$db_detail['field_name'].': '.
+										$db_detail['oldvalue'].' => '.
+										$db_detail['newvalue'],BR());
 				}
 			}
-			else
+			else{
 				$details = $row['details'];
+			}
 
 			$table->addRow(array(
 				date('Y.M.d H:i:s',$row['clock']),
 				$row['alias'],
 				$row['ip'],
-				audit_resource2str($row['resourcetype']),
-				$action,
+				$row['resourcetype'],
+				$row['action'],
 				$row['resourceid'],
 				$row['resourcename'],
-				new CCol($details)
+				new CCol($details, 'wraptext')
 			));
-			$row_count++;
 		}
-
-		$numrows = new CSpan(null,'info');
-		$numrows->addOption('name','numrows');
-		$header = get_table_header(array(S_AUDIT_LOGS, new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'), S_FOUND.': ',$numrows,));
-		show_table_header($header, $frmForm);	
 	}
 	else if(1 == $config){
-		$table = get_history_of_actions($_REQUEST["start"], PAGE_SIZE, $sql_cond);		
-		$row_count = $table->GetNumRows();	
-		
-		$numrows = new CSpan(null,'info');
-		$numrows->addOption('name','numrows');	
-		$header = get_table_header(array(S_AUDIT_ACTIONS,
-						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-						S_FOUND.': ',$numrows,)
-						);
-		show_table_header($header, $frmForm);
+		$table = get_history_of_actions($limit, $last_clock, $sql_cond);		
+		$count = $table->getNumRows();
 	}
+	
+// Navigation
+	$next_clock = $last_clock;
+	
+	$navForm = new CForm('audit.php');
+	$navForm->setMethod('get');
+	
+	$navForm->addVar('config',$_REQUEST['config']);
+
+	$navForm->addVar('prev_clock',$prev_clock);
+	$navForm->addVar('curr_clock',$curr_clock);
+	$navForm->addVar('next_clock',$next_clock);
+
+/*
+	$prev_page = new CDiv(SPACE,'arrowleft');
+	$prev_page->addOption('title','Previous page');
+	$prev_page->addAction('onclick',new CScript("javascript: alert('left');"));
+
+	$next_page = new CDiv(SPACE,'arrowright');
+	$next_page->addOption('title','Next page');
+	$next_page->addAction('onclick',new CScript("javascript: alert('right');"));
+//*/
+//*
+	$prev_page = new CButton('prev_page','« '.S_BACK);
+	if(empty($prev_clock)) $prev_page->addOption('disabled','disabled');
+
+	$next_page = new CButton('next_page',S_NEXT.' »');
+	if($count < $limit) $next_page->addOption('disabled','disabled');
+//*/
+	$navForm->addItem(array($prev_page,SPACE,$next_page));
+
+	$navigation = $navForm;
+//------------
 
 /************************* FILTER **************************/
 /***********************************************************/
 
-	$prev = 'Prev 100';
-	$next = 'Next 100';
-	if($_REQUEST['start'] > 0){
-		$prev = new Clink('Prev '.PAGE_SIZE, 'audit.php?prev=1'.url_param('start').url_param('config'),'styled');
-	}
-
-	if($table->GetNumRows() >= PAGE_SIZE){
-		$next = new Clink('Next '.PAGE_SIZE, 'audit.php?next=1'.url_param('start').url_param('config'),'styled');
-	}
-
-	$filterForm = new CFormTable(S_FILTER);//,'events.php?filter_set=1','POST',null,'sform');
+	$filterForm = new CFormTable();
 	$filterForm->addOption('name','zbx_filter');
 	$filterForm->addOption('id','zbx_filter');
-	$filterForm->setMethod('get');
 
 	$script = new CScript("javascript: if(CLNDR['audit_since'].clndr.setSDateFromOuterObj()){".
-							"$('filter_timesince').value = parseInt(CLNDR['audit_since'].clndr.sdt.getTime()/1000);}".
-						"if(CLNDR['audit_till'].clndr.setSDateFromOuterObj()){".
-							"$('filter_timetill').value = parseInt(CLNDR['audit_till'].clndr.sdt.getTime()/1000);}"
-						);
+							"$('filter_timesince').value = parseInt(CLNDR['audit_since'].clndr.sdt.getTime()/1000);}");
 	$filterForm->addAction('onsubmit',$script);
 
 	$filterForm->addVar('filter_timesince',($_REQUEST['filter_timesince']>0)?$_REQUEST['filter_timesince']:'');
-	$filterForm->addVar('filter_timetill',($_REQUEST['filter_timetill']>0)?$_REQUEST['filter_timetill']:'');
 	$filterForm->addVar('config',$_REQUEST['config']);
 
 	$filterForm->addVar('userid',$_REQUEST['userid']);
@@ -291,13 +333,13 @@ include_once 'include/page_header.php';
 	if($config == 0){
 		$cmbAction = new CComboBox('action',$_REQUEST['action']);
 			$cmbAction->addItem(-1,S_ALL_S);
-			$cmbAction->addItem(AUDIT_ACTION_LOGIN,	S_LOGIN);
+			$cmbAction->addItem(AUDIT_ACTION_LOGIN,		S_LOGIN);
 			$cmbAction->addItem(AUDIT_ACTION_LOGOUT,	S_LOGOUT);
-			$cmbAction->addItem(AUDIT_ACTION_ADD,	S_ADD);
+			$cmbAction->addItem(AUDIT_ACTION_ADD,		S_ADD);
 			$cmbAction->addItem(AUDIT_ACTION_UPDATE,	S_UPDATE);
 			$cmbAction->addItem(AUDIT_ACTION_DELETE,	S_DELETE);
 			$cmbAction->addItem(AUDIT_ACTION_ENABLE,	S_ENABLE);
-			$cmbAction->addItem(AUDIT_ACTION_DISABLE,S_DISABLE);
+			$cmbAction->addItem(AUDIT_ACTION_DISABLE,	S_DISABLE);
 
 		$filterForm->addRow(S_ACTION, $cmbAction);
 
@@ -337,72 +379,49 @@ include_once 'include/page_header.php';
 	}
 //*
 	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-	$clndr_icon->AddAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['audit_since'].clndr.clndrshow(pos.top,pos.left);");
+	$clndr_icon->addAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['audit_since'].clndr.clndrshow(pos.top,pos.left);");
 
 	$filtertimetab = new CTable();
-	$filtertimetab->AddOption('width','10%');
-	$filtertimetab->SetCellPadding(0);
-	$filtertimetab->SetCellSpacing(0);
+	$filtertimetab->addOption('width','10%');
+	$filtertimetab->setCellPadding(0);
+	$filtertimetab->setCellSpacing(0);
 
-	$filtertimetab->AddRow(array(
-							S_FROM,
-							new CNumericBox('filter_since_day',(($_REQUEST['filter_timesince']>0)?date('d',$_REQUEST['filter_timesince']):''),2),
-							'/',
-							new CNumericBox('filter_since_month',(($_REQUEST['filter_timesince']>0)?date('m',$_REQUEST['filter_timesince']):''),2),
-							'/',
-							new CNumericBox('filter_since_year',(($_REQUEST['filter_timesince']>0)?date('Y',$_REQUEST['filter_timesince']):''),4),
-							new CNumericBox('filter_since_hour',(($_REQUEST['filter_timesince']>0)?date('H',$_REQUEST['filter_timesince']):''),2),
-							':',
-							new CNumericBox('filter_since_minute',(($_REQUEST['filter_timesince']>0)?date('i',$_REQUEST['filter_timesince']):''),2),
-							$clndr_icon
-					));
-	zbx_add_post_js('create_calendar(null,["filter_since_day","filter_since_month","filter_since_year","filter_since_hour","filter_since_minute"],"audit_since");');
+	$nav_clndr =  array(
+						new CNumericBox('filter_since_day',(($_REQUEST['filter_timesince']>0)?date('d',$_REQUEST['filter_timesince']):''),2),
+						new CNumericBox('filter_since_month',(($_REQUEST['filter_timesince']>0)?date('m',$_REQUEST['filter_timesince']):''),2),
+						new CNumericBox('filter_since_year',(($_REQUEST['filter_timesince']>0)?date('Y',$_REQUEST['filter_timesince']):''),4),
+						new CNumericBox('filter_since_hour',(($_REQUEST['filter_timesince']>0)?date('H',$_REQUEST['filter_timesince']):''),2),
+						':',
+						new CNumericBox('filter_since_minute',(($_REQUEST['filter_timesince']>0)?date('i',$_REQUEST['filter_timesince']):''),2),
+					$clndr_icon
+				);
+				
+	$filtertimetab->addRow($nav_clndr);
+	
+	zbx_add_post_js('create_calendar(null,'.
+				 '["filter_since_day","filter_since_month","filter_since_year","filter_since_hour","filter_since_minute"],'.
+				 '"audit_since");');
 
-	$clndr_icon->AddAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['audit_till'].clndr.clndrshow(pos.top,pos.left);");
-	$filtertimetab->AddRow(array(
-							S_TILL,
-							new CNumericBox('filter_till_day',(($_REQUEST['filter_timetill']>0)?date('d',$_REQUEST['filter_timetill']):''),2),
-							'/',
-							new CNumericBox('filter_till_month',(($_REQUEST['filter_timetill']>0)?date('m',$_REQUEST['filter_timetill']):''),2),
-							'/',
-							new CNumericBox('filter_till_year',(($_REQUEST['filter_timetill']>0)?date('Y',$_REQUEST['filter_timetill']):''),4),
-							new CNumericBox('filter_till_hour',(($_REQUEST['filter_timetill']>0)?date('H',$_REQUEST['filter_timetill']):''),2),
-							':',
-							new CNumericBox('filter_till_minute',(($_REQUEST['filter_timetill']>0)?date('i',$_REQUEST['filter_timetill']):''),2),
-							$clndr_icon
-					));
-	zbx_add_post_js('create_calendar(null,["filter_till_day","filter_till_month","filter_till_year","filter_till_hour","filter_till_minute"],"audit_till");');
+	zbx_add_post_js('addListener($("filter_icon"),'.
+				'"click",CLNDR[\'audit_since\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'audit_since\'].clndr));');
 
-	zbx_add_post_js('addListener($("filter_icon"),"click",CLNDR[\'audit_since\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'audit_since\'].clndr));'.
-					'addListener($("filter_icon"),"click",CLNDR[\'audit_till\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'audit_till\'].clndr));'
-					);
-	$row_count++;
-
-	$filterForm->addRow(S_PERIOD, $filtertimetab);
+	$filterForm->addRow(S_START_DATE, $filtertimetab);
 //*/
-	$reset = new CButton("filter_rst",S_RESET);
-	$reset->SetType('button');
-	$reset->SetAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+	$reset = new CButton('filter_rst',S_RESET);
+	$reset->setType('button');
+	$reset->setAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
-	$filterForm->AddItemToBottomRow(new CButton("filter_set",S_FILTER));
-	$filterForm->AddItemToBottomRow($reset);
+	$filterForm->addItemToBottomRow(new CButton("filter_set",S_FILTER));
+	$filterForm->addItemToBottomRow($reset);
 
-	$navigation = array(
-						new CSpan(array('&laquo; ',$prev),'textcolorstyles'),
-						new CSpan(' | ','divider'),
-						new CSpan(array($next,' &raquo;'),'textcolorstyles'));
-
-	$filter = create_filter(S_FILTER,$navigation,$filterForm,'tr_filter',get_profile('web.audit.filter.state',0));
-	$filter->Show();
+	$audit_wdgt->addFlicker($filterForm, get_profile('web.audit.filter.state',1));	
 //-------
 
-	$table->show();
-
-	show_thin_table_header(SPACE,$navigation);
-	zbx_add_post_js('insert_in_element("numrows","'.--$row_count.'");');
-
+	$nav = get_thin_table_header($navigation);
+	
+	$audit_wdgt->addItem(array($nav, $table, $nav));
+	$audit_wdgt->show();
 ?>
-
 <?php
 
 include_once "include/page_footer.php";

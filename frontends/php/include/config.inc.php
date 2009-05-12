@@ -1251,7 +1251,7 @@ function __autoload($class_name){
 				$img = new CImg('images/general/sort_upw.gif','up',10,10);
 			}
 
-			$img->AddOption('style','line-height: 18px; vertical-align: middle;');
+			$img->addOption('style','line-height: 18px; vertical-align: middle;');
 			$link = array($link,SPACE,$img);
 		}
 
@@ -1272,5 +1272,28 @@ function __autoload($class_name){
 		$sortorder = get_request('sortorder',get_profile('web.'.$page["file"].'.sortorder',ZBX_SORT_UP));
 
 	return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
+	}
+	
+	function order_result(&$data, $def_field, $def_order=ZBX_SORT_UP){
+		global $page;
+		
+		$sortfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def_field));
+		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def_order));
+		
+		if($data[0])
+		foreach($data as $key => $rows){
+			if(!isset($sortfield,$rows)){
+				info('Page sorting failed ["'.$sortfield.'","'.$sortorder.'"]');
+				return false;
+			}
+
+			$tmp[$key] = $rows[$sortfield];
+		}
+		
+		$sortorder = ($sortorder == 'ASC')?SORT_ASC:SORT_DESC;
+		
+		array_multisort($tmp, $sortorder, $data);
+		
+	return true;
 	}
 ?>

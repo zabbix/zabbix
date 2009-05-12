@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	function	event_source2str($sourceid){
+	function event_source2str($sourceid){
 		switch($sourceid){
 			case EVENT_SOURCE_TRIGGERS:	return S_TRIGGERS;
 			case EVENT_SOURCE_DISCOVERY:	return S_DISCOVERY;
@@ -338,39 +338,36 @@ return $table;
 function make_popup_eventlist($eventid, $trigger_type) {
 
 	$table = new CTableInfo();
-	$table->SetHeader(array(S_TIME,S_STATUS,S_DURATION, S_AGE, S_ACK));
+	$table->setHeader(array(S_TIME,S_STATUS,S_DURATION, S_AGE, S_ACK));
+	$table->addOption('style', 'width: 400px;');
 
+	$event_list = array();
 	$sql = 'SELECT * '.
 			' FROM events '.
 			' WHERE eventid<='.$eventid.
 			' ORDER BY eventid DESC';
 	$db_events = DBselect($sql, 20);
-
-
-	$event_list = array();
-	$count = 0;
 	while($event = DBfetch($db_events)) {		
 		if(!empty($event_list) && ($event_list[$count]['value'] != $event['value'])) {
 			$count++;
 		}
-		elseif(!empty($event_list) && 
+		else if(!empty($event_list) && 
 				($event_list[$count]['value'] == $event['value']) && 
 				($trigger_type == TRIGGER_MULT_EVENT_ENABLED) && 
 				($event['value'] == TRIGGER_VALUE_TRUE)
 				) {
 			$count++;
 		}
+
 		$event_list[$count] = $event;
 	}
 
-	$clock = time();
+	$lclock = time();
 	foreach($event_list as $id => $event) {
-		$lclock = $clock;
-		$clock = $event["clock"];
+		$duration = zbx_date2age($lclock, $event['clock']);
+		$lclock = $event['clock'];
 		
-		$duration = zbx_date2age($lclock, $event["clock"]);
-		
-		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event["value"]));
+		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
 		
 // ack +++
 		$ack = new CSpan(S_NO,'on');
@@ -378,8 +375,8 @@ function make_popup_eventlist($eventid, $trigger_type) {
 			$ack=new CSpan(S_YES,'action');			
 		}
 // ---
-		$table->AddRow(array(
-			date('Y.M.d H:i:s',$event['clock']),
+		$table->addRow(array(
+			zbx_date2str(S_DATE_FORMAT_YMDHMS,$event['clock']),
 			$value,
 			$duration,
 			zbx_date2age($event['clock']),

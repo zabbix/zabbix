@@ -18,19 +18,19 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-	require_once "include/config.inc.php";
-	require_once "include/discovery.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/discovery.inc.php');
 	$page['hist_arg'] = array('druleid');
 
-	$page["file"] = "discovery.php";
-	$page["title"] = "S_STATUS_OF_DISCOVERY";
+	$page['file'] = 'discovery.php';
+	$page['title'] = "S_STATUS_OF_DISCOVERY";
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"druleid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
+		'druleid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
@@ -54,16 +54,27 @@ include_once "include/page_header.php";
 
 	validate_sort_and_sortorder('ip',ZBX_SORT_UP);
 
-	$p_elements = array();
+
+	$dscvry_wdgt = new CWidget('hat_discovery');
 	
+// HEADER
 	$r_form = new CForm();
-	$r_form->SetMethod('get');
+	$r_form->setMethod('get');
 	
 	$druleid = get_request('druleid', 0);
 	$fullscreen = get_request('fullscreen', 0);
+	
+	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1').'&amp;druleid='.$druleid;
 
+	$fs_icon = new CDiv(SPACE,'fullscreen');
+	$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	
+	$dscvry_wdgt->addHeader(S_STATUS_OF_DISCOVERY_BIG, $fs_icon);
+	
+// 2nd header
 	$cmbDRules = new CComboBox('druleid',$druleid,'submit()');
-	$cmbDRules->AddItem(0,S_ALL_SMALL);
+	$cmbDRules->addItem(0,S_ALL_SMALL);
 	$sql = 'SELECT DISTINCT druleid,name '.
 			' FROM drules '.
 			' WHERE '.DBin_node('druleid').
@@ -71,23 +82,14 @@ include_once "include/page_header.php";
 			' ORDER BY name';
 	$db_drules = DBselect($sql);
 	while($drule = DBfetch($db_drules))
-		$cmbDRules->AddItem(
+		$cmbDRules->addItem(
 				$drule['druleid'],
 				get_node_name_by_elid($drule['druleid']).$drule['name']
 				);
 	$r_form->addVar('fullscreen', $fullscreen);
-	$r_form->AddItem(array(S_DISCOVERY_RULE.SPACE,$cmbDRules));
-
-// Header	
-	$text = array(SPACE);
+	$r_form->addItem(array(S_DISCOVERY_RULE.SPACE,$cmbDRules));
 	
-	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1').'&amp;druleid='.$druleid;
-
-	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
-	
-	$p_elements[] = get_table_header($text, $r_form);
+	$dscvry_wdgt->addHeader(SPACE, $r_form);
 //-------------
 	
 
@@ -124,7 +126,7 @@ include_once "include/page_header.php";
 	}
 
 	$table  = new CTableInfo();
-	$table->SetHeader($header,'vertical_header');
+	$table->setHeader($header,'vertical_header');
 
 	$sql_where='';
 	if($druleid>0){
@@ -179,10 +181,10 @@ include_once "include/page_header.php";
 
 		if ($druleid == 0 && !empty($discovery_info)) {
 			$col = new CCol(array(bold($drule['name']),
-				SPACE."(".count($discovery_info).SPACE.S_ITEMS.")"));
-			$col->SetColSpan(count($services) + 2);
+				SPACE.'('.count($discovery_info).SPACE.S_ITEMS.')'));
+			$col->setColSpan(count($services) + 2);
 
-			$table->AddRow(array(get_node_name_by_elid($drule['druleid']),$col));
+			$table->addRow(array(get_node_name_by_elid($drule['druleid']),$col));
 		}
 
 		foreach($discovery_info as $ip => $h_data){
@@ -192,21 +194,25 @@ include_once "include/page_header.php";
 				new CSpan(($h_data['time'] == 0 ? '' : convert_units(time() - $h_data['time'], 'uptime')), $h_data['class'])
 				);
 			foreach($services as $name => $foo){
-				$class = null; $time = SPACE;
+				$class = null;
+				$time = SPACE;
 				
 				$hint = new CDiv(SPACE, $class);
 				$hintTable = new CTableInfo();
-				$hintTable->addOption('border',0);
+				$hintTable->addOption('style','width: auto;');
 
 
 				if(isset($h_data['services'][$name])){
 					$class = $h_data['services'][$name]['class'];
 					$time = $h_data['services'][$name]['time'];
+					
 					if ($class == 'active') {
 						$hintTable->setHeader(S_UP_TIME);
-					} else if ($class == 'inactive') {
+					} 
+					else if ($class == 'inactive') {
 						$hintTable->setHeader(S_DOWN_TIME);
 					}
+					
 					$timeColumn = new CCol(zbx_date2age($h_data['services'][$name]['time']), $class);
 					$hintTable->addRow($timeColumn);
 					$hint->setHint($hintTable);
@@ -214,21 +220,12 @@ include_once "include/page_header.php";
 				
 				$table_row[] = new CCol($hint, $class);
 			}
-			$table->AddRow($table_row);
+			$table->addRow($table_row);
 		}
 	}
 
-	$p_elements[] = $table;
-	
-	$latest_hat = create_hat(
-			S_STATUS_OF_DISCOVERY_BIG,
-			$p_elements,
-			array($fs_icon),
-			'hat_discovery',
-			get_profile('web.discovery.hats.hat_discovery.state',1)
-	);
-
-	$latest_hat->Show();
+	$dscvry_wdgt->addItem($table);
+	$dscvry_wdgt->show();
 ?>
 <?php
 

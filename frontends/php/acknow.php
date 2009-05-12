@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/acknow.inc.php";
-	require_once "include/triggers.inc.php";
-	require_once "include/forms.inc.php";
+	require_once 'include/config.inc.php';
+	require_once 'include/acknow.inc.php';
+	require_once 'include/triggers.inc.php';
+	require_once 'include/forms.inc.php';
 
-	$page["title"]	= "S_ACKNOWLEDGES";
+	$page['title']	= "S_ACKNOWLEDGES";
 	$page["file"]	= "acknow.php";
 	$page['hist_arg'] = array('eventid');
 	

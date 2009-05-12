@@ -2022,37 +2022,60 @@ include_once('include/page_header.php');
 // ----
 			$available_maintenances = get_accessible_maintenance_by_user(PERM_READ_WRITE);
 
+			$sqls = array();
+			
 			$maintenances = array();
 			$maintenanceids = array();
 
-			$sql_from = '';
-			$sql_where = '';
-			if($_REQUEST['hostid']>0){
-				$sql_from = ', maintenances_hosts mh, maintenances_groups mg, hosts_groups hg ';
-				$sql_where = ' AND hg.hostid='.$_REQUEST['hostid'].
-							' AND ('.
-								'(mh.hostid=hg.hostid AND m.maintenanceid=mh.maintenanceid) '.
-								' OR (mg.groupid=hg.groupid AND m.maintenanceid=mg.maintenanceid))';
-			}
-			else if($_REQUEST['groupid']>0){
-				$sql_from = ', maintenances_hosts mh, maintenances_groups mg, hosts_groups hg ';
-				$sql_where = ' AND hg.groupid='.$_REQUEST['groupid'].
-							' AND ('.
-								'(mg.groupid=hg.groupid AND m.maintenanceid=mg.maintenanceid) '.
-								' OR (mh.hostid=hg.hostid AND m.maintenanceid=mh.maintenanceid))';
-			}
-			
-			$sql = 'SELECT m.* '.
-					' FROM maintenances m '.$sql_from.
+			if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
+				$sqls[] = 'SELECT m.* '.
+					' FROM maintenances m, maintenances_hosts mh '.
 					' WHERE '.DBin_node('m.maintenanceid').
 						' AND '.DBcondition('m.maintenanceid',$available_maintenances).
-						$sql_where.
-					order_by('m.name');
+						' AND mh.hostid='.$_REQUEST['hostid'].
+						' AND m.maintenanceid=mh.maintenanceid ';
+					' ORDER BY m.name';
 
-			$db_maintenances = DBselect($sql);
-			while($maintenance = DBfetch($db_maintenances)){
-				$maintenances[$maintenance['maintenanceid']] = $maintenance;
-				$maintenanceids[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
+				$sqls[] = 'SELECT m.* '.
+					' FROM maintenances m, maintenances_groups mg, hosts_groups hg '.
+					' WHERE '.DBin_node('m.maintenanceid').
+						' AND '.DBcondition('m.maintenanceid',$available_maintenances).
+						' AND hg.hostid='.$_REQUEST['hostid'].
+						' AND mg.groupid=hg.groupid '.
+						' AND m.maintenanceid=mg.maintenanceid ';
+					' ORDER BY m.name';
+			}
+			else if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0)){
+				$sqls[] = 'SELECT m.* '.
+					' FROM maintenances m, maintenances_groups mg '.
+					' WHERE '.DBin_node('m.maintenanceid').
+						' AND '.DBcondition('m.maintenanceid',$available_maintenances).
+						' AND mg.groupid='.$_REQUEST['groupid'].
+						' AND m.maintenanceid=mg.maintenanceid ';
+					' ORDER BY m.name';
+
+				$sqls[] = 'SELECT m.* '.
+					' FROM maintenances m, maintenances_hosts mh, hosts_groups hg '.
+					' WHERE '.DBin_node('m.maintenanceid').
+						' AND '.DBcondition('m.maintenanceid',$available_maintenances).
+						' AND hg.groupid='.$_REQUEST['groupid'].
+						' AND mh.hostid=hg.hostid '.
+						' AND m.maintenanceid=mh.maintenanceid ';
+					' ORDER BY m.name';			}
+			else{
+				$sqls[] = 'SELECT m.* '.
+					' FROM maintenances m '.
+					' WHERE '.DBin_node('m.maintenanceid').
+						' AND '.DBcondition('m.maintenanceid',$available_maintenances).
+					' ORDER BY m.name';
+			}
+			
+			foreach($sqls as $num => $sql){
+				$db_maintenances = DBselect($sql);
+				while($maintenance = DBfetch($db_maintenances)){
+					$maintenances[$maintenance['maintenanceid']] = $maintenance;
+					$maintenanceids[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
+				}
 			}
 			
 		

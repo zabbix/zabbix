@@ -173,7 +173,7 @@ class CChart extends CGraph{
 					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
 					$this->sizeX+$this->shiftXleft,
 					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
-					$this->GetColor('Gray')
+					$this->getColor('Gray')
 				);
 		}
 	
@@ -184,7 +184,7 @@ class CChart extends CGraph{
 						$this->shiftY,
 						$i*($this->sizeX/($vline_count+1))+$this->shiftXleft,
 						$this->sizeY+$this->shiftY,
-						$this->GetColor('Gray')
+						$this->getColor('Gray')
 				);
 		}
 
@@ -195,7 +195,7 @@ class CChart extends CGraph{
 						$i*($this->sizeX/($vline_count+1))+$this->shiftXleft-3, 
 						$this->sizeY+$this->shiftY+57, 
 						date('      H:i',$this->from_time+$i*($this->period/($vline_count+1))), 
-						$this->GetColor('Black No Alpha')
+						$this->getColor('Black No Alpha')
 				);
 
 			$new_day=date('d',$this->from_time+$i*($this->period/($vline_count+1)));
@@ -206,7 +206,7 @@ class CChart extends CGraph{
 									$i*($this->sizeX/($vline_count+1))+$this->shiftXleft-3, 
 									$this->sizeY+$this->shiftY+57, 
 									date('m.d H:i',$this->from_time+$i*($this->period/($vline_count+1))), 
-									$this->GetColor('Dark Red No Alpha')
+									$this->getColor('Dark Red No Alpha')
 							);
 
 			}
@@ -231,7 +231,7 @@ class CChart extends CGraph{
 			$this->shiftY,
 			$this->sizeX+$this->shiftXleft,
 			$this->sizeY+$this->shiftY,
-			$this->GetColor('Not Work Period'));
+			$this->getColor('Not Work Period'));
 
 		$now = time();
 		if(isset($this->stime)){
@@ -260,7 +260,7 @@ class CChart extends CGraph{
 				$this->shiftY,
 				$x2,
 				$this->sizeY+$this->shiftY,
-				$this->GetColor('White'));
+				$this->getColor('White'));
 
 			$start = find_period_start($periods,$end);
 		}
@@ -327,7 +327,7 @@ class CChart extends CGraph{
 				$trigger['y'],
 				$this->sizeX+$this->shiftXleft,
 				$trigger['y'],
-				$this->GetColor($trigger['color']));
+				$this->getColor($trigger['color']));
 		}
 	}
 	
@@ -350,10 +350,10 @@ class CChart extends CGraph{
 //SDI($i);
 			if($this->items[$i]['calc_type'] == GRAPH_ITEM_AGGREGATED){
 				$fnc_name = 'agr('.$this->items[$i]['periods_cnt'].')';
-				$color = $this->GetColor('HistoryMinMax');
+				$color = $this->getColor('HistoryMinMax');
 			}
 			else{
-				$color = $this->GetColor($this->items[$i]['color']);
+				$color = $this->getColor($this->items[$i]['color'], GRAPH_STACKED_ALFA);
 				switch($this->items[$i]['calc_fnc']){
 					case CALC_FNC_MIN:	$fnc_name = 'min';	break;
 					case CALC_FNC_MAX:	$fnc_name = 'max';	break;
@@ -399,7 +399,7 @@ class CChart extends CGraph{
 							$this->sizeY+$this->shiftY+62+12*$i,
 							$this->shiftXleft+5,
 							$this->sizeY+$this->shiftY+5+62+12*$i,
-							$this->GetColor('Black No Alpha')
+							$this->getColor('Black No Alpha')
 						);
 
 			imagestring($this->im, 
@@ -407,7 +407,7 @@ class CChart extends CGraph{
 							$this->shiftXleft+9,
 							$this->sizeY+$this->shiftY+(62-5)+12*$i,
 							$str,
-							$this->GetColor('Black No Alpha')
+							$this->getColor('Black No Alpha')
 						);
 						
 			$i +=($this->type == GRAPH_TYPE_STACKED)?-1:1;
@@ -421,14 +421,14 @@ class CChart extends CGraph{
 				$this->sizeY+$this->shiftY+2+62+12*$i,
 				6,
 				6,
-				$this->GetColor($trigger['color']));
+				$this->getColor($trigger['color']));
 
 			imageellipse($this->im,
 				$this->shiftXleft + 2,
 				$this->sizeY+$this->shiftY+2+62+12*$i,
 				6,
 				6,
-				$this->GetColor('Black No Alpha'));
+				$this->getColor('Black No Alpha'));
 
 			imagestring(
 				$this->im, 
@@ -436,7 +436,7 @@ class CChart extends CGraph{
 				$this->shiftXleft+9,
 				$this->sizeY+$this->shiftY+(62-5)+12*$i,
 				$trigger['description'],
-				$this->GetColor('Black No Alpha'));
+				$this->getColor('Black No Alpha'));
 			++$i;
 		}
 
@@ -460,7 +460,7 @@ class CChart extends CGraph{
 								$this->shiftXleft+6,$this->sizeY+$this->shiftY+67+12*$i,
 							),
 							3,
-							$this->GetColor($color)
+							$this->getColor($color)
 						);
 						
 					imagepolygon($this->im,
@@ -470,7 +470,7 @@ class CChart extends CGraph{
 								$this->shiftXleft+6,$this->sizeY+$this->shiftY+67+12*$i,
 							),
 							3,
-							$this->GetColor('Black No Alpha')
+							$this->getColor('Black No Alpha')
 						);
 								
 					imagestring(
@@ -479,7 +479,7 @@ class CChart extends CGraph{
 						$this->shiftXleft+9,
 						$this->sizeY+$this->shiftY+(62-5)+12*$i,
 						sprintf($str,$percentile['percent'],convert_units($percentile['value'],$units[$side])),
-						$this->GetColor('Black No Alpha'));
+						$this->getColor('Black No Alpha'));
 						
 					$i++;
 					$color = '00AA00';
@@ -1204,7 +1204,7 @@ class CChart extends CGraph{
 							5, 
 							$this->sizeY-$this->sizeY*$i/$hstr_count-4+$this->shiftY, 
 							$str, 
-							$this->GetColor('Dark Red No Alpha')
+							$this->getColor('Dark Red No Alpha')
 						);
 			}
 			
@@ -1216,7 +1216,7 @@ class CChart extends CGraph{
 							$this->zero[GRAPH_YAXIS_SIDE_LEFT],
 							$this->shiftXleft+$this->sizeX,
 							$this->zero[GRAPH_YAXIS_SIDE_LEFT],
-							$this->GetColor(GRAPH_ZERO_LINE_COLOR_LEFT)
+							$this->getColor(GRAPH_ZERO_LINE_COLOR_LEFT)
 						); //*/
 			}
 		}
@@ -1241,7 +1241,7 @@ class CChart extends CGraph{
 							$this->sizeX+$this->shiftXleft+2, 
 							$this->sizeY-$this->sizeY*$i/$hstr_count-4+$this->shiftY, 
 							$str, 
-							$this->GetColor('Dark Red No Alpha'));
+							$this->getColor('Dark Red No Alpha'));
 			}
 			
 			if(($this->zero[GRAPH_YAXIS_SIDE_RIGHT] != $this->sizeY+$this->shiftY) && 
@@ -1252,7 +1252,7 @@ class CChart extends CGraph{
 							$this->zero[GRAPH_YAXIS_SIDE_RIGHT],
 							$this->shiftXleft+$this->sizeX,
 							$this->zero[GRAPH_YAXIS_SIDE_RIGHT],
-							$this->GetColor(GRAPH_ZERO_LINE_COLOR_RIGHT)
+							$this->getColor(GRAPH_ZERO_LINE_COLOR_RIGHT)
 						); //*/
 			}
 		}
@@ -1282,7 +1282,7 @@ class CChart extends CGraph{
 					$y,
 					$this->sizeX+$this->shiftXleft,
 					$y,
-					$this->GetColor($color));
+					$this->getColor($color));
 				
 				$color = '00AA00';
 			}
@@ -1378,6 +1378,7 @@ class CChart extends CGraph{
 
 				$calc_fnc = $this->items[$item]['calc_fnc'];
 			}
+
 // For each X
 			for($i = 1, $j = 0; $i < $maxX; $i++){  // new point
 				if(($data->count[$i] == 0) && ($i != ($maxX-1))) continue;
@@ -1430,7 +1431,7 @@ class CChart extends CGraph{
 		
 		$end_time=getmicrotime();
 		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
-		imagestring($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12,"Generated in $str sec", $this->GetColor('Gray'));
+		imagestring($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12,"Generated in $str sec", $this->getColor('Gray'));
 
 		unset($this->items, $this->data);
 

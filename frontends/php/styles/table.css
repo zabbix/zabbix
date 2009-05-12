@@ -19,6 +19,7 @@ table.nowrap tr td {
 }
 
 td,tr{
+	color: inherit;
 	font-family:Verdana, Arial, Helvetica, sans-serif;
 	font-size:10px;
 	text-decoration: none;
@@ -611,6 +612,15 @@ table.header{
 	vertical-align: middle;
 }
 
+table.header tr td.header_c{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	height: 24px;
+	padding-left: 4px;
+	padding-right: 4px;
+	line-height: 20px;
+}
+
 table.header tr td.header_l{
 	background:none;
 	font-family:verdana, arial, helvetica, sans-serif;
@@ -634,22 +644,17 @@ table.header a{
 	color: #FFFFFF;
 }
 
-/****** FILTER *********/
-table.filter{
+/****** FLICKER *********/
+table.flicker{
 	width: 100%;
 	color: #FFFFFF;
-	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	background: #5C7099 url('../images/gradients/menu_not_active2.gif') repeat-x top left;
 	background-color: #6d88ad;
-	border-color: #000000;
-	border-width:0px;
-	border-top-style: solid;
-	border-left-style: solid;
-	border-right-style: solid;
-	border-bottom-style: solid;
+	border: 0px #000000 solid;
 	vertical-align:middle;
 }
 
-table.filter tr td.filter_c{
+table.flicker tr td.flicker_c{
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:10px;
 	height: 16px;
@@ -658,7 +663,7 @@ table.filter tr td.filter_c{
 	line-height: 12px;
 }
 
-table.filter tr td.filter_l{
+table.flicker tr td.flicker_l{
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:10px;
 	text-align: left;
@@ -666,7 +671,7 @@ table.filter tr td.filter_l{
 	padding-left: 4px;
 	line-height: 12px;
 }
-table.filter tr td.filter_r{
+table.flicker tr td.flicker_r{
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:10px;
 	text-align: right;
@@ -675,10 +680,49 @@ table.filter tr td.filter_r{
 	line-height: 12px;
 }
 
-table.filter a{
+table.flicker a{
 	color: #0BF;
 }
 
+/****** THIN HEADER *********/
+table.thin_header{
+	width: 100%;
+	color: #FFFFFF;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	background-color: #6d88ad;
+	border: 0px #000000 solid;
+	vertical-align:middle;
+}
+
+table.thin_header tr td.thin_header_c{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	height: 16px;
+	padding-left: 4px;
+	padding-right: 4px;
+	line-height: 12px;
+}
+
+table.thin_header tr td.thin_header_l{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	text-align: left;
+	height: 16px;
+	padding-left: 4px;
+	line-height: 12px;
+}
+table.thin_header tr td.thin_header_r{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	text-align: right;
+	height: 16px;
+	padding-right: 4px;
+	line-height: 12px;
+}
+
+table.thin_header a{
+	color: #0BF;
+}
 /**************** Aknowledges ****************/
 
 table.ack_msgs{

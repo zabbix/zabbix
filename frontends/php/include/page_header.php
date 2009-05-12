@@ -72,6 +72,8 @@ COpt::profiling_start("page");
 			else 
 				header('Content-Type: text/html; charset='.$page['encoding']);
 
+//			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . " GMT");
+			
 			if(isset($page['title']) && defined($page['title']))	$page['title'] = constant($page['title']);
 			
 			if(!isset($page['title'])) $page['title'] = 'ZABBIX';

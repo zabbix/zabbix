@@ -108,8 +108,13 @@ img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 	color: #000000;
 }
 
+.textwhite{
+	color: #FFFFFF;
+}
+
 .pointer{
 }
+
 .pointer:hover{
 	cursor: pointer;
 }

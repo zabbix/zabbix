@@ -91,7 +91,7 @@ include_once 'include/page_header.php';
 				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
 				
 				if($result){
-					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVORITES.'";'."\n");
+					print('$("addrm_fav").title = "'.S_add_TO.' '.S_FAVORITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){ add2favorites("'.$_REQUEST['favobj'].'","'.$_REQUEST['favid'].'");}'."\n");
 				}
 			}			
@@ -127,22 +127,23 @@ include_once 'include/page_header.php';
 	$elementid = get_request('elementid', null);
 	if($elementid <= 0) $elementid = null;
 
-	$p_elements = array();
-	
+	$screens_wdgt = new CWidget();
+
+// HEADER
 	$text = null;
 	
 	$form = new CForm();
-	$form->SetMethod('get');
+	$form->setMethod('get');
 	
-	$form->AddVar('fullscreen',$_REQUEST['fullscreen']);
-	if(isset($_REQUEST['period']))	$form->AddVar('period', $_REQUEST['period']);
-	if(isset($_REQUEST['stime']))	$form->AddVar('stime', $_REQUEST['stime']);
+	$form->addVar('fullscreen',$_REQUEST['fullscreen']);
+	if(isset($_REQUEST['period']))	$form->addVar('period', $_REQUEST['period']);
+	if(isset($_REQUEST['stime']))	$form->addVar('stime', $_REQUEST['stime']);
 
 	$cmbConfig = new CComboBox('config', $config, "javascript: redirect('slides.php?config=1');");
 	$cmbConfig->addItem(0, S_SCREENS);
 	$cmbConfig->addItem(1, S_SLIDESHOWS);
 
-	$form->AddItem(array(S_SHOW.SPACE,$cmbConfig));
+	$form->addItem(array(S_SHOW.SPACE,$cmbConfig));
 
 	$cmbElements = new CComboBox('elementid',$elementid,'submit()');
 	unset($screen_correct);
@@ -179,7 +180,7 @@ include_once 'include/page_header.php';
 		}
 	}
 
-	if($cmbElements->ItemsCount() > 0) $form->AddItem(array(SPACE.S_SCREENS.SPACE,$cmbElements));
+	if($cmbElements->ItemsCount() > 0) $form->addItem(array(SPACE.S_SCREENS.SPACE,$cmbElements));
 		
 	if((2 != $_REQUEST['fullscreen']) && !empty($elementid) && check_dynamic_items($elementid, 0)){
 		if(!isset($_REQUEST['hostid'])){
@@ -213,22 +214,16 @@ include_once 'include/page_header.php';
 			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
 		}
 		$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-
-		show_table_header($text,$form);
 	}
-	else if(2 != $_REQUEST['fullscreen']){
-		show_table_header($text,$form);
-	}
+//-------------------
 ?>
 <?php
 	if(isset($elementid)){
 		$effectiveperiod = navigation_bar_calc();
 		
 
-		if($element = get_screen($elementid, 0, $effectiveperiod)){
-			$p_elements[] = $element;
-		}
-		
+		$element = get_screen($elementid, 0, $effectiveperiod);
+
 		$_REQUEST['elementid'] = $elementid;
 
 		if( 2 != $_REQUEST['fullscreen'] ){
@@ -249,7 +244,7 @@ include_once 'include/page_header.php';
 		}
 	}
 	else{
-		$p_elements[] = new CTableInfo(S_NO_SCREENS_DEFINED);
+		$element = new CTableInfo(S_NO_SCREENS_DEFINED);
 	}
 	
 	$icon = null;
@@ -262,7 +257,7 @@ include_once 'include/page_header.php';
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
-			$icon->addOption('title',S_ADD_TO.' '.S_FAVORITES);
+			$icon->addOption('title',S_add_TO.' '.S_FAVORITES);
 			$icon->addAction('onclick',new CScript("javascript: add2favorites('screenid','".$elementid."');"));
 		}
 		$icon->addOption('id','addrm_fav');
@@ -275,19 +270,12 @@ include_once 'include/page_header.php';
 		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));	
 	}
 	
-	if( 2 == $_REQUEST['fullscreen']){
-		echo unpack_object($p_elements);
-	}
-	else{
-		$screens_hat = create_hat(
-				S_SCREENS_BIG,
-				$p_elements,
-				array($icon,$fs_icon),
-				'hat_screens'
-		);
-		
-		$screens_hat->Show();
-	}
+	$screens_wdgt->addHeader(S_SCREENS_BIG,array($icon,$fs_icon));
+	$screens_wdgt->addHeader($text,$form);
+	
+	$screens_wdgt->addItem($element);
+	
+	$screens_wdgt->show();
 	
 	$scroll_div = new CDiv();
 	$scroll_div->addOption('id','scroll_cntnr');

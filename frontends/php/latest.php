@@ -26,7 +26,7 @@
 	$page['title'] = "S_LATEST_VALUES";
 	$page['file'] = 'latest.php';
 	$page['hist_arg'] = array('groupid','hostid','show','select','open','applicationid');
-//	$page['scripts'] = array('updater.js');
+	$page['scripts'] = array('scriptaculous.js?load=effects');
 	
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	
@@ -50,15 +50,20 @@ include_once 'include/page_header.php';
 
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
-		'select'=>		array(T_ZBX_STR, O_OPT, NULL,	NULL,		NULL),
 
-		'show'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,		NULL),
+
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
+
+// filter
+		'select'=>			array(T_ZBX_STR, O_OPT, NULL,	NULL,		NULL),
+
+		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
+		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 		
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
 	check_fields($fields);
@@ -82,10 +87,10 @@ include_once 'include/page_header.php';
 //----------------
 ?>
 <?php
-/* AJAX	*/
+/* AJAX */	
 	if(isset($_REQUEST['favobj'])){
-		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.latest.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		if('filter' == $_REQUEST['favobj']){
+			update_profile('web.latest.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 /*
 		else if('refresh' == $_REQUEST['favobj']){
@@ -102,10 +107,33 @@ include_once 'include/page_header.php';
 		exit();
 	}
 //--------
-	$p_elements = array();
+
+/* FILTER */
+	if(isset($_REQUEST['filter_rst'])){
+		$_REQUEST['select'] = '';
+	}
+	
+	$_REQUEST['select'] = get_request('select',get_profile('web.latest.filter.select',''));
+	
+	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
+		update_profile('web.latest.filter.select',$_REQUEST['select'], PROFILE_TYPE_STR);
+	}
+// --------------
+
+	$latest_wdgt = new CWidget();
 // Header
+
+	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+
+	$fs_icon = new CDiv(SPACE,'fullscreen');
+	$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+
+	$latest_wdgt->addHeader(S_LATEST_DATA_BIG,$fs_icon);
+
+// 2nd header
 	$r_form = new CForm();
-	$r_form->SetMethod('get');
+	$r_form->setMethod('get');
 
 //	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
 //	$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
@@ -125,25 +153,28 @@ include_once 'include/page_header.php';
 	
 	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
 	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));	
-	
-	$sql_from = '';
-	$sql_where = '';
-	if($_REQUEST['groupid'] > 0){
-		$sql_from .= ',hosts_groups hg ';
-		$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
-	}
-//---
-	
-	$l_form = new CForm();
-	$l_form->SetMethod('get');
-	$l_form->addVar('groupid',$_REQUEST['groupid']);
-	$l_form->addVar('hostid',$_REQUEST['hostid']);
-	$l_form->AddItem(array(S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE, new CTextBox('select',$_REQUEST['select'],20)));
-	$l_form->AddItem(array(SPACE, new CButton('show',S_SHOW,'javascript: submit();')));
-//	$l_form->AddItem(array(SPACE, new CButton('show',S_SHOW,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);")));
 
-	$p_elements[] = get_table_header($l_form,$r_form);
-//-------------
+	$latest_wdgt->addHeader(SPACE,$r_form);
+//	show_table_header(S_LATEST_DATA_BIG,$r_form);
+//-------------	
+	
+/************************* FILTER **************************/
+/***********************************************************/
+	$filterForm = new CFormTable();
+	$filterForm->addOption('name','zbx_filter');
+	$filterForm->addOption('id','zbx_filter');
+
+	$filterForm->addRow(S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE, new CTextBox('select',$_REQUEST['select'],20));
+
+	$reset = new CButton("filter_rst",S_RESET);
+	$reset->setType('button');
+	$reset->setAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+
+	$filterForm->addItemToBottomRow(new CButton("filter_set",S_FILTER));
+	$filterForm->addItemToBottomRow($reset);
+	
+	$latest_wdgt->addFlicker($filterForm, get_profile('web.latest.filter.state',1));
+//-------
 
 	validate_sort_and_sortorder('i.description',ZBX_SORT_UP);
 	
@@ -199,7 +230,7 @@ include_once 'include/page_header.php';
 	}
 	
 	$table=new CTableInfo();
-	$table->SetHeader(array(
+	$table->setHeader(array(
 		is_show_all_nodes()?make_sorting_link(S_NODE,'h.hostid') : null,
 		($_REQUEST['hostid'] ==0)?make_sorting_link(S_HOST,'h.host') : NULL,
 		array($link,SPACE,make_sorting_link(S_DESCRIPTION,'i.description')),
@@ -213,7 +244,16 @@ include_once 'include/page_header.php';
 	$db_apps = array();
 	$db_appids = array();
 	
-	$sql_where.=($_REQUEST['hostid']>0)?' AND h.hostid='.$_REQUEST['hostid']:'';
+	$sql_from = '';
+	$sql_where = '';
+	if($_REQUEST['groupid'] > 0){
+		$sql_from .= ',hosts_groups hg ';
+		$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+	}
+	
+	if($_REQUEST['hostid']>0){
+		$sql_where.= ' AND h.hostid='.$_REQUEST['hostid'];
+	}
 	
 	$sql = 'SELECT DISTINCT h.host,h.hostid, a.* '.
 			' FROM applications a, hosts h '.$sql_from.
@@ -319,16 +359,16 @@ include_once 'include/page_header.php';
 		}
 
 		$col = new CCol(array($link,SPACE,bold($db_app['name']),SPACE.'('.$db_app['item_cnt'].SPACE.S_ITEMS.')'));
-		$col->SetColSpan(5);
+		$col->setColSpan(5);
 
-		$table->AddRow(array(
+		$table->addRow(array(
 				get_node_name_by_elid($db_app['applicationid']),
 				($_REQUEST['hostid'] > 0)?NULL:$db_app['host'],
 				$col
 			));
 
 		foreach($app_rows as $row)
-			$table->AddRow($row);
+			$table->addRow($row);
 	}
 
 // OTHER ITEMS (which doesn't linked to application)
@@ -448,19 +488,17 @@ include_once 'include/page_header.php';
 		}
 
 		$col = new CCol(array($link,SPACE,bold(S_MINUS_OTHER_MINUS),SPACE.'('.$db_host['item_cnt'].SPACE.S_ITEMS.')'));
-		$col->SetColSpan(5);
+		$col->setColSpan(5);
 		
-		$table->AddRow(array(
+		$table->addRow(array(
 				get_node_name_by_elid($db_host['hostid']),
 				($_REQUEST['hostid'] > 0)?NULL:$db_host['host'],
 				$col
 				));	
 
 		foreach($app_rows as $row)
-			$table->AddRow($row);
+			$table->addRow($row);
 	}
-
-	$p_elements[] = $table;
 
 /*
 // Refresh tab
@@ -472,22 +510,8 @@ include_once 'include/page_header.php';
 	);
 //*/
 
-	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
-
-	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
-
-
-	$latest_hat = create_hat(
-			S_LATEST_DATA_BIG,
-			$p_elements,//new CSpan(S_LOADING_P,'textcolorstyles'),
-			array($fs_icon),
-			ZBX_PAGE_MAIN_HAT,
-			get_profile('web.latest.hats.hat_latest.state',1)
-	);
-
-	$latest_hat->Show();
+	$latest_wdgt->addItem($table);
+	$latest_wdgt->show();
 	
 //	add_refresh_objects($refresh_tab);
 ?>
