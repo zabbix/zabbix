@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-316] rework of events history, as consequences changes in audit screen, some reports and other pages (Artem)
  - [DEV-356] moved dropdown configuration from defines to frontend (Vedmak)
  - [DEV-355] changed node management interface (Vedmak)
  - [DEV-341] added hint with previous 20 events in Dashboard's widget "Last 20 issues" on mouse-over (Vedmak)
