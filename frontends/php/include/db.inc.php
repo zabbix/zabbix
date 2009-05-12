@@ -28,6 +28,8 @@ if(!isset($DB)){
 	if(isset($DB_DATABASE))	$DB['DATABASE'] = $DB_DATABASE;
 	if(isset($DB_USER))		$DB['USER'] 	= $DB_USER;
 	if(isset($DB_PASSWORD))	$DB['PASSWORD'] = $DB_PASSWORD;
+	$DB['SELECT_COUNT'] = 0;
+	$DB['EXECUTE_COUNT'] = 0;	
 }
 
 	function DBconnect(&$error){
@@ -61,6 +63,10 @@ if(!isset($DB)){
 						if (!mysql_select_db($DB['DATABASE'])){
 							$error = 'Error database selection ['.mysql_error().']';
 							$result = false;
+						}
+						else{
+							DBexecute('SET NAMES "latin1"');
+							DBexecute('SET CHARACTER SET "latin1"');
 						}
 					}
 					break;
@@ -366,7 +372,7 @@ if(!isset($DB)){
 			SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
 	*/
 
-	function &DBselect($query, $limit='NO'){
+	function &DBselect($query, $limit='NO', $offset=0){
 		global $DB;
 //COpt::savesqlrequest($query);
 		$result = false;
@@ -378,7 +384,7 @@ if(!isset($DB)){
 			switch($DB['TYPE']){
 				case 'MYSQL':
 					if(zbx_numeric($limit)){
-						$query .= ' limit '.intval($limit);
+						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
 					$result=mysql_query($query,$DB['DB']);
 					if(!$result){
@@ -387,7 +393,7 @@ if(!isset($DB)){
 					break;
 				case 'POSTGRESQL':
 					if(zbx_numeric($limit)){
-						$query .= ' limit '.intval($limit);
+						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
 					$result = pg_query($DB['DB'],$query);
 					if(!$result){
@@ -396,7 +402,8 @@ if(!isset($DB)){
 					break;
 				case 'ORACLE':
 					if(zbx_numeric($limit)){
-						$query = 'select * from ('.$query.') where rownum<='.intval($limit);
+//						$query = 'select * from ('.$query.') where rownum<='.intval($limit);
+						$query = 'select * from ('.$query.') where rownum between '.intval($offset).' and '.intval($limit);
 					}
 					$result = DBexecute($query);
 					if(!$result){
@@ -410,7 +417,11 @@ if(!isset($DB)){
 						lock_db_access();
 					}
 					
-					if(!($result = sqlite3_query($DB['DB'],$query))){
+					if(zbx_numeric($limit)){
+						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
+					}
+					
+					if(!$result = sqlite3_query($DB['DB'],$query)){
 						error('Error in query ['.$query.'] ['.sqlite3_error($DB['DB']).']');
 					}
 					else{

@@ -84,7 +84,7 @@ include_once "include/page_header.php";
 
 	if(isset($service) && isset($_REQUEST['showgraph'])){
 		$table  = new CTable(null,'chart');
-		$table->AddRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')));
+		$table->addRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')));
 		$table->Show();
 	} 
 	else {
@@ -151,7 +151,7 @@ include_once "include/page_header.php";
 					if(is_string($row['reason']) && ($row['reason'] == '-'))
 						$row['reason'] = new CList(null,"itservices");
 					if(does_service_depend_on_the_service($row["serviceid"],$row2["serviceid"])){
-						$row['reason']->AddItem(new CLink(
+						$row['reason']->addItem(new CLink(
 										expand_trigger_description($row2["triggerid"]),
 										"events.php?triggerid=".$row2["triggerid"]));
 					}
@@ -214,18 +214,14 @@ include_once "include/page_header.php";
 			$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 	
 			$fs_icon = new CDiv(SPACE,'fullscreen');
-			$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-			$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+			$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+			$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 	
-			$tab = create_hat(
-					S_IT_SERVICES_BIG,
-					$tree->getHTML(),
-					null,
-					'hat_services'
-				);
+			
+			$srv_wdgt = new CWidget('hat_services', $tree->getHTML());
+			$srv_wdgt->addHeader(S_IT_SERVICES_BIG, $fs_icon);
 				
-			$tab->Show();
-			unset($tab);
+			$srv_wdgt->show();
 		} 
 		else {
 			error('Can not format Tree. Check logik structure in service links');

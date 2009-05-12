@@ -216,8 +216,12 @@ table.header tr td.header_r{
 	height: 24px;
 }
 
-table.filter{
+table.thin_header{
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
+}
+
+table.flicker{
+	background: #5C7099 url('../images/gradients/menu_not_active_bb.gif') repeat-x top left;
 }
 
 table.ack_msgs tr.title {
@@ -228,7 +232,7 @@ table.menu tr{
 	background: #AAAAAA url('../images/gradients/menu_not_active_bb.gif') repeat-x top left;
 }
 
-table.menu td{
+table.menu tr td{
 	border-color: #777777;
 }
 
@@ -326,6 +330,14 @@ div.arrowup{
 
 div.arrowdown{
 	background-image: url('../images/general/bttn/arrowdown_bb.png');
+}
+
+div.arrowleft{
+	background-image: url('../images/general/bttn/arrowleft_bb.png');
+}
+
+div.arrowright{
+	background-image: url('../images/general/bttn/arrowright_bb.png');
 }
 
 div.fullscreen{

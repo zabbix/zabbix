@@ -22,8 +22,8 @@
 class CFormTable extends CForm{
 
  private $align;
- private $title;
  private $help;
+ 
 
  protected $top_items = array();
  protected $center_items = array();
@@ -82,9 +82,9 @@ class CFormTable extends CForm{
 		return $this->align = $value;
 	}
 
-	public function setTitle($value=NULL){
+	public function setTitle($value=null){
 		if(is_null($value)){
-			unset($this->title);
+			$this->title = null;
 			return 0;
 		}
 
@@ -106,7 +106,7 @@ class CFormTable extends CForm{
 		else {
 			return $this->error('Incorrect value for setHelp ['.$value.']');
 		}
-		return 0;
+	return 0;
 	}
 	
 	public function addVar($name, $value){
@@ -170,10 +170,12 @@ class CFormTable extends CForm{
 		}
 	}
 	
-	public function bodyToString(){
+	public function bodyToString(){	
 		parent::bodyToString();
-
+		
 		$tbl = new CTable(NULL,$this->tableclass);
+		
+		foreach($this->top_items as $item)	$tbl->additem($item);
 
 		$tbl->setOddRowClass('form_odd_row');
 		$tbl->setEvenRowClass('form_even_row');
@@ -183,20 +185,23 @@ class CFormTable extends CForm{
 		
 		$tbl->setAlign($this->align);
 // add first row
-		$col = new CCol(NULL,'form_row_first');
-		$col->setColSpan(2);
+		if(!is_null($this->title)){
+			$col = new CCol(NULL,'form_row_first');
+			$col->setColSpan(2);
 		
-		if(isset($this->help))			$col->addItem($this->help);
-		if(isset($this->title))		 	$col->addItem($this->title);
-		foreach($this->top_items as $item)	$col->addItem($item);
-		
-		$tbl->setHeader($col);
+			if(isset($this->help))			$col->addItem($this->help);
+			if(isset($this->title))		 	$col->addItem($this->title);
+			
+			$tbl->setHeader($col);
+		}
+
 // add last row
 		$tbl->setFooter($this->bottom_items);
 // add center rows
 		foreach($this->center_items as $item){
 			$tbl->addRow($item);
 		}
+
 	return $tbl->toString();
 	}
 }

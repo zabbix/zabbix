@@ -20,45 +20,38 @@
 ?>
 <?php
 	require_once("include/config.inc.php");
-
+	
 	global $USER_DETAILS;
 	global $page;
 	global $ZBX_PAGE_POST_JS;
-
+	
 	if(!defined('PAGE_HEADER_LOADED')){
 		define ('PAGE_HEADER_LOADED', 1);
 	}
 	
-//------------------------------------- <HISTORY> ---------------------------------------
-	add_user_history($page);
-//------------------------------------- </HISTORY> --------------------------------------
-
+	//------------------------------------- <HISTORY> ---------------------------------------
+	if(($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
+		add_user_history($page);
+	}
+	//------------------------------------- </HISTORY> --------------------------------------
+	
 	show_messages();
 		
+	$post_script = '';
 	if($page['type'] == PAGE_TYPE_HTML){
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-function zbxCallPostScripts(){
-<?php
+		$post_script.= 'function zbxCallPostScripts(){';
+
 		if(isset($ZBX_PAGE_POST_JS)){
-			foreach($ZBX_PAGE_POST_JS as $script){
-				echo $script."\n";
+			foreach($ZBX_PAGE_POST_JS as $num => $script){
+				$post_script.=$script."\n";
 			}
 		}
-?>
-}
 
-try{
-	chkbx_range_ext.init();
-}
-catch(e){
-	throw('Checkbox extension failed!');
-}
--->
-</script>
-<?php
-//SDI(SBR.'SELECTS: '.$DB['SELECT_COUNT'].SPACE.SPACE.'EXECUTE: '.$DB['EXECUTE_COUNT'].SPACE.SPACE.'TOTAL: '.($DB['EXECUTE_COUNT']+$DB['SELECT_COUNT']));
+		$post_script.='}'."\n";
+
+		$post_script.= 'try{ chkbx_range_ext.init(); } catch(e){ throw("Checkbox extension failed!");}';			
+		insert_js($post_script);
+	
 		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')){
 			$table = new CTable(NULL,"page_footer");
 			$table->SetCellSpacing(0);
@@ -80,6 +73,8 @@ catch(e){
 
 COpt::profiling_stop("page");
 COpt::profiling_stop("script");
+
+print('<!--'."\n".'SELECTS: '.$DB['SELECT_COUNT']."\n".'EXECUTE: '.$DB['EXECUTE_COUNT']."\n".'TOTAL: '.($DB['EXECUTE_COUNT']+$DB['SELECT_COUNT'])."\n".'-->');
 
 		echo "</body>\n";
 		echo "</html>\n";

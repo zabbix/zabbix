@@ -10,7 +10,7 @@
 // For details, see the script.aculo.us web site: http://script.aculo.us/ 
 
 // converts rgb() and #xxx to #xxxxxx format,  
-// returns self (or first argument) if not convertable  
+// returns self (or first argument) if not convertable
 String.prototype.parseColor = function() {  
   var color = '#';
   if (this.slice(0,4) == 'rgb(') {  

@@ -30,7 +30,7 @@
 	$page["title"]		= "S_EVENT_DETAILS";
 	$page["file"]		= "tr_events.php";
 	$page['hist_arg'] = array('triggerid','eventid');
-	$page['scripts'] = array('calendar.js');
+	$page['scripts'] = array('calendar.js', 'scriptaculous.js?load=effects');
 	
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	
@@ -81,7 +81,7 @@
 							' AND '.DBin_node('t.triggerid')));
 ?>
 <?php
-	$p_elements = array();
+	$tr_events_wdgt = new CWidget();
 //Header
 	$trigger_data['exp_expr'] = explode_exp($trigger_data["expression"],1);
 	$trigger_data['exp_desc'] = expand_trigger_description_by_data($trigger_data);
@@ -94,6 +94,7 @@
 	$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 
+	$tr_events_wdgt->addHeader($text, $fs_icon);
 //-------
 	$left_tab = new CTable();
 	$left_tab->setCellPadding(3);
@@ -101,19 +102,21 @@
 	
 	$left_tab->addOption('border',0);
 	
-	$left_tab->addRow(create_hat(
-			S_EVENT.SPACE.S_SOURCE.SPACE.S_DETAILS,
-			make_trigger_details($_REQUEST['triggerid'],$trigger_data),//null,
-			null,
-			'hat_triggerdetails'
-		));
+// tr details
+	$tr_dtl = new CWidget('hat_triggerdetails',
+							make_trigger_details($_REQUEST['triggerid'],$trigger_data) //null,
+						);
+	$tr_dtl->addHeader(S_EVENT.SPACE.S_SOURCE.SPACE.S_DETAILS, SPACE);
+	$left_tab->addRow($tr_dtl);
+//----------------
 		
-	$left_tab->addRow(create_hat(
-			S_EVENT_DETAILS,
-			make_event_details($_REQUEST['eventid']),//null,
-			null,
-			'hat_eventdetails'
-		));
+// event details
+	$event_dtl = new CWidget('hat_eventdetails',
+						make_event_details($_REQUEST['eventid'])//null,
+						);
+	$event_dtl->addHeader(S_EVENT_DETAILS, SPACE);
+	$left_tab->addRow($event_dtl);
+//----------------
 		
 
 	$right_tab = new CTable();
@@ -123,39 +126,42 @@
 	$right_tab->addOption('border',0);
 
 
-	$right_tab->addRow(create_hat(
-			S_ACKNOWLEDGES,
-			make_acktab_by_eventid($_REQUEST['eventid']),//null,
-			null,
-			'hat_eventack',
-			get_profile('web.tr_events.hats.hat_eventack.state',1)
-		));
-		
-	$right_tab->addRow(create_hat(
-			S_MESSAGE_ACTIONS,
-			get_action_msgs_for_event($_REQUEST['eventid']),//null,
-			null,
-			'hat_eventactionmsgs',
-			get_profile('web.tr_events.hats.hat_eventactionmsgs.state',1)
-		));
+// event ack
+	$event_ack = new CWidget('hat_eventack',
+						make_acktab_by_eventid($_REQUEST['eventid']),//null,
+						get_profile('web.tr_events.hats.hat_eventack.state',1)
+						);
+	$event_ack->addHeader(S_ACKNOWLEDGES);
+	$right_tab->addRow($event_ack);
+//----------------
 
-	$right_tab->addRow(create_hat(
-			S_COMMAND_ACTIONS,
-			get_action_cmds_for_event($_REQUEST['eventid']),//null,
-			null,
-			'hat_eventactioncmds',
-			get_profile('web.tr_events.hats.hat_eventactioncmds.state',1)
-		));
 
-	$right_tab->addRow(create_hat(
-			S_EVENTS.SPACE.S_LIST.SPACE.'['.S_LAST.' 20]', 
-			//null,//
-			make_small_eventlist($_REQUEST['eventid'], $trigger_data),
-			null,
-			'hat_eventlist',
-			get_profile('web.tr_events.hats.hat_eventlist.state',1)
-		));
+// event sms actions
+	$actions_sms = new CWidget('hat_eventactionmsgs',
+						get_action_msgs_for_event($_REQUEST['eventid']),//null,
+						get_profile('web.tr_events.hats.hat_eventactionmsgs.state',1)
+						);
+	$actions_sms->addHeader(S_MESSAGE_ACTIONS);
+	$right_tab->addRow($actions_sms);
+//----------------		
 
+// event cmd actions
+	$actions_cmd = new CWidget('hat_eventactionmcmds',
+						get_action_cmds_for_event($_REQUEST['eventid']),//null,
+						get_profile('web.tr_events.hats.hat_eventactioncmds.state',1)
+						);
+	$actions_cmd->addHeader(S_COMMAND_ACTIONS);
+	$right_tab->addRow($actions_cmd);
+//----------------
+	
+// event history
+	$events_histry = new CWidget('hat_eventlist',
+						make_small_eventlist($_REQUEST['eventid'], $trigger_data),
+						get_profile('web.tr_events.hats.hat_eventlist.state',1)
+						);
+	$events_histry->addHeader(S_EVENTS.SPACE.S_LIST.SPACE.'['.S_LAST.' 20]');
+	$right_tab->addRow($events_histry);
+//----------------
 
 	$td_l = new CCol($left_tab);
 	$td_l->addOption('valign','top');
@@ -169,17 +175,8 @@
 	$outer_table->setCellSpacing(1);
 	$outer_table->addRow(array($td_l,$td_r));
 	
-	$p_elements[] = $outer_table;
-	
-	$latest_hat = create_hat(
-			$text,
-			$p_elements,
-			array($fs_icon),
-			'hat_tr_events',
-			get_profile('web.tr_events.hats.hat_tr_events.state',1)
-	);
-
-	$latest_hat->show();
+	$tr_events_wdgt->addItem($outer_table);
+	$tr_events_wdgt->show();
 ?>
 <?php
 

@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/graphs.inc.php';
-	require_once 'include/screens.inc.php';
-	require_once 'include/blocks.inc.php';
-	require_once 'include/nodes.inc.php';
+	require_once('include/config.inc.php');
+	require_once('include/graphs.inc.php');
+	require_once('include/screens.inc.php');
+	require_once('include/blocks.inc.php');
+	require_once('include/nodes.inc.php');
 
 
 	$page['title'] = "S_CUSTOM_SCREENS";
@@ -39,7 +39,7 @@
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
 	
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
 ?>
 
@@ -168,7 +168,8 @@ include_once 'include/page_header.php';
 	}
 ?>
 <?php
-
+	$slides_wdgt = new CWidget('hat_slides');
+	
 	$elementid = get_request('elementid', null);
 	if($elementid <= 0) $elementid = null;
 
@@ -253,10 +254,6 @@ include_once 'include/page_header.php';
 		}
 		$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 		
-		show_table_header($text,$form);
-	}
-	else if(2 != $_REQUEST['fullscreen']){
-		show_table_header($text,$form);
 	}
 ?>
 <?php	
@@ -341,15 +338,13 @@ include_once 'include/page_header.php';
 		$element = new CSpan(S_LOADING_P,'textcolorstyles');
 	}
 
-	$tab->addRow(create_hat(
-			$slide_name,
-			$element,
-			array($icon,$fs_icon,$refresh_icon),
-			'hat_slides',
-			get_profile('web.slides.hats.hat_slides.state',1)
-		),'center');
+	$slides_wdgt->addHeader($text, array($icon,$refresh_icon,$fs_icon));
+	$slides_wdgt->addHeader($slide_name, $form);
 	
+	$slides_wdgt->additem($element);
 
+	$tab->addRow($slides_wdgt,'center');
+	
 	$tab->show();
 	
 	$scroll_div = new CDiv();

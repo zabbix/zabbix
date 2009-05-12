@@ -100,8 +100,15 @@ function rm4favorites(favobj,favid,menu_rowid){
 
 function change_hat_state(icon, divid){
 	deselectAll(); 
-	var hat_state = ShowHide(divid); 
-	switchElementsClass(icon,"arrowup","arrowdown");
+	
+	var eff_time = 500;
+	
+	var switchIcon = function(){
+		switchElementsClass(icon,"arrowup","arrowdown");
+	}
+
+//	var hat_state = ShowHide(divid);	
+	var hat_state = showHideEffect(divid, 'slide', eff_time, switchIcon);	
 
 	if(false === hat_state) return false;
 	
@@ -114,11 +121,18 @@ function change_hat_state(icon, divid){
 	send_params(params);
 }
 
-function change_filter_state(icon, divid){
+function change_flicker_state(divid){
 	deselectAll(); 
-	var filter_state = ShowHide(divid); 
-	switchElementsClass(icon,"filteropened","filterclosed");
+	var eff_time = 500;
 	
+	var switchArrows = function(){
+		switchElementsClass($("flicker_icon_l"),"dbl_arrow_up","dbl_arrow_down");
+		switchElementsClass($("flicker_icon_r"),"dbl_arrow_up","dbl_arrow_down");
+	}
+	
+	var filter_state = showHideEffect(divid,'blind', eff_time, switchArrows);
+	
+
 	if(false === filter_state) return false;
 
 	var params = {

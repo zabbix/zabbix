@@ -20,14 +20,14 @@
 ?>
 <?php
 class CTable extends CTag{
+ public $headerClass;
+ public $footerClass;
+
  protected $oddRowClass;
  protected $evenRowClass;
  
  protected $header;
  protected $footer;
- 
- public $headerClass;
- public $footerClass;
  
  protected $colnum;
  protected $rownum;

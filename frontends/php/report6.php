@@ -147,6 +147,7 @@ include_once('include/page_header.php');
 <?php
 	$config = $_REQUEST['config'] = get_request('config',1);
 	
+	$rep6_wdgt = new CWidget();
 // Header
 	$r_form = new CForm();
 //	$r_form->addVar('items', get_request('items',array()));
@@ -157,7 +158,8 @@ include_once('include/page_header.php');
 		
 	$r_form->addItem(array(S_REPORTS.SPACE,$cnfCmb));
 
-	show_table_header(S_BAR_REPORTS, $r_form);
+	$rep6_wdgt->addHeader(S_BAR_REPORTS, $r_form);
+//	show_table_header(S_BAR_REPORTS, $r_form);
 //-------------
 
 	$rep_tab = new CTable();
@@ -174,8 +176,7 @@ include_once('include/page_header.php');
 		default: $rep_form = bar_report_form(); 
 	}	
 	
-	$form = create_filter(S_REPORTS,NULL,$rep_form,'report_form',get_profile('web.report6.filter.state',1));
-	$form->Show();
+	$rep6_wdgt->addFlicker($rep_form, get_profile('web.report6.filter.state',1));
 	
 	if(isset($_REQUEST['report_show'])){
 		$src = 'chart_bar.php?config='.$_REQUEST['config'].
@@ -195,13 +196,7 @@ include_once('include/page_header.php');
 					url_param('palette').
 					url_param('palettetype');
 					
-		$rep_tab->addRow(create_hat(
-				S_REPORT,
-				new CImg($src, 'report'),
-				null,
-				'hat_report',
-				get_profile('web.report6.hats.hat_report.state',1)
-			));
+		$rep_tab->addRow(new CImg($src, 'report'));
 	}
 	
 	$outer_table = new CTable();
@@ -214,7 +209,8 @@ include_once('include/page_header.php');
 	$tmp_row->addOption('align','center');
 	$outer_table->addRow($tmp_row);
 	
-	$outer_table->Show();
+	$rep6_wdgt->addItem($outer_table);
+	$rep6_wdgt->show();
 ?>
 <?php
 include_once 'include/page_footer.php';

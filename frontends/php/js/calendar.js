@@ -292,6 +292,10 @@ setSDateDMY: function(d,m,y){
 			result = true;
 		}
 	}
+	
+	this.sdt.setHours(00);
+	this.sdt.setMinutes(00);
+	this.sdt.setSeconds(00);
 																							  
 //alert(d+'/'+m+'/'+y+'/'+result);
 //alert(this.sdt.getDate()+'/'+this.sdt.getMonth()+'/'+this.sdt.getFullYear()+'/'+result);

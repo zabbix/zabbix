@@ -1594,7 +1594,7 @@ Element.Methods = {
 
   show: function(element) {
     element = $(element);
-    element.style.display = '';
+    element.style.display = (element.tagName == 'span')?'inline':'block';
     return element;
   },
 

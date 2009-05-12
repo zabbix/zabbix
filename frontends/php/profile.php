@@ -130,6 +130,7 @@ $fields=array(
 			$user['lang'] = get_request('lang');
 			$user['theme'] = get_request('theme');
 			$user['refresh'] = get_request('refresh');
+			$user['rows_per_page'] = get_request('rows_per_page');
 //			$user['user_type'] = $USER_DETAILS['type'];
 			$user['user_groups'] = null;
 			$user['user_medias'] = get_request('user_medias');

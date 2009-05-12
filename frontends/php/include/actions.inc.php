@@ -244,7 +244,7 @@ function add_action($name, $eventsource, $esc_period, $def_shortdata, $def_longd
 return $actionid;
 }
 
-# Update Action
+// Update Action
 
 function update_action($actionid, $name, $eventsource, $esc_period, $def_shortdata, $def_longdata, $recovery_msg, $r_shortdata, $r_longdata, $evaltype, $status, $conditions, $operations){
 
@@ -306,7 +306,7 @@ function update_action($actionid, $name, $eventsource, $esc_period, $def_shortda
 return $result;
 }
 
-# Delete Action
+// Delete Action
 
 function delete_action( $actionid ){
 	$return = DBexecute('delete from conditions where actionid='.$actionid);
@@ -325,11 +325,10 @@ function delete_action( $actionid ){
 	if($return)
 		$result = DBexecute('delete from actions where actionid='.$actionid);
 
-	return $result;
+return $result;
 }
 
-function	condition_operator2str($operator)
-{
+function condition_operator2str($operator){
 	$str_op[CONDITION_OPERATOR_EQUAL] 	= '=';
 	$str_op[CONDITION_OPERATOR_NOT_EQUAL]	= '<>';
 	$str_op[CONDITION_OPERATOR_LIKE]	= S_LIKE_SMALL;
@@ -345,8 +344,7 @@ function	condition_operator2str($operator)
 	return S_UNKNOWN;
 }
 
-function	condition_type2str($conditiontype)
-{
+function condition_type2str($conditiontype){
 	$str_type[CONDITION_TYPE_HOST_GROUP]		= S_HOST_GROUP;
 	$str_type[CONDITION_TYPE_HOST_TEMPLATE]		= S_HOST_TEMPLATE;
 	$str_type[CONDITION_TYPE_TRIGGER]		= S_TRIGGER;
@@ -368,7 +366,7 @@ function	condition_type2str($conditiontype)
 	if(isset($str_type[$conditiontype]))
 		return $str_type[$conditiontype];
 
-	return S_UNKNOWN;
+return S_UNKNOWN;
 }
 	
 function condition_value2str($conditiontype, $value){
@@ -894,75 +892,79 @@ function count_operations_delay($operations, $def_period=0){
 return $delays;
 }
 
-function get_history_of_actions($start,$num,$sql_cond=''){
+function get_history_of_actions($limit,&$last_clock,$sql_cond=''){
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
 
+	$alerts = array();
+	$clock = array();
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
-	$table->SetHeader(array(
+	$table->setHeader(array(
 			is_show_all_nodes() ? make_sorting_link(S_NODES,'a.alertid') : null,
-			make_sorting_link(S_TIME,'a.clock'),
-			make_sorting_link(S_TYPE,'mt.description'),
-			make_sorting_link(S_STATUS,'a.status'),
-			make_sorting_link(S_RETRIES_LEFT,'a.retries'),
-			make_sorting_link(S_RECIPIENTS,'a.sendto'),
+			make_sorting_link(S_TIME,'clock'),
+			make_sorting_link(S_TYPE,'description'),
+			make_sorting_link(S_STATUS,'status'),
+			make_sorting_link(S_RETRIES_LEFT,'retries'),
+			make_sorting_link(S_RECIPIENTS,'sendto'),
 			S_MESSAGE,
 			S_ERROR
 			));
 			
-	$sql = 'SELECT DISTINCT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
-			' FROM events e,alerts a'.
-			' left join media_type mt on mt.mediatypeid=a.mediatypeid'.
-			' WHERE e.eventid = a.eventid and alerttype in ('.ALERT_TYPE_MESSAGE.')'.
+	$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
+			' FROM events e, alerts a '.
+				' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid '.
+			' WHERE e.eventid = a.eventid '.
+				' AND alerttype IN ('.ALERT_TYPE_MESSAGE.') '.
 				$sql_cond.
 				' AND '.DBcondition('e.objectid',$available_triggers).
 				' AND '.DBin_node('a.alertid').
-			order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries');
-	$result=DBselect($sql,10*$start+$num);
+			' ORDER BY e.clock ASC';
+	$result=DBselect($sql,$limit);
+	while($row=DBfetch($result)){		
+		$alerts[] = $row;
+		$clock[] = $row['clock'];
+	}
+	
+	$last_clock = max($clock);
+	
+	order_result($alerts, 'clock', ZBX_SORT_DOWN);
+	
+	foreach($alerts as $num => $row){
+		$time=date(S_DATE_FORMAT_YMDHMS,$row['clock']);	
 		
-	$col=0;
-	$skip=$start;
-	while(($row=DBfetch($result))&&($col<$num)){
-		if($skip > 0) {
-			$skip--;
-			continue;
+		if($row['status'] == ALERT_STATUS_SENT){
+			$status=new CSpan(S_SENT,'green');
+			$retries=new CSpan(SPACE,'green');
 		}
-		$time=date("Y.M.d H:i:s",$row["clock"]);
-
-		if($row["status"] == ALERT_STATUS_SENT){
-			$status=new CSpan(S_SENT,"green");
-			$retries=new CSpan(SPACE,"green");
-		}
-		else if($row["status"] == ALERT_STATUS_NOT_SENT){
-			$status=new CSpan(S_IN_PROGRESS,"orange");
-			$retries=new CSpan(ALERT_MAX_RETRIES - $row["retries"],"orange");
+		else if($row['status'] == ALERT_STATUS_NOT_SENT){
+			$status=new CSpan(S_IN_PROGRESS,'orange');
+			$retries=new CSpan(ALERT_MAX_RETRIES - $row['retries'],'orange');
 		}
 		else{
-			$status=new CSpan(S_NOT_SENT,"red");
-			$retries=new CSpan(0,"red");
+			$status=new CSpan(S_NOT_SENT,'red');
+			$retries=new CSpan(0,'red');
 		}
-		$sendto=$row["sendto"];
+		$sendto=$row['sendto'];
 
-		$message = array(bold(S_SUBJECT.': '),br(),$row["subject"],br(),br(),bold(S_MESSAGE.': '),br(),$row['message']);
+		$message = array(bold(S_SUBJECT.': '),br(),$row['subject'],br(),br(),bold(S_MESSAGE.': '),br(),$row['message']);
 
-		if(empty($row["error"])){
-			$error=new CSpan(SPACE,"off");
+		if(empty($row['error'])){
+			$error=new CSpan(SPACE,'off');
 		}
 		else{
-			$error=new CSpan($row["error"],"on");
+			$error=new CSpan($row['error'],'on');
 		}
+
 		$table->addRow(array(
 			get_node_name_by_elid($row['alertid']),
 			new CCol($time, 'top'),
-			new CCol($row["description"], 'top'),
+			new CCol($row['description'], 'top'),
 			new CCol($status, 'top'),
 			new CCol($retries, 'top'),
 			new CCol($sendto, 'top'),
 			new CCol($message, 'top'),
 			new CCol($error, 'wraptext top')));
-		$col++;
 	}
-
-	return $table;
+return $table;
 }
 	
 // Author: Aly
@@ -1003,7 +1005,7 @@ function get_action_msgs_for_event($eventid){
 	$result=DBselect($sql);
 
 	while($row=DBfetch($result)){
-		$time=date("Y.M.d H:i:s",$row["clock"]);
+		$time=date(S_DATE_FORMAT_YMDHMS,$row["clock"]);
 		if($row['esc_step'] > 0){
 			$time = array(bold(S_STEP.': '),$row["esc_step"],br(),bold(S_TIME.': '),br(),$time);	
 		}
