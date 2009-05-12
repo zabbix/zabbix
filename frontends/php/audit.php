@@ -226,8 +226,8 @@ ini_set('max_execution_time',10);
 			$clock[] = $row['clock'];
 			$actions[] = $row;
 		}
-		$last_clock = max($clock);
 
+		$last_clock = !empty($clock)?max($clock):null;
 		order_result($actions, 'clock', ZBX_SORT_DOWN);
 		
 		foreach($actions as $num => $row){

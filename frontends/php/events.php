@@ -240,7 +240,10 @@
 	$col=0;
 
 	if($source == EVENT_SOURCE_DISCOVERY){
-		$table = get_history_of_discovery_events($start_page, 0);
+		$last_clock = null;
+		$table = get_history_of_discovery_events($page_start, $limit, $last_clock);
+
+		$col = $table->getNumRows();
 	}
 	else{
 		$config = select_config();
@@ -305,7 +308,7 @@
 				make_sorting_link(S_DESCRIPTION,'desc'),
 				make_sorting_link(S_STATUS,'status'),
 				make_sorting_link(S_SEVERITY,'priority'),
-				make_sorting_link(S_DURATION,'duration'),
+				S_DURATION,
 				($config['event_ack_enable'])?S_ACK:NULL,
 				S_ACTIONS
 			));
@@ -340,7 +343,7 @@
 				$events[] = $row;
 			}
 
-			$last_clock = max($clock);
+			$last_clock = !empty($clock)?max($clock):null;
 			order_result($events, 'clock', ZBX_SORT_DOWN);
 
 			foreach($events as $num => $row){
@@ -396,16 +399,6 @@
 	$navForm->addVar('prev_clock',$prev_clock);
 	$navForm->addVar('curr_clock',$curr_clock);
 	$navForm->addVar('next_clock',$next_clock);
-
-/*
-	$prev_page = new CDiv(SPACE,'arrowleft');
-	$prev_page->addOption('title','Previous page');
-	$prev_page->addAction('onclick',new CScript("javascript: alert('left');"));
-
-	$next_page = new CDiv(SPACE,'arrowright');
-	$next_page->addOption('title','Next page');
-	$next_page->addAction('onclick',new CScript("javascript: alert('right');"));
-//*/
 //*
 	$prev_page = new CButton('prev_page','« '.S_BACK);
 	if(empty($prev_clock)) $prev_page->addOption('disabled','disabled');
@@ -428,28 +421,28 @@
 //	$filterForm->setMethod('get');
 	
 	$filterForm->addVar('nav_time',$_REQUEST['nav_time']);
+	
+	$script = new CScript("javascript: if(CLNDR['nav_time'].clndr.setSDateFromOuterObj()){".
+							"$('nav_time').value = parseInt(CLNDR['nav_time'].clndr.sdt.getTime()/1000); }"
+							);
+	$filterForm->addAction('onsubmit',$script);
+	
+	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
+	$clndr_icon->addAction('onclick',"javascript: var pos = getPosition(this); pos.top+=14; pos.left-=174; CLNDR['nav_time'].clndr.clndrshow(pos.top,pos.left);");
+	$clndr_icon->addOption('style','vertical-align: middle;');
+	
+	$nav_clndr =  array(
+					new CNumericBox('nav_day',(($_REQUEST['nav_time']>0)?date('d',$_REQUEST['nav_time']):''),2),
+					new CNumericBox('nav_month',(($_REQUEST['nav_time']>0)?date('m',$_REQUEST['nav_time']):''),2),
+					new CNumericBox('nav_year',(($_REQUEST['nav_time']>0)?date('Y',$_REQUEST['nav_time']):''),4),
+					$clndr_icon
+				);
+	zbx_add_post_js('create_calendar(null,["nav_day","nav_month","nav_year"],"nav_time");');
 
+	$filterForm->addRow(S_START_DATE,$nav_clndr);
+		
 	if(EVENT_SOURCE_TRIGGERS == $source){
 	
-		$script = new CScript("javascript: if(CLNDR['nav_time'].clndr.setSDateFromOuterObj()){".
-								"$('nav_time').value = parseInt(CLNDR['nav_time'].clndr.sdt.getTime()/1000); }"
-								);
-		$filterForm->addAction('onsubmit',$script);
-		
-		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-		$clndr_icon->addAction('onclick',"javascript: var pos = getPosition(this); pos.top+=14; pos.left-=174; CLNDR['nav_time'].clndr.clndrshow(pos.top,pos.left);");
-		$clndr_icon->addOption('style','vertical-align: middle;');
-		
-		$nav_clndr =  array(
-						new CNumericBox('nav_day',(($_REQUEST['nav_time']>0)?date('d',$_REQUEST['nav_time']):''),2),
-						new CNumericBox('nav_month',(($_REQUEST['nav_time']>0)?date('m',$_REQUEST['nav_time']):''),2),
-						new CNumericBox('nav_year',(($_REQUEST['nav_time']>0)?date('Y',$_REQUEST['nav_time']):''),4),
-						$clndr_icon
-					);
-		zbx_add_post_js('create_calendar(null,["nav_day","nav_month","nav_year"],"nav_time");');
-	
-		$filterForm->addRow(S_START_DATE,$nav_clndr);
-
 		$filterForm->addVar('triggerid',$_REQUEST['triggerid']);
 		
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
@@ -475,15 +468,16 @@
 		$unkcbx->setAction('javascript: create_var("'.$filterForm->GetName().'", "show_unknown", (this.checked?1:0), 0); ');
 		
 		$filterForm->addRow(S_SHOW_UNKNOWN,$unkcbx);
-
-		$reset = new CButton("filter_rst",S_RESET);
-		$reset->setType('button');
-		$reset->setAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
-
-		$filterForm->addItemToBottomRow(new CButton("filter_set",S_FILTER));
-		$filterForm->addItemToBottomRow($reset);
 	}
+	
+	$reset = new CButton("filter_rst",S_RESET);
+	$reset->setType('button');
+	$reset->setAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+
+	$filterForm->addItemToBottomRow(new CButton("filter_set",S_FILTER));
+	$filterForm->addItemToBottomRow($reset);
 //-------
+
 	$nav = get_thin_table_header($navigation);
 	
 	$events_wdgt->addFlicker($filterForm, get_profile('web.events.filter.state',0));

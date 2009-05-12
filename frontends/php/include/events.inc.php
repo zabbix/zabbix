@@ -485,51 +485,78 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 return $table;
 }
 
-function get_history_of_discovery_events($start,$end){
+function get_history_of_discovery_events($start_time, $limit, &$last_clock=null){
 
-	$sql_cond=' AND e.clock>'.$start;
-	$sql_cond.=' AND e.clock<'.$end;
+	$table = new CTableInfo(S_NO_EVENTS_FOUND); 
+	$table->setHeader(array(S_TIME, S_IP, S_DESCRIPTION, S_STATUS));
+	$col=0;
 
+	$clock = array();
+	$dsc_events = array();
+	
+	$sql_cond=' AND e.clock>'.$start_time;
+	$sql_cond.=' AND e.clock<'.time();
 	$sql = 'SELECT DISTINCT e.source,e.object,e.objectid,e.clock,e.value '.
 			' FROM events e'.
 			' WHERE e.source='.EVENT_SOURCE_DISCOVERY.
 			$sql_cond.
-			order_by('e.clock');
-	$db_events = DBselect($sql);
-   
-	$table = new CTableInfo(S_NO_EVENTS_FOUND); 
-	$table->SetHeader(array(S_TIME, S_IP, S_DESCRIPTION, S_STATUS));
-	$col=0;
-	
+			' ORDER BY e.clock ASC';
+	$db_events = DBselect($sql, $limit);
 	while($event_data = DBfetch($db_events)){
-		$value = new CCol(trigger_value2str($event_data['value']), get_trigger_value_style($event_data['value']));
-
+	
 		switch($event_data['object']){
 			case EVENT_OBJECT_DHOST:
-				$object_data = DBfetch(DBselect('SELECT ip FROM dhosts WHERE dhostid='.$event_data['objectid']));
-				$description = SPACE;
+				$sql = 'SELECT ip FROM dhosts WHERE dhostid='.$event_data['objectid'];
+				if($object_data = DBfetch(DBselect($sql))){
+					$event_data['object_data'] = $object_data;					
+				}
+				else{
+					$event_data['object_data']['ip'] = S_UNKNOWN;
+				}
+
+				$event_data['description'] = SPACE;
 				break;
 			case EVENT_OBJECT_DSERVICE:
-				$object_data = DBfetch(DBselect('SELECT h.ip,s.type,s.port '.
-											' FROM dhosts h,dservices s '.
-											' WHERE h.dhostid=s.dhostid '.
-												' AND s.dserviceid='.$event_data['objectid']));
+				$sql = 'SELECT h.ip,s.type,s.port '.
+						' FROM dhosts h,dservices s '.
+						' WHERE h.dhostid=s.dhostid '.
+							' AND s.dserviceid='.$event_data['objectid'];
+				if($object_data = DBfetch(DBselect($sql))){
+					$event_data['object_data'] = $object_data;					
+				}
+				else{
+					$event_data['object_data']['ip'] = S_UNKNOWN;
+					$event_data['object_data']['type'] = S_UNKNOWN;
+					$event_data['object_data']['port'] = S_UNKNOWN;
+				}
 												
-				$description = S_SERVICE.': '.discovery_check_type2str($object_data['type']).'; '.S_PORT.': '.$object_data['port'];
+				$event_data['description'] = S_SERVICE.': '.
+											discovery_check_type2str($event_data['object_data']['type']).
+											'; '.S_PORT.': '.
+											$event_data['object_data']['port'];
 				break;
 			default:
 				continue;
 		}
 
-		if(!$object_data) continue;
+		if(!isset($event_data['object_data'])) continue;
+		
+		
+		$clock[] = $event_data['clock'];
+		$dsc_events[] = $event_data;
+	}
+	
+	$last_clock = !empty($clock)?max($clock):null;
+	order_result($dsc_events, 'clock', 'ASC');
+	
+	foreach($dsc_events as $num => $event_data){
+		$value = new CCol(trigger_value2str($event_data['value']), get_trigger_value_style($event_data['value']));
 
-		$table->AddRow(array(
+		$table->addRow(array(
 			date('Y.M.d H:i:s',$event_data['clock']),
-			$object_data['ip'],
-			$description,
+			$event_data['object_data']['ip'],
+			$event_data['description'],
 			$value));
-
-		$col++;
 	}
 return $table;
 }
