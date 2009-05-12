@@ -241,7 +241,9 @@ int MAIN_ZABBIX_ENTRY(void)
 		CONFIG_LOG_FILE
 		);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. ZABBIX %s.", ZABBIX_VERSION);
+	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. ZABBIX %s (revision %s).",
+			ZABBIX_VERSION,
+			ZABBIX_REVISION);
 
 	if(0 == CONFIG_DISABLE_PASSIVE)
 	{
@@ -340,7 +342,9 @@ void	zbx_on_exit()
 
 	zbx_sleep(2); /* wait for all threads closing */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Agent stopped. ZABBIX %s.", ZABBIX_VERSION);
+	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Agent stopped. ZABBIX %s (revision %s).",
+			ZABBIX_VERSION,
+			ZABBIX_REVISION);
 
 	zabbix_close_log();
 
