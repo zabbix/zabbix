@@ -46,7 +46,7 @@ char *help_message[] = {
 	"  -o --value <Key value>               Specify value of the key",
 	"",
 	"  -i --input-file <input_file>         Load values from input file",
-	"                                       Each line of file contains: <zabbix_server> <hostname> <port> <key> <value>",
+	"                                       Each line of file contains space delimited: <hostname> <key> <value>",
 	"",
 	"  -v --verbose                         Verbose mode, -vv for more details",
 	"",
