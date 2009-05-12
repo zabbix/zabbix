@@ -126,27 +126,14 @@ function SDJ(obj){
 
 function addListener(element, eventname, expression, bubbling){
 	bubbling = bubbling || false;
-	
+
+	element = $(element);
 	if(window.addEventListener){
 		element.addEventListener(eventname, expression, bubbling);
 		return true;
 	} 
 	else if(window.attachEvent){
 		element.attachEvent('on'+eventname, expression);
-		return true;
-	} 
-	else return false;
-}
-
-function removeListener(element, eventname, expression, bubbling){
-	bubbling = bubbling || false;
-	
-	if(window.removeEventListener){
-		element.removeEventListener(eventname, expression, bubbling);
-		return true;
-	} 
-	else if(window.detachEvent){
-		element.detachEvent('on'+eventname, expression);
 		return true;
 	} 
 	else return false;
@@ -359,10 +346,8 @@ function get_cursor_position(e){
 	else {
 		var de = document.documentElement;
 		var b = document.body;
-		cursor.x = e.clientX + 
-		(de.scrollLeft || b.scrollLeft) - (de.clientLeft || 0);
-		cursor.y = e.clientY + 
-		(de.scrollTop || b.scrollTop) - (de.clientTop || 0);
+		cursor.x = e.clientX + (de.scrollLeft || b.scrollLeft) - (de.clientLeft || 0);
+		cursor.y = e.clientY + (de.scrollTop || b.scrollTop) - (de.clientTop || 0);
 	}
 	return cursor;
 }
@@ -423,6 +408,20 @@ function redirect(uri) {
 	var loc = uri.getUrl();
 	window.location = loc;
 	return false;
+}
+
+function removeListener(element, eventname, expression, bubbling){
+	bubbling = bubbling || false;
+	
+	if(window.removeEventListener){
+		element.removeEventListener(eventname, expression, bubbling);
+		return true;
+	} 
+	else if(window.detachEvent){
+		element.detachEvent('on'+eventname, expression);
+		return true;
+	} 
+	else return false;
 }
 
 function remove_childs(form_name,rmvbyname,tag){
@@ -494,6 +493,49 @@ function ShowHide(obj,style){
 		obj.style.display = style;
 		return 1;
 	}
+}
+
+function showHideEffect(obj, eff, time, cb_afterFinish){
+	obj = $(obj);	
+	if(!obj){
+		throw 'showHideEffect(): Object not found.';
+		return false;
+	}
+
+	if(typeof(Effect) == 'undefined'){
+		eff = 'none';
+	}
+	
+	if(typeof(cb_afterFinish) == 'undefined'){
+		cb_afterFinish = function(){};
+	}
+	
+	var timeShow = (typeof(time) == 'undefined')?0.5:(parseInt(time)/1000);
+	var show = (obj.style.display != 'none')?0:1;
+	
+	switch(eff){
+		case 'blind':
+			if(show)
+				Effect.BlindDown(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
+			else
+				Effect.BlindUp(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
+			break;
+		case 'slide':
+			if(show)
+				Effect.SlideDown(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
+			else
+				Effect.SlideUp(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
+			break;
+		default:
+			if(show)
+				obj.show();
+			else
+				obj.hide();
+
+			cb_afterFinish();
+			break;
+	}
+return show;
 }
 
 function switchElementsClass(obj,class1,class2){

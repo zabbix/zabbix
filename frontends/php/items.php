@@ -26,6 +26,7 @@
 
 	$page['title'] = "S_CONFIGURATION_OF_ITEMS";
 	$page['file'] = 'items.php';
+	$page['scripts'] = array('scriptaculous.js?load=effects');
 	$page['hist_arg'] = array();
 
 include_once 'include/page_header.php';
@@ -827,6 +828,8 @@ include_once 'include/page_header.php';
 		insert_copy_elements_to_forms('group_itemid');
 	}
 	else if (!isset($_REQUEST['form']) ||  !str_in_array($_REQUEST['form'],array(S_CREATE_ITEM,'update','clone'))) {
+	
+		$items_wdgt = new CWidget();
 // Table HEADER
 		$form = new CForm();
 		$form->setMethod('get');
@@ -869,18 +872,17 @@ include_once 'include/page_header.php';
 		$row_count = 0;
 		$numrows = new CSpan(null,'info');
 		$numrows->addOption('name','numrows');	
-		$header = get_table_header(array(S_ITEMS_BIG,
+		$header = array(S_ITEMS_BIG,
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-						S_FOUND.': ',$numrows,)
-						);			
-		show_table_header($header, $form);
+						S_FOUND.': ',$numrows);	
+						
+		$items_wdgt->addHeader($header, $form);
+//		show_table_header($header, $form);
 // ----------------
 
 // Items Filter
-		$filterForm = get_item_filter_form();
-
-		$filter = create_filter(S_FILTER,null,$filterForm,'item_filter',get_profile('web.items.filter.state',0));
-		$filter->Show();
+		$items_wdgt->addFlicker(get_item_filter_form(), get_profile('web.items.filter.state',0));
+//-----
 
 		if($filter_enabled){
 			if(ZBX_DISTRIBUTED && isset($_REQUEST['filter_node'])){
@@ -1100,7 +1102,9 @@ include_once 'include/page_header.php';
 		$table->setFooter(new CCol($footerButtons));
 
 		$form->addItem($table);
-		$form->Show();
+		
+		$items_wdgt->addItem($form);
+		$items_wdgt->show();
 	}
 
 	if(isset($_REQUEST['form'])){

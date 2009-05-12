@@ -114,6 +114,28 @@ div.arrowdown:hover{
 	cursor:pointer;
 }
 
+div.arrowleft{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/arrowleft.png');
+	background-repeat:no-repeat;
+}
+
+div.arrowleft:hover{
+	cursor:pointer;
+}
+
+div.arrowright{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/arrowright.png');
+	background-repeat:no-repeat;
+}
+
+div.arrowright:hover{
+	cursor:pointer;
+}
+
 div.fullscreen{
 	height: 18px;
 	width: 18px;
@@ -194,7 +216,7 @@ div.iconreset:hover{
 div.dbl_arrow_down{
 	height: 10px;
 	width: 9px;
-	background-image: url('../images/general/dbl_arrow_down.png');
+	background-image: url('../images/general/dbl_arrow_down2.png');
 	background-repeat:no-repeat;
 	display:block;
 }
@@ -206,7 +228,7 @@ div.dbl_arrow_down:hover{
 div.dbl_arrow_up{
 	height: 10px;
 	width: 9px;
-	background-image: url('../images/general/dbl_arrow_up.png');
+	background-image: url('../images/general/dbl_arrow_up2.png');
 	background-repeat:no-repeat;
 }
 

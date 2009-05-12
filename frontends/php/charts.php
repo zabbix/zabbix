@@ -173,7 +173,8 @@ include_once 'include/page_header.php';
 		array_push($h1, S_SELECT_GRAPH_TO_DISPLAY);
 	}
 
-	$p_elements = array();
+	$charts_wdgt = new CWidget('hat_charts');
+// HEADER
 
 	$r_form = new CForm();
 	$r_form->setMethod('get');
@@ -193,7 +194,6 @@ include_once 'include/page_header.php';
 	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));	
 		
-//---------------------------------------------_
 	$cmbGraphs = new CComboBox('graphid',$_REQUEST['graphid'],'submit()');
 	$cmbGraphs->addItem(0,S_SELECT_GRAPH_DOT_DOT_DOT);
 	
@@ -229,7 +229,8 @@ include_once 'include/page_header.php';
 	
 	$r_form->addItem(array(SPACE.S_GRAPH.SPACE,$cmbGraphs));
 	
-	$p_elements[] = get_table_header($h1, $r_form);
+//	show_table_header(S_GRAPHS_BIG, $r_form);
+//---------------------------------------------
 ?>
 <?php
 	$table = new CTableInfo('...','chart');
@@ -296,9 +297,7 @@ include_once 'include/page_header.php';
 		
 		$table->addRow(new CScript($row));
 	}
-	
-	$p_elements[] = $table;
-	
+		
 	$icon = null;
 	$fs_icon = null;
 	$rst_icon = null;
@@ -327,15 +326,12 @@ include_once 'include/page_header.php';
 		
 	}
 	
-	$charts_hat = create_hat(
-			S_GRAPHS_BIG,
-			$p_elements,
-			array($icon,$rst_icon,$fs_icon),
-			'hat_charts',
-			get_profile('web.charts.hats.hat_charts.state',1)
-	);
+	$charts_wdgt->addHeader(S_GRAPHS_BIG,array($icon,$rst_icon,$fs_icon));
+	$charts_wdgt->addHeader($h1,$r_form);
+	
+	$charts_wdgt->addItem($table);
 
-	$charts_hat->show();
+	$charts_wdgt->show();
 	
 	if($_REQUEST['graphid'] > 0){
 // NAV BAR

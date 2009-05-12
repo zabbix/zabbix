@@ -1320,11 +1320,11 @@
 		$filter_delta					= $_REQUEST['filter_delta'];
 		$filter_trapper_hosts			= $_REQUEST['filter_trapper_hosts'];
 
-		$form = new CFormTable(S_ITEM.' '.S_FILTER);
+		$form = new CFormTable();
 
 		$form->addOption('name','zbx_filter');
 		$form->addOption('id','zbx_filter');
-		$form->SetMethod('get');
+		$form->setMethod('get');
 
 		$form->addAction('onsubmit',"javascript: if(empty_form(this)) return Confirm('Filter is empty! All items will be selected. Proceed?');");
 

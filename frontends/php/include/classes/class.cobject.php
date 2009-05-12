@@ -32,7 +32,7 @@ class CObject{
 	public function toString($destroy=true){
 		$res = implode('',$this->items);
 		if($destroy) $this->destroy();
-		return $res;
+	return $res;
 	}
 
 	public function show($destroy=true){
@@ -81,7 +81,7 @@ function unpack_object(&$item){
 	$res = '';
 
 	if(is_object($item)){
-		$res = $item->ToString(false);
+		$res = $item->toString(false);
 	}
 	else if(is_array($item)){
 		foreach($item as $id => $dat)	
@@ -100,5 +100,5 @@ function implode_objects($glue, &$pieces){
 	foreach($pieces as $id => $piece)
 		$pieces[$id] = unpack_object($piece);
 
-	return implode($glue, $pieces);
+return implode($glue, $pieces);
 }

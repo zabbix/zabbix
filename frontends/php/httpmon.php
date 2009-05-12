@@ -19,31 +19,32 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/hosts.inc.php";
-	require_once "include/httptest.inc.php";
-	require_once "include/forms.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/httptest.inc.php');
+	require_once('include/forms.inc.php');
 
-	$page["title"] = "S_STATUS_OF_WEB_MONITORING";
-	$page["file"] = "httpmon.php";
+	$page['title'] = "S_STATUS_OF_WEB_MONITORING";
+	$page['file'] = 'httpmon.php';
 	$page['hist_arg'] = array('open','groupid','hostid');
 	
 	define('ZBX_PAGE_DO_REFRESH', 1);
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 ?>
 <?php
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"applications"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-		"applicationid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-		"close"=>		array(T_ZBX_INT, O_OPT,	null,	IN("1"),	null),
-		"open"=>		array(T_ZBX_INT, O_OPT,	null,	IN("1"),	null),
+		'applications'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		'applicationid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		'close'=>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
+		'open'=>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
+		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	NULL),
 
-		"groupid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	null),
-		"hostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null),
+		'groupid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	null),
+		'hostid'=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
@@ -109,12 +110,22 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-	$p_elements = array();
+	$httpmon_wdgt = new CWidget();
 	
 // Table HEADER
-	$form = new CForm();
-	$form->setMethod('get');
+	$url = 'httpmon.php?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 
+	$fs_icon = new CDiv(SPACE,'fullscreen');
+	$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+
+	$httpmon_wdgt->addHeader(S_STATUS_OF_WEB_MONITORING_BIG, $fs_icon);
+
+// 2nd header
+	$r_form = new CForm();
+	$r_form->setMethod('get');
+	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
+	
 	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 
@@ -128,10 +139,12 @@ include_once "include/page_header.php";
 		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
 	}
 	
-	$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
-	$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-			
-	$p_elements[] = get_table_header(SPACE, $form);
+	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+	
+	$httpmon_wdgt->addHeader(SPACE, $r_form);
+//	show_table_header(S_STATUS_OF_WEB_MONITORING_BIG, $r_form);
+//-----------------
 
 // TABLE
 	$form = new CForm();
@@ -300,17 +313,9 @@ include_once "include/page_header.php";
 
 	$form->addItem($table);
 	
-	$p_elements[] = $form;
+	$httpmon_wdgt->addItem($form);
 	
-	$latest_hat = create_hat(
-			S_STATUS_OF_WEB_MONITORING_BIG,
-			$p_elements,
-			null,
-			'hat_httpmon',
-			get_profile('web.httpmon.hats.hat_httpmon.state',1)
-	);
-
-	$latest_hat->Show();
+	$httpmon_wdgt->show();
 ?>
 <?php
 

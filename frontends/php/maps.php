@@ -71,7 +71,7 @@ include_once('include/page_header.php');
 				$result = rm4favorites('web.favorite.sysmapids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
 				
 				if($result){
-					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVORITES.'";'."\n");
+					print('$("addrm_fav").title = "'.S_add_TO.' '.S_FAVORITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){ add2favorites("sysmapid","'.$_REQUEST['favid'].'");}'."\n");
 				}
 			}
@@ -122,42 +122,37 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$p_elements = array();
+	$map_wdgt = new CWidget('hat_maps');
 	
-	$text = null;
+// HEADER
+	$text = SPACE;
 	if(isset($_REQUEST["sysmapid"])){
 		$sysmap = get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
 		$text = $all_maps[$_REQUEST["sysmapid"]];		
 	}
 
 	$form = new CForm();
-	$form->SetMethod('get');
+	$form->setMethod('get');
 	
-	$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
+	$form->addVar("fullscreen",$_REQUEST["fullscreen"]);
 
 	$cmbMaps = new CComboBox("sysmapid",get_request("sysmapid",0),"submit()");
 	
 	foreach($all_maps as $id => $name){
-		$cmbMaps->AddItem($id, $name);
+		$cmbMaps->addItem($id, $name);
 	}
-	
-	if($cmbMaps->ItemsCount()>0){
-		$form->AddItem($cmbMaps);
-		$p_elements[] = get_table_header($text,$form);
-	}
+//-------------------------	
 ?>
 <?php
 	$table = new CTable(S_NO_MAPS_DEFINED,"map");
 	if(isset($_REQUEST["sysmapid"])){
 		$action_map = get_action_map_by_sysmapid($_REQUEST["sysmapid"]);
-		$table->AddRow($action_map);
+		$table->addRow($action_map);
 
 		$imgMap = new CImg("map.php?noedit=1&sysmapid=".$_REQUEST["sysmapid"]);
-		$imgMap->SetMap($action_map->GetName());
-		$table->AddRow($imgMap);
+		$imgMap->setMap($action_map->GetName());
+		$table->addRow($imgMap);
 	}
-		
-	$p_elements[] = $table;
 
 	$icon = null;
 	$fs_icon = null;
@@ -168,32 +163,33 @@ include_once('include/page_header.php');
 		
 		if(infavorites('web.favorite.sysmapids',$_REQUEST['sysmapid'],'sysmapid')){
 			$icon = new CDiv(SPACE,'iconminus');
-			$icon->AddOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
-			$icon->AddAction('onclick',new CScript("javascript: rm4favorites('sysmapid','".$_REQUEST["sysmapid"]."',0);"));
+			$icon->addOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
+			$icon->addAction('onclick',new CScript("javascript: rm4favorites('sysmapid','".$_REQUEST["sysmapid"]."',0);"));
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
-			$icon->AddOption('title',S_ADD_TO.' '.S_FAVORITES);
-			$icon->AddAction('onclick',new CScript("javascript: add2favorites('sysmapid','".$_REQUEST["sysmapid"]."');"));
+			$icon->addOption('title',S_add_TO.' '.S_FAVORITES);
+			$icon->addAction('onclick',new CScript("javascript: add2favorites('sysmapid','".$_REQUEST["sysmapid"]."');"));
 		}
-		$icon->AddOption('id','addrm_fav');
+		$icon->addOption('id','addrm_fav');
 		
 		$url = '?sysmapid='.$_REQUEST['sysmapid'].($_REQUEST['fullscreen']?'':'&fullscreen=1');
 
 		$fs_icon = new CDiv(SPACE,'fullscreen');
-		$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));	
+		$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));	
+	}
+
+	$map_wdgt->addHeader(S_NETWORK_MAPS_BIG,array($icon,$fs_icon));
+
+	if($cmbMaps->itemsCount()>0){
+		$form->addItem($cmbMaps);
+		$map_wdgt->addHeader($text,$form);
 	}
 	
-	$latest_hat = create_hat(
-			S_NETWORK_MAPS_BIG,
-			$p_elements,
-			array($icon,$fs_icon),
-			'hat_maps',
-			get_profile('web.maps.hats.hat_maps.state',1)
-	);
+	$map_wdgt->addItem($table);
 
-	$latest_hat->Show();
+	$map_wdgt->show();
 ?>
 <?php
 

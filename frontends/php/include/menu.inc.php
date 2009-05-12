@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+global $ZBX_MENU;
 
 $ZBX_MENU = array(
 	'view'=>array(
@@ -313,7 +314,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 
 function zbx_define_menu_restrictions(){
 	global $page, $ZBX_MENU;
-	
+
 	foreach($ZBX_MENU as $sid => $section){
 		foreach($section['pages'] as $pid => $menu_page) {
 			if (($menu_page['url'] == $page['file']) || (isset($menu_page['sub_pages']) && in_array($page['file'], $menu_page['sub_pages']))) {

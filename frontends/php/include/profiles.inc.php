@@ -123,8 +123,9 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 
 	if(profile_type($type,'array')){
 		$sql='DELETE FROM profiles '.
-			' WHERE userid='.$USER_DETAILS["userid"].
+			' WHERE userid='.$USER_DETAILS['userid'].
 				' AND idx='.zbx_dbstr($idx).
+				' AND '.DBin_node('profileid').
 				$sql_cond;
 
 		DBstart();
@@ -139,6 +140,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 		$sql = 'SELECT profileid '.
 				' FROM profiles '.
 				' WHERE userid='.$USER_DETAILS['userid'].
+					' AND '.DBin_node('profileid').
 					' AND idx='.zbx_dbstr($idx).
 					$sql_cond;
 					
@@ -174,6 +176,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 					' source='.zbx_dbstr($src).
 				' WHERE userid='.$USER_DETAILS["userid"].
 					' AND idx='.zbx_dbstr($idx).
+					' AND '.DBin_node('profileid').
 					$sql_cond;
 //if($idx == 'web.audit.filter.action') SDI($sql);
 			$result = DBexecute($sql);

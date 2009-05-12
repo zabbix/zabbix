@@ -531,11 +531,15 @@ function make_latest_issues($params = array()){
 //actions
 			$actions = get_event_actions_stat_hints($row_event['eventid']);
 
-			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'events.php?triggerid='.$row['triggerid'].'&source=0&show_unknown=1&nav_time='.$row_event['clock'],'action');			
+			$clock = new CLink(
+					zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),
+					'events.php?triggerid='.$row['triggerid'].'&source=0&show_unknown=1&nav_time='.$row_event['clock'],
+					'action');
 			
 			$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action', null, true) : $description;
 			$description = new CCol($description,get_severity_style($row["priority"]));
 			$description->setHint(make_popup_eventlist($row_event['eventid'], $row['type']));
+			
 			$table->addRow(array(
 				get_node_name_by_elid($row['triggerid']),
 				$host,
