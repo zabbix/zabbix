@@ -745,9 +745,10 @@ void	child_trapper_main(zbx_process_t p, zbx_sock_t *s)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In child_trapper_main()");
 
-	phan.sa_handler = child_signal_handler;
+/*	phan.sa_handler = child_signal_handler;*/
+	phan.sa_sigaction = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = 0;
+	phan.sa_flags = SA_SIGINFO;
 	sigaction(SIGALRM, &phan, NULL);
 
 	zbx_process = p;
