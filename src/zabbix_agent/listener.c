@@ -84,10 +84,12 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd listener started");
 
 #if defined(ZABBIX_DAEMON)
-	phan.sa_handler = child_signal_handler;
+/*	phan.sa_handler = child_signal_handler;*/
+        phan.sa_sigaction = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = 0;
+	phan.sa_flags = SA_SIGINFO;
 	sigaction(SIGALRM, &phan, NULL);
+
 #endif
 
 	memcpy(&s, ((zbx_sock_t *)pSock), sizeof(zbx_sock_t));

@@ -463,9 +463,10 @@ int	main_datasender_loop()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_datasender_loop()");
 
-	phan.sa_handler = child_signal_handler;
+/*	phan.sa_handler = child_signal_handler;*/
+	phan.sa_sigaction = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = 0;
+	phan.sa_flags = SA_SIGINFO;
 	sigaction(SIGALRM, &phan, NULL);
 
 	zbx_setproctitle("data sender [connecting to the database]");
