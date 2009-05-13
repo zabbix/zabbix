@@ -5270,7 +5270,7 @@
 // Insert form for Host Groups
 	function insert_hostgroups_form(){
 		global	$USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
 
 		$hosts = get_request('hosts',array());
 		$frm_title = S_HOST_GROUP;

@@ -663,10 +663,13 @@ include_once('include/page_header.php');
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(($_REQUEST['config']==1) && isset($_REQUEST['save'])){
+
 		$hosts = get_request('hosts',array());
+		$hosts = array_intersect($available_hosts, $hosts);
 		if(isset($_REQUEST['groupid'])){
 			DBstart();
-				$result = update_host_group($_REQUEST['groupid'], $_REQUEST['gname'], $hosts);
+			
+			$result = update_host_group($_REQUEST['groupid'], $_REQUEST['gname'], $hosts);
 			$result = DBend($result);
 			
 			$action 	= AUDIT_ACTION_UPDATE;
