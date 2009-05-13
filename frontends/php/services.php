@@ -125,18 +125,13 @@ if(isset($_REQUEST['msg']) && !empty($_REQUEST['msg'])){
 //show_table_header(S_IT_SERVICES_BIG);
 
 $tree = new CTree('service_conf_tree', $treeServ,array('caption' => bold(S_SERVICE),'algorithm' => bold(S_STATUS_CALCULATION), 'description' => bold(S_TRIGGER)));
+
 if($tree){
-	
-	$tab = create_hat(
-			S_IT_SERVICES_BIG,
-			$tree->getHTML(),
-			null,
-			'hat_services',
-			get_profile('web.services.hats.hat_services.state',1)
-		);
+	$serv_wdgt = new CWidget();
+	$serv_wdgt->addHeader(S_IT_SERVICES_BIG, SPACE);
+	$serv_wdgt->addItem($tree->getHTML());
 		
-	$tab->Show();
-	unset($tab);
+	$serv_wdgt->show();
 }
 else {
 	error(S_CANT_FORMAT_TREE);
@@ -145,6 +140,7 @@ else {
 
 $tr_ov_menu[] = array('test1',	null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 $tr_ov_menu[] = array('test2',	null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
+
 $jsmenu = new CPUMenu($tr_ov_menu,170);
 $jsmenu->InsertJavaScript();
 
