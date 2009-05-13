@@ -630,7 +630,7 @@
 				$key		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_KEY_ID];
 				$function = &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID];
 				$parameter	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
-				
+
 				/* Check host */
 				$sql = 'SELECT COUNT(*) as cnt,min(status) as status,min(hostid) as hostid '.
 						' FROM hosts h '.
@@ -711,6 +711,7 @@
 					}
 				}
 			}
+	
 			$expr = $arr[ZBX_EXPRESSION_LEFT_ID].$ZBX_TR_EXPR_REPLACE_TO.$arr[ZBX_EXPRESSION_RIGHT_ID];
 		}
 
@@ -719,7 +720,7 @@
 			return false;
 		}
 
-		/* Replace all calculations and numbers with '$ZBX_TR_EXPR_REPLACE_TO' */
+/* Replace all calculations and numbers with '$ZBX_TR_EXPR_REPLACE_TO' */
 		$expt_number = '('.$ZBX_TR_EXPR_REPLACE_TO.'|'.ZBX_EREG_NUMBER.')';
 		$expt_term = '((\('.$expt_number.'\))|('.$expt_number.'))';
 		$expr_format = '(('.$expt_term.ZBX_EREG_SPACES.ZBX_EREG_SIGN.ZBX_EREG_SPACES.$expt_term.')|(\('.$expt_term.'\)))';
@@ -729,12 +730,13 @@
 			$expr = substr($expr, 0, strpos($expr, $arr[1])).$ZBX_TR_EXPR_REPLACE_TO.$arr[58];
 		}
 
-		if ( $ZBX_TR_EXPR_REPLACE_TO != $expr ){
+
+		if($ZBX_TR_EXPR_REPLACE_TO != $expr){
 			error('Incorrect trigger expression. ['.str_replace($ZBX_TR_EXPR_REPLACE_TO, ' ... ', $expr).']');
 			return false;
 		}
 
-		return true;
+	return true;
 	}
 
 	function add_trigger($expression, $description, $type, $priority, $status, $comments, $url, $deps=array(), $templateid=0){

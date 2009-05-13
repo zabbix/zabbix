@@ -277,7 +277,7 @@ include_once 'include/page_header.php';
 	$filterForm = new CFormTable();//,'tr_status.php?filter_set=1','POST',null,'sform');
 	$filterForm->addOption('name','zbx_filter');
 	$filterForm->addOption('id','zbx_filter');
-	$filterForm->SetMethod('post');
+	$filterForm->setMethod('post');
 
 	$filterForm->addVar('fullscreen',$_REQUEST['fullscreen']);
 	$filterForm->addVar('groupid',$_REQUEST['groupid']);
@@ -356,8 +356,8 @@ include_once 'include/page_header.php';
 	$filterForm->addRow(S_INVERSE_SELECT, new CCheckBox('inverse_select',$_REQUEST['inverse_select'],null,1));
 
 	$reset = new CButton('filter_rst',S_RESET);
-	$reset->SetType('button');
-	$reset->SetAction('javascript: var url = new Curl(location.href); url.setArgument("filter_rst",1); location.href = url.getUrl();');
+	$reset->setType('button');
+	$reset->setAction('javascript: var url = new Curl(location.href); url.setArgument("filter_rst",1); location.href = url.getUrl();');
 
 	$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
 	$filterForm->addItemToBottomRow($reset);
@@ -368,16 +368,16 @@ include_once 'include/page_header.php';
   	if($_REQUEST['fullscreen']){
 		$triggerInfo = new CTriggersInfo();
 		$triggerInfo->HideHeader();
-		$triggerInfo->Show();
+		$triggerInfo->show();
 	}
 	
 	$m_form = new CForm('acknow.php');
-	$m_form->SetName('tr_status');
+	$m_form->setName('tr_status');
 
 	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
 	
 	$table  = new CTableInfo();
-	$table->ShowStart();
+	$table->showStart();
 	
 	$header=array();
 	$show_event_col = ($config['event_ack_enable'] && ($show_events != EVENTS_OPTION_NOEVENT));
@@ -567,7 +567,7 @@ include_once 'include/page_header.php';
 		if($dependency){
 			$img = new Cimg('images/general/up_icon.png','DEP_UP');
 			$img->addOption('style','vertical-align: middle; border: 0px;');
-			$img->SetHint($dep_table);
+			$img->setHint($dep_table);
 			
 			$description = array($img,SPACE,$description);
 		}
