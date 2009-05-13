@@ -1,6 +1,6 @@
 Changes for 1.7.0
 
- - [DEV-328] implemented printing of stopped Zabbix process for better debugging (Alexei)
+ - [DEV-328] implemented printing of stopped Zabbix process PID for better debugging (Alexei)
  - [DEV-137] now SNMP keys with dynamic indexes use only one connection (Sasha)
  - [ZBX-921] fixed processing of SNMP strings (Sasha)
  - [DEV-341] rework of events history, as consequences changes in audit screen, some reports and other pages (Artem)
