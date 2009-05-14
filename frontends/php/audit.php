@@ -63,7 +63,7 @@ include_once('include/page_header.php');
 
 		'userid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 
-		'filter_timesince'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
+		'nav_time'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
 
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
@@ -93,21 +93,21 @@ ini_set('max_execution_time',10);
 		$_REQUEST['action'] = -1;
 		$_REQUEST['resourcetype'] = -1;
 
-		$_REQUEST['filter_timesince'] = time();
+		$_REQUEST['nav_time'] = time();
 	}
 
 	$_REQUEST['userid'] = get_request('userid',get_profile('web.audit.filter.userid',0));
 	$_REQUEST['action'] = get_request('action',get_profile('web.audit.filter.action',-1));
 	$_REQUEST['resourcetype'] = get_request('resourcetype',get_profile('web.audit.filter.resourcetype',-1));
 
-	$_REQUEST['filter_timesince'] = get_request('filter_timesince',get_profile('web.audit.filter.timesince',time()));
+	$_REQUEST['nav_time'] = get_request('nav_time',get_profile('web.audit.filter.nav_time',time()));
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		update_profile('web.audit.filter.userid',$_REQUEST['userid']);
 		update_profile('web.audit.filter.action',$_REQUEST['action'], PROFILE_TYPE_INT);
 		update_profile('web.audit.filter.resourcetype',$_REQUEST['resourcetype'], PROFILE_TYPE_INT);
 
-		update_profile('web.audit.filter.timesince',$_REQUEST['filter_timesince'], PROFILE_TYPE_INT);
+		update_profile('web.audit.filter.nav_time',$_REQUEST['nav_time'], PROFILE_TYPE_INT);
 	}
 // --------------
 
@@ -116,9 +116,9 @@ ini_set('max_execution_time',10);
 
 
 // Navigation initialization
-	$nav_time = $_REQUEST['filter_timesince'];
+	$nav_time = $_REQUEST['nav_time'];
 	
-	$page_start = null;
+	$time_end = null;
 
 	$prev_clock = get_request('prev_clock', array());
 	$next_clock = get_request('next_clock', null);
@@ -131,24 +131,24 @@ ini_set('max_execution_time',10);
 //SDI(array($prev_clock, $curr_clock, $next_clock));
 	if($next_page){
 		$prev_clock[] = $curr_clock;
-		$page_start = $next_clock;
+		$time_end = $next_clock;
 	}
 	else if($prev_page){
 		$next_clock = $curr_clock;
-		$page_start = array_pop($prev_clock);
+		$time_end = array_pop($prev_clock);
 	}
 	else if($nav_time){
 		$prev_clock = array();
-		$page_start = $nav_time;
+		$time_end = $nav_time;
 	}
 	else{
-		$page_start  = $curr_clock;
+		$time_end  = $curr_clock;
 	}
 
-	$curr_clock = $page_start;	
+	$curr_clock = $time_end;	
 	$limit = $USER_DETAILS['rows_per_page'];
 	
-//SDI(array($prev_clock, $curr_clock, $next_clock, $page_start));
+//SDI(array($prev_clock, $curr_clock, $next_clock, $time_end));
 // end of navigation initialization
 // -------------
 ?>
@@ -180,7 +180,7 @@ ini_set('max_execution_time',10);
 	if(($_REQUEST['resourcetype']>-1) && ($config == 0)) 
 		$sql_cond.=' AND a.resourcetype='.$_REQUEST['resourcetype'].' ';
 		
-	$sql_cond.=' AND a.clock>'.$page_start.' AND a.clock<'.time();
+	$sql_cond.=' AND a.clock>1000000000 AND a.clock<'.$time_end;
 
 	if(0 == $config){
 		$count = 0;
@@ -205,7 +205,7 @@ ini_set('max_execution_time',10);
 						' WHERE u.userid=a.userid '.
 							$sql_cond.
 							' AND '.DBin_node('u.userid', get_current_nodeid(null, PERM_READ_ONLY)).
-						' ORDER BY a.clock ASC';
+						' ORDER BY a.clock DESC';
 		$result = DBselect($sql, $limit);
 		while($row=DBfetch($result)){	
 			switch($row['action']){
@@ -227,7 +227,7 @@ ini_set('max_execution_time',10);
 			$actions[] = $row;
 		}
 
-		$last_clock = !empty($clock)?max($clock):null;
+		$last_clock = !empty($clock)?min($clock):null;
 		order_result($actions, 'clock', ZBX_SORT_DOWN);
 		
 		foreach($actions as $num => $row){
@@ -306,10 +306,10 @@ ini_set('max_execution_time',10);
 	$filterForm->addOption('id','zbx_filter');
 
 	$script = new CScript("javascript: if(CLNDR['audit_since'].clndr.setSDateFromOuterObj()){".
-							"$('filter_timesince').value = parseInt(CLNDR['audit_since'].clndr.sdt.getTime()/1000);}");
+							"$('nav_time').value = parseInt(CLNDR['audit_since'].clndr.sdt.getTime()/1000);}");
 	$filterForm->addAction('onsubmit',$script);
 
-	$filterForm->addVar('filter_timesince',($_REQUEST['filter_timesince']>0)?$_REQUEST['filter_timesince']:'');
+	$filterForm->addVar('nav_time',($_REQUEST['nav_time']>0)?$_REQUEST['nav_time']:'');
 	$filterForm->addVar('config',$_REQUEST['config']);
 
 	$filterForm->addVar('userid',$_REQUEST['userid']);
@@ -381,31 +381,25 @@ ini_set('max_execution_time',10);
 	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
 	$clndr_icon->addAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['audit_since'].clndr.clndrshow(pos.top,pos.left);");
 
-	$filtertimetab = new CTable();
-	$filtertimetab->addOption('width','10%');
-	$filtertimetab->setCellPadding(0);
-	$filtertimetab->setCellSpacing(0);
-
 	$nav_clndr =  array(
-						new CNumericBox('filter_since_day',(($_REQUEST['filter_timesince']>0)?date('d',$_REQUEST['filter_timesince']):''),2),
-						new CNumericBox('filter_since_month',(($_REQUEST['filter_timesince']>0)?date('m',$_REQUEST['filter_timesince']):''),2),
-						new CNumericBox('filter_since_year',(($_REQUEST['filter_timesince']>0)?date('Y',$_REQUEST['filter_timesince']):''),4),
-						new CNumericBox('filter_since_hour',(($_REQUEST['filter_timesince']>0)?date('H',$_REQUEST['filter_timesince']):''),2),
+						new CNumericBox('nav_day',(($_REQUEST['nav_time']>0)?date('d',$_REQUEST['nav_time']):''),2),
+						new CNumericBox('nav_month',(($_REQUEST['nav_time']>0)?date('m',$_REQUEST['nav_time']):''),2),
+						new CNumericBox('nav_year',(($_REQUEST['nav_time']>0)?date('Y',$_REQUEST['nav_time']):''),4),
+						new CNumericBox('nav_hour',(($_REQUEST['nav_time']>0)?date('H',$_REQUEST['nav_time']):''),2),
 						':',
-						new CNumericBox('filter_since_minute',(($_REQUEST['filter_timesince']>0)?date('i',$_REQUEST['filter_timesince']):''),2),
+						new CNumericBox('nav_minute',(($_REQUEST['nav_time']>0)?date('i',$_REQUEST['nav_time']):''),2),
 					$clndr_icon
 				);
 				
-	$filtertimetab->addRow($nav_clndr);
+	$filterForm->addRow(S_START_DATE,$nav_clndr);
 	
 	zbx_add_post_js('create_calendar(null,'.
-				 '["filter_since_day","filter_since_month","filter_since_year","filter_since_hour","filter_since_minute"],'.
+				 '["nav_day","nav_month","nav_year","nav_hour","nav_minute"],'.
 				 '"audit_since");');
 
 	zbx_add_post_js('addListener($("filter_icon"),'.
 				'"click",CLNDR[\'audit_since\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'audit_since\'].clndr));');
 
-	$filterForm->addRow(S_START_DATE, $filtertimetab);
 //*/
 	$reset = new CButton('filter_rst',S_RESET);
 	$reset->setType('button');

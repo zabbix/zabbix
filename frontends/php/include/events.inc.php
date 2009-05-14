@@ -268,18 +268,17 @@ return $table;
 function make_small_eventlist($eventid, $trigger_data){
 	
 	$table = new CTableInfo();
-	$table->SetHeader(array(S_TIME,S_STATUS,S_DURATION, S_AGE, S_ACK, S_ACTIONS));
+	$table->setHeader(array(S_TIME,S_STATUS,S_DURATION, S_AGE, S_ACK, S_ACTIONS));
+
+	$rows = array();
+	$count = 0;
 
 	$sql = 'SELECT * '.
 			' FROM events '.
 			' WHERE eventid<='.$eventid.
 			' ORDER BY eventid DESC';
-	$result = DBselect($sql,20);
-
-	$rows = array();
-	$count = 0;
-	
-	while($row=DBfetch($result)){	
+	$result = DBselect($sql,100);
+	while(($row=DBfetch($result)) && ($count < 20)){	
 		
 		if(!empty($rows) && ($rows[$count]['value'] != $row['value'])){
 			$count++;
@@ -485,7 +484,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 return $table;
 }
 
-function get_history_of_discovery_events($start_time, $limit, &$last_clock=null){
+function get_history_of_discovery_events($end_time, $limit, &$last_clock=null){
 
 	$table = new CTableInfo(S_NO_EVENTS_FOUND); 
 	$table->setHeader(array(S_TIME, S_IP, S_DESCRIPTION, S_STATUS));
@@ -494,13 +493,11 @@ function get_history_of_discovery_events($start_time, $limit, &$last_clock=null)
 	$clock = array();
 	$dsc_events = array();
 	
-	$sql_cond=' AND e.clock>'.$start_time;
-	$sql_cond.=' AND e.clock<'.time();
 	$sql = 'SELECT DISTINCT e.source,e.object,e.objectid,e.clock,e.value '.
 			' FROM events e'.
 			' WHERE e.source='.EVENT_SOURCE_DISCOVERY.
-			$sql_cond.
-			' ORDER BY e.clock ASC';
+			' AND e.clock<'.$end_time.
+			' ORDER BY e.clock DESC';
 	$db_events = DBselect($sql, $limit);
 	while($event_data = DBfetch($db_events)){
 	
@@ -546,8 +543,8 @@ function get_history_of_discovery_events($start_time, $limit, &$last_clock=null)
 		$dsc_events[] = $event_data;
 	}
 	
-	$last_clock = !empty($clock)?max($clock):null;
-	order_result($dsc_events, 'clock', 'ASC');
+	$last_clock = !empty($clock)?min($clock):null;
+	order_result($dsc_events, 'clock', ZBX_SORT_DOWN);
 	
 	foreach($dsc_events as $num => $event_data){
 		$value = new CCol(trigger_value2str($event_data['value']), get_trigger_value_style($event_data['value']));
