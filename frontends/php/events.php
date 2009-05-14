@@ -201,7 +201,7 @@
 // Navigation initialization
 	$nav_time = get_request('nav_time', false);
 	
-	$page_start = null;
+	$time_end = null;
 
 	$prev_clock = get_request('prev_clock', array());
 	$next_clock = get_request('next_clock', null);
@@ -214,22 +214,22 @@
 //SDI(array($prev_clock, $curr_clock, $next_clock));
 	if($next_page){
 		$prev_clock[] = $curr_clock;
-		$page_start = $next_clock;
+		$time_end = $next_clock;
 	}
 	else if($prev_page){
 		$next_clock = $curr_clock;
-		$page_start = array_pop($prev_clock);
+		$time_end = array_pop($prev_clock);
 	}
 	else if($nav_time){
 		$prev_clock = array();
-		$page_start = $nav_time;
+		$time_end = $nav_time;
 	}
 	else{
-		$page_start  = $curr_clock;
+		$time_end  = $curr_clock;
 	}
 	
-	$curr_clock = $page_start;
-//SDI(array($prev_clock, $curr_clock, $next_clock, $page_start));
+	$curr_clock = $time_end;
+//SDI(array($prev_clock, $curr_clock, $next_clock, $time_end));
 // end of navigation initialization
 
 // -------------
@@ -241,7 +241,7 @@
 
 	if($source == EVENT_SOURCE_DISCOVERY){
 		$last_clock = null;
-		$table = get_history_of_discovery_events($page_start, $limit, $last_clock);
+		$table = get_history_of_discovery_events($time_end, $limit, $last_clock);
 
 		$col = $table->getNumRows();
 	}
@@ -298,7 +298,7 @@
 		}
 		
 		$sql_cond=($show_unknown == 0)?(' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.' '):('');
-		$sql_cond.=' AND e.clock>'.$page_start;
+		$sql_cond.=' AND e.clock<'.$time_end;
 
 		$table = new CTableInfo(S_NO_EVENTS_FOUND); 
 		$table->setHeader(array(
@@ -322,7 +322,7 @@
 					' WHERE '.DBcondition('e.objectid', $triggerids).
 						' AND (e.object+0)='.EVENT_OBJECT_TRIGGER.
 						$sql_cond.
-					' ORDER BY e.clock ASC';
+					' ORDER BY e.clock DESC';
 			$result = DBselect($sql, (0 == $show_unknown)?($limit*50):$limit);
 			while(($row=DBfetch($result)) && ($col < $limit)){
 				$row = array_merge($triggers[$row['triggerid']],$row);
@@ -343,7 +343,7 @@
 				$events[] = $row;
 			}
 
-			$last_clock = !empty($clock)?max($clock):null;
+			$last_clock = !empty($clock)?min($clock):null;
 			order_result($events, 'clock', ZBX_SORT_DOWN);
 
 			foreach($events as $num => $row){
@@ -435,9 +435,14 @@
 					new CNumericBox('nav_day',(($_REQUEST['nav_time']>0)?date('d',$_REQUEST['nav_time']):''),2),
 					new CNumericBox('nav_month',(($_REQUEST['nav_time']>0)?date('m',$_REQUEST['nav_time']):''),2),
 					new CNumericBox('nav_year',(($_REQUEST['nav_time']>0)?date('Y',$_REQUEST['nav_time']):''),4),
+					SPACE,
+					new CNumericBox('nav_hour',(($_REQUEST['nav_time']>0)?date('H',$_REQUEST['nav_time']):''),2),
+					':',
+					new CNumericBox('nav_minute',(($_REQUEST['nav_time']>0)?date('i',$_REQUEST['nav_time']):''),2),
+
 					$clndr_icon
 				);
-	zbx_add_post_js('create_calendar(null,["nav_day","nav_month","nav_year"],"nav_time");');
+	zbx_add_post_js('create_calendar(null,["nav_day","nav_month","nav_year","nav_hour","nav_minute"],"nav_time");');
 
 	$filterForm->addRow(S_START_DATE,$nav_clndr);
 		
