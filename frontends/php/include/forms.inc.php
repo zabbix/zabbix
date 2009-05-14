@@ -4400,7 +4400,7 @@ include_once 'include/discovery.inc.php';
 	}
 
 	# Insert form for Host Groups
-	function	insert_hostgroups_form()
+	function	insert_hostgroups_form($available_hosts)
 	{
 		global  $_REQUEST;
 		global	$USER_DETAILS;
@@ -4415,9 +4415,11 @@ include_once 'include/discovery.inc.php';
 		if(isset($_REQUEST["groupid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$name=$group["name"];
+			
 			$db_hosts=DBselect("select distinct h.hostid,host from hosts h, hosts_groups hg".
 				" where h.status<>".HOST_STATUS_DELETED.
 				" and h.hostid=hg.hostid".
+				' AND h.hostid IN ('.$available_hosts.') '.
 				" and hg.groupid=".$_REQUEST["groupid"].
 				" order by host");
 			while($db_host=DBfetch($db_hosts))
@@ -4443,7 +4445,7 @@ include_once 'include/discovery.inc.php';
 		$cmbHosts = new CListBox("hosts[]",$hosts,10);
 		$db_hosts=DBselect("select distinct hostid,host from hosts".
 			" where status<>".HOST_STATUS_DELETED.
-			" and hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).")".
+			" and hostid in (".$available_hosts.") ".
 			" order by host");
 		while($db_host=DBfetch($db_hosts))
 		{

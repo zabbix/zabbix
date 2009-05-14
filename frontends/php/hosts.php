@@ -1089,7 +1089,7 @@ include_once "include/page_header.php";
 	{
 		if(isset($_REQUEST["form"]))
 		{
-			insert_hostgroups_form(get_request("groupid",NULL));
+			insert_hostgroups_form($available_hosts);
 		} else {
 			show_table_header(S_HOST_GROUPS_BIG);
 

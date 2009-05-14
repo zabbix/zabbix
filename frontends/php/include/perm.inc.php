@@ -253,12 +253,14 @@ COpt::counter_up('perm');
 		else			$where = '';
 	
 		/* if no rights defined used node rights */
-		$db_groups = DBselect('select n.nodeid as nodeid,n.name as node_name,hg.groupid,hg.name,min(r.permission) as permission,g.userid'.
+		$sql = 'select n.nodeid as nodeid,n.name as node_name,hg.groupid,hg.name,min(r.permission) as permission,g.userid'.
 			' from groups hg left join rights r on r.id=hg.groupid and r.type='.RESOURCE_TYPE_GROUP.
 			' left join users_groups g on r.groupid=g.usrgrpid and g.userid='.$userid.
 			' left join nodes n on '.DBid2nodeid('hg.groupid').'=n.nodeid '.
 			$where.' group by n.nodeid, n.name, hg.groupid, hg.name, g.userid, g.userid '.
-			' order by n.name, hg.name, permission desc');
+			' order by n.name, hg.name, permission desc';
+			
+		$db_groups = DBselect($sql);
 
 		$processed = array();
 		while($group_data = DBfetch($db_groups))
@@ -273,8 +275,7 @@ COpt::counter_up('perm');
 
 				if(!isset($nodes))
 				{
-					$nodes = get_accessible_nodes_by_user($user_data,
-						PERM_DENY,PERM_MODE_GE,PERM_RES_DATA_ARRAY);
+					$nodes = get_accessible_nodes_by_user($user_data,PERM_DENY,PERM_MODE_GE,PERM_RES_DATA_ARRAY);
 				}
 
 				if( !isset($nodes[$group_data['nodeid']]) || $user_type==USER_TYPE_ZABBIX_USER )
@@ -286,9 +287,13 @@ COpt::counter_up('perm');
 //			$processed[$group_data['permission']] = true;
 			$processed[$group_data['groupid']] = true;
 
-			if(eval('return ('.$group_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
+			if(eval('return ('.$group_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;')){
+				if(($perm_mode == PERM_MODE_GE) && ($group_data["permission"] < PERM_READ_ONLY)){
+					unset($result[$group_data['groupid']]);
+				}
 				continue;
-
+			}
+			
 			$result[$group_data['groupid']] = eval('return '.$resdata.';');
 		}
 
