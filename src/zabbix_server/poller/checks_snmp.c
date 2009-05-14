@@ -18,6 +18,7 @@
 **/
 
 #include "checks_snmp.h"
+#include "comms.h"
 
 #ifdef HAVE_SNMP
 
@@ -221,7 +222,10 @@ static struct snmp_session	*snmp_open_session(DB_ITEM *item, char *err)
 {
 	const char		*__function_name = "snmp_open_session";
 	struct snmp_session	session, *ss;
-	char			addr[64];
+	char			*host, addr[64];
+#ifdef HAVE_IPV6
+	int			family;
+#endif	/* HAVE_IPV6 */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -236,9 +240,19 @@ static struct snmp_session	*snmp_open_session(DB_ITEM *item, char *err)
 	else
 		/* this should never happen */;
 
-	zbx_snprintf(addr, sizeof(addr), "%s:%d",
-			(item->useip == 1) ? item->host_ip : item->host_dns,
-			item->snmp_port);
+	host = (item->useip == 1) ? item->host_ip : item->host_dns;
+
+#ifdef HAVE_IPV6
+	if (SUCCEED != get_address_family(host, &family, err, MAX_STRING_LEN))
+		return NULL;
+
+	if (family == PF_INET)
+		zbx_snprintf(addr, sizeof(addr), "%s:%d", host, item->snmp_port);
+	else
+		zbx_snprintf(addr, sizeof(addr), "udp6:[%s]:%d", host, item->snmp_port);
+#else
+	zbx_snprintf(addr, sizeof(addr), "%s:%d", host, item->snmp_port);
+#endif	/* HAVE_IPV6 */
 	session.peername = addr;
 	session.remote_port = item->snmp_port;
 
