@@ -561,6 +561,59 @@ void	zbx_tcp_close(zbx_sock_t *s)
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_address_family                                               *
+ *                                                                            *
+ * Purpose: return address family                                             *
+ *                                                                            *
+ * Parameters: addr - [IN] address or hostname                                *
+ *             family - [OUT] address family                                  *
+ *             error - [OUT] error string                                     *
+ *             max_error_len - [IN] error string length                       *
+ *                                                                            *
+ * Return value: SUCCEED - success                                            *
+ *               FAIL - an error occured                                      *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+#ifdef HAVE_IPV6
+int	get_address_family(const char *addr, int *family, char *error, int max_error_len)
+{
+	struct	addrinfo hints, *ai = NULL;
+	int	err, res = FAIL;
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = PF_UNSPEC;
+	hints.ai_flags = 0;
+	hints.ai_socktype = SOCK_STREAM;
+
+	if (0 != (err = getaddrinfo(addr, NULL, &hints, &ai)))
+	{
+		zbx_snprintf(error, max_error_len, "%s: [%d] %s", addr, err, gai_strerror(err));
+		goto out;
+	}
+
+	if (ai->ai_family != PF_INET && ai->ai_family != PF_INET6)
+	{
+		zbx_snprintf(error, max_error_len, "%s: Unsupported address family", addr);
+		goto out;
+	}
+
+	*family = (int)ai->ai_family;
+
+	res = SUCCEED;
+out:
+	if (NULL != ai)
+		freeaddrinfo(ai);
+
+	return res;
+}
+#endif /* HAVE_IPV6 */
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_tcp_listen                                                   *
  *                                                                            *
  * Purpose: create socket for listening                                       *
