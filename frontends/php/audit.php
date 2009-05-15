@@ -380,6 +380,7 @@ ini_set('max_execution_time',10);
 //*
 	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
 	$clndr_icon->addAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['audit_since'].clndr.clndrshow(pos.top,pos.left);");
+	$clndr_icon->addOption('style','vertical-align: middle;');
 
 	$nav_clndr =  array(
 						new CNumericBox('nav_day',(($_REQUEST['nav_time']>0)?date('d',$_REQUEST['nav_time']):''),2),
@@ -391,7 +392,7 @@ ini_set('max_execution_time',10);
 					$clndr_icon
 				);
 				
-	$filterForm->addRow(S_START_DATE,$nav_clndr);
+	$filterForm->addRow(S_ACTIONS_BEFORE,$nav_clndr);
 	
 	zbx_add_post_js('create_calendar(null,'.
 				 '["nav_day","nav_month","nav_year","nav_hour","nav_minute"],'.

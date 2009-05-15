@@ -341,6 +341,7 @@
 	'S_IN_SMALL'=>					'in',
 	'S_NOT_IN_SMALL'=>				'not in',
 	'S_RETRIES_LEFT'=>				'Retries left',
+	'S_ACTIONS_BEFORE'=>			'Actions before',
 
 //	alarms.php
 	'S_ALARMS'=>					'Alarms',
@@ -1130,8 +1131,7 @@
 	'S_LATEST_EVENTS'=>			'Latest events',
 	'S_HISTORY_OF_EVENTS_BIG'=>	'HISTORY OF EVENTS',
 	'S_NO_EVENTS_FOUND'=>		'No events found',
-	'S_START_DATE'=>			'Start date',
-	
+	'S_EVENTS_BEFORE'=>			'Events before',
 
 //	latest.php
 	'S_LAST_CHECK'=>			'Last check',

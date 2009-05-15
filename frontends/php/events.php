@@ -444,7 +444,7 @@
 				);
 	zbx_add_post_js('create_calendar(null,["nav_day","nav_month","nav_year","nav_hour","nav_minute"],"nav_time");');
 
-	$filterForm->addRow(S_START_DATE,$nav_clndr);
+	$filterForm->addRow(S_EVENTS_BEFORE,$nav_clndr);
 		
 	if(EVENT_SOURCE_TRIGGERS == $source){
 	
