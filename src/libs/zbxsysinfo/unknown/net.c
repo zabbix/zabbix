@@ -41,7 +41,7 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	return SYSINFO_RET_FAIL;
 }
 
-int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 
         assert(result);
