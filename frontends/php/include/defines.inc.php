@@ -30,8 +30,8 @@
 	define('TRIGGERS_OPTION_ALL',			2);		// use 0 to disable
 	define('TRIGGERS_OPTION_NOFALSEFORB',	0);		// use 0 to disable
 	
-	define('TRIGGER_FALSE_PERIOD', 			1800);	// 30min,  0 - disable
-	define('TRIGGER_BLINK_PERIOD',			1800);	// 30min,  0 - disable
+	define('TRIGGER_FALSE_PERIOD', 			300);	// 30min,  0 - disable
+	define('TRIGGER_BLINK_PERIOD',			120);	// 30min,  0 - disable
 
 	define('EVENTS_OPTION_DISABLED',		0);		//	reserved
 	define('EVENTS_OPTION_NOEVENT',			1);		//	use 0 to disable
