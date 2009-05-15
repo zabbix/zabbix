@@ -3299,12 +3299,13 @@
 		}
 
 		$esc_step_from = array();
-		$esc_optype = array();
+		$objects_tmp = array();
 		foreach($operations as $key => $operation) {
 			$esc_step_from[$key]  = $operation['esc_step_from'];
-			$esc_optype[$key]  = $operation['operationtype'];
+			$objects_tmp[$key] = $operation['object'];
 		}
-		array_multisort($esc_step_from, SORT_ASC, $esc_optype, SORT_ASC, $operations);
+		
+		array_multisort($esc_step_from, SORT_ASC, $objects_tmp, SORT_DESC, $operations);
 
 		$tblOper->SetHeader(array(
 				new CCheckBox('all_operations',null,'CheckAll("'.S_ACTION.'","all_operations","g_operationid");'),
