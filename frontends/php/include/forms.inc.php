@@ -3971,10 +3971,13 @@
 		}
 
 		$esc_step_from = array();
+		$objects_tmp = array();
 		foreach($operations as $key => $operation) {
 			$esc_step_from[$key]  = $operation['esc_step_from'];
+			$objects_tmp[$key] = $operation['object'];
 		}
-		array_multisort($esc_step_from, SORT_ASC, $operations);
+		
+		array_multisort($esc_step_from, SORT_ASC, $objects_tmp, SORT_DESC, $operations);
 
 		$tblOper->SetHeader(array(
 				new CCheckBox('all_operations',null,'CheckAll("'.S_ACTION.'","all_operations","g_operationid");'),
@@ -3986,12 +3989,6 @@
 			));
 
 		$allowed_operations = get_operations_by_eventsource($eventsource);
-		
-		$objects_tmp = array();
-		foreach($operations as $id => $val){
-			$objects_tmp[$id] = $val['object'];
-		}
-		array_multisort($objects_tmp, SORT_DESC, $operations);
 		
 		$delay = count_operations_delay($operations,$esc_period);
 		foreach($operations as $id => $val){
