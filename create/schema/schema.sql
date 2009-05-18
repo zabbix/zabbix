@@ -362,6 +362,12 @@ FIELD		|operator	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|operationid
 
+TABLE|opmediatypes|opmediatypeid|ZBX_SYNC
+FIELD		|opmediatypeid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|operationid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|operations
+FIELD		|mediatypeid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|media_type
+UNIQUE		|1		|operationid
+
 TABLE|escalations|escalationid|0
 FIELD		|escalationid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|actionid	|t_id		|'0'	|NOT NULL	|0			|actions

@@ -35,6 +35,7 @@
 ZBX_USER_MSG
 {
 	zbx_uint64_t	userid;
+	zbx_uint64_t	mediatypeid;
 	char		*subject;
 	char		*message;
 	void		*next;
@@ -163,7 +164,7 @@ static int	get_trigger_permision(zbx_uint64_t userid, zbx_uint64_t triggerid)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		hostid = zbx_atoui64(row[0]);
+		ZBX_STR2UINT64(hostid, row[0]);
 		host_perm = get_host_permision(userid, hostid);
 
 		if (perm < host_perm)
@@ -178,7 +179,8 @@ static int	get_trigger_permision(zbx_uint64_t userid, zbx_uint64_t triggerid)
 	return perm;
 }
 
-static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t triggerid, ZBX_USER_MSG **user_msg, char *subject, char *message)
+static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, zbx_uint64_t triggerid, ZBX_USER_MSG **user_msg,
+		char *subject, char *message)
 {
 	ZBX_USER_MSG	*p;
 
@@ -203,6 +205,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t triggerid, ZBX_USER_M
 		p = zbx_malloc(p, sizeof(ZBX_USER_MSG));
 
 		p->userid = userid;
+		p->mediatypeid = mediatypeid;
 		p->subject = strdup(subject);
 		p->message = strdup(message);
 		p->next = *user_msg;
@@ -215,10 +218,19 @@ static void	add_object_msg(zbx_uint64_t triggerid, DB_OPERATION *operation, ZBX_
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+	zbx_uint64_t	mediatypeid = 0, userid;
+
+	result = DBselect("select mediatypeid from opmediatypes where operationid=" ZBX_FS_UI64,
+			operation->operationid);
+
+	if (NULL != (row = DBfetch(result)))
+		ZBX_STR2UINT64(mediatypeid, row[0]);
+
+	DBfree_result(result);
 
 	switch (operation->object) {
 		case OPERATION_OBJECT_USER:
-			add_user_msg(operation->objectid, triggerid, user_msg, subject, message);
+			add_user_msg(operation->objectid, mediatypeid, triggerid, user_msg, subject, message);
 			break;
 		case OPERATION_OBJECT_GROUP:
 			result = DBselect("select ug.userid from users_groups ug,usrgrp g"
@@ -227,7 +239,10 @@ static void	add_object_msg(zbx_uint64_t triggerid, DB_OPERATION *operation, ZBX_
 					GROUP_STATUS_ACTIVE);
 
 			while (NULL != (row = DBfetch(result)))
-				add_user_msg(zbx_atoui64(row[0]), triggerid, user_msg, subject, message);
+			{
+				ZBX_STR2UINT64(userid, row[0]);
+				add_user_msg(userid, mediatypeid, triggerid, user_msg, subject, message);
+			}
 
 			DBfree_result(result);
 			break;
@@ -270,11 +285,12 @@ static void	add_command_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 	zbx_free(command_esc);
 }
 
-static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action, zbx_uint64_t userid, char *subject, char *message)
+static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action,
+		zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *subject, char *message)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	alertid, mediatypeid;
+	zbx_uint64_t	alertid;
 	int		now, severity, medias = 0;
 	char		*sendto_esc, *subject_esc, *message_esc, *error_esc;
 	char		error[MAX_STRING_LEN];
@@ -286,15 +302,26 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 	subject_esc	= DBdyn_escape_string_len(subject, ALERT_SUBJECT_LEN);
 	message_esc	= DBdyn_escape_string(message);
 
-	result = DBselect("select mediatypeid,sendto,severity,period from media"
-			" where active=%d and userid=" ZBX_FS_UI64,
-			MEDIA_STATUS_ACTIVE,
-			userid);
+	if (0 == mediatypeid)
+	{
+		result = DBselect("select mediatypeid,sendto,severity,period from media"
+				" where active=%d and userid=" ZBX_FS_UI64,
+				MEDIA_STATUS_ACTIVE,
+				userid);
+	}
+	else
+	{
+		result = DBselect("select mediatypeid,sendto,severity,period from media"
+				" where active=%d and userid=" ZBX_FS_UI64 " and mediatypeid=" ZBX_FS_UI64,
+				MEDIA_STATUS_ACTIVE,
+				userid,
+				mediatypeid);
+	}
 
 	while (NULL != (row = DBfetch(result))) {
 		medias		= 1;
 
-		mediatypeid	= zbx_atoui64(row[0]);
+		ZBX_STR2UINT64(mediatypeid, row[0]);
 		severity	= atoi(row[2]);
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Trigger severity [%d] Media severity [%d] Period [%s]",
@@ -501,11 +528,11 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 	while (NULL != (row = DBfetch(result))) {
 		memset(&operation, 0, sizeof(operation));
-		operation.operationid	= zbx_atoui64(row[0]);
+		ZBX_STR2UINT64(operation.operationid, row[0]);
 		operation.actionid	= action->actionid;
 		operation.operationtype	= atoi(row[1]);
 		operation.object	= atoi(row[2]);
-		operation.objectid	= zbx_atoui64(row[3]);
+		ZBX_STR2UINT64(operation.objectid, row[3]);
 		operation.default_msg	= atoi(row[4]);
 		operation.shortdata	= strdup(row[5]);
 		operation.longdata	= strdup(row[6]);
@@ -530,7 +557,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 						shortdata = action->shortdata;
 						longdata = action->longdata;
 					}
-					
+
 					add_object_msg(event->objectid, &operation, &user_msg, shortdata, longdata);
 					break;
 				case	OPERATION_TYPE_COMMAND:
@@ -554,7 +581,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		p = user_msg;
 		user_msg = user_msg->next;
 
-		add_message_alert(escalation, event, action, p->userid, p->subject, p->message);
+		add_message_alert(escalation, event, action, p->userid, p->mediatypeid, p->subject, p->message);
 
 		zbx_free(p->subject);
 		zbx_free(p->message);
@@ -587,22 +614,23 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	userid;
+	zbx_uint64_t	userid, mediatypeid;
 
 	if (1 == action->recovery_msg)
 	{
-		result = DBselect("select distinct userid from alerts where actionid=" ZBX_FS_UI64
-				" and eventid=" ZBX_FS_UI64 " and alerttype=%d",
+		result = DBselect("select distinct userid,mediatypeid from alerts where actionid=" ZBX_FS_UI64
+				" and eventid=" ZBX_FS_UI64 " and mediatypeid<>0 and alerttype=%d",
 				action->actionid,
 				escalation->eventid,
 				ALERT_TYPE_MESSAGE);
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			userid = zbx_atoui64(row[0]);
+			ZBX_STR2UINT64(userid, row[0]);
+			ZBX_STR2UINT64(mediatypeid, row[1]);
 
 			escalation->esc_step = 0;
-			add_message_alert(escalation, r_event, action, userid, action->shortdata, action->longdata);
+			add_message_alert(escalation, r_event, action, userid, mediatypeid, action->shortdata, action->longdata);
 		}
 
 		DBfree_result(result);
@@ -764,7 +792,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	if (NULL != (row = DBfetch(result)))
 	{
 		memset(&action, 0, sizeof(action));
-		action.actionid		= zbx_atoui64(row[0]);
+		ZBX_STR2UINT64(action.actionid, row[0]);
 		action.eventsource	= atoi(row[1]);
 		action.esc_period	= atoi(row[2]);
 		action.shortdata	= strdup(row[3]);
@@ -839,14 +867,14 @@ static void	process_escalations(int now)
 
 	while (NULL != (row = DBfetch(result))) {
 		memset(&escalation, 0, sizeof(escalation));
-		escalation.escalationid		= zbx_atoui64(row[0]);
-		escalation.actionid		= zbx_atoui64(row[1]);
-		escalation.triggerid		= zbx_atoui64(row[2]);
-		escalation.eventid		= zbx_atoui64(row[3]);
-		escalation.r_eventid		= zbx_atoui64(row[4]);
-		escalation.esc_step		= atoi(row[5]);
-		escalation.status		= atoi(row[6]);
-		escalation.nextcheck		= 0;
+		ZBX_STR2UINT64(escalation.escalationid, row[0]);
+		ZBX_STR2UINT64(escalation.actionid, row[1]);
+		ZBX_STR2UINT64(escalation.triggerid, row[2]);
+		ZBX_STR2UINT64(escalation.eventid, row[3]);
+		ZBX_STR2UINT64(escalation.r_eventid, row[4]);
+		escalation.esc_step	= atoi(row[5]);
+		escalation.status	= atoi(row[6]);
+		escalation.nextcheck	= 0;
 
 		DBbegin();
 
