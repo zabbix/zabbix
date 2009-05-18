@@ -593,7 +593,10 @@ function __autoload($class_name){
 		if($level > 32) return array();
 
 		$result = array();
-		$result[$parentid] = $tree[$parentid];
+		if(isset($tree[$parentid])){
+			$result[$parentid] = $tree[$parentid];
+		}
+		
 		foreach($tree as $id => $child){
 			if($child[$parent_field] == $parentid){
 				$result[$id] = $child;
