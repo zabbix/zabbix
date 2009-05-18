@@ -3959,6 +3959,13 @@
 					$operation_data['opconditions'][] = $db_opcond;
 				}
 
+				$sql = 'SELECT * from opmediatypes WHERE operationid='.$operation_data['operationid'];
+
+				$db_opmtypes = DBSelect($sql);
+				if($db_opmtype = DBfetch($db_opmtypes)){
+					$operation_data['mediatypeid'] = $db_opmtype['mediatypeid'];
+				}
+
 				if(str_in_array($operation_data, $operations)) continue;
 				array_push($operations, $operation_data);
 			}
@@ -3998,6 +4005,7 @@
 
 			if(!isset($val['default_msg'])) $val['default_msg'] = 0;
 			if(!isset($val['opconditions'])) $val['opconditions'] = array();
+			if(!isset($val['mediatypeid'])) $val['mediatypeid'] = 0;
 
 			$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $val));
 			$oper_details->SetHint(nl2br(get_operation_desc(LONG_DESCRITION, $val)));
@@ -4026,6 +4034,7 @@
 			$tblOper->addItem(new CVar('operations['.$id.'][operationtype]'	,$val['operationtype']));
 			$tblOper->addItem(new CVar('operations['.$id.'][object]'	,$val['object']	));
 			$tblOper->addItem(new CVar('operations['.$id.'][objectid]'	,$val['objectid']));
+			$tblOper->addItem(new CVar('operations['.$id.'][mediatypeid]'	,$val['mediatypeid']));
 			$tblOper->addItem(new CVar('operations['.$id.'][shortdata]'	,$val['shortdata']));
 			$tblOper->addItem(new CVar('operations['.$id.'][longdata]'	,$val['longdata']));
 			$tblOper->addItem(new CVar('operations['.$id.'][esc_period]'	,$val['esc_period']	));
@@ -4091,6 +4100,7 @@
 		if(!isset($new_operation['operationtype']))	$new_operation['operationtype']	= OPERATION_TYPE_MESSAGE;
 		if(!isset($new_operation['object']))		$new_operation['object']	= OPERATION_OBJECT_GROUP;
 		if(!isset($new_operation['objectid']))		$new_operation['objectid']	= 0;
+		if(!isset($new_operation['mediatypeid']))	$new_operation['mediatypeid']	= 0;
 		if(!isset($new_operation['shortdata']))		$new_operation['shortdata']	= '{TRIGGER.NAME}: {STATUS}';
 		if(!isset($new_operation['longdata']))		$new_operation['longdata']	= '{TRIGGER.NAME}: {STATUS}';
 		if(!isset($new_operation['esc_step_from']))		$new_operation['esc_step_from'] = 1;
@@ -4182,6 +4192,60 @@
 							'",450,450)',
 							'T')
 					)));
+
+				$cmbMediaType = new CComboBox('new_operation[mediatypeid]', $new_operation['mediatypeid'], 'submit()');
+				$cmbMediaType->addItem(0, S_MINUS_ALL_MINUS);
+
+				if (OPERATION_OBJECT_USER == $new_operation['object']) {
+					$sql = 'SELECT DISTINCT mt.mediatypeid,mt.description,m.userid'.
+							' FROM media_type mt'.
+								' LEFT JOIN media m'.
+									' ON m.mediatypeid=mt.mediatypeid'.
+									' AND m.userid='.$new_operation['objectid'].
+									' AND m.active=0'.
+							' ORDER BY mt.description';
+
+					$db_mediatypes = DBselect($sql);
+					while($db_mediatype = DBfetch($db_mediatypes))
+						$cmbMediaType->addItem($db_mediatype['mediatypeid'], $db_mediatype['description'],
+								null, is_null($db_mediatype['userid']) ? 'no' : 'yes');
+				}
+				else{
+					$sql = 'SELECT mediatypeid,description'.
+							' FROM media_type'.
+							' ORDER BY description';
+							' ORDER BY mt.description';
+
+					$db_mediatypes = DBselect($sql);
+					while($db_mediatype = DBfetch($db_mediatypes))
+						$cmbMediaType->addItem($db_mediatype['mediatypeid'], $db_mediatype['description']);
+				}
+
+				$tblNewOperation->addRow(array(S_SEND_ONLY_TO, array($cmbMediaType, S_MEDIAS_SMALL)));
+
+				if (OPERATION_OBJECT_USER == $new_operation['object']) {
+					$media_table = new CTableInfo(S_NO_MEDIA_DEFINED);
+
+					$db_medias = DBselect('SELECT mt.description,m.sendto,m.period,m.severity'.
+						' FROM media_type mt,media m'.
+						' WHERE mt.mediatypeid=m.mediatypeid'.
+						' AND m.userid='.$new_operation['objectid'].
+						($new_operation['mediatypeid'] ? ' AND m.mediatypeid='.$new_operation['mediatypeid'] : '').
+						' AND m.active=0'.
+						' ORDER BY mt.description,m.sendto');
+					while($db_media = DBfetch($db_medias))
+					{
+						$media_table->addRow(array(
+								new CSpan($db_media['description'], 'nowrap'),
+								new CSpan($db_media['sendto'], 'nowrap'),
+								new CSpan($db_media['period'], 'nowrap'),
+								media_severity2str($db_media['severity'])
+								));
+
+					}
+			
+					$tblNewOperation->addRow(array(S_USER_MEDIAS, $media_table));
+				}
 
 				$tblNewOperation->addRow(array(S_DEFAULT_MESSAGE, new CCheckBox('new_operation[default_msg]', $new_operation['default_msg'], 'javascript: submit();',1)));
 

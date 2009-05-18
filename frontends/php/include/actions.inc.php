@@ -178,6 +178,8 @@ function add_action_operation($actionid, $operation){
 		$result &= add_operation_condition($operationid, $opcondition);
 	}
 
+	$result &= add_operation_mediatype($operationid, $operation['mediatypeid']);
+
 	return $operationid;
 }
 
@@ -197,6 +199,22 @@ function add_operation_condition($operationid, $opcondition){
 		return $result;
 
 return $opconditionid;
+}
+
+// Add operation mediatype
+function add_operation_mediatype($operationid, $mediatypeid){
+	if (0 == $mediatypeid)
+		return;
+
+	$opmediatypeid = get_dbid('opmediatypes', 'opmediatypeid');
+
+	$result = DBexecute('INSERT INTO opmediatypes (opmediatypeid,operationid,mediatypeid)'.
+		' values ('.$opmediatypeid.','.$operationid.','.$mediatypeid.')');
+
+	if(!$result)
+		return $result;
+
+return $opmediatypeid;
 }
 
 // Add Action			
@@ -288,6 +306,7 @@ function update_action($actionid, $name, $eventsource, $esc_period, $def_shortda
 		$opers = get_operations_by_actionid($actionid);
 		while($operation = DBFetch($opers)){
 			DBexecute('DELETE FROM opconditions WHERE operationid='.$operation['operationid']);
+			DBexecute('DELETE FROM opmediatypes WHERE operationid='.$operation['operationid']);
 		}
 		DBexecute('DELETE FROM operations WHERE actionid='.$actionid);
 		
