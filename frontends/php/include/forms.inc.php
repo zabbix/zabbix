@@ -4187,8 +4187,12 @@
 						new CTextBox('object_name', $object_name, 40, 'yes'),
 						new CButton('select_object',S_SELECT,
 							'return PopUp("popup.php?dstfrm='.S_ACTION.
-							'&dstfld1=new_operation%5Bobjectid%5D&dstfld2=object_name'.
-							'&srctbl='.$object_srctbl.'&srcfld1='.$object_srcfld1.'&srcfld2='.$display_name.
+							'&dstfld1=new_operation%5Bobjectid%5D'.
+							'&dstfld2=object_name'.
+							'&srctbl='.$object_srctbl.
+							'&srcfld1='.$object_srcfld1.
+							'&srcfld2='.$display_name.
+							'&submit=1'.
 							'",450,450)',
 							'T')
 					)));
@@ -4197,51 +4201,50 @@
 				$cmbMediaType->addItem(0, S_MINUS_ALL_MINUS);
 
 				if (OPERATION_OBJECT_USER == $new_operation['object']) {
-					$sql = 'SELECT DISTINCT mt.mediatypeid,mt.description,m.userid'.
-							' FROM media_type mt'.
-								' LEFT JOIN media m'.
-									' ON m.mediatypeid=mt.mediatypeid'.
-									' AND m.userid='.$new_operation['objectid'].
-									' AND m.active=0'.
+					$sql = 'SELECT DISTINCT mt.mediatypeid,mt.description,m.userid '.
+							' FROM media_type mt, media m '.
+							' WHERE '.DBin_node('m.mediatypeid').
+								' AND m.mediatypeid=mt.mediatypeid '.
+								' AND m.userid='.$new_operation['objectid'].
+								' AND m.active='.ACTION_STATUS_ENABLED.
 							' ORDER BY mt.description';
-
 					$db_mediatypes = DBselect($sql);
-					while($db_mediatype = DBfetch($db_mediatypes))
-						$cmbMediaType->addItem($db_mediatype['mediatypeid'], $db_mediatype['description'],
-								null, is_null($db_mediatype['userid']) ? 'no' : 'yes');
+					while($db_mediatype = DBfetch($db_mediatypes)){
+						$cmbMediaType->addItem($db_mediatype['mediatypeid'], $db_mediatype['description']);
+					}
 				}
 				else{
-					$sql = 'SELECT mediatypeid,description'.
-							' FROM media_type'.
-							' ORDER BY description';
+					$sql = 'SELECT mt.mediatypeid, mt.description'.
+							' FROM media_type mt '.
+							' WHERE '.DBin_node('m.mediatypeid').
 							' ORDER BY mt.description';
-
 					$db_mediatypes = DBselect($sql);
-					while($db_mediatype = DBfetch($db_mediatypes))
+					while($db_mediatype = DBfetch($db_mediatypes)){
 						$cmbMediaType->addItem($db_mediatype['mediatypeid'], $db_mediatype['description']);
+					}
 				}
 
 				$tblNewOperation->addRow(array(S_SEND_ONLY_TO, $cmbMediaType));
 
-				if (OPERATION_OBJECT_USER == $new_operation['object']) {
+				if(OPERATION_OBJECT_USER == $new_operation['object']){
 					$media_table = new CTableInfo(S_NO_MEDIA_DEFINED);
 
-					$db_medias = DBselect('SELECT mt.description,m.sendto,m.period,m.severity'.
-						' FROM media_type mt,media m'.
-						' WHERE mt.mediatypeid=m.mediatypeid'.
-						' AND m.userid='.$new_operation['objectid'].
-						($new_operation['mediatypeid'] ? ' AND m.mediatypeid='.$new_operation['mediatypeid'] : '').
-						' AND m.active=0'.
-						' ORDER BY mt.description,m.sendto');
-					while($db_media = DBfetch($db_medias))
-					{
+					$sql = 'SELECT mt.description,m.sendto,m.period,m.severity '.
+							' FROM media_type mt,media m '.
+							' WHERE '.DBin_node('m.mediatypeid').
+								' AND mt.mediatypeid=m.mediatypeid '.
+								' AND m.userid='.$new_operation['objectid'].
+								($new_operation['mediatypeid'] ? ' AND m.mediatypeid='.$new_operation['mediatypeid'] : '').
+								' AND m.active='.ACTION_STATUS_ENABLED.
+							' ORDER BY mt.description,m.sendto';
+					$db_medias = DBselect($sql);
+					while($db_media = DBfetch($db_medias)){
 						$media_table->addRow(array(
 								new CSpan($db_media['description'], 'nowrap'),
 								new CSpan($db_media['sendto'], 'nowrap'),
 								new CSpan($db_media['period'], 'nowrap'),
 								media_severity2str($db_media['severity'])
 								));
-
 					}
 			
 					$tblNewOperation->addRow(array(S_USER_MEDIAS, $media_table));
