@@ -4221,7 +4221,7 @@
 						$cmbMediaType->addItem($db_mediatype['mediatypeid'], $db_mediatype['description']);
 				}
 
-				$tblNewOperation->addRow(array(S_SEND_ONLY_TO, array($cmbMediaType, S_MEDIAS_SMALL)));
+				$tblNewOperation->addRow(array(S_SEND_ONLY_TO, $cmbMediaType));
 
 				if (OPERATION_OBJECT_USER == $new_operation['object']) {
 					$media_table = new CTableInfo(S_NO_MEDIA_DEFINED);
