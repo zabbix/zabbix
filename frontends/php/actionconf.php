@@ -26,6 +26,7 @@
 	require_once 'include/triggers.inc.php';
 	require_once 'include/events.inc.php';
 	require_once 'include/forms.inc.php';
+	require_once "include/media.inc.php";
 
 
 	$page['title']	= "S_CONFIGURATION_OF_ACTIONS";

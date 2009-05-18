@@ -268,6 +268,9 @@
 	'S_CANNOT_UNLINK_FROM_TEMPLATE'=>	'Cannot unlink from template',
 	'S_HOST_TEMPLATE'=>					'Host template',
 	'S_EVENT_ACKNOWLEDGED'=>			'Event acknowledged',
+	'S_SEND_ONLY_TO'=>			'Send only to',
+	'S_MEDIAS_SMALL'=>			'medias',
+	'S_USER_MEDIAS'=>			'User medias',
 
 	'S_INCORRECT_TRIGGER'=>			'Incorrect trigger',
 	'S_INCORRECT_HOST'=>			'Incorrect host',
