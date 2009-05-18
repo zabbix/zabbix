@@ -4203,7 +4203,7 @@
 				if (OPERATION_OBJECT_USER == $new_operation['object']) {
 					$sql = 'SELECT DISTINCT mt.mediatypeid,mt.description,m.userid '.
 							' FROM media_type mt, media m '.
-							' WHERE '.DBin_node('m.mediatypeid').
+							' WHERE '.DBin_node('mt.mediatypeid').
 								' AND m.mediatypeid=mt.mediatypeid '.
 								' AND m.userid='.$new_operation['objectid'].
 								' AND m.active='.ACTION_STATUS_ENABLED.
@@ -4216,7 +4216,7 @@
 				else{
 					$sql = 'SELECT mt.mediatypeid, mt.description'.
 							' FROM media_type mt '.
-							' WHERE '.DBin_node('m.mediatypeid').
+							' WHERE '.DBin_node('mt.mediatypeid').
 							' ORDER BY mt.description';
 					$db_mediatypes = DBselect($sql);
 					while($db_mediatype = DBfetch($db_mediatypes)){
@@ -4231,7 +4231,7 @@
 
 					$sql = 'SELECT mt.description,m.sendto,m.period,m.severity '.
 							' FROM media_type mt,media m '.
-							' WHERE '.DBin_node('m.mediatypeid').
+							' WHERE '.DBin_node('mt.mediatypeid').
 								' AND mt.mediatypeid=m.mediatypeid '.
 								' AND m.userid='.$new_operation['objectid'].
 								($new_operation['mediatypeid'] ? ' AND m.mediatypeid='.$new_operation['mediatypeid'] : '').
