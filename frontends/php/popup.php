@@ -151,6 +151,7 @@ include_once('include/page_header.php');
 		'host_templates'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		'existed_templates'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		'multiselect'=>		array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
+		'submit'=>		array(T_ZBX_STR,O_OPT,	null,	null,	null),
 		
 		'only_hostid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'monitored_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
@@ -203,10 +204,9 @@ include_once('include/page_header.php');
 	function get_window_opener($frame, $field, $value){
 //		return empty($field) ? "" : "window.opener.document.forms['".addslashes($frame)."'].elements['".addslashes($field)."'].value='".addslashes($value)."';";
 		if(empty($field)) return '';
-
 //						"alert(window.opener.document.getElementById('".addslashes($field)."').value);".
 		$script = 	'try{'.
-						"window.opener.document.getElementById('".addslashes($field)."').value='".addslashes($value)."';".
+						"window.opener.document.getElementById('".addslashes($field)."').value='".addslashes($value)."'; ".
 					'} catch(e){'.
 						'throw("Error: Target not found")'.
 					'}'."\n";
@@ -612,7 +612,8 @@ include_once('include/page_header.php');
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
+				(isset($_REQUEST['submit'])?" window.opener.document.getElementsByName('$dstfrm')[0].submit();":'');
 			}
 			$alias = new CSpan(get_node_name_by_elid($row['userid']).$row['alias'], 'link');
 			$alias->onClick($action.' close_window(); return false;');
