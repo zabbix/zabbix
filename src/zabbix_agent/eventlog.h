@@ -26,6 +26,7 @@ int process_eventlog(
 	unsigned long	*out_timestamp, 
 	char			**out_source, 
 	unsigned short	*out_severity,
-	char			**out_message);
+	char			**out_message,
+	unsigned long	*out_eventid);
 
 #endif /* ZABBIX_EVENTLOG_H */
