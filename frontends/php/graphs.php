@@ -90,7 +90,8 @@ include_once "include/page_header.php";
 	$_REQUEST['items'] = get_request('items', array());
 	$_REQUEST['group_gid'] = get_request('group_gid', array());
 	
-	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, null, null, get_current_nodeid());
+	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid());
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 
 	if(isset($_REQUEST["clone"]) && isset($_REQUEST["graphid"]))
@@ -302,11 +303,14 @@ include_once "include/page_header.php";
 
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 
-		$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
-			" where h.hostid in (".$availiable_hosts.") ".
-			" and hg.groupid=g.groupid ".
-			" and h.hostid=i.hostid and hg.hostid=h.hostid ".
-			" order by g.name");
+		$sql = 'select distinct g.groupid,g.name '.
+			' from groups g, hosts_groups hg, hosts h, items i '.
+			' where g.groupid in ('.$available_groups.') '.
+				' and hg.groupid=g.groupid '.
+				' and h.hostid=i.hostid '.
+				' and hg.hostid=h.hostid '.
+			' order by g.name';
+		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
 			$cmbGroup->AddItem($row["groupid"],$row["name"]);
