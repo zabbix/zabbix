@@ -224,6 +224,7 @@ FIELD		|timestamp	|t_time		|'0'	|NOT NULL	|0
 FIELD		|source		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value		|t_history_log	|''	|NOT NULL	|0
+FIELD		|logeventid	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|itemid,clock
 UNIQUE		|2		|itemid,id
 
@@ -243,6 +244,7 @@ FIELD		|timestamp	|t_time		|'0'	|NOT NULL	|0
 FIELD		|source		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value		|t_history_log	|''	|NOT NULL	|0
+FIELD		|logeventid	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|clock
 
 TABLE|proxy_dhistory|id|0

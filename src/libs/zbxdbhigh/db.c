@@ -1257,7 +1257,8 @@ lbl_exit:
 	return SUCCEED;
 }
 
-int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, int lastlogsize)
+int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity,
+		int logeventid, int lastlogsize)
 {
 	char		*value_esc, *source_esc;
 
@@ -1266,15 +1267,16 @@ int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp
 	value_esc = DBdyn_escape_string(value);
 	source_esc = DBdyn_escape_string_len(source, HISTORY_LOG_SOURCE_LEN);
 
-	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity)"
-			" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",
+	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity,logeventid)"
+			" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d,%d)",
 			DBget_maxid("history_log", "id"),
 			clock,
 			itemid,
 			timestamp,
 			value_esc,
 			source_esc,
-			severity);
+			severity,
+			logeventid);
 
 	zbx_free(source_esc);
 	zbx_free(value_esc);
@@ -1876,6 +1878,9 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->params		= row[37];		/* !!! WHAT about CLOB??? */
 
 	item->eventlog_source	= NULL;
+	item->timestamp		= 0;
+	item->eventlog_severity	= 0;
+	item->logeventid	= 0;
 
 	item->useipmi		= atoi(row[39]);
 	item->ipmi_ip		= row[51];
@@ -2189,7 +2194,8 @@ void	DBproxy_add_history_text(zbx_uint64_t itemid, char *value, int clock)
 	zbx_free(value_esc);
 }
 
-void	DBproxy_add_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, int lastlogsize)
+void	DBproxy_add_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity,
+		int logeventid, int lastlogsize)
 {
 	char		*source_esc, *value_esc;
 
@@ -2198,14 +2204,15 @@ void	DBproxy_add_history_log(zbx_uint64_t itemid, char *value, int clock, int ti
 	source_esc = DBdyn_escape_string_len(source, HISTORY_LOG_SOURCE_LEN);
 	value_esc = DBdyn_escape_string(value);
 
-	DBexecute("insert into proxy_history (itemid,clock,timestamp,source,severity,value)"
-			" values (" ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s')",
+	DBexecute("insert into proxy_history (itemid,clock,timestamp,source,severity,value,logeventid)"
+			" values (" ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s',%d)",
 			itemid,
 			clock,
 			timestamp,
 			source_esc,
 			severity,
-			value_esc);
+			value_esc,
+			logeventid);
 
 	zbx_free(value_esc);
 	zbx_free(source_esc);

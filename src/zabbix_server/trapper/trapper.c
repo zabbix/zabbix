@@ -245,6 +245,7 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 
 						item.eventlog_severity = values[i].severity;
 						item.eventlog_source = values[i].source;
+						item.logeventid = values[i].logeventid;
 
 /*						zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] Lastlogsize [%s] Timestamp [%s]",
 								values[i].value,
@@ -438,6 +439,9 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGSEVERITY, tmp, sizeof(tmp)))
 			av->severity = atoi(tmp);
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGEVENTID, tmp, sizeof(tmp)))
+			av->logeventid = atoi(tmp);
 
 		value_num ++;
 

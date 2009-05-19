@@ -702,6 +702,7 @@
 	'S_TIMESTAMP'=>				'Timestamp',
 	'S_LOCAL'=>				'Local',
 	'S_SOURCE'=>				'Source',
+	'S_EVENT_ID'=>				'Event ID',
 	'S_SHOW_UNKNOWN'=>			'Show unknown',
 	'S_HIDE_UNKNOWN'=>			'Hide unknown',
 

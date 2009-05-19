@@ -1686,6 +1686,28 @@ char	*zbx_age2str(int age)
 	return buffer;
 }
 
+static int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
+{
+	if (NULL == s1 && NULL == s2)
+		return 0;
+
+	if (NULL == s1)
+		return 1;
+
+	if (NULL == s2)
+		return -1;
+
+	while (n && '\0' != *s1 && '\0' != *s2 &&
+			tolower((unsigned char)*s1) == tolower((unsigned char)*s2))
+	{
+		s1++;
+		s2++;
+		n--;
+	}
+
+	return n == 0 ? 0 : tolower((unsigned char)*s1) - tolower((unsigned char)*s2);
+}
+
 char	*zbx_strcasestr(const char *haystack, const char *needle)
 {
 /*#ifdef HAVE_STRCASESTR
@@ -1707,7 +1729,7 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 
 	for (p = haystack; p <= &haystack[sz_h - sz_n]; p++)
 	{
-		if (0 == strncasecmp(p, needle, sz_n))
+		if (0 == zbx_strncasecmp(p, needle, sz_n))
 			return (char *)p;
 	}
 

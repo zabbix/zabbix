@@ -469,6 +469,8 @@ static int	send_buffer(
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, buffer.data[i].source, ZBX_JSON_TYPE_STRING);
 		if (buffer.data[i].severity)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, buffer.data[i].severity);
+		if (buffer.data[i].logeventid)
+			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGEVENTID, buffer.data[i].logeventid);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, buffer.data[i].clock);
 		zbx_json_close(&json);
 	}
@@ -560,7 +562,8 @@ static int	process_value(
 		long			*lastlogsize,
 		unsigned long	*timestamp,
 		const char		*source, 
-		unsigned short	*severity
+		unsigned short	*severity,
+		unsigned long	*logeventid
 )
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
@@ -613,6 +616,8 @@ static int	process_value(
 		el->lastlogsize	= *lastlogsize;
 	if (timestamp)
 		el->timestamp	= *timestamp;
+	if (logeventid)
+		el->logeventid	= (int)*logeventid;
 	el->clock	= (int)time(NULL);
 
 /*	zabbix_log(LOG_LEVEL_DEBUG, "BUFFER");
@@ -630,7 +635,7 @@ static void	process_active_checks(char *server, unsigned short port)
 	register int	i, s_count, p_count;
 	char		**pvalue;
 	int		now, send_err = SUCCEED, ret;
-	unsigned long	timestamp;
+	unsigned long	timestamp, logeventid;
 	char		*source = NULL;
 	char		*value = NULL;
 	unsigned short	severity;
@@ -685,6 +690,7 @@ static void	process_active_checks(char *server, unsigned short port)
 									&lastlogsize,
 									NULL,
 									NULL,
+									NULL,
 									NULL
 								);
 						s_count++;
@@ -720,6 +726,7 @@ static void	process_active_checks(char *server, unsigned short port)
 								&active_metrics[i].lastlogsize,
 								NULL,
 								NULL,
+								NULL,
 								NULL
 							);
 				}
@@ -746,7 +753,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
 				while (SUCCEED == (ret = process_eventlog(filename, &lastlogsize,
-					&timestamp, &source, &severity, &value)))
+					&timestamp, &source, &severity, &value, &logeventid)))
 				{
 					if (!value) /* EOF */
 						break;
@@ -761,7 +768,8 @@ static void	process_active_checks(char *server, unsigned short port)
 									&lastlogsize,
 									&timestamp,
 									source,
-									&severity
+									&severity,
+									&logeventid
 								);
 						s_count++;
 					}
@@ -797,6 +805,7 @@ static void	process_active_checks(char *server, unsigned short port)
 								&active_metrics[i].lastlogsize,
 								NULL,
 								NULL,
+								NULL,
 								NULL
 							);
 				}
@@ -820,6 +829,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						CONFIG_HOSTNAME,
 						active_metrics[i].key_orig,
 						*pvalue,
+						NULL,
 						NULL,
 						NULL,
 						NULL,

@@ -353,7 +353,8 @@ include_once "include/page_header.php";
 					$sql_filter = ' AND h.value NOT LIKE '.zbx_dbstr('%'.$_REQUEST['filter'].'%');
 			}
 
-			$sql = 'SELECT hst.host,i.itemid,i.key_,i.description,h.clock,h.value,i.valuemapid,h.timestamp,h.source,h.severity '.
+			$sql = 'SELECT hst.host,i.itemid,i.key_,i.description,h.clock,h.value,i.valuemapid,h.timestamp,h.source,'.
+					'h.severity,h.logeventid '.
 					' FROM history_log h, items i, hosts hst '.
 					' WHERE hst.hostid=i.hostid '.
 						' AND h.itemid=i.itemid'.$sql_filter.
@@ -370,6 +371,7 @@ include_once "include/page_header.php";
 						S_LOCAL_TIME,
 						S_SOURCE,
 						S_SEVERITY,
+						S_EVENT_ID,
 						S_VALUE),'header');
 
 				$table->ShowStart(); // to solve memory leak we call 'Show' method by steps
@@ -424,6 +426,13 @@ include_once "include/page_header.php";
 							get_severity_style($row['severity'])
 							)
 					);
+
+				if($row['source'] == '' && $row['logeventid'] == '0'){
+					array_push($new_row,new CCol(' - '));
+				}
+				else{
+					array_push($new_row,$row['logeventid']);
+				}
 
 				$row['value'] = trim($row['value'],"\r\n");
 				$row['value'] = encode_log($row['value']);
