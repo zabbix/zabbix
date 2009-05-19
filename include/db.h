@@ -381,6 +381,7 @@ DB_ITEM
 	int	timestamp;
 	int	eventlog_severity;
 	char	*eventlog_source;
+	int	logeventid;
 
 	char	*logtimefmt;
 	zbx_uint64_t	valuemapid;
@@ -686,7 +687,8 @@ int	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 
 int	DBadd_history(zbx_uint64_t itemid, double value, int clock);
-int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, int lastlogsize);
+int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity,
+		int logeventid, int lastlogsize);
 int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock);
 int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock);
 int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
@@ -695,7 +697,8 @@ void	DBproxy_add_history(zbx_uint64_t itemid, double value, int clock);
 void	DBproxy_add_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 void	DBproxy_add_history_str(zbx_uint64_t itemid, char *value, int clock);
 void	DBproxy_add_history_text(zbx_uint64_t itemid, char *value, int clock);
-void	DBproxy_add_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, int lastlogsize);
+void	DBproxy_add_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity,
+		int logeventid, int lastlogsize);
 
 
 void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num);

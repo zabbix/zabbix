@@ -56,6 +56,7 @@ typedef struct zbx_active_buffer_element_type
 	int	severity;
 	long	lastlogsize;
 	int	clock;
+	int	logeventid;
 } ZBX_ACTIVE_BUFFER_ELEMENT;
 
 typedef struct zbx_active_buffer_type
