@@ -2959,6 +2959,7 @@
 		$tblHlink = new CTableInfo();
 		$tblHlink->addOption('style','background-color: #CCC;');
 
+		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 
 //		validate_group(PERM_READ_WRITE,array('real_hosts'),'web.last.conf.groupid');
@@ -2967,7 +2968,7 @@
 		$cmbGroups->addItem(0,S_ALL_S);
 		$sql = 'SELECT DISTINCT g.groupid,g.name '.
 				' FROM groups g,hosts_groups hg,hosts h '.
-				' WHERE '.DBcondition('h.hostid',$available_hosts).
+				' WHERE '.DBcondition('g.groupid',$available_groups).
 					' AND g.groupid=hg.groupid '.
 					' AND h.hostid=hg.hostid'.
 					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
@@ -3036,8 +3037,7 @@
 		$tblGlink = new CTableInfo();
 		$tblGlink->addOption('style','background-color: #CCC;');
 
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-
+		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 
 		$groupids = get_request('groupids', array());
 
@@ -3057,7 +3057,7 @@
 				' FROM hosts h, hosts_groups hg, groups g '.$sql_from.
 				' WHERE hg.groupid=g.groupid'.
 					' AND h.hostid=hg.hostid '.
-					' AND '.DBcondition('h.hostid',$available_hosts).
+					' AND '.DBcondition('g.groupid',$available_groups).
 					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
 					$sql_where.
 				' ORDER BY g.name';
@@ -3073,7 +3073,7 @@
 				' FROM hosts h, hosts_groups hg, groups g '.
 				' WHERE hg.groupid=g.groupid'.
 					' AND h.hostid=hg.hostid '.
-					' AND '.DBcondition('h.hostid',$available_hosts).
+					' AND '.DBcondition('g.groupid',$available_groups).
 					' AND '.DBcondition('g.groupid',$groupids,true).
 					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
 				' ORDER BY g.name';
@@ -5288,6 +5288,8 @@
 	function insert_host_form($show_only_tmp=0){
 		global $USER_DETAILS;
 
+		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
+
 		$groups= get_request('groups',array());
 
 		$newgroup	= get_request('newgroup','');
@@ -5360,7 +5362,6 @@
 			$ipmi_password		= $db_host['ipmi_password'];
 
 // add groups
-			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 			$db_groups=DBselect('SELECT DISTINCT groupid '.
 							' FROM hosts_groups '.
 							' WHERE hostid='.$_REQUEST['hostid'].
@@ -5436,7 +5437,6 @@
 
 		$frmHost->addRow(S_NAME,new CTextBox('host',$host,54));
 
-		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST);
 		$grp_tb = new CTweenBox($frmHost,'groups',$groups,10);
 		$db_groups=DBselect('SELECT DISTINCT groupid,name '.
 						' FROM groups '.

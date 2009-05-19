@@ -1911,7 +1911,8 @@ include_once('include/page_header.php');
 			$form->show();
 		}
 	}
-	else if($_REQUEST['config'] == 6){		if(isset($_REQUEST["form"])){
+	else if($_REQUEST['config'] == 6){
+		if(isset($_REQUEST["form"])){
 			$frmMaintenance = new CForm('hosts.php','post');
 			$frmMaintenance->setName(S_MAINTENANCE);
 			
