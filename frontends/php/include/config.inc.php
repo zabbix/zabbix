@@ -598,7 +598,7 @@ function __autoload($class_name){
 		}
 		
 		foreach($tree as $id => $child){
-			if($child[$parent_field] == $parentid){
+			if(bccomp($child[$parent_field],$parentid) == 0){
 				$result[$id] = $child;
 				$childs = get_tree_by_parentid($id,$tree,$parent_field, $level); // RECURSION !!!
 				$result += $childs;	
