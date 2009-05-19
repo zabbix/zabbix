@@ -2,7 +2,7 @@ Changes for 1.0.0
 
  - [NTP-17] fixes in user permissions (Artem)
  - [NTD-91] fixed maintenance period selection by host-group or host (Artem)
- - [NTP-16] removed from events page option hosts all from dropdown, when group is selected (Artem)
+ - [NTP-16] added to events page option hosts all from dropdown, when group is selected (Artem)
  - [NTP-14] removed time limit when "No False For B" is selected (Artem)
  - [NTP-13] fixed link in popup in overview page type data (Artem)
  - [NTP-12] fixed styles in menu for IE6 (Artem)

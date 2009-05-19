@@ -4176,6 +4176,8 @@ include_once 'include/discovery.inc.php';
 
 		$frm_title	= $show_only_tmp ? S_TEMPLATE : S_HOST;
 
+		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid());
+		
 		if(isset($_REQUEST["hostid"]))
 		{
 			$db_host=get_host_by_hostid($_REQUEST["hostid"]);
@@ -4199,10 +4201,11 @@ include_once 'include/discovery.inc.php';
 			$ip	= $db_host["ip"];
 
 // add groups
-			$db_groups=DBselect("select distinct groupid from hosts_groups where hostid=".$_REQUEST["hostid"].
-				" and groupid in (".
-				get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid()).
-				") ");
+			$sql = 'select distinct groupid '.
+					' from hosts_groups '.
+					' where hostid='.$_REQUEST['hostid'].
+						' and groupid in ('.$available_groups.') ';
+			$db_groups=DBselect($sql);
 			while($db_group=DBfetch($db_groups)){
 				if(in_array($db_group["groupid"],$groups)) continue;
 				array_push($groups, $db_group["groupid"]);
@@ -4249,10 +4252,11 @@ include_once 'include/discovery.inc.php';
 
 		$frm_row = array();
 		
-		$db_groups=DBselect("select distinct groupid,name from groups ".
-			" where groupid in (".
-			get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid()).
-			") order by name");
+		$sql = 'select distinct groupid,name '.
+				' from groups '.
+				' where groupid in ('.$available_groups.') '.
+				' order by name';
+		$db_groups=DBselect($sql);
 		while($db_group=DBfetch($db_groups))
 		{
 			array_push($frm_row,
