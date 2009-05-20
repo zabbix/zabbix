@@ -217,7 +217,7 @@
 			unset($_REQUEST['triggerid']);
 		}
 	}
-	else if(isset($_REQUEST['copy'])&&isset($_REQUEST['g_triggerid'])&&isset($_REQUEST['form_copy_to'])){
+	else if(isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid']) && isset($_REQUEST['form_copy_to'])){
 		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
 			if(0 == $_REQUEST['copy_type']){ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
@@ -234,12 +234,22 @@
 					array_push($hosts_ids, $db_host['hostid']);
 				}
 			}
+			
 			$result = false;
+			$new_triggerids = array();
+			
 			DBstart();
-			foreach($_REQUEST['g_triggerid'] as $trigger_id)
-				foreach($hosts_ids as $host_id){
-					$result |= copy_trigger_to_host($trigger_id, $host_id, true);
+			foreach($hosts_ids as $num => $host_id){
+				foreach($_REQUEST['g_triggerid'] as $tnum => $trigger_id){
+					$newtrigid = copy_trigger_to_host($trigger_id, $host_id, true);
+
+					$new_triggerids[$trigger_id] = $newtrigid;
+					$result |= (bool) $newtrigid;
 				}
+				
+				replace_triggers_depenedencies($new_triggerids);
+			}
+
 			$result = DBend($result);
 			unset($_REQUEST['form_copy_to']);
 		}

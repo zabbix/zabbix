@@ -791,7 +791,7 @@
 // create trigger for childs
 			$child_hosts = get_hosts_by_templateid($trig_host['hostid']);
 			while($child_host = DBfetch($child_hosts)){
-				if( !($result = copy_trigger_to_host($triggerid, $child_host['hostid'])))
+				if(!$result = copy_trigger_to_host($triggerid, $child_host['hostid']))
 					break;
 			}
 		}
@@ -820,8 +820,8 @@
 		$trigger = get_trigger_by_triggerid($triggerid);
 
 		$deps = replace_template_dependencies(
-				get_trigger_dependencies_by_triggerid($triggerid),
-				$hostid);
+					get_trigger_dependencies_by_triggerid($triggerid),
+					$hostid);
 
 		$sql='SELECT t2.triggerid, t2.expression '.
 				' FROM triggers t2, functions f1, functions f2, items i1, items i2 '.
@@ -1489,10 +1489,13 @@
 			}
 			info($msg);
 		}
+		
 		if($result) {
 			$trigger_new = get_trigger_by_triggerid($triggerid);
 			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,	$triggerid,	$trigger['description'], 'triggers', $trigger, $trigger_new);
 		}
+		
+		$result = $result?$triggerid:$result;
 		
 	return $result;
 	}
@@ -1607,6 +1610,22 @@
 		}
 	}
 
+	function replace_triggers_depenedencies($new_triggerids){
+		$old_triggerids = array_keys($new_triggerids);
+		
+		$deps = array();
+		$res = DBselect('SELECT * FROM trigger_depends WHERE '.DBcondition('triggerid_up',$old_triggerids));
+		while($db_dep = DBfetch($res)){
+			$deps[$db_dep['triggerid_up']] = $db_dep['triggerid_down'];
+		}
+				
+		delete_dependencies_by_triggerid($deps);
+		
+		foreach($new_triggerids as $old_triggerid => $newtriggerid){
+			if(isset($deps[$old_triggerid]))
+				insert_dependency($deps[$old_triggerid], $newtriggerid);
+		}
+	}
 /*
 	 * Function: update_template_dependencies_for_host
 	 *
