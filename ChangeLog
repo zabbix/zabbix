@@ -1,7 +1,7 @@
 Changes for 1.7.0
 
+ - [DEV-332] added media selection for notifications (Sasha,Artem)
  - [DEV-385] added Event ID field for eventlogs (Sasha)
- - [DEV-332] added media selection for notifications on server side (Sasha)
  - [DEV-382] added support of IPv6 for monitoring of the SNMP devices (Sasha)
  - [DEV-328] implemented printing of stopped Zabbix process PID for better debugging (Alexei)
  - [DEV-137] now SNMP keys with dynamic indexes use only one connection (Sasha)
