@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-848] fixed typos in changelog and comments (Richlv)
  - [ZBX-926] fixed exporting after preview (Artem)
  - [ZBX-925] fixed verification of IPv6 adresses in frontend (Sasha)
  - [ZBX-918, ZBX-919] fixed compilation errors for 'unknown' platforms (Alexei)
@@ -40,7 +41,7 @@ Changes for 1.6.5
  - [ZBX-864] fixed problem when saving screen item without selected item (Artem)
  - [ZBX-856] fixed email sending if tcp packets from smtp server are segmented (Sasha)
  - [ZBX-855] fixed processing of eventlogs timestamps on server side (Sasha)
- - [ZBX-851] changed sorting of users  to alias in popup (Artem)
+ - [ZBX-851] changed sorting of users to alias in popup (Artem)
  - [ZBX-849] fixed permissions problem for users in dashboard (Artem)
  - [ZBX-797] fixed possible manual deletion of web items (Vedmak)
  - [ZBX-847] fixed error in "Status of ZABBIX" when server is not running (Vedmak)

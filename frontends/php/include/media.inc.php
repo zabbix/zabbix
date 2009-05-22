@@ -77,7 +77,7 @@
 		return	DBexecute($sql);
 	}
 
-	# Delete alrtes by mediatypeid
+	# Delete alerts by mediatypeid
 
 	function	delete_alerts_by_mediatypeid($mediatypeid)
 	{
