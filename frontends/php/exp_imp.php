@@ -96,14 +96,15 @@ include_once "include/page_header.php";
 		$graphs		= get_request('graphs', array());
 		$triggers	= get_request('triggers', array());
 		
-		function &zbx_array_val_inc($arr, $inc_size = 1){
+		function zbx_array_val_inc($arr, $inc_size = 1){
 			foreach($arr as $id => $val){
 				$arr[$id] = $val + $inc_size;
 			}
-			return $arr;
+		return $arr;
 		}
 		
 		$hosts		= zbx_array_val_inc(array_flip(array_intersect(array_keys($hosts),	$available_hosts)));
+SDI($hosts);
 		$templates	= zbx_array_val_inc(array_flip(array_intersect(array_keys($templates),	array_keys($hosts))));
 		$items		= zbx_array_val_inc(array_flip(array_intersect(array_keys($items),	array_keys($hosts))));
 		$graphs		= zbx_array_val_inc(array_flip(array_intersect(array_keys($graphs),	array_keys($hosts))));
@@ -111,7 +112,9 @@ include_once "include/page_header.php";
 
 		if(count($hosts)==0) $hosts[-1] = 1;
 	}
-		
+SDI($_REQUEST);
+//die();
+
 	if(isset($EXPORT_DATA)){
 		include_once "include/export.inc.php";
 		
@@ -175,7 +178,8 @@ include_once "include/page_header.php";
 			$cmbExist->AddItem(1, S_SKIP);
 			
 			$cmbMissed = new CComboBox('rules['.$key.'][missed]', $rules[$key]['missed']);
-			($key == 'template')?(''):($cmbMissed->AddItem(0, S_ADD));
+			
+			if($key == 'template') $cmbMissed->AddItem(0, S_ADD);
 			$cmbMissed->AddItem(1, S_SKIP);
 
 			$table->AddRow(array($title, $cmbExist, $cmbMissed));
@@ -231,18 +235,19 @@ include_once "include/page_header.php";
 					$db_els = DBselect($sql);
 					while($el = DBfetch($db_els)){
 						if($el['cnt'] != 1 || (bccomp($el['hostid'] , $host['hostid']) != 0)) continue;
-						$el_table->AddRow(array($el_type, $el['info']));
+						$el_table->addRow(array($el_type, $el['info']));
 					}
 				}
 				
-				$table->ShowRow(array(new CCol($host['host'], 'top'),$el_table));
+				$table->showRow(array(new CCol($host['host'], 'top'),$el_table));
 				unset($el_table);
 			}
 			
 			$form = new CForm(null,'post');
 			$form->setName('hosts');
-			$form->addVar("config",		$config);
+			$form->addVar('config',		$config);
 			$form->addVar('update',		true);
+			$form->addVar('groupid',	$PAGE_GROUPS['selected']);
 			$form->addVar('hosts',		$hosts);
 			$form->addVar('templates',	$templates);
 			$form->addVar('items', 		$items);
