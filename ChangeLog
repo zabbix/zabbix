@@ -35,7 +35,8 @@ Changes for 1.7.0
  - [DEV-261] added triggers status to screens (Artem)
  - [DEV-256] improved multiple labels in maps and support of macros (Sasha)
  - [DEV-265] added popups with links to "Status of trigger" & "Events history" pages (Artem)
- - [DEV-262] added group filtering  for "Trigger info" (Artem)  - [DEV-259] added internal links (Artem)
+ - [DEV-262] added group filtering for "Trigger info" (Artem)
+ - [DEV-259] added internal links (Artem)
  - [DEV-251] added improved screen editing (Artem)
  - [DEV-249] added support of advanced regular expressions (Artem,Sasha)
  - [DEV-247] added enhancement to the Graph function (Artem)
@@ -43,6 +44,7 @@ Changes for 1.7.0
 
 Changes for 1.6.5
 
+ - [ZBX-848] fixed typos in changelog and comments (Richlv)
  - [ZBX-926] fixed exporting after preview (Artem)
  - [ZBX-925] fixed verification of IPv6 adresses in frontend (Sasha)
  - [ZBX-918, ZBX-919] fixed compilation errors for 'unknown' platforms (Alexei)
@@ -82,10 +84,10 @@ Changes for 1.6.5
  - [ZBX-864] fixed problem when saving screen item without selected item (Artem)
  - [ZBX-856] fixed email sending if tcp packets from smtp server are segmented (Sasha)
  - [ZBX-855] fixed processing of eventlogs timestamps on server side (Sasha)
- - [ZBX-851] changed sorting of users  to alias in popup (Artem)
+ - [ZBX-851] changed sorting of users to alias in popup (Artem)
  - [ZBX-797] fixed possible manual deletion of web items (Vedmak)
  - [ZBX-847] fixed error in "Status of ZABBIX" when server is not running (Vedmak)
- - [ZBX-864] fixed node names instead of group names (Artem)
+ - [ZBX-846] fixed node names instead of group names (Artem)
 
 Changes for 1.6.4 
 
