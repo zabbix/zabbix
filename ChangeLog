@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-926] fixed exporting after preview (Artem)
  - [ZBX-925] fixed verification of IPv6 adresses in frontend (Sasha)
  - [ZBX-918, ZBX-919] fixed compilation errors for 'unknown' platforms (Alexei)
  - [ZBX-922] fixed selection proper hosts for hosts-groups assign (Artem)

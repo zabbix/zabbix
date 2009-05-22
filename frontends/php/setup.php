@@ -128,7 +128,7 @@ include_once('include/page_header.php');
 	insert_showhint_javascript();
 
 	echo SBR;
-	$ZBX_SETUP_WIZARD->Show();
+	$ZBX_SETUP_WIZARD->show();
 
 	unset($_POST);
 ?>
