@@ -513,12 +513,16 @@ typedef enum
 #define TRIGGER_VALUE_UNKNOWN	2
 
 /* Trigger severity */
-#define TRIGGER_SEVERITY_NOT_CLASSIFIED	0
-#define TRIGGER_SEVERITY_INFORMATION	1
-#define TRIGGER_SEVERITY_WARNING	2
-#define TRIGGER_SEVERITY_AVERAGE	3
-#define TRIGGER_SEVERITY_HIGH		4
-#define TRIGGER_SEVERITY_DISASTER	5
+typedef enum
+{
+	TRIGGER_SEVERITY_NOT_CLASSIFIED = 0,
+	TRIGGER_SEVERITY_INFORMATION,
+	TRIGGER_SEVERITY_WARNING,
+	TRIGGER_SEVERITY_AVERAGE,
+	TRIGGER_SEVERITY_HIGH,
+	TRIGGER_SEVERITY_DISASTER
+} zbx_trigger_severity_t;
+char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
 
 /* Media statuses */
 #define MEDIA_STATUS_ACTIVE	0
@@ -843,6 +847,8 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len );
 /* Time related functions */
 double	time_diff(struct timeval *from, struct timeval *to);
 char	*zbx_age2str(int age);
+char	*zbx_date2str(time_t date);
+char	*zbx_time2str(time_t time);
 
 /* Return the needle in the haystack (or NULL). */
 char	*zbx_strcasestr(const char *haystack, const char *needle);

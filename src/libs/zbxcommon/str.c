@@ -1678,11 +1678,38 @@ char	*zbx_age2str(int age)
 	offset	= 0;
 
 	if (days)
-		offset = zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dd ", days);
+		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dd ", days);
 	if (days || hours)
-		offset = zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dh ", hours);
-	offset = zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dm ", minutes);
+		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dh ", hours);
+	offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dm ", minutes);
 
+	return buffer;
+}
+
+char	*zbx_date2str(time_t date)
+{
+	static char	buffer[11];
+	struct tm	*tm;
+
+	tm	= localtime(&date);
+	zbx_snprintf(buffer, sizeof(buffer), "%.4d.%.2d.%.2d",
+			tm->tm_year + 1900,
+			tm->tm_mon + 1,
+			tm->tm_mday);
+
+	return buffer;
+}
+
+char	*zbx_time2str(time_t time)
+{
+	static char	buffer[9];
+	struct tm	*tm;
+
+	tm	= localtime(&time);
+	zbx_snprintf(buffer, sizeof(buffer), "%.2d:%.2d:%.2d",
+			tm->tm_hour,
+			tm->tm_min,
+			tm->tm_sec);
 	return buffer;
 }
 
@@ -1774,6 +1801,19 @@ char	*zbx_result_string(int result)
 	case NETWORK_ERROR: return "NETWORK_ERROR";
 	case TIMEOUT_ERROR: return "TIMEOUT_ERROR";
 	case AGENT_ERROR: return "AGENT_ERROR";
+	default: return "unknown";
+	}
+}
+
+char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity)
+{
+	switch (severity) {
+	case TRIGGER_SEVERITY_NOT_CLASSIFIED: return "Not classified";
+	case TRIGGER_SEVERITY_INFORMATION: return "Information";
+	case TRIGGER_SEVERITY_WARNING: return "Warning";
+	case TRIGGER_SEVERITY_AVERAGE: return "Average";
+	case TRIGGER_SEVERITY_HIGH: return "High";
+	case TRIGGER_SEVERITY_DISASTER: return "Disaster";
 	default: return "unknown";
 	}
 }
