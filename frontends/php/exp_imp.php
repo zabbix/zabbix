@@ -104,7 +104,6 @@ include_once "include/page_header.php";
 		}
 		
 		$hosts		= zbx_array_val_inc(array_flip(array_intersect(array_keys($hosts),	$available_hosts)));
-SDI($hosts);
 		$templates	= zbx_array_val_inc(array_flip(array_intersect(array_keys($templates),	array_keys($hosts))));
 		$items		= zbx_array_val_inc(array_flip(array_intersect(array_keys($items),	array_keys($hosts))));
 		$graphs		= zbx_array_val_inc(array_flip(array_intersect(array_keys($graphs),	array_keys($hosts))));
@@ -112,9 +111,8 @@ SDI($hosts);
 
 		if(count($hosts)==0) $hosts[-1] = 1;
 	}
-SDI($_REQUEST);
-//die();
 
+//die();
 	if(isset($EXPORT_DATA)){
 		include_once "include/export.inc.php";
 		
