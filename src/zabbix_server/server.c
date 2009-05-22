@@ -843,6 +843,171 @@ ZBX_TEST_HEX expressions[]=
 	printf("Passed OK\n");
 }
 
+void test_macros()
+{
+#define ZBX_TEST struct zbx_test_t
+ZBX_TEST
+{
+	char	*data;
+	char	*result;
+	int	macro_type;
+};
+
+ZBX_TEST expressions[]=
+{
+	{"{TRIGGER.ID}", "99900000000018378", MACRO_TYPE_MESSAGE_BODY},
+	{"{TRIGGER.NAME}", "TEST TRIGGER", MACRO_TYPE_MESSAGE_BODY},
+	{"{TRIGGER.COMMENT}", "TEST COMMENTS", MACRO_TYPE_MESSAGE_BODY},
+	{"{TRIGGER.VALUE}", "1", MACRO_TYPE_MESSAGE_BODY},
+	{"{EVENT.ID}", "99900000000008378", MACRO_TYPE_MESSAGE_BODY},
+	{"{EVENT.DATE}", "2009.05.20", MACRO_TYPE_MESSAGE_BODY},
+	{"{EVENT.TIME}", "16:58:18", MACRO_TYPE_MESSAGE_BODY},
+	{"{EVENT.AGE}", NULL, MACRO_TYPE_MESSAGE_BODY},
+	{"{PROFILE.DEVICETYPE}", "TEST DEVICETYPE", MACRO_TYPE_MESSAGE_BODY},
+	{"{PROFILE.NAME}", "TEST NAME", MACRO_TYPE_MESSAGE_BODY},
+	{"{PROFILE.OS}", "TEST OS", MACRO_TYPE_MESSAGE_BODY},
+	{"{PROFILE.SERIALNO}", "TEST SERIALNO", MACRO_TYPE_MESSAGE_BODY},
+	{"{PROFILE.TAG}", "TEST TAG", MACRO_TYPE_MESSAGE_BODY},
+	{"{PROFILE.MACADDRESS}", "TEST MACADDRESS", MACRO_TYPE_MESSAGE_BODY},
+	{"{PROFILE.HARDWARE}", "TEST HARDWARE", MACRO_TYPE_MESSAGE_BODY},
+	{"{PROFILE.SOFTWARE}", "TEST SOFTWARE", MACRO_TYPE_MESSAGE_BODY},
+	{"{PROFILE.CONTACT}", "TEST CONTACT", MACRO_TYPE_MESSAGE_BODY},
+	{"{PROFILE.LOCATION}", "TEST LOCATIONS", MACRO_TYPE_MESSAGE_BODY},
+	{"{PROFILE.NOTES}", "TEST NOTES", MACRO_TYPE_MESSAGE_BODY},
+	{"{DATE}", NULL, MACRO_TYPE_MESSAGE_BODY},
+	{"{TIME}", NULL, MACRO_TYPE_MESSAGE_BODY},
+	{"{HOSTNAME}", "TEST HOST", MACRO_TYPE_MESSAGE_BODY},
+	{"{IPADDRESS}", "2001:0db8:85a3:0000:0000:8a2e:0370:7334", MACRO_TYPE_MESSAGE_BODY},
+	{"{HOST.DNS}", "localhost", MACRO_TYPE_MESSAGE_BODY},
+	{"{HOST.CONN}", "2001:0db8:85a3:0000:0000:8a2e:0370:7334", MACRO_TYPE_MESSAGE_BODY},
+	{"{ITEM.NAME}", "TEST ITEM 1", MACRO_TYPE_MESSAGE_BODY},
+	{"{TRIGGER.KEY}", "test.item.1[]", MACRO_TYPE_MESSAGE_BODY},
+	{"{TRIGGER.SEVERITY}", "High", MACRO_TYPE_MESSAGE_BODY},
+	{"{TRIGGER.NSEVERITY}", "4", MACRO_TYPE_MESSAGE_BODY},
+	{"{TRIGGER.STATUS}", "PROBLEM", MACRO_TYPE_MESSAGE_BODY},
+	{"{STATUS}", "PROBLEM", MACRO_TYPE_MESSAGE_BODY},
+	{"{TRIGGER.URL}", "TEST URL", MACRO_TYPE_MESSAGE_BODY},
+	{"{ITEM.LASTVALUE}", "1", MACRO_TYPE_MESSAGE_BODY},
+	{"{ESC.HISTORY}", NULL, MACRO_TYPE_MESSAGE_BODY},
+	{"{ITEM.LOG.DATE}", "2009.05.20", MACRO_TYPE_MESSAGE_BODY},
+	{"{ITEM.LOG.TIME}", "15:58:18", MACRO_TYPE_MESSAGE_BODY},
+	{"{ITEM.LOG.AGE}", NULL, MACRO_TYPE_MESSAGE_BODY},
+	{"{ITEM.LOG.SOURCE}", "TEST SOURCE", MACRO_TYPE_MESSAGE_BODY},
+	{"{ITEM.LOG.SEVERITY}", "Average", MACRO_TYPE_MESSAGE_BODY},
+	{"{ITEM.LOG.NSEVERITY}", "3", MACRO_TYPE_MESSAGE_BODY},
+	{"{ITEM.LOG.EVENTID}", "1800", MACRO_TYPE_MESSAGE_BODY},
+	{"{{{{NOT.SUPPORTED.MACRO}}}}{}", "{{{{NOT.SUPPORTED.MACRO}}}}{}", MACRO_TYPE_MESSAGE_BODY},
+	{NULL}
+};
+	DB_EVENT	event;
+	char		*data = NULL;
+	int		i, r, retry = 1000000, res = SUCCEED;
+
+	printf("-= Test substitute_simple_macros =-\n");
+
+	event.eventid = (zbx_uint64_t)__UINT64_C(99900000000008378);
+	event.source = EVENT_SOURCE_TRIGGERS;
+	event.object = EVENT_OBJECT_TRIGGER;
+	event.objectid = (zbx_uint64_t)__UINT64_C(99900000000018378);
+	event.clock = 1242827898;	/* 2009-05-20 16:58:18 */
+	event.value = TRIGGER_VALUE_TRUE;
+	event.acknowledged = 1;
+/*	int		skip_actions;*/
+	zbx_snprintf(event.trigger_description, TRIGGER_DESCRIPTION_LEN_MAX, "TEST TRIGGER"); 
+	event.trigger_priority = TRIGGER_SEVERITY_HIGH;
+	event.trigger_url = strdup("TEST URL");
+	event.trigger_comments = strdup("TEST COMMENTS");
+/*	int		trigger_type;*/
+
+	DBconnect(ZBX_DB_CONNECT_EXIT);
+
+	DBexecute("insert into events (eventid,source,object,objectid,clock,value,acknowledged)"
+			" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d,%d)",
+			event.eventid,
+			event.source,
+			event.object,
+			event.objectid,
+			event.clock,
+			event.value,
+			event.acknowledged);
+
+	DBexecute("insert into triggers (triggerid,expression,description,url,status,value,priority,"
+			"lastchange,comments,type) values (" ZBX_FS_UI64 ",'%s','%s','%s',%d,%d,%d,%d,'%s',%d)",
+			event.objectid,
+			"{99900000000028378}>0",
+			event.trigger_description,
+			event.trigger_url,
+			TRIGGER_STATUS_ENABLED,
+			event.value,
+			event.trigger_priority,
+			event.clock,
+			event.trigger_comments,
+			TRIGGER_TYPE_NORMAL);
+
+	DBexecute("insert into functions (functionid,itemid,triggerid,lastvalue,function,parameter)"
+			" values (99900000000028378,99900000000108378," ZBX_FS_UI64 ",'%s','%s','%s')",
+			event.objectid,
+			"1",
+			"last",
+			"0");
+
+	DBexecute("insert into items (itemid,type,hostid,description,key_,status,value_type,lastvalue) values"
+			" (99900000000108378,%d,99900000000208378,'%s','%s',%d,%d,'%s')",
+			ITEM_TYPE_ZABBIX_ACTIVE,
+			"TEST ITEM 1",
+			"test.item.1[]",
+			ITEM_STATUS_ACTIVE,
+			ITEM_VALUE_TYPE_LOG,
+			"1");
+
+	DBexecute("insert into hosts (hostid,host,ip,dns,useip) values (99900000000208378,'TEST HOST',"
+			"'2001:0db8:85a3:0000:0000:8a2e:0370:7334','localhost',1)");
+
+	DBexecute("insert into hosts_profiles (hostid,devicetype,name,os,serialno,tag,macaddress,hardware,software,contact,location,notes)"
+			" values (99900000000208378,'TEST DEVICETYPE','TEST NAME','TEST OS','TEST SERIALNO','TEST TAG','TEST MACADDRESS',"
+			"'TEST HARDWARE','TEST SOFTWARE','TEST CONTACT','TEST LOCATIONS','TEST NOTES')");
+
+	DBexecute("insert into history_log (id,itemid,clock,timestamp,source,severity,value,logeventid) values"
+			"(99900000000000001,99900000000108378,%d,%d,'%s',%d,'%s',%d)",
+			event.clock,
+			event.clock - 3600,
+			"TEST SOURCE",
+			3,
+			"1",
+			1800);
+
+	for (i = 0; expressions[i].data != NULL && SUCCEED == res; i++)
+	{
+		res = SUCCEED;
+		for (r = 0; r < retry && SUCCEED == res; r ++)
+		{
+			data = zbx_dsprintf(data, "%s", expressions[i].data);
+			substitute_simple_macros(&event, NULL, NULL, NULL, &data, expressions[i].macro_type);
+			if (NULL != expressions[i].result && 0 != strcmp(expressions[i].result, data))
+				res = FAIL;
+		}
+
+		printf("[%d] %-30s => %-55s : %s\n", r, expressions[i].data, data, zbx_result_string(res));
+		fflush(stdout);
+		zbx_free(data);
+	}
+
+	DBexecute("delete from events where eventid=" ZBX_FS_UI64, event.eventid);
+	DBexecute("delete from triggers where triggerid=" ZBX_FS_UI64, event.objectid);
+	DBexecute("delete from functions where functionid=99900000000028378");
+	DBexecute("delete from items where itemid=99900000000108378");
+	DBexecute("delete from hosts where hostid=99900000000208378");
+	DBexecute("delete from hosts_profiles where hostid=99900000000208378");
+	DBexecute("delete from history_log where id=99900000000000001");
+
+	DBclose();
+
+	zbx_free(event.trigger_comments);
+
+	printf("Passed OK\n");
+	fflush(stdout);
+}
+
 void test()
 {
 
@@ -875,6 +1040,7 @@ void test()
 /*	test_zbx_tcp_connect( );*/
 /*	test_ip_in_list(); */
 /*	test_binary2hex();*/
+	test_macros();
 
 	printf("\n-= Test completed =-\n");
 }
