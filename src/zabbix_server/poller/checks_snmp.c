@@ -627,7 +627,7 @@ int	get_snmp(struct snmp_session *ss, DB_ITEM *item, char *snmp_oid, AGENT_RESUL
 			}
 			else
 			{
-				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "OID [%s] value has unknow type [0x%02X]",
+				SET_MSG_RESULT(value, zbx_dsprintf(NULL, "OID [%s] value has unknown type [0x%02X]",
 						snmp_oid,
 						vars->type));
 				ret = NOTSUPPORTED;
