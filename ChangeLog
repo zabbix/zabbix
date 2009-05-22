@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-859] fixed typo in server log message (Richlv)
  - [ZBX-848] fixed typos in changelog and comments (Richlv)
  - [ZBX-926] fixed exporting after preview (Artem)
  - [ZBX-925] fixed verification of IPv6 adresses in frontend (Sasha)
