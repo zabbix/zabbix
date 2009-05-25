@@ -55,8 +55,9 @@
 	define('PAGE_TYPE_HTML',		0);
 	define('PAGE_TYPE_IMAGE',		1);
 	define('PAGE_TYPE_XML',			2);
-	define('PAGE_TYPE_JS',			3);	//javascript
-	define('PAGE_TYPE_HTML_BLOCK',	4);	//simple block of html (as text)
+	define('PAGE_TYPE_JS',			3);	// javascript
+	define('PAGE_TYPE_HTML_BLOCK',	4);	// simple block of html (as text)
+	define('PAGE_TYPE_JSON_RPC',	5);	// api call
 	
 	define('ZBX_SESSION_ACTIVE', 0);
 	define('ZBX_SESSION_PASSIVE', 1);
@@ -358,8 +359,8 @@
 	define('STYLE_TOP', 1);
 
 /* time module tipe */
-        define('TIME_TYPE_LOCAL',	0);
-        define('TIME_TYPE_SERVER',	1);
+	define('TIME_TYPE_LOCAL',	0);
+	define('TIME_TYPE_SERVER',	1);
 
 	define('FILTER_TAST_SHOW',	0);
 	define('FILTER_TAST_HIDE',	1);

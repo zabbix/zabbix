@@ -37,6 +37,10 @@ create/data/images/Workstation.png -text svneol=unset#unset
 create/data/images/Workstation_small.png -text svneol=unset#unset
 create/data/recreate.sh -text
 docs/ZABBIX[!!-~]Manual[!!-~]v1.6[!!-~]rev[!!-~]17.pdf -text
+frontends/php/api/.htaccess -text
+frontends/php/api/rpc/class.cjsonrpc.php -text
+frontends/php/api/rpc/class.czbxrpc.php -text
+frontends/php/api_jsonrpc.php -text
 frontends/php/audio/trigger_off.wav -text
 frontends/php/audio/trigger_on.wav -text
 frontends/php/audio/trigger_on_average.wav -text
@@ -188,9 +192,11 @@ frontends/php/include/classes/class.cformtable.php -text
 frontends/php/include/classes/class.cgraph.php -text
 frontends/php/include/classes/class.chelp.php -text
 frontends/php/include/classes/class.chostsinfo.php -text
+frontends/php/include/classes/class.chttp_request.php -text
 frontends/php/include/classes/class.ciframe.php -text
 frontends/php/include/classes/class.cimg.php -text
 frontends/php/include/classes/class.cipbox.php -text
+frontends/php/include/classes/class.cjson.php -text
 frontends/php/include/classes/class.cldap.php -text
 frontends/php/include/classes/class.clink.php -text
 frontends/php/include/classes/class.clist.php -text
