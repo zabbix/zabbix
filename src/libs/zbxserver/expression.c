@@ -64,7 +64,7 @@ static int	trigger_get_N_functionid(char *short_expression, int n, zbx_uint64_t 
 
 	assert(short_expression);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() short_expression:'%s' n:%d)", __function_name, short_expression, n);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() short_expression:'%s' n:%d", __function_name, short_expression, n);
 
 	for (c = short_expression; '\0' != *c && ret != SUCCEED; c++)
 	{
@@ -876,7 +876,7 @@ int	get_host_profile_value_by_triggerid(zbx_uint64_t triggerid, char **replace_t
 			fieldname,
 			functionid);
 
-	if (NULL != (row = DBfetch(result)) || SUCCEED != DBis_null(row[0]))
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 	{
 		*replace_to = zbx_dsprintf(*replace_to, "%s", row[0]);
 
