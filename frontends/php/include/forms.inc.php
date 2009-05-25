@@ -3864,6 +3864,17 @@
 			case CONDITION_TYPE_MAINTENANCE:
 				$rowCondition[] = new CCol(S_MAINTENANCE_SMALL);
 				break;
+			case CONDITION_TYPE_NODE:
+				$tblCond->addItem(new CVar('new_condition[value]','0'));
+				$rowCondition[] = array(
+					new CTextBox('node','',20,'yes'),
+					new CButton('btn1',S_SELECT,
+						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=node&srctbl=nodes".
+						"&srcfld1=nodeid&srcfld2=name',450,450);",
+						'T')
+					);
+				break;
 			case CONDITION_TYPE_DHOST_IP:
 				$rowCondition[] = new CTextBox('new_condition[value]', '192.168.0.1-127,192.168.2.1', 50);
 				break;
