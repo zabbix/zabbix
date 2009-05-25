@@ -1145,11 +1145,6 @@
 			$cmbGUI->addItem(GROUP_GUI_ACCESS_DISABLED,user_auth_type2str(GROUP_GUI_ACCESS_DISABLED));
 			$frmUserG->addRow(S_GUI_ACCESS, $cmbGUI);
 			
-			$cmbAPI = new CComboBox('api_access', $api_access);
-			$cmbAPI->addItem(GROUP_API_ACCESS_ENABLED, S_ENABLED);
-			$cmbAPI->addItem(GROUP_API_ACCESS_DISABLED, S_DISABLED);
-			$frmUserG->addRow(S_API_ACCESS, $cmbAPI);
-
 			$cmbStat = new CComboBox('users_status',$users_status);
 			$cmbStat->addItem(GROUP_STATUS_ENABLED,S_ENABLED);
 			$cmbStat->addItem(GROUP_STATUS_DISABLED,S_DISABLED);
@@ -1161,12 +1156,15 @@
 			$frmUserG->addVar('gui_access',$gui_access);
 			$frmUserG->addRow(S_GUI_ACCESS, new CSpan(user_auth_type2str($gui_access),'green'));
 			
-			$frmUserG->addVar('api_access', $api_access);
-			$frmUserG->addRow(S_API_ACCESS, new CSpan(($api_access ? S_ENABLED : S_DISABLED),'green'));
-
 			$frmUserG->addVar('users_status',GROUP_STATUS_ENABLED);
 			$frmUserG->addRow(S_USERS_STATUS, new CSpan(S_ENABLED,'green'));
 		}
+
+		$cmbAPI = new CComboBox('api_access', $api_access);
+		$cmbAPI->addItem(GROUP_API_ACCESS_ENABLED, S_ENABLED);
+		$cmbAPI->addItem(GROUP_API_ACCESS_DISABLED, S_DISABLED);
+		$frmUserG->addRow(S_API_ACCESS, $cmbAPI);
+
 
 		$table_Rights = new CTable(S_NO_RIGHTS_DEFINED,'right_table');
 
