@@ -575,6 +575,7 @@
 	'S_NODES_BIG'=>				'NODES',
 	'S_NEW_NODE'=>				'New node',
 	'S_NO_NODES_DEFINED'=>		'No nodes defined',
+	'S_ALL_NODES'=>				'All nodes',
 
 //  Authentication
 	'S_AUTHENTICATION'=>				'Authentication',
