@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-927] removed default values for text and blob fields in the upgrade script for compatibility with MySQL 5.0 (Sasha)
  - [ZBX-719] fixed typo in default graph title (Richlv)
  - [ZBX-859] fixed typo in server log message (Richlv)
  - [ZBX-848] fixed typos in changelog and comments (Richlv)
