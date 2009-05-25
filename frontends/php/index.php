@@ -75,96 +75,12 @@ $page['file']	= 'index.php';
 		
 		$name = get_request('name','');
 		$passwd = get_request('password','');
-		$password = md5($passwd);
-
-		$sql = 'SELECT u.userid,u.attempt_failed, u.attempt_clock, u.attempt_ip '.
-				' FROM users u '.
-				' WHERE u.alias='.zbx_dbstr($name);
-				
-//SQL to BLOCK attempts
-//					.' AND ( attempt_failed<'.ZBX_LOGIN_ATTEMPTS.
-//							' OR (attempt_failed>'.(ZBX_LOGIN_ATTEMPTS-1).
-//									' AND ('.time().'-attempt_clock)>'.ZBX_LOGIN_BLOCK.'))';
-					
-		$login = $attempt = DBfetch(DBselect($sql));
-
-		if(($name!=ZBX_GUEST_USER) && zbx_empty($passwd)){
-			$login = $attempt = false;
-		}
-
-		if($login){
-			if($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS){
-				sleep(ZBX_LOGIN_BLOCK);
-			}
-			
-			switch(get_user_auth($login['userid'])){
-				case GROUP_GUI_ACCESS_INTERNAL:
-					$authentication_type = ZBX_AUTH_INTERNAL;
-					break;
-				case GROUP_GUI_ACCESS_SYSTEM:
-				case GROUP_GUI_ACCESS_DISABLED:
-				default:
-					break;
-			}
-			
-			switch($authentication_type){
-				case ZBX_AUTH_LDAP:
-					$login = ldap_authentication($name,get_request('password',''));
-					break;
-				case ZBX_AUTH_HTTP:
-					$login = true;
-					break;
-				case ZBX_AUTH_INTERNAL:
-				default:
-					$alt_auth = ZBX_AUTH_INTERNAL;
-					$login = true;
-			}
-		}
+		
+		$login = user_login($name, $passwd, $authentication_type);
 		
 		if($login){
-			$login = $row = DBfetch(DBselect('SELECT u.userid,u.alias,u.name,u.surname,u.url,u.refresh,u.passwd '.
-						' FROM users u, users_groups ug, usrgrp g '.
- 						' WHERE u.alias='.zbx_dbstr($name).
-							((ZBX_AUTH_INTERNAL==$authentication_type)?' AND u.passwd='.zbx_dbstr($password):'').
-							' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
-		}
-		
-/* update internal pass if it's different
-		if($login && ($row['passwd']!=$password) && (ZBX_AUTH_INTERNAL!=$authentication_type)){
-			DBexecute('UPDATE users SET passwd='.zbx_dbstr($password).' WHERE userid='.$row['userid']);
-		}
-*/		
-		if($login){
-			$login = (check_perm2login($row['userid']) && check_perm2system($row['userid']));
-		}
-
-		if($login){
-			$sessionid = zbx_session_start($row['userid'], $name, $password);
-
-			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,'Correct login ['.$name.']');
-			
-			if(empty($row['url'])){
-				$row['url'] = get_profile('web.menu.view.last','index.php');
-			}
-
-			redirect($row['url']);
-			die();
-		}
-		else{
-			$row = NULL;
-			
-			$_REQUEST['message'] = 'Login name or password is incorrect';
-			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,'Login failed ['.$name.']');
-			
-			if($attempt){
-				$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];			
-				$attempt['attempt_failed']++;
-				$sql = 'UPDATE users SET attempt_failed='.$attempt['attempt_failed'].
-										', attempt_clock='.time().
-										', attempt_ip='.zbx_dbstr($ip).
-									' WHERE userid='.$attempt['userid'];
-				DBexecute($sql);
-			}
+			redirect($USER_DETAILS['url']);
+			exit();
 		}
 	}
 

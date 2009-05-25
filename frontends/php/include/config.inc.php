@@ -31,10 +31,22 @@ function __autoload($class_name){
 		'ctrigger' => 1,		
 		'cusergroup' => null,		
 		'cuser' => null);	
+		
+	$rpc = array(		
+		'cjsonrpc' =>1,		
+		'czbxrpc' => 1,		
+		'cxmlrpc' => null,
+		'csoap' => null,		
+		'csoapjr' => null);	
+		
 	if(isset($api[$class_name])) 
 		require_once('api/classes/class.'.$class_name.'.php');	
+	else if(isset($rpc[$class_name])) 
+		require_once('api/rpc/class.'.$class_name.'.php');	
 	else 
-		require_once('include/classes/class.'.$class_name.'.php');}?>
+		require_once('include/classes/class.'.$class_name.'.php');
+}
+?>
 <?php
 
 	require_once('include/defines.inc.php');
@@ -141,6 +153,7 @@ function __autoload($class_name){
 
 	if(!defined('ZBX_PAGE_NO_AUTHERIZATION')){
 		check_authorisation();
+
 		if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){
 			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
 			process_locales();
@@ -310,7 +323,7 @@ function __autoload($class_name){
 // +++ Fill $result['NODEIDS'], $result['NODES'] +++	
 		$nodes = array();
 		$nodeids = array();
-		foreach($selected_nodeids as $nodeid) {
+		foreach($selected_nodeids as $num => $nodeid) {
 			if(isset($available_nodes[$nodeid])) {
 				$result['nodes'][$nodeid] = array(
 					'nodeid' => $available_nodes[$nodeid]['nodeid'], 
