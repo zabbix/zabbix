@@ -20,21 +20,21 @@
 function SDI($msg='SDI') { echo 'DEBUG INFO: '; var_dump($msg); echo SBR; } // DEBUG INFO!!!
 function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
 function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
-function __autoload($class_name){ 
-	$class_name = strtolower($class_name);	
-	$api = array('chostgroup' => 1,
-				'chost' => 1,
-				'ctemplate' => 1,
-				'cproxy' => null,
-				'citem' => null,
-				'ctrigger' => null,
-				'cusergroup' => null,
-				'cuser' => null);
-
-	if(isset($api[$class_name])) require_once('api/classes/class.'.$class_name.'.php');
-	else require_once('include/classes/class.'.$class_name.'.php');
-}
-?>
+function __autoload($class_name){ 	
+	$class_name = strtolower($class_name); 	
+	$api = array(		
+		'chostgroup' =>1,		
+		'chost' => 1,		
+		'ctemplate' => 1,		
+		'cproxy' => null,		
+		'citem' => 1,		
+		'ctrigger' => 1,		
+		'cusergroup' => null,		
+		'cuser' => null);	
+	if(isset($api[$class_name])) 
+		require_once('api/classes/class.'.$class_name.'.php');	
+	else 
+		require_once('include/classes/class.'.$class_name.'.php');}?>
 <?php
 
 	require_once('include/defines.inc.php');
@@ -297,19 +297,9 @@ function __autoload($class_name){
 		$options = array_merge($def_options, $options);
 		
 		$result = array('selected' => 0, 'nodes' => array(), 'nodeids' => array());
-		
-		//$config['dropdown_first_entry'] =1;
-		$dd_first_entry = $config['dropdown_first_entry'];
-		if($dd_first_entry == ZBX_DROPDOWN_FIRST_ZBX162){
-			$dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
-		}
-		if($options['allow_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
-		
+				
 		if(!defined('ZBX_NOT_ALLOW_ALL_NODES')){
-			if($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)
-				$result['nodes'][0] = array('nodeid' => 0, 'name' => S_NONE);
-			else // ALL
-				$result['nodes'][0] = array('nodeid' => 0, 'name' => S_ALL_S);
+			$result['nodes'][0] = array('nodeid' => 0, 'name' => S_ALL_S);
 		}
 		
 		$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
@@ -336,23 +326,13 @@ function __autoload($class_name){
 		if(!isset($available_nodes[$switch_node]) || !uint_in_array($switch_node, $selected_nodeids)) { //check switch_node
 			$switch_node = 0;
 		}
+		
+		$result['nodeids'] = $nodeids;
 		if(!defined('ZBX_NOT_ALLOW_ALL_NODES')) {		
-			switch($dd_first_entry) {	
-				case ZBX_DROPDOWN_FIRST_NONE: // NONE
-					if($switch_node == 0) {	
-						$result['nodeids'] = array();
-					}
-				break;
-				case ZBX_DROPDOWN_FIRST_ALL:
-				default: // ALL
-					$result['nodeids'] = $nodeids;
-				break;
-			}
 			$result['selected'] = $switch_node;
 		}
 		else if(!empty($nodeids)){
-			$result['nodeids'] = $nodeids;
-			$result['selected'] = ($switch_node > 0)?$switch_node:array_shift($nodeids);
+			$result['selected'] = ($switch_node > 0) ? $switch_node : array_shift($nodeids);
 		}
 
 	return $result;
@@ -374,7 +354,7 @@ function __autoload($class_name){
 	}
 
 	function is_show_all_nodes(){
-		global $ZBX_VIEWED_NODES;
+		global	$ZBX_VIEWED_NODES;
 
 	return (ZBX_DISTRIBUTED && ($ZBX_VIEWED_NODES['selected'] == 0));
 	}

@@ -79,8 +79,12 @@ COpt::profiling_start("page");
 			if(!isset($page['title'])) $page['title'] = 'ZABBIX';
 			
 			if(defined('ZBX_DISTRIBUTED')){
-				if(!empty($ZBX_NODES))
+				if($ZBX_VIEWED_NODES['selected'] == 0){ // ALL selected
+					$page['title'] .= ' ('.S_ALL_NODES.') ';
+				}
+				else if(!empty($ZBX_NODES)){
 					$page['title'] .= ' ('.$ZBX_NODES[$ZBX_CURRENT_NODEID]['name'].')';
+				}
 			}
 			
 			if((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && $USER_DETAILS['refresh']){
