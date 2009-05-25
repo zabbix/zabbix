@@ -1,7 +1,7 @@
 // JavaScript Document
 /*
 ** ZABBIX
-** Copyright (C) 2000-2008 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,9 +23,10 @@
 //------------------------------------------------------
 //var menu_usrgrp_all 	= new Array();
 //var menu_usrgrp_gui 	= new Array();
+//var menu_usrgrp_api 	= new Array();
 //var menu_usrgrp_status 	= new Array();
 
-function create_user_menu(e,userid,usr_grp_all_in,usr_grp_gui_in,usr_grp_status_in){
+function create_user_menu(e,userid,usr_grp_all_in,usr_grp_gui_in,usr_grp_api_in,usr_grp_status_in){
 	if(!e) var e = window.event;
 
 // ALL GROUPS
@@ -78,6 +79,31 @@ function create_user_menu(e,userid,usr_grp_all_in,usr_grp_gui_in,usr_grp_status_
 		}
 	}
 
+// API ACCESS GROUPS
+	var grp_api_add_to = new Array('Add to',null,null,{'outer' : ['pum_o_submenu'],'inner' : ['pum_i_submenu']});
+	grp_api_add_to.push(['Groups',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
+	
+	var grp_api_rmv_frm = new Array('Remove from',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']});
+	grp_api_rmv_frm.push(['Groups',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
+	
+// add to
+	for(var i=0; i < menu_usrgrp_api.length; i++){
+		if((typeof(menu_usrgrp_api[i]) != 'undefined') && !empty(menu_usrgrp_api[i])){
+			var row = menu_usrgrp_api[i];
+			var menu_row = new Array(row.name,'users.php?config=0&form=update&grpaction=1&userid='+userid+'&usrgrpid='+row.usrgrpid);
+			grp_api_add_to.push(menu_row);
+		}
+	}
+
+// remove from
+	for(var i=0; i < usr_grp_api_in.length; i++){
+		if((typeof(usr_grp_api_in[i]) != 'undefined') && !empty(usr_grp_api_in[i])){
+			var row = usr_grp_api_in[i];
+			var menu_row = new Array(row.name,'users.php?config=0&form=update&grpaction=0&userid='+userid+'&usrgrpid='+row.usrgrpid);
+			grp_api_rmv_frm.push(menu_row);
+		}
+	}
+
 // DISABLED STATUS GROUPS
 	var grp_status_add_to = new Array('Add to',null,null,{'outer' : ['pum_o_submenu'],'inner' : ['pum_i_submenu']});
 	grp_status_add_to.push(['Groups',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
@@ -110,6 +136,9 @@ function create_user_menu(e,userid,usr_grp_all_in,usr_grp_gui_in,usr_grp_status_
 							Array('GUI access',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}),
 								grp_gui_add_to,
 								grp_gui_rmv_frm,
+							Array('API access',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}),
+								grp_api_add_to,
+								grp_api_rmv_frm,
 							Array('Status disabled',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}),
 								grp_status_add_to,
 								grp_status_rmv_frm

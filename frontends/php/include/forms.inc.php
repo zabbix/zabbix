@@ -1017,6 +1017,7 @@
 
 			$users_status = $usrgrp['users_status'];
 			$gui_access = $usrgrp['gui_access'];
+			$api_access = $usrgrp['api_access'];
 
 			$group_users = array();
 			$sql = 'SELECT DISTINCT u.userid '.
@@ -1050,7 +1051,8 @@
 		else{
 			$name			= get_request('gname','');
 			$users_status 	= get_request('users_status',GROUP_STATUS_ENABLED);
-			$gui_access 	= get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);			
+			$gui_access 	= get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);	
+			$api_access 	= get_request('api_access',GROUP_API_ACCESS_DISABLED);			
 			$group_users	= get_request("group_users",array());
 			$group_rights	= get_request("group_rights",array());
 		}
@@ -1141,8 +1143,12 @@
 			$cmbGUI->addItem(GROUP_GUI_ACCESS_SYSTEM,user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM));
 			$cmbGUI->addItem(GROUP_GUI_ACCESS_INTERNAL,user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL));
 			$cmbGUI->addItem(GROUP_GUI_ACCESS_DISABLED,user_auth_type2str(GROUP_GUI_ACCESS_DISABLED));
-
 			$frmUserG->addRow(S_GUI_ACCESS, $cmbGUI);
+			
+			$cmbAPI = new CComboBox('api_access', $api_access);
+			$cmbAPI->addItem(GROUP_API_ACCESS_ENABLED, S_ENABLED);
+			$cmbAPI->addItem(GROUP_API_ACCESS_DISABLED, S_DISABLED);
+			$frmUserG->addRow(S_API_ACCESS, $cmbAPI);
 
 			$cmbStat = new CComboBox('users_status',$users_status);
 			$cmbStat->addItem(GROUP_STATUS_ENABLED,S_ENABLED);
@@ -1154,6 +1160,9 @@
 		else{
 			$frmUserG->addVar('gui_access',$gui_access);
 			$frmUserG->addRow(S_GUI_ACCESS, new CSpan(user_auth_type2str($gui_access),'green'));
+			
+			$frmUserG->addVar('api_access', $api_access);
+			$frmUserG->addRow(S_API_ACCESS, new CSpan(($api_access ? S_ENABLED : S_DISABLED),'green'));
 
 			$frmUserG->addVar('users_status',GROUP_STATUS_ENABLED);
 			$frmUserG->addRow(S_USERS_STATUS, new CSpan(S_ENABLED,'green'));

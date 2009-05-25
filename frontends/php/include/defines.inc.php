@@ -402,7 +402,9 @@
 	define('GROUP_GUI_ACCESS_INTERNAL', 1);
 	define('GROUP_GUI_ACCESS_DISABLED', 2);	
 	
-
+	define('GROUP_API_ACCESS_DISABLED', 0);
+	define('GROUP_API_ACCESS_ENABLED', 1);
+	
 	define('PERM_MAX',		3);
 	define('PERM_READ_WRITE',	3);
 	define('PERM_READ_ONLY',	2);

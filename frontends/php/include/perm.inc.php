@@ -355,6 +355,17 @@ function get_user_auth($userid){
 return $result;
 }
 
+function get_user_api_access($userid){
+	$sql = 'SELECT g.usrgrpid '.
+			' FROM usrgrp g, users_groups ug '.
+			' WHERE ug.userid = '.$userid.
+				' AND g.usrgrpid = ug.usrgrpid '.
+				' AND g.api_access = '.GROUP_API_ACCESS_ENABLED;
+	if($res = DBfetch(DBselect($sql,1))){
+		return true;
+	}
+return false;
+}
 /* Function: get_user_system_auth()
  *
  * Description:
