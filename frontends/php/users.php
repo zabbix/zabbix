@@ -587,7 +587,7 @@ include_once('include/page_header.php');
 				
 				$user['api_access'] = get_user_api_access($userid);
 				$api_access = ($user['api_access']) ? S_ENABLED : S_DISABLED;
-				$api_access = new CSpan($api_access, ($user['api_access'] == GROUP_API_ACCESS_DISABLED)?'orange':'green');
+				$api_access = new CSpan($api_access, ($user['api_access'] == GROUP_API_ACCESS_DISABLED)?'green':'orange');
 
 				$action = get_user_actionmenu($userid);				
 
@@ -681,13 +681,6 @@ include_once('include/page_header.php');
 								url_param('config'),
 								($row['gui_access'] == GROUP_GUI_ACCESS_DISABLED)?'orange':'enabled');
 								
-					$api_access = new CLink($api_access,
-								'users.php?form=update'.
-								'&set_api_access='.(($row['api_access'] == GROUP_API_ACCESS_DISABLED) ? GROUP_API_ACCESS_ENABLED : GROUP_API_ACCESS_DISABLED).
-								'&usrgrpid='.$row['usrgrpid'].
-								url_param('config'),
-								($row['api_access'] == GROUP_API_ACCESS_DISABLED)?'orange':'enabled');
-
 					$users_status = new CLink($users_status,
 								'users.php?form=update'.
 								'&set_users_status='.(($row['users_status'] == GROUP_STATUS_ENABLED)?GROUP_STATUS_DISABLED:GROUP_STATUS_ENABLED).
@@ -698,9 +691,15 @@ include_once('include/page_header.php');
 				}
 				else{
 					$gui_access = new CSpan($gui_access,($row['gui_access'] == GROUP_GUI_ACCESS_DISABLED)?'orange':'green');
-					$api_access = new CSpan($api_access,($row['api_access'] == GROUP_API_ACCESS_DISABLED)?'orange':'green');					
 					$users_status = new CSpan($users_status,($row['users_status'] == GROUP_STATUS_ENABLED)?'green':'red');
 				}
+				
+				$api_access = new CLink($api_access,
+							'users.php?form=update'.
+							'&set_api_access='.(($row['api_access'] == GROUP_API_ACCESS_DISABLED)?GROUP_API_ACCESS_ENABLED: GROUP_API_ACCESS_DISABLED).
+							'&usrgrpid='.$row['usrgrpid'].
+							url_param('config'),
+							($row['api_access'] == GROUP_API_ACCESS_DISABLED)?'enabled':'orange');
 								
 				$table->addRow(array(
 					$users_status,
