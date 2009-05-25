@@ -38,6 +38,11 @@ create/data/images/Workstation_small.png -text svneol=unset#unset
 create/data/recreate.sh -text
 docs/ZABBIX[!!-~]Manual[!!-~]v1.6[!!-~]rev[!!-~]17.pdf -text
 frontends/php/api/.htaccess -text
+frontends/php/api/classes/class.chost.php -text
+frontends/php/api/classes/class.chostgroup.php -text
+frontends/php/api/classes/class.citem.php -text
+frontends/php/api/classes/class.ctemplate.php -text
+frontends/php/api/classes/class.ctrigger.php -text
 frontends/php/api/rpc/class.cjsonrpc.php -text
 frontends/php/api/rpc/class.czbxrpc.php -text
 frontends/php/api_jsonrpc.php -text
