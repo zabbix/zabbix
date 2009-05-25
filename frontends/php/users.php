@@ -87,6 +87,7 @@ include_once('include/page_header.php');
 		'users'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	null),
 		'users_status'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	'(isset({config})&&({config}==1))&&isset({save})'),
 		'gui_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'),	'(isset({config})&&({config}==1))&&isset({save})'),
+		'api_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		'(isset({config})&&({config}==1))&&isset({save})'),
 		'new_right'=>		array(T_ZBX_STR, O_OPT,	null,	null,	null),
 		'right_to_del'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
 		'group_users_to_del'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
@@ -95,6 +96,7 @@ include_once('include/page_header.php');
 		
 		'set_users_status'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
 		'set_gui_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'), null),
+		'set_api_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
 
 /* actions */
 		'register'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"add permission","delete permission"'), null),
@@ -349,7 +351,7 @@ include_once('include/page_header.php');
 				$action = AUDIT_ACTION_UPDATE;
 				
 				DBstart();
-				$result = update_user_group($_REQUEST['usrgrpid'], $_REQUEST['gname'], $_REQUEST['users_status'], $_REQUEST['gui_access'], $group_users, $group_rights);
+				$result = update_user_group($_REQUEST['usrgrpid'], $_REQUEST['gname'], $_REQUEST['users_status'], $_REQUEST['gui_access'], $_REQUEST['api_access'], $group_users, $group_rights);
 				$result = DBend($result);
 				
 				show_messages($result, S_GROUP_UPDATED, S_CANNOT_UPDATE_GROUP);
@@ -358,7 +360,7 @@ include_once('include/page_header.php');
 				$action = AUDIT_ACTION_ADD;
 				
 				DBstart();
-				$result = add_user_group($_REQUEST['gname'], $_REQUEST['users_status'], $_REQUEST['gui_access'], $group_users, $group_rights);
+				$result = add_user_group($_REQUEST['gname'], $_REQUEST['users_status'], $_REQUEST['gui_access'], $_REQUEST['api_access'], $group_users, $group_rights);
 				$result = DBend($result);
 				
 				show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
@@ -411,6 +413,19 @@ include_once('include/page_header.php');
 			if($result){
 				$audit_action = ($_REQUEST['set_gui_access'] == GROUP_GUI_ACCESS_DISABLED)?AUDIT_ACTION_DISABLE:AUDIT_ACTION_UPDATE;
 				add_audit($audit_action,AUDIT_RESOURCE_USER_GROUP,'GUI access for group name ['.$group['name'].']');
+				
+				unset($_REQUEST['usrgrpid']);
+			}
+			unset($_REQUEST['form']);
+		}
+		else if(isset($_REQUEST['set_api_access'])&&isset($_REQUEST['usrgrpid'])){
+			$group=get_group_by_usrgrpid($_REQUEST['usrgrpid']);
+			$result=change_group_api_access($_REQUEST['usrgrpid'], $_REQUEST['set_api_access']);
+			
+			show_messages($result, S_GROUP.' "'.$group['name'].'" '.S_API_ACCESS_UPDATED, S_CANNOT_UPDATE_API_ACCESS);
+			if($result){
+				$audit_action = ($_REQUEST['set_api_access'] == GROUP_API_ACCESS_DISABLED)?AUDIT_ACTION_DISABLE:AUDIT_ACTION_UPDATE;
+				add_audit($audit_action,AUDIT_RESOURCE_USER_GROUP,'API access for group name ['.$group['name'].']');
 				
 				unset($_REQUEST['usrgrpid']);
 			}
@@ -491,6 +506,7 @@ include_once('include/page_header.php');
 				S_GROUPS,
 				S_IS_ONLINE_Q,
 				S_GUI_ACCESS,
+				S_API_ACCESS,
 				S_STATUS,
 				S_ACTIONS
 				));
@@ -568,6 +584,10 @@ include_once('include/page_header.php');
 
 				$users_status = new CSpan($users_status,($user['users_status'])?'green':'red');
 				$gui_access = new CSpan($gui_access,($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED)?'orange':'green');
+				
+				$user['api_access'] = get_user_api_access($userid);
+				$api_access = ($user['api_access']) ? S_ENABLED : S_DISABLED;
+				$api_access = new CSpan($api_access, ($user['api_access'] == GROUP_API_ACCESS_DISABLED)?'orange':'green');
 
 				$action = get_user_actionmenu($userid);				
 
@@ -584,6 +604,7 @@ include_once('include/page_header.php');
 					isset($users_groups[$userid])?$users_groups[$userid]:'',
 					$online,
 					$gui_access,
+					$api_access,
 					$users_status,
 					$action
 					));
@@ -618,11 +639,12 @@ include_once('include/page_header.php');
 			$table->setHeader(array(
 				S_USERS_STATUS,
 				S_GUI_ACCESS,
+				S_API_ACCESS,
 				array(  new CCheckBox('all_groups',NULL, "CheckAll('".$form->GetName()."','all_groups');"), make_sorting_link(S_NAME,'ug.name')),
 				S_MEMBERS,
 				));
 		
-			$result=DBselect('SELECT ug.usrgrpid, ug.name, ug.users_status, ug.gui_access '.
+			$result=DBselect('SELECT ug.usrgrpid, ug.name, ug.users_status, ug.gui_access, ug.api_access '.
 							' FROM usrgrp ug'.
 							' WHERE '.DBin_node('ug.usrgrpid').
 							order_by('ug.name'));
@@ -645,7 +667,8 @@ include_once('include/page_header.php');
 				}
 				
 				$gui_access = user_auth_type2str($row['gui_access']);
-				$users_status = ($row['users_status'] == GROUP_STATUS_ENABLED)?S_ENABLED:S_DISABLED;
+				$api_access = ($row['api_access'] == GROUP_API_ACCESS_DISABLED) ? S_DISABLED : S_ENABLED;
+				$users_status = ($row['users_status'] == GROUP_STATUS_ENABLED) ? S_ENABLED : S_DISABLED;
 
 				if(granted2update_group($row['usrgrpid'])){
 
@@ -657,6 +680,13 @@ include_once('include/page_header.php');
 								'&usrgrpid='.$row['usrgrpid'].
 								url_param('config'),
 								($row['gui_access'] == GROUP_GUI_ACCESS_DISABLED)?'orange':'enabled');
+								
+					$api_access = new CLink($api_access,
+								'users.php?form=update'.
+								'&set_api_access='.(($row['api_access'] == GROUP_API_ACCESS_DISABLED) ? GROUP_API_ACCESS_ENABLED : GROUP_API_ACCESS_DISABLED).
+								'&usrgrpid='.$row['usrgrpid'].
+								url_param('config'),
+								($row['api_access'] == GROUP_API_ACCESS_DISABLED)?'orange':'enabled');
 
 					$users_status = new CLink($users_status,
 								'users.php?form=update'.
@@ -667,13 +697,15 @@ include_once('include/page_header.php');
 
 				}
 				else{
-					$gui_access = new CSpan($gui_access,($row['gui_access'] == GROUP_GUI_ACCESS_DISABLED)?'orange':'green');				
+					$gui_access = new CSpan($gui_access,($row['gui_access'] == GROUP_GUI_ACCESS_DISABLED)?'orange':'green');
+					$api_access = new CSpan($api_access,($row['api_access'] == GROUP_API_ACCESS_DISABLED)?'orange':'green');					
 					$users_status = new CSpan($users_status,($row['users_status'] == GROUP_STATUS_ENABLED)?'green':'red');
 				}
 								
 				$table->addRow(array(
 					$users_status,
 					$gui_access,
+					$api_access,
 					array(
 						 new CCheckBox('group_groupid['.$row['usrgrpid'].']',NULL,NULL,$row['usrgrpid']),
 						$alias = new CLink($row['name'],

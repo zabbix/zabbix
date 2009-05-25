@@ -347,7 +347,7 @@
 	USER GROUPS
 **************************/
 
-	function add_user_group($name,$users_status,$gui_access,$users=array(),$rights=array()){
+	function add_user_group($name,$users_status,$gui_access,$api_access,$users=array(),$rights=array()){
 	
 		if(DBfetch(DBselect('select * from usrgrp where name='.zbx_dbstr($name).' and '.DBin_node('usrgrpid', get_current_nodeid(false))))){
 			error("Group '$name' already exists");
@@ -362,6 +362,7 @@
 // must come before adding user to group
 		$result&=change_group_status($usrgrpid,$users_status);
 		$result&=change_group_gui_access($usrgrpid,$gui_access);
+		$result&=change_group_api_access($usrgrpid, $api_access);
 		if(!$result) return	$result;
 //--------
 
@@ -382,7 +383,7 @@
 		return $result;
 	}
 
-	function update_user_group($usrgrpid,$name,$users_status,$gui_access,$users=array(),$rights=array()){
+	function update_user_group($usrgrpid,$name,$users_status,$gui_access,$api_access,$users=array(),$rights=array()){
 		global $USER_DETAILS;
 		
 		$sql = 'SELECT * '.
@@ -401,6 +402,7 @@
 // must come before adding user to group
 		$result&=change_group_status($usrgrpid,$users_status);
 		$result&=change_group_gui_access($usrgrpid,$gui_access);
+		$result&=change_group_api_access($usrgrpid, $api_access);
 		if(!$result) return	$result;
 //-------
 		
@@ -483,13 +485,20 @@
 	return $res;
 	}
 	
+	function change_group_api_access($usrgrpid, $api_access){		
+		$res = false;
+		$res = DBexecute('UPDATE usrgrp SET api_access='.$api_access.' WHERE usrgrpid='.$usrgrpid);	
+	return $res;
+	}
+	
 /********************************/
 	function set_users_jsmenu_array(){
 		$menu_all = array();
 		$menu_gui_access = array();
+		$menu_api_access = array();
 		$menu_users_status = array();
 		
-		$res = DBselect('SELECT DISTINCT g.usrgrpid, g.name, g.gui_access, g.users_status'.
+		$res = DBselect('SELECT DISTINCT g.usrgrpid, g.name, g.gui_access, g.api_access, g.users_status'.
 			' FROM usrgrp g'.
 			' WHERE '.DBin_node('g.usrgrpid', get_current_nodeid(false)).
 			' ORDER BY g.name');
@@ -498,16 +507,20 @@
 			$group['name'] = htmlspecialchars($group['name']);
 			
 			$gui_access = $group['gui_access'];
+			$api_access = $group['api_access'];
 			$users_status = $group['users_status'];
 
 			unset($group['gui_access']);
+			unset($group['api_access']);
 			unset($group['users_status']);
 
 			$menu_all[] = $group;			
 			if($gui_access != GROUP_GUI_ACCESS_SYSTEM){
 				$menu_gui_access[] = $group;
 			}
-
+			if($api_access == GROUP_API_ACCESS_ENABLED){
+				$menu_api_access[] = $group;
+			}
 			if($users_status == GROUP_STATUS_DISABLED){
 				$menu_users_status[] = $group;
 			}
@@ -515,6 +528,7 @@
 		insert_js(
 			'var menu_usrgrp_all='.zbx_jsvalue($menu_all).";\n".
 			'var menu_usrgrp_gui='.zbx_jsvalue($menu_gui_access).";\n".
+			'var menu_usrgrp_api='.zbx_jsvalue($menu_api_access).";\n".
 			'var menu_usrgrp_status='.zbx_jsvalue($menu_users_status).";\n"
 		);
 		
@@ -523,9 +537,10 @@
 	function get_user_actionmenu($userid){
 		$usr_grp_all_in = array();
 		$usr_grp_gui_in = array();
+		$usr_grp_api_in = array();
 		$usr_grp_status_in = array();
 		
-		$sql = 'SELECT DISTINCT g.name, g.usrgrpid, g.gui_access, g.users_status '.
+		$sql = 'SELECT DISTINCT g.name, g.usrgrpid, g.gui_access, g.api_access, g.users_status '.
 			' FROM users_groups ug, usrgrp g '.
 			' WHERE ug.userid='.$userid.
 				' AND g.usrgrpid=ug.usrgrpid '.
@@ -536,14 +551,19 @@
 			$group['name'] = htmlspecialchars($group['name']);
 			
 			$gui_access = $group['gui_access'];
+			$api_access = $group['api_access'];
 			$users_status = $group['users_status'];
 			
 			unset($group['gui_access']);
+			unset($group['api_access']);
 			unset($group['users_status']);
 		
 			$usr_grp_all_in[] = $group;	
 			if($gui_access != GROUP_GUI_ACCESS_SYSTEM){
 				$usr_grp_gui_in[] = $group;
+			}
+			if($api_access == GROUP_API_ACCESS_ENABLED){
+				$usr_grp_api_in[] = $group;
 			}
 			if($users_status == GROUP_STATUS_DISABLED){
 				$usr_grp_status_in[] = $group;
@@ -555,6 +575,7 @@
 												$userid.",".
 												zbx_jsvalue($usr_grp_all_in).",".
 												zbx_jsvalue($usr_grp_gui_in).",".
+												zbx_jsvalue($usr_grp_api_in).",".
 												zbx_jsvalue($usr_grp_status_in).");"
 							 );
 							 
