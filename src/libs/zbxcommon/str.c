@@ -1681,7 +1681,7 @@ char	*zbx_age2str(int age)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dd ", days);
 	if (days || hours)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dh ", hours);
-	offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dm ", minutes);
+	offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dm", minutes);
 
 	return buffer;
 }

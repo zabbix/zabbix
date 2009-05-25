@@ -69,6 +69,7 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 {
 	DB_RESULT result;
 	DB_ROW	row;
+	zbx_uint64_t	nodeid;
 	zbx_uint64_t	groupid;
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	condition_value;
@@ -354,6 +355,26 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
 				condition->operator,
 				condition->conditionid);
+		}
+	}
+	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_NODE)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "CONDITION_TYPE_NODE");
+
+		nodeid = get_nodeid_by_id(event->objectid);
+		ZBX_STR2UINT64(condition_value, condition->value);
+
+		switch (condition->operator) {
+		case CONDITION_OPERATOR_EQUAL:
+			ret = (nodeid == condition_value) ? SUCCEED : FAIL;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			ret = (nodeid != condition_value) ? SUCCEED : FAIL;
+			break;
+		default:
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
 		}
 	}
 	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_EVENT_ACKNOWLEDGED)
