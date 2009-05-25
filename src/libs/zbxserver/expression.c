@@ -1185,6 +1185,61 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_node_value_by_triggerid                                      *
+ *                                                                            *
+ * Purpose: request node value by triggerid                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: returns requested host profile value                         *
+ *                      or *UNKNOWN* if profile is not defined                *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	get_node_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to, int N_functionid, const char *fieldname)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
+	zbx_uint64_t	functionid;
+	int		nodeid, ret = FAIL;
+
+	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
+		return FAIL;
+
+	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
+		return FAIL;
+
+	nodeid = get_nodeid_by_id(functionid);
+
+	if (0 == strcmp(fieldname, "nodeid"))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%d", nodeid);
+
+		ret = SUCCEED;
+	}
+	else
+	{
+		result = DBselect("select distinct %s from nodes where nodeid=%d", fieldname, nodeid);
+
+		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+		{
+			*replace_to = zbx_dsprintf(*replace_to, "%s", row[0]);
+
+			ret = SUCCEED;
+		}
+
+		DBfree_result(result);
+	}
+
+	return ret;
+}
+
 #define MVAR_DATE			"{DATE}"
 #define MVAR_EVENT_ID			"{EVENT.ID}"
 #define MVAR_EVENT_DATE			"{EVENT.DATE}"
@@ -1226,6 +1281,8 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 #define MVAR_PROFILE_CONTACT		"{PROFILE.CONTACT}"
 #define MVAR_PROFILE_LOCATION		"{PROFILE.LOCATION}"
 #define MVAR_PROFILE_NOTES		"{PROFILE.NOTES}"
+#define MVAR_NODE_ID			"{NODE.ID}"
+#define MVAR_NODE_NAME			"{NODE.NAME}"
 
 #define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
 
@@ -1457,6 +1514,14 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_TRIGGER_NSEVERITY))
 		{
 			replace_to = zbx_dsprintf(replace_to, "%d", event->trigger_priority);
+		}
+		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_NODE_ID))
+		{
+			ret = get_node_value_by_triggerid(event->objectid, &replace_to, 1, "nodeid");
+		}
+		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_NODE_NAME))
+		{
+			ret = get_node_value_by_triggerid(event->objectid, &replace_to, 1, "name");
 		}
 		else if (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_HOST_IPMI_IP))
 		{
