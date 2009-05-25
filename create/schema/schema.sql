@@ -852,6 +852,7 @@ TABLE|usrgrp|usrgrpid|ZBX_SYNC
 FIELD		|usrgrpid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|gui_access	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|api_access	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|users_status	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
