@@ -43,6 +43,7 @@ include_once "include/page_header.php";
 		'g_druleid'=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
 
 		'dchecks'=>	array(null, O_OPT, null, null, null),
+		'dchecks_deleted'=>	array(null, O_OPT, null, null, null),
 		'selected_checks'=>	array(T_ZBX_INT, O_OPT, null, null, null),
 
 		'new_check_type'=>	array(T_ZBX_INT, O_OPT,  null,	
@@ -74,6 +75,7 @@ include_once "include/page_header.php";
 	validate_sort_and_sortorder('d.name',ZBX_SORT_UP);
 	
 	$_REQUEST['dchecks'] = get_request('dchecks', array());
+	$_REQUEST['dchecks_deleted'] = get_request('dchecks_deleted', array());
 	
 ?>
 <?php
@@ -89,7 +91,11 @@ include_once "include/page_header.php";
 	}
 	else if(inarr_isset(array('delete_ckecks', 'selected_checks'))){
 		foreach($_REQUEST['selected_checks'] as $chk_id)
+		{
+			if (isset($_REQUEST['dchecks'][$chk_id]['dcheckid']))
+				$_REQUEST['dchecks_deleted'][] = $_REQUEST['dchecks'][$chk_id]['dcheckid'];
 			unset($_REQUEST['dchecks'][$chk_id]);
+		}
 	}
 	else if(inarr_isset('save')){
 		if(inarr_isset('druleid')){ /* update */
@@ -97,7 +103,7 @@ include_once "include/page_header.php";
 			$msg_fail = S_CANNOT_UPDATE_DISCOVERY_RULE;
 
 			$result = update_discovery_rule($_REQUEST["druleid"], $_REQUEST["proxy_hostid"], $_REQUEST['name'], $_REQUEST['iprange'], 
-				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks']);
+				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'], $_REQUEST['dchecks_deleted']);
 
 			$druleid = $_REQUEST["druleid"];
 		}

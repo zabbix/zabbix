@@ -689,6 +689,29 @@ require_once('include/httptest.inc.php');
 
 	function delete_proxy($proxyids){
 		zbx_value2array($proxyids);
+
+		$actionids = array();
+// conditions
+		$sql = 'SELECT DISTINCT actionid FROM conditions '.
+				' WHERE conditiontype='.CONDITION_TYPE_PROXY.
+					' AND '.DBcondition('value', $proxyids, false, true);	// FIXED[POSIBLE value type violation]!!!
+
+		$db_actions = DBselect($sql);
+		while($db_action = DBfetch($db_actions))
+			$actionids[] = $db_action['actionid'];
+
+		if (!empty($actionids))
+		{
+			DBexecute('UPDATE actions '.
+					' SET status='.ACTION_STATUS_DISABLED.
+					' WHERE '.DBcondition('actionid', $actionids));
+
+// delete action conditions
+			DBexecute('DELETE FROM conditions '.
+					' WHERE conditiontype='.CONDITION_TYPE_PROXY.
+					' AND '.DBcondition('value',$proxyids, false, true)); 	// FIXED[POSIBLE value type violation]!!!
+		}
+
 		if(!DBexecute('UPDATE hosts SET proxy_hostid=0 WHERE '.DBcondition('proxy_hostid',$proxyids)))
 			return false;
 

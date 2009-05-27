@@ -26,6 +26,7 @@
 	require_once('include/users.inc.php');
 	require_once('include/nodes.inc.php');
 	require_once('include/js.inc.php');
+	require_once('include/discovery.inc.php');
 
 	$srctbl		= get_request("srctbl",  '');	// source table name
 
@@ -38,6 +39,10 @@
 			break;
 		case 'hosts':
 			$page['title'] = "S_HOSTS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			break;
+		case 'proxies':
+			$page['title'] = "S_PROXIES_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'applications':
@@ -114,6 +119,14 @@
 				$min_user_type = USER_TYPE_ZABBIX_USER;
 				break;
 			}
+		case 'drules':
+			$page['title'] = "S_DISCOVERY_RULES_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			break;
+		case 'dchecks':
+			$page['title'] = "S_DISCOVERY_CHECKS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			break;
 		default:
 			$page['title'] = "S_ERROR";
 			$error = true;
@@ -1307,6 +1320,85 @@ include_once('include/page_header.php');
 			$table->addRow($name);
 		}
 		$table->show();
+	}
+	else if($srctbl == "drules"){
+		$table = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
+		$table->SetHeader(S_NAME);
+
+		$result = DBselect('SELECT DISTINCT * FROM drules WHERE '.DBin_node('druleid', $nodeid));
+		while($row = DBfetch($result)){
+			$name = new CLink($row["name"],"#","action");
+
+			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
+					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
+					"window.opener.setTimeout('add2favorites();', 1000);";
+			}
+			else{
+				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+			}
+
+			$name->SetAction($action." close_window(); return false;");
+
+			$table->addRow($name);
+		}
+		$table->Show();
+	}
+	else if($srctbl == "dchecks"){
+		$table = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
+		$table->SetHeader(S_NAME);
+
+		$result = DBselect('SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.snmp_community,c.ports FROM drules r,dchecks c'.
+				' WHERE r.druleid=c.druleid and '.DBin_node('r.druleid', $nodeid));
+		while($row = DBfetch($result)){
+			$row['name'] = $row['name'].':'.discovery_check2str($row['type'],
+					$row['snmp_community'], $row['key_'], $row['ports']);
+			$name = new CLink($row["name"],"#","action");
+
+			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
+					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
+					"window.opener.setTimeout('add2favorites();', 1000);";
+			}
+			else{
+				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+			}
+
+			$name->SetAction($action." close_window(); return false;");
+
+			$table->addRow($name);
+		}
+		$table->Show();
+	}
+	else if($srctbl == "proxies"){
+		$table = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
+		$table->SetHeader(S_NAME);
+
+		$result = DBselect('SELECT DISTINCT hostid,host '.
+				' FROM hosts'.
+				' WHERE '.DBin_node('hostid', $nodeid).
+					' AND status='.HOST_STATUS_PROXY.
+				' ORDER BY host,hostid');
+		while($row = DBfetch($result)){
+			$name = new CLink($row["host"],"#","action");
+
+			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
+				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
+					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
+					"window.opener.setTimeout('add2favorites();', 1000);";
+			}
+			else{
+				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+			}
+
+			$name->SetAction($action." close_window(); return false;");
+
+			$table->addRow($name);
+		}
+		$table->Show();
 	}
 ?>
 <script language="JavaScript" type="text/javascript">

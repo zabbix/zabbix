@@ -75,6 +75,25 @@
 		return S_UNKNOWN;
 	}
 
+	function	discovery_check2str($type, $snmp_community, $key_, $ports)
+	{
+		$external_param = null;
+		$port_def = svc_default_port($type);
+
+		switch($type)
+		{
+			case SVC_SNMPv1:
+			case SVC_SNMPv2:
+				$external_param = ' "'.$snmp_community.'":"'.$key_.'"';
+				break;
+			case SVC_AGENT:
+				$external_param = ' "'.$key_.'"';
+				break;
+		}
+		return discovery_check_type2str($type).($port_def == $ports ? '' : ' ('.$ports.')').
+				$external_param;
+	}
+
 	function	discovery_port2str($type_int, $port)
 	{
 		$port_def = svc_default_port($type_int);
@@ -160,7 +179,6 @@
 
 		if($result)
 		{
-			DBexecute('delete from dchecks where druleid='.$druleid);
 			if(isset($dchecks)) foreach($dchecks as $val)
 				add_discovery_check($druleid,$val["type"],$val["ports"],$val["key"],$val["snmp_community"]);
 
@@ -170,7 +188,7 @@
 		return $result;
 	}
 
-	function	update_discovery_rule($druleid, $proxy_hostid, $name, $iprange, $delay, $status, $dchecks)
+	function	update_discovery_rule($druleid, $proxy_hostid, $name, $iprange, $delay, $status, $dchecks, $dchecks_deleted)
 	{
 		if( !validate_ip_range($iprange) )
 		{
@@ -184,16 +202,75 @@
 
 		if($result)
 		{
-			DBexecute('delete from dchecks where druleid='.$druleid);
-			if(isset($dchecks)) foreach($dchecks as $val)
-				add_discovery_check($druleid,$val["type"],$val["ports"],$val["key"],$val["snmp_community"]);
+			if (isset($dchecks))
+			{
+				foreach($dchecks as $val)
+					if (!isset($val['dcheckid']))
+						add_discovery_check($druleid, $val['type'], $val['ports'],
+								$val['key'], $val['snmp_community']);
+			}
+			if(isset($dchecks_deleted) && !empty($dchecks_deleted))
+				delete_discovery_check($dchecks_deleted);
 		}
 		return $result;
+	}
+
+	function	delete_discovery_check($dcheckids)
+	{
+		$actionids = array();
+// conditions
+		$sql = 'SELECT DISTINCT actionid '.
+				' FROM conditions '.
+				' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
+					' AND '.DBcondition('value', $dcheckids, false, true);	// FIXED[POSIBLE value type violation]!!!
+
+		$db_actions = DBselect($sql);
+		while($db_action = DBfetch($db_actions))
+			$actionids[] = $db_action['actionid'];
+
+// disabling actions with deleted conditions
+		if (!empty($actionids))
+		{
+			DBexecute('UPDATE actions '.
+					' SET status='.ACTION_STATUS_DISABLED.
+					' WHERE '.DBcondition('actionid', $actionids));
+
+// delete action conditions
+			DBexecute('DELETE FROM conditions '.
+					' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
+					' AND '.DBcondition('value', $dcheckids, false, true));	// FIXED[POSIBLE value type violation]!!!
+		}
+
+		DBexecute('DELETE FROM dchecks WHERE '.DBcondition('dcheckid', $dchecks_deleted));
 	}
 
 	function	delete_discovery_rule($druleid)
 	{
 		$result = true;
+
+		$actionids = array();
+// conditions
+		$sql = 'SELECT DISTINCT actionid '.
+				' FROM conditions '.
+				' WHERE conditiontype='.CONDITION_TYPE_DRULE.
+					" AND value='$druleid'";
+
+		$db_actions = DBselect($sql);
+		while($db_action = DBfetch($db_actions))
+			$actionids[] = $db_action['actionid'];
+
+// disabling actions with deleted conditions
+		if (!empty($actionids))
+		{
+			DBexecute('UPDATE actions '.
+					' SET status='.ACTION_STATUS_DISABLED.
+					' WHERE '.DBcondition('actionid', $actionids));
+
+// delete action conditions
+			DBexecute('DELETE FROM conditions '.
+					' WHERE conditiontype='.CONDITION_TYPE_DRULE.
+					" AND value='$druleid'");
+		}
 
 		if ($result) {
 			$db_dhosts = DBselect('select dhostid from dhosts'.

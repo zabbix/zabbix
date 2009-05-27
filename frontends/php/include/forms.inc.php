@@ -171,11 +171,14 @@
 
 			//TODO init checks
 			$dchecks = array();
-			$db_checks = DBselect('SELECT type,ports,key_,snmp_community FROM dchecks WHERE druleid='.$_REQUEST['druleid']);
+			$db_checks = DBselect('SELECT dcheckid,type,ports,key_,snmp_community FROM dchecks WHERE druleid='.
+					$_REQUEST['druleid']);
 			while($check_data = DBfetch($db_checks)){
-				$dchecks[] = array( 'type' => $check_data['type'], 'ports' => $check_data['ports'] ,
-						'key' => $check_data['key_'], 'snmp_community' => $check_data['snmp_community']);
+				$dchecks[] = array('dcheckid' => $check_data['dcheckid'], 'type' => $check_data['type'],
+						'ports' => $check_data['ports'], 'key' => $check_data['key_'],
+						'snmp_community' => $check_data['snmp_community']);
 			}
+			$dchecks_deleted = get_request('dchecks_deleted',array());
 		}
 		else{
 			$proxy_hostid	= get_request("proxy_hostid",0);
@@ -185,6 +188,7 @@
 			$status		= get_request('status',DRULE_STATUS_ACTIVE);
 
 			$dchecks	= get_request('dchecks',array());
+			$dchecks_deleted = get_request('dchecks_deleted',array());
 		}
 
 		$new_check_type	= get_request('new_check_type', SVC_HTTP);
@@ -213,6 +217,7 @@
 		$form->addRow(S_DELAY.' (seconds)', new CNumericBox('delay', $delay, 8));
 
 		$form->addVar('dchecks', $dchecks);
+		$form->addVar('dchecks_deleted', $dchecks_deleted);
 
 		foreach($dchecks as $id => $data){
 			switch($data['type'])
@@ -3879,6 +3884,39 @@
 						"return PopUp('popup.php?dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=node&srctbl=nodes".
 						"&srcfld1=nodeid&srcfld2=name',450,450);",
+						'T')
+					);
+				break;
+			case CONDITION_TYPE_DRULE:
+				$tblCond->addItem(new CVar('new_condition[value]','0'));
+				$rowCondition[] = array(
+					new CTextBox('drule','',20,'yes'),
+					new CButton('btn1',S_SELECT,
+						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=drule&srctbl=drules".
+						"&srcfld1=druleid&srcfld2=name',450,450);",
+						'T')
+					);
+				break;
+			case CONDITION_TYPE_DCHECK:
+				$tblCond->addItem(new CVar('new_condition[value]','0'));
+				$rowCondition[] = array(
+					new CTextBox('dcheck','',50,'yes'),
+					new CButton('btn1',S_SELECT,
+						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=dcheck&srctbl=dchecks".
+						"&srcfld1=dcheckid&srcfld2=name',450,450);",
+						'T')
+					);
+				break;
+			case CONDITION_TYPE_PROXY:
+				$tblCond->addItem(new CVar('new_condition[value]','0'));
+				$rowCondition[] = array(
+					new CTextBox('proxy','',20,'yes'),
+					new CButton('btn1',S_SELECT,
+						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=proxy&srctbl=proxies".
+						"&srcfld1=hostid&srcfld2=host',450,450);",
 						'T')
 					);
 				break;
