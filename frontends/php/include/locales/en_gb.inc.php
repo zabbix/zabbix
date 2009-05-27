@@ -271,6 +271,7 @@
 	'S_SEND_ONLY_TO'=>			'Send only to',
 	'S_MEDIAS_SMALL'=>			'medias',
 	'S_USER_MEDIAS'=>			'User medias',
+	'S_DISCOVERY_CHECK'=>			'Discovery check',
 
 	'S_INCORRECT_TRIGGER'=>			'Incorrect trigger',
 	'S_INCORRECT_HOST'=>			'Incorrect host',
@@ -1831,6 +1832,8 @@
 	'S_EMPTY'=>				'Empty',
 	'S_STANDARD_ITEMS_BIG'=>		'STANDARD ITEMS',
 	'S_NO_ITEMS'=>				'No items',
+	'S_DISCOVERY_RULES_BIG'=>		'DISCOVERY RULES',
+	'S_DISCOVERY_CHECKS_BIG'=>		'DISCOVERY CHECKS',
 
 //	Menu
 
