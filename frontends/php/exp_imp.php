@@ -164,7 +164,8 @@ include_once "include/page_header.php";
 		$table = new CTable();
 		$table->SetHeader(array(S_ELEMENT, S_EXISTING, S_MISSING),'bold');
 
-		foreach(array(	'host'		=> S_HOST,
+		foreach(array(
+				'host'		=> S_HOST,
 				'template'	=> S_TEMPLATE,
 				'item'		=> S_ITEM,
 				'trigger'	=> S_TRIGGER,
@@ -172,15 +173,17 @@ include_once "include/page_header.php";
 			as $key => $title)
 		{
 			$cmbExist = new CComboBox('rules['.$key.'][exist]', $rules[$key]['exist']);
-			$cmbExist->AddItem(0, S_UPDATE);
-			$cmbExist->AddItem(1, S_SKIP);
+			$cmbExist->addItem(0, S_UPDATE);
+			$cmbExist->addItem(1, S_SKIP);
 			
 			$cmbMissed = new CComboBox('rules['.$key.'][missed]', $rules[$key]['missed']);
 			
-			if($key == 'template') $cmbMissed->AddItem(0, S_ADD);
-			$cmbMissed->AddItem(1, S_SKIP);
+			if($key != 'template') 
+				$cmbMissed->addItem(0, S_ADD);
+				
+			$cmbMissed->addItem(1, S_SKIP);
 
-			$table->AddRow(array($title, $cmbExist, $cmbMissed));
+			$table->addRow(array($title, $cmbExist, $cmbMissed));
 		}
 
 		$form->AddRow(S_RULES, $table);
