@@ -374,6 +374,8 @@ function condition_type2str($conditiontype){
 	$str_type[CONDITION_TYPE_TIME_PERIOD]		= S_TIME_PERIOD;
 	$str_type[CONDITION_TYPE_MAINTENANCE]		= S_MAINTENANCE_STATUS;
 	$str_type[CONDITION_TYPE_NODE]			= S_NODE;
+	$str_type[CONDITION_TYPE_DRULE]			= S_DISCOVERY_RULE;
+	$str_type[CONDITION_TYPE_DCHECK]		= S_DISCOVERY_CHECK;
 	$str_type[CONDITION_TYPE_DHOST_IP]		= S_HOST_IP;
 	$str_type[CONDITION_TYPE_DSERVICE_TYPE]		= S_SERVICE_TYPE;
 	$str_type[CONDITION_TYPE_DSERVICE_PORT]		= S_SERVICE_PORT;
@@ -382,6 +384,7 @@ function condition_type2str($conditiontype){
 	$str_type[CONDITION_TYPE_DVALUE]		= S_RECEIVED_VALUE;
 	$str_type[CONDITION_TYPE_EVENT_ACKNOWLEDGED]	= S_EVENT_ACKNOWLEDGED;
 	$str_type[CONDITION_TYPE_APPLICATION]		= S_APPLICATION;
+	$str_type[CONDITION_TYPE_PROXY]			= S_PROXY;
 
 	if(isset($str_type[$conditiontype]))
 		return $str_type[$conditiontype];
@@ -426,6 +429,20 @@ function condition_value2str($conditiontype, $value){
 		case CONDITION_TYPE_NODE:
 			$node = get_node_by_nodeid($value);
 			$str_val = $node['name'];
+			break;
+		case CONDITION_TYPE_DRULE:
+			$drule = get_discovery_rule_by_druleid($value);
+			$str_val = $drule['name'];
+			break;
+		case CONDITION_TYPE_DCHECK:
+			$row = DBfetch(DBselect('SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.snmp_community,c.ports'.
+					' FROM drules r,dchecks c WHERE r.druleid=c.druleid AND c.dcheckid='.$value));
+			$str_val = $row['name'].':'.discovery_check2str($row['type'],
+					$row['snmp_community'], $row['key_'], $row['ports']);
+			break;
+		case CONDITION_TYPE_PROXY:
+			$host = get_host_by_hostid($value);
+			$str_val = $host['host'];
 			break;
 		case CONDITION_TYPE_DHOST_IP:
 			$str_val = $value;
@@ -578,9 +595,12 @@ function get_conditions_by_eventsource($eventsource){
 			CONDITION_TYPE_DHOST_IP,
 			CONDITION_TYPE_DSERVICE_TYPE,
 			CONDITION_TYPE_DSERVICE_PORT,
+			CONDITION_TYPE_DRULE,
+			CONDITION_TYPE_DCHECK,
 			CONDITION_TYPE_DSTATUS,
 			CONDITION_TYPE_DUPTIME,
-			CONDITION_TYPE_DVALUE
+			CONDITION_TYPE_DVALUE,
+			CONDITION_TYPE_PROXY
 		);
 
 	if (ZBX_DISTRIBUTED)
@@ -685,6 +705,18 @@ function	get_operators_by_conditiontype($conditiontype)
 			CONDITION_OPERATOR_NOT_IN
 		);
 	$operators[CONDITION_TYPE_NODE] = array(
+			CONDITION_OPERATOR_EQUAL,
+			CONDITION_OPERATOR_NOT_EQUAL
+		);
+	$operators[CONDITION_TYPE_DRULE] = array(
+			CONDITION_OPERATOR_EQUAL,
+			CONDITION_OPERATOR_NOT_EQUAL
+		);
+	$operators[CONDITION_TYPE_DCHECK] = array(
+			CONDITION_OPERATOR_EQUAL,
+			CONDITION_OPERATOR_NOT_EQUAL
+		);
+	$operators[CONDITION_TYPE_PROXY] = array(
 			CONDITION_OPERATOR_EQUAL,
 			CONDITION_OPERATOR_NOT_EQUAL
 		);
@@ -810,6 +842,9 @@ function validate_condition($conditiontype, $value){
 		case CONDITION_TYPE_TRIGGER_SEVERITY:
 		case CONDITION_TYPE_MAINTENANCE:
 		case CONDITION_TYPE_NODE:
+		case CONDITION_TYPE_DRULE:
+		case CONDITION_TYPE_DCHECK:
+		case CONDITION_TYPE_PROXY:
 		case CONDITION_TYPE_DUPTIME:
 		case CONDITION_TYPE_DVALUE:
 		case CONDITION_TYPE_APPLICATION:
