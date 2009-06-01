@@ -194,24 +194,30 @@ static void	register_service(DB_DSERVICE *service, const char *ip, int port, int
 			port,
 			key_esc);
 
-	if (NULL == (row = DBfetch(result)) || DBis_null(row[0]) == SUCCEED) {
+	if (NULL == (row = DBfetch(result)) || DBis_null(row[0]) == SUCCEED)
+	{
 		/* Add host only if service is up */
-		if (status == DOBJECT_STATUS_UP) {
+		if (status == DOBJECT_STATUS_UP)
+		{
 			zabbix_log(LOG_LEVEL_DEBUG, "New service discovered on port %d", port);
 
 			service->dserviceid	= DBget_maxid("dservices","dserviceid");
 			service->port		= port;
 			service->status		= DOBJECT_STATUS_DOWN;
 
-			DBexecute("insert into dservices (dhostid,dserviceid,type,port,status,key_) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s')",
-				service->dhostid,
-				service->dserviceid,
-				service->type,
-				service->port,
-				service->status,
-				key_esc);
+			DBexecute("insert into dservices (dserviceid,dhostid,dcheckid,type,port,status,key_)"
+					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s')",
+					service->dserviceid,
+					service->dhostid,
+					service->dcheckid,
+					service->type,
+					service->port,
+					service->status,
+					key_esc);
 		}
-	} else {
+	}
+	else
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Service is already in database");
 		
 		service->dserviceid	= zbx_atoui64(row[0]);
@@ -316,23 +322,26 @@ static void update_service_status(DB_DSERVICE *service, DB_DCHECK *check, int no
 	assert(check);
 
 	/* Update service status */
-	if (check->status == DOBJECT_STATUS_UP) {
-		if (service->status == DOBJECT_STATUS_DOWN || service->lastup == 0) {
+	if (check->status == DOBJECT_STATUS_UP)
+	{
+		strcpy(service->value, check->value);
+		if (service->status == DOBJECT_STATUS_DOWN || service->lastup == 0)
+		{
 			service->status		= check->status;
 			service->lastdown	= 0;
 			service->lastup		= now;
-			strcpy(service->value, check->value);
 
 			update_dservice(service);
 
 			add_event(EVENT_OBJECT_DSERVICE, service->dserviceid, DOBJECT_STATUS_DISCOVER);
-		} else if (0 != strcmp(service->value, check->value)) {
-			strcpy(service->value, check->value);
-
-			update_dservice_value(service);
 		}
-	} else { /* DOBJECT_STATUS_DOWN */
-		if (service->status == DOBJECT_STATUS_UP || service->lastdown == 0) {
+		else if (0 != strcmp(service->value, check->value))
+			update_dservice_value(service);
+	}
+	else
+	{ /* DOBJECT_STATUS_DOWN */
+		if (service->status == DOBJECT_STATUS_UP || service->lastdown == 0)
+		{
 			service->status		= check->status;
 			service->lastdown	= now;
 			service->lastup		= 0;
@@ -426,7 +435,8 @@ void update_service(DB_DHOST *dhost, DB_DCHECK *check, char *ip, int port, int n
 	/* Register service if is not registered yet */
 	if (dhost->dhostid > 0) {
 		service.dhostid = dhost->dhostid;
-		service.type	= check->type;
+		service.dcheckid = check->dcheckid;
+		service.type = check->type;
 		strscpy(service.key_, check->key_);
 		register_service(&service, ip, port, check->status);
 	}
@@ -466,10 +476,10 @@ static void proxy_update_service(DB_DCHECK *check, char *ip, int port, int now)
 	key_esc = DBdyn_escape_string_len(check->key_, PROXY_DHISTORY_KEY_LEN);
 	value_esc = DBdyn_escape_string_len(check->value, PROXY_DHISTORY_VALUE_LEN);
 
-	DBexecute("insert into proxy_dhistory (clock,druleid,type,ip,port,key_,value,status)"
+	DBexecute("insert into proxy_dhistory (clock,dcheckid,type,ip,port,key_,value,status)"
 			" values (%d," ZBX_FS_UI64 ",%d,'%s',%d,'%s','%s',%d)",
 			now,
-			check->druleid,
+			check->dcheckid,
 			check->type,
 			ip_esc,
 			port,

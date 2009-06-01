@@ -50,6 +50,7 @@ FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|key_		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmp_community	|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ports		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+INDEX		|1		|druleid
 
 TABLE|dhosts|dhostid|ZBX_SYNC
 FIELD		|dhostid	|t_id		|'0'	|NOT NULL	|0
@@ -58,6 +59,7 @@ FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+INDEX		|1		|druleid
 
 TABLE|dservices|dserviceid|ZBX_SYNC
 FIELD		|dserviceid	|t_id		|'0'	|NOT NULL	|0
@@ -69,6 +71,9 @@ FIELD		|port		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|dcheckid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|dchecks
+INDEX		|1		|dhostid
+INDEX		|2		|dcheckid
 
 TABLE|ids|nodeid,table_name,field_name|
 FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0			|nodes
@@ -251,6 +256,7 @@ TABLE|proxy_dhistory|id|0
 FIELD		|id		|t_serial	|	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|druleid	|t_id		|'0'	|NOT NULL	|0			|drules
+FIELD		|dcheckid	|t_id		|'0'	|NOT NULL	|0			|dchecks
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|port		|t_integer	|'0'	|NOT NULL	|0
