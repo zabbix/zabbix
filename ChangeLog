@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-932] fixed typo in changelog (Richlv)
  - [ZBX-931] fixed timeout handling for agent's user parameters (Alexei)
  - [ZBX-889] fixed possible bug in media types form (Artem)
  - [ZBX-927] removed default values for text and blob fields in the upgrade script for compatibility with MySQL 5.0 (Sasha)
@@ -41,7 +42,7 @@ Changes for 1.6.5
  - [ZBX-874] fixed evaluation of items nextcheck for flexible intervals (Sasha) 
  - [ZBX-868] fixed incorrect processing of not supported internal checks (Alexei)
  - [ZBX-867] added php sockets check to installation wizard (Artem)
- - [ZBX-865] fixed displaying templates without groups in tempalte linkage page (Artem)
+ - [ZBX-865] fixed displaying templates without groups in template linkage page (Artem)
  - [ZBX-857] changed queue details timestamp to timestamp defined in locale file (Artem)
  - [ZBX-864] fixed problem when saving screen item without selected item (Artem)
  - [ZBX-856] fixed email sending if tcp packets from smtp server are segmented (Sasha)
