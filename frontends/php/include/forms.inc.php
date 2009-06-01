@@ -518,7 +518,7 @@
                 $form->Show();
 	}
 
-	function	insert_configuration_form($file)
+	function insert_configuration_form($file)
 	{
 		$type		= get_request('type',		'MYSQL');
 		$server		= get_request('server',		'localhost');
@@ -1496,6 +1496,7 @@
 
 // Insert form for Item information
 	function insert_item_form(){
+
 		global  $USER_DETAILS;
 
 		$frmItem = new CFormTable(S_ITEM,'items.php','post');
@@ -2316,6 +2317,7 @@
 
 // Insert form for Trigger
 	function insert_trigger_form(){
+	
 		global $USER_DETAILS;
 
 		$frmTrig = new CFormTable(S_TRIGGER,'triggers.php');
@@ -5344,10 +5346,10 @@
 	function insert_host_form($show_only_tmp=0){
 		global $USER_DETAILS;
 
-		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-
 		$groups= get_request('groups',array());
-
+		
+		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
+		
 		$newgroup	= get_request('newgroup','');
 
 		$host 		= get_request('host',	'');
@@ -5888,6 +5890,7 @@
 
 // Insert form for Host Groups
 	function insert_hostgroups_form(){
+	
 		global	$USER_DETAILS;
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
 
@@ -6096,6 +6099,7 @@
 // END:   HOSTS PROFILE EXTENDED Section
 
  	function insert_template_form($available_hosts){
+
  		$frm_title = S_TEMPLATE_LINKAGE;
 
  		if($_REQUEST['hostid']>0){

@@ -25,16 +25,17 @@ require_once('include/items.inc.php');
 require_once('include/httptest.inc.php');
 
 /* HOST GROUP functions */
-	function add_host_to_group($hostid, $groupid){
-		if(!is_numeric($hostid) || !is_numeric($groupid)){
-			error("incorrect parameters for 'add_host_to_group' [hostid:".$hostid."][groupid:".$groupid."]");
-			return false;
+	function add_host_to_group($hostids, $groupid){
+		zbx_value2array($hostids);
+
+		$result = false;
+		foreach($hostids as $key => $hostid) {
+			$hostgroupid = get_dbid("hosts_groups","hostgroupid");
+			$result = DBexecute("insert into hosts_groups (hostgroupid,hostid,groupid) values ($hostgroupid,$hostid,$groupid)");
+			if(!$result)
+				return $result;
 		}
-		$hostgroupid=get_dbid("hosts_groups","hostgroupid");
-		$result=DBexecute("insert into hosts_groups (hostgroupid,hostid,groupid) values ($hostgroupid,$hostid,$groupid)");
-		if(!$result)
-			return $result;
-		return $hostgroupid;
+		return $result;
 	}
 
 	function delete_host_from_group($hostid, $groupid){
@@ -112,14 +113,12 @@ require_once('include/httptest.inc.php');
 	function update_host_groups_by_groupid($groupid,$hosts=array()){
 		DBexecute('DELETE FROM hosts_groups WHERE groupid='.$groupid);
 
-		foreach($hosts as $hostid){
-			add_host_to_group($hostid, $groupid);
-		}
+		add_host_to_group($hosts, $groupid);
 	}
 
 	function update_host_groups($hostid,$groups=array()){
 		DBexecute('DELETE FROM hosts_groups WHERE hostid='.$hostid);
-
+		
 		foreach($groups as $groupid){
 			add_host_to_group($hostid, $groupid);
 		}
@@ -233,6 +232,7 @@ require_once('include/httptest.inc.php');
 				error('Circle link can not be created');
 				return false;
 			}
+			
 			$host_old = get_host_by_hostid($hostid);
 			$result = DBexecute('UPDATE hosts SET proxy_hostid='.$proxy_hostid.
 							',host='.zbx_dbstr($host).
@@ -285,7 +285,11 @@ require_once('include/httptest.inc.php');
 						$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,
 						$newgroup,$groups)
 	{
-
+		if(is_null($templates))
+			$templates = array();
+		if(is_null($groups))
+			$groups = array();
+			
 		$hostid = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,
 								$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password);
 		if(!$hostid)
@@ -319,13 +323,18 @@ require_once('include/httptest.inc.php');
 							$templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,
 							$newgroup,$groups)
 	{
-		$old_templates = get_templates_by_hostid($hostid);
-		$new_templates = array_diff($templates, $old_templates);
-		
-		$unlinked_templates = array_diff($old_templates, $templates);
-		
-		foreach($unlinked_templates as $id => $name){
-			unlink_template($hostid, $id);
+		if(is_null($templates)){
+			$new_templates = array();
+		}
+		else{	
+			$old_templates = get_templates_by_hostid($hostid);
+			$new_templates = array_diff($templates, $old_templates);
+			
+			$unlinked_templates = array_diff($old_templates, $templates);
+			
+			foreach($unlinked_templates as $id => $name){
+				unlink_template($hostid, $id);
+			}
 		}
 		
 		$result = (bool) db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$new_templates,
@@ -333,15 +342,17 @@ require_once('include/httptest.inc.php');
 										$hostid);
 		if(!$result)
 			return $result;
+		
+		if(!is_null($groups))
+			update_host_groups($hostid, $groups);
 			
-		update_host_groups($hostid, $groups);
 		add_group_to_host($hostid,$newgroup);
 
 		if(count($new_templates) > 0){
 			sync_host_with_templates($hostid,array_keys($new_templates));
 		}
 	
-	return	$result;
+	return $result;
 	}
 
 	/*

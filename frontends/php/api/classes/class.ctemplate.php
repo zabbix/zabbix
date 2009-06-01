@@ -9,6 +9,8 @@
  */
 class CTemplate {
 
+	public static $error;
+
 	/**
 	 * Get host data 
 	 *
@@ -120,6 +122,7 @@ class CTemplate {
 		while($host = DBfetch($res)){
 			$result[$host['hostid']] = $host;
 		}
+		
 		return $result;
 	}
 	
@@ -127,22 +130,30 @@ class CTemplate {
 	 * Gets all template data from DB by templateid
 	 *
 	 * @static
-	 * @param int $templateid 
+	 * @param array $template_data 
 	 * @return array|boolean template data as array or false if error
 	 */
-	public static function getById($templateid){
-		$sql = 'SELECT * FROM hosts WHERE hostid='.$templateid.' AND status=3';
+	public static function getById($template_data){
+		$sql = 'SELECT * FROM hosts WHERE hostid='.$template_data['templateid'].' AND status=3';
 		$template = DBfetch(DBselect($sql));
 		
-		return $template ? $template : false;
+		$result = $template ? true : false;
+		if($result)
+			return $template;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return false;
+		}
 	}
 	
 	/**
 	 * Get templateid by template name
 	 *
+	 * <code>
 	 * $template_data = array(
-	 * + string 'template' => 'template name'
+	 * 	string 'template' => 'template name'
 	 * );
+	 * </code>
 	 *
 	 * @static
 	 * @param array $template_data
@@ -150,12 +161,18 @@ class CTemplate {
 	 */
 	public static function getId($template_data){
 		$sql = 'SELECT hostid FROM hosts '.
-			' WHERE host='.zbx_dbstr($template_data['template']).
+			' WHERE host='.zbx_dbstr($template_data['name']).
 				' AND status=3 '.
 				' AND '.DBin_node('hostid', get_current_nodeid(false));
 		$templateid = DBfetch(DBselect($sql));
 		
-		return $templateid ? $templateid['hostid'] : false;	
+		$result = $templateid ? true : false;
+		if($result)
+			return $templateid['hostid'];
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return false;
+		}
 	}
 	
 	/**
@@ -171,6 +188,8 @@ class CTemplate {
 		$groups = null;
 		$status = 3;
 		
+		$templateids = array();
+		
 		$result = false;
 		
 		DBstart(false);
@@ -178,8 +197,11 @@ class CTemplate {
 		
 			$host_db_fields = array(
 				'host' => null,
+				'port' => 0,
+				'status' => 0,
 				'useip' => 0,
 				'dns' => '',
+				'ip' => '0.0.0.0',
 				'proxy_hostid' => 0,
 				'useipmi' => 0,
 				'ipmi_ip' => '',
@@ -199,10 +221,16 @@ class CTemplate {
 				$template['proxy_hostid'], $tpls, $template['useipmi'], $template['ipmi_ip'], $template['ipmi_port'], $template['ipmi_authtype'], 
 				$template['ipmi_privilege'], $template['ipmi_username'], $template['ipmi_password'], $newgroup, $groups);
 			if(!$result) break;
+			$templateids[$result] = $result;
 		}
 		$result = DBend($result);
 		
-		return $result;
+		if($result)
+			return $templateids;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return $result;	
+		}
 	}
 	
 	/**
@@ -218,6 +246,7 @@ class CTemplate {
 		$groups = null;
 		$status = 3;
 		
+		$templateids = array();
 		$result = false;
 		
 		DBstart(false);
@@ -244,10 +273,17 @@ class CTemplate {
 				$template['proxy_hostid'], $tpls, $template['useipmi'], $template['ipmi_ip'], $template['ipmi_port'], $template['ipmi_authtype'], 
 				$template['ipmi_privilege'], $template['ipmi_username'], $template['ipmi_password'], $newgroup, $groups);
 			if(!$result) break;
+			$templateids[$result] = $result;
 		}	
 		$result = DBend($result);
 		
-		return $result;
+		if($result)
+			return $templateids;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return false;
+		}
+
 	}
 	
 	/**
@@ -258,43 +294,15 @@ class CTemplate {
 	 * @return boolean
 	 */	
 	public static function delete($templateids){
-		return delete_host($templateids, false);	
+		$result = delete_host($templateids, false);
+		if($result)
+			return $templateids;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return false;
+		}
 	}
 	
-	/**
-	 * Add groups to existing template groups
-	 *
-	 * @static
-	 * @param int $templateid
-	 * @param array $groupids
-	 * @return boolean
-	 */	
-	public static function addGroups($templateid, $groupids){	
-		$result = false;
-		
-		DBstart(false);	
-		foreach($groupids as $key => $groupid) {
-			$hostgroupid = get_dbid("hosts_groups","hostgroupid");
-			$result = DBexecute("insert into hosts_groups (hostgroupid,hostid,groupid) values ($hostgroupid, $templateid, $groupid)");
-			if(!$result)
-				return $result;
-		}	
-		$result = DBend($result);
-		
-		return $result;
-	}
-	
-	/**
-	 * Update existing host groups with new one (rewrite) //result ne boolean
-	 *
-	 * @static
-	 * @param int $templateid 
-	 * @param array $groupids 
-	 * @return boolean
-	 */	
-	public static function updateGroups($templateid, $groupids){
-		return update_host_groups($templateid, $groupids);
-	}
 	
 	/**
 	 * Link template to hosts
@@ -304,26 +312,39 @@ class CTemplate {
 	 * @param array $hostids 
 	 * @return boolean
 	 */	
-	public static function linkHosts($templateid, $hostids){		
+	public static function linkHosts($data){		
 		$result = false;
+		$error = '';
 		
+		$templateid = $data['templateid'];
+		$hostids = $data['hostids'];
 		DBstart(false);
 		
 		foreach($hostids as $hostid){
 			$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
-			if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$hostid.','.$templateid.')'))
+			if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$hostid.','.$templateid.')')){
+				$error = 'DBexecute';
 				break;
+			}
 		}
 		
 		if($result) {
 			foreach($hostids as $hostid){
 				$result = sync_host_with_templates($hostid, $templateid);
-				if(!$result) break;
+				if(!$result) {
+					$error = 'sync_host_with_templates';
+					break;
+				}
 			}
 		}
 		$result = DBend($result);
 		
-		return $result;
+		if($result)
+			return true;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			return false;
+		}
 	}
 
 	/**
@@ -335,12 +356,22 @@ class CTemplate {
 	 * @param boolean $clean default = true; whether to wipe all info from template elements.
 	 * @return boolean
 	 */
-	public static function unlinkHosts($templateid, $hostids, $clean = true){	
+	public static function unlinkHosts($data){	
+		$templateid = $data['templateid'];
+		$hostids = $data['hostids'];
+		$clean = isset($data['clean']);
+		
 		foreach($hostids as $hostid) {
 			$result = delete_template_elements($hostid, array($templateid), $clean);
 		}
 		$result&= DBexecute('DELETE FROM hosts_templates WHERE templateid='.$templateid.' AND '.DBcondition('hostid',$hostids));
-		return $result;
+		
+		if($result)
+			return true;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			return false;
+		}
 	}
 	
 	/**
@@ -351,8 +382,11 @@ class CTemplate {
 	 * @param array $templateids 
 	 * @return boolean
 	 */	
-	public static function linkTemplates($hostid, $templateids){
+	public static function linkTemplates($data){
 		$result = false;
+		
+		$hostid = $data['hostid'];
+		$templateids = $data['templateids'];
 		
 		DBstart(false);
 		
@@ -370,7 +404,12 @@ class CTemplate {
 		}
 		$result = DBend($result);
 		
-		return $result;
+		if($result)
+			return true;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			return false;
+		}
 	}
 	
 	/**
@@ -382,10 +421,20 @@ class CTemplate {
 	 * @param boolean $clean whether to wipe all info from template elements.
 	 * @return boolean
 	 */
-	public static function unlinkTemplates($hostid, $templateids, $clean = true){
+	public static function unlinkTemplates($data){
+		$templateid = $data['templateid'];
+		$hostids = $data['hostids'];
+		$clean = isset($data['clean']);
+		
 		$result = delete_template_elements($hostid, $templateids, $clean);
 		$result&= DBexecute('DELETE FROM hosts_templates WHERE hostid='.$hostid.' AND '.DBcondition('templateid',$templateids));
-		return $result;
+		
+		if($result)
+			return true;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			return false;
+		}
 	}
 
 }

@@ -635,7 +635,15 @@ else{
 	define('XML_TAG_DEPENDENCIES',		'dependencies');
 	define('XML_TAG_DEPENDENCY',		'dependency');
 	define('XML_TAG_DEPENDS',			'depends');
-
+	
+// API errors //
+	define('ZBX_API_ERROR_NO_HOST', 1);
+	define('ZBX_API_ERROR_INTERNAL', 111);
+	define('ZBX_API_ERROR_PARAMETERS', 100);
+	define('ZBX_API_ERROR_NO_AUTH', 200);
+	define('ZBX_API_ERROR_NO_METHOD', 300);
+	//define('ZBX_API_ERROR_PARAMETERS', 100);
+	
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if(!function_exists('version_compare')){
 		$_GET		= $HTTP_GET_VARS;
