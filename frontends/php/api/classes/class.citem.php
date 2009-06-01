@@ -9,47 +9,61 @@
  */
 class CItem {
 
+	public static $error;
+
 	/**
 	 * Gets all item data from DB by itemid
 	 *
 	 * @static
-	 * @param int $itemid 
+	 * @param int $item_data 
 	 * @return array|boolean item data || false if error
 	 */
-	public static function getById($itemid){
-		return get_item_by_itemid($itemid);
+	public static function getById($item_data){
+		$item = get_item_by_itemid($item_data['itemid']);
+		$result = $item ? true : false;
+		if($result)
+			return $item;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Item with id: '.$itemid.' doesn\'t exists.');
+			return false;
+		}
 	}
 	
 	/**
 	 * Get itemid by host.name and item.key
 	 *
+	 * <code>
 	 * $item_data = array(
-	 * + string 'key_' => 'item key',
-	 * + string 'host' => 'host name',
-	 * + string 'hostid' => 'hostid'
+	 * 	*string 'key_' => 'item key',
+	 * 	*string 'host' => 'host name',
+	 * 	*string 'hostid' => 'hostid'
 	 * );
+	 * </code>
+	 * 
 	 *
 	 * @static
 	 * @param array $item_data
 	 * @return int|boolean 
 	 */
 	public static function getId($item_data){
-	
-		if(!isset($item_data['host']) && !isset($item_data['hostid'])) {
-			return false;
-		}
 		
-		if(isset($item_data['host']) {
+		if(isset($item_data['host'])) {
 			$host = $item_data['host'];
 		}
 		else {
-			$host = CHost::getById($item_data['hostid']);
+			$host = CHost::getById(array($item_data['hostid']));
 			$host = $host['host'];
 		}
 		
 		$item = get_item_by_key($item_data['key_'], $host);
-		
-		return $item ? $item['itemid'] : false;	
+				
+		$result = $item ? true : false;
+		if($result)
+			return $item['itemid'];
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Item doesn\'t exists.');
+			return false;		
+		}
 	}
 	
  	// /**
@@ -75,55 +89,63 @@ class CItem {
 	 *
 	 * 
 	 * Input array $items has following structure and default values :
-	 * ( fields with value * are mandatory )
+	 * <code>
 	 * array( array(
-	 * + *'description'				=> *,
-	 * + *'key_'					=> *,
-	 * + *'hostid'					=> *,
-	 * + 'delay'					=> 60,
-	 * + 'history'					=> 7,
-	 * + 'status'					=> ITEM_STATUS_ACTIVE,
-	 * + 'type'						=> ITEM_TYPE_ZABBIX,
-	 * + 'snmp_community'			=> '',
-	 * + 'snmp_oid'					=> '',
-	 * + 'value_type'				=> ITEM_VALUE_TYPE_STR,
-	 * + 'data_type'				=> ITEM_DATA_TYPE_DECIMAL,
-	 * + 'trapper_hosts'			=> 'localhost',
-	 * + 'snmp_port'				=> 161,
-	 * + 'units'					=> '',
-	 * + 'multiplier'				=> 0,
-	 * + 'delta'					=> 0,
-	 * + 'snmpv3_securityname'		=> '',
-	 * + 'snmpv3_securitylevel'		=> 0,
-	 * + 'snmpv3_authpassphrase'	=> '',
-	 * + 'snmpv3_privpassphrase'	=> '',
-	 * + 'formula'					=> 0,
-	 * + 'trends'					=> 365,
-	 * + 'logtimefmt'				=> '',
-	 * + 'valuemapid'				=> 0,
-	 * + 'delay_flex'				=> '',
-	 * + 'params'					=> '',
-	 * + 'ipmi_sensor'				=> '',
-	 * + 'applications'				=> array(),
-	 * + 'templateid'				=> 0
+	 * *'description'			=> *,
+	 * *'key_'					=> *,
+	 * *'hostid'				=> *,
+	 * 'delay'					=> 60,
+	 * 'history'				=> 7,
+	 * 'status'					=> ITEM_STATUS_ACTIVE,
+	 * 'type'					=> ITEM_TYPE_ZABBIX,
+	 * 'snmp_community'			=> '',
+	 * 'snmp_oid'				=> '',
+	 * 'value_type'				=> ITEM_VALUE_TYPE_STR,
+	 * 'data_type'				=> ITEM_DATA_TYPE_DECIMAL,
+	 * 'trapper_hosts'			=> 'localhost',
+	 * 'snmp_port'				=> 161,
+	 * 'units'					=> '',
+	 * 'multiplier'				=> 0,
+	 * 'delta'					=> 0,
+	 * 'snmpv3_securityname'	=> '',
+	 * 'snmpv3_securitylevel'	=> 0,
+	 * 'snmpv3_authpassphrase'	=> '',
+	 * 'snmpv3_privpassphrase'	=> '',
+	 * 'formula'					=> 0,
+	 * 'trends'					=> 365,
+	 * 'logtimefmt'				=> '',
+	 * 'valuemapid'				=> 0,
+	 * 'delay_flex'				=> '',
+	 * 'params'					=> '',
+	 * 'ipmi_sensor'			=> '',
+	 * 'applications'			=> array(),
+	 * 'templateid'				=> 0
 	 * ), ...);
+	 * </code>
 	 *
 	 * @static
 	 * @param array $items multidimensional array with items data
-	 * @return boolean 
+	 * @return array|boolean 
 	 */
 	public static function add($items){
-		
+		$itemids = array();
 		DBstart(false);
 		
 		$result = false;
 		foreach($items as $item){
 			$result = add_item($item);
 			if(!$result) break;
+			$itemids['result'] = $result;
 		}
 		
 		$result = DBend($result);
-		return $result;
+
+		if($result)
+			return $itemids;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return false;
+		}
 	}
 	
 	/**
@@ -136,15 +158,21 @@ class CItem {
 	public static function update($items){
 		
 		$result = false;
-		
+		$itemids = array();
 		DBstart(false);
 		foreach($items as $item){
 			$result = update_item($item['itemid'], $item);
 			if(!$result) break;
+			$itemids[$result] = $result;
 		}	
 		$result = DBend($result);
 		
-		return $result;
+		if($result)
+			return $itemids;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return false;
+		}
 	}
 	
 	/**
@@ -152,10 +180,16 @@ class CItem {
 	 *
 	 * @static
 	 * @param array $itemids 
-	 * @return boolean
+	 * @return array|boolean
 	 */	
 	public static function delete($itemids){
-		return delete_item($itemids);	
+		$result = delete_item($itemids);	
+		if($result)
+			return $itemids;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return false;
+		}
 	}
 	
 }

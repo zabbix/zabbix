@@ -227,16 +227,15 @@ if(!isset($DB)){
 		return true;
 	}
 	
-	function DBstart($comments=false){
+	function DBstart($strict=true){
 		global $DB;
 //SDI('DBStart(): '.$DB['TRANSACTIONS']);
-		$DB['COMMENTS'] = $comments;
-		if($DB['COMMENTS']) info(S_TRANSACTION.': '.S_STARTED_BIG);
+		$DB['STRICT'] = $strict;
 		
 		$DB['TRANSACTIONS']++;
 
 		if($DB['TRANSACTIONS']>1){
-			info('POSSIBLE ERROR: Used incorect logic in database processing, started subtransaction!');
+			if($DB['STRICT']) info('POSSIBLE ERROR: Used incorrect logic in database processing, started subtransaction!');
 		return $DB['TRANSACTION_STATE'];
 		}
 		
@@ -275,7 +274,8 @@ if(!isset($DB)){
 			if($DB['TRANSACTIONS'] < 1){
 				$DB['TRANSACTIONS'] = 0;
 				$DB['TRANSACTION_STATE'] = false;
-				info('POSSIBLE ERROR: Used incorect logic in database processing, transaction not started!');
+				
+				if($DB['STRICT']) info('POSSIBLE ERROR: Used incorrect logic in database processing, transaction not started!');
 			}
 		return $DB['TRANSACTION_STATE'];
 		}
@@ -295,12 +295,9 @@ if(!isset($DB)){
 			$DBresult = DBcommit();
 		}
 		
-		$msg = S_TRANSACTION.': '.S_COMMITED_BIG;
 		if(!$DBresult){ // FAIL
 			DBrollback();
-			$msg = S_TRANSACTION.': '.S_ROLLBACKED_BIG;
 		}
-		if($DB['COMMENTS']) info($msg);
 		
 		$result = (!is_null($result) && $DBresult)?$result:$DBresult;
 		

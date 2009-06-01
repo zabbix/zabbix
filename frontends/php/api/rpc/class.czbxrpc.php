@@ -30,7 +30,7 @@ public static $result;
 							'host:delete_all'=>1	// example!
 						);	
 		if(is_null($params) && !isset($notifications[$method])){
-			self::$result = array('error'=>'-32602');
+			self::$result = array('error'=>ZBX_API_ERROR_PARAMETERS);
 			return self::$result;
 		}
 //-----
@@ -39,15 +39,16 @@ public static $result;
 		
 // Authentication
 		if(is_null($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
-			self::$result = array('error'=>'-32602', 'data'=>'Not authorized');
+			self::$result = array('error'=>ZBX_API_ERROR_NO_AUTH, 'data'=>'Not authorized');
 		}
 		else if(!self::auth($sessionid)){
-			self::$result = array('error'=>'-32602', 'data'=>'Not authorized');
+			self::$result = array('error'=>ZBX_API_ERROR_NO_AUTH, 'data'=>'Not authorized');
 		}
 		else{
 			switch($resource){
 				case 'user':
 					self::user($action, $params);
+					break;
 				case 'hostgroup':
 					self::hostgroup($action, $params);
 					break;
@@ -64,11 +65,9 @@ public static $result;
 					self::trigger($action, $params);
 					break;
 				default:
-					self::$result = array('error'=>'-32601');
+					self::$result = array('error'=>ZBX_API_ERROR_PARAMETERS);
 			}
 		}
-		
-		
 	return self::$result;
 	}
 	
@@ -85,51 +84,215 @@ public static $result;
 					self::$result = array('result' => $login);
 				}
 				else{
-					self::$result = array('error' => '-32602', 'data' => 'Given login or password is incorrect.');
+					self::$result = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Given login or password is incorrect.');
 				}
-				
 				break;
 		}	
 	}
 	
+// HOST GROUP
 	private static function hostgroup($action, $params){
-		switch($action){
-			case 'add':
-				self::$result = array('result' => 'CHostGroup::add($params);');
-				break;
-		}	
-	}
 		
+		CHostGroup::$error = array();
+		
+		switch($action){
+			case 'add':
+				$result = CHostGroup::add($params);
+				break;
+			case 'get':
+				$result = CHostGroup::get($params);
+				break;
+			case 'getById':
+				$result = CHostGroup::getById($params);
+				break;
+			case 'getId':
+				$result = CHostGroup::getId($params);
+				break;
+			case 'update':
+				$result = CHostGroup::update($params);
+				break;
+			case 'addHosts':
+				$result = CHostGroup::addHosts($params);
+				break;
+			case 'removeHosts':
+				$result = CHostGroup::removeHosts($params);
+				break;
+			case 'addGroupsToHost':
+				$result = CHostGroup::addGroupsToHost($params);
+				break;
+			case 'updateGroupsToHost':
+				$result = CHostGroup::updateGroupsToHost($params);
+				break;	
+			case 'delete':
+				$result = CHostGroup::delete($params);
+				break;	
+			default:
+				self::$result = array('error' => ZBX_API_ERROR_NO_METHOD, 'data' => 'Method: "'.$action.'" doesn\'t exist.');
+				return; //exit function
+		}
+		
+		if($result){
+			self::$result = array('result' => $result);
+		}
+		else{
+			self::$result = CHostGroup::$error;
+		}
+	}
+	
+// TEMPLATE
 	private static function template($action, $params){
+		
+		CTemplate::$error = array();
+		
 		switch($action){
 			case 'add':
-				self::$result = array('result' => 'CTemplate::add($params);');
+				$result = CTemplate::add($params);
 				break;
+			case 'get':
+				$result = CTemplate::get($params);
+				break;
+			case 'getById':
+				$result = CTemplate::getById($params);
+				break;
+			case 'getId':
+				$result = CTemplate::getId($params);
+				break;
+			case 'update':
+				$result = CTemplate::update($params);
+				break;
+			case 'linkHosts':
+				$result = CTemplate::linkHosts($params);
+				break;
+			case 'unlinkHosts':
+				$result = CTemplate::unlinkHosts($params);
+				break;
+			case 'linkTemplates':
+				$result = CTemplate::linkTemplates($params);
+				break;
+			case 'unlinkTemplates':
+				$result = CTemplate::unlinkTemplates($params);
+				break;
+			case 'delete':
+				$result = CTemplate::delete($params);
+				break;	
+			default:
+				self::$result = array('error' => ZBX_API_ERROR_NO_METHOD, 'data' => 'Method: "'.$action.'" doesn\'t exist.');
+				return; //exit function
+		}
+		
+		if($result){
+			self::$result = array('result' => $result);
+		}
+		else{
+			self::$result = CTemplate::$error;
 		}	
 	}
 	
+// HOST
 	private static function host($action, $params){
-		switch($action){
-			case 'add':
-				self::$result = array('result' => 'CHost::add($params);');
-				break;
-		}	
-	}
 	
-	private static function item($action, $params){
+		CHost::$error = array();
+		
 		switch($action){
 			case 'add':
-				self::$result = array('result' => 'CItem::add($params);');
+				$result = CHost::add($params);
 				break;
-		}	
+			case 'get':
+				$result = CHost::get($params);
+				break;
+			case 'getById':
+				$result = CHost::getById($params);
+				break;
+			case 'getId':
+				$result = CHost::getId($params);
+				break;
+			case 'update':
+				$result = CHost::update($params);
+				break;
+			case 'massUpdate':
+				$result = CHost::massUpdate($params);
+				break;
+			case 'delete':
+				$result = CHost::delete($params);
+				break;	
+			default:
+				self::$result = array('error' => ZBX_API_ERROR_NO_METHOD, 'data' => 'Method: "'.$action.'" doesn\'t exist.');
+				return; //exit function
+		}
+		
+		if($result){
+			self::$result = array('result' => $result);
+		}
+		else{
+			self::$result = CHost::$error;
+		}
+	}
+
+// ITEM
+	private static function item($action, $params){
+		
+		CItem::$error = array();
+		
+		switch($action){
+			case 'add':
+				$result = CItem::add($params);
+				break;
+			case 'getById':
+				$result = CItem::getById($params);
+				break;
+			case 'getId':
+				$result = CItem::getId($params);
+				break;
+			case 'update':
+				$result = CItem::update($params);
+				break;
+			case 'delete':
+				$result = CItem::delete($params);
+				break;	
+			default:
+				self::$result = array('error' => ZBX_API_ERROR_NO_METHOD, 'data' => 'Method: "'.$action.'" doesn\'t exist.');
+				return; //exit function
+		}
+		
+		if($result){
+			self::$result = array('result' => $result);
+		}
+		else{
+			self::$result = CItem::$error;
+		}
 	}
 	
 	private static function trigger($action, $params){
+		
+		CTrigger::$error = array();
+		
 		switch($action){
 			case 'add':
-				self::$result = array('result' => 'CTrigger::add($params);');
+				$result = CTrigger::add($params);
 				break;
-		}	
+			case 'getById':
+				$result = CTrigger::getById($params);
+				break;
+			case 'getId':
+				$result = CTrigger::getId($params);
+				break;
+			case 'update':
+				$result = CTrigger::update($params);
+				break;
+			case 'delete':
+				$result = CTrigger::delete($params);
+				break;	
+			default:
+				self::$result = array('error' => ZBX_API_ERROR_NO_METHOD, 'data' => 'Method: "'.$action.'" doesn\'t exist.');
+				return; //exit function
+		}
+		
+		if($result){
+			self::$result = array('result' => $result);
+		}
+		else{
+			self::$result = array_shift(CTrigger::$error);
+		}
 	}
 }
 ?>

@@ -400,6 +400,7 @@ function __autoload($class_name){
 		global	$page, $ZBX_MESSAGES;
 
 		if (! defined('PAGE_HEADER_LOADED')) return;
+		if (defined('ZBX_API_REQUEST')) return;
 
 		if (!isset($page["type"])) $page["type"] = PAGE_TYPE_HTML;
 
