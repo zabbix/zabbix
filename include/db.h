@@ -264,6 +264,7 @@ DB_DSERVICE
 {
 	zbx_uint64_t	dserviceid;
 	zbx_uint64_t	dhostid;
+	zbx_uint64_t	dcheckid;
 	int		type;
 	int		port;
 	int		status;

@@ -27,6 +27,7 @@
 #define ZBX_PROTO_TAG_REGEXP		"regexp"
 #define	ZBX_PROTO_TAG_DELAY		"delay"
 #define	ZBX_PROTO_TAG_DRULE		"drule"
+#define	ZBX_PROTO_TAG_DCHECK		"dcheck"
 #define ZBX_PROTO_TAG_HOST		"host"
 #define ZBX_PROTO_TAG_INFO		"info"
 #define ZBX_PROTO_TAG_IP		"ip"
