@@ -242,8 +242,12 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	{
 		switch (errno)
 		{
-			case	EINTR:	ret = SYSINFO_RET_TIMEOUT;
-			default:	ret = SYSINFO_RET_FAIL;
+			case	EINTR:
+				ret = SYSINFO_RET_TIMEOUT;
+				break;
+			default:
+				ret = SYSINFO_RET_FAIL;
+				break;
 		}
 		goto lbl_exit;
 	}
@@ -260,8 +264,12 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	{
 		switch (errno)
 		{
-			case	EINTR:	ret = SYSINFO_RET_TIMEOUT;
-			default:	ret = SYSINFO_RET_FAIL;
+			case	EINTR:
+				ret = SYSINFO_RET_TIMEOUT;
+				break;
+			default:
+				ret = SYSINFO_RET_FAIL;
+				break;
 		}
 		goto lbl_exit;
 	}
@@ -270,8 +278,12 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	{
 		switch (errno)
 		{
-			case	EINTR:	ret = SYSINFO_RET_TIMEOUT;
-			default:	ret = SYSINFO_RET_FAIL;
+			case	EINTR:
+				ret = SYSINFO_RET_TIMEOUT;
+				break;
+			default:
+				ret = SYSINFO_RET_FAIL;
+				break;
 		}
 		goto lbl_exit;
 	}
