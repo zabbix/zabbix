@@ -29,13 +29,12 @@
 		define ('PAGE_HEADER_LOADED', 1);
 	}
 	
-//------------------------------------- <HISTORY> ---------------------------------------
-	add_user_history($page);
-//------------------------------------- </HISTORY> --------------------------------------
-
 	show_messages();
 		
 	if($page['type'] == PAGE_TYPE_HTML){
+//------------- <HISTORY> -------------
+		add_user_history($page);
+//------------- </HISTORY> ------------
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
