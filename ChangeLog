@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-931] fixed timeout handling for agent's user parameters (Alexei)
  - [ZBX-889] fixed possible bug in media types form (Artem)
  - [ZBX-927] removed default values for text and blob fields in the upgrade script for compatibility with MySQL 5.0 (Sasha)
  - [ZBX-719] fixed typo in default graph title (Richlv)
