@@ -476,9 +476,10 @@ static void proxy_update_service(DB_DCHECK *check, char *ip, int port, int now)
 	key_esc = DBdyn_escape_string_len(check->key_, PROXY_DHISTORY_KEY_LEN);
 	value_esc = DBdyn_escape_string_len(check->value, PROXY_DHISTORY_VALUE_LEN);
 
-	DBexecute("insert into proxy_dhistory (clock,dcheckid,type,ip,port,key_,value,status)"
-			" values (%d," ZBX_FS_UI64 ",%d,'%s',%d,'%s','%s',%d)",
+	DBexecute("insert into proxy_dhistory (clock,druleid,dcheckid,type,ip,port,key_,value,status)"
+			" values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',%d,'%s','%s',%d)",
 			now,
+			check->druleid,
 			check->dcheckid,
 			check->type,
 			ip_esc,
