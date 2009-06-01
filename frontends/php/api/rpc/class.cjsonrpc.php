@@ -30,6 +30,7 @@ private $multicall;
 private $error;
 private $response;
 private $error_list;
+private $zbx2json_error_list;
 
 	public function __construct(){
 		$this->json = new CJSON();
@@ -108,7 +109,8 @@ private $error_list;
 			}
 			else{
 				$result['data'] = isset($result['data'])?$result['data']:null;
-				$this->json_error($call['id'], $result['error'], $result['data']);
+				$error = $this->zbx2json_error($result['error']);
+				$this->json_error($call['id'], $error, $result['data']);
 			}
 		}
 	}
@@ -182,6 +184,19 @@ private $error_list;
 					'code' => -32300,
 					'message'=>'Transport error.', 
 					'data' => 'No details'));
+					
+		$this->zbx2json_errors = array(
+			'-32601' => array(ZBX_API_ERROR_NO_METHOD),
+			'-32602' => array(ZBX_API_ERROR_PARAMETERS, ZBX_API_ERROR_NO_AUTH),
+			'-32500' => array(ZBX_API_ERROR_NO_HOST, ZBX_API_ERROR_INTERNAL)
+		);
+	}
+	
+	private function zbx2json_error($error){
+		foreach($this->zbx2json_errors as $json_error => $zbx_errors){
+			if(in_array($error, $zbx_errors)) 
+				return $json_error;
+		}	
 	}
 }
 ?>

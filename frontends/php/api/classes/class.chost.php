@@ -5,27 +5,30 @@
  */
 /**
  * Class containing methods for operations with hosts
- *
  */
 class CHost {
+
+	public static $error;
 
 	/**
 	 * Get host data 
 	 *
+	 * <code>
 	 * $def_options = array(
-	 * + string 'nodeid' 					=> 'node ID,
-	 * + array 'groupids' 					=> array(groupid1, groupid2, ...),
-	 * + array 'hostids' 					=> array(hostid1, hostid2, ...),
-	 * + boolean 'monitored_hosts'			=> 'only monitored hosts',
-	 * + boolean 'with_items' 				=> 'only with items',
-	 * + boolean 'with_monitored_items' 	=> 'only with monitored items',
-	 * + boolean 'with_historical_items'	=> 'only with historical items',
-	 * + boolean 'with_triggers' 			=> 'only with triggers',
-	 * + boolean 'with_monitored_triggers'	=> 'only with monitores triggers',
-	 * + boolean 'with_httptests' 			=> 'only with http tests',
-	 * + boolean 'with_monitored_httptests'	=> 'only with monitores http tests',
-	 * + boolean 'with_graphs'				=> 'only with graphs'
+	 * 	string 'nodeid' 					=> 'node ID,
+	 * 	array 'groupids' 					=> array(groupid1, groupid2, ...),
+	 * 	array 'hostids' 					=> array(hostid1, hostid2, ...),
+	 * 	boolean 'monitored_hosts'			=> 'only monitored hosts',
+	 * 	boolean 'with_items' 				=> 'only with items',
+	 * 	boolean 'with_monitored_items' 		=> 'only with monitored items',
+	 * 	boolean 'with_historical_items'		=> 'only with historical items',
+	 * 	boolean 'with_triggers' 			=> 'only with triggers',
+	 * 	boolean 'with_monitored_triggers'	=> 'only with monitores triggers',
+	 * 	boolean 'with_httptests' 			=> 'only with http tests',
+	 * 	boolean 'with_monitored_httptests'	=> 'only with monitores http tests',
+	 * 	boolean 'with_graphs'				=> 'only with graphs'
 	 * );
+	 * </code>
 	 *
 	 * @static
 	 * @param array $options 
@@ -164,6 +167,7 @@ class CHost {
 		while($host = DBfetch($res)){
 			$result[$host['hostid']] = $host;
 		}
+		
 		return $result;
 	}
 	
@@ -174,19 +178,27 @@ class CHost {
 	 * @param string $hostid
 	 * @return array|boolean host data as array or false if error
 	 */
-	public static function getById($hostid){
-		$sql = 'SELECT * FROM hosts WHERE hostid='.$hostid;
+	public static function getById($host_data){
+		$sql = 'SELECT * FROM hosts WHERE hostid='.$host_data['hostid'];
 		$host = DBfetch(DBselect($sql));
 		
-		return $host ? $host : false;
+		$result = $host ? true : false;
+		if($result)
+			return $host;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host with id: '.$host_data['hostid'].' doesn\'t exists.');
+			return false;
+		}
 	}
 	
 	/**
 	 * Get hostid by host name
 	 *
+	 * <code>
 	 * $host_data = array(
-	 * + string 'host' => 'hostname'
+	 * 	string 'host' => 'hostname'
 	 * );
+	 * </code>
 	 *
 	 * @static
 	 * @param array $host_data
@@ -196,29 +208,37 @@ class CHost {
 		$sql = 'SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host_data['host']).' AND '.DBin_node('hostid', get_current_nodeid(false));
 		$hostid = DBfetch(DBselect($sql));
 		
-		return $hostid ? $hostid['hostid'] : false;	
+		$result = $hostid ? true : false;
+		if($result)
+			return $hostid['hostid'];
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host with name: "'.$host_data['host'].'" doesn\'t exists.');
+			return false;
+		}
 	}
-	strcmp(
+	
 	/**
 	 * Add host
 	 *
+	 * <code>
 	 * $host_db_fields = array(
-	 * + string 'host' => 'host name [0]',
-	 * + 'port' => 'port [0]',
-	 * + 'status' => 0,
-	 * + 'useip' => 0,
-	 * + 'dns' => '',
-	 * + 'ip' => '0.0.0.0',
-	 * + 'proxy_hostid' => 0,
-	 * + 'useipmi' => 0,
-	 * + 'ipmi_ip' => '',
-	 * + 'ipmi_port' => 623,
-	 * + 'ipmi_authtype' => 0,
-	 * + 'ipmi_privilege' => 0,
-	 * + 'ipmi_username' => '',
-	 * + 'ipmi_password' => '',
+	 * 	string 'host' => 'host name [0]',
+	 * 	'port' => 'port [0]',
+	 * 	'status' => 0,
+	 * 	'useip' => 0,
+	 * 	'dns' => '',
+	 * 	'ip' => '0.0.0.0',
+	 * 	'proxy_hostid' => 0,
+	 * 	'useipmi' => 0,
+	 * 	'ipmi_ip' => '',
+	 * 	'ipmi_port' => 623,
+	 * 	'ipmi_authtype' => 0,
+	 * 	'ipmi_privilege' => 0,
+	 * 	'ipmi_username' => '',
+	 * 	'ipmi_password' => '',
 	 * );
-
+	 * </code>
+	 *
 	 * @static
 	 * @param array $hosts multidimensional array with hosts data
 	 * @return boolean 
@@ -228,6 +248,7 @@ class CHost {
 		$newgroup = ''; 
 		$groups = null;
 			
+		$hostids = array();
 		DBstart(false);
 		
 		$result = false;
@@ -259,10 +280,16 @@ class CHost {
 				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'], 
 				$host['ipmi_privilege'], $host['ipmi_username'], $host['ipmi_password'], $newgroup, $groups);
 			if(!$result) break;
+			$hostids[$result] = $result;
 		}
-		
 		$result = DBend($result);
-		return $result ? true : false;
+		if($result){
+			return $hostids;
+		}
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $hostids);//'Internal zabbix error');
+			return false;
+		}
 	}
 	
 	/**
@@ -277,8 +304,10 @@ class CHost {
 		$newgroup = ''; 
 		$groups = null;
 		
+		$hostids = array();
+		
 		$result = false;
-					
+		
 		DBstart(false);
 		foreach($hosts as $host){
 		
@@ -294,7 +323,6 @@ class CHost {
 			}
 			
 			if(!check_db_fields($host_db_fields, $host)){
-				error('Incorrect arguments pasted to function [CHost::update]');
 				$result = false;
 				break;
 			}			
@@ -303,10 +331,17 @@ class CHost {
 				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'], 
 				$host['ipmi_privilege'], $host['ipmi_username'], $host['ipmi_password'], $newgroup, $groups);
 			if(!$result) break;
+			$hostids[$result] = $result;
 		}	
 		$result = DBend($result);
 		
-		return $result;
+		if($result){
+			return $hostids;
+		}
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return false;
+		}
 	}
 	
 	/**
@@ -314,11 +349,12 @@ class CHost {
 	 *
 	 * @static
 	 * @param array $hosts multidimensional array with host ids
-	 * @param array $host_data array with host data to update
 	 * @return boolean
 	 */
-	public static function massUpdate($hostids, $host_data) {
+	public static function massUpdate($hosts) {
 	
+		$hostids = $hosts['hostids'];
+		$host_data = $hosts['host_data'];
 		$sql = 'UPDATE hosts SET '.
 			(isset($host_data['proxy_hostid']) ? ',proxy_hostid='.$host_data['proxy_hostid'] : '').
 			(isset($host_data['host']) ? ',host='.zbx_dbstr($host_data['host']) : '').
@@ -327,7 +363,7 @@ class CHost {
 			(isset($host_data['useip']) ? ',useip='.$host_data['useip'] : '').
 			(isset($host_data['dns']) ? ',dns='.zbx_dbstr($host_data['dns']) : '').
 			(isset($host_data['ip']) ? ',ip='.zbx_dbstr($host_data['ip']) : '').
-			(isset($host_data['useipmi']) ? ',useipmi='$host_data['useipmi'] : '').
+			(isset($host_data['useipmi']) ? ',useipmi='.$host_data['useipmi'] : '').
 			(isset($host_data['ipmi_port']) ? ',ipmi_port='.$host_data['ipmi_port'] : '').
 			(isset($host_data['ipmi_authtype']) ? ',ipmi_authtype='.$host_data['ipmi_authtype'] : '').
 			(isset($host_data['ipmi_privilege']) ? ',ipmi_privilege='.$host_data['ipmi_privilege'] : '').
@@ -339,8 +375,13 @@ class CHost {
 		substr_replace($sql, '', strpos(',', $sql), 1);
 		
 		$result = DBexecute($sql);
-		
-		return $result;
+		if($result){
+			return $hostids;
+		}
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return false;
+		}
 	}
 	
 	/**
@@ -351,7 +392,13 @@ class CHost {
 	 * @return boolean
 	 */	
 	public static function delete($hostids){
-		return delete_host($hostids, false);	
+		$result = delete_host($hostids, false);	
+		if($result)
+			return $hostids;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return false;
+		}
 	}
 		
 }
