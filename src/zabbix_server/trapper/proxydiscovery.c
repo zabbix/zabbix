@@ -92,7 +92,11 @@ int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DRULE, tmp, sizeof(tmp)))
 				goto json_parse_error;
-			dcheck.druleid = zbx_atoui64(tmp);
+			ZBX_STR2UINT64(dcheck.druleid, tmp);
+
+			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DCHECK, tmp, sizeof(tmp)))
+				goto json_parse_error;
+			ZBX_STR2UINT64(dcheck.dcheckid, tmp);
 
 			if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TYPE, tmp, sizeof(tmp)))
 				goto json_parse_error;
