@@ -56,8 +56,11 @@ frontends/php/authentication.php -text
 frontends/php/chart6.php -text
 frontends/php/chart7.php -text
 frontends/php/chart_bar.php -text
+frontends/php/conf/.htaccess -text
 frontends/php/conf/maintenance.inc.php -text
 frontends/php/dashboard.php -text
+frontends/php/fonts/kochi-gothic-subst.ttf -text
+frontends/php/fonts/kochi-mincho-subst.ttf -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/bar/arrow_down.gif -text
 frontends/php/images/general/bar/arrow_l.gif -text
@@ -250,6 +253,7 @@ frontends/php/js/cscreen.js -text
 frontends/php/js/gmenu.js -text
 frontends/php/js/gpc.js -text
 frontends/php/js/graphs.js -text
+frontends/php/js/ie6fixes.js -text
 frontends/php/js/menu.js -text
 frontends/php/js/menu_scripts.js -text
 frontends/php/js/pmaster.js -text
