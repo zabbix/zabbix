@@ -153,7 +153,10 @@ class CTree{
 
 					if($this->tree[$id]['nodetype'] == 2){	
 						$img= new CImg('images/general/tree/plus.gif','y','22','14');
-						$img->addOption('onclick','javascript: '.$this->treename.'.closeSNodeX('.$id.',this);');
+						$img->addOption('onclick','javascript: '.
+												$this->treename.'.closeSNodeX('.$id.',this);'.
+												" showPopupDiv('div_node_tree','select_iframe');"); // IE6 Fix
+
 						$img->addOption('id','idi_'.$id);
 						$img->setClass('imgnode');
 					} 
@@ -169,7 +172,10 @@ class CTree{
 						$td->addOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 						$img= new CImg('images/general/tree/plus.gif','t','22','14');
 						
-						$img->addOption('onclick','javascript: '.$this->treename.'.closeSNodeX('.$id.',this);');
+						$img->addOption('onclick','javascript: '.
+												$this->treename.'.closeSNodeX('.$id.',this);'.
+												" showPopupDiv('div_node_tree','select_iframe');");	// IE6 Fix
+												
 						$img->addOption('id','idi_'.$id);
 						$img->setClass('imgnode');					
 					} 

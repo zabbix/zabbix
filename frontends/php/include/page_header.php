@@ -147,6 +147,7 @@ COpt::profiling_start("page");
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/gpc.js"></script>
 <script type="text/javascript" src="js/ajax_req.js"></script>
+<script type="text/javascript" src="js/ie6fixes.js"></script>
 
 <?php
 	if(isset($page['scripts']) && is_array($page['scripts'])){
@@ -239,10 +240,11 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				}
 // --- ---
 				$jscript = 'javascript : '. 
-					"var pos = getPosition('button_show_tree');".
-					"ShowHide('div_node_tree',IE6?'block':'table');".
-					'pos.top += 20;'.
-					"\$('div_node_tree').setStyle({top: pos.top+'px'});";
+					" var pos = getPosition('button_show_tree');".
+					" ShowHide('div_node_tree',IE6?'block':'table');".
+					' pos.top += 20;'.
+					" \$('div_node_tree').setStyle({top: pos.top+'px'});".
+					" showPopupDiv('div_node_tree','select_iframe');";		// IE6
 				$button_show_tree = new CButton('show_node_tree', S_SELECT_NODES, $jscript); //sdelatj konstatntu!
 				$button_show_tree->setType('button');
 				$button_show_tree->addOption('id', 'button_show_tree');				
@@ -275,8 +277,10 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				$div_node_tree = new CDiv();
 				$div_node_tree->additem($node_tree->getHTML());
 				
-				$div_node_tree->additem(new CButton('select_nodes', S_SELECT, "javascript: \$('div_node_tree').setStyle({display:'none'});"));
-				
+				$div_node_tree->additem(new CButton('select_nodes', S_SELECT, "javascript: ".
+																				" hidePopupDiv('select_iframe');".	//IE6 fix
+																				" \$('div_node_tree').setStyle({display:'none'});"));
+
 				$div_node_tree->addOption('id', 'div_node_tree');
 				$div_node_tree->addStyle('display: none');
 				
