@@ -42,6 +42,11 @@ function checkBrowser(){
 return 0;
 }
 
+function isset(key, obj){
+	if(typeof(obj[key]) != 'undefined') return true;
+return false;
+}
+
 function empty(obj){
 	if(is_null(obj)) return true;
 	if(obj == false) return true;
@@ -57,11 +62,11 @@ return false;
 }
 
 function is_number(obj){
-	return (typeof(obj) == 'number');
+	return (typeof(obj) === 'number');
 }
 
 function is_string(obj){
-	return (typeof(obj) == 'string');
+	return (typeof(obj) === 'string');
 }
 
 function is_array(obj) {
@@ -373,6 +378,20 @@ function get_scroll_pos(){
 }
 
 
+function onload_update_scroll(id,w,period,stime,timel,bar_stime){
+	var obj = $(id);
+	if((typeof(obj) == 'undefined') || is_null(obj)){
+		setTimeout('onload_update_scroll("'+id+'",'+w+','+period+','+stime+','+timel+','+bar_stime+');',1000);
+		return;
+	}
+//	eval('var fnc = function(){ onload_update_scroll("'+id+'",'+w+','+period+','+stime+','+timel+','+bar_stime+');}');
+	scrollinit(w,period,stime,timel,bar_stime);
+	if(!is_null($('scroll')) && showgraphmenu){
+		showgraphmenu(id);
+	}
+//	addListener(window,'resize', fnc );
+}
+
 function openWinCentered(loc, winname, iwidth, iheight, params){
 		var uri = new Curl(loc);
 		loc = uri.getUrl();
@@ -458,20 +477,6 @@ function remove_element(elmnt,tag){
 		}
 	}
 return true;
-}
-
-function onload_update_scroll(id,w,period,stime,timel,bar_stime){
-	var obj = $(id);
-	if((typeof(obj) == 'undefined') || is_null(obj)){
-		setTimeout('onload_update_scroll("'+id+'",'+w+','+period+','+stime+','+timel+','+bar_stime+');',1000);
-		return;
-	}
-//	eval('var fnc = function(){ onload_update_scroll("'+id+'",'+w+','+period+','+stime+','+timel+','+bar_stime+');}');
-	scrollinit(w,period,stime,timel,bar_stime);
-	if(!is_null($('scroll')) && showgraphmenu){
-		showgraphmenu(id);
-	}
-//	addListener(window,'resize', fnc );
 }
 
 function ShowHide(obj,style){

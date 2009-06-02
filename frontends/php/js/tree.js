@@ -97,8 +97,10 @@ OpenNode : function(nodelist){
 		var c = nodelist.length-1;
 		for(var i=0; i<c; i++){
 			document.getElementById('id_'+nodelist[i]).style.display = (IE)?('block'):('table-row');
-			if(this.getNodeStatus(nodelist[i]) == 'open'){
-				this.OpenNode(this.treenode[nodelist[i]].nodelist.split(','));
+			if(this.checkParent(nodelist[i])){
+				if(this.getNodeStatus(nodelist[i]) == 'open'){
+					this.OpenNode(this.treenode[nodelist[i]].nodelist.split(','));
+				}
 			}
 		}
 	} catch(e){
@@ -111,8 +113,10 @@ CloseNode : function(nodelist){
 		var c = nodelist.length-1;
 		for(var i=0; i<c; i++){
 			document.getElementById('id_'+nodelist[i]).style.display = 'none';
-			if(this.getNodeStatus(nodelist[i]) == 'open'){
-				this.CloseNode(this.treenode[nodelist[i]].nodelist.split(','));
+			if(this.checkParent(nodelist[i])){
+				if(this.getNodeStatus(nodelist[i]) == 'open'){
+					this.CloseNode(this.treenode[nodelist[i]].nodelist.split(','));
+				}
 			}
 		}
 	} catch(e){ 
