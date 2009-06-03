@@ -269,14 +269,14 @@ static void run_remote_command(char* host_name, char* command)
 
 			ret = get_value_agent(&item, &agent_result);
 
+			free_result(&agent_result);
+	
 			alarm(0);
 #ifdef HAVE_OPENIPMI
 		}
 #endif
 	}
 	DBfree_result(result);
-	
-	free_result( &agent_result );
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "End run_remote_command(result:%d)",
 		ret);
