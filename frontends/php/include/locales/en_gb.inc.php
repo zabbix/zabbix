@@ -564,7 +564,7 @@
 
 //	Footer
 	'S_ZABBIX_VER'=>			'ZABBIX '.ZABBIX_VERSION,
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2008 by ',
+	'S_COPYRIGHT_BY'=>			'Copyright 2001-2009 by ',
 	'S_CONNECTED_AS'=>			'Connected as',
 	'S_NOT_CONNECTED'=>			'Not connected',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',

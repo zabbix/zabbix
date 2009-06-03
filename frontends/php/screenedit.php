@@ -68,8 +68,9 @@ include_once "include/page_header.php";
 
 	if(isset($_REQUEST["screenid"]))
 	{
-		if(!screen_accessible($_REQUEST["screenid"], PERM_READ_WRITE))
+		if(!screen_accessible($_REQUEST["screenid"], PERM_READ_WRITE)){
 			access_deny();
+		}
 
 		$screen = get_screen_by_screenid($_REQUEST["screenid"]);
 
@@ -112,8 +113,7 @@ include_once "include/page_header.php";
 			unset($_REQUEST["x"]);
 		}
 
-		if($_REQUEST["screenid"] > 0)
-		{
+		if($_REQUEST["screenid"] > 0){
 			$table = get_screen($_REQUEST["screenid"], 1);
 			$table->Show();
 		}

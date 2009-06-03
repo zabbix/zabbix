@@ -793,7 +793,8 @@
 
 	// editmode: 0 - view with actions, 1 - edit mode, 2 - view without any actions
 	function get_screen($screenid, $editmode, $effectiveperiod=NULL){
-
+		if($screenid == 0) return new CTableInfo(S_NO_SCREENS_DEFINED);
+		
 		if(!screen_accessible($screenid, ($editmode == 1)?PERM_READ_WRITE:PERM_READ_ONLY))
 			access_deny();
 
