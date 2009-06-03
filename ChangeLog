@@ -45,6 +45,7 @@ Changes for 1.7.0
 
 Changes for 1.6.5
 
+ - [ZBX-936] fixed saving flexible intervals to items linked to templates (Artem)
  - [ZBX-932] fixed typo in changelog (Richlv)
  - [ZBX-931] fixed timeout handling for agent's user parameters (Alexei)
  - [ZBX-927] removed default values for text and blob fields in the upgrade script for compatibility with MySQL 5.0 (Sasha)
