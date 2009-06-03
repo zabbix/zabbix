@@ -246,6 +246,10 @@ DB_DCHECK
 	char		*ports;
 	char		*key_;
 	char		*snmp_community;
+	char		*snmpv3_securityname;
+	int		snmpv3_securitylevel;
+	char		*snmpv3_authpassphrase;
+	char		*snmpv3_privpassphrase;
 	int		status;
 	char		value[DSERVICE_VALUE_LEN_MAX];
 };
