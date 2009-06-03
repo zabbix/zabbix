@@ -195,6 +195,10 @@
 		$new_check_ports= get_request('new_check_ports', '80');
 		$new_check_key= get_request('new_check_key', '');
 		$new_check_snmp_community= get_request('new_check_snmp_community', '');
+		$new_check_snmpv3_securitylevel = get_request('new_check_snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
+		$new_check_snmpv3_securityname = get_request('new_check_snmpv3_securityname', '');
+		$new_check_snmpv3_authpassphrase = get_request('new_check_snmpv3_authpassphrase', '');
+		$new_check_snmpv3_privpassphrase = get_request('new_check_snmpv3_privpassphrase', '');
 
 		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
 //Proxy
@@ -250,7 +254,7 @@
 		$cmbChkType = new CComboBox('new_check_type',$new_check_type,
 			"if(add_variable(this, 'type_changed', 1)) submit()"
 			);
-		foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_ICMPPING) as $type_int)
+		foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3, SVC_ICMPPING) as $type_int)
 			$cmbChkType->addItem($type_int, discovery_check_type2str($type_int));
 
 		if(isset($_REQUEST['type_changed'])){
@@ -260,18 +264,52 @@
 		switch($new_check_type){
 			case SVC_SNMPv1:
 			case SVC_SNMPv2:
-				$external_param = array_merge($external_param, array(BR(), S_SNMP_COMMUNITY, SPACE, new CTextBox('new_check_snmp_community', $new_check_snmp_community)));
-				$external_param = array_merge($external_param, array(BR(), S_SNMP_OID, new CTextBox('new_check_key', $new_check_key), BR()));
+				$external_param = array_merge($external_param, array(BR(), S_SNMP_COMMUNITY, SPACE,
+						new CTextBox('new_check_snmp_community', $new_check_snmp_community)));
+				$external_param = array_merge($external_param, array(BR(), S_SNMP_OID, SPACE,
+						new CTextBox('new_check_key', $new_check_key), BR()));
+				$form->addVar('new_check_snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
+				$form->addVar('new_check_snmpv3_securityname', '');
+				$form->addVar('new_check_snmpv3_authpassphrase', '');
+				$form->addVar('new_check_snmpv3_privpassphrase', '');
+				break;
+			case SVC_SNMPv3:
+				$form->addVar('new_check_snmp_community', '');
+
+				$external_param = array_merge($external_param, array(BR(), S_SNMP_OID, SPACE,
+						new CTextBox('new_check_key', $new_check_key)));
+				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_SECURITY_NAME, SPACE,
+						new CTextBox('new_check_snmpv3_securityname', $new_check_snmpv3_securityname)));
+
+				$cmbSecLevel = new CComboBox('new_check_snmpv3_securitylevel', $new_check_snmpv3_securitylevel);
+				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'NoAuthPriv');
+				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'AuthNoPriv');
+				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'AuthPriv');
+
+				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_SECURITY_LEVEL, SPACE,
+						$cmbSecLevel));
+				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_AUTH_PASSPHRASE, SPACE,
+						new CTextBox('new_check_snmpv3_authpassphrase', $new_check_snmpv3_authpassphrase)));
+				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_PRIV_PASSPHRASE, SPACE,
+						new CTextBox('new_check_snmpv3_privpassphrase', $new_check_snmpv3_privpassphrase), BR()));
 				break;
 			case SVC_AGENT:
-				$form->addVar('new_check_snmp_community', '');
-				$external_param = array_merge($external_param, array(BR(), S_KEY, new CTextBox('new_check_key', $new_check_key), BR()));
+				$form->addVar('new_check_snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
+				$form->addVar('new_check_snmpv3_securityname', '');
+				$form->addVar('new_check_snmpv3_authpassphrase', '');
+				$form->addVar('new_check_snmpv3_privpassphrase', '');
+				$external_param = array_merge($external_param, array(BR(), S_KEY, SPACE,
+						new CTextBox('new_check_key', $new_check_key), BR()));
 				break;
 			case SVC_ICMPPING:
 				$form->addVar('new_check_ports', '0');
 			default:
 				$form->addVar('new_check_snmp_community', '');
 				$form->addVar('new_check_key', '');
+				$form->addVar('new_check_snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
+				$form->addVar('new_check_snmpv3_securityname', '');
+				$form->addVar('new_check_snmpv3_authpassphrase', '');
+				$form->addVar('new_check_snmpv3_privpassphrase', '');
 		}
 
 		$ports_box = $new_check_type == SVC_ICMPPING ? NULL : array(S_PORTS_SMALL, SPACE,
@@ -3928,7 +3966,7 @@
 			case CONDITION_TYPE_DSERVICE_TYPE:
 				$cmbCondVal = new CComboBox('new_condition[value]');
 				foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP,
-					SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,SVC_AGENT,SVC_SNMPv1,SVC_SNMPv2,
+					SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,SVC_AGENT,SVC_SNMPv1,SVC_SNMPv2,SVC_SNMPv3,
 					SVC_ICMPPING) as $svc)
 					$cmbCondVal->addItem($svc,discovery_check_type2str($svc));
 

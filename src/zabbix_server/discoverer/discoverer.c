@@ -608,6 +608,7 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 		case SVC_AGENT:
 		case SVC_SNMPv1:
 		case SVC_SNMPv2c:
+		case SVC_SNMPv3:
 		case SVC_ICMPPING:
 			break;
 		default:
@@ -623,6 +624,7 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 			case SVC_AGENT:
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
+			case SVC_SNMPv3:
 				memset(&item,0,sizeof(DB_ITEM));
 				item.key	= check->key_;
 				item.host_name	= ip;
@@ -633,18 +635,20 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 
 				item.value_type	= ITEM_VALUE_TYPE_STR;
 
-				if(check->type == SVC_SNMPv1)
-				{
-					item.type = ITEM_TYPE_SNMPv1;
-				}
-				else
-				{
-					item.type = ITEM_TYPE_SNMPv2c;
+				switch (check->type) {
+				case SVC_SNMPv1:	item.type = ITEM_TYPE_SNMPv1; break;
+				case SVC_SNMPv2c:	item.type = ITEM_TYPE_SNMPv2c; break;
+				case SVC_SNMPv3:	item.type = ITEM_TYPE_SNMPv3; break;
+				default:		item.type = ITEM_TYPE_ZABBIX; break;
 				}
 
-				item.snmp_oid		= check->key_;
-				item.snmp_community	= check->snmp_community;
-				item.snmp_port		= port;
+				item.snmp_oid			= check->key_;
+				item.snmp_community		= check->snmp_community;
+				item.snmpv3_securityname	= check->snmpv3_securityname;
+				item.snmpv3_securitylevel	= check->snmpv3_securitylevel;
+				item.snmpv3_authpassphrase	= check->snmpv3_authpassphrase;
+				item.snmpv3_privpassphrase	= check->snmpv3_privpassphrase;
+				item.snmp_port			= port;
 
 				if (check->type == SVC_AGENT)
 				{
@@ -937,7 +941,8 @@ static void process_rule(DB_DRULE *rule)
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Discovery: process_rule() [IP:%s]", ip);
 
-			result = DBselect("select dcheckid,type,key_,snmp_community,ports"
+			result = DBselect("select dcheckid,type,key_,snmp_community,snmpv3_securityname,"
+					"snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,ports"
 					" from dchecks where druleid=" ZBX_FS_UI64,
 					rule->druleid);
 
@@ -945,11 +950,15 @@ static void process_rule(DB_DRULE *rule)
 				memset(&check, 0, sizeof(check));
 
 				ZBX_STR2UINT64(check.dcheckid,row[0]);
-				check.druleid		= rule->druleid;
-				check.type		= atoi(row[1]);
-				check.key_		= row[2];
-				check.snmp_community	= row[3];
-				check.ports		= row[4];
+				check.druleid			= rule->druleid;
+				check.type			= atoi(row[1]);
+				check.key_			= row[2];
+				check.snmp_community		= row[3];
+				check.snmpv3_securityname	= row[4];
+				check.snmpv3_securitylevel	= atoi(row[5]);
+				check.snmpv3_authpassphrase	= row[6];
+				check.snmpv3_privpassphrase	= row[7];
+				check.ports			= row[8];
 		
 				process_check(rule, &dhost, &host_status, &check, ip);
 			}
