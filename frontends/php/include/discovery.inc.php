@@ -47,6 +47,7 @@
 			case SVC_AGENT:		$port = 10050;	break;
 			case SVC_SNMPv1:	$port = 161;	break;
 			case SVC_SNMPv2:	$port = 161;	break;
+			case SVC_SNMPv3:	$port = 161;	break;
 			case SVC_ICMPPING:	$port = 0;	break;
 		}
 
@@ -67,6 +68,7 @@
 		$str_type[SVC_AGENT]	= S_ZABBIX_AGENT;
 		$str_type[SVC_SNMPv1]	= S_SNMPV1_AGENT;
 		$str_type[SVC_SNMPv2]	= S_SNMPV2_AGENT;
+		$str_type[SVC_SNMPv3]	= S_SNMPV3_AGENT;
 		$str_type[SVC_ICMPPING]	= S_ICMPPING;
 
 		if(isset($str_type[$type_int]))
@@ -151,12 +153,15 @@
 		return DBexecute('update drules set status='.$status.' where druleid='.$druleid);
 	}
 
-	function	add_discovery_check($druleid, $type, $ports, $key, $snmp_community)
+	function	add_discovery_check($druleid, $type, $ports, $key, $snmp_community,
+			$snmpv3_securityname, $snmpv3_securitylevel, $snmpv3_authpassphrase, $snmpv3_privpassphrase)
 	{
 		$dcheckid = get_dbid('dchecks', 'dcheckid');
-		$result = DBexecute('insert into dchecks (dcheckid,druleid,type,ports,key_,snmp_community) '.
-			' values ('.$dcheckid.','.$druleid.','.$type.','.zbx_dbstr($ports).','.
-				zbx_dbstr($key).','.zbx_dbstr($snmp_community).')');
+		$result = DBexecute('insert into dchecks (dcheckid,druleid,type,ports,key_,snmp_community'.
+				',snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase) '.
+				' values ('.$dcheckid.','.$druleid.','.$type.','.zbx_dbstr($ports).','.
+				zbx_dbstr($key).','.zbx_dbstr($snmp_community).','.zbx_dbstr($snmpv3_securityname).','.
+				$snmpv3_securitylevel.','.zbx_dbstr($snmpv3_authpassphrase).','.zbx_dbstr($snmpv3_privpassphrase).')');
 
 		if(!$result)
 			return $result;
@@ -180,7 +185,9 @@
 		if($result)
 		{
 			if(isset($dchecks)) foreach($dchecks as $val)
-				add_discovery_check($druleid,$val["type"],$val["ports"],$val["key"],$val["snmp_community"]);
+				add_discovery_check($druleid, $val['type'], $val['ports'], $val['key'], $val['snmp_community'],
+						$val['snmpv3_securityname'], $val['snmpv3_securitylevel'], $val['snmpv3_authpassphrase'],
+						$val['snmpv3_privpassphrase']);
 
 			$result = $druleid;
 		}
@@ -202,13 +209,10 @@
 
 		if($result)
 		{
-			if (isset($dchecks))
-			{
-				foreach($dchecks as $val)
-					if (!isset($val['dcheckid']))
-						add_discovery_check($druleid, $val['type'], $val['ports'],
-								$val['key'], $val['snmp_community']);
-			}
+			if(isset($dchecks)) foreach($dchecks as $val) if(!isset($val['dcheckid']))
+				add_discovery_check($druleid, $val['type'], $val['ports'], $val['key'], $val['snmp_community'],
+						$val['snmpv3_securityname'], $val['snmpv3_securitylevel'], $val['snmpv3_authpassphrase'],
+						$val['snmpv3_privpassphrase']);
 			if(isset($dchecks_deleted) && !empty($dchecks_deleted))
 				delete_discovery_check($dchecks_deleted);
 		}

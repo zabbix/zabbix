@@ -515,6 +515,7 @@
 	define('SVC_SNMPv1',	10);
 	define('SVC_SNMPv2',	11);
 	define('SVC_ICMPPING',	12);
+	define('SVC_SNMPv3',	13);
 
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);

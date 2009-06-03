@@ -47,12 +47,16 @@ include_once "include/page_header.php";
 		'selected_checks'=>	array(T_ZBX_INT, O_OPT, null, null, null),
 
 		'new_check_type'=>	array(T_ZBX_INT, O_OPT,  null,	
-			IN(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_ICMPPING)),
+			IN(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3, SVC_ICMPPING)),
 										'isset({add_check})'),
 
 		'new_check_ports'=>	array(T_ZBX_PORTS, O_OPT,  null,	NOT_EMPTY,	'isset({add_check})'),
 		'new_check_key'=>	array(T_ZBX_STR, O_OPT,  null,	null,	'isset({add_check})'),
-		'new_check_snmp_community'=>	array(T_ZBX_STR, O_OPT,  null,	null,	'isset({add_check})'),
+		'new_check_snmp_community'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({add_check})'),
+		'new_check_snmpv3_securitylevel'=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({add_check})'),
+		'new_check_snmpv3_securityname'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({add_check})'),
+		'new_check_snmpv3_authpassphrase'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({add_check})'),
+		'new_check_snmpv3_privpassphrase'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({add_check})'),
 
 		'type_changed'=>	array(T_ZBX_INT, O_OPT, null, IN(1), null),
 
@@ -79,12 +83,18 @@ include_once "include/page_header.php";
 	
 ?>
 <?php
-	if(inarr_isset(array('add_check', 'new_check_type', 'new_check_ports', 'new_check_key', 'new_check_snmp_community'))){
+	if(inarr_isset(array('add_check', 'new_check_type', 'new_check_ports', 'new_check_key', 'new_check_snmp_community',
+			'new_check_snmpv3_securitylevel', 'new_check_snmpv3_securityname', 'new_check_snmpv3_authpassphrase',
+			'new_check_snmpv3_privpassphrase'))){
 		$new_dcheck = array(
 			'type' => $_REQUEST['new_check_type'],
 			'ports'=> $_REQUEST['new_check_ports'],
 			'key'=> $_REQUEST['new_check_key'],
-			'snmp_community'=> $_REQUEST['new_check_snmp_community']
+			'snmp_community'=> $_REQUEST['new_check_snmp_community'],
+			'snmpv3_securitylevel'=> $_REQUEST['new_check_snmpv3_securitylevel'],
+			'snmpv3_securityname'=> $_REQUEST['new_check_snmpv3_securityname'],
+			'snmpv3_authpassphrase'=> $_REQUEST['new_check_snmpv3_authpassphrase'],
+			'snmpv3_privpassphrase'=> $_REQUEST['new_check_snmpv3_privpassphrase']
 			);
 		if( !str_in_array($new_dcheck, $_REQUEST['dchecks']))
 			$_REQUEST['dchecks'][] = $new_dcheck;
