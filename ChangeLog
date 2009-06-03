@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-936] fixed saving flexible intervals to items linked to templates (Artem)
  - [ZBX-932] fixed typo in changelog (Richlv)
  - [ZBX-931] fixed timeout handling for agent's user parameters (Alexei)
  - [ZBX-889] fixed possible bug in media types form (Artem)

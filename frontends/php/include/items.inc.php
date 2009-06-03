@@ -601,14 +601,14 @@
 					'logtimefmt'	=> array(),
 					'valuemapid'	=> array('httptest' => 1),
 					'params'		=> array(),
-					'delay_flex'	=> array(),
+					'delay_flex'	=> array('template' => 1),
 					'ipmi_sensor'	=> array());
 
 		foreach($restore_rules as $var_name => $info){
 			if(($item_data['type'] == ITEM_TYPE_HTTPTEST) && !isset($info['httptest'])){
 				$item[$var_name] = $item_data[$var_name];
 			}
-				
+			
 			if(!isset($info['template']) && (0 != $item_data['templateid'])){
 				$item[$var_name] = $item_data[$var_name];
 			}
