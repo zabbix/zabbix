@@ -119,13 +119,16 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 	if($value === false) return false;
 
 	$sql_cond = '';
-	if(zbx_numeric($idx2)) 	$sql_cond = ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
+// dirty fix, but havn't figureout something better
+	if($idx != 'web.nodes.switch_node') $sql_cond.= ' AND '.DBin_node('profileid');	
+// ---
+	if(zbx_numeric($idx2)) 	$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
+
 
 	if(profile_type($type,'array')){
 		$sql='DELETE FROM profiles '.
 			' WHERE userid='.$USER_DETAILS['userid'].
 				' AND idx='.zbx_dbstr($idx).
-				' AND '.DBin_node('profileid').
 				$sql_cond;
 
 		DBstart();
@@ -141,7 +144,6 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 				' FROM profiles '.
 				' WHERE userid='.$USER_DETAILS['userid'].
 					' AND '.DBin_node('profileid').
-					' AND idx='.zbx_dbstr($idx).
 					$sql_cond;
 					
 		$row = DBfetch(DBselect($sql));
@@ -176,9 +178,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 					' source='.zbx_dbstr($src).
 				' WHERE userid='.$USER_DETAILS["userid"].
 					' AND idx='.zbx_dbstr($idx).
-					' AND '.DBin_node('profileid').
 					$sql_cond;
-//if($idx == 'web.audit.filter.action') SDI($sql);
 			$result = DBexecute($sql);
 		}
 	}
