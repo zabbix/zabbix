@@ -179,7 +179,7 @@ static int	get_trigger_permision(zbx_uint64_t userid, zbx_uint64_t triggerid)
 	return perm;
 }
 
-static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, zbx_uint64_t triggerid, ZBX_USER_MSG **user_msg,
+static void	add_user_msg(int source, zbx_uint64_t userid, zbx_uint64_t mediatypeid, zbx_uint64_t triggerid, ZBX_USER_MSG **user_msg,
 		char *subject, char *message)
 {
 	ZBX_USER_MSG	*p;
@@ -189,7 +189,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, zbx_uint
 	if (SUCCEED != check_perm2system(userid))
 		return;
 
-	if (PERM_READ_ONLY > get_trigger_permision(userid, triggerid))
+	if (EVENT_SOURCE_TRIGGERS == source && PERM_READ_ONLY > get_trigger_permision(userid, triggerid))
 		return;
 
 	p = *user_msg;
@@ -214,7 +214,8 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, zbx_uint
 	}
 }
 
-static void	add_object_msg(zbx_uint64_t triggerid, DB_OPERATION *operation, ZBX_USER_MSG **user_msg, char *subject, char *message)
+static void	add_object_msg(int source, zbx_uint64_t triggerid, DB_OPERATION *operation, ZBX_USER_MSG **user_msg,
+		char *subject, char *message)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -230,7 +231,7 @@ static void	add_object_msg(zbx_uint64_t triggerid, DB_OPERATION *operation, ZBX_
 
 	switch (operation->object) {
 		case OPERATION_OBJECT_USER:
-			add_user_msg(operation->objectid, mediatypeid, triggerid, user_msg, subject, message);
+			add_user_msg(source, operation->objectid, mediatypeid, triggerid, user_msg, subject, message);
 			break;
 		case OPERATION_OBJECT_GROUP:
 			result = DBselect("select ug.userid from users_groups ug,usrgrp g"
@@ -241,7 +242,7 @@ static void	add_object_msg(zbx_uint64_t triggerid, DB_OPERATION *operation, ZBX_
 			while (NULL != (row = DBfetch(result)))
 			{
 				ZBX_STR2UINT64(userid, row[0]);
-				add_user_msg(userid, mediatypeid, triggerid, user_msg, subject, message);
+				add_user_msg(source, userid, mediatypeid, triggerid, user_msg, subject, message);
 			}
 
 			DBfree_result(result);
@@ -558,7 +559,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 						longdata = action->longdata;
 					}
 
-					add_object_msg(event->objectid, &operation, &user_msg, shortdata, longdata);
+					add_object_msg(event->source, escalation->triggerid, &operation, &user_msg, shortdata, longdata);
 					break;
 				case	OPERATION_TYPE_COMMAND:
 					add_command_alert(escalation, event, action, operation.longdata);
@@ -733,19 +734,32 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	DB_ACTION	action;
 	DB_EVENT	event;
 	char		*error = NULL;
+	int		source;
 
-	/* Trigger disabled? */
-	result = DBselect("select description,status from triggers where triggerid=" ZBX_FS_UI64,
-			escalation->triggerid);
+	result = DBselect("select source from events where eventid=" ZBX_FS_UI64,
+			escalation->eventid);
 	if (NULL == (row = DBfetch(result)))
-		error = zbx_dsprintf(error, "Trigger [" ZBX_FS_UI64 "] deleted.",
-				escalation->triggerid);
-	else if (TRIGGER_STATUS_DISABLED == atoi(row[1]))
-		error = zbx_dsprintf(error, "Trigger '%s' disabled.",
-				row[0]);
+		error = zbx_dsprintf(error, "Event [" ZBX_FS_UI64 "] deleted.",
+				escalation->eventid);
+	else
+		source = atoi(row[0]);
 	DBfree_result(result);
 
-	if (NULL == error)
+	if (NULL == error && EVENT_SOURCE_TRIGGERS == source)
+	{
+		/* Trigger disabled? */
+		result = DBselect("select description,status from triggers where triggerid=" ZBX_FS_UI64,
+				escalation->triggerid);
+		if (NULL == (row = DBfetch(result)))
+			error = zbx_dsprintf(error, "Trigger [" ZBX_FS_UI64 "] deleted.",
+					escalation->triggerid);
+		else if (TRIGGER_STATUS_DISABLED == atoi(row[1]))
+			error = zbx_dsprintf(error, "Trigger '%s' disabled.",
+					row[0]);
+		DBfree_result(result);
+	}
+
+	if (NULL == error && EVENT_SOURCE_TRIGGERS == source)
 	{
 		/* Item disabled? */
 		result = DBselect("select i.description from items i,functions f,triggers t"
@@ -759,7 +773,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		DBfree_result(result);
 	}
 
-	if (NULL == error)
+	if (NULL == error && EVENT_SOURCE_TRIGGERS == source)
 	{
 		/* Host disabled? */
 		result = DBselect("select h.host from hosts h,items i,functions f,triggers t"
