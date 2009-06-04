@@ -481,11 +481,11 @@
 		'sortorder'=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	NULL,NULL)
 	);
 
-	function invalid_url(){
-		include_once "include/page_header.php";
+	function invalid_url($msg=S_INVALID_URL_PARAMS){
+		include_once('include/page_header.php');
 		unset_all();
-		show_error_message(S_INVALID_URL);
-		include_once "include/page_footer.php";
+		show_error_message($msg);
+		include_once('include/page_footer.php');
 	}
 	
 	function check_fields(&$fields, $show_messages=true){
