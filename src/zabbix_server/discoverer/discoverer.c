@@ -37,9 +37,12 @@
 static zbx_process_t	zbx_process;
 int			discoverer_num;
 
+static DB_EVENT	*events = NULL;
+int		events_alloc, events_count;
+
 /******************************************************************************
  *                                                                            *
- * Function: add_event                                                        *
+ * Functions: init_events, add_event, process_events, free_events             *
  *                                                                            *
  * Purpose: generate UP/DOWN event if required                                *
  *                                                                            *
@@ -52,21 +55,48 @@ int			discoverer_num;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
+static void	init_events()
+{
+	events_alloc = 8;
+	events_count = 0;
+
+	events = zbx_malloc(events, events_alloc * sizeof(DB_EVENT));
+}
+
 static void	add_event(int object, zbx_uint64_t objectid, int value)
 {
-	DB_EVENT	event;
+	DB_EVENT	*event;
 
-	memset(&event, 0, sizeof(DB_EVENT));
+	if (events_count == events_alloc)
+	{
+		events_alloc += 4;
+		events = zbx_realloc(events, events_alloc * sizeof(DB_EVENT));
+	}
 
-	event.eventid		= 0;
-	event.source		= EVENT_SOURCE_DISCOVERY;
-	event.object		= object;
-	event.objectid		= objectid;
-	event.clock 		= time(NULL);
-	event.value 		= value;
-	event.acknowledged 	= 0;
+	event = &events[events_count++];
 
-	process_event(&event);
+	memset(event, 0, sizeof(DB_EVENT));
+
+	event->eventid		= 0;
+	event->source		= EVENT_SOURCE_DISCOVERY;
+	event->object		= object;
+	event->objectid		= objectid;
+	event->clock 		= time(NULL);
+	event->value 		= value;
+	event->acknowledged 	= 0;
+}
+
+static void	process_events()
+{
+	DB_EVENT	*p;
+
+	for (p = events; 0 != events_count; events_count--, p++)
+		process_event(p);
+}
+
+static void	free_events()
+{
+	zbx_free(events);
 }
 
 /******************************************************************************
@@ -188,8 +218,10 @@ static void	register_service(DB_DSERVICE *service, const char *ip, int port, int
 	key_esc = DBdyn_escape_string_len(service->key_, DSERVICE_KEY_LEN);
 
 	result = DBselect("select dserviceid,status,lastup,lastdown,value"
-			" from dservices where dhostid=" ZBX_FS_UI64 " and type=%d and port=%d and key_='%s'",
+			" from dservices where dhostid=" ZBX_FS_UI64 " and dcheckid=" ZBX_FS_UI64
+			" and type=%d and port=%d and key_='%s'",
 			service->dhostid,
+			service->dcheckid,
 			service->type,
 			port,
 			key_esc);
@@ -760,7 +792,7 @@ static void process_check(DB_DRULE *rule, DB_DHOST *dhost, int *host_status, DB_
 		else
 			first = last	= atoi(curr_range);
 
-		if ( next_range ) 
+		if (NULL != next_range)
 		{
 			*next_range = ',';
 			next_range++;
@@ -829,6 +861,9 @@ static void process_rule(DB_DRULE *rule)
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_rule() [name:%s] [range:%s]",
 		rule->name,
 		rule->iprange);
+
+	if (ZBX_PROCESS_SERVER == zbx_process)
+		init_events();
 
 	for ( curr_range = rule->iprange; curr_range; curr_range = next_range )
 	{ /* split by ',' */
@@ -956,8 +991,14 @@ static void process_rule(DB_DRULE *rule)
 				break;
 			}
 			DBcommit();
+
+			if (ZBX_PROCESS_SERVER == zbx_process)
+				process_events();
 		}
 	}
+
+	if (ZBX_PROCESS_SERVER == zbx_process)
+		free_events();
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End process_rule()");
 }
