@@ -634,6 +634,7 @@ include_once('include/page_header.php');
 							);			
 			show_table_header($header);
 			$form = new CForm();
+			$form->setName('usrgrp_form');
 
 			$table = new CTableInfo(S_NO_USER_GROUPS_DEFINED);
 			$table->setHeader(array(
