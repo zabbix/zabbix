@@ -298,7 +298,7 @@
 		}
 
 		$ports_box = $new_check_type == SVC_ICMPPING ? NULL : array(S_PORTS_SMALL, SPACE,
-				new CNumericBox('new_check_ports', $new_check_ports,5));
+				new CTextBox('new_check_ports', $new_check_ports, 20));
 		$form->addRow(S_NEW_CHECK, array(
 			$cmbChkType, SPACE,
 			$ports_box,
