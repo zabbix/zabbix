@@ -253,7 +253,7 @@ typedef enum
 	SVC_SNMPv3,
 	SVC_ICMPPING
 } zbx_dservice_type_t;
-
+char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 
 /* Item snmpv3 security levels */
 #define ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
