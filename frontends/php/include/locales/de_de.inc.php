@@ -75,8 +75,6 @@
 	'S_CANNOT_ADD_DISCOVERY_RULE'=>			'Kann Discoveryregel nicht hinzufügen',
 	'S_STATUS_OF_DISCOVERY_BIG'=>			'STATUS VON DISCOVERY',
 	'S_STATUS_OF_DISCOVERY'=>			'Status von discovery',
-	'S_DISCOVER'=>			'',
-	'S_LOST'=>			'',
 	'S_DETAILS_OF_SCENARIO'=>			'Details des Szenarios',
 	'S_DETAILS_OF_SCENARIO_BIG'=>			'DETAILS DES SZENARIOS',
 	'S_SPEED'=>			'Geschwindigkeit',

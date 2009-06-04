@@ -75,7 +75,7 @@
 	'S_CANNOT_ADD_DISCOVERY_RULE'=>			'Nie można dodać reguły wykrycia',
 	'S_STATUS_OF_DISCOVERY_BIG'=>			'STATUS WYKRYCIA',
 	'S_STATUS_OF_DISCOVERY'=>			'Status wykrycia',
-	'S_DISCOVER'=>					'Wykryj',
+	'S_DISCOVERED'=>				'Wykryj',
 	'S_LOST'=>					'Stracone',
 	'S_DETAILS_OF_SCENARIO'=>			'Szczegóły scenariusza',
 	'S_DETAILS_OF_SCENARIO_BIG'=>			'SZCZEGÓŁY SCENARIUSZA',

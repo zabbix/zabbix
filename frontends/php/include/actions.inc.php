@@ -376,6 +376,7 @@ function condition_type2str($conditiontype){
 	$str_type[CONDITION_TYPE_NODE]			= S_NODE;
 	$str_type[CONDITION_TYPE_DRULE]			= S_DISCOVERY_RULE;
 	$str_type[CONDITION_TYPE_DCHECK]		= S_DISCOVERY_CHECK;
+	$str_type[CONDITION_TYPE_DOBJECT]		= S_DISCOVERED_OBJECT;
 	$str_type[CONDITION_TYPE_DHOST_IP]		= S_HOST_IP;
 	$str_type[CONDITION_TYPE_DSERVICE_TYPE]		= S_SERVICE_TYPE;
 	$str_type[CONDITION_TYPE_DSERVICE_PORT]		= S_SERVICE_PORT;
@@ -391,7 +392,17 @@ function condition_type2str($conditiontype){
 
 return S_UNKNOWN;
 }
-	
+
+function discovery_object2str($object){
+	$str_object[EVENT_OBJECT_DHOST]		= S_DEVICE;
+	$str_object[EVENT_OBJECT_DSERVICE]	= S_SERVICE;
+
+	if(isset($str_object[$object]))
+		return $str_object[$object];
+
+return S_UNKNOWN;
+}
+
 function condition_value2str($conditiontype, $value){
 	switch($conditiontype){
 		case CONDITION_TYPE_HOST_GROUP:
@@ -439,6 +450,9 @@ function condition_value2str($conditiontype, $value){
 					' FROM drules r,dchecks c WHERE r.druleid=c.druleid AND c.dcheckid='.$value));
 			$str_val = $row['name'].':'.discovery_check2str($row['type'],
 					$row['snmp_community'], $row['key_'], $row['ports']);
+			break;
+		case CONDITION_TYPE_DOBJECT:
+			$str_val = discovery_object2str($value);
 			break;
 		case CONDITION_TYPE_PROXY:
 			$host = get_host_by_hostid($value);
@@ -597,6 +611,7 @@ function get_conditions_by_eventsource($eventsource){
 			CONDITION_TYPE_DSERVICE_PORT,
 			CONDITION_TYPE_DRULE,
 			CONDITION_TYPE_DCHECK,
+			CONDITION_TYPE_DOBJECT,
 			CONDITION_TYPE_DSTATUS,
 			CONDITION_TYPE_DUPTIME,
 			CONDITION_TYPE_DVALUE,
@@ -715,6 +730,9 @@ function	get_operators_by_conditiontype($conditiontype)
 	$operators[CONDITION_TYPE_DCHECK] = array(
 			CONDITION_OPERATOR_EQUAL,
 			CONDITION_OPERATOR_NOT_EQUAL
+		);
+	$operators[CONDITION_TYPE_DOBJECT] = array(
+			CONDITION_OPERATOR_EQUAL,
 		);
 	$operators[CONDITION_TYPE_PROXY] = array(
 			CONDITION_OPERATOR_EQUAL,
@@ -844,6 +862,7 @@ function validate_condition($conditiontype, $value){
 		case CONDITION_TYPE_NODE:
 		case CONDITION_TYPE_DRULE:
 		case CONDITION_TYPE_DCHECK:
+		case CONDITION_TYPE_DOBJECT:
 		case CONDITION_TYPE_PROXY:
 		case CONDITION_TYPE_DUPTIME:
 		case CONDITION_TYPE_DVALUE:
