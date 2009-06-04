@@ -1455,6 +1455,7 @@
 	'S_DEPENDENT'=>				'Dependent',
 	'S_URL'=>				'URL',
 	'S_INVALID_URL'=>			'Invalid URL',
+	'S_INVALID_URL_PARAMS'=>		'Invalid URL parameters',
 	'S_CREATE_TRIGGER'=>			'Create Trigger',
 	'S_INSERT'=>				'Insert',
 	'S_TIMES'=>				'Times',
