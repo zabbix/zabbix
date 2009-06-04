@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-938] fixed usage of 'color' in en_gb locale (Richlv)
  - [ZBX-937] fixed possible server crash while processing IPMI remote command (Sasha)
  - [ZBX-936] fixed saving flexible intervals to items linked to templates (Artem)
  - [ZBX-932] fixed typo in changelog (Richlv)

@@ -581,7 +581,7 @@
 	'S_DISPLAYED_PARAMETERS_BIG'=>		'DISPLAYED PARAMETERS',
 	'S_SORT_ORDER'=>			'Sort order',
 	'S_PARAMETER'=>				'Parameter',
-	'S_COLOR'=>				'Color',
+	'S_COLOR'=>				'Colour',
 	'S_UP'=>				'Up',
 	'S_DOWN'=>				'Down',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>		'New item for the graph',
@@ -1036,8 +1036,8 @@
 	'S_COORDINATE_Y'=>				'Coordinate Y',
 	'S_TYPE_OFF'=>				'Type (OFF)',
 	'S_TYPE_ON'=>				'Type (ON)',
-	'S_COLOR_OFF'=>				'Color (OFF)',
-	'S_COLOR_ON'=>				'Color (ON)',
+	'S_COLOR_OFF'=>				'Colour (OFF)',
+	'S_COLOR_ON'=>				'Colour (ON)',
 
 
 //	sysmaps.php
