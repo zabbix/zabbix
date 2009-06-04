@@ -97,8 +97,8 @@ COpt::profiling_start("page");
 	$main_menu	= array();
 	$sub_menus	= array();
 	$denyed_page_requested = zbx_construct_menu($main_menu, $sub_menus);
-	
-	zbx_flush_post_cookies(isset($denyed_page_requested));
+
+	zbx_flush_post_cookies($denyed_page_requested);
 
 	if($page['type'] == PAGE_TYPE_HTML){
 ?>
