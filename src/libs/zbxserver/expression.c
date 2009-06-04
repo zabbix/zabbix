@@ -857,7 +857,7 @@ static void	expand_trigger_description_constants(
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_host_profile_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to, int N_functionid, const char *fieldname)
+static int	get_host_profile_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to, int N_functionid, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -923,6 +923,149 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
 	result = DBselect("select %s from hosts h,items i,functions f"
 			" where h.hostid=i.hostid and i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
 			fieldname, functionid);
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%s", row[0]);
+		ret = SUCCEED;
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_dhost_value_by_event                                       *
+ *                                                                            *
+ * Purpose: retrive discovered host value by event and field name             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_dhost_value_by_event(DB_EVENT *event, char **replace_to, const char *fieldname)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	switch (event->object)
+	{
+	case EVENT_OBJECT_DHOST:
+		result = DBselect("select %s from dhosts h where h.dhostid=" ZBX_FS_UI64,
+				fieldname, event->objectid);
+		break;
+	case EVENT_OBJECT_DSERVICE:
+		result = DBselect("select %s from dhosts h,dservices s"
+				" where h.dhostid=s.dhostid and s.dserviceid=" ZBX_FS_UI64,
+				fieldname, event->objectid);
+		break;
+	default:
+		return ret;
+	}
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%s", row[0]);
+		ret = SUCCEED;
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_dservice_value_by_event                                    *
+ *                                                                            *
+ * Purpose: retrive discovered service value by event and field name          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_dservice_value_by_event(DB_EVENT *event, char **replace_to, const char *fieldname)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	switch (event->object)
+	{
+	case EVENT_OBJECT_DSERVICE:
+		result = DBselect("select %s from dservices s where s.dserviceid=" ZBX_FS_UI64,
+				fieldname, event->objectid);
+		break;
+	default:
+		return ret;
+	}
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%s", row[0]);
+		ret = SUCCEED;
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_drule_value_by_event                                       *
+ *                                                                            *
+ * Purpose: retrive discovery rule value by event and field name              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const char *fieldname)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	if (EVENT_SOURCE_DISCOVERY != event->source)
+		return FAIL;
+
+	switch (event->object)
+	{
+	case EVENT_OBJECT_DHOST:
+		result = DBselect("select r.%s from drules r,dhosts h"
+				" where r.druleid=r.druleid and h.dhostid=" ZBX_FS_UI64,
+				fieldname, event->objectid);
+		break;
+	case EVENT_OBJECT_DSERVICE:
+		result = DBselect("select r.%s from drules r,dhosts h,dservices s"
+				" where r.druleid=h.druleid and h.dhostid=s.dhostid and s.dserviceid=" ZBX_FS_UI64,
+				fieldname, event->objectid);
+		break;
+	default:
+		return ret;
+	}
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 	{
@@ -1201,7 +1344,7 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_node_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to, int N_functionid, const char *fieldname)
+static int	get_node_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to, int N_functionid, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1216,6 +1359,53 @@ int	get_node_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to, int N
 		return FAIL;
 
 	nodeid = get_nodeid_by_id(functionid);
+
+	if (0 == strcmp(fieldname, "nodeid"))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%d", nodeid);
+
+		ret = SUCCEED;
+	}
+	else
+	{
+		result = DBselect("select distinct %s from nodes where nodeid=%d", fieldname, nodeid);
+
+		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+		{
+			*replace_to = zbx_dsprintf(*replace_to, "%s", row[0]);
+
+			ret = SUCCEED;
+		}
+
+		DBfree_result(result);
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_node_value_by_event                                          *
+ *                                                                            *
+ * Purpose: request node value by event                                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: returns requested host profile value                         *
+ *                      or *UNKNOWN* if profile is not defined                *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_node_value_by_event(DB_EVENT *event, char **replace_to, const char *fieldname)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		nodeid, ret = FAIL;
+
+	nodeid = get_nodeid_by_id(event->objectid);
 
 	if (0 == strcmp(fieldname, "nodeid"))
 	{
@@ -1284,6 +1474,15 @@ int	get_node_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to, int N
 #define MVAR_NODE_ID			"{NODE.ID}"
 #define MVAR_NODE_NAME			"{NODE.NAME}"
 
+#define MVAR_DISCOVERY_RULE_NAME	"{DISCOVERY.RULE.NAME}"
+#define MVAR_DISCOVERY_SERVICE_NAME	"{DISCOVERY.SERVICE.NAME}"
+#define MVAR_DISCOVERY_SERVICE_PORT	"{DISCOVERY.SERVICE.PORT}"
+#define MVAR_DISCOVERY_SERVICE_STATUS	"{DISCOVERY.SERVICE.STATUS}"
+#define MVAR_DISCOVERY_SERVICE_UPTIME	"{DISCOVERY.SERVICE.UPTIME}"
+#define MVAR_DISCOVERY_DEVICE_IPADDRESS	"{DISCOVERY.DEVICE.IPADDRESS}"
+#define MVAR_DISCOVERY_DEVICE_STATUS	"{DISCOVERY.DEVICE.STATUS}"
+#define MVAR_DISCOVERY_DEVICE_UPTIME	"{DISCOVERY.DEVICE.UPTIME}"
+
 #define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
 
 /******************************************************************************
@@ -1309,7 +1508,7 @@ int	get_node_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to, int N
  ******************************************************************************/
 void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, DB_ESCALATION *escalation, char **data, int macro_type)
 {
-	char	*p, *bl, *br, c, *str_out = NULL, *replace_to = NULL;
+	char	*p, *bl, *br, c, *str_out = NULL, *replace_to = NULL, sql[64];
 	int	ret;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
@@ -1343,185 +1542,195 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 
 		ret = SUCCEED;
 
-		if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_TRIGGER_NAME))
+		if (macro_type & MACRO_TYPE_MESSAGE)
 		{
-			replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_description);
-			/* Why it was here? *//* For substituting macros in trigger description :) */
-			substitute_simple_macros(event, action, item, escalation, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION);
+			if (EVENT_SOURCE_TRIGGERS == event->source)
+			{
+				if (0 == strcmp(bl, MVAR_TRIGGER_NAME))
+				{
+					replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_description);
+					/* Why it was here? *//* For substituting macros in trigger description :) */
+					substitute_simple_macros(event, action, item, escalation, &replace_to,
+							MACRO_TYPE_TRIGGER_DESCRIPTION);
+				}
+				else if (0 == strcmp(bl, MVAR_TRIGGER_COMMENT))
+					replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_comments);
+				else if (0 == strcmp(bl, MVAR_PROFILE_DEVICETYPE))
+					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "devicetype");
+				else if (0 == strcmp(bl, MVAR_PROFILE_NAME))
+					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "name");
+				else if (0 == strcmp(bl, MVAR_PROFILE_OS))
+					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "os");
+				else if (0 == strcmp(bl, MVAR_PROFILE_SERIALNO))
+					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "serialno");
+				else if (0 == strcmp(bl, MVAR_PROFILE_TAG))
+					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "tag");
+				else if (0 == strcmp(bl, MVAR_PROFILE_MACADDRESS))
+					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "macaddress");
+				else if (0 == strcmp(bl, MVAR_PROFILE_HARDWARE))
+					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "hardware");
+				else if (0 == strcmp(bl, MVAR_PROFILE_SOFTWARE))
+					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "software");
+				else if (0 == strcmp(bl, MVAR_PROFILE_CONTACT))
+					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "contact");
+				else if (0 == strcmp(bl, MVAR_PROFILE_LOCATION))
+					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "location");
+				else if (0 == strcmp(bl, MVAR_PROFILE_NOTES))
+					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "notes");
+				else if (0 == strcmp(bl, MVAR_HOSTNAME))
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "h.host");
+				else if (0 == strcmp(bl, MVAR_ITEM_NAME))
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "i.description");
+				else if (0 == strcmp(bl, MVAR_TRIGGER_KEY))
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "i.key_");
+				else if (0 == strcmp(bl, MVAR_IPADDRESS))
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "h.ip");
+				else if (0 == strcmp(bl, MVAR_HOST_DNS))
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "h.dns");
+				else if (0 == strcmp(bl, MVAR_HOST_CONN))
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1,
+							"case when h.useip=1 then h.ip else h.dns end");
+				else if (0 == strcmp(bl, MVAR_ITEM_LASTVALUE))
+					ret = DBget_item_lastvalue_by_triggerid(event->objectid, &replace_to, 1);
+				else if (0 == strcmp(bl, MVAR_ITEM_LOG_DATE))
+				{
+					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
+									1, "timestamp")))
+						replace_to = zbx_dsprintf(replace_to, "%s", zbx_date2str((time_t)atoi(replace_to)));
+				}
+				else if (0 == strcmp(bl, MVAR_ITEM_LOG_TIME))
+				{
+					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
+									1, "timestamp")))
+						replace_to = zbx_dsprintf(replace_to, "%s", zbx_time2str((time_t)atoi(replace_to)));
+				}
+				else if (0 == strcmp(bl, MVAR_ITEM_LOG_AGE))
+				{
+					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
+									1, "timestamp")))
+						replace_to = zbx_dsprintf(replace_to, "%s", zbx_age2str(time(NULL) - atoi(replace_to)));
+				}
+				else if (0 == strcmp(bl, MVAR_ITEM_LOG_SOURCE))
+					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, 1, "source");
+				else if (0 == strcmp(bl, MVAR_ITEM_LOG_SEVERITY))
+				{
+					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
+									1, "severity")))
+						replace_to = zbx_dsprintf(replace_to, "%s",
+								zbx_trigger_severity_string((zbx_trigger_severity_t)atoi(replace_to)));
+				}
+				else if (0 == strcmp(bl, MVAR_ITEM_LOG_NSEVERITY))
+					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, 1, "severity");
+				else if (0 == strcmp(bl, MVAR_ITEM_LOG_EVENTID))
+					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, 1, "logeventid");
+				else if (0 == strcmp(bl, MVAR_DATE))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_date2str(time(NULL)));
+				else if (0 == strcmp(bl, MVAR_TIME))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_time2str(time(NULL)));
+				else if (0 == strcmp(bl, MVAR_TRIGGER_STATUS) || 0 == strcmp(bl, MVAR_TRIGGER_STATUS_OLD))
+					replace_to = zbx_dsprintf(replace_to, "%s",
+							event->value == TRIGGER_VALUE_TRUE ? "PROBLEM" : "OK");
+				else if (0 == strcmp(bl, MVAR_TRIGGER_ID))
+					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
+				else if (0 == strcmp(bl, MVAR_TRIGGER_VALUE))
+					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
+				else if (0 == strcmp(bl, MVAR_TRIGGER_URL))
+					replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_url);
+				else if (0 == strcmp(bl, MVAR_EVENT_ID))
+					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
+				else if (0 == strcmp(bl, MVAR_EVENT_DATE))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_date2str(event->clock));
+				else if (0 == strcmp(bl, MVAR_EVENT_TIME))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_time2str(event->clock));
+				else if (0 == strcmp(bl, MVAR_EVENT_AGE))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_age2str(time(NULL) - event->clock));
+				else if (0 == strcmp(bl, MVAR_ESC_HISTORY))
+					ret = get_escalation_history(event, escalation, &replace_to);
+				else if (0 == strcmp(bl, MVAR_TRIGGER_SEVERITY))
+					replace_to = zbx_dsprintf(replace_to, "%s",
+							zbx_trigger_severity_string((zbx_trigger_severity_t)event->trigger_priority));
+				else if (0 == strcmp(bl, MVAR_TRIGGER_NSEVERITY))
+					replace_to = zbx_dsprintf(replace_to, "%d", event->trigger_priority);
+				else if (0 == strcmp(bl, MVAR_NODE_ID))
+					ret = get_node_value_by_triggerid(event->objectid, &replace_to, 1, "nodeid");
+				else if (0 == strcmp(bl, MVAR_NODE_NAME))
+					ret = get_node_value_by_triggerid(event->objectid, &replace_to, 1, "name");
+			}
+			else if (EVENT_SOURCE_DISCOVERY == event->source)
+			{
+				if (0 == strcmp(bl, MVAR_DATE))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_date2str(time(NULL)));
+				else if (0 == strcmp(bl, MVAR_TIME))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_time2str(time(NULL)));
+				else if (0 == strcmp(bl, MVAR_EVENT_ID))
+					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
+				else if (0 == strcmp(bl, MVAR_EVENT_DATE))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_date2str(event->clock));
+				else if (0 == strcmp(bl, MVAR_EVENT_TIME))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_time2str(event->clock));
+				else if (0 == strcmp(bl, MVAR_EVENT_AGE))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_age2str(time(NULL) - event->clock));
+				else if (0 == strcmp(bl, MVAR_NODE_ID))
+					ret = get_node_value_by_event(event, &replace_to, "nodeid");
+				else if (0 == strcmp(bl, MVAR_NODE_NAME))
+					ret = get_node_value_by_event(event, &replace_to, "name");
+				else if (0 == strcmp(bl, MVAR_DISCOVERY_RULE_NAME))
+					ret = DBget_drule_value_by_event(event, &replace_to, "name");
+				else if (0 == strcmp(bl, MVAR_DISCOVERY_DEVICE_IPADDRESS))
+					ret = DBget_dhost_value_by_event(event, &replace_to, "h.ip");
+				else if (0 == strcmp(bl, MVAR_DISCOVERY_DEVICE_STATUS))
+				{
+					if (SUCCEED == (ret = DBget_dhost_value_by_event(event, &replace_to, "h.status")))
+						replace_to = zbx_dsprintf(replace_to, "%s",
+								(DOBJECT_STATUS_UP == atoi(replace_to)) ? "UP" : "DOWN");
+				}
+				else if (0 == strcmp(bl, MVAR_DISCOVERY_DEVICE_UPTIME))
+				{
+					zbx_snprintf(sql, sizeof(sql), "case when h.status=%d then h.lastup else h.lastdown end",
+							DOBJECT_STATUS_UP);
+					if (SUCCEED == (ret = DBget_dhost_value_by_event(event, &replace_to, sql)))
+						replace_to = zbx_dsprintf(replace_to, "%s", zbx_age2str(time(NULL) - atoi(replace_to)));
+				}
+				else if (0 == strcmp(bl, MVAR_DISCOVERY_SERVICE_NAME))
+				{
+					if (SUCCEED == (ret = DBget_dservice_value_by_event(event, &replace_to, "s.type")))
+						replace_to = zbx_dsprintf(replace_to, "%s",
+								zbx_dservice_type_string(atoi(replace_to)));
+				}
+				else if (0 == strcmp(bl, MVAR_DISCOVERY_SERVICE_PORT))
+					ret = DBget_dservice_value_by_event(event, &replace_to, "s.port");
+				else if (0 == strcmp(bl, MVAR_DISCOVERY_SERVICE_STATUS))
+				{
+					if (SUCCEED == (ret = DBget_dhost_value_by_event(event, &replace_to, "s.status")))
+						replace_to = zbx_dsprintf(replace_to, "%s",
+								(DOBJECT_STATUS_UP == atoi(replace_to)) ? "UP" : "DOWN");
+				}
+				else if (0 == strcmp(bl, MVAR_DISCOVERY_SERVICE_UPTIME))
+				{
+					zbx_snprintf(sql, sizeof(sql), "case when s.status=%d then s.lastup else s.lastdown end",
+							DOBJECT_STATUS_UP);
+					if (SUCCEED == (ret = DBget_dhost_value_by_event(event, &replace_to, sql)))
+						replace_to = zbx_dsprintf(replace_to, "%s", zbx_age2str(time(NULL) - atoi(replace_to)));
+				}
+			}
 		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_TRIGGER_COMMENT))
+		else if (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION)
 		{
-			replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_comments);
+			if (EVENT_SOURCE_TRIGGERS == event->source)
+			{
+				if (0 == strcmp(bl, MVAR_HOSTNAME))
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "h.host");
+				else if (0 == strcmp(bl, MVAR_ITEM_LASTVALUE))
+					ret = DBget_item_lastvalue_by_triggerid(event->objectid, &replace_to, 1);
+			}
 		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_PROFILE_DEVICETYPE))
+		else if (macro_type & MACRO_TYPE_TRIGGER_EXPRESSION)
 		{
-			ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "devicetype");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_PROFILE_NAME))
-		{
-			ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "name");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_PROFILE_OS))
-		{
-			ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "os");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_PROFILE_SERIALNO))
-		{
-			ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "serialno");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_PROFILE_TAG))
-		{
-			ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "tag");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_PROFILE_MACADDRESS))
-		{
-			ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "macaddress");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_PROFILE_HARDWARE))
-		{
-			ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "hardware");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_PROFILE_SOFTWARE))
-		{
-			ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "software");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_PROFILE_CONTACT))
-		{
-			ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "contact");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_PROFILE_LOCATION))
-		{
-			ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "location");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_PROFILE_NOTES))
-		{
-			ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, 1, "notes");
-		}
-		else if ((macro_type & (MACRO_TYPE_MESSAGE | MACRO_TYPE_TRIGGER_DESCRIPTION)) && 0 == strcmp(bl, MVAR_HOSTNAME))
-		{
-			ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "h.host");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_ITEM_NAME))
-		{
-			ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "i.description");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_TRIGGER_KEY))
-		{
-			ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "i.key_");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_IPADDRESS))
-		{
-			ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "h.ip");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_HOST_DNS))
-		{
-			ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "h.dns");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_HOST_CONN))
-		{
-			ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1,
-					"case when h.useip=1 then h.ip else h.dns end");
-		}
-		else if ((macro_type & (MACRO_TYPE_MESSAGE | MACRO_TYPE_TRIGGER_DESCRIPTION)) &&
-				0 == strcmp(bl, MVAR_ITEM_LASTVALUE))
-		{
-			ret = DBget_item_lastvalue_by_triggerid(event->objectid, &replace_to, 1);
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_ITEM_LOG_DATE))
-		{
-			if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, 1, "timestamp")))
-				replace_to = zbx_dsprintf(replace_to, "%s", zbx_date2str((time_t)atoi(replace_to)));
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_ITEM_LOG_TIME))
-		{
-			if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, 1, "timestamp")))
-				replace_to = zbx_dsprintf(replace_to, "%s", zbx_time2str((time_t)atoi(replace_to)));
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_ITEM_LOG_AGE))
-		{
-			if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, 1, "timestamp")))
-				replace_to = zbx_dsprintf(replace_to, "%s", zbx_age2str(time(NULL) - atoi(replace_to)));
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_ITEM_LOG_SOURCE))
-		{
-			ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, 1, "source");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_ITEM_LOG_SEVERITY))
-		{
-			if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, 1, "severity")))
-				replace_to = zbx_dsprintf(replace_to, "%s",
-						zbx_trigger_severity_string((zbx_trigger_severity_t)atoi(replace_to)));
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_ITEM_LOG_NSEVERITY))
-		{
-			ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, 1, "severity");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_ITEM_LOG_EVENTID))
-		{
-			ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, 1, "logeventid");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_DATE))
-		{
-			replace_to = zbx_dsprintf(replace_to, "%s", zbx_date2str(time(NULL)));
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_TIME))
-		{
-			replace_to = zbx_dsprintf(replace_to, "%s", zbx_time2str(time(NULL)));
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) &&
-				(0 == strcmp(bl, MVAR_TRIGGER_STATUS) || 0 == strcmp(bl, MVAR_TRIGGER_STATUS_OLD)))
-		{
-			replace_to = zbx_dsprintf(replace_to, "%s",
-					event->value == TRIGGER_VALUE_TRUE ? "PROBLEM" : "OK");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_TRIGGER_ID))
-		{
-			replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
-		}
-		else if ((macro_type & (MACRO_TYPE_MESSAGE | MACRO_TYPE_TRIGGER_EXPRESSION)) && 0 == strcmp(bl, MVAR_TRIGGER_VALUE))
-		{
-			replace_to = zbx_dsprintf(replace_to, "%d", event->value);
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_TRIGGER_URL))
-		{
-			replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_url);
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_EVENT_ID))
-		{
-			replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_EVENT_DATE))
-		{
-			replace_to = zbx_dsprintf(replace_to, "%s", zbx_date2str(event->clock));
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_EVENT_TIME))
-		{
-			replace_to = zbx_dsprintf(replace_to, "%s", zbx_time2str(event->clock));
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_EVENT_AGE))
-		{
-			replace_to = zbx_dsprintf(replace_to, "%s", zbx_age2str(time(NULL) - event->clock));
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_ESC_HISTORY))
-		{
-			ret = get_escalation_history(event, escalation, &replace_to);
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_TRIGGER_SEVERITY))
-		{
-			replace_to = zbx_dsprintf(replace_to, "%s",
-					zbx_trigger_severity_string((zbx_trigger_severity_t)event->trigger_priority));
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_TRIGGER_NSEVERITY))
-		{
-			replace_to = zbx_dsprintf(replace_to, "%d", event->trigger_priority);
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_NODE_ID))
-		{
-			ret = get_node_value_by_triggerid(event->objectid, &replace_to, 1, "nodeid");
-		}
-		else if ((macro_type & MACRO_TYPE_MESSAGE) && 0 == strcmp(bl, MVAR_NODE_NAME))
-		{
-			ret = get_node_value_by_triggerid(event->objectid, &replace_to, 1, "name");
+			if (EVENT_SOURCE_TRIGGERS == event->source)
+			{
+				if (0 == strcmp(bl, MVAR_TRIGGER_VALUE))
+					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
+			}
 		}
 		else if (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_HOST_IPMI_IP))
 		{
