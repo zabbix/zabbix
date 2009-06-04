@@ -245,7 +245,9 @@
 					' AND '.DBcondition('value', $dcheckids, false, true));	// FIXED[POSIBLE value type violation]!!!
 		}
 
-		DBexecute('DELETE FROM dchecks WHERE '.DBcondition('dcheckid', $dchecks_deleted));
+		DBexecute('DELETE FROM dservices WHERE '.DBcondition('dcheckid', $dcheckids));
+
+		DBexecute('DELETE FROM dchecks WHERE '.DBcondition('dcheckid', $dcheckids));
 	}
 
 	function	delete_discovery_rule($druleid)
