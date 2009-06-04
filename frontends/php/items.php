@@ -782,6 +782,7 @@ include_once 'include/page_header.php';
 	
 	$reset = true;
 	$options = array('only_current_node', 'not_proxy_hosts');
+	$params = array();
 	if($filter_enabled){
 		array_push($options,'allow_all');
 		$reset = false;
