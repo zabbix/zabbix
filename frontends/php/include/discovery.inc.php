@@ -134,7 +134,7 @@
 	{
 		$str_stat[DOBJECT_STATUS_UP] = S_UP;
 		$str_stat[DOBJECT_STATUS_DOWN] = S_DOWN;
-		$str_stat[DOBJECT_STATUS_DISCOVER] = S_DISCOVER;
+		$str_stat[DOBJECT_STATUS_DISCOVER] = S_DISCOVERED;
 		$str_stat[DOBJECT_STATUS_LOST] = S_LOST;
 
 		if(isset($str_stat[$status]))
