@@ -3983,6 +3983,13 @@
 
 				$rowCondition[] = $cmbCondVal;
 				break;
+			case CONDITION_TYPE_DOBJECT:
+				$cmbCondVal = new CComboBox('new_condition[value]');
+				foreach(array(EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE) as $object)
+					$cmbCondVal->addItem($object, discovery_object2str($object));
+
+				$rowCondition[] = $cmbCondVal;
+				break;
 			case CONDITION_TYPE_DUPTIME:
 				$rowCondition[] = new CNumericBox('new_condition[value]','600',15);
 				break;

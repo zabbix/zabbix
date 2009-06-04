@@ -84,7 +84,7 @@
 	'S_STATUS_OF_DISCOVERY_BIG'=>		'STATUS OF DISCOVERY',
 	'S_STATUS_OF_DISCOVERY'=>		'Status of discovery',
 
-	'S_DISCOVER'=>				'Discover',
+	'S_DISCOVERED'=>			'Discovered',
 	'S_LOST'=>				'Lost',
 	
 //	discovery.php
@@ -272,6 +272,8 @@
 	'S_MEDIAS_SMALL'=>			'medias',
 	'S_USER_MEDIAS'=>			'User medias',
 	'S_DISCOVERY_CHECK'=>			'Discovery check',
+	'S_DISCOVERED_OBJECT'=>			'Discovered object',
+	'S_DEVICE'=>				'Device',
 
 	'S_INCORRECT_TRIGGER'=>			'Incorrect trigger',
 	'S_INCORRECT_HOST'=>			'Incorrect host',
