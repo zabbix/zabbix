@@ -224,24 +224,9 @@
 		$form->addVar('dchecks_deleted', $dchecks_deleted);
 
 		foreach($dchecks as $id => $data){
-			switch($data['type'])
-			{
-				case SVC_SNMPv1:
-				case SVC_SNMPv2:
-					$external_param = ' "'.$data['snmp_community'].'":"'.$data['key'].'"';
-					break;
-				case SVC_AGENT:
-					$external_param = ' "'.$data['key'].'"';
-					break;
-				default:
-					$external_param = null;
-			}
-			$port_def = svc_default_port($data['type']);
 			$dchecks[$id] = array(
 				new CCheckBox('selected_checks[]',null,null,$id),
-				discovery_check_type2str($data['type']),
-				($port_def == $data['ports'] ? '' : SPACE.'('.$data['ports'].')').
-				$external_param,
+				discovery_check2str($data['type'], $data['snmp_community'], $data['key'], $data['ports']),
 				BR()
 			);
 		}

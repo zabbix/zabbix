@@ -689,10 +689,7 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 				strscpy(host.addr, ip);
 				host.useip = 1;
 
-				if (SUCCEED == do_ping(&host, 1, error, sizeof(error))) {
-				       if (0 == host.alive)
-					       ret = FAIL;
-				} else
+				if (SUCCEED != do_ping(&host, 1, error, sizeof(error)) || 0 == host.alive)
 					ret = FAIL;
 				break;
 			/* Simple checks */
@@ -734,13 +731,8 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
  ******************************************************************************/
 static void process_check(DB_DRULE *rule, DB_DHOST *dhost, int *host_status, DB_DCHECK *check, char *ip)
 {
-	int	port,
-		first,
-		last,
-		now;
-	char	*curr_range = NULL,
-		*next_range = NULL,
-		*last_port = NULL;
+	int	port, first, last, now;
+	char	*curr_range, *next_range, *last_port;
 
 	assert(rule);
 	assert(dhost);
@@ -753,24 +745,20 @@ static void process_check(DB_DRULE *rule, DB_DHOST *dhost, int *host_status, DB_
 			check->ports,
 			check->type);
 
-	for ( curr_range = check->ports; curr_range; curr_range = next_range )
-	{ /* split by ',' */
-		if ( (next_range = strchr(curr_range, ',')) )
-		{
+	for (curr_range = check->ports; curr_range; curr_range = next_range)
+	{	/* split by ',' */
+		if (NULL != (next_range = strchr(curr_range, ',')))
 			*next_range = '\0';
-		}
 
-		if ( (last_port = strchr(curr_range, '-')) )
-		{ /* split by '-' */
+		if (NULL != (last_port = strchr(curr_range, '-')))
+		{	/* split by '-' */
 			*last_port	= '\0';
 			first		= atoi(curr_range);
-			last		= atoi(last_port);
+			last		= atoi(last_port + 1);
 			*last_port	= '-';
 		}
 		else
-		{
 			first = last	= atoi(curr_range);
-		}
 
 		if ( next_range ) 
 		{
@@ -779,7 +767,7 @@ static void process_check(DB_DRULE *rule, DB_DHOST *dhost, int *host_status, DB_
 		}
 
 		for (port = first; port <= last; port++) {	
-			check->status = SUCCEED == discover_service(check, ip, port) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
+			check->status = (SUCCEED == discover_service(check, ip, port)) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
 
 			/* Update host status */
 			if (*host_status == -1 || check->status == DOBJECT_STATUS_UP)
@@ -831,9 +819,7 @@ static void process_rule(DB_DRULE *rule)
 	unsigned int	j[9], i;
 	int		first, last, ipv6;
 
-	char	*curr_range = NULL,
-		*next_range = NULL,
-		*dash = NULL;
+	char	*curr_range, *next_range, *dash;
 #if defined(HAVE_IPV6)
 	char	*colon;
 #endif
@@ -846,15 +832,11 @@ static void process_rule(DB_DRULE *rule)
 
 	for ( curr_range = rule->iprange; curr_range; curr_range = next_range )
 	{ /* split by ',' */
-		if ( NULL != (next_range = strchr(curr_range, ',')) )
-		{
-			next_range[0] = '\0';
-		}
+		if (NULL != (next_range = strchr(curr_range, ',')))
+			*next_range = '\0';
 
-		if ( NULL != (dash = strchr(curr_range, '-')) )
-		{
-			dash[0] = '\0';
-		}
+		if (NULL != (dash = strchr(curr_range, '-')))
+			*dash = '\0';
 
 		first = last = -1;
 #if defined(HAVE_IPV6)
@@ -872,17 +854,13 @@ static void process_rule(DB_DRULE *rule)
 				}
 			}
 
-			if( dash != NULL )
+			if (NULL != dash)
 			{
-				if( sscanf(dash + 1, "%x", &j[8]) == 1 )
-				{
+				if (sscanf(dash + 1, "%x", &j[8]) == 1)
 					last = j[8];
-				}
 			}
 			else
-			{
 				last = first;
-			}
 		}
 		else
 		{
@@ -959,7 +937,7 @@ static void process_rule(DB_DRULE *rule)
 				check.snmpv3_authpassphrase	= row[6];
 				check.snmpv3_privpassphrase	= row[7];
 				check.ports			= row[8];
-		
+
 				process_check(rule, &dhost, &host_status, &check, ip);
 			}
 			DBfree_result(result);
