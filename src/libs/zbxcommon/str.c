@@ -1817,3 +1817,24 @@ char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity)
 	default: return "unknown";
 	}
 }
+
+char	*zbx_dservice_type_string(zbx_dservice_type_t service)
+{
+	switch (service) {
+	case SVC_SSH: return "SSH";
+	case SVC_LDAP: return "LDAP";
+	case SVC_SMTP: return "SMTP";
+	case SVC_FTP: return "FTP";
+	case SVC_HTTP: return "HTTP";
+	case SVC_POP: return "POP";
+	case SVC_NNTP: return "NNTP";
+	case SVC_IMAP: return "IMAP";
+	case SVC_TCP: return "TCP";
+	case SVC_AGENT: return "ZABBIX agent";
+	case SVC_SNMPv1: return "SNMPv1 agent";
+	case SVC_SNMPv2c: return "SNMPv2c agent";
+	case SVC_SNMPv3: return "SNMPv3 agent";
+	case SVC_ICMPPING: return "ICMP Ping";
+	default: return "unknown";
+	}
+}
