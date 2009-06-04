@@ -1026,16 +1026,16 @@ void	process_actions(DB_EVENT *event)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operations.");
 
-			DBstart_escalation(action.actionid, event->object == EVENT_OBJECT_TRIGGER ? event->objectid : 0, event->eventid);
+			DBstart_escalation(action.actionid, event->source == EVENT_SOURCE_TRIGGERS ? event->objectid : 0, event->eventid);
 
 			if (event->source == EVENT_SOURCE_DISCOVERY)
 				execute_operations(event, &action);
 		}
-		else
+		else if (event->source == EVENT_SOURCE_TRIGGERS)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions do not match our event. Do not execute operations.");
 
-			DBstop_escalation(action.actionid, event->object == EVENT_OBJECT_TRIGGER ? event->objectid : 0, event->eventid);
+			DBstop_escalation(action.actionid, event->objectid, event->eventid);
 		}
 	}
 	DBfree_result(result);

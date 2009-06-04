@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-318] Notifications: fixed messaging for discovery events (Sasha)
  - [DEV-391] Notifications: added new {DISCOVERY.*} macros (Sasha)
  - [DEV-390] Discovery: added support of port intervals (Sasha)
  - [DEV-317] added new action conditions (node, discovery rule/check, proxy) (Sasha)
