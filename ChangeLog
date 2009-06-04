@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-390] Discovery: added support of port intervals (Sasha)
  - [DEV-317] added new action conditions (node, discovery rule/check, proxy) (Sasha)
  - [DEV-389] added SNMPv3 discovery check (Sasha)
  - [DEV-320] added macros for windows events logs in notifications (Sasha)
