@@ -104,8 +104,11 @@ lbl_create:
 		{
 			if(-1 == semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
 			{
-				zbx_error("Semaphore [%i] error in semctl(SETVAL)", name);
+				zbx_error("Semaphore [%i] error in semctl(SETVAL) [%s]",
+						name,
+						strerror(errno));
 				return ZBX_MUTEX_ERROR;
+
 			}
 
 			zbx_mutex_lock(&i);	/* call semop to update sem_otime */
@@ -127,6 +130,9 @@ lbl_create:
 					strerror(errno));
 				exit(1);
 			}
+
+			/* Semaphore is successfully removed */
+			ZBX_SEM_LIST_ID = -1;
 
 			if ( ++attempts > ZBX_MAX_ATTEMPTS )
 			{
