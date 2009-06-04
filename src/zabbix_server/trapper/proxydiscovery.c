@@ -120,18 +120,16 @@ int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 				goto json_parse_error;
 			dcheck.status = atoi(tmp);
 
-			if (dcheck.type == -1) {
-				memset(&dhost, 0, sizeof(dhost));
-				dhost.druleid = dcheck.druleid;
+			memset(&dhost, 0, sizeof(dhost));
+			dhost.druleid = dcheck.druleid;
 
+			if (dcheck.type == -1)
+			{
 				register_host(&dhost, ip, dcheck.status);
 				update_host_status(&dhost, dcheck.status, itemtime);
-			} else {
-				memset(&dhost, 0, sizeof(dhost));
-				dhost.druleid = dcheck.druleid;
-
-				update_service(&dhost, &dcheck, ip, port, itemtime);
 			}
+			else
+				update_service(&dhost, &dcheck, ip, port, itemtime);
 
 			continue;
 json_parse_error:
