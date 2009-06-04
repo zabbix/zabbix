@@ -86,8 +86,7 @@
 		{
 			case SVC_SNMPv1:
 			case SVC_SNMPv2:
-				$external_param = ' "'.$snmp_community.'":"'.$key_.'"';
-				break;
+			case SVC_SNMPv3:
 			case SVC_AGENT:
 				$external_param = ' "'.$key_.'"';
 				break;
