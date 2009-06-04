@@ -101,10 +101,12 @@ include_once('include/page_header.php');
 	}
 
 	$sql = 'SELECT s.type,s.port,s.key_ '.
-			' FROM dservices s,dhosts h '.
-			' WHERE '.DBin_node('s.dserviceid').
-				' AND s.dhostid=h.dhostid'.
-				$sql_where;
+			' FROM dservices s,dhosts h,drules r '.
+			' WHERE s.dhostid=h.dhostid'.
+				' AND h.druleid=r.druleid'.
+				' AND r.status='.DRULE_STATUS_ACTIVE.
+				$sql_where.
+				' AND '.DBin_node('s.dserviceid');
 	$db_dservices = DBselect($sql);
 	while ($dservice = DBfetch($db_dservices)) {
 		$service_name = discovery_check_type2str($dservice['type']).
