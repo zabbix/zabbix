@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-935] minor fixes for snmptrap.sh. Thanks to Joseph Womack. (Alexei)
  - [ZBX-942] fixed error message for server and proxy if cannot bind a port (Alexei)
  - [ZBX-940] fixed bug with not initialized array variable (Vedmak)
  - [ZBX-939] fixed IPC semaphore related issue when starting Zabbix daemons (Alexei)
