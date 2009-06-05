@@ -29,7 +29,7 @@
 				}
 		} 
 		else if(is_string($str)) {
-			$b = new CTag('strong','yes');
+			$b = new CTag('strong','yes','');
 			$b->addItem($str);
 			$str = $b;
 		}

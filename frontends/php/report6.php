@@ -25,7 +25,7 @@
 	$page['title']	= "S_BAR_REPORTS";
 	$page['file']	= 'report6.php';
 	$page['hist_arg'] = array('period');
-	$page['scripts'] = array('calendar.js');
+	$page['scripts'] = array('calendar.js','scriptaculous.js?load=effects');
 	
 include_once('include/page_header.php');
 ?>

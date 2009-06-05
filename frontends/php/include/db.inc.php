@@ -28,8 +28,6 @@ if(!isset($DB)){
 	if(isset($DB_DATABASE))	$DB['DATABASE'] = $DB_DATABASE;
 	if(isset($DB_USER))		$DB['USER'] 	= $DB_USER;
 	if(isset($DB_PASSWORD))	$DB['PASSWORD'] = $DB_PASSWORD;
-	$DB['SELECT_COUNT'] = 0;
-	$DB['EXECUTE_COUNT'] = 0;	
 }
 
 	function DBconnect(&$error){

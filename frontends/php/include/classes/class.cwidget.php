@@ -21,6 +21,7 @@
 <?php
 
 class CWidget{
+
 public $domid;
 public $state;
 public $flicker_state;

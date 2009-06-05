@@ -4080,7 +4080,7 @@
 			$objectids_tmp[$key] = $operation['objectid'];
 		}
 
-		array_multisort($esc_step_from, SORT_ASC, $objects_tmp, SORT_DESC, $objectids_tmp, SORT_ASC, $operations);
+		array_multisort($esc_step_from, SORT_ASC, SORT_NUMERIC, $objects_tmp, SORT_DESC, $objectids_tmp, SORT_ASC, $operations);
 
 		$tblOper->SetHeader(array(
 				new CCheckBox('all_operations',null,'CheckAll("'.S_ACTION.'","all_operations","g_operationid");'),
