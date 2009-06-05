@@ -513,7 +513,7 @@
 			global $DB;
 
 //			$old_DB		= $DB['DB'];
-			if(!empty($DB)){
+			if(!empty($DB) ){
 				$old_DB			= true;
 				$old_DB_TYPE	= $DB['TYPE'];
 				$old_DB_SERVER	= $DB['SERVER'];

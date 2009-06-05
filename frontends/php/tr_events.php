@@ -159,7 +159,7 @@
 						make_small_eventlist($_REQUEST['eventid'], $trigger_data),
 						get_profile('web.tr_events.hats.hat_eventlist.state',1)
 						);
-	$events_histry->addHeader(S_EVENTS.SPACE.S_LIST.SPACE.'['.S_LAST.' 20]');
+	$events_histry->addHeader(S_EVENTS.SPACE.S_LIST.SPACE.'['.S_PREVIOUS.' 20]');
 	$right_tab->addRow($events_histry);
 //----------------
 
