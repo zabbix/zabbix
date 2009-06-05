@@ -613,6 +613,7 @@ const char *zbx_permission_string(int perm);
 #define	ZBX_NODE_TYPE_LOCAL	1
 
 #define	POLLER_DELAY	5
+#define DISCOVERER_DELAY	60
 
 #define	ZBX_POLLER_TYPE_NORMAL		0
 #define	ZBX_POLLER_TYPE_UNREACHABLE	1
