@@ -250,8 +250,8 @@ typedef enum
 	SVC_AGENT,
 	SVC_SNMPv1,
 	SVC_SNMPv2c,
-	SVC_SNMPv3,
-	SVC_ICMPPING
+	SVC_ICMPPING,
+	SVC_SNMPv3
 } zbx_dservice_type_t;
 char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 
