@@ -171,12 +171,18 @@
 
 			//TODO init checks
 			$dchecks = array();
-			$db_checks = DBselect('SELECT dcheckid,type,ports,key_,snmp_community FROM dchecks WHERE druleid='.
-					$_REQUEST['druleid']);
+			$db_checks = DBselect('SELECT dcheckid,type,ports,key_,snmp_community,snmpv3_securityname,'.
+						'snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase'.
+						' FROM dchecks'.
+						' WHERE druleid='.$_REQUEST['druleid']);
 			while($check_data = DBfetch($db_checks)){
 				$dchecks[] = array('dcheckid' => $check_data['dcheckid'], 'type' => $check_data['type'],
 						'ports' => $check_data['ports'], 'key' => $check_data['key_'],
-						'snmp_community' => $check_data['snmp_community']);
+						'snmp_community' => $check_data['snmp_community'],
+						'snmpv3_securityname' => $check_data['snmpv3_securityname'],
+						'snmpv3_securitylevel' => $check_data['snmpv3_securitylevel'],
+						'snmpv3_authpassphrase' => $check_data['snmpv3_authpassphrase'],
+						'snmpv3_privpassphrase' => $check_data['snmpv3_privpassphrase']);
 			}
 			$dchecks_deleted = get_request('dchecks_deleted',array());
 		}

@@ -138,6 +138,9 @@ include_once "include/page_header.php";
 	}
 	else if(inarr_isset(array('clone','druleid'))){
 		unset($_REQUEST["druleid"]);
+		$dchecks = $_REQUEST['dchecks'];
+		foreach($dchecks as $id => $data)
+			unset($dchecks[$id]['dcheckid']);
 		$_REQUEST["form"] = "clone";
 	}
 	else if(inarr_isset(array('delete', 'druleid'))){
@@ -217,7 +220,7 @@ include_once "include/page_header.php";
 						
 		while($rule_data = DBfetch($db_rules)){
 			$cheks = array();
-			$db_checks = DBselect("select * from dchecks where druleid=".$rule_data["druleid"].
+			$db_checks = DBselect("select type from dchecks where druleid=".$rule_data["druleid"].
 				" order by type,druleid");
 			while($check_data = DBfetch($db_checks)){
 				$cheks[] = discovery_check_type2str($check_data['type']);
