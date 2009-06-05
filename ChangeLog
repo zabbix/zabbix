@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [ZBX-137] operation interval steps N-N will be displayed as N (Alexei)
  - [DEV-318] Notifications: fixed messaging for discovery events (Sasha)
  - [DEV-391] Notifications: added new {DISCOVERY.*} macros (Sasha)
  - [DEV-390] Discovery: added support of port intervals (Sasha)
