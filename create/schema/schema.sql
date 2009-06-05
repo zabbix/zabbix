@@ -523,6 +523,7 @@ FIELD		|hostgroupid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|hosts
 FIELD		|groupid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|groups
 INDEX		|groups_1	|hostid,groupid
+INDEX		|groups_2	|groupid
 
 TABLE|hosts_profiles|hostid|ZBX_SYNC
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|0			|hosts
