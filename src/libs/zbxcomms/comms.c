@@ -690,7 +690,7 @@ int zbx_tcp_listen(
 	/* Bind socket */
 	if (ZBX_SOCK_ERROR == bind(s->socket,(struct sockaddr *)&serv_addr,sizeof(ZBX_SOCKADDR)) )
 	{
-		zbx_set_tcp_strerror("Cannot bind to port %u for server %s. Error [%s]. Another zabbix_agentd already running ?",
+		zbx_set_tcp_strerror("Cannot bind to port %u for server %s. Error [%s]. Another daemon already running on this port ?",
 				listen_port,
 				listen_ip ? listen_ip : "[ANY]",
 				strerror_from_system(zbx_sock_last_error()));
