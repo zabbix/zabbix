@@ -285,6 +285,7 @@
 						new CTextBox('new_check_snmpv3_privpassphrase', $new_check_snmpv3_privpassphrase), BR()));
 				break;
 			case SVC_AGENT:
+				$form->addVar('new_check_snmp_community', '');
 				$form->addVar('new_check_snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
 				$form->addVar('new_check_snmpv3_securityname', '');
 				$form->addVar('new_check_snmpv3_authpassphrase', '');
