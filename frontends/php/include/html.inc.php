@@ -24,13 +24,13 @@
 			foreach($str as $key => $val)
 				if(is_string($val)){
 					$b = new CTag('strong','yes');
-					$b->AddItem($val);
+					$b->addItem($val);
 					$str[$key] = $b;
 				}
 		} 
 		else if(is_string($str)) {
-			$b = new CTag('strong','yes');
-			$b->AddItem($str);
+			$b = new CTag('strong','yes','');
+			$b->addItem($str);
 			$str = $b;
 		}
 	return $str;

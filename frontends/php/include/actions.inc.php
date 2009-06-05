@@ -495,9 +495,9 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 					if(isset($data['default_msg']) && !empty($data['default_msg'])){
 						if(isset($_REQUEST['def_shortdata']) && isset($_REQUEST['def_longdata'])){
 							$temp = bold(S_SUBJECT.': ');
-							$result = $temp->ToString().$_REQUEST['def_shortdata']."\n";
+							$result = $temp->ToString()."\n".$_REQUEST['def_shortdata']."\n";
 							$temp = bold(S_MESSAGE.':');
-							$result .= $temp->ToString().$_REQUEST['def_longdata'];
+							$result .= $temp->ToString()."\n".$_REQUEST['def_longdata'];
 						}
 						else if(isset($data['operationid'])){ 
 							$sql = 'SELECT a.def_shortdata,a.def_longdata '.
@@ -506,9 +506,9 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 										' AND o.operationid='.$data['operationid'];
 							if($rows = DBfetch(DBselect($sql,1))){
 								$temp = bold(S_SUBJECT.': ');
-								$result = $temp->ToString().$rows['def_shortdata']."\n";
+								$result = $temp->ToString()."\n".$rows['def_shortdata']."\n";
 								$temp = bold(S_MESSAGE.':');
-								$result .= $temp->ToString().$rows['def_longdata'];
+								$result .= $temp->ToString()."\n".$rows['def_longdata'];
 							}
 						}
 					}
