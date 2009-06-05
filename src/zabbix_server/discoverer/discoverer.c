@@ -32,8 +32,6 @@
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
 
-#define DISCOVERER_DELAY 600
-
 static zbx_process_t	zbx_process;
 int			discoverer_num;
 
