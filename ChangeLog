@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-947] fixed various typos and formatting errors in changelog (Richlv)
  - [ZBX-945] added comment about min/max values for RefreshActiveChecks param in agent config file (Sasha)
  - [ZBX-935] minor fixes for snmptrap.sh. Thanks to Joseph Womack. (Alexei)
  - [ZBX-942] fixed error message for server and proxy if cannot bind a port (Alexei)
@@ -44,7 +45,7 @@ Changes for 1.6.5
  - [ZBX-884] added subject field for Jabber notifications (Sasha)
  - [ZBX-460] fixed processing `distclean' target of `Makefile' for zabbix_proxy (Dmitry)
  - [ZBX-882] fixed template linkage form (Artem)
- - [ZBX-879] fixed maximum 30 issues shown in Dahsboard system status (Vedmak)
+ - [ZBX-879] fixed maximum 30 issues shown in Dashboard system status (Vedmak)
  - [ZBX-876] removed unused files (Artem)
  - [ZBX-872] fixed group selected in another section of Hosts affects shown proxy members, and proxies shown in Items host dropdown (Vedmak)
  - [ZBX-874] fixed evaluation of items nextcheck for flexible intervals (Sasha) 
@@ -68,7 +69,7 @@ Changes for 1.6.4
  - [DEV-323] removed master nodes from dropdown (Artem)
  - [ZBX-837] removed sid from Zabbix logo link (Vedmak)
  - [ZBX-589] fixed processing of quoted floating point values (Sasha)
- - [ZBX-836] fixed probem with permissions of proxy shared memory (Sasha)
+ - [ZBX-836] fixed problem with permissions of proxy shared memory (Sasha)
  - [ZBX-833] fixed link from maps element to trigger status page (Artem)
  - [ZBX-831] DM: fixed synchronization of trends data (Sasha)
  - [DEV-137] DM: improved performance of historical data synchronization (Sasha)
@@ -102,13 +103,13 @@ Changes for 1.6.3
  - [ZBX-795] fixed SQL error when try to activate auto-login in profile (Vedmak)
  - [ZBX-794] fixed SQL error on login screen when postgre is used, small GUI typos fix (Vedmak)
  - [ZBX-702] events duration now counts weeks instead of months, small GUI typos fix (Vedmak)
- - [ZBX-537] Distributed monitoring: PosrgeSQL related fixes (Sasha)
+ - [ZBX-537] Distributed monitoring: PostgreSQL related fixes (Sasha)
  - [ZBX-792] fixed server memory leak in processing remote commands in actions (Dmitry)
- - [ZBX-537] Distributed monitoring: added update of Last chack and Last value fields (Sasha)
+ - [ZBX-537] Distributed monitoring: added update of Last check and Last value fields (Sasha)
  - [ZBX-537] Distributed monitoring: fixed deadlocks (Sasha)
  - [ZBX-760] historical data is now available for "not supported" items (Vedmak)
  - [ZBX-789] fixed error when try to remove trigger comment (Vedmak)
- - [ZBX-782] added host name of deppending trigger (amach)
+ - [ZBX-782] added host name of depending trigger (amach)
  - [ZBX-786] fixed undefined argument on graph delete (Artem)
  - [ZBX-776] changed disabled auto-logout indication (amach)
  - [ZBX-784] added extension to hosts when importing graph to template (Artem)
@@ -119,11 +120,11 @@ Changes for 1.6.3
  - [ZBX-660] fixed screen clock set to server time showed local time (Artem)
  - [ZBX-603] fixed min autologout value to 90 seconds (amach)
  - [ZBX-762] improved performance of processing of log and text items (Sasha)
- - [ZBX-749] details box is open by default if any error occured (Vedmak)
+ - [ZBX-749] details box is open by default if any error occurred (Vedmak)
  - [ZBX-751] expanded details box added for triggers copying messages (Vedmak)
  - [DEV-268] added support of <mode> for system.cpu.util under Solaris (Sasha)
  - [ZBX-737] the behaviour of the agent's key "vfs.fs.size" improved to be similar to the "df" command (Dmitry)
- - [ZBX-599] the purpose of the configuration parameter StartAgents precised (Dmitry)
+ - [ZBX-599] the purpose of the configuration parameter StartAgents clarified (Dmitry)
  - [ZBX-756] added tooltip in "status of ZABBIX" report for number of items and triggers parameter (Vedmak)
  - [ZBX-740] fixed wrong aggregate graph drawing (Artem)
  - [ZBX-747] fixed template linkage not working properly (Vedmak)
@@ -215,7 +216,7 @@ Changes for 1.6.2
  - [ZBX-443] removed excess space after detail messages (Artem)
  - [ZBX-526] fixed graphs on screens not getting refreshed issue (Artem)
  - [ZBX-531] fixed plain text line wrapping (Artem)
- - [ZBX-551] updated german language file (Artem)
+ - [ZBX-551] updated German language file (Artem)
  - [ZBX-554] added proxy host info in export/import (Artem)
  - [ZBX-638] fixed deleting applications on host remove (Artem)
  - [ZBX-636] removed "Keep trends (in days)" from Item Configuration form if "Type of information" is Character, Log or Text (Artem)
@@ -234,7 +235,7 @@ Changes for 1.6.2
  - [DEV-273] added mass update for IPMI fields (Sasha)
  - [DEV-272] added support of {HOSTNAME}, {HOST.CONN}... macros for "IPMI IP address" (Sasha)
  - [ZBX-623] fixed incorrect processing of function abschange() for integers(Sasha)
- - [ZBX-622] fixed broked autocreation of SQLite database (Alexei)
+ - [ZBX-622] fixed broken autocreation of SQLite database (Alexei)
  - [ZBX-621] fixed bad performance of the graph related screen due to missing index (Alexei)
  - [ZBX-620] fixed jstree error in IT Services (Artem)
  - [ZBX-619] fixed agent crash for system.uptime under Solaris 2.5.1 (Sasha)
@@ -242,7 +243,7 @@ Changes for 1.6.2
  - [ZBX-613] fixed possible incorrect evaluating of trigger functions if using dbcache (Sasha)
  - [ZBX-610] fixed memory leak in external checks (Sasha)
  - [DEV-254] improved server side logging (Sasha)
- - [ZBX-602] fixed possible incorrect trigger evaluation if value sotred as "delta" (Sasha)
+ - [ZBX-602] fixed possible incorrect trigger evaluation if value sorted as "delta" (Sasha)
  - [DEV-268] added support of net.if.in/out/total under AIX (Sasha)
  - [DEV-268] added support of system.cpu.num/util/load/intr/switches, system.uptime under AIX (Sasha)
  - [ZBX-595] improved performance of export screen (Artem)
@@ -320,7 +321,7 @@ Changes for 1.5.5
 
 Changes for 1.5.4
 
- - [DEV-203] fixed probem with permissions of server's shared memory (Sasha)
+ - [DEV-203] fixed problem with permissions of server's shared memory (Sasha)
  - [DEV-202] fixed compilation problem under Solaris (Sasha)
  - [DEV-201] improved performance on disabling/enabling, deleting hosts (Artem)
  - [DEV-200] Queue for proxies (Sasha)
@@ -357,7 +358,7 @@ Changes for 1.5.3
  - [DEV-170] improved charts period & start time selection (Artem)
  - [DEV-163] added support of perf_counter[path<,period>] (Sasha)
  - [DEV-169] improved msg functionality in GUI (Artem)
- - [DEV-149] added hosts masss update functionality (Artem)
+ - [DEV-149] added hosts mass update functionality (Artem)
  - [DEV-167] added support of Host Template=<template> in actions (Sasha)
  - [DEV-168] added more supported items in FreeBSD, NetBSD and OpenBSD (Sasha)
  - [DEV-161] changed greeting message (Artem)
@@ -366,10 +367,10 @@ Changes for 1.5.3
 Changes for 1.5.2:
 
  - [DEV-153] added protection against brute force attack (Artem)
- - [DEV-158] added standart sorting to screens (Artem)
+ - [DEV-158] added standard sorting to screens (Artem)
  - [DEV-154] added more flexibility to scripts (Artem)
  - [DEV-166] fixed problem with node syncing (Sasha)
- - [DEV-145] added Ldap authentication (Artem)
+ - [DEV-145] added LDAP authentication (Artem)
  - [DEV-147] added support network and disk stats under OpenBSD (Sasha)
  - [DEV-164] added required server performance info to Status of ZABBIX (Alexei)
  - [DEV-160] added time filter in "Availability report" (Artem)
@@ -388,7 +389,7 @@ Changes for 1.5.1:
  - [DEV-72] improved icmpping* processing. added "-c3" to fping (Sasha) 
  - [DEV-122] improved "Events" screen, added "Event Details" screen (Artem)
  - [DEV-139] added transaction functionality to frontend (Artem)
- - [DEV-138] added support of update interval in icmpping* simpe checks (Sasha)
+ - [DEV-138] added support of update interval in icmpping* simple checks (Sasha)
  - [DEV-137] increased max number of log file lines sent per second to 100 (Alexei)
 
 Changes for 1.5:
@@ -397,7 +398,7 @@ Changes for 1.5:
  - [DEV-127] improved system status widget in dashboard screen (Artem)
  - [DEV-125] added "Discovery status" widget (Artem)
  - [DEV-123] screen "queue" moved to administration section (Artem)
- - [DEV-126] moved graphs,maps,screens to dashboard, implemented quick add to favorites (Artem)
+ - [DEV-126] moved graphs,maps,screens to dashboard, implemented quick add to favourites (Artem)
  - [DEV-116] added option to remember user login (Artem)
  - [DEV-117] added support of BufferSize and BufferSend paramaters (Alexei)
  - [DEV-118] added dashboard screen to monitoring (Artem)
@@ -442,7 +443,7 @@ Changes for 1.5:
  - basic support of database caching (Alexei)
  - added pie graphs (Artem)
  - added new columns graphs.show_legend, graphs.show_3d (Alexei)
- - added frontend-side support of quotes and triger expression validation (Eugene)
+ - added frontend-side support of quotes and trigger expression validation (Eugene)
  - added availability to show negative values in graphs (Artem) 
  - developed database monitoring via ODBC (Eugene)
  - added availability to export/import templates for hosts (Artem)
@@ -451,8 +452,8 @@ Changes for 1.5:
 
 Changes for 1.4.7:
 
- - [ZBX-450] fixed showing status of items in maps for non english locale (Sasha)
- - [ZBX-432] set trigger value to unknown if changed item status (Sahsa)
+ - [ZBX-450] fixed showing status of items in maps for non English locale (Sasha)
+ - [ZBX-432] set trigger value to unknown if changed item status (Sasha)
  - [ZBX-103] fixed escaping in sql queries (Sasha)
  - [ZBX-424] fixed possible server crash while importing XML (Sasha)
  - [ZBX-420] added support of log files in screens (Sasha)
@@ -493,7 +494,7 @@ Changes for 1.4.5:
  - [ZBX-322] fixed possible incorrect autodiscovery (Sasha)
  - [ZBX-315] fixed server irregulary stop on OpenBSD (Sasha)
  - [ZBX-206] fixed case sensitive hosts sorting (Artem)
- - [ZBX-313] fixed problem with sqlite3 sepamhore (Sasha)
+ - [ZBX-313] fixed problem with sqlite3 semaphore (Sasha)
  - [ZBX-292] fixed negative values in availability report issue (Artem)
  - [ZBX-182] fixed processing of icmpping if dns name cannot be resolved (Sasha)
  - [HAN-2] improved speed on coping triggers to host (Artem)
@@ -510,7 +511,7 @@ Changes for 1.4.5:
  - [ZBX-250] 100% CPU on server side after connection loss (Sasha)
  - [ZBX-246] fixed header error in Monitoring->slideshows (Artem)
  - [ZBX-243] speed improvement for windows agent for eventlog[] processing (Sasha)
- - [DEV-92] added supprt of multiple windows agents, service description (Sasha)
+ - [DEV-92] added support of multiple windows agents, service description (Sasha)
  - [ZBX-7] added support of system.cpu.util[] for FreeBSD agents, thanks to 'brick' (Sasha)
  - [ZBX-222] fixed problem with slashes (Artem)
  - [ZBX-210] added support of system.cpu.num[] for FreeBSD agents, thanks to 'freak' (Sasha)
@@ -573,17 +574,17 @@ Changes for 1.4.3:
  - [DEV-42] Synchronisation of log files (Sasha)
  - [ZBX-90] fixed displaying of last line of a log file in the Latest Data and Overview (Alexei)
  - [ZBX-89] Unused fields:history_lastid, ..str_lastid & ..uint_lastid (Sasha)
- - [ZBX-88] Chenged method to "get" in all forms which affects display info (Artem)
+ - [ZBX-88] Changed method to "get" in all forms which affects display info (Artem)
  - [ZBX-57] Problem in zbx_tcp_check_security 127.0.0.1 != 127.0.00.1 (Sasha)
  - [ZBX-80] Master node does not display configuration of slave nodes (Sasha)
  - [ZBX-67] Under DM, Synchronizing binary data between nodes for PostgresSQL (Sasha)
  - [ZBX-77] fixes for refreshing page in Monitoring (Artem)
- - [ZBX-75] fixed problem with occured warning in events (Artem)
+ - [ZBX-75] fixed problem with occurred warning in events (Artem)
  - [ZBX-68] fixed iframe resize on refresh in Screens (Artem)
  - [ZBX-65] fixed sideeffect on massupdate items, 'application' entries are cleaned from all affected items" (Artem)
  - fixed setting trigger status to unknown on trigger update, now only if expression is changed (Artem)
  - fixed problem with Enabling/Disabling actions (Artem)
- - [ZBX-72] fixed occured error after graph refresh (Artem)
+ - [ZBX-72] fixed occurred error after graph refresh (Artem)
  - [ZBX-67] Under DM, Synchronizing binary data between nodes (Sasha)
  - [ZBX-71] added separation of "other" by node and host in "latest data" (Artem)
  - [ZBX-70] fixed even more compilation warnings (Alexei)
@@ -611,7 +612,7 @@ Changes for 1.4.3:
  - fixed PostgreSQL error in synchronization of graphs (Alexei)
  - minor grammar fixes (Alexei)
  - fixed compilation of ZABBIX agent under Mac OS/X (Alexei)
- - fixed memory leak when processing non-existant trapper item (Alexei)
+ - fixed memory leak when processing non-existent trapper item (Alexei)
  - fixed unefficient SQL in browsing of events (Alexei)
  - fixed iregexp() (Alexei)
  - fixed detection of __VA_ARGS__ (Eugene)
@@ -652,17 +653,17 @@ Changes for 1.4.2:
  - fixed problem with libresolv under Solaris 8 (Alexei)
  - improved SMS sender (Eugene)
  - improved item and trigger filtering (Eugene)
- - added dotted drowing type for links of map (Eugene)
- - fixed links drowing type of map (Eugene)
+ - added dotted drawing type for links of map (Eugene)
+ - fixed links drawing type of map (Eugene)
  - fixed items,graphs,hostgroups deletion (Eugene)
- - fixed permisions for maps (Eugene)
+ - fixed permissions for maps (Eugene)
  - fixed filtering of items by status (Eugene)
  - fixed collector for WinXX (Eugene)
  - fixed definition of serial columns to allow use of older MySQL (Alexei)
  - decreased required version of libcurl (Eugene)
  - added timeout handler for http monitoring (Eugene)
- - more informative report for confiuration script (Eugene)
- - changed installation directory to '$sbin' (Eudene)
+ - more informative report for configuration script (Eugene)
+ - changed installation directory to '$sbin' (Eugene)
  - fixed "Reset" button for Web screens (Eugene)
  - fixed graph items limitation for IE6 (Eugene)
  - added availability of using spaces for trigger expressions (Eugene)
@@ -675,7 +676,7 @@ Changes for 1.4.2:
  - fixed reset button for graph (Eugene)
  - fixed item multiple cleaning on mass update (Eugene)
  - fixed error 'undefined function delete_service' (Eugene)
- - fixed internal loging system (Eugene)
+ - fixed internal logging system (Eugene)
  - added non-persistent connection for PostgreSQL to avoid problems with unfinished transactions (Alexei)
  - fixed housekeeper to process history_text (Alexei)
  - improved zabbix_get for receiving large data (Eugene)
@@ -694,7 +695,7 @@ Changes for 1.4.1:
 
  - fixed processing of 'service_state[*]' (Eugene)
  - fixed PostgreSQL database upgrade script (Alexei)
- - adde support of non standard PostgreSQL & MySQL ports (Eugene)
+ - added support of non standard PostgreSQL & MySQL ports (Eugene)
  - fixed compilation of ZABBIX server under HP-UX (Alexei)
  - fixed upgrade of maps without backgrounds (Alexei)
  - improved UserParameters for Win32 (Eugene)
@@ -717,7 +718,7 @@ Changes for 1.4.1:
  - better reporting of DM data transfers in log file (Alexei)
  - added better error reporting in zbx_malloc() (Alexei)
  - fixed transfer of NULL values between nodes (Alexei)
- - minor Oracle related fixes for frontend (Alexe)
+ - minor Oracle related fixes for frontend (Alexei)
  - fixed reconnection for jabber notifications (Eugene)
  - fixed incorrect reporting of SMTP error messages (Alexei)
  - filesize[] replaced by vfs.file.size[] in data.sql (Alexei)
@@ -730,7 +731,7 @@ Changes for 1.4.1:
  - fixed host and group remembering on graph monitoring screen (Eugene) 
  - improved trigger expression syntax and validation (Eugene)
  - fixed 'Field [formula] is not double' (Eugene)
- - fixed template aplication synchronization (Eugene)
+ - fixed template application synchronization (Eugene)
  - fixed NOTSUPPORTED status for 'net.if.*' of Solaris, thanks to 'juampe' (Eugene)
  - minor fixes for sqlite mutexes (Alexei)
  - added check of memory leaks in zbx_malloc() (Alexei)
@@ -742,7 +743,7 @@ Changes for 1.4.1:
  - fixed crash in processing of active checks on agent side (Alexei)
  - minor fix of misc/conf/zabbix_server.conf (Alexei)
  - fixed linkage of applications in 1.1.x migration scripts (Alexei)
- - fixed permissiong of Admin in 1.1.x migration scripts (Alexei)
+ - fixed permission of Admin in 1.1.x migration scripts (Alexei)
  - fixed bug in processing of host groups permissions (Alexei)
  - minor fix of zabbix_sender command line help (Alexei)
  - fixed pinger to process DNS name instead of host name (Alexei)
@@ -805,9 +806,9 @@ Changes for 1.3.8:
  - fixed Error in "Cancel" after ack of a trigger (Eugene)
  - fixed index.php looping on db connection failing (Eugene)
  - button "Update" renamed to "Refresh" in data export (Alexei)
- - fixed translation behavior for housekeeper configurations (Eugene)
+ - fixed translation behaviour for housekeeper configurations (Eugene)
  - fixed time movement for history (Eugene)
- - added availability to yse ')(!' characters in item keys (Eugene)
+ - added availability to use ')(!' characters in item keys (Eugene)
  - improved management of trigger (Eugene)
 
 Changes for 1.3.7:
@@ -823,7 +824,7 @@ Changes for 1.3.7:
  - support of Include directive for configuration files (Alexei)
  - ZABBIX process will exit on config file open error (Alexei)
  - cosmetic changes for server's option '-h' (Alexei) 
- - fixed coniguration scripts for mysql/net-snmp/curl (Eugene)
+ - fixed configuration scripts for mysql/net-snmp/curl (Eugene)
  - fixed SMS sender (Eugene)
  - timeout for sending emails and SMS was increased to 40 seconds (Eugene)
  - unknown trigger events won't generate actions (Alexei)
@@ -862,28 +863,28 @@ Changes for 1.3.5:
  - fixed creation of Sqlite schema (Alexei)
  - fixed dependences of deleted elements for actions (Eugene) 
  - developed slideshows (Eugene)
- - fixed carceling of frontend installation screen (Eugene)
+ - fixed cancelling of frontend installation screen (Eugene)
  - fixed processing of COUNTER64 SNMP values (Alexei)
  - added frontend-side support of external checks. (Eugene)
  - fixed trigger dependencies for templated triggers (Eugene)
  - fixed support of 'curl' library (Eugene)
- - added suport of 'automake' v1.6 (Eugene)
+ - added support of 'automake' v1.6 (Eugene)
  - fixed oracle support (Eugene)
  - added support of MySQL v3.23 (Eugene)
  - fixed unnecessary check of MySQL if other database is selected in Wizard (Alexei)
  - fixed remembering of previous charts viewed (Eugene)
- - fixed color validation (Eugene)
+ - fixed colour validation (Eugene)
  - fixed template graphs editing (Eugene)
  - fixed trigger overview status (Eugene)
- - developed action configurations for discodery events (Eugene)
+ - developed action configurations for discovery events (Eugene)
  - do not start HTTP poller if libcurl is not included (Alexei)
  - fixed function diff for integer items (Alexei)
  - fixed SMS sender (Eugene)
  - improved ZABBIX sender (Eugene)
- - added filering of log items by regexp on agentside (Eugene)
+ - added filtering of log items by regexp on agentside (Eugene)
  - removed check of function bcpowmod() in GUI Wizard (Alexei)
  - updated poller to have current system date (Alexei)
- - removed unnecessary dependencies fron autoconf script (Alexei)
+ - removed unnecessary dependencies from autoconf script (Alexei)
  - added generation of service up/down events (Alexei)
  - fixed '--with-ldap' compilation (Eugene)
  - added popup menu for quick hosts controlling in configuration screen (Eugene)
@@ -897,10 +898,10 @@ Changes for 1.3.4:
  - added new table slides and slideshows (Alexei)
  - added server-side support of external checks. Thanks to Mike Nestor. (Alexei)
  - fixed incorrect SQL statement for ICMP check (Alexei)
- - support of multiple actions per set of conidtions (Alexei/Eugene)
- - added viwer of dicovery events (Eugene)
+ - support of multiple actions per set of conditions (Alexei/Eugene)
+ - added viewer of discovery events (Eugene)
  - added quick help for overview (Eugene)
- - developed Dicovery system (Alexei/Eugene)
+ - developed Discovery system (Alexei/Eugene)
  - fixed processing of text items (Alexei)
  - fixed processing of aggregate items (Alexei)
  - added events.object (Alexei)
@@ -951,7 +952,7 @@ Changes for 1.3.3:
  - new communication library and protocol (Alexei)
  - developed configuration interface of http monitoring (Eugene)
  - added support of 'eventlog[*]' for WinXX (Eugene)
- - fixed comilation on FreeBSD (Eugene)
+ - fixed compilation on FreeBSD (Eugene)
  - misc HP-UX fixes (Alexei)
  - misc FreeBSD fixes (Alexei)
  - fixed false "Database corrupted" situations (Alexei)
@@ -1023,7 +1024,7 @@ Integrated from 1.1.x
  - fixed stderr/stdout redirection during logrotation (Eugene)
  - fixed graphs in Oracle system (Eugene)
  - fixed trigger expressions with ':' (Eugene)
- - fixed 'Server info' screen componets (Eugene)
+ - fixed 'Server info' screen components (Eugene)
  - fixed 'service_state[*]' for WinXX (Eugene)
  - fixed SQLs for PostgreSQL (Eugene)
  - fix for adding trigger expressions having sign '-' (Alexei)
@@ -1048,7 +1049,7 @@ Integrated from 1.1.x
  - fixed conflict with cookies of other products (Eugene)
  - added sorting by host in trigger status screen (Eugene)
  - added login/logout information into auditlog (Eugene)
- - fixed values viwing on overview screen (Eugene)
+ - fixed values viewing on overview screen (Eugene)
  - added support of "system.swap.(in/out)[<swap><,param>]" for Linux 2.x
      <param> accept next values: 'count', 'sectors', 'pages'
      DEFAULT: <swap> = 'all', <param> = 'pages'
@@ -1067,7 +1068,7 @@ Integrated from 1.1.x
  - fixed "not equal" condition for hosts and host groups in actions (Alexei)
  - added support of macro TRIGGER.URL and TRIGGER.COMMENT (Alexei)
  - fixed dependences of item deletion (Eugene)
- - fixed Y asix value displaying for graphs (Eugene)
+ - fixed Y axis value displaying for graphs (Eugene)
 
 1.1.4
 
@@ -1088,12 +1089,12 @@ Integrated from 1.1.x
  - fixed processing of item calculated as delta speed per second (Alexei)
 
 1.1.3
- - added Dutch tranlation (Alexei)
+ - added Dutch translation (Alexei)
  - fixed processing of SNMP HEX and OCTET string values (Alexei)
  - fixed system.swap.in[] and system.swap.out[] under Linux 2.4 (Alexei)
  - fixed occasional LIBSQLORA8-30002: Memory allocation error. (Alexei)
  - added support of macro {EVENT.ID} (Alexei)
- - support of environment variables for aleert scripts:
+ - support of environment variables for alert scripts:
    ZABBIX_ALERT_ID,ZABBIX_ACTION_ID,ZABBIX_ALERT_TIME,ZABBIX_ALERT_MEDIATYPEID,
    ZABBIX_ALERT_STATUS,ZABBIX_ALERT_RETRIES,ZABBIX_ALERT_DELAY (Alexei)
  - added support of macro {TRIGGER.ID} (Alexei)
@@ -1113,7 +1114,7 @@ Integrated from 1.1.x
  - changed all zabbix_log(lev, str) to zabbix_log(lev,"%s", str) (Alexei)
  - introduced secure strcat and strcpy: zbx_strlcat, zbx_strlcpy (Alexei)
  - better format for Queue report (Alexei)
- - fixed perofmance problem in Status of Triggers (Alexei)
+ - fixed performance problem in Status of Triggers (Alexei)
  - history stats removed from Status of ZABBIX report (Alexei)
  - fixed assignment of default listen port for Win agent (Eugene)
  - changed return value for 'net.tcp.port[]' of Win agent (Eugene)
@@ -1125,7 +1126,7 @@ Integrated from 1.1.x
 1.1.2
 
  - fixed storage and calculation of i64 values (Eugene)
- - added color selection for trigger severity 'warning' and 'information' (Eugene)
+ - added colour selection for trigger severity 'warning' and 'information' (Eugene)
  - fixed limitation of return value for 'net.if.*' (Eugene)
  - fixed limitation of return value for 'vfs.dev.*' (Eugene)
  - fixed limitation of return value for 'system.cpu.intr' (Eugene)
@@ -1144,23 +1145,21 @@ Integrated from 1.1.x
  - added action email action variable '{TRIGGER.SEVERITY}' (Eugene)
  - added Brazilian Portuguese translation. Thanks to Marcelo Honorio. (Alexei)
  - fixed history cleaning (Eugene)
- - fixed Unknown when selcting trigger severity Disaster in action form (Alexei)
+ - fixed Unknown when selecting trigger severity Disaster in action form (Alexei)
  - fixed windows agent crashing with processing of 'system.cpu.util' key (Eugene)
  - fixed errors while adding a host to IT service (Alexei)
  - fixed warning in classes.inc.php while displaying graphs (Alexei)
  - fixed warning in trigger selection popup (Alexei)
  - added spec file for ZABBIX agent. Thanks to Alexey Zilber. (Alexei)
- - fixed count of problems displayin for submaps (Eugene)
+ - fixed count of problems displaying for submaps (Eugene)
  - added support of macro {TRIGGER.COMMENT} (Alexei)
  - added ZABBIX agent for Win64 platforms. (Eugene)
  - fixed incorrect disabling of actions while deleting a trigger (Alexei)
  - improved sound notification of trigger status changing (Eugene)
  - added alternative startup scripts for Fedora Linux (Alexei)
- - developed aggrigated graphs (Eugene)
  - fixed graphs drawing (Eugene)
  - fixed graph min value calculation (Eugene)
- - better pattern of distribution of item next checks to improve overall
- performance (Alexei)
+ - better pattern of distribution of item next checks to improve overall performance (Alexei)
  - fixed housekeeper, removal of historical and trend data (Alexei)
  - fixed caption of IT Services Availability Report (Alexei)
 
@@ -1182,7 +1181,7 @@ Changes for 1.1.1:
  - new more efficient definition of function DBexecute() (Alexei)
  - new more efficient definition of function DBselect() (Alexei)
  - removed stat file using (Eugene)
- - intergeated Win32 and Linux sources of ZABBIX agent (Eugene)
+ - integrated Win32 and Linux sources of ZABBIX agent (Eugene)
  - fixed selection popup if return string contains single quote (Alexei)
  - fixed incorrect character in item key selector (Alexei)
  - fixed processing of SNMP having non-standard port (Alexei)
@@ -1210,7 +1209,7 @@ Changes for 1.1:
  - fixes in Oracle schema (Alexei)
  - fixed syntax in snmptrap.sh (Alexei)
  - fixed EventLog for Win32 ZABBIX agent, thanks to "bcheese" (Eugene)
- - developed aggrgated graphs (Eugene)
+ - developed aggregated graphs (Eugene)
  - improved graphs, added selector of data calculation function (Eugene)
  - fixed popup of trigger selection (Eugene)
 
@@ -1229,7 +1228,7 @@ Changes for 1.1beta12:
  - fixed "Server info" screen item (Eugene)
  - fixed "Host info" screen item (Eugene)
  - fixed "Trigger info" screen item (Eugene)
- - dropped suport of delays between actions due to bad design (Alexei)
+ - dropped support of delays between actions due to bad design (Alexei)
  - fixed incorrect handling of actions (Alexei)
  - fixed bad performance of previous beta because of wrong DBselectN() (Alexei)
  - added support for direct sending of SMS via GSM modem (Alexei)
@@ -1261,7 +1260,7 @@ Changes for 1.1beta10:
  - fixed Win32 ZABBIX agent crash (Eugene)
  - added selection button for item keys (Alexei)
  - new table 'help_items' (Alexei)
- - fixed confugration of triggers having logseverity() (Alexei)
+ - fixed configuration of triggers having logseverity() (Alexei)
  - changed size of functions.function to varchar(12) (Alexei)
  - fixed evaluation of simple checks (Alexei)
  - fixed history cleaning for logs (Eugene)
@@ -1281,11 +1280,11 @@ Changes for 1.1beta10:
  - fixed host group adding (Eugene)
  - fixed map displaying (Eugene)
  - fixed 'No permissions' for 'Latest data','Triggers','Alarms' screens (Eugene)
- - fixed permision deletion (Eugene)
+ - fixed permission deletion (Eugene)
  - fixed 'get_map_by_sysmapid' function calls(Eugene)
  - improved php code execution speed (Eugene)
  - fixed zabbix_sender for sending values from a file (Alexei)
- - integer values will not be treated a sunsupported for items having type float (Alexei)
+ - integer values will not be treated as unsupported for items having type float (Alexei)
  - fixed is_double() (Alexei)
  - improved performance of MySQL calls (Alexei)
  - started development of Oracle support (Alexei)
@@ -1296,7 +1295,7 @@ Changes for 1.1beta10:
  - improved support of proc.num[<process>,<user name>] for win32 agent (Eugene)
  - replaced old naming of items by new naming for win32 agent (Eugene)
  - fixed action adding (Eugene)
- - improved 'Latest data' sreen, items grouped by applications (Eugene)
+ - improved 'Latest data' screen, items grouped by applications (Eugene)
  - added applications for hosts (Eugene)
  - added trigger displaying on graphs (Eugene)
  - added report "Most Busy Triggers Top 100" (Martins)
@@ -1328,7 +1327,7 @@ Changes for 1.1beta9:
  - do not display disabled triggers and items in overview screens (Eugene)
  - vertical hostnames in overview screens (Eugene)
  - disabling/enabling template items (Eugene)
- - fixed agregate functions to work with uint data type (Alexei)
+ - fixed aggregate functions to work with uint data type (Alexei)
  - parameter StartSuckers renamed to StartPollers (Alexei)
  - dropped support of experimental parameter NoTimeWait (Alexei)
  - removed unused escalator (Alexei)
@@ -1342,16 +1341,16 @@ Changes for 1.1beta9:
  - fixed host conditions in actions (Alexei)
  - improved filter by hosts and groups (Eugene)
  - fixed processing of trapped items when a key contains '\' (Alexei)
- - added latest values filtring/marking of log history (Eugene)
+ - added latest values filtering/marking of log history (Eugene)
  - developed multiple log history viewing (Eugene)
 
 Changes for 1.1beta8:
 
  - moved installation of images to data.sql (Alexei)
  - fixed highly unefficient check of permissions (Alexei)
- - developed remote commads execution on specific actions (Eugene)
+ - developed remote commands execution on specific actions (Eugene)
  - added "URL" module for screens (Eugene)
- - added trigger selecton from popup (Eugene)
+ - added trigger selection from popup (Eugene)
  - improved popup selection (Eugene)
  - improved "IT services" configuration (Eugene)
  - added "Data overview" for screens (Eugene)
@@ -1493,8 +1492,8 @@ Changes for 1.1beta3:
  - reverted multiple server patch (Alexei)
  - fixed autoregistration (Alexei)
  - added preliminary bulk host and bulk user loader.  (James)
- - applied Graph Dropdown fix.  Thanks to Elkor (James)
- - applied SNMPv3 fix.  Thanks to Sauron (James)  --  Please note I do not
+ - applied Graph Dropdown fix. Thanks to Elkor (James)
+ - applied SNMPv3 fix. Thanks to Sauron (James)  --  Please note I do not
  have any SNMPv3 items to test this with, but it did complete and server runs
  after build.
  - added column graphs_items.yaxisside (Alexei)
@@ -1655,8 +1654,7 @@ Changes for 1.1alpha11:
  - added column users.lang (Alexei)
  - added column users.autologout (Alexei)
  - added frontends/php/profile.php (Alexei)
- - performance optimization: do not update functions and triggers if same
- value received (Alexei)
+ - performance optimization: do not update functions and triggers if same value received (Alexei)
  - do not show deleted hosts/items and triggers (Alexei)
  - draw graph's timeline even if no data exists (Alexei)
  - added support of system[procload] under AIX. Thanks to Moisio Juha. (Alexei)
@@ -1964,8 +1962,7 @@ Changes for 1.0beta14:
  - do not link crypt and crypto to the agent (Alexei)
  - fixed report1.php to work under FreeBSD (Alexei)
  - fixed displaying of string value in the Latest Values (Alexei)
- - fixed simple check when port specified. Order of IP and PORT is
- arbitrary now (Alexei)
+ - fixed simple check when port specified. Order of IP and PORT is arbitrary now (Alexei)
  - fixed pinger to correc calculate number of seconds (Alexei)
  - fixed selection of "Dark Yellow" for graphs and map links (Alexei)
  - fixed removal of trigger dependency (Alexei)
@@ -1986,12 +1983,10 @@ Changes for 1.0beta13:
  - sprintf() was replaced with snprintf() (Alexei)
  - fix for prefixes K,M and G (Alexei)
  - strncpy() was replaced with secure strscpy() where possible (Alexei)
- - fixed support for situation when one of graph's metrics has no values
- (Alexei)
+ - fixed support for situation when one of graph's metrics has no values (Alexei)
  - added '2>/dev/null' to fping to get rid of message on the console (Alexei)
  - new icons and icon types for sysmaps (Alexei)
- - added columns color_on,color_off,drawtype_on,drawtype_off to table
- sysmaps_links (Alexei)
+ - added columns color_on,color_off,drawtype_on,drawtype_off to table sysmaps_links (Alexei)
  - do not show group having no hosts in Latest Values (Alexei) 
  - better management of host groups (Alexei)
  - added support of macro {HOSTNAME}, removed support of %s (Alexei)
@@ -2027,13 +2022,10 @@ Changes for 1.0beta12:
  - fixed add services (Alexei)
  - fixed simple *_perf checks (Alexei)
  - data.sql was modified to include usrgrp records (Alexei)
- - fixed update of special items 'status'. Thanks to
- Sebastien "Slix" Linard. (Alexei) 
+ - fixed update of special items 'status'. Thanks to Sebastien "Slix" Linard. (Alexei) 
  - fixes for graph time navigation (Alexei)
- - fixed processing of trapped values, fixed pinger. Thanks
- to Sebastien "Slix" Linard. (Alexei) 
- - fixed UserParameter when it replaces existing one. Thanks to
- Sebastien "Slix" Linard. (Alexei) 
+ - fixed processing of trapped values, fixed pinger. Thanks to Sebastien "Slix" Linard. (Alexei) 
+ - fixed UserParameter when it replaces existing one. Thanks to Sebastien "Slix" Linard. (Alexei) 
  - fixed PostgreSQL schema (Alexei)
 
 Changes for 1.0beta11:
@@ -2041,12 +2033,10 @@ Changes for 1.0beta11:
  - added support for user groups (Alexei)
  - added column actions.recipient (Alexei)
  - added support of system[proccount] under Solaris (Alexei) 
- - support for swap sizes >2Gb under Solaris. Thanks to Franky
- Van Liedekerke. (Alexei)
+ - support for swap sizes >2Gb under Solaris. Thanks to Franky Van Liedekerke. (Alexei)
  - add actions when using templates. (Alexei)
  - fixed refresh of status of triggers. (Alexei) 
- - updated RedHat start-up scripts in misc/init.d/redhat. Thanks
- to Charlie. (Alexei)
+ - updated RedHat start-up scripts in misc/init.d/redhat. Thanks to Charlie. (Alexei)
  - fix for flexible SNMP port name (Alexei)
  - fixed permissions of PHP screens (Alexei)
  - period in graphs. Thanks to Igor Micko. (Alexei)
@@ -2056,28 +2046,23 @@ Changes for 1.0beta11:
  - fixed snmptrap.sh (Alexei)
  - IRC support channel #zabbix on irc.pilgerer.org (Alexei)
  - fix for dashed lines under some broken GD (Alexei)
- - http://zabbix.sf.net was changed to http://www.zabbix.org
- (Alexei)
+ - http://zabbix.sf.net was changed to http://www.zabbix.org (Alexei)
  - support of delta flag in item definition (Alexei)
  - added column items.delta,prevorgvalue (Alexei)
  - support for operator '#', not equal. (Alexei)
  - support for functions date() and time() (Alexei)
  - fix of /proc/stat interpretation in diskdevice.c (Alexei)
- - support of system[uptime] for Solaris. Thanks to Franky Van
- Liedekerke. (Alexei)
- - fix for disk space calculation. Use statvfs' f_frsize instead
- of f_bsize. Thanks to Franky Van Liedekerke. (Alexei)
+ - support of system[uptime] for Solaris. Thanks to Franky Van Liedekerke. (Alexei)
+ - fix for disk space calculation. Use statvfs' f_frsize instead of f_bsize. Thanks to Franky Van Liedekerke. (Alexei)
  - restrict host status change from Unreachable (Alexei)
  - fix for Solaris swap sizes (Alexei)
  - fix for counting of triggers in map.php.  (Alexei)
- - added translation of special HTML characters in history of
- alerts and alarms (Alexei)
+ - added translation of special HTML characters in history of alerts and alarms (Alexei)
  - fixed calculation of graph width under MS Explorer (Alexei)
  - fixed interpretation of parameter 'from' for graphs (Alexei)
  - removed references to screens_graphs (Alexei)
  - fix for proc_cnt[*] under Solaris (Alexei)
- - fix of automatic image scaling under Explorer for charts.php
- (Alexei)
+ - fix of automatic image scaling under Explorer for charts.php (Alexei)
  - fixed division by zero and infinite loop in graphs (Alexei)
  - fixes for agent. Error checking for opendir() (Alexei)
  - fix for syslog logging of zabbix_trapperd (Alexei)
@@ -2089,8 +2074,7 @@ Changes for 1.0beta11:
  - new item status: 'deleted' (Alexei)
  - fixed autoconf problems under SUSE 8.2 (Alexei)
  - housekeeping to delete hosts having status 'deleted' (Alexei)
- - AC_FUNC_GETLOADAVG changes to AC_REPLACE_FUNCS(getloadavg) in
- configure.in (Alexei)
+ - AC_FUNC_GETLOADAVG changes to AC_REPLACE_FUNCS(getloadavg) in configure.in (Alexei)
  - eliminated compiler's warnings under SUSE 8.2 (Alexei)
  - added src/zabbix_sucker/housekeeper.* (Alexei)
  - new host status: 'deleted' (Alexei)
@@ -2104,15 +2088,13 @@ Changes for 1.0beta10:
  - improvements for action form (Alexei)
  - support of system maps for screens (Alexei)
  - removed column graphid from table screens_items (Alexei)
- - added columns resource and resourceid to table screens_items
- (Alexei)
+ - added columns resource and resourceid to table screens_items (Alexei)
  - non breakable space in PHP forms (Alexei)
  - new draw type for graphs: Dot (Alexei)
  - improved media maintenance form (Alexei)
  - added sort order for custom graphs (Alexei)
  - added column graphs_items.sortorder (Alexei)
- - fixed problem when adding host from template and function 'str' 
- is used. Thanks to Jean-Baptiste Mariotte. (Alexei)
+ - fixed problem when adding host from template and function 'str' is used. Thanks to Jean-Baptiste Mariotte. (Alexei)
  - support of proc_cnt[*] under Solaris. Thanks to Marc Ledent (Alexei)
  - fixed sysinfo() result. Multiplication to mem_unit required (Alexei)
  - better reporting in case of different startup errors (Alexei)
@@ -2125,12 +2107,10 @@ Changes for 1.0beta10:
  - fixed snmptrap.sh (Alexei)
  - improved performance of simple graphs (Alexei)
  - minor fixes to eliminate compiler's warnings (Alexei)
- - fix to show HTML characters of string items in Latest Values and
- History  (Alexei)
+ - fix to show HTML characters of string items in Latest Values and History  (Alexei)
  - added disk statistics to data.sql (Alexei)
  - popup confirmation screen for deletes and updates (Alexei)
- - buttons "Activate selected" and "Disable selected" in item
- maintenance form (Alexei)
+ - buttons "Activate selected" and "Disable selected" in item maintenance form (Alexei)
  - do not wrap Latest Values (Alexei)
  - support for changing of graph items (Alexei)
  - menu will not require more than three lines (Alexei)
@@ -2142,8 +2122,7 @@ Changes for 1.0beta10:
  - fix to enable use of abschange() (Alexei)
  - cosmetic change of "LATEST VALUES" screen (Alexei)
  - support for simple checks :smtp_perf, ftp_perf, ssh_perf, etc. (Alexei)
- - fixed nasty bug in getting SNMP parameters. Thanks to Igor Micko.
- (Alexei)
+ - fixed nasty bug in getting SNMP parameters. Thanks to Igor Micko. (Alexei)
  - added support for diskused[*] (Alexei)
  - Alert History renamed to Alerts (Alexei)
  - Status of Triggers renamed to Triggers (Alexei)
@@ -2161,8 +2140,7 @@ Changes for 1.0beta10:
  - added column items.multiplier (Alexei)
  - added column items.units (Alexei)
  - added table 'stats' (Alexei)
- - support for spaces in trigger expression. Thanks to S?bastien "Slix"
- Li?nard. (Alexei)
+ - support for spaces in trigger expression. Thanks to S?bastien "Slix" Li?nard. (Alexei)
  - dynamic form items.php (Alexei)
  - added zabbix.spec. 'rpm -ta zabbix.tar.gz'. Thanks to Harald Holzer. (Alexei)
  - dynamic form config.php (Alexei)
@@ -2190,12 +2168,9 @@ Changes for 1.0beta9:
  - added columns actions.scope and actions.severity (Alexei)
  - added support of global alerts limited by triggers severity (Alexei)
  - added group selection in Item and Trigger definition forms (Alexei)
- - added support for functions abschange(),change(),delta(),sum(), 
- count() and avg() in trigger expressions (Alexei)
- - fixed plaintext values for string data type. Thanks to
- S?bastien "Slix" Li?nard. (Alexei)
- - misc fixes for services.php. Thanks to S?bastien "Slix" Li?nard.
- (Alexei)
+ - added support for functions abschange(),change(),delta(),sum(), count() and avg() in trigger expressions (Alexei)
+ - fixed plaintext values for string data type. Thanks to S?bastien "Slix" Li?nard. (Alexei)
+ - misc fixes for services.php. Thanks to S?bastien "Slix" Li?nard. (Alexei)
  - different styles for user-defined graphs (Alexei)
  - cached memory in bytes (not in Kb as before) (Alexei)
  - show current and planned SLA in IT Services screen (Alexei)
@@ -2206,8 +2181,7 @@ Changes for 1.0beta9:
  - added support for zabbix[items], zabbix[history] (Alexei)
  - new item type: internal (Alexei)
  - play disaster-on.wav if disaster trigger appers (Alexei)
- - added support for disk_read_opsX[*],disk_write_opsX[*],disk_read_blksX[*],
- disk_write_blksX[*] (Alexei)
+ - added support for disk_read_opsX[*],disk_write_opsX[*],disk_read_blksX[*], disk_write_blksX[*] (Alexei)
  - added basice support of monitoring of disk stats (Alexei)
  - session cookie will expire wneh session is closed (Alexei)
  - fixed situation when large SNMP values become nagative (Alexei) 
@@ -2215,11 +2189,9 @@ Changes for 1.0beta9:
  - added new column "severity" to history of alarms (Alexei)
  - status of triggers. If Select is used, no refresh (Alexei)
  - support for MIN algorithm for IT Services (Alexei)
- - support for timeticks for SNMP values. Thanks to Daniel
- Ester. (Alexei)
+ - support for timeticks for SNMP values. Thanks to Daniel Ester. (Alexei)
  - fixed pinger.pl (Alexei)
- - user-defined parameters will overwrite already existing
- (Alexei)
+ - user-defined parameters will overwrite already existing (Alexei)
  - fixed field order for PostgreSQL, table items (Alexei)
  - removed doc/manual.lyx (Alexei)
  - fixed resizing of simple graphs (Alexei)
@@ -2246,8 +2218,7 @@ Changes for 1.0beta8:
  - user-defined port number for SNMP requests (Alexei)
  - fixed SQL errors when adding host to IT Services (Alexei)
  - added chart_sla.php (Alexei)
- - fixed incorrect handling of timeouts when sendign emails
- (Alexei)
+ - fixed incorrect handling of timeouts when sending emails (Alexei)
  - fixed selection of recipient in trigger actions (Alexei)
  - fixed Plain Text values (Alexei)
  - fixed improper handling of special characters i.e. '\/" (Alexei)
@@ -2258,29 +2229,21 @@ Changes for 1.0beta8:
  - assured uniqueness of host names (Alexei)
  - added upgrades/dbpatches/1.0beta7_to_1.0beta8/ with patches (Alexei)
  - mass update for triggers (activate, deactivate, delete) (Alexei)
- - all sendto() and recvfrom() were changed to write() and read() in function
- send_mail() (Alexei)
- - fixed bug in host addition procedure when template host is used (Alexei) 
- - different colors for different status of items, triggers, users
- (Alexei)
+ - all sendto() and recvfrom() were changed to write() and read() in function send_mail() (Alexei)
+ - fixed bug in host addition procedure when template host is used (Alexei)
+ - different colors for different status of items, triggers, users (Alexei)
 
  - WIN32 agent. Added support for multiple servers (Victor)
- - WIN32 agent. Changes in communication protocol: on errors now returned
-   special (Victor)
+ - WIN32 agent. Changes in communication protocol: on errors now returned special (Victor)
  - WIN32 agent. Support for new client-server protocol (Victor)
  - WIN32 agent. Added proc_info[] parameter (Victor)
  - WIN32 agent. Added memory[cached] parameter (supported only on Windows XP) (Victor)
  - WIN32 agent. Added logging to system Event Log (Victor)
  - WIN32 agent. PDH-related error messages are now more specific (Victor)
- - WIN32 agent. Listener thread now will not exit on any accept() error
-   (Victor)
- - WIN32 agent. Added some parameters for agent statistics monitoring: number 
- of accepted and rejected connections, processing errors, etc. (Victor)
- - WIN32 agent. Fixed bug in calculation of md5_hash[] and cksum[] parameters for
- zero-length files (Victor)
- - WIN32 agent. md5_hash[] and cksum[] now ruturns UNSUPPORTED for files larger than
- 64MB (due to high performance impact caused by checksum computing for large files).
- (Victor)
+ - WIN32 agent. Listener thread now will not exit on any accept() error (Victor)
+ - WIN32 agent. Added some parameters for agent statistics monitoring: number of accepted and rejected connections, processing errors, etc. (Victor)
+ - WIN32 agent. Fixed bug in calculation of md5_hash[] and cksum[] parameters for zero-length files (Victor)
+ - WIN32 agent. md5_hash[] and cksum[] now ruturns UNSUPPORTED for files larger than 64MB (due to high performance impact caused by checksum computing for large files). (Victor)
 
 
 Changes for 1.0beta7:
@@ -2295,13 +2258,11 @@ Changes for 1.0beta7:
  - SO_LINGER is not default socket() option for zabbix_sender. (Alexei)
  - recvfrom() and sendto() were changed to read() and write() (Alexei)
  - fixed housekeeping procedure. Upgrade carefully! (Alexei)
- - support of template hosts. Remove tables hosts_templates and
-   triggers_template. (Alexei) 
+ - support of template hosts. Remove tables hosts_templates and triggers_template. (Alexei) 
  - Show-Show-Show renamed to Graph-Trend-Compare in latest.html (Alexei)
  - fixed buffer overflow in zabbix_log(). (Alexei)
  - availability reports for trapper-based triggers (Alexei)
- - fixed possible zabbix_suckerd crash. It may happen if socket() returns 0.
-   (Alexei)
+ - fixed possible zabbix_suckerd crash. It may happen if socket() returns 0. (Alexei)
  - added new Host status - Template(3). (Alexei)
  - fixed group "all" in latest.php (Alexei)
  - do not dump "Expression cannot be evaluated" in case if function.lastvalue
@@ -2309,37 +2270,26 @@ Changes for 1.0beta7:
  - show who is online in User config form. (Alexei)
  - when ran first time, some triggers becomes TRUE (like files was changed).
    This is already fixed. This bug does not exist. (Alexei)
- - fixed bug in queue.php select statement. Trapper type will not be
-   selected. (Alexei)
+ - fixed bug in queue.php select statement. Trapper type will not be selected. (Alexei)
  - when W2000 with SNMP agent restarted, items will becomes Not Supported.
    There is no such bug in CVS code anymore. (Alexei)
  - map will show host status in case of trigger based on trapper (Alexei)
- - fixed bug in zabbix_suckerd's select statements. Trapper type will not be
-   selected. (Alexei)
- - new protocol for Zabbix agents, Support for ZBX_ERROR and ZBX_NOTSUPPORTED.
-   (Alexei)
+ - fixed bug in zabbix_suckerd's select statements. Trapper type will not be selected. (Alexei)
+ - new protocol for Zabbix agents, Support for ZBX_ERROR and ZBX_NOTSUPPORTED. (Alexei)
  - about.php: version of Zabbix was changed to 1.0beta7 (Alexei)
  - items.php: "Delay" renamed to "Update interval". (Alexei)
- - fixed precision issues in zabbix_agent(d) and zabbix_suckerd. All floats
-   converted to double. (Alexei)
- - fixed selection of icon and host in sysmap.php. Thanks to S?bastien "slix"
-   Li?nard. (Alexei)
- - monitoring of servers without Zabbix agent installed. New item type: Simple
-   Check. (Alexei)
+ - fixed precision issues in zabbix_agent(d) and zabbix_suckerd. All floats converted to double. (Alexei)
+ - fixed selection of icon and host in sysmap.php. Thanks to S?bastien "slix" Li?nard. (Alexei)
+ - monitoring of servers without Zabbix agent installed. New item type: Simple Check. (Alexei)
  - improved performance of pinger.pl (Alexei)
- - added support of ':','\' for flexible parameters (example, cksum[c:\a.bat])
-   (Alexei)
+ - added support of ':','\' for flexible parameters (example, cksum[c:\a.bat]) (Alexei)
  - added copyright notice to source files (Alexei)
- - pinger.pl will use mass-send of collected data. No unnecessary forks
-   anymore. (Alexei)
- - all <? ?> were changed to <?php ?>. No changes in php.ini required anymore.
-   (Alexei)
- - added Zabbix agent for WIN32 platforms. Thanks to Victor Kirhenstein. (Alexei) 
+ - pinger.pl will use mass-send of collected data. No unnecessary forks anymore. (Alexei)
+ - all <? ?> were changed to <?php ?>. No changes in php.ini required anymore. (Alexei)
+ - added Zabbix agent for WIN32 platforms. Thanks to Victor Kirhenstein. (Alexei)
  - fixed coredump in get_lastvalue(). Thanks to Rickard Plars. (Alexei)
- - delay renamed to "Update interval (in sec)" in item definition form
- (Alexei)
- - create/mysql/schema.sql will create tables with type=InnoDB by default
- (Alexei)
+ - delay renamed to "Update interval (in sec)" in item definition form (Alexei)
+ - create/mysql/schema.sql will create tables with type=InnoDB by default (Alexei)
  - added upgrades/dbpatches/1.0beta6_to_1.0beta7/ with patches (Alexei)
  - added item type TRAPPER (Alexei) 
  - fixes for PostgreSQL (Alexei)
@@ -2351,8 +2301,7 @@ Changes for 1.0beta7:
  - zabbix_sender to be able to get information from stdin (Alexei)
  - support fo JavaScript required now (Alexei)
  - automatic resize of all graphs depending on screen size (Alexei)
- - got rid of message "Bad protocol identification '0'" when doing check_service[ssh]
- (Alexei)
+ - got rid of message "Bad protocol identification '0'" when doing check_service[ssh] (Alexei)
  - performance improvements for zabbix_suckerd (Alexei)
  - added support of CSS (Alexei)
  - support of processor load on Solaris 2.6. Thanks to Mariusz. (Alexei)
@@ -2361,8 +2310,7 @@ Changes for 1.0beta7:
  - support for host groups (Alexei)
  - added table hosts_groups (Alexei)
  - added table groups (Alexei)
- - ./configure to find PostgreSQL's includes in /usr/local/include
- (Alexei)
+ - ./configure to find PostgreSQL's includes in /usr/local/include (Alexei)
  - basic support for log rotating (Alexei)
  - added additional error checks in get_value_snmp() (Alexei)
 
@@ -2374,8 +2322,7 @@ Changes for 1.0beta6:
  - fixed check_right(). Thanks to Daniel Higgins. (Alexei)
  - more changes to send_email(). Thanks to Daniel Higgins. (Alexei)
  - added file TODO (Alexei)
- - status will be changed to UNCREACHABLE only in case of three network errors
- (Alexei)
+ - status will be changed to UNCREACHABLE only in case of three network errors (Alexei)
  - added column hosts.network_errors (Alexei)
  - support for parameters netloadin[*] and netloadout[*] (Alexei)
  - added src/zabbix_agent/stats.c and stats.h (Alexei)
@@ -2388,15 +2335,12 @@ Changes for 1.0beta6:
  - added graph to availability report (Alexei)
  - added frontends/php/chart4.php (Alexei)
  - availability report will not show trigger expressions (Alexei)
- - added creation of table 'sessions' to migration scripts for 
- 1.0beta4 (Alexei)
+ - added creation of table 'sessions' to migration scripts for 1.0beta4 (Alexei)
  - no dependency on register_globals in php.ini (Alexei)
- - zabbix_suckerd to write "Connection reset by peer" to LogFile
- (Alexei)
+ - zabbix_suckerd to write "Connection reset by peer" to LogFile (Alexei)
  - \n change to \r\n in send_email() (Alexei)
  - added table service_alarms (Alexei)
- - fixed problem with parsing of trigger expressions. [.-.] changed
- to - (Alexei)
+ - fixed problem with parsing of trigger expressions. [.-.] changed to - (Alexei)
  - support for function nodata() added (Alexei)
  - minimum number of zabbix_suckerd that can be started is 4 (Alexei)
  - simplified function update_triggers(). (Alexei)
@@ -2405,14 +2349,11 @@ Changes for 1.0beta6:
  - support for new trigger function: str() (Alexei)
  - changed type of functions.parameter to varchar(255) (Alexei)
  - additional colors for graphs (Alexei)
- - in chart3.php: group by <complex expression> changed to group by 1
- (Alexei)
+ - in chart3.php: group by <complex expression> changed to group by 1 (Alexei)
  - added housekeeping procedure for table sessions (Alexei)
  - changed width=\"X%\" to width=X% in *.php (Alexei)
- - Status of a trigger will blink if it was changes during last 300
- seconds (Alexei)
- - Zabbix daemons to update triggers.lastchange when triggers.values 
- is changed (Alexei)
+ - Status of a trigger will blink if it was changes during last 300 seconds (Alexei)
+ - Zabbix daemons to update triggers.lastchange when triggers.values is changed (Alexei)
  - added misc/init.d/debian/zabbix-[suckerd|trapperd] (Alexei)
  - removed misc/init.d/debian/zabbix-server (Alexei)
  - send_email() will timeout after 10 seconds (Alexei)
@@ -2425,8 +2366,7 @@ Changes for 1.0beta6:
  - added "...#form" to button Change in form Configuration of Users (Alexei)
  - "Just for information" changed to "Information" (Alexei)
  - fixed ./configure to correctly find zlib (Alexei)
- - housekeeping to delete no more than HousekeepingFrequency*3600 records
- from table history and history_str at once (MySQL only) (Alexei)
+ - housekeeping to delete no more than HousekeepingFrequency*3600 records from table history and history_str at once (MySQL only) (Alexei)
  - changed definition of functions.lastvalue to allow NULL (Alexei)
  - added upgrades/dbpatches/1.0beta5_to_1.0beta6/ with patches (Alexei)
  - added misc/init.d/debian/zabbix_agent (Alexei)
@@ -2439,8 +2379,7 @@ Changes for 1.0beta5:
  - added support for inodetotal[*] (Alexei)
  - added support for *,/,+, and - in trigger expressions (Alexei)
  - removed frontends/php/chart4.php (Alexei)
- - update item status to UNSUPPORTED in case if SNMP support was not included
- into zabbix_suckerd (Alexei)
+ - update item status to UNSUPPORTED in case if SNMP support was not included into zabbix_suckerd (Alexei)
  - added mysql_init() to DBconnect() (Alexei)
  - fixed Next100 and Prev100 for case if some hosts are hidden (Alexei)
  - added select for latest values (Alexei)
@@ -2455,8 +2394,7 @@ Changes for 1.0beta5:
  - redesigned all graphs (changed colors, etc) (Alexei)
  - host selection for availability report (Alexei)
  - more fixes to send_email() (Alexei)
- - fixed crash in case if MySQL server gone (support for signal PIPE) (Alexei)
- Thanks to Arturs.
+ - fixed crash in case if MySQL server gone (support for signal PIPE) (Alexei) Thanks to Arturs.
  - fixed duplicate triggers in Availability Report (Alexei)
  - fixed division by zero in Availability Report (Alexei)
  - added frontends/php/chart3.php (Alexei)
@@ -2464,11 +2402,9 @@ Changes for 1.0beta5:
  - for host templates, %s can be used in trigger description to be substituted
    with new host name (Alexei)
  - empty result for DBselect is always checked (Alexei)
- - fixed send_email(). According to RFC, DATA should be sent with followed 
- EOL (Alexei)
- - fixed memory leak in main_alerter_loop(). Added DBfree_result(). (Alexei) 
- - fixed missing close of socket in case if connection to SMTP server
- is rejected (Alexei)
+ - fixed send_email(). According to RFC, DATA should be sent with followed EOL (Alexei)
+ - fixed memory leak in main_alerter_loop(). Added DBfree_result(). (Alexei)
+ - fixed missing close of socket in case if connection to SMTP server is rejected (Alexei)
 
 Changes for 1.0beta4:
 
@@ -2480,8 +2416,7 @@ Changes for 1.0beta4:
  - fixed function apply_actions() (Alexei)
  - added Next100 and Prev100 for alerts and alarms (Alexei)
  - check permissions for Availability report (Alexei)
- - added parameter SenderFrequency to zabbix_suckerd configuration 
- file (Alexei)
+ - added parameter SenderFrequency to zabbix_suckerd configuration file (Alexei)
  - added frontends/include/defines.inc.php (Alexei)
  - added column services.algorithm (Alexei)
  - list of test cases added to the Manual (Alexei)
@@ -2535,8 +2470,7 @@ Changes for 1.0beta3:
 
  - support for chart showing diff instead of real values (Alexei)
  - support for new trigger status - UNKNOWN (Alexei)
- - zabbix_suckerd housekeeping process to disconnect from 
- DB when unactive (Alexei)
+ - zabbix_suckerd housekeeping process to disconnect from DB when unactive (Alexei)
  - support for check_service[http] (Alexei)
  - drop column config.password_required (Alexei)
  - drop column users.groupid (Alexei)
@@ -2550,8 +2484,7 @@ Changes for 1.0beta3:
  - added table 'rights' (Alexei)
  - added time legend for simple graph (Alexei)
  - already existing hosts can be used as template from new host (Alexei)
- - new algorithm for audible notification in screen "Status of Triggers"
- (Alexei)
+ - new algorithm for audible notification in screen "Status of Triggers" (Alexei)
  - changed definition of DebugLevel (Alexei)
  - improved update_triggers() (Alexei)
  - fixed get_lastvalue() (Alexei)
@@ -2560,8 +2493,7 @@ Changes for 1.0beta3:
  - column items.lastvalue changed to varchar(255) (Alexei)
  - column items.prevvalue changed to varchar(255) (Alexei)
  - support for version[zabbix_agent] (Alexei)
- - better validation of trigger expressions in validate_expression
- (Alexei)
+ - better validation of trigger expressions in validate_expression (Alexei)
  - common parser of config files in include/cfg.c (Alexei)
  - added column value_type to table items_template (Alexei)
  - support for system[uname] (Alexei)
@@ -2601,32 +2533,25 @@ Changes for 1.0beta3:
  - added column value_type to table items (Alexei)
  - removed(?) support for automake (Alexei)
  - partial support for automake (Alexei)
- - parent process will terminate childs if one of the childs died
- (Alexei)
- - support for PidFile for zabbix_agentd,zabbix_suckerd and
- zabbix_trapperd (Alexei)
+ - parent process will terminate childs if one of the childs died (Alexei)
+ - support for PidFile for zabbix_agentd,zabbix_suckerd and zabbix_trapperd (Alexei)
  - Zabbix processes will show statuses for ps (FreeBSD,...) (Alexei)
  - changes in AUTHORS (Alexei)
- - added support for IP addresses for SNMP-enabled hosts.
- Thanks to Denis Ustimenko. (Alexei) 
+ - added support for IP addresses for SNMP-enabled hosts. Thanks to Denis Ustimenko. (Alexei)
  - commented #define TEST_PARAMETERS in zabbix_agent.c (Alexei)
  - proc_cnt[apache] was changed to proc_cnt[httpd] (Alexei)
 
 Changes for 1.0beta2:
 
  - changes in manual.lyx (Alexei)
- - added parameter ListenPort to zabbix_agentd and zabbix_trapperd
- (Alexei)
+ - added parameter ListenPort to zabbix_agentd and zabbix_trapperd (Alexei)
  - all *.html documents were renamed to *.php (Alexei)
  - clean compilation on HP-UX 11.xx (Alexei)
  - change host status to Unreachable if agent drops connection (Alexei)
  - added #include <time.h> into db.h (Alexei)
- - added support for connection to MySQL via Unix socket. Thanks to Arturs
- Aboltins (Alexei)
- - configure to find PostgreSQL in /usr/local/lib and  
-/usr/local/include/pgsql (Alexei)
- - added set of user-defined parameters for monitoring MySQL
-servers. See misc/conf/zabbix_agent(d).conf (Alexei)
+ - added support for connection to MySQL via Unix socket. Thanks to Arturs Aboltins (Alexei)
+ - configure to find PostgreSQL in /usr/local/lib and /usr/local/include/pgsql (Alexei)
+ - added set of user-defined parameters for monitoring MySQL servers. See misc/conf/zabbix_agent(d).conf (Alexei)
  - check_service[smtp] will send QUIT. (Charlie)
  - clean compilation on FreeBSD (Alexei)
  - clean compilation on Solaris (Alexei)
@@ -2649,16 +2574,13 @@ Changes for 1.0beta1:
  - added misc/init.d/debian/zabbix-server (Alexei)
  - zabbix_suckerd cannot be ran as root (Alexei)
  - added column URL to table triggers (Alexei)
- - character '.' can be used in definition of monitored paramaters
- (Alexei)
+ - character '.' can be used in definition of monitored paramaters (Alexei)
  - added average-only mode for trends (Alexei)
- - fixed bug with unexpected change of item status to NOT SUPPORTED. This
- bug appeared because of incomplete processing of timeout situations (Alexei)
+ - fixed bug with unexpected change of item status to NOT SUPPORTED. This bug appeared because of incomplete processing of timeout situations (Alexei)
  - constant DELAY_ON_NETWORK_FAILURE is set to 60 (Alexei)
  - added column status to table services (Alexei)
  - added user-defined sorting to form "Latest Values" (Alexei)
- - extra debug information in case of network errors in zabbix_suckerd
- (Alexei)
+ - extra debug information in case of network errors in zabbix_suckerd (Alexei)
  - fixed uninterruptable calls to connect() in zabbix_suckerd (Alexei)
  - added column "soft" to services_links (Alexei)
  - added function DBfetch to frontends/php/include/db.inc (Alexei)
@@ -2671,17 +2593,13 @@ Changes for 1.0beta1:
  - support for parameter UserParameter in zabbix_agentd.conf (Alexei)
  - support for advanced zabbix_agentd.conf (Alexei)
  - added misc/conf/zabbix_agentd.conf
- - in case of network error, zabbix_suckerd will not try to request any parameters
- from the host during next 120 seconds (Alexei)
+ - in case of network error, zabbix_suckerd will not try to request any parameters from the host during next 120 seconds (Alexei)
  - added directory upgrades/dbpatches/1.0alpha12_to_1.0beta1 (Alexei)
  - added column disabled_until to table hosts (Alexei)
- - modified SQL statements in both report2.html and graph2.html. Thanks
-to Oliver Siegmar. (Alexei) 
+ - modified SQL statements in both report2.html and graph2.html. Thanks to Oliver Siegmar. (Alexei) 
  - added support of audible notification (Alexei)
- - select criteria in form "Status of Triggers". Thanks to Lauris
-Stiglics. (Alexei)
- - default values for config.alert_history and config.alarm_history are set to
- one year (Alexei)
+ - select criteria in form "Status of Triggers". Thanks to Lauris Stiglics. (Alexei)
+ - default values for config.alert_history and config.alarm_history are set to one year (Alexei)
  - file COPYING changed (Alexei)
  - file INSTALL truncated (Alexei)
  - added "-lcrypto" to SNMP library detection in configure.in (Alexei)
@@ -2695,14 +2613,12 @@ Changes for 1.0alpha12:
  - diff(0) will not be evaluated as '1' for a fresh item (Alexei)
  - not monitored hosts will not be referenced from System Map (Alexei)
  - not monitored hosts will not be shown in form Status of Triggers (Alexei)
- - in case of network error, zabbix_suckerd will not try to request same parameter
- during next 120 seconds (Alexei)
+ - in case of network error, zabbix_suckerd will not try to request same parameter during next 120 seconds (Alexei)
  - zabbix_trapperd will not exit after timeout (Alexei)
  - added comments to many functions of source code (Alexei)
  - added columns alert_history and alarm_history to table config (Alexei)
  - added link from graphs to trends and vs (Alexei)
- - housekeeping process in zabbix_suckerd will also delete old records from tables
-   alerts and alarms (Alexei)
+ - housekeeping process in zabbix_suckerd will also delete old records from tables alerts and alarms (Alexei)
  - added directory upgrades/dbpatches/1.0alpha11_to_1.0alpha12 (Alexei)
  - added index on column "clock" for table alarms (Alexei)
  - cleanup of all *.html files (Alexei)
@@ -2726,13 +2642,11 @@ Changes for 1.0alpha12:
  - changes in timeout handling (Alexei)
  - added support for cksum[*], "*" can be any filename (Alexei)
  - cksum[] does not call external program "cksum" anymore (Alexei)
- - added support for memory[free], memory[total] and memory[shared]
-   for FreeBSD (Alexei)
+ - added support for memory[free], memory[total] and memory[shared] for FreeBSD (Alexei)
  - minor fixes in doc/manual.txt (Alexei)
  - minor fixes in INSTALL (Alexei)
  - added support for check_port[*], which tries to connect to the port (Aelxei)
- - new type of parameters: parameter[*], actual value of "*" can
- be passed from Zabbix server (Alexei)
+ - new type of parameters: parameter[*], actual value of "*" can be passed from Zabbix server (Alexei)
  - zabbix_agentd will lower scheduling priority to 5 (Alexei)
  - fixed broken customized graphs, file chart2.html (Alexei)
 
