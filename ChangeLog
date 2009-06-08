@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-945] added comment about min/max values for RefreshActiveChecks param in agent config file (Sasha)
  - [ZBX-935] minor fixes for snmptrap.sh. Thanks to Joseph Womack. (Alexei)
  - [ZBX-942] fixed error message for server and proxy if cannot bind a port (Alexei)
  - [ZBX-940] fixed bug with not initialized array variable (Vedmak)
