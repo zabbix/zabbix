@@ -2774,7 +2774,6 @@ Changes for 1.0alpha7:
  - added file frontends/php/chart2.html
  - added file frontends/php/charts.html
  - added file frontends/php/graph.html
-
  - added file frontends/php/graphs.html
  - added file frontends/php/images/sysmaps/host.png
  - added file frontends/php/map.html
@@ -2800,7 +2799,7 @@ Changes for 1.0alpha5:
  - source code became more structured
  - call to perror was changed to syslog where necessary 
  - zabbix_sucker will not print "Spent x seconds ..." to syslog
- 
+
 Changes for 1.0alpha4:
 
  - fixed EXECUTE function in sysinfo.c
@@ -2810,9 +2809,8 @@ Changes for 1.0alpha4:
  - added hints on choosing right DB (PostgreSQL vs MySQL) to manual.txt
  - added section on reports in manual.txt
  - fixed "undefined $register" and other warnings in media.html
- - "netstat -an|grep LISTEN" was replaced by more efficient "netstat -ln|grep tcp"
-   in zabbix_agent.c
- - critical value for disk space and number of inodes decreased to 100000000 
+ - "netstat -an|grep LISTEN" was replaced by more efficient "netstat -ln|grep tcp" in zabbix_agent.c
+ - critical value for disk space and number of inodes decreased to 100000000
  - table "platforms" is not used anymore
  - removed platformid and related indexes from table items_template
  - directory upgrades/ created
