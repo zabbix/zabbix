@@ -91,7 +91,7 @@ include_once 'include/page_header.php';
 				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
 				
 				if($result){
-					print('$("addrm_fav").title = "'.S_add_TO.' '.S_FAVORITES.'";'."\n");
+					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVORITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){ add2favorites("'.$_REQUEST['favobj'].'","'.$_REQUEST['favid'].'");}'."\n");
 				}
 			}			
@@ -257,7 +257,7 @@ include_once 'include/page_header.php';
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
-			$icon->addOption('title',S_add_TO.' '.S_FAVORITES);
+			$icon->addOption('title',S_ADD_TO.' '.S_FAVORITES);
 			$icon->addAction('onclick',new CScript("javascript: add2favorites('screenid','".$elementid."');"));
 		}
 		$icon->addOption('id','addrm_fav');
