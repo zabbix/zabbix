@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-21] size of files larger than 2GB is reported correctly (Dmitry)
  - [NTP-17] fixes in user permissions (Artem)
  - [NTD-91] fixed maintenance period selection by host-group or host (Artem)
  - [NTP-16] added to events page option hosts all from dropdown, when group is selected (Artem)

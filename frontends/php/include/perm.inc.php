@@ -258,7 +258,7 @@ COpt::counter_up('perm');
 			' left join users_groups g on r.groupid=g.usrgrpid and g.userid='.$userid.
 			' left join nodes n on '.DBid2nodeid('hg.groupid').'=n.nodeid '.
 			$where.' group by n.nodeid, n.name, hg.groupid, hg.name, g.userid, g.userid '.
-			' order by n.name, hg.name, permission desc';
+			' order by n.name, hg.name, permission desc, g.userid desc';
 			
 		$db_groups = DBselect($sql);
 
@@ -340,7 +340,7 @@ COpt::counter_up('perm');
 		$db_nodes = DBselect('select n.nodeid,min(r.permission) as permission, g.userid'.
 			' from nodes n left join rights r on r.id=n.nodeid and r.type='.RESOURCE_TYPE_NODE.
 			' left join users_groups g on r.groupid=g.usrgrpid and g.userid='.$userid.
-			$where_nodeid.' group by n.nodeid, g.userid order by nodeid desc, userid desc, permission desc');
+			$where_nodeid.' group by n.nodeid, g.userid order by nodeid desc, permission desc, userid desc');
 
 		while(($node_data = DBfetch($db_nodes)) || (!isset($do_break) && !ZBX_DISTRIBUTED))
 		{
