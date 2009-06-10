@@ -211,18 +211,15 @@
 		return $result;
 	}
 
-	function	add_node($new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends,$node_type)
-	{
+	function add_node($new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends,$node_type){
 		global $ZBX_CURMASTERID;
 
-		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) )
-		{
+		if(!eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
 			error("Incorrect characters used for Node name");
 			return false;
 		}
 
-		switch($node_type)
-		{
+		switch($node_type){
 			case ZBX_NODE_REMOTE:
 				$masterid = get_current_nodeid(false);
 				$nodetype = 0;
@@ -230,8 +227,7 @@
 			case ZBX_NODE_MASTER:
 				$masterid = 0;
 				$nodetype = 0;
-				if($ZBX_CURMASTERID)
-				{
+				if($ZBX_CURMASTERID){
 					error('Master node already exist');
 					return false;
 				}
@@ -261,7 +257,7 @@
 			$ZBX_CURMASTERID = $new_nodeid; /* applay Master node for this script */
 		}
 
-		return ($result ? $new_nodeid : $result);
+	return ($result ? $new_nodeid : $result);
 	}
 
 	function update_node($nodeid,$new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends){

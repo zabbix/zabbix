@@ -56,3 +56,9 @@ table.thin_header .biginput{
 	height: 10px;
 	margin: 0px;
 }
+
+form.thin .biginput{
+	font-size: 9px;
+	height: 10px;
+	margin: 0px;
+}

@@ -617,7 +617,7 @@
 	'S_COMPARE'=>				'Compare',
 
 //	Footer
-	'S_ZABBIX_VER'=>			'ZABBIX '.ZABBIX_VERSION,
+	'S_ZABBIX'=>				'ZABBIX',
 	'S_COPYRIGHT_BY'=>			'Copyright 2001-2009 by ',
 	'S_CONNECTED_AS'=>			'Connected as',
 	'S_NOT_CONNECTED'=>			'Not connected',
@@ -1831,6 +1831,13 @@
 	'S_HOST_PROFILES_BIG'=>		'HOST PROFILES',
 	'S_EXTENDED_HOST_PROFILE'=>	'Extended host profile',
 	'S_EXTENDED'=>				'Extended',
+
+//	search.php
+	'S_SEARCH_BIG' =>			'SEARCH',
+	'S_GO' =>					'Go',
+	'S_FOUND_SMALL' =>			'found',
+	'S_DISPLAYING' =>			'Displaying',
+	'S_OF_SMALL' =>				'of',
 
 //	popup.php
 	'S_CAPTION'=>			'Caption',

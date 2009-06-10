@@ -581,7 +581,8 @@ return $result;
 
 function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=null,$cache=1){
 	global $ZBX_LOCALNODEID, $ZBX_NODES_IDS;
-
+	static $available_nodes;
+	
 	if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
 	if(is_null($nodeid)) $nodeid = $ZBX_NODES_IDS;
 	if(!is_array($nodeid)) $nodeid = array($nodeid);
@@ -590,6 +591,14 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 	$user_type	=& $user_data['type'];
 	if(!isset($userid)) fatal_error('Incorrect user data in "get_accessible_nodes_by_user"');
 
+
+	$nodeid_str =(is_array($nodeid))?md5(implode('',$nodeid)):strval($nodeid);
+	
+	if($cache && isset($available_nodes[$userid][$perm][$perm_res][$nodeid_str])){
+//SDI('Cache!!! '."[$userid][$perm][$perm_res]");
+		return $available_nodes[$userid][$perm][$perm_res][$nodeid_str];
+	}
+	
 	$node_data = array();
 	$result = array();
 
@@ -648,6 +657,8 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 		else
 			$result = implode(',',$result);
 	}
+	
+	$available_nodes[$userid][$perm][$perm_res][$nodeid_str] = $result;
 
 return $result;
 }

@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-377] added search for hosts and host-groups (Artem)
  - [DEV-388] Discovery: added new action operations - enable/disable host (Sasha)
  - [ZBX-949] fixed undefined constant S_add_TO (Richlv)
  - [ZBX-137] operation interval steps N-N will be displayed as N (Alexei)
