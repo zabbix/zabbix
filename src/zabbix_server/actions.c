@@ -969,23 +969,23 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 			case	OPERATION_TYPE_HOST_REMOVE:
 				op_host_del(event);
 				break;
+			case	OPERATION_TYPE_HOST_ENABLE:
+				op_host_enable(event);
+				break;
+			case	OPERATION_TYPE_HOST_DISABLE:
+				op_host_disable(event);
+				break;
 			case	OPERATION_TYPE_GROUP_ADD:
-//				zabbix_set_log_level(LOG_LEVEL_DEBUG);
 				op_group_add(event,action,&operation);
-//				zabbix_set_log_level(LOG_LEVEL_CRIT);
 				break;
 			case	OPERATION_TYPE_GROUP_REMOVE:
-//				zabbix_set_log_level(LOG_LEVEL_DEBUG);
 				op_group_del(event,action,&operation);
-//				zabbix_set_log_level(LOG_LEVEL_CRIT);
 				break;
 			case	OPERATION_TYPE_TEMPLATE_ADD:
 				op_template_add(event,action,&operation);
 				break;
 			case	OPERATION_TYPE_TEMPLATE_REMOVE:
-				zabbix_set_log_level(LOG_LEVEL_DEBUG);
 				op_template_del(event,action,&operation);
-				zabbix_set_log_level(LOG_LEVEL_CRIT);
 				break;
 			default:
 				break;
