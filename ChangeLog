@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-850] zabbix version removed from locales (Artem)
  - [ZBX-947] fixed various typos and formatting errors in changelog (Richlv)
  - [ZBX-945] added comment about min/max values for RefreshActiveChecks param in agent config file (Sasha)
  - [ZBX-935] minor fixes for snmptrap.sh. Thanks to Joseph Womack. (Alexei)
