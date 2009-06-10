@@ -64,7 +64,7 @@ catch(e){
 			$table->SetCellPadding(1);
 			$table->AddRow(array(
 				new CCol(new CLink(
-					S_ZABBIX_VER.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
+					S_ZABBIX.SPACE.ZABBIX_VERSION.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
 					"http://www.zabbix.com", "highlight", null, true),
 					"page_footer_l"),
 				new CCol(array(

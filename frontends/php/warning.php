@@ -59,7 +59,7 @@ unset($USER_DETAILS);
 	$table->SetAlign('center');
 	$table->AddOption('style','width: 480px; margin-top: 100px;');
 	$table->SetHeader(array(
-		new CCol(S_ZABBIX_VER, 'left'), 
+		new CCol(S_ZABBIX.SPACE.ZABBIX_VERSION, 'left'), 
 		SPACE
 		),'header');
 		

@@ -501,7 +501,6 @@
 	'S_GRAPH'=>			'Graph',
 	'S_TREND'=>			'Tendenz',
 	'S_COMPARE'=>			'vergleichen',
-	'S_ZABBIX_VER'=>			'Zabbix 1.6',
 	'S_COPYRIGHT_BY'=>			'Copyright 2001-2006 by',
 	'S_CONNECTED_AS'=>			'Angemeldet:',
 	'S_NOT_CONNECTED'=>			'Nicht angemeldet',

@@ -60,7 +60,7 @@ body{
 .enabled	{	color: #00AA00;	}
 .disabled	{	color: #AA0000;	}
 .unknown	{	color: #AAAAAA;	}
-.on		{	color: #AA0000;	}
+.on			{	color: #AA0000;	}
 .off		{	color: #00AA00;	}
 
 .disaster	{	background-color: #FF0000;	color: #222222;}
