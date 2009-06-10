@@ -550,6 +550,8 @@ char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
 #define OPERATION_TYPE_GROUP_REMOVE	5
 #define OPERATION_TYPE_TEMPLATE_ADD	6
 #define OPERATION_TYPE_TEMPLATE_REMOVE	7
+#define OPERATION_TYPE_HOST_ENABLE	8
+#define OPERATION_TYPE_HOST_DISABLE	9
 
 /* Algorithms for service status calculation */
 #define SERVICE_ALGORITHM_NONE	0

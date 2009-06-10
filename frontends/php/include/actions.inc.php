@@ -526,6 +526,12 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 				case OPERATION_TYPE_HOST_REMOVE:
 					$result = S_REMOVE_HOST;
 					break;
+				case OPERATION_TYPE_HOST_ENABLE:
+					$result = S_ENABLE_HOST;
+					break;
+				case OPERATION_TYPE_HOST_DISABLE:
+					$result = S_DISABLE_HOST;
+					break;
 				case OPERATION_TYPE_GROUP_ADD:
 					$obj_data = get_hostgroup_by_groupid($data['objectid']);
 					$result = S_ADD_TO_GROUP.' "'.$obj_data['name'].'"';
@@ -651,6 +657,8 @@ function get_operations_by_eventsource($eventsource){
 			OPERATION_TYPE_COMMAND,
 			OPERATION_TYPE_HOST_ADD,
 			OPERATION_TYPE_HOST_REMOVE,
+			OPERATION_TYPE_HOST_ENABLE,
+			OPERATION_TYPE_HOST_DISABLE,
 			OPERATION_TYPE_GROUP_ADD,
 			OPERATION_TYPE_GROUP_REMOVE,
 			OPERATION_TYPE_TEMPLATE_ADD,
@@ -669,6 +677,8 @@ function	operation_type2str($type)
 	$str_type[OPERATION_TYPE_COMMAND]		= S_REMOTE_COMMAND;
 	$str_type[OPERATION_TYPE_HOST_ADD]		= S_ADD_HOST;
 	$str_type[OPERATION_TYPE_HOST_REMOVE]		= S_REMOVE_HOST;
+	$str_type[OPERATION_TYPE_HOST_ENABLE]		= S_ENABLE_HOST;
+	$str_type[OPERATION_TYPE_HOST_DISABLE]		= S_DISABLE_HOST;
 	$str_type[OPERATION_TYPE_GROUP_ADD]		= S_ADD_TO_GROUP;
 	$str_type[OPERATION_TYPE_GROUP_REMOVE]		= S_DELETE_FROM_GROUP;
 	$str_type[OPERATION_TYPE_TEMPLATE_ADD]		= S_LINK_TO_TEMPLATE;
@@ -903,6 +913,8 @@ function validate_operation($operation){
 			return validate_commands($operation['longdata']);
 		case OPERATION_TYPE_HOST_ADD:
 		case OPERATION_TYPE_HOST_REMOVE:
+		case OPERATION_TYPE_HOST_ENABLE:
+		case OPERATION_TYPE_HOST_DISABLE:
 			break;
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:

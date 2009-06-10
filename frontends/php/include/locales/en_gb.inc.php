@@ -262,6 +262,8 @@
 	'S_NEW'=>						'New',
 	'S_ADD_HOST'=>					'Add host',
 	'S_REMOVE_HOST'=>				'Remove host',
+	'S_ENABLE_HOST'=>				'Enable host',
+	'S_DISABLE_HOST'=>				'Disable host',
 	'S_LINK_TO_TEMPLATE'=>				'Link to template',
 	'S_CANNOT_LINK_TO_TEMPLATE'=>		'Cannot link to template',
 	'S_UNLINK_FROM_TEMPLATE'=>			'Unlink from template',
