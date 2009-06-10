@@ -88,7 +88,7 @@
 			$table = new CTable(null, 'setup_wizard');
 			$table->setAlign('center');
 			$table->setHeader(array(
-				new CCol(S_ZABBIX_VER, 'left'), 
+				new CCol(S_ZABBIX.SPACE.ZABBIX_VERSION, 'left'), 
 				SPACE
 				),'header');
 			$table->addRow(array(SPACE, new CCol($this->stage[$this->getStep()]['title'], 'right')),'title');
