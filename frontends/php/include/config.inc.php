@@ -176,7 +176,7 @@ function __autoload($class_name){
 /*
 //Require MB strings, otherwise show warning page.
 	if(!isset($show_setup) && !isset($show_warning) && !init_mbstrings()){
-		$_REQUEST['warning_msg'] = S_ZABBIX_VER.SPACE.S_REQUIRE_MB_STRING_MODULE;
+		$_REQUEST['warning_msg'] = S_ZABBIX.SPACE.ZABBIX_VERSION.SPACE.S_REQUIRE_MB_STRING_MODULE;
 		$show_warning = true;
 	}
 //*/
