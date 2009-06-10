@@ -636,28 +636,36 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if(event->source == EVENT_SOURCE_DISCOVERY && condition->conditiontype == CONDITION_TYPE_DSERVICE_TYPE)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DSERVICE_TYPE [%d:%s]",
-			event->value,
-			condition->value);
-		value_int = atoi(condition->value);
-		result = DBselect("select dserviceid from dservices where type=%d and dserviceid=" ZBX_FS_UI64,
-			value_int,
-			event->objectid);
-		row = DBfetch(result);
-		if(condition->operator == CONDITION_OPERATOR_EQUAL)
+		zabbix_log(LOG_LEVEL_DEBUG, "CONDITION_TYPE_DSERVICE_TYPE");
+
+		if (EVENT_OBJECT_DSERVICE == event->object)
 		{
-			if(row && DBis_null(row[0]) != SUCCEED)
+			result = DBselect("select type from dservices where dserviceid=" ZBX_FS_UI64,
+					event->objectid);
+			if (NULL != (row = DBfetch(result)))
 			{
-				ret = SUCCEED;
+				value_int = atoi(condition->value);
+				tmp_int = atoi(row[0]);
+
+				if (condition->operator == CONDITION_OPERATOR_EQUAL)
+				{
+					if (value_int == tmp_int)
+						ret = SUCCEED;
+				}
+				else if (condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+				{
+					if (value_int != tmp_int)
+						ret = SUCCEED;
+				}
+				else
+				{
+					zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+							condition->operator,
+							condition->conditionid);
+				}
 			}
+			DBfree_result(result);
 		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-				condition->operator,
-				condition->conditionid);
-		}
-		DBfree_result(result);
 	}
 	else if(event->source == EVENT_SOURCE_DISCOVERY &&
 		(event->object == EVENT_OBJECT_DHOST || event->object == EVENT_OBJECT_DSERVICE) &&
@@ -962,16 +970,22 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 				op_host_del(event);
 				break;
 			case	OPERATION_TYPE_GROUP_ADD:
+//				zabbix_set_log_level(LOG_LEVEL_DEBUG);
 				op_group_add(event,action,&operation);
+//				zabbix_set_log_level(LOG_LEVEL_CRIT);
 				break;
 			case	OPERATION_TYPE_GROUP_REMOVE:
+//				zabbix_set_log_level(LOG_LEVEL_DEBUG);
 				op_group_del(event,action,&operation);
+//				zabbix_set_log_level(LOG_LEVEL_CRIT);
 				break;
 			case	OPERATION_TYPE_TEMPLATE_ADD:
 				op_template_add(event,action,&operation);
 				break;
 			case	OPERATION_TYPE_TEMPLATE_REMOVE:
+				zabbix_set_log_level(LOG_LEVEL_DEBUG);
 				op_template_del(event,action,&operation);
+				zabbix_set_log_level(LOG_LEVEL_CRIT);
 				break;
 			default:
 				break;
