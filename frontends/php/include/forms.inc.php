@@ -4380,6 +4380,18 @@
 				$tblOper->addItem(new CVar('new_operation[shortdata]',''));
 				$tblOper->addItem(new CVar('new_operation[longdata]',''));
 				break;
+			case OPERATION_TYPE_HOST_ENABLE:
+				$tblOper->addItem(new CVar('new_operation[object]',0));
+				$tblOper->addItem(new CVar('new_operation[objectid]',0));
+				$tblOper->addItem(new CVar('new_operation[shortdata]',''));
+				$tblOper->addItem(new CVar('new_operation[longdata]',''));
+				break;
+			case OPERATION_TYPE_HOST_DISABLE:
+				$tblOper->addItem(new CVar('new_operation[object]',0));
+				$tblOper->addItem(new CVar('new_operation[objectid]',0));
+				$tblOper->addItem(new CVar('new_operation[shortdata]',''));
+				$tblOper->addItem(new CVar('new_operation[longdata]',''));
+				break;
 			case OPERATION_TYPE_GROUP_ADD:
 				$tblOper->addItem(new CVar('new_operation[object]',0));
 				$tblOper->addItem(new CVar('new_operation[objectid]',$new_operation['objectid']));

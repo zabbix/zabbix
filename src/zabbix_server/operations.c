@@ -695,6 +695,78 @@ void	op_host_del(DB_EVENT *event)
 
 /******************************************************************************
  *                                                                            *
+ * Function: op_host_enable                                                   *
+ *                                                                            *
+ * Purpose: enable discovered                                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: nothing                                                      *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	op_host_enable(DB_EVENT *event)
+{
+	const char	*__function_name = "op_host_enable";
+	zbx_uint64_t	hostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (event->source != EVENT_SOURCE_DISCOVERY)
+		return;
+
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)
+		return;
+
+	if (0 == (hostid = select_discovered_host(event)))
+		return;
+
+	DBexecute("update hosts set status=%d where hostid=" ZBX_FS_UI64, HOST_STATUS_MONITORED, hostid);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: op_host_disable                                                  *
+ *                                                                            *
+ * Purpose: disable host                                                      *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: nothing                                                      *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	op_host_disable(DB_EVENT *event)
+{
+	const char	*__function_name = "op_host_disable";
+	zbx_uint64_t	hostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (event->source != EVENT_SOURCE_DISCOVERY)
+		return;
+
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)
+		return;
+
+	if (0 == (hostid = select_discovered_host(event)))
+		return;
+
+	DBexecute("update hosts set status=%d where hostid=" ZBX_FS_UI64, HOST_STATUS_NOT_MONITORED, hostid);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: op_group_add                                                     *
  *                                                                            *
  * Purpose: add group to discovered host                                      *
