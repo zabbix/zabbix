@@ -71,10 +71,13 @@ class CHostGroup {
 					'from' =>	array('groups g'),
 					'where' =>	array(),
 					'order' =>	array(),
+					'limit' =>	null,
 				);
 				
 		$def_options = array(
 					'nodeid' =>      				0,
+					'groupids' =>					0,
+					'hostids' =>					0,
 					'monitored_hosts' =>			0,
 					'templated_hosts' =>			0,
 					'real_hosts' =>					0,
@@ -88,6 +91,9 @@ class CHostGroup {
 					'with_monitored_httptests'=>	0,
 					'with_graphs'=>					0,
 					'only_current_node' =>			0,
+					'pattern' =>					0,
+					'order' =>						0,
+					'limit' =>						0,
 				);	
 		$def_options = array_merge($def_options, $params);
 		$result = array();
@@ -98,17 +104,32 @@ class CHostGroup {
 		else{
 			$nodeid = get_current_nodeid(false);
 		}
-		//$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,$nodeid,AVAILABLE_NOCACHE);
-
-	// nodes
-		// if(ZBX_DISTRIBUTED){
-			// $def_sql['select'][] = 'n.name as node_name';
-			// $def_sql['from'][] = 'nodes n';
-			// $def_sql['where'][] = 'n.nodeid='.DBid2nodeid('g.groupid');
-			// $def_sql['order'][] = 'node_name';
-		// }
 		
-	// hosts
+//		$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,$nodeid,AVAILABLE_NOCACHE);
+
+// nodes
+// disabled by false
+// TODO('check this ~106');
+ 		if(false && ZBX_DISTRIBUTED){
+		 	$def_sql['select'][] = 'n.name as node_name';
+			$def_sql['from'][] = 'nodes n';
+			$def_sql['where'][] = 'n.nodeid='.DBid2nodeid('g.groupid');
+			$def_sql['order'][] = 'node_name';
+		}
+		
+// groups
+		if($def_options['groupids']){
+			zbx_value2array($def_options['groupids']);
+			$def_sql['where'][] = DBcondition('g.groupid',$def_options['groupids']);			
+		}
+		
+		if(!zbx_empty($def_options['pattern'])){
+			$def_sql['where'][] = ' g.name LIKE '.zbx_dbstr('%'.$def_options['pattern'].'%');
+		}
+
+// hosts
+		$in_hosts = count($def_sql['where']);
+		
 		if($def_options['monitored_hosts'])
 			$def_sql['where'][] = 'h.status='.HOST_STATUS_MONITORED;
 		else if($def_options['real_hosts'])
@@ -117,17 +138,20 @@ class CHostGroup {
 			$def_sql['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
 		else if($def_options['not_proxy_hosts'])
 			$def_sql['where'][] = 'h.status<>'.HOST_STATUS_PROXY;
-		else
-			$in_hosts = false;
 
-		if(!isset($in_hosts)){
+		if($def_options['hostids']){
+			zbx_value2array($def_options['hostids']);
+			$def_sql['where'][] = DBcondition('h.hostid',$def_options['hostids']);
+		}
+
+		if($in_hosts != count($def_sql['where'])){
 			$def_sql['from'][] = 'hosts_groups hg';
 			$def_sql['from'][] = 'hosts h';
 			$def_sql['where'][] = 'hg.groupid=g.groupid';
 			$def_sql['where'][] = 'h.hostid=hg.hostid';
 		}
 		
-	// items
+// items
 		if($def_options['with_items']){
 			$def_sql['from'][] = 'hosts_groups hg';
 
@@ -147,7 +171,7 @@ class CHostGroup {
 			$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
 		}
 
-	// triggers
+// triggers
 		if($def_options['with_triggers']){
 			$def_sql['from'][] = 'hosts_groups hg';
 			
@@ -171,7 +195,7 @@ class CHostGroup {
 											' AND t.status='.TRIGGER_STATUS_ENABLED.')';
 		}
 		
-	// htptests	
+// htptests	
 		if($def_options['with_httptests']){
 			$def_sql['from'][] = 'hosts_groups hg';
 			
@@ -192,7 +216,7 @@ class CHostGroup {
 										' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
 		}
 		
-	// graphs
+// graphs
 		if($def_options['with_graphs']){
 			$def_sql['from'][] = 'hosts_groups hg';
 			
@@ -202,17 +226,20 @@ class CHostGroup {
 										' WHERE i.hostid=hg.hostid '.
 											' AND i.itemid=gi.itemid)';
 		}
-		
-	//-----
-		$def_sql['order'][] = 'g.name';
-		
-		foreach($sql as $key => $value){
-			zbx_value2array($value);
-			
-			if(isset($def_sql[$key])) $def_sql[$key] = array_merge($def_sql[$key], $value);
-			else $def_sql[$key] = $value;
+
+// order
+		if(str_in_array($def_options['order'], array('group','groupid'))){
+			$def_sql['order'][] = 'g.'.$def_options['order'];
 		}
 		
+// limit
+		if(zbx_ctype_digit($def_options['limit'])){
+			$def_sql['limit'] = $def_options['limit'];
+		}
+//-----
+
+		$def_sql['order'][] = 'g.name';
+				
 		$def_sql['select'] = array_unique($def_sql['select']);
 		$def_sql['from'] = array_unique($def_sql['from']);
 		$def_sql['where'] = array_unique($def_sql['where']);
@@ -222,17 +249,19 @@ class CHostGroup {
 		$sql_from = '';
 		$sql_where = '';
 		$sql_order = '';
+		$sql_limit = null;
 		if(!empty($def_sql['select'])) $sql_select.= implode(',',$def_sql['select']);
 		if(!empty($def_sql['from'])) $sql_from.= implode(',',$def_sql['from']);
 		if(!empty($def_sql['where'])) $sql_where.= ' AND '.implode(' AND ',$def_sql['where']);
-		if(!empty($def_sql['order'])) $sql_order.= implode(',',$def_sql['order']);
+		if(!empty($def_sql['order'])) $sql_order.= ' ORDER BY '.implode(',',$def_sql['order']);
+		if(!empty($def_sql['limit'])) $sql_limit = $def_sql['limit'];
 
 		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('g.groupid', $nodeid).
 					$sql_where.
-				' ORDER BY '.$sql_order;
-		$res = DBselect($sql);
+				$sql_order;
+		$res = DBselect($sql,$sql_limit);
 		while($group = DBfetch($res)){
 			$result[$group['groupid']] = $group;			
 		}

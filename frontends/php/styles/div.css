@@ -42,6 +42,12 @@ div.onajaxload{
 	z-index: 50;
 }
 
+div.zbx_search{
+	color:#FFFFFF;
+	font-weight:bold;
+	float:right;
+}
+
 
 /**** SCREEN DRAG & DROP ****/
 div.draggable {

@@ -36,6 +36,27 @@
 	return $str;
 	}
 
+	function make_decoration($haystack, $needle, $class=null){
+		$result = $haystack;
+		
+		$pos = stripos($haystack,$needle);
+		if($pos !== FALSE){
+			$start = zbx_substring($haystack, 0, $pos);
+//			$middle = substr($haystack, $pos, zbx_strlen($needle));
+			$middle = $needle;
+			$end = substr($haystack, $pos+zbx_strlen($needle));
+
+			if(is_null($class)){
+				$result = array($start, bold($middle), $end);
+			}
+			else{
+				$result = array($start, new CSpan($middle, $class), $end);
+			}
+		}
+
+	return $result;
+	}
+
 	function bfirst($str){
 // mark first symbol of string as bold
 		$res = bold($str[0]);

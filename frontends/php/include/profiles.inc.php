@@ -114,7 +114,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 	if(profile_type($type,'unknown')) $type = profile_type_by_value($value);
 	else $value = profile_value_by_type($value,$type);
 	
-//if($idx == 'web.nodes.selected') SDI('PROF: v='.$value.'  t='.$type);
+//if($idx == 'web.history') SDI('PROF: v='.$value.'  t='.$type);
 
 	if($value === false) return false;
 
@@ -137,13 +137,12 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 			insert_profile($idx,$val,$type,$idx2,$source);
 		}
 		$result = DBend();
-		
 	}
 	else{
 		$sql = 'SELECT profileid '.
 				' FROM profiles '.
 				' WHERE userid='.$USER_DETAILS['userid'].
-					' AND '.DBin_node('profileid').
+					' AND idx='.zbx_dbstr($idx).
 					$sql_cond;
 					
 		$row = DBfetch(DBselect($sql));
@@ -391,14 +390,16 @@ return	DBexecute('update config set '.implode(',',$update).' where '.DBin_node('
 /************ HISTORY **************/
 // Author: Aly
 function get_user_history(){
-	$history=array();
+	$history = array();
+	
+	$db_hist = get_source_profile('web.history',false);
 	$delimiter = new CSpan('&raquo;','delimiter');
+	
 	for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
-		if($rows = get_source_profile('web.history.'.$i,false)){
-			if($i>0){
-				array_push($history,$delimiter);
-			}
-			$url = new CLink($rows['source'],$rows['value'],'history');
+		if(isset($db_hist[$i])){
+			if($i>0) array_push($history,$delimiter);
+
+			$url = new CLink($db_hist[$i]['source'],$db_hist[$i]['value'],'history');
 			array_push($history,array(SPACE,$url,SPACE));
 		}
 	}
@@ -407,15 +408,20 @@ return $history;
 
 function get_last_history_page($same_page=false){
 	global $page;
+	
 	$title = explode('[',$page['title']);
 	$title = $title[0];
 	
 	$rows=false;
+	
+	$db_hist = get_source_profile('web.history',false);
 	for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
-		$new_rows = get_source_profile('web.history.'.$i,false);
+		if(isset($db_hist[$i])){
+			$new_rows = get_source_profile('web.history.'.$i,false);
 		
-		if(!$same_page && ($title == $new_rows['source'])) continue;
-		$rows = $new_rows;
+			if(!$same_page && ($title == $db_hist[$i]['source'])) continue;
+			$rows = $db_hist[$i];
+		}
 	}
 	
 	if(is_array($rows)){
@@ -447,10 +453,11 @@ function add_user_history($page){
 
 	$curr = 0;
 	$profile = array();
+	$db_hist = get_source_profile('web.history',false);
 	for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
-		if($history = get_source_profile('web.history.'.$i,false)){
-			if($history['source'] != $title){
-				$profile[$curr] = $history;
+		if(isset($db_hist[$i])){
+			if($db_hist[$i]['source'] != $title){
+				$profile[$curr] = $db_hist[$i];
 				$curr++;
 			}
 		}
@@ -460,17 +467,13 @@ function add_user_history($page){
 					'value' => $url);
 				
 	if($curr < ZBX_HISTORY_COUNT){
-		for($i = 0; $i < $curr; $i++){
-			update_profile('web.history.'.$i,$profile[$i], PROFILE_TYPE_STR);
-		}
-		$result = update_profile('web.history.'.$curr,$history, PROFILE_TYPE_STR);
+		$profile[$curr] = $history;
 	} 
 	else {
-		for($i = 1; $i < ZBX_HISTORY_COUNT; $i++){
-			update_profile('web.history.'.($i-1),$profile[$i], PROFILE_TYPE_STR);
-		}
-		$result = update_profile('web.history.'.(ZBX_HISTORY_COUNT-1),$history, PROFILE_TYPE_STR);
+		$profile[(ZBX_HISTORY_COUNT-1)] = $history;
 	}
+
+	$result = update_profile('web.history',$profile, PROFILE_TYPE_ARRAY_STR);
 
 return $result;
 }

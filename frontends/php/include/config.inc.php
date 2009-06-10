@@ -1117,7 +1117,7 @@ function __autoload($class_name){
 				return false;
 			}
 
-			$tmp[$key] = $rows[$sortfield];
+			$tmp[$key] = strtolower($rows[$sortfield]);
 		}
 		
 		$sortorder = ($sortorder == 'ASC')?SORT_ASC:SORT_DESC;
@@ -1125,5 +1125,20 @@ function __autoload($class_name){
 		array_multisort($tmp, $sortorder, $data);
 		
 	return true;
+	}
+	
+	function selectByPattern(&$table, $column, $pattern, $limit){
+		$rsTable = array();
+		foreach($table as $num => $row){
+			if($row[$column] == $pattern)
+				$rsTable = array($num=>$row) + $rsTable;
+			else if($limit > 0)
+				$rsTable[$num] = $row;
+			else
+				continue;
+				
+			$limit--;
+		}
+	return $rsTable;
 	}
 ?>

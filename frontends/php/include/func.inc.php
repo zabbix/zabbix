@@ -566,9 +566,8 @@ return $pos;
 }
 
 function zbx_substring($haystack, $start, $end=null){
-	if($end < $start) return '';
-	
-	$len = zbx_strlen($haystack);
+	if(!is_null($end) && ($end < $start)) return '';
+
 	if(is_null($end))
 		$result = substr($haystack, $start);
 	else
