@@ -373,9 +373,8 @@ if(!isset($DB)){
 		$result = false;
 		
 		if( isset($DB['DB']) && !empty($DB['DB']) ){
-//SDI('SQL: '.$query);
 			$DB['SELECT_COUNT']++;
-			
+//SDI('SQL['.$DB['SELECT_COUNT'].']: '.$query);	
 			switch($DB['TYPE']){
 				case 'MYSQL':
 					if(zbx_numeric($limit)){
@@ -458,7 +457,7 @@ if(!isset($DB)){
 
 		if( isset($DB['DB']) && !empty($DB['DB']) ){
 			$DB['EXECUTE_COUNT']++;	// WRONG FOR ORACLE!!
-//SDI('SQL Exec: '.$query);
+//SDI('SQL xec: '.$query);
 			switch($DB['TYPE']){
 				case 'MYSQL':
 					$result=mysql_query($query,$DB['DB']);
@@ -704,7 +703,6 @@ else {
 				}
 	
 				DBexecute("UPDATE ids SET nextid=nextid+1 WHERE nodeid=$nodeid AND table_name='$table' AND field_name='$field'");
-	
 				$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid." AND table_name='$table' AND field_name='$field'"));
 				if(!$row || is_null($row["nextid"])){
 					/* Should never be here */

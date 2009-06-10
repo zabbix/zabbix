@@ -293,26 +293,31 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			}
 		}
 
+// 1st level menu
 		$table = new CTable();
 		$table->setCellSpacing(0);
 		$table->setCellPadding(0);
 		$table->addOption('style','width: 100%;');
 
 		$r_col = new CCol($node_form);
-		$r_col->AddOption('align','right');
-//		$r_col->AddOption('style','text-align: right;');
+		$r_col->addOption('align','right');
+//		$r_col->addOption('style','text-align: right;');
 		
 		$table->addRow(array($menu_table,$r_col));
 		
 		$page_menu = new CDiv();
 		$page_menu->addoption('id','mmenu');
 		$page_menu->addItem($table);
-		
+//----
+
+// 2nd level menu	
+		$sub_menu_table = new CTable(NULL,'sub_menu');
+		$sub_menu_table->setCellSpacing(0);
+		$sub_menu_table->setCellPadding(5);
+
+		$menu_divs = array();
 		$menu_selected = false;
 		foreach($sub_menus as $label => $sub_menu){
-			$sub_menu_table = new CTable(NULL,'sub_menu');
-			$sub_menu_table->setCellSpacing(0);
-			$sub_menu_table->setCellPadding(5);
 			
 			$sub_menu_row = array();
 			foreach($sub_menu as $id => $sub_page){
@@ -323,9 +328,8 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				$sub_menu_row[] = $sub_menu_item;
 				$sub_menu_row[] = new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider');
 			}
-			$sub_menu_table->addRow(new CCol($sub_menu_row));
 			
-			$sub_menu_div = new CDiv($sub_menu_table);
+			$sub_menu_div = new CDiv($sub_menu_row);
 			$sub_menu_div->addOption('id', 'sub_'.$label);
 			$sub_menu_div->addAction('onmouseover','javascript: MMenu.submenu_mouseOver();');
 			$sub_menu_div->addAction('onmouseout','javascript: MMenu.mouseOut();');
@@ -339,19 +343,39 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				$sub_menu_div->addOption('style','display: none;');
 			}
 			
-			$page_menu->addItem($sub_menu_div);
+			$menu_divs[] = $sub_menu_div;
 		}
-
-		$sub_menu_table = new CTable(NULL,'sub_menu');
-		$sub_menu_table->setCellSpacing(0);
-		$sub_menu_table->setCellPadding(5);
-		$sub_menu_table->addRow(SPACE);
-		
-		$sub_menu_div = new CDiv($sub_menu_table);
+	
+		$sub_menu_div = new CDiv(SPACE);
 		$sub_menu_div->addOption('id', 'sub_empty');
 		$sub_menu_div->addOption('style','display: '.($menu_selected?'none;':'block;'));
-		$page_menu->addItem($sub_menu_div);
 		
+		$menu_divs[] = $sub_menu_div;
+		
+		$search_form = new CForm('search.php');
+		$search_form->addOption('class','thin');
+		$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', new CTextBox('search','',15))));
+		
+		$search_div = new CDiv($search_form);
+		$search_div->addOption('id','zbx_search');
+		$search_div->addOption('class','zbx_search');
+
+		$sub_menu_table->addRow(array($menu_divs, $search_div));
+
+		$page_menu->addItem($sub_menu_table);
+//---
+
+/* SEARCH form
+		$search_form = new CForm('search.php');
+		$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', new CTextBox('search','',20))));
+		
+		$search_div = new CDiv($search_form);
+		$search_div->addOption('id','zbx_search');
+		$search_div->addOption('class','zbx_search');
+		
+		$page_menu->addItem($search_div);
+//*/
+
 		$page_menu->show();
 	}
 

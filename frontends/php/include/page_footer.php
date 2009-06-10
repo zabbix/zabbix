@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	require_once("include/config.inc.php");
+	require_once('include/config.inc.php');
 	
 	global $USER_DETAILS;
 	global $page;
@@ -48,8 +48,8 @@
 		}
 
 		$post_script.='}'."\n";
-
 		$post_script.= 'try{ chkbx_range_ext.init(); } catch(e){ throw("Checkbox extension failed!");}';			
+		
 		insert_js($post_script);
 	
 		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')){
@@ -58,13 +58,13 @@
 			$table->SetCellPadding(1);
 			$table->AddRow(array(
 				new CCol(new CLink(
-					S_ZABBIX_VER.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
-					"http://www.zabbix.com", "highlight", null, true),
-					"page_footer_l"),
+					S_ZABBIX.SPACE.ZABBIX_VERSION.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
+					'http://www.zabbix.com', 'highlight', null, true),
+					'page_footer_l'),
 				new CCol(array(
-						new CSpan(SPACE.SPACE."|".SPACE.SPACE,"divider"),
-						new CSpan(($USER_DETAILS['userid'] == 0)?S_NOT_CONNECTED:S_CONNECTED_AS.SPACE."'".$USER_DETAILS["alias"]."'".
-						(ZBX_DISTRIBUTED ? SPACE.S_FROM_SMALL.SPACE."'".$USER_DETAILS["node"]['name']."'" : ''),'footer_sign')
+						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE,'divider'),
+						new CSpan(($USER_DETAILS['userid'] == 0)?S_NOT_CONNECTED:S_CONNECTED_AS.SPACE."'".$USER_DETAILS['alias']."'".
+						(ZBX_DISTRIBUTED ? SPACE.S_FROM_SMALL.SPACE."'".$USER_DETAILS['node']['name']."'" : ''),'footer_sign')
 					),
 					"page_footer_r")
 				));

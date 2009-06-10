@@ -23,18 +23,22 @@ class CTemplate {
 		$def_sql = array(
 			'select' => array('h.hostid','h.host'),
 			'from' => array('hosts h'),
-			'where' => array('status=3'),
+			'where' => array(),
 			'order' => array(),
+			'limit' => null,
 			);
 
 		$def_options = array(
-			'nodeid' =>      0,
-			'groupids' =>     0,
-			'hostids' =>     0,
-			'templateids' =>     0,
-			'with_items' =>     0,
-			'with_triggers' =>    0,
-			'with_graphs'=>     0,
+			'nodeid' =>				0,
+			'groupids' =>			0,
+			'hostids' =>			0,
+			'templateids' =>		0,
+			'with_items' =>			0,
+			'with_triggers' =>		0,
+			'with_graphs' =>		0,
+			'pattern' =>			0,
+			'order' =>				0,
+			'limit' =>				0,
 		);
 
 		$def_options = array_merge($def_options, $options);
@@ -64,14 +68,20 @@ class CTemplate {
 
 			$def_sql['where'][] = DBcondition('h.hostid',$def_options['templateids']);
 		}
+		
+		if(!zbx_empty($def_options['pattern'])){
+			$def_sql['where'][] = ' h.host LIKE '.zbx_dbstr('%'.$def_options['pattern'].'%');
+		}
 
 // hosts 
+		$def_sql['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
+		
 		if($def_options['hostids']){
 			zbx_value2array($def_options['hostids']);
 
-		$def_sql['from'][] = 'hosts_templates ht';
-		$def_sql['where'][] = DBcondition('ht.hostids',$def_options['hostids']);
-		$def_sql['where'][] = 'h.hostid=ht.hostid';
+			$def_sql['from'][] = 'hosts_templates ht';
+			$def_sql['where'][] = DBcondition('ht.hostids',$def_options['hostids']);
+			$def_sql['where'][] = 'h.hostid=ht.hostid';
 		}
 
 // items
@@ -96,6 +106,16 @@ class CTemplate {
 				 ' WHERE i.hostid=h.hostid '.
 				  ' AND i.itemid=gi.itemid)';
 		}
+
+// order
+		if(str_in_array($def_options['order'], array('host','hostid'))){
+			$def_sql['order'][] = 'h.'.$def_options['order'];
+		}
+		
+// limit
+		if(zbx_ctype_digit($def_options['limit'])){
+			$def_sql['limit'] = $def_options['limit'];
+		}
 //------
 		$def_sql['order'][] = 'h.host';
 
@@ -108,17 +128,19 @@ class CTemplate {
 		$sql_from = '';
 		$sql_where = '';
 		$sql_order = '';
+		$sql_limit = null;
 		if(!empty($def_sql['select'])) $sql_select.= implode(',',$def_sql['select']);
 		if(!empty($def_sql['from'])) $sql_from.= implode(',',$def_sql['from']);
 		if(!empty($def_sql['where'])) $sql_where.= ' AND '.implode(' AND ',$def_sql['where']);
-		if(!empty($def_sql['order'])) $sql_order.= implode(',',$def_sql['order']);
+		if(!empty($def_sql['order'])) $sql_order.= ' ORDER BY '.implode(',',$def_sql['order']);
+		if(!empty($def_sql['limit'])) $sql_limit = $def_sql['limit'];
 
 		$sql = 'SELECT DISTINCT '.$sql_select.
 			' FROM '.$sql_from.
 			' WHERE '.DBin_node('h.hostid', $nodeid).
-		$sql_where.
-			' ORDER BY '.$sql_order; 
-		$res = DBselect($sql);
+				$sql_where.
+			$sql_order; 
+		$res = DBselect($sql, $sql_limit);
 		while($host = DBfetch($res)){
 			$result[$host['hostid']] = $host;
 		}

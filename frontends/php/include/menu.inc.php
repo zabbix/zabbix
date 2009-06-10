@@ -82,7 +82,8 @@ $ZBX_MENU = array(
 						'sub_pages'=>array('report3.php','report7.php','chart_sla.php','chart5.php')
 					),
 				array('url'=>'vtext.php'),
-				array('url'=>'chart3.php')
+				array('url'=>'chart3.php'),
+				array('url'=>'search.php')
 				)
 			),
 	'cm'=>array(
@@ -218,43 +219,32 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 	*/
 
 	//SDI($USER_DETAILS);
+	$page_exists = false;
 	$deny = !defined('ZBX_PAGE_NO_AUTHERIZATION');
 
 	foreach($ZBX_MENU as $label => $menu){
-	// Check to show menu or not
+// Check to show menu or not
 		$show_menu = true;
 
 		if(isset($menu['user_type'])){
 			$show_menu &= ($menu['user_type'] <= $USER_DETAILS['type']);
 		}
 
-		if(isset($menu['node_perm']) && isset($DB['DB']) && !is_null($DB['DB'])){
-			$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,$menu['node_perm']);
-			$show_menu &= (0 < count($available_nodes));
-		}
-
 		if($label == 'login'){
 			$show_menu = false;
 		}
 
-	//---
+//---
 		$menu_class = 'horizontal_menu_n';	
-		$page_exists = false;
 		$sub_menus[$label] = array();
 		foreach($menu['pages'] as $id => $sub_page){
 			$show_sub_menu = true;
-	// show check
+// show check
 			if(!isset($sub_page['label'])) $show_sub_menu = false;
 			if(isset($sub_page['user_type']) && ($USER_DETAILS['type'] < $sub_page['user_type'])){
 				$show_sub_menu = false;
 			}
-			if(isset($sub_pages['node_perm']) && isset($DB['DB']) && !is_null($DB['DB'])){
-				$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,$sub_page['node_perm']);				
-				if(0 == count($available_nodes)){
-					$show_sub_menu = false;
-				}
-			}
-	//----------
+//----------
 			$row = array('menu_text' => isset($sub_page['label'])?$sub_page['label']:'', 
 							'menu_url'=> $sub_page['url'],
 							'class'=> 'highlight',
@@ -263,27 +253,28 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 			$sub_menu_active = ($page['file'] == $sub_page['url']);
 			$sub_menu_active |=  (isset($sub_page['sub_pages']) && str_in_array($page['file'], $sub_page['sub_pages']));
 			if($sub_menu_active){
-	// PERMISSION CHECK
+// PERMISSION CHECK
 				$deny &= ($USER_DETAILS['type'] < $menu['user_type']);
-	// END OF PERMISSION CHECK 
+// END OF PERMISSION CHECK 
 				$menu_class = 'active';
 				$page_exists = true;
 				$page['menu'] = $label;
 				$row['selected'] = true;
 				
-				if(!defined('ZBX_PAGE_NO_MENU'))
+				if(!defined('ZBX_PAGE_NO_MENU')){
 					update_profile('web.menu.'.$label.'.last', $sub_page['url'], PROFILE_TYPE_STR);
+				}
 			}
 			
 			if($show_sub_menu) $sub_menus[$label][] = $row;
 		}
-		
+
 		if($page_exists && !defined('ZBX_NOT_ALLOW_ALL_NODES') && 
 			(isset($menu['forse_disable_all_nodes']) || isset($sub_page['forse_disable_all_nodes'])))
 		{
 			define('ZBX_NOT_ALLOW_ALL_NODES', 1);
 		}
-	//SDI($label.' : '.$show_menu.' : '.$deny);
+//SDI($label.' : '.$show_menu.' : '.$deny);
 		if($page_exists && $deny){
 			$denyed_page_requested = true;
 		}
@@ -293,23 +284,23 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 			continue;
 		}
 		
-		$menu_url = get_profile('web.menu.'.$label.'.last',false);			
-	//		if(ZBX_DISABLE_MENU_CACHE == 1) $menu_url = $menu['pages'][$sub_menus['default_page_id']]['url'];
+//		$menu_url = get_profile('web.menu.'.$label.'.last',false);
+		$menu_url = $menu['pages'][$menu['default_page_id']]['url'];
 
 		$mmenu_entry = new CCol($menu['label'], $menu_class);
 		$mmenu_entry->addOption('id', $label);
-		$mmenu_entry->addAction('onclick', "javascript: location.href = '$menu_url';");
+		$mmenu_entry->addAction('onclick', "javascript: redirect('$menu_url');");
 		$mmenu_entry->addAction('onmouseover', 'javascript: MMenu.mouseOver("'.$label.'");');
 		$mmenu_entry->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
 		
 		array_push($main_menu, $mmenu_entry);
 	}
 
-	if(!isset($page_exists) && ($page['type']!=PAGE_TYPE_XML)){
+	if(!$page_exists && ($page['type']!=PAGE_TYPE_XML)){
 		$denyed_page_requested = true;
 	}
 	
-	return $denyed_page_requested;
+return $denyed_page_requested;
 }
 
 function zbx_define_menu_restrictions(){

@@ -27,6 +27,9 @@ class CHost {
 	 * 	boolean 'with_httptests' 			=> 'only with http tests',
 	 * 	boolean 'with_monitored_httptests'	=> 'only with monitores http tests',
 	 * 	boolean 'with_graphs'				=> 'only with graphs'
+	 *  string  'pattern'					=> 'search hosts by pattern in host names'
+	 *  integer 'limit'						=> 'limit selection'
+	 *  string  'order'						=> 'depricated parametr (for now)'
 	 * );
 	 * </code>
 	 *
@@ -41,21 +44,25 @@ class CHost {
 			'from' => array('hosts h'),
 			'where' => array(),
 			'order' => array(),
+			'limit' => null,
 			);
 
 		$def_options = array(
-			'nodeid' =>      0,
-			'groupids' =>     0,
-			'hostids' =>     0,
-			'monitored_hosts' =>   0,
-			'with_items' =>     0,
-			'with_monitored_items' =>  0,
-			'with_historical_items'=>  0,
-			'with_triggers' =>    0,
-			'with_monitored_triggers'=>  0,
-			'with_httptests' =>    0,
-			'with_monitored_httptests'=> 0,
-			'with_graphs'=>     0,
+			'nodeid'					=>		0,
+			'groupids'					=>		0,
+			'hostids'					=>		0,
+			'monitored_hosts'			=>		0,
+			'with_items'				=>		0,
+			'with_monitored_items'		=>		0,
+			'with_historical_items'		=>		0,
+			'with_triggers'				=>		0,
+			'with_monitored_triggers'	=>		0,
+			'with_httptests'			=>		0,
+			'with_monitored_httptests'	=>		0,
+			'with_graphs'				=>		0,
+			'pattern'					=>		0,
+			'order' 					=>		0,
+			'limit'						=>		0,
 			);
 
 		$def_options = array_merge($def_options, $options);
@@ -71,13 +78,18 @@ class CHost {
 		}
 
 // groups
+		$in_groups = count($def_sql['where']);
+		
 		if($def_options['groupids']){
 			zbx_value2array($def_options['groupids']);
-
-		$def_sql['from'][] = 'hosts_groups hg';
-		$def_sql['where'][] = DBcondition('hg.groupid',$def_options['groupids']);
-		$def_sql['where'][] = 'hg.hostid=h.hostid';
+			$def_sql['where'][] = DBcondition('hg.groupid',$def_options['groupids']);			
 		}
+
+		if($in_groups != count($def_sql['where'])){
+			$def_sql['from'][] = 'hosts_groups hg';
+			$def_sql['where'][] = 'hg.hostid=h.hostid';
+		}
+		
 
 // hosts 
 		if($def_options['hostids']){
@@ -86,8 +98,14 @@ class CHost {
 			$def_sql['where'][] = DBcondition('h.hostid',$def_options['hostids']);
 		}
 
+		if(!zbx_empty($def_options['pattern'])){
+			$def_sql['where'][] = ' h.host LIKE '.zbx_dbstr('%'.$def_options['pattern'].'%');
+		}
+
 		if($def_options['monitored_hosts'])
 			$def_sql['where'][] = 'h.status='.HOST_STATUS_MONITORED;
+		else
+			$def_sql['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 
 // items
 		if($def_options['with_items']){
@@ -106,17 +124,17 @@ class CHost {
 			$def_sql['where'][] = 'EXISTS( SELECT i.itemid '.
 				 ' FROM items i, functions f, triggers t'.
 				 ' WHERE i.hostid=h.hostid '.
-				  ' AND i.itemid=f.itemid '.
-				  ' AND f.triggerid=t.triggerid)';
+				 	' AND i.itemid=f.itemid '.
+				 	' AND f.triggerid=t.triggerid)';
 		} 
 		else if($def_options['with_monitored_triggers']){
 			$def_sql['where'][] = 'EXISTS( SELECT i.itemid '.
 				 ' FROM items i, functions f, triggers t'.
 				 ' WHERE i.hostid=h.hostid '.
-				  ' AND i.status='.ITEM_STATUS_ACTIVE.
-				  ' AND i.itemid=f.itemid '.
-				  ' AND f.triggerid=t.triggerid '.
-				  ' AND t.status='.TRIGGER_STATUS_ENABLED.')';
+				 	' AND i.status='.ITEM_STATUS_ACTIVE.
+				 	' AND i.itemid=f.itemid '.
+				 	' AND f.triggerid=t.triggerid '.
+				 	' AND t.status='.TRIGGER_STATUS_ENABLED.')';
 		}
 
 // httptests
@@ -124,14 +142,14 @@ class CHost {
 			$def_sql['where'][] = 'EXISTS( SELECT a.applicationid '.
 				' FROM applications a, httptest ht '.
 				' WHERE a.hostid=h.hostid '.
-				 ' AND ht.applicationid=a.applicationid)';
+					' AND ht.applicationid=a.applicationid)';
 		}
 		else if($def_options['with_monitored_httptests']){
 			$def_sql['where'][] = 'EXISTS( SELECT a.applicationid '.
 				' FROM applications a, httptest ht '.
 				' WHERE a.hostid=h.hostid '.
-				 ' AND ht.applicationid=a.applicationid '.
-				 ' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
+					' AND ht.applicationid=a.applicationid '.
+					' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
 		}
 
 // graphs
@@ -139,10 +157,20 @@ class CHost {
 			$def_sql['where'][] = 'EXISTS( SELECT DISTINCT i.itemid '.
 				 ' FROM items i, graphs_items gi '.
 				 ' WHERE i.hostid=h.hostid '.
-				  ' AND i.itemid=gi.itemid)';
+				 	' AND i.itemid=gi.itemid)';
+		}
+
+// order
+		if(str_in_array($def_options['order'], array('host','hostid'))){
+			$def_sql['order'][] = 'h.'.$def_options['order'];
+		}
+
+// limit
+		if(zbx_ctype_digit($def_options['limit'])){
+			$def_sql['limit'] = $def_options['limit'];
 		}
 //------
-		$def_sql['order'][] = 'h.host';
+		
 
 		$def_sql['select'] = array_unique($def_sql['select']);
 		$def_sql['from'] = array_unique($def_sql['from']);
@@ -153,22 +181,24 @@ class CHost {
 		$sql_from = '';
 		$sql_where = '';
 		$sql_order = '';
+		$sql_limit = null;
 		if(!empty($def_sql['select'])) $sql_select.= implode(',',$def_sql['select']);
 		if(!empty($def_sql['from'])) $sql_from.= implode(',',$def_sql['from']);
 		if(!empty($def_sql['where'])) $sql_where.= ' AND '.implode(' AND ',$def_sql['where']);
-		if(!empty($def_sql['order'])) $sql_order.= implode(',',$def_sql['order']);
+		if(!empty($def_sql['order'])) $sql_order.= ' ORDER BY '.implode(',',$def_sql['order']);
+		if(!empty($def_sql['limit'])) $sql_limit = $def_sql['limit'];
 
 		$sql = 'SELECT DISTINCT '.$sql_select.
 			' FROM '.$sql_from.
 			' WHERE '.DBin_node('h.hostid', $nodeid).
-		$sql_where.
-			' ORDER BY '.$sql_order; 
-		$res = DBselect($sql);
+				$sql_where.
+			$sql_order; 
+		$res = DBselect($sql, $sql_limit);
 		while($host = DBfetch($res)){
 			$result[$host['hostid']] = $host;
 		}
 		
-		return $result;
+	return $result;
 	}
 	
 	/**
@@ -205,16 +235,20 @@ class CHost {
 	 * @return int|boolean hostid
 	 */
 	public static function getId($host_data){
-		$sql = 'SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host_data['host']).' AND '.DBin_node('hostid', get_current_nodeid(false));
-		$hostid = DBfetch(DBselect($sql));
+		$result = false;
 		
-		$result = $hostid ? true : false;
-		if($result)
-			return $hostid['hostid'];
+		$sql = 'SELECT hostid '.
+				' FROM hosts '.
+				' WHERE host='.zbx_dbstr($host_data['host']).
+					' AND '.DBin_node('hostid', get_current_nodeid(false));
+		$res = DBselect($sql);
+		if($hostid = DBfetch($res))
+			$result = $hostid['hostid'];
 		else{
 			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host with name: "'.$host_data['host'].'" doesn\'t exists.');
-			return false;
 		}
+		
+	return $result;
 	}
 	
 	/**
