@@ -278,6 +278,7 @@ frontends/php/popup_period.php -text
 frontends/php/report6.php -text
 frontends/php/scripts.php -text
 frontends/php/scripts_exec.php -text
+frontends/php/search.php -text
 frontends/php/slides.php -text
 frontends/php/styles/blocks.css -text
 frontends/php/styles/calendar.css -text
