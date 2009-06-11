@@ -41,7 +41,7 @@ class CHost {
 	public static function get($options=array()){
 
 		$def_sql = array(
-			'select' => array('h.hostid','h.host'),
+			'select' => array(),
 			'from' => array('hosts h'),
 			'where' => array(),
 			'order' => array(),
@@ -62,6 +62,7 @@ class CHost {
 			'with_httptests'			=>		0,
 			'with_monitored_httptests'	=>		0,
 			'with_graphs'				=>		0,
+			'count'						=>		0,
 			'pattern'					=>		'',
 			'order' 					=>		0,
 			'limit'						=>		0,
@@ -164,6 +165,15 @@ class CHost {
 				 	' AND i.itemid=gi.itemid)';
 		}
 
+// count
+		if($def_options['count']){
+			$def_sql['select'][] = 'COUNT(h.hostid) as rowscount';
+		}
+		else{
+			$def_sql['select'][] = 'h.hostid';
+			$def_sql['select'][] = 'h.host';
+		}
+
 // order
 		if(str_in_array($def_options['order'], array('host','hostid'))){
 			$def_sql['order'][] = 'h.'.$def_options['order'];
@@ -199,7 +209,10 @@ class CHost {
 			$sql_order; 
 		$res = DBselect($sql, $sql_limit);
 		while($host = DBfetch($res)){
-			$result[$host['hostid']] = $host;
+			if($def_options['count']) 
+				$result = $host;
+			else 
+				$result[$host['hostid']] = $host;
 		}
 		
 	return $result;
