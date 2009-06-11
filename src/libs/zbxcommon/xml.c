@@ -18,46 +18,46 @@
 **/
 
 #include "common.h"
-#include "log.h"
+
+static char	data_static[ZBX_MAX_B64_LEN];
 
 /* Get DATA from <tag>DATA</tag> */
-int xml_get_data(char *xml,char *tag, char *data, int maxlen)
+int xml_get_data_dyn(const char *xml, const char *tag, char **data)
 {
-	int ret = SUCCEED;
-	char *start, *end;
-	char tag_open[MAX_STRING_LEN];
-	char tag_close[MAX_STRING_LEN];
-	int len;
+	int	len;
+	char	*start, *end;
+	size_t	sz;
 
-	zbx_snprintf(tag_open, sizeof(tag_open),"<%s>",tag);
-	zbx_snprintf(tag_close, sizeof(tag_close),"</%s>",tag);
+	sz = sizeof(data_static);
 
-	if(NULL==(start=strstr(xml,tag_open)))
-	{
-		ret = FAIL;
-	}
+	len = zbx_snprintf(data_static, sz, "<%s>", tag);
+	if (NULL == (start = strstr(xml, data_static)))
+		return FAIL;
 
-	if(NULL==(end=strstr(xml,tag_close)))
-	{
-		ret = FAIL;
-	}
+	zbx_snprintf(data_static, sz, "</%s>", tag);
+	if (NULL == (end = strstr(xml, data_static)))
+		return FAIL;
 
-	if(ret == SUCCEED)
-	{
-		if(end<start)
-		{
-			ret = FAIL;
-		}
-	}
+	if (end < start)
+		return FAIL;
 
-	if(ret == SUCCEED)
-	{
-		len = (int)(end - start - strlen(tag_open));
+	start += len;
+	len = end - start;
 
-		if(len>maxlen)	len=maxlen;
+	if (len > (int)sz - 1)
+		*data = zbx_malloc(*data, len + 1);
+	else
+		*data = data_static;
 
-		zbx_strlcpy(data, start+strlen(tag_open),len+1);
-	}
+	zbx_strlcpy(*data, start, len + 1);
 
-	return ret;
+	return SUCCEED;
+}
+
+void	xml_free_data_dyn(char **data)
+{
+	if (*data == data_static)
+		*data = NULL;
+	else
+		zbx_free(*data);
 }
