@@ -20,7 +20,7 @@
 #include "common.h"
 #include "base64.h"
 
-#define MAX_B64_SIZE 16*1024
+#define MAX_B64_SIZE 64*1024
 
 static char base64_set [] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -203,6 +203,7 @@ void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
  *
  * Parameters	:  p_b64str (in)	- the base64 string to decode
  *		   p_str (out)		- the encoded str to return
+ *		   p_str_maxsize (in)	- the size of p_str buffer
  *		   p_out_size (out)	- the size (len) of the str decoded
  *
  * Returns	:  
@@ -210,78 +211,66 @@ void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
  * Comments	:
  *
  *----------------------------------------------------------------------*/
-void str_base64_decode(const char *p_b64str, char *p_str, int *p_out_size)
+void str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_out_size)
 {
-	int i;
-	int j = 0;
-	int	in_size;
-	char from1='A',from2='A',from3='A',from4='A';
-	unsigned char to1=0,to2=0,to3=0,to4=0;
-	char	str_clean[MAX_B64_SIZE];/* str_clean is the string 
-					* after removing the non-base64 
-					* characters
-					*/
+	const char	*p;
+	char		*o, from1, from2, from3, from4;
+	unsigned char	to1, to2, to3, to4;
+	char		str_clean[MAX_B64_SIZE];/* str_clean is the string after removing
+						 * the non-base64 characters
+						 */
 	assert(p_b64str);
 	assert(p_str);
 	assert(p_out_size);
+	assert(maxsize > 0);
 
-	in_size = (int)strlen(p_b64str);
-	memset(str_clean, 0, sizeof(str_clean));
 	*p_out_size = 0;
-	
+
 	/* Clean-up input string */
-	for ( i=0; i < in_size; i++ )
-	{
-		if (is_base64(p_b64str[i]))
-		{
-			str_clean[j++] = p_b64str[i];
-		}
-	}
-	
-	/* Re-define in_size after clean-up */
-	in_size = (int)strlen(str_clean);
-	
-	if ( 0 == in_size )
-	{
-		return;
-	}
+	for (p = p_b64str, o = str_clean; *p != '\0'; p++ )
+		if (is_base64(*p))
+			*o++ = *p;
+	*o = '\0';
 
-	for ( i=0; i < in_size ;i+=4)
+	for (o = str_clean; *o != '\0';)
 	{	
-		from1 = from2 = from3 = from4 = 'A';
-		from1 = str_clean[i];
-		if ( i+1 < in_size )
-		{
-			from2 = str_clean[i+1];
-		}		
-		if ( i+2 < in_size )
-		{
-			from3 = str_clean[i+2];
-		}
-		if ( i+3 < in_size )
-		{
-			from4 = str_clean[i+3];
-		};
+		from1 = *o++;
+		from2 = from3 = from4 = 'A';
 
-		to1 = to2 = to3 = to4 = 0;
+		if (*o != '\0')
+		{
+			from2 = *o++;
+			if (*o != '\0')
+			{
+				from3 = *o++;
+				if (*o != '\0')
+					from4 = *o++;
+			}
+		}
+
 		to1 = char_base64_decode(from1);
 		to2 = char_base64_decode(from2);
 		to3 = char_base64_decode(from3);
 		to4 = char_base64_decode(from4);
 
-		*(p_str++) = ( (to1<<2)|(to2>>4) );
-		(*p_out_size)++;
+		*p_str++ = ((to1 << 2) | (to2 >> 4));
+		if (++(*p_out_size) == maxsize)
+			break;
+
 		if (from3 != '=')
 		{
-			*(p_str++) = ( ((to2&0xf)<<4)|(to3>>2) );
-			(*p_out_size)++;
+			*p_str++ = (((to2 & 0xf) << 4) | (to3 >> 2));
+			if (++(*p_out_size) == maxsize)
+				break;
 		}
+
 		if (from4 != '=')
 		{
-			*(p_str++) =  ( ((to3&0x3)<<6)|to4 );
-			(*p_out_size)++;
+			*p_str++ =  (((to3 & 0x3) << 6) | to4);
+			if (++(*p_out_size) == maxsize)
+				break;
 		}
 	}
-	
+
 	return;
 }
