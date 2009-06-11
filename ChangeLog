@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [DEV-137] updated Japanese translation. Thanks to Kodai. (Alexei)
  - [ZBX-850] zabbix version removed from locales (Artem)
  - [ZBX-947] fixed various typos and formatting errors in changelog (Richlv)
  - [ZBX-945] added comment about min/max values for RefreshActiveChecks param in agent config file (Sasha)
