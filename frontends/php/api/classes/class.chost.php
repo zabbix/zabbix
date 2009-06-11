@@ -19,6 +19,7 @@ class CHost {
 	 * 	array 'groupids' 					=> array(groupid1, groupid2, ...),
 	 * 	array 'hostids' 					=> array(hostid1, hostid2, ...),
 	 * 	boolean 'monitored_hosts'			=> 'only monitored hosts',
+	 *	boolean 'templated_hosts'			=> 'include templates in result',
 	 * 	boolean 'with_items' 				=> 'only with items',
 	 * 	boolean 'with_monitored_items' 		=> 'only with monitored items',
 	 * 	boolean 'with_historical_items'		=> 'only with historical items',
@@ -52,6 +53,7 @@ class CHost {
 			'groupids'					=>		0,
 			'hostids'					=>		0,
 			'monitored_hosts'			=>		0,
+			'templated_hosts'			=>		0,
 			'with_items'				=>		0,
 			'with_monitored_items'		=>		0,
 			'with_historical_items'		=>		0,
@@ -60,7 +62,7 @@ class CHost {
 			'with_httptests'			=>		0,
 			'with_monitored_httptests'	=>		0,
 			'with_graphs'				=>		0,
-			'pattern'					=>		0,
+			'pattern'					=>		'',
 			'order' 					=>		0,
 			'limit'						=>		0,
 			);
@@ -80,7 +82,7 @@ class CHost {
 // groups
 		$in_groups = count($def_sql['where']);
 		
-		if($def_options['groupids']){
+		if($def_options['groupids'] != 0){
 			zbx_value2array($def_options['groupids']);
 			$def_sql['where'][] = DBcondition('hg.groupid',$def_options['groupids']);			
 		}
@@ -92,7 +94,7 @@ class CHost {
 		
 
 // hosts 
-		if($def_options['hostids']){
+		if($def_options['hostids'] != 0){
 			zbx_value2array($def_options['hostids']);
 
 			$def_sql['where'][] = DBcondition('h.hostid',$def_options['hostids']);
@@ -104,6 +106,8 @@ class CHost {
 
 		if($def_options['monitored_hosts'])
 			$def_sql['where'][] = 'h.status='.HOST_STATUS_MONITORED;
+		else if($def_options['templated_hosts'])
+			$def_sql['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
 		else
 			$def_sql['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 
