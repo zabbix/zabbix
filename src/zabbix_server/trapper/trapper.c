@@ -351,7 +351,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 {
 	struct zbx_json_parse   jp_data, jp_row;
 	const char		*p;
-	char			info[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
+	char			info[MAX_STRING_LEN], tmp[MAX_BUF_LEN];
 	int			ret = SUCCEED;
 	int			processed = 0;
 	double			sec;
@@ -534,11 +534,8 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 {
 	char	*server,*key,*value_string, *data;
 	char	copy[MAX_STRING_LEN];
-	char	host_dec[MAX_STRING_LEN],key_dec[MAX_STRING_LEN],value_dec[MAX_STRING_LEN];
-	char	lastlogsize[MAX_STRING_LEN];
-	char	timestamp[MAX_STRING_LEN];
-	char	source[MAX_STRING_LEN];
-	char	severity[MAX_STRING_LEN];
+	char	host_dec[HOST_HOST_LEN_MAX], key_dec[ITEM_KEY_LEN_MAX], value_dec[MAX_BUF_LEN];
+	char	lastlogsize[11], timestamp[11], source[HISTORY_LOG_SOURCE_LEN_MAX], severity[11];
 	int	sender_nodeid, nodeid;
 	char	*answer;
 
@@ -650,11 +647,11 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "XML received [%s]", s);
 
-			comms_parse_response(s,host_dec,key_dec,value_dec,lastlogsize,timestamp,source,severity,sizeof(host_dec)-1);
+			comms_parse_response(s, host_dec, key_dec, value_dec, lastlogsize, timestamp, source, severity);
 
-			server=host_dec;
-			value_string=value_dec;
-			key=key_dec;
+			server		= host_dec;
+			value_string	= value_dec;
+			key		= key_dec;
 		}
 		else
 		{
@@ -681,10 +678,10 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 			}
 			/* It points to ':', so have to increment */
 			value_string++;
-			lastlogsize[0]=0;
-			timestamp[0]=0;
-			source[0]=0;
-			severity[0]=0;
+			*lastlogsize	= '\0';
+			*timestamp	= '\0';
+			*source		= '\0';
+			*severity	= '\0';
 		}
 		zabbix_log( LOG_LEVEL_DEBUG, "Value [%s]", value_string);
 

@@ -164,7 +164,7 @@ char	*zbx_result_string(int result);
 #else
 	#define MAX_STRING_LEN	2048
 #endif
-#define MAX_BUF_LEN	65000
+#define MAX_BUF_LEN	65536
 
 #define ZBX_DM_DELIMITER	'\255'
 
@@ -708,20 +708,11 @@ char* __zbx_zbx_strdcatf(char *dest, const char *f, ...);
 
 int	replace_param(const char *cmd, const char *param, char *out, int outlen);
 
-int	xml_get_data(char *xml,char *tag, char *data, int maxlen);
-
-char*	comms_create_request(
-	const char		*host,
-	const char		*key,
-	const char		*data,
-	long			*lastlogsize,
-	unsigned long	*timestamp,
-	const char		*source,
-	unsigned short	*severity
-	);
+int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
+void	xml_free_data_dyn(char **data);
 
 int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastlogsize, char *timestamp,
-	       char *source, char *severity, int maxlen);
+	       char *source, char *severity);
 
 int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param, int param_max_len);
 

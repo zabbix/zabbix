@@ -86,9 +86,8 @@ int   process_log(
 			else
 			{
 				*value = zbx_malloc(*value, MAX_BUF_LEN);
-				memset(*value, 0, MAX_BUF_LEN);
 
-				if(NULL == fgets(*value, MAX_BUF_LEN-1, f))
+				if (NULL == fgets(*value, MAX_BUF_LEN, f))
 				{
 					/* EOF */
 					zbx_free(*value);
