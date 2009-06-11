@@ -113,6 +113,7 @@ include_once('include/page_header.php');
 		
 /* host linkage form */
 		'tname'=>			array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'isset({config})&&({config}==2)&&isset({save})'),
+		'groupid_tb'=> 		array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
 		
 // maintenance
 		'maintenanceid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'(isset({config})&&({config}==6))&&(isset({form})&&({form}=="update"))'),
@@ -156,7 +157,6 @@ include_once('include/page_header.php');
 		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
-
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 
@@ -167,7 +167,14 @@ include_once('include/page_header.php');
 /************ ACTIONS FOR HOSTS ****************/
 /* this code menages operations to unlink 1 template from multiple hosts */
 	if($_REQUEST['config']==2 && (isset($_REQUEST['save']))){
+	
 		$hosts = get_request('hosts',array());
+
+//----------------------
+		//$_REQUEST['hostid'] = ;
+		//$hosts = array();
+//--------------------
+
 		if(isset($_REQUEST['hostid'])){
 			$templateid=$_REQUEST['hostid'];
 			$result = true;
@@ -1321,7 +1328,6 @@ include_once('include/page_header.php');
 	$cmbConf->addItem(5,S_PROXIES);
 	$cmbConf->addItem(6,S_MAINTENANCE);
 	$cmbConf->addItem(4,S_APPLICATIONS);
-
 
 	switch($_REQUEST['config']){
 		case 0:
