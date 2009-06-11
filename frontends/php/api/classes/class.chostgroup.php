@@ -91,7 +91,7 @@ class CHostGroup {
 					'with_monitored_httptests'=>	0,
 					'with_graphs'=>					0,
 					'only_current_node' =>			0,
-					'pattern' =>					0,
+					'pattern' =>					'',
 					'order' =>						0,
 					'limit' =>						0,
 				);	
@@ -118,7 +118,7 @@ class CHostGroup {
 		}
 		
 // groups
-		if($def_options['groupids']){
+		if($def_options['groupids'] != 0){
 			zbx_value2array($def_options['groupids']);
 			$def_sql['where'][] = DBcondition('g.groupid',$def_options['groupids']);			
 		}
@@ -139,7 +139,7 @@ class CHostGroup {
 		else if($def_options['not_proxy_hosts'])
 			$def_sql['where'][] = 'h.status<>'.HOST_STATUS_PROXY;
 
-		if($def_options['hostids']){
+		if($def_options['hostids'] != 0){
 			zbx_value2array($def_options['hostids']);
 			$def_sql['where'][] = DBcondition('h.hostid',$def_options['hostids']);
 		}

@@ -36,7 +36,7 @@ class CTemplate {
 			'with_items' =>			0,
 			'with_triggers' =>		0,
 			'with_graphs' =>		0,
-			'pattern' =>			0,
+			'pattern' =>			'',
 			'order' =>				0,
 			'limit' =>				0,
 		);
@@ -54,7 +54,7 @@ class CTemplate {
 		}
 
 // groups
-		if($def_options['groupids']){
+		if($def_options['groupids'] != 0){
 			zbx_value2array($def_options['groupids']);
 
 		$def_sql['from'][] = 'hosts_groups hg';
@@ -63,7 +63,7 @@ class CTemplate {
 		}
 
 // templateids 
-		if($def_options['templateids']){
+		if($def_options['templateids'] != 0){
 			zbx_value2array($def_options['templateids']);
 
 			$def_sql['where'][] = DBcondition('h.hostid',$def_options['templateids']);
