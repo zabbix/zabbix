@@ -67,7 +67,7 @@ class CHostGroup {
 	public static function get($params){
 		
 		$def_sql = array(
-					'select' =>	array('g.groupid','g.name'),
+					'select' =>	array(),
 					'from' =>	array('groups g'),
 					'where' =>	array(),
 					'order' =>	array(),
@@ -91,6 +91,7 @@ class CHostGroup {
 					'with_monitored_httptests'=>	0,
 					'with_graphs'=>					0,
 					'only_current_node' =>			0,
+					'count'	=>						0,
 					'pattern' =>					'',
 					'order' =>						0,
 					'limit' =>						0,
@@ -227,6 +228,14 @@ class CHostGroup {
 											' AND i.itemid=gi.itemid)';
 		}
 
+// count
+		if($def_options['count']){
+			$def_sql['select'][] = 'COUNT(g.groupid) as rowscount';
+		}
+		else{
+			$def_sql['select'][] = 'g.groupid';
+			$def_sql['select'][] = 'g.name';
+		}
 // order
 		if(str_in_array($def_options['order'], array('group','groupid'))){
 			$def_sql['order'][] = 'g.'.$def_options['order'];
@@ -263,7 +272,10 @@ class CHostGroup {
 				$sql_order;
 		$res = DBselect($sql,$sql_limit);
 		while($group = DBfetch($res)){
-			$result[$group['groupid']] = $group;			
+			if($def_options['count']) 
+				$result = $group;
+			else 
+				$result[$group['groupid']] = $group;
 		}
 	return $result;
 	}

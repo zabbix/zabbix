@@ -105,14 +105,20 @@ include_once('include/page_header.php');
 // Find Host groups
 	$params = array(
 				'pattern' => $search,
+				'limit' => $rows_per_page,
+				'order' => 'name',
 				);
 				
 	$db_hostGroups = CHostGroup::get($params);
-
 	$hostGroups = selectByPattern($db_hostGroups, 'name', $search, $rows_per_page);
-	order_result($hostGroups, 'name', ZBX_SORT_UP);
 	
-	$overalCount = count($db_hostGroups);
+	$params = array(
+				'pattern' => $search,
+				'count' => 1,
+				);
+	$groups_count = CHostGroup::get($params);
+	
+	$overalCount = $groups_count['rowscount'];
 	$viewCount = count($hostGroups);
 	
 	$header = array(
@@ -152,12 +158,11 @@ include_once('include/page_header.php');
 // FIND Hosts
 	$params = array(
 				'pattern' => $search,
+				'limit' => $rows_per_page,
+				'order' => 'host',
 				);
-				
 	$db_hosts = CHost::get($params);
-	
 	$hosts = selectByPattern($db_hosts, 'host', $search, $rows_per_page);
-	order_result($hosts, 'host', ZBX_SORT_UP);
 	
 	$hostids = array_keys($hosts);
 	$hostsgroups = array();
@@ -167,7 +172,13 @@ include_once('include/page_header.php');
 		$hostsgroups[$hostgroup['hostid']] = $hostgroup['groupid'];
 	}
 	
-	$overalCount = count($db_hosts);
+	$params = array(
+				'pattern' => $search,
+				'count' => 1,
+				);
+	$hosts_count = CHost::get($params);
+	
+	$overalCount = $hosts_count['rowscount'];
 	$viewCount = count($hosts);
 	
 	$header = array(
@@ -226,11 +237,12 @@ include_once('include/page_header.php');
 	if($admin){
 		$params = array(
 					'pattern' => $search,
+					'limit' => $rows_per_page,
+					'order' => 'host',
 					);
 					
 		$db_templates = CTemplate::get($params);
 		$templates = selectByPattern($db_templates, 'host', $search, $rows_per_page);
-		order_result($templates, 'host', ZBX_SORT_UP);
 		
 		$templateids = array_keys($templates);
 		$hostsgroups = array();	
@@ -240,7 +252,13 @@ include_once('include/page_header.php');
 			$hostsgroups[$templategroup['hostid']] = $templategroup['groupid'];
 		}
 	
-		$overalCount = count($db_templates);
+		$params = array(
+					'pattern' => $search,
+					'count' => 1,
+					);
+		$hosts_count = CTemplate::get($params);
+		
+		$overalCount = $hosts_count['rowscount'];
 		$viewCount = count($templates);
 		
 		$header = array(
