@@ -105,7 +105,6 @@ include_once('include/page_header.php');
 // Find Host groups
 	$params = array(
 				'pattern' => $search,
-				'with_items' => 1,
 				);
 				
 	$db_hostGroups = CHostGroup::get($params);
@@ -153,7 +152,6 @@ include_once('include/page_header.php');
 // FIND Hosts
 	$params = array(
 				'pattern' => $search,
-				'with_items' => 1,
 				);
 				
 	$db_hosts = CHost::get($params);
@@ -228,7 +226,6 @@ include_once('include/page_header.php');
 	if($admin){
 		$params = array(
 					'pattern' => $search,
-					'with_items' => 1,
 					);
 					
 		$db_templates = CTemplate::get($params);
