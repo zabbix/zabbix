@@ -3008,8 +3008,8 @@
 
 //		validate_group(PERM_READ_WRITE,array('real_hosts'),'web.last.conf.groupid');
 
-		$cmbGroups = new CComboBox('groupid',get_request('groupid',0),'submit()');
-		$cmbGroups->addItem(0,S_ALL_S);
+		$cmbGroups = new CComboBox('groupid_tb',get_request('groupid_tb',0),'submit()');
+//		$cmbGroups->addItem(0,S_ALL_S);
 		$sql = 'SELECT DISTINCT g.groupid,g.name '.
 				' FROM groups g,hosts_groups hg,hosts h '.
 				' WHERE '.DBcondition('g.groupid',$available_groups).
@@ -3052,9 +3052,9 @@
 
 		$sql_from = '';
 		$sql_where = '';
-		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0)){
+		if(isset($_REQUEST['groupid_tb']) && ($_REQUEST['groupid_tb']>0)){
 			$sql_from .= ', hosts_groups hg ';
-			$sql_where .= ' AND hg.groupid='.$_REQUEST['groupid'].
+			$sql_where .= ' AND hg.groupid='.$_REQUEST['groupid_tb'].
 							' AND h.hostid=hg.hostid ';
 		}
 
@@ -5943,33 +5943,55 @@
 
 // Insert form for Host Groups
 	function insert_hostgroups_form(){
-	
-		global	$USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
+		global $USER_DETAILS;
+		
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
 
-		$hosts = get_request('hosts',array());
+		$hosts_in = get_request('hosts',array());
+		
 		$frm_title = S_HOST_GROUP;
+
 		if($_REQUEST['groupid']>0){
 			$group = get_hostgroup_by_groupid($_REQUEST['groupid']);
-			$frm_title = S_HOST_GROUP.' ['.$group["name"].']';
+			$name = $group["name"];
+			$frm_title .= ' ['.$group["name"].']';	
 		}
 
-		if(($_REQUEST['groupid']>0) && !isset($_REQUEST["form_refresh"])){
-			$name=$group["name"];
-			$db_hosts=DBselect('SELECT DISTINCT h.hostid,host '.
-					' FROM hosts h, hosts_groups hg '.
-					' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-						' AND h.hostid=hg.hostid '.
-						' AND hg.groupid='.$_REQUEST['groupid'].
-					' ORDER BY host');
-			while($db_host=DBfetch($db_hosts)){
-				if(uint_in_array($db_host['hostid'],$hosts)) continue;
-				array_push($hosts, $db_host['hostid']);
-			}
+		if(isset($_REQUEST["form_refresh"])){
+			$sql = 'SELECT DISTINCT h.hostid,host '.
+					' FROM hosts h'.
+					' WHERE '.DBcondition('h.hostid', $hosts_in).
+					' ORDER BY host';
 		}
 		else{
-			$name=get_request("gname","");
+			$sql = 'SELECT DISTINCT h.hostid,host '.
+				' FROM hosts h, hosts_groups hg '.
+				' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
+					' AND h.hostid=hg.hostid '.
+					' AND hg.groupid='.$_REQUEST['groupid'].
+				' ORDER BY host';
 		}
+		$db_hosts = DBselect($sql);
+		while($db_host=DBfetch($db_hosts)){
+			$hosts_in[$db_host['hostid']] = $db_host['hostid'];
+		}
+		
+		// if(($_REQUEST['groupid']>0) && !isset($_REQUEST["form_refresh"])){
+			// $name=$group["name"];
+			// $db_hosts=DBselect('SELECT DISTINCT h.hostid,host '.
+					// ' FROM hosts h, hosts_groups hg '.
+					// ' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
+						// ' AND h.hostid=hg.hostid '.
+						// ' AND hg.groupid='.$_REQUEST['groupid'].
+					// ' ORDER BY host');
+			// while($db_host=DBfetch($db_hosts)){
+				// if(uint_in_array($db_host['hostid'],$hosts)) continue;
+				// array_push($hosts, $db_host['hostid']);
+			// }
+		// }
+		// else{
+			// $name=get_request("gname","");
+		// }
 
 		$frmHostG = new CFormTable($frm_title,"hosts.php");
 		$frmHostG->SetHelp("web.hosts.group.php");
@@ -5981,20 +6003,41 @@
 
 		$frmHostG->addRow(S_GROUP_NAME,new CTextBox("gname",$name,48));
 
-		$cmbHosts = new CTweenBox($frmHostG,'hosts',$hosts, 25);
-		$db_hosts=DBselect('SELECT DISTINCT hostid,host '.
-				' FROM hosts '.
-				' WHERE status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-					' AND '.DBcondition('hostid',$available_hosts).
-				' ORDER BY host');
+		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
+		
+		$selected_grp = get_request('groupid_tb', 0);
+		$selected_grp = isset($available_groups[$selected_grp]) ? $selected_grp :  reset($available_groups);
 
+		$cmbGroups = new CComboBox('groupid_tb', $selected_grp, 'submit()');
+		$sql = 'SELECT DISTINCT g.groupid, g.name '.
+				' FROM groups g, hosts_groups hg, hosts h '.
+				' WHERE '.DBcondition('g.groupid',$available_groups).
+					' AND g.groupid=hg.groupid '.
+					' AND h.hostid=hg.hostid'.
+					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
+				' ORDER BY g.name';
+		$result=DBselect($sql);
+		while($row=DBfetch($result)){
+			$cmbGroups->addItem($row['groupid'],$row['name']);
+		}
+		
+		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts_in, 25);
+		
+		$db_hosts=DBselect('SELECT DISTINCT h.hostid, h.host '.
+				' FROM hosts h, hosts_groups hg '.
+				' WHERE (status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
+					' AND '.DBcondition('h.hostid',$available_hosts).
+					' AND hg.groupid='.$selected_grp.
+					' AND h.hostid=hg.hostid)'.
+					' OR '.DBcondition('h.hostid', $hosts_in).
+				' ORDER BY h.host');
 		while($db_host=DBfetch($db_hosts)){
 			$cmbHosts->addItem(
 					$db_host['hostid'],
 					get_node_name_by_elid($db_host['hostid']).$db_host["host"]
 					);
 		}
-		$frmHostG->addRow(S_HOSTS,$cmbHosts->Get(S_HOSTS.SPACE.S_IN,S_OTHER.SPACE.S_HOSTS));
+		$frmHostG->addRow(S_HOSTS,$cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
 
 		$frmHostG->addItemToBottomRow(new CButton("save",S_SAVE));
 		if($_REQUEST['groupid']>0){
@@ -6152,7 +6195,8 @@
 // END:   HOSTS PROFILE EXTENDED Section
 
  	function insert_template_form($available_hosts){
-
+		global $USER_DETAILS;
+	
  		$frm_title = S_TEMPLATE_LINKAGE;
 
  		if($_REQUEST['hostid']>0){
@@ -6166,6 +6210,25 @@
  		else{
  			$name=get_request("tname",'');
  		}
+		
+		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
+		
+		$selected_grp = get_request('groupid_tb', 0);
+		$selected_grp = isset($available_groups[$selected_grp]) ? $selected_grp :  reset($available_groups);
+
+		$cmbGroups = new CComboBox('groupid_tb', $selected_grp, 'submit()');
+//		$cmbGroups->addItem(0,S_ALL_S);
+		$sql = 'SELECT DISTINCT g.groupid, g.name '.
+				' FROM groups g, hosts_groups hg, hosts h '.
+				' WHERE '.DBcondition('g.groupid',$available_groups).
+					' AND g.groupid=hg.groupid '.
+					' AND h.hostid=hg.hostid'.
+					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
+				' ORDER BY g.name';
+		$result=DBselect($sql);
+		while($row=DBfetch($result)){
+			$cmbGroups->addItem($row['groupid'],$row['name']);
+		}
 
  		$frmHostT = new CFormTable($frm_title,'hosts.php');
  		$frmHostT->setHelp('web.hosts.group.php');
@@ -6177,23 +6240,45 @@
  		$frmHostT->addRow(S_TEMPLATE,new CTextBox('tname',$name,60,'yes'));
 
 		$hosts_in_tpl = array();
-		$sql = 'SELECT DISTINCT h.hostid,h.host '.
-			' FROM hosts h,hosts_templates ht'.
- 			' WHERE ht.templateid='.$_REQUEST['hostid'].
-				' AND h.hostid=ht.hostid'.
-				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
- 				' AND '.DBcondition('h.hostid',$available_hosts).
- 			' ORDER BY h.host';
- 		$db_hosts=DBselect($sql);
- 		while($db_host=DBfetch($db_hosts)){
-			$hosts_in_tpl[$db_host['hostid']] = $db_host['hostid'];
- 		}
+		$sql_where = '';
+		if(isset($_REQUEST['form_refresh'])){
+		
+			$saved_hosts = get_request('hosts', array());
+			$hosts_in_tpl = array_intersect($available_hosts, $saved_hosts);
 
- 		$cmbHosts = new CTweenBox($frmHostT,'hosts',$hosts_in_tpl,6);
+			$sql = 'SELECT DISTINCT h.hostid,h.host '.
+				' FROM hosts h'.
+				' WHERE '.DBcondition('h.hostid',$hosts_in_tpl).
+				' ORDER BY h.host';
+			$db_hosts=DBselect($sql);
+			while($db_host=DBfetch($db_hosts)){
+				$hosts_in_tpl[$db_host['hostid']] = $db_host['hostid'];
+			}
+		}
+		else{
+			$sql = 'SELECT DISTINCT h.hostid,h.host '.
+				' FROM hosts h,hosts_templates ht'.
+				' WHERE (ht.templateid='.$_REQUEST['hostid'].
+					' AND h.hostid=ht.hostid'.
+					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
+					' AND '.DBcondition('h.hostid',$available_hosts).' )'.
+				' ORDER BY h.host';
+			$db_hosts=DBselect($sql);
+			while($db_host=DBfetch($db_hosts)){
+				$hosts_in_tpl[$db_host['hostid']] = $db_host['hostid'];
+			}
+		}
+		
+ 		$cmbHosts = new CTweenBox($frmHostT,'hosts',$hosts_in_tpl,25);
+
+		
 		$sql = 'SELECT DISTINCT h.hostid,h.host '.
-			' FROM hosts h'.
- 			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
+			' FROM hosts h, hosts_groups hg'.
+ 			' WHERE ( h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
  				' AND '.DBcondition('h.hostid',$available_hosts).
+				' AND hg.groupid='.$selected_grp.
+				' AND h.hostid=hg.hostid)'.
+				' OR '.DBcondition('h.hostid', $hosts_in_tpl).
  			' ORDER BY h.host';
  		$db_hosts=DBselect($sql);
 
@@ -6201,7 +6286,7 @@
  			$cmbHosts->addItem($db_host['hostid'],get_node_name_by_elid($db_host['hostid']).$db_host['host']);
  		}
 
- 		$frmHostT->addRow(S_HOSTS,$cmbHosts->Get(S_HOSTS.SPACE.S_IN,S_OTHER.SPACE.S_HOSTS));
+ 		$frmHostT->addRow(S_HOSTS,$cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
 
  		$frmHostT->addItemToBottomRow(new CButton('save',S_SAVE));
  		$frmHostT->addItemToBottomRow(SPACE);
