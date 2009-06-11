@@ -20,97 +20,18 @@
 #include "common.h"
 #include "log.h"
 #include "base64.h"
+#include "db.h"
 
 #if defined (_WINDOWS)
 char ZABBIX_SERVICE_NAME[64] = {APPLICATION_NAME};
 char ZABBIX_EVENT_SOURCE[64] = {APPLICATION_NAME};
 #endif /* _WINDOWS */
 
-/******************************************************************************
- *                                                                            *
- * Function: comms_create_request                                             *
- *                                                                            *
- * Purpose: dinamical xml request generation                                  *
- *                                                                            *
- * Return value: XML request                                                  *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:  required free allocated string with function 'zbx_free'         *
- *                                                                            *
- ******************************************************************************/
-char*	comms_create_request(
-	const char		*host,
-	const char		*key,
-	const char		*data,
-	long			*lastlogsize,
-	unsigned long	*timestamp,
-	const char		*source,
-	unsigned short	*severity
-	)
+int	comms_parse_response(char *xml, char *host, char *key, char *data, char *lastlogsize, char *timestamp,
+	       char *source, char *severity)
 {
-#define ADD_XML_DATA(tag_name, var) \
-	data_b64[0] = '\0'; \
-	str_base64_encode(var, data_b64, (int)strlen(var)); \
-	request = zbx_strdcatf(request, "<" tag_name ">%s</" tag_name ">",	data_b64)
-
-	char data_b64[ZBX_MAX_B64_LEN];
-	char *tmp_str = NULL;
-	char *request = NULL;
-	
-	assert(host);
-	assert(key);
-	assert(data);
-
-	/* zabbix_log(LOG_LEVEL_DEBUG, "comms_create_request host [%s] key [%s] data [%s]",host,key,data); */
-
-	memset(data_b64,0,sizeof(data_b64));
-
-	request = zbx_dsprintf(NULL,"%s", "<req>");
-	
-	ADD_XML_DATA("host",	host);
-	ADD_XML_DATA("key",		key);
-	ADD_XML_DATA("data",	data);
-
-	if(lastlogsize)
-	{
-		tmp_str = zbx_dsprintf(NULL, "%li", *lastlogsize);
-		ADD_XML_DATA("lastlogsize",	tmp_str);
-		zbx_free(tmp_str);
-	}
-
-	if(timestamp)
-	{
-		assert(source);
-		assert(severity);
-		
-		tmp_str = zbx_dsprintf(NULL, "%lu", *timestamp);
-		ADD_XML_DATA("timestamp",	tmp_str);
-		zbx_free(tmp_str);
-
-		ADD_XML_DATA("source",		source);
-
-		tmp_str = zbx_dsprintf(NULL, "%u", *severity);
-		ADD_XML_DATA("severity",	tmp_str);
-		zbx_free(tmp_str);
-	}
-
-	return zbx_strdcat(request, "</req>");
-}
-
-int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastlogsize, char *timestamp,
-	       char *source, char *severity, int maxlen)
-{
-	int ret = SUCCEED;
-	int i;
-
-	char host_b64[MAX_STRING_LEN];
-	char key_b64[MAX_STRING_LEN];
-	char data_b64[MAX_STRING_LEN];
-	char lastlogsize_b64[MAX_STRING_LEN];
-	char timestamp_b64[MAX_STRING_LEN];
-	char source_b64[ZBX_MAX_B64_LEN];
-	char severity_b64[MAX_STRING_LEN];
+	int	i, ret = SUCCEED;
+	char	*data_b64 = NULL;
 
 	assert(key);
 	assert(host);
@@ -120,37 +41,54 @@ int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastl
 	assert(source);
 	assert(severity);
 
-	memset(host_b64,0,sizeof(host_b64));
-	memset(key_b64,0,sizeof(key_b64));
-	memset(data_b64,0,sizeof(data_b64));
-	memset(lastlogsize_b64,0,sizeof(lastlogsize_b64));
-	memset(timestamp_b64,0,sizeof(timestamp_b64));
-	memset(source_b64,0,sizeof(source_b64));
-	memset(severity_b64,0,sizeof(severity_b64));
+	if (SUCCEED == xml_get_data_dyn(xml, "host", &data_b64))
+	{
+		str_base64_decode(data_b64, host, HOST_HOST_LEN, &i);
+		host[i] = '\0';
+		xml_free_data_dyn(&data_b64);
+	}
 
-	xml_get_data(xml, "host", host_b64, sizeof(host_b64)-1);
-	xml_get_data(xml, "key", key_b64, sizeof(key_b64)-1);
-	xml_get_data(xml, "data", data_b64, sizeof(data_b64)-1);
-	xml_get_data(xml, "lastlogsize", lastlogsize_b64, sizeof(lastlogsize_b64)-1);
-	xml_get_data(xml, "timestamp", timestamp_b64, sizeof(timestamp_b64)-1);
-	xml_get_data(xml, "source", source_b64, sizeof(source_b64)-1);
-	xml_get_data(xml, "severity", severity_b64, sizeof(severity_b64)-1);
+	if (SUCCEED == xml_get_data_dyn(xml, "key", &data_b64))
+	{
+		str_base64_decode(data_b64, key, ITEM_KEY_LEN, &i);
+		key[i] = '\0';
+		xml_free_data_dyn(&data_b64);
+	}
 
-	memset(key,0,maxlen);
-	memset(host,0,maxlen);
-	memset(data,0,maxlen);
-	memset(lastlogsize,0,maxlen);
-	memset(timestamp,0,maxlen);
-	memset(source,0,maxlen);
-	memset(severity,0,maxlen);
+	if (SUCCEED == xml_get_data_dyn(xml, "data", &data_b64))
+	{
+		str_base64_decode(data_b64, data, MAX_BUF_LEN - 1, &i);
+		data[i] = '\0';
+		xml_free_data_dyn(&data_b64);
+	}
 
-	str_base64_decode(host_b64, host, &i);
-	str_base64_decode(key_b64, key, &i);
-	str_base64_decode(data_b64, data, &i);
-	str_base64_decode(lastlogsize_b64, lastlogsize, &i);
-	str_base64_decode(timestamp_b64, timestamp, &i);
-	str_base64_decode(source_b64, source, &i);
-	str_base64_decode(severity_b64, severity, &i);
+	if (SUCCEED == xml_get_data_dyn(xml, "lastlogsize", &data_b64))
+	{
+		str_base64_decode(data_b64, lastlogsize, 10, &i);
+		lastlogsize[i] = '\0';
+		xml_free_data_dyn(&data_b64);
+	}
+
+	if (SUCCEED == xml_get_data_dyn(xml, "timestamp", &data_b64))
+	{
+		str_base64_decode(data_b64, timestamp, 10, &i);
+		timestamp[i] = '\0';
+		xml_free_data_dyn(&data_b64);
+	}
+
+	if (SUCCEED == xml_get_data_dyn(xml, "source", &data_b64))
+	{
+		str_base64_decode(data_b64, source, HISTORY_LOG_SOURCE_LEN, &i);
+		source[i] = '\0';
+		xml_free_data_dyn(&data_b64);
+	}
+
+	if (SUCCEED == xml_get_data_dyn(xml, "severity", &data_b64))
+	{
+		str_base64_decode(data_b64, severity, 10, &i);
+		severity[i] = '\0';
+		xml_free_data_dyn(&data_b64);
+	}
 
 	return ret;
 }
