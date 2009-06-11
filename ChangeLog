@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-840] added displaying of text items in the latest data screen (Sasha)
  - [DEV-137] updated Japanese translation. Thanks to Kodai. (Alexei)
  - [ZBX-850] zabbix version removed from locales (Artem)
  - [ZBX-947] fixed various typos and formatting errors in changelog (Richlv)

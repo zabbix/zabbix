@@ -1267,33 +1267,20 @@ COpt::profiling_stop('prepare table');
 	}
 	
 	function format_lastvalue($db_item){
-		if($db_item["value_type"] == ITEM_VALUE_TYPE_LOG){
-			$row=DBfetch(DBselect('SELECT value FROM history_log WHERE itemid='.$db_item['itemid'].' ORDER BY clock DESC', 1));
-			if($row){
-				$lastvalue=/*nbsp(htmlspecialchars(*/$row['value']/*))*/;
-				if(strlen($lastvalue) > 20)
-					$lastvalue = substr($lastvalue,0,20)." ...";
-				$lastvalue = nbsp(htmlspecialchars($lastvalue));
-			}
-			else{
-				$lastvalue='-';
-			}
-
-		}
-		else if(isset($db_item["lastvalue"])){
+		if(isset($db_item["lastvalue"])){
 			if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT){
 				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
 			}
 			else if($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64){
 				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
 			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_TEXT){
-				$lastvalue="...";
-			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_STR){
-					$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)));
-					if(strlen($db_item["lastvalue"]) > 20)
-						$lastvalue .= " ...";
+			else if($db_item["value_type"] == ITEM_VALUE_TYPE_STR ||
+					$db_item["value_type"] == ITEM_VALUE_TYPE_TEXT ||
+					$db_item["value_type"] == ITEM_VALUE_TYPE_LOG){
+				$lastvalue=$db_item["lastvalue"];
+				if(strlen($lastvalue) > 20)
+					$lastvalue = substr($lastvalue,0,20)." ...";
+				$lastvalue = nbsp(htmlspecialchars($lastvalue));
 			}
 			else{
 				$lastvalue="Unknown value type";
