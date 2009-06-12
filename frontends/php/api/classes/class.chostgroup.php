@@ -32,7 +32,7 @@ class CHostGroup {
 	}
 	
 	/**
-	 * Get host group id by group name
+	 * Get HostGroup ID by group name
 	 *
 	 * <code>
 	 * $group_data = array(
@@ -42,7 +42,7 @@ class CHostGroup {
 	 *
 	 * @static
 	 * @param array $group_data
-	 * @return int|boolean host group data as array or false if error
+	 * @return string|boolean HostGroup ID or false if error
 	 */
 	public static function getId($group_data){
 		$sql = 'SELECT groupid FROM groups WHERE name='.zbx_dbstr($group_data['name']).' AND '.DBin_node('groupid', get_current_nodeid(false));

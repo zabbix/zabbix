@@ -12,6 +12,137 @@ class CItem {
 	public static $error;
 
 	/**
+	 * Get items data 
+	 *
+	 * <code>
+	 * $options = array(
+	 *	array 'itemids' 			=> array(),
+	 *	array 'hostids' 			=> array(),
+	 *	array 'groupids' 			=> array(),
+	 *	array 'triggerids' 			=> array(),
+	 *	array 'applicationids' 		=> array(),
+	 *	boolean 'status' 			=> false,
+	 *	boolean 'templated_items' 	=> false,
+	 *	boolean 'count'				=> false,
+	 *	string 'pattern'			=> '',
+	 *	int 'limit' 				=> null,
+	 *	string 'order' 				=> ''
+	 * );
+	 * </code>
+	 *
+	 * @static
+	 * @param array $options 
+	 * @return array|int item data as array or false if error
+	 */
+	public static function get($options=array()){
+
+		$result = array();
+		
+		$sort_columns = array('itemid'); // allowed columns for sorting
+
+		$sql_parts = array(
+			'select' => array('i.itemid, i.type, i.description, i.key_, i.status'),
+			'from' => array('items i'),
+			'where' => array('i.type<>9'),
+			'order' => array(),
+			'limit' => null,
+			);
+		
+		$def_options = array(
+			'itemids' 			=> array(),
+			'hostids' 			=> array(),
+			'groupids' 			=> array(),
+			'triggerids' 		=> array(),
+			'applicationids' 	=> array(),
+			'status' 			=> false,
+			'templated_items' 	=> false,
+			'count'				=> false,
+			'pattern'			=> '',
+			'limit' 			=> null,
+			'order' 			=> ''
+		);
+		
+		$options = array_merge($def_options, $options);
+
+		// restrict not allowed columns for sorting 
+		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
+		
+// count
+		if($options['count']){
+			$sql_parts['select'] = array('count(i.itemid) as count');
+		}
+// itemids
+		if($options['itemids']){
+			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
+		}
+// hostids
+		if($options['hostids']){
+			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
+		}
+// groupids
+		if($options['groupids']){
+			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sql_parts['where'][] = 'hg.hostid=i.hostid';			
+			$sql_parts['from'][] = 'hosts_groups hg';	
+		}
+// triggerids
+		if($options['triggerids']){
+			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sql_parts['where'][] = 'i.itemid=f.itemid';			
+			$sql_parts['from'][] = 'functions f';	
+		}
+// applicationids
+		if($options['applicationids']){
+			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
+			$sql_parts['where'][] = 'i.hostid=a.hostid';			
+			$sql_parts['from'][] = 'applications a';	
+		}
+// status
+		if($options['status'] !== false){
+			$sql_parts['where'][] = 'i.status='.$options['status'];
+		}	
+// templated_items
+		if($options['templated_items']){
+			$sql_parts['where'][] = 'i.templateid=0';				
+		}
+// pattern
+		if(!zbx_empty($options['pattern'])){
+			$sql_parts['where'][] = ' i.description LIKE '.zbx_dbstr('%'.$options['pattern'].'%');
+		}
+// order
+		if(!zbx_empty($options['order'])){
+			$sql_parts['order'][] = 'i.'.$options['order'];
+		}		
+// limit
+		if(zbx_ctype_digit($options['limit']) && $options['limit']){
+			$sql_parts['limit'] = $options['limit'];
+		}
+	
+	
+		$sql_select = implode(',', $sql_parts['select']);
+		$sql_from = implode(',', $sql_parts['from']);
+		$sql_where = implode(' AND ', $sql_parts['where']);
+		$sql_order = zbx_empty($options['order']) ? '' : ' ORDER BY '.implode(',', $sql_parts['order']);
+		$sql_limit = $sql_parts['limit'];
+
+		
+		$sql = 'SELECT DISTINCT '.$sql_select.
+			' FROM '.$sql_from.
+			' WHERE '.$sql_where.
+			$sql_order; 
+		$db_res = DBselect($sql, $sql_limit);
+		
+		while($item = DBfetch($db_res)){
+			if($options['count']) 
+				$result = $item;
+			else 
+				$result[$item['itemid']] = $item;
+		}
+		
+	return $result;
+	}
+	
+	/**
 	 * Gets all item data from DB by itemid
 	 *
 	 * @static

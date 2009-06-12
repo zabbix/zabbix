@@ -131,7 +131,7 @@ public static $result;
 				return; //exit function
 		}
 		
-		if($result){
+		if($result !== false){
 			self::$result = array('result' => $result);
 		}
 		else{
@@ -180,7 +180,7 @@ public static $result;
 				return; //exit function
 		}
 		
-		if($result){
+		if($result !== false){
 			self::$result = array('result' => $result);
 		}
 		else{
@@ -220,7 +220,7 @@ public static $result;
 				return; //exit function
 		}
 		
-		if($result){
+		if($result !== false){
 			self::$result = array('result' => $result);
 		}
 		else{
@@ -236,6 +236,9 @@ public static $result;
 		switch($action){
 			case 'add':
 				$result = CItem::add($params);
+				break;
+			case 'get':
+				$result = CItem::get($params);
 				break;
 			case 'getById':
 				$result = CItem::getById($params);
@@ -254,7 +257,7 @@ public static $result;
 				return; //exit function
 		}
 		
-		if($result){
+		if($result !== false){
 			self::$result = array('result' => $result);
 		}
 		else{
@@ -269,6 +272,9 @@ public static $result;
 		switch($action){
 			case 'add':
 				$result = CTrigger::add($params);
+				break;
+			case 'get':
+				$result = CTrigger::get($params);
 				break;
 			case 'getById':
 				$result = CTrigger::getById($params);
@@ -287,7 +293,7 @@ public static $result;
 				return; //exit function
 		}
 		
-		if($result){
+		if($result !== false){
 			self::$result = array('result' => $result);
 		}
 		else{
