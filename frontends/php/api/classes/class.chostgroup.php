@@ -125,7 +125,7 @@ class CHostGroup {
 		}
 		
 		if(!zbx_empty($def_options['pattern'])){
-			$def_sql['where'][] = ' g.name LIKE '.zbx_dbstr('%'.$def_options['pattern'].'%');
+			$def_sql['where'][] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.strtoupper($def_options['pattern']).'%');
 		}
 
 // hosts

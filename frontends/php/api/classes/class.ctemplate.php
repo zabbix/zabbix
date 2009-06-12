@@ -71,7 +71,7 @@ class CTemplate {
 		}
 		
 		if(!zbx_empty($def_options['pattern'])){
-			$def_sql['where'][] = ' h.host LIKE '.zbx_dbstr('%'.$def_options['pattern'].'%');
+			$def_sql['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.strtoupper($def_options['pattern']).'%');
 		}
 
 // hosts 
