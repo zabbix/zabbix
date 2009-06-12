@@ -104,6 +104,7 @@ include_once('include/page_header.php');
 
 // Find Host groups
 	$params = array(
+				'nodeid'=> get_current_nodeid(),
 				'pattern' => $search,
 				'limit' => $rows_per_page,
 				'order' => 'name',
@@ -113,6 +114,7 @@ include_once('include/page_header.php');
 	$hostGroups = selectByPattern($db_hostGroups, 'name', $search, $rows_per_page);
 	
 	$params = array(
+				'nodeid'=> get_current_nodeid(),
 				'pattern' => $search,
 				'count' => 1,
 				);
@@ -157,6 +159,7 @@ include_once('include/page_header.php');
 	
 // FIND Hosts
 	$params = array(
+				'nodeid'=> get_current_nodeid(),
 				'pattern' => $search,
 				'limit' => $rows_per_page,
 				'order' => 'host',
@@ -173,6 +176,7 @@ include_once('include/page_header.php');
 	}
 	
 	$params = array(
+				'nodeid'=> get_current_nodeid(),
 				'pattern' => $search,
 				'count' => 1,
 				);
@@ -236,6 +240,7 @@ include_once('include/page_header.php');
 // FIND Templates
 	if($admin){
 		$params = array(
+					'nodeid'=> get_current_nodeid(),
 					'pattern' => $search,
 					'limit' => $rows_per_page,
 					'order' => 'host',
@@ -253,6 +258,7 @@ include_once('include/page_header.php');
 		}
 	
 		$params = array(
+					'nodeid'=> get_current_nodeid(),
 					'pattern' => $search,
 					'count' => 1,
 					);
