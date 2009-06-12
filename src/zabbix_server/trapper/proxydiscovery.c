@@ -77,8 +77,6 @@ int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	hosttime = atoi(tmp);
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)) {
-		memset(&dhost, 0, sizeof(dhost));
-
 		p = NULL;
 		while (NULL != (p = zbx_json_next(&jp_data, p)) && SUCCEED == res) {
 			if (FAIL == (res = zbx_json_brackets_open(p, &jp_row)))
@@ -124,10 +122,7 @@ int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			dhost.druleid = dcheck.druleid;
 
 			if (dcheck.type == -1)
-			{
-				register_host(&dhost, ip, dcheck.status);
-				update_host_status(&dhost, dcheck.status, itemtime);
-			}
+				update_host(&dhost, ip, dcheck.status, itemtime);
 			else
 				update_service(&dhost, &dcheck, ip, port, itemtime);
 
