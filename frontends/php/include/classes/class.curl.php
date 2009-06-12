@@ -138,7 +138,7 @@ class Curl{
 	public function formatQuery(){
 		$query = '';
 		foreach($this->arguments as $key => $value){
-			$query.= $key.'='.$value.'&';
+			if(!is_null($value)) $query.= $key.'='.$value.'&';
 		}
 		$this->query = rtrim($query,'&');
 	}
@@ -152,6 +152,7 @@ class Curl{
 			$args = explode('&',$query);
 			foreach($args as $id => $arg){
 				if(empty($arg)) continue;
+
 				$tmp = explode('=',$arg);
 				$this->arguments[$tmp[0]] = isset($tmp[1])?$tmp[1]:'';
 			}

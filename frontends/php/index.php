@@ -37,7 +37,8 @@ $page['file']	= 'index.php';
 		'reconnect'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),NULL),
 		'enter'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,		NULL),
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,  NULL,   	NULL),
-		'form_refresh'=>	array(T_ZBX_INT, O_OPT, NULL,   NULL,   	NULL)
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT, NULL,   NULL,   	NULL),
+		'request'=>			array(T_ZBX_STR, O_OPT, NULL, 	NULL,   	NULL),
 	);
 	check_fields($fields);
 ?>
@@ -70,7 +71,8 @@ $page['file']	= 'index.php';
 			access_deny();
 		}
 	}
-	
+
+	$request = get_request('request');	
 	if(isset($_REQUEST['enter'])&&($_REQUEST['enter']=='Enter')){
 		
 		$name = get_request('name','');
@@ -79,7 +81,8 @@ $page['file']	= 'index.php';
 		$login = user_login($name, $passwd, $authentication_type);
 		
 		if($login){
-			redirect($USER_DETAILS['url']);
+			$url = is_null($request)?$USER_DETAILS['url']:$request;
+			redirect($url);
 			exit();
 		}
 	}
@@ -98,6 +101,7 @@ include_once('include/page_header.php');
 //	konqueror bug #138024; adding useless param(login=1) to the form's action path to avoid bug!!
 				$frmLogin = new CFormTable('Login','index.php?login=1','post','multipart/form-data');
 				$frmLogin->setHelp('web.index.login');
+				$frmLogin->addVar('request', $request);
 				$frmLogin->addRow('Login name', new CTextBox('name'));
 				$frmLogin->addRow('Password', new CPassBox('password'));
 				$frmLogin->addItemToBottomRow(new CButton('enter','Enter'));
