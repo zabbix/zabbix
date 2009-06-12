@@ -20,15 +20,15 @@
 #include "common.h"
 #include "log.h"
 #include "base64.h"
-#include "db.h"
 
 #if defined (_WINDOWS)
 char ZABBIX_SERVICE_NAME[64] = {APPLICATION_NAME};
 char ZABBIX_EVENT_SOURCE[64] = {APPLICATION_NAME};
 #endif /* _WINDOWS */
 
-int	comms_parse_response(char *xml, char *host, char *key, char *data, char *lastlogsize, char *timestamp,
-	       char *source, char *severity)
+int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key_len, char *data, int data_len,
+		char *lastlogsize, int lastlogsize_len, char *timestamp, int timestamp_len,
+		char *source, int source_len, char *severity, int severity_len)
 {
 	int	i, ret = SUCCEED;
 	char	*data_b64 = NULL;
@@ -43,49 +43,49 @@ int	comms_parse_response(char *xml, char *host, char *key, char *data, char *las
 
 	if (SUCCEED == xml_get_data_dyn(xml, "host", &data_b64))
 	{
-		str_base64_decode(data_b64, host, HOST_HOST_LEN, &i);
+		str_base64_decode(data_b64, host, host_len - 1, &i);
 		host[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
 
 	if (SUCCEED == xml_get_data_dyn(xml, "key", &data_b64))
 	{
-		str_base64_decode(data_b64, key, ITEM_KEY_LEN, &i);
+		str_base64_decode(data_b64, key, key_len - 1, &i);
 		key[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
 
 	if (SUCCEED == xml_get_data_dyn(xml, "data", &data_b64))
 	{
-		str_base64_decode(data_b64, data, MAX_BUF_LEN - 1, &i);
+		str_base64_decode(data_b64, data, data_len - 1, &i);
 		data[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
 
 	if (SUCCEED == xml_get_data_dyn(xml, "lastlogsize", &data_b64))
 	{
-		str_base64_decode(data_b64, lastlogsize, 10, &i);
+		str_base64_decode(data_b64, lastlogsize, lastlogsize_len - 1, &i);
 		lastlogsize[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
 
 	if (SUCCEED == xml_get_data_dyn(xml, "timestamp", &data_b64))
 	{
-		str_base64_decode(data_b64, timestamp, 10, &i);
+		str_base64_decode(data_b64, timestamp, timestamp_len - 1, &i);
 		timestamp[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
 
 	if (SUCCEED == xml_get_data_dyn(xml, "source", &data_b64))
 	{
-		str_base64_decode(data_b64, source, HISTORY_LOG_SOURCE_LEN, &i);
+		str_base64_decode(data_b64, source, source_len - 1, &i);
 		source[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}
 
 	if (SUCCEED == xml_get_data_dyn(xml, "severity", &data_b64))
 	{
-		str_base64_decode(data_b64, severity, 10, &i);
+		str_base64_decode(data_b64, severity, severity_len - 1, &i);
 		severity[i] = '\0';
 		xml_free_data_dyn(&data_b64);
 	}

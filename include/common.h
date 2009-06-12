@@ -711,8 +711,9 @@ int	replace_param(const char *cmd, const char *param, char *out, int outlen);
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
 
-int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastlogsize, char *timestamp,
-	       char *source, char *severity);
+int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key_len, char *data, int data_len,
+		char *lastlogsize, int lastlogsize_len, char *timestamp, int timestamp_len,
+		char *source, int source_len, char *severity, int severity_len);
 
 int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param, int param_max_len);
 

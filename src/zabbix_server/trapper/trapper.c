@@ -647,7 +647,9 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "XML received [%s]", s);
 
-			comms_parse_response(s, host_dec, key_dec, value_dec, lastlogsize, timestamp, source, severity);
+			comms_parse_response(s, host_dec, sizeof(host_dec), key_dec, sizeof(key_dec), value_dec, sizeof(value_dec),
+					lastlogsize, sizeof(lastlogsize), timestamp, sizeof(timestamp), source, sizeof(source),
+					severity, sizeof(severity));
 
 			server		= host_dec;
 			value_string	= value_dec;
