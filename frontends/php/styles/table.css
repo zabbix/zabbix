@@ -1002,10 +1002,7 @@ table.warning{
 }
 
 table.warning td{
-	padding-left:	0;
-	padding-right:	0;
-	padding-top: 	2px;
-	padding-bottom: 2px;
+	padding:	10px;
 	line-height: 20px;
 }
 
@@ -1016,9 +1013,18 @@ table.warning tr.header{
 	color: 			white;
 	font-weight:	bold;
 }
+
+table.warning tr.header td{
+	padding:	2px;
+}
+
 table.warning tr.footer{
 	height:		34px;
 	border-top:	1px black dotted;
+}
+
+table.warning tr.footer td{
+	padding:	2px;
 }
 
 table.warning tr td.left{

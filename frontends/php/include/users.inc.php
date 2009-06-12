@@ -491,7 +491,7 @@
 	return $res;
 	}
 	
-/********************************/
+/**************** MENU ****************/
 	function set_users_jsmenu_array(){
 		$menu_all = array();
 		$menu_gui_access = array();

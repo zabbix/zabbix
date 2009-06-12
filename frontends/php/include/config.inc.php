@@ -205,9 +205,38 @@ function __autoload($class_name){
 	/********** END INITIALIZATION ************/
 
 	function access_deny(){
-
+		global $USER_DETAILS;
 		include_once('include/page_header.php');
-		show_error_message(S_NO_PERMISSIONS);
+		
+		if($USER_DETAILS['alias'] != ZBX_GUEST_USER){
+			show_error_message(S_NO_PERMISSIONS);
+		}
+		else{
+			$req = new Curl($_SERVER['REQUEST_URI']);
+			$req->setArgument('sid', null);
+
+			$warning_msg = array('You cannot view this URL as a ',bold(ZBX_GUEST_USER),'. ',
+								'You must login to view this page.', BR(),
+								'If you think this message is wrong, ',
+								' please consult your administrators about getting the necessary permissions.');
+
+			$table = new CTable(null, 'warning');
+			$table->setAlign('center');
+			$table->setHeader(new CCol('You are not logged in', 'left'),'header');
+				
+			$table->addRow(new CCol($warning_msg));
+			
+			$url = urlencode($req->toString());
+			$footer = new CCol(
+							array(
+								new CButton('login',S_LOGIN,"javascript: document.location = 'index.php?request=$url';"),
+								new CButton('back',S_CANCEL,'javascript: window.history.back();')
+							),
+							'left');
+			$table->setFooter($footer,'footer');
+			$table->show();
+		}
+		
 		include_once('include/page_footer.php');
 	}
 

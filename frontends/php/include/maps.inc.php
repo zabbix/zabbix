@@ -76,47 +76,42 @@
 	function sysmap_accessible($sysmapid,$perm){
 		global $USER_DETAILS;
 
-		$result = false;
+		$nodes = get_current_nodeid(null,$perm);
+		$result = (bool) count($nodes);
 
 		$sql = 'SELECT * '.
 				' FROM sysmaps_elements '.
 				' WHERE sysmapid='.$sysmapid.
-					' AND '.DBin_node('sysmapid', get_current_nodeid(null,$perm));
-		if($db_result = DBselect($sql)){
-			$result = true;
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
+					' AND '.DBin_node('sysmapid', $nodes);
+		$db_result = DBselect($sql);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
 //SDI($available_hosts);
-			while(($se_data = DBfetch($db_result)) && $result){
-				switch($se_data['elementtype']){
-					case SYSMAP_ELEMENT_TYPE_HOST:
-						if(!isset($available_hosts[$se_data['elementid']])){
-							$result = false;
-						}
-						break;
-					case SYSMAP_ELEMENT_TYPE_MAP:
-						$result = sysmap_accessible($se_data['elementid'], $perm);
-						break;
-					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						$available_triggers = get_accessible_triggers($perm, array(), PERM_RES_IDS_ARRAY);
-						if(!isset($available_triggers[$se_data['elementid']])){
-							$result = false;
-						}
-						break;
-					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm);
-						if(!isset($available_groups[$se_data['elementid']])){
-							$result = false;
-						}
-						break;
-				}
+		while(($se_data = DBfetch($db_result)) && $result){
+			switch($se_data['elementtype']){
+				case SYSMAP_ELEMENT_TYPE_HOST:
+					if(!isset($available_hosts[$se_data['elementid']])){
+						$result = false;
+					}
+					break;
+				case SYSMAP_ELEMENT_TYPE_MAP:
+					$result = sysmap_accessible($se_data['elementid'], $perm);
+					break;
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+					$available_triggers = get_accessible_triggers($perm, array(), PERM_RES_IDS_ARRAY);
+					if(!isset($available_triggers[$se_data['elementid']])){
+						$result = false;
+					}
+					break;
+				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm);
+					if(!isset($available_groups[$se_data['elementid']])){
+						$result = false;
+					}
+					break;
 			}
+		}
 //SDI($se_data['elementid']);
-		}
-		else{
-			if(DBselect('SELECT sysmapid FROM sysmaps WHERE sysmapid='.$sysmapid.
-				' AND '.DBin_node('sysmapid', get_current_nodeid($perm))))
-					$result = true;
-		}
+
 	return $result;
 	}
 

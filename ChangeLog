@@ -1,6 +1,7 @@
 Changes for 1.7.0
 
- - [DEV-398] Added hostgroup filter for HostGroup and TemplateLinkage twinboxes (Vedmak)
+ - [DEV-394] added easy access when not logged in (Artem)
+ - [DEV-398] added hostgroup filter for HostGroup and TemplateLinkage twinboxes (Vedmak)
  - [DEV-377] added search for hosts and host-groups (Artem)
  - [DEV-388] Discovery: added new action operations - enable/disable host (Sasha)
  - [ZBX-949] fixed undefined constant S_add_TO (Richlv)
