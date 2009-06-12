@@ -126,7 +126,6 @@ class CTemplate {
 			$def_sql['limit'] = $def_options['limit'];
 		}
 //------
-		$def_sql['order'][] = 'h.host';
 
 		$def_sql['select'] = array_unique($def_sql['select']);
 		$def_sql['from'] = array_unique($def_sql['from']);
