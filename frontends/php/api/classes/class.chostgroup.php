@@ -268,7 +268,6 @@ class CHostGroup {
 				' WHERE '.DBin_node('g.groupid', $nodeid).
 					$sql_where.
 				$sql_order;
-SDI($sql);
 		$res = DBselect($sql,$sql_limit);
 		while($group = DBfetch($res)){
 			if($def_options['count']) 
