@@ -27,9 +27,10 @@ class CHost {
 	 * 	boolean 'with_monitored_triggers'	=> 'only with monitores triggers',
 	 * 	boolean 'with_httptests' 			=> 'only with http tests',
 	 * 	boolean 'with_monitored_httptests'	=> 'only with monitores http tests',
-	 * 	boolean 'with_graphs'				=> 'only with graphs'
-	 *  string  'pattern'					=> 'search hosts by pattern in host names'
-	 *  integer 'limit'						=> 'limit selection'
+	 * 	boolean 'with_graphs'				=> 'only with graphs',
+	 *	int 'count'							=> 'count',
+	 *  string  'pattern'					=> 'search hosts by pattern in host names',
+	 *  integer 'limit'						=> 'limit selection',
 	 *  string  'order'						=> 'depricated parametr (for now)'
 	 * );
 	 * </code>
@@ -100,7 +101,7 @@ class CHost {
 
 			$def_sql['where'][] = DBcondition('h.hostid',$def_options['hostids']);
 		}
-
+		
 		if(!zbx_empty($def_options['pattern'])){
 			$def_sql['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.strtoupper($def_options['pattern']).'%');
 		}
@@ -271,21 +272,22 @@ class CHost {
 	 * Add host
 	 *
 	 * <code>
-	 * $host_db_fields = array(
-	 * 	string 'host' => 'host name [0]',
-	 * 	'port' => 'port [0]',
-	 * 	'status' => 0,
-	 * 	'useip' => 0,
-	 * 	'dns' => '',
-	 * 	'ip' => '0.0.0.0',
-	 * 	'proxy_hostid' => 0,
-	 * 	'useipmi' => 0,
-	 * 	'ipmi_ip' => '',
-	 * 	'ipmi_port' => 623,
-	 * 	'ipmi_authtype' => 0,
-	 * 	'ipmi_privilege' => 0,
-	 * 	'ipmi_username' => '',
-	 * 	'ipmi_password' => '',
+	 * $hosts = array(
+	 * 	*string 'host' => 'host name [0]',
+	 *	*array 'groupids' => 'groupids add host to',
+	 * 	int 'port' => 'port [0]',
+	 * 	int 'status' => 0,
+	 * 	int 'useip' => 0,
+	 * 	string 'dns' => '',
+	 * 	string 'ip' => '0.0.0.0',
+	 * 	int 'proxy_hostid' => 0,
+	 * 	int 'useipmi' => 0,
+	 * 	string 'ipmi_ip' => '',
+	 * 	int 'ipmi_port' => 623,
+	 * 	int 'ipmi_authtype' => 0,
+	 * 	int 'ipmi_privilege' => 0,
+	 * 	string 'ipmi_username' => '',
+	 * 	string 'ipmi_password' => '',
 	 * );
 	 * </code>
 	 *
@@ -296,13 +298,20 @@ class CHost {
 	public static function add($hosts){
 		$templates = null;
 		$newgroup = ''; 
-		$groups = null;
-			
-		$hostids = array();
+		
+		$error = 'Unknown ZABBIX internal error';
+		$result_ids = array();
+		$result = false;
+		
 		DBstart(false);
 		
-		$result = false;
 		foreach($hosts as $host){
+			
+			if(empty($host['groupids'])){
+				$result = false;
+				$error = 'No groups for host [ '.$host['host'].' ]';
+				break;
+			}
 		
 			$host_db_fields = array(
 				'host' => null,
@@ -323,21 +332,23 @@ class CHost {
 
 			if(!check_db_fields($host_db_fields, $host)){
 				$result = false;
+				$error = 'Wrong fields for host [ '.$host['host'].' ]';
 				break;
 			}
 			
 			$result = add_host($host['host'], $host['port'], $host['status'], $host['useip'], $host['dns'], $host['ip'], 
 				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'], 
-				$host['ipmi_privilege'], $host['ipmi_username'], $host['ipmi_password'], $newgroup, $groups);
+				$host['ipmi_privilege'], $host['ipmi_username'], $host['ipmi_password'], $newgroup, $host['groupids']);
 			if(!$result) break;
-			$hostids[$result] = $result;
+			$result_ids[$result] = $result;
 		}
 		$result = DBend($result);
+		
 		if($result){
-			return $hostids;
+			return $result_ids;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $hostids);//'Internal zabbix error');
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
 			return false;
 		}
 	}

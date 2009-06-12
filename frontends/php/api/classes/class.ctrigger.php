@@ -12,6 +12,152 @@ class CTrigger {
 	public static $error = array();
 
 	/**
+	 * Get triggers data 
+	 *
+	 * <code>
+	 * $options = array(
+	 *	array 'itemids' 			=> array(),
+	 *	array 'hostids' 			=> array(),
+	 *	array 'groupids' 			=> array(),
+	 *	array 'triggerids' 			=> array(),
+	 *	array 'applicationids' 		=> array(),
+	 *	boolean 'status' 			=> false,
+	 *	boolean 'templated_items' 	=> false,
+	 *	boolean 'count'				=> false,
+	 *	string 'pattern'			=> '',
+	 *	int 'limit' 				=> null,
+	 *	string 'order' 				=> ''
+	 * );
+	 * </code>
+	 *
+	 * @static
+	 * @param array $options 
+	 * @return array|int item data as array or false if error
+	 */
+	public static function get($options=array()){
+
+		$result = array();
+		
+		$sort_columns = array('triggerid'); // allowed columns for sorting
+
+		$sql_parts = array(
+			'select' => array('t.triggerid, t.description, t.status'),
+			'from' => array('triggers t'),
+			'where' => array(),
+			'order' => array(),
+			'limit' => null,
+			);
+		
+		$def_options = array(
+			'triggerids' 		=> array(),
+			'itemids' 			=> array(),
+			'hostids' 			=> array(),
+			'groupids' 			=> array(),
+			'applicationids' 	=> array(),
+			'status' 			=> false,
+			'severity'			=> false,
+			'templated_triggers'=> false,
+			'count'				=> false,
+			'pattern'			=> '',
+			'limit' 			=> null,
+			'order' 			=> ''
+		);
+		
+		$options = array_merge($def_options, $options);
+
+		// restrict not allowed columns for sorting 
+		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
+		
+// count
+		if($options['count']){
+			$sql_parts['select'] = array('count(t.triggerid) as count');
+		}
+// triggerids
+		if($options['triggerids']){
+			$sql_parts['where'][] = DBcondition('t.triggerid', $options['triggerids']);
+		}
+// itemids
+		if($options['itemids']){
+			$sql_parts['from']['fi'] = 'functions f, items i';
+			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
+			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+			
+		}
+// hostids
+		if($options['hostids']){
+			$sql_parts['from']['fi'] = 'functions f, items i';
+			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
+			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+		}
+// groupids
+		if($options['groupids']){
+			$sql_parts['from']['fi'] = 'functions f, items i';
+			$sql_parts['from'][] = 'hosts_groups hg';
+			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sql_parts['where'][] = 'hg.hostid=i.hostid';
+			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';			
+		}
+// applicationids
+		if($options['applicationids']){
+			$sql_parts['from']['fi'] = 'functions f, items i';
+			$sql_parts['from'][] = 'applications a';
+			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
+			$sql_parts['where'][] = 'i.hostid=a.hostid';	
+			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';	
+		}
+// status
+		if($options['status'] !== false){
+			$sql_parts['where'][] = 't.status='.$options['status'];
+		}	
+// severity
+		if($options['severity'] !== false){
+			$sql_parts['where'][] = 't.priority='.$options['severity'];
+		}	
+// templated_triggers
+		if($options['templated_triggers']){
+			$sql_parts['where'][] = 't.templateid=0';				
+		}
+// pattern
+		if(!zbx_empty($options['pattern'])){
+			$sql_parts['where'][] = ' t.description LIKE '.zbx_dbstr('%'.$options['pattern'].'%');
+		}
+// order
+		if(!zbx_empty($options['order'])){
+			$sql_parts['order'][] = 't.'.$options['order'];
+		}		
+// limit
+		if(zbx_ctype_digit($options['limit']) && $options['limit']){
+			$sql_parts['limit'] = $options['limit'];
+		}
+	
+		$sql_select = implode(',', $sql_parts['select']);
+		$sql_from = implode(',', $sql_parts['from']);
+		$sql_where = implode(' AND ', $sql_parts['where']);
+		$sql_order = zbx_empty($options['order']) ? '' : ' ORDER BY '.implode(',', $sql_parts['order']);
+		$sql_limit = $sql_parts['limit'];
+
+		
+		$sql = 'SELECT DISTINCT '.$sql_select.
+			' FROM '.$sql_from.
+			($sql_where ? ' WHERE '.$sql_where : '').
+			$sql_order; 
+		$db_res = DBselect($sql, $sql_limit);
+		
+		while($trigger = DBfetch($db_res)){
+			if($options['count']) 
+				$result = $trigger;
+			else 
+				$result[$trigger['triggerid']] = $trigger;
+		}
+		
+	return $result;
+	}
+	
+	/**
 	 *Gets all trigger data from DB by triggerid
 	 * 
 	 * <code>
