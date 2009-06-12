@@ -95,7 +95,6 @@ include_once('include/page_header.php');
 						' WHERE '.DBin_node('sysmapid').
 						' ORDER BY name');
 	while($row=DBfetch($result)){
-//SDI($row['name']);
 		if(!sysmap_accessible($row['sysmapid'],PERM_READ_ONLY))
 			continue;
 
