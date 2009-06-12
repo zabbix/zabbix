@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-886] removed duplicate and outdated strings from locales (Richlv)
  - [ZBX-952] increased max length of processed text and log data to 64KB (Sasha)
  - [ZBX-840] added displaying of text items in the latest data screen (Sasha)
  - [DEV-137] updated Japanese translation. Thanks to Kodai. (Alexei)
