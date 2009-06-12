@@ -353,6 +353,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$menu_divs[] = $sub_menu_div;
 		
 		$search_form = new CForm('search.php');
+		$search_form->setMethod('get');
 		$search_form->addOption('class','thin');
 		$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', new CTextBox('search','',15))));
 		

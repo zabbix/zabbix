@@ -237,7 +237,7 @@ class CHostGroup {
 			$def_sql['select'][] = 'g.name';
 		}
 // order
-		if(str_in_array($def_options['order'], array('group','groupid'))){
+		if(str_in_array($def_options['order'], array('name','groupid'))){
 			$def_sql['order'][] = 'g.'.$def_options['order'];
 		}
 		
@@ -246,8 +246,6 @@ class CHostGroup {
 			$def_sql['limit'] = $def_options['limit'];
 		}
 //-----
-
-		$def_sql['order'][] = 'g.name';
 				
 		$def_sql['select'] = array_unique($def_sql['select']);
 		$def_sql['from'] = array_unique($def_sql['from']);
@@ -270,6 +268,7 @@ class CHostGroup {
 				' WHERE '.DBin_node('g.groupid', $nodeid).
 					$sql_where.
 				$sql_order;
+SDI($sql);
 		$res = DBselect($sql,$sql_limit);
 		while($group = DBfetch($res)){
 			if($def_options['count']) 

@@ -185,7 +185,6 @@ class CHost {
 		}
 //------
 		
-
 		$def_sql['select'] = array_unique($def_sql['select']);
 		$def_sql['from'] = array_unique($def_sql['from']);
 		$def_sql['where'] = array_unique($def_sql['where']);
