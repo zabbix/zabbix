@@ -11029,7 +11029,7 @@ INSERT INTO drules VALUES (2,0,'Local network','192.168.1.1-255',3600,0,1);
 -- Dumping data for table `dchecks`
 --
 
-INSERT INTO dchecks VALUES (2,2,9,'system.uname','','10050');
+INSERT INTO dchecks VALUES (2,2,9,'system.uname','','10050','',0,'','');
 
 --
 -- Dumping data for table graphs
