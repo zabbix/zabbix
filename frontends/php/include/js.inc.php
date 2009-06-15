@@ -236,7 +236,7 @@ function insert_javascript_for_visibilitybox(){
 						obj[i].parentNode.replaceChild(new_obj, obj[i]);
 					}
 					else{
-						throw "Missed originalObject for restoring";
+						throw "Missing originalObject for restoring";
 					}
 				}
 				else{
@@ -299,7 +299,7 @@ function insert_js_function($fnct_name){
 					var o_form;
 			
 					if( !(o_form = window.opener.document.forms[s_formname]) )
-						 throw "Missed form with name ["+s_formname+"].";
+						throw "Missing form with name ["+s_formname+"].";
 			
 					var element = o_form.elements["itemid"];
 					if(element) element.name = "itemid["+element.value+"]";

@@ -201,24 +201,24 @@
 				'history'		=> 7,
 				'status'		=> ITEM_STATUS_ACTIVE,
 				'type'			=> ITEM_TYPE_ZABBIX,
-				'snmp_community'=> '',
+				'snmp_community'	=> '',
 				'snmp_oid'		=> '',
-				'value_type'	=> ITEM_VALUE_TYPE_STR,
-				'trapper_hosts'	=> 'localhost',
+				'value_type'		=> ITEM_VALUE_TYPE_STR,
+				'trapper_hosts'		=> 'localhost',
 				'snmp_port'		=> 161,
 				'units'			=> '',
-				'multiplier'	=> 0,
+				'multiplier'		=> 0,
 				'delta'			=> 0,
 				'snmpv3_securityname'	=> '',
 				'snmpv3_securitylevel'	=> 0,
 				'snmpv3_authpassphrase'	=> '',
 				'snmpv3_privpassphrase'	=> '',
-				'formula'			=> 0,
-				'trends'			=> 365,
+				'formula'		=> 0,
+				'trends'		=> 365,
 				'logtimefmt'		=> '',
 				'valuemapid'		=> 0,
 				'delay_flex'		=> '',
-				'params'			=> '',
+				'params'		=> '',
 				'ipmi_sensor'		=> '',
 				'applications'		=> array(),
 				'templateid'		=> 0);
@@ -351,24 +351,24 @@
 			$item['hostid'] = $db_host['hostid'];
 			$item['applications'] = get_same_applications_for_host($item['applications'], $db_host['hostid']);
 			$item['templateid'] = $itemid;
-			
+
 			$result = add_item($item);
 			if(!$result) break;
 		}
-		
+
 		if($result)
 			return $itemid;
 
 		if($item['templateid'] == 0){
 			delete_item($itemid);
 		}
-		
+
 	return $result;
 	}
 
 	function update_trigger_value_to_unknown_by_itemid($itemids){
 		zbx_value2array($itemids);
-		
+
 		$now = time();
 		$result = DBselect('SELECT DISTINCT t.triggerid '.
 				' FROM triggers t,functions f '.
@@ -381,7 +381,7 @@
 				continue;
 			$triggerids[$row['triggerid']] = $row['triggerid'];
 		}
-		
+
 		if(!empty($triggers)){
 			DBexecute('UPDATE triggers SET value='.TRIGGER_VALUE_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids));
 		}
@@ -392,7 +392,7 @@
 	function update_item_status($itemids, $status){
 		zbx_value2array($itemids);
 		$result = true;
-		
+
 		$db_items = DBselect('SELECT itemid, status FROM items WHERE '.DBcondition('itemid',$itemids));
 		while($row = DBfetch($db_items)){
 			$old_status=$row['status'];
@@ -403,14 +403,14 @@
 		}
 		if(!empty($itemids)){
 			update_trigger_value_to_unknown_by_itemid($itemids);
-			
+
 			if($status==ITEM_STATUS_ACTIVE)
 				$sql='UPDATE items SET status='.$status.",error='',nextcheck=0 ".
 					' WHERE '.DBcondition('itemid',$itemids);
 			else
 				$sql='UPDATE items SET status='.$status.
 					' WHERE '.DBcondition('itemid',$itemids);
-					
+
 			$result = DBexecute($sql);
 		}
 
@@ -430,7 +430,7 @@
 		'formula','trends','logtimefmt','valuemapid','delay_flex','params','ipmi_sensor','applications','templateid');
 //*/
 		$item_in_params = $item;
-		
+
 		$item_data = get_item_by_itemid_limited($itemid);
 		$item_data['applications'] = get_applications_by_itemid($itemid);
 		
@@ -438,7 +438,7 @@
 			error('Incorrect arguments pasted to function [update_item]');
 			return false;
 		}
-		
+
 		$host = get_host_by_hostid($item['hostid']);
 
 		if(($i = array_search(0,$item['applications'])) !== FALSE)
@@ -485,7 +485,7 @@
 		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
 		while($db_tmp_item = DBfetch($db_tmp_items)){
 			$child_item_params = $item_in_params;
-			
+
 			$child_item_params['hostid'] = $db_tmp_item['hostid'];
 			$child_item_params['templateid'] = $itemid;
 			$child_item_params['applications'] = get_same_applications_for_host($item['applications'], $db_tmp_item['hostid']);
@@ -494,7 +494,7 @@
 				error('Incorrect arguments pasted to function [update_item]');
 				return false;
 			}
-			
+
 			$result = update_item($db_tmp_item['itemid'], $child_item_params);		// recursion!!!
 
 			if(!$result)
@@ -557,7 +557,7 @@
 		if($result){
 			info("Item '".$host['host'].':'.$item['key_']."' updated");
 		}
-		
+
 	return $result;
 	}
 
@@ -573,24 +573,24 @@
 	 * Comments:
 	 *
 	 */
-	function smart_update_item($itemid, $item=array()){		
+	function smart_update_item($itemid, $item=array()){
 		$item_data = get_item_by_itemid_limited($itemid);
 		
 		$restore_rules= array(
-					'description'	=> array(),
+					'description'		=> array(),
 					'key_'			=> array(),
 					'hostid'		=> array(),
 					'delay'			=> array('template' => 1),
 					'history'		=> array('template' => 1 , 'httptest' => 1),
 					'status'		=> array('template' => 1 , 'httptest' => 1),
 					'type'			=> array(),
-					'snmp_community'=> array(),
+					'snmp_community'	=> array(),
 					'snmp_oid'		=> array(),
-					'value_type'	=> array(),
-					'trapper_hosts'	=> array(),
+					'value_type'		=> array(),
+					'trapper_hosts'		=> array(),
 					'snmp_port'		=> array(),
 					'units'			=> array(),
-					'multiplier'	=> array(),
+					'multiplier'		=> array(),
 					'delta'			=> array('template' => 1 , 'httptest' => 1),
 					'snmpv3_securityname'	=> array(),
 					'snmpv3_securitylevel'	=> array(),
@@ -598,21 +598,21 @@
 					'snmpv3_privpassphrase'	=> array(),
 					'formula'		=> array(),
 					'trends'		=> array('template' => 1 , 'httptest' => 1),
-					'logtimefmt'	=> array(),
-					'valuemapid'	=> array('httptest' => 1),
+					'logtimefmt'		=> array(),
+					'valuemapid'		=> array('httptest' => 1),
 					'params'		=> array(),
-					'delay_flex'	=> array('template' => 1),
-					'ipmi_sensor'	=> array());
+					'delay_flex'		=> array('template' => 1),
+					'ipmi_sensor'		=> array());
 
 		foreach($restore_rules as $var_name => $info){
 			if(($item_data['type'] == ITEM_TYPE_HTTPTEST) && !isset($info['httptest'])){
 				$item[$var_name] = $item_data[$var_name];
 			}
-			
+
 			if(!isset($info['template']) && (0 != $item_data['templateid'])){
 				$item[$var_name] = $item_data[$var_name];
 			}
-				
+
 			if(!array_key_exists($var_name,$item)){
 				$item[$var_name] = $item_data[$var_name];
 			}
@@ -638,7 +638,7 @@
 	 */
 	function delete_template_items($hostid, $templateids = null, $unlink_mode = false){
 		zbx_value2array($templateids);
-		
+
 		$db_items = get_items_by_hostid($hostid);
 		while($db_item = DBfetch($db_items)){
 			if($db_item["templateid"] == 0)
@@ -679,9 +679,9 @@
 		$db_tmp_item['hostid'] = $hostid;
 		$db_tmp_item['applications'] = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item['itemid']),$hostid);
 		$db_tmp_item['templateid'] = $copy_mode?0:$db_tmp_item['itemid'];
-		
+
 		$result = add_item($db_tmp_item);
-			
+
 	return $result;
 	}
 
@@ -701,7 +701,7 @@
 		if($templateid == null){
 			$templateid = array_keys(get_templates_by_hostid($hostid));
 		}
-		
+
 		if(is_array($templateid)){
 			foreach($templateid as $id)
 				copy_template_items($hostid, $id, $copy_mode); // attention recursion
@@ -811,29 +811,29 @@
  *		Aly 
  *
  * Comments: 
- *		$error= true : rise Error if item doesn't exists(error generated), false: special processing (NO error generated)
+ *		$error= true : rise Error if item doesn't exist (error generated), false: special processing (NO error generated)
  */
 	function get_same_item_for_host($item,$dest_hostid, $error=true){
-	
+
 		if(!is_array($item)){
 			$itemid = $item;
 		}
 		else if(isset($item['itemid'])){
 			$itemid = $item['itemid'];
 		}
-		
+
 		if(isset($itemid)){
 			$sql = 'SELECT src.itemid '.
 							' FROM items src, items dest '.
 							' WHERE dest.itemid='.$itemid.
 								' AND src.key_=dest.key_ '.
 								' AND src.hostid='.$dest_hostid;
-								
+
 			$db_item = DBfetch(DBselect($sql));
 			if (!$db_item && $error){
 				$item = get_item_by_itemid($db_item['itemid']);
 				$host = get_host_by_hostid($dest_hostid);
-				error('Missed key "'.$item['key_'].'" for host "'.$host['host'].'"');
+				error('Missing key "'.$item['key_'].'" for host "'.$host['host'].'"');
 			}
 			else{
 				if(is_array($item)){
@@ -844,7 +844,7 @@
 				}
 			}
 		}
-	return false;	
+	return false;
 	}
 
 	/******************************************************************************
@@ -896,11 +896,11 @@
 		if(!$result)	return	$result;
 
 		$temp_arr = array(SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_PLAIN_TEXT);
-		
+
 		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$itemids).' AND '.DBcondition('resourcetype', $temp_arr));
 		DBexecute('DELETE FROM items_applications WHERE '.DBcondition('itemid',$itemids));
 		DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='itemid' AND ".DBcondition('value_id',$itemids));
-		
+
 		$result = DBexecute('DELETE FROM items WHERE '.DBcondition('itemid',$itemids));
 		if($result){
 			foreach($items as $itemid => $item){
@@ -989,7 +989,7 @@
  * Function: get_items_data_overview
  *
  * Description:
- *     Retrive overview table object for items
+ *     Retrieve overview table object for items
  *
  * Author:
  *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
@@ -1049,7 +1049,7 @@ COpt::profiling_start('prepare data');
 				);
 			}
 		}
-		
+
 		if(!isset($hosts)){
 			return $table;
 		}
@@ -1063,10 +1063,10 @@ COpt::profiling_start('prepare table');
 			foreach($hosts as $hostname){
 				$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
 			}
-			
+
 			$table->SetHeader($header,'vertical_header');
 			$curr_rime = time();
-			
+
 			foreach($items as $descr => $ithosts){
 				$table_row = array(nbsp($descr));
 				foreach($hosts as $hostname){
@@ -1080,7 +1080,7 @@ COpt::profiling_start('prepare table');
 			foreach($items as $descr => $ithosts){
 				$header=array_merge($header,array(new CImg('vtext.php?text='.$descr)));
 			}
-			
+
 			$table->SetHeader($header,'vertical_header');
 			$curr_rime = time();
 			
@@ -1112,7 +1112,7 @@ COpt::profiling_stop('prepare table');
 				else
 					$ack = null;
 			}
-			
+
 			$value = format_lastvalue($ithosts[$hostname]);
 
 			$it_ov_menu = array(
@@ -1215,22 +1215,22 @@ COpt::profiling_stop('prepare table');
 				$sql = 'INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
 							" VALUES ($housekeeperid,'history_text','itemid',$itemid)";
 				DBexecute($sql);
-				
+
 				$housekeeperid = get_dbid('housekeeper','housekeeperid');
 				$sql = 'INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
 							" VALUES ($housekeeperid,'history_log','itemid',$itemid)";
 				DBexecute($sql);
-							
+
 				$housekeeperid = get_dbid('housekeeper','housekeeperid');
 				$sql = 'INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
 							" VALUES ($housekeeperid,'history_uint','itemid',$itemid)";
 				DBexecute($sql);
-							
+
 				$housekeeperid = get_dbid('housekeeper','housekeeperid');
 				$sql = 'INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
 							" VALUES ($housekeeperid,'history_str','itemid',$itemid)";
 				DBexecute($sql);
-							
+
 				$housekeeperid = get_dbid('housekeeper','housekeeperid');
 				$sql = 'INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
 							" VALUES ($housekeeperid,'history','itemid',$itemid)";
@@ -1301,7 +1301,7 @@ COpt::profiling_stop('prepare table');
 	 * Description:
 	 *     Get value from history
 	 *
-	 * Peremeters:
+	 * Paremeters:
 	 *     itemid - item ID
 	 *     last  - 0 - last value (clock is used), 1 - last value
 	 *
@@ -1360,7 +1360,7 @@ COpt::profiling_stop('prepare table');
 	 * Purpose: check if current time is within given period
 	 *
 	 * Parameters: period - time period in format [d1-d2,hh:mm-hh:mm]*
-	 *             now    - timestamp for comporation
+	 *             now    - timestamp for comparison
 	 *
 	 * Return value: 0 - out of period, 1 - within the period
 	 *
@@ -1396,12 +1396,12 @@ COpt::profiling_stop('prepare table');
 	 *
 	 * Purpose: check for flexible delay value
 	 *
-	 * Parameters: delay_flex - [IN] separeated flexible intervals
+	 * Parameters: delay_flex - [IN] separated flexible intervals
 	 *                          [dd/d1-d2,hh:mm-hh:mm;]
 	 *             delay - [IN] default delay
 	 *
 	 * Return value: flexible delay or $delay if $delay_flex is not defined
-	 *             
+	 *
 	 *
 	 * Author: Alexander Vladishev
 	 *
@@ -1431,7 +1431,7 @@ COpt::profiling_stop('prepare table');
 	 *
 	 * Purpose: return time of next flexible interval
 	 *
-	 * Parameters: delay_flex - [IN] ';' separeated flexible intervals
+	 * Parameters: delay_flex - [IN] ';' separated flexible intervals
 	 *                          [dd/d1-d2,hh:mm-hh:mm]
 	 *             now = [IN] current time
 	 *
@@ -1486,9 +1486,9 @@ COpt::profiling_stop('prepare table');
 	 * Function: calculate_item_nextcheck
 	 *
 	 * Description:
-	 *     calculate nextcheck timespamp for item
+	 *     calculate nextcheck timestamp for item
 	 *
-	 * Peremeters:
+	 * Parameters:
 	 *     itemid - item ID
 	 *     item_type - item type
 	 *     delay - item's refresh rate in sec

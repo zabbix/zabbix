@@ -119,15 +119,15 @@ function add_variable(o_el, s_name, x_value, s_formname, o_document){
 
 	if(s_formname){
 		if( !(form = o_document.forms[s_formname]) )
-			 throw "Missed form with name '"+s_formname+"'.";
+			 throw "Missing form with name '"+s_formname+"'.";
 	}
 	else if(o_el){
 		if( !(form = o_el.form) )
-			throw "Missed form in 'o_el' object";
+			throw "Missing form in 'o_el' object";
 	}
 	else{
 		if( !(form = this.form) )
-			throw "Missed form in 'this' object";
+			throw "Missing form in 'this' object";
 	}
 
 	var o_variable = o_document.createElement('input');
@@ -467,7 +467,7 @@ return false;
 
 
 /************************************************************************************/
-/*										 Pages stuff								*/
+/*					Pages stuff					*/
 /************************************************************************************/
 function ScaleChartToParenElement(obj_name){
 	var obj = document.getElementsByName(obj_name);
@@ -496,7 +496,7 @@ function insert_sizeable_graph(graph_id,url){
 }
 
 /************************************************************************************/
-/*									MAIN MENU stuff									*/
+/*				MAIN MENU stuff						*/
 /************************************************************************************/
 // Author: Aly
 
@@ -539,7 +539,7 @@ showSubMenu: function(show_label){
 
 
 /************************************************************************************/
-/*						Automatic checkbox range selection 							*/
+/*			Automatic checkbox range selection 				*/
 /************************************************************************************/
 // Author: Aly
 
@@ -584,7 +584,7 @@ check: function(e){
 					if(flag){
 						chkbx_list[i].checked = this.startbox.checked;
 					}
-					
+
 					if(obj.name == chkbx_list[i].name) break;
 					if(this.startbox.name == chkbx_list[i].name) flag = true;
 				}
@@ -597,7 +597,7 @@ check: function(e){
 			else{
 				for(var i=chkbx_list.length-1; i >= 0; i--){
 					if(typeof(chkbx_list[i]) !='undefined'){
-//alert(obj.name+' == '+chkbx_list[i].name);			
+//alert(obj.name+' == '+chkbx_list[i].name);
 						if(flag){
 							chkbx_list[i].checked = this.startbox.checked;
 						}
@@ -623,7 +623,7 @@ check: function(e){
 }
 }
 /************************************************************************************/
-/*						Replace Standart Blink functionality						*/
+/*			Replace Standart Blink functionality				*/
 /************************************************************************************/
 // Author: Aly
 var blink = {

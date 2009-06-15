@@ -138,7 +138,7 @@ if(!isset($DB)){
 						}
 					}
 					else{
-						$error = 'Missed database';
+						$error = 'Missing database';
 						$result = false;
 					}
 
@@ -776,10 +776,10 @@ else {
 				}
 				break;
 		}
-		
+
 		if(zbx_empty($condition)) $condition = $string?"'-1'":'-1';
 
 	return ' ('.$fieldname.$in.'('.$condition.')) ';
 	}
-	
+
 ?>

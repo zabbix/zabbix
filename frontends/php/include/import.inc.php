@@ -37,14 +37,14 @@
 			$this->available_groups = get_accessible_groups_by_user($USER_DETAILS, PERM_READ_WRITE);
 
 			$this->available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
-				
+
 			$this->available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
 		}
-		
+
 		function CharacterData($parser, $data) {
 			$this->element_data .= html_entity_decode($data);
 		}
-		
+
 		function StartElement($parser, $name, $attrs) {
 			$this->element_data = '';
 
@@ -77,7 +77,7 @@
 					$data		= $attrs;
 					$data['groups'] = array();
 					$data['skip']	= false;
-					
+
 					$sql = 'SELECT hostid '.
 						' FROM hosts'.
 						' WHERE host='.zbx_dbstr($data['name']).
@@ -106,9 +106,9 @@
 							info('Host ['.$data['name'].'] skipped - user rule');
 							break; // case
 						}
-						
+
 						if(!uint_in_array(get_current_nodeid(),$this->available_nodes)){
-							error('Host ['.$data['name'].'] skipped - Access deny.');
+							error('Host ['.$data['name'].'] skipped - access denied.');
 							break; // case
 						}
 
@@ -131,7 +131,7 @@
 							'', /* ipmi_password */
 							null,
 							array());
-							
+
 					}
 					break; // case
 				case XML_TAG_GRAPH:
@@ -146,13 +146,13 @@
 						info('Trigger ['.$attrs['description'].'] dependency update skipped - user rule');
 						break;
 					}
-					
+
 					// searches trigger by host name & trigger description
 					if(!$trigger_down = get_trigger_by_description($attrs['description'])){
 						error('Trigger ['.$attrs['description'].'] dependency update skipped - trigger not found');
 						break;
 					}
-					
+
 					$data['triggerid_down'] = $trigger_down['triggerid'];
 					$data['triggerid_up']	= array();
 					$this->sub_node	= null;
@@ -199,31 +199,31 @@
 			}
 
 			global $USER_DETAILS;
-			
+
 			$data = &$this->data[$name];
 			switch($name){
 				case XML_TAG_HOST:
 					if($data['skip'] || !isset($data['hostid']) || !$data['hostid'])
 						break; // case
-					
+
 					if(!isset($data['port']))	$data['port']	= 10050;
 					if(!isset($data['status']))	$data['status']	= 0;
 					if(!isset($data['useip']))	$data['useip'] = 0;
 					if(!isset($data['dns']))	$data['dns'] = '';
 					if(!isset($data['ip']))		$data['ip'] = '';
 					if(!isset($data['proxy']))	$data['proxy'] = '';
-					
+
 					if(!zbx_empty($data['proxy'])){
 						$sql = 'SELECT hostid '.
 								' FROM hosts '.
 								' WHERE host='.zbx_dbstr($data['proxy']).
 									' AND status='.HOST_STATUS_PROXY.
 									' AND '.DBin_node('hostid',get_current_nodeid(false));
-									
+
 						if($host_data = DBfetch(DBselect($sql)))
 							$data['proxy'] = $host_data['hostid'];
 						else
-							$data['proxy'] = 0;						
+							$data['proxy'] = 0;
 					}
 					else{
 						$data['proxy'] = 0;
@@ -242,35 +242,35 @@
 					{
 						info('Host ['.$data['name'].'] updated');
 					}
-					
+
 					break; // case
-// based on  mod by scricca	
+// based on mod by scricca
 				case XML_TAG_HOSTPROFILE:
 					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
 						break; //case
 
 					if(!isset($data['devicetype']))		$data['devicetype'] = '';
-					if(!isset($data['name']))			$data['name'] = '';
-					if(!isset($data['os']))				$data['os'] = '';
+					if(!isset($data['name']))		$data['name'] = '';
+					if(!isset($data['os']))			$data['os'] = '';
 					if(!isset($data['serialno']))		$data['serialno'] = '';
-					if(!isset($data['tag']))			$data['tag'] = '';
+					if(!isset($data['tag']))		$data['tag'] = '';
 					if(!isset($data['macaddress']))		$data['macaddress'] = '';
 					if(!isset($data['hardware']))		$data['hardware'] = '';
 					if(!isset($data['software']))		$data['software'] = '';
 					if(!isset($data['contact']))		$data['contact'] = '';
 					if(!isset($data['location']))		$data['location'] = '';
-					if(!isset($data['notes']))			$data['notes'] = '';
-					
+					if(!isset($data['notes']))		$data['notes'] = '';
+
 					delete_host_profile($this->data[XML_TAG_HOST]['hostid']);
-					
+
 					if(add_host_profile($this->data[XML_TAG_HOST]['hostid'], $data['devicetype'], $data['name'], $data['os'],
 						$data['serialno'], $data['tag'], $data['macaddress'], $data['hardware'], $data['software'],
 						$data['contact'], $data['location'], $data['notes']))
 					{
 						info('Host Profile ['.$this->data[XML_TAG_HOST]['name'].'] updated');
 					}
- 					
- 					break; // case
+
+					break; // case
 //---
 // Extended profiles
 				case XML_TAG_HOSTPROFILE_EXT:
@@ -282,35 +282,35 @@
 					if(!isset($data['device_chassis'])) $data['device_chassis'] = '';
 					if(!isset($data['device_os'])) $data['device_os'] = '';
 					if(!isset($data['device_os_short'])) $data['device_os_short'] = '';
-					
+
 					if(!isset($data['device_hw_arch'])) $data['device_hw_arch'] = '';
 					if(!isset($data['device_serial'])) $data['device_serial'] = '';
 					if(!isset($data['device_model'])) $data['device_model'] = '';
 					if(!isset($data['device_tag'])) $data['device_tag'] = '';
 					if(!isset($data['device_vendor'])) $data['device_vendor'] = '';
 					if(!isset($data['device_contract'])) $data['device_contract'] = '';
-					
+
 					if(!isset($data['device_who'])) $data['device_who'] = '';
 					if(!isset($data['device_status'])) $data['device_status'] = '';
 					if(!isset($data['device_app_01'])) $data['device_app_01'] = '';
 					if(!isset($data['device_app_02'])) $data['device_app_02'] = '';
 					if(!isset($data['device_app_03'])) $data['device_app_03'] = '';
 					if(!isset($data['device_app_04'])) $data['device_app_04'] = '';
-					
+
 					if(!isset($data['device_app_05'])) $data['device_app_05'] = '';
 					if(!isset($data['device_url_1'])) $data['device_url_1'] = '';
 					if(!isset($data['device_url_2'])) $data['device_url_2'] = '';
 					if(!isset($data['device_url_3'])) $data['device_url_3'] = '';
 					if(!isset($data['device_networks'])) $data['device_networks'] = '';
 					if(!isset($data['device_notes'])) $data['device_notes'] = '';
-					
+
 					if(!isset($data['device_hardware'])) $data['device_hardware'] = '';
 					if(!isset($data['device_software'])) $data['device_software'] = '';
 					if(!isset($data['ip_subnet_mask'])) $data['ip_subnet_mask'] = '';
 					if(!isset($data['ip_router'])) $data['ip_router'] = '';
 					if(!isset($data['ip_macaddress'])) $data['ip_macaddress'] = '';
 					if(!isset($data['oob_ip'])) $data['oob_ip'] = '';
-					
+
 					if(!isset($data['oob_subnet_mask'])) $data['oob_subnet_mask'] = '';
 					if(!isset($data['oob_router'])) $data['oob_router'] = '';
 					if(!isset($data['date_hw_buy'])) $data['date_hw_buy'] = '';
@@ -318,7 +318,7 @@
 					if(!isset($data['date_hw_expiry'])) $data['date_hw_expiry'] = '';
 					if(!isset($data['date_hw_decomm'])) $data['date_hw_decomm'] = '';
 					if(!isset($data['site_street_1'])) $data['site_street_1'] = '';
-					
+
 					if(!isset($data['site_street_2'])) $data['site_street_2'] = '';
 					if(!isset($data['site_street_3'])) $data['site_street_3'] = '';
 					if(!isset($data['site_city'])) $data['site_city'] = '';
@@ -327,7 +327,7 @@
 					if(!isset($data['site_zip'])) $data['site_zip'] = '';
 					if(!isset($data['site_rack'])) $data['site_rack'] = '';
 					if(!isset($data['site_notes'])) $data['site_notes'] = '';
-					
+
 					if(!isset($data['poc_1_name'])) $data['poc_1_name'] = '';
 					if(!isset($data['poc_1_email'])) $data['poc_1_email'] = '';
 					if(!isset($data['poc_1_phone_1'])) $data['poc_1_phone_1'] = '';
@@ -336,7 +336,7 @@
 					if(!isset($data['poc_1_screen'])) $data['poc_1_screen'] = '';
 					if(!isset($data['poc_1_notes'])) $data['poc_1_notes'] = '';
 					if(!isset($data['poc_2_name'])) $data['poc_2_name'] = '';
-					
+
 					if(!isset($data['poc_2_email'])) $data['poc_2_email'] = '';
 					if(!isset($data['poc_2_phone_1'])) $data['poc_2_phone_1'] = '';
 					if(!isset($data['poc_2_phone_2'])) $data['poc_2_phone_2'] = '';
@@ -344,26 +344,25 @@
 					if(!isset($data['poc_2_screen'])) $data['poc_2_screen'] = '';
 					if(!isset($data['poc_2_notes'])) $data['poc_2_notes'] = '';
 
-					
 					delete_host_profile_ext($this->data[XML_TAG_HOST]['hostid']);
-					
+
 					if(add_host_profile_ext($this->data[XML_TAG_HOST]['hostid'], $data)){
 						info('Host Extended Profile ['.$this->data[XML_TAG_HOST]['name'].'] updated');
 					}
- 					
- 					break; // case
+
+					break; // case
 //---
 				case XML_TAG_GROUP:
 					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
 						break; //case
-						
+
 					$sql = 'SELECT groupid, name '.
 							' FROM groups'.
 							' WHERE '.DBin_node('groupid',get_current_nodeid(false)).
 								' AND name='.zbx_dbstr($this->element_data);
-								
+
 					if(!$group = DBfetch(DBselect($sql))){
-						error('Missed group ['.$this->element_data.']');
+						error('Missing group ['.$this->element_data.']');
 						break; // case
 					}
 					
@@ -378,17 +377,17 @@
 				case XML_TAG_DEPENDENCY:
 					if(!isset($data['triggerid_down']) || !$data['triggerid_down'])
 						break; // case
-					
+
 					update_trigger($data['triggerid_down'],
 							null,null,null,
 							null,null,null,null,
 							$data['triggerid_up'], null);
-												
+
 					break; // case
 				case XML_TAG_DEPENDS:
 					if(!isset($this->data[XML_TAG_DEPENDENCY]['triggerid_down']) || !$this->data[XML_TAG_DEPENDENCY]['triggerid_down'])
 						break; //case
-					
+
 					if(!$trigger_up = get_trigger_by_description($this->element_data)) break;
 					
 					array_push($this->data[XML_TAG_DEPENDENCY]['triggerid_up'], $trigger_up['triggerid']);
@@ -426,7 +425,7 @@
 									' AND host='.zbx_dbstr($this->element_data).
 									' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
 					if(!$template = DBfetch(DBselect($sql))){
-						error('Missed template ['.$this->element_data.']');
+						error('Missing template ['.$this->element_data.']');
 						break; // case
 					}
 					
@@ -444,18 +443,18 @@
 							break; // case
 						}
 
-						error('Item ['.$data['description'].'] skipped - missed host');
+						error('Item ['.$data['description'].'] skipped - missing host');
 						break; // case
 					}
 
 					if(!isset($data['description']))		$data['description']		= '';
-					if(!isset($data['delay']))				$data['delay']			= 30;
+					if(!isset($data['delay']))			$data['delay']			= 30;
 					if(!isset($data['history']))			$data['history']		= 90;
-					if(!isset($data['trends']))				$data['trends']			= 365;
-					if(!isset($data['status']))				$data['status']			= 0;
-					if(!isset($data['units']))				$data['units']			= '';
+					if(!isset($data['trends']))			$data['trends']			= 365;
+					if(!isset($data['status']))			$data['status']			= 0;
+					if(!isset($data['units']))			$data['units']			= '';
 					if(!isset($data['multiplier']))			$data['multiplier']		= 0;
-					if(!isset($data['delta']))				$data['delta']			= 0;
+					if(!isset($data['delta']))			$data['delta']			= 0;
 					if(!isset($data['formula']))			$data['formula']		= '';
 					if(!isset($data['lastlogsize']))		$data['lastlogsize']		= 0;
 					if(!isset($data['logtimefmt']))			$data['logtimefmt']		= '';
@@ -468,17 +467,17 @@
 					if(!isset($data['snmpv3_securitylevel']))	$data['snmpv3_securitylevel']	= 0;
 					if(!isset($data['snmpv3_authpassphrase']))	$data['snmpv3_authpassphrase']	= '';
 					if(!isset($data['snmpv3_privpassphrase']))	$data['snmpv3_privpassphrase']	= '';
-					if(!isset($data['valuemap']))				$data['valuemap']		= '';
-					if(!isset($data['params']))					$data['params']			= '';
-					if(!isset($data['ipmi_sensor']))			$data['ipmi_sensor']	= '';
-					if(!isset($data['applications']))			$data['applications']		= array();
+					if(!isset($data['valuemap']))			$data['valuemap']		= '';
+					if(!isset($data['params']))			$data['params']			= '';
+					if(!isset($data['ipmi_sensor']))		$data['ipmi_sensor']		= '';
+					if(!isset($data['applications']))		$data['applications']		= array();
 
 					if(!empty($data['valuemap'])){
 						$sql = 'SELECT valuemapid '.
 								' FROM valuemaps '.
 								' WHERE '.DBin_node('valuemapid', get_current_nodeid(false)).
 									' AND name='.zbx_dbstr($data['valuemap']);
-										
+
 						if( $valuemap = DBfetch(DBselect($sql))){
 							$data['valuemapid'] = $valuemap['valuemapid'];
 						}
@@ -492,7 +491,7 @@
 							' WHERE key_='.zbx_dbstr($data['key']).
 								' AND hostid='.$this->data[XML_TAG_HOST]['hostid'].
 								' AND '.DBin_node('itemid', get_current_nodeid(false));
-						
+
 					if($item = DBfetch(DBselect($sql))){ /* exist */
 						if($this->item['exist']==1) /* skip */{
 							info('Item ['.$data['description'].'] skipped - user rule');
@@ -506,9 +505,9 @@
 							$data['hostid'] = $this->data[XML_TAG_HOST]['hostid'];
 							$data['applications'] = array_unique(array_merge($data['applications'],get_applications_by_itemid($item['itemid'])));
 							$data['templateid'] = $item['templateid'];
-							
+
 							check_db_fields($item, $data);
-							
+
 						update_item($item['itemid'], $data);
 					}
 					else{ /* missed */
@@ -522,7 +521,7 @@
 
 						$data['hostid'] = $this->data[XML_TAG_HOST]['hostid'];
 						$data['key_'] = $data['key'];
-						
+
 						add_item($data);
 					}
 
@@ -538,19 +537,19 @@
 
 					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid']){
 						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip']){
-						
+
 // remember skipped triggers for dependencies
 							$this->data[XML_TAG_DEPENDENCIES]['skip'][] = $this->data[XML_TAG_HOST]['name'].':'.$data['description'];
-							
+
 							info('Trigger ['.$data['description'].'] skipped - user rule for host');
 							break; // case
 						}
 						if(zbx_strstr($data['expression'],'{HOSTNAME}')){
-						
+
 // remember skipped triggers for dependencies
 							$this->data[XML_TAG_DEPENDENCIES]['skip'][] = $this->data[XML_TAG_HOST]['name'].':'.$data['description'];
 
-							error('Trigger ['.$data['description'].'] skipped - missed host');
+							error('Trigger ['.$data['description'].'] skipped - missing host');
 							break; // case
 						}
 					}
@@ -600,7 +599,7 @@
 					}
 					
 					if($this->trigger['missed']==1) /* skip */{
-					
+
 // remember skipped triggers for dependencies
 						$this->data[XML_TAG_DEPENDENCIES]['skip'][] = $this->data[XML_TAG_HOST]['name'].':'.$data['description'];
 
@@ -644,7 +643,7 @@
 						foreach($data['items'] as $id)
 
 						if(zbx_strstr($data['name'],'{HOSTNAME}')){
-							error('Graph ['.$data['name'].'] skipped - missed host');
+							error('Graph ['.$data['name'].'] skipped - missing host');
 							break; // case
 						}
 					}
@@ -740,7 +739,7 @@
 					if(!$item = get_item_by_key($data['key'], $data['host'])){
 						$this->data[XML_TAG_GRAPH]['error'] = true;
 
-						error('Missed item ['.$data['key'].'] for host ['.$data['host'].']');
+						error('Missing item ['.$data['key'].'] for host ['.$data['host'].']');
 						break; // case
 					}
 

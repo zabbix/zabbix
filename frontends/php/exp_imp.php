@@ -420,7 +420,7 @@ include_once "include/page_header.php";
 				else{
 					$graph_cnt = '-';
 				}
-				
+
 				/* $screens = 0; */
 				if($host["status"] == HOST_STATUS_TEMPLATE){
 					$ip = $dns = $port = '-';
@@ -454,7 +454,7 @@ include_once "include/page_header.php";
 						$screens)*/
 					));
 			}
-			
+
 			$table->SetFooter(new CCol(array(
 				new CButton('preview', S_PREVIEW),
 				new CButton('export', S_EXPORT)
@@ -464,7 +464,7 @@ include_once "include/page_header.php";
 			$form->Show();
 		}
 	}
-	
+
 ?>
 <?php
 

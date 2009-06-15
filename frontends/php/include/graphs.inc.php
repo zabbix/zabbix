@@ -31,15 +31,15 @@
  */
 	function graph_item_type2str($type,$count=null){
 		switch($type){
-			case GRAPH_ITEM_SUM:	
+			case GRAPH_ITEM_SUM:
 				$type = S_GRAPH_SUM;
-				break;				
-			case GRAPH_ITEM_AGGREGATED:	
-				$type = S_AGGREGATED.(isset($count) ? '('.$count.')' : '');	
+				break;
+			case GRAPH_ITEM_AGGREGATED:
+				$type = S_AGGREGATED.(isset($count) ? '('.$count.')' : '');
 				break;
 			case GRAPH_ITEM_SIMPLE:
-			default:			
-				$type = S_SIMPLE;	
+			default:
+				$type = S_SIMPLE;
 				break;
 		}
 	return $type;
@@ -138,7 +138,7 @@
 	return get_hosts_by_graphid($graphid);
 	}
 
-	function get_hosts_by_graphid($graphid){	
+	function get_hosts_by_graphid($graphid){
 		return DBselect('SELECT distinct h.* '.
 							' FROM graphs_items gi, items i, hosts h'.
 							' WHERE h.hostid=i.hostid '.
@@ -162,7 +162,7 @@
  * Author:
  *     Aly
  *
- */		
+ */
 	function graph_accessible($graphid){
 		global $USER_DETAILS;
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY,get_current_nodeid(true));
@@ -439,7 +439,7 @@
 			if (!$db_item && $error){
 				$item = get_item_by_itemid($gitem['itemid']);
 				$host = get_host_by_hostid($dest_hostid);
-				error('Missed key "'.$item['key_'].'" for host "'.$host['host'].'"');
+				error('Missing key "'.$item['key_'].'" for host "'.$host['host'].'"');
 				return false;
 			}
 			else if(!$db_item){
@@ -497,7 +497,7 @@
 		$result = false;
 
 		if(!is_array($gitems) || count($gitems)<1){
-			error('Missed items for graph "'.$name.'"');
+			error('Missing items for graph "'.$name.'"');
 			return $result;
 		}
 
@@ -596,7 +596,7 @@
 		}
 		return $result;
 	}
-	
+
         /*
          * Function: update_graph_with_items
          *
@@ -614,7 +614,7 @@
 		$result = false;
 
 		if(!is_array($gitems) || count($gitems) < 1){
-			error('Missed items for graph "'.$name.'"');
+			error('Missing items for graph "'.$name.'"');
 			return $result;
 		}
 
@@ -650,11 +650,11 @@
 			$tmp_hosts = get_hosts_by_graphid($chd_graph['graphid']);
 			$chd_host = DBfetch($tmp_hosts);
 			
-			if(!$new_gitems = get_same_graphitems_for_host($gitems, $chd_host['hostid'])){ /* skip host with missed items */
+			if(!$new_gitems = get_same_graphitems_for_host($gitems, $chd_host['hostid'])){ /* skip host with missing items */
 				error('Can not update graph "'.$name.'" for host "'.$chd_host['host'].'"');
 				return $result;
 			}
-		
+
 			if (!$result = update_graph_with_items($chd_graph['graphid'], $name, $width, $height,
 				$yaxistype, $yaxismin, $yaxismax,
 				$showworkperiod, $showtriggers, $graphtype, $legend, $graph3d, $percent_left, $percent_right, $new_gitems, $graphid))
@@ -700,7 +700,7 @@
  * Function: delete_graph
  *
  * Description:
- *     De;ete graph with templates
+ *     Delete graph with templates
  *
  * Author:
  *     Eugene Grigorjev 
@@ -1085,14 +1085,14 @@
 	 *		make_array_from_gitems
 	 *
 	 * Description:
-	 *     Creates array with items params for preapare_url function
+	 *     Creates array with items params for prepare_url function
 	 *
 	 * Author:
 	 *     Aly
 	 *
 	 * Comments
-	 *	
-	 */	
+	 *
+	 */
 	function make_url_from_gitems($gitems){
 
 		$gurl=array();
@@ -1114,10 +1114,10 @@
 				}
 			}
 		}
-		
+
 	return prepare_url($gurl);
 	}
-	
+
 	/*
 	 * Function: 
 	 *		make_array_from_graphid
