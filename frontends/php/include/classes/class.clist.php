@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -27,14 +27,14 @@ class CList extends CTag{
 		$this->addItem($value);
 		$this->setClass($class);
 	}
-	
+
 	public function prepareItem($value=NULL,$class=null){
 		if(!is_null($value)){
 			$value = new CListItem($value,$class);
 		}
 		return $value;
 	}
-	
+
 	public function addItem($value,$class=null){
 		if(is_array($value)){
 			foreach($value as $el)

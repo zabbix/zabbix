@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -31,7 +31,7 @@ class CColor extends CObject{
 		$txt->addAction('onchange', "set_color_by_name('".$name."',this.value)");
 		$txt->addOption('style', 'margin-top: 0px; margin-bottom: 0px');
 		$this->addItem(array($txt, $lbl));
-		
+
 		insert_show_color_picker_javascript();
 	}
 }
@@ -52,7 +52,7 @@ function insert_show_color_picker_javascript(){
 		$table .= '<td>'.unpack_object(new CColorCell(null, $color, 'set_color(\\\''.$color.'\\\')')).'</td>';
 	}
 	$table .= '</tr>';
-	
+
 	/* other colors */
 	$colors = array(
 		array('r' => 0, 'g' => 0, 'b' => 1),
@@ -62,7 +62,7 @@ function insert_show_color_picker_javascript(){
 		array('r' => 1, 'g' => 0, 'b' => 1),
 		array('r' => 1, 'g' => 1, 'b' => 0)
 		);
-	
+
 	$brigs  = array(
 		array(0 => '0', 1 => '3'),
 		array(0 => '0', 1 => '4'),
@@ -88,7 +88,7 @@ function insert_show_color_picker_javascript(){
 			$r = $br[$c['r']];
 			$g = $br[$c['g']];
 			$b = $br[$c['b']];
-			
+
 			$color = $r.$r.$g.$g.$b.$b;
 
 			$table .= '<td>'.unpack_object(new CColorCell(null, $color, 'set_color(\\\''.$color.'\\\')')).'</td>';
@@ -102,7 +102,7 @@ function insert_show_color_picker_javascript(){
 	$script = 'var color_picker = null;
 				var curr_lbl = null;
 				var curr_txt = null;'."\n";
-	
+
 	$script.= "var color_table = '".$table.$cancel."'\n";
 	insert_js($script);
 	print('<script type="text/javascript" src="js/color_picker.js"></script>');

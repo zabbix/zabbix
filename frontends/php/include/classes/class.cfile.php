@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -27,7 +27,7 @@ class CFile extends CTag{
 		$this->setName($name);
 		$this->setFile($value);
 	}
-	
+
 	public function setFile($value=''){
 		if(!is_string($value)){
 			return $this->error('Incorrect value for SetFile ['.$value.']');

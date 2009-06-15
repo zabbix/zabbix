@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -29,7 +29,7 @@ class CVar{
 
 		$this->setValue($value);
 	}
-	
+
 	public function setValue($value){
 		$this->var_container = array();
 

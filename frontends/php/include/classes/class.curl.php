@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -47,36 +47,36 @@ class Curl{
 		$this->path =		null;
 		$this->query =		null;
 		$this->arguments = 	array();
-	
+
 		if(empty($url)){
 			$this->formatArguments();
 			$this->url = $url = 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['SCRIPT_NAME'].'?'.$this->getQuery();
 		}
 		else{
 			$this->url=urldecode($url);
-	
+
 			$tmp_pos = strpos($this->url,'?');
 			$this->query=($tmp_pos!==false)?(substr($this->url,$tmp_pos+1)):'';
-	
+
 			$tmp_pos = strpos($this->query,'#');
 			if($tmp_pos!==false) $this->query=zbx_substring($this->query,0,$tmp_pos);
-	
+
 			$this->formatArguments($this->query);
 		}
-	
-		$protocolSepIndex=strpos($this->url,'://');	
+
+		$protocolSepIndex=strpos($this->url,'://');
 		if($protocolSepIndex!==false){
 			$this->protocol= strtolower(zbx_substring($this->url,0,$protocolSepIndex));
-			
+
 			$this->host=substr($this->url, $protocolSepIndex+3);
-			
+
 			$tmp_pos = strpos($this->host,'/');
 			if($tmp_pos!==false) $this->host=zbx_substring($this->host,0,$tmp_pos);
-			
+
 			$atIndex=strpos($this->host,'@');
 			if($atIndex!==false){
 				$credentials=zbx_substring($this->host,0,$atIndex);
-				
+
 				$colonIndex=strpos(credentials,':');
 				if($colonIndex!==false){
 					$this->username=zbx_substring($credentials,0,$colonIndex);
@@ -87,13 +87,13 @@ class Curl{
 				}
 				$this->host=substr($this->host,$atIndex+1);
 			}
-			
+
 			$host_ipv6 = strpos($this->host,']');
 			if($host_ipv6!==false){
 				if($host_ipv6 < (zbx_strlen($this->host)-1)){
 					$host_ipv6++;
 					$host_less = substr($this->host,$host_ipv6);
-	
+
 					$portColonIndex=strpos($host_less,':');
 					if($portColonIndex!==false){
 						$this->host=zbx_substring($this->host,0,$host_ipv6);
@@ -108,33 +108,33 @@ class Curl{
 					$this->port=substr($this->host,$portColonIndex+1);
 				}
 			}
-			
+
 			$this->file = substr($this->url,$protocolSepIndex+3);
 			$this->file = substr($this->file, strpos($this->file,'/'));
-			
+
 			if($this->file == $this->host) $this->file = '';
 		}
 		else{
 			$this->file = $this->url;
 		}
-		
+
 		$tmp_pos = strpos($this->file,'?');
 		if($tmp_pos!==false) $this->file=zbx_substring($this->file, 0, $tmp_pos);
-	
+
 		$refSepIndex=strpos($url,'#');
 		if($refSepIndex!==false){
 			$this->file = zbx_substring($this->file,0,$refSepIndex);
 			$this->reference = substr($url,strpos($url,'#')+1);
 		}
-		
+
 		$this->path=$this->file;
 		if(zbx_strlen($this->query)>0) 		$this->file.='?'.$this->query;
 		if(zbx_strlen($this->reference)>0)	$this->file.='#'.$this->reference;
-	
+
 		if(isset($_COOKIE['zbx_sessionid']))
 			$this->setArgument('sid', substr($_COOKIE['zbx_sessionid'],16,16));
 	}
-	
+
 	public function formatQuery(){
 		$query = '';
 		foreach($this->arguments as $key => $value){
@@ -142,7 +142,7 @@ class Curl{
 		}
 		$this->query = rtrim($query,'&');
 	}
-	
+
 	public function formatArguments($query=null){
 		if(is_null($query)){
 			$this->arguments = $_REQUEST;
@@ -159,7 +159,7 @@ class Curl{
 		}
 		$this->formatQuery();
 	}
-	
+
 	public function getUrl(){
 			$url = $this->protocol ? $this->protocol.'://' : '';
 			$url .= $this->username ? $this->username : '';
@@ -172,97 +172,97 @@ class Curl{
 	//SDI($this->getProtocol().' : '.$this->getHost().' : '.$this->getPort().' : '.$this->getPath().' : '.$this->getQuery());
 	return $url;
 	}
-	
+
 	public function setPort($port){
 		$this->port = $port;
 	}
-	
-	public function getPort(){ 
+
+	public function getPort(){
 		return $this->port;
 	}
-	
+
 	public function setArgument($key,$value=''){
 		$this->arguments[$key] = $value;
 		$this->formatQuery();
 	}
-	
+
 	public function getArgument($key){
 		if(isset($this->arguments[$key])) return $this->arguments[$key];
 		else return NULL;
 	}
-	
-	public function setQuery($query){ 
+
+	public function setQuery($query){
 		$this->query = $query;
 		$this->formatArguments();
 		$this->formatQuery();
 	}
-	
-	public function getQuery(){ 
+
+	public function getQuery(){
 		return $this->query;
 	}
-	
+
 	public function setProtocol($protocol){
 		$this->protocol = $protocol;
 	}
-	
+
 	/* Returns the protocol of $this URL, i.e. 'http' in the url 'http://server/' */
 	public function getProtocol(){
 		return $this->protocol;
 	}
-	
+
 	public function setHost($host){
 		$this->host = $host;
 	}
-	
+
 	/* Returns the host name of $this URL, i.e. 'server.com' in the url 'http://server.com/' */
 	public function getHost(){
 		return $this->host;
 	}
-	
+
 	public function setUserName($username){
 		$this->username = $username;
 	}
-	
+
 	/* Returns the user name part of $this URL, i.e. 'joe' in the url 'http://joe@server.com/' */
 	public function getUserName(){
 		return $this->username;
 	}
-	
+
 	public function setPassword($password){
 		$this->password = $password;
 	}
-	
+
 	/* Returns the password part of $this url, i.e. 'secret' in the url 'http://joe:secret@server.com/' */
 	public function getPassword(){
 		return $this->password;
 	}
-	
+
 	/* Returns the file part of $this url, i.e. everything after the host name. */
 	public function getFile(){
 		$url .= $this->path ? $this->path : '';
 		$url .= $this->query ? '?'.$this->query : '';
 		$url .= $this->reference ? '#'.urlencode($this->reference) : '';
-		return $url;	
+		return $url;
 	}
-	
+
 	public function setReference($reference){
 		$this->reference = $reference;
 	}
-	
+
 	/* Returns the reference of $this url, i.e. 'bookmark' in the url 'http://server/file.html#bookmark' */
 	public function getReference(){
 		return $this->reference;
 	}
-	
+
 	public function setPath($path){
 		$this->path = $path;
 	}
-	
+
 	/* Returns the file path of $this url, i.e. '/dir/file.html' in the url 'http://server/dir/file.html' */
 	public function getPath(){
 		return $this->path;
 	}
-	
+
 	public function toString(){
 		return $this->getUrl();
 	}

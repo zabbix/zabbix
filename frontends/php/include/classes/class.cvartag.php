@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -26,11 +26,11 @@ class CVarTag extends CTag{
 		$this->options['type'] = 'hidden';
 		$this->options['name'] = $name;
 		$this->options['id'] = $name;
-		
+
 		$this->setValue($value);
 	}
-	
-	public function setValue($value){ 
+
+	public function setValue($value){
 		$this->options['value'] = htmlspecialchars($value);
 	}
 }

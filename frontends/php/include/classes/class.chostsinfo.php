@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -25,7 +25,7 @@ class CHostsInfo extends CTable{
 		$this->nodeid = id2nodeid($groupid);
 		$this->groupid = $groupid;
 		$this->style = null;
-		
+
 		parent::CTable(NULL,"hosts_info");
 		$this->SetOrientation($style);
 	}
@@ -38,7 +38,7 @@ class CHostsInfo extends CTable{
 	}
 
 	public function bodyToString(){
-		global $USER_DETAILS; 
+		global $USER_DETAILS;
 		$this->cleanItems();
 
 		$total = 0;
@@ -60,11 +60,11 @@ class CHostsInfo extends CTable{
 									' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
 									' AND '.DBcondition('h.hostid',$accessible_hosts).
 									$cond_where);
-									
+
 		$host_cnt = DBfetch($db_host_cnt);
 		$avail = $host_cnt['cnt'];
 		$total += $host_cnt['cnt'];
-		
+
 		$db_host_cnt = DBselect('SELECT COUNT(DISTINCT h.hostid) as cnt '.
 								' FROM hosts h'.$cond_from.
 								' WHERE h.available='.HOST_AVAILABLE_FALSE.
@@ -83,27 +83,27 @@ class CHostsInfo extends CTable{
 									' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
 									' AND '.DBcondition('h.hostid',$accessible_hosts).
 									$cond_where);
-									
+
 
 		$host_cnt = DBfetch($db_host_cnt);
 		$uncn = $host_cnt['cnt'];
 		$total += $host_cnt['cnt'];
-		
+
 		$node = get_node_by_nodeid($this->nodeid);
 		$header_str = S_HOSTS_INFO.SPACE;
-		
+
 		$header_str.= S_FOR_GROUP_SMALL.SPACE.'&quot;';
 		if($node > 0) $header_str.= '('.$node['name'].')'.SPACE;
-		
+
 		if(remove_nodes_from_id($this->groupid)>0){
 			$group = get_hostgroup_by_groupid($this->groupid);
 			$header_str.= $group['name'].'&quot;';
 		}
 		else{
 			$header_str.= S_ALL_S.'&quot;';
-		}			
-		
-		$header = new CCol($header_str,"header");			
+		}
+
+		$header = new CCol($header_str,"header");
 		if($this->style == STYLE_HORISONTAL)
 			$header->SetColspan(4);
 
@@ -123,7 +123,7 @@ class CHostsInfo extends CTable{
 			$this->addRow($uncn);
 			$this->addRow($total);
 		}
-		
+
 	return parent::bodyToString();
 	}
 }

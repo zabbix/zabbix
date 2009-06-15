@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -30,15 +30,15 @@ class CButton extends CTag{
 		$this->setAction($action);
 		$this->setAccessKey($accesskey);
 	}
-	
+
 	public function setAction($value=null){
 		$this->addAction('onclick', $value);
 	}
-	
+
 	public function setTitle($value='button title'){
 		$this->addOption('title', $value);
 	}
-	
+
 	public function setAccessKey($value='B'){
 		if(isset($value))
 			if(!isset($this->options['title']))
@@ -46,7 +46,7 @@ class CButton extends CTag{
 
 		return $this->addOption('accessKey', $value);
 	}
-	
+
 	public function setType($type='button'){
 		$this->addOption('type',$type);
 	}

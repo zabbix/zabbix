@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -22,7 +22,7 @@
 class CLink extends CTag{
 	public function __construct($item=NULL,$url=NULL,$class=NULL,$action=NULL, $nosid=NULL){
 		parent::__construct('a','yes');
-		
+
 		$this->tag_start= '';
 		$this->tag_end = '';
 		$this->tag_body_start = '';
@@ -34,14 +34,14 @@ class CLink extends CTag{
 		if(!is_null($url))		$this->setUrl($url);
 		if(!is_null($action))	$this->setAction($action);
 	}
-	
+
 	public function setAction($value=NULL){
 		if(is_null($value))
 			return $this->options['action'] = $page['file'];
 
 		return parent::addAction('onclick', $value);
 	}
-	
+
 	public function setUrl($value){
 		if(is_null($this->nosid)) {
 			$uri = new Curl($value);
@@ -52,14 +52,14 @@ class CLink extends CTag{
 		}
 		$this->addOption('href', $url);
 	}
-	
+
 	public function getUrl(){
 		if(isset($this->options['href']))
 			return $this->options['href'];
 		else
 			return null;
 	}
-	
+
 	public function setTarget($value=NULL){
 		if(is_null($value)){
 			unset($this->options['target']);

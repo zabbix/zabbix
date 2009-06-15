@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -21,14 +21,14 @@
 <?php
 class CObject{
  public $items;
- 
+
 	public function __construct($items=null){
 		$this->items = array();
 		if(isset($items)){
 			$this->addItem($items);
 		}
 	}
-	
+
 	public function toString($destroy=true){
 		$res = implode('',$this->items);
 		if($destroy) $this->destroy();
@@ -36,21 +36,21 @@ class CObject{
 	}
 
 	public function show($destroy=true){
-		echo $this->toString($destroy);			
+		echo $this->toString($destroy);
 	}
 
 	public function destroy(){
 		$this->cleanItems();
 	}
 
-	public function cleanItems(){	
-		$this->items = array();	
+	public function cleanItems(){
+		$this->items = array();
 	}
-	
-	public function itemsCount(){	
-		return count($this->items);	
+
+	public function itemsCount(){
+		return count($this->items);
 	}
-	
+
 	public function addItem($value){
 		if(is_object($value)){
 			array_push($this->items,unpack_object($value));
@@ -84,7 +84,7 @@ function unpack_object(&$item){
 		$res = $item->toString(false);
 	}
 	else if(is_array($item)){
-		foreach($item as $id => $dat)	
+		foreach($item as $id => $dat)
 			$res .= unpack_object($item[$id]); // Attention, recursion !!!
 	}
 	else if(!is_null($item)){

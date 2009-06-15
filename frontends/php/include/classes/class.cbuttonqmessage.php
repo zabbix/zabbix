@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -28,14 +28,14 @@ class CButtonQMessage extends CButton{
 		$this->vars = null;
 		$this->msg = null;
 		$this->name = $name;
-		
+
 		parent::__construct($name,$caption);
 
 		$this->setMessage($msg);
 		$this->setVars($vars);
 		$this->setAction(NULL);
 	}
-	
+
 	public function setVars($value=NULL){
 		if(!is_string($value) && !is_null($value)){
 			return $this->error('Incorrect value for setVars ['.$value.']');
@@ -43,7 +43,7 @@ class CButtonQMessage extends CButton{
 		$this->vars = $value;
 		$this->setAction(NULL);
 	}
-	
+
 	public function setMessage($value=NULL){
 		if(is_null($value))
 			$value = 'Are You Sure?';
@@ -54,7 +54,7 @@ class CButtonQMessage extends CButton{
 		$this->msg = $value;
 		$this->setAction(NULL);
 	}
-	
+
 	public function setAction($value=null){
 		if(!is_null($value))
 			return parent::setAction($value);
@@ -62,17 +62,17 @@ class CButtonQMessage extends CButton{
 		global $page;
 
 		$confirmation = "Confirm('".$this->msg."')";
-		
+
 		if(isset($this->vars)){
 			$link = $page['file'].'?'.$this->name.'=1'.$this->vars;
 			$url = new Curl($link);
-			
+
 			$action = "redirect('".$url->getUrl()."')";
 		}
 		else{
 			$action = 'true';
 		}
-		
+
 		return parent::setAction('if('.$confirmation.') return '.$action.'; else return false;');
 	}
 }
