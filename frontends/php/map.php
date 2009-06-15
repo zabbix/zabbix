@@ -108,11 +108,11 @@ include_once 'include/page_header.php';
 		$grid = 50;
 
 		for($x=$grid;$x<$width;$x+=$grid){
-			MyDrawLine($im,$x,0,$x,$height,$black,GRAPH_DRAW_TYPE_DASHEDLINE);
+			MyDrawLine($im,$x,0,$x,$height,$black, MAP_LINK_DRAWTYPE_DASHED_LINE);
 			imagestring($im, 2, $x+2,2, $x , $black);
 		}
 		for($y=$grid;$y<$height;$y+=$grid){
-			MyDrawLine($im,0,$y,$width,$y,$black,GRAPH_DRAW_TYPE_DASHEDLINE);
+			MyDrawLine($im,0,$y,$width,$y,$black, MAP_LINK_DRAWTYPE_DASHED_LINE);
 			imagestring($im, 2, 2,$y+2, $y , $black);
 		}
 

@@ -6065,13 +6065,16 @@
 			$colorbox = new CSpan(SPACE.SPACE.SPACE);
 			$colorbox->AddOption('style','text-decoration: none; outline-color: black; outline-style: solid; outline-width: 1px; background-color: #'.$trigger['color'].';');
 
+			$link_desc = new CSpan($trigger['description'],'link');
+			$link_desc->addoption('onclick', "javascript: openWinCentered('popup_link_tr.php?form=1&dstfrm=".$frmCnct->GetName()."&triggerid=".$trigger['triggerid'].url_param('linkid')."','ZBX_Link_Indicator',560,260,'scrollbars=1, toolbar=0, menubar=0, resizable=0');");
+			
 			$table->AddRow(array(
 					array(
 						new CCheckBox('triggers['.$trigger['triggerid'].'][triggerid]',null,null,$trigger['triggerid']),
 						new CVar('triggers['.$trigger['triggerid'].'][triggerid]', $trigger['triggerid'])
 						),
 					array(
-						new CLink($trigger['description'],"javascript: openWinCentered('popup_link_tr.php?form=1&dstfrm=".$frmCnct->GetName()."&triggerid=".$trigger['triggerid'].url_param('linkid')."','ZBX_Link_Indicator',560,260,'scrollbars=1, toolbar=0, menubar=0, resizable=0');"),
+						$link_desc,
 						new CVar('triggers['.$trigger['triggerid'].'][description]', $trigger['description'])
 						),
 					array(

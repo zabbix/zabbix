@@ -1,5 +1,7 @@
 Changes for 1.6.5
 
+ - [ZBX-956] fixed js error on map link edit (Artem)
+ - [ZBX-955] fixed bold lines in map links (Artem)
  - [ZBX-954] fixed various minor typos and formatting errors (Richlv)
  - [ZBX-886] removed duplicate and outdated strings from locales (Richlv)
  - [ZBX-952] increased max length of processed text and log data to 64KB (Sasha)
