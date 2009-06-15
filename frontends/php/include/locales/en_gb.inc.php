@@ -526,7 +526,7 @@
 	'S_DOWN'=>				'Down',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>		'New item for the graph',
 	'S_UPD_ITEM_FOR_THE_GRAPH'=>		'Update item for the graph',
-	'S_SORT_ORDER_1_100'=>			'Sort order (0->100)',
+	'S_SORT_ORDER_0_100'=>			'Sort order (0->100)',
 	'S_YAXIS_SIDE'=>			'Y axis side',
 	'S_AXIS_SIDE'=>				'Axis side',
 	'S_LEFT'=>				'Left',

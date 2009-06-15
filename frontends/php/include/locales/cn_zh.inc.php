@@ -124,7 +124,7 @@
 	'S_UP'=>			'Up',
 	'S_DOWN'=>			'Down',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>			'New item for the graph',
-	'S_SORT_ORDER_1_100'=>			'Sort order (0->100)',
+	'S_SORT_ORDER_0_100'=>			'Sort order (0->100)',
 	'S_YAXIS_SIDE'=>			'Y axis side',
 	'S_LEFT'=>			'向左',
 	'S_CONFIGURATION_OF_GRAPHS'=>			'图表显示配置',
