@@ -732,7 +732,7 @@
 	'S_POC_2_NAME'=>			'Secondary POC Name',
 	'S_POC_2_EMAIL'=>			'Secondary POC Email',
 	'S_POC_2_PHONE_1'=>			'Secondary POC Phone 1',
-	'S_POC_2_PHONE_2'			'Secondary POC Phone 2',
+	'S_POC_2_PHONE_2'=>			'Secondary POC Phone 2',
 	'S_POC_2_CELL'=>			'Secondary POC Cell',
 	'S_POC_2_SCREEN'=>			'Secondary POC Screen Name',
 	'S_POC_2_NOTES'=>			'Secondary POC Comments',
