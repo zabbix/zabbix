@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -24,7 +24,7 @@
 
 class Curl{
 /*
-private $url = 			'';		//	actually, it's depricated/private variable 
+private $url = 			'';		//	actually, it's depricated/private variable
 private $port =			false;
 private $host = 		'';
 private $protocol = 	'';
@@ -39,8 +39,8 @@ private $arguments = 	array();
 
 function curl($url=null){
 	global $USER_DETAILS;
-	
-	$this->url = 		'';		//	actually, it's depricated/private variable 
+
+	$this->url = 		'';		//	actually, it's depricated/private variable
 	$this->port =		false;
 	$this->host = 		'';
 	$this->protocol = 	'';
@@ -68,19 +68,19 @@ function curl($url=null){
 		$this->formatArguments($this->query);
 	}
 
-	$protocolSepIndex=strpos($this->url,'://');	
+	$protocolSepIndex=strpos($this->url,'://');
 	if($protocolSepIndex!==false){
 		$this->protocol= strtolower(zbx_substring($this->url,0,$protocolSepIndex));
-		
+
 		$this->host=substr($this->url, $protocolSepIndex+3);
-		
+
 		$tmp_pos = strpos($this->host,'/');
 		if($tmp_pos!==false) $this->host=zbx_substring($this->host,0,$tmp_pos);
-		
+
 		$atIndex=strpos($this->host,'@');
 		if($atIndex!==false){
 			$credentials=zbx_substring($this->host,0,$atIndex);
-			
+
 			$colonIndex=strpos(credentials,':');
 			if($colonIndex!==false){
 				$this->username=zbx_substring($credentials,0,$colonIndex);
@@ -91,7 +91,7 @@ function curl($url=null){
 			}
 			$this->host=substr($this->host,$atIndex+1);
 		}
-		
+
 		$host_ipv6 = strpos($this->host,']');
 		if($host_ipv6!==false){
 			if($host_ipv6 < (zbx_strlen($this->host)-1)){
@@ -112,16 +112,16 @@ function curl($url=null){
 				$this->port=substr($this->host,$portColonIndex+1);
 			}
 		}
-		
+
 		$this->file = substr($this->url,$protocolSepIndex+3);
 		$this->file = substr($this->file, strpos($this->file,'/'));
-		
+
 		if($this->file == $this->host) $this->file = '';
 	}
 	else{
 		$this->file = $this->url;
 	}
-	
+
 	$tmp_pos = strpos($this->file,'?');
 	if($tmp_pos!==false) $this->file=zbx_substring($this->file, 0, $tmp_pos);
 
@@ -130,7 +130,7 @@ function curl($url=null){
 		$this->file = zbx_substring($this->file,0,$refSepIndex);
 		$this->reference = substr($url,strpos($url,'#')+1);
 	}
-	
+
 	$this->path=$this->file;
 	if(zbx_strlen($this->query)>0) 		$this->file.='?'.$this->query;
 	if(zbx_strlen($this->reference)>0)	$this->file.='#'.$this->reference;
@@ -173,7 +173,7 @@ function getUrl(){
 	$url .=  (zbx_strlen($this->path) > 0)?$this->path:'';
 	$url .=  (zbx_strlen($this->query) > 0)?('?'.$this->query):'';
 	$url .=  (zbx_strlen($this->reference) > 0)?('#'.urlencode($this->reference)):'';
-	
+
 //SDI($this->getProtocol().' : '.$this->getHost().' : '.$this->getPort().' : '.$this->getPath().' : '.$this->getQuery());
 return $url;
 }
@@ -182,7 +182,7 @@ function setPort($port){
 	$this->port = $port;
 }
 
-function getPort(){ 
+function getPort(){
 	return $this->port;
 }
 
@@ -196,13 +196,13 @@ function getArgument($key){
 	else return NULL;
 }
 
-function setQuery($query){ 
+function setQuery($query){
 	$this->query = $query;
 	$this->formatArguments();
 	$this->formatQuery();
 }
 
-function getQuery(){ 
+function getQuery(){
 	return $this->query;
 }
 

@@ -1,5 +1,5 @@
-<?php 
-/* 
+<?php
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2007 SIA Zabbix
 **
@@ -25,7 +25,7 @@ class Pie extends Graph{
 
 function Pie($type = GRAPH_TYPE_PIE){
 	parent::Graph($type);
-	
+
 	$this->background = false;
 	$this->sum = false;
 	$this->exploderad = 1;
@@ -61,7 +61,7 @@ function AddItem($itemid, $calc_fnc=CALC_FNC_AVG,$color=null, $type=null, $perio
 	$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
 	$this->items[$this->num]['calc_type'] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
 	$this->items[$this->num]['periods_cnt'] = is_null($periods_cnt) ? 0 : $periods_cnt;
-	
+
 	$this->num++;
 }
 
@@ -82,19 +82,19 @@ function selectData(){
 
 	$p = $this->to_time - $this->from_time;		// graph size in time
 	$z = $p - $this->from_time % $p;		//<strong></strong>
-	$x = $this->sizeX;		// graph size in px	
+	$x = $this->sizeX;		// graph size in px
 	$strvaluelength = 0;	// we need to know how long in px will be our legend
 
 	for($i=0; $i < $this->num; $i++){
-	
+
 		$real_item = get_item_by_itemid($this->items[$i]['itemid']);
 		$type = $this->items[$i]['calc_type'];
 
 		$from_time	= $this->from_time;
 		$to_time	= $this->to_time;
-		
+
 		$sql_arr = array();
-				
+
 		if((($real_item['history']*86400) > (time()-($from_time+$this->period/2))) &&				// should pick data from history or trends
 			(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))		// is reasonable to take data from history?
 		{
@@ -145,7 +145,7 @@ function selectData(){
 				' GROUP BY t.itemid'
 				);
 		}
-		
+
 		$curr_data = &$this->data[$this->items[$i]['itemid']][$type];
 		$curr_data->min = NULL;
 		$curr_data->max = NULL;
@@ -154,7 +154,7 @@ function selectData(){
 
 		foreach($sql_arr as $sql){
 			$result=DBselect($sql);
-			
+
 			while($row=DBfetch($result)){
 				$curr_data->min	= $row['min'];
 				$curr_data->max	= $row['max'];
@@ -163,24 +163,24 @@ function selectData(){
 				$curr_data->clock	= $row['clock'];
 				$curr_data->shift_min = 0;
 				$curr_data->shift_max = 0;
-				$curr_data->shift_avg = 0;				
+				$curr_data->shift_avg = 0;
 			}
 			unset($row);
 		}
-		
+
 		switch($this->items[$i]['calc_fnc']){
-			case CALC_FNC_MIN:	
+			case CALC_FNC_MIN:
 				$item_value = abs($curr_data->min);
 
 				break;
-			case CALC_FNC_MAX:	
+			case CALC_FNC_MAX:
 				$item_value = abs($curr_data->max);
 				break;
-			case CALC_FNC_LST:	
+			case CALC_FNC_LST:
 				$item_value = abs($curr_data->lst);
 				break;
 			case CALC_FNC_AVG:
-			default:		
+			default:
 				$item_value = abs($curr_data->avg);
 		}
 
@@ -188,11 +188,11 @@ function selectData(){
 			$this->background = $i;
 			$graph_sum = $item_value;
 		}
-		
+
 		$this->sum += $item_value;
 		$strvaluelength = max($strvaluelength,strlen(convert_units($item_value,$this->items[$i]['unit'])));
 	}
-	
+
 	if(isset($graph_sum)) $this->sum = $graph_sum;
 	$this->shiftlegendright += $strvaluelength * 7;
 }
@@ -201,7 +201,7 @@ function selectData(){
 /*function set3DAngle($angle = 70){
 	if(is_numeric($angle) && ($angle < 85) && ($angle > 10)){
 		$this->angle3d = (int) $angle;
-	} 
+	}
 	else {
 		$this->angle3d = 70;
 	}
@@ -254,7 +254,7 @@ function SwitchPieExploded($type){
 				$this->type = GRAPH_TYPE_PIE;
 		}
 	}
-return $this->type;	
+return $this->type;
 }
 
 function calc3dhight($height){
@@ -268,7 +268,7 @@ function calcExplodedCenter($anglestart,$angleend,$x,$y,$count){
 	$y+= round($count * sin(deg2rad($anglemid)));
 	$x+= round($count * cos(deg2rad($anglemid)));
 
-return array($x,$y);		
+return array($x,$y);
 }
 
 function calcExplodedRadius($sizeX,$sizeY,$count){
@@ -286,10 +286,10 @@ return array($sizeX,round($sizeY));
 function drawLegend(){
 
 	$shiftY = $this->shiftY + $this->shiftYLegend;
-	
+
 	$max_host_len=0;
 	$max_desc_len=0;
-	
+
 	for($i=0;$i<$this->num;$i++){
 		if(strlen($this->items[$i]['host'])>$max_host_len)		$max_host_len=strlen($this->items[$i]['host']);
 		if(strlen($this->items[$i]['description'])>$max_desc_len)	$max_desc_len=strlen($this->items[$i]['description']);
@@ -299,26 +299,26 @@ function drawLegend(){
 
 		$color = $this->GetColor($this->items[$i]['color']);
 		$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
-		
+
 		switch($this->items[$i]['calc_fnc']){
-			case CALC_FNC_MIN:	
+			case CALC_FNC_MIN:
 				$fnc_name = 'min';
 				$datavalue = $data->min;
 				break;
-			case CALC_FNC_MAX:	
-				$fnc_name = 'max';	
+			case CALC_FNC_MAX:
+				$fnc_name = 'max';
 				$datavalue = $data->max;
 				break;
-			case CALC_FNC_LST:	
-				$fnc_name = 'last';	
+			case CALC_FNC_LST:
+				$fnc_name = 'last';
 				$datavalue = $data->lst;
 				break;
 			case CALC_FNC_AVG:
-			default:		
+			default:
 				$fnc_name = 'avg';
 				$datavalue = $data->avg;
 		}
-		
+
 		$proc = ($datavalue * 100)/ $this->sum;
 //		convert_units($datavalue,$this->items[$i]["units"]),
 		if(isset($data) && isset($datavalue)){
@@ -347,10 +347,10 @@ function drawLegend(){
 
 		$shiftX = $this->fullSizeX - $this->shiftlegendright - $this->shiftXright + 10;
 //		SDI($shiftX.','.$this->sizeX);
-		
+
 		ImageFilledRectangle($this->im,$shiftX,$this->shiftY+10+5+12*$i,$shiftX+5,$this->shiftY+10+10+12*$i,$color);
 		ImageRectangle($this->im,$shiftX,$this->shiftY+10+5+12*$i,$shiftX+5,$this->shiftY+10+10+12*$i,$this->GetColor('Black No Alpha'));
-		
+
 		ImageString($this->im, 2,
 			$shiftX+9,
 			$this->shiftY+10+12*$i,
@@ -365,7 +365,7 @@ function drawLegend(){
 function drawElementPie($values){
 
 	$sum = $this->sum;
-	
+
 	if($this->background !== false){
 		$least = 0;
 		foreach($values as $item => $value){
@@ -376,17 +376,17 @@ function drawElementPie($values){
 		}
 		$values[$this->background] -= $least;
 	}
-	
+
 	if($sum <= 0){
 		$this->items[0]['color'] = 'FFFFFF';
 		$values = array(0 => 1);
 		$sum = 1;
 	}
 //		asort($values);
-	
+
 	$sizeX = $this->sizeX;
 	$sizeY = $this->sizeY;
-	
+
 	if($this->type == GRAPH_TYPE_EXPLODED){
 		list($sizeX,$sizeY) = $this->calcExplodedRadius($sizeX,$sizeY,count($values));
 	} else {
@@ -396,18 +396,18 @@ function drawElementPie($values){
 
 	$xc = $x = (int) $this->sizeX/2 + ($this->shiftXleft);
 	$yc = $y = (int) $this->sizeY/2 + $this->shiftY;
-	
+
 	$anglestart = 0;
 	$angleend = 0;
 	foreach($values as $item => $value){
 		$angleend += (int)(360 * $value/$sum)+1;
 		$angleend = ($angleend > 360)?(360):($angleend);
 		if(($angleend - $anglestart) < 1) continue;
-		
+
 		if($this->type == GRAPH_TYPE_EXPLODED){
 			list($x,$y) = $this->calcExplodedCenter($anglestart,$angleend,$xc,$yc,count($values));
 		}
-		
+
 		imagefilledarc($this->im, $x, $y, $sizeX, $sizeY, $anglestart, $angleend, $this->GetColor($this->items[$item]['color'],0), IMG_ARC_PIE);
 		imagefilledarc($this->im, $x, $y, $sizeX, $sizeY, $anglestart, $angleend, $this->GetColor('Black'), IMG_ARC_PIE|IMG_ARC_EDGED|IMG_ARC_NOFILL);
 		$anglestart = $angleend;
@@ -418,7 +418,7 @@ function drawElementPie($values){
 function drawElementPie3D($values){
 
 	$sum = $this->sum;
-	
+
 	if($this->background !== false){
 		$least = 0;
 		foreach($values as $item => $value){
@@ -428,45 +428,45 @@ function drawElementPie3D($values){
 		}
 		$values[$this->background] -= $least;
 	}
-	
+
 	if($sum <= 0){
 		$this->items[0]['color'] = 'FFFFFF';
 		$values = array(0 => 1);
 		$sum = 1;
 	}
 //		asort($values);
-	
+
 	$sizeX = $this->sizeX;
 	$sizeY = $this->sizeY;
-	
+
 	$this->exploderad = $this->exploderad3d;
-	
+
 	if($this->type == GRAPH_TYPE_3D_EXPLODED){
 		list($sizeX,$sizeY) = $this->calcExplodedRadius($sizeX,$sizeY,count($values));
 	}
 
 	list($sizeX,$sizeY) = $this->calc3DAngle($sizeX,$sizeY);
-	
+
 	$xc = $x = (int) $this->sizeX/2 + ($this->shiftXleft);
 	$yc = $y = (int) $this->sizeY/2 + $this->shiftY;
-	
+
 // ----- bottom angle line ----
 	$anglestart = 0;
 	$angleend = 0;
 	foreach($values as $item => $value){
-		
+
 		$angleend += (int)(360 * $value/$sum)+1;
 		$angleend = ($angleend > 360)?(360):($angleend);
 		if(($angleend - $anglestart) < 1) continue;
-		
+
 		if($this->type == GRAPH_TYPE_3D_EXPLODED){
 			list($x,$y) = $this->calcExplodedCenter($anglestart,$angleend,$xc,$yc,count($values));
 		}
 		imagefilledarc($this->im, $x, $y+$this->graphheight3d+1, $sizeX, $sizeY, $anglestart, $angleend, $this->GetShadow($this->items[$item]['color'],0), IMG_ARC_PIE);
-		imagefilledarc($this->im, $x, $y+$this->graphheight3d+1, $sizeX, $sizeY, $anglestart, $angleend, $this->GetColor('Black'), IMG_ARC_PIE|IMG_ARC_EDGED|IMG_ARC_NOFILL);				
+		imagefilledarc($this->im, $x, $y+$this->graphheight3d+1, $sizeX, $sizeY, $anglestart, $angleend, $this->GetColor('Black'), IMG_ARC_PIE|IMG_ARC_EDGED|IMG_ARC_NOFILL);
 		$anglestart = $angleend;
 	}//*/
-	
+
 //	------ 3d effect	------
 	for ($i = $this->graphheight3d; $i > 0; $i--) {
 		$anglestart = 0;
@@ -474,23 +474,23 @@ function drawElementPie3D($values){
 		foreach($values as $item => $value){
 			$angleend += (int)(360 * $value/$sum)+1;
 			$angleend = ($angleend > 360)?(360):($angleend);
-			
+
 			if(($angleend - $anglestart) < 1) continue;
 			elseif($this->sum == 0) continue;
-			
+
 			if($this->type == GRAPH_TYPE_3D_EXPLODED){
 				list($x,$y) = $this->calcExplodedCenter($anglestart,$angleend,$xc,$yc,count($values));
 			}
-			
+
 			imagefilledarc($this->im, $x, $y+$i, $sizeX, $sizeY, $anglestart, $angleend, $this->GetShadow($this->items[$item]['color'],0), IMG_ARC_PIE);
 			$anglestart = $angleend;
 		}
 	}
-	
+
 	$anglestart = 0;
 	$angleend = 0;
 	foreach($values as $item => $value){
-		
+
 		$angleend += (int)(360 * $value/$sum)+1;
 		$angleend = ($angleend > 360)?(360):($angleend);
 		if(($angleend - $anglestart) < 1) continue;
@@ -498,7 +498,7 @@ function drawElementPie3D($values){
 		if($this->type == GRAPH_TYPE_3D_EXPLODED){
 			list($x,$y) = $this->calcExplodedCenter($anglestart,$angleend,$xc,$yc,count($values));
 		}
-			
+
 		imagefilledarc($this->im, $x, $y, $sizeX, $sizeY, $anglestart, $angleend, $this->GetColor($this->items[$item]['color'],0), IMG_ARC_PIE);
 		imagefilledarc($this->im, $x, $y, $sizeX, $sizeY, $anglestart, $angleend, $this->GetColor('Black'), IMG_ARC_PIE|IMG_ARC_EDGED|IMG_ARC_NOFILL);
 		$anglestart = $angleend;
@@ -509,19 +509,19 @@ function Draw(){
 	$start_time=getmicrotime();
 	set_image_header();
 	check_authorisation();
-	
+
 	$this->selectData();
 
 	$this->shiftY = 20;
 	$this->shiftYLegend = 20;
 	$this->shiftXleft = 10;
 	$this->shiftXright = 0;
-	
+
 	$this->fullSizeX = $this->sizeX;
 	$this->fullSizeY = $this->sizeY;
-	
+
 	if(($this->sizeX < 300) || ($this->sizeY < 200)) $this->switchlegend(0);
-	
+
 	if($this->drawlegendallow == 1){
 		$this->sizeX -= ($this->shiftXleft+$this->shiftXright+$this->shiftlegendright);
 		$this->sizeY -= ($this->shiftY+$this->shiftYLegend+12*$this->num+8);
@@ -530,17 +530,17 @@ function Draw(){
 		$this->sizeX -= ($this->shiftXleft*2);
 		$this->sizeY -= ($this->shiftY*2);
 	}
-	
+
 //	SDI($this->sizeX.','.$this->sizeY);
-	
+
 	$this->sizeX = min($this->sizeX,$this->sizeY);
 	$this->sizeY = min($this->sizeX,$this->sizeY);
-	
+
 	$this->calc3dhight($this->sizeY);
-	
+
 	$this->exploderad = (int) $this->sizeX / 100;
 	$this->exploderad3d = (int) $this->sizeX / 60;
-	
+
 	if(function_exists('ImageColorExactAlpha')&&function_exists('ImageCreateTrueColor')&&@imagecreatetruecolor(1,1))
 		$this->im = imagecreatetruecolor($this->fullSizeX,$this->fullSizeY);
 	else
@@ -550,16 +550,16 @@ function Draw(){
 	$this->initColors();
 	$this->drawRectangle();
 	$this->drawHeader();
-	
+
 	$maxX = $this->sizeX;
-	
+
 	// For each metric
 	for($item = 0; $item < $this->num; $item++){
 		$minY = $this->m_minY[$this->items[$item]['axisside']];
 		$maxY = $this->m_maxY[$this->items[$item]['axisside']];
 
 		$data = &$this->data[$this->items[$item]['itemid']][$this->items[$item]['calc_type']];
-		
+
 		if(!isset($data))	continue;
 
 		$drawtype	= $this->items[$item]['drawtype'];
@@ -568,7 +568,7 @@ function Draw(){
 		$avg_color	= $this->GetColor($this->items[$item]['color']);
 		$min_color	= $this->GetColor('ValueMin');
 		$minmax_color	= $this->GetColor('ValueMinMax');
-		
+
 		$calc_fnc = $this->items[$item]['calc_fnc'];
 
 		switch($calc_fnc){
@@ -586,7 +586,7 @@ function Draw(){
 				break;
 		}
 	}
-	
+
 	switch($this->type){
 		case GRAPH_TYPE_EXPLODED:
 			$this->drawElementPie($values);
@@ -605,14 +605,14 @@ function Draw(){
 	$this->drawLogo();
 
 	if($this->drawlegendallow == 1)	$this->drawLegend();
-	
+
 	$end_time=getmicrotime();
 	$str=sprintf("%0.2f",(getmicrotime()-$start_time));
 	ImageString($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12,"Generated in $str sec", $this->GetColor('Gray'));
 
 	unset($this->items, $this->data);
 
-	ImageOut($this->im); 
+	ImageOut($this->im);
 }
 
 }

@@ -26,7 +26,7 @@ function add_refresh_objects($ref_tab){
 	foreach($ref_tab as $id => $obj){
 		$obj['interval'] = (isset($obj['interval']))?$obj['interval']:60;
 		zbx_add_post_js(get_refresh_obj_script($obj));
-		
+
 		$min = ($min < $obj['interval'])?$min:$obj['interval'];
 	}
 	zbx_add_post_js('updater.interval = 10; updater.check4Update();');
@@ -35,7 +35,7 @@ function add_refresh_objects($ref_tab){
 function get_refresh_obj_script($obj){
 	$obj['url'] = isset($obj['url'])?$obj['url']:'';
 	$obj['url'].= (zbx_empty($obj['url'])?'?':'&').'output=html';
-	
+
 return 'updater.setObj4Update("'.$obj['id'].'",'.$obj['interval'].',"'.$obj['url'].'",{"favobj": "refresh", "favid": "'.$obj['id'].'"});';
 }
 
@@ -43,13 +43,13 @@ function make_refresh_menu($id,$cur_interval,&$menu,&$submenu){
 
 	$menu['menu_'.$id][] = array(S_REFRESH, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$intervals = array('10','30','60', '120','600','900');
-	
+
 	foreach($intervals as $key => $value){
 		$menu['menu_'.$id][] = array(
-					S_EVERY.SPACE.$value.SPACE.S_SECONDS_SMALL, 
+					S_EVERY.SPACE.$value.SPACE.S_SECONDS_SMALL,
 					'javascript: setRefreshRate("'.$id.'",'.$value.');'.
-					'void(0);',	
-					null, 
+					'void(0);',
+					null,
 					array('outer' => ($value == $cur_interval)?'pum_b_submenu':'pum_o_submenu', 'inner'=>array('pum_i_submenu')
 			));
 	}
@@ -183,7 +183,7 @@ function zbx_date2str($format, $timestamp){
  *      zbx_date2age
  *
  * description:
- *      Calculate and convert timestamp to string representation. 
+ *      Calculate and convert timestamp to string representation.
  *
  * author: Aly
  */
@@ -205,19 +205,19 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 
 	//$months = (int ) ($time / (30*86400));
 	//$time -= $months*30*86400;
-	
+
 	$weeks = (int ) ($time / (7*86400));
 	$time -= $weeks*7*86400;
-	 
+
 	$days = (int) ($time / 86400);
 	$time -= $days*86400;
-	
+
 	$hours = (int) ($time / 3600);
 	$time -= $hours*3600;
-	
+
 	$minutes = (int) ($time / 60);
 	$time -= $minutes*60;
-	
+
 	if($time >= 1){
 		$seconds = round($time,2);
 		$ms = 0;
@@ -226,7 +226,7 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 		$seconds = 0;
 		$ms = round($time,3) * 1000;
 	}
-	
+
 	$str =  (($years)?$years.'y ':'').
 //			(($months)?$months.'m ':'').
 			(($weeks)?$weeks.'w ':'').
@@ -239,8 +239,8 @@ return $str;
 }
 
 function getmicrotime(){
-	list($usec, $sec) = explode(" ",microtime()); 
-	return ((float)$usec + (float)$sec); 
+	list($usec, $sec) = explode(" ",microtime());
+	return ((float)$usec + (float)$sec);
 }
 
 /************* END DATE *************/
@@ -260,13 +260,13 @@ function natksort(&$array) {
 	$array = $new_array;
 	return true;
 }
-	
+
 function asort_by_key(&$array, $key){
 	if(!is_array($array)) {
 		error('Incorrect type of asort_by_key');
 		return array();
 	}
-	
+
 	$key = htmlspecialchars($key);
 	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
 return $array;
@@ -296,29 +296,29 @@ function zbx_rksort(&$array, $flags=NULL){
 /************* ZBX MISC *************/
 
 // accepts parametr as integer either
-function zbx_ctype_digit($x){ 
+function zbx_ctype_digit($x){
 	return preg_match('/^\\d+$/',$x);
 }
 
 function zbx_numeric($value){
 	if(is_array($value)) return false;
 	if(zbx_empty($value)) return false;
-	
+
 	$value = strval($value);
 
 return preg_match('/^[-|+]?\\d+$/',$value);
 }
 
 function zbx_empty($value){
-	if(is_null($value)) return true;		
+	if(is_null($value)) return true;
 	if(is_array($value) && empty($value)) return true;
 	if(is_string($value) && ($value === '')) return true;
 return false;
 }
-	
+
 function zbx_strlen(&$str){
 	if(!$strlen = strlen($str)) return $strlen;
-	
+
 	$reallen = 0;
 	$fbin= 1 << 7;
 	$sbin= 1 << 6;
@@ -341,7 +341,7 @@ return $pos;
 function zbx_stristr($haystack,$needle){
 	$haystack_B = strtoupper($haystack);
 	$needle = strtoupper($needle);
-	
+
 	$pos = strpos($haystack_B,$needle);
 	if($pos !== FALSE){
 		$pos = substr($haystack,$pos);
@@ -351,7 +351,7 @@ return $pos;
 
 function zbx_substring($haystack, $start, $end=null){
 	if($end < $start) return '';
-	
+
 	$len = zbx_strlen($haystack);
 	if(is_null($end))
 		$result = substr($haystack, $start);
@@ -372,7 +372,7 @@ function str_in_array($needle,$haystack,$strict=false){
 		return in_array($needle,$haystack,$strict);
 	}
 	else if($strict){
-		foreach($haystack as $id => $value) 
+		foreach($haystack as $id => $value)
 			if($needle === $value) return true;
 	}
 	else{

@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2008 SIA Zabbix
 **
@@ -25,48 +25,48 @@ class CLdap{
 	function CLdap($arg=array()){
 		$this->ds = false;
 		$this->info = array();
-		
+
 		$this->cnf = array(
 				'host'=>			'ldap://localhost',
 				'port'=>			'389',
-				
+
 				'bind_dn'=>				'uid=admin,ou=system',
 				'bind_password'=>		'secret',
-				
+
 				'base_dn'=> 			'ou=users,ou=system',
-				
+
 				'search_attribute'=>	'uid',
 				'userfilter'=>			'(%{attr}=%{user})',
-				
+
 				'groupkey'=>		'cn',
-				
+
 				'mapping'=> 		array(
 										'alias'=>	 	'uid',
 										'userid'=> 		'uidnumbera',
 										'passwd'=>		'userpassword',
 									),
-				
+
 				'referrals'=> 		0,
 				'version'=> 		3,
-				
+
 				'starttls'=>		null,
 				'deref'=>			null,
 			);
 
-		
+
 		if(is_array($arg)){
 			$this->cnf = array_merge($this->cnf,$arg);
 		}
-		
+
 		if(!function_exists('ldap_connect')) {
 			error('LDAP lib error. Cannot find needed functions');
 		return false;
 		}
 	}
-	
+
 	function connect(){
 // connection already established
-		if($this->ds) return true; 
+		if($this->ds) return true;
 
 		$this->bound = 0;
 
@@ -78,7 +78,7 @@ class CLdap{
 //set protocol version and dependend options
 		if($this->cnf['version']){
 			if(!ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, $this->cnf['version'])){
-			   error('Setting LDAP Protocol version '.$this->cnf['version'].' failed');			
+			   error('Setting LDAP Protocol version '.$this->cnf['version'].' failed');
 			}
 			else{
 //use TLS (needs version 3)
@@ -90,7 +90,7 @@ class CLdap{
 // needs version 3
 				if(!zbx_empty($this->cnf['referrals'])) {
 					if(!ldap_set_option($this->ds, LDAP_OPT_REFERRALS,$this->cnf['referrals'])){
-					   error('Setting LDAP referrals to off failed');		
+					   error('Setting LDAP referrals to off failed');
 					}
 				}
 			}
@@ -105,7 +105,7 @@ class CLdap{
 
 	return true;
 	}
-	
+
 	function checkPass($user,$pass){
 // reject empty password
 		if(empty($pass)) return false;
@@ -151,25 +151,25 @@ class CLdap{
 
 			if(empty($this->info['dn'])) {
 				return false;
-			} 
+			}
 			else {
 				$dn = $this->info['dn'];
 			}
 
 //SDI($dn.' - '.$this->info['passwd'].' : '.$pass);
-				
+
 // Try to bind with the dn provided
 			if(!ldap_bind($this->ds,$dn,$pass)){
 				return false;
 			}
-		
+
 			$this->bound = 1;
 			return true;
 		}
 
 	return false;
 	}
-	
+
 	function getUserData($user) {
 		if(!$this->connect()) return false;
 
@@ -184,20 +184,20 @@ class CLdap{
 // with no superuser creds we continue as user or anonymous here
 		$info['user'] = $user;
 		$info['host'] = $this->cnf['host'];
-		
+
 //get info for given user
 		$base = $this->makeFilter($this->cnf['base_dn'], $info);
-		
+
 		if(isset($this->cnf['userfilter']) && !empty($this->cnf['userfilter'])) {
 			$filter = $this->makeFilter($this->cnf['userfilter'], $info);
-		} 
+		}
 		else {
 			$filter = "(ObjectClass=*)";
 		}
 
 		$sr     = ldap_search($this->ds, $base, $filter);
 		$result = ldap_get_entries($this->ds, $sr);
-		
+
 // Don't accept more or less than one response
 		if($result['count'] != 1){
 			error('LDAP: User not found');
@@ -226,14 +226,14 @@ class CLdap{
 			$filter = $this->makeFilter($this->cnf['groupfilter'], $user_result);
 
 			$sr = ldap_search($this->ds, $base, $filter, array($this->cnf['groupkey']));
-	
+
 			if(!$sr){
-				error('LDAP: Reading group memberships failed');		
+				error('LDAP: Reading group memberships failed');
 				return false;
 			}
-		
+
 			$result = ldap_get_entries($this->ds, $sr);
-		
+
 			foreach($result as $grp){
 				if(!empty($grp[$this->cnf['groupkey']][0])){
 					$info['grps'][] = $grp[$this->cnf['groupkey']][0];
@@ -245,10 +245,10 @@ class CLdap{
 		if(isset($conf['defaultgroup']) && !in_array($conf['defaultgroup'],$info['grps'])){
 			$info['grps'][] = $conf['defaultgroup'];
 		}
-	
+
 	return $info;
 	}
-	
+
 	function makeFilter($filter, $placeholders) {
 		$placeholders['attr'] = $this->cnf['search_attribute'];
 		preg_match_all("/%{([^}]+)/", $filter, $matches, PREG_PATTERN_ORDER);
@@ -257,7 +257,7 @@ class CLdap{
 //take first element if array
 			if(is_array($placeholders[$match])) {
 				$value = $placeholders[$match][0];
-			} 
+			}
 			else{
 				$value = $placeholders[$match];
 			}

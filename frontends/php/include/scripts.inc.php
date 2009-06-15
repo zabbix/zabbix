@@ -2,7 +2,7 @@
 
 function get_script_by_scriptid($scriptid){
 	$sql = 'SELECT * FROM scripts WHERE scriptid='.$scriptid;
-	
+
 	$rows = false;
 	if($res = DBSelect($sql)){
 		$rows = DBfetch($res);
@@ -36,7 +36,7 @@ function update_script($scriptid,$name,$command,$usrgrpid,$groupid,$access){
 				' ,groupid='.$groupid.
 				' ,host_access='.$access.
 			' WHERE scriptid='.$scriptid;
-			
+
 	$result = DBexecute($sql);
 return $result;
 }
@@ -44,7 +44,7 @@ return $result;
 function script_make_command($scriptid,$hostid){
 	$host_db = DBfetch(DBselect('SELECT dns,useip,ip FROM hosts WHERE hostid='.$hostid));
 	$script_db = DBfetch(DBselect('SELECT command FROM scripts WHERE scriptid='.$scriptid));
-	
+
 	if($host_db && $script_db){
 		$command = $script_db['command'];
 		$command = str_replace("{HOST.DNS}", $host_db['dns'],$command);
@@ -70,17 +70,17 @@ function execute_script($scriptid,$hostid){
 	if(!$socket){
 		$res = 0;
 	}
-	
+
 	if($res){
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 		$res = socket_connect($socket, $ZBX_SERVER, $ZBX_SERVER_PORT);
 	}
-	
+
 	if($res){
 		$send = "Command\255$nodeid\255$hostid\255$command\n";
 		socket_write($socket,$send);
 	}
-	
+
 	if($res){
 		$res = socket_read($socket,65535);
 	}
@@ -104,26 +104,26 @@ return $message;
 
 function get_accessible_scripts_by_hosts($hosts){
 	global $USER_DETAILS;
-	
+
 	if(!is_array($hosts)){
 		$hosts = array('0' => hosts);
 	}
 
-// Selecting usrgroups by user	
+// Selecting usrgroups by user
 	$sql = 'SELECT ug.usrgrpid '.
 			' FROM users_groups ug '.
 			' WHERE ug.userid='.$USER_DETAILS['userid'];
-			
+
 	$user_groups = DBfetch(DBselect($sql));
 	$user_groups[] = 0;	// to ALL user groups
 // --
 
 
-// Selecting groups by Hosts	
+// Selecting groups by Hosts
 	$sql = 'SELECT hg.hostid,hg.groupid '.
 			' FROM hosts_groups hg '.
 			' WHERE '.DBcondition('hg.hostid',$hosts);
-			
+
 	$hg_res = DBselect($sql);
 	while($hg_rows = DBfetch($hg_res)){
 		$hosts_groups[$hg_rows['groupid']][$hg_rows['hostid']] = $hg_rows['hostid'];
@@ -137,14 +137,14 @@ function get_accessible_scripts_by_hosts($hosts){
 
 	$hosts_read_only = array_intersect($hosts,$hosts_read_only);
 	$hosts_read_write = array_intersect($hosts,$hosts_read_write);
-	
+
 	$scripts_by_host = array();
-// initialize array 
+// initialize array
 	foreach($hosts as $id => $hostid){
 		$scripts_by_host[$hostid] = array();
 	}
 //-----
-	
+
 	$sql = 'SELECT s.* '.
 			' FROM scripts s '.
 			' WHERE '.DBin_node('s.scriptid').
@@ -158,16 +158,16 @@ function get_accessible_scripts_by_hosts($hosts){
 		if(PERM_READ_WRITE == $script['host_access']){
 			if($script['groupid'] > 0)
 				$add_to_hosts = array_intersect($hosts_read_write, $hosts_groups[$script['groupid']]);
-			else 
+			else
 				$add_to_hosts = $hosts_read_write;
 		}
 		else if(PERM_READ_ONLY == $script['host_access']){
 			if($script['groupid'] > 0)
 				$add_to_hosts = array_intersect($hosts_read_only, $hosts_groups[$script['groupid']]);
-			else 
+			else
 				$add_to_hosts = $hosts_read_only;
 		}
-		
+
 		foreach($add_to_hosts as $id => $hostid){
 			$scripts_by_host[$hostid][] = $script;
 		}

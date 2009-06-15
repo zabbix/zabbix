@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -26,7 +26,7 @@ class CScript extends CObject{
 			$this->items = array();
 			$this->addItem($item);
 		}
-		
+
 		function addItem($value){
 			if(is_array($value)){
 				foreach($value as $item){
