@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -32,40 +32,40 @@ private $items;
 
 	public function __construct($id=null,$body=null,$state=null){
 		if(is_null($id)){
-			list($usec, $sec) = explode(' ',microtime());	
+			list($usec, $sec) = explode(' ',microtime());
 			$id = 'widget_'.((int)($sec % 10)).((int)($usec * 1000));
 		}
-		
+
 		$this->domid = $id;
 		$this->state = $state;		// 0 - closed, 1 - opened
 
 		$this->flicker_state = 0;	// 0 - closed, 1 - opened
 
 		$this->headers = null;
-		
+
 		$this->flicker = array();
 		$this->body = array();
-		
+
 		$this->addItem($body);
 	}
-	
+
 	public function addHeader($header=null, $headerright=null){
 		zbx_value2array($headerright);
-		
-		if(is_null($header) && !is_null($headerright)) $header = SPACE;		
-		
+
+		if(is_null($header) && !is_null($headerright)) $header = SPACE;
+
 		$this->headers[] = array('left'=> $header, 'right'=>$headerright);
 	}
-	
+
 	public function addFlicker($items=null, $state = 0){
 		if(!is_null($items)) $this->flicker[] = $items;
 		$this->flicker_state = $state;
 	}
-		
+
 	public function addItem($items=null){
 		if(!is_null($items)) $this->body[] = $items;
 	}
-	
+
 	public function get(){
 		$widget = new CTable();
 		$widget->addOption('width','100%');
@@ -73,18 +73,18 @@ private $items;
 		$widget->setCellSpacing(0);
 
 		foreach($this->headers as $num => $header){
-			$right_tab = null;		
+			$right_tab = null;
 			if(!is_null($header['right']) || !is_null($this->state)){
 				$td_l = new CCol(SPACE);
 				$td_l->addOption('width','100%');
-				
+
 				$right_row = array($td_l);
-				
+
 				if(!is_null($header['right'])){
-					foreach($header['right'] as $num => $r_item) 
+					foreach($header['right'] as $num => $r_item)
 						$right_row[] = new CCol($r_item);
 				}
-			
+
 				if(!is_null($this->state)){
 					$icon = new CDiv(SPACE, $this->state?'arrowup':'arrowdown');
 					$icon->addOption('id',$this->domid.'_icon');
@@ -95,21 +95,21 @@ private $items;
 
 				$right_tab = new CTable(null,'textwhite');
 				$right_tab->addOption('width','100%');
-				
+
 				$right_tab->addRow($right_row);
 			}
-	
+
 			$header_tab = new CTable(null,'nowrap');
 			$header_tab->addOption('width','100%');
 //			$header_tab->addOption('border','1');
 			$header_tab->setCellPadding(0);
 			$header_tab->setCellSpacing(0);
-			
+
 			$header_tab->addRow($this->createHeader($header['left'],$right_tab));
-		
+
 			$widget->addRow($header_tab);
 		}
-		
+
 		if(is_null($this->state)){
 			$this->state = true;
 		}
@@ -121,30 +121,30 @@ private $items;
 			$flicker_tab->setCellPadding(0);
 			$flicker_tab->setCellSpacing(0);
 			$flicker_tab->addOption('border',0);
-			
+
 			$div = new CDiv($this->flicker);
 			$div->addOption('id',$flicker_domid);
 			if(!$this->flicker_state) $div->addOption('style','display: none;');
-			
+
 			$flicker_tab->addRow($div);
-			
+
 			$icon_l = new CDiv(SPACE.SPACE, $this->flicker_state?'dbl_arrow_up':'dbl_arrow_down');
 			$icon_l->addOption('title',S_MAXIMIZE.'/'.S_MINIMIZE);
 			$icon_l->addOption('id','flicker_icon_l');
 
 			$icon_r = new CDiv(SPACE.SPACE, $this->flicker_state?'dbl_arrow_up':'dbl_arrow_down');
-			$icon_r->addOption('title',S_MAXIMIZE.'/'.S_MINIMIZE);				
+			$icon_r->addOption('title',S_MAXIMIZE.'/'.S_MINIMIZE);
 			$icon_r->addOption('id','flicker_icon_r');
-			
+
 			$icons_row = new CTable(null,'whitetext');
 			$icons_row->addRow(array($icon_l,SPACE,S_FILTER,SPACE,$icon_r));
-			
+
 			$thin_tab = $this->createFlicker($icons_row);
 			$thin_tab->addOption('id','filter_icon');
 			$thin_tab->addAction('onclick',new CScript("javascript: change_flicker_state('".$flicker_domid."');"));
-			
+
 			$flicker_tab->addRow($thin_tab,'textcolorstyles link pointer');
-			
+
 			$widget->addRow($flicker_tab);
 		}
 
@@ -152,20 +152,20 @@ private $items;
 		$div->addOption('id',$this->domid);
 
 		if(!$this->state) $div->addOption('style','display: none;');
-		
+
 		$widget->addRow($div);
 	return $widget;
 	}
-	
+
 	public function show(){
 		print($this->toString());
 	}
-	
+
 	public function toString(){
 		$tab = $this->get();
 	return $tab->toString();
 	}
-	
+
 	private function createHeader($col1, $col2=null){
 		if(isset($_REQUEST['print'])){
 			hide_form_items($col1);
@@ -173,12 +173,12 @@ private $items;
 		//if empty header than do not show it
 			if(($col1 == SPACE) && ($col2 == SPACE)) return new CScript('');
 		}
-		
+
 		$table = new CTable(NULL,'header');
 //		$table->addOption('border',1);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
-		
+
 		if(!is_null($col2)){
 			$td_r = new CCol($col2,'header_r');
 			$td_r->addOption('align','right');
@@ -190,17 +190,17 @@ private $items;
 
 			$table->addRow($td_c);
 		}
-		
+
 	return $table;
 	}
-	
+
 	private function createFlicker($col1, $col2=NULL){
-		
+
 		$table = new CTable(NULL,'flicker');
 //		$table->addOption('border',1);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
-		
+
 		if(!is_null($col2)){
 			$td_r = new CCol($col2,'flicker_r');
 			$td_r->addOption('align','right');
@@ -212,7 +212,7 @@ private $items;
 
 			$table->addRow($td_c);
 		}
-		
+
 	return $table;
 	}
 }

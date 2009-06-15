@@ -35,25 +35,25 @@ function add_regexp($regexp=array()){
 	$db_fields = array('name' => null,
 						'test_string' => '',
 					);
-					
+
 	if(!check_db_fields($db_fields, $regexp)){
 		error('Incorrect arguments pasted to function [add_regexp]');
 		return false;
 	}
-	
+
 	$sql = 'SELECT regexpid FROM regexps WHERE name='.zbx_dbstr($regexp['name']);
 	if(DBfetch(DBselect($sql))){
 		info(S_REGULAR_EXPRESSION.' ['.$regexp['name'].'] '.S_ALREADY_EXISTS_SMALL);
 		return false;
 	}
-	
+
 	$regexpid = get_dbid('regexps','regexpid');
-	
+
 	$result = DBexecute('INSERT INTO regexps (regexpid,name,test_string) '.
 				' VALUES ('.$regexpid.','.
 						zbx_dbstr($regexp['name']).','.
 						zbx_dbstr($regexp['test_string']).')');
-			
+
 return $result?$regexpid:false;
 }
 
@@ -63,12 +63,12 @@ function update_regexp($regexpid, $regexp=array()){
 	$db_fields = array('name' => null,
 						'test_string' => '',
 					);
-					
+
 	if(!check_db_fields($db_fields, $regexp)){
 		error('Incorrect arguments pasted to function [update_regexp]');
 		return false;
 	}
-	
+
 	$sql = 'SELECT regexpid FROM regexps WHERE name='.zbx_dbstr($regexp['name']);
 	if($db_regexp = DBfetch(DBselect($sql))){
 		if(bccomp($regexpid,$db_regexp['regexpid']) != 0){
@@ -76,7 +76,7 @@ function update_regexp($regexpid, $regexp=array()){
 			return false;
 		}
 	}
-	
+
 	$sql = 'UPDATE regexps SET '.
 				' name='.zbx_dbstr($regexp['name']).','.
 				' test_string='.zbx_dbstr($regexp['test_string']).
@@ -93,7 +93,7 @@ function delete_regexp($regexpids){
 // delete expressions first
 	delete_expressions_by_regexpid($regexpids);
 	$result = DBexecute('DELETE FROM regexps WHERE '.DBcondition('regexpid',$regexpids));
-	
+
 return $result;
 }
 
@@ -105,14 +105,14 @@ function add_expression($regexpid, $expression = array()){
 						'case_sensitive' => 0,
 						'exp_delimiter' => ',',
 					);
-					
+
 	if(!check_db_fields($db_fields, $expression)){
 		error('Incorrect arguments pasted to function [add_expression]');
 		return false;
 	}
-		
+
 	$expressionid = get_dbid('expressions','expressionid');
-	
+
 	$result = DBexecute('INSERT INTO expressions (expressionid,regexpid,expression,expression_type,case_sensitive,exp_delimiter) '.
 				' VALUES ('.$expressionid.','.
 						$regexpid.','.
@@ -120,7 +120,7 @@ function add_expression($regexpid, $expression = array()){
 						$expression['expression_type'].','.
 						$expression['case_sensitive'].','.
 						zbx_dbstr($expression['exp_delimiter']).')');
-			
+
 return $result?$expressionid:false;
 }
 

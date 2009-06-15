@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -27,11 +27,11 @@ class CRow extends CTag{
 		$this->addItem($item);
 		$this->setClass($class);
 	}
-	
+
 	public function setAlign($value){
 		return $this->options['align'] = $value;
 	}
-	
+
 	public function addItem($item){
 		if(strtolower(get_class($item))=='ccol') {
 			parent::addItem($item);
@@ -40,7 +40,7 @@ class CRow extends CTag{
 			foreach($item as $el){
 				if(strtolower(get_class($el))=='ccol') {
 					parent::addItem($el);
-				} 
+				}
 				else if(!is_null($el)){
 					parent::addItem(new CCol($el));
 				}
@@ -50,7 +50,7 @@ class CRow extends CTag{
 			parent::addItem(new CCol($item));
 		}
 	}
-	
+
 	public function setWidth($value){
 		if(is_string($value))$this->addOption('width',$value);
 	}

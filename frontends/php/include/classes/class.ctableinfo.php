@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -26,10 +26,10 @@ class CTableInfo extends CTable{
 
 		$this->setOddRowClass('odd_row');
 		$this->setEvenRowClass('even_row');
-		
+
 		$this->options['cellpadding'] = 3;
 		$this->options['cellspacing'] = 1;
-		
+
 		$this->headerClass = 'header';
 		$this->footerClass = 'footer';
 	}

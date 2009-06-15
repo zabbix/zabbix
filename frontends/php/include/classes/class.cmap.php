@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -25,15 +25,15 @@ class CMap extends CTag{
 		parent::__construct('map','yes');
 		$this->setName($name);
 	}
-	
-	public function addRectArea($x1,$y1,$x2,$y2,$href,$alt){ 
-		return $this->addArea(array($x1,$y1,$x2,$y2),$href,$alt,'rect'); 
+
+	public function addRectArea($x1,$y1,$x2,$y2,$href,$alt){
+		return $this->addArea(array($x1,$y1,$x2,$y2),$href,$alt,'rect');
 	}
-	
+
 	public function addArea($coords,$href,$alt,$shape){
 		return $this->addItem(new CArea($coords,$href,$alt,$shape));
 	}
-	
+
 	public function addItem($value){
 		if(strtolower(get_class($value)) != 'carea')
 			return $this->error('Incorrect value for addItem ['.$value.']');

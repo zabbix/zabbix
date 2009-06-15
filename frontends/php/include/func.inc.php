@@ -20,35 +20,35 @@
 ?>
 <?php
 /************* DYNAMIC REFRESH *************/
-function add_doll_objects($ref_tab, $pmid='mainpage'){	
+function add_doll_objects($ref_tab, $pmid='mainpage'){
 	$upd_script = array();
 	foreach($ref_tab as $id => $doll){
 		$upd_script[$doll['id']] = format_doll_init($doll);
-	}		
-		
+	}
+
 	zbx_add_post_js('initPMaster('.zbx_jsvalue($pmid).','.zbx_jsvalue($upd_script).');');
 }
 
 function format_doll_init($doll){
 	global $USER_DETAILS;
-	
+
 	$args = array('frequency' => 60,
 					'url' => '',
 					'counter' => 0,
 					'darken' => 0,
 					'params' => array()
 				);
-	
+
 	foreach($args as $key => $def){
 		if(isset($doll[$key])) $obj[$key] = $doll[$key];
 		else $obj[$key] = $def;
 	}
-	
+
 	$obj['url'].= (zbx_empty($obj['url'])?'?':'&').'output=html';
-	
+
 	$obj['params']['favobj'] = 'refresh';
 	$obj['params']['favid'] = $doll['id'];
-	
+
 return $obj;
 }
 
@@ -61,13 +61,13 @@ function make_refresh_menu($pmid,$dollid,$cur_interval,$params=null,&$menu,&$sub
 
 	$menu['menu_'.$dollid][] = array(S_REFRESH, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$intervals = array('10','30','60','120','600','900');
-	
+
 	foreach($intervals as $key => $value){
 		$menu['menu_'.$dollid][] = array(
-					S_EVERY.SPACE.$value.SPACE.S_SECONDS_SMALL, 
+					S_EVERY.SPACE.$value.SPACE.S_SECONDS_SMALL,
 					'javascript: setRefreshRate('.zbx_jsvalue($pmid).','.zbx_jsvalue($dollid).','.$value.','.zbx_jsvalue($params).');'.
-					'void(0);',	
-					null, 
+					'void(0);',
+					null,
 					array('outer' => ($value == $cur_interval)?'pum_b_submenu':'pum_o_submenu', 'inner'=>array('pum_i_submenu')
 			));
 	}
@@ -201,7 +201,7 @@ function zbx_date2str($format, $timestamp){
  *      zbx_date2age
  *
  * description:
- *      Calculate and convert timestamp to string representation. 
+ *      Calculate and convert timestamp to string representation.
  *
  * author: Aly
  */
@@ -223,19 +223,19 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 
 	//$months = (int ) ($time / (30*86400));
 	//$time -= $months*30*86400;
-	 
+
 	$weeks = (int ) ($time / (7*86400));
 	$time -= $weeks*7*86400;
-	 
+
 	$days = (int) ($time / 86400);
 	$time -= $days*86400;
-	
+
 	$hours = (int) ($time / 3600);
 	$time -= $hours*3600;
-	
+
 	$minutes = (int) ($time / 60);
 	$time -= $minutes*60;
-	
+
 	if($time >= 1){
 		$seconds = round($time,2);
 		$ms = 0;
@@ -244,20 +244,20 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 		$seconds = 0;
 		$ms = round($time,3) * 1000;
 	}
-	
+
 	$str =  (($years)?$years.'y ':'').
 //			(($months)?$months.'m ':'').
 			(($weeks)?$weeks.'w ':'').
 			(($days)?$days.'d ':'').
 			(($hours && !$years)?$hours.'h ':'').
-			(($minutes && !$years && !$weeks)?$minutes.'m ':'').			
-			((!$years && !$weeks && !$days && (!$ms || $seconds))?$seconds.'s ':'').			
+			(($minutes && !$years && !$weeks)?$minutes.'m ':'').
+			((!$years && !$weeks && !$days && (!$ms || $seconds))?$seconds.'s ':'').
 			(($ms && !$years && !$weeks && !$days && !$hours)?$ms.'ms':'');return $str;
 }
 
 function getmicrotime(){
-	list($usec, $sec) = explode(" ",microtime()); 
-	return ((float)$usec + (float)$sec); 
+	list($usec, $sec) = explode(" ",microtime());
+	return ((float)$usec + (float)$sec);
 }
 
 function getDateStringByType($type, $timestamp){
@@ -298,13 +298,13 @@ function natksort(&$array) {
 	$array = $new_array;
 	return true;
 }
-	
+
 function asort_by_key(&$array, $key){
 	if(!is_array($array)) {
 		error('Incorrect type of asort_by_key');
 		return array();
 	}
-	
+
 	$key = htmlspecialchars($key);
 	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
 return $array;
@@ -333,29 +333,29 @@ function zbx_rksort(&$array, $flags=NULL){
 
 
 /*************** CONVERTING ******************/
-function rgb2hex($color){			
+function rgb2hex($color){
 	$HEX = array(
 		dechex($color[0]),
 		dechex($color[1]),
 		dechex($color[2])
 	);
-	
+
 	foreach($HEX as $id => $value){
 		if(strlen($value) != 2) $HEX[$id] = '0'.$value;
 	}
-	
+
 return $HEX[0].$HEX[1].$HEX[2];
 }
 
 function zbx_num2bitstr($num,$rev=false){
 	if(!is_numeric($num)) return 0;
-	
+
 	$sbin = 0;
 	$strbin = '';
-	
+
 	$len = 32;
 	if($num > 2147483647) $len = 64;
-	
+
 	for($i=0;$i<$len;$i++){
 		$sbin= 1 << $i;
 		$bit = ($sbin & $num)?'1':'0';
@@ -397,7 +397,7 @@ function mem2str($size){
 	return round($size, 6).$prefix;
 }
 
-/* Do not forget to sync it with add_value_suffix in evalfunc.c! */ 
+/* Do not forget to sync it with add_value_suffix in evalfunc.c! */
 function convert_units($value,$units){
 // Special processing for unix timestamps
 	if($units=='unixtime'){
@@ -429,7 +429,7 @@ function convert_units($value,$units){
 	}
 // Special processing for seconds
 	if($units=='s'){
-		return zbx_date2age(0,$value,true);	
+		return zbx_date2age(0,$value,true);
 	}
 
 	$u='';
@@ -512,29 +512,29 @@ return "$s $u$units";
 /************* ZBX MISC *************/
 
 // accepts parametr as integer either
-function zbx_ctype_digit($x){ 
+function zbx_ctype_digit($x){
 	return preg_match('/^\\d+$/',$x);
 }
 
 function zbx_numeric($value){
 	if(is_array($value)) return false;
 	if(zbx_empty($value)) return false;
-	
+
 	$value = strval($value);
 
 return preg_match('/^[-|+]?\\d+$/',$value);
 }
 
 function zbx_empty($value){
-	if(is_null($value)) return true;		
+	if(is_null($value)) return true;
 	if(is_array($value) && empty($value)) return true;
 	if(is_string($value) && ($value === '')) return true;
 return false;
 }
-	
+
 function zbx_strlen(&$str){
 	if(!$strlen = strlen($str)) return $strlen;
-	
+
 	$reallen = 0;
 	$fbin= 1 << 7;
 	$sbin= 1 << 6;
@@ -557,7 +557,7 @@ return $pos;
 function zbx_stristr($haystack,$needle){
 	$haystack_B = strtoupper($haystack);
 	$needle = strtoupper($needle);
-	
+
 	$pos = strpos($haystack_B,$needle);
 	if($pos !== FALSE){
 		$pos = substr($haystack,$pos);
@@ -578,7 +578,7 @@ return $result;
 
 function zbx_str_revert(&$str){
 	$result = '';
-	
+
 	$str_rep = 	str_split($str);
 	foreach($str_rep as $num => $symb){
 		$result = $symb.$result;
@@ -604,7 +604,7 @@ function str_in_array($needle,$haystack,$strict=false){
 		return in_array($needle,$haystack,$strict);
 	}
 	else if($strict){
-		foreach($haystack as $id => $value) 
+		foreach($haystack as $id => $value)
 			if($needle === $value) return true;
 	}
 	else{
@@ -626,7 +626,7 @@ return $str_res;
 function zbx_value2array(&$values){
 	if(!is_array($values) && !is_null($values)){
 		$tmp = array();
-		
+
 		if(is_object($values))
 			$tmp[] = $values;
 		else

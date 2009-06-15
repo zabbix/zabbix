@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -24,11 +24,11 @@ class CNumericBox extends CTextBox{
 		parent::__construct($name,$value,$size,$readonly);
 		$this->addOption('maxlength', $size);
 		$this->addOption('style', 'text-align: right;');
-		
+
 		$this->addAction('onkeypress',
 			' var c = (window.event) ? event.keyCode : event.which;'.
 			' if(event.ctrlKey || c <= 31 || (c >= 48 && c <= 57)) return true; else return false; ');
-			
+
 		$this->addAction('onchange',
 				($allowempty ? ' if(this.value.length==0 || this.value==null) this.value = \'\'; else ' : '').
 				' if(isNaN(parseInt(this.value,10))) this.value = 0; '.

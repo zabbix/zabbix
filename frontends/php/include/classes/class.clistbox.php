@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -27,7 +27,7 @@ class CListBox extends CComboBox{
 		$this->options['size'] = $size;
 		$this->setValue($value);
 	}
-	
+
 	public function setSize($value){
 		$this->options['size'] = $value;
 	}

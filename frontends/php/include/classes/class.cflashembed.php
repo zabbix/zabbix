@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -27,20 +27,20 @@ class CFlashEmbed extends CTag{
 		$this->options['pluginspage']  = 'http://www.macromedia.com/go/getflashplayer';
 		$this->options['align'] = 'middle';
 		$this->options['quality'] = 'high';
-		
+
 		$this->options['width'] = $width;
 		$this->options['height'] = $height;
 		$this->options['src'] = $src;
 	}
-	
+
 	public function setWidth($value){
 		$this->options['width']  = $value;
 	}
-	
+
 	public function setHeight($value){
 		$this->options['height'] = $value;
 	}
-	
+
 	public function setSrc($value){
 		$this->options['src'] = $value;
 	}

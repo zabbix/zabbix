@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -31,36 +31,36 @@ class CTree{
 
 /*public*/
 	public function __construct($treename, $value=array(),$fields=array()){
-	
+
 		$this->maxlevel=0;
 
 		$this->tree = $value;
 		$this->fields = $fields;
 		$this->treename = $treename;
-		
+
 		$this->size = count($value);
 		unset($value);
 		unset($fields);
-	
+
 		if(!$this->checkTree()){
 			$this->destroy();
 			return false;
-		} 
+		}
 		else {
 			$this->countDepth();
 		}
 	}
-	
+
 	public function getTree(){
 		return $this->tree;
 	}
-	
+
 	public function getHTML(){
 		$html[] = $this->createJS();
 		$html[] = $this->simpleHTML();
 	return $html;
 	}
-	
+
 /* private */
 	private function makeHeaders(){
 		$c=0;
@@ -71,35 +71,35 @@ class CTree{
 		foreach($this->fields as $id => $caption){
 			$tr->addItem($caption);
 			$fields[$c] = $id;
-			$c++;	
+			$c++;
 		}
 		$this->fields = $fields;
 	return $tr;
 	}
-	
+
 	private function simpleHTML(){
 		$table = new CTable('','tabletree');
-		
+
 		$table->setCellSpacing(0);
 		$table->setCellPadding(0);
-	
+
 		$table->setOddRowClass('odd_row');
 		$table->setEvenRowClass('even_row');
 		$table->headerClass = 'header';
 		$table->footerClass = 'footer';
-		
+
 		$table->addOption('valign','top');
 //		$table->addOption('border','1');
 		$table->addRow($this->makeHeaders());
-	
+
 		foreach($this->tree as $id => $rows){
 			$table->addRow($this->makeRow($id));
 		}
 	return $table;
 	}
-	
+
 	private function makeRow($id){
-		
+
 		$table = new CTable();
 		$table->setCellSpacing(0);
 		$table->setCellPadding(0);
@@ -107,32 +107,32 @@ class CTree{
 		$table->addOption('height','100%');
 
 		$tr = $this->makeSImgStr($id);
-		
+
 		$td = new CCol($this->tree[$id]['caption']);
 		$td->addOption('style','height: 100%; vertical-align: top; white-space: normal; padding-right: 10px; padding-left: 2px;');
 		$tr->addItem($td);
-	
+
 		$table->addRow($tr);
-		
+
 		$tr = new CRow();
 		$tr->addItem($table);
 		$tr->addOption('id','id_'.$id);
 		$tr->addOption('style',($this->tree[$id]['parentid'] != '0')?('display: none;'):(''));
-	
-	
+
+
 		foreach($this->fields as $key => $value){
 			$td = new CCol($this->tree[$id][$value]);
 			$td->addOption('style',' padding-right: 10px; padding-left: 2px;');
 			$tr->addItem($td);
 		}
-		
+
 	return $tr;
 	}
-	
+
 	private function makeSImgStr($id){
 		$tr = new CRow();
 		$td = new CCol();
-	
+
 		$count=(isset($this->tree[$id]['nodeimg']))?(strlen($this->tree[$id]['nodeimg'])):(0);
 		for($i=0; $i<$count; $i++){
 			switch($this->tree[$id]['nodeimg'][$i]){
@@ -151,7 +151,7 @@ class CTree{
 					$div = new CTag('div','yes');
 					$div->addOption('style','height: 10px; width:22px; background-image:url(images/general/tree/pointc.gif);');
 
-					if($this->tree[$id]['nodetype'] == 2){	
+					if($this->tree[$id]['nodetype'] == 2){
 						$img= new CImg('images/general/tree/plus.gif','y','22','14');
 						$img->addOption('onclick','javascript: '.
 												$this->treename.'.closeSNodeX('.$id.',this);'.
@@ -159,7 +159,7 @@ class CTree{
 
 						$img->addOption('id','idi_'.$id);
 						$img->setClass('imgnode');
-					} 
+					}
 					else {
 						$img = new CImg('images/general/tree/pointl.gif','y','22','14');
 					}
@@ -171,14 +171,14 @@ class CTree{
 					if($this->tree[$id]['nodetype'] == 2){
 						$td->addOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 						$img= new CImg('images/general/tree/plus.gif','t','22','14');
-						
+
 						$img->addOption('onclick','javascript: '.
 												$this->treename.'.closeSNodeX('.$id.',this);'.
 												" showPopupDiv('div_node_tree','select_iframe');");	// IE6 Fix
-												
+
 						$img->addOption('id','idi_'.$id);
-						$img->setClass('imgnode');					
-					} 
+						$img->setClass('imgnode');
+					}
 					else {
 						$td->addOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 						$img= new CImg('images/general/tree/pointl.gif','t','22','14');
@@ -187,97 +187,97 @@ class CTree{
 			}
 			$td->addItem($img);
 			$tr->addItem($td);
-	
+
 			$td = new CCol();
 		}
 	//	echo $txt.' '.$this->tree[$id]['Name'].'<br />';
 	return $tr;
 	}
-	
+
 	private  function countDepth(){
 		foreach($this->tree as $id => $rows){
-			
+
 			if($rows['id'] == '0'){
 				continue;
 			}
 			$parentid = $this->tree[$id]['parentid'];
-			
+
 			$this->tree[$id]['nodeimg'] = $this->GetImg($id,(isset($this->tree[$parentid]['nodeimg']))?($this->tree[$parentid]['nodeimg']):(''));
 			//$this->tree[$parentid]['childs'] = ($this->tree[$parentid]['childs']+$this->tree[$id]['childs']+1);
-			
+
 			$this->tree[$parentid]['nodetype'] = 2;
-			
+
 			$this->tree[$id]['Level'] = (isset($this->tree[$parentid]['Level']))?($this->tree[$parentid]['Level']+1):(1);
-			
+
 			($this->maxlevel>$this->tree[$id]['Level'])?(''):($this->maxlevel = $this->tree[$id]['Level']);
 		}
-	
+
 	}
-	
-	
+
+
 	public function createJS(){
-		
-		$js = '<script src="js/tree.js" type="text/javascript"></script>'."\n".	
+
+		$js = '<script src="js/tree.js" type="text/javascript"></script>'."\n".
 				'<script type="text/javascript">  var '.$this->treename.'_tree = new Array(0);';
-				
+
 		foreach($this->tree as $id => $rows){
 			$parentid = $rows['parentid'];
 			$this->tree[$parentid]['nodelist'].=$id.',';
 		}
-		
+
 		foreach($this->tree as $id => $rows){
 			if($rows['nodetype'] == '2'){
 				$js .= $this->treename.'_tree['.$id.'] = { status: \'close\',  nodelist : \''.$rows['nodelist'].'\', parentid : \''.$rows['parentid'].'\'};';
 				$js .= "\n";
 			}
 		}
-		
+
 		$js.= 'var '.$this->treename.' = null';
 		$js.= '</script>'."\n";
-		
+
 		zbx_add_post_js($this->treename.' = new CTree("tree_'.$this->getUserAlias().'_'.$this->treename.'", '.$this->treename.'_tree);');
-		
+
 	return new CScript($js);
 	}
-	
+
 	private function getImg($id,$img){
 
 		$img=str_replace('T','I',$img);
 		$img=str_replace('L','O',$img);
 		$ch = 'L';
-	
+
 		$childs = $this->tree[$this->tree[$id]['parentid']]['childnodes'];
 		$childs_last = count($this->tree[$this->tree[$id]['parentid']]['childnodes'])-1;
-		
+
 		if(isset($childs[$childs_last]) && ($childs[$childs_last] != $id)){
 			$ch='T';
 		}
 		$img.=$ch;
-		
+
 	return $img;
 	}
-	
+
 	private function checkTree(){
 		if(!is_array($this->tree)){
 			return false;
 		}
 		foreach($this->tree as $id => $cell){
 			$this->tree[$id]['nodetype'] = 0;
-			
+
 			$parentid=$cell['parentid'];
 			$this->tree[$parentid]['childnodes'][] = $id;//$cell['id'];
-	
+
 			$this->tree[$id]['nodelist'] = '';
 //		echo $parentid.' : '.$id.'('.$cell['id'].')'.SBR;
 		}
-		
+
 	return true;
 	}
-	
+
 	private function destroy(){
 		unset($this->tree);
 	}
-	
+
 	private function getUserAlias(){
 		global $USER_DETAILS;
 	return $USER_DETAILS['alias'];

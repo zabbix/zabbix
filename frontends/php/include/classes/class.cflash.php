@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -40,22 +40,22 @@ class CFlash extends CTag{
 		$this->setHeight($height);
 		$this->setSrc($src);
 	}
-	
+
 	public function setWidth($value){
 		$this->options['width'] = $value;
 		$this->embededFlash->options['width'] = $value;
 	}
-	
+
 	public function setHeight($value){
 		$this->options['height'] = $value;
 		$this->embededFlash->options['height'] = $value;
 	}
-	
+
 	public function setSrc($value){
 		$this->srcParam->options['value'] = $value;
 		$this->embededFlash->options['src'] = $value;
 	}
-	
+
 	public function bodyToString(){
 		$ret = parent::bodyToString();
 		$ret .= $this->srcParam->toString();

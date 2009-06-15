@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -22,23 +22,23 @@
 class CTweenBox{
 	public function __construct(&$form,$name,$value=null,$size=10){
 		insert_javascript_for_tweenbox();
-		
+
 		$this->form = &$form;
 		$this->name = $name.'_tweenbox';
 		$this->varname = $name;
-		
+
 		$this->value = $value;
-		
+
 		$this->id_l = $this->varname.'_left';
 		$this->id_r = $this->varname.'_right';
-		
+
 		$this->lbox = new ClistBox($this->id_l,null,$size);
 		$this->rbox = new ClistBox($this->id_r,null,$size);
 
 		$this->lbox->addOption('style','width: 280px;');
 		$this->rbox->addOption('style','width: 280px;');
 	}
-	
+
 	public function setName($name=null){
 		if(is_string($name)) $this->name = $name;
 	}
@@ -46,7 +46,7 @@ class CTweenBox{
 	public function getName($name=null){
 		return $this->name;
 	}
-	
+
 	public function addItem($value, $caption, $selected=null, $enabled='yes'){
 		if(is_null($selected)){
 			if(is_array($this->value)) {
@@ -57,8 +57,8 @@ class CTweenBox{
 				$selected = 1;
 			}
 		}
-		if((is_bool($selected) && $selected) || 
-			(is_int($selected) && ($selected!=0)) || 
+		if((is_bool($selected) && $selected) ||
+			(is_int($selected) && ($selected!=0)) ||
 			(is_string($selected) && ($selected == 'yes' || $selected == 'selected' || $selected=='on')))
 		{
 			$this->lbox->addItem($value,$caption,null,$enabled);
@@ -68,7 +68,7 @@ class CTweenBox{
 			$this->rbox->addItem($value,$caption,null,$enabled);
 		}
 	}
-	
+
 	public function setAction($expr, $event='onchange', $value='submit()'){
 //			$box = &$this->lbox;
 		if($expr){
@@ -78,7 +78,7 @@ class CTweenBox{
 			$this->rbox->addOption($event,$value);
 		}
 	}
-	
+
 	public function get($caption_l=S_IN,$caption_r=S_OTHER){
 		$grp_tab = new CTable();
 		$grp_tab->addOption('name',$this->name);
@@ -94,22 +94,22 @@ class CTweenBox{
 		$add_btn = new CButton('add',' « ');//S_ADD);//
 		$add_btn->setType('button');
 		$add_btn->setAction('javascript: moveListBoxSelectedItem("'.$this->form->GetName().'","'.$this->varname.'","'.$this->id_r.'","'.$this->id_l.'","add");');
-		
+
 		$rmv_btn = new CButton('remove',' » ');//S_REMOVE);//
 		$rmv_btn->setType('button');
 		$rmv_btn->setAction('javascript: moveListBoxSelectedItem("'.$this->form->GetName().'","'.$this->varname.'","'.$this->id_l.'","'.$this->id_r.'","rmv");');
 
 		$grp_tab->addRow(array($this->lbox,new CCol(array($add_btn,BR(),$rmv_btn),'top'),$this->rbox));
-		
-		
+
+
 	return $grp_tab;
 	}
-	
+
 	public function show($caption_l=S_IN,$caption_r=S_OTHER){
 		$tab = $this->get($caption_l,$caption_r);
 		$tab->show();
 	}
-	
+
 	public function toString(){
 		$tab = $this->get();
 		return $tab->toString();

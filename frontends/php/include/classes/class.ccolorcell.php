@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -27,13 +27,13 @@ class CColorCell extends CDiv{
 		$this->addOption('title', '#'.$value);
 		$this->addOption('class', 'pointer');
 		$this->addOption('style', 'display: inline; width: 10px; height: 10px; text-decoration: none; outline: 1px solid black; background-color: #'.$value);
-		
+
 		$this->setAction($action);
 	}
-	
+
 	public function setAction($action=null){
 		if(!isset($action)) return false;
-		
+
 		return $this->addAction('onclick', 'javascript:'.$action);
 	}
 }

@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -30,7 +30,7 @@ class CServerInfo extends CTable{
 		$this->cleanItems();
 
 		$status = get_status();
-		
+
 		if($status['zabbix_server'] == S_YES)
 			$server = new CSpan(S_RUNNING,'off');
 		else
@@ -62,7 +62,7 @@ class CServerInfo extends CTable{
 			new CSpan($status['triggers_count_unknown'],'unknown'),'/',
 			new CSpan($status['triggers_count_off'],'off'),']'
 			)));
-			
+
 //			$this->addRow(S_NUMBER_OF_EVENTS.': '.$status['events_count']);
 //			$this->addRow(S_NUMBER_OF_ALERTS.': '.$status['alerts_count']);
 

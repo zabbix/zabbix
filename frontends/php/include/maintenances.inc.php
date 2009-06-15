@@ -22,12 +22,12 @@
 function get_accessible_maintenance_by_user($perm,$perm_res=null,$nodeid=null,$hostid=null,$cache=1){
 	global $USER_DETAILS;
 	static $available_maintenances;
-	
+
 	$result = array();
 	if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
 	$nodeid_str =(is_array($nodeid))?implode('',$nodeid):strval($nodeid);
 	$hostid_str =(is_array($hostid))?implode('',$hostid):strval($hostid);
-		
+
 	if($cache && isset($available_maintenances[$perm][$perm_res][$nodeid_str][$hostid_str])){
 		return $available_maintenances[$perm][$perm_res][$nodeid_str][$hostid_str];
 	}
@@ -36,7 +36,7 @@ function get_accessible_maintenance_by_user($perm,$perm_res=null,$nodeid=null,$h
 
 	$denied_maintenances = array();
 	$available_maintenances = array();
-	
+
 	$sql = 	'SELECT DISTINCT m.maintenanceid '.
 			' FROM maintenances m, maintenances_hosts mh, maintenances_groups mg, hosts_groups hg '.
 			' WHERE '.DBcondition('hg.hostid',$available_hosts,true).
@@ -49,7 +49,7 @@ function get_accessible_maintenance_by_user($perm,$perm_res=null,$nodeid=null,$h
 	while($maintenance = DBfetch($db_maintenances)){
 		$denied_maintenances[] = $maintenance['maintenanceid'];
 	}
-		
+
 	$sql = 'SELECT m.maintenanceid '.
 			' FROM maintenances m '.
 			' WHERE '.DBin_node('m.maintenanceid').
@@ -59,16 +59,16 @@ function get_accessible_maintenance_by_user($perm,$perm_res=null,$nodeid=null,$h
 	while($maintenance = DBfetch($db_maintenances)){
 		$result[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
 	}
-	
+
 	if(PERM_RES_STRING_LINE == $perm_res){
-		if(count($result) == 0) 
+		if(count($result) == 0)
 			$result = '-1';
 		else
 			$result = implode(',',$result);
 	}
-	
+
 	$available_maintenances[$perm][$perm_res][$nodeid_str][$hostid_str] = $result;
-	
+
 return $result;
 }
 
@@ -79,7 +79,7 @@ function get_maintenance_by_maintenanceid($maintenanceid){
 			' FROM maintenances m '.
 			' WHERE '.DBin_node('m.maintenanceid').
 				' AND maintenanceid='.$maintenanceid;
-			
+
 	$maintenance = DBfetch(DBselect($sql));
 return $maintenance;
 }
@@ -93,14 +93,14 @@ function add_maintenance($maintenance = array()){
 						'active_since'=> time(),
 						'active_till' => time()+86400,
 					);
-					
+
 	if(!check_db_fields($db_fields, $maintenance)){
 		error('Incorrect arguments pasted to function [add_maintenance]');
 		return false;
 	}
-		
+
 	$maintenanceid = get_dbid('maintenances','maintenanceid');
-	
+
 	$result = DBexecute('INSERT INTO maintenances (maintenanceid,name,maintenance_type,description,active_since,active_till) '.
 				' VALUES ('.$maintenanceid.','.
 						zbx_dbstr($maintenance['name']).','.
@@ -108,7 +108,7 @@ function add_maintenance($maintenance = array()){
 						zbx_dbstr($maintenance['description']).','.
 						$maintenance['active_since'].','.
 						$maintenance['active_till'].')');
-			
+
 return $result?$maintenanceid:false;
 }
 
@@ -119,12 +119,12 @@ function update_maintenance($maintenanceid, $maintenance = array()){
 	if(!$db_maintenance = DBfetch(DBselect($sql))){
 		return false;
 	}
-	
+
 	if(!check_db_fields($db_maintenance, $maintenance)){
 		error('Incorrect arguments pasted to function [update_maintenance]');
 		return false;
 	}
-	
+
 	$sql = 'UPDATE maintenances SET '.
 				' name='.zbx_dbstr($maintenance['name']).','.
 				' maintenance_type='.$maintenance['maintenance_type'].','.
@@ -133,7 +133,7 @@ function update_maintenance($maintenanceid, $maintenance = array()){
 				' active_till='.$maintenance['active_till'].
 			' WHERE maintenanceid='.$maintenanceid;
 	$result = DBexecute($sql);
-	
+
 return $result;
 }
 
@@ -141,9 +141,9 @@ return $result;
 // author: Aly
 function delete_maintenance($maintenanceids){
 	zbx_value2array($maintenanceids);
-	
+
 	delete_timeperiods_by_maintenanceid($maintenanceids);
-	
+
 	DBexecute('DELETE FROM maintenances_hosts WHERE '.DBcondition('maintenanceid',$maintenanceids));
 	DBexecute('DELETE FROM maintenances_groups WHERE '.DBcondition('maintenanceid',$maintenanceids));
 	$result = DBexecute('DELETE FROM maintenances WHERE '.DBcondition('maintenanceid',$maintenanceids));
@@ -152,7 +152,7 @@ return $result;
 
 function save_maintenance_host_links($maintenanceid, $hostids){
 	$result = true;
-	
+
 	DBexecute('DELETE FROM maintenances_hosts WHERE maintenanceid='.$maintenanceid);
 	foreach($hostids as $id => $hostid)
 	{
@@ -161,13 +161,13 @@ function save_maintenance_host_links($maintenanceid, $hostids){
 		$result = DBexecute('INSERT INTO maintenances_hosts (maintenance_hostid,maintenanceid,hostid)'.
 				' VALUES ('.$maintenance_hostid.','.$maintenanceid.','.$hostid.')');
 	}
-		
+
 return $result;
 }
 
 function save_maintenance_group_links($maintenanceid, $groupids){
 	$result = true;
-	
+
 	DBexecute('DELETE FROM maintenances_groups WHERE maintenanceid='.$maintenanceid);
 	foreach($groupids as $id => $groupid)
 	{
@@ -176,7 +176,7 @@ function save_maintenance_group_links($maintenanceid, $groupids){
 		$result = DBexecute('INSERT INTO maintenances_groups (maintenance_groupid,maintenanceid,groupid)'.
 				' VALUES ('.$maintenance_groupid.','.$maintenanceid.','.$groupid.')');
 	}
-		
+
 return $result;
 
 }
@@ -192,7 +192,7 @@ function add_timeperiod($timeperiod = array()){
 						'period' => 3600,
 						'date' => time()
 					);
-					
+
 	if(!check_db_fields($db_fields, $timeperiod)){
 		error('Incorrect arguments pasted to function [add_timeperiod]');
 		return false;
@@ -210,7 +210,7 @@ function add_timeperiod($timeperiod = array()){
 						$timeperiod['start_time'].','.
 						$timeperiod['period'].','.
 						$timeperiod['date'].')');
-			
+
 return $result?$timeperiodid:false;
 }
 
@@ -231,7 +231,7 @@ function delete_timeperiods_by_maintenanceid($maintenanceids){
 	}
 
 	$result = delete_timeperiod($timeperiods);
-	
+
 return $result;
 }
 
@@ -243,7 +243,7 @@ function delete_timeperiod($timeperiodids){
 
 	DBexecute('DELETE FROM timeperiods WHERE '.DBcondition('timeperiodid',$timeperiodids));
 	$result = DBexecute('DELETE FROM maintenances_windows WHERE '.DBcondition('timeperiodid',$timeperiodids));
-	
+
 return $result;
 }
 
@@ -252,9 +252,9 @@ return $result;
 function save_maintenances_windows($maintenanceid, $timeperiodids){
 	zbx_value2array($timeperiodids);
 	$result = true;
-	
+
 	DBexecute('DELETE FROM maintenances_windows WHERE maintenanceid='.$maintenanceid);
-	
+
 	foreach($timeperiodids as $id => $timeperiodid){
 		$maintenance_timeperiodid = get_dbid('maintenances_windows', 'maintenance_timeperiodid');
 		$sql = 'INSERT INTO maintenances_windows (maintenance_timeperiodid,timeperiodid,maintenanceid) '.
@@ -289,16 +289,16 @@ return $str;
 // function: shedule2str
 // author: Aly
 function shedule2str($timeperiod){
-	
+
 	$timeperiod['hour'] = floor($timeperiod['start_time'] / 3600);
 	$timeperiod['minute'] = floor(($timeperiod['start_time'] - ($timeperiod['hour'] * 3600)) / 60);
 
 	if($timeperiod['hour'] < 10) 	$timeperiod['hour']='0'.$timeperiod['hour'];
 	if($timeperiod['minute'] < 10) 	$timeperiod['minute']='0'.$timeperiod['minute'];
-	
-	
+
+
 	$str = 'At '.$timeperiod['hour'].':'.$timeperiod['minute'].' on ';
-	
+
 	if($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME){
 		$str= 'At '.date('H',$timeperiod['date']).':'.date('i',$timeperiod['date']).' on '.date(S_DATE_FORMAT_YMD,$timeperiod['date']);
 	}
@@ -307,7 +307,7 @@ function shedule2str($timeperiod){
 	}
 	else if($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY){
 		$days = '';
-		
+
 		$dayofweek = zbx_num2bitstr($timeperiod['dayofweek'],true);
 		$length = strlen($dayofweek);
 		for($i=0; $i < $length; $i++){
@@ -320,7 +320,7 @@ function shedule2str($timeperiod){
 	}
 	else if($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY){
 		$months = '';
-		
+
 
 		$month = zbx_num2bitstr($timeperiod['month'],true);
 		$length = strlen($month);
@@ -341,7 +341,7 @@ function shedule2str($timeperiod){
 					$days.= get_str_dayofweek($i+1);
 				}
 			}
-			
+
 			$every = '';
 			switch($timeperiod['every']){
 				case 1:	$every = S_FIRST; break;
@@ -350,7 +350,7 @@ function shedule2str($timeperiod){
 				case 4: $every = S_FOURTH; break;
 				case 5: $every = S_LAST; break;
 			}
-			
+
 			$str.= $every.SPACE.$days.' of every '.$months;
 		}
 		else{
