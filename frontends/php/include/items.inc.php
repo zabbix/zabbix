@@ -216,32 +216,32 @@
 //*/
 
 		$item_db_fields = array(
-				'description'	=> null,
+				'description'		=> null,
 				'key_'			=> null,
 				'hostid'		=> null,
 				'delay'			=> 60,
 				'history'		=> 7,
 				'status'		=> ITEM_STATUS_ACTIVE,
 				'type'			=> ITEM_TYPE_ZABBIX,
-				'snmp_community'=> '',
+				'snmp_community'	=> '',
 				'snmp_oid'		=> '',
-				'value_type'	=> ITEM_VALUE_TYPE_STR,
+				'value_type'		=> ITEM_VALUE_TYPE_STR,
 				'data_type'		=> ITEM_DATA_TYPE_DECIMAL,
-				'trapper_hosts'	=> 'localhost',
+				'trapper_hosts'		=> 'localhost',
 				'snmp_port'		=> 161,
 				'units'			=> '',
-				'multiplier'	=> 0,
+				'multiplier'		=> 0,
 				'delta'			=> 0,
 				'snmpv3_securityname'	=> '',
 				'snmpv3_securitylevel'	=> 0,
 				'snmpv3_authpassphrase'	=> '',
 				'snmpv3_privpassphrase'	=> '',
-				'formula'			=> 0,
-				'trends'			=> 365,
+				'formula'		=> 0,
+				'trends'		=> 365,
 				'logtimefmt'		=> '',
 				'valuemapid'		=> 0,
 				'delay_flex'		=> '',
-				'params'			=> '',
+				'params'		=> '',
 				'ipmi_sensor'		=> '',
 				'applications'		=> array(),
 				'templateid'		=> 0);
@@ -471,15 +471,15 @@
 		'formula','trends','logtimefmt','valuemapid','delay_flex','params','ipmi_sensor','applications','templateid');
 //*/
 		$item_in_params = $item;
-		
+
 		$item_data = get_item_by_itemid_limited($itemid);
 		$item_data['applications'] = get_applications_by_itemid($itemid);
-		
+
 		if(!check_db_fields($item_data, $item)){
 			error('Incorrect arguments pasted to function [update_item]');
 			return false;
 		}
-		
+
 		$host = get_host_by_hostid($item['hostid']);
 
 		if(($i = array_search(0,$item['applications'])) !== FALSE)
@@ -530,16 +530,16 @@
 		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
 		while($db_tmp_item = DBfetch($db_tmp_items)){
 			$child_item_params = $item_in_params;
-			
+
 			$child_item_params['hostid'] = $db_tmp_item['hostid'];
 			$child_item_params['templateid'] = $itemid;
 			$child_item_params['applications'] = get_same_applications_for_host($item['applications'], $db_tmp_item['hostid']);
-			
+
 			if(!check_db_fields($db_tmp_item, $child_item_params)){
 				error('Incorrect arguments pasted to function [update_item]');
 				return false;
 			}
-			
+
 			$result = update_item($db_tmp_item['itemid'], $child_item_params);		// recursion!!!
 
 			if(!$result)
@@ -609,7 +609,7 @@
 		if($result){
 			info("Item '".$host['host'].':'.$item['key_']."' updated");
 		}
-		
+
 	return $result;
 	}
 
@@ -625,25 +625,25 @@
 	 * Comments:
 	 *
 	 */
-	function smart_update_item($itemid, $item=array()){		
+	function smart_update_item($itemid, $item=array()){
 		$item_data = get_item_by_itemid_limited($itemid);
-		
+
 		$restore_rules= array(
-					'description'	=> array(),
+					'description'		=> array(),
 					'key_'			=> array(),
 					'hostid'		=> array(),
 					'delay'			=> array('template' => 1),
 					'history'		=> array('template' => 1 , 'httptest' => 1),
 					'status'		=> array('template' => 1 , 'httptest' => 1),
 					'type'			=> array(),
-					'snmp_community'=> array(),
+					'snmp_community'=>	array(),
 					'snmp_oid'		=> array(),
-					'value_type'	=> array(),
-					'data_type'	=> array(),
-					'trapper_hosts'	=> array(),
+					'value_type'		=> array(),
+					'data_type'		=> array(),
+					'trapper_hosts'		=> array(),
 					'snmp_port'		=> array(),
 					'units'			=> array(),
-					'multiplier'	=> array(),
+					'multiplier'		=> array(),
 					'delta'			=> array('template' => 1 , 'httptest' => 1),
 					'snmpv3_securityname'	=> array(),
 					'snmpv3_securitylevel'	=> array(),
@@ -651,11 +651,11 @@
 					'snmpv3_privpassphrase'	=> array(),
 					'formula'		=> array(),
 					'trends'		=> array('template' => 1 , 'httptest' => 1),
-					'logtimefmt'	=> array(),
-					'valuemapid'	=> array('httptest' => 1),
+					'logtimefmt'		=> array(),
+					'valuemapid'		=> array('httptest' => 1),
 					'params'		=> array(),
-					'delay_flex'	=> array('template' => 1),
-					'ipmi_sensor'	=> array());
+					'delay_flex'		=> array('template' => 1),
+					'ipmi_sensor'		=> array());
 
 		foreach($restore_rules as $var_name => $info){
 			if(($item_data['type'] == ITEM_TYPE_HTTPTEST) && !isset($info['httptest'])){
@@ -754,7 +754,7 @@
 		if($templateid == null){
 			$templateid = array_keys(get_templates_by_hostid($hostid));
 		}
-		
+
 		if(is_array($templateid)){
 			foreach($templateid as $id)
 				copy_template_items($hostid, $id, $copy_mode); // attention recursion
@@ -869,14 +869,14 @@
 	function get_same_item_for_host($item,$dest_hostids){
 		$return_array = is_array($dest_hostids);
 		zbx_value2array($dest_hostids);
-	
+
 		if(!is_array($item)){
 			$itemid = $item;
 		}
 		else if(isset($item['itemid'])){
 			$itemid = $item['itemid'];
 		}
-		
+
 		$same_items = array();
 		if(isset($itemid)){
 			$sql = 'SELECT src.* '.
@@ -884,7 +884,7 @@
 							' WHERE dest.itemid='.$itemid.
 								' AND src.key_=dest.key_ '.
 								' AND '.DBcondition('src.hostid',$dest_hostids);
-								
+
 			$res = DBselect($sql);
 			while($db_item = DBfetch($res)){
 				if(is_array($item)){
@@ -913,7 +913,7 @@
 	function delete_item($itemids){
 		zbx_value2array($itemids);
 		if(empty($itemids)) return true;
-		
+
 // Get items INFO before delete them!
 		$items = array();
 		$item_res = DBselect('SELECT itemid, description, key_ FROM items WHERE '.DBcondition('itemid',$itemids));
@@ -1057,7 +1057,7 @@
  * Function: get_items_data_overview
  *
  * Description:
- *     Retrive overview table object for items
+ *     Retrieve overview table object for items
  *
  * Author:
  *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
@@ -1117,7 +1117,7 @@ COpt::profiling_start('prepare data');
 				);
 			}
 		}
-		
+
 		if(!isset($hosts)){
 			return $table;
 		}
@@ -1131,10 +1131,10 @@ COpt::profiling_start('prepare table');
 			foreach($hosts as $hostname){
 				$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
 			}
-			
+
 			$table->SetHeader($header,'vertical_header');
 			$curr_rime = time();
-			
+
 			foreach($items as $descr => $ithosts){
 				$table_row = array(nbsp($descr));
 				foreach($hosts as $hostname){
@@ -1148,10 +1148,10 @@ COpt::profiling_start('prepare table');
 			foreach($items as $descr => $ithosts){
 				$header=array_merge($header,array(new CImg('vtext.php?text='.$descr)));
 			}
-			
+
 			$table->SetHeader($header,'vertical_header');
 			$curr_rime = time();
-			
+
 			foreach($hosts as $hostname){
 				$table_row = array(nbsp($hostname));
 				foreach($items as $descr => $ithosts){
@@ -1180,7 +1180,7 @@ COpt::profiling_stop('prepare table');
 				else
 					$ack = null;
 			}
-			
+
 			$value = format_lastvalue($ithosts[$hostname]);
 
 			$it_ov_menu = array(
@@ -1369,7 +1369,7 @@ COpt::profiling_stop('prepare table');
 	 * Description:
 	 *     Get value from history
 	 *
-	 * Peremeters:
+	 * Parameters:
 	 *     itemid - item ID
 	 *     last  - 0 - last value (clock is used), 1 - last value
 	 *
@@ -1400,7 +1400,7 @@ COpt::profiling_stop('prepare table');
 				$table = "history_log";
 				break;
 		}
-		
+
 		if($last == 0){
 			$sql = "select value from $table where itemid=".$db_item["itemid"]." and clock=$clock";
 			$row = DBfetch(DBselect($sql, 1));
@@ -1428,7 +1428,7 @@ COpt::profiling_stop('prepare table');
 	 * Purpose: check if current time is within given period
 	 *
 	 * Parameters: period - time period in format [d1-d2,hh:mm-hh:mm]*
-	 *             now    - timestamp for comporation
+	 *             now    - timestamp for comparison
 	 *
 	 * Return value: 0 - out of period, 1 - within the period
 	 *
@@ -1464,12 +1464,12 @@ COpt::profiling_stop('prepare table');
 	 *
 	 * Purpose: check for flexible delay value
 	 *
-	 * Parameters: delay_flex - [IN] separeated flexible intervals
+	 * Parameters: delay_flex - [IN] separated flexible intervals
 	 *                          [dd/d1-d2,hh:mm-hh:mm;]
 	 *             delay - [IN] default delay
 	 *
 	 * Return value: flexible delay or $delay if $delay_flex is not defined
-	 *             
+	 *
 	 *
 	 * Author: Alexander Vladishev
 	 *
@@ -1499,7 +1499,7 @@ COpt::profiling_stop('prepare table');
 	 *
 	 * Purpose: return time of next flexible interval
 	 *
-	 * Parameters: delay_flex - [IN] ';' separeated flexible intervals
+	 * Parameters: delay_flex - [IN] ';' separated flexible intervals
 	 *                          [dd/d1-d2,hh:mm-hh:mm]
 	 *             now = [IN] current time
 	 *
@@ -1554,9 +1554,9 @@ COpt::profiling_stop('prepare table');
 	 * Function: calculate_item_nextcheck
 	 *
 	 * Description:
-	 *     calculate nextcheck timespamp for item
+	 *     calculate nextcheck timestamp for item
 	 *
-	 * Peremeters:
+	 * Parameters:
 	 *     itemid - item ID
 	 *     item_type - item type
 	 *     delay - item's refresh rate in sec

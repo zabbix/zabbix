@@ -693,7 +693,7 @@
 								continue;
 							}
 						 	else{
-								error('Missed mandatory parameter for function ('.$function.')');
+								error('Missing mandatory parameter for function ('.$function.')');
 								return false;
 							}
 						}
