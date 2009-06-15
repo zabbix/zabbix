@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -41,21 +41,21 @@ class CImg extends CTag{
 		$this->setHeight($height);
 		$this->setClass($class);
 	}
-	
+
 	public function setSrc($value){
 		if(!is_string($value)){
 			return $this->error('Incorrect value for SetSrc ['.$value.']');
 		}
 	return $this->addOption('src',$value);
 	}
-	
+
 	public function setAltText($value=NULL){
 		if(!is_string($value)){
 			return $this->error('Incorrect value for SetText ['.$value.']');
 		}
 	return $this->addOption('alt',$value);
 	}
-	
+
 	public function setMap($value=NULL){
 		if(is_null($value))
 			$this->deleteOption('usemap');
@@ -63,11 +63,11 @@ class CImg extends CTag{
 		if(!is_string($value)){
 			return $this->error('Incorrect value for SetMap ['.$value.']');
 		}
-		
+
 		$value = '#'.ltrim($value,'#');
 	return $this->addOption('usemap',$value);
 	}
-	
+
 	public function SetWidth($value=NULL){
 		if(is_null($value))
 			return $this->delOption('width');
@@ -76,7 +76,7 @@ class CImg extends CTag{
 		else
 			return $this->error('Incorrect value for SetWidth ['.$value.']');
 	}
-	
+
 	public function setHeight($value=NULL){
 		if(is_null($value))
 			return $this->delOption('height');

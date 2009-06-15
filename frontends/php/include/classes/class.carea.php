@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -27,7 +27,7 @@ class CArea extends CTag{
 		$this->setHref($href);
 		$this->setAlt($alt);
 	}
-	
+
 	public function setCoords($value){
 		if(!is_array($value))
 			return $this->error('Incorrect value for setCoords ['.$value.']');
@@ -56,10 +56,10 @@ class CArea extends CTag{
 			return $this->error('Incorrect value for setHref ['.$value.']');
 		$url = new Curl($value);
 		$value = $url->getUrl();
-		
+
 		$this->addOption('href',$value);
 	}
-	
+
 	public function setAlt($value){
 		if(!is_string($value))
 			return $this->error('Incorrect value for setAlt ['.$value.']');

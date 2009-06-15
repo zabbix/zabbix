@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -34,7 +34,7 @@ class CButtonCancel extends CButton{
 
 		$uri = new Curl($url);
 		$url = $uri->getUrl();
-		
+
 		return parent::setAction("javascript: return redirect('".$url."');");
 	}
 }

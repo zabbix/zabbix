@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -34,7 +34,7 @@ class CIFrame extends CTag{
 		$this->setScrolling($scrolling);
 		$this->addOption('id',$id);
 	}
-	
+
 	public function setSrc($value=NULL){
 		if(is_null($value)){
 			return $this->delOption('src');
@@ -44,7 +44,7 @@ class CIFrame extends CTag{
 		}
 	return $this->addOption('src',$value);
 	}
-	
+
 	public function setWidth($value){
 		if(is_null($value)){
 			return $this->delOption('width');
@@ -52,10 +52,10 @@ class CIFrame extends CTag{
 		else if(!is_string($value)){
 			return $this->error('Incorrect value for setWidth ['.$value.']');
 		}
-		
+
 		$this->addOption('width',$value);
 	}
-	
+
 	public function setHeight($value){
 		if(is_null($value)){
 			return $this->delOption('height');
@@ -63,17 +63,17 @@ class CIFrame extends CTag{
 		else if(!is_string($value)){
 			return $this->error('Incorrect value for setHeight ['.$value.']');
 		}
-		
+
 		$this->addOption('height',$value);
 	}
-	
+
 	public function setScrolling($value){
 		if(is_null($value)) $value = 'no';
 
 		if($value=='no' && $value=='yes' && $value=='auto'){
 			return $this->error('Incorrect value for setScrolling ['.$value.']');
 		}
-		
+
 		$this->addOption('scrolling',$value);
 	}
 }

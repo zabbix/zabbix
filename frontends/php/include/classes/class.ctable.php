@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -25,10 +25,10 @@ class CTable extends CTag{
 
  protected $oddRowClass;
  protected $evenRowClass;
- 
+
  protected $header;
  protected $footer;
- 
+
  protected $colnum;
  protected $rownum;
 
@@ -37,7 +37,7 @@ class CTable extends CTag{
 	public function __construct($message=NULL,$class=NULL){
 		parent::__construct('table','yes');
 		$this->setClass($class);
-		
+
 		$this->rownum = 0;
 		$this->oddRowClass = NULL;
 		$this->evenRowClass = NULL;
@@ -51,23 +51,23 @@ class CTable extends CTag{
 
 		$this->message = $message;
 	}
-	
+
 	public function setOddRowClass($value=NULL){
 		$this->oddRowClass = $value;
 	}
-	
+
 	public function setEvenRowClass($value=NULL){
 		$this->evenRowClass = $value;
 	}
-	
+
 	public function setAlign($value){
 		return $this->options['align'] = $value;
 	}
-	
+
 	public function setCellPadding($value){
 		return $this->options['cellpadding'] = strval($value);
 	}
-	
+
 	public function setCellSpacing($value){
 		return $this->options['cellspacing'] = strval($value);
 	}
@@ -104,7 +104,7 @@ class CTable extends CTag{
 		else{
 			$value = new CRow($value,$class);
 		}
-		
+
 		$this->colnum = $value->itemsCount();
 		$this->header = $value->toString();
 	}
@@ -139,7 +139,7 @@ class CTable extends CTag{
 		$ret .= $this->header;
 	return $ret;
 	}
-	
+
 	public function endToString(){
 		$ret = '';
 		if($this->rownum == 0 && isset($this->message)) {
@@ -149,6 +149,6 @@ class CTable extends CTag{
 		$ret .= $this->footer;
 		$ret .= parent::endToString();
 	return $ret;
-	}		
+	}
 }
 ?>

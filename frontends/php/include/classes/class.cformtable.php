@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -23,7 +23,7 @@ class CFormTable extends CForm{
 
  private $align;
  private $help;
- 
+
 
  protected $top_items = array();
  protected $center_items = array();
@@ -48,16 +48,16 @@ class CFormTable extends CForm{
 		$this->setTitle($title);
 		$this->setAlign('center');
 		$this->setHelp();
-		
+
 		$this->addVar($form_variable, get_request($form_variable, 1));
 		$this->addVar('form_refresh',get_request('form_refresh',0)+1);
 
 		$this->bottom_items = new CCol(SPACE,'form_row_last');
 			$this->bottom_items->setColSpan(2);
 	}
-	
+
 	public function setAction($value){
-		
+
 		if(is_string($value))
 			return parent::setAction($value);
 		elseif(is_null($value))
@@ -65,7 +65,7 @@ class CFormTable extends CForm{
 		else
 			return $this->error('Incorrect value for setAction ['.$value.']');
 	}
-	
+
 	public function setName($value){
 		if(!is_string($value)){
 			return $this->error('Incorrect value for setAlign ['.$value.']');
@@ -74,7 +74,7 @@ class CFormTable extends CForm{
 		$this->addOption('id',$value);
 	return true;
 	}
-	
+
 	public function setAlign($value){
 		if(!is_string($value)){
 			return $this->error('Incorrect value for setAlign ['.$value.']');
@@ -90,52 +90,52 @@ class CFormTable extends CForm{
 
 		$this->title = unpack_object($value);
 	}
-	
+
 	public function setHelp($value=NULL){
 		if(is_null($value)) {
 			$this->help = new CHelp();
-		} 
+		}
 		else if(strtolower(get_class($value)) == 'chelp') {
 			$this->help = $value;
-		} 
+		}
 		else if(is_string($value)) {
 			$this->help = new CHelp($value);
 			if($this->getName()==NULL)
 				$this->setName($value);
-		} 
+		}
 		else {
 			return $this->error('Incorrect value for setHelp ['.$value.']');
 		}
 	return 0;
 	}
-	
+
 	public function addVar($name, $value){
 		$this->addItemToTopRow(new CVar($name, $value));
 	}
-	
+
 	public function addItemToTopRow($value){
 		array_push($this->top_items, $value);
 	}
-	
+
 	public function addRow($item1, $item2=NULL, $class=NULL){
 		if(strtolower(get_class($item1)) == 'crow'){
-		
-		} 
+
+		}
 		else if(strtolower(get_class($item1)) == 'ctable'){
 			$td = new CCol($item1,'form_row_c');
 			$td->setColSpan(2);
-			
+
 			$item1 = new CRow($td);
-		} 
+		}
 		else{
 			$tmp = $item1;
 			if(is_string($item1)){
 				$item1=nbsp($item1);
 			}
-			
+
 			if(empty($item1)) $item1 = SPACE;
 			if(empty($item2)) $item2 = SPACE;
-			
+
 			$item1 = new CRow(
 							array(
 								new CCol($item1,'form_row_l'),
@@ -146,7 +146,7 @@ class CFormTable extends CForm{
 
 		array_push($this->center_items, $item1);
 	}
-	
+
 	public function addSpanRow($value, $class=NULL){
 		if(is_string($value))
 			$item1=nbsp($value);
@@ -158,8 +158,8 @@ class CFormTable extends CForm{
 			$col->setColSpan(2);
 		array_push($this->center_items,new CRow($col));
 	}
-	
-	
+
+
 	public function addItemToBottomRow($value){
 		$this->bottom_items->addItem($value);
 	}
@@ -169,29 +169,29 @@ class CFormTable extends CForm{
 			$this->tableclass = $class;
 		}
 	}
-	
-	public function bodyToString(){	
+
+	public function bodyToString(){
 		parent::bodyToString();
-		
+
 		$tbl = new CTable(NULL,$this->tableclass);
-		
+
 		foreach($this->top_items as $item)	$tbl->additem($item);
 
 		$tbl->setOddRowClass('form_odd_row');
 		$tbl->setEvenRowClass('form_even_row');
-		
+
 		$tbl->setCellSpacing(0);
 		$tbl->setCellPadding(1);
-		
+
 		$tbl->setAlign($this->align);
 // add first row
 		if(!is_null($this->title)){
 			$col = new CCol(NULL,'form_row_first');
 			$col->setColSpan(2);
-		
+
 			if(isset($this->help))			$col->addItem($this->help);
 			if(isset($this->title))		 	$col->addItem($this->title);
-			
+
 			$tbl->setHeader($col);
 		}
 

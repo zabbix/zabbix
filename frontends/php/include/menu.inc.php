@@ -34,7 +34,7 @@ $ZBX_MENU = array(
 					),
 				array(
 						'url'=>'overview.php',
-						'label'=>S_OVERVIEW	
+						'label'=>S_OVERVIEW
 					),
 				array(
 						'url'=>'httpmon.php',
@@ -73,7 +73,7 @@ $ZBX_MENU = array(
 					),
 				array(
 						'url'=>'discovery.php',
-						'label'=>S_DISCOVERY, 
+						'label'=>S_DISCOVERY,
 						'user_type'=>USER_TYPE_ZABBIX_ADMIN),
 				array(
 						'url'=>'srv_status.php',
@@ -105,7 +105,7 @@ $ZBX_MENU = array(
 				array('url'=>'report2.php',	'label'=>S_AVAILABILITY_REPORT	),
 				array('url'=>'report5.php',	'label'=>S_TRIGGERS_TOP_100	),
 				array(
-						'url'=>'report6.php',	
+						'url'=>'report6.php',
 						'label'=>S_BAR_REPORTS,
 						'sub_pages'=>array('popup_period.php','popup_bitem.php','chart_bar.php')
 					),
@@ -136,7 +136,7 @@ $ZBX_MENU = array(
 				array(
 						'url'=>'items.php',
 						'label'=>S_ITEMS,
-						'sub_pages'=>array('tr_logform.php')		
+						'sub_pages'=>array('tr_logform.php')
 					),
 				array(
 						'url'=>'triggers.php',
@@ -158,7 +158,7 @@ $ZBX_MENU = array(
 					),
 				array('url'=>'services.php',
 						'label'=>S_IT_SERVICES,
-						'sub_pages'=>array('services_form.php')	
+						'sub_pages'=>array('services_form.php')
 					),
 				array('url'=>'discoveryconf.php','label'=>S_DISCOVERY),
 				array('url'=>'exp_imp.php'	,'label'=>S_EXPORT_IMPORT)
@@ -198,11 +198,11 @@ $ZBX_MENU = array(
 				)
 			)
 	);
-	
-	
+
+
 function zbx_construct_menu(&$main_menu, &$sub_menus) {
 	global $page, $ZBX_MENU, $USER_DETAILS;
-	
+
 	$denyed_page_requested = false;
 
 	/* NOTE - menu array format:
@@ -235,7 +235,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 		}
 
 //---
-		$menu_class = 'horizontal_menu_n';	
+		$menu_class = 'horizontal_menu_n';
 		$sub_menus[$label] = array();
 		foreach($menu['pages'] as $id => $sub_page){
 			$show_sub_menu = true;
@@ -245,7 +245,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 				$show_sub_menu = false;
 			}
 //----------
-			$row = array('menu_text' => isset($sub_page['label'])?$sub_page['label']:'', 
+			$row = array('menu_text' => isset($sub_page['label'])?$sub_page['label']:'',
 							'menu_url'=> $sub_page['url'],
 							'class'=> 'highlight',
 							'selected'=> false);
@@ -255,21 +255,21 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 			if($sub_menu_active){
 // PERMISSION CHECK
 				$deny &= ($USER_DETAILS['type'] < $menu['user_type']);
-// END OF PERMISSION CHECK 
+// END OF PERMISSION CHECK
 				$menu_class = 'active';
 				$page_exists = true;
 				$page['menu'] = $label;
 				$row['selected'] = true;
-				
+
 				if(!defined('ZBX_PAGE_NO_MENU')){
 					update_profile('web.menu.'.$label.'.last', $sub_page['url'], PROFILE_TYPE_STR);
 				}
 			}
-			
+
 			if($show_sub_menu) $sub_menus[$label][] = $row;
 		}
 
-		if($page_exists && !defined('ZBX_NOT_ALLOW_ALL_NODES') && 
+		if($page_exists && !defined('ZBX_NOT_ALLOW_ALL_NODES') &&
 			(isset($menu['forse_disable_all_nodes']) || isset($sub_page['forse_disable_all_nodes'])))
 		{
 			define('ZBX_NOT_ALLOW_ALL_NODES', 1);
@@ -283,7 +283,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 			unset($sub_menus[$label]);
 			continue;
 		}
-		
+
 //		$menu_url = get_profile('web.menu.'.$label.'.last',false);
 		$menu_url = $menu['pages'][$menu['default_page_id']]['url'];
 
@@ -292,14 +292,14 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 		$mmenu_entry->addAction('onclick', "javascript: redirect('$menu_url');");
 		$mmenu_entry->addAction('onmouseover', 'javascript: MMenu.mouseOver("'.$label.'");');
 		$mmenu_entry->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
-		
+
 		array_push($main_menu, $mmenu_entry);
 	}
 
 	if(!$page_exists && ($page['type']!=PAGE_TYPE_XML)){
 		$denyed_page_requested = true;
 	}
-	
+
 return $denyed_page_requested;
 }
 

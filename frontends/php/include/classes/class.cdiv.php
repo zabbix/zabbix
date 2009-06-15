@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -24,12 +24,12 @@ class CDiv extends CTag{
 		parent::__construct('div','yes');
 		$this->setClass($class);
 		$this->addItem($items);
-		
-		$this->tag_body_start = '';			
+
+		$this->tag_body_start = '';
 		$this->tag_start= '';
 		$this->tag_end = '';
 		$this->tag_body_start = '';
-		$this->tag_body_end = '';			
+		$this->tag_body_end = '';
 	}
 }
 ?>

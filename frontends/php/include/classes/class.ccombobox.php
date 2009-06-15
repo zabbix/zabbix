@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -31,19 +31,19 @@ class CComboBox extends CTag{
 
 		$this->options['class'] = 'biginput';
 		$this->options['size'] = 1;
-		
+
 		$this->value = $value;
 		$this->SetAction($action);
 	}
-	
+
 	public function SetAction($value='submit()', $event='onchange'){
 		$this->addOption($event,$value);
 	}
-	
+
 	public function setValue($value=NULL){
 		$this->value = $value;
 	}
-	
+
 	public function addItem($value, $caption='', $selected=NULL, $enabled='yes'){
 //			if($enabled=='no') return;	/* disable item method 1 */
 		if(strtolower(get_class($value))=='ccomboitem'){

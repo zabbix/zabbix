@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -32,25 +32,25 @@ class CTextArea extends CTag{
 
 		$this->addItem($value);
 	}
-	
+
 	public function setReadonly($value='yes'){
 		if($value=='yes')
 			return $this->options['readonly'] = 'readonly';
 
 		$this->delOption('readonly');
 	}
-	
+
 	public function setValue($value=''){
 		return $this->addItem($value);
 	}
-	
+
 	public function setRows($value){
 		return $this->options['rows'] = $value;
 	}
-	
+
 	public function setCols($value){
 		return $this->options['cols'] = $value;
-		
+
 	}
 }
 ?>

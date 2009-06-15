@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -41,7 +41,7 @@ class CTag extends CObject{
 		if(!is_string($tagname)){
 			return $this->error('Incorrect tagname for CTag ['.$tagname.']');
 		}
-		
+
 		$this->tagname = $tagname;
 		$this->paired = $paired;
 
@@ -56,7 +56,7 @@ class CTag extends CObject{
 
 		$this->setClass($class);
 	}
-	
+
 	public function showStart(){	echo $this->startToString();}
 	public function showBody(){	echo $this->bodyToString();	}
 	public function showEnd(){		echo $this->endToString();	}
@@ -73,18 +73,18 @@ class CTag extends CObject{
 	public function bodyToString(){
 		$res = $this->tag_body_start;
 	return $res.parent::ToString(false);
-		
+
 		/*foreach($this->items as $item)
 			$res .= $item;
 		return $res;*/
 	}
-	
+
 	public function endToString(){
 		$res = ($this->paired=='yes') ? $this->tag_body_end.'</'.$this->tagname.'>' : '';
 		$res .= $this->tag_end;
 	return $res;
 	}
-	
+
 	public function toString($destroy=true){
 		$res  = $this->startToString();
 		$res .= $this->bodyToString();
@@ -94,7 +94,7 @@ class CTag extends CObject{
 
 	return $res;
 	}
-	
+
 	public function setName($value){
 		if(is_null($value)) return $value;
 
@@ -103,13 +103,13 @@ class CTag extends CObject{
 		}
 	return $this->addOption("name",$value);
 	}
-	
+
 	public function getName(){
 		if(isset($this->options['name']))
 			return $this->options['name'];
 	return NULL;
 	}
-	
+
 	public function setClass($value){
 		if(isset($value))
 			$this->options['class'] = $value;
@@ -118,7 +118,7 @@ class CTag extends CObject{
 
 	return $value;
 	}
-	
+
 	public function getOption($name){
 		$ret = NULL;
 		if(isset($this->options[$name]))
@@ -131,11 +131,11 @@ class CTag extends CObject{
 			$this->options[$name] = unpack_object($value);
 		}
 		else if(isset($value))
-			$this->options[$name] = htmlspecialchars(strval($value)); 
+			$this->options[$name] = htmlspecialchars(strval($value));
 		else
 			unset($this->options[$name]);
 	}
-	
+
 	public function delOption($name){
 		unset($this->options[$name]);
 	}
@@ -148,7 +148,7 @@ class CTag extends CObject{
 			$this->options[$name] = htmlentities(str_replace(array("\r", "\n"), '', strval($value)),ENT_COMPAT,S_HTML_CHARSET);
 		}
 	}
-	
+
 	public function setHint($text, $width='', $class=''){
 		if(empty($text)) return false;
 
@@ -169,12 +169,12 @@ class CTag extends CObject{
 	public function onClick($handle_code){
 		$this->addAction('onClick', $handle_code);
 	}
-	
+
 	public function addStyle($value){
 		if(!isset($this->options['style'])) $this->options['style'] = '';
-		
+
 		if(isset($value))
-			$this->options['style'].= htmlspecialchars(strval($value)); 
+			$this->options['style'].= htmlspecialchars(strval($value));
 		else
 			unset($this->options['style']);
 	}
@@ -187,7 +187,7 @@ class CTag extends CObject{
 			$this->options['disabled'] = 'disabled';
 		}
 	}
-	
+
 	public function error($value){
 		error('class('.get_class($this).') - '.$value);
 		return 1;

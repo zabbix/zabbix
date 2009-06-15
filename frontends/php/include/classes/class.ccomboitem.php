@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -31,21 +31,21 @@ class CComboItem extends CTag{
 		$this->setEnabled($enabled);
 
 	}
-	
+
 	public function setValue($value){
 		return $this->options['value'] = $value;
 	}
-	
+
 	public function getValue(){
 		return $this->getOption('value');
 	}
-	
+
 	public function setCaption($value=NULL){
 		$this->addItem(nbsp($value));
 	}
-	
+
 	public function setSelected($value='yes'){
-		if((is_string($value) && ($value == 'yes' || $value == 'selected' || $value=='on')) || 
+		if((is_string($value) && ($value == 'yes' || $value == 'selected' || $value=='on')) ||
 			(is_int($value) && $value<>0))
 		{
 			return $this->options['selected'] = 'selected';

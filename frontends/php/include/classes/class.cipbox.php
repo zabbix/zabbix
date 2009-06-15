@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -21,7 +21,7 @@
 <?php
 class CIpBox{
  public $ip_parts;
-	
+
 	public function __construct($name='ip',$value){
 		$this->ip_parts = array();
 
@@ -30,7 +30,7 @@ class CIpBox{
 		if(!isset($value[1])) $value[1] = 0;
 		if(!isset($value[2])) $value[2] = 0;
 		if(!isset($value[3])) $value[3] = 0;
-		
+
 		for($i = 0; $i < 4; $i++){
 			$this->ip_parts[$i] = new CNumericBox($name.'['.$i.']', $value[$i], 3);
 			if($i != 3){
@@ -49,7 +49,7 @@ class CIpBox{
 
 	public function toString($destroy=true){
 		$res = implode('.',$this->ip_parts);
-		
+
 		if($destroy){
 			$this = array();
 		}

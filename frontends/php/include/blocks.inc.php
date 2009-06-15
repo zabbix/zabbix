@@ -28,45 +28,45 @@ require_once('include/users.inc.php');
 // Author: Aly
 function make_favorite_graphs(){
 	$table = new CTableInfo();
-	
+
 	$fav_graphs = get_favorites('web.favorite.graphids');
 	foreach($fav_graphs as $key => $favorite){
-		
+
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
 
 		if('itemid' == $source){
 			if(!$item = get_item_by_itemid($sourceid)) continue;
-	
+
 			$host = get_host_by_itemid($sourceid);
 			$item["description"] = item_description($item);
-			
+
 			$link = new CLink(get_node_name_by_elid($sourceid).$host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$sourceid);
 			$link->setTarget('blank');
-			
+
 			$capt = new CSpan($link);
 			$capt->addOption('style','line-height: 14px; vertical-align: middle;');
-			
+
 			$icon = new CLink(new CImg('images/general/chart.png','chart',18,18,'borderless'),'history.php?action=showgraph&itemid='.$sourceid.'&fullscreen=1');
 			$icon->setTarget('blank');
 		}
 		else{
 			if(!$graph = get_graph_by_graphid($sourceid)) continue;
 			if(!graph_accessible($sourceid)) continue;
-			
+
 			$result = get_hosts_by_graphid($sourceid);
 			$ghost = DBFetch($result);
-	
+
 			$link = new CLink(get_node_name_by_elid($sourceid).$ghost['host'].':'.$graph['name'],'charts.php?graphid='.$sourceid);
 			$link->setTarget('blank');
-	
+
 			$capt = new CSpan($link);
 			$capt->addOption('style','line-height: 14px; vertical-align: middle;');
-			
+
 			$icon = new CLink(new CImg('images/general/chart.png','chart',18,18,'borderless'),'charts.php?graphid='.$sourceid.'&fullscreen=1');
 			$icon->setTarget('blank');
 		}
-		
+
 		$table->addRow(new CCol(array(
 			$icon,
 			SPACE,
@@ -77,14 +77,14 @@ function make_favorite_graphs(){
 	$td->addOption('style','text-align: right;');
 
 	$table->setFooter($td);
-	
+
 return $table;
 }
 
 // Author: Aly
 function make_favorite_screens(){
 	$table = new CTableInfo();
-	
+
 	$fav_screens = get_favorites('web.favorite.screenids');
 
 	foreach($fav_screens as $key => $favorite){
@@ -97,34 +97,34 @@ function make_favorite_screens(){
 
 			$link = new CLink(get_node_name_by_elid($sourceid).$slide['name'],'screens.php?config=1&elementid='.$sourceid);
 			$link->setTarget('blank');
-		
+
 			$capt = new CSpan($link);
 			$capt->addOption('style','line-height: 14px; vertical-align: middle;');
-			
+
 			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=1&elementid='.$sourceid.'&fullscreen=1');
 			$icon->setTarget('blank');
 		}
 		else{
 			if(!$screen = get_screen_by_screenid($sourceid)) continue;
 			if(!screen_accessible($sourceid, PERM_READ_ONLY)) continue;
-		
+
 			$link = new CLink(get_node_name_by_elid($sourceid).$screen['name'],'screens.php?config=0&elementid='.$sourceid);
 			$link->setTarget('blank');
-			
+
 			$capt = new CSpan($link);
 			$capt->addOption('style','line-height: 14px; vertical-align: middle;');
-			
+
 			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=0&elementid='.$sourceid.'&fullscreen=1');
 			$icon->setTarget('blank');
 		}
-		
+
 		$table->addRow(new CCol(array(
 			$icon,
 			SPACE,
 			$capt)
 		));
 	}
-	
+
 	$td = new CCol(array(new CLink(S_SCREENS.' &raquo;','screens.php','highlight')));
 	$td->addOption('style','text-align: right;');
 
@@ -136,23 +136,23 @@ return $table;
 // Author: Aly
 function make_favorite_maps(){
 	$table = new CTableInfo();
-	
+
 	$fav_sysmaps = get_favorites('web.favorite.sysmapids');
-	
+
 	foreach($fav_sysmaps as $key => $favorite){
-	
+
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
-		
+
 		if(!$sysmap = get_sysmap_by_sysmapid($sourceid)) continue;
 		if(!sysmap_accessible($sourceid,PERM_READ_ONLY)) continue;
-		
+
 		$link = new CLink(get_node_name_by_elid($sourceid).$sysmap['name'],'maps.php?sysmapid='.$sourceid);
 		$link->setTarget('blank');
 
 		$capt = new CSpan($link);
 		$capt->addOption('style','line-height: 14px; vertical-align: middle;');
-		
+
 		$icon = new CLink(new CImg('images/general/chart.png','map',18,18,'borderless'),'maps.php?sysmapid='.$sourceid.'&fullscreen=1');
 		$icon->setTarget('blank');
 
@@ -162,7 +162,7 @@ function make_favorite_maps(){
 			$capt)
 		));
 	}
-	
+
 	$td = new CCol(array(new CLink(S_MAPS.' &raquo;','maps.php','highlight')));
 	$td->addOption('style','text-align: right;');
 
@@ -175,24 +175,24 @@ return $table;
 function make_system_summary($args = array()){
 	global $USER_DETAILS;
 	$config = select_config();
-	
+
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,array(),PERM_RES_IDS_ARRAY);
-	
+
 	if(isset($args['hosts']) && !empty($args['hosts'])){
 		$available_hosts = zbx_uint_array_intersect($args['hosts'], $available_hosts);
 	}
-	
+
 	if(isset($args['groups']) && !empty($args['groups'])){
 		$available_groups = zbx_uint_array_intersect($args['groups'], $available_groups);
 	}
-	
+
 	$sql_where = '';
 	if(isset($args['severity']) && ctype_digit($args['severity'])){
 		$sql_where = ' AND t.priority>='.$args['severity'];
 	}
-	
+
 	$table = new CTableInfo();
 	$table->setHeader(array(
 		is_show_all_nodes()?S_NODE:null,
@@ -219,16 +219,16 @@ function make_system_summary($args = array()){
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 			' ORDER BY g.name';
 	$gr_result = DBselect($sql);
-					
+
 	while($group = DBFetch($gr_result)){
 		$group_row = new CRow();
 		if(is_show_all_nodes())
 			$group_row->addItem(get_node_name_by_elid($group['groupid']));
-		
+
 		$name = new CLink($group['name'],'tr_status.php?groupid='.$group['groupid'].'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
 		$name->setTarget('blank');
 		$group_row->addItem($name);
-		
+
 		$tab_priority[TRIGGER_SEVERITY_DISASTER] = 0;
 		$tab_priority[TRIGGER_SEVERITY_HIGH] = 0;
 		$tab_priority[TRIGGER_SEVERITY_AVERAGE] = 0;
@@ -269,7 +269,7 @@ function make_system_summary($args = array()){
 					($config['event_ack_enable'])? S_ACK : NULL,
 					S_ACTIONS
 					));
-				
+
 				$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.value,h.host,h.hostid '.
 							' FROM triggers t,hosts h,items i,functions f, hosts_groups hg '.
 							' WHERE f.itemid=i.itemid '.
@@ -285,16 +285,16 @@ function make_system_summary($args = array()){
 								' AND t.priority='.$key.
 							' ORDER BY t.lastchange DESC';
 				$result = DBselect($sql);
-				while($row_inf=DBfetch($result)){	
+				while($row_inf=DBfetch($result)){
 // Check for dependencies
 					if(trigger_dependent($row_inf["triggerid"]))	continue;
-					
+
 					$tr_count++;
-					
+
 					if($tr_count > 30) continue;
-					
+
 					$host = new CSpan($row_inf['host']);
-								
+
 					$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
 								' FROM events e, triggers t '.
 								' WHERE e.object='.EVENT_SOURCE_TRIGGERS.
@@ -303,7 +303,7 @@ function make_system_summary($args = array()){
 									' AND e.value='.TRIGGER_VALUE_TRUE.
 								' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 					if($row_inf_event=DBfetch(DBselect($event_sql,1))){
-						
+
 						if($config['event_ack_enable']){
 							if($row_inf_event['acknowledged'] == 1){
 								$ack=new CLink(S_YES,'acknow.php?eventid='.$row_inf_event['eventid'],'action');
@@ -312,14 +312,14 @@ function make_system_summary($args = array()){
 								$ack= new CLink(S_NO,'acknow.php?eventid='.$row_inf_event['eventid'],'on');
 							}
 						}
-			
+
 						$description = expand_trigger_description_by_data(
 								array_merge($row_inf, array('clock'=>$row_inf_event['clock'])),
 								ZBX_FLAG_EVENT);
-						
-//actions								
+
+//actions
 						$actions= get_event_actions_status($row_inf_event['eventid']);
-//--------				
+//--------
 					}
 					else{
 						$description = expand_trigger_description_by_data($row_inf, ZBX_FLAG_EVENT);
@@ -327,7 +327,7 @@ function make_system_summary($args = array()){
 						$actions = S_NO_DATA_SMALL;
 						$row_inf_event['clock'] = $row_inf['clock'];
 					}
-					
+
 					$table_inf->addRow(array(
 						get_node_name_by_elid($row_inf['triggerid']),
 						$host,
@@ -336,16 +336,16 @@ function make_system_summary($args = array()){
 						($config['event_ack_enable'])?(new CCol($ack,'center')):NULL,
 						$actions
 					));
-					
+
 					unset($row_inf,$description,$actions);
 				}
-				
+
 				$value = new CSpan($tr_count);
 				$value->setHint($table_inf);
 //-------------*/
 			}
 			$group_row->AddItem(new CCol($value,get_severity_style($key,$tr_count)));			unset($table_inf);
-		}		
+		}
 		$table->addRow($group_row);
 	}
 	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
@@ -366,28 +366,28 @@ function make_status_of_zbx(){
 
 	$table->addRow(array(S_ZABBIX_SERVER_IS_RUNNING,
 	new CSpan($status['zabbix_server'], ($status['zabbix_server'] == S_YES ? 'off' : 'on')),' - '));
-	//	$table->addRow(array(S_VALUES_STORED,$status['history_count']));$table->addRow(array(S_TRENDS_STORED,$status['trends_count']));	
-	$title = new CSpan(S_NUMBER_OF_HOSTS);	
-	$title->addOption('title', 'asdad');	
-	$table->addRow(array(S_NUMBER_OF_HOSTS ,$status['hosts_count'],		
+	//	$table->addRow(array(S_VALUES_STORED,$status['history_count']));$table->addRow(array(S_TRENDS_STORED,$status['trends_count']));
+	$title = new CSpan(S_NUMBER_OF_HOSTS);
+	$title->addOption('title', 'asdad');
+	$table->addRow(array(S_NUMBER_OF_HOSTS ,$status['hosts_count'],
 		array(
 			new CSpan($status['hosts_count_monitored'],'off'),' / ',
 			new CSpan($status['hosts_count_not_monitored'],'on'),' / ',
 			new CSpan($status['hosts_count_template'],'unknown')
 		)
 	));
-	$title = new CSpan(S_NUMBER_OF_ITEMS);	
-	$title->addOption('title', S_NUMBER_OF_ITEMS_TOOLTIP);	
-	$table->addRow(array($title, $status['items_count'],		
+	$title = new CSpan(S_NUMBER_OF_ITEMS);
+	$title->addOption('title', S_NUMBER_OF_ITEMS_TOOLTIP);
+	$table->addRow(array($title, $status['items_count'],
 		array(
 			new CSpan($status['items_count_monitored'],'off'),' / ',
 			new CSpan($status['items_count_disabled'],'on'),' / ',
 			new CSpan($status['items_count_not_supported'],'unknown')
 		)
 	));
-	$title = new CSpan(S_NUMBER_OF_TRIGGERS);	
-	$title->addOption('title', S_NUMBER_OF_TRIGGERS_TOOLTIP);	
-	$table->addRow(array($title,$status['triggers_count'],		
+	$title = new CSpan(S_NUMBER_OF_TRIGGERS);
+	$title->addOption('title', S_NUMBER_OF_TRIGGERS_TOOLTIP);
+	$table->addRow(array($title,$status['triggers_count'],
 		array(
 			$status['triggers_count_enabled'],' / ',
 			$status['triggers_count_disabled'].SPACE.SPACE.'[',
@@ -399,14 +399,14 @@ function make_status_of_zbx(){
 /*	$table->addRow(array(S_NUMBER_OF_EVENTS,$status['events_count'],' - '));
 	$table->addRow(array(S_NUMBER_OF_ALERTS,$status['alerts_count'],' - '));*/
 
-//Log Out 10min	
+//Log Out 10min
 	$sql = 'SELECT DISTINCT u.userid, MAX(s.lastaccess) as lastaccess, MAX(u.autologout) as autologout, s.status '.
 			' FROM users u '.
 				' LEFT JOIN sessions s ON s.userid=u.userid AND s.status='.ZBX_SESSION_ACTIVE.
 			' WHERE '.DBin_node('u.userid').
 			' GROUP BY u.userid,s.status';
 	$db_users = DBSelect($sql);
-	
+
 	$usr_cnt = 0;
 	$online_cnt = 0;
 	while($user=DBFetch($db_users)){
@@ -425,32 +425,32 @@ return $table;
 // author Aly
 function make_latest_issues($params = array()){
 	global $USER_DETAILS;
-	
+
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
 	$scripts_by_hosts = get_accessible_scripts_by_hosts($available_hosts);
 	$config=select_config();
-	
+
 	$sql_select = '';
 	$sql_from = '';
 	$sql_where= '';
 	$limit = 20;
 	if(!empty($params)){
-		if(isset($params['limit'])) 
+		if(isset($params['limit']))
 			$limit = $params['limit'];
-		
+
 		if(isset($params['groupid']) && ($params['groupid']>0)){
 			$sql_select.=',g.name ';
 			$sql_from.= ',groups g ';
 			$sql_where.= ' AND g.groupid=hg.groupid '.
 							' AND hg.groupid='.$params['groupid'];
 		}
-		
-		if(isset($params['hostid']) && ($params['hostid']>0)) 
+
+		if(isset($params['hostid']) && ($params['hostid']>0))
 			$sql_where.= ' AND h.hostid='.$params['hostid'];
 	}
-	
+
 	$table  = new CTableInfo();
 	$table->setHeader(array(
 		is_show_all_nodes()?S_NODE:null,
@@ -462,8 +462,8 @@ function make_latest_issues($params = array()){
 		($config['event_ack_enable'])? S_ACK : NULL,
 		S_ACTIONS
 		));
-	
-	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.value,h.host,h.hostid '.$sql_select.				
+
+	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.value,h.host,h.hostid '.$sql_select.
 				' FROM triggers t,hosts h,items i,functions f,hosts_groups hg '.$sql_from.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
@@ -496,7 +496,7 @@ function make_latest_issues($params = array()){
 
 		$menus = rtrim($menus,',');
 		$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
-		
+
 		$host = new CSpan($row['host']);
 		$host->addOption('onclick','javascript: '.$menus);
 		$host->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
@@ -509,14 +509,14 @@ function make_latest_issues($params = array()){
 						' AND e.value='.TRIGGER_VALUE_TRUE.
 					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 		$res_events = DBSelect($event_sql,1);
-				
+
 		while($row_event=DBfetch($res_events)){
 			$ack = NULL;
 			if($config['event_ack_enable']){
 				if($row_event['acknowledged'] == 1){
 					$ack_info = make_acktab_by_eventid($row_event['eventid']);
 					$ack_info->addOption('style','width: auto;');
-					
+
 					$ack=new CLink(S_YES,'acknow.php?eventid='.$row_event['eventid'],'action');
 					$ack->setHint($ack_info);
 				}
@@ -527,7 +527,7 @@ function make_latest_issues($params = array()){
 
 //			$description = expand_trigger_description($row['triggerid']);
 			$description = expand_trigger_description_by_data(array_merge($row, array('clock'=>$row_event['clock'])),ZBX_FLAG_EVENT);
-					
+
 //actions
 			$actions = get_event_actions_stat_hints($row_event['eventid']);
 
@@ -535,11 +535,11 @@ function make_latest_issues($params = array()){
 					zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),
 					'events.php?triggerid='.$row['triggerid'].'&source=0&show_unknown=1&nav_time='.$row_event['clock'],
 					'action');
-			
+
 			$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action', null, true) : $description;
 			$description = new CCol($description,get_severity_style($row["priority"]));
 			$description->setHint(make_popup_eventlist($row_event['eventid'], $row['type']));
-			
+
 			$table->addRow(array(
 				get_node_name_by_elid($row['triggerid']),
 				$host,
@@ -548,7 +548,7 @@ function make_latest_issues($params = array()){
 				zbx_date2age($row_event['clock']),
 				$ack,
 				$actions
-			));			
+			));
 		}
 		unset($row,$description,$actions,$alerts,$hint);
 	}
@@ -559,7 +559,7 @@ return $table;
 // author Aly
 function make_webmon_overview(){
 	global $USER_DETAILS;
-	
+
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
 	$table  = new CTableInfo();
@@ -581,14 +581,14 @@ function make_webmon_overview(){
 				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
 			' ORDER BY g.name';
 	$host_groups = DBSelect($sql);
-	
+
 	while($group = DBFetch($host_groups)){
 
 		$apps['ok'] = 0;
 		$apps['failed'] = 0;
 		$apps[HTTPTEST_STATE_BUSY] = 0;
 		$apps[HTTPTEST_STATE_UNKNOWN] = 0;
-		
+
 		$sql = 'SELECT DISTINCT ht.httptestid, ht.curstate, ht.lastfailedstep '.
 				' FROM httptest ht, applications a, hosts_groups hg, groups g '.
 				' WHERE g.groupid='.$group['groupid'].
@@ -598,7 +598,7 @@ function make_webmon_overview(){
 					' AND ht.status='.HTTPTEST_STATUS_ACTIVE;
 
 		$db_httptests = DBselect($sql);
-	
+
 		while($httptest_data = DBfetch($db_httptests)){
 
 			if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
@@ -616,7 +616,7 @@ function make_webmon_overview(){
 				$apps[HTTPTEST_STATE_UNKNOWN]++;
 			}
 		}
-		
+
 		$table->addRow(array(
 			is_show_all_nodes() ? get_node_name_by_elid($group['groupid']) : null,
 			$group['name'],
@@ -627,13 +627,13 @@ function make_webmon_overview(){
 		));
 	}
 	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
-return $table;	
+return $table;
 }
 
 // Author: Aly
 function make_discovery_status(){
 	$drules = array();
-	
+
 	$db_drules = DBselect('select distinct * from drules where '.DBin_node('druleid').' order by name');
 	while($drule_data = DBfetch($db_drules)){
 		$drules[$drule_data['druleid']] = $drule_data;
@@ -681,9 +681,9 @@ return 	$table;
 
 function make_latest_data(){
 	global $USER_DETAILS;
-	
+
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-	
+
 	while($db_app = DBfetch($db_applications)){
 		$db_items = DBselect('SELECT DISTINCT i.* '.
 					' FROM items i,items_applications ia'.
@@ -739,7 +739,7 @@ function make_latest_data(){
 				$actions
 				)));
 		}
-		
+
 		if($item_cnt > 0){
 			if(uint_in_array($db_app['applicationid'],$_REQUEST['applications']) || isset($show_all_apps)){
 				$link = new CLink(new CImg('images/general/opened.gif'),
@@ -765,7 +765,7 @@ function make_latest_data(){
 					));
 
 			$any_app_exist = true;
-		
+
 			foreach($app_rows as $row)	$table->ShowRow($row);
 		}
 	}
@@ -774,13 +774,13 @@ function make_latest_data(){
 function make_graph_menu(&$menu,&$submenu){
 
 	$menu['menu_graphs'][] = array(
-				S_FAVORITE.SPACE.S_GRAPHS, 
+				S_FAVORITE.SPACE.S_GRAPHS,
 				null,
-				null, 
+				null,
 				array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
 		);
 	$menu['menu_graphs'][] = array(
-				S_ADD.SPACE.S_GRAPH, 
+				S_ADD.SPACE.S_GRAPH,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=graphs&".
 					'reference=dashboard&'.
@@ -790,11 +790,11 @@ function make_graph_menu(&$menu,&$submenu){
 					'srcfld1=name&'.
 					"srcfld2=graphid',800,450);".
 				'void(0);',
-				null, 
+				null,
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))
 		);
 	$menu['menu_graphs'][] = array(
-				S_ADD.SPACE.S_SIMPLE_GRAPH, 
+				S_ADD.SPACE.S_SIMPLE_GRAPH,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=simple_graph&".
 					'reference=dashboard&'.
@@ -803,14 +803,14 @@ function make_graph_menu(&$menu,&$submenu){
 					'dstfld2=favid&'.
 					'srcfld1=description&'.
 					"srcfld2=itemid',800,450);".
-				"void(0);",				
-				null, 
+				"void(0);",
+				null,
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))
 		);
 	$menu['menu_graphs'][] = array(
-				S_REMOVE, 
-				null, 
-				null, 
+				S_REMOVE,
+				null,
+				null,
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))
 		);
 	$submenu['menu_graphs'] = make_graph_submenu();
@@ -818,23 +818,23 @@ function make_graph_menu(&$menu,&$submenu){
 
 function make_graph_submenu(){
 	$graphids = array();
-	
+
 	$fav_graphs = get_favorites('web.favorite.graphids');
-	
+
 	foreach($fav_graphs as $key => $favorite){
-		
+
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
 
 		if('itemid' == $source){
 			if(!$item = get_item_by_itemid($sourceid)) continue;
-			
+
 			$item_added = true;
-	
+
 			$host = get_host_by_itemid($sourceid);
 			$item["description"] = item_description($item);
-			
-			$graphids[] = array( 
+
+			$graphids[] = array(
 							'name'	=>	$host['host'].':'.$item['description'],
 							'favobj'=>	'itemid',
 							'favid'	=>	$sourceid,
@@ -843,13 +843,13 @@ function make_graph_submenu(){
 		}
 		else{
 			if(!$graph = get_graph_by_graphid($sourceid)) continue;
-			
+
 			$graph_added = true;
-	
+
 			$result = get_hosts_by_graphid($sourceid);
 			$ghost = DBFetch($result);
-			
-			$graphids[] = array( 
+
+			$graphids[] = array(
 							'name'	=>	$ghost['host'].':'.$graph['name'],
 							'favobj'=>	'graphid',
 							'favid'	=>	$sourceid,
@@ -859,23 +859,23 @@ function make_graph_submenu(){
 	}
 
 	if(isset($graph_added)){
-			$graphids[] = array( 
+			$graphids[] = array(
 			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_GRAPHS,
 			'favobj'=>	'graphid',
 			'favid'	=>	0,
 			'action'=>	'remove'
 		);
 	}
-	
+
 	if(isset($item_added)){
-		$graphids[] = array( 
+		$graphids[] = array(
 			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SIMPLE_GRAPHS,
 			'favobj'=>	'itemid',
 			'favid'	=>	0,
 			'action'=>	'remove'
 		);
 	}
-	
+
 return $graphids;
 }
 
@@ -883,7 +883,7 @@ function make_sysmap_menu(&$menu,&$submenu){
 
 	$menu['menu_sysmaps'][] = array(S_FAVORITE.SPACE.S_MAPS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$menu['menu_sysmaps'][] = array(
-				S_ADD.SPACE.S_MAP, 
+				S_ADD.SPACE.S_MAP,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=sysmaps&".
 					'reference=dashboard&'.
@@ -892,8 +892,8 @@ function make_sysmap_menu(&$menu,&$submenu){
 					'dstfld2=favid&'.
 					'srcfld1=name&'.
 					"srcfld2=sysmapid',800,450);".
-				"void(0);",	 
-				null, 
+				"void(0);",
+				null,
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu')
 		));
 	$menu['menu_sysmaps'][] = array(S_REMOVE, null, null, array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu')));
@@ -903,31 +903,31 @@ function make_sysmap_menu(&$menu,&$submenu){
 function make_sysmap_submenu(){
 	$sysmapids = array();
 	$fav_sysmaps = get_favorites('web.favorite.sysmapids');
-	
+
 	foreach($fav_sysmaps as $key => $favorite){
-	
+
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
-		
+
 		if(!$sysmap = get_sysmap_by_sysmapid($sourceid)) continue;
 
-		$sysmapids[] = array( 
+		$sysmapids[] = array(
 							'name'	=>	$sysmap['name'],
 							'favobj'=>	'sysmapid',
 							'favid'	=>	$sourceid,
 							'action'=>	'remove'
 						);
 	}
-	
+
 	if(!empty($sysmapids)){
-		$sysmapids[] = array( 
+		$sysmapids[] = array(
 							'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_MAPS,
 							'favobj'=>	'sysmapid',
 							'favid'	=>	0,
 							'action'=>	'remove'
 						);
 	}
-	
+
 return $sysmapids;
 }
 
@@ -935,7 +935,7 @@ function make_screen_menu(&$menu,&$submenu){
 
 	$menu['menu_screens'][] = array(S_FAVORITE.SPACE.S_SCREENS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$menu['menu_screens'][] = array(
-				S_ADD.SPACE.S_SCREEN, 
+				S_ADD.SPACE.S_SCREEN,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=screens&".
 					'reference=dashboard&'.
@@ -944,12 +944,12 @@ function make_screen_menu(&$menu,&$submenu){
 					'dstfld2=favid&'.
 					'srcfld1=name&'.
 					"srcfld2=screenid',800,450);".
-				"void(0);",	
-				null, 
+				"void(0);",
+				null,
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu')
 		));
 	$menu['menu_screens'][] = array(
-				S_ADD.SPACE.S_SLIDESHOW, 
+				S_ADD.SPACE.S_SLIDESHOW,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=slides&".
 					'reference=dashboard&'.
@@ -958,8 +958,8 @@ function make_screen_menu(&$menu,&$submenu){
 					'dstfld2=favid&'.
 					'srcfld1=name&'.
 					"srcfld2=slideshowid',800,450);".
-				"void(0);",	
-				null, 
+				"void(0);",
+				null,
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu')
 		));
 	$menu['menu_screens'][] = array(S_REMOVE, null, null, array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu')));
@@ -968,7 +968,7 @@ function make_screen_menu(&$menu,&$submenu){
 
 function make_screen_submenu(){
 	$screenids = array();
-	
+
 	$fav_screens = get_favorites('web.favorite.screenids');
 
 	foreach($fav_screens as $key => $favorite){
@@ -978,8 +978,8 @@ function make_screen_submenu(){
 		if('slideshowid' == $source){
 			if(!$slide = get_slideshow_by_slideshowid($sourceid)) continue;
 			$slide_added = true;
-			
-			$screenids[] = array( 
+
+			$screenids[] = array(
 								'name'	=>	$slide['name'],
 								'favobj'=>	'slideshowid',
 								'favid'	=>	$sourceid,
@@ -988,10 +988,10 @@ function make_screen_submenu(){
 
 		}
 		else{
-			if(!$screen = get_screen_by_screenid($sourceid)) continue;			
+			if(!$screen = get_screen_by_screenid($sourceid)) continue;
 			$screen_added = true;
-			
-			$screenids[] = array( 
+
+			$screenids[] = array(
 								'name'	=>	$screen['name'],
 								'favobj'=>	'screenid',
 								'favid'	=>	$sourceid,
@@ -999,26 +999,26 @@ function make_screen_submenu(){
 							);
 		}
 	}
-	
+
 
 	if(isset($screen_added)){
-		$screenids[] = array( 
+		$screenids[] = array(
 			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SCREENS,
 			'favobj'=>	'screenid',
 			'favid'	=>	0,
 			'action'=>	'remove'
 		);
 	}
-	
+
 	if(isset($slide_added)){
-		$screenids[] = array( 
+		$screenids[] = array(
 			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SLIDES,
 			'favobj'=>	'slideshowid',
 			'favid'	=>	0,
 			'action'=>	'remove'
 		);
 	}
-	
+
 return $screenids;
 }
 

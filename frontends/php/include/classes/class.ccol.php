@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -22,23 +22,23 @@
 class CCol extends CTag{
 	public function __construct($item=NULL,$class=NULL){
 		parent::__construct('td','yes');
-		
+
 		$this->addItem($item);
 		$this->setClass($class);
 	}
-	
+
 	public function setAlign($value){
 		return $this->options['align'] = $value;
 	}
-	
+
 	public function setRowSpan($value){
 		return $this->options['rowspan'] = strval($value);
 	}
-	
+
 	public function setColSpan($value){
 		return $this->options['colspan'] =strval($value);
 	}
-	
+
 	public function setWidth($value){
 		if(is_string($value))$this->addOption('width',$value);
 	}

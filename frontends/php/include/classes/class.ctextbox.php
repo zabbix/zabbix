@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -32,21 +32,21 @@ class CTextBox extends CTag{
 		$this->addOption('value',$value);
 		$this->setReadonly($readonly);
 	}
-	
+
 	public function setReadonly($value='yes'){
 		if((is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1') || (is_int($value) && $value<>0))
 			return $this->options['readonly'] = 'readonly';
 
 		$this->delOption('readonly');
 	}
-	
+
 	public function setValue($value=NULL){
 		$this->options['value'] = $value;
 	}
-	
+
 	public function setSize($value){
 		$this->options['size'] = $value;
-		
+
 	}
 }
 ?>
