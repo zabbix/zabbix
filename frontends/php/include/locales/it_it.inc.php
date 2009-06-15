@@ -115,7 +115,7 @@
 	'S_UP'=>			'S',
 	'S_DOWN'=>			'Gi',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>			'Aggiungi il seguente elemento',
-	'S_SORT_ORDER_1_100'=>			'Posizione (0->100)',
+	'S_SORT_ORDER_0_100'=>			'Posizione (0->100)',
 	'S_CONFIGURATION_OF_GRAPHS'=>			'Configurazione grafici',
 	'S_CONFIGURATION_OF_GRAPHS_BIG'=>			'CONFIGURAZIONE GRAFICI',
 	'S_GRAPH_ADDED'=>			'Grafico aggiunto!',

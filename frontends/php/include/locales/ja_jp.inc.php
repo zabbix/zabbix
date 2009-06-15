@@ -421,7 +421,7 @@
 	'S_DOWN'=>			'DOWN',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>			'グラフに追加するアイテム',
 	'S_UPD_ITEM_FOR_THE_GRAPH'=>			'グラフのアイテムを更新',
-	'S_SORT_ORDER_1_100'=>			'ソート順(0->100)',
+	'S_SORT_ORDER_0_100'=>			'ソート順(0->100)',
 	'S_YAXIS_SIDE'=>			'Y軸',
 	'S_LEFT'=>			'左',
 	'S_FUNCTION'=>			'機能',

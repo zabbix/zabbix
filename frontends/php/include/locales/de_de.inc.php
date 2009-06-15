@@ -419,7 +419,7 @@
 	'S_UP'=>			'aufsteigend',
 	'S_DOWN'=>			'absteigend',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>			'Neues Element für Graph',
-	'S_SORT_ORDER_1_100'=>			'Sortierreihenfolge (0->100)',
+	'S_SORT_ORDER_0_100'=>			'Sortierreihenfolge (0->100)',
 	'S_YAXIS_SIDE'=>			'Y-Achse',
 	'S_LEFT'=>			'links',
 	'S_FUNCTION'=>			'Funktion',

@@ -2751,7 +2751,7 @@
 		}
 
 		if($type != GRAPH_ITEM_SUM){
-			$frmGItem->AddRow(S_SORT_ORDER_1_100, new CTextBox('sortorder',$sortorder,3));
+			$frmGItem->AddRow(S_SORT_ORDER_0_100, new CTextBox('sortorder',$sortorder,3));
 		}
 
 		$frmGItem->AddItemToBottomRow(new CButton('save', isset($gid) ? S_SAVE : S_ADD));

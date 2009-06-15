@@ -164,7 +164,7 @@
 	'S_UP'=>			'Omhoog',
 	'S_DOWN'=>			'Omlaag',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>			'Nieuw item voor de grafiek',
-	'S_SORT_ORDER_1_100'=>			'Sorteer orde (0->100)',
+	'S_SORT_ORDER_0_100'=>			'Sorteer orde (0->100)',
 	'S_YAXIS_SIDE'=>			'Y lijn zijde',
 	'S_LEFT'=>			'Links',
 	'S_FUNCTION'=>			'Functie',

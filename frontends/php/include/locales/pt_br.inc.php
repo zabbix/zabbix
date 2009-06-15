@@ -345,7 +345,7 @@
 	'S_UP'=>			'Acima',
 	'S_DOWN'=>			'Abaixo',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>			'Novo item de gráfico',
-	'S_SORT_ORDER_1_100'=>			'Posição (0->100)',
+	'S_SORT_ORDER_0_100'=>			'Posição (0->100)',
 	'S_YAXIS_SIDE'=>			'Eixo Y',
 	'S_LEFT'=>			'Esquerda',
 	'S_FUNCTION'=>			'Função',

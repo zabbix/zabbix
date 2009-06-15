@@ -164,7 +164,7 @@
 	'S_UP'=>			'Uppåt',
 	'S_DOWN'=>			'Nedåt',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>			'Nytt objekt för diagrammet',
-	'S_SORT_ORDER_1_100'=>			'Sorteringsordning (0->100)',
+	'S_SORT_ORDER_0_100'=>			'Sorteringsordning (0->100)',
 	'S_YAXIS_SIDE'=>			'Y-axel',
 	'S_LEFT'=>			'Vänster',
 	'S_FUNCTION'=>			'Funktion',

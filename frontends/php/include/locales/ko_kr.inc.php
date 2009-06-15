@@ -401,7 +401,7 @@
 	'S_UP'=>				'UP',
 	'S_DOWN'=>				'DOWN',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>		'그래프에 추가할 아이템',
-	'S_SORT_ORDER_1_100'=>			'정렬 순서(0->100)',
+	'S_SORT_ORDER_0_100'=>			'정렬 순서(0->100)',
 	'S_YAXIS_SIDE'=>			'Y축',
 	'S_LEFT'=>				'왼쪽',
 	'S_FUNCTION'=>				'기능',

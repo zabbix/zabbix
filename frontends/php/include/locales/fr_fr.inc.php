@@ -338,7 +338,7 @@
 	'S_UP'=>			'Haut',
 	'S_DOWN'=>			'Bas',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>			'Nouvel item pour le graphique',
-	'S_SORT_ORDER_1_100'=>			'Ordre du tri (0->100)',
+	'S_SORT_ORDER_0_100'=>			'Ordre du tri (0->100)',
 	'S_YAXIS_SIDE'=>			'Coté axe des Y',
 	'S_LEFT'=>			'Gauche',
 	'S_FUNCTION'=>			'Fonction',

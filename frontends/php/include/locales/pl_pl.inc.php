@@ -419,7 +419,7 @@
 	'S_UP'=>					'W górę',
 	'S_DOWN'=>					'W dół',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>			'Nowy element wykresu',
-	'S_SORT_ORDER_1_100'=>				'Porządek sortowania (0->100)',
+	'S_SORT_ORDER_0_100'=>				'Porządek sortowania (0->100)',
 	'S_YAXIS_SIDE'=>				'Strona osi Y',
 	'S_LEFT'=>					'Lewy',
 	'S_FUNCTION'=>					'Funkcja',

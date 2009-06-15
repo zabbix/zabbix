@@ -115,7 +115,7 @@
 	'S_UP'=>			'Up',
 	'S_DOWN'=>			'Down',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>			'New item for the graph',
-	'S_SORT_ORDER_1_100'=>			'Sort order (0->100)',
+	'S_SORT_ORDER_0_100'=>			'Sort order (0->100)',
 	'S_CONFIGURATION_OF_GRAPHS'=>			'Configuration of graphs',
 	'S_CONFIGURATION_OF_GRAPHS_BIG'=>			'CONFIGURATION OF GRAPHS',
 	'S_GRAPH_ADDED'=>			'Graph added',

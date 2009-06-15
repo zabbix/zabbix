@@ -346,7 +346,7 @@
 	'S_UP'=>			'Fut',
 	'S_DOWN'=>			'Áll',
 	'S_NEW_ITEM_FOR_THE_GRAPH'=>			'New item for the graph',
-	'S_SORT_ORDER_1_100'=>			'Sort order (0->100)',
+	'S_SORT_ORDER_0_100'=>			'Sort order (0->100)',
 	'S_YAXIS_SIDE'=>			'Y axis side',
 	'S_LEFT'=>			'Balra',
 	'S_FUNCTION'=>			'Function',
