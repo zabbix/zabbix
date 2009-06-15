@@ -295,7 +295,6 @@
 	'S_GRAPHS_BIG'=>			'그래프',
 	'S_SELECT_GRAPH_TO_DISPLAY'=>		'표시할 그래프를 선택하십시오',
 	'S_PERIOD'=>				'기간',
-	'S_24H'=>				'24시간',
 	'S_SELECT_GRAPH_DOT_DOT_DOT'=>		'그래프 선택...',
 
 // Colors
@@ -443,8 +442,6 @@
 	'S_LAST_WEEK_GRAPH'=>			'최근 1주일의 그래프',
 	'S_LAST_MONTH_GRAPH'=>			'최근 1개월의 그래프',
 	'S_500_LATEST_VALUES'=>			'최근 500개의 값',
-	'S_GRAPH_OF_SPECIFIED_PERIOD'=>		'특정 기간의 그래프',
-	'S_VALUES_OF_SPECIFIED_PERIOD'=>	'특정 기간의 값',
 	'S_TIMESTAMP'=>				'타임 스탬프',
 	'S_LOCAL'=>				'로컬',
 	'S_SOURCE'=>				'소스',
@@ -661,8 +658,6 @@
 	'S_LINK'=>				'연결',
 	'S_X'=>					'X',
 	'S_Y'=>					'Y',
-	'S_ICON_ON'=>				'아이콘(장애)',
-	'S_ICON_OFF'=>				'아이콘(정상)',
 	'S_ICON_UNKNOWN'=>			'아이콘(알 수 없음)',
 	'S_ELEMENT_1'=>				'구성요소1',
 	'S_ELEMENT_2'=>				'구성요소2',
@@ -736,7 +731,6 @@
 	'S_30_SECONDS'=>			'30초',
 	'S_1_MINUTE'=>				'1분',
 	'S_5_MINUTES'=>				'5분',
-	'S_MORE_THAN_5_MINUTES'=>		'5분 이상',
 
 //	report1.php
 	'S_STATUS_OF_ZABBIX'=>			'ZABBIX 서버 상태',
@@ -892,11 +886,8 @@
 	'S_STATUS_CALCULATION'=>		'상태 계산',
 	'S_STATUS_CALCULATION_ALGORITHM'=>	'상태 계산 알고리즘',
 	'S_NONE'=>				'없음',
-	'S_MAX_OF_CHILDS'=>			'최대 자식 수',
-	'S_MIN_OF_CHILDS'=>			'최소 자식 수',
 	'S_SOFT'=>				'Soft',
 	'S_DO_NOT_CALCULATE'=>			'계산 안함',
-	'S_SHOW_SLA'=>				'SLA 표시',
 	'S_ACCEPTABLE_SLA_IN_PERCENT'=>		'SLA 허용 값(%)',
 	'S_LINK_TO_TRIGGER_Q'=>			'트리거와 연결',
 	'S_SORT_ORDER_0_999'=>			'정렬 순서(0->999)',
@@ -977,7 +968,6 @@
 	'S_STATUS_OF_TRIGGERS_BIG'=>		'트리거 상태',
 	'S_SHOW_ONLY_TRUE'=>			'장애만 보이기',
 	'S_SHOW_ACTIONS'=>			'액션 보이기',
-	'S_SHOW_ALL_TRIGGERS'=>			'모든 트리거 보이기',
 	'S_SHOW_DETAILS'=>			'상세 보이기',
 	'S_SELECT'=>				'선택',
 	'S_INVERSE_SELECT'=>                    '반전 선택',
@@ -1029,7 +1019,6 @@
 	'S_CHANGE_PASSWORD'=>			'암호변경',
 	'S_PASSWORD_ONCE_AGAIN'=>		'암호 확인',
 	'S_URL_AFTER_LOGIN'=>			'로그인 후 URL',
-	'S_AUTO_LOGOUT_IN_SEC'=>		'자동 로그아웃(초)',
 	'S_SCREEN_REFRESH'=>                    '새로 고침(초)',
 	'S_CREATE_USER'=>			'사용자 작성',
 	'S_CREATE_GROUP'=>			'그룹 작성',
@@ -1037,8 +1026,6 @@
 	'S_NO_ACCESSIBLE_RESOURCES'=>		'사용할 수 있는 리소스가 없습니다',
 
 //	audit.php
-	'S_AUDIT_LOG'=>				'감사 로그',
-	'S_AUDIT_LOG_BIG'=>			'감사 로그',
 	'S_ACTION'=>				'액션',
 	'S_DETAILS'=>				'자세히',
 	'S_UNKNOWN_ACTION'=>			'알 수 없는 액션',
@@ -1065,7 +1052,6 @@
 	'S_CHINESE_CN'=>			'중국어 (CN)',
 	'S_DUTCH_NL'=>				'네덜란드어 (NL)',
 	'S_HUNGARY_HU'=>                        '헝가리어 (HU)',
-	'S_KOREAN_KR'=>				'한국어 (KR)',
 
 //	index.php
 	'S_ZABBIX_BIG'=>			'ZABBIX',

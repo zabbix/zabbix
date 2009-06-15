@@ -353,7 +353,6 @@
 	'S_GRAPHS_BIG'=>			'GRAPHS',
 	'S_SELECT_GRAPH_TO_DISPLAY'=>		'Select graph to display',
 	'S_PERIOD'=>				'Period',
-	'S_24H'=>				'24h',
 	'S_SELECT_GRAPH_DOT_DOT_DOT'=>		'Select graph...',
 	'S_FULLSCREEN'=>			'Fullscreen',
 	'S_VIEW'=>				'View',
