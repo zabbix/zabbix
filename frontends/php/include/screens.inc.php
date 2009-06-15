@@ -296,7 +296,7 @@
 	function get_screen_plaintext($itemid,$elements,$style=0){
 
 		if($itemid == 0){
-			$table = new CTableInfo(S_ITEM_NOT_EXISTS);
+			$table = new CTableInfo(S_ITEM_DOES_NOT_EXIST);
 			$table->setHeader(array(S_TIMESTAMP,S_ITEM));
 			return $table;
 		}

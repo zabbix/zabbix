@@ -413,7 +413,7 @@
 	'S_ITEM_ADDED'=>			'Element hinzugefügt',
 	'S_ITEM_UPDATED'=>			'Element aktualisiert',
 	'S_ITEMS_UPDATED'=>			'Elemente aktualisiert',
-	'S_ITEM_NOT_EXISTS'=>			'Element existiert nicht',
+	'S_ITEM_DOES_NOT_EXIST'=>			'Element existiert nicht',
 	'S_PARAMETER'=>			'Parameter',
 	'S_COLOR'=>			'Farbe',
 	'S_UP'=>			'aufsteigend',

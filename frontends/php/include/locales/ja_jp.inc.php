@@ -414,7 +414,7 @@
 	'S_ITEM_ADDED'=>			'アイテムを追加しました',
 	'S_ITEM_UPDATED'=>			'アイテムを更新しました',
 	'S_ITEMS_UPDATED'=>			'アイテムを更新しました',
-	'S_ITEM_NOT_EXISTS'=>			'アイテムが存在しません',
+	'S_ITEM_DOES_NOT_EXIST'=>			'アイテムが存在しません',
 	'S_PARAMETER'=>			'パラメータ',
 	'S_COLOR'=>			'色',
 	'S_UP'=>			'UP',
