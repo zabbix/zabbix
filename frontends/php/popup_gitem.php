@@ -247,7 +247,7 @@ include_once 'include/page_header.php';
 		}
 
 		if($type != GRAPH_ITEM_SUM){
-			$frmGItem->addRow(S_SORT_ORDER_1_100, new CTextBox('sortorder',$sortorder,3));
+			$frmGItem->addRow(S_SORT_ORDER_0_100, new CTextBox('sortorder',$sortorder,3));
 		}
 
 		$frmGItem->addItemToBottomRow(new CButton('save', isset($gid) ? S_SAVE : S_ADD));
