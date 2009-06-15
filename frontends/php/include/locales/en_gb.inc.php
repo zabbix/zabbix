@@ -518,7 +518,7 @@
 	'S_ITEM_ADDED'=>			'Item added',
 	'S_ITEM_UPDATED'=>			'Item updated',
 	'S_ITEMS_UPDATED'=>			'Items updated',
-	'S_ITEM_NOT_EXISTS'=>			'Item does not exist',
+	'S_ITEM_DOES_NOT_EXIST'=>			'Item does not exist',
 	'S_SORT_BY'=>				'Sort by',
 	'S_PARAMETER'=>				'Parameter',
 	'S_COLOR'=>				'Colour',

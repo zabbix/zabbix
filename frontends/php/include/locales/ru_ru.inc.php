@@ -440,7 +440,7 @@
 	'S_ITEM_ADDED'=>			'Элемент добавлен',
 	'S_ITEM_UPDATED'=>			'Элемент обновлен',
 	'S_ITEMS_UPDATED'=>			'Элементы обновлены',
-	'S_ITEM_NOT_EXISTS'=>			'Элемент не существует',
+	'S_ITEM_DOES_NOT_EXIST'=>			'Элемент не существует',
 	'S_SORT_BY'=>			'Сортировка по',
 	'S_PARAMETER'=>			'Параметр',
 	'S_COLOR'=>			'Цвет',
