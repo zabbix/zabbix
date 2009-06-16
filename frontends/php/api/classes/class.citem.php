@@ -103,7 +103,7 @@ class CItem {
 		}	
 // templated_items
 		if($options['templated_items']){
-			$sql_parts['where'][] = 'i.templateid=0';				
+			$sql_parts['where'][] = 'i.templateid<>0';				
 		}
 // pattern
 		if(!zbx_empty($options['pattern'])){
