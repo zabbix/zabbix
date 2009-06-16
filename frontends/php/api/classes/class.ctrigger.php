@@ -119,7 +119,7 @@ class CTrigger {
 		}	
 // templated_triggers
 		if($options['templated_triggers']){
-			$sql_parts['where'][] = 't.templateid=0';				
+			$sql_parts['where'][] = 't.templateid<>0';				
 		}
 // pattern
 		if(!zbx_empty($options['pattern'])){
