@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-class CPie extends CGraph{
+class CPie extends CGraphDraw{
 
 	public function __construct($type = GRAPH_TYPE_PIE){
 		parent::__construct($type);

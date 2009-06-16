@@ -20,7 +20,7 @@
 ?>
 <?php
 
-class CChart extends CGraph{
+class CChart extends CGraphDraw{
 
 	public function __construct($type = GRAPH_TYPE_NORMAL){
 		parent::__construct($type);

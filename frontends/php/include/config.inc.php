@@ -28,7 +28,8 @@ function __autoload($class_name){
 		'ctemplate' => 1,		
 		'cproxy' => null,		
 		'citem' => 1,		
-		'ctrigger' => 1,		
+		'ctrigger' => 1,	
+		'cgraph' => 1,		
 		'cusergroup' => null,		
 		'cuser' => null);	
 		

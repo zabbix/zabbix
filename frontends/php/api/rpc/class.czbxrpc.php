@@ -64,6 +64,9 @@ public static $result;
 				case 'trigger':
 					self::trigger($action, $params);
 					break;
+				case 'graph':
+					self::graph($action, $params);
+					break;
 				default:
 					self::$result = array('error'=>ZBX_API_ERROR_PARAMETERS);
 			}
@@ -136,6 +139,49 @@ public static $result;
 		}
 		else{
 			self::$result = CHostGroup::$error;
+		}
+	}
+	
+// GRAPH
+	private static function graph($action, $params){
+		
+		CGraph::$error = array();
+		
+		switch($action){
+			case 'add':
+				$result = CGraph::add($params);
+				break;
+			case 'get':
+				$result = CGraph::get($params);
+				break;
+			case 'getById':
+				$result = CGraph::getById($params);
+				break;
+			case 'getId':
+				$result = CGraph::getId($params);
+				break;
+			case 'update':
+				$result = CGraph::update($params);
+				break;
+			case 'addItems':
+				$result = CGraph::addItems($params);
+				break;
+			case 'deleteItems':
+				$result = CGraph::deleteItems($params);
+				break;	
+			case 'delete':
+				$result = CGraph::delete($params);
+				break;	
+			default:
+				self::$result = array('error' => ZBX_API_ERROR_NO_METHOD, 'data' => 'Method: "'.$action.'" doesn\'t exist.');
+				return; //exit function
+		}
+		
+		if($result !== false){
+			self::$result = array('result' => $result);
+		}
+		else{
+			self::$result = CGraph::$error;
 		}
 	}
 	
