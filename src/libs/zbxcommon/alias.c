@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -20,7 +20,7 @@
 #include "common.h"
 #include "alias.h"
 #include "log.h"
-	
+
 /* Static data */
 
 static ALIAS *aliasList=NULL;
@@ -28,11 +28,11 @@ static ALIAS *aliasList=NULL;
 
 /*
  * Add alias to the list
- * Returns 1 on success or 0 if alias with that name already exist
+ * Returns 1 on success or 0 if alias with that name already exists
 */
 int	add_alias_from_config(char *line)
 {
-	char 	*name = NULL,
+	char	*name = NULL,
 		*value = NULL;
 
 	name = line;
@@ -79,7 +79,7 @@ int	add_alias(const char *name, const char *value)
 			zbx_free(alias->value);
 
 			memset(alias, 0, sizeof(ALIAS));
-			
+
 			zbx_strlcpy(alias->name, name, MAX_ALIAS_NAME-1);
 
 			alias->value = strdup(value);
@@ -100,7 +100,7 @@ void	alias_list_free(void)
 {
 	ALIAS	*curr;
 	ALIAS	*next;
-		
+
 	next = aliasList;
 	while(next!=NULL)
 	{

@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -110,7 +110,7 @@ double	zbx_time(void)
  *                                                                            *
  * Function: zbx_current_time                                                 *
  *                                                                            *
- * Purpose: Gets the current time include UTC offset                          *
+ * Purpose: Gets the current time including UTC offset                        *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -296,7 +296,7 @@ static time_t	get_next_flexible_interval(char *delay_flex, time_t now)
  *                                                                            *
  * Function: calculate_item_nextcheck                                         *
  *                                                                            *
- * Purpose: calculate nextcheck timespamp for item                            *
+ * Purpose: calculate nextcheck timestamp for item                            *
  *                                                                            *
  * Parameters: delay - item's refresh rate in sec                             *
  *             now - current timestamp                                        *
@@ -368,7 +368,7 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
  *                                                                            *
  * Parameters: ip - string                                                    *
  *                                                                            *
- * Return value: SUCCEED - is IPv4 address                                    * 
+ * Return value: SUCCEED - is IPv4 address                                    *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Author: Alexei Vladishev, Aleksander Vladishev                             *
@@ -418,7 +418,7 @@ static int	is_ip4(const char *ip)
  *                                                                            *
  * Parameters: ip - string                                                    *
  *                                                                            *
- * Return value: SUCCEED - is IPv6 address                                    * 
+ * Return value: SUCCEED - is IPv6 address                                    *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Author: Aleksader Vladishev                                                *
@@ -473,7 +473,7 @@ static int	is_ip6(const char *ip)
  *                                                                            *
  * Parameters: ip - string                                                    *
  *                                                                            *
- * Return value: SUCCEED - is IP address                                      * 
+ * Return value: SUCCEED - is IP address                                      *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Author: Aleksader Vladishev                                                *
@@ -505,7 +505,7 @@ int	is_ip(const char *ip)
  * Parameters: ip - IPv6 IPs [12fc::2]                                        *
  *             buf - result value [12fc:0000:0000:0000:0000:0000:0000:0002]   *
  *                                                                            *
- * Return value: FAIL - invlid IP address, SUCCEED - conversion OK            *
+ * Return value: FAIL - invalid IP address, SUCCEED - conversion OK           *
  *                                                                            *
  * Author: Alksander Vladishev                                                *
  *                                                                            *
@@ -653,8 +653,8 @@ static int	ip6_in_list(char *list, char *ip)
 			j[8] = j[7];
 		}
 
-		if(i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3] && 
-		   i[4] == j[4] && i[5] == j[5] && i[6] == j[6] && 
+		if(i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3] &&
+		   i[4] == j[4] && i[5] == j[5] && i[6] == j[6] &&
 		   i[7] >= j[7] && i[7] <= j[8])
 		{
 			ret = SUCCEED;
@@ -823,11 +823,11 @@ int	int_in_list(char *list, int value)
 		end=strchr(start, ',');
 
 		if(end != NULL)
-		{	
+		{
 			c=end[0];
 			end[0]='\0';
 		}
-		
+
 		if(sscanf(start,"%d-%d",&i1,&i2) == 2)
 		{
 			if(value>=i1 && value<=i2)
@@ -874,7 +874,7 @@ int	int_in_list(char *list, int value)
  * Purpose: check if current time is within given period                      *
  *                                                                            *
  * Parameters: period - time period in format [d1-d2,hh:mm-hh:mm]*            *
- *             now    - timestamp for comporation                             *
+ *             now    - timestamp for comparison                             *
  *                      if NULL - use current timestamp.                      *
  *                                                                            *
  * Return value: 0 - out of period, 1 - within the period                     *
@@ -897,7 +897,7 @@ int	check_time_period(char *period, time_t now)
 
 	if (now == (time_t)NULL)
 		now = time(NULL);
-	
+
 	tm = localtime(&now);
 
 	day = tm->tm_wday;
@@ -982,7 +982,7 @@ int	cmp_double(double a,double b)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: the functions support prefixes K,M,G                             *
+ * Comments: the functions supports prefixes K,M,G                            *
  *                                                                            *
  ******************************************************************************/
 int	is_double_prefix(char *c)
@@ -1040,7 +1040,7 @@ int	is_double_prefix(char *c)
 	const char *endstr = str + strlen(str);
 	char *endptr = NULL;
 	double x;
-       
+
 	x = strtod(str, &endptr);
 
 	if(endptr == str || errno != 0)
@@ -1080,13 +1080,13 @@ int	is_double(char *c)
 		if(c[i]==' ') /* check right spaces */
 		{
 			for( ; c[i]==' ' && c[i]!=0;i++); /* trim right spaces */
-			
+
 			if(c[i]==0) break; /* SUCCEED */
 		}
 
 		return FAIL;
 	}
-	
+
 	if(len <= 0) return FAIL;
 
 	if(len == 1 && dot!=-1) return FAIL;
@@ -1116,25 +1116,25 @@ int	is_uint(char *c)
 	int	len;
 
 	for(i=0; c[i]==' ' && c[i]!=0;i++); /* trim left spaces */
-	
+
 	for(len=0; c[i]!=0; i++,len++)
 	{
 		if((c[i]>='0')&&(c[i]<='9'))
 		{
 			continue;
 		}
-		
+
 		if(c[i]==' ') /* check right spaces */
 		{
 			for( ; c[i]==' ' && c[i]!=0;i++); /* trim right spaces */
-			
+
 			if(c[i]==0) break; /* SUCCEED */
 		}
 		return FAIL;
 	}
 
 	if(len <= 0) return FAIL;
-	
+
 	return SUCCEED;
 }
 
@@ -1210,7 +1210,7 @@ int	is_uoct(char *str)
 
 		res = SUCCEED;
 	}
-		
+
 	while (' ' == *str)	/* check right spaces */
 		str++;
 
@@ -1250,7 +1250,7 @@ int	is_uhex(char *str)
 
 		res = SUCCEED;
 	}
-		
+
 	while (' ' == *str)	/* check right spaces */
 		str++;
 
@@ -1290,11 +1290,11 @@ int	uint64_in_list(char *list, zbx_uint64_t value)
 		end=strchr(start, ',');
 
 		if(end != NULL)
-		{	
+		{
 			c=end[0];
 			end[0]='\0';
 		}
-		
+
 		if(sscanf(start,ZBX_FS_UI64 "-" ZBX_FS_UI64,&i1,&i2) == 2)
 		{
 			if(value>=i1 && value<=i2)
