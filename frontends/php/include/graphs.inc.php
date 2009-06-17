@@ -26,7 +26,7 @@
  *     Represent integer value of graph item type into the string
  *
  * Author:
- *     Eugene Grigorjev 
+ *     Eugene Grigorjev
  *
  */
 	function graph_item_type2str($type,$count=null){
@@ -52,7 +52,7 @@
  *     Return available drawing types for graph item
  *
  * Author:
- *     Eugene Grigorjev 
+ *     Eugene Grigorjev
  *
  */
 	function graph_item_drawtypes(){
@@ -72,7 +72,7 @@
  *     Represent integer value of graph item drawing type into the string
  *
  * Author:
- *     Eugene Grigorjev 
+ *     Eugene Grigorjev
  *
  */
 	function graph_item_drawtype2str($drawtype,$type=null){
@@ -95,7 +95,7 @@
  *     Represent integer value of calculation function into the string
  *
  * Author:
- *     Eugene Grigorjev 
+ *     Eugene Grigorjev
  *
  */
 	function graph_item_calc_fnc2str($calc_fnc, $type=null){
@@ -118,7 +118,7 @@
 						' FROM graphs g, graphs_items gi '.
 						' WHERE g.graphid=gi.graphid '.
 							' AND gi.gitemid='.$gitemid);
-			
+
 	return DBfetch($db_graphs);
 	}
 
@@ -151,7 +151,7 @@
 		return DBselect('SELECT * '.
 					' FROM graphs_items '.
 					' WHERE graphid='.$graphid.
-					' ORDER BY itemid,drawtype,sortorder,color,yaxisside'); 
+					' ORDER BY itemid,drawtype,sortorder,color,yaxisside');
 	}
 
 /*
@@ -163,11 +163,11 @@
  * Author:
  *     Aly
  *
- */		
+ */
 	function graph_accessible($graphid){
 		global $USER_DETAILS;
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY,get_current_nodeid(true));
-		
+
 		$sql = 	'SELECT g.graphid '.
 				' FROM graphs g, graphs_items gi, items i '.
 				' WHERE g.graphid='.$graphid.
@@ -235,9 +235,9 @@
 		while($graph = DBfetch($db_graphs)){
 			$result[$graph['graphid']] = $graph['graphid'];
 		}
-		
+
 		if(PERM_RES_STRING_LINE == $perm_res){
-			if(count($result) == 0) 
+			if(count($result) == 0)
 				$result = '-1';
 			else
 				$result = implode(',',$result);
@@ -289,7 +289,7 @@
 		$min = null;
 		$result = time() - 86400*365;
 
-		$items_by_type = array(ITEM_VALUE_TYPE_FLOAT => array(), ITEM_VALUE_TYPE_STR =>  array(), ITEM_VALUE_TYPE_LOG => array(), 
+		$items_by_type = array(ITEM_VALUE_TYPE_FLOAT => array(), ITEM_VALUE_TYPE_STR =>  array(), ITEM_VALUE_TYPE_LOG => array(),
 						ITEM_VALUE_TYPE_UINT64 => array(), ITEM_VALUE_TYPE_TEXT => array());
 
 		$sql = 'SELECT i.itemid, i.value_type '.
@@ -345,13 +345,13 @@
 			}
 		}
 		$result = is_null($min)?$result:$min;
-		
+
 	return $result;
 	}
 
 // Show History Graph
 	function show_history($itemid,$from,$stime,$period){
-		//$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);   
+		//$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);
 
 		//show_table_header(S_TILL.SPACE.$till.' ( '.zbx_date2age($stime,$stime+$period).' )');
 
@@ -419,7 +419,7 @@
  *     Replace items for specified host
  *
  * Author:
- *     Eugene Grigorjev 
+ *     Eugene Grigorjev
  *
  * Comments: !!! Don't forget sync code with C !!!
  * Only PHP:
@@ -454,7 +454,7 @@
 
 		return $result;
 	}
-	
+
         /*
          * Function: add_graph
          *
@@ -462,7 +462,7 @@
          *     Add graph without items and recursion for templates
          *
          * Author:
-         *     Eugene Grigorjev 
+         *     Eugene Grigorjev
          *
          * Comments: !!! Don't forget sync code with C !!!
          *
@@ -486,7 +486,7 @@
          *     Add graph with items and recursion for templates
          *
          * Author:
-         *     Eugene Grigorjev 
+         *     Eugene Grigorjev
          *
          * Comments: !!! Don't forget sync code with C !!!
          *
@@ -512,7 +512,7 @@
 							' FROM items i, hosts h '.
 							' WHERE h.hostid=i.hostid '.
 								' AND '.DBcondition('i.itemid',$itemid));
-								
+
 		while($db_item_host = DBfetch($db_item_hosts)){
 			$host_list[] = '"'.$db_item_host['host'].'"';
 
@@ -572,7 +572,7 @@
          *     Update graph without items and recursion for template
          *
          * Author:
-         *     Eugene Grigorjev 
+         *     Eugene Grigorjev
          *
          * Comments: !!! Don't forget sync code with C !!!
          *
@@ -600,7 +600,7 @@
 				'percent_left='.$percent_left.','.
 				'percent_right='.$percent_right.
 			' WHERE graphid='.$graphid;
-			
+
 		if($result = DBexecute($sql)){
 			if($g_graph['graphtype'] != $graphtype && $graphtype == GRAPH_TYPE_STACKED){
 				$result = DBexecute('UPDATE graphs_items SET calc_fnc='.CALC_FNC_AVG.',drawtype=1,type='.GRAPH_ITEM_SIMPLE.
@@ -609,7 +609,7 @@
 		}
 		return $result;
 	}
-	
+
         /*
          * Function: update_graph_with_items
          *
@@ -617,7 +617,7 @@
          *     Update graph with items and recursion for template
          *
          * Author:
-         *     Eugene Grigorjev 
+         *     Eugene Grigorjev
          *
          * Comments: !!! Don't forget sync code with C !!!
          *
@@ -716,7 +716,7 @@
  *     Delete graph with templates
  *
  * Author:
- *     Eugene Grigorjev 
+ *     Eugene Grigorjev
  *
  * Comments: !!! Don't forget sync code with C !!!
  *
@@ -738,7 +738,7 @@
 			}
 		}
 
-// first remove child graphs 
+// first remove child graphs
 		$del_chd_graphs = array();
 		$chd_graphs = get_graphs_by_templateid($graphids);
 		while($chd_graph = DBfetch($chd_graphs)){ /* recursion */
@@ -750,7 +750,7 @@
 
 		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$graphids).' AND resourcetype='.SCREEN_RESOURCE_GRAPH);
 
-// delete graph 
+// delete graph
 		DBexecute('DELETE FROM graphs_items WHERE '.DBcondition('graphid',$graphids));
 		DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='graphid' AND ".DBcondition('value_id',$graphids));
 
@@ -772,7 +772,7 @@
  *     Compare two graph items
  *
  * Author:
- *     Eugene Grigorjev 
+ *     Eugene Grigorjev
  *
  * Comments: !!! Don't forget sync code with C !!!
  *
@@ -798,7 +798,7 @@
  *     Add item to graph
  *
  * Author:
- *     Eugene Grigorjev 
+ *     Eugene Grigorjev
  *
  * Comments: !!! Don't forget sync code with C !!!
  *
@@ -814,7 +814,7 @@
 
 		return ( $result ? $gitemid : $result );
 	}
-	
+
 /*
  * Function: delete_template_graphs
  *
@@ -822,7 +822,7 @@
  *     Delete template graph from specified host
  *
  * Author:
- *     Eugene Grigorjev 
+ *     Eugene Grigorjev
  *
  * Comments: !!! Don't forget sync code with C !!!
  *
@@ -845,7 +845,7 @@
 			if($unlink_mode){
 				if(DBexecute('UPDATE graphs SET templateid=0 WHERE graphid='.$db_graph['graphid'])){
 					info('Graph "'.$db_graph['name'].'" unlinked');
-				}	
+				}
 			}
 			else{
 				delete_graph($db_graph['graphid']);
@@ -860,7 +860,7 @@
          *     Copy all graphs to the specified host
          *
          * Author:
-         *     Eugene Grigorjev 
+         *     Eugene Grigorjev
          *
          * Comments: !!! Don't forget sync code with C !!!
          *
@@ -891,7 +891,7 @@
  *     Copy specified graph to the specified host
  *
  * Author:
- *     Eugene Grigorjev 
+ *     Eugene Grigorjev
  *
  * Comments: !!! Don't forget sync code with C !!!
  *
@@ -919,9 +919,9 @@
 
 		if($new_gitems = get_same_graphitems_for_host($gitems, $hostid)){
 			unset($chd_graphid);
-			
+
 			$chd_graphs = get_graphs_by_hostid($hostid);
-			while( !isset($chd_graphid) && $chd_graph = DBfetch($chd_graphs)){ 
+			while( !isset($chd_graphid) && $chd_graph = DBfetch($chd_graphs)){
 /* compare graphs */
 				if ( $chd_graph['templateid'] != 0 ) continue;
 
@@ -948,7 +948,7 @@
 					$equal++;
 				}
 
-				if(isset($equal) && (count($new_gitems) == $equal)){ 
+				if(isset($equal) && (count($new_gitems) == $equal)){
 /* founded equal graph */
 					$chd_graphid = $chd_graph['graphid'];
 					break;
@@ -959,14 +959,14 @@
 				$result = update_graph_with_items($chd_graphid, $db_graph['name'], $db_graph['width'], $db_graph['height'],
 					$db_graph['ymin_type'], $db_graph['ymax_type'], $db_graph['yaxismin'], $db_graph['yaxismax'],
 					$db_graph['ymin_itemid'], $db_graph['ymax_itemid'],
-					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],$db_graph['show_legend'], 
+					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],$db_graph['show_legend'],
 					$db_graph['show_3d'], $db_graph['percent_left'], $db_graph['percent_right'], $new_gitems, ($copy_mode ? 0: $db_graph['graphid']));
 			}
 			else{
 				$result = add_graph_with_items($db_graph['name'], $db_graph['width'], $db_graph['height'],
 					$db_graph['ymin_type'], $db_graph['ymax_type'], $db_graph['yaxismin'], $db_graph['yaxismax'],
 					$db_graph['ymin_itemid'], $db_graph['ymax_itemid'],
-					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],$db_graph['show_legend'], 
+					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],$db_graph['show_legend'],
 					$db_graph['show_3d'], $db_graph['percent_left'], $db_graph['percent_right'], $new_gitems, ($copy_mode ? 0: $db_graph['graphid']));
 			}
 		}
@@ -1004,7 +1004,7 @@
 	}
 
 /*
- * Function: 
+ * Function:
  *		make_array_from_gitems
  *
  * Description:
@@ -1042,7 +1042,7 @@
 	}
 
 /*
- * Function: 
+ * Function:
  *		make_array_from_graphid
  *
  * Description:
@@ -1053,7 +1053,7 @@
  *
  * Comments
  *	$full= false: for screens(WITHOUT width && height), true=all params
- */	
+ */
 	function make_url_from_graphid($graphid,$full=false){
 
 		$gurl=array();
@@ -1080,7 +1080,7 @@
 		}
 	return $url;
 	}
-	
+
 //Author:	Aly
 	function get_next_color($palettetype=0){
 		static $prev_color = array('dark'=>true, 'color'=>0, 'grad'=>0);
@@ -1119,7 +1119,7 @@
 		static $prev_color = array(0,0,0,0);
 
 		switch($palette){
-			case 0: $palettes = array(array(150,0,0), array(0,100,150), array(170,180,180), array(152,100,0), 
+			case 0: $palettes = array(array(150,0,0), array(0,100,150), array(170,180,180), array(152,100,0),
 									array(130,0,150), array(0,0,150), array(200,100,50),
 									array(250,40,40), array(50,150,150), array(100,150,0));
 				break;
@@ -1132,7 +1132,7 @@
 									array(0,100,150), array(200,100,50), array(0,100,0),);
 				break;
 			case 3:
-			default: 
+			default:
 				return get_next_color($palettetype);
 		}
 
@@ -1146,7 +1146,7 @@
 			case 1:	$diff = -50; break;
 			case 2:	$diff = 50; break;
 		}
-		
+
 		foreach($result as $n => $color){
 			if(($color + $diff) < 0) $result[$n] = 0;
 			else if(($color + $diff) > 255) $result[$n] = 255;

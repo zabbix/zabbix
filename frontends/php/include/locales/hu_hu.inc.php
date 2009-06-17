@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2008 SIA Zabbix
 **
@@ -932,6 +932,6 @@
 	'S_LATEST_DATA'=>			'Legutolsó adat',
 	'S_INCORRECT_DESCRIPTION'=>			'Incorrect description',
 	'S_CANT_FORMAT_TREE'=>			'Can\"t format Tree',
-	
+
 	);
 ?>

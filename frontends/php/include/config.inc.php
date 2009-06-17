@@ -20,31 +20,31 @@
 function SDI($msg='SDI') { echo 'DEBUG INFO: '; var_dump($msg); echo SBR; } // DEBUG INFO!!!
 function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
 function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
-function __autoload($class_name){ 	
-	$class_name = strtolower($class_name); 	
-	$api = array(		
-		'chostgroup' =>1,		
-		'chost' => 1,		
-		'ctemplate' => 1,		
-		'cproxy' => null,		
-		'citem' => 1,		
-		'ctrigger' => 1,	
-		'cgraph' => 1,		
-		'cusergroup' => null,		
-		'cuser' => null);	
-		
-	$rpc = array(		
-		'cjsonrpc' =>1,		
-		'czbxrpc' => 1,		
+function __autoload($class_name){
+	$class_name = strtolower($class_name);
+	$api = array(
+		'chostgroup' =>1,
+		'chost' => 1,
+		'ctemplate' => 1,
+		'cproxy' => null,
+		'citem' => 1,
+		'ctrigger' => 1,
+		'cgraph' => 1,
+		'cusergroup' => null,
+		'cuser' => null);
+
+	$rpc = array(
+		'cjsonrpc' =>1,
+		'czbxrpc' => 1,
 		'cxmlrpc' => null,
-		'csoap' => null,		
-		'csoapjr' => null);	
-		
-	if(isset($api[$class_name])) 
-		require_once('api/classes/class.'.$class_name.'.php');	
-	else if(isset($rpc[$class_name])) 
-		require_once('api/rpc/class.'.$class_name.'.php');	
-	else 
+		'csoap' => null,
+		'csoapjr' => null);
+
+	if(isset($api[$class_name]))
+		require_once('api/classes/class.'.$class_name.'.php');
+	else if(isset($rpc[$class_name]))
+		require_once('api/rpc/class.'.$class_name.'.php');
+	else
 		require_once('include/classes/class.'.$class_name.'.php');
 }
 ?>
@@ -59,7 +59,7 @@ function __autoload($class_name){
 
 	require_once('include/nodes.inc.php');
 	require_once('include/hosts.inc.php');
-	
+
 // GLOBALS
 	global $USER_DETAILS, $USER_RIGHTS;
 
@@ -69,7 +69,7 @@ function __autoload($class_name){
 
 // Include Tactical Overview modules
 	require_once('include/locales.inc.php');
-	
+
 	require_once('include/perm.inc.php');
 	require_once('include/audit.inc.php');
 	require_once('include/js.inc.php');
@@ -208,7 +208,7 @@ function __autoload($class_name){
 	function access_deny(){
 		global $USER_DETAILS;
 		include_once('include/page_header.php');
-		
+
 		if($USER_DETAILS['alias'] != ZBX_GUEST_USER){
 			show_error_message(S_NO_PERMISSIONS);
 		}
@@ -224,9 +224,9 @@ function __autoload($class_name){
 			$table = new CTable(null, 'warning');
 			$table->setAlign('center');
 			$table->setHeader(new CCol('You are not logged in', 'left'),'header');
-				
+
 			$table->addRow(new CCol($warning_msg));
-			
+
 			$url = urlencode($req->toString());
 			$footer = new CCol(
 							array(
@@ -237,7 +237,7 @@ function __autoload($class_name){
 			$table->setFooter($footer,'footer');
 			$table->show();
 		}
-		
+
 		include_once('include/page_footer.php');
 	}
 
@@ -364,7 +364,7 @@ function __autoload($class_name){
 				$tab->addOption('id','msg_messages');
 				$tab->addOption('style','width: 100%;');
 
-				if(isset($msg_tab) && $bool){					
+				if(isset($msg_tab) && $bool){
 					$tab->addOption('style','display: none;');
 				}
 
@@ -441,7 +441,7 @@ function __autoload($class_name){
 		show_error_message($msg);
 		include_once "include/page_footer.php";
 	}
-	
+
 	function get_tree_by_parentid($parentid,&$tree,$parent_field, $level=0){
 		if(empty($tree)) return $tree;
 
@@ -452,12 +452,12 @@ function __autoload($class_name){
 		if(isset($tree[$parentid])){
 			$result[$parentid] = $tree[$parentid];
 		}
-		
+
 		foreach($tree as $id => $child){
 			if(bccomp($child[$parent_field],$parentid) == 0){
 				$result[$id] = $child;
 				$childs = get_tree_by_parentid($id,$tree,$parent_field, $level); // RECURSION !!!
-				$result += $childs;	
+				$result += $childs;
 			}
 		}
 	return $result;
@@ -661,7 +661,7 @@ function __autoload($class_name){
 	}
 
 	function get_status(){
-		global $ZBX_SERVER, $ZBX_SERVER_PORT;		
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 		$status = array();
 // server
 		$checkport = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, 2);
@@ -916,14 +916,14 @@ function __autoload($class_name){
 		}
 	return $new;
 	}
-	
+
 
 	function zbx_stripslashes($value){
 		if(is_array($value)){
 			foreach($value as $id => $data)
-				$value[$id] = zbx_stripslashes($data); 
+				$value[$id] = zbx_stripslashes($data);
 				// $value = array_map('zbx_stripslashes',$value); /* don't use 'array_map' it buggy with indexes */
-		} 
+		}
 		else if(is_string($value)){
 			$value = stripslashes($value);
 		}
@@ -946,10 +946,10 @@ function __autoload($class_name){
 			case 11: $month = S_NOVEMBER; break;
 			case 12: $month = S_DECEMBER; break;
 		}
-	
+
 	return $month;
 	}
-	
+
 	function get_str_dayofweek($num){
 		$day = '[Wrong value for day of week: '.$num.']';
 		switch($num){
@@ -961,7 +961,7 @@ function __autoload($class_name){
 			case 6: $day = S_SATURDAY; break;
 			case 7: $day = S_SUNDAY; break;
 		}
-	
+
 	return $day;
 	}
 /*************** VALUE MAPPING ******************/
@@ -1132,15 +1132,15 @@ function __autoload($class_name){
 
 	return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
 	}
-	
+
 	function order_result(&$data, $def_field, $def_order=ZBX_SORT_UP){
 		global $page;
-		
+
 		if(empty($data)) return false;
-		
+
 		$sortfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def_field));
 		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def_order));
-		
+
 		foreach($data as $key => $rows){
 			if(!isset($rows[$sortfield])){
 //				info('Page sorting failed ["'.$sortfield.'","'.$sortorder.'"]');
@@ -1149,14 +1149,14 @@ function __autoload($class_name){
 
 			$tmp[$key] = strtolower($rows[$sortfield]);
 		}
-		
+
 		$sortorder = ($sortorder == 'ASC')?SORT_ASC:SORT_DESC;
-		
+
 		array_multisort($tmp, $sortorder, $data);
-		
+
 	return true;
 	}
-	
+
 	function selectByPattern(&$table, $column, $pattern, $limit){
 		$rsTable = array();
 		foreach($table as $num => $row){
@@ -1166,7 +1166,7 @@ function __autoload($class_name){
 				$rsTable[$num] = $row;
 			else
 				continue;
-				
+
 			$limit--;
 		}
 	return $rsTable;

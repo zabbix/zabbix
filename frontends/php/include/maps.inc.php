@@ -23,7 +23,7 @@
 	require_once('include/hosts.inc.php');
 	require_once('include/triggers.inc.php');
 	require_once('include/scripts.inc.php');
-	
+
 /*
  * Function: map_link_drawtypes
  *
@@ -31,7 +31,7 @@
  *     Return available drawing types for links
  *
  * Author:
- *     Eugene Grigorjev 
+ *     Eugene Grigorjev
  *
  */
 	function map_link_drawtypes(){
@@ -50,7 +50,7 @@
  *     Represent integer value of links drawing type into the string
  *
  * Author:
- *     Eugene Grigorjev 
+ *     Eugene Grigorjev
  *
  */
 	function map_link_drawtype2str($drawtype){
@@ -125,7 +125,7 @@
 	}
 
 	function get_sysmaps_element_by_selementid($selementid){
-		$sql="select * FROM sysmaps_elements WHERE selementid=$selementid"; 
+		$sql="select * FROM sysmaps_elements WHERE selementid=$selementid";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 		if($row){
@@ -164,7 +164,7 @@
 
 	function delete_sysmap($sysmapids){
 		zbx_value2array($sysmapids);
-		
+
 		$result = delete_sysmaps_elements_with_sysmapid($sysmapids);
 		if(!$result)	return	$result;
 
@@ -177,7 +177,7 @@
 		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.sysmapids' AND source='sysmapid' AND ".DBcondition('value_id',$sysmapids));
 		$result &= DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$sysmapids).' AND resourcetype='.SCREEN_RESOURCE_MAP);
 		$result &= DBexecute('DELETE FROM sysmaps WHERE '.DBcondition('sysmapid',$sysmapids));
-		
+
 	return $result;
 	}
 
@@ -185,13 +185,13 @@
 
 	function add_link($sysmapid,$selementid1,$selementid2,$triggers,$drawtype,$color){
 		$linkid=get_dbid("sysmaps_links","linkid");
-		
+
 		$result=TRUE;
 		foreach($triggers as $id => $trigger){
 			if(empty($trigger['triggerid'])) continue;
 			$result&=add_link_trigger($linkid,$trigger['triggerid'],$trigger['drawtype'],$trigger['color']);
 		}
-		
+
 		if(!$result){
 			return $result;
 		}
@@ -207,18 +207,18 @@
 	}
 
 	function update_link($linkid,$sysmapid,$selementid1,$selementid2,$triggers,$drawtype,$color){
-		
+
 		$result=delete_all_link_triggers($linkid);;
-		
+
 		foreach($triggers as $id => $trigger){
 			if(empty($trigger['triggerid'])) continue;
 			$result&=add_link_trigger($linkid,$trigger['triggerid'],$trigger['drawtype'],$trigger['color']);
 		}
-		
+
 		if(!$result){
 			return $result;
 		}
-		
+
 		$result&=DBexecute('UPDATE sysmaps_links SET '.
 							" sysmapid=$sysmapid,selementid1=$selementid1,selementid2=$selementid2,".
 							" drawtype=$drawtype,color=".zbx_dbstr($color).
@@ -237,7 +237,7 @@
 
 		$sql = "SELECT * FROM sysmaps_link_triggers WHERE linkid=$linkid";
 		$res = DBselect($sql);
-		
+
 		while($rows = DBfetch($res)){
 			$triggers[] = $rows;
 		}
@@ -256,11 +256,11 @@
 		$result&=add_link_trigger($linkid,$triggerid,$drawtype,$color);
 	return $result;
 	}
-	
+
 	function delete_link_trigger($linkid,$triggerid){
 	return DBexecute('DELETE FROM sysmaps_link_triggers WHERE linkid='.$linkid.' AND triggerid='.$triggerid);
 	}
-	
+
 	function delete_all_link_triggers($linkid){
 	return DBexecute('DELETE FROM sysmaps_link_triggers WHERE linkid='.$linkid);
 	}
@@ -272,7 +272,7 @@
  *     Check circeling of maps
  *
  * Author:
- *     Eugene Grigorjev 
+ *     Eugene Grigorjev
  *
  */
 	function check_circle_elements_link($sysmapid,$elementid,$elementtype){
@@ -330,7 +330,7 @@
 			return FALSE;
 		}
 
-		return	DBexecute('UPDATE sysmaps_elements '. 
+		return	DBexecute('UPDATE sysmaps_elements '.
 					"SET elementid=$elementid,elementtype=$elementtype,".
 						"label=".zbx_dbstr($label).",x=$x,y=$y,iconid_off=$iconid_off,".
 						"url=".zbx_dbstr($url).",iconid_on=$iconid_on,".
@@ -349,12 +349,12 @@
 	function delete_sysmaps_element($selementids){
 		zbx_value2array($selementids);
 		if(empty($selementids)) return true;
-		
+
 		$result=TRUE;
 		$sql = 'SELECT linkid FROM sysmaps_links '.
 				' WHERE '.DBcondition('selementid1',$selementids).
 					' OR '.DBcondition('selementid2',$selementids);
-					
+
 		$res=DBselect($sql);
 		while($rows = DBfetch($res)){
 			$result&=delete_link($rows['linkid']);
@@ -374,25 +374,25 @@
 	function delete_sysmaps_elements_with_hostid($hostids){
 		zbx_value2array($hostids);
 		if(empty($hostids)) return true;
-		
+
 		$db_elements = DBselect('SELECT selementid '.
 					' FROM sysmaps_elements '.
 					' WHERE '.DBcondition('elementid',$hostids).
 						' AND elementtype='.SYSMAP_ELEMENT_TYPE_HOST);
-		
+
 		$selementids = array();
 		while($db_element = DBfetch($db_elements)){
 			$selementids[$db_element['selementid']] = $db_element['selementid'];
 		}
 		delete_sysmaps_element($selementids);
-		
+
 	return TRUE;
 	}
-	
+
 	function delete_sysmaps_elements_with_sysmapid($sysmapids){
 		zbx_value2array($sysmapids);
 		if(empty($sysmapids)) return true;
-		
+
 		$db_elements = DBselect('SELECT selementid '.
 					' FROM sysmaps_elements '.
 					' WHERE '.DBcondition('elementid',$sysmapids).
@@ -402,7 +402,7 @@
 			$selementids[$db_element['selementid']] = $db_element['selementid'];
 		}
 		delete_sysmaps_element($selementids);
-		
+
 	return TRUE;
 	}
 
@@ -414,7 +414,7 @@
 	function delete_sysmaps_elements_with_triggerid($triggerids){
 		zbx_value2array($triggerids);
 		if(empty($triggerids)) return true;
-		
+
 		$db_elements = DBselect('SELECT selementid '.
 					' FROM sysmaps_elements '.
 					' WHERE '.DBcondition('elementid',$triggerids).
@@ -426,11 +426,11 @@
 		delete_sysmaps_element($selementids);
 	return TRUE;
 	}
-	
+
 	function delete_sysmaps_elements_with_groupid($groupids){
 		zbx_value2array($groupids);
 		if(empty($groupids)) return true;
-				
+
 		$db_elements = DBselect('SELECT selementid '.
 						' FROM sysmaps_elements '.
 						' WHERE '.DBcondition('elementid',$groupids).
@@ -440,7 +440,7 @@
 			$selementids[$db_element['selementid']] = $db_element['selementid'];
 		}
 		delete_sysmaps_element($selementids);
-		
+
 	return TRUE;
 	}
 
@@ -466,7 +466,7 @@
  *     Retrive information for map element
  *
  * Author:
- *     Eugene Grigorjev 
+ *     Eugene Grigorjev
  *
  */
 	function get_info_by_selementid($selementid){
@@ -558,10 +558,10 @@
 						array_push($triggers, $triggerid);
 
 				$type = $inf['type'];
-				
+
 				if(!isset($tr_info[$type]['count'])) $tr_info[$type]['count'] = 0;
 				$tr_info[$type]['count'] += isset($inf['count']) ? $inf['count'] : 1;
-				
+
 				if(!isset($tr_info[$type]['priority']) || $tr_info[$type]['priority'] < $inf["priority"]){
 					$tr_info[$type]['priority'] = $inf['priority'];
 					$tr_info[$type]['info'] = $inf['info'];
@@ -656,7 +656,7 @@
 
 			$out['type'] = TRIGGER_VALUE_UNKNOWN;
 			$out['info'] = 'UNKNOWN';
-			
+
 			$out['color'] = $colors['Gray'];
 			if (isset($out['disabled']) && $out['disabled'] == 1)
 				$out['iconid'] = $db_element['iconid_disabled'];
@@ -671,7 +671,7 @@
 
 			$out['type'] = TRIGGER_VALUE_FALSE;
 			$out['info'] = 'OK';
-			
+
 			if(isset($inf['info']))
 				$out['info'] = 'OK';
 
@@ -699,7 +699,7 @@
          *     Retrive action for map element
          *
          * Author:
-         *     Eugene Grigorjev 
+         *     Eugene Grigorjev
          *
          */
 	function get_action_map_by_sysmapid($sysmapid){
@@ -710,7 +710,7 @@
 			$url	= $db_element["url"];
 			$alt	= "Label: ".$db_element["label"];
 			$scripts_by_hosts = null;
-			
+
 			if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST){
 				$host = get_host_by_hostid($db_element["elementid"]);
 				if($host["status"] != HOST_STATUS_MONITORED)	continue;
@@ -718,7 +718,7 @@
 				$scripts_by_hosts = get_accessible_scripts_by_hosts(array($db_element["elementid"]));
 
 				if(empty($url))	$url='tr_status.php?hostid='.$db_element['elementid'].'&noactions=true&onlytrue=true&compact=true';
-				
+
 				$alt = "Host: ".$host["host"]." ".$alt;
 			}
 			else if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP){
@@ -752,14 +752,14 @@
 			$r_area = new CArea(array($x1_,$y1_,$x2_,$y2_),$url,$alt,'rect');
 			if(!empty($scripts_by_hosts)){
 				$menus = '';
-	
+
 				$host_nodeid = id2nodeid($db_element["elementid"]);
 				foreach($scripts_by_hosts[$db_element["elementid"]] as $id => $script){
 					$script_nodeid = id2nodeid($script['scriptid']);
 					if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
 						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$db_element["elementid"]."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
-				
+
 				$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 
 				$menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?groupid=0&hostid=".$db_element['elementid']."&noactions=true&onlytrue=true&compact=true')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
@@ -767,15 +767,15 @@
 				if(!empty($db_element["url"])){
 					$menus.= "['".S_MAP.SPACE.S_URL."',\"javascript: redirect('".$url."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
-				
+
 				$menus = trim($menus,',');
 				$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180); cancelEvent(event);";
-				
+
 				$r_area->AddAction('onclick','javascript: '.$menus);
 			}
 			$action_map->AddItem($r_area);//AddRectArea($x1_,$y1_,$x2_,$y2_, $url, $alt);
 		}
-		
+
 		$jsmenu = new CPUMenu(null,170);
 		$jsmenu->InsertJavaScript();
 		return $action_map;
@@ -839,28 +839,28 @@
 			ImageLine($image,$x1,$y1,$x2,$y2,$color);
 		}
 	}
-	
+
 	function convertColor($im,$color){
-	
+
 		$RGB = array(
 			hexdec('0x'.substr($color, 0,2)),
 			hexdec('0x'.substr($color, 2,2)),
 			hexdec('0x'.substr($color, 4,2))
 			);
-		
-		
+
+
 	return ImageColorAllocate($im,$RGB[0],$RGB[1],$RGB[2]);
 	}
 
 	/*
 	 * Function: expand_map_element_label_by_data
 	 *
-	 * Description: 
-	 *     substitute simple macros {HOSTNAME}, {HOST.CONN}, {HOST.DNS}, {IPADDRESS} and 
+	 * Description:
+	 *     substitute simple macros {HOSTNAME}, {HOST.CONN}, {HOST.DNS}, {IPADDRESS} and
 	 *     functions {hostname:key.min/max/avg/last(...)}
 	 *     in data string with real values
-	 *     
-	 * Author: 
+	 *
+	 * Author:
 	 *     Aleksander Vladishev
 	 *
 	 */

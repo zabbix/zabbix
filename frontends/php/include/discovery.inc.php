@@ -174,7 +174,7 @@
 		{
 			error('Incorrect IP range.');
 			return false;
-		
+
 		}
 
 		$druleid = get_dbid('drules', 'druleid');
@@ -200,7 +200,7 @@
 		{
 			error('Incorrect IP range.');
 			return false;
-		
+
 		}
 
 		$result = DBexecute('update drules set proxy_hostid='.$proxy_hostid.',name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.
