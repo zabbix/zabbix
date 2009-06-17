@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -63,8 +63,8 @@ int	create_pid_file(const char *pidfile)
 		if(-1 == flock(fd, LOCK_EX | LOCK_NB) && EWOULDBLOCK == errno)
 #endif /* HAVE_FCNTL_H */
 		{
-			zbx_error("File [%s] exists and locked. Is this process already running ?", pidfile);
-			zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists and locked. Is this process already running ?", pidfile);
+			zbx_error("File [%s] exists and is locked. Is this process already running ?", pidfile);
+			zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists and is locked. Is this process already running ?", pidfile);
 			close(fd);
 			return FAIL;
 		}

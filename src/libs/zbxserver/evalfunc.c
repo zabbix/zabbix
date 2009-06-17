@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -536,7 +536,7 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, int parameter, int flag, tim
 			item->itemid);
 
 		row = DBfetch(result);
-		
+
 		if(!row || DBis_null(row[0])==SUCCEED)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for AVG is empty" );
@@ -847,7 +847,7 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, int parameter, int flag, tim
 
 	zbx_uint64_t	max_uint64=0;
 	zbx_uint64_t	l;
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_MAX()");
 
 	assert(flag == ZBX_FLAG_SEC || flag == ZBX_FLAG_VALUES);
@@ -906,7 +906,7 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, int parameter, int flag, tim
 		}
 
 		DBfree_result(result);
-	
+
 		if(rows == 0)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
@@ -960,7 +960,7 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, int parameter, int flag, t
 
 	zbx_uint64_t	max_uint64=0,min_uint64=0;
 	zbx_uint64_t	l;
-	
+
 	char		*table = NULL;
 	char		table_ui64[] = "history_uint";
 	char		table_float[] = "history";
@@ -1015,7 +1015,7 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, int parameter, int flag, t
 					max_uint64 = l;
 					min_uint64 = l;
 				}
-				else 
+				else
 				{
 					if(l>max_uint64)	max_uint64 = l;
 					if(l<min_uint64)	min_uint64 = l;
@@ -1599,7 +1599,7 @@ int evaluate_function(char *value, DB_ITEM *item, char *function, char *paramete
  *                                                                            *
  * Function: add_value_suffix_uptime                                          *
  *                                                                            *
- * Purpose: Peocess suffix 'uptime'                                           *
+ * Purpose: Process suffix 'uptime'                                           *
  *                                                                            *
  * Parameters: value - value for adjusting                                    *
  *             max_len - max len of the value                                 *
@@ -1661,7 +1661,7 @@ static void	add_value_suffix_uptime(char *value, int max_len)
  *                                                                            *
  * Function: add_value_suffix_s                                               *
  *                                                                            *
- * Purpose: Peocess suffix 's'                                                *
+ * Purpose: Process suffix 's'                                                *
  *                                                                            *
  * Parameters: value - value for adjusting                                    *
  *             max_len - max len of the value                                 *
@@ -1741,11 +1741,11 @@ static void	add_value_suffix_s(char *value, int max_len)
  *                                                                            *
  * Function: add_value_suffix_normsl                                          *
  *                                                                            *
- * Purpose: Peocess normal values and add K,M,G,T                             *
+ * Purpose: Process normal values and add K,M,G,T                             *
  *                                                                            *
  * Parameters: value - value for adjusting                                    *
  *             max_len - max len of the value                                 *
- *             units - units (bps, b,B, etc)                                  *
+ *             units - units (bps, b, B, etc)                                  *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -1770,7 +1770,7 @@ static void	add_value_suffix_normal(char *value, int max_len, char *units)
 
 /*      value_uint64 = llabs(zbx_atoui64(value));*/
 
-	/* SPecial processing for bits */
+	/* Special processing for bits */
 	if(strcmp(units,"b") == 0 || strcmp(units,"bps") == 0)
 	{
 		base = 1000;
@@ -1827,7 +1827,7 @@ static void	add_value_suffix_normal(char *value, int max_len, char *units)
  *                                                                            *
  * Purpose: Add suffix for value                                              *
  *                                                                            *
- * Parameters: value - value to replacing                                     *
+ * Parameters: value - value for replacing                                    *
  *             valuemapid - index of value map                                *
  *                                                                            *
  * Return value: SUCCEED - suffix added succesfully, value contains new value *
@@ -1839,7 +1839,7 @@ static void	add_value_suffix_normal(char *value, int max_len, char *units)
  *                                                                            *
  ******************************************************************************/
 
-/* Do not forget to keep it in sync wiht convert_units in config.inc.php */
+/* Do not forget to keep it in sync with convert_units in config.inc.php */
 int	add_value_suffix(char *value, int max_len, char *units, int value_type)
 {
 	int	ret = FAIL;
@@ -1924,7 +1924,7 @@ int	add_value_suffix(char *value, int max_len, char *units, int value_type)
  *                                                                            *
  * Purpose: replace value by mapping value                                    *
  *                                                                            *
- * Parameters: value - value to replacing                                     *
+ * Parameters: value - value for replacing                                    *
  *             valuemapid - index of value map                                *
  *                                                                            *
  * Return value: SUCCEED - evaluated succesfully, value contains new value    *

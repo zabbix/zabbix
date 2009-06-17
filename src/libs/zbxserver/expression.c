@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -100,7 +100,7 @@ static int	trigger_get_N_functionid(char *short_expression, int n, zbx_uint64_t 
  *                                                                            *
  * Function: DBget_trigger_expression_by_triggerid                            *
  *                                                                            *
- * Purpose: retrive trigger expression by triggerid                           *
+ * Purpose: retrieve trigger expression by triggerid                          *
  *                                                                            *
  * Parameters: triggerid - trigger identificator from database                *
  *             expression - result buffer                                     *
@@ -239,7 +239,7 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 /* Remove left and right spaces */
 	lrtrim_spaces(exp);
 
-/* Compress repeating - and +. Add prefix N to negative numebrs. */
+/* Compress repeating - and +. Add prefix N to negative numbers. */
 	compress_signs(exp);
 
 	/* We should process negative prefix, i.e. N123 == -123 */
@@ -570,7 +570,7 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 	}
 	else
 	{
-		zbx_snprintf(error,maxerrlen,"Format error or unsupported operator.  Exp: [%s]",
+		zbx_snprintf(error,maxerrlen,"Format error or unsupported operator. Exp: [%s]",
 			exp);
 		zabbix_log(LOG_LEVEL_WARNING, "%s",
 			error);
@@ -641,7 +641,7 @@ int	evaluate(int *result, char *exp, char *error, int maxerrlen)
 		for(i=l+1;i<r;i++)
 		{
 			simple[i-l-1]=tmp[i];
-		} 
+		}
 		simple[r-l-1]=0;
 
 		if( evaluate_simple( &value, simple, error, maxerrlen ) != SUCCEED )
@@ -751,7 +751,7 @@ static char**	extract_numbers(char *str, int *count)
 			break; /* for e */
 		}
 
-		/* number founded */
+		/* number found */
 		len = e - s;
 		(*count)++;
 		result = zbx_realloc(result, sizeof(char*) * (*count));
@@ -826,8 +826,8 @@ static void	expand_trigger_description_constants(
 			replace[1] = '0' + i + 1;
 			new_str = string_replace(
 					*data,
-					replace, 
-					i < numbers_cnt ? 
+					replace,
+					i < numbers_cnt ?
 						numbers[i] :
 						""
 					);
@@ -892,7 +892,7 @@ static int	get_host_profile_value_by_triggerid(zbx_uint64_t triggerid, char **re
  *                                                                            *
  * Function: DBget_trigger_value_by_triggerid                                 *
  *                                                                            *
- * Purpose: retrive trigger value by functionid and field name                *
+ * Purpose: retrieve trigger value by functionid and field name               *
  *                                                                            *
  * Parameters: functionid - function identificator from database              *
  *             value - pointer to result buffer. Must be NULL                 *
@@ -939,7 +939,7 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
  *                                                                            *
  * Function: DBget_dhost_value_by_event                                       *
  *                                                                            *
- * Purpose: retrive discovered host value by event and field name             *
+ * Purpose: retrieve discovered host value by event and field name            *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -987,7 +987,7 @@ static int	DBget_dhost_value_by_event(DB_EVENT *event, char **replace_to, const 
  *                                                                            *
  * Function: DBget_dservice_value_by_event                                    *
  *                                                                            *
- * Purpose: retrive discovered service value by event and field name          *
+ * Purpose: retrieve discovered service value by event and field name         *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -1030,7 +1030,7 @@ static int	DBget_dservice_value_by_event(DB_EVENT *event, char **replace_to, con
  *                                                                            *
  * Function: DBget_drule_value_by_event                                       *
  *                                                                            *
- * Purpose: retrive discovery rule value by event and field name              *
+ * Purpose: retrieve discovery rule value by event and field name             *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -1082,7 +1082,7 @@ static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const 
  *                                                                            *
  * Function: DBget_history_log_value_by_triggerid                             *
  *                                                                            *
- * Purpose: retrive item lastvalue by functionid                              *
+ * Purpose: retrieve item lastvalue by functionid                             *
  *                                                                            *
  * Parameters: functionid - function identificator from database              *
  *             lastvalue - pointer to result buffer. Must be NULL             *
@@ -1148,7 +1148,7 @@ static int	DBget_history_log_value_by_triggerid(zbx_uint64_t triggerid, char **r
  *                                                                            *
  * Function: DBget_item_lastvalue_by_triggerid                                *
  *                                                                            *
- * Purpose: retrive item lastvalue by triggerid                               *
+ * Purpose: retrieve item lastvalue by triggerid                              *
  *                                                                            *
  * Parameters: functionid - function identificator from database              *
  *             lastvalue - pointer to result buffer. Must be NULL             *
@@ -1231,7 +1231,7 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
  *                                                                            *
  * Function: get_escalation_history                                           *
  *                                                                            *
- * Purpose: retrive escalation history                                        *
+ * Purpose: retrieve escalation history                                       *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -1495,7 +1495,7 @@ static int	get_node_value_by_event(DB_EVENT *event, char **replace_to, const cha
  *             action - action structure (NULL if unknown)                    *
  *             escalation - escalation structure. used for recovery           *
  *                          messages in {ESC.HISTORY} macro.                  *
- *                          (NULL for other cases)                            * 
+ *                          (NULL for other cases)                            *
  *             data - data string                                             *
  *                                                                            *
  * Return value:                                                              *
@@ -1516,7 +1516,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 		zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros(data:NULL)");
 		return;
 	}
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros (data:'%s')",
 			*data);
 
@@ -1530,7 +1530,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 	for ( ; NULL != bl; bl = strchr(p, '{'))
 	{
 		if (NULL == (br = strchr(bl, '}')))
-			break; 
+			break;
 
 		*bl = '\0';
 		str_out = zbx_strdcat(str_out, p);
@@ -1787,7 +1787,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
  *             action - action structure                                      *
  *             escalation - escalation structure. used for recovery           *
  *                          messages in {ESC.HISTORY} macro.                  *
- *                          (NULL for other cases)                            * 
+ *                          (NULL for other cases)                            *
  *             data - data string                                             *
  *                                                                            *
  * Return value:                                                              *
@@ -1799,7 +1799,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
  ******************************************************************************/
 void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escalation, char **data)
 {
-	char	
+	char
 		*str_out = NULL,
 		*replace_to = NULL,
 		*pl = NULL,
@@ -1831,8 +1831,8 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 			break;
 
 		pme[0] = '\0';
-	
-		pr = strrchr(pr, '{'); /* find '{' near '}' */	
+
+		pr = strrchr(pr, '{'); /* find '{' near '}' */
 
 		/* copy left side */
 		pr[0] = '\0';
@@ -1846,7 +1846,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 		pl = pr + strlen(replace_to);
 
 		pms = pr + 1;
-	
+
 		if(NULL != (p = strchr(pms, ':')))
 		{
 			*p = '\0';
@@ -1871,7 +1871,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 						zbx_snprintf(parameter, sizeof(parameter), "%s", pms);
 						*p = ')';
 						pms = p + 1;
-						
+
 						/* function 'evaluate_function2' require 'replace_to' with size 'MAX_STRING_LEN' */
 						zbx_free(replace_to);
 						replace_to = zbx_malloc(replace_to, MAX_STRING_LEN);
@@ -1881,7 +1881,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 					}
 				}
 			}
-			
+
 		}
 		pme[0] = '}';
 
@@ -1902,7 +1902,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
  *                                                                            *
  * Function: substitute_functions                                             *
  *                                                                            *
- * Purpose: substitute expression functions with theirs values                *
+ * Purpose: substitute expression functions with their values                 *
  *                                                                            *
  * Parameters: exp - expression string                                        *
  *             error - place error message here if any                        *
@@ -1964,7 +1964,7 @@ static int	substitute_functions(char **exp, char *error, int maxerrlen)
 			{
 				zbx_snprintf(error, maxerrlen, "unable to get function value: %s",
 						err);
-				/* It may happen because of functions.lastvalue is NULL, so this is not warning  */
+				/* It may happen because functions.lastvalue is NULL, so this is not warning  */
 				level = LOG_LEVEL_DEBUG;
 				goto error;
 			}
@@ -2001,7 +2001,7 @@ error:
  * Purpose: evaluate expression                                               *
  *                                                                            *
  * Parameters: exp - expression string                                        *
- *             error - place rrror message if any                             *
+ *             error - place error message if any                             *
  *             maxerrlen - max length of error message                        *
  *                                                                            *
  * Return value:  SUCCEED - evaluated succesfully, result - value of the exp  *
@@ -2023,7 +2023,7 @@ int	evaluate_expression(int *result,char **expression, DB_TRIGGER *trigger, char
 		*expression);
 
 	/* Substitute macros first */
-	memset(&event,0,sizeof(DB_EVENT));	
+	memset(&event,0,sizeof(DB_EVENT));
 	event.value = trigger->value;
 
 	substitute_simple_macros(&event, NULL, NULL, NULL, expression, MACRO_TYPE_TRIGGER_EXPRESSION);

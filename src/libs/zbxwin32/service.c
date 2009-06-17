@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -84,8 +84,8 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 
 			serviceStatus.dwCurrentState	= SERVICE_STOPPED;
 			serviceStatus.dwWaitHint	= 0;
-			serviceStatus.dwCheckPoint	= 0; 
-			serviceStatus.dwWin32ExitCode	= 0; 
+			serviceStatus.dwCheckPoint	= 0;
+			serviceStatus.dwWin32ExitCode	= 0;
 			break;
 		default:
 			break;
@@ -131,7 +131,7 @@ void service_start(void)
 	int c = 0;
 	static SERVICE_TABLE_ENTRY serviceTable[] = {
 		{ ZABBIX_SERVICE_NAME, (LPSERVICE_MAIN_FUNCTION)ServiceEntry },
-		{ NULL,NULL } 
+		{ NULL,NULL }
 		};
 
 	/* Create synchronization stuff */
@@ -141,7 +141,7 @@ void service_start(void)
 	{
 		if(ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == GetLastError())
 		{
-			zbx_error("\n\n\t!!!ATTENTION!!! ZABBIX Agent runned as a console application. !!!ATTENTION!!!\n");
+			zbx_error("\n\n\t!!!ATTENTION!!! ZABBIX Agent started as a console application. !!!ATTENTION!!!\n");
 			MAIN_ZABBIX_ENTRY();
 		}
 		else
@@ -208,7 +208,7 @@ int ZabbixCreateService(char *path)
 
 		if (ERROR_SERVICE_EXISTS == code)
 		{
-			zbx_error("ERROR: Service named '%s' already exist", ZABBIX_SERVICE_NAME);
+			zbx_error("ERROR: Service named '%s' already exists", ZABBIX_SERVICE_NAME);
 		}
 		else
 		{
@@ -220,7 +220,7 @@ int ZabbixCreateService(char *path)
 	{
 		zbx_error("Service \"%s\" installed successfully.", ZABBIX_SERVICE_NAME);
 		CloseServiceHandle(service);
-    
+
 		/* Updates the service description */
 		service = OpenService(mgr, ZABBIX_SERVICE_NAME, SERVICE_CHANGE_CONFIG);
 		sd.lpDescription = szDesc;
