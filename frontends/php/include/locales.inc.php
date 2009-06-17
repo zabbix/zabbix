@@ -28,7 +28,7 @@ function init_mbstrings(){
 
 // HTTP input encoding translation is enabled.
 	$res&= (ini_set('mbstring.encoding_translation','On') === FALSE);
-	
+
 // Set default character encoding detection order
 	$res&= (ini_set('mbstring.detect_order','UTF-8, ISO-8859-1, JIS, SJIS') === FALSE);
 
@@ -37,7 +37,7 @@ return $res;
 }
 
 function mbstrings_available(){
-	$mbstrings_fnc_exist = 
+	$mbstrings_fnc_exist =
 		function_exists('mb_strlen') &&
 		function_exists('mb_strtoupper') &&
 		function_exists('mb_strpos') &&
@@ -47,9 +47,9 @@ function mbstrings_available(){
 		function_exists('mb_ereg_replace') &&
 		function_exists('mb_eregi_replace') &&
 		function_exists('mb_split');
-/* This function is supported by PHP5 only 
+/* This function is supported by PHP5 only
 		function_exists('mb_stristr') &&
-		function_exists('mb_strstr') && 
+		function_exists('mb_strstr') &&
 //*/
 return $mbstrings_fnc_exist;
 }

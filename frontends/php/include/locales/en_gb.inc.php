@@ -85,7 +85,7 @@
 
 	'S_DISCOVERED'=>			'Discovered',
 	'S_LOST'=>				'Lost',
-	
+
 //	discovery.php
 	'S_UP_TIME'=>				'Uptime',
 	'S_DOWN_TIME'=>				'Downtime',

@@ -27,7 +27,7 @@
 					$b->addItem($val);
 					$str[$key] = $b;
 				}
-		} 
+		}
 		else if(is_string($str)) {
 			$b = new CTag('strong','yes','');
 			$b->addItem($str);
@@ -38,7 +38,7 @@
 
 	function make_decoration($haystack, $needle, $class=null){
 		$result = $haystack;
-		
+
 		$pos = stripos($haystack,$needle);
 		if($pos !== FALSE){
 			$start = zbx_substring($haystack, 0, $pos);
@@ -62,7 +62,7 @@
 		$res = bold($str[0]);
 		for($i=1,$max=strlen($str); $i<$max; $i++)	$res .= $str[$i];
 		$str = $res;
-		return $str;	
+		return $str;
 	}
 
 	function nbsp($str){
@@ -97,32 +97,32 @@
 			if(!isset($name)){
 				if(!$request)
 					fatal_error('not request variable require url name [url_param]');
-					
+
 				$name = $parameter;
 			}
 		}
-		
+
 		if($request){
 			$var =& $_REQUEST[$parameter];
 		}
 		else{
 			$var =& $parameter;
 		}
-		
+
 		if(isset($var)){
 			$result = prepare_url($var,$name);
 		}
 
 	return $result;
 	}
-	
+
 	function BR(){
 		return new CTag('br','no');
 	}
-	
+
 	function create_hat($caption,$items,$addicons=null,$id=null,$state=null){
 		if(is_null($id)){
-			list($usec, $sec) = explode(' ',microtime());	
+			list($usec, $sec) = explode(' ',microtime());
 			$id = 'hat_'.((int)($sec % 10)).((int)($usec * 1000));
 		}
 
@@ -148,9 +148,9 @@
 
 		$icon_tab = new CTable();
 		$icon_tab->addOption('width','100%');
-		
+
 		$icon_tab->addRow($icons_row);
-		
+
 		$table = new CTable();
 		$table->addOption('width','100%');
 		$table->setCellPadding(0);
@@ -160,19 +160,19 @@
 		$div = new CDiv($items);
 		$div->addOption('id',$id);
 		if(!$state) $div->addOption('style','display: none;');
-		
+
 		$table->addRow($div);
 	return $table;
 	}
-		
-	
-/* Function: 
+
+
+/* Function:
  *	hide_form_items()
  *
  * Desc:
  *	Searches items/objects for Form tags like "<input"/Form classes like CForm, and makes it empty
- * 
- * Author: 
+ *
+ * Author:
  *	Aly
  */
 	function hide_form_items(&$obj){
@@ -197,14 +197,14 @@
 			}
 		}
 	}
-	
+
 	function get_thin_table_header($col1, $col2=NULL){
-		
+
 		$table = new CTable(NULL,'thin_header');
 //		$table->addOption('border',1);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
-		
+
 		if(!is_null($col2)){
 			$td_r = new CCol($col2,'thin_header_r');
 			$td_r->addOption('align','right');
@@ -216,7 +216,7 @@
 
 			$table->addRow($td_c);
 		}
-		
+
 	return $table;
 	}
 
@@ -232,15 +232,15 @@
 		//if empty header than do not show it
 			if(($col1 == SPACE) && ($col2 == SPACE)) return new CScript('');
 		}
-		
+
 		$table = new CTable(NULL,'header');
 //		$table->addOption('border',0);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
-		
+
 		$td_r = new CCol($col2,'header_r');
 		$td_r->addOption('align','right');
-		
+
 		$table->addRow(array(new CCol($col1,'header_l'), $td_r));
 	return $table;
 	}

@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -20,16 +20,16 @@
 ?>
 <?php
 	define('ZABBIX_VERSION','1.7');
-/* USER DEFINES */	
+/* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
 	define('ZBX_LOGIN_BLOCK',			30); // sec
-	
+
 	define('TRIGGERS_OPTION_DISABLED',		0);	// reserved
 	define('TRIGGERS_OPTION_ONLYTRUE',		1);	// use 0 to disable
 	define('TRIGGERS_OPTION_ALL',			2);	// use 0 to disable
 	define('TRIGGERS_OPTION_NOFALSEFORB',		0);	// use 0 to disable
-	
+
 	define('TRIGGER_FALSE_PERIOD', 			300);	// 30min,  0 - disable
 	define('TRIGGER_BLINK_PERIOD',			120);	// 30min,  0 - disable
 
@@ -43,7 +43,7 @@
 	define('ZBX_MIN_PERIOD', 3600);				// ~1 hour
 	define('ZBX_MAX_PERIOD', 12*31*24*3600);		// ~1 year
 	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
-	
+
 	putenv('GDFONTPATH='.realpath('fonts/'));		// where to search for font  (GD > 2.0.18)
 	define('ZBX_GRAPH_FONT_NAME',	'kochi-gothic-subst');	// font file name
 /* END OF USERS DEFINES */
@@ -51,17 +51,17 @@
 	define('ZBX_AUTH_INTERNAL',	0);
 	define('ZBX_AUTH_LDAP',		1);
 	define('ZBX_AUTH_HTTP',		2);
-	
+
 	define('PAGE_TYPE_HTML',		0);
 	define('PAGE_TYPE_IMAGE',		1);
 	define('PAGE_TYPE_XML',			2);
 	define('PAGE_TYPE_JS',			3);	// javascript
 	define('PAGE_TYPE_HTML_BLOCK',		4);	// simple block of html (as text)
 	define('PAGE_TYPE_JSON_RPC',		5);	// api call
-	
+
 	define('ZBX_SESSION_ACTIVE', 0);
 	define('ZBX_SESSION_PASSIVE', 1);
-	
+
 	define('ZBX_DROPDOWN_FIRST_NONE',		0);
 	define('ZBX_DROPDOWN_FIRST_ALL',		1);
 	define('ZBX_DROPDOWN_FIRST_ZBX162',		2);
@@ -92,12 +92,12 @@
 	define('IMAGE_FORMAT_PNG',		'PNG');
 	define('IMAGE_FORMAT_JPEG',		'JPEG');
 	define('IMAGE_FORMAT_TEXT',		'JPEG');
-	
+
 	define('IMAGE_TYPE_UNKNOWN',		0);
 	define('IMAGE_TYPE_ICON',		1);
 	define('IMAGE_TYPE_BACKGROUND',		2);
-	
-	
+
+
 	define('ZBX_SORT_UP',			'ASC');
 	define('ZBX_SORT_DOWN',			'DESC');
 //	END OF MISC PARAMETERS
@@ -182,10 +182,10 @@
 	define('HOST_AVAILABLE_UNKNOWN',	0);
 	define('HOST_AVAILABLE_TRUE',		1);
 	define('HOST_AVAILABLE_FALSE',		2);
-	
+
 	define('MAINTENANCE_TYPE_NORMAL', 	0);
 	define('MAINTENANCE_TYPE_NODATA', 	1);
-	
+
 	define('TIMEPERIOD_TYPE_ONETIME',	0);
 	define('TIMEPERIOD_TYPE_HOURLY',	1);
 	define('TIMEPERIOD_TYPE_DAILY',		2);
@@ -260,14 +260,14 @@
 	define('SERVICE_ALGORITHM_NONE',0);
 	define('SERVICE_ALGORITHM_MAX',1);
 	define('SERVICE_ALGORITHM_MIN',2);
-	
+
 	define('TRIGGER_MULT_EVENT_DISABLED',0);
 	define('TRIGGER_MULT_EVENT_ENABLED',1);
-	
+
 	define('TRIGGER_STATUS_ENABLED',0);
 	define('TRIGGER_STATUS_DISABLED',1);
 	define('TRIGGER_STATUS_UNKNOWN',2);
-	
+
 	define('TRIGGER_VALUE_FALSE',0);
 	define('TRIGGER_VALUE_TRUE',1);
 	define('TRIGGER_VALUE_UNKNOWN',2);
@@ -278,9 +278,9 @@
 	define('TRIGGER_SEVERITY_AVERAGE',		3);
 	define('TRIGGER_SEVERITY_HIGH',			4);
 	define('TRIGGER_SEVERITY_DISASTER',		5);
-	
+
 	define('ALERT_MAX_RETRIES',3);
-	
+
 	define('ALERT_STATUS_NOT_SENT',0);
 	define('ALERT_STATUS_SENT',1);
 	define('ALERT_STATUS_FAILED',2);
@@ -294,7 +294,7 @@
 	define('MEDIA_TYPE_JABBER',3);
 
 	define('ACTION_DEFAULT_MSG', '{TRIGGER.NAME}: {STATUS}');
-	
+
 	define('ACTION_STATUS_ENABLED',0);
 	define('ACTION_STATUS_DISABLED',1);
 
@@ -384,14 +384,14 @@
 	define('PROFILE_TYPE_ARRAY_ID',		4);
 	define('PROFILE_TYPE_ARRAY_INT',	5);
 	define('PROFILE_TYPE_ARRAY_STR',	6);
-	
+
 	define('CALC_FNC_MIN', 1);
 	define('CALC_FNC_AVG', 2);
 	define('CALC_FNC_MAX', 4);
 	define('CALC_FNC_ALL', 7);
 	define('CALC_FNC_LST', 9);
 
-	
+
 	define('SERVICE_TIME_TYPE_UPTIME', 0);
 	define('SERVICE_TIME_TYPE_DOWNTIME', 1);
 	define('SERVICE_TIME_TYPE_ONETIME_DOWNTIME', 2);
@@ -402,24 +402,24 @@
 
 	define('GROUP_STATUS_DISABLED', 1);
 	define('GROUP_STATUS_ENABLED', 0);
-	
+
 // IMPORTANT!!!    by priority	DESC
 	define('GROUP_GUI_ACCESS_SYSTEM',	0);
 	define('GROUP_GUI_ACCESS_INTERNAL',	1);
 	define('GROUP_GUI_ACCESS_DISABLED',	2);
-	
+
 	define('GROUP_API_ACCESS_DISABLED', 0);
 	define('GROUP_API_ACCESS_ENABLED', 1);
-	
+
 	define('PERM_MAX',		3);
 	define('PERM_READ_WRITE',	3);
 	define('PERM_READ_ONLY',	2);
 	define('PERM_READ_LIST',	1);
 	define('PERM_DENY',		0);
-	
+
 	define('PERM_RES_STRING_LINE',	0); /* return string of nodes id - '1,2,3,4,5' */
 	define('PERM_RES_IDS_ARRAY',	1); /* return array of nodes id - array(1,2,3,4) */
-	define('PERM_RES_DATA_ARRAY',	2); 
+	define('PERM_RES_DATA_ARRAY',	2);
 
 	define('RESOURCE_TYPE_NODE',	0);
 	define('RESOURCE_TYPE_GROUP',	1);
@@ -452,25 +452,25 @@
 	define('EVENTS_NOFALSEFORB_STATUS_ALL',		0);	// used with TRIGGERS_OPTION_NOFALSEFORB
 	define('EVENTS_NOFALSEFORB_STATUS_FALSE',	1);	// used with TRIGGERS_OPTION_NOFALSEFORB
 	define('EVENTS_NOFALSEFORB_STATUS_TRUE',	2);	// used with TRIGGERS_OPTION_NOFALSEFORB
-	
+
 	define('EVENT_SOURCE_TRIGGERS',		0);
 	define('EVENT_SOURCE_DISCOVERY',	1);
 
 	define('EVENT_OBJECT_TRIGGER',		0);
 	define('EVENT_OBJECT_DHOST',		1);
 	define('EVENT_OBJECT_DSERVICE',		2);
-	
+
 	define('GRAPH_YAXIS_TYPE_CALCULATED',	0);
 	define('GRAPH_YAXIS_TYPE_FIXED',	1);
 	define('GRAPH_YAXIS_TYPE_ITEM_VALUE',	2);
-	
+
 	define('GRAPH_YAXIS_SIDE_LEFT',		0);
 	define('GRAPH_YAXIS_SIDE_RIGHT',	1);
-	
+
 	define('GRAPH_ITEM_SIMPLE',		0);
 	define('GRAPH_ITEM_AGGREGATED',		1);
 	define('GRAPH_ITEM_SUM',		2);
-	
+
 	define('GRAPH_TYPE_NORMAL',		0);
 	define('GRAPH_TYPE_STACKED',		1);
 	define('GRAPH_TYPE_PIE',		2);
@@ -481,19 +481,19 @@
 	define('GRAPH_TYPE_COLUMN',		7);
 	define('GRAPH_TYPE_BAR_STACKED',	8);
 	define('GRAPH_TYPE_COLUMN_STACKED',	9);
-	
+
 	define('GRAPH_3D_ANGLE', 70);
-	
+
 	define('GRAPH_STACKED_ALFA',	15);	// 0..100 transperancy
-	
+
 	define('GRAPH_ZERO_LINE_COLOR_LEFT', 'AAAAAA');
 	define('GRAPH_ZERO_LINE_COLOR_RIGHT', '888888');
-	
+
 	define('ZBX_MAX_TREND_DIFF', 3600);
-	
+
 	define('ZBX_GRAPH_MAX_SKIP_CELL', 16);
 	define('ZBX_GRAPH_MAX_SKIP_DELAY', 4);
-	
+
 	define('DOBJECT_STATUS_UP',		0);
 	define('DOBJECT_STATUS_DOWN',		1);
 	define('DOBJECT_STATUS_DISCOVER',	2); /* only for events,           */
@@ -522,15 +522,15 @@
 
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);
-	
+
 	define('EXPRESSION_TYPE_INCLUDED',	0);
 	define('EXPRESSION_TYPE_ANY_INCLUDED',	1);
 	define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
 	define('EXPRESSION_TYPE_TRUE',		3);
 	define('EXPRESSION_TYPE_FALSE',		4);
-	
+
 	define('AVAILABLE_NOCACHE',	0);	// take available objects not from cache
-	
+
 	define('SBR',	"<br/>\n");
 	define('SPACE',	'&nbsp;');
 	define('RARR',	'&rArr;');
@@ -555,7 +555,7 @@ else{
 	/* Character '-' must be last in the list of symbols, otherwise it won't be accepted */
 	define('ZBX_EREG_DNS_FORMAT', '([0-9a-zA-Z\_\.\$[.'.ZBX_EREG_MINUS_SYMB.'.]]+)');
 	define('ZBX_EREG_HOST_FORMAT', ZBX_EREG_INTERNAL_NAMES);
-	
+
 	define('ZBX_EREG_NODE_FORMAT', ZBX_EREG_INTERNAL_NAMES);
 	define('ZBX_EREG_ITEM_KEY_FORMAT', '('.ZBX_EREG_KEY_NAME.'(\['.ZBX_EREG_PARAMS.'\]){0,1})');
 	define('ZBX_KEY_ID', 1);
@@ -581,18 +581,18 @@ else{
 	define('ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID', 2);
 	define('ZBX_EXPRESSION_MACRO_ID', 13);
 	define('ZBX_EXPRESSION_RIGHT_ID', 14);
-	
+
 	define('ZBX_HISTORY_COUNT',5);
-	
+
 	define('ZBX_USER_ONLINE_TIME',600);		// 10min
 	define('ZBX_GUEST_USER','guest');
 	define('ZBX_DEFAULT_CSS','default.css');
-	
+
 	define('ZBX_FAVORITES_ALL', -1);
 
-// Allow for testing 
+// Allow for testing
 	define('ZBX_ALLOW_UNICODE',1);
-	
+
 // IPMI
 	define('IPMI_AUTHTYPE_DEFAULT', -1);
 	define('IPMI_AUTHTYPE_NONE', 0);
@@ -612,7 +612,7 @@ else{
 /*	define('ZBX_LOG_ENCODING_DEFAULT', 'Shift_JIS');*/
 
 	define('ZBX_HAVE_IPV6', 1);
-	
+
 	define('XML_TAG_ZABBIX_EXPORT',		'zabbix_export');
 	define('XML_TAG_HOSTS',			'hosts');
 	define('XML_TAG_HOST',			'host');
@@ -639,7 +639,7 @@ else{
 	define('XML_TAG_DEPENDENCIES',		'dependencies');
 	define('XML_TAG_DEPENDENCY',		'dependency');
 	define('XML_TAG_DEPENDS',		'depends');
-	
+
 // API errors //
 	define('ZBX_API_ERROR_NO_HOST', 1);
 	define('ZBX_API_ERROR_INTERNAL', 111);
@@ -647,7 +647,7 @@ else{
 	define('ZBX_API_ERROR_NO_AUTH', 200);
 	define('ZBX_API_ERROR_NO_METHOD', 300);
 	//define('ZBX_API_ERROR_PARAMETERS', 100);
-	
+
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if(!function_exists('version_compare')){
 		$_GET		= $HTTP_GET_VARS;
