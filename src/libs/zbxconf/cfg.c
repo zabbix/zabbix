@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -107,7 +107,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 	register int
 		i, lineno;
 
-	char	
+	char
 		line[MAX_STRING_LEN],
 		*parameter,
 		*value;
@@ -236,7 +236,7 @@ lbl_missing_mandatory:
 	exit(1);
 
 lbl_incorrect_config:
-	zbx_error("Wrong value of [%s] in line %d.", cfg[i].parameter, lineno);
+	zbx_error("Wrong value for [%s] in line %d.", cfg[i].parameter, lineno);
 	exit(1);
 }
 
