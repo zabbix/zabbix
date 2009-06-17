@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -202,10 +202,10 @@ static int disconnect_jabber()
 	const char	*__function_name = "disconnect_jabber";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s()", __module_name, __function_name);
-	
+
 	if (JABBER_DISCONNECTED != jsess->status)
 		iks_disconnect(jsess->prs);
-	
+
 	if (jsess->my_filter)
 	{
 		iks_filter_delete (jsess->my_filter);
@@ -340,7 +340,7 @@ static void on_log (jabber_session_p sess, const char *data, size_t size, int is
  *                                                                            *
  * Parameters: ... ... ...                                                    *
  *                                                                            *
- * Return value:  SUCCEED on successfull connection                           *
+ * Return value:  SUCCEED on successful connection                            *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -353,7 +353,7 @@ static int connect_jabber(const char *jabber_id, const char *password, int use_s
 	const char	*__function_name = "connect_jabber";
 	char		*buf = NULL;
 	int		iks_error, timeout, ret = FAIL;
-		
+
 	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s('%s')",
 			__module_name, __function_name, jabber_id);
 
@@ -468,7 +468,7 @@ lbl_fail:
  *                                                                            *
  * Parameters: ... ... ...                                                    *
  *                                                                            *
- * Return value:  SUCCEED if message sended                                   *
+ * Return value:  SUCCEED if message sent                                     *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -539,4 +539,3 @@ lbl_fail:
 
 	return ret;
 }
-

@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -73,7 +73,7 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
 
 	unsigned thrdaddr;
 
-	if(0 == (thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL,0,handler,args,0,&thrdaddr))) /* NOTE: _beginthreadex returns 0 on failure, rather than –1 */
+	if(0 == (thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL,0,handler,args,0,&thrdaddr))) /* NOTE: _beginthreadex returns 0 on failure, rather than 1 */
 	{
 		zbx_error("Error on thread creation. [%s]", strerror_from_system(GetLastError()));
 		thread = (ZBX_THREAD_HANDLE)(ZBX_THREAD_ERROR);
@@ -91,7 +91,7 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
 		/* And in normal case the program will never reach this point. */
 		zbx_tread_exit(0);
 		/* Program will never reach this point. */
-	} 
+	}
 	else if(thread < 0)
 	{
 		zbx_error("Error on thread creation.");
@@ -107,7 +107,7 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
  *                                                                            *
  * Function: zbx_thread_wait                                                  *
  *                                                                            *
- * Purpose: Waits until the "thread" is in the signaled state                 *
+ * Purpose: Waits until the "thread" is in the signalled state                *
  *                                                                            *
  * Parameters: "thread" handle                                                *
  *                                                                            *
@@ -123,7 +123,7 @@ int zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 {
 	int status = 0; /* significant 8 bits of the status */
 
-#if defined(_WINDOWS)	
+#if defined(_WINDOWS)
 
 	if(WaitForSingleObject(thread, INFINITE) != WAIT_OBJECT_0)
 	{
@@ -133,7 +133,7 @@ int zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 	if( 0 == GetExitCodeThread(thread, &status) )
 	{
-		zbx_error("Error on thread exit code receaving. [%s]", strerror_from_system(GetLastError()));
+		zbx_error("Error on thread exit code receiving. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_THREAD_ERROR;
 	}
 
@@ -160,7 +160,7 @@ int zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 long int zbx_get_thread_id(void)
 {
-#if defined(_WINDOWS)	
+#if defined(_WINDOWS)
 
 	return (long int) GetCurrentThreadId();
 
@@ -170,4 +170,3 @@ long int zbx_get_thread_id(void)
 
 #endif /* _WINDOWS */
 }
-

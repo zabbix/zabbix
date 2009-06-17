@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -87,7 +87,7 @@ static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char
 			(*sbuf)[i++] = '\0';
 
 		ret = (NULL == strstr(*sbuf, expect)) ? FAIL : SUCCEED;
-	
+
 		*sbuf += i;
 
 		if (*sbuf != buffer)
@@ -140,7 +140,7 @@ int read_gsm(int fd, const char *expect, char *error, int max_error_len, int tim
 		if ( i == -1 )
 		{
 			if ( EINTR == errno )	continue;
-		
+
 			zabbix_log(LOG_LEVEL_DEBUG, "Error select() for GSM modem. [%s]", strerror(errno));
 			if (error)
 				zbx_snprintf(error,max_error_len, "Error select() for GSM modem. [%s]", strerror(errno));
@@ -221,7 +221,7 @@ int	send_sms(char *device,char *number,char *message, char *error, int max_error
 		ret = SUCCEED;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In %s()", __function_name);
-	
+
 	if ( -1 == (f = open(device, O_RDWR | O_NOCTTY | O_NDELAY)) )
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Error open(%s) [%s]",
@@ -245,7 +245,7 @@ int	send_sms(char *device,char *number,char *message, char *error, int max_error
 #ifdef ONOCR
 	options.c_oflag     = ONOCR;
 #endif /* ONOCR */
-	
+
 	options.c_cflag     = old_options.c_cflag | CRTSCTS | CS8 | CLOCAL | CREAD;
 	options.c_lflag     &= ~(ICANON | ECHO | ECHOE | ISIG);
 	options.c_cc[VMIN]  = 0;
