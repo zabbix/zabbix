@@ -26,7 +26,7 @@
 		$str_type[MEDIA_TYPE_EXEC]	= S_SCRIPT;
 		$str_type[MEDIA_TYPE_SMS]	= S_SMS;
 		$str_type[MEDIA_TYPE_JABBER]	= S_JABBER;
-		
+
 		if(isset($str_type[$type]))
 			return $str_type[$type];
 
@@ -34,7 +34,7 @@
 	}
 
 	function media_severity2str($severity){
-	
+
 		insert_showhint_javascript();
 		$mapping = array(
 			0 => array('letter' => 'N', 'style' => (($severity & 1)  ? 'enabled' : NULL)),
@@ -54,8 +54,8 @@
 	}
 
 	function get_media_by_mediaid($mediaid){
-	
-		$sql="select * from media where mediaid=$mediaid"; 
+
+		$sql="select * from media where mediaid=$mediaid";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 		if($row)
@@ -99,7 +99,7 @@
 		delete_media_by_mediatypeid($mediatypeid);
 		delete_alerts_by_mediatypeid($mediatypeid);
 		$mediatype = get_mediatype_by_mediatypeid($mediatypeid);
-		
+
 		$sql='DELETE FROM media_type WHERE mediatypeid='.$mediatypeid;
 
 		if($ret = DBexecute($sql)){
@@ -123,7 +123,7 @@
 		}
 		else{
 			$mediatype_old = get_mediatype_by_mediatypeid($mediatypeid);
-			
+
 			$sql='UPDATE media_type SET '.
 					'type='.$type.','.
 					'description='.zbx_dbstr($description).','.
@@ -138,12 +138,12 @@
 			$ret = DBexecute($sql);
 			if($ret){
 				$mediatype_new = get_mediatype_by_mediatypeid($mediatypeid);
-				add_audit_ext(AUDIT_ACTION_UPDATE, 
-								AUDIT_RESOURCE_MEDIA_TYPE, 
-								$mediatypeid, 
-								$mediatype_old['description'], 
-								'media_type', 
-								$mediatype_old, 
+				add_audit_ext(AUDIT_ACTION_UPDATE,
+								AUDIT_RESOURCE_MEDIA_TYPE,
+								$mediatypeid,
+								$mediatype_old['description'],
+								'media_type',
+								$mediatype_old,
 								$mediatype_new);
 			}
 		}
@@ -179,7 +179,7 @@
 		}
 		return $ret;
 	}
-	
+
 	# Add Media definition
 
 	function	add_media( $userid, $mediatypeid, $sendto, $severity, $active, $period)

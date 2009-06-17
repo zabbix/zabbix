@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-// TODO !!! Correcr the help links !!! TODO
+// TODO !!! Correct the help links !!! TODO
 
 	require_once('include/users.inc.php');
 
@@ -780,7 +780,7 @@
 			$theme 		= get_request('theme','default.css');
 			$refresh	= get_request('refresh',30);
 			$rows_per_page = get_request('rows_per_page',50);
-			
+
 			$user_type	= get_request('user_type',USER_TYPE_ZABBIX_USER);;
 			$user_groups	= get_request('user_groups',array());
 			$change_password = get_request('change_password', null);
@@ -788,15 +788,15 @@
 			$new_group_id	= get_request('new_group_id', 0);
 			$new_group_name = get_request('new_group_name', '');
 		}
-		
+
 		if($autologin){
 			$autologout = 0;
 //			zbx_add_post_js("document.getElementById('autologout_visible').disabled = true;");
-		} 
+		}
 		else if(isset($_REQUEST['autologout']) && ($autologout < 90)){
 			$autologout = 90;
 		}
-	
+
 		$perm_details	= get_request('perm_details',0);
 
 		$media_types = array();
@@ -851,7 +851,7 @@
 		}
 
 		if($profile==0){
-		
+
 			$frmUser->addVar('user_groups',$user_groups);
 
 			if(isset($userid) && (bccomp($USER_DETAILS['userid'], $userid)==0)){
@@ -881,9 +881,9 @@
 						'&list_name=user_groups_to_del[]&var_name=user_groups",450, 450);'),
 					SPACE,
 					(count($user_groups) > 0)?new CButton('del_user_group',S_DELETE_SELECTED):null
-				));	
+				));
 		}
-		
+
 
 
 		$cmbLang = new CComboBox('lang',$lang);
@@ -900,8 +900,8 @@
 
 		$frmUser->addRow(S_THEME, $cmbTheme);
 
-		$chkbx_autologin = new CCheckBox("autologin", 
-											$autologin, 
+		$chkbx_autologin = new CCheckBox("autologin",
+											$autologin,
 											new CScript("var autologout_visible = document.getElementById('autologout_visible');
 														var autologout = document.getElementById('autologout');
 														if (this.checked) {
@@ -915,15 +915,15 @@
 														}"), 1);
 		$chkbx_autologin->AddOption('autocomplete','off');
 		$frmUser->AddRow(S_AUTO_LOGIN,	$chkbx_autologin);
-		$autologoutCheckBox = new CCheckBox('autologout_visible', 
-											($autologout == 0) ? 'no' : 'yes', 
+		$autologoutCheckBox = new CCheckBox('autologout_visible',
+											($autologout == 0) ? 'no' : 'yes',
 											new CScript("var autologout = document.getElementById('autologout');
 														if (this.checked) {
 															autologout.disabled = false;
 														} else {
 															autologout.disabled = true;
 														}"));
-		
+
 		$autologoutTextBox = new CNumericBox("autologout", ($autologout == 0) ? '90' : $autologout, 4);
 		// if autologout is disabled
 		if ($autologout == 0) {
@@ -935,7 +935,7 @@
 
 		$frmUser->AddRow(S_AUTO_LOGOUT, array($autologoutCheckBox, $autologoutTextBox));
 		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox('refresh',$refresh,4));
-		
+
 		$frmUser->AddRow(S_ROWS_PER_PAGE,	new CNumericBox('rows_per_page',$rows_per_page,3));
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 
@@ -952,7 +952,7 @@
 					$status = new CLink(S_DISABLED,'#','disabled');
 					$status->OnClick("return create_var('".$frmUser->GetName()."','enable_media',".$id.", true);");
 				}
-				
+
 				$media_url = '?dstfrm='.$frmUser->GetName().
 								'&media='.$id.
 								'&mediatypeid='.$one_media['mediatypeid'].
@@ -960,7 +960,7 @@
 								'&period='.$one_media['period'].
 								'&severity='.$one_media['severity'].
 								'&active='.$one_media['active'];
-								
+
 				$media_table->addRow(array(
 					new CCheckBox('user_medias_to_del['.$id.']',null,null,$id),
 					new CSpan($media_types[$one_media['mediatypeid']], 'nowrap'),
@@ -971,7 +971,7 @@
 					new CButton('edit_media',S_EDIT,'javascript: return PopUp("popup_media.php'.$media_url.'",550,400);'))
 				);
 			}
-			
+
 			$frmUser->addRow(
 						S_MEDIA,
 						array($media_table,
@@ -980,7 +980,7 @@
 							(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
 						));
 		}
-		
+
 		if(0 == $profile){
 			$frmUser->addVar('perm_details', $perm_details);
 
@@ -1019,7 +1019,7 @@
 				$frmUser->addSpanRow(get_rights_of_elements_table($user_rights, $user_type));
 			}
 		}
-		
+
 		$frmUser->addItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($userid) && $profile == 0){
 			$frmUser->addItemToBottomRow(SPACE);
@@ -1027,7 +1027,7 @@
 			if(bccomp($USER_DETAILS['userid'],$userid) == 0){
 				$delete_b->addOption('disabled','disabled');
 			}
-			
+
 			$frmUser->addItemToBottomRow($delete_b);
 		}
 		$frmUser->addItemToBottomRow(SPACE);
@@ -1059,7 +1059,7 @@
 						' FROM users u,users_groups ug '.
 						' WHERE u.userid=ug.userid '.
 							' AND ug.usrgrpid='.$_REQUEST['usrgrpid'];
-							
+
 			$db_users=DBselect($sql);
 
 			while($db_user=DBfetch($db_users))
@@ -1086,8 +1086,8 @@
 		else{
 			$name			= get_request('gname','');
 			$users_status 	= get_request('users_status',GROUP_STATUS_ENABLED);
-			$gui_access 	= get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);	
-			$api_access 	= get_request('api_access',GROUP_API_ACCESS_DISABLED);			
+			$gui_access 	= get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);
+			$api_access 	= get_request('api_access',GROUP_API_ACCESS_DISABLED);
 			$group_users	= get_request("group_users",array());
 			$group_rights	= get_request("group_rights",array());
 		}
@@ -1116,17 +1116,17 @@
 	$selusrgrp = get_request('selusrgrp', 0);
 	$cmbGroups = new CComboBox('selusrgrp', $selusrgrp, 'submit()');
 	$cmbGroups->addItem(0,S_ALL_S);
-	
+
 	$sql = 'SELECT usrgrpid, name FROM usrgrp WHERE '.DBin_node('usrgrpid').' ORDER BY name';
 	$result=DBselect($sql);
 	while($row=DBfetch($result)){
 		$cmbGroups->addItem($row['usrgrpid'], $row['name']);
 	}
-// - 
-	
+// -
+
 // create user twinbox +
 	$user_tb = new CTweenBox($frmUserG, 'group_users', $group_users, 10);
-	
+
 	$sql_from = '';
 	$sql_where = '';
 	if($selusrgrp > 0) {
@@ -1143,10 +1143,10 @@
 	while($row=DBfetch($result)){
 		$user_tb->addItem($row['userid'], $row['alias']);
 	}
-	
+
 	$frmUserG->addRow(S_USERS, $user_tb->get(S_IN.SPACE.S_GROUP,array(S_OTHER.SPACE.S_GROUPS.SPACE.'|'.SPACE, $cmbGroups)));
 // -
-	
+
 /////////////////
 /*
 		$lstUsers = new CListBox('group_users_to_del[]');
@@ -1179,7 +1179,7 @@
 			$cmbGUI->addItem(GROUP_GUI_ACCESS_INTERNAL,user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL));
 			$cmbGUI->addItem(GROUP_GUI_ACCESS_DISABLED,user_auth_type2str(GROUP_GUI_ACCESS_DISABLED));
 			$frmUserG->addRow(S_GUI_ACCESS, $cmbGUI);
-			
+
 			$cmbStat = new CComboBox('users_status',$users_status);
 			$cmbStat->addItem(GROUP_STATUS_ENABLED,S_ENABLED);
 			$cmbStat->addItem(GROUP_STATUS_DISABLED,S_DISABLED);
@@ -1190,7 +1190,7 @@
 		else{
 			$frmUserG->addVar('gui_access',$gui_access);
 			$frmUserG->addRow(S_GUI_ACCESS, new CSpan(user_auth_type2str($gui_access),'green'));
-			
+
 			$frmUserG->addVar('users_status',GROUP_STATUS_ENABLED);
 			$frmUserG->addRow(S_USERS_STATUS, new CSpan(S_ENABLED,'green'));
 		}
@@ -2347,14 +2347,14 @@
 
 // Insert form for Trigger
 	function insert_trigger_form(){
-	
+
 		global $USER_DETAILS;
 
 		$frmTrig = new CFormTable(S_TRIGGER,'triggers.php');
 		$frmTrig->SetHelp('config_triggers.php');
 
 		if(isset($_REQUEST['hostid'])){
-			$frmTrig->addVar('hostid',$_REQUEST['hostid']);		
+			$frmTrig->addVar('hostid',$_REQUEST['hostid']);
 		}
 
 		$dep_el=array();
@@ -3870,7 +3870,7 @@
 				break;
 			case CONDITION_TYPE_TRIGGER:
 				$tblCond->addItem(new CVar('new_condition[value]','0'));
-				
+
 				$rowCondition[] = array(
 					new CTextBox('trigger','',20,'yes'),
 					new CButton('btn1',S_SELECT,
@@ -4092,7 +4092,7 @@
 			));
 
 		$allowed_operations = get_operations_by_eventsource($eventsource);
-		
+
 		$delay = count_operations_delay($operations,$esc_period);
 		foreach($operations as $id => $val){
 			if( !str_in_array($val['operationtype'], $allowed_operations) )	continue;
@@ -4344,7 +4344,7 @@
 								media_severity2str($db_media['severity'])
 								));
 					}
-			
+
 					$tblNewOperation->addRow(array(S_USER_MEDIAS, $media_table));
 				}
 
@@ -5399,9 +5399,9 @@
 		global $USER_DETAILS;
 
 		$groups= get_request('groups',array());
-		
+
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-		
+
 		$newgroup	= get_request('newgroup','');
 
 		$host 		= get_request('host',	'');
@@ -5943,34 +5943,34 @@
 // Insert form for Host Groups
 	function insert_hostgroups_form(){
 		global $USER_DETAILS;
-		
+
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 
 		$hosts = get_request('hosts', array());
 		$hosts = array_intersect($available_hosts, $hosts);
-		
+
 		$frm_title = S_HOST_GROUP;
 
 		if($_REQUEST['groupid']>0){
 			$group = get_hostgroup_by_groupid($_REQUEST['groupid']);
 			$name = $group['name'];
-			$frm_title .= ' ['.$group['name'].']';	
+			$frm_title .= ' ['.$group['name'].']';
 		}
 
 		if(!isset($_REQUEST['form_refresh']) && ($_REQUEST['groupid']>0)){
 			$params = array('groupids' => $_REQUEST['groupid']);
 			$db_hosts = CHost::get($params);
 			$db_tempaltes = CTemplate::get($params);
-			
+
 			$db_hosts = $db_hosts + $db_tempaltes;
 			order_result($db_hosts, 'host', ZBX_SORT_UP);
-			
+
 			foreach($db_hosts as $hostid => $db_host){
 				$hosts[$db_host['hostid']] = $db_host['hostid'];
 			}
 		}
-		
+
 		$frmHostG = new CFormTable($frm_title,'hosts.php');
 		$frmHostG->setHelp('web.hosts.group.php');
 		$frmHostG->addVar('config',get_request('config',1));
@@ -5983,35 +5983,35 @@
 
 		$selected_grp = get_request('twb_groupid', 0);
 		$selected_grp = isset($available_groups[$selected_grp]) ? $selected_grp :  reset($available_groups);
-		
+
 		$cmbGroups = new CComboBox('twb_groupid', $selected_grp, 'submit()');
-		
-		$params = array('not_proxy_host'=>1, 
+
+		$params = array('not_proxy_host'=>1,
 						'order'=>'name');
 		$db_groups = CHostGroup::get($params);
 		foreach($db_groups as $groupid => $row){
 			$cmbGroups->addItem($row['groupid'],$row['name']);
 		}
-		
+
 		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts, 25);
-		
+
 		$params = array('groupids'=>$selected_grp,
-						'templated_hosts'=>1, 
+						'templated_hosts'=>1,
 						'order'=>'host');
 		$db_hosts = CHost::get($params);
 		foreach($db_hosts as $hostid => $db_host){
 			if(!isset($hosts[$hostid]))
 			$cmbHosts->addItem($db_host['hostid'],get_node_name_by_elid($db_host['hostid']).$db_host['host']);
 		}
-		
+
 		$params = array('hostids'=>$hosts,
-						'templated_hosts'=>1, 
+						'templated_hosts'=>1,
 						'order'=>'host');
 		$db_hosts = CHost::get($params);
 		foreach($db_hosts as $hostid => $db_host){
 			$cmbHosts->addItem($db_host['hostid'],get_node_name_by_elid($db_host['hostid']).$db_host['host']);
 		}
-		
+
 		$frmHostG->addRow(S_HOSTS,$cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
 
 		$frmHostG->addItemToBottomRow(new CButton('save',S_SAVE));
@@ -6019,11 +6019,11 @@
 			$frmHostG->addItemToBottomRow(SPACE);
 			$frmHostG->addItemToBottomRow(new CButton('clone',S_CLONE));
 			$frmHostG->addItemToBottomRow(SPACE);
-			
+
 			$dltButton = new CButtonDelete('Delete selected group?', url_param('form').url_param('config').url_param('groupid'));
 			$dlt_groups = getDeleteableHostGroups($_REQUEST['groupid']);
 			if(empty($dlt_groups)) $dltButton->addOption('disabled','disabled');
-			
+
 			$frmHostG->addItemToBottomRow($dltButton);
 		}
 		$frmHostG->addItemToBottomRow(SPACE);
@@ -6103,17 +6103,17 @@
 
 		$frmHostP = new CFormTable(S_HOST_PROFILE);
 		$frmHostP->SetHelp("web.host_profile.php");
-		
+
 		$table_titles = array(
 				'devicetype' => S_DEVICE_TYPE, 'name' => S_NAME, 'os' => S_OS, 'serialno' => S_SERIALNO,
-				'tag' => S_TAG, 'macaddress' => S_MACADDRESS, 'hardware' => S_HARDWARE, 'software' => S_SOFTWARE, 
+				'tag' => S_TAG, 'macaddress' => S_MACADDRESS, 'hardware' => S_HARDWARE, 'software' => S_SOFTWARE,
 				'contact' => S_CONTACT, 'location' => S_LOCATION, 'notes' => S_NOTES);
-				
+
 		$sql_fields = implode(', ', array_keys($table_titles)); //generate string of fields to get from DB
-		
+
 		$sql = 'SELECT '.$sql_fields.' FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid'];
 		$result = DBselect($sql);
-					
+
 		if($row=DBfetch($result)) {
 			foreach($row as $key => $value) {
 				if(!zbx_empty($value)) {
@@ -6133,28 +6133,28 @@
 
 		$frmHostPA = new CFormTable(S_EXTENDED_HOST_PROFILE);
 		$frmHostPA->SetHelp('web.host_profile_alt.php');
-		
+
 		$table_titles = array(
 				'device_alias' => S_DEVICE_ALIAS, 'device_type' => S_DEVICE_TYPE, 'device_chassis' => S_DEVICE_CHASSIS, 'device_os' => S_DEVICE_OS,
-				'device_os_short' => S_DEVICE_OS_SHORT, 'device_hw_arch' => S_DEVICE_HW_ARCH, 'device_serial' => S_DEVICE_SERIAL, 
-				'device_model' => S_DEVICE_MODEL, 'device_tag' => S_DEVICE_TAG, 'device_vendor' => S_DEVICE_VENDOR, 'device_contract' => S_DEVICE_CONTRACT, 
-				'device_who' => S_DEVICE_WHO, 'device_status' => S_DEVICE_STATUS, 'device_app_01' => S_DEVICE_APP_01, 'device_app_02' => S_DEVICE_APP_02, 
-				'device_app_03' => S_DEVICE_APP_03, 'device_app_04' => S_DEVICE_APP_04, 'device_app_05' => S_DEVICE_APP_05, 'device_url_1' => S_DEVICE_URL_1, 
-				'device_url_2' => S_DEVICE_URL_2, 'device_url_3' => S_DEVICE_URL_3, 'device_networks' => S_DEVICE_NETWORKS, 'device_notes' => S_DEVICE_NOTES, 
-				'device_hardware' => S_DEVICE_HARDWARE, 'device_software' => S_DEVICE_SOFTWARE, 'ip_subnet_mask' => S_IP_SUBNET_MASK, 'ip_router' => S_IP_ROUTER, 
-				'ip_macaddress' => S_IP_MACADDRESS, 'oob_ip' => S_OOB_IP, 'oob_subnet_mask' => S_OOB_SUBNET_MASK, 'oob_router' => S_OOB_ROUTER, 
-				'date_hw_buy' => S_DATE_HW_BUY, 'date_hw_install' => S_DATE_HW_INSTALL, 'date_hw_expiry' => S_DATE_HW_EXPIRY, 'date_hw_decomm' => S_DATE_HW_DECOMM, 
-				'site_street_1' => S_SITE_STREET_1, 'site_street_2' => S_SITE_STREET_2, 'site_street_3' => S_SITE_STREET_3, 'site_city' => S_SITE_CITY, 
-				'site_state' => S_SITE_STATE, 'site_country' => S_SITE_COUNTRY, 'site_zip' => S_SITE_ZIP, 'site_rack' => S_SITE_RACK, 
-				'site_notes' => S_SITE_NOTES, 'poc_1_name' => S_POC_1_NAME, 'poc_1_email' => S_POC_1_EMAIL, 'poc_1_phone_1' => S_POC_1_PHONE_1, 
-				'poc_1_phone_2' => S_POC_1_PHONE_2, 'poc_1_cell' => S_POC_1_CELL, 'poc_1_notes' => S_POC_1_NOTES, 'poc_2_name' => S_POC_2_NAME, 
-				'poc_2_email' => S_POC_2_EMAIL, 'poc_2_phone_1' => S_POC_2_PHONE_1, 'poc_2_phone_2' => S_POC_2_PHONE_2, 'poc_2_cell' => S_POC_2_CELL, 
+				'device_os_short' => S_DEVICE_OS_SHORT, 'device_hw_arch' => S_DEVICE_HW_ARCH, 'device_serial' => S_DEVICE_SERIAL,
+				'device_model' => S_DEVICE_MODEL, 'device_tag' => S_DEVICE_TAG, 'device_vendor' => S_DEVICE_VENDOR, 'device_contract' => S_DEVICE_CONTRACT,
+				'device_who' => S_DEVICE_WHO, 'device_status' => S_DEVICE_STATUS, 'device_app_01' => S_DEVICE_APP_01, 'device_app_02' => S_DEVICE_APP_02,
+				'device_app_03' => S_DEVICE_APP_03, 'device_app_04' => S_DEVICE_APP_04, 'device_app_05' => S_DEVICE_APP_05, 'device_url_1' => S_DEVICE_URL_1,
+				'device_url_2' => S_DEVICE_URL_2, 'device_url_3' => S_DEVICE_URL_3, 'device_networks' => S_DEVICE_NETWORKS, 'device_notes' => S_DEVICE_NOTES,
+				'device_hardware' => S_DEVICE_HARDWARE, 'device_software' => S_DEVICE_SOFTWARE, 'ip_subnet_mask' => S_IP_SUBNET_MASK, 'ip_router' => S_IP_ROUTER,
+				'ip_macaddress' => S_IP_MACADDRESS, 'oob_ip' => S_OOB_IP, 'oob_subnet_mask' => S_OOB_SUBNET_MASK, 'oob_router' => S_OOB_ROUTER,
+				'date_hw_buy' => S_DATE_HW_BUY, 'date_hw_install' => S_DATE_HW_INSTALL, 'date_hw_expiry' => S_DATE_HW_EXPIRY, 'date_hw_decomm' => S_DATE_HW_DECOMM,
+				'site_street_1' => S_SITE_STREET_1, 'site_street_2' => S_SITE_STREET_2, 'site_street_3' => S_SITE_STREET_3, 'site_city' => S_SITE_CITY,
+				'site_state' => S_SITE_STATE, 'site_country' => S_SITE_COUNTRY, 'site_zip' => S_SITE_ZIP, 'site_rack' => S_SITE_RACK,
+				'site_notes' => S_SITE_NOTES, 'poc_1_name' => S_POC_1_NAME, 'poc_1_email' => S_POC_1_EMAIL, 'poc_1_phone_1' => S_POC_1_PHONE_1,
+				'poc_1_phone_2' => S_POC_1_PHONE_2, 'poc_1_cell' => S_POC_1_CELL, 'poc_1_notes' => S_POC_1_NOTES, 'poc_2_name' => S_POC_2_NAME,
+				'poc_2_email' => S_POC_2_EMAIL, 'poc_2_phone_1' => S_POC_2_PHONE_1, 'poc_2_phone_2' => S_POC_2_PHONE_2, 'poc_2_cell' => S_POC_2_CELL,
 				'poc_2_screen' => S_POC_2_SCREEN, 'poc_2_notes' => S_POC_2_NOTES);
-				
+
 		$sql_fields = implode(', ', array_keys($table_titles)); //generate string of fields to get from DB
-		
+
 		$result=DBselect('SELECT '.$sql_fields.' FROM hosts_profiles_ext WHERE hostid='.$_REQUEST['hostid']);
-		
+
 		if($row=DBfetch($result)) {
 			foreach($row as $key => $value) {
 				if(!zbx_empty($value)) {
@@ -6172,7 +6172,7 @@
 
  	function insert_template_form($available_hosts){
 		global $USER_DETAILS;
-	
+
  		$frm_title = S_TEMPLATE_LINKAGE;
 
  		if($_REQUEST['hostid']>0){
@@ -6186,9 +6186,9 @@
  		else{
  			$name=get_request("tname",'');
  		}
-		
+
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-		
+
 		$selected_grp = get_request('twb_groupid', 0);
 		$selected_grp = isset($available_groups[$selected_grp]) ? $selected_grp :  reset($available_groups);
 
@@ -6218,7 +6218,7 @@
 		$hosts_in_tpl = array();
 		$sql_where = '';
 		if(isset($_REQUEST['form_refresh'])){
-		
+
 			$saved_hosts = get_request('hosts', array());
 			$hosts_in_tpl = array_intersect($available_hosts, $saved_hosts);
 
@@ -6244,10 +6244,10 @@
 				$hosts_in_tpl[$db_host['hostid']] = $db_host['hostid'];
 			}
 		}
-		
+
  		$cmbHosts = new CTweenBox($frmHostT,'hosts',$hosts_in_tpl,25);
 
-		
+
 		$sql = 'SELECT DISTINCT h.hostid,h.host '.
 			' FROM hosts h, hosts_groups hg'.
  			' WHERE ( h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
@@ -6756,7 +6756,7 @@
 
 			$link_desc = new CSpan($trigger['description'],'link');
 			$link_desc->addoption('onclick', "javascript: openWinCentered('popup_link_tr.php?form=1&dstfrm=".$frmCnct->GetName()."&triggerid=".$trigger['triggerid'].url_param('linkid')."','ZBX_Link_Indicator',560,260,'scrollbars=1, toolbar=0, menubar=0, resizable=0');");
-			
+
 			$table->addRow(array(
 					array(
 						new CCheckBox('triggers['.$trigger['triggerid'].'][triggerid]',null,null,$trigger['triggerid']),

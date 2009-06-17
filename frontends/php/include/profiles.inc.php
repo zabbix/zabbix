@@ -33,7 +33,7 @@ function get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN,$idx2=n
 		if(profile_type($type,'id'))	$sql_cond.= ' AND '.DBin_node('value_id');
 		if(zbx_numeric($idx2)) 			$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
 		if(!is_null($source)) 			$sql_cond.= ' AND source='.zbx_dbstr($source);
-		
+
 		$sql = 'SELECT value_id, value_int, value_str, type '.
 				' FROM profiles '.
 				' WHERE userid='.$USER_DETAILS["userid"].
@@ -43,7 +43,7 @@ function get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN,$idx2=n
 
 		$db_profiles = DBselect($sql);
 		if($profile=DBfetch($db_profiles)){
-		
+
 			if(profile_type($type,'unknown')) $type = $profile['type'];
 			$value_type = profile_field_by_type($type);
 
@@ -75,7 +75,7 @@ function get_source_profile($idx,$default_value=array(),$type=PROFILE_TYPE_UNKNO
 		if(profile_type($type,'id'))	$sql_cond.= ' AND '.DBin_node('value_id');
 		if(zbx_numeric($idx2)) 			$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
 		if(!is_null($source)) 			$sql_cond.= ' AND source='.zbx_dbstr($source);
-		
+
 		$sql = 'SELECT value_id,value_int,value_str,source,type '.
 				' FROM profiles '.
 				' WHERE userid='.$USER_DETAILS["userid"].
@@ -87,10 +87,10 @@ function get_source_profile($idx,$default_value=array(),$type=PROFILE_TYPE_UNKNO
 		if($profile=DBfetch($db_profiles)){
 			if(profile_type($type,'unknown')) $type = $profile['type'];
 			$value_type = profile_field_by_type($type);
-			
+
 			if(profile_type($type,'array')){
 				$result[] = array('value'=>$profile[$value_type], 'source'=>$profile['source']);
-				
+
 				while($profile=DBfetch($db_profiles)){
 					$result[] = array('value'=>$profile[$value_type], 'source'=>$profile['source']);
 				}
@@ -102,7 +102,7 @@ function get_source_profile($idx,$default_value=array(),$type=PROFILE_TYPE_UNKNO
 		}
 	}
 	$result = count($result)?$result:$default_value;
-	
+
 return $result;
 }
 
@@ -113,14 +113,14 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 
 	if(profile_type($type,'unknown')) $type = profile_type_by_value($value);
 	else $value = profile_value_by_type($value,$type);
-	
+
 //if($idx == 'web.history') SDI('PROF: v='.$value.'  t='.$type);
 
 	if($value === false) return false;
 
 	$sql_cond = '';
 // dirty fix, but havn't figureout something better
-	if($idx != 'web.nodes.switch_node') $sql_cond.= ' AND '.DBin_node('profileid');	
+	if($idx != 'web.nodes.switch_node') $sql_cond.= ' AND '.DBin_node('profileid');
 // ---
 	if(zbx_numeric($idx2)) 	$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
 
@@ -144,7 +144,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 				' WHERE userid='.$USER_DETAILS['userid'].
 					' AND idx='.zbx_dbstr($idx).
 					$sql_cond;
-					
+
 		$row = DBfetch(DBselect($sql));
 
 		if(!$row){
@@ -157,8 +157,8 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 			$val['value_id'] = 0;
 			$val['value_int'] = 0;
 			$val['value_str'] = '';
-			
-			$val[$value_type] = $value;	
+
+			$val[$value_type] = $value;
 
 			$idx2 = zbx_numeric($idx2)?$idx2:0;
 			$src = is_null($source)?'':$source;
@@ -182,7 +182,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 		}
 	}
 
-	
+
 return $result;
 }
 
@@ -193,13 +193,13 @@ function insert_profile($idx,$value,$type,$idx2,$source){
 
 	$profileid = get_dbid('profiles', 'profileid');
 	$value_type = profile_field_by_type($type);
-	
+
 	$val['value_id'] = 0;
 	$val['value_int'] = 0;
 	$val['value_str'] = '';
-	
-	$val[$value_type] = $value;	
-	
+
+	$val[$value_type] = $value;
+
 	$idx2 = zbx_numeric($idx2)?$idx2:0;
 	$src = is_null($source)?'':$source;
 
@@ -207,9 +207,9 @@ function insert_profile($idx,$value,$type,$idx2,$source){
 		$val[$value_type] = isset($value['value'])?$value['value']:'';
 		$src = isset($value['source'])?$value['source']:$src;
 	}
-	
+
 	if(is_null($val[$value_type])) return false;
-	
+
 	$sql='INSERT INTO profiles (profileid,userid,idx,idx2,value_id,value_int,value_str,source,type)'.
 		' VALUES ('.$profileid.','.
 					$USER_DETAILS['userid'].','.
@@ -222,7 +222,7 @@ function insert_profile($idx,$value,$type,$idx2,$source){
 					$type.')';
 
 	$result = DBexecute($sql);
-	
+
 return $result;
 }
 
@@ -252,7 +252,7 @@ return $result;
 }
 
 function profile_field_by_type($type){
-	switch($type){	
+	switch($type){
 		case PROFILE_TYPE_INT:
 		case PROFILE_TYPE_ARRAY_INT:
 			$field = 'value_int';
@@ -273,9 +273,9 @@ return $field;
 function profile_type_by_value($value,$type=PROFILE_TYPE_UNKNOWN){
 	if(is_array($value)){
 		$value = $value[0];
-		
+
 		if(is_array($value)){
-			if(isset($value['value'])) 
+			if(isset($value['value']))
 				$type=zbx_numeric($value['value'])?PROFILE_TYPE_ARRAY_ID:PROFILE_TYPE_ARRAY_STR;
 		}
 		else{
@@ -296,9 +296,9 @@ function profile_value_by_type(&$value,$type){
 	}
 	else if(is_array($value)){
 		if(!isset($value['value'])) return false;
-		
+
 		$result = $value;
-		switch($type){	
+		switch($type){
 			case PROFILE_TYPE_ID:
 			case PROFILE_TYPE_INT:
 				if(zbx_numeric($value['value'])){
@@ -316,7 +316,7 @@ function profile_value_by_type(&$value,$type){
 		}
 	}
 	else{
-		switch($type){	
+		switch($type){
 			case PROFILE_TYPE_ID:
 				$result = zbx_ctype_digit($value)?$value:false;
 				break;
@@ -341,12 +341,12 @@ return $result;
 function select_config($cache = true){
 	global $page;
 	static $config;
-	
+
 	if($cache && isset($config))
 		return $config;
-		
+
 	$row = DBfetch(DBselect('SELECT * FROM config WHERE '.DBin_node('configid', get_current_nodeid(false))));
-		
+
 	if($row){
 		$config = $row;
 		return $row;
@@ -359,7 +359,7 @@ return $row;
 
 function update_config($configs){
 	$update = array();
-	
+
 	if(isset($configs['work_period']) && !is_null($configs['work_period'])){
 		if(!validate_period($configs['work_period'])){
 			error(S_ICORRECT_WORK_PERIOD);
@@ -372,9 +372,9 @@ function update_config($configs){
 			return NULL;
 		}
 	}
-	
+
 	foreach($configs as $key => $value){
-		if(!is_null($value)) 
+		if(!is_null($value))
 			$update[] = $key.'='.zbx_dbstr($value);
 	}
 
@@ -391,10 +391,10 @@ return	DBexecute('update config set '.implode(',',$update).' where '.DBin_node('
 // Author: Aly
 function get_user_history(){
 	$history = array();
-	
+
 	$db_hist = get_source_profile('web.history',false);
 	$delimiter = new CSpan('&raquo;','delimiter');
-	
+
 	for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
 		if(isset($db_hist[$i])){
 			if($i>0) array_push($history,$delimiter);
@@ -408,27 +408,27 @@ return $history;
 
 function get_last_history_page($same_page=false){
 	global $page;
-	
+
 	$title = explode('[',$page['title']);
 	$title = $title[0];
-	
+
 	$rows=false;
-	
+
 	$db_hist = get_source_profile('web.history',false);
 	for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
 		if(isset($db_hist[$i])){
 			$new_rows = get_source_profile('web.history.'.$i,false);
-		
+
 			if(!$same_page && ($title == $db_hist[$i]['source'])) continue;
 			$rows = $db_hist[$i];
 		}
 	}
-	
+
 	if(is_array($rows)){
 		$rows['page'] = $rows['source'];
 		$rows['url'] = $rows['value'];
 	}
-	
+
 return $rows;
 }
 
@@ -441,7 +441,7 @@ function add_user_history($page){
 	if(!(isset($page['hist_arg']) && is_array($page['hist_arg']))){
 		return FALSE;
 	}
-	
+
 	$url = '';
 	foreach($page['hist_arg'] as $key => $arg){
 		if(isset($_REQUEST[$arg]) && !empty($_REQUEST[$arg])){
@@ -463,12 +463,12 @@ function add_user_history($page){
 		}
 	}
 
-	$history = array('source' => $title, 
+	$history = array('source' => $title,
 					'value' => $url);
-				
+
 	if($curr < ZBX_HISTORY_COUNT){
 		$profile[$curr] = $history;
-	} 
+	}
 	else {
 		$profile[(ZBX_HISTORY_COUNT-1)] = $history;
 	}
@@ -495,9 +495,9 @@ function add2favorites($favobj,$favid,$source=null){
 			return true;
 		}
 	}
-	 
+
 	$favorites[] = array('value' => $favid);
-	
+
 	$result = update_profile($favobj,$favorites,PROFILE_TYPE_ARRAY_ID,null,$source);
 return $result;
 }
@@ -506,7 +506,7 @@ return $result;
 function rm4favorites($favobj,$favid,$favcnt=null,$source=null){
 	$favorites = get_favorites($favobj,get_current_nodeid(true));
 
-	$favcnt = (is_null($favcnt))?0:$favcnt;		
+	$favcnt = (is_null($favcnt))?0:$favcnt;
 	if($favid == 0) $favcnt = ZBX_FAVORITES_ALL;
 
 	foreach($favorites as $key => $favorite){

@@ -37,11 +37,11 @@
 		}
 		return true;
 	}
-	
+
 	function is_hex_color($value){
 		return eregi('^[0-9,A-F]{6}$', $value);
 	}
-	
+
 	function BETWEEN($min,$max,$var=NULL){
 		return "({".$var."}>=".$min."&&{".$var."}<=".$max.")&&";
 	}
@@ -212,9 +212,9 @@
 				if(!ereg('^[a-zA-Z0-9_]+$',$key)) return FALSE;
 
 				$expression2 = str_replace('{}','$_REQUEST["'.$field.'"]["'.$key.'"]',$expression);
-				if(calc_exp2($fields,$field,$expression2)==FALSE) 
+				if(calc_exp2($fields,$field,$expression2)==FALSE)
 					return FALSE;
-			}	
+			}
 			return TRUE;
 		}
 
@@ -244,7 +244,7 @@
 	function unset_action_vars($fields){
 		foreach($fields as $field => $checks){
 			list($type,$opt,$flags,$validation,$exception)=$checks;
-			
+
 			if(($flags&P_ACT)&&(isset($_REQUEST[$field]))){
 				unset_request($field,'unset_action_vars');
 			}
@@ -265,7 +265,7 @@
 			}
 			return $err;
 		}
- 
+
 		if($type == T_ZBX_IP){
 			if( !validate_ip($var,$arr) ){
 				if($flags&P_SYS){
@@ -315,7 +315,7 @@
 			}
 			return ZBX_VALID_OK;
 		}
-		
+
 		if(($type == T_ZBX_INT) && !is_numeric($var)) {
 			if($flags&P_SYS){
 				info("Critical error. Field [".$field."] is not integer");
@@ -348,7 +348,7 @@
 				return ZBX_VALID_WARNING;
 			}
 		}
-//*		
+//*
 		if(($type == T_ZBX_STR) && !defined('ZBX_ALLOW_UNICODE') && (strlen($var) != zbx_strlen($var))){
 			if($flags&P_SYS){
 				info("Critical error. Field [".$field."] contains Multibyte chars");
@@ -464,18 +464,18 @@
 			}
 		}
 
-		
+
 		return ZBX_VALID_OK;
 	}
 
 //		VAR							TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$system_fields=array(
 		'sid'=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	HEX(), NULL),
-// 
+//
 		'switch_node'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
 		'triggers_hash'=>	array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,NULL),
 		'print'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('1'),NULL),
-		
+
 // table sorting
 		'sort'=>			array(T_ZBX_STR, O_OPT,	 P_SYS,	NULL,NULL),
 		'sortorder'=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	NULL,NULL)
@@ -487,7 +487,7 @@
 		show_error_message($msg);
 		include_once('include/page_footer.php');
 	}
-	
+
 	function check_fields(&$fields, $show_messages=true){
 		global	$system_fields;
 
@@ -506,7 +506,7 @@
 		}
 
 		$fields = null;
-		
+
 		if($err&ZBX_VALID_ERROR){
 			invalid_url();
 		}

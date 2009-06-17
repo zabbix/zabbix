@@ -37,7 +37,7 @@
 		vs
 		echo
 
-	4)regexps 
+	4)regexps
 		preg_match("![0-9]+!", $foo);
 		vs
 		ctype_digit($foo);
@@ -73,7 +73,7 @@
 		"var=$var"
 		vs
 		'var='.$var
-		
+
 	*/
 
 
@@ -82,7 +82,7 @@
 	**     Optimization class. Provide functions for
 	**     PHP code optimization.
 	**
-	** Author: 
+	** Author:
 	**     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
 	**/
 
@@ -97,7 +97,7 @@ define("USE_SQLREQUEST_PROF",1);
 //define("SHOW_SQLREQUEST_DETAILS",1);
 
 if(!defined('OBR')) define('OBR',"<br/>\n");
-	
+
 if(defined('USE_PROFILING')){
 	$starttime=array();
 	$memorystamp=array();
@@ -109,10 +109,10 @@ if(defined('USE_PROFILING')){
 	class COpt{
 		/* protected static $starttime[]=array(); */
 
-		/* protected  static */  function getmicrotime() { 
+		/* protected  static */  function getmicrotime() {
 			if(defined('USE_TIME_PROF')) {
-				list($usec, $sec) = explode(' ',microtime());	
-				return ((float)$usec + (float)$sec); 
+				list($usec, $sec) = explode(' ',microtime());
+				return ((float)$usec + (float)$sec);
 			}
 			else {
 				return 0;
@@ -149,7 +149,7 @@ if(defined('USE_PROFILING')){
 				}
 			}
 		}
-		
+
 		/* public static */ function profiling_start($type=NULL){
 			global $starttime;
 			global $memorystamp;
@@ -164,7 +164,7 @@ if(defined('USE_PROFILING')){
 			if(defined('USE_VAR_MON')){
 				$var_list[$type] = isset($GLOBALS) ? array_keys($GLOBALS) : array();
 			}
-			
+
 			if(defined('USE_SQLREQUEST_PROF')){
 				if(defined('SHOW_SQLREQUEST_DETAILS')){
 					$sqlmark[$type] = count($sqlrequests);
@@ -204,13 +204,13 @@ if(defined('USE_PROFILING')){
 			if(defined('USE_TIME_PROF')){
 				echo '('.$type.') Time to execute: '.round($endtime - $starttime[$type],6).' seconds!'.OBR;
 			}
-			
+
 			if(defined('USE_MEM_PROF')){
 				echo '('.$type.') Memory limit	 : '.ini_get('memory_limit').OBR;
 				echo '('.$type.') Memory usage	 : '.mem2str($memorystamp[$type]).' - '.mem2str($memory).OBR;
 				echo '('.$type.') Memory leak	 : '.mem2str($memory - $memorystamp[$type]).OBR;
 			}
-			
+
 			if(defined('USE_VAR_MON')){
 				$curr_var_list = isset($GLOBALS) ? array_keys($GLOBALS) : array();
 				$var_diff = array_diff($curr_var_list, $var_list[$type]);
@@ -218,9 +218,9 @@ if(defined('USE_PROFILING')){
 				print_r(implode(', ',$var_diff));
 				echo ']'.OBR;
 			}
-			
+
 			if(defined('USE_COUNTER_PROF')){
-			
+
 				if(isset($perf_counter[$type])){
 					ksort($perf_counter[$type]);
 					foreach($perf_counter[$type] as $name => $value){
@@ -233,7 +233,7 @@ if(defined('USE_PROFILING')){
 				if(defined('SHOW_SQLREQUEST_DETAILS')){
 					$requests_cnt = count($sqlrequests);
 					echo '('.$type.') SQL requests count: '.($requests_cnt - $sqlmark[$type]).OBR;
-			
+
 					for($i = $sqlmark[$type]; $i < $requests_cnt; $i++){
 						echo '('.$type.') SQL request    : '.$sqlrequests[$i].OBR;
 					}
@@ -251,7 +251,7 @@ if(defined('USE_PROFILING')){
 
 		/* public static */ function compare_files_with_menu($menu=null){
 			if(defined('USE_MENU_PROF')){
-			
+
 				$files_list = glob('*.php');
 
 				$result = array();
@@ -260,32 +260,32 @@ if(defined('USE_PROFILING')){
 					foreach($menu as $label=>$sub){
 						foreach($sub['pages'] as $sub_pages){
 							if(empty($sub_pages)) continue;
-							
+
 							if(!isset($sub_pages['label'])) $sub_pages['label']=$sub_pages['url'];
-							
+
 							$menu_path = $sub['label'].'->'.$sub_pages['label'];
-							
+
 							if($sub_pages['url'] == $file){
 								array_push($list, $menu_path);
 							}
 							if(!str_in_array($sub_pages['url'], $files_list))
 								$result['error'][$sub_pages['url']] = array($menu_path);
-	
+
 							if(isset($sub_pages['sub_pages'])) foreach($sub_pages['sub_pages'] as $page){
 								$menu_path = $sub['label'].'->'.$sub_pages['label'].'->sub_pages';
-								
+
 								if(!str_in_array($page, $files_list))
 									$result['error'][$page] = array($menu_path);
-	
+
 								if($page != $file) continue;
 								array_push($list, $menu_path);
 							}
 						}
 					}
-					
+
 					if(count($list) != 1)	$level = 'worning';
 					else			$level = 'normal';
-				
+
 					$result[$level][$file] = $list;
 				}
 
@@ -311,7 +311,7 @@ else{
 	$static = null;
 	if(version_compare(phpversion(),'5.0','>='))
 		$static = 'static';
-		
+
 	eval('
 	class COpt
 	{

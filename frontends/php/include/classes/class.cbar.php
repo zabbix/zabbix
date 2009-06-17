@@ -43,8 +43,8 @@ class CBar extends CGraphDraw{
 		$this->seriesWidth = 10;					// overal per serie bar/column width
 		$this->seriesDistance = 10;
 
-		$this->axisSideLeft = false;				// Does values for axis left/top persist
-		$this->axisSideRight = false;				// Does values for axis right/bottom persist
+		$this->axisSideLeft = false;				// Do values for axis left/top persist
+		$this->axisSideRight = false;				// Do values for axis right/bottom persist
 
 		$this->xLabel = null;
 		$this->yLabel = null;
@@ -57,7 +57,7 @@ class CBar extends CGraphDraw{
 
 		$this->gridLinesCount = NULL;				// How many grids to draw
 		$this->gridPixels = 40;						// optimal grid size
-		$this->gridStep = array(GRAPH_YAXIS_SIDE_LEFT=>null, GRAPH_YAXIS_SIDE_RIGHT=>null);		// seted value
+		$this->gridStep = array(GRAPH_YAXIS_SIDE_LEFT=>null, GRAPH_YAXIS_SIDE_RIGHT=>null);		// set value
 
 		$this->side_values = array(GRAPH_YAXIS_SIDE_LEFT=>ITEM_VALUE_TYPE_UINT64,
 									GRAPH_YAXIS_SIDE_RIGHT=>ITEM_VALUE_TYPE_UINT64);	// 0 - float, 3 - uint
@@ -352,7 +352,7 @@ class CBar extends CGraphDraw{
 					$this->gridLinesCount = floor($this->maxValue[$axis] / $this->gridStep[$axis]) + 1;
 	// needs to be fixed!!!
 	// via gridLinesCount can't be different for each axis,
-	// due to this, gridStep must be some how normilized before calculations
+	// due to this, gridStep must be some how normalised before calculations
 				$this->maxValue[$axis] = $this->gridStep[$axis] * $this->gridLinesCount;
 			}
 		}
