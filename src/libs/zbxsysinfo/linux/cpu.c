@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -164,7 +164,7 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 	assert(result);
 
 	init_result(result);
-	
+
 	return SYSINFO_RET_FAIL;
 }
 
@@ -185,7 +185,7 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
-		if (2 != sscanf(line, "%s " ZBX_FS_UI64, name, &value)) 
+		if (2 != sscanf(line, "%s " ZBX_FS_UI64, name, &value))
 			continue;
 
 		if (0 == strcmp(name, "intr"))

@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -45,7 +45,7 @@
 				&ds[ZBX_DSTAT_R_SECT],	\
 				&ds[ZBX_DSTAT_W_OPER], 	\
 				&ds[ZBX_DSTAT_W_SECT]	\
-				) != 5) continue 
+				) != 5) continue
 #endif
 
 void	refresh_diskdevices()
