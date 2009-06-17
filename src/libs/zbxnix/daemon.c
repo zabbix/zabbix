@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -82,7 +82,7 @@ static void	parent_signal_handler(int sig,  siginfo_t *siginfo, void *context)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: it doesn't allow running under 'root' if allow_root is zerro     *
+ * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
 
@@ -112,7 +112,7 @@ int	daemon_start(int allow_root)
 			exit(FAIL);
 		}
 #ifdef HAVE_FUNCTION_INITGROUPS
-		if(initgroups(user, pwd->pw_gid) == -1) 
+		if(initgroups(user, pwd->pw_gid) == -1)
 		{
 			zbx_error("Cannot initgroups to %s [%s].",
 				user,
@@ -138,19 +138,19 @@ int	daemon_start(int allow_root)
 
 	}
 
-	if( (pid = zbx_fork()) != 0 )	
-	{				
-		exit( 0 );		
-	}				
+	if( (pid = zbx_fork()) != 0 )
+	{
+		exit( 0 );
+	}
 
 	setsid();
-	
+
 	signal( SIGHUP, SIG_IGN );
 
-	if( (pid = zbx_fork()) !=0 )	
-	{				
-		exit( 0 );		
-	}				
+	if( (pid = zbx_fork()) !=0 )
+	{
+		exit( 0 );
+	}
 
 	/* This is to eliminate warning: ignoring return value of chdir */
 	if(-1 == chdir("/"))
@@ -193,16 +193,16 @@ int	daemon_start(int allow_root)
 }
 
 void	daemon_stop(void)
-{	
+{
 	drop_pid_file(APP_PID_FILE);
 }
 
 void	init_main_process(void)
 {
 	struct sigaction	phan;
-	
-	parent = 1; /* signalize signal_handler what this process isi a PARENT process */
-	
+
+	parent = 1; /* signalize signal_handler that this process is a PARENT process */
+
 /*	phan.sa_handler = parent_signal_handler;*/
 	phan.sa_sigaction = parent_signal_handler;
 	sigemptyset(&phan.sa_mask);
@@ -211,4 +211,3 @@ void	init_main_process(void)
 	/* For parent only. To avoid problems with EXECUTE_INT */
 	sigaction(SIGCHLD,	&phan, NULL);
 }
-
