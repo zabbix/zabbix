@@ -22,25 +22,25 @@
 	define('ZABBIX_VERSION','1.7');
 /* USER DEFINES */	
 
-	define('ZBX_LOGIN_ATTEMPTS', 	5);
-	define('ZBX_LOGIN_BLOCK', 		30); // sec
+	define('ZBX_LOGIN_ATTEMPTS',			5);
+	define('ZBX_LOGIN_BLOCK',			30); // sec
 	
-	define('TRIGGERS_OPTION_DISABLED',		0);		// reserved
-	define('TRIGGERS_OPTION_ONLYTRUE',		1);		// use 0 to disable
-	define('TRIGGERS_OPTION_ALL',			2);		// use 0 to disable
-	define('TRIGGERS_OPTION_NOFALSEFORB',	0);		// use 0 to disable
+	define('TRIGGERS_OPTION_DISABLED',		0);	// reserved
+	define('TRIGGERS_OPTION_ONLYTRUE',		1);	// use 0 to disable
+	define('TRIGGERS_OPTION_ALL',			2);	// use 0 to disable
+	define('TRIGGERS_OPTION_NOFALSEFORB',		0);	// use 0 to disable
 	
 	define('TRIGGER_FALSE_PERIOD', 			300);	// 30min,  0 - disable
 	define('TRIGGER_BLINK_PERIOD',			120);	// 30min,  0 - disable
 
-	define('EVENTS_OPTION_DISABLED',		0);		//	reserved
-	define('EVENTS_OPTION_NOEVENT',			1);		//	use 0 to disable
-	define('EVENTS_OPTION_ALL',				2);		//	use 0 to disable
-	define('EVENTS_OPTION_NOT_ACK',			3);		//	use 0 to disable
-	define('EVENTS_OPTION_ONLYTRUE_NOTACK',	4);		//	use 0 to disable
-	define('EVENTS_OPTION_NOFALSEFORB',		5);		//  reserved for TRIGGERS_OPTION_NOFALSEFORB, to disable set TRIGGERS_OPTION_NOFALSEFORB to 0
+	define('EVENTS_OPTION_DISABLED',		0);	// reserved
+	define('EVENTS_OPTION_NOEVENT',			1);	// use 0 to disable
+	define('EVENTS_OPTION_ALL',			2);	// use 0 to disable
+	define('EVENTS_OPTION_NOT_ACK',			3);	// use 0 to disable
+	define('EVENTS_OPTION_ONLYTRUE_NOTACK',		4);	// use 0 to disable
+	define('EVENTS_OPTION_NOFALSEFORB',		5);	//  reserved for TRIGGERS_OPTION_NOFALSEFORB, to disable set TRIGGERS_OPTION_NOFALSEFORB to 0
 
-	define('ZBX_MIN_PERIOD', 3600);					// ~1 hour
+	define('ZBX_MIN_PERIOD', 3600);				// ~1 hour
 	define('ZBX_MAX_PERIOD', 12*31*24*3600);		// ~1 year
 	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
 	
@@ -56,8 +56,8 @@
 	define('PAGE_TYPE_IMAGE',		1);
 	define('PAGE_TYPE_XML',			2);
 	define('PAGE_TYPE_JS',			3);	// javascript
-	define('PAGE_TYPE_HTML_BLOCK',	4);	// simple block of html (as text)
-	define('PAGE_TYPE_JSON_RPC',	5);	// api call
+	define('PAGE_TYPE_HTML_BLOCK',		4);	// simple block of html (as text)
+	define('PAGE_TYPE_JSON_RPC',		5);	// api call
 	
 	define('ZBX_SESSION_ACTIVE', 0);
 	define('ZBX_SESSION_PASSIVE', 1);
@@ -93,9 +93,9 @@
 	define('IMAGE_FORMAT_JPEG',		'JPEG');
 	define('IMAGE_FORMAT_TEXT',		'JPEG');
 	
-	define('IMAGE_TYPE_UNKNOWN',	0);
+	define('IMAGE_TYPE_UNKNOWN',		0);
 	define('IMAGE_TYPE_ICON',		1);
-	define('IMAGE_TYPE_BACKGROUND',	2);
+	define('IMAGE_TYPE_BACKGROUND',		2);
 	
 	
 	define('ZBX_SORT_UP',			'ASC');
@@ -112,17 +112,17 @@
 
 	define('AUDIT_RESOURCE_USER',			0);
 //	define('AUDIT_RESOURCE_ZABBIX',			1);
-	define('AUDIT_RESOURCE_ZABBIX_CONFIG',	2);
+	define('AUDIT_RESOURCE_ZABBIX_CONFIG',		2);
 	define('AUDIT_RESOURCE_MEDIA_TYPE',		3);
 	define('AUDIT_RESOURCE_HOST',			4);
 	define('AUDIT_RESOURCE_ACTION',			5);
 	define('AUDIT_RESOURCE_GRAPH',			6);
-	define('AUDIT_RESOURCE_GRAPH_ELEMENT',	7);
+	define('AUDIT_RESOURCE_GRAPH_ELEMENT',		7);
 //	define('AUDIT_RESOURCE_ESCALATION',		8);
 //	define('AUDIT_RESOURCE_ESCALATION_RULE',9);
 //	define('AUDIT_RESOURCE_AUTOREGISTRATION',10);
 	define('AUDIT_RESOURCE_USER_GROUP',		11);
-	define('AUDIT_RESOURCE_APPLICATION',	12);
+	define('AUDIT_RESOURCE_APPLICATION',		12);
 	define('AUDIT_RESOURCE_TRIGGER',		13);
 	define('AUDIT_RESOURCE_HOST_GROUP',		14);
 	define('AUDIT_RESOURCE_ITEM',			15);
@@ -133,35 +133,35 @@
 	define('AUDIT_RESOURCE_SCREEN',			20);
 	define('AUDIT_RESOURCE_NODE',			21);
 	define('AUDIT_RESOURCE_SCENARIO',		22);
-	define('AUDIT_RESOURCE_DISCOVERY_RULE',	23);
+	define('AUDIT_RESOURCE_DISCOVERY_RULE',		23);
 	define('AUDIT_RESOURCE_SLIDESHOW',		24);
 	define('AUDIT_RESOURCE_SCRIPT',			25);
 	define('AUDIT_RESOURCE_PROXY',			26);
-	define('AUDIT_RESOURCE_MAINTENANCE',	27);
+	define('AUDIT_RESOURCE_MAINTENANCE',		27);
 	define('AUDIT_RESOURCE_REGEXP',			28);
 
-	define('CONDITION_TYPE_HOST_GROUP',	0);
-	define('CONDITION_TYPE_HOST',		1);
-	define('CONDITION_TYPE_TRIGGER',	2);
-	define('CONDITION_TYPE_TRIGGER_NAME',	3);
-	define('CONDITION_TYPE_TRIGGER_SEVERITY',4);
-	define('CONDITION_TYPE_TRIGGER_VALUE',	5);
-	define('CONDITION_TYPE_TIME_PERIOD',	6);
-	define('CONDITION_TYPE_DHOST_IP',	7);
-	define('CONDITION_TYPE_DSERVICE_TYPE',	8);
-	define('CONDITION_TYPE_DSERVICE_PORT',	9);
-	define('CONDITION_TYPE_DSTATUS',	10);
-	define('CONDITION_TYPE_DUPTIME',	11);
-	define('CONDITION_TYPE_DVALUE',		12);
-	define('CONDITION_TYPE_HOST_TEMPLATE',	13);
+	define('CONDITION_TYPE_HOST_GROUP',		0);
+	define('CONDITION_TYPE_HOST',			1);
+	define('CONDITION_TYPE_TRIGGER',		2);
+	define('CONDITION_TYPE_TRIGGER_NAME',		3);
+	define('CONDITION_TYPE_TRIGGER_SEVERITY',	4);
+	define('CONDITION_TYPE_TRIGGER_VALUE',		5);
+	define('CONDITION_TYPE_TIME_PERIOD',		6);
+	define('CONDITION_TYPE_DHOST_IP',		7);
+	define('CONDITION_TYPE_DSERVICE_TYPE',		8);
+	define('CONDITION_TYPE_DSERVICE_PORT',		9);
+	define('CONDITION_TYPE_DSTATUS',		10);
+	define('CONDITION_TYPE_DUPTIME',		11);
+	define('CONDITION_TYPE_DVALUE',			12);
+	define('CONDITION_TYPE_HOST_TEMPLATE',		13);
 	define('CONDITION_TYPE_EVENT_ACKNOWLEDGED',	14);
-	define('CONDITION_TYPE_APPLICATION',	15);
-	define('CONDITION_TYPE_MAINTENANCE',	16);
-	define('CONDITION_TYPE_NODE',		17);
-	define('CONDITION_TYPE_DRULE',		18);
-	define('CONDITION_TYPE_DCHECK',		19);
-	define('CONDITION_TYPE_PROXY',		20);
-	define('CONDITION_TYPE_DOBJECT',	21);
+	define('CONDITION_TYPE_APPLICATION',		15);
+	define('CONDITION_TYPE_MAINTENANCE',		16);
+	define('CONDITION_TYPE_NODE',			17);
+	define('CONDITION_TYPE_DRULE',			18);
+	define('CONDITION_TYPE_DCHECK',			19);
+	define('CONDITION_TYPE_PROXY',			20);
+	define('CONDITION_TYPE_DOBJECT',		21);
 
 	define('CONDITION_OPERATOR_EQUAL',	0);
 	define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -328,22 +328,22 @@
 	define('SCREEN_SIMPLE_ITEM',0);
 	define('SCREEN_DYNAMIC_ITEM',1);
 
-	define('SCREEN_RESOURCE_GRAPH', 		0);
-	define('SCREEN_RESOURCE_SIMPLE_GRAPH', 	1);
-	define('SCREEN_RESOURCE_MAP', 			2);
-	define('SCREEN_RESOURCE_PLAIN_TEXT', 	3);
-	define('SCREEN_RESOURCE_HOSTS_INFO', 	4);
-	define('SCREEN_RESOURCE_TRIGGERS_INFO', 5);
-	define('SCREEN_RESOURCE_SERVER_INFO', 	6);
-	define('SCREEN_RESOURCE_CLOCK', 		7);
-	define('SCREEN_RESOURCE_SCREEN', 		8);
-	define('SCREEN_RESOURCE_TRIGGERS_OVERVIEW', 9);
-	define('SCREEN_RESOURCE_DATA_OVERVIEW', 10);
-	define('SCREEN_RESOURCE_URL', 			11);
-	define('SCREEN_RESOURCE_ACTIONS', 		12);
+	define('SCREEN_RESOURCE_GRAPH',			0);
+	define('SCREEN_RESOURCE_SIMPLE_GRAPH',		1);
+	define('SCREEN_RESOURCE_MAP',			2);
+	define('SCREEN_RESOURCE_PLAIN_TEXT',		3);
+	define('SCREEN_RESOURCE_HOSTS_INFO',		4);
+	define('SCREEN_RESOURCE_TRIGGERS_INFO',		5);
+	define('SCREEN_RESOURCE_SERVER_INFO',		6);
+	define('SCREEN_RESOURCE_CLOCK',			7);
+	define('SCREEN_RESOURCE_SCREEN',		8);
+	define('SCREEN_RESOURCE_TRIGGERS_OVERVIEW',	9);
+	define('SCREEN_RESOURCE_DATA_OVERVIEW',		10);
+	define('SCREEN_RESOURCE_URL',			11);
+	define('SCREEN_RESOURCE_ACTIONS',		12);
 	define('SCREEN_RESOURCE_EVENTS',		13);
-	define('SCREEN_RESOURCE_STATUS_OF_TRIGGERS', 14);
-	define('SCREEN_RESOURCE_SYSTEM_STATUS',	15);
+	define('SCREEN_RESOURCE_STATUS_OF_TRIGGERS',	14);
+	define('SCREEN_RESOURCE_SYSTEM_STATUS',		15);
 
 /* alignes */
 	define('HALIGN_DEFAULT',0);
@@ -368,19 +368,19 @@
 	define('TIME_TYPE_LOCAL',	0);
 	define('TIME_TYPE_SERVER',	1);
 
-	define('FILTER_TAST_SHOW',	0);
-	define('FILTER_TAST_HIDE',	1);
-	define('FILTER_TAST_MARK',	2);
-	define('FILTER_TAST_INVERT_MARK', 3);
+	define('FILTER_TAST_SHOW',		0);
+	define('FILTER_TAST_HIDE',		1);
+	define('FILTER_TAST_MARK',		2);
+	define('FILTER_TAST_INVERT_MARK',	3);
 
 	define('MARK_COLOR_RED',	1);
 	define('MARK_COLOR_GREEN',	2);
 	define('MARK_COLOR_BLUE',	3);
 
 	define('PROFILE_TYPE_UNKNOWN',		0);
-	define('PROFILE_TYPE_ID',			1);
-	define('PROFILE_TYPE_INT',			2);
-	define('PROFILE_TYPE_STR',			3);
+	define('PROFILE_TYPE_ID',		1);
+	define('PROFILE_TYPE_INT',		2);
+	define('PROFILE_TYPE_STR',		3);
 	define('PROFILE_TYPE_ARRAY_ID',		4);
 	define('PROFILE_TYPE_ARRAY_INT',	5);
 	define('PROFILE_TYPE_ARRAY_STR',	6);
@@ -400,13 +400,13 @@
 	define('USER_TYPE_ZABBIX_ADMIN',	2);
 	define('USER_TYPE_SUPER_ADMIN',		3);
 
-	define('GROUP_STATUS_DISABLED', 1);	
+	define('GROUP_STATUS_DISABLED', 1);
 	define('GROUP_STATUS_ENABLED', 0);
 	
 // IMPORTANT!!!    by priority	DESC
-	define('GROUP_GUI_ACCESS_SYSTEM', 	0);
-	define('GROUP_GUI_ACCESS_INTERNAL', 1);
-	define('GROUP_GUI_ACCESS_DISABLED', 2);	
+	define('GROUP_GUI_ACCESS_SYSTEM',	0);
+	define('GROUP_GUI_ACCESS_INTERNAL',	1);
+	define('GROUP_GUI_ACCESS_DISABLED',	2);
 	
 	define('GROUP_API_ACCESS_DISABLED', 0);
 	define('GROUP_API_ACCESS_ENABLED', 1);
@@ -421,8 +421,8 @@
 	define('PERM_RES_IDS_ARRAY',	1); /* return array of nodes id - array(1,2,3,4) */
 	define('PERM_RES_DATA_ARRAY',	2); 
 
-	define('RESOURCE_TYPE_NODE',		0);
-	define('RESOURCE_TYPE_GROUP',		1);
+	define('RESOURCE_TYPE_NODE',	0);
+	define('RESOURCE_TYPE_GROUP',	1);
 
 	define('PARAM_TYPE_SECONDS',	0);
 	define('PARAM_TYPE_COUNTS',	1);
@@ -449,9 +449,9 @@
 	define('EVENT_ACK_DISABLED','0');
 	define('EVENT_ACK_ENABLED','1');
 
-	define('EVENTS_NOFALSEFORB_STATUS_ALL',		0);	//	used with TRIGGERS_OPTION_NOFALSEFORB
-	define('EVENTS_NOFALSEFORB_STATUS_FALSE',	1);	//	used with TRIGGERS_OPTION_NOFALSEFORB
-	define('EVENTS_NOFALSEFORB_STATUS_TRUE',	2);	//	used with TRIGGERS_OPTION_NOFALSEFORB
+	define('EVENTS_NOFALSEFORB_STATUS_ALL',		0);	// used with TRIGGERS_OPTION_NOFALSEFORB
+	define('EVENTS_NOFALSEFORB_STATUS_FALSE',	1);	// used with TRIGGERS_OPTION_NOFALSEFORB
+	define('EVENTS_NOFALSEFORB_STATUS_TRUE',	2);	// used with TRIGGERS_OPTION_NOFALSEFORB
 	
 	define('EVENT_SOURCE_TRIGGERS',		0);
 	define('EVENT_SOURCE_DISCOVERY',	1);
@@ -461,30 +461,30 @@
 	define('EVENT_OBJECT_DSERVICE',		2);
 	
 	define('GRAPH_YAXIS_TYPE_CALCULATED',	0);
-	define('GRAPH_YAXIS_TYPE_FIXED',		1);
+	define('GRAPH_YAXIS_TYPE_FIXED',	1);
 	define('GRAPH_YAXIS_TYPE_ITEM_VALUE',	2);
 	
 	define('GRAPH_YAXIS_SIDE_LEFT',		0);
 	define('GRAPH_YAXIS_SIDE_RIGHT',	1);
 	
-	define('GRAPH_ITEM_SIMPLE' , 	0);
-	define('GRAPH_ITEM_AGGREGATED',	1);
+	define('GRAPH_ITEM_SIMPLE',		0);
+	define('GRAPH_ITEM_AGGREGATED',		1);
 	define('GRAPH_ITEM_SUM',		2);
 	
-	define('GRAPH_TYPE_NORMAL',			0);
+	define('GRAPH_TYPE_NORMAL',		0);
 	define('GRAPH_TYPE_STACKED',		1);
-	define('GRAPH_TYPE_PIE',			2);
+	define('GRAPH_TYPE_PIE',		2);
 	define('GRAPH_TYPE_EXPLODED',		3);
-	define('GRAPH_TYPE_3D',				4);
+	define('GRAPH_TYPE_3D',			4);
 	define('GRAPH_TYPE_3D_EXPLODED',	5);
-	define('GRAPH_TYPE_BAR',			6);
-	define('GRAPH_TYPE_COLUMN',			7);
+	define('GRAPH_TYPE_BAR',		6);
+	define('GRAPH_TYPE_COLUMN',		7);
 	define('GRAPH_TYPE_BAR_STACKED',	8);
 	define('GRAPH_TYPE_COLUMN_STACKED',	9);
 	
 	define('GRAPH_3D_ANGLE', 70);
 	
-	define('GRAPH_STACKED_ALFA',	15);	//0..100 transperancy
+	define('GRAPH_STACKED_ALFA',	15);	// 0..100 transperancy
 	
 	define('GRAPH_ZERO_LINE_COLOR_LEFT', 'AAAAAA');
 	define('GRAPH_ZERO_LINE_COLOR_RIGHT', '888888');
@@ -494,7 +494,7 @@
 	define('ZBX_GRAPH_MAX_SKIP_CELL', 16);
 	define('ZBX_GRAPH_MAX_SKIP_DELAY', 4);
 	
-	define('DOBJECT_STATUS_UP',			0);
+	define('DOBJECT_STATUS_UP',		0);
 	define('DOBJECT_STATUS_DOWN',		1);
 	define('DOBJECT_STATUS_DISCOVER',	2); /* only for events,           */
 	define('DOBJECT_STATUS_LOST',		3); /*     generated by discovery */
@@ -523,13 +523,13 @@
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);
 	
-	define('EXPRESSION_TYPE_INCLUDED',		0);
+	define('EXPRESSION_TYPE_INCLUDED',	0);
 	define('EXPRESSION_TYPE_ANY_INCLUDED',	1);
 	define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
-	define('EXPRESSION_TYPE_TRUE',			3);
-	define('EXPRESSION_TYPE_FALSE',			4);
+	define('EXPRESSION_TYPE_TRUE',		3);
+	define('EXPRESSION_TYPE_FALSE',		4);
 	
-	define('AVAILABLE_NOCACHE',	0);		// take available objects not from cache
+	define('AVAILABLE_NOCACHE',	0);	// take available objects not from cache
 	
 	define('SBR',	"<br/>\n");
 	define('SPACE',	'&nbsp;');
@@ -616,8 +616,8 @@ else{
 	define('XML_TAG_ZABBIX_EXPORT',		'zabbix_export');
 	define('XML_TAG_HOSTS',			'hosts');
 	define('XML_TAG_HOST',			'host');
-	define('XML_TAG_HOSTPROFILE',	'host_profile');
-	define('XML_TAG_HOSTPROFILE_EXT','host_profiles_ext');
+	define('XML_TAG_HOSTPROFILE',		'host_profile');
+	define('XML_TAG_HOSTPROFILE_EXT',	'host_profiles_ext');
 	define('XML_TAG_GROUPS',		'groups');
 	define('XML_TAG_GROUP',			'group');
 	define('XML_TAG_APPLICATIONS',		'applications');
@@ -638,7 +638,7 @@ else{
 	define('XML_TAG_SCREEN_ELEMENTS',	'screen_elements');
 	define('XML_TAG_DEPENDENCIES',		'dependencies');
 	define('XML_TAG_DEPENDENCY',		'dependency');
-	define('XML_TAG_DEPENDS',			'depends');
+	define('XML_TAG_DEPENDS',		'depends');
 	
 // API errors //
 	define('ZBX_API_ERROR_NO_HOST', 1);
@@ -657,9 +657,9 @@ else{
 
 /* if magic quotes on then get rid of them */
 	if(get_magic_quotes_gpc()){
-		$_GET    = zbx_stripslashes($_GET);
-		$_POST	 = zbx_stripslashes($_POST);
-		$_COOKIE = zbx_stripslashes($_COOKIE);
+		$_GET		= zbx_stripslashes($_GET);
+		$_POST		 = zbx_stripslashes($_POST);
+		$_COOKIE	= zbx_stripslashes($_COOKIE);
 	}
 
 /* init $_REQUEST */
