@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -48,12 +48,12 @@
 		function SetRows($value)
 		{
 			return $this->options['rows'] = $value;
-			
+
 		}
 		function SetCols($value)
 		{
 			return $this->options['cols'] = $value;
-			
+
 		}
 	}
 ?>

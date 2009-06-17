@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -34,21 +34,21 @@
 			$this->AddOption('value',$value);
 			$this->SetReadonly($readonly);
 		}
-		
+
 		function SetReadonly($value='yes'){
 			if((is_string($value) && ($value=="yes" || $value=="checked" || $value=="on") || $value=="1") || (is_int($value)&&$value<>0))
 				return $this->options['readonly'] = 'readonly';
 
 			$this->DelOption('readonly');
 		}
-		
+
 		function SetValue($value=NULL){
 			$this->options['value'] = $value;
 		}
-		
+
 		function SetSize($value){
 			$this->options['size'] = $value;
-			
+
 		}
 	}
 
@@ -78,7 +78,7 @@
 
 	class CIpBox{
 		//var $ip_parts = array();
-		
+
 		function CIPBox($name='ip',$value){
 			$this->ip_parts = array();
 
@@ -87,7 +87,7 @@
 			if(!isset($value[1])) $value[1] = 0;
 			if(!isset($value[2])) $value[2] = 0;
 			if(!isset($value[3])) $value[3] = 0;
-			
+
 			for($i = 0; $i < 4; $i++){
 				$this->ip_parts[$i] = new CNumericBox($name.'['.$i.']', $value[$i], 3);
 				if($i != 3){
@@ -106,7 +106,7 @@
 
 		function ToString($destroy=true){
 			$res = implode('.',$this->ip_parts);
-			
+
 			if($destroy){
 ### TODO Problem under PHP 5.0  "Fatal error: Cannot re-assign $this in ..."
 #				$this = null;

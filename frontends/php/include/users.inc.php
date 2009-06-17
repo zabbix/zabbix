@@ -35,7 +35,7 @@
 			global $USER_DETAILS;
 			$auth_type = get_user_auth($USER_DETAILS['userid']);
 		}
-		
+
 		$auth_user_type[GROUP_GUI_ACCESS_SYSTEM]	= S_SYSTEM_DEFAULT;
 		$auth_user_type[GROUP_GUI_ACCESS_INTERNAL]	= S_INTERNAL_S;
 		$auth_user_type[GROUP_GUI_ACCESS_DISABLED]	= S_DISABLED;
@@ -45,7 +45,7 @@
 
 	return S_UNKNOWN;
 	}
-	
+
 
 // Add User definition
 	function add_user($name,$surname,$alias,$passwd,$url,$autologin,$autologout,$lang,$theme,$refresh,$user_type,$user_groups,$user_medias){
@@ -55,7 +55,7 @@
 			error("Insufficient permissions");
 			return 0;
 		}
-		
+
 		if(DBfetch(DBselect("select * from users where alias=".zbx_dbstr($alias)." and ".DBin_node('userid', get_current_nodeid(false))))){
 			error('User "'.$alias.'" already exists');
 			return 0;
@@ -66,7 +66,7 @@
 		$result =  DBexecute('insert into users (userid,name,surname,alias,passwd,url,autologin,autologout,lang,theme,refresh,type)'.
 			' values ('.$userid.','.zbx_dbstr($name).','.zbx_dbstr($surname).','.zbx_dbstr($alias).','.
 			zbx_dbstr(md5($passwd)).','.zbx_dbstr($url).','.$autologin.','.$autologout.','.zbx_dbstr($lang).','.zbx_dbstr($theme).','.$refresh.','.$user_type.')');
-		
+
 		if($result){
 			DBexecute('delete from users_groups where userid='.$userid);
 			foreach($user_groups as $groupid => $grou_pname){
@@ -174,12 +174,12 @@
 			error(S_CANNOT_DELETE_USER.SPACE."'".ZBX_GUEST_USER."'");
 			return	false;
 		}
-		
+
 		if(bccomp($USER_DETAILS['userid'],$userid) == 0){
 			error(S_USER_CANNOT_DELETE_ITSELF);
 			return false;
 		}
-		
+
 		DBexecute('delete from operations where object='.OPERATION_OBJECT_USER.' and objectid='.$userid);
 
 		$result = DBexecute('delete from media where userid='.$userid);
@@ -205,7 +205,7 @@
 		return	false;
 	}
 
-	
+
 	function get_userid_by_usrgrpid($usrgrpid){
 		$userids = array();
 		if($res=DBselect('SELECT DISTINCT u.userid '.
@@ -219,13 +219,13 @@
 
 	return $userids;
 	}
-	
-	
+
+
 	function add_user_to_group($userid,$usrgrpid){
 		$result = false;
 		if(granted2move_user($userid,$usrgrpid)){
 			DBexecute('DELETE FROM users_groups WHERE userid='.$userid.' AND usrgrpid='.$usrgrpid);
-	
+
 			$users_groups_id = get_dbid("users_groups","id");
 			$result = DBexecute('INSERT INTO users_groups (id,usrgrpid,userid) '.
 									' VALUES ('.$users_groups_id.','.$usrgrpid.','.$userid.')');
@@ -265,7 +265,7 @@
 
 		$result = true;
 		$group = get_group_by_usrgrpid($usrgrpid);
-		
+
 		if(($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED) || ($group['users_status'] == GROUP_STATUS_DISABLED)){
 			$result=(bccomp($USER_DETAILS['userid'],$userid)!=0);
 		}
@@ -277,7 +277,7 @@
 **************************/
 
 	function add_user_group($name,$users_status,$gui_access,$users=array(),$rights=array()){
-	
+
 		if(DBfetch(DBselect('select * from usrgrp where name='.zbx_dbstr($name).' and '.DBin_node('usrgrpid', get_current_nodeid(false))))){
 			error("Group '$name' already exists");
 			return 0;
@@ -304,16 +304,16 @@
 			$id = get_dbid('rights','rightid');
 			$result=DBexecute('insert into rights (rightid,groupid,permission,id)'.
 				' values ('.$id.','.$usrgrpid.','.$right['permission'].','.$right['id'].')');
-				
+
 			if(!$result)	return	$result;
 		}
-		
+
 		return $result;
 	}
 
 	function update_user_group($usrgrpid,$name,$users_status,$gui_access,$users=array(),$rights=array()){
 		global $USER_DETAILS;
-		
+
 		$sql = 'SELECT * '.
 				' FROM usrgrp '.
 				' WHERE name='.zbx_dbstr($name).
@@ -332,7 +332,7 @@
 		$result&=change_group_gui_access($usrgrpid,$gui_access);
 		if(!$result) return	$result;
 //-------
-		
+
 		$grant = true;
 		if(($gui_access == GROUP_GUI_ACCESS_DISABLED) || ($users_status == GROUP_STATUS_DISABLED)){
 			$grant = !uint_in_array($USER_DETAILS['userid'],$users);
@@ -347,14 +347,14 @@
 		else{
 			error(S_USER_CANNOT_DISABLE_ITSELF);
 			return false;
-		}	
-			
+		}
+
 		$result=DBexecute('DELETE FROM rights WHERE groupid='.$usrgrpid);
 		foreach($rights as $right){
 			$id = get_dbid('rights','rightid');
 			$result = DBexecute('INSERT INTO rights (rightid,groupid,permission,id)'.
 				' VALUES ('.$id.','.$usrgrpid.','.$right['permission'].','.$right['id'].')');
-				
+
 			if(!$result)	return	$result;
 		}
 
@@ -382,13 +382,13 @@
 	return  FALSE;
 	}
 
-	
+
 	function change_group_status($usrgrpid,$users_status){
 		$res = false;
-		
+
 		$grant = true;
 		if($users_status == GROUP_STATUS_DISABLED) $grant = granted2update_group($usrgrpid);
-		
+
 		if($grant){
 			$res = DBexecute('UPDATE usrgrp SET users_status='.$users_status.' WHERE usrgrpid='.$usrgrpid);
 		}
@@ -397,9 +397,9 @@
 		}
 	return $res;
 	}
-	
-	
-	function change_group_gui_access($usrgrpid,$gui_access){		
+
+
+	function change_group_gui_access($usrgrpid,$gui_access){
 		$res = false;
 
 		if(($gui_access == GROUP_GUI_ACCESS_DISABLED) && !granted2update_group($usrgrpid)){
@@ -408,31 +408,31 @@
 		}
 
 		$res = DBexecute('UPDATE usrgrp SET gui_access='.$gui_access.' WHERE usrgrpid='.$usrgrpid);
-		
+
 	return $res;
 	}
-	
+
 /********************************/
 	function set_users_jsmenu_array(){
 		$menu_all = array();
 		$menu_gui_access = array();
 		$menu_users_status = array();
-		
+
 		$res = DBselect('SELECT DISTINCT g.usrgrpid, g.name, g.gui_access, g.users_status'.
 			' FROM usrgrp g'.
 			' WHERE '.DBin_node('g.usrgrpid', get_current_nodeid(false)).
 			' ORDER BY g.name');
-		
+
 		while($group=DBfetch($res)){
 			$group['name'] = htmlspecialchars($group['name']);
-			
+
 			$gui_access = $group['gui_access'];
 			$users_status = $group['users_status'];
 
 			unset($group['gui_access']);
 			unset($group['users_status']);
 
-			$menu_all[] = $group;			
+			$menu_all[] = $group;
 			if($gui_access != GROUP_GUI_ACCESS_SYSTEM){
 				$menu_gui_access[] = $group;
 			}
@@ -446,14 +446,14 @@
 			'var menu_usrgrp_gui='.zbx_jsvalue($menu_gui_access).";\n".
 			'var menu_usrgrp_status='.zbx_jsvalue($menu_users_status).";\n"
 		);
-		
+
 	}
 
 	function get_user_actionmenu($userid){
 		$usr_grp_all_in = array();
 		$usr_grp_gui_in = array();
 		$usr_grp_status_in = array();
-		
+
 		$sql = 'SELECT DISTINCT g.name, g.usrgrpid, g.gui_access, g.users_status '.
 			' FROM users_groups ug, usrgrp g '.
 			' WHERE ug.userid='.$userid.
@@ -463,14 +463,14 @@
 
 		while($group = DBFetch($res)){
 			$group['name'] = htmlspecialchars($group['name']);
-			
+
 			$gui_access = $group['gui_access'];
 			$users_status = $group['users_status'];
-			
+
 			unset($group['gui_access']);
 			unset($group['users_status']);
-		
-			$usr_grp_all_in[] = $group;	
+
+			$usr_grp_all_in[] = $group;
 			if($gui_access != GROUP_GUI_ACCESS_SYSTEM){
 				$usr_grp_gui_in[] = $group;
 			}
@@ -478,7 +478,7 @@
 				$usr_grp_status_in[] = $group;
 			}
 		}
-				
+
 		$action = new CSpan(S_SELECT);
 		$script = new CScript("javascript: create_user_menu(event,".
 												$userid.",".
@@ -486,10 +486,10 @@
 												zbx_jsvalue($usr_grp_gui_in).",".
 												zbx_jsvalue($usr_grp_status_in).");"
 							 );
-							 
+
 		$action->AddAction('onclick',$script);
 		$action->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
-		
+
 	return $action;
 	}
 ?>

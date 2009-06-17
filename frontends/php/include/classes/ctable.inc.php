@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -23,28 +23,28 @@
 /* public */
 		function CCol($item=NULL,$class=NULL){
 			parent::CTag("td","yes");
-			
+
 			$this->AddItem($item);
 			$this->SetClass($class);
 		}
-		
+
 		function SetAlign($value){
 			return $this->options['align'] = $value;
 		}
-		
+
 		function SetRowSpan($value){
 			return $this->options['rowspan'] = strval($value);
 		}
-		
+
 		function SetColSpan($value){
 			return $this->options['colspan'] =strval($value);
 		}
-		
+
 		function SetWidth($value){
 			if(is_string($value))$this->AddOption('width',$value);
 		}
 	}
-	
+
 	class CRow extends CTag{
 /* public */
 		function CRow($item=NULL,$class=NULL){
@@ -53,11 +53,11 @@
 			$this->AddItem($item);
 			$this->SetClass($class);
 		}
-		
+
 		function SetAlign($value){
 			return $this->options['align'] = $value;
 		}
-		
+
 		function AddItem($item){
 			if(strtolower(get_class($item))=='ccol') {
 				parent::AddItem($item);
@@ -66,7 +66,7 @@
 				foreach($item as $el){
 					if(strtolower(get_class($el))=='ccol') {
 						parent::AddItem($el);
-					} 
+					}
 					else if(!is_null($el)){
 						parent::AddItem(new CCol($el));
 					}
@@ -76,7 +76,7 @@
 				parent::AddItem(new CCol($item));
 			}
 		}
-		
+
 		function SetWidth($value){
 			if(is_string($value))$this->AddOption('width',$value);
 		}
@@ -97,7 +97,7 @@
 		function CTable($message=NULL,$class=NULL){
 			parent::CTag("table","yes");
 			$this->SetClass($class);
-			
+
 			$this->rownum = 0;
 			$this->oddRowClass = NULL;
 			$this->evenRowClass = NULL;
@@ -111,23 +111,23 @@
 
 			$this->message = $message;
 		}
-		
+
 		function SetOddRowClass($value=NULL){
 			$this->oddRowClass = $value;
 		}
-		
+
 		function SetEvenRowClass($value=NULL){
 			$this->evenRowClass = $value;
 		}
-		
+
 		function SetAlign($value){
 			return $this->options['align'] = $value;
 		}
-		
+
 		function SetCellPadding($value){
 			return $this->options['cellpadding'] = strval($value);
 		}
-		
+
 		function SetCellSpacing($value){
 			return $this->options['cellspacing'] = strval($value);
 		}
@@ -201,7 +201,7 @@
 			$ret .= $this->header;
 			return $ret;
 		}
-		
+
 		function EndToString(){
 			$ret = "";
 			if($this->rownum == 0 && isset($this->message)) {
@@ -211,6 +211,6 @@
 			$ret .= $this->footer;
 			$ret .= parent::EndToString();
 			return $ret;
-		}		
+		}
 	}
 ?>

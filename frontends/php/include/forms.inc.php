@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-// TODO !!! Correcr the help links !!! TODO
+// TODO !!! Correct the help links !!! TODO
 
 	require_once('include/users.inc.php');
 
@@ -732,7 +732,7 @@
 				$autologout = 90;
 			}
 		}
-		
+
 		$perm_details	= get_request('perm_details',0);
 
 		$media_types = array();
@@ -875,8 +875,8 @@
 
 		$frmUser->AddRow(S_THEME, $cmbTheme);
 
-		$chkbx_autologin = new CCheckBox("autologin", 
-											$autologin, 
+		$chkbx_autologin = new CCheckBox("autologin",
+											$autologin,
 											new CScript("var autologout_visible = document.getElementById('autologout_visible');
 														var autologout = document.getElementById('autologout');
 														if (this.checked) {
@@ -890,8 +890,8 @@
 														}"), 1);
 		$chkbx_autologin->AddOption('autocomplete','off');
 		$frmUser->AddRow(S_AUTO_LOGIN,	$chkbx_autologin);
-		$autologoutCheckBox = new CCheckBox('autologout_visible', 
-											(isset($autologout) && $autologout != 0) ? 'yes' : 'no', 
+		$autologoutCheckBox = new CCheckBox('autologout_visible',
+											(isset($autologout) && $autologout != 0) ? 'yes' : 'no',
 											new CScript("var autologout = document.getElementById('autologout');
 														if (this.checked) {
 															autologout.disabled = false;
@@ -3319,7 +3319,7 @@
 			));
 
 		$allowed_operations = get_operations_by_eventsource($eventsource);
-		
+
 		$delay = count_operations_delay($operations,$esc_period);
 		foreach($operations as $id => $val){
 			if( !str_in_array($val['operationtype'], $allowed_operations) )	continue;
@@ -6067,7 +6067,7 @@
 
 			$link_desc = new CSpan($trigger['description'],'link');
 			$link_desc->addoption('onclick', "javascript: openWinCentered('popup_link_tr.php?form=1&dstfrm=".$frmCnct->GetName()."&triggerid=".$trigger['triggerid'].url_param('linkid')."','ZBX_Link_Indicator',560,260,'scrollbars=1, toolbar=0, menubar=0, resizable=0');");
-			
+
 			$table->AddRow(array(
 					array(
 						new CCheckBox('triggers['.$trigger['triggerid'].'][triggerid]',null,null,$trigger['triggerid']),

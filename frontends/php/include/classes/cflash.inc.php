@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -29,7 +29,7 @@
 			$this->options['pluginspage']  = 'http://www.macromedia.com/go/getflashplayer';
 			$this->options['align'] = 'middle';
 			$this->options['quality'] = 'high';
-			
+
 			$this->options['width'] = $width;
 			$this->options['height'] = $height;
 			$this->options['src'] = $src;

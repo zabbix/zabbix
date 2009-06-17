@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2008 SIA Zabbix
 **
@@ -919,6 +919,6 @@
 	'S_LATEST_DATA'=>			'Dernières métriques',
 	'S_INCORRECT_DESCRIPTION'=>			'Description incorrecte',
 	'S_CANT_FORMAT_TREE'=>			'Production arbre de tri impossible',
-	
+
 	);
 ?>

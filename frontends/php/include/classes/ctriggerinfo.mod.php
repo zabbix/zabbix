@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -20,13 +20,13 @@
 ?>
 <?php
 	include_once('include/triggers.inc.php');
-	
+
 	class CTriggersInfo extends CTable{
 		/*
 		var $style;
 		var $show_header;
 		var $nodeid;*/
-		
+
 		function CTriggersInfo($style = STYLE_HORISONTAL){
 			$this->style = null;
 
@@ -46,18 +46,18 @@
 		function SetNodeid($nodeid){
 			$this->nodeid = (int)$nodeid;
 		}
-		
+
 		function HideHeader(){
 			$this->show_header = false;
 		}
 
 		function BodyToString(){
 			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY, get_current_nodeid(true));
-			
+
 			foreach($available_triggers as $id => $triggerid){
 				if(trigger_dependent($triggerid))	unset($available_triggers[$id]);
 			}
-		
+
 			$this->CleanItems();
 
 			$ok = $uncn = $info = $warn = $avg = $high = $dis = 0;
@@ -74,7 +74,7 @@
 								' AND '.DBcondition('t.triggerid',$available_triggers).
 							' GROUP BY t.priority,t.value');
 			while($row=DBfetch($db_priority)){
-				
+
 				switch($row["value"]){
 					case TRIGGER_VALUE_TRUE:
 						switch($row["priority"]){
@@ -108,12 +108,12 @@
 			$avg	= new CCol($avg.SPACE.S_AVERAGE,			get_severity_style(TRIGGER_SEVERITY_AVERAGE,$avg));
 			$high	= new CCol($high.SPACE.S_HIGH,				get_severity_style(TRIGGER_SEVERITY_HIGH,$high));
 			$dis	= new CCol($dis.SPACE.S_DISASTER,			get_severity_style(TRIGGER_SEVERITY_DISASTER,$dis));
-			
+
 
 			if(STYLE_HORISONTAL == $this->style){
 				$this->AddRow(array($trok, $uncn, $info, $warn, $avg, $high, $dis));
 			}
-			else{			
+			else{
 				$this->AddRow($trok);
 				$this->AddRow($uncn);
 				$this->AddRow($info);

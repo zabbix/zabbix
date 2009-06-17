@@ -1,5 +1,5 @@
-<?php 
-/* 
+<?php
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -66,7 +66,7 @@
 			}
 
 			$data = &$this->data[$name];
-			
+
 			foreach($attrs as $id => $val)
 				$attrs[$id] = html_entity_decode($val);
 
@@ -365,7 +365,7 @@
 						error('Missing group ['.$this->element_data.']');
 						break; // case
 					}
-					
+
 					if(!isset($this->available_groups[$group['groupid']])){
 						error('Group ['.$this->element_data.'] skipped - Access deny.');
 						break; // case
@@ -389,7 +389,7 @@
 						break; //case
 
 					if(!$trigger_up = get_trigger_by_description($this->element_data)) break;
-					
+
 					array_push($this->data[XML_TAG_DEPENDENCY]['triggerid_up'], $trigger_up['triggerid']);
 
 					break; // case
@@ -428,7 +428,7 @@
 						error('Missing template ['.$this->element_data.']');
 						break; // case
 					}
-					
+
 					if(!isset($this->available_hosts[$template['hostid']])){
 						error('Template ['.$this->element_data.'] skipped - Access deny.');
 						break; // case
@@ -485,7 +485,7 @@
 							$data['valuemapid'] = add_valuemap($data['valuemap'],array());
 						}
 					}
-					
+
 					$sql = 'SELECT itemid,valuemapid,templateid '.
 							' FROM items '.
 							' WHERE key_='.zbx_dbstr($data['key']).
@@ -500,7 +500,7 @@
 
 						if(!isset($data['valuemapid']))
 							$data['valuemapid'] = $item['valuemapid'];
-	
+
 							$data['key_'] = $data['key'];
 							$data['hostid'] = $this->data[XML_TAG_HOST]['hostid'];
 							$data['applications'] = array_unique(array_merge($data['applications'],get_applications_by_itemid($item['itemid'])));
@@ -555,7 +555,7 @@
 					}
 					else{
 						$data['expression'] = str_replace('{{HOSTNAME}:','{'.$this->data[XML_TAG_HOST]['name'].':',$data['expression']);
- 
+
 						$result = DBselect('SELECT DISTINCT t.triggerid,t.templateid,t.expression '.
  							' FROM triggers t,functions f,items i '.
  							' WHERE t.triggerid=f.triggerid '.
@@ -571,7 +571,7 @@
 
 						if(!empty($trigger)){ /* exist */
 							if($this->trigger['exist']==1){ /* skip */
-							
+
 // remember skipped triggers for dependencies
 								$this->data[XML_TAG_DEPENDENCIES]['skip'][] = $this->data[XML_TAG_HOST]['name'].':'.$data['description'];
 
@@ -597,7 +597,7 @@
 							// continue [add_trigger]
 						}
 					}
-					
+
 					if($this->trigger['missed']==1) /* skip */{
 
 // remember skipped triggers for dependencies
@@ -661,7 +661,7 @@
 							}
 
 							$data['graphid'] = $graph['graphid'];
-					
+
 							update_graph_with_items(
 									$data['graphid'],
 									$data['name'],
@@ -684,13 +684,13 @@
 							// continue [add_group]
 						}
 					}
-					
+
 					if(!isset($data['graphid'])){
 						if($this->graph['missed']==1){ /* skip */
 							info('Graph ['.$data['name'].'] skipped - user rule');
 							break; // case
 						}
-						
+
 						$data['graphid'] = add_graph_with_items(
 												$data['name'],
 												$data['width'],
@@ -713,7 +713,7 @@
 				case XML_TAG_GRAPH_ELEMENT:
 					if(!isset($this->data[XML_TAG_GRAPH]))
 						break; // case
-						
+
 					$data['key'] = explode(':', $data['item']);
 					if(count($data['key']) < 2){
 						$this->data[XML_TAG_GRAPH]['error'] = true;
@@ -760,9 +760,9 @@
 					$this->sub_node = null;
 					return;
 			}
-			
+
 			unset($this->data[$name], $data);
-			
+
 			array_pop($this->main_node);
 		}
 
@@ -770,13 +770,13 @@
 			$this->main_node	= null;
 			$this->sub_node		= null;
 			$this->data		= null;
-			
+
 			$xml_parser = xml_parser_create();
-			
+
 			xml_parser_set_option($xml_parser, XML_OPTION_CASE_FOLDING, false);
-			
+
 			xml_set_element_handler($xml_parser, array(&$this, "StartElement"), array(&$this, "EndElement"));
-			
+
 			xml_set_character_data_handler($xml_parser, array(&$this, "characterData"));
 
 			if(!$fp = fopen($file, "r")){
@@ -799,7 +799,7 @@
 				fclose($fp);
 			}
 			xml_parser_free($xml_parser);
-			
+
 			$this->main_node	= null;
 			$this->sub_node		= null;
 			$this->data		= null;
@@ -819,7 +819,7 @@
 	class CZabbixHostImport{
 		function CZabbixHostImport(){
 		}
-		
+
 		function Parse($file){
 			if (!($fp = fopen($file, "r"))){
 				error("could not open XML input");

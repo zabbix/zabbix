@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -31,15 +31,15 @@
 			$this->setAction($action);
 			$this->setAccessKey($accesskey);
 		}
-		
+
 		function setAction($value=null){
 			$this->addAction('onclick', $value);
 		}
-		
+
 		function setTitle($value='button title'){
 			$this->addOption('title', $value);
 		}
-		
+
 		function setAccessKey($value='B'){
 			if(isset($value))
 				if(!isset($this->options['title']))
@@ -47,7 +47,7 @@
 
 			return $this->addOption('accessKey', $value);
 		}
-		
+
 		function setType($type='button'){
 			$this->addOption('type',$type);
 		}
@@ -68,7 +68,7 @@
 
 			$uri = new Curl($url);
 			$url = $uri->getUrl();
-			
+
 			return parent::setAction("javascript: return redirect('".$url."');");
 		}
 	}
@@ -83,14 +83,14 @@
 			$this->vars = null;
 			$this->msg = null;
 			$this->name = $name;
-			
+
 			parent::CButton($name,$caption);
 
 			$this->setMessage($msg);
 			$this->setVars($vars);
 			$this->setAction(NULL);
 		}
-		
+
 		function setVars($value=NULL){
 			if(!is_string($value) && !is_null($value)){
 				return $this->error('Incorrect value for setVars ['.$value.']');
@@ -98,7 +98,7 @@
 			$this->vars = $value;
 			$this->setAction(NULL);
 		}
-		
+
 		function setMessage($value=NULL){
 			if(is_null($value))
 				$value = 'Are You Sure?';
@@ -109,7 +109,7 @@
 			$this->msg = $value;
 			$this->setAction(NULL);
 		}
-		
+
 		function setAction($value=null){
 			if(!is_null($value))
 				return parent::setAction($value);
@@ -117,17 +117,17 @@
 			global $page;
 
 			$confirmation = "Confirm('".$this->msg."')";
-			
+
 			if(isset($this->vars)){
 				$link = $page['file'].'?'.$this->name.'=1'.$this->vars;
 				$url = new Curl($link);
-				
+
 				$action = "redirect('".$url->getUrl()."')";
 			}
 			else{
 				$action = 'true';
 			}
-			
+
 			return parent::setAction('if('.$confirmation.') return '.$action.'; else return false;');
 		}
 	}

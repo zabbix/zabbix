@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -53,16 +53,16 @@
 //			$frm_link = new CLink();
 //			$frm_link->setName("formtable");
 //			$this->addItemToTopRow($frm_link);
-			
+
 			$this->addVar($form_variable, get_request($form_variable, 1));
 			$this->addVar('form_refresh',get_request('form_refresh',0)+1);
 
 			$this->bottom_items = new CCol(SPACE,'form_row_last');
 		        $this->bottom_items->setColSpan(2);
 		}
-		
+
 		function setAction($value){
-			
+
 			if(is_string($value))
 				return parent::setAction($value);
 			elseif(is_null($value))
@@ -70,7 +70,7 @@
 			else
 				return $this->error("Incorrect value for SetAction [$value]");
 		}
-		
+
 		function setName($value){
 			if(!is_string($value)){
 				return $this->error("Incorrect value for SetAlign [$value]");
@@ -79,7 +79,7 @@
 			$this->addOption('id',$value);
 		return true;
 		}
-		
+
 		function setAlign($value){
 			if(!is_string($value)){
 				return $this->error("Incorrect value for SetAlign [$value]");
@@ -100,52 +100,52 @@
 */
 			$this->title = unpack_object($value);
 		}
-		
+
 		function setHelp($value=NULL){
 			if(is_null($value)) {
 				$this->help = new CHelp();
-			} 
+			}
 			else if(strtolower(get_class($value)) == 'chelp') {
 				$this->help = $value;
-			} 
+			}
 			else if(is_string($value)) {
 				$this->help = new CHelp($value);
 				if($this->getName()==NULL)
 					$this->setName($value);
-			} 
+			}
 			else {
 				return $this->error("Incorrect value for SetHelp [$value]");
 			}
 			return 0;
 		}
-		
+
 		function addVar($name, $value){
 			$this->addItemToTopRow(new CVar($name, $value));
 		}
-		
+
 		function addItemToTopRow($value){
 			array_push($this->top_items, $value);
 		}
-		
+
 		function addRow($item1, $item2=NULL, $class=NULL){
 			if(strtolower(get_class($item1)) == 'crow'){
-			
-			} 
+
+			}
 			else if(strtolower(get_class($item1)) == 'ctable'){
 				$td = new CCol($item1,'form_row_c');
 				$td->setColSpan(2);
-				
+
 				$item1 = new CRow($td);
-			} 
+			}
 			else{
 				$tmp = $item1;
 				if(is_string($item1)){
 					$item1=nbsp($item1);
 				}
-				
+
 				if(empty($item1)) $item1 = SPACE;
 				if(empty($item2)) $item2 = SPACE;
-				
+
 				$item1 = new CRow(
 								array(
 									new CCol($item1,'form_row_l'),
@@ -156,7 +156,7 @@
 
 			array_push($this->center_items, $item1);
 		}
-		
+
 		function addSpanRow($value, $class=NULL){
 			if(is_string($value))
 				$item1=nbsp($value);
@@ -168,8 +168,8 @@
 		        $col->setColSpan(2);
 			array_push($this->center_items,new CRow($col));
 		}
-		
-		
+
+
 		function addItemToBottomRow($value){
 			$this->bottom_items->addItem($value);
 		}
@@ -179,7 +179,7 @@
 				$this->tableclass = $class;
 			}
 		}
-		
+
 /* protected */
 		function BodyToString(){
 			parent::BodyToString();
@@ -194,11 +194,11 @@
 # add first row
 			$col = new CCol(NULL,'form_row_first');
 			$col->setColSpan(2);
-			
+
 			if(isset($this->help))			$col->addItem($this->help);
 			if(isset($this->title))		 	$col->addItem($this->title);
 			foreach($this->top_items as $item)	$col->addItem($item);
-			
+
 			$tbl->setHeader($col);
 # add last row
 			$tbl->setFooter($this->bottom_items);

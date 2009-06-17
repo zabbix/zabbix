@@ -27,7 +27,7 @@
 					$b->addItem($val);
 					$str[$key] = $b;
 				}
-		} 
+		}
 		else if(is_string($str)) {
 			$b = new CTag('strong','yes','');
 			$b->addItem($str);
@@ -41,7 +41,7 @@
 		$res = bold($str[0]);
 		for($i=1,$max=strlen($str); $i<$max; $i++)	$res .= $str[$i];
 		$str = $res;
-		return $str;	
+		return $str;
 	}
 
 	function nbsp($str){
@@ -76,35 +76,35 @@
 			if(!isset($name)){
 				if(!$request)
 					fatal_error('not request variable require url name [url_param]');
-					
+
 				$name = $parameter;
 			}
 		}
-		
+
 		if($request){
 			$var =& $_REQUEST[$parameter];
 		}
 		else{
 			$var =& $parameter;
 		}
-		
+
 		if(isset($var)){
 			$result = prepare_url($var,$name);
 		}
 
 	return $result;
 	}
-	
+
 	function BR(){
 		return new CTag('br','no');
 	}
-	
+
 	function create_hat($caption,$items,$addicons=null,$id=null,$state=1){
 // dirty FIX !!!!!!!!!!!!!	 FIX this one
 		global $page;
 //---------------------------------------
 		if(is_null($id)){
-			list($usec, $sec) = explode(' ',microtime());	
+			list($usec, $sec) = explode(' ',microtime());
 			$id = 'hat_'.((int)($sec % 10)).((int)($usec * 1000));
 		}
 
@@ -130,9 +130,9 @@
 
 		$icon_tab = new CTable();
 		$icon_tab->addOption('width','100%');
-		
+
 		$icon_tab->addRow($icons_row);
-		
+
 		$table = new CTable();
 		$table->addOption('width','100%');
 		$table->setCellPadding(0);
@@ -142,21 +142,21 @@
 		$div = new CDiv($items);
 		$div->addOption('id',$id);
 		if(!$state) $div->AddOption('style','display: none;');
-		
+
 		$table->addRow($div);
 	return $table;
 	}
-	
+
 	function create_filter($col_l,$col_r,$items,$id='zbx_filter',$state=1){
 
 		if(isset($_REQUEST['print'])) $state = 0;
-		
+
 		$table = new CTable();
 		$table->AddOption('width','100%');
 		$table->SetCellPadding(0);
 		$table->SetCellSpacing(0);
 		$table->AddOption('border',0);
-		
+
 		$icon = new CDiv(SPACE,($state)?'filteropened':'filterclosed');
 		$icon->AddAction('onclick',new CScript("javascript: change_filter_state(this,'".$id."');"));
 		$icon->AddOption('title',S_MAXIMIZE.'/'.S_MINIMIZE);
@@ -171,25 +171,25 @@
 		$icon_tab = new CTable();
 		$icon_tab->SetCellSpacing(0);
 		$icon_tab->SetCellPadding(0);
-		
+
 		$icon_tab->AddRow($icons_row);
-		
+
 		$table->AddRow(get_thin_table_header($icon_tab,$col_r));
 
 		$div = new CDiv($items);
 		$div->AddOption('id',$id);
 		if(!$state) $div->AddOption('style','display: none;');
-		
+
 		$tab = new CTable();
 		$tab->AddRow($div);
-		
+
 //		$table->AddRow($tab);
 		$table->AddRow($div);
 	return $table;
 	}
-	
+
 	function create_filter_hat($col_l,$col_r,$items,$id,$state=1){
-		
+
 		$table = new CTable(NULL,"filter");
 		$table->SetCellSpacing(0);
 		$table->SetCellPadding(1);
@@ -197,22 +197,22 @@
 
 
 		$td_l = new CCol($icon_tab,"filter_l");
-				
+
 		$td_r = new CCol($col_r,"filter_r");
 		$td_r->AddOption('align','right');
-				
+
 		$table->AddRow(array($td_l, $td_r));
 	return $table;
 	}
-	
-	
-/* Function: 
+
+
+/* Function:
  *	hide_form_items()
  *
  * Desc:
  *	Searches items/objects for Form tags like "<input"/Form classes like CForm, and makes it empty
- * 
- * Author: 
+ *
+ * Author:
  *	Aly
  */
 	function hide_form_items(&$obj){
@@ -237,17 +237,17 @@
 			}
 		}
 	}
-	
+
 	function get_thin_table_header($col1, $col2=SPACE){
-		
+
 		$table = new CTable(NULL,"filter");
 //		$table->AddOption('border',1);
 		$table->SetCellSpacing(0);
 		$table->SetCellPadding(1);
-		
+
 		$td_r = new CCol($col2,"filter_r");
 		$td_r->AddOption('align','right');
-		
+
 		$table->AddRow(array(new CCol($col1,"filter_l"), $td_r));
 	return $table;
 	}
@@ -264,15 +264,15 @@
 		//if empty header than do not show it
 			if(($col1 == SPACE) && ($col2 == SPACE)) return new CScript('');
 		}
-		
+
 		$table = new CTable(NULL,"header");
 //		$table->AddOption('border',1);
 		$table->SetCellSpacing(0);
 		$table->SetCellPadding(1);
-		
+
 		$td_r = new CCol($col2,"header_r");
 		$td_r->AddOption('align','right');
-		
+
 		$table->AddRow(array(new CCol($col1,"header_l"), $td_r));
 	return $table;
 	}

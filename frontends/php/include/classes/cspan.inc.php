@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -27,12 +27,12 @@
 			parent::CTag("span","yes");
 			$this->SetClass($class);
 			$this->AddItem($items);
-			
-			$this->tag_body_start = "";			
+
+			$this->tag_body_start = "";
 			$this->tag_start= "";
 			$this->tag_end = "";
 			$this->tag_body_start = "";
-			$this->tag_body_end = "";			
+			$this->tag_body_end = "";
 		}
 	}
 

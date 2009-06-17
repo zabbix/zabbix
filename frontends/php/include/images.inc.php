@@ -28,7 +28,7 @@
 		info(SQLITE3_INTEGER.','.SQLITE3_FLOAT.','.SQLITE3_TEXT.','.SQLITE3_BLOB.','.SQLITE3_NULL);
 		return 0;*/
 		global $DB;
-		
+
 		$result = DBselect('select * from images where imageid='.$imageid);
 		$row = DBfetch($result);
 		if($row){
@@ -82,7 +82,7 @@
 						error("Execute SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
 						return false;
 					}
-					
+
 					$result = DBend($lobimage->save($image));
 					if(!$result){
 						error("Couldn't save image!\n");
@@ -136,7 +136,7 @@
 									' WHERE imageid='.$imageid);
 
 					if(!$result) return $result;
-					
+
 					DBstart();
 					if(!$stid = DBselect('SELECT image FROM images WHERE imageid='.$imageid.' FOR UPDATE')){
 						DBend();
@@ -163,11 +163,11 @@
 
 				$sql='UPDATE images SET name='.zbx_dbstr($name).',imagetype='.zbx_dbstr($imagetype).',image='.zbx_dbstr($image).
 					' WHERE imageid='.$imageid;
-					
+
 				return	DBexecute($sql);
 			}
 			else{
-				error("Image size must be less than 1Mb");
+				error("Image size must be less than 1MB");
 				return FALSE;
 			}
 		}

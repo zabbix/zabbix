@@ -60,7 +60,7 @@ function make_acktab_by_eventid($eventid){
 	$table->SetHeader(array(S_TIME,S_USER, S_COMMENTS));
 
 	$acks = get_acknowledges_by_eventid($eventid);
-	
+
 	while($ack = DBfetch($acks)){
 		$user = get_user_by_userid($ack['userid']);
 		$table->AddRow(array(

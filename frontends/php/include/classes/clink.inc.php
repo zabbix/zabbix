@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -23,7 +23,7 @@
 /* public */
 		function CLink($item=NULL,$url=NULL,$class=NULL,$action=NULL, $nosid=NULL){
 			parent::CTag('a','yes');
-			
+
 			$this->tag_start= '';
 			$this->tag_end = '';
 			$this->tag_body_start = '';
@@ -35,14 +35,14 @@
 			if(!is_null($url))		$this->setUrl($url);
 			if(!is_null($action))	$this->setAction($action);
 		}
-		
+
 		function setAction($value=NULL){
 			if(is_null($value))
 				return $this->options['action'] = $page['file'];
 
 			return parent::addAction('onclick', $value);
 		}
-		
+
 		function setUrl($value){
 			if(is_null($this->nosid)) {
 				$uri = new Curl($value);
@@ -53,14 +53,14 @@
 			}
 			$this->addOption('href', $url);
 		}
-		
+
 		function getUrl(){
 			if(isset($this->options['href']))
 				return $this->options['href'];
 			else
 				return null;
 		}
-		
+
 		function setTarget($value=NULL){
 			if(is_null($value)){
 				unset($this->options['target']);

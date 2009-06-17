@@ -28,9 +28,9 @@
 	if(!defined('PAGE_HEADER_LOADED')){
 		define ('PAGE_HEADER_LOADED', 1);
 	}
-	
+
 	show_messages();
-		
+
 	if($page['type'] == PAGE_TYPE_HTML){
 //------------- <HISTORY> -------------
 		add_user_history($page);

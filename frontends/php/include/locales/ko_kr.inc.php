@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -30,7 +30,7 @@
 	'S_DISABLE_SELECTED'=>			'선택 항목 비활성화',
 	'S_DELETE_SELECTED'=>			'선택 항목 삭제',
 	'S_COPY_SELECTED_TO'=>			'선택 항목 복사...',
-	
+
 //	dicoveryconf.php
 	'S_HOST_IP'=>				'호스트 IP 주소',
 	'S_SERVICE_TYPE'=>			'서비스 종류',
@@ -130,7 +130,7 @@
 	'S_POST'=>				'POST',
 	'S_REQUIRED'=>				'요구 문자열',
 	'S_STEP_OF_SCENARIO'=>			'시나리오 스텝',
-	
+
 //	exp_imp.php
 	'S_ELEMENT'=>				'항목',
 	'S_ELEMENTS'=>				'항목',
@@ -161,7 +161,7 @@
 	'S_NEW_INSTALLATION'=>			'새로 설치',
 	'S_NEW_INSTALLATION_BIG'=>		'새로 설치',
 	'S_INSTALLATION_UPDATE'=>		'설치/갱신',
-	
+
 //	node.php
 	'S_TIME_ZONE'=>				'시간대',
 	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>	'이력 보존 기간(일)',
@@ -178,7 +178,7 @@
 	'S_CURRENT_NODE'=>			'현재 노드',
 	'S_CURRENT_NODE_ONLY'=>			'현재 노드만',
 	'S_WITH_SUBNODES'=>			'하위 노드도 포함',
-	
+
 //	acknow.php
 	'S_ACKNOWLEDGES'=>			'인지',
 	'S_ACKNOWLEDGE'=>			'인지',
@@ -373,7 +373,7 @@
 	'S_INCORRECT_GROUP'=>			'부적절한 그룹',
 	'S_NOTHING_TO_DO'=>			'실행할 것이 없습니다',
 	'S_ICORRECT_WORK_PERIOD'=>		'부적절한 Working time',
-	
+
 //	nodes.php
 	'S_NODE'=>				'노드',
 	'S_NODES'=>				'노드',
@@ -670,8 +670,8 @@
 	'S_CREATE_CONNECTION'=>			'연결 작성',
 	'S_COORDINATE_X'=>			'X좌표',
 	'S_COORDINATE_Y'=>			'Y좌표',
-	
-	
+
+
 
 //	sysmaps.php
 	'S_MAPS_BIG'=>				'맵',
@@ -789,7 +789,7 @@
 	'S_NUMBER_OF_STATUS_CHANGES'=>		'상태 변경 횟수',
 	'S_WEEK'=>				'주',
 	'S_LAST'=>				'최근',
- 
+
 //	screenconf.php
 	'S_SCREENS'=>				'스크린',
 	'S_SCREEN'=>				'스크린',

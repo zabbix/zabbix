@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -26,25 +26,25 @@
 			$this->setMethod($method);
 			$this->setAction($action);
 			$this->setEnctype($enctype);
-			
+
 			if(isset($_COOKIE['zbx_sessionid']))
 				$this->addVar('sid', substr($_COOKIE['zbx_sessionid'],16,16));
 		}
-		
+
 		function setMethod($value='post'){
 			return $this->options['method'] = $value;
 		}
-		
+
 		function setAction($value){
 			global $page;
 
 			if(is_null($value)){
 				$value = isset($page['file'])?$page['file']:'#';
 			}
-			
+
 		return $this->options['action'] = $value;
 		}
-		
+
 		function setEnctype($value=NULL){
 			if(is_null($value)){
 				return $this->DelOption('enctype');
@@ -52,7 +52,7 @@
 			else if(!is_string($value)){
 				return $this->error("Incorrect value for SetEnctype [$value]");
 			}
-			
+
 		return $this->addOption('enctype',$value);
 		}
 

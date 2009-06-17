@@ -18,7 +18,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 ?>
-<?php	
+<?php
 	function detect_node_type($node_data){
 		global $ZBX_CURMASTERID;
 

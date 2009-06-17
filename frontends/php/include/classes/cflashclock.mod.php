@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -30,7 +30,7 @@
 
 			if(!is_numeric($width) || $width < 24) $width = 200;
 			if(!is_numeric($height) || $height< 24) $height = 200;
-			
+
 			$this->src = "images/flash/zbxclock.swf?analog=1&smooth=1";
 			if(!is_null($url))	$this->src .= "&url=".urlencode($url);
 
@@ -49,7 +49,7 @@
 			if($this->timetype == TIME_TYPE_SERVER)
 				$this->setSrc($this->src.'&timestamp='.(time() + date('Z')));
 
-			return parent::BodyToString();	
+			return parent::BodyToString();
 		}
 	}
 ?>

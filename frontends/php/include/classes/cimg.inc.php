@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -41,21 +41,21 @@
 			$this->SetHeight($height);
 			$this->SetClass($class);
 		}
-		
+
 		function SetSrc($value){
 			if(!is_string($value)){
 				return $this->error("Incorrect value for SetSrc [$value]");
 			}
 		return $this->AddOption("src",$value);
 		}
-		
+
 		function SetAltText($value=NULL){
 			if(!is_string($value)){
 				return $this->error("Incorrect value for SetText [$value]");
 			}
 		return $this->AddOption("alt",$value);
 		}
-		
+
 		function SetMap($value=NULL){
 			if(is_null($value))
 				$this->DeleteOption("usemap");
@@ -63,11 +63,11 @@
 			if(!is_string($value)){
 				return $this->error("Incorrect value for SetMap [$value]");
 			}
-			
+
 			$value = '#'.ltrim($value,'#');
 		return $this->AddOption("usemap",$value);
 		}
-		
+
 		function SetWidth($value=NULL){
 			if(is_null($value))
 				return $this->DelOption("width");
@@ -76,7 +76,7 @@
 			else
 				return $this->error("Incorrect value for SetWidth [$value]");
 		}
-		
+
 		function SetHeight($value=NULL){
 			if(is_null($value))
 				return $this->DelOption("height");

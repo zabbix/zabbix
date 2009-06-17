@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -32,7 +32,7 @@
 			$this->InsertJavaScript();
 			/*********************** ITEM ARRAY ***********************
 			 ITEM: array(name, url, param, css, submenu1, submenu2, ... , submenuN)
-			 
+
 			 name:  text
 			 url:   text (url for href perameter)
 			 param: array(tw => t_val, sb => s_val)
@@ -56,7 +56,7 @@
 
 			return 'return show_popup_menu(event,'.zbx_jsvalue($this->items).','.zbx_jsvalue($this->width).');';
 		}
-		
+
 		function InsertJavaScript()
 		{
 			if(defined('CPUMENU_INSERTJAVASCRIPT_INSERTED')) return;

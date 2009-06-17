@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2008 SIA Zabbix
 **
@@ -1238,6 +1238,6 @@
 	'S_CANT_FORMAT_TREE'=>			'Kann Baum nicht formatieren',
 	'S_UNSUPPORTED_FILE_FORMAT'=>			'Nicht unterstütztes Dateiformat',
 	'S_UNSUPPORTED_VERSION_OF_IMPORTED_DATA'=>			'Nicht unterstützte Version der Importdaten',
-	
+
 	);
 ?>

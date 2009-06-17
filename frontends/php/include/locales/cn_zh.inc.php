@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2008 SIA Zabbix
 **
@@ -469,6 +469,6 @@
 	'S_AUDIT'=>			'审计',
 	'S_LOGIN'=>			'登录/退出',
 	'S_LATEST_DATA'=>			'最新数据',
-	
+
 	);
 ?>

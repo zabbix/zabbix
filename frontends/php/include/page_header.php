@@ -28,12 +28,12 @@
 	global $page;
 
 COpt::profiling_start("page");
-	
+
 	unset($denyed_page_requested);
 
 	if(!isset($page['type'])) $page['type'] = PAGE_TYPE_HTML;
 	if(!isset($page['file'])) $page['file'] = basename($_SERVER['PHP_SELF']);
-	
+
 	if($_REQUEST['fullscreen']=get_request('fullscreen', 0)) define('ZBX_PAGE_NO_MENU', 1);
 
 	include_once('include/locales/en_gb.inc.php');
@@ -64,25 +64,25 @@ COpt::profiling_start("page");
 			break;
 		case PAGE_TYPE_HTML:
 		default:
-			if(!isset($page['encoding'])) 
+			if(!isset($page['encoding']))
 				header('Content-Type: text/html; charset='.S_HTML_CHARSET);
-			else 
+			else
 				header('Content-Type: text/html; charset='.$page['encoding']);
 
 			if(isset($page['title']) && defined($page['title']))	$page['title'] = constant($page['title']);
-			
+
 			if(!isset($page['title'])) $page['title'] = 'ZABBIX';
-			
+
 			if(defined('ZBX_DISTRIBUTED')){
 				if(isset($DB['DB']) && ($curr_node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.get_current_nodeid(false)))))
 					$page['title'] .= ' ('.$curr_node_data['name'].')';
 			}
-			
+
 			if((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && $USER_DETAILS['refresh']){
 				$page['title'] .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
 			}
-		break; 
-	} 
+		break;
+	}
 
 	/* switch($page["type"]) */
 
@@ -98,7 +98,7 @@ COpt::profiling_start("page");
 			'label'	= 	submenu title, if missed menu skipped, but remmembed as last visited page.
 			'sub_pages'	= collection of pages for displaying but dont remember as last visited.
 	*/
-	
+
 	$ZBX_MENU = array(
 		'view'=>array(
 				'label'			=> S_MONITORING,
@@ -112,7 +112,7 @@ COpt::profiling_start("page");
 						),
 					array(
 							'url'=>'overview.php',
-							'label'=>S_OVERVIEW	
+							'label'=>S_OVERVIEW
 						),
 					array(
 							'url'=>'httpmon.php',
@@ -141,7 +141,7 @@ COpt::profiling_start("page");
 						),
 					array(
 							'url'=>'screens.php',
-							'label'=>S_SCREENS	
+							'label'=>S_SCREENS
 						),
 					array(
 							'url'=>'maps.php',
@@ -150,7 +150,7 @@ COpt::profiling_start("page");
 						),
 					array(
 							'url'=>'discovery.php',
-							'label'=>S_DISCOVERY, 
+							'label'=>S_DISCOVERY,
 							'user_type'=>USER_TYPE_ZABBIX_ADMIN),
 					array(
 							'url'=>'srv_status.php',
@@ -180,7 +180,7 @@ COpt::profiling_start("page");
 				'pages'=>array(
 					array('url'=>'report1.php',	'label'=>S_STATUS_OF_ZABBIX	),
 					array('url'=>'report2.php',	'label'=>S_AVAILABILITY_REPORT	),
-					array('url'=>'report5.php',	'label'=>S_TRIGGERS_TOP_100	)   
+					array('url'=>'report5.php',	'label'=>S_TRIGGERS_TOP_100	)
 					)
 				),
 		'config'=>array(
@@ -204,7 +204,7 @@ COpt::profiling_start("page");
 					array(
 							'url'=>'items.php',
 							'label'=>S_ITEMS,
-							'sub_pages'=>array('tr_logform.php')		
+							'sub_pages'=>array('tr_logform.php')
 						),
 					array(
 							'url'=>'triggers.php',
@@ -226,7 +226,7 @@ COpt::profiling_start("page");
 						),
 					array('url'=>'services.php',
 							'label'=>S_IT_SERVICES,
-							'sub_pages'=>array('services_form.php')	
+							'sub_pages'=>array('services_form.php')
 						),
 					array('url'=>'discoveryconf.php','label'=>S_DISCOVERY),
 					array('url'=>'exp_imp.php'	,'label'=>S_EXPORT_IMPORT)
@@ -288,7 +288,7 @@ COpt::profiling_start("page");
 
 //---
 		$menu_class = 'horizontal_menu_n';
-		
+
 		$page_exists = false;
 		$sub_menus[$label] = array();
 		foreach($menu['pages'] as $id => $sub_page){
@@ -301,13 +301,13 @@ COpt::profiling_start("page");
 			}
 
 			if(isset($sub_pages['node_perm']) && isset($DB['DB']) && !is_null($DB['DB'])){
-				$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,$sub_page['node_perm']);				
+				$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,$sub_page['node_perm']);
 				if(0 == count($available_nodes)){
 					$show_sub_menu = false;
 				}
 			}
 //----------
-			$row = array('menu_text' => isset($sub_page['label'])?$sub_page['label']:'', 
+			$row = array('menu_text' => isset($sub_page['label'])?$sub_page['label']:'',
 							'menu_url'=> $sub_page['url'],
 							'class'=> 'highlight',
 							'selected'=> false);
@@ -318,20 +318,20 @@ COpt::profiling_start("page");
 			if($sub_menu_active){
 // PERMISSION CHECK
 				$deny &= ($USER_DETAILS['type'] < $menu['user_type']);
-// END OF PERMISSION CHECK 
+// END OF PERMISSION CHECK
 				$menu_class = 'active';
 				$page_exists = true;
 				$page['menu'] = $label;
 				$row['selected'] = true;
-				
+
 				if(!defined('ZBX_PAGE_NO_MENU'))
 					update_profile('web.menu.'.$label.'.last', $sub_page['url'], PROFILE_TYPE_STR);
 			}
-			
+
 			if($show_sub_menu) $sub_menus[$label][] = $row;
 		}
-		
-		if($page_exists && !defined('ZBX_DISABLE_SUBNODES') && 
+
+		if($page_exists && !defined('ZBX_DISABLE_SUBNODES') &&
 			(isset($menu['forse_disable_subnodes']) || isset($sub_page['forse_disable_subnodes'])))
 		{
 			define('ZBX_DISABLE_SUBNODES', 1);
@@ -345,8 +345,8 @@ COpt::profiling_start("page");
 			unset($sub_menus[$label]);
 			continue;
 		}
-		
-		$menu_url = get_profile('web.menu.'.$label.'.last',false);			
+
+		$menu_url = get_profile('web.menu.'.$label.'.last',false);
 //		if(ZBX_DISABLE_MENU_CACHE == 1) $menu_url = $menu['pages'][$sub_menus['default_page_id']]['url'];
 
 		$mmenu_entry = new CCol($menu['label'], $menu_class);
@@ -354,7 +354,7 @@ COpt::profiling_start("page");
 		$mmenu_entry->addAction('onclick', "javascript: location.href = '$menu_url';");
 		$mmenu_entry->addAction('onmouseover', 'javascript: MMenu.mouseOver("'.$label.'");');
 		$mmenu_entry->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
-		
+
 		array_push($main_menu, $mmenu_entry);
 	}
 
@@ -370,19 +370,19 @@ COpt::profiling_start("page");
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title><?php echo $page['title']; ?></title>
-<?php 
-	if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"]) { 
+<?php
+	if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"]) {
 		echo '<meta http-equiv="refresh" content="'.$USER_DETAILS["refresh"].'" />';
 	}
 ?>
- 
+
 <meta name="Author" content="ZABBIX SIA" />
 <link rel="stylesheet" type="text/css" href="css.css" />
 
 <?php
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
 		$css = false;
-		$config=select_config();		
+		$config=select_config();
 		if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
 			$css = $config['default_theme'];
 		}
@@ -392,7 +392,7 @@ COpt::profiling_start("page");
 				$css = $USER_DETAILS['theme'];
 			}
 		}
-		
+
 		if($css){
 			echo '<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n";
 			$ico = ereg_replace('.*(\_[a-z]+).*',"\\1",$css);
@@ -417,10 +417,10 @@ COpt::profiling_start("page");
 		foreach($page['scripts'] as $id => $script){
 			if(file_exists('js/'.$script)){
 				echo '    <script type="text/javascript" src="js/'.$script.'"></script>'."\n";
-			} 
+			}
 			else if(file_exists($script)){
 				echo '    <script type="text/javascript" src="'.$script.'"></script>'."\n";
-			} 
+			}
 			else {
 				echo '<!-- js script "'.$script.'" not found-->'."\n";
 			}
@@ -437,14 +437,14 @@ COpt::profiling_start("page");
 	if(isset($_REQUEST['print'])){
 		define('ZBX_PAGE_NO_MENU', 1);
 		$req = substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'print')-1);
-		
+
 		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req, 'small_font');
 		$link->addOption('style','padding-left: 10px;');
-		
+
 		$printview = new CDiv($link,'printless');
 		$printview->addOption('style','border: 1px #333 dotted;');
 		$printview->Show();
-		
+
 	}
 
 	if(!defined('ZBX_PAGE_NO_MENU')){
@@ -455,21 +455,21 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$support = new CLink(S_GET_SUPPORT, 'http://www.zabbix.com/support.php', 'small_font', null, true);
 		$support->setTarget('_blank');
 		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font');
-		
+
 		$page_header_r_col = array($help,'|',$support,'|',$printview);
 
 		if($USER_DETAILS['alias']!=ZBX_GUEST_USER){
-			$page_header_r_col[] = array('|', 
-						new CLink(S_PROFILE, 'profile.php', 'small_font'),'|', 
+			$page_header_r_col[] = array('|',
+						new CLink(S_PROFILE, 'profile.php', 'small_font'),'|',
 						new CLink(S_LOGOUT, 'index.php?reconnect=1', 'small_font'));
-		} 
+		}
 		else {
 			$page_header_r_col[] = array('|', new CLink(S_LOGIN, 'index.php?reconnect=1', 'small_font'));
 		}
 
 		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),'http://www.zabbix.com/', null, null, true);
 		$logo->setTarget('_blank');
-		
+
 		$td_r = new CCol($page_header_r_col, 'page_header_r');
 		$td_r->addOption('width','100%');
 
@@ -486,12 +486,12 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$menu_table->setCellSpacing(0);
 		$menu_table->setCellPadding(5);
 		$menu_table->addRow($main_menu);
-		
+
 		$node_form = null;
 		if(ZBX_DISTRIBUTED){
 			$lst_nodes = new CComboBox('switch_node', get_current_nodeid(false), 'submit()');
-			
-// REMOVING PARENT NODES 
+
+// REMOVING PARENT NODES
 			$PAGE_NODES = get_viewed_nodes();
 //------
 			foreach($PAGE_NODES['nodes'] as $id => $node){
@@ -514,7 +514,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				}
 			}
 		}
-		
+
 		$table = new CTable();
 		$table->setCellSpacing(0);
 		$table->setCellPadding(0);
@@ -522,30 +522,30 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 		$r_col = new CCol($node_form);
 		$r_col->addOption('style','text-align: right;');
-		
+
 		$table->addRow(array($menu_table,$r_col));
-		
+
 		$page_menu = new CDiv();
 		$page_menu->addoption('id','mmenu');
 		$page_menu->addItem($table);
-		
+
 		$menu_selected = false;
 		foreach($sub_menus as $label => $sub_menu){
 			$sub_menu_table = new CTable(NULL,'sub_menu');
 			$sub_menu_table->setCellSpacing(0);
 			$sub_menu_table->setCellPadding(5);
-			
+
 			$sub_menu_row = array();
 			foreach($sub_menu as $id => $sub_page){
 				if(empty($sub_page['menu_text'])) $sub_page['menu_text'] = SPACE;
-				
+
 				$sub_menu_item = new CLink($sub_page['menu_text'], $sub_page['menu_url'], $sub_page['class']);
 				if($sub_page['selected']) $sub_menu_item = new CSpan($sub_menu_item, 'active');
 				$sub_menu_row[] = $sub_menu_item;
 				$sub_menu_row[] = new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider');
 			}
 			$sub_menu_table->addRow(new CCol($sub_menu_row));
-			
+
 			$sub_menu_div = new CDiv($sub_menu_table);
 			$sub_menu_div->addOption('id', 'sub_'.$label);
 			$sub_menu_div->addAction('onmouseover','javascript: MMenu.submenu_mouseOver();');
@@ -559,7 +559,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			else{
 				$sub_menu_div->addOption('style','display: none;');
 			}
-			
+
 			$page_menu->addItem($sub_menu_div);
 		}
 
@@ -567,19 +567,19 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$sub_menu_table->setCellSpacing(0);
 		$sub_menu_table->setCellPadding(5);
 		$sub_menu_table->addRow(SPACE);
-		
+
 		$sub_menu_div = new CDiv($sub_menu_table);
 		$sub_menu_div->addOption('id', 'sub_empty');
 		$sub_menu_div->addOption('style','display: '.($menu_selected?'none;':'block;'));
 		$page_menu->addItem($sub_menu_div);
-		
+
 		$page_menu->show();
 	}
 //------------------------------------- <HISTORY> ---------------------------------------
 	if(isset($page['hist_arg']) && ($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
 		$table = new CTable();
 		$table->setClass('history');
-		
+
 		$table->setCellSpacing(0);
 		$table->setCellPadding(0);
 
@@ -587,17 +587,17 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 		$tr = new CRow(new CCol('History:','caption'));
 		$tr->addItem($history);
-		
+
 		$table->addRow($tr);
 		$table->Show();
-	} 
+	}
 	else if(($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')) {
 		echo SBR;
 	}
 //------------------------------------ </HISTORY> ---------------------------------------
 
 	unset($ZBX_MENU);
-		
+
 	unset($table, $top_page_row, $menu_table, $node_form);
 	unset($main_menu_row);
 	unset($db_nodes, $node_data);
@@ -615,6 +615,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		}
 		unset($tmezone);
 	}
-	
+
 	show_messages();
 ?>

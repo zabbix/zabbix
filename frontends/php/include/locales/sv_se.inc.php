@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2008 SIA Zabbix
 **
@@ -632,6 +632,6 @@
 	'S_LOGIN'=>			'Inloggning',
 	'S_LATEST_DATA'=>			'Senaste data',
 	'S_INCORRECT_DESCRIPTION'=>			'Felaktig beskrivning',
-	
+
 	);
 ?>

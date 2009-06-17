@@ -26,7 +26,7 @@
 		$str_type[MEDIA_TYPE_EXEC]	= S_SCRIPT;
 		$str_type[MEDIA_TYPE_SMS]	= S_SMS;
 		$str_type[MEDIA_TYPE_JABBER]	= S_JABBER;
-		
+
 		if(isset($str_type[$type]))
 			return $str_type[$type];
 
@@ -34,7 +34,7 @@
 	}
 
 	function media_severity2str($severity){
-	
+
 		insert_showhint_javascript();
 		$mapping = array(
 			0 => array('letter' => 'N', 'style' => (($severity & 1)  ? 'enabled' : NULL)),
@@ -54,8 +54,8 @@
 	}
 
 	function get_media_by_mediaid($mediaid){
-	
-		$sql="select * from media where mediaid=$mediaid"; 
+
+		$sql="select * from media where mediaid=$mediaid";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 		if($row)
@@ -158,7 +158,7 @@
 		}
 		return $ret;
 	}
-	
+
 	# Add Media definition
 
 	function	add_media( $userid, $mediatypeid, $sendto, $severity, $active, $period)

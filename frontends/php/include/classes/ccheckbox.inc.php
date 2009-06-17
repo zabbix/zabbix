@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2007 SIA Zabbix
 **
@@ -24,31 +24,31 @@
 		function CCheckBox($name='checkbox',$checked='no',$action=null,$value='yes'){
 			parent::CTag('input','no');
 			$this->tag_body_start = '';
-			
+
 			$this->AddOption('class','checkbox');
 			$this->AddOption('type','checkbox');
 			$this->AddOption('value',$value);
 			$this->AddOption('name',$name);
 			$this->AddOption('id',$name);
-			
+
 			$this->SetAction($action);
 			$this->SetChecked($checked);
 		}
-		
+
 		function SetEnabled($value='yes'){
 			if($value=='yes' || $value == true || $value === 1)
 				return $this->DelOption('disabled');
 
 			return $this->options['disabled'] = 'disabled';
 		}
-		
+
 		function SetChecked($value="yes"){
 			if((is_string($value)&& ($value=="yes" || $value=="checked" || $value=="on") || $value=="1") || (is_int($value)&&$value<>0))
 				return $this->options['checked'] = 'checked';
 
 			$this->DelOption("checked");
 		}
-		
+
 		function SetAction($value='submit()', $event='onclick'){
 			$this->AddAction('onclick', $value);
 		}

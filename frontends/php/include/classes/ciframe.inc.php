@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -59,7 +59,7 @@
 			{
 				return $this->error("Incorrect value for SetWidth [$value]");
 			}
-			
+
 			$this->AddOption("width",$value);
 		}
 		function SetHeight($value)
@@ -72,18 +72,18 @@
 			{
 				return $this->error("Incorrect value for SetHeight [$value]");
 			}
-			
+
 			$this->AddOption("height",$value);
 		}
 		function SetScrolling($value)
 		{
 			if(is_null($value)) $value = 'no';
-	
+
 			if($value=='no' && $value=='yes' && $value=='auto')
 			{
 				return $this->error("Incorrect value for SetScrolling [$value]");
 			}
-			
+
 			$this->AddOption("scrolling",$value);
 		}
 	}

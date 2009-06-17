@@ -245,7 +245,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
 				$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid FROM nodes n ';
 			}
-			else{ 
+			else{
 				$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid '.
 					' FROM nodes n, groups hg,rights r, users_groups g '.
 					' WHERE r.id=hg.groupid '.
@@ -466,7 +466,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				$tab->addOption('id','msg_messages');
 				$tab->addOption('style','width: 100%;');
 
-				if(isset($msg_tab) && $bool){					
+				if(isset($msg_tab) && $bool){
 					$tab->addOption('style','display: none;');
 				}
 
@@ -543,7 +543,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		show_error_message($msg);
 		include_once "include/page_footer.php";
 	}
-	
+
 	function get_tree_by_parentid($parentid,&$tree,$parent_field, $level=0){
 		if(empty($tree)) return $tree;
 
@@ -556,7 +556,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			if($child[$parent_field] == $parentid){
 				$result[$id] = $child;
 				$childs = get_tree_by_parentid($id,$tree,$parent_field, $level); // RECURSION !!!
-				$result += $childs;	
+				$result += $childs;
 			}
 		}
 	return $result;
@@ -765,7 +765,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$status = array();
 // server
 		$checkport = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, 2);
-		if(!$checkport) { 
+		if(!$checkport) {
 			clear_messages();
 			$status['zabbix_server'] = S_NO;
 		}

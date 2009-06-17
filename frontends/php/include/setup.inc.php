@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -33,10 +33,10 @@
 		var $stage = array();
 		*/
 
-/* public */	
+/* public */
 		function CSetupWizard(&$ZBX_CONFIG){
 			$this->DISABLE_NEXT_BUTTON = false;
-			
+
 			$this->ZBX_CONFIG = &$ZBX_CONFIG;
 
 			$this->stage = array(
@@ -50,16 +50,16 @@
 				6 => array('title' => '7. Install'			, 'fnc' => 'Stage6' ),
 				7 => array('title' => '8. Finish'			, 'fnc' => 'Stage7' )
 				);
-			
+
 			$this->EventHandler();
-			
+
 			parent::CForm(null, 'post');
 		}
 
 		function getConfig($name, $default = null){
 			return isset($this->ZBX_CONFIG[$name]) ? $this->ZBX_CONFIG[$name] : $default;
 		}
-		
+
 		function setConfig($name, $value){
 			return ($this->ZBX_CONFIG[$name] = $value);
 		}
@@ -67,7 +67,7 @@
 		function GetStep(){
 			return $this->GetConfig('step', 0);
 		}
-		
+
 		function DoNext(){
 			if(isset($this->stage[$this->GetStep() + 1])){
 				$this->ZBX_CONFIG['step']++;
@@ -88,7 +88,7 @@
 			$table = new CTable(null, 'setup_wizard');
 			$table->SetAlign('center');
 			$table->SetHeader(array(
-				new CCol(S_ZABBIX.SPACE.ZABBIX_VERSION, 'left'), 
+				new CCol(S_ZABBIX.SPACE.ZABBIX_VERSION, 'left'),
 				SPACE
 				),'header');
 			$table->AddRow(array(SPACE, new CCol($this->stage[$this->GetStep()]['title'], 'right')),'title');
@@ -96,12 +96,12 @@
 				new CCol($this->GetList(), 'left'),
 				new CCol($this->GetState(), 'right')
 				), 'center');
-			
+
 			$next = new CButton('next['.$this->GetStep().']', S_NEXT.' >>');
 			if($this->DISABLE_NEXT_BUTTON) $next->SetEnabled(false);
-			
+
 			$table->SetFooter(array(
-				new CCol(new CButton('cancel',S_CANCEL),'left'), 
+				new CCol(new CButton('cancel',S_CANCEL),'left'),
 				new CCol(array(
 					isset($this->stage[$this->GetStep()-1]) ? new CButton('back['.$this->GetStep().']', '<< '.S_PREVIOUS) : null,
 					isset($this->stage[$this->GetStep()+1]) ? $next: new CButton('finish', S_FINISH)
@@ -117,7 +117,7 @@
 				if($id < $this->GetStep()) $style = 'completed';
 				else if($id == $this->GetStep()) $style = 'current';
 				else $style = null;
-				
+
 				$list->AddItem($data['title'], $style);
 			}
 		return $list;
@@ -128,7 +128,7 @@
 			return  $this->$fnc();
 		}
 
-		function Stage0(){			
+		function Stage0(){
 			return new CTag('div', 'yes', array('Welcome to the ZABBIX frontend installation wizard.',BR(),BR(),
 				'This installation wizard will guide you through the installation of ZABBIX frontend',BR(),BR(),
 				'Click to "Next" button to proceed to the next screen. If you want to change something '.
@@ -140,17 +140,17 @@
 			$LICENCE_FILE = 'conf/COPYING';
 
 			$this->DISABLE_NEXT_BUTTON = !$this->GetConfig('agree', false);
-							
+
 			return array(
-				new CTag('div', 'yes', (file_exists($LICENCE_FILE) ? 
-					new CScript(nl2br(nbsp(htmlspecialchars(file_get_contents($LICENCE_FILE))))) : 
+				new CTag('div', 'yes', (file_exists($LICENCE_FILE) ?
+					new CScript(nl2br(nbsp(htmlspecialchars(file_get_contents($LICENCE_FILE))))) :
 					'Missing licence file. See GPL licence.')
 				, 'licence'),
 				BR(),
 				new CTag('div', 'yes',
 					array(
 						new CCheckBox(
-							'agree', 
+							'agree',
 							$this->GetConfig('agree', false),
 							'submit();'),
 						'I agree'),
@@ -160,14 +160,14 @@
 
 		function get_test_result(&$result, $test_name, $test_value, $condition, $fail_message){
 			$result &= $condition;
-			
+
 			$row = new CRow(array(
 					new CCol($test_name,'header'),
 					$test_value,
 					$condition ? new CSpan(S_OK,'ok') : new CSpan(S_FAIL,'fail')
 				),
 				!$condition ? 'fail' : null);
-			
+
 			if(!$condition && isset($fail_message))
 				$row->SetHint($fail_message);
 
@@ -179,7 +179,7 @@
 
 			$table = new CTable(null, 'requirements');
 			$table->SetAlign('center');
-			
+
 			/* Check PHP version */
 			$table->AddRow($this->get_test_result(
 				$final_result,
@@ -212,7 +212,7 @@
 					ini_get('max_execution_time').' sec',
 					ini_get('max_execution_time') >= 300,
 					'300 sec is a maximal limitation on execution of PHP scripts'));
-			
+
 			/* Check supporteds databases */
 			global $ZBX_CONFIG;
 
@@ -225,7 +225,7 @@
 					'Required any databases support [MySQL or PostgreSQL or Oracle]'));
 
 /* Check BC math */
-			$bcmath_fnc_exist = 
+			$bcmath_fnc_exist =
 				function_exists('bcadd') &&
 				function_exists('bccomp') &&
 				function_exists('bcdiv') &&
@@ -244,8 +244,8 @@
 					$bcmath_fnc_exist ? 'yes' : 'no',
 					$bcmath_fnc_exist,
 					'Required bcmath module [configured PHP with --enable-bcmath]'));
-					
-					
+
+
 //* Check sockets lib
 			$sockets_fnc_exist = function_exists('socket_create');
 			$table->AddRow(
@@ -257,8 +257,8 @@
 					'Required Sockets module [configured PHP with --enable-sockets]'));
 //*/
 
-					
-/* Check mb-strings 
+
+/* Check mb-strings
 			$mbstrings_fnc_exist = mbstrings_available();
 			$table->AddRow(
 				$this->get_test_result(
@@ -275,7 +275,7 @@
 				$gd_info = gd_info();
 				$gd_version = $gd_info['GD Version'];
 			}
-			
+
 			$table->AddRow(
 				$this->get_test_result(
 					$final_result,
@@ -290,7 +290,7 @@
 				//if($gd_info['JPG Support']) array_push($img_formats, 'JPEG');
 				if($gd_info['PNG Support']) array_push($img_formats, 'PNG');
 			}
-			
+
 			if(count($img_formats) == 0){
 				$img_formats = array(S_NO);
 				$no_img_formats = true;
@@ -298,17 +298,17 @@
 			$table->AddRow(
 				$this->get_test_result(
 					$final_result,
-					'Image formats:', 
+					'Image formats:',
 					$img_formats,
 					!isset($no_img_formats),
-					'Required images genetarion support [PNG]'));	
-			
+					'Required images genetarion support [PNG]'));
+
 			if(version_compare(phpversion(), '5.1.0RC1', '>=')){
 				$tmezone = ini_get('date.timezone');
 				$table->AddRow(
 					$this->get_test_result(
 						$final_result,
-						'PHP Timezone:', 
+						'PHP Timezone:',
 						empty($tmezone) ? 'n/a' : $tmezone,
 						!empty($tmezone),
 						'Timezone for PHP is not set. Please set "date.timezone" option in php.ini.'));
@@ -317,9 +317,9 @@
 
 			if(!$final_result){
 				$this->DISABLE_NEXT_BUTTON = true;
-				
+
 				$this->AddVar('trouble',true);
-				
+
 				$final_result = array(
 					new CSpan(S_FAIL,'fail'),
 					BR(), BR(),
@@ -332,7 +332,7 @@
 				$this->DISABLE_NEXT_BUTTON = false;
 				$final_result = new CSpan(S_OK,'ok');
 			}
-			
+
 		return array($table, BR(), $final_result);
 		}
 
@@ -341,7 +341,7 @@
 
 			$table = new CTable(null, 'requirements');
 			$table->SetAlign('center');
-			
+
 			$DB['TYPE'] = $this->GetConfig('DB_TYPE');
 
 			$cmbType = new CComboBox('type', $DB['TYPE']);
@@ -374,7 +374,7 @@
 
 			$table = new CTable(null, 'requirements');
 			$table->SetAlign('center');
-			
+
 			$table->AddRow(array(S_HOST, new CTextBox('zbx_server',		$this->GetConfig('ZBX_SERVER',		'localhost'))));
 			$table->AddRow(array(S_PORT, new CNumericBox('zbx_server_port',	$this->GetConfig('ZBX_SERVER_PORT',	'10051'),5)));
 
@@ -401,7 +401,7 @@
 					'Node ID',
 					new CNumericBox('nodeid', $this->GetConfig('nodeid',      0), 10)
 					));
-				
+
 			}
 			else
 			{
@@ -422,10 +422,10 @@
 				), 'text');
 		}
 		*/
-		
+
 		function Stage5(){
 			$allowed_db = $this->GetConfig('allowed_db', array());
-			
+
 			$table = new CTable(null, 'requirements');
 			$table->SetAlign('center');
 			$table->AddRow(array(new CCol('Database type:','header'),		$allowed_db[$this->GetConfig('DB_TYPE',	'unknown')]));
@@ -435,12 +435,12 @@
 			$table->AddRow(array(new CCol('Database user:','header'),		$this->GetConfig('DB_USER',	'unknown')));
 			$table->AddRow(array(new CCol('Database password:','header'),	ereg_replace('.','*',$this->GetConfig('DB_PASSWORD',	'unknown'))));
 			/* $table->AddRow(array(new CCol('Distributed monitoring','header'),	$this->GetConfig('distributed', null) ? 'Enabled' : 'Disabled')); */
-			
+
 			if($this->GetConfig('distributed', null)){
 				$table->AddRow(array(new CCol('Node name','header'),	$this->GetConfig('nodename',	'unknown')));
 				$table->AddRow(array(new CCol('Node GUID','header'),	$this->GetConfig('nodeid',	'unknown')));
 			}
-			
+
 			$table->AddRow(BR());
 
 			$table->AddRow(array(new CCol('ZABBIX server:','header'),		$this->GetConfig('ZBX_SERVER',		'unknown')));
@@ -467,22 +467,22 @@
 				}
 			}
 			clear_messages(); /* don't show errors */
-			
+
 			$table = new CTable(null, 'requirements');
 			$table->SetAlign('center');
 
-			$table->AddRow(array('Configuration file:',  $this->GetConfig('ZBX_CONFIG_FILE_CORRECT', false) ? 
+			$table->AddRow(array('Configuration file:',  $this->GetConfig('ZBX_CONFIG_FILE_CORRECT', false) ?
 									new CSpan(S_OK,'ok') :
 									new CSpan(S_FAIL,'fail')
 										));
 
 			/*
-			$table->AddRow(array('Table creation:',  $this->GetConfig('ZBX_TABLES_CREATED', false) ? 
+			$table->AddRow(array('Table creation:',  $this->GetConfig('ZBX_TABLES_CREATED', false) ?
 									new CSpan(S_OK,'ok') :
 									new CSpan(S_FAIL,'fail')
 										));
-			
-			$table->AddRow(array('Data loading:',  $this->GetConfig('ZBX_DATA_LOADED', false) ? 
+
+			$table->AddRow(array('Data loading:',  $this->GetConfig('ZBX_DATA_LOADED', false) ?
 									new CSpan(S_OK,'ok') :
 									new CSpan(S_FAIL,'fail')
 										));
@@ -491,7 +491,7 @@
 			return array(
 				$table, BR(),
 				$this->DISABLE_NEXT_BUTTON ? array(new CButton('retry', S_RETRY), BR(),BR()) : null,
-				!$this->GetConfig('ZBX_CONFIG_FILE_CORRECT', false) ? 
+				!$this->GetConfig('ZBX_CONFIG_FILE_CORRECT', false) ?
 					array('Please install configuration file manualy.',BR(),BR(),
 						'By pressing "Save configuration file" button download configuration file ',
 						'and place them into the ',BR(),
@@ -524,7 +524,7 @@
 				$old_DB_USER	= $DB['USER'];
 				$old_DB_PASSWORD= $DB['PASSWORD'];
 			}
-			
+
 			$DB['TYPE']	= $this->GetConfig('DB_TYPE');
 			if(is_null($DB['TYPE']))	return false;
 
@@ -542,14 +542,14 @@
 				$result = DBexecute('CREATE table zabbix_installation_test ( test_row integer )');
 				$result &= DBexecute('DROP table zabbix_installation_test');
 			}
-			
+
 			DBclose();
 
 			if($DB['TYPE'] == 'SQLITE3' && !zbx_is_callable(array('sem_get','sem_acquire','sem_release','sem_remove'))){
 				error('SQLite3 required IPC functions');
 				$result &= false;
 			}
-			
+
 			/* restore connection */
 			global $DB;
 
@@ -561,12 +561,12 @@
 				$DB['USER']		= $old_DB_USER;
 				$DB['PASSWORD']	= $old_DB_PASSWORD;
 			}
-			
+
 			DBconnect($error);
 
 		return $result;
 		}
-		
+
 		/*
 		function CreateTables()
 		{
@@ -576,7 +576,7 @@
 			if(file_exists($ZBX_CONFIGURATION_FILE))
 			{
 				include $ZBX_CONFIGURATION_FILE;
-			
+
 				switch($DB['TYPE'])
 				{
 					case 'MYSQL':		$ZBX_SCHEMA_FILE = 'mysql.sql';		break;
@@ -620,7 +620,7 @@
 			if(file_exists($ZBX_CONFIGURATION_FILE))
 			{
 				include $ZBX_CONFIGURATION_FILE;
-			
+
 				$ZBX_DATA_FILE = 'create/data.sql';
 				if(DBconnect($error))
 				{
@@ -665,24 +665,24 @@
 				$old_DB_DATABASE	= $DB['DATABASE'];
 				$old_DB_USER		= $DB['USER'];
 				$old_DB_PASSWORD	= $DB['PASSWORD'];
-				
+
 				$old_ZBX_SERVER		= $ZBX_SERVER;
 				$old_ZBX_SERVER_PORT	= $ZBX_SERVER_PORT;
 			}
-			
+
 
 			$error = null;
 			$error_msg = null;
 
 			global $ZBX_CONFIGURATION_FILE;
-						
+
 			if(file_exists($ZBX_CONFIGURATION_FILE)){
 				include $ZBX_CONFIGURATION_FILE;
 
-				if(	isset($DB['TYPE']) && 
-					isset($DB['SERVER']) && 
-					isset($DB['DATABASE']) && 
-					isset($DB['USER']) && 
+				if(	isset($DB['TYPE']) &&
+					isset($DB['SERVER']) &&
+					isset($DB['DATABASE']) &&
+					isset($DB['USER']) &&
 					isset($DB['PASSWORD']) &&
 					isset($ZBX_SERVER) &&
 					isset($ZBX_SERVER_PORT) &&
@@ -707,7 +707,7 @@
 			else{
 				$error = 'Missing configuration file['.$ZBX_CONFIGURATION_FILE.']';
 			}
-			
+
 			if(isset($error_msg)){
 				error($error_msg);
 			}
@@ -722,7 +722,7 @@
 				$DB['DATABASE']	= $old_DB_DATABASE;
 				$DB['USER']		= $old_DB_USER;
 				$DB['PASSWORD']	= $old_DB_PASSWORD;
-				
+
 				$ZBX_SERVER	= $old_ZBX_SERVER;
 				$ZBX_SERVER_PORT= $old_ZBX_SERVER_PORT;
 			}
@@ -731,20 +731,20 @@
 
 			return !isset($error)&&!isset($error_msg);
 		}
-		
+
 		function EventHandler(){
-			if(isset($_REQUEST['back'][$this->GetStep()]))	$this->DoBack();	
+			if(isset($_REQUEST['back'][$this->GetStep()]))	$this->DoBack();
 
 			if($this->GetStep() == 1){
 				if(!isset($_REQUEST['next'][0]) && !isset($_REQUEST['back'][2])){
 					$this->setConfig('agree', isset($_REQUEST['agree']));
 				}
-				
+
 				if(isset($_REQUEST['next'][$this->GetStep()]) && $this->GetConfig('agree', false)){
 					$this->DoNext();
 				}
 			}
-			
+
 			if($this->GetStep() == 2 && isset($_REQUEST['next'][$this->GetStep()]) && !isset($_REQUEST['trouble'])){
 				$this->DoNext();
 			}
@@ -755,15 +755,15 @@
 				$this->SetConfig('DB_DATABASE',	get_request('database',	$this->GetConfig('DB_DATABASE',	'zabbix')));
 				$this->SetConfig('DB_USER',	get_request('user',	$this->GetConfig('DB_USER',	'root')));
 				$this->SetConfig('DB_PASSWORD',	get_request('password',	$this->GetConfig('DB_PASSWORD',	'')));
-		
+
 				if(!$this->CheckConnection()){
 					$this->DISABLE_NEXT_BUTTON = true;
 					unset($_REQUEST['next']);
 				}
-				
+
 				if(isset($_REQUEST['next'][$this->GetStep()]))		$this->DoNext();
 			}
-			
+
 			if($this->GetStep() == 4){
 				$this->SetConfig('ZBX_SERVER',		get_request('zbx_server',	$this->GetConfig('ZBX_SERVER',		'localhost')));
 				$this->SetConfig('ZBX_SERVER_PORT',	get_request('zbx_server_port',	$this->GetConfig('ZBX_SERVER_PORT',	'10051')));
@@ -778,7 +778,7 @@
 					$this->SetConfig('distributed',
 						get_request('distributed',	null));
 				}
-				
+
 				if($this->GetConfig('distributed',	null))
 				{
 					$this->SetConfig('nodename',
@@ -804,13 +804,13 @@
 			if($this->GetStep() == 6)
 			{
 				$this->SetConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile());
-				
+
 				/*
 				if($this->GetConfig('ZBX_CONFIG_FILE_CORRECT', false) && !$this->GetConfig('ZBX_TABLES_CREATED', false))
 				{
 					$this->SetConfig('ZBX_TABLES_CREATED', $this->CreateTables());
 				}
-				
+
 				if($this->GetConfig('ZBX_TABLES_CREATED', false) && !$this->GetConfig('ZBX_DATA_LOADED', false))
 				{
 					$this->SetConfig('ZBX_DATA_LOADED', $this->LoadData());
@@ -834,15 +834,15 @@
 					die($this->GetNewConfigurationFileContent());
 				 }
 			}
-			
+
 			if(isset($_REQUEST['next'][$this->GetStep()]))		$this->DoNext();
 		}
 
 		function GetNewConfigurationFileContent()
 		{
-			return 
+			return
 '<?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **

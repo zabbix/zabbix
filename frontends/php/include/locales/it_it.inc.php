@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2008 SIA Zabbix
 **
@@ -424,6 +424,6 @@
 	'S_HELP'=>			'Aiuto',
 	'S_PROFILE'=>			'Profilo',
 	'S_LATEST_DATA'=>			'ULTIMI VALORI',
-	
+
 	);
 ?>

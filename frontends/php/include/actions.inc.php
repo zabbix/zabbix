@@ -29,10 +29,10 @@ function action_accessible($actionid,$perm){
 
 	if (DBselect('select actionid from actions where actionid='.$actionid.' and '.DBin_node('actionid'))){
 		$result = true;
-		
+
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,null,get_current_nodeid(true));
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm,null,get_current_nodeid(true));
-		
+
 		$db_result = DBselect('SELECT * FROM conditions WHERE actionid='.$actionid);
 		while(($ac_data = DBfetch($db_result)) && $result){
 			if($ac_data['operator'] != 0) continue;
@@ -56,7 +56,7 @@ function action_accessible($actionid,$perm){
 							' AND f.triggerid=t.triggerid'.
 							' AND i.itemid=f.itemid '.
 							' AND '.DBcondition('i.hostid',$available_hosts, true);
-							
+
 					if(DBfetch(DBselect($sql,1))){
 						$result = false;
 					}
@@ -101,7 +101,7 @@ function check_permission_for_action_conditions($conditions){
 							' AND '.DBcondition('i.hostid',$available_hosts, true);
 //								' AND e.eventid='.$ac_data['value'].
 //								' AND t.triggerid=e.objectid';
-						
+
 				if(DBfetch(DBselect($sql,1))){
 					error(S_INCORRECT_TRIGGER);
 					$result = false;
@@ -114,7 +114,7 @@ function check_permission_for_action_conditions($conditions){
 }
 
 function get_action_by_actionid($actionid){
-	$sql="select * from actions where actionid=$actionid"; 
+	$sql="select * from actions where actionid=$actionid";
 	$result=DBselect($sql);
 
 	if($row=DBfetch($result)){
@@ -127,7 +127,7 @@ return	$result;
 }
 
 function get_operations_by_actionid($actionid){
-	$sql='SELECT * FROM operations WHERE actionid='.$actionid; 
+	$sql='SELECT * FROM operations WHERE actionid='.$actionid;
 	$result=DBselect($sql);
 
 return	$result;
@@ -145,7 +145,7 @@ function add_action_condition($actionid, $condition){
 			$condition['operator'].','.
 			zbx_dbstr($condition['value']).
 		')');
-	
+
 	if(!$result)
 		return $result;
 
@@ -154,7 +154,7 @@ function add_action_condition($actionid, $condition){
 
 function add_action_operation($actionid, $operation){
 	$operationid = get_dbid('operations','operationid');
-	
+
 	if(!isset($operation['default_msg'])) $operation['default_msg'] = 0;
 	if(!isset($operation['opconditions'])) $operation['opconditions'] = array();
 
@@ -192,14 +192,14 @@ function add_operation_condition($operationid, $opcondition){
 			$opcondition['operator'].','.
 			zbx_dbstr($opcondition['value']).
 		')');
-	
+
 	if(!$result)
 		return $result;
 
 return $opconditionid;
 }
 
-// Add Action			
+// Add Action
 function add_action($name, $eventsource, $esc_period, $def_shortdata, $def_longdata, $recovery_msg, $r_shortdata, $r_longdata, $evaltype, $status, $conditions, $operations){
 	if(!is_array($conditions) || count($conditions) == 0){
 		/*
@@ -290,7 +290,7 @@ function update_action($actionid, $name, $eventsource, $esc_period, $def_shortda
 			DBexecute('DELETE FROM opconditions WHERE operationid='.$operation['operationid']);
 		}
 		DBexecute('DELETE FROM operations WHERE actionid='.$actionid);
-		
+
 
 		foreach($operations as $operation)
 			if(!$result = add_action_operation($actionid, $operation))
@@ -300,7 +300,7 @@ function update_action($actionid, $name, $eventsource, $esc_period, $def_shortda
 			foreach($conditions as $condition)
 			if(!$result = add_action_condition($actionid, $condition))
 				break;
-		}		
+		}
 	}
 
 return $result;
@@ -315,7 +315,7 @@ function delete_action( $actionid ){
 	while($operation = DBFetch($opers)){
 		DBexecute('DELETE FROM opconditions WHERE operationid='.$operation['operationid']);
 	}
-	
+
 	if($return)
 		$result = DBexecute('delete from operations where actionid='.$actionid);
 
@@ -369,12 +369,12 @@ function	condition_type2str($conditiontype)
 
 	return S_UNKNOWN;
 }
-	
+
 function condition_value2str($conditiontype, $value){
 	switch($conditiontype){
 		case CONDITION_TYPE_HOST_GROUP:
 			$group = get_hostgroup_by_groupid($value);
-			
+
 			$str_val = '';
 			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true);
 			$str_val.= $group['name'];
@@ -384,7 +384,7 @@ function condition_value2str($conditiontype, $value){
 			break;
 		case CONDITION_TYPE_HOST:
 		case CONDITION_TYPE_HOST_TEMPLATE:
-			$host = get_host_by_hostid($value);			
+			$host = get_host_by_hostid($value);
 			$str_val = '';
 			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true);
 			$str_val.= $host['host'];
@@ -499,7 +499,7 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 							$temp = bold(S_MESSAGE.':');
 							$result .= $temp->ToString()."\n".$_REQUEST['def_longdata'];
 						}
-						else if(isset($data['operationid'])){ 
+						else if(isset($data['operationid'])){
 							$sql = 'SELECT a.def_shortdata,a.def_longdata '.
 									' FROM actions a, operations o '.
 									' WHERE a.actionid=o.actionid '.
@@ -566,7 +566,7 @@ function get_opconditions_by_eventsource($eventsource){
 	$conditions[EVENT_SOURCE_TRIGGERS] = array(
 			CONDITION_TYPE_EVENT_ACKNOWLEDGED
 		);
-		
+
 	$conditions[EVENT_SOURCE_DISCOVERY] = array(
 		);
 
@@ -635,7 +635,7 @@ function	get_operators_by_conditiontype($conditiontype)
 		);
 	$operators[CONDITION_TYPE_TRIGGER_NAME] = array(
 			CONDITION_OPERATOR_LIKE,
-			CONDITION_OPERATOR_NOT_LIKE	
+			CONDITION_OPERATOR_NOT_LIKE
 		);
 	$operators[CONDITION_TYPE_TRIGGER_SEVERITY] = array(
 			CONDITION_OPERATOR_EQUAL,
@@ -683,7 +683,7 @@ function	get_operators_by_conditiontype($conditiontype)
 	$operators[CONDITION_TYPE_APPLICATION] = array(
 			CONDITION_OPERATOR_EQUAL,
 			CONDITION_OPERATOR_LIKE,
-			CONDITION_OPERATOR_NOT_LIKE	
+			CONDITION_OPERATOR_NOT_LIKE
 		);
 
 	if(isset($operators[$conditiontype]))
@@ -716,7 +716,7 @@ function validate_condition($conditiontype, $value){
 			}
 			break;
 		case CONDITION_TYPE_TRIGGER:
-			if( !DBfetch(DBselect('select triggerid from triggers where triggerid='.$value)) || 
+			if( !DBfetch(DBselect('select triggerid from triggers where triggerid='.$value)) ||
 				!check_right_on_trigger_by_triggerid(PERM_READ_ONLY, $value) )
 			{
 				error(S_INCORRECT_TRIGGER);
@@ -766,7 +766,7 @@ function validate_condition($conditiontype, $value){
 				return false;
 			}
 			break;
-		
+
 		case CONDITION_TYPE_TRIGGER_NAME:
 		case CONDITION_TYPE_TRIGGER_VALUE:
 		case CONDITION_TYPE_TRIGGER_SEVERITY:
@@ -839,7 +839,7 @@ function validate_commands($commands){
 			error("Incorrect command: '$cmd'");
 			return FALSE;
 		}
-		
+
 		if($cmd_items[4] == "#"){ // group
 			if(!DBfetch(DBselect("select groupid from groups where name=".zbx_dbstr($cmd_items[1])))){
 				error("Unknown group name: '".$cmd_items[1]."' in command ".$cmd."'");
@@ -864,9 +864,9 @@ function count_operations_delay($operations, $def_period=0){
 		$step_from = $operation['esc_step_from']?$operation['esc_step_from']:1;
 		$step_to = $operation['esc_step_to']?$operation['esc_step_to']:9999;
 		$esc_period = $operation['esc_period']?$operation['esc_period']:$def_period;
-		
+
 		$max_step = ($max_step>$step_from)?$max_step:$step_from;
-		
+
 		for($i=$step_from; $i<$step_to; $i++){
 			if(isset($periods[$i]) && ($periods[$i] < $esc_period)){
 			}
@@ -880,7 +880,7 @@ function count_operations_delay($operations, $def_period=0){
 		$esc_period = isset($periods[$i])?$periods[$i]:$def_period;
 		$delays[$i+1] = $delays[$i] + $esc_period;
 	}
-	
+
 return $delays;
 }
 
@@ -898,7 +898,7 @@ function get_history_of_actions($start,$num,$sql_cond=''){
 			S_MESSAGE,
 			S_ERROR
 			));
-			
+
 	$sql = 'SELECT DISTINCT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
 			' FROM events e,alerts a'.
 			' left join media_type mt on mt.mediatypeid=a.mediatypeid'.
@@ -908,7 +908,7 @@ function get_history_of_actions($start,$num,$sql_cond=''){
 				' AND '.DBin_node('a.alertid').
 			order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries');
 	$result=DBselect($sql,10*$start+$num);
-		
+
 	$col=0;
 	$skip=$start;
 	while(($row=DBfetch($result))&&($col<$num)){
@@ -954,7 +954,7 @@ function get_history_of_actions($start,$num,$sql_cond=''){
 
 	return $table;
 }
-	
+
 // Author: Aly
 function get_action_msgs_for_event($eventid){
 	$hostids = array();
@@ -980,7 +980,7 @@ function get_action_msgs_for_event($eventid){
 			S_MESSAGE,
 			S_ERROR
 			));
-			
+
 	$sql = 'SELECT DISTINCT a.alertid,a.clock,a.esc_step, mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
 			' FROM events e,alerts a'.
 				' left join media_type mt on mt.mediatypeid=a.mediatypeid'.
@@ -995,9 +995,9 @@ function get_action_msgs_for_event($eventid){
 	while($row=DBfetch($result)){
 		$time=date("Y.M.d H:i:s",$row["clock"]);
 		if($row['esc_step'] > 0){
-			$time = array(bold(S_STEP.': '),$row["esc_step"],br(),bold(S_TIME.': '),br(),$time);	
+			$time = array(bold(S_STEP.': '),$row["esc_step"],br(),bold(S_TIME.': '),br(),$time);
 		}
-		
+
 		if($row["status"] == ALERT_STATUS_SENT){
 			$status=new CSpan(S_SENT,"green");
 			$retries=new CSpan(SPACE,"green");
@@ -1018,14 +1018,14 @@ function get_action_msgs_for_event($eventid){
 		{
 			array_push($message, BR(), $m);
 		}
-		
+
 		if(empty($row["error"])){
 			$error=new CSpan(SPACE,"off");
 		}
 		else{
 			$error=new CSpan($row["error"],"on");
 		}
-		
+
 		$table->AddRow(array(
 			get_node_name_by_elid($row['alertid']),
 			new CCol($time, 'top'),
@@ -1062,7 +1062,7 @@ function get_action_cmds_for_event($eventid){
 			S_COMMAND,
 			S_ERROR
 			));
-			
+
 	$sql = 'SELECT DISTINCT a.alertid,a.clock,a.sendto,a.esc_step,a.subject,a.message,a.status,a.retries,a.error '.
 			' FROM events e,alerts a'.
 			' WHERE a.eventid='.$eventid.
@@ -1076,9 +1076,9 @@ function get_action_cmds_for_event($eventid){
 	while($row=DBfetch($result)){
 		$time=date("Y.M.d H:i:s",$row["clock"]);
 		if($row['esc_step'] > 0){
-			$time = array(bold(S_STEP.': '),$row["esc_step"],br(),bold(S_TIME.': '),br(),$time);	
+			$time = array(bold(S_STEP.': '),$row["esc_step"],br(),bold(S_TIME.': '),br(),$time);
 		}
-		
+
 		if($row["status"] == ALERT_STATUS_SENT){
 			$status=new CSpan(S_EXECUTED,"green");
 		}
@@ -1101,7 +1101,7 @@ function get_action_cmds_for_event($eventid){
 		else{
 			$error=new CSpan($row["error"],"on");
 		}
-		
+
 		$table->AddRow(array(
 			get_node_name_by_elid($row['alertid']),
 			new CCol($time, 'top'),
@@ -1126,7 +1126,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 		$hostids[$host['hostid']] = $host['hostid'];
 	}
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
-	
+
 	$tab_hint = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$tab_hint->AddOption('style', 'width: 300px;');
 	$tab_hint->SetHeader(array(
@@ -1135,7 +1135,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 			S_DETAILS,
 			S_STATUS
 			));
-/*			
+/*
 	$sql = 'SELECT DISTINCT a.alertid,mt.description,a.sendto,a.status,u.alias,a.retries '.
 			' FROM events e,users u,alerts a'.
 			' left join media_type mt on mt.mediatypeid=a.mediatypeid'.
@@ -1175,7 +1175,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 			$status=new CSpan(S_NOT_SENT,"red");
 			$retries=new CSpan(0,"red");
 		}
-		
+
 		switch($row['alerttype']){
 			case ALERT_TYPE_MESSAGE:
 				$message = empty($row['description'])?'-':$row['description'];
@@ -1190,7 +1190,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 			default:
 				$message = '-';
 		}
-		
+
 		$tab_hint->AddRow(array(
 			get_node_name_by_elid($row['alertid']),
 			empty($row['alias'])?' - ':$row['alias'],
@@ -1203,14 +1203,14 @@ return $tab_hint;
 }
 
 function get_event_actions_status($eventid){
-// Actions								
+// Actions
 	$actions= new CTable(' - ');
 
 	$sql='SELECT COUNT(a.alertid) as cnt_all'.
 			' FROM alerts a '.
 			' WHERE a.eventid='.$eventid.
 				' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')';
-			
+
 	$alerts=DBfetch(DBselect($sql));
 
 	if(isset($alerts['cnt_all']) && ($alerts['cnt_all'] > 0)){
@@ -1257,7 +1257,7 @@ function get_event_actions_status($eventid){
 		else{
 			$tdl = new CCol(($alerts['sent'])?(new CSpan($alerts['sent'],'green')):SPACE);
 			$tdl->AddOption('width','10');
-			
+
 			$tdr = new CCol(($alerts['failed'])?(new CSpan($alerts['failed'],'red')):SPACE);
 			$tdr->AddOption('width','10');
 
@@ -1266,7 +1266,7 @@ function get_event_actions_status($eventid){
 
 		$actions->AddRow($status);
 	}
-	
+
 return $actions;
 }
 
@@ -1278,7 +1278,7 @@ function get_event_actions_stat_hints($eventid){
 			' WHERE a.eventid='.$eventid.
 				' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')';
 
-			
+
 	$alerts=DBfetch(DBselect($sql));
 
 	if(isset($alerts['cnt']) && ($alerts['cnt'] > 0)){
@@ -1330,7 +1330,7 @@ function get_event_actions_stat_hints($eventid){
 
 		$tdr = new CCol(($alerts['failed'])?$alert_cnt:SPACE);
 		$tdr->AddOption('width','10');
-		
+
 		$actions->AddRow(array($tdl,$tdc,$tdr));
 	}
 return $actions;

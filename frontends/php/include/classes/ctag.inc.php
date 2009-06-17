@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -33,7 +33,7 @@ function unpack_object(&$item){
 		$res = $item->toString(false);
 	}
 	else if(is_array($item)){
-		foreach($item as $id => $dat)	
+		foreach($item as $id => $dat)
 			$res .= unpack_object($item[$id]); // Attention, recursion !!!
 	}
 	else if(!is_null($item)){
@@ -59,7 +59,7 @@ class CObject{
 			$this->addItem($items);
 		}
 	}
-	
+
 	function toString($destroy=true){
 		$res = implode('',$this->items);
 		if($destroy) $this->destroy();
@@ -67,7 +67,7 @@ class CObject{
 	}
 
 	function show($destroy=true){
-		echo $this->toString($destroy);			
+		echo $this->toString($destroy);
 	}
 
 	function destroy(){
@@ -76,16 +76,16 @@ class CObject{
 		$this->cleanItems();
 	}
 
-	function cleanItems(){	
-		$this->items = array();	
+	function cleanItems(){
+		$this->items = array();
 	}
-	
-	function itemsCount(){	
-		return count($this->items);	
+
+	function itemsCount(){
+		return count($this->items);
 	}
-	
+
 	function addItem($value){
-	
+
 		if(is_object($value)){
 			array_push($this->items,unpack_object($value));
 		}
@@ -126,7 +126,7 @@ class CTag extends CObject{
 		if(!is_string($tagname)){
 			return $this->error('Incorrect tagname for CTag ['.$tagname.']');
 		}
-		
+
 		$this->tagname = $tagname;
 		$this->paired = $paired;
 
@@ -141,7 +141,7 @@ class CTag extends CObject{
 
 		$this->setClass($class);
 	}
-	
+
 	function showStart()	{	echo $this->startToString();	}
 	function showBody()	{	echo $this->bodyToString();	}
 	function showEnd()	{	echo $this->endToString();	}
@@ -158,18 +158,18 @@ class CTag extends CObject{
 	function bodyToString(){
 		$res = $this->tag_body_start;
 	return $res.parent::ToString(false);
-		
+
 		/*foreach($this->items as $item)
 			$res .= $item;
 		return $res;*/
 	}
-	
+
 	function endToString(){
 		$res = ($this->paired=='yes') ? $this->tag_body_end.'</'.$this->tagname.'>' : '';
 		$res .= $this->tag_end;
 	return $res;
 	}
-	
+
 	function toString($destroy=true){
 		$res  = $this->startToString();
 		$res .= $this->bodyToString();
@@ -179,7 +179,7 @@ class CTag extends CObject{
 
 	return $res;
 	}
-	
+
 	function setName($value){
 		if(is_null($value)) return $value;
 
@@ -188,13 +188,13 @@ class CTag extends CObject{
 		}
 	return $this->addOption("name",$value);
 	}
-	
+
 	function getName(){
 		if(isset($this->options['name']))
 			return $this->options['name'];
 	return NULL;
 	}
-	
+
 	function setClass($value){
 		if(isset($value))
 			$this->options['class'] = $value;
@@ -203,11 +203,11 @@ class CTag extends CObject{
 
 	return $value;
 	}
-	
+
 	function DelOption($name){
 		unset($this->options[$name]);
 	}
-	
+
 	function getOption($name){
 		$ret = NULL;
 		if(isset($this->options[$name]))
@@ -250,7 +250,7 @@ class CTag extends CObject{
 			$this->options[$name] = unpack_object($value);
 		}
 		else if(isset($value))
-			$this->options[$name] = htmlspecialchars(strval($value)); 
+			$this->options[$name] = htmlspecialchars(strval($value));
 		else
 			unset($this->options[$name]);
 	}
@@ -267,7 +267,7 @@ class CTag extends CObject{
 			$this->options['disabled'] = 'disabled';
 		}
 	}
-	
+
 	function error($value){
 		error('class('.get_class($this).') - '.$value);
 		return 1;

@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -42,7 +42,7 @@ var color_table = <?php
 		$table .= '<td>'.unpack_object(new CColorCell(null, $color, 'set_color(\\\''.$color.'\\\')')).'</td>';
 	}
 	$table .= '</tr>';
-	
+
 	/* other colors */
 	$colors = array(
 		array('r' => 0, 'g' => 0, 'b' => 1),
@@ -52,7 +52,7 @@ var color_table = <?php
 		array('r' => 1, 'g' => 0, 'b' => 1),
 		array('r' => 1, 'g' => 1, 'b' => 0)
 		);
-	
+
 	$brigs  = array(
 		array(0 => '0', 1 => '3'),
 		array(0 => '0', 1 => '4'),
@@ -78,7 +78,7 @@ var color_table = <?php
 			$r = $br[$c['r']];
 			$g = $br[$c['g']];
 			$b = $br[$c['b']];
-			
+
 			$color = $r.$r.$g.$g.$b.$b;
 
 			$table .= '<td>'.unpack_object(new CColorCell(null, $color, 'set_color(\\\''.$color.'\\\')')).'</td>';
@@ -94,7 +94,7 @@ var color_table = <?php
 function GetPos(obj){
 	var left = obj.offsetLeft;
 	var top  = obj.offsetTop;
-	
+
 	while (obj = obj.offsetParent){
 		left	+= obj.offsetLeft
 		top	+= obj.offsetTop
@@ -121,7 +121,7 @@ function show_color_picker(name){
 
 	curr_lbl = document.getElementById('lbl_' + name);
 	curr_txt = document.getElementById(name);
-	
+
 	var pos = GetPos(curr_lbl);
 
 	color_picker.x	= pos[0];
@@ -154,7 +154,7 @@ function set_color(color){
 function set_color_by_name(name, color){
 	curr_lbl = document.getElementById('lbl_' + name);
 	curr_txt = document.getElementById(name);
-	
+
 	set_color(color);
 }
 
@@ -173,13 +173,13 @@ addListener(window, "load", create_color_picker, false);
 			$this->addOption('title', '#'.$value);
 			$this->addOption('class', 'pointer');
 			$this->addOption('style', 'display: inline; width: 10px; height: 10px; text-decoration: none; outline: 1px solid black; background-color: #'.$value);
-			
+
 			$this->setAction($action);
 		}
-		
+
 		function setAction($action=null){
 			if(!isset($action)) return false;
-			
+
 			return $this->addAction('onclick', 'javascript:'.$action);
 		}
 	}
@@ -197,7 +197,7 @@ addListener(window, "load", create_color_picker, false);
 			$txt->addAction('onchange', 'set_color_by_name(\''.$name.'\',this.value)');
 			$txt->addOption('style', 'margin-top: 0px; margin-bottom: 0px');
 			$this->addItem(array($txt, $lbl));
-			
+
 			insert_show_color_picker_javascript();
 		}
 	}

@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -25,15 +25,15 @@ class CMap extends CTag{
 		parent::CTag('map','yes');
 		$this->setName($name);
 	}
-	
-	function addRectArea($x1,$y1,$x2,$y2,$href,$alt){ 
-		return $this->addArea(array($x1,$y1,$x2,$y2),$href,$alt,'rect'); 
+
+	function addRectArea($x1,$y1,$x2,$y2,$href,$alt){
+		return $this->addArea(array($x1,$y1,$x2,$y2),$href,$alt,'rect');
 	}
-	
+
 	function addArea($coords,$href,$alt,$shape){
 		return $this->addItem(new CArea($coords,$href,$alt,$shape));
 	}
-	
+
 	function addItem($value){
 		if(strtolower(get_class($value)) != 'carea')
 			return $this->error('Incorrect value for addItem ['.$value.']');
@@ -50,7 +50,7 @@ class CArea extends CTag{
 		$this->setHref($href);
 		$this->setAlt($alt);
 	}
-	
+
 	function setCoords($value){
 		if(!is_array($value))
 			return $this->error('Incorrect value for setCoords ['.$value.']');
@@ -79,10 +79,10 @@ class CArea extends CTag{
 			return $this->error('Incorrect value for setHref ['.$value.']');
 		$url = new Curl($value);
 		$value = $url->getUrl();
-		
+
 		$this->addOption('href',$value);
 	}
-	
+
 	function setAlt($value){
 		if(!is_string($value))
 			return $this->error('Incorrect value for setAlt ['.$value.']');

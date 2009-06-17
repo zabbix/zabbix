@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -49,7 +49,7 @@
 			}
 			return $value;
 		}
-		
+
 		function AddItem($value,$class=null)
 		{
 			if(is_array($value))

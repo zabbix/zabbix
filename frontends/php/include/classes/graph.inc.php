@@ -1,5 +1,5 @@
-<?php 
-/* 
+<?php
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -56,7 +56,7 @@ define('ZBX_GRAPH_MAX_SKIP_DELAY', 4);
 class Graph{
 
 	function Graph($type = GRAPH_TYPE_NORMAL){
-	
+
 		$this->stime = null;
 		$this->fullSizeX = null;
 		$this->fullSizeY = null;
@@ -82,7 +82,7 @@ class Graph{
 		$this->colors = null;
 		$this->colorsrgb = null;
 		$this->im = null;
-		
+
 		$this->period=3600;
 		$this->from=0;
 		$this->sizeX=900;				// default graph size X
@@ -93,7 +93,7 @@ class Graph{
 		$this->border=1;
 		$this->num=0;
 		$this->type = $type;			// graph type
-		
+
 		$this->axis_valuetype = array();		// overal items type (int/float)
 
 	}
@@ -135,9 +135,9 @@ class Graph{
 
 			'UnknownData'		=> array(130,130,130, 50)
 		);
-		
+
 		$this->colorsrgb = $colors;
-		
+
 // I should rename No Alpha to Alpha at some point to get rid of some confusion
 		foreach($colors as $name => $RGBA){
 			if(isset($RGBA[3]) &&  function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1,1)){
@@ -231,7 +231,7 @@ class Graph{
 		$hours=floor(($this->period%$day)/$hour);
 		$minutes=floor((($this->period%$day)%$hour)/$minute);
 		$seconds=floor(((($this->period%$day)%$hour)%$minute)/$second);
-		
+
 		$str.=($days>0 ? $days.'d' : '').($hours>0 ?  $hours.'h' : '').($minutes>0 ? $minutes.'m' : '').($seconds>0 ? $seconds.'s' : '');
 		$str.=' history ';
 
@@ -240,7 +240,7 @@ class Graph{
 		$hours=floor(($this->from%$day)/$hour);
 		$minutes=floor((($this->from%$day)%$hour)/$minute);
 		$seconds=floor(((($this->from%$day)%$hour)%$minute)/$second);
-		
+
 		$str.=($days>0 ? $days.'d' : '').($hours>0 ?  $hours.'h' : '').($minutes>0 ? $minutes.'m' : '').($seconds>0 ? $seconds.'s' : '');
 		$str.=($days+$hours+$minutes+$seconds>0 ? ' in past ' : '');
 
@@ -279,58 +279,58 @@ class Graph{
 	}
 
 	function GetColor($color,$alfa=50){
-	
+
 		if(isset($this->colors[$color]))
 			return $this->colors[$color];
-			
+
 		$RGB = array(
 			hexdec('0x'.substr($color, 0,2)),
 			hexdec('0x'.substr($color, 2,2)),
 			hexdec('0x'.substr($color, 4,2))
 			);
-		
-		if(isset($alfa) && 
-			function_exists('imagecolorexactalpha') && 
-			function_exists('imagecreatetruecolor') && 
+
+		if(isset($alfa) &&
+			function_exists('imagecolorexactalpha') &&
+			function_exists('imagecreatetruecolor') &&
 			@imagecreatetruecolor(1,1)
 		)
 		{
 			return imagecolorexactalpha($this->im,$RGB[0],$RGB[1],$RGB[2],$alfa);
 		}
-		
+
 		return imagecolorallocate($this->im,$RGB[0],$RGB[1],$RGB[2]);
 	}
-	
+
 	function GetShadow($color,$alfa=0){
-		
+
 		if(isset($this->colorsrgb[$color])){
 			$red = $this->colorsrgb[$color][0];
 			$green = $this->colorsrgb[$color][1];
 			$blue = $this->colorsrgb[$color][2];
-		} 
+		}
 		else{
 			$red = hexdec(substr($color, 0,2));
 			$green = hexdec(substr($color, 2,2));
 			$blue = hexdec(substr($color, 4,2));
 		}
-		
+
 		if($this->sum > 0){
 			$red = (int)($red * 0.6);
 			$green = (int)($green * 0.6);
 			$blue = (int)($blue * 0.6);
 		}
-		
+
 		$RGB = array($red,$green,$blue);
-		
-		if(isset($alfa) && 
-			function_exists('imagecolorexactalpha') && 
-			function_exists('imagecreatetruecolor') && 
+
+		if(isset($alfa) &&
+			function_exists('imagecolorexactalpha') &&
+			function_exists('imagecreatetruecolor') &&
 			@imagecreatetruecolor(1,1)
 		)
 		{
 				return imagecolorexactalpha($this->im,$RGB[0],$RGB[1],$RGB[2],$alfa);
 		}
-		
+
 		return imagecolorallocate($this->im,$RGB[0],$RGB[1],$RGB[2]);
 	}
 

@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -31,7 +31,7 @@
 			$this->CleanItems();
 
 			$status = get_status();
-			
+
 			if($status["zabbix_server"] == S_YES)
 				$server = new CSpan(S_RUNNING,"off");
 			else

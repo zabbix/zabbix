@@ -32,7 +32,7 @@
 		}
 		return $status;
 	}
-	
+
 	function	httptest_status2style($status)
 	{
 		switch($status)
@@ -57,9 +57,9 @@
 		}
 
 		if(!$httpstep_data = DBfetch(DBselect('select httpstepid from httpstep where httptestid='.$httptestid.' and name='.zbx_dbstr($name)))){
-			
+
 			$httpstepid = get_dbid("httpstep","httpstepid");
-			
+
 			if (!DBexecute('insert into httpstep'.
 				' (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) '.
 				' values ('.$httpstepid.','.$httptestid.','.zbx_dbstr($name).','.$no.','.
@@ -96,7 +96,7 @@
 				'units'		=> '',
 				'httpstepitemtype'=> HTTPSTEP_ITEM_TYPE_RSPCODE),
 			);
-		
+
 		foreach($monitored_items as $item){
 			$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
 				' from items i, httpstepitem hi '.
@@ -131,14 +131,14 @@
 				'params'			=> '',
 				'ipmi_sensor'		=> '',
 				'applications'		=> array($applicationid));
-				
+
 			if(!$item_data){
 				$item_args['history'] = $history;
 				$item_args['status'] = ITEM_STATUS_ACTIVE;
 				$item_args['delta'] = 0;
 				$item_args['trends'] = $trends;
 				$item_args['valuemapid'] = 0;
-				
+
 				if(!$itemid = add_item($item_args)){
 					return false;
 				}
@@ -151,12 +151,12 @@
 				$item_args['delta'] = $item_data['delta'];
 				$item_args['trends'] = $item_data['trends'];
 				$item_args['valuemapid'] = $item_data['valuemapid'];
-					
+
 				if(!update_item($itemid, $item_args)){
 					return false;
 				}
 			}
-			
+
 			$httpstepitemid = get_dbid('httpstepitem', 'httpstepitemid');
 
 			DBexecute('delete from httpstepitem where itemid='.$itemid);
@@ -179,9 +179,9 @@
 			error("Scenario name should contain '0-9a-zA-Z_.$ '- characters only");
 			return false;
 		}
-		
+
 		DBstart();
-		
+
 		if($applicationid = DBfetch(DBselect('select applicationid from applications '.
 			' where name='.zbx_dbstr($application).
 			' and hostid='.$hostid)))
@@ -195,7 +195,7 @@
 				return false;
 			}
 		}
-		
+
 		if(isset($httptestid)){
 			$result = DBexecute('update httptest set '.
 				' applicationid='.$applicationid.', name='.zbx_dbstr($name).', delay='.$delay.','.
@@ -205,14 +205,14 @@
 		}
 		else{
 			$httptestid = get_dbid("httptest","httptestid");
-			
+
 			if(DBfetch(DBselect('select t.httptestid from httptest t, applications a where t.applicationid=a.applicationid '.
 				' and a.hostid='.$hostid.' and t.name='.zbx_dbstr($name))))
 			{
 				error('Scenario with name ['.$name.'] already exist');
 				return false;
 			}
-			
+
 			$result = DBexecute('insert into httptest'.
 				' (httptestid, applicationid, name, delay, status, agent, macros, curstate) '.
 				' values ('.$httptestid.','.$applicationid.','.zbx_dbstr($name).','.
@@ -231,13 +231,13 @@
 				if(!isset($s['posts']))       	$s['posts'] = '';
 				if(!isset($s['required']))      $s['required'] = '';
 				if(!isset($s['status_codes']))  $s['status_codes'] = '';
-			
+
 				$result = db_save_step($hostid, $applicationid, $httptestid,
 						$name, $s['name'], $sid+1, $s['timeout'], $s['url'], $s['posts'], $s['required'],$s['status_codes'],
 						$delay, $history, $trends);
-				
+
 				if(!$result) break;
-				
+
 				$httpstepids[$result] = $result;
 			}
 			if($result){
@@ -265,7 +265,7 @@
 					'units'		=> '',
 					'httptestitemtype'=> HTTPSTEP_ITEM_TYPE_LASTSTEP)
 				);
-			
+
 			foreach($monitored_items as $item){
 				$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
 					' from items i, httptestitem hi '.
@@ -300,14 +300,14 @@
 					'params'			=> '',
 					'ipmi_sensor'		=> '',
 					'applications'		=> array($applicationid));
-					
+
 				if(!$item_data){
 					$item_args['history'] = $history;
 					$item_args['status'] = ITEM_STATUS_ACTIVE;
 					$item_args['delta'] = 0;
 					$item_args['trends'] = $trends;
 					$item_args['valuemapid'] = 0;
-					
+
 					if(!$itemid = add_item($item_args)){
 						$result = false;
 						break;
@@ -321,14 +321,14 @@
 					$item_args['delta'] = $item_data['delta'];
 					$item_args['trends'] = $item_data['trends'];
 					$item_args['valuemapid'] = $item_data['valuemapid'];
-						
+
 					if(!update_item($itemid, $item_args)){
 						$result = false;
 						break;
 					}
 				}
 
-				
+
 				$httptestitemid = get_dbid('httptestitem', 'httptestitemid');
 
 				DBexecute('delete from httptestitem where itemid='.$itemid);
@@ -351,45 +351,45 @@
 
 		return $result;
 	}
-	
+
 	function	add_httptest($hostid, $application, $name, $delay, $status, $agent, $macros, $steps)
 	{
 		$result = db_save_httptest(null, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps);
-		
+
 		if($result) info("Sceanrio '".$name."' added");
 
 		return $result;
 	}
-	
+
 	function	update_httptest($httptestid, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps)
 	{
 		$result = db_save_httptest($httptestid, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps);
-		
+
 		if($result)	info("Sceanrio '".$name."' updated");
 
 		return $result;
 	}
-	
+
 	function delete_httpstep($httpstepids){
 		zbx_value2array($httpstepids);
-		
+
 		$db_httpstepitems = DBselect('SELECT DISTINCT * FROM httpstepitem WHERE '.DBcondition('httpstepid',$httpstepids));
 		while($httpstepitem_data = DBfetch($db_httpstepitems)){
 			if(!DBexecute('DELETE FROM httpstepitem WHERE httpstepitemid='.$httpstepitem_data['httpstepitemid'])) return false;
 			if(!delete_item($httpstepitem_data['itemid'])) return false;
 		}
-			
+
 	return DBexecute('DELETE FROM httpstep WHERE '.DBcondition('httpstepid',$httpstepids));
 	}
-	
+
 	function delete_httptest($httptestids){
 		zbx_value2array($httptestids);
-	
+
 		$httptests = array();
 		foreach($httptestids as $id => $httptestid){
 			$httptests[$httptestid] =  DBfetch(DBselect('SELECT * FROM httptest WHERE httptestid='.$httptestid));
 		}
-		
+
 		$db_httpstep = DBselect('SELECT DISTINCT s.httpstepid '.
 								' FROM httpstep s '.
 								' WHERE '.DBcondition('s.httptestid',$httptestids));
@@ -398,19 +398,19 @@
 			$del_httpsteps[$httpstep_data['httpstepid']] = $httpstep_data['httpstepid'];
 		}
 		delete_httpstep($del_httpsteps);
-		
+
 		$httptestitemids_del = array();
 		$itemids_del = array();
 		$sql = 'SELECT httptestitemid, itemid '.
 				' FROM httptestitem '.
 				' WHERE '.DBcondition('httptestid',$httptestids);
-				
+
 		$db_httptestitems = DBselect($sql);
 		while($httptestitem_data = DBfetch($db_httptestitems)){
 			$httptestitemids_del[$httptestitem_data['httptestitemid']] = $httptestitem_data['httptestitemid'];
 			$itemids_del[$httptestitem_data['itemid']] = $httptestitem_data['itemid'];
 		}
-		
+
 		if(!DBexecute('DELETE FROM httptestitem WHERE '.DBcondition('httptestitemid',$httptestitemids_del))) return false;
 		if (!delete_item($itemids_del)) return false;
 
@@ -418,11 +418,11 @@
 
 		foreach($httptests as $id => $httptest){
 			info("Sceanrio '".$httptest["name"]."' deleted");
-		}		
-		
+		}
+
 	return true;
 	}
-	
+
 	function activate_httptest($httptestid){
 		return DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_ACTIVE.' WHERE httptestid='.$httptestid);
 	}
@@ -458,7 +458,7 @@
 	function get_httpstep_by_no($httptestid, $no){
 		return DBfetch(DBselect('select * from httpstep where httptestid='.$httptestid.' and no='.$no));
 	}
-	
+
 	function get_httptests_by_hostid($hostids){
 		zbx_value2array($hostids);
 		$sql = 'SELECT DISTINCT ht.* '.

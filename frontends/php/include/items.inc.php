@@ -98,7 +98,7 @@
 		}
 	return $status;
 	}
-	
+
 	/*
 	 * Function: item_status2style
 	 *
@@ -115,7 +115,7 @@
 		switch($status){
 			case ITEM_STATUS_ACTIVE:	$status = 'off';	break;
 			case ITEM_STATUS_DISABLED:	$status = 'on';		break;
-			case ITEM_STATUS_NOTSUPPORTED:	
+			case ITEM_STATUS_NOTSUPPORTED:
 			default:
 				$status = 'unknown';	break;
 		}
@@ -222,12 +222,12 @@
 				'ipmi_sensor'		=> '',
 				'applications'		=> array(),
 				'templateid'		=> 0);
-		
+
 		if(!check_db_fields($item_db_fields, $item)){
 			error('Incorrect arguments pasted to function [add_item]');
 			return false;
 		}
-		
+
 		$host=get_host_by_hostid($item['hostid']);
 
 		if(($i = array_search(0,$item['applications'])) !== FALSE)
@@ -268,7 +268,7 @@
 			error('Value type must be Float for aggregate items');
 			return FALSE;
 		}
-		
+
 		if($item['type'] == ITEM_TYPE_AGGREGATE){
 			/* grpfunc('group','key','itemfunc','numeric param') */
 //			if(eregi('^((.)*)(\(\'((.)*)\'\,\'((.)*)\'\,\'((.)*)\'\,\'([0-9]+)\'\))$', $key, $arr))
@@ -304,7 +304,7 @@
 		if($db_item && $item['templateid'] == 0){
 			error('An item with the Key ['.$item['key_'].'] already exists for host ['.$host['host'].']. The key must be unique.');
 			return FALSE;
-		} 
+		}
 		else if ($db_item && $item['templateid'] != 0){
 			$item['hostid'] = $db_item['hostid'];
 			$item['applications'] = get_same_applications_for_host($item['applications'], $db_item['hostid']);
@@ -416,7 +416,7 @@
 
 	return $result;
 	}
-	
+
 	/******************************************************************************
 	 *                                                                            *
 	 * Comments: !!! Don't forget sync code with C !!!                            *
@@ -433,7 +433,7 @@
 
 		$item_data = get_item_by_itemid_limited($itemid);
 		$item_data['applications'] = get_applications_by_itemid($itemid);
-		
+
 		if(!check_db_fields($item_data, $item)){
 			error('Incorrect arguments pasted to function [update_item]');
 			return false;
@@ -489,7 +489,7 @@
 			$child_item_params['hostid'] = $db_tmp_item['hostid'];
 			$child_item_params['templateid'] = $itemid;
 			$child_item_params['applications'] = get_same_applications_for_host($item['applications'], $db_tmp_item['hostid']);
-			
+
 			if(!check_db_fields($db_tmp_item, $child_item_params)){
 				error('Incorrect arguments pasted to function [update_item]');
 				return false;
@@ -511,7 +511,7 @@
 
 		DBexecute('UPDATE items SET lastlogsize=0 WHERE itemid='.$itemid.' AND key_<>'.zbx_dbstr($item['key_']));
 
-		if(isset($_REQUEST['applications_visible'])){	
+		if(isset($_REQUEST['applications_visible'])){
 			$result = DBexecute('DELETE FROM items_applications WHERE itemid='.$itemid);
 			foreach($item['applications'] as $appid){
 				$itemappid=get_dbid('items_applications','itemappid');
@@ -575,7 +575,7 @@
 	 */
 	function smart_update_item($itemid, $item=array()){
 		$item_data = get_item_by_itemid_limited($itemid);
-		
+
 		$restore_rules= array(
 					'description'		=> array(),
 					'key_'			=> array(),
@@ -722,14 +722,14 @@
 
 	function activate_item($itemids){
 		zbx_value2array($itemids);
-		
+
 // first update status for child items
 		$chd_items = array();
 		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE '.DBcondition('templateid',$itemids));
-		while($db_tmp_item = DBfetch($db_tmp_items)){ 
+		while($db_tmp_item = DBfetch($db_tmp_items)){
 			$chd_items[$db_tmp_item['itemid']] = $db_tmp_item['itemid'];
 		}
-		if(!empty($chd_items)){ 
+		if(!empty($chd_items)){
 			activate_item($chd_items);  // Recursion !!!
 		}
 
@@ -743,10 +743,10 @@
 // first update status for child items
 		$chd_items = array();
 		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE '.DBcondition('templateid',$itemids));
-		while($db_tmp_item = DBfetch($db_tmp_items)){ 
+		while($db_tmp_item = DBfetch($db_tmp_items)){
 			$chd_items[$db_tmp_item['itemid']] = $db_tmp_item['itemid'];
 		}
-		if(!empty($chd_items)){ 
+		if(!empty($chd_items)){
 			disable_item($chd_items);  // Recursion !!!
 		}
 
@@ -778,14 +778,14 @@
 	}
 
 	function get_item_by_itemid($itemid){
-		$row = DBfetch(DBselect('select * from items where itemid='.$itemid)); 
+		$row = DBfetch(DBselect('select * from items where itemid='.$itemid));
 		if($row){
 			return	$row;
 		}
 		error("No item with itemid=[$itemid]");
 	return	FALSE;
 	}
-	
+
 	function get_item_by_itemid_limited($itemid){
 		$sql = 'SELECT itemid,description,key_,hostid,delay,history,status,type,'.
 					'snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,'.
@@ -793,14 +793,14 @@
 					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid '.
 			' FROM items '.
 			' WHERE itemid='.$itemid;
-		$row = DBfetch(DBselect($sql)); 
+		$row = DBfetch(DBselect($sql));
 		if($row){
 			return	$row;
 		}
 		error('No item with itemid=['.$itemid.']');
 	return	FALSE;
 	}
-	
+
 /*
  * Function: get_same_items_for_host
  *
@@ -808,9 +808,9 @@
  *		Replace items for specified host
  *
  * Author:
- *		Aly 
+ *		Aly
  *
- * Comments: 
+ * Comments:
  *		$error= true : rise Error if item doesn't exist (error generated), false: special processing (NO error generated)
  */
 	function get_same_item_for_host($item,$dest_hostid, $error=true){
@@ -976,7 +976,7 @@
 
 	return $descr;
 	}
-	
+
 	function get_realhost_by_itemid($itemid){
 		$item = get_item_by_itemid($itemid);
 		if($item['templateid'] <> 0)
@@ -1000,7 +1000,7 @@
 	function get_items_data_overview($hostids,$view_style=null){
 
 		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
-		
+
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 COpt::profiling_start('prepare data');
@@ -1083,7 +1083,7 @@ COpt::profiling_start('prepare table');
 
 			$table->SetHeader($header,'vertical_header');
 			$curr_rime = time();
-			
+
 			foreach($hosts as $hostname){
 				$table_row = array(nbsp($hostname));
 				foreach($items as $descr => $ithosts){
@@ -1096,7 +1096,7 @@ COpt::profiling_stop('prepare table');
 
 		return $table;
 	}
-	
+
 	function get_item_data_overview_cells(&$table_row,&$ithosts,$hostname){
 		$css_class = NULL;
 		unset($it_ov_menu);
@@ -1116,7 +1116,7 @@ COpt::profiling_stop('prepare table');
 			$value = format_lastvalue($ithosts[$hostname]);
 
 			$it_ov_menu = array(
-				array(S_VALUES,	null, null, 
+				array(S_VALUES,	null, null,
 					array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))),
 				array(S_500_LATEST_VALUES, 'history.php?action=showlatest&itemid='.$ithosts[$hostname]['itemid'],
 					array('tw'=>'_blank'))
@@ -1127,7 +1127,7 @@ COpt::profiling_stop('prepare table');
 				case ITEM_VALUE_TYPE_FLOAT:
 					$it_ov_menu = array_merge(array(
 						/* name, url, (target [tw], statusbar [sb]), css, submenu */
-						array(S_GRAPHS, null,  null, 
+						array(S_GRAPHS, null,  null,
 							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
 							),
 						array(S_LAST_HOUR_GRAPH, 'history.php?period=3600&action=showgraph&itemid='.
@@ -1185,9 +1185,9 @@ COpt::profiling_stop('prepare table');
 	 ******************************************************************************/
 	function get_applications_by_itemid($itemids, $field='applicationid'){
 		zbx_value2array($itemids);
-		
+
 		$result = array();
-		
+
 		$db_applications = DBselect('SELECT DISTINCT app.'.$field.' as result '.
 										' FROM applications app, items_applications ia '.
 										' WHERE app.applicationid=ia.applicationid '.
@@ -1254,7 +1254,7 @@ COpt::profiling_stop('prepare table');
 	 ******************************************************************************/
 	function delete_trends_by_itemid($itemids, $use_housekeeper=0){
 		zbx_value2array($itemids);
-		
+
 		if($use_housekeeper){
 			foreach($itemids as $id => $itemid){
 				$housekeeperid = get_dbid('housekeeper','housekeeperid');
@@ -1265,7 +1265,7 @@ COpt::profiling_stop('prepare table');
 		}
 	return	DBexecute('DELETE FROM trends WHERE '.DBcondition('itemid',$itemids));
 	}
-	
+
 	function format_lastvalue($db_item){
 		if(isset($db_item["lastvalue"])){
 			if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT){
@@ -1332,7 +1332,7 @@ COpt::profiling_stop('prepare table');
 				$table = "history_log";
 				break;
 		}
-		
+
 		if($last == 0){
 			$sql = "select value from $table where itemid=".$db_item["itemid"]." and clock=$clock";
 			$row = DBfetch(DBselect($sql, 1));

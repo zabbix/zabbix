@@ -50,17 +50,17 @@
 	}
 
 	function add_audit_if($condition,$action,$resourcetype,$details){
-		if($condition) 
+		if($condition)
 			return add_audit($action,$resourcetype,$details);
 
 		return false;
 	}
-	
+
 	function add_audit($action,$resourcetype,$details){
 		global $USER_DETAILS;
 
 		if(!isset($USER_DETAILS["userid"]))	check_authorisation();
-		
+
 		$auditid	= get_dbid("auditlog","auditid");
 
 		if(strlen($details) > 128)

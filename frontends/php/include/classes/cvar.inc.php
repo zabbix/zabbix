@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -28,11 +28,11 @@
 			$this->options['type'] = 'hidden';
 			$this->options['name'] = $name;
 			$this->options['id'] = $name;
-			
+
 			$this->SetValue($value);
 		}
 		function SetValue($value)
-		{ 
+		{
 			$this->options['value'] = htmlspecialchars($value);
 		}
 	}
@@ -50,7 +50,7 @@
 
 			$this->SetValue($value);
 		}
-		
+
 		function SetValue($value)
 		{
 			$this->var_container = array();
