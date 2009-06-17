@@ -69,7 +69,7 @@ void	zbx_db_close(void)
 /*
  * Connect to the database.
  * If fails, program terminates.
- */ 
+ */
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbsocket, int port)
 {
 	int	ret = ZBX_DB_OK;
@@ -287,7 +287,7 @@ static DB_RESULT __zbx_zbx_db_select(const char *fmt, ...)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing of DB does not support transactions                   *
+ * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_begin(void)
@@ -300,7 +300,7 @@ void	zbx_db_begin(void)
 #endif
 #ifdef	HAVE_SQLITE3
 	sqlite_transaction_started++;
-	
+
 	if(sqlite_transaction_started == 1)
 	{
 		php_sem_acquire(&sqlite_access);
@@ -326,7 +326,7 @@ void	zbx_db_begin(void)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing of DB does not support transactions                   *
+ * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void zbx_db_commit(void)
@@ -346,7 +346,7 @@ void zbx_db_commit(void)
 	{
 		sqlite_transaction_started--;
 	}
-	
+
 	if(sqlite_transaction_started == 1)
 	{
 		zbx_db_execute("%s","commit;");
@@ -371,7 +371,7 @@ void zbx_db_commit(void)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing of DB does not support transactions                   *
+ * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void zbx_db_rollback(void)
@@ -407,7 +407,7 @@ void zbx_db_rollback(void)
 /*
  * Execute SQL statement. For non-select statements only.
  * If fails, program terminates.
- */ 
+ */
 int zbx_db_vexecute(const char *fmt, va_list args)
 {
 	char	*sql = NULL;
@@ -513,7 +513,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	{
 		php_sem_acquire(&sqlite_access);
 	}
-	
+
 lbl_exec:
 	if (SQLITE_OK != (ret = sqlite3_exec(conn, sql, NULL, 0, &error)))
 	{
@@ -536,7 +536,7 @@ lbl_exec:
 	}
 #endif
 
-/*	sec = zbx_time() - sec;	
+/*	sec = zbx_time() - sec;
 	if(sec > 0.1)
 		zabbix_log( LOG_LEVEL_WARNING, "Long query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);*/
 
@@ -580,7 +580,7 @@ void	PG_DBfree_result(DB_RESULT result)
 void	SQ_DBfree_result(DB_RESULT result)
 {
 	if(!result) return;
-	
+
 	if(result->data)
 	{
 		sqlite3_free_table(result->data);
@@ -603,18 +603,18 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	/* EOF */
 	if(!result)	return NULL;
-		
+
 	/* free old data */
 	if(result->values)
 	{
 		zbx_free(result->values);
 		result->values = NULL;
 	}
-	
+
 	/* EOF */
 	if(result->cursor == result->row_num) return NULL;
 
-	/* init result */	
+	/* init result */
 	result->fld_num = PQnfields(result->pg_result);
 
 	if(result->fld_num > 0)
@@ -637,7 +637,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	result->cursor++;
 
-	return result->values;	
+	return result->values;
 #endif
 #ifdef	HAVE_ORACLE
 	int res;
@@ -658,10 +658,10 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 	return NULL;
 #endif
 #ifdef HAVE_SQLITE3
-	
+
 	/* EOF */
 	if(!result)	return NULL;
-		
+
 	/* EOF */
 	if(result->curow >= result->nrow) return NULL;
 
@@ -669,7 +669,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	result->curow++; /* NOTE: First row == header row */
 
-	return &(result->data[result->curow * result->ncolumn]);	
+	return &(result->data[result->curow * result->ncolumn]);
 #endif
 
 	return NULL;
@@ -678,7 +678,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 /*
  * Execute SQL statement. For select statements only.
  * If fails, program terminates.
- */ 
+ */
 DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 {
 	char	*sql = NULL;
@@ -793,7 +793,7 @@ lbl_get_table:
 	}
 #endif
 
-/*	sec = zbx_time() - sec;	
+/*	sec = zbx_time() - sec;
 	if(sec > 0.1)
 		zabbix_log( LOG_LEVEL_WARNING, "Long query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);*/
 
@@ -803,14 +803,14 @@ lbl_get_table:
 
 /*
  * Get value of autoincrement field for last insert or update statement
- */ 
+ */
 zbx_uint64_t	zbx_db_insert_id(int exec_result, const char *table, const char *field)
 {
 #ifdef	HAVE_MYSQL
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
-	
+
 	if(exec_result == FAIL) return 0;
-	
+
 	return mysql_insert_id(conn);
 #endif
 
@@ -819,18 +819,18 @@ zbx_uint64_t	zbx_db_insert_id(int exec_result, const char *table, const char *fi
 	zbx_uint64_t	id_res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
-	
+
 	if(exec_result < 0) return 0;
 	if(exec_result == FAIL) return 0;
 	if((Oid)exec_result == InvalidOid) return 0;
-	
+
 	tmp_res = zbx_db_select("select %s from %s where oid=%i", field, table, exec_result);
 
 	ZBX_STR2UINT64(id_res, PQgetvalue(tmp_res->pg_result, 0, 0));
 /*	id_res = atoi(PQgetvalue(tmp_res->pg_result, 0, 0));*/
-	
+
 	DBfree_result(tmp_res);
-	
+
 	return id_res;
 #endif
 
@@ -839,7 +839,7 @@ zbx_uint64_t	zbx_db_insert_id(int exec_result, const char *table, const char *fi
 	char    sql[MAX_STRING_LEN];
 	DB_RESULT       result;
 	zbx_uint64_t	id;
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
 
 	if(exec_result == FAIL) return 0;
@@ -847,7 +847,7 @@ zbx_uint64_t	zbx_db_insert_id(int exec_result, const char *table, const char *fi
 	zbx_snprintf(sql, sizeof(sql), "select %s_%s.currval from dual", table, field);
 
 	result=DBselect("%s", sql);
-	
+
 	row = DBfetch(result);
 
 	ZBX_STR2UINT64(id, row[0]);
@@ -864,7 +864,7 @@ zbx_uint64_t	zbx_db_insert_id(int exec_result, const char *table, const char *fi
 /*
  * Execute SQL statement. For select statements only.
  * If fails, program terminates.
- */ 
+ */
 DB_RESULT zbx_db_select_n(char *query, int n)
 {
 #ifdef	HAVE_MYSQL
@@ -880,4 +880,3 @@ DB_RESULT zbx_db_select_n(char *query, int n)
 	return zbx_db_select("%s limit %d", query, n);
 #endif
 }
-

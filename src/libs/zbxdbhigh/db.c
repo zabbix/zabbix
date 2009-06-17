@@ -61,7 +61,7 @@ void	DBclose(void)
 /*
  * Connect to the database.
  * If fails, program terminates.
- */ 
+ */
 void    DBconnect(int flag)
 {
 	int	err;
@@ -99,9 +99,9 @@ void    DBconnect(int flag)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alksander Vladishev                                                *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
- * Comments:                                                                  * 
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DBinit()
@@ -121,7 +121,7 @@ void	DBinit()
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  * 
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	DBping(void)
@@ -146,7 +146,7 @@ int	DBping(void)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing of DB does not support transactions                   *
+ * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void DBbegin(void)
@@ -166,7 +166,7 @@ void DBbegin(void)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing of DB does not support transactions                   *
+ * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void DBcommit(void)
@@ -186,7 +186,7 @@ void DBcommit(void)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing of DB does not support transactions                   *
+ * Comments: Do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void DBrollback(void)
@@ -197,7 +197,7 @@ void DBrollback(void)
 /*
  * Execute SQL statement. For non-select statements only.
  * If fails, program terminates.
- */ 
+ */
 int __zbx_DBexecute(const char *fmt, ...)
 {
 	va_list args;
@@ -235,7 +235,7 @@ DB_ROW	DBfetch(DB_RESULT result)
 /*
  * Execute SQL statement. For select statements only.
  * If fails, program terminates.
- */ 
+ */
 DB_RESULT __zbx_DBselect(const char *fmt, ...)
 {
 	va_list args;
@@ -261,7 +261,7 @@ DB_RESULT __zbx_DBselect(const char *fmt, ...)
 /*
  * Execute SQL statement. For select statements only.
  * If fails, program terminates.
- */ 
+ */
 DB_RESULT DBselectN(char *query, int n)
 {
 	return zbx_db_select_n(query,n);
@@ -269,7 +269,7 @@ DB_RESULT DBselectN(char *query, int n)
 
 /*
  * Get value of autoincrement field for last insert or update statement
- */ 
+ */
 zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field)
 {
 	return zbx_db_insert_id(exec_result, table, field);
@@ -277,7 +277,7 @@ zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field)
 
 /*
  * Get function value.
- */ 
+ */
 int     DBget_function_result(char **result, char *functionid, char *error, int maxerrlen)
 {
 	DB_RESULT dbresult;
@@ -370,7 +370,7 @@ void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *late
 	}
 	DBfree_result(result);
 
-/* I do not remember exactlywhy it was so complex. Rewritten. */
+/* I do not remember exactly why it was so complex. Rewritten. */
 
 /*
 	zbx_snprintf(sql,sizeof(sql),"select eventid,value,clock from events where source=%d and object=%d and objectid=" ZBX_FS_UI64 " order by clock desc",
@@ -392,7 +392,7 @@ void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *late
 			value_max=atoi(row[1]);
 		}
 	}
-	
+
 	if(eventid_max == 0)
         {
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for last is empty" );
@@ -441,7 +441,7 @@ int	latest_service_alarm(zbx_uint64_t serviceid, int status)
 int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
 {
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_service_alarm()");
-	
+
 	if(latest_service_alarm(serviceid,status) == SUCCEED)
 	{
 		return SUCCEED;
@@ -454,7 +454,7 @@ int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
 		status);
 
 	zabbix_log(LOG_LEVEL_DEBUG,"End of add_service_alarm()");
-	
+
 	return SUCCEED;
 }
 
@@ -624,7 +624,7 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, const ch
 			}
 		}
 
-		/* The lastest event has the same status, do not generate new one */
+		/* The latest event has the same status, do not generate new one */
 		/* Generate also UNKNOWN events, We are not interested in prev trigger value here. */
 		if(event_last_status != new_value ||
 			(trigger->type == TRIGGER_TYPE_MULTIPLE_TRUE && new_value == TRIGGER_VALUE_TRUE)
@@ -701,7 +701,7 @@ void update_triggers_status_to_unknown(zbx_uint64_t hostid,int clock,char *reaso
 	DBfree_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG,"End of update_triggers_status_to_unknown()");
 
-	return; 
+	return;
 }
 
 void  DBdelete_service(zbx_uint64_t serviceid)
@@ -808,7 +808,7 @@ void DBupdate_triggers_status_after_restart(void)
 	DBfree_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG,"End of DBupdate_triggers_after_restart()");
 
-	return; 
+	return;
 }
 
 void DBupdate_host_availability(DB_ITEM *item, int available, int clock, const char *error)
@@ -1174,7 +1174,7 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 	value_esc = DBdyn_escape_string(value);
 	value_esc_max_len = strlen(value_esc);
 
-	/* alloate the lob descriptor */
+	/* allocate the lob descriptor */
 	if(sqlo_alloc_lob_desc(oracle, &loblp) < 0)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG,"CLOB allocating failed:%s", sqlo_geterror(oracle));
@@ -1220,10 +1220,10 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 		goto lbl_exit_loblp;
 	}
 
-	/* commiting */
+	/* committing */
 	if(sqlo_commit(oracle) < 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG,"Commiting failed:%s", sqlo_geterror(oracle) );
+		zabbix_log(LOG_LEVEL_DEBUG,"Committing failed:%s", sqlo_geterror(oracle) );
 	}
 
 	ret = SUCCEED;
@@ -1657,7 +1657,7 @@ void    DBescape_string(const char *src, char *dst, int len)
 		if (*s == '\r')
 			continue;
 
-		if (*s == '\'' 
+		if (*s == '\''
 #if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
 			|| *s == '\\'
 #endif
@@ -1692,7 +1692,7 @@ char*	DBdyn_escape_string(const char *src)
 		if (*s == '\r')
 			continue;
 
-		if (*s == '\'' 
+		if (*s == '\''
 #if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
 			|| *s == '\\'
 #endif
@@ -1741,7 +1741,7 @@ char*	DBdyn_escape_string_len(const char *src, int max_src_len)
 		if (*s == '\r')
 			continue;
 
-		if (*s == '\'' 
+		if (*s == '\''
 #if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
 			|| *s == '\\'
 #endif
@@ -1802,7 +1802,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 			default:
 				item->lastvalue_str=s;
 				break;
-		}	
+		}
 	}
 	s=row[14];
 	if(DBis_null(s)==SUCCEED)
@@ -1822,7 +1822,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 			default:
 				item->prevvalue_str=s;
 				break;
-		}	
+		}
 	}
 	ZBX_STR2UINT64(item->hostid, row[15]);
 	item->host_status=atoi(row[16]);
@@ -1849,7 +1849,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 			default:
 				item->prevorgvalue_str=s;
 				break;
-		}	
+		}
 	}
 	s = row[22];
 	if(DBis_null(s)==SUCCEED)
@@ -1938,7 +1938,7 @@ zbx_uint64_t DBget_nextid(char *table, char *field)
 		min,
 		field,
 		max);
-	zabbix_log(LOG_LEVEL_DEBUG, "select max(%s) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64, field, table, field, min, field, max); 
+	zabbix_log(LOG_LEVEL_DEBUG, "select max(%s) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64, field, table, field, min, field, max);
 
 	row=DBfetch(result);
 
@@ -2123,7 +2123,7 @@ zbx_uint64_t DBget_maxid_num(char *tablename, char *fieldname, int num)
 	{
 		result = DBselect("select %s_%s from nodes where nodeid=%d", table, field, CONFIG_NODEID);
 		row = DBfetch(result);
-	
+
 		if(!row || DBis_null(row[0])==SUCCEED)
 		{
 			ret = CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + 1;
@@ -2267,7 +2267,7 @@ static char	string[640];
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
- * Comments:                                                                  * 
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_host_key_string(zbx_uint64_t itemid)
@@ -2301,7 +2301,7 @@ char	*zbx_host_key_string(zbx_uint64_t itemid)
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
- * Comments:                                                                  * 
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_host_key_string_by_item(DB_ITEM *item)
@@ -2325,7 +2325,7 @@ char	*zbx_host_key_string_by_item(DB_ITEM *item)
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
- * Comments:                                                                  * 
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_host_key_function_string(zbx_uint64_t functionid)
@@ -2379,4 +2379,3 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
 
 	return value_uint64;
 }
-
