@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -36,8 +36,8 @@ static int	get_sensor(const char *name, unsigned flags, AGENT_RESULT *result)
 
         assert(result);
 
-        init_result(result);	
-	
+        init_result(result);
+
 	dir=opendir("/proc/sys/dev/sensors");
 	if(NULL == dir)
 	{
@@ -46,7 +46,7 @@ static int	get_sensor(const char *name, unsigned flags, AGENT_RESULT *result)
 
 	while((entries=readdir(dir))!=NULL)
 	{
-		strscpy(filename,"/proc/sys/dev/sensors/");	
+		strscpy(filename,"/proc/sys/dev/sensors/");
 		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
 		zbx_strlcat(filename,name,MAX_STRING_LEN);
 
@@ -118,4 +118,3 @@ int     OLD_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         return ret;
 }
-
