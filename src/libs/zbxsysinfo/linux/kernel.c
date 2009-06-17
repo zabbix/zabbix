@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -27,12 +27,12 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char line[MAX_STRING_LEN];
 
 	zbx_uint64_t value = 0;
-	
+
 	FILE 	*f;
 
 	assert(result);
 
-        init_result(result);	
+        init_result(result);
 
 	if(NULL != ( f = fopen("/proc/sys/fs/file-max","r") ))
 	{
@@ -58,8 +58,8 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	assert(result);
 
-        init_result(result);	
-	
+        init_result(result);
+
 	mib[0]=CTL_KERN;
 	mib[1]=KERN_MAXPROC;
 
@@ -85,7 +85,7 @@ int     OLD_KERNEL(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         assert(result);
 
-        init_result(result);	
+        init_result(result);
 
         if(num_param(param) > 1)
         {
@@ -112,4 +112,3 @@ int     OLD_KERNEL(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         return ret;
 }
-

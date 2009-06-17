@@ -152,7 +152,7 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
 	rewind(f_stat);
 
 	while (NULL != fgets(tmp, sizeof(tmp), f_stat))
-	{	
+	{
 		if (0 != strncmp(tmp, "State:\t", 7))
 			continue;
 
@@ -334,7 +334,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	assert(result);
 
 	init_result(result);
-	
+
 
 	if (num_param(param) > 4)
 		return SYSINFO_RET_FAIL;
@@ -351,10 +351,10 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			return SYSINFO_RET_FAIL;
 	} else
 		usrinfo = NULL;
-    
+
 	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
 		*tmp = '\0';
-		
+
 	if (*tmp != '\0') {
 		if (0 == strcmp(tmp, "run"))
 			zbx_proc_stat = ZBX_PROC_STAT_RUN;
@@ -416,4 +416,3 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	return SYSINFO_RET_OK;
 }
-

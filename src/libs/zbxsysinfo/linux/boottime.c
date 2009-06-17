@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -31,7 +31,7 @@ static int getPROC2(char *file, char *param, int fieldno, unsigned flags, int ty
 	int	found;
 	unsigned long uValue;
 	double fValue;
-        
+
 	if (NULL == (f = fopen(file,"r")))
 	{
 		return SYSINFO_RET_FAIL;
@@ -39,7 +39,7 @@ static int getPROC2(char *file, char *param, int fieldno, unsigned flags, int ty
 
 	/* find line */
 	found = 0;
-	while ( fgets(buf, MAX_STRING_LEN, f) != NULL ) 
+	while ( fgets(buf, MAX_STRING_LEN, f) != NULL )
 	{
 		if (strncmp(buf, "btime", 5) == 0)
 		{

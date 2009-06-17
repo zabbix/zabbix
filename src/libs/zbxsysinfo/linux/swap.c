@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -149,7 +149,7 @@ SWP_FNCLIST
 	int (*function)();
 };
 
-	SWP_FNCLIST fl[] = 
+	SWP_FNCLIST fl[] =
 	{
 		{"total",	SYSTEM_SWAP_TOTAL},
 		{"free",	SYSTEM_SWAP_FREE},
@@ -161,11 +161,11 @@ SWP_FNCLIST
 	char swapdev[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
 	int i;
-	
+
         assert(result);
 
         init_result(result);
-	
+
         if(num_param(param) > 2)
         {
                 return SYSINFO_RET_FAIL;
@@ -186,12 +186,12 @@ SWP_FNCLIST
 	{
 		return SYSINFO_RET_FAIL;
 	}
-	
+
 	if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
-	
+
         if(mode[0] == '\0')
 	{
 		/* default parameter */
@@ -205,7 +205,7 @@ SWP_FNCLIST
 			return (fl[i].function)(cmd, param, flags, result);
 		}
 	}
-	
+
 	return SYSINFO_RET_FAIL;
 }
 
@@ -302,7 +302,7 @@ static int get_swap_dev_stat(const char *interface, struct swap_stat_s *result)
 		while(fgets(line,MAX_STRING_LEN,f) != NULL)
 		{
 			PARSE(line);
-		
+
 			if(strncmp(name, interface, MAX_STRING_LEN) == 0)
 			{
 				ret = SYSINFO_RET_OK;
@@ -321,7 +321,7 @@ static int get_swap_dev_stat(const char *interface, struct swap_stat_s *result)
 	}
 	return ret;
 }
-	
+
 static int	get_swap_pages(struct swap_stat_s *result)
 {
 	int ret = SYSINFO_RET_FAIL;
@@ -331,7 +331,7 @@ static int	get_swap_pages(struct swap_stat_s *result)
 	zbx_uint64_t
 		value1,
 		value2;
-	
+
 	FILE *f;
 
 	assert(result);
@@ -342,19 +342,19 @@ static int	get_swap_pages(struct swap_stat_s *result)
 		{
 			if(sscanf(line, "%10s " ZBX_FS_UI64 " " ZBX_FS_UI64, name, &value1, &value2) != 3)
 				continue;
-			
+
 			if(strcmp(name, "swap"))
 				continue;
-			
+
 			result->wpag	= value1;
 			result->rpag	= value2;
-			
+
 			ret = SYSINFO_RET_OK;
 			break;
 		};
 		zbx_fclose(f);
 	}
-	
+
 	if(ret != SYSINFO_RET_OK)
 	{
 		result->wpag	= 0;
@@ -367,13 +367,13 @@ static int	get_swap_pages(struct swap_stat_s *result)
 static int 	get_swap_stat(const char *interface, struct swap_stat_s *result)
 {
 	int ret = SYSINFO_RET_FAIL;
-	
+
 	struct swap_stat_s curr;
-	
+
 	FILE *f;
 
 	char line[MAX_STRING_LEN], *s;
-	
+
 	assert(result);
 
 	memset(result, 0, sizeof(struct swap_stat_s));
@@ -394,14 +394,14 @@ static int 	get_swap_stat(const char *interface, struct swap_stat_s *result)
 				*s = 0;
 
 				if(interface && 0 != strcmp(interface, line+5)) continue;
-				
+
 				if(SYSINFO_RET_OK == get_swap_dev_stat(line+5, &curr))
 				{
 					result->rio	+= curr.rio;
 					result->rsect	+= curr.rsect;
 					result->wio	+= curr.wio;
 					result->wsect	+= curr.wsect;
-					
+
 					ret = SYSINFO_RET_OK;
 				}
 			}
@@ -545,4 +545,3 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	return ret;
 }
-
