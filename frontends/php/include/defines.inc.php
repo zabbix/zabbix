@@ -23,30 +23,30 @@
 
 /* USER DEFINES */	
 
-	define('ZBX_LOGIN_ATTEMPTS', 	5);
-	define('ZBX_LOGIN_BLOCK', 		30); // sec
+	define('ZBX_LOGIN_ATTEMPTS',			5);
+	define('ZBX_LOGIN_BLOCK',			30);	// sec
 	
-	define('TRIGGERS_OPTION_DISABLED',		0);		// reserved
-	define('TRIGGERS_OPTION_ONLYTRUE',		1);		// use 0 to disable
-	define('TRIGGERS_OPTION_ALL',			2);		// use 0 to disable
-	define('TRIGGERS_OPTION_NOFALSEFORB',	0);		// use 0 to disable
+	define('TRIGGERS_OPTION_DISABLED',		0);	// reserved
+	define('TRIGGERS_OPTION_ONLYTRUE',		1);	// use 0 to disable
+	define('TRIGGERS_OPTION_ALL',			2);	// use 0 to disable
+	define('TRIGGERS_OPTION_NOFALSEFORB',		0);	// use 0 to disable
 	
 	define('TRIGGER_FALSE_PERIOD', 			1800);	// 30min,  0 - disable
 	define('TRIGGER_BLINK_PERIOD',			1800);	// 30min,  0 - disable
 
-	define('EVENTS_OPTION_DISABLED',		0);		//	reserved
-	define('EVENTS_OPTION_NOEVENT',			1);		//	use 0 to disable
-	define('EVENTS_OPTION_ALL',				2);		//	use 0 to disable
-	define('EVENTS_OPTION_NOT_ACK',			3);		//	use 0 to disable
-	define('EVENTS_OPTION_ONLYTRUE_NOTACK',	4);		//	use 0 to disable
-	define('EVENTS_OPTION_NOFALSEFORB',		5);		//  reserved for TRIGGERS_OPTION_NOFALSEFORB, to disable set TRIGGERS_OPTION_NOFALSEFORB to 0
+	define('EVENTS_OPTION_DISABLED',		0);	// reserved
+	define('EVENTS_OPTION_NOEVENT',			1);	// use 0 to disable
+	define('EVENTS_OPTION_ALL',			2);	// use 0 to disable
+	define('EVENTS_OPTION_NOT_ACK',			3);	// use 0 to disable
+	define('EVENTS_OPTION_ONLYTRUE_NOTACK',		4);	// use 0 to disable
+	define('EVENTS_OPTION_NOFALSEFORB',		5);	// reserved for TRIGGERS_OPTION_NOFALSEFORB, to disable set TRIGGERS_OPTION_NOFALSEFORB to 0
 
-	define('ZBX_MIN_PERIOD', 3600);					// ~1 hour
+	define('ZBX_MIN_PERIOD', 3600);				// ~1 hour
 	define('ZBX_MAX_PERIOD', 12*31*24*3600);		// ~1 year
 	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
 
-	define('ZBX_DROPDOWN_FIRST_ENTRY',		2);		// 0 - NONE, 1 - ALL, 2 - SIMILAR ZBX 1.6.2 (compatibility mode)
-	define('ZBX_DROPDOWN_FIRST_REMEMBER',	1);		// 0 - do NOT remember, 1 - do remember
+	define('ZBX_DROPDOWN_FIRST_ENTRY',		2);	// 0 - NONE, 1 - ALL, 2 - SIMILAR ZBX 1.6.2 (compatibility mode)
+	define('ZBX_DROPDOWN_FIRST_REMEMBER',		1);	// 0 - do NOT remember, 1 - do remember
 	
 /* END OF USERS DEFINES */
 
@@ -58,7 +58,7 @@
 	define('PAGE_TYPE_IMAGE',		1);
 	define('PAGE_TYPE_XML',			2);
 	define('PAGE_TYPE_JS',			3);	//javascript
-	define('PAGE_TYPE_HTML_BLOCK',	4);	//simple block of html (as text)
+	define('PAGE_TYPE_HTML_BLOCK',		4);	//simple block of html (as text)
 	
 	define('ZBX_SESSION_ACTIVE', 0);
 	define('ZBX_SESSION_PASSIVE', 1);
@@ -94,9 +94,9 @@
 	define('IMAGE_FORMAT_JPEG',		'JPEG');
 	define('IMAGE_FORMAT_TEXT',		'JPEG');
 	
-	define('IMAGE_TYPE_UNKNOWN',	0);
+	define('IMAGE_TYPE_UNKNOWN',		0);
 	define('IMAGE_TYPE_ICON',		1);
-	define('IMAGE_TYPE_BACKGROUND',	2);
+	define('IMAGE_TYPE_BACKGROUND',		2);
 	
 	
 	define('ZBX_SORT_UP',			'ASC');
@@ -139,22 +139,22 @@
 	define('AUDIT_RESOURCE_SCRIPT',		25);
 	define('AUDIT_RESOURCE_PROXY',		26);
 
-	define('CONDITION_TYPE_HOST_GROUP',	0);
-	define('CONDITION_TYPE_HOST',		1);
-	define('CONDITION_TYPE_TRIGGER',	2);
-	define('CONDITION_TYPE_TRIGGER_NAME',	3);
-	define('CONDITION_TYPE_TRIGGER_SEVERITY',4);
-	define('CONDITION_TYPE_TRIGGER_VALUE',	5);
-	define('CONDITION_TYPE_TIME_PERIOD',	6);
-	define('CONDITION_TYPE_DHOST_IP',	7);
-	define('CONDITION_TYPE_DSERVICE_TYPE',	8);
-	define('CONDITION_TYPE_DSERVICE_PORT',	9);
-	define('CONDITION_TYPE_DSTATUS',	10);
-	define('CONDITION_TYPE_DUPTIME',	11);
-	define('CONDITION_TYPE_DVALUE',		12);
-	define('CONDITION_TYPE_HOST_TEMPLATE',	13);
+	define('CONDITION_TYPE_HOST_GROUP',		0);
+	define('CONDITION_TYPE_HOST',			1);
+	define('CONDITION_TYPE_TRIGGER',		2);
+	define('CONDITION_TYPE_TRIGGER_NAME',		3);
+	define('CONDITION_TYPE_TRIGGER_SEVERITY',	4);
+	define('CONDITION_TYPE_TRIGGER_VALUE',		5);
+	define('CONDITION_TYPE_TIME_PERIOD',		6);
+	define('CONDITION_TYPE_DHOST_IP',		7);
+	define('CONDITION_TYPE_DSERVICE_TYPE',		8);
+	define('CONDITION_TYPE_DSERVICE_PORT',		9);
+	define('CONDITION_TYPE_DSTATUS',		10);
+	define('CONDITION_TYPE_DUPTIME',		11);
+	define('CONDITION_TYPE_DVALUE',			12);
+	define('CONDITION_TYPE_HOST_TEMPLATE',		13);
 	define('CONDITION_TYPE_EVENT_ACKNOWLEDGED',	14);
-	define('CONDITION_TYPE_APPLICATION',	15);
+	define('CONDITION_TYPE_APPLICATION',		15);
 
 	define('CONDITION_OPERATOR_EQUAL',	0);
 	define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -176,11 +176,11 @@
 	define('HOST_AVAILABLE_TRUE',		1);
 	define('HOST_AVAILABLE_FALSE',		2);
 
-	define('MAP_LABEL_TYPE_LABEL',0);
-	define('MAP_LABEL_TYPE_IP',1);
-	define('MAP_LABEL_TYPE_NAME',2);
-	define('MAP_LABEL_TYPE_STATUS',3);
-	define('MAP_LABEL_TYPE_NOTHING',4);
+	define('MAP_LABEL_TYPE_LABEL',		0);
+	define('MAP_LABEL_TYPE_IP',		1);
+	define('MAP_LABEL_TYPE_NAME',		2);
+	define('MAP_LABEL_TYPE_STATUS',		3);
+	define('MAP_LABEL_TYPE_NOTHING',	4);
 
 	define('MAP_LABEL_LOC_BOTTOM',		0);
 	define('MAP_LABEL_LOC_LEFT',		1);
@@ -225,30 +225,30 @@
 	define('ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV',	1);
 	define('ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV',	2);
 
-	define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
+	define('GRAPH_ITEM_DRAWTYPE_LINE',		0);
 	define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
 	define('GRAPH_ITEM_DRAWTYPE_BOLD_LINE',		2);
-	define('GRAPH_ITEM_DRAWTYPE_DOT',			3);
+	define('GRAPH_ITEM_DRAWTYPE_DOT',		3);
 	define('GRAPH_ITEM_DRAWTYPE_DASHED_LINE',	4);
 
-	define('MAP_LINK_DRAWTYPE_LINE',			0);
+	define('MAP_LINK_DRAWTYPE_LINE',		0);
 	define('MAP_LINK_DRAWTYPE_BOLD_LINE',		2);
-	define('MAP_LINK_DRAWTYPE_DOT',				3);
+	define('MAP_LINK_DRAWTYPE_DOT',			3);
 	define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
 
 	define('SERVICE_ALGORITHM_NONE',	0);
 	define('SERVICE_ALGORITHM_MAX',		1);
 	define('SERVICE_ALGORITHM_MIN',		2);
 	
-	define('TRIGGER_MULT_EVENT_DISABLED',0);
-	define('TRIGGER_MULT_EVENT_ENABLED'	,1);
+	define('TRIGGER_MULT_EVENT_DISABLED',	0);
+	define('TRIGGER_MULT_EVENT_ENABLED',	1);
 	
 	define('TRIGGER_STATUS_ENABLED'	,0);
 	define('TRIGGER_STATUS_DISABLED',1);
 	define('TRIGGER_STATUS_UNKNOWN'	,2);
 	
 	define('TRIGGER_VALUE_FALSE'	,0);
-	define('TRIGGER_VALUE_TRUE'		,1);
+	define('TRIGGER_VALUE_TRUE'	,1);
 	define('TRIGGER_VALUE_UNKNOWN'	,2);
 
 	define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
@@ -343,59 +343,59 @@
 	define('TIME_TYPE_LOCAL',	0);
 	define('TIME_TYPE_SERVER',	1);
 
-	define('FILTER_TAST_SHOW',	0);
-	define('FILTER_TAST_HIDE',	1);
-	define('FILTER_TAST_MARK',	2);
-	define('FILTER_TAST_INVERT_MARK', 3);
+	define('FILTER_TAST_SHOW',		0);
+	define('FILTER_TAST_HIDE',		1);
+	define('FILTER_TAST_MARK',		2);
+	define('FILTER_TAST_INVERT_MARK',	3);
 
 	define('MARK_COLOR_RED',	1);
 	define('MARK_COLOR_GREEN',	2);
 	define('MARK_COLOR_BLUE',	3);
 
 	define('PROFILE_TYPE_UNKNOWN',		0);
-	define('PROFILE_TYPE_ID',			1);
-	define('PROFILE_TYPE_INT',			2);
-	define('PROFILE_TYPE_STR',			3);
+	define('PROFILE_TYPE_ID',		1);
+	define('PROFILE_TYPE_INT',		2);
+	define('PROFILE_TYPE_STR',		3);
 	define('PROFILE_TYPE_ARRAY_ID',		4);
 	define('PROFILE_TYPE_ARRAY_INT',	5);
 	define('PROFILE_TYPE_ARRAY_STR',	6);
-	
+
 	define('CALC_FNC_MIN', 1);
 	define('CALC_FNC_AVG', 2);
 	define('CALC_FNC_MAX', 4);
 	define('CALC_FNC_ALL', 7);
 	define('CALC_FNC_LST', 9);
 
-	
-	define('SERVICE_TIME_TYPE_UPTIME', 0);
-	define('SERVICE_TIME_TYPE_DOWNTIME', 1);
-	define('SERVICE_TIME_TYPE_ONETIME_DOWNTIME', 2);
+
+	define('SERVICE_TIME_TYPE_UPTIME',		0);
+	define('SERVICE_TIME_TYPE_DOWNTIME',		1);
+	define('SERVICE_TIME_TYPE_ONETIME_DOWNTIME',	2);
 
 	define('USER_TYPE_ZABBIX_USER',		1);
 	define('USER_TYPE_ZABBIX_ADMIN',	2);
 	define('USER_TYPE_SUPER_ADMIN',		3);
 
-	define('GROUP_STATUS_DISABLED', 1);	
-	define('GROUP_STATUS_ENABLED', 0);
-	
+	define('GROUP_STATUS_DISABLED',	1);
+	define('GROUP_STATUS_ENABLED',	0);
+
 // IMPORTANT!!!    by priority	ASC
-	define('GROUP_GUI_ACCESS_SYSTEM', 	0);
-	define('GROUP_GUI_ACCESS_INTERNAL', 1);
-	define('GROUP_GUI_ACCESS_DISABLED', 2);	
+	define('GROUP_GUI_ACCESS_SYSTEM',	0);
+	define('GROUP_GUI_ACCESS_INTERNAL',	1);
+	define('GROUP_GUI_ACCESS_DISABLED',	2);
 	
 
-	define('PERM_MAX',			3);
+	define('PERM_MAX',		3);
 	define('PERM_READ_WRITE',	3);
 	define('PERM_READ_ONLY',	2);
 	define('PERM_READ_LIST',	1);
-	define('PERM_DENY',			0);
-	
+	define('PERM_DENY',		0);
+
 	define('PERM_RES_STRING_LINE',	0); /* return string of nodes id - '1,2,3,4,5' */
 	define('PERM_RES_IDS_ARRAY',	1); /* return array of nodes id - array(1,2,3,4) */
 	define('PERM_RES_DATA_ARRAY',	2); 
 
-	define('RESOURCE_TYPE_NODE',		0);
-	define('RESOURCE_TYPE_GROUP',		1);
+	define('RESOURCE_TYPE_NODE',	0);
+	define('RESOURCE_TYPE_GROUP',	1);
 
 	define('PARAM_TYPE_SECONDS',	0);
 	define('PARAM_TYPE_COUNTS',	1);
@@ -457,7 +457,7 @@
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);
 	
-	define('AVAILABLE_NOCACHE',	0);		// take available objects not from cache
+	define('AVAILABLE_NOCACHE',	0);	// take available objects not from cache
 	
 	
 //	define('BR',	"<br/>\n");
@@ -546,8 +546,8 @@ else{
 	define('XML_TAG_ZABBIX_EXPORT',		'zabbix_export');
 	define('XML_TAG_HOSTS',			'hosts');
 	define('XML_TAG_HOST',			'host');
-	define('XML_TAG_HOSTPROFILE',	'host_profile');
-	define('XML_TAG_HOSTPROFILE_EXT','host_profiles_ext');
+	define('XML_TAG_HOSTPROFILE',		'host_profile');
+	define('XML_TAG_HOSTPROFILE_EXT',	'host_profiles_ext');
 	define('XML_TAG_GROUPS',		'groups');
 	define('XML_TAG_GROUP',			'group');
 	define('XML_TAG_APPLICATIONS',		'applications');
@@ -568,7 +568,7 @@ else{
 	define('XML_TAG_SCREEN_ELEMENTS',	'screen_elements');
 	define('XML_TAG_DEPENDENCIES',		'dependencies');
 	define('XML_TAG_DEPENDENCY',		'dependency');
-	define('XML_TAG_DEPENDS',			'depends');
+	define('XML_TAG_DEPENDS',		'depends');
 
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))
@@ -580,9 +580,9 @@ else{
 
 /* if magic quotes on then get rid of them */
 	if (get_magic_quotes_gpc()) {
-		$_GET    = zbx_stripslashes($_GET);
-		$_POST	 = zbx_stripslashes($_POST);
-		$_COOKIE = zbx_stripslashes($_COOKIE);
+		$_GET		= zbx_stripslashes($_GET);
+		$_POST		= zbx_stripslashes($_POST);
+		$_COOKIE	= zbx_stripslashes($_COOKIE);
 	}
 
 /* init $_REQUEST */
