@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -28,7 +28,7 @@ char ZABBIX_EVENT_SOURCE[64] = {APPLICATION_NAME};
 #endif /* _WINDOWS */
 
 int	comms_parse_response(char *xml, char *host, char *key, char *data, char *lastlogsize, char *timestamp,
-	       char *source, char *severity)
+		char *source, char *severity)
 {
 	int	i, ret = SUCCEED;
 	char	*data_b64 = NULL;
