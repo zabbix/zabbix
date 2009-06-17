@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2006 SIA Zabbix
 **
@@ -56,7 +56,7 @@
  *                                                                            *
  * Function: zbx_tcp_strerror                                                 *
  *                                                                            *
- * Purpose: return string describing of tcp error                             *
+ * Purpose: return string describing tcp error                                *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -108,7 +108,7 @@ static void __zbx_zbx_set_tcp_strerror(const char *fmt, ...)
  *                                                                            *
  * Function: zbx_gethost_by_ip                                                *
  *                                                                            *
- * Purpose: retrive 'hostent' by IP address                                   *
+ * Purpose: retrieve 'hostent' by IP address                                  *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -124,7 +124,7 @@ static void __zbx_zbx_set_tcp_strerror(const char *fmt, ...)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 {
 	struct	addrinfo hints, *ai = NULL;
-	
+
 	assert(ip);
 
 	memset(&hints, 0, sizeof(hints));
@@ -172,7 +172,7 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
  *                                                                            *
  * Function: zbx_gethost                                                      *
  *                                                                            *
- * Purpose: retrive 'hostent' by host name and IP                             *
+ * Purpose: retrieve 'hostent' by host name and IP                            *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -209,11 +209,11 @@ struct hostent	*zbx_gethost(const char *hostname)
  *                                                                            *
  * Function: zbx_tcp_start                                                    *
  *                                                                            *
- * Purpose: Initialize Windows Sockets APIa                                   *
+ * Purpose: Initialize Windows Sockets APIs                                   *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCEED or FAIL - an error occured                           *
+ * Return value: SUCCEED or FAIL - an error occurred                           *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -318,7 +318,7 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
 #if defined(HAVE_IPV6)
 int	zbx_tcp_connect(zbx_sock_t *s,
 	const char	*source_ip,
-	const char	*ip, 
+	const char	*ip,
 	unsigned short	port,
 	int		timeout
 	)
@@ -549,7 +549,7 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags)
 void	zbx_tcp_close(zbx_sock_t *s)
 {
 	zbx_tcp_unaccept(s);
-	
+
 	zbx_tcp_free(s);
 
 #if !defined(_WINDOWS)
@@ -571,7 +571,7 @@ void	zbx_tcp_close(zbx_sock_t *s)
  *             max_error_len - [IN] error string length                       *
  *                                                                            *
  * Return value: SUCCEED - success                                            *
- *               FAIL - an error occured                                      *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -769,8 +769,8 @@ out:
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCEED - success                                            * 
- *               FAIL - an error occured                                      *
+ * Return value: SUCCEED - success                                            *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -964,7 +964,7 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 	else if( ZBX_TCP_ERROR != nbytes )
 	{
 		read_bytes		= nbytes;
-		expected_len	= 16*1024*1024;		
+		expected_len	= 16*1024*1024;
 	}
 
 	if( ZBX_TCP_ERROR != nbytes )
@@ -979,19 +979,19 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 
 
 		/* fill static buffer */
-		if ( s->buf_stat[ read_bytes - 1 ] != '\n' ) /* Not try to read from an empty socket. */
-		{	
+		if ( s->buf_stat[ read_bytes - 1 ] != '\n' ) /* Don't try to read from an empty socket. */
+		{
 			while(	read_bytes < expected_len && left > 0
 				&& ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, left)))
 			{
 
 				read_bytes += nbytes;
 
-				if( flags & ZBX_TCP_READ_UNTIL_CLOSE ) 
+				if( flags & ZBX_TCP_READ_UNTIL_CLOSE )
 				{
 					if(nbytes == 0)	break;
-				} 
-				else 
+				}
+				else
 				{
 					if(nbytes < left) break;
 				}
@@ -999,7 +999,7 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 				left -= nbytes;
 			}
 		}
-		
+
 		s->buf_stat[read_bytes] = '\0';
 		if( (sizeof(s->buf_stat) - 1) == read_bytes) /* static buffer is full */
 		{
@@ -1095,8 +1095,8 @@ char	*get_ip_by_socket(zbx_sock_t *s)
  ******************************************************************************/
 
 int	zbx_tcp_check_security(
-	zbx_sock_t *s, 
-	const char *ip_list, 
+	zbx_sock_t *s,
+	const char *ip_list,
 	int allow_if_empty
 	)
 {
@@ -1111,7 +1111,7 @@ int	zbx_tcp_check_security(
 #endif
 	socklen_t	nlen;
 
-	char	tmp[MAX_STRING_LEN], 
+	char	tmp[MAX_STRING_LEN],
 		sname[MAX_STRING_LEN],
 		*start = NULL,
 		*end = NULL,

@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -35,9 +35,9 @@ static int is_base64 (char c);
  *
  * Purpose	:  Is the character passed in a base64 character ?
  *
- * Parameters	:  
+ * Parameters	:
  *
- * Returns	:  
+ * Returns	:
  *
  * Comments	:
  *
@@ -49,12 +49,12 @@ static int is_base64 (char c)
 	  || (c >= 'A' && c <= 'Z')
 	  || c == '/'
 	  || c == '+'
-	  || c == '='		) 
+	  || c == '='		)
 
 	{
 		return 1;
 	}
-	
+
 	return 0;
 }
 /*------------------------------------------------------------------------
@@ -63,9 +63,9 @@ static int is_base64 (char c)
  *
  * Purpose	:  Encode a byte into a base64 character
  *
- * Parameters	:  
+ * Parameters	:
  *
- * Returns	:  
+ * Returns	:
  *
  * Comments	:
  *
@@ -81,9 +81,9 @@ static char char_base64_encode(unsigned char uc)
  *
  * Purpose	:  Decode a base64 character into a byte
  *
- * Parameters	:  
+ * Parameters	:
  *
- * Returns	:  
+ * Returns	:
  *
  * Comments	:
  *
@@ -94,22 +94,22 @@ static unsigned char char_base64_decode(char c)
 	{
 		return c - 'A';
 	}
-	
+
 	if (c >= 'a' && c <= 'z')
 	{
 		return c - 'a' + 26;
 	}
-	
+
 	if (c >= '0' && c <= '9')
 	{
 		return c - '0' + 52;
 	}
-	
+
 	if (c == '+')
 	{
 		return 62;
 	}
-	
+
 	return 63;
 }
 /*------------------------------------------------------------------------
@@ -121,7 +121,7 @@ static unsigned char char_base64_decode(char c)
  * Parameters	:  p_str (in)		- the string to encode
  *		   p_b64str (out)	- the encoded str to return
  *		   in_size (in)		- size (length) of input str
- * Returns	:  
+ * Returns	:
  *
  * Comments	:
  *
@@ -206,7 +206,7 @@ void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
  *		   p_str_maxsize (in)	- the size of p_str buffer
  *		   p_out_size (out)	- the size (len) of the str decoded
  *
- * Returns	:  
+ * Returns	:
  *
  * Comments	:
  *
@@ -233,7 +233,7 @@ void str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_ou
 	*o = '\0';
 
 	for (o = str_clean; *o != '\0';)
-	{	
+	{
 		from1 = *o++;
 		from2 = from3 = from4 = 'A';
 
