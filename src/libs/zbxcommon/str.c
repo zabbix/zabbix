@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -58,7 +58,7 @@ void version()
  *                                                                            *
  * Function: usage                                                            *
  *                                                                            *
- * Purpose: print applicatin parameters on stdout                             *
+ * Purpose: print application parameters on stdout                            *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -75,7 +75,7 @@ void usage()
  *                                                                            *
  * Function: help                                                             *
  *                                                                            *
- * Purpose: print help of applicatin parameters on stdout by application      *
+ * Purpose: print help of application parameters on stdout by application     *
  *          request with parameter '-h'                                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -87,7 +87,7 @@ void usage()
 void help()
 {
 	char **p = help_message;
-	
+
 	app_title();
 	printf("\n");
 	usage();
@@ -115,7 +115,7 @@ void help()
 int	find_char(char *str,char c)
 {
 	char *p;
-	for(p = str; *p; p++) 
+	for(p = str; *p; p++)
 		if(*p == c) return (int)(p - str);
 
 	return	FAIL;
@@ -146,7 +146,7 @@ void __zbx_zbx_error(const char *fmt, ...)
 #else
 	f = stderr;
 #endif /* ZBX_STDERR_FILE */
-    
+
 	va_start(args, fmt);
 
 	fprintf(f, "%s [%li]: ",progname, zbx_get_thread_id());
@@ -168,8 +168,8 @@ void __zbx_zbx_error(const char *fmt, ...)
  * Purpose: Sequire version of snprintf function.                             *
  *          Add zero character at the end of string.                          *
  *                                                                            *
- * Parameters: str - distination buffer poiner                                *
- *             count - size of distination buffer                             *
+ * Parameters: str - destination buffer poiner                                *
+ *             count - size of destination buffer                             *
  *             fmt - format                                                   *
  *                                                                            *
  * Return value:                                                              *
@@ -181,7 +181,7 @@ int __zbx_zbx_snprintf(char* str, size_t count, const char *fmt, ...)
 {
 	va_list	args;
 	int	writen_len = 0;
-    
+
 	assert(str);
 
 	va_start(args, fmt);
@@ -204,8 +204,8 @@ int __zbx_zbx_snprintf(char* str, size_t count, const char *fmt, ...)
  * Purpose: Sequire version of vsnprintf function.                            *
  *          Add zero character at the end of string.                          *
  *                                                                            *
- * Parameters: str - distination buffer poiner                                *
- *             count - size of distination buffer                             *
+ * Parameters: str - destination buffer poiner                                *
+ *             count - size of destination buffer                             *
  *             fmt - format                                                   *
  *                                                                            *
  * Return value:                                                              *
@@ -236,9 +236,9 @@ int zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args)
  *          Add zero character at the end of string.                          *
  *          Reallocs memory if not enough.                                    *
  *                                                                            *
- * Parameters: str - distination buffer poiner                                *
+ * Parameters: str - destination buffer pointer                               *
  *             alloc_len - already allocated memory                           *
- *             offset - ofsset for writing                                    *
+ *             offset - offset for writing                                    *
  *             max_len - fmt + data won't write more than max_len bytes       *
  *             fmt - format                                                   *
  *                                                                            *
@@ -279,9 +279,9 @@ void __zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
  * Purpose: Add zero character at the end of string.                          *
  *          Reallocs memory if not enough.                                    *
  *                                                                            *
- * Parameters: str - distination buffer poiner                                *
+ * Parameters: str - destination buffer pointer                               *
  *             alloc_len - already allocated memory                           *
- *             offset - ofsset for writing                                    *
+ *             offset - offset for writing                                    *
  *             src - copied null terminated string                            *
  *                                                                            *
  * Return value:                                                              *
@@ -317,9 +317,9 @@ void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src)
  * Purpose: Add zero character at the end of string.                          *
  *          Reallocs memory if not enough.                                    *
  *                                                                            *
- * Parameters: str - distination buffer poiner                                *
+ * Parameters: str - destination buffer pointer                               *
  *             alloc_len - already allocated memory                           *
- *             offset - ofsset for writing                                    *
+ *             offset - offset for writing                                    *
  *             src - copied char                                              *
  *                                                                            *
  * Return value:                                                              *
@@ -384,7 +384,7 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
         for( ; *q ; *t++ = *q++ );
 
 	*t = '\0';
-	
+
         return new_str;
 
 }
@@ -459,9 +459,9 @@ void	delete_reol(char *c)
  *                                                                            *
  * Function: zbx_rtrim                                                        *
  *                                                                            *
- * Purpose: Strip haracters from the end of a string                          *
+ * Purpose: Strip characters from the end of a string                         *
  *                                                                            *
- * Parameters: str - string to processing                                     *
+ * Parameters: str - string for processing                                    *
  *             charlist - null terminated list of characters                  *
  *                                                                            *
  * Return value: Stripped string                                              *
@@ -488,9 +488,9 @@ void	zbx_rtrim(char *str, const char *charlist)
  *                                                                            *
  * Function: zbx_ltrim                                                        *
  *                                                                            *
- * Purpose: Strip haracters from the beginning of a string                    *
+ * Purpose: Strip characters from the beginning of a string                   *
  *                                                                            *
- * Parameters: str - string to processing                                     *
+ * Parameters: str - string for processing                                    *
  *             charlist - null terminated list of characters                  *
  *                                                                            *
  * Return value: Stripped string                                              *
@@ -512,7 +512,7 @@ void	zbx_ltrim(register char *str, const char *charlist)
 
 	if (p == str)
 		return;
-	
+
 	while ('\0' != *p)
 		*str++ = *p++;
 
@@ -523,9 +523,9 @@ void	zbx_ltrim(register char *str, const char *charlist)
  *                                                                            *
  * Function: zbx_remove_chars                                                 *
  *                                                                            *
- * Purpose: Remove characters 'charlist' from all string                      *
+ * Purpose: Remove characters 'charlist' from the whole string                *
  *                                                                            *
- * Parameters: str - string to processing                                     *
+ * Parameters: str - string for processing                                    *
  *             charlist - null terminated list of characters                  *
  *                                                                            *
  * Return value:                                                              *
@@ -575,7 +575,7 @@ void	compress_signs(char *str)
 	/* Compress '--' '+-' '++' '-+' */
 	while(loop == 1)
 	{
-		loop=0;	
+		loop=0;
 		for(i=0;str[i]!='\0';i++)
 		{
 			cur=str[i];
@@ -799,7 +799,7 @@ int	zbx_get_field(char *line, char *result, int num, char separator)
  *                                                                            *
  * Function: zbx_strlcpy                                                      *
  *                                                                            *
- * Purpose: replacement of insecure strncpy, same os OpenBSD's strlcpy        *
+ * Purpose: replacement of insecure strncpy, same as OpenBSD's strlcpy        *
  *                                                                            *
  * Copy src to string dst of size siz.  At most siz-1 characters              *
  * will be copied.  Always NUL terminates (unless siz == 0).                  *
@@ -839,7 +839,7 @@ size_t zbx_strlcpy(char *dst, const char *src, size_t siz)
  *                                                                            *
  * Function: zbx_strlcat                                                      *
  *                                                                            *
- * Purpose: replacement of insecure strncat, same os OpenBSD's strlcat        *
+ * Purpose: replacement of insecure strncat, same as OpenBSD's strlcat        *
  *                                                                            *
  * Appends src to string dst of size siz (unlike strncat, size is the         *
  * full size of dst, not space left).  At most siz-1 characters               *
@@ -876,7 +876,7 @@ size_t zbx_strlcat(char *dst, const char *src, size_t siz)
 	}
 	*d = '\0';
 
-	return(dlen + (s - src));        /* count does not include NUL */
+	return(dlen + (s - src));	/* count does not include NUL */
 }
 
 /******************************************************************************
@@ -925,9 +925,9 @@ char* zbx_dvsprintf(char *dest, const char *f, va_list args)
  *                                                                            *
  * Function: zbx_dsprintf                                                     *
  *                                                                            *
- * Purpose: dinamical formatted output conversion                             *
+ * Purpose: dynamical formatted output conversion                             *
  *                                                                            *
- * Return value: formated string                                              *
+ * Return value: formatted string                                             *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -952,7 +952,7 @@ char* __zbx_zbx_dsprintf(char *dest, const char *f, ...)
  *                                                                            *
  * Function: zbx_strdcat                                                      *
  *                                                                            *
- * Purpose: dinamical cating of strings                                       *
+ * Purpose: dynamical cating of strings                                       *
  *                                                                            *
  * Return value: new pointer of string                                        *
  *                                                                            *
@@ -969,12 +969,12 @@ char* zbx_strdcat(char *dest, const char *src)
 
 	if(!src)	return dest;
 	if(!dest)	return strdup(src);
-	
+
 	new_len += (int)strlen(dest);
 	new_len += (int)strlen(src);
-	
+
 	new_dest = zbx_malloc(new_dest, new_len + 1);
-	
+
 	if(dest)
 	{
 		strcpy(new_dest, dest);
@@ -995,7 +995,7 @@ char* zbx_strdcat(char *dest, const char *src)
  *                                                                            *
  * Function: zbx_strdcat                                                      *
  *                                                                            *
- * Purpose: dinamical cating of formated strings                              *
+ * Purpose: dynamical cating of formated strings                              *
  *                                                                            *
  * Return value: new pointer of string                                        *
  *                                                                            *
@@ -1038,7 +1038,7 @@ char* __zbx_zbx_strdcatf(char *dest, const char *f, ...)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter vor parameters is ','                                 *
+ * Comments:  delimeter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	num_param(const char *param)
@@ -1050,9 +1050,9 @@ int	num_param(const char *param)
 	int	state = 0;
 	char	c;
 
-	if(param == NULL) 
+	if(param == NULL)
 		return 0;
-	
+
 	for(i=0;param[i]!='\0';i++)
 	{
 		c=param[i];
@@ -1110,15 +1110,15 @@ int	num_param(const char *param)
  * 	param  - parameter list                                               *
  *      num    - requested parameter index                                    *
  *      buf    - pointer of output buffer                                     *
- *      maxlem - size of output buffer                                        *
+ *      maxlen - size of output buffer                                        *
  *                                                                            *
  * Return value:                                                              *
- *      1 - requested parameter missed                                        *
- *      0 - requested parameter founded (value - 'buf' can be empty string)   *
+ *      1 - requested parameter missing                                       *
+ *      0 - requested parameter found (value - 'buf' can be empty string)     *
  *                                                                            *
  * Author: Eugene Grigorjev, rewritten by Alexei                              *
  *                                                                            *
- * Comments:  delimeter vor parameters is ','                                 *
+ * Comments:  delimeter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	get_param(const char *param, int num, char *buf, int maxlen)
@@ -1271,7 +1271,7 @@ u_char	zbx_hex2num(char c)
  *                                                                            *
  * Parameters:                                                                *
  * 	input - binary data                                                   *
- *	ilen - binaru data length                                             *
+ *	ilen - binary data length                                             *
  *	output - pointer to output buffer                                     *
  *	olen - output buffer length                                           *
  	*                                                                            *
@@ -1351,7 +1351,7 @@ int	zbx_hex2binary(char *io)
  *                                                                            *
  * Purpose: converts from binary string to the null terminated escaped string *
  *                                                                            *
- * Transormations:                                                            *
+ * Transformations:                                                           *
  *	'\0' [0x00] -> \\ooo (ooo is an octal number)                         *
  *	'\'' [0x37] -> \'                                                     *
  *	'\\' [0x5c] -> \\\\                                                   *
@@ -1439,7 +1439,7 @@ int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen)
  *                                                                            *
  * Purpose: converts the null terminated string into binary buffer            *
  *                                                                            *
- * Transormations:                                                            *
+ * Transformations:                                                           *
  *	\ooo == a byte whose value = ooo (ooo is an octal number)             *
  *	\x   == x (x is any character)                                        *
  *                                                                            *
@@ -1495,7 +1495,7 @@ int	zbx_pg_unescape_bytea(u_char *io)
  * Purpose: return current field of characted separated string                *
  *                                                                            *
  * Parameters:                                                                *
- *	line - null terminated, characret separated string                    *
+ *	line - null terminated, character separated string                    *
  *	output - output buffer (current field)                                *
  *	olen - allocated output buffer size                                   *
  *	separator - fields separator                                          *
@@ -1535,7 +1535,7 @@ int	zbx_get_next_field(const char **line, char **output, int *olen, char separat
  *                                                                            *
  * Function: str_in_list                                                      *
  *                                                                            *
- * Purpose: check if string matches a list of demilited strings               *
+ * Purpose: check if string matches a list of delimited strings               *
  *                                                                            *
  * Parameters: list     - strings a,b,ccc,ddd                                 *
  *             value    - value                                               *
@@ -1556,7 +1556,7 @@ int	str_in_list(char *list, const char *value, const char delimiter)
 	for (start = list; *start != '\0' && ret == FAIL;) {
 		if (NULL != (end = strchr(start, delimiter)))
 			*end = '\0';
-		
+
 		if (0 == strcmp(start, value))
 			ret = SUCCEED;
 
@@ -1580,10 +1580,10 @@ int	str_in_list(char *list, const char *value, const char delimiter)
  * 	param  - parameter list                                               *
  *      num    - requested parameter index                                    *
  *      buf    - pointer of output buffer                                     *
- *      maxlem - size of output buffer                                        *
+ *      maxlen - size of output buffer                                        *
  *                                                                            *
  * Return value:                                                              *
- *      1 - requested parameter missed                                        *
+ *      1 - requested parameter missing                                        *
  *      0 - requested parameter found (value - 'buf' can be empty string)     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -1605,7 +1605,7 @@ int	get_key_param(char *param, int num, char *buf, int maxlen)
 
 	if(!pl || !pr || (pl && !pr) || (!pl && pr))
 		return 1;
-	
+
 	if(pr != NULL)
 		pr[0] = 0;
 
@@ -1631,7 +1631,7 @@ int	get_key_param(char *param, int num, char *buf, int maxlen)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter vor parameters is ','                                 *
+ * Comments:  delimeter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	num_key_param(char *param)
@@ -1640,7 +1640,7 @@ int	num_key_param(char *param)
 
 	char *pl, *pr;
 
-	if(param == NULL) 
+	if(param == NULL)
 		return 0;
 
 	pl = strchr(param, '[');

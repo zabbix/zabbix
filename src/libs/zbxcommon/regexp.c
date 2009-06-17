@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -24,7 +24,7 @@
 #endif /* _WINDOWS */
 
 static	char	*zbx_regexp(const char *string, const char *pattern, int *len, int flags)
-{ 
+{
 	char	*c = NULL;
 
 	regex_t	re;
@@ -40,7 +40,7 @@ static	char	*zbx_regexp(const char *string, const char *pattern, int *len, int f
 			{ /* Matched */
 				c=(char *)string+match.rm_so;
 				if(len) *len = match.rm_eo - match.rm_so;
-			
+
 			}
 
 			regfree(&re);
@@ -53,7 +53,7 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 {
 	return zbx_regexp(string, pattern, len, REG_EXTENDED | REG_NEWLINE);
 }
- 
+
 char	*zbx_iregexp_match(const char *string, const char *pattern, int *len)
 {
 	return zbx_regexp(string, pattern, len, REG_EXTENDED | REG_ICASE | REG_NEWLINE);
