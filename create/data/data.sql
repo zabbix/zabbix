@@ -21,7 +21,7 @@
 -- Dumping data for table `config`
 --
 
-INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00',7,1,7,100,'default.css',0,'',389,'','','','',1,1);
+INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00',7,1,7,100,'default.css',0,'',389,'','','','',1,1,5);
 
 --
 -- Dumping data for table `scripts`
@@ -51,7 +51,6 @@ INSERT INTO usrgrp VALUES (7,'Zabbix administrators',0,0,0);
 INSERT INTO usrgrp VALUES (8,'Guests',0,0,0);
 INSERT INTO usrgrp VALUES (9,'Disabled',0,0,1);
 INSERT INTO usrgrp VALUES (10,'API access',0,1,0);
-
 --
 -- Dumping data for table `users_groups`
 --
@@ -315,6 +314,7 @@ INSERT INTO groups VALUES (1,'Templates',0);
 INSERT INTO groups VALUES (2,'Linux servers',0);
 INSERT INTO groups VALUES (3,'Windows servers',0);
 INSERT INTO groups VALUES (4,'ZABBIX Servers',0);
+INSERT INTO groups VALUES (5,'Discovered Hosts',1);
 
 --
 -- Dumping data for table hosts_groups
