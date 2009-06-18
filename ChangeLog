@@ -1,11 +1,12 @@
 Changes for 1.7.0
 
+ - [ZBX-944] fixed changelog reference (Richlv)
  - [DEV-394] added easy access when not logged in (Artem)
  - [DEV-398] added hostgroup filter for HostGroup and TemplateLinkage twinboxes (Vedmak)
  - [DEV-377] added search for hosts and host-groups (Artem)
  - [DEV-388] Discovery: added new action operations - enable/disable host (Sasha)
  - [ZBX-949] fixed undefined constant S_add_TO (Richlv)
- - [ZBX-137] operation interval steps N-N will be displayed as N (Alexei)
+ - [DEV-137] operation interval steps N-N will be displayed as N (Alexei)
  - [DEV-318] Notifications: fixed messaging for discovery events (Sasha)
  - [DEV-391] Notifications: added new {DISCOVERY.*} macros (Sasha)
  - [DEV-390] Discovery: added support of port intervals (Sasha)
