@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -157,9 +157,9 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 	}
 	else
 	{
-		/* Get page size */	
+		/* Get page size */
 		page = pst.page_size;
-		/* Total physical memory in bytes */	
+		/* Total physical memory in bytes */
 		SET_UI64_RESULT(result, (zbx_uint64_t)page*(zbx_uint64_t)pst.physical_memory);
 		return SYSINFO_RET_OK;
 	}
@@ -241,7 +241,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 	}
 	else
 	{
-		/* Get page size */	
+		/* Get page size */
 		page = pst.page_size;
 /*		return pst.physical_memory;*/
 
@@ -274,7 +274,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
 		SET_UI64_RESULT(result, (zbx_uint64_t)info.freeram * (zbx_uint64_t)info.mem_unit);
-#else	
+#else
 		SET_UI64_RESULT(result, info.freeram);
 #endif
 		return SYSINFO_RET_OK;
@@ -373,4 +373,3 @@ MEM_FNCLIST
 
 	return SYSINFO_RET_FAIL;
 }
-

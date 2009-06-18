@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -26,8 +26,8 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 	assert(result);
 
         init_result(result);
-	
-	return EXECUTE_INT(cmd,"vmstat -s | awk 'BEGIN{pages=0}{gsub(\"[()]\",\"\");if($4==\"pagesize\")pgsize=($6);if(($2==\"inactive\"||$2==\"active\"||$2==\"wired\")&&$3==\"pages\")pages+=$1}END{printf (pages*pgsize)}'", flags, result);	
+
+	return EXECUTE_INT(cmd,"vmstat -s | awk 'BEGIN{pages=0}{gsub(\"[()]\",\"\");if($4==\"pagesize\")pgsize=($6);if(($2==\"inactive\"||$2==\"active\"||$2==\"wired\")&&$3==\"pages\")pages+=$1}END{printf (pages*pgsize)}'", flags, result);
 }
 
 static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -38,11 +38,11 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 	mach_msg_type_number_t count;
 	kern_return_t kret;
 	int ret;
-	
+
 	assert(result);
 
         init_result(result);
-		
+
 	pagesize = 0;
 	kret = host_page_size (mach_host_self(), &pagesize);
 
@@ -72,8 +72,8 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 	assert(result);
 
         init_result(result);
-	
-	return EXECUTE_INT(cmd, "vmstat -s | awk '{gsub(\"[()]\",\"\");if($4==\"pagesize\")pgsize=($6);if($2==\"free\"&&$3==\"pages\")pages=($1)}END{printf (pages*pgsize)}'", flags, result);	
+
+	return EXECUTE_INT(cmd, "vmstat -s | awk '{gsub(\"[()]\",\"\");if($4==\"pagesize\")pgsize=($6);if($2==\"free\"&&$3==\"pages\")pages=($1)}END{printf (pages*pgsize)}'", flags, result);
 }
 
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -85,7 +85,7 @@ MEM_FNCLIST
 	int (*function)();
 };
 
-	MEM_FNCLIST fl[] = 
+	MEM_FNCLIST fl[] =
 	{
 		{"free",	VM_MEMORY_FREE},
 		{"total",	VM_MEMORY_TOTAL},
@@ -113,7 +113,7 @@ MEM_FNCLIST
 		/* default parameter */
 		zbx_snprintf(mode, sizeof(mode), "total");
 	}
-	
+
 	for(i=0; fl[i].mode!=0; i++)
 	{
 		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
@@ -121,7 +121,6 @@ MEM_FNCLIST
 			return (fl[i].function)(cmd, param, flags, result);
 		}
 	}
-	
+
 	return SYSINFO_RET_FAIL;
 }
-

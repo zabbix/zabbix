@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -34,14 +34,14 @@ ZBX_METRIC	parameters_specific[]=
 	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,		0,	"sd0,bytes"},
 
 	{"net.tcp.listen",	CF_USEUPARAM,	NET_TCP_LISTEN,		0,	"80"},
-	
+
 	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		0,	"hme0,bytes"},
 	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		0,	"hme0,bytes"},
 	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,		0,	"hme0,bytes"},
-        {"net.if.collisions",   CF_USEUPARAM,	NET_IF_COLLISIONS,      0,	"hme0"},	
+        {"net.if.collisions",   CF_USEUPARAM,	NET_IF_COLLISIONS,      0,	"hme0"},
 
 	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,		0,	"free"},
-	
+
 	{"proc.num",		CF_USEUPARAM,	PROC_NUM,		0,	"inetd,,"},
 	{"proc.mem",		CF_USEUPARAM,	PROC_MEMORY,		0,	"inetd,,"},
 
@@ -50,11 +50,11 @@ ZBX_METRIC	parameters_specific[]=
 	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	0,	"all,idle"},
 	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	0,	"all,avg1"},
 	{"system.cpu.num",	CF_USEUPARAM,	SYSTEM_CPU_NUM,		0,	"online"},
-	
+
 	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	0,	"all,free"},
 	{"system.swap.in",	CF_USEUPARAM,	SYSTEM_SWAP_IN,		0,	"all"},
 	{"system.swap.out",	CF_USEUPARAM,	SYSTEM_SWAP_OUT,	0,	"all,count"},
-	
+
 	{"system.uptime",	0,		SYSTEM_UPTIME,		0,	0},
 	{"system.boottime",	0,		SYSTEM_BOOTTIME,	0,	0},
 

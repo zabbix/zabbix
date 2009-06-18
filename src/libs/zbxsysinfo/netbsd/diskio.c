@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -33,17 +33,17 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifndef TODO
-	return SYSINFO_RET_FAIL; 
+	return SYSINFO_RET_FAIL;
 #else
 	/* !!!TODO!!! */
 	char devname[MAX_STRING_LEN];
 	char type[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
-	
+
         assert(result);
 
         init_result(result);
-	
+
         if(num_param(param) > 3)
         {
                 return SYSINFO_RET_FAIL;
@@ -53,7 +53,7 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
         {
                 return SYSINFO_RET_FAIL;
         }
-	
+
 	if(get_param(param, 2, type, sizeof(type)) != 0)
         {
                 type[0] = '\0';
@@ -63,12 +63,12 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		/* default parameter */
 		zbx_snprintf(type, sizeof(type), "bps");
 	}
-	
+
 	if(get_param(param, 3, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
-	
+
         if(mode[0] == '\0')
 	{
 		/* default parameter */
@@ -109,17 +109,17 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifndef TODO
-	return SYSINFO_RET_FAIL; 
+	return SYSINFO_RET_FAIL;
 #else
 	/* !!!TODO!!! */
 	char devname[MAX_STRING_LEN];
 	char type[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
-	
+
         assert(result);
 
         init_result(result);
-	
+
         if(num_param(param) > 3)
         {
                 return SYSINFO_RET_FAIL;
@@ -129,7 +129,7 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
         {
                 return SYSINFO_RET_FAIL;
         }
-	
+
 	if(get_param(param, 2, type, sizeof(type)) != 0)
         {
                 type[0] = '\0';
@@ -139,12 +139,12 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		/* default parameter */
 		zbx_snprintf(type, sizeof(type), "bps");
 	}
-	
+
 	if(get_param(param, 3, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
-	
+
         if(mode[0] == '\0')
 	{
 		/* default parameter */
@@ -270,7 +270,6 @@ int	OLD_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *res
 	{
 		ret = SYSINFO_RET_FAIL;
 	}
-    
+
 	return ret;
 }
-

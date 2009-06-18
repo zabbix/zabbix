@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -28,10 +28,10 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
     kstat_ctl_t *kc;
     kstat_t	*kt;
     struct var	*v;
-    
+
 	assert(result);
 
-	init_result(result);	
+	init_result(result);
 
 	kc = kstat_open();
 	if(kc)
@@ -59,7 +59,7 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	assert(result);
 
-        init_result(result);	
+        init_result(result);
 
 	return	SYSINFO_RET_FAIL;
 }
@@ -71,7 +71,7 @@ int     OLD_KERNEL(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         assert(result);
 
-        init_result(result);	
+        init_result(result);
 
         if(num_param(param) > 1)
         {
@@ -98,4 +98,3 @@ int     OLD_KERNEL(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         return ret;
 }
-

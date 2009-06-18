@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -97,6 +97,5 @@ static int	DISK_WBLK(const char *cmd, const char *param, unsigned flags, AGENT_R
 int	OLD_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	/* SKIP REALIZATION */
-	return SYSINFO_RET_FAIL;	
+	return SYSINFO_RET_FAIL;
 }
-

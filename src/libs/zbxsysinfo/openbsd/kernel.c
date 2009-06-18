@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -57,8 +57,8 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	assert(result);
 
-	init_result(result);	
-	
+	init_result(result);
+
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_MAXPROC;
 

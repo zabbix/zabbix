@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -69,7 +69,7 @@ int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
         {
                 return SYSINFO_RET_FAIL;
         }
-	
+
         if(get_param(param, 2, type, MAX_STRING_LEN) != 0)
         {
                 type[0] = '\0';
@@ -79,7 +79,7 @@ int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	{
 		strscpy(type, "modify");
 	}
-	
+
 	if(stat(filename,&buf) == 0)
 	{
 		if(strcmp(type,"modify") == 0)
@@ -280,10 +280,10 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	md5_byte_t	hash[MD5_DIGEST_SIZE];
 
 	char filename[MAX_STRING_LEN];
-	
+
 	assert(result);
-	
-        init_result(result);	
+
+        init_result(result);
 
         if(num_param(param) > 1)
         {
@@ -294,7 +294,7 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
         {
                 return SYSINFO_RET_FAIL;
         }
-	
+
 	if(stat(filename,&buf_stat) != 0)
 	{
 		/* Cannot stat() file */
@@ -326,7 +326,7 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	{
 		zbx_snprintf((char *)&hashText[i<<1], sizeof(hashText) - (i<<1), "%02x",hash[i]);
 	}
-	
+
 	SET_STR_RESULT(result, strdup((char*)hashText));
 
 	return SYSINFO_RET_OK;
@@ -415,7 +415,7 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	assert(result);
 
-        init_result(result);	
+        init_result(result);
 
 	if(num_param(param) > 1)
         {
@@ -425,8 +425,8 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
         if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
         {
                 return SYSINFO_RET_FAIL;
-        }	
-		
+        }
+
 	if(NULL == (f = fopen(filename,"rb")))
 	{
 		return	SYSINFO_RET_FAIL;
@@ -443,7 +443,7 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 		}
 	}
 	zbx_fclose(f);
-	
+
 	if (nr < 0)
 	{
 		return	SYSINFO_RET_FAIL;

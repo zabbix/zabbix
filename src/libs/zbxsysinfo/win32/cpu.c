@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -27,11 +27,11 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	SYSTEM_INFO	sysInfo;
 
 	char	mode[128];
-	
+
         assert(result);
 
         init_result(result);
-	
+
         if(num_param(param) > 1)
         {
                 return SYSINFO_RET_FAIL;
@@ -56,7 +56,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 
 	SET_UI64_RESULT(result, sysInfo.dwNumberOfProcessors);
-	
+
 	return SYSINFO_RET_OK;
 }
 
@@ -108,7 +108,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	/* default parameter */
 	if (*mode == '\0')
 		zbx_snprintf(mode, sizeof(mode), "avg1");
-	
+
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
 		SET_MSG_RESULT(result, strdup("Collector is not started!"));
@@ -218,4 +218,3 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 	return SYSINFO_RET_FAIL;
 
 }
-

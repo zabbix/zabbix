@@ -33,7 +33,7 @@
 #include <sys/socket.h>
 #include <sys/timeout.h>
 #include <netinet/in.h>
-#include <net/if.h> 
+#include <net/if.h>
 #include <netinet/ip_var.h>
 #include <netinet/tcp.h>
 #include <netinet/tcp_fsm.h>
@@ -147,7 +147,7 @@ static DISK_DATA *disks;
 /*
  * ADDED to net.c
  *
-static struct nlist kernel_symbols[] = 
+static struct nlist kernel_symbols[] =
    {
        {"_ifnet", N_UNDF, 0, 0, 0},
        {"_tcbtable", N_UNDF, 0, 0, 0},
@@ -162,7 +162,7 @@ static DISK_DATA *get_disk_data_record(const char *device)
   p = disks;
 
   while ((p) && (strcmp(p->name, device) != 0))
-    p = p->next;  
+    p = p->next;
 
   if (p == (DISK_DATA *) NULL)
     {
@@ -175,7 +175,7 @@ static DISK_DATA *get_disk_data_record(const char *device)
           if (p->name)
             {
 	      p->next = disks;
-              
+
               disks = p;
             }
 
@@ -198,7 +198,7 @@ static NETWORK_DATA *get_net_data_record(const char *device)
   p = interfaces;
 
   while ((p) && (strcmp(p->name, device) != 0))
-    p = p->next;  
+    p = p->next;
 
   if (p == (NETWORK_DATA *) NULL)
     {
@@ -211,7 +211,7 @@ static NETWORK_DATA *get_net_data_record(const char *device)
           if (p->name)
             {
 	      p->next = interfaces;
-              
+
               interfaces = p;
             }
 
@@ -237,11 +237,11 @@ static int PROCCNT(const char *cmd, const char *procname,double  *value, const c
         if (kp)
            {
               int count;
-              struct kinfo_proc2 *proc; 
+              struct kinfo_proc2 *proc;
 
-              proc = kvm_getproc2(kp, 
-                                  KERN_PROC_ALL, 
-                                  0, 
+              proc = kvm_getproc2(kp,
+                                  KERN_PROC_ALL,
+                                  0,
                                   sizeof(struct kinfo_proc2),
                                   &count);
 
@@ -275,14 +275,14 @@ static int get_disk_stats(const char *device, struct diskstats *returned_stats)
    int result = SYSINFO_RET_FAIL;
    int mib[2];
    int drive_count;
-   size_t l; 
+   size_t l;
 
    mib[0] = CTL_HW;
    mib[1] = HW_DISKCOUNT;
 
    l = sizeof(drive_count);
 
-   if (sysctl(mib, 2, &drive_count, &l, NULL, 0) == 0 ) 
+   if (sysctl(mib, 2, &drive_count, &l, NULL, 0) == 0 )
       {
          struct diskstats *stats;
 
@@ -292,9 +292,9 @@ static int get_disk_stats(const char *device, struct diskstats *returned_stats)
             {
                mib[0] = CTL_HW;
                mib[1] = HW_DISKSTATS;
-             
+
                l = (drive_count * sizeof (struct diskstats));
- 
+
                if (sysctl(mib, 2, stats, &l, NULL, 0) == 0)
                   {
                      int i;
@@ -332,7 +332,7 @@ static int DISKREADOPS(const char *cmd, const char *device, double  *value, cons
 
          result = get_disk_stats(device, &ds);
 
-         if (result == SYSINFO_RET_OK) 
+         if (result == SYSINFO_RET_OK)
             {
                struct timeval interval;
                struct timeval snaptime;
@@ -343,7 +343,7 @@ static int DISKREADOPS(const char *cmd, const char *device, double  *value, cons
 
                if (interval.tv_sec > 0)
                   *value = (ds.ds_rxfer - p->reads.reads) / interval.tv_sec;
-      	       else 
+      	       else
                   *value = 0.0;
 
                p->reads.clock = snaptime;
@@ -372,7 +372,7 @@ static int DISKREADBLOCKS(const char *cmd, const char *device, double  *value, c
 
          result = get_disk_stats(device, &ds);
 
-         if (result == SYSINFO_RET_OK) 
+         if (result == SYSINFO_RET_OK)
             {
                struct timeval interval;
                struct timeval snaptime;
@@ -383,7 +383,7 @@ static int DISKREADBLOCKS(const char *cmd, const char *device, double  *value, c
 
                if (interval.tv_sec > 0)
                   *value = ((ds.ds_rbytes/1024) - p->rblocks.nread) / interval.tv_sec;
-      	       else 
+      	       else
                   *value = 0.0;
 
                p->rblocks.clock = snaptime;
@@ -412,7 +412,7 @@ static int DISKWRITEOPS(const char *cmd, const char *device, double  *value, con
 
          result = get_disk_stats(device, &ds);
 
-         if (result == SYSINFO_RET_OK) 
+         if (result == SYSINFO_RET_OK)
             {
                struct timeval interval;
                struct timeval snaptime;
@@ -423,7 +423,7 @@ static int DISKWRITEOPS(const char *cmd, const char *device, double  *value, con
 
                if (interval.tv_sec > 0)
                   *value = (ds.ds_wxfer - p->writes.writes) / interval.tv_sec;
-      	       else 
+      	       else
                   *value = 0.0;
 
                p->writes.clock = snaptime;
@@ -451,7 +451,7 @@ static int DISKWRITEBLOCKS(const char *cmd, const char *device, double  *value, 
 
          result = get_disk_stats(device, &ds);
 
-         if (result == SYSINFO_RET_OK) 
+         if (result == SYSINFO_RET_OK)
             {
                struct timeval interval;
                struct timeval snaptime;
@@ -462,7 +462,7 @@ static int DISKWRITEBLOCKS(const char *cmd, const char *device, double  *value, 
 
                if (interval.tv_sec > 0)
                   *value = ((ds.ds_wbytes/1024) - p->wblocks.nwritten) / interval.tv_sec;
-      	       else 
+      	       else
                   *value = 0.0;
 
                p->wblocks.clock = snaptime;
@@ -487,7 +487,7 @@ static int DISKBUSY(const char *cmd, const char *device, double  *value, const c
 
          result = get_disk_stats(device, &ds);
 
-         if (result == SYSINFO_RET_OK) 
+         if (result == SYSINFO_RET_OK)
             {
                struct timeval interval;
                struct timeval snaptime;
@@ -512,7 +512,7 @@ static int DISKBUSY(const char *cmd, const char *device, double  *value, const c
 
                    }
 
-      	       else 
+      	       else
                   *value = 0.0;
 
                p->busy.clock = snaptime;
@@ -533,14 +533,14 @@ static int CPUIDLE(const char *cmd, const char *param, double  *value, const cha
    u_int64_t current[cpustates];
    int result = sysinfo_ret_fail;
    int mib[2];
-   size_t l; 
+   size_t l;
 
    mib[0] = ctl_kern;
    mib[1] = kern_cptime;
 
    l = sizeof(current);
 
-   if (sysctl(mib, 2, current, &l, null, 0) == 0 ) 
+   if (sysctl(mib, 2, current, &l, null, 0) == 0 )
       {
          u_int64_t interval_size;
 
@@ -549,12 +549,12 @@ static int CPUIDLE(const char *cmd, const char *param, double  *value, const cha
                          +  (current[cp_nice] - last[cp_nice])
                          +  (current[cp_sys] - last[cp_sys])
                          +  (current[cp_intr] - last[cp_intr]);
- 
+
          if (interval_size > 0)
             {
 	       *value = ((current[cp_idle] - last[cp_idle]) * 100.0)/interval_size;
 
-               memcpy(&last, &current, sizeof(current)); 
+               memcpy(&last, &current, sizeof(current));
 
                result = sysinfo_ret_ok;
             }
@@ -572,14 +572,14 @@ static int CPUUSER(const char *cmd, const char *param,double  *value, const char
    u_int64_t current[CPUSTATES];
    int result = SYSINFO_RET_FAIL;
    int mib[2];
-   size_t l; 
+   size_t l;
 
    mib[0] = CTL_KERN;
    mib[1] = KERN_CPTIME;
 
    l = sizeof(current);
 
-   if (sysctl(mib, 2, current, &l, NULL, 0) == 0 ) 
+   if (sysctl(mib, 2, current, &l, NULL, 0) == 0 )
       {
          u_int64_t interval_size;
 
@@ -588,12 +588,12 @@ static int CPUUSER(const char *cmd, const char *param,double  *value, const char
                          +  (current[CP_NICE] - last[CP_NICE])
                          +  (current[CP_SYS] - last[CP_SYS])
                          +  (current[CP_INTR] - last[CP_INTR]);
- 
+
          if (interval_size > 0)
             {
 	       *value = ((current[CP_USER] - last[CP_USER]) * 100.0)/interval_size;
 
-               memcpy(&last, &current, sizeof(current)); 
+               memcpy(&last, &current, sizeof(current));
 
                result = SYSINFO_RET_OK;
             }
@@ -611,14 +611,14 @@ static int CPUSYSTEM(const char *cmd, const char *param,double  *value, const ch
    u_int64_t current[CPUSTATES];
    int result = SYSINFO_RET_FAIL;
    int mib[2];
-   size_t l; 
+   size_t l;
 
    mib[0] = CTL_KERN;
    mib[1] = KERN_CPTIME;
 
    l = sizeof(current);
 
-   if (sysctl(mib, 2, current, &l, NULL, 0) == 0 ) 
+   if (sysctl(mib, 2, current, &l, NULL, 0) == 0 )
       {
          u_int64_t interval_size;
 
@@ -627,12 +627,12 @@ static int CPUSYSTEM(const char *cmd, const char *param,double  *value, const ch
                          +  (current[CP_NICE] - last[CP_NICE])
                          +  (current[CP_SYS] - last[CP_SYS])
                          +  (current[CP_INTR] - last[CP_INTR]);
- 
+
          if (interval_size > 0)
             {
 	       *value = ((current[CP_SYS] - last[CP_SYS]) * 100.0)/interval_size;
 
-               memcpy(&last, &current, sizeof(current)); 
+               memcpy(&last, &current, sizeof(current));
 
                result = SYSINFO_RET_OK;
             }
@@ -650,14 +650,14 @@ static int CPUNICE(const char *cmd, const char *param, double *value, const char
    u_int64_t current[CPUSTATES];
    int result = SYSINFO_RET_FAIL;
    int mib[2];
-   size_t l; 
+   size_t l;
 
    mib[0] = CTL_KERN;
    mib[1] = KERN_CPTIME;
 
    l = sizeof(current);
 
-   if (sysctl(mib, 2, current, &l, NULL, 0) == 0 ) 
+   if (sysctl(mib, 2, current, &l, NULL, 0) == 0 )
       {
          u_int64_t interval_size;
 
@@ -666,12 +666,12 @@ static int CPUNICE(const char *cmd, const char *param, double *value, const char
                          +  (current[CP_NICE] - last[CP_NICE])
                          +  (current[CP_SYS] - last[CP_SYS])
                          +  (current[CP_INTR] - last[CP_INTR]);
- 
+
          if (interval_size > 0)
             {
 	       *value = ((current[CP_NICE] - last[CP_NICE]) * 100.0)/interval_size;
 
-               memcpy(&last, &current, sizeof(current)); 
+               memcpy(&last, &current, sizeof(current));
 
                result = SYSINFO_RET_OK;
             }
@@ -689,14 +689,14 @@ static int CPUINTERRUPT(const char *cmd, const char *param, double *value, const
    u_int64_t current[CPUSTATES];
    int result = SYSINFO_RET_FAIL;
    int mib[2];
-   size_t l; 
+   size_t l;
 
    mib[0] = CTL_KERN;
    mib[1] = KERN_CPTIME;
 
    l = sizeof(current);
 
-   if (sysctl(mib, 2, current, &l, NULL, 0) == 0 ) 
+   if (sysctl(mib, 2, current, &l, NULL, 0) == 0 )
       {
          u_int64_t interval_size;
 
@@ -705,12 +705,12 @@ static int CPUINTERRUPT(const char *cmd, const char *param, double *value, const
                          +  (current[CP_NICE] - last[CP_NICE])
                          +  (current[CP_SYS] - last[CP_SYS])
                          +  (current[CP_INTR] - last[CP_INTR]);
- 
+
          if (interval_size > 0)
             {
 	       *value = ((current[CP_INTR] - last[CP_INTR]) * 100.0)/interval_size;
 
-               memcpy(&last, &current, sizeof(current)); 
+               memcpy(&last, &current, sizeof(current));
 
                result = SYSINFO_RET_OK;
             }
@@ -765,7 +765,7 @@ static int get_ifdata(const char *device, struct if_data *returned_data)
                                 *returned_data = ifn.if_data;
 
                                 result = SYSINFO_RET_OK;
-                               
+
                                 break;
                              }
 
@@ -802,7 +802,7 @@ static int NETLOADIN(const char *cmd, const char *parameter,double  *value, cons
                struct timeval interval;
 
                gettimeofday(&snaptime, NULL);
-	  
+
                timersub(&snaptime, &p->rb.clock, &interval);
 
                if (interval.tv_sec > 0)
@@ -816,7 +816,7 @@ static int NETLOADIN(const char *cmd, const char *parameter,double  *value, cons
             }
 
          else
-            result = SYSINFO_RET_FAIL;  
+            result = SYSINFO_RET_FAIL;
      }
 
    return result;
@@ -844,7 +844,7 @@ static int NETPACKETSIN(const char *cmd, const char *parameter,double  *value, c
                struct timeval interval;
 
                gettimeofday(&snaptime, NULL);
-	  
+
                timersub(&snaptime, &p->rp.clock, &interval);
 
                if (interval.tv_sec > 0)
@@ -858,7 +858,7 @@ static int NETPACKETSIN(const char *cmd, const char *parameter,double  *value, c
             }
 
          else
-            result = SYSINFO_RET_FAIL;  
+            result = SYSINFO_RET_FAIL;
      }
 
    return result;
@@ -904,7 +904,7 @@ static int NETLOADOUT(const char *cmd, const char *parameter,double  *value, con
                struct timeval interval;
 
                gettimeofday(&snaptime, NULL);
-	  
+
                timersub(&snaptime, &p->ob.clock, &interval);
 
                if (interval.tv_sec > 0)
@@ -918,7 +918,7 @@ static int NETLOADOUT(const char *cmd, const char *parameter,double  *value, con
             }
 
          else
-            result = SYSINFO_RET_FAIL;  
+            result = SYSINFO_RET_FAIL;
      }
 
    return result;
@@ -946,7 +946,7 @@ static int NETPACKETSOUT(const char *cmd, const char *parameter,double  *value, 
                struct timeval interval;
 
                gettimeofday(&snaptime, NULL);
-	  
+
                timersub(&snaptime, &p->op.clock, &interval);
 
                if (interval.tv_sec > 0)
@@ -960,7 +960,7 @@ static int NETPACKETSOUT(const char *cmd, const char *parameter,double  *value, 
             }
 
          else
-            result = SYSINFO_RET_FAIL;  
+            result = SYSINFO_RET_FAIL;
      }
 
    return result;
@@ -1107,7 +1107,7 @@ static int TCP_LISTEN(const char *cmd, const char *porthex, double  *value, cons
 
          if (kernel_symbols[1].n_type != N_UNDF)
             {
-               struct inpcbtable pcbq_head; 
+               struct inpcbtable pcbq_head;
 
                if (kvm_read(kp, kernel_symbols[1].n_value, &pcbq_head, sizeof pcbq_head) >= sizeof pcbq_head)
                   {
@@ -1168,7 +1168,7 @@ static int count_active_sockets()
 
          if (kernel_symbols[1].n_type != N_UNDF)
             {
-               struct inpcbtable pcbq_head; 
+               struct inpcbtable pcbq_head;
 
                if (kvm_read(kp, kernel_symbols[1].n_value, &pcbq_head, sizeof pcbq_head) >= sizeof pcbq_head)
                   {
@@ -1196,7 +1196,7 @@ static int count_active_sockets()
                                 if (     (kvm_read(kp, (u_long)pcb.inp_ppcb, &tcpcb, sizeof tcpcb) >= sizeof tcpcb)
                                       && (tcpcb.t_state >= TCPS_ESTABLISHED)
                                       && (tcpcb.t_state < TCPS_TIME_WAIT)
-                                   ) 
+                                   )
                                    socket_count++;
                              }
                        }
@@ -1229,7 +1229,7 @@ static void count_active_sockets_on_port(int port, int *sockets_in, int *sockets
 
          if (kernel_symbols[1].n_type != N_UNDF)
             {
-               struct inpcbtable pcbq_head; 
+               struct inpcbtable pcbq_head;
 
                if (kvm_read(kp, kernel_symbols[1].n_value, &pcbq_head, sizeof pcbq_head) >= sizeof pcbq_head)
                   {
@@ -1260,7 +1260,7 @@ static void count_active_sockets_on_port(int port, int *sockets_in, int *sockets
                                 if (     (kvm_read(kp, (u_long)pcb.inp_ppcb, &tcpcb, sizeof tcpcb) >= sizeof tcpcb)
                                       && (tcpcb.t_state >= TCPS_ESTABLISHED)
                                       && (tcpcb.t_state < TCPS_TIME_WAIT)
-                                   ) 
+                                   )
                                    {
                                       if (ntohs(pcb.inp_lport) ==  port)
                                          *sockets_in++;
@@ -1473,7 +1473,7 @@ static int     PROCLOAD15(const char *cmd, const char *parameter,double  *value,
 */
 /*
  * ADDED TO cwap.c
- * 
+ *
 static int SWAPFREE(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	int	mib[2];
@@ -1498,7 +1498,7 @@ static int SWAPFREE(const char *cmd, const char *parameter,double  *value, const
 */
 /*
  * ADDED TO cwap.c
- * 
+ *
 static int     SWAPTOTAL(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	int	mib[2];
@@ -1523,7 +1523,7 @@ static int     SWAPTOTAL(const char *cmd, const char *parameter,double  *value, 
 */
 /*
  * ADDED TO cwap.c
- * 
+ *
 static int SWAPIN(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	int	mib[2];
@@ -1580,11 +1580,11 @@ static int     PROCCOUNT(const char *cmd, const char *parameter,double  *value, 
         if (kp)
            {
               int count;
-              struct kinfo_proc2 *proc; 
+              struct kinfo_proc2 *proc;
 
-              proc = kvm_getproc2(kp, 
-                                  KERN_PROC_ALL, 
-                                  0, 
+              proc = kvm_getproc2(kp,
+                                  KERN_PROC_ALL,
+                                  0,
                                   sizeof(struct kinfo_proc2),
                                   &count);
 
@@ -1610,11 +1610,11 @@ static int PROCRUNNING(const char *cmd, const char *parameter,double  *value, co
         if (kp)
            {
               int count;
-              struct kinfo_proc2 *proc; 
+              struct kinfo_proc2 *proc;
 
-              proc = kvm_getproc2(kp, 
-                                  KERN_PROC_ALL, 
-                                  0, 
+              proc = kvm_getproc2(kp,
+                                  KERN_PROC_ALL,
+                                  0,
                                   sizeof(struct kinfo_proc2),
                                   &count);
 
@@ -1797,7 +1797,7 @@ ZBX_METRIC agent_commands[]=
         {"disk_write_kbs[*]"    ,DISKWRITEBLOCKS,       0, "hda"},
         {"disk_busy[*]"         ,DISKBUSY,              0, "hda"},
 
-        /* 
+        /*
         {"sensor[temp1]"        ,SENSOR,                0, "temp1"},
         {"sensor[temp2]"        ,SENSOR,                0, "temp2"},
         {"sensor[temp3]"        ,SENSOR,                0, "temp3"},
@@ -1835,4 +1835,3 @@ ZBX_METRIC agent_commands[]=
 
         {0}
         };
-

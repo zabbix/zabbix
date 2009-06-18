@@ -18,9 +18,9 @@ int kmem;                 /* file descriptor */
 
 
 static struct nlist nlst[] = {
-  { "avenrun", 0, 0, 0, 0, 0 }, 
-  { "sysinfo", 0, 0, 0, 0, 0 }, 
-  { "vmker",   0, 0, 0, 0, 0 }, 
+  { "avenrun", 0, 0, 0, 0, 0 },
+  { "sysinfo", 0, 0, 0, 0, 0 },
+  { "vmker",   0, 0, 0, 0, 0 },
   { "v",    0, 0, 0, 0, 0 },
   {  NULL, 0, 0, 0, 0, 0 }
 };
@@ -49,9 +49,9 @@ void init() {
     return ;
   }
 
-  
+
   if (knlist(nlst, 1, sizeof(struct nlist)) == -1) {
-    
+
     perror("knlist, proc entry not found");
     return;
   }
@@ -64,7 +64,7 @@ void init() {
 
   getkval(v_offset, (caddr_t)&v_info, sizeof v_info, "v");
 
-  ncpus = v_info.v_ncpus;    
+  ncpus = v_info.v_ncpus;
 
   nprocs = 20480;
 
@@ -112,7 +112,7 @@ long get_running_procs()
                      &procsindex, nprocs)) > 0) {
 
     for (pp=p_info, i=0; i < nproc;pp++, i++) {
-      
+
       if (pp->pi_state == SACTIVE && pp->pi_cpu != 0)
 	running++;
 
@@ -129,7 +129,7 @@ long get_running_procs()
 double get_loadavg(int data_type) {
 
   perfstat_cpu_total_t ub;
-  
+
   if (perfstat_cpu_total ((perfstat_id_t*)NULL, &ub, sizeof(perfstat_cpu_total_t),1) >= 0) {
 
     switch(data_type) {
@@ -156,9 +156,9 @@ u_longlong_t get_disk_io(int data_type) {
   perfstat_disk_total_t ub;
 
   if (perfstat_disk_total ((perfstat_id_t*)NULL, &ub, sizeof(perfstat_disk_total_t),1) >= 0) {
-    
+
     switch(data_type) {
-      
+
     case DISK_IO_RBLKS:
       return ub.rblks;
       break;
@@ -169,11 +169,11 @@ u_longlong_t get_disk_io(int data_type) {
       return ub.rblks + ub.wblks;
       break;
     }
-   
+
   } else {
     return -1;
   }
-    
+
 }
 
 

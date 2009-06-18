@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -170,7 +170,7 @@ MEM_FNCLIST
 	int	(*function)();
 };
 
-	MEM_FNCLIST fl[] = 
+	MEM_FNCLIST fl[] =
 	{
 		{"total",	VM_MEMORY_TOTAL},
 		{"free",	VM_MEMORY_FREE},

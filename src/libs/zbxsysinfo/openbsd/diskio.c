@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -42,7 +42,7 @@ static int get_disk_stats(const char *devname, zbx_uint64_t *rbytes, zbx_uint64_
 
 	len = sizeof(drive_count);
 
-	if (0 != sysctl(mib, 2, &drive_count, &len, NULL, 0)) 
+	if (0 != sysctl(mib, 2, &drive_count, &len, NULL, 0))
 		return SYSINFO_RET_FAIL;
 
 	len = (drive_count * sizeof(struct diskstats));
@@ -140,7 +140,7 @@ DEV_FNCLIST
 	int	(*function)();
 };
 
-	DEV_FNCLIST fl[] = 
+	DEV_FNCLIST fl[] =
 	{
 		{"bytes",	VFS_DEV_WRITE_BYTES},
 		{"operations",	VFS_DEV_WRITE_OPERATIONS},
@@ -150,17 +150,17 @@ DEV_FNCLIST
 	char	devname[MAX_STRING_LEN];
 	char	mode[MAX_STRING_LEN];
 	int	i;
-	
+
 	assert(result);
 
 	init_result(result);
-	
+
 	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, devname, sizeof(devname)))
 		*devname = '\0';
-	
+
 	/* default parameter */
 	if (*devname == '\0')
 		zbx_snprintf(devname, sizeof(devname), "all");
@@ -171,11 +171,11 @@ DEV_FNCLIST
 	/* default parameter */
 	if (*mode == '\0')
 		zbx_snprintf(mode, sizeof(mode), "operations");
-	
+
 	for (i = 0; fl[i].mode != 0; i++)
 		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
 			return (fl[i].function)(devname, result);
-	
+
 	return SYSINFO_RET_FAIL;
 }
 
@@ -188,7 +188,7 @@ DEV_FNCLIST
 	int (*function)();
 };
 
-	DEV_FNCLIST fl[] = 
+	DEV_FNCLIST fl[] =
 	{
 		{"bytes",	VFS_DEV_READ_BYTES},
 		{"operations",	VFS_DEV_READ_OPERATIONS},
@@ -198,11 +198,11 @@ DEV_FNCLIST
 	char	devname[MAX_STRING_LEN];
 	char	mode[MAX_STRING_LEN];
 	int	i;
-	
+
 	assert(result);
 
 	init_result(result);
-	
+
 	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
 
@@ -223,6 +223,6 @@ DEV_FNCLIST
 	for (i = 0; fl[i].mode != 0; i++)
 		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
 			return (fl[i].function)(devname, result);
-	
+
 	return SYSINFO_RET_FAIL;
 }
