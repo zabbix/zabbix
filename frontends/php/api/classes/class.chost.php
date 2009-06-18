@@ -28,7 +28,7 @@ class CHost {
 	 * 	boolean 'with_httptests' 			=> 'only with http tests',
 	 * 	boolean 'with_monitored_httptests'	=> 'only with monitores http tests',
 	 * 	boolean 'with_graphs'				=> 'only with graphs',
-	 *	int 'count'							=> 'count',
+	 *	int 'count'							=> 'count hosts, returned column name is rowscount',
 	 *  string  'pattern'					=> 'search hosts by pattern in host names',
 	 *  integer 'limit'						=> 'limit selection',
 	 *  string  'order'						=> 'depricated parametr (for now)'
@@ -40,7 +40,8 @@ class CHost {
 	 * @return array|boolean host data as array or false if error
 	 */
 	public static function get($options=array()){
-
+		global $USER_DETAILS;
+		
 		$def_sql = array(
 			'select' => array(),
 			'from' => array('hosts h'),
@@ -63,6 +64,7 @@ class CHost {
 			'with_httptests'			=>		0,
 			'with_monitored_httptests'	=>		0,
 			'with_graphs'				=>		0,
+			'permission'				=>		0,
 			'count'						=>		0,
 			'pattern'					=>		'',
 			'order' 					=>		0,
@@ -164,6 +166,13 @@ class CHost {
 				 ' FROM items i, graphs_items gi '.
 				 ' WHERE i.hostid=h.hostid '.
 				 	' AND i.itemid=gi.itemid)';
+		}
+		
+// permission
+		if($def_options['permission'] || defined('ZBX_API_REQUEST')){
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,$nodeid,AVAILABLE_NOCACHE);
+
+			$def_sql['where'][] = DBcondition('h.hostid', $available_hosts);
 		}
 
 // count

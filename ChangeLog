@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-400] added necessary link between hosts and groups (Artem)
  - [ZBX-944] fixed changelog reference (Richlv)
  - [DEV-394] added easy access when not logged in (Artem)
  - [DEV-398] added hostgroup filter for HostGroup and TemplateLinkage twinboxes (Vedmak)

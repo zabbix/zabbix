@@ -238,16 +238,14 @@ function add_action($name, $eventsource, $esc_period, $def_shortdata, $def_longd
 		return false;
 	}
 
-	foreach($operations as $operation)
-		if( !validate_operation($operation) )	return false;
+	foreach($operations as $num => $operation){
+		if(!validate_operation($operation))	return false;
+	}
 
 	$actionid=get_dbid('actions','actionid');
 
 	$result = DBexecute('INSERT INTO actions (actionid,name,eventsource,esc_period,def_shortdata,def_longdata,recovery_msg,r_shortdata,r_longdata,evaltype,status)'.
 				' VALUES ('.$actionid.','.zbx_dbstr($name).','.$eventsource.','.$esc_period.','.zbx_dbstr($def_shortdata).','.zbx_dbstr($def_longdata).','.$recovery_msg.','.zbx_dbstr($r_shortdata).','.zbx_dbstr($r_longdata).','.$evaltype.','.$status.')');
-
-	if(!$result)
-		return $result;
 
 	foreach($operations as $operation)
 		if(!$result = add_action_operation($actionid, $operation))
@@ -258,6 +256,9 @@ function add_action($name, $eventsource, $esc_period, $def_shortdata, $def_longd
 		if(!$result = add_action_condition($actionid, $condition))
 			break;
 	}
+
+	if(!$result)
+		return $result;
 
 return $actionid;
 }
@@ -285,9 +286,10 @@ function update_action($actionid, $name, $eventsource, $esc_period, $def_shortda
 		return false;
 	}
 
-	foreach($operations as $operation)
-		if( !validate_operation($operation) )	return false;
-
+	foreach($operations as $num => $operation){
+		if(!validate_operation($operation))	return false;
+	}
+	
 	$result = DBexecute('UPDATE actions SET name='.zbx_dbstr($name).
 							',eventsource='.$eventsource.
 							',esc_period='.$esc_period.
@@ -918,14 +920,16 @@ function validate_operation($operation){
 			break;
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:
-			if(!uint_in_array($operation['objectid'], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
+			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
+			if(!isset($available_groups[$operation['objectid']])){
 				error(S_INCORRECT_GROUP);
 				return false;
 			}
 			break;
 		case OPERATION_TYPE_TEMPLATE_ADD:
 		case OPERATION_TYPE_TEMPLATE_REMOVE:
-			if(!uint_in_array($operation['objectid'], get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
+			if(!isset($available_hosts[$operation['objectid']])){
 				error(S_INCORRECT_HOST);
 				return false;
 			}

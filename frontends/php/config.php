@@ -39,16 +39,18 @@
 		'config'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('0,3,5,6,7,8,9,10'),	NULL),
 
 // other form
-		'alert_history'=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),		'isset({config})&&({config}==0)&&isset({save})'),
-		'event_history'=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),		'isset({config})&&({config}==0)&&isset({save})'),
-		'work_period'=>		array(T_ZBX_STR, O_NO,	NULL,	NULL,					'isset({config})&&({config}==7)&&isset({save})'),
+		'alert_history'=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
+		'event_history'=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
+		'work_period'=>			array(T_ZBX_STR, O_NO,	NULL,	NULL,				'isset({config})&&({config}==7)&&isset({save})'),
 		'refresh_unsupported'=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==5)&&isset({save})'),
-		'alert_usrgrpid'=>	array(T_ZBX_INT, O_NO,	NULL,	DB_ID,					'isset({config})&&({config}==5)&&isset({save})'),
+		'alert_usrgrpid'=>		array(T_ZBX_INT, O_NO,	NULL,	DB_ID,				'isset({config})&&({config}==5)&&isset({save})'),
+		'discovery_groupid'=>	array(T_ZBX_INT, O_NO,	NULL,	DB_ID,				'isset({config})&&({config}==5)&&isset({save})'),
 
 // image form
 		'imageid'=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,						'isset({config})&&({config}==3)&&(isset({form})&&({form}=="update"))'),
 		'name'=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,					'isset({config})&&({config}==3)&&isset({save})'),
 		'imagetype'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('1,2'),				'isset({config})&&({config}==3)&&(isset({save}))'),
+		
 //value mapping
 		'valuemapid'=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,					'isset({config})&&({config}==6)&&(isset({form})&&({form}=="update"))'),
 		'mapname'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY, 					'isset({config})&&({config}==6)&&isset({save})'),
@@ -102,6 +104,8 @@
 
 	update_profile('web.config.config',$_REQUEST['config'],PROFILE_TYPE_INT);
 
+	$orig_config = select_config();
+	
 	$result = 0;
 	if($_REQUEST['config']==3){
 /* IMAGES ACTIONS */
@@ -195,7 +199,8 @@
 				'alert_history' => get_request('alert_history'),
 				'refresh_unsupported' => get_request('refresh_unsupported'),
 				'work_period' => get_request('work_period'),
-				'alert_usrgrpid' => get_request('alert_usrgrpid')
+				'alert_usrgrpid' => get_request('alert_usrgrpid'),
+				'discovery_groupid' => get_request('discovery_groupid'),
 			);
 		$result=update_config($configs);
 
@@ -210,6 +215,16 @@
 				$msg[] = S_REFRESH_UNSUPPORTED_ITEMS.' ['.$val.']';
 			if(!is_null($val = get_request('work_period')))
 				$msg[] = S_WORKING_TIME.' ['.$val.']';
+			if(!is_null($val = get_request('discovery_groupid'))){
+				$val = CHostGroup::get(array('groupids' => $val));
+				if(!empty($val)){
+					$val = array_pop($val);
+					$msg[] = S_GROUP_FOR_DISCOVERED_HOSTS.' ['.$val['name'].']';
+					
+					setHostGroupInternal($orig_config['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
+					setHostGroupInternal($val['groupid'], ZBX_INTERNAL_GROUP);
+				}
+			}
 			if(!is_null($val = get_request('alert_usrgrpid'))){
 				if(0 == $val) {
 					$val = S_NONE;
@@ -503,13 +518,22 @@
 	else if($_REQUEST['config']==5){ // Other parameters
 		echo SBR;
 		
-		$frmHouseKeep = new CFormTable(S_OTHER_PARAMETERS, 'config.php');
-		$frmHouseKeep->SetHelp('web.config.other.php');
-		$frmHouseKeep->addVar('config',get_request('config', 5));
+		$frmOther = new CFormTable(S_OTHER_PARAMETERS, 'config.php');
+		$frmOther->SetHelp('web.config.other.php');
+		$frmOther->addVar('config',get_request('config', 5));
 		
-		$frmHouseKeep->addRow(S_REFRESH_UNSUPPORTED_ITEMS,
+		$frmOther->addRow(S_REFRESH_UNSUPPORTED_ITEMS,
 			new CNumericBox('refresh_unsupported', $config['refresh_unsupported'], 5));
-			
+		
+
+		$cmbGrp = new CComboBox('discovery_groupid', $config['discovery_groupid']);
+		$groups = CHostGroup::get(array('order'=>'name'));
+		foreach($groups as $groupid => $group){
+			$cmbGrp->addItem($groupid, $group['name']);
+		}
+		$frmOther->addRow(S_GROUP_FOR_DISCOVERED_HOSTS, $cmbGrp);
+		
+		
 		$cmbUsrGrp = new CComboBox('alert_usrgrpid', $config['alert_usrgrpid']);
 		$cmbUsrGrp->addItem(0, S_NONE);
 		$result=DBselect('SELECT usrgrpid,name FROM usrgrp'.
@@ -520,10 +544,10 @@
 					$row['usrgrpid'],
 					get_node_name_by_elid($row['usrgrpid']).$row['name']
 					);
-		$frmHouseKeep->addRow(S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE, $cmbUsrGrp);
-
-		$frmHouseKeep->addItemToBottomRow(new CButton('save', S_SAVE));
-		$frmHouseKeep->Show();
+		$frmOther->addRow(S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE, $cmbUsrGrp);
+		
+		$frmOther->addItemToBottomRow(new CButton('save', S_SAVE));
+		$frmOther->show();
 	}
 /////////////////////////////////
 //  config = 7 // Work Period  //

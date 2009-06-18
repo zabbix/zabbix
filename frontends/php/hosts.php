@@ -113,7 +113,7 @@ include_once('include/page_header.php');
 		
 /* host linkage form */
 		'tname'=>			array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'isset({config})&&({config}==2)&&isset({save})'),
-		'groupid_tb'=> 		array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
+		'twb_groupid'=> 	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
 		
 // maintenance
 		'maintenanceid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'(isset({config})&&({config}==6))&&(isset({form})&&({form}=="update"))'),
@@ -169,11 +169,6 @@ include_once('include/page_header.php');
 	if($_REQUEST['config']==2 && (isset($_REQUEST['save']))){
 	
 		$hosts = get_request('hosts',array());
-
-//----------------------
-		//$_REQUEST['hostid'] = ;
-		//$hosts = array();
-//--------------------
 
 		if(isset($_REQUEST['hostid'])){
 			$templateid=$_REQUEST['hostid'];
@@ -272,13 +267,8 @@ include_once('include/page_header.php');
 		if(count($_REQUEST['groups']) > 0){
 			$accessible_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
 			foreach($_REQUEST['groups'] as $gid){
-				if(isset($accessible_groups[$gid])) continue;
-				access_deny();
+				if(!isset($accessible_groups[$gid])) access_deny();
 			}
-		}
-		else{
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
-				access_deny();
 		}
 
 		$result = true;
@@ -315,7 +305,7 @@ include_once('include/page_header.php');
 				$db_host['templates'] = $db_templates;
 			}
 
-			$result = update_host($hostid,
+			$result &= (bool) update_host($hostid,
 				$db_host['host'],$db_host['port'],$db_host['status'],$db_host['useip'],$db_host['dns'],
 				$db_host['ip'],$db_host['proxy_hostid'],$db_host['templates'],$db_host['useipmi'],$db_host['ipmi_ip'],
 				$db_host['ipmi_port'],$db_host['ipmi_authtype'],$db_host['ipmi_privilege'],$db_host['ipmi_username'],
@@ -1024,8 +1014,9 @@ include_once('include/page_header.php');
 			$timeperiods = get_request('timeperiods', array());
 			
 			DBstart();
-
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
+			
+// update available_hosts after ACTIONS 
+			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,null,AVAILABLE_NOCACHE); 
 			if(isset($_REQUEST['maintenanceid'])) delete_timeperiods_by_maintenanceid($_REQUEST['maintenanceid']);
 			
 			$timeperiodids = array();
@@ -1556,6 +1547,7 @@ include_once('include/page_header.php');
 	else if($_REQUEST['config']==1){
 	
 		if(isset($_REQUEST['form'])){
+			echo SBR;
 			insert_hostgroups_form($_REQUEST['groupid']);
 		} 
 		else {
@@ -1583,23 +1575,30 @@ include_once('include/page_header.php');
 				' # ',
 				S_MEMBERS));
 
-			$sql = 'SELECT g.groupid,g.name '.
-					' FROM groups g'.
-					' WHERE '.DBcondition('g.groupid',$available_groups).
-					order_by('g.name');
-			$db_groups=DBselect($sql);
-			while($db_group=DBfetch($db_groups)){
-				$count = 0;
-				$hosts = array();
+// uncomment this for group deletion
+			$dlt_groups = getDeletableHostGroups();
 
-				$sql = 'SELECT DISTINCT h.host, h.hostid, h.status'.
-						' FROM hosts h, hosts_groups hg'.
-						' WHERE h.hostid=hg.hostid '.
-							' AND hg.groupid='.$db_group['groupid'].
-							' AND '.DBcondition('h.hostid',$available_hosts).
-						' ORDER BY host';
-				$db_hosts = DBselect($sql);
-				while($db_host=DBfetch($db_hosts)){
+			$db_groups = CHostGroup::get(array('order'=> 'name'));
+			$groupids = array_keys($db_groups);
+
+			$db_hosts = array();
+			$sql = 'SELECT hg.groupid, h.host, h.hostid, h.status'.
+					' FROM hosts h, hosts_groups hg'.
+					' WHERE h.hostid=hg.hostid '.
+						' AND '.DBcondition('hg.groupid',$groupids).
+						' AND '.DBcondition('h.hostid',$available_hosts).
+					' ORDER BY h.host';
+			$res = DBselect($sql);
+			while($db_host=DBfetch($res)){
+				if(!isset($db_groups[$db_host['groupid']]['hosts'])) $db_groups[$db_host['groupid']]['hosts'] = array();
+				$db_groups[$db_host['groupid']]['hosts'][$db_host['hostid']] = $db_host;
+			}
+			
+			foreach($db_groups as $groupid => $db_group){
+				if(!isset($db_group['hosts'])) $db_group['hosts'] = array();
+
+				$hosts = array();
+				foreach($db_group['hosts'] as $hostid => $db_host){
 					$link = 'hosts.php?form=update&config=0&hostid='.$db_host['hostid'];
 					switch($db_host['status']){
 						case HOST_STATUS_MONITORED:
@@ -1613,19 +1612,22 @@ include_once('include/page_header.php');
 					}
 
 					array_push($hosts, empty($hosts)?'':', ', new CLink(new CSpan($db_host['host'], $style), $link));
-					$count++;
 				}
 
+				$grp_chkb = new CCheckBox('groups['.$db_group['groupid'].']',NULL,NULL,$db_group['groupid']);
+//				if(!empty($db_group['hosts'])) $grp_chkb->addOption('disabled', 'disabled');
+				if(!isset($dlt_groups[$groupid])) $grp_chkb->addOption('disabled', 'disabled');
+				
 				$table->addRow(array(
 					array(
-						new CCheckBox('groups['.$db_group['groupid'].']',NULL,NULL,$db_group['groupid']),
+						$grp_chkb,
 						SPACE,
 						new CLink(
 							$db_group['name'],
 							'hosts.php?form=update&groupid='.$db_group['groupid'].
 							url_param('config'),'action')
 					),
-					$count,
+					count($db_group['hosts']),
 					new CCol((empty($hosts)?'-':$hosts),'wraptext')
 					));
 					$row_count++;
