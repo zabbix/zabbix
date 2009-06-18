@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -71,60 +71,60 @@ static int	get_fs_inodes_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t 
 static int	VFS_FS_INODE_USED(const char *fs, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value = 0;
-	
+
 	if (SYSINFO_RET_OK != get_fs_inodes_stat(fs, NULL, NULL, &value, NULL, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_UI64_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
 static int	VFS_FS_INODE_FREE(const char *fs, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value = 0;
-	
+
 	if (SYSINFO_RET_OK != get_fs_inodes_stat(fs, NULL, &value, NULL, NULL, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_UI64_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
 static int	VFS_FS_INODE_TOTAL(const char *fs, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value = 0;
-	
+
 	if (SYSINFO_RET_OK != get_fs_inodes_stat(fs, &value, NULL, NULL, NULL, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_UI64_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
 static int	VFS_FS_INODE_PFREE(const char *fs, AGENT_RESULT *result)
 {
 	double	value = 0;
-	
+
 	if (SYSINFO_RET_OK != get_fs_inodes_stat(fs, NULL, NULL, NULL, &value, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_DBL_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
 static int	VFS_FS_INODE_PUSED(const char *fs, AGENT_RESULT *result)
 {
 	double	value = 0;
-	
+
 	if (SYSINFO_RET_OK != get_fs_inodes_stat(fs, NULL, NULL, NULL, NULL, &value))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_DBL_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -137,7 +137,7 @@ FS_FNCLIST
 	int	(*function)();
 };
 
-	FS_FNCLIST fl[] = 
+	FS_FNCLIST fl[] =
 	{
 		{"free",	VFS_FS_INODE_FREE},
 		{"total",	VFS_FS_INODE_TOTAL},
@@ -150,27 +150,27 @@ FS_FNCLIST
 	char	fsname[MAX_STRING_LEN];
 	char	mode[MAX_STRING_LEN];
 	int	i;
-	
+
 	assert(result);
 
 	init_result(result);
-	
+
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, fsname, sizeof(fsname)))
 		return SYSINFO_RET_FAIL;
-	
+
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
 
 	/* default parameter */
 	if (*mode == '\0')
 		zbx_snprintf(mode, sizeof(mode), "total");
-	
+
 	for (i = 0; fl[i].mode != 0; i++)
 		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
 			return (fl[i].function)(fsname, result);
-	
+
 	return SYSINFO_RET_FAIL;
 }

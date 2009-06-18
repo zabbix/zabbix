@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -26,7 +26,7 @@
 
 #include "net.h"
 
-/* 
+/*
  * 0 - NOT OK
  * 1 - OK
  * */
@@ -93,7 +93,7 @@ int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
         assert(result);
 
-        init_result(result);	
+        init_result(result);
 
         if(num_param(param) > 1)
         {
@@ -103,8 +103,8 @@ int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
         if(get_param(param, 1, porthex, MAX_STRING_LEN) != 0)
         {
                 return SYSINFO_RET_FAIL;
-        }	
-	
+        }
+
 	strscpy(pattern,porthex);
 	zbx_strlcat(pattern," 00000000:0000 0A", MAX_STRING_LEN);
 
@@ -125,7 +125,7 @@ int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	zbx_fclose(f);
 
 	SET_UI64_RESULT(result, 0);
-	
+
 	return ret;
 #else
 	return	SYSINFO_RET_FAIL;
@@ -143,17 +143,17 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
         assert(result);
 
 	init_result(result);
-		
+
     if(num_param(param) > 2)
     {
         return SYSINFO_RET_FAIL;
     }
-        
+
 	if(get_param(param, 1, ip, MAX_STRING_LEN) != 0)
     {
            ip[0] = '\0';
     }
-	
+
 	if(ip[0] == '\0')
 	{
 		strscpy(ip, "127.0.0.1");
@@ -172,12 +172,12 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	port=atoi(port_str);
 
 	ret = tcp_expect(ip,port,NULL,NULL,"",&value_int);
-		
+
 	if(ret == SYSINFO_RET_OK)
 	{
 		SET_UI64_RESULT(result, value_int);
 	}
-	
+
 	return ret;
 }
 
@@ -189,7 +189,7 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #	define PACKETSZ 512
 #endif /* PACKETSZ */
 
-#if !defined(C_IN) 
+#if !defined(C_IN)
 #	define C_IN 	ns_c_in
 #endif /* C_IN */
 
@@ -209,10 +209,10 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	assert(result);
 
         init_result(result);
-	
+
         if (num_param(param) > 2)
                 return SYSINFO_RET_FAIL;
-        
+
 	if (0 != get_param(param, 1, ip, MAX_STRING_LEN))
                *ip = '\0';
 

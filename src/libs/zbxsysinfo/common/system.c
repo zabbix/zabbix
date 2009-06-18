@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -31,7 +31,7 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 	assert(result);
 
         init_result(result);
-	
+
 	SET_UI64_RESULT(result, time(NULL));
 
 	return SYSINFO_RET_OK;
@@ -71,7 +71,7 @@ int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_R
 		versionInfo;
 
 	dwSize = sizeof(computerName);
-	
+
 	if( 0 == GetComputerName(computerName,&dwSize))
 		computerName[0] = '\0';
 
@@ -81,8 +81,8 @@ int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_R
 	{
 		case VER_PLATFORM_WIN32_WINDOWS:
 			zbx_snprintf(
-				osVersion, 
-				sizeof(osVersion), 
+				osVersion,
+				sizeof(osVersion),
 				"Windows %s-%s",
 				versionInfo.dwMinorVersion==0 ? "95" :
 					(versionInfo.dwMinorVersion==10 ? "98" :
@@ -148,8 +148,8 @@ int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_R
 	}
 
 	zbx_snprintf(
-		buffer, 
-		sizeof(buffer), 
+		buffer,
+		sizeof(buffer),
 		"Windows %s %d.%d.%d %s %s",
 		computerName,
 		versionInfo.dwMajorVersion,

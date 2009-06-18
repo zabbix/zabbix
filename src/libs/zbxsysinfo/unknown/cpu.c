@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -32,13 +32,13 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char cpuname[MAX_STRING_LEN];
 	char type[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
-	
+
 	int cpu_num = 0;
 
         assert(result);
 
         init_result(result);
-	
+
         if(num_param(param) > 3)
         {
                 return SYSINFO_RET_FAIL;
@@ -64,12 +64,12 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		/* default parameter */
 		zbx_snprintf(type, sizeof(type), "user");
 	}
-	
+
 	if(get_param(param, 3, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
-	
+
         if(mode[0] == '\0')
 	{
 		/* default parameter */
@@ -173,7 +173,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 	assert(result);
 
         init_result(result);
-		
+
 	if(getloadavg(load, 3))
 	{
 		SET_DBL_RESULT(result, load[0]);
@@ -181,7 +181,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 	}
 	else
 	{
-		return SYSINFO_RET_FAIL;	
+		return SYSINFO_RET_FAIL;
 	}
 #else
 #ifdef	HAVE_SYS_PSTAT_H
@@ -212,7 +212,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 	assert(result);
 
         init_result(result);
-	
+
 	if (!kc && !(kc = kstat_open()))
 	{
 		return SYSINFO_RET_FAIL;
@@ -232,7 +232,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 	assert(result);
 
         init_result(result);
-		
+
 	if(getloadavg_kmem(loadavg,3) == FAIL)
 	{
 		return SYSINFO_RET_FAIL;
@@ -260,7 +260,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 	assert(result);
 
         init_result(result);
-		
+
 	if(getloadavg(load, 3))
 	{
 		SET_DBL_RESULT(result, load[1]);
@@ -268,7 +268,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 	}
 	else
 	{
-		return SYSINFO_RET_FAIL;	
+		return SYSINFO_RET_FAIL;
 	}
 #else
 #ifdef	HAVE_SYS_PSTAT_H
@@ -277,7 +277,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 	assert(result);
 
         init_result(result);
-	
+
 	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
 	{
 		return SYSINFO_RET_FAIL;
@@ -299,7 +299,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 	assert(result);
 
         init_result(result);
-		
+
 	if (!kc && !(kc = kstat_open()))
 	{
 		return SYSINFO_RET_FAIL;
@@ -350,12 +350,12 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	if(getloadavg(load, 3))
 	{
-		SET_DBL_RESULT(result, load[2]);	
+		SET_DBL_RESULT(result, load[2]);
 		return SYSINFO_RET_OK;
 	}
 	else
 	{
-		return SYSINFO_RET_FAIL;	
+		return SYSINFO_RET_FAIL;
 	}
 #else
 #ifdef	HAVE_SYS_PSTAT_H
@@ -364,7 +364,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 	assert(result);
 
         init_result(result);
-		
+
 	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
 	{
 		return SYSINFO_RET_FAIL;
@@ -386,7 +386,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 	assert(result);
 
         init_result(result);
-		
+
 	if (!kc && !(kc = kstat_open()))
 	{
 		return SYSINFO_RET_FAIL;
@@ -406,7 +406,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 	assert(result);
 
         init_result(result);
-	
+
 	if(getloadavg_kmem(loadavg,3) == FAIL)
 	{
 		return STSINFO_RET_FAIL;
@@ -436,7 +436,7 @@ CPU_FNCLIST
 	int (*function)();
 };
 
-	CPU_FNCLIST fl[] = 
+	CPU_FNCLIST fl[] =
 	{
 		{"avg1" ,	SYSTEM_CPU_LOAD1},
 		{"avg5" ,	SYSTEM_CPU_LOAD5},
@@ -447,11 +447,11 @@ CPU_FNCLIST
 	char cpuname[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
 	int i;
-	
+
         assert(result);
 
         init_result(result);
-	
+
         if(num_param(param) > 2)
         {
                 return SYSINFO_RET_FAIL;
@@ -470,7 +470,7 @@ CPU_FNCLIST
 	{
 		return SYSINFO_RET_FAIL;
 	}
-	
+
 	if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
@@ -487,7 +487,7 @@ CPU_FNCLIST
 			return (fl[i].function)(cmd, param, flags, result);
 		}
 	}
-	
+
 	return SYSINFO_RET_FAIL;
 }
 
@@ -496,7 +496,7 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
         assert(result);
 
         init_result(result);
-	
+
 	return SYSINFO_RET_FAIL;
 }
 
@@ -505,7 +505,6 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
         assert(result);
 
         init_result(result);
-	
+
 	return SYSINFO_RET_FAIL;
 }
-

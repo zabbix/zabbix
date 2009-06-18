@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -35,7 +35,7 @@ ZBX_METRIC	parameters_specific[]=
 	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,		0,	"hda,ops,avg1"},
 	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,		0,	"hda,ops,avg1"},
 
-	{"net.tcp.listen",      CF_USEUPARAM,   NET_TCP_LISTEN, 	0,      "80"},	
+	{"net.tcp.listen",      CF_USEUPARAM,   NET_TCP_LISTEN, 	0,      "80"},
 
 	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		0,	"lo,bytes"},
 	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		0,	"lo,bytes"},
@@ -55,14 +55,14 @@ ZBX_METRIC	parameters_specific[]=
 
 	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	0,	"all,free"},
 	{"system.swap.in",      CF_USEUPARAM,   SYSTEM_SWAP_IN,       	0,      "all"},
-	{"system.swap.out",     CF_USEUPARAM,   SYSTEM_SWAP_OUT,	0,      "all,count"},	
+	{"system.swap.out",     CF_USEUPARAM,   SYSTEM_SWAP_OUT,	0,      "all,count"},
 
 	{"system.uptime",	0,		SYSTEM_UPTIME,		0,	0},
 
 	{"service_state",	CF_USEUPARAM,	SERVICE_STATE,		0,	ZABBIX_SERVICE_NAME},
 	{"perf_counter",	CF_USEUPARAM,	PERF_MONITOR,		0,	"\\System\\Processes"},
 	{"proc_info",		CF_USEUPARAM,	PROC_INFO,		0,	"svchost.exe"},
-	
+
 	{"__UserPerfCounter",	CF_USEUPARAM,	USER_PERFCOUNTER,	0,	""},
 
 	{0}

@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -125,7 +125,7 @@ SWP_FNCLIST
 	int	(*function)();
 };
 
-	SWP_FNCLIST fl[] = 
+	SWP_FNCLIST fl[] =
 	{
 		{"total",	SYSTEM_SWAP_TOTAL},
 		{"free",	SYSTEM_SWAP_FREE},
@@ -158,7 +158,7 @@ SWP_FNCLIST
 
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
-	
+
 	/* default parameter */
 	if (*mode == '\0')
 		zbx_snprintf(mode, sizeof(mode), "free");
@@ -166,7 +166,7 @@ SWP_FNCLIST
 	for (i = 0; fl[i].mode != 0; i++)
 		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
 			return (fl[i].function)(result);
-	
+
 	return SYSINFO_RET_FAIL;
 }
 
@@ -197,7 +197,7 @@ int	get_swap_io(zbx_uint64_t *icount, zbx_uint64_t *ipages, zbx_uint64_t *ocount
 		*ocount = (zbx_uint64_t)v.swapouts;
 	if (opages)
 		*opages = (zbx_uint64_t)v.pgswapout;
-	
+
 	return SYSINFO_RET_OK;
 }
 
@@ -226,7 +226,7 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
-	
+
 	/* default parameter */
 	if (*mode == '\0')
 		zbx_snprintf(mode, sizeof(mode), "count");
@@ -270,7 +270,7 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
-	
+
 	/* default parameter */
 	if (*mode == '\0')
 		zbx_snprintf(mode, sizeof(mode), "count");

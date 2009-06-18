@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -54,7 +54,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *ns)
 	ns->oerr = (zbx_uint64_t)ps_netif.oerrors;
 
 	ns->colls = (zbx_uint64_t)ps_netif.collisions;
-	
+
 	return SYSINFO_RET_OK;
 #else
 	return SYSINFO_RET_FAIL;

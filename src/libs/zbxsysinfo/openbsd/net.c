@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -21,7 +21,7 @@
 
 #include "sysinfo.h"
 
-static struct nlist kernel_symbols[] = 
+static struct nlist kernel_symbols[] =
 {
 	{"_ifnet", N_UNDF, 0, 0, 0},
 	{"_tcbtable", N_UNDF, 0, 0, 0},
@@ -38,7 +38,7 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 	struct ifnet_head	head;
 	struct ifnet 		*ifp;
 	struct ifnet		v;
-	
+
 	kvm_t 	*kp;
 	int	len = 0;
 	int 	ret = SYSINFO_RET_FAIL;
@@ -49,7 +49,7 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 		if (N_UNDF == kernel_symbols[IFNET_ID].n_type)
 			if (0 != kvm_nlist(kp, &kernel_symbols[0]))
 				kernel_symbols[IFNET_ID].n_type = N_UNDF;
-		
+
 		if (N_UNDF != kernel_symbols[IFNET_ID].n_type) {
 			len = sizeof(struct ifnet_head);
 
@@ -405,7 +405,7 @@ int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 	assert(result);
 
 	init_result(result);
-	
+
 	return SYSINFO_RET_FAIL;
 }
 

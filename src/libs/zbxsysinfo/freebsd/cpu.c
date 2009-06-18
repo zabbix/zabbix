@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -95,7 +95,7 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 	assert(result);
 
 	init_result(result);
-	
+
 	len = sizeof(v_intr);
 
 	if (0 != sysctlbyname("vm.stats.sys.v_intr", &v_intr, &len, NULL, 0))
@@ -119,7 +119,7 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 	assert(result);
 
 	init_result(result);
-	
+
 	len = sizeof(v_swtch);
 
 	if (0 != sysctlbyname("vm.stats.sys.v_swtch", &v_swtch, &len, NULL, 0))
@@ -250,9 +250,9 @@ static int	SYSTEM_CPU_LOAD1(AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_cpuload(&value, NULL, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_DBL_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -262,9 +262,9 @@ static int	SYSTEM_CPU_LOAD5(AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_cpuload(NULL, &value, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_DBL_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -274,9 +274,9 @@ static int	SYSTEM_CPU_LOAD15(AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_cpuload(NULL, NULL, &value))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_DBL_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -289,7 +289,7 @@ CPU_FNCLIST
 	int	(*function)();
 };
 
-	CPU_FNCLIST fl[] = 
+	CPU_FNCLIST fl[] =
 	{
 		{"avg1",	SYSTEM_CPU_LOAD1},
 		{"avg5",	SYSTEM_CPU_LOAD5},

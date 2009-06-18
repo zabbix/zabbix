@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -97,12 +97,12 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	/* in this moment this function for this platform unsupported */
+	/* currently this function for this platform is unsupported */
 	return SYSINFO_RET_FAIL;
 }
 
 int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	/* in this moment this function for this platform unsupported */
+	/* currently this function for this platform is unsupported */
 	return SYSINFO_RET_FAIL;
 }

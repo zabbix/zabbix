@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -63,12 +63,12 @@ static int    check_ldap(char *hostname, short port, int *value_int)
 	}
 
 	if( LDAP_SUCCESS != (ldapErr = ldap_search_s(
-		ldap, 
-		"", 
-		LDAP_SCOPE_BASE, 
-		"(objectClass=*)", 
-		attrs, 
-		0, 
+		ldap,
+		"",
+		LDAP_SCOPE_BASE,
+		"(objectClass=*)",
+		attrs,
+		0,
 		&res)) )
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "LDAP - serching failed [%s] [%s]",hostname, ldap_err2string(ldapErr));
@@ -80,7 +80,7 @@ static int    check_ldap(char *hostname, short port, int *value_int)
 		zabbix_log( LOG_LEVEL_DEBUG, " LDAP - empty sort result. [%s] [%s]", hostname, ldap_err2string(ldapErr));
 		goto lbl_ret;
 	}
-       
+
 	attr	= ldap_first_attribute (ldap, msg, &ber);
 
 	valRes	= ldap_get_values( ldap, msg, attr );
@@ -93,13 +93,13 @@ lbl_ret:
 	if(ber) 	ber_free(ber, 0);
 	if(res)		ldap_msgfree(res);
 	if(res)		ldap_unbind(ldap);
-       
+
 	return	SYSINFO_RET_OK;
 }
 #endif
 
 
-/* 
+/*
  *  0- NOT OK
  *  1 - OK
  * */
@@ -109,10 +109,10 @@ static int	check_ssh(const char *host, unsigned short port, int *value_int)
 
 	zbx_sock_t	s;
 
-	char	
+	char
 		send_buf[MAX_BUF_LEN],
 		*recv_buf,
-		*ssh_server, 
+		*ssh_server,
 		*ssh_proto;
 
 	assert(value_int);
@@ -171,7 +171,7 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT
         {
                 return SYSINFO_RET_FAIL;
         }
-        
+
 	if(get_param(param, 1, service, MAX_STRING_LEN) != 0)
         {
                 return SYSINFO_RET_FAIL;
@@ -191,7 +191,7 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT
         {
                 str_port[0] = '\0';
         }
-	
+
 	if(str_port[0] != '\0')
 	{
 		port = atoi(str_port);
@@ -270,7 +270,7 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT
 			SET_DBL_RESULT(result, 0.0);
 		}
 	}
-	
+
 
 	return ret;
 }
@@ -290,12 +290,12 @@ int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
         assert(result);
 
         init_result(result);
-	
+
         if(num_param(param) > 3)
         {
                 return SYSINFO_RET_FAIL;
         }
-        
+
 	if(get_param(param, 1, service, MAX_STRING_LEN) != 0)
         {
                 return SYSINFO_RET_FAIL;
@@ -315,7 +315,7 @@ int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
         {
                 str_port[0] = '\0';
         }
-	
+
 	if(str_port[0] != '\0')
 	{
 		port = atoi(str_port);
@@ -395,4 +395,3 @@ int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	return ret;
 }
-

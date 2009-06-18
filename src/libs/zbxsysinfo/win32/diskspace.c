@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -24,7 +24,7 @@
 
 int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	
+
 	char
 		path[MAX_PATH],
 		mode[20];
@@ -83,4 +83,3 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	return SYSINFO_RET_OK;
 }
-

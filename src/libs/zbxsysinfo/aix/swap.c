@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -167,7 +167,7 @@ static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags,
         init_result(result);
 
 	get_swapinfo(&swaptotal,&swapfree);
-	
+
 	SET_UI64_RESULT(result, swaptotal);
 	return SYSINFO_RET_OK;
 #else
@@ -260,7 +260,7 @@ SWP_FNCLIST
 	int (*function)();
 };
 
-	SWP_FNCLIST fl[] = 
+	SWP_FNCLIST fl[] =
 	{
 		{"total",	SYSTEM_SWAP_TOTAL},
 		{"free",	SYSTEM_SWAP_FREE},
@@ -272,11 +272,11 @@ SWP_FNCLIST
 	char swapdev[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
 	int i;
-	
+
         assert(result);
 
         init_result(result);
-	
+
         if(num_param(param) > 2)
         {
                 return SYSINFO_RET_FAIL;
@@ -297,12 +297,12 @@ SWP_FNCLIST
 	{
 		return SYSINFO_RET_FAIL;
 	}
-	
+
 	if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
-	
+
         if(mode[0] == '\0')
 	{
 		/* default parameter */
@@ -316,7 +316,7 @@ SWP_FNCLIST
 			return (fl[i].function)(cmd, param, flags, result);
 		}
 	}
-	
+
 	return SYSINFO_RET_FAIL;
 }
 
@@ -357,13 +357,12 @@ int     OLD_SWAP(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-    /* in this moment this function for this platform unsupported */
+    /* currently this function for this platform is unsupported */
     return	SYSINFO_RET_FAIL;
 }
 
 int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-    /* in this moment this function for this platform unsupported */
+    /* currently this function for this platform isunsupported */
     return	SYSINFO_RET_FAIL;
 }
-

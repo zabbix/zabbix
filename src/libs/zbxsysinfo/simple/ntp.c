@@ -54,19 +54,19 @@
 
 typedef struct ntp_data_s {
 
-    unsigned char 
-	    status, 
-	    version, 
-	    mode, 
-	    stratum, 
-	    polling, 
+    unsigned char
+	    status,
+	    version,
+	    mode,
+	    stratum,
+	    polling,
 	    precision;
-    double 
-	    dispersion, 
-	    reference, 
-	    originate, 
-	    receive, 
-	    transmit, 
+    double
+	    dispersion,
+	    reference,
+	    originate,
+	    receive,
+	    transmit,
 	    current;
 
 } ntp_data;
@@ -76,7 +76,7 @@ static void make_packet (ntp_data *data)
 	data->status	= NTP_LI_FUDGE<<6;
 	data->stratum	= NTP_STRATUM;
 	data->reference = data->dispersion = 0.0;
-    
+
 	data->version	= NTP_VERSION;
 	data->mode	= 1;
 	data->polling	= NTP_POLLING;
@@ -200,10 +200,10 @@ int	check_ntp(char *host, unsigned short port, int *value_int)
 		{
 			if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
 			{
-			
+
 				unpack_ntp(&data, (unsigned char *)buf, (int)strlen(buf));
 
-#if OFF 
+#if OFF
 			/* local time */	*value_int = time(NULL);
 #else
 			/* server time */	*value_int = (data.receive > 0) ? (int)(data.receive - ZBX_JAN_1970_IN_SEC) : 0;
@@ -220,4 +220,3 @@ int	check_ntp(char *host, unsigned short port, int *value_int)
 
 	return SYSINFO_RET_OK;
 }
-

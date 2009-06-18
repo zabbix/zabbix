@@ -259,10 +259,10 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 			return SYSINFO_RET_FAIL;
 	} else
 		usrinfo = NULL;
-    
+
 	if (0 != get_param(param, 3, buffer, sizeof(buffer)))
 		*buffer = '\0';
-		
+
 	if (*buffer != '\0') {
 		if (0 == strcmp(buffer, "run"))
 			zbx_proc_stat = ZBX_PROC_STAT_RUN;
@@ -336,7 +336,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 			}
 		} else
 			comm_ok = 1;
-		
+
 		if (proc_ok && stat_ok && comm_ok)
 			proccount++;
 	}

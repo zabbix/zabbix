@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -158,7 +158,7 @@ static int	get_cpuload(double *load1, double *load5, double *load15)
 		*load5 = (double)ps_cpu_total.loadavg[1] / (1 << SBITS);
 	if (NULL != load15)
 		*load15 = (double)ps_cpu_total.loadavg[2] / (1 << SBITS);
- 
+
 	return SYSINFO_RET_OK;
 #else
 	return SYSINFO_RET_FAIL;
@@ -171,9 +171,9 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	if (SYSINFO_RET_OK != get_cpuload(&value, NULL, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_DBL_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -183,9 +183,9 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	if (SYSINFO_RET_OK != get_cpuload(NULL, &value, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_DBL_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -195,9 +195,9 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	if (SYSINFO_RET_OK != get_cpuload(NULL, NULL, &value))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_DBL_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -211,7 +211,7 @@ CPU_FNCLIST
 	int (*function)();
 };
 
-	CPU_FNCLIST fl[] = 
+	CPU_FNCLIST fl[] =
 	{
 		{"avg1" ,	SYSTEM_CPU_LOAD1},
 		{"avg5" ,	SYSTEM_CPU_LOAD5},
@@ -239,7 +239,7 @@ CPU_FNCLIST
 
 	if (0 != strcmp(cpuname, "all"))
 		return SYSINFO_RET_FAIL;
-	
+
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
 
@@ -269,7 +269,7 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, (zbx_uint64_t)ps_cpu_total.pswitch);
- 
+
 	return SYSINFO_RET_OK;
 #else
 	return SYSINFO_RET_FAIL;
@@ -291,10 +291,9 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, (zbx_uint64_t)(ps_cpu_total.devintrs + ps_cpu_total.softintrs));
- 
+
 	return SYSINFO_RET_OK;
 #else
 	return SYSINFO_RET_FAIL;
 #endif
 }
-

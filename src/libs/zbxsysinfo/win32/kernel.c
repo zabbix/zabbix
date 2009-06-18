@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -44,4 +44,3 @@ int     OLD_KERNEL(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	/* SKIP REALIZATEION */
 	return SYSINFO_RET_FAIL;
 }
-

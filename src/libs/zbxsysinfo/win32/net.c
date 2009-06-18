@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -66,4 +66,3 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
 
 	return SYSINFO_RET_FAIL;
 }
-

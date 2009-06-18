@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -29,7 +29,7 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	assert(result);
 
-        init_result(result);	
+        init_result(result);
 
 	mib[0]=CTL_KERN;
 	mib[1]=KERN_MAXFILES;
@@ -56,8 +56,8 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	assert(result);
 
-        init_result(result);	
-	
+        init_result(result);
+
 	mib[0]=CTL_KERN;
 	mib[1]=KERN_MAXPROC;
 
@@ -69,7 +69,7 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 /*		printf("Errno [%m]");*/
 	}
 
-	
+
      	SET_UI64_RESULT(result, maxproc);
 	return SYSINFO_RET_OK;
 #else
@@ -84,7 +84,7 @@ int     OLD_KERNEL(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         assert(result);
 
-        init_result(result);	
+        init_result(result);
 
         if(num_param(param) > 1)
         {
@@ -111,4 +111,3 @@ int     OLD_KERNEL(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         return ret;
 }
-
