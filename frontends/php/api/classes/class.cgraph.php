@@ -200,9 +200,9 @@ class CGraph {
 	 * 	int 'ymin_itemid' 		=> 0,
 	 * 	int 'ymax_itemid' 		=> 0,
 	 * 	int 'show_work_period' 	=> 1,
-	 * 	int 'show_triggers' 		=> 1,
+	 * 	int 'show_triggers' 	=> 1,
 	 * 	int 'graphtype' 		=> 0,
-	 * 	int 'show_legend' 			=> 0,
+	 * 	int 'show_legend' 		=> 0,
 	 * 	int 'show_3d' 			=> 0,
 	 * 	int 'percent_left' 		=> 0,
 	 * 	int 'percent_right' 	=> 0
@@ -339,6 +339,7 @@ class CGraph {
 		$error = 'Unknown ZABBIX internal error';
 		$result_ids = array();
 		$result = false;
+		$tpl_graph = false;
 		
 		$graphid = $items['graphid'];
 		$items_tmp = $items['items'];
@@ -388,10 +389,11 @@ class CGraph {
 				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'You must use items only from host : '.$host['host'].' for template graph : '.$graph['name']);
 				return false;
 			}
+			$tpl_graph = true;
 		}
 		
 		DBstart(false);
-		$result = self::addItems_rec($graphid, $items);
+		$result = self::addItems_rec($graphid, $items, $tpl_graph);
 		$result = DBend($result);
 		
 		if($result){
@@ -403,40 +405,30 @@ class CGraph {
 		}
 	}
 	
-	protected static function addItems_rec($graphid, $items){
-	
-		$error = 'Error adding item in recursive function';
-		$result_ids = array();
+	protected static function addItems_rec($graphid, $items, $tpl_graph=false){
 		
-		$chd_graphs = get_graphs_by_templateid($graphid);
-		while($chd_graph = DBfetch($chd_graphs)){
-			$tmp_hosts = get_hosts_by_graphid($chd_graph['graphid']);
-			$chd_host = DBfetch($tmp_hosts);
-			
-			if(!$new_gitems = get_same_graphitems_for_host($gitems, $chd_host['hostid'])){ /* skip host with missed items */
-				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Can not update graph "'.$chd_graph['name'].'" for host "'.$chd_host['host'].'"');
-				return false;
+		if($tpl_graph){
+			$chd_graphs = get_graphs_by_templateid($graphid);
+			while($chd_graph = DBfetch($chd_graphs)){
+				$result = self::addItems_rec($chd_graph['graphid'], $items, $tpl_graph);
+				if(!$result) return false;
 			}
 		
-			$result = self::addItems_rec($chd_graph['graphid'], $items);
-			if(!$result) return false;
-			$result_ids = array_merge($result, $result_ids);
+			$tmp_hosts = get_hosts_by_graphid($graphid);
+			$graph_host = DBfetch($tmp_hosts);
+			if(!$items = get_same_graphitems_for_host($items, $graph_host['hostid'])){ 
+				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Can not update graph "'.$chd_graph['name'].'" for host "'.$graph_host['host'].'"');
+				return false;
+			}
 		}
-			
+		
 		foreach($items as $item){
 			$result = add_item_to_graph($graphid,$item['itemid'],$item['color'],$item['drawtype'],$item['sortorder'],$item['yaxisside'],
 						$item['calc_fnc'],$item['type'],$item['periods_cnt']);
-			if(!$result) break;
-			$result_ids[$result] = $result;
+			if(!$result) return false;
 		}
 		
-		if($result){
-			return $result_ids;
-		}
-		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
-			return false;
-		}
+		return true;
 	}
 	
 	/**
@@ -464,13 +456,27 @@ class CGraph {
 		
 		$chd_graphs = get_graphs_by_templateid($graphid);
 		while($chd_graph = DBfetch($chd_graphs)){
-			$result = self::deleteItems(item_list, true);
+			$item_list['graphid'] = $chd_graph['graphid'];
+			$result = self::deleteItems($item_list, true);
 			if(!$result) return false;
 		}
 		
-		$sql = 'DELETE 
+		
+		$sql = 'SELECT curr.itemid
+				FROM graphs_items gi, items curr, items src
+				WHERE gi.graphid='.$graphid.
+					' AND gi.itemid=curr.itemid
+					AND curr.key_=src.key_
+					AND '.DBcondition('src.itemid', $items);
+		$db_items = DBselect($sql);
+		while($curr_item = DBfetch($db_items)){
+			$gitems[$curr_item['itemid']] = $curr_item['itemid'];
+		}
+
+		$sql = 'DELETE
 				FROM graphs_items 
-				WHERE '.DBcondition('itemid', $items);
+				WHERE graphid='.$graphid.
+					' AND '.DBcondition('itemid', $gitems);
 		$result = DBselect($sql);
 		
 		return $result;
