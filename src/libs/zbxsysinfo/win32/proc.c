@@ -47,15 +47,15 @@ static int GetProcessUsername(HANDLE hProcess, char *userName)
 		return res;
 
 	// Get required buffer size and allocate the TOKEN_USER buffer
-	if (0 == GetTokenInformation(tok, (TOKEN_INFORMATION_CLASS)1, (LPVOID)ptu, 0, &sz)) 
+	if (0 == GetTokenInformation(tok, (TOKEN_INFORMATION_CLASS)1, (LPVOID)ptu, 0, &sz))
 	{
-		if (GetLastError() != ERROR_INSUFFICIENT_BUFFER) 
+		if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
 			goto lbl_err;
 		ptu = (PTOKEN_USER)zbx_malloc(ptu, sz);
 	}
 
 	// Get the token user information from the access token.
-	if (0 == GetTokenInformation(tok, (TOKEN_INFORMATION_CLASS)1, (LPVOID)ptu, sz, &sz)) 
+	if (0 == GetTokenInformation(tok, (TOKEN_INFORMATION_CLASS)1, (LPVOID)ptu, sz, &sz))
 		goto lbl_err;
 
 	//get the account/domain name of the SID
@@ -94,7 +94,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		user_ok = 0;
 	char	procName[MAX_PATH],
 		userName[MAX_PATH],
-		baseName[MAX_PATH], 
+		baseName[MAX_PATH],
 		uname[MAX_NAME];
 
 	if (num_param(param) > 2)
@@ -119,7 +119,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 		if (NULL != (hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, procList[i])))
 		{
-			if ('\0' != *procName) 
+			if ('\0' != *procName)
 			{
 				if (0 != EnumProcessModules(hProcess, &hMod, sizeof(hMod), &dwSize))
 					if (0 != GetModuleBaseName(hProcess, hMod, baseName, sizeof(baseName)))
@@ -171,7 +171,7 @@ static double ConvertProcessTime(FILETIME *lpft)
 
 static double GetProcessAttribute(HANDLE hProcess,int attr,int type,int count,double *lastValue)
 {
-   double value;  
+   double value;
    PROCESS_MEMORY_COUNTERS mc;
    IO_COUNTERS ioCounters;
    FILETIME ftCreate,ftExit,ftKernel,ftUser;

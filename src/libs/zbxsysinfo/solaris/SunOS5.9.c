@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -49,7 +49,7 @@
 
 /*
  * ADDED to /solaric/diskio.c
- *   
+ *
 typedef struct busy_data
 {
   hrtime_t clock;
@@ -102,10 +102,10 @@ typedef struct disk_data
 
 /*
  * ADDED to /solaric/net.c
- *   
+ *
 typedef union value_overlay
 {
-  union 
+  union
   {
     zbx_uint64_t ui64;
     uint32_t ui32;
@@ -151,7 +151,7 @@ static NETWORK_DATA *interfaces;
 
 /*
  * ADDED to /solaric/diskio.c
- *   
+ *
 static DISK_DATA *disks;
 
 static DISK_DATA *get_disk_data_record(const char *device)
@@ -161,7 +161,7 @@ static DISK_DATA *get_disk_data_record(const char *device)
   p = disks;
 
   while ((p) && (strcmp(p->name, device) != 0))
-    p = p->next;  
+    p = p->next;
 
   if (p == (DISK_DATA *) NULL)
     {
@@ -174,7 +174,7 @@ static DISK_DATA *get_disk_data_record(const char *device)
           if (p->name)
             {
 	      p->next = disks;
-              
+
               disks = p;
             }
 
@@ -193,7 +193,7 @@ static DISK_DATA *get_disk_data_record(const char *device)
 
 /*
  * ADDED to /solaric/net.c
- *   
+ *
 static NETWORK_DATA *get_net_data_record(const char *device)
 {
   NETWORK_DATA *p;
@@ -201,7 +201,7 @@ static NETWORK_DATA *get_net_data_record(const char *device)
   p = interfaces;
 
   while ((p) && (strcmp(p->name, device) != 0))
-    p = p->next;  
+    p = p->next;
 
   if (p == (NETWORK_DATA *) NULL)
     {
@@ -214,7 +214,7 @@ static NETWORK_DATA *get_net_data_record(const char *device)
           if (p->name)
             {
 	      p->next = interfaces;
-              
+
               interfaces = p;
             }
 
@@ -242,7 +242,7 @@ static int  PROCCNT(const char *cmd, const char *procname,double  *value, const 
 	char	filename[MAX_STRING_LEN];
 
 	int	fd;
-// In the correct procfs.h, the structure name is psinfo_t 
+// In the correct procfs.h, the structure name is psinfo_t
 	psinfo_t psinfo;
 
 	int	proccount=0;
@@ -255,7 +255,7 @@ static int  PROCCNT(const char *cmd, const char *procname,double  *value, const 
 
 	while((entries=readdir(dir))!=NULL)
 	{
-		strscpy(filename,"/proc/");	
+		strscpy(filename,"/proc/");
 		strncat(filename,entries->d_name,MAX_STRING_LEN);
 		strncat(filename,"/psinfo",MAX_STRING_LEN);
 
@@ -292,10 +292,10 @@ static int  PROCCNT(const char *cmd, const char *procname,double  *value, const 
 
 /*
  * ADDED to /solaric/diskio.c
- *   
+ *
 static int get_disk_kstat_record(const char *name,
                                  hrtime_t *crtime,
-                                 hrtime_t *snaptime, 
+                                 hrtime_t *snaptime,
                                  kstat_io_t *returned_data)
 {
   int result = SYSINFO_RET_FAIL;
@@ -350,7 +350,7 @@ static int DISKREADOPS(const char *cmd, const char *device,double  *value, const
              if (interval_seconds > 0)
                *value = (kio.reads - p->reads.reads) / interval_seconds;
 
-   	     else 
+   	     else
                 *value = 0.0;
 
             p->reads.clock = snaptime;
@@ -385,8 +385,8 @@ static int DISKREADBLOCKS(const char *cmd, const char *device,double  *value, co
              if (interval_seconds > 0)
                 *value = ((kio.nread - p->rblocks.nread) / 1024.0) / interval_seconds;
 
-   	     else 
-                *value = 0.0; 
+   	     else
+                *value = 0.0;
 
             p->rblocks.clock = snaptime;
 
@@ -420,8 +420,8 @@ static int DISKWRITEOPS(const char *cmd, const char *device,double  *value, cons
 	     if (interval_seconds > 0)
                 *value = (kio.writes - p->writes.writes) / interval_seconds;
 
-  	     else 
-                *value = 0.0; 
+  	     else
+                *value = 0.0;
 
             p->writes.clock = snaptime;
 
@@ -455,8 +455,8 @@ static int DISKWRITEBLOCKS(const char *cmd, const char *device,double  *value, c
              if (interval_seconds > 0)
                 *value = ((kio.nwritten - p->wblocks.nwritten) / 1024.0) / interval_seconds;
 
-	     else 
-                *value = 0.0; 
+	     else
+                *value = 0.0;
 
             p->wblocks.clock = snaptime;
 
@@ -486,7 +486,7 @@ static int DISKBUSY(const char *cmd, const char *device, double  *value, const c
              if (snaptime > p->busy.clock)
                 *value = ((kio.rtime - p->busy.rtime) * 100.0) / (snaptime - p->busy.clock);
 
-   	     else 
+   	     else
                *value = 0.0;
 
              p->busy.clock = snaptime;
@@ -536,7 +536,7 @@ static int DISKSVC(const char *cmd, const char *device, double  *value, const ch
 
 /*
  * ADDED to /solaric/cpu.c
- *   
+ *
 static int get_cpu_data(zbx_uint64_t *idle,
                         zbx_uint64_t *system,
                         zbx_uint64_t *user,
@@ -598,7 +598,7 @@ static int CPUIDLE(const char *cmd, const char *param, double  *value, const cha
 	                  + (system[1] - system[0])
 	                  + (user[1] - user[0])
 	                  + (iowait[1] - iowait[0]);
- 
+
          if (interval_size > 0)
             {
 	       *value = ((idle[1] - idle[0]) * 100.0)/interval_size;
@@ -632,7 +632,7 @@ static int CPUUSER(const char *cmd, const char *param,double  *value, const char
                           + (system[1] - system[0])
 	                  + (user[1] - user[0])
 	                  + (iowait[1] - iowait[0]);
- 
+
          if (interval_size > 0)
             {
 	       *value = ((user[1] - user[0]) * 100.0)/interval_size;
@@ -666,7 +666,7 @@ static int CPUSYSTEM(const char *cmd, const char *param,double  *value, const ch
                           + (system[1] - system[0])
 	                  + (user[1] - user[0])
 	                  + (iowait[1] - iowait[0]);
- 
+
          if (interval_size > 0)
             {
 	       *value = ((system[1] - system[0]) * 100.0)/interval_size;
@@ -700,7 +700,7 @@ static int CPUIOWAIT(const char *cmd, const char *param,double  *value, const ch
                           + (system[1] - system[0])
 	                  + (user[1] - user[0])
 	                  + (iowait[1] - iowait[0]);
- 
+
          if (interval_size > 0)
             {
 	       *value = ((iowait[1] - iowait[0]) * 100.0)/interval_size;
@@ -720,8 +720,8 @@ static int CPUIOWAIT(const char *cmd, const char *param,double  *value, const ch
 
 /*
  * ADDED to /solaric/net.c
- *   
-static int get_named_field(const char *name, 
+ *
+static int get_named_field(const char *name,
                            const char *field,
                            kstat_named_t *returned_data,
                            hrtime_t *snaptime)
@@ -746,7 +746,7 @@ static int get_named_field(const char *name,
                   *snaptime = kp->ks_snaptime;
 
                   *returned_data = *kn;
- 
+
                   result = SYSINFO_RET_OK;
                }
 
@@ -860,7 +860,7 @@ static int NETERRSIN(const char *cmd, const char *parameter,double  *value, cons
   int result;
   kstat_named_t kn;
   hrtime_t snaptime;
-  
+
   result = get_named_field(parameter, "ierrors", &kn, &snaptime);
 
   if (result == SYSINFO_RET_OK)
@@ -972,7 +972,7 @@ static int NETERRSOUT(const char *cmd, const char *parameter,double  *value, con
   int result;
   kstat_named_t kn;
   hrtime_t snaptime;
-  
+
   result = get_named_field(parameter, "oerrors", &kn, &snaptime);
 
   if (result == SYSINFO_RET_OK)
@@ -986,7 +986,7 @@ static int NETCOLLOUT(const char *cmd, const char *parameter,double  *value, con
   int result;
   kstat_named_t kn;
   hrtime_t snaptime;
-  
+
   result = get_named_field(parameter, "collisions", &kn, &snaptime);
 
   if (result == SYSINFO_RET_OK)
@@ -998,7 +998,7 @@ static int NETCOLLOUT(const char *cmd, const char *parameter,double  *value, con
 
 /*
  * ADDED
- * 
+ *
 int	INODEFREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 	struct statvfs   s;
@@ -1015,7 +1015,7 @@ int	INODEFREE(const char *cmd, const char *mountPoint,double  *value, const char
 
 /*
  * ADDED
- * 
+ *
 int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 	struct statvfs   s;
@@ -1032,7 +1032,7 @@ int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value, const cha
 
 /*
  * ADDED
- * 
+ *
 int	DISKFREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 	struct statvfs   s;
@@ -1050,7 +1050,7 @@ int	DISKFREE(const char *cmd, const char *mountPoint,double  *value, const char 
 
 /*
  * ADDED
- * 
+ *
 int	DISKUSED(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 	struct statvfs   s;
@@ -1068,7 +1068,7 @@ int	DISKUSED(const char *cmd, const char *mountPoint,double  *value, const char 
 
 /*
  * ADDED
- * 
+ *
 int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 	struct statvfs   s;
@@ -1086,7 +1086,7 @@ int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value, const char
 
 /*
  * ADDED
- * 
+ *
 static int	TOTALMEM(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	*value=(double)sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE);
@@ -1096,7 +1096,7 @@ static int	TOTALMEM(const char *cmd, const char *parameter,double  *value, const
 
 /*
  * ADDED
- * 
+ *
 static int	FREEMEM(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	*value=(double)sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE);
@@ -1106,7 +1106,7 @@ static int	FREEMEM(const char *cmd, const char *parameter,double  *value, const 
 
 /*
  * ADDED
- * 
+ *
 static int KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   int result = SYSINFO_RET_FAIL;
@@ -1142,7 +1142,7 @@ static int KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value,
 
 /*
  * ADDED
- * 
+ *
 static int UPTIME(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
    {
       int result = SYSINFO_RET_FAIL;
@@ -1164,9 +1164,9 @@ static int UPTIME(const char *cmd, const char *parameter,double  *value, const c
 	          kn = (kstat_named_t*) kstat_data_lookup(kp, "boot_time");
 
                   time(&now);
- 
+
 	          *value=difftime(now, (time_t) kn->value.ul);
-                  
+
                   result = SYSINFO_RET_OK;
                }
 
@@ -1179,7 +1179,7 @@ static int UPTIME(const char *cmd, const char *parameter,double  *value, const c
 
 /*
  * ADDED
- * 
+ *
 static int	PROCLOAD(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	double	load[3];
@@ -1191,14 +1191,14 @@ static int	PROCLOAD(const char *cmd, const char *parameter,double  *value, const
 	}
 	else
 	{
-		return SYSINFO_RET_FAIL;	
+		return SYSINFO_RET_FAIL;
 	}
 }
 */
 
 /*
  * ADDED
- * 
+ *
 static int	PROCLOAD5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	double	load[3];
@@ -1210,33 +1210,33 @@ static int	PROCLOAD5(const char *cmd, const char *parameter,double  *value, cons
 	}
 	else
 	{
-		return SYSINFO_RET_FAIL;	
+		return SYSINFO_RET_FAIL;
 	}
 }
 */
 
 /*
  * ADDED
- * 
+ *
 static int	PROCLOAD15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	double	load[3];
 
 	if(getloadavg(load, 3))
 	{
-		*value=load[2];	
+		*value=load[2];
 		return SYSINFO_RET_OK;
 	}
 	else
 	{
-		return SYSINFO_RET_FAIL;	
+		return SYSINFO_RET_FAIL;
 	}
 }
 */
 
 /*
  * ADDED
- * 
+ *
 static int get_swap_data(zbx_uint64_t *resv,
                          zbx_uint64_t *avail,
                          zbx_uint64_t *free)
@@ -1273,11 +1273,11 @@ static int get_swap_data(zbx_uint64_t *resv,
                       vm = (vminfo_t *) ksp->ks_data;
 
                       if ((oresv != vm->swap_resv) || (ofree != vm->swap_free) || (oavail != vm->swap_avail))
-	                 {  
+	                 {
 			    *resv = vm->swap_resv - oresv;
                             *free = vm->swap_free - ofree;
                             *avail = vm->swap_avail - oavail;
-                          
+
                              result = SYSINFO_RET_OK;
 
 			     break;
@@ -1328,7 +1328,7 @@ int SWAPTOTAL(const char *cmd, const char *parameter,double  *value, const char 
 
 /*
  * ADDED
- * 
+ *
 static int SWAPIN(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   kstat_ctl_t *kc;
@@ -1341,7 +1341,7 @@ static int SWAPIN(const char *cmd, const char *parameter,double  *value, const c
   if (kc)
     {
       kstat_t *k = kc->kc_chain;
-      
+
       while (k)
 	{
 	  if (     (strncmp(k->ks_name, "cpu_stat", 8) == 0)
@@ -1367,7 +1367,7 @@ static int SWAPIN(const char *cmd, const char *parameter,double  *value, const c
 
 /*
  * ADDED
- * 
+ *
 static int SWAPOUT(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   kstat_ctl_t *kc;
@@ -1380,7 +1380,7 @@ static int SWAPOUT(const char *cmd, const char *parameter,double  *value, const 
   if (kc)
     {
       kstat_t *k = kc->kc_chain;
-      
+
       while (k)
 	{
 	  if (     (strncmp(k->ks_name, "cpu_stat", 8) == 0)
@@ -1427,7 +1427,7 @@ static int PROCCOUNT(const char *cmd, const char *parameter,double  *value, cons
 	          kn = (kstat_named_t*) kstat_data_lookup(kp, "nproc");
 
 	          *value = (double) kn->value.ul;
-                  
+
                   result = SYSINFO_RET_OK;
                }
 
@@ -1440,7 +1440,7 @@ static int PROCCOUNT(const char *cmd, const char *parameter,double  *value, cons
 
 /*
  * ADDED
- * 
+ *
 static int PROCRUNNING(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	DIR	*dir;
@@ -1463,7 +1463,7 @@ static int PROCRUNNING(const char *cmd, const char *parameter,double  *value, co
 
 	while((entries=readdir(dir))!=NULL)
 	{
-		strscpy(filename,"/proc/");	
+		strscpy(filename,"/proc/");
 		strncat(filename,entries->d_name,MAX_STRING_LEN);
 		strncat(filename,"/psinfo",MAX_STRING_LEN);
 
@@ -1500,7 +1500,7 @@ static int PROCRUNNING(const char *cmd, const char *parameter,double  *value, co
 
 /*
  * ADDED
- * 
+ *
 static int CSWITCHES(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   kstat_ctl_t *kc;
@@ -1513,7 +1513,7 @@ static int CSWITCHES(const char *cmd, const char *parameter,double  *value, cons
   if (kc)
     {
       kstat_t *k = kc->kc_chain;
-      
+
       while (k)
 	{
 	  if (     (strncmp(k->ks_name, "cpu_stat", 8) == 0)
@@ -1537,24 +1537,24 @@ static int CSWITCHES(const char *cmd, const char *parameter,double  *value, cons
 }
 */
 
-/* 
+/*
  * ADDED to /solaris/net.c
- * 
+ *
 static int TCP_LISTEN(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   char command[MAX_STRING_LEN];
-  
+
   memset(command, '\0', sizeof command);
 
   zbx_snprintf(command, sizeof(command), "netstat -an | grep '*.%s' | wc -l", parameter);
-   
+
   return EXECUTE_INT(NULL, command, value, msg, mlen_max);
 }
 */
 
-/* 
+/*
  * ADDED
- * 
+ *
 static int INTERRUPTS(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   kstat_ctl_t *kc;
@@ -1567,7 +1567,7 @@ static int INTERRUPTS(const char *cmd, const char *parameter,double  *value, con
   if (kc)
     {
       kstat_t *k = kc->kc_chain;
-      
+
       while (k)
 	{
 	  if (     (strncmp(k->ks_name, "cpu_stat", 8) == 0)
@@ -1591,9 +1591,9 @@ static int INTERRUPTS(const char *cmd, const char *parameter,double  *value, con
 }
 */
 
-/* 
+/*
  * ALREADY ADDED
- * 
+ *
 #ifdef HAVE_LDAP
 static int check_ldap(char *hostname, short port,int *value, const char *msg, int mlen_max)
 {
@@ -1635,7 +1635,7 @@ static int check_ldap(char *hostname, short port,int *value, const char *msg, in
 		*value=0;
 		return	SYSINFO_RET_OK;
 	}
-       
+
 	attr = ldap_first_attribute (ldap, msg, &ber);
 	valRes = ldap_get_values( ldap, msg, attr );
 
@@ -1646,7 +1646,7 @@ static int check_ldap(char *hostname, short port,int *value, const char *msg, in
 	}
 	ldap_msgfree(res);
 	ldap_unbind(ldap);
-       
+
 	*value=1;
 	return	SYSINFO_RET_OK;
 }
@@ -1666,7 +1666,7 @@ ZBX_METRIC agent_commands[]=
 
         {"memory[total]"        ,TOTALMEM,              0, 0},
         {"memory[free]"         ,FREEMEM,               0, 0},
-	
+
         /*
         {"memory[shared]"       ,SHAREDMEM,             0, 0},
         {"memory[buffers]"      ,BUFFERSMEM,            0, 0},

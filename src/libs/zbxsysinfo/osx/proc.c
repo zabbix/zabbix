@@ -25,7 +25,7 @@
 #define DO_MAX 1
 #define DO_MIN 2
 #define DO_AVG 3
-				    
+
 int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(HAVE_PROC_1_STATUS)
@@ -59,7 +59,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
         assert(result);
 
         init_result(result);
-	
+
         if(num_param(param) > 3)
         {
                 return SYSINFO_RET_FAIL;
@@ -69,7 +69,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
         {
                 return SYSINFO_RET_FAIL;
         }
-    
+
         if(get_param(param, 2, usrname, MAX_STRING_LEN) != 0)
         {
                 usrname[0] = 0;
@@ -83,7 +83,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                     {
 	                /* incorrect user name */
                             return SYSINFO_RET_FAIL;
-	            }			        
+	            }
         }
     }
 
@@ -96,7 +96,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
     {
         strscpy(mode, "sum");
     }
-    
+
     if(strcmp(mode,"avg") == 0)
     {
         do_task = DO_AVG;
@@ -117,7 +117,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
     {
         return SYSINFO_RET_FAIL;
     }
-    
+
     dir=opendir("/proc");
     if(NULL == dir)
     {
@@ -128,25 +128,25 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
     {
         proc_ok = 0;
         usr_ok = 0;
-    
-        strscpy(filename,"/proc/");	
+
+        strscpy(filename,"/proc/");
         zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
         zbx_strlcat(filename,"/status",MAX_STRING_LEN);
-    
+
     /* Self is a symbolic link. It leads to incorrect results for proc_cnt[zabbix_agentd] */
     /* Better approach: check if /proc/x/ is symbolic link */
         if(strncmp(entries->d_name,"self",MAX_STRING_LEN) == 0)
         {
             continue;
         }
-    
+
         if(stat(filename,&buf)==0)
         {
             if(NULL == (f = fopen(filename,"r") ))
             {
                 continue;
             }
-    
+
             if(procname[0] != 0)
             {
                 fgets(line,MAX_STRING_LEN,f);
@@ -160,8 +160,8 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                                             }
                                     }
                             }
-            
-                if(proc_ok == 0) 
+
+                if(proc_ok == 0)
                 {
                     zbx_fclose(f);
                     continue;
@@ -171,22 +171,22 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
             {
                 proc_ok = 1;
             }
-            
+
             if(usrinfo != NULL)
             {
                 while(fgets(line, MAX_STRING_LEN, f) != NULL)
-                {	
-                
+                {
+
                     if(sscanf(line, "%s\t%lli\n", name1, &llvalue) != 2)
                     {
                         continue;
                     }
-                    
+
                     if(strcmp(name1,"Uid:") != 0)
                     {
                         continue;
                     }
-                    
+
                     if(usrinfo->pw_uid == (uid_t)(llvalue))
                     {
                         usr_ok = 1;
@@ -198,24 +198,24 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
             {
                 usr_ok = 1;
             }
-            
+
             if(proc_ok && usr_ok)
             {
                 while(fgets(line, MAX_STRING_LEN, f) != NULL)
-                {	
-                
+                {
+
                     if(sscanf(line, "%s\t%lli %s\n", name1, &llvalue, name2) != 3)
                     {
                         continue;
                     }
-                    
+
                     if(strcmp(name1,"VmSize:") != 0)
                     {
                         continue;
                     }
-                    
+
                     proccount++;
-                    
+
                     if(strcasecmp(name2, "kB") == 0)
                     {
                         llvalue <<= 10;
@@ -232,7 +232,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                     {
                         llvalue <<= 40;
                     }
-                    
+
                     if(memsize < 0)
                     {
                         memsize = (double) llvalue;
@@ -252,23 +252,23 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                             memsize +=  (double) llvalue;
                         }
                     }
-                    
+
                     break;
                 }
             }
-            
-                    
+
+
             zbx_fclose(f);
         }
     }
     closedir(dir);
-    
+
     if(memsize < 0)
     {
         /* incorrect process name */
         memsize = 0;
     }
-    
+
     if(do_task == DO_AVG)
     {
 	SET_DBL_RESULT(result, proccount == 0 ? 0 : ((double)memsize/(double)proccount));
@@ -313,18 +313,18 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
         assert(result);
 
         init_result(result);
-	
-    
+
+
         if(num_param(param) > 3)
         {
                 return SYSINFO_RET_FAIL;
         }
-    
+
         if(get_param(param, 1, procname, MAX_STRING_LEN) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
-    
+
         if(get_param(param, 2, usrname, MAX_STRING_LEN) != 0)
         {
                 usrname[0] = 0;
@@ -338,10 +338,10 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 {
                     /* incorrect user name */
                     return SYSINFO_RET_FAIL;
-                }			        
+                }
             }
         }
-    
+
 	if(get_param(param, 3, procstat, MAX_STRING_LEN) != 0)
 	{
 		procstat[0] = '\0';
@@ -351,18 +351,18 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	{
 		strscpy(procstat, "all");
 	}
-    
+
         if(strcmp(procstat,"run") == 0)
         {
-            strscpy(procstat,"R");	
+            strscpy(procstat,"R");
         }
         else if(strcmp(procstat,"sleep") == 0)
         {
-            strscpy(procstat,"S");	
+            strscpy(procstat,"S");
         }
         else if(strcmp(procstat,"zomb") == 0)
         {
-            strscpy(procstat,"Z");	
+            strscpy(procstat,"Z");
         }
         else if(strcmp(procstat,"all") == 0)
         {
@@ -372,7 +372,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
         {
             return SYSINFO_RET_FAIL;
         }
-		
+
         dir=opendir("/proc");
         if(NULL == dir)
         {
@@ -384,7 +384,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
             proc_ok = 0;
             stat_ok = 0;
             usr_ok = 0;
-    
+
 /* Self is a symbolic link. It leads to incorrect results for proc_cnt[zabbix_agentd] */
 /* Better approach: check if /proc/x/ is symbolic link */
             if(strncmp(entries->d_name,"self",MAX_STRING_LEN) == 0)
@@ -392,7 +392,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 continue;
             }
 
-            strscpy(filename,"/proc/");	
+            strscpy(filename,"/proc/");
             zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
             zbx_strlcat(filename,"/status",MAX_STRING_LEN);
 
@@ -402,7 +402,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 {
                     continue;
                 }
-    
+
                 if(procname[0] != 0)
                 {
                     fgets(line,MAX_STRING_LEN,f);
@@ -416,8 +416,8 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                             }
                         }
                     }
-                
-                    if(proc_ok == 0) 
+
+                    if(proc_ok == 0)
                     {
                         zbx_fclose(f);
                         continue;
@@ -431,18 +431,18 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 if(procstat[0] != 0)
                 {
                     while(fgets(line, MAX_STRING_LEN, f) != NULL)
-                    {	
-                    
+                    {
+
                         if(sscanf(line, "%s\t%s\n", name1, name2) != 2)
                         {
                             continue;
                         }
-                        
+
                         if(strcmp(name1,"State:") != 0)
                         {
                             continue;
                         }
-                        
+
                         if(strcmp(name2, procstat))
                         {
                             stat_ok = 1;
@@ -454,22 +454,22 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 {
                     stat_ok = 1;
                 }
-                
+
                 if(usrinfo != NULL)
                 {
                     while(fgets(line, MAX_STRING_LEN, f) != NULL)
-                    {	
-                    
+                    {
+
                         if(sscanf(line, "%s\t%li\n", name1, &lvalue) != 2)
                         {
                             continue;
                         }
-                        
+
                         if(strcmp(name1,"Uid:") != 0)
                         {
                             continue;
                         }
-                        
+
                         if(usrinfo->pw_uid == (uid_t)(lvalue))
                         {
                             usr_ok = 1;
@@ -481,12 +481,12 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 {
                     usr_ok = 1;
                 }
-                
+
                 if(proc_ok && stat_ok && usr_ok)
                 {
                     proccount++;
                 }
-                
+
                 zbx_fclose(f);
             }
     }

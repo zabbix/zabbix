@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -188,7 +188,7 @@ FS_FNCLIST
 	int (*function)();
 };
 
-	FS_FNCLIST fl[] = 
+	FS_FNCLIST fl[] =
 	{
 		{"free" ,	VFS_FS_FREE},
 		{"total" ,	VFS_FS_TOTAL},
@@ -201,11 +201,11 @@ FS_FNCLIST
 	char fsname[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
 	int i;
-	
+
         assert(result);
 
         init_result(result);
-	
+
         if(num_param(param) > 2)
         {
                 return SYSINFO_RET_FAIL;
@@ -215,7 +215,7 @@ FS_FNCLIST
         {
                 return SYSINFO_RET_FAIL;
         }
-	
+
 	if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
@@ -225,7 +225,7 @@ FS_FNCLIST
 		/* default parameter */
 		zbx_snprintf(mode, sizeof(mode), "total");
 	}
-	
+
 	for(i=0; fl[i].mode!=0; i++)
 	{
 		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
@@ -233,7 +233,6 @@ FS_FNCLIST
 			return (fl[i].function)(cmd, fsname, flags, result);
 		}
 	}
-	
+
 	return SYSINFO_RET_FAIL;
 }
-

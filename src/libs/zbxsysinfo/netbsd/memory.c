@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -59,9 +59,9 @@ static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_vm_stat(&value, NULL, NULL, NULL, NULL, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_UI64_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -71,9 +71,9 @@ static int	VM_MEMORY_FREE(AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_vm_stat(NULL, &value, NULL, NULL, NULL, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_UI64_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -83,9 +83,9 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_vm_stat(NULL, NULL, &value, NULL, NULL, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_UI64_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -95,9 +95,9 @@ static int	VM_MEMORY_PFREE(AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_vm_stat(NULL, NULL, NULL, &value, NULL, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_DBL_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -107,9 +107,9 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_vm_stat(NULL, NULL, NULL, NULL, &value, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_DBL_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -163,9 +163,9 @@ static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_vm_stat(NULL, NULL, NULL, NULL, NULL, &value))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_UI64_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -178,7 +178,7 @@ MEM_FNCLIST
 	int	(*function)();
 };
 
-	MEM_FNCLIST fl[] = 
+	MEM_FNCLIST fl[] =
 	{
 		{"total",	VM_MEMORY_TOTAL},
 		{"free",	VM_MEMORY_FREE},

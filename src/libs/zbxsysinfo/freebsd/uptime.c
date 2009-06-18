@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -57,7 +57,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		return SYSINFO_RET_FAIL;
 
 	now = time(NULL);
-	
+
 	SET_UI64_RESULT(result, now - uptime.tv_sec);
 
 	return SYSINFO_RET_OK;
@@ -72,7 +72,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
         assert(result);
 
         init_result(result);
-	
+
 	hz = sysconf(_SC_CLK_TCK);
 
 	/* open kstat */

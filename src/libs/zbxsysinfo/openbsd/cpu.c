@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -226,9 +226,9 @@ static int	SYSTEM_CPU_LOAD1(AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_cpuload(&value, NULL, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_DBL_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -238,9 +238,9 @@ static int	SYSTEM_CPU_LOAD5(AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_cpuload(NULL, &value, NULL))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_DBL_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -250,9 +250,9 @@ static int	SYSTEM_CPU_LOAD15(AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK != get_cpuload(NULL, NULL, &value))
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_DBL_RESULT(result, value);
-		
+
 	return SYSINFO_RET_OK;
 }
 
@@ -265,7 +265,7 @@ CPU_FNCLIST
 	int	(*function)();
 };
 
-	CPU_FNCLIST fl[] = 
+	CPU_FNCLIST fl[] =
 	{
 		{"avg1",	SYSTEM_CPU_LOAD1},
 		{"avg5",	SYSTEM_CPU_LOAD5},

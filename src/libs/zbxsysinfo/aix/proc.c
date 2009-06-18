@@ -264,7 +264,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 	if (num_param(param) > 4)
 		return SYSINFO_RET_FAIL;
-    
+
 	if (0 != get_param(param, 1, procname, sizeof(procname)))
 		*procname = '\0';
 
@@ -280,7 +280,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
 		*tmp = '\0';
-		
+
 	if (*tmp != '\0') {
 		if (0 == strcmp(tmp, "run"))
 			zbx_proc_stat = ZBX_PROC_STAT_RUN;

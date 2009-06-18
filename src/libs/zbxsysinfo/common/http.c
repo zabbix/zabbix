@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -33,7 +33,7 @@ static int	get_http_page(char *host, char *param, unsigned short port, char *buf
 	char
 		*buf,
 		request[MAX_STRING_LEN];
-	
+
 	zbx_sock_t		s;
 
 	int	ret;
@@ -81,7 +81,7 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	{
 		return SYSINFO_RET_FAIL;
 	}
-        
+
 	if(get_param(param, 1, hostname, MAX_STRING_LEN) != 0)
 	{
 		return SYSINFO_RET_FAIL;
@@ -134,7 +134,7 @@ int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESU
         {
                 return SYSINFO_RET_FAIL;
         }
-        
+
 	if(get_param(param, 1, hostname, MAX_STRING_LEN) != 0)
 	{
                 return SYSINFO_RET_FAIL;
@@ -195,7 +195,7 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
         {
                 return SYSINFO_RET_FAIL;
         }
-        
+
 	if(get_param(param, 1, hostname, MAX_STRING_LEN) != 0)
 	{
                 return SYSINFO_RET_FAIL;
@@ -236,7 +236,7 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 			zbx_strlcpy(back,found, l+1);
 			SET_STR_RESULT(result, strdup(back));
 		}
-		else	
+		else
 		{
 			SET_STR_RESULT(result, strdup("EOF"));
 		}

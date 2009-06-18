@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -33,7 +33,7 @@ MEM_FNCLIST
 	int (*function)();
 };
 
-	MEM_FNCLIST fl[] = 
+	MEM_FNCLIST fl[] =
 	{
 		{"total",	VM_MEMORY_TOTAL},
 		{"free",	VM_MEMORY_FREE},
@@ -61,7 +61,7 @@ MEM_FNCLIST
 		/* default parameter */
 		zbx_snprintf(mode, sizeof(mode), "total");
 	}
-	
+
 	for(i=0; fl[i].mode!=0; i++)
 	{
 		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
@@ -69,7 +69,7 @@ MEM_FNCLIST
 			return (fl[i].function)(cmd, param, flags, result);
 		}
 	}
-	
+
 	return SYSINFO_RET_FAIL;
 }
 
@@ -78,7 +78,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 	assert(result);
 
         init_result(result);
-		
+
 	SET_UI64_RESULT(result, (zbx_uint64_t)sysconf(_SC_PHYS_PAGES)*(zbx_uint64_t)sysconf(_SC_PAGESIZE));
 	return SYSINFO_RET_OK;
 }
@@ -88,8 +88,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 	assert(result);
 
         init_result(result);
-		
+
 	SET_UI64_RESULT(result, (zbx_uint64_t)sysconf(_SC_AVPHYS_PAGES)*(zbx_uint64_t)sysconf(_SC_PAGESIZE));
 	return SYSINFO_RET_OK;
 }
-

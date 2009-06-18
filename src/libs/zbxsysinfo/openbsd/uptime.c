@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -49,4 +49,3 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	return SYSINFO_RET_FAIL;
 #endif /* HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME */
 }
-

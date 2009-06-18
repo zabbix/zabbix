@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -27,11 +27,11 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	char	mode[128];
 	int	sysinfo_name = -1;
 	long	ncpu = 0;
-	
+
         assert(result);
 
         init_result(result);
-	
+
         if(num_param(param) > 1)
         {
                 return SYSINFO_RET_FAIL;
@@ -60,7 +60,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, ncpu);
-	
+
 	return SYSINFO_RET_OK;
 }
 
@@ -243,18 +243,18 @@ int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGEN
     kstat_ctl_t	    *kc;
     kstat_t	    *k;
     cpu_stat_t	    *cpu;
-    
+
     int	    cpu_count = 0;
     double  swt_count = 0.0;
-    
+
     assert(result);
 
     init_result(result);
-		
+
     kc = kstat_open();
 
     if(kc != NULL)
-    {    
+    {
 	k = kc->kc_chain;
   	while (k != NULL)
 	{
@@ -276,7 +276,7 @@ int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGEN
     }
 
 	SET_UI64_RESULT(result, swt_count);
-    
+
     return SYSINFO_RET_OK;
 }
 
@@ -285,18 +285,18 @@ int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RE
     kstat_ctl_t	    *kc;
     kstat_t	    *k;
     cpu_stat_t	    *cpu;
-    
+
     int	    cpu_count = 0;
     double  intr_count = 0.0;
-    
+
     assert(result);
 
     init_result(result);
-	
+
     kc = kstat_open();
 
     if(kc != NULL)
-    {    
+    {
 	k = kc->kc_chain;
   	while (k != NULL)
 	{
@@ -316,9 +316,8 @@ int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RE
     {
 	return SYSINFO_RET_FAIL;
     }
-    
+
 	SET_UI64_RESULT(result, intr_count);
-    
+
     return SYSINFO_RET_OK;
 }
-
