@@ -476,6 +476,7 @@ INDEX		|2		|graphid
 TABLE|groups|groupid|ZBX_SYNC
 FIELD		|groupid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|internal	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 TABLE|help_items|itemtype,key_|0
