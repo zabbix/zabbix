@@ -1,5 +1,6 @@
 Changes for 1.6.5
 
+ - [ZBX-962] removed "FOUND: 0" from medi type config form (Vedmak)
  - [ZBX-956] fixed js error on map link edit (Artem)
  - [ZBX-955] fixed bold lines in map links (Artem)
  - [ZBX-954] fixed various minor typos and formatting errors (Richlv)

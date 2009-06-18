@@ -111,13 +111,18 @@ include_once "include/page_header.php";
 	
 	$form->AddItem(new CButton("form",S_CREATE_MEDIA_TYPE));
 	
-	$row_count = 0;
-	$numrows = new CSpan(null,'info');
-	$numrows->addOption('name','numrows');	
-	$header = get_table_header(array(S_CONFIGURATION_OF_MEDIA_TYPES_BIG,
+	if(isset($_REQUEST["form"])){
+		$header = get_table_header(S_CONFIGURATION_OF_MEDIA_TYPES_BIG);
+	}
+	else{
+		$row_count = 0;
+		$numrows = new CSpan(null,'info');
+		$numrows->addOption('name','numrows');	
+		$header = get_table_header(array(S_CONFIGURATION_OF_MEDIA_TYPES_BIG,
 					new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 					S_FOUND.': ',$numrows,)
 					);			
+	}			
 	show_table_header($header, $form);
 
 ?>
@@ -170,8 +175,9 @@ include_once "include/page_header.php";
 			$row_count++;
 		}
 		$table->show();
+		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 	}
-	zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+	
 
 ?>
 
