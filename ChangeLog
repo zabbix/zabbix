@@ -1,6 +1,10 @@
+Changes for 1.6.6
+
+ - [ZBX-953] added informative note to zabbix_agentd --help output about user parameters and -t switch (Richlv)
+ - [ZBX-962] removed "Found: 0" from media type config form (Vedmak)
+
 Changes for 1.6.5
 
- - [ZBX-962] removed "FOUND: 0" from medi type config form (Vedmak)
  - [ZBX-956] fixed js error on map link edit (Artem)
  - [ZBX-955] fixed bold lines in map links (Artem)
  - [ZBX-954] fixed various minor typos and formatting errors (Richlv)
