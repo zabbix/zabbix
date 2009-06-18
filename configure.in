@@ -861,7 +861,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 			AC_DEFINE(HAVE_ORACLE,1,[Define to 1 if Oracle should be enabled.])
 		else
-			AC_MSG_ERROR([Not found Sqlora8 library])
+			AC_MSG_ERROR([Sqlora8 library not found])
 		fi
 	fi
 
@@ -875,7 +875,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		if test "x$found_sqlite3" = "xyes"; then
 			have_db="SQLite v3.x"
 		else
-			AC_MSG_ERROR([Not found SQLite3 library])
+			AC_MSG_ERROR([SQLite3 library not found])
 		fi
 	fi
 
@@ -889,7 +889,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		if test "x$found_mysql" = "xyes"; then
 			have_db="MySQL"
 		else
-			AC_MSG_ERROR([Not found MySQL library])
+			AC_MSG_ERROR([MySQL library not found])
 		fi
 	fi
 
@@ -908,7 +908,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 			dnl It seems PostgreSQL does not require this
 			dnl AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  POSTGRESQL_LDFLAGS="-lcrypt $POSTGRESQL_LDFLAGS"))
 		else
-			AC_MSG_ERROR([Not found PostgreSQL library])
+			AC_MSG_ERROR([PostgreSQL library not found])
 		fi
 	fi
 
@@ -939,7 +939,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	JABBER_CHECK_CONFIG()
 	if test "x$want_jabber" = "xyes"; then
 		if test "x$found_jabber" != "xyes"; then
-			AC_MSG_ERROR([Not found Jabber library])
+			AC_MSG_ERROR([Jabber library not found])
 		else
 			have_jabber="yes"
 		fi
@@ -955,7 +955,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
 	if test "x$want_curl" = "xyes"; then
 		if test "x$found_curl" != "xyes"; then
-			AC_MSG_ERROR([Not found Curl library])
+			AC_MSG_ERROR([Curl library not found])
 		fi
 	fi
 	if test "x$found_curl" = "xyes"; then
@@ -977,7 +977,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		if test "x$found_iodbc" = "xyes"; then
 			have_odbc="iODBC"
 		else
-			AC_MSG_ERROR([Not found iODBC library])
+			AC_MSG_ERROR([iODBC library not found])
 		fi
 	fi
 
@@ -985,13 +985,13 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	LIBUNIXODBC_CHECK_CONFIG([no])
 	if test "x$want_unixodbc" = "xyes"; then
 		if test "x$have_odbc" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one ODBC griver.])
+			AC_MSG_ERROR([You can configure for only one ODBC driver.])
 		fi
 
 		if test "x$found_unixodbc" = "xyes"; then
 			have_odbc="unixODBC"
 		else
-			AC_MSG_ERROR([Not found unixODBC library])
+			AC_MSG_ERROR([unixODBC library not found])
 		fi
 	fi
 
@@ -1163,7 +1163,7 @@ openbsd*)
 dnl	AC_MSG_ERROR(${host_os} not supported)
 ;;
 esac
-	AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to os name for code  managing])
+	AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to os name for code managing])
 
 AC_SUBST(ARCH)
 
