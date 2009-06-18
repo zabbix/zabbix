@@ -5952,6 +5952,8 @@
 
 		$frm_title = S_HOST_GROUP;
 
+		$name = get_request('name','');
+
 		if($_REQUEST['groupid']>0){
 			$group = get_hostgroup_by_groupid($_REQUEST['groupid']);
 			$name = $group['name'];
@@ -6021,7 +6023,7 @@
 			$frmHostG->addItemToBottomRow(SPACE);
 
 			$dltButton = new CButtonDelete('Delete selected group?', url_param('form').url_param('config').url_param('groupid'));
-			$dlt_groups = getDeleteableHostGroups($_REQUEST['groupid']);
+			$dlt_groups = getDeletableHostGroups($_REQUEST['groupid']);
 			if(empty($dlt_groups)) $dltButton->addOption('disabled','disabled');
 
 			$frmHostG->addItemToBottomRow($dltButton);

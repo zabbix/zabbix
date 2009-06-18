@@ -35,7 +35,8 @@ require_once('include/httptest.inc.php');
 			if(!$result)
 				return $result;
 		}
-		return $result;
+		
+	return $result;
 	}
 
 	function delete_host_from_group($hostid, $groupid){
@@ -43,33 +44,38 @@ require_once('include/httptest.inc.php');
 			error("incorrect parameters for 'add_host_to_group' [hostid:".$hostid."][groupid:".$groupid."]");
 			return false;
 		}
-		return DBexecute('delete from hosts_groups where hostid='.$hostid.' and groupid='.$groupid);
+	
+	return DBexecute('delete from hosts_groups where hostid='.$hostid.' and groupid='.$groupid);
 	}
 
-	/*
-	 * Function: db_save_group
-	 *
-	 * Description:
-	 *     Add new or update host group
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
+/*
+ * Function: db_save_group
+ *
+ * Description:
+ *     Add new or update host group
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ */
 	function db_save_group($name,$groupid=null){
 		if(!is_string($name)){
 			error("incorrect parameters for 'db_save_group'");
 			return false;
 		}
 
-		if(is_null($groupid))
-			$result = DBselect("select * from groups where ".DBin_node('groupid')." AND name=".zbx_dbstr($name));
-		else
-			$result = DBselect("select * from groups where ".DBin_node('groupid')." AND name=".zbx_dbstr($name).
-				" and groupid<>$groupid");
-
+		$sql_where = '';
+		if(!is_null($groupid))
+			$sql_where.= ' AND groupid<>'.$groupid;
+			
+		$sql = 'SELECT * '.
+				' FROM groups '.
+				' WHERE '.DBin_node('groupid').
+					' AND name='.zbx_dbstr($name).
+					$sql_where;
+		$result = DBselect($sql);
 		if(DBfetch($result)){
 			error("Group '$name' already exists");
 			return false;
@@ -77,7 +83,8 @@ require_once('include/httptest.inc.php');
 
 		if(is_null($groupid)){
 			$groupid=get_dbid('groups','groupid');
-			$result = DBexecute('INSERT INTO groups (groupid,name) VALUES ('.$groupid.','.zbx_dbstr($name).')');
+			$result = DBexecute('INSERT INTO groups (groupid,name,internal) '.
+								" VALUES ($groupid,".zbx_dbstr($name).",".ZBX_NOT_INTERNAL_GROUP.')');
 			if($result){
 				$result = $groupid;
 				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groupid, $name, 'groups', NULL, NULL);
@@ -100,28 +107,66 @@ require_once('include/httptest.inc.php');
 		if(zbx_empty($newgroup))
 			 return true;
 
-		$group = DBfetch(DBselect('SELECT groupid FROM groups WHERE name='.zbx_dbstr($newgroup)));
-		$groupid = $group['groupid'];
-		if(!$groupid) {
+		$sql = 'SELECT groupid FROM groups WHERE name='.zbx_dbstr($newgroup);
+		$result = DBselect($sql);
+		if($group = DBfetch($result)){
+			$groupid = $group['groupid'];
+		}
+		else{
 			$groupid = db_save_group($newgroup);
 			if(!$groupid)
 				return	$groupid;
 		}
-		return add_host_to_group($hostid, $groupid);
+		
+	return add_host_to_group($hostid, $groupid);
 	}
 
 	function update_host_groups_by_groupid($groupid,$hosts=array()){
-		DBexecute('DELETE FROM hosts_groups WHERE groupid='.$groupid);
+		$grp_hosts = CHost::get(array('groupids'=>$groupid));
+		$grp_hostids = array_keys($grp_hosts);
 
-		add_host_to_group($hosts, $groupid);
+// unlinked hosts 
+		$missed_hostids = array_diff($grp_hostids, $hosts);		
+// hosts that allowed to be unlinked
+		$unlinkable_hostids = getUnlinkableHosts($groupid);
+		
+// hosts that have been unlinked improperly
+		$err_hostids = array_diff($missed_hostids, $unlinkable_hostids);
+
+		foreach($err_hostids as $num => $hostid){
+			$host = get_host_by_hostid($hostid);
+			error('Host "'.$host['host'].'" can not exist without group');
+			
+			return false;
+		}
+		
+		$result = DBexecute('DELETE FROM hosts_groups WHERE groupid='.$groupid);
+		$result = add_host_to_group($hosts, $groupid);
+		
+	return $result;
 	}
 
 	function update_host_groups($hostid,$groups=array()){
-		DBexecute('DELETE FROM hosts_groups WHERE hostid='.$hostid);
-
-		foreach($groups as $groupid){
-			add_host_to_group($hostid, $groupid);
+		if(empty($groups)){
+			$host = get_host_by_hostid($hostid);
+			error('Host "'.$host['host'].'" can not exist without group');	
+			return false;
 		}
+		
+		DBexecute('DELETE FROM hosts_groups WHERE hostid='.$hostid);
+		foreach($groups as $num => $groupid){
+			$result = add_host_to_group($hostid, $groupid);
+		}
+		
+	return $result;
+	}
+	
+	function setHostGroupInternal($groupids, $internal=ZBX_NOT_INTERNAL_GROUP){
+		zbx_value2array($groupids);
+		
+		$sql = 'UPDATE groups SET internal='.$internal.' WHERE '.DBcondition('groupid', $groupids);
+		$result = DBexecute($sql);
+	return $result;
 	}
 
 	function add_host_group($name,$hosts=array()){
@@ -139,9 +184,9 @@ require_once('include/httptest.inc.php');
 		if(!$result)
 			return	$result;
 
-		update_host_groups_by_groupid($groupid,$hosts);
+		$result = update_host_groups_by_groupid($groupid,$hosts);
 
-		return $result;
+	return $result;
 	}
 
 	/*
@@ -285,6 +330,11 @@ require_once('include/httptest.inc.php');
 						$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,
 						$newgroup,$groups)
 	{
+		if(zbx_empty($newgroup) && (count($groups) == 0)){
+			info('Host must be linked to at least one host group');
+			return false;
+		}
+		
 		if(is_null($templates))
 			$templates = array();
 		if(is_null($groups))
@@ -323,6 +373,11 @@ require_once('include/httptest.inc.php');
 							$templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,
 							$newgroup,$groups)
 	{
+		if(zbx_empty($newgroup) && (count($groups) == 0)){
+			info('Host "'.$host.'" must be linked to at least one host group');
+			return false;
+		}
+		
 		if(is_null($templates)){
 			$new_templates = array();
 		}
@@ -579,7 +634,21 @@ require_once('include/httptest.inc.php');
 	function delete_host_group($groupids){
 		zbx_value2array($groupids);
 		if(empty($groupids)) return true;
-
+		
+		$dlt_groupids = getDeletableHostGroups($groupids);
+		if(count($groupids) != count($dlt_groupids)){
+			foreach($groupids as $num => $groupid){
+				if(!isset($dlt_groupids[$groupid])){
+					$group = get_hostgroup_by_groupid($groupid);
+					if($group['internal'] == ZBX_INTERNAL_GROUP)
+						error('Group "'.$group['name'].'" is internal and can not be deleted');
+					else
+						error('Group "'.$group['name'].'" can not be deleted, due to inner hosts can not be unlinked');
+				}
+			}
+			return false;
+		}
+		
 // delete sysmap element
 		if(!delete_sysmaps_elements_with_groupid($groupids))
 			return false;
@@ -764,8 +833,10 @@ require_once('include/httptest.inc.php');
 		$result = false;
 		$hosts = array();
 
-		$sql = 'SELECT i.itemid, h.* FROM hosts h, items i WHERE i.hostid=h.hostid AND '.DBcondition('i.itemid',$itemids);
-
+		$sql = 'SELECT i.itemid, h.* '.
+				' FROM hosts h, items i '.
+				' WHERE i.hostid=h.hostid '.
+					' AND '.DBcondition('i.itemid',$itemids);
 		$res=DBselect($sql);
 		while($row=DBfetch($res)){
 			$result = true;
@@ -1133,7 +1204,7 @@ return $result;
  * Comments:
  *
  */
-function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sql=array('monitored_hosts'=>1)){
+function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sql=array()){
 	global $USER_DETAILS;
 	global $page;
 
@@ -1463,18 +1534,18 @@ return $result;
 
 /* APPLICATIONS */
 
-	/*
-	 * Function: db_save_application
-	 *
-	 * Description:
-	 *     Add or update application
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *       If applicationid is NULL add application, in other cases update
-	 */
+/*
+ * Function: db_save_application
+ *
+ * Description:
+ *     Add or update application
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *       If applicationid is NULL add application, in other cases update
+ */
 	function db_save_application($name,$hostid,$applicationid=null,$templateid=0){
 		if(!is_string($name)){
 			error("Incorrect parameters for 'db_save_application'");
@@ -1552,46 +1623,46 @@ return $result;
 
 	}
 
-	/*
-	 * Function: add_application
-	 *
-	 * Description:
-	 *     Add application
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 */
+/*
+ * Function: add_application
+ *
+ * Description:
+ *     Add application
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ */
 	function add_application($name,$hostid,$templateid=0){
 		return db_save_application($name,$hostid,null,$templateid);
 	}
 
-	/*
-	 * Function: update_application
-	 *
-	 * Description:
-	 *     Update application
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 */
+/*
+ * Function: update_application
+ *
+ * Description:
+ *     Update application
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ */
 	function update_application($applicationid,$name,$hostid,$templateid=0){
 		return db_save_application($name,$hostid,$applicationid,$templateid);
 	}
 
-	/*
-	 * Function: delete_application
-	 *
-	 * Description:
-	 *     Delete application with all linkages
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 */
+/*
+ * Function: delete_application
+ *
+ * Description:
+ *     Delete application with all linkages
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
 	function delete_application($applicationid){
 		$app = get_application_by_applicationid($applicationid);
 		$host = get_host_by_hostid($app["hostid"]);
@@ -1942,12 +2013,12 @@ return $result;
 	function host_js_menu($hostid,$link_text = S_SELECT){
 		$hst_grp_all_in = array();
 
-		$db_groups = DBselect('SELECT DISTINCT g.groupid, g.name '.
+		$sql = 'SELECT DISTINCT g.groupid, g.name '.
 				' FROM groups g, hosts_groups hg '.
  				' WHERE g.groupid=hg.groupid '.
 					' AND hg.hostid='.$hostid.
- 				' ORDER BY g.name');
-
+ 				' ORDER BY g.name';
+		$db_groups = DBselect($sql);
 		while($group = DBfetch($db_groups)){
 			$group['name'] = htmlspecialchars($group['name']);
 			$hst_grp_all_in[] = $group;
@@ -1956,23 +2027,79 @@ return $result;
 		$action = new CSpan($link_text);
 		$script = new CScript('javascript: create_host_menu(event,'.$hostid.','.zbx_jsvalue($hst_grp_all_in).');');
 
-		$action->AddAction('onclick',$script);
-		$action->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
+		$action->addAction('onclick',$script);
+		$action->addOption('onmouseover','javascript: this.style.cursor = "pointer";');
 
 	return $action;
 	}
 
 	function expand_host_ipmi_ip_by_data($ipmi_ip, $host){
-		if (zbx_strstr($ipmi_ip, '{HOSTNAME}'))
+		if(zbx_strstr($ipmi_ip, '{HOSTNAME}'))
 			$ipmi_ip = str_replace('{HOSTNAME}', $host['host'], $ipmi_ip);
-		else if (zbx_strstr($ipmi_ip, '{IPADDRESS}'))
+		else if(zbx_strstr($ipmi_ip, '{IPADDRESS}'))
 			$ipmi_ip = str_replace('{IPADDRESS}', $host['ip'], $ipmi_ip);
-		else if (zbx_strstr($ipmi_ip, '{HOST.DNS}'))
+		else if(zbx_strstr($ipmi_ip, '{HOST.DNS}'))
 			$ipmi_ip = str_replace('{HOST.DNS}', $host['dns'], $ipmi_ip);
-		else if (zbx_strstr($ipmi_ip, '{HOST.CONN}'))
+		else if(zbx_strstr($ipmi_ip, '{HOST.CONN}'))
 			$ipmi_ip = str_replace('{HOST.CONN}', $host['useip'] ? $host['ip'] : $host['dns'], $ipmi_ip);
 
-		return $ipmi_ip;
+	return $ipmi_ip;
 	}
 
+	function getUnlinkableHosts($groupids=null,$hostids=null){
+		zbx_value2array($groupids);
+		zbx_value2array($hostids);
+
+		$unlnk_hostids = array();
+		
+		$sql_where = '';
+		if(!is_null($hostids)){
+			$sql_where.= ' AND '.DBcondition('hg.hostid', $hostids);
+		}
+
+		if(!is_null($groupids)){
+			$sql_where.= ' AND '.DBcondition('hg.groupid', $groupids);
+		}
+				
+		$sql = 'SELECT hg.hostid, count(hg.groupid) as grp_count '.
+				' FROM hosts_groups hg '.
+				' WHERE hostgroupid>0 '.
+				$sql_where.
+				' GROUP BY hg.hostid '.
+				' HAVING grp_count > 1';
+		$res = DBselect($sql);
+		while($host = DBfetch($res)){
+			$unlnk_hostids[$host['hostid']] = $host['hostid'];
+		}
+	return $unlnk_hostids;
+	}
+	
+	function getDeletableHostGroups($groupids=null){
+		zbx_value2array($groupids);
+		
+		$dlt_groupids = array();
+		$hostids = getUnlinkableHosts($groupids);
+
+		$sql_where = '';
+		if(!is_null($groupids)){
+			$sql_where.= ' AND '.DBcondition('g.groupid', $groupids);
+		}
+
+		$sql = 'SELECT DISTINCT g.groupid '.
+				' FROM groups g '.
+				' WHERE g.internal='.ZBX_NOT_INTERNAL_GROUP.
+					$sql_where.
+					' AND NOT EXISTS ('.
+						'SELECT hg.groupid '.
+						' FROM hosts_groups hg '.
+						' WHERE g.groupid=hg.groupid '.
+							' AND '.DBcondition('hg.hostid', $hostids, true).
+						')';
+		$res = DBselect($sql);
+		while($group = DBfetch($res)){
+			$dlt_groupids[$group['groupid']] = $group['groupid'];
+		}
+
+	return $dlt_groupids;
+	}
 ?>

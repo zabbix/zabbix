@@ -19,22 +19,22 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/actions.inc.php';
-	require_once 'include/hosts.inc.php';
-	include_once 'include/discovery.inc.php';
-	require_once 'include/triggers.inc.php';
-	require_once 'include/events.inc.php';
-	require_once 'include/forms.inc.php';
-	require_once "include/media.inc.php";
-	require_once "include/nodes.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/actions.inc.php');
+	require_once('include/hosts.inc.php');
+	include_once('include/discovery.inc.php');
+	require_once('include/triggers.inc.php');
+	require_once('include/events.inc.php');
+	require_once('include/forms.inc.php');
+	require_once('include/media.inc.php');
+	require_once('include/nodes.inc.php');
 
 
 	$page['title']	= "S_CONFIGURATION_OF_ACTIONS";
 	$page['file']	= 'actionconf.php';
 	$page['hist_arg'] = array();
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 	
 	$_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
 ?>
@@ -157,7 +157,7 @@ include_once 'include/page_header.php';
 		DBstart();
 		if(isset($_REQUEST['actionid'])){
 
-			$actionid=$_REQUEST['actionid'];
+			$actionid = $_REQUEST['actionid'];
 			$result = update_action($actionid,
 				$_REQUEST['name'],$_REQUEST['eventsource'],$_REQUEST['esc_period'],
 				$_REQUEST['def_shortdata'],$_REQUEST['def_longdata'],
@@ -166,21 +166,20 @@ include_once 'include/page_header.php';
 				$conditions, $operations
 				);
 
-			$result = DBend();
+			$result = DBend($result);
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		} 
 		else {
 			
-			$actionid=add_action(
+			$result = $actionid = add_action(
 				$_REQUEST['name'],$_REQUEST['eventsource'],$_REQUEST['esc_period'],
 				$_REQUEST['def_shortdata'],$_REQUEST['def_longdata'],
 				$_REQUEST['recovery_msg'],$_REQUEST['r_shortdata'],$_REQUEST['r_longdata'],
 				$_REQUEST['evaltype'],$_REQUEST['status'],
 				$conditions, $operations
 				);
-			$result=$actionid;
 
-			$result = DBend();
+			$result = DBend($result);
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 		}
 

@@ -311,10 +311,10 @@ INSERT INTO valuemaps VALUES (7,'Dell Open Manage System Status');
 -- Dumping data for table `groups`
 --
 
-INSERT INTO groups VALUES (1,'Templates');
-INSERT INTO groups VALUES (2,'Linux servers');
-INSERT INTO groups VALUES (3,'Windows servers');
-INSERT INTO groups VALUES (4,'ZABBIX Servers');
+INSERT INTO groups VALUES (1,'Templates',0);
+INSERT INTO groups VALUES (2,'Linux servers',0);
+INSERT INTO groups VALUES (3,'Windows servers',0);
+INSERT INTO groups VALUES (4,'ZABBIX Servers',0);
 
 --
 -- Dumping data for table hosts_groups

@@ -549,9 +549,11 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 	const char	*__function_name = "add_discovered_host";
 	DB_RESULT	result;
 	DB_RESULT	result2;
+	DB_RESULT	result3;
 	DB_ROW		row;
 	DB_ROW		row2;
-	zbx_uint64_t	hostid = 0, proxy_hostid;
+	DB_ROW		row3;
+	zbx_uint64_t	hostgroupid = 0, groupid = 0, hostid = 0, proxy_hostid;
 	char		host[MAX_STRING_LEN], *host_esc, *ip_esc;
 	int		port;
 
@@ -593,15 +595,36 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 		if (NULL == (row2 = DBfetch(result2)))
 		{
-			hostid = DBget_maxid("hosts","hostid");
-			DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,ip,dns,port)"
-					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',1,'%s','%s',%d)",
-					hostid,
-					proxy_hostid,
-					(*host != '\0' ? host_esc : ip_esc), /* Use host name if exists, IP otherwise */
-					ip_esc,
-					host_esc,
-					port);
+			result3 = DBselect("select discovery_groupid from config where 1=1" DB_NODE, DBnode_local("configid"));
+			row3 = DBfetch(result3);
+		
+			if( (row3 != NULL) && DBis_null(row3[0]) != SUCCEED)
+			{
+				hostid = DBget_maxid("hosts","hostid");
+				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,ip,dns,port)"
+						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',1,'%s','%s',%d)",
+						hostid,
+						proxy_hostid,
+						(*host != '\0' ? host_esc : ip_esc), /* Use host name if exists, IP otherwise */
+						ip_esc,
+						host_esc,
+						port);
+
+				
+				ZBX_STR2UINT64(groupid, row3[0]);
+				
+				hostgroupid = DBget_maxid("hosts_groups", "hostgroupid");
+				DBexecute("insert into hosts_groups (hostgroupid,hostid,groupid)"
+						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+						hostgroupid,
+						hostid,
+						groupid);				
+			}
+			else{
+				zabbix_log(LOG_LEVEL_DEBUG, "Discovery group is not defined %s()", __function_name);
+			}
+			
+			DBfree_result(result3);
 		}
 		else
 		{

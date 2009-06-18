@@ -623,6 +623,12 @@ include_once 'include/page_header.php';
 										" new Array({'triggerid': '".$row['triggerid'].
 												"', 'lastchange': '".$row['lastchange']."'}, ".$tr_conf_link."),".
 										zbx_jsvalue($row['items']).");");
+
+// We add 1 to event start url, so events would show it
+		$clock = new CLink(
+						zbx_date2str(S_DATE_FORMAT_YMDHMS,$row['lastchange']),
+						'events.php?triggerid='.$row['triggerid'].'&nav_time='.($row['lastchange']+1),'action'
+						);
 //--
 
 			$table->addRow(array(
@@ -632,11 +638,10 @@ include_once 'include/page_header.php';
 					get_severity_style($row['priority'],$row['value'])
 					),
 				$value,
-				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row['lastchange']),'events.php?triggerid='.$row['triggerid'].'&nav_time='.$row['lastchange'],'action'),
+				$clock,
 				get_node_name_by_elid($row['triggerid']),
 				$host,
 				$tr_desc,
-//				$admin_links?(new CLink($description, 'triggers.php?form=update&triggerid='.$row['triggerid'].'&hostid='.$row['hostid'])):$description,
 				$actions,
 				$show_event_col?SPACE:NULL,
 				new CLink(zbx_empty($row['comments'])?S_ADD:S_SHOW,'tr_comments.php?triggerid='.$row['triggerid'],'action')
@@ -672,6 +677,11 @@ include_once 'include/page_header.php';
 			$description = new CCol($description);
 			$description->addOption('style','white-space: normal; width: 90%;');
 
+			$clock = new CLink(
+							zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),
+							'tr_events.php?triggerid='.$row['triggerid'].'&eventid='.$row_event['eventid'],'action'
+							);
+							
 			$table->addRow(array(
 					($config['event_ack_enable'])?(($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid']))):NULL,
 					new CCol(
@@ -679,7 +689,7 @@ include_once 'include/page_header.php';
 						get_severity_style($row['priority'],$row_event['value'])
 						),
 					$value,
-					new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),'tr_events.php?triggerid='.$row['triggerid'].'&eventid='.$row_event['eventid'],'action'),					
+					$clock,
 					get_node_name_by_elid($row['triggerid']),
 					$host,
 					$description,
