@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -40,8 +40,8 @@ static int	buffer_allocated, tmp_allocated;
  * Parameters: sock - opened socket of node-node connection                   *
  *             record                                                         *
  *                                                                            *
- * Return value:  SUCCEED - sent succesfully                                  *
- *                FAIL - an error occured                                     *
+ * Return value:  SUCCEED - sent successfully                                 *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -137,7 +137,7 @@ error:
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -220,7 +220,7 @@ static void	begin_history_sql(char **sql, int *sql_allocated, int *sql_offset, c
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -347,7 +347,7 @@ error:
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author:                                                                    *
  *                                                                            *
@@ -462,12 +462,12 @@ error:
  *                                                                            *
  * Function: node_history                                                     *
  *                                                                            *
- * Purpose: process new history received from a salve node                    *
+ * Purpose: process new history received from a slave node                    *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *

@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -130,7 +130,7 @@ static void	calc_timestamp(char *line,int *timestamp, char *format)
  *             value - new value of server:key                                *
  *             lastlogsize - if key=log[*], last size of log file             *
  *                                                                            *
- * Return value: SUCCEED - new value processed sucesfully                     *
+ * Return value: SUCCEED - new value processed successfully                   *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -299,7 +299,7 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
  * Parameters: result SUCCEED or FAIL                                         *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -345,7 +345,7 @@ static void clean_agent_values(AGENT_VALUE *values, int value_num)
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -377,7 +377,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
 		proxy_timediff = now - atoi(tmp);
 
-/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]} 
+/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]}
  *                                     ^
  */	if (NULL == (p = zbx_json_pair_by_name(jp, ZBX_PROTO_TAG_DATA)))
 	{
@@ -387,19 +387,19 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 
 	if(SUCCEED == ret)
 	{
-/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]} 
+/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]}
  *                                     ^------------------------------------------^
  */		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_data)))
 			zabbix_log(LOG_LEVEL_WARNING, "Can't proceed jason request. %s",
 					zbx_json_strerror());
 	}
 
-/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]} 
+/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]}
  *                                      ^
  */	p = NULL;
 	while (SUCCEED == ret && NULL != (p = zbx_json_next(&jp_data, p)))
 	{
-/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]} 
+/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]}
  *                                      ^------------------------------^
  */ 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
@@ -428,7 +428,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 
 		av->value = strdup(tmp);
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, sizeof(tmp))) 
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, sizeof(tmp)))
 			av->lastlogsize = atoi(tmp);
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGTIMESTAMP, tmp, sizeof(tmp)))
@@ -482,7 +482,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -512,7 +512,7 @@ static int	process_proxy_values(zbx_sock_t *sock, struct zbx_json_parse *jp)
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -676,7 +676,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 			{
 				return FAIL;
 			}
-	
+
 			value_string=strchr(copy,':');
 			value_string=strchr(value_string+1,':');
 
@@ -710,7 +710,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 			zabbix_syslog("Trapper: error sending result back");
 		}
 		zabbix_log( LOG_LEVEL_DEBUG, "After write()");
-	}	
+	}
 	return ret;
 }
 

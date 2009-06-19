@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -50,7 +50,7 @@
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -177,7 +177,7 @@ static void	execute_script(zbx_uint64_t hostid, char *command, char **result, in
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -255,7 +255,7 @@ exit_sock:
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -294,7 +294,7 @@ int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nodeid)
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *

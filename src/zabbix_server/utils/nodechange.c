@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2006 SIA Zabbix
 **
@@ -33,8 +33,8 @@
  * Parameters: old_id - old id, new_id - new node id                          *
  *             old_exp - old expression, new_exp - new expression             *
  *                                                                            *
- * Return value: SUCCESS - converted succesfully                              *
- *               FAIL - an error occured                                      *
+ * Return value: SUCCESS - converted successfully                             *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -91,8 +91,8 @@ static int convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const
  *                                                                            *
  * Parameters: old_id - old id, new_id - new node id                          *
  *                                                                            *
- * Return value: SUCCESS - converted succesfully                              *
- *               FAIL - an error occured                                      *
+ * Return value: SUCCESS - converted successfully                             *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -144,8 +144,8 @@ static int convert_triggers_expression(int old_id, int new_id)
  *                                                                            *
  * Parameters: old_id - old id, new_id - new node id                          *
  *                                                                            *
- * Return value: SUCCESS - converted succesfully                              *
- *               FAIL - an error occured                                      *
+ * Return value: SUCCESS - converted successfully                             *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -171,12 +171,12 @@ static int convert_profiles(int old_id, int new_id, const char *field_name)
  *                                                                            *
  * Function: convert_special_field                                            *
  *                                                                            *
- * Purpose: special processing for multipurposes fields                       *
+ * Purpose: special processing for multipurpose fields                        *
  *                                                                            *
  * Parameters: old_id - old id, new_id - new node id                          *
  *                                                                            *
- * Return value: SUCCESS - converted succesfully                              *
- *               FAIL - an error occured                                      *
+ * Return value: SUCCESS - converted successfully                             *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -219,8 +219,8 @@ static int convert_special_field(int old_id, int new_id, const char *table_name,
  *                                                                            *
  * Parameters: old_id - old id, new_id - new node id                          *
  *                                                                            *
- * Return value: SUCCESS - converted succesfully                              * 
- *               FAIL - an error occured                                      *
+ * Return value: SUCCESS - converted successfully                             *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -384,7 +384,7 @@ int change_nodeid(int old_id, int new_id)
 
 			if (tables[i].fields[j].type == ZBX_TYPE_ID)
 			{
-				if (0 == strcmp(tables[i].fields[j].name, tables[i].recid))	/* primaky key */
+				if (0 == strcmp(tables[i].fields[j].name, tables[i].recid))	/* primary key */
 				{
 					prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
 
@@ -434,7 +434,7 @@ int change_nodeid(int old_id, int new_id)
 			new_id);
 
 	DBcommit();
-	
+
 	DBclose();
 	printf(" done.\nConversion completed.\n");
 

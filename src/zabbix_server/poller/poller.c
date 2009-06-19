@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -192,7 +192,7 @@ static int get_minnextcheck(int now)
 	if(!row || DBis_null(row[0])==SUCCEED || DBis_null(row[1])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "No items to update for minnextcheck.");
-		res = FAIL; 
+		res = FAIL;
 	}
 	else
 	{
@@ -459,7 +459,7 @@ static int get_values(int now, int *nextcheck)
 			if (HOST_AVAILABLE_TRUE != item.host_available)
 			{
 				DBbegin();
-		
+
 				enable_host(&item, now);
 				stop = 1;
 
@@ -469,7 +469,7 @@ static int get_values(int now, int *nextcheck)
 			if (item.host_errors_from != 0)
 			{
 				DBbegin();
-		
+
 				DBexecute("update hosts set errors_from=0 where hostid=" ZBX_FS_UI64,
 						item.hostid);
 				stop = 1;
@@ -479,7 +479,7 @@ static int get_values(int now, int *nextcheck)
 
 			if (0 == CONFIG_DBSYNCER_FORKS)
 				DBbegin();
-		
+
 			switch (zbx_process) {
 			case ZBX_PROCESS_SERVER:
 				process_new_value(&item, &agent, now);
@@ -515,7 +515,7 @@ static int get_values(int now, int *nextcheck)
 			if (0 == CONFIG_DBSYNCER_FORKS)
 			{
 				DBbegin();
-		
+
 				DBupdate_item_status_to_notsupported(&item, now, agent.msg);
 
 				DBcommit();
@@ -529,7 +529,7 @@ static int get_values(int now, int *nextcheck)
 
 			if (HOST_AVAILABLE_TRUE != item.host_available) {
 				DBbegin();
-		
+
 				enable_host(&item, now);
 				stop = 1;
 
@@ -539,7 +539,7 @@ static int get_values(int now, int *nextcheck)
 		else if (res == NETWORK_ERROR)
 		{
 			DBbegin();
-		
+
 			/* First error */
 			if (item.host_errors_from == 0)
 			{
@@ -608,7 +608,7 @@ static int get_values(int now, int *nextcheck)
 		/* Poller for unreachable hosts */
 		if (poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
 		{
-			/* We cannot freeit earlier because items has references to the structure */
+			/* We cannot free it earlier because items have references to the structure */
 			DBfree_result(result2);
 		}
 		free_result(&agent);

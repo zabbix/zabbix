@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -49,7 +49,7 @@ ZBX_USER_MSG
  *                                                                            *
  * Parameters: userid - user ID                                               *
  *                                                                            *
- * Return value: SUCCEED - prermitions is positive, FAIL - otherwise          *
+ * Return value: SUCCEED - prermission is positive, FAIL - otherwise          *
  *                                                                            *
  * Author:                                                                    *
  *                                                                            *
@@ -428,7 +428,7 @@ static int	check_operation_conditions(DB_EVENT *event, DB_OPERATION *operation)
 	DB_ROW		row;
 	DB_CONDITION	condition;
 
-	/* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */	
+	/* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
 	int	ret = SUCCEED;
 	int	old_type = -1;
 	int	cond;
@@ -461,7 +461,7 @@ static int	check_operation_conditions(DB_EVENT *event, DB_OPERATION *operation)
 					else if (FAIL == check_action_condition(event, &condition))
 						ret	= FAIL;
 				}
-		
+
 				old_type = condition.conditiontype;
 				break;
 			case ACTION_EVAL_TYPE_AND:
@@ -858,7 +858,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	if (NULL != error)
 	{
 		escalation->status = ESCALATION_STATUS_COMPLETED;
-		zabbix_log(LOG_LEVEL_WARNING, "Escalation canceled: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "Escalation cancelled: %s",
 				error);
 		zbx_free(error);
 	}
@@ -941,7 +941,7 @@ static void	process_escalations(int now)
 	if (NULL == (row = DBfetch(result)) || DBis_null(row[0]) == SUCCEED || DBis_null(row[1]) == SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "No items to update for minnextcheck.");
-		res = FAIL; 
+		res = FAIL;
 	}
 	else
 	{
@@ -967,7 +967,7 @@ static void	process_escalations(int now)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -1019,12 +1019,12 @@ int main_escalator_loop()
 				sec,
 				CONFIG_ESCALATOR_FREQUENCY);
 
-		zbx_setproctitle("escalator [sleeping for %d seconds]", 
+		zbx_setproctitle("escalator [sleeping for %d seconds]",
 				CONFIG_ESCALATOR_FREQUENCY);
 
 		sleep(CONFIG_ESCALATOR_FREQUENCY);
 /*		if (sleeptime > 0) {
-			zbx_setproctitle("escalator [sleeping for %d seconds]", 
+			zbx_setproctitle("escalator [sleeping for %d seconds]",
 					sleeptime);
 
 			sleep(sleeptime);

@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -44,7 +44,7 @@ static S_ZBX_HTTPPAGE	page;
  *             host - host name                                               *
  *             value - new value of the item                                  *
  *                                                                            *
- * Return value: SUCCEED - new value sucesfully processed                     *
+ * Return value: SUCCEED - new value successfully processed                   *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -129,7 +129,7 @@ static size_t WRITEFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream
 
 static size_t HEADERFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream)
 {
-/*	
+/*
 	ZBX_LIM_PRINT("HEADERFUNCTION", size*nmemb, ptr, 300);
 	zabbix_log(LOG_LEVEL_WARNING, "In HEADERFUNCTION");
 */
@@ -183,7 +183,7 @@ static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
 
 		free_result(&value);
 	}
-	
+
 	DBfree_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_test_data()");
 
@@ -239,7 +239,7 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
 
 		free_result(&value);
 	}
-	
+
 	DBfree_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_step_data()");
 

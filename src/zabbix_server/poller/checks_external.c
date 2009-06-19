@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -30,7 +30,7 @@
  *                                                                            *
  * Parameters: item - item we are interested in                               *
  *                                                                            *
- * Return value: SUCCEED - data succesfully retrieved and stored in result    *
+ * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *                         and result_str (as string)                         *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
@@ -95,7 +95,7 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 		item->useip == 1 ? item->host_ip : item->host_dns,
 		params);
 	zabbix_log( LOG_LEVEL_DEBUG, "%s", cmd );
-	if (NULL == (fp = popen(cmd, "r"))) 
+	if (NULL == (fp = popen(cmd, "r")))
 	{
 		zbx_snprintf(error, sizeof(error), "External check is not supported, failed execution");
 		SET_MSG_RESULT(result, strdup(error));
@@ -106,9 +106,9 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 	memset(msg,0,sizeof(msg));
 	if(NULL != fgets(msg, sizeof(msg)-1, fp))
 	{
-		for (i = 0; i < MAX_STRING_LEN && msg[i] != 0; ++i) 
+		for (i = 0; i < MAX_STRING_LEN && msg[i] != 0; ++i)
 		{
-			if (msg[i] == '\n') 
+			if (msg[i] == '\n')
 			{
 				msg[i] = 0;
 				break;

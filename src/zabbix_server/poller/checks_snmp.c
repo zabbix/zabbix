@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -92,7 +92,7 @@ end:
  *                                                                            *
  * Purpose:                                                                   *
  *                                                                            *
- * Parameters:                                                                * 
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: -                                                            *
  ******************************************************************************/
@@ -131,7 +131,7 @@ end:
  *                                                                            *
  * Purpose:                                                                   *
  *                                                                            *
- * Parameters:                                                                * 
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: -                                                            *
  ******************************************************************************/
@@ -176,7 +176,7 @@ end:
  *                                                                            *
  * Purpose:                                                                   *
  *                                                                            *
- * Parameters:                                                                * 
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: -                                                            *
  ******************************************************************************/
@@ -214,7 +214,7 @@ end:
  *                                                                            *
  * Purpose:                                                                   *
  *                                                                            *
- * Parameters:                                                                * 
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: -                                                            *
  ******************************************************************************/
@@ -556,7 +556,7 @@ int	get_snmp(struct snmp_session *ss, DB_ITEM *item, char *snmp_oid, AGENT_RESUL
 #endif
 
 	snmp_add_null_var(pdu, anOID, anOID_len);
-  
+
 	status = snmp_synch_response(ss, pdu, &response);
 	zabbix_log( LOG_LEVEL_DEBUG, "Status send [%d]", status);
 
@@ -737,7 +737,7 @@ static ZBX_MIB_NORM mibs[]=
 					mibs[i].replace,
 					oid + sz);
 			break;
-		} 
+		}
 	}
 	if (0 == found)
 		zbx_strlcpy(buf, oid, maxlen);

@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -851,7 +851,7 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 		goto out;
 	}
 
-	    
+
 
 	tv.tv_sec = 10;
 	tv.tv_usec = 0;
@@ -875,8 +875,8 @@ int	get_value_ipmi(DB_ITEM *item, AGENT_RESULT *value)
 
 	if (NULL == os_hnd)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s", "IPMI handler is not initialized");
-		SET_MSG_RESULT(value, strdup("IPMI handler is not initialized"));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", "IPMI handler is not initialised");
+		SET_MSG_RESULT(value, strdup("IPMI handler is not initialised"));
 		return NOTSUPPORTED;
 	}
 
@@ -898,9 +898,9 @@ int	get_value_ipmi(DB_ITEM *item, AGENT_RESULT *value)
 
 	if (NULL == s && NULL == c)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Sensor or control %s@[%s]:%d does not exists",
+		zabbix_log(LOG_LEVEL_DEBUG, "Sensor or control %s@[%s]:%d does not exist",
 				item->ipmi_sensor, h->ip, h->port);
-		SET_MSG_RESULT(value, strdup("Sensor or control does not exists"));
+		SET_MSG_RESULT(value, strdup("Sensor or control does not exist"));
 		return NOTSUPPORTED;
 	}
 
@@ -976,7 +976,7 @@ int	set_ipmi_control_value(DB_ITEM *item, int value, char *error, size_t error_m
 
 	if (NULL == os_hnd)
 	{
-		zbx_strlcpy(error, "IPMI handler is not initialized", error_max_len);
+		zbx_strlcpy(error, "IPMI handler is not initialised", error_max_len);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 		return NOTSUPPORTED;
 	}
@@ -997,7 +997,7 @@ int	set_ipmi_control_value(DB_ITEM *item, int value, char *error, size_t error_m
 
 	if (NULL == c)
 	{
-		zbx_snprintf(error, error_max_len, "Control %s@[%s]:%d does not exists",
+		zbx_snprintf(error, error_max_len, "Control %s@[%s]:%d does not exist",
 				item->ipmi_sensor, h->ip, h->port);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 		return NOTSUPPORTED;

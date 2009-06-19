@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -51,7 +51,7 @@
  *                                                                            *
  ******************************************************************************/
 void __zbx_zabbix_syslog(const char *fmt, ...)
-{ 
+{
 	va_list		ap;
 	char		value_str[MAX_STRING_LEN];
 

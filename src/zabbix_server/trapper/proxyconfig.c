@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -33,7 +33,7 @@
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -51,7 +51,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_proxyconfig_table() [proxy_hostid:" ZBX_FS_UI64 "] [table:%s]",
 			proxy_hostid,
 			table->table);
-	
+
 	zbx_json_addobject(j, table->table);
 	zbx_json_addarray(j, "fields");
 
@@ -59,7 +59,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 			table->recid);
 
 	zbx_json_addstring(j, NULL, table->recid, ZBX_JSON_TYPE_STRING);
-	
+
 	for (f = 0; table->fields[f].name != 0; f ++) {
 		if ((table->fields[f].flags & ZBX_PROXY) == 0)
 			continue;
@@ -106,7 +106,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 			table->recid);
 
 	zbx_json_addarray(j, "data");
-		
+
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result))) {
@@ -148,7 +148,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -198,7 +198,7 @@ static int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -248,7 +248,7 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid)
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -271,7 +271,7 @@ void	update_proxy_lastaccess(const zbx_uint64_t hostid)
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -290,7 +290,7 @@ int	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		goto exit;
 
 	update_proxy_lastaccess(proxy_hostid);
-	
+
 	zbx_json_init(&j, 512*1024);
 	if (SUCCEED == (res = get_proxyconfig_data(proxy_hostid, &j))) {
 		zabbix_log(LOG_LEVEL_WARNING, "Sending configuration data to proxy. Datalen %d",
@@ -306,4 +306,3 @@ int	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 exit:
 	return res;
 }
-
