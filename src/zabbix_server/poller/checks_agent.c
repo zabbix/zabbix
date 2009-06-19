@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -30,11 +30,11 @@
  *                                                                            *
  * Parameters: item - item we are interested in                               *
  *                                                                            *
- * Return value: SUCCEED - data succesfully retrieved and stored in result    *
+ * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *                         and result_str (as string)                         *
- *               NETWORK_ERROR - network related error occured                *
+ *               NETWORK_ERROR - network related error occurred               *
  *               NOTSUPPORTED - item not supported by the agent               *
- *               AGENT_ERROR - uncritical error on agent side occured         *
+ *               AGENT_ERROR - uncritical error on agent side occurred        *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *

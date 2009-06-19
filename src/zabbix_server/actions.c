@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -225,9 +225,9 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
 	{
 		tmp_str = zbx_dsprintf(tmp_str, "%s", event->trigger_description);
-		
+
 		substitute_simple_macros(event, NULL, NULL, NULL, &tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION);
-		
+
 		if(condition->operator == CONDITION_OPERATOR_LIKE)
 		{
 			if(strstr(tmp_str, condition->value) != NULL)
@@ -488,7 +488,7 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_EVENT_ACKNOWLEDGED)
 	{
-		
+
 		result = DBselect("select acknowledged from events where eventid=" ZBX_FS_UI64,
 				event->eventid);
 
@@ -821,7 +821,7 @@ static int	check_action_conditions(DB_EVENT *event, DB_ACTION *action)
 
 	DB_CONDITION	condition;
 
-	/* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */	
+	/* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
 	int	ret = SUCCEED;
 	int	old_type = -1;
 	int	cond;
@@ -865,7 +865,7 @@ static int	check_action_conditions(DB_EVENT *event, DB_ACTION *action)
 						ret = FAIL;
 					}
 				}
-		
+
 				old_type = condition.conditiontype;
 				break;
 			case ACTION_EVAL_TYPE_AND:
@@ -903,7 +903,7 @@ static int	check_action_conditions(DB_EVENT *event, DB_ACTION *action)
 	}
 	DBfree_result(result);
 
-	/* If no conditions defined, return SUCCEED*/ 
+	/* If no conditions defined, return SUCCEED*/
 	if(num == 0)	ret = SUCCEED;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End check_action_conditions (result:%s)",
@@ -931,7 +931,7 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	
+
 	DB_OPERATION	operation;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In execute_operations(actionid:" ZBX_FS_UI64 ")",
@@ -990,7 +990,7 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 			default:
 				break;
 		}
-	
+
 /*		zbx_free(operation.shortdata);
 		zbx_free(operation.longdata);*/
 	}
@@ -1017,7 +1017,7 @@ void	process_actions(DB_EVENT *event)
 {
 	DB_RESULT result;
 	DB_ROW row;
-	
+
 	DB_ACTION action;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_actions(source:%s,eventid:" ZBX_FS_UI64 ")",

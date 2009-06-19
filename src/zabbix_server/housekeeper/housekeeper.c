@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -32,7 +32,7 @@
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCEED - information removed succesfully                    *
+ * Return value: SUCCEED - information removed successfully                   *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -69,8 +69,8 @@ static int housekeeping_process_log()
 			housekeeper.value);
 #elif defined(HAVE_POSTGRESQL)
 		deleted = DBexecute("delete from %s where oid in (select oid from %s where %s=" ZBX_FS_UI64 " limit 500)",
-				housekeeper.tablename, 
-				housekeeper.tablename, 
+				housekeeper.tablename,
+				housekeeper.tablename,
 				housekeeper.field,
 				housekeeper.value);
 #else
@@ -163,7 +163,7 @@ static int housekeeping_events(int now)
 	result = DBselect("select event_history from config");
 
 	row1=DBfetch(result);
-	
+
 	if(!row1 || DBis_null(row1[0])==SUCCEED)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
@@ -178,17 +178,17 @@ static int housekeeping_events(int now)
 		while((row2=DBfetch(result2)))
 		{
 			ZBX_STR2UINT64(eventid,row2[0]);
-			
+
 			DBexecute("delete from acknowledges where eventid=" ZBX_FS_UI64,
 				eventid);
-			
+
 			DBexecute("delete from events where eventid=" ZBX_FS_UI64,
 				eventid);
 		}
 		DBfree_result(result2);
 
 	}
-	
+
 	DBfree_result(result);
 	return res;
 }
@@ -257,7 +257,7 @@ static int delete_history(char *table, zbx_uint64_t itemid, int keep_history, in
  *                                                                            *
  * Parameters: now - current timestamp                                        *
  *                                                                            *
- * Return value: SUCCEED - information removed succesfully                    *
+ * Return value: SUCCEED - information removed successfully                   *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *

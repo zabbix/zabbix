@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -32,7 +32,7 @@
  * Parameters: host - host name                                               *
  *                                                                            *
  * Return value:  SUCCEED - host is found                                     *
- *                FAIL - an error occured or host not found                   *
+ *                FAIL - an error occurred or host not found                  *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -78,8 +78,8 @@ static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *erro
  * Parameters: sock - open socket of server-agent connection                  *
  *             request - request buffer                                       *
  *                                                                            *
- * Return value:  SUCCEED - list of active checks sent succesfully            *
- *                FAIL - an error occured                                     *
+ * Return value:  SUCCEED - list of active checks sent successfully           *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -179,8 +179,8 @@ out:
  * Parameters: sock - open socket of server-agent connection                  *
  *             json - request buffer                                          *
  *                                                                            *
- * Return value:  SUCCEED - list of active checks sent succesfully            *
- *                FAIL - an error occured                                     *
+ * Return value:  SUCCEED - list of active checks sent successfully           *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -268,7 +268,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 			if (2 != parse_command(item.key, NULL, 0, params, MAX_STRING_LEN))
 				break;;
-				
+
 			if (0 != get_param(params, 2, pattern, sizeof(pattern)))
 				break;
 
@@ -343,7 +343,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	return res;
 error:
-	zabbix_log(LOG_LEVEL_WARNING, "Send list of active checks to [%s] failed: %s",
+	zabbix_log(LOG_LEVEL_WARNING, "Sending list of active checks to [%s] failed: %s",
 			get_ip_by_socket(sock), error);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);

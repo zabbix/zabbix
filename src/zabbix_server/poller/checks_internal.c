@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -24,11 +24,11 @@
  *                                                                            *
  * Function: get_value_internal                                               *
  *                                                                            *
- * Purpose: retrieve data from ZABBIX server (internally supported intems)    *
+ * Purpose: retrieve data from ZABBIX server (internally supported items)     *
  *                                                                            *
  * Parameters: item - item we are interested in                               *
  *                                                                            *
- * Return value: SUCCEED - data succesfully retrieved and stored in result    *
+ * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *                         and result_str (as string)                         *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
@@ -51,7 +51,7 @@ int	get_value_internal(DB_ITEM *item, AGENT_RESULT *result)
 
 	if (parse_command(item->key, NULL, 0, params, sizeof(params)) != 2)
 		goto not_supported;
-				
+
 	if (get_param(params, 1, tmp, sizeof(tmp)) != 0)
 		goto not_supported;
 

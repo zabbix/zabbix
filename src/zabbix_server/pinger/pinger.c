@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -46,7 +46,7 @@ static int		hosts_allocated = 4;
  *             host - host name                                               *
  *             value - new value of the item                                  *
  *                                                                            *
- * Return value: SUCCEED - new value sucesfully processed                     *
+ * Return value: SUCCEED - new value successfully processed                   *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -101,7 +101,7 @@ static void process_value(char *key, ZBX_FPING_HOST *host, zbx_uint64_t *value_u
 			if (0 == CONFIG_DBSYNCER_FORKS)
 			{
 				DBbegin();
-		
+
 				DBupdate_item_status_to_notsupported(&item, now, error);
 
 				DBcommit();
@@ -206,7 +206,7 @@ static int process_values(ZBX_FPING_HOST *hosts, int hosts_count, int now)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCEED - the file was created succesfully                   *
+ * Return value: SUCCEED - the file was created successfully                  *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Author: Alexei Vladishev, Aleksander Vladishev                             *
@@ -235,7 +235,7 @@ static int	get_pinger_hosts(int now)
 	result = DBselect("select distinct h.ip from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d"
 			" and i.hostid=h.hostid and h.proxy_hostid=0 and h.status=%d and i.key_ in ('%s','%s')"
 			" and i.type=%d and i.status in (%s) and h.useip=1 and i.nextcheck<=%d"
-			" and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE, 
+			" and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE,
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,
 			HOST_STATUS_MONITORED,
@@ -332,7 +332,7 @@ static int get_minnextcheck()
 
 	result = DBselect("select count(*),min(i.nextcheck) from items i,hosts h where " ZBX_SQL_MOD(h.hostid,%d) "=%d"
 			" and h.status=%d and h.hostid=i.hostid and h.proxy_hostid=0 and i.key_ in ('%s','%s')"
-			" and i.type=%d and i.status in (%s) and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE, 
+			" and i.type=%d and i.status in (%s) and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE,
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,
 			HOST_STATUS_MONITORED,
@@ -345,7 +345,7 @@ static int get_minnextcheck()
 	if (NULL == (row = DBfetch(result)) || DBis_null(row[0]) == SUCCEED || DBis_null(row[1]) == SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "No items to update for minnextcheck.");
-		res = FAIL; 
+		res = FAIL;
 	}
 	else
 	{
@@ -403,8 +403,8 @@ void main_pinger_loop(zbx_process_t p, int num)
 
 		items = 0;
 		if (0 < (hosts_count = get_pinger_hosts(now)))
-			items = process_values(hosts, hosts_count, now); 
-	
+			items = process_values(hosts, hosts_count, now);
+
 		sec = zbx_time() - sec;
 
 		nextcheck = get_minnextcheck();
@@ -427,7 +427,7 @@ void main_pinger_loop(zbx_process_t p, int num)
 				sleeptime);
 
 		if (sleeptime > 0) {
-			zbx_setproctitle("pinger [sleeping for %d seconds]", 
+			zbx_setproctitle("pinger [sleeping for %d seconds]",
 					sleeptime);
 
 			sleep(sleeptime);

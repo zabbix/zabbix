@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2006 SIA Zabbix
 **
@@ -68,11 +68,11 @@ int	is_master_node(int current_nodeid, int nodeid)
  *                                                                            *
  * Function: main_nodewatcher_loop                                            *
  *                                                                            *
- * Purpose: periodically calculates checks sum of config data                 *
+ * Purpose: periodically calculates checksum of config data                   *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *

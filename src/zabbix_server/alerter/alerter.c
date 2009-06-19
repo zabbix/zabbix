@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -37,12 +37,12 @@
  *                                                                            *
  * Function: execute_action                                                   *
  *                                                                            *
- * Purpose: executa an action depending on mediatype                          *
+ * Purpose: execute an action depending on mediatype                          *
  *                                                                            *
  * Parameters: alert - alert details                                          *
  *             mediatype - media details                                      *
  *                                                                            *
- * Return value: SUCCESS - action executed sucesfully                         * 
+ * Return value: SUCCESS - action executed sucessfully                        *
  *               FAIL - otherwise, error will contain error message           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -171,7 +171,7 @@ int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *

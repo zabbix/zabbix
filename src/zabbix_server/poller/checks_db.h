@@ -18,7 +18,7 @@
 **/
 
 #ifndef ZABBIX_CHECKS_DB_H
-#define ZABBIX_CHECKS_DB_H 
+#define ZABBIX_CHECKS_DB_H
 
 #include "db.h"
 #include "sysinfo.h"

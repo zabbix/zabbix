@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -50,7 +50,7 @@ void http_substitute_macros(DB_HTTPTEST *httptest, char *data, int data_max_len)
 		str_out[MAX_STRING_LEN],
 		replace_to[MAX_STRING_LEN],
 		*c,*c2, save,*replacement,save2;
-	int	
+	int
 		outlen,
 		var_len;
 
@@ -97,7 +97,7 @@ void http_substitute_macros(DB_HTTPTEST *httptest, char *data, int data_max_len)
 						zbx_snprintf(replace_to, sizeof(replace_to), "%s", replacement);
 					}
 				}
-				
+
 			}
 /*			result = DBselect("select value from httpmacro where macro='%s' and httptestid=" ZBX_FS_UI64,
 				pr, httptest->httptestid);

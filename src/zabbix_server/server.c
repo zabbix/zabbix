@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -104,7 +104,7 @@ static struct zbx_option longopts[] =
 
 /* short options */
 
-static char	shortopts[] = 
+static char	shortopts[] =
 	"c:n:hV"
 #if defined (_WINDOWS)
 	"idsx"
@@ -171,7 +171,7 @@ int	CONFIG_ENABLE_LOG		= 1;
 /* From table config */
 int	CONFIG_REFRESH_UNSUPPORTED	= 0;
 
-/* Zabbix server sturtup time */
+/* Zabbix server startup time */
 int     CONFIG_SERVER_STARTUP_TIME      = 0;
 
 /* Mutex for node syncs */
@@ -494,7 +494,7 @@ void test_db_connection(void)
 
 	if( row_val )
 	{
-		fprintf(stderr, "DB result: [%s] [%s]\n", row_val[0], row_val[1]); 
+		fprintf(stderr, "DB result: [%s] [%s]\n", row_val[0], row_val[1]);
 	}
 	else
 	{
@@ -539,7 +539,7 @@ void test_templates()
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
 	DBsync_host_with_template(10096, 10004);
-	
+
 	DBclose();
 }
 
@@ -623,7 +623,7 @@ void	test_email()
 			" 18 Line\n",
 			str_error,
 			sizeof(str_error)
-			
+
 		  ) )
 		printf("ERROR: %s\n", str_error);
 	else
@@ -664,14 +664,14 @@ void test_trigger_description()
 
 	data = strdup("!!!test $0 $1 $2 $3 $5 $6 $7 $8 $9 $10 $11");
 
-	printf("Descriptioni (before): [%s]\n", data); 
+	printf("Descriptioni (before): [%s]\n", data);
 
 	expand_trigger_description_simple(&data, 100000000012896);
 
-	printf("Description  (after) : [%s]\n", data); 
+	printf("Description  (after) : [%s]\n", data);
 
 	zbx_free(data);
-	
+
 	DBclose();
 }
 
@@ -706,9 +706,9 @@ ZBX_TEST_TCP_CONNECT expressions[]=
 		printf("[%25s]:%-5d %-30s ", expressions[i].hostname, expressions[i].port, host);
 
 		alarm(5);
-		switch(zbx_tcp_connect(&s, expressions[i].hostname, expressions[i].port)) 
+		switch(zbx_tcp_connect(&s, expressions[i].hostname, expressions[i].port))
 		{
-			case SUCCEED : 
+			case SUCCEED :
 				printf("Succeed");
 
 				if(FAIL == zbx_tcp_check_security(&s, ip_list, 0))
@@ -717,7 +717,7 @@ ZBX_TEST_TCP_CONNECT expressions[]=
 				}
 				zbx_tcp_close(&s);
 				break;
-			case FAIL    : 
+			case FAIL    :
 				printf("Fail %s\n", zbx_tcp_strerror());
 				break;
 		}
@@ -771,7 +771,7 @@ ZBX_TEST_IP expressions[]=
 	{
 		strcpy(list, expressions[i].list);
 		result = ip_in_list(list, expressions[i].ip);
-			
+
 		printf("list [%50s] ip [%20s] expected [%7s] got [%7s]\n",
 			expressions[i].list,
 			expressions[i].ip,
@@ -913,7 +913,7 @@ ZBX_TEST expressions[]=
 	event.value = TRIGGER_VALUE_TRUE;
 	event.acknowledged = 1;
 /*	int		skip_actions;*/
-	zbx_snprintf(event.trigger_description, TRIGGER_DESCRIPTION_LEN_MAX, "TEST TRIGGER"); 
+	zbx_snprintf(event.trigger_description, TRIGGER_DESCRIPTION_LEN_MAX, "TEST TRIGGER");
 	event.trigger_priority = TRIGGER_SEVERITY_HIGH;
 	event.trigger_url = strdup("TEST URL");
 	event.trigger_comments = strdup("TEST COMMENTS");
@@ -1137,7 +1137,7 @@ int main(int argc, char **argv)
 	zbx_on_exit();
 	return 0;
 #endif /* ZABBIX_TEST */
-	
+
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }
 
@@ -1278,7 +1278,7 @@ int MAIN_ZABBIX_ENTRY(void)
 		if((pid = zbx_fork()) == 0)
 		{
 			server_num = i;
-			break; 
+			break;
 		}
 		else
 		{
@@ -1440,7 +1440,7 @@ int MAIN_ZABBIX_ENTRY(void)
 void	zbx_on_exit()
 {
 #if !defined(_WINDOWS)
-	
+
 	int i = 0;
 
 	if(threads != NULL)
@@ -1457,7 +1457,7 @@ void	zbx_on_exit()
 		}
 		zbx_free(threads);
 	}
-	
+
 #endif /* not _WINDOWS */
 
 #ifdef USE_PID_FILE
@@ -1481,7 +1481,7 @@ void	zbx_on_exit()
 #endif
 
 	zabbix_close_log();
-	
+
 #ifdef  HAVE_SQLITE3
 	php_sem_remove(&sqlite_access);
 #endif /* HAVE_SQLITE3 */
@@ -1492,4 +1492,3 @@ void	zbx_on_exit()
 
 	exit(SUCCEED);
 }
-
