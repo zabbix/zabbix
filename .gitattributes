@@ -146,6 +146,8 @@ frontends/php/images/gradients/gradient.png -text
 frontends/php/images/gradients/menu_not_active.gif -text svneol=unset#unset
 frontends/php/images/gradients/menu_not_active2.gif -text
 frontends/php/images/gradients/menu_not_active_bb.gif -text
+frontends/php/images/gradients/sla_green.png -text
+frontends/php/images/gradients/sla_red.png -text
 frontends/php/images/gradients/table_head.gif -text svneol=unset#unset
 frontends/php/images/gradients/table_head2.gif -text svneol=unset#unset
 frontends/php/images/gradients/table_head2_bb.gif -text
