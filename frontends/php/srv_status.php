@@ -38,6 +38,7 @@ include_once "include/page_header.php";
 	$fields=array(
 		'serviceid'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,			NULL),
 		'showgraph'=>		array(T_ZBX_INT, O_OPT,	P_SYS,			IN('1'),		'isset({serviceid})'),
+		'period_start'=>	array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,	NULL),
 		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,			IN('0,1'),	NULL),
 // ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	IN('"hat"'),		NULL),
@@ -88,6 +89,43 @@ include_once "include/page_header.php";
 		$table->Show();
 	} 
 	else {
+		$periods = array(
+			'today' => S_TODAY,
+			'week' => S_THIS_WEEK,
+			'month' => S_THIS_MONTH,
+			'year' => S_THIS_YEAR,
+			24 => S_LAST_24_HOURS,
+			24*7 => S_LAST_7_DAYS,
+			24*30 => S_LAST_30_DAYS,
+			24*365 => S_LAST_365_DAYS,
+		);
+	
+		$period_start = get_request('period_start', 7*24);
+		
+		switch($period_start){
+			case 'today':
+				$period_start_sec = mktime(0, 0, 0, date('n'), date('j'), date('Y'));
+			break;
+			case 'week':
+				$period_start_sec = strtotime('last sunday');
+			break;
+			case 'month':
+				$period_start_sec = mktime(0, 0, 0, date('n'), 1, date('Y'));
+			break;
+			case 'year':
+				$period_start_sec = mktime(0, 0, 0, 1, 1, date('Y'));
+			break;
+			case 24:
+			case 24*7:
+			case 24*30:
+			case 24*365:
+				$period_start_sec = $period_start * 3600;
+			break;
+			default:
+				$period_start = 24*7;
+				$period_start_sec = $period_start * 3600;
+		}
+		
 		$query = 'SELECT DISTINCT s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid, s.triggerid, '.
 				' s.name as caption, s.algorithm, t.description, t.expression, s.sortorder, sl.linkid, s.showsla, s.goodsla, s.status '.
 			' FROM services s '.
@@ -159,16 +197,30 @@ include_once "include/page_header.php";
 			}
 			
 			if($row["showsla"]==1){
-				$row['sla'] = new CLink(new CImg("chart_sla.php?serviceid=".$row["serviceid"]),
-						"report3.php?serviceid=".$row["serviceid"]."&year=".date("Y"));
+				$now = time(null);
+				$start = $now - $period_start_sec;
+				$end = $now;
 				
-				$now		= time(NULL);
-				$period_start	= $now-7*24*3600;
-				$period_end	= $now;
+				$stat = calculate_service_availability($row["serviceid"], $start, $end);
+				$p = min($stat['problem'], 20);
+				$sla_style = $row['goodsla'] > $stat['ok'] ? 'red' : 'green';  
 				
+				$sizeX = 160;
+				$sizeY = 15;
+				$sizeX_red = $sizeX*$p/20;
+				$sizeX_green = $sizeX - $sizeX_red;
 
-				$stat = calculate_service_availability($row["serviceid"],$period_start,$period_end);
-
+				$chart = array(
+					'chart1'	=> new CImg('images/gradients/sla_green.png',$stat['ok'].'%' ,$sizeX_green,$sizeY),
+					'chart2'	=> new CImg('images/gradients/sla_red.png',$stat['problem'].'%' ,$sizeX_red,$sizeY),
+					'text'		=> new CSpan(SPACE.sprintf("%.2f",$stat['problem']),$sla_style));
+		
+				$chart['chart1']->addStyle('vertical-align: middle; line-height: 16px;');
+				$chart['chart2']->addStyle('vertical-align: middle; line-height: 16px;');	
+				$chart['text']->addStyle('vertical-align: middle; line-height: 16px;');
+	
+				$row['sla'] = new CLink($chart, "report3.php?serviceid=".$row['serviceid']."&year=".date("Y"));
+				
 				if($row["goodsla"] > $stat["ok"]){
 					$sla_style='red';
 				} 
@@ -206,21 +258,30 @@ include_once "include/page_header.php";
 		$tree = new CTree('service_status_tree', $treeServ,array('caption' => bold(S_SERVICE),
 						'status' => bold(S_STATUS), 
 						'reason' => bold(S_REASON),
-						'sla' => bold(S_SLA_LAST_7_DAYS),
+						'sla' => bold('SLA ('.$periods[$period_start].')'),
 						'sla2' => bold(nbsp(S_SLA)),
 						'graph' => bold(S_GRAPH)));
 		
 		if($tree){
-			$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
+			// creates form for choosing a preset interval
+			$r_form = new CForm();
+			$r_form->setClass('nowrap');
+			$r_form->setMethod('get');	
+			$r_form->addOption('name', 'period_choice');
+			$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
+			$period_combo = new CComboBox('period_start', $period_start, 'javascript: submit();');
+			foreach($periods as $key => $val){
+				$period_combo->AddItem($key, $val);
+			}
+			$r_form->AddItem(array(S_PERIOD, $period_combo));	
 	
+			$url = '?period_start='.$period_start.'&fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 			$fs_icon = new CDiv(SPACE,'fullscreen');
 			$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 			$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
-	
 			
 			$srv_wdgt = new CWidget('hat_services', $tree->getHTML());
-			$srv_wdgt->addHeader(S_IT_SERVICES_BIG, $fs_icon);
-				
+			$srv_wdgt->addHeader(S_IT_SERVICES_BIG, array($r_form, $fs_icon));
 			$srv_wdgt->show();
 		} 
 		else {
