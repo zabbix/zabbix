@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2006 SIA Zabbix
 **
@@ -89,7 +89,7 @@ static ZBX_HISTORY_TABLE dht={
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -104,7 +104,7 @@ static void	get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_lastid() [%s.%s]",
 			ht->table,
 			ht->lastfieldname);
-	
+
 	result = DBselect("select nextid from ids where table_name='%s' and field_name='%s'",
 			ht->table,
 			ht->lastfieldname);
@@ -115,7 +115,7 @@ static void	get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
 		*lastid = zbx_atoui64(row[0]);
 
 	DBfree_result(result);
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of get_lastid() [%s.%s]:" ZBX_FS_UI64,
 			ht->table,
 			ht->lastfieldname,
@@ -130,7 +130,7 @@ static void	get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -146,7 +146,7 @@ static void	set_lastid(const ZBX_HISTORY_TABLE *ht, const zbx_uint64_t lastid)
 			ht->table,
 			ht->lastfieldname,
 			lastid);
-			
+
 	result = DBselect("select 1 from ids where table_name='%s' and field_name='%s'",
 			ht->table,
 			ht->lastfieldname);
@@ -175,7 +175,7 @@ static void	set_lastid(const ZBX_HISTORY_TABLE *ht, const zbx_uint64_t lastid)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -244,7 +244,7 @@ static int get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -311,7 +311,7 @@ static int get_dhistory_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zb
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -379,7 +379,7 @@ retry:
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -447,7 +447,7 @@ retry:
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
