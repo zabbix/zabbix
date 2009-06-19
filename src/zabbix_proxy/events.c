@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -57,6 +57,6 @@ int	process_event(DB_EVENT *event)
 			event->value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of [proxy]process_event()");
-*/	
+*/
 	return SUCCEED;
 }

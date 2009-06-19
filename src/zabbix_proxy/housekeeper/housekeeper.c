@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -96,7 +96,7 @@ rollback:
  *                                                                            *
  * Parameters: now - current timestamp                                        *
  *                                                                            *
- * Return value: SUCCEED - information removed succesfully                    *
+ * Return value: SUCCEED - information removed successfully                   *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *

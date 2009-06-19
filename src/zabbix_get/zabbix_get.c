@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -106,7 +106,7 @@ void    signal_handler( int sig )
 		signal( SIGALRM, signal_handler );
 		zbx_error("Timeout while executing operation.");
 	}
- 
+
 	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
 	{
 /*		zbx_error("\nGot QUIT or INT or TERM signal. Exiting..." ); */
