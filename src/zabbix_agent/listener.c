@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -58,8 +58,8 @@ static void	process_listener(zbx_sock_t *s)
 			zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
 			ret = zbx_tcp_send(s, *value);
 		}
-		
-		free_result(&result);	
+
+		free_result(&result);
 	}
 
 	if( FAIL == ret )
@@ -73,7 +73,7 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 #if defined(ZABBIX_DAEMON)
 	struct	sigaction phan;
 #endif
-	int 
+	int
 		ret,
 		local_request_failed = 0;
 
@@ -99,7 +99,7 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 		if( SUCCEED == (ret = zbx_tcp_accept(&s)) )
 		{
 			local_request_failed = 0;     /* Reset consecutive errors counter */
-			
+
 			zbx_setproctitle("processing request");
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Processing request.");
@@ -122,7 +122,7 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 		}
 
 		if(ZBX_IS_RUNNING)
-			zbx_sleep(1);		
+			zbx_sleep(1);
 	}
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd listener stopped");

@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -42,7 +42,7 @@ typedef struct s_collector_data
 	ZBX_PERF_STAT_DATA	perfs;
 #endif /* _WINDOWS */
 } ZBX_COLLECTOR_DATA;
- 
+
 extern ZBX_COLLECTOR_DATA *collector;
 
 ZBX_THREAD_ENTRY(collector_thread, pSemColectorStarted);

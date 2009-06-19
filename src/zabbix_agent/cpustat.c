@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -166,7 +166,7 @@ void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 			pcpus->cpu[i].usage_couter = NULL;
 		}
 	}
-	
+
 	if(pcpus->pdh_query)
 	{
 		PdhCloseQuery(pcpus->pdh_query);
@@ -191,13 +191,13 @@ static int	get_cpustat(
 	)
 {
     #if defined(HAVE_PROC_STAT)
-	
+
 	FILE	*file;
 	char	line[1024];
 	char	cpu_name[10];
-	
+
     #elif defined(HAVE_SYS_PSTAT_H)
-	
+
 	struct	pst_dynamic stats;
 	struct	pst_processor psp;
 
@@ -205,7 +205,7 @@ static int	get_cpustat(
 
 	static long	cp_time[CPUSTATES];
 	size_t		nlen = sizeof(cp_time);
- 	
+
     #elif defined(HAVE_FUNCTION_SYSCTL_KERN_CPTIME)
 
 	int		mib[3];
@@ -256,7 +256,7 @@ static int	get_cpustat(
 	}
 	zbx_fclose(file);
 
-	if (*cpu_user + *cpu_system + *cpu_nice + *cpu_idle + *cpu_interrupt + *cpu_iowait + *cpu_softirq + *cpu_steal == 0) 
+	if (*cpu_user + *cpu_system + *cpu_nice + *cpu_idle + *cpu_interrupt + *cpu_iowait + *cpu_softirq + *cpu_steal == 0)
 		return 1;
 
     #elif defined(HAVE_SYS_PSTAT_H) /* HAVE_PROC_STAT */
@@ -430,8 +430,8 @@ static int	get_cpustat(
 static void	apply_cpustat(
 	ZBX_CPUS_STAT_DATA *pcpus,
 	int cpuid,
-	int now, 
-	zbx_uint64_t cpu_user, 
+	int now,
+	zbx_uint64_t cpu_user,
 	zbx_uint64_t cpu_system,
 	zbx_uint64_t cpu_nice,
 	zbx_uint64_t cpu_idle,
@@ -578,15 +578,15 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 			continue;
 
 		PdhGetRawCounterValue(
-			pcpus->cpu[i].usage_couter, 
-			NULL, 
+			pcpus->cpu[i].usage_couter,
+			NULL,
 			&pcpus->cpu[i].usage);
 
 		PdhCalculateCounterFromRawValue(
 			pcpus->cpu[i].usage_couter,
 			PDH_FMT_LONG,
 			&pcpus->cpu[i].usage,
-			&pcpus->cpu[i].usage_old, 
+			&pcpus->cpu[i].usage_old,
 			&value);
 
 		pcpus->cpu[i].h_usage[pcpus->cpu[i].h_usage_index] = value.longValue;
@@ -611,7 +611,7 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 
 		/* cpu usage for last fifteen minutes */
 		pcpus->cpu[i].util15 = ((double)sum)/(double)MAX_CPU_HISTORY;
-		
+
 		pcpus->cpu[i].h_usage_index++;
 		if (pcpus->cpu[i].h_usage_index == MAX_CPU_HISTORY)
 			pcpus->cpu[i].h_usage_index = 0;

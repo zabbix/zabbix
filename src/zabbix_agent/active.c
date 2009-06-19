@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -141,15 +141,15 @@ static void	add_check(const char *key, const char *key_orig, int refresh, long l
  *                                                                            *
  * Parameters: str - NULL terminated string received from server              *
  *                                                                            *
- * Return value: returns SUCCEED on succesfull parsing,                       *
- *               FAIL on an incoorrect format of string                       *
+ * Return value: returns SUCCEED on succesful parsing,                        *
+ *               FAIL on an incorrect format of string                        *
  *                                                                            *
  * Author: Eugene Grigorjev, Alexei Vladishev (new json protocol)             *
  *                                                                            *
  * Comments:                                                                  *
- *    String reprents as "ZBX_EOF" termination list                           *
+ *    String represented as "ZBX_EOF" termination list                        *
  *    With '\n' delimeter between elements.                                   *
- *    Each element represents as:                                             *
+ *    Each element represented as:                                            *
  *           <key>:<refresh time>:<last log size>                             *
  *                                                                            *
  ******************************************************************************/
@@ -188,7 +188,7 @@ static int	parse_list_of_checks(char *str)
  	p = NULL;
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
-/* {"data":[{"key":"system.cpu.num",...,...},{...},...]} 
+/* {"data":[{"key":"system.cpu.num",...,...},{...},...]}
  *          ^------------------------------^
  */ 		if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
 			goto json_error;
@@ -231,7 +231,7 @@ static int	parse_list_of_checks(char *str)
 	 	p = NULL;
 		while (NULL != (p = zbx_json_next(&jp_data, p)))
 		{
-/* {"regexp":[{"name":"regexp1",...,...},{...},...]} 
+/* {"regexp":[{"name":"regexp1",...,...},{...},...]}
  *            ^------------------------^
  */			if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
 				goto json_error;
@@ -293,12 +293,12 @@ json_error:
  *                                                                            *
  * Function: refresh_active_checks                                            *
  *                                                                            *
- * Purpose: Retrive from ZABBIX server list of active checks                  *
+ * Purpose: Retrieve from ZABBIX server list of active checks                 *
  *                                                                            *
  * Parameters: host - IP or Hostname of ZABBIX server                         *
  *             port - port of ZABBIX server                                   *
  *                                                                            *
- * Return value: returns SUCCEED on succesfull parsing,                       *
+ * Return value: returns SUCCEED on succesful parsing,                        *
  *               FAIL on other cases                                          *
  *                                                                            *
  * Author: Eugene Grigorjev, Alexei Vladishev (new json protocol)             *
@@ -401,12 +401,12 @@ static int	check_response(char *response)
  *                                                                            *
  * Function: send_buffer                                                      *
  *                                                                            *
- * Purpose: Send value stgored in the buffer to ZABBIX server                 *
+ * Purpose: Send value stored in the buffer to ZABBIX server                  *
  *                                                                            *
  * Parameters: host - IP or Hostname of ZABBIX server                         *
  *             port - port number                                             *
  *                                                                            *
- * Return value: returns SUCCEED on succesfull parsing,                       *
+ * Return value: returns SUCCEED on succesful parsing,                        *
  *               FAIL on other cases                                          *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -540,12 +540,12 @@ static int	send_buffer(
  *             hostname - name of host in ZABBIX database                     *
  *             key - name of metric                                           *
  *             value - string version os key value                            *
- *             lastlogsize - size of readed logfile                           *
- *             timestamp - timestamp of readed value                          *
+ *             lastlogsize - size of read logfile                             *
+ *             timestamp - timestamp of read value                            *
  *             source - name of logged data source                            *
  *             severity - severity of logged data sources                     *
  *                                                                            *
- * Return value: returns SUCCEED on succesfull parsing,                       *
+ * Return value: returns SUCCEED on succesful parsing,                        *
  *               FAIL on other cases                                          *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -561,7 +561,7 @@ static int	process_value(
 		const char		*value,
 		long			*lastlogsize,
 		unsigned long	*timestamp,
-		const char		*source, 
+		const char		*source,
 		unsigned short	*severity,
 		unsigned long	*logeventid
 )
@@ -663,7 +663,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			do{ /* simple try realization */
 				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2)
 					break;
-				
+
 				if (num_param(params) > 2)
 					break;
 
@@ -739,7 +739,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			do{ /* simple try realization */
 				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2)
 					break;
-				
+
 				if (num_param(params) > 2)
 					break;
 
@@ -813,7 +813,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		}
 		else
 		{
-			
+
 			process(active_metrics[i].key, 0, &result);
 
 			if( NULL == (pvalue = GET_TEXT_RESULT(&result)) )
@@ -835,7 +835,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						NULL,
 						NULL
 					);
-				
+
 				if( 0 == strcmp(*pvalue,"ZBX_NOTSUPPORTED") )
 				{
 					active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
@@ -871,7 +871,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)args)->port;
 
 	assert(activechk_args.host);
-	
+
 	p = strchr(activechk_args.host,',');
 	if(p) *p = '\0';
 
@@ -927,4 +927,3 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_tread_exit(0);
 
 }
-
