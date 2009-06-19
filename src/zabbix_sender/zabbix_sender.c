@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -28,7 +28,7 @@
 
 char *progname = NULL;
 
-char title_message[] = "ZABBIX send";
+char title_message[] = "ZABBIX sender";
 
 char usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -i <file>} [-c <file>]";
 
@@ -126,7 +126,7 @@ static void    send_signal_handler( int sig )
 		signal( SIGALRM, send_signal_handler );
 		zabbix_log( LOG_LEVEL_WARNING, "Timeout while executing operation");
 	}
- 
+
 	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
 	{
 /*		fprintf(stderr,"\nGot QUIT or INT or TERM signal. Exiting..." ); */
@@ -152,7 +152,7 @@ typedef struct zbx_active_metric_type
  * Parameters: result SUCCEED or FAIL                                         *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -327,10 +327,10 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 				version();
 				exit(-1);
 				break;
-			case 'I': 
+			case 'I':
 				CONFIG_SOURCE_IP = strdup(zbx_optarg);
 				break;
-			case 'z': 
+			case 'z':
 				ZABBIX_SERVER = strdup(zbx_optarg);
 				break;
 			case 'p':
@@ -521,4 +521,3 @@ exit:
 
 	return ret;
 }
-

@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2006 SIA Zabbix
 **
@@ -34,12 +34,12 @@
  *                                                                            *
  * Function: calculate_checksums                                              *
  *                                                                            *
- * Purpose: calculate check sums of configuration data                        *
+ * Purpose: calculate checksums of configuration data                         *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCESS - calculated succesfully                             * 
- *               FAIL - an error occured                                      *
+ * Return value: SUCCESS - calculated successfully                            *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -164,8 +164,8 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCESS - processed succesfully                              * 
- *               FAIL - an error occured                                      *
+ * Return value: SUCCESS - processed successfully                             *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -184,7 +184,7 @@ char *get_config_data(int nodeid, int dest_nodetype)
 	int	data_offset=0, sql_offset = 0;
 	int	data_allocated=1024, hex_allocated=1024, sql_allocated=8*1024;
 	int	f, j, rowlen;
-	
+
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_config_data(node:%d,dest_nodetype:%s)",
 		nodeid,
 		dest_nodetype == ZBX_NODE_MASTER ? "MASTER" : "SLAVE");
@@ -276,7 +276,7 @@ char *get_config_data(int nodeid, int dest_nodetype)
 
 			if (r[0] == NULL || r[1] == NULL || (dest_nodetype == ZBX_NODE_SLAVE && *s != c[0]) ||
 				(dest_nodetype == ZBX_NODE_MASTER && *(s+1) != c[0]) || strcmp(r[0], r[1]) != 0) {
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "%s,length(%s),", 
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "%s,length(%s),",
 					table->fields[f].name,
 					table->fields[f].name);
 			}
@@ -287,12 +287,12 @@ char *get_config_data(int nodeid, int dest_nodetype)
 				*d[0] = ',';
 				r[0] = d[0] + 1;
 			} else
-				r[0] = NULL; 
+				r[0] = NULL;
 			if (d[1] != NULL) {
 				*d[1] = ',';
 				r[1] = d[1] + 1;
 			} else
-				r[1] = NULL; 
+				r[1] = NULL;
 		} while (d[0] != NULL || d[1] != NULL);
 
 		if (sql[sql_offset-1] != ',')
@@ -366,12 +366,12 @@ char *get_config_data(int nodeid, int dest_nodetype)
 				*d[0] = ',';
 				r[0] = d[0] + 1;
 			} else
-				r[0] = NULL; 
+				r[0] = NULL;
 			if (d[1] != NULL) {
 				*d[1] = ',';
 				r[1] = d[1] + 1;
 			} else
-				r[1] = NULL; 
+				r[1] = NULL;
 		} while (d[0] != NULL || d[1] != NULL);
 		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n");
 out:
@@ -393,8 +393,8 @@ out:
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCESS - calculated succesfully                             * 
- *               FAIL - an error occured                                      *
+ * Return value: SUCCESS - calculated successfully                            *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -478,7 +478,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 			if (synked == SUCCEED) {
 				if (synked_nodetype == ZBX_NODE_SLAVE)
 					*s = c[1];
-				else if (synked_nodetype == ZBX_NODE_MASTER) 
+				else if (synked_nodetype == ZBX_NODE_MASTER)
 					*(s + 1) = c[1];
 			}
 			s += 2;
@@ -513,7 +513,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 						if (synked == SUCCEED) {
 							if (synked_nodetype == ZBX_NODE_SLAVE)
 								*s = c[0];
-							else if (synked_nodetype == ZBX_NODE_MASTER) 
+							else if (synked_nodetype == ZBX_NODE_MASTER)
 								*(s + 1) = c[0];
 						}
 					}
@@ -526,12 +526,12 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 					*d[0] = ',';
 					r[0] = d[0] + 1;
 				} else
-					r[0] = NULL; 
+					r[0] = NULL;
 				if (d[1] != NULL) {
 					*d[1] = ',';
 					r[1] = d[1] + 1;
 				} else
-					r[1] = NULL; 
+					r[1] = NULL;
 			} while (d[0] != NULL || d[1] != NULL);
 		}
 		*s = '\0';
@@ -564,7 +564,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -584,7 +584,7 @@ void node_sync_lock(int nodeid)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -600,11 +600,11 @@ void node_sync_unlock(int nodeid)
  *                                                                            *
  * Function: process_nodes                                                    *
  *                                                                            *
- * Purpose: calculates checks sum of config data                              *
+ * Purpose: calculates checkssum of config data                               *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *

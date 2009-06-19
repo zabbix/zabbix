@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2006 SIA Zabbix
 **
@@ -107,8 +107,8 @@ void	disconnect_node(zbx_sock_t *sock)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCESS - processed succesfully                              * 
- *               FAIL - an error occured                                      *
+ * Return value: SUCCESS - processed successfully                             *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *

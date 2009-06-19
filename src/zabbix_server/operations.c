@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -115,7 +115,7 @@
  *                                                                            *
  * Author: Aly                                                                *
  *                                                                            *
- * Comments:                    			                      *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 /*int check_user_active(zbx_uint64_t userid){
@@ -124,9 +124,9 @@
 	int		rtrn = SUCCEED;
 
 	result = DBselect("SELECT COUNT(g.usrgrpid) FROM users_groups ug, usrgrp g WHERE ug.userid=" ZBX_FS_UI64 " AND g.usrgrpid=ug.usrgrpid AND g.users_status=%d", userid, GROUP_STATUS_DISABLED);
-	
+
 	row = DBfetch(result);
-	if(row && (DBis_null(row[0])!=SUCCEED) && (atoi(row[0])>0)) 
+	if(row && (DBis_null(row[0])!=SUCCEED) && (atoi(row[0])>0))
 		rtrn=FAIL;
 
 	DBfree_result(result);
@@ -270,14 +270,14 @@ static void run_remote_command(char* host_name, char* command)
 			ret = get_value_agent(&item, &agent_result);
 
 			free_result(&agent_result);
-	
+
 			alarm(0);
 #ifdef HAVE_OPENIPMI
 		}
 #endif
 	}
 	DBfree_result(result);
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End run_remote_command(result:%d)",
 		ret);
 }
@@ -294,7 +294,7 @@ static void run_remote_command(char* host_name, char* command)
  *                               1 if alias is a group name                   *
  *             command - (output) remote command                              *
  *                                                                            *
- * Return value: 0 - correct comand is readed                                 *
+ * Return value: 0 - correct comand is read                                   *
  *               1 - EOL                                                      *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -311,7 +311,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 	int state = CMD_ALIAS;
 	int len = 0;
 	int i = 0;
-	
+
 	assert(alias);
 	assert(is_group);
 	assert(command);
@@ -322,7 +322,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 	*alias = NULL;
 	*is_group = 0;
 	*command = NULL;
-	
+
 
 	if((*command_list)[0] == '\0' || (*command_list)==NULL) {
 		zabbix_log(LOG_LEVEL_DEBUG, "Result get_next_command [EOL]");
@@ -369,7 +369,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 		*alias,
 		*is_group,
 		*command);
-	
+
 	return 0;
 }
 
@@ -386,7 +386,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: commands devided with newline                                    *
+ * Comments: commands separated with newline                                  *
  *                                                                            *
  ******************************************************************************/
 void	op_run_commands(char *cmd_list)
@@ -481,7 +481,7 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: discovered port number, otherwice default port - 10050       *
+ * Return value: discovered port number, otherwise default port - 10050       *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -597,7 +597,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 		{
 			result3 = DBselect("select discovery_groupid from config where 1=1" DB_NODE, DBnode_local("configid"));
 			row3 = DBfetch(result3);
-		
+
 			if( (row3 != NULL) && DBis_null(row3[0]) != SUCCEED)
 			{
 				hostid = DBget_maxid("hosts","hostid");
@@ -610,20 +610,20 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 						host_esc,
 						port);
 
-				
+
 				ZBX_STR2UINT64(groupid, row3[0]);
-				
+
 				hostgroupid = DBget_maxid("hosts_groups", "hostgroupid");
 				DBexecute("insert into hosts_groups (hostgroupid,hostid,groupid)"
 						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
 						hostgroupid,
 						hostid,
-						groupid);				
+						groupid);
 			}
 			else{
 				zabbix_log(LOG_LEVEL_DEBUG, "Discovery group is not defined %s()", __function_name);
 			}
-			
+
 			DBfree_result(result3);
 		}
 		else
@@ -998,7 +998,7 @@ void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 	{
 		DBbegin();
 
-		DBdelete_template_elements(hostid, templateid, 0 /* not a unlink mode */);
+		DBdelete_template_elements(hostid, templateid, 0 /* not an unlink mode */);
 
 		DBexecute("delete from hosts_templates where "
 				"hostid=" ZBX_FS_UI64 " and templateid=" ZBX_FS_UI64,

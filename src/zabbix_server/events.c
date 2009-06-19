@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -200,6 +200,6 @@ int	process_event(DB_EVENT *event)
 	free_trigger_info(event);
 
 	zabbix_log(LOG_LEVEL_DEBUG,"End of process_event()");
-	
+
 	return SUCCEED;
 }

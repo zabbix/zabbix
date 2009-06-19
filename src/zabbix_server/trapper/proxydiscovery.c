@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -36,7 +36,7 @@
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -68,7 +68,7 @@ int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	update_proxy_lastaccess(proxy_hostid);
 
 	now = time(NULL);
-	
+
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp))) {
 		res = FAIL;
 		goto exit;
@@ -150,4 +150,3 @@ exit:
 
 	return res;
 }
-

@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -215,10 +215,10 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 	if (NULL == hosts)
 		hosts = zbx_malloc(hosts, hosts_alloc);
 	*hosts = '\0';
-	
+
 	if (NULL == sql)
 		sql = zbx_malloc(sql, sql_alloc);
-	
+
 	for (i = 0; i < hm_count; i ++)
 	{
 		if (SUCCEED == uint64_in_list(hosts, hm[i].hostid))
@@ -355,7 +355,7 @@ static void	process_maintenance()
 		case TIMEPERIOD_TYPE_MONTHLY:
 			if (0 == (db_month & (1 << mon)))
 				continue;
-				
+
 			if (0 != db_day)
 			{
 				if (mday != db_day)

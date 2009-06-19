@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -195,7 +195,7 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 		strscpy(s,item->key);
 		t=strstr(s,"_perf");
 		t[0]=0;
-		
+
 		if(item->useip==1)
 		{
 			zbx_snprintf(c,sizeof(c),"net.tcp.service.perf[%s,%s]",s,item->ip);

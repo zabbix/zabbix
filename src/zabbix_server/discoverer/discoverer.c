@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -71,7 +71,7 @@ static void	add_event(int object, zbx_uint64_t objectid, int now, int value)
  *                                                                            *
  * Function: update_dservice                                                  *
  *                                                                            *
- * Purpose: update descovered service details                                 *
+ * Purpose: update discovered service details                                 *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -103,7 +103,7 @@ static void	update_dservice(DB_DSERVICE *service)
  *                                                                            *
  * Function: update_dservice_value                                            *
  *                                                                            *
- * Purpose: update descovered service details                                 *
+ * Purpose: update discovered service details                                 *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -132,7 +132,7 @@ static void	update_dservice_value(DB_DSERVICE *service)
  *                                                                            *
  * Function: update_dhost                                                      *
  *                                                                            *
- * Purpose: update descovered host details                                    *
+ * Purpose: update discovered host details                                    *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -219,7 +219,7 @@ static void	register_service(DB_DSERVICE *service, const char *ip, int port, int
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Service is already in database");
-		
+
 		service->dserviceid	= zbx_atoui64(row[0]);
 		service->port		= port;
 		service->status		= atoi(row[1]);
@@ -548,7 +548,7 @@ static void proxy_update_service(DB_DCHECK *check, char *ip, int port, int now)
 			ip_esc,
 			port,
 			key_esc,
-			value_esc,	
+			value_esc,
 			check->status);
 	DBcommit();
 
@@ -596,9 +596,9 @@ static void proxy_update_host(zbx_uint64_t druleid, char *ip, int status, int no
  *                                                                            *
  * Function: discover_service                                                 *
  *                                                                            *
- * Purpose: check if service is avaiable and update database                  *
+ * Purpose: check if service is available and update database                 *
  *                                                                            *
- * Parameters: service typ,e ip address, port number                          *
+ * Parameters: service type, ip address, port number                          *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -784,7 +784,7 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
  *                                                                            *
  * Function: process_check                                                    *
  *                                                                            *
- * Purpose: check if service is avaiable and update database                  *
+ * Purpose: check if service is available and update database                 *
  *                                                                            *
  * Parameters: service - service info                                         *
  *                                                                            *
@@ -832,7 +832,7 @@ static void process_check(DB_DRULE *rule, DB_DHOST *dhost, int *host_status, DB_
 			next_range++;
 		}
 
-		for (port = first; port <= last; port++) {	
+		for (port = first; port <= last; port++) {
 			check->status = (SUCCEED == discover_service(check, ip, port)) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
 
 			/* Update host status */
@@ -955,7 +955,7 @@ static void process_rule(DB_DRULE *rule)
 			dash = NULL;
 		}
 
-		if ( next_range ) 
+		if ( next_range )
 		{
 			next_range[0] = ',';
 			next_range ++;
@@ -1145,7 +1145,7 @@ void main_discoverer_loop(zbx_process_t p, int num)
 			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
 					sleeptime);
 
-			zbx_setproctitle("discoverer [sleeping for %d seconds]", 
+			zbx_setproctitle("discoverer [sleeping for %d seconds]",
 					sleeptime);
 
 			sleep( sleeptime );
