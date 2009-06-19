@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -58,7 +58,7 @@ static int    zbx_open_eventlog(const char *source, HANDLE *eventlog_handle, lon
 
 	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, reg_path, 0, KEY_READ, &hk))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Missed eventlog '%s'", source);
+		zabbix_log(LOG_LEVEL_WARNING, "Missing eventlog '%s'", source);
 		goto out;
 	}
 
@@ -162,7 +162,7 @@ retry:
 	/* prepare the array of insert strings for FormatMessage - the
 	insert strings are in the log entry. */
 	for (i = 0, pCh = (char *)((LPBYTE)pELR + pELR->StringOffset);
-			i < pELR->NumStrings && i < MAX_INSERT_STRS; 
+			i < pELR->NumStrings && i < MAX_INSERT_STRS;
 			i++, pCh += strlen(pCh) + 1) /* point to next string */
 	{
 		aInsertStrs[i] = pCh;
@@ -177,16 +177,16 @@ retry:
 
 		if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_LOCAL_MACHINE, stat_buf, 0, KEY_READ, &hk))
 		{
-			pFile = stat_buf; 
+			pFile = stat_buf;
 			Data = sizeof(stat_buf);
 
 			err = RegQueryValueEx(
-					hk,						/* handle of key to query */
-					"EventMessageFile",     /* value name             */
-					NULL,                   /* must be NULL           */
-					&Type,                  /* address of type value  */
-					(UCHAR*)pFile,          /* address of value data  */
-					&Data);                 /* length of value data   */
+					hk,			/* handle of key to query */
+					"EventMessageFile",	/* value name             */
+					NULL,			/* must be NULL           */
+					&Type,			/* address of type value  */
+					(UCHAR*)pFile,		/* address of value data  */
+					&Data);			/* length of value data   */
 
 			RegCloseKey(hk);
 
@@ -258,22 +258,22 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
-} 
+}
 #endif /* _WINDOWS */
 
 int process_eventlog(
 	const char	*source,
-	long		*lastlogsize, 
-	unsigned long	*out_timestamp, 
-	char		**out_source, 
+	long		*lastlogsize,
+	unsigned long	*out_timestamp,
+	char		**out_source,
 	unsigned short	*out_severity,
 	char		**out_message,
 	unsigned long	*out_eventid)
 {
 	int		ret = FAIL;
-	
+
 #if defined(_WINDOWS)
-	
+
 	HANDLE  eventlog_handle;
 	long    FirstID;
 	long    LastID;
@@ -298,13 +298,13 @@ int process_eventlog(
 
 	if (source && source[0] && SUCCEED == zbx_open_eventlog(source,&eventlog_handle,&LastID /* number */, &FirstID /* oldest */))
 	{
-		LastID += FirstID; 
+		LastID += FirstID;
 
 		if(*lastlogsize > LastID)
 			*lastlogsize = FirstID;
 		else if((*lastlogsize) >= FirstID)
 			FirstID = (*lastlogsize)+1;
-		
+
 		for (i = FirstID; i < LastID; i++)
 		{
 			if (SUCCEED == zbx_get_eventlog_message(source, eventlog_handle, i, out_source, out_message,
@@ -329,6 +329,6 @@ int process_eventlog(
 	}
 
 #endif /* _WINDOWS */
-	
+
 	return ret;
 }

@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -39,7 +39,7 @@
 
 ZBX_COLLECTOR_DATA *collector = NULL;
 
-#define ZBX_GET_SHM_KEY(smk_key) 														\
+#define ZBX_GET_SHM_KEY(smk_key) 													\
 	{if( -1 == (shm_key = ftok(CONFIG_FILE, (int)'z') )) 										\
         { 																\
                 zbx_error("Can not create IPC key for path '%s', try to create for path '.' [%s]", CONFIG_FILE, strerror(errno)); 	\
@@ -151,7 +151,7 @@ return_one:
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Linux version allocate memory as shared.                         *
+ * Comments: Linux version allocates memory as shared.                        *
  *                                                                            *
  ******************************************************************************/
 
@@ -201,7 +201,7 @@ lbl_create:
 			}
 			if ( attempts > (ZBX_MAX_ATTEMPTS / 2) )
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Wait 1 sec for next attemtion of collector shared memory allocation.");
+				zabbix_log(LOG_LEVEL_DEBUG, "Wait 1 sec for next attempt of collector shared memory allocation.");
 				zbx_sleep(1);
 			}
 			goto lbl_create;
@@ -212,14 +212,14 @@ lbl_create:
 			exit(1);
 		}
 	}
-	
+
 	collector = shmat(shm_id, 0, 0);
 	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)(collector + 1);
 	collector->cpus.count = cpu_count;
 
 	if ((void*)(-1) == collector)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can't attache shared memory for collector. [%s]",strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "Can't attach shared memory for collector. [%s]",strerror(errno));
 		exit(1);
 	}
 
@@ -230,7 +230,7 @@ lbl_create:
  *                                                                            *
  * Function: free_collector_data                                              *
  *                                                                            *
- * Purpose: Free memory aloccated for collector                               *
+ * Purpose: Free memory allocated for collector                               *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -238,7 +238,7 @@ lbl_create:
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Linux version allocate memory as shared.                         *
+ * Comments: Linux version allocates memory as shared.                        *
  *                                                                            *
  ******************************************************************************/
 
@@ -255,7 +255,7 @@ void	free_collector_data(void)
 	int	shm_id;
 
 	if(NULL == collector) return;
-	
+
 	ZBX_GET_SHM_KEY(shm_key);
 
 	shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), 0);

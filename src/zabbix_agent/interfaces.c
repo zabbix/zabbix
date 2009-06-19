@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -300,7 +300,7 @@ void	add_values_interfaces(int now,char *interface,double value_sent,double valu
 					bounced=1;
 					break;
 				}
-		
+
 			}
 			if(bounced==0)
 			{
@@ -331,7 +331,7 @@ void	add_values_interfaces(int now,char *interface,double value_sent,double valu
 void	collect_stats_interfaces(FILE *outfile)
 {
 #ifdef HAVE_PROC_NET_DEV
-	
+
 	FILE	*file;
 
 	char	*s;
@@ -404,4 +404,3 @@ void	collect_stats_interfaces(FILE *outfile)
 }
 
 #endif /* TODO */
-

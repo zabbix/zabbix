@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -32,7 +32,7 @@
  *             lastlogsize - offset for message                               *
  *             value - pointer for logged message                             *
  *                                                                            *
- * Return value: returns SUCCEED on succesfull reading,                       *
+ * Return value: returns SUCCEED on succesful reading,                        *
  *               FAIL on other cases                                          *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -81,7 +81,7 @@ int   process_log(
 		{
 			if(-1 == fseek(f,*lastlogsize,SEEK_SET))
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Cannot set postition to [%li] for [%s] [%s]", *lastlogsize, filename, strerror(errno));
+				zabbix_log( LOG_LEVEL_WARNING, "Cannot set position to [%li] for [%s] [%s]", *lastlogsize, filename, strerror(errno));
 			}
 			else
 			{
