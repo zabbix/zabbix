@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -106,7 +106,7 @@ void	collect_stats_diskdevices(ZBX_DISKDEVICES_DATA *diskdevices)
 	register int	i;
 
 	s = s % 60;
-	if (0 == s++)	/* refresh device list each 60 seconds */
+	if (0 == s++)	/* refresh device list every 60 seconds */
 		refresh_diskdevices();
 
 	for (i = 0; i < diskdevices->count; i++)
