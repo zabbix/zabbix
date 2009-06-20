@@ -11,7 +11,7 @@ class CGraph {
 	public static $error;
 
 	/**
-	 * Get graph data 
+	 * Get graph data
 	 *
 	 * <code>
 	 * $options = array(
@@ -28,15 +28,15 @@ class CGraph {
 	 * </code>
 	 *
 	 * @static
-	 * @param array $options 
+	 * @param array $options
 	 * @return array|boolean host data as array or false if error
 	 */
 	public static function get($options=array()){
 
 		$result = array();
-		
+
 		$sort_columns = array('graphid'); // allowed columns for sorting
-		
+
 		$sql_parts = array(
 			'select' => array('g.graphid, g.name'),
 			'from' => array('graphs g'),
@@ -59,9 +59,9 @@ class CGraph {
 
 		$options = array_merge($def_options, $options);
 
-		// restrict not allowed columns for sorting 
+		// restrict not allowed columns for sorting
 		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
-		
+
 // count
 		if($options['count']){
 			$sql_parts['select'] = array('count(g.graphid) as count');
@@ -81,17 +81,17 @@ class CGraph {
 			$sql_parts['from']['gi'] = 'graphs_items gi';
 			$sql_parts['from'][] = 'hosts h, items i';
 			$sql_parts['where'][] = DBcondition('h.hostid', $options['hostids']);
-			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';	
-			$sql_parts['where'][] = 'i.itemid=gi.itemid';			
+			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
+			$sql_parts['where'][] = 'i.itemid=gi.itemid';
 			$sql_parts['where'][] = 'h.hostid=i.hostid';
 		}
 // type
 		if($options['type'] !== false){
 			$sql_parts['where'][] = 'g.type='.$options['type'];
-		}	
+		}
 // templated_graphs
 		if($options['templated_graphs']){
-			$sql_parts['where'][] = 'g.templateid<>0';				
+			$sql_parts['where'][] = 'g.templateid<>0';
 		}
 // pattern
 		if(!zbx_empty($options['pattern'])){
@@ -100,36 +100,36 @@ class CGraph {
 // order
 		if(!zbx_empty($options['order'])){
 			$sql_parts['order'][] = 'g.'.$options['order'];
-		}		
+		}
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
 		}
-	
-	
+
+
 		$sql_select = implode(',', $sql_parts['select']);
 		$sql_from = implode(',', $sql_parts['from']);
 		$sql_where = implode(' AND ', $sql_parts['where']);
 		$sql_order = zbx_empty($options['order']) ? '' : ' ORDER BY '.implode(',', $sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		
+
 		$sql = 'SELECT DISTINCT '.$sql_select.
 			' FROM '.$sql_from.
 			($sql_where ? ' WHERE '.$sql_where : '').
-			$sql_order; 
+			$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
-		
+
 		while($graph = DBfetch($db_res)){
-			if($options['count']) 
+			if($options['count'])
 				$result = $graph;
-			else 
+			else
 				$result[$graph['graphid']] = $graph;
 		}
-		
+
 	return $result;
 	}
-	
+
 	/**
 	 * Gets all graph data from DB by graphid
 	 *
@@ -145,7 +145,7 @@ class CGraph {
 	 */
 	public static function getById($graph_data){
 		$graph = get_graph_by_graphid($graph_data['graphid']);
-		
+
 		$result = $graph ? true : false;
 		if($result)
 			return $graph;
@@ -154,7 +154,7 @@ class CGraph {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Get graphid by graph name
 	 *
@@ -170,7 +170,7 @@ class CGraph {
 	 */
 	public static function getId($graph_data){
 		$result = false;
-		
+
 		$sql = 'SELECT g.graphid '.
 				' FROM graphs g '.
 				' WHERE g.name='.zbx_dbstr($graph_data['name']).
@@ -181,10 +181,10 @@ class CGraph {
 		else{
 			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Host with name: "'.$graph_data['name'].'" doesn\'t exists.');
 		}
-		
+
 	return $result;
 	}
-	
+
 	/**
 	 * Add graph
 	 *
@@ -211,18 +211,18 @@ class CGraph {
 	 *
 	 * @static
 	 * @param array $graphs multidimensional array with graphs data
-	 * @return boolean 
+	 * @return boolean
 	 */
 	public static function add($graphs){
-		
+
 		$error = 'Unknown ZABBIX internal error';
 		$result_ids = array();
 		$result = false;
-		
+
 		DBstart(false);
-		
+
 		foreach($graphs as $graph){
-					
+
 			$graph_db_fields = array(
 				'name' 				=> null,
 				'width' 			=> 900,
@@ -248,7 +248,7 @@ class CGraph {
 				$error = 'Wrong fields for graph [ '.$graph['name'].' ]';
 				break;
 			}
-			
+
 			$result = add_graph($graph['name'],$graph['width'],$graph['height'],$graph['ymin_type'],$graph['ymax_type'],$graph['yaxismin'],
 				$graph['yaxismax'],$graph['ymin_itemid'],$graph['ymax_itemid'],$graph['showworkperiod'],$graph['showtriggers'],$graph['graphtype'],
 				$graph['legend'],$graph['graph3d'],$graph['percent_left'],$graph['percent_right'],$graph['templateid']);
@@ -256,7 +256,7 @@ class CGraph {
 			$result_ids[$result] = $result;
 		}
 		$result = DBend($result);
-		
+
 		if($result){
 			return $result_ids;
 		}
@@ -265,7 +265,7 @@ class CGraph {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Update graphs
 	 *
@@ -273,34 +273,34 @@ class CGraph {
 	 * @param array $graphs multidimensional array with graphs data
 	 * @return boolean
 	 */
-	public static function update($graphs){	
-	
+	public static function update($graphs){
+
 		$result_ids = array();
 		$result = false;
-		
+
 		DBstart(false);
 		foreach($graphs as $graph){
-		
+
 			$host_db_fields = self::getById(array('graphid' => $graph['graphid']));
-			
+
 			if(!$host_db_fields) {
 				$result = false;
 				break;
 			}
-			
+
 			if(!check_db_fields($host_db_fields, $graph)){
 				$result = false;
 				break;
-			}			
-			
+			}
+
 			$result = update_graph($graph['graphid'],$graph['name'],$graph['width'],$graph['height'],$graph['ymin_type'],$graph['ymax_type'],$graph['yaxismin'],
 				$graph['yaxismax'],$graph['ymin_itemid'],$graph['ymax_itemid'],$graph['show_work_period'],$graph['show_triggers'],$graph['graphtype'],
 				$graph['show_legend'],$graph['show_3d'],$graph['percent_left'],$graph['percent_right'],$graph['templateid']);
 			if(!$result) break;
 			$result_ids[$graph['graphid']] = $result;
-		}	
+		}
 		$result = DBend($result);
-		
+
 		if($result){
 			return $result_ids;
 		}
@@ -309,14 +309,14 @@ class CGraph {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Add items to graph
 	 *
 	 * <code>
 	 * $items = array(
 	 * 	*string 'graphid'		=> null,
-	 * 	array 'items' 			=> ( 
+	 * 	array 'items' 			=> (
 	 *		'item1' => array(
 	 * 			*int 'itemid' 			=> null,
 	 * 			int 'color' 			=> '000000',
@@ -332,22 +332,22 @@ class CGraph {
 	 *
 	 * @static
 	 * @param array $items multidimensional array with items data
-	 * @return boolean 
+	 * @return boolean
 	 */
 	public static function addItems($items){
-		
+
 		$error = 'Unknown ZABBIX internal error';
 		$result_ids = array();
 		$result = false;
 		$tpl_graph = false;
-		
+
 		$graphid = $items['graphid'];
 		$items_tmp = $items['items'];
 		$items = array();
 		$itemids = array();
-		
+
 		foreach($items_tmp as $item){
-					
+
 			$graph_db_fields = array(
 				'itemid' 		=> null,
 				'color' 		=> '000000',
@@ -366,24 +366,24 @@ class CGraph {
 			$items[$item['itemid']] = $item;
 			$itemids[$item['itemid']] = $item['itemid'];
 		}
-		
+
 		// check if graph is templated graph, then items cannot be added
 		$graph = CGraph::getById(array('graphid' => $graphid));
 		if($graph['templateid'] != 0){
 			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated graph : '.$graph['name']);
 			return false;
 		}
-		
+
 		// check if graph belongs to template, if so, only items from same template can be added
 		$tmp_hosts = get_hosts_by_graphid($graphid);
 		$host = DBfetch($tmp_hosts); // if graph belongs to template, only one host is possible
-		
+
 		if($host["status"] == HOST_STATUS_TEMPLATE ){
 			$sql = 'SELECT DISTINCT count(i.hostid) as count
-					FROM items i  
+					FROM items i
 					WHERE i.hostid<>'.$host['hostid'].
 						' AND '.DBcondition('i.itemid', $itemids);
-						
+
 			$host_count = DBfetch(DBselect($sql));
 			if ($host_count['count']){
 				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'You must use items only from host : '.$host['host'].' for template graph : '.$graph['name']);
@@ -391,11 +391,11 @@ class CGraph {
 			}
 			$tpl_graph = true;
 		}
-		
+
 		DBstart(false);
 		$result = self::addItems_rec($graphid, $items, $tpl_graph);
 		$result = DBend($result);
-		
+
 		if($result){
 			return $result;
 		}
@@ -404,47 +404,47 @@ class CGraph {
 			return false;
 		}
 	}
-	
+
 	protected static function addItems_rec($graphid, $items, $tpl_graph=false){
-		
+
 		if($tpl_graph){
 			$chd_graphs = get_graphs_by_templateid($graphid);
 			while($chd_graph = DBfetch($chd_graphs)){
 				$result = self::addItems_rec($chd_graph['graphid'], $items, $tpl_graph);
 				if(!$result) return false;
 			}
-		
+
 			$tmp_hosts = get_hosts_by_graphid($graphid);
 			$graph_host = DBfetch($tmp_hosts);
-			if(!$items = get_same_graphitems_for_host($items, $graph_host['hostid'])){ 
+			if(!$items = get_same_graphitems_for_host($items, $graph_host['hostid'])){
 				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Can not update graph "'.$chd_graph['name'].'" for host "'.$graph_host['host'].'"');
 				return false;
 			}
 		}
-		
+
 		foreach($items as $item){
 			$result = add_item_to_graph($graphid,$item['itemid'],$item['color'],$item['drawtype'],$item['sortorder'],$item['yaxisside'],
 						$item['calc_fnc'],$item['type'],$item['periods_cnt']);
 			if(!$result) return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Delete graph items
 	 *
 	 * @static
-	 * @param array $items 
+	 * @param array $items
 	 * @return boolean
-	 */	
+	 */
 	public static function deleteItems($item_list, $force=false){
 		$error = 'Unknown ZABBIX internal error';
 		$result = true;
-		
+
 		$graphid = $item_list['graphid'];
 		$items = $item_list['items'];
-			
+
 		if(!$force){
 			// check if graph is templated graph, then items cannot be added
 			$graph = CGraph::getById(array('graphid' => $graphid));
@@ -453,15 +453,15 @@ class CGraph {
 				return false;
 			}
 		}
-		
+
 		$chd_graphs = get_graphs_by_templateid($graphid);
 		while($chd_graph = DBfetch($chd_graphs)){
 			$item_list['graphid'] = $chd_graph['graphid'];
 			$result = self::deleteItems($item_list, true);
 			if(!$result) return false;
 		}
-		
-		
+
+
 		$sql = 'SELECT curr.itemid
 				FROM graphs_items gi, items curr, items src
 				WHERE gi.graphid='.$graphid.
@@ -474,23 +474,23 @@ class CGraph {
 		}
 
 		$sql = 'DELETE
-				FROM graphs_items 
+				FROM graphs_items
 				WHERE graphid='.$graphid.
 					' AND '.DBcondition('itemid', $gitems);
 		$result = DBselect($sql);
-		
+
 		return $result;
 	}
-	
+
 	/**
 	 * Delete graphs
 	 *
 	 * @static
-	 * @param array $graphids 
+	 * @param array $graphids
 	 * @return boolean
-	 */	
+	 */
 	public static function delete($graphids){
-		$result = delete_graph($graphids);	
+		$result = delete_graph($graphids);
 		if($result)
 			return true;
 		else{
@@ -498,6 +498,6 @@ class CGraph {
 			return false;
 		}
 	}
-		
+
 }
 ?>

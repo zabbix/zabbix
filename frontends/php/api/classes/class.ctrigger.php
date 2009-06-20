@@ -12,7 +12,7 @@ class CTrigger {
 	public static $error = array();
 
 	/**
-	 * Get triggers data 
+	 * Get triggers data
 	 *
 	 * <code>
 	 * $options = array(
@@ -31,13 +31,13 @@ class CTrigger {
 	 * </code>
 	 *
 	 * @static
-	 * @param array $options 
+	 * @param array $options
 	 * @return array|int item data as array or false if error
 	 */
 	public static function get($options=array()){
 
 		$result = array();
-		
+
 		$sort_columns = array('triggerid'); // allowed columns for sorting
 
 		$sql_parts = array(
@@ -47,7 +47,7 @@ class CTrigger {
 			'order' => array(),
 			'limit' => null,
 			);
-		
+
 		$def_options = array(
 			'triggerids' 		=> array(),
 			'itemids' 			=> array(),
@@ -62,12 +62,12 @@ class CTrigger {
 			'limit' 			=> null,
 			'order' 			=> ''
 		);
-		
+
 		$options = array_merge($def_options, $options);
 
-		// restrict not allowed columns for sorting 
+		// restrict not allowed columns for sorting
 		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
-		
+
 // count
 		if($options['count']){
 			$sql_parts['select'] = array('count(t.triggerid) as count');
@@ -82,7 +82,7 @@ class CTrigger {
 			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
-			
+
 		}
 // hostids
 		if($options['hostids']){
@@ -98,28 +98,28 @@ class CTrigger {
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where'][] = 'hg.hostid=i.hostid';
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';			
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 // applicationids
 		if($options['applicationids']){
 			$sql_parts['from']['fi'] = 'functions f, items i';
 			$sql_parts['from'][] = 'applications a';
 			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
-			$sql_parts['where'][] = 'i.hostid=a.hostid';	
+			$sql_parts['where'][] = 'i.hostid=a.hostid';
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';	
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 // status
 		if($options['status'] !== false){
 			$sql_parts['where'][] = 't.status='.$options['status'];
-		}	
+		}
 // severity
 		if($options['severity'] !== false){
 			$sql_parts['where'][] = 't.priority='.$options['severity'];
-		}	
+		}
 // templated_triggers
 		if($options['templated_triggers']){
-			$sql_parts['where'][] = 't.templateid<>0';				
+			$sql_parts['where'][] = 't.templateid<>0';
 		}
 // pattern
 		if(!zbx_empty($options['pattern'])){
@@ -128,38 +128,38 @@ class CTrigger {
 // order
 		if(!zbx_empty($options['order'])){
 			$sql_parts['order'][] = 't.'.$options['order'];
-		}		
+		}
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
 		}
-	
+
 		$sql_select = implode(',', $sql_parts['select']);
 		$sql_from = implode(',', $sql_parts['from']);
 		$sql_where = implode(' AND ', $sql_parts['where']);
 		$sql_order = zbx_empty($options['order']) ? '' : ' ORDER BY '.implode(',', $sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		
+
 		$sql = 'SELECT DISTINCT '.$sql_select.
 			' FROM '.$sql_from.
 			($sql_where ? ' WHERE '.$sql_where : '').
-			$sql_order; 
+			$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
-		
+
 		while($trigger = DBfetch($db_res)){
-			if($options['count']) 
+			if($options['count'])
 				$result = $trigger;
-			else 
+			else
 				$result[$trigger['triggerid']] = $trigger;
 		}
-		
+
 	return $result;
 	}
-	
+
 	/**
 	 *Gets all trigger data from DB by triggerid
-	 * 
+	 *
 	 * <code>
 	 * $trigger = array(
 	 * 	*string 'triggerid' => 'triggerid'
@@ -177,10 +177,10 @@ class CTrigger {
 			$result = $trigger;
 		else
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-			
+
 		return $result;
 	}
-	
+
 	/**
 	 * Get triggerid by host.host and trigger.expression
 	 *
@@ -195,14 +195,14 @@ class CTrigger {
 	 *
 	 * @static
 	 * @param array $trigger
-	 * @return string|boolean triggerid || false if error 
+	 * @return string|boolean triggerid || false if error
 	 */
 	public static function getId($trigger){
-			
+
 		$result = false;
-		
+
 		$sql_where = '';
-		$sql_from = '';	
+		$sql_from = '';
 		if(isset($trigger['hostid']) && isset($trigger['host'])) {
 			$sql_where .= ''.
 					' i.hostid='.$trigger['hostid'].
@@ -232,23 +232,23 @@ class CTrigger {
 		if(isset($trigger['description'])) {
 			$sql_where .= ' AND t.description='.zbx_dbstr($trigger['description']);
 		}
-		
+
 		$sql = 'SELECT DISTINCT t.triggerid, t.expression '.
 				' FROM triggers t'.$sql_from.
-				' WHERE '.$sql_where;	
+				' WHERE '.$sql_where;
 		if($db_triggers = DBselect($sql)){
 			$result = true;
-			$triggerid = null; 
-			
+			$triggerid = null;
+
 			while($tmp_trigger = DBfetch($db_triggers)) {
 				$tmp_exp = explode_exp($tmp_trigger['expression'], false);
 				if(strcmp($tmp_exp, $trigger['expression']) == 0) {
-					$triggerid = $tmp_trigger['triggerid']; 
+					$triggerid = $tmp_trigger['triggerid'];
 					break;
 				}
 			}
 		}
-		
+
 		if($result)
 			return $triggerid;
 		else{
@@ -256,8 +256,8 @@ class CTrigger {
 			return false;
 		}
 	}
-		
-	/** 
+
+	/**
 	 * Add triggers
 	 *
 	 * Input array $triggers has following structure and default values :
@@ -275,13 +275,13 @@ class CTrigger {
 	 *
 	 * @static
 	 * @param array $triggers multidimensional array with triggers data
-	 * @return boolean 
+	 * @return boolean
 	 */
 	public static function add($triggers){
-		
+
 		$triggerids = array();
 		DBstart(false);
-		
+
 		$result = false;
 		foreach($triggers as $trigger){
 			$trigger_db_fields = array(
@@ -298,13 +298,13 @@ class CTrigger {
 				$result = false;
 				break;
 			}
-			
-			$result = add_trigger($trigger['expression'], $trigger['description'], $trigger['type'], $trigger['priority'], 
+
+			$result = add_trigger($trigger['expression'], $trigger['description'], $trigger['type'], $trigger['priority'],
 			$trigger['status'], $trigger['comments'], $trigger['url']);
 			if(!$result) break;
 			$triggerids[$result] = $result;
 		}
-		
+
 		$result = DBend($result);
 		if($result)
 			return $triggerids;
@@ -313,7 +313,7 @@ class CTrigger {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Update triggers
 	 *
@@ -334,7 +334,7 @@ class CTrigger {
 	 * @return boolean
 	 */
 	public static function update($triggers){
-		
+
 		$result = false;
 		$triggerids = array();
 		DBstart(false);
@@ -344,21 +344,21 @@ class CTrigger {
 				$result = false;
 				break;
 			}
-			
+
 			if(!check_db_fields($trigger_db_fields, $trigger)){
 				error('Incorrect arguments pasted to function [CTrigger::update]');
 				$result = false;
 				break;
-			}	
-			
+			}
+
 			$trigger['expression'] = explode_exp($trigger['expression'], false);
-			$result = update_trigger($trigger['triggerid'], $trigger['expression'], $trigger['description'], $trigger['type'], 
+			$result = update_trigger($trigger['triggerid'], $trigger['expression'], $trigger['description'], $trigger['type'],
 				$trigger['priority'], $trigger['status'], $trigger['comments'], $trigger['url']);
 			if(!$result) break;
 			$triggerids[$result] = $result;
-		}	
+		}
 		$result = DBend($result);
-		
+
 		if($result)
 			return $triggerids;
 		else{
@@ -366,16 +366,16 @@ class CTrigger {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Delete triggers
 	 *
 	 * @static
-	 * @param array $triggerids 
+	 * @param array $triggerids
 	 * @return boolean
-	 */	
+	 */
 	public static function delete($triggerids){
-		$result = delete_trigger($triggerids);	
+		$result = delete_trigger($triggerids);
 		if($result)
 			return $result;
 		else{
@@ -383,11 +383,11 @@ class CTrigger {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Add dependency for trigger
 	 *
-	 * Add dependency, to make trigger be dependent on other trigger. 
+	 * Add dependency, to make trigger be dependent on other trigger.
 	 * <code>
 	 * $triggers_data = array(
 	 * 	string 'triggerid] => 'triggerid',
@@ -396,9 +396,9 @@ class CTrigger {
 	 * </code>
 	 *
 	 * @static
-	 * @param array $triggers_data 
+	 * @param array $triggers_data
 	 * @return boolean
-	 */	
+	 */
 	public static function addDependency($triggers_data){
 		$result = insert_dependency($triggers_data['triggerid'], $triggers_data['depends_on_triggerid']);
 		if($result)

@@ -12,7 +12,7 @@ class CItem {
 	public static $error;
 
 	/**
-	 * Get items data 
+	 * Get items data
 	 *
 	 * <code>
 	 * $options = array(
@@ -31,13 +31,13 @@ class CItem {
 	 * </code>
 	 *
 	 * @static
-	 * @param array $options 
+	 * @param array $options
 	 * @return array|int item data as array or false if error
 	 */
 	public static function get($options=array()){
 
 		$result = array();
-		
+
 		$sort_columns = array('itemid'); // allowed columns for sorting
 
 		$sql_parts = array(
@@ -47,7 +47,7 @@ class CItem {
 			'order' => array(),
 			'limit' => null,
 			);
-		
+
 		$def_options = array(
 			'itemids' 			=> array(),
 			'hostids' 			=> array(),
@@ -61,12 +61,12 @@ class CItem {
 			'limit' 			=> null,
 			'order' 			=> ''
 		);
-		
+
 		$options = array_merge($def_options, $options);
 
-		// restrict not allowed columns for sorting 
+		// restrict not allowed columns for sorting
 		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
-		
+
 // count
 		if($options['count']){
 			$sql_parts['select'] = array('count(i.itemid) as count');
@@ -82,28 +82,28 @@ class CItem {
 // groupids
 		if($options['groupids']){
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
-			$sql_parts['where'][] = 'hg.hostid=i.hostid';			
-			$sql_parts['from'][] = 'hosts_groups hg';	
+			$sql_parts['where'][] = 'hg.hostid=i.hostid';
+			$sql_parts['from'][] = 'hosts_groups hg';
 		}
 // triggerids
 		if($options['triggerids']){
 			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
-			$sql_parts['where'][] = 'i.itemid=f.itemid';			
-			$sql_parts['from'][] = 'functions f';	
+			$sql_parts['where'][] = 'i.itemid=f.itemid';
+			$sql_parts['from'][] = 'functions f';
 		}
 // applicationids
 		if($options['applicationids']){
 			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
-			$sql_parts['where'][] = 'i.hostid=a.hostid';			
-			$sql_parts['from'][] = 'applications a';	
+			$sql_parts['where'][] = 'i.hostid=a.hostid';
+			$sql_parts['from'][] = 'applications a';
 		}
 // status
 		if($options['status'] !== false){
 			$sql_parts['where'][] = 'i.status='.$options['status'];
-		}	
+		}
 // templated_items
 		if($options['templated_items']){
-			$sql_parts['where'][] = 'i.templateid<>0';				
+			$sql_parts['where'][] = 'i.templateid<>0';
 		}
 // pattern
 		if(!zbx_empty($options['pattern'])){
@@ -112,41 +112,41 @@ class CItem {
 // order
 		if(!zbx_empty($options['order'])){
 			$sql_parts['order'][] = 'i.'.$options['order'];
-		}		
+		}
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
 		}
-	
-	
+
+
 		$sql_select = implode(',', $sql_parts['select']);
 		$sql_from = implode(',', $sql_parts['from']);
 		$sql_where = implode(' AND ', $sql_parts['where']);
 		$sql_order = zbx_empty($options['order']) ? '' : ' ORDER BY '.implode(',', $sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		
+
 		$sql = 'SELECT DISTINCT '.$sql_select.
 			' FROM '.$sql_from.
 			' WHERE '.$sql_where.
-			$sql_order; 
+			$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
-		
+
 		while($item = DBfetch($db_res)){
-			if($options['count']) 
+			if($options['count'])
 				$result = $item;
-			else 
+			else
 				$result[$item['itemid']] = $item;
 		}
-		
+
 	return $result;
 	}
-	
+
 	/**
 	 * Gets all item data from DB by itemid
 	 *
 	 * @static
-	 * @param int $item_data 
+	 * @param int $item_data
 	 * @return array|boolean item data || false if error
 	 */
 	public static function getById($item_data){
@@ -159,7 +159,7 @@ class CItem {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Get itemid by host.name and item.key
 	 *
@@ -170,14 +170,14 @@ class CItem {
 	 * 	*string 'hostid' => 'hostid'
 	 * );
 	 * </code>
-	 * 
+	 *
 	 *
 	 * @static
 	 * @param array $item_data
-	 * @return int|boolean 
+	 * @return int|boolean
 	 */
 	public static function getId($item_data){
-		
+
 		if(isset($item_data['host'])) {
 			$host = $item_data['host'];
 		}
@@ -185,40 +185,40 @@ class CItem {
 			$host = CHost::getById(array($item_data['hostid']));
 			$host = $host['host'];
 		}
-		
+
 		$item = get_item_by_key($item_data['key_'], $host);
-				
+
 		$result = $item ? true : false;
 		if($result)
 			return $item['itemid'];
 		else{
 			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Item doesn\'t exists.');
-			return false;		
+			return false;
 		}
 	}
-	
+
  	// /**
 	 // * Get itemid by host.hostid and item.key
 	 // *
 	 // * @static
 	 // * @param string $hostid
 	 // * @param string $itemkey
-	 // * @return int|boolean 
+	 // * @return int|boolean
 	 // */
 	// public static function getIdByHostId($item_data$hostid, $itemkey){
-	
+
 		// $sql = 'SELECT DISTINCT i.itemid '.
 				// ' FROM items i '.
 				// ' WHERE i.hostid='.$hostid.' AND i.key_='.zbx_dbstr($itemkey);
 		// $item = DBfetch(DBselect($sql));
-			
-		// return $item ? $item['itemid'] : false;	
+
+		// return $item ? $item['itemid'] : false;
 	// }
-	
-	/** 
+
+	/**
 	 * Add item
 	 *
-	 * 
+	 *
 	 * Input array $items has following structure and default values :
 	 * <code>
 	 * array( array(
@@ -256,19 +256,19 @@ class CItem {
 	 *
 	 * @static
 	 * @param array $items multidimensional array with items data
-	 * @return array|boolean 
+	 * @return array|boolean
 	 */
 	public static function add($items){
 		$itemids = array();
 		DBstart(false);
-		
+
 		$result = false;
 		foreach($items as $item){
 			$result = add_item($item);
 			if(!$result) break;
 			$itemids['result'] = $result;
 		}
-		
+
 		$result = DBend($result);
 
 		if($result)
@@ -278,7 +278,7 @@ class CItem {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Update item
 	 *
@@ -287,7 +287,7 @@ class CItem {
 	 * @return boolean
 	 */
 	public static function update($items){
-		
+
 		$result = false;
 		$itemids = array();
 		DBstart(false);
@@ -295,9 +295,9 @@ class CItem {
 			$result = update_item($item['itemid'], $item);
 			if(!$result) break;
 			$itemids[$result] = $result;
-		}	
+		}
 		$result = DBend($result);
-		
+
 		if($result)
 			return $itemids;
 		else{
@@ -305,16 +305,16 @@ class CItem {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Delete items
 	 *
 	 * @static
-	 * @param array $itemids 
+	 * @param array $itemids
 	 * @return array|boolean
-	 */	
+	 */
 	public static function delete($itemids){
-		$result = delete_item($itemids);	
+		$result = delete_item($itemids);
 		if($result)
 			return $itemids;
 		else{
@@ -322,6 +322,6 @@ class CItem {
 			return false;
 		}
 	}
-	
+
 }
 ?>
