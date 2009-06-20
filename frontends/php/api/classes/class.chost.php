@@ -11,7 +11,7 @@ class CHost {
 	public static $error;
 
 	/**
-	 * Get host data 
+	 * Get host data
 	 *
 	 * <code>
 	 * $def_options = array(
@@ -36,12 +36,12 @@ class CHost {
 	 * </code>
 	 *
 	 * @static
-	 * @param array $options 
+	 * @param array $options
 	 * @return array|boolean host data as array or false if error
 	 */
 	public static function get($options=array()){
 		global $USER_DETAILS;
-		
+
 		$def_sql = array(
 			'select' => array(),
 			'from' => array('hosts h'),
@@ -85,25 +85,25 @@ class CHost {
 
 // groups
 		$in_groups = count($def_sql['where']);
-		
+
 		if($def_options['groupids'] != 0){
 			zbx_value2array($def_options['groupids']);
-			$def_sql['where'][] = DBcondition('hg.groupid',$def_options['groupids']);			
+			$def_sql['where'][] = DBcondition('hg.groupid',$def_options['groupids']);
 		}
 
 		if($in_groups != count($def_sql['where'])){
 			$def_sql['from'][] = 'hosts_groups hg';
 			$def_sql['where'][] = 'hg.hostid=h.hostid';
 		}
-		
 
-// hosts 
+
+// hosts
 		if($def_options['hostids'] != 0){
 			zbx_value2array($def_options['hostids']);
 
 			$def_sql['where'][] = DBcondition('h.hostid',$def_options['hostids']);
 		}
-		
+
 		if(!zbx_empty($def_options['pattern'])){
 			$def_sql['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.strtoupper($def_options['pattern']).'%');
 		}
@@ -118,7 +118,7 @@ class CHost {
 // items
 		if($def_options['with_items']){
 			$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
-		}  
+		}
 		else if($def_options['with_monitored_items']){
 			$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
 		}
@@ -134,7 +134,7 @@ class CHost {
 				 ' WHERE i.hostid=h.hostid '.
 				 	' AND i.itemid=f.itemid '.
 				 	' AND f.triggerid=t.triggerid)';
-		} 
+		}
 		else if($def_options['with_monitored_triggers']){
 			$def_sql['where'][] = 'EXISTS( SELECT i.itemid '.
 				 ' FROM items i, functions f, triggers t'.
@@ -167,7 +167,7 @@ class CHost {
 				 ' WHERE i.hostid=h.hostid '.
 				 	' AND i.itemid=gi.itemid)';
 		}
-		
+
 // permission
 		if($def_options['permission'] || defined('ZBX_API_REQUEST')){
 			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,$nodeid,AVAILABLE_NOCACHE);
@@ -194,7 +194,7 @@ class CHost {
 			$def_sql['limit'] = $def_options['limit'];
 		}
 //------
-		
+
 		$def_sql['select'] = array_unique($def_sql['select']);
 		$def_sql['from'] = array_unique($def_sql['from']);
 		$def_sql['where'] = array_unique($def_sql['where']);
@@ -215,18 +215,18 @@ class CHost {
 			' FROM '.$sql_from.
 			' WHERE '.DBin_node('h.hostid', $nodeid).
 				$sql_where.
-			$sql_order; 
+			$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($host = DBfetch($res)){
-			if($def_options['count']) 
+			if($def_options['count'])
 				$result = $host;
-			else 
+			else
 				$result[$host['hostid']] = $host;
 		}
-		
+
 	return $result;
 	}
-	
+
 	/**
 	 * Gets all host data from DB by hostid
 	 *
@@ -237,7 +237,7 @@ class CHost {
 	public static function getById($host_data){
 		$sql = 'SELECT * FROM hosts WHERE hostid='.$host_data['hostid'];
 		$host = DBfetch(DBselect($sql));
-		
+
 		$result = $host ? true : false;
 		if($result)
 			return $host;
@@ -246,7 +246,7 @@ class CHost {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Get hostid by host name
 	 *
@@ -262,7 +262,7 @@ class CHost {
 	 */
 	public static function getId($host_data){
 		$result = false;
-		
+
 		$sql = 'SELECT hostid '.
 				' FROM hosts '.
 				' WHERE host='.zbx_dbstr($host_data['host']).
@@ -273,10 +273,10 @@ class CHost {
 		else{
 			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host with name: "'.$host_data['host'].'" doesn\'t exists.');
 		}
-		
+
 	return $result;
 	}
-	
+
 	/**
 	 * Add host
 	 *
@@ -302,26 +302,26 @@ class CHost {
 	 *
 	 * @static
 	 * @param array $hosts multidimensional array with hosts data
-	 * @return boolean 
+	 * @return boolean
 	 */
 	public static function add($hosts){
 		$templates = null;
-		$newgroup = ''; 
-		
+		$newgroup = '';
+
 		$error = 'Unknown ZABBIX internal error';
 		$result_ids = array();
 		$result = false;
-		
+
 		DBstart(false);
-		
+
 		foreach($hosts as $host){
-			
+
 			if(empty($host['groupids'])){
 				$result = false;
 				$error = 'No groups for host [ '.$host['host'].' ]';
 				break;
 			}
-		
+
 			$host_db_fields = array(
 				'host' => null,
 				'port' => 0,
@@ -344,15 +344,15 @@ class CHost {
 				$error = 'Wrong fields for host [ '.$host['host'].' ]';
 				break;
 			}
-			
-			$result = add_host($host['host'], $host['port'], $host['status'], $host['useip'], $host['dns'], $host['ip'], 
-				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'], 
+
+			$result = add_host($host['host'], $host['port'], $host['status'], $host['useip'], $host['dns'], $host['ip'],
+				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'],
 				$host['ipmi_privilege'], $host['ipmi_username'], $host['ipmi_password'], $newgroup, $host['groupids']);
 			if(!$result) break;
 			$result_ids[$result] = $result;
 		}
 		$result = DBend($result);
-		
+
 		if($result){
 			return $result_ids;
 		}
@@ -361,7 +361,7 @@ class CHost {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Update host
 	 *
@@ -371,40 +371,40 @@ class CHost {
 	 */
 	public static function update($hosts){
 		$templates = null;
-		$newgroup = ''; 
+		$newgroup = '';
 		$groups = null;
-		
+
 		$hostids = array();
-		
+
 		$result = false;
-		
+
 		DBstart(false);
 		foreach($hosts as $host){
-		
+
 			$sql = 'SELECT DISTINCT * '.
 			' FROM hosts '.
 			' WHERE hostid='.$host['hostid'];
 
 			$host_db_fields = DBfetch(DBselect($sql));
-			
+
 			if(!isset($host_db_fields)) {
 				$result = false;
 				break;
 			}
-			
+
 			if(!check_db_fields($host_db_fields, $host)){
 				$result = false;
 				break;
-			}			
-			
-			$result = update_host($host['hostid'], $host['host'], $host['port'], $host['status'], $host['useip'], $host['dns'], $host['ip'], 
-				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'], 
+			}
+
+			$result = update_host($host['hostid'], $host['host'], $host['port'], $host['status'], $host['useip'], $host['dns'], $host['ip'],
+				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'],
 				$host['ipmi_privilege'], $host['ipmi_username'], $host['ipmi_password'], $newgroup, $groups);
 			if(!$result) break;
 			$hostids[$result] = $result;
-		}	
+		}
 		$result = DBend($result);
-		
+
 		if($result){
 			return $hostids;
 		}
@@ -413,7 +413,7 @@ class CHost {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Mass update hosts
 	 *
@@ -422,7 +422,7 @@ class CHost {
 	 * @return boolean
 	 */
 	public static function massUpdate($hosts) {
-	
+
 		$hostids = $hosts['hostids'];
 		$host_data = $hosts['host_data'];
 		$sql = 'UPDATE hosts SET '.
@@ -441,9 +441,9 @@ class CHost {
 			(isset($host_data['ipmi_password']) ? ',ipmi_password='.zbx_dbstr($host_data['ipmi_password']) : '').
 			(isset($host_data['ipmi_ip']) ? ',ipmi_ip='.zbx_dbstr($host_data['ipmi_ip']) : '').
 			' WHERE '.DBcondition('hostid', $hostids);
-			
+
 		substr_replace($sql, '', strpos(',', $sql), 1);
-		
+
 		$result = DBexecute($sql);
 		if($result){
 			return $hostids;
@@ -453,16 +453,16 @@ class CHost {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Delete host
 	 *
 	 * @static
-	 * @param array $hostids 
+	 * @param array $hostids
 	 * @return boolean
-	 */	
+	 */
 	public static function delete($hostids){
-		$result = delete_host($hostids, false);	
+		$result = delete_host($hostids, false);
 		if($result)
 			return $hostids;
 		else{
@@ -470,6 +470,6 @@ class CHost {
 			return false;
 		}
 	}
-		
+
 }
 ?>
