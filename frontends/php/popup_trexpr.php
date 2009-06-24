@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -26,7 +26,7 @@
 	$page["file"] = "popup_trexpr.php";
 
 	define('ZBX_PAGE_NO_MENU', 1);
-	
+
 include_once "include/page_header.php";
 
 ?>
@@ -50,7 +50,7 @@ include_once "include/page_header.php";
 				'T' => T_ZBX_INT,	/* type */
 				'M' => $metrics		/* metrcis */
 			     ));
-	
+
 	$param1_str = array(
 			array(
 				'C' => 'T',		/* caption */
@@ -123,15 +123,15 @@ include_once "include/page_header.php";
 			'operators'     => $operators,
 			'params'	=> $param1_sec_count
 			)
-		
+
 	);
-	
-		
+
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
 		"dstfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
-		
+
 		"expression"=>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 
 		"itemid"=>	array(T_ZBX_INT, O_OPT,	null,	null,						'isset({insert})'),
@@ -159,7 +159,7 @@ include_once "include/page_header.php";
 					' and i.key_='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_KEY_ID])));
 
 			$_REQUEST['itemid'] = $itemid['itemid'];
-			
+
 			$_REQUEST['paramtype'] = PARAM_TYPE_SECONDS;
 			$_REQUEST['param'] = $expr_res[ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
 			if($_REQUEST['param'][0] == '#')
@@ -167,14 +167,14 @@ include_once "include/page_header.php";
 				$_REQUEST['paramtype'] = PARAM_TYPE_COUNTS;
 				$_REQUEST['param'] = ltrim($_REQUEST['param'],'#');
 			}
-				
+
 			$operator = $expr_res[count($expr_res) - 2];
-			
+
 			$_REQUEST['expr_type'] = $expr_res[ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID].'['.$operator.']';
-				
-			
+
+
 			$_REQUEST['value'] = $expr_res[count($expr_res) - 1];
-			
+
 		}
 	}
 	unset($expr_res);
@@ -184,7 +184,7 @@ include_once "include/page_header.php";
 	$itemid		= get_request("itemid",		0);
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-	
+
 	if($item_data = DBfetch(DBselect('SELECT DISTINCT h.host,i.* '.
 						' FROM hosts h,items i '.
 						' WHERE h.hostid=i.hostid '.
@@ -208,12 +208,12 @@ include_once "include/page_header.php";
 	unset($expr_res);
 
 	if(!isset($function))	$function = 'last';
-		
+
 	if(!str_in_array($operator, array_keys($functions[$function]['operators'])))	unset($operator);
 	if(!isset($operator))	$operator = '=';
-	
+
 	$expr_type = $function.'['.$operator.']';
-	
+
 	$param		= get_request('param',	0);
 	$paramtype	= get_request('paramtype',	PARAM_TYPE_SECONDS);
 	$value		= get_request('value',		0);
@@ -264,7 +264,7 @@ function InsertText(obj, value)
 	if(isset($_REQUEST['insert']))
 	{
 
-		$expression = sprintf("{%s:%s.%s(%s%s)}%s%s", 
+		$expression = sprintf("{%s:%s.%s(%s%s)}%s%s",
 			$item_data['host'],
 			$item_data['key_'],
 			$function,
@@ -327,7 +327,7 @@ if(form)
 
 			if($pf['T'] == T_ZBX_INT)
 			{
-				if( 0 == $pid) 
+				if( 0 == $pid)
 				{
 					if( isset($pf['M']) && is_array($pf['M']))
 					{
@@ -345,12 +345,12 @@ if(form)
 				{
 					$cmbParamType = null;
 				}
-					
-				
+
+
 				$form->AddRow(S_LAST_OF.' ', array(
 					new CNumericBox('param['.$pid.']', $pv, 10),
 					$cmbParamType
-					)); 
+					));
 			}
 			else
 			{
@@ -366,7 +366,7 @@ if(form)
 	}
 
 	$form->AddRow('N', new CTextBox('value', $value, 10));
-	
+
 	$form->AddItemToBottomRow(new CButton('insert',S_INSERT));
 	$form->Show();
 ?>

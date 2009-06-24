@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -21,7 +21,7 @@
 <?php
 	require_once 'include/config.inc.php';
 	require_once 'include/maps.inc.php';
-		
+
 	$page['title'] = "S_MAP";
 	$page['file'] = 'map.php';
 	$page['type'] = PAGE_TYPE_IMAGE;
@@ -43,7 +43,7 @@ include_once 'include/page_header.php';
 	if(!sysmap_accessible($_REQUEST['sysmapid'],PERM_READ_ONLY)){
 		access_deny();
 	}
-	
+
 	if(!$map = get_sysmap_by_sysmapid($_REQUEST['sysmapid'])){
 		include_once 'include/page_footer.php';
 	}
@@ -60,35 +60,35 @@ include_once 'include/page_header.php';
 	else{
 		$im = imagecreate($width,$height);
 	}
-  
-	$red		= imagecolorallocate($im,255,0,0); 
-	$darkred	= imagecolorallocate($im,150,0,0); 
+
+	$red		= imagecolorallocate($im,255,0,0);
+	$darkred	= imagecolorallocate($im,150,0,0);
 	$green		= imagecolorallocate($im,0,255,0);
-	$darkgreen	= imagecolorallocate($im,0,150,0); 
+	$darkgreen	= imagecolorallocate($im,0,150,0);
 	$blue		= imagecolorallocate($im,0,0,255);
 	$yellow		= imagecolorallocate($im,255,255,0);
 	$darkyellow	= imagecolorallocate($im,150,127,0);
 	$cyan		= imagecolorallocate($im,0,255,255);
-	$white		= imagecolorallocate($im,255,255,255); 
-	$black		= imagecolorallocate($im,0,0,0); 
+	$white		= imagecolorallocate($im,255,255,255);
+	$black		= imagecolorallocate($im,0,0,0);
 	$gray		= imagecolorallocate($im,150,150,150);
 
-	$colors['Red']		= imagecolorallocate($im,255,0,0); 
-	$colors['Dark Red']	= imagecolorallocate($im,150,0,0); 
-	$colors['Green']	= imagecolorallocate($im,0,255,0); 
-	$colors['Dark Green']	= imagecolorallocate($im,0,150,0); 
-	$colors['Blue']		= imagecolorallocate($im,0,0,255); 
-	$colors['Dark Blue']	= imagecolorallocate($im,0,0,150); 
-	$colors['Yellow']	= imagecolorallocate($im,255,255,0); 
-	$colors['Dark Yellow']	= imagecolorallocate($im,150,150,0); 
-	$colors['Cyan']		= imagecolorallocate($im,0,255,255); 
-	$colors['Black']	= imagecolorallocate($im,0,0,0); 
-	$colors['Gray']		= imagecolorallocate($im,150,150,150); 
+	$colors['Red']		= imagecolorallocate($im,255,0,0);
+	$colors['Dark Red']	= imagecolorallocate($im,150,0,0);
+	$colors['Green']	= imagecolorallocate($im,0,255,0);
+	$colors['Dark Green']	= imagecolorallocate($im,0,150,0);
+	$colors['Blue']		= imagecolorallocate($im,0,0,255);
+	$colors['Dark Blue']	= imagecolorallocate($im,0,0,150);
+	$colors['Yellow']	= imagecolorallocate($im,255,255,0);
+	$colors['Dark Yellow']	= imagecolorallocate($im,150,150,0);
+	$colors['Cyan']		= imagecolorallocate($im,0,255,255);
+	$colors['Black']	= imagecolorallocate($im,0,0,0);
+	$colors['Gray']		= imagecolorallocate($im,150,150,150);
 	$colors['White']	= imagecolorallocate($im,255,255,255);
 
-	$x=imagesx($im); 
+	$x=imagesx($im);
 	$y=imagesy($im);
-  
+
 	imagefilledrectangle($im,0,0,$width,$height,$white);
 
 	if(($db_image = get_image_by_imageid($backgroundid))){
@@ -119,7 +119,7 @@ include_once 'include/page_header.php';
 		imagestring($im, 2, 1,1, "Y X:" , $black);
 	}
 
-// Draw connectors 
+// Draw connectors
 
 	$links = DBselect('select * from sysmaps_links where sysmapid='.$_REQUEST['sysmapid']);
 	while($link = DBfetch($links)){
@@ -130,8 +130,8 @@ include_once 'include/page_header.php';
 		$color = convertColor($im,$link["color"]);
 
 		$triggers = get_link_triggers($link['linkid']);
-		
-		
+
+
 		if(!empty($triggers)){
 			$max_severity=0;
 			foreach($triggers as $id => $link_trigger){
@@ -188,7 +188,7 @@ include_once 'include/page_header.php';
 
 		if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
 			$host = get_host_by_hostid($db_element['elementid']);
-			
+
 			if( $label_type==MAP_LABEL_TYPE_IP )
 				$label_line=$host['ip'];
 		}

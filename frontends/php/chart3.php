@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -21,7 +21,7 @@
 <?php
 	require_once('include/config.inc.php');
 	require_once('include/graphs.inc.php');
-	
+
 	$page['file']	= 'chart3.php';
 	$page['title']	= 'S_CHART';
 	$page['type']	= PAGE_TYPE_IMAGE;
@@ -61,7 +61,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid(true));
-	
+
 	$items = get_request('items', array());
 	asort_by_key($items, 'sortorder');
 
@@ -73,7 +73,7 @@ include_once('include/page_header.php');
 			access_deny();
 		}
 	}
-	
+
 	$graph = new CChart(get_request('graphtype'	,GRAPH_TYPE_NORMAL));
 
 	$chart_header = '';
@@ -81,7 +81,7 @@ include_once('include/page_header.php');
 		$chart_header = get_node_name_by_elid($host['hostid'],true);
 	}
 	$chart_header.= $host['host'].':'.get_request('name','');
-	
+
 	$graph->setHeader($chart_header);
 
 	unset($host);
@@ -96,13 +96,13 @@ include_once('include/page_header.php');
 
 	$graph->showWorkPeriod(get_request('showworkperiod'	,1));
 	$graph->showTriggers(get_request('showtriggers'		,1));
-	
+
 	$graph->setYMinAxisType(get_request('ymin_type'		,GRAPH_YAXIS_TYPE_CALCULATED));
 	$graph->setYMaxAxisType(get_request('ymax_type'		,GRAPH_YAXIS_TYPE_CALCULATED));
-	
+
 	$graph->setYAxisMin(get_request('yaxismin'		,0.00));
 	$graph->setYAxisMax(get_request('yaxismax'		,100.00));
-	
+
 	$graph->setYMinItemId(get_request('ymin_itemid'		,0));
 	$graph->setYMaxItemId(get_request('ymax_itemid'		,0));
 

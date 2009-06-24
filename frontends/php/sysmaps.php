@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -54,11 +54,11 @@ include_once "include/page_header.php";
 	);
 	check_fields($fields);
 	validate_sort_and_sortorder('sm.name',ZBX_SORT_UP);
-	
+
 	if(isset($_REQUEST["sysmapid"])){
 		if(!sysmap_accessible($_REQUEST["sysmapid"],PERM_READ_WRITE))
 			access_deny();
-	
+
 		$sysmap = DBfetch(DBselect("select * from sysmaps where sysmapid=".$_REQUEST["sysmapid"]));
 	}
 ?>
@@ -71,19 +71,19 @@ include_once "include/page_header.php";
 				$_REQUEST["height"],$_REQUEST["backgroundid"],$_REQUEST["label_type"],
 				$_REQUEST["label_location"]);
 			$result = DBend();
-			
+
 			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
 			show_messages($result,"Network map updated","Cannot update network map");
-		} 
+		}
 		else {
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
-			
+
 			DBstart();
 			add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 				$_REQUEST["backgroundid"],$_REQUEST["label_type"],$_REQUEST["label_location"]);
 			$result = DBend();
-			
+
 			add_audit_if($result,AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
 			show_messages($result,"Network map added","Cannot add network map");
 		}
@@ -95,7 +95,7 @@ include_once "include/page_header.php";
 		DBstart();
 		delete_sysmap($_REQUEST["sysmapid"]);
 		$result = DBend();
-		
+
 		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].']');
 		show_messages($result,"Network map deleted","Cannot delete network map");
 		if($result){
@@ -106,7 +106,7 @@ include_once "include/page_header.php";
 <?php
 	$form = new CForm();
 	$form->SetMethod('get');
-	
+
 	$form->AddItem(new CButton("form",S_CREATE_MAP));
 	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
 	echo SBR;
@@ -118,11 +118,11 @@ include_once "include/page_header.php";
 	else{
 		$row_count = 0;
 		$numrows = new CSpan(null,'info');
-		$numrows->addOption('name','numrows');	
+		$numrows->addOption('name','numrows');
 		$header = get_table_header(array(S_MAPS_BIG,
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 						S_FOUND.': ',$numrows,)
-						);			
+						);
 		show_table_header($header);
 
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
@@ -137,7 +137,7 @@ include_once "include/page_header.php";
 						' FROM sysmaps sm'.
 						' WHERE '.DBin_node('sm.sysmapid').
 						order_by('sm.name,sm.width,sm.height','sm.sysmapid'));
-						
+
 		while($row=DBfetch($result)){
 			if(!sysmap_accessible($row["sysmapid"],PERM_READ_WRITE)) continue;
 

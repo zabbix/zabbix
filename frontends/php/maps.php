@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -21,18 +21,18 @@
 <?php
 	require_once('include/config.inc.php');
 	require_once('include/maps.inc.php');
-	
+
 	$page['title'] = "S_NETWORK_MAPS";
 	$page['file'] = 'maps.php';
 	$page['hist_arg'] = array('sysmapid');
 	$page['scripts'] = array('prototype.js','url.js');
-	
+
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	
+
 	if(PAGE_TYPE_HTML == $page['type']){
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
-	
+
 include_once('include/page_header.php');
 
 ?>
@@ -41,7 +41,7 @@ include_once('include/page_header.php');
 	$fields=array(
 		"sysmapid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,		NULL),
 		"fullscreen"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1"),	NULL),
-		
+
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -69,27 +69,27 @@ include_once('include/page_header.php');
 			}
 			else if('remove' == $_REQUEST['action']){
 				$result = rm4favorites('web.favorite.sysmapids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
-				
+
 				if($result){
 					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVORITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){ add2favorites("sysmapid","'.$_REQUEST['favid'].'");}'."\n");
 				}
 			}
-			
+
 			if((PAGE_TYPE_JS == $page['type']) && $result){
 				print('switchElementsClass("addrm_fav","iconminus","iconplus");');
 			}
 		}
-	}	
+	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 		exit();
 	}
-	
+
 	$_REQUEST['sysmapid'] = get_request('sysmapid',get_profile('web.maps.sysmapid',0));
 
 	$all_maps = array();
-	
+
 	$result = DBselect('SELECT sysmapid,name '.
 						' FROM sysmaps '.
 						' WHERE '.DBin_node('sysmapid').
@@ -101,7 +101,7 @@ include_once('include/page_header.php');
 		if(!isset($all_maps[0]))
 			$all_maps[0] = $row['sysmapid'];
 
-		$all_maps[$row['sysmapid']] = 
+		$all_maps[$row['sysmapid']] =
 			get_node_name_by_elid($row['sysmapid']).
 			$row['name'];
 	}
@@ -115,32 +115,32 @@ include_once('include/page_header.php');
 		}
 	}
 	unset($all_maps[0]);
-	
+
 	if(isset($_REQUEST["sysmapid"])){
 		update_profile("web.maps.sysmapid",$_REQUEST["sysmapid"]);
 	}
 ?>
 <?php
 	$map_wdgt = new CWidget('hat_maps');
-	
+
 // HEADER
 	$text = SPACE;
 	if(isset($_REQUEST["sysmapid"])){
 		$sysmap = get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
-		$text = $all_maps[$_REQUEST["sysmapid"]];		
+		$text = $all_maps[$_REQUEST["sysmapid"]];
 	}
 
 	$form = new CForm();
 	$form->setMethod('get');
-	
+
 	$form->addVar("fullscreen",$_REQUEST["fullscreen"]);
 
 	$cmbMaps = new CComboBox("sysmapid",get_request("sysmapid",0),"submit()");
-	
+
 	foreach($all_maps as $id => $name){
 		$cmbMaps->addItem($id, $name);
 	}
-//-------------------------	
+//-------------------------
 ?>
 <?php
 	$table = new CTable(S_NO_MAPS_DEFINED,"map");
@@ -159,7 +159,7 @@ include_once('include/page_header.php');
 		$sysmap = get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
 
 		$text = $all_maps[$_REQUEST["sysmapid"]];
-		
+
 		if(infavorites('web.favorite.sysmapids',$_REQUEST['sysmapid'],'sysmapid')){
 			$icon = new CDiv(SPACE,'iconminus');
 			$icon->addOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
@@ -171,12 +171,12 @@ include_once('include/page_header.php');
 			$icon->addAction('onclick',new CScript("javascript: add2favorites('sysmapid','".$_REQUEST["sysmapid"]."');"));
 		}
 		$icon->addOption('id','addrm_fav');
-		
+
 		$url = '?sysmapid='.$_REQUEST['sysmapid'].($_REQUEST['fullscreen']?'':'&fullscreen=1');
 
 		$fs_icon = new CDiv(SPACE,'fullscreen');
 		$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));	
+		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 	}
 
 	$map_wdgt->addHeader(S_NETWORK_MAPS_BIG,array($icon,$fs_icon));
@@ -185,7 +185,7 @@ include_once('include/page_header.php');
 		$form->addItem($cmbMaps);
 		$map_wdgt->addHeader($text,$form);
 	}
-	
+
 	$map_wdgt->addItem($table);
 
 	$map_wdgt->show();

@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -28,7 +28,7 @@
 	$page["file"] = "httpdetails.php";
 	$page['hist_arg'] = array('hostid','grouid','graphid','period','stime');
 	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js');
-	
+
 	define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once "include/page_header.php";
@@ -48,7 +48,7 @@ include_once "include/page_header.php";
 
 		"groupid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		"hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-		
+
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
@@ -66,26 +66,26 @@ include_once "include/page_header.php";
 		' where '.DBcondition('a.hostid',$available_hosts).
 			' and a.applicationid=ht.applicationid '.
 			' and ht.httptestid='.$_REQUEST['httptestid'];
-			
+
 	if(!$httptest_data = DBfetch(DBselect($sql))){
 		access_deny();
 	}
-	
+
 	navigation_bar_calc();
 ?>
 <?php
-// Header	
+// Header
 	$text = array(S_DETAILS_OF_SCENARIO_BIG.' / ',bold($httptest_data['name']),' ['.date(S_DATE_FORMAT_YMDHMS,$httptest_data['lastcheck']).']');
-	
+
 	$url = '?httptestid='.$_REQUEST['httptestid'].'&fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
-	
+
 	$icon_tab = new CTable();
 	$icon_tab->AddRow(array($fs_icon,SPACE,$text));
-	
+
 	$text = $icon_tab;
 
 	show_table_header($text,new CLink(S_CANCEL,'httpmon.php'.url_param('groupid').url_param('hostid')));
@@ -166,7 +166,7 @@ include_once "include/page_header.php";
 			$httpstep_data['item_data'][$item_data['httpitem_type']] = $item_data;
 
 			if (!str_in_array($item_data['httpitem_type'], array(HTTPSTEP_ITEM_TYPE_IN, HTTPSTEP_ITEM_TYPE_TIME))) continue;
-	
+
 			if(isset($total_data[$item_data['httpitem_type']])){
 				$total_data[$item_data['httpitem_type']]['lastvalue'] += $item_data['lastvalue'];
 			}
@@ -203,9 +203,9 @@ include_once "include/page_header.php";
 		$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
 		$status['style'] = 'disabled';
 	}
-	
+
 	$table->AddRow(array(
-		new CCol(S_TOTAL_BIG, 'bold'), 
+		new CCol(S_TOTAL_BIG, 'bold'),
 		new CCol(SPACE, 'bold'),
 		new CCol(format_lastvalue($total_data[HTTPSTEP_ITEM_TYPE_TIME]), 'bold'),
 		new CCol(SPACE, 'bold'),
@@ -215,12 +215,12 @@ include_once "include/page_header.php";
 	$table->Show();
 
 	echo SBR;
-	
+
 	if( isset($_REQUEST['period']) && $_REQUEST['period'] != ZBX_MIN_PERIOD ) {
 		update_profile('web.httptest.period', $_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['httptestid']);
 	}
 	$_REQUEST['period'] = get_profile('web.httptest.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['httptestid']);
-				
+
 	show_table_header(array(S_HISTORY.' "',
 						bold($httptest_data['name']),
 						'"')
@@ -246,14 +246,14 @@ include_once "include/page_header.php";
 		,'center')));
 
 	$form->Show();
-	
+
 
 	$period = get_request('period',3600);
 //SDI(get_min_itemclock_by_itemid($items[HTTPSTEP_ITEM_TYPE_IN][0]['itemid']));
 	$mstime = min(get_min_itemclock_by_itemid($items[HTTPSTEP_ITEM_TYPE_IN][0]['itemid']),get_min_itemclock_by_itemid($items[HTTPSTEP_ITEM_TYPE_TIME][0]['itemid']));
 	$stime = ($mstime)?$mstime:0;
 	$bstime = time()-$period;
-	
+
 	if(isset($_REQUEST['stime'])){
 		$bstime = $_REQUEST['stime'];
 		$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
@@ -262,8 +262,8 @@ include_once "include/page_header.php";
 				showgraphmenu("graph");
 				graph_zoom_init("graph_1",'.$bstime.','.$period.',ZBX_G_WIDTH, 150, false);
 				graph_zoom_init("graph_2",'.$bstime.','.$period.',ZBX_G_WIDTH, 150, false);';
-					
-	zbx_add_post_js($script); 
+
+	zbx_add_post_js($script);
 
 	$scroll_div = new CDiv();
 	$scroll_div->addOption('id','scroll_cntnr');

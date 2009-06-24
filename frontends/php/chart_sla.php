@@ -1,5 +1,5 @@
-<?php 
-/* 
+<?php
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -44,13 +44,13 @@ include_once 'include/page_header.php';
 	}
 
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
-	
+
 	$sql = 'SELECT s.* '.
 			' FROM services s '.
 			' WHERE s.serviceid='.$_REQUEST['serviceid'].
 				' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 				' AND '.DBin_node('s.serviceid');
-				
+
 	if(!$service = DBfetch(DBselect($sql))){
 		access_deny();
 	}
@@ -59,18 +59,18 @@ include_once 'include/page_header.php';
 	$sizeX=200;
 	$sizeY=15;
 
-	$im = imagecreate($sizeX,$sizeY); 
-  
-	$red		= imagecolorallocate($im,255,0,0); 
-	$darkred	= imagecolorallocate($im,150,0,0); 
-	$green		= imagecolorallocate($im,0,255,0); 
-	$darkgreen	= imagecolorallocate($im,0,150,0); 
-	$blue		= imagecolorallocate($im,0,0,255); 
-	$yellow		= imagecolorallocate($im,255,255,0); 
-	$cyan		= imagecolorallocate($im,0,255,255); 
-	$black		= imagecolorallocate($im,0,0,0); 
-	$gray		= imagecolorallocate($im,150,150,150); 
-	$white		= imagecolorallocate($im,255,255,255); 
+	$im = imagecreate($sizeX,$sizeY);
+
+	$red		= imagecolorallocate($im,255,0,0);
+	$darkred	= imagecolorallocate($im,150,0,0);
+	$green		= imagecolorallocate($im,0,255,0);
+	$darkgreen	= imagecolorallocate($im,0,150,0);
+	$blue		= imagecolorallocate($im,0,0,255);
+	$yellow		= imagecolorallocate($im,255,255,0);
+	$cyan		= imagecolorallocate($im,0,255,255);
+	$black		= imagecolorallocate($im,0,0,0);
+	$gray		= imagecolorallocate($im,150,150,150);
+	$white		= imagecolorallocate($im,255,255,255);
 
 	imagefilledrectangle($im,0,0,$sizeX,$sizeY,imagecolorallocate($im,120,200,120));
 
@@ -84,7 +84,7 @@ include_once 'include/page_header.php';
 
 // Percentage to show
 	$percentage = 20;
-	
+
 	$p=min($problem,$percentage);
 	$g=max($service['goodsla']-(100 - $percentage),0);
 
@@ -97,8 +97,8 @@ include_once 'include/page_header.php';
 	imagestring($im, 2,1,1, $s , $white);
 	$s=sprintf('%2.2f%%', $problem);
 	imagestring($im, 2,$sizeX-45,1, $s , $white);
-	ImageOut($im); 
-	imagedestroy($im); 
+	ImageOut($im);
+	imagedestroy($im);
 
 include_once('include/page_footer.php');
 

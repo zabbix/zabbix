@@ -145,15 +145,15 @@ include_once 'include/page_header.php';
 
 			if(isset($visible['percent_left'])) 	$percent_left  = get_request('percent_left', 0);
 			if(isset($visible['percent_right']))	$percent_right = get_request('percent_right', 0);
-			
+
 			if(($_REQUEST['ymin_itemid'] != 0) && ($_REQUEST['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
 				$_REQUEST['yaxismin']=0;
 			}
-			
+
 			if(($_REQUEST['ymax_itemid'] != 0)  && ($_REQUEST['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)){
 				$_REQUEST['yaxismax']=0;
 			}
-			
+
 			if(isset($_REQUEST['graphid'])){
 
 				DBstart();
@@ -314,7 +314,7 @@ include_once 'include/page_header.php';
 			$_REQUEST['groupid'] = $group['groupid'];
 		}
 	}
-	
+
 	if(isset($_REQUEST['graphid']) && ($_REQUEST['graphid']>0)){
 		$sql_from = '';
 		$sql_where = '';
@@ -420,7 +420,7 @@ include_once 'include/page_header.php';
 		$header = get_table_header(array(S_GRAPHS_BIG,
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 						S_FOUND.': ',$numrows,)
-						);							
+						);
 		show_table_header($header, $r_form);
 
 /* TABLE */
@@ -525,7 +525,7 @@ include_once 'include/page_header.php';
 		$form->AddItem($table);
 		$form->Show();
 	}
-	
+
 	if(isset($row_count))
 		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 ?>

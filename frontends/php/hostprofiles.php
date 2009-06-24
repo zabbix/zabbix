@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -26,7 +26,7 @@
 	$page["title"] = "S_HOST_PROFILES";
 	$page["file"] = "hostprofiles.php";
 	$page['hist_arg'] = array('groupid','hostid');
-	
+
 include_once "include/page_header.php";
 
 ?>
@@ -39,18 +39,18 @@ include_once "include/page_header.php";
 	);
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
-	
+
 	$reset_hostid = (isset($_REQUEST['hostid'])) ? false : true;
-	
+
 	$params = array();
 	$options = array('allow_all_hosts','real_hosts');
-	if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');	
+	if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
 	foreach($options as $option) $params[$option] = 1;
 
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
 	validate_group($PAGE_GROUPS, $PAGE_HOSTS, $reset_hostid);
-		
+
 	$r_form = new CForm();
 	$r_form->setMethod('get');
 
@@ -94,10 +94,10 @@ include_once "include/page_header.php";
 	$sql = 'SELECT pe.hostid'.
 			' FROM hosts_profiles_ext pe, hosts_groups hg'.
 			' WHERE hg.hostid=pe.hostid '.
-				$sql_where;				
+				$sql_where;
 	$result = DBselect($sql,1);
 	if(DBfetch($result)) $profile_types += 2;
-	
+
 	switch($profile_types) {
 		case 1:
 			$prof_type = 0;
@@ -113,8 +113,8 @@ include_once "include/page_header.php";
 			$r_form->addItem(array(SPACE.S_HOST_PROFILES.SPACE,$cmbProf));
 		break;
 	}
-/// --- --- ///	
-	
+/// --- --- ///
+
 	show_table_header(S_HOST_PROFILES_BIG, $r_form);
 ?>
 
@@ -141,7 +141,7 @@ include_once "include/page_header.php";
 				make_sorting_link(S_DEVICE_TYPE,'hpe.device_type'),
 				make_sorting_link(S_DEVICE_STATUS,'hpe.device_status'))
 			);
-			
+
 			$sql_where = '';
 			if($_REQUEST['groupid'] > 0){
 				$sql_where = ' AND hg.groupid='.$_REQUEST['groupid'];
@@ -178,7 +178,7 @@ include_once "include/page_header.php";
 				make_sorting_link(S_TAG,'p.tag'),
 				make_sorting_link(S_MACADDRESS,'p.macaddress'))
 			);
-			
+
 			$sql_from = '';
 			$sql_where = '';
 			if($_REQUEST['groupid'] > 0){

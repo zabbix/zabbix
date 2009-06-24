@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -26,7 +26,7 @@
 	$page['file']	= 'report5.php';
 	$page['hist_arg'] = array('period');
 	$page['scripts'] = array('menu_scripts.js');
-	
+
 include_once('include/page_header.php');
 
 ?>
@@ -41,10 +41,10 @@ include_once('include/page_header.php');
 <?php
 	$_REQUEST['period'] = get_request('period', 'day');
 	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
-	
+
 	$form = new CForm();
 	$form->SetMethod('get');
-	
+
 	$cmbPeriod = new CComboBox('period',$_REQUEST['period'],'submit()');
 	$cmbPeriod->addItem('day',S_DAY);
 	$cmbPeriod->addItem('week',S_WEEK);
@@ -96,7 +96,7 @@ include_once('include/page_header.php');
 		$triggers[$row['triggerid']] = $row;
 		$triggerids[$row['triggerid']] = $row['triggerid'];
 	}
-	
+
 	$sql = 'SELECT f.triggerid, i.* '.
 			' FROM functions f, items i '.
 			' WHERE '.DBcondition('f.triggerid',$triggerids).
@@ -106,13 +106,13 @@ include_once('include/page_header.php');
 		$item['itemid'] = $row['itemid'];
 		$item['action'] = str_in_array($row['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
 		$item['description'] = item_description($row);
-		
+
 		$triggers[$row['triggerid']]['items'][$row['itemid']] = $item;
 	}
-	
+
 	foreach($triggers as $triggerid => $row){
 		$description = expand_trigger_description_by_data($row);
-		
+
 		$menus = '';
 		$host_nodeid = id2nodeid($row['hostid']);
 		foreach($scripts_by_hosts[$row['hostid']] as $id => $script){
@@ -126,16 +126,16 @@ include_once('include/page_header.php');
 
 		$menus = rtrim($menus,',');
 		$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
-		
+
 		$host = new CSpan($row['host']);
 		$host->addOption('onclick','javascript: '.$menus);
 		$host->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
-		
+
 		$tr_conf_link = 'null';
 		if($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER)
 			$tr_conf_link = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$row['triggerid']."&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 
-		
+
 		$tr_desc = new CSpan($description,'pointer');
 		$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
 										" new Array({'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['lastchange']."'},".$tr_conf_link."),".
@@ -150,7 +150,7 @@ include_once('include/page_header.php');
 		));
 	}
 	$table->show();
-	
+
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
 ?>

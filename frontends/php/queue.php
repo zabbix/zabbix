@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -25,7 +25,7 @@
 	$page["title"] = "S_QUEUE_BIG";
 	$page["file"] = "queue.php";
 	$page['hist_arg'] = array('config');
-	
+
 	define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once "include/page_header.php";
@@ -38,7 +38,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
-	
+
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 ?>
 
@@ -48,7 +48,7 @@ include_once "include/page_header.php";
 
 	$form = new CForm();
 	$form->SetMethod('get');
-	
+
 	$cmbMode = new CComboBox("config", $_REQUEST["config"], "submit();");
 	$cmbMode->AddItem(0, S_OVERVIEW);
 	$cmbMode->AddItem(1, S_OVERVIEW_BY_PROXY);
@@ -120,7 +120,7 @@ include_once "include/page_header.php";
 			else	$sec_rest[$row['type']]++;
 
 		}
-		
+
 		$table->setHeader(array(S_ITEMS,S_5_SECONDS,S_10_SECONDS,S_30_SECONDS,S_1_MINUTE,S_5_MINUTES,S_MORE_THAN_10_MINUTES));
 		foreach($item_types as $type){
 			$elements=array(
@@ -132,7 +132,7 @@ include_once "include/page_header.php";
 				new CCol($sec_600[$type],($sec_600[$type])?"high":"normal"),
 				new CCol($sec_rest[$type],($sec_rest[$type])?"disaster":"normal")
 			);
-			
+
 			$table->addRow($elements);
 		}
 	}

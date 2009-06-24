@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -24,18 +24,18 @@ require_once('include/config.inc.php');
 define('ZBX_API_REQUEST', PAGE_TYPE_JSON_RPC);
 
 $allowed_content = array(
-				'application/json-rpc'		=> 'json-rpc', 
-				'application/json'			=> 'json-rpc', 
+				'application/json-rpc'		=> 'json-rpc',
+				'application/json'			=> 'json-rpc',
 				'application/jsonrequest'	=> 'json-rpc',
-//				'application/xml-rpc'		=> 'xml-rpc', 
-//				'application/xml'			=> 'xml-rpc', 
+//				'application/xml-rpc'		=> 'xml-rpc',
+//				'application/xml'			=> 'xml-rpc',
 //				'application/xmlrequest'	=> 'xml-rpc'
 				);
 ?>
 <?php
 
-$http_request = new CHTTP_request();  
-$content_type = $http_request->header('Content-Type');  
+$http_request = new CHTTP_request();
+$content_type = $http_request->header('Content-Type');
 
 if(!isset($allowed_content[$content_type])){
 	header('HTTP/1.0 412 Precondition Failed');
@@ -44,13 +44,13 @@ if(!isset($allowed_content[$content_type])){
 
 $data = $http_request->body();
 //SDI($data);
-	
+
 if($allowed_content[$content_type] == 'json-rpc'){
 	$json_rpc = new CJSONrpc();
-	
+
 	$json_rpc->process($data);
 	$data = $json_rpc->result();
-	
+
 	echo $data;
 }
 else if($allowed_content[$content_type] == 'xml-rpc'){

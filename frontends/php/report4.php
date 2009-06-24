@@ -53,7 +53,7 @@ include_once "include/page_header.php";
 	{
 		$MIN_YEAR = intval(date("Y"));
 	}
-		
+
 	$form = new CForm();
 	$form->SetMethod('get');
 
@@ -74,7 +74,7 @@ include_once "include/page_header.php";
 	$cmbPeriod->AddItem("monthly",	S_MONTHLY);
 	$cmbPeriod->AddItem("yearly",	S_YEARLY);
 	$form->AddItem($cmbPeriod);
-	
+
 	if($period != "yearly")
 	{
 		$form->AddItem(SPACE.S_YEAR.SPACE);
@@ -83,7 +83,7 @@ include_once "include/page_header.php";
 			$cmbYear->AddItem($y, $y);
 		$form->AddItem($cmbYear);
 	}
-	
+
         show_table_header(S_NOTIFICATIONS_BIG, $form);
 ?>
 <?php
@@ -91,7 +91,7 @@ include_once "include/page_header.php";
 	$_REQUEST["period"]	= $period;
 	$_REQUEST["media_type"]	= $media_type;
 
-	
+
         $table = new CTableInfo();
 
 	$header = array();
@@ -111,7 +111,7 @@ include_once "include/page_header.php";
 	{
 		$media_types[$media_type_data['mediatypeid']] = $media_type_data['description'];
 	}
-	
+
         switch($period)
 	{
 		case "yearly":
@@ -144,7 +144,7 @@ include_once "include/page_header.php";
 			$to	= 52;
 			array_unshift($header,new CCol(S_FROM,"center"),new CCol(S_TILL,"center"));
 			function get_time($w)	{
-				global $year;	
+				global $year;
 
 				$time	= mktime(0,0,0,1, 1, $year);
 				$wd	= date("w", $time);
@@ -161,10 +161,10 @@ include_once "include/page_header.php";
 	$table->SetHeader($header,"vertical_header");
 
 	for($t = $from; $t <= $to; $t++)
-	{       
+	{
 		if(($start = get_time($t)) > time())
 			break;
-		
+
 		if(($end = get_time($t+1)) > time())
 			$end = time();
 
@@ -188,7 +188,7 @@ include_once "include/page_header.php";
 		$table->AddRow($table_row);
 	}
 	$table->show();
-	
+
 	if($media_type == 0)
 	{
 		$table = new CTableInfo();

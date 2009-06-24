@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -26,7 +26,7 @@
 	$page['title'] = "S_CONFIGURATION_OF_NETWORK_MAPS";
 	$page['file'] = 'sysmap.php';
 	$page['hist_arg'] = array('sysmapid');
-	
+
 include_once('include/page_header.php');
 
 ?>
@@ -72,7 +72,7 @@ include_once('include/page_header.php');
 	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS_BIG);
 
 	if(!sysmap_accessible($_REQUEST['sysmapid'],PERM_READ_WRITE)) access_deny();
-	
+
 	$sysmap = DBfetch(DBselect('select * from sysmaps where sysmapid='.$_REQUEST['sysmapid']));
 ?>
 <?php
@@ -92,7 +92,7 @@ include_once('include/page_header.php');
 			else{
 				info('Map element is not selected');
 			}
-			
+
 			show_messages($result,'Element updated','Cannot update element');
 		}
 		else{ // add element
@@ -106,13 +106,13 @@ include_once('include/page_header.php');
 			else{
 				info('Map element is not selected');
 			}
-			
+
 			show_messages($result,'Element added','Cannot add element');
 		}
 		add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].'] Element ['.$selementid.'] updated ');
 		if($result)	unset($_REQUEST['form']);
 	}
-	
+
 	if(isset($_REQUEST['save_link'])){
 		if(isset($_REQUEST['linkid'])){ // update link
 			$result=update_link($_REQUEST['linkid'],
@@ -133,7 +133,7 @@ include_once('include/page_header.php');
 		if($result)	unset($_REQUEST['form']);
 	}
 	else if(isset($_REQUEST['delete'])){
-		
+
 		if(isset($_REQUEST['linkid'])){
 			$result=delete_link($_REQUEST['linkid']);
 			show_messages($result,'Link deleted','Cannot delete link');
@@ -236,9 +236,9 @@ include_once('include/page_header.php');
 				' where selementid='.$row['selementid2']);
 			$row1=DBfetch($result1);
 			$label2=$row1['label'];
-			
+
 	/* prepare description */
-	
+
 			$triggers = get_link_triggers($row['linkid']);
 			$description=array();
 
@@ -249,7 +249,7 @@ include_once('include/page_header.php');
 				}
 				$description[]= $triggers[$id]['description'];
 			}
-			
+
 			if(empty($description))
 				$description='-';
 
@@ -266,9 +266,9 @@ include_once('include/page_header.php');
 		}
 		$table->Show();
 	}
-	
+
 	show_messages();
-	
+
 	echo SBR;
 	$map=get_sysmap_by_sysmapid($_REQUEST['sysmapid']);
 	show_table_header($map['name']);
@@ -293,7 +293,7 @@ include_once('include/page_header.php');
 				$db_element['label']);
 
 		}
-		
+
 		$imgMap = new CImg('map.php?sysmapid='.$_REQUEST['sysmapid']);
 		$imgMap->setMap($linkMap->GetName());
 		$table->addRow($linkMap);
@@ -302,7 +302,7 @@ include_once('include/page_header.php');
 	$table->Show();
 ?>
 <?php
-	
+
 include_once('include/page_footer.php');
 
 ?>

@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -53,7 +53,7 @@ include_once "include/page_header.php";
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
-	
+
 	check_fields($fields);
 	validate_sort_and_sortorder('mt.description',ZBX_SORT_UP);
 ?>
@@ -107,21 +107,21 @@ include_once "include/page_header.php";
 
 	$form = new CForm();
 	$form->SetMethod('get');
-	
+
 	$form->AddItem(new CButton("form",S_CREATE_MEDIA_TYPE));
-	
+
 	if(isset($_REQUEST["form"])){
 		$header = get_table_header(S_CONFIGURATION_OF_MEDIA_TYPES_BIG);
 	}
 	else{
 		$row_count = 0;
 		$numrows = new CSpan(null,'info');
-		$numrows->addOption('name','numrows');	
+		$numrows->addOption('name','numrows');
 		$header = get_table_header(array(S_CONFIGURATION_OF_MEDIA_TYPES_BIG,
 					new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 					S_FOUND.': ',$numrows,)
-					);			
-	}			
+					);
+	}
 	show_table_header($header, $form);
 
 ?>
@@ -151,7 +151,7 @@ include_once "include/page_header.php";
 				case MEDIA_TYPE_EMAIL:
 					$details =
 						S_SMTP_SERVER.": '".$row['smtp_server']."', ".
-						S_SMTP_HELO.": '".$row['smtp_helo']."', ". 
+						S_SMTP_HELO.": '".$row['smtp_helo']."', ".
 						S_SMTP_EMAIL.": '".$row['smtp_email']."'";
 					break;
 				case MEDIA_TYPE_EXEC:
@@ -166,7 +166,7 @@ include_once "include/page_header.php";
 				default:
 					$details = '';
 			}
-			
+
 			$table->addRow(array(
 				media_type2str($row['type']),
 				new CLink($row["description"],"?&form=update&mediatypeid=".$row["mediatypeid"],'action'),
@@ -176,7 +176,7 @@ include_once "include/page_header.php";
 		$table->show();
 		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 	}
-	
+
 
 ?>
 

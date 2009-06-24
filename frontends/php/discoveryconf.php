@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -28,7 +28,7 @@
 	$page['hist_arg'] = array('');
 
 include_once "include/page_header.php";
-	
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -46,7 +46,7 @@ include_once "include/page_header.php";
 		'dchecks_deleted'=>	array(null, O_OPT, null, null, null),
 		'selected_checks'=>	array(T_ZBX_INT, O_OPT, null, null, null),
 
-		'new_check_type'=>	array(T_ZBX_INT, O_OPT,  null,	
+		'new_check_type'=>	array(T_ZBX_INT, O_OPT,  null,
 			IN(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3, SVC_ICMPPING)),
 										'isset({add_check})'),
 
@@ -77,10 +77,10 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 	validate_sort_and_sortorder('d.name',ZBX_SORT_UP);
-	
+
 	$_REQUEST['dchecks'] = get_request('dchecks', array());
 	$_REQUEST['dchecks_deleted'] = get_request('dchecks_deleted', array());
-	
+
 ?>
 <?php
 	if(inarr_isset(array('add_check', 'new_check_type', 'new_check_ports', 'new_check_key', 'new_check_snmp_community',
@@ -112,7 +112,7 @@ include_once "include/page_header.php";
 			$msg_ok = S_DISCOVERY_RULE_UPDATED;
 			$msg_fail = S_CANNOT_UPDATE_DISCOVERY_RULE;
 
-			$result = update_discovery_rule($_REQUEST["druleid"], $_REQUEST["proxy_hostid"], $_REQUEST['name'], $_REQUEST['iprange'], 
+			$result = update_discovery_rule($_REQUEST["druleid"], $_REQUEST["proxy_hostid"], $_REQUEST['name'], $_REQUEST['iprange'],
 				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'], $_REQUEST['dchecks_deleted']);
 
 			$druleid = $_REQUEST["druleid"];
@@ -126,7 +126,7 @@ include_once "include/page_header.php";
 
 			$result = $druleid;
 		}
-		
+
 		show_messages($result, $msg_ok, $msg_fail);
 
 		if($result){ // result - OK
@@ -187,7 +187,7 @@ include_once "include/page_header.php";
 /* header */
 	$form = new CForm();
 	$form->SetMethod('get');
-	
+
 	if(!isset($_REQUEST["form"]))
 		$form->AddItem(new CButton('form', S_CREATE_RULE));
 	show_table_header(S_CONFIGURATION_OF_DISCOVERY_BIG, $form);
@@ -217,7 +217,7 @@ include_once "include/page_header.php";
 						' FROM drules d'.
 						' WHERE '.DBin_node('druleid').
 						order_by('d.name,d.iprange,d.delay','d.druleid'));
-						
+
 		while($rule_data = DBfetch($db_rules)){
 			$cheks = array();
 			$db_checks = DBselect("select type from dchecks where druleid=".$rule_data["druleid"].
@@ -237,7 +237,7 @@ include_once "include/page_header.php";
 				$proxy = get_host_by_hostid($rule_data["proxy_hostid"]);
 				array_push($description, $proxy["host"], ":");
 			}
-			
+
 			array_push($description,
 					new CLink($rule_data['name'], "?form=update&druleid=".$rule_data['druleid'],'action'));
 
@@ -249,7 +249,7 @@ include_once "include/page_header.php";
 						$rule_data["druleid"]),	/* value */
 					SPACE,
 					$description));
-		
+
 			$tblDiscovery->AddRow(array(
 				$drule,
 /*				array(
@@ -266,7 +266,7 @@ include_once "include/page_header.php";
 				$rule_data['delay'],
 				implode(',', $cheks),
 				$status
-				));	
+				));
 		}
 		$tblDiscovery->SetFooter(new CCol(array(
 			new CButtonQMessage('group_enable',S_ENABLE_SELECTED, S_ENABLE_SELECTED_RULES_Q), SPACE,

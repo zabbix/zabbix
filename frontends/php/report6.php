@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2008 SIA Zabbix
 **
@@ -26,47 +26,47 @@
 	$page['file']	= 'report6.php';
 	$page['hist_arg'] = array('period');
 	$page['scripts'] = array('calendar.js','scriptaculous.js?load=effects');
-	
+
 include_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'config'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1,2,3'),		NULL),
-		
+
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		NULL),
 		'hostids'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		'isset({config})&&({config}==3)&&isset({report_show})&&!isset({groupids})'),
 		'groupids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		'isset({config})&&({config}==3)&&isset({report_show})&&!isset({hostids})'),
 
-		'items'=>			array(T_ZBX_STR, O_OPT,  NULL,	null,		'isset({report_show})'),		
+		'items'=>			array(T_ZBX_STR, O_OPT,  NULL,	null,		'isset({report_show})'),
 		'new_graph_item'=>	array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 		'group_gid'=>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
-		
+
 		'title'=>			array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 		'xlabel'=>			array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 		'ylabel'=>			array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 
 		'showlegend'=>		array(T_ZBX_STR, O_OPT, NULL,	null,		null),
 		'sorttype'=>		array(T_ZBX_INT, O_OPT,	null,	null,		null),
-		
+
 		'scaletype'=>		array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
 		'avgperiod'=>		array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
-		
+
 		'periods'=>			array(T_ZBX_STR, O_OPT,	null,	null,		null),
 		'new_period'=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 		'group_pid'=>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
 
 		'palette'=>			array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
 		'palettetype'=>		array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
-		
+
 // actions
 		'delete_item'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete_period'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'report_show'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		
+
 // filter
 		'report_show'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
-		
+
 		'report_timesince'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
 		'report_timetill'=>		array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
 
@@ -77,13 +77,13 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	
-/* AJAX */	
+
+/* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
 			update_profile('web.report6.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
-	}	
+	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 		exit();
@@ -99,19 +99,19 @@ include_once('include/page_header.php');
 		foreach($_REQUEST['items'] as $gid => $data){
 			if(	(bccomp($new_gitem['itemid'] , $data['itemid'])==0) &&
 				$new_gitem['calc_fnc'] == $data['calc_fnc'] &&
-				$new_gitem['caption'] == $data['caption']) 
+				$new_gitem['caption'] == $data['caption'])
 			{
 				$already_exist = true;
 				break;
 			}
 		}
-		
+
 		if(!isset($already_exist)){
 			array_push($_REQUEST['items'], $new_gitem);
 		}
 	}
 	else if(isset($_REQUEST['delete_item']) && isset($_REQUEST['group_gid'])){
-	
+
 		foreach($_REQUEST['items'] as $gid => $data){
 			if(!isset($_REQUEST['group_gid'][$gid])) continue;
 			unset($_REQUEST['items'][$gid]);
@@ -124,29 +124,29 @@ include_once('include/page_header.php');
 
 		foreach($_REQUEST['periods'] as $pid => $data){
 			if(	$new_period['report_timesince'] == $data['report_timesince'] &&
-				$new_period['report_timetill'] == $data['report_timetill']) 
+				$new_period['report_timetill'] == $data['report_timetill'])
 			{
 				$already_exist = true;
 				break;
 			}
 		}
-		
+
 		if(!isset($already_exist)){
 			array_push($_REQUEST['periods'], $new_period);
 		}
 	}
 	else if(isset($_REQUEST['delete_period']) && isset($_REQUEST['group_pid'])){
-	
+
 		foreach($_REQUEST['periods'] as $pid => $data){
 			if(!isset($_REQUEST['group_pid'][$pid])) continue;
 			unset($_REQUEST['periods'][$pid]);
 		}
 		unset($_REQUEST['delete_period'], $_REQUEST['group_pid']);
-	}	
+	}
 ?>
 <?php
 	$config = $_REQUEST['config'] = get_request('config',1);
-	
+
 	$rep6_wdgt = new CWidget();
 // Header
 	$r_form = new CForm();
@@ -155,7 +155,7 @@ include_once('include/page_header.php');
 		$cnfCmb->addItem(1, S_BAR_REPORT_1);
 		$cnfCmb->addItem(2, S_BAR_REPORT_2);
 		$cnfCmb->addItem(3, S_BAR_REPORT_3);
-		
+
 	$r_form->addItem(array(S_REPORTS.SPACE,$cnfCmb));
 
 	$rep6_wdgt->addHeader(S_BAR_REPORTS, $r_form);
@@ -167,17 +167,17 @@ include_once('include/page_header.php');
 	$rep_tab->setCellSpacing(3);
 
 	$rep_tab->addOption('border',0);
-		
+
 // --------------
 	switch($config){
 		case 1: $rep_form = bar_report_form(); break;
 		case 2: $rep_form = bar_report_form2(); break;
 		case 3: $rep_form = bar_report_form3(); break;
-		default: $rep_form = bar_report_form(); 
-	}	
-	
+		default: $rep_form = bar_report_form();
+	}
+
 	$rep6_wdgt->addFlicker($rep_form, get_profile('web.report6.filter.state',1));
-	
+
 	if(isset($_REQUEST['report_show'])){
 		$src = 'chart_bar.php?config='.$_REQUEST['config'].
 					url_param('title').
@@ -195,10 +195,10 @@ include_once('include/page_header.php');
 					url_param('groupids').
 					url_param('palette').
 					url_param('palettetype');
-					
+
 		$rep_tab->addRow(new CImg($src, 'report'));
 	}
-	
+
 	$outer_table = new CTable();
 	$outer_table->addOption('border',0);
 	$outer_table->addOption('width','100%');
@@ -208,7 +208,7 @@ include_once('include/page_header.php');
 	$tmp_row = new CRow($rep_tab);
 	$tmp_row->addOption('align','center');
 	$outer_table->addRow($tmp_row);
-	
+
 	$rep6_wdgt->addItem($outer_table);
 	$rep6_wdgt->show();
 ?>

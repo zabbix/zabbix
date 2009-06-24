@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -29,7 +29,7 @@
 	$page['hist_arg'] = array('config');
 
 include_once "include/page_header.php";
-	
+
 ?>
 <?php
 	$_REQUEST['config'] = get_request('config',get_profile('web.screenconf.config',0));
@@ -69,7 +69,7 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 	validate_sort_and_sortorder('s.name',ZBX_SORT_UP);
-	
+
 	$config = $_REQUEST['config'] = get_request('config', 0);
 
 	update_profile('web.screenconf.config', $_REQUEST['config'],PROFILE_TYPE_INT);
@@ -91,7 +91,7 @@ include_once "include/page_header.php";
 				$result=update_screen($_REQUEST["screenid"],$_REQUEST["name"],$_REQUEST["hsize"],$_REQUEST["vsize"]);
 				$audit_action = AUDIT_ACTION_UPDATE;
 				show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
-			} 
+			}
 			else {
 				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 					access_deny();
@@ -99,7 +99,7 @@ include_once "include/page_header.php";
 				DBstart();
 				add_screen($_REQUEST["name"],$_REQUEST["hsize"],$_REQUEST["vsize"]);
 				$result = DBend();
-				
+
 				$audit_action = AUDIT_ACTION_ADD;
 				show_messages($result,S_SCREEN_ADDED,S_CANNOT_ADD_SCREEN);
 			}
@@ -114,7 +114,7 @@ include_once "include/page_header.php";
 				DBstart();
 					delete_screen($_REQUEST["screenid"]);
 				$result = DBend();
-				
+
 				show_messages($result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
 				add_audit_if($result, AUDIT_ACTION_DELETE,AUDIT_RESOURCE_SCREEN," Name [".$screen['name']."] ");
 			}
@@ -139,7 +139,7 @@ include_once "include/page_header.php";
 				DBstart();
 				update_slideshow($_REQUEST['slideshowid'],$_REQUEST['name'],$_REQUEST['delay'],$slides);
 				$result = DBend();
-				
+
 				$audit_action = AUDIT_ACTION_UPDATE;
 				show_messages($result, S_SLIDESHOW_UPDATED, S_CANNOT_UPDATE_SLIDESHOW);
 			}
@@ -147,7 +147,7 @@ include_once "include/page_header.php";
 				DBstart();
 				add_slideshow($_REQUEST['name'],$_REQUEST['delay'],$slides);
 				$result = DBend();
-				
+
 				$audit_action = AUDIT_ACTION_ADD;
 				show_messages($result, S_SLIDESHOW_ADDED, S_CANNOT_ADD_SLIDESHOW);
 			}
@@ -201,11 +201,11 @@ include_once "include/page_header.php";
 		}
 		else if(isset($_REQUEST['delete'])&&isset($_REQUEST['slideshowid'])){
 			if($slideshow = get_slideshow_by_slideshowid($_REQUEST['slideshowid'])){
-			
+
 				DBstart();
 					delete_slideshow($_REQUEST['slideshowid']);
 				$result = DBend();
-				
+
 				show_messages($result, S_SLIDESHOW_DELETED, S_CANNOT_DELETE_SLIDESHOW);
 				add_audit_if($result, AUDIT_ACTION_DELETE,AUDIT_RESOURCE_SLIDESHOW," Name [".$slideshow['name']."] ");
 			}
@@ -217,7 +217,7 @@ include_once "include/page_header.php";
 <?php
 	$form = new CForm();
 	$form->SetMethod('get');
-	
+
 	$cmbConfig = new CComboBox('config', $config, 'submit()');
 	$cmbConfig->AddItem(0, S_SCREENS);
 	$cmbConfig->AddItem(1, S_SLIDESHOWS);
@@ -234,13 +234,13 @@ include_once "include/page_header.php";
 			insert_screen_form();
 		}
 		else{
-			
+
 			$numrows = new CSpan(null,'info');
-			$numrows->addOption('name','numrows');	
+			$numrows->addOption('name','numrows');
 			$header = get_table_header(array(S_SCREENS_BIG,
 							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 							S_FOUND.': ',$numrows,)
-							);			
+							);
 			show_table_header($header);
 
 			$table = new CTableInfo(S_NO_SCREENS_DEFINED);
@@ -254,7 +254,7 @@ include_once "include/page_header.php";
 							' WHERE '.DBin_node('s.screenid').
 							order_by('s.name,s_size','s.screenid'));
 			while($row=DBfetch($result)){
-				
+
 				if(!screen_accessible($row["screenid"], PERM_READ_WRITE)) continue;
 
 				$table->AddRow(array(
@@ -275,11 +275,11 @@ include_once "include/page_header.php";
 		else{
 			$row_count = 0;
 			$numrows = new CSpan(null,'info');
-			$numrows->addOption('name','numrows');	
+			$numrows->addOption('name','numrows');
 			$header = get_table_header(array(S_SLIDESHOWS_BIG,
 							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 							S_FOUND.': ',$numrows,)
-							);			
+							);
 			show_table_header($header);
 
 
@@ -296,7 +296,7 @@ include_once "include/page_header.php";
 							' WHERE '.DBin_node('s.slideshowid').
 							' GROUP BY s.slideshowid,s.name,s.delay '.
 							order_by('s.name,s.delay,cnt','s.slideshowid'));
-							
+
 			while($slide_data = DBfetch($db_slides)){
 				if(!slideshow_accessible($slide_data['slideshowid'], PERM_READ_WRITE)) continue;
 

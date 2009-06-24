@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2008 SIA Zabbix
 **
@@ -21,7 +21,7 @@
 <?php
 	require_once "include/config.inc.php";
 	require_once "include/blocks.inc.php";
-	
+
 	$page["title"] = "S_STATUS_OF_ZABBIX";
 	$page["file"] = "report1.php";
 	$page['hist_arg'] = array();
@@ -37,7 +37,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 	show_table_header(S_STATUS_OF_ZABBIX_BIG);
-	
+
 	$status = make_status_of_zbx();
 	$status->show();
 ?>

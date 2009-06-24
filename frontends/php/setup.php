@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -48,7 +48,7 @@ if(!defined("PAGE_HEADER_LOADED"))
 
 		"zbx_server"=>		array(T_ZBX_STR, O_OPT, null,   null,                   null),
 		"zbx_server_port"=>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(0,65535),	null),
-		
+
 		"message"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,			NULL),
 
 		"nodename"=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
@@ -75,7 +75,7 @@ if(!defined("PAGE_HEADER_LOADED"))
 		redirect('index.php');
 		exit;
 	}
-	
+
 	$ZBX_CONFIG = get_cookie('ZBX_CONFIG', null);
 	$ZBX_CONFIG = isset($ZBX_CONFIG) ? unserialize($ZBX_CONFIG) : array();
 
@@ -83,19 +83,19 @@ if(!defined("PAGE_HEADER_LOADED"))
 	if(!isset($ZBX_CONFIG['agree'])) $ZBX_CONFIG['agree'] = false;
 
 	$ZBX_CONFIG['allowed_db'] = array();
-	
-	/* MYSQL */	
+
+	/* MYSQL */
 	if(zbx_is_callable(array('mysql_pconnect', 'mysql_select_db', 'mysql_error', 'mysql_select_db','mysql_query', 'mysql_fetch_array', 'mysql_fetch_row', 'mysql_data_seek','mysql_insert_id')))
 	{
 		$ZBX_CONFIG['allowed_db']['MYSQL'] = 'MySQL';
 	}
-	
+
 	/* POSTGRESQL */
 	if(zbx_is_callable(array('pg_pconnect', 'pg_fetch_array', 'pg_fetch_row', 'pg_exec', 'pg_getlastoid'))){
 		$ZBX_CONFIG['allowed_db']['POSTGRESQL'] = 'PostgreSQL';
 	}
-	
-	/* ORACLE */	
+
+	/* ORACLE */
 	if(zbx_is_callable(array('ocilogon', 'ocierror', 'ociparse', 'ociexecute', 'ocifetchinto'))){
 		$ZBX_CONFIG['allowed_db']['ORACLE'] = 'Oracle';
 	}
@@ -104,7 +104,7 @@ if(!defined("PAGE_HEADER_LOADED"))
 	if(zbx_is_callable(array('sqlite3_open', 'sqlite3_close', 'sqlite3_query', 'sqlite3_error', 'sqlite3_fetch_array', 'sqlite3_query_close', 'sqlite3_exec'))){
 		$ZBX_CONFIG['allowed_db']['SQLITE3'] = 'SQLite3';
 	}
-	
+
 	if(count($ZBX_CONFIG['allowed_db']) == 0){
 		$ZBX_CONFIG['allowed_db']['no'] = 'No';
 	}

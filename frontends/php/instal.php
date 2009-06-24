@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -71,7 +71,7 @@ include_once "include/page_footer.php";
 			),
 		new CButton('update',S_UPDATE));
 	$form->Show();
-	
+
 ?>
 <?php
 

@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2007 SIA Zabbix
 **
@@ -59,7 +59,7 @@ $frmForm = new CForm();
 $frmForm->SetMethod('get');
 $frmForm->addItem(new CButton('form',S_CREATE_SCRIPT,"javascript: redirect('scripts.php?form=1');"));
 show_table_header(S_SCRIPTS_CONFIGURATION, $frmForm);
-echo SBR; 
+echo SBR;
 if(isset($_REQUEST['action'])){
 
     if(isset($_REQUEST['save'])){

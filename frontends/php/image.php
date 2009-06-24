@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -27,7 +27,7 @@
 	$page['type']	= PAGE_TYPE_IMAGE;
 
 include_once "include/page_header.php";
-	
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -64,10 +64,10 @@ include_once "include/page_header.php";
 		if($src_width > $th_width || $src_height > $th_height){
 			if($th_width == 0){
 				$th_width = $th_height * $src_width/$src_height;
-			} 
+			}
 			else if($th_height == 0){
 				$th_height = $th_width * $src_height/$src_width;
-			} 
+			}
 			else {
 				$a = $th_width/$th_height;
 				$b = $src_width/$src_height;
@@ -75,7 +75,7 @@ include_once "include/page_header.php";
 				if($a > $b){
 					$th_width  = $b * $th_height;
 					$th_height = $th_height;
-				} 
+				}
 				else {
 					$th_height = $th_width/$b;
 					$th_width  = $th_width;
@@ -91,9 +91,9 @@ include_once "include/page_header.php";
 
 			imagecopyresized(
 				$thumb, $source,
-				0, 0, 
-				0, 0, 
-				$th_width, $th_height, 
+				0, 0,
+				0, 0,
+				$th_width, $th_height,
 				$src_width, $src_height);
 
 			imagedestroy($source);

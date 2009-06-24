@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -21,7 +21,7 @@
 <?php
 	require_once 'include/config.inc.php';
 	require_once 'include/graphs.inc.php';
-	
+
 	$page['file']	= 'chart6.php';
 	$page['title']	= "S_CHART";
 	$page['type']	= PAGE_TYPE_IMAGE;
@@ -55,7 +55,7 @@ include_once 'include/page_header.php';
 	if(!graph_accessible($_REQUEST['graphid'])){
 		access_deny();
 	}
-	
+
 	$sql = 'SELECT g.*,h.host,h.hostid '.
 			' FROM graphs g '.
 				' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
@@ -63,9 +63,9 @@ include_once 'include/page_header.php';
 				' LEFT JOIN hosts h ON i.hostid=h.hostid '.
 			' WHERE g.graphid='.$_REQUEST['graphid'].
 				' AND '.DBcondition('h.hostid',$available_hosts);
-					
+
 	$db_data = DBfetch(DBselect($sql));
-	
+
 	$graph = new CPie($db_data['graphtype']);
 
 	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
