@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -23,14 +23,14 @@
 	require_once "include/triggers.inc.php";
 	require_once "include/forms.inc.php";
 	require_once "include/js.inc.php";
-	
+
 	$dstfrm		= get_request("dstfrm",		0);	// destination form
 
 	$page["title"] = "S_MEDIA";
 	$page["file"] = "popup_media.php";
 
 	define('ZBX_PAGE_NO_MENU', 1);
-	
+
 include_once "include/page_header.php";
 
 ?>
@@ -38,8 +38,8 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"dstfrm"=>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		NULL),
-		
-		"media"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	NULL,			NULL),		
+
+		"media"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	NULL,			NULL),
 		"mediatypeid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'isset({add})'),
 		"sendto"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({add})'),
 		"period"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({add})'),
@@ -56,7 +56,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 
 	insert_js_function('add_media');
-	
+
 	if(isset($_REQUEST['add'])){
 		if( !validate_period($_REQUEST['period']) ){
 			error("Icorrect time period");
@@ -78,12 +78,12 @@ include_once "include/page_header.php";
 				'--></script>';
 		}
 	}
-	
+
 	echo SBR;
 
 	if(isset($_REQUEST['media']) && !isset($_REQUEST['form_refresh'])){
 		$rq_severity	= get_request('severity',63);
-		
+
 		$severity = array();
 		for($i=0; $i<6; $i++){
 			if($rq_severity & (1 << $i)) $severity[$i] = $i;
@@ -91,8 +91,8 @@ include_once "include/page_header.php";
 	}
 	else{
 		$severity	= get_request('severity',array(0,1,2,3,4,5));
-	}	
-	
+	}
+
 	$media		= get_request('media',-1);
 	$sendto		= get_request('sendto','');
 	$mediatypeid	= get_request('mediatypeid',0);
@@ -111,7 +111,7 @@ include_once "include/page_header.php";
 					' FROM media_type'.
 					' WHERE '.DBin_node('mediatypeid').
 					' ORDER BY type');
-			
+
 	while($type=DBfetch($types)){
 		$cmbType->AddItem(
 				$type["mediatypeid"],
@@ -120,16 +120,16 @@ include_once "include/page_header.php";
 	}
 	$frmMedia->AddRow(S_TYPE,$cmbType);
 
-	$frmMedia->AddRow(S_SEND_TO,new CTextBox("sendto",$sendto,20));	
-	$frmMedia->AddRow(S_WHEN_ACTIVE,new CTextBox("period",$period,48));	
+	$frmMedia->AddRow(S_SEND_TO,new CTextBox("sendto",$sendto,20));
+	$frmMedia->AddRow(S_WHEN_ACTIVE,new CTextBox("period",$period,48));
 
 	$frm_row = array();
 	for($i=0; $i<=5; $i++){
-		array_push($frm_row, 
+		array_push($frm_row,
 			array(
 				new CCheckBox(
 					"severity[$i]",
-					str_in_array($i,$severity)?'yes':'no', 
+					str_in_array($i,$severity)?'yes':'no',
 					null,		/* action */
 					$i),		/* value */
 				get_severity_description($i)

@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -36,7 +36,7 @@
 include_once "include/page_header.php";
 
 	$_REQUEST["config"] = get_request("config",get_profile("web.exp_imp.config",0));
-	
+
 ?>
 <?php
 	$fields=array(
@@ -49,7 +49,7 @@ include_once "include/page_header.php";
 		"items"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		"triggers"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		"graphs"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-		
+
 		"update"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		"rules"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		/*,
@@ -62,11 +62,11 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
-	
+
 	$preview = isset($_REQUEST['preview']) ? true : false;
 	$config = get_request('config', 0);
 	$update = get_request('update', null);
-	
+
 	update_profile("web.exp_imp.config", $config, PROFILE_TYPE_INT);
 ?>
 <?php
@@ -82,7 +82,7 @@ include_once "include/page_header.php";
 		$params=array();
 		$options = array('only_current_node');
 		foreach($options as $option) $params[$option] = 1;
-		
+
 		$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 		$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
 
@@ -95,14 +95,14 @@ include_once "include/page_header.php";
 		$items		= get_request('items', array());
 		$graphs		= get_request('graphs', array());
 		$triggers	= get_request('triggers', array());
-		
+
 		function zbx_array_val_inc($arr, $inc_size = 1){
 			foreach($arr as $id => $val){
 				$arr[$id] = $val + $inc_size;
 			}
 		return $arr;
 		}
-		
+
 		$hosts		= zbx_array_val_inc(array_flip(array_intersect(array_keys($hosts),	$available_hosts)));
 		$templates	= zbx_array_val_inc(array_flip(array_intersect(array_keys($templates),	array_keys($hosts))));
 		$items		= zbx_array_val_inc(array_flip(array_intersect(array_keys($items),	array_keys($hosts))));
@@ -115,14 +115,14 @@ include_once "include/page_header.php";
 //die();
 	if(isset($EXPORT_DATA)){
 		include_once "include/export.inc.php";
-		
+
 		$exporter = new CZabbixXMLExport();
 		$exporter->Export($hosts,$templates,$items,$triggers,$graphs);
 
 		unset($exporter);
 	}
 ?>
-<?php	
+<?php
 	switch($config){
 		case 1:
 			$title = S_IMPORT_BIG;
@@ -136,7 +136,7 @@ include_once "include/page_header.php";
 
 	$form = new CForm();
 	$form->setMethod('get');
-	
+
 	$cmbConfig = new CComboBox('config', $config, 'submit()');
 	$cmbConfig->addItem(0, S_EXPORT);
 	$cmbConfig->addItem(1, S_IMPORT);
@@ -148,7 +148,7 @@ include_once "include/page_header.php";
 			include_once "include/import.inc.php";
 
 			DBstart();
-			
+
 			$importer = new CZabbixXMLImport();
 			$importer->setRules($rules['host'],$rules['template'],$rules['item'],$rules['trigger'],$rules['graph']);
 			$result = $importer->Parse($_FILES['import_file']['tmp_name']);
@@ -156,7 +156,7 @@ include_once "include/page_header.php";
 			$result = DBend($result);
 			show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
 		}
-		
+
 		$form = new CFormTable($frm_title,null,"post","multipart/form-data");
 		$form->AddVar('config', $config);
 		$form->AddRow(S_IMPORT_FILE, new CFile('import_file'));
@@ -175,12 +175,12 @@ include_once "include/page_header.php";
 			$cmbExist = new CComboBox('rules['.$key.'][exist]', $rules[$key]['exist']);
 			$cmbExist->addItem(0, S_UPDATE);
 			$cmbExist->addItem(1, S_SKIP);
-			
+
 			$cmbMissed = new CComboBox('rules['.$key.'][missed]', $rules[$key]['missed']);
-			
-			if($key != 'template') 
+
+			if($key != 'template')
 				$cmbMissed->addItem(0, S_ADD);
-				
+
 			$cmbMissed->addItem(1, S_SKIP);
 
 			$table->addRow(array($title, $cmbExist, $cmbMissed));
@@ -207,12 +207,12 @@ include_once "include/page_header.php";
 			while($host = DBfetch($db_hosts)){
 				$el_table = new CTableInfo(S_ONLY_HOST_INFO);
 				$sqls = array(
-					S_TEMPLATE	=> !isset($templates[$host['hostid']]) ? null : 
+					S_TEMPLATE	=> !isset($templates[$host['hostid']]) ? null :
 								'SELECT MIN(ht.hostid) as hostid, h.host as info, count(distinct ht.hosttemplateid) as cnt '.
 								' FROM hosts h, hosts_templates ht '.
 								' WHERE ht.templateid = h.hostid '.
 								' GROUP BY h.host',
-					S_ITEM		=> !isset($items[$host['hostid']]) ? null : 
+					S_ITEM		=> !isset($items[$host['hostid']]) ? null :
 								'SELECT hostid, description as info, 1 as cnt '.
 								' FROM items'.
 								' WHERE hostid='.$host['hostid'],
@@ -239,11 +239,11 @@ include_once "include/page_header.php";
 						$el_table->addRow(array($el_type, $el['info']));
 					}
 				}
-				
+
 				$table->showRow(array(new CCol($host['host'], 'top'),$el_table));
 				unset($el_table);
 			}
-			
+
 			$form = new CForm(null,'post');
 			$form->setName('hosts');
 			$form->addVar('config',		$config);
@@ -260,9 +260,9 @@ include_once "include/page_header.php";
 				new CButton('preview', S_REFRESH),
 				new CButton('export', S_EXPORT)
 				));
-			
+
 			$table->setFooter(new CCol($form));
-			
+
 			$table->showEnd();
 		}
 		else{
@@ -271,12 +271,12 @@ include_once "include/page_header.php";
 			$form->SetName('hosts');
 			$form->AddVar('config',$config);
 			$form->AddVar('update', true);
-			
-			$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');		
+
+			$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 			foreach($PAGE_GROUPS['groups'] as $groupid => $name){
 				$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 			}
-			
+
 			$header = get_table_header(S_HOSTS_BIG, array(S_GROUP.SPACE, $cmbGroups));
 
 			$form->addItem($header);
@@ -302,16 +302,16 @@ include_once "include/page_header.php";
 					S_GRAPHS)
 				*/
 				));
-		
-		
+
+
 			$sql_from = '';
 			$sql_where = '';
 			if($_REQUEST['groupid']>0){
 				$sql_from.= ' ,hosts_groups hg ';
 				$sql_where.= ' AND hg.groupid='.$_REQUEST['groupid'].
 							' AND hg.hostid=h.hostid ';
-			} 
-			
+			}
+
 			$hosts = array();
 			$hostids = array();
 			$sql = 'SELECT DISTINCT h.* '.
@@ -364,7 +364,7 @@ include_once "include/page_header.php";
 			while($graphs=DBfetch($result)){
 				$hosts[$graphs['hostid']]['graphs_cnt'] = $graphs['cnt'];
 			}
-			
+
 			foreach($hosts as $hostid => $host){
 				$host_name=new CCol(array(
 					new CCheckBox('hosts['.$host['hostid'].']',
@@ -373,9 +373,9 @@ include_once "include/page_header.php";
 					SPACE,
 					$host['host']
 					));
-				
+
 				$status = new CCol(host_status2str($host['status']),host_status2style($host['status']));
-				
+
 				/* calculate template */
 				if(isset($host['templates_cnt']) && ($host['templates_cnt'] > 0)){
 					$template_cnt = array(new CCheckBox('templates['.$host['hostid'].']',
@@ -386,9 +386,9 @@ include_once "include/page_header.php";
 				else{
 					$template_cnt = '-';
 				}
-								
+
 				/* calculate items */
-			
+
 				if(isset($host['items_cnt']) && ($host['items_cnt'] > 0)){
 					$item_cnt = array(new CCheckBox('items['.$host['hostid'].']',
 							isset($items[$host['hostid']]) || !isset($update),
@@ -398,7 +398,7 @@ include_once "include/page_header.php";
 				else{
 					$item_cnt = '-';
 				}
-				
+
 				/* calculate triggers */
 				if(isset($host['triggers_cnt']) && ($host['triggers_cnt'] > 0)){
 					$trigger_cnt = array(new CCheckBox('triggers['.$host['hostid'].']',
@@ -409,7 +409,7 @@ include_once "include/page_header.php";
 				else{
 					$trigger_cnt = '-';
 				}
-			
+
 				/* calculate graphs */
 				if(isset($host['graphs_cnt']) && ($host['graphs_cnt'] > 0)){
 					$graph_cnt = array(new CCheckBox('graphs['.$host['hostid'].']',

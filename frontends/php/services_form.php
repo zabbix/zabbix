@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2007 SIA Zabbix
 **
@@ -23,7 +23,7 @@
 	include_once "include/config.inc.php";
 	include_once "include/services.inc.php";
 	include_once "include/triggers.inc.php";
-	
+
 	$page["title"] = "S_IT_SERVICES";
 	$page["file"] = "services_form.php";
 	$page['scripts'] = array('services.js','calendar.js');
@@ -41,14 +41,14 @@ include_once "include/page_header.php";
 
 		"serviceid"=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
 		"group_serviceid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
-				
+
 		'name'=>		array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'isset({save_service})'),
 		'algorithm'=>		array(T_ZBX_INT, O_OPT,  NULL,	IN('0,1,2'),	'isset({save_service})'),
 		'showsla'=>		array(T_ZBX_INT, O_OPT,  NULL,  IN('0,1'),null),
 		'goodsla'=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,100),		null),
 		'sortorder'=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),	null),
 		'service_times'=>	array(T_ZBX_STR, O_OPT,  null,  null,			null),
-		
+
 		'linktrigger'=>		array(T_ZBX_INT, O_OPT,  NULL,  IN('0,1'),null),
 		'triggerid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	NULL),
 		'trigger'=>		array(T_ZBX_STR, O_OPT,  null,  null,			null), //??
@@ -57,7 +57,7 @@ include_once "include/page_header.php";
 
 		'new_service_time'=>	array(T_ZBX_STR, O_OPT,  null,  null,			null),
 		'rem_service_times'=>	array(T_ZBX_STR, O_OPT,  null,  null,			null),
-		
+
 		'childs'=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	DB_ID,NULL),
 
 		'parentid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
@@ -68,14 +68,14 @@ include_once "include/page_header.php";
 
 		'save_service'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'add_server'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		
+
 		'add_service_time'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'del_service_times'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 
 		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),		
+		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 /* other */
-		
+
 		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_copy_to'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
@@ -99,7 +99,7 @@ include_once "include/page_header.php";
 						' AND s.serviceid='.$_REQUEST['serviceid'];
 		if(!$service = DBfetch(DBselect($sql))){
 			access_deny();
-		} 		
+		}
 	}
 
 /*-------------------------------------------- ACTIONS --------------------------------------------*/
@@ -109,14 +109,14 @@ if(isset($_REQUEST['saction'])){
 	$_REQUEST["soft"]	= get_request("soft", 0);
 
 	if(isset($_REQUEST["delete"]) && isset($_REQUEST["serviceid"])){
-	
+
 		$result = delete_service($service["serviceid"]);
 		show_messages($result, S_SERVICE_DELETED, S_CANNOT_DELETE_SERVICE);
 		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_IT_SERVICE,' Name ['.$service["name"].'] id ['.$service['serviceid'].']');
 		unset($service);
-	} 
+	}
 	else if(isset($_REQUEST["save_service"])){
-	
+
 		$service_times = get_request('service_times',array());
 		$childs = get_request('childs',array());
 
@@ -127,17 +127,17 @@ if(isset($_REQUEST['saction'])){
 			$result = update_service($service["serviceid"],
 				$_REQUEST["name"],$triggerid,$_REQUEST["algorithm"],
 				$_REQUEST["showsla"],$_REQUEST["goodsla"],$_REQUEST["sortorder"],
-				$service_times,$_REQUEST['parentid'],$childs);			
-		} 
+				$service_times,$_REQUEST['parentid'],$childs);
+		}
 		else {
 			$result = add_service(
 				$_REQUEST["name"],$triggerid,$_REQUEST["algorithm"],
 				$_REQUEST["showsla"],$_REQUEST["goodsla"],$_REQUEST["sortorder"],
 				$service_times,$_REQUEST['parentid'],$childs);
 		}
-		
+
 		$result = DBend()?$result:false;
-		
+
 		if(isset($serrvice['serviceid'])){
 			show_messages($result, S_SERVICE_UPDATED, S_CANNOT_UPDATE_SERVICE);
 			$serviceid = $service["serviceid"];
@@ -148,10 +148,10 @@ if(isset($_REQUEST['saction'])){
 			$serviceid = $result;
 			$audit_acrion = AUDIT_ACTION_ADD;
 		}
-		
+
 		add_audit_if($result,$audit_acrion,AUDIT_RESOURCE_IT_SERVICE,' Name ['.$_REQUEST["name"].'] id ['.$serviceid.']');
-			
-	} 
+
+	}
 	else if(isset($_REQUEST["add_server"])){
 		$sql = 'SELECT h.* '.
 				' FROM hosts h '.
@@ -161,7 +161,7 @@ if(isset($_REQUEST['saction'])){
 		if(!$host_data = DBfetch(DBselect($sql))){
 			access_deny();
 		}
-		
+
 		$result = add_host_to_services($_REQUEST["serverid"], $service["serviceid"]);
 		add_audit_if($result,AUDIT_ACTION_ADD,AUDIT_RESOURCE_IT_SERVICE,' Host ['.$host_data["host"].'] id ['.$_REQUEST["serverid"].']');
 		show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
@@ -175,13 +175,13 @@ if(isset($_REQUEST['saction'])){
 //----------------------------------------- <PARENT SERVICES LIST> ------------------------------------------
 
 if(isset($_REQUEST['pservices'])){
-	if(isset($service)) $service = get_service_by_serviceid($service['serviceid']); // update date after ACTIONS 
+	if(isset($service)) $service = get_service_by_serviceid($service['serviceid']); // update date after ACTIONS
 
 	show_table_header(S_IT_SERVICES_BIG);
-	
+
 	$form = new CForm();
 	$form->SetName("services");
-	
+
 	if(isset($service)) $form->AddVar("serviceid", $service['serviceid']);
 
 	$table = new CTableInfo();
@@ -190,71 +190,71 @@ if(isset($_REQUEST['pservices'])){
 		S_STATUS_CALCULATION,
 		S_TRIGGER
 		));
-		
+
 //root
 		$prefix	 = null;
 		$trigger = "-";
-		
+
 		$description = S_ROOT_SMALL;
-		
+
 		$description = new CLink($description,'#','action');
-		$description->SetAction('javascript: 
+		$description->SetAction('javascript:
 				window.opener.document.forms[0].elements[\'parent_name\'].value = '.zbx_jsvalue(S_ROOT_SMALL).';
-				window.opener.document.forms[0].elements[\'parentname\'].value = '.zbx_jsvalue(S_ROOT_SMALL).'; 
-				window.opener.document.forms[0].elements[\'parentid\'].value = '.zbx_jsvalue(0).'; 
+				window.opener.document.forms[0].elements[\'parentname\'].value = '.zbx_jsvalue(S_ROOT_SMALL).';
+				window.opener.document.forms[0].elements[\'parentid\'].value = '.zbx_jsvalue(0).';
 				self.close(); return false;');
-		
+
 		$table->AddRow(array(array($prefix,$description),S_NONE,$trigger));
 //-----
 	if(isset($service)){
 		$childs = get_service_childs($service['serviceid'],1);
 		$childs_str = implode(',',$childs);
 		(!empty($childs_str))?($childs_str.=','):('');
-		
+
 		$query = 'SELECT DISTINCT s.* '.
 				' FROM services s '.
 				' WHERE '.DBin_node('s.serviceid').
 					' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 					' AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') '.
 				' ORDER BY s.sortorder,s.name';
-	} 
+	}
 	else {
 		$query = 'SELECT DISTINCT s.* '.
 			' FROM services s '.
 			' WHERE '.DBin_node('s.serviceid').
 				' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 			' ORDER BY s.sortorder,s.name';
-	}	
+	}
 
 	$db_services = DBselect($query);
-	
+
 	while($db_service_data = DBfetch($db_services)){
 		$prefix	 = null;
 		$trigger = "-";
-		
+
 		$description = $db_service_data["name"];
-		
+
 		$description = new CLink($description,'#','action');
-		$description->SetAction('javascript: 
+		$description->SetAction('javascript:
 						window.opener.document.forms[0].elements[\'parent_name\'].value = '.zbx_jsvalue($db_service_data["name"]).';
-						window.opener.document.forms[0].elements[\'parentname\'].value = '.zbx_jsvalue($db_service_data["name"]).'; 
-						window.opener.document.forms[0].elements[\'parentid\'].value = '.zbx_jsvalue($db_service_data["serviceid"]).'; 
+						window.opener.document.forms[0].elements[\'parentname\'].value = '.zbx_jsvalue($db_service_data["name"]).';
+						window.opener.document.forms[0].elements[\'parentid\'].value = '.zbx_jsvalue($db_service_data["serviceid"]).';
 						self.close(); return false;');
-		
+
 		if(isset($db_service_data["triggerid"])){
 			$trigger = expand_trigger_description($db_service_data["triggerid"]);
 		}
 
 		$table->AddRow(array(array($prefix,$description),algorithm2str($db_service_data["algorithm"]),$trigger));
 	}
-	
+
 	$cb = new CButton('cancel',S_CANCEL);
 	$cb->SetType('button');
 	$cb->SetAction('javascript: self.close();');
 
 	$td = new CCol($cb);
 	$td->AddOption('style','text-align:right;');
-	
+
 	$table->SetFooter($td);
 	$form->AddItem($table);
 	$form->Show();
@@ -264,13 +264,13 @@ if(isset($_REQUEST['pservices'])){
 //---------------------------------------------- <CHILD SERVICES LIST> --------------------------------------------
 
 if(isset($_REQUEST['cservices'])){
-	if(isset($service)) $service = get_service_by_serviceid($service['serviceid']); // update date after ACTIONS 
+	if(isset($service)) $service = get_service_by_serviceid($service['serviceid']); // update date after ACTIONS
 
 	show_table_header(S_IT_SERVICES_BIG);
-	
+
 	$form = new CForm();
 	$form->SetName("services");
-	
+
 	if(isset($service)) $form->AddVar("serviceid", $service['serviceid']);
 
 	$table = new CTableInfo();
@@ -280,14 +280,14 @@ if(isset($_REQUEST['cservices'])){
 		$childs = get_service_childs($service['serviceid'],1);
 		$childs_str = implode(',',$childs);
 		(!empty($childs_str))?($childs_str.=','):('');
-	
+
 		$query = 'SELECT DISTINCT s.* '.
 				' FROM services s '.
 				' WHERE '.DBin_node('s.serviceid').
 					' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 					' AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') '.
 				' ORDER BY s.sortorder,s.name';
-		
+
 	} else {
 		$query = 'SELECT DISTINCT s.* '.
 				' FROM services s '.
@@ -295,19 +295,19 @@ if(isset($_REQUEST['cservices'])){
 					' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 				' ORDER BY s.sortorder,s.name';
 	}
-	
+
 	$db_services = DBselect($query);
-	
+
 	while($db_service_data = DBfetch($db_services)){
 		$prefix	 = null;
 		$trigger = "-";
-		
+
 		$description = $db_service_data["name"];
-		
+
 		if(isset($db_service_data["triggerid"])){
 			$trigger = expand_trigger_description($db_service_data["triggerid"]);
 		}
-		
+
 		$description = new CLink($description,'#','action');
 		$description->SetAction('window.opener.add_child_service('.zbx_jsvalue($db_service_data["name"]).','.zbx_jsvalue($db_service_data["serviceid"]).','.zbx_jsvalue($trigger).','.zbx_jsvalue($db_service_data["triggerid"]).'); self.close(); return false;');
 
@@ -320,11 +320,11 @@ if(isset($_REQUEST['cservices'])){
 
 	$td = new CCol($cb);
 	$td->AddOption('style','text-align:right;');
-	
+
 	$table->SetFooter($td);
 	$form->AddItem($table);
 	$form->Show();
-	
+
 }
 //--------------------------------------------	</CHILD SERVICES LIST>  --------------------------------------------
 
@@ -333,7 +333,7 @@ if(isset($_REQUEST['sform'])){
 	$frmService = new CFormTable(S_SERVICE,'services_form.php','POST',null,'sform');
 	$frmService->SetHelp("web.services.service.php");
 	$frmService->SetTableClass('formlongtable');
-	
+
 //service times
 	if(isset($_REQUEST["add_service_time"]) && isset($_REQUEST["new_service_time"])){
 		$_REQUEST['service_times'] = get_request('service_times',array());
@@ -350,8 +350,8 @@ if(isset($_REQUEST['sform'])){
 			$new_service_time['to'] = strtotime($_REQUEST["new_service_time"]['to_week'].' '.$_REQUEST["new_service_time"]['to']);
 			$new_service_time['note'] = $_REQUEST["new_service_time"]['note'];
 		}
-		
-		while($new_service_time['to'] && ($new_service_time['to'] <= $new_service_time['from'])) 
+
+		while($new_service_time['to'] && ($new_service_time['to'] <= $new_service_time['from']))
 			$new_service_time['to'] += 7*24*3600;
 
 
@@ -383,7 +383,7 @@ if(isset($_REQUEST['sform'])){
 		if(!isset($triggerid)) $triggerid = 0;
 
 		$result = DBselect('select * from services_times where serviceid='.$service['serviceid']);
-		
+
 		while($db_stime = DBfetch($result)){
 			$stime = array(
 				'type'=>	$db_stime['type'],
@@ -412,7 +412,7 @@ if(isset($_REQUEST['sform'])){
 			$parentid = 0;
 			$parentname = 'root';
 		}
-		
+
 		$query = 'SELECT DISTINCT s.*, sl.soft '.
 				' FROM services s1, services s2, services_links sl, services s '.
 				' WHERE (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
@@ -421,10 +421,10 @@ if(isset($_REQUEST['sform'])){
 					' AND sl.servicedownid=s2.serviceid '.
 					' AND sl.serviceupid='.$service['serviceid'].
 					' AND s.serviceid=sl.servicedownid';
-					
+
 		$db_services = DBselect($query);
-				
-		$childs = array();			
+
+		$childs = array();
 		while($db_service_data = DBfetch($db_services)){
 			$child = array(
 				'name' => $db_service_data["name"],
@@ -458,9 +458,9 @@ if(isset($_REQUEST['sform'])){
 	if(isset($service)){
 		$frmService->AddVar('serviceid',$service['serviceid']);
 	}
-	
+
 	$frmService->AddRow(S_NAME,new CTextBox('name',$name,60));
-	
+
 //link
 //-------------------------------------------- <LINK> --------------------------------------------
 //parent link
@@ -475,12 +475,12 @@ if(isset($_REQUEST['sform'])){
 	$cb->SetAction("javascript: openWinCentered('services_form.php?pservices=1".url_param('serviceid')."','ZBX_Services_List',740,420,'scrollbars=1, toolbar=0, menubar=0, resizable=1, dialog=0');");
 
 	$frmService->AddRow('Parent Service',array($ctb,$cb));
-//----------							
-							
+//----------
+
 //child links
 
 	$table = new CTable();
-	
+
 	$table->setClass('tableinfo');
 	$table->setOddRowClass('even_row');
 	$table->setEvenRowClass('even_row');
@@ -488,7 +488,7 @@ if(isset($_REQUEST['sform'])){
 	$table->options['cellspacing'] = 1;
 	$table->headerClass = 'header';
 	$table->footerClass = 'footer';
-	
+
 	$table->setHeader(array(new CCheckBox('all_child_services',null,"check_childs('".$frmService->GetName()."','childs','all_child_services');"),S_SERVICES,S_SOFT,S_TRIGGER));
 
 	$table->addOption('id','service_childs');
@@ -496,7 +496,7 @@ if(isset($_REQUEST['sform'])){
 	foreach($childs as $id => $child){
 		$prefix	 = null;
 		$trigger = '-';
-		
+
 		$description = new CLink($child['name'],'services_form.php?sform=1&serviceid='.$child['serviceid'],'action');
 
 		if(isset($child['triggerid']) && !empty($child['triggerid'])){
@@ -527,7 +527,7 @@ if(isset($_REQUEST['sform'])){
 	$cb = new CButton('add_child_service',S_ADD);
 	$cb->SetType('button');
 	$cb->SetAction("javascript: openWinCentered('services_form.php?cservices=1".url_param('serviceid')."','ZBX_Services_List',640,520,'scrollbars=1, toolbar=0, menubar=0, resizable=0');");
-	
+
 	$cb2 = new CButton('del_child_service',S_REMOVE);
 	$cb2->SetType('button');
 	$cb2->SetAction("javascript: remove_childs('".$frmService->GetName()."','childs_to_del','tr');");
@@ -535,7 +535,7 @@ if(isset($_REQUEST['sform'])){
 	$frmService->AddRow(S_DEPENDS_ON,array($table,BR(),$cb,$cb2));
 //----------
 //--------------------------------------------- </LINK> -------------------------------------------
-	
+
 //algorithm
 	$cmbAlg = new CComboBox('algorithm',$algorithm);
 	foreach(array(SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN, SERVICE_ALGORITHM_NONE) as $val)
@@ -551,19 +551,19 @@ if(isset($_REQUEST['sform'])){
 						new CCol(new CTextBox("goodsla",$goodsla,6),'form_row_r')
 						)
 					);
-	
+
 	$row->AddOption('style',($linktrigger == 1)?(''):('display: none;'));
 
 	$row->AddOption('id','sla_row');
 	$row->AddOption('style',($showsla)?(''):('display: none;'));
-	
+
 	$frmService->AddRow($row);
 //------
 
 //times
 	$stime_el = array();
 	$i = 0;
-	
+
 	foreach($service_times as $val){
 		switch($val['type']){
 			case SERVICE_TIME_TYPE_UPTIME:
@@ -582,19 +582,19 @@ if(isset($_REQUEST['sform'])){
 				$to = date('d M Y H:i', $val['to']);
 				break;
 		}
-		array_push($stime_el, array(new CCheckBox("rem_service_times[]", 'no', null,$i), 
+		array_push($stime_el, array(new CCheckBox("rem_service_times[]", 'no', null,$i),
 			$type,':'.SPACE, $from, SPACE.'-'.SPACE, $to,
 			(!empty($val['note'])?(array(BR(),'['.htmlspecialchars($val['note']).']')):('')),BR()));
 
-		
+
 		$frmService->AddVar('service_times['.$i.'][type]',	$val['type']);
 		$frmService->AddVar('service_times['.$i.'][from]',	$val['from']);
 		$frmService->AddVar('service_times['.$i.'][to]',	$val['to']);
 		$frmService->AddVar('service_times['.$i.'][note]',	$val['note']);
-		
+
 		$i++;
 	}
-	
+
 //	print_r($stime_el);
 
 	if(count($stime_el)==0)
@@ -612,41 +612,41 @@ if(isset($_REQUEST['sform'])){
 	$time_param = new CTable();
 
 	$div = new Ctag('div','yes');
-	
+
 	if($new_service_time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME){
 //		$time_param->AddRow(array(S_NOTE, new CTextBox('new_service_time[note]','<short description>',40)));
 //		$time_param->AddRow(array(S_FROM, new CTextBox('new_service_time[from]','d M Y H:i',20)));
 //		$time_param->AddRow(array(S_TILL, new CTextBox('new_service_time[to]','d M Y H:i',20)));
-		
+
 
 
 		$script = new CScript("javascript: if(CLNDR['downtime_since'].clndr.setSDateFromOuterObj()){".
 								"$('new_service_time[from]').value = parseInt(CLNDR['downtime_since'].clndr.sdt.getTime()/1000);}".
-							"if(CLNDR['downtime_till'].clndr.setSDateFromOuterObj()){". 
+							"if(CLNDR['downtime_till'].clndr.setSDateFromOuterObj()){".
 								"$('new_service_time[to]').value = parseInt(CLNDR['downtime_till'].clndr.sdt.getTime()/1000);}"
 							);
 		$frmService->AddAction('onsubmit',$script);
 		$frmService->AddVar('new_service_time[from]','');
 		$frmService->AddVar('new_service_time[to]','');
-		
+
 		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
 		$clndr_icon->AddAction('onclick','javascript: var pos = getPosition(this);'.
 											' pos.top-=203; pos.left+=16; '.
 											" CLNDR['downtime_since'].clndr.clndrshow(pos.top,pos.left);"
 								);
-				
+
 		$filtertimetab = new CTable(null,'calendar');
 		$filtertimetab->AddOption('width','10%');
-		
+
 		$filtertimetab->SetCellPadding(0);
 		$filtertimetab->SetCellSpacing(0);
-	
+
 		$td_tmp = new CCol(new CTextBox('new_service_time[note]','<short description>',40));
 		$td_tmp->SetColSpan(10);
 		$filtertimetab->AddRow(array(S_NOTE, $td_tmp));
-		
+
 		$filtertimetab->AddRow(array(
-								S_FROM, 
+								S_FROM,
 								new CNumericBox('downtime_since_day','',2),
 								'/',
 								new CNumericBox('downtime_since_month','',2),
@@ -669,7 +669,7 @@ if(isset($_REQUEST['sform'])){
 											" CLNDR['downtime_till'].clndr.clndrshow(pos.top,pos.left);"
 								);
 		$filtertimetab->AddRow(array(
-								S_TILL, 
+								S_TILL,
 								new CNumericBox('downtime_till_day','',2),
 								'/',
 								new CNumericBox('downtime_till_month','',2),
@@ -686,7 +686,7 @@ if(isset($_REQUEST['sform'])){
 							'["downtime_till_day","downtime_till_month","downtime_till_year","downtime_till_hour","downtime_till_minute"],'.
 							'"downtime_till");'
 						);
-		
+
 		$time_param->AddRow($filtertimetab);
 	}
 	else{
@@ -712,7 +712,7 @@ if(isset($_REQUEST['sform'])){
 	}
 
 	$frmService->AddRow(S_NEW_SERVICE_TIME, array(
-			$cmbTimeType, BR(), 
+			$cmbTimeType, BR(),
 			$time_param,
 			new CButton('add_service_time','add','javascript: document.forms[0].action += \'?sform=1\'; submit();')
 		));
@@ -721,11 +721,11 @@ if(isset($_REQUEST['sform'])){
 
 	if($triggerid > 0){
 		$trigger = expand_trigger_description($triggerid);
-	} 
+	}
 	else{
 		$trigger = "";
 	}
-	
+
 	$row = new CRow(array(
 						new CCol(S_TRIGGER,'form_row_l'),
 						new CCol(array(

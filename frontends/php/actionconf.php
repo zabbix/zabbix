@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -35,7 +35,7 @@
 	$page['hist_arg'] = array();
 
 include_once('include/page_header.php');
-	
+
 	$_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
 ?>
 <?php
@@ -49,7 +49,7 @@ include_once('include/page_header.php');
 		'esc_period'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(60,999999),		'isset({save})&&isset({escalation})'),
 		'escalation'=>		array(T_ZBX_INT, O_OPT,  null,	IN("0,1"),		null),
 		'status'=>			array(T_ZBX_INT, O_OPT,	 null,	IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)),			'isset({save})'),
-		
+
 		'def_shortdata'=>	array(T_ZBX_STR, O_OPT,	 null,	null,				'isset({save})'),
 		'def_longdata'=>	array(T_ZBX_STR, O_OPT,	 null,	null,				'isset({save})'),
 
@@ -63,14 +63,14 @@ include_once('include/page_header.php');
 		'g_conditionid'=> 	array(null, O_OPT, null, null, null),
 
 		'new_condition'=>	array(null, O_OPT,  null,	null,	'isset({add_condition})'),
-		
+
 		'operations'=>		array(null, O_OPT, null, null, 'isset({save})'),
 		'g_operationid'=>	array(null, O_OPT, null, null, null),
 
 		'edit_operationid'=>array(null, O_OPT, P_ACT,	DB_ID,	null),
 
 		'new_operation'=>	array(null, O_OPT,  null,	null,	'isset({add_operation})'),
-				
+
 		'opconditions'=>		array(null, O_OPT, null, null, null),
 		'g_opconditionid'=> 	array(null, O_OPT, null, null, null),
 
@@ -89,7 +89,7 @@ include_once('include/page_header.php');
 		'add_opcondition'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_opcondition'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'cancel_new_opcondition'=>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		
+
 		'save'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'clone'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -97,7 +97,7 @@ include_once('include/page_header.php');
 /* other */
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
-		
+
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -107,19 +107,19 @@ include_once('include/page_header.php');
 	check_fields($fields);
 	validate_sort_and_sortorder('a.name',ZBX_SORT_UP);
 
-/* AJAX */	
+/* AJAX */
 // for future use
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
 			update_profile('web.audit.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
-	}	
+	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 		exit();
 	}
 //--------
-	
+
 	if(isset($_REQUEST['actionid']) && !action_accessible($_REQUEST['actionid'], PERM_READ_WRITE)){
 		access_deny();
 	}
@@ -148,9 +148,9 @@ include_once('include/page_header.php');
 		$_REQUEST['recovery_msg'] = get_request('recovery_msg',0);
 		$_REQUEST['r_shortdata'] = get_request('r_shortdata','');
 		$_REQUEST['r_longdata'] = get_request('r_longdata','');
-		
+
 		if(!isset($_REQUEST['escalation'])) $_REQUEST['esc_period'] = 0;
-		
+
 		$conditions = get_request('conditions', array());
 		$operations = get_request('operations', array());
 
@@ -168,9 +168,9 @@ include_once('include/page_header.php');
 
 			$result = DBend($result);
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
-		} 
+		}
 		else {
-			
+
 			$result = $actionid = add_action(
 				$_REQUEST['name'],$_REQUEST['eventsource'],$_REQUEST['esc_period'],
 				$_REQUEST['def_shortdata'],$_REQUEST['def_longdata'],
@@ -184,8 +184,8 @@ include_once('include/page_header.php');
 		}
 
 		if($result){ // result - OK
-			add_audit(!isset($_REQUEST['actionid'])?AUDIT_ACTION_ADD:AUDIT_ACTION_UPDATE, 
-				AUDIT_RESOURCE_ACTION, 
+			add_audit(!isset($_REQUEST['actionid'])?AUDIT_ACTION_ADD:AUDIT_ACTION_UPDATE,
+				AUDIT_RESOURCE_ACTION,
 				S_NAME.': '.$_REQUEST['name']);
 
 			unset($_REQUEST['form']);
@@ -200,7 +200,7 @@ include_once('include/page_header.php');
 		DBstart();
 		delete_action($_REQUEST['actionid']);
 		$result = DBend();
-		
+
 		show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
 		if($result){
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ACTION,
@@ -232,12 +232,12 @@ include_once('include/page_header.php');
 		if( validate_condition($new_opcondition['conditiontype'],$new_opcondition['value']) ){
 			$new_operation = get_request('new_operation',array());
 			if(!isset($new_operation['opconditions'])) $new_operation['opconditions'] = array();
-			
+
 			if(!str_in_array($new_opcondition,$new_operation['opconditions']))
 				array_push($new_operation['opconditions'],$new_opcondition);
 
 			$_REQUEST['new_operation'] = $new_operation;
-			
+
 			unset($_REQUEST['new_opcondition']);
 		}
 	}
@@ -247,7 +247,7 @@ include_once('include/page_header.php');
 		foreach($_REQUEST['g_opconditionid'] as $val){
 			unset($new_operation['opconditions'][$val]);
 		}
-		
+
 		$_REQUEST['new_operation'] = $new_operation;
 	}
 	else if(inarr_isset(array('add_operation','new_operation'))){
@@ -270,7 +270,7 @@ include_once('include/page_header.php');
 					unset($new_operation['id']);
 					$_REQUEST['operations'][$id] = $new_operation;
 				}
-	
+
 				unset($_REQUEST['new_operation']);
 			}
 			else{
@@ -284,11 +284,11 @@ include_once('include/page_header.php');
 			unset($_REQUEST['operations'][$val]);
 		}
 	}
-	else if(inarr_isset(array('edit_operationid'))){	
+	else if(inarr_isset(array('edit_operationid'))){
 		$_REQUEST['edit_operationid'] = array_keys($_REQUEST['edit_operationid']);
 		$edit_operationid = $_REQUEST['edit_operationid'] =array_pop($_REQUEST['edit_operationid']);
 		$_REQUEST['operations'] = get_request('operations',array());
-		
+
 		if(isset($_REQUEST['operations'][$edit_operationid])){
 			$_REQUEST['new_operation'] = $_REQUEST['operations'][$edit_operationid];
 			$_REQUEST['new_operation']['id'] = $edit_operationid;
@@ -298,13 +298,13 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['group_enable'])&&isset($_REQUEST['g_actionid'])){
 		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
-		
+
 		$query = 'select distinct actionid from actions'.
 				' where '.DBin_node('actionid',$nodes).
 				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') ';
-				
+
 		$result=DBselect($query);
-		
+
 		$actionids = array();
 
 		DBstart();
@@ -335,11 +335,11 @@ include_once('include/page_header.php');
 		Dbstart();
 		while($row=DBfetch($result)){
 			$res = update_action_status($row['actionid'],1);
-			if($res) 
+			if($res)
 				$actionids[] = $row['actionid'];
 		}
 		$result = DBend();
-		
+
 		if($result && isset($res)){
 			show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] disabled');
@@ -357,11 +357,11 @@ include_once('include/page_header.php');
 		DBstart();
 		while($row=DBfetch($result)){
 			$del_res = delete_action($row['actionid']);
-			if($del_res) 
+			if($del_res)
 				$actionids[] = $row['actionid'];
 		}
 		$result = DBend();
-		
+
 		if($result && isset($del_res)){
 			show_messages(TRUE, S_ACTIONS_DELETED, S_CANNOT_DELETE_ACTIONS);
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] deleted');
@@ -372,69 +372,69 @@ include_once('include/page_header.php');
 /* header */
 	$form = new CForm();
 	$form->SetMethod('get');
-	
+
 	$form->addVar('eventsource', $_REQUEST['eventsource']);
 	if(!isset($_REQUEST['form'])){
 		$form->addItem(new CButton('form',S_CREATE_ACTION));
 	} else {
 
     }
-		
+
 	show_table_header(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
     echo SBR;
 	if(isset($_REQUEST['form'])){
 /* form */
 //		insert_action_form();
-//* NEW Form 
+//* NEW Form
 		$frmAction = new CForm('actionconf.php','post');
 		$frmAction->setName(S_ACTION);
-		
+
 		$frmAction->addVar('form',get_request('form',1));
 		$from_rfr = get_request('form_refresh',0);
 		$frmAction->addVar('form_refresh',$from_rfr+1);
-		
+
 		$action = null;
 		if(isset($_REQUEST['actionid'])){
 			$action = get_action_by_actionid($_REQUEST['actionid']);
 			$frmAction->addVar('actionid',$_REQUEST['actionid']);
 		}
-		
+
 		$left_tab = new CTable();
 		$left_tab->setCellPadding(3);
 		$left_tab->setCellSpacing(3);
-		
+
 		$left_tab->addOption('border',0);
-		
+
 		$left_tab->addRow(create_hat(
 				S_ACTION,
 				get_act_action_form($action),//null,
 				null,
 				'hat_action'
 			));
-			
+
 		$left_tab->addRow(create_hat(
 				S_ACTION_CONDITIONS,
 				get_act_condition_form($action),//null,
 				null,
 				'hat_conditions'
 			));
-			
+
 		if(isset($_REQUEST['new_condition'])){
 			$left_tab->addRow(create_hat(
 					S_NEW_CONDITION,
 					get_act_new_cond_form($action),//null,
 					null,
 					'hat_new_cond'
-				));			
+				));
 		}
 
 
 		$right_tab = new CTable();
 		$right_tab->SetCellPadding(3);
 		$right_tab->SetCellSpacing(3);
-		
+
 		$right_tab->addOption('border',0);
-				
+
 		$right_tab->addRow(create_hat(
 				S_ACTION_OPERATIONS,
 				get_act_operations_form($action),//null,
@@ -450,7 +450,7 @@ include_once('include/page_header.php');
 					'hat_new_oper'
 				));
 		}
-		
+
 		if(isset($_REQUEST['new_opcondition'])){
 			$right_tab->addRow(create_hat(
 					S_NEW.SPACE.S_OPERATION_CONDITION,
@@ -459,21 +459,21 @@ include_once('include/page_header.php');
 					'hat_new_oper_cond'
 				));
 		}
-		
+
 		$td_l = new CCol($left_tab);
 		$td_l->addOption('valign','top');
-		
+
 		$td_r = new CCol($right_tab);
 		$td_r->addOption('valign','top');
-		
+
 		$outer_table = new CTable();
 		$outer_table->addOption('border',0);
 		$outer_table->SetCellPadding(1);
 		$outer_table->SetCellSpacing(1);
 		$outer_table->addRow(array($td_l,$td_r));
-		
+
 		$frmAction->additem($outer_table);
-		
+
 		show_messages();
 		$frmAction->Show();
 //*/
@@ -481,7 +481,7 @@ include_once('include/page_header.php');
 	else{
 		$form = new CForm();
 		$form->SetMethod('get');
-		
+
 		$cmbSource = new CComboBox('eventsource',$_REQUEST['eventsource'],'submit()');
 		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS,S_TRIGGERS);
 		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY,S_DISCOVERY);
@@ -489,11 +489,11 @@ include_once('include/page_header.php');
 
 		$row_count = 0;
 		$numrows = new CSpan(null,'info');
-		$numrows->addOption('name','numrows');	
+		$numrows->addOption('name','numrows');
 		$header = get_table_header(array(S_ACTIONS_BIG,
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 						S_FOUND.': ',$numrows,)
-						);			
+						);
 		show_table_header($header, $form);
 
 		unset($form, $cmbSource);
@@ -535,7 +535,7 @@ include_once('include/page_header.php');
 				' order by operationtype,operationid');
 			while($operation_data = DBfetch($db_operations))
 				array_push($operations,array(get_operation_desc(SHORT_DESCRITION, $operation_data),BR()));
-				
+
 			if($action_data['status'] == ACTION_STATUS_DISABLED){
 				$status= new CLink(S_DISABLED,
 					'actionconf.php?group_enable=1&g_actionid%5B%5D='.$action_data['actionid'].url_param('eventsource'),
@@ -562,7 +562,7 @@ include_once('include/page_header.php');
 				$conditions,
 				$operations,
 				$status
-				));	
+				));
 			$row_count++;
 		}
 

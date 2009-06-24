@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -25,7 +25,7 @@
 	$page["title"] = "S_IT_SERVICES_AVAILABILITY_REPORT";
 	$page["file"] = "report3.php";
 	$page['hist_arg'] = array();
-	
+
 include_once "include/page_header.php";
 
 ?>
@@ -41,27 +41,27 @@ include_once "include/page_header.php";
 
 	$period = get_request("period", "weekly");
 	$year	= get_request("year",	date("Y"));
-	
+
 	define("YEAR_LEFT_SHIFT", 5);
 ?>
 <?php
 	if(!DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"]))){
 		fatal_error(S_NO_IT_SERVICE_DEFINED);
 	}
-	
+
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
-	
+
 	$sql = 'SELECT s.* '.
 			' FROM services s '.
 			' WHERE s.serviceid='.$_REQUEST['serviceid'].
 				' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 				' AND '.DBin_node('s.serviceid');
-				
+
 	if(!$service = DBfetch(DBselect($sql))){
 		access_deny();
 	}
 ?>
-<?php	
+<?php
 	$form = new CForm();
 	$form->SetMethod('get');
 	$form->AddVar("serviceid", $_REQUEST["serviceid"]);
@@ -74,11 +74,11 @@ include_once "include/page_header.php";
 	$form->AddItem(array(SPACE.S_PERIOD.SPACE, $cmbPeriod));
 
 	$cmbYear = new CComboBox("year", $year, "submit();");
-	
+
 	for($y = (date("Y") - YEAR_LEFT_SHIFT); $y <= date("Y"); $y++){
 		$cmbYear->AddItem($y, $y);
 	}
-	
+
 	$form->AddItem(array(SPACE.S_YEAR.SPACE, $cmbYear));
 
 	show_table_header(array(
@@ -91,7 +91,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$table = new CTableInfo();
-	
+
 	$header = array(S_OK,S_PROBLEMS,S_DOWNTIME,S_PERCENTAGE,S_SLA);
 
         switch($period){
@@ -125,12 +125,12 @@ include_once "include/page_header.php";
 				$to	= 52;
 				array_unshift($header,new CCol(S_FROM,"center"),new CCol(S_TILL,"center"));
 				function get_time($w)	{
-					global $year;	
-	
+					global $year;
+
 					$time	= mktime(0,0,0,1, 1, $year);
 					$wd	= date("w", $time);
 					$wd	= $wd == 0 ? 6 : $wd - 1;
-	
+
 					return ($time + ($w*7 - $wd)*24*3600);
 				}
 				function format_time($t){	return date("d M Y H:i",$t);	}
@@ -141,13 +141,13 @@ include_once "include/page_header.php";
 	$table->SetHeader($header);
 
 	for($t = $from; $t <= $to; $t++)
-	{       
+	{
 		if(($start = get_time($t)) > time())
 			break;
-		
+
 		if(($end = get_time($t+1)) > time())
 			$end = time();
-		
+
 		$stat = calculate_service_availability($service["serviceid"],$start,$end);
 
 		$ok 		= new CSpan(
@@ -156,7 +156,7 @@ include_once "include/page_header.php";
 						($stat["ok_time"]%(24*3600))/3600,
 						($stat["ok_time"]%(3600))/(60)),
 					"off");
-		
+
 		$problems	= new CSpan(
 					sprintf("%dd %dh %dm",
 						$stat["problem_time"]/(24*3600),
@@ -168,7 +168,7 @@ include_once "include/page_header.php";
 					$stat["downtime_time"]/(24*3600),
 					($stat["downtime_time"]%(24*3600))/3600,
 					($stat["downtime_time"]%(3600))/(60));
-		
+
 		$percentage	= new CSpan(sprintf("%2.2f%%",$stat["ok"]) , "off");
 
 		$table->AddRow(array(
@@ -181,7 +181,7 @@ include_once "include/page_header.php";
 			($service["showsla"]==1) ?
 				new CSpan($service["goodsla"], ($stat["ok"] >= $service["goodsla"]) ? "off" : "on") :
 				"-"
-				
+
 			));
 	}
 

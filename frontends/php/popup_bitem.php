@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -22,14 +22,14 @@
 	require_once 'include/config.inc.php';
 	require_once 'include/triggers.inc.php';
 	require_once 'include/js.inc.php';
-	
+
 	$dstfrm		= get_request('dstfrm',		0);	// destination form
 
 	$page['title'] = "S_GRAPH_ITEM";
 	$page['file'] = 'popup_bitem.php';
 
 	define('ZBX_PAGE_NO_MENU', 1);
-	
+
 include_once 'include/page_header.php';
 
 ?>
@@ -57,13 +57,13 @@ include_once 'include/page_header.php';
 	);
 
 	check_fields($fields);
-	
+
 	$_REQUEST['caption'] = get_request('caption','');
 	$_REQUEST['axisside'] = get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 	if(zbx_empty($_REQUEST['caption']) && isset($_REQUEST['itemid']) && ($_REQUEST['itemid'] > 0)){
 		$_REQUEST['caption'] = item_description(get_item_by_itemid($_REQUEST['itemid']));
 	}
-	
+
 	insert_js_function('add_bitem');
 	insert_js_function('update_bitem');
 
@@ -76,7 +76,7 @@ include_once 'include/page_header.php';
 			$_REQUEST['calc_fnc'].",".
 			$_REQUEST['axisside'].");\n");
 	}
-	
+
 	if(isset($_REQUEST['save']) && isset($_REQUEST['gid'])){
 		insert_js("update_bitem('".
 			$_REQUEST['dstfrm']."','".
@@ -112,13 +112,13 @@ include_once 'include/page_header.php';
 			$description = get_item_by_itemid($itemid);
 			$description = item_description($description);
 		}
-		
+
 		$frmGItem->addVar('gid',$gid);
 		$frmGItem->addVar('config',$config);
 		$frmGItem->addVar('list_name',$list_name);
 		$frmGItem->addVar('itemid',$itemid);
 
-		$frmGItem->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', S_DEFAULT), 
+		$frmGItem->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', S_DEFAULT),
 			S_CAPTION), new CTextBox('caption',$caption,32));
 
 //		$frmGItem->addRow(S_CAPTION, new CTextBox('caption',$caption,10));
@@ -130,9 +130,9 @@ include_once 'include/page_header.php';
 				'&dstfld1=itemid&dstfld2=description&srctbl=items'.
 				"&srcfld1=itemid&srcfld2=description&monitored_hosts=1');",
 				'T');
-		
+
 		$frmGItem->addRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
-		
+
 		$cmbFnc = new CComboBox('calc_fnc',$calc_fnc);
 			$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
 			$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);

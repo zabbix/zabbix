@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2007 SIA Zabbix
 **
@@ -55,7 +55,7 @@ if(isset($_REQUEST['execute'])){
 				insert_command_result_form($_REQUEST['scriptid'],$_REQUEST['hostid']);
 /*				echo nl2br(htmlspecialchars($result));*/
 			}
-		} 
+		}
 		else {
 			$hosts_read_only  = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 

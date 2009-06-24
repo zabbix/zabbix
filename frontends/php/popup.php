@@ -165,7 +165,7 @@ include_once('include/page_header.php');
 		'existed_templates'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		'multiselect'=>		array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
 		'submit'=>		array(T_ZBX_STR,O_OPT,	null,	null,	null),
-		
+
 		'only_hostid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'monitored_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'real_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
@@ -189,7 +189,7 @@ include_once('include/page_header.php');
 	$srcfld1	= get_request('srcfld1', '');	// source table field [can be different from fields of source table]
 	$srcfld2	= get_request('srcfld2', null);	// second source table field [can be different from fields of source table]
 	$multiselect = get_request('multiselect', 0); //if create popup with checkboxes
-	$dstact 	= get_request('dstact', ''); 
+	$dstact 	= get_request('dstact', '');
 
 
 
@@ -274,7 +274,7 @@ include_once('include/page_header.php');
 
 	$groupid = 0;
 	$hostid = 0;
-	
+
 	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
 	$available_groups	= $PAGE_GROUPS['groupids'];
 	$available_hosts	= $PAGE_HOSTS['hostids'];
@@ -604,7 +604,7 @@ include_once('include/page_header.php');
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 			}
-			
+
 			$name->onClick($action.' close_window(); return false;');
 
 			$table->addRow($name);
@@ -616,7 +616,7 @@ include_once('include/page_header.php');
 		$table->setHeader(array(S_ALIAS, S_NAME, S_SURNAME));
 
 		$result = DBselect('SELECT * FROM users WHERE '.DBin_node('userid').' ORDER BY alias');
-		while($row = DBfetch($result)){			
+		while($row = DBfetch($result)){
 
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
@@ -662,18 +662,18 @@ include_once('include/page_header.php');
 		}
 		$table->Show();
 	}
-	else if($srctbl == 'triggers'){	
-		
+	else if($srctbl == 'triggers'){
+
 		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $available_hosts, PERM_RES_IDS_ARRAY, $nodeid);
 
 		$form = new CForm();
 		$form->addOption('id', S_TRIGGERS);
-		
+
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
-		
+
 		if($multiselect) {
 			insert_js_function('add_selected_values');
-			insert_js_function('check_all');	
+			insert_js_function('check_all');
 			$header = array(new CCol(array(new CCheckBox("check", NULL, 'check_all("'.S_TRIGGERS.'", this.checked);'), S_NAME)), S_SEVERITY, S_STATUS);
 			$button = new CButton('select', S_SELECT, 'add_selected_values("'.S_TRIGGERS.'", "'.$dstfrm.'", "'.$dstfld1.'", "'.$dstact.'")');
 			$button->setType('button');
@@ -684,7 +684,7 @@ include_once('include/page_header.php');
 			$header = array(S_NAME, S_SEVERITY,	S_STATUS);
 		}
 		$table->SetHeader($header);
-		
+
 		$sql = 'SELECT h.host,t.triggerid,t.description,t.expression,t.priority,t.status,count(d.triggerid_up) as dep_count '.
 				' FROM hosts h,items i,functions f, triggers t'.
 					' LEFT JOIN trigger_depends d ON d.triggerid_down=t.triggerid '.
@@ -694,12 +694,12 @@ include_once('include/page_header.php');
 					' AND '.DBin_node('t.triggerid', $nodeid).
 					' AND '.DBcondition('t.triggerid',$available_triggers).
 					' AND h.status in ('.implode(',', $host_status).')';
-		if($hostid>0) 
+		if($hostid>0)
 			$sql .= ' AND h.hostid='.$hostid;
 		$sql .= ' GROUP BY h.host, t.triggerid, t.description, t.expression, t.priority, t.status'.
 				' ORDER BY h.host,t.description';
 		$result=DBselect($sql);
-		
+
 		while($row = DBfetch($result)) {
 			$exp_desc = expand_trigger_description_by_data($row);
 			$description = new CSpan($exp_desc, 'link');
@@ -722,10 +722,10 @@ include_once('include/page_header.php');
 					$description[] = array(expand_trigger_description($val),BR());
 			}
 			switch($row["status"]) {
-				case TRIGGER_STATUS_DISABLED: 
+				case TRIGGER_STATUS_DISABLED:
 					$status = new CSpan(S_DISABLED, 'disabled');
 				break;
-				case TRIGGER_STATUS_UNKNOWN: 
+				case TRIGGER_STATUS_UNKNOWN:
 					$status = new CSpan(S_UNKNOWN, 'unknown');
 				break;
 				case TRIGGER_STATUS_ENABLED:
@@ -734,17 +734,17 @@ include_once('include/page_header.php');
 			}
 			//if($row["status"] != TRIGGER_STATUS_UNKNOWN) $row["error"]=SPACE;
 			//if($row["error"]=="") $row["error"]=SPACE;
-			
+
 			if($multiselect){
 				$description = new CCol(array(new CCheckBox('trigger['.$row['triggerid'].']', NULL, NULL, $row['triggerid']),	$description));
 			}
-			
+
 			$table->addRow(array(
 				$description,
 				new CCol(get_severity_description($row['priority']), get_severity_style($row['priority'])),
 				$status
 			));
-			
+
 
 			unset($description);
 			unset($status);
@@ -774,14 +774,14 @@ include_once('include/page_header.php');
 		{
 			$description = new CSpan(item_description($db_item),'link');
 			$description->onClick("return add_item_variable('".$dstfrm."','".$db_item["itemid"]."');");
-			
+
 			switch($db_item["status"]){
 				case 0: $status=new CCol(S_ACTIVE,"enabled");		break;
 				case 1: $status=new CCol(S_DISABLED,"disabled");	break;
 				case 3: $status=new CCol(S_NOT_SUPPORTED,"unknown");	break;
 				default:$status=S_UNKNOWN;
 			}
-			
+
 			$table->addRow(array(
 				($hostid>0)?null:$db_item['host'],
 				$description,
@@ -820,7 +820,7 @@ include_once('include/page_header.php');
 			$row["description"] = item_description($row);
 
 			$description = new CLink($row["description"],"#","action");
-			
+
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
 					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
@@ -925,7 +925,7 @@ include_once('include/page_header.php');
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND '.DBcondition('g.graphid',$available_graphs);
 
-		if($hostid>0) 
+		if($hostid>0)
 			$sql .= ' AND h.hostid='.$hostid;
 
 		$sql .= ' ORDER BY h.host,g.name';
@@ -994,7 +994,7 @@ include_once('include/page_header.php');
 					' AND '.DBin_node('i.itemid', $nodeid).
 					' AND '.DBcondition('h.hostid',$available_hosts);
 
-		if($hostid>0) 
+		if($hostid>0)
 			$sql .= ' AND h.hostid='.$hostid;
 
 		$sql .= ' ORDER BY h.host, i.description, i.key_, i.itemid';
@@ -1096,7 +1096,7 @@ include_once('include/page_header.php');
 					' AND '.DBin_node('i.itemid', $nodeid).
 					' AND '.DBcondition('h.hostid',$available_hosts);
 
-		if($hostid>0) 
+		if($hostid>0)
 			$sql .= ' AND h.hostid='.$hostid;
 
 		$sql .= ' ORDER BY h.host, i.description, i.key_, i.itemid';
@@ -1407,12 +1407,12 @@ function add_trigger(formname, triggerid) {
 	var parent_document = window.opener.document;
 
 	if(!parent_document) return close_window();
-	
+
 	add_variable('input', 'new_dependence['+triggerid+']', triggerid, formname, parent_document);
 	add_variable('input', 'add_dependence', 1, formname, parent_document);
-	
+
 	parent_document.forms[formname].submit();
-	close_window();	
+	close_window();
 }
 </script>
 <?php

@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2007 SIA Zabbix
 **
@@ -46,12 +46,12 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
-/* AJAX */	
+/* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
 			update_profile('web.services.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'],PROFILE_TYPE_INT);
 		}
-	}	
+	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 		exit();
@@ -92,18 +92,18 @@ $services[0]=$row;
 while($row = DBFetch($result)){
 
 		$row['id'] = $row['serviceid'];
-		
+
 		(empty($row['serviceupid']))?($row['serviceupid']='0'):('');
 		(empty($row['triggerid']))?($row['description']='None'):($row['description']=expand_trigger_description($row['triggerid']));
-		
+
 
 			if(isset($services[$row['serviceid']])){
 				$services[$row['serviceid']] = array_merge($services[$row['serviceid']],$row);
 			} else {
-				
+
 				$services[$row['serviceid']] = $row;
 			}
-	
+
 		if(isset($row['serviceupid']))
 		$services[$row['serviceupid']]['childs'][] = array('id' => $row['serviceid'], 'soft' => 0, 'linkid' => 0);
 
@@ -130,7 +130,7 @@ if($tree){
 	$serv_wdgt = new CWidget();
 	$serv_wdgt->addHeader(S_IT_SERVICES_BIG, SPACE);
 	$serv_wdgt->addItem($tree->getHTML());
-		
+
 	$serv_wdgt->show();
 }
 else {

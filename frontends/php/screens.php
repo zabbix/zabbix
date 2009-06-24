@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2007 SIA Zabbix
 **
@@ -34,11 +34,11 @@
 	$_REQUEST['config'] = get_request('config',get_profile('web.screens.config',0));
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	
+
 	if((1 != $_REQUEST['config']) && (PAGE_TYPE_HTML == $page['type'])){
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
-	
+
 include_once 'include/page_header.php';
 
 ?>
@@ -50,7 +50,7 @@ include_once 'include/page_header.php';
 
 		'groupid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
 		'hostid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
-		
+
 // STATUS OF TRIGGER
 		'tr_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 		'tr_hostid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
@@ -89,18 +89,18 @@ include_once 'include/page_header.php';
 			}
 			else if('remove' == $_REQUEST['action']){
 				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
-				
+
 				if($result){
 					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVORITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){ add2favorites("'.$_REQUEST['favobj'].'","'.$_REQUEST['favid'].'");}'."\n");
 				}
-			}			
+			}
 
 			if((PAGE_TYPE_JS == $page['type']) && $result){
 				print('switchElementsClass("addrm_fav","iconminus","iconplus");');
 			}
 		}
-	}	
+	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 		exit();
@@ -131,10 +131,10 @@ include_once 'include/page_header.php';
 
 // HEADER
 	$text = null;
-	
+
 	$form = new CForm();
 	$form->setMethod('get');
-	
+
 	$form->addVar('fullscreen',$_REQUEST['fullscreen']);
 	if(isset($_REQUEST['period']))	$form->addVar('period', $_REQUEST['period']);
 	if(isset($_REQUEST['stime']))	$form->addVar('stime', $_REQUEST['stime']);
@@ -174,22 +174,22 @@ include_once 'include/page_header.php';
 	if(isset($elementid)){
 		if(!screen_accessible($elementid, PERM_READ_ONLY)) access_deny();
 		$element = get_screen_by_screenid($elementid);
-		
+
 		if($element ){
 			$text = $element['name'];
 		}
 	}
 
 	if($cmbElements->ItemsCount() > 0) $form->addItem(array(SPACE.S_SCREENS.SPACE,$cmbElements));
-		
+
 	if((2 != $_REQUEST['fullscreen']) && !empty($elementid) && check_dynamic_items($elementid, 0)){
 		if(!isset($_REQUEST['hostid'])){
 			$_REQUEST['groupid'] = $_REQUEST['hostid'] = 0;
 		}
-		
+
 		$options = array('allow_all_hosts','monitored_hosts','with_items');
 		if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
-		
+
 		$params = array();
 		foreach($options as  $option) $params[$option] = 1;
 		$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
@@ -200,7 +200,7 @@ include_once 'include/page_header.php';
 		$available_groups = $PAGE_GROUPS['groupids'];
 //		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 		$available_hosts = $PAGE_HOSTS['hostids'];
-		
+
 		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
 			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
@@ -209,7 +209,7 @@ include_once 'include/page_header.php';
 
 
 		$PAGE_HOSTS['hosts']['0'] = S_DEFAULT;
-		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');		
+		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
 		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
 			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
 		}
@@ -220,33 +220,33 @@ include_once 'include/page_header.php';
 <?php
 	if(isset($elementid)){
 		$effectiveperiod = navigation_bar_calc();
-		
+
 
 		$element = get_screen($elementid, 0, $effectiveperiod);
 
 		$_REQUEST['elementid'] = $elementid;
 
 		if( 2 != $_REQUEST['fullscreen'] ){
-		
+
 			$stime = time() - (31536000); // ~1year
 			$bstime = time()-$effectiveperiod;
-			
+
 			if(isset($_REQUEST['stime'])){
 				$bstime = $_REQUEST['stime'];
 				$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 			}
-			
+
  			$script = 	'scrollinit(0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');
 						 showgraphmenu("iframe");';
-							
-			zbx_add_post_js($script); 
+
+			zbx_add_post_js($script);
 //			navigation_bar('screens.php',array('config','elementid'));
 		}
 	}
 	else{
 		$element = new CTableInfo(S_NO_SCREENS_DEFINED);
 	}
-	
+
 	$icon = null;
 	$fs_icon = null;
 	if(isset($elementid) && $element ){
@@ -261,27 +261,27 @@ include_once 'include/page_header.php';
 			$icon->addAction('onclick',new CScript("javascript: add2favorites('screenid','".$elementid."');"));
 		}
 		$icon->addOption('id','addrm_fav');
-		
+
 		$url = '?elementid='.$elementid.($_REQUEST['fullscreen']?'':'&fullscreen=1');
 		$url.=url_param('groupid').url_param('hostid');
-		
+
 		$fs_icon = new CDiv(SPACE,'fullscreen');
 		$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));	
+		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 	}
-	
+
 	$screens_wdgt->addHeader(S_SCREENS_BIG,array($icon,$fs_icon));
 	$screens_wdgt->addHeader($text,$form);
-	
+
 	$screens_wdgt->addItem($element);
-	
+
 	$screens_wdgt->show();
-	
+
 	$scroll_div = new CDiv();
 	$scroll_div->addOption('id','scroll_cntnr');
 	$scroll_div->addOption('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
 	$scroll_div->show();
-	
+
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
 ?>

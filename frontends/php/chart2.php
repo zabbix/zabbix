@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -21,7 +21,7 @@
 <?php
 	require_once('include/config.inc.php');
 	require_once('include/graphs.inc.php');
-	
+
 	$page['file']	= 'chart2.php';
 	$page['title']	= 'S_CHART';
 	$page['type']	= PAGE_TYPE_IMAGE;
@@ -49,19 +49,19 @@ include_once('include/page_header.php');
 	}
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY,PERM_RES_IDS_ARRAY, get_current_nodeid(true));
-	
+
 	if(!graph_accessible($_REQUEST['graphid'])){
 		access_deny();
 	}
-	
+
 	$effectiveperiod = navigation_bar_calc();
-	
+
 	if(($_REQUEST['graphid']>0) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD)){
 		update_profile('web.graph.period',$_REQUEST['period'],PROFILE_TYPE_INT,$_REQUEST['graphid']);
 	}
-	
-	update_profile('web.charts.graphid',$_REQUEST['graphid']);	
-		
+
+	update_profile('web.charts.graphid',$_REQUEST['graphid']);
+
 	$sql = 'SELECT g.*,h.host,h.hostid '.
 				' FROM graphs g '.
 					' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
@@ -69,9 +69,9 @@ include_once('include/page_header.php');
 					' LEFT JOIN hosts h ON i.hostid=h.hostid '.
 				' WHERE g.graphid='.$_REQUEST['graphid'].
 					' AND '.DBcondition('h.hostid',$available_hosts);
-					
+
 	$db_data = DBfetch(DBselect($sql));
-	
+
 	$graph = new CChart($db_data['graphtype']);
 
 	$chart_header = '';
@@ -80,7 +80,7 @@ include_once('include/page_header.php');
 	}
 	$chart_header.= $db_data['host'].':'.$db_data['name'];
 	$graph->setHeader($chart_header);
-	
+
 	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
 	if(isset($_REQUEST['from']))		$graph->SetFrom($_REQUEST['from']);
 	if(isset($_REQUEST['stime']))		$graph->SetSTime($_REQUEST['stime']);
@@ -105,13 +105,13 @@ include_once('include/page_header.php');
 
 	$graph->setYAxisMin($db_data['yaxismin']);
 	$graph->setYAxisMax($db_data['yaxismax']);
-	
+
 	$graph->setYMinItemId($db_data['ymin_itemid']);
 	$graph->setYMaxItemId($db_data['ymax_itemid']);
 
 	$graph->setLeftPercentage($db_data['percent_left']);
 	$graph->setRightPercentage($db_data['percent_right']);
-	
+
 	$result = DBselect('SELECT gi.* '.
 		' FROM graphs_items gi '.
 		' WHERE gi.graphid='.$db_data['graphid'].

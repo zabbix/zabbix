@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -26,7 +26,7 @@
 	$page["file"] = "popup_users.php";
 
 	define('ZBX_PAGE_NO_MENU', 1);
-	
+
 include_once "include/page_header.php";
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -47,39 +47,39 @@ function add_users(formname) {
 	var parent_document = window.opener.document;
 
 	if(!parent_document) return close_window();
-	
-	$('usersid_left').immediateDescendants().each( 
-		function(e){ 
+
+	$('usersid_left').immediateDescendants().each(
+		function(e){
 			add_variable('input', 'new_user['+e.value+']', e.text, formname, parent_document);
 		});
 	parent_document.forms[formname].submit();
-	close_window();	
+	close_window();
 }
 -->
 </script>
 
-<?php 
+<?php
 	$comboform = new CForm();
 	$comboform->addVar('dstfrm',$dstfrm);
 
 // create table header +
 	$cmbGroups = new CComboBox('groupid', $groupid, 'submit()');
 	$cmbGroups->addItem(0,S_ALL_S);
-	
+
 	$sql = 'SELECT usrgrpid, name FROM usrgrp WHERE '.DBin_node('usrgrpid').' ORDER BY name';
 	$result=DBselect($sql);
-	
+
 	while($row=DBfetch($result)){
 		$cmbGroups->addItem($row['usrgrpid'], $row['name']);
 	}
 	$comboform->addItem($cmbGroups);
 	show_table_header(S_USERS, $comboform);
-// - 
-	
+// -
+
 // create user twinbox +
 	$form = new CForm('users.php');
 	$form->addOption('id', 'users');
-	
+
 	$user_tb = new CTweenBox($form, 'usersid', null, 10);
 
 	$from = '';
@@ -101,7 +101,7 @@ function add_users(formname) {
 // -
 	$button = new CButton('select', S_SELECT, 'add_users("'.$dstfrm.'")');
 	$button->setType('button');
-	
+
 	$form->addItem($button);
 	$form->show();
 

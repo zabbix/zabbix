@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2007 SIA Zabbix
 **
@@ -25,7 +25,7 @@
 
 	$page["title"] = "S_LINK_STATUS_INDICATORS";
 	$page["file"] = "popup_link_tr.php";
-	
+
 	define('ZBX_PAGE_NO_MENU', 1);
 
 include_once('include/page_header.php');
@@ -36,13 +36,13 @@ include_once('include/page_header.php');
 //			VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"dstfrm"=>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null),
-		
+
 		"linkid"=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
 		"triggerid"=>	array(T_ZBX_INT, O_OPT,  NULL, 	DB_ID, 			'isset({save})'),
-		
+
 		"drawtype"=>	array(T_ZBX_INT, O_OPT,  NULL, 	IN('0,1,2,3,4'),'isset({save})'),
 		"color"=>		array(T_ZBX_STR, O_OPT,  NULL, 	NOT_EMPTY,		'isset({save})'),
-		
+
 /* actions */
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 /* other */
@@ -57,9 +57,9 @@ function add_var_to_opener_obj(obj, name, value){
 		var parent = window.opener.document;
 		if(typeof(parent) == 'undefined'){
 			close_window();
-			return false;	
+			return false;
 		}
-		
+
 		var dest = parent.getElementsByName(name);
 		if(is_array(dest) && (typeof(dest[0]) == 'undefined')){
 			dest[0].value = value;
@@ -69,14 +69,14 @@ function add_var_to_opener_obj(obj, name, value){
 			new_variable.type = 'hidden';
 			new_variable.name = name;
 			new_variable.value = value;
-			
+
 			obj.appendChild(new_variable);
-		}		
+		}
 }
 
 function add_trigger_link(formname,triggerid,drawtype,color){
 	var form = window.opener.document.forms[formname];
-	
+
 	if(!form){
 		close_window();
 		return false;
@@ -85,7 +85,7 @@ function add_trigger_link(formname,triggerid,drawtype,color){
 	add_var_to_opener_obj(form,'triggers['+triggerid+'][triggerid]',triggerid);
 	add_var_to_opener_obj(form,'triggers['+triggerid+'][drawtype]',drawtype);
 	add_var_to_opener_obj(form,'triggers['+triggerid+'][color]',color);
-	
+
 	form.submit();
 	window.close();
 return true;
@@ -111,17 +111,17 @@ else if(isset($_REQUEST['form'])){
 	$frmCnct = new CFormTable("New connector","popup_link_tr.php");
 	$frmCnct->SetHelp("web.sysmap.connector.php");
 
-	$frmCnct->AddVar("dstfrm",$_REQUEST["dstfrm"]);	
-	
+	$frmCnct->AddVar("dstfrm",$_REQUEST["dstfrm"]);
+
 	if(isset($_REQUEST["linkid"]) && isset($_REQUEST['triggerid'])){
 		$frmCnct->AddVar("linkid",$_REQUEST["linkid"]);
-		
+
 		$db_link=DBfetch(DBselect('SELECT * FROM sysmaps_link_triggers WHERE linkid='.$_REQUEST["linkid"].' AND triggerid='.$_REQUEST['triggerid']));
-	
+
 		$triggerid		= $_REQUEST['triggerid'];
 		$drawtype	= $db_link["drawtype"];
 		$color		= $db_link["color"];
-	
+
 	}
 	else{
 		$triggerid	= get_request("triggerid",	0);
@@ -129,16 +129,16 @@ else if(isset($_REQUEST['form'])){
 		$color		= get_request("color",		0);
 	}
 	$frmCnct->AddVar("triggerid",$triggerid);
-	
+
 	/* START comboboxes preparations */
-	
+
 	$cmbType = new CComboBox("drawtype",$drawtype);
-	
+
 	foreach(map_link_drawtypes() as $i){
 		$value = map_link_drawtype2str($i);
 		$cmbType->AddItem($i, $value);
 	}
-	
+
 	$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmCnct->GetName().
 				"&dstfld1=triggerid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description');",
@@ -146,20 +146,20 @@ else if(isset($_REQUEST['form'])){
 	$btnSelect->SetType('button');
 	/* END preparation */
 	$description = ($triggerid>0)?expand_trigger_description($triggerid):'';
-	
-	$frmCnct->AddRow(S_TRIGGER, 
+
+	$frmCnct->AddRow(S_TRIGGER,
 					 array(new CTextBox('trigger',$description,70,'yes'),
 							SPACE,
 							$btnSelect
 						));
-	
+
 	$frmCnct->AddRow(S_TYPE.' ('.S_PROBLEM_BIG.')',$cmbType);
 	$frmCnct->AddRow(S_COLOR.' ('.S_PROBLEM_BIG.')', new CColor('color',$color));
-	
+
 	$frmCnct->AddItemToBottomRow(new CButton("save",(isset($_REQUEST['triggerid']))?S_SAVE:S_ADD));
 	$frmCnct->AddItemToBottomRow(SPACE);
 	$frmCnct->AddItemToBottomRow(new CButton("cancel",S_CANCEL,'javascript: window.close();'));
-	
+
 	$frmCnct->Show();
 }
 

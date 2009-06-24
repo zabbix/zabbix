@@ -102,7 +102,7 @@ include_once 'include/page_header.php';
 			$_REQUEST['periods_cnt'].");\n";
 		insert_js($script);
 	}
-	
+
 	if(isset($_REQUEST['save']) && isset($_REQUEST['gid'])){
 		$script = "update_graph_item('".
 			$_REQUEST['dstfrm']."','".

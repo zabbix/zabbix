@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -55,21 +55,21 @@ include_once "include/page_header.php";
 			' FROM items i, functions f '.
 			' WHERE i.itemid=f.itemid '.
 				' AND f.triggerid='.$_REQUEST['triggerid'].
-				' AND '.DBin_node('f.triggerid');				
+				' AND '.DBin_node('f.triggerid');
 	if(!$db_data = DBfetch(DBselect($sql))){
 		fatal_error(S_NO_TRIGGER_DEFINED);
 	}
-	
+
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($db_data['hostid']));
-	
+
 	if(!isset($available_triggers[$_REQUEST['triggerid']])){
 		access_deny();
 	}
-	
+
 	$trigger_hostid = $db_data['hostid'];
-	
+
 	if(isset($_REQUEST["save"])){
-	
+
 		$result = update_trigger_comments($_REQUEST["triggerid"],$_REQUEST["comments"]);
 		show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
 
@@ -83,7 +83,7 @@ include_once "include/page_header.php";
 	{
 		redirect('tr_status.php?hostid='.$trigger_hostid);
 		exit;
-		
+
 	}
 ?>
 <?php

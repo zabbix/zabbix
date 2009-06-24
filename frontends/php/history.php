@@ -268,13 +268,13 @@ include_once "include/page_header.php";
 		show_history($_REQUEST['itemid'],$_REQUEST['from'],$bstime,$effectiveperiod);
 	}
 	else if($_REQUEST['action']=='showvalues' || $_REQUEST['action']=='showlatest'){
-	
+
 		if($_REQUEST['action']=='showvalues') {
 			$time = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 			$till = $time + $effectiveperiod;
 		}
 		$l_header = null;
-		
+
 		if(!isset($_REQUEST['plaintext'])){
 			if($item_type==ITEM_VALUE_TYPE_LOG){
 				$to_save_request = array('filter_task', 'filter', 'mark_color');
@@ -542,25 +542,25 @@ COpt::profiling_stop('history');
 	if(!isset($_REQUEST['plaintext'])){
 
 		if(str_in_array($_REQUEST['action'],array('showvalues','showgraph'))){
-		
+
 			$stime = get_min_itemclock_by_itemid($_REQUEST['itemid']);
 			$stime = (is_null($stime))?0:$stime;
 			$bstime = time()-$effectiveperiod;
-			
+
 			if(isset($_REQUEST['stime'])){
 				$bstime = $_REQUEST['stime'];
 				$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 			}
-		
+
  			$script = 'scrollinit(0,'.$effectiveperiod.','.$stime.',0,'.$bstime.'); showgraphmenu("graph");';
 			if(isset($dom_graph_id))
 				$script.='graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH, 200, true);';
-			
-			zbx_add_post_js($script); 
-			
-			$scroll_div = new CDiv();			
-			$scroll_div->addOption('id','scroll_cntnr');			
-			$scroll_div->addOption('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');			
+
+			zbx_add_post_js($script);
+
+			$scroll_div = new CDiv();
+			$scroll_div->addOption('id','scroll_cntnr');
+			$scroll_div->addOption('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
 			$scroll_div->show();
 	//		navigation_bar("history.php",$to_save_request);
 		}
