@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -39,13 +39,13 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	
+
 /* AJAX	*/
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
 			update_profile('web.discovery.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
-	}	
+	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 		exit();
@@ -56,28 +56,28 @@ include_once('include/page_header.php');
 
 
 	$dscvry_wdgt = new CWidget('hat_discovery');
-	
+
 // HEADER
 	$r_form = new CForm();
 	$r_form->setMethod('get');
-	
+
 	$druleid = get_request('druleid', 0);
 	$fullscreen = get_request('fullscreen', 0);
-	
+
 	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1').'&amp;druleid='.$druleid;
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
-	
+
 	$row_count = 0;
 	$numrows = new CSpan(null,'info');
-	$numrows->addOption('name','numrows');	
+	$numrows->addOption('name','numrows');
 	$header = array(S_STATUS_OF_DISCOVERY_BIG,
 			new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-			S_FOUND.': ',$numrows);	
+			S_FOUND.': ',$numrows);
 	$dscvry_wdgt->addHeader($header, $fs_icon);
-	
+
 // 2nd header
 	$cmbDRules = new CComboBox('druleid',$druleid,'submit()');
 	$cmbDRules->addItem(0,S_ALL_SMALL);
@@ -94,10 +94,10 @@ include_once('include/page_header.php');
 				);
 	$r_form->addVar('fullscreen', $fullscreen);
 	$r_form->addItem(array(S_DISCOVERY_RULE.SPACE,$cmbDRules));
-	
+
 	$dscvry_wdgt->addHeader(SPACE, $r_form);
 //-------------
-	
+
 
 	$services = array();
 
@@ -204,7 +204,7 @@ include_once('include/page_header.php');
 			foreach($services as $name => $foo){
 				$class = null;
 				$time = SPACE;
-				
+
 				$hint = new CDiv(SPACE, $class);
 				$hintTable = new CTableInfo();
 				$hintTable->addOption('style','width: auto;');
@@ -213,19 +213,19 @@ include_once('include/page_header.php');
 				if(isset($h_data['services'][$name])){
 					$class = $h_data['services'][$name]['class'];
 					$time = $h_data['services'][$name]['time'];
-					
+
 					if ($class == 'active') {
 						$hintTable->setHeader(S_UP_TIME);
-					} 
+					}
 					else if ($class == 'inactive') {
 						$hintTable->setHeader(S_DOWN_TIME);
 					}
-					
+
 					$timeColumn = new CCol(zbx_date2age($h_data['services'][$name]['time']), $class);
 					$hintTable->addRow($timeColumn);
 					$hint->setHint($hintTable);
 				}
-				
+
 				$table_row[] = new CCol($hint, $class);
 			}
 			$table->addRow($table_row);

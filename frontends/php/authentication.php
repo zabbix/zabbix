@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -37,23 +37,23 @@ include_once('include/page_header.php');
 // LDAP form
 		'ldap_host'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
 		'ldap_port'=>			array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-		
+
 		'ldap_base_dn'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-		
+
 		'ldap_bind_dn'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
 		'ldap_bind_password'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-		
+
 		'ldap_search_attribute'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-		
+
 		'authentication_type'=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1,2'),			NULL),
-		
+
 		'user'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&isset({form_refresh_ldap})&&(isset({authentication_type}) || isset({test}))'),
 		'user_password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&isset({form_refresh_ldap})&&(isset({authentication_type}) || isset({test}))'),
 
 /* actions */
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'test'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		
+
 /* other */
 		'form'=>					array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh_internal'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
@@ -65,21 +65,21 @@ include_once('include/page_header.php');
 <?php
 	$_REQUEST['config'] = get_request('config',get_profile('web.authentication.config',ZBX_AUTH_LDAP));
 	check_fields($fields);
-	
+
 	update_profile('web.authentication.config',$_REQUEST['config'], PROFILE_TYPE_INT);
-	
+
 	$_REQUEST['authentication_type'] = get_request('authentication_type',ZBX_AUTH_INTERNAL);
-	
+
 	$result = 0;
-	
+
 	if(ZBX_AUTH_INTERNAL==$_REQUEST['config']){
 		if(isset($_REQUEST['save'])){
-			
+
 			$config=select_config();
 
 			$cur_auth_type = $config['authentication_type'] ;
 			$config['authentication_type'] = ZBX_AUTH_INTERNAL;
-			
+
 			foreach($config as $id => $value){
 				if(isset($_REQUEST[$id])){
 					$config[$id] = $_REQUEST[$id];
@@ -89,28 +89,28 @@ include_once('include/page_header.php');
 				}
 			}
 
-// If we do save and auth_type changed, reset all sessions 
+// If we do save and auth_type changed, reset all sessions
 			if($cur_auth_type<>$config['authentication_type']){
 				DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
 			}
 
 			$result=update_config($config);
-			
+
 			show_messages($result, S_ZABBIX_INTERNAL_AUTH.SPACE.S_UPDATED, S_CANNOT_UPDATE.SPACE.S_HTTP_AUTH);
-	
+
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,S_HTTP_AUTH);
 			}
 		}
 	}
 	else if($_REQUEST['config']==ZBX_AUTH_LDAP){
-		if(isset($_REQUEST['save'])){	
+		if(isset($_REQUEST['save'])){
 			$alias = get_request('user', $USER_DETAILS['alias']);
 			$passwd = get_request('user_password','');
 
 			$config=select_config();
 			$cur_auth_type = $config['authentication_type'] ;
-			
+
 			foreach($config as $id => $value){
 				if(isset($_REQUEST[$id])){
 					$config[$id] = $_REQUEST[$id];
@@ -125,21 +125,21 @@ include_once('include/page_header.php');
 			if(ZBX_AUTH_LDAP == $config['authentication_type']){
 				$result=ldap_authentication($alias,$passwd,$ldap_cnf);
 			}
-			
-// If we do save and auth_type changed, reset all sessions 
+
+// If we do save and auth_type changed, reset all sessions
 			if($result && ($cur_auth_type<>$config['authentication_type'])){
 				DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
 			}
-			
+
 			if($result){
 				$result=update_config($config);
 			}
-	
+
 			show_messages($result, S_LDAP.SPACE.S_UPDATED, S_LDAP.SPACE.S_WAS_NOT.SPACE.S_UPDATED);
-	
+
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,S_LDAP);
-			}		
+			}
 		}
 		else if(isset($_REQUEST['test'])){
 			$alias = get_request('user', $USER_DETAILS['alias']);
@@ -159,7 +159,7 @@ include_once('include/page_header.php');
 	}
 	else if(ZBX_AUTH_HTTP==$_REQUEST['config']){
 		if(isset($_REQUEST['save'])){
-			
+
 			if(ZBX_AUTH_HTTP == $_REQUEST['authentication_type']){
 				$sql = 'SELECT COUNT(g.usrgrpid) as cnt_usrgrp FROM usrgrp g WHERE g.gui_access='.GROUP_GUI_ACCESS_INTERNAL;
 				$res = DBfetch(DBselect($sql));
@@ -167,12 +167,12 @@ include_once('include/page_header.php');
 					info('Exists ['.$res['cnt_usrgrp'].'] groups with ['.S_INTERNAL_S.'] GUI access.');
 				}
 			}
-			
+
 			$config=select_config();
 
 			$cur_auth_type = $config['authentication_type'] ;
 			$config['authentication_type'] = ZBX_AUTH_HTTP;
-			
+
 			foreach($config as $id => $value){
 				if(isset($_REQUEST[$id])){
 					$config[$id] = $_REQUEST[$id];
@@ -182,15 +182,15 @@ include_once('include/page_header.php');
 				}
 			}
 
-// If we do save and auth_type changed or is set to LDAP, reset all sessions 
+// If we do save and auth_type changed or is set to LDAP, reset all sessions
 			if($cur_auth_type<>$config['authentication_type']){
 				DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
 			}
 
 			$result=update_config($config);
-			
+
 			show_messages($result, S_HTTP_AUTH.SPACE.S_UPDATED, S_CANNOT_UPDATE.SPACE.S_HTTP_AUTH);
-	
+
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,S_HTTP_AUTH);
 			}
@@ -217,16 +217,16 @@ include_once('include/page_header.php');
 
 	show_table_header(S_AUTHENTICATION_TO_ZABBIX, $auth);
 	echo SBR;
-	
+
 	if(ZBX_AUTH_INTERNAL==$_REQUEST['config']){
 
 		$form_refresh_internal = get_request('form_refresh_internal',0);
 		$form_refresh_internal++;
-		
+
 		$frmAuth = new CFormTable(S_ZABBIX_INTERNAL_AUTH,'authentication.php');
 		$frmAuth->SetHelp('web.authentication.php');
 		$frmAuth->AddVar('form_refresh_internal',$form_refresh_internal);
-		
+
 		$cmbConfig = new CCombobox('config',ZBX_AUTH_INTERNAL,'submit()');
 		$cmbConfig->AddItem(ZBX_AUTH_INTERNAL,S_INTERNAL_S);
 		$cmbConfig->AddItem(ZBX_AUTH_LDAP,S_LDAP);
@@ -254,24 +254,24 @@ include_once('include/page_header.php');
 
 		$form_refresh_ldap = get_request('form_refresh_ldap',0);
 		$form_refresh_ldap++;
-		
+
 		$frmAuth = new CFormTable(S_LDAP_AUTH,'authentication.php');
 		$frmAuth->SetHelp('web.authentication.php');
 		$frmAuth->AddVar('form_refresh_ldap',$form_refresh_ldap);
-		
+
 		$cmbConfig = new CCombobox('config',ZBX_AUTH_LDAP,'submit()');
 		$cmbConfig->AddItem(ZBX_AUTH_INTERNAL,S_INTERNAL_S);
 		$cmbConfig->AddItem(ZBX_AUTH_LDAP,S_LDAP);
 		$cmbConfig->AddItem(ZBX_AUTH_HTTP,S_HTTP);
 
 		$frmAuth->AddRow(S_DEFAULT_AUTHENTICATION, $cmbConfig);
-		
+
 		$frmAuth->AddRow(S_LDAP.SPACE.S_HOST, new CTextBox('ldap_host',$config['ldap_host'],64));
 		$frmAuth->AddRow(S_PORT, new CNumericBox('ldap_port',$config['ldap_port'],5));
 
-		$frmAuth->AddRow(S_BASE_DN,new CTextBox('ldap_base_dn',$config['ldap_base_dn'],64));		
+		$frmAuth->AddRow(S_BASE_DN,new CTextBox('ldap_base_dn',$config['ldap_base_dn'],64));
 		$frmAuth->AddRow(S_SEARCH_ATTRIBUTE,new CTextBox('ldap_search_attribute',empty($config['ldap_search_attribute'])?'uid':$config['ldap_search_attribute']));
-				
+
 		$frmAuth->AddRow(S_BIND_DN.'*', new CTextBox('ldap_bind_dn',$config['ldap_bind_dn'],64));
 		$frmAuth->AddRow(S_BIND_PASSWORD.'*',new CPassBox('ldap_bind_password',$config['ldap_bind_password']));
 
@@ -279,7 +279,7 @@ include_once('include/page_header.php');
 		$frmAuth->AddRow(S_LDAP.SPACE.S_AUTHENTICATION.SPACE.S_ENABLED, new CCheckBox('authentication_type', $config['authentication_type'],$action,ZBX_AUTH_LDAP));
 
 		$frmAuth->AddRow(S_TEST.SPACE.S_AUTHENTICATION, ' ['.S_MUST_BE_VALID_SMALL.SPACE.S_LDAP.SPACE.S_USER.']');
-		
+
 		if(GROUP_GUI_ACCESS_INTERNAL == get_user_auth($USER_DETAILS['userid'])){
 			$usr_test = new CComboBox('user', $USER_DETAILS['alias']);
 			$sql = 'SELECT u.alias, u.userid '.
@@ -296,7 +296,7 @@ include_once('include/page_header.php');
 		else{
 			$usr_test = new CTextBox('user',$USER_DETAILS['alias'],null,'yes');
 		}
-		
+
 		$frmAuth->AddRow(S_LOGIN , $usr_test);
 		$frmAuth->AddRow(S_USER.SPACE.S_PASSWORD,new CPassBox('user_password'));
 
@@ -308,11 +308,11 @@ include_once('include/page_header.php');
 
 		$form_refresh_http = get_request('form_refresh_http',0);
 		$form_refresh_http++;
-		
+
 		$frmAuth = new CFormTable(S_HTTP_AUTH,'authentication.php');
 		$frmAuth->SetHelp('web.authentication.php');
 		$frmAuth->AddVar('form_refresh_http',$form_refresh_http);
-		
+
 		$cmbConfig = new CCombobox('config',ZBX_AUTH_HTTP,'submit()');
 		$cmbConfig->AddItem(ZBX_AUTH_INTERNAL,S_INTERNAL_S);
 		$cmbConfig->AddItem(ZBX_AUTH_LDAP,S_LDAP);

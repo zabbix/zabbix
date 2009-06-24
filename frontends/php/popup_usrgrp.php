@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -26,7 +26,7 @@
 	$page["file"] = "popup_usrgrp.php";
 
 	define('ZBX_PAGE_NO_MENU', 1);
-	
+
 include_once "include/page_header.php";
 
 ?>

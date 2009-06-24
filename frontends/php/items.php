@@ -655,7 +655,7 @@ include_once 'include/page_header.php';
 			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 
 			$group_itemid = $_REQUEST['group_itemid'];
-		
+
 			$sql = 'SELECT h.host, i.itemid, i.key_, i.templateid, i.type'.
 					' FROM items i, hosts h '.
 					' WHERE '.DBcondition('i.itemid',$group_itemid).
@@ -672,7 +672,7 @@ include_once 'include/page_header.php';
 					unset($group_itemid[$item['itemid']]);
 					info(S_ITEM.SPACE."'".$item['host'].':'.$item['itemid']."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
 					continue;
-				}				
+				}
 /*				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');*/
 			}
 
@@ -683,7 +683,7 @@ include_once 'include/page_header.php';
 				$result = DBend($result);
 			}
 			show_messages($result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
-			
+
 		}
 		else if($_REQUEST['group_task']==S_ACTIVATE_SELECTED){
 			global $USER_DETAILS;
@@ -790,7 +790,7 @@ include_once 'include/page_header.php';
 //			$_REQUEST['itemid'] = 0;
 		}
 	}
-	
+
 	$reset = true;
 	$options = array('only_current_node', 'not_proxy_hosts');
 	$params = array();
@@ -829,7 +829,7 @@ include_once 'include/page_header.php';
 		insert_copy_elements_to_forms('group_itemid');
 	}
 	else if (!isset($_REQUEST['form']) ||  !str_in_array($_REQUEST['form'],array(S_CREATE_ITEM,'update','clone'))) {
-	
+
 		$items_wdgt = new CWidget();
 // Table HEADER
 		$form = new CForm();
@@ -869,14 +869,14 @@ include_once 'include/page_header.php';
 		}
 
 		if($showdisabled == 0) $where_case[] = 'i.status <> 1';
-		
+
 		$row_count = 0;
 		$numrows = new CSpan(null,'info');
-		$numrows->addOption('name','numrows');	
+		$numrows->addOption('name','numrows');
 		$header = array(S_ITEMS_BIG,
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-						S_FOUND.': ',$numrows);	
-						
+						S_FOUND.': ',$numrows);
+
 		$items_wdgt->addHeader($header, $form);
 //		show_table_header($header, $form);
 // ----------------
@@ -1024,7 +1024,7 @@ include_once 'include/page_header.php';
 					' LEFT JOIN hosts th ON ti.hostid=th.hostid '.
 				' WHERE '.implode(' AND ', $where_case).
 				order_by('h.host,i.description,i.key_,i.delay,i.history,i.trends,i.type,i.status','i.itemid');
-//*/			
+//*/
 //*
 		$sql = 'SELECT DISTINCT th.host as template_host,th.hostid as template_hostid, h.host, h.hostid, i.* '.
 				' FROM '.implode(',', $from_tables).
@@ -1103,7 +1103,7 @@ include_once 'include/page_header.php';
 		$table->setFooter(new CCol($footerButtons));
 
 		$form->addItem($table);
-		
+
 		$items_wdgt->addItem($form);
 		$items_wdgt->show();
 	}

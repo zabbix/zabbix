@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -35,7 +35,7 @@ include_once "include/page_header.php";
 
 // media form
 		"nodeid"=>		array(T_ZBX_INT, O_NO,	null,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-		
+
 		"new_nodeid"=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,			'isset({save})'),
 		"name"=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({save})'),
 		"timezone"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(-12,+13),	'isset({save})'),
@@ -56,18 +56,18 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 	validate_sort_and_sortorder();
-	
+
 	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
 
 	if (0 == count($available_nodes) ){
 		access_deny();
 	}
-	
+
 ?>
 <?php
 	if(isset($_REQUEST['save'])){
 		$result = false;
-		if(isset($_REQUEST['nodeid'])){ 
+		if(isset($_REQUEST['nodeid'])){
 /* update */
 			$audit_action = AUDIT_ACTION_UPDATE;
 			DBstart();
@@ -78,15 +78,15 @@ include_once "include/page_header.php";
 			$nodeid = $_REQUEST['nodeid'];
 			show_messages($result, S_NODE_UPDATED, S_CANNOT_UPDATE_NODE);
 		}
-		else{ 
+		else{
 /* add */
 			$audit_action = AUDIT_ACTION_ADD;
-			
+
 			DBstart();
 			$nodeid = add_node($_REQUEST['new_nodeid'],
 				$_REQUEST['name'], $_REQUEST['timezone'], $_REQUEST['ip'], $_REQUEST['port'],
 				$_REQUEST['slave_history'], $_REQUEST['slave_trends'], $_REQUEST['node_type']);
-			$result = DBend($nodeid);			
+			$result = DBend($nodeid);
 			show_messages($result, S_NODE_ADDED, S_CANNOT_ADD_NODE);
 		}
 		add_audit_if($result,$audit_action,AUDIT_RESOURCE_NODE,'Node ['.$_REQUEST['name'].'] id ['.$nodeid.']');
@@ -96,12 +96,12 @@ include_once "include/page_header.php";
 	}
 	else if(isset($_REQUEST['delete'])){
 		$node_data = get_node_by_nodeid($_REQUEST['nodeid']);
-		
+
 		DBstart();
 		$result = delete_node($_REQUEST['nodeid']);
 		$result = DBend($result);
 		show_messages($result, S_NODE_DELETED, S_CANNOT_DELETE_NODE);
-		
+
 		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_NODE,'Node ['.$node_data['name'].'] id ['.$node_data['nodeid'].']');
 		if($result){
 			unset($_REQUEST['form'],$node_data);

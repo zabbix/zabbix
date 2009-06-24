@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -23,7 +23,7 @@
 	require_once('include/users.inc.php');
 	require_once('include/forms.inc.php');
 	require_once('include/media.inc.php');
-	
+
 	$page['title'] = "S_USER_PROFILE";
 	$page['file'] = 'profile.php';
 	$page['hist_arg'] = array();
@@ -96,7 +96,7 @@ $fields=array(
 	elseif(isset($_REQUEST['save'])){
 		$_REQUEST['password1'] = get_request('password1', null);
 		$_REQUEST['password2'] = get_request('password2', null);
-		
+
 		if(($config['authentication_type'] != ZBX_AUTH_INTERNAL) && zbx_empty($_REQUEST['password1'])) {
 			if(($config['authentication_type'] == ZBX_AUTH_LDAP) && isset($_REQUEST['userid'])) {
 				if(GROUP_GUI_ACCESS_INTERNAL != get_user_auth($_REQUEST['userid'])) {
@@ -117,7 +117,7 @@ $fields=array(
 			show_error_message(S_PASSWORD_SHOULD_NOT_BE_EMPTY);
 		}
 		else {
-			
+
 			$userid = $USER_DETAILS['userid'];
 			$user = array();
 //			$user['name'] = $USER_DETAILS['name'];
@@ -134,11 +134,11 @@ $fields=array(
 //			$user['user_type'] = $USER_DETAILS['type'];
 			$user['user_groups'] = null;
 			$user['user_medias'] = get_request('user_medias');
-			
+
 			DBstart();
 			$result = update_user($userid, $user);
 			$result = DBend($result);
-			
+
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 
 			if($result)

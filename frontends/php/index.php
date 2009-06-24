@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -47,7 +47,7 @@ $page['file']	= 'index.php';
 
 	if(isset($_REQUEST['reconnect']) && isset($sessionid)){
 		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,'Manual Logout');
-		
+
 		zbx_unsetcookie('zbx_sessionid');
 		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
 		unset($sessionid);
@@ -57,13 +57,13 @@ $page['file']	= 'index.php';
 	}
 
 	$config = select_config();
-	
+
 	$authentication_type = $config['authentication_type'];
 
 	if($authentication_type == ZBX_AUTH_HTTP){
 		if(isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])){
 			if(!isset($sessionid)) $_REQUEST['enter'] = 'Enter';
-			
+
 			$_REQUEST['name'] = $_SERVER['PHP_AUTH_USER'];
 			$_REQUEST['password'] = 'zabbix';//$_SERVER['PHP_AUTH_PW'];
 		}
@@ -72,14 +72,14 @@ $page['file']	= 'index.php';
 		}
 	}
 
-	$request = get_request('request');	
+	$request = get_request('request');
 	if(isset($_REQUEST['enter'])&&($_REQUEST['enter']=='Enter')){
-		
+
 		$name = get_request('name','');
 		$passwd = get_request('password','');
-		
+
 		$login = user_login($name, $passwd, $authentication_type);
-		
+
 		if($login){
 			$url = is_null($request)?$USER_DETAILS['url']:$request;
 			redirect($url);
@@ -106,9 +106,9 @@ include_once('include/page_header.php');
 				$frmLogin->addRow('Password', new CPassBox('password'));
 				$frmLogin->addItemToBottomRow(new CButton('enter','Enter'));
 				$frmLogin->show(false);
-		
+
 				setFocus($frmLogin->getName(),'name');
-				
+
 				$frmLogin->destroy();
 		}
 

@@ -1,5 +1,5 @@
-<?php 
-/* 
+<?php
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -45,9 +45,9 @@ include_once 'include/page_header.php';
 	if(!$host = DBfetch(DBselect($sql))){
 		fatal_error(S_NO_TRIGGER_DEFINED);
 	}
-	
+
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($host['hostid']));
-				
+
 	$sql = 'SELECT DISTINCT t.triggerid,t.description,t.expression, h.host,h.hostid '.
 			' FROM hosts h, items i, functions f, triggers t'.
 			' WHERE h.hostid=i.hostid '.
@@ -55,7 +55,7 @@ include_once 'include/page_header.php';
 				' AND f.triggerid=t.triggerid '.
 				' AND t.triggerid='.$_REQUEST['triggerid'].
 				' AND '.DBcondition('t.triggerid',$available_triggers);
-			
+
 	if(!$db_data = DBfetch(DBselect($sql))){
 		access_deny();
 	}
@@ -69,25 +69,25 @@ include_once 'include/page_header.php';
 	$shiftYup	= 17;
 	$shiftYdown	= 25+15*3;
 
-	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10); 
-	
-	$red		= imagecolorallocate($im,255,0,0); 
-	$darkred	= imagecolorallocate($im,150,0,0); 
-	$green		= imagecolorallocate($im,0,255,0); 
-	$darkgreen	= imagecolorallocate($im,0,150,0); 
-	$bluei		= imagecolorallocate($im,0,0,255); 
-	$darkblue	= imagecolorallocate($im,0,0,150); 
-	$yellow		= imagecolorallocate($im,255,255,0); 
-	$darkyellow	= imagecolorallocate($im,150,150,0); 
-	$cyan		= imagecolorallocate($im,0,255,255); 
-	$black		= imagecolorallocate($im,0,0,0); 
-	$gray		= imagecolorallocate($im,150,150,150); 
-	$white		= imagecolorallocate($im,255,255,255); 
+	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10);
+
+	$red		= imagecolorallocate($im,255,0,0);
+	$darkred	= imagecolorallocate($im,150,0,0);
+	$green		= imagecolorallocate($im,0,255,0);
+	$darkgreen	= imagecolorallocate($im,0,150,0);
+	$bluei		= imagecolorallocate($im,0,0,255);
+	$darkblue	= imagecolorallocate($im,0,0,150);
+	$yellow		= imagecolorallocate($im,255,255,0);
+	$darkyellow	= imagecolorallocate($im,150,150,0);
+	$cyan		= imagecolorallocate($im,0,255,255);
+	$black		= imagecolorallocate($im,0,0,0);
+	$gray		= imagecolorallocate($im,150,150,150);
+	$white		= imagecolorallocate($im,255,255,255);
 	$bg			= imagecolorallocate($im,6+6*16,7+7*16,8+8*16);
 
-	$x=imagesx($im); 
+	$x=imagesx($im);
 	$y=imagesy($im);
-  
+
 	imagefilledrectangle($im,0,0,$x,$y,$white);
 	imagerectangle($im,0,0,$x-1,$y-1,$black);
 
@@ -110,13 +110,13 @@ include_once 'include/page_header.php';
 	$wday=date('w',$start);
 	if($wday==0) $wday=7;
 	$start=$start-($wday-1)*24*3600;
-	
+
 	$weeks = (int)(date('z')/7 +1);
 
 	for($i=0;$i<$weeks;$i++){
 		$period_start=$start+7*24*3600*$i;
 		$period_end=$start+7*24*3600*($i+1);
-		
+
 		$stat=calculate_availability($_REQUEST['triggerid'],$period_start,$period_end);
 		$true[$i]=$stat['true'];
 		$false[$i]=$stat['false'];
@@ -149,7 +149,7 @@ include_once 'include/page_header.php';
 
 	for($i=0;$i<$weeks;$i++){
 		$x1=(900/52)*$sizeX*($i-$minX)/($maxX-$minX);
-		
+
 //		imagefilledrectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,imagecolorallocate($im,0,0,0)); 	// WHITE
 
 		$yt=$sizeY*$true[$i]/100;
@@ -186,8 +186,8 @@ include_once 'include/page_header.php';
 	$end_time=time(NULL);
 	imagestring($im, 0,imagesx($im)-100,imagesy($im)-12,'Generated in '.($end_time-$start_time).' sec', $gray);
 
-	ImageOut($im); 
-	imagedestroy($im); 
+	ImageOut($im);
+	imagedestroy($im);
 ?>
 <?php
 

@@ -1,5 +1,5 @@
-<?php 
-/* 
+<?php
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -20,7 +20,7 @@
 ?>
 <?php
 	define('ZBX_PAGE_NO_AUTHERIZATION', 1);
-	
+
 	require_once "include/config.inc.php";
 
 	$page['file'] = 'vtext.php';
@@ -42,20 +42,20 @@ include_once "include/page_header.php";
 
 	$text = get_request("text",' ');;
 	$font = get_request("font",3);
-	
+
 	$width = ImageFontWidth($font) * strlen($text);
 	$height = ImageFontHeight($font);
 
-	$im = imagecreate($height,$width); 
-  
-	$backgroud_color = ImageColorAllocate($im,255,255,255); 
-	$text_color = ImageColorAllocate($im,0,0,0); 
+	$im = imagecreate($height,$width);
+
+	$backgroud_color = ImageColorAllocate($im,255,255,255);
+	$text_color = ImageColorAllocate($im,0,0,0);
 
 	ImageStringUp($im,$font,0,$width-1,$text,$text_color);
 	imagecolortransparent($im,$backgroud_color);
 
-	ImageOut($im); 
-	ImageDestroy($im); 
+	ImageOut($im);
+	ImageDestroy($im);
 ?>
 <?php
 

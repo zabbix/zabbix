@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -21,7 +21,7 @@
 <?php
 	require_once 'include/config.inc.php';
 	require_once 'include/graphs.inc.php';
-	
+
 	$page['file']	= 'chart7.php';
 	$page['title']	= "S_CHART";
 	$page['type']	= PAGE_TYPE_IMAGE;
@@ -61,8 +61,8 @@ include_once 'include/page_header.php';
 			access_deny();
 		}
 	}
-	
-	
+
+
 	$effectiveperiod = navigation_bar_calc();
 
 	if(count($items) == 1){
@@ -71,16 +71,16 @@ include_once 'include/page_header.php';
 			update_profile('web.item.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $items['itemid']);
 		}
 	}
-	
+
 	$graph = new CPie(get_request('graphtype'	,GRAPH_TYPE_NORMAL));
 	$graph->setHeader($host['host'].':'.get_request('name',''));
-	
+
 	$graph3d = get_request('graph3d',0);
 	$legend = get_request('legend',0);
-	
+
 	if($graph3d == 1) $graph->switchPie3D();
 	$graph->switchLegend($legend);
-	
+
 	unset($host);
 
 	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
@@ -90,7 +90,7 @@ include_once 'include/page_header.php';
 
 	$graph->SetWidth(get_request('width',		400));
 	$graph->SetHeight(get_request('height',		300));
-	
+
 	foreach($items as $id => $gitem){
 //		SDI($gitem);
 		$graph->addItem(

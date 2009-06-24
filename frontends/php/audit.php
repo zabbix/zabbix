@@ -47,7 +47,7 @@ include_once('include/page_header.php');
 // actions
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
 		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
-		
+
 		'next_page'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		'prev_page'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 
@@ -117,16 +117,16 @@ ini_set('max_execution_time',10);
 
 // Navigation initialization
 	$nav_time = $_REQUEST['nav_time'];
-	
+
 	$time_end = null;
 
 	$prev_clock = get_request('prev_clock', array());
 	$next_clock = get_request('next_clock', null);
 	$curr_clock = get_request('curr_clock', $nav_time);
-	
+
 	$prev_page = get_request('prev_page', false);
 	$next_page = get_request('next_page', false);
-	
+
 //SDI(array($prev_page, $next_page, $nav_time));
 //SDI(array($prev_clock, $curr_clock, $next_clock));
 	if($next_page){
@@ -145,20 +145,20 @@ ini_set('max_execution_time',10);
 		$time_end  = $curr_clock;
 	}
 
-	$curr_clock = $time_end;	
+	$curr_clock = $time_end;
 	$limit = $USER_DETAILS['rows_per_page'];
-	
+
 //SDI(array($prev_clock, $curr_clock, $next_clock, $time_end));
 // end of navigation initialization
 // -------------
 ?>
 <?php
-	
+
 	$audit_wdgt = new CWidget();
-	
+
 // HEADER
 	$header =($config == 0)?S_AUDIT_LOGS:S_AUDIT_ACTIONS;
-	
+
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
 
@@ -167,7 +167,7 @@ ini_set('max_execution_time',10);
 	$cmbConf->addItem(1,S_AUDIT_ACTIONS);
 
 	$frmForm->addItem($cmbConf);
-	
+
 	$audit_wdgt->addHeader($header, $frmForm);
 //--------
 	$sql_cond = '';
@@ -176,10 +176,10 @@ ini_set('max_execution_time',10);
 
 	if(($_REQUEST['action']>-1) && ($config == 0))
 		$sql_cond.=' AND a.action='.$_REQUEST['action'].' ';
-		
-	if(($_REQUEST['resourcetype']>-1) && ($config == 0)) 
+
+	if(($_REQUEST['resourcetype']>-1) && ($config == 0))
 		$sql_cond.=' AND a.resourcetype='.$_REQUEST['resourcetype'].' ';
-		
+
 	$sql_cond.=' AND a.clock>1000000000 AND a.clock<'.$time_end;
 
 	if(0 == $config){
@@ -188,7 +188,7 @@ ini_set('max_execution_time',10);
 
 		$actions = array();
 		$clock = array();
-		
+
 		$table = new CTableInfo();
 		$table->setHeader(array(
 				make_sorting_link(S_TIME,'clock'),
@@ -207,7 +207,7 @@ ini_set('max_execution_time',10);
 							' AND '.DBin_node('u.userid', get_current_nodeid(null, PERM_READ_ONLY)).
 						' ORDER BY a.clock DESC';
 		$result = DBselect($sql, $limit);
-		while($row=DBfetch($result)){	
+		while($row=DBfetch($result)){
 			switch($row['action']){
 				case AUDIT_ACTION_ADD: 		$action = S_ADDED; break;
 				case AUDIT_ACTION_UPDATE:	$action = S_UPDATED; break;
@@ -221,7 +221,7 @@ ini_set('max_execution_time',10);
 
 			$row['action'] = $action;
 			$row['resourcetype'] = audit_resource2str($row['resourcetype']);
-			
+
 			$count++;
 			$clock[] = $row['clock'];
 			$actions[] = $row;
@@ -229,7 +229,7 @@ ini_set('max_execution_time',10);
 
 		$last_clock = !empty($clock)?min($clock):null;
 		order_result($actions, 'clock', ZBX_SORT_DOWN);
-		
+
 		foreach($actions as $num => $row){
 			if(empty($row['details'])){
 				$details = array();
@@ -261,16 +261,16 @@ ini_set('max_execution_time',10);
 		}
 	}
 	else if(1 == $config){
-		$table = get_history_of_actions($limit, $last_clock, $sql_cond);		
+		$table = get_history_of_actions($limit, $last_clock, $sql_cond);
 		$count = $table->getNumRows();
 	}
-	
+
 // Navigation
 	$next_clock = $last_clock;
-	
+
 	$navForm = new CForm('audit.php');
 	$navForm->setMethod('get');
-	
+
 	$navForm->addVar('config',$_REQUEST['config']);
 
 	$navForm->addVar('prev_clock',$prev_clock);
@@ -391,9 +391,9 @@ ini_set('max_execution_time',10);
 						new CNumericBox('nav_minute',(($_REQUEST['nav_time']>0)?date('i',$_REQUEST['nav_time']):''),2),
 					$clndr_icon
 				);
-				
+
 	$filterForm->addRow(S_ACTIONS_BEFORE,$nav_clndr);
-	
+
 	zbx_add_post_js('create_calendar(null,'.
 				 '["nav_day","nav_month","nav_year","nav_hour","nav_minute"],'.
 				 '"audit_since");');
@@ -409,11 +409,11 @@ ini_set('max_execution_time',10);
 	$filterForm->addItemToBottomRow(new CButton("filter_set",S_FILTER));
 	$filterForm->addItemToBottomRow($reset);
 
-	$audit_wdgt->addFlicker($filterForm, get_profile('web.audit.filter.state',1));	
+	$audit_wdgt->addFlicker($filterForm, get_profile('web.audit.filter.state',1));
 //-------
 
 	$nav = get_thin_table_header($navigation);
-	
+
 	$audit_wdgt->addItem(array($nav, $table, $nav));
 	$audit_wdgt->show();
 ?>

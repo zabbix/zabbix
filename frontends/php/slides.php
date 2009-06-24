@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2007 SIA Zabbix
 **
@@ -34,11 +34,11 @@
 	$_REQUEST['config'] = get_request('config',get_profile('web.screens.config',0));
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	
+
 	if((1 != $_REQUEST['config']) && (PAGE_TYPE_HTML == $page['type'])){
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
-	
+
 include_once('include/page_header.php');
 
 ?>
@@ -50,7 +50,7 @@ include_once('include/page_header.php');
 
 		'groupid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
 		'hostid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
-		
+
 // STATUS OF TRIGGER
 		'tr_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 		'tr_hostid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
@@ -63,7 +63,7 @@ include_once('include/page_header.php');
 
 		'reset'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1,2'),		NULL),
-		
+
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -79,11 +79,11 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['favobj'])){
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
-		
+
 		if('hat' == $_REQUEST['favobj']){
 			update_profile('web.screens.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
-		
+
 		if(in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
@@ -95,18 +95,18 @@ include_once('include/page_header.php');
 			}
 			else if('remove' == $_REQUEST['action']){
 				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
-				
+
 				if($result){
 					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVORITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){ add2favorites("'.$_REQUEST['favobj'].'","'.$_REQUEST['favid'].'");}'."\n");
 				}
-			}			
+			}
 
 			if((PAGE_TYPE_JS == $page['type']) && $result){
 				print('switchElementsClass("addrm_fav","iconminus","iconplus");');
 			}
 		}
-		
+
 		if('refresh' == $_REQUEST['favobj']){
 			switch($_REQUEST['favid']){
 				case 'hat_slides':
@@ -118,16 +118,16 @@ include_once('include/page_header.php');
 
 					$element = get_slideshow($elementid, $step, $effectiveperiod);
 					$element->Show();
-					
+
 //					$element = get_slideshow($elementid, get_request('step', null), $effectiveperiod);
 					break;
 			}
 		}
-		
+
 		if('set_rf_rate' == $_REQUEST['favobj']){
 			if(str_in_array($_REQUEST['favid'],array('hat_slides'))){
 				$elementid = $_REQUEST['elementid'];
-				
+
 				update_profile('web.slides.rf_rate.'.$_REQUEST['favid'],$_REQUEST['favcnt'], PROFILE_TYPE_INT);
 				$_REQUEST['favcnt'] = get_profile('web.slides.rf_rate.'.$_REQUEST['favid'],30);
 
@@ -136,16 +136,16 @@ include_once('include/page_header.php');
 				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'stopDoll');
 				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'startDoll');
 				print $script;
-				
+
 				$menu = array();
 				$submenu = array();
-				
+
 				make_refresh_menu('mainpage', $_REQUEST['favid'],$_REQUEST['favcnt'],array('elementid'=> $elementid),$menu,$submenu);
-				
+
 				print 'page_menu["menu_'.$_REQUEST['favid'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favid']]).';';
 			}
 		}
-	}	
+	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 		exit();
@@ -169,17 +169,17 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$slides_wdgt = new CWidget('hat_slides');
-	
+
 	$elementid = get_request('elementid', null);
 	if($elementid <= 0) $elementid = null;
 
 	$text = S_SLIDESHOWS;
-		
+
 	$form = new CForm();
 	$form->setMethod('get');
-	$form->addVar('config',S_SLIDESHOWS);	
+	$form->addVar('config',S_SLIDESHOWS);
 	$form->addVar('fullscreen',$_REQUEST['fullscreen']);
-	
+
 	if(isset($_REQUEST['period']))	$form->addVar('period', $_REQUEST['period']);
 	if(isset($_REQUEST['stime']))	$form->addVar('stime', $_REQUEST['stime']);
 
@@ -219,16 +219,16 @@ include_once('include/page_header.php');
 	if(isset($elementid) && !slideshow_accessible($elementid, PERM_READ_ONLY)) access_deny();
 
 	if($cmbElements->ItemsCount() > 0) $form->addItem(array(SPACE.S_SLIDESHOW.SPACE,$cmbElements));
-	
-	
+
+
 	if((2 != $_REQUEST['fullscreen']) && !empty($elementid) && check_dynamic_items($elementid, 1)){
 		if(!isset($_REQUEST['hostid'])){
 			$_REQUEST['groupid'] = $_REQUEST['hostid'] = 0;
 		}
-		
+
 		$options = array('allow_all_hosts','monitored_hosts','with_items');
 		if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
-		
+
 		$params = array();
 		foreach($options as  $option) $params[$option] = 1;
 		$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
@@ -239,7 +239,7 @@ include_once('include/page_header.php');
 		$available_groups = $PAGE_GROUPS['groupids'];
 //		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 		$available_hosts = $PAGE_HOSTS['hostids'];
-		
+
 		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
 			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
@@ -248,15 +248,15 @@ include_once('include/page_header.php');
 
 
 		$PAGE_HOSTS['hosts']['0'] = S_DEFAULT;
-		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');		
+		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
 		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
 			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
 		}
 		$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-		
+
 	}
 ?>
-<?php	
+<?php
 	$slide_name = S_SLIDESHOW;
 	if(isset($elementid)){
 		if($element = get_slideshow_by_slideshowid($elementid)){
@@ -278,26 +278,26 @@ include_once('include/page_header.php');
 			$icon->addAction('onclick',new CScript("javascript: add2favorites('slideshowid','".$elementid."');"));
 		}
 		$icon->addOption('id','addrm_fav');
-		
+
 		$url = '?elementid='.$elementid.($_REQUEST['fullscreen']?'':'&fullscreen=1');
 		$url.=url_param('groupid').url_param('hostid');
-		
+
 		$fs_icon = new CDiv(SPACE,'fullscreen');
 		$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));	
+		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 	}
-	
+
 	$menu = array();
 	$submenu = array();
 
-// js menu arrays	
+// js menu arrays
 	make_refresh_menu('mainpage','hat_slides',get_profile('web.slides.rf_rate.hat_slides',30),array('elementid'=> $elementid),$menu,$submenu);
 
 	insert_js('var page_menu='.zbx_jsvalue($menu).";\n".
 			 'var page_submenu='.zbx_jsvalue($submenu).";\n"
-		);	
+		);
 // --------------
-	
+
 	$tab = new CTable();
 	$tab->setCellPadding(0);
 	$tab->setCellSpacing(0);
@@ -314,17 +314,17 @@ include_once('include/page_header.php');
 				'params'=> array('lastupdate' => time()),
 			));
 	add_doll_objects($refresh_tab);
-	
+
 	$refresh_icon = new CDiv(SPACE,'iconmenu');
 	$refresh_icon->addAction('onclick','javascript: create_page_menu(event,"hat_slides");');
 	$refresh_icon->addOption('title',S_MENU);
-	
+
 	if(isset($elementid)){
 		$effectiveperiod = navigation_bar_calc();
-		if( 2 != $_REQUEST['fullscreen'] ){		
+		if( 2 != $_REQUEST['fullscreen'] ){
 			$stime = time() - 31536000; // ~1year
 			$bstime = time()-$effectiveperiod;
-			
+
 			if(isset($_REQUEST['stime'])){
 				$bstime = $_REQUEST['stime'];
 				$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
@@ -340,26 +340,26 @@ include_once('include/page_header.php');
 
 	$slides_wdgt->addHeader($text, array($icon,$refresh_icon,$fs_icon));
 	$slides_wdgt->addHeader($slide_name, $form);
-	
+
 	$slides_wdgt->additem($element);
 
 	$tab->addRow($slides_wdgt,'center');
-	
+
 	$tab->show();
-	
+
 	$scroll_div = new CDiv();
 	$scroll_div->addOption('id','scroll_cntnr');
 	$scroll_div->addOption('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
 	$scroll_div->show();
-	
-/*	
+
+/*
 	$img = new CImg('images/general/tree/zero.gif','space','20','20');
 	$elements = array($img,BR());
 	print(unpack_object($elements));
 //*/
 
 	$jsmenu = new CPUMenu(null,170);
-	$jsmenu->InsertJavaScript();	
+	$jsmenu->InsertJavaScript();
 ?>
 <?php
 

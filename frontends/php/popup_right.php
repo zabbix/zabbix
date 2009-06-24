@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -25,7 +25,7 @@
 	$page["file"] = "popup_right.php";
 
 	define('ZBX_PAGE_NO_MENU', 1);
-	
+
 include_once "include/page_header.php";
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -52,13 +52,13 @@ include_once "include/page_header.php";
 
 		$cmbResourceNode = new CComboBox('nodeid',$nodeid,'submit();');
 		$cmbResourceNode->AddItem(0, S_ALL_S);
-		
+
 		$sql = 'SELECT name,nodeid FROM nodes WHERE '.DBcondition('nodeid',$available_nodes);
 		$db_nodes = DBselect($sql);
 		while($node = DBfetch($db_nodes)){
 			$cmbResourceNode->AddItem($node['nodeid'], $node['name']);
 		}
-		
+
 		$frmTitle->AddItem(array(S_NODE, SPACE, $cmbResourceNode));
 	}
 
@@ -69,7 +69,7 @@ include_once "include/page_header.php";
 
 	$table = new CTableInfo(S_NO_RESOURCES_DEFINED);
 	$table->SetHeader(new CCol(array(new CCheckBox("all_groups", NULL, 'check_all(this.checked)'),S_NAME)));
-	
+
 
 	$count=0;
 	$result = DBselect('SELECT n.name as node_name, g.name as name, g.groupid '.
@@ -77,23 +77,23 @@ include_once "include/page_header.php";
 						' LEFT JOIN nodes n on '.DBid2nodeid('g.groupid').'=n.nodeid '.
 					($nodeid?' WHERE nodeid='.$nodeid:'').
 					' ORDER BY n.name, g.name');
-	
+
 	$grouplist = array();
 	while($row = DBfetch($result)){
 		if(isset($row['node_name']))
 			$row['name'] = $row['node_name'].':'.$row['name'];
-			
+
 		$grouplist[$count] = array('groupid' => $row['groupid'], 'name' => $row['name'], 'permission' => $permission);
 		$table->addRow(	new CCol(array(new CCheckBox('groups['.$count.']', NULL, NULL, $count), $row['name'])));
 		$count++;
 	}
 
 	insert_js('var grouplist = '.zbx_jsvalue($grouplist).';');
-	
+
 	$button = new CButton('select', S_SELECT, 'add_groups("'.$dstfrm.'")');
 	$button->setType('button');
 	$table->setFooter(new CCol($button,'right'));
-	
+
 	$form->addItem($table);
 	$form->show();
 
@@ -105,7 +105,7 @@ function add_groups(formname) {
 
 	if(!parent_document) return close_window();
 
-	$('groups').getInputs("checkbox").each( 
+	$('groups').getInputs("checkbox").each(
 		function(box){
 			if(box.checked && (box.name != "all_groups")){
 				var groupid = grouplist[box.value].groupid;
@@ -114,7 +114,7 @@ function add_groups(formname) {
 			}
 		});
 	parent_document.forms[formname].submit();
-	close_window();	
+	close_window();
 }
 
 function check_all(value) {
