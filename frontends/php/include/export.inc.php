@@ -25,7 +25,7 @@
 
 	$ZBX_EXPORT_MAP = array(
 		XML_TAG_HOST => array(
-			'attribures'	=> array(
+			'attributes'	=> array(
 				'host'		=> 'name'),
 			'elements'	=> array(
 				'proxy'		=> '',
@@ -36,7 +36,7 @@
 				'status'	=> '')
 			),
 		XML_TAG_HOSTPROFILE => array(
-			'attribures'	=> array(),
+			'attributes'	=> array(),
 			'elements'	=> array(
 				'devicetype'	=> '',
 				'name'		=> '',
@@ -51,7 +51,7 @@
 				'notes'		=> '')
 			),
 		XML_TAG_HOSTPROFILE_EXT => array(
-			'attribures'		=> array(),
+			'attributes'		=> array(),
 			'elements'		=> array(
 				'device_alias'		=> '',
 				'device_type'		=> '',
@@ -115,13 +115,13 @@
 				'poc_2_notes'		=> '')
 			),
 		XML_TAG_DEPENDENCY => array(
-			'attribures'	=> array(
+			'attributes'	=> array(
 				'dependency'	=> 'description'),
 			'elements'	=> array(
 				'depends'	=> '')
 			),
 		XML_TAG_ITEM => array(
-			'attribures'	=> array(
+			'attributes'	=> array(
 				'type'			=> '',
 				'key_'			=> 'key',
 				'value_type'		=> ''),
@@ -151,7 +151,7 @@
 				'snmpv3_privpassphrase'	=> '')
 			),
 		XML_TAG_TRIGGER => array(
-			'attribures'	=> array(),
+			'attributes'	=> array(),
 			'elements'	=> array(
 				'description'		=> '',
 				'type'			=> '',
@@ -162,7 +162,7 @@
 				'comments'		=> '')
 			),
 		XML_TAG_GRAPH => array(
-			'attribures'	=> array(
+			'attributes'	=> array(
 				'name'			=> '',
 				'width'			=> '',
 				'height'		=> ''),
@@ -182,7 +182,7 @@
 				'percent_right'		=> '')
 			),
 		XML_TAG_GRAPH_ELEMENT => array(
-			'attribures'	=> array(
+			'attributes'	=> array(
 				'item'		=> ''),
 			'elements'	=> array(
 				'drawtype'	=> '',
@@ -248,7 +248,7 @@
 
 			$map =& $ZBX_EXPORT_MAP[XML_TAG_ITEM];
 
-			foreach($map['attribures'] as $db_name => $xml_name){
+			foreach($map['attributes'] as $db_name => $xml_name){
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
 			}
@@ -290,7 +290,7 @@
 
 			$map =& $ZBX_EXPORT_MAP[XML_TAG_TRIGGER];
 
-			foreach($map['attribures'] as $db_name => $xml_name){
+			foreach($map['attributes'] as $db_name => $xml_name){
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
 			}
@@ -322,7 +322,7 @@
 
 			$map =& $ZBX_EXPORT_MAP[XML_TAG_GRAPH_ELEMENT];
 
-			foreach($map['attribures'] as $db_name => $xml_name){
+			foreach($map['attributes'] as $db_name => $xml_name){
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
 			}
@@ -373,7 +373,7 @@
 
 			$map =& $ZBX_EXPORT_MAP[XML_TAG_GRAPH];
 
-			foreach($map['attribures'] as $db_name => $xml_name){
+			foreach($map['attributes'] as $db_name => $xml_name){
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
 			}
@@ -415,7 +415,7 @@
 
 			$map =& $ZBX_EXPORT_MAP[XML_TAG_HOST];
 
-			foreach($map['attribures'] as $db_name => $xml_name){
+			foreach($map['attributes'] as $db_name => $xml_name){
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
 			}
@@ -446,7 +446,7 @@
 
 				$map =& $ZBX_EXPORT_MAP[XML_TAG_HOSTPROFILE];
 
-				foreach($map['attribures'] as $db_name => $xml_name){
+				foreach($map['attributes'] as $db_name => $xml_name){
 					if(empty($xml_name)) $xml_name = $db_name;
 					zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
 				}
@@ -468,7 +468,7 @@
 
 				$map =& $ZBX_EXPORT_MAP[XML_TAG_HOSTPROFILE_EXT];
 
-				foreach($map['attribures'] as $db_name => $xml_name){
+				foreach($map['attributes'] as $db_name => $xml_name){
 					if(empty($xml_name)) $xml_name = $db_name;
 					zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
 				}
@@ -555,7 +555,7 @@
 
 			$map =& $ZBX_EXPORT_MAP[XML_TAG_DEPENDENCY];
 
-			foreach($map['attribures'] as $db_name => $xml_name){
+			foreach($map['attributes'] as $db_name => $xml_name){
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
 			}
