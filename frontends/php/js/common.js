@@ -598,19 +598,22 @@ var MMenu = {
 menus:			{'empty': 0, 'view': 0, 'cm': 0, 'reports': 0, 'config': 0, 'admin': 0},
 def_label:		null,
 sub_active: 	false,
-timeout: 		null,
+timeout_reset:	null,
+timeout_change:	null,
 
 mouseOver: function(show_label){
-	clearTimeout(this.timeout);
-	MMenu.showSubMenu(show_label);
+	clearTimeout(this.timeout_reset);
+	this.timeout_change = setTimeout('MMenu.showSubMenu("'+show_label+'")', 150);
 },
 
 submenu_mouseOver: function(){
-	clearTimeout(this.timeout);
+	clearTimeout(this.timeout_reset);
+	clearTimeout(this.timeout_change);
 },
 
 mouseOut: function(){
-	this.timeout = setTimeout('MMenu.showSubMenu("'+this.def_label+'")', 2000);
+	clearTimeout(this.timeout_change);
+	this.timeout_reset = setTimeout('MMenu.showSubMenu("'+this.def_label+'")', 3000);
 },
 
 showSubMenu: function(show_label){
