@@ -348,8 +348,8 @@
 			}
 			$table->addRow(array(new CCol(S_TYPE,'header'), $cmbType));
 			$table->addRow(array(new CCol(S_HOST,'header'), new CTextBox('server',		$this->getConfig('DB_SERVER',	'localhost'))));
-			$table->addRow(array(new CCol(S_PORT,'header'), array(new CNumericBox('port',		$this->getConfig('DB_PORT',	'0'),5),' 0 - use default port')));
-			$table->addRow(array(new CCol(S_NAME,'header'), new CTextBox('database',		$this->getConfig('DB_DATABASE',	'zabbix'))));
+			$table->addRow(array(new CCol(S_PORT,'header'), array(new CNumericBox('port',	$this->getConfig('DB_PORT',	'0'),5),' 0 - use default port')));
+			$table->addRow(array(new CCol(S_NAME,'header'), new CTextBox('database',	$this->getConfig('DB_DATABASE',	'zabbix'))));
 			$table->addRow(array(new CCol(S_USER,'header'), new CTextBox('user',		$this->getConfig('DB_USER',	'root'))));
 			$table->addRow(array(new CCol(S_PASSWORD,'header'), new CPassBox('password',	$this->getConfig('DB_PASSWORD',	''))));
 
@@ -426,11 +426,11 @@
 
 			$table = new CTable(null, 'requirements');
 			$table->setAlign('center');
-			$table->addRow(array(new CCol('Database type:','header'),		$allowed_db[$this->getConfig('DB_TYPE',	'unknown')]));
-			$table->addRow(array(new CCol('Database server:','header'),	$this->getConfig('DB_SERVER',	'unknown')));
-			$table->addRow(array(new CCol('Database port:','header'),		$this->getConfig('DB_PORT',	'0')));
-			$table->addRow(array(new CCol('Database name:','header'),		$this->getConfig('DB_DATABASE',	'unknown')));
-			$table->addRow(array(new CCol('Database user:','header'),		$this->getConfig('DB_USER',	'unknown')));
+			$table->addRow(array(new CCol('Database type:','header'),	$allowed_db[$this->getConfig('DB_TYPE',	'unknown')]));
+			$table->addRow(array(new CCol('Database server:','header'),	$this->getConfig('DB_SERVER',		'unknown')));
+			$table->addRow(array(new CCol('Database port:','header'),	$this->getConfig('DB_PORT',		'0')));
+			$table->addRow(array(new CCol('Database name:','header'),	$this->getConfig('DB_DATABASE',		'unknown')));
+			$table->addRow(array(new CCol('Database user:','header'),	$this->getConfig('DB_USER',		'unknown')));
 			$table->addRow(array(new CCol('Database password:','header'),	ereg_replace('.','*',$this->getConfig('DB_PASSWORD',	'unknown'))));
 			/* $table->addRow(array(new CCol('Distributed monitoring','header'),	$this->getConfig('distributed', null) ? 'Enabled' : 'Disabled')); */
 
@@ -441,7 +441,7 @@
 
 			$table->addRow(BR());
 
-			$table->addRow(array(new CCol('ZABBIX server:','header'),		$this->getConfig('ZBX_SERVER',		'unknown')));
+			$table->addRow(array(new CCol('ZABBIX server:','header'),	$this->getConfig('ZBX_SERVER',		'unknown')));
 			$table->addRow(array(new CCol('ZABBIX server port:','header'),	$this->getConfig('ZBX_SERVER_PORT',	'unknown')));
 			return array(
 				'Please check configuration parameters.', BR(),
@@ -504,7 +504,7 @@
 
 		function stage7(){
 			return array(
-				'Congratulation with succesfull instalation of ZABBIX frontend.',BR(),BR(),
+				'Congratulations with successfull instalation of ZABBIX frontend.',BR(),BR(),
 				'Press "Finish" button to complete installation'
 				);
 		}
@@ -527,9 +527,9 @@
 			if(is_null($DB['TYPE']))	return false;
 
 			$DB['SERVER']	= $this->getConfig('DB_SERVER',		'localhost');
-			$DB['PORT']		= $this->getConfig('DB_PORT',		'0');
+			$DB['PORT']	= $this->getConfig('DB_PORT',		'0');
 			$DB['DATABASE']	= $this->getConfig('DB_DATABASE',	'zabbix');
-			$DB['USER']		= $this->getConfig('DB_USER',		'root');
+			$DB['USER']	= $this->getConfig('DB_USER',		'root');
 			$DB['PASSWORD']	= $this->getConfig('DB_PASSWORD',	'');
 
 			$error = '';
@@ -552,11 +552,11 @@
 			global $DB;
 
 			if(isset($old_DB)){
-				$DB['TYPE']		= $old_DB_TYPE;
+				$DB['TYPE']	= $old_DB_TYPE;
 				$DB['SERVER']	= $old_DB_SERVER;
-				$DB['PORT']		= $old_DB_PORT;
+				$DB['PORT']	= $old_DB_PORT;
 				$DB['DATABASE']	= $old_DB_DATABASE;
-				$DB['USER']		= $old_DB_USER;
+				$DB['USER']	= $old_DB_USER;
 				$DB['PASSWORD']	= $old_DB_PASSWORD;
 			}
 
@@ -685,12 +685,12 @@
 					isset($ZBX_SERVER) &&
 					isset($ZBX_SERVER_PORT) &&
 					isset($IMAGE_FORMAT_DEFAULT) &&
-					$DB['TYPE']		== $this->getConfig('DB_TYPE',				null) &&
-					$DB['SERVER']		== $this->getConfig('DB_SERVER',			null) &&
-					$DB['PORT']		== $this->getConfig('DB_PORT',				null) &&
-					$DB['DATABASE']		== $this->getConfig('DB_DATABASE',			null) &&
-					$DB['USER']		== $this->getConfig('DB_USER',				null) &&
-					$DB['PASSWORD']		== $this->getConfig('DB_PASSWORD',			null)
+					$DB['TYPE']		== $this->getConfig('DB_TYPE',		null) &&
+					$DB['SERVER']		== $this->getConfig('DB_SERVER',	null) &&
+					$DB['PORT']		== $this->getConfig('DB_PORT',		null) &&
+					$DB['DATABASE']		== $this->getConfig('DB_DATABASE',	null) &&
+					$DB['USER']		== $this->getConfig('DB_USER',		null) &&
+					$DB['PASSWORD']		== $this->getConfig('DB_PASSWORD',	null)
 					)
 				{
 					if(!DBconnect($error_msg)){
@@ -715,14 +715,14 @@
 
 			if(isset($old_DB)){
 				$DB['TYPE']		= $old_DB_TYPE;
-				$DB['SERVER']	= $old_DB_SERVER;
+				$DB['SERVER']		= $old_DB_SERVER;
 				$DB['PORT']		= $old_DB_PORT;
-				$DB['DATABASE']	= $old_DB_DATABASE;
+				$DB['DATABASE']		= $old_DB_DATABASE;
 				$DB['USER']		= $old_DB_USER;
-				$DB['PASSWORD']	= $old_DB_PASSWORD;
+				$DB['PASSWORD']		= $old_DB_PASSWORD;
 
-				$ZBX_SERVER	= $old_ZBX_SERVER;
-				$ZBX_SERVER_PORT= $old_ZBX_SERVER_PORT;
+				$ZBX_SERVER		= $old_ZBX_SERVER;
+				$ZBX_SERVER_PORT	= $old_ZBX_SERVER_PORT;
 			}
 
 			DBconnect($error2);
