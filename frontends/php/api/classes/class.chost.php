@@ -15,23 +15,23 @@ class CHost {
 	 *
 	 * <code>
 	 * $def_options = array(
-	 * 	string 'nodeid' 					=> 'node ID,
-	 * 	array 'groupids' 					=> array(groupid1, groupid2, ...),
-	 * 	array 'hostids' 					=> array(hostid1, hostid2, ...),
-	 * 	boolean 'monitored_hosts'			=> 'only monitored hosts',
-	 *	boolean 'templated_hosts'			=> 'include templates in result',
-	 * 	boolean 'with_items' 				=> 'only with items',
-	 * 	boolean 'with_monitored_items' 		=> 'only with monitored items',
-	 * 	boolean 'with_historical_items'		=> 'only with historical items',
-	 * 	boolean 'with_triggers' 			=> 'only with triggers',
-	 * 	boolean 'with_monitored_triggers'	=> 'only with monitores triggers',
-	 * 	boolean 'with_httptests' 			=> 'only with http tests',
-	 * 	boolean 'with_monitored_httptests'	=> 'only with monitores http tests',
-	 * 	boolean 'with_graphs'				=> 'only with graphs',
-	 *	int 'count'							=> 'count hosts, returned column name is rowscount',
-	 *  string  'pattern'					=> 'search hosts by pattern in host names',
-	 *  integer 'limit'						=> 'limit selection',
-	 *  string  'order'						=> 'depricated parametr (for now)'
+	 *	string 'nodeid'				=> 'node ID,
+	 *	array 'groupids'			=> array(groupid1, groupid2, ...),
+	 *	array 'hostids'				=> array(hostid1, hostid2, ...),
+	 *	boolean 'monitored_hosts'		=> 'only monitored hosts',
+	 *	boolean 'templated_hosts'		=> 'include templates in result',
+	 *	boolean 'with_items'			=> 'only with items',
+	 *	boolean 'with_monitored_items'		=> 'only with monitored items',
+	 *	boolean 'with_historical_items'		=> 'only with historical items',
+	 *	boolean 'with_triggers'			=> 'only with triggers',
+	 *	boolean 'with_monitored_triggers'	=> 'only with monitores triggers',
+	 *	boolean 'with_httptests'		=> 'only with http tests',
+	 *	boolean 'with_monitored_httptests'	=> 'only with monitores http tests',
+	 *	boolean 'with_graphs'			=> 'only with graphs',
+	 *	int 'count'				=> 'count hosts, returned column name is rowscount',
+	 *	string 'pattern'			=> 'search hosts by pattern in host names',
+	 *	integer 'limit'				=> 'limit selection',
+	 *	string 'order'				=> 'depricated parametr (for now)'
 	 * );
 	 * </code>
 	 *
@@ -51,24 +51,24 @@ class CHost {
 			);
 
 		$def_options = array(
-			'nodeid'					=>		0,
-			'groupids'					=>		0,
-			'hostids'					=>		0,
-			'monitored_hosts'			=>		0,
-			'templated_hosts'			=>		0,
-			'with_items'				=>		0,
+			'nodeid'			=>		0,
+			'groupids'			=>		0,
+			'hostids'			=>		0,
+			'monitored_hosts'		=>		0,
+			'templated_hosts'		=>		0,
+			'with_items'			=>		0,
 			'with_monitored_items'		=>		0,
 			'with_historical_items'		=>		0,
-			'with_triggers'				=>		0,
+			'with_triggers'			=>		0,
 			'with_monitored_triggers'	=>		0,
-			'with_httptests'			=>		0,
+			'with_httptests'		=>		0,
 			'with_monitored_httptests'	=>		0,
-			'with_graphs'				=>		0,
-			'permission'				=>		0,
-			'count'						=>		0,
-			'pattern'					=>		'',
-			'order' 					=>		0,
-			'limit'						=>		0,
+			'with_graphs'			=>		0,
+			'permission'			=>		0,
+			'count'				=>		0,
+			'pattern'			=>		'',
+			'order' 			=>		0,
+			'limit'				=>		0,
 			);
 
 		$def_options = array_merge($def_options, $options);
@@ -282,21 +282,21 @@ class CHost {
 	 *
 	 * <code>
 	 * $hosts = array(
-	 * 	*string 'host' => 'host name [0]',
+	 *	*string 'host' => 'host name [0]',
 	 *	*array 'groupids' => 'groupids add host to',
-	 * 	int 'port' => 'port [0]',
-	 * 	int 'status' => 0,
-	 * 	int 'useip' => 0,
-	 * 	string 'dns' => '',
-	 * 	string 'ip' => '0.0.0.0',
-	 * 	int 'proxy_hostid' => 0,
-	 * 	int 'useipmi' => 0,
-	 * 	string 'ipmi_ip' => '',
-	 * 	int 'ipmi_port' => 623,
-	 * 	int 'ipmi_authtype' => 0,
-	 * 	int 'ipmi_privilege' => 0,
-	 * 	string 'ipmi_username' => '',
-	 * 	string 'ipmi_password' => '',
+	 *	int 'port' => 'port [0]',
+	 *	int 'status' => 0,
+	 *	int 'useip' => 0,
+	 *	string 'dns' => '',
+	 *	string 'ip' => '0.0.0.0',
+	 *	int 'proxy_hostid' => 0,
+	 *	int 'useipmi' => 0,
+	 *	string 'ipmi_ip' => '',
+	 *	int 'ipmi_port' => 623,
+	 *	int 'ipmi_authtype' => 0,
+	 *	int 'ipmi_privilege' => 0,
+	 *	string 'ipmi_username' => '',
+	 *	string 'ipmi_password' => '',
 	 * );
 	 * </code>
 	 *
