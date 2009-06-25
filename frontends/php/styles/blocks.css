@@ -58,7 +58,7 @@ div#scroll{
 img#scroll_calendar{
 	position: absolute;
 	top: -12px;
-	left: 0px;	
+	left: 0px;
 }
 
 img#scroll_calendar:hover{
@@ -80,7 +80,7 @@ div#scrolltabright{
 	top: -15px;
 	right: 0px;
 	font-family:Verdana, Arial, Helvetica, sans-serif;
-	font-size:10px;	
+	font-size:10px;
 	font-weight:bold;
 /*	background-color:#FFF; */
 }
@@ -90,15 +90,15 @@ div#scrolltabright_flag {
 	top: -15px;
 	right: 160px;
 	font-family:Verdana, Arial, Helvetica, sans-serif;
-	font-size:10px;	
+	font-size:10px;
 	font-weight:bold;
 }
 
 div#scroll_left{
-	background-image: url(../images/general/bar/left.gif); 
-	background-repeat:no-repeat; 
-	width:17px; 
-	height: 17px; 
+	background-image: url(../images/general/bar/left.gif);
+	background-repeat:no-repeat;
+	width:17px;
+	height: 17px;
 	float: left;
 }
 
@@ -107,10 +107,10 @@ div#scroll_left:hover{
 }
 
 div#scroll_right{
-	background-image: url(../images/general/bar/right.gif); 
-	background-repeat:no-repeat; 
-	width:17px; 
-	height: 17px; 
+	background-image: url(../images/general/bar/right.gif);
+	background-repeat:no-repeat;
+	width:17px;
+	height: 17px;
 	float: left;
 }
 
@@ -119,14 +119,14 @@ div#scroll_right:hover{
 }
 
 div#scroll_middle{
-	background-image: url(../images/general/bar/bg.gif); 
-	height: 17px; 
+	background-image: url(../images/general/bar/bg.gif);
+	height: 17px;
 	float: left;
 }
 
 div#scroll_bar{
-	position: absolute; 
-	bottom: 0px; 
+	position: absolute;
+	bottom: 0px;
 	left: 17px;
 }
 
@@ -139,9 +139,9 @@ div#arrow_l{
 	position:absolute;
 	bottom: 0px;
 	display:none;
-	background-image:url(../images/general/bar/arrow_l.gif); 
-	background-repeat:no-repeat; 
-	width: 12px; 
+	background-image:url(../images/general/bar/arrow_l.gif);
+	background-repeat:no-repeat;
+	width: 12px;
 	height:17px;
 }
 
@@ -153,9 +153,9 @@ div#arrow_r{
 	position:absolute;
 	bottom: 0px;
 	display:none;
-	background-image:url(../images/general/bar/arrow_r.gif); 
-	background-repeat:no-repeat; 
-	width: 12px; 
+	background-image:url(../images/general/bar/arrow_r.gif);
+	background-repeat:no-repeat;
+	width: 12px;
 	height:17px;
 }
 
@@ -164,40 +164,40 @@ div#arrow_r:hover{
 }
 
 div#bar_left{
-	background-image: url(../images/general/bar/bar_left.gif); 
-	background-repeat:no-repeat; 
-	width:2px; 
-	height: 17px; 
+	background-image: url(../images/general/bar/bar_left.gif);
+	background-repeat:no-repeat;
+	width:2px;
+	height: 17px;
 	float: left;
 }
 
 div#bar_bg_l{
-	background-image: url(../images/general/bar/bar_bg.gif); 
-	width:26px; 
-	height: 17px; 
+	background-image: url(../images/general/bar/bar_bg.gif);
+	width:26px;
+	height: 17px;
 	float: left;
 }
 
 div#bar_middle{
-	background-image: url(../images/general/bar/bar_middle.gif); 
-	background-repeat:no-repeat; 
-	width:8px; 
-	height: 17px; 
+	background-image: url(../images/general/bar/bar_middle.gif);
+	background-repeat:no-repeat;
+	width:8px;
+	height: 17px;
 	float: left;
 }
 
 div#bar_bg_r{
-	background-image: url(../images/general/bar/bar_bg.gif); 
-	width:26px; 
-	height: 17px; 
+	background-image: url(../images/general/bar/bar_bg.gif);
+	width:26px;
+	height: 17px;
 	float: left;
 }
 
 div#bar_right{
-	background-image: url(../images/general/bar/bar_right.gif); 
-	background-repeat:no-repeat; 
-	width:2px; 
-	height: 17px; 
+	background-image: url(../images/general/bar/bar_right.gif);
+	background-repeat:no-repeat;
+	width:2px;
+	height: 17px;
 	float: left;
 }
 
@@ -595,7 +595,7 @@ span#gmenu_period_type{
 
 div#selection_box{
 	position: absolute;
-	
+
 	-moz-opacity:.40;
 	filter:alpha(opacity=40);
 	opacity:.40;
@@ -609,18 +609,18 @@ div#selection_box{
 
 div.box_on{
 	position: absolute;
-	z-index:2;	
+	z-index:2;
 /*	border: 1px red solid;
 /*	background-color:#FF0000;
 /**/
 }
 
 span#period_span{
-	font-weight: bold; 
-	font-size: 11px; 
-	color: #FFFFFF; 
-	position: absolute; 
-	top: 2px; 
+	font-weight: bold;
+	font-size: 11px;
+	color: #FFFFFF;
+	position: absolute;
+	top: 2px;
 	right: 4px;
 	text-decoration:none;
 }
