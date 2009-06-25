@@ -11,26 +11,26 @@ class CGraph {
 	public static $error;
 
 	/**
-	 * Get graph data
-	 *
-	 * <code>
-	 * $options = array(
-	 * 	array 'graphids' 					=> array(graphid1, graphid2, ...),
-	 * 	array 'itemids' 					=> array(itemid1, itemid2, ...),
-	 * 	array 'hostids' 					=> array(hostid1, hostid2, ...),
-	 * 	int 'type' 							=> 'graph type, chart/pie'
-	 *	boolean 'templated_graphs'			=> 'only templated graphs',
-	 *	int 'count'							=> 'count',
-	 *  string  'pattern'					=> 'search hosts by pattern in graph names',
-	 *  integer 'limit'						=> 'limit selection',
-	 *  string  'order'						=> 'depricated parameter (for now)'
-	 * );
-	 * </code>
-	 *
-	 * @static
-	 * @param array $options
-	 * @return array|boolean host data as array or false if error
-	 */
+	* Get graph data
+	*
+	* <code>
+	* $options = array(
+	*	array 'graphids'				=> array(graphid1, graphid2, ...),
+	*	array 'itemids'					=> array(itemid1, itemid2, ...),
+	*	array 'hostids'					=> array(hostid1, hostid2, ...),
+	*	int 'type'					=> 'graph type, chart/pie'
+	*	boolean 'templated_graphs'			=> 'only templated graphs',
+	*	int 'count'					=> 'count',
+	*	string 'pattern'				=> 'search hosts by pattern in graph names',
+	*	integer 'limit'					=> 'limit selection',
+	*	string 'order'					=> 'depricated parameter (for now)'
+	* );
+	* </code>
+	*
+	* @static
+	* @param array $options
+	* @return array|boolean host data as array or false if error
+	*/
 	public static function get($options=array()){
 
 		$result = array();
@@ -50,7 +50,7 @@ class CGraph {
 			'itemids' 			=> array(),
 			'hostids' 			=> array(),
 			'type' 				=> false,
-			'templated_graphs'	=> false,
+			'templated_graphs'		=> false,
 			'count'				=> false,
 			'pattern'			=> '',
 			'limit'				=> false,
@@ -190,22 +190,22 @@ class CGraph {
 	 *
 	 * <code>
 	 * $graphs = array(
-	 * 	*string 'name' 			=> null,
-	 * 	int 'width' 			=> 900,
-	 * 	int 'height' 			=> 200,
-	 * 	int 'ymin_type' 		=> 0,
-	 * 	int 'ymax_type' 		=> 0,
-	 * 	int 'yaxismin' 			=> 0,
-	 * 	int 'yaxismax' 			=> 100,
-	 * 	int 'ymin_itemid' 		=> 0,
-	 * 	int 'ymax_itemid' 		=> 0,
-	 * 	int 'show_work_period' 	=> 1,
-	 * 	int 'show_triggers' 	=> 1,
-	 * 	int 'graphtype' 		=> 0,
-	 * 	int 'show_legend' 		=> 0,
-	 * 	int 'show_3d' 			=> 0,
-	 * 	int 'percent_left' 		=> 0,
-	 * 	int 'percent_right' 	=> 0
+	 * 	*string 'name'			=> null,
+	 * 	int 'width'			=> 900,
+	 * 	int 'height'			=> 200,
+	 * 	int 'ymin_type'			=> 0,
+	 * 	int 'ymax_type'			=> 0,
+	 * 	int 'yaxismin'			=> 0,
+	 * 	int 'yaxismax'			=> 100,
+	 * 	int 'ymin_itemid'		=> 0,
+	 * 	int 'ymax_itemid'		=> 0,
+	 * 	int 'show_work_period'		=> 1,
+	 * 	int 'show_triggers'		=> 1,
+	 * 	int 'graphtype'			=> 0,
+	 * 	int 'show_legend'		=> 0,
+	 * 	int 'show_3d'			=> 0,
+	 * 	int 'percent_left'		=> 0,
+	 * 	int 'percent_right'		=> 0
 	 * );
 	 * </code>
 	 *
@@ -224,23 +224,23 @@ class CGraph {
 		foreach($graphs as $graph){
 
 			$graph_db_fields = array(
-				'name' 				=> null,
-				'width' 			=> 900,
-				'height' 			=> 200,
-				'ymin_type' 		=> 0,
-				'ymax_type' 		=> 0,
-				'yaxismin' 			=> 0,
-				'yaxismax' 			=> 100,
-				'ymin_itemid' 		=> 0,
-				'ymax_itemid' 		=> 0,
-				'showworkperiod' 	=> 1,
-				'showtriggers' 		=> 1,
-				'graphtype' 		=> 0,
-				'legend' 			=> 0,
-				'graph3d' 			=> 0,
-				'percent_left' 		=> 0,
-				'percent_right' 	=> 0,
-				'templateid' 		=> 0,
+				'name'			=> null,
+				'width'			=> 900,
+				'height'		=> 200,
+				'ymin_type'		=> 0,
+				'ymax_type'		=> 0,
+				'yaxismin'		=> 0,
+				'yaxismax'		=> 100,
+				'ymin_itemid'		=> 0,
+				'ymax_itemid'		=> 0,
+				'showworkperiod'	=> 1,
+				'showtriggers'		=> 1,
+				'graphtype'		=> 0,
+				'legend'		=> 0,
+				'graph3d'		=> 0,
+				'percent_left'		=> 0,
+				'percent_right'		=> 0,
+				'templateid'		=> 0,
 			);
 
 			if(!check_db_fields($graph_db_fields, $graph)){
@@ -318,14 +318,14 @@ class CGraph {
 	 * 	*string 'graphid'		=> null,
 	 * 	array 'items' 			=> (
 	 *		'item1' => array(
-	 * 			*int 'itemid' 			=> null,
-	 * 			int 'color' 			=> '000000',
-	 * 			int 'drawtype' 			=> 0,
-	 * 			int 'sortorder' 		=> 0,
-	 * 			int 'yaxisside' 		=> 1,
-	 * 			int 'calc_fnc' 			=> 2,
-	 * 			int 'type' 				=> 0,
-	 * 			int 'periods_cnt' 		=> 5,
+	 * 			*int 'itemid'			=> null,
+	 * 			int 'color'			=> '000000',
+	 * 			int 'drawtype'			=> 0,
+	 * 			int 'sortorder'			=> 0,
+	 * 			int 'yaxisside'			=> 1,
+	 * 			int 'calc_fnc'			=> 2,
+	 * 			int 'type'			=> 0,
+	 * 			int 'periods_cnt'		=> 5,
 	 *		), ... )
 	 * );
 	 * </code>
@@ -349,14 +349,14 @@ class CGraph {
 		foreach($items_tmp as $item){
 
 			$graph_db_fields = array(
-				'itemid' 		=> null,
-				'color' 		=> '000000',
-				'drawtype' 		=> 0,
-				'sortorder' 	=> 0,
-				'yaxisside' 	=> 1,
-				'calc_fnc' 		=> 2,
-				'type' 			=> 0,
-				'periods_cnt' 	=> 5
+				'itemid'	=> null,
+				'color'		=> '000000',
+				'drawtype'	=> 0,
+				'sortorder'	=> 0,
+				'yaxisside'	=> 1,
+				'calc_fnc'	=> 2,
+				'type'		=> 0,
+				'periods_cnt'	=> 5
 			);
 
 			if(!check_db_fields($graph_db_fields, $item)){
