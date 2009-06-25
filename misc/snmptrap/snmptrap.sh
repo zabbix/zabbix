@@ -50,4 +50,3 @@ community=`echo $community|cut -f2 -d'"'`
 str="$hostname $address $community $enterprise $oid"
 
 $ZABBIX_SENDER -z $ZABBIX_SERVER -p $ZABBIX_PORT -s $HOST -k $KEY -o "$str"
-
