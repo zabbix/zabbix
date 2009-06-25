@@ -33,11 +33,11 @@ div.warning{
 
 div.onajaxload{
 	position: absolute;
-	background-color:#000000; 
-	
+	background-color:#000000;
+
 	filter:alpha(opacity=05);
 	opacity:.05;
-	
+
 	cursor:wait;
 	z-index: 50;
 }
@@ -182,7 +182,7 @@ div.filteropened{
 	background-repeat:no-repeat;
 }
 
-div.filteropened:hover{         
+div.filteropened:hover{
 	cursor:pointer;
 }
 
@@ -258,10 +258,10 @@ span.footer_sign{
 	padding-left: 5px;
 }
 
-span.divider{	
-	color: #000000;	
-	font-family: Verdana, Arial, sans-serif; 
-	font-size: 10px; 
+span.divider{
+	color: #000000;
+	font-family: Verdana, Arial, sans-serif;
+	font-size: 10px;
 	font-weight: normal;
 }
 
@@ -300,9 +300,9 @@ span.info{
 
 /*********** Node Tree ****************/
 
-div #div_node_tree {	
-	background-color: gray;	
-	position: absolute;	
+div #div_node_tree {
+	background-color: gray;
+	position: absolute;
 	border: 2px solid black;
 	right: 0px;
 }

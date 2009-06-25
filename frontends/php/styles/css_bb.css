@@ -4,14 +4,14 @@
 @media print {
 	body{
 		background-color:#A5A5A5;
-	} 
+	}
 }
 
 @media screen {
 	body{
 		background-color:#353535;
 		color: #0088FF;
-	} 
+	}
 }
 
 .delimiter{
@@ -22,12 +22,12 @@
 	color: #0088FF;
 }
 
-.pum_oheader { 
+.pum_oheader {
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
 .right_header {
-	border-color: #222; 
+	border-color: #222;
 }
 
 
@@ -136,52 +136,52 @@ table.page_footer{
 
 table.formtable tr td.form_row_first{
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-	border-color: #222; 
+	border-color: #222;
 }
 
 table.formtable tr td.form_row_last {
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-	border-color: #222; 
+	border-color: #222;
 }
 
 table.formtable tr td.form_row_l { /* left cell */
-	border-color: #222; 
+	border-color: #222;
 }
 
 table.formtable tr td.form_row_c { /* center cell */
-	border-color: #222; 
+	border-color: #222;
 }
 
 table.formtable tr td.form_row_r { /* right cell */
-	border-color: #222; 
+	border-color: #222;
 }
 
 td.form_row_l_simple { /* left cell simple */
-	border-color: #222; 
+	border-color: #222;
 }
 
 td.form_row_r_simple { /* right cell simple */
-	border-color: #222; 
+	border-color: #222;
 }
 
 table.formlongtable tr td.form_row_first{
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-	border-color: #222; 
+	border-color: #222;
 }
 
 table.formlongtable tr td.form_row_last {
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-	border-color: #222; 
+	border-color: #222;
 }
 
 table.formlongtable tr td.form_row_l { /* left cell */
 	border-color:	#222;
 }
 table.formlongtable tr td.form_row_c { /* center cell */
-	border-color: #222; 
+	border-color: #222;
 }
 table.formlongtable tr td.form_row_r { /* right cell */
-	border-color: #222; 
+	border-color: #222;
 }
 
 table.tabletree tr.footer td {
@@ -189,9 +189,9 @@ table.tabletree tr.footer td {
 }
 
 table.tableinfo{
-	border-spacing: 1px; 
+	border-spacing: 1px;
 	background-color: #5A5A5A;
-	border: 0px #5A5A5A solid; 
+	border: 0px #5A5A5A solid;
 }
 
 table.tableinfo tr td.normal			{	background-color: #AADDDD;	border: 1px #AADDDD solid; }
@@ -225,7 +225,7 @@ table.flicker{
 }
 
 table.ack_msgs tr.title {
-	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left; 
+	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
 table.menu tr{
@@ -378,7 +378,7 @@ span.info{
 
 /*////////////////	FORMS	////////////////////*/
 
-.button:hover {	
+.button:hover {
 	border-color: #000;
 	color: #00F;
 }

@@ -1,10 +1,10 @@
 /* CSS Document */
 
 div.calendar{
-	position: absolute; 
-	width: 180px; 
-	top: 10px; 
-	right: 30px; 
+	position: absolute;
+	width: 180px;
+	top: 10px;
+	right: 30px;
 	border: 1px blue solid;
 }
 
@@ -13,9 +13,9 @@ div.calendardays{
 }
 
 div.calendartime{
-	background-color: #DDEEFF; 
-	text-align: center; 
-	padding-top: 2px; 
+	background-color: #DDEEFF;
+	text-align: center;
+	padding-top: 2px;
 	padding-bottom: 2px;
 }
 
