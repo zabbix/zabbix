@@ -16,17 +16,17 @@ class CTrigger {
 	 *
 	 * <code>
 	 * $options = array(
-	 *	array 'itemids' 			=> array(),
-	 *	array 'hostids' 			=> array(),
-	 *	array 'groupids' 			=> array(),
-	 *	array 'triggerids' 			=> array(),
-	 *	array 'applicationids' 		=> array(),
-	 *	boolean 'status' 			=> false,
-	 *	boolean 'templated_items' 	=> false,
-	 *	boolean 'count'				=> false,
-	 *	string 'pattern'			=> '',
-	 *	int 'limit' 				=> null,
-	 *	string 'order' 				=> ''
+	 *	array 'itemids'			=> array(),
+	 *	array 'hostids'			=> array(),
+	 *	array 'groupids'		=> array(),
+	 *	array 'triggerids'		=> array(),
+	 *	array 'applicationids'		=> array(),
+	 *	boolean 'status'		=> false,
+	 *	boolean 'templated_items'	=> false,
+	 *	boolean 'count'			=> false,
+	 *	string 'pattern'		=> '',
+	 *	int 'limit'			=> null,
+	 *	string 'order'			=> ''
 	 * );
 	 * </code>
 	 *
@@ -49,18 +49,18 @@ class CTrigger {
 			);
 
 		$def_options = array(
-			'triggerids' 		=> array(),
-			'itemids' 			=> array(),
-			'hostids' 			=> array(),
-			'groupids' 			=> array(),
-			'applicationids' 	=> array(),
-			'status' 			=> false,
-			'severity'			=> false,
-			'templated_triggers'=> false,
-			'count'				=> false,
-			'pattern'			=> '',
-			'limit' 			=> null,
-			'order' 			=> ''
+			'triggerids'		=> array(),
+			'itemids'		=> array(),
+			'hostids'		=> array(),
+			'groupids'		=> array(),
+			'applicationids'	=> array(),
+			'status'		=> false,
+			'severity'		=> false,
+			'templated_triggers'	=> false,
+			'count'			=> false,
+			'pattern'		=> '',
+			'limit'			=> null,
+			'order'			=> ''
 		);
 
 		$options = array_merge($def_options, $options);
@@ -265,11 +265,11 @@ class CTrigger {
 	 * array( array(
 	 * 	*'expression'	=> *,
 	 * 	*'description'	=> *,
-	 * 	'type'			=> 0,
-	 * 	'priority'		=> 1,
-	 * 	'status'		=> TRIGGER_STATUS_ACTIVE,
-	 * 	'comments'		=> '',
-	 * 	'url'			=> '',
+	 * 	'type'		=> 0,
+	 * 	'priority'	=> 1,
+	 * 	'status'	=> TRIGGER_STATUS_ACTIVE,
+	 * 	'comments'	=> '',
+	 * 	'url'		=> '',
 	 * ), ...);
 	 * </code>
 	 *
@@ -287,11 +287,11 @@ class CTrigger {
 			$trigger_db_fields = array(
 				'expression'	=> null,
 				'description'	=> null,
-				'type'			=> 0,
-				'priority'		=> 1,
-				'status'		=> TRIGGER_STATUS_DISABLED,
-				'comments'		=> '',
-				'url'			=> ''
+				'type'		=> 0,
+				'priority'	=> 1,
+				'status'	=> TRIGGER_STATUS_DISABLED,
+				'comments'	=> '',
+				'url'		=> ''
 			);
 
 			if(!check_db_fields($trigger_db_fields, $trigger)){
@@ -321,11 +321,11 @@ class CTrigger {
 	 * array( array(
 	 * 	*'triggerid'	=> ,
 	 * 	'description'	=> ,
-	 * 	'type'			=> 0,
-	 * 	'priority'		=> 1,
-	 * 	'status'		=> TRIGGER_STATUS_ACTIVE,
-	 * 	'comments'		=> '',
-	 * 	'url'			=> '',
+	 * 	'type'		=> 0,
+	 * 	'priority'	=> 1,
+	 * 	'status'	=> TRIGGER_STATUS_ACTIVE,
+	 * 	'comments'	=> '',
+	 * 	'url'		=> '',
 	 * ), ...);
 	 * </code>
 	 *

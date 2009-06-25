@@ -29,17 +29,17 @@ class CTemplate {
 			);
 
 		$def_options = array(
-			'nodeid' =>				0,
-			'groupids'	 =>			0,
-			'hostids' 	=>			0,
-			'templateids'	 =>		0,
-			'with_items' 	=>		0,
-			'with_triggers' =>		0,
-			'with_graphs' 	=>		0,
-			'count'	=>				0,
-			'pattern' =>			'',
-			'order' =>				0,
-			'limit' =>				0,
+			'nodeid'	=>	0,
+			'groupids'	=>	0,
+			'hostids'	=>	0,
+			'templateids'	=>	0,
+			'with_items'	=>	0,
+			'with_triggers'	=>	0,
+			'with_graphs'	=>	0,
+			'count'		=>	0,
+			'pattern'	=>	'',
+			'order'		=>	0,
+			'limit'		=>	0,
 		);
 
 		$def_options = array_merge($def_options, $options);

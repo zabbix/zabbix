@@ -16,17 +16,17 @@ class CItem {
 	 *
 	 * <code>
 	 * $options = array(
-	 *	array 'itemids' 			=> array(),
-	 *	array 'hostids' 			=> array(),
-	 *	array 'groupids' 			=> array(),
-	 *	array 'triggerids' 			=> array(),
-	 *	array 'applicationids' 		=> array(),
-	 *	boolean 'status' 			=> false,
-	 *	boolean 'templated_items' 	=> false,
-	 *	boolean 'count'				=> false,
-	 *	string 'pattern'			=> '',
-	 *	int 'limit' 				=> null,
-	 *	string 'order' 				=> ''
+	 *	array 'itemids'			=> array(),
+	 *	array 'hostids'			=> array(),
+	 *	array 'groupids'		=> array(),
+	 *	array 'triggerids'		=> array(),
+	 *	array 'applicationids'		=> array(),
+	 *	boolean 'status'		=> false,
+	 *	boolean 'templated_items'	=> false,
+	 *	boolean 'count'			=> false,
+	 *	string 'pattern'		=> '',
+	 *	int 'limit'			=> null,
+	 *	string 'order'			=> ''
 	 * );
 	 * </code>
 	 *
@@ -49,17 +49,17 @@ class CItem {
 			);
 
 		$def_options = array(
-			'itemids' 			=> array(),
-			'hostids' 			=> array(),
-			'groupids' 			=> array(),
-			'triggerids' 		=> array(),
-			'applicationids' 	=> array(),
-			'status' 			=> false,
-			'templated_items' 	=> false,
-			'count'				=> false,
-			'pattern'			=> '',
-			'limit' 			=> null,
-			'order' 			=> ''
+			'itemids'		=> array(),
+			'hostids'		=> array(),
+			'groupids'		=> array(),
+			'triggerids'		=> array(),
+			'applicationids'	=> array(),
+			'status'		=> false,
+			'templated_items'	=> false,
+			'count'			=> false,
+			'pattern'		=> '',
+			'limit'			=> null,
+			'order'			=> ''
 		);
 
 		$options = array_merge($def_options, $options);
@@ -223,31 +223,31 @@ class CItem {
 	 * <code>
 	 * array( array(
 	 * *'description'			=> *,
-	 * *'key_'					=> *,
+	 * *'key_'				=> *,
 	 * *'hostid'				=> *,
-	 * 'delay'					=> 60,
+	 * 'delay'				=> 60,
 	 * 'history'				=> 7,
-	 * 'status'					=> ITEM_STATUS_ACTIVE,
-	 * 'type'					=> ITEM_TYPE_ZABBIX,
+	 * 'status'				=> ITEM_STATUS_ACTIVE,
+	 * 'type'				=> ITEM_TYPE_ZABBIX,
 	 * 'snmp_community'			=> '',
 	 * 'snmp_oid'				=> '',
 	 * 'value_type'				=> ITEM_VALUE_TYPE_STR,
 	 * 'data_type'				=> ITEM_DATA_TYPE_DECIMAL,
 	 * 'trapper_hosts'			=> 'localhost',
 	 * 'snmp_port'				=> 161,
-	 * 'units'					=> '',
+	 * 'units'				=> '',
 	 * 'multiplier'				=> 0,
-	 * 'delta'					=> 0,
-	 * 'snmpv3_securityname'	=> '',
-	 * 'snmpv3_securitylevel'	=> 0,
-	 * 'snmpv3_authpassphrase'	=> '',
-	 * 'snmpv3_privpassphrase'	=> '',
-	 * 'formula'					=> 0,
-	 * 'trends'					=> 365,
+	 * 'delta'				=> 0,
+	 * 'snmpv3_securityname'		=> '',
+	 * 'snmpv3_securitylevel'		=> 0,
+	 * 'snmpv3_authpassphrase'		=> '',
+	 * 'snmpv3_privpassphrase'		=> '',
+	 * 'formula'				=> 0,
+	 * 'trends'				=> 365,
 	 * 'logtimefmt'				=> '',
 	 * 'valuemapid'				=> 0,
 	 * 'delay_flex'				=> '',
-	 * 'params'					=> '',
+	 * 'params'				=> '',
 	 * 'ipmi_sensor'			=> '',
 	 * 'applications'			=> array(),
 	 * 'templateid'				=> 0
