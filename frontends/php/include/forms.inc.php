@@ -1334,33 +1334,33 @@
 
 	function get_item_filter_form(){
 
-		$selection_mode					= $_REQUEST['selection_mode'];
+		$selection_mode			= $_REQUEST['selection_mode'];
 
-		$filter_node					= $_REQUEST['filter_node'];
-		$filter_group					= $_REQUEST['filter_group'];
-		$filter_host					= $_REQUEST['filter_host'];
-		$filter_application				= $_REQUEST['filter_application'];
-		$filter_description				= $_REQUEST['filter_description'];
-		$filter_type					= $_REQUEST['filter_type'];
-		$filter_key						= $_REQUEST['filter_key'];
-		$filter_snmp_community			= $_REQUEST['filter_snmp_community'];
-		$filter_snmp_oid				= $_REQUEST['filter_snmp_oid'];
-		$filter_snmp_port				= $_REQUEST['filter_snmp_port'];
-		$filter_snmpv3_securityname		= $_REQUEST['filter_snmpv3_securityname'];
+		$filter_node			= $_REQUEST['filter_node'];
+		$filter_group			= $_REQUEST['filter_group'];
+		$filter_host			= $_REQUEST['filter_host'];
+		$filter_application		= $_REQUEST['filter_application'];
+		$filter_description		= $_REQUEST['filter_description'];
+		$filter_type			= $_REQUEST['filter_type'];
+		$filter_key			= $_REQUEST['filter_key'];
+		$filter_snmp_community		= $_REQUEST['filter_snmp_community'];
+		$filter_snmp_oid		= $_REQUEST['filter_snmp_oid'];
+		$filter_snmp_port		= $_REQUEST['filter_snmp_port'];
+		$filter_snmpv3_securityname	= $_REQUEST['filter_snmpv3_securityname'];
 		$filter_snmpv3_securitylevel	= $_REQUEST['filter_snmpv3_securitylevel'];
 		$filter_snmpv3_authpassphrase	= $_REQUEST['filter_snmpv3_authpassphrase'];
 		$filter_snmpv3_privpassphrase	= $_REQUEST['filter_snmpv3_privpassphrase'];
-		$filter_value_type				= $_REQUEST['filter_value_type'];
-		$filter_data_type				= $_REQUEST['filter_data_type'];
-		$filter_units					= $_REQUEST['filter_units'];
-		$filter_formula					= $_REQUEST['filter_formula'];
-		$filter_delay					= $_REQUEST['filter_delay'];
-		$filter_history					= $_REQUEST['filter_history'];
-		$filter_trends					= $_REQUEST['filter_trends'];
-		$filter_status					= $_REQUEST['filter_status'];
-		$filter_logtimefmt				= $_REQUEST['filter_logtimefmt'];
-		$filter_delta					= $_REQUEST['filter_delta'];
-		$filter_trapper_hosts			= $_REQUEST['filter_trapper_hosts'];
+		$filter_value_type		= $_REQUEST['filter_value_type'];
+		$filter_data_type		= $_REQUEST['filter_data_type'];
+		$filter_units			= $_REQUEST['filter_units'];
+		$filter_formula			= $_REQUEST['filter_formula'];
+		$filter_delay			= $_REQUEST['filter_delay'];
+		$filter_history			= $_REQUEST['filter_history'];
+		$filter_trends			= $_REQUEST['filter_trends'];
+		$filter_status			= $_REQUEST['filter_status'];
+		$filter_logtimefmt		= $_REQUEST['filter_logtimefmt'];
+		$filter_delta			= $_REQUEST['filter_delta'];
+		$filter_trapper_hosts		= $_REQUEST['filter_trapper_hosts'];
 
 		$form = new CFormTable();
 
@@ -1540,30 +1540,30 @@
 		$frmItem->addVar('applications_visible',1);
 
 
-		$description	= get_request('description'	,'');
+		$description		= get_request('description'	,'');
 		$key			= get_request('key'		,'');
 		$host			= get_request('host',		null);
 		$delay			= get_request('delay'		,30);
 		$history		= get_request('history'		,90);
 		$status			= get_request('status'		,0);
 		$type			= get_request('type'		,0);
-		$snmp_community	= get_request('snmp_community'	,'public');
+		$snmp_community		= get_request('snmp_community'	,'public');
 		$snmp_oid		= get_request('snmp_oid'	,'interfaces.ifTable.ifEntry.ifInOctets.1');
 		$snmp_port		= get_request('snmp_port'	,161);
 		$value_type		= get_request('value_type'	,ITEM_VALUE_TYPE_UINT64);
 		$data_type		= get_request('data_type'	,ITEM_DATA_TYPE_DECIMAL);
-		$trapper_hosts	= get_request('trapper_hosts'	,'');
+		$trapper_hosts		= get_request('trapper_hosts'	,'');
 		$units			= get_request('units'		,'');
 		$valuemapid		= get_request('valuemapid'	,0);
 		$params			= get_request('params'		,'DSN=<database source name>\n'.
-								 'user=<user name>\n'.
-								 'password=<password>\n'.
-								 'sql=<query>');
+									 'user=<user name>\n'.
+									 'password=<password>\n'.
+									 'sql=<query>');
 		$multiplier		= get_request('multiplier'	,0);
 		$delta			= get_request('delta'		,0);
 		$trends			= get_request('trends'		,365);
-		$new_application= get_request('new_application',	'')	;
-		$applications	= get_request('applications'	,array());
+		$new_application	= get_request('new_application','');
+		$applications		= get_request('applications'	,array());
 		$delay_flex		= get_request('delay_flex'	,array());
 
 		$snmpv3_securityname	= get_request('snmpv3_securityname'	,'');
@@ -1599,16 +1599,16 @@
 		}
 
 		if((isset($_REQUEST['itemid']) && !isset($_REQUEST['form_refresh'])) || isset($limited)){
-			$description	= $item_data['description'];
+			$description		= $item_data['description'];
 			$key			= $item_data['key_'];
 			$host			= $item_data['host'];
 			$type			= $item_data['type'];
-			$snmp_community	= $item_data['snmp_community'];
+			$snmp_community		= $item_data['snmp_community'];
 			$snmp_oid		= $item_data['snmp_oid'];
 			$snmp_port		= $item_data['snmp_port'];
 			$value_type		= $item_data['value_type'];
 			$data_type		= $item_data['data_type'];
-			$trapper_hosts	= $item_data['trapper_hosts'];
+			$trapper_hosts		= $item_data['trapper_hosts'];
 			$units			= $item_data['units'];
 			$valuemapid		= $item_data['valuemapid'];
 			$multiplier		= $item_data['multiplier'];
@@ -2300,7 +2300,7 @@
 						$cmbPrior
 					);
 
-/* fependencies */
+/* dependencies */
 		$dep_el = array();
 		foreach($dependencies as $val){
 			array_push($dep_el,
@@ -2319,7 +2319,7 @@
 
 //		$frmMTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
 /* end dependencies */
-/* new dependence */
+/* new dependency */
 		//$frmMTrig->addVar('new_dependence','0');
 
 		$btnSelect = new CButton('btn1', S_ADD,
@@ -2336,7 +2336,7 @@
 		$frmMTrig->addRow(array(new CVisibilityBox('visible[dependencies]', isset($visible['dependencies']), 'dependency_box', S_ORIGINAL),S_TRIGGER_DEPENDENCIES),
 							$dep_div
 						);
-/* end new dependence */
+/* end new dependency */
 
 
 		$frmMTrig->addItemToBottomRow(new CButton('mass_save',S_SAVE));
@@ -2372,8 +2372,8 @@
 		}
 
 		$expression		= get_request('expression'	,'');
-		$description	= get_request('description'	,'');
-		$type 			= get_request('type', 0);
+		$description		= get_request('description'	,'');
+		$type 			= get_request('type',		0);
 		$priority		= get_request('priority'	,0);
 		$status			= get_request('status'		,0);
 		$comments		= get_request('comments'	,'');
@@ -2431,7 +2431,7 @@
 		$frmTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
 	/* end dependencies */
 
-	/* new dependence */
+	/* new dependency */
 //		$frmTrig->addVar('new_dependence','0');
 
 //		$txtCondVal = new CTextBox('trigger','',75,'yes');
@@ -2448,7 +2448,7 @@
 
 
 		$frmTrig->addRow(S_NEW_DEPENDENCY, $btnSelect, 'new');
-	/* end new dependence */
+	/* end new dependency */
 
 		$type_select = new CComboBox('type');
 		$type_select->additem(TRIGGER_MULT_EVENT_DISABLED,S_NORMAL,(($type == TRIGGER_MULT_EVENT_ENABLED)?'no':'yes'));
@@ -2587,7 +2587,7 @@
 			$percent_left  = 0;
 			$percent_right = 0;
 
-			if(isset($visible['percent_left'])) 	$percent_left  = get_request('percent_left', 0);
+			if(isset($visible['percent_left']))	$percent_left  = get_request('percent_left', 0);
 			if(isset($visible['percent_right']))	$percent_right = get_request('percent_right', 0);
 		}
 
@@ -2603,14 +2603,14 @@
 		$_REQUEST['yaxismin']		= $yaxismin;
 		$_REQUEST['yaxismax']		= $yaxismax;
 
-		$_REQUEST['ymin_itemid']		= $ymin_itemid;
-		$_REQUEST['ymax_itemid']		= $ymax_itemid;
+		$_REQUEST['ymin_itemid']	= $ymin_itemid;
+		$_REQUEST['ymax_itemid']	= $ymax_itemid;
 
 		$_REQUEST['showworkperiod']	= $showworkperiod;
 		$_REQUEST['showtriggers']	= $showtriggers;
 		$_REQUEST['graphtype']		= $graphtype;
 		$_REQUEST['legend']		= $legend;
-		$_REQUEST['graph3d']	= $graph3d;
+		$_REQUEST['graph3d']		= $graph3d;
 		$_REQUEST['percent_left']	= $percent_left;
 		$_REQUEST['percent_right']	= $percent_right;
 		/********************/
@@ -2862,7 +2862,7 @@
 
 			$frm_title = S_USER.' ['.$maintenance['name'].']';
 
-			$mname				= $maintenance['name'];
+			$mname			= $maintenance['name'];
 			$maintenance_type	= $maintenance['maintenance_type'];
 
 			$active_since		= $maintenance['active_since'];
@@ -2873,7 +2873,7 @@
 		}
 		else{
 
-			$mname				= get_request('mname','');
+			$mname			= get_request('mname','');
 			$maintenance_type	= get_request('maintenance_type',0);
 
 			$active_since		= get_request('active_since',time());
@@ -3224,13 +3224,13 @@
 		}
 
 		if(!isset($new_timeperiod['every']))			$new_timeperiod['every']		= 1;
-		if(!isset($new_timeperiod['day']))				$new_timeperiod['day']			= 1;
-		if(!isset($new_timeperiod['hour']))				$new_timeperiod['hour']			= 12;
+		if(!isset($new_timeperiod['day']))			$new_timeperiod['day']			= 1;
+		if(!isset($new_timeperiod['hour']))			$new_timeperiod['hour']			= 12;
 		if(!isset($new_timeperiod['minute']))			$new_timeperiod['minute']		= 0;
-		if(!isset($new_timeperiod['date']))				$new_timeperiod['date']			= 0;
+		if(!isset($new_timeperiod['date']))			$new_timeperiod['date']			= 0;
 
-		if(!isset($new_timeperiod['period_days']))		$new_timeperiod['period_days']	= 0;
-		if(!isset($new_timeperiod['period_hours']))		$new_timeperiod['period_hours']	= 1;
+		if(!isset($new_timeperiod['period_days']))		$new_timeperiod['period_days']		= 0;
+		if(!isset($new_timeperiod['period_hours']))		$new_timeperiod['period_hours']		= 1;
 		if(!isset($new_timeperiod['period_minutes']))		$new_timeperiod['period_minutes']	= 0;
 
 		if(!isset($new_timeperiod['month_date_type']))	$new_timeperiod['month_date_type'] = !(bool)$new_timeperiod['day'];
@@ -3313,9 +3313,9 @@
 
 		$cmbType = new CComboBox('new_timeperiod[timeperiod_type]', $new_timeperiod['timeperiod_type'],'submit()');
 			$cmbType->addItem(TIMEPERIOD_TYPE_ONETIME,	S_ONE_TIME_ONLY);
-			$cmbType->addItem(TIMEPERIOD_TYPE_DAILY, 	S_DAILY);
-			$cmbType->addItem(TIMEPERIOD_TYPE_WEEKLY, 	S_WEEKLY);
-			$cmbType->addItem(TIMEPERIOD_TYPE_MONTHLY, 	S_MONTHLY);
+			$cmbType->addItem(TIMEPERIOD_TYPE_DAILY,	S_DAILY);
+			$cmbType->addItem(TIMEPERIOD_TYPE_WEEKLY,	S_WEEKLY);
+			$cmbType->addItem(TIMEPERIOD_TYPE_MONTHLY,	S_MONTHLY);
 
 		$tblPeriod->addRow(array(S_PERIOD_TYPE, $cmbType));
 
@@ -3327,7 +3327,7 @@
 			$tblPeriod->addItem(new Cvar('new_timeperiod[date]',$new_timeperiod['date']));
 			$tblPeriod->addItem(new Cvar('new_timeperiod[month_date_type]',$new_timeperiod['month_date_type']));
 
-			$tblPeriod->addRow(array(S_EVERY_DAY_S, 	new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 3)));
+			$tblPeriod->addRow(array(S_EVERY_DAY_S,		new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 3)));
 		}
 		else if($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY){
 			$tblPeriod->addItem(new Cvar('new_timeperiod[month]',bindec($bit_month)));
@@ -3335,7 +3335,7 @@
 			$tblPeriod->addItem(new Cvar('new_timeperiod[date]',$new_timeperiod['date']));
 			$tblPeriod->addItem(new Cvar('new_timeperiod[month_date_type]',$new_timeperiod['month_date_type']));
 
-			$tblPeriod->addRow(array(S_EVERY_WEEK_S, 	new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 2)));
+			$tblPeriod->addRow(array(S_EVERY_WEEK_S,	new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 2)));
 
 			$tabDays = new CTable();
 			$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_mo]',$dayofweek[0],null,1), S_MONDAY));
@@ -3389,7 +3389,7 @@
 								new CCheckBox('new_timeperiod[month_dec]',$month[11],null,1), S_DECEMBER
 								 ));
 
-			$tblPeriod->addRow(array(S_MONTH, 	$tabMonths));
+			$tblPeriod->addRow(array(S_MONTH,	$tabMonths));
 
 			$radioDaily = new CTag('input');
 			$radioDaily->addOption('type','radio');
@@ -3557,17 +3557,17 @@
 		}
 
 		if(isset($_REQUEST['actionid']) && !isset($_REQUEST['form_refresh'])){
-			$name			= $action['name'];
+			$name		= $action['name'];
 			$eventsource	= $action['eventsource'];
-			$esc_period		= $action['esc_period'];
-			$status 		= $action['status'];
+			$esc_period	= $action['esc_period'];
+			$status		= $action['status'];
 
 			$def_shortdata	= $action['def_shortdata'];
 			$def_longdata	= $action['def_longdata'];
 
 			$recovery_msg	= $action['recovery_msg'];
 			$r_shortdata	= $action['r_shortdata'];
-			$r_longdata		= $action['r_longdata'];
+			$r_longdata	= $action['r_longdata'];
 
 			if($esc_period) $_REQUEST['escalation'] = 1;
 		}
@@ -3576,17 +3576,17 @@
 			if(isset($_REQUEST['escalation']) && (0 == $_REQUEST['esc_period']))
 				$_REQUEST['esc_period'] = 3600;
 
-			$name			= get_request('name');
+			$name		= get_request('name');
 			$eventsource	= get_request('eventsource');
-			$esc_period		= get_request('esc_period',0);
-			$status 		= get_request('status');
+			$esc_period	= get_request('esc_period',0);
+			$status 	= get_request('status');
 
 			$def_shortdata	= get_request('def_shortdata', ACTION_DEFAULT_MSG);
 			$def_longdata	= get_request('def_longdata', ACTION_DEFAULT_MSG);
 
 			$recovery_msg	= get_request('recovery_msg',0);
 			$r_shortdata	= get_request('r_shortdata', ACTION_DEFAULT_MSG);
-			$r_longdata		= get_request('r_longdata', ACTION_DEFAULT_MSG);
+			$r_longdata	= get_request('r_longdata', ACTION_DEFAULT_MSG);
 
 			if(!$esc_period) unset($_REQUEST['escalation']);
 		}
@@ -3746,7 +3746,7 @@
 				switch($evaltype){
 					case ACTION_EVAL_TYPE_AND:	$group_op = 		$glog_op = S_AND;	break;
 					case ACTION_EVAL_TYPE_OR:	$group_op = 		$glog_op = S_OR;	break;
-					default:					$group_op = S_OR;	$glog_op = S_AND;	break;
+					default:			$group_op = S_OR;	$glog_op = S_AND;	break;
 				}
 
 				foreach($grouped_conditions as $id => $val)
@@ -3760,7 +3760,7 @@
 				$cmb_calc_type->addItem(ACTION_EVAL_TYPE_OR, S_OR_BIG);
 				$tblCond->addRow(array(S_TYPE_OF_CALCULATION, array($cmb_calc_type, new CTextBox('preview', $grouped_conditions, 60,'yes'))));
 				unset($cmb_calc_type, $group_op, $glog_op);
-				/* end of calcuation type selector */
+				/* end of calculation type selector */
 			}
 			else{
 				$tblCond->addItem(new CVar('evaltype', ACTION_EVAL_TYPE_AND_OR));
@@ -4033,16 +4033,16 @@
 			while($operation_data = DBfetch($db_operations)){
 				$operation_data = array(
 					'operationtype'	=>	$operation_data['operationtype'],
-					'operationid' =>	$operation_data['operationid'],
-					'object'	=> 		$operation_data['object'],
-					'objectid'	=> 		$operation_data['objectid'],
-					'shortdata'	=> 		$operation_data['shortdata'],
-					'longdata'	=> 		$operation_data['longdata'],
-					'esc_period'	=> 	$operation_data['esc_period'],
-					'esc_step_from'	=> 	$operation_data['esc_step_from'],
-					'esc_step_to'	=> 	$operation_data['esc_step_to'],
-					'default_msg'	=> 	$operation_data['default_msg'],
-					'evaltype'		=> 	$operation_data['evaltype']);
+					'operationid'	=>	$operation_data['operationid'],
+					'object'	=>	$operation_data['object'],
+					'objectid'	=>	$operation_data['objectid'],
+					'shortdata'	=>	$operation_data['shortdata'],
+					'longdata'	=>	$operation_data['longdata'],
+					'esc_period'	=>	$operation_data['esc_period'],
+					'esc_step_from'	=>	$operation_data['esc_step_from'],
+					'esc_step_to'	=>	$operation_data['esc_step_to'],
+					'default_msg'	=>	$operation_data['default_msg'],
+					'evaltype'	=>	$operation_data['evaltype']);
 
 				$operation_data['opconditions'] = array();
 				$sql = 'SELECT * FROM opconditions WHERE operationid='.$operation_data['operationid'];
@@ -4075,7 +4075,7 @@
 		$objects_tmp = array();
 		$objectids_tmp = array();
 		foreach($operations as $key => $operation) {
-			$esc_step_from[$key]  = $operation['esc_step_from'];
+			$esc_step_from[$key] = $operation['esc_step_from'];
 			$objects_tmp[$key] = $operation['object'];
 			$objectids_tmp[$key] = $operation['objectid'];
 		}
@@ -4139,7 +4139,7 @@
 			$tblOper->addItem(new CVar('operations['.$id.'][esc_step_from]'	,$val['esc_step_from']));
 			$tblOper->addItem(new CVar('operations['.$id.'][esc_step_to]'	,$val['esc_step_to']));
 			$tblOper->addItem(new CVar('operations['.$id.'][default_msg]'	,$val['default_msg']));
-			$tblOper->addItem(new CVar('operations['.$id.'][evaltype]'		,$val['evaltype']));
+			$tblOper->addItem(new CVar('operations['.$id.'][evaltype]'	,$val['evaltype']));
 
 			foreach($val['opconditions'] as $opcondid => $opcond){
 				foreach($opcond as $field => $value)
@@ -4201,13 +4201,13 @@
 		if(!isset($new_operation['mediatypeid']))	$new_operation['mediatypeid']	= 0;
 		if(!isset($new_operation['shortdata']))		$new_operation['shortdata']	= '{TRIGGER.NAME}: {STATUS}';
 		if(!isset($new_operation['longdata']))		$new_operation['longdata']	= '{TRIGGER.NAME}: {STATUS}';
-		if(!isset($new_operation['esc_step_from']))		$new_operation['esc_step_from'] = 1;
-		if(!isset($new_operation['esc_step_to']))		$new_operation['esc_step_to'] = 1;
-		if(!isset($new_operation['esc_period']))		$new_operation['esc_period'] = 0;
+		if(!isset($new_operation['esc_step_from']))	$new_operation['esc_step_from'] = 1;
+		if(!isset($new_operation['esc_step_to']))	$new_operation['esc_step_to'] = 1;
+		if(!isset($new_operation['esc_period']))	$new_operation['esc_period'] = 0;
 
-		if(!isset($new_operation['evaltype']))			$new_operation['evaltype']	= 0;
-		if(!isset($new_operation['opconditions']))		$new_operation['opconditions'] = array();
-		if(!isset($new_operation['default_msg']))		$new_operation['default_msg'] = 0;
+		if(!isset($new_operation['evaltype']))		$new_operation['evaltype']	= 0;
+		if(!isset($new_operation['opconditions']))	$new_operation['opconditions'] = array();
+		if(!isset($new_operation['default_msg']))	$new_operation['default_msg'] = 0;
 
 
 		unset($update_mode);
@@ -4540,7 +4540,7 @@
 					$tblNewOperation->addRow(array(S_TYPE_OF_CALCULATION, new CCol(array($cmb_calc_type,new CTextBox('preview', $grouped_opconditions, 60,'yes')))));
 
 					unset($cmb_calc_type, $group_op, $glog_op);
-					/* end of calcuation type selector */
+					/* end of calculation type selector */
 				}
 				else{
 					$tblCond->addItem(new CVar('new_operation[evaltype]', ACTION_EVAL_TYPE_AND_OR));
@@ -4597,9 +4597,9 @@
 		$new_opcondition = get_request('new_opcondition', array());
 		if( !is_array($new_opcondition) )	$new_opcondition = array();
 
-		if( !isset($new_opcondition['conditiontype']) )		$new_opcondition['conditiontype']		= CONDITION_TYPE_EVENT_ACKNOWLEDGED;
-		if( !isset($new_opcondition['operator']))	$new_opcondition['operator']	= CONDITION_OPERATOR_LIKE;
-		if( !isset($new_opcondition['value']) )		$new_opcondition['value']		= 0;
+		if( !isset($new_opcondition['conditiontype']) )		$new_opcondition['conditiontype']	= CONDITION_TYPE_EVENT_ACKNOWLEDGED;
+		if( !isset($new_opcondition['operator']))		$new_opcondition['operator']		= CONDITION_OPERATOR_LIKE;
+		if( !isset($new_opcondition['value']) )			$new_opcondition['value']		= 0;
 
 		if( !str_in_array($new_opcondition['conditiontype'], $allowed_conditions) )
 			$new_opcondition['conditiontype'] = $allowed_conditions[0];
@@ -4790,7 +4790,7 @@
 		$ipmi_username	= get_request('ipmi_username', '');
 		$ipmi_password	= get_request('ipmi_password', '');
 
-		$useprofile = get_request('useprofile','no');
+		$useprofile	= get_request('useprofile','no');
 
 		$devicetype	= get_request('devicetype','');
 		$name		= get_request('name','');
@@ -5327,64 +5327,64 @@
 		);
 	}
 	else{
-		$frmHost->addVar('ext_host_profiles[device_alias]',        $ext_host_profiles['device_alias']);
-		$frmHost->addVar('ext_host_profiles[device_type]', 	$ext_host_profiles['device_type']);
-		$frmHost->addVar('ext_host_profiles[device_chassis]',      $ext_host_profiles['device_chassis']);
-		$frmHost->addVar('ext_host_profiles[device_os]',   	$ext_host_profiles['device_os']);
-		$frmHost->addVar('ext_host_profiles[device_os_short]',     $ext_host_profiles['device_os_short']);
-		$frmHost->addVar('ext_host_profiles[device_hw_arch]',      $ext_host_profiles['device_hw_arch']);
-		$frmHost->addVar('ext_host_profiles[device_serial]',       $ext_host_profiles['device_serial']);
-		$frmHost->addVar('ext_host_profiles[device_model]',        $ext_host_profiles['device_model']);
-		$frmHost->addVar('ext_host_profiles[device_tag]',  	$ext_host_profiles['device_tag']);
-		$frmHost->addVar('ext_host_profiles[device_vendor]',       $ext_host_profiles['device_vendor']);
-		$frmHost->addVar('ext_host_profiles[device_contract]',     $ext_host_profiles['device_contract']);
-		$frmHost->addVar('ext_host_profiles[device_who]',  	$ext_host_profiles['device_who']);
-		$frmHost->addVar('ext_host_profiles[device_status]',       $ext_host_profiles['device_status']);
-		$frmHost->addVar('ext_host_profiles[device_app_01]',       $ext_host_profiles['device_app_01']);
-		$frmHost->addVar('ext_host_profiles[device_app_02]',       $ext_host_profiles['device_app_02']);
-		$frmHost->addVar('ext_host_profiles[device_app_03]',       $ext_host_profiles['device_app_03']);
-		$frmHost->addVar('ext_host_profiles[device_app_04]',       $ext_host_profiles['device_app_04']);
-		$frmHost->addVar('ext_host_profiles[device_app_05]',       $ext_host_profiles['device_app_05']);
-		$frmHost->addVar('ext_host_profiles[device_url_1]',        $ext_host_profiles['device_url_1']);
-		$frmHost->addVar('ext_host_profiles[device_url_2]',        $ext_host_profiles['device_url_2']);
-		$frmHost->addVar('ext_host_profiles[device_url_3]',        $ext_host_profiles['device_url_3']);
-		$frmHost->addVar('ext_host_profiles[device_networks]',     $ext_host_profiles['device_networks']);
-		$frmHost->addVar('ext_host_profiles[device_notes]',        $ext_host_profiles['device_notes']);
-		$frmHost->addVar('ext_host_profiles[device_hardware]',     $ext_host_profiles['device_hardware']);
-		$frmHost->addVar('ext_host_profiles[device_software]',     $ext_host_profiles['device_software']);
-		$frmHost->addVar('ext_host_profiles[ip_subnet_mask]',      $ext_host_profiles['ip_subnet_mask']);
-		$frmHost->addVar('ext_host_profiles[ip_router]',   	$ext_host_profiles['ip_router']);
-		$frmHost->addVar('ext_host_profiles[ip_macaddress]',       $ext_host_profiles['ip_macaddress']);
-		$frmHost->addVar('ext_host_profiles[oob_ip]',      	$ext_host_profiles['oob_ip']);
-		$frmHost->addVar('ext_host_profiles[oob_subnet_mask]',     $ext_host_profiles['oob_subnet_mask']);
-		$frmHost->addVar('ext_host_profiles[oob_router]',  	$ext_host_profiles['oob_router']);
-		$frmHost->addVar('ext_host_profiles[date_hw_buy]', 	$ext_host_profiles['date_hw_buy']);
-		$frmHost->addVar('ext_host_profiles[date_hw_install]',     $ext_host_profiles['date_hw_install']);
-		$frmHost->addVar('ext_host_profiles[date_hw_expiry]',      $ext_host_profiles['date_hw_expiry']);
-		$frmHost->addVar('ext_host_profiles[date_hw_decomm]',      $ext_host_profiles['date_hw_decomm']);
-		$frmHost->addVar('ext_host_profiles[site_street_1]',       $ext_host_profiles['site_street_1']);
-		$frmHost->addVar('ext_host_profiles[site_street_2]',       $ext_host_profiles['site_street_2']);
-		$frmHost->addVar('ext_host_profiles[site_street_3]',       $ext_host_profiles['site_street_3']);
-		$frmHost->addVar('ext_host_profiles[site_city]',   	$ext_host_profiles['site_city']);
-		$frmHost->addVar('ext_host_profiles[site_state]',  	$ext_host_profiles['site_state']);
-		$frmHost->addVar('ext_host_profiles[site_country]',        $ext_host_profiles['site_country']);
-		$frmHost->addVar('ext_host_profiles[site_zip]',    	$ext_host_profiles['site_zip']);
-		$frmHost->addVar('ext_host_profiles[site_rack]',   	$ext_host_profiles['site_rack']);
-		$frmHost->addVar('ext_host_profiles[site_notes]',  	$ext_host_profiles['site_notes']);
-		$frmHost->addVar('ext_host_profiles[poc_1_name]',  	$ext_host_profiles['poc_1_name']);
-		$frmHost->addVar('ext_host_profiles[poc_1_email]', 	$ext_host_profiles['poc_1_email']);
-		$frmHost->addVar('ext_host_profiles[poc_1_phone_1]',       $ext_host_profiles['poc_1_phone_1']);
-		$frmHost->addVar('ext_host_profiles[poc_1_phone_2]',       $ext_host_profiles['poc_1_phone_2']);
-		$frmHost->addVar('ext_host_profiles[poc_1_cell]',  	$ext_host_profiles['poc_1_cell']);
-		$frmHost->addVar('ext_host_profiles[poc_1_screen]',        $ext_host_profiles['poc_1_screen']);
-		$frmHost->addVar('ext_host_profiles[poc_1_notes]', 	$ext_host_profiles['poc_1_notes']);
-		$frmHost->addVar('ext_host_profiles[poc_2_name]',  	$ext_host_profiles['poc_2_name']);
-		$frmHost->addVar('ext_host_profiles[poc_2_email]', 	$ext_host_profiles['poc_2_email']);
-		$frmHost->addVar('ext_host_profiles[poc_2_phone_1]',       $ext_host_profiles['poc_2_phone_1']);
-		$frmHost->addVar('ext_host_profiles[poc_2_phone_2]',       $ext_host_profiles['poc_2_phone_2']);
-		$frmHost->addVar('ext_host_profiles[poc_2_cell]',  	$ext_host_profiles['poc_2_cell']);
-		$frmHost->addVar('ext_host_profiles[poc_2_screen]',        $ext_host_profiles['poc_2_screen']);
-		$frmHost->addVar('ext_host_profiles[poc_2_notes]', 	$ext_host_profiles['poc_2_notes']);
+		$frmHost->addVar('ext_host_profiles[device_alias]',	$ext_host_profiles['device_alias']);
+		$frmHost->addVar('ext_host_profiles[device_type]',	$ext_host_profiles['device_type']);
+		$frmHost->addVar('ext_host_profiles[device_chassis]',	$ext_host_profiles['device_chassis']);
+		$frmHost->addVar('ext_host_profiles[device_os]',	$ext_host_profiles['device_os']);
+		$frmHost->addVar('ext_host_profiles[device_os_short]',	$ext_host_profiles['device_os_short']);
+		$frmHost->addVar('ext_host_profiles[device_hw_arch]',	$ext_host_profiles['device_hw_arch']);
+		$frmHost->addVar('ext_host_profiles[device_serial]',	$ext_host_profiles['device_serial']);
+		$frmHost->addVar('ext_host_profiles[device_model]',	$ext_host_profiles['device_model']);
+		$frmHost->addVar('ext_host_profiles[device_tag]',	$ext_host_profiles['device_tag']);
+		$frmHost->addVar('ext_host_profiles[device_vendor]',	$ext_host_profiles['device_vendor']);
+		$frmHost->addVar('ext_host_profiles[device_contract]',	$ext_host_profiles['device_contract']);
+		$frmHost->addVar('ext_host_profiles[device_who]',	$ext_host_profiles['device_who']);
+		$frmHost->addVar('ext_host_profiles[device_status]',	$ext_host_profiles['device_status']);
+		$frmHost->addVar('ext_host_profiles[device_app_01]',	$ext_host_profiles['device_app_01']);
+		$frmHost->addVar('ext_host_profiles[device_app_02]',	$ext_host_profiles['device_app_02']);
+		$frmHost->addVar('ext_host_profiles[device_app_03]',	$ext_host_profiles['device_app_03']);
+		$frmHost->addVar('ext_host_profiles[device_app_04]',	$ext_host_profiles['device_app_04']);
+		$frmHost->addVar('ext_host_profiles[device_app_05]',	$ext_host_profiles['device_app_05']);
+		$frmHost->addVar('ext_host_profiles[device_url_1]',	$ext_host_profiles['device_url_1']);
+		$frmHost->addVar('ext_host_profiles[device_url_2]',	$ext_host_profiles['device_url_2']);
+		$frmHost->addVar('ext_host_profiles[device_url_3]',	$ext_host_profiles['device_url_3']);
+		$frmHost->addVar('ext_host_profiles[device_networks]',	$ext_host_profiles['device_networks']);
+		$frmHost->addVar('ext_host_profiles[device_notes]',	$ext_host_profiles['device_notes']);
+		$frmHost->addVar('ext_host_profiles[device_hardware]',	$ext_host_profiles['device_hardware']);
+		$frmHost->addVar('ext_host_profiles[device_software]',	$ext_host_profiles['device_software']);
+		$frmHost->addVar('ext_host_profiles[ip_subnet_mask]',	$ext_host_profiles['ip_subnet_mask']);
+		$frmHost->addVar('ext_host_profiles[ip_router]',	$ext_host_profiles['ip_router']);
+		$frmHost->addVar('ext_host_profiles[ip_macaddress]',	$ext_host_profiles['ip_macaddress']);
+		$frmHost->addVar('ext_host_profiles[oob_ip]',		$ext_host_profiles['oob_ip']);
+		$frmHost->addVar('ext_host_profiles[oob_subnet_mask]',	$ext_host_profiles['oob_subnet_mask']);
+		$frmHost->addVar('ext_host_profiles[oob_router]',	$ext_host_profiles['oob_router']);
+		$frmHost->addVar('ext_host_profiles[date_hw_buy]',	$ext_host_profiles['date_hw_buy']);
+		$frmHost->addVar('ext_host_profiles[date_hw_install]',	$ext_host_profiles['date_hw_install']);
+		$frmHost->addVar('ext_host_profiles[date_hw_expiry]',	$ext_host_profiles['date_hw_expiry']);
+		$frmHost->addVar('ext_host_profiles[date_hw_decomm]',	$ext_host_profiles['date_hw_decomm']);
+		$frmHost->addVar('ext_host_profiles[site_street_1]',	$ext_host_profiles['site_street_1']);
+		$frmHost->addVar('ext_host_profiles[site_street_2]',	$ext_host_profiles['site_street_2']);
+		$frmHost->addVar('ext_host_profiles[site_street_3]',	$ext_host_profiles['site_street_3']);
+		$frmHost->addVar('ext_host_profiles[site_city]',	$ext_host_profiles['site_city']);
+		$frmHost->addVar('ext_host_profiles[site_state]',	$ext_host_profiles['site_state']);
+		$frmHost->addVar('ext_host_profiles[site_country]',	$ext_host_profiles['site_country']);
+		$frmHost->addVar('ext_host_profiles[site_zip]',		$ext_host_profiles['site_zip']);
+		$frmHost->addVar('ext_host_profiles[site_rack]',	$ext_host_profiles['site_rack']);
+		$frmHost->addVar('ext_host_profiles[site_notes]',	$ext_host_profiles['site_notes']);
+		$frmHost->addVar('ext_host_profiles[poc_1_name]',	$ext_host_profiles['poc_1_name']);
+		$frmHost->addVar('ext_host_profiles[poc_1_email]',	$ext_host_profiles['poc_1_email']);
+		$frmHost->addVar('ext_host_profiles[poc_1_phone_1]',	$ext_host_profiles['poc_1_phone_1']);
+		$frmHost->addVar('ext_host_profiles[poc_1_phone_2]',	$ext_host_profiles['poc_1_phone_2']);
+		$frmHost->addVar('ext_host_profiles[poc_1_cell]',	$ext_host_profiles['poc_1_cell']);
+		$frmHost->addVar('ext_host_profiles[poc_1_screen]',	$ext_host_profiles['poc_1_screen']);
+		$frmHost->addVar('ext_host_profiles[poc_1_notes]',	$ext_host_profiles['poc_1_notes']);
+		$frmHost->addVar('ext_host_profiles[poc_2_name]',	$ext_host_profiles['poc_2_name']);
+		$frmHost->addVar('ext_host_profiles[poc_2_email]',	$ext_host_profiles['poc_2_email']);
+		$frmHost->addVar('ext_host_profiles[poc_2_phone_1]',	$ext_host_profiles['poc_2_phone_1']);
+		$frmHost->addVar('ext_host_profiles[poc_2_phone_2]',	$ext_host_profiles['poc_2_phone_2']);
+		$frmHost->addVar('ext_host_profiles[poc_2_cell]',	$ext_host_profiles['poc_2_cell']);
+		$frmHost->addVar('ext_host_profiles[poc_2_screen]',	$ext_host_profiles['poc_2_screen']);
+		$frmHost->addVar('ext_host_profiles[poc_2_notes]',	$ext_host_profiles['poc_2_notes']);
 	}
 // END:   HOSTS PROFILE EXTENDED Section
 
@@ -5409,7 +5409,7 @@
 		$status		= get_request('status',	HOST_STATUS_MONITORED);
 		$useip		= get_request('useip',	0);
 		$dns		= get_request('dns',	'');
-		$ip			= get_request('ip',	'0.0.0.0');
+		$ip		= get_request('ip',	'0.0.0.0');
 		$proxy_hostid	= get_request('proxy_hostid','');
 
 		$useipmi	= get_request('useipmi','no');
@@ -5436,13 +5436,13 @@
 
 // BEGIN: HOSTS PROFILE EXTENDED Section
 		$useprofile_ext		= get_request('useprofile_ext','no');
-		$ext_host_profiles 	= get_request('ext_host_profiles',array());
+		$ext_host_profiles	= get_request('ext_host_profiles',array());
 // END:   HOSTS PROFILE EXTENDED Section
 
-		$templates	= get_request('templates',array());
-		$clear_templates = get_request('clear_templates',array());
+		$templates		= get_request('templates',array());
+		$clear_templates	= get_request('clear_templates',array());
 
-		$frm_title	= $show_only_tmp ? S_TEMPLATE : S_HOST;
+		$frm_title		= $show_only_tmp ? S_TEMPLATE : S_HOST;
 
 		if($_REQUEST['hostid']>0){
 			$db_host=get_host_by_hostid($_REQUEST['hostid']);
@@ -5455,7 +5455,7 @@
 		}
 
 		if(($_REQUEST['hostid']>0) && !isset($_REQUEST['form_refresh'])){
-			$proxy_hostid	= $db_host['proxy_hostid'];
+			$proxy_hostid		= $db_host['proxy_hostid'];
 			$host			= $db_host['host'];
 			$port			= $db_host['port'];
 			$status			= $db_host['status'];
@@ -5491,7 +5491,7 @@
 
 				$devicetype	= $db_profile['devicetype'];
 				$name		= $db_profile['name'];
-				$os			= $db_profile['os'];
+				$os		= $db_profile['os'];
 				$serialno	= $db_profile['serialno'];
 				$tag		= $db_profile['tag'];
 				$macaddress	= $db_profile['macaddress'];
@@ -6448,8 +6448,8 @@
 		}
 		else{
 
-			$elementid 	= get_request('elementid', 	0);
-			$elementtype	= get_request('elementtype', 	SYSMAP_ELEMENT_TYPE_HOST);
+			$elementid 	= get_request('elementid',	0);
+			$elementtype	= get_request('elementtype',	SYSMAP_ELEMENT_TYPE_HOST);
 			$label		= get_request('label',		'');
 			$x		= get_request('x',		0);
 			$y		= get_request('y',		0);
@@ -6462,7 +6462,7 @@
 		}
 
 		$cmbType = new CComboBox('elementtype',$elementtype,'submit()');
-		$available_hosts = 		get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
+		$available_hosts =		get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
 
 		$sql = 'SELECT DISTINCT n.name as node_name,h.hostid,h.host '.
 				' FROM hosts h'.
