@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [ZBX-773] fixed typo 'attribures' (Richlv)
  - [ZBX-974] recompressed most frontend images with pngcrush (Richlv)
  - [DEV-400] added necessary link between hosts and groups (Artem)
  - [ZBX-944] fixed changelog reference (Richlv)
