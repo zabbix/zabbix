@@ -11,4 +11,3 @@ EXTRA_DIST = \
 	data/images_pgsql.sql \
 	data/images_mysql.sql \
 	data/images_sqlite3.sql
-
