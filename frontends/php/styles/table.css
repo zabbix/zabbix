@@ -69,7 +69,7 @@ table.page_footer{
 	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/table_head.gif') repeat-x top left;
 	border-color: #000000;
-	font-weight: bold; 
+	font-weight: bold;
 
 	border-color: 	#E5E5E5;
 
@@ -163,11 +163,11 @@ table.formtable tr td.form_row_l { /* left cell */
 	border-top-style:	none;
 	border-right-style:	none;
 	border-bottom-style:	none;
-	border-color:	#AAAAAA;
-	text-align:	left;
-	white-space:	nowrap;
-	word-spacing:	0px;
-	width:		50%;
+	border-color:		#AAAAAA;
+	text-align:		left;
+	white-space:		nowrap;
+	word-spacing:		0px;
+	width:			50%;
 }
 table.formtable tr td.form_row_c { /* center cell */
 	border-right-style: solid;
@@ -309,7 +309,7 @@ table.log_history_table {
 	width: 100%;
 	border-width: 0px;
 	border-style: solid;
-	border-color: #0B198C; 
+	border-color: #0B198C;
 }
 table.log_history_table tr td {
 	white-space: nowrap;
@@ -334,7 +334,7 @@ table.log_history_table tr.header td {
 	white-space: nowrap;
 	word-spacing:	0px;
 	text-align: center;
-	font-weight: bold; 
+	font-weight: bold;
 	background-color:#CCCCCC;
 }
 table.log_history_table tr td.message {
@@ -362,17 +362,17 @@ table.screen_edit td{
 	vertical-align: middle;
 }
 
-table.screen_edit tr td.def_def {		text-align: center;	vertical-align: middle;		}
-table.screen_edit tr td.def_top {		text-align: center;	vertical-align: top;		}
-table.screen_edit tr td.def_mdl {		text-align: center;	vertical-align: middle;		}
-table.screen_edit tr td.def_btm {		text-align: center;	vertical-align: bottom;		}
+table.screen_edit tr td.def_def {	text-align: center;	vertical-align: middle;		}
+table.screen_edit tr td.def_top {	text-align: center;	vertical-align: top;		}
+table.screen_edit tr td.def_mdl {	text-align: center;	vertical-align: middle;		}
+table.screen_edit tr td.def_btm {	text-align: center;	vertical-align: bottom;		}
 
-table.screen_edit tr td.left_top {		text-align: left;	vertical-align: top;		}
-table.screen_edit tr td.left_mdl {		text-align: left;	vertical-align: middle;		}
+table.screen_edit tr td.left_top {	text-align: left;	vertical-align: top;		}
+table.screen_edit tr td.left_mdl {	text-align: left;	vertical-align: middle;		}
 table.screen_edit tr td.left_bttm {	text-align: left;	vertical-align: bottom;		}
 
-table.screen_edit tr td.cntr_top {		text-align: center;	vertical-align: top;		}
-table.screen_edit tr td.cntr_mdl {		text-align: center;	vertical-align: middle;		}
+table.screen_edit tr td.cntr_top {	text-align: center;	vertical-align: top;		}
+table.screen_edit tr td.cntr_mdl {	text-align: center;	vertical-align: middle;		}
 table.screen_edit tr td.cntr_bttm {	text-align: center;	vertical-align: bottom;		}
 
 table.screen_edit tr td.right_top {	text-align: right;	vertical-align: top;		}
@@ -396,17 +396,17 @@ table.screen_view iframe {
 	border: 0px;
 }
 
-table.screen_view tr td.def_def {		text-align: center;	vertical-align: middle;		}
-table.screen_view tr td.def_top {		text-align: center;	vertical-align: top;		}
-table.screen_view tr td.def_mdl {		text-align: center;	vertical-align: middle;		}
-table.screen_view tr td.def_btm {		text-align: center;	vertical-align: bottom;		}
+table.screen_view tr td.def_def {	text-align: center;	vertical-align: middle;		}
+table.screen_view tr td.def_top {	text-align: center;	vertical-align: top;		}
+table.screen_view tr td.def_mdl {	text-align: center;	vertical-align: middle;		}
+table.screen_view tr td.def_btm {	text-align: center;	vertical-align: bottom;		}
 
-table.screen_view tr td.left_top {		text-align: left;	vertical-align: top;		}
-table.screen_view tr td.left_mdl {		text-align: left;	vertical-align: middle;		}
+table.screen_view tr td.left_top {	text-align: left;	vertical-align: top;		}
+table.screen_view tr td.left_mdl {	text-align: left;	vertical-align: middle;		}
 table.screen_view tr td.left_bttm {	text-align: left;	vertical-align: bottom;		}
 
-table.screen_view tr td.cntr_top {		text-align: center;	vertical-align: top;		}
-table.screen_view tr td.cntr_mdl {		text-align: center;	vertical-align: middle;		}
+table.screen_view tr td.cntr_top {	text-align: center;	vertical-align: top;		}
+table.screen_view tr td.cntr_mdl {	text-align: center;	vertical-align: middle;		}
 table.screen_view tr td.cntr_bttm {	text-align: center;	vertical-align: bottom;		}
 
 table.screen_view tr td.right_top {	text-align: right;	vertical-align: top;		}
@@ -433,25 +433,25 @@ table.tabletree{
 table.tabletree tr td {
 	white-space: nowrap;
 	word-spacing:	0px;
-	
+
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:8pt;
 	text-decoration: none;
 	text-align: left;
 	vertical-align:top;
-	
+
 	border-width: 0px;
-	
+
 	padding-top: 0px;
 	padding-bottom: 0px;
-	
+
 	height: 100%;
 }
 
 table.tabletree tr.header td {
 	white-space: nowrap;
 	word-spacing:	0px;
-	font-weight: bold; 
+	font-weight: bold;
 	background-color:#CCCCCC;
 	border-width: 0px;
 }
@@ -464,10 +464,10 @@ table.tabletree tr.footer td {
 	padding-left: 5px;
 }
 
-table.tabletree tr.odd_row td			{	background-color: #EEEEEE;}
-table.tabletree tr.odd_row:hover td		{	background-color: #DFDFDF;}
+table.tabletree tr.odd_row td		{	background-color: #EEEEEE;}
+table.tabletree tr.odd_row:hover td	{	background-color: #DFDFDF;}
 
-table.tabletree tr.even_row td			{	background-color: #EEEEEE;}
+table.tabletree tr.even_row td		{	background-color: #EEEEEE;}
 table.tabletree tr.even_row:hover td	{	background-color: #DFDFDF;}
 
 .tdtree{
@@ -481,9 +481,9 @@ table.tabletree tr.even_row:hover td	{	background-color: #DFDFDF;}
 table.tableinfo{
 	empty-cells:show;
 	color: #000000;
-	width: 100%; 
+	width: 100%;
 	background-color: #AAAAAA;
-	border-spacing: 1px; 
+	border-spacing: 1px;
 
 /*	border: 1px #AAAAAA dotted; */
 }
@@ -504,7 +504,7 @@ table.tableinfo tr td {
 table.tableinfo tr.header td {
 	white-space: nowrap;
 	word-spacing:	0px;
-	font-weight: bold; 
+	font-weight: bold;
 	background-color:#CCCCCC;
 	border-width: 0px;
 }
@@ -517,7 +517,7 @@ table.tableinfo tr.vertical_header td {
 	margin: 0px;
 	white-space: nowrap;
 	word-spacing:	0px;
-	font-weight: bold; 
+	font-weight: bold;
 	background-color:#CCCCCC;
 	vertical-align:text-top;
 	text-align: center;
@@ -543,58 +543,58 @@ table.tableinfo tr td.message {
 	text-align: center;
 }
 
-table.tableinfo tr.odd_row td			{	background-color: #DDDDDD; border: 1px #DDDDDD solid; }
-table.tableinfo tr.odd_row:hover td		{	background-color: #DDDDEE; border: 1px #DDDDEE solid; }
+table.tableinfo tr.odd_row td				{	background-color: #DDDDDD; border: 1px #DDDDDD solid; }
+table.tableinfo tr.odd_row:hover td			{	background-color: #DDDDEE; border: 1px #DDDDEE solid; }
 
-table.tableinfo tr.even_row td			{	background-color: #EEEEEE; border: 1px #EEEEEE solid; }
-table.tableinfo tr.even_row:hover td		{	background-color: #EEEEFE; border: 1px #EEEEFE solid; }
+table.tableinfo tr.even_row td				{	background-color: #EEEEEE; border: 1px #EEEEEE solid; }
+table.tableinfo tr.even_row:hover td			{	background-color: #EEEEFE; border: 1px #EEEEFE solid; }
 
-table.tableinfo tr td.center			{	vertical-align: middle; text-align: center; }
+table.tableinfo tr td.center				{	vertical-align: middle; text-align: center; }
 
-table.tableinfo tr td.disaster_empty		{	border: 1px #FF0000 solid; }
-table.tableinfo tr:hover td.disaster_empty	{	border: 1px #FF0000 solid; }
+table.tableinfo tr td.disaster_empty			{	border: 1px #FF0000 solid; }
+table.tableinfo tr:hover td.disaster_empty		{	border: 1px #FF0000 solid; }
 
 table.tableinfo tr td.disaster				{	background-color: #FF0000;	border: 1px #FF0000 solid; }
-table.tableinfo tr:hover td.disaster		{	background-color: #FA0000;	border: 1px #FA0000 solid; }
+table.tableinfo tr:hover td.disaster			{	background-color: #FA0000;	border: 1px #FA0000 solid; }
 
 table.tableinfo tr td.high_empty			{	border: 1px #FF8888 solid; }
 table.tableinfo tr:hover td.high_empty			{	border: 1px #FF8888 solid; }
 
 table.tableinfo tr td.high				{	background-color: #FF8888;	border: 1px #FF8888 solid; }
-table.tableinfo tr:hover td.high		{	background-color: #FA8388;	border: 1px #FA8388 solid; }
+table.tableinfo tr:hover td.high			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
 
 table.tableinfo tr td.average_empty			{	border: 1px #DDAAAA solid; }
-table.tableinfo tr:hover td.average_empty	{	border: 1px #DDAAAA solid; }
+table.tableinfo tr:hover td.average_empty		{	border: 1px #DDAAAA solid; }
 
-table.tableinfo tr td.average			{	background-color: #DDAAAA;	border: 1px #DDAAAA solid; }
-table.tableinfo tr:hover td.average		{	background-color: #D8A5AA;	border: 1px #D8A5AA solid; }
+table.tableinfo tr td.average				{	background-color: #DDAAAA;	border: 1px #DDAAAA solid; }
+table.tableinfo tr:hover td.average			{	background-color: #D8A5AA;	border: 1px #D8A5AA solid; }
 
 table.tableinfo tr td.warning_empty			{	border: 1px #EFEFCC solid; }
-table.tableinfo tr:hover td.warning_empty	{	border: 1px #EAEACC solid; }
+table.tableinfo tr:hover td.warning_empty		{	border: 1px #EAEACC solid; }
 
-table.tableinfo tr td.warning			{	background-color: #EFEFCC;	border: 1px #EFEFCC solid; }
-table.tableinfo tr:hover td.warning		{	background-color: #EAEACC;	border: 1px #EAEACC solid; }
+table.tableinfo tr td.warning				{	background-color: #EFEFCC;	border: 1px #EFEFCC solid; }
+table.tableinfo tr:hover td.warning			{	background-color: #EAEACC;	border: 1px #EAEACC solid; }
 
 table.tableinfo tr td.information_empty			{	border: 1px #BBE2BB solid; }
-table.tableinfo tr:hover td.information_empty	{	border: 1px #B7DDBB solid; }
+table.tableinfo tr:hover td.information_empty		{	border: 1px #B7DDBB solid; }
 
-table.tableinfo tr td.information		{	background-color: #BBE2BB;	border: 1px #CCE2CC solid; }
-table.tableinfo tr:hover td.information		{	background-color: #B7DDBB;	border: 1px #C7DDCC solid; }
+table.tableinfo tr td.information			{	background-color: #BBE2BB;	border: 1px #CCE2CC solid; }
+table.tableinfo tr:hover td.information			{	background-color: #B7DDBB;	border: 1px #C7DDCC solid; }
 
-table.tableinfo tr td.unknown_trigger_empty			{	border: 1px #ACACAC solid; }
+table.tableinfo tr td.unknown_trigger_empty		{	border: 1px #ACACAC solid; }
 table.tableinfo tr:hover td.unknown_trigger_empty	{	border: 1px #ACA7AC solid; }
 
-table.tableinfo tr td.unknown_trigger		{	background-color: #BCBCBC;	border: 1px #BCBCBC solid; }
-table.tableinfo tr:hover td.unknown_trigger	{	background-color: #BCB7BC;	border: 1px #BCB7BC solid; }
+table.tableinfo tr td.unknown_trigger			{	background-color: #BCBCBC;	border: 1px #BCBCBC solid; }
+table.tableinfo tr:hover td.unknown_trigger		{	background-color: #BCB7BC;	border: 1px #BCB7BC solid; }
 
-table.tableinfo tr td.normal			{	background-color: #AAFFAA;	border: 1px #AAFFAA solid; }
-table.tableinfo tr:hover td.normal		{	background-color: #AAF9AA;	border: 1px #AAF9AA solid; }
+table.tableinfo tr td.normal				{	background-color: #AAFFAA;	border: 1px #AAFFAA solid; }
+table.tableinfo tr:hover td.normal			{	background-color: #AAF9AA;	border: 1px #AAF9AA solid; }
 
-table.tableinfo tr td.active			{	background-color: #AADDAA;	border: 1px #AADDAA solid; }
-table.tableinfo tr:hover td.active		{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }
+table.tableinfo tr td.active				{	background-color: #AADDAA;	border: 1px #AADDAA solid; }
+table.tableinfo tr:hover td.active			{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }
 
-table.tableinfo tr td.inactive			{	background-color: #FF8888;	border: 1px #FF8888 solid; }
-table.tableinfo tr:hover td.inactive		{	background-color: #FA8388;	border: 1px #FA8388 solid; }
+table.tableinfo tr td.inactive				{	background-color: #FF8888;	border: 1px #FF8888 solid; }
+table.tableinfo tr:hover td.inactive			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
 
 /****** HEADER *********/
 
@@ -735,7 +735,7 @@ table.ack_msgs tr.title {
 	height: 14px;
 	vertical-align: middle;
 	color: #FFFFFF;
-	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left; 
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
 }
 
 table.ack_msgs tr td.user{
@@ -763,7 +763,7 @@ table.ack_msgs tr.msg td{
 /**************** TABLE FOR RIGHT DISPLAYING *********/
 
 .right_header {
-	font-weight: bold; 
+	font-weight: bold;
 	text-align: center;
 
 	border-left-style: solid;
@@ -798,7 +798,7 @@ table.right_table select{
 
 table.right_table tr td.read_write	select.biginput	{ color: #008800; width: 320px;}
 table.right_table tr td.read_only	select.biginput	{ color: #CC8800; width: 320px;}
-table.right_table tr td.deny 	select.biginput	{ color: #CC0000; width: 320px;}
+table.right_table tr td.deny		select.biginput	{ color: #CC0000; width: 320px;}
 
 /**************** GRAPH ****************/
 
@@ -848,7 +848,7 @@ table.menu td{
 }
 
 table.menu tr td:hover{
-	cursor: pointer; 
+	cursor: pointer;
 }
 
 table.menu tr td.active{
@@ -1048,7 +1048,7 @@ table.warning tr.center td.left{
 table.warning tr.center td.right{
 	padding: 	5px;
 	vertical-align:	middle;
-	text-align: 	center; 
+	text-align: 	center;
 	border-top:	2px gray inset;
 	border-left:	2px gray inset;
 	background-color: white;
@@ -1128,7 +1128,7 @@ table.setup_wizard tr.center td.right
 {
 	padding: 	5px;
 	vertical-align:	middle;
-	text-align: 	center; 
+	text-align: 	center;
 	border-top:	2px gray inset;
 	border-left:	2px gray inset;
 	background-color: white;
@@ -1195,7 +1195,7 @@ table.history td.caption{
 	font-weight:bold;
 	font-family: Verdana, Helvetica, Geneva;
 	font-size:10px;
-	text-align:left;	
+	text-align:left;
 }
 
 /**************** </HISTORY> *****************/
@@ -1261,7 +1261,7 @@ table.msgerr tr td.msg{
 /********** <REQUIREMENTS> *************/
 table.requirements{
 	text-align: left;
-	border-spacing: 1px; 
+	border-spacing: 1px;
 }
 
 table.requirements tr td.header{
