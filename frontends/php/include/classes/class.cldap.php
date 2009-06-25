@@ -193,8 +193,8 @@ class CLdap{
 			$filter = "(ObjectClass=*)";
 		}
 
-		$sr     = ldap_search($this->ds, $base, $filter);
-		$result = ldap_get_entries($this->ds, $sr);
+		$sr	= ldap_search($this->ds, $base, $filter);
+		$result	= ldap_get_entries($this->ds, $sr);
 
 // Don't accept more or less than one response
 		if($result['count'] != 1){
