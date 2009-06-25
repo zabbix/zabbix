@@ -379,7 +379,7 @@
 *		check_dynamic_items
 *
 * Description:
-*		Check if in screen are dynamic items, if so return TRUE, esle FALSE
+*		Check whether there are dynamic items in the screen, if so return TRUE, else FALSE
 *
 * Author:
 *		Aly
@@ -610,7 +610,7 @@
 				$form->addVar('resourceid',0);
 		}
 		else if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW))){
-// Overiews
+// Overviews
 			$caption = '';
 			$id=0;
 
@@ -671,7 +671,7 @@
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 		}
 		else if(($resourcetype == SCREEN_RESOURCE_HOSTS_INFO) || ($resourcetype == SCREEN_RESOURCE_TRIGGERS_INFO)){
-// HOTS info
+// HOSTS info
 			$caption = '';
 			$id=0;
 
@@ -1208,11 +1208,11 @@
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_ACTIONS)){
 					$item = array(get_history_of_actions($elements));
-					if($editmode == 1)      array_push($item,new CLink(S_CHANGE,$action));
+					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_EVENTS)){
 					$item = array(get_history_of_triggers_events(0, $elements));
-					if($editmode == 1)      array_push($item,new CLink(S_CHANGE,$action));
+					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else{
 					$item = array(SPACE);
@@ -1221,12 +1221,12 @@
 
 				$str_halign = 'def';
 				if($halign == HALIGN_CENTER)	$str_halign = 'cntr';
-				if($halign == HALIGN_LEFT)		$str_halign = 'left';
-				if($halign == HALIGN_RIGHT)		$str_halign = 'right';
+				if($halign == HALIGN_LEFT)	$str_halign = 'left';
+				if($halign == HALIGN_RIGHT)	$str_halign = 'right';
 
 				$str_valign = 'def';
 				if($valign == VALIGN_MIDDLE)	$str_valign = 'mdl';
-				if($valign == VALIGN_TOP)		$str_valign = 'top';
+				if($valign == VALIGN_TOP)	$str_valign = 'top';
 				if($valign == VALIGN_BOTTOM)	$str_valign = 'bttm';
 
 				if(($editmode == 1) && !$item_form){
