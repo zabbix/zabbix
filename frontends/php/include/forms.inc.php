@@ -3155,7 +3155,7 @@
 		$tblPeriod->SetHeader(array(
 				new CCheckBox('all_periods',null,'CheckAll("'.S_PERIOD.'","all_periods","g_timeperiodid");'),
 				S_PERIOD_TYPE,
-				S_SHEDULE,
+				S_SCHEDULE,
 				S_PERIOD,
 //				S_NEXT_RUN,
 				S_ACTION

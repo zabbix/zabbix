@@ -63,7 +63,7 @@ include_once('include/page_header.php');
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.sysmapids',$_REQUEST['favid'],$_REQUEST['favobj']);
 				if($result){
-					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVORITES.'";'."\n");
+					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVOURITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){rm4favorites("sysmapid","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
@@ -71,7 +71,7 @@ include_once('include/page_header.php');
 				$result = rm4favorites('web.favorite.sysmapids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
 
 				if($result){
-					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVORITES.'";'."\n");
+					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVOURITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){ add2favorites("sysmapid","'.$_REQUEST['favid'].'");}'."\n");
 				}
 			}
@@ -162,12 +162,12 @@ include_once('include/page_header.php');
 
 		if(infavorites('web.favorite.sysmapids',$_REQUEST['sysmapid'],'sysmapid')){
 			$icon = new CDiv(SPACE,'iconminus');
-			$icon->addOption('title',S_REMOVE_FROM.' '.S_FAVORITES);
+			$icon->addOption('title',S_REMOVE_FROM.' '.S_FAVOURITES);
 			$icon->addAction('onclick',new CScript("javascript: rm4favorites('sysmapid','".$_REQUEST["sysmapid"]."',0);"));
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
-			$icon->addOption('title',S_ADD_TO.' '.S_FAVORITES);
+			$icon->addOption('title',S_ADD_TO.' '.S_FAVOURITES);
 			$icon->addAction('onclick',new CScript("javascript: add2favorites('sysmapid','".$_REQUEST["sysmapid"]."');"));
 		}
 		$icon->addOption('id','addrm_fav');
