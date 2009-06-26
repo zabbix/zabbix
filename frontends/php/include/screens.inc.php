@@ -718,7 +718,7 @@
 
 		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_HOSTS_INFO,SCREEN_RESOURCE_TRIGGERS_INFO))){
 			$cmbStyle = new CComboBox("style", $style);
-			$cmbStyle->AddItem(STYLE_HORISONTAL,	S_HORISONTAL);
+			$cmbStyle->AddItem(STYLE_HORISONTAL,	S_HORIZONTAL);
 			$cmbStyle->AddItem(STYLE_VERTICAL,	S_VERTICAL);
 			$form->AddRow(S_STYLE,	$cmbStyle);
 		}
@@ -757,10 +757,10 @@
 		if(uint_in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_MAP,
 			SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL))){
 			$cmbHalign = new CComboBox("halign",$halign);
-			$cmbHalign->AddItem(HALIGN_CENTER,	S_CENTER);
+			$cmbHalign->AddItem(HALIGN_CENTER,	S_CENTRE);
 			$cmbHalign->AddItem(HALIGN_LEFT,	S_LEFT);
 			$cmbHalign->AddItem(HALIGN_RIGHT,	S_RIGHT);
-			$form->AddRow(S_HORISONTAL_ALIGN,	$cmbHalign);
+			$form->AddRow(S_HORIZONTAL_ALIGN,	$cmbHalign);
 		}
 		else{
 			$form->AddVar("halign",	0);

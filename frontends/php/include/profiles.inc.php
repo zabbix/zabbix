@@ -350,7 +350,7 @@ function update_config($configs){
 
 	if(isset($configs['work_period']) && !is_null($configs['work_period'])){
 		if(!validate_period($configs['work_period'])){
-			error(S_ICORRECT_WORK_PERIOD);
+			error(S_INCORRECT_WORK_PERIOD);
 			return NULL;
 		}
 	}

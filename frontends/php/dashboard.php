@@ -216,7 +216,7 @@ include_once "include/page_header.php";
 	$graph_menu->AddOption('title',S_MENU);
 	
 	$left_tab->AddRow(create_hat(
-			S_FAVORITE.SPACE.S_GRAPHS,
+			S_FAVOURITE.SPACE.S_GRAPHS,
 			make_favorite_graphs(),
 			array($graph_menu),
 			'hat_favgrph',
@@ -228,7 +228,7 @@ include_once "include/page_header.php";
 	$screen_menu->AddOption('title',S_MENU);
 
 	$left_tab->AddRow(create_hat(
-			S_FAVORITE.SPACE.S_SCREENS,
+			S_FAVOURITE.SPACE.S_SCREENS,
 			make_favorite_screens(),
 			array($screen_menu),
 			'hat_favscr',
@@ -241,7 +241,7 @@ include_once "include/page_header.php";
 	$sysmap_menu->AddOption('title',S_MENU);
 		
 	$left_tab->AddRow(create_hat(
-			S_FAVORITE.SPACE.S_MAPS,
+			S_FAVOURITE.SPACE.S_MAPS,
 			make_favorite_maps(),
 			array($sysmap_menu),
 			'hat_favmap',

@@ -159,7 +159,7 @@
 	'S_MISSING'=>				'Missing',
 	'S_REFRESH'=>				'Refresh',
 	'S_IMPORTED'=>				'Imported',
-	'S_SUCCESSEFULLY_SMALL'=>		'successfuly',
+	'S_SUCCESSEFULLY_SMALL'=>		'successfully',
 	'S_FAILED_SMALL'=>			'failed',
 
 //	admin.php
@@ -201,7 +201,7 @@
 	'S_ACKNOWLEDGE_ALARM_BY'=>		'Acknowledge alarm by',
 	'S_ADD_COMMENT_BY'=>			'Add comment by',
 	'S_COMMENT_ADDED'=>			'Comment added',
-	'S_CANNOT_ADD_COMMENT'=>		'Cannot add coment',
+	'S_CANNOT_ADD_COMMENT'=>		'Cannot add comment',
 	'S_ALARM_ACKNOWLEDGES_BIG'=>		'ALARM ACKNOWLEDGES',
 	'S_ACKNOWLEDGE_ADDED'=>			'Acknowledge added',
 	'S_SYS_BULK_ACKNOWLEDGE'=>		'----[BULK ACKNOWLEDGE]----',
@@ -420,7 +420,7 @@
 	'S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE'=>	'User group for database down message',
 	'S_INCORRECT_GROUP'=>				'Incorrect group',
 	'S_NOTHING_TO_DO'=>				'Nothing to do',
-	'S_ICORRECT_WORK_PERIOD'=>			'Icorrect work period',
+	'S_INCORRECT_WORK_PERIOD'=>			'Incorrect work period',
 
 //	nodes.php
 	'S_NODE'=>			'Node',
@@ -503,7 +503,7 @@
 	'S_GRAPHS_DELETED'=>			'Graphs deleted',
 	'S_CANNOT_DELETE_GRAPHS'=>		'Cannot delete graphs',
 	'S_CANNOT_ADD_GRAPH'=>			'Cannot add graph',
-	'S_ANOTHER_ITEM_SUM'=>			'Cannot add onemore item with type "Graph sum"',
+	'S_ANOTHER_ITEM_SUM'=>			'Cannot add another item with type "Graph sum"',
 	'S_ID'=>				'Id',
 	'S_NO_GRAPHS_DEFINED'=>			'No graphs defined',
 	'S_NO_GRAPH_DEFINED'=>			'No graph defined',
@@ -537,7 +537,7 @@
 	'S_SHOW_UNKNOWN'=>			'Show unknown',
 
 	'S_SHOW_SELECTED'=>			'Show selected',
-	'S_HIDE_SELECTED'=>			'Hide selectede',
+	'S_HIDE_SELECTED'=>			'Hide selected',
 	'S_MARK_SELECTED'=>			'Mark selected',
 	'S_MARK_OTHERS'=>			'Mark others',
 
@@ -918,8 +918,8 @@
 	'S_ISSUE'=>				'Issue',
 	'S_SYSTEM_STATUS'=>			'System status',
 	'S_LAST_20_ISSUES'=>			'Last 20 issues',
-	'S_FAVORITE'=>				'Favorite',
-	'S_FAVORITES'=>				'Favorites',
+	'S_FAVOURITE'=>				'Favourite',
+	'S_FAVOURITES'=>				'Favourites',
 	'S_EVERY'=>				'Every',
 	'S_MENU'=>				'Menu',
 	'S_RESET'=>				'Reset',
@@ -1093,10 +1093,10 @@
 
 	'S_STYLE'=>				'Style',
 	'S_VERTICAL'=>				'Vertical',
-	'S_HORISONTAL'=>			'Horizontal',
+	'S_HORIZONTAL'=>			'Horizontal',
 
-	'S_HORISONTAL_ALIGN'=>			'Horizontal align',
-	'S_CENTER'=>				'Center',
+	'S_HORIZONTAL_ALIGN'=>			'Horizontal align',
+	'S_CENTRE'=>				'Centre',
 	'S_RIGHT'=>				'Right',
 
 	'S_VERTICAL_ALIGN'=>			'Vertical align',
@@ -1137,7 +1137,7 @@
 	'S_SOFT'=>				'Soft',
 	'S_DO_NOT_CALCULATE'=>			'Do not calculate',
 	'S_CALCULATE_SLA'=>			'Calculate SLA',
-	'S_ACCEPTABLE_SLA_IN_PERCENT'=>		'Acceptabe SLA (in %)',
+	'S_ACCEPTABLE_SLA_IN_PERCENT'=>		'Acceptable SLA (in %)',
 	'S_LINK_TO_TRIGGER_Q'=>			'Link to trigger?',
 	'S_SORT_ORDER_0_999'=>			'Sort order (0->999)',
 	'S_TRIGGER'=>				'Trigger',

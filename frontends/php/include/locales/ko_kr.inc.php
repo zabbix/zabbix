@@ -372,7 +372,7 @@
 	'S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE'=>'데이터베이스 정지 메시지 송신 대상 사용자 그룹',
 	'S_INCORRECT_GROUP'=>			'부적절한 그룹',
 	'S_NOTHING_TO_DO'=>			'실행할 것이 없습니다',
-	'S_ICORRECT_WORK_PERIOD'=>		'부적절한 Working time',
+	'S_INCORRECT_WORK_PERIOD'=>		'부적절한 Working time',
 
 //	nodes.php
 	'S_NODE'=>				'노드',
@@ -850,10 +850,10 @@
 
 	'S_STYLE'=>				'표시 형식',
 	'S_VERTICAL'=>				'세로',
-	'S_HORISONTAL'=>			'가로',
+	'S_HORIZONTAL'=>			'가로',
 
-	'S_HORISONTAL_ALIGN'=>			'가로 위치',
-	'S_CENTER'=>				'가운데',
+	'S_HORIZONTAL_ALIGN'=>			'가로 위치',
+	'S_CENTRE'=>				'가운데',
 	'S_RIGHT'=>				'오른쪽',
 
 	'S_VERTICAL_ALIGN'=>			'세로 위치',
