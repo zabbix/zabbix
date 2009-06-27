@@ -261,7 +261,7 @@ class Chart extends Graph{
 		$db_triggers = DBselect('SELECT distinct tr.triggerid,tr.expression,tr.priority '.
 						' FROM triggers tr,functions f,items i'.
 						' WHERE tr.triggerid=f.triggerid '.
-							" AND f.function IN ('last','min','max') ".
+							" AND f.function IN ('last','min','avg','max') ".
 							' AND tr.status='.TRIGGER_STATUS_ENABLED.
 							' AND i.itemid=f.itemid '.
 							' AND f.itemid='.$this->items[0]['itemid'].
