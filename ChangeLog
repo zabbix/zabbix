@@ -1,5 +1,6 @@
 Changes for 1.6.6
 
+ - [ZBX-960] fixed confirmation questions in Configuration->Hosts->Host groups (Alexei)
  - [ZBX-975] TRUE/FALSE was replaced to Problems/Ok in Availability Report (Alexei)
  - [ZBX-137] added new indexes for tables: httptest, httptest, actions, dhosts, dservices, escalations (Alexei)
  - [ZBX-946] fixed drawing trigger line in graphs with trigger function "avg" (Artem)

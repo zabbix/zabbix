@@ -1346,11 +1346,11 @@ include_once('include/page_header.php');
 					$row_count++;
 			}
 			$table->SetFooter(new CCol(array(
-				new CButtonQMessage('activate',S_ACTIVATE_SELECTED,S_ACTIVATE_SELECTED_HOSTS_Q),
+				new CButtonQMessage('activate',S_ACTIVATE_SELECTED,S_ACTIVATE_SELECTED_HOST_GROUPS_Q),
 				SPACE,
-				new CButtonQMessage('disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_HOSTS_Q),
+				new CButtonQMessage('disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_HOST_GROUPS_Q),
 				SPACE,
-				new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_GROUPS_Q)
+				new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_HOST_GROUPS_Q)
 			)));
 
 			$form->AddItem($table);
