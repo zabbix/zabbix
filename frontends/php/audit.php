@@ -85,7 +85,6 @@ include_once('include/page_header.php');
 		exit();
 	}
 //--------
-ini_set('max_execution_time',10);
 
 /* FILTER */
 	if(isset($_REQUEST['filter_rst'])){
