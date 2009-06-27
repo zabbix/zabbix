@@ -272,8 +272,8 @@ include_once 'include/page_header.php';
 				array(is_show_subnodes()?S_NODE : null,
 				(($_REQUEST['hostid'] == 0) || (1 == $config))?S_HOST:NULL, 
 				S_NAME,
-				S_TRUE,
-				S_FALSE,
+				S_PROBLEMS,
+				S_OK,
 				S_UNKNOWN,
 				S_GRAPH));
 				
