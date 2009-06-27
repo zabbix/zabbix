@@ -86,7 +86,7 @@ include_once 'include/page_header.php';
 	else{
 		echo SBR;
 
-		$frmPd = new CFormTable();
+		$frmPd = new CFormTable(S_PERIOD);
 		$frmPd->setName('period');
 
 		$frmPd->addVar('dstfrm',$_REQUEST['dstfrm']);
