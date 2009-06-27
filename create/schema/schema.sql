@@ -63,7 +63,7 @@ FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|druleid
+INDEX		|1		|druleid,ip
 
 TABLE|dservices|dserviceid|ZBX_SYNC
 FIELD		|dserviceid	|t_id		|'0'	|NOT NULL	|0
@@ -76,7 +76,7 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|dcheckid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|dchecks
-INDEX		|1		|dhostid
+INDEX		|1		|dhostid,type,key_,port
 INDEX		|2		|dcheckid
 
 TABLE|ids|nodeid,table_name,field_name|
@@ -101,6 +101,8 @@ FIELD		|agent		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|time		|t_double	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|error		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|httptest_1	|applicationid
+INDEX		|2		|name
+INDEX		|3		|status
 
 TABLE|httpstep|httpstepid|ZBX_SYNC
 FIELD		|httpstepid	|t_id		|'0'	|NOT NULL	|0
@@ -350,6 +352,7 @@ FIELD		|def_longdata	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|recovery_msg	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|r_shortdata	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|r_longdata	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+INDEX		|1		|eventsource,status
 
 TABLE|operations|operationid|ZBX_SYNC
 FIELD		|operationid	|t_id		|'0'	|NOT NULL	|0
@@ -390,6 +393,7 @@ FIELD		|nextcheck	|t_time		|'0'	|NOT NULL	|0
 FIELD		|esc_step	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|actionid,triggerid
+INDEX		|2		|status,nextcheck
 
 TABLE|applications|applicationid|ZBX_SYNC
 FIELD		|applicationid	|t_id		|'0'	|NOT NULL	|0
