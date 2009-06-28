@@ -759,7 +759,7 @@
 				array_push($valuemap_el, S_NO_MAPPING_DEFINED);
 				$saveButton->addOption('disabled', 'true');
 			} else {
-				array_push($valuemap_el, new CButton('del_map','delete selected'));
+				array_push($valuemap_el, new CButton('del_map',S_DELETE_SELECTED));
 			}
 
 			$frmValmap->addRow(S_MAPPING, $valuemap_el);
