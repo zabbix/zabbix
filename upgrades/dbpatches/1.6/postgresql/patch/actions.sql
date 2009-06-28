@@ -4,3 +4,5 @@ alter table actions add        def_longdata            text            DEFAULT '
 alter table actions add        recovery_msg            integer         DEFAULT '0'     NOT NULL;
 alter table actions add        r_shortdata             varchar(255)            DEFAULT ''      NOT NULL;
 alter table actions add        r_longdata              text            DEFAULT ''      NOT NULL;
+
+CREATE INDEX actions_1 on actions (eventsource,status);
