@@ -1677,7 +1677,7 @@
 		if(count($delay_flex_el)==0)
 			array_push($delay_flex_el, S_NO_FLEXIBLE_INTERVALS);
 		else
-			array_push($delay_flex_el, new CButton('del_delay_flex','delete selected'));
+			array_push($delay_flex_el, new CButton('del_delay_flex',S_DELETE_SELECTED));
 
 		if(count($applications)==0)  array_push($applications,0);
 
@@ -2067,7 +2067,7 @@
 		if(count($delay_flex_el)==0)
 			array_push($delay_flex_el, "No flexible intervals");
 		else
-			array_push($delay_flex_el, new CButton('del_delay_flex','delete selected'));
+			array_push($delay_flex_el, new CButton('del_delay_flex',S_DELETE_SELECTED));
 
 		if(count($applications)==0)  array_push($applications,0);
 
@@ -2315,7 +2315,7 @@
 		if(count($dep_el)==0)
 			$dep_el[] = S_NO_DEPENDENCES_DEFINED;
 		else
-			$dep_el[] = new CButton('del_dependence','delete selected');
+			$dep_el[] = new CButton('del_dependence',S_DELETE_SELECTED);
 
 //		$frmMTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
 /* end dependencies */
@@ -2427,7 +2427,7 @@
 		if(count($dep_el)==0)
 			array_push($dep_el,  S_NO_DEPENDENCES_DEFINED);
 		else
-			array_push($dep_el, new CButton('del_dependence','delete selected'));
+			array_push($dep_el, new CButton('del_dependence',S_DELETE_SELECTED));
 		$frmTrig->addRow(S_THE_TRIGGER_DEPENDS_ON,$dep_el);
 	/* end dependencies */
 
