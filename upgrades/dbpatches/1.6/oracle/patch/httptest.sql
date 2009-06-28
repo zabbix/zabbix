@@ -21,3 +21,5 @@ drop table httptest;
 alter table httptest_tmp rename to httptest;
 
 CREATE INDEX httptest_httptest_1 on httptest (applicationid);
+CREATE INDEX httptest_2 on httptest (name);
+CREATE INDEX httptest_3 on httptest (status);

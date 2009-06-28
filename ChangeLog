@@ -1,5 +1,6 @@
 Changes for 1.6.6
 
+ - [ZBX-920] addedd missing indexes to DB upgrade patch for 1.6 (Alexei)
  - [ZBX-854] added support of template triggers for actions (Alexei)
  - [ZBX-916] phrase 'delete selected' replaced by translatable S_DELETE_SELECTED (Alexei)
  - [ZBX-960] fixed confirmation questions in Configuration->Hosts->Host groups (Alexei)
