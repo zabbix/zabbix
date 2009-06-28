@@ -208,6 +208,19 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 			{
 				ret = SUCCEED;
 			}
+			/* Processing of templated triggers */
+			else
+			{
+				result = DBselect("select triggerid from triggers where triggerid=" ZBX_FS_UI64
+					" and templateid=" ZBX_FS_UI64,
+						event->objectid,
+						condition_value);
+				if((row=DBfetch(result)))
+				{
+					ret = SUCCEED;
+				}
+				DBfree_result(result);
+			}
 		}
 		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 		{
