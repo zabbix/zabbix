@@ -10,3 +10,4 @@ CREATE TABLE escalations (
 	PRIMARY KEY (escalationid)
 );
 CREATE INDEX escalations_1 on escalations (actionid,triggerid);
+CREATE INDEX escalations_2 on escalations (status,nextcheck);
