@@ -11,3 +11,5 @@ CREATE TABLE dhosts_tmp (
 insert into dhosts_tmp select * from dhosts;
 drop table dhosts;
 alter table dhosts_tmp rename to dhosts;
+
+CREATE INDEX dhosts_1 on dhosts (druleid,ip);

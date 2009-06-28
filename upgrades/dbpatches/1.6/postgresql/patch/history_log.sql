@@ -12,3 +12,4 @@ insert into history_log_tmp select id,itemid,clock,timestamp,source,severity,val
 drop table history_log;
 alter table history_log_tmp rename to history_log;
 CREATE INDEX history_log_1 on history_log (itemid,clock);
+CREATE UNIQUE INDEX history_log_2 on history_log (itemid,id);
