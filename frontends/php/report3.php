@@ -32,14 +32,14 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"serviceid"=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,			NULL),
+		"serviceid"=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,						NULL),
 		"period"=>		array(T_ZBX_STR, O_OPT,	null,	IN('"dayly","weekly","monthly","yearly"'),	NULL),
-		"year"=>		array(T_ZBX_INT, O_OPT,	null,	null,		NULL)
+		"year"=>		array(T_ZBX_INT, O_OPT,	null,	null,						NULL)
 	);
 
 	check_fields($fields);
 
-	$period = get_request("period", "weekly");
+	$period = get_request("period",	"weekly");
 	$year	= get_request("year",	date("Y"));
 
 	define("YEAR_LEFT_SHIFT", 5);
