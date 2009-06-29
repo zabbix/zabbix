@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-        require_once "include/config.inc.php";
+	require_once "include/config.inc.php";
 
-        $page["title"] = "S_IT_NOTIFICATIONS";
-        $page["file"] = "report4.php";
+	$page["title"] = "S_IT_NOTIFICATIONS";
+	$page["file"] = "report4.php";
 	$page['hist_arg'] = array('media_type','period','year');
 
 include_once "include/page_header.php";
@@ -31,9 +31,9 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"year"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	NULL,		NULL),
-		"period"=>		array(T_ZBX_STR, O_OPT,	P_SYS|P_NZERO,	IN('"dayly","weekly","monthly","yearly"'),		NULL),
-		"media_type"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL)
+		"year"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	NULL,						NULL),
+		"period"=>		array(T_ZBX_STR, O_OPT,	P_SYS|P_NZERO,	IN('"dayly","weekly","monthly","yearly"'),	NULL),
+		"media_type"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,							NULL)
 	);
 
 	check_fields($fields);
