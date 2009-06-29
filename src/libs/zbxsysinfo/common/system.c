@@ -30,14 +30,14 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 {
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	SET_UI64_RESULT(result, time(NULL));
 
 	return SYSINFO_RET_OK;
 }
 
-int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(_WINDOWS)
 	char	counter_path[64];
@@ -46,15 +46,15 @@ int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	return PERF_MONITOR(cmd, counter_path, flags, result);
 #else
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        return EXECUTE_INT(cmd, "who|wc -l", flags, result);
+	return EXECUTE_INT(cmd, "who|wc -l", flags, result);
 #endif /* _WINDOWS */
 }
 
-int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(_WINDOWS)
 	DWORD	dwSize;
@@ -163,15 +163,15 @@ int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	return SYSINFO_RET_OK;
 #else
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        return EXECUTE_STR(cmd, "uname -a", flags, result);
+	return EXECUTE_STR(cmd, "uname -a", flags, result);
 #endif /* _WINDOWS */
 }
 
-int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(_WINDOWS)
 	DWORD dwSize;
@@ -188,10 +188,10 @@ int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGEN
 
 	return SYSINFO_RET_OK;
 #else
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        return EXECUTE_STR(cmd, "hostname", flags, result);
+	return EXECUTE_STR(cmd, "hostname", flags, result);
 #endif /* _WINDOWS */
 }

@@ -78,7 +78,7 @@ static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT
 {
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 	SET_MSG_RESULT(result, strdup("Accessible only as active check!"));
 	return SYSINFO_RET_FAIL;
 }
@@ -94,7 +94,7 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	if(NULL == (f = fopen(file,"r")))
 	{
@@ -129,9 +129,9 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 
 static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	SET_UI64_RESULT(result, 1);
 	return SYSINFO_RET_OK;
@@ -143,7 +143,7 @@ static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGE
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	SET_STR_RESULT(result, strdup(version));
 
@@ -174,9 +174,9 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	char	*command=NULL;
 	int	len;
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	cmd_result = zbx_dsprintf(cmd_result,"");
 	memset(stat_buf, 0, sizeof(stat_buf));
@@ -359,7 +359,7 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	pid_t	pid;
 #endif
 
-        assert(result);
+	assert(result);
 
 	init_result(result);
 
@@ -369,11 +369,11 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		return SYSINFO_RET_FAIL;
 	}
 
-        if (num_param(param) > 2)
-                return SYSINFO_RET_FAIL;
+	if (num_param(param) > 2)
+		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, command, sizeof(command)))
-                return SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 
 	if (*command == '\0')
 		return SYSINFO_RET_FAIL;
