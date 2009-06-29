@@ -32,31 +32,31 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'config'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1,2,3'),		NULL),
+		'config'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1,2,3'),	NULL),
 
-		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		NULL),
-		'hostids'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		'isset({config})&&({config}==3)&&isset({report_show})&&!isset({groupids})'),
+		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		NULL),
+		'hostids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		'isset({config})&&({config}==3)&&isset({report_show})&&!isset({groupids})'),
 		'groupids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		'isset({config})&&({config}==3)&&isset({report_show})&&!isset({hostids})'),
 
-		'items'=>			array(T_ZBX_STR, O_OPT,  NULL,	null,		'isset({report_show})'),
-		'new_graph_item'=>	array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
+		'items'=>		array(T_ZBX_STR, O_OPT,	NULL,	null,		'isset({report_show})'),
+		'new_graph_item'=>	array(T_ZBX_STR, O_OPT,	NULL,	null,		null),
 		'group_gid'=>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
 
-		'title'=>			array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
-		'xlabel'=>			array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
-		'ylabel'=>			array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
+		'title'=>		array(T_ZBX_STR, O_OPT,	NULL,	null,		null),
+		'xlabel'=>		array(T_ZBX_STR, O_OPT,	NULL,	null,		null),
+		'ylabel'=>		array(T_ZBX_STR, O_OPT,	NULL,	null,		null),
 
-		'showlegend'=>		array(T_ZBX_STR, O_OPT, NULL,	null,		null),
+		'showlegend'=>		array(T_ZBX_STR, O_OPT,	NULL,	null,		null),
 		'sorttype'=>		array(T_ZBX_INT, O_OPT,	null,	null,		null),
 
 		'scaletype'=>		array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
 		'avgperiod'=>		array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
 
-		'periods'=>			array(T_ZBX_STR, O_OPT,	null,	null,		null),
-		'new_period'=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
+		'periods'=>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
+		'new_period'=>		array(T_ZBX_STR, O_OPT,	NULL,	null,		null),
 		'group_pid'=>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
 
-		'palette'=>			array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
+		'palette'=>		array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
 		'palettetype'=>		array(T_ZBX_INT, O_OPT,	NULL,	null,		NULL),
 
 // actions
@@ -65,10 +65,10 @@ include_once('include/page_header.php');
 		'report_show'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
 // filter
-		'report_show'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
+		'report_show'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		NULL),
 
 		'report_timesince'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
-		'report_timetill'=>		array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
+		'report_timetill'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
 
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
