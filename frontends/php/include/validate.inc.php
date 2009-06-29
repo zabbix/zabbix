@@ -363,11 +363,11 @@
 		if(($type == T_ZBX_CLR) && !is_hex_color($var)) {
 			$var = 'FFFFFF';
 			if($flags&P_SYS){
-				info("Critical error. Field [".$field."] is not color");
+				info("Critical error. Field [".$field."] is not a colour");
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info("Warning. Field [".$field."] is not color");
+				info("Warning. Field [".$field."] is not a colour");
 				return ZBX_VALID_WARNING;
 			}
 		}
