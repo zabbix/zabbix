@@ -472,7 +472,7 @@
 	'S_DELETE_REGULAR_EXPRESSION_Q'=>		'Delete regular expression?',
 	'S_DELETE_SELECTED_REGULAR_EXPRESSIONS_Q'=>	'Delete selected regular expressions?',
 	
-	'S_GROUP_FOR_DISCOVERED_HOSTS' => 'Group for discovered hosts',
+	'S_GROUP_FOR_DISCOVERED_HOSTS'=>		'Group for discovered hosts',
 
 //	nodes.php
 	'S_NODE'=>			'Node',
@@ -520,7 +520,7 @@
 	'S_ITEM_ADDED'=>			'Item added',
 	'S_ITEM_UPDATED'=>			'Item updated',
 	'S_ITEMS_UPDATED'=>			'Items updated',
-	'S_ITEM_DOES_NOT_EXIST'=>			'Item does not exist',
+	'S_ITEM_DOES_NOT_EXIST'=>		'Item does not exist',
 	'S_SORT_BY'=>				'Sort by',
 	'S_PARAMETER'=>				'Parameter',
 	'S_COLOR'=>				'Colour',
@@ -1047,7 +1047,7 @@
 	'S_SYSTEM_STATUS'=>			'System status',
 	'S_LAST_20_ISSUES'=>			'Last 20 issues',
 	'S_FAVOURITE'=>				'Favourite',
-	'S_FAVOURITES'=>				'Favourites',
+	'S_FAVOURITES'=>			'Favourites',
 	'S_EVERY'=>				'Every',
 	'S_MENU'=>				'Menu',
 	'S_RESET'=>				'Reset',
@@ -1310,14 +1310,14 @@
 	'S_SATURDAY'=>				'Saturday',
 
 //	srv_status.php
-	'S_IT_SERVICES_BIG'=>		'IT SERVICES',
+	'S_IT_SERVICES_BIG'=>			'IT SERVICES',
 	'S_SERVICE'=>				'Service',
 	'S_SERVICES'=>				'Services',
 	'S_REASON'=>				'Reason',
-	'S_SLA_LAST_7_DAYS'=>		'SLA (last 7 days)',
-	'S_PLANNED_CURRENT_SLA'=>	'Planned/current SLA',
+	'S_SLA_LAST_7_DAYS'=>			'SLA (last 7 days)',
+	'S_PLANNED_CURRENT_SLA'=>		'Planned/current SLA',
 	'S_TRIGGER_BIG'=>			'TRIGGER',
-	'S_TODAY'=>					'Today',
+	'S_TODAY'=>				'Today',
 	'S_THIS_WEEK'=>				'This week',
 	'S_THIS_YEAR'=>				'This year',
 	'S_THIS_MONTH'=>			'This month',
