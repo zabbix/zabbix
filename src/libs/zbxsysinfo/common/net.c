@@ -31,17 +31,17 @@
  * 1 - OK
  * */
 int	tcp_expect(
-		   const char		*host,
-		   unsigned short	port,
-		   const char		*request,
-		   const char		*expect,
-		   const char		*sendtoclose,
-		   int			*value_int
+		const char		*host,
+		unsigned short		port,
+		const char		*request,
+		const char		*expect,
+		const char		*sendtoclose,
+		int			*value_int
 	   )
 {
 	zbx_sock_t	s;
-	char	*buf;
-	int	ret;
+	char		*buf;
+	int		ret;
 
 	assert(value_int);
 
@@ -91,19 +91,19 @@ int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	char	pattern[MAX_STRING_LEN];
 	int	ret = SYSINFO_RET_FAIL;
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(num_param(param) > 1)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(get_param(param, 1, porthex, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(get_param(param, 1, porthex, MAX_STRING_LEN) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
 	strscpy(pattern,porthex);
 	zbx_strlcat(pattern," 00000000:0000 0A", MAX_STRING_LEN);
@@ -140,19 +140,19 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	char	ip[MAX_STRING_LEN];
 	char	port_str[MAX_STRING_LEN];
 
-        assert(result);
+	assert(result);
 
 	init_result(result);
 
-    if(num_param(param) > 2)
-    {
-        return SYSINFO_RET_FAIL;
-    }
+	if(num_param(param) > 2)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
 	if(get_param(param, 1, ip, MAX_STRING_LEN) != 0)
-    {
-           ip[0] = '\0';
-    }
+	{
+		ip[0] = '\0';
+	}
 
 	if(ip[0] == '\0')
 	{
@@ -160,9 +160,9 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	}
 
 	if(get_param(param, 2, port_str, MAX_STRING_LEN) != 0)
-    {
-        port_str[0] = '\0';
-    }
+	{
+		port_str[0] = '\0';
+	}
 
 	if(port_str[0] == '\0')
 	{
@@ -190,7 +190,7 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #endif /* PACKETSZ */
 
 #if !defined(C_IN)
-#	define C_IN 	ns_c_in
+#	define C_IN	ns_c_in
 #endif /* C_IN */
 
 #if !defined(T_ANY)
@@ -208,10 +208,10 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        if (num_param(param) > 2)
-                return SYSINFO_RET_FAIL;
+	if (num_param(param) > 2)
+		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, ip, MAX_STRING_LEN))
                *ip = '\0';

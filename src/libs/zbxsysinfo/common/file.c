@@ -30,15 +30,15 @@ int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN];
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        if (num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
+	if (num_param(param) > 1)
+	return SYSINFO_RET_FAIL;
 
-        if (0 != get_param(param, 1, filename, MAX_STRING_LEN))
-                return SYSINFO_RET_FAIL;
+	if (0 != get_param(param, 1, filename, MAX_STRING_LEN))
+		return SYSINFO_RET_FAIL;
 
 	if (0 != stat(filename, &buf))
 		return SYSINFO_RET_FAIL;
@@ -52,28 +52,28 @@ int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
-	char    filename[MAX_STRING_LEN];
-	char    type[MAX_STRING_LEN];
-	int	ret = SYSINFO_RET_FAIL;
+	char		filename[MAX_STRING_LEN];
+	char		type[MAX_STRING_LEN];
+	int		ret = SYSINFO_RET_FAIL;
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        if(num_param(param) > 2)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(num_param(param) > 2)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(get_param(param, 2, type, MAX_STRING_LEN) != 0)
-        {
-                type[0] = '\0';
-        }
+	if(get_param(param, 2, type, MAX_STRING_LEN) != 0)
+	{
+		type[0] = '\0';
+	}
 
 	if(type[0] == '\0')
 	{
@@ -106,15 +106,15 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	struct stat	buf;
 	char		filename[MAX_STRING_LEN];
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        if (num_param(param) > 1)
-                return SYSINFO_RET_FAIL;
+	if (num_param(param) > 1)
+		return SYSINFO_RET_FAIL;
 
-        if (0 != get_param(param, 1, filename, sizeof(filename)))
-                return SYSINFO_RET_FAIL;
+	if (0 != get_param(param, 1, filename, sizeof(filename)))
+		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, 0);
 
@@ -138,9 +138,9 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	char	*buf = NULL;
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	memset(tmp,0,MAX_STRING_LEN);
 
@@ -208,9 +208,9 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	char	*buf = NULL;
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
 	{
@@ -273,7 +273,7 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	size_t	nr;
 	struct stat	buf_stat;
 
-        md5_state_t state;
+	md5_state_t state;
 	u_char	buf[16 * 1024];
 
 	unsigned char	hashText[MD5_DIGEST_SIZE*2+1];
@@ -283,17 +283,17 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(num_param(param) > 1)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
 	if(stat(filename,&buf_stat) != 0)
 	{
@@ -312,12 +312,12 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return	SYSINFO_RET_FAIL;
 	}
 
-        md5_init(&state);
+	md5_init(&state);
 	while ((nr = fread(buf, 1, (size_t)sizeof(buf), file)) > 0)
 	{
-        	md5_append(&state,(const md5_byte_t *)buf, (int)nr);
+		md5_append(&state,(const md5_byte_t *)buf, (int)nr);
 	}
-        md5_finish(&state, hash);
+	md5_finish(&state, hash);
 
 	zbx_fclose(file);
 
@@ -415,17 +415,17 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
 	if(NULL == (f = fopen(filename,"rb")))
 	{
