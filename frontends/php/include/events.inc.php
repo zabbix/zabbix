@@ -357,7 +357,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 		$sql_cond = ' AND h.hostid=hg.hostid AND hg.groupid='.$groupid;
 	}
 	else{
-		$sql_from = ', hosts_groups hg ';
+		$sql_from = '';
 		$sql_cond = ' AND '.DBcondition('h.hostid',$available_hosts);
 	}
 
