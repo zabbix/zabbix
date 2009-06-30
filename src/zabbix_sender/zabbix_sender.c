@@ -28,7 +28,7 @@
 
 char *progname = NULL;
 
-char title_message[] = "ZABBIX sender";
+char title_message[] = "ZABBIX Sender";
 
 char usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -i <file>} [-c <file>]";
 
