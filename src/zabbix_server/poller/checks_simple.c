@@ -59,7 +59,7 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 			{
 				zbx_snprintf(c,sizeof(c),"net.tcp.service[%s,%s]",
 					item->key,
-					item->host_ip);
+					item->host_dns);
 			}
 		}
 	}
