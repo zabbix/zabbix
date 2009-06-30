@@ -175,7 +175,7 @@ include_once "include/page_header.php";
 
 	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+35+9+15*1,imagecolorallocate($im,235,120,120));
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+35*1,$black);
-	imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+35, S_PROBLEMS."(%)", $black);
+	imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+35, S_PROBLEMS." (%)", $black);
 
 	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,imagecolorallocate($im,220,220,220));
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,$black);
