@@ -26,7 +26,7 @@
 #include "zbxgetopt.h"
 
 char *progname = NULL;
-char title_message[] = "ZABBIX get - Communicate with ZABBIX agent";
+char title_message[] = "ZABBIX Get";
 char usage_message[] = "[-hV] -s<host name or IP> [-p<port>] [-I<ip address>] -k<key>";
 
 #ifdef HAVE_GETOPT_LONG
