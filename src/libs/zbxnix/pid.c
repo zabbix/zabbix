@@ -58,7 +58,7 @@ int	create_pid_file(const char *pidfile)
 			return FAIL;
 		}
 #ifdef HAVE_FCNTL_H
-    		if(-1 == fcntl(fd, F_SETLK, &fl) && EAGAIN == errno)
+		if(-1 == fcntl(fd, F_SETLK, &fl) && EAGAIN == errno)
 #else
 		if(-1 == flock(fd, LOCK_EX | LOCK_NB) && EWOULDBLOCK == errno)
 #endif /* HAVE_FCNTL_H */
