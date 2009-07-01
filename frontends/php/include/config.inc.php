@@ -1369,4 +1369,28 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
 	}
+	
+	function order_result(&$data, $def_field, $def_order=ZBX_SORT_UP){
+		global $page;
+
+		if(empty($data)) return false;
+
+		$sortfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def_field));
+		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def_order));
+
+		foreach($data as $key => $rows){
+			if(!isset($rows[$sortfield])){
+//				info('Page sorting failed ["'.$sortfield.'","'.$sortorder.'"]');
+				return false;
+			}
+
+			$tmp[$key] = strtolower($rows[$sortfield]);
+		}
+
+		$sortorder = ($sortorder == 'ASC')?SORT_ASC:SORT_DESC;
+
+		array_multisort($tmp, $sortorder, $data);
+
+	return true;
+	}
 ?>

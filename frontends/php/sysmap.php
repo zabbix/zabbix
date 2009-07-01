@@ -186,10 +186,17 @@ include_once('include/page_header.php');
 		$table = new CTableInfo();
 		$table->setHeader(array(S_LABEL,S_TYPE,S_X,S_Y,S_ICON_OK,S_ICON_PROBLEM,S_ICON_UNKNOWN,S_ICON_DISABLED));
 
-		$db_elements = DBselect('select * from sysmaps_elements where sysmapid='.$_REQUEST['sysmapid'].
-			' order by label');
+		$map_elements = array();
+		$sql = 'select * '.
+				' from sysmaps_elements '.
+				' where sysmapid='.$_REQUEST['sysmapid'];
+		$db_elements = DBselect($sql);
 		while($db_element = DBfetch($db_elements)){
-
+			$map_elements[$db_element['selementid']] = $db_element;
+		}
+		order_result($map_elements, 'label');
+		
+		foreach($map_elements as $selementid => $db_element){
 			if(    $db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)		$type = S_HOST;
 			elseif($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP)		$type = S_MAP;
 			elseif($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)	$type = S_TRIGGER;
@@ -222,20 +229,38 @@ include_once('include/page_header.php');
 		$table->setHeader(array(S_LINK,S_ELEMENT_1,S_ELEMENT_2,S_LINK_STATUS_INDICATOR));
 
 		$i = 1;
-		$result=DBselect('select linkid,selementid1,selementid2 from sysmaps_links'.
-			' where sysmapid='.$_REQUEST['sysmapid'].' order by linkid');
+		
+		$links = array();
+		$selementids = array();
+		$sql = 'SELECT linkid,selementid1,selementid2 '.
+				' FROM sysmaps_links '.
+				' WHERE sysmapid='.$_REQUEST['sysmapid'];
+		$result=DBselect($sql);
 		while($row=DBfetch($result)){
-	/* prepare label 1 */
-			$result1=DBselect('select label from sysmaps_elements'.
-				' where selementid='.$row['selementid1']);
-			$row1=DBfetch($result1);
-			$label1=$row1['label'];
+			$links[$row['linkid']] = $row;
+			$selementids[$row['selementid1']] = $row['selementid1'];
+			$selementids[$row['selementid2']] = $row['selementid2'];
+		}
+		
+		$labels = array();
+		$sql = 'SELECT selementid, label '.
+				' FROM sysmaps_elements '.
+				' WHERE '.DBcondition('selementid',$selementids);
+		$result=DBselect($sql);
+		while($row=DBfetch($result)){
+			$labels[$row['selementid']] = $row['label'];
+		}
+		
+		foreach($links as $linkid => $row){
+			$links[$linkid]['label1']=$labels[$row['selementid1']];
+			$links[$linkid]['label2']=$labels[$row['selementid2']];
+		}
+		
+		order_result($links, 'label1');
 
-	/* prepare label 2 */
-			$result1=DBselect('select label from sysmaps_elements'.
-				' where selementid='.$row['selementid2']);
-			$row1=DBfetch($result1);
-			$label2=$row1['label'];
+		foreach($links as $linkid => $row){
+			$label1 = $row['label1'];
+			$label2 = $row['label2'];
 			
 	/* prepare description */
 	
