@@ -86,15 +86,22 @@
 	**     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
 	**/
 
-//define("USE_PROFILING",1);
-define("USE_VAR_MON",1);
+define("USE_PROFILING",1);
+//define("USE_VAR_MON",1);
 define("USE_TIME_PROF",1);
-define("USE_MEM_PROF",1);
-define("USE_COUNTER_PROF",1);
-define("USE_MENU_PROF",1);
+//define("USE_MEM_PROF",1);
+//define("USE_COUNTER_PROF",1);
+//define("USE_MENU_PROF",1);
 //define("USE_MENU_DETAILS",1);
 define("USE_SQLREQUEST_PROF",1);
-//define("SHOW_SQLREQUEST_DETAILS",1);
+define("SHOW_SQLREQUEST_DETAILS",1);
+// What is considered long query
+define("LONG_QUERY",0.01);
+// WHat is limit on total time spent on all SQL queries
+define("QUERY_TOTAL_TIME",0.5);
+// WHat is limit on total time spent
+define("TOTAL_TIME",1.0);
+//define("SHOW_SQLREQUEST_LONG_QUERIES_ONLY",1);
 
 if(!defined('OBR')) define('OBR',"<br/>\n");
 
@@ -109,7 +116,7 @@ if(defined('USE_PROFILING')){
 	class COpt{
 		/* protected static $starttime[]=array(); */
 
-		/* protected  static */  function getmicrotime() {
+		protected  static function getmicrotime() {
 			if(defined('USE_TIME_PROF')) {
 				list($usec, $sec) = explode(' ',microtime());
 				return ((float)$usec + (float)$sec);
@@ -120,7 +127,7 @@ if(defined('USE_PROFILING')){
 		}
 
 
-		/* public static */ function showmemoryusage($descr=null){
+		public static function showmemoryusage($descr=null){
 			if(defined('USE_MEM_PROF')) {
 				$memory_usage = COpt::getmemoryusage();
 				$memory_usage = $memory_usage.'b | '.($memory_usage>>10).'K | '.($memory_usage>>20).'M';
@@ -128,7 +135,7 @@ if(defined('USE_PROFILING')){
 			}
 		}
 
-		/* protected static */ function getmemoryusage() {
+		protected static function getmemoryusage() {
 			if(defined('USE_MEM_PROF')) {
 				return memory_get_usage('memory_limit');
 			} else {
@@ -136,7 +143,7 @@ if(defined('USE_PROFILING')){
 			}
 		}
 
-		/* public static */ function counter_up($type=NULL){
+		public static function counter_up($type=NULL){
 			if(defined('USE_COUNTER_PROF')){
 				global $perf_counter;
 				global $starttime;
@@ -150,7 +157,7 @@ if(defined('USE_PROFILING')){
 			}
 		}
 
-		/* public static */ function profiling_start($type=NULL){
+		public static function profiling_start($type=NULL){
 			global $starttime;
 			global $memorystamp;
 			global $sqlmark;
@@ -175,11 +182,13 @@ if(defined('USE_PROFILING')){
 			}
 		}
 
-		/* public static */ function savesqlrequest($sql){
+		public static function savesqlrequest($time,$sql){
 			if(defined('USE_SQLREQUEST_PROF')){
 				global $sqlrequests;
+				$time=round($time,6);
+//				echo $time,"<br>";
 				if(defined('SHOW_SQLREQUEST_DETAILS')){
-					array_push($sqlrequests, $sql);
+					array_push($sqlrequests, array($time,$sql));
 				}
 				else{
 					$sqlrequests++;
@@ -187,13 +196,16 @@ if(defined('USE_PROFILING')){
 			}
 		}
 
-		/* public static */ function profiling_stop($type=NULL){
+		public static function profiling_stop($type=NULL){
 			global $starttime;
 			global $memorystamp;
 			global $sqlrequests;
 			global $sqlmark;
 			global $perf_counter;
 			global $var_list;
+			global $USER_DETAILS;
+
+			if(isset($USER_DETAILS['debug_mode']) && $USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) return;
 
 			$endtime = COpt::getmicrotime();
 			$memory = COpt::getmemoryusage();
@@ -201,20 +213,30 @@ if(defined('USE_PROFILING')){
 			if(is_null($type)) $type='global';
 
 			echo OBR;
+			echo '<a name="debug"></a>';
+			echo "******************* Stats for $type *************************".OBR;
 			if(defined('USE_TIME_PROF')){
-				echo '('.$type.') Time to execute: '.round($endtime - $starttime[$type],6).' seconds!'.OBR;
+				$time = $endtime - $starttime[$type];
+				if($time < TOTAL_TIME)
+				{
+					echo 'Total time: '.round($time,6).OBR;
+				}
+				else
+				{
+					echo '<b>Total time: '.round($time,6).'</b>'.OBR;
+				}
 			}
 
 			if(defined('USE_MEM_PROF')){
-				echo '('.$type.') Memory limit	 : '.ini_get('memory_limit').OBR;
-				echo '('.$type.') Memory usage	 : '.mem2str($memorystamp[$type]).' - '.mem2str($memory).OBR;
-				echo '('.$type.') Memory leak	 : '.mem2str($memory - $memorystamp[$type]).OBR;
+				echo 'Memory limit	 : '.ini_get('memory_limit').OBR;
+				echo 'Memory usage	 : '.mem2str($memorystamp[$type]).' - '.mem2str($memory).OBR;
+				echo 'Memory leak	 : '.mem2str($memory - $memorystamp[$type]).OBR;
 			}
 
 			if(defined('USE_VAR_MON')){
 				$curr_var_list = isset($GLOBALS) ? array_keys($GLOBALS) : array();
 				$var_diff = array_diff($curr_var_list, $var_list[$type]);
-				echo '('.$type.') Undeleted vars : '.count($var_diff).' [';
+				echo ' Undeleted vars : '.count($var_diff).' [';
 				print_r(implode(', ',$var_diff));
 				echo ']'.OBR;
 			}
@@ -224,7 +246,7 @@ if(defined('USE_PROFILING')){
 				if(isset($perf_counter[$type])){
 					ksort($perf_counter[$type]);
 					foreach($perf_counter[$type] as $name => $value){
-						echo '('.$type.') Counter "'.$name.'" : '.$value.OBR;
+						echo 'Counter "'.$name.'" : '.$value.OBR;
 					}
 				}
 			}
@@ -232,24 +254,43 @@ if(defined('USE_PROFILING')){
 			if(defined('USE_SQLREQUEST_PROF')){
 				if(defined('SHOW_SQLREQUEST_DETAILS')){
 					$requests_cnt = count($sqlrequests);
-					echo '('.$type.') SQL requests count: '.($requests_cnt - $sqlmark[$type]).OBR;
+					echo 'SQL requests count: '.($requests_cnt - $sqlmark[$type]).OBR;
 
+					$sql_time=0;
 					for($i = $sqlmark[$type]; $i < $requests_cnt; $i++){
-						echo '('.$type.') SQL request    : '.$sqlrequests[$i].OBR;
+						$time=$sqlrequests[$i][0];
+						$sql_time+=$time;
+						if($time < LONG_QUERY)
+						{
+							echo 'Time:'.round($time,8).' SQL:&nbsp;'.$sqlrequests[$i][1].OBR;
+						}
+						else
+						{
+							echo '<b>Time:'.round($time,8).' LONG SQL:&nbsp;'.$sqlrequests[$i][1].'</b>'.OBR;
+						}
 					}
 				}
 				else{
-					echo '('.$type.') SQL requests count: '.($sqlrequests - $sqlmark[$type]).OBR;
+					echo 'SQL requests count: '.($sqlrequests - $sqlmark[$type]).OBR;
+				}
+				if($sql_time < QUERY_TOTAL_TIME)
+				{
+					echo 'Total time spent on SQL: '.round($sql_time,8).OBR;
+				}
+				else
+				{
+					echo '<b>Total time spent on SQL: '.round($sql_time,8).'</b>'.OBR;
 				}
 			}
+			echo "******************** End of $type ***************************".OBR;
 		}
 
 
-		/* public static */ function set_memory_limit($limit='8M'){
+		public static function set_memory_limit($limit='256M'){
 			ini_set('memory_limit',$limit);
 		}
 
-		/* public static */ function compare_files_with_menu($menu=null){
+		public static function compare_files_with_menu($menu=null){
 			if(defined('USE_MENU_PROF')){
 
 				$files_list = glob('*.php');
@@ -304,7 +345,7 @@ if(defined('USE_PROFILING')){
 		}
 	}
 
-	COpt::set_memory_limit('32M');
+	COpt::set_memory_limit('256M');
 	COpt::profiling_start('script');
 }
 else{

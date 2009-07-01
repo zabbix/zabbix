@@ -120,6 +120,7 @@ function user_login($name, $passwd, $auth_type){
 			$user['url'] = get_profile('web.menu.view.last','index.php');
 		}
 
+
 		$USER_DETAILS = $user;
 		$login = $sessionid;
 	}
@@ -229,6 +230,8 @@ function check_authentication($sessionid=null){
 			$USER_DETAILS['node']['name'] = '- unknown -';
 			$USER_DETAILS['node']['nodeid'] = $ZBX_LOCALNODEID;
 		}
+
+		$USER_DETAILS['debug_mode'] = get_user_debug_mode($USER_DETAILS['userid']);
 	}
 	else{
 		$USER_DETAILS = array(
@@ -366,6 +369,19 @@ function get_user_api_access($userid){
 	}
 return false;
 }
+
+function get_user_debug_mode($userid){
+	$sql = 'SELECT g.usrgrpid '.
+			' FROM usrgrp g, users_groups ug '.
+			' WHERE ug.userid = '.$userid.
+				' AND g.usrgrpid = ug.usrgrpid '.
+				' AND g.debug_mode = '.GROUP_DEBUG_MODE_ENABLED;
+	if($res = DBfetch(DBselect($sql,1))){
+		return true;
+	}
+return false;
+}
+
 /* Function: get_user_system_auth()
  *
  * Description:

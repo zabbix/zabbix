@@ -27,9 +27,6 @@
 	global $ZBX_CURMASTERID;
 	global $page;
 
-COpt::profiling_start("page");
-
-
 	if(!isset($page['type'])) $page['type'] = PAGE_TYPE_HTML;
 	if(!isset($page['file'])) $page['file'] = basename($_SERVER['PHP_SELF']);
 
@@ -188,9 +185,11 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$page_header_r_col = array($help,'|',$support,'|',$printview);
 
 		if($USER_DETAILS['alias']!=ZBX_GUEST_USER){
-			$page_header_r_col[] = array('|',
-						new CLink(S_PROFILE, 'profile.php', 'small_font'),'|',
-						new CLink(S_LOGOUT, 'index.php?reconnect=1', 'small_font'));
+			$page_header_r_col[] = array('|');
+			array_push($page_header_r_col, new CLink(S_PROFILE, 'profile.php', 'small_font'),'|');
+			if($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
+						array_push($page_header_r_col,new CLink(S_DEBUG, '#debug', 'small_font'),'|');
+			array_push($page_header_r_col,new CLink(S_LOGOUT, 'index.php?reconnect=1', 'small_font'));
 		}
 		else {
 			$page_header_r_col[] = array('|', new CLink(S_LOGIN, 'index.php?reconnect=1', 'small_font'));

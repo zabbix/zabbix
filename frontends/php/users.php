@@ -88,6 +88,7 @@ include_once('include/page_header.php');
 		'users_status'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	'(isset({config})&&({config}==1))&&isset({save})'),
 		'gui_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'),	'(isset({config})&&({config}==1))&&isset({save})'),
 		'api_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		'(isset({config})&&({config}==1))&&isset({save})'),
+		'debug_mode'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		'(isset({config})&&({config}==1))&&isset({save})'),
 		'new_right'=>		array(T_ZBX_STR, O_OPT,	null,	null,	null),
 		'right_to_del'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
 		'group_users_to_del'=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
@@ -97,6 +98,7 @@ include_once('include/page_header.php');
 		'set_users_status'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
 		'set_gui_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'), null),
 		'set_api_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
+		'set_debug_mode'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
 
 /* actions */
 		'register'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"add permission","delete permission"'), null),
@@ -351,7 +353,7 @@ include_once('include/page_header.php');
 				$action = AUDIT_ACTION_UPDATE;
 
 				DBstart();
-				$result = update_user_group($_REQUEST['usrgrpid'], $_REQUEST['gname'], $_REQUEST['users_status'], $_REQUEST['gui_access'], $_REQUEST['api_access'], $group_users, $group_rights);
+				$result = update_user_group($_REQUEST['usrgrpid'], $_REQUEST['gname'], $_REQUEST['users_status'], $_REQUEST['gui_access'], $_REQUEST['api_access'], $_REQUEST['debug_mode'],$group_users, $group_rights);
 				$result = DBend($result);
 
 				show_messages($result, S_GROUP_UPDATED, S_CANNOT_UPDATE_GROUP);
@@ -360,7 +362,7 @@ include_once('include/page_header.php');
 				$action = AUDIT_ACTION_ADD;
 
 				DBstart();
-				$result = add_user_group($_REQUEST['gname'], $_REQUEST['users_status'], $_REQUEST['gui_access'], $_REQUEST['api_access'], $group_users, $group_rights);
+				$result = add_user_group($_REQUEST['gname'], $_REQUEST['users_status'], $_REQUEST['gui_access'], $_REQUEST['api_access'], $_REQUEST['debug_mode'],$group_users, $group_rights);
 				$result = DBend($result);
 
 				show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
@@ -426,6 +428,19 @@ include_once('include/page_header.php');
 			if($result){
 				$audit_action = ($_REQUEST['set_api_access'] == GROUP_API_ACCESS_DISABLED)?AUDIT_ACTION_DISABLE:AUDIT_ACTION_UPDATE;
 				add_audit($audit_action,AUDIT_RESOURCE_USER_GROUP,'API access for group name ['.$group['name'].']');
+
+				unset($_REQUEST['usrgrpid']);
+			}
+			unset($_REQUEST['form']);
+		}
+		else if(isset($_REQUEST['set_debug_mode'])&&isset($_REQUEST['usrgrpid'])){
+			$group=get_group_by_usrgrpid($_REQUEST['usrgrpid']);
+			$result=change_group_debug_mode($_REQUEST['usrgrpid'], $_REQUEST['set_debug_mode']);
+
+			show_messages($result, S_GROUP.' "'.$group['name'].'" '.S_DEBUG_MODE_UPDATED, S_CANNOT_UPDATE_DEBUG_MODE);
+			if($result){
+				$audit_action = ($_REQUEST['set_debug_mode'] == GROUP_DEBUG_MODE_DISABLED)?AUDIT_ACTION_DISABLE:AUDIT_ACTION_UPDATE;
+				add_audit($audit_action,AUDIT_RESOURCE_USER_GROUP,'Debug mode for group name ['.$group['name'].']');
 
 				unset($_REQUEST['usrgrpid']);
 			}
@@ -507,6 +522,7 @@ include_once('include/page_header.php');
 				S_IS_ONLINE_Q,
 				S_GUI_ACCESS,
 				S_API_ACCESS,
+				S_DEBUG_MODE,
 				S_STATUS,
 				S_ACTIONS
 				));
@@ -589,6 +605,9 @@ include_once('include/page_header.php');
 				$api_access = ($user['api_access']) ? S_ENABLED : S_DISABLED;
 				$api_access = new CSpan($api_access, ($user['api_access'] == GROUP_API_ACCESS_DISABLED)?'green':'orange');
 
+				$user['debug_mode'] = get_user_debug_mode($userid);
+				$debug_mode = ($user['debug_mode']) ? S_ENABLED : S_DISABLED;
+				$debug_mode = new CSpan($debug_mode, ($user['debug_mode'] == GROUP_DEBUG_MODE_DISABLED)?'green':'orange');
 				$action = get_user_actionmenu($userid);
 
 				$table->addRow(array(
@@ -605,6 +624,7 @@ include_once('include/page_header.php');
 					$online,
 					$gui_access,
 					$api_access,
+					$debug_mode,
 					$users_status,
 					$action
 					));
@@ -641,11 +661,12 @@ include_once('include/page_header.php');
 				S_USERS_STATUS,
 				S_GUI_ACCESS,
 				S_API_ACCESS,
+				S_DEBUG_MODE,
 				array(  new CCheckBox('all_groups',NULL, "CheckAll('".$form->GetName()."','all_groups');"), make_sorting_link(S_NAME,'ug.name')),
 				S_MEMBERS,
 				));
 
-			$result=DBselect('SELECT ug.usrgrpid, ug.name, ug.users_status, ug.gui_access, ug.api_access '.
+			$result=DBselect('SELECT ug.usrgrpid, ug.name, ug.users_status, ug.gui_access, ug.api_access, ug.debug_mode '.
 							' FROM usrgrp ug'.
 							' WHERE '.DBin_node('ug.usrgrpid').
 							order_by('ug.name'));
@@ -669,6 +690,7 @@ include_once('include/page_header.php');
 
 				$gui_access = user_auth_type2str($row['gui_access']);
 				$api_access = ($row['api_access'] == GROUP_API_ACCESS_DISABLED) ? S_DISABLED : S_ENABLED;
+				$debug_mode = ($row['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) ? S_DISABLED : S_ENABLED;
 				$users_status = ($row['users_status'] == GROUP_STATUS_ENABLED) ? S_ENABLED : S_DISABLED;
 
 				if(granted2update_group($row['usrgrpid'])){
@@ -701,11 +723,19 @@ include_once('include/page_header.php');
 							'&usrgrpid='.$row['usrgrpid'].
 							url_param('config'),
 							($row['api_access'] == GROUP_API_ACCESS_DISABLED)?'enabled':'orange');
+				$debug_mode = new CLink($debug_mode,
+							'users.php?form=update'.
+							'&set_debug_mode='.(($row['debug_mode'] == GROUP_DEBUG_MODE_DISABLED)?GROUP_DEBUG_MODE_ENABLED: GROUP_DEBUG_MODE_DISABLED).
+							'&usrgrpid='.$row['usrgrpid'].
+							url_param('config'),
+							($row['debug_mode'] == GROUP_DEBUG_MODE_DISABLED)?'enabled':'orange');
+
 
 				$table->addRow(array(
 					$users_status,
 					$gui_access,
 					$api_access,
+					$debug_mode,
 					array(
 						 new CCheckBox('group_groupid['.$row['usrgrpid'].']',NULL,NULL,$row['usrgrpid']),
 						$alias = new CLink($row['name'],
