@@ -596,7 +596,8 @@
 				'delay_flex='.zbx_dbstr($item['delay_flex']).','.
 				'params='.zbx_dbstr($item['params']).','.
 				'ipmi_sensor='.zbx_dbstr($item['ipmi_sensor']).','.
-				'templateid='.$item['templateid'].
+				'templateid='.$item['templateid'].','.
+				'nextcheck=0 '.
 			' WHERE itemid='.$itemid);
 
 		if ($result){
