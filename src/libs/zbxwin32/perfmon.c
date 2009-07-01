@@ -39,7 +39,7 @@ char *GetCounterName(DWORD index)
 	while(counterName!=NULL)
 	{
 		if (counterName->pdhIndex == index)
-		   break;
+			break;
 		counterName = counterName->next;
 	}
 	if (counterName == NULL)
