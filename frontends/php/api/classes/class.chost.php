@@ -1,238 +1,242 @@
 <?php
 /**
- * File containing host class for API.
+ * File containing CHost class for API.
  * @package API
  */
 /**
- * Class containing methods for operations with hosts
+ * Class containing methods for operations with Hosts
  */
 class CHost {
 
 	public static $error;
 
 	/**
-	 * Get host data
+	 * Get Host data
 	 *
-	 * <code>
-	 * $def_options = array(
-	 *	string 'nodeid'				=> 'node ID,
-	 *	array 'groupids'			=> array(groupid1, groupid2, ...),
-	 *	array 'hostids'				=> array(hostid1, hostid2, ...),
-	 *	boolean 'monitored_hosts'		=> 'only monitored hosts',
-	 *	boolean 'templated_hosts'		=> 'include templates in result',
-	 *	boolean 'with_items'			=> 'only with items',
-	 *	boolean 'with_monitored_items'		=> 'only with monitored items',
-	 *	boolean 'with_historical_items'		=> 'only with historical items',
-	 *	boolean 'with_triggers'			=> 'only with triggers',
-	 *	boolean 'with_monitored_triggers'	=> 'only with monitores triggers',
-	 *	boolean 'with_httptests'		=> 'only with http tests',
-	 *	boolean 'with_monitored_httptests'	=> 'only with monitores http tests',
-	 *	boolean 'with_graphs'			=> 'only with graphs',
-	 *	int 'count'				=> 'count hosts, returned column name is rowscount',
-	 *	string 'pattern'			=> 'search hosts by pattern in host names',
-	 *	integer 'limit'				=> 'limit selection',
-	 *	string 'order'				=> 'depricated parametr (for now)'
-	 * );
-	 * </code>
-	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $options
-	 * @return array|boolean host data as array or false if error
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $options
+	 * @param array $opyions['nodeids'] Node IDs
+	 * @param array $opyions['groupids'] HostGroup IDs
+	 * @param array $opyions['hostids'] Host IDs
+	 * @param boolean $opyions['monitored_hosts'] only monitored Hosts
+	 * @param boolean $opyions['templated_hosts'] include templates in result
+	 * @param boolean $opyions['with_items'] only with items
+	 * @param boolean $opyions['with_monitored_items'] only with monitored items
+	 * @param boolean $opyions['with_historical_items'] only with historical items
+	 * @param boolean $opyions['with_triggers'] only with triggers
+	 * @param boolean $opyions['with_monitored_triggers'] only with monitores triggers
+	 * @param boolean $opyions['with_httptests'] only with http tests
+	 * @param boolean $opyions['with_monitored_httptests'] only with monitores http tests
+	 * @param boolean $opyions['with_graphs'] only with graphs
+	 * @param boolean $opyions['editable'] only with read-write permission. Ignored for SuperAdmins
+	 * @param int $opyions['count'] count Hosts, returned column name is rowscount
+	 * @param string $opyions['pattern'] search hosts by pattern in host names
+	 * @param int $opyions['limit'] limit selection
+	 * @param string $opyions['order'] depricated parametr (for now)
+	 * @return array|boolean Host data as array or false if error
 	 */
 	public static function get($options=array()){
 		global $USER_DETAILS;
 
-		$def_sql = array(
-			'select' => array(),
+		$result = array();
+		$user_type = $USER_DETAILS['type'];
+		$userid = $USER_DETAILS['userid'];
+		
+		$sort_columns = array('hostid'); // allowed columns for sorting
+	
+	
+		$sql_parts = array(
+			'select' => array('h.hostid, h.host'),
 			'from' => array('hosts h'),
 			'where' => array(),
 			'order' => array(),
-			'limit' => null,
-			);
-
+			'limit' => null);
+		
 		$def_options = array(
-			'nodeid'			=>		0,
-			'groupids'			=>		0,
-			'hostids'			=>		0,
-			'monitored_hosts'		=>		0,
-			'templated_hosts'		=>		0,
-			'with_items'			=>		0,
-			'with_monitored_items'		=>		0,
-			'with_historical_items'		=>		0,
-			'with_triggers'			=>		0,
-			'with_monitored_triggers'	=>		0,
-			'with_httptests'		=>		0,
-			'with_monitored_httptests'	=>		0,
-			'with_graphs'			=>		0,
-			'permission'			=>		0,
-			'count'				=>		0,
-			'pattern'			=>		'',
-			'order' 			=>		0,
-			'limit'				=>		0,
-			);
+			'nodeids'					=> array(),
+			'groupids'					=> array(),
+			'hostids'					=> array(),
+			'monitored_hosts'			=> false,
+			'templated_hosts'			=> false,
+			'with_items'				=> false,
+			'with_monitored_items'		=> false,
+			'with_historical_items'		=> false,
+			'with_triggers'				=> false,
+			'with_monitored_triggers'	=> false,
+			'with_httptests'			=> false,
+			'with_monitored_httptests'	=> false,
+			'with_graphs'				=> false,
+			'editable'					=> false,
+			'count'						=> false,
+			'pattern'					=> '',
+			'order' 					=> '',
+			'limit'						=> null);
 
-		$def_options = array_merge($def_options, $options);
-
-		$result = array();
-//-----
-// nodes
-		if($def_options['nodeid']){
-			$nodeid = $def_options['nodeid'];
+		$options = array_merge($def_options, $options);
+	
+// editable + PERMISSION CHECK
+		if(USER_TYPE_SUPER_ADMIN != $user_type){
+			if($options['editable']){
+				$permission = PERM_READ_WRITE;
+			}
+			else{
+				$permission = PERM_READ_ONLY;
+			}
+			
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from'][] = 'rights r, users_groups g';
+			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
+			$sql_parts['where'][] = '
+					r.id=hg.groupid
+					AND r.groupid=g.usrgrpid
+					AND g.userid='.$userid.'
+					AND r.permission>'.($permission-1).'
+					AND NOT EXISTS(
+						SELECT hgg.groupid
+						FROM hosts_groups hgg, rights rr, users_groups gg
+						WHERE hgg.hostid=hg.hostid
+							AND rr.id=hgg.groupid
+							AND rr.groupid=gg.usrgrpid
+							AND gg.userid='.$userid.'
+							AND rr.permission<'.$permission.')';
 		}
-		else{
-			$nodeid = get_current_nodeid(false);
-		}
-
-// groups
-		$in_groups = count($def_sql['where']);
-
-		if($def_options['groupids'] != 0){
-			zbx_value2array($def_options['groupids']);
-			$def_sql['where'][] = DBcondition('hg.groupid',$def_options['groupids']);
-		}
-
-		if($in_groups != count($def_sql['where'])){
-			$def_sql['from'][] = 'hosts_groups hg';
-			$def_sql['where'][] = 'hg.hostid=h.hostid';
-		}
-
-
-// hosts
-		if($def_options['hostids'] != 0){
-			zbx_value2array($def_options['hostids']);
-
-			$def_sql['where'][] = DBcondition('h.hostid',$def_options['hostids']);
-		}
-
-		if(!zbx_empty($def_options['pattern'])){
-			$def_sql['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.strtoupper($def_options['pattern']).'%');
-		}
-
-		if($def_options['monitored_hosts'])
-			$def_sql['where'][] = 'h.status='.HOST_STATUS_MONITORED;
-		else if($def_options['templated_hosts'])
-			$def_sql['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
-		else
-			$def_sql['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
-
-// items
-		if($def_options['with_items']){
-			$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
-		}
-		else if($def_options['with_monitored_items']){
-			$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
-		}
-		else if($def_options['with_historical_items']){
-			$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
-		}
-
-
-// triggers
-		if($def_options['with_triggers']){
-			$def_sql['where'][] = 'EXISTS( SELECT i.itemid '.
-				 ' FROM items i, functions f, triggers t'.
-				 ' WHERE i.hostid=h.hostid '.
-				 	' AND i.itemid=f.itemid '.
-				 	' AND f.triggerid=t.triggerid)';
-		}
-		else if($def_options['with_monitored_triggers']){
-			$def_sql['where'][] = 'EXISTS( SELECT i.itemid '.
-				 ' FROM items i, functions f, triggers t'.
-				 ' WHERE i.hostid=h.hostid '.
-				 	' AND i.status='.ITEM_STATUS_ACTIVE.
-				 	' AND i.itemid=f.itemid '.
-				 	' AND f.triggerid=t.triggerid '.
-				 	' AND t.status='.TRIGGER_STATUS_ENABLED.')';
-		}
-
-// httptests
-		if($def_options['with_httptests']){
-			$def_sql['where'][] = 'EXISTS( SELECT a.applicationid '.
-				' FROM applications a, httptest ht '.
-				' WHERE a.hostid=h.hostid '.
-					' AND ht.applicationid=a.applicationid)';
-		}
-		else if($def_options['with_monitored_httptests']){
-			$def_sql['where'][] = 'EXISTS( SELECT a.applicationid '.
-				' FROM applications a, httptest ht '.
-				' WHERE a.hostid=h.hostid '.
-					' AND ht.applicationid=a.applicationid '.
-					' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
-		}
-
-// graphs
-		if($def_options['with_graphs']){
-			$def_sql['where'][] = 'EXISTS( SELECT DISTINCT i.itemid '.
-				 ' FROM items i, graphs_items gi '.
-				 ' WHERE i.hostid=h.hostid '.
-				 	' AND i.itemid=gi.itemid)';
-		}
-
-// permission
-		if($def_options['permission'] || defined('ZBX_API_REQUEST')){
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,$nodeid,AVAILABLE_NOCACHE);
-
-			$def_sql['where'][] = DBcondition('h.hostid', $available_hosts);
-		}
-
 // count
-		if($def_options['count']){
-			$def_sql['select'][] = 'COUNT(h.hostid) as rowscount';
+		if($options['count']){
+			$sql_parts['select'] = array('count(h.hostid) as rowscount');
+		}
+// nodeids
+		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+// groupids
+		if($options['groupids']){
+			zbx_value2array($options['groupids']);
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
+		}
+// hostids
+		if($options['hostids']){
+			zbx_value2array($options['hostids']);
+			$sql_parts['where'][] = DBcondition('h.hostid', $options['hostids']);
+		}
+// monitored_hosts, templated_hosts
+		if($options['monitored_hosts']){
+			$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
+		}
+		else if($options['templated_hosts']){
+			$sql_parts['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
 		}
 		else{
-			$def_sql['select'][] = 'h.hostid';
-			$def_sql['select'][] = 'h.host';
+			$sql_parts['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		}
-
+// with_items, with_monitored_items, with_historical_items
+		if($options['with_items']){
+			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
+		}
+		else if($options['with_monitored_items']){
+			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
+		}
+		else if($options['with_historical_items']){
+			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
+		}
+// with_triggers, with_monitored_triggers
+		if($options['with_triggers']){
+			$sql_parts['where'][] = 'EXISTS( 
+					SELECT i.itemid
+					FROM items i, functions f, triggers t
+					WHERE i.hostid=h.hostid 
+						AND i.itemid=f.itemid 
+						AND f.triggerid=t.triggerid)';
+		}
+		else if($options['with_monitored_triggers']){
+			$sql_parts['where'][] = 'EXISTS( 
+					SELECT i.itemid 
+					FROM items i, functions f, triggers t
+					WHERE i.hostid=h.hostid 
+						AND i.status='.ITEM_STATUS_ACTIVE.'
+						AND i.itemid=f.itemid 
+						AND f.triggerid=t.triggerid 
+						AND t.status='.TRIGGER_STATUS_ENABLED.')';
+		}
+// with_httptests, with_monitored_httptests
+		if($options['with_httptests']){
+			$sql_parts['where'][] = 'EXISTS( 
+					SELECT a.applicationid 
+					FROM applications a, httptest ht 
+					WHERE a.hostid=h.hostid 
+						AND ht.applicationid=a.applicationid)';
+		}
+		else if($options['with_monitored_httptests']){
+			$sql_parts['where'][] = 'EXISTS( 
+					SELECT a.applicationid 	
+					FROM applications a, httptest ht 	
+					WHERE a.hostid=h.hostid	
+						AND ht.applicationid=a.applicationid 	
+						AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
+		}
+// with_graphs
+		if($options['with_graphs']){
+			$sql_parts['where'][] = 'EXISTS( 
+					SELECT DISTINCT i.itemid 
+					FROM items i, graphs_items gi 
+					WHERE i.hostid=h.hostid 
+						AND i.itemid=gi.itemid)';
+		}
+// pattern
+		if(!zbx_empty($options['pattern'])){
+			$sql_parts['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+		}
 // order
-		if(str_in_array($def_options['order'], array('host','hostid'))){
-			$def_sql['order'][] = 'h.'.$def_options['order'];
+		// restrict not allowed columns for sorting
+		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
+		if(!zbx_empty($options['order'])){
+			$sql_parts['order'][] = 'h.'.$options['order'];
 		}
-
 // limit
-		if(zbx_ctype_digit($def_options['limit'])){
-			$def_sql['limit'] = $def_options['limit'];
+		if(zbx_ctype_digit($options['limit']) && $options['limit']){
+			$sql_parts['limit'] = $options['limit'];
 		}
-//------
+		
+		
+		$sql_select = implode(',', $sql_parts['select']);
+		$sql_from = implode(',', $sql_parts['from']);
+		$sql_where = implode(' AND ', $sql_parts['where']);
+		$sql_order = zbx_empty($options['order']) ? '' : ' ORDER BY '.implode(',',$sql_parts['order']);
+		$sql_limit = $sql_parts['limit'];
 
-		$def_sql['select'] = array_unique($def_sql['select']);
-		$def_sql['from'] = array_unique($def_sql['from']);
-		$def_sql['where'] = array_unique($def_sql['where']);
-		$def_sql['order'] = array_unique($def_sql['order']);
-
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_order = '';
-		$sql_limit = null;
-		if(!empty($def_sql['select'])) $sql_select.= implode(',',$def_sql['select']);
-		if(!empty($def_sql['from'])) $sql_from.= implode(',',$def_sql['from']);
-		if(!empty($def_sql['where'])) $sql_where.= ' AND '.implode(' AND ',$def_sql['where']);
-		if(!empty($def_sql['order'])) $sql_order.= ' ORDER BY '.implode(',',$def_sql['order']);
-		if(!empty($def_sql['limit'])) $sql_limit = $def_sql['limit'];
-
-		$sql = 'SELECT DISTINCT '.$sql_select.
-			' FROM '.$sql_from.
-			' WHERE '.DBin_node('h.hostid', $nodeid).
-				$sql_where.
-			$sql_order;
+		$sql = 'SELECT DISTINCT '.$sql_select.'
+				FROM '.$sql_from.'
+				WHERE '.DBin_node('h.hostid', $nodeids).
+				($sql_where ? ' AND '.$sql_where : '').
+				$sql_order;
 		$res = DBselect($sql, $sql_limit);
+		
 		while($host = DBfetch($res)){
-			if($def_options['count'])
+			if($options['count'])
 				$result = $host;
 			else
 				$result[$host['hostid']] = $host;
 		}
-
+		
 	return $result;
 	}
 
 	/**
-	 * Gets all host data from DB by hostid
+	 * Gets all Host data from DB by Host ID
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param string $hostid
-	 * @return array|boolean host data as array or false if error
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $host_data
+	 * @param string $host_data['hostid']
+	 * @return array|boolean Host data as array or false if error
 	 */
 	public static function getById($host_data){
 		$sql = 'SELECT * FROM hosts WHERE hostid='.$host_data['hostid'];
@@ -248,17 +252,17 @@ class CHost {
 	}
 
 	/**
-	 * Get hostid by host name
+	 * Get Host ID by Host name
 	 *
-	 * <code>
-	 * $host_data = array(
-	 * 	string 'host' => 'hostname'
-	 * );
-	 * </code>
-	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $host_data
-	 * @return int|boolean hostid
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $host_data
+	 * @param string $host_data['host']
+	 * @return int|boolean 
 	 */
 	public static function getId($host_data){
 		$result = false;
@@ -278,30 +282,30 @@ class CHost {
 	}
 
 	/**
-	 * Add host
+	 * Add Host
 	 *
-	 * <code>
-	 * $hosts = array(
-	 *	*string 'host' => 'host name [0]',
-	 *	*array 'groupids' => 'groupids add host to',
-	 *	int 'port' => 'port [0]',
-	 *	int 'status' => 0,
-	 *	int 'useip' => 0,
-	 *	string 'dns' => '',
-	 *	string 'ip' => '0.0.0.0',
-	 *	int 'proxy_hostid' => 0,
-	 *	int 'useipmi' => 0,
-	 *	string 'ipmi_ip' => '',
-	 *	int 'ipmi_port' => 623,
-	 *	int 'ipmi_authtype' => 0,
-	 *	int 'ipmi_privilege' => 0,
-	 *	string 'ipmi_username' => '',
-	 *	string 'ipmi_password' => '',
-	 * );
-	 * </code>
-	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $hosts multidimensional array with hosts data
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $hosts multidimensional array with Hosts data
+	 * @param string $hosts['host'] Host name.
+	 * @param array $hosts['groupids'] HostGroup IDs add Host to.
+	 * @param int $hosts['port'] Port. OPTIONAL
+	 * @param int $hosts['status'] Host Status. OPTIONAL
+	 * @param int $hosts['useip'] Use IP. OPTIONAL
+	 * @param string $hosts['dns'] DNS. OPTIONAL
+	 * @param string $hosts['ip'] IP. OPTIONAL
+	 * @param int $hosts['proxy_hostid'] Proxy Host ID. OPTIONAL
+	 * @param int $hosts['useipmi'] Use IPMI. OPTIONAL
+	 * @param string $hosts['ipmi_ip'] IPMAI IP. OPTIONAL
+	 * @param int $hosts['ipmi_port'] IPMI port. OPTIONAL
+	 * @param int $hosts['ipmi_authtype'] IPMI authentication type. OPTIONAL
+	 * @param int $hosts['ipmi_privilege'] IPMI privilege. OPTIONAL
+	 * @param string $hosts['ipmi_username'] IPMI username. OPTIONAL
+	 * @param string $hosts['ipmi_password'] IPMI password. OPTIONAL
 	 * @return boolean
 	 */
 	public static function add($hosts){
@@ -363,16 +367,34 @@ class CHost {
 	}
 
 	/**
-	 * Update host
+	 * Update Host
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $hosts multidimensional array with host data
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $hosts multidimensional array with Hosts data
+	 * @param string $hosts['host'] Host name.
+	 * @param int $hosts['port'] Port. OPTIONAL
+	 * @param int $hosts['status'] Host Status. OPTIONAL
+	 * @param int $hosts['useip'] Use IP. OPTIONAL
+	 * @param string $hosts['dns'] DNS. OPTIONAL
+	 * @param string $hosts['ip'] IP. OPTIONAL
+	 * @param int $hosts['proxy_hostid'] Proxy Host ID. OPTIONAL
+	 * @param int $hosts['useipmi'] Use IPMI. OPTIONAL
+	 * @param string $hosts['ipmi_ip'] IPMAI IP. OPTIONAL
+	 * @param int $hosts['ipmi_port'] IPMI port. OPTIONAL
+	 * @param int $hosts['ipmi_authtype'] IPMI authentication type. OPTIONAL
+	 * @param int $hosts['ipmi_privilege'] IPMI privilege. OPTIONAL
+	 * @param string $hosts['ipmi_username'] IPMI username. OPTIONAL
+	 * @param string $hosts['ipmi_password'] IPMI password. OPTIONAL
 	 * @return boolean
 	 */
 	public static function update($hosts){
 		$templates = null;
 		$newgroup = '';
-		$groups = null;
 
 		$hostids = array();
 
@@ -396,6 +418,8 @@ class CHost {
 				$result = false;
 				break;
 			}
+			
+			$groups = get_groupids_by_host($host['hostid']);
 
 			$result = update_host($host['hostid'], $host['host'], $host['port'], $host['status'], $host['useip'], $host['dns'], $host['ip'],
 				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'],
@@ -417,29 +441,49 @@ class CHost {
 	/**
 	 * Mass update hosts
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $hosts multidimensional array with host ids
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $hosts multidimensional array with Hosts data
+	 * @param array $hosts['hostids'] Host IDs to update
+	 * @param string $hosts['host'] Host name.
+	 * @param array $hosts['groupids'] HostGroup IDs add Host to.
+	 * @param int $hosts['port'] Port. OPTIONAL
+	 * @param int $hosts['status'] Host Status. OPTIONAL
+	 * @param int $hosts['useip'] Use IP. OPTIONAL
+	 * @param string $hosts['dns'] DNS. OPTIONAL
+	 * @param string $hosts['ip'] IP. OPTIONAL
+	 * @param int $hosts['proxy_hostid'] Proxy Host ID. OPTIONAL
+	 * @param int $hosts['useipmi'] Use IPMI. OPTIONAL
+	 * @param string $hosts['ipmi_ip'] IPMAI IP. OPTIONAL
+	 * @param int $hosts['ipmi_port'] IPMI port. OPTIONAL
+	 * @param int $hosts['ipmi_authtype'] IPMI authentication type. OPTIONAL
+	 * @param int $hosts['ipmi_privilege'] IPMI privilege. OPTIONAL
+	 * @param string $hosts['ipmi_username'] IPMI username. OPTIONAL
+	 * @param string $hosts['ipmi_password'] IPMI password. OPTIONAL
 	 * @return boolean
 	 */
 	public static function massUpdate($hosts) {
 
 		$hostids = $hosts['hostids'];
-		$host_data = $hosts['host_data'];
 		$sql = 'UPDATE hosts SET '.
-			(isset($host_data['proxy_hostid']) ? ',proxy_hostid='.$host_data['proxy_hostid'] : '').
-			(isset($host_data['host']) ? ',host='.zbx_dbstr($host_data['host']) : '').
-			(isset($host_data['port']) ? ',port='.$host_data['port'] : '').
-			(isset($host_data['status']) ? ',status='.$host_data['status'] : '').
-			(isset($host_data['useip']) ? ',useip='.$host_data['useip'] : '').
-			(isset($host_data['dns']) ? ',dns='.zbx_dbstr($host_data['dns']) : '').
-			(isset($host_data['ip']) ? ',ip='.zbx_dbstr($host_data['ip']) : '').
-			(isset($host_data['useipmi']) ? ',useipmi='.$host_data['useipmi'] : '').
-			(isset($host_data['ipmi_port']) ? ',ipmi_port='.$host_data['ipmi_port'] : '').
-			(isset($host_data['ipmi_authtype']) ? ',ipmi_authtype='.$host_data['ipmi_authtype'] : '').
-			(isset($host_data['ipmi_privilege']) ? ',ipmi_privilege='.$host_data['ipmi_privilege'] : '').
-			(isset($host_data['ipmi_username']) ? ',ipmi_username='.zbx_dbstr($host_data['ipmi_username']) : '').
-			(isset($host_data['ipmi_password']) ? ',ipmi_password='.zbx_dbstr($host_data['ipmi_password']) : '').
-			(isset($host_data['ipmi_ip']) ? ',ipmi_ip='.zbx_dbstr($host_data['ipmi_ip']) : '').
+			(isset($hosts['proxy_hostid']) ? ',proxy_hostid='.$hosts['proxy_hostid'] : '').
+			(isset($hosts['host']) ? ',host='.zbx_dbstr($hosts['host']) : '').
+			(isset($hosts['port']) ? ',port='.$hosts['port'] : '').
+			(isset($hosts['status']) ? ',status='.$hosts['status'] : '').
+			(isset($hosts['useip']) ? ',useip='.$hosts['useip'] : '').
+			(isset($hosts['dns']) ? ',dns='.zbx_dbstr($hosts['dns']) : '').
+			(isset($hosts['ip']) ? ',ip='.zbx_dbstr($hosts['ip']) : '').
+			(isset($hosts['useipmi']) ? ',useipmi='.$hosts['useipmi'] : '').
+			(isset($hosts['ipmi_port']) ? ',ipmi_port='.$hosts['ipmi_port'] : '').
+			(isset($hosts['ipmi_authtype']) ? ',ipmi_authtype='.$hosts['ipmi_authtype'] : '').
+			(isset($hosts['ipmi_privilege']) ? ',ipmi_privilege='.$hosts['ipmi_privilege'] : '').
+			(isset($hosts['ipmi_username']) ? ',ipmi_username='.zbx_dbstr($hosts['ipmi_username']) : '').
+			(isset($hosts['ipmi_password']) ? ',ipmi_password='.zbx_dbstr($hosts['ipmi_password']) : '').
+			(isset($hosts['ipmi_ip']) ? ',ipmi_ip='.zbx_dbstr($hosts['ipmi_ip']) : '').
 			' WHERE '.DBcondition('hostid', $hostids);
 
 		substr_replace($sql, '', strpos(',', $sql), 1);
@@ -455,9 +499,14 @@ class CHost {
 	}
 
 	/**
-	 * Delete host
+	 * Delete Host
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * @param array $hostids
 	 * @return boolean
 	 */

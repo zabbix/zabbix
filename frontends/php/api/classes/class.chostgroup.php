@@ -1,10 +1,10 @@
 <?php
 /**
- * File containing hostgroup class for API.
+ * File containing CHostGroup class for API.
  * @package API
  */
 /**
- * Class containing methods for operations with host groups
+ * Class containing methods for operations with HostGroups
  *
  */
 class CHostGroup {
@@ -12,11 +12,18 @@ class CHostGroup {
 	public static $error;
 
 	/**
-	 * Gets all host group data from DB by groupid
+	 * Gets all HostGroup data from DB by HostGroup ID
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
-	 * @param array $group_data
-	 * @return array|boolean host group data as array or false if error
+	 * @param _array $group_data
+	 * @param array $group_data['groupid']
+	 * @return array|boolean HostGroup data as array or false if error
 	 */
 	public static function getById($group_data){
 		$sql = 'SELECT * FROM groups WHERE groupid='.$group_data['groupid'];
@@ -32,16 +39,17 @@ class CHostGroup {
 	}
 
 	/**
-	 * Get HostGroup ID by group name
+	 * Get HostGroup ID by HostGroup name
 	 *
-	 * <code>
-	 * $group_data = array(
-	 * 	string 'name' => 'group name'
-	 * );
-	 * </code>
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
 	 * @param array $group_data
+	 * @param array $group_data['name']
 	 * @return string|boolean HostGroup ID or false if error
 	 */
 	public static function getId($group_data){
@@ -58,136 +66,175 @@ class CHostGroup {
 	}
 
 	/**
-	 * Get host groups
+	 * Get HostGroups
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
 	 * @param array $params
 	 * @return array
 	 */
 	public static function get($params){
+		global $USER_DETAILS;
 
-		$def_sql = array(
-					'select' =>	array(),
-					'from' =>	array('groups g'),
-					'where' =>	array(),
-					'order' =>	array(),
-					'limit' =>	null,
-				);
+		$result = array();
+		$user_type = $USER_DETAILS['type'];
+		$userid = $USER_DETAILS['userid'];
+		
+		$sort_columns = array('groupid'); // allowed columns for sorting
+		
+		
+		$sql_parts = array(
+			'select'	=> array('g.groupid, g.name'),
+			'from' 		=> array('groups g'),
+			'where' 	=> array(),
+			'order' 	=> array(),
+			'limit' 	=> null);
 
 		$def_options = array(
-					'nodeid' =>			0,
-					'groupids' =>			0,
-					'hostids' =>			0,
-					'monitored_hosts' =>		0,
-					'templated_hosts' =>		0,
-					'real_hosts' =>			0,
-					'not_proxy_hosts' =>		0,
-					'with_items' =>			0,
-					'with_monitored_items' =>	0,
-					'with_historical_items' =>	0,
-					'with_triggers' =>		0,
-					'with_monitored_triggers' =>	0,
-					'with_httptests' =>		0,
-					'with_monitored_httptests' =>	0,
-					'with_graphs' =>		0,
-					'only_current_node' =>		0,
-					'count' =>			0,
-					'pattern' =>			'',
-					'order' =>			0,
-					'limit' =>			0,
-				);
-		$def_options = array_merge($def_options, $params);
-		$result = array();
+			'nodeids'					=> array(),
+			'groupids'					=> array(),
+			'hostids'					=> array(),
+			'monitored_hosts'			=> false,
+			'templated_hosts' 			=> false,
+			'real_hosts' 				=> false,
+			'not_proxy_hosts'			=> false,
+			'with_items'				=> false,
+			'with_monitored_items' 		=> false,
+			'with_historical_items'		=> false,
+			'with_triggers'				=> false,
+			'with_monitored_triggers' 	=> false,
+			'with_httptests' 			=> false,
+			'with_monitored_httptests'	=> false,
+			'with_graphs'				=> false,
+			'only_current_node'			=> false,
+			'editable'					=> false,
+			'count'						=> false,
+			'pattern' 					=> '',
+			'order'						=> '',
+			'limit'						=> null);
+					
+		$options = array_merge($def_options, $params);
 
-		if($def_options['nodeid']){
-			$nodeid = $def_options['nodeid'];
-		}
-		else{
-			$nodeid = get_current_nodeid(false);
-		}
 
-//		$available_groups = get_accessible_groups_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,$nodeid,AVAILABLE_NOCACHE);
-
+// *** ????? *** //
 // nodes
 // disabled by false
 // TODO('check this ~106');
  		if(false && ZBX_DISTRIBUTED){
-		 	$def_sql['select'][] = 'n.name as node_name';
-			$def_sql['from'][] = 'nodes n';
-			$def_sql['where'][] = 'n.nodeid='.DBid2nodeid('g.groupid');
-			$def_sql['order'][] = 'node_name';
+		 	$sql_parts['select'][] = 'n.name as node_name';
+			$sql_parts['from'][] = 'nodes n';
+			$sql_parts['where'][] = 'n.nodeid='.DBid2nodeid('g.groupid');
+			$sql_parts['order'][] = 'node_name';
 		}
-
-// groups
-		if($def_options['groupids'] != 0){
-			zbx_value2array($def_options['groupids']);
-			$def_sql['where'][] = DBcondition('g.groupid',$def_options['groupids']);
+// *** ????? *** //
+		
+// editable + PERMISSION CHECK
+		if(USER_TYPE_SUPER_ADMIN != $user_type){
+			if($options['editable']){
+				$permission = PERM_READ_WRITE;
+			}
+			else{
+				$permission = PERM_READ_ONLY;
+			}
+			
+			$sql_parts['from'][] = 'rights r, users_groups ug';
+			$sql_parts['where'][] = '
+					r.id=g.groupid
+					AND r.groupid=ug.usrgrpid
+					AND ug.userid='.$userid.'
+					AND r.permission>'.($permission-1).'
+					AND NOT EXISTS(
+						SELECT gg.groupid
+						FROM groups gg, rights rr, users_groups ugg
+						WHERE rr.id=g.groupid
+							AND rr.groupid=ugg.usrgrpid
+							AND ugg.userid='.$userid.'
+							AND rr.permission<'.$permission.')';
 		}
-
-		if(!zbx_empty($def_options['pattern'])){
-			$def_sql['where'][] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.strtoupper($def_options['pattern']).'%');
+// count
+		if($options['count']){
+			$sql_parts['select'] = array('COUNT(g.groupid) as rowscount');
 		}
-
-// hosts
-		$in_hosts = count($def_sql['where']);
-
-		if($def_options['monitored_hosts'])
-			$def_sql['where'][] = 'h.status='.HOST_STATUS_MONITORED;
-		else if($def_options['real_hosts'])
-			$def_sql['where'][] = 'h.status IN('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
-		else if($def_options['templated_hosts'])
-			$def_sql['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
-		else if($def_options['not_proxy_hosts'])
-			$def_sql['where'][] = 'h.status<>'.HOST_STATUS_PROXY;
-
-		if($def_options['hostids'] != 0){
-			zbx_value2array($def_options['hostids']);
-			$def_sql['where'][] = DBcondition('h.hostid',$def_options['hostids']);
+// nodeids
+		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+// groupids
+		if($options['groupids']){
+			zbx_value2array($options['groupids']);
+			$sql_parts['where'][] = DBcondition('g.groupid', $options['groupids']);
 		}
-
-		if($in_hosts != count($def_sql['where'])){
-			$def_sql['from'][] = 'hosts_groups hg';
-			$def_sql['from'][] = 'hosts h';
-			$def_sql['where'][] = 'hg.groupid=g.groupid';
-			$def_sql['where'][] = 'h.hostid=hg.hostid';
+// hostids
+		if($options['hostids']){
+			zbx_value2array($options['hostids']);
+			$sql_parts['where'][] = DBcondition('h.hostid', $options['hostids']);
 		}
-
-// items
-		if($def_options['with_items']){
-			$def_sql['from'][] = 'hosts_groups hg';
-
-			$def_sql['where'][] = 'hg.groupid=g.groupid';
-			$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid )';
+// pattern
+		if(!zbx_empty($options['pattern'])){
+			$sql_parts['where'][] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
 		}
-		else if($def_options['with_monitored_items']){
-			$def_sql['from'][] = 'hosts_groups hg';
-
-			$def_sql['where'][] = 'hg.groupid=g.groupid';
-			$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
+// monitored_hosts, real_hosts, templated_hosts, not_proxy_hosts
+		if($options['monitored_hosts']){
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from'][] = 'hosts h';
+			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sql_parts['where'][] = 'h.hostid=hg.hostid';
+			$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
 		}
-		else if($def_options['with_historical_items']){
-			$def_sql['from'][] = 'hosts_groups hg';
-
-			$def_sql['where'][] = 'hg.groupid=g.groupid';
-			$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
+		else if($options['real_hosts']){
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from'][] = 'hosts h';
+			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sql_parts['where'][] = 'h.hostid=hg.hostid';
+			$sql_parts['where'][] = 'h.status IN('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		}
-
-// triggers
-		if($def_options['with_triggers']){
-			$def_sql['from'][] = 'hosts_groups hg';
-
-			$def_sql['where'][] = 'hg.groupid=g.groupid';
-			$def_sql['where'][] = 'EXISTS( SELECT t.triggerid '.
+		else if($options['templated_hosts']){
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from'][] = 'hosts h';
+			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sql_parts['where'][] = 'h.hostid=hg.hostid';
+			$sql_parts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
+		}
+		else if($options['not_proxy_hosts']){
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from'][] = 'hosts h';
+			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sql_parts['where'][] = 'h.hostid=hg.hostid';
+			$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_PROXY;
+		}
+// with_items, with_monitored_items, with_historical_items
+		if($options['with_items']){
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid )';
+		}
+		else if($options['with_monitored_items']){
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
+		}
+		else if($options['with_historical_items']){
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
+		}
+// with_triggers, with_monitored_triggers
+		if($options['with_triggers']){
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sql_parts['where'][] = 'EXISTS( SELECT t.triggerid '.
 										' FROM items i, functions f, triggers t'.
 										' WHERE i.hostid=hg.hostid '.
 											' AND f.itemid=i.itemid '.
 											' AND t.triggerid=f.triggerid)';
 		}
-		else if($def_options['with_monitored_triggers']){
-			$def_sql['from'][] = 'hosts_groups hg';
-
-			$def_sql['where'][] = 'hg.groupid=g.groupid';
-			$def_sql['where'][] = 'EXISTS( SELECT t.triggerid '.
+		else if($options['with_monitored_triggers']){
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sql_parts['where'][] = 'EXISTS( SELECT t.triggerid '.
 										' FROM items i, functions f, triggers t'.
 										' WHERE i.hostid=hg.hostid '.
 											' AND i.status='.ITEM_STATUS_ACTIVE.
@@ -195,82 +242,59 @@ class CHostGroup {
 											' AND f.triggerid=t.triggerid '.
 											' AND t.status='.TRIGGER_STATUS_ENABLED.')';
 		}
-
-// htptests
-		if($def_options['with_httptests']){
-			$def_sql['from'][] = 'hosts_groups hg';
-
-			$def_sql['where'][] = 'hg.groupid=g.groupid';
-			$def_sql['where'][] = 'EXISTS( SELECT a.applicationid '.
+// with_httptests, with_monitored_httptests
+		if($options['with_httptests']){
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sql_parts['where'][] = 'EXISTS( SELECT a.applicationid '.
 									' FROM applications a, httptest ht '.
 									' WHERE a.hostid=hg.hostid '.
 										' AND ht.applicationid=a.applicationid)';
 		}
-		else if($def_options['with_monitored_httptests']){
-			$def_sql['from'][] = 'hosts_groups hg';
-
-			$def_sql['where'][] = 'hg.groupid=g.groupid';
-			$def_sql['where'][] = 'EXISTS( SELECT a.applicationid '.
+		else if($options['with_monitored_httptests']){
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sql_parts['where'][] = 'EXISTS( SELECT a.applicationid '.
 									' FROM applications a, httptest ht '.
 									' WHERE a.hostid=hg.hostid '.
 										' AND ht.applicationid=a.applicationid '.
 										' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
 		}
-
-// graphs
-		if($def_options['with_graphs']){
-			$def_sql['from'][] = 'hosts_groups hg';
-
-			$def_sql['where'][] = 'hg.groupid=g.groupid';
-			$def_sql['where'][] = 'EXISTS( SELECT DISTINCT i.itemid '.
+// with_graphs
+		if($options['with_graphs']){
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
+			$sql_parts['where'][] = 'EXISTS( SELECT DISTINCT i.itemid '.
 										' FROM items i, graphs_items gi '.
 										' WHERE i.hostid=hg.hostid '.
 											' AND i.itemid=gi.itemid)';
 		}
-
-// count
-		if($def_options['count']){
-			$def_sql['select'][] = 'COUNT(g.groupid) as rowscount';
-		}
-		else{
-			$def_sql['select'][] = 'g.groupid';
-			$def_sql['select'][] = 'g.name';
-		}
 // order
-		if(str_in_array($def_options['order'], array('name','groupid'))){
-			$def_sql['order'][] = 'g.'.$def_options['order'];
+		// restrict not allowed columns for sorting
+		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
+		if(!zbx_empty($options['order'])){
+			$sql_parts['order'][] = 'g.'.$options['order'];
 		}
-
 // limit
-		if(zbx_ctype_digit($def_options['limit'])){
-			$def_sql['limit'] = $def_options['limit'];
+		if(zbx_ctype_digit($options['limit']) && $options['limit']){
+			$sql_parts['limit'] = $options['limit'];
 		}
-//-----
 
-		$def_sql['select'] = array_unique($def_sql['select']);
-		$def_sql['from'] = array_unique($def_sql['from']);
-		$def_sql['where'] = array_unique($def_sql['where']);
-		$def_sql['order'] = array_unique($def_sql['order']);
+		$sql_select = implode(',', $sql_parts['select']);
+		$sql_from = implode(',', $sql_parts['from']);
+		$sql_where = implode(' AND ', $sql_parts['where']);
+		$sql_order = zbx_empty($options['order']) ? '' : ' ORDER BY '.implode(',',$sql_parts['order']);
+		$sql_limit = $sql_parts['limit'];
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_order = '';
-		$sql_limit = null;
-		if(!empty($def_sql['select'])) $sql_select.= implode(',',$def_sql['select']);
-		if(!empty($def_sql['from'])) $sql_from.= implode(',',$def_sql['from']);
-		if(!empty($def_sql['where'])) $sql_where.= ' AND '.implode(' AND ',$def_sql['where']);
-		if(!empty($def_sql['order'])) $sql_order.= ' ORDER BY '.implode(',',$def_sql['order']);
-		if(!empty($def_sql['limit'])) $sql_limit = $def_sql['limit'];
-
-		$sql = 'SELECT DISTINCT '.$sql_select.
-				' FROM '.$sql_from.
-				' WHERE '.DBin_node('g.groupid', $nodeid).
-					$sql_where.
+		$sql = 'SELECT DISTINCT '.$sql_select.'
+				FROM '.$sql_from.'
+				WHERE '.DBin_node('g.groupid', $nodeids).
+				($sql_where ? ' AND '.$sql_where : '').
 				$sql_order;
-		$res = DBselect($sql,$sql_limit);
+		$res = DBselect($sql, $sql_limit);
+
 		while($group = DBfetch($res)){
-			if($def_options['count'])
+			if($options['count'])
 				$result = $group;
 			else
 				$result[$group['groupid']] = $group;
@@ -279,13 +303,16 @@ class CHostGroup {
 	}
 
 	/**
-	 * Add host group
+	 * Add HostGroup
 	 *
-	 * Create Host group. Input parameter is array with following structure :
-	 * Array('Name1', 'Name2', ...);
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
-	 * @param array $groups multidimensional array with host groups data
+	 * @param array $groups array with HostGroup names
 	 * @return boolean
 	 */
 	public static function add($groups){
@@ -309,15 +336,20 @@ class CHostGroup {
 	}
 
 	/**
-	 * Update host group
+	 * Update HostGruop
 	 *
-	 * Updates existing host groups, changing names. Input parameter is array with following structure :
-	 * <code>
-	 * Array( Array('groupid' => groupid1, 'name' => name1), Array( 'groupid => groupid2, 'name' => name2), ...);
-	 * </code>
+	 * Updates existing HostGroups, changing names. Input parameter is array with following structure :
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
-	 * @param array $groups multidimensional array with host groups data
+	 * @param array $groups
+	 * @param array $groups[0]['name'], ...
+	 * @param array $groups[0]['groupid'], ...
 	 * @return boolean
 	 */
 	public static function update($groups){
@@ -341,7 +373,13 @@ class CHostGroup {
 	}
 
 	/**
-	 * Delete host groups
+	 * Delete HostGroups
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
 	 * @param array $groupids
@@ -358,7 +396,13 @@ class CHostGroup {
 	}
 
 	/**
-	 * Add hosts to host group
+	 * Add Hosts to HostGroup
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
 	 * @param array $data
@@ -376,7 +420,13 @@ class CHostGroup {
 	}
 
 	/**
-	 * Add hosts to host group
+	 * Add Hosts to HostGroup
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
 	 * @param array $data
@@ -403,7 +453,13 @@ class CHostGroup {
 	}
 
 	/**
-	 * Add groups to existing host groups
+	 * Add Groups to existing Host
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
 	 * @param string $hostid
@@ -433,7 +489,13 @@ class CHostGroup {
 	}
 
 	/**
-	 * Update existing host groups with new one (rewrite) //work
+	 * Update Host's HostGroups with new HostGroups (rewrite) 
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
 	 * @param string $hostid

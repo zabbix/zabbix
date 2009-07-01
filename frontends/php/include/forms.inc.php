@@ -5961,7 +5961,7 @@
 		}
 
 		if(!isset($_REQUEST['form_refresh']) && ($_REQUEST['groupid']>0)){
-			$params = array('groupids' => $_REQUEST['groupid']);
+			$params = array('groupids' => $_REQUEST['groupid'], 'editable' => 1);
 			$db_hosts = CHost::get($params);
 			$db_tempaltes = CTemplate::get($params);
 
@@ -5989,7 +5989,8 @@
 		$cmbGroups = new CComboBox('twb_groupid', $selected_grp, 'submit()');
 
 		$params = array('not_proxy_host'=>1,
-						'order'=>'name');
+						'order'=>'name',
+						'editable' => 1);
 		$db_groups = CHostGroup::get($params);
 		foreach($db_groups as $groupid => $row){
 			$cmbGroups->addItem($row['groupid'],$row['name']);
@@ -5999,7 +6000,8 @@
 
 		$params = array('groupids'=>$selected_grp,
 						'templated_hosts'=>1,
-						'order'=>'host');
+						'order'=>'host',
+						'editable' => 1);
 		$db_hosts = CHost::get($params);
 		foreach($db_hosts as $hostid => $db_host){
 			if(!isset($hosts[$hostid]))
@@ -6008,7 +6010,8 @@
 
 		$params = array('hostids'=>$hosts,
 						'templated_hosts'=>1,
-						'order'=>'host');
+						'order'=>'host',
+						'editable'=>1);
 		$db_hosts = CHost::get($params);
 		foreach($db_hosts as $hostid => $db_host){
 			$cmbHosts->addItem($db_host['hostid'],get_node_name_by_elid($db_host['hostid']).$db_host['host']);
