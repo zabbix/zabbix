@@ -53,7 +53,7 @@ char *help_message[] = {
 	" Other options:",
 	"  -h --help                            Give this help",
 	"  -V --version                         Display version number",
-        0 /* end of text */
+	0 /* end of text */
 };
 #else
 char *help_message[] = {
@@ -76,7 +76,7 @@ char *help_message[] = {
 	" Other options:",
 	"  -h                           Give this help.",
 	"  -V                           Display version number.",
-        0 /* end of text */
+	0 /* end of text */
 };
 #endif
 
@@ -94,15 +94,15 @@ static struct zbx_option longopts[] =
 	{"key",			1,	NULL,	'k'},
 	{"value",		1,	NULL,	'o'},
 	{"input-file",		1,	NULL,	'i'},
-	{"verbose",        	0,      NULL,	'v'},
-	{"help",        	0,      NULL,	'h'},
-	{"version",     	0,      NULL,	'V'},
+	{"verbose",		0,	NULL,	'v'},
+	{"help",		0,	NULL,	'h'},
+	{"version",		0,	NULL,	'V'},
 	{0,0,0,0}
 };
 
 /* short options */
 
-static char     shortopts[] = "c:I:z:p:s:k:o:i:vhV";
+static char	shortopts[] = "c:I:z:p:s:k:o:i:vhV";
 
 /* end of COMMAND LINE OPTIONS*/
 
@@ -119,7 +119,7 @@ static char*	ZABBIX_KEY_VALUE = NULL;
 
 #if !defined(_WINDOWS)
 
-static void    send_signal_handler( int sig )
+static void	send_signal_handler( int sig )
 {
 	if( SIGALRM == sig )
 	{
@@ -161,7 +161,7 @@ typedef struct zbx_active_metric_type
  ******************************************************************************/
 static int	check_response(char *response)
 {
-	struct 		zbx_json_parse jp;
+	struct		zbx_json_parse jp;
 	const char 	*p;
 	char		value[MAX_STRING_LEN];
 	char		info[MAX_STRING_LEN];
