@@ -41,17 +41,17 @@
  ******************************************************************************/
 int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 {
-	FILE*   fp;
-	char    scriptname[MAX_STRING_LEN];
-	char    key[MAX_STRING_LEN];
-	char    params[MAX_STRING_LEN];
-	char    error[MAX_STRING_LEN];
-	char    cmd[MAX_STRING_LEN];
-	char    msg[MAX_STRING_LEN];
-	char    *p,*p2;
-	int     i;
+	FILE*	fp;
+	char	scriptname[MAX_STRING_LEN];
+	char	key[MAX_STRING_LEN];
+	char	params[MAX_STRING_LEN];
+	char	error[MAX_STRING_LEN];
+	char	cmd[MAX_STRING_LEN];
+	char	msg[MAX_STRING_LEN];
+	char	*p,*p2;
+	int	i;
 
-	int     ret = SUCCEED;
+	int	ret = SUCCEED;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_external([%s])",item->key);
 
