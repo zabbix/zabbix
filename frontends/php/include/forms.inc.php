@@ -779,8 +779,10 @@
 			$password1 	= get_request('password1', '');
 			$password2 	= get_request('password2', '');
 			$url 		= get_request('url','');
-			$autologin	= get_request('autologin', 0);
-			$autologout	= get_request('autologout', 0);
+			
+			$autologin	= get_request('autologin',0);
+			$autologout	= get_request('autologout',90);
+			
 			$lang		= get_request('lang','en_gb');
 			$theme 		= get_request('theme','default.css');
 			$refresh	= get_request('refresh',30);
@@ -794,9 +796,8 @@
 			$new_group_name = get_request('new_group_name', '');
 		}
 
-		if($autologin){
+		if($autologin || !isset($_REQUEST['autologout'])){
 			$autologout = 0;
-//			zbx_add_post_js("document.getElementById('autologout_visible').disabled = true;");
 		}
 		else if(isset($_REQUEST['autologout']) && ($autologout < 90)){
 			$autologout = 90;
@@ -985,6 +986,7 @@
 							(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
 						));
 		}
+
 
 		if(0 == $profile){
 			$frmUser->addVar('perm_details', $perm_details);
