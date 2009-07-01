@@ -231,7 +231,7 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 {
 	double	value1,value2;
 	char	first[MAX_STRING_LEN],second[MAX_STRING_LEN];
-	char 	*p;
+	char	*p;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_simple(%s)",
 		exp);
@@ -1289,9 +1289,9 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 			ALERT_TYPE_MESSAGE);
 
 	while (NULL != (row = DBfetch(result))) {
-		now	 = atoi(row[0]);
-		status	 = atoi(row[1]);
-		esc_step = atoi(row[5]);
+		now		= atoi(row[0]);
+		status		= atoi(row[1]);
+		esc_step	= atoi(row[5]);
 
 		if (esc_step != 0)
 			zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 16, "%d. ", esc_step);
