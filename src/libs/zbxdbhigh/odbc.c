@@ -98,8 +98,8 @@ void	odbc_DBclose(ZBX_ODBC_DBH *pdbh)
 int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, const char *db_dsn, const char *user, const char *pass)
 {
 	SQLCHAR
-	 	err_stat[10],
-	 	err_msg[100];
+		err_stat[10],
+		err_msg[100];
 
 	SQLINTEGER
 		err_int;
@@ -197,8 +197,8 @@ int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, const char *db_dsn, const char *user, con
 int	odbc_DBexecute(ZBX_ODBC_DBH *pdbh, const char *query)
 {
 	SQLCHAR
-	 	err_stat[10],
-	 	err_msg[100];
+		err_stat[10],
+		err_msg[100];
 
 	SQLINTEGER
 		err_int;
@@ -240,8 +240,8 @@ lbl_err_exit:
 ZBX_ODBC_ROW	odbc_DBfetch(ZBX_ODBC_RESULT pdbh)
 {
 	SQLCHAR
-	 	err_stat[10],
-	 	err_msg[100];
+		err_stat[10],
+		err_msg[100];
 
 	SQLINTEGER
 		err_int;
@@ -297,8 +297,8 @@ lbl_err_exit:
 ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, const char *query)
 {
 	SQLCHAR
-	 	err_stat[10],
-	 	err_msg[100];
+		err_stat[10],
+		err_msg[100];
 
 	SQLINTEGER
 		err_int;

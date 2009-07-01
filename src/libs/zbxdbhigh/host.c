@@ -601,7 +601,7 @@ static int	DBdelete_sysmaps_element(zbx_uint64_t selementid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t 	linkid;
+	zbx_uint64_t	linkid;
 
 	result = DBselect("select linkid from sysmaps_links where "
 			" where selementid1=" ZBX_FS_UI64 " or selementid2=" ZBX_FS_UI64,
@@ -614,7 +614,7 @@ static int	DBdelete_sysmaps_element(zbx_uint64_t selementid)
 		DBdelete_link(linkid);
 	}
 
-        DBfree_result(result);
+	DBfree_result(result);
 
 	DBexecute("delete from sysmaps_elements where selementid=" ZBX_FS_UI64, selementid);
 
@@ -1005,7 +1005,7 @@ static ZBX_GRAPH_ITEMS* DBget_same_graphitems_for_host(
 	ZBX_GRAPH_ITEMS *new_gitems = NULL;
 
 	int i = 0,
-	    new_gi = 0;
+	new_gi = 0;
 
 	new_gitems = zbx_malloc(new_gitems, sizeof(ZBX_GRAPH_ITEMS));
 	new_gitems[0].itemid = 0;
@@ -1185,7 +1185,7 @@ static int	DBdelete_graph(zbx_uint64_t graphid)
  ******************************************************************************/
 static int	DBupdate_graph(
 		zbx_uint64_t	graphid,
-		char 		*name,
+		char		*name,
 		int		width,
 		int		height,
 		int		yaxistype,
@@ -1533,7 +1533,7 @@ static int	DBadd_graph_with_items(
 
 	char *itemids = NULL;
 
-	int 	i = 0,
+	int	i = 0,
 		new_host_count = 0,
 		new_host_is_template = 0;
 
@@ -2271,27 +2271,27 @@ static int	DBupdate_item(
 		const char	*description,
 		const char	*key,
 		zbx_uint64_t	hostid,
-		int 		delay,
-		int 		history,
+		int		delay,
+		int		history,
 		int		status,
 		int		type,
 		const char	*snmp_community,
 		const char	*snmp_oid,
 		int		value_type,
-		const char      *trapper_hosts,
+		const char	*trapper_hosts,
 		int		snmp_port,
-		const char      *units,
+		const char	*units,
 		int		multiplier,
 		int		delta,
-		const char      *snmpv3_securityname,
+		const char	*snmpv3_securityname,
 		int		snmpv3_securitylevel,
-		const char      *snmpv3_authpassphrase,
-		const char      *snmpv3_privpassphrase,
-		const char      *formula,
+		const char	*snmpv3_authpassphrase,
+		const char	*snmpv3_privpassphrase,
+		const char	*formula,
 		int		trends,
-		const char      *logtimefmt,
+		const char	*logtimefmt,
 		zbx_uint64_t	valuemapid,
-		const char      *delay_flex,
+		const char	*delay_flex,
 		const char	*params,
 		zbx_uint64_t	*apps,
 		zbx_uint64_t	templateid
@@ -2537,25 +2537,25 @@ static int	DBadd_item(
 		const char	*description,
 		const char	*key,
 		zbx_uint64_t	hostid,
-		int 		delay,
-		int 		history,
+		int		delay,
+		int		history,
 		int		status,
 		int		type,
 		const char	*snmp_community,
 		const char	*snmp_oid,
 		int		value_type,
-		const char      *trapper_hosts,
+		const char	*trapper_hosts,
 		int		snmp_port,
-		const char      *units,
+		const char	*units,
 		int		multiplier,
 		int		delta,
-		const char      *snmpv3_securityname,
+		const char	*snmpv3_securityname,
 		int		snmpv3_securitylevel,
-		const char      *snmpv3_authpassphrase,
-		const char      *snmpv3_privpassphrase,
-		const char      *formula,
+		const char	*snmpv3_authpassphrase,
+		const char	*snmpv3_privpassphrase,
+		const char	*formula,
 		int		trends,
-		const char      *logtimefmt,
+		const char	*logtimefmt,
 		zbx_uint64_t	valuemapid,
 		const char      *delay_flex,
 		const char      *params,
@@ -3394,9 +3394,9 @@ static int	DBupdate_trigger(
 	int	i = 0;
 
 	db_triggers = DBselect("select distinct t.description,h.host,t.expression,t.priority,t.status,t.comments,t.url,t.type "
-		       " from triggers t,functions f,items i,hosts h "
-		       " where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid "
-		       " and i.itemid=f.itemid and i.hostid=h.hostid", triggerid);
+			" from triggers t,functions f,items i,hosts h "
+			" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid "
+			" and i.itemid=f.itemid and i.hostid=h.hostid", triggerid);
 
 	if( (trigger_data = DBfetch(db_triggers)) )
 	{
@@ -3834,8 +3834,8 @@ static int	DBcopy_trigger_to_host(
  *                                                                            *
  ******************************************************************************/
 static int DBupdate_template_dependencies_for_host(
-		  zbx_uint64_t hostid
-		   )
+		zbx_uint64_t hostid
+		)
 {
 	DB_RESULT	db_triggers;
 	DB_RESULT	db_dependencies;
@@ -3976,7 +3976,7 @@ static int	DBcopy_template_triggers(
 	else
 	{
 		db_elements = DBselect("select distinct t.triggerid from triggers t, functions f, items i"
-		                        " where i.hostid=" ZBX_FS_UI64 " and f.itemid=i.itemid and f.triggerid=t.triggerid", templateid);
+					" where i.hostid=" ZBX_FS_UI64 " and f.itemid=i.itemid and f.triggerid=t.triggerid", templateid);
 
 		while( (element_data = DBfetch(db_elements)) )
 		{
@@ -4409,7 +4409,7 @@ static int	DBcopy_template_graphs(
  ******************************************************************************/
 /* public */ void	DBunlink_template(
 		zbx_uint64_t	hostid,
-	       	zbx_uint64_t	templateid
+		zbx_uint64_t	templateid
 	)
 {
 	DBdelete_template_elements(hostid, templateid, 1 /* unlink, not delete */);
