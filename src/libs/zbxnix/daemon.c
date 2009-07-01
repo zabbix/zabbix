@@ -88,7 +88,7 @@ static void	parent_signal_handler(int sig,  siginfo_t *siginfo, void *context)
 
 int	daemon_start(int allow_root)
 {
-	pid_t   		pid;
+	pid_t			pid;
 	struct passwd		*pwd;
 	struct sigaction	phan;
 	char			user[7] = "zabbix";

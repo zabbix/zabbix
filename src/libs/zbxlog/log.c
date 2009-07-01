@@ -108,8 +108,8 @@ int zabbix_open_log(int type, int level, const char *filename)
 
 #else /* not _WINDOWS */
 
-        	openlog("zabbix_suckerd", LOG_PID, LOG_USER);
-        	setlogmask(LOG_UPTO(LOG_WARNING));
+		openlog("zabbix_suckerd", LOG_PID, LOG_USER);
+		setlogmask(LOG_UPTO(LOG_WARNING));
 
 #endif /* _WINDOWS */
 	}
