@@ -185,8 +185,8 @@ out:
 }
 
 typedef struct {
-	char 		*message;
-	const char 	*result;
+	char		*message;
+	const char	*result;
 	int		timeout_sec;
 } zbx_sms_scenario;
 
