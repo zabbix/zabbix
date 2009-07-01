@@ -1371,10 +1371,10 @@ class CChart extends CGraphDraw{
 			else{
 				$drawtype	= $this->items[$item]['drawtype'];
 
-				$max_color	= $this->getColor('ValueMax');
-				$avg_color	= $this->getColor($this->items[$item]['color']);
-				$min_color	= $this->getColor('ValueMin');
-				$minmax_color	= $this->getColor('ValueMinMax');
+				$max_color	= $this->getColor('ValueMax', GRAPH_STACKED_ALFA);
+				$avg_color	= $this->getColor($this->items[$item]['color'], GRAPH_STACKED_ALFA);
+				$min_color	= $this->getColor('ValueMin', GRAPH_STACKED_ALFA);
+				$minmax_color	= $this->getColor('ValueMinMax', GRAPH_STACKED_ALFA);
 
 				$calc_fnc = $this->items[$item]['calc_fnc'];
 			}
