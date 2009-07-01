@@ -5993,10 +5993,17 @@
 		$cmbElements1 = new CComboBox('selementid1',$selementid1);
 		$cmbElements2 = new CComboBox('selementid2',$selementid2);
 
-		$db_selements = DBselect('SELECT selementid,label,elementid,elementtype '.
-							' FROM sysmaps_elements '.
-							' WHERE sysmapid='.$_REQUEST['sysmapid']);
-		while($db_selement = DBfetch($db_selements)){
+		$map_elements = array();
+		$sql = 'SELECT selementid,label,elementid,elementtype '.
+				' FROM sysmaps_elements '.
+				' WHERE sysmapid='.$_REQUEST['sysmapid'];
+		$db_elements = DBselect($sql);
+		while($db_element = DBfetch($db_elements)){
+			$map_elements[$db_element['selementid']] = $db_element;
+		}
+		order_result($map_elements, 'label');
+		
+		foreach($map_elements as $selementid => $db_selement){
 
 			$label = $db_selement['label'];
 			if($db_selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
