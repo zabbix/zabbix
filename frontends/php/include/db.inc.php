@@ -369,7 +369,8 @@ if(!isset($DB)){
 
 	function &DBselect($query, $limit='NO', $offset=0){
 		global $DB;
-//COpt::savesqlrequest($query);
+
+		$time_start=microtime(true);
 		$result = false;
 
 		if( isset($DB['DB']) && !empty($DB['DB']) ){
@@ -447,14 +448,15 @@ if(!isset($DB)){
 	//			SDI($DB['TRANSACTION_STATE']);
 			}
 		}
+COpt::savesqlrequest(microtime(true)-$time_start,$query);
 		return $result;
 	}
 
 	function DBexecute($query, $skip_error_messages=0){
 		global $DB;
-//COpt::savesqlrequest($query);
 		$result = false;
 
+		$time_start=microtime(true);
 		if( isset($DB['DB']) && !empty($DB['DB']) ){
 			$DB['EXECUTE_COUNT']++;	// WRONG FOR ORACLE!!
 //SDI('SQL xec: '.$query);
@@ -510,6 +512,7 @@ if(!isset($DB)){
 	//			SDI($DB['TRANSACTION_STATE']);
 			}
 		}
+COpt::savesqlrequest(microtime(true)-$time_start,$query);
 	return $result;
 	}
 

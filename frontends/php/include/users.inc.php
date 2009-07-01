@@ -347,7 +347,7 @@
 	USER GROUPS
 **************************/
 
-	function add_user_group($name,$users_status,$gui_access,$api_access,$users=array(),$rights=array()){
+	function add_user_group($name,$users_status,$gui_access,$api_access,$debug_mode,$users=array(),$rights=array()){
 
 		if(DBfetch(DBselect('select * from usrgrp where name='.zbx_dbstr($name).' and '.DBin_node('usrgrpid', get_current_nodeid(false))))){
 			error("Group '$name' already exists");
@@ -363,6 +363,7 @@
 		$result&=change_group_status($usrgrpid,$users_status);
 		$result&=change_group_gui_access($usrgrpid,$gui_access);
 		$result&=change_group_api_access($usrgrpid, $api_access);
+		$result&=change_group_debug_mode($usrgrpid, $debug_mode);
 		if(!$result) return	$result;
 //--------
 
@@ -383,7 +384,7 @@
 		return $result;
 	}
 
-	function update_user_group($usrgrpid,$name,$users_status,$gui_access,$api_access,$users=array(),$rights=array()){
+	function update_user_group($usrgrpid,$name,$users_status,$gui_access,$api_access,$debug_mode,$users=array(),$rights=array()){
 		global $USER_DETAILS;
 
 		$sql = 'SELECT * '.
@@ -403,6 +404,7 @@
 		$result&=change_group_status($usrgrpid,$users_status);
 		$result&=change_group_gui_access($usrgrpid,$gui_access);
 		$result&=change_group_api_access($usrgrpid, $api_access);
+		$result&=change_group_debug_mode($usrgrpid, $debug_mode);
 		if(!$result) return	$result;
 //-------
 
@@ -488,6 +490,12 @@
 	function change_group_api_access($usrgrpid, $api_access){
 		$res = false;
 		$res = DBexecute('UPDATE usrgrp SET api_access='.$api_access.' WHERE usrgrpid='.$usrgrpid);
+	return $res;
+	}
+
+	function change_group_debug_mode($usrgrpid, $debug_mode){
+		$res = false;
+		$res = DBexecute('UPDATE usrgrp SET debug_mode='.$debug_mode.' WHERE usrgrpid='.$usrgrpid);
 	return $res;
 	}
 
