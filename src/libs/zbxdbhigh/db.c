@@ -307,9 +307,9 @@ int     DBget_function_result(char **result, char *functionid, char *error, int 
 	{
 		*result = strdup(row[1]);
 	}
-        DBfree_result(dbresult);
+	DBfree_result(dbresult);
 
-        return res;
+	return res;
 }
 
 /******************************************************************************
@@ -394,15 +394,15 @@ void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *late
 	}
 
 	if(eventid_max == 0)
-        {
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for last is empty" );
-                *prev_status = TRIGGER_VALUE_UNKNOWN;
+		*prev_status = TRIGGER_VALUE_UNKNOWN;
 		*latest_status = TRIGGER_VALUE_UNKNOWN;
-        }
+	}
 	else
 	{
 		*latest_status = value_max;
-                *prev_status = TRIGGER_VALUE_FALSE;
+		*prev_status = TRIGGER_VALUE_FALSE;
 
 		if(eventid_prev_max != 0)
 		{
@@ -431,7 +431,7 @@ int	latest_service_alarm(zbx_uint64_t serviceid, int status)
 
 	if(row && (DBis_null(row[1])==FAIL) && (atoi(row[1]) == status)){
 		ret = SUCCEED;
-        }
+	}
 
 	DBfree_result(result);
 
@@ -959,7 +959,7 @@ int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *e
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		trigger.triggerid 	= zbx_atoui64(row[0]);
+		trigger.triggerid	= zbx_atoui64(row[0]);
 		strscpy(trigger.expression, row[1]);
 		strscpy(trigger.description, row[2]);
 		trigger.url		= row[3];
