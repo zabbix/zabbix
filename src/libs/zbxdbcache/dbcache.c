@@ -32,17 +32,17 @@
 #define	LOCK_CACHE_IDS		zbx_mutex_lock(&cache_ids_lock)
 #define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(&cache_ids_lock)
 
-#define ZBX_GET_SHM_DBCACHE_KEY(smk_key) 								\
-	{if( -1 == (shm_key = ftok(CONFIG_FILE, (int)'c') )) 						\
-        { 												\
-                zbx_error("Can not create IPC key for path '%s', try to create for path '.' [%s]",	\
-				CONFIG_FILE, strerror(errno)); 						\
-                if( -1 == (shm_key = ftok(".", (int)'c') )) 						\
-                { 											\
-                        zbx_error("Can not create IPC key for path '.' [%s]", strerror(errno)); 	\
-                        exit(1); 									\
-                } 											\
-        }}
+#define ZBX_GET_SHM_DBCACHE_KEY(smk_key)								\
+	{if( -1 == (shm_key = ftok(CONFIG_FILE, (int)'c') ))						\
+	{												\
+		zbx_error("Can not create IPC key for path '%s', try to create for path '.' [%s]",	\
+				CONFIG_FILE, strerror(errno));						\
+		if( -1 == (shm_key = ftok(".", (int)'c') ))						\
+		{											\
+			zbx_error("Can not create IPC key for path '.' [%s]", strerror(errno));	\
+			exit(1);									\
+		}											\
+	}}
 
 ZBX_DC_CACHE		*cache = NULL;
 ZBX_DC_IDS		*ids = NULL;
