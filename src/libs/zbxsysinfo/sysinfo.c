@@ -133,7 +133,7 @@ int	add_user_parameter(char *key, char *command)
 
 void	init_metrics(void)
 {
-	register int 	i;
+	register int	i;
 
 	commands = malloc(sizeof(ZBX_METRIC));
 	commands[0].key=NULL;
@@ -207,7 +207,7 @@ void    escape_string(char *from, char *to, int maxlen)
 	to[maxlen-1]=0;
 }
 
-int 	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist)
+int	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist)
 {
 	assert(src);
 	assert(dist);
@@ -405,12 +405,12 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	char	usr_param[MAX_STRING_LEN];
 
 	char	usr_command[MAX_STRING_LEN];
-	int 	usr_command_len;
+	int	usr_command_len;
 
 	char	param[MAX_STRING_LEN];
 
-        assert(result);
-        init_result(result);
+	assert(result);
+	init_result(result);
 
 	alias_expand(in_command, usr_command, MAX_STRING_LEN);
 
@@ -752,11 +752,11 @@ static char** get_result_str_value(AGENT_RESULT *result)
 	}
 	else if(ISSET_UI64(result))
 	{
-		 SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64))
+		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64))
 	}
 	else if(ISSET_DBL(result))
 	{
-		 SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl))
+		SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl))
 	}
 	/* skip AR_MESSAGE - it is information field */
 
@@ -782,11 +782,11 @@ static char** get_result_text_value(AGENT_RESULT *result)
 	}
 	else if(ISSET_UI64(result))
 	{
-		 SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64))
+		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, result->ui64))
 	}
 	else if(ISSET_DBL(result))
 	{
-		 SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl))
+		SET_TEXT_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_DBL, result->dbl))
 	}
 	/* skip AR_MESSAGE - it is information field */
 
