@@ -71,7 +71,6 @@
 			$table->Show();
 		}
 
-COpt::profiling_stop("page");
 COpt::profiling_stop("script");
 
 print('<!--'."\n".'SELECTS: '.$DB['SELECT_COUNT']."\n".'EXECUTE: '.$DB['EXECUTE_COUNT']."\n".'TOTAL: '.($DB['EXECUTE_COUNT']+$DB['SELECT_COUNT'])."\n".'-->');
