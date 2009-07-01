@@ -5950,84 +5950,82 @@
 // Insert form for Host Groups
 	function insert_hostgroups_form(){
 		global $USER_DETAILS;
-
-		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
-
-		$hosts = get_request('hosts', array());
-		$hosts = array_intersect($available_hosts, $hosts);
-
+		
+		$groupid = get_request('groupid', 0);
+		$hosts = get_request('hosts', array(0));
+		
 		$frm_title = S_HOST_GROUP;
-
-		$name = get_request('name','');
-
-		if($_REQUEST['groupid']>0){
+		if($groupid > 0){
 			$group = get_hostgroup_by_groupid($_REQUEST['groupid']);
 			$name = $group['name'];
 			$frm_title .= ' ['.$group['name'].']';
 		}
+		else{
+			$name = '';
+		}
+		
+		$frmHostG = new CFormTable($frm_title, 'hosts.php');
+		$frmHostG->setHelp('web.hosts.group.php');
+		$frmHostG->addVar('config', get_request('config',1));
+		$frmHostG->addRow(S_GROUP_NAME, new CTextBox('gname', $name, 48));
 
-		if(!isset($_REQUEST['form_refresh']) && ($_REQUEST['groupid']>0)){
-			$params = array('groupids' => $_REQUEST['groupid'], 'editable' => 1);
-			$db_hosts = CHost::get($params);
-			$db_tempaltes = CTemplate::get($params);
-
-			$db_hosts = $db_hosts + $db_tempaltes;
-			order_result($db_hosts, 'host', ZBX_SORT_UP);
-
-			foreach($db_hosts as $hostid => $db_host){
-				$hosts[$db_host['hostid']] = $db_host['hostid'];
+		if($groupid > 0){
+			$frmHostG->addVar('groupid',$_REQUEST['groupid']);
+			// if first time select all hosts for group from db
+			if(!isset($_REQUEST['form_refresh'])){
+				$params = array('groupids' => $groupid, 
+								'editable' => 1,
+								'order' => 'host',
+								'templated_hosts' => 1);
+				$db_hosts = CHost::get($params);
+				foreach($db_hosts as $hostid => $db_host){
+					$hosts[$db_host['hostid']] = $db_host['hostid'];
+				}
 			}
 		}
 
-		$frmHostG = new CFormTable($frm_title,'hosts.php');
-		$frmHostG->setHelp('web.hosts.group.php');
-		$frmHostG->addVar('config',get_request('config',1));
-
-		if($_REQUEST['groupid']>0){
-			$frmHostG->addVar('groupid',$_REQUEST['groupid']);
-		}
-
-		$frmHostG->addRow(S_GROUP_NAME,new CTextBox('gname',$name,48));
-
-		$selected_grp = get_request('twb_groupid', 0);
-		$selected_grp = isset($available_groups[$selected_grp]) ? $selected_grp :  reset($available_groups);
-
-		$cmbGroups = new CComboBox('twb_groupid', $selected_grp, 'submit()');
-
-		$params = array('not_proxy_host'=>1,
-						'order'=>'name',
+		// select all possible groups
+		$params = array('not_proxy_host' => 1,
+						'order' => 'name',
 						'editable' => 1);
 		$db_groups = CHostGroup::get($params);
+		$selected_grp = get_request('twb_groupid', 0);
+		if($selected_grp == 0){
+			$gr = reset($db_groups);
+			$selected_grp = $gr['groupid'];
+		}
+		$cmbGroups = new CComboBox('twb_groupid', $selected_grp, 'submit()');
 		foreach($db_groups as $groupid => $row){
-			$cmbGroups->addItem($row['groupid'],$row['name']);
+			$cmbGroups->addItem($row['groupid'], $row['name']);
 		}
 
 		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts, 25);
-
+		
+		// get hosts from selected twb_groupid combo
 		$params = array('groupids'=>$selected_grp,
 						'templated_hosts'=>1,
 						'order'=>'host',
 						'editable' => 1);
 		$db_hosts = CHost::get($params);
 		foreach($db_hosts as $hostid => $db_host){
-			if(!isset($hosts[$hostid]))
-			$cmbHosts->addItem($db_host['hostid'],get_node_name_by_elid($db_host['hostid']).$db_host['host']);
+			if(!isset($hosts[$hostid])) // add all except selected hosts
+			$cmbHosts->addItem($db_host['hostid'], get_node_name_by_elid($db_host['hostid']).$db_host['host']);
 		}
 
-		$params = array('hostids'=>$hosts,
-						'templated_hosts'=>1,
-						'order'=>'host',
-						'editable'=>1);
+		// select selected hosts and add them
+		$params = array('hostids' => $hosts,
+						'templated_hosts' =>1 ,
+						'order' => 'host',
+						'editable' => 1);
 		$db_hosts = CHost::get($params);
 		foreach($db_hosts as $hostid => $db_host){
-			$cmbHosts->addItem($db_host['hostid'],get_node_name_by_elid($db_host['hostid']).$db_host['host']);
+			$cmbHosts->addItem($db_host['hostid'], get_node_name_by_elid($db_host['hostid']).$db_host['host']);
 		}
 
 		$frmHostG->addRow(S_HOSTS,$cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
 
 		$frmHostG->addItemToBottomRow(new CButton('save',S_SAVE));
-		if($_REQUEST['groupid']>0){
+		if($groupid>0){
 			$frmHostG->addItemToBottomRow(SPACE);
 			$frmHostG->addItemToBottomRow(new CButton('clone',S_CLONE));
 			$frmHostG->addItemToBottomRow(SPACE);
