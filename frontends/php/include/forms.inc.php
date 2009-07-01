@@ -710,8 +710,10 @@
 			$password1 	= get_request('password1', '');
 			$password2 	= get_request('password2', '');
 			$url 		= get_request('url','');
+			
 			$autologin	= get_request('autologin',0);
 			$autologout	= get_request('autologout',90);
+			
 			$lang		= get_request('lang','en_gb');
 			$theme 		= get_request('theme','default.css');
 			$refresh	= get_request('refresh',30);
@@ -724,13 +726,12 @@
 		}
 
 
-		if ($autologin > 0) {
-			$autologout = 0;
-			zbx_add_post_js("document.getElementById('autologout_visible').disabled = true;");
-		} else if (isset($_REQUEST['autologout'])) {
-			if ($autologout >= 0 && $autologout < 90) {
-				$autologout = 90;
-			}
+		if($autologin > 0) {
+			unset($_REQUEST['autologout']);
+			zbx_add_post_js("$('autologout_visible').disabled = true;");
+		} 
+		else if(isset($_REQUEST['autologout'])) {
+			if($autologout < 90) $autologout = 90;
 		}
 
 		$perm_details	= get_request('perm_details',0);
@@ -877,32 +878,27 @@
 
 		$chkbx_autologin = new CCheckBox("autologin",
 											$autologin,
-											new CScript("var autologout_visible = document.getElementById('autologout_visible');
-														var autologout = document.getElementById('autologout');
-														if (this.checked) {
-															if (autologout_visible.checked) {
-																autologout_visible.checked = false;
-																autologout_visible.onclick();
-															}
-															autologout_visible.disabled = true;
-														} else {
-															autologout_visible.disabled = false;
-														}"), 1);
+											"javascript: if(this.checked) {".
+															"$('autologout_visible').disabled = true;".
+															"$('autologout_visible').checked = false;".
+															"$('autologout').disabled = true;".
+														"} else {".
+															"$('autologout_visible').disabled = false;".
+														"}", 1);
 		$chkbx_autologin->AddOption('autocomplete','off');
 		$frmUser->AddRow(S_AUTO_LOGIN,	$chkbx_autologin);
 		$autologoutCheckBox = new CCheckBox('autologout_visible',
-											(isset($autologout) && $autologout != 0) ? 'yes' : 'no',
-											new CScript("var autologout = document.getElementById('autologout');
-														if (this.checked) {
-															autologout.disabled = false;
-														} else {
-															autologout.disabled = true;
-														}"));
-		// if autologout is disabled
-		if (isset($autologout) && $autologout == 0) {
-			zbx_add_post_js('document.getElementById("autologout").disabled = true;');
+											isset($_REQUEST['autologout']),
+											"javascript: if(this.checked){".
+												"$('autologout').disabled = false;".
+											"} else {".
+												"$('autologout').disabled = true;".
+											"}");
+// if autologout is disabled
+		if(!isset($_REQUEST['autologout'])) {
+			zbx_add_post_js('$("autologout").disabled = true;');
 		}
-		$autologoutTextBox = new CNumericBox("autologout", ($autologout == 0) ? '90' : $autologout, 4);
+		$autologoutTextBox = new CNumericBox("autologout", ($autologout == 0)?'90':$autologout, 4);
 		$frmUser->AddRow(S_AUTO_LOGOUT, array($autologoutCheckBox, $autologoutTextBox));
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));

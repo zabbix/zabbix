@@ -64,8 +64,10 @@ include_once('include/page_header.php');
 		'disable_media'=>array(T_ZBX_INT, O_OPT,null,	null,		null),
 		'lang'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
 		'theme'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'(isset({config})&&({config}==0))&&isset({save})'),
-		'autologin'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
-		'autologout'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(90,10000), null),
+
+		'autologin'=>				array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+		'autologout'=>  			array(T_ZBX_INT, O_OPT, null,   BETWEEN(90,10000), null),
+
 		'url'=>			array(T_ZBX_STR, O_OPT,	null,	null,		'(isset({config})&&({config}==0))&&isset({save})'),
 		'refresh'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'(isset({config})&&({config}==0))&&isset({save})'),
 
