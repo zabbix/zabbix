@@ -25,15 +25,15 @@
 #include "sysinfo.h"
 
 extern	void	signal_handler(int);
-extern  int     server_num;
+extern	int	server_num;
 
-extern  int     CONFIG_TIMEOUT;
-extern  int     CONFIG_POLLER_FORKS;
-extern  int     CONFIG_IPMIPOLLER_FORKS;
-extern  int     CONFIG_UNREACHABLE_POLLER_FORKS;
-extern  int     CONFIG_UNAVAILABLE_DELAY;
-extern  int     CONFIG_UNREACHABLE_PERIOD;
-extern  int     CONFIG_UNREACHABLE_DELAY;
+extern	int	CONFIG_TIMEOUT;
+extern	int	CONFIG_POLLER_FORKS;
+extern	int	CONFIG_IPMIPOLLER_FORKS;
+extern	int	CONFIG_UNREACHABLE_POLLER_FORKS;
+extern	int	CONFIG_UNAVAILABLE_DELAY;
+extern	int	CONFIG_UNREACHABLE_PERIOD;
+extern	int	CONFIG_UNREACHABLE_DELAY;
 
 void	main_poller_loop(zbx_process_t p, int type, int num);
 
