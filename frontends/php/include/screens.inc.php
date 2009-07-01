@@ -210,53 +210,39 @@
 		return DBfetch(DBselect('select * from slideshows where slideshowid='.$slideshowid));
 	}
 
-	function	validate_slide($slide)
-	{
-		if(!screen_accessible($slide["screenid"], PERM_READ_ONLY)) return false;
+	function validate_slide($slide){
+		if(!screen_accessible($slide['screenid'], PERM_READ_ONLY)) return false;
 
-		if( !is_numeric($slide['delay']) ) return false;
-
-		return true;
+	return true;
 	}
 
-	function	add_slideshow($name, $delay, $slides)
-	{
-		foreach($slides as $slide)
-		{
-			if( !validate_slide($slide) )
-				return false;
+	function add_slideshow($name, $delay, $slides){
+		foreach($slides as $slide){
+			if(!validate_slide($slide)) return false;
 		}
 
 		$slideshowid = get_dbid('slideshows','slideshowid');
-		$result = DBexecute('insert into slideshows (slideshowid,name,delay) '.
-			' values ('.$slideshowid.','.zbx_dbstr($name).','.$delay.')');
+		$result = DBexecute('INSERT INTO slideshows (slideshowid,name,delay) '.
+							' VALUES ('.$slideshowid.','.zbx_dbstr($name).','.$delay.')');
 
 		$i = 0;
-		foreach($slides as $slide)
-		{
+		foreach($slides as $num => $slide){
 			$slideid = get_dbid('slides','slideid');
-			if( !($result = DBexecute('insert into slides (slideid,slideshowid,screenid,step,delay) '.
-				' values ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')')) )
-			{
-				break;
-			}
+			$result = DBexecute('INSERT INTO slides (slideid,slideshowid,screenid,step,delay) '.
+								' VALUES ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')');
+			if(!$result) return false;
 		}
 
-		if( !$result )
-		{
-			delete_slideshow($slideshowid);
-			return false;
-		}
-		return $slideshowid;
+	return $slideshowid;
 	}
 
-	function	update_slideshow($slideshowid, $name, $delay, $slides){
+	function update_slideshow($slideshowid, $name, $delay, $slides){
 		foreach($slides as $slide){
 			if(!validate_slide($slide))
 				return false;
 		}
 
-		if(!$result = DBexecute('update slideshows set name='.zbx_dbstr($name).',delay='.$delay.' where slideshowid='.$slideshowid))
+		if(!$result = DBexecute('UPDATE slideshows SET name='.zbx_dbstr($name).',delay='.$delay.' WHERE slideshowid='.$slideshowid))
 			return false;
 
 		DBexecute('DELETE FROM slides where slideshowid='.$slideshowid);
@@ -264,13 +250,14 @@
 		$i = 0;
 		foreach($slides as $slide){
 			$slideid = get_dbid('slides','slideid');
-			if( !($result = DBexecute('insert into slides (slideid,slideshowid,screenid,step,delay) '.
-				' values ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')')) ){
+			$result = DBexecute('insert into slides (slideid,slideshowid,screenid,step,delay) '.
+				' values ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')');
+			if(!$result){
 				return false;
 			}
 		}
 
-		return true;
+	return true;
 	}
 
 	function delete_slideshow($slideshowid){

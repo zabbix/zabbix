@@ -25,17 +25,17 @@
 	require_once('include/blocks.inc.php');
 	require_once('include/nodes.inc.php');
 
-
 	$page['title'] = "S_CUSTOM_SCREENS";
 	$page['file'] = 'slides.php';
 	$page['hist_arg'] = array('config','elementid');
 	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js','pmaster.js','menu_scripts.js'); //do not change order!!!
 
-	$_REQUEST['config'] = get_request('config',get_profile('web.screens.config',0));
-
+	$config = $_REQUEST['config'] = get_request('config', 1);
+	if($_REQUEST['config'] == 0) redirect('screens.php');
+	
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	if((1 != $_REQUEST['config']) && (PAGE_TYPE_HTML == $page['type'])){
+	if(PAGE_TYPE_HTML == $page['type']){
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
 
@@ -80,10 +80,6 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['favobj'])){
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
 
-		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.screens.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
-		}
-
 		if(in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
@@ -110,16 +106,17 @@ include_once('include/page_header.php');
 		if('refresh' == $_REQUEST['favobj']){
 			switch($_REQUEST['favid']){
 				case 'hat_slides':
-					$elementid = $_REQUEST['elementid'];
+					$elementid = get_request('elementid');
 
-					$effectiveperiod = navigation_bar_calc();
-					$step = get_request('upd_counter');
-//					$element = new CTableInfo(S_NO_SLIDESHOWS_DEFINED);
+					if(!is_null($elementid)){
+						$effectiveperiod = navigation_bar_calc();
+						
+						$step = get_request('upd_counter');
+	
+						$element = get_slideshow($elementid, $step, $effectiveperiod);
+						$element->show();		
+					}
 
-					$element = get_slideshow($elementid, $step, $effectiveperiod);
-					$element->Show();
-
-//					$element = get_slideshow($elementid, get_request('step', null), $effectiveperiod);
 					break;
 			}
 		}
@@ -128,11 +125,11 @@ include_once('include/page_header.php');
 			if(str_in_array($_REQUEST['favid'],array('hat_slides'))){
 				$elementid = $_REQUEST['elementid'];
 
-				update_profile('web.slides.rf_rate.'.$_REQUEST['favid'],$_REQUEST['favcnt'], PROFILE_TYPE_INT);
-				$_REQUEST['favcnt'] = get_profile('web.slides.rf_rate.'.$_REQUEST['favid'],30);
+				update_profile('web.slides.rf_rate.'.$_REQUEST['favid'],$_REQUEST['favcnt'], PROFILE_TYPE_INT, $elementid);
+				$_REQUEST['favcnt'] = get_profile('web.slides.rf_rate.'.$_REQUEST['favid'],30,null,$elementid);
 
 				$script = get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $_REQUEST['favcnt']);
-				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'url', 'slides.php?elementid='.$elementid.url_param('stime').url_param('period'));
+//				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'url', 'slides.php?elementid='.$elementid.'&output=html'.url_param('stime').url_param('period'));
 				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'stopDoll');
 				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'startDoll');
 				print $script;
@@ -152,10 +149,7 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$config = $_REQUEST['config'] = get_request('config', 1);
-
-	if( 2 != $_REQUEST['fullscreen'] )
-		update_profile('web.screens.config', $_REQUEST['config'],PROFILE_TYPE_INT);
+	$config = $_REQUEST['config'];
 
 	$_REQUEST['elementid'] = get_request('elementid',get_profile('web.screens.elementid', null));
 
@@ -194,11 +188,11 @@ include_once('include/page_header.php');
 	unset($first_screen);
 
 
-	$result = DBselect('SELECT slideshowid as elementid,name '.
+	$sql = 'SELECT slideshowid as elementid,name '.
 			' FROM slideshows '.
 			' WHERE '.DBin_node('slideshowid').
-			' ORDER BY name'
-			);
+			' ORDER BY name';
+	$result = DBselect($sql);
 	while($row=DBfetch($result)){
 		if(!slideshow_accessible($row['elementid'], PERM_READ_ONLY))
 			continue;
@@ -231,6 +225,7 @@ include_once('include/page_header.php');
 
 		$params = array();
 		foreach($options as  $option) $params[$option] = 1;
+		
 		$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 		$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
@@ -291,7 +286,7 @@ include_once('include/page_header.php');
 	$submenu = array();
 
 // js menu arrays
-	make_refresh_menu('mainpage','hat_slides',get_profile('web.slides.rf_rate.hat_slides',30),array('elementid'=> $elementid),$menu,$submenu);
+	make_refresh_menu('mainpage','hat_slides',get_profile('web.slides.rf_rate.hat_slides',$element['delay'],null,$elementid),array('elementid'=> $elementid),$menu,$submenu);
 
 	insert_js('var page_menu='.zbx_jsvalue($menu).";\n".
 			 'var page_submenu='.zbx_jsvalue($submenu).";\n"
@@ -309,7 +304,7 @@ include_once('include/page_header.php');
 
 	$refresh_tab = array(
 		array('id' => 'hat_slides',
-				'frequency' => get_profile('web.slides.rf_rate.hat_slides',30),
+				'frequency' => get_profile('web.slides.rf_rate.hat_slides',$element['delay'], null,$elementid),
 				'url' => 'slides.php?elementid='.$elementid.url_param('stime').url_param('period').url_param('groupid').url_param('hostid'),
 				'params'=> array('lastupdate' => time()),
 			));

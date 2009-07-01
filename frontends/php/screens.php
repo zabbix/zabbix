@@ -19,19 +19,19 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/graphs.inc.php';
-	require_once 'include/screens.inc.php';
-	require_once 'include/blocks.inc.php';
-	require_once 'include/nodes.inc.php';
-
+	require_once('include/config.inc.php');
+	require_once('include/graphs.inc.php');
+	require_once('include/screens.inc.php');
+	require_once('include/blocks.inc.php');
+	require_once('include/nodes.inc.php');
 
 	$page['title'] = "S_CUSTOM_SCREENS";
 	$page['file'] = 'screens.php';
 	$page['hist_arg'] = array('config','elementid');
 	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js'); //do not change order!!!
 
-	$_REQUEST['config'] = get_request('config',get_profile('web.screens.config',0));
+	$_REQUEST['config'] = get_request('config',0);
+	if($_REQUEST['config'] == 1) redirect('slides.php');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -39,7 +39,7 @@
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
 ?>
 
@@ -107,10 +107,7 @@ include_once 'include/page_header.php';
 	}
 ?>
 <?php
-	$config = $_REQUEST['config'] = get_request('config', 0);
-
-	if( 2 != $_REQUEST['fullscreen'] )
-		update_profile('web.screens.config', $_REQUEST['config'],PROFILE_TYPE_INT);
+	$config = $_REQUEST['config'];
 
 	$_REQUEST['elementid'] = get_request('elementid',get_profile('web.screens.elementid', null));
 

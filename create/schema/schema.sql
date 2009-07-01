@@ -722,6 +722,7 @@ FIELD		|groupid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|usrgrp
 FIELD		|permission	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|id		|t_id		|	|		|ZBX_SYNC		|groups
 INDEX		|1		|groupid
+INDEX		|2		|id
 
 TABLE|scripts|scriptid|ZBX_SYNC
 FIELD		|scriptid	|t_id		|'0'	|NOT NULL	|0
