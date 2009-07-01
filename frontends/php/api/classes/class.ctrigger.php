@@ -1,10 +1,10 @@
 <?php
 /**
- * File containing Trigger class for API.
+ * File containing CTrigger class for API.
  * @package API
  */
 /**
- * Class containing methods for operations with triggers
+ * Class containing methods for operations with Triggers
  *
  */
 class CTrigger {
@@ -12,34 +12,39 @@ class CTrigger {
 	public static $error = array();
 
 	/**
-	 * Get triggers data
+	 * Get Triggers data
 	 *
-	 * <code>
-	 * $options = array(
-	 *	array 'itemids'			=> array(),
-	 *	array 'hostids'			=> array(),
-	 *	array 'groupids'		=> array(),
-	 *	array 'triggerids'		=> array(),
-	 *	array 'applicationids'		=> array(),
-	 *	boolean 'status'		=> false,
-	 *	boolean 'templated_items'	=> false,
-	 *	boolean 'count'			=> false,
-	 *	string 'pattern'		=> '',
-	 *	int 'limit'			=> null,
-	 *	string 'order'			=> ''
-	 * );
-	 * </code>
-	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $options
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $options
+	 * @param array $options['itemids']
+	 * @param array $options['hostids']
+	 * @param array $options['groupids']
+	 * @param array $options['triggerids']
+	 * @param array $options['applicationids']
+	 * @param array $options['status']
+	 * @param array $options['templated_items']
+	 * @param array $options['editable']
+	 * @param array $options['count']
+	 * @param array $options['pattern']
+	 * @param array $options['limit']
+	 * @param array $options['order']
 	 * @return array|int item data as array or false if error
 	 */
 	public static function get($options=array()){
+		global $USER_DETAILS;
 
 		$result = array();
-
+		$user_type = $USER_DETAILS['type'];
+		$userid = $USER_DETAILS['userid'];
+		
 		$sort_columns = array('triggerid'); // allowed columns for sorting
 
+		
 		$sql_parts = array(
 			'select' => array('t.triggerid, t.description, t.status'),
 			'from' => array('triggers t'),
@@ -57,6 +62,7 @@ class CTrigger {
 			'status'		=> false,
 			'severity'		=> false,
 			'templated_triggers'	=> false,
+			'editable'		=> false,
 			'count'			=> false,
 			'pattern'		=> '',
 			'limit'			=> null,
@@ -65,12 +71,44 @@ class CTrigger {
 
 		$options = array_merge($def_options, $options);
 
-		// restrict not allowed columns for sorting
-		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
-
+		
+// editable + PERMISSION CHECK
+		if(USER_TYPE_SUPER_ADMIN != $user_type){
+			if($options['editable']){
+				$permission = PERM_READ_WRITE;
+			}
+			else{
+				$permission = PERM_READ_ONLY;
+			}
+			   
+			$sql_parts['from']['fi'] = 'functions f, items i';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from'][] = 'rights r, users_groups g';
+			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+			$sql_parts['where'][] = '
+					r.id=hg.groupid
+					AND r.groupid=g.usrgrpid
+					AND g.userid='.$userid.'
+					AND r.permission>'.($permission-1).'
+					AND NOT EXISTS(
+						SELECT ff.triggerid
+						FROM functions ff, items ii
+						WHERE ff.triggerid=t.triggerid
+							AND ff.itemid=ii.itemid
+							AND EXISTS(
+								SELECT hgg.groupid
+								FROM hosts_groups hgg, rights rr, users_groups gg
+								WHERE hgg.hostid=hg.hostid
+									AND rr.id=hgg.groupid
+									AND rr.groupid=gg.usrgrpid
+									AND gg.userid='.$userid.'
+									AND rr.permission<'.$permission.'))';
+		}
 // count
 		if($options['count']){
-			$sql_parts['select'] = array('count(t.triggerid) as count');
+			$sql_parts['select'] = array('count(t.triggerid) as rowscount');
 		}
 // triggerids
 		if($options['triggerids']){
@@ -94,9 +132,9 @@ class CTrigger {
 // groupids
 		if($options['groupids']){
 			$sql_parts['from']['fi'] = 'functions f, items i';
-			$sql_parts['from'][] = 'hosts_groups hg';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
-			$sql_parts['where'][] = 'hg.hostid=i.hostid';
+			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 		}
@@ -126,6 +164,9 @@ class CTrigger {
 			$sql_parts['where'][] = ' t.description LIKE '.zbx_dbstr('%'.$options['pattern'].'%');
 		}
 // order
+		// restrict not allowed columns for sorting
+		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
+		
 		if(!zbx_empty($options['order'])){
 			$sql_parts['order'][] = 't.'.$options['order'];
 		}
@@ -141,10 +182,10 @@ class CTrigger {
 		$sql_limit = $sql_parts['limit'];
 
 
-		$sql = 'SELECT DISTINCT '.$sql_select.
-			' FROM '.$sql_from.
-			($sql_where ? ' WHERE '.$sql_where : '').
-			$sql_order;
+		$sql = 'SELECT DISTINCT '.$sql_select.'
+				FROM '.$sql_from.
+				($sql_where ? ' WHERE '.$sql_where : '').
+				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
 
 		while($trigger = DBfetch($db_res)){
@@ -153,21 +194,20 @@ class CTrigger {
 			else
 				$result[$trigger['triggerid']] = $trigger;
 		}
-
 	return $result;
 	}
 
 	/**
-	 *Gets all trigger data from DB by triggerid
+	 * Gets all trigger data from DB by Trigger ID
 	 *
-	 * <code>
-	 * $trigger = array(
-	 * 	*string 'triggerid' => 'triggerid'
-	 * );
-	 * </code>
-	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $trigger
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $trigger
+	 * @param array $trigger['triggerid']
 	 * @return array|boolean array of trigger data || false if error
 	 */
 	public static function getById($trigger){
@@ -184,17 +224,17 @@ class CTrigger {
 	/**
 	 * Get triggerid by host.host and trigger.expression
 	 *
-	 * <code>
-	 * $trigger = array(
-	 * 	*string 'expression' => 'trigger expression',
-	 * 	string 'host' => 'hostname',
-	 * 	string 'hostid' => hostid,
-	 * 	string 'description' => 'trigger description'
-	 * );
-	 * </code>
-	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $trigger
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $trigger
+	 * @param array $trigger['expression']
+	 * @param array $trigger['host']
+	 * @param array $trigger['hostid']
+	 * @param array $trigger['description']
 	 * @return string|boolean triggerid || false if error
 	 */
 	public static function getId($trigger){
@@ -260,21 +300,20 @@ class CTrigger {
 	/**
 	 * Add triggers
 	 *
-	 * Input array $triggers has following structure and default values :
-	 * <code>
-	 * array( array(
-	 * 	*'expression'	=> *,
-	 * 	*'description'	=> *,
-	 * 	'type'		=> 0,
-	 * 	'priority'	=> 1,
-	 * 	'status'	=> TRIGGER_STATUS_ACTIVE,
-	 * 	'comments'	=> '',
-	 * 	'url'		=> '',
-	 * ), ...);
-	 * </code>
-	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $triggers multidimensional array with triggers data
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $triggers multidimensional array with triggers data
+	 * @param array $triggers[0,...]['expression']
+	 * @param array $triggers[0,...]['description']
+	 * @param array $triggers[0,...]['type'] OPTIONAL
+	 * @param array $triggers[0,...]['priority'] OPTIONAL
+	 * @param array $triggers[0,...]['status'] OPTIONAL
+	 * @param array $triggers[0,...]['comments'] OPTIONAL
+	 * @param array $triggers[0,...]['url'] OPTIONAL
 	 * @return boolean
 	 */
 	public static function add($triggers){
@@ -317,20 +356,20 @@ class CTrigger {
 	/**
 	 * Update triggers
 	 *
-	 * <code>
-	 * array( array(
-	 * 	*'triggerid'	=> ,
-	 * 	'description'	=> ,
-	 * 	'type'		=> 0,
-	 * 	'priority'	=> 1,
-	 * 	'status'	=> TRIGGER_STATUS_ACTIVE,
-	 * 	'comments'	=> '',
-	 * 	'url'		=> '',
-	 * ), ...);
-	 * </code>
-	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $triggers multidimensional array with triggers data
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $triggers multidimensional array with triggers data
+	 * @param array $triggers[0,...]['expression']
+	 * @param array $triggers[0,...]['description'] OPTIONAL
+	 * @param array $triggers[0,...]['type'] OPTIONAL
+	 * @param array $triggers[0,...]['priority'] OPTIONAL
+	 * @param array $triggers[0,...]['status'] OPTIONAL
+	 * @param array $triggers[0,...]['comments'] OPTIONAL
+	 * @param array $triggers[0,...]['url'] OPTIONAL
 	 * @return boolean
 	 */
 	public static function update($triggers){
@@ -370,8 +409,13 @@ class CTrigger {
 	/**
 	 * Delete triggers
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $triggerids
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $triggerids
 	 * @return boolean
 	 */
 	public static function delete($triggerids){
@@ -387,16 +431,15 @@ class CTrigger {
 	/**
 	 * Add dependency for trigger
 	 *
-	 * Add dependency, to make trigger be dependent on other trigger.
-	 * <code>
-	 * $triggers_data = array(
-	 * 	string 'triggerid] => 'triggerid',
-	 * 	string 'depends_on_triggerid' => 'triggerid'
-	 * );
-	 * </code>
-	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $triggers_data
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $triggers_data
+	 * @param array $triggers_data['triggerid]
+	 * @param array $triggers_data['depends_on_triggerid']
 	 * @return boolean
 	 */
 	public static function addDependency($triggers_data){

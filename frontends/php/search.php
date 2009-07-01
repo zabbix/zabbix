@@ -46,7 +46,6 @@ include_once('include/page_header.php');
 
 	check_fields($fields);
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 // ACTION /////////////////////////////////////////////////////////////////////////////
 	if(isset($_REQUEST['favobj'])){
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
@@ -104,7 +103,7 @@ include_once('include/page_header.php');
 
 // Find Host groups
 	$params = array(
-				'nodeid'=> get_current_nodeid(),
+				'nodeids'=> get_current_nodeid(),
 				'pattern' => $search,
 				'limit' => $rows_per_page,
 				'order' => 'name',
@@ -114,7 +113,7 @@ include_once('include/page_header.php');
 	$hostGroups = selectByPattern($db_hostGroups, 'name', $search, $rows_per_page);
 
 	$params = array(
-				'nodeid'=> get_current_nodeid(),
+				'nodeids'=> get_current_nodeid(),
 				'pattern' => $search,
 				'count' => 1,
 				);
@@ -159,7 +158,7 @@ include_once('include/page_header.php');
 
 // FIND Hosts
 	$params = array(
-				'nodeid'=> get_current_nodeid(),
+				'nodeids'=> get_current_nodeid(),
 				'pattern' => $search,
 				'limit' => $rows_per_page,
 				'order' => 'host',
@@ -176,7 +175,7 @@ include_once('include/page_header.php');
 	}
 
 	$params = array(
-				'nodeid'=> get_current_nodeid(),
+				'nodeids'=> get_current_nodeid(),
 				'pattern' => $search,
 				'count' => 1,
 				);
@@ -244,6 +243,7 @@ include_once('include/page_header.php');
 					'pattern' => $search,
 					'limit' => $rows_per_page,
 					'order' => 'host',
+					'editable' => 1
 					);
 
 		$db_templates = CTemplate::get($params);
@@ -258,9 +258,10 @@ include_once('include/page_header.php');
 		}
 
 		$params = array(
-					'nodeid'=> get_current_nodeid(),
+					'nodeids'=> get_current_nodeid(),
 					'pattern' => $search,
 					'count' => 1,
+					'editable' => 1
 					);
 		$hosts_count = CTemplate::get($params);
 

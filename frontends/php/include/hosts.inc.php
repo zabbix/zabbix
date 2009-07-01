@@ -122,7 +122,7 @@ require_once('include/httptest.inc.php');
 	}
 
 	function update_host_groups_by_groupid($groupid,$hosts=array()){
-		$grp_hosts = CHost::get(array('groupids'=>$groupid));
+		$grp_hosts = CHost::get(array('groupids'=>$groupid, 'editable'=>1));
 		$grp_hostids = array_keys($grp_hosts);
 
 // unlinked hosts 

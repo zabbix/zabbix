@@ -1,10 +1,10 @@
 <?php
 /**
- * File containing template class for API.
+ * File containing CTemplate class for API.
  * @package API
  */
 /**
- * Class containing methods for operations with templates
+ * Class containing methods for operations with Templates
  *
  */
 class CTemplate {
@@ -12,158 +12,165 @@ class CTemplate {
 	public static $error;
 
 	/**
-	 * Get host data
+	 * Get Template data
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
 	 * @param array $options
-	 * @return array|boolean host data as array or false if error
+	 * @return array|boolean Template data as array or false if error
 	 */
 	public static function get($options = array()) {
-
-		$def_sql = array(
-			'select' => array(),
-			'from' => array('hosts h'),
-			'where' => array(),
-			'order' => array(),
-			'limit' => null,
-			);
-
-		$def_options = array(
-			'nodeid'	=>	0,
-			'groupids'	=>	0,
-			'hostids'	=>	0,
-			'templateids'	=>	0,
-			'with_items'	=>	0,
-			'with_triggers'	=>	0,
-			'with_graphs'	=>	0,
-			'count'		=>	0,
-			'pattern'	=>	'',
-			'order'		=>	0,
-			'limit'		=>	0,
-		);
-
-		$def_options = array_merge($def_options, $options);
+		global $USER_DETAILS;
 
 		$result = array();
-//-----
-// nodes
-		if($def_options['nodeid']){
-			$nodeid = $def_options['nodeid'];
+		$user_type = $USER_DETAILS['type'];
+		$userid = $USER_DETAILS['userid'];
+		
+		$sort_columns = array('hostid'); // allowed columns for sorting
+		
+		$sql_parts = array(
+			'select' => array('h.hostid, h.host'),
+			'from' => array('hosts h'),
+			'where' => array('h.status=3'),
+			'order' => array(),
+			'limit' => null);
+
+		$def_options = array(
+			'nodeids'		=> array(),
+			'groupids'		=> array(),
+			'templateids'	=> array(),
+			'with_items'	=> false,
+			'with_triggers'	=> false,
+			'with_graphs'	=> false,
+			'editable' 		=> false,
+			'count'			=> false,
+			'pattern'		=> '',
+			'order'			=> '',
+			'limit'			=> null);
+
+		$options = array_merge($def_options, $options);
+		
+// editable + PERMISSION CHECK
+		if(USER_TYPE_SUPER_ADMIN != $user_type){
+			if($options['editable']){
+				$permission = PERM_READ_WRITE;
+			}
+			else{
+				$permission = PERM_READ_ONLY;
+			}
+			
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from'][] = 'rights r, users_groups g';
+			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
+			$sql_parts['where'][] = '
+					r.id=hg.groupid
+					AND r.groupid=g.usrgrpid
+					AND g.userid='.$userid.'
+					AND r.permission>'.($permission-1).'
+					AND NOT EXISTS(
+						SELECT hgg.groupid
+						FROM hosts_groups hgg, rights rr, users_groups gg
+						WHERE hgg.hostid=hg.hostid
+							AND rr.id=hgg.groupid
+							AND rr.groupid=gg.usrgrpid
+							AND gg.userid='.$userid.'
+							AND rr.permission<'.$permission.')';
 		}
-		else{
-			$nodeid = get_current_nodeid(false);
-		}
-
-// groups
-		if($def_options['groupids'] != 0){
-			zbx_value2array($def_options['groupids']);
-
-		$def_sql['from'][] = 'hosts_groups hg';
-		$def_sql['where'][] = DBcondition('hg.groupid',$def_options['groupids']);
-		$def_sql['where'][] = 'hg.hostid=h.hostid';
-		}
-
-// templateids
-		if($def_options['templateids'] != 0){
-			zbx_value2array($def_options['templateids']);
-
-			$def_sql['where'][] = DBcondition('h.hostid',$def_options['templateids']);
-		}
-
-		if(!zbx_empty($def_options['pattern'])){
-			$def_sql['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.strtoupper($def_options['pattern']).'%');
-		}
-
-// hosts
-		$def_sql['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
-
-		if($def_options['hostids']){
-			zbx_value2array($def_options['hostids']);
-
-			$def_sql['from'][] = 'hosts_templates ht';
-			$def_sql['where'][] = DBcondition('ht.hostids',$def_options['hostids']);
-			$def_sql['where'][] = 'h.hostid=ht.hostid';
-		}
-
-// items
-		if($def_options['with_items']){
-			$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
-		}
-
-// triggers
-		if($def_options['with_triggers']){
-			$def_sql['where'][] = 'EXISTS( SELECT i.itemid '.
-				 ' FROM items i, functions f, triggers t'.
-				 ' WHERE i.hostid=h.hostid '.
-				  ' AND i.itemid=f.itemid '.
-				  ' AND f.triggerid=t.triggerid)';
-		}
-
-
-// graphs
-		if($def_options['with_graphs']){
-			$def_sql['where'][] = 'EXISTS( SELECT DISTINCT i.itemid '.
-				 ' FROM items i, graphs_items gi '.
-				 ' WHERE i.hostid=h.hostid '.
-				  ' AND i.itemid=gi.itemid)';
-		}
-
 // count
-		if($def_options['count']){
-			$def_sql['select'][] = 'COUNT(h.hostid) as rowscount';
+		if($options['count']){
+			$sql_parts['select'] = array('count(h.hostid) as rowscount');
 		}
-		else{
-			$def_sql['select'][] = 'h.hostid';
-			$def_sql['select'][] = 'h.host';
+// nodeids
+		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+// groupids
+		if($options['groupids']){
+			zbx_value2array($options['groupids']);
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
+		}
+// templateids
+		if($options['templateids']){
+			zbx_value2array($options['templateids']);
+			$sql_parts['where'][] = DBcondition('h.hostid', $options['templateids']);
+		}
+// with_items
+		if($options['with_items']){
+			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
+		}
+// with_triggers
+		if($options['with_triggers']){
+			$sql_parts['where'][] = 'EXISTS( 
+					SELECT i.itemid
+					FROM items i, functions f, triggers t
+					WHERE i.hostid=h.hostid 
+						AND i.itemid=f.itemid 
+						AND f.triggerid=t.triggerid)';
+		}
+// with_graphs
+		if($options['with_graphs']){
+			$sql_parts['where'][] = 'EXISTS( 
+					SELECT DISTINCT i.itemid 
+					FROM items i, graphs_items gi 
+					WHERE i.hostid=h.hostid 
+						AND i.itemid=gi.itemid)';
+		}
+// pattern
+		if(!zbx_empty($options['pattern'])){
+			$sql_parts['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
 		}
 // order
-		if(str_in_array($def_options['order'], array('host','hostid'))){
-			$def_sql['order'][] = 'h.'.$def_options['order'];
+		// restrict not allowed columns for sorting
+		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
+		if(!zbx_empty($options['order'])){
+			$sql_parts['order'][] = 'h.'.$options['order'];
 		}
-
 // limit
-		if(zbx_ctype_digit($def_options['limit'])){
-			$def_sql['limit'] = $def_options['limit'];
+		if(zbx_ctype_digit($options['limit']) && $options['limit']){
+			$sql_parts['limit'] = $options['limit'];
 		}
-//------
+		
+		
+		$sql_select = implode(',', $sql_parts['select']);
+		$sql_from = implode(',', $sql_parts['from']);
+		$sql_where = implode(' AND ', $sql_parts['where']);
+		$sql_order = zbx_empty($options['order']) ? '' : ' ORDER BY '.implode(',',$sql_parts['order']);
+		$sql_limit = $sql_parts['limit'];
 
-		$def_sql['select'] = array_unique($def_sql['select']);
-		$def_sql['from'] = array_unique($def_sql['from']);
-		$def_sql['where'] = array_unique($def_sql['where']);
-		$def_sql['order'] = array_unique($def_sql['order']);
-
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_order = '';
-		$sql_limit = null;
-		if(!empty($def_sql['select'])) $sql_select.= implode(',',$def_sql['select']);
-		if(!empty($def_sql['from'])) $sql_from.= implode(',',$def_sql['from']);
-		if(!empty($def_sql['where'])) $sql_where.= ' AND '.implode(' AND ',$def_sql['where']);
-		if(!empty($def_sql['order'])) $sql_order.= ' ORDER BY '.implode(',',$def_sql['order']);
-		if(!empty($def_sql['limit'])) $sql_limit = $def_sql['limit'];
-
-		$sql = 'SELECT DISTINCT '.$sql_select.
-			' FROM '.$sql_from.
-			' WHERE '.DBin_node('h.hostid', $nodeid).
-				$sql_where.
-			$sql_order;
+		$sql = 'SELECT DISTINCT '.$sql_select.'
+				FROM '.$sql_from.'
+				WHERE '.DBin_node('h.hostid', $nodeids).
+				($sql_where ? ' AND '.$sql_where : '').
+				$sql_order;
 		$res = DBselect($sql, $sql_limit);
-		while($host = DBfetch($res)){
-			if($def_options['count'])
-				$result = $host;
+		
+		while($template = DBfetch($res)){
+			if($options['count'])
+				$result = $template;
 			else
-				$result[$host['hostid']] = $host;
+				$result[$template['hostid']] = $template;
 		}
-
-		return $result;
+		
+	return $result;
 	}
 
 	/**
-	 * Gets all template data from DB by templateid
+	 * Gets all Template data from DB by Template ID
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
-	 * @param array $template_data
+	 * @param _array $template_data
+	 * @param array $template_data['templateid']
 	 * @return array|boolean template data as array or false if error
 	 */
 	public static function getById($template_data){
@@ -180,17 +187,17 @@ class CTemplate {
 	}
 
 	/**
-	 * Get templateid by template name
+	 * Get Template ID by Template name
 	 *
-	 * <code>
-	 * $template_data = array(
-	 * 	string 'template' => 'template name'
-	 * );
-	 * </code>
-	 *
+	 * {@source}
+	 * @access public
 	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * @param array $template_data
-	 * @return int templateid
+	 * @param array $template_data['template']
+	 * @return string templateid
 	 */
 	public static function getId($template_data){
 		$sql = 'SELECT hostid FROM hosts '.
@@ -209,16 +216,34 @@ class CTemplate {
 	}
 
 	/**
-	 * Add template
+	 * Add Template
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $templates multidimensional array with templates data
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $templates multidimensional array with templates data
+	 * @param string $templates['host']
+	 * @param string $templates['port']
+	 * @param string $templates['status']
+	 * @param string $templates['useip']
+	 * @param string $templates['dns']
+	 * @param string $templates['ip']
+	 * @param string $templates['proxy_hostid']
+	 * @param string $templates['useipmi']
+	 * @param string $templates['ipmi_ip']
+	 * @param string $templates['ipmi_port']
+	 * @param string $templates['ipmi_authtype']
+	 * @param string $templates['ipmi_privilege']
+	 * @param string $templates['ipmi_username']
+	 * @param string $templates['ipmi_password']
 	 * @return boolean
 	 */
 	public static function add($templates){
 		$tpls = null;
 		$newgroup = '';
-		$groups = null;
 		$status = 3;
 
 		$templateids = array();
@@ -227,6 +252,12 @@ class CTemplate {
 
 		DBstart(false);
 		foreach($templates as $template){
+		
+			if(empty($template['groupids'])){
+				$result = false;
+				$error = 'No groups for host [ '.$template['host'].' ]';
+				break;
+			}
 
 			$host_db_fields = array(
 				'host' => null,
@@ -252,7 +283,7 @@ class CTemplate {
 
 			$result = add_host($template['host'], $template['port'], $status, $template['useip'], $template['dns'], $template['ip'],
 				$template['proxy_hostid'], $tpls, $template['useipmi'], $template['ipmi_ip'], $template['ipmi_port'], $template['ipmi_authtype'],
-				$template['ipmi_privilege'], $template['ipmi_username'], $template['ipmi_password'], $newgroup, $groups);
+				$template['ipmi_privilege'], $template['ipmi_username'], $template['ipmi_password'], $newgroup, $template['groupids']);
 			if(!$result) break;
 			$templateids[$result] = $result;
 		}
@@ -267,16 +298,20 @@ class CTemplate {
 	}
 
 	/**
-	 * Update template
+	 * Update Template
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * @param array $templates multidimensional array with templates data
 	 * @return boolean
 	 */
 	public static function update($templates){
 		$tpls = null;
 		$newgroup = '';
-		$groups = null;
 		$status = 3;
 
 		$templateids = array();
@@ -301,6 +336,8 @@ class CTemplate {
 				$result = false;
 				break;
 			}
+			
+			$groups = get_groupids_by_host($template['hostid']);
 
 			$result = update_host($template['hostid'], $template['host'], $template['port'], $status, $template['useip'], $template['dns'], $template['ip'],
 				$template['proxy_hostid'], $tpls, $template['useipmi'], $template['ipmi_ip'], $template['ipmi_port'], $template['ipmi_authtype'],
@@ -320,9 +357,14 @@ class CTemplate {
 	}
 
 	/**
-	 * Delete template
+	 * Delete Template
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * @param array $templateids
 	 * @return boolean
 	 */
@@ -338,11 +380,17 @@ class CTemplate {
 
 
 	/**
-	 * Link template to hosts
+	 * Link Template to Hosts
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param int $templateid
-	 * @param array $hostids
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param array $data
+	 * @param string $data['templateid']
+	 * @param array $data['hostids']
 	 * @return boolean
 	 */
 	public static function linkHosts($data){
@@ -381,12 +429,18 @@ class CTemplate {
 	}
 
 	/**
-	 * Unlink hosts from templates
+	 * Unlink Hosts from Templates
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param int $templateid
-	 * @param array $hostids
-	 * @param boolean $clean default = true; whether to wipe all info from template elements.
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $data
+	 * @param string $data['templateid']
+	 * @param array $data['hostids']
+	 * @param boolean $data['clean']
 	 * @return boolean
 	 */
 	public static function unlinkHosts($data){
@@ -408,11 +462,17 @@ class CTemplate {
 	}
 
 	/**
-	 * Link host to templates
+	 * Link Host to Templates
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param string $hostid
-	 * @param array $templateids
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param array $data
+	 * @param string $data['hostid']
+	 * @param array $data['templateids']
 	 * @return boolean
 	 */
 	public static function linkTemplates($data){
@@ -446,12 +506,18 @@ class CTemplate {
 	}
 
 	/**
-	 * Unlink templates from host
+	 * Unlink Templates from Host
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param string $hostid
-	 * @param array $templateids
-	 * @param boolean $clean whether to wipe all info from template elements.
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param string $data
+	 * @param string $data['templateid']
+	 * @param array $data['hostids']
+	 * @param boolean $data['clean'] whether to wipe all info from template elements.
 	 * @return boolean
 	 */
 	public static function unlinkTemplates($data){

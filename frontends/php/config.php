@@ -216,7 +216,7 @@
 			if(!is_null($val = get_request('work_period')))
 				$msg[] = S_WORKING_TIME.' ['.$val.']';
 			if(!is_null($val = get_request('discovery_groupid'))){
-				$val = CHostGroup::get(array('groupids' => $val));
+				$val = CHostGroup::get(array('groupids' => $val, 'editable' => 1));
 				if(!empty($val)){
 					$val = array_pop($val);
 					$msg[] = S_GROUP_FOR_DISCOVERED_HOSTS.' ['.$val['name'].']';
@@ -527,7 +527,7 @@
 
 
 		$cmbGrp = new CComboBox('discovery_groupid', $config['discovery_groupid']);
-		$groups = CHostGroup::get(array('order'=>'name'));
+		$groups = CHostGroup::get(array('order'=>'name', 'editable' => 1));
 		foreach($groups as $groupid => $group){
 			$cmbGrp->addItem($groupid, $group['name']);
 		}
