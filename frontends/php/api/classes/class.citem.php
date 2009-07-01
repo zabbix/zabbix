@@ -1,10 +1,10 @@
 <?php
 /**
- * File containing Item class for API.
+ * File containing CItem class for API.
  * @package API
  */
 /**
- * Class containing methods for operations with items
+ * Class containing methods for operations with Items
  *
  */
 class CItem {
@@ -14,30 +14,35 @@ class CItem {
 	/**
 	 * Get items data
 	 *
-	 * <code>
-	 * $options = array(
-	 *	array 'itemids'			=> array(),
-	 *	array 'hostids'			=> array(),
-	 *	array 'groupids'		=> array(),
-	 *	array 'triggerids'		=> array(),
-	 *	array 'applicationids'		=> array(),
-	 *	boolean 'status'		=> false,
-	 *	boolean 'templated_items'	=> false,
-	 *	boolean 'count'			=> false,
-	 *	string 'pattern'		=> '',
-	 *	int 'limit'			=> null,
-	 *	string 'order'			=> ''
-	 * );
-	 * </code>
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
 	 * @param array $options
+	 * @param array $options['itemids']
+	 * @param array $options['hostids']
+	 * @param array $options['groupids']
+	 * @param array $options['triggerids']
+	 * @param array $options['applicationids']
+	 * @param boolean $options['status']
+	 * @param boolean $options['templated_items']
+	 * @param boolean $options['editable']
+	 * @param boolean $options['count']
+	 * @param string $options['pattern']
+	 * @param int $options['limit']
+	 * @param string $options['order']
 	 * @return array|int item data as array or false if error
 	 */
 	public static function get($options=array()){
+		global $USER_DETAILS;
 
 		$result = array();
-
+		$user_type = $USER_DETAILS['type'];
+		$userid = $USER_DETAILS['userid'];
+		
 		$sort_columns = array('itemid'); // allowed columns for sorting
 
 		$sql_parts = array(
@@ -45,28 +50,50 @@ class CItem {
 			'from' => array('items i'),
 			'where' => array('i.type<>9'),
 			'order' => array(),
-			'limit' => null,
-			);
+			'limit' => null);
 
 		$def_options = array(
-			'itemids'		=> array(),
-			'hostids'		=> array(),
-			'groupids'		=> array(),
+			'itemids'			=> array(),
+			'hostids'			=> array(),
+			'groupids'			=> array(),
 			'triggerids'		=> array(),
 			'applicationids'	=> array(),
-			'status'		=> false,
+			'status'			=> false,
 			'templated_items'	=> false,
-			'count'			=> false,
-			'pattern'		=> '',
-			'limit'			=> null,
-			'order'			=> ''
-		);
+			'editable'			=> false,
+			'count'				=> false,
+			'pattern'			=> '',
+			'limit'				=> null,
+			'order'				=> '');
 
 		$options = array_merge($def_options, $options);
 
-		// restrict not allowed columns for sorting
-		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
-
+// editable + PERMISSION CHECK
+		if(USER_TYPE_SUPER_ADMIN != $user_type){
+			if($options['editable']){
+				$permission = PERM_READ_WRITE;
+			}
+			else{
+				$permission = PERM_READ_ONLY;
+			}
+			
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from'][] = 'rights r, users_groups g';
+			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+			$sql_parts['where'][] = '
+					r.id=hg.groupid
+					AND r.groupid=g.usrgrpid
+					AND g.userid='.$userid.'
+					AND r.permission>'.($permission-1).'
+					AND NOT EXISTS(
+						SELECT hgg.groupid
+						FROM hosts_groups hgg, rights rr, users_groups gg
+						WHERE hgg.hostid=hg.hostid
+							AND rr.id=hgg.groupid
+							AND rr.groupid=gg.usrgrpid
+							AND gg.userid='.$userid.'
+							AND rr.permission<'.$permission.')';
+		}
 // count
 		if($options['count']){
 			$sql_parts['select'] = array('count(i.itemid) as count');
@@ -82,8 +109,8 @@ class CItem {
 // groupids
 		if($options['groupids']){
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
-			$sql_parts['where'][] = 'hg.hostid=i.hostid';
-			$sql_parts['from'][] = 'hosts_groups hg';
+			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
 		}
 // triggerids
 		if($options['triggerids']){
@@ -110,6 +137,9 @@ class CItem {
 			$sql_parts['where'][] = ' i.description LIKE '.zbx_dbstr('%'.$options['pattern'].'%');
 		}
 // order
+		// restrict not allowed columns for sorting
+		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
+		
 		if(!zbx_empty($options['order'])){
 			$sql_parts['order'][] = 'i.'.$options['order'];
 		}
@@ -128,7 +158,7 @@ class CItem {
 
 		$sql = 'SELECT DISTINCT '.$sql_select.
 			' FROM '.$sql_from.
-			' WHERE '.$sql_where.
+			($sql_where ? ' WHERE '.$sql_where : '').
 			$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
 
@@ -145,8 +175,15 @@ class CItem {
 	/**
 	 * Gets all item data from DB by itemid
 	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * @static
 	 * @param int $item_data
+	 * @param int $item_data['itemid']
 	 * @return array|boolean item data || false if error
 	 */
 	public static function getById($item_data){
@@ -163,17 +200,17 @@ class CItem {
 	/**
 	 * Get itemid by host.name and item.key
 	 *
-	 * <code>
-	 * $item_data = array(
-	 * 	*string 'key_' => 'item key',
-	 * 	*string 'host' => 'host name',
-	 * 	*string 'hostid' => 'hostid'
-	 * );
-	 * </code>
-	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
 	 * @param array $item_data
+	 * @param array $item_data['key_']
+	 * @param array $item_data['host']
+	 * @param array $item_data['hostid'] OPTIONAL
 	 * @return int|boolean
 	 */
 	public static function getId($item_data){
@@ -182,7 +219,7 @@ class CItem {
 			$host = $item_data['host'];
 		}
 		else {
-			$host = CHost::getById(array($item_data['hostid']));
+			$host = CHost::getById(array('hostid' => $item_data['hostid']));
 			$host = $host['host'];
 		}
 
@@ -218,6 +255,11 @@ class CItem {
 	/**
 	 * Add item
 	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * Input array $items has following structure and default values :
 	 * <code>
@@ -282,6 +324,12 @@ class CItem {
 	/**
 	 * Update item
 	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * @static
 	 * @param array $items multidimensional array with items data
 	 * @return boolean
@@ -308,6 +356,12 @@ class CItem {
 
 	/**
 	 * Delete items
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * @static
 	 * @param array $itemids

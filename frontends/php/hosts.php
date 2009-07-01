@@ -1578,7 +1578,7 @@ include_once('include/page_header.php');
 // uncomment this for group deletion
 			$dlt_groups = getDeletableHostGroups();
 
-			$db_groups = CHostGroup::get(array('order'=> 'name'));
+			$db_groups = CHostGroup::get(array('order'=> 'name', 'editable' => 1));
 			$groupids = array_keys($db_groups);
 
 			$db_hosts = array();
