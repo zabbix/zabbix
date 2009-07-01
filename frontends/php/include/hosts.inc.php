@@ -28,7 +28,7 @@ require_once('include/httptest.inc.php');
 	function add_host_to_group($hostids, $groupid){
 		zbx_value2array($hostids);
 
-		$result = false;
+		$result = true;
 		foreach($hostids as $key => $hostid) {
 			$hostgroupid = get_dbid("hosts_groups","hostgroupid");
 			$result = DBexecute("insert into hosts_groups (hostgroupid,hostid,groupid) values ($hostgroupid,$hostid,$groupid)");
@@ -2058,7 +2058,11 @@ return $result;
 		}
 
 		if(!is_null($groupids)){
-			$sql_where.= ' AND '.DBcondition('hg.groupid', $groupids);
+			$sql_where.= ' AND EXISTS ('.
+							' SELECT hostid '.
+							' FROM hosts_groups hgg '.
+							' WHERE hgg.hostid = hg.hostid'.
+								' AND '.DBcondition('hgg.groupid', $groupids).')';
 		}
 				
 		$sql = 'SELECT hg.hostid, count(hg.groupid) as grp_count '.
