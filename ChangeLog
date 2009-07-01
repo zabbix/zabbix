@@ -1,5 +1,6 @@
 Changes for 1.6.6
 
+ - [ZBX-965] fixed color in graph legend (artem)
  - [ZBX-966] added sorting in map creation form (Artem)
  - [ZBX-824] fixed net.tcp.service to work with host DNS name (Alexei)
  - [ZBX-967] cosmetic changes in --help output of zabbix_get and zabbix_sender (Alexei)

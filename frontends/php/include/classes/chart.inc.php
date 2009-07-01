@@ -338,7 +338,7 @@ class Chart extends Graph{
 				$color = $this->GetColor('HistoryMinMax');
 			}
 			else{
-				$color = $this->GetColor($this->items[$i]['color']);
+				$color = $this->GetColor($this->items[$i]['color'], GRAPH_STACKED_ALFA);
 				switch($this->items[$i]['calc_fnc']){
 					case CALC_FNC_MIN:	$fnc_name = 'min';	break;
 					case CALC_FNC_MAX:	$fnc_name = 'max';	break;
@@ -1356,10 +1356,10 @@ class Chart extends Graph{
 			else{
 				$drawtype	= $this->items[$item]['drawtype'];
 
-				$max_color	= $this->GetColor('ValueMax');
-				$avg_color	= $this->GetColor($this->items[$item]['color']);
-				$min_color	= $this->GetColor('ValueMin');
-				$minmax_color	= $this->GetColor('ValueMinMax');
+				$max_color	= $this->GetColor('ValueMax', GRAPH_STACKED_ALFA);
+				$avg_color	= $this->GetColor($this->items[$item]['color'], GRAPH_STACKED_ALFA);
+				$min_color	= $this->GetColor('ValueMin', GRAPH_STACKED_ALFA);
+				$minmax_color	= $this->GetColor('ValueMinMax', GRAPH_STACKED_ALFA);
 
 				$calc_fnc = $this->items[$item]['calc_fnc'];
 			}
