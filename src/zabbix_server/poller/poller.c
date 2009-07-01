@@ -637,9 +637,9 @@ void main_poller_loop(zbx_process_t p, int type, int num)
 			num);
 
 /*	phan.sa_handler = child_signal_handler;*/
-        phan.sa_sigaction = child_signal_handler;
+	phan.sa_sigaction = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
-        phan.sa_flags = SA_SIGINFO;
+	phan.sa_flags = SA_SIGINFO;
 	sigaction(SIGALRM, &phan, NULL);
 
 	zbx_process	= p;
