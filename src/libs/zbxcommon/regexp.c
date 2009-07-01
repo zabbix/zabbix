@@ -100,7 +100,7 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 	char	*s, *c = NULL;
 
 	if (NULL == pattern || '\0' == *pattern)
-	       return SUCCEED;
+		return SUCCEED;
 
 	if ('@' != *pattern)
 	{

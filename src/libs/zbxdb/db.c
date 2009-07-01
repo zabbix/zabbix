@@ -471,7 +471,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 				}
 
 				/* more results? -1 = no, >0 = error, 0 = yes (keep looping) */
-			        if ((status = mysql_next_result(conn)) > 0)
+				if ((status = mysql_next_result(conn)) > 0)
 					zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 			} while (status == 0);
 		}
@@ -748,7 +748,7 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 	{
 		error = zbx_dsprintf(error, "%s:%s",
 				PQresStatus(PQresultStatus(result->pg_result)),
-			 	PQresultErrorMessage(result->pg_result));
+				PQresultErrorMessage(result->pg_result));
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		zbx_free(error);
 	}
