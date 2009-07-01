@@ -378,21 +378,6 @@ function get_scroll_pos(){
 	return [ scrOfX, scrOfY ];
 }
 
-
-function onload_update_scroll(id,w,period,stime,timel,bar_stime){
-	var obj = $(id);
-	if((typeof(obj) == 'undefined') || is_null(obj)){
-		setTimeout('onload_update_scroll("'+id+'",'+w+','+period+','+stime+','+timel+','+bar_stime+');',1000);
-		return;
-	}
-//	eval('var fnc = function(){ onload_update_scroll("'+id+'",'+w+','+period+','+stime+','+timel+','+bar_stime+');}');
-	scrollinit(w,period,stime,timel,bar_stime);
-	if(!is_null($('scroll')) && showgraphmenu){
-		showgraphmenu(id);
-	}
-//	addListener(window,'resize', fnc );
-}
-
 function openWinCentered(loc, winname, iwidth, iheight, params){
 		var uri = new Curl(loc);
 		loc = uri.getUrl();

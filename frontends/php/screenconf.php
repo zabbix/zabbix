@@ -145,12 +145,13 @@ include_once "include/page_header.php";
 			}
 			else{ /* add */
 				DBstart();
-				add_slideshow($_REQUEST['name'],$_REQUEST['delay'],$slides);
-				$result = DBend();
+				$slideshowid = add_slideshow($_REQUEST['name'],$_REQUEST['delay'],$slides);
+				$result = DBend($slideshowid);
 
 				$audit_action = AUDIT_ACTION_ADD;
 				show_messages($result, S_SLIDESHOW_ADDED, S_CANNOT_ADD_SLIDESHOW);
 			}
+
 			if($result){
 				add_audit($audit_action,AUDIT_RESOURCE_SLIDESHOW," Name [".$_REQUEST['name']."] ");
 				unset($_REQUEST['form'], $_REQUEST['slideshowid']);

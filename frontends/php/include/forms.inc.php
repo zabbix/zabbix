@@ -57,10 +57,18 @@
 
 		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
 
-		$form->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));
+		$delayBox = new CComboBox('delay', $delay);
+		$delayBox->addItem(10,'10');
+		$delayBox->addItem(30,'30');
+		$delayBox->addItem(60,'60');
+		$delayBox->addItem(120,'120');
+		$delayBox->addItem(600,'600');
+		$delayBox->addItem(900,'900');
+		
+		$form->addRow(S_UPDATE_INTERVAL_IN_SEC, $delayBox);
 
 		$tblSteps = new CTableInfo(S_NO_SLIDES_DEFINED);
-		$tblSteps->SetHeader(array(S_SCREEN, S_DELAY, SPACE));
+		$tblSteps->setHeader(array(S_SCREEN, SPACE));
 		if(count($steps) > 0){
 			ksort($steps);
 			$first = min(array_keys($steps));
@@ -93,7 +101,6 @@
 
 			$tblSteps->addRow(array(
 				array(new CCheckBox('sel_step[]',null,null,$sid), $name),
-				$s['delay'],
 				array($up, isset($up) && isset($down) ? SPACE : null, $down)
 				));
 		}
@@ -108,7 +115,6 @@
 
 		if(isset($new_step)){
 			if( !isset($new_step['screenid']) )	$new_step['screenid'] = 0;
-			if( !isset($new_step['delay']) )	$new_step['delay'] = 0;
 
 			if( isset($new_step['sid']) )
 				$form->addVar('new_step[sid]',$new_step['sid']);
@@ -118,13 +124,12 @@
 			$screen_data = get_screen_by_screenid($new_step['screenid']);
 
 			$form->addRow(S_NEW_SLIDE, array(
-					new CTextBox('screen_name', $screen_data['name'], 25, 'yes'),
+					new CTextBox('screen_name', $screen_data['name'], 40, 'yes'),
 					new CButton('select_screen',S_SELECT,
 						'return PopUp("popup.php?dstfrm='.$form->GetName().'&srctbl=screens'.
 						'&dstfld1=screen_name&srcfld1=name'.
 						'&dstfld2=new_step%5Bscreenid%5D&srcfld2=screenid");'),
-					S_DELAY,
-					new CNumericBox('new_step[delay]', $new_step['delay'], 5), BR(),
+					BR(),
 					new CButton('add_step', isset($new_step['sid']) ? S_SAVE : S_ADD),
 					new CButton('cancel_step', S_CANCEL)
 
