@@ -85,7 +85,7 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, char *parameter)
  * Parameters: item - item (performance metric)                               *
  *             parameter - ignored                                            *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -132,7 +132,7 @@ static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, char *parameter)
  * Parameters: item - item (performance metric)                               *
  *             parameter - number of seconds                                  *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -160,7 +160,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, char *parameter, int flag,
 			count, res = SUCCEED;
 	zbx_uint64_t	value_uint64 = 0, dbvalue_uint64;
 	double		value_double = 0, dbvalue_double;
-	static  char	*history_tables[] = {"history", "history_str", "history_log", "history_uint", "history_text"};
+	static char	*history_tables[] = {"history", "history_str", "history_log", "history_uint", "history_text"};
 	char		*operators[OP_MAX] = {"=", "<>", ">", ">=", "<", "<="};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_COUNT()");
@@ -389,7 +389,7 @@ count_inc:
  * Parameters: item - item (performance metric)                               *
  *             parameter - number of seconds                                  *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -494,7 +494,7 @@ static int	evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag, tim
  * Parameters: item - item (performance metric)                               *
  *             parameter - number of seconds                                  *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -591,7 +591,7 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, int parameter, int flag, tim
  *             item - item (performance metric)                               *
  *             num - Nth last value                                           *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
@@ -703,7 +703,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, int num)
  * Parameters: item - item (performance metric)                               *
  *             parameter - number of seconds                                  *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -822,7 +822,7 @@ static int	evaluate_MIN(char *value, DB_ITEM *item, int parameter, int flag, tim
  * Parameters: item - item (performance metric)                               *
  *             parameter - number of seconds                                  *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -939,7 +939,7 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, int parameter, int flag, tim
  * Parameters: item - item (performance metric)                               *
  *             parameter - number of seconds                                  *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -1072,7 +1072,7 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, int parameter, int flag, t
  * Parameters: item - item (performance metric)                               *
  *             parameter - number of seconds                                  *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -1087,7 +1087,7 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, int parameter, time_t now
 	if (item->lastclock + parameter > now)
 		strcpy(value,"0");
 	else
- 	{
+	{
 		if (CONFIG_SERVER_STARTUP_TIME + parameter > now)
 			return FAIL;
 
@@ -1108,7 +1108,7 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, int parameter, time_t now
  * Parameters: item - item (performance metric)                               *
  *             parameter - number of seconds                                  *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -1160,7 +1160,7 @@ static int	evaluate_ABSCHANGE(char *value, DB_ITEM *item, const char *parameter,
  * Parameters: item - item (performance metric)                               *
  *             parameter - number of seconds                                  *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -1212,7 +1212,7 @@ static int	evaluate_CHANGE(char *value, DB_ITEM *item, const char *parameter, ti
  * Parameters: item - item (performance metric)                               *
  *             parameters - <string>[,seconds]                                *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
@@ -1371,7 +1371,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, char *function, char *parame
  *             flag - if EVALUATE_FUNCTION_SUFFIX, then include units and     *
  *                    suffix (K,M,G) into result value (for example, 15GB)    *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, value contains its value    *
+ * Return value: SUCCEED - evaluated successfully, value contains its value   *
  *               FAIL - evaluation failed                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -1830,7 +1830,7 @@ static void	add_value_suffix_normal(char *value, int max_len, char *units)
  * Parameters: value - value for replacing                                    *
  *             valuemapid - index of value map                                *
  *                                                                            *
- * Return value: SUCCEED - suffix added succesfully, value contains new value *
+ * Return value: SUCCEED - suffix added successfully, value contains new value*
  *               FAIL - adding failed, value contains old value               *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -1844,7 +1844,7 @@ int	add_value_suffix(char *value, int max_len, char *units, int value_type)
 {
 	int	ret = FAIL;
 
-        struct  tm *local_time = NULL;
+	struct  tm *local_time = NULL;
 	time_t	time;
 
 	char	tmp[MAX_STRING_LEN];
@@ -1893,7 +1893,7 @@ int	add_value_suffix(char *value, int max_len, char *units, int value_type)
 			ret = SUCCEED;
 		}
 		else if(strcmp(units,"uptime") == 0)
-                {
+		{
 			add_value_suffix_uptime(value, max_len);
 			ret = SUCCEED;
 		}
@@ -1927,7 +1927,7 @@ int	add_value_suffix(char *value, int max_len, char *units, int value_type)
  * Parameters: value - value for replacing                                    *
  *             valuemapid - index of value map                                *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, value contains new value    *
+ * Return value: SUCCEED - evaluated successfully, value contains new value   *
  *               FAIL - evaluation failed, value contains old value           *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -1982,7 +1982,7 @@ int	replace_value_by_map(char *value, zbx_uint64_t valuemapid)
  *             function - function (for example, 'max')                       *
  *             parameter - parameter of the function)                         *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, value contains its value    *
+ * Return value: SUCCEED - evaluated successfully, value contains its value   *
  *               FAIL - evaluation failed                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -2020,7 +2020,7 @@ int evaluate_function2(char *value,char *host,char *key,char *function,char *par
 
 	if (!row)
 	{
-        	DBfree_result(result);
+		DBfree_result(result);
 		zabbix_log(LOG_LEVEL_WARNING, "Function [%s:%s.%s(%s)] not found. Query returned empty result",
 				host, key, function, parameter);
 		zabbix_syslog("Function [%s:%s.%s(%s)] not found. Query returned empty result",
