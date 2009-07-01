@@ -6032,6 +6032,7 @@
 
 			$dltButton = new CButtonDelete('Delete selected group?', url_param('form').url_param('config').url_param('groupid'));
 			$dlt_groups = getDeletableHostGroups($_REQUEST['groupid']);
+
 			if(empty($dlt_groups)) $dltButton->addOption('disabled','disabled');
 
 			$frmHostG->addItemToBottomRow($dltButton);
