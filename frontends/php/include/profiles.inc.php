@@ -398,6 +398,11 @@ function get_user_history(){
 			FROM user_history WHERE userid='.$USER_DETAILS['userid'];
 	$history = DBfetch(DBSelect($sql));
 	
+	if($history)
+		$USER_DETAILS['last_page'] = array('title' => $history['title5'], 'url' => $history['url5']);
+	else 
+		$USER_DETAILS['last_page'] = false;
+		
 	for($i = 1; $i<6; $i++){
 		if(defined($history['title'.$i])){
 			$url = new CLink(constant($history['title'.$i]), $history['url'.$i], 'history');
@@ -411,16 +416,14 @@ function get_user_history(){
 }
 function get_last_history_page(){
 	global $USER_DETAILS;
-
-	$sql = 'SELECT title5 as title, url5 as url FROM user_history WHERE userid='.$USER_DETAILS['userid'];
-	$result = DBfetch(DBselect($sql));
 	
-	return $result;
+	return $USER_DETAILS['last_page'] ? $USER_DETAILS['last_page'] : false;
 }
 function add_user_history($page){
 	global $USER_DETAILS;
 
 	$userid = $USER_DETAILS['userid'];
+	$last_page = $USER_DETAILS['last_page'];
 	$title = $page['title'];
 
 	if(isset($page['hist_arg']) && is_array($page['hist_arg'])){
@@ -436,9 +439,9 @@ function add_user_history($page){
 		$url = $page['file'];
 	}
 
-	$last = get_last_history_page();
-	if(isset($last['title']) && ($last['title'] == $title)){ //title is same
-		if($last['url'] != $url){ // title same, url isnt, change only url
+	
+	if(isset($last_page['title']) && ($last_page['title'] == $title)){ //title is same
+		if($last_page['url'] != $url){ // title same, url isnt, change only url
 			$sql = 'UPDATE user_history SET url5='.zbx_dbstr($url).'
 					WHERE userid='.$USER_DETAILS['userid'];
 		}
@@ -446,7 +449,7 @@ function add_user_history($page){
 			return; // no need to change anything;
 	}
 	else{ // new page with new title is added
-		if(!$last){
+		if(!$last_page){
 			$userhistoryid = get_dbid('user_history', 'userhistoryid');
 			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5) 
 					VALUES("'.$userhistoryid.'", "'.$userid.'", '.zbx_dbstr($title).', '.zbx_dbstr($url).')';
