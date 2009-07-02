@@ -121,7 +121,7 @@ include_once "include/page_header.php";
 				' ['.$_REQUEST['message'].']');
 		}
 
-		$last_page=get_last_history_page();
+		$last_page = $USER_DETAILS['last_page'];
 
 		if(!$last_page){
 			$last_page['url']='tr_status.php?hostid='.get_profile('web.tr_status.hostid',0);
@@ -131,7 +131,7 @@ include_once "include/page_header.php";
 		exit;
 	}
 	else if(isset($_REQUEST['cancel'])){
-		$last_page=get_last_history_page();
+		$last_page = $USER_DETAILS['last_page'];;
 
 		if(!$last_page){
 			$last_page['url']='tr_status.php?hostid='.get_profile('web.tr_status.hostid',0);
