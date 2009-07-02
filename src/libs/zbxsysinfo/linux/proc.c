@@ -319,7 +319,7 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	return SYSINFO_RET_OK;
 }
 
-int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char		tmp[MAX_STRING_LEN],
 			procname[MAX_STRING_LEN],
