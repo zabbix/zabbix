@@ -641,31 +641,34 @@ include_once 'include/page_header.php';
 // GROUP TASKS
 		if($_REQUEST['group_task']==S_DELETE_SELECTED){
 			global $USER_DETAILS;
+
+			$result = true;
 			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 
 			$group_itemid = $_REQUEST['group_itemid'];
 		
-			$sql = 'SELECT h.host, i.itemid, i.key_, i.templateid, i.type'.
+			$sql = 'SELECT h.host, i.itemid, i.description, i.key_, i.templateid, i.type'.
 					' FROM items i, hosts h '.
 					' WHERE '.DBcondition('i.itemid',$group_itemid).
 						' AND h.hostid=i.hostid'.
 						' AND '.DBcondition('h.hostid',$available_hosts);
 			$db_items = DBselect($sql);
 			while($item = DBfetch($db_items)) {
-				if($item['templateid'] != 0) {
+				if($item['templateid'] != ITEM_TYPE_ZABBIX) {
 					unset($group_itemid[$item['itemid']]);
-					info(S_ITEM.SPACE."'".$item['host'].':'.$item['itemid']."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
+					error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
 					continue;
 				}
-				elseif($item['type'] == 9) {
+				else if($item['type'] == ITEM_TYPE_HTTPTEST) {
 					unset($group_itemid[$item['itemid']]);
-					info(S_ITEM.SPACE."'".$item['host'].':'.$item['itemid']."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
+					error(S_ITEM.SPACE."'".$item['host'].':'.item_description($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
 					continue;
-				}				
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');
+				}		
+				$result = false;		
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');					
 			}
 
-			$result = !empty($group_itemid);
+			$result &= !empty($group_itemid);
 			if($result) {
 				DBstart();
 				$result = delete_item($group_itemid);
