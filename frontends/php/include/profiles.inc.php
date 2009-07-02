@@ -388,90 +388,78 @@ return	DBexecute('update config set '.implode(',',$update).' where '.DBin_node('
 /************ END CONFIG **************/
 
 /************ HISTORY **************/
-// Author: Aly
 function get_user_history(){
-	$history = array();
-
-	$db_hist = get_source_profile('web.history',false);
-	$delimiter = new CSpan('&raquo;','delimiter');
-
-	for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
-		if(isset($db_hist[$i])){
-			if($i>0) array_push($history,$delimiter);
-
-			$url = new CLink($db_hist[$i]['source'],$db_hist[$i]['value'],'history');
-			array_push($history,array(SPACE,$url,SPACE));
-		}
-	}
-return $history;
-}
-
-function get_last_history_page($same_page=false){
-	global $page;
-
-	$title = explode('[',$page['title']);
-	$title = $title[0];
-
-	$rows=false;
-
-	$db_hist = get_source_profile('web.history',false);
-	for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
-		if(isset($db_hist[$i])){
-			$new_rows = get_source_profile('web.history.'.$i,false);
-
-			if(!$same_page && ($title == $db_hist[$i]['source'])) continue;
-			$rows = $db_hist[$i];
-		}
-	}
-
-	if(is_array($rows)){
-		$rows['page'] = $rows['source'];
-		$rows['url'] = $rows['value'];
-	}
-
-return $rows;
-}
-
-// Author: Aly
-function add_user_history($page){
-
-	$title = explode('[',$page['title']);
-	$title = $title[0];
-
-	if(!(isset($page['hist_arg']) && is_array($page['hist_arg']))){
-		return FALSE;
-	}
-
-	$url = '';
-	foreach($page['hist_arg'] as $key => $arg){
-		if(isset($_REQUEST[$arg]) && !empty($_REQUEST[$arg])){
-			$url.=((empty($url))?('?'):('&')).$arg.'='.$_REQUEST[$arg];
-		}
-	}
-	$url = $page['file'].$url;
-
-
-	$curr = 0;
-	$profile = array();
-	$db_hist = get_source_profile('web.history',array());
-	foreach($db_hist as $i => $hist){
-		if($hist['source'] != $title){
-			$profile[$curr] = $hist;
-			$curr++;
-		}
-	}
+	global $USER_DETAILS;
 	
-	$history = array('source' => $title,
-					'value' => $url);
+	$result = array();
+	$delimiter = new CSpan('&raquo;','delimiter');
+	
+	$sql = 'SELECT title1, url1, title2, url2, title3, url3, title4, url4, title5, url5
+			FROM user_history WHERE userid='.$USER_DETAILS['userid'];
+	$history = DBfetch(DBSelect($sql));
+	
+	for($i = 1; $i<6; $i++){
+		if(defined($history['title'.$i])){
+			$url = new CLink(constant($history['title'.$i]), $history['url'.$i], 'history');
+			array_push($result, array(SPACE, $url, SPACE));
+			array_push($result, $delimiter);
+		}
+	}
+	array_pop($result);
+	
+	return $result;
+}
+function get_last_history_page(){
+	global $USER_DETAILS;
 
-	$profile[] = $history;
-	if($curr >= ZBX_HISTORY_COUNT){
-		unset($profile[0]);
+	$sql = 'SELECT title5 as title, url5 as url FROM user_history WHERE userid='.$USER_DETAILS['userid'];
+	$result = DBfetch(DBselect($sql));
+	
+	return $result;
+}
+function add_user_history($page){
+	global $USER_DETAILS;
+
+	$userid = $USER_DETAILS['userid'];
+	$title = $page['title'];
+
+	if(isset($page['hist_arg']) && is_array($page['hist_arg'])){
+		$url = '';
+		foreach($page['hist_arg'] as $arg){
+			if(isset($_REQUEST[$arg])){
+				$url .= ((empty($url))? '?' : '&').$arg.'='.$_REQUEST[$arg];
+			}
+		}
+		$url = $page['file'].$url;
+	}
+	else{
+		$url = $page['file'];
 	}
 
-	$result = update_profile('web.history',$profile, PROFILE_TYPE_ARRAY_STR);
-
-return $result;
+	$last = get_last_history_page();
+	if(isset($last['title']) && ($last['title'] == $title)){ //title is same
+		if($last['url'] != $url){ // title same, url isnt, change only url
+			$sql = 'UPDATE user_history SET url5='.zbx_dbstr($url).'
+					WHERE userid='.$USER_DETAILS['userid'];
+		}
+		else
+			return; // no need to change anything;
+	}
+	else{ // new page with new title is added
+		if(!$last){
+			$userhistoryid = get_dbid('user_history', 'userhistoryid');
+			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5) 
+					VALUES("'.$userhistoryid.'", "'.$userid.'", '.zbx_dbstr($title).', '.zbx_dbstr($url).')';
+		}
+		else{
+			$sql = 'UPDATE user_history SET title1=title2, url1=url2, title2=title3, url2=url3, title3=title4,
+					url3=url4, title4=title5, url4=url5, title5='.zbx_dbstr($title).', url5='.zbx_dbstr($url).'
+					WHERE userid='.$USER_DETAILS['userid'];
+		}
+	}
+	$result = DBexecute($sql);
+	
+	return $result;
 }
 /********* END USER HISTORY **********/
 

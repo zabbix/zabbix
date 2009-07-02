@@ -71,21 +71,26 @@
 
 //			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . " GMT");
 
-			if(isset($page['title']) && defined($page['title']))	$page['title'] = constant($page['title']);
+			if(isset($page['title']) && defined($page['title'])){
 
-			if(!isset($page['title'])) $page['title'] = 'ZABBIX';
+				$page_title = constant($page['title']);	
+			}
+			else{
+				$page_title = 'ZABBIX';
+				$page['title'] = 'S_ZABBIX';
+			}
 
-			if(defined('ZBX_DISTRIBUTED')){
+			if(ZBX_DISTRIBUTED){
 				if($ZBX_VIEWED_NODES['selected'] == 0){ // ALL selected
-					$page['title'] .= ' ('.S_ALL_NODES.') ';
+					$page_title .= ' ('.S_ALL_NODES.') ';
 				}
 				else if(!empty($ZBX_NODES)){
-					$page['title'] .= ' ('.$ZBX_NODES[$ZBX_CURRENT_NODEID]['name'].')';
+					$page_title .= ' ('.$ZBX_NODES[$ZBX_CURRENT_NODEID]['name'].')';
 				}
 			}
 
 			if((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && $USER_DETAILS['refresh']){
-				$page['title'] .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
+				$page_title .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
 			}
 		break;
 	}
@@ -102,7 +107,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <title><?php echo $page['title']; ?></title>
+    <title><?php echo $page_title; ?></title>
 <?php
 	if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"]) {
 		echo '<meta http-equiv="refresh" content="'.$USER_DETAILS["refresh"].'" />';
