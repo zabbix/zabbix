@@ -87,7 +87,7 @@ int	SYSTEM_BOOTTIME(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	return  getPROC2("/proc/stat", "btime", 1, flags, AR_UINT64, result);
 }
