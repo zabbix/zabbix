@@ -463,7 +463,7 @@ include_once "include/page_header.php";
 		if(!zbx_empty($_REQUEST['txt_select']) && ((bool)zbx_stristr($description, $_REQUEST['txt_select']) == (bool)$_REQUEST['inverse_select'])) continue;
 
 		if(!zbx_empty($row['url'])){
-			$description = new CLink($description, $row['url']);
+			$description = new CLink($description, $row['url'], null, null, true);
 		}
 
 		if($_REQUEST['show_details']){
