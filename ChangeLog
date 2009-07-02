@@ -1,5 +1,7 @@
 Changes for 1.7.0
 
+ - [DEV-404] improved web history (Vedmak)
+ - [ZBX-961] fixed history strings saved not by reference (Vedmak)
  - [DEV-403] added Debug mode for user groups in order to simplify GUI troubleshooting (Alexei)
  - [ZBX-773] fixed typo 'attribures' (Richlv)
  - [ZBX-974] recompressed most frontend images with pngcrush (Richlv)

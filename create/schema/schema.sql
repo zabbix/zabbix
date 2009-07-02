@@ -930,6 +930,21 @@ FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|test_string	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
+TABLE|user_history|userhistoryid|ZBX_SYNC
+FIELD		|userhistoryid	|t_id			|'0'	|NOT NULL	|0
+FIELD		|userid			|t_id			|'0'	|NOT NULL	|ZBX_SYNC	|users
+FIELD		|title1			|t_varchar(255)	|''		|NOT NULL	|ZBX_SYNC
+FIELD		|url1			|t_varchar(255)	|''		|NOT NULL	|ZBX_SYNC
+FIELD		|title2			|t_varchar(255)	|''		|NOT NULL	|ZBX_SYNC
+FIELD		|url2			|t_varchar(255)	|''		|NOT NULL	|ZBX_SYNC
+FIELD		|title3			|t_varchar(255)	|''		|NOT NULL	|ZBX_SYNC
+FIELD		|url3			|t_varchar(255)	|''		|NOT NULL	|ZBX_SYNC
+FIELD		|title4			|t_varchar(255)	|''		|NOT NULL	|ZBX_SYNC
+FIELD		|url4			|t_varchar(255)	|''		|NOT NULL	|ZBX_SYNC
+FIELD		|title5			|t_varchar(255)	|''		|NOT NULL	|ZBX_SYNC
+FIELD		|url5			|t_varchar(255)	|''		|NOT NULL	|ZBX_SYNC
+UNIQUE		|1		|userid
+
 TABLE|expressions|expressionid|ZBX_SYNC
 FIELD		|expressionid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|regexpid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|regexps
