@@ -30,7 +30,7 @@
 	}
 
 	//------------------------------------- <HISTORY> ---------------------------------------
-	if(($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
+	if(isset($page['hist_arg']) && ($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
 		add_user_history($page);
 	}
 	//------------------------------------- </HISTORY> --------------------------------------
