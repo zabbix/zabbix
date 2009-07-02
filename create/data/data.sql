@@ -396,7 +396,7 @@ insert into help_items values (5,'zabbix[queue]','Number of items in the queue')
 insert into help_items values (5,'zabbix[trends]','Number of values stored in table TRENDS');
 insert into help_items values (5,'zabbix[triggers]','Number of triggers in ZABBIX database');
 
-insert into help_items values (8,'grpfunc(&lt;Group&gt;,&lt;Key&gt;,&lt;func&gt;,&lt;param&gt;)','Aggregate checks do not require any agent running on a host being monitored. ZABBIX server collects aggregate information by doing direct database queries. See ZABBIX Manual.');
+insert into help_items values (8,'grpfunc[&lt;Group&gt;,&lt;Key&gt;,&lt;func&gt;,&lt;param&gt;]','Aggregate checks do not require any agent running on a host being monitored. ZABBIX server collects aggregate information by doing direct database queries. See ZABBIX Manual.');
 
 insert into help_items values(0,'agent.ping','Check the agent usability. Always return 1. Can be used as a TCP ping.');
 insert into help_items values(0,'agent.version','Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1');

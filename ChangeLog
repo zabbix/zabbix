@@ -1,5 +1,6 @@
 Changes for 1.6.6
 
+ - [ZBX-981] fixed aggregate item helper text (Richlv)
  - [ZBX-213] added sql patches for graphs_items color field (Artem)
  - [ZBX-933] fixed user profile auto-logout behavior (Artem)
  - [ZBX-908] fixed item nextcheck recalculation on item update (Artem)

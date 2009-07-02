@@ -270,7 +270,7 @@
 		}
 
 		if($item['type'] == ITEM_TYPE_AGGREGATE){
-			/* grpfunc('group','key','itemfunc','numeric param') */
+			/* grpfunc['group','key','itemfunc','numeric param'] */
 //			if(eregi('^((.)*)(\(\'((.)*)\'\,\'((.)*)\'\,\'((.)*)\'\,\'([0-9]+)\'\))$', $key, $arr))
 			if(eregi('^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$', $item['key_'], $arr)){
 				$g=$arr[1];
