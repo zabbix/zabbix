@@ -453,24 +453,20 @@ function add_user_history($page){
 
 	$curr = 0;
 	$profile = array();
-	$db_hist = get_source_profile('web.history',false);
-	for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
-		if(isset($db_hist[$i])){
-			if($db_hist[$i]['source'] != $title){
-				$profile[$curr] = $db_hist[$i];
-				$curr++;
-			}
+	$db_hist = get_source_profile('web.history',array());
+	foreach($db_hist as $i => $hist){
+		if($hist['source'] != $title){
+			$profile[$curr] = $hist;
+			$curr++;
 		}
 	}
-
+	
 	$history = array('source' => $title,
 					'value' => $url);
 
-	if($curr < ZBX_HISTORY_COUNT){
-		$profile[$curr] = $history;
-	}
-	else {
-		$profile[(ZBX_HISTORY_COUNT-1)] = $history;
+	$profile[] = $history;
+	if($curr >= ZBX_HISTORY_COUNT){
+		unset($profile[0]);
 	}
 
 	$result = update_profile('web.history',$profile, PROFILE_TYPE_ARRAY_STR);
