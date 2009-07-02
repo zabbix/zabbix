@@ -29,7 +29,7 @@ static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, 
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	if( 0 == sysinfo(&info))
 	{
@@ -52,7 +52,7 @@ static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags,
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	if( 0 == sysinfo(&info))
 	{
@@ -72,71 +72,71 @@ static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags,
 static int	SYSTEM_SWAP_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	AGENT_RESULT	result_tmp;
-        zbx_uint64_t  tot_val = 0;
-        zbx_uint64_t  free_val = 0;
+	zbx_uint64_t  tot_val = 0;
+	zbx_uint64_t  free_val = 0;
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
-        init_result(&result_tmp);
+	init_result(result);
+	init_result(&result_tmp);
 
 	if(SYSTEM_SWAP_TOTAL(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK ||
 		!(result_tmp.type & AR_UINT64))
-	                return  SYSINFO_RET_FAIL;
+			return  SYSINFO_RET_FAIL;
 	tot_val = result_tmp.ui64;
 
 	/* Check fot division by zero */
 	if(tot_val == 0)
 	{
 		free_result(&result_tmp);
-                return  SYSINFO_RET_FAIL;
+		return  SYSINFO_RET_FAIL;
 	}
 
 	if(SYSTEM_SWAP_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK ||
 		!(result_tmp.type & AR_UINT64))
-                	return  SYSINFO_RET_FAIL;
+			return  SYSINFO_RET_FAIL;
 	free_val = result_tmp.ui64;
 
 	free_result(&result_tmp);
 
 	SET_DBL_RESULT(result, (100.0 * (double)free_val) / (double)tot_val);
 
-        return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
 
 static int	SYSTEM_SWAP_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	AGENT_RESULT	result_tmp;
-        zbx_uint64_t  tot_val = 0;
-        zbx_uint64_t  free_val = 0;
+	zbx_uint64_t  tot_val = 0;
+	zbx_uint64_t  free_val = 0;
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
-        init_result(&result_tmp);
+	init_result(result);
+	init_result(&result_tmp);
 
 	if(SYSTEM_SWAP_TOTAL(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK ||
 		!(result_tmp.type & AR_UINT64))
-                	return  SYSINFO_RET_FAIL;
+			return  SYSINFO_RET_FAIL;
 	tot_val = result_tmp.ui64;
 
-	/* Check fot division by zero */
+	/* Check for division by zero */
 	if(tot_val == 0)
 	{
 		free_result(&result_tmp);
-                return  SYSINFO_RET_FAIL;
+		return  SYSINFO_RET_FAIL;
 	}
 
 	if(SYSTEM_SWAP_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK ||
 		!(result_tmp.type & AR_UINT64))
-                	return  SYSINFO_RET_FAIL;
+			return  SYSINFO_RET_FAIL;
 	free_val = result_tmp.ui64;
 
 	free_result(&result_tmp);
 
 	SET_DBL_RESULT(result, 100.0-(100.0 * (double)free_val) / (double)tot_val);
 
-        return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
 
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -162,21 +162,21 @@ SWP_FNCLIST
 	char mode[MAX_STRING_LEN];
 	int i;
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        if(num_param(param) > 2)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(num_param(param) > 2)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(get_param(param, 1, swapdev, sizeof(swapdev)) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(get_param(param, 1, swapdev, sizeof(swapdev)) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(swapdev[0] == '\0')
+	if(swapdev[0] == '\0')
 	{
 		/* default parameter */
 		zbx_snprintf(swapdev, sizeof(swapdev), "all");
@@ -188,11 +188,11 @@ SWP_FNCLIST
 	}
 
 	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-        {
-                mode[0] = '\0';
-        }
+	{
+		mode[0] = '\0';
+	}
 
-        if(mode[0] == '\0')
+	if(mode[0] == '\0')
 	{
 		/* default parameter */
 		zbx_snprintf(mode, sizeof(mode), "free");
@@ -209,39 +209,39 @@ SWP_FNCLIST
 	return SYSINFO_RET_FAIL;
 }
 
-int     OLD_SWAP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	OLD_SWAP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-        char    key[MAX_STRING_LEN];
-        int     ret;
+	char	key[MAX_STRING_LEN];
+	int	ret;
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(num_param(param) > 1)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(strcmp(key,"free") == 0)
-        {
-                ret = SYSTEM_SWAP_FREE(cmd, param, flags, result);
-        }
-        else if(strcmp(key,"total") == 0)
-        {
-                ret = SYSTEM_SWAP_TOTAL(cmd, param, flags, result);
-        }
-        else
-        {
-                ret = SYSINFO_RET_FAIL;
-        }
+	if(strcmp(key,"free") == 0)
+	{
+		ret = SYSTEM_SWAP_FREE(cmd, param, flags, result);
+	}
+	else if(strcmp(key,"total") == 0)
+	{
+		ret = SYSTEM_SWAP_TOTAL(cmd, param, flags, result);
+	}
+	else
+	{
+		ret = SYSINFO_RET_FAIL;
+	}
 
-        return ret;
+	return ret;
 }
 
 struct swap_stat_s {
@@ -258,10 +258,10 @@ struct swap_stat_s {
 #	define PARSE(line)	if(sscanf(line,"%*d %*d %*d %s " \
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d", \
-				name, 			/* name */ \
-				&(result->rio), 	/* rio */ \
+				name,			/* name */ \
+				&(result->rio),		/* rio */ \
 				&(result->rsect),	/* rsect */ \
-				&(result->wio), 	/* rio */ \
+				&(result->wio),		/* rio */ \
 				&(result->wsect)	/* wsect */ \
 				) != 5) continue
 #else
@@ -269,29 +269,29 @@ struct swap_stat_s {
 #	define PARSE(line)	if(sscanf(line, "%*d %*d %s " \
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d", \
-				name, 			/* name */ \
-				&(result->rio), 	/* rio */ \
+				name,			/* name */ \
+				&(result->rio),		/* rio */ \
 				&(result->rsect),	/* rsect */ \
-				&(result->wio), 	/* wio */ \
+				&(result->wio),		/* wio */ \
 				&(result->wsect)	/* wsect */ \
 				) != 5)  \
 					if(sscanf(line,"%*d %*d %s " \
 						ZBX_FS_UI64 " " ZBX_FS_UI64 " " \
 						ZBX_FS_UI64 " " ZBX_FS_UI64, \
-					name, 			/* name */ \
-					&(result->rio), 	/* rio */ \
+					name,			/* name */ \
+					&(result->rio),		/* rio */ \
 					&(result->rsect),	/* rsect */ \
-					&(result->wio), 	/* wio */ \
+					&(result->wio),		/* wio */ \
 					&(result->wsect)	/* wsect */ \
 					) != 5) continue
 #endif
 
 static int get_swap_dev_stat(const char *interface, struct swap_stat_s *result)
 {
-	int ret = SYSINFO_RET_FAIL;
-	char line[MAX_STRING_LEN];
+	int	ret = SYSINFO_RET_FAIL;
+	char	line[MAX_STRING_LEN];
 
-	char name[MAX_STRING_LEN];
+	char	name[MAX_STRING_LEN];
 
 	FILE *f;
 
@@ -364,7 +364,7 @@ static int	get_swap_pages(struct swap_stat_s *result)
 	return ret;
 }
 
-static int 	get_swap_stat(const char *interface, struct swap_stat_s *result)
+static int	get_swap_stat(const char *interface, struct swap_stat_s *result)
 {
 	int ret = SYSINFO_RET_FAIL;
 
@@ -415,8 +415,8 @@ static int 	get_swap_stat(const char *interface, struct swap_stat_s *result)
 int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
-	char    	swapdev[10];
-	char    	mode[20];
+	char		swapdev[10];
+	char		mode[20];
 
 	struct swap_stat_s	ss;
 
@@ -482,8 +482,8 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
-	char    	swapdev[10];
-	char    	mode[20];
+	char		swapdev[10];
+	char		mode[20];
 
 	struct swap_stat_s	ss;
 
