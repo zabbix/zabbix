@@ -59,22 +59,22 @@ static int get_net_stat(const char *if_name, struct net_stat_s *result)
 					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
 					ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n",
 				name,
-				&(result->ibytes), 	/* bytes */
+				&(result->ibytes),	/* bytes */
 				&(result->ipackets),	/* packets */
-				&(result->ierr), 	/* errs */
+				&(result->ierr),	/* errs */
 				&(result->idrop),	/* drop */
-			        &(tmp), 		/* fifo */
+				&(tmp),			/* fifo */
 				&(tmp),			/* frame */
-				&(tmp), 		/* compressed */
+				&(tmp),			/* compressed */
 				&(tmp),			/* multicast */
-				&(result->obytes), 	/* bytes */
+				&(result->obytes),	/* bytes */
 				&(result->opackets),	/* packets*/
 				&(result->oerr),	/* errs */
 				&(result->odrop),	/* drop */
-			        &(tmp), 		/* fifo */
+				&(tmp),			/* fifo */
 				&(result->colls),	/* icolls */
-			        &(tmp), 		/* carrier */
-			        &(tmp)	 		/* compressed */
+				&(tmp),			/* carrier */
+				&(tmp)			/* compressed */
 				) == 17)
 			{
 				if(strncmp(name, if_name, MAX_STRING_LEN) == 0)
@@ -106,23 +106,23 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        if(num_param(param) > 2)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(num_param(param) > 2)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
 	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-        {
-                mode[0] = '\0';
-        }
-        if(mode[0] == '\0')
+	{
+		mode[0] = '\0';
+	}
+	if(mode[0] == '\0')
 	{
 		/* default parameter */
 		zbx_snprintf(mode, sizeof(mode), "bytes");
@@ -165,27 +165,27 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	char	if_name[MAX_STRING_LEN];
 	char	mode[MAX_STRING_LEN];
 
-	int ret = SYSINFO_RET_FAIL;
+	int	ret = SYSINFO_RET_FAIL;
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        if(num_param(param) > 2)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(num_param(param) > 2)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
+	{
+	return SYSINFO_RET_FAIL;
+	}
 
 	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-        {
-                mode[0] = '\0';
-        }
-        if(mode[0] == '\0')
+	{
+		mode[0] = '\0';
+	}
+	if(mode[0] == '\0')
 	{
 		/* default parameter */
 		zbx_snprintf(mode, sizeof(mode), "bytes");
@@ -232,23 +232,23 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        if(num_param(param) > 2)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(num_param(param) > 2)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
 	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-        {
-                mode[0] = '\0';
-        }
-        if(mode[0] == '\0')
+	{
+		mode[0] = '\0';
+	}
+	if(mode[0] == '\0')
 	{
 		/* default parameter */
 		zbx_snprintf(mode, sizeof(mode), "bytes");
@@ -284,16 +284,16 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return ret;
 }
 
-int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	return SYSINFO_RET_FAIL;
 }
 
-int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct net_stat_s	ns;
 
@@ -303,17 +303,17 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(num_param(param) > 1)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(get_param(param, 1, if_name, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(get_param(param, 1, if_name, MAX_STRING_LEN) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
 
 	ret = get_net_stat(if_name, &ns);
