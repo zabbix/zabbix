@@ -246,12 +246,13 @@
 	return $result;
 	}
 */
-function get_accessible_triggers($perm, $hostids, $nodeid=null, $cache=1){
+function get_accessible_triggers($perm, $hostids, $perm_res=null, $nodeid=null, $cache=1){
 	global $USER_DETAILS;
 	static $available_triggers;
 	
 	$userid = $USER_DETAILS['userid'];
 	$user_type = $USER_DETAILS['type'];
+
 	if(is_null($nodeid)) $nodeid = get_current_nodeid();
 	
 	$nodeid_str = (is_array($nodeid)) ? implode('', $nodeid) : strval($nodeid);
