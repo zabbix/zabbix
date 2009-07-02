@@ -414,16 +414,11 @@ function get_user_history(){
 	
 	return $result;
 }
-function get_last_history_page(){
-	global $USER_DETAILS;
-	
-	return $USER_DETAILS['last_page'] ? $USER_DETAILS['last_page'] : false;
-}
 function add_user_history($page){
 	global $USER_DETAILS;
 
 	$userid = $USER_DETAILS['userid'];
-	$last_page = $USER_DETAILS['last_page'];
+	$last_page = $USER_DETAILS['last_page'] ? $USER_DETAILS['last_page'] : false;
 	$title = $page['title'];
 
 	if(isset($page['hist_arg']) && is_array($page['hist_arg'])){
