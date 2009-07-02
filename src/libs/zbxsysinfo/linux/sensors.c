@@ -34,9 +34,9 @@ static int	get_sensor(const char *name, unsigned flags, AGENT_RESULT *result)
 
 	FILE	*f;
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
 	dir=opendir("/proc/sys/dev/sensors");
 	if(NULL == dir)
@@ -82,39 +82,39 @@ static int	get_sensor(const char *name, unsigned flags, AGENT_RESULT *result)
 
 int     OLD_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-        char    key[MAX_STRING_LEN];
-        int     ret;
+	char	key[MAX_STRING_LEN];
+	int	ret;
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(num_param(param) > 1)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-        if(strcmp(key,"temp1") == 0)
-        {
-                ret = get_sensor("temp1", flags, result);
-        }
-        else if(strcmp(key,"temp2") == 0)
-        {
-                ret = get_sensor("temp2", flags, result);
-        }
-        else if(strcmp(key,"temp3") == 0)
-        {
-                ret = get_sensor("temp3", flags, result);
-        }
-        else
-        {
-                ret = SYSINFO_RET_FAIL;
-        }
+	if(strcmp(key,"temp1") == 0)
+	{
+	ret = get_sensor("temp1", flags, result);
+	}
+	else if(strcmp(key,"temp2") == 0)
+	{
+	ret = get_sensor("temp2", flags, result);
+	}
+	else if(strcmp(key,"temp3") == 0)
+	{
+	ret = get_sensor("temp3", flags, result);
+	}
+	else
+	{
+	ret = SYSINFO_RET_FAIL;
+	}
 
-        return ret;
+	return ret;
 }
