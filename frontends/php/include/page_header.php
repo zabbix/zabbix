@@ -393,7 +393,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$table->setCellPadding(0);
 
 		$history = get_user_history();
-
 		$tr = new CRow(new CCol('History:','caption'));
 		$tr->addItem($history);
 
