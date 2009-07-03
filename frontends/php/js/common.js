@@ -588,7 +588,7 @@ timeout_change:	null,
 
 mouseOver: function(show_label){
 	clearTimeout(this.timeout_reset);
-	this.timeout_change = setTimeout('MMenu.showSubMenu("'+show_label+'")', 150);
+	this.timeout_change = setTimeout('MMenu.showSubMenu("'+show_label+'")', 200);
 },
 
 submenu_mouseOver: function(){
@@ -598,7 +598,7 @@ submenu_mouseOver: function(){
 
 mouseOut: function(){
 	clearTimeout(this.timeout_change);
-	this.timeout_reset = setTimeout('MMenu.showSubMenu("'+this.def_label+'")', 3000);
+	this.timeout_reset = setTimeout('MMenu.showSubMenu("'+this.def_label+'")', 2500);
 },
 
 showSubMenu: function(show_label){
