@@ -156,7 +156,7 @@
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
-/* OTHER ACTIONS */
+/* THEME */
 		$configs = array(
 				'default_theme' => get_request('default_theme')
 			);
@@ -210,6 +210,7 @@
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,implode('; ',$msg));
 		}
 	}
+// VALUE MAPS
 	else if($_REQUEST['config']==6){
 		$_REQUEST['valuemap'] = get_request('valuemap',array());
 		if(isset($_REQUEST['add_map'])){
@@ -223,9 +224,15 @@
 			}
 			
 			if($added == 0){
-				array_push($_REQUEST['valuemap'],array(
-					'value'		=> $_REQUEST['add_value'],
-					'newvalue'	=> $_REQUEST['add_newvalue']));
+				if(!ctype_digit($_REQUEST['add_value']) || !is_string($_REQUEST['add_newvalue'])){
+					info('Value maps are used to create a mapping between numeric values and string representations');
+					show_messages(false,null,S_CANNNOT_ADD_VALUE_MAP);
+				}
+				else{
+					array_push($_REQUEST['valuemap'],array(
+						'value'		=> $_REQUEST['add_value'],
+						'newvalue'	=> $_REQUEST['add_newvalue']));
+				}
 			}
 		}
 		else if(isset($_REQUEST['del_map'])&&isset($_REQUEST['rem_value'])){
