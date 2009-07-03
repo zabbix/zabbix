@@ -251,7 +251,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 							'selected'=> false);
 
 			$sub_menu_active = ($page['file'] == $sub_page['url']);
-			$sub_menu_active |=  (isset($sub_page['sub_pages']) && str_in_array($page['file'], $sub_page['sub_pages']));
+			$sub_menu_active |= (isset($sub_page['sub_pages']) && str_in_array($page['file'], $sub_page['sub_pages']));
 			if($sub_menu_active){
 // PERMISSION CHECK
 				$deny &= ($USER_DETAILS['type'] < $menu['user_type']);
