@@ -210,9 +210,10 @@
 		return DBfetch(DBselect('select * from slideshows where slideshowid='.$slideshowid));
 	}
 
-	function validate_slide($slide){
+	function validate_slide(&$slide){
 		if(!screen_accessible($slide['screenid'], PERM_READ_ONLY)) return false;
-
+		if(!isset($slide['delay'])) $slide['delay'] = 0;
+		
 	return true;
 	}
 
@@ -250,8 +251,8 @@
 		$i = 0;
 		foreach($slides as $slide){
 			$slideid = get_dbid('slides','slideid');
-			$result = DBexecute('insert into slides (slideid,slideshowid,screenid,step,delay) '.
-				' values ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')');
+			$result = DBexecute('INSERT INTO slides (slideid,slideshowid,screenid,step,delay) '.
+				' VALUES ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')');
 			if(!$result){
 				return false;
 			}
