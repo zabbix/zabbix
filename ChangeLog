@@ -1,6 +1,6 @@
 Changes for 1.0.0
 
- - [ZBX-824] fixed net.tcp.service to work with host DNS name (Alexei)
+ - [NTP-32] fixed misspelled function inserted in trigger "logserverity" (Artem) - [ZBX-824] fixed net.tcp.service to work with host DNS name (Alexei)
  - [ZBX-737] the behaviour of the agent's key "vfs.fs.size" improved to be similar to the "df" command (Dmitry)
  - [NTP-21] size of files larger than 2GB is reported correctly (Dmitry)
  - [NTP-17] fixes in user permissions (Artem)

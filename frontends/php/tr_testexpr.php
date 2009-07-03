@@ -106,7 +106,7 @@ $function_info = array(
 		'type'			=> $type_of_value_type,
 		'validation'	=> NOT_EMPTY
 		),
-	'logserverity' => array(
+	'logseverity' => array(
 		'value_type'	=> S_NUMERIC_UINT64,
 		'type'			=> T_ZBX_INT,
 		'validation'	=> NOT_EMPTY
