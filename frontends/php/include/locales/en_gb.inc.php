@@ -1517,7 +1517,7 @@
     'S_FNC_DESCRIPTION_DAYOFWEEK'=>     'X(day of week in range of 1 - Mon to 7 - Sun) {OP} N.',
     'S_FNC_DESCRIPTION_FUZZYTIME'=>     'X(1 - if timestamp - item value does not differ from ZABBIX server time for more than T seconds, 0 - otherwise) {OP} N.',
     'S_FNC_DESCRIPTION_IREGEXP'=>       'X(1 - last value matches regular expression, 0 - otherwise) {OP} N not case-sensitive.',
-    'S_FNC_DESCRIPTION_LOGSERVERITY'=>  'X(log severity of the last log entry) {OP} N.',
+    'S_FNC_DESCRIPTION_LOGSEVERITY'=>  'X(log severity of the last log entry) {OP} N.',
     'S_FNC_DESCRIPTION_LOGSOURCE'=>     'X(1 - log source of the last log entry matches parameter, 0 - otherwise) {OP} N.',
     'S_FNC_DESCRIPTION_NODATA'=>        'X(1 - no data received during period of time in seconds, 0 - otherwise) {OP} N.',
     'S_FNC_DESCRIPTION_NOW'=>       'X(number of seconds since 00:00:00 UTC, January 1, 1970) {OP} N.',

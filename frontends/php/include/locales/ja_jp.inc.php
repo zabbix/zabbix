@@ -802,7 +802,7 @@
 	'S_FNC_DESCRIPTION_DAYOFWEEK'=>		'X {OP} N （システム日付が月曜日の場合Xは1、日曜日の場合Xは7）',
 	'S_FNC_DESCRIPTION_FUZZYTIME'=>		'X {OP} N （最終値のタイムスタンプがシステム日付から過去T秒以内の場合Xは1、それ以外の場合Xは0）',
 	'S_FNC_DESCRIPTION_IREGEXP'=>		'X {OP} N （最終値に大文字小文字同一視で正規表現Rがマッチした場合Xは1、それ以外の場合Xは0）',
-	'S_FNC_DESCRIPTION_LOGSERVERITY'=>	'X {OP} N （Xは最終Windowsイベントログのイベント種別値）',
+	'S_FNC_DESCRIPTION_LOGSEVERITY'=>	'X {OP} N （Xは最終Windowsイベントログのイベント種別値）',
 	'S_FNC_DESCRIPTION_LOGSOURCE'=>		'X {OP} N （最終Windowsイベントログに文字列Vが含まれる場合Xは1、含まれない場合Xは0）',
 	'S_FNC_DESCRIPTION_NODATA'=>		'X {OP} N （直近T秒以内にデータがない場合Xは1、ある場合Xは0）',
 	'S_FNC_DESCRIPTION_NOW'=>		'X {OP} N （Xは1970/01/01 0:00:00からの経過秒数）',

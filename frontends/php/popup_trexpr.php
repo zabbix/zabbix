@@ -170,8 +170,8 @@ include_once "include/page_header.php";
             'operators' => $limited_operators,
             'params'    => $param1_regexp
             ),
-        'logserverity'  => array(
-            'description'   => S_FNC_DESCRIPTION_LOGSERVERITY,
+        'logseverity'  => array(
+            'description'   => S_FNC_DESCRIPTION_LOGSEVERITY,
             'value_types'   => array(ITEM_VALUE_TYPE_LOG),
             'operators' => $operators
             ),
