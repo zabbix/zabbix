@@ -4124,7 +4124,7 @@
 					$val['esc_step_from']:$val['esc_step_from'].' - '.$val['esc_step_to'];
 
 				$esc_period_txt = $val['esc_period']?$val['esc_period']:S_DEFAULT;
-				$esc_delay_txt = $delay[$val['esc_step_from']]?convert_units($delay[$val['esc_step_from']],'uptime'):S_AT_MOMENT;
+				$esc_delay_txt = $delay[$val['esc_step_from']]?convert_units($delay[$val['esc_step_from']],'uptime'):S_IMMEDIATELY;
 			}
 
 			$tblOper->addRow(array(
