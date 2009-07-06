@@ -1019,7 +1019,7 @@
 				
 				$calc_field = 'round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0)'; /* required for 'group by' support of Oracle */
 				$sql_arr = array();
-				if(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))
+				if(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / 16))
 				{
 					array_push($sql_arr,
 						'select itemid,'.$calc_field.' as i,'.
