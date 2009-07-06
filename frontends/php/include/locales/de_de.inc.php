@@ -183,7 +183,7 @@
 	'S_ACKNOWLEDGE_ADDED'=>			'Bestätigung hinzugefügt',
 	'S_SYS_BULK_ACKNOWLEDGE'=>			'----[Massenbestätigung]----',
 	'S_BULK_ACKNOWLEDGE'=>			'Massenbestätigung',
-	'S_AT_MOMENT'=>			'Zur Zeit',
+	'S_IMMEDIATELY'=>			'Zur Zeit',
 	'S_INFINITY'=>			'Unendlich',
 	'S_RECOVERY_MESSAGE'=>			'Wiederherstellungsnachricht',
 	'S_CONFIGURATION_OF_ACTIONS'=>			'Konfiguration von Aktionen',

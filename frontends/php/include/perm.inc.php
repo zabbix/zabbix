@@ -134,7 +134,7 @@ function check_authorisation(){
 
 	if(!$login || isset($incorrect_session) || isset($missed_user_guest)){
 
-		if(isset($incorrect_session))	$message = 'Session was ended, please relogin!';
+		if(isset($incorrect_session))	$message = 'Session terminated, please re-login!';
 		else if(isset($missed_user_guest)){
 			$row = DBfetch(DBselect('SELECT count(u.userid) as user_cnt FROM users u'));
 			if(!$row || $row['user_cnt'] == 0){

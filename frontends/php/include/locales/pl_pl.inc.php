@@ -183,7 +183,7 @@
 	'S_ACKNOWLEDGE_ADDED'=>				'Potwierdzenie dodane',
 	'S_SYS_BULK_ACKNOWLEDGE'=>			'----[POTWIERDZENIE ZBIOROWE]----',
 	'S_BULK_ACKNOWLEDGE'=>				'Potwierdzenie zbiorowe',
-	'S_AT_MOMENT'=>					'Teraz',
+	'S_IMMEDIATELY'=>					'Teraz',
 	'S_INFINITY'=>					'Nieskończoność',
 	'S_RECOVERY_MESSAGE'=>				'Komunikat odzyskania',
 	'S_CONFIGURATION_OF_ACTIONS'=>			'Konfiguracja działań',

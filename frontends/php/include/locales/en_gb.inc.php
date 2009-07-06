@@ -208,7 +208,7 @@
 	'S_BULK_ACKNOWLEDGE'=>			'Bulk acknowledge',
 
 //	actionconf.php
-	'S_AT_MOMENT'=>				'At moment',
+	'S_IMMEDIATELY'=>			'Immediately',
 	'S_INFINITY'=>				'Infinity',
 	'S_RECOVERY_MESSAGE'=>			'Recovery message',
 	'S_CONFIGURATION_OF_ACTIONS'=>		'Configuration of actions',

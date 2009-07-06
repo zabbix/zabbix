@@ -183,7 +183,7 @@
 	'S_ACKNOWLEDGE_ADDED'=>			'対応コメントを追加しました',
 	'S_SYS_BULK_ACKNOWLEDGE'=>			'----[対応コメントの一括処理]----',
 	'S_BULK_ACKNOWLEDGE'=>			'対応コメントの一括処理',
-	'S_AT_MOMENT'=>			'すぐに',
+	'S_IMMEDIATELY'=>			'すぐに',
 	'S_INFINITY'=>			'無限',
 	'S_RECOVERY_MESSAGE'=>			'リカバリメッセージ',
 	'S_CONFIGURATION_OF_ACTIONS'=>			'アクションの設定',
