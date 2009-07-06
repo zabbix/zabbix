@@ -670,7 +670,7 @@
 			$password2	= null;
 			$url		= $user["url"];
 			$autologin	= $user["autologin"];
-			$autologout	= $user["autologout"];
+			$autologout	= $_REQUEST['autologout'] = $user["autologout"];
 			$lang		= $user["lang"];
 			$theme 		= $user['theme'];
 			$refresh	= $user["refresh"];
