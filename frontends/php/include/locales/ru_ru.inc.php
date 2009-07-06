@@ -183,7 +183,7 @@
 	'S_ACKNOWLEDGE_ADDED'=>			'Подтверждение добавлено',
 	'S_SYS_BULK_ACKNOWLEDGE'=>			'----[БОЛЬШАЯ ЧАТЬ ПОДТВЕРЖДЕНА]----',
 	'S_BULK_ACKNOWLEDGE'=>			'Большая часть подтверждена',
-	'S_AT_MOMENT'=>			'В текущий момент',
+	'S_IMMEDIATELY'=>			'В текущий момент',
 	'S_INFINITY'=>			'Бесконечность',
 	'S_RECOVERY_MESSAGE'=>			'Сообщение восстановления',
 	'S_CONFIGURATION_OF_ACTIONS'=>			'Настройка действий',
