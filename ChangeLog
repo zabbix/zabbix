@@ -1,6 +1,6 @@
 Changes for 1.6.6
 
- - [ZBX-959] fixed windows agent crash while processing performance counters under Windows 2000 (Sasha)
+ - [ZBX-959] fixed windows agent crash while processing performance counters under Windows 2000. Thanks to Takanori Suzuki (Sasha)
  - [ZBX-733] added checks on value map creation/update (Artem)
  - [ZBX-768] improved menu linebreaking (Artem)
  - [ZBX-853] fixed item massdelete if not zabbix item selected (Artem)
