@@ -85,7 +85,7 @@ class CHostGroup {
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 		
-		$sort_columns = array('groupid'); // allowed columns for sorting
+		$sort_columns = array('groupid, name'); // allowed columns for sorting
 		
 		
 		$sql_parts = array(
@@ -113,6 +113,8 @@ class CHostGroup {
 			'with_graphs'				=> false,
 			'only_current_node'			=> false,
 			'editable'					=> false,
+			'nopermissions'				=> false,
+			'extendselect'					=> false,
 			'count'						=> false,
 			'pattern' 					=> '',
 			'order'						=> '',
@@ -134,77 +136,75 @@ class CHostGroup {
 // *** ????? *** //
 		
 // editable + PERMISSION CHECK
-		if(USER_TYPE_SUPER_ADMIN != $user_type){
-			if($options['editable']){
-				$permission = PERM_READ_WRITE;
-			}
-			else{
-				$permission = PERM_READ_ONLY;
-			}
+		if(defined('ZBX_API_REQUEST')){
+			$options['nopermissions'] = false;
+		}
+		
+		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
+		}
+		else{
+			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 			
-			$sql_parts['from'][] = 'rights r, users_groups ug';
-			$sql_parts['where'][] = '
-					r.id=g.groupid
-					AND r.groupid=ug.usrgrpid
-					AND ug.userid='.$userid.'
-					AND r.permission>'.($permission-1).'
-					AND NOT EXISTS(
-						SELECT gg.groupid
-						FROM groups gg, rights rr, users_groups ugg
-						WHERE rr.id=g.groupid
-							AND rr.groupid=ugg.usrgrpid
-							AND ugg.userid='.$userid.'
-							AND rr.permission<'.$permission.')';
+			$sql_parts['from']['r'] = 'rights r';
+			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['where'][] = 'r.id=g.groupid';
+			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
+			$sql_parts['where'][] = 'ug.userid='.$userid;
+			$sql_parts['where'][] = 'r.permission>='.$permission;
+			$sql_parts['where'][] = 'NOT EXISTS( '.
+									' SELECT gg.groupid '.
+										' FROM groups gg, rights rr, users_groups ugg '.
+										' WHERE rr.id=g.groupid '.
+											' AND rr.groupid=ugg.usrgrpid '.
+											' AND ugg.userid='.$userid.
+											' AND rr.permission<'.$permission.')';
 		}
-// count
-		if($options['count']){
-			$sql_parts['select'] = array('COUNT(g.groupid) as rowscount');
-		}
+
 // nodeids
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+
 // groupids
 		if($options['groupids']){
 			zbx_value2array($options['groupids']);
 			$sql_parts['where'][] = DBcondition('g.groupid', $options['groupids']);
 		}
+
 // hostids
 		if($options['hostids']){
 			zbx_value2array($options['hostids']);
 			$sql_parts['where'][] = DBcondition('h.hostid', $options['hostids']);
 		}
-// pattern
-		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
-		}
+
 // monitored_hosts, real_hosts, templated_hosts, not_proxy_hosts
 		if($options['monitored_hosts']){
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from'][] = 'hosts h';
+			$sql_parts['from']['h'] = 'hosts h';
 			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
 			$sql_parts['where'][] = 'h.hostid=hg.hostid';
 			$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
 		}
 		else if($options['real_hosts']){
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from'][] = 'hosts h';
+			$sql_parts['from']['h'] = 'hosts h';
 			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
 			$sql_parts['where'][] = 'h.hostid=hg.hostid';
 			$sql_parts['where'][] = 'h.status IN('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		}
 		else if($options['templated_hosts']){
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from'][] = 'hosts h';
+			$sql_parts['from']['h'] = 'hosts h';
 			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
 			$sql_parts['where'][] = 'h.hostid=hg.hostid';
 			$sql_parts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
 		}
 		else if($options['not_proxy_hosts']){
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from'][] = 'hosts h';
+			$sql_parts['from']['h'] = 'hosts h';
 			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
 			$sql_parts['where'][] = 'h.hostid=hg.hostid';
 			$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_PROXY;
 		}
+
 // with_items, with_monitored_items, with_historical_items
 		if($options['with_items']){
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
@@ -221,6 +221,7 @@ class CHostGroup {
 			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
 			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
 		}
+
 // with_triggers, with_monitored_triggers
 		if($options['with_triggers']){
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
@@ -242,6 +243,7 @@ class CHostGroup {
 											' AND f.triggerid=t.triggerid '.
 											' AND t.status='.TRIGGER_STATUS_ENABLED.')';
 		}
+
 // with_httptests, with_monitored_httptests
 		if($options['with_httptests']){
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
@@ -260,6 +262,7 @@ class CHostGroup {
 										' AND ht.applicationid=a.applicationid '.
 										' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
 		}
+
 // with_graphs
 		if($options['with_graphs']){
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
@@ -269,30 +272,56 @@ class CHostGroup {
 										' WHERE i.hostid=hg.hostid '.
 											' AND i.itemid=gi.itemid)';
 		}
+
+// extendselect
+		if($options['extendselect']){
+			$sql_parts['select'] = array('g.*');
+		}
+		
+// count
+		if($options['count']){
+			$sql_parts['select'] = array('COUNT(g.groupid) as rowscount');
+		}
+
+// pattern
+		if(!zbx_empty($options['pattern'])){
+			$sql_parts['where'][] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+		}
+
 // order
 		// restrict not allowed columns for sorting
 		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
 		if(!zbx_empty($options['order'])){
 			$sql_parts['order'][] = 'g.'.$options['order'];
+			if(!str_in_array('g.'.$options['order'], $sql_parts['select'])) $sql_parts['select'][] = 'g.'.$options['order'];
 		}
+
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
 		}
-
-		$sql_select = implode(',', $sql_parts['select']);
-		$sql_from = implode(',', $sql_parts['from']);
-		$sql_where = implode(' AND ', $sql_parts['where']);
-		$sql_order = zbx_empty($options['order']) ? '' : ' ORDER BY '.implode(',',$sql_parts['order']);
+//-----------
+		$sql_parts['select'] = array_unique($sql_parts['select']);
+		$sql_parts['from'] = array_unique($sql_parts['from']);
+		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['order'] = array_unique($sql_parts['order']);
+	
+		$sql_select = '';
+		$sql_from = '';
+		$sql_where = '';
+		$sql_order = '';
+		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
+		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
+		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);			
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.'
+		$sql = 'SELECT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('g.groupid', $nodeids).
-				($sql_where ? ' AND '.$sql_where : '').
+					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
-
 		while($group = DBfetch($res)){
 			if($options['count'])
 				$result = $group;

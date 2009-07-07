@@ -999,9 +999,10 @@ class CChart extends CGraphDraw{
 
 			$sql_arr = array();
 
-			if((($real_item['history']*86400) > (time()-($this->from_time+$this->period/2))) &&				// should pick data from history or trends
+			if((($real_item['history']*86400) > (time()-($this->from_time+$this->period/2))) &&			// should pick data from history or trends
 				(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))		// is reasonable to take data from history?
 			{
+				$this->dataFrom = 'history';
 				array_push($sql_arr,
 					'SELECT itemid,'.$calc_field.' as i,'.
 						' count(*) as count,avg(value) as avg,min(value) as min,'.
@@ -1024,6 +1025,7 @@ class CChart extends CGraphDraw{
 					);
 			}
 			else{
+				$this->dataFrom = 'trends';
 				array_push($sql_arr,
 					'SELECT itemid,'.$calc_field.' as i,'.
 						' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
@@ -1388,9 +1390,9 @@ class CChart extends CGraphDraw{
 				$delay	= $this->items[$item]['delay'];
 
 				if($cell > $delay)
-					$draw = (boolean) ($diff < ZBX_GRAPH_MAX_SKIP_CELL * $cell);
+					$draw = (boolean) ($diff < (ZBX_GRAPH_MAX_SKIP_CELL * $cell));
 				else
-					$draw = (boolean) ($diff < ZBX_GRAPH_MAX_SKIP_DELAY * $delay);
+					$draw = (boolean) ($diff < (ZBX_GRAPH_MAX_SKIP_DELAY * $delay));
 
 				if(($draw == false) && ($this->items[$item]['calc_type'] == GRAPH_ITEM_AGGREGATED))
 					$draw = $i - $j < 5;
@@ -1431,7 +1433,7 @@ class CChart extends CGraphDraw{
 
 		$end_time=getmicrotime();
 		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
-		imagestring($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12,"Generated in $str sec", $this->getColor('Gray'));
+		imagestring($this->im, 0,$this->fullSizeX-160,$this->fullSizeY-12,'Generated in '.$str.' sec ('.$this->dataFrom.')', $this->getColor('Gray'));
 
 		unset($this->items, $this->data);
 

@@ -101,6 +101,96 @@ include_once('include/page_header.php');
 
 	$right_tab->addOption('border',0);
 
+// FIND Hosts
+	$params = array(
+				'nodeids'=> get_current_nodeid(),
+				'extendselect' => true,
+				'pattern' => $search,
+				'extend_pattern' => true,
+				'limit' => $rows_per_page,
+				'order' => 'host',
+				);
+	$db_hosts = CHost::get($params);
+	$hosts = selectByPattern($db_hosts, 'host', $search, $rows_per_page);
+
+	$hostids = array_keys($hosts);
+	$hostsgroups = array();
+	$sql = 'SELECT * FROM hosts_groups hg WHERE '.DBcondition('hg.hostid', $hostids);
+	$res = DBselect($sql);
+	while($hostgroup = DBfetch($res)){
+		$hostsgroups[$hostgroup['hostid']] = $hostgroup['groupid'];
+	}
+
+	$params = array(
+				'nodeids'=> get_current_nodeid(),
+				'pattern' => $search,
+				'extend_pattern' => true,
+				'count' => 1,
+				);
+	$hosts_count = CHost::get($params);
+
+	$overalCount = $hosts_count['rowscount'];
+	$viewCount = count($hosts);
+
+	$header = array(
+		is_show_all_nodes()?new CCol(S_NODE):null,
+		new CCol(S_HOSTS),
+		new CCol(S_IP),
+		new CCol(S_DNS),
+		new CCol(S_LATEST_DATA),
+		new CCol(S_TRIGGERS),
+		new CCol(S_EVENTS),
+		$admin?new CCol(S_EDIT, 'center'):null,
+		);
+
+	$table  = new CTableInfo();
+	$table->setHeader($header);
+
+	foreach($hosts as $num => $host){
+		$hostid = $host['hostid'];
+		$groupid = isset($hostsgroups[$hostid])?$hostsgroups[$hostid]:0;
+		$link = 'groupid='.$groupid.'&hostid='.$hostid;
+
+		if($admin){
+			$pageBox = new CComboBox('hostpages_'.$hostid);
+				$pageBox->addItem('hosts.php?form=update&config=0&'.$link, S_HOST);
+				$pageBox->addItem('items.php?'.$link, S_ITEMS);
+				$pageBox->addItem('triggers.php?'.$link, S_TRIGGERS);
+				$pageBox->addItem('graphs.php?'.$link, S_GRAPHS);
+
+			$pageGo = new CButton('pagego', S_GO, "javascript: ".
+							" redirect(\$('hostpages_$hostid').options[\$('hostpages_$hostid').selectedIndex].value);");
+
+			$pageSelect = array($pageBox,SPACE,$pageGo);
+		}
+		else{
+			$pageSelect = null;
+		}
+
+		$caption = make_decoration($host['host'], $search);
+		$hostip = make_decoration($host['ip'], $search);
+		$hostdns = make_decoration($host['dns'], $search);
+
+		$table->addRow(array(
+			get_node_name_by_elid($hostid),
+			$caption,
+			$hostip,
+			$hostdns,
+			new CLink(S_GO,'latest.php?'.$link),
+			new CLink(S_GO,'tr_status.php?'.$link),
+			new CLink(S_GO,'events.php?'.$link),
+			$pageSelect
+		));
+	}
+	$table->setFooter(new CCol(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL));
+
+
+	$wdgt_hosts = new CWidget('search_hosts',$table);
+	$wdgt_hosts->addHeader(S_HOSTS, SPACE);
+	$left_tab->addRow($wdgt_hosts);
+//----------------
+
+
 // Find Host groups
 	$params = array(
 				'nodeids'=> get_current_nodeid(),
@@ -153,87 +243,7 @@ include_once('include/page_header.php');
 
 	$wdgt_hgroups = new CWidget('search_hostgroup',$table);
 	$wdgt_hgroups->addHeader(S_HOST_GROUPS, SPACE);
-	$left_tab->addRow($wdgt_hgroups);
-//----------------
-
-// FIND Hosts
-	$params = array(
-				'nodeids'=> get_current_nodeid(),
-				'pattern' => $search,
-				'limit' => $rows_per_page,
-				'order' => 'host',
-				);
-	$db_hosts = CHost::get($params);
-	$hosts = selectByPattern($db_hosts, 'host', $search, $rows_per_page);
-
-	$hostids = array_keys($hosts);
-	$hostsgroups = array();
-	$sql = 'SELECT * FROM hosts_groups hg WHERE '.DBcondition('hg.hostid', $hostids);
-	$res = DBselect($sql);
-	while($hostgroup = DBfetch($res)){
-		$hostsgroups[$hostgroup['hostid']] = $hostgroup['groupid'];
-	}
-
-	$params = array(
-				'nodeids'=> get_current_nodeid(),
-				'pattern' => $search,
-				'count' => 1,
-				);
-	$hosts_count = CHost::get($params);
-
-	$overalCount = $hosts_count['rowscount'];
-	$viewCount = count($hosts);
-
-	$header = array(
-		is_show_all_nodes()?new CCol(S_NODE):null,
-		new CCol(S_HOSTS),
-		new CCol(S_LATEST_DATA),
-		new CCol(S_TRIGGERS),
-		new CCol(S_EVENTS),
-		$admin?new CCol(S_EDIT, 'center'):null,
-		);
-
-	$table  = new CTableInfo();
-	$table->setHeader($header);
-
-	foreach($hosts as $num => $host){
-		$hostid = $host['hostid'];
-		$groupid = isset($hostsgroups[$hostid])?$hostsgroups[$hostid]:0;
-		$link = 'groupid='.$groupid.'&hostid='.$hostid;
-
-		if($admin){
-			$pageBox = new CComboBox('hostpages_'.$hostid);
-				$pageBox->addItem('hosts.php?form=update&config=0&'.$link, S_HOST);
-				$pageBox->addItem('items.php?'.$link, S_ITEMS);
-				$pageBox->addItem('triggers.php?'.$link, S_TRIGGERS);
-				$pageBox->addItem('graphs.php?'.$link, S_GRAPHS);
-
-			$pageGo = new CButton('pagego', S_GO, "javascript: ".
-							" redirect(\$('hostpages_$hostid').options[\$('hostpages_$hostid').selectedIndex].value);");
-
-			$pageSelect = array($pageBox,SPACE,$pageGo);
-		}
-		else{
-			$pageSelect = null;
-		}
-
-		$caption = make_decoration($host['host'], $search);
-
-		$table->addRow(array(
-			get_node_name_by_elid($hostid),
-			$caption,
-			new CLink(S_GO,'latest.php?'.$link),
-			new CLink(S_GO,'tr_status.php?'.$link),
-			new CLink(S_GO,'events.php?'.$link),
-			$pageSelect
-		));
-	}
-	$table->setFooter(new CCol(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL));
-
-
-	$wdgt_hosts = new CWidget('search_hosts',$table);
-	$wdgt_hosts->addHeader(S_HOSTS, SPACE);
-	$right_tab->addRow($wdgt_hosts);
+	$right_tab->addRow($wdgt_hgroups);
 //----------------
 
 // FIND Templates

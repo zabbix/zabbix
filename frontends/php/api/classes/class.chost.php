@@ -20,24 +20,25 @@ class CHost {
 	 * @version 1
 	 *
 	 * @param _array $options
-	 * @param array $opyions['nodeids'] Node IDs
-	 * @param array $opyions['groupids'] HostGroup IDs
-	 * @param array $opyions['hostids'] Host IDs
-	 * @param boolean $opyions['monitored_hosts'] only monitored Hosts
-	 * @param boolean $opyions['templated_hosts'] include templates in result
-	 * @param boolean $opyions['with_items'] only with items
-	 * @param boolean $opyions['with_monitored_items'] only with monitored items
-	 * @param boolean $opyions['with_historical_items'] only with historical items
-	 * @param boolean $opyions['with_triggers'] only with triggers
-	 * @param boolean $opyions['with_monitored_triggers'] only with monitores triggers
-	 * @param boolean $opyions['with_httptests'] only with http tests
-	 * @param boolean $opyions['with_monitored_httptests'] only with monitores http tests
-	 * @param boolean $opyions['with_graphs'] only with graphs
-	 * @param boolean $opyions['editable'] only with read-write permission. Ignored for SuperAdmins
-	 * @param int $opyions['count'] count Hosts, returned column name is rowscount
-	 * @param string $opyions['pattern'] search hosts by pattern in host names
-	 * @param int $opyions['limit'] limit selection
-	 * @param string $opyions['order'] depricated parametr (for now)
+	 * @param array $options['nodeids'] Node IDs
+	 * @param array $options['groupids'] HostGroup IDs
+	 * @param array $options['hostids'] Host IDs
+	 * @param boolean $options['monitored_hosts'] only monitored Hosts
+	 * @param boolean $options['templated_hosts'] include templates in result
+	 * @param boolean $options['with_items'] only with items
+	 * @param boolean $options['with_monitored_items'] only with monitored items
+	 * @param boolean $options['with_historical_items'] only with historical items
+	 * @param boolean $options['with_triggers'] only with triggers
+	 * @param boolean $options['with_monitored_triggers'] only with monitores triggers
+	 * @param boolean $options['with_httptests'] only with http tests
+	 * @param boolean $options['with_monitored_httptests'] only with monitores http tests
+	 * @param boolean $options['with_graphs'] only with graphs
+	 * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
+	 * @param int $options['extendselect'] return all fields for Hosts
+	 * @param int $options['count'] count Hosts, returned column name is rowscount
+	 * @param string $options['pattern'] search hosts by pattern in host names
+	 * @param int $options['limit'] limit selection
+	 * @param string $options['order'] depricated parametr (for now)
 	 * @return array|boolean Host data as array or false if error
 	 */
 	public static function get($options=array()){
@@ -47,11 +48,11 @@ class CHost {
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 		
-		$sort_columns = array('hostid'); // allowed columns for sorting
+		$sort_columns = array('hostid, host'); // allowed columns for sorting
 	
 	
 		$sql_parts = array(
-			'select' => array('h.hostid, h.host'),
+			'select' => array('h.hostid','h.host'),
 			'from' => array('hosts h'),
 			'where' => array(),
 			'order' => array(),
@@ -72,45 +73,47 @@ class CHost {
 			'with_monitored_httptests'	=> false,
 			'with_graphs'				=> false,
 			'editable'					=> false,
+			'nopermissions'				=> false,
+			'extendselect'					=> false,
 			'count'						=> false,
 			'pattern'					=> '',
+			'extend_pattern'			=> false,
 			'order' 					=> '',
 			'limit'						=> null);
 
 		$options = array_merge($def_options, $options);
 	
 // editable + PERMISSION CHECK
-		if(USER_TYPE_SUPER_ADMIN != $user_type){
-			if($options['editable']){
-				$permission = PERM_READ_WRITE;
-			}
-			else{
-				$permission = PERM_READ_ONLY;
-			}
+		if(defined('ZBX_API_REQUEST')){
+			$options['nopermissions'] = false;
+		}
+		
+		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
+		}
+		else{
+			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 			
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from'][] = 'rights r, users_groups g';
+			$sql_parts['from']['r'] = 'rights r';
+			$sql_parts['from']['ug'] = 'users_groups ug';
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
-			$sql_parts['where'][] = '
-					r.id=hg.groupid
-					AND r.groupid=g.usrgrpid
-					AND g.userid='.$userid.'
-					AND r.permission>'.($permission-1).'
-					AND NOT EXISTS(
-						SELECT hgg.groupid
-						FROM hosts_groups hgg, rights rr, users_groups gg
-						WHERE hgg.hostid=hg.hostid
-							AND rr.id=hgg.groupid
-							AND rr.groupid=gg.usrgrpid
-							AND gg.userid='.$userid.'
-							AND rr.permission<'.$permission.')';
+			$sql_parts['where'][] = 'r.id=hg.groupid ';
+			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
+			$sql_parts['where'][] = 'ug.userid='.$userid;
+			$sql_parts['where'][] = 'r.permission>='.$permission;
+			$sql_parts['where'][] = 'NOT EXISTS( '.
+								' SELECT hgg.groupid '.
+								' FROM hosts_groups hgg, rights rr, users_groups gg '.
+								' WHERE hgg.hostid=hg.hostid '.
+									' AND rr.id=hgg.groupid '.
+									' AND rr.groupid=gg.usrgrpid '.
+									' AND gg.userid='.$userid.
+									' AND rr.permission<'.$permission.')';
 		}
-// count
-		if($options['count']){
-			$sql_parts['select'] = array('count(h.hostid) as rowscount');
-		}
+
 // nodeids
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+
 // groupids
 		if($options['groupids']){
 			zbx_value2array($options['groupids']);
@@ -118,11 +121,13 @@ class CHost {
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
 		}
+
 // hostids
 		if($options['hostids']){
 			zbx_value2array($options['hostids']);
 			$sql_parts['where'][] = DBcondition('h.hostid', $options['hostids']);
 		}
+
 // monitored_hosts, templated_hosts
 		if($options['monitored_hosts']){
 			$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
@@ -133,6 +138,7 @@ class CHost {
 		else{
 			$sql_parts['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		}
+
 // with_items, with_monitored_items, with_historical_items
 		if($options['with_items']){
 			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
@@ -143,6 +149,7 @@ class CHost {
 		else if($options['with_historical_items']){
 			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
 		}
+
 // with_triggers, with_monitored_triggers
 		if($options['with_triggers']){
 			$sql_parts['where'][] = 'EXISTS( 
@@ -162,6 +169,7 @@ class CHost {
 						AND f.triggerid=t.triggerid 
 						AND t.status='.TRIGGER_STATUS_ENABLED.')';
 		}
+
 // with_httptests, with_monitored_httptests
 		if($options['with_httptests']){
 			$sql_parts['where'][] = 'EXISTS( 
@@ -178,6 +186,7 @@ class CHost {
 						AND ht.applicationid=a.applicationid 	
 						AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
 		}
+
 // with_graphs
 		if($options['with_graphs']){
 			$sql_parts['where'][] = 'EXISTS( 
@@ -186,35 +195,66 @@ class CHost {
 					WHERE i.hostid=h.hostid 
 						AND i.itemid=gi.itemid)';
 		}
+
+// extendselect
+		if($options['extendselect']){
+			$sql_parts['select'] = array('h.*');
+		}
+		
+// count
+		if($options['count']){
+			$sql_parts['select'] = array('count(h.hostid) as rowscount');
+		}
+
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+			if($options['extend_pattern']){
+				$sql_parts['where'][] = ' ( '.
+											'UPPER(h.host) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%').' OR '.
+											'h.ip LIKE '.zbx_dbstr('%'.$options['pattern'].'%').' OR '.
+											'UPPER(h.dns) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%').
+										' ) ';
+			}
+			else{
+				$sql_parts['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+			}
 		}
+
 // order
 		// restrict not allowed columns for sorting
-		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
+		$options['order'] = str_in_array($options['order'], $sort_columns) ? $options['order'] : '';
 		if(!zbx_empty($options['order'])){
 			$sql_parts['order'][] = 'h.'.$options['order'];
+			if(!str_in_array('h.'.$options['order'], $sql_parts['select'])) $sql_parts['select'][] = 'h.'.$options['order'];
 		}
+
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
 		}
+//-------
 		
-		
-		$sql_select = implode(',', $sql_parts['select']);
-		$sql_from = implode(',', $sql_parts['from']);
-		$sql_where = implode(' AND ', $sql_parts['where']);
-		$sql_order = zbx_empty($options['order']) ? '' : ' ORDER BY '.implode(',',$sql_parts['order']);
+		$sql_parts['select'] = array_unique($sql_parts['select']);
+		$sql_parts['from'] = array_unique($sql_parts['from']);
+		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['order'] = array_unique($sql_parts['order']);
+	
+		$sql_select = '';
+		$sql_from = '';
+		$sql_where = '';
+		$sql_order = '';
+		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
+		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
+		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);	
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.'
+		$sql = 'SELECT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('h.hostid', $nodeids).
-				($sql_where ? ' AND '.$sql_where : '').
+					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
-		
 		while($host = DBfetch($res)){
 			if($options['count'])
 				$result = $host;
