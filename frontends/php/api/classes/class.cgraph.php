@@ -38,7 +38,7 @@ class CGraph {
 		$sort_columns = array('graphid'); // allowed columns for sorting
 
 		$sql_parts = array(
-			'select' => array('g.graphid, g.name'),
+			'select' => array('g.graphid','g.name'),
 			'from' => array('graphs g'),
 			'where' => array(),
 			'order' => array(),
@@ -50,7 +50,10 @@ class CGraph {
 			'itemids' 			=> array(),
 			'hostids' 			=> array(),
 			'type' 				=> false,
-			'templated_graphs'		=> false,
+			'templated_graphs'	=> false,
+			'editable'			=> false,
+			'nopermission'		=> false,
+			'extendselect'			=> false,
 			'count'				=> false,
 			'pattern'			=> '',
 			'limit'				=> false,
@@ -58,68 +61,127 @@ class CGraph {
 			);
 
 		$options = array_merge($def_options, $options);
-
-		// restrict not allowed columns for sorting
-		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
-
-// count
-		if($options['count']){
-			$sql_parts['select'] = array('count(g.graphid) as count');
+		
+// editable + PERMISSION CHECK
+		if(defined('ZBX_API_REQUEST')){
+			$options['nopermissions'] = false;
 		}
+		
+		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
+		}
+		else{
+			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+
+			$sql_parts['from']['gi'] = 'graphs_items gi';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['r'] = 'rights r';
+			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
+			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+			$sql_parts['where'][] = 'r.id=hg.groupid ';
+			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
+			$sql_parts['where'][] = 'ug.userid='.$userid;
+			$sql_parts['where'][] = 'r.permission>='.$permission;
+			$sql_parts['where'][] = 'NOT EXISTS( '.
+										' AND NOT EXISTS( '.
+											' SELECT gg.graphid '.
+											' FROM graphs_items gii, items ii '.
+											' WHERE gii.graphid=g.graphid '.
+												' AND gii.itemid=ii.itemid '.
+												' AND EXISTS( '.
+													' SELECT hgg.groupid '.
+													' FROM hosts_groups hgg, rights rr, users_groups gg '.
+													' WHERE ii.hostid=hg.hostid '.
+														' AND rr.id=hgg.groupid '.
+														' AND rr.groupid=gg.usrgrpid '.
+														' AND gg.userid='.$userid.
+														' AND rr.permission<'.$permission.'))';
+		}
+		
+
+
+// hostids
+		if($options['hostids']){
+			$sql_parts['from']['gi'] = 'graphs_items gi';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
+			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
+			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+		}
+
 // graphids
 		if($options['graphids']){
 			$sql_parts['where'][] = DBcondition('g.graphid', $options['graphids']);
 		}
+
 // itemids
 		if($options['itemids']){
 			$sql_parts['from']['gi'] = 'graphs_items gi';
 			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sql_parts['where'][] = DBcondition('gi.itemid', $options['itemids']);
 		}
-// hostids
-		if($options['hostids']){
-			$sql_parts['from']['gi'] = 'graphs_items gi';
-			$sql_parts['from'][] = 'hosts h, items i';
-			$sql_parts['where'][] = DBcondition('h.hostid', $options['hostids']);
-			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sql_parts['where'][] = 'i.itemid=gi.itemid';
-			$sql_parts['where'][] = 'h.hostid=i.hostid';
-		}
+
 // type
 		if($options['type'] !== false){
 			$sql_parts['where'][] = 'g.type='.$options['type'];
 		}
+
 // templated_graphs
 		if($options['templated_graphs']){
 			$sql_parts['where'][] = 'g.templateid<>0';
 		}
+
+// extendselect
+		if($options['extendselect']){
+			$sql_parts['select'] = array('g.*');
+		}
+
+// count
+		if($options['count']){
+			$sql_parts['select'] = array('count(g.graphid) as count');
+		}
+
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' g.name LIKE '.zbx_dbstr('%'.$options['pattern'].'%');
+			$sql_parts['where'][] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
 		}
+
 // order
+		// restrict not allowed columns for sorting
+		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
 		if(!zbx_empty($options['order'])){
 			$sql_parts['order'][] = 'g.'.$options['order'];
 		}
+
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
 		}
+//------------
 
-
-		$sql_select = implode(',', $sql_parts['select']);
-		$sql_from = implode(',', $sql_parts['from']);
-		$sql_where = implode(' AND ', $sql_parts['where']);
-		$sql_order = zbx_empty($options['order']) ? '' : ' ORDER BY '.implode(',', $sql_parts['order']);
+		$sql_parts['select'] = array_unique($sql_parts['select']);
+		$sql_parts['from'] = array_unique($sql_parts['from']);
+		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['order'] = array_unique($sql_parts['order']);
+	
+		$sql_select = '';
+		$sql_from = '';
+		$sql_where = '';
+		$sql_order = '';
+		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
+		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
+		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);			
 		$sql_limit = $sql_parts['limit'];
 
-
-		$sql = 'SELECT DISTINCT '.$sql_select.
-			' FROM '.$sql_from.
-			($sql_where ? ' WHERE '.$sql_where : '').
-			$sql_order;
+		$sql = 'SELECT '.$sql_select.'
+				FROM '.$sql_from.'
+				WHERE '.DBin_node('g.graphid', $nodeids).
+					$sql_where.
+				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
-
 		while($graph = DBfetch($db_res)){
 			if($options['count'])
 				$result = $graph;

@@ -1086,7 +1086,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 										' AND t.status='.TRIGGER_STATUS_ENABLED.')';
 	}
 
-// htptests
+// httptests
 	if($def_options['with_httptests']){
 		$def_sql['from'][] = 'hosts_groups hg';
 

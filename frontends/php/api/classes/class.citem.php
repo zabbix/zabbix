@@ -53,14 +53,17 @@ class CItem {
 			'limit' => null);
 
 		$def_options = array(
-			'itemids'			=> array(),
-			'hostids'			=> array(),
+			'nodeids'			=> array(),
 			'groupids'			=> array(),
+			'hostids'			=> array(),
+			'itemids'			=> array(),
 			'triggerids'		=> array(),
 			'applicationids'	=> array(),
 			'status'			=> false,
 			'templated_items'	=> false,
 			'editable'			=> false,
+			'nopermissions'		=> false,
+			'extendselect'			=> false,
 			'count'				=> false,
 			'pattern'			=> '',
 			'limit'				=> null,
@@ -69,99 +72,128 @@ class CItem {
 		$options = array_merge($def_options, $options);
 
 // editable + PERMISSION CHECK
-		if(USER_TYPE_SUPER_ADMIN != $user_type){
-			if($options['editable']){
-				$permission = PERM_READ_WRITE;
-			}
-			else{
-				$permission = PERM_READ_ONLY;
-			}
+		if(defined('ZBX_API_REQUEST')){
+			$options['nopermissions'] = false;
+		}
+		
+		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
+		}
+		else{
+			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 			
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from'][] = 'rights r, users_groups g';
-			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sql_parts['where'][] = '
-					r.id=hg.groupid
-					AND r.groupid=g.usrgrpid
-					AND g.userid='.$userid.'
-					AND r.permission>'.($permission-1).'
-					AND NOT EXISTS(
-						SELECT hgg.groupid
-						FROM hosts_groups hgg, rights rr, users_groups gg
-						WHERE hgg.hostid=hg.hostid
-							AND rr.id=hgg.groupid
-							AND rr.groupid=gg.usrgrpid
-							AND gg.userid='.$userid.'
-							AND rr.permission<'.$permission.')';
+			$sql_parts['from']['r'] = 'rights r';
+			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['where'][] = 'hg.hostid=i.hostid';
+			$sql_parts['where'][] = 'r.id=hg.groupid ';
+			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
+			$sql_parts['where'][] = 'ug.userid='.$userid;
+			$sql_parts['where'][] = 'r.permission>='.$permission;
+			$sql_parts['where'][] = 'NOT EXISTS( '.
+								' SELECT hgg.groupid '.
+								' FROM hosts_groups hgg, rights rr, users_groups gg '.
+								' WHERE hgg.hostid=hg.hostid '.
+									' AND rr.id=hgg.groupid '.
+									' AND rr.groupid=gg.usrgrpid '.
+									' AND gg.userid='.$userid.
+									' AND rr.permission<'.$permission.')';									
 		}
-// count
-		if($options['count']){
-			$sql_parts['select'] = array('count(i.itemid) as count');
+
+// nodeids
+		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		
+// groupids
+		if($options['groupids']){
+			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sql_parts['where'][] = 'hg.hostid=i.hostid';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
 		}
-// itemids
-		if($options['itemids']){
-			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
-		}
+
 // hostids
 		if($options['hostids']){
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
 		}
-// groupids
-		if($options['groupids']){
-			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
-			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
+
+// itemids
+		if($options['itemids']){
+			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
 		}
+
 // triggerids
 		if($options['triggerids']){
 			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
 			$sql_parts['where'][] = 'i.itemid=f.itemid';
 			$sql_parts['from'][] = 'functions f';
 		}
+
 // applicationids
 		if($options['applicationids']){
 			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
 			$sql_parts['where'][] = 'i.hostid=a.hostid';
 			$sql_parts['from'][] = 'applications a';
 		}
+
 // status
 		if($options['status'] !== false){
 			$sql_parts['where'][] = 'i.status='.$options['status'];
 		}
+
 // templated_items
 		if($options['templated_items']){
 			$sql_parts['where'][] = 'i.templateid<>0';
 		}
+
+// extendselect
+		if($options['extendselect']){
+			$sql_parts['select'] = array('i.*');
+		}
+
+// count
+		if($options['count']){
+			$sql_parts['select'] = array('count(i.itemid) as count');
+		}
+
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' i.description LIKE '.zbx_dbstr('%'.$options['pattern'].'%');
+			$sql_parts['where'][] = ' UPPER(i.description) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
 		}
+
 // order
 		// restrict not allowed columns for sorting
 		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
 		
 		if(!zbx_empty($options['order'])){
 			$sql_parts['order'][] = 'i.'.$options['order'];
+			if(!str_in_array('i.'.$options['order'], $sql_parts['select'])) $sql_parts['select'][] = 'i.'.$options['order'];
 		}
+
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
 		}
+//----------
 
-
-		$sql_select = implode(',', $sql_parts['select']);
-		$sql_from = implode(',', $sql_parts['from']);
-		$sql_where = implode(' AND ', $sql_parts['where']);
-		$sql_order = zbx_empty($options['order']) ? '' : ' ORDER BY '.implode(',', $sql_parts['order']);
+		$sql_parts['select'] = array_unique($sql_parts['select']);
+		$sql_parts['from'] = array_unique($sql_parts['from']);
+		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['order'] = array_unique($sql_parts['order']);
+	
+		$sql_select = '';
+		$sql_from = '';
+		$sql_where = '';
+		$sql_order = '';
+		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
+		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
+		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);			
 		$sql_limit = $sql_parts['limit'];
 
-
-		$sql = 'SELECT DISTINCT '.$sql_select.
-			' FROM '.$sql_from.
-			($sql_where ? ' WHERE '.$sql_where : '').
-			$sql_order;
-		$db_res = DBselect($sql, $sql_limit);
-
+		$sql = 'SELECT '.$sql_select.'
+				FROM '.$sql_from.'
+				WHERE '.DBin_node('i.itemid', $nodeids).
+					$sql_where.
+				$sql_order;
+		$res = DBselect($sql, $sql_limit);
 		while($item = DBfetch($db_res)){
 			if($options['count'])
 				$result = $item;
