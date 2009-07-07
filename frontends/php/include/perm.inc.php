@@ -163,6 +163,7 @@ COpt::counter_up('perm');
 		if(count($where)) 	$where = ' where '.implode(' and ',$where);
 		else			$where = '';
 	
+		$processed = array();
 		$sql = 'select distinct n.nodeid,n.name as node_name,h.hostid,h.host, min(r.permission) as permission,ug.userid '.
 			' from hosts h left join hosts_groups hg on hg.hostid=h.hostid '.
 			' left join groups g on g.groupid=hg.groupid '.
@@ -172,8 +173,6 @@ COpt::counter_up('perm');
 			$where.' group by h.hostid,n.nodeid,n.name,h.host,ug.userid '.
 			' order by n.name,n.nodeid, h.host, permission desc, userid desc';
 		$db_hosts = DBselect($sql);
-
-		$processed = array();
 		while($host_data = DBfetch($db_hosts))
 		{
 //			It seems that host details are not required by the logic
@@ -220,7 +219,7 @@ COpt::counter_up('perm');
 				$result = implode(',',$result);
 		}
 
-		return $result;
+	return $result;
 	}
 
 	function	get_accessible_groups_by_user($user_data,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)

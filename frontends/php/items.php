@@ -535,11 +535,13 @@ include_once "include/page_header.php";
 	{
 		echo BR;
 		insert_mass_update_item_form("group_itemid");
-	} else if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["group_itemid"]))
+	} 
+	else if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["group_itemid"]))
 	{
 		echo BR;
-		insert_copy_elements_to_forms("group_itemid");
-	} elseif (!isset($_REQUEST["form"]) ||  !in_array($_REQUEST["form"],array(S_CREATE_ITEM,"update","clone"))) {
+		insert_copy_elements_to_forms("group_itemid", $accessible_hosts);
+	} 
+	elseif (!isset($_REQUEST["form"]) ||  !in_array($_REQUEST["form"],array(S_CREATE_ITEM,"update","clone"))) {
 		echo BR;
 // Table HEADER
 		$form = new CForm();

@@ -2153,9 +2153,8 @@
 		$frmItem->Show();
 	}
 
-	function	insert_copy_elements_to_forms($elements_array_name)
+	function	insert_copy_elements_to_forms($elements_array_name, &$accessible_hosts)
 	{
-		
 		$copy_type = get_request("copy_type", 0);
 		$copy_mode = get_request("copy_mode", 0);
 		$filter_groupid = get_request("filter_groupid", 0);
@@ -2178,8 +2177,9 @@
 		$frmCopy->AddRow(S_TARGET_TYPE, $cmbCopyType);
 
 		$target_sql = 'select distinct g.groupid as target_id, g.name as target_name'.
-			' from groups g, hosts_groups hg'.
-			' where hg.groupid=g.groupid';
+					' from groups g, hosts_groups hg'.
+					' where hg.groupid=g.groupid'.
+						' and hg.hostid in('.$accessible_hosts.')';
 
 		if(0 == $copy_type)
 		{
@@ -2192,11 +2192,16 @@
 			}
 			$frmCopy->AddRow('Group', $cmbGroup);
 
-			$target_sql = 'select h.hostid as target_id, h.host as target_name from hosts h';
-			if($filter_groupid > 0)
-			{
-				$target_sql .= ', hosts_groups hg where hg.hostid=h.hostid and hg.groupid='.$filter_groupid;
+			$sql_from = '';
+			$sql_where = 'h.hostid in('.$accessible_hosts.')';
+			if($filter_groupid > 0){
+				$sql_from.=',hosts_groups hg ';
+				$sql_where.=' and hg.hostid=h.hostid and hg.groupid='.$filter_groupid;
 			}
+			
+			$target_sql = 'select h.hostid as target_id, h.host as target_name '.
+							' from hosts h'.$sql_from.
+							' where '.$sql_where;
 		}
 
 		$db_targets = DBselect($target_sql.' order by target_name');
