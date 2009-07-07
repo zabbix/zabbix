@@ -192,8 +192,12 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		if($USER_DETAILS['alias']!=ZBX_GUEST_USER){
 			$page_header_r_col[] = array('|');
 			array_push($page_header_r_col, new CLink(S_PROFILE, 'profile.php', 'small_font'),'|');
-			if($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
-						array_push($page_header_r_col,new CLink(S_DEBUG, '#debug', 'small_font'),'|');
+			if($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_ENABLED){
+				$debug = new CLink(S_DEBUG, '#debug', 'small_font');
+				$debug->addOption('onclick', "javascript: ShowHide('zbx_gebug_info');");
+
+				array_push($page_header_r_col,$debug,'|');
+			}
 			array_push($page_header_r_col,new CLink(S_LOGOUT, 'index.php?reconnect=1', 'small_font'));
 		}
 		else {
