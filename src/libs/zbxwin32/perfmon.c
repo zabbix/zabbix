@@ -77,18 +77,22 @@ char *GetCounterName(DWORD index)
 
 int check_counter_path(char *counterPath)
 {
-	DWORD				dwSize;
+	DWORD				dwSize = 0;
 	PDH_COUNTER_PATH_ELEMENTS	*cpe = NULL;
 	PDH_STATUS			status;
 	int				is_numeric;
 
-	dwSize = 0;
-retry:
+	status = PdhParseCounterPath(counterPath, NULL, &dwSize, 0);
+	if (status == PDH_MORE_DATA || status == ERROR_SUCCESS)
+		cpe = (PDH_COUNTER_PATH_ELEMENTS *)zbx_malloc(cpe, dwSize);
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Can't get required buffer size. Counter path is \"%s\": %s",
+				counterPath, strerror_from_module(status, "PDH.DLL"));
+		return FAIL;
+	}
+
 	if (ERROR_SUCCESS != (status = PdhParseCounterPath(counterPath, cpe, &dwSize, 0))) {
-		if (status == PDH_MORE_DATA) {
-			cpe = (PDH_COUNTER_PATH_ELEMENTS *)zbx_malloc(cpe, dwSize);
-			goto retry;
-		}
 		zabbix_log(LOG_LEVEL_DEBUG, "Can't parse counter path \"%s\": %s",
 				counterPath, strerror_from_module(status, "PDH.DLL"));
 
