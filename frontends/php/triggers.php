@@ -458,7 +458,8 @@
 					"CheckAll('".$form->GetName()."','all_triggers');")
 				,make_sorting_link(S_NAME,'t.description'),
 			),
-			S_EXPRESSION));
+			S_EXPRESSION,
+			S_ERROR));
 
 		$sql_from = '';
 		$sql_where = '';
@@ -530,8 +531,10 @@
 			}
 
 			if(($row['error'] != '') && ($row['hoststatus'] != HOST_STATUS_TEMPLATE)){
-				$description[] = array(BR(), bold(S_ERROR.':'), SPACE);
-				$description[] = array(BR(), new CSpan($row['error'], 'red'));
+				//$img_error = new CImg('images/general/error.png');
+				$img_error = new CDiv(new CImg('images/general/error.png'));
+				$img_error->addStyle('text-align: center; display: block;');
+				$img_error->setHint($row['error'], '', 'red ');
 			}
 
 			switch($row['priority']){
@@ -570,7 +573,8 @@
 				$status,
 				$_REQUEST['hostid'] > 0 ? NULL : $row['host'],
 				$description,
-				explode_exp($row['expression'],1)
+				explode_exp($row['expression'],1),
+				$img_error
 			));
 			$row_count++;
 		}

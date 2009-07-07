@@ -1067,7 +1067,10 @@ include_once 'include/page_header.php';
 				$error=new CCol('-','off');
 			}
 			else{
-				$error=new CCol($db_item['error'],'on');
+				$img_error = new CDiv(new CImg('images/general/error.png'));
+				$img_error->addStyle('text-align: center; display: block;');
+				$img_error->setHint($db_item['error'], '', 'on');
+				$error=new CCol($img_error);
 			}
 
 			$applications = $show_applications ? implode(', ', get_applications_by_itemid($db_item['itemid'], 'name')) : null;

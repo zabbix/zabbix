@@ -62,6 +62,7 @@ frontends/php/conf/maintenance.inc.php -text
 frontends/php/dashboard.php -text
 frontends/php/fonts/kochi-gothic-subst.ttf -text
 frontends/php/fonts/kochi-mincho-subst.ttf -text
+frontends/php/hostgroups.php -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/bar/arrow_down.gif -text
 frontends/php/images/general/bar/arrow_l.gif -text
@@ -111,6 +112,7 @@ frontends/php/images/general/dbl_arrow_down2.png -text
 frontends/php/images/general/dbl_arrow_up.png -text
 frontends/php/images/general/dbl_arrow_up2.png -text
 frontends/php/images/general/down_icon.png -text
+frontends/php/images/general/error.png -text
 frontends/php/images/general/error_small.gif -text
 frontends/php/images/general/help.gif -text svneol=unset#unset
 frontends/php/images/general/inst_completed.gif -text
@@ -275,9 +277,11 @@ frontends/php/js/services.js -text
 frontends/php/js/showhint.js -text
 frontends/php/js/tree.js -text
 frontends/php/locales.php -text
+frontends/php/maintenance.php -text
 frontends/php/popup_bitem.php -text
 frontends/php/popup_link_tr.php -text
 frontends/php/popup_period.php -text
+frontends/php/proxies.php -text
 frontends/php/report6.php -text
 frontends/php/scripts.php -text
 frontends/php/scripts_exec.php -text
