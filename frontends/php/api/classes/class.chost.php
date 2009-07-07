@@ -52,7 +52,7 @@ class CHost {
 	
 	
 		$sql_parts = array(
-			'select' => array('h.hostid','h.host'),
+			'select' => array('hosts' => 'h.hostid, h.host'),
 			'from' => array('hosts h'),
 			'where' => array(),
 			'order' => array(),
@@ -74,7 +74,7 @@ class CHost {
 			'with_graphs'				=> false,
 			'editable'					=> false,
 			'nopermissions'				=> false,
-			'extendselect'					=> false,
+			'extenduotput'				=> false,
 			'count'						=> false,
 			'pattern'					=> '',
 			'extend_pattern'			=> false,
@@ -91,7 +91,7 @@ class CHost {
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 			
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['from']['r'] = 'rights r';
@@ -117,11 +117,13 @@ class CHost {
 // groupids
 		if($options['groupids']){
 			zbx_value2array($options['groupids']);
+			if($options['extenduotput']){
+				$sql_parts['select']['groupid'] = 'hg.groupid';
+			}
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
 		}
-
 // hostids
 		if($options['hostids']){
 			zbx_value2array($options['hostids']);
@@ -196,9 +198,9 @@ class CHost {
 						AND i.itemid=gi.itemid)';
 		}
 
-// extendselect
-		if($options['extendselect']){
-			$sql_parts['select'] = array('h.*');
+// extenduotput
+		if($options['extenduotput']){
+			$sql_parts['select']['hosts'] = 'h.*';
 		}
 		
 // count
@@ -252,16 +254,28 @@ class CHost {
 		$sql = 'SELECT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('h.hostid', $nodeids).
-					$sql_where.
+				$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($host = DBfetch($res)){
 			if($options['count'])
 				$result = $host;
-			else
-				$result[$host['hostid']] = $host;
+			else{
+				if(!isset($result[$host['hostid']])) 
+					$result[$host['hostid']]= array();
+				
+				if(isset($host['groupid'])){
+					if(!isset($result[$host['hostid']]['groups'])) 
+						$result[$host['hostid']]['groups'] = array();
+						
+					$result[$host['hostid']]['groups'][$host['groupid']] = $host['groupid'];
+					unset($host['groupid']);
+				}
+				
+				$result[$host['hostid']] += $host;
+			}
 		}
-		
+
 	return $result;
 	}
 

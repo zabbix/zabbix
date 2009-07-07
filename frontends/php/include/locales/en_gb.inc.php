@@ -364,6 +364,7 @@
 	'S_ZBX162_MODE'=>				'ZABBIX 1.6.2 comp. mode',
 	'S_DROPDOWN_FIRST_ENTRY'=>			'Dropdown first entry',
 	'S_DROPDOWN_REMEMBER_SELECTED'=>		'remember selected',
+	'S_MAX_IN_TABLE' =>					'Max count of elements to show inside table cell',
 	'S_THEMES'=>					'Themes',
 	'S_SYSTEM_DEFAULT'=>				'System default',
 	'S_BLACK_AND_BLUE'=>				'Black & Blue',
@@ -665,6 +666,8 @@
 
 	'S_INCORRECT_MAINTENANCE_PERIOD'=>	'Incorrect maintenance period',
 
+// hostgroups.php
+	'S_CONFIGURATION_OF_GROUPS' => 'CONFIGURATION OF HOST GROUPS',
 
 //	hosts.php
 	'S_IN'=>						'In',
@@ -684,7 +687,6 @@
 	'S_APPLICATION_DELETED'=>				'Application deleted',
 	'S_CANNOT_DELETE_APPLICATION'=>				'Cannot delete application',
 	'S_NO_APPLICATIONS_DEFINED'=>				'No applications defined',
-
 	'S_HOSTS'=>						'Hosts',
 	'S_ITEMS'=>						'Items',
 	'S_ITEMS_BIG'=>						'ITEMS',

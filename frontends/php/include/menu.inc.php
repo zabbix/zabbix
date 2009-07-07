@@ -130,6 +130,10 @@ $ZBX_MENU = array(
 						'sub_pages'=>array('popup_httpstep.php')
 					),
 				array(
+						'url'=>'hostgroups.php',
+						'label'=>S_HOST_GROUPS
+					),
+				array(
 						'url'=>'hosts.php',
 						'label'=>S_HOSTS
 					),

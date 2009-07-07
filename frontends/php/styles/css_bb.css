@@ -43,38 +43,38 @@ a.highlight:link 	{ 	text-decoration: none;	color: #ffffff; }
 a.highlight:visited {	text-decoration: none;	color: #ffffff; }
 a.highlight:hover	{	text-decoration: none;	color: #0AF; }
 
-A.enabled:link		{	color:#0088FF;	text-decoration: none; }
-A.enabled:visited 	{	color:#0088FF;	text-decoration: none; }
+A.enabled:link		{	color:#0088FF;	text-decoration: underline; }
+A.enabled:visited 	{	color:#0088FF;	text-decoration: underline; }
 A.enabled:hover 	{	color:#0088FF;	text-decoration: underline; }
 A.enabled:active 	{	color:#0088FF;	text-decoration: underline;}
 
-A.disabled:link		{	color:#AA0000;	text-decoration: none; }
-A.disabled:visited 	{	color:#AA0000;	text-decoration: none; }
+A.disabled:link		{	color:#AA0000;	text-decoration: underline; }
+A.disabled:visited 	{	color:#AA0000;	text-decoration: underline; }
 A.disabled:hover 	{	color:#AA0000;	text-decoration: underline; }
 A.disabled:active 	{	color:#AA0000;	text-decoration: underline;}
 
-A.orange:link		{	color:#EE7000;	text-decoration: none; }
-A.orange:visited 	{	color:#EE7000;	text-decoration: none; }
+A.orange:link		{	color:#EE7000;	text-decoration: underline; }
+A.orange:visited 	{	color:#EE7000;	text-decoration: underline; }
 A.orange:hover 		{	color:#EE7000;	text-decoration: underline; }
 A.orange:active 	{	color:#EE7000;	text-decoration: underline;}
 
-A.unknown:link		{	color:#777777;	text-decoration: none; }
-A.unknown:visited 	{	color:#777777;	text-decoration: none; }
+A.unknown:link		{	color:#777777;	text-decoration: underline; }
+A.unknown:visited 	{	color:#777777;	text-decoration: underline; }
 A.unknown:hover 	{	color:#AAAAAA;	text-decoration: underline; }
 A.unknown:active 	{	color:#777777;	text-decoration: underline;}
 
-A.off:link		{	color:#0088FF;	text-decoration: none; }
-A.off:visited 	{	color:#0088FF;	text-decoration: none; }
+A.off:link		{	color:#0088FF;	text-decoration: underline; }
+A.off:visited 	{	color:#0088FF;	text-decoration: underline; }
 A.off:hover 	{	color:#0088FF;	text-decoration: underline; }
 A.off:active 	{	color:#0088FF;	text-decoration: underline;}
 
-A.on:link	{	color:#AA0000;	text-decoration: none; }
-A.on:visited 	{	color:#AA0000;	text-decoration: none; }
+A.on:link	{	color:#AA0000;	text-decoration: underline; }
+A.on:visited 	{	color:#AA0000;	text-decoration: underline; }
 A.on:hover 	{	color:#AA0000;	text-decoration: underline; }
 A.on:active 	{	color:#AA0000;	text-decoration: underline;}
 
-A.action:link		{	color:#3C3089;	text-decoration: none; }
-A.action:visited 	{	color:#3C3089;	text-decoration: none; }
+A.action:link		{	color:#3C3089;	text-decoration: underline; }
+A.action:visited 	{	color:#3C3089;	text-decoration: underline; }
 A.action:hover 		{	color:#3C3089;	text-decoration: underline; }
 A.action:active 	{	color:#3C3089;	text-decoration: underline;}
 
@@ -90,10 +90,10 @@ A.small_font:active 	{color: #FFF; text-decoration: underline;}
 A.footer	{color:#CCCCCC;}
 
 A 		{font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt;}
-A:link 		{color:black; text-decoration: none; }
-A:visited 	{color:black; text-decoration: none; }
-A:hover 	{color:black; text-decoration: underline; }
-A:active 	{color:black; text-decoration: underline;}
+A:link 		{color:#3C3089; text-decoration: underline; }
+A:visited 	{color:#3C3089; text-decoration: underline; }
+A:hover 	{color:#3C3089; text-decoration: underline; }
+A:active 	{color:#3C3089; text-decoration: underline;}
 
 
 A.history:link		{	color:#28F;	text-decoration: none; font-size:10px;}
