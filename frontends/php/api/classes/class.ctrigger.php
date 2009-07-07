@@ -29,6 +29,7 @@ class CTrigger {
 	 * @param array $options['status']
 	 * @param array $options['templated_items']
 	 * @param array $options['editable']
+	 * @param array $options['extendselect']
 	 * @param array $options['count']
 	 * @param array $options['pattern']
 	 * @param array $options['limit']
@@ -54,140 +55,175 @@ class CTrigger {
 			);
 
 		$def_options = array(
-			'triggerids'		=> array(),
-			'itemids'		=> array(),
-			'hostids'		=> array(),
-			'groupids'		=> array(),
-			'applicationids'	=> array(),
-			'status'		=> false,
-			'severity'		=> false,
+			'triggerids'			=> array(),
+			'itemids'				=> array(),
+			'hostids'				=> array(),
+			'groupids'				=> array(),
+			'applicationids'		=> array(),
+			'status'				=> false,
+			'severity'				=> false,
 			'templated_triggers'	=> false,
-			'editable'		=> false,
-			'count'			=> false,
-			'pattern'		=> '',
-			'limit'			=> null,
-			'order'			=> ''
+			'editable'				=> false,
+			'nopermissions'			=> false,
+			'extendselect'			=> false,
+			'count'					=> false,
+			'pattern'				=> '',
+			'limit'					=> null,
+			'order'					=> ''
 		);
 
 		$options = array_merge($def_options, $options);
 
 		
 // editable + PERMISSION CHECK
-		if(USER_TYPE_SUPER_ADMIN != $user_type){
-			if($options['editable']){
-				$permission = PERM_READ_WRITE;
-			}
-			else{
-				$permission = PERM_READ_ONLY;
-			}
+		if(defined('ZBX_API_REQUEST')){
+			$options['nopermissions'] = false;
+		}
+		
+		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
+		}
+		else{
+			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 			   
-			$sql_parts['from']['fi'] = 'functions f, items i';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from'][] = 'rights r, users_groups g';
+			$sql_parts['from']['r'] = 'rights r';
+			$sql_parts['from']['ug'] = 'users_groups ug';
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sql_parts['where'][] = '
-					r.id=hg.groupid
-					AND r.groupid=g.usrgrpid
-					AND g.userid='.$userid.'
-					AND r.permission>'.($permission-1).'
-					AND NOT EXISTS(
-						SELECT ff.triggerid
-						FROM functions ff, items ii
-						WHERE ff.triggerid=t.triggerid
-							AND ff.itemid=ii.itemid
-							AND EXISTS(
-								SELECT hgg.groupid
-								FROM hosts_groups hgg, rights rr, users_groups gg
-								WHERE hgg.hostid=hg.hostid
-									AND rr.id=hgg.groupid
-									AND rr.groupid=gg.usrgrpid
-									AND gg.userid='.$userid.'
-									AND rr.permission<'.$permission.'))';
+			$sql_parts['where'][] = 'r.id=hg.groupid ';
+			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
+			$sql_parts['where'][] = 'ug.userid='.$userid;
+			$sql_parts['where'][] = 'r.permission>='.$permission;
+			$sql_parts['where'][] = 'NOT EXISTS( '.
+										' AND NOT EXISTS( '.
+											' SELECT ff.triggerid '.
+											' FROM functions ff, items ii '.
+											' WHERE ff.triggerid=t.triggerid '.
+												' AND ff.itemid=ii.itemid '.
+												' AND EXISTS( '.
+													' SELECT hgg.groupid '.
+													' FROM hosts_groups hgg, rights rr, users_groups gg '.
+													' WHERE hgg.hostid=hg.hostid '.
+														' AND rr.id=hgg.groupid '.
+														' AND rr.groupid=gg.usrgrpid '.
+														' AND gg.userid='.$userid.
+														' AND rr.permission<'.$permission.'))';
 		}
-// count
-		if($options['count']){
-			$sql_parts['select'] = array('count(t.triggerid) as rowscount');
-		}
-// triggerids
-		if($options['triggerids']){
-			$sql_parts['where'][] = DBcondition('t.triggerid', $options['triggerids']);
-		}
-// itemids
-		if($options['itemids']){
-			$sql_parts['from']['fi'] = 'functions f, items i';
-			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
-			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 
+// groupids
+		if($options['groupids']){
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sql_parts['where'][] = 'hg.hostid=i.hostid';
+			$sql_parts['where'][] = 'f.triggerid=t.triggerid';
+			$sql_parts['where'][] = 'f.itemid=i.itemid';
 		}
+
 // hostids
 		if($options['hostids']){
-			$sql_parts['from']['fi'] = 'functions f, items i';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 		}
-// groupids
-		if($options['groupids']){
-			$sql_parts['from']['fi'] = 'functions f, items i';
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
-			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+
+// triggerids
+		if($options['triggerids']){
+			$sql_parts['where'][] = DBcondition('t.triggerid', $options['triggerids']);
+		}
+
+// itemids
+		if($options['itemids']){
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 		}
+
 // applicationids
 		if($options['applicationids']){
-			$sql_parts['from']['fi'] = 'functions f, items i';
-			$sql_parts['from'][] = 'applications a';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['a'] = 'applications a';
 			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
 			$sql_parts['where'][] = 'i.hostid=a.hostid';
-			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+			$sql_parts['where'][] = 'f.triggerid=t.triggerid';
+			$sql_parts['where'][] = 'f.itemid=i.itemid';
 		}
+
 // status
 		if($options['status'] !== false){
 			$sql_parts['where'][] = 't.status='.$options['status'];
 		}
+
 // severity
 		if($options['severity'] !== false){
 			$sql_parts['where'][] = 't.priority='.$options['severity'];
 		}
+
 // templated_triggers
 		if($options['templated_triggers']){
 			$sql_parts['where'][] = 't.templateid<>0';
 		}
+		
+// extendselect
+		if($options['extendselect']){
+			$sql_parts['select'] = array('t.*');
+		}
+		
+// count
+		if($options['count']){
+			$sql_parts['select'] = array('count(t.triggerid) as rowscount');
+		}
+		
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' t.description LIKE '.zbx_dbstr('%'.$options['pattern'].'%');
+			$sql_parts['where'][] = ' UPPER(t.description) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
 		}
+
 // order
 		// restrict not allowed columns for sorting
 		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
 		
 		if(!zbx_empty($options['order'])){
 			$sql_parts['order'][] = 't.'.$options['order'];
+			if(!str_in_array('t.'.$options['order'], $sql_parts['select'])) $sql_parts['select'][] = 't.'.$options['order'];
 		}
+
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
 		}
+//---------------
 
-		$sql_select = implode(',', $sql_parts['select']);
-		$sql_from = implode(',', $sql_parts['from']);
-		$sql_where = implode(' AND ', $sql_parts['where']);
-		$sql_order = zbx_empty($options['order']) ? '' : ' ORDER BY '.implode(',', $sql_parts['order']);
+		$sql_parts['select'] = array_unique($sql_parts['select']);
+		$sql_parts['from'] = array_unique($sql_parts['from']);
+		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['order'] = array_unique($sql_parts['order']);
+	
+		$sql_select = '';
+		$sql_from = '';
+		$sql_where = '';
+		$sql_order = '';
+		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
+		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
+		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);			
 		$sql_limit = $sql_parts['limit'];
 
-
-		$sql = 'SELECT DISTINCT '.$sql_select.'
-				FROM '.$sql_from.
-				($sql_where ? ' WHERE '.$sql_where : '').
+		$sql = 'SELECT '.$sql_select.'
+				FROM '.$sql_from.'
+				WHERE '.DBin_node('t.triggerid', $nodeids).
+					$sql_where.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
-
 		while($trigger = DBfetch($db_res)){
 			if($options['count'])
 				$result = $trigger;
