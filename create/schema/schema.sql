@@ -432,6 +432,7 @@ FIELD		|ldap_search_attribute|t_varchar(128)|''|NOT NULL	|ZBX_SYNC
 FIELD		|dropdown_first_entry|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|dropdown_first_remember|t_integer|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|discovery_groupid|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|max_in_table|t_integer		|'50'	|NOT NULL	|ZBX_SYNC
 
 TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|'0'	|NOT NULL	|0

@@ -246,6 +246,7 @@ div.dbl_arrow_up:hover{
 
 span.link{
 	color:#333399;
+	text-decoration: underline;
 }
 
 span.link:hover{

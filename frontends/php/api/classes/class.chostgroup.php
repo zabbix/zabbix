@@ -114,7 +114,7 @@ class CHostGroup {
 			'only_current_node'			=> false,
 			'editable'					=> false,
 			'nopermissions'				=> false,
-			'extendselect'					=> false,
+			'extendselect'				=> false,
 			'count'						=> false,
 			'pattern' 					=> '',
 			'order'						=> '',
@@ -143,7 +143,7 @@ class CHostGroup {
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 			
 			$sql_parts['from']['r'] = 'rights r';
 			$sql_parts['from']['ug'] = 'users_groups ug';
@@ -319,7 +319,7 @@ class CHostGroup {
 		$sql = 'SELECT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('g.groupid', $nodeids).
-					$sql_where.
+				$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($group = DBfetch($res)){

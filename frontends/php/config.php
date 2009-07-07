@@ -67,10 +67,11 @@
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 /* GUI */
 		'event_ack_enable'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1'),		'isset({config})&&({config}==8)&&isset({save})'),
-		'event_expire'=> 		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,65535),	'isset({config})&&({config}==8)&&isset({save})'),
-		'event_show_max'=> 		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,65535),	'isset({config})&&({config}==8)&&isset({save})'),
+		'event_expire'=> 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,65535),	'isset({config})&&({config}==8)&&isset({save})'),
+		'event_show_max'=> 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,65535),	'isset({config})&&({config}==8)&&isset({save})'),
 		'dropdown_first_entry'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1,2'),		'isset({config})&&({config}==8)&&isset({save})'),
 		'dropdown_first_remember'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1'),	NULL),
+		'max_in_table' => 				array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,65535),	'isset({config})&&({config}==8)&&isset({save})'),
 
 /* Themes */
 		'default_theme'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,			'isset({config})&&({config}==9)&&isset({save})'),
@@ -153,7 +154,7 @@
 			unset($image, $_REQUEST['imageid']);
 		}
 	}
-	else if(isset($_REQUEST['save']) && ($_REQUEST['config']==8)){
+	else if(isset($_REQUEST['save']) && ($_REQUEST['config']==8)){ // GUI
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
@@ -163,7 +164,8 @@
 			'event_expire' => get_request('event_expire'),
 			'event_show_max' => get_request('event_show_max'),
 			'dropdown_first_entry' => get_request('dropdown_first_entry'),
-			'dropdown_first_remember' => is_null(get_request('dropdown_first_remember')) ? 0 : 1
+			'dropdown_first_remember' => (is_null(get_request('dropdown_first_remember')) ? 0 : 1),
+			'max_in_table' => get_request('max_in_table'),
 		);
 
 		$result = update_config($configs);
@@ -184,6 +186,8 @@
 				$msg[] = S_DROPDOWN_FIRST_ENTRY.' ['.$val.']';
 			if(!is_null($val = get_request('dropdown_first_remember')))
 				$msg[] = S_DROPDOWN_REMEMBER_SELECTED.' ['.$val.']';
+			if(!is_null($val = get_request('max_in_table')))
+				$msg[] = S_MAX_IN_TABLE.' ['.$val.']';
 
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,implode('; ',$msg));
 		}
@@ -580,13 +584,14 @@
 		echo SBR;
 
 		$frmGUI = new CFormTable(S_GUI, "config.php");
-//		$frmGUI->SetHelp("web.config.workperiod.php");
 		$frmGUI->addVar("config",get_request("config",8));
 
 		$combo_theme = new CComboBox('default_theme',$config['default_theme']);
 		$combo_theme->addItem('css_ob.css',S_ORIGINAL_BLUE);
 		$combo_theme->addItem('css_bb.css',S_BLACK_AND_BLUE);
 
+		$text_max_in_table = new CTextBox('max_in_table', $config['max_in_table'], 5);
+		
 		$exp_select = new CComboBox('event_ack_enable');
 		$exp_select->addItem(EVENT_ACK_ENABLED,S_ENABLED,$config['event_ack_enable']?'yes':'no');
 		$exp_select->addItem(EVENT_ACK_DISABLED,S_DISABLED,$config['event_ack_enable']?'no':'yes');
@@ -604,6 +609,7 @@
 			$check_dd_first_remember,
 			S_DROPDOWN_REMEMBER_SELECTED
 			));
+		$frmGUI->addRow(S_MAX_IN_TABLE, $text_max_in_table);
 		$frmGUI->addRow(S_EVENT_ACKNOWLEDGES,$exp_select);
 		$frmGUI->addRow(S_SHOW_EVENTS_NOT_OLDER.SPACE.'('.S_DAYS.')',
 			new CTextBox('event_expire',$config['event_expire'],5));
