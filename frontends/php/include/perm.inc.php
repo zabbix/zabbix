@@ -160,6 +160,7 @@ function check_authentication($sessionid=null){
 	global	$PHP_AUTH_USER,$PHP_AUTH_PW;
 	global	$USER_DETAILS;
 	global	$ZBX_LOCALNODEID;
+	global	$ZBX_NODES;
 
 	$USER_DETAILS = NULL;
 	$login = FALSE;
@@ -224,9 +225,12 @@ function check_authentication($sessionid=null){
 	}
 
 	if($USER_DETAILS){
-		$USER_DETAILS['node'] = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.id2nodeid($USER_DETAILS['userid'])));
-
-		if(empty($USER_DETAILS['node'])){
+//		$USER_DETAILS['node'] = DBfetch(DBselect('SELECT * FROM nodes WHERE nodeid='.id2nodeid($USER_DETAILS['userid'])));
+		if(isset($ZBX_NODES[$ZBX_LOCALNODEID])){
+			$USER_DETAILS['node'] = $ZBX_NODES[$ZBX_LOCALNODEID];
+		}
+		else{
+			$USER_DETAILS['node'] = array();
 			$USER_DETAILS['node']['name'] = '- unknown -';
 			$USER_DETAILS['node']['nodeid'] = $ZBX_LOCALNODEID;
 		}
@@ -345,15 +349,21 @@ return (GROUP_GUI_ACCESS_DISABLED == $res)?false:true;
  * Author: Aly
  */
 function get_user_auth($userid){
-	$result = GROUP_GUI_ACCESS_SYSTEM;
-
+	global $USER_DETAILS;
+	
+	if(isset($USER_DETAILS['gui_access'])) return $USER_DETAILS['gui_access'];
+	else $result = GROUP_GUI_ACCESS_SYSTEM;
+	
 	$sql = 'SELECT MAX(g.gui_access) as gui_access '.
 		' FROM usrgrp g, users_groups ug '.
 		' WHERE ug.userid='.$userid.
 			' AND g.usrgrpid=ug.usrgrpid ';
 	$acc = DBfetch(DBselect($sql));
 
-	if(!zbx_empty($acc['gui_access'])) $result=$acc['gui_access'];
+	if(!zbx_empty($acc['gui_access'])){
+		$result = $acc['gui_access'];
+		$USER_DETAILS['gui_access'] = $acc['gui_access'];
+	}
 
 return $result;
 }

@@ -204,41 +204,42 @@ if(defined('USE_PROFILING')){
 			global $perf_counter;
 			global $var_list;
 			global $USER_DETAILS;
+			global $DB;
 
-			if(isset($USER_DETAILS['debug_mode']) && $USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) return;
+			if(isset($USER_DETAILS['debug_mode']) && ($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_DISABLED)) return;
 
 			$endtime = COpt::getmicrotime();
 			$memory = COpt::getmemoryusage();
 
 			if(is_null($type)) $type='global';
 
-			echo OBR;
-			echo '<a name="debug"></a>';
-			echo "******************* Stats for $type *************************".OBR;
+			$debug_str = '';
+			$debug_str.= '<a name="debug"></a>';
+			$debug_str.= "******************* Stats for $type *************************".OBR;
 			if(defined('USE_TIME_PROF')){
 				$time = $endtime - $starttime[$type];
 				if($time < TOTAL_TIME)
 				{
-					echo 'Total time: '.round($time,6).OBR;
+					$debug_str.= 'Total time: '.round($time,6).OBR;
 				}
 				else
 				{
-					echo '<b>Total time: '.round($time,6).'</b>'.OBR;
+					$debug_str.= '<b>Total time: '.round($time,6).'</b>'.OBR;
 				}
 			}
 
 			if(defined('USE_MEM_PROF')){
-				echo 'Memory limit	 : '.ini_get('memory_limit').OBR;
-				echo 'Memory usage	 : '.mem2str($memorystamp[$type]).' - '.mem2str($memory).OBR;
-				echo 'Memory leak	 : '.mem2str($memory - $memorystamp[$type]).OBR;
+				$debug_str.= 'Memory limit	 : '.ini_get('memory_limit').OBR;
+				$debug_str.= 'Memory usage	 : '.mem2str($memorystamp[$type]).' - '.mem2str($memory).OBR;
+				$debug_str.= 'Memory leak	 : '.mem2str($memory - $memorystamp[$type]).OBR;
 			}
 
 			if(defined('USE_VAR_MON')){
 				$curr_var_list = isset($GLOBALS) ? array_keys($GLOBALS) : array();
 				$var_diff = array_diff($curr_var_list, $var_list[$type]);
-				echo ' Undeleted vars : '.count($var_diff).' [';
+				$debug_str.= ' Undeleted vars : '.count($var_diff).' [';
 				print_r(implode(', ',$var_diff));
-				echo ']'.OBR;
+				$debug_str.= ']'.OBR;
 			}
 
 			if(defined('USE_COUNTER_PROF')){
@@ -246,7 +247,7 @@ if(defined('USE_PROFILING')){
 				if(isset($perf_counter[$type])){
 					ksort($perf_counter[$type]);
 					foreach($perf_counter[$type] as $name => $value){
-						echo 'Counter "'.$name.'" : '.$value.OBR;
+						$debug_str.= 'Counter "'.$name.'" : '.$value.OBR;
 					}
 				}
 			}
@@ -254,7 +255,9 @@ if(defined('USE_PROFILING')){
 			if(defined('USE_SQLREQUEST_PROF')){
 				if(defined('SHOW_SQLREQUEST_DETAILS')){
 					$requests_cnt = count($sqlrequests);
-					echo 'SQL requests count: '.($requests_cnt - $sqlmark[$type]).OBR;
+					$debug_str.= 'SQL selects count: '.$DB['SELECT_COUNT'].OBR;
+					$debug_str.= 'SQL executes count: '.$DB['EXECUTE_COUNT'].OBR;
+					$debug_str.= 'SQL requests count: '.($requests_cnt - $sqlmark[$type]).OBR;
 
 					$sql_time=0;
 					for($i = $sqlmark[$type]; $i < $requests_cnt; $i++){
@@ -262,27 +265,38 @@ if(defined('USE_PROFILING')){
 						$sql_time+=$time;
 						if($time < LONG_QUERY)
 						{
-							echo 'Time:'.round($time,8).' SQL:&nbsp;'.$sqlrequests[$i][1].OBR;
+							$debug_str.= 'Time:'.round($time,8).' SQL:&nbsp;'.$sqlrequests[$i][1].OBR;
 						}
 						else
 						{
-							echo '<b>Time:'.round($time,8).' LONG SQL:&nbsp;'.$sqlrequests[$i][1].'</b>'.OBR;
+							$debug_str.= '<b>Time:'.round($time,8).' LONG SQL:&nbsp;'.$sqlrequests[$i][1].'</b>'.OBR;
 						}
 					}
 				}
 				else{
-					echo 'SQL requests count: '.($sqlrequests - $sqlmark[$type]).OBR;
+					$debug_str.= 'SQL requests count: '.($sqlrequests - $sqlmark[$type]).OBR;
 				}
+				
 				if($sql_time < QUERY_TOTAL_TIME)
 				{
-					echo 'Total time spent on SQL: '.round($sql_time,8).OBR;
+					$debug_str.= 'Total time spent on SQL: '.round($sql_time,8).OBR;
 				}
 				else
 				{
-					echo '<b>Total time spent on SQL: '.round($sql_time,8).'</b>'.OBR;
+					$debug_str.= '<b>Total time spent on SQL: '.round($sql_time,8).'</b>'.OBR;
 				}
 			}
-			echo "******************** End of $type ***************************".OBR;
+			$debug_str.= "******************** End of $type ***************************".OBR;
+			
+// DEBUG of ZBX FrontEnd
+			$zbx_debug = new CWidget('debug_hat',new CSpan(new CScript($debug_str),'textcolorstyles'));
+			$zbx_debug->addHeader(S_DEBUG);
+
+			$debud = new CDiv(array(BR(),$zbx_debug));
+			$debud->addOption('id','zbx_gebug_info');
+			$debud->addOption('style','display: none;');
+			$debud->show();
+//----------------
 		}
 
 

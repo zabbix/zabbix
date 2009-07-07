@@ -131,7 +131,9 @@ function __autoload($class_name){
 			if($local_node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodetype=1 ORDER BY nodeid'))){
 				$ZBX_LOCALNODEID = $local_node_data['nodeid'];
 				$ZBX_LOCMASTERID = $local_node_data['masterid'];
-
+				
+				$ZBX_NODES[$local_node_data['nodeid']] = $local_node_data;
+				
 				define('ZBX_DISTRIBUTED', true);
 			}
 			else{
@@ -1169,6 +1171,12 @@ function __autoload($class_name){
 
 			$limit--;
 		}
+
+		if(!empty($rsTable)){
+			$rsTable = array_chunk($rsTable, 20, true);
+			$rsTable = $rsTable[0];
+		}
+
 	return $rsTable;
 	}
 ?>
