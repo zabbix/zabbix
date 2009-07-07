@@ -400,7 +400,7 @@ echo '<script type="text/javascript" src="js/triggers.js"></script>';
 	else if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["g_triggerid"]))
 	{
 		echo BR;
-		insert_copy_elements_to_forms("g_triggerid");
+		insert_copy_elements_to_forms("g_triggerid", $accessible_hosts);
 	} 
 	else{
 /* TABLE */
