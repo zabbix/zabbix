@@ -525,7 +525,7 @@ include_once('include/page_header.php');
 			}
 			$result = DBend($result);
 		}
-//HOSTS PROFILE EXTANDED Section		
+//-------------	
 
 		show_messages($result, $msg_ok, $msg_fail);
 		
@@ -588,7 +588,7 @@ include_once('include/page_header.php');
 		}
 		unset($_REQUEST['delete']);
 	}
-/* ADD / REMOVE HOSTS FROM GROUP*/
+// ADD/REMOVE HOSTS FROM GROUP
 	else if(($_REQUEST['config']==0 || $_REQUEST['config']==3) && (inarr_isset(array('add_to_group','hostid')))){
 //		if(!uint_in_array($_REQUEST['add_to_group'], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
 		if(!isset($available_groups[$_REQUEST['add_to_group']])){
