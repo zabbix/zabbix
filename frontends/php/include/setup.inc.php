@@ -504,7 +504,7 @@
 
 		function stage7(){
 			return array(
-				'Congratulations with successfull instalation of ZABBIX frontend.',BR(),BR(),
+				'Congratulations on successful instalation of ZABBIX frontend.',BR(),BR(),
 				'Press "Finish" button to complete installation'
 				);
 		}
