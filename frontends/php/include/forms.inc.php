@@ -1062,6 +1062,7 @@
 			$users_status = $usrgrp['users_status'];
 			$gui_access = $usrgrp['gui_access'];
 			$api_access = $usrgrp['api_access'];
+			$debug_mode = $usrgrp['debug_mode'];
 
 			$group_users = array();
 			$sql = 'SELECT DISTINCT u.userid '.
@@ -1097,6 +1098,7 @@
 			$users_status 	= get_request('users_status',GROUP_STATUS_ENABLED);
 			$gui_access 	= get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);
 			$api_access 	= get_request('api_access',GROUP_API_ACCESS_DISABLED);
+			$debug_mode 	= get_request('debug_mode',GROUP_DEBUG_MODE_DISABLED);
 			$group_users	= get_request("group_users",array());
 			$group_rights	= get_request("group_rights",array());
 		}
@@ -1208,6 +1210,11 @@
 		$cmbAPI->addItem(GROUP_API_ACCESS_ENABLED, S_ENABLED);
 		$cmbAPI->addItem(GROUP_API_ACCESS_DISABLED, S_DISABLED);
 		$frmUserG->addRow(S_API_ACCESS, $cmbAPI);
+
+		$cmbDebug = new CComboBox('debug_mode', $debug_mode);
+		$cmbDebug->addItem(GROUP_DEBUG_MODE_ENABLED, S_ENABLED);
+		$cmbDebug->addItem(GROUP_DEBUG_MODE_DISABLED, S_DISABLED);
+		$frmUserG->addRow(S_DEBUG_MODE, $cmbDebug);
 
 
 		$table_Rights = new CTable(S_NO_RIGHTS_DEFINED,'right_table');
