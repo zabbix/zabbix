@@ -269,7 +269,7 @@
  * Function: check_circle_elements_link
  *
  * Description:
- *     Check circeling of maps
+ *     Check for circular map creation
  *
  * Author:
  *     Eugene Grigorjev
@@ -300,7 +300,7 @@
 		if($label_location<0) $label_location='null';
 		if(check_circle_elements_link($sysmapid,$elementid,$elementtype))
 		{
-			error("Circle link can't be created");
+			error("Circular link can't be created");
 			return FALSE;
 		}
 
@@ -326,7 +326,7 @@
 		if($label_location<0) $label_location='null';
 		if(check_circle_elements_link($sysmapid,$elementid,$elementtype))
 		{
-			error("Circle link can't be created");
+			error("Circular link can't be created");
 			return FALSE;
 		}
 
@@ -463,7 +463,7 @@
  * Function: get_info_by_selementid
  *
  * Description:
- *     Retrive information for map element
+ *     Retrieve information for map element
  *
  * Author:
  *     Eugene Grigorjev
