@@ -217,29 +217,14 @@ void zabbix_errlog(zbx_err_codes_t err, ...)
 
 void __zbx_zabbix_log(int level, const char *fmt, ...)
 {
-#ifdef TEST
-	time_t	t;
-	struct	tm	*tm;
-	va_list ap;
-
-		t=time(NULL);
-		tm=localtime(&t);
-		printf("%.6li:%.4d%.2d%.2d:%.2d%.2d%.2d ",zbx_get_thread_id(),tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday,tm->tm_hour,tm->tm_min,tm->tm_sec);
-		va_start(ap,fmt);
-		vprintf(fmt,ap);
-		va_end(ap);
-
-		printf("\n");
-		return;
-#else /* TEST */
-
 	FILE *log_file = NULL;
 
 	char	message[MAX_BUF_LEN];
 
-	time_t		t;
 	struct	tm	*tm;
 	va_list		args;
+
+	long		milliseconds;
 
 	struct	stat	buf;
 
@@ -247,11 +232,14 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 
 	char	filename_old[MAX_STRING_LEN];
 #if defined(_WINDOWS)
+        struct _timeb current_time;
 
 	WORD	wType;
 	char	thread_id[20];
 	char	*(strings[]) = {thread_id, message, NULL};
 
+#else /* not _WINDOWS */
+	struct timeval	current_time;
 #endif /* _WINDOWS */
 
 	if( (level != LOG_LEVEL_INFORMATION) && ((level > log_level) || (LOG_LEVEL_EMPTY == level)) )
@@ -267,18 +255,31 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 
 		if(NULL != log_file)
 		{
-			t = time(NULL);
-			tm = localtime(&t);
+
+#if defined(_WINDOWS)
+		        _ftime(&current_time);
+
+			tm = localtime(&current_time.time);
+			milliseconds = current_time.millitm/1000;
+#else /* not _WINDOWS */
+
+			gettimeofday(&current_time,NULL);
+
+			tm = localtime(&current_time.tv_sec);
+
+			milliseconds = current_time.tv_usec/1000;
+#endif /* _WINDOWS */
 
 			fprintf(log_file,
-				"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d ",
+				"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld ",
 				zbx_get_thread_id(),
 				tm->tm_year+1900,
 				tm->tm_mon+1,
 				tm->tm_mday,
 				tm->tm_hour,
 				tm->tm_min,
-				tm->tm_sec
+				tm->tm_sec,
+				milliseconds
 				);
 
 			va_start(args,fmt);
@@ -325,9 +326,6 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 	if(LOG_TYPE_SYSLOG == log_type)
 	{
 #if defined(_WINDOWS)
-		t = time(NULL);
-		tm = localtime(&t);
-
 		memset(thread_id, 0, sizeof(thread_id));
 		zbx_snprintf(thread_id, sizeof(thread_id),"[%li]: ",zbx_get_thread_id());
 
@@ -386,9 +384,6 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 
 		zbx_mutex_unlock(&log_file_access);
 	}
-
-#endif /* TEST */
-
 }
 
 /*
