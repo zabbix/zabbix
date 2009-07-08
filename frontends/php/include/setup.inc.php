@@ -131,7 +131,7 @@
 		function Stage0(){
 			return new CTag('div', 'yes', array('Welcome to the ZABBIX frontend installation wizard.',BR(),BR(),
 				'This installation wizard will guide you through the installation of ZABBIX frontend',BR(),BR(),
-				'Click to "Next" button to proceed to the next screen. If you want to change something '.
+				'Click the "Next" button to proceed to the next screen. If you want to change something '.
 				'on a previous screen, click "Previous" button',BR(),BR(),
 				'You may cancel installation at any time by clicking "Cancel" button'), 'text');
 		}
@@ -323,7 +323,7 @@
 				$final_result = array(
 					new CSpan(S_FAIL,'fail'),
 					BR(), BR(),
-					'Please correct all issuse and press "Retry" button',
+					'Please correct all issues and press "Retry" button',
 					BR(), BR(),
 					new CButton('retry', S_RETRY)
 					);
@@ -506,7 +506,7 @@
 
 		function Stage7(){
 			return array(
-				'Congratulation with succesfull instalation of ZABBIX frontend.',BR(),BR(),
+				'Congratulations on successful instalation of ZABBIX frontend.',BR(),BR(),
 				'Press "Finish" button to complete installation'
 				);
 		}
