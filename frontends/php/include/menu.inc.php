@@ -213,13 +213,13 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 		first level:
 			'label' 		= main menu title.
 			'default_page_id	= default page url from 'pages' then opened menu.
-			'pages'			= collection of pages whitch displayed from this menu
-						this pages are saved a last visited submenu of main menu.
+			'pages'			= collection of pages which are displayed from this menu.
+						these pages are saved a last visited submenu of main menu.
 
 		second level (pages):
 			'url'	= 	real url for this page
-			'label'	= 	submenu title, if missed menu skipped, but remmembed as last visited page.
-			'sub_pages'	= collection of pages for displaying but dont remember as last visited.
+			'label'	= 	submenu title, if missing, menu skipped, but remembered as last visited page.
+			'sub_pages'	= collection of pages for displaying but not remembered as last visited.
 	*/
 
 	//SDI($USER_DETAILS);
