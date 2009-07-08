@@ -454,13 +454,13 @@ point
     /* grab all swap info */
     swapctl(SC_LIST, swt);
 
-    /* walk thru the structs and sum up the fields */
+    /* walk through the structs and sum up the fields */
     t = f = 0;
     ste = &(swt->swt_ent[0]);
     i = cnt;
     while (--i >= 0)
     {
-  /* dont count slots being deleted */
+  /* don't count slots being deleted */
   if (!(ste->ste_flags & ST_INDEL) &&
       !(ste->ste_flags & ST_DOINGDEL))
   {

@@ -85,7 +85,7 @@ static int	SYSTEM_SWAP_PFREE(const char *cmd, const char *param, unsigned flags,
 	                return  SYSINFO_RET_FAIL;
 	tot_val = result_tmp.ui64;
 
-	/* Check fot division by zero */
+	/* Check for division by zero */
 	if(tot_val == 0)
 	{
 		free_result(&result_tmp);
@@ -120,7 +120,7 @@ static int	SYSTEM_SWAP_PUSED(const char *cmd, const char *param, unsigned flags,
                 	return  SYSINFO_RET_FAIL;
 	tot_val = result_tmp.ui64;
 
-	/* Check fot division by zero */
+	/* Check for division by zero */
 	if(tot_val == 0)
 	{
 		free_result(&result_tmp);
