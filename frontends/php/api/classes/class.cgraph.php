@@ -53,7 +53,7 @@ class CGraph {
 			'templated_graphs'	=> false,
 			'editable'			=> false,
 			'nopermission'		=> false,
-			'extendselect'			=> false,
+			'extendoutput'			=> false,
 			'count'				=> false,
 			'pattern'			=> '',
 			'limit'				=> false,
@@ -133,8 +133,8 @@ class CGraph {
 			$sql_parts['where'][] = 'g.templateid<>0';
 		}
 
-// extendselect
-		if($options['extendselect']){
+// extendoutput
+		if($options['extendoutput']){
 			$sql_parts['select'] = array('g.*');
 		}
 

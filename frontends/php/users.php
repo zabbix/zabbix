@@ -511,10 +511,8 @@ include_once('include/page_header.php');
 
 			$table=new CTableInfo(S_NO_USERS_DEFINED);
 			$table->setHeader(array(
-				array(new CCheckBox('all_users',NULL,
-                                        "CheckAll('".$form->GetName()."','all_users','group_userid');"),
-					make_sorting_link(S_ALIAS,'u.alias')
-				),
+				new CCheckBox('all_users',NULL,"CheckAll('".$form->GetName()."','all_users','group_userid');"),
+				make_sorting_link(S_ALIAS,'u.alias'),
 				make_sorting_link(S_NAME,'u.name'),
 				make_sorting_link(S_SURNAME,'u.surname'),
 				make_sorting_link(S_USER_TYPE,'u.type'),
@@ -611,12 +609,8 @@ include_once('include/page_header.php');
 				$action = get_user_actionmenu($userid);
 
 				$table->addRow(array(
-					array(
-						new CCheckBox('group_userid['.$userid.']',NULL,NULL,$userid),
-						new CLink($user['alias'],
-							'users.php?form=update'.url_param('config').
-							'&userid='.$userid.'#form', 'action')
-					),
+					new CCheckBox('group_userid['.$userid.']',NULL,NULL,$userid),
+					new CLink($user['alias'],'users.php?form=update'.url_param('config').'&userid='.$userid.'#form'),
 					$user['name'],
 					$user['surname'],
 					user_type2str($user['type']),
@@ -658,11 +652,12 @@ include_once('include/page_header.php');
 
 			$table = new CTableInfo(S_NO_USER_GROUPS_DEFINED);
 			$table->setHeader(array(
+				new CCheckBox('all_groups',NULL, "CheckAll('".$form->GetName()."','all_groups');"),
 				S_USERS_STATUS,
 				S_GUI_ACCESS,
 				S_API_ACCESS,
 				S_DEBUG_MODE,
-				array(  new CCheckBox('all_groups',NULL, "CheckAll('".$form->GetName()."','all_groups');"), make_sorting_link(S_NAME,'ug.name')),
+				make_sorting_link(S_NAME,'ug.name'),
 				S_MEMBERS,
 				));
 
@@ -732,16 +727,12 @@ include_once('include/page_header.php');
 
 
 				$table->addRow(array(
+					new CCheckBox('group_groupid['.$row['usrgrpid'].']',NULL,NULL,$row['usrgrpid']),
 					$users_status,
 					$gui_access,
 					$api_access,
 					$debug_mode,
-					array(
-						 new CCheckBox('group_groupid['.$row['usrgrpid'].']',NULL,NULL,$row['usrgrpid']),
-						$alias = new CLink($row['name'],
-							'users.php?form=update'.url_param('config').
-							'&usrgrpid='.$row['usrgrpid'].'#form', 'action')
-					),
+					new CLink($row['name'],'users.php?form=update'.url_param('config').'&usrgrpid='.$row['usrgrpid'].'#form'),
 					new CCol($users,'wraptext')
 					));
 				$row_count++;

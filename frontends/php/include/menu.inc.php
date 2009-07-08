@@ -125,33 +125,24 @@ $ZBX_MENU = array(
 						'sub_pages'=>array('image.php')
 					),
 				array(
-						'url'=>'httpconf.php',
-						'label'=>S_WEB,
-						'sub_pages'=>array('popup_httpstep.php')
-					),
-				array(
 						'url'=>'hostgroups.php',
 						'label'=>S_HOST_GROUPS
 					),
 				array(
 						'url'=>'hosts.php',
-						'label'=>S_HOSTS
+						'label'=>S_HOSTS,
+						'sub_pages'=>array('items.php','triggers.php','graphs.php','tr_logform.php','popup_trexpr.php','popup_gitem.php')
 					),
 				array(
-						'url'=>'items.php',
-						'label'=>S_ITEMS,
-						'sub_pages'=>array('tr_logform.php')
+						'url'=>'maintenance.php',
+						'label'=>S_MAINTENANCE
 					),
 				array(
-						'url'=>'triggers.php',
-						'label'=>S_TRIGGERS,
-						'sub_pages'=>array('popup_trexpr.php')
+						'url'=>'httpconf.php',
+						'label'=>S_WEB,
+						'sub_pages'=>array('popup_httpstep.php')
 					),
 				array('url'=>'actionconf.php'	,'label'=>S_ACTIONS),
-				array('url'=>'graphs.php',
-						'label'=>S_GRAPHS,
-						'sub_pages'=>array('popup_gitem.php')
-					),
 				array('url'=>'screenconf.php',
 						'label'=>S_SCREENS,
 						'sub_pages'=>array('screenedit.php')
@@ -175,20 +166,38 @@ $ZBX_MENU = array(
 			'default_page_id'	=> 1,
 			'forse_disable_all_nodes'=> true,
 			'pages'=>array(
-				ZBX_DISTRIBUTED?array('url'=>'nodes.php','label'=>S_NODES):null,
-				array('url'=>'authentication.php'	,'label'=>S_AUTHENTICATION),
-				array('url'=>'users.php',
-					'label'=>S_USERS,
-					'sub_pages'=>array('popup_media.php','popup_usrgrp.php','popup_right.php','popup_users.php')
+				array('url'=>'nodes.php',
+						'label'=>S_DM
 					),
-				array('url'=>'media_types.php'	,'label'=>S_MEDIA_TYPES),
-				array('url'=>'scripts.php'	,'label'=>S_SCRIPTS),
-				array('url'=>'audit.php'	,'label'=>S_AUDIT),
-				array('url'=>'queue.php'	,'label'=>S_QUEUE),
-				array('url'=>'report4.php'	,'label'=>S_NOTIFICATIONS),
-				array('url'=>'locales.php'	,'label'=>S_LOCALES	),
-				array('url'=>'instal.php'	,'label'=>S_INSTALLATION,
-					'sub_pages'=>array('setup.php','warning.php'))
+				array('url'=>'authentication.php',
+						'label'=>S_AUTHENTICATION
+					),
+				array('url'=>'users.php',
+						'label'=>S_USERS,
+						'sub_pages'=>array('popup_media.php','popup_usrgrp.php','popup_right.php','popup_users.php')
+					),
+				array('url'=>'media_types.php',
+						'label'=>S_MEDIA_TYPES
+					),
+				array('url'=>'scripts.php',
+						'label'=>S_SCRIPTS
+					),
+				array('url'=>'audit.php',
+						'label'=>S_AUDIT
+					),
+				array('url'=>'queue.php',
+						'label'=>S_QUEUE
+					),
+				array('url'=>'report4.php',
+						'label'=>S_NOTIFICATIONS
+					),
+				array('url'=>'locales.php',
+						'label'=>S_LOCALES
+					),
+				array('url'=>'instal.php',
+						'label'=>S_INSTALLATION,
+						'sub_pages'=>array('setup.php','warning.php')
+					)
 				)
 			),
 	'login'=>array(

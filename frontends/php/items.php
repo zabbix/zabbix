@@ -1005,12 +1005,11 @@ include_once 'include/page_header.php';
 
 		$table  = new CTableInfo();
 		$table->setHeader(array(
+			new CCheckBox('all_items',null,"CheckAll('".$form->GetName()."','all_items');"),
 			$show_host ? make_sorting_link(S_HOST,'h.host') : null,
-			array(	new CCheckBox('all_items',null,
-					"CheckAll('".$form->GetName()."','all_items');"),
-				make_sorting_link(S_DESCRIPTION,'i.description')),
+			make_sorting_link(S_DESCRIPTION,'i.description'),
 			make_sorting_link(S_KEY,'i.key_'),
-			make_sorting_link(nbsp(S_UPDATE_INTERVAL),'i.delay'),
+			make_sorting_link(S_INTERVAL,'i.delay'),
 			make_sorting_link(S_HISTORY,'i.history'),
 			make_sorting_link(S_TRENDS,'i.trends'),
 			make_sorting_link(S_TYPE,'i.type'),
@@ -1063,24 +1062,24 @@ include_once 'include/page_header.php';
 					'&group_task='.($db_item['status']?S_ACTIVATE_SELECTED:S_DISABLE_SELECTED),
 					item_status2style($db_item['status'])));
 
-			if($db_item['error'] == ''){
-				$error=new CCol('-','off');
+			if(!zbx_empty($db_item['error'])){
+				$error = new CDiv(SPACE,'error_icon');
+				$error->setHint($db_item['error'], '', 'on');
 			}
 			else{
-				$img_error = new CDiv(new CImg('images/general/error.png'));
-				$img_error->addStyle('text-align: center; display: block;');
-				$img_error->setHint($db_item['error'], '', 'on');
-				$error=new CCol($img_error);
+				$error = new CDiv(SPACE,'ok_icon');
 			}
-
+			
 			$applications = $show_applications ? implode(', ', get_applications_by_itemid($db_item['itemid'], 'name')) : null;
 			if(!is_null($applications) && empty($applications)) $applications = ' - ';
+			$applications = new CCol($applications, 'wraptext');
 
 			$chkBox = new CCheckBox('group_itemid['.$db_item['itemid'].']',null,null,$db_item['itemid']);
 			//if($db_item['templateid'] > 0) $chkBox->setEnabled(false);
 			$table->addRow(array(
+				$chkBox,
 				$show_host ? $db_item['host'] : null,
-				array($chkBox, $description),
+				$description,
 				$db_item['key_'],
 				$db_item['delay'],
 				$db_item['history'],

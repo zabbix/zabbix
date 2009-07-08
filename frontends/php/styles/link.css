@@ -1,74 +1,73 @@
 /* CSS Document */
-A {font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt;}
+a {font-family:Verdana, Arial, Helvetica, sans-serif; font-size:8pt; text-decoration: underline;}
+a:link 		{	color:#3C3089;  }
+a:visited 	{	color:#3C3089;  }
+a:hover 	{	color:#6C80B9;  }
+a:active 	{	color:#3C3089;  }
 
-a.highlight 		{	font-family: Verdana, Arial, sans-serif;	font-size:10px; 	font-weight: bold; }
-a.highlight:link 	{ 	text-decoration: none;		color: #ffffff; }
-a.highlight:visited {	text-decoration: none;		color: #ffffff; }
-a.highlight:hover	{	text-decoration: underline;	color: #ffcc00; }
+a.highlight 		{	font-size:10px; font-weight: bold; }
+a.highlight:link 	{ 	color: #ffffff; text-decoration: none; }
+a.highlight:visited {	color: #ffffff; text-decoration: none; }
+a.highlight:hover	{	color: #ffcc00; }
 
-A.enabled:link		{	color:#00AA00;	text-decoration: underline; }
-A.enabled:visited 	{	color:#00AA00;	text-decoration: underline; }
-A.enabled:hover 	{	color:#00AA00;	text-decoration: underline; }
-A.enabled:active 	{	color:#00AA00;	text-decoration: underline;}
+a.enabled:link		{	color:#00AA00;	}
+a.enabled:visited 	{	color:#00AA00;	}
+a.enabled:hover 	{	color:#44CC44;	}
+a.enabled:active 	{	color:#00AA00;	}
 
-A.disabled:link		{	color:#AA0000;	text-decoration: underline; }
-A.disabled:visited 	{	color:#AA0000;	text-decoration: underline; }
-A.disabled:hover 	{	color:#AA0000;	text-decoration: underline; }
-A.disabled:active 	{	color:#AA0000;	text-decoration: underline;}
+a.disabled:link		{	color:#AA0000;	}
+a.disabled:visited 	{	color:#AA0000;	}
+a.disabled:hover 	{	color:#CC4444;	}
+a.disabled:active 	{	color:#AA0000;	}
 
-A.orange:link		{	color:#EE7000;	text-decoration: underline; }
-A.orange:visited 	{	color:#EE7000;	text-decoration: underline; }
-A.orange:hover 		{	color:#EE7000;	text-decoration: underline; }
-A.orange:active 	{	color:#EE7000;	text-decoration: underline;}
+a.orange:link		{	color:#EE7000;	}
+a.orange:visited 	{	color:#EE7000;	}
+a.orange:hover 		{	color:#FF9444;	}
+a.orange:active 	{	color:#EE7000;	}
 
-A.unknown:link		{	color:#777777;	text-decoration: underline; }
-A.unknown:visited 	{	color:#777777;	text-decoration: underline; }
-A.unknown:hover 	{	color:#AAAAAA;	text-decoration: underline; }
-A.unknown:active 	{	color:#777777;	text-decoration: underline;}
+a.unknown:link		{	color:#777777;	}
+a.unknown:visited 	{	color:#777777;	}
+a.unknown:hover 	{	color:#999999;	}
+a.unknown:active 	{	color:#777777;	}
 
-A.off:link	{	color:#00AA00;	text-decoration: underline; }
-A.off:visited 	{	color:#00AA00;	text-decoration: underline; }
-A.off:hover 	{	color:#00AA00;	text-decoration: underline; }
-A.off:active 	{	color:#00AA00;	text-decoration: underline;}
+a.off:link		{	color:#00AA00;	}
+a.off:visited 	{	color:#00AA00;	}
+a.off:hover 	{	color:#00AA00;	}
+a.off:active 	{	color:#00AA00;	}
 
-A.on:link	{	color:#AA0000;	text-decoration: underline; }
-A.on:visited 	{	color:#AA0000;	text-decoration: underline; }
-A.on:hover 	{	color:#AA0000;	text-decoration: underline; }
-A.on:active 	{	color:#AA0000;	text-decoration: underline;}
+a.on:link		{	color:#AA0000;	}
+a.on:visited 	{	color:#AA0000;	}
+a.on:hover 		{	color:#CC7777;	}
+a.on:active 	{	color:#AA0000;	}
 
-A.action:link		{	color:#3C3089;	text-decoration: underline; }
-A.action:visited 	{	color:#3C3089;	text-decoration: underline; }
-A.action:hover 		{	color:#3C3089;	text-decoration: underline; }
-A.action:active 	{	color:#3C3089;	text-decoration: underline;}
+a.action:link		{	color:#3C3089;	}
+a.action:visited 	{	color:#3C3089;	}
+a.action:hover 		{	color:#3C3089;	}
+a.action:active 	{	color:#3C3089;	}
 
-a.small_font
-{
-	color: #000000;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 8pt;
-}
+a.small_font:link	{	color: #000000;	text-decoration: none; }
+a.small_font:visited{	color: #000000;	text-decoration: none; }
+a.small_font:hover	{	color: #000000;	text-decoration: underline; }
+a.small_font:active	{	color: #000000;	text-decoration: underline; }
 
-A.footer
-{
-	color:#CCCCCC;
-}
+a.footer	{	color:#CCCCCC; }
 
-A:link 		{color:#3C3089; text-decoration: underline; }
-A:visited 	{color:#3C3089; text-decoration: underline; }
-A:hover 	{color:#3C3089; text-decoration: underline; }
-A:active 	{color:#3C3089; text-decoration: underline;}
+a.header_sort:link		{	color:#222; text-decoration: none;  }
+a.header_sort:visited 	{	color:#222; text-decoration: none;  }
+a.header_sort:hover 	{	color:#222; text-decoration: underline; }
+a.header_sort:active 	{	color:#222; text-decoration: underline; }
 
-A.history:link		{color:#448;	text-decoration: none; font-size:10px;}
-A.history:visited 	{color:#448;	text-decoration: none; font-size:10px;}
-A.history:hover 	{color:#448;	text-decoration: underline; font-size:10px;}
-A.history:active 	{color:#448;	text-decoration: underline; font-size:10px;}
+a.history:link		{	color:#448; font-size:10px; text-decoration: none;  }
+a.history:visited 	{	color:#448; font-size:10px; text-decoration: none;  }
+a.history:hover 	{	color:#448; font-size:10px;  }
+a.history:active 	{	color:#448; font-size:10px;  }
 
-A.link:link		{color:#EEE;	text-decoration: none; font-size:10px;}
-A.link:visited 		{color:#EEE;	text-decoration: none; font-size:10px;}
-A.link:hover 		{color:#EEE;	text-decoration: underline; font-size:10px;}
-A.link:active 		{color:#EEE;	text-decoration: underline; font-size:10px;}
+a.link:link			{	color:#EEE; font-size:10px; text-decoration: none; }
+a.link:visited 		{	color:#EEE; font-size:10px; text-decoration: none; }
+a.link:hover 		{	color:#EEE; font-size:10px; }
+a.link:active 		{	color:#EEE; font-size:10px; }
 
-A.styled:link		{color:#000;	text-decoration: none; font-size: 10px;}
-A.styled:visited 	{color:#000;	text-decoration: none; font-size: 10px;}
-A.styled:hover 		{color:#000;	text-decoration: underline; font-size: 10px;}
-A.styled:active 	{color:#000;	text-decoration: underline; font-size: 10px;}
+a.styled:link		{	color:#000; font-size: 10px; text-decoration: none; }
+a.styled:visited 	{	color:#000; font-size: 10px; text-decoration: none; }
+a.styled:hover 		{	color:#000; font-size: 10px; }
+a.styled:active 	{	color:#000; font-size: 10px; }

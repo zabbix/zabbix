@@ -196,14 +196,21 @@ return false;
 function CheckAll(form_name, chkMain, shkName){
 	var frmForm = document.forms[form_name];
 	var value = frmForm.elements[chkMain].checked;
+
+	chkbxRange.checkAll(shkName, value);
+	return true;
+	
 	for (var i=0; i < frmForm.length; i++){
 		name = frmForm.elements[i].name.split('[')[0];
 		if(frmForm.elements[i].type != 'checkbox') continue;
 		if(name == chkMain) continue;
 		if(shkName && shkName != name) continue;
 		if(frmForm.elements[i].disabled == true) continue;
+		
 		frmForm.elements[i].checked = value;
 	}
+
+	chkbxRange.setGo();
 }
 
 function close_window(){
@@ -625,13 +632,16 @@ showSubMenu: function(show_label){
 /************************************************************************************/
 // Author: Aly
 
-var chkbx_range_ext = {
+var chkbxRange = {
 startbox: 			null,			// start checkbox obj
 startbox_name: 		null,			// start checkbox name
 chkboxes:			new Array(),	// ckbx list
+pageGoName:			null,			// wich checkboxes should be counted by Go button
+pageGoCount:		0,				// selected checkboxes
 
 init: function(){
 	var chk_bx = document.getElementsByTagName('input');
+	
 	for(var i=0; i < chk_bx.length; i++){
 		if((typeof(chk_bx[i]) != 'undefined') && (chk_bx[i].type.toLowerCase() == 'checkbox')){
 			this.implement(chk_bx[i]);
@@ -650,57 +660,118 @@ implement: function(obj){
 
 check: function(e){
 	var e = e || window.event;
-	if(!e.ctrlKey) return true;
 	var obj = eventTarget(e);
 
-	if((typeof(obj) != 'undefined') && (obj.type.toLowerCase() == 'checkbox')){
-		var obj_name = obj.name.split('[')[0];
+	if((typeof(obj) == 'undefined') || (obj.type.toLowerCase() != 'checkbox')){
+		return true;
+	}
+	
+	this.setGo();
 
-		if(!is_null(this.startbox) && (this.startbox_name == obj_name) && (obj.name != this.startbox.name)){
-			var chkbx_list = this.chkboxes[obj_name];
-			var flag = false;
+	if(!e.ctrlKey) return true;
+	
+	var obj_name = obj.name.split('[')[0];
+
+	if(!is_null(this.startbox) && (this.startbox_name == obj_name) && (obj.name != this.startbox.name)){
+		var chkbx_list = this.chkboxes[obj_name];
+		var flag = false;
+		
+		for(var i=0; i < chkbx_list.length; i++){
+			if(typeof(chkbx_list[i]) !='undefined'){
+//alert(obj.name+' == '+chkbx_list[i].name);
+				if(flag){
+					chkbx_list[i].checked = this.startbox.checked;
+				}
+
+				if(obj.name == chkbx_list[i].name) break;
+				if(this.startbox.name == chkbx_list[i].name) flag = true;
+			}
+		}
+		
+		if(flag){
+			this.startbox = null;
+			this.startbox_name = null;
 			
-			for(var i=0; i < chkbx_list.length; i++){
+			this.setGo();
+			return true;
+		}
+		else{
+			for(var i=chkbx_list.length-1; i >= 0; i--){
 				if(typeof(chkbx_list[i]) !='undefined'){
 //alert(obj.name+' == '+chkbx_list[i].name);
 					if(flag){
 						chkbx_list[i].checked = this.startbox.checked;
 					}
+					
+					if(obj.name == chkbx_list[i].name){
+						this.startbox = null;
+						this.startbox_name = null;
+						
+						this.setGo();
+						return true;
+					}
 
-					if(obj.name == chkbx_list[i].name) break;
 					if(this.startbox.name == chkbx_list[i].name) flag = true;
 				}
-			}
-			if(flag){
-				this.startbox = null;
-				this.startbox_name = null;
-				return true;
-			}
-			else{
-				for(var i=chkbx_list.length-1; i >= 0; i--){
-					if(typeof(chkbx_list[i]) !='undefined'){
-//alert(obj.name+' == '+chkbx_list[i].name);
-						if(flag){
-							chkbx_list[i].checked = this.startbox.checked;
-						}
-						
-						if(obj.name == chkbx_list[i].name){
-							this.startbox = null;
-							this.startbox_name = null;
-							return true;
-						}
-						if(this.startbox.name == chkbx_list[i].name) flag = true;
-					}
-				}	
-			}
+			}	
+		}
 
+	}
+	else{
+		if(!is_null(this.startbox)) this.startbox.checked = !this.startbox.checked;
+		
+		this.startbox = obj;
+		this.startbox_name = obj_name;
+	}
+	
+	this.setGo();
+},
+
+checkAll: function(name, value){
+	if(typeof(this.chkboxes[name]) == 'undefined') return false;
+
+	var chk_bx = this.chkboxes[name];
+	for(var i=0; i < chk_bx.length; i++){
+		if((typeof(chk_bx[i]) !='undefined') && (chk_bx[i].disabled != true)){
+			var box = chk_bx[i];
+			var obj_name = chk_bx[i].name.split('[')[0];
+
+			if(obj_name == name){
+
+				chk_bx[i].checked = value;
+			}
+											   
 		}
-		else{
-			if(!is_null(this.startbox)) this.startbox.checked = !this.startbox.checked;
-			
-			this.startbox = obj;
-			this.startbox_name = obj_name;
+	}	
+},
+
+setGo: function(){
+	if(!is_null(this.pageGoName)){
+		var countChecked = 0;
+		
+		if(typeof(this.chkboxes[this.pageGoName]) == 'undefined'){
+			alert('CheckBoxes with name '+this.pageGoName+' doesnt exists');
+			return false;
 		}
+
+		var chk_bx = this.chkboxes[this.pageGoName];
+		for(var i=0; i < chk_bx.length; i++){
+			if(typeof(chk_bx[i]) !='undefined'){
+				var box = chk_bx[i];
+				var obj_name = box.name.split('[')[0];
+				
+				if((obj_name == this.pageGoName) && (box.checked)){
+					countChecked++;
+				}
+												   
+			}
+		}
+		
+		var tmp_val = $('goButton').value.split(' ');
+		$('goButton').value = tmp_val[0]+' ('+countChecked+')';
+	}
+	else{
+		alert('NOt isset pageGoName')
 	}
 }
 }

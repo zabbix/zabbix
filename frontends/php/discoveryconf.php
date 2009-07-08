@@ -186,10 +186,10 @@ include_once "include/page_header.php";
 <?php
 /* header */
 	$form = new CForm();
-	$form->SetMethod('get');
+	$form->setMethod('get');
 
 	if(!isset($_REQUEST["form"]))
-		$form->AddItem(new CButton('form', S_CREATE_RULE));
+		$form->addItem(new CButton('form', S_CREATE_RULE));
 	show_table_header(S_CONFIGURATION_OF_DISCOVERY_BIG, $form);
 	echo SBR;
 
@@ -201,13 +201,12 @@ include_once "include/page_header.php";
 		show_table_header(S_DISCOVERY_BIG);
 /* table */
 		$form = new CForm();
-		$form->SetName('frmdrules');
+		$form->setName('frmdrules');
 
 		$tblDiscovery = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
-		$tblDiscovery->SetHeader(array(
-			array(	new CCheckBox('all_drules',null,"CheckAll('".$form->GetName()."','all_drules');"),
-				make_sorting_link(S_NAME,'d.name')
-			),
+		$tblDiscovery->setHeader(array(
+			new CCheckBox('all_drules',null,"CheckAll('".$form->GetName()."','all_drules');"),
+			make_sorting_link(S_NAME,'d.name'),
 			make_sorting_link(S_IP_RANGE,'d.iprange'),
 			make_sorting_link(S_DELAY,'d.delay'),
 			S_CHECKS,
@@ -239,19 +238,11 @@ include_once "include/page_header.php";
 			}
 
 			array_push($description,
-					new CLink($rule_data['name'], "?form=update&druleid=".$rule_data['druleid'],'action'));
+					new CLink($rule_data['name'], "?form=update&druleid=".$rule_data['druleid']));
 
-			$drule=new CCol(array(
-					new CCheckBox(
-						'g_druleid['.$rule_data["druleid"].']',		/* name */
-						null,			/* checked */
-						null,			/* action */
-						$rule_data["druleid"]),	/* value */
-					SPACE,
-					$description));
-
-			$tblDiscovery->AddRow(array(
-				$drule,
+			$tblDiscovery->addRow(array(
+				new CCheckBox('g_druleid['.$rule_data["druleid"].']',null,null,$rule_data["druleid"]),
+				$description,
 /*				array(
 					new CCheckBox(
 						"g_druleid[]",
@@ -260,7 +251,7 @@ include_once "include/page_header.php";
 						$rule_data["druleid"]),
 					SPACE,
 					new CLink($rule_data['name'],
-						"?form=update&druleid=".$rule_data['druleid'],'action'),
+						"?form=update&druleid=".$rule_data['druleid']),
 					),*/
 				$rule_data['iprange'],
 				$rule_data['delay'],
@@ -268,13 +259,13 @@ include_once "include/page_header.php";
 				$status
 				));
 		}
-		$tblDiscovery->SetFooter(new CCol(array(
+		$tblDiscovery->setFooter(new CCol(array(
 			new CButtonQMessage('group_enable',S_ENABLE_SELECTED, S_ENABLE_SELECTED_RULES_Q), SPACE,
 			new CButtonQMessage('group_disable',S_DISABLE_SELECTED, S_DISABLE_SELECTED_RULES_Q), SPACE,
 			new CButtonQMessage('group_delete',S_DELETE_SELECTED, S_DELETE_SELECTED_RULES_Q)
 		)));
 
-		$form->AddItem($tblDiscovery);
+		$form->addItem($tblDiscovery);
 		$form->Show();
 	}
 ?>

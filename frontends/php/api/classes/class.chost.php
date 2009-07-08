@@ -34,7 +34,7 @@ class CHost {
 	 * @param boolean $options['with_monitored_httptests'] only with monitores http tests
 	 * @param boolean $options['with_graphs'] only with graphs
 	 * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
-	 * @param int $options['extendselect'] return all fields for Hosts
+	 * @param int $options['extendoutput'] return all fields for Hosts
 	 * @param int $options['count'] count Hosts, returned column name is rowscount
 	 * @param string $options['pattern'] search hosts by pattern in host names
 	 * @param int $options['limit'] limit selection
@@ -74,7 +74,7 @@ class CHost {
 			'with_graphs'				=> false,
 			'editable'					=> false,
 			'nopermissions'				=> false,
-			'extenduotput'				=> false,
+			'extendoutput'				=> false,
 			'count'						=> false,
 			'pattern'					=> '',
 			'extend_pattern'			=> false,
@@ -198,8 +198,8 @@ class CHost {
 						AND i.itemid=gi.itemid)';
 		}
 
-// extenduotput
-		if($options['extenduotput']){
+// extendoutput
+		if($options['extendoutput']){
 			$sql_parts['select']['hosts'] = 'h.*';
 		}
 		

@@ -371,7 +371,7 @@ include_once('include/page_header.php');
 <?php
 /* header */
 	$form = new CForm();
-	$form->SetMethod('get');
+	$form->setMethod('get');
 
 	$form->addVar('eventsource', $_REQUEST['eventsource']);
 	if(!isset($_REQUEST['form'])){
@@ -430,8 +430,8 @@ include_once('include/page_header.php');
 
 
 		$right_tab = new CTable();
-		$right_tab->SetCellPadding(3);
-		$right_tab->SetCellSpacing(3);
+		$right_tab->setCellPadding(3);
+		$right_tab->setCellSpacing(3);
 
 		$right_tab->addOption('border',0);
 
@@ -468,8 +468,8 @@ include_once('include/page_header.php');
 
 		$outer_table = new CTable();
 		$outer_table->addOption('border',0);
-		$outer_table->SetCellPadding(1);
-		$outer_table->SetCellSpacing(1);
+		$outer_table->setCellPadding(1);
+		$outer_table->setCellSpacing(1);
 		$outer_table->addRow(array($td_l,$td_r));
 
 		$frmAction->additem($outer_table);
@@ -480,7 +480,7 @@ include_once('include/page_header.php');
 	}
 	else{
 		$form = new CForm();
-		$form->SetMethod('get');
+		$form->setMethod('get');
 
 		$cmbSource = new CComboBox('eventsource',$_REQUEST['eventsource'],'submit()');
 		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS,S_TRIGGERS);
@@ -499,13 +499,12 @@ include_once('include/page_header.php');
 		unset($form, $cmbSource);
 /* table */
 		$form = new CForm();
-		$form->SetName('actions');
+		$form->setName('actions');
 
 		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
-		$tblActions->SetHeader(array(
-			array(	new CCheckBox('all_items',null,'CheckAll("'.$form->GetName().'","all_items");'),
-				make_sorting_link(S_NAME,'a.name')
-			),
+		$tblActions->setHeader(array(
+			new CCheckBox('all_items',null,'CheckAll("'.$form->GetName().'","all_items");'),
+			make_sorting_link(S_NAME,'a.name'),
 			S_CONDITIONS,
 			S_OPERATIONS,
 			make_sorting_link(S_STATUS,'a.status')
@@ -548,17 +547,8 @@ include_once('include/page_header.php');
 			}
 
 			$tblActions->addRow(array(
-				array(
-					new CCheckBox(
-						'g_actionid['.$action_data['actionid'].']',			/* name */
-						null,				/* checked */
-						null,				/* action */
-						$action_data['actionid']),	/* value */
-					SPACE,
-					new CLink(
-						$action_data['name'],
-						'actionconf.php?form=update&actionid='.$action_data['actionid'],'action'),
-					),
+				new CCheckBox('g_actionid['.$action_data['actionid'].']',null,null,$action_data['actionid']),
+				new CLink($action_data['name'],'actionconf.php?form=update&actionid='.$action_data['actionid']),
 				$conditions,
 				$operations,
 				$status
@@ -566,7 +556,7 @@ include_once('include/page_header.php');
 			$row_count++;
 		}
 
-		$tblActions->SetFooter(new CCol(array(
+		$tblActions->setFooter(new CCol(array(
 			new CButtonQMessage('group_enable',S_ENABLE_SELECTED,S_ENABLE_SELECTED_ACTIONS_Q),
 			SPACE,
 			new CButtonQMessage('group_disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_ACTIONS_Q),
