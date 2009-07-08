@@ -356,9 +356,10 @@ include_once 'include/page_header.php';
 
 		$table  = new CTableInfo();
 		$table->setHeader(array(
+			new CCheckBox('all_httptests',null, "CheckAll('".$form->getName()."','all_httptests');"),
 			is_show_all_nodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
 			$_REQUEST['hostid'] ==0 ? make_sorting_link(S_HOST,'h.host') : NULL,
-			array($link, SPACE, new CCheckBox('all_httptests',null, "CheckAll('".$form->getName()."','all_httptests');"),  make_sorting_link(S_NAME,'wt.name')),
+			array($link, SPACE, make_sorting_link(S_NAME,'wt.name')),
 			S_NUMBER_OF_STEPS,
 			S_UPDATE_INTERVAL,
 			make_sorting_link(S_STATUS,'wt.status')));
@@ -447,13 +448,15 @@ include_once 'include/page_header.php';
 			$step_cout = DBfetch(DBselect('select count(*) as cnt from httpstep where httptestid='.$httptest_data['httptestid']));
 			$step_cout = $step_cout['cnt'];
 
-			array_push($app_rows, new CRow(array(
-				is_show_all_nodes()?SPACE:NULL,
-				($_REQUEST['hostid']>0)?NULL:SPACE,
-				array(str_repeat(SPACE,4),$chkBox, $name),
-				$step_cout,
-				$httptest_data['delay'],
-				$status
+			array_push($app_rows, 
+				new CRow(array(
+					$chkBox,
+					is_show_all_nodes()?SPACE:NULL,
+					($_REQUEST['hostid']>0)?NULL:SPACE,
+					array(str_repeat(SPACE,4), $name),
+					$step_cout,
+					$httptest_data['delay'],
+					$status
 				)));
 		}
 		unset($app_rows);

@@ -59,7 +59,9 @@ $frmForm = new CForm();
 $frmForm->SetMethod('get');
 $frmForm->addItem(new CButton('form',S_CREATE_SCRIPT,"javascript: redirect('scripts.php?form=1');"));
 show_table_header(S_SCRIPTS_CONFIGURATION, $frmForm);
+
 echo SBR;
+
 if(isset($_REQUEST['action'])){
 
     if(isset($_REQUEST['save'])){
@@ -225,7 +227,8 @@ else {
 
     $table=new CTableInfo(S_NO_SCRIPTS_DEFINED);
     $table->setHeader(array(
-            array(new CCheckBox('all_scripts',null,"CheckAll('".$form->GetName()."','all_scripts');"),make_sorting_link(S_NAME,'s.name')),
+			new CCheckBox('all_scripts',null,"CheckAll('".$form->GetName()."','all_scripts');"),
+            make_sorting_link(S_NAME,'s.name'),
             make_sorting_link(S_COMMAND,'s.command'),
             S_USER_GROUP,
             S_HOST_GROUP,
@@ -256,10 +259,8 @@ else {
 
 
         $table->addRow(array(
-                array(
-                    new CCheckBox('scripts['.$script['scriptid'].']','no',NULL,$script['scriptid']),
-                    new CLink($script['name'],'scripts.php?form=1'.'&scriptid='.$script['scriptid'].'#form','action')
-                ),
+				new CCheckBox('scripts['.$script['scriptid'].']','no',NULL,$script['scriptid']),
+				new CLink($script['name'],'scripts.php?form=1'.'&scriptid='.$script['scriptid'].'#form'),
                 htmlspecialchars($script['command']),
                 $user_group_name,
                 $host_group_name,

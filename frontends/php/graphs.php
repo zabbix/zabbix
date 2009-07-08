@@ -430,9 +430,9 @@ include_once 'include/page_header.php';
 
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
 		$table->setHeader(array(
+			new CCheckBox('all_graphs',NULL,"CheckAll('".$form->GetName()."','all_graphs');"),
 			$_REQUEST['hostid'] != 0 ? NULL : S_HOSTS,
-			array(	new CCheckBox('all_graphs',NULL,"CheckAll('".$form->GetName()."','all_graphs');"),
-				make_sorting_link(S_NAME,'g.name')),
+			make_sorting_link(S_NAME,'g.name'),
 			make_sorting_link(S_WIDTH,'g.width'),
 			make_sorting_link(S_HEIGHT,'g.height'),
 			make_sorting_link(S_GRAPH_TYPE,'g.graphtype')));
@@ -465,7 +465,7 @@ include_once 'include/page_header.php';
 
 			if($row['templateid']==0){
 				$name = new CLink($row['name'],
-					'graphs.php?graphid='.$row['graphid'].'&form=update','action');
+					'graphs.php?graphid='.$row['graphid'].'&form=update');
 			}
 			else {
 				$real_hosts = get_realhosts_by_graphid($row['templateid']);
@@ -507,8 +507,9 @@ include_once 'include/page_header.php';
 			}
 
 			$table->addRow(array(
+				$chkBox,
 				$host_list,
-				array($chkBox, $name),
+				$name,
 				$row['width'],
 				$row['height'],
 				$graphtype

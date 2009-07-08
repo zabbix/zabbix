@@ -476,8 +476,9 @@
 	'S_GROUP_FOR_DISCOVERED_HOSTS'=>		'Group for discovered hosts',
 
 //	nodes.php
-	'S_NODE'=>			'Node',
-	'S_NODES'=>			'Nodes',
+	'S_DM'=>				'DM',	// Distributed Monitoring
+	'S_NODE'=>				'Node',
+	'S_NODES'=>				'Nodes',
 	'S_NODES_BIG'=>			'NODES',
 	'S_NEW_NODE'=>			'New node',
 	'S_NO_NODES_DEFINED'=>		'No nodes defined',
@@ -883,6 +884,7 @@
 	'S_KEY'=>						'Key',
 	'S_DESCRIPTION'=>					'Description',
 	'S_UPDATE_INTERVAL'=>					'Update interval',
+	'S_INTERVAL'=>						'Interval',
 	'S_HISTORY'=>						'History',
 	'S_TRENDS'=>						'Trends',
 	'S_ZABBIX_AGENT'=>					'ZABBIX agent',

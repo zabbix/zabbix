@@ -1098,10 +1098,10 @@ function __autoload($class_name){
 		$url.='sort='.$tabfield.'&sortorder='.$sortorder;
 
 		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
-			$link = new CLink($obj,$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+			$link = new CLink($obj,$url,'header_sort',"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
 		}
 		else{
-			$link = new CLink($obj,$url);
+			$link = new CLink($obj,$url,'header_sort');
 		}
 
 		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){

@@ -158,11 +158,11 @@ include_once "include/page_header.php";
 		}
 
 		$form = new CFormTable($frm_title,null,"post","multipart/form-data");
-		$form->AddVar('config', $config);
-		$form->AddRow(S_IMPORT_FILE, new CFile('import_file'));
+		$form->addVar('config', $config);
+		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
 
 		$table = new CTable();
-		$table->SetHeader(array(S_ELEMENT, S_EXISTING, S_MISSING),'bold');
+		$table->setHeader(array(S_ELEMENT, S_EXISTING, S_MISSING),'bold');
 
 		foreach(array(
 				'host'		=> S_HOST,
@@ -186,9 +186,9 @@ include_once "include/page_header.php";
 			$table->addRow(array($title, $cmbExist, $cmbMissed));
 		}
 
-		$form->AddRow(S_RULES, $table);
+		$form->addRow(S_RULES, $table);
 
-		$form->AddItemToBottomRow(new CButton('import', S_IMPORT));
+		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
 		$form->Show();
 	}
 	else{
@@ -268,9 +268,9 @@ include_once "include/page_header.php";
 		else{
 	/* table HOSTS */
 			$form = new CForm(null,'post');
-			$form->SetName('hosts');
-			$form->AddVar('config',$config);
-			$form->AddVar('update', true);
+			$form->setName('hosts');
+			$form->addVar('config',$config);
+			$form->addVar('update', true);
 
 			$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 			foreach($PAGE_GROUPS['groups'] as $groupid => $name){
@@ -283,8 +283,8 @@ include_once "include/page_header.php";
 
 			$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 			$table->setHeader(array(
-				array(	new CCheckBox("all_hosts",true, "CheckAll('".$form->GetName()."','all_hosts','hosts');"),
-					make_sorting_link(S_NAME,'h.host')),
+				new CCheckBox("all_hosts",true, "CheckAll('".$form->GetName()."','all_hosts','hosts');"),
+				make_sorting_link(S_NAME,'h.host'),
 				make_sorting_link(S_DNS,'h.dns'),
 				make_sorting_link(S_IP,'h.ip'),
 				make_sorting_link(S_PORT,'h.port'),
@@ -366,14 +366,6 @@ include_once "include/page_header.php";
 			}
 
 			foreach($hosts as $hostid => $host){
-				$host_name=new CCol(array(
-					new CCheckBox('hosts['.$host['hostid'].']',
-						isset($hosts[$host['hostid']]) || !isset($update),
-						NULL,true),
-					SPACE,
-					$host['host']
-					));
-
 				$status = new CCol(host_status2str($host['status']),host_status2style($host['status']));
 
 				/* calculate template */
@@ -437,8 +429,9 @@ include_once "include/page_header.php";
 					$port = (empty($host["port"]))?'-':$host["port"];
 				}
 
-				$table->AddRow(array(
-					$host_name,
+				$table->addRow(array(
+					new CCheckBox('hosts['.$host['hostid'].']',isset($hosts[$host['hostid']]) || !isset($update),NULL,true),
+					$host['host'],
 					$dns,
 					$ip,
 					$port,
@@ -455,12 +448,12 @@ include_once "include/page_header.php";
 					));
 			}
 
-			$table->SetFooter(new CCol(array(
+			$table->setFooter(new CCol(array(
 				new CButton('preview', S_PREVIEW),
 				new CButton('export', S_EXPORT)
 				)));
 
-			$form->AddItem($table);
+			$form->addItem($table);
 			$form->Show();
 		}
 	}
