@@ -61,13 +61,13 @@ point them all to the same buffer */
 	/* grab all swap info */
 	swapctl(SC_LIST, swt);
 
-	/* walk thru the structs and sum up the fields */
+	/* walk through the structs and sum up the fields */
 	t = f = 0;
 	ste = &(swt->swt_ent[0]);
 	i = cnt;
 	while (--i >= 0)
 	{
-		/* dont count slots being deleted */
+		/* don't count slots being deleted */
 		if (!(ste->ste_flags & ST_INDEL) &&
 		!(ste->ste_flags & ST_DOINGDEL))
 		{
@@ -129,7 +129,7 @@ static int	SYSTEM_SWAP_PFREE(const char *cmd, const char *param, unsigned flags,
 	                return  SYSINFO_RET_FAIL;
 	tot_val = result_tmp.ui64;
 
-	/* Check fot division by zero */
+	/* Check for division by zero */
 	if(tot_val == 0)
 	{
 		free_result(&result_tmp);
@@ -164,7 +164,7 @@ static int	SYSTEM_SWAP_PUSED(const char *cmd, const char *param, unsigned flags,
                 	return  SYSINFO_RET_FAIL;
 	tot_val = result_tmp.ui64;
 
-	/* Check fot division by zero */
+	/* Check for division by zero */
 	if(tot_val == 0)
 	{
 		free_result(&result_tmp);
