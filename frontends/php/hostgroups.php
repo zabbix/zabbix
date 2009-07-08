@@ -353,7 +353,7 @@ validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 
 		$groups = CHostGroup::get(array('order'=> 'name', 'editable' => 1));
 		$groupids = array_keys($groups);
-		$hosts = CHost::get(array('groupids' => $groupids, 'extenduotput' => 1, 'templated_hosts' => 1));
+		$hosts = CHost::get(array('groupids' => $groupids, 'extendoutput' => 1, 'templated_hosts' => 1));
 
 		foreach($groups as $groupid => $group){
 			$groups[$groupid]['hosts'] = array();

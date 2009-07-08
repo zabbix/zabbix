@@ -117,7 +117,7 @@ class CHost {
 // groupids
 		if($options['groupids']){
 			zbx_value2array($options['groupids']);
-			if($options['extenduotput']){
+			if($options['extendoutput']){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 			$sql_parts['from']['hg'] = 'hosts_groups hg';

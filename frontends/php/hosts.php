@@ -1361,7 +1361,7 @@ include_once('include/page_header.php');
 
 				$templates_linked = array();
 				foreach($templates as $templateid => $temp){
-					$templates_linked[$templateid] = array(empty($templates_linked)?'':', ',host_js_menu($templateid, $templates[$templateid]));
+					$templates_linked[$templateid] = array(empty($templates_linked)?'':', ',$templates[$templateid]);
 				}
 
 				$table->addRow(array(
