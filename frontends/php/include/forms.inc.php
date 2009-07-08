@@ -738,13 +738,15 @@
 			$password2	= null;
 			$url		= $user['url'];
 			$autologin	= $user['autologin'];
-			$autologout	= $_REQUEST['autologout'] = $user['autologout'];
+			$autologout	= $user['autologout'];
 			$lang		= $user['lang'];
 			$theme 		= $user['theme'];
 			$refresh	= $user['refresh'];
 			$rows_per_page = $user['rows_per_page'];
 			$user_type	= $user['type'];
 
+			if($autologout > 0) $_REQUEST['autologout'] = $autologout;
+			
 			$user_groups	= array();
 			$user_medias		= array();
 
