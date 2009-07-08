@@ -260,7 +260,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 		        _ftime(&current_time);
 
 			tm = localtime(&current_time.time);
-			milliseconds = current_time.millitm/1000;
+			milliseconds = current_time.millitm;
 #else /* not _WINDOWS */
 
 			gettimeofday(&current_time,NULL);
