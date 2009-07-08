@@ -92,7 +92,7 @@ double	zbx_time(void)
 
 	_ftime(&current);
 
-	return (((double)current.time) + 1.0e-6 * ((double)current.millitm));
+	return (((double)current.time) + 1.0e-3 * ((double)current.millitm));
 
 #else /* not _WINDOWS */
 
