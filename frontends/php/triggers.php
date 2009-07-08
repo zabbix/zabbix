@@ -450,14 +450,12 @@
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->setHeader(array(
+			new CCheckBox('all_triggers',NULL,"CheckAll('".$form->GetName()."','all_triggers');"),
 			make_sorting_link(S_SEVERITY,'t.priority'),
 			make_sorting_link(S_STATUS,'t.status'),
 
 			($_REQUEST['hostid'] > 0)?NULL:make_sorting_link(S_HOST,'h.host'),
-			array(	new CCheckBox('all_triggers',NULL,
-					"CheckAll('".$form->GetName()."','all_triggers');")
-				,make_sorting_link(S_NAME,'t.description'),
-			),
+			make_sorting_link(S_NAME,'t.description'),
 			S_EXPRESSION,
 			S_ERROR));
 
@@ -486,7 +484,7 @@
 			if(is_null($row['host'])) $row['host'] = '';
 			if(is_null($row['hostid'])) $row['hostid'] = '0';
 
-			$description = array(new CCheckBox('g_triggerid['.$row['triggerid'].']', NULL,NULL,$row['triggerid']), SPACE);
+			$description = array();
 
 			if($row['templateid']){
 				$real_hosts = get_realhosts_by_triggerid($row['triggerid']);
@@ -501,8 +499,7 @@
 			}
 
 			$description[] = new CLink(expand_trigger_description($row['triggerid']),
-				'triggers.php?form=update&triggerid='.$row['triggerid'].
-					'&hostid='.$row['hostid'], 'action');
+										'triggers.php?form=update&triggerid='.$row['triggerid'].'&hostid='.$row['hostid']);
 
 			//add dependencies
 			$deps = get_trigger_dependencies_by_triggerid($row['triggerid']);
@@ -530,11 +527,12 @@
 				}
 			}
 
-			if(($row['error'] != '') && ($row['hoststatus'] != HOST_STATUS_TEMPLATE)){
-				//$img_error = new CImg('images/general/error.png');
-				$img_error = new CDiv(new CImg('images/general/error.png'));
-				$img_error->addStyle('text-align: center; display: block;');
-				$img_error->setHint($row['error'], '', 'red ');
+			if(!zbx_empty($row['error']) && (HOST_STATUS_TEMPLATE != $row['hoststatus'])){
+				$error = new CDiv(SPACE,'error_icon');
+				$error->setHint($row['error'], '', 'on');
+			}
+			else{
+				$error = new CDiv(SPACE,'ok_icon');
 			}
 
 			switch($row['priority']){
@@ -569,12 +567,13 @@
 			if($row['status'] != TRIGGER_STATUS_UNKNOWN)	$row['error']=SPACE;
 
 			$table->addRow(array(
+				new CCheckBox('g_triggerid['.$row['triggerid'].']', NULL,NULL,$row['triggerid']),
 				$priority,
 				$status,
 				$_REQUEST['hostid'] > 0 ? NULL : $row['host'],
 				$description,
 				explode_exp($row['expression'],1),
-				$img_error
+				$error
 			));
 			$row_count++;
 		}

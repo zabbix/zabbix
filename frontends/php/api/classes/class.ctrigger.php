@@ -29,7 +29,7 @@ class CTrigger {
 	 * @param array $options['status']
 	 * @param array $options['templated_items']
 	 * @param array $options['editable']
-	 * @param array $options['extendselect']
+	 * @param array $options['extendoutput']
 	 * @param array $options['count']
 	 * @param array $options['pattern']
 	 * @param array $options['limit']
@@ -65,7 +65,7 @@ class CTrigger {
 			'templated_triggers'	=> false,
 			'editable'				=> false,
 			'nopermissions'			=> false,
-			'extendselect'			=> false,
+			'extendoutput'			=> false,
 			'count'					=> false,
 			'pattern'				=> '',
 			'limit'					=> null,
@@ -173,8 +173,8 @@ class CTrigger {
 			$sql_parts['where'][] = 't.templateid<>0';
 		}
 		
-// extendselect
-		if($options['extendselect']){
+// extendoutput
+		if($options['extendoutput']){
 			$sql_parts['select'] = array('t.*');
 		}
 		

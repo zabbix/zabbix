@@ -104,7 +104,7 @@ include_once('include/page_header.php');
 // FIND Hosts
 	$params = array(
 				'nodeids'=> get_current_nodeid(),
-				'extendselect' => true,
+				'extendoutput' => true,
 				'pattern' => $search,
 				'extend_pattern' => true,
 				'limit' => $rows_per_page,

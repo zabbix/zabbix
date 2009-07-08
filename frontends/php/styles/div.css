@@ -242,6 +242,28 @@ div.dbl_arrow_up:hover{
 	cursor:pointer;
 }
 
+div.error_icon{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/error.png');
+	background-repeat:no-repeat;
+}
+
+div.error_icon:hover{
+	cursor:pointer;
+}
+
+div.ok_icon{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/ok.png');
+	background-repeat:no-repeat;
+}
+
+div.ok_icon:hover{
+	cursor:pointer;
+}
+
 /********* DIV IMG END *********/
 
 span.link{

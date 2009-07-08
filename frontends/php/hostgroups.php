@@ -345,15 +345,12 @@ validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 
 		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
 		$table->setHeader(array(
-				array(	
 					new CCheckBox('all_groups', NULL, "CheckAll('".$form->GetName()."','all_groups');"),
-					SPACE,
-					make_sorting_link(S_NAME,'g.name')),
-				' # ',
-				S_MEMBERS));
+					make_sorting_link(S_NAME,'g.name'),
+					' # ',
+					S_MEMBERS
+				));
 
-		$dlt_groups = getDeletableHostGroups();
-		
 		$groups = CHostGroup::get(array('order'=> 'name', 'editable' => 1));
 		$groupids = array_keys($groups);
 		$hosts = CHost::get(array('groupids' => $groupids, 'extenduotput' => 1, 'templated_hosts' => 1));
@@ -390,20 +387,14 @@ validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 					default:
 						$style = 'on';
 				}
-				array_push($hosts_output, (empty($hosts_output) ? '' : ', '), new CLink(new CSpan($host['host'], $style), $link));
+				array_push($hosts_output, (empty($hosts_output) ? '' : ', '), new CLink($host['host'], $link, $style));
 			}
 
 			$checkbox_group = new CCheckBox('groups['.$groupid.']', NULL, NULL, $groupid);
-			if(!isset($dlt_groups[$groupid])){
-				$checkbox_group->addOption('disabled', 'disabled');
-			}
 
 			$table->addRow(array(
-				array(
-					$checkbox_group,
-					SPACE,
-					new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$groupid, 'action')
-				),
+				$checkbox_group,
+				new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$groupid),
 				new CLink(count($group['hosts']), 'hosts.php?groupid='.$groupid),
 				new CCol((empty($hosts_output) ? '-' : $hosts_output), 'wraptext')
 			));

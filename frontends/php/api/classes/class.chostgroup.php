@@ -114,7 +114,7 @@ class CHostGroup {
 			'only_current_node'			=> false,
 			'editable'					=> false,
 			'nopermissions'				=> false,
-			'extendselect'				=> false,
+			'extendoutput'				=> false,
 			'count'						=> false,
 			'pattern' 					=> '',
 			'order'						=> '',
@@ -273,8 +273,8 @@ class CHostGroup {
 											' AND i.itemid=gi.itemid)';
 		}
 
-// extendselect
-		if($options['extendselect']){
+// extendoutput
+		if($options['extendoutput']){
 			$sql_parts['select'] = array('g.*');
 		}
 		

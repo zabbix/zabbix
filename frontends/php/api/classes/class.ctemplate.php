@@ -49,7 +49,7 @@ class CTemplate {
 			'with_graphs'		=> false,
 			'editable' 			=> false,
 			'nopermissions'		=> false,
-			'extendselect'			=> false,
+			'extendoutput'			=> false,
 			'count'				=> false,
 			'pattern'			=> '',
 			'order'				=> '',
@@ -126,8 +126,8 @@ class CTemplate {
 						AND i.itemid=gi.itemid)';
 		}
 
-// extendselect
-		if($options['extendselect']){
+// extendoutput
+		if($options['extendoutput']){
 			$sql_parts['select'] = array('h.*');
 		}
 

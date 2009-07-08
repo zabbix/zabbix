@@ -38,7 +38,7 @@ td.right{
 }
 
 /**************** PAGE TABLE ****************/
-/* header */
+/* page_header */
 table.page_header{
 	background-color: #FFFFFF;
 	border-color: #000000;
@@ -509,6 +509,18 @@ table.tableinfo tr.header td {
 	border-width: 0px;
 }
 
+table.tableinfo tr.header td.hover_grey {
+	white-space: nowrap;
+	word-spacing:	0px;
+	font-weight: bold;
+	background-color:#CCCCCC;
+	border-width: 0px;
+}
+
+table.tableinfo tr.header td.hover_grey:hover {
+	background-color:#DDDDDD;
+}
+
 table.tableinfo tr.vertical_header td {
 	padding-left: 0px;
 	padding-right: 0px;
@@ -533,6 +545,10 @@ table.tableinfo tr.footer td {
 	padding-left: 5px;
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:10px;
+}
+
+table.tableinfo tr > td:first-child{
+	width: 1px;
 }
 
 table.tableinfo tr td.wraptext {
@@ -630,6 +646,16 @@ table.header tr td.header_l{
 	padding-left: 5px;
 	border-width: 0px;
 }
+table.header tr td.header_r{
+	background:none;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	text-align: right;
+	height: 24px;
+	padding-right: 5px;
+	border-width: 0px;
+}
+
 table.header tr td.header_r{
 	background:none;
 	font-family:verdana, arial, helvetica, sans-serif;

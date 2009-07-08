@@ -63,7 +63,7 @@ class CItem {
 			'templated_items'	=> false,
 			'editable'			=> false,
 			'nopermissions'		=> false,
-			'extendselect'			=> false,
+			'extendoutput'			=> false,
 			'count'				=> false,
 			'pattern'			=> '',
 			'limit'				=> null,
@@ -143,8 +143,8 @@ class CItem {
 			$sql_parts['where'][] = 'i.templateid<>0';
 		}
 
-// extendselect
-		if($options['extendselect']){
+// extendoutput
+		if($options['extendoutput']){
 			$sql_parts['select'] = array('i.*');
 		}
 

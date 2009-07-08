@@ -702,7 +702,7 @@
 				else if($row['imagetype'] == IMAGE_TYPE_BACKGROUND)	$imagetype=S_BACKGROUND;
 				else				$imagetype=S_UNKNOWN;
 
-				$name=new CLink($row['name'],'config.php?form=update'.url_param('config').'&imageid='.$row['imageid'],'action');
+				$name = new CLink($row['name'],'config.php?form=update'.url_param('config').'&imageid='.$row['imageid']);
 
 				$table->addRow(array(
 					$name,
@@ -947,22 +947,16 @@
 
 			$table = new CTableInfo();
 			$table->setHeader(array(
-				array(
-					new CCheckBox('all_regexps',NULL,"CheckAll('".$form->GetName()."','all_regexps','group_regexpid');"),
-					S_NAME
-				),
+				new CCheckBox('all_regexps',NULL,"CheckAll('".$form->GetName()."','all_regexps','group_regexpid');"),
+				S_NAME,
 				S_EXPRESSIONS
 				));
 
 			foreach($regexps as $regexpid => $regexp){
 
 				$table->addRow(array(
-					array(
-						new CCheckBox('regexpids['.$regexp['regexpid'].']',NULL,NULL,$regexp['regexpid']),
-						new CLink($regexp['name'],
-							'config.php?form=update'.url_param('config').
-							'&regexpid='.$regexp['regexpid'].'#form', 'action')
-					),
+					new CCheckBox('regexpids['.$regexp['regexpid'].']',NULL,NULL,$regexp['regexpid']),
+					new CLink($regexp['name'],'config.php?form=update'.url_param('config').'&regexpid='.$regexp['regexpid'].'#form'),
 					isset($expressions[$regexpid])?$expressions[$regexpid]:'-'
 					));
 			}
