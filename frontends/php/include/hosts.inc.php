@@ -139,7 +139,7 @@ require_once "include/httptest.inc.php";
 	 * Function: check_circle_host_link
 	 *
 	 * Description:
-	 *     Check templates linage circeling
+	 *     Check for circular templates linkage
 	 *
 	 * Author:
 	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
@@ -216,7 +216,7 @@ require_once "include/httptest.inc.php";
 		}
 		else{
 			if(check_circle_host_link($hostid, $templates)){
-				error("Circle link can't be created");
+				error("Circular link can't be created");
 				return false;
 			}
 			$result = DBexecute('UPDATE hosts SET proxy_hostid='.$proxy_hostid.
