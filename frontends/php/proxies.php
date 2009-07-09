@@ -21,128 +21,38 @@
 <?php
 	require_once('include/config.inc.php');
 	require_once('include/hosts.inc.php');
-	require_once('include/forms.inc.php');
 
 	$page['title'] = "S_PROXIES";
 	$page['file'] = 'proxies.php';
-	// $page['hist_arg'] = array('groupid','config','hostid');
+	$page['hist_arg'] = array('config');
 	// $page['scripts'] = array('menu_scripts.js','calendar.js');
 
+	$_REQUEST['config'] = get_request('config',0);
+	if($_REQUEST['config'] == 0) redirect('nodes.php');
+	
 include_once('include/page_header.php');
 
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 
-	if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !isset($available_groups[$_REQUEST['groupid']])){
-		access_deny();
-	}
 	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_hosts[$_REQUEST['hostid']])) {
-		access_deny();
-	}
-	if(isset($_REQUEST['apphostid']) && ($_REQUEST['apphostid']>0) && !isset($available_hosts[$_REQUEST['apphostid']])) {
 		access_deny();
 	}
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
+		'config'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null), // 0 - nodes, 1 - proxies
 /* ARRAYS */
+		'hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'isset({form})&&({form}=="update")'),
+		'host'=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'isset({save})'),		
 		'hosts'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'groups'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'hostids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'groupids'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'applications'=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-/* host */
-		'hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'isset({config})&&({config}==0||{config}==5||{config}==2)&&isset({form})&&({form}=="update")'),
-		'host'=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'isset({config})&&({config}==0||{config}==3||{config}==5)&&isset({save})&&!isset({massupdate})'),
-		'proxy_hostid'=>array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,		'isset({config})&&({config}==0)&&isset({save})&&!isset({massupdate})'),
-		'dns'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'(isset({config})&&({config}==0))&&isset({save})&&!isset({massupdate})'),
-		'useip'=>	array(T_ZBX_STR, O_OPT, NULL,	IN('0,1'),	'(isset({config})&&({config}==0))&&isset({save})&&!isset({massupdate})'),
-		'ip'=>		array(T_ZBX_IP, O_OPT, NULL,	NULL,		'(isset({config})&&({config}==0))&&isset({save})&&!isset({massupdate})'),
-		'port'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),'(isset({config})&&({config}==0))&&isset({save})&&!isset({massupdate})'),
-		'status'=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1,3'),	'(isset({config})&&({config}==0))&&isset({save})&&!isset({massupdate})'),
-
-		'newgroup'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
-		'templates'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	NULL),
-		'clear_templates'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
-
-		'useipmi'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,			NULL),
-		'ipmi_ip'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,			'isset({useipmi})&&!isset({massupdate})'),
-		'ipmi_port'=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),	'isset({useipmi})&&!isset({massupdate})'),
-		'ipmi_authtype'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(-1,6),		'isset({useipmi})&&!isset({massupdate})'),
-		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(1,5),		'isset({useipmi})&&!isset({massupdate})'),
-		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,			'isset({useipmi})&&!isset({massupdate})'),
-		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,			'isset({useipmi})&&!isset({massupdate})'),
-
-		'useprofile'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
-		'devicetype'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'name'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'os'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'serialno'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'tag'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'macaddress'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'hardware'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'software'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'contact'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'location'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'notes'=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-
-		'useprofile_ext'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
-		'ext_host_profiles'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,   NULL,   NULL),
-
-/* mass update*/
-		'massupdate'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'visible'=>			array(T_ZBX_STR, O_OPT,	null, 	null,	null),
-
-/* group */
-		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'(isset({config})&&({config}==1))&&(isset({form})&&({form}=="update"))'),
-		'gname'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'(isset({config})&&({config}==1))&&isset({save})'),
-
-/* application */
-		'applicationid'=>	array(T_ZBX_INT,O_OPT,	P_SYS,	DB_ID,		'(isset({config})&&({config}==4))&&(isset({form})&&({form}=="update"))'),
-		'appname'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'(isset({config})&&({config}==4))&&isset({save})'),
-		'apphostid'=>		array(T_ZBX_INT, O_OPT, NULL,	DB_ID.'{}>0',	'(isset({config})&&({config}==4))&&isset({save})'),
-		'apptemplateid'=>	array(T_ZBX_INT,O_OPT,	NULL,	DB_ID,	NULL),
-
-/* host linkage form */
-		'tname'=>			array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'isset({config})&&({config}==2)&&isset({save})'),
-		'twb_groupid'=> 	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
-
-// maintenance
-		'maintenanceid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'(isset({config})&&({config}==6))&&(isset({form})&&({form}=="update"))'),
-		'maintenanceids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		NULL),
-		'mname'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'(isset({config})&&({config}==6))&&isset({save})'),
-		'maintenance_type'=>	array(T_ZBX_INT, O_OPT,  null,	null,		'(isset({config})&&({config}==6))&&isset({save})'),
-
-		'description'=>			array(T_ZBX_STR, O_OPT,	NULL,	null,					'(isset({config})&&({config}==6))&&isset({save})'),
-		'active_since'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,time()*2),	'(isset({config})&&({config}==6))&&isset({save})'),
-		'active_till'=>			array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,time()*2),	'(isset({config})&&({config}==6))&&isset({save})'),
-
-		'new_timeperiod'=>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({add_timeperiod})'),
-
-		'timeperiods'=>			array(T_ZBX_STR, O_OPT, null,	null, null),
-		'g_timeperiodid'=>		array(null, O_OPT, null, null, null),
-
-		'edit_timeperiodid'=>	array(null, O_OPT, P_ACT,	DB_ID,	null),
-
 /* actions */
-		'add_timeperiod'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, 	null, null),
-		'del_timeperiod'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'cancel_new_timeperiod'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-
 		'activate'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 		'disable'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 
-		'add_to_group'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
-		'delete_from_group'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
-
-		'unlink'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
-		'unlink_and_clear'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
-
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'full_clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'delete_and_clear'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 
 /* other */
@@ -152,80 +62,9 @@ include_once('include/page_header.php');
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 
-	update_profile('web.hosts.config',$_REQUEST['config'], PROFILE_TYPE_INT);
+//	update_profile('web.hosts.config',$_REQUEST['config'], PROFILE_TYPE_INT);
 ?>
 <?php
-
-/************ ACTIONS FOR HOSTS ****************/
-/* this code menages operations to unlink 1 template from multiple hosts */
-	if($_REQUEST['config']==2 && (isset($_REQUEST['save']))){
-
-		$hosts = get_request('hosts',array());
-
-		if(isset($_REQUEST['hostid'])){
-			$templateid=$_REQUEST['hostid'];
-			$result = true;
-
-// Permission check
-			$hosts = array_intersect($hosts,$available_hosts);
-//-- unlink --
-			DBstart();
-
-			$linked_hosts = array();
-			$db_childs = get_hosts_by_templateid($templateid);
-			while($db_child = DBfetch($db_childs)){
-				$linked_hosts[$db_child['hostid']] = $db_child['hostid'];
-			}
-
-			$unlink_hosts = array_diff($linked_hosts,$hosts);
-
-			foreach($unlink_hosts as $id => $value){
-				$result &= unlink_template($value, $templateid, false);
-			}
-//----------
-//-- link --
-			$link_hosts = array_diff($hosts,$linked_hosts);
-
-			$template_name=DBfetch(DBselect('SELECT host FROM hosts WHERE hostid='.$templateid));
-
-			foreach($link_hosts as $id => $hostid){
-
-				$host_groups=array();
-				$db_hosts_groups = DBselect('SELECT groupid FROM hosts_groups WHERE hostid='.$hostid);
-				while($hg = DBfetch($db_hosts_groups)) $host_groups[] = $hg['groupid'];
-
-				$host=get_host_by_hostid($hostid);
-
-				$templates_tmp=get_templates_by_hostid($hostid);
-				$templates_tmp[$templateid]=$template_name['host'];
-
-				$result &= update_host($hostid,
-								$host['host'],$host['port'],$host['status'],$host['useip'],$host['dns'],
-								$host['ip'],$host['proxy_hostid'],$templates_tmp,$host['useipmi'],$host['ipmi_ip'],
-								$host['ipmi_port'],$host['ipmi_authtype'],$host['ipmi_privilege'],$host['ipmi_username'],
-								$host['ipmi_password'],null,$host_groups);
-			}
-//----------
-			$result = DBend($result);
-
-			show_messages($result, S_LINK_TO_TEMPLATE, S_CANNOT_LINK_TO_TEMPLATE);
-/*			if($result){
-				$host=get_host_by_hostid($templateid);
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,
-					'Host ['.$host['host'].'] '.
-					'Mass Linkage '.
-					'Status ['.$host['status'].']');
-			}*/
-//---
-			unset($_REQUEST['save']);
-			unset($_REQUEST['hostid']);
-			unset($_REQUEST['form']);
-		}
-	}
-/* UNLINK HOST */
-
-/****** ACTIONS FOR GROUPS **********/
-/* CLONE HOST */
 
 	if(isset($_REQUEST['save'])){
 		$result = true;
@@ -329,7 +168,6 @@ include_once('include/page_header.php');
 			unset($_REQUEST['disable']);
 	}
 
-
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
 ?>
 <?php
@@ -344,12 +182,23 @@ include_once('include/page_header.php');
 
 	validate_group($PAGE_GROUPS, $PAGE_HOSTS, false);
 			
-//	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
 	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 
-
-	show_table_header(S_CONFIGURATION_OF_HOSTS_GROUPS_AND_TEMPLATES, $frmForm);
+	
+	$frmForm = new CForm();
+	$frmForm->setMethod('get');
+	
+	$cmbConfig = new CComboBox('config', $_REQUEST['config'], "javascript: redirect('nodes.php?config=0');");
+	$cmbConfig->addItem(0, S_NODES);
+	$cmbConfig->addItem(1, S_PROXIES);
+	
+	$frmForm->addItem($cmbConfig);
+	if(!isset($_REQUEST["form"])){
+		$frmForm->addItem(new CButton('form',S_CREATE_PROXY));
+	}
+	
+	show_table_header(S_CONFIGURATION_OF_PROXIES, $frmForm);
 
 	$row_count = 0;
 
@@ -381,7 +230,7 @@ include_once('include/page_header.php');
 			$name=get_request("host","");
 		}
 
-		$frmHostG = new CFormTable($frm_title,"hosts.php");
+		$frmHostG = new CFormTable($frm_title,"proxies.php");
 		$frmHostG->SetHelp("web.proxy.php");
 		$frmHostG->addVar("config",get_request("config",5));
 
@@ -421,17 +270,7 @@ include_once('include/page_header.php');
 		$frmHostG->Show();
 	}
 	else {
-		$frmForm = new CForm();
-		$frmForm->setMethod('get');
-		
-		$btn = new CButton('form',S_CREATE_PROXY);
-
-		$frmForm->addItem($cmbConf);
-		if(isset($btn) && !isset($_REQUEST['form'])){
-			$frmForm->addItem(SPACE);
-			$frmForm->addItem($btn);
-		}
-		
+			
 		$numrows = new CSpan(null,'info');
 		$numrows->addOption('name','numrows');
 		$header = get_table_header(array(S_PROXIES_BIG,
@@ -440,7 +279,7 @@ include_once('include/page_header.php');
 						);
 		show_table_header($header);
 
-		$form = new CForm('hosts.php');
+		$form = new CForm('proxies.php');
 		$form->setMethod('get');
 
 		$form->setName('hosts');
@@ -490,7 +329,7 @@ include_once('include/page_header.php');
 					new CCheckBox('hosts['.$db_proxy['hostid'].']', NULL, NULL, $db_proxy['hostid']),
 					SPACE,
 					new CLink($db_proxy['host'],
-							'hosts.php?form=update&hostid='.$db_proxy['hostid'].url_param('config'),
+							'proxies.php?form=update&hostid='.$db_proxy['hostid'].url_param('config'),
 							'action')
 				),
 				$lastclock,
