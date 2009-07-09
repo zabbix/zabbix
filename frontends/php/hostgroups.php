@@ -24,18 +24,23 @@
 
 	$page['title'] = 'S_HOST_GROUPS';
 	$page['file'] = 'hostgroups.php';
-	// $page['hist_arg'] = array('groupid','hostid');
+	$page['hist_arg'] = array('groupid');
 	// $page['scripts'] = array('menu_scripts.js','calendar.js');
 
 include_once('include/page_header.php');
 
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-	// $available_groups1 = CHostGroup::get(array('editable' => 1));
-	// $available_hosts1 = CHost::get(array('editable' => 1, 'templated_hosts' => 1));
+	// $available_groups = CHostGroup::get(array('editable' => 1));
+	//$available_groups = array_keys($available_groups);
+	// $available_hosts = CHost::get(array('editable' => 1, 'templated_hosts' => 1));
+	// $available_hosts = array_keys($available_hosts);
+	
 // SDI('<pre>'.print_r(array_diff($available_groups, $available_groups1), true).'</pre>');
-// SDI('<pre>'.print_r($available_groups, true).'</pre>');
+ // SDI('<pre>'.print_r($available_hosts, true).'</pre>');
+// SDI('<pre>'.print_r($available_groups1, true).'</pre>');
 // SDI('<pre>'.print_r($available_hosts, true).'</pre>');
+
 	if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !isset($available_groups[$_REQUEST['groupid']])){
 		access_deny();
 	}
@@ -58,8 +63,8 @@ include_once('include/page_header.php');
 		'activate'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, 	NULL),
 		'disable'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, 	NULL),
 
-		'add_to_group'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
-		'delete_from_group'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
+		// 'add_to_group'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
+		// 'delete_from_group'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
 
 		'save'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'clone'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -73,14 +78,14 @@ include_once('include/page_header.php');
 		'form_refresh'=>		array(T_ZBX_STR, O_OPT, NULL,			NULL,	NULL)
 	);
 	check_fields($fields);
-validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
+//validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 //	update_profile('web.hosts.config',$_REQUEST['config'], PROFILE_TYPE_INT);
 ?>
 <?php
 
 
 /*** <--- ACTIONS ---> ***/
-	if(inarr_isset(array('add_to_group','hostid'))){
+	/* if(inarr_isset(array('add_to_group','hostid'))){
 //		if(!uint_in_array($_REQUEST['add_to_group'], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
 		if(!isset($available_groups[$_REQUEST['add_to_group']])){
 			access_deny();
@@ -103,8 +108,8 @@ validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 		$result = DBend($result);
 
 		show_messages($result, S_HOST_UPDATED, S_CANNOT_UPDATE_HOST);
-	}
-	else if(isset($_REQUEST['clone']) && isset($_REQUEST['groupid'])){
+	} */
+	if(isset($_REQUEST['clone']) && isset($_REQUEST['groupid'])){
 		unset($_REQUEST['groupid']);
 		$_REQUEST['form'] = 'clone';
 	}
@@ -163,8 +168,8 @@ validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 /* group operations */
 			$result = true;
 
-			$groups = get_request('groups',array());
-			$db_groups=DBselect('select groupid, name from groups where '.DBin_node('groupid'));
+			$groups = get_request('groups', array());
+			$db_groups = DBselect('select groupid, name from groups where '.DBin_node('groupid'));
 
 			DBstart();
 			while($db_group=DBfetch($db_groups)){
@@ -341,7 +346,7 @@ validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 		show_table_header($header);
 
 		$form = new CForm('hostgroups.php');
-		$form->setName('groups');
+		$form->setName('form_groups');
 
 		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
 		$table->setHeader(array(
@@ -363,9 +368,7 @@ validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 				$groups[$groupid]['hosts'][$hostid] = $host;
 			}
 		}
-		
-//order_result($groups, 'group', ZBX_SORT_UP);
-		
+			
 		foreach($groups as $groupid => $group){
 			$i = 0;
 			$hosts_output = array();
@@ -392,10 +395,11 @@ validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 
 			$checkbox_group = new CCheckBox('groups['.$groupid.']', NULL, NULL, $groupid);
 
+			$host_count = count($group['hosts']);
 			$table->addRow(array(
 				$checkbox_group,
 				new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$groupid),
-				new CLink(count($group['hosts']), 'hosts.php?groupid='.$groupid),
+				($host_count == 0 ? '0' : new CLink($host_count, 'hosts.php?groupid='.$groupid)),
 				new CCol((empty($hosts_output) ? '-' : $hosts_output), 'wraptext')
 			));
 		}

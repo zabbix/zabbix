@@ -167,7 +167,8 @@ $ZBX_MENU = array(
 			'forse_disable_all_nodes'=> true,
 			'pages'=>array(
 				array('url'=>'nodes.php',
-						'label'=>S_DM
+						'label'=>S_DM,
+						'sub_pages'=>array('proxies.php')
 					),
 				array('url'=>'authentication.php',
 						'label'=>S_AUTHENTICATION
