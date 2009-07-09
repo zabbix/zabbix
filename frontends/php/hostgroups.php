@@ -24,8 +24,7 @@
 
 	$page['title'] = 'S_HOST_GROUPS';
 	$page['file'] = 'hostgroups.php';
-	$page['hist_arg'] = array('groupid');
-	// $page['scripts'] = array('menu_scripts.js','calendar.js');
+	$page['hist_arg'] = array();
 
 include_once('include/page_header.php');
 
@@ -36,10 +35,7 @@ include_once('include/page_header.php');
 	// $available_hosts = CHost::get(array('editable' => 1, 'templated_hosts' => 1));
 	// $available_hosts = array_keys($available_hosts);
 	
-// SDI('<pre>'.print_r(array_diff($available_groups, $available_groups1), true).'</pre>');
- // SDI('<pre>'.print_r($available_hosts, true).'</pre>');
-// SDI('<pre>'.print_r($available_groups1, true).'</pre>');
-// SDI('<pre>'.print_r($available_hosts, true).'</pre>');
+
 
 	if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !isset($available_groups[$_REQUEST['groupid']])){
 		access_deny();

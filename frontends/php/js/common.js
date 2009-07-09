@@ -668,7 +668,7 @@ check: function(e){
 	
 	this.setGo();
 
-	if(!e.ctrlKey) return true;
+	if(!(e.ctrlKey || e.shiftKey)) return true;
 	
 	var obj_name = obj.name.split('[')[0];
 
