@@ -2179,7 +2179,8 @@
 		$target_sql = 'select distinct g.groupid as target_id, g.name as target_name'.
 					' from groups g, hosts_groups hg'.
 					' where hg.groupid=g.groupid'.
-						' and hg.hostid in('.$accessible_hosts.')';
+						' and hg.hostid in('.$accessible_hosts.')'.
+					' order by g.name';
 
 		if(0 == $copy_type)
 		{
@@ -2201,13 +2202,13 @@
 			
 			$target_sql = 'select h.hostid as target_id, h.host as target_name '.
 							' from hosts h'.$sql_from.
-							' where '.$sql_where;
+							' where '.$sql_where.
+							' order by h.host';
 		}
 
-		$db_targets = DBselect($target_sql.' order by target_name');
+		$db_targets = DBselect($target_sql);
 		$target_list = array();
-		while($target = DBfetch($db_targets))
-		{
+		while($target = DBfetch($db_targets)){
 			array_push($target_list,array(
 				new CCheckBox('copy_targetid[]',
 					in_array($target['target_id'], $copy_targetid), 
