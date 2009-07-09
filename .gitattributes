@@ -47,6 +47,7 @@ frontends/php/api/classes/class.ctrigger.php -text
 frontends/php/api/rpc/class.cjsonrpc.php -text
 frontends/php/api/rpc/class.czbxrpc.php -text
 frontends/php/api_jsonrpc.php -text
+frontends/php/applications.php -text
 frontends/php/audio/trigger_off.wav -text
 frontends/php/audio/trigger_on.wav -text
 frontends/php/audio/trigger_on_average.wav -text
