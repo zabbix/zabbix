@@ -100,9 +100,7 @@ include_once('include/page_header.php');
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 
-/************ ACTIONS FOR HOSTS ****************/
-/* this code menages operations to unlink 1 template from multiple hosts */
-
+/************ MAINTENANCE ****************/
 
 	if(inarr_isset(array('clone','maintenanceid'))){
 		unset($_REQUEST['maintenanceid']);
