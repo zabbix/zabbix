@@ -37,6 +37,8 @@ struct zbx_perfs
    double		lastValue;
    int			CurrentCounter;
    int			CurrentNum;
+   int			status;
+   char			*error;
 };
 
 typedef struct zbx_perfs PERF_COUNTERS;

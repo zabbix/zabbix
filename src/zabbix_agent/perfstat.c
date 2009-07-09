@@ -22,12 +22,14 @@
 #include "alias.h"
 
 #include "log.h"
+#include "mutexs.h"
 
 #ifdef _WINDOWS
 	#include "perfmon.h"
 
 /* Static data */
 static ZBX_PERF_STAT_DATA *ppsd = NULL;
+static ZBX_MUTEX perfstat_access;
 
 /******************************************************************************
  *                                                                            *
@@ -53,21 +55,20 @@ int	add_perf_counter(const char *name, const char *counterPath, int interval)
 	char		*alias_name;
 	int		result = FAIL;
 
-	assert(name);
 	assert(counterPath);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_perf_counter() [name:%s] [counter:%s] [interval:%d]",
-			name, counterPath, interval);
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_perf_counter() [counter:%s] [interval:%d]",
+			counterPath, interval);
 
 	if (NULL == ppsd->pdh_query) {
-		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter %s: \"%s\" FAILED: Collector is not started!",
-				name, counterPath);
+		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: Collector is not started!",
+				counterPath);
 		return FAIL;
 	}
 
 	if (interval < 1 || interval > 900) {
-		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter %s: \"%s\" FAILED: Interval value out of range",
-				name, counterPath);
+		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: Interval value out of range",
+				counterPath);
 		return FAIL;
 	}
 
@@ -77,8 +78,8 @@ int	add_perf_counter(const char *name, const char *counterPath, int interval)
 			cptr = (PERF_COUNTERS *)zbx_malloc(cptr, sizeof(PERF_COUNTERS));
 
 			memset(cptr, 0, sizeof(PERF_COUNTERS));
-			cptr->next		= ppsd->pPerfCounterList;
-			cptr->name		= strdup(name);
+			if (NULL != name)
+				cptr->name	= strdup(name);
 			cptr->counterPath	= strdup(counterPath);
 			cptr->interval		= interval;
 			cptr->rawValueArray	= (PDH_RAW_COUNTER *)zbx_malloc(cptr->rawValueArray,
@@ -87,39 +88,52 @@ int	add_perf_counter(const char *name, const char *counterPath, int interval)
 
 			/* Add user counters to query */
 			if (ERROR_SUCCESS != (status = PdhAddCounter(ppsd->pdh_query, cptr->counterPath, 0, &cptr->handle))) {
-				cptr->interval	= -1;   /* Flag for unsupported counters */
-				cptr->lastValue	= NOTSUPPORTED;
+				cptr->status	= ITEM_STATUS_NOTSUPPORTED;
+				cptr->error	= zbx_dsprintf(cptr->error, "%s", strerror_from_module(status, "PDH.DLL"));
+				zbx_rtrim(cptr->error, " \r\n");
 
-				zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter \"%s\" to query: %s",
+				zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter '%s' to query: %s",
 						cptr->counterPath,
-						strerror_from_module(status, "PDH.DLL"));
+						cptr->error);
 			} else
-				zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter %s: \"%s\" successfully added. Interval %d seconds",
-						name, cptr->counterPath, interval);
+			{
+				cptr->status	= ITEM_STATUS_ACTIVE;
+				zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter '%s' successfully added. Interval %d seconds",
+						cptr->counterPath, interval);
+			}
 
+			zbx_mutex_lock(&perfstat_access);
+
+			cptr->next		= ppsd->pPerfCounterList;
 			ppsd->pPerfCounterList	= cptr;
+
+			zbx_mutex_unlock(&perfstat_access);
 
 			result = SUCCEED;
 			break;
 		}
 
-		if (*name != '\0' && 0 == strcmp(cptr->name, name)) {
-			zabbix_log(LOG_LEVEL_WARNING, "PerfCounter %s: \"%s\" FAILED: Counter already exists",
-					name, counterPath);
+		if (NULL != name && 0 == strcmp(cptr->name, name))
 			break;
-		}
+
+		if (NULL == name && NULL == cptr->name && 0 == strcmp(cptr->counterPath, counterPath) && cptr->interval == interval)
+			break;
 	}
 
-	if (SUCCEED == result && *name != '\0') {
+	if (FAIL == result)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: Counter already exists",
+				counterPath);
+	}
+	else if (NULL != name)
+	{
 		alias_name = zbx_dsprintf(NULL, "__UserPerfCounter[%s]", name);
 
 		result = add_alias(name, alias_name);
 
 		zbx_free(alias_name);
-	}/* else
-		zabbix_log(LOG_LEVEL_WARNING, "PerfCounter %s: \"%s\" FAILED",
-				name, counterPath);
-*/
+	}
+		
 	return result;
 }
 
@@ -186,6 +200,8 @@ void	perfs_list_free(void)
 {
 	PERF_COUNTERS	*cptr;
 
+	zbx_mutex_lock(&perfstat_access);
+
 	while (NULL != ppsd->pPerfCounterList) {
 		cptr = ppsd->pPerfCounterList;
 		ppsd->pPerfCounterList = cptr->next;
@@ -193,8 +209,10 @@ void	perfs_list_free(void)
 		zbx_free(cptr->name);
 		zbx_free(cptr->counterPath);
 		zbx_free(cptr->rawValueArray);
+		zbx_free(cptr->error);
 		zbx_free(cptr);
 	}
+	zbx_mutex_unlock(&perfstat_access);
 }
 
 /******************************************************************************
@@ -219,6 +237,12 @@ int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf)
 	zabbix_log(LOG_LEVEL_DEBUG, "In init_perf_collector()");
 
 	ppsd = pperf;
+
+	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&perfstat_access, ZBX_MUTEX_PERFSTAT))
+	{
+		zbx_error("Unable to create mutex for performance counters");
+		exit(FAIL);
+	}
 
 	if (ERROR_SUCCESS != PdhOpenQuery(NULL, 0, &ppsd->pdh_query)) {
 		zabbix_log(LOG_LEVEL_ERR, "Call to PdhOpenQuery() failed: %s", strerror_from_system(GetLastError()));
@@ -260,6 +284,8 @@ void	close_perf_collector()
 	ppsd->pdh_query = NULL;
 
 	perfs_list_free();
+
+	zbx_mutex_destroy(&perfstat_access);
 }
 
 /******************************************************************************
@@ -297,7 +323,7 @@ void	collect_perfstat()
 	/* Process user-defined counters */
 	for ( cptr = ppsd->pPerfCounterList; cptr != NULL; cptr = cptr->next )
 	{
-		if (cptr->interval == -1)	/* Inactive counter? */
+		if (cptr->status == ITEM_STATUS_NOTSUPPORTED)	/* Inactive counter? */
 			continue;
 
 		PdhGetRawCounterValue(
