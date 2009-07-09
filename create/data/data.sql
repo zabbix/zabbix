@@ -21,7 +21,7 @@
 -- Dumping data for table `config`
 --
 
-INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00',7,1,7,100,'default.css',0,'',389,'','','','',1,1,5);
+INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00',7,1,7,100,'default.css',0,'',389,'','','','',1,1,5,50);
 
 --
 -- Dumping data for table `scripts`
