@@ -32,6 +32,7 @@
 include_once('include/page_header.php');
 
 	$_REQUEST['config'] = get_request('config',get_profile('web.hosts.config',0));
+	$_REQUEST['go'] = get_request('go','none');
 
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
@@ -53,15 +54,16 @@ include_once('include/page_header.php');
 		// 0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications; 5 - Proxies; 6 - maintenance
 		'config'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,2,3,4,5,6'),	NULL),
 
-/* ARRAYS */
+//ARRAYS
 		'hosts'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'groups'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'hostids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'groupids'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'applications'=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-/* host */
-		'hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'({config}==0||{config}==5||{config}==2)&&isset({form})&&({form}=="update")'),
-		'host'=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'({config}==0||{config}==3||{config}==5)&&isset({save})&&!isset({massupdate})'),
+
+// host
+		'hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'({config}==0||{config}==2)&&isset({form})&&({form}=="update")'),
+		'host'=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'({config}==0||{config}==3)&&isset({save})&&!isset({massupdate})'),
 		'proxy_hostid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,		'({config}==0)&&isset({save})&&!isset({massupdate})'),
 		'dns'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'(({config}==0))&&isset({save})&&!isset({massupdate})'),
 		'useip'=>		array(T_ZBX_STR, O_OPT, NULL,	IN('0,1'),	'(({config}==0))&&isset({save})&&!isset({massupdate})'),
@@ -97,21 +99,21 @@ include_once('include/page_header.php');
 		'useprofile_ext'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 		'ext_host_profiles'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,   NULL,   NULL),
 
-/* mass update*/
+// mass update
 		'massupdate'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'visible'=>			array(T_ZBX_STR, O_OPT,	null, 	null,	null),
 
-/* group */
+// group
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'(({config}==1))&&(isset({form})&&({form}=="update"))'),
 		'gname'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'(({config}==1))&&isset({save})'),
 
-/* application */
+// application
 		'applicationid'=>	array(T_ZBX_INT,O_OPT,	P_SYS,	DB_ID,		'(({config}==4))&&(isset({form})&&({form}=="update"))'),
 		'appname'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'(({config}==4))&&isset({save})'),
 		'apphostid'=>		array(T_ZBX_INT, O_OPT, NULL,	DB_ID.'{}>0',	'(({config}==4))&&isset({save})'),
 		'apptemplateid'=>	array(T_ZBX_INT,O_OPT,	NULL,	DB_ID,	NULL),
 
-/* host linkage form */
+// host linkage form
 		'tname'=>			array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'({config}==2)&&isset({save})'),
 		'twb_groupid'=> 	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
 
@@ -132,28 +134,25 @@ include_once('include/page_header.php');
 
 		'edit_timeperiodid'=>	array(null, O_OPT, P_ACT,	DB_ID,	null),
 
-/* actions */
+// actions 
 		'add_timeperiod'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, 	null, null),
 		'del_timeperiod'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'cancel_new_timeperiod'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
-		'go'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-/*		
-		'activate'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-		'disable'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-*/
+		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
+
 		'add_to_group'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
 		'delete_from_group'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
 
 		'unlink'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 		'unlink_and_clear'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 
-		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'full_clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'save'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'clone'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'full_clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'delete'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete_and_clear'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'cancel'=>				array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 
 /* other */
 		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
@@ -1166,15 +1165,6 @@ include_once('include/page_header.php');
 
 			validate_group($PAGE_GROUPS, $PAGE_HOSTS, false);
 			break;
-		case 6:
-			$options = array('only_current_node','allow_all');
-
-			foreach($options as $option) $params[$option] = 1;
-			$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
-			$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
-
-			validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS,false);
-			break;
 		default:
 			$options = array('only_current_node');
 			if(isset($_REQUEST['form']) || isset($_REQUEST['massupdate'])) array_push($options,'do_not_select_if_empty');
@@ -1200,8 +1190,6 @@ include_once('include/page_header.php');
 	$cmbConf->addItem(0,S_HOSTS);
 	$cmbConf->addItem(3,S_TEMPLATES);
 	$cmbConf->addItem(2,S_TEMPLATE_LINKAGE);
-	$cmbConf->addItem(5,S_PROXIES);
-	$cmbConf->addItem(6,S_MAINTENANCE);
 	$cmbConf->addItem(4,S_APPLICATIONS);
 
 	switch($_REQUEST['config']){
@@ -1218,12 +1206,6 @@ include_once('include/page_header.php');
 		case 4:
 			$btn = new CButton('form',S_CREATE_APPLICATION);
 			$frmForm->addVar('hostid',get_request('hostid',0));
-			break;
-		case 5:
-			$btn = new CButton('form',S_CREATE_PROXY);
-			break;
-		case 6:
-			$btn = new CButton('form',S_CREATE_MAINTENANCE_PERIOD);
 			break;
 	}
 
@@ -1406,6 +1388,7 @@ include_once('include/page_header.php');
 
 		}
 	}
+	
 	if($_REQUEST['config']==3){
 		echo SBR;
 
@@ -1413,7 +1396,7 @@ include_once('include/page_header.php');
 			insert_mass_update_host_form();
 		}
 		else if(isset($_REQUEST['form'])){
-			insert_host_form(true);
+			insert_template_form();
 		}
 		else{
 
@@ -1516,7 +1499,7 @@ include_once('include/page_header.php');
 		$all_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
 
 		if(isset($_REQUEST['form'])){
-			insert_template_form($all_hosts);
+			insert_template_link_form($all_hosts);
 		}
 		else{
 			$frmForm = new CForm();
