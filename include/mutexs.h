@@ -29,7 +29,7 @@
 #	define ZBX_MUTEX_NAME		char*
 
 #	define ZBX_MUTEX_LOG    	"ZBX_MUTEX_LOG"
-#	define ZBX_MUTEX_NODE_SYNC    	"ZBX_MUTEX_NODE_SYNC"
+#	define ZBX_MUTEX_PERFSTAT  	"ZBX_MUTEX_PERFSTAT"
 
 #else /* not _WINDOWS */
 
