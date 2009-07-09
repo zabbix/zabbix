@@ -476,6 +476,7 @@
 	'S_GROUP_FOR_DISCOVERED_HOSTS'=>		'Group for discovered hosts',
 
 //	nodes.php
+	'S_CONFIGURATION_OF_NODES' => 'CONFIGURATION OF NODES',
 	'S_DM'=>				'DM',	// Distributed Monitoring
 	'S_NODE'=>				'Node',
 	'S_NODES'=>				'Nodes',
@@ -483,6 +484,9 @@
 	'S_NEW_NODE'=>			'New node',
 	'S_NO_NODES_DEFINED'=>		'No nodes defined',
 	'S_ALL_NODES'=>			'All nodes',
+
+// proxies.php
+	'S_CONFIGURATION_OF_PROXIES' => 'CONFIGURATION OF PROXIES',
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Authentication',

@@ -32,7 +32,7 @@ a.unknown:active 	{	color:#777777;	}
 
 a.off:link		{	color:#00AA00;	}
 a.off:visited 	{	color:#00AA00;	}
-a.off:hover 	{	color:#00AA00;	}
+a.off:hover 	{	color:#44CC44;	}
 a.off:active 	{	color:#00AA00;	}
 
 a.on:link		{	color:#AA0000;	}
