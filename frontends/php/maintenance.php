@@ -26,12 +26,10 @@
 
 	$page['title'] = 'S_MAINTENANCE';
 	$page['file'] = 'maintenance.php';
-	$page['hist_arg'] = array('groupid','config','hostid');
+	$page['hist_arg'] = array('groupid','hostid');
 	$page['scripts'] = array('menu_scripts.js','calendar.js');
 
 include_once('include/page_header.php');
-
-	$_REQUEST['config'] = get_request('config',get_profile('web.hosts.config',6));
 
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
@@ -42,28 +40,29 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_hosts[$_REQUEST['hostid']])) {
 		access_deny();
 	}
+	
+	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'config'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,2,3,4,5,6'),	NULL),
-
 /* ARRAYS */
 		'hosts'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'groups'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'hostids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'groupids'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'applications'=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 
 // maintenance
-		'maintenanceid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'({config}==6)&&isset({form})&&({form}=="update")'),
+		'maintenanceid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
 		'maintenanceids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		NULL),
-		'mname'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==6)&&isset({save})'),
-		'maintenance_type'=>	array(T_ZBX_INT, O_OPT,  null,	null,		'({config}==6)&&isset({save})'),
+		'mname'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'isset({save})'),
+		'maintenance_type'=>	array(T_ZBX_INT, O_OPT,  null,	null,		'isset({save})'),
 
-		'description'=>			array(T_ZBX_STR, O_OPT,	NULL,	null,					'(({config}==6))&&isset({save})'),
-		'active_since'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,time()*2),	'(({config}==6))&&isset({save})'),
-		'active_till'=>			array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,time()*2),	'(({config}==6))&&isset({save})'),
+		'description'=>			array(T_ZBX_STR, O_OPT,	NULL,	null,					'isset({save})'),
+		'active_since'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,time()*2),	'isset({save})'),
+		'active_till'=>			array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,time()*2),	'isset({save})'),
 
 		'new_timeperiod'=>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({add_timeperiod})'),
 
@@ -71,30 +70,22 @@ include_once('include/page_header.php');
 		'g_timeperiodid'=>		array(null, O_OPT, null, null, null),
 
 		'edit_timeperiodid'=>	array(null, O_OPT, P_ACT,	DB_ID,	null),
+		
+// actions 
+		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 
-/* actions */
+// form actions
 		'add_timeperiod'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, 	null, null),
 		'del_timeperiod'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'cancel_new_timeperiod'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
-		'activate'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-		'disable'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
-		'add_to_group'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
-		'delete_from_group'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
-
-		'unlink'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
-		'unlink_and_clear'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
-
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'full_clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'delete_and_clear'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 
 /* other */
-		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
 	check_fields($fields);
@@ -171,7 +162,7 @@ include_once('include/page_header.php');
 			unset($_REQUEST['form']);
 		}
 	}
-	else if(isset($_REQUEST['delete'])){
+	else if(isset($_REQUEST['delete']) || ($_REQUEST['go'] == 'delete')){
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
 
 		$maintenanceids = get_request('maintenanceid', array());
@@ -333,21 +324,16 @@ include_once('include/page_header.php');
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
 
-	$params = array();
+
+	$params = array('only_current_node' => 1);
 	
-	$options = array('only_current_node','allow_all');
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
 
-	foreach($options as $option) $params[$option] = 1;
-	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
-	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS, true);
 
-	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS,false);
-
-
-//	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
 	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
-
 
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
@@ -356,21 +342,19 @@ include_once('include/page_header.php');
 		$frmForm->addItem(new CButton('form',S_CREATE_MAINTENANCE_PERIOD));
 	}
 
-	show_table_header(S_CONFIGURATION_OF_HOSTS_GROUPS_AND_TEMPLATES, $frmForm);
+	show_table_header(S_CONFIGURATION_OF_MAINTENANCE_PERIODS, $frmForm);
 ?>
 <?php
 	$row_count = 0;
 
 	if(isset($_REQUEST["form"])){
-		$frmMaintenance = new CForm('hosts.php','post');
+		$frmMaintenance = new CForm('maintenance.php','post');
 		$frmMaintenance->setName(S_MAINTENANCE);
 
 		$frmMaintenance->addVar('form',get_request('form',1));
 
 		$from_rfr = get_request('form_refresh',0);
 		$frmMaintenance->addVar('form_refresh',$from_rfr+1);
-
-		$frmMaintenance->addVar('config',get_request('config',6));
 
 		if(isset($_REQUEST['maintenanceid']))
 			$frmMaintenance->addVar('maintenanceid',$_REQUEST['maintenanceid']);
@@ -453,17 +437,11 @@ include_once('include/page_header.php');
 		$form->setMethod('get');
 
 		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
-		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
-
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
 			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 		}
-		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
-		}
-
 		$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
-		$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+
 
 		$numrows = new CSpan(null,'info');
 		$numrows->addOption('name','numrows');
@@ -473,32 +451,15 @@ include_once('include/page_header.php');
 						);
 		show_table_header($header, $form);
 // ----
-		$available_maintenances = get_accessible_maintenance_by_user(PERM_READ_WRITE);
+		$available_maintenances = get_accessible_maintenance_by_user(PERM_READ_ONLY);
 
 		$sqls = array();
 
+		$config = select_config();
+
 		$maintenances = array();
 		$maintenanceids = array();
-
-		if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
-			$sqls[] = 'SELECT m.* '.
-				' FROM maintenances m, maintenances_hosts mh '.
-				' WHERE '.DBin_node('m.maintenanceid').
-					' AND '.DBcondition('m.maintenanceid',$available_maintenances).
-					' AND mh.hostid='.$_REQUEST['hostid'].
-					' AND m.maintenanceid=mh.maintenanceid ';
-				' ORDER BY m.name';
-
-			$sqls[] = 'SELECT m.* '.
-				' FROM maintenances m, maintenances_groups mg, hosts_groups hg '.
-				' WHERE '.DBin_node('m.maintenanceid').
-					' AND '.DBcondition('m.maintenanceid',$available_maintenances).
-					' AND hg.hostid='.$_REQUEST['hostid'].
-					' AND mg.groupid=hg.groupid '.
-					' AND m.maintenanceid=mg.maintenanceid ';
-				' ORDER BY m.name';
-		}
-		else if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0)){
+		if($_REQUEST['groupid']>0){
 			$sqls[] = 'SELECT m.* '.
 				' FROM maintenances m, maintenances_groups mg '.
 				' WHERE '.DBin_node('m.maintenanceid').
@@ -515,7 +476,7 @@ include_once('include/page_header.php');
 					' AND mh.hostid=hg.hostid '.
 					' AND m.maintenanceid=mh.maintenanceid ';
 				' ORDER BY m.name';			}
-		else{
+		else if($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_ALL){
 			$sqls[] = 'SELECT m.* '.
 				' FROM maintenances m '.
 				' WHERE '.DBin_node('m.maintenanceid').
@@ -537,10 +498,8 @@ include_once('include/page_header.php');
 
 		$table = new CTableInfo();
 		$table->setHeader(array(
-			array(
-				new CCheckBox('all_maintenances',NULL,"CheckAll('".$form->GetName()."','all_maintenances','group_maintenanceid');"),
-				make_sorting_link(S_NAME,'m.name')
-			),
+			new CCheckBox('all_maintenances',NULL,"CheckAll('".$form->GetName()."','all_maintenances','maintenanceids');"),
+			make_sorting_link(S_NAME,'m.name'),
 			S_TYPE,
 			S_STATUS,
 			S_DESCRIPTION
@@ -552,12 +511,8 @@ include_once('include/page_header.php');
 			else $mnt_status = new CSpan(S_ACTIVE,'green');
 
 			$table->addRow(array(
-				array(
-					new CCheckBox('maintenanceids['.$maintenance['maintenanceid'].']',NULL,NULL,$maintenance['maintenanceid']),
-					new CLink($maintenance['name'],
-						'hosts.php?form=update'.url_param('config').
-						'&maintenanceid='.$maintenance['maintenanceid'].'#form', 'action')
-				),
+				new CCheckBox('maintenanceids['.$maintenance['maintenanceid'].']',NULL,NULL,$maintenance['maintenanceid']),
+				new CLink($maintenance['name'],'maintenance.php?form=update&maintenanceid='.$maintenance['maintenanceid'].'#form'),
 				$maintenance['maintenance_type']?S_NO_DATA_PROCESSING:S_NORMAL_PROCESSING,
 				$mnt_status,
 				$maintenance['description']
@@ -566,10 +521,16 @@ include_once('include/page_header.php');
 		}
 //			$table->setFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_USERS_Q)));
 
-		$table->setFooter(new CCol(array(
-			new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_GROUPS_Q)
-		)));
+		$goBox = new CComboBox('go');
+		$goBox->addItem('delete',S_DELETE_SELECTED);
 
+// goButton name is necessary!!!
+		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton->addOption('id','goButton');
+		zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');
+//----
+		$table->setFooter(new CCol(array($goBox, $goButton)));
+		
 		$form->addItem($table);
 
 		$form->show();
