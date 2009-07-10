@@ -53,8 +53,6 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	int		i;
 	char		counter_path[MAX_COUNTER_PATH];
 
-	memset(pcpus, 0, sizeof(ZBX_CPUS_STAT_DATA));
-
 	if (PdhOpenQuery(NULL,0,&pcpus->pdh_query)!=ERROR_SUCCESS)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Call to PdhOpenQuery() failed: %s", strerror_from_system(GetLastError()));
