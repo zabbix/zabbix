@@ -28,14 +28,12 @@
 
 include_once('include/page_header.php');
 
+	$_REQUEST['go'] = get_request('go','none');
+	
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 	// $available_groups = CHostGroup::get(array('editable' => 1));
-	//$available_groups = array_keys($available_groups);
 	// $available_hosts = CHost::get(array('editable' => 1, 'templated_hosts' => 1));
-	// $available_hosts = array_keys($available_hosts);
-	
-
 
 	if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !isset($available_groups[$_REQUEST['groupid']])){
 		access_deny();
@@ -55,20 +53,16 @@ include_once('include/page_header.php');
 /* group */
 		'groupid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		'(isset({form})&&({form}=="update"))'),
 		'gname'=>				array(T_ZBX_STR, O_OPT,	NULL,		NOT_EMPTY,	'isset({save})'),
+
 /* actions */
-		'activate'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, 	NULL),
-		'disable'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, 	NULL),
+		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 
-		// 'add_to_group'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
-		// 'delete_from_group'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
-
+// form
 		'save'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'clone'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'full_clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>				array(T_ZBX_STR, O_OPT, P_SYS,			NULL,	NULL),
-/* host linkage form */
-		'twb_groupid'=> 	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
+		
 /* other */
 		'form'=>				array(T_ZBX_STR, O_OPT, P_SYS,			NULL,	NULL),
 		'form_refresh'=>		array(T_ZBX_STR, O_OPT, NULL,			NULL,	NULL)
@@ -81,30 +75,6 @@ include_once('include/page_header.php');
 
 
 /*** <--- ACTIONS ---> ***/
-	/* if(inarr_isset(array('add_to_group','hostid'))){
-//		if(!uint_in_array($_REQUEST['add_to_group'], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
-		if(!isset($available_groups[$_REQUEST['add_to_group']])){
-			access_deny();
-		}
-
-		DBstart();
-			$result = add_host_to_group($_REQUEST['hostid'], $_REQUEST['add_to_group']);
-		$result = DBend($result);
-
-		show_messages($result,S_HOST_UPDATED,S_CANNOT_UPDATE_HOST);
-	}
-	else if(inarr_isset(array('delete_from_group','hostid'))){
-//		if(!uint_in_array($_REQUEST['delete_from_group'], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
-		if(!isset($available_groups[$_REQUEST['delete_from_group']])){
-			access_deny();
-		}
-
-		DBstart();
-			$result = delete_host_from_group($_REQUEST['hostid'], $_REQUEST['delete_from_group']);
-		$result = DBend($result);
-
-		show_messages($result, S_HOST_UPDATED, S_CANNOT_UPDATE_HOST);
-	} */
 	if(isset($_REQUEST['clone']) && isset($_REQUEST['groupid'])){
 		unset($_REQUEST['groupid']);
 		$_REQUEST['form'] = 'clone';
@@ -142,51 +112,44 @@ include_once('include/page_header.php');
 		}
 		unset($_REQUEST['save']);
 	}
-	else if(isset($_REQUEST['delete'])){
-		if(isset($_REQUEST['groupid'])){
-			$result = false;
-/*			if($group = get_hostgroup_by_groupid($_REQUEST['groupid'])){*/
-				DBstart();
-				$result = delete_host_group($_REQUEST['groupid']);
-				$result = DBend($result);
-/*			} */
+	else if(isset($_REQUEST['delete']) && isset($_REQUEST['groupid'])){
+		$result = false;
 
-/*			if($result){
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST_GROUP,S_HOST_GROUP.' ['.$group['name'].' ] ['.$group['groupid'].']');
-			}*/
+		DBstart();
+		$result = delete_host_group($_REQUEST['groupid']);
+		$result = DBend($result);
+		
+		unset($_REQUEST['form']);
 
-			unset($_REQUEST['form']);
-
-			show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-			unset($_REQUEST['groupid']);
-		}
-		else {
+		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
+		unset($_REQUEST['groupid']);
+	}
+// --------- GO  ----------
+	else if($_REQUEST['go'] == 'delete'){
 /* group operations */
-			$result = true;
+		$result = true;
 
-			$groups = get_request('groups', array());
-			$db_groups = DBselect('select groupid, name from groups where '.DBin_node('groupid'));
+		$groups = get_request('groups', array());
+		$db_groups = DBselect('select groupid, name from groups where '.DBin_node('groupid'));
 
-			DBstart();
-			while($db_group=DBfetch($db_groups)){
-				if(!uint_in_array($db_group['groupid'],$groups)) continue;
+		DBstart();
+		while($db_group=DBfetch($db_groups)){
+			if(!uint_in_array($db_group['groupid'],$groups)) continue;
 
 /*				if(!$group = get_hostgroup_by_groupid($db_group['groupid'])) continue;*/
-				$result &= delete_host_group($db_group['groupid']);
+			$result &= delete_host_group($db_group['groupid']);
 
 /*				if($result){
-					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST_GROUP,
-					S_HOST_GROUP.' ['.$group['name'].' ] ['.$group['groupid'].']');
-				}*/
-			}
-			$result = DBend($result);
-			show_messages(true, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST_GROUP,
+				S_HOST_GROUP.' ['.$group['name'].' ] ['.$group['groupid'].']');
+			}*/
 		}
-		unset($_REQUEST['delete']);
+		$result = DBend($result);
+		show_messages(true, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 	}
-	else if(isset($_REQUEST['activate']) || isset($_REQUEST['disable'])){
+	else if(str_in_array($_REQUEST['go'], array('activate','disable'))){
 		$result = true;
-		$status = isset($_REQUEST['activate']) ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
+		$status = ($_REQUEST['go'] == 'activate')?HOST_STATUS_MONITORED:HOST_STATUS_NOT_MONITORED;
 		$groups = get_request('groups',array());
 
 		$db_hosts=DBselect('select h.hostid, hg.groupid '.
@@ -210,22 +173,6 @@ include_once('include/page_header.php');
 		unset($_REQUEST['activate']);
 	}
 /*** ---> ACTIONS <--- ***/
-
-	// $available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
-
-	// $params = array();
-	// $options = array('only_current_node');
-	// if(isset($_REQUEST['form']) || isset($_REQUEST['massupdate'])){
-		// array_push($options, 'do_not_select_if_empty');
-	// }
-	// foreach($options as $option) $params[$option] = 1;
-	
-	// $PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
-	// $PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['groupids'], $params);
-	// validate_group($PAGE_GROUPS, $PAGE_HOSTS, $PAGE_HOSTS, false);
-	
-	// $available_groups = $PAGE_GROUPS['groupids'];
-	// $available_hosts = $PAGE_HOSTS['hostids'];
 
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
@@ -346,7 +293,7 @@ include_once('include/page_header.php');
 
 		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
 		$table->setHeader(array(
-					new CCheckBox('all_groups', NULL, "CheckAll('".$form->GetName()."','all_groups');"),
+					new CCheckBox('all_groups', NULL, "checkAll('".$form->GetName()."','all_groups','groups');"),
 					make_sorting_link(S_NAME,'g.name'),
 					' # ',
 					S_MEMBERS
@@ -389,11 +336,9 @@ include_once('include/page_header.php');
 				array_push($hosts_output, (empty($hosts_output) ? '' : ', '), new CLink($host['host'], $link, $style));
 			}
 
-			$checkbox_group = new CCheckBox('groups['.$groupid.']', NULL, NULL, $groupid);
-
 			$host_count = count($group['hosts']);
 			$table->addRow(array(
-				$checkbox_group,
+				new CCheckBox('groups['.$groupid.']', NULL, NULL, $groupid),
 				new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$groupid),
 				($host_count == 0 ? '0' : new CLink($host_count, 'hosts.php?groupid='.$groupid)),
 				new CCol((empty($hosts_output) ? '-' : $hosts_output), 'wraptext')
@@ -401,13 +346,20 @@ include_once('include/page_header.php');
 		}
 		
 		$row_count = $table->getNumRows();
-		$table->setFooter(new CCol(array(
-			new CButtonQMessage('activate',S_ACTIVATE_SELECTED,S_ACTIVATE_SELECTED_HOST_GROUPS_Q),
-			SPACE,
-			new CButtonQMessage('disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_HOST_GROUPS_Q),
-			SPACE,
-			new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_HOST_GROUPS_Q)
-		)));
+		
+//----- GO ------
+		$goBox = new CComboBox('go');
+		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
+		$goBox->addItem('disable',S_DISABLE_SELECTED);
+		$goBox->addItem('delete',S_DELETE_SELECTED);
+
+// goButton name is necessary!!!
+		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton->addOption('id','goButton');
+		zbx_add_post_js('chkbxRange.pageGoName = "groups";');
+
+		$table->setFooter(new CCol(array($goBox, $goButton)));
+//----
 
 		$form->addItem($table);
 		$form->show();

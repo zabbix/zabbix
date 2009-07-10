@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,11 +31,18 @@
 
 
 	include_once('include/page_header.php');
+
+	$_REQUEST['config'] = get_request('config','triggers.php');
+	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
+//  NEW  templates.php; hosts.php; items.php; triggers.php; graphs.php; maintenances.php;
+// 	OLD  0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications; 5 - Proxies; 6 - maintenance
+		'config'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID, null),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID, null),
 
@@ -66,7 +73,10 @@
 		'massupdate'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'visible'=>			array(T_ZBX_STR, O_OPT,	null, 	null,	null),
 
-/* actions */
+// Actions
+		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
+
+// form
 		'add_dependence'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'del_dependence'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'group_enable'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -78,9 +88,9 @@
 		'mass_save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+
 /* other */
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'form_copy_to'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
@@ -90,6 +100,7 @@
 
 	validate_sort_and_sortorder('t.description',ZBX_SORT_UP);
 
+// triggerid permission check
 	if(isset($_REQUEST['triggerid']))
 		if(!check_right_on_trigger_by_triggerid(PERM_READ_WRITE, $_REQUEST['triggerid']))
 			access_deny();
@@ -217,8 +228,63 @@
 			unset($_REQUEST['triggerid']);
 		}
 	}
-	else if(isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid']) && isset($_REQUEST['form_copy_to'])){
-		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
+/* DEPENDENCE ACTIONS */
+	else if(isset($_REQUEST['add_dependence'])&&isset($_REQUEST['new_dependence'])){
+		if(!isset($_REQUEST['dependencies']))
+			$_REQUEST['dependencies'] = array();
+
+			foreach($_REQUEST['new_dependence'] as $triggerid) {
+			if(!uint_in_array($triggerid, $_REQUEST['dependencies']))
+				array_push($_REQUEST['dependencies'], $triggerid);
+		}
+	}
+	else if(isset($_REQUEST['del_dependence'])&&isset($_REQUEST['rem_dependence'])){
+		if(isset($_REQUEST['dependencies'])){
+			foreach($_REQUEST['dependencies'] as $key => $val){
+				if(!uint_in_array($val, $_REQUEST['rem_dependence']))	continue;
+				unset($_REQUEST['dependencies'][$key]);
+			}
+		}
+	}
+// ------- GO ---------
+	else if(str_in_array($_REQUEST['go'], array('activate','disable')) && isset($_REQUEST['g_triggerid'])){
+
+		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
+
+		$sql = 'SELECT triggerid, description FROM triggers'.
+				' WHERE '.DBcondition('triggerid',$_REQUEST['g_triggerid']);
+		$result = DBSelect($sql);
+		while($trigger = DBfetch($result)) {
+			$triggers[$trigger['triggerid']] = $trigger;
+		}
+
+		if(($_REQUEST['go'] == 'activate')){
+			$status = TRIGGER_STATUS_ENABLED;
+			$status_old = array('status'=>0);
+			$status_new = array('status'=>1);
+		}
+		else {
+			$status = TRIGGER_STATUS_DISABLED;
+			$status_old = array('status'=>1);
+			$status_new = array('status'=>0);
+		}
+
+		DBstart();
+		$result = update_trigger_status($_REQUEST['g_triggerid'],$status);
+
+		if($result){
+			foreach($_REQUEST['g_triggerid'] as $id => $triggerid){
+				$serv_status = (isset($_REQUEST['group_enable'])) ? get_service_status_of_trigger($triggerid) : 0;
+				update_services($triggerid, $serv_status); // updating status to all services by the dependency
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $triggerid, $triggers[$triggerid]['description'], 'triggers', $status_old, $status_new);
+			}
+		}
+		$result = DBend($result);
+		show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+
+	}
+	else if(isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid']) && ($_REQUEST['go'] == 'copy_to')){
+		if(isset($_REQUEST['copy_targetid']) && ($_REQUEST['copy_targetid'] > 0) && isset($_REQUEST['copy_type'])){
 			if(0 == $_REQUEST['copy_type']){ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
 			}
@@ -251,70 +317,14 @@
 			}
 
 			$result = DBend($result);
-			unset($_REQUEST['form_copy_to']);
+			$_REQUEST['go'] = 'none';
 		}
 		else{
 			error('No target selection.');
 		}
 		show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
-/* DEPENDENCE ACTIONS */
-	else if(isset($_REQUEST['add_dependence'])&&isset($_REQUEST['new_dependence'])){
-		if(!isset($_REQUEST['dependencies']))
-			$_REQUEST['dependencies'] = array();
-
-			foreach($_REQUEST['new_dependence'] as $triggerid) {
-			if(!uint_in_array($triggerid, $_REQUEST['dependencies']))
-				array_push($_REQUEST['dependencies'], $triggerid);
-		}
-	}
-	else if(isset($_REQUEST['del_dependence'])&&isset($_REQUEST['rem_dependence'])){
-		if(isset($_REQUEST['dependencies'])){
-			foreach($_REQUEST['dependencies'] as $key => $val){
-				if(!uint_in_array($val, $_REQUEST['rem_dependence']))	continue;
-				unset($_REQUEST['dependencies'][$key]);
-			}
-		}
-	}
-/* GROUP ACTIONS */
-	else if((isset($_REQUEST['group_enable']) || isset($_REQUEST['group_disable'])) && isset($_REQUEST['g_triggerid'])){
-
-		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
-
-		$sql = 'SELECT triggerid, description FROM triggers'.
-				' WHERE '.DBcondition('triggerid',$_REQUEST['g_triggerid']);
-		$result = DBSelect($sql);
-		while($trigger = DBfetch($result)) {
-			$triggers[$trigger['triggerid']] = $trigger;
-		}
-
-		if(isset($_REQUEST['group_enable'])) {
-			$status = TRIGGER_STATUS_ENABLED;
-			$status_old = array('status'=>0);
-			$status_new = array('status'=>1);
-		}
-		else {
-			$status = TRIGGER_STATUS_DISABLED;
-			$status_old = array('status'=>1);
-			$status_new = array('status'=>0);
-		}
-
-		DBstart();
-		$result = update_trigger_status($_REQUEST['g_triggerid'],$status);
-
-		if($result){
-			foreach($_REQUEST['g_triggerid'] as $id => $triggerid){
-				$serv_status = (isset($_REQUEST['group_enable'])) ? get_service_status_of_trigger($triggerid) : 0;
-				update_services($triggerid, $serv_status); // updating status to all services by the dependency
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $triggerid, $triggers[$triggerid]['description'], 'triggers', $status_old, $status_new);
-			}
-		}
-		$result = DBend($result);
-		show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
-
-	}
-	else if(isset($_REQUEST['group_delete'])&&isset($_REQUEST['g_triggerid'])){
-
+	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
 		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
 
 		DBstart();
@@ -395,21 +405,33 @@
 
 	$form = new CForm();
 	$form->setMethod('get');
-	$form->addItem(new CButton('form',S_CREATE_TRIGGER));
+	
+// Config
+	$cmbConf = new CComboBox('config','triggers.php','javascript: submit()');
+	$cmbConf->addOption('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
+		$cmbConf->addItem('templates.php',S_TEMPLATES);
+		$cmbConf->addItem('hosts.php',S_HOSTS);
+		$cmbConf->addItem('items.php',S_ITEMS);
+		$cmbConf->addItem('triggers.php',S_TRIGGERS);
+		$cmbConf->addItem('graphs.php',S_GRAPHS);
+		$cmbConf->addItem('applications.php',S_APPLICATIONS);
+		
+	$form->addItem($cmbConf);
 
+	$form->addItem(new CButton('form',S_CREATE_TRIGGER));
+	
 	show_table_header(S_CONFIGURATION_OF_TRIGGERS_BIG,$form);
 	echo SBR;
 ?>
 <?php
-	if(isset($_REQUEST['massupdate']) && isset($_REQUEST['g_triggerid'])){
+	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['g_triggerid'])){
 		insert_mass_update_trigger_form();
 	}
 	else if(isset($_REQUEST['form'])){
 /* FORM */
 		insert_trigger_form();
-
 	}
-	else if(isset($_REQUEST['form_copy_to']) && isset($_REQUEST['g_triggerid'])){
+	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['g_triggerid'])){
 		insert_copy_elements_to_forms('g_triggerid');
 	}
 	else{
@@ -450,7 +472,7 @@
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->setHeader(array(
-			new CCheckBox('all_triggers',NULL,"CheckAll('".$form->GetName()."','all_triggers');"),
+			new CCheckBox('all_triggers',NULL,"checkAll('".$form->GetName()."','all_triggers','g_triggerid');"),
 			make_sorting_link(S_SEVERITY,'t.priority'),
 			make_sorting_link(S_STATUS,'t.status'),
 
@@ -533,6 +555,7 @@
 			}
 			else{
 				$error = new CDiv(SPACE,'ok_icon');
+				$error->setHint(S_OK_BIG, '', 'off');
 			}
 
 			switch($row['priority']){
@@ -578,20 +601,24 @@
 			$row_count++;
 		}
 
-		$table->SetFooter(new CCol(array(
-			new CButtonQMessage('group_enable',S_ENABLE_SELECTED,S_ENABLE_SELECTED_TRIGGERS_Q),
-			SPACE,
-			new CButtonQMessage('group_disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_TRIGGERS_Q),
-			SPACE,
-			new CButtonQMessage('group_delete',S_DELETE_SELECTED,S_DELETE_SELECTED_TRIGGERS_Q),
-			SPACE,
-			new CButton('form_copy_to',S_COPY_SELECTED_TO),
-			SPACE,
-			new CButton('massupdate',S_TRIGGERS_MASSUPDATE)
-		)));
+//----- GO ------
+		$goBox = new CComboBox('go');
+		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
+		$goBox->addItem('disable',S_DISABLE_SELECTED);
+		$goBox->addItem('massupdate',S_MASS_UPDATE);
+		$goBox->addItem('copy_to',S_COPY_SELECTED_TO);
+		$goBox->addItem('delete',S_DELETE_SELECTED);
 
-		$form->AddItem($table);
-		$form->Show();
+// goButton name is necessary!!!
+		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton->addOption('id','goButton');
+		zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
+
+		$table->setFooter(new CCol(array($goBox, $goButton)));
+//----
+
+		$form->addItem($table);
+		$form->show();
 	}
 	if(isset($row_count))
 		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');

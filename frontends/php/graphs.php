@@ -29,12 +29,18 @@
 	$page['hist_arg'] = array();
 	$page['scripts'] = array('graphs.js');
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
+	$_REQUEST['config'] = get_request('config','graphs.php');
+	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
+	$fields = array(
+//  NEW  templates.php; hosts.php; items.php; triggers.php; graphs.php; maintenances.php;
+// 	OLD  0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications; 5 - Proxies; 6 - maintenance
+		'config'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		
 		'groupid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
 		'hostid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
 
@@ -71,7 +77,11 @@ include_once 'include/page_header.php';
 		'group_graphid'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
 		'copy_targetid'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
 		'filter_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
-/* actions */
+
+// Actions
+		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
+
+// form
 		'add_item'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete_item'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 
@@ -80,9 +90,9 @@ include_once 'include/page_header.php';
 		'copy'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+
 /* other */
 		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'form_copy_to'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
@@ -210,56 +220,6 @@ include_once 'include/page_header.php';
 		}
 		show_messages($result, S_GRAPH_DELETED, S_CANNOT_DELETE_GRAPH);
 	}
-	else if(isset($_REQUEST['delete']) && isset($_REQUEST['group_graphid'])){
-		$group_graphid = $_REQUEST['group_graphid'];
-		$group_graphid = zbx_uint_array_intersect($group_graphid,$available_graphs);
-		$result = false;
-
-		DBstart();
-		foreach($group_graphid as $id => $graphid){
-			$graph=get_graph_by_graphid($graphid);
-			if($graph['templateid']<>0)	continue;
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,'Graph ['.$graph['name'].']');
-		}
-		if(!empty($group_graphid)){
-			$result = delete_graph($group_graphid);
-		}
-
-		$result = DBend($result);
-
-		show_messages($result, S_GRAPHS_DELETED, S_CANNOT_DELETE_GRAPHS);
-	}
-	else if(isset($_REQUEST['copy'])&&isset($_REQUEST['group_graphid'])&&isset($_REQUEST['form_copy_to'])){
-		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
-			if(0 == $_REQUEST['copy_type']){ /* hosts */
-				$hosts_ids = $_REQUEST['copy_targetid'];
-			}
-			else{ /* groups */
-				$hosts_ids = array();
-
-				$sql = 'SELECT DISTINCT h.hostid '.
-						' FROM hosts h, hosts_groups hg'.
-						' WHERE h.hostid=hg.hostid '.
-							' AND '.DBcondition('hg.groupid',$_REQUEST['copy_targetid']).
-							' AND '.DBcondition('h.hostid',$available_hosts_all_nodes);
-				$db_hosts = DBselect($sql);
-				while($db_host = DBfetch($db_hosts)){
-					array_push($hosts_ids, $db_host['hostid']);
-				}
-			}
-			DBstart();
-			foreach($_REQUEST['group_graphid'] as $graph_id)
-				foreach($hosts_ids as $host_id){
-					copy_graph_to_host($graph_id, $host_id, true);
-				}
-			$result = DBend();
-			unset($_REQUEST['form_copy_to']);
-		}
-		else{
-			error('No target selection.');
-		}
-		show_messages();
-	}
 	else if(isset($_REQUEST['delete_item']) && isset($_REQUEST['group_gid'])){
 
 		foreach($_REQUEST['items'] as $gid => $data){
@@ -302,6 +262,58 @@ include_once 'include/page_header.php';
 				$_REQUEST['items'][$_REQUEST['move_down']]['sortorder']++;
 			}
 		}
+	}
+//------ GO -------
+	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_graphid'])){
+		$group_graphid = $_REQUEST['group_graphid'];
+		$group_graphid = zbx_uint_array_intersect($group_graphid,$available_graphs);
+		$result = false;
+
+		DBstart();
+		foreach($group_graphid as $id => $graphid){
+			$graph=get_graph_by_graphid($graphid);
+			if($graph['templateid']<>0)	continue;
+			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,'Graph ['.$graph['name'].']');
+		}
+		if(!empty($group_graphid)){
+			$result = delete_graph($group_graphid);
+		}
+
+		$result = DBend($result);
+
+		show_messages($result, S_GRAPHS_DELETED, S_CANNOT_DELETE_GRAPHS);
+	}
+
+	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy'])&&isset($_REQUEST['group_graphid'])){
+		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
+			if(0 == $_REQUEST['copy_type']){ /* hosts */
+				$hosts_ids = $_REQUEST['copy_targetid'];
+			}
+			else{ /* groups */
+				$hosts_ids = array();
+
+				$sql = 'SELECT DISTINCT h.hostid '.
+						' FROM hosts h, hosts_groups hg'.
+						' WHERE h.hostid=hg.hostid '.
+							' AND '.DBcondition('hg.groupid',$_REQUEST['copy_targetid']).
+							' AND '.DBcondition('h.hostid',$available_hosts_all_nodes);
+				$db_hosts = DBselect($sql);
+				while($db_host = DBfetch($db_hosts)){
+					array_push($hosts_ids, $db_host['hostid']);
+				}
+			}
+			DBstart();
+			foreach($_REQUEST['group_graphid'] as $graph_id)
+				foreach($hosts_ids as $host_id){
+					copy_graph_to_host($graph_id, $host_id, true);
+				}
+			$result = DBend();
+			$_REQUEST['go'] = 'none';
+		}
+		else{
+			error('No target selection.');
+		}
+		show_messages();
 	}
 // ----</ACTIONS>----
 ?>
@@ -364,6 +376,18 @@ include_once 'include/page_header.php';
 	$form = new CForm();
 	$form->setMethod('get');
 
+// Config
+	$cmbConf = new CComboBox('config','graphs.php','javascript: submit()');
+	$cmbConf->addOption('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
+		$cmbConf->addItem('templates.php',S_TEMPLATES);
+		$cmbConf->addItem('hosts.php',S_HOSTS);
+		$cmbConf->addItem('items.php',S_ITEMS);
+		$cmbConf->addItem('triggers.php',S_TRIGGERS);
+		$cmbConf->addItem('graphs.php',S_GRAPHS);
+		$cmbConf->addItem('applications.php',S_APPLICATIONS);
+		
+	$form->addItem($cmbConf);
+	
 	if(!isset($_REQUEST['form']))
 		$form->addItem(new CButton('form',S_CREATE_GRAPH));
 
@@ -430,7 +454,7 @@ include_once 'include/page_header.php';
 
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
 		$table->setHeader(array(
-			new CCheckBox('all_graphs',NULL,"CheckAll('".$form->GetName()."','all_graphs');"),
+			new CCheckBox('all_graphs',NULL,"checkAll('".$form->getName()."','all_graphs','group_graphid');"),
 			$_REQUEST['hostid'] != 0 ? NULL : S_HOSTS,
 			make_sorting_link(S_NAME,'g.name'),
 			make_sorting_link(S_WIDTH,'g.width'),
@@ -489,7 +513,7 @@ include_once 'include/page_header.php';
 			}
 
 			$chkBox = new CCheckBox('group_graphid['.$row['graphid'].']',NULL,NULL,$row['graphid']);
-			if($row['templateid'] > 0) $chkBox->SetEnabled(false);
+			if($row['templateid'] > 0) $chkBox->setEnabled(false);
 
 			switch($row['graphtype']){
 				case  GRAPH_TYPE_STACKED:
@@ -517,14 +541,21 @@ include_once 'include/page_header.php';
 			$row_count++;
 		}
 
-		$table->SetFooter(new CCol(array(
-			new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_ITEMS_Q),
-			SPACE,
-			new CButton('form_copy_to',S_COPY_SELECTED_TO)
-		)));
+//----- GO ------
+		$goBox = new CComboBox('go');
+		$goBox->addItem('copy_to',S_COPY_SELECTED_TO);
+		$goBox->addItem('delete',S_DELETE_SELECTED);
 
-		$form->AddItem($table);
-		$form->Show();
+// goButton name is necessary!!!
+		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton->addOption('id','goButton');
+		zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');
+
+		$table->setFooter(new CCol(array($goBox, $goButton)));
+//----
+
+		$form->addItem($table);
+		$form->show();
 	}
 
 	if(isset($row_count))

@@ -193,7 +193,7 @@ function cancelEvent(e){
 return false;
 }
 
-function CheckAll(form_name, chkMain, shkName){
+function checkAll(form_name, chkMain, shkName){
 	var frmForm = document.forms[form_name];
 	var value = frmForm.elements[chkMain].checked;
 
