@@ -2136,7 +2136,7 @@
 			return;
 		}
 
-		$frmCopy = new CFormTable(count($group_itemid).' '.S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT,null,'post',null,'form_copy_to');
+		$frmCopy = new CFormTable(count($group_itemid).' '.S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT,null,'post',null,'go');
 		$frmCopy->SetHelp('web.items.copyto.php');
 		$frmCopy->addVar($elements_array_name, $group_itemid);
 
