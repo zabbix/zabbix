@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-30] added support of UTF8 in email notifications (Sasha)
  - [NTP-29] fixed malfunction of the cpu data collector for Windows agents (Sasha)
  - [NTP-34] returned graph data pickup logic (Artem)
  - [NTP-32] fixed misspelled function inserted in trigger "logserverity" (Artem)
