@@ -174,6 +174,7 @@ void	init_collector_data(void)
 
 	collector = zbx_malloc(collector, sz + sz_cpu);
 	memset(collector, 0, sz + sz_cpu);
+	memset(&collector->cpus, 0, sizeof(ZBX_CPUS_STAT_DATA));
 
 	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)(collector + 1);
 	collector->cpus.count = cpu_count;
