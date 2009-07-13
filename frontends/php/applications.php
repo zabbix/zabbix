@@ -70,7 +70,7 @@ include_once('include/page_header.php');
 		'apphostid'=>		array(T_ZBX_INT, O_OPT, NULL,	DB_ID.'{}>0',	'(({config}==4))&&isset({save})'),
 		'apptemplateid'=>	array(T_ZBX_INT,O_OPT,	NULL,	DB_ID,	NULL),
 
-// actions 
+// actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 
 // form
@@ -88,7 +88,7 @@ include_once('include/page_header.php');
 	);
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
-	
+
 ?>
 <?php
 
@@ -219,7 +219,7 @@ include_once('include/page_header.php');
 
 // Config
 	$cmbConf = new CComboBox('config','applications.php','javascript: submit()');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
+	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('templates.php',S_TEMPLATES);
 		$cmbConf->addItem('hosts.php',S_HOSTS);
 		$cmbConf->addItem('items.php',S_ITEMS);
@@ -313,7 +313,7 @@ include_once('include/page_header.php');
 				));
 			$row_count++;
 		}
-		
+
 // goBox
 		$goBox = new CComboBox('go');
 		$goBox->addItem('activate',S_ACTIVATE_ITEMS);
@@ -326,7 +326,7 @@ include_once('include/page_header.php');
 		zbx_add_post_js('chkbxRange.pageGoName = "applications";');
 //----
 		$table->setFooter(new CCol(array($goBox, $goButton)));
-		
+
 		$form->addItem($table);
 		$form->show();
 	}
