@@ -34,26 +34,27 @@ class CTemplate {
 		$sort_columns = array('hostid, host'); // allowed columns for sorting
 		
 		$sql_parts = array(
-			'select' => array('h.hostid, h.host'),
+			'select' => array('templates' => 'h.hostid'),
 			'from' => array('hosts h'),
 			'where' => array('h.status=3'),
 			'order' => array(),
 			'limit' => null);
 
 		$def_options = array(
-			'nodeids'			=> array(),
-			'groupids'			=> array(),
-			'templateids'		=> array(),
-			'with_items'		=> false,
-			'with_triggers'		=> false,
-			'with_graphs'		=> false,
-			'editable' 			=> false,
-			'nopermissions'		=> false,
-			'extendoutput'			=> false,
-			'count'				=> false,
+			'nodeids'			=> 0,
+			'groupids'			=> 0,
+			'templateids'		=> 0,
+			'hostids'			=> 0,
+			'with_items'		=> 0,
+			'with_triggers'		=> 0,
+			'with_graphs'		=> 0,
+			'editable' 			=> 0,
+			'nopermissions'		=> 0,
+			'extendoutput'		=> 0,
+			'count'				=> 0,
 			'pattern'			=> '',
 			'order'				=> '',
-			'limit'				=> null);
+			'limit'				=> 0);
 
 		$options = array_merge($def_options, $options);
 		
@@ -89,7 +90,7 @@ class CTemplate {
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
-		if($options['groupids']){
+		if($options['groupids'] != 0){
 			zbx_value2array($options['groupids']);
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
@@ -97,18 +98,27 @@ class CTemplate {
 		}
 
 // templateids
-		if($options['templateids']){
+		if($options['templateids'] != 0){
 			zbx_value2array($options['templateids']);
 			$sql_parts['where'][] = DBcondition('h.hostid', $options['templateids']);
 		}
-
+// hostids
+		if($options['hostids'] != 0){
+			zbx_value2array($options['hostids']);
+			if($options['extendoutput']){
+				$sql_parts['select']['linked_to_id'] = 'ht.hostid as linked_to_id';
+			}
+			$sql_parts['from']['ht'] = 'hosts_templates ht';
+			$sql_parts['where'][] = DBcondition('ht.hostid', $options['hostids']);
+			$sql_parts['where']['hht'] = 'h.hostid=ht.templateid';
+		}
 // with_items
-		if($options['with_items']){
+		if($options['with_items'] != 0){
 			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
 		}
 
 // with_triggers
-		if($options['with_triggers']){
+		if($options['with_triggers'] != 0){
 			$sql_parts['where'][] = 'EXISTS( 
 					SELECT i.itemid
 					FROM items i, functions f, triggers t
@@ -118,7 +128,7 @@ class CTemplate {
 		}
 
 // with_graphs
-		if($options['with_graphs']){
+		if($options['with_graphs'] != 0){
 			$sql_parts['where'][] = 'EXISTS( 
 					SELECT DISTINCT i.itemid 
 					FROM items i, graphs_items gi 
@@ -127,13 +137,13 @@ class CTemplate {
 		}
 
 // extendoutput
-		if($options['extendoutput']){
-			$sql_parts['select'] = array('h.*');
+		if($options['extendoutput'] != 0){
+			$sql_parts['select']['templates'] = 'h.*';
 		}
 
 // count
-		if($options['count']){
-			$sql_parts['select'] = array('count(h.hostid) as rowscount');
+		if($options['count'] != 0){
+			$sql_parts['select']['templates'] = 'count(h.hostid) as rowscount';
 		}
 
 // pattern
@@ -164,10 +174,10 @@ class CTemplate {
 		$sql_from = '';
 		$sql_where = '';
 		$sql_order = '';
-		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
-		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);	
+		if(!empty($sql_parts['select']))	$sql_select.= implode(',', $sql_parts['select']);
+		if(!empty($sql_parts['from']))		$sql_from.= implode(',', $sql_parts['from']);
+		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ', $sql_parts['where']);
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',', $sql_parts['order']);	
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.$sql_select.'
@@ -176,13 +186,32 @@ class CTemplate {
 					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
+		
 		while($template = DBfetch($res)){
 			if($options['count'])
 				$result = $template;
-			else
-				$result[$template['hostid']] = $template;
+			else{
+				if(!isset($options['extendoutput'])){
+					$result[$template['hostid']] = $template['hostid'];
+				}
+				else{
+					if(!isset($result[$template['hostid']])) 
+						$result[$template['hostid']]= array();
+					
+					if(isset($template['linked_to_id'])){
+						if(!isset($result[$template['hostid']]['linked_to_hostids'])) 
+							$result[$template['hostid']]['linked_to_hostids'] = array();
+							
+						$result[$template['hostid']]['linked_to_hostids'][$template['linked_to_id']] = $template['linked_to_id'];
+						unset($template['linked_to_id']);
+					}
+					
+					$result[$template['hostid']] += $template;
+				}
+			}
+				
 		}
-		
+	
 	return $result;
 	}
 
@@ -504,6 +533,7 @@ class CTemplate {
 	 */
 	public static function linkTemplates($data){
 		$result = false;
+		$error = '';
 
 		$hostid = $data['hostid'];
 		$templateids = $data['templateids'];

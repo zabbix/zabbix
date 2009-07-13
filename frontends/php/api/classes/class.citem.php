@@ -46,27 +46,27 @@ class CItem {
 		$sort_columns = array('itemid'); // allowed columns for sorting
 
 		$sql_parts = array(
-			'select' => array('i.itemid, i.type, i.description, i.key_, i.status'),
+			'select' => array('items' => 'i.itemid'),
 			'from' => array('items i'),
 			'where' => array('i.type<>9'),
 			'order' => array(),
 			'limit' => null);
 
 		$def_options = array(
-			'nodeids'			=> array(),
-			'groupids'			=> array(),
-			'hostids'			=> array(),
-			'itemids'			=> array(),
-			'triggerids'		=> array(),
-			'applicationids'	=> array(),
-			'status'			=> false,
-			'templated_items'	=> false,
-			'editable'			=> false,
-			'nopermissions'		=> false,
-			'extendoutput'			=> false,
-			'count'				=> false,
+			'nodeids'			=> 0,
+			'groupids'			=> 0,
+			'hostids'			=> 0,
+			'itemids'			=> 0,
+			'triggerids'		=> 0,
+			'applicationids'	=> 0,
+			'status'			=> 0,
+			'templated_items'	=> 0,
+			'editable'			=> 0,
+			'nopermissions'		=> 0,
+			'extendoutput'		=> 0,
+			'count'				=> 0,
 			'pattern'			=> '',
-			'limit'				=> null,
+			'limit'				=> 0,
 			'order'				=> '');
 
 		$options = array_merge($def_options, $options);
@@ -103,54 +103,55 @@ class CItem {
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
 		
 // groupids
-		if($options['groupids']){
+		if($options['groupids'] != 0){
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where'][] = 'hg.hostid=i.hostid';
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 		}
 
 // hostids
-		if($options['hostids']){
+		if($options['hostids'] != 0){
+			zbx_value2array($options['hostids']);
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
 		}
 
 // itemids
-		if($options['itemids']){
+		if($options['itemids'] != 0){
 			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
 		}
 
 // triggerids
-		if($options['triggerids']){
+		if($options['triggerids'] != 0){
 			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
 			$sql_parts['where'][] = 'i.itemid=f.itemid';
 			$sql_parts['from'][] = 'functions f';
 		}
 
 // applicationids
-		if($options['applicationids']){
+		if($options['applicationids'] != 0){
 			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
 			$sql_parts['where'][] = 'i.hostid=a.hostid';
 			$sql_parts['from'][] = 'applications a';
 		}
 
 // status
-		if($options['status'] !== false){
+		if($options['status'] != 0){
 			$sql_parts['where'][] = 'i.status='.$options['status'];
 		}
 
 // templated_items
-		if($options['templated_items']){
+		if($options['templated_items'] != 0){
 			$sql_parts['where'][] = 'i.templateid<>0';
 		}
 
 // extendoutput
-		if($options['extendoutput']){
-			$sql_parts['select'] = array('i.*');
+		if($options['extendoutput'] != 0){
+			$sql_parts['select']['items'] = 'i.*';
 		}
 
 // count
-		if($options['count']){
-			$sql_parts['select'] = array('count(i.itemid) as count');
+		if($options['count'] != 0){
+			$sql_parts['select']['items'] = 'count(i.itemid) as count';
 		}
 
 // pattern
@@ -194,11 +195,21 @@ class CItem {
 					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
-		while($item = DBfetch($db_res)){
+		while($item = DBfetch($res)){
 			if($options['count'])
 				$result = $item;
 			else
-				$result[$item['itemid']] = $item;
+				if(!isset($options['extendoutput'])){
+					$result[$item['itemid']] = $item['itemid'];
+				}
+				else{
+					if(!isset($result[$item['itemid']])) 
+						$result[$item['itemid']] = array();
+					
+					$result[$item['itemid']] += $item;
+				}
+				
+				
 		}
 
 	return $result;
