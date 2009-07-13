@@ -408,7 +408,7 @@
 	
 // Config
 	$cmbConf = new CComboBox('config','triggers.php','javascript: submit()');
-	$cmbConf->addOption('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
+	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
 		$cmbConf->addItem('templates.php',S_TEMPLATES);
 		$cmbConf->addItem('hosts.php',S_HOSTS);
 		$cmbConf->addItem('items.php',S_ITEMS);
@@ -458,7 +458,7 @@
 
 		$row_count = 0;
 		$numrows = new CSpan(null,'info');
-		$numrows->addOption('name','numrows');
+		$numrows->setAttribute('name','numrows');
 		$header = get_table_header(array(S_TRIGGERS_BIG,
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 						S_FOUND.': ',$numrows,)
@@ -611,7 +611,7 @@
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
-		$goButton->addOption('id','goButton');
+		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));

@@ -667,7 +667,7 @@ include_once('include/page_header.php');
 		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $available_hosts, PERM_RES_IDS_ARRAY, $nodeid);
 
 		$form = new CForm();
-		$form->addOption('id', S_TRIGGERS);
+		$form->setAttribute('id', S_TRIGGERS);
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 

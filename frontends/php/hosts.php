@@ -62,6 +62,7 @@ include_once('include/page_header.php');
 		'applications'=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 
 // host
+		'groupid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
 		'hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
 		'host'=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,		'isset({save})&&!isset({massupdate})'),
 		'proxy_hostid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	'isset({save})&&!isset({massupdate})'),
@@ -557,7 +558,7 @@ include_once('include/page_header.php');
 
 // Config
 	$cmbConf = new CComboBox('config','hosts.php','javascript: submit()');
-	$cmbConf->addOption('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
+	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
 		$cmbConf->addItem('templates.php',S_TEMPLATES);
 		$cmbConf->addItem('hosts.php',S_HOSTS);
 		$cmbConf->addItem('items.php',S_ITEMS);
@@ -600,7 +601,7 @@ include_once('include/page_header.php');
 		$frmForm->addItem(array(S_GROUP.SPACE,$cmbGroups));
 
 		$numrows = new CSpan(null,'info');
-		$numrows->addOption('name','numrows');
+		$numrows->setAttribute('name','numrows');
 
 		$header = get_table_header(array(S_HOSTS_BIG,
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
@@ -733,7 +734,7 @@ include_once('include/page_header.php');
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
-		$goButton->addOption('id','goButton');
+		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));

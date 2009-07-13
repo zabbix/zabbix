@@ -25,11 +25,11 @@ class CCheckBox extends CTag{
 		parent::__construct('input','no');
 		$this->tag_body_start = '';
 
-		$this->addOption('class','checkbox');
-		$this->addOption('type','checkbox');
-		$this->addOption('value',$value);
-		$this->addOption('name',$name);
-		$this->addOption('id',$name);
+		$this->setAttribute('class','checkbox');
+		$this->setAttribute('type','checkbox');
+		$this->setAttribute('value',$value);
+		$this->setAttribute('name',$name);
+		$this->setAttribute('id',$name);
 
 		$this->setAction($action);
 		$this->setChecked($checked);
@@ -37,16 +37,16 @@ class CCheckBox extends CTag{
 
 	public function setEnabled($value='yes'){
 		if($value=='yes' || $value == true || $value === 1)
-			return $this->delOption('disabled');
+			return $this->removeAttribute('disabled');
 
-		return $this->options['disabled'] = 'disabled';
+		return $this->attributes['disabled'] = 'disabled';
 	}
 
 	public function setChecked($value='yes'){
 		if((is_string($value)&& ($value=='yes' || $value=='checked' || $value=='on') || $value=='1') || (is_int($value)&&$value<>0))
-			return $this->options['checked'] = 'checked';
+			return $this->attributes['checked'] = 'checked';
 
-		$this->delOption('checked');
+		$this->removeAttribute('checked');
 	}
 
 	public function setAction($value='submit()', $event='onclick'){

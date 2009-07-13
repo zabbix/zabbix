@@ -41,7 +41,7 @@ class CVisibilityBox extends CCheckBox{
 	public function toString($destroy=true){
 		global $ZBX_PAGE_POST_JS;
 
-		if(!isset($this->options['checked'])){
+		if(!isset($this->attributes['checked'])){
 			foreach($this->object_name as $obj_name){
 				if(empty($obj_name)) continue;
 				zbx_add_post_js('visibility_status_changeds(false,'.zbx_jsvalue($obj_name).','.zbx_jsvalue($this->replace_to).');');

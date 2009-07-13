@@ -116,7 +116,7 @@ include_once('include/page_header.php');
 	$url = 'httpmon.php?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 
 	$httpmon_wdgt->addHeader(S_STATUS_OF_WEB_MONITORING_BIG, $fs_icon);

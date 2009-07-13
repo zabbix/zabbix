@@ -45,7 +45,7 @@ function make_favorite_graphs(){
 			$link->setTarget('blank');
 
 			$capt = new CSpan($link);
-			$capt->addOption('style','line-height: 14px; vertical-align: middle;');
+			$capt->setAttribute('style','line-height: 14px; vertical-align: middle;');
 
 			$icon = new CLink(new CImg('images/general/chart.png','chart',18,18,'borderless'),'history.php?action=showgraph&itemid='.$sourceid.'&fullscreen=1');
 			$icon->setTarget('blank');
@@ -61,7 +61,7 @@ function make_favorite_graphs(){
 			$link->setTarget('blank');
 
 			$capt = new CSpan($link);
-			$capt->addOption('style','line-height: 14px; vertical-align: middle;');
+			$capt->setAttribute('style','line-height: 14px; vertical-align: middle;');
 
 			$icon = new CLink(new CImg('images/general/chart.png','chart',18,18,'borderless'),'charts.php?graphid='.$sourceid.'&fullscreen=1');
 			$icon->setTarget('blank');
@@ -74,7 +74,7 @@ function make_favorite_graphs(){
 		));
 	}
 	$td = new CCol(array(new CLink(S_GRAPHS.' &raquo;','charts.php','highlight')));
-	$td->addOption('style','text-align: right;');
+	$td->setAttribute('style','text-align: right;');
 
 	$table->setFooter($td);
 
@@ -99,7 +99,7 @@ function make_favorite_screens(){
 			$link->setTarget('blank');
 
 			$capt = new CSpan($link);
-			$capt->addOption('style','line-height: 14px; vertical-align: middle;');
+			$capt->setAttribute('style','line-height: 14px; vertical-align: middle;');
 
 			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=1&elementid='.$sourceid.'&fullscreen=1');
 			$icon->setTarget('blank');
@@ -112,7 +112,7 @@ function make_favorite_screens(){
 			$link->setTarget('blank');
 
 			$capt = new CSpan($link);
-			$capt->addOption('style','line-height: 14px; vertical-align: middle;');
+			$capt->setAttribute('style','line-height: 14px; vertical-align: middle;');
 
 			$icon = new CLink(new CImg('images/general/chart.png','screen',18,18,'borderless'),'screens.php?config=0&elementid='.$sourceid.'&fullscreen=1');
 			$icon->setTarget('blank');
@@ -126,7 +126,7 @@ function make_favorite_screens(){
 	}
 
 	$td = new CCol(array(new CLink(S_SCREENS.' &raquo;','screens.php','highlight')));
-	$td->addOption('style','text-align: right;');
+	$td->setAttribute('style','text-align: right;');
 
 	$table->setFooter($td);
 
@@ -151,7 +151,7 @@ function make_favorite_maps(){
 		$link->setTarget('blank');
 
 		$capt = new CSpan($link);
-		$capt->addOption('style','line-height: 14px; vertical-align: middle;');
+		$capt->setAttribute('style','line-height: 14px; vertical-align: middle;');
 
 		$icon = new CLink(new CImg('images/general/chart.png','map',18,18,'borderless'),'maps.php?sysmapid='.$sourceid.'&fullscreen=1');
 		$icon->setTarget('blank');
@@ -164,7 +164,7 @@ function make_favorite_maps(){
 	}
 
 	$td = new CCol(array(new CLink(S_MAPS.' &raquo;','maps.php','highlight')));
-	$td->addOption('style','text-align: right;');
+	$td->setAttribute('style','text-align: right;');
 
 	$table->setFooter($td);
 
@@ -260,7 +260,7 @@ function make_system_summary($args = array()){
 			if($value){
 //* trigger list
 				$table_inf  = new CTableInfo();
-				$table_inf->addOption('style', 'width: 400px;');
+				$table_inf->setAttribute('style', 'width: 400px;');
 				$table_inf->setHeader(array(
 					is_show_all_nodes() ? S_NODE : null,
 					S_HOST,
@@ -368,7 +368,7 @@ function make_status_of_zbx(){
 	new CSpan($status['zabbix_server'], ($status['zabbix_server'] == S_YES ? 'off' : 'on')),' - '));
 	//	$table->addRow(array(S_VALUES_STORED,$status['history_count']));$table->addRow(array(S_TRENDS_STORED,$status['trends_count']));
 	$title = new CSpan(S_NUMBER_OF_HOSTS);
-	$title->addOption('title', 'asdad');
+	$title->setAttribute('title', 'asdad');
 	$table->addRow(array(S_NUMBER_OF_HOSTS ,$status['hosts_count'],
 		array(
 			new CSpan($status['hosts_count_monitored'],'off'),' / ',
@@ -377,7 +377,7 @@ function make_status_of_zbx(){
 		)
 	));
 	$title = new CSpan(S_NUMBER_OF_ITEMS);
-	$title->addOption('title', S_NUMBER_OF_ITEMS_TOOLTIP);
+	$title->setAttribute('title', S_NUMBER_OF_ITEMS_TOOLTIP);
 	$table->addRow(array($title, $status['items_count'],
 		array(
 			new CSpan($status['items_count_monitored'],'off'),' / ',
@@ -386,7 +386,7 @@ function make_status_of_zbx(){
 		)
 	));
 	$title = new CSpan(S_NUMBER_OF_TRIGGERS);
-	$title->addOption('title', S_NUMBER_OF_TRIGGERS_TOOLTIP);
+	$title->setAttribute('title', S_NUMBER_OF_TRIGGERS_TOOLTIP);
 	$table->addRow(array($title,$status['triggers_count'],
 		array(
 			$status['triggers_count_enabled'],' / ',
@@ -498,8 +498,8 @@ function make_latest_issues($params = array()){
 		$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
 
 		$host = new CSpan($row['host']);
-		$host->addOption('onclick','javascript: '.$menus);
-		$host->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
+		$host->setAttribute('onclick','javascript: '.$menus);
+		$host->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 		$event_sql = 'SELECT DISTINCT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type, t.url '.
 					' FROM events e, triggers t '.
@@ -515,7 +515,7 @@ function make_latest_issues($params = array()){
 			if($config['event_ack_enable']){
 				if($row_event['acknowledged'] == 1){
 					$ack_info = make_acktab_by_eventid($row_event['eventid']);
-					$ack_info->addOption('style','width: auto;');
+					$ack_info->setAttribute('style','width: auto;');
 
 					$ack=new CLink(S_YES,'acknow.php?eventid='.$row_event['eventid'],'action');
 					$ack->setHint($ack_info);

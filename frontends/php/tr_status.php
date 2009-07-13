@@ -252,15 +252,15 @@ include_once 'include/page_header.php';
 	$url = 'tr_status.php'.($_REQUEST['fullscreen']?'':'?fullscreen=1');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 
 	$mute_icon = new CDiv(SPACE,$mute?'iconmute':'iconsound');
-	$mute_icon->addOption('title',S_SOUND.' '.S_ON.'/'.S_OFF);
+	$mute_icon->setAttribute('title',S_SOUND.' '.S_ON.'/'.S_OFF);
 	$mute_icon->addAction('onclick',new CScript("javascript: switch_mute(this);"));
 
 	$tr_numrows = new CSpan(null,'info');
-	$tr_numrows->addOption('name','tr_numrows');
+	$tr_numrows->setAttribute('name','tr_numrows');
 
 	$tr_info = array(S_TRIGGERS,
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
@@ -275,8 +275,8 @@ include_once 'include/page_header.php';
 /***********************************************************/
 
 	$filterForm = new CFormTable();//,'tr_status.php?filter_set=1','POST',null,'sform');
-	$filterForm->addOption('name','zbx_filter');
-	$filterForm->addOption('id','zbx_filter');
+	$filterForm->setAttribute('name','zbx_filter');
+	$filterForm->setAttribute('id','zbx_filter');
 	$filterForm->setMethod('post');
 
 	$filterForm->addVar('fullscreen',$_REQUEST['fullscreen']);
@@ -316,7 +316,7 @@ include_once 'include/page_header.php';
 //------- JP -------
 	if($show_triggers==TRIGGERS_OPTION_NOFALSEFORB){
 		$ev_select->addItem(EVENTS_OPTION_NOFALSEFORB,' - ','yes');
-		$ev_select->addOption('disabled','disabled');
+		$ev_select->setAttribute('disabled','disabled');
 
 		$ev_status = new CComboBox('show_events_status',$show_events_status,'javascript: submit();');
 		$ev_status->addItem(EVENTS_NOFALSEFORB_STATUS_ALL, S_SHOW_ALL);
@@ -525,15 +525,15 @@ include_once 'include/page_header.php';
 
 		if($_REQUEST['show_details']){
 			$font = new CTag('font','yes');
-			$font->addOption('color','#000');
-			$font->addOption('size','-2');
+			$font->setAttribute('color','#000');
+			$font->setAttribute('size','-2');
 			$font->addItem(explode_exp($row['expression'],1));
 			$description = array($description,BR(), $font);
 		}
 // dependency
 		$dependency = false;
 		$dep_table = new CTableInfo();
-		$dep_table->addOption('style', 'width: 200px;');
+		$dep_table->setAttribute('style', 'width: 200px;');
 		$dep_table->addRow(bold(S_DEPENDS_ON.':'));
 
 		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.$row['triggerid'];
@@ -545,7 +545,7 @@ include_once 'include/page_header.php';
 
 		if($dependency){
 			$img = new Cimg('images/general/down_icon.png','DEP_DOWN');
-			$img->addOption('style','vertical-align: middle; border: 0px;');
+			$img->setAttribute('style','vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 
 			$description = array($img,SPACE,$description);
@@ -554,7 +554,7 @@ include_once 'include/page_header.php';
 
 		$dependency = false;
 		$dep_table = new CTableInfo();
-		$dep_table->addOption('style', 'width: 200px;');
+		$dep_table->setAttribute('style', 'width: 200px;');
 		$dep_table->addRow(bold(S_DEPENDENT.':'));
 
 		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.$row['triggerid'];
@@ -566,7 +566,7 @@ include_once 'include/page_header.php';
 
 		if($dependency){
 			$img = new Cimg('images/general/up_icon.png','DEP_UP');
-			$img->addOption('style','vertical-align: middle; border: 0px;');
+			$img->setAttribute('style','vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 
 			$description = array($img,SPACE,$description);
@@ -576,7 +576,7 @@ include_once 'include/page_header.php';
 
 		if((time(NULL)-$row['lastchange'])<TRIGGER_BLINK_PERIOD){
 			$tr_status = new CLink(trigger_value2str($row['value']));
-			$tr_status->addOption('name','blink');
+			$tr_status->setAttribute('name','blink');
 		}
 		else{
 			$tr_status = trigger_value2str($row['value']);
@@ -610,7 +610,7 @@ include_once 'include/page_header.php';
 			$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
 
 			$host = new CSpan($row['host'],'pointer');
-			$host->addOption('onclick','javascript: '.$menus);
+			$host->setAttribute('onclick','javascript: '.$menus);
 		}
 
 		$tr_conf_link = 'null';
@@ -670,12 +670,12 @@ include_once 'include/page_header.php';
 					ZBX_FLAG_EVENT);
 
 			$font = new CTag('font','yes');
-			$font->addOption('color','#808080');
+			$font->setAttribute('color','#808080');
 			$font->addItem(array('&nbsp;-&nbsp;',$description));
 			$description = $font;
 
 			$description = new CCol($description);
-			$description->addOption('style','white-space: normal; width: 90%;');
+			$description->setAttribute('style','white-space: normal; width: 90%;');
 
 			$clock = new CLink(
 							zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),

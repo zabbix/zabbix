@@ -78,7 +78,7 @@ function add_users(formname) {
 
 // create user twinbox +
 	$form = new CForm('users.php');
-	$form->addOption('id', 'users');
+	$form->setAttribute('id', 'users');
 
 	$user_tb = new CTweenBox($form, 'usersid', null, 10);
 

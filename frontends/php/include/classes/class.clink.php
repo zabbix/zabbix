@@ -37,7 +37,7 @@ class CLink extends CTag{
 
 	public function setAction($value=NULL){
 		if(is_null($value))
-			return $this->options['action'] = $page['file'];
+			return $this->attributes['action'] = $page['file'];
 
 		return parent::addAction('onclick', $value);
 	}
@@ -50,22 +50,22 @@ class CLink extends CTag{
 		else {
 			$url = $value;
 		}
-		$this->addOption('href', $url);
+		$this->setAttribute('href', $url);
 	}
 
 	public function getUrl(){
-		if(isset($this->options['href']))
-			return $this->options['href'];
+		if(isset($this->attributes['href']))
+			return $this->attributes['href'];
 		else
 			return null;
 	}
 
 	public function setTarget($value=NULL){
 		if(is_null($value)){
-			unset($this->options['target']);
+			unset($this->attributes['target']);
 		}
 		else{
-			$this->options['target'] = $value;
+			$this->attributes['target'] = $value;
 		}
 	}
 }

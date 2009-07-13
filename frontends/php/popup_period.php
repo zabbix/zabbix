@@ -120,7 +120,7 @@ include_once 'include/page_header.php';
 											"CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
 
 		$reporttimetab = new CTable(null,'calendar');
-		$reporttimetab->addOption('width','10%');
+		$reporttimetab->setAttribute('width','10%');
 
 		$reporttimetab->setCellPadding(0);
 		$reporttimetab->setCellSpacing(0);

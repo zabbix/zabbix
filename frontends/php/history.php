@@ -168,15 +168,15 @@ include_once "include/page_header.php";
 		if('showgraph' == $_REQUEST['action']){
 			if(infavorites('web.favorite.graphids',$_REQUEST['itemid'],'itemid')){
 				$icon = new CDiv(SPACE,'iconminus');
-				$icon->addOption('title',S_REMOVE_FROM.' '.S_FAVOURITES);
+				$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
 				$icon->addAction('onclick',new CScript("javascript: rm4favorites('itemid','".$_REQUEST['itemid']."',0);"));
 			}
 			else{
 				$icon = new CDiv(SPACE,'iconplus');
-				$icon->addOption('title',S_ADD_TO.' '.S_FAVOURITES);
+				$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
 				$icon->addAction('onclick',new CScript("javascript: add2favorites('itemid','".$_REQUEST['itemid']."');"));
 			}
-			$icon->addOption('id','addrm_fav');
+			$icon->setAttribute('id','addrm_fav');
 
 			$icon_tab = new CTable();
 			$icon_tab->addRow(array($icon,SPACE,$l_header));
@@ -365,7 +365,7 @@ include_once "include/page_header.php";
 
 			if(!isset($_REQUEST['plaintext'])){
 				$table = new CTableInfo('...','log_history_table');
-				$table->addOption('id','graph');
+				$table->setAttribute('id','graph');
 				$table->setHeader(array(S_TIMESTAMP,
 						($item_cout>1)?S_ITEM:null,
 						S_LOCAL_TIME,
@@ -449,7 +449,7 @@ include_once "include/page_header.php";
 						$int_color = ($max_color - $min_color) / count($_REQUEST['itemid']);
 						$int_color *= array_search($row['itemid'],$_REQUEST['itemid']);
 						$int_color += $min_color;
-						$crow->addOption('style','background-color: '.sprintf("#%X%X%X",$int_color,$int_color,$int_color));
+						$crow->setAttribute('style','background-color: '.sprintf("#%X%X%X",$int_color,$int_color,$int_color));
 					}
 					else {
 						$crow->setClass($color_style);
@@ -486,7 +486,7 @@ include_once "include/page_header.php";
 			if(!isset($_REQUEST['plaintext'])){
 				$table = new CTableInfo();
 				$table->setHeader(array(S_TIMESTAMP, S_VALUE));
-				$table->addOption('id','graph');
+				$table->setAttribute('id','graph');
 				$table->ShowStart(); // to solve memory leak we call 'Show' method by steps
 			}
 			else{
@@ -559,8 +559,8 @@ COpt::profiling_stop('history');
 			zbx_add_post_js($script);
 
 			$scroll_div = new CDiv();
-			$scroll_div->addOption('id','scroll_cntnr');
-			$scroll_div->addOption('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
+			$scroll_div->setAttribute('id','scroll_cntnr');
+			$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
 			$scroll_div->show();
 	//		navigation_bar("history.php",$to_save_request);
 		}

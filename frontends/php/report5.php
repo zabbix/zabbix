@@ -128,8 +128,8 @@ include_once('include/page_header.php');
 		$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
 
 		$host = new CSpan($row['host']);
-		$host->addOption('onclick','javascript: '.$menus);
-		$host->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
+		$host->setAttribute('onclick','javascript: '.$menus);
+		$host->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 		$tr_conf_link = 'null';
 		if($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER)

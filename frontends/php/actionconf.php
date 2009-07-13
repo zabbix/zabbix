@@ -403,7 +403,7 @@ include_once('include/page_header.php');
 		$left_tab->setCellPadding(3);
 		$left_tab->setCellSpacing(3);
 
-		$left_tab->addOption('border',0);
+		$left_tab->setAttribute('border',0);
 
 		$left_tab->addRow(create_hat(
 				S_ACTION,
@@ -433,7 +433,7 @@ include_once('include/page_header.php');
 		$right_tab->setCellPadding(3);
 		$right_tab->setCellSpacing(3);
 
-		$right_tab->addOption('border',0);
+		$right_tab->setAttribute('border',0);
 
 		$right_tab->addRow(create_hat(
 				S_ACTION_OPERATIONS,
@@ -461,13 +461,13 @@ include_once('include/page_header.php');
 		}
 
 		$td_l = new CCol($left_tab);
-		$td_l->addOption('valign','top');
+		$td_l->setAttribute('valign','top');
 
 		$td_r = new CCol($right_tab);
-		$td_r->addOption('valign','top');
+		$td_r->setAttribute('valign','top');
 
 		$outer_table = new CTable();
-		$outer_table->addOption('border',0);
+		$outer_table->setAttribute('border',0);
 		$outer_table->setCellPadding(1);
 		$outer_table->setCellSpacing(1);
 		$outer_table->addRow(array($td_l,$td_r));
@@ -489,7 +489,7 @@ include_once('include/page_header.php');
 
 		$row_count = 0;
 		$numrows = new CSpan(null,'info');
-		$numrows->addOption('name','numrows');
+		$numrows->setAttribute('name','numrows');
 		$header = get_table_header(array(S_ACTIONS_BIG,
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 						S_FOUND.': ',$numrows,)

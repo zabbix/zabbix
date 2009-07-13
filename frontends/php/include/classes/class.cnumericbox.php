@@ -22,8 +22,8 @@
 class CNumericBox extends CTextBox{
 	public function __construct($name='number',$value='0',$size=20,$readonly='no',$allowempty=false){
 		parent::__construct($name,$value,$size,$readonly);
-		$this->addOption('maxlength', $size);
-		$this->addOption('style', 'text-align: right;');
+		$this->setAttribute('maxlength', $size);
+		$this->setAttribute('style', 'text-align: right;');
 
 		$this->addAction('onkeypress',
 			' var c = (window.event) ? event.keyCode : event.which;'.

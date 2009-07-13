@@ -2028,7 +2028,7 @@ return $result;
 		$script = new CScript('javascript: create_host_menu(event,'.$hostid.','.zbx_jsvalue($hst_grp_all_in).');');
 
 		$action->addAction('onclick',$script);
-		$action->addOption('onmouseover','javascript: this.style.cursor = "pointer";');
+		$action->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
 
 	return $action;
 	}

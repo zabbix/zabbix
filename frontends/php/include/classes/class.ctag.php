@@ -36,7 +36,7 @@ class CTag extends CObject{
 	public function __construct($tagname=NULL, $paired='no', $body=NULL, $class=null){
 		parent::__construct();
 
-		$this->options = array();
+		$this->attributes = array();
 
 		if(!is_string($tagname)){
 			return $this->error('Incorrect tagname for CTag ['.$tagname.']');
@@ -63,7 +63,7 @@ class CTag extends CObject{
 
 	public function startToString(){
 		$res = $this->tag_start.'<'.$this->tagname;
-		foreach($this->options as $key => $value){
+		foreach($this->attributes as $key => $value){
 			$res .= ' '.$key.'="'.$value.'"';
 		}
 		$res .= ($this->paired=='yes')?'>':' />';
@@ -101,51 +101,51 @@ class CTag extends CObject{
 		if(!is_string($value)){
 			return $this->error("Incorrect value for SetName [$value]");
 		}
-	return $this->addOption("name",$value);
+	return $this->setAttribute("name",$value);
 	}
 
 	public function getName(){
-		if(isset($this->options['name']))
-			return $this->options['name'];
+		if(isset($this->attributes['name']))
+			return $this->attributes['name'];
 	return NULL;
 	}
 
 	public function setClass($value){
 		if(isset($value))
-			$this->options['class'] = $value;
+			$this->attributes['class'] = $value;
 		else
-			unset($this->options['class']);
+			unset($this->attributes['class']);
 
 	return $value;
 	}
 
-	public function getOption($name){
+	public function getAttribute($name){
 		$ret = NULL;
-		if(isset($this->options[$name]))
-			$ret =& $this->options[$name];
+		if(isset($this->attributes[$name]))
+			$ret =& $this->attributes[$name];
 	return $ret;
 	}
 
-	public function addOption($name, $value){
+	public function setAttribute($name, $value){
 		if(is_object($value)){
-			$this->options[$name] = unpack_object($value);
+			$this->attributes[$name] = unpack_object($value);
 		}
 		else if(isset($value))
-			$this->options[$name] = htmlspecialchars(strval($value));
+			$this->attributes[$name] = htmlspecialchars(strval($value));
 		else
-			unset($this->options[$name]);
+			unset($this->attributes[$name]);
 	}
 
-	public function delOption($name){
-		unset($this->options[$name]);
+	public function removeAttribute($name){
+		unset($this->attributes[$name]);
 	}
 
 	public function addAction($name, $value){
 		if(is_object($value)){
-			$this->options[$name] = unpack_object($value);
+			$this->attributes[$name] = unpack_object($value);
 		}
 		else if(!empty($value)){
-			$this->options[$name] = htmlentities(str_replace(array("\r", "\n"), '', strval($value)),ENT_COMPAT,S_HTML_CHARSET);
+			$this->attributes[$name] = htmlentities(str_replace(array("\r", "\n"), '', strval($value)),ENT_COMPAT,S_HTML_CHARSET);
 		}
 	}
 
@@ -171,20 +171,20 @@ class CTag extends CObject{
 	}
 
 	public function addStyle($value){
-		if(!isset($this->options['style'])) $this->options['style'] = '';
+		if(!isset($this->attributes['style'])) $this->attributes['style'] = '';
 
 		if(isset($value))
-			$this->options['style'].= htmlspecialchars(strval($value));
+			$this->attributes['style'].= htmlspecialchars(strval($value));
 		else
-			unset($this->options['style']);
+			unset($this->attributes['style']);
 	}
 
 	public function setEnabled($value='yes'){
 		if((is_string($value) && ($value == 'yes' || $value == 'enabled' || $value=='on') || $value=='1') || (is_int($value) && $value<>0)){
-			unset($this->options['disabled']);
+			unset($this->attributes['disabled']);
 		}
 		else if((is_string($value) && ($value == 'no' || $value == 'disabled' || $value=='off') || $value=='0') || (is_int($value) && $value==0)){
-			$this->options['disabled'] = 'disabled';
+			$this->attributes['disabled'] = 'disabled';
 		}
 	}
 

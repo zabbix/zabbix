@@ -41,14 +41,14 @@ class CArea extends CTag{
 
 			$str_val .= $val.',';
 		}
-		$this->addOption('coords',trim($str_val,','));
+		$this->setAttribute('coords',trim($str_val,','));
 	}
 
 	public function setShape($value){
 		if(!is_string($value))
 			return $this->error('Incorrect value for setShape ['.$value.']');
 
-		$this->addOption('shape',$value);
+		$this->setAttribute('shape',$value);
 	}
 
 	public function setHref($value){
@@ -57,14 +57,14 @@ class CArea extends CTag{
 		$url = new Curl($value);
 		$value = $url->getUrl();
 
-		$this->addOption('href',$value);
+		$this->setAttribute('href',$value);
 	}
 
 	public function setAlt($value){
 		if(!is_string($value))
 			return $this->error('Incorrect value for setAlt ['.$value.']');
 
-		$this->addOption('alt',$value);
+		$this->setAttribute('alt',$value);
 	}
 }
 ?>

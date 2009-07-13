@@ -29,7 +29,7 @@ class CRow extends CTag{
 	}
 
 	public function setAlign($value){
-		return $this->options['align'] = $value;
+		return $this->attributes['align'] = $value;
 	}
 
 	public function addItem($item){
@@ -52,7 +52,7 @@ class CRow extends CTag{
 	}
 
 	public function setWidth($value){
-		if(is_string($value))$this->addOption('width',$value);
+		if(is_string($value))$this->setAttribute('width',$value);
 	}
 }
 ?>

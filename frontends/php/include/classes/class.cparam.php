@@ -22,8 +22,8 @@
 class CParam extends CTag{
 	function __construct($name,$value){
 		parent::__construct('param','no');
-		$this->options['name'] = $name;
-		$this->options['value'] = $value;
+		$this->attributes['name'] = $name;
+		$this->attributes['value'] = $value;
 	}
 }
 ?>

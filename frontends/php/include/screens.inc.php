@@ -490,7 +490,7 @@
 
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
-			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
+			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->AddRow(S_GRAPH_NAME,array($textfield,SPACE,$selectbtn));
 
@@ -523,7 +523,7 @@
 
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description',800,450);");
-			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
+			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 		}
@@ -551,7 +551,7 @@
 			$textfield = new Ctextbox('caption',$caption,60,'yes');
 
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name',400,450);");
-			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
+			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 
@@ -584,7 +584,7 @@
 
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=plain_text&srcfld1=itemid&srcfld2=description',800,450);");
-			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
+			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 			$form->addRow(S_SHOW_LINES, new CNumericBox('elements',$elements,2));
@@ -625,7 +625,7 @@
 
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=overview&srcfld1=groupid&srcfld2=name',800,450);");
-			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
+			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->AddRow(S_GROUP,array($textfield,SPACE,$selectbtn));
 		}
@@ -654,7 +654,7 @@
 
 			$textfield = new Ctextbox('caption',$caption,60,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=screens2&srcfld1=screenid&srcfld2=name&screenid=".$_REQUEST['screenid']."',800,450);");
-			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
+			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 		}
@@ -693,7 +693,7 @@
 
 			$textfield = new CTextbox('caption',$caption,60,'yes');
 			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=host_group_scr&srcfld1=groupid&srcfld2=name',480,450);");
-			$selectbtn->addOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
+			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->AddRow(S_GROUP,array($textfield,SPACE,$selectbtn));
 		}
@@ -820,7 +820,7 @@
 		$table = new CTable(
 			new CLink('No rows in screen '.$row['name'],'screenconf.php?config=0&form=update&screenid='.$screenid),
 			($editmode == 0 || $editmode == 2) ? 'screen_view' : 'screen_edit');
-		$table->addOption('id','iframe');
+		$table->setAttribute('id','iframe');
 
 		if($editmode == 1){
 			$add_col_link = 'screenedit.php?config=1&screenid='.$screenid.'&add_col=';
@@ -988,7 +988,7 @@
 
 						$dom_graph_id = 'graph_'.$screenitemid.'_'.$resourceid;
 						$g_img = new CImg($url.'&width='.$width.'&height='.$height.'&period='.$effectiveperiod.url_param('stime'));
-						$g_img->addOption('id',$dom_graph_id);
+						$g_img->setAttribute('id',$dom_graph_id);
 
 						if(!is_null($graphid) && ($editmode != 1)){
 							insert_js('	A_SBOX["'.$dom_graph_id.'"] = new Object;'.
@@ -1009,7 +1009,7 @@
 								zbx_add_post_js('graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
 							}
 							else{
-								$g_img->addOption('onload','javascript: graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
+								$g_img->setAttribute('onload','javascript: graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
 //								insert_js('graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
 							}
 						}
@@ -1219,8 +1219,8 @@
 
 				if(($editmode == 1) && !$item_form){
 					$item = new CDiv($item,'draggable');
-					$item->addOption('id','position_'.$r.'_'.$c);
-					if($editmode == 1)	$item->addOption('onclick','javascript: '.$onclick_action);
+					$item->setAttribute('id','position_'.$r.'_'.$c);
+					if($editmode == 1)	$item->setAttribute('onclick','javascript: '.$onclick_action);
 				}
 
 				$new_col = new CCol($item,$str_halign.'_'.$str_valign);

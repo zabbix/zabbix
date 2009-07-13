@@ -757,7 +757,7 @@
 			else{
 				$passwd_but = new CButton('change_password', S_CHANGE_PASSWORD);
 				if($alias == ZBX_GUEST_USER){
-					$passwd_but->addOption('disabled','disabled');
+					$passwd_but->setAttribute('disabled','disabled');
 				}
 				$frmUser->addRow(S_PASSWORD, $passwd_but);
 			}
@@ -785,7 +785,7 @@
 			}
 
 			$lstGroups = new CListBox('user_groups_to_del[]');
-			$lstGroups->options['style'] = 'width: 320px';
+			$lstGroups->attributes['style'] = 'width: 320px';
 
 			foreach($user_groups as $groupid => $group_name){
 				$lstGroups->addItem($groupid,	$group_name);
@@ -832,7 +832,7 @@
 														} else {
 															autologout_visible.disabled = false;
 														}"), 1);
-		$chkbx_autologin->AddOption('autocomplete','off');
+		$chkbx_autologin->setAttribute('autocomplete','off');
 		$frmUser->AddRow(S_AUTO_LOGIN,	$chkbx_autologin);
 		$autologoutCheckBox = new CCheckBox('autologout_visible',
 											($autologout == 0) ? 'no' : 'yes',
@@ -846,10 +846,10 @@
 		$autologoutTextBox = new CNumericBox("autologout", ($autologout == 0) ? '90' : $autologout, 4);
 		// if autologout is disabled
 		if ($autologout == 0) {
-			$autologoutTextBox->addOption('disabled','disabled');
+			$autologoutTextBox->setAttribute('disabled','disabled');
 		}
 		if($autologin != 0) {
-			$autologoutCheckBox->addOption('disabled','disabled');
+			$autologoutCheckBox->setAttribute('disabled','disabled');
 		}
 
 		$frmUser->AddRow(S_AUTO_LOGOUT, array($autologoutCheckBox, $autologoutTextBox));
@@ -945,7 +945,7 @@
 			$frmUser->addItemToBottomRow(SPACE);
 			$delete_b = new CButtonDelete("Delete selected user?",url_param("form").url_param("config").url_param("userid"));
 			if(bccomp($USER_DETAILS['userid'],$userid) == 0){
-				$delete_b->addOption('disabled','disabled');
+				$delete_b->setAttribute('disabled','disabled');
 			}
 
 			$frmUser->addItemToBottomRow($delete_b);
@@ -1026,7 +1026,7 @@
 		}
 
 		$grName = new CTextBox('gname',$name,49);
-		$grName->options['style'] = 'width: 280px';
+		$grName->attributes['style'] = 'width: 280px';
 		$frmUserG->addRow(S_GROUP_NAME,$grName);
 
 		$frmUserG->addVar('group_rights', $group_rights);
@@ -1072,7 +1072,7 @@
 /////////////////
 /*
 		$lstUsers = new CListBox('group_users_to_del[]');
-		$lstUsers->options['style'] = 'width: 280px';
+		$lstUsers->attributes['style'] = 'width: 280px';
 
 		foreach($group_users as $userid => $alias){
 			$lstUsers->addItem($userid,	$alias);
@@ -1291,8 +1291,8 @@
 
 		$form = new CFormTable();
 
-		$form->addOption('name','zbx_filter');
-		$form->addOption('id','zbx_filter');
+		$form->setAttribute('name','zbx_filter');
+		$form->setAttribute('id','zbx_filter');
 		$form->setMethod('get');
 
 		$form->addAction('onsubmit',"javascript: if(empty_form(this)) return Confirm('Filter is empty! All items will be selected. Proceed?');");
@@ -1835,7 +1835,7 @@
 			}
 
 			$link = new CLink('throw map','config.php?config=6','action');
-			$link->addOption('target','_blank');
+			$link->setAttribute('target','_blank');
 			$frmItem->addRow(array(S_SHOW_VALUE.SPACE,$link),$cmbMap);
 
 		}
@@ -2049,7 +2049,7 @@
 			S_UPDATE_INTERVAL_IN_SEC), new CNumericBox('delay',$delay,5));
 
 		$delay_flex_el = new CSpan($delay_flex_el);
-		$delay_flex_el->addOption('id', 'delay_flex_list');
+		$delay_flex_el->setAttribute('id', 'delay_flex_list');
 
 		$frmItem->addRow(array(
 						new CVisibilityBox('delay_flex_visible',
@@ -2065,7 +2065,7 @@
 										new CTextBox("new_delay_flex[period]","1-7,00:00-23:59",27), BR(),
 										new CButton("add_delay_flex",S_ADD)
 									));
-		$new_delay_flex_el->addOption('id', 'new_delay_flex_el');
+		$new_delay_flex_el->setAttribute('id', 'new_delay_flex_el');
 
 		$frmItem->addRow(S_NEW_FLEXIBLE_INTERVAL, $new_delay_flex_el, 'new');
 
@@ -2100,7 +2100,7 @@
 					);
 
 		$link = new CLink("throw map","config.php?config=6","action");
-		$link->addOption("target","_blank");
+		$link->setAttribute("target","_blank");
 		$frmItem->addRow(array( new CVisibilityBox('valuemapid_visible', get_request('valuemapid_visible'), 'valuemapid', S_ORIGINAL),
 			S_SHOW_VALUE, SPACE, $link),$cmbMap);
 
@@ -2120,7 +2120,7 @@
 		$frmItem->addItemToBottomRow(array(new CButton("update",S_UPDATE),
 			SPACE, new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
 
-		$frmItem->Show();
+		$frmItem->show();
 	}
 
 	function insert_copy_elements_to_forms($elements_array_name){
@@ -2212,7 +2212,7 @@
 
 		$frmMTrig = new CFormTable(S_TRIGGERS_MASSUPDATE, 'triggers.php');
 		$frmMTrig->addVar('massupdate',get_request('massupdate',1));
-		$frmMTrig->addOption('id', 'massupdate');
+		$frmMTrig->setAttribute('id', 'massupdate');
 
 		$triggers = $_REQUEST['g_triggerid'];
 		foreach($triggers as $id => $triggerid){
@@ -2258,7 +2258,7 @@
 		array_push($dep_el, array(br(),$btnSelect));
 
 		$dep_div = new CDiv($dep_el);
-		$dep_div->addOption('id','dependency_box');
+		$dep_div->setAttribute('id','dependency_box');
 
 		$frmMTrig->addRow(array(new CVisibilityBox('visible[dependencies]', isset($visible['dependencies']), 'dependency_box', S_ORIGINAL),S_TRIGGER_DEPENDENCIES),
 							$dep_div
@@ -2559,11 +2559,11 @@
 		$frmGraph->addRow(S_NAME,new CTextBox('name',$name,32));
 
 		$g_width = new CNumericBox('width',$width,5);
-		$g_width->addoption('onblur','javascript: submit();');
+		$g_width->setAttribute('onblur','javascript: submit();');
 		$frmGraph->addRow(S_WIDTH,$g_width);
 
 		$g_height = new CNumericBox('height',$height,5);
-		$g_height->addoption('onblur','javascript: submit();');
+		$g_height->setAttribute('onblur','javascript: submit();');
 		$frmGraph->addRow(S_HEIGHT,$g_height);
 
 		$cmbGType = new CComboBox('graphtype',$graphtype,'graphs.submit(this)');
@@ -2587,14 +2587,14 @@
 				$pr_left_input = new CTextBox('percent_left',$percent_left,'5');
 				$pr_left_chkbx = new CCheckBox('visible[percent_left]',1,"javascript: ShowHide('percent_left');",1);
 				if($percent_left == 0){
-					$pr_left_input->addOption('style','display: none;');
+					$pr_left_input->setAttribute('style','display: none;');
 					$pr_left_chkbx->SetChecked(0);
 				}
 
 				$pr_right_input = new CTextBox('percent_right',$percent_right,'5');
 				$pr_right_chkbx = new CCheckBox('visible[percent_right]',1,"javascript: ShowHide('percent_right');",1);
 				if($percent_right == 0){
-					$pr_right_input->addOption('style','display: none;');
+					$pr_right_input->setAttribute('style','display: none;');
 					$pr_right_chkbx->SetChecked(0);
 				}
 
@@ -2834,7 +2834,7 @@
 											"CLNDR['mntc_active_since'].clndr.clndrshow(pos.top,pos.left);");
 
 		$filtertimetab = new CTable(null,'calendar');
-		$filtertimetab->addOption('width','10%');
+		$filtertimetab->setAttribute('width','10%');
 
 		$filtertimetab->SetCellPadding(0);
 		$filtertimetab->SetCellSpacing(0);
@@ -2866,7 +2866,7 @@
 		$tblMntc->addRow(array(S_ACTIVE_SINCE,$filtertimetab));
 
 		$filtertimetab = new CTable(null,'calendar');
-		$filtertimetab->addOption('width','10%');
+		$filtertimetab->setAttribute('width','10%');
 
 		$filtertimetab->SetCellPadding(0);
 		$filtertimetab->SetCellSpacing(0);
@@ -2906,8 +2906,8 @@
 		$tblMaintenance->addRow($tblMntc);
 
 		$td = new CCol(array(new CButton('save',S_SAVE)));
-		$td->addOption('colspan','2');
-		$td->addOption('style','text-align: right;');
+		$td->setAttribute('colspan','2');
+		$td->setAttribute('style','text-align: right;');
 
 		if(isset($_REQUEST['maintenanceid'])){
 
@@ -2928,7 +2928,7 @@
 		global $USER_DETAILS;
 
 		$tblHlink = new CTableInfo();
-		$tblHlink->addOption('style','background-color: #CCC;');
+		$tblHlink->setAttribute('style','background-color: #CCC;');
 
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
@@ -3005,7 +3005,7 @@
 		global $USER_DETAILS;
 
 		$tblGlink = new CTableInfo();
-		$tblGlink->addOption('style','background-color: #CCC;');
+		$tblGlink->setAttribute('style','background-color: #CCC;');
 
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 
@@ -3059,7 +3059,7 @@
 
 	function get_maintenance_periods(){
 		$tblPeriod = new CTableInfo();
-		$tblPeriod->addOption('style','background-color: #CCC;');
+		$tblPeriod->setAttribute('style','background-color: #CCC;');
 
 		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST["form_refresh"])){
 
@@ -3126,8 +3126,8 @@
 		}
 
 		$td = new CCol($oper_buttons);
-		$td->addOption('colspan',7);
-		$td->addOption('style','text-align: right;');
+		$td->setAttribute('colspan',7);
+		$td->setAttribute('style','text-align: right;');
 
 
 		$tblPeriodFooter->SetFooter($td);
@@ -3319,22 +3319,22 @@
 			$tblPeriod->addRow(array(S_MONTH,	$tabMonths));
 
 			$radioDaily = new CTag('input');
-			$radioDaily->addOption('type','radio');
-			$radioDaily->addOption('name','new_timeperiod[month_date_type]');
-			$radioDaily->addOption('value','0');
-			$radioDaily->addOption('onclick','submit()');
+			$radioDaily->setAttribute('type','radio');
+			$radioDaily->setAttribute('name','new_timeperiod[month_date_type]');
+			$radioDaily->setAttribute('value','0');
+			$radioDaily->setAttribute('onclick','submit()');
 
 			$radioDaily2 = new CTag('input');
-			$radioDaily2->addOption('type','radio');
-			$radioDaily2->addOption('name','new_timeperiod[month_date_type]');
-			$radioDaily2->addOption('value','1');
-			$radioDaily2->addOption('onclick','submit()');
+			$radioDaily2->setAttribute('type','radio');
+			$radioDaily2->setAttribute('name','new_timeperiod[month_date_type]');
+			$radioDaily2->setAttribute('value','1');
+			$radioDaily2->setAttribute('onclick','submit()');
 
 			if($new_timeperiod['month_date_type']){
-				$radioDaily2->addOption('checked','checked');
+				$radioDaily2->setAttribute('checked','checked');
 			}
 			else{
-				$radioDaily->addOption('checked','checked');
+				$radioDaily->setAttribute('checked','checked');
 			}
 
 			$tblPeriod->addRow(array(S_DATE, array($radioDaily, S_DAY, SPACE, SPACE, $radioDaily2, S_DAY_OF_WEEK)));
@@ -3392,7 +3392,7 @@
 												"CLNDR['new_timeperiod_date'].clndr.clndrshow(pos.top,pos.left);");
 
 			$filtertimetab = new CTable(null,'calendar');
-			$filtertimetab->addOption('width','10%');
+			$filtertimetab->setAttribute('width','10%');
 
 			$filtertimetab->SetCellPadding(0);
 			$filtertimetab->SetCellSpacing(0);
@@ -3468,8 +3468,8 @@
 			new CButton('cancel_new_timeperiod',S_CANCEL)
 			));
 
-		$td->addOption('colspan','3');
-		$td->addOption('style','text-align: right;');
+		$td->setAttribute('colspan','3');
+		$td->setAttribute('style','text-align: right;');
 
 		$tblPeriod->SetFooter($td);
 
@@ -3573,8 +3573,8 @@
 		$tblAction->addRow($tblAct);
 
 		$td = new CCol(array(new CButton('save',S_SAVE)));
-		$td->addOption('colspan','2');
-		$td->addOption('style','text-align: right;');
+		$td->setAttribute('colspan','2');
+		$td->setAttribute('style','text-align: right;');
 
 		if(isset($_REQUEST["actionid"])){
 			$td->addItem(SPACE);
@@ -3704,8 +3704,8 @@
 		$tblConditions->addRow($tblCond);
 
 		$td = new CCol($cond_buttons);
-		$td->addOption('colspan','2');
-		$td->addOption('style','text-align: right;');
+		$td->setAttribute('colspan','2');
+		$td->setAttribute('style','text-align: right;');
 
 		$tblConditions->SetFooter($td);
 		unset($grouped_conditions,$cond_el,$cond_buttons);
@@ -3926,8 +3926,8 @@
 		$tblConditions->addRow($tblCond);
 
 		$td = new CCol(array(new CButton('add_condition',S_ADD),new CButton('cancel_new_condition',S_CANCEL)));
-		$td->addOption('colspan','3');
-		$td->addOption('style','text-align: right;');
+		$td->setAttribute('colspan','3');
+		$td->setAttribute('style','text-align: right;');
 
 		$tblConditions->SetFooter($td);
 		unset($grouped_conditions,$cond_el,$cond_buttons);
@@ -3937,7 +3937,7 @@
 
 	function get_act_operations_form($action=null){
 		$tblOper = new CTableInfo(S_NO_OPERATIONS_DEFINED);
-		$tblOper->addOption('style','background-color: #CCC;');
+		$tblOper->setAttribute('style','background-color: #CCC;');
 
 		if(isset($_REQUEST['actionid']) && empty($action)){
 			$action = get_action_by_actionid($_REQUEST['actionid']);
@@ -4087,8 +4087,8 @@
 		}
 
 		$td = new CCol($oper_buttons);
-		$td->addOption('colspan',isset($_REQUEST['escalation'])?6:3);
-		$td->addOption('style','text-align: right;');
+		$td->setAttribute('colspan',isset($_REQUEST['escalation'])?6:3);
+		$td->setAttribute('style','text-align: right;');
 
 
 		$tblOperFooter->SetFooter($td);
@@ -4152,7 +4152,7 @@
 			$tblStep = new CTable(null,'nowrap');
 
 			$step_from = new CNumericBox('new_operation[esc_step_from]', $new_operation['esc_step_from'],4);
-			$step_from->addAction('onchange','javascript:'.$step_from->GetOption('onchange').' if(this.value == 0) this.value=1;');
+			$step_from->addAction('onchange','javascript:'.$step_from->getAttribute('onchange').' if(this.value == 0) this.value=1;');
 
 			$tblStep->addRow(array(S_FROM, $step_from));
 			$tblStep->addRow(array(
@@ -4495,8 +4495,8 @@
 			new CButton('cancel_new_operation',S_CANCEL)
 			));
 
-		$td->addOption('colspan','3');
-		$td->addOption('style','text-align: right;');
+		$td->setAttribute('colspan','3');
+		$td->setAttribute('style','text-align: right;');
 
 		$tblOper->SetFooter($td);
 
@@ -4565,8 +4565,8 @@
 		$tblConditions->addRow($tblCond);
 
 		$td = new CCol(array(new CButton('add_opcondition',S_ADD),new CButton('cancel_new_opcondition',S_CANCEL)));
-		$td->addOption('colspan','3');
-		$td->addOption('style','text-align: right;');
+		$td->setAttribute('colspan','3');
+		$td->setAttribute('style','text-align: right;');
 
 		$tblConditions->SetFooter($td);
 		unset($grouped_conditions,$cond_el,$cond_buttons);
@@ -4900,13 +4900,13 @@
 
 		$template_table = new CTable();
 
-		$template_table->addOption('name','template_table');
-		$template_table->addOption('id','template_table');
+		$template_table->setAttribute('name','template_table');
+		$template_table->setAttribute('id','template_table');
 
 		$template_table->SetCellPadding(0);
 		$template_table->SetCellSpacing(0);
 
-//		$template_table->addOption('style','border: 1px black solid;');
+//		$template_table->setAttribute('style','border: 1px black solid;');
 
 		foreach($templates as $id => $temp_name){
 			$frmHost->addVar('templates['.$id.']',$temp_name);
@@ -5436,7 +5436,7 @@
 		if($_REQUEST['form'] == 'full_clone'){
 // Host items
 			$items_lbx = new CListBox('items',null,8);
-			$items_lbx->addOption('disabled','disabled');
+			$items_lbx->setAttribute('disabled','disabled');
 
 			$sql = 'SELECT * '.
 					' FROM items '.
@@ -5449,14 +5449,14 @@
 				$items_lbx->addItem($host_item['itemid'],$item_description);
 			}
 
-			if($items_lbx->ItemsCount() < 1) $items_lbx->addOption('style','width: 200px;');
+			if($items_lbx->ItemsCount() < 1) $items_lbx->setAttribute('style','width: 200px;');
 			$frmHost->addRow(S_ITEMS, $items_lbx);
 
 // Host triggers
 			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
 
 			$trig_lbx = new CListBox('triggers',null,8);
-			$trig_lbx->addOption('disabled','disabled');
+			$trig_lbx->setAttribute('disabled','disabled');
 
 			$sql = 'SELECT DISTINCT t.* '.
 					' FROM triggers t, items i, functions f'.
@@ -5473,14 +5473,14 @@
 				$trig_lbx->addItem($host_trig['triggerid'],$trig_description);
 			}
 
-			if($trig_lbx->ItemsCount() < 1) $trig_lbx->addOption('style','width: 200px;');
+			if($trig_lbx->ItemsCount() < 1) $trig_lbx->setAttribute('style','width: 200px;');
 			$frmHost->addRow(S_TRIGGERS, $trig_lbx);
 
 // Host graphs
 			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
 
 			$graphs_lbx = new CListBox('graphs',null,8);
-			$graphs_lbx->addOption('disabled','disabled');
+			$graphs_lbx->setAttribute('disabled','disabled');
 
 			$def_items = array();
 			$sql = 'SELECT DISTINCT g.* '.
@@ -5497,7 +5497,7 @@
 				$graphs_lbx->addItem($host_graph['graphid'],$host_graph['name']);
 			}
 
-			if($graphs_lbx->ItemsCount() < 1) $graphs_lbx->addOption('style','width: 200px;');
+			if($graphs_lbx->ItemsCount() < 1) $graphs_lbx->setAttribute('style','width: 200px;');
 
 			$frmHost->addRow(S_GRAPHS, $graphs_lbx);
 		}
@@ -5687,7 +5687,7 @@
 		if($_REQUEST['form'] == 'full_clone'){
 // Host items
 			$items_lbx = new CListBox('items',null,8);
-			$items_lbx->addOption('disabled','disabled');
+			$items_lbx->setAttribute('disabled','disabled');
 
 			$sql = 'SELECT * '.
 					' FROM items '.
@@ -5700,14 +5700,14 @@
 				$items_lbx->addItem($host_item['itemid'],$item_description);
 			}
 
-			if($items_lbx->ItemsCount() < 1) $items_lbx->addOption('style','width: 200px;');
+			if($items_lbx->ItemsCount() < 1) $items_lbx->setAttribute('style','width: 200px;');
 			$frmHost->addRow(S_ITEMS, $items_lbx);
 
 // Host triggers
 			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
 
 			$trig_lbx = new CListBox('triggers',null,8);
-			$trig_lbx->addOption('disabled','disabled');
+			$trig_lbx->setAttribute('disabled','disabled');
 
 			$sql = 'SELECT DISTINCT t.* '.
 					' FROM triggers t, items i, functions f'.
@@ -5724,14 +5724,14 @@
 				$trig_lbx->addItem($host_trig['triggerid'],$trig_description);
 			}
 
-			if($trig_lbx->ItemsCount() < 1) $trig_lbx->addOption('style','width: 200px;');
+			if($trig_lbx->ItemsCount() < 1) $trig_lbx->setAttribute('style','width: 200px;');
 			$frmHost->addRow(S_TRIGGERS, $trig_lbx);
 
 // Host graphs
 			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
 
 			$graphs_lbx = new CListBox('graphs',null,8);
-			$graphs_lbx->addOption('disabled','disabled');
+			$graphs_lbx->setAttribute('disabled','disabled');
 
 			$def_items = array();
 			$sql = 'SELECT DISTINCT g.* '.
@@ -5748,7 +5748,7 @@
 				$graphs_lbx->addItem($host_graph['graphid'],$host_graph['name']);
 			}
 
-			if($graphs_lbx->ItemsCount() < 1) $graphs_lbx->addOption('style','width: 200px;');
+			if($graphs_lbx->ItemsCount() < 1) $graphs_lbx->setAttribute('style','width: 200px;');
 
 			$frmHost->addRow(S_GRAPHS, $graphs_lbx);
 		}
@@ -6426,8 +6426,8 @@
 		$table->SetClass('tableinfo');
 		$table->setOddRowClass('even_row');
 		$table->setEvenRowClass('even_row');
-		$table->options['cellpadding'] = 3;
-		$table->options['cellspacing'] = 1;
+		$table->attributes['cellpadding'] = 3;
+		$table->attributes['cellspacing'] = 1;
 		$table->headerClass = 'header';
 		$table->footerClass = 'footer';
 
@@ -6437,16 +6437,16 @@
 			S_TYPE,
 			S_COLOR));
 
-		$table->addOption('id','link_triggers');
+		$table->setAttribute('id','link_triggers');
 
 		foreach($triggers as $id => $trigger){
 			if(!isset($trigger['triggerid'])) continue;
 
 			$colorbox = new CSpan(SPACE.SPACE.SPACE);
-			$colorbox->addOption('style','text-decoration: none; outline-color: black; outline-style: solid; outline-width: 1px; background-color: #'.$trigger['color'].';');
+			$colorbox->setAttribute('style','text-decoration: none; outline-color: black; outline-style: solid; outline-width: 1px; background-color: #'.$trigger['color'].';');
 
 			$link_desc = new CSpan($trigger['description'],'link');
-			$link_desc->addoption('onclick', "javascript: openWinCentered('popup_link_tr.php?form=1&dstfrm=".$frmCnct->GetName()."&triggerid=".$trigger['triggerid'].url_param('linkid')."','ZBX_Link_Indicator',560,260,'scrollbars=1, toolbar=0, menubar=0, resizable=0');");
+			$link_desc->setAttribute('onclick', "javascript: openWinCentered('popup_link_tr.php?form=1&dstfrm=".$frmCnct->GetName()."&triggerid=".$trigger['triggerid'].url_param('linkid')."','ZBX_Link_Indicator',560,260,'scrollbars=1, toolbar=0, menubar=0, resizable=0');");
 
 			$table->addRow(array(
 					array(
@@ -6721,8 +6721,8 @@
 		}
 
 		$td = new CCol($buttons);
-		$td->addOption('colspan','5');
-		$td->addOption('style','text-align: right;');
+		$td->setAttribute('colspan','5');
+		$td->setAttribute('style','text-align: right;');
 
 
 		$tblExp->SetFooter($td);
@@ -6784,8 +6784,8 @@
 		$oper_buttons[] = new CButton('cancel_new_expression',S_CANCEL);
 
 		$td = new CCol($oper_buttons);
-		$td->addOption('colspan',2);
-		$td->addOption('style','text-align: right;');
+		$td->setAttribute('colspan',2);
+		$td->setAttribute('style','text-align: right;');
 
 		$tblExpFooter->setFooter($td);
 // end of condition list preparation

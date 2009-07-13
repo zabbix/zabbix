@@ -253,7 +253,7 @@ if(isset($_REQUEST['pservices'])){
 	$cb->SetAction('javascript: self.close();');
 
 	$td = new CCol($cb);
-	$td->AddOption('style','text-align:right;');
+	$td->setAttribute('style','text-align:right;');
 
 	$table->SetFooter($td);
 	$form->AddItem($table);
@@ -319,7 +319,7 @@ if(isset($_REQUEST['cservices'])){
 	$cb->SetAction('javascript: self.close();');
 
 	$td = new CCol($cb);
-	$td->AddOption('style','text-align:right;');
+	$td->setAttribute('style','text-align:right;');
 
 	$table->SetFooter($td);
 	$form->AddItem($table);
@@ -465,7 +465,7 @@ if(isset($_REQUEST['sform'])){
 //-------------------------------------------- <LINK> --------------------------------------------
 //parent link
 	$ctb = new CTextBox('parent_name',$parentname,60);
-	$ctb->Addoption('disabled','disabled');
+	$ctb->setAttribute('disabled','disabled');
 
 	$frmService->AddVar('parentname',$parentname);
 	$frmService->AddVar('parentid',$parentid);
@@ -484,14 +484,14 @@ if(isset($_REQUEST['sform'])){
 	$table->setClass('tableinfo');
 	$table->setOddRowClass('even_row');
 	$table->setEvenRowClass('even_row');
-	$table->options['cellpadding'] = 3;
-	$table->options['cellspacing'] = 1;
+	$table->attributes['cellpadding'] = 3;
+	$table->attributes['cellspacing'] = 1;
 	$table->headerClass = 'header';
 	$table->footerClass = 'footer';
 
 	$table->setHeader(array(new CCheckBox('all_child_services',null,"check_childs('".$frmService->GetName()."','childs','all_child_services');"),S_SERVICES,S_SOFT,S_TRIGGER));
 
-	$table->addOption('id','service_childs');
+	$table->setAttribute('id','service_childs');
 
 	foreach($childs as $id => $child){
 		$prefix	 = null;
@@ -552,10 +552,10 @@ if(isset($_REQUEST['sform'])){
 						)
 					);
 
-	$row->AddOption('style',($linktrigger == 1)?(''):('display: none;'));
+	$row->setAttribute('style',($linktrigger == 1)?(''):('display: none;'));
 
-	$row->AddOption('id','sla_row');
-	$row->AddOption('style',($showsla)?(''):('display: none;'));
+	$row->setAttribute('id','sla_row');
+	$row->setAttribute('style',($showsla)?(''):('display: none;'));
 
 	$frmService->AddRow($row);
 //------
@@ -636,7 +636,7 @@ if(isset($_REQUEST['sform'])){
 								);
 
 		$filtertimetab = new CTable(null,'calendar');
-		$filtertimetab->AddOption('width','10%');
+		$filtertimetab->setAttribute('width','10%');
 
 		$filtertimetab->SetCellPadding(0);
 		$filtertimetab->SetCellSpacing(0);
@@ -733,8 +733,8 @@ if(isset($_REQUEST['sform'])){
 									new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$frmService->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');",'T')
 								),'form_row_r')
 							));
-	$row->AddOption('id','trigger_name');
-	$row->AddOption('style',($linktrigger == 1)?(''):('display: none;'));
+	$row->setAttribute('id','trigger_name');
+	$row->setAttribute('style',($linktrigger == 1)?(''):('display: none;'));
 
 	$frmService->AddRow($row);
 

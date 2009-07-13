@@ -88,8 +88,8 @@ class CTree{
 		$table->headerClass = 'header';
 		$table->footerClass = 'footer';
 
-		$table->addOption('valign','top');
-//		$table->addOption('border','1');
+		$table->setAttribute('valign','top');
+//		$table->setAttribute('border','1');
 		$table->addRow($this->makeHeaders());
 
 		foreach($this->tree as $id => $rows){
@@ -103,26 +103,26 @@ class CTree{
 		$table = new CTable();
 		$table->setCellSpacing(0);
 		$table->setCellPadding(0);
-		$table->addOption('border','0');
-		$table->addOption('height','100%');
+		$table->setAttribute('border','0');
+		$table->setAttribute('height','100%');
 
 		$tr = $this->makeSImgStr($id);
 
 		$td = new CCol($this->tree[$id]['caption']);
-		$td->addOption('style','height: 100%; vertical-align: top; white-space: normal; padding-right: 10px; padding-left: 2px;');
+		$td->setAttribute('style','height: 100%; vertical-align: top; white-space: normal; padding-right: 10px; padding-left: 2px;');
 		$tr->addItem($td);
 
 		$table->addRow($tr);
 
 		$tr = new CRow();
 		$tr->addItem($table);
-		$tr->addOption('id','id_'.$id);
-		$tr->addOption('style',($this->tree[$id]['parentid'] != '0')?('display: none;'):(''));
+		$tr->setAttribute('id','id_'.$id);
+		$tr->setAttribute('style',($this->tree[$id]['parentid'] != '0')?('display: none;'):(''));
 
 
 		foreach($this->fields as $key => $value){
 			$td = new CCol($this->tree[$id][$value]);
-			$td->addOption('style',' padding-right: 10px; padding-left: 2px;');
+			$td->setAttribute('style',' padding-right: 10px; padding-left: 2px;');
 			$tr->addItem($td);
 		}
 
@@ -137,27 +137,27 @@ class CTree{
 		for($i=0; $i<$count; $i++){
 			switch($this->tree[$id]['nodeimg'][$i]){
 				case 'O':
-					$td->addOption('style','width: 22px');
+					$td->setAttribute('style','width: 22px');
 					$img= new CImg('images/general/tree/zero.gif','o','22','14');
 					break;
 				case 'I':
-					$td->addOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
+					$td->setAttribute('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 					$img= new CImg('images/general/tree/zero.gif','i','22','14');
 					break;
 				case 'L':
-					$td->addOption('valign','top');
-//					$td->addOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
+					$td->setAttribute('valign','top');
+//					$td->setAttribute('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 
 					$div = new CTag('div','yes');
-					$div->addOption('style','height: 10px; width:22px; background-image:url(images/general/tree/pointc.gif);');
+					$div->setAttribute('style','height: 10px; width:22px; background-image:url(images/general/tree/pointc.gif);');
 
 					if($this->tree[$id]['nodetype'] == 2){
 						$img= new CImg('images/general/tree/plus.gif','y','22','14');
-						$img->addOption('onclick','javascript: '.
+						$img->setAttribute('onclick','javascript: '.
 												$this->treename.'.closeSNodeX('.$id.',this);'.
 												" showPopupDiv('div_node_tree','select_iframe');"); // IE6 Fix
 
-						$img->addOption('id','idi_'.$id);
+						$img->setAttribute('id','idi_'.$id);
 						$img->setClass('imgnode');
 					}
 					else {
@@ -167,20 +167,20 @@ class CTree{
 					$img=$div;
 					break;
 				case 'T':
-					$td->addOption('valign','top');
+					$td->setAttribute('valign','top');
 					if($this->tree[$id]['nodetype'] == 2){
-						$td->addOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
+						$td->setAttribute('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 						$img= new CImg('images/general/tree/plus.gif','t','22','14');
 
-						$img->addOption('onclick','javascript: '.
+						$img->setAttribute('onclick','javascript: '.
 												$this->treename.'.closeSNodeX('.$id.',this);'.
 												" showPopupDiv('div_node_tree','select_iframe');");	// IE6 Fix
 
-						$img->addOption('id','idi_'.$id);
+						$img->setAttribute('id','idi_'.$id);
 						$img->setClass('imgnode');
 					}
 					else {
-						$td->addOption('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
+						$td->setAttribute('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 						$img= new CImg('images/general/tree/pointl.gif','t','22','14');
 					}
 					break;

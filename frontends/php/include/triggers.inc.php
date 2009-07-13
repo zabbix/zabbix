@@ -1039,7 +1039,7 @@ return $result;
 				else{
 					if(1 == $html){
 						$font = new CTag('font','yes');
-						$font->addOption('color','#AA0000');
+						$font->setAttribute('color','#AA0000');
 						$font->addItem('*ERROR*');
 						array_push($exp,$font);
 					}
@@ -2256,7 +2256,7 @@ return $result;
 
 			$dependency = false;
 			$dep_table = new CTableInfo();
-			$dep_table->addOption('style', 'width: 200px;');
+			$dep_table->setAttribute('style', 'width: 200px;');
 			$dep_table->addRow(bold(S_DEPENDS_ON.':'));
 
 			$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.$triggerid;
@@ -2268,7 +2268,7 @@ return $result;
 
 			if($dependency){
 				$img = new Cimg('images/general/down_icon.png','DEP_DOWN');
-				$img->addOption('style','vertical-align: middle; border: 0px;');
+				$img->setAttribute('style','vertical-align: middle; border: 0px;');
 				$img->SetHint($dep_table);
 
 				array_push($desc,$img);
@@ -2278,7 +2278,7 @@ return $result;
 // TRIGGERS THAT DEPEND ON THIS
 			$dependency = false;
 			$dep_table = new CTableInfo();
-			$dep_table->addOption('style', 'width: 200px;');
+			$dep_table->setAttribute('style', 'width: 200px;');
 			$dep_table->addRow(bold(S_DEPENDENT.':'));
 
 			$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.$triggerid;
@@ -2290,7 +2290,7 @@ return $result;
 
 			if($dependency){
 				$img = new Cimg('images/general/up_icon.png','DEP_UP');
-				$img->addOption('style','vertical-align: middle; border: 0px;');
+				$img->setAttribute('style','vertical-align: middle; border: 0px;');
 				$img->SetHint($dep_table);
 
 				array_push($desc,$img);
@@ -2300,7 +2300,7 @@ return $result;
 //------------------------
 		$status_col = new CCol(array($desc, $ack),$css_class);
 		if(isset($style)){
-			$status_col->addOption('style', $style);
+			$status_col->setAttribute('style', $style);
 		}
 
 		if(isset($tr_ov_menu)){
