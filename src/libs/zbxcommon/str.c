@@ -1128,14 +1128,11 @@ int	get_param(const char *param, int num, char *buf, int maxlen)
 	int	idx = 1;
 	int	buf_i = 0;
 
-	char	test[MAX_STRING_LEN];
-
 /* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
 	int	state = 0;
 	char	c;
 
 	buf[0]='\0';
-	test[0]='\0';
 
 	for(i=0; param[i] != '\0' && idx<=num && buf_i<maxlen; i++)
 	{
