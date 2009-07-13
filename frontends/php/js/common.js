@@ -72,24 +72,24 @@ function is_string(obj){
 
 function is_array(obj) {
 	return obj != null && typeof obj == "object" &&
-      'splice' in obj && 'join' in obj;	  
+	'splice' in obj && 'join' in obj;
 }
 
 if (!Array.prototype.forEach)
 {
-  Array.prototype.forEach = function(fun /*, thisp*/)
-  {
-    var len = this.length;
-    if (typeof fun != "function")
-      throw new TypeError();
+	Array.prototype.forEach = function(fun /*, thisp*/)
+	{
+		var len = this.length;
+		if (typeof fun != "function")
+			throw new TypeError();
 
-    var thisp = arguments[1];
-    for (var i = 0; i < len; i++)
-    {
-      if (i in this)
-        fun.call(thisp, this[i], i, this);
-    }
-  };
+		var thisp = arguments[1];
+		for (var i = 0; i < len; i++)
+		{
+			if (i in this)
+				fun.call(thisp, this[i], i, this);
+		}
+	};
 }
 
 function SDI(msg){
@@ -235,14 +235,14 @@ function create_var(form_name, var_name, var_val, subm){
 
 	if(is_null(objVar)){
 		objVar = document.createElement('input');
-		objVar.setAttribute('type', 	'hidden');
+		objVar.setAttribute('type',	'hidden');
 		
 		if(!objVar) return false;
 
 		frmForm.appendChild(objVar);
 		
-		objVar.setAttribute('name', 	var_name);
-		objVar.setAttribute('id', 		var_name);
+		objVar.setAttribute('name',	var_name);
+		objVar.setAttribute('id',	var_name);
 	}
 
 	objVar.value = var_val;
@@ -258,7 +258,7 @@ function deselectAll(){
 	if(IE){
 		document.selection.empty();
 	}
-	else if(!KQ){	
+	else if(!KQ){
 		var sel = window.getSelection();
 		sel.removeAllRanges();
 	}
@@ -267,31 +267,31 @@ function deselectAll(){
 function empty_form(id){
 	id = $(id);
 	var count = 0;
-	
+
 	var inputs = id.getElementsByTagName('input');
 	for(var i=0; i<inputs.length;i++){
 		if((inputs[i].type == 'text') && (typeof(inputs[i].hidden) == 'undefined') && !empty(inputs[i].value)) return false;
 		if((inputs[i].type == 'checkbox') && (inputs[i].checked)) return false;
 	}
-	
+
 	var selects = id.getElementsByTagName('select');
 	for(var i=0; i<selects.length;i++){
 		if((typeof(selects[i].hidden) == 'undefined') && (selects[i].selectedIndex)) return false;
 	}
-	
+
 return true;
 }
 
 function eventTarget(e){
 	var targ = false;
-	
+
 	if (!e) var e = window.event;
 	if (e.target) targ = e.target;
 	else if (e.srcElement) targ = e.srcElement;
-	
+
 // defeat Safari bug
 	if (targ.nodeType == 3) targ = targ.parentNode;
-	
+
 return targ;
 }
 
@@ -306,7 +306,7 @@ function getPosition(obj){
 				obj=obj.offsetParent;
 				pos.left += obj.offsetLeft;
 				pos.top += obj.offsetTop;
-				
+
 				if(IE && (obj.offsetParent.toString() == 'unknown')){
 //					alert(obj.offsetParent.toString());
 					break;
@@ -406,12 +406,12 @@ function PopUp(url,width,height,form_name){
 
 	var left = (screen.width-(width+150))/2; 
 	var top = (screen.height-(height+150))/2;
-	
+
 	var popup = window.open(url,form_name,'width=' + width +',height=' + height + ',top='+ top +',left='+ left +
 			',resizable=yes,scrollbars=yes,location=no,menubar=no');
 
 	popup.focus();
-	
+
 	return false;
 }
 
@@ -424,7 +424,7 @@ function redirect(uri) {
 
 function removeListener(element, eventname, expression, bubbling){
 	bubbling = bubbling || false;
-	
+
 	if(window.removeEventListener){
 		element.removeEventListener(eventname, expression, bubbling);
 		return true;
@@ -443,7 +443,7 @@ function remove_childs(form_name,rmvbyname,tag){
 		if(frmForm.elements[i].type != 'checkbox') continue;
 		if(frmForm.elements[i].disabled == true) continue;
 		if(frmForm.elements[i].checked != true) continue;
-		
+
 		var splt = frmForm.elements[i].name.split('[');
 		var name = splt[0];
 		var serviceid = splt[1];
@@ -474,10 +474,10 @@ return true;
 
 function ShowHide(obj,style){
 	if(typeof(style) == 'undefined') var style = 'inline';
-	
+
 	if(is_string(obj))
 		obj = document.getElementById(obj);
-		
+
 	if(!obj){
 		throw 'ShowHide(): Object not found.';
 		return false;
@@ -494,7 +494,7 @@ function ShowHide(obj,style){
 }
 
 function showHideEffect(obj, eff, time, cb_afterFinish){
-	obj = $(obj);	
+	obj = $(obj);
 	if(!obj){
 		throw 'showHideEffect(): Object not found.';
 		return false;
@@ -507,10 +507,10 @@ function showHideEffect(obj, eff, time, cb_afterFinish){
 	if(typeof(cb_afterFinish) == 'undefined'){
 		cb_afterFinish = function(){};
 	}
-	
+
 	var timeShow = (typeof(time) == 'undefined')?0.5:(parseInt(time)/1000);
 	var show = (obj.style.display != 'none')?0:1;
-	
+
 	switch(eff){
 		case 'blind':
 			if(show)
@@ -567,7 +567,7 @@ function ScaleChartToParenElement(obj_name){
 
 function insert_in_element(element_name, text){
 	var elems = document.getElementsByName(element_name);
-	
+
 	for(var key=0; key < elems.length; key++){
 		if((typeof(elems[key]) != 'undefined') && !is_null(elems[key])){
 			$(elems[key]).update(text);
@@ -618,7 +618,7 @@ showSubMenu: function(show_label){
 
 			var menu_cell = $(key);
 			if(!is_null(menu_cell)) menu_cell.className = '';
-			
+
 			var sub_menu_cell = $('sub_'+key);
 			if(!is_null(sub_menu_cell)) sub_menu_cell.hide();
 		}
@@ -633,15 +633,15 @@ showSubMenu: function(show_label){
 // Author: Aly
 
 var chkbxRange = {
-startbox: 			null,			// start checkbox obj
-startbox_name: 		null,			// start checkbox name
-chkboxes:			new Array(),	// ckbx list
-pageGoName:			null,			// wich checkboxes should be counted by Go button
-pageGoCount:		0,				// selected checkboxes
+startbox:		null,		// start checkbox obj
+startbox_name: 		null,		// start checkbox name
+chkboxes:		new Array(),	// ckbx list
+pageGoName:		null,		// wich checkboxes should be counted by Go button
+pageGoCount:		0,		// selected checkboxes
 
 init: function(){
 	var chk_bx = document.getElementsByTagName('input');
-	
+
 	for(var i=0; i < chk_bx.length; i++){
 		if((typeof(chk_bx[i]) != 'undefined') && (chk_bx[i].type.toLowerCase() == 'checkbox')){
 			this.implement(chk_bx[i]);
@@ -665,17 +665,17 @@ check: function(e){
 	if((typeof(obj) == 'undefined') || (obj.type.toLowerCase() != 'checkbox')){
 		return true;
 	}
-	
+
 	this.setGo();
 
 	if(!(e.ctrlKey || e.shiftKey)) return true;
-	
+
 	var obj_name = obj.name.split('[')[0];
 
 	if(!is_null(this.startbox) && (this.startbox_name == obj_name) && (obj.name != this.startbox.name)){
 		var chkbx_list = this.chkboxes[obj_name];
 		var flag = false;
-		
+
 		for(var i=0; i < chkbx_list.length; i++){
 			if(typeof(chkbx_list[i]) !='undefined'){
 //alert(obj.name+' == '+chkbx_list[i].name);
@@ -687,11 +687,11 @@ check: function(e){
 				if(this.startbox.name == chkbx_list[i].name) flag = true;
 			}
 		}
-		
+
 		if(flag){
 			this.startbox = null;
 			this.startbox_name = null;
-			
+
 			this.setGo();
 			return true;
 		}
@@ -702,28 +702,28 @@ check: function(e){
 					if(flag){
 						chkbx_list[i].checked = this.startbox.checked;
 					}
-					
+
 					if(obj.name == chkbx_list[i].name){
 						this.startbox = null;
 						this.startbox_name = null;
-						
+
 						this.setGo();
 						return true;
 					}
 
 					if(this.startbox.name == chkbx_list[i].name) flag = true;
 				}
-			}	
+			}
 		}
 
 	}
 	else{
 		if(!is_null(this.startbox)) this.startbox.checked = !this.startbox.checked;
-		
+
 		this.startbox = obj;
 		this.startbox_name = obj_name;
 	}
-	
+
 	this.setGo();
 },
 
@@ -740,17 +740,17 @@ checkAll: function(name, value){
 
 				chk_bx[i].checked = value;
 			}
-											   
+
 		}
-	}	
+	}
 },
 
 setGo: function(){
 	if(!is_null(this.pageGoName)){
 		var countChecked = 0;
-		
+
 		if(typeof(this.chkboxes[this.pageGoName]) == 'undefined'){
-			alert('CheckBoxes with name '+this.pageGoName+' doesnt exists');
+			alert('CheckBoxes with name '+this.pageGoName+' doesn\'t exist');
 			return false;
 		}
 
@@ -759,14 +759,14 @@ setGo: function(){
 			if(typeof(chk_bx[i]) !='undefined'){
 				var box = chk_bx[i];
 				var obj_name = box.name.split('[')[0];
-				
+
 				if((obj_name == this.pageGoName) && (box.checked)){
 					countChecked++;
 				}
-												   
+
 			}
 		}
-		
+
 		var tmp_val = $('goButton').value.split(' ');
 		$('goButton').value = tmp_val[0]+' ('+countChecked+')';
 	}
@@ -781,7 +781,7 @@ setGo: function(){
 // Author: Aly
 var blink = {
 	blinkobjs: new Array(),
-	
+
 	init: function(){
 		this.blinkobjs = document.getElementsByName("blink");
 		if(this.blinkobjs.length > 0) this.view();
