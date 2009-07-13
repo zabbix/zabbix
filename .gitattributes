@@ -301,6 +301,7 @@ frontends/php/styles/p.css -text
 frontends/php/styles/popupmenu.css -text
 frontends/php/styles/table.css -text
 frontends/php/styles/ul.css -text
+frontends/php/templates.php -text
 frontends/php/warning.php -text
 include/dbcache.h -text
 include/dbschema.h -text

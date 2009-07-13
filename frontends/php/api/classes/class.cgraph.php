@@ -32,13 +32,17 @@ class CGraph {
 	* @return array|boolean host data as array or false if error
 	*/
 	public static function get($options=array()){
+		global $USER_DETAILS;
 
+		$result = array();
+		$user_type = $USER_DETAILS['type'];
+		$userid = $USER_DETAILS['userid'];
 		$result = array();
 
 		$sort_columns = array('graphid'); // allowed columns for sorting
 
 		$sql_parts = array(
-			'select' => array('g.graphid','g.name'),
+			'select' => array('graphs' => 'g.graphid'),
 			'from' => array('graphs g'),
 			'where' => array(),
 			'order' => array(),
@@ -46,19 +50,18 @@ class CGraph {
 			);
 
 		$def_options = array(
-			'graphids' 			=> array(),
-			'itemids' 			=> array(),
-			'hostids' 			=> array(),
-			'type' 				=> false,
-			'templated_graphs'	=> false,
-			'editable'			=> false,
-			'nopermission'		=> false,
-			'extendoutput'			=> false,
-			'count'				=> false,
+			'graphids' 			=> 0,
+			'itemids' 			=> 0,
+			'hostids' 			=> 0,
+			'type' 				=> 0,
+			'templated_graphs'	=> 0,
+			'editable'			=> 0,
+			'nopermission'		=> 0,
+			'extendoutput'		=> 0,
+			'count'				=> 0,
 			'pattern'			=> '',
-			'limit'				=> false,
-			'order'				=> ''
-			);
+			'limit'				=> 0,
+			'order'				=> '');
 
 		$options = array_merge($def_options, $options);
 		
@@ -85,7 +88,6 @@ class CGraph {
 			$sql_parts['where'][] = 'ug.userid='.$userid;
 			$sql_parts['where'][] = 'r.permission>='.$permission;
 			$sql_parts['where'][] = 'NOT EXISTS( '.
-										' AND NOT EXISTS( '.
 											' SELECT gg.graphid '.
 											' FROM graphs_items gii, items ii '.
 											' WHERE gii.graphid=g.graphid '.
@@ -103,7 +105,8 @@ class CGraph {
 
 
 // hostids
-		if($options['hostids']){
+		if($options['hostids'] != 0){
+			zbx_value2array($options['hostids']);
 			$sql_parts['from']['gi'] = 'graphs_items gi';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
@@ -112,35 +115,35 @@ class CGraph {
 		}
 
 // graphids
-		if($options['graphids']){
+		if($options['graphids'] != 0){
 			$sql_parts['where'][] = DBcondition('g.graphid', $options['graphids']);
 		}
 
 // itemids
-		if($options['itemids']){
+		if($options['itemids'] != 0){
 			$sql_parts['from']['gi'] = 'graphs_items gi';
 			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sql_parts['where'][] = DBcondition('gi.itemid', $options['itemids']);
 		}
 
 // type
-		if($options['type'] !== false){
+		if($options['type']  != 0){
 			$sql_parts['where'][] = 'g.type='.$options['type'];
 		}
 
 // templated_graphs
-		if($options['templated_graphs']){
+		if($options['templated_graphs'] != 0){
 			$sql_parts['where'][] = 'g.templateid<>0';
 		}
 
 // extendoutput
-		if($options['extendoutput']){
-			$sql_parts['select'] = array('g.*');
+		if($options['extendoutput'] != 0){
+			$sql_parts['select']['graphs'] = 'g.*';
 		}
 
 // count
-		if($options['count']){
-			$sql_parts['select'] = array('count(g.graphid) as count');
+		if($options['count'] != 0){
+			$sql_parts['select']['graphs'] = 'count(g.graphid) as count';
 		}
 
 // pattern
@@ -172,21 +175,30 @@ class CGraph {
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);			
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.$sql_select.'
 				FROM '.$sql_from.'
-				WHERE '.DBin_node('g.graphid', $nodeids).
+				WHERE '.
 					$sql_where.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
 		while($graph = DBfetch($db_res)){
 			if($options['count'])
 				$result = $graph;
-			else
-				$result[$graph['graphid']] = $graph;
+			else{
+				if(!isset($options['extendoutput'])){
+					$result[$graph['graphid']] = $graph['graphid'];
+				}
+				else{
+					if(!isset($result[$graph['graphid']])) 
+						$result[$graph['graphid']]= array();
+					
+					$result[$graph['graphid']] += $graph;
+				}
+			}
 		}
 
 	return $result;
