@@ -1869,7 +1869,7 @@
 						$description,
 						$type,
 						$priority,
-						NULL,		// status
+						$status,
 						$comments,
 						$url,
 						replace_template_dependences($deps, $chd_trig_host['hostid']),
