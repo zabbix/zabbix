@@ -47,7 +47,7 @@ class CTrigger {
 
 		
 		$sql_parts = array(
-			'select' => array('t.triggerid, t.description, t.status'),
+			'select' => array('triggers' => 't.triggerid'),
 			'from' => array('triggers t'),
 			'where' => array(),
 			'order' => array(),
@@ -55,22 +55,21 @@ class CTrigger {
 			);
 
 		$def_options = array(
-			'triggerids'			=> array(),
-			'itemids'				=> array(),
-			'hostids'				=> array(),
-			'groupids'				=> array(),
-			'applicationids'		=> array(),
-			'status'				=> false,
-			'severity'				=> false,
-			'templated_triggers'	=> false,
-			'editable'				=> false,
-			'nopermissions'			=> false,
-			'extendoutput'			=> false,
-			'count'					=> false,
+			'triggerids'			=> 0,
+			'itemids'				=> 0,
+			'hostids'				=> 0,
+			'groupids'				=> 0,
+			'applicationids'		=> 0,
+			'status'				=> 0,
+			'severity'				=> 0,
+			'templated_triggers'	=> 0,
+			'editable'				=> 0,
+			'nopermissions'			=> 0,
+			'extendoutput'			=> 0,
+			'count'					=> 0,
 			'pattern'				=> '',
-			'limit'					=> null,
-			'order'					=> ''
-		);
+			'limit'					=> 0,
+			'order'					=> '');
 
 		$options = array_merge($def_options, $options);
 
@@ -114,7 +113,7 @@ class CTrigger {
 		}
 
 // groupids
-		if($options['groupids']){
+		if($options['groupids'] != 0){
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
@@ -125,7 +124,8 @@ class CTrigger {
 		}
 
 // hostids
-		if($options['hostids']){
+		if($options['hostids'] != 0){
+			zbx_value2array($options['hostids']);
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
@@ -134,12 +134,12 @@ class CTrigger {
 		}
 
 // triggerids
-		if($options['triggerids']){
+		if($options['triggerids'] != 0){
 			$sql_parts['where'][] = DBcondition('t.triggerid', $options['triggerids']);
 		}
 
 // itemids
-		if($options['itemids']){
+		if($options['itemids'] != 0){
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
@@ -148,7 +148,7 @@ class CTrigger {
 		}
 
 // applicationids
-		if($options['applicationids']){
+		if($options['applicationids'] != 0){
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['from']['a'] = 'applications a';
@@ -159,28 +159,28 @@ class CTrigger {
 		}
 
 // status
-		if($options['status'] !== false){
+		if($options['status'] != 0){
 			$sql_parts['where'][] = 't.status='.$options['status'];
 		}
 
 // severity
-		if($options['severity'] !== false){
+		if($options['severity'] != 0){
 			$sql_parts['where'][] = 't.priority='.$options['severity'];
 		}
 
 // templated_triggers
-		if($options['templated_triggers']){
+		if($options['templated_triggers'] != 0){
 			$sql_parts['where'][] = 't.templateid<>0';
 		}
 		
 // extendoutput
-		if($options['extendoutput']){
-			$sql_parts['select'] = array('t.*');
+		if($options['extendoutput'] != 0){
+			$sql_parts['select']['triggers'] = 't.*';
 		}
 		
 // count
-		if($options['count']){
-			$sql_parts['select'] = array('count(t.triggerid) as rowscount');
+		if($options['count'] != 0){
+			$sql_parts['select']['triggers'] = 'count(t.triggerid) as rowscount';
 		}
 		
 // pattern
@@ -214,13 +214,13 @@ class CTrigger {
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);			
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.$sql_select.'
 				FROM '.$sql_from.'
-				WHERE '.DBin_node('t.triggerid', $nodeids).
+				WHERE '.
 					$sql_where.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);

@@ -775,7 +775,15 @@
 	'S_PROXY_NAME'=>					'Proxy name',
 	'S_LASTSEEN_AGE'=>					'Last seen (age)',
 
-
+// templates.php
+	'S_TEMPLATE_ADDED' => 'New template added',
+	'S_CANNOT_ADD_TEMPLATE' => 'Cannot add template',
+	'S_TEMPLATE_UPDATED' => 'Template updated',
+	'S_CANNOT_UPDATE_TEMPLATE' => 'Cannot update template',
+	'S_LINKED_TEMPLATES' =>		'Linked templates',
+	'S_LINKED_TO' => 		'Linked to',
+	'S_CONFIGURATION_OF_TEMPLATES' => 	'CONFIGURATION OF TEMPLATES',
+	
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
 	'S_DEVICE_TYPE'=>			'Device type',

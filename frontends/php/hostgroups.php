@@ -30,10 +30,8 @@ include_once('include/page_header.php');
 
 	$_REQUEST['go'] = get_request('go','none');
 	
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-	// $available_groups = CHostGroup::get(array('editable' => 1));
-	// $available_hosts = CHost::get(array('editable' => 1, 'templated_hosts' => 1));
+	$available_groups = CHostGroup::get(array('editable' => 1));
+	$available_hosts = CHost::get(array('editable' => 1, 'templated_hosts' => 1));	
 
 	if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !isset($available_groups[$_REQUEST['groupid']])){
 		access_deny();
@@ -69,9 +67,6 @@ include_once('include/page_header.php');
 	);
 	check_fields($fields);
 //validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
-//	update_profile('web.hosts.config',$_REQUEST['config'], PROFILE_TYPE_INT);
-?>
-<?php
 
 
 /*** <--- ACTIONS ---> ***/
@@ -113,40 +108,40 @@ include_once('include/page_header.php');
 		unset($_REQUEST['save']);
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['groupid'])){
-		$result = false;
+			$result = false;
 
-		DBstart();
-		$result = delete_host_group($_REQUEST['groupid']);
-		$result = DBend($result);
+				DBstart();
+				$result = delete_host_group($_REQUEST['groupid']);
+				$result = DBend($result);
 		
-		unset($_REQUEST['form']);
+			unset($_REQUEST['form']);
 
-		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-		unset($_REQUEST['groupid']);
-	}
+			show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
+			unset($_REQUEST['groupid']);
+		}
 // --------- GO  ----------
 	else if($_REQUEST['go'] == 'delete'){
 /* group operations */
-		$result = true;
+			$result = true;
 
-		$groups = get_request('groups', array());
-		$db_groups = DBselect('select groupid, name from groups where '.DBin_node('groupid'));
+			$groups = get_request('groups', array());
+			$db_groups = DBselect('select groupid, name from groups where '.DBin_node('groupid'));
 
-		DBstart();
-		while($db_group=DBfetch($db_groups)){
-			if(!uint_in_array($db_group['groupid'],$groups)) continue;
+			DBstart();
+			while($db_group=DBfetch($db_groups)){
+				if(!uint_in_array($db_group['groupid'],$groups)) continue;
 
 /*				if(!$group = get_hostgroup_by_groupid($db_group['groupid'])) continue;*/
-			$result &= delete_host_group($db_group['groupid']);
+				$result &= delete_host_group($db_group['groupid']);
 
 /*				if($result){
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST_GROUP,
-				S_HOST_GROUP.' ['.$group['name'].' ] ['.$group['groupid'].']');
-			}*/
+					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST_GROUP,
+					S_HOST_GROUP.' ['.$group['name'].' ] ['.$group['groupid'].']');
+				}*/
+			}
+			$result = DBend($result);
+			show_messages(true, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 		}
-		$result = DBend($result);
-		show_messages(true, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-	}
 	else if(str_in_array($_REQUEST['go'], array('activate','disable'))){
 		$result = true;
 		$status = ($_REQUEST['go'] == 'activate')?HOST_STATUS_MONITORED:HOST_STATUS_NOT_MONITORED;
@@ -172,7 +167,7 @@ include_once('include/page_header.php');
 
 		unset($_REQUEST['activate']);
 	}
-/*** ---> ACTIONS <--- ***/
+/*** --->>> ACTIONS <<<--- ***/
 
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
@@ -299,19 +294,21 @@ include_once('include/page_header.php');
 					S_MEMBERS
 				));
 
-		$groups = CHostGroup::get(array('order'=> 'name', 'editable' => 1));
+		$groups = CHostGroup::get(array('order'=> 'name', 'editable' => 1, 'extendoutput' => 1));
 		$groupids = array_keys($groups);
+		
 		$hosts = CHost::get(array('groupids' => $groupids, 'extendoutput' => 1, 'templated_hosts' => 1));
-
+		
 		foreach($groups as $groupid => $group){
 			$groups[$groupid]['hosts'] = array();
 		}
+
 		foreach($hosts as $hostid => $host){
-			foreach($host['groups'] as $groupid){
+			foreach($host['groupids'] as $groupid){
 				$groups[$groupid]['hosts'][$hostid] = $host;
 			}
 		}
-			
+		
 		foreach($groups as $groupid => $group){
 			$i = 0;
 			$hosts_output = array();
@@ -319,22 +316,14 @@ include_once('include/page_header.php');
 			foreach($group['hosts'] as $hostid => $host){
 				$i++;
 				if($i > $config['max_in_table']){
-					array_push($hosts_output, ', ', new CLink('...', 'hosts.php?config=0&hostid=0&groupid='.$groupid));
+					array_push($hosts_output, new CLink('...', 'hosts.php?config=0&hostid=0&groupid='.$groupid), '//empty for array_pop');
 					break;
 				}
 				$link = 'hosts.php?form=update&config=0&hostid='.$hostid;
-				switch($host['status']){
-					case HOST_STATUS_MONITORED:
-						$style = null;
-						break;
-					case HOST_STATUS_TEMPLATE:
-						$style = 'unknown';
-						break;
-					default:
-						$style = 'on';
-				}
-				array_push($hosts_output, (empty($hosts_output) ? '' : ', '), new CLink($host['host'], $link, $style));
+				$style = ($host['status'] == HOST_STATUS_NOT_MONITORED) ? 'on' : (($host['status'] == HOST_STATUS_TEMPLATE) ? 'unknown' : null);
+				array_push($hosts_output, new CLink($host['host'], $link, $style), ', ');
 			}
+			array_pop($hosts_output);
 
 			$host_count = count($group['hosts']);
 			$table->addRow(array(
