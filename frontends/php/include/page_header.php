@@ -170,10 +170,10 @@
 		$req = substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'print')-1);
 
 		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req, 'small_font');
-		$link->addOption('style','padding-left: 10px;');
+		$link->setAttribute('style','padding-left: 10px;');
 
 		$printview = new CDiv($link,'printless');
-		$printview->addOption('style','border: 1px #333 dotted;');
+		$printview->setAttribute('style','border: 1px #333 dotted;');
 		$printview->Show();
 
 	}
@@ -194,7 +194,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			array_push($page_header_r_col, new CLink(S_PROFILE, 'profile.php', 'small_font'),'|');
 			if($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_ENABLED){
 				$debug = new CLink(S_DEBUG, '#debug', 'small_font');
-				$debug->addOption('onclick', "javascript: ShowHide('zbx_gebug_info');");
+				$debug->setAttribute('onclick', "javascript: ShowHide('zbx_gebug_info');");
 
 				array_push($page_header_r_col,$debug,'|');
 			}
@@ -208,7 +208,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$logo->setTarget('_blank');
 
 		$td_r = new CCol($page_header_r_col, 'page_header_r');
-		$td_r->addOption('width','100%');
+		$td_r->setAttribute('width','100%');
 
 		$top_page_row	= array(new CCol($logo, 'page_header_l'), $td_r);
 		unset($logo, $page_header_r_col, $help, $support);
@@ -235,7 +235,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 				$node_form = new CForm();
 				$node_form->setMethod('get');
-				$node_form->addOption('id', 'node_form');
+				$node_form->setAttribute('id', 'node_form');
 
 // +++ create Combo Box with selected nodes +++
 				$combo_node_list = null;
@@ -255,7 +255,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 					" showPopupDiv('div_node_tree','select_iframe');";		// IE6
 				$button_show_tree = new CButton('show_node_tree', S_SELECT_NODES, $jscript); //sdelatj konstatntu!
 				$button_show_tree->setType('button');
-				$button_show_tree->addOption('id', 'button_show_tree');
+				$button_show_tree->setAttribute('id', 'button_show_tree');
 
 // +++ Create node tree +++
 				$combo_check_all = new CCheckbox('check_all_nodes', null, "javascript : check_all('node_form', this.checked);");
@@ -289,7 +289,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 																				" hidePopupDiv('select_iframe');".	//IE6 fix
 																				" \$('div_node_tree').setStyle({display:'none'});"));
 
-				$div_node_tree->addOption('id', 'div_node_tree');
+				$div_node_tree->setAttribute('id', 'div_node_tree');
 				$div_node_tree->addStyle('display: none');
 
 
@@ -305,16 +305,16 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$table = new CTable();
 		$table->setCellSpacing(0);
 		$table->setCellPadding(0);
-		$table->addOption('style','width: 100%;');
+		$table->setAttribute('style','width: 100%;');
 
 		$r_col = new CCol($node_form);
-		$r_col->addOption('align','right');
-//		$r_col->addOption('style','text-align: right;');
+		$r_col->setAttribute('align','right');
+//		$r_col->setAttribute('style','text-align: right;');
 
 		$table->addRow(array($menu_table,$r_col));
 
 		$page_menu = new CDiv();
-		$page_menu->addoption('id','mmenu');
+		$page_menu->setAttribute('id','mmenu');
 		$page_menu->addItem($table);
 //----
 
@@ -338,36 +338,36 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			}
 
 			$sub_menu_div = new CDiv($sub_menu_row);
-			$sub_menu_div->addOption('id', 'sub_'.$label);
+			$sub_menu_div->setAttribute('id', 'sub_'.$label);
 			$sub_menu_div->addAction('onmouseover','javascript: MMenu.submenu_mouseOver();');
 			$sub_menu_div->addAction('onmouseout','javascript: MMenu.mouseOut();');
 
 			if(isset($page['menu']) && ($page['menu'] == $label)){
 				$menu_selected = true;
-				$sub_menu_div->addOption('style','display: block;');
+				$sub_menu_div->setAttribute('style','display: block;');
 				insert_js('MMenu.def_label = '.zbx_jsvalue($label));
 			}
 			else{
-				$sub_menu_div->addOption('style','display: none;');
+				$sub_menu_div->setAttribute('style','display: none;');
 			}
 
 			$menu_divs[] = $sub_menu_div;
 		}
 
 		$sub_menu_div = new CDiv(SPACE);
-		$sub_menu_div->addOption('id', 'sub_empty');
-		$sub_menu_div->addOption('style','display: '.($menu_selected?'none;':'block;'));
+		$sub_menu_div->setAttribute('id', 'sub_empty');
+		$sub_menu_div->setAttribute('style','display: '.($menu_selected?'none;':'block;'));
 
 		$menu_divs[] = $sub_menu_div;
 
 		$search_form = new CForm('search.php');
 		$search_form->setMethod('get');
-		$search_form->addOption('class','thin');
+		$search_form->setAttribute('class','thin');
 		$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', new CTextBox('search','',15))));
 
 		$search_div = new CDiv($search_form);
-		$search_div->addOption('id','zbx_search');
-		$search_div->addOption('class','zbx_search');
+		$search_div->setAttribute('id','zbx_search');
+		$search_div->setAttribute('class','zbx_search');
 
 		$sub_menu_table->addRow(array($menu_divs, $search_div));
 
@@ -379,8 +379,8 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', new CTextBox('search','',20))));
 
 		$search_div = new CDiv($search_form);
-		$search_div->addOption('id','zbx_search');
-		$search_div->addOption('class','zbx_search');
+		$search_div->setAttribute('id','zbx_search');
+		$search_div->setAttribute('class','zbx_search');
 
 		$page_menu->addItem($search_div);
 //*/

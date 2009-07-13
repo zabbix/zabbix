@@ -22,27 +22,27 @@
 class CFlashEmbed extends CTag{
 	public function __construct($src=NULL, $width = NULL, $height = NULL){
 		parent::__construct('embed');
-		$this->options['allowScriptAccess'] = 'sameDomain';
-		$this->options['type'] = 'application/x-shockwave-flash';
-		$this->options['pluginspage']  = 'http://www.macromedia.com/go/getflashplayer';
-		$this->options['align'] = 'middle';
-		$this->options['quality'] = 'high';
+		$this->attributes['allowScriptAccess'] = 'sameDomain';
+		$this->attributes['type'] = 'application/x-shockwave-flash';
+		$this->attributes['pluginspage']  = 'http://www.macromedia.com/go/getflashplayer';
+		$this->attributes['align'] = 'middle';
+		$this->attributes['quality'] = 'high';
 
-		$this->options['width'] = $width;
-		$this->options['height'] = $height;
-		$this->options['src'] = $src;
+		$this->attributes['width'] = $width;
+		$this->attributes['height'] = $height;
+		$this->attributes['src'] = $src;
 	}
 
 	public function setWidth($value){
-		$this->options['width']  = $value;
+		$this->attributes['width']  = $value;
 	}
 
 	public function setHeight($value){
-		$this->options['height'] = $value;
+		$this->attributes['height'] = $value;
 	}
 
 	public function setSrc($value){
-		$this->options['src'] = $value;
+		$this->attributes['src'] = $value;
 	}
 }
 ?>

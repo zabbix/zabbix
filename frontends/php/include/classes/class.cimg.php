@@ -32,8 +32,8 @@ class CImg extends CTag{
 		if(is_null($name))
 			$name='image';
 
-		$this->addOption('border',0);
-		$this->addOption('alt',$name);
+		$this->setAttribute('border',0);
+		$this->setAttribute('alt',$name);
 		$this->setName($name);
 		$this->setAltText($name);
 		$this->setSrc($src);
@@ -46,14 +46,14 @@ class CImg extends CTag{
 		if(!is_string($value)){
 			return $this->error('Incorrect value for SetSrc ['.$value.']');
 		}
-	return $this->addOption('src',$value);
+	return $this->setAttribute('src',$value);
 	}
 
 	public function setAltText($value=NULL){
 		if(!is_string($value)){
 			return $this->error('Incorrect value for SetText ['.$value.']');
 		}
-	return $this->addOption('alt',$value);
+	return $this->setAttribute('alt',$value);
 	}
 
 	public function setMap($value=NULL){
@@ -65,23 +65,23 @@ class CImg extends CTag{
 		}
 
 		$value = '#'.ltrim($value,'#');
-	return $this->addOption('usemap',$value);
+	return $this->setAttribute('usemap',$value);
 	}
 
 	public function SetWidth($value=NULL){
 		if(is_null($value))
-			return $this->delOption('width');
+			return $this->removeAttribute('width');
 		else if(is_numeric($value)||is_int($value))
-			return $this->addOption('width',$value);
+			return $this->setAttribute('width',$value);
 		else
 			return $this->error('Incorrect value for SetWidth ['.$value.']');
 	}
 
 	public function setHeight($value=NULL){
 		if(is_null($value))
-			return $this->delOption('height');
+			return $this->removeAttribute('height');
 		else if(is_numeric($value)||is_int($value))
-			return $this->addOption('height',$value);
+			return $this->setAttribute('height',$value);
 		else
 			return $this->error('Incorrect value for SetHeight ['.$value.']');
 	}

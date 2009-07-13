@@ -59,7 +59,7 @@ unset($USER_DETAILS);
 
 	$table = new CTable(null, 'warning');
 	$table->setAlign('center');
-	$table->addOption('style','width: 480px; margin-top: 100px;');
+	$table->setAttribute('style','width: 480px; margin-top: 100px;');
 	$table->setHeader(array(new CCol(S_ZABBIX.SPACE.ZABBIX_VERSION, 'left')),'header');
 
 	$table->addRow(SPACE);
@@ -67,10 +67,10 @@ unset($USER_DETAILS);
 	$warning_msg=(isset($_REQUEST['warning_msg']))?($_REQUEST['warning_msg']):(S_ZABBIX_IS_UNAVAILABLE.'!');
 
 	$img = new CImg('./images/general/warning16r.gif','warning',16,16,'img');
-	$img->addOption('style','border-width: 0px; vertical-align: bottom;');
+	$img->setAttribute('style','border-width: 0px; vertical-align: bottom;');
 
 	$msg = new CSpan(bold(SPACE.$warning_msg));
-	$msg->addOption('style','line-height: 20px; vertical-align: top;');
+	$msg->setAttribute('style','line-height: 20px; vertical-align: top;');
 
 	$table->addRow(new CCol(array(
 						$img,

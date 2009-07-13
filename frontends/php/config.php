@@ -770,7 +770,7 @@
 
 			if(count($valuemap_el)==0) {
 				array_push($valuemap_el, S_NO_MAPPING_DEFINED);
-				$saveButton->addOption('disabled', 'true');
+				$saveButton->setAttribute('disabled', 'true');
 			} else {
 				array_push($valuemap_el, new CButton('del_map',S_DELETE_SELECTED));
 			}
@@ -850,7 +850,7 @@
 			$left_tab->setCellPadding(3);
 			$left_tab->setCellSpacing(3);
 
-			$left_tab->addOption('border',0);
+			$left_tab->setAttribute('border',0);
 
 			$left_tab->addRow(create_hat(
 					S_REGULAR_EXPRESSION,
@@ -864,7 +864,7 @@
 			$right_tab->setCellPadding(3);
 			$right_tab->setCellSpacing(3);
 
-			$right_tab->addOption('border',0);
+			$right_tab->setAttribute('border',0);
 
 			$right_tab->addRow(create_hat(
 					S_EXPRESSIONS,
@@ -886,13 +886,13 @@
 
 
 			$td_l = new CCol($left_tab);
-			$td_l->AddOption('valign','top');
+			$td_l->setAttribute('valign','top');
 
 			$td_r = new CCol($right_tab);
-			$td_r->AddOption('valign','top');
+			$td_r->setAttribute('valign','top');
 
 			$outer_table = new CTable();
-			$outer_table->AddOption('border',0);
+			$outer_table->setAttribute('border',0);
 			$outer_table->SetCellPadding(1);
 			$outer_table->SetCellSpacing(1);
 			$outer_table->AddRow(array($td_l,$td_r));

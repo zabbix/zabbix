@@ -121,7 +121,7 @@
 
 	$r_form = new CForm();
 	$r_form->setMethod('get');
-	$r_form->addOption('name','events_menu');
+	$r_form->setAttribute('name','events_menu');
 
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 //	$r_form->addVar('nav_time',$_REQUEST['nav_time']);
@@ -192,7 +192,7 @@
 	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 
 	$events_wdgt->addHeader($text,array($r_form,SPACE.SPACE,$fs_icon));
@@ -401,10 +401,10 @@
 	$navForm->addVar('next_clock',$next_clock);
 //*
 	$prev_page = new CButton('prev_page','« '.S_BACK);
-	if(empty($prev_clock)) $prev_page->addOption('disabled','disabled');
+	if(empty($prev_clock)) $prev_page->setAttribute('disabled','disabled');
 
 	$next_page = new CButton('next_page',S_NEXT.' »');
-	if($col < $limit) $next_page->addOption('disabled','disabled');
+	if($col < $limit) $next_page->setAttribute('disabled','disabled');
 //*/
 	$navForm->addItem(array($prev_page,SPACE,$next_page));
 
@@ -416,8 +416,8 @@
 /***********************************************************/
 
 	$filterForm = new CFormTable();//,'events.php?filter_set=1','POST',null,'sform');
-	$filterForm->addOption('name','zbx_filter');
-	$filterForm->addOption('id','zbx_filter');
+	$filterForm->setAttribute('name','zbx_filter');
+	$filterForm->setAttribute('id','zbx_filter');
 //	$filterForm->setMethod('get');
 
 	$filterForm->addVar('nav_time',$_REQUEST['nav_time']);
@@ -429,7 +429,7 @@
 
 	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
 	$clndr_icon->addAction('onclick',"javascript: var pos = getPosition(this); pos.top+=14; pos.left-=174; CLNDR['nav_time'].clndr.clndrshow(pos.top,pos.left);");
-	$clndr_icon->addOption('style','vertical-align: middle;');
+	$clndr_icon->setAttribute('style','vertical-align: middle;');
 
 	$nav_clndr =  array(
 					new CNumericBox('nav_day',(($_REQUEST['nav_time']>0)?date('d',$_REQUEST['nav_time']):''),2),

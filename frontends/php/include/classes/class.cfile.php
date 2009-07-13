@@ -23,7 +23,7 @@ class CFile extends CTag{
 	public function __construct($name='file',$value=''){
 		parent::__construct('input','no');
 		$this->setClass('biginput');
-		$this->addOption('type','file');
+		$this->setAttribute('type','file');
 		$this->setName($name);
 		$this->setFile($value);
 	}
@@ -32,7 +32,7 @@ class CFile extends CTag{
 		if(!is_string($value)){
 			return $this->error('Incorrect value for SetFile ['.$value.']');
 		}
-	return $this->addOption('value',$value);
+	return $this->setAttribute('value',$value);
 	}
 }
 ?>

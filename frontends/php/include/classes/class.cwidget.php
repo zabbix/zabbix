@@ -68,7 +68,7 @@ private $items;
 
 	public function get(){
 		$widget = new CTable();
-		$widget->addOption('width','100%');
+		$widget->setAttribute('width','100%');
 		$widget->setCellPadding(0);
 		$widget->setCellSpacing(0);
 
@@ -76,7 +76,7 @@ private $items;
 			$right_tab = null;
 			if(!is_null($header['right']) || !is_null($this->state)){
 				$td_l = new CCol(SPACE);
-				$td_l->addOption('width','100%');
+				$td_l->setAttribute('width','100%');
 
 				$right_row = array($td_l);
 
@@ -87,21 +87,21 @@ private $items;
 
 				if(!is_null($this->state)){
 					$icon = new CDiv(SPACE, $this->state?'arrowup':'arrowdown');
-					$icon->addOption('id',$this->domid.'_icon');
-					$icon->addOption('title',S_SHOW.'/'.S_HIDE);
+					$icon->setAttribute('id',$this->domid.'_icon');
+					$icon->setAttribute('title',S_SHOW.'/'.S_HIDE);
 					$icon->addAction('onclick',new CScript("javascript: change_hat_state(this,'".$this->domid."');"));
 					$right_row[] = new CCol($icon);
 				}
 
 				$right_tab = new CTable(null,'textwhite');
-				$right_tab->addOption('width','100%');
+				$right_tab->setAttribute('width','100%');
 
 				$right_tab->addRow($right_row);
 			}
 
 			$header_tab = new CTable(null,'nowrap');
-			$header_tab->addOption('width','100%');
-//			$header_tab->addOption('border','1');
+			$header_tab->setAttribute('width','100%');
+//			$header_tab->setAttribute('border','1');
 			$header_tab->setCellPadding(0);
 			$header_tab->setCellSpacing(0);
 
@@ -117,30 +117,30 @@ private $items;
 		if(!empty($this->flicker)){
 			$flicker_domid = 'flicker_'.$this->domid;
 			$flicker_tab = new CTable();
-			$flicker_tab->addOption('width','100%');
+			$flicker_tab->setAttribute('width','100%');
 			$flicker_tab->setCellPadding(0);
 			$flicker_tab->setCellSpacing(0);
-			$flicker_tab->addOption('border',0);
+			$flicker_tab->setAttribute('border',0);
 
 			$div = new CDiv($this->flicker);
-			$div->addOption('id',$flicker_domid);
-			if(!$this->flicker_state) $div->addOption('style','display: none;');
+			$div->setAttribute('id',$flicker_domid);
+			if(!$this->flicker_state) $div->setAttribute('style','display: none;');
 
 			$flicker_tab->addRow($div);
 
 			$icon_l = new CDiv(SPACE.SPACE, $this->flicker_state?'dbl_arrow_up':'dbl_arrow_down');
-			$icon_l->addOption('title',S_MAXIMIZE.'/'.S_MINIMIZE);
-			$icon_l->addOption('id','flicker_icon_l');
+			$icon_l->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
+			$icon_l->setAttribute('id','flicker_icon_l');
 
 			$icon_r = new CDiv(SPACE.SPACE, $this->flicker_state?'dbl_arrow_up':'dbl_arrow_down');
-			$icon_r->addOption('title',S_MAXIMIZE.'/'.S_MINIMIZE);
-			$icon_r->addOption('id','flicker_icon_r');
+			$icon_r->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
+			$icon_r->setAttribute('id','flicker_icon_r');
 
 			$icons_row = new CTable(null,'whitetext');
 			$icons_row->addRow(array($icon_l,SPACE,S_FILTER,SPACE,$icon_r));
 
 			$thin_tab = $this->createFlicker($icons_row);
-			$thin_tab->addOption('id','filter_icon');
+			$thin_tab->setAttribute('id','filter_icon');
 			$thin_tab->addAction('onclick',new CScript("javascript: change_flicker_state('".$flicker_domid."');"));
 
 			$flicker_tab->addRow($thin_tab,'textcolorstyles link pointer');
@@ -149,9 +149,9 @@ private $items;
 		}
 
 		$div = new CDiv($this->body);
-		$div->addOption('id',$this->domid);
+		$div->setAttribute('id',$this->domid);
 
-		if(!$this->state) $div->addOption('style','display: none;');
+		if(!$this->state) $div->setAttribute('style','display: none;');
 
 		$widget->addRow($div);
 	return $widget;
@@ -175,18 +175,18 @@ private $items;
 		}
 
 		$table = new CTable(NULL,'header');
-//		$table->addOption('border',1);
+//		$table->setAttribute('border',1);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 
 		if(!is_null($col2)){
 			$td_r = new CCol($col2,'header_r');
-			$td_r->addOption('align','right');
+			$td_r->setAttribute('align','right');
 			$table->addRow(array(new CCol($col1,'header_l'), $td_r));
 		}
 		else{
 			$td_c = new CCol($col1,'header_c');
-			$td_c->addOption('align','center');
+			$td_c->setAttribute('align','center');
 
 			$table->addRow($td_c);
 		}
@@ -197,18 +197,18 @@ private $items;
 	private function createFlicker($col1, $col2=NULL){
 
 		$table = new CTable(NULL,'flicker');
-//		$table->addOption('border',1);
+//		$table->setAttribute('border',1);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 
 		if(!is_null($col2)){
 			$td_r = new CCol($col2,'flicker_r');
-			$td_r->addOption('align','right');
+			$td_r->setAttribute('align','right');
 			$table->addRow(array(new CCol($col1,'flicker_l'), $td_r));
 		}
 		else{
 			$td_c = new CCol($col1,'flicker_c');
-			$td_c->addOption('align','center');
+			$td_c->setAttribute('align','center');
 
 			$table->addRow($td_c);
 		}

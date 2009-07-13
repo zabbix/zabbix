@@ -80,7 +80,7 @@ include_once "include/page_header.php";
 	$url = '?httptestid='.$_REQUEST['httptestid'].'&fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->AddOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 
 	$icon_tab = new CTable();
@@ -226,7 +226,7 @@ include_once "include/page_header.php";
 						'"')
 					);
 	$form = new CTableInfo();
-	$form->AddOption('id','graph');
+	$form->setAttribute('id','graph');
 	$form->AddRow(array(bold(S_SPEED) , new CCol(
 		get_dynamic_chart('graph_1','chart3.php?'.url_param('period').url_param('from').
 			url_param($httptest_data['name'], false,'name').
@@ -266,8 +266,8 @@ include_once "include/page_header.php";
 	zbx_add_post_js($script);
 
 	$scroll_div = new CDiv();
-	$scroll_div->addOption('id','scroll_cntnr');
-	$scroll_div->addOption('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
+	$scroll_div->setAttribute('id','scroll_cntnr');
+	$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
 	$scroll_div->show();
 
 //	navigation_bar("#", array('httptestid'));

@@ -234,7 +234,7 @@ include_once 'include/page_header.php';
 ?>
 <?php
 	$table = new CTableInfo('...','chart');
-//	$table->AddOption('border',1);
+//	$table->setAttribute('border',1);
 
 	if($_REQUEST['graphid'] > 0){
 		$graphtype = GRAPH_TYPE_NORMAL;
@@ -304,24 +304,24 @@ include_once 'include/page_header.php';
 	if($_REQUEST['graphid'] > 0){
 		if(infavorites('web.favorite.graphids',$_REQUEST['graphid'],'graphid')){
 			$icon = new CDiv(SPACE,'iconminus');
-			$icon->addOption('title',S_REMOVE_FROM.' '.S_FAVOURITES);
+			$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
 			$icon->addAction('onclick',new CScript("javascript: rm4favorites('graphid','".$_REQUEST['graphid']."',0);"));
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
-			$icon->addOption('title',S_ADD_TO.' '.S_FAVOURITES);
+			$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
 			$icon->addAction('onclick',new CScript("javascript: add2favorites('graphid','".$_REQUEST['graphid']."');"));
 		}
-		$icon->addOption('id','addrm_fav');
+		$icon->setAttribute('id','addrm_fav');
 
 		$url = '?graphid='.$_REQUEST['graphid'].($_REQUEST['fullscreen']?'':'&fullscreen=1');
 
 		$fs_icon = new CDiv(SPACE,'fullscreen');
-		$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+		$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 
 		$rst_icon = new CDiv(SPACE,'iconreset');
-		$rst_icon->addOption('title',S_RESET);
+		$rst_icon->setAttribute('title',S_RESET);
 		$rst_icon->addAction('onclick',new CScript("javascript: graphload(SCROLL_BAR.dom_graphs, ".(time()+100000000).", 3600, false);"));
 
 	}
@@ -352,8 +352,8 @@ include_once 'include/page_header.php';
 		zbx_add_post_js($script);
 
 		$scroll_div = new CDiv();
-		$scroll_div->addOption('id','scroll_cntnr');
-		$scroll_div->addOption('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
+		$scroll_div->setAttribute('id','scroll_cntnr');
+		$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
 		$scroll_div->show();
 //		navigation_bar('charts.php',array('groupid','hostid','graphid'));
 //-------------

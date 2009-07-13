@@ -22,7 +22,7 @@
 class CPassBox extends CTextBox{
 	public function __construct($name='password',$value='',$size=20){
 		parent::__construct($name,$value,$size);
-		$this->options['type'] = 'password';
+		$this->attributes['type'] = 'password';
 	}
 }
 ?>

@@ -267,7 +267,7 @@ include_once "include/page_header.php";
 			$r_form = new CForm();
 			$r_form->setClass('nowrap');
 			$r_form->setMethod('get');
-			$r_form->addOption('name', 'period_choice');
+			$r_form->setAttribute('name', 'period_choice');
 			$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 			$period_combo = new CComboBox('period_start', $period_start, 'javascript: submit();');
 			foreach($periods as $key => $val){
@@ -277,7 +277,7 @@ include_once "include/page_header.php";
 
 			$url = '?period_start='.$period_start.'&fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 			$fs_icon = new CDiv(SPACE,'fullscreen');
-			$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+			$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 			$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 
 			$srv_wdgt = new CWidget('hat_services', $tree->getHTML());

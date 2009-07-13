@@ -302,7 +302,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 		$menu_url = $menu['pages'][$menu['default_page_id']]['url'];
 
 		$mmenu_entry = new CCol($menu['label'], $menu_class);
-		$mmenu_entry->addOption('id', $label);
+		$mmenu_entry->setAttribute('id', $label);
 		$mmenu_entry->addAction('onclick', "javascript: redirect('$menu_url');");
 		$mmenu_entry->addAction('onmouseover', 'javascript: MMenu.mouseOver("'.$label.'");');
 		$mmenu_entry->addAction('onmouseout', 'javascript: MMenu.mouseOut();');

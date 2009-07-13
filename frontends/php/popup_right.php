@@ -65,7 +65,7 @@ include_once "include/page_header.php";
 	show_table_header(permission2str($permission),$frmTitle);
 
 	$form = new CForm();
-	$form->addOption('id', 'groups');
+	$form->setAttribute('id', 'groups');
 
 	$table = new CTableInfo(S_NO_RESOURCES_DEFINED);
 	$table->SetHeader(new CCol(array(new CCheckBox("all_groups", NULL, 'check_all(this.checked)'),S_NAME)));

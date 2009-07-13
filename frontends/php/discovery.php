@@ -67,12 +67,12 @@ include_once('include/page_header.php');
 	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1').'&amp;druleid='.$druleid;
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 
 	$row_count = 0;
 	$numrows = new CSpan(null,'info');
-	$numrows->addOption('name','numrows');
+	$numrows->setAttribute('name','numrows');
 	$header = array(S_STATUS_OF_DISCOVERY_BIG,
 			new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 			S_FOUND.': ',$numrows);
@@ -207,7 +207,7 @@ include_once('include/page_header.php');
 
 				$hint = new CDiv(SPACE, $class);
 				$hintTable = new CTableInfo();
-				$hintTable->addOption('style','width: auto;');
+				$hintTable->setAttribute('style','width: auto;');
 
 
 				if(isset($h_data['services'][$name])){

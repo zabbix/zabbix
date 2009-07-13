@@ -142,7 +142,7 @@ if(isset($_REQUEST['make'])){
 else if(isset($_REQUEST['next'])){
 	$help = new CHelp('web.view.php','left');
 	$help_table = new CTableInfo();
-	$help_table->addOption('style', 'width: 600px;');
+	$help_table->setAttribute('style', 'width: 600px;');
 
 	if($_REQUEST['extlang'] == 'new'){
 		define('S_NEW_LOCALE_STEP_1','Download newly created locale file by pressing "Download".');
@@ -178,7 +178,7 @@ else if(isset($_REQUEST['next'])){
 	echo SBR;
 
 	$frmLcls = new CFormTable(S_CREATE.SPACE.S_LOCALE_SMALL.SPACE.S_FROM_SMALL.SPACE.$ZBX_LOCALES[$_REQUEST['srclang']],'locales.php?action=1','post',null,'form');
-	$frmLcls->addOption('id','locales');
+	$frmLcls->setAttribute('id','locales');
 	$frmLcls->SetHelp($help);
 
 	$fileFrom = 'include/locales/'.$_REQUEST['srclang'].'.inc.php';
@@ -242,7 +242,7 @@ else{
 	echo SBR;
 
 	$frmLcls = new CFormTable(S_CREATE.SPACE.S_LOCALE_SMALL,'locales.php','post',null,'form');
-	$frmLcls->addOption('id','locales');
+	$frmLcls->setAttribute('id','locales');
 
 	$cmbLang = new CComboBox('srclang',get_request('srclang','en_gb'));
 	foreach($ZBX_LOCALES as $id => $name){

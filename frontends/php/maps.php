@@ -162,20 +162,20 @@ include_once('include/page_header.php');
 
 		if(infavorites('web.favorite.sysmapids',$_REQUEST['sysmapid'],'sysmapid')){
 			$icon = new CDiv(SPACE,'iconminus');
-			$icon->addOption('title',S_REMOVE_FROM.' '.S_FAVOURITES);
+			$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
 			$icon->addAction('onclick',new CScript("javascript: rm4favorites('sysmapid','".$_REQUEST["sysmapid"]."',0);"));
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
-			$icon->addOption('title',S_ADD_TO.' '.S_FAVOURITES);
+			$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
 			$icon->addAction('onclick',new CScript("javascript: add2favorites('sysmapid','".$_REQUEST["sysmapid"]."');"));
 		}
-		$icon->addOption('id','addrm_fav');
+		$icon->setAttribute('id','addrm_fav');
 
 		$url = '?sysmapid='.$_REQUEST['sysmapid'].($_REQUEST['fullscreen']?'':'&fullscreen=1');
 
 		$fs_icon = new CDiv(SPACE,'fullscreen');
-		$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+		$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 	}
 

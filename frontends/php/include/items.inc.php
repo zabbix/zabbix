@@ -1218,7 +1218,7 @@ COpt::profiling_stop('prepare table');
 		if(isset($it_ov_menu)){
 			$it_ov_menu  = new CPUMenu($it_ov_menu,170);
 			$value_col->OnClick($it_ov_menu->GetOnActionJS());
-			$value_col->AddOption('style', 'cursor: pointer;');
+			$value_col->setAttribute('style', 'cursor: pointer;');
 			$value_col->AddAction('onmouseover',
 				'this.old_border=this.style.border; this.style.border=\'1px dotted #0C0CF0\'');
 			$value_col->AddAction('onmouseout', 'this.style.border=this.old_border;');

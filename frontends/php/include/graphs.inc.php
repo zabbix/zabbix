@@ -359,16 +359,16 @@
 				url_param($from,false,'from').
 				url_param($stime,false,'stime').
 				url_param($period,false,'period')));
-		$td->addOption('align','center');
+		$td->setAttribute('align','center');
 
 		$tr = new CRow($td);
-		$tr->addOption('bgcolor','#dddddd');
+		$tr->setAttribute('bgcolor','#dddddd');
 
 		$table = new CTable();
-		$table->addOption('width','100%');
-		$table->addOption('bgcolor','#cccccc');
-		$table->addOption('cellspacing','1');
-		$table->addOption('cellpadding','3');
+		$table->setAttribute('width','100%');
+		$table->setAttribute('bgcolor','#cccccc');
+		$table->setAttribute('cellspacing','1');
+		$table->setAttribute('cellpadding','3');
 
 		$table->addRow($tr);
 

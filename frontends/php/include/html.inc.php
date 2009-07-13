@@ -127,7 +127,7 @@
 		}
 
 		$td_l = new CCol(SPACE);
-		$td_l->addOption('width','100%');
+		$td_l->setAttribute('width','100%');
 
 		$icons_row = array($td_l);
 		if(!is_null($addicons)){
@@ -137,9 +137,9 @@
 
 		if(!is_null($state)){
 			$icon = new CDiv(SPACE, $state?'arrowup':'arrowdown');
-			$icon->addOption('id',$id.'_icon');
+			$icon->setAttribute('id',$id.'_icon');
 			$icon->addAction('onclick',new CScript("javascript: change_hat_state(this,'".$id."');"));
-			$icon->addOption('title',S_SHOW.'/'.S_HIDE);
+			$icon->setAttribute('title',S_SHOW.'/'.S_HIDE);
 			$icons_row[] = $icon;
 		}
 		else{
@@ -147,19 +147,19 @@
 		}
 
 		$icon_tab = new CTable();
-		$icon_tab->addOption('width','100%');
+		$icon_tab->setAttribute('width','100%');
 
 		$icon_tab->addRow($icons_row);
 
 		$table = new CTable();
-		$table->addOption('width','100%');
+		$table->setAttribute('width','100%');
 		$table->setCellPadding(0);
 		$table->setCellSpacing(0);
 		$table->addRow(get_table_header($caption,$icon_tab));
 
 		$div = new CDiv($items);
-		$div->addOption('id',$id);
-		if(!$state) $div->addOption('style','display: none;');
+		$div->setAttribute('id',$id);
+		if(!$state) $div->setAttribute('style','display: none;');
 
 		$table->addRow($div);
 	return $table;
@@ -201,18 +201,18 @@
 	function get_thin_table_header($col1, $col2=NULL){
 
 		$table = new CTable(NULL,'thin_header');
-//		$table->addOption('border',1);
+//		$table->setAttribute('border',1);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 
 		if(!is_null($col2)){
 			$td_r = new CCol($col2,'thin_header_r');
-			$td_r->addOption('align','right');
+			$td_r->setAttribute('align','right');
 			$table->addRow(array(new CCol($col1,'thin_header_l'), $td_r));
 		}
 		else{
 			$td_c = new CCol($col1,'thin_header_c');
-			$td_c->addOption('align','center');
+			$td_c->setAttribute('align','center');
 
 			$table->addRow($td_c);
 		}
@@ -234,12 +234,12 @@
 		}
 
 		$table = new CTable(NULL,'header');
-//		$table->addOption('border',0);
+//		$table->setAttribute('border',0);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 
 		$td_r = new CCol($col2,'header_r');
-		$td_r->addOption('align','right');
+		$td_r->setAttribute('align','right');
 
 		$table->addRow(array(new CCol($col1,'header_l'), $td_r));
 	return $table;

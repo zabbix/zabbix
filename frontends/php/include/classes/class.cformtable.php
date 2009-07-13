@@ -70,8 +70,8 @@ class CFormTable extends CForm{
 		if(!is_string($value)){
 			return $this->error('Incorrect value for setAlign ['.$value.']');
 		}
-		$this->addOption('name',$value);
-		$this->addOption('id',$value);
+		$this->setAttribute('name',$value);
+		$this->setAttribute('id',$value);
 	return true;
 	}
 

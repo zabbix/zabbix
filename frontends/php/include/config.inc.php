@@ -296,13 +296,13 @@ function __autoload($class_name){
 					$msg_tab->setCellSpacing(0);
 
 					$msg_col = new CCol(bold($msg),'msg_main msg');
-					$msg_col->addOption('id','page_msg');
+					$msg_col->setAttribute('id','page_msg');
 
 					$msg_details = SPACE;
 					if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
 						$msg_details = new CDiv(array(S_DETAILS),'pointer');
 						$msg_details->addAction('onclick',new CScript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
-						$msg_details->addOption('title',S_MAXIMIZE.'/'.S_MINIMIZE);
+						$msg_details->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
 					}
 
 					$msg_tab->addRow(array(new CCol($msg_details,'clr'),$msg_col));
@@ -354,7 +354,7 @@ function __autoload($class_name){
 					$msg_count = $msg_show;
 
 					$msg_count = ($msg_count * 16);
-					$lst_error->addOption('style','height: '.$msg_count.'px;');
+					$lst_error->setAttribute('style','height: '.$msg_count.'px;');
 				}
 
 
@@ -363,11 +363,11 @@ function __autoload($class_name){
 				$tab->setCellPadding(0);
 				$tab->setCellSpacing(0);
 
-				$tab->addOption('id','msg_messages');
-				$tab->addOption('style','width: 100%;');
+				$tab->setAttribute('id','msg_messages');
+				$tab->setAttribute('style','width: 100%;');
 
 				if(isset($msg_tab) && $bool){
-					$tab->addOption('style','display: none;');
+					$tab->setAttribute('style','display: none;');
 				}
 
 				$tab->addRow(new CCol($lst_error,'msg'));
@@ -1112,7 +1112,7 @@ function __autoload($class_name){
 				$img = new CImg('images/general/sort_upw.gif','up',10,10);
 			}
 
-			$img->addOption('style','line-height: 18px; vertical-align: middle;');
+			$img->setAttribute('style','line-height: 18px; vertical-align: middle;');
 			$link = array($link,SPACE,$img);
 		}
 

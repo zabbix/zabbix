@@ -103,7 +103,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 
 	$help = new CHelp('web.view.php','right');
 	$help_table = new CTableInfo();
-	$help_table->addOption('style', 'width: 200px');
+	$help_table->setAttribute('style', 'width: 200px');
 
 	if($_REQUEST['type']==SHOW_TRIGGERS){
 		$help_table->addRow(array(new CCol(SPACE, 'normal'), S_DISABLED));
@@ -116,11 +116,11 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 
 	if($_REQUEST['type']==SHOW_TRIGGERS){
 		$col = new CCol(SPACE, 'unknown_trigger');
-		$col->addOption('style','background-image: url(images/gradients/blink1.gif); '.
+		$col->setAttribute('style','background-image: url(images/gradients/blink1.gif); '.
 			'background-position: top left; background-repeat: repeate;');
 		$help_table->addRow(array($col, S_5_MIN));
 		$col = new CCol(SPACE, 'unknown_trigger');
-		$col->addOption('style','background-image: url(images/gradients/blink2.gif); '.
+		$col->setAttribute('style','background-image: url(images/gradients/blink2.gif); '.
 			'background-position: top left; background-repeat: repeate;');
 		$help_table->addRow(array($col, S_15_MIN));
 		$help_table->addRow(array(new CCol(SPACE), S_NO_TRIGGER));
@@ -136,7 +136,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$url = 'overview.php?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 
 	$over_wdgt->addHeader(S_OVERVIEW_BIG, array($fs_icon, $help));
