@@ -588,7 +588,7 @@
 							 );
 
 		$action->AddAction('onclick',$script);
-		$action->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
+		$action->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
 
 	return $action;
 	}

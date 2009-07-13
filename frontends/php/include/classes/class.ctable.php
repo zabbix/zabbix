@@ -61,23 +61,23 @@ class CTable extends CTag{
 	}
 
 	public function setAlign($value){
-		return $this->options['align'] = $value;
+		return $this->attributes['align'] = $value;
 	}
 
 	public function setCellPadding($value){
-		return $this->options['cellpadding'] = strval($value);
+		return $this->attributes['cellpadding'] = strval($value);
 	}
 
 	public function setCellSpacing($value){
-		return $this->options['cellspacing'] = strval($value);
+		return $this->attributes['cellspacing'] = strval($value);
 	}
 
 	public function prepareRow($item,$rowClass=NULL){
 		if(is_null($item)) return NULL;
 
 		if(strtolower(get_class($item))=='ccol') {
-			if(isset($this->header) && !isset($item->options['colspan']))
-				$item->options['colspan'] = $this->colnum;
+			if(isset($this->header) && !isset($item->attributes['colspan']))
+				$item->attributes['colspan'] = $this->colnum;
 
 			$item = new CRow($item,$rowClass);
 		}
@@ -88,7 +88,7 @@ class CTable extends CTag{
 		else{
 			$item = new CRow($item,$rowClass);
 		}
-		if(!isset($item->options['class'])){
+		if(!isset($item->attributes['class'])){
 			$item->setClass(($this->rownum % 2)?$this->oddRowClass:$this->evenRowClass);
 		}
 	return $item;

@@ -126,7 +126,7 @@ include_once 'include/page_header.php';
 	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
-	$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 
 	$latest_wdgt->addHeader(S_LATEST_DATA_BIG,$fs_icon);
@@ -161,8 +161,8 @@ include_once 'include/page_header.php';
 /************************* FILTER **************************/
 /***********************************************************/
 	$filterForm = new CFormTable();
-	$filterForm->addOption('name','zbx_filter');
-	$filterForm->addOption('id','zbx_filter');
+	$filterForm->setAttribute('name','zbx_filter');
+	$filterForm->setAttribute('id','zbx_filter');
 
 	$filterForm->addRow(S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE, new CTextBox('select',$_REQUEST['select'],20));
 

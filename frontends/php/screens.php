@@ -249,21 +249,21 @@ include_once('include/page_header.php');
 	if(isset($elementid) && $element ){
 		if(infavorites('web.favorite.screenids',$elementid,'screenid')){
 			$icon = new CDiv(SPACE,'iconminus');
-			$icon->addOption('title',S_REMOVE_FROM.' '.S_FAVOURITES);
+			$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
 			$icon->addAction('onclick',new CScript("javascript: rm4favorites('screenid','".$elementid."',0);"));
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
-			$icon->addOption('title',S_ADD_TO.' '.S_FAVOURITES);
+			$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
 			$icon->addAction('onclick',new CScript("javascript: add2favorites('screenid','".$elementid."');"));
 		}
-		$icon->addOption('id','addrm_fav');
+		$icon->setAttribute('id','addrm_fav');
 
 		$url = '?elementid='.$elementid.($_REQUEST['fullscreen']?'':'&fullscreen=1');
 		$url.=url_param('groupid').url_param('hostid');
 
 		$fs_icon = new CDiv(SPACE,'fullscreen');
-		$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
+		$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 	}
 
@@ -275,8 +275,8 @@ include_once('include/page_header.php');
 	$screens_wdgt->show();
 
 	$scroll_div = new CDiv();
-	$scroll_div->addOption('id','scroll_cntnr');
-	$scroll_div->addOption('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
+	$scroll_div->setAttribute('id','scroll_cntnr');
+	$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
 	$scroll_div->show();
 
 	$jsmenu = new CPUMenu(null,170);

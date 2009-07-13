@@ -28,19 +28,19 @@ class CCol extends CTag{
 	}
 
 	public function setAlign($value){
-		return $this->options['align'] = $value;
+		return $this->attributes['align'] = $value;
 	}
 
 	public function setRowSpan($value){
-		return $this->options['rowspan'] = strval($value);
+		return $this->attributes['rowspan'] = strval($value);
 	}
 
 	public function setColSpan($value){
-		return $this->options['colspan'] =strval($value);
+		return $this->attributes['colspan'] =strval($value);
 	}
 
 	public function setWidth($value){
-		if(is_string($value))$this->addOption('width',$value);
+		if(is_string($value))$this->setAttribute('width',$value);
 	}
 }
 ?>

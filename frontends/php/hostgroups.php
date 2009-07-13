@@ -267,7 +267,7 @@ include_once('include/page_header.php');
 			$dltButton = new CButtonDelete('Delete selected group?', url_param('form').url_param('config').url_param('groupid'));
 			$dlt_groups = getDeletableHostGroups($_REQUEST['groupid']);
 
-			if(empty($dlt_groups)) $dltButton->addOption('disabled','disabled');
+			if(empty($dlt_groups)) $dltButton->setAttribute('disabled','disabled');
 
 			$frmHostG->addItemToBottomRow($dltButton);
 		}
@@ -279,7 +279,7 @@ include_once('include/page_header.php');
 		$config = select_config();
 		
 		$numrows = new CSpan(null, 'info');
-		$numrows->addOption('name', 'numrows');
+		$numrows->setAttribute('name', 'numrows');
 		$header = get_table_header(array(
 						S_HOST_GROUPS_BIG,
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
@@ -355,7 +355,7 @@ include_once('include/page_header.php');
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
-		$goButton->addOption('id','goButton');
+		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "groups";');
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));

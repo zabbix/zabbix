@@ -35,8 +35,8 @@ class CTweenBox{
 		$this->lbox = new ClistBox($this->id_l,null,$size);
 		$this->rbox = new ClistBox($this->id_r,null,$size);
 
-		$this->lbox->addOption('style','width: 280px;');
-		$this->rbox->addOption('style','width: 280px;');
+		$this->lbox->setAttribute('style','width: 280px;');
+		$this->rbox->setAttribute('style','width: 280px;');
 	}
 
 	public function setName($name=null){
@@ -72,17 +72,17 @@ class CTweenBox{
 	public function setAction($expr, $event='onchange', $value='submit()'){
 //			$box = &$this->lbox;
 		if($expr){
-			$this->lbox->addOption($event,$value);
+			$this->lbox->setAttribute($event,$value);
 		}
 		else{
-			$this->rbox->addOption($event,$value);
+			$this->rbox->setAttribute($event,$value);
 		}
 	}
 
 	public function get($caption_l=S_IN,$caption_r=S_OTHER){
 		$grp_tab = new CTable();
-		$grp_tab->addOption('name',$this->name);
-		$grp_tab->addOption('id',$this->name);
+		$grp_tab->setAttribute('name',$this->name);
+		$grp_tab->setAttribute('id',$this->name);
 
 		$grp_tab->setCellSpacing(0);
 		$grp_tab->setCellPadding(0);

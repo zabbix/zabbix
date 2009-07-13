@@ -36,8 +36,8 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 /************************* FILTER *************************/
 /***********************************************************/
 	$filterForm = new CFormTable();//,'events.php?filter_set=1','POST',null,'sform');
-	$filterForm->addOption('name','zbx_filter');
-	$filterForm->addOption('id','zbx_filter');
+	$filterForm->setAttribute('name','zbx_filter');
+	$filterForm->setAttribute('id','zbx_filter');
 
 	$filterForm->addVar('config',$config);
 	$filterForm->addVar('filter_timesince',($_REQUEST['filter_timesince']>0)?$_REQUEST['filter_timesince']:'');
@@ -125,7 +125,7 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 										"CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
 
 	$filtertimetab = new CTable(null,'calendar');
-	$filtertimetab->addOption('width','10%');
+	$filtertimetab->setAttribute('width','10%');
 
 	$filtertimetab->setCellPadding(0);
 	$filtertimetab->setCellSpacing(0);
@@ -211,8 +211,8 @@ function bar_report_form(){
 	$report_timetill = get_request('report_timetill',time());
 
 	$reportForm = new CFormTable(null,null,'get');//,'events.php?report_set=1','POST',null,'sform');
-	$reportForm->addOption('name','zbx_report');
-	$reportForm->addOption('id','zbx_report');
+	$reportForm->setAttribute('name','zbx_report');
+	$reportForm->setAttribute('id','zbx_report');
 
 //	$reportForm->setMethod('post');
 	if(isset($_REQUEST['report_show']) && !empty($items))
@@ -246,7 +246,7 @@ function bar_report_form(){
 										"CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
 
 	$reporttimetab = new CTable(null,'calendar');
-	$reporttimetab->addOption('width','10%');
+	$reporttimetab->setAttribute('width','10%');
 
 	$reporttimetab->setCellPadding(0);
 	$reporttimetab->setCellSpacing(0);
@@ -380,8 +380,8 @@ function bar_report_form2(){
 	$showlegend = get_request('showlegend',0);
 
 	$reportForm = new CFormTable(null,null,'get');//,'events.php?report_set=1','POST',null,'sform');
-	$reportForm->addOption('name','zbx_report');
-	$reportForm->addOption('id','zbx_report');
+	$reportForm->setAttribute('name','zbx_report');
+	$reportForm->setAttribute('id','zbx_report');
 
 //	$reportForm->setMethod('post');
 	if(isset($_REQUEST['report_show']) && !empty($items))
@@ -533,8 +533,8 @@ function bar_report_form3(){
 	$palettetype = get_request('palettetype',0);
 
 	$reportForm = new CFormTable(null,null,'get');//,'events.php?report_set=1','POST',null,'sform');
-	$reportForm->addOption('name','zbx_report');
-	$reportForm->addOption('id','zbx_report');
+	$reportForm->setAttribute('name','zbx_report');
+	$reportForm->setAttribute('id','zbx_report');
 
 //	$reportForm->setMethod('post');
 	if(isset($_REQUEST['report_show']) && !empty($items))
@@ -611,7 +611,7 @@ function bar_report_form3(){
 	}
 
 	$td_groups = new CCol(array(S_GROUP,SPACE,$cmbGroups));
-	$td_groups->addOption('style','text-align: right;');
+	$td_groups->setAttribute('style','text-align: right;');
 
 	$host_tb = new CTweenBox($reportForm,'hostids',null,10);
 
@@ -666,7 +666,7 @@ function bar_report_form3(){
 										"CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
 
 	$reporttimetab = new CTable(null,'calendar');
-	$reporttimetab->addOption('width','10%');
+	$reporttimetab->setAttribute('width','10%');
 
 	$reporttimetab->setCellPadding(0);
 	$reporttimetab->setCellSpacing(0);

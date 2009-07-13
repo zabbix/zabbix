@@ -278,19 +278,19 @@ include_once('include/page_header.php');
 
 /*
 	$prev_page = new CDiv(SPACE,'arrowleft');
-	$prev_page->addOption('title','Previous page');
+	$prev_page->setAttribute('title','Previous page');
 	$prev_page->addAction('onclick',new CScript("javascript: alert('left');"));
 
 	$next_page = new CDiv(SPACE,'arrowright');
-	$next_page->addOption('title','Next page');
+	$next_page->setAttribute('title','Next page');
 	$next_page->addAction('onclick',new CScript("javascript: alert('right');"));
 //*/
 //*
 	$prev_page = new CButton('prev_page','« '.S_BACK);
-	if(empty($prev_clock)) $prev_page->addOption('disabled','disabled');
+	if(empty($prev_clock)) $prev_page->setAttribute('disabled','disabled');
 
 	$next_page = new CButton('next_page',S_NEXT.' »');
-	if($count < $limit) $next_page->addOption('disabled','disabled');
+	if($count < $limit) $next_page->setAttribute('disabled','disabled');
 //*/
 	$navForm->addItem(array($prev_page,SPACE,$next_page));
 
@@ -301,8 +301,8 @@ include_once('include/page_header.php');
 /***********************************************************/
 
 	$filterForm = new CFormTable();
-	$filterForm->addOption('name','zbx_filter');
-	$filterForm->addOption('id','zbx_filter');
+	$filterForm->setAttribute('name','zbx_filter');
+	$filterForm->setAttribute('id','zbx_filter');
 
 	$script = new CScript("javascript: if(CLNDR['audit_since'].clndr.setSDateFromOuterObj()){".
 							"$('nav_time').value = parseInt(CLNDR['audit_since'].clndr.sdt.getTime()/1000);}");
@@ -379,7 +379,7 @@ include_once('include/page_header.php');
 //*
 	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
 	$clndr_icon->addAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['audit_since'].clndr.clndrshow(pos.top,pos.left);");
-	$clndr_icon->addOption('style','vertical-align: middle;');
+	$clndr_icon->setAttribute('style','vertical-align: middle;');
 
 	$nav_clndr =  array(
 						new CNumericBox('nav_day',(($_REQUEST['nav_time']>0)?date('d',$_REQUEST['nav_time']):''),2),

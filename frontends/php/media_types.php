@@ -116,7 +116,7 @@ include_once "include/page_header.php";
 	else{
 		$row_count = 0;
 		$numrows = new CSpan(null,'info');
-		$numrows->addOption('name','numrows');
+		$numrows->setAttribute('name','numrows');
 		$header = get_table_header(array(S_CONFIGURATION_OF_MEDIA_TYPES_BIG,
 					new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 					S_FOUND.': ',$numrows,)

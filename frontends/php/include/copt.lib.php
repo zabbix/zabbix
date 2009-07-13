@@ -293,8 +293,8 @@ if(defined('USE_PROFILING')){
 			$zbx_debug->addHeader(S_DEBUG);
 
 			$debud = new CDiv(array(BR(),$zbx_debug));
-			$debud->addOption('id','zbx_gebug_info');
-			$debud->addOption('style','display: none;');
+			$debud->setAttribute('id','zbx_gebug_info');
+			$debud->setAttribute('style','display: none;');
 			$debud->show();
 //----------------
 		}

@@ -338,7 +338,7 @@ function make_popup_eventlist($eventid, $trigger_type) {
 
 	$table = new CTableInfo();
 	$table->setHeader(array(S_TIME,S_STATUS,S_DURATION, S_AGE, S_ACK));
-	$table->addOption('style', 'width: 400px;');
+	$table->setAttribute('style', 'width: 400px;');
 
 	$event_list = array();
 	$sql = 'SELECT * '.

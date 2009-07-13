@@ -26,9 +26,9 @@ class CFlash extends CTag{
 
 	public function __construct($src=NULL, $width = NULL, $height = NULL){
 		parent::__construct('object','yes');
-		$this->options['classid'] = 'clsid:d27cdb6e-ae6d-11cf-96b8-444553540000';
-		$this->options['codebase'] = 'http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0';
-		$this->options['align'] = 'middle';
+		$this->attributes['classid'] = 'clsid:d27cdb6e-ae6d-11cf-96b8-444553540000';
+		$this->attributes['codebase'] = 'http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0';
+		$this->attributes['align'] = 'middle';
 
 		$this->addItem(new CParam('allowScriptAccess','sameDomain'));
 		$this->addItem(new CParam('quality','high'));
@@ -42,18 +42,18 @@ class CFlash extends CTag{
 	}
 
 	public function setWidth($value){
-		$this->options['width'] = $value;
-		$this->embededFlash->options['width'] = $value;
+		$this->attributes['width'] = $value;
+		$this->embededFlash->attributes['width'] = $value;
 	}
 
 	public function setHeight($value){
-		$this->options['height'] = $value;
-		$this->embededFlash->options['height'] = $value;
+		$this->attributes['height'] = $value;
+		$this->embededFlash->attributes['height'] = $value;
 	}
 
 	public function setSrc($value){
-		$this->srcParam->options['value'] = $value;
-		$this->embededFlash->options['src'] = $value;
+		$this->srcParam->attributes['value'] = $value;
+		$this->embededFlash->attributes['src'] = $value;
 	}
 
 	public function bodyToString(){

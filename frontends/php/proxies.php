@@ -272,7 +272,7 @@ include_once('include/page_header.php');
 	else {
 			
 		$numrows = new CSpan(null,'info');
-		$numrows->addOption('name','numrows');
+		$numrows->setAttribute('name','numrows');
 		$header = get_table_header(array(S_PROXIES_BIG,
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 						S_FOUND.': ',$numrows,)

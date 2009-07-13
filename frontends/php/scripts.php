@@ -132,7 +132,7 @@ if(isset($_REQUEST['form'])){
     echo SBR;
 
     $frmScr = new CFormTable(S_SCRIPT,'scripts.php','POST',null,'form');
-    $frmScr->addOption('id','scripts');
+    $frmScr->setAttribute('id','scripts');
 
     if(isset($_REQUEST['scriptid'])) $frmScr->addVar('scriptid',$_REQUEST['scriptid']);
 
@@ -214,11 +214,11 @@ else {
 
     $form = new CForm();
     $form->setName('scripts');
-    $form->addOption('id','scripts');
+    $form->setAttribute('id','scripts');
     $form->addVar('action','1');
 
     $numrows = new CSpan(null,'info');
-    $numrows->addOption('name','numrows');
+    $numrows->setAttribute('name','numrows');
     $header = get_table_header(array(S_SCRIPTS,
             new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
             S_FOUND.': ',$numrows,)

@@ -377,8 +377,8 @@ include_once('include/page_header.php');
 	$form->setMethod('get');
 
 // Config
-	$cmbConf = new CComboBox('config','graphs.php','javascript: submit()');
-	$cmbConf->addOption('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
+	$cmbConf = new CComboBox('config','graphs.php','javascript: submit();');
+	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
 		$cmbConf->addItem('templates.php',S_TEMPLATES);
 		$cmbConf->addItem('hosts.php',S_HOSTS);
 		$cmbConf->addItem('items.php',S_ITEMS);
@@ -440,7 +440,7 @@ include_once('include/page_header.php');
 
 		$row_count = 0;
 		$numrows = new CSpan(null,'info');
-		$numrows->addOption('name','numrows');
+		$numrows->setAttribute('name','numrows');
 		$header = get_table_header(array(S_GRAPHS_BIG,
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 						S_FOUND.': ',$numrows,)
@@ -548,7 +548,7 @@ include_once('include/page_header.php');
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
-		$goButton->addOption('id','goButton');
+		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));

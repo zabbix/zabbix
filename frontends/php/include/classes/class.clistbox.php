@@ -23,13 +23,13 @@ class CListBox extends CComboBox{
 /* public */
 	public function __construct($name='listbox',$value=NULL,$size=5,$action=NULL){
 		parent::__construct($name,NULL,$action);
-		$this->options['multiple'] = 'multiple';
-		$this->options['size'] = $size;
+		$this->attributes['multiple'] = 'multiple';
+		$this->attributes['size'] = $size;
 		$this->setValue($value);
 	}
 
 	public function setSize($value){
-		$this->options['size'] = $value;
+		$this->attributes['size'] = $value;
 	}
 }
 ?>

@@ -23,9 +23,9 @@ class CButton extends CTag{
 	public function __construct($name='button', $caption='', $action=NULL, $accesskey=NULL){
 		parent::__construct('input','no');
 		$this->tag_body_start = '';
-		$this->options['type'] = 'submit';
-		$this->addOption('value', $caption);
-		$this->options['class'] = 'button';
+		$this->attributes['type'] = 'submit';
+		$this->setAttribute('value', $caption);
+		$this->attributes['class'] = 'button';
 		$this->setName($name);
 		$this->setAction($action);
 		$this->setAccessKey($accesskey);
@@ -36,19 +36,19 @@ class CButton extends CTag{
 	}
 
 	public function setTitle($value='button title'){
-		$this->addOption('title', $value);
+		$this->setAttribute('title', $value);
 	}
 
 	public function setAccessKey($value='B'){
 		if(isset($value))
-			if(!isset($this->options['title']))
-				$this->setTitle($this->options['value'].' [Alt+'.$value.']');
+			if(!isset($this->attributes['title']))
+				$this->setTitle($this->attributes['value'].' [Alt+'.$value.']');
 
-		return $this->addOption('accessKey', $value);
+		return $this->setAttribute('accessKey', $value);
 	}
 
 	public function setType($type='button'){
-		$this->addOption('type',$type);
+		$this->setAttribute('type',$type);
 	}
 }
 ?>

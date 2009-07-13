@@ -22,7 +22,7 @@
 class CButtonCancel extends CButton{
 	public function __construct($vars=NULL,$action=NULL){
 		parent::__construct('cancel',S_CANCEL);
-		$this->options['type'] = 'button';
+		$this->attributes['type'] = 'button';
 		$this->setVars($vars);
 		$this->setAction($action);
 	}

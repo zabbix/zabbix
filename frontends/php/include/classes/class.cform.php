@@ -31,7 +31,7 @@ class CForm extends CTag{
 	}
 
 	public function setMethod($value='post'){
-		return $this->options['method'] = $value;
+		return $this->attributes['method'] = $value;
 	}
 
 	public function setAction($value){
@@ -41,18 +41,18 @@ class CForm extends CTag{
 			$value = isset($page['file'])?$page['file']:'#';
 		}
 
-	return $this->options['action'] = $value;
+	return $this->attributes['action'] = $value;
 	}
 
 	public function setEnctype($value=NULL){
 		if(is_null($value)){
-			return $this->delOption('enctype');
+			return $this->removeAttribute('enctype');
 		}
 		else if(!is_string($value)){
 			return $this->error('Incorrect value for SetEnctype ['.$value.']');
 		}
 
-	return $this->addOption('enctype',$value);
+	return $this->setAttribute('enctype',$value);
 	}
 
 	public function addVar($name, $value){

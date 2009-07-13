@@ -23,15 +23,15 @@ class CVarTag extends CTag{
 /* public */
 	public function __construct($name='',$value='0'){
 		parent::__construct('input','no');
-		$this->options['type'] = 'hidden';
-		$this->options['name'] = $name;
-		$this->options['id'] = $name;
+		$this->attributes['type'] = 'hidden';
+		$this->attributes['name'] = $name;
+		$this->attributes['id'] = $name;
 
 		$this->setValue($value);
 	}
 
 	public function setValue($value){
-		$this->options['value'] = htmlspecialchars($value);
+		$this->attributes['value'] = htmlspecialchars($value);
 	}
 }
 ?>

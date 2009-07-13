@@ -26,10 +26,10 @@ class CColor extends CObject{
 		$lbl = new CColorCell('lbl_'.$name, $value, "show_color_picker('".$name."')");
 
 		$txt = new CTextBox($name,$value,7);
-		$txt->addOption('maxlength', 6);
-		$txt->addOption('id', $name);
+		$txt->setAttribute('maxlength', 6);
+		$txt->setAttribute('id', $name);
 		$txt->addAction('onchange', "set_color_by_name('".$name."',this.value)");
-		$txt->addOption('style', 'margin-top: 0px; margin-bottom: 0px');
+		$txt->setAttribute('style', 'margin-top: 0px; margin-bottom: 0px');
 		$this->addItem(array($txt, $lbl));
 
 		insert_show_color_picker_javascript();

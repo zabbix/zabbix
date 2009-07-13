@@ -1243,7 +1243,7 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
 
 	$tab_hint = new CTableInfo(S_NO_ACTIONS_FOUND);
-	$tab_hint->addOption('style', 'width: 300px;');
+	$tab_hint->setAttribute('style', 'width: 300px;');
 	$tab_hint->SetHeader(array(
 			is_show_all_nodes() ? S_NODES : null,
 			S_USER,
@@ -1371,10 +1371,10 @@ function get_event_actions_status($eventid){
 		}
 		else{
 			$tdl = new CCol(($alerts['sent'])?(new CSpan($alerts['sent'],'green')):SPACE);
-			$tdl->addOption('width','10');
+			$tdl->setAttribute('width','10');
 
 			$tdr = new CCol(($alerts['failed'])?(new CSpan($alerts['failed'],'red')):SPACE);
-			$tdr->addOption('width','10');
+			$tdr->setAttribute('width','10');
 
 			$status = new CRow(array($tdl,$tdr));
 		}
@@ -1411,7 +1411,7 @@ function get_event_actions_stat_hints($eventid){
 			$alert_cnt->SetHint($hint);
 		}
 		$tdl = new CCol(($alerts['sent'])?$alert_cnt:SPACE);
-		$tdl->addOption('width','10');
+		$tdl->setAttribute('width','10');
 
 		$sql='SELECT COUNT(a.alertid) as inprogress '.
 				' FROM alerts a '.
@@ -1427,7 +1427,7 @@ function get_event_actions_stat_hints($eventid){
 			$alert_cnt->setHint($hint);
 		}
 		$tdc = new CCol(($alerts['inprogress'])?$alert_cnt:SPACE);
-		$tdc->addOption('width','10');
+		$tdc->setAttribute('width','10');
 
 		$sql='SELECT COUNT(a.alertid) as failed '.
 				' FROM alerts a '.
@@ -1444,7 +1444,7 @@ function get_event_actions_stat_hints($eventid){
 		}
 
 		$tdr = new CCol(($alerts['failed'])?$alert_cnt:SPACE);
-		$tdr->addOption('width','10');
+		$tdr->setAttribute('width','10');
 
 		$actions->addRow(array($tdl,$tdc,$tdr));
 	}
