@@ -50,9 +50,11 @@ class CGraph {
 			);
 
 		$def_options = array(
+			'nodeids' 			=> 0,
+			'groupids' 			=> 0,
+			'hostids' 			=> 0,
 			'graphids' 			=> 0,
 			'itemids' 			=> 0,
-			'hostids' 			=> 0,
 			'type' 				=> 0,
 			'templated_graphs'	=> 0,
 			'editable'			=> 0,
@@ -103,10 +105,36 @@ class CGraph {
 		}
 		
 
+// nodeids
+		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
 
+// groupids
+		if($options['groupids'] != 0){
+			zbx_value2array($options['groupids']);
+
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['groupid'] = 'hg.groupid';
+			}
+
+			$sql_parts['from']['gi'] = 'graphs_items gi';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			
+			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sql_parts['where'][] = 'hg.hostid=i.hostid';
+			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
+			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+		}
+		
 // hostids
 		if($options['hostids'] != 0){
 			zbx_value2array($options['hostids']);
+
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['hostid'] = 'i.hostid';
+			}
+
 			$sql_parts['from']['gi'] = 'graphs_items gi';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
@@ -175,13 +203,13 @@ class CGraph {
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);			
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.'
-				FROM '.$sql_from.'
-				WHERE '.
+		$sql = 'SELECT '.$sql_select.
+				' FROM '.$sql_from.
+				' WHERE '.DBin_node('g.graphid', $nodeids).
 					$sql_where.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
@@ -193,9 +221,16 @@ class CGraph {
 					$result[$graph['graphid']] = $graph['graphid'];
 				}
 				else{
-					if(!isset($result[$graph['graphid']])) 
-						$result[$graph['graphid']]= array();
+					if(!isset($result[$graph['graphid']])) $result[$graph['graphid']]= array();
 					
+					// hostids
+					if(isset($graph['hostid'])){
+						if(!isset($result[$graph['graphid']]['hostids'])) $result[$graph['graphid']]['hostids'] = array();
+
+						$result[$graph['graphid']]['hostids'][$graph['hostid']] = $graph['hostid'];
+						unset($graph['hostid']);
+					}
+
 					$result[$graph['graphid']] += $graph;
 				}
 			}

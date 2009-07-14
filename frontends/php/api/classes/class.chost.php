@@ -75,12 +75,17 @@ class CHost {
 			'with_graphs'				=> 0,
 			'editable'					=> 0,
 			'nopermissions'				=> 0,
+// OutPut
 			'extendoutput'				=> 0,
+			'select_items'				=> 0,
+			'select_triggers'			=> 0,
+			'select_graphs'				=> 0,
 			'count'						=> 0,
 			'pattern'					=> '',
 			'extend_pattern'			=> 0,
 			'order' 					=> '',
-			'limit'						=> 0);
+			'limit'						=> 0
+		);
 
 		$options = array_merge($def_options, $options);
 	
@@ -121,6 +126,7 @@ class CHost {
 			if($options['extendoutput'] != 0){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
+
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
@@ -245,6 +251,7 @@ class CHost {
 			$sql_parts['limit'] = $options['limit'];
 		}
 //-------
+		$hostids = array();
 		
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
@@ -267,8 +274,9 @@ class CHost {
 				$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
-
 		while($host = DBfetch($res)){
+			$hostids[$host['hostid']] = $host['hostid'];
+
 			if($options['count'])
 				$result = $host;
 			else{
@@ -276,8 +284,11 @@ class CHost {
 					$result[$host['hostid']] = $host['hostid'];
 				}
 				else{
-					if(!isset($result[$host['hostid']])) 
-						$result[$host['hostid']]= array();
+					if(!isset($result[$host['hostid']])) $result[$host['hostid']]= array();
+					
+					if($options['select_items'] && !isset($result[$host['hostid']]['itemids'])) $host['itemids'] = array();
+					if($options['select_triggers'] && !isset($result[$host['hostid']]['triggers'])) $host['triggerids'] = array();
+					if($options['select_graphs'] && !isset($result[$host['hostid']]['graphids'])) $host['graphids'] = array();
 					
 					// groupids
 					if(isset($host['groupid'])){
@@ -299,6 +310,41 @@ class CHost {
 				}
 			}
 		}
+		
+// Adding Objects
+		if($options['count'] == 0){
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);	
+// Adding Items
+			if($options['select_items']){
+				$items = CItem::get($obj_params);
+				foreach($items as $itemid => $item){
+					foreach($item['hostids'] as $num => $hostid){
+						$result[$hostid]['itemids'][$itemid] = $itemid;
+					}
+				}
+			}
+		
+// Adding triggers	
+			if($options['select_triggers']){
+				$triggers = CTrigger::get($obj_params);
+				foreach($triggers as $triggerid => $trigger){
+					foreach($trigger['hostids'] as $num => $hostid){
+						$result[$hostid]['triggerids'][$triggerid] = $triggerid;
+					}
+				}
+			}
+			
+// Adding graphs
+			if($options['select_graphs']){
+				$graphs = CGraph::get($obj_params);
+				foreach($graphs as $graphid => $graph){
+					foreach($graph['hostids'] as $num => $hostid){
+						$result[$hostid]['graphids'][$graphid] = $graphid;
+					}
+				}
+			}
+		}
+
 	return $result;
 	}
 
