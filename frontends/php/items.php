@@ -818,7 +818,6 @@ include_once('include/page_header.php');
 		$form->addItem(array(SPACE, new CButton('form',S_CREATE_ITEM)));
 
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
-	echo SBR;
 
 	if(isset($_REQUEST['form'])){
 // FORM
@@ -883,6 +882,64 @@ include_once('include/page_header.php');
 		$header = array(S_ITEMS_BIG,
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 						S_FOUND.': ',$numrows);
+			
+// <<<--- SELECTED HOST HEADER INFORMATION --->>>	
+		if($PAGE_HOSTS['selected'] > 0){
+		
+			$header_host = CHost::getByID(array('hostid' => $PAGE_HOSTS['selected']));
+			
+			$description = array();
+			if($header_host['proxy_hostid']){
+				$proxy = get_host_by_hostid($header_host['proxy_hostid']);
+				array_push($description, $proxy['host'], ':');
+			}			
+			array_push($description, new CLink($header_host['host'], 'hosts.php?form=update&hostid='.$header_host['hostid'].url_param('groupid'), 'action'));
+
+			$triggers = new CLink(S_TRIGGERS, 'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']);
+			$graphs = new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']);
+			
+			$dns = empty($header_host['dns']) ? '-' : $header_host['dns'];
+			$ip = empty($header_host['ip']) ? '-' : $header_host['ip'];
+			$port = empty($header_host['port']) ? '-' : $header_host['port'];
+			if(1 == $header_host['useip'])
+				$ip = bold($ip);
+			else
+				$dns = bold($dns);
+				
+				
+			switch($header_host['status']){
+				case HOST_STATUS_MONITORED:
+					$status=new CSpan(S_MONITORED, 'off');
+					break;
+				case HOST_STATUS_NOT_MONITORED:
+					$status=new CSpan(S_NOT_MONITORED, 'off');
+					break;
+				default:
+					$status=S_UNKNOWN;
+			}
+
+			if($header_host['available'] == HOST_AVAILABLE_TRUE)
+				$available=new CSpan(S_AVAILABLE,'off');
+			else if($header_host['available'] == HOST_AVAILABLE_FALSE)
+				$available=new CSpan(S_NOT_AVAILABLE,'on');
+			else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
+				$available=new CSpan(S_UNKNOWN,'unknown');
+
+				
+			$tbl_header_host = new CTableInfo();
+			$tbl_header_host->addRow(array(
+				new CLink(bold(S_HOST_INFO), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
+				$description,
+				$triggers,
+				$graphs,
+				array(bold(S_DNS.': '), $dns),
+				array(bold(S_IP.': '), $ip),
+				array(bold(S_PORT.': '), $port),
+				array(bold(S_STATUS.': '), $status),
+				array(bold(S_AVAILABILITY.': '), $available)));
+			$tbl_header_host->show();
+		}
+// --->>> SELECTED HOST HEADER INFORMATION <<<---
 
 		$items_wdgt->addHeader($header, $form);
 //		show_table_header($header, $form);

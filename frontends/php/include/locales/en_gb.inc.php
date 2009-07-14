@@ -675,6 +675,7 @@
 	'S_CONFIGURATION_OF_GROUPS' => 'CONFIGURATION OF HOST GROUPS',
 
 //	hosts.php
+	'S_HOST_INFO' => 'Host info',
 	'S_IN'=>						'In',
 	'S_APPLICATION'=>					'Application',
 	'S_APPLICATIONS'=>					'Applications',
