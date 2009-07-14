@@ -710,6 +710,7 @@ void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const ch
 char	*zbx_host_key_string(zbx_uint64_t itemid);
 char	*zbx_host_key_string_by_item(DB_ITEM *item);
 char	*zbx_host_key_function_string(zbx_uint64_t functionid);
+char	*zbx_user_string(zbx_uint64_t userid);
 
 double	DBmultiply_value_float(DB_ITEM *item, double value);
 zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value);

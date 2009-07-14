@@ -2313,6 +2313,45 @@ char	*zbx_host_key_string_by_item(DB_ITEM *item)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_user_string                                                  *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: "Name Surname (Alias)" or "unknown" if user not found        *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_user_string(zbx_uint64_t userid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect("select name,surname,alias from users where userid=" ZBX_FS_UI64,
+			userid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		zbx_snprintf(string, sizeof(string), "%s %s (%s)",
+				row[0],
+				row[1],
+				row[2]);
+	}
+	else
+		zbx_snprintf(string, sizeof(string), "unknown");
+
+	DBfree_result(result);
+
+	return string;
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_host_key_function_string                                     *
  *                                                                            *
  * Purpose:                                                                   *
