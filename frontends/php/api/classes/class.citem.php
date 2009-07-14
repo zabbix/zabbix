@@ -104,6 +104,12 @@ class CItem {
 		
 // groupids
 		if($options['groupids'] != 0){
+			zbx_value2array($options['groupids']);
+			
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['groupid'] = 'hg.groupid';
+			}
+			
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where'][] = 'hg.hostid=i.hostid';
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
@@ -112,6 +118,11 @@ class CItem {
 // hostids
 		if($options['hostids'] != 0){
 			zbx_value2array($options['hostids']);
+			
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['hostid'] = 'i.hostid';
+			}
+
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
 		}
 
@@ -199,17 +210,23 @@ class CItem {
 			if($options['count'])
 				$result = $item;
 			else
-				if(!isset($options['extendoutput'])){
+				if($options['extendoutput'] == 0){
 					$result[$item['itemid']] = $item['itemid'];
 				}
 				else{
 					if(!isset($result[$item['itemid']])) 
-						$result[$item['itemid']] = array();
+						$result[$item['itemid']]= array();
 					
+					// hostids
+					if(isset($item['hostid'])){
+						if(!isset($result[$item['itemid']]['hostids'])) $result[$item['itemid']]['hostids'] = array();
+
+						$result[$item['itemid']]['hostids'][$item['hostid']] = $item['hostid'];
+						unset($item['hostid']);
+					}
+
 					$result[$item['itemid']] += $item;
 				}
-				
-				
 		}
 
 	return $result;

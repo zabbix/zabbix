@@ -55,10 +55,11 @@ class CTrigger {
 			);
 
 		$def_options = array(
+			'nodeids'				=> 0,
+			'groupids'				=> 0,
+			'hostids'				=> 0,
 			'triggerids'			=> 0,
 			'itemids'				=> 0,
-			'hostids'				=> 0,
-			'groupids'				=> 0,
 			'applicationids'		=> 0,
 			'status'				=> 0,
 			'severity'				=> 0,
@@ -111,8 +112,17 @@ class CTrigger {
 														' AND rr.permission<'.$permission.'))';
 		}
 
+// nodeids
+		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+
 // groupids
 		if($options['groupids'] != 0){
+			zbx_value2array($options['groupids']);
+
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['groupid'] = 'hg.groupid';
+			}
+
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
@@ -125,6 +135,11 @@ class CTrigger {
 // hostids
 		if($options['hostids'] != 0){
 			zbx_value2array($options['hostids']);
+
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['hostid'] = 'i.hostid';
+			}
+
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
@@ -213,13 +228,13 @@ class CTrigger {
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);			
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.'
-				FROM '.$sql_from.'
-				WHERE '.
+		$sql = 'SELECT '.$sql_select.
+				' FROM '.$sql_from.
+				' WHERE '.DBin_node('t.triggerid', $nodeids).
 					$sql_where.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
@@ -227,7 +242,22 @@ class CTrigger {
 			if($options['count'])
 				$result = $trigger;
 			else
-				$result[$trigger['triggerid']] = $trigger;
+				if($options['extendoutput'] == 0){
+					$result[$trigger['triggerid']] = $trigger['triggerid'];
+				}
+				else{
+					if(!isset($result[$trigger['triggerid']])) $result[$trigger['triggerid']]= array();
+					
+					// hostids
+					if(isset($trigger['hostid'])){
+						if(!isset($result[$trigger['triggerid']]['hostids'])) $result[$trigger['triggerid']]['hostids'] = array();
+
+						$result[$trigger['triggerid']]['hostids'][$trigger['hostid']] = $trigger['hostid'];
+						unset($trigger['hostid']);
+					}
+
+					$result[$trigger['triggerid']] += $trigger;
+				}
 		}
 	return $result;
 	}
