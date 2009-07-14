@@ -633,11 +633,11 @@ showSubMenu: function(show_label){
 // Author: Aly
 
 var chkbxRange = {
-startbox:		null,		// start checkbox obj
-startbox_name: 		null,		// start checkbox name
-chkboxes:		new Array(),	// ckbx list
-pageGoName:		null,		// wich checkboxes should be counted by Go button
-pageGoCount:		0,		// selected checkboxes
+startbox:			null,			// start checkbox obj
+startbox_name: 		null,			// start checkbox name
+chkboxes:			new Array(),	// ckbx list
+pageGoName:			null,			// wich checkboxes should be counted by Go button
+pageGoCount:		0,				// selected checkboxes
 
 init: function(){
 	var chk_bx = document.getElementsByTagName('input');
@@ -647,6 +647,10 @@ init: function(){
 			this.implement(chk_bx[i]);
 		}
 	}
+	
+	var goButton = $('goButton');
+	if(!is_null(goButton))
+		addListener(goButton, 'click', this.submitGo.bindAsEventListener(this), false);
 },
 
 implement: function(obj){
@@ -769,12 +773,27 @@ setGo: function(){
 
 		var tmp_val = $('goButton').value.split(' ');
 		$('goButton').value = tmp_val[0]+' ('+countChecked+')';
+
+		this.pageGoCount = countChecked;
 	}
 	else{
-		alert('NOt isset pageGoName')
+//		alert('Not isset pageGoName')
+	}
+},
+
+submitGo: function(e){
+	var e = e || window.event;
+	if(this.pageGoCount > 0){
+		return true;
+	}
+	else{
+		alert('No elements selected!');
+		Event.stop(e);
+		return false;
 	}
 }
 }
+
 /************************************************************************************/
 /*			Replace Standart Blink functionality				*/
 /************************************************************************************/

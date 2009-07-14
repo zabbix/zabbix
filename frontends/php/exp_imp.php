@@ -309,7 +309,7 @@ include_once('include/page_header.php');
 				array(	new CCheckBox("all_graphs",true, "checkAll('".$form->getName()."','all_graphs','graphs');"),
 					S_GRAPHS)
 				/*
-				array(	new CCheckBox("all_screens",true, "CheckAll('".$form->getName()."','all_screens','screens');")
+				array(	new CCheckBox("all_screens",true, "checkAll('".$form->getName()."','all_screens','screens');")
 					S_GRAPHS)
 				*/
 				));
