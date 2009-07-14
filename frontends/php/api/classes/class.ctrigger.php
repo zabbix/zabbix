@@ -97,7 +97,6 @@ class CTrigger {
 			$sql_parts['where'][] = 'ug.userid='.$userid;
 			$sql_parts['where'][] = 'r.permission>='.$permission;
 			$sql_parts['where'][] = 'NOT EXISTS( '.
-										' AND NOT EXISTS( '.
 											' SELECT ff.triggerid '.
 											' FROM functions ff, items ii '.
 											' WHERE ff.triggerid=t.triggerid '.
@@ -105,7 +104,7 @@ class CTrigger {
 												' AND EXISTS( '.
 													' SELECT hgg.groupid '.
 													' FROM hosts_groups hgg, rights rr, users_groups gg '.
-													' WHERE hgg.hostid=hg.hostid '.
+													' WHERE hgg.hostid=ii.hostid '.
 														' AND rr.id=hgg.groupid '.
 														' AND rr.groupid=gg.usrgrpid '.
 														' AND gg.userid='.$userid.
