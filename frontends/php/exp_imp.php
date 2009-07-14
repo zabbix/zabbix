@@ -74,6 +74,7 @@ include_once('include/page_header.php');
 	$update = get_request('update', null);
 
 	update_profile('web.exp_imp.config', $config, PROFILE_TYPE_INT);
+
 ?>
 <?php
 	if($config == 1){
@@ -281,17 +282,22 @@ include_once('include/page_header.php');
 			$form = new CForm(null,'post');
 			$form->setName('hosts');
 			$form->addVar('config',$config);
-			$form->addVar('update', true);
 
 			$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 			foreach($PAGE_GROUPS['groups'] as $groupid => $name){
 				$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 			}
 
-			$header = get_table_header(S_HOSTS_BIG, array(S_GROUP.SPACE, $cmbGroups));
+			$form->addItem(array(S_GROUP.SPACE, $cmbGroups));
+			
+			show_table_header(S_HOSTS_BIG, $form);
 
-			$form->addItem($header);
 
+			$form = new CForm(null,'post');
+			$form->setName('hosts');
+			$form->addVar('config',$config);
+			$form->addVar('update', true);
+			
 			$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 			$table->setHeader(array(
 				new CCheckBox('all_hosts',true, "checkAll('".$form->getName()."','all_hosts','hosts');"),
