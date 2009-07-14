@@ -104,6 +104,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_FAIL == ret)
 	{
 		switch (mysql_errno(conn)) {
+		case CR_CONN_HOST_ERROR:
 		case CR_SERVER_GONE_ERROR:
 		case CR_CONNECTION_ERROR:
 		case CR_SERVER_LOST:
@@ -443,6 +444,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 		{
 			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 			switch(mysql_errno(conn)) {
+				case	CR_CONN_HOST_ERROR:
 				case	CR_SERVER_GONE_ERROR:
 				case	CR_CONNECTION_ERROR:
 				case	CR_SERVER_LOST:
@@ -715,6 +717,7 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 		{
 			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 			switch(mysql_errno(conn)) {
+				case 	CR_CONN_HOST_ERROR:
 				case	CR_SERVER_GONE_ERROR:
 				case	CR_CONNECTION_ERROR:
 				case	CR_SERVER_LOST:
