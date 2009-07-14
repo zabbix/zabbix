@@ -498,7 +498,7 @@ include_once('include/page_header.php');
 
 		$table = new CTableInfo();
 		$table->setHeader(array(
-			new CCheckBox('all_maintenances',NULL,"CheckAll('".$form->GetName()."','all_maintenances','maintenanceids');"),
+			new CCheckBox('all_maintenances',NULL,"checkAll('".$form->GetName()."','all_maintenances','maintenanceids');"),
 			make_sorting_link(S_NAME,'m.name'),
 			S_TYPE,
 			S_STATUS,

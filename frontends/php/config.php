@@ -947,7 +947,7 @@
 
 			$table = new CTableInfo();
 			$table->setHeader(array(
-				new CCheckBox('all_regexps',NULL,"CheckAll('".$form->GetName()."','all_regexps','group_regexpid');"),
+				new CCheckBox('all_regexps',NULL,"checkAll('".$form->GetName()."','all_regexps','regexpids');"),
 				S_NAME,
 				S_EXPRESSIONS
 				));
@@ -962,7 +962,7 @@
 			}
 //			$table->SetFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_USERS_Q)));
 
-			$table->SetFooter(new CCol(array(
+			$table->setFooter(new CCol(array(
 				new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_REGULAR_EXPRESSIONS_Q)
 			)));
 

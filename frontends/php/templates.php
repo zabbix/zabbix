@@ -372,9 +372,10 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 	}
 
 	show_table_header(S_CONFIGURATION_OF_TEMPLATES, $frmForm);
-
+	
+	echo SBR;
+		
 	if(isset($_REQUEST['form'])){
-
 	// FORM 1 insert_template_form
 		$templateid = get_request('templateid', 0);
 		$template_name = get_request('template_name', '');

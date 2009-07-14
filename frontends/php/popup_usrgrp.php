@@ -90,27 +90,22 @@ if(form)
 	$form->SetName('groups');
 
 	$table = new CTableInfo(S_NO_GROUPS_DEFINED);
-	$table->SetHeader(array(
-		array(	new CCheckBox("all_groups",NULL,
-				"CheckAll('".$form->GetName()."','all_groups');"),
-			S_NAME)
+	$table->setHeader(array(
+		new CCheckBox("all_groups",NULL,"checkAll('".$form->getName()."','all_groups','new_group');"),
+		S_NAME
 		));
 
 	$result = DBselect('select * from usrgrp where '.DBin_node('usrgrpid').' order by name');
-	while($row = DBfetch($result))
-	{
-		$table->AddRow(array(
-			array(	new CCheckBox('new_group['.$row['usrgrpid'].']',
-					isset($new_group[$row['usrgrpid']]),
-					NULL,
-					$row['name']),
-				$row['name'])
-			));
+	while($row = DBfetch($result)){
+		$table->addRow(array(
+			new CCheckBox('new_group['.$row['usrgrpid'].']',isset($new_group[$row['usrgrpid']]),NULL,$row['name']),
+			$row['name']
+		));
 	}
-	$table->SetFooter(new CButton('select', S_SELECT));
+	$table->setFooter(new CButton('select', S_SELECT));
 
-	$form->AddItem($table);
-	$form->Show();
+	$form->addItem($table);
+	$form->show();
 ?>
 <?php
 

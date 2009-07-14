@@ -448,7 +448,7 @@ include_once('include/page_header.php');
 			$table->addRow(array(
 				new CCheckBox('group_groupid['.$usrgrpid.']',NULL,NULL,$usrgrpid),
 				new CLink($row['name'],'usergrps.php?form=update&usrgrpid='.$usrgrpid.'#form'),
-				new CLink(count($row['userids']),'users.php?&filter_usrgrpid='.$usrgrpid),
+				array(new CLink(S_USERS,'users.php?&filter_usrgrpid='.$usrgrpid),' (',count($row['userids']),')'),
 				new CCol($row['users'],'wraptext'),
 				$users_status,
 				$gui_access,

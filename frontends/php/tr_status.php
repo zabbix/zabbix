@@ -383,7 +383,7 @@ include_once 'include/page_header.php';
 	$show_event_col = ($config['event_ack_enable'] && ($show_events != EVENTS_OPTION_NOEVENT));
 
 	$table->setHeader(array(
-		$show_event_col?(new CCheckBox('all_events',false, "CheckAll('".$m_form->GetName()."','all_events','events');")):NULL,
+		$show_event_col?(new CCheckBox('all_events',false, "checkAll('".$m_form->GetName()."','all_events','events');")):NULL,
 		make_sorting_link(S_SEVERITY,'t.priority'),
 		S_STATUS,
 		make_sorting_link(S_LAST_CHANGE,'t.lastchange'),
@@ -703,7 +703,22 @@ include_once 'include/page_header.php';
 		unset($row,$description, $actions);
 	}
 
-	$table->setFooter(new CCol(array(($config['event_ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE))));
+//----- GO ------
+	if($config['event_ack_enable']){
+		$goBox = new CComboBox('go');
+		$goBox->addItem('bulkacknowledge',S_BULK_ACKNOWLEDGE);
+
+// goButton name is necessary!!!
+		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton->setAttribute('id','goButton');
+		zbx_add_post_js('chkbxRange.pageGoName = "events";');
+
+		$table->setFooter(new CCol(array($goBox, $goButton)));
+	}
+//----
+
+
+//	$table->setFooter(new CCol(array(($config['event_ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE))));
 
 	$m_form->addItem($table);
 

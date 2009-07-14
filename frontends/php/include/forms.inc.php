@@ -148,7 +148,7 @@
 		$form->addItemToBottomRow(SPACE);
 		$form->addItemToBottomRow(new CButtonCancel());
 
-                $form->Show();
+                $form->show();
 	}
 
 	function insert_drule_form(){
@@ -334,7 +334,7 @@
 		$form->addItemToBottomRow(SPACE);
 		$form->addItemToBottomRow(new CButtonCancel());
 
-		$form->Show();
+		$form->show();
 	}
 
 	function	insert_httpstep_form()
@@ -550,7 +550,7 @@
 		$form->addItemToBottomRow(SPACE);
 		$form->addItemToBottomRow(new CButtonCancel());
 
-                $form->Show();
+                $form->show();
 	}
 
 	function insert_configuration_form($file)
@@ -577,7 +577,7 @@
 
 		$form->addItemToBottomRow(new CButton('save',S_SAVE));
 
-		$form->Show();
+		$form->show();
 	}
 
 	function insert_new_message_form($events,$bulk){
@@ -618,7 +618,7 @@
 		(isset($btn_txt))?($frmMsg->addItemToBottomRow(new CButton("save",$btn_txt))):('');
 		$frmMsg->addItemToBottomRow(new CButtonCancel(url_param('eventid')));
 
-		$frmMsg->Show(false);
+		$frmMsg->show(false);
 
 		SetFocus($frmMsg->GetName(),'message');
 
@@ -952,7 +952,7 @@
 		}
 		$frmUser->addItemToBottomRow(SPACE);
 		$frmUser->addItemToBottomRow(new CButtonCancel(url_param("config")));
-		$frmUser->Show();
+		$frmUser->show();
 	}
 
 	# Insert form for User Groups
@@ -1181,7 +1181,7 @@
 		}
 		$frmUserG->addItemToBottomRow(SPACE);
 		$frmUserG->addItemToBottomRow(new CButtonCancel(url_param("config")));
-		$frmUserG->Show();
+		$frmUserG->show();
 	}
 
 	function get_rights_of_elements_table($rights=array(),$user_type=USER_TYPE_ZABBIX_USER){
@@ -1919,7 +1919,7 @@
 		$frmItem->addItemToBottomRow(SPACE);
 		$frmItem->addItemToBottomRow(new CButton('register','do'));
 
-		$frmItem->Show();
+		$frmItem->show();
 	}
 
 	function	insert_mass_update_item_form($elements_array_name){
@@ -2169,7 +2169,7 @@
 					SPACE,
 					$host['host'],
 					BR()
-					));
+				));
 			}
 		}
 		else{
@@ -2186,10 +2186,6 @@
 			}
 		}
 
-
-
-
-
 		$frmCopy->addRow(S_TARGET, $target_list);
 
 		$cmbCopyMode = new CComboBox('copy_mode',$copy_mode);
@@ -2202,7 +2198,7 @@
 		$frmCopy->addItemToBottomRow(array(SPACE,
 			new CButtonCancel(url_param('groupid').url_param("hostid").url_param("config"))));
 
-		$frmCopy->Show();
+		$frmCopy->show();
 	}
 
 // TRIGGERS
@@ -2277,7 +2273,7 @@
 		$frmMTrig->addItemToBottomRow(new CButton('mass_save',S_SAVE));
 		$frmMTrig->addItemToBottomRow(SPACE);
 		$frmMTrig->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
-		$frmMTrig->Show();
+		$frmMTrig->show();
 	}
 
 // Insert form for Trigger
@@ -2414,7 +2410,7 @@
 		}
 		$frmTrig->addItemToBottomRow(SPACE);
 		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
-		$frmTrig->Show();
+		$frmTrig->show();
 	}
 
 	function insert_trigger_comment_form($triggerid){
@@ -2433,7 +2429,7 @@
 		$frmComent->addItemToBottomRow(new CButton("save",S_SAVE));
 		$frmComent->addItemToBottomRow(new CButtonCancel('&triggerid='.$triggerid));
 
-		$frmComent->Show();
+		$frmComent->show();
 	}
 
 	function insert_graph_form(){
@@ -2782,7 +2778,7 @@
 		$frmGraph->addItemToBottomRow(SPACE);
 		$frmGraph->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
 
-		$frmGraph->Show();
+		$frmGraph->show();
 	}
 
 	function get_maintenance_form(){
@@ -3088,7 +3084,7 @@
 		}
 
 		$tblPeriod->SetHeader(array(
-				new CCheckBox('all_periods',null,'CheckAll("'.S_PERIOD.'","all_periods","g_timeperiodid");'),
+				new CCheckBox('all_periods',null,'checkAll("'.S_PERIOD.'","all_periods","g_timeperiodid");'),
 				S_PERIOD_TYPE,
 				S_SCHEDULE,
 				S_PERIOD,
@@ -4018,7 +4014,7 @@
 		array_multisort($esc_step_from, SORT_ASC, SORT_NUMERIC, $objects_tmp, SORT_DESC, $objectids_tmp, SORT_ASC, $operations);
 
 		$tblOper->SetHeader(array(
-				new CCheckBox('all_operations',null,'CheckAll("'.S_ACTION.'","all_operations","g_operationid");'),
+				new CCheckBox('all_operations',null,'checkAll("'.S_ACTION.'","all_operations","g_operationid");'),
 				isset($_REQUEST['escalation'])?S_STEPS:null,
 				S_DETAILS,
 				isset($_REQUEST['escalation'])?S_PERIOD.' ('.S_SEC_SMALL.')':null,
@@ -4650,7 +4646,7 @@
 		}
 		$frmMeadia->addItemToBottomRow(SPACE);
 		$frmMeadia->addItemToBottomRow(new CButtonCancel());
-		$frmMeadia->Show();
+		$frmMeadia->show();
 	}
 
 	function insert_screen_form(){
@@ -4696,7 +4692,7 @@
 		}
 		$frmScr->addItemToBottomRow(SPACE);
 		$frmScr->addItemToBottomRow(new CButtonCancel());
-		$frmScr->Show();
+		$frmScr->show();
 	}
 
 // HOSTS
@@ -5527,7 +5523,7 @@
 
 		$frmHost->addItemToBottomRow(SPACE);
 		$frmHost->addItemToBottomRow(new CButtonCancel(url_param("config").url_param('groupid')));
-		$frmHost->Show();
+		$frmHost->show();
 	}
 
 
@@ -5817,7 +5813,7 @@
 			$frmHostP->addSpanRow("Profile for this host is missing","form_row_c");
 		}
 		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
-		$frmHostP->Show();
+		$frmHostP->show();
 	}
 
 // BEGIN: HOSTS PROFILE EXTENDED Section
@@ -5858,7 +5854,7 @@
 			$frmHostPA->addSpanRow('Extended Profile for this host is missing','form_row_c');
 		}
 		$frmHostPA->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
-		$frmHostPA->Show();
+		$frmHostPA->show();
 	}
 // END:   HOSTS PROFILE EXTENDED Section
 
@@ -5959,7 +5955,7 @@
  		$frmHostT->addItemToBottomRow(new CButton('save',S_SAVE));
  		$frmHostT->addItemToBottomRow(SPACE);
  		$frmHostT->addItemToBottomRow(new CButtonCancel(url_param('config')));
- 		$frmHostT->Show();
+ 		$frmHostT->show();
 	}
 
 
@@ -6022,7 +6018,7 @@
 		$frmApp->addItemToBottomRow(SPACE);
 		$frmApp->addItemToBottomRow(new CButtonCancel(url_param("config").url_param("hostid").url_param('groupid')));
 
-		$frmApp->Show();
+		$frmApp->show();
 
 	}
 
@@ -6103,7 +6099,7 @@
 		$frmMap->addItemToBottomRow(SPACE);
 		$frmMap->addItemToBottomRow(new CButtonCancel());
 
-		$frmMap->Show();
+		$frmMap->show();
 
 	}
 
@@ -6334,7 +6330,7 @@
 		$frmEl->addItemToBottomRow(SPACE);
 		$frmEl->addItemToBottomRow(new CButtonCancel(url_param('sysmapid')));
 
-		$frmEl->Show();
+		$frmEl->show();
 	}
 
 	function insert_map_link_form(){
@@ -6439,8 +6435,8 @@
 		$table->headerClass = 'header';
 		$table->footerClass = 'footer';
 
-		$table->SetHeader(array(
-			new CCheckBox('all_triggers',null,"CheckAll('".$frmCnct->GetName()."','all_triggers','triggers');"),
+		$table->setHeader(array(
+			new CCheckBox('all_triggers',null,"checkAll('".$frmCnct->getName()."','all_triggers','triggers');"),
 			S_TRIGGERS,
 			S_TYPE,
 			S_COLOR));
@@ -6502,7 +6498,7 @@
 		$frmCnct->addItemToBottomRow(SPACE);
 		$frmCnct->addItemToBottomRow(new CButtonCancel(url_param("sysmapid")));
 
-		$frmCnct->Show();
+		$frmCnct->show();
 	}
 
 	function insert_command_result_form($scriptid,$hostid){
@@ -6520,7 +6516,7 @@
 		$frmResult->addRow(S_RESULT,new CTextArea("message",$message,100,25,'yes'));
 		$frmResult->addItemToBottomRow(new CButton('close',S_CLOSE,'window.close();'));
 
-		$frmResult->Show();
+		$frmResult->show();
 	}
 
 	function get_regexp_form(){
@@ -6693,7 +6689,7 @@
 
 		$tblExp = new CTableInfo();
 		$tblExp->setHeader(array(
-				new CCheckBox('all_expressions',null,'CheckAll("Regular expression","all_expressions","g_expressionid");'),
+				new CCheckBox('all_expressions',null,'checkAll("Regular expression","all_expressions","g_expressionid");'),
 				S_EXPRESSION,
 				S_EXPECTED_RESULT,
 				S_IGNORE_CASE,
