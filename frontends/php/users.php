@@ -407,9 +407,14 @@ include_once('include/page_header.php');
 					' AND '.DBcondition('ug.userid',$userids);
 		$db_groups = DBselect($sql);
 		while($db_group = DBfetch($db_groups)){
-			if(!isset($users_groups[$db_group['userid']])) $users_groups[$db_group['userid']] = array();
-			if(!empty($users_groups[$db_group['userid']])) $users_groups[$db_group['userid']][] = BR();
-			$users_groups[$db_group['userid']][] = new CLink($db_group['name'],'users.php?form=update&config=1&usrgrpid='.$db_group['usrgrpid'].'#form');
+			$usrgrp_link = new CLink($db_group['name'],'usergrps.php?form=update&usrgrpid='.$db_group['usrgrpid'].'#form');
+			
+			if(!isset($users_groups[$db_group['userid']]))
+				$users_groups[$db_group['userid']] = array();
+			else
+				$users_groups[$db_group['userid']][] = BR();
+				
+			$users_groups[$db_group['userid']][] = $usrgrp_link;
 		}
 
 		foreach($userids as $id => $userid){
@@ -447,7 +452,7 @@ include_once('include/page_header.php');
 
 			$table->addRow(array(
 				new CCheckBox('group_userid['.$userid.']',NULL,NULL,$userid),
-				new CLink($user['alias'],'users.php?form=update'.url_param('config').'&userid='.$userid.'#form'),
+				new CLink($user['alias'],'users.php?form=update&userid='.$userid.'#form'),
 				$user['name'],
 				$user['surname'],
 				user_type2str($user['type']),
