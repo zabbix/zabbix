@@ -1251,6 +1251,7 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 	int		buf_offset, buf_allocated = 1024;
 	int		status, esc_step;
 	time_t		now;
+	zbx_uint64_t	userid;
 
 	buf = zbx_malloc(buf, buf_allocated);
 	buf_offset = 0;
@@ -1282,8 +1283,9 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 		DBfree_result(result);
 	}
 
-	result = DBselect("select a.clock,a.status,m.description,a.sendto,a.error,a.esc_step"
-			" from alerts a left join media_type m on m.mediatypeid = a.mediatypeid"
+	result = DBselect("select a.clock,a.status,m.description,a.sendto,a.error,a.esc_step,a.userid"
+			" from alerts a"
+			" left join media_type m on m.mediatypeid = a.mediatypeid"
 			" where a.eventid=" ZBX_FS_UI64 " and a.alerttype=%d order by a.clock",
 			escalation != NULL ? escalation->eventid : event->eventid,
 			ALERT_TYPE_MESSAGE);
@@ -1292,18 +1294,20 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 		now		= atoi(row[0]);
 		status		= atoi(row[1]);
 		esc_step	= atoi(row[5]);
+		ZBX_STR2UINT64(userid, row[6]);
 
 		if (esc_step != 0)
 			zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 16, "%d. ", esc_step);
 
 		zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 256,
-				"%s %s %-11s %s %s %s\n",
+				"%s %s %-11s %s %s \"%s\" %s\n",
 				zbx_date2str(now),
 				zbx_time2str(now),
 				(status == ALERT_STATUS_NOT_SENT ? "in progress" :
 					(status == ALERT_STATUS_SENT ? "sent" : "failed")),
 				SUCCEED == DBis_null(row[2]) ? "" : row[2],
 				row[3],
+				zbx_user_string(userid),
 				row[4]);
 	}
 
@@ -1321,9 +1325,72 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 	if (0 != buf_offset)
 		buf[--buf_offset] = '\0';
 
-	*replace_to = zbx_dsprintf(*replace_to, "%s", buf);
+	*replace_to = buf;
 
-	zbx_free(buf);
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_event_ack_history                                            *
+ *                                                                            *
+ * Purpose: retrive event acknowledges history                                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_event_ack_history(DB_EVENT *event, char **replace_to)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*buf = NULL;
+	int		buf_offset, buf_allocated = 1024;
+	time_t		now;
+	zbx_uint64_t	userid;
+
+	if (0 == event->acknowledged)
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "");
+		return SUCCEED;
+	}
+
+	buf = zbx_malloc(buf, buf_allocated);
+	buf_offset = 0;
+	*buf = '\0';
+
+	result = DBselect("select clock,userid,message"
+			" from acknowledges"
+			" where eventid=" ZBX_FS_UI64 " order by clock",
+			event->eventid);
+
+	while (NULL != (row = DBfetch(result))) {
+		now = atoi(row[0]);
+		ZBX_STR2UINT64(userid, row[1]);
+
+		zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 256,
+				"%s %s \"%s\"\n%s\n\n",
+				zbx_date2str(now),
+				zbx_time2str(now),
+				zbx_user_string(userid),
+				row[2]);
+	}
+
+	DBfree_result(result);
+
+	if (0 != buf_offset)
+	{
+		buf_offset -= 2;
+		buf[buf_offset] = '\0';
+	}
+
+	*replace_to = buf;
 
 	return SUCCEED;
 }
@@ -1435,6 +1502,8 @@ static int	get_node_value_by_event(DB_EVENT *event, char **replace_to, const cha
 #define MVAR_EVENT_DATE			"{EVENT.DATE}"
 #define MVAR_EVENT_TIME			"{EVENT.TIME}"
 #define MVAR_EVENT_AGE			"{EVENT.AGE}"
+#define MVAR_EVENT_ACK_STATUS		"{EVENT.ACK.STATUS}"
+#define MVAR_EVENT_ACK_HISTORY		"{EVENT.ACK.HISTORY}"
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_HOSTNAME			"{HOSTNAME}"
 #define MVAR_IPADDRESS			"{IPADDRESS}"
@@ -1644,6 +1713,10 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 					replace_to = zbx_dsprintf(replace_to, "%s", zbx_time2str(event->clock));
 				else if (0 == strcmp(bl, MVAR_EVENT_AGE))
 					replace_to = zbx_dsprintf(replace_to, "%s", zbx_age2str(time(NULL) - event->clock));
+				else if (0 == strcmp(bl, MVAR_EVENT_ACK_STATUS))
+					replace_to = zbx_dsprintf(replace_to, "%s", event->acknowledged ? "Yes" : "No");
+				else if (0 == strcmp(bl, MVAR_EVENT_ACK_HISTORY))
+					ret = get_event_ack_history(event, &replace_to);
 				else if (0 == strcmp(bl, MVAR_ESC_HISTORY))
 					ret = get_escalation_history(event, escalation, &replace_to);
 				else if (0 == strcmp(bl, MVAR_TRIGGER_SEVERITY))
