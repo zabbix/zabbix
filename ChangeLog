@@ -1,5 +1,8 @@
 Changes for 1.7.0
 
+ - [DEV-405] Proxies, Nodes moved under "Administration->DM" (Artem)
+ - [DEV-405] Items, Triggers, Graphs moved under "Configuration->Hosts" (Artem)
+ - [DEV-405] Host Groups, Maintenancess moved under "Configuration" (Artem)
  - [DEV-406] added milliseconds to log files of all Zabbix daemon processes (Alexei)
  - [DEV-350] cleanup of sample config files, added sample of windows agent config (Alexei)
  - [DEV-404] improved web history (Vedmak)
