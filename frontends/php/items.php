@@ -1058,8 +1058,7 @@ include_once('include/page_header.php');
 			array_push($description, new CLink(
 				item_description($db_item),
 				'?form=update&itemid='.$db_item['itemid'].
-				'&hostid='.$db_item['hostid'],
-				'action'));
+				'&hostid='.$db_item['hostid']));
 
 			$status=new CCol(new CLink(item_status2str($db_item['status']),
 					'?group_itemid%5B%5D='.$db_item['itemid'].

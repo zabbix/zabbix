@@ -173,9 +173,9 @@ $ZBX_MENU = array(
 				array('url'=>'authentication.php',
 						'label'=>S_AUTHENTICATION
 					),
-				array('url'=>'users.php',
+				array('url'=>'usergrps.php',
 						'label'=>S_USERS,
-						'sub_pages'=>array('popup_media.php','popup_usrgrp.php','popup_right.php','popup_users.php')
+						'sub_pages'=>array('users.php','popup_media.php','popup_usrgrp.php','popup_right.php','popup_users.php')
 					),
 				array('url'=>'media_types.php',
 						'label'=>S_MEDIA_TYPES

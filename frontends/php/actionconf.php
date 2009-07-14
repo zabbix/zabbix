@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 
 include_once('include/page_header.php');
 
+	$_REQUEST['go'] = get_request('go','none');
 	$_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
 ?>
 <?php
@@ -76,10 +77,10 @@ include_once('include/page_header.php');
 
 		'new_opcondition'=>	array(null, 	 O_OPT,  null,	null,	'isset({add_opcondition})'),
 
-/* actions */
-		'group_delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'group_enable'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'group_disable'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+// Actions
+		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
+
+// form
 		'add_condition'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_condition'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'cancel_new_condition'=>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -294,67 +295,46 @@ include_once('include/page_header.php');
 			$_REQUEST['new_operation']['id'] = $edit_operationid;
 		}
 	}
-/* GROUP ACTIONS */
-	else if(isset($_REQUEST['group_enable'])&&isset($_REQUEST['g_actionid'])){
+// ------ GO ------
+	else if(str_in_array($_REQUEST['go'], array('activate','disable')) && isset($_REQUEST['g_actionid'])){
 		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
-
-		$query = 'select distinct actionid from actions'.
-				' where '.DBin_node('actionid',$nodes).
-				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') ';
-
-		$result=DBselect($query);
-
-		$actionids = array();
-
+		
+		$status = ($_REQUEST['go'] == 'activate')?0:1;
+		$status_name = $status?'disabled':'enabled';
+		
 		DBstart();
+		$actionids = array();
+		$sql = 'SELECT DISTINCT a.actionid '.
+					' FROM actions a '.
+					' WHERE '.DBin_node('a.actionid',$nodes).
+						' AND '.DBcondition('a.actionid', $_REQUEST['g_actionid']);
+
+		$result=DBselect($sql);
 		while($row=DBfetch($result)){
-			$res = update_action_status($row['actionid'],0);
+			$res = update_action_status($row['actionid'],$status);
 			if($res)
 				$actionids[] = $row['actionid'];
 		}
-		$result = DBend();
+		$result = DBend($res);
 
 		if($result && isset($res)){
 			show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] enabled');
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] '.$status_name);
 		}
 	}
-	else if(isset($_REQUEST['group_disable'])&&isset($_REQUEST['g_actionid'])){
-
+	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_actionid'])){
 		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
-		$query = 'select distinct actionid from actions'.
-				' where '.DBin_node('actionid',$nodes).
-				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') ';
-
-		$result=DBselect($query);
-
-		$actionids = array();
-		Dbstart();
-		while($row=DBfetch($result)){
-			$res = update_action_status($row['actionid'],1);
-			if($res)
-				$actionids[] = $row['actionid'];
-		}
-		$result = DBend();
-
-		if($result && isset($res)){
-			show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] disabled');
-		}
-	}
-	else if(isset($_REQUEST['group_delete'])&&isset($_REQUEST['g_actionid'])){
-		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
-			access_deny();
-
-		$result=DBselect('select distinct actionid from actions'.
-				' where '.DBin_node('actionid',$nodes).
-				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') '
-				);
-		$actionids = array();
 		DBstart();
+		$actionids = array();
+		$sql = 'SELECT DISTINCT a.actionid '.
+					' FROM actions a '.
+					' WHERE '.DBin_node('a.actionid',$nodes).
+						' AND '.DBcondition('a.actionid', $_REQUEST['g_actionid']);
+
+		$result=DBselect($sql);
 		while($row=DBfetch($result)){
 			$del_res = delete_action($row['actionid']);
 			if($del_res)
@@ -503,7 +483,7 @@ include_once('include/page_header.php');
 
 		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
 		$tblActions->setHeader(array(
-			new CCheckBox('all_items',null,'CheckAll("'.$form->GetName().'","all_items");'),
+			new CCheckBox('all_items',null,"checkAll('".$form->getName()."','all_items','g_actionid');"),
 			make_sorting_link(S_NAME,'a.name'),
 			S_CONDITIONS,
 			S_OPERATIONS,
@@ -556,13 +536,19 @@ include_once('include/page_header.php');
 			$row_count++;
 		}
 
-		$tblActions->setFooter(new CCol(array(
-			new CButtonQMessage('group_enable',S_ENABLE_SELECTED,S_ENABLE_SELECTED_ACTIONS_Q),
-			SPACE,
-			new CButtonQMessage('group_disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_ACTIONS_Q),
-			SPACE,
-			new CButtonQMessage('group_delete',S_DELETE_SELECTED,S_DELETE_SELECTED_ACTIONS_Q)
-		)));
+//----- GO ------
+		$goBox = new CComboBox('go');
+		$goBox->addItem('activate',S_ENABLE_SELECTED);
+		$goBox->addItem('disable',S_DISABLE_SELECTED);
+		$goBox->addItem('delete',S_DELETE_SELECTED);
+
+// goButton name is necessary!!!
+		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton->setAttribute('id','goButton');
+		zbx_add_post_js('chkbxRange.pageGoName = "g_actionid";');
+
+		$tblActions->setFooter(new CCol(array($goBox, $goButton)));
+//----
 
 		$form->addItem($tblActions);
 		$form->Show();
