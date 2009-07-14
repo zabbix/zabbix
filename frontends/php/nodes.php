@@ -19,41 +19,42 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/nodes.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/nodes.inc.php');
 
-	$page["title"] = "S_NODES";
-	$page["file"] = "nodes.php";
+	$page['title'] = "S_NODES";
+	$page['file'] = 'nodes.php';
 
-	$_REQUEST['config'] = get_request('config',0);
-	if($_REQUEST['config'] == 1) redirect('proxies.php');
-	
-include_once "include/page_header.php";
+include_once('include/page_header.php');
+
+	$_REQUEST['config'] = get_request('config','nodes.php');
 
 ?>
 <?php
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-		'config'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null), // 0 - nodes, 1 - proxies
+		'config'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		
 // media form
-		"nodeid"=>		array(T_ZBX_INT, O_NO,	null,	DB_ID,			'(isset({form})&&({form}=="update"))'),
+		'nodeid'=>			array(T_ZBX_INT, O_NO,	null,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 
-		"new_nodeid"=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,			'isset({save})'),
-		"name"=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({save})'),
-		"timezone"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(-12,+13),	'isset({save})'),
-		"ip"=>			array(T_ZBX_IP,	 O_OPT,	null,	null,			'isset({save})'),
-		"node_type"=>		array(T_ZBX_INT, O_OPT,	null,
+		'new_nodeid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,			'isset({save})'),
+		'name'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({save})'),
+		'timezone'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(-12,+13),	'isset({save})'),
+		'ip'=>				array(T_ZBX_IP,	 O_OPT,	null,	null,			'isset({save})'),
+		'node_type'=>		array(T_ZBX_INT, O_OPT,	null,
 			IN(ZBX_NODE_REMOTE.','.ZBX_NODE_MASTER.','.ZBX_NODE_LOCAL),		'isset({save})&&!isset({nodeid})'),
-		"port"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,65535),	'isset({save})'),
-		"slave_history"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	'isset({save})'),
-		"slave_trends"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	'isset({save})'),
+		'port'=>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,65535),	'isset({save})'),
+		'slave_history'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	'isset({save})'),
+		'slave_trends'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	'isset({save})'),
+
 /* actions */
-		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 /* other */
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
+		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
 	check_fields($fields);
@@ -116,18 +117,21 @@ include_once "include/page_header.php";
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
 	
-	$cmbConfig = new CComboBox('config', $_REQUEST['config'], "javascript: redirect('proxies.php?config=1');");
-	$cmbConfig->addItem(0, S_NODES);
-	$cmbConfig->addItem(1, S_PROXIES);
+// Config
+	$cmbConf = new CComboBox('config','nodes.php','javascript: submit()');
+	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
+		$cmbConf->addItem('nodes.php',S_NODES);
+		$cmbConf->addItem('proxies.php',S_PROXIES);
+		
+	$frmForm->addItem($cmbConf);
 	
-	$frmForm->addItem($cmbConfig);
-	if(!isset($_REQUEST["form"])){
+	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(new CButton('form',S_NEW_NODE));
 	}
 	
 	show_table_header(S_CONFIGURATION_OF_NODES, $frmForm);
 	
-	if(isset($_REQUEST["form"])){
+	if(isset($_REQUEST['form'])){
 		global $ZBX_CURMASTERID;
 
 		$frm_title = S_NODE;
@@ -143,13 +147,13 @@ include_once "include/page_header.php";
 		}
 
 		$frmNode= new CFormTable($frm_title);
-		$frmNode->SetHelp("node.php");
+		$frmNode->SetHelp('node.php');
 
 		if(isset($_REQUEST['nodeid'])){
 			$frmNode->addVar('nodeid', $_REQUEST['nodeid']);
 		}
 
-		if(isset($_REQUEST['nodeid']) && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"]))){
+		if(isset($_REQUEST['nodeid']) && (!isset($_REQUEST['form_refresh']) || isset($_REQUEST['register']))){
 			$new_nodeid	= $node_data['nodeid'];
 			$name		= $node_data['name'];
 			$timezone	= $node_data['timezone'];
@@ -196,7 +200,7 @@ include_once "include/page_header.php";
 
 		$cmbTimeZone = new CComboBox('timezone', $timezone);
 		for($i = -12; $i <= 13; $i++){
-			$cmbTimeZone->addItem($i, "GMT".sprintf("%+03d:00", $i));
+			$cmbTimeZone->addItem($i, 'GMT'.sprintf('%+03d:00', $i));
 		}
 		$frmNode->addRow(S_TIME_ZONE, $cmbTimeZone);
 		$frmNode->addRow(S_IP, new CTextBox('ip', $ip, 15));
@@ -208,11 +212,11 @@ include_once "include/page_header.php";
 		$frmNode->addItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($_REQUEST['nodeid']) && $node_type != ZBX_NODE_LOCAL){
 			$frmNode->addItemToBottomRow(SPACE);
-			$frmNode->addItemToBottomRow(new CButtonDelete("Delete selected node?",
-				url_param("form").url_param("nodeid")));
+			$frmNode->addItemToBottomRow(new CButtonDelete('Delete selected node?',
+				url_param('form').url_param('nodeid')));
 		}
 		$frmNode->addItemToBottomRow(SPACE);
-		$frmNode->addItemToBottomRow(new CButtonCancel(url_param("config")));
+		$frmNode->addItemToBottomRow(new CButtonCancel(url_param('config')));
 		$frmNode->Show();
 	}
 	else{
@@ -243,16 +247,16 @@ include_once "include/page_header.php";
 				array(
 					get_node_path($row['masterid']),
 					new CLink(
-						($row['nodetype'] ? new CSpan($row["name"], 'bold') : $row["name"]),
-						"?&form=update&nodeid=".$row["nodeid"],'action')),
+						($row['nodetype'] ? new CSpan($row['name'], 'bold') : $row['name']),
+						'?&form=update&nodeid='.$row['nodeid'],'action')),
 				$node_type == ZBX_NODE_LOCAL ? new CSpan($node_type_name, 'bold') : $node_type_name,
-				new CSpan("GMT".sprintf("%+03d:00", $row['timezone']),	$row['nodetype'] ? 'bold' : null),
+				new CSpan('GMT'.sprintf('%+03d:00', $row['timezone']),	$row['nodetype'] ? 'bold' : null),
 				new CSpan($row['ip'].':'.$row['port'], 			$row['nodetype'] ? 'bold' : null)
 				));
 		}
 		$table->Show();
 	}
 
-include_once "include/page_footer.php";
+include_once 'include/page_footer.php';
 
 ?>
