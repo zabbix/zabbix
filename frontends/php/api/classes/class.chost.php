@@ -221,6 +221,10 @@ class CHost {
 		
 // count
 		if($options['count'] != 0){
+			$options['select_items'] = 0;
+			$options['select_triggers'] = 0;
+			$options['select_graphs'] = 0;
+
 			$sql_parts['select'] = array('count(h.hostid) as rowscount');
 		}
 
@@ -275,11 +279,11 @@ class CHost {
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($host = DBfetch($res)){
-			$hostids[$host['hostid']] = $host['hostid'];
-
 			if($options['count'])
 				$result = $host;
 			else{
+				$hostids[$host['hostid']] = $host['hostid'];
+
 				if($options['extendoutput'] == 0){
 					$result[$host['hostid']] = $host['hostid'];
 				}
@@ -312,35 +316,34 @@ class CHost {
 		}
 		
 // Adding Objects
-		if($options['count'] == 0){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);	
+
+		$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);	
 // Adding Items
-			if($options['select_items']){
-				$items = CItem::get($obj_params);
-				foreach($items as $itemid => $item){
-					foreach($item['hostids'] as $num => $hostid){
-						$result[$hostid]['itemids'][$itemid] = $itemid;
-					}
+		if($options['select_items']){
+			$items = CItem::get($obj_params);
+			foreach($items as $itemid => $item){
+				foreach($item['hostids'] as $num => $hostid){
+					$result[$hostid]['itemids'][$itemid] = $itemid;
 				}
 			}
-		
+		}
+	
 // Adding triggers	
-			if($options['select_triggers']){
-				$triggers = CTrigger::get($obj_params);
-				foreach($triggers as $triggerid => $trigger){
-					foreach($trigger['hostids'] as $num => $hostid){
-						$result[$hostid]['triggerids'][$triggerid] = $triggerid;
-					}
+		if($options['select_triggers']){
+			$triggers = CTrigger::get($obj_params);
+			foreach($triggers as $triggerid => $trigger){
+				foreach($trigger['hostids'] as $num => $hostid){
+					$result[$hostid]['triggerids'][$triggerid] = $triggerid;
 				}
 			}
-			
+		}
+		
 // Adding graphs
-			if($options['select_graphs']){
-				$graphs = CGraph::get($obj_params);
-				foreach($graphs as $graphid => $graph){
-					foreach($graph['hostids'] as $num => $hostid){
-						$result[$hostid]['graphids'][$graphid] = $graphid;
-					}
+		if($options['select_graphs']){
+			$graphs = CGraph::get($obj_params);
+			foreach($graphs as $graphid => $graph){
+				foreach($graph['hostids'] as $num => $hostid){
+					$result[$hostid]['graphids'][$graphid] = $graphid;
 				}
 			}
 		}
