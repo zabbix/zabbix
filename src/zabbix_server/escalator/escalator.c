@@ -366,18 +366,8 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 	DBfree_result(result);
 
 	if (0 == medias) {
-		result = DBselect("select name,surname,alias from users where userid=" ZBX_FS_UI64,
-				userid);
-
-		if (NULL != (row = DBfetch(result))) {
-			zbx_snprintf(error, sizeof(error), "No media defined for user %s %s (%s)",
-					row[0],
-					row[1],
-					row[2]);
-		} else
-			zbx_snprintf(error, sizeof(error), "No media defined");
-
-		DBfree_result(result);
+		zbx_snprintf(error, sizeof(error), "No media defined for user \"%s\"",
+				zbx_user_string(userid));
 
 		alertid		= DBget_maxid("alerts", "alertid");
 		error_esc	= DBdyn_escape_string(error);
