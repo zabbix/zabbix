@@ -73,7 +73,7 @@ class CGraph {
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
 			$sql_parts['from']['gi'] = 'graphs_items gi';
 			$sql_parts['from']['i'] = 'items i';
@@ -88,17 +88,17 @@ class CGraph {
 			$sql_parts['where'][] = 'ug.userid='.$userid;
 			$sql_parts['where'][] = 'r.permission>='.$permission;
 			$sql_parts['where'][] = 'NOT EXISTS( '.
-											' SELECT gg.graphid '.
+											' SELECT gii.graphid '.
 											' FROM graphs_items gii, items ii '.
 											' WHERE gii.graphid=g.graphid '.
 												' AND gii.itemid=ii.itemid '.
 												' AND EXISTS( '.
 													' SELECT hgg.groupid '.
-													' FROM hosts_groups hgg, rights rr, users_groups gg '.
-													' WHERE ii.hostid=hg.hostid '.
+													' FROM hosts_groups hgg, rights rr, users_groups ugg '.
+													' WHERE ii.hostid=hgg.hostid '.
 														' AND rr.id=hgg.groupid '.
-														' AND rr.groupid=gg.usrgrpid '.
-														' AND gg.userid='.$userid.
+														' AND rr.groupid=ugg.usrgrpid '.
+														' AND ugg.userid='.$userid.
 														' AND rr.permission<'.$permission.'))';
 		}
 		
@@ -189,7 +189,7 @@ class CGraph {
 			if($options['count'])
 				$result = $graph;
 			else{
-				if(!isset($options['extendoutput'])){
+				if(!$options['extendoutput']){
 					$result[$graph['graphid']] = $graph['graphid'];
 				}
 				else{
@@ -520,7 +520,7 @@ class CGraph {
 		$items = $item_list['items'];
 
 		if(!$force){
-			// check if graph is templated graph, then items cannot be added
+			// check if graph is templated graph, then items cannot be deleted
 			$graph = CGraph::getById(array('graphid' => $graphid));
 			if($graph['templateid'] != 0){
 				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated graph : '.$graph['name']);
@@ -543,6 +543,7 @@ class CGraph {
 					AND curr.key_=src.key_
 					AND '.DBcondition('src.itemid', $items);
 		$db_items = DBselect($sql);
+		$gitems = array();
 		while($curr_item = DBfetch($db_items)){
 			$gitems[$curr_item['itemid']] = $curr_item['itemid'];
 		}
