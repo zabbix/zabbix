@@ -45,32 +45,32 @@ if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_ho
 
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 $fields=array(
-	'config'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
+	'config'		=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
 
-	'hosts'				=> array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID, 		NULL),
-	'groups'			=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID, 		NULL),
+	'hosts'			=> array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID, 		NULL),
+	'groups'		=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID, 		NULL),
 	'clear_templates'	=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID, 		NULL),
-	'templates'			=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
+	'templates'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
 	'templateid'		=> array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,		'isset({form})&&({form}=="update")'),
 	'template_name'		=> array(T_ZBX_STR,	O_OPT,	NOT_EMPTY,		NULL,		'isset({save})'),
-	'groupid'			=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,		NULL),
+	'groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,		NULL),
 	'twb_groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,		NULL),
-	'newgroup'			=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
+	'newgroup'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
 
 // actions
-	'go'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
+	'go'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 
 //form
-	'unlink'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
+	'unlink'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 	'unlink_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'save'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'clone'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
+	'save'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
+	'clone'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 	'full_clone'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'delete'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
+	'delete'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 	'delete_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'cancel'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
+	'cancel'		=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
 // other
-	'form'				=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
+	'form'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
 	'form_refresh'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL)
 );
 
@@ -299,19 +299,19 @@ else if((isset($_REQUEST['delete']) || isset($_REQUEST['delete_and_clear'])) && 
 	}
 
 
-	$host=get_host_by_hostid($_REQUEST['templateid']);
+		$host=get_host_by_hostid($_REQUEST['templateid']);
 
-	DBstart();
-	$result = delete_host($_REQUEST['templateid'], $unlink_mode);
-	$result=DBend($result);
+		DBstart();
+		$result = delete_host($_REQUEST['templateid'], $unlink_mode);
+		$result=DBend($result);
 
-	show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
-	if($result){
+		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
+		if($result){
 /*				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$host['host'].']');*/
 
-		unset($_REQUEST['form']);
-		unset($_REQUEST['templateid']);
-	}
+			unset($_REQUEST['form']);
+			unset($_REQUEST['templateid']);
+		}
 
 	unset($_REQUEST['delete']);
 }
@@ -322,26 +322,26 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 		$unlink_mode =  true;
 	}
 
-	$result = true;
-	$hosts = get_request('templates',array());
-	$del_hosts = array();
-	$sql = 'SELECT host,hostid '.
-			' FROM hosts '.
-			' WHERE '.DBin_node('hostid').
-				' AND '.DBcondition('hostid',$hosts).
-				' AND '.DBcondition('hostid',$available_hosts);
-	$db_hosts=DBselect($sql);
+		$result = true;
+		$hosts = get_request('templates',array());
+		$del_hosts = array();
+		$sql = 'SELECT host,hostid '.
+				' FROM hosts '.
+				' WHERE '.DBin_node('hostid').
+					' AND '.DBcondition('hostid',$hosts).
+					' AND '.DBcondition('hostid',$available_hosts);
+		$db_hosts=DBselect($sql);
 
-	DBstart();
-	while($db_host=DBfetch($db_hosts)){
-		$del_hosts[$db_host['hostid']] = $db_host['hostid'];
+		DBstart();
+		while($db_host=DBfetch($db_hosts)){
+			$del_hosts[$db_host['hostid']] = $db_host['hostid'];
 /*				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$db_host['host'].']');*/
-	}
+		}
 
-	$result = delete_host($del_hosts, $unlink_mode);
-	$result = DBend($result);
+		$result = delete_host($del_hosts, $unlink_mode);
+		$result = DBend($result);
 
-	show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
+		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 }
 /**********************************/
 /* --->>> TEMPLATE ACTIONS <<<--- */
@@ -594,9 +594,7 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 	else{ // TABLE WITH TEMPLATES
 // TEMPLATES window header
 		$selected_group = get_request('groupid', 0);
-		$options = array('editable' => 1, 
-						'extendoutput' => 1, 
-						'templated_hosts' => 1);
+		$options = array('editable' => 1, 'extendoutput' => 1);
 		$groups = CHostGroup::get($options);
 
 		$frmForm = new CForm();

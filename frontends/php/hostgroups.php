@@ -54,7 +54,6 @@ include_once('include/page_header.php');
 
 /* actions */
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-
 // form
 		'save'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'clone'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -298,7 +297,7 @@ include_once('include/page_header.php');
 		$groupids = array_keys($groups);
 		
 		$hosts = CHost::get(array('groupids' => $groupids, 'extendoutput' => 1, 'templated_hosts' => 1));
-		
+
 		foreach($groups as $groupid => $group){
 			$groups[$groupid]['hosts'] = array();
 		}
@@ -309,27 +308,52 @@ include_once('include/page_header.php');
 			}
 		}
 		
+		
 		foreach($groups as $groupid => $group){
+			$tpl_count = 0;
+			$host_count = 0;
 			$i = 0;
 			$hosts_output = array();
 			
 			foreach($group['hosts'] as $hostid => $host){
 				$i++;
+				
 				if($i > $config['max_in_table']){
-					array_push($hosts_output, new CLink('...', 'hosts.php?config=0&hostid=0&groupid='.$groupid), '//empty for array_pop');
+					array_push($hosts_output, '...', '//empty for array_pop');
 					break;
 				}
-				$link = 'hosts.php?form=update&config=0&hostid='.$hostid;
-				$style = ($host['status'] == HOST_STATUS_NOT_MONITORED) ? 'on' : (($host['status'] == HOST_STATUS_TEMPLATE) ? 'unknown' : null);
-				array_push($hosts_output, new CLink($host['host'], $link, $style), ', ');
+				
+				Switch($host['status']){
+					case HOST_STATUS_NOT_MONITORED:
+						$style = 'on';
+						$url = 'hosts.php?form=update&hostid='.$hostid.'&groupid='.$groupid;
+					break;
+					case HOST_STATUS_TEMPLATE:
+						$style = 'unknown';
+						$url = 'templates.php?form=update&templateid='.$hostid.'&groupid='.$groupid;
+					break;
+					default:
+						$style = null;
+						$url = 'hosts.php?form=update&hostid='.$hostid.'&groupid='.$groupid;
+					break;
+				}
+				array_push($hosts_output, new CLink($host['host'], $url, $style), ', ');	
 			}
 			array_pop($hosts_output);
+			
+			foreach($group['hosts'] as $hostid => $host){
+				$host['status'] == HOST_STATUS_TEMPLATE ? $tpl_count++ : $host_count++;
+			}
 
-			$host_count = count($group['hosts']);
+//			$host_count = count($group['hosts']);
 			$table->addRow(array(
 				new CCheckBox('groups['.$groupid.']', NULL, NULL, $groupid),
 				new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$groupid),
-				($host_count == 0 ? '0' : new CLink($host_count, 'hosts.php?groupid='.$groupid)),
+				array(
+					array(new CLink(S_HOSTS, 'hosts.php?groupid='.$groupid),' ('.$host_count.')'),
+					BR(),
+					array(new CLink(S_TEMPLATES, 'templates.php?groupid='.$groupid, 'unknown'), ' ('.$tpl_count.')'),
+				),
 				new CCol((empty($hosts_output) ? '-' : $hosts_output), 'wraptext')
 			));
 		}
