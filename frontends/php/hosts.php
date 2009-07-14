@@ -511,7 +511,7 @@ include_once('include/page_header.php');
 
 		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 	}
-/* ACTIVATE/DISABLE HOSTS */
+// ACTIVATE/DISABLE HOSTS
 	else if(str_in_array($_REQUEST['go'], array('activate','disable'))){
 
 		$result = true;
@@ -539,7 +539,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$params = array();
-	$options = array('only_current_node','real_hosts');
+	$options = array('only_current_node');
 	if(isset($_REQUEST['form']) || isset($_REQUEST['massupdate'])) array_push($options,'do_not_select_if_empty');
 
 	foreach($options as $option) $params[$option] = 1;
@@ -631,32 +631,43 @@ include_once('include/page_header.php');
 			S_ERROR
 			));
 
-		$sql_from = '';
-		$sql_where = '';
+		$options = array(
+					'hostids' => $PAGE_HOSTS['hostids'],
+					'extendoutput' => 1,
+					'select_items' => 1,
+					'select_triggers' => 1,
+					'select_graphs' => 1,
+					'editable' => 1,
+					'order' => 'host'
+				);
+				
 		if($_REQUEST['groupid'] > 0){
-			$sql_from.= ',hosts_groups hg ';
-			$sql_where.= ' AND hg.groupid='.$_REQUEST['groupid'].' AND hg.hostid=h.hostid ';
+			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
-
-		$sql='SELECT DISTINCT h.* '.
-			' FROM hosts h '.$sql_from.
-			' WHERE '.DBcondition('h.hostid',$available_hosts).
-				$sql_where.
-			order_by('h.host,h.port,h.ip,h.status,h.available,h.dns');
-		$result=DBselect($sql);
-		while($row=DBfetch($result)){
+		
+		$hosts = Chost::get($options);
+		foreach($hosts as $hostid => $row){
 			$description = array();
 
-			$items = new CLink(S_ITEMS,'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']);
-			$triggers = new CLink(S_TRIGGERS,'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']);
-			$graphs = new CLink(S_GRAPHS,'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']);
+			$items = array(
+					new CLink(S_ITEMS,'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']),
+					' ('.count($row['itemids']).')'
+				);
+			$triggers = array(
+					new CLink(S_TRIGGERS,'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']),
+					' ('.count($row['triggerids']).')'
+				);
+			$graphs = array(
+					new CLink(S_GRAPHS,'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']),
+					' ('.count($row['graphids']).')'
+				);
 				
 			if($row['proxy_hostid']){
 				$proxy = get_host_by_hostid($row['proxy_hostid']);
 				array_push($description,$proxy['host'],':');
 			}
 
-			array_push($description, new CLink($row['host'], 'hosts.php?form=update&hostid='.$row['hostid'].url_param('groupid').url_param('config'), 'action'));
+			array_push($description, new CLink($row['host'], 'hosts.php?form=update&hostid='.$row['hostid'].url_param('groupid')));
 
 			$templates = get_templates_by_hostid($row['hostid']);
 
@@ -673,10 +684,10 @@ include_once('include/page_header.php');
 
 			switch($row['status']){
 				case HOST_STATUS_MONITORED:
-					$status=new CLink(S_MONITORED,'hosts.php?hostid='.$row['hostid'].'&disable=1'.url_param('config').url_param('groupid'),'off');
+					$status=new CLink(S_MONITORED,'hosts.php?hosts%5B%5D='.$row['hostid'].'&go=disable'.url_param('groupid'),'off');
 					break;
 				case HOST_STATUS_NOT_MONITORED:
-					$status=new CLink(S_NOT_MONITORED,'hosts.php?hostid='.$row['hostid'].'&activate=1'.url_param('config').url_param('groupid'),'on');
+					$status=new CLink(S_NOT_MONITORED,'hosts.php?hosts%5B%5D='.$row['hostid'].'&go=activate'.url_param('groupid'),'on');
 					break;
 				default:
 					$status=S_UNKNOWN;
