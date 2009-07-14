@@ -317,9 +317,9 @@ class CHost {
 		
 // Adding Objects
 
-		$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);	
 // Adding Items
 		if($options['select_items']){
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'nopermissions' => 1);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
 				foreach($item['hostids'] as $num => $hostid){
@@ -330,6 +330,7 @@ class CHost {
 	
 // Adding triggers	
 		if($options['select_triggers']){
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
 			$triggers = CTrigger::get($obj_params);
 			foreach($triggers as $triggerid => $trigger){
 				foreach($trigger['hostids'] as $num => $hostid){
@@ -340,6 +341,7 @@ class CHost {
 		
 // Adding graphs
 		if($options['select_graphs']){
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
 			$graphs = CGraph::get($obj_params);
 			foreach($graphs as $graphid => $graph){
 				foreach($graph['hostids'] as $num => $hostid){

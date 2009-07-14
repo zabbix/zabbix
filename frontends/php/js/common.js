@@ -101,7 +101,7 @@ function SDI(msg){
 		doc_body.appendChild(div_help);
 		
 		div_help.setAttribute('id','div_help');
-		div_help.setAttribute('style','position: absolute; left: 10px; top: 100px; border: 1px red solid; width: 500px; height: 400px; background-color: white; overflow: auto; z-index: 20;');
+		div_help.setAttribute('style','position: absolute; right: 10px; top: 100px; border: 1px red solid; width: 500px; height: 400px; background-color: white; overflow: auto; z-index: 20;');
 		
 //		new Draggable(div_help,{});
 	}
@@ -199,18 +199,6 @@ function checkAll(form_name, chkMain, shkName){
 
 	chkbxRange.checkAll(shkName, value);
 	return true;
-	
-	for (var i=0; i < frmForm.length; i++){
-		name = frmForm.elements[i].name.split('[')[0];
-		if(frmForm.elements[i].type != 'checkbox') continue;
-		if(name == chkMain) continue;
-		if(shkName && shkName != name) continue;
-		if(frmForm.elements[i].disabled == true) continue;
-		
-		frmForm.elements[i].checked = value;
-	}
-
-	chkbxRange.setGo();
 }
 
 function close_window(){
@@ -293,6 +281,12 @@ function eventTarget(e){
 	if (targ.nodeType == 3) targ = targ.parentNode;
 
 return targ;
+}
+
+function getParent(obj, name){
+	if(obj.parentNode.nodeName.toLowerCase() == name.toLowerCase()) return obj.parentNode;
+	else if(obj.parentNode.nodeName.toLowerCase() == 'body') return null;
+	else return getParent(obj.parentNode, name);
 }
 
 function getPosition(obj){
@@ -741,7 +735,6 @@ checkAll: function(name, value){
 			var obj_name = chk_bx[i].name.split('[')[0];
 
 			if(obj_name == name){
-
 				chk_bx[i].checked = value;
 			}
 
@@ -763,9 +756,28 @@ setGo: function(){
 			if(typeof(chk_bx[i]) !='undefined'){
 				var box = chk_bx[i];
 				var obj_name = box.name.split('[')[0];
+				var crow = getParent(box,'tr');
 
-				if((obj_name == this.pageGoName) && (box.checked)){
-					countChecked++;
+				if(box.checked){
+					if(!is_null(crow)){
+						var oldClass = crow.getAttribute('oldClass');
+						if(is_null(oldClass))
+							crow.setAttribute('oldClass',crow.className);
+							
+						crow.className = 'selected';
+					}
+					
+					if(obj_name == this.pageGoName) countChecked++;
+				}
+				else{
+					if(!is_null(crow)){
+						var oldClass = crow.getAttribute('oldClass');
+
+						if(!is_null(oldClass)){
+							crow.className = oldClass;
+							crow.removeAttribute('oldClass');
+						}
+					}
 				}
 
 			}
