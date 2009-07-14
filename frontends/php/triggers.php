@@ -421,7 +421,6 @@
 	$form->addItem(new CButton('form',S_CREATE_TRIGGER));
 	
 	show_table_header(S_CONFIGURATION_OF_TRIGGERS_BIG,$form);
-	echo SBR;
 ?>
 <?php
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['g_triggerid'])){
@@ -436,6 +435,65 @@
 	}
 	else{
 /* TABLE */
+
+// <<<--- SELECTED HOST HEADER INFORMATION --->>>	
+		if($PAGE_HOSTS['selected'] > 0){
+		
+			$header_host = CHost::getByID(array('hostid' => $PAGE_HOSTS['selected']));
+			
+			$description = array();
+			if($header_host['proxy_hostid']){
+				$proxy = get_host_by_hostid($header_host['proxy_hostid']);
+				array_push($description, $proxy['host'], ':');
+			}			
+			array_push($description, new CLink($header_host['host'], 'hosts.php?form=update&hostid='.$header_host['hostid'].url_param('groupid'), 'action'));
+
+			$graphs = new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']);
+			$items = new CLink(S_ITEMS,'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']);
+			
+			$dns = empty($header_host['dns']) ? '-' : $header_host['dns'];
+			$ip = empty($header_host['ip']) ? '-' : $header_host['ip'];
+			$port = empty($header_host['port']) ? '-' : $header_host['port'];
+			if(1 == $header_host['useip'])
+				$ip = bold($ip);
+			else
+				$dns = bold($dns);
+				
+				
+			switch($header_host['status']){
+				case HOST_STATUS_MONITORED:
+					$status=new CSpan(S_MONITORED, 'off');
+					break;
+				case HOST_STATUS_NOT_MONITORED:
+					$status=new CSpan(S_NOT_MONITORED, 'off');
+					break;
+				default:
+					$status=S_UNKNOWN;
+			}
+
+			if($header_host['available'] == HOST_AVAILABLE_TRUE)
+				$available=new CSpan(S_AVAILABLE,'off');
+			else if($header_host['available'] == HOST_AVAILABLE_FALSE)
+				$available=new CSpan(S_NOT_AVAILABLE,'on');
+			else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
+				$available=new CSpan(S_UNKNOWN,'unknown');
+
+				
+			$tbl_header_host = new CTableInfo();
+			$tbl_header_host->addRow(array(
+				new CLink(bold(S_HOST_INFO), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
+				$description,
+				$items,
+				$graphs,
+				array(bold(S_DNS.': '), $dns),
+				array(bold(S_IP.': '), $ip),
+				array(bold(S_PORT.': '), $port),
+				array(bold(S_STATUS.': '), $status),
+				array(bold(S_AVAILABILITY.': '), $available)));
+			$tbl_header_host->show();
+		}
+// --->>> SELECTED HOST HEADER INFORMATION <<<---
+
 		$r_form = new CForm();
 		$r_form->setMethod('get');
 		$r_form->addItem(array('[',
@@ -619,13 +677,8 @@
 
 		$form->addItem($table);
 		$form->show();
-	}
-	if(isset($row_count))
 		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
-
-?>
-
-<?php
+	}
 
 include_once('include/page_footer.php');
 

@@ -673,10 +673,10 @@ include_once('include/page_header.php');
 
 			switch($row['status']){
 				case HOST_STATUS_MONITORED:
-					$status=new CLink(S_MONITORED,'hosts.php?hosts%5B%5D='.$row['hostid'].'&disable=1'.url_param('config').url_param('groupid'),'off');
+					$status=new CLink(S_MONITORED,'hosts.php?hostid='.$row['hostid'].'&disable=1'.url_param('config').url_param('groupid'),'off');
 					break;
 				case HOST_STATUS_NOT_MONITORED:
-					$status=new CLink(S_NOT_MONITORED,'hosts.php?hosts%5B%5D='.$row['hostid'].'&activate=1'.url_param('config').url_param('groupid'),'on');
+					$status=new CLink(S_NOT_MONITORED,'hosts.php?hostid='.$row['hostid'].'&activate=1'.url_param('config').url_param('groupid'),'on');
 					break;
 				default:
 					$status=S_UNKNOWN;
