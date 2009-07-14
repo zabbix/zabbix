@@ -439,17 +439,32 @@
 // <<<--- SELECTED HOST HEADER INFORMATION --->>>	
 		if($PAGE_HOSTS['selected'] > 0){
 		
-			$header_host = CHost::getByID(array('hostid' => $PAGE_HOSTS['selected']));
+			$header_host = CHost::get(array(
+										'hostids' => $PAGE_HOSTS['selected'],
+										'nopermissions' => 1,
+										'extendoutput' => 1,
+										'select_items' => 1,
+										'select_graphs' => 1
+									));
+			$header_host = array_pop($header_host);
 			
 			$description = array();
 			if($header_host['proxy_hostid']){
 				$proxy = get_host_by_hostid($header_host['proxy_hostid']);
-				array_push($description, $proxy['host'], ':');
+				$description[] = $proxy['host'].':';
 			}			
-			array_push($description, new CLink($header_host['host'], 'hosts.php?form=update&hostid='.$header_host['hostid'].url_param('groupid'), 'action'));
+			
+			$description[] = new CLink($header_host['host'], 'hosts.php?form=update&hostid='.$header_host['hostid'].url_param('groupid'));
 
-			$graphs = new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']);
-			$items = new CLink(S_ITEMS,'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']);
+			$items = array(
+							new CLink(S_ITEMS, 'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
+							' ('.count($header_host['itemids']).')'
+						);
+
+			$graphs = array(
+							new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
+							' ('.count($header_host['graphids']).')'
+						);
 			
 			$dns = empty($header_host['dns']) ? '-' : $header_host['dns'];
 			$ip = empty($header_host['ip']) ? '-' : $header_host['ip'];
