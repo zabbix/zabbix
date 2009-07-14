@@ -194,6 +194,7 @@ include_once('include/page_header.php');
 // Find Host groups
 	$params = array(
 				'nodeids'=> get_current_nodeid(),
+				'extendoutput' => 1,
 				'pattern' => $search,
 				'limit' => $rows_per_page,
 				'order' => 'name',
@@ -250,6 +251,7 @@ include_once('include/page_header.php');
 	if($admin){
 		$params = array(
 					'nodeid'=> get_current_nodeid(),
+					'extendoutput' => 1,
 					'pattern' => $search,
 					'limit' => $rows_per_page,
 					'order' => 'host',
