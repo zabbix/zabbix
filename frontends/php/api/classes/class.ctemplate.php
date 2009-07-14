@@ -31,7 +31,7 @@ class CTemplate {
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 		
-		$sort_columns = array('hostid, host'); // allowed columns for sorting
+		$sort_columns = array('hostid', 'host'); // allowed columns for sorting
 		
 		$sql_parts = array(
 			'select' => array('templates' => 'h.hostid'),

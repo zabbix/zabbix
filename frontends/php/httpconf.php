@@ -30,6 +30,7 @@
 
 include_once 'include/page_header.php';
 
+	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
 
@@ -63,7 +64,10 @@ include_once 'include/page_header.php';
 
 		'showdisabled'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null),
 
-		'group_task'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+// Actions
+		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
+
+// form
 		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -207,85 +211,84 @@ include_once 'include/page_header.php';
 			unset($_REQUEST['form']);
 		}
 	}
-	else if(isset($_REQUEST['group_task'])&&isset($_REQUEST['group_httptestid'])){
-		if($_REQUEST['group_task']=='Delete selected'){
-			$result = false;
+// -------- GO ---------
+	else if(($_REQUEST['go'] == 'activate') && isset($_REQUEST['group_httptestid'])){
+		$result = false;
 
-			$group_httptestid = $_REQUEST['group_httptestid'];
-			foreach($group_httptestid as $id){
-				if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
-				/* if($httptest_data['templateid']<>0)	continue; // for future use */
-				if(delete_httptest($id)){
-					$result = true;
+		$group_httptestid = $_REQUEST['group_httptestid'];
+		foreach($group_httptestid as $id){
+			if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
 
-					$host = get_host_by_applicationid($httptest_data['applicationid']);
+			if(activate_httptest($id)){
+				$result = true;
 
-					add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
-						S_SCENARIO.' ['.$httptest_data['name'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']');
-				}
+				$host = get_host_by_applicationid($httptest_data['applicationid']);
+
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
+					S_SCENARIO.' ['.$httptest_data['name'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']'.
+					S_SCENARIO_ACTIVATED);
 			}
-			show_messages($result, S_SCENARIO_DELETED, null);
 		}
-		else if($_REQUEST['group_task'] == S_ACTIVATE_SELECTED){
-			$result = false;
+		show_messages($result, S_SCENARIO_ACTIVATED, null);
+	}
+	else if(($_REQUEST['go'] == 'disable') && isset($_REQUEST['group_httptestid'])){
+		$result = false;
 
-			$group_httptestid = $_REQUEST['group_httptestid'];
-			foreach($group_httptestid as $id){
-				if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
+		$group_httptestid = $_REQUEST['group_httptestid'];
+		foreach($group_httptestid as $id){
+			if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
 
-				if(activate_httptest($id)){
-					$result = true;
+			if(disable_httptest($id)){
+				$result = true;
 
-					$host = get_host_by_applicationid($httptest_data['applicationid']);
+				$host = get_host_by_applicationid($httptest_data['applicationid']);
 
-					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
-						S_SCENARIO.' ['.$httptest_data['name'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']'.
-						S_SCENARIO_ACTIVATED);
-				}
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
+					S_SCENARIO.' ['.$httptest_data['name'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']'.
+					S_SCENARIO_DISABLED);
 			}
-			show_messages($result, S_SCENARIO_ACTIVATED, null);
 		}
-		else if($_REQUEST['group_task']== S_DISABLE_SELECTED){
-			$result = false;
+		show_messages($result, S_SCENARIO_DISABLED, null);
+	}
+	else if(($_REQUEST['go'] == 'clean_history') && isset($_REQUEST['group_httptestid'])){
+		$result = false;
 
-			$group_httptestid = $_REQUEST['group_httptestid'];
-			foreach($group_httptestid as $id){
-				if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
+		$group_httptestid = $_REQUEST['group_httptestid'];
+		foreach($group_httptestid as $id){
+			if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
 
-				if(disable_httptest($id)){
-					$result = true;
+			if(delete_history_by_httptestid($id)){
+				$result = true;
+				DBexecute('update httptest set nextcheck=0'.
+					/* ',lastvalue=null,lastclock=null,prevvalue=null'. // for future use */
+					' where httptestid='.$id);
 
-					$host = get_host_by_applicationid($httptest_data['applicationid']);
+				$host = get_host_by_applicationid($httptest_data['applicationid']);
 
-					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
-						S_SCENARIO.' ['.$httptest_data['name'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']'.
-						S_SCENARIO_DISABLED);
-				}
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
+					S_SCENARIO.' ['.$httptest_data['name'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']'.
+					S_HISTORY_CLEANED);
 			}
-			show_messages($result, S_SCENARIO_DISABLED, null);
 		}
-		else if($_REQUEST['group_task']== S_CLEAN_HISTORY_SELECTED_SCENARIOS){
-			$result = false;
+		show_messages($result, S_HISTORY_CLEANED, $result);
+	}
+	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_httptestid'])){
+		$result = false;
 
-			$group_httptestid = $_REQUEST['group_httptestid'];
-			foreach($group_httptestid as $id){
-				if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
+		$group_httptestid = $_REQUEST['group_httptestid'];
+		foreach($group_httptestid as $id){
+			if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
+			/* if($httptest_data['templateid']<>0)	continue; // for future use */
+			if(delete_httptest($id)){
+				$result = true;
 
-				if(delete_history_by_httptestid($id)){
-					$result = true;
-					DBexecute('update httptest set nextcheck=0'.
-						/* ',lastvalue=null,lastclock=null,prevvalue=null'. // for future use */
-						' where httptestid='.$id);
+				$host = get_host_by_applicationid($httptest_data['applicationid']);
 
-					$host = get_host_by_applicationid($httptest_data['applicationid']);
-
-					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
-						S_SCENARIO.' ['.$httptest_data['name'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']'.
-						S_HISTORY_CLEANED);
-				}
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
+					S_SCENARIO.' ['.$httptest_data['name'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']');
 			}
-			show_messages($result, S_HISTORY_CLEANED, $result);
 		}
+		show_messages($result, S_SCENARIO_DELETED, null);
 	}
 ?>
 <?php
@@ -356,7 +359,7 @@ include_once 'include/page_header.php';
 
 		$table  = new CTableInfo();
 		$table->setHeader(array(
-			new CCheckBox('all_httptests',null, "CheckAll('".$form->getName()."','all_httptests');"),
+			new CCheckBox('all_httptests',null, "checkAll('".$form->getName()."','all_httptests','group_httptestid');"),
 			is_show_all_nodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
 			$_REQUEST['hostid'] ==0 ? make_sorting_link(S_HOST,'h.host') : NULL,
 			array($link, SPACE, make_sorting_link(S_NAME,'wt.name')),
@@ -477,7 +480,7 @@ include_once 'include/page_header.php';
 					url_param('select'));
 
 			$col = new CCol(array($link,SPACE,bold($db_app['name']),SPACE.'('.$db_app['scenarios_cnt'].SPACE.S_SCENARIOS.')'));
-			$col->SetColSpan(6);
+			$col->setColSpan(6);
 
 			$table->addRow(array(
 					get_node_name_by_elid($db_app['applicationid']),
@@ -490,6 +493,22 @@ include_once 'include/page_header.php';
 			foreach($app_rows as $row)
 				$table->addRow($row);
 		}
+		
+//----- GO ------
+		$goBox = new CComboBox('go');
+		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
+		$goBox->addItem('disable',S_DISABLE_SELECTED);
+		$goBox->addItem('clean_history',S_CLEAN_HISTORY_SELECTED_ITEMS);
+		$goBox->addItem('delete',S_DELETE_SELECTED);
+
+// goButton name is necessary!!!
+		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton->setAttribute('id','goButton');
+		zbx_add_post_js('chkbxRange.pageGoName = "group_httptestid";');
+
+		$table->setFooter(new CCol(array($goBox, $goButton)));
+//----
+
 		$footerButtons = array();
 		array_push($footerButtons, new CButtonQMessage('group_task',S_ACTIVATE_SELECTED,S_ACTIVATE_SELECTED_SCENARIOS_Q));
 		array_push($footerButtons, SPACE);
@@ -498,10 +517,10 @@ include_once 'include/page_header.php';
 		array_push($footerButtons, new CButtonQMessage('group_task',S_CLEAN_HISTORY_SELECTED_SCENARIOS,S_HISTORY_CLEANING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q));
 		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButtonQMessage('group_task',S_DELETE_SELECTED,S_DELETE_SELECTED_SCENARIOS_Q));
-		$table->setFooter(new CCol($footerButtons));
+
 
 		$form->addItem($table);
-		$form->Show();
+		$form->show();
 	}
 ?>
 <?php

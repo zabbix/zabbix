@@ -2124,7 +2124,7 @@
 	}
 
 	function insert_copy_elements_to_forms($elements_array_name){
-
+		
 		$copy_type = get_request("copy_type", 0);
 		$copy_mode = get_request("copy_mode", 0);
 		$filter_groupid = get_request("filter_groupid", 0);
@@ -2145,42 +2145,50 @@
 		$cmbCopyType->addItem(1,S_HOST_GROUPS);
 		$frmCopy->addRow(S_TARGET_TYPE, $cmbCopyType);
 
-		$target_sql = 'SELECT DISTINCT g.groupid as target_id, g.name as target_name '.
-			' FROM groups g, hosts_groups hg '.
-			' WHERE hg.groupid=g.groupid '.
-				' AND '.DBin_node('g.groupid').
-			' ORDER BY g.name';
-
+		$target_list = array();
+		$groups = CHostGroup::get(array('extendoutput'=>1, 'order'=>'name'));
 		if(0 == $copy_type){
 			$cmbGroup = new CComboBox('filter_groupid',$filter_groupid,'submit()');
-			$cmbGroup->addItem(0,S_ALL_SMALL);
-			$groups = DBselect($target_sql);
-			while($group = DBfetch($groups)){
-				$cmbGroup->addItem($group["target_id"],$group["target_name"]);
+			foreach($groups as $groupid => $group){
+				if(empty($filter_groupid)) $filter_groupid = $groupid;
+				$cmbGroup->addItem($groupid,$group['name']);
 			}
 
 			$frmCopy->addRow('Group', $cmbGroup);
-
-			$target_sql = 'SELECT h.hostid as target_id, h.host as target_name FROM hosts h ';
-			if($filter_groupid > 0){
-				$target_sql .= ', hosts_groups hg WHERE hg.hostid=h.hostid AND hg.groupid='.$filter_groupid;
+			
+			$options = array('extendoutput'=>1, 
+							'order'=>'host',
+							'groupids'=> $filter_groupid);
+			$hosts = CHost::get($options);
+			foreach($hosts as $hostid => $host){
+				array_push($target_list,array(
+					new CCheckBox('copy_targetid['.$hostid.']',
+						uint_in_array($hostid, $copy_targetid),
+						null,
+						$hostid),
+					SPACE,
+					$host['host'],
+					BR()
+					));
 			}
-			$target_sql.=' ORDER BY target_name';
+		}
+		else{
+			foreach($groups as $groupid => $group){
+				array_push($target_list,array(
+					new CCheckBox('copy_targetid['.$groupid.']',
+						uint_in_array($groupid, $copy_targetid),
+						null,
+						$groupid),
+					SPACE,
+					$group['name'],
+					BR()
+					));
+			}
 		}
 
-		$db_targets = DBselect($target_sql);
-		$target_list = array();
-		while($target = DBfetch($db_targets)){
-			array_push($target_list,array(
-				new CCheckBox('copy_targetid['.$target['target_id'].']',
-					uint_in_array($target['target_id'], $copy_targetid),
-					null,
-					$target['target_id']),
-				SPACE,
-				$target['target_name'],
-				BR()
-				));
-		}
+
+
+
 
 		$frmCopy->addRow(S_TARGET, $target_list);
 

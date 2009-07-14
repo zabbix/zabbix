@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -273,19 +273,22 @@
 			return	$row;
 		}
 		/* error("No user with id [$userid]"); */
-		return	false;
+	return	false;
 	}
 
-
-	function get_userid_by_usrgrpid($usrgrpid){
+	function get_userid_by_usrgrpid($usrgrpids){
+		zbx_value2array($usrgrpids);
+		
 		$userids = array();
-		if($res=DBselect('SELECT DISTINCT u.userid '.
-						' FROM users u,users_groups ug '.
-						' WHERE u.userid=ug.userid '.
-							' AND ug.usrgrpid='.$usrgrpid.
-							' AND '.DBin_node('ug.usrgrpid', get_current_nodeid(false))))
-		{
-			while($rows = DBFetch($res)) $userids[]=$rows['userid'];
+		
+		$sql = 'SELECT DISTINCT u.userid '.
+				' FROM users u,users_groups ug '.
+				' WHERE u.userid=ug.userid '.
+					' AND '.DBcondition('ug.usrgrpid',$usrgrpids).
+					' AND '.DBin_node('ug.usrgrpid', get_current_nodeid(false));
+		$res = DBselect($sql);
+		while($user = DBFetch($res)){
+			$userids[$user['userid']] = $user['userid'];
 		}
 
 	return $userids;
@@ -321,10 +324,13 @@
 
 // description:
 //		checks if user is adding himself to disabled group
-	function granted2update_group($usrgrpid){
+	function granted2update_group($usrgrpids){
 		global $USER_DETAILS;
-		$users = get_userid_by_usrgrpid($usrgrpid);
+		zbx_value2array($usrgrpids);
+			
+		$users = get_userid_by_usrgrpid($usrgrpids);
 		$result=(!uint_in_array($USER_DETAILS['userid'],$users));
+
 	return $result;
 	}
 
@@ -436,17 +442,20 @@
 	return $result;
 	}
 
-	function delete_user_group($usrgrpid){
-		$result = DBexecute("delete from rights where groupid=$usrgrpid");
+	function delete_user_group($usrgrpids){
+		zbx_value2array($usrgrpids);
+		
+		$result = DBexecute('DELETE FROM rights WHERE '.DBcondition('groupid',$usrgrpids));
 		if(!$result)	return	$result;
 
-		DBexecute('delete from operations where object='.OPERATION_OBJECT_GROUP.' and objectid='.$usrgrpid);
+		DBexecute('DELETE FROM operations WHERE object='.OPERATION_OBJECT_GROUP.' AND '.DBcondition('objectid',$usrgrpids));
 
-		$result = DBexecute("delete from users_groups where usrgrpid=$usrgrpid");
+		$result = DBexecute('DELETE FROM users_groups WHERE '.DBcondition('usrgrpid',$usrgrpids));
 		if(!$result)	return	$result;
 
-		$result = DBexecute("delete from usrgrp where usrgrpid=$usrgrpid");
-	return	$result;
+		$result = DBexecute('DELETE FROM usrgrp WHERE '.DBcondition('usrgrpid',$usrgrpids));
+		
+	return $result;
 	}
 
 	function get_group_by_usrgrpid($usrgrpid){
@@ -458,44 +467,48 @@
 	}
 
 
-	function change_group_status($usrgrpid,$users_status){
+	function change_group_status($usrgrpids,$users_status){
+		zbx_value2array($usrgrpids);
+		
 		$res = false;
-
 		$grant = true;
-		if($users_status == GROUP_STATUS_DISABLED) $grant = granted2update_group($usrgrpid);
+		if($users_status == GROUP_STATUS_DISABLED) $grant = granted2update_group($usrgrpids);
 
-		if($grant){
-			$res = DBexecute('UPDATE usrgrp SET users_status='.$users_status.' WHERE usrgrpid='.$usrgrpid);
-		}
-		else{
+		if($grant)
+			$res = DBexecute('UPDATE usrgrp SET users_status='.$users_status.' WHERE '.DBcondition('usrgrpid',$usrgrpids));
+		else
 			error(S_USER_CANNOT_CHANGE_STATUS);
-		}
+
 	return $res;
 	}
 
 
-	function change_group_gui_access($usrgrpid,$gui_access){
+	function change_group_gui_access($usrgrpids,$gui_access){
+		zbx_value2array($usrgrpids);
+		
 		$res = false;
+		$grant = true;
+		if($gui_access == GROUP_GUI_ACCESS_DISABLED) $grant = granted2update_group($usrgrpids);
 
-		if(($gui_access == GROUP_GUI_ACCESS_DISABLED) && !granted2update_group($usrgrpid)){
+		if($grant)
+			$res = DBexecute('UPDATE usrgrp SET gui_access='.$gui_access.' WHERE '.DBcondition('usrgrpid',$usrgrpids));
+		else
 			error(S_USER_CANNOT_CHANGE_GUI_ACCESS);
-			return false;
-		}
-
-		$res = DBexecute('UPDATE usrgrp SET gui_access='.$gui_access.' WHERE usrgrpid='.$usrgrpid);
 
 	return $res;
 	}
 
-	function change_group_api_access($usrgrpid, $api_access){
+	function change_group_api_access($usrgrpids, $api_access){
+		zbx_value2array($usrgrpids);
 		$res = false;
-		$res = DBexecute('UPDATE usrgrp SET api_access='.$api_access.' WHERE usrgrpid='.$usrgrpid);
+		$res = DBexecute('UPDATE usrgrp SET api_access='.$api_access.' WHERE '.DBcondition('usrgrpid',$usrgrpids));
 	return $res;
 	}
 
-	function change_group_debug_mode($usrgrpid, $debug_mode){
+	function change_group_debug_mode($usrgrpids, $debug_mode){
+		zbx_value2array($usrgrpids);
 		$res = false;
-		$res = DBexecute('UPDATE usrgrp SET debug_mode='.$debug_mode.' WHERE usrgrpid='.$usrgrpid);
+		$res = DBexecute('UPDATE usrgrp SET debug_mode='.$debug_mode.' WHERE '.DBcondition('usrgrpid',$usrgrpids));
 	return $res;
 	}
 

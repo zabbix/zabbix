@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,16 +19,17 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/forms.inc.php";
-	require_once "include/discovery.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/forms.inc.php');
+	require_once('include/discovery.inc.php');
 
-	$page["title"]	= "S_CONFIGURATION_OF_DISCOVERY";
-	$page["file"]	= "discoveryconf.php";
+	$page['title']	= "S_CONFIGURATION_OF_DISCOVERY";
+	$page['file']	= 'discoveryconf.php';
 	$page['hist_arg'] = array('');
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
+	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -60,12 +61,12 @@ include_once "include/page_header.php";
 
 		'type_changed'=>	array(T_ZBX_INT, O_OPT, null, IN(1), null),
 
-/* actions */
+// Actions
+		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
+
+// form
 		'add_check'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete_ckecks'=> 	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'group_enable'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'group_disable'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'group_delete'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -154,33 +155,31 @@ include_once "include/page_header.php";
 		}
 
 	}
-	else if(inarr_isset('g_druleid')){
-		if(inarr_isset('group_disable') || inarr_isset('group_enable')){
-			$status = DRULE_STATUS_ACTIVE;
-			if(isset($_REQUEST['group_disable'])) $status = DRULE_STATUS_DISABLED;
+// ------- GO --------
+	else if(str_in_array($_REQUEST['go'], array('activate','disable')) && isset($_REQUEST['g_druleid'])){
+		$status = ($_REQUEST['go'] == 'activate')?DRULE_STATUS_ACTIVE:DRULE_STATUS_DISABLED;
 
-			$result = false;
-			foreach($_REQUEST['g_druleid'] as $drid){
-				if(set_discovery_rule_status($drid,$status)){
-					$rule_data = get_discovery_rule_by_druleid($drid);
-					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_DISCOVERY_RULE,
-						'['.$drid.'] '.$rule_data['name']);
-					$result = true;
-				}
+		$result = false;
+		foreach($_REQUEST['g_druleid'] as $drid){
+			if(set_discovery_rule_status($drid,$status)){
+				$rule_data = get_discovery_rule_by_druleid($drid);
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_DISCOVERY_RULE,
+					'['.$drid.'] '.$rule_data['name']);
+				$result = true;
 			}
-			show_messages($result,S_DISCOVERY_RULES_UPDATED);
 		}
-		else if( inarr_isset('group_delete') ){
-			$result = false;
-			foreach($_REQUEST['g_druleid'] as $drid){
-				if(delete_discovery_rule($drid)){
-					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_DISCOVERY_RULE,
-						'['.$drid.']');
-					$result = true;
-				}
+		show_messages($result,S_DISCOVERY_RULES_UPDATED);
+	}
+	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_druleid'])){
+		$result = false;
+		foreach($_REQUEST['g_druleid'] as $drid){
+			if(delete_discovery_rule($drid)){
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_DISCOVERY_RULE,
+					'['.$drid.']');
+				$result = true;
 			}
-			show_messages($result,S_DISCOVERY_RULES_DELETED);
 		}
+		show_messages($result,S_DISCOVERY_RULES_DELETED);
 	}
 ?>
 <?php
@@ -205,7 +204,7 @@ include_once "include/page_header.php";
 
 		$tblDiscovery = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
 		$tblDiscovery->setHeader(array(
-			new CCheckBox('all_drules',null,"CheckAll('".$form->GetName()."','all_drules');"),
+			new CCheckBox('all_drules',null,"checkAll('".$form->GetName()."','all_drules','g_druleid');"),
 			make_sorting_link(S_NAME,'d.name'),
 			make_sorting_link(S_IP_RANGE,'d.iprange'),
 			make_sorting_link(S_DELAY,'d.delay'),
@@ -243,27 +242,26 @@ include_once "include/page_header.php";
 			$tblDiscovery->addRow(array(
 				new CCheckBox('g_druleid['.$rule_data["druleid"].']',null,null,$rule_data["druleid"]),
 				$description,
-/*				array(
-					new CCheckBox(
-						"g_druleid[]",
-						null,
-						null,
-						$rule_data["druleid"]),
-					SPACE,
-					new CLink($rule_data['name'],
-						"?form=update&druleid=".$rule_data['druleid']),
-					),*/
 				$rule_data['iprange'],
 				$rule_data['delay'],
 				implode(',', $cheks),
 				$status
 				));
 		}
-		$tblDiscovery->setFooter(new CCol(array(
-			new CButtonQMessage('group_enable',S_ENABLE_SELECTED, S_ENABLE_SELECTED_RULES_Q), SPACE,
-			new CButtonQMessage('group_disable',S_DISABLE_SELECTED, S_DISABLE_SELECTED_RULES_Q), SPACE,
-			new CButtonQMessage('group_delete',S_DELETE_SELECTED, S_DELETE_SELECTED_RULES_Q)
-		)));
+		
+//----- GO ------
+		$goBox = new CComboBox('go');
+		$goBox->addItem('activate',S_ENABLE_SELECTED);
+		$goBox->addItem('disable',S_DISABLE_SELECTED);
+		$goBox->addItem('delete',S_DELETE_SELECTED);
+
+// goButton name is necessary!!!
+		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton->setAttribute('id','goButton');
+		zbx_add_post_js('chkbxRange.pageGoName = "g_druleid";');
+
+		$tblDiscovery->setFooter(new CCol(array($goBox, $goButton)));
+//----
 
 		$form->addItem($tblDiscovery);
 		$form->Show();

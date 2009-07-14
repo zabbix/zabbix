@@ -276,6 +276,8 @@ include_once('include/page_header.php');
 
 		$form = new CForm();
 		$form->setName('applications');
+		$form->addVar('groupid', $PAGE_GROUPS['selected']);
+		$form->addVar('hostid', $PAGE_HOSTS['selected']);
 
 		$table = new CTableInfo();
 		$table->setHeader(array(
