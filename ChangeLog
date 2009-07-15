@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-358] added notification macros {TRIGGER.KEY[1..9]} (Sasha)
  - [DEV-358] added notification macros {HOSTNAME[1..9]} (Sasha)
  - [DEV-358] added notification macros {ITEM.NAME[1..9]} (Sasha)
  - [DEV-358] added notification macros {PROFILE.*[1..9]} (Sasha)
