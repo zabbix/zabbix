@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-358] added notification macros {ITEM.VALUE} and {ITEM.VALUE[1..9]} (Sasha)
  - [DEV-358] added notification/trigger description macros {ITEM.LASTVALUE[1..9]} (Sasha)
  - [DEV-358] added notification macros {HOST.CONN[1..9]} {HOST.DNS[1..9]} {IPADDRESS[1..9]} (Sasha)
  - [DEV-358] added notification macros {TRIGGER.KEY[1..9]} (Sasha)

@@ -1229,6 +1229,70 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBget_item_value_by_triggerid                                    *
+ *                                                                            *
+ * Purpose: retrieve item lastvalue by triggerid                              *
+ *                                                                            *
+ * Parameters: functionid - function identificator from database              *
+ *             lastvalue - pointer to result buffer. Must be NULL             *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, int N_functionid, int clock)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_RESULT	h_result;
+	DB_ROW		h_row;
+	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
+	zbx_uint64_t	functionid;
+	int		ret = FAIL;
+	char		tmp[MAX_STRING_LEN], *table;
+
+	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
+		return FAIL;
+
+	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
+		return FAIL;
+
+	result = DBselect("select i.itemid,i.value_type from items i,functions f "
+			" where i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
+			functionid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		switch (atoi(row[1])) {
+			case ITEM_VALUE_TYPE_FLOAT:	table = "history"; break;
+			case ITEM_VALUE_TYPE_UINT64:	table = "history_uint"; break;
+			case ITEM_VALUE_TYPE_TEXT:	table = "history_text"; break;
+			case ITEM_VALUE_TYPE_STR:	table = "history_str"; break;
+			case ITEM_VALUE_TYPE_LOG:
+			default:			table = "history_log"; break;
+		}
+
+		zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s and clock=%d",
+				table, row[0], clock);
+		h_result = DBselectN(tmp, 1);
+		if (NULL != (h_row = DBfetch(h_result)))
+		{
+			*value = zbx_dsprintf(*value, "%s", h_row[0]);
+			ret = SUCCEED;
+		}
+		DBfree_result(h_result);
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_escalation_history                                           *
  *                                                                            *
  * Purpose: retrieve escalation history                                       *
@@ -1511,6 +1575,7 @@ static int	get_node_value_by_event(DB_EVENT *event, char **replace_to, const cha
 #define MVAR_HOST_CONN			"{HOST.CONN}"
 #define MVAR_TIME			"{TIME}"
 #define MVAR_ITEM_LASTVALUE		"{ITEM.LASTVALUE}"
+#define MVAR_ITEM_VALUE			"{ITEM.VALUE}"
 #define MVAR_ITEM_NAME			"{ITEM.NAME}"
 #define MVAR_ITEM_LOG_DATE		"{ITEM.LOG.DATE}"
 #define MVAR_ITEM_LOG_TIME		"{ITEM.LOG.TIME}"
@@ -1564,6 +1629,7 @@ static const char	*ex_macros[] = {MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MV
 				MVAR_TRIGGER_KEY,
 				MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_IPADDRESS,
 				MVAR_ITEM_LASTVALUE,
+				MVAR_ITEM_VALUE,
 				NULL};
 #define			EX_SUFFIX_NUM 10
 static const char	*ex_suffix[EX_SUFFIX_NUM] = {"}", "1}", "2}", "3}", "4}", "5}", "6}", "7}", "8}", "9}"};
@@ -1697,6 +1763,8 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 							"case when h.useip=1 then h.ip else h.dns end");
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 					ret = DBget_item_lastvalue_by_triggerid(event->objectid, &replace_to, N_functionid);
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
+					ret = DBget_item_value_by_triggerid(event->objectid, &replace_to, N_functionid, event->clock);
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_DATE))
 				{
 					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
@@ -1831,6 +1899,8 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid, "h.host");
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 					ret = DBget_item_lastvalue_by_triggerid(event->objectid, &replace_to, N_functionid);
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
+					ret = DBget_item_value_by_triggerid(event->objectid, &replace_to, N_functionid, event->clock);
 			}
 		}
 		else if (macro_type & MACRO_TYPE_TRIGGER_EXPRESSION)
