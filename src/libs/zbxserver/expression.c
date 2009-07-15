@@ -1276,7 +1276,7 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 			default:			table = "history_log"; break;
 		}
 
-		zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s and clock=%d",
+		zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s and clock<=%d order by itemid,clock desc",
 				table, row[0], clock);
 		h_result = DBselectN(tmp, 1);
 		if (NULL != (h_row = DBfetch(h_result)))
