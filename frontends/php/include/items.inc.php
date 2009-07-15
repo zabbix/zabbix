@@ -1403,7 +1403,6 @@ COpt::profiling_stop('prepare table');
 		}
 
 		if($last == 0){
-		zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s and clock<=%d order by itemid,clock desc",
 			$sql = 'select value from '.$table.' where itemid='.$db_item['itemid'].' and clock<='.$clock.
 					' order by itemid,clock desc';
 			$row = DBfetch(DBselect($sql, 1));
