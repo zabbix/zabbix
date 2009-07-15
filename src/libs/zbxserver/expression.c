@@ -1562,6 +1562,7 @@ static const char	*ex_macros[] = {MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MV
 				MVAR_ITEM_NAME,
 				MVAR_HOSTNAME,
 				MVAR_TRIGGER_KEY,
+				MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_IPADDRESS,
 				NULL};
 #define			EX_SUFFIX_NUM 10
 static const char	*ex_suffix[EX_SUFFIX_NUM] = {"}", "1}", "2}", "3}", "4}", "5}", "6}", "7}", "8}", "9}"};
@@ -1687,11 +1688,11 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 				else if (0 == strcmp(m, MVAR_TRIGGER_KEY))
 					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid, "i.key_");
 				else if (0 == strcmp(m, MVAR_IPADDRESS))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "h.ip");
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid, "h.ip");
 				else if (0 == strcmp(m, MVAR_HOST_DNS))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "h.dns");
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid, "h.dns");
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1,
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
 							"case when h.useip=1 then h.ip else h.dns end");
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 					ret = DBget_item_lastvalue_by_triggerid(event->objectid, &replace_to, 1);
