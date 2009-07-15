@@ -1,7 +1,6 @@
 Changes for 1.7.0
 
  - [DEV-405] added highlighting of selected rows (Artem)
- - [DEV-397] added user name to output of {ESC.HISTORY} macros (Sasha)
  - [DEV-397] added notification macros {EVENT.ACK.STATUS} and {EVENT.ACK.HISTORY} (Sasha)
  - [DEV-405] Proxies, Nodes moved under "Administration->DM" (Artem)
  - [DEV-405] Items, Triggers, Graphs moved under "Configuration->Hosts" (Artem)
