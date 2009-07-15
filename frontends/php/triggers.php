@@ -628,7 +628,6 @@
 			}
 			else{
 				$error = new CDiv(SPACE,'ok_icon');
-				$error->setHint(S_OK_BIG, '', 'off');
 			}
 
 			switch($row['priority']){

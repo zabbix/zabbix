@@ -1028,7 +1028,7 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 
 	$last_clock = !empty($clock)?min($clock):null;
 
-	order_result($alerts, 'clock', ZBX_SORT_DOWN);
+	order_page_result($alerts, 'clock', ZBX_SORT_DOWN);
 
 	foreach($alerts as $num => $row){
 		$time=date(S_DATE_FORMAT_YMDHMS,$row['clock']);

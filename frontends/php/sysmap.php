@@ -194,7 +194,7 @@ include_once('include/page_header.php');
 		while($db_element = DBfetch($db_elements)){
 			$map_elements[$db_element['selementid']] = $db_element;
 		}
-		order_result($map_elements, 'label');
+		order_page_result($map_elements, 'label');
 		
 		foreach($map_elements as $selementid => $db_element){
 			if(    $db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)		$type = S_HOST;

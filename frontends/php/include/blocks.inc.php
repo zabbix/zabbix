@@ -256,7 +256,7 @@ function make_system_summary($args = array()){
 		}
 
 		foreach($tab_priority as $key => $value){
-				$tr_count = 0;
+			$tr_count = 0;
 			if($value){
 //* trigger list
 				$table_inf  = new CTableInfo();
@@ -340,7 +340,7 @@ function make_system_summary($args = array()){
 					unset($row_inf,$description,$actions);
 				}
 
-				$value = new CSpan($tr_count);
+				$value = new CSpan($tr_count, 'pointer');
 				$value->setHint($table_inf);
 //-------------*/
 			}
@@ -497,7 +497,7 @@ function make_latest_issues($params = array()){
 		$menus = rtrim($menus,',');
 		$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
 
-		$host = new CSpan($row['host']);
+		$host = new CSpan($row['host'],'link');
 		$host->setAttribute('onclick','javascript: '.$menus);
 		$host->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
@@ -536,7 +536,11 @@ function make_latest_issues($params = array()){
 					'events.php?triggerid='.$row['triggerid'].'&source=0&show_unknown=1&nav_time='.$row_event['clock'],
 					'action');
 
-			$description = ($row_event['url']) ? new CLink($description, $row_event['url'], 'action', null, true) : $description;
+			if($row_event['url'])
+				$description = new CLink($description, $row_event['url'], 'action', null, true);
+			else
+				$description = new CSpan($description,'pointer');
+				
 			$description = new CCol($description,get_severity_style($row["priority"]));
 			$description->setHint(make_popup_eventlist($row_event['eventid'], $row['type']));
 

@@ -19,100 +19,173 @@
 **
 */
 
-var hint_box = null;
+var hintBox = {
+boxes:	{},	// array of dom Hint Boxes
+boxesCount: 0,			// unique box id
 
-function hide_hint()
-{
-	if(!hint_box) return;
-
-	hint_box.style.visibility="hidden"
-	hint_box.style.left	= "-" + ((hint_box.style.width) ? hint_box.style.width : 100) + "px";
-}
-
-function show_hint(obj, e, hint_text)
-{
-	show_hint_ext(obj, e, hint_text, "", "");
-}
-
-function show_hint_ext(obj, e, hint_text, width, class_name)
-{
-	if(!hint_box) return;
-
-	if(class_name != ""){
-		hint_text = "<span class=" + class_name + ">" + hint_text + "</"+"span>";
-	}
-
-	hint_box.innerHTML = hint_text;
-	hint_box.style.width = width;
-
-	var cursor = get_cursor_position(e);
-	var pos = getPosition(obj);
-
-	var body_width = get_bodywidth();
-
-	if(parseInt(cursor.x+10+hint_box.offsetWidth) > body_width){
-		cursor.x-=parseInt(hint_box.offsetWidth);
-		cursor.x-=10;
-		cursor.x=(cursor.x < 0)?0:cursor.x;
-	}
-	else{
-		cursor.x+=10;
-	}
-
-	hint_box.x	= cursor.x;
-	hint_box.y	= pos.top;
-
-	hint_box.style.left = cursor.x + "px";
-//	hint_box.style.left	= hint_box.x + obj.offsetWidth + 10 + "px";
-	hint_box.style.top	= hint_box.y + obj.offsetHeight + "px";
-
-	hint_box.style.visibility = "visible";
-	obj.onmouseout	= hide_hint;
-}
-
-function update_hint(obj, e)
-{
-	if(!hint_box) return;
-	if('undefined' == typeof(hint_box.y)) return;
-
-	var cursor = get_cursor_position(e);
-	var body_width = get_bodywidth();
+createBox: function(obj, hint_text, width, className, byClick){
+	var boxid = 'hintbox_'+this.boxesCount;
 	
-	if(parseInt(cursor.x+10+hint_box.offsetWidth) > body_width){
-		cursor.x-=parseInt(hint_box.offsetWidth);
+	var box = document.createElement('div');
+	obj.parentNode.appendChild(box);
+	box.setAttribute('id', boxid);
+	box.className = 'hintbox';
+	
+	if(!empty(className)){
+		hint_text = "<span class=" + className + ">" + hint_text + "</"+"span>";
+	}
+	
+	if(!empty(width)){
+		box.style.width = width+'px';
+	}
+	
+	var close_link = '';
+	if(byClick){
+		close_link = '<div class="link" '+
+						'style="text-align: right; backgground-color: #AAA; border-bottom: 1px #333 solid;" '+
+						'onclick="hintBox.hide(\''+boxid+'\');">Close</div>';
+	}
+
+	box.innerHTML = close_link + hint_text;
+	
+	
+/*	
+	var box_close = document.createElement('div');
+	box.appendChild(box_close);	
+	box_close.appendChild(document.createTextNode('X'));
+	box_close.className = 'link';
+	box_close.setAttribute('style','text-align: right; backgground-color: #AAA;');
+	box_close.onclick = eval("function(){ hintBox.hide('"+boxid+"'); }");
+*/
+	this.boxes[boxid] = box;
+	this.boxesCount++;
+	
+return box;
+},
+
+showOver: function(e, obj, hint_text, width, className){
+	var hintid = obj.getAttribute('hintid');
+	var hintbox = $(hintid);
+
+	if(!empty(hintbox)) 
+		var byClick = hintbox.getAttribute('byclick');
+	else
+		var byClick = null;
+
+	if(!empty(byClick)) return;
+
+	var hintbox = this.createBox(obj,hint_text, width, className, false);
+	
+	obj.setAttribute('hintid', hintbox.id);
+	this.show(e, obj, hintbox);
+},
+
+hideOut: function(e, obj){
+	var hintid = obj.getAttribute('hintid');
+	var hintbox = $(hintid);
+
+	if(!empty(hintbox)) 
+		var byClick = hintbox.getAttribute('byclick');
+	else
+		var byClick = null;
+
+	if(!empty(byClick)) return;
+	
+	if(!empty(hintid)){
+		obj.removeAttribute('hintid');
+		obj.removeAttribute('byclick');
+	
+		this.hide(hintid);
+	}
+},
+
+onClick: function(e, obj, hint_text, width, className){
+	var hintid = obj.getAttribute('hintid');
+	var hintbox = $(hintid);
+
+	if(!empty(hintbox)) 
+		var byClick = hintbox.getAttribute('byclick');
+	else
+		var byClick = null;
+	
+	if(!empty(hintid) && empty(byClick)){
+		obj.removeAttribute('hintid');
+		this.hide(hintid);
+		
+		var hintbox = this.createBox(obj, hint_text, width, className, true);
+		
+		hintbox.setAttribute('byclick', 'true');
+		obj.setAttribute('hintid', hintbox.id);
+		
+		this.show(e, obj, hintbox);
+	}
+	else if(!empty(hintid)){
+		obj.removeAttribute('hintid');
+		hintbox.removeAttribute('byclick');
+		
+		this.hide(hintid);
+	}
+	else{
+		var hintbox = this.createBox(obj,hint_text, width, className, true);
+		
+		hintbox.setAttribute('byclick', 'true');
+		obj.setAttribute('hintid', hintbox.id);
+		
+		this.show(e, obj, hintbox);
+	}
+},
+
+show: function(e, obj, hintbox){
+	var hintid = hintbox.id;
+	var body_width = get_bodywidth();
+
+	var pos = getPosition(obj);
+	var cursor = get_cursor_position(e);
+	
+// by Object
+/*
+	if(parseInt(pos.left+obj.offsetWidth+4+hintbox.offsetWidth) > body_width){
+		pos.left-=parseInt(hintbox.offsetWidth);
+		pos.left-=4;
+		pos.left=(pos.left < 0)?0:pos.left;
+	}
+	else{
+		pos.left+= obj.offsetWidth+4;
+	}
+	hintbox.x	= pos.left;
+//*/
+// by Cursor
+//*
+	if(parseInt(cursor.x+10+hintbox.offsetWidth) > body_width){
+		cursor.x-=parseInt(hintbox.offsetWidth);
 		cursor.x-=10;
 		cursor.x=(cursor.x < 0)?0:cursor.x;
 	}
 	else{
 		cursor.x+=10;
 	}
+	hintbox.x	= cursor.x;
+//*/
 
-	hint_box.style.left     = cursor.x + "px";
-//	hint_box.style.left		= hint_box.x + obj.offsetWidth + 10 + "px";
-	hint_box.style.top      = hint_box.y + obj.offsetHeight + "px";
-}
+	hintbox.y	= pos.top;
 
-function create_hint_box()
-{
-	if(hint_box) return;
+	hintbox.style.left = hintbox.x + 'px';
+	hintbox.style.top	= hintbox.y + parseInt(obj.offsetHeight/2) + 'px';
+},
 
-	hint_box = document.createElement("div");
-	hint_box.setAttribute("id", "hint_box");
-	document.body.appendChild(hint_box);
+hide: function(boxid){
+	var hint = $(boxid);
+	if(!is_null(hint)){
+		delete(this.boxes[boxid]);
+		hint.parentNode.removeChild(hint);
+	}
+},
 
-	hide_hint();
+hideAll: function(){
+	for(var id in this.boxes){
+		if((typeof(this.boxes[id]) != 'undefined') && !empty(this.boxes[id])){
+			this.hide(id);
+		}
+	}
 }
-
-if (window.addEventListener)
-{
-	window.addEventListener("load", create_hint_box, false);
 }
-else if (window.attachEvent)
-{
-	window.attachEvent("onload", create_hint_box);
-}
-else if (document.getElementById)
-{
-	window.onload	= create_hint_box;
-}
-//-->

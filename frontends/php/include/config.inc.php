@@ -1135,7 +1135,8 @@ function __autoload($class_name){
 	return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
 	}
 
-	function order_result(&$data, $def_field, $def_order=ZBX_SORT_UP){
+	
+	function order_page_result(&$data, $def_field, $def_order=ZBX_SORT_UP){
 		global $page;
 
 		if(empty($data)) return false;
@@ -1143,9 +1144,17 @@ function __autoload($class_name){
 		$sortfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def_field));
 		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def_order));
 
+	return order_result($data, $sortfield, $sortorder);
+	}
+	
+	function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP){
+		global $page;
+
+		if(empty($data)) return false;
+
 		foreach($data as $key => $rows){
 			if(!isset($rows[$sortfield])){
-//				info('Page sorting failed ["'.$sortfield.'","'.$sortorder.'"]');
+//				info('Sorting failed ["'.$sortfield.'","'.$sortorder.'"]');
 				return false;
 			}
 

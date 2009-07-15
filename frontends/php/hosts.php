@@ -634,6 +634,7 @@ include_once('include/page_header.php');
 		$options = array(
 					'hostids' => $PAGE_HOSTS['hostids'],
 					'extendoutput' => 1,
+					'select_templates' => 1,
 					'select_items' => 1,
 					'select_triggers' => 1,
 					'select_graphs' => 1,
@@ -646,6 +647,7 @@ include_once('include/page_header.php');
 		}
 		
 		$hosts = Chost::get($options);
+		
 		foreach($hosts as $hostid => $row){
 			$description = array();
 
@@ -668,8 +670,6 @@ include_once('include/page_header.php');
 			}
 
 			array_push($description, new CLink($row['host'], 'hosts.php?form=update&hostid='.$row['hostid'].url_param('groupid')));
-
-			$templates = get_templates_by_hostid($row['hostid']);
 
 			$dns = empty($row['dns'])?'-':$row['dns'];
 			$ip = empty($row['ip'])?'-':$row['ip'];
@@ -706,12 +706,12 @@ include_once('include/page_header.php');
 			}
 			else{
 				$error = new CDiv(SPACE,'ok_icon');
-				$error->setHint(S_OK_BIG, '', 'off');
 			}
 
+			$templates = $row['templates'];
 			$templates_linked = array();
-			foreach($templates as $templateid => $temp){
-				$templates_linked[$templateid] = array(empty($templates_linked)?'':', ',$templates[$templateid]);
+			foreach($templates as $templateid => $template){
+				$templates_linked[$templateid] = array(empty($templates_linked)?'':', ',$template['host']);
 			}
 
 			$table->addRow(array(
@@ -730,11 +730,6 @@ include_once('include/page_header.php');
 			));
 
 			$row_count++;
-
-			$jsmenu = new CPUMenu(null,270);
-			$jsmenu->InsertJavaScript();
-
-			set_hosts_jsmenu_array();
 		}
 //----- GO ------
 		$goBox = new CComboBox('go');
