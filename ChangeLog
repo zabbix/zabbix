@@ -1,8 +1,9 @@
 Changes for 1.7.0
 
+ - [DEV-358] added notification/trigger description macros {ITEM.LASTVALUE[1..9]} (Sasha)
  - [DEV-358] added notification macros {HOST.CONN[1..9]} {HOST.DNS[1..9]} {IPADDRESS[1..9]} (Sasha)
  - [DEV-358] added notification macros {TRIGGER.KEY[1..9]} (Sasha)
- - [DEV-358] added notification macros {HOSTNAME[1..9]} (Sasha)
+ - [DEV-358] added notification/trigger description macros {HOSTNAME[1..9]} (Sasha)
  - [DEV-358] added notification macros {ITEM.NAME[1..9]} (Sasha)
  - [DEV-358] added notification macros {PROFILE.*[1..9]} (Sasha)
  - [DEV-405] added highlighting of selected rows (Artem)
