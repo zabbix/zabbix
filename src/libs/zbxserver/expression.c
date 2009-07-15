@@ -1630,6 +1630,8 @@ static const char	*ex_macros[] = {MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MV
 				MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_IPADDRESS,
 				MVAR_ITEM_LASTVALUE,
 				MVAR_ITEM_VALUE,
+				MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
+				MVAR_ITEM_LOG_SEVERITY, MVAR_ITEM_LOG_NSEVERITY, MVAR_ITEM_LOG_EVENTID,
 				NULL};
 #define			EX_SUFFIX_NUM 10
 static const char	*ex_suffix[EX_SUFFIX_NUM] = {"}", "1}", "2}", "3}", "4}", "5}", "6}", "7}", "8}", "9}"};
@@ -1768,34 +1770,34 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_DATE))
 				{
 					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
-									1, "timestamp")))
+									N_functionid, "timestamp")))
 						replace_to = zbx_dsprintf(replace_to, "%s", zbx_date2str((time_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_TIME))
 				{
 					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
-									1, "timestamp")))
+									N_functionid, "timestamp")))
 						replace_to = zbx_dsprintf(replace_to, "%s", zbx_time2str((time_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_AGE))
 				{
 					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
-									1, "timestamp")))
+									N_functionid, "timestamp")))
 						replace_to = zbx_dsprintf(replace_to, "%s", zbx_age2str(time(NULL) - atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_SOURCE))
-					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, 1, "source");
+					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, N_functionid, "source");
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_SEVERITY))
 				{
 					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
-									1, "severity")))
+									N_functionid, "severity")))
 						replace_to = zbx_dsprintf(replace_to, "%s",
 								zbx_trigger_severity_string((zbx_trigger_severity_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_NSEVERITY))
-					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, 1, "severity");
+					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, N_functionid, "severity");
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_EVENTID))
-					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, 1, "logeventid");
+					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, N_functionid, "logeventid");
 				else if (0 == strcmp(m, MVAR_DATE))
 					replace_to = zbx_dsprintf(replace_to, "%s", zbx_date2str(time(NULL)));
 				else if (0 == strcmp(m, MVAR_TIME))
