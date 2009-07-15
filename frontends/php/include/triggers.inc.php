@@ -1221,7 +1221,8 @@ return $result;
 			$description = expand_trigger_description_constants($row['description'], $row);
 
 			for($i=0; $i<10; $i++){
-				if (zbx_strstr($description, '{HOSTNAME'.($i ? $i : '').'}')) {
+				$macro = '{HOSTNAME'.($i ? $i : '').'}';
+				if (zbx_strstr($description, $macro)) {
 					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
 					if (isset($functionid)) {
@@ -1232,14 +1233,15 @@ return $result;
 									' AND f.functionid='.$functionid;
 						$host = DBfetch(DBselect($sql));
 						if (is_null($host['host']))
-							$host['host'] = '{HOSTNAME'.($i ? $i : '').'}';
-						$description = str_replace('{HOSTNAME'.($i ? $i : '').'}', $host['host'], $description);
+							$host['host'] = $macro;
+						$description = str_replace($macro, $host['host'], $description);
 					}
 				}
 			}
 
 			for($i=0; $i<10; $i++){
-				if (zbx_strstr($description, '{ITEM.LASTVALUE'.($i ? $i : '').'}')) {
+				$macro = '{ITEM.LASTVALUE'.($i ? $i : '').'}';
+				if (zbx_strstr($description, $macro)) {
 					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
 					if(isset($functionid)){
@@ -1249,8 +1251,7 @@ return $result;
 									' AND f.functionid='.$functionid;
 						$row2=DBfetch(DBselect($sql));
 						if($row2['value_type']!=ITEM_VALUE_TYPE_LOG){
-							$description = str_replace('{ITEM.LASTVALUE'.($i ? $i : '').'}',
-									$row2['lastvalue'], $description);
+							$description = str_replace($macro, $row2['lastvalue'], $description);
 						}
 						else{
 							$sql = 'SELECT MAX(clock) as max FROM history_log WHERE itemid='.$row2['itemid'];
@@ -1259,33 +1260,21 @@ return $result;
 								$sql = 'SELECT value FROM history_log WHERE itemid='.$row2['itemid'].
 										' AND clock='.$row3['max'];
 								$row4=DBfetch(DBselect($sql));
-								$description = str_replace('{ITEM.LASTVALUE'.($i ? $i : '').'}',
-										$row4['value'], $description);
+								$description = str_replace($macro, $row4['value'], $description);
 							}
 						}
 					}
 				}
 			}
 
-			if(zbx_strstr($description,'{ITEM.VALUE}')){
-				$value=($flag==ZBX_FLAG_TRIGGER)?
-						trigger_get_func_value($row['expression'],ZBX_FLAG_TRIGGER,1,1):
-						trigger_get_func_value($row['expression'],ZBX_FLAG_EVENT,1,$row['clock']);
-
-				$description = str_replace('{ITEM.VALUE}',
-						$value,
-						$description);
-			}
-
-			for($i=1; $i<10; $i++){
-				if(zbx_strstr($description,'{ITEM.VALUE'.$i.'}')){
+			for($i=0; $i<10; $i++){
+				$macro = '{ITEM.VALUE'.($i ? $i : '').'}';
+				if(zbx_strstr($description, $macro)){
 					$value=($flag==ZBX_FLAG_TRIGGER)?
-							trigger_get_func_value($row['expression'],ZBX_FLAG_TRIGGER,$i,1):
-							trigger_get_func_value($row['expression'],ZBX_FLAG_EVENT,$i,$row['clock']);
+							trigger_get_func_value($row['expression'],ZBX_FLAG_TRIGGER,$i ? $i : 1, 1):
+							trigger_get_func_value($row['expression'],ZBX_FLAG_EVENT,$i ? $i : 1, $row['clock']);
 
-					$description = str_replace('{ITEM.VALUE'.$i.'}',
-							$value,
-							$description);
+					$description = str_replace($macro, $value, $description);
 				}
 
 			}
