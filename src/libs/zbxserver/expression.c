@@ -1558,7 +1558,8 @@ static int	get_node_value_by_event(DB_EVENT *event, char **replace_to, const cha
 
 static const char	*ex_macros[] = {MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MVAR_PROFILE_OS, MVAR_PROFILE_SERIALNO,
 				MVAR_PROFILE_TAG, MVAR_PROFILE_MACADDRESS, MVAR_PROFILE_HARDWARE, MVAR_PROFILE_SOFTWARE,
-				MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION, MVAR_PROFILE_NOTES, NULL};
+				MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION, MVAR_PROFILE_NOTES,
+				MVAR_ITEM_NAME, NULL};
 #define			EX_SUFFIX_NUM 10
 static const char	*ex_suffix[EX_SUFFIX_NUM] = {"}", "1}", "2}", "3}", "4}", "5}", "6}", "7}", "8}", "9}"};
 
@@ -1679,7 +1680,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 				else if (0 == strcmp(m, MVAR_HOSTNAME))
 					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "h.host");
 				else if (0 == strcmp(m, MVAR_ITEM_NAME))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "i.description");
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid, "i.description");
 				else if (0 == strcmp(m, MVAR_TRIGGER_KEY))
 					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, 1, "i.key_");
 				else if (0 == strcmp(m, MVAR_IPADDRESS))
