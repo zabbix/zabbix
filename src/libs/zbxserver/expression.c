@@ -1632,6 +1632,7 @@ static const char	*ex_macros[] = {MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MV
 				MVAR_ITEM_VALUE,
 				MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
 				MVAR_ITEM_LOG_SEVERITY, MVAR_ITEM_LOG_NSEVERITY, MVAR_ITEM_LOG_EVENTID,
+				MVAR_NODE_ID, MVAR_NODE_NAME,
 				NULL};
 #define			EX_SUFFIX_NUM 10
 static const char	*ex_suffix[EX_SUFFIX_NUM] = {"}", "1}", "2}", "3}", "4}", "5}", "6}", "7}", "8}", "9}"};
@@ -1831,9 +1832,9 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 				else if (0 == strcmp(m, MVAR_TRIGGER_NSEVERITY))
 					replace_to = zbx_dsprintf(replace_to, "%d", event->trigger_priority);
 				else if (0 == strcmp(m, MVAR_NODE_ID))
-					ret = get_node_value_by_triggerid(event->objectid, &replace_to, 1, "nodeid");
+					ret = get_node_value_by_triggerid(event->objectid, &replace_to, N_functionid, "nodeid");
 				else if (0 == strcmp(m, MVAR_NODE_NAME))
-					ret = get_node_value_by_triggerid(event->objectid, &replace_to, 1, "name");
+					ret = get_node_value_by_triggerid(event->objectid, &replace_to, N_functionid, "name");
 			}
 			else if (EVENT_SOURCE_DISCOVERY == event->source)
 			{
