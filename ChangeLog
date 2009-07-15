@@ -1,7 +1,8 @@
 Changes for 1.7.0
 
- - [DEV-358] added notification macros {ITEM.NAME1} - {ITEM.NAME9} (Sasha)
- - [DEV-358] added notification macros {PROFILE.*1} - {PROFILE.*9} (Sasha)
+ - [DEV-358] added notification macros {HOSTNAME[1..9]} (Sasha)
+ - [DEV-358] added notification macros {ITEM.NAME[1..9]} (Sasha)
+ - [DEV-358] added notification macros {PROFILE.*[1..9]} (Sasha)
  - [DEV-405] added highlighting of selected rows (Artem)
  - [DEV-397] added user name to output of {ESC.HISTORY} macros (Sasha)
  - [DEV-397] added notification macros {EVENT.ACK.STATUS} and {EVENT.ACK.HISTORY} (Sasha)
