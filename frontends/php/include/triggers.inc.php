@@ -1238,26 +1238,30 @@ return $result;
 				}
 			}
 
-			if(zbx_strstr($description, '{ITEM.LASTVALUE}')){
+			for($i=0; $i<10; $i++){
+				if (zbx_strstr($description, '{ITEM.LASTVALUE'.($i ? $i : '').'}')) {
+					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
-				$functionid=trigger_get_N_functionid($row['expression'], 1);
-
-				if(isset($functionid)){
-					$sql = 'SELECT i.lastvalue, i.value_type, i.itemid '.
-							' FROM items i, functions f '.
-							' WHERE i.itemid=f.itemid '.
-								' AND f.functionid='.$functionid;
-					$row2=DBfetch(DBselect($sql));
-					if($row2['value_type']!=ITEM_VALUE_TYPE_LOG){
-						$description = str_replace('{ITEM.LASTVALUE}', $row2['lastvalue'], $description);
-					}
-					else{
-						$sql = 'SELECT MAX(clock) as max FROM history_log WHERE itemid='.$row2['itemid'];
-						$row3=DBfetch(DBselect($sql));
-						if($row3 && !is_null($row3['max'])){
-							$sql = 'SELECT value FROM history_log WHERE itemid='.$row2['itemid'].' AND clock='.$row3['max'];
-							$row4=DBfetch(DBselect($sql));
-							$description = str_replace('{ITEM.LASTVALUE}', $row4['value'], $description);
+					if(isset($functionid)){
+						$sql = 'SELECT i.lastvalue, i.value_type, i.itemid '.
+								' FROM items i, functions f '.
+								' WHERE i.itemid=f.itemid '.
+									' AND f.functionid='.$functionid;
+						$row2=DBfetch(DBselect($sql));
+						if($row2['value_type']!=ITEM_VALUE_TYPE_LOG){
+							$description = str_replace('{ITEM.LASTVALUE'.($i ? $i : '').'}',
+									$row2['lastvalue'], $description);
+						}
+						else{
+							$sql = 'SELECT MAX(clock) as max FROM history_log WHERE itemid='.$row2['itemid'];
+							$row3=DBfetch(DBselect($sql));
+							if($row3 && !is_null($row3['max'])){
+								$sql = 'SELECT value FROM history_log WHERE itemid='.$row2['itemid'].
+										' AND clock='.$row3['max'];
+								$row4=DBfetch(DBselect($sql));
+								$description = str_replace('{ITEM.LASTVALUE'.($i ? $i : '').'}',
+										$row4['value'], $description);
+							}
 						}
 					}
 				}
