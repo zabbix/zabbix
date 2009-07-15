@@ -149,25 +149,22 @@ class CTag extends CObject{
 		}
 	}
 
-	public function setHint($text, $width='', $class=''){
+	public function setHint($text, $width='', $class='', $byclick=true){
 		if(empty($text)) return false;
 
 		insert_showhint_javascript();
 
 		$text = unpack_object($text);
-		if($width != '' || $class != ''){
-			$code = "show_hint_ext(this,event,'".$text."','".$width."','".$class."');";
-		}
-		else{
-			$code = "show_hint(this,event,'".$text."');";
-		}
 
-		$this->addAction('onMouseOver',	$code);
-		$this->addAction('onMouseMove',	'update_hint(this,event);');
+		$this->addAction('onmouseover',	"javascript: hintBox.showOver(event,this,'".$text."','".$width."','".$class."');");
+		$this->addAction('onmouseout',	"javascript: hintBox.hideOut(event,this);");
+		if($byclick){
+			$this->addAction('onclick',	"javascript: hintBox.onClick(event,this,'".$text."','".$width."','".$class."');");
+		}
 	}
 
 	public function onClick($handle_code){
-		$this->addAction('onClick', $handle_code);
+		$this->addAction('onclick', $handle_code);
 	}
 
 	public function addStyle($value){

@@ -1994,45 +1994,6 @@ return $result;
 	return $result;
 	}
 
-	function set_hosts_jsmenu_array($hostids = array()){
-		$menu_all = array();
-
- 		$db_groups = DBselect('SELECT DISTINCT g.groupid, g.name '.
-		 				' FROM groups g '.
-						' WHERE '.DBin_node('g.groupid').
- 						' ORDER BY g.name,g.groupid');
-
-		while($group=DBfetch($db_groups)){
-			$group['name'] = htmlspecialchars($group['name']);
-			$menu_all[] = $group;
-		}
-		insert_js('var menu_hstgrp_all='.zbx_jsvalue($menu_all).";\n");
-	}
-
-
-	function host_js_menu($hostid,$link_text = S_SELECT){
-		$hst_grp_all_in = array();
-
-		$sql = 'SELECT DISTINCT g.groupid, g.name '.
-				' FROM groups g, hosts_groups hg '.
- 				' WHERE g.groupid=hg.groupid '.
-					' AND hg.hostid='.$hostid.
- 				' ORDER BY g.name';
-		$db_groups = DBselect($sql);
-		while($group = DBfetch($db_groups)){
-			$group['name'] = htmlspecialchars($group['name']);
-			$hst_grp_all_in[] = $group;
-		}
-
-		$action = new CSpan($link_text);
-		$script = new CScript('javascript: create_host_menu(event,'.$hostid.','.zbx_jsvalue($hst_grp_all_in).');');
-
-		$action->addAction('onclick',$script);
-		$action->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
-
-	return $action;
-	}
-
 	function expand_host_ipmi_ip_by_data($ipmi_ip, $host){
 		if(zbx_strstr($ipmi_ip, '{HOSTNAME}'))
 			$ipmi_ip = str_replace('{HOSTNAME}', $host['host'], $ipmi_ip);

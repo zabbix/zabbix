@@ -544,7 +544,7 @@ function get_history_of_discovery_events($end_time, $limit, &$last_clock=null){
 	}
 
 	$last_clock = !empty($clock)?min($clock):null;
-	order_result($dsc_events, 'clock', ZBX_SORT_DOWN);
+	order_page_result($dsc_events, 'clock', ZBX_SORT_DOWN);
 
 	foreach($dsc_events as $num => $event_data){
 		$value = new CCol(trigger_value2str($event_data['value']), get_trigger_value_style($event_data['value']));

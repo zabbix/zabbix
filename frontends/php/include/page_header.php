@@ -181,30 +181,34 @@
 	if(!defined('ZBX_PAGE_NO_MENU')){
 COpt::compare_files_with_menu($ZBX_MENU);
 
-		$help = new CLink(S_HELP, 'http://www.zabbix.com/documentation.php', 'small_font', null, true);
+		$help = new CLink(S_HELP, 'http://www.zabbix.com/documentation.php', 'small_font', null, 'nosid');
 		$help->setTarget('_blank');
-		$support = new CLink(S_GET_SUPPORT, 'http://www.zabbix.com/support.php', 'small_font', null, true);
+		$support = new CLink(S_GET_SUPPORT, 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 		$support->setTarget('_blank');
-		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font');
+		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font', null, 'nosid');
 
 		$page_header_r_col = array($help,'|',$support,'|',$printview);
 
 		if($USER_DETAILS['alias']!=ZBX_GUEST_USER){
 			$page_header_r_col[] = array('|');
-			array_push($page_header_r_col, new CLink(S_PROFILE, 'profile.php', 'small_font'),'|');
+
+			array_push($page_header_r_col, new CLink(S_PROFILE, 'profile.php', 'small_font', null, 'nosid'),'|');
+
 			if($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_ENABLED){
-				$debug = new CLink(S_DEBUG, '#debug', 'small_font');
+
+				$debug = new CLink(S_DEBUG, '#debug', 'small_font', null, 'nosid');
 				$debug->setAttribute('onclick', "javascript: ShowHide('zbx_gebug_info');");
 
 				array_push($page_header_r_col,$debug,'|');
 			}
-			array_push($page_header_r_col,new CLink(S_LOGOUT, 'index.php?reconnect=1', 'small_font'));
+			
+			array_push($page_header_r_col,new CLink(S_LOGOUT, 'index.php?reconnect=1', 'small_font', null, 'nosid'));
 		}
 		else {
-			$page_header_r_col[] = array('|', new CLink(S_LOGIN, 'index.php?reconnect=1', 'small_font'));
+			$page_header_r_col[] = array('|', new CLink(S_LOGIN, 'index.php?reconnect=1', 'small_font', null, 'nosid'));
 		}
 
-		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),'http://www.zabbix.com/', null, null, true);
+		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),'http://www.zabbix.com/', null, null, 'nosid');
 		$logo->setTarget('_blank');
 
 		$td_r = new CCol($page_header_r_col, 'page_header_r');

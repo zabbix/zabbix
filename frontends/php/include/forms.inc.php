@@ -6336,7 +6336,7 @@
 	function insert_map_link_form(){
 
 		$frmCnct = new CFormTable('New connector','sysmap.php');
-		$frmCnct->SetHelp('web.sysmap.connector.php');
+		$frmCnct->setHelp('web.sysmap.connector.php');
 		$frmCnct->addVar('sysmapid',$_REQUEST['sysmapid']);
 
 		if(isset($_REQUEST['linkid']) && !isset($_REQUEST['form_refresh'])){

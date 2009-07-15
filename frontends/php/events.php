@@ -344,7 +344,7 @@
 			}
 
 			$last_clock = !empty($clock)?min($clock):null;
-			order_result($events, 'clock', ZBX_SORT_DOWN);
+			order_page_result($events, 'clock', ZBX_SORT_DOWN);
 
 			foreach($events as $num => $row){
 // Actions

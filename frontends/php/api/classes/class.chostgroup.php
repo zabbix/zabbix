@@ -321,7 +321,7 @@ class CHostGroup {
 		$sql = 'SELECT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('g.groupid', $nodeids).
-				$sql_where.
+					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($group = DBfetch($res)){

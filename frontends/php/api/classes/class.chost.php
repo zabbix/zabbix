@@ -77,6 +77,7 @@ class CHost {
 			'nopermissions'				=> 0,
 // OutPut
 			'extendoutput'				=> 0,
+			'select_templates'			=> 0,
 			'select_items'				=> 0,
 			'select_triggers'			=> 0,
 			'select_graphs'				=> 0,
@@ -221,6 +222,7 @@ class CHost {
 		
 // count
 		if($options['count'] != 0){
+			$options['select_templates'] = 0;
 			$options['select_items'] = 0;
 			$options['select_triggers'] = 0;
 			$options['select_graphs'] = 0;
@@ -290,10 +292,26 @@ class CHost {
 				else{
 					if(!isset($result[$host['hostid']])) $result[$host['hostid']]= array();
 					
-					if($options['select_items'] && !isset($result[$host['hostid']]['itemids'])) $host['itemids'] = array();
-					if($options['select_triggers'] && !isset($result[$host['hostid']]['triggers'])) $host['triggerids'] = array();
-					if($options['select_graphs'] && !isset($result[$host['hostid']]['graphids'])) $host['graphids'] = array();
+					if($options['select_templates'] && !isset($result[$host['hostid']]['templateids'])){
+						$host['templateids'] = array();
+						$host['templates'] = array();
+					}
 					
+					if($options['select_items'] && !isset($result[$host['hostid']]['itemids'])){
+						$host['itemids'] = array();
+						$host['items'] = array();
+					}
+						
+					if($options['select_triggers'] && !isset($result[$host['hostid']]['triggers'])){
+						$host['triggerids'] = array();
+						$host['triggers'] = array();
+					}
+						
+					if($options['select_graphs'] && !isset($result[$host['hostid']]['graphids'])){
+						$host['graphids'] = array();
+						$host['graphs'] = array();
+					}
+						
 					// groupids
 					if(isset($host['groupid'])){
 						if(!isset($result[$host['hostid']]['groupids'])) 
@@ -302,6 +320,7 @@ class CHost {
 						$result[$host['hostid']]['groupids'][$host['groupid']] = $host['groupid'];
 						unset($host['groupid']);
 					}
+
 					// templateids
 					if(isset($host['templateid'])){
 						if(!isset($result[$host['hostid']]['templateids'])) 
@@ -310,6 +329,15 @@ class CHost {
 						$result[$host['hostid']]['templateids'][$host['templateid']] = $host['templateid'];
 						unset($host['templateid']);
 					}
+					
+					// itemids
+					if(isset($host['itemid'])){
+						if(!isset($result[$host['hostid']]['itemids'])) $result[$host['hostid']]['itemids'] = array();
+							
+						$result[$host['hostid']]['itemids'][$host['itemid']] = $host['itemid'];
+						unset($host['itemid']);
+					}
+										
 					$result[$host['hostid']] += $host;
 				}
 			}
@@ -317,6 +345,18 @@ class CHost {
 		
 // Adding Objects
 
+// Adding Templates
+		if($options['select_templates']){
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+			$templates = CTemplate::get($obj_params);
+			foreach($templates as $templateid => $template){
+				foreach($template['hostids'] as $num => $hostid){
+					$result[$hostid]['templateids'][$templateid] = $templateid;
+					$result[$hostid]['templates'][$templateid] = $template;
+				}
+			}
+		}
+		
 // Adding Items
 		if($options['select_items']){
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'nopermissions' => 1);
@@ -324,6 +364,7 @@ class CHost {
 			foreach($items as $itemid => $item){
 				foreach($item['hostids'] as $num => $hostid){
 					$result[$hostid]['itemids'][$itemid] = $itemid;
+					$result[$hostid]['items'][$itemid] = $item;
 				}
 			}
 		}
@@ -335,6 +376,7 @@ class CHost {
 			foreach($triggers as $triggerid => $trigger){
 				foreach($trigger['hostids'] as $num => $hostid){
 					$result[$hostid]['triggerids'][$triggerid] = $triggerid;
+					$result[$hostid]['triggers'][$triggerid] = $trigger;
 				}
 			}
 		}
@@ -346,6 +388,7 @@ class CHost {
 			foreach($graphs as $graphid => $graph){
 				foreach($graph['hostids'] as $num => $hostid){
 					$result[$hostid]['graphids'][$graphid] = $graphid;
+					$result[$hostid]['graphs'][$graphid] = $graph;
 				}
 			}
 		}
