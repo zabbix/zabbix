@@ -49,6 +49,24 @@ div.zbx_search{
 }
 
 
+/**************** HINT BOX *****************/
+
+div.hintbox {
+	top: 0;
+	z-index: 100;
+	position: absolute;
+	background-color: #FFFFE0;
+	padding: 2px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	line-height:15px;
+	border: 1px solid black;
+	border-left: none;
+	border-top: none;
+}
+
+/************** END OF HINT BOX ************/
+
 /**** SCREEN DRAG & DROP ****/
 div.draggable {
 	cursor: pointer;
@@ -266,12 +284,13 @@ div.ok_icon:hover{
 
 /********* DIV IMG END *********/
 
-span.link{
-	color:#333399;
+.link{
+	color:#3C3089;
 	text-decoration: underline;
 }
 
-span.link:hover{
+.link:hover{
+	color:#6C80B9;
 	cursor: pointer;
 	text-decoration: underline;
 }

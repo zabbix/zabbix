@@ -1142,7 +1142,6 @@ include_once('include/page_header.php');
 			}
 			else{
 				$error = new CDiv(SPACE,'ok_icon');
-				$error->setHint(S_OK_BIG, '', 'off');
 			}
 			
 			$applications = $show_applications ? implode(', ', get_applications_by_itemid($db_item['itemid'], 'name')) : null;

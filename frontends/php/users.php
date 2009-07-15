@@ -358,8 +358,7 @@ include_once('include/page_header.php');
 			S_GUI_ACCESS,
 			S_API_ACCESS,
 			S_DEBUG_MODE,
-			S_STATUS,
-			S_ACTIONS
+			S_STATUS
 			));
 
 
@@ -448,7 +447,6 @@ include_once('include/page_header.php');
 			$user['debug_mode'] = get_user_debug_mode($userid);
 			$debug_mode = ($user['debug_mode']) ? S_ENABLED : S_DISABLED;
 			$debug_mode = new CSpan($debug_mode, ($user['debug_mode'] == GROUP_DEBUG_MODE_DISABLED)?'green':'orange');
-			$action = get_user_actionmenu($userid);
 
 			$table->addRow(array(
 				new CCheckBox('group_userid['.$userid.']',NULL,NULL,$userid),
@@ -461,8 +459,7 @@ include_once('include/page_header.php');
 				$gui_access,
 				$api_access,
 				$debug_mode,
-				$users_status,
-				$action
+				$users_status
 				));
 			$row_count++;
 		}
@@ -481,11 +478,6 @@ include_once('include/page_header.php');
 
 		$form->addItem($table);
 		$form->show();
-
-		$jsmenu = new CPUMenu(null,270);
-		$jsmenu->InsertJavaScript();
-
-		set_users_jsmenu_array();
 	}
 
 	zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
@@ -493,6 +485,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once 'include/page_footer.php'
+include_once('include/page_footer.php');
 
 ?>

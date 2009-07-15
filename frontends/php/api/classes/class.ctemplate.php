@@ -50,7 +50,13 @@ class CTemplate {
 			'with_graphs'		=> 0,
 			'editable' 			=> 0,
 			'nopermissions'		=> 0,
+// OutPut
 			'extendoutput'		=> 0,
+			'select_hosts'		=> 0,
+			'select_templates'	=> 0,
+			'select_items'		=> 0,
+			'select_triggers'	=> 0,
+			'select_graphs'		=> 0,
 			'count'				=> 0,
 			'pattern'			=> '',
 			'order'				=> '',
@@ -102,16 +108,18 @@ class CTemplate {
 			zbx_value2array($options['templateids']);
 			$sql_parts['where'][] = DBcondition('h.hostid', $options['templateids']);
 		}
+
 // hostids
 		if($options['hostids'] != 0){
 			zbx_value2array($options['hostids']);
 			if($options['extendoutput']){
-				$sql_parts['select']['linked_to_id'] = 'ht.hostid as linked_to_id';
+				$sql_parts['select']['linked_hostid'] = 'ht.hostid as linked_hostid';
 			}
 			$sql_parts['from']['ht'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.hostid', $options['hostids']);
 			$sql_parts['where']['hht'] = 'h.hostid=ht.templateid';
 		}
+
 // with_items
 		if($options['with_items'] != 0){
 			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
@@ -143,6 +151,12 @@ class CTemplate {
 
 // count
 		if($options['count'] != 0){
+			$options['select_hosts'] = 0;
+			$options['select_templates'] = 0;
+			$options['select_items'] = 0;
+			$options['select_triggers'] = 0;
+			$options['select_graphs'] = 0;
+
 			$sql_parts['select']['templates'] = 'count(h.hostid) as rowscount';
 		}
 
@@ -191,25 +205,130 @@ class CTemplate {
 			if($options['count'])
 				$result = $template;
 			else{
+				$templateids[$template['hostid']] = $template['hostid'];
+				
 				if(!isset($options['extendoutput'])){
 					$result[$template['hostid']] = $template['hostid'];
 				}
 				else{
-					if(!isset($result[$template['hostid']])) 
-						$result[$template['hostid']]= array();
+					if(!isset($result[$template['hostid']])) $result[$template['hostid']]= array();
 					
-					if(isset($template['linked_to_id'])){
-						if(!isset($result[$template['hostid']]['linked_to_hostids'])) 
-							$result[$template['hostid']]['linked_to_hostids'] = array();
+					if($options['select_templates'] && !isset($result[$template['hostid']]['templateids'])){
+						$template['templateids'] = array();
+						$template['templates'] = array();
+					}
+						
+					if($options['select_hosts'] && !isset($result[$template['hostid']]['hostids'])){
+						$template['hostids'] = array();
+						$template['hosts'] = array();
+					}
+					
+					if($options['select_items'] && !isset($result[$template['hostid']]['itemids'])){
+						$template['itemids'] = array();
+						$template['items'] = array();
+					}
+					
+					if($options['select_triggers'] && !isset($result[$template['hostid']]['triggers'])){
+						$template['triggerids'] = array();
+						$template['triggers'] = array();
+					}
+					
+					if($options['select_graphs'] && !isset($result[$template['hostid']]['graphids'])){
+						$template['graphids'] = array();
+						$template['graphs'] = array();
+					}
+					
+					// groupids
+					if(isset($template['groupid'])){
+						if(!isset($result[$template['hostid']]['groupids'])) 
+							$result[$template['hostid']]['groupids'] = array();
 							
-						$result[$template['hostid']]['linked_to_hostids'][$template['linked_to_id']] = $template['linked_to_id'];
-						unset($template['linked_to_id']);
+						$result[$template['hostid']]['groupids'][$template['groupid']] = $template['groupid'];
+						unset($template['groupid']);
+					}
+					
+					// hostids
+					if(isset($template['linked_hostid'])){
+						if(!isset($result[$template['hostid']]['hostids'])) $result[$template['hostid']]['hostids'] = array();
+							
+						$result[$template['hostid']]['hostids'][$template['linked_hostid']] = $template['linked_hostid'];
+						unset($template['linked_hostid']);
+					}
+					
+					// itemids
+					if(isset($template['itemid'])){
+						if(!isset($result[$template['hostid']]['itemids'])) $result[$template['hostid']]['itemids'] = array();
+							
+						$result[$template['hostid']]['itemids'][$template['itemid']] = $template['itemid'];
+						unset($template['itemid']);
 					}
 					
 					$result[$template['hostid']] += $template;
 				}
 			}
 				
+		}
+		
+// Adding Objects
+
+// Adding Templates
+		if($options['select_templates']){
+			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids);
+			$templates = CTemplate::get($obj_params);
+			foreach($templates as $templateid => $template){
+				foreach($template['hostids'] as $num => $hostid){
+					$result[$hostid]['templateids'][$templateid] = $templateid;
+					$result[$hostid]['templates'][$templateid] = $template;
+				}
+			}
+		}
+		
+// Adding Hosts
+		if($options['select_templates']){
+			$obj_params = array('extendoutput' => 1, 'templateids' => $templateids);
+			$hosts = CHost::get($obj_params);
+			foreach($hosts as $hostid => $host){
+				foreach($host['templateids'] as $num => $templateid){
+					$result[$templateid]['hostids'][$hostid] = $hostid;
+					$result[$templateid]['hosts'][$hostid] = $host;
+				}
+			}
+		}
+		
+// Adding Items
+		if($options['select_items']){
+			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'nopermissions' => 1);
+			$items = CItem::get($obj_params);
+			foreach($items as $itemid => $item){
+				foreach($item['hostids'] as $num => $hostid){
+					$result[$hostid]['itemids'][$itemid] = $itemid;
+					$result[$hostid]['items'][$itemid] = $item;
+				}
+			}
+		}
+	
+// Adding triggers	
+		if($options['select_triggers']){
+			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids);
+			$triggers = CTrigger::get($obj_params);
+			foreach($triggers as $triggerid => $trigger){
+				foreach($trigger['hostids'] as $num => $hostid){
+					$result[$hostid]['triggerids'][$triggerid] = $triggerid;
+					$result[$hostid]['triggers'][$triggerid] = $trigger;
+				}
+			}
+		}
+		
+// Adding graphs
+		if($options['select_graphs']){
+			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids);
+			$graphs = CGraph::get($obj_params);
+			foreach($graphs as $graphid => $graph){
+				foreach($graph['hostids'] as $num => $hostid){
+					$result[$hostid]['graphids'][$graphid] = $graphid;
+					$result[$hostid]['graphs'][$graphid] = $graph;
+				}
+			}
 		}
 	
 	return $result;

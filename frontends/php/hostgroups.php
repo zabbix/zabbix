@@ -199,7 +199,7 @@ include_once('include/page_header.php');
 
 		if($groupid > 0){
 			$frmHostG->addVar('groupid',$_REQUEST['groupid']);
-			// if first time select all hosts for group from db
+// if first time select all hosts for group from db
 			if(!isset($_REQUEST['form_refresh'])){
 				$params = array('groupids' => $groupid, 
 								'editable' => 1,
@@ -212,7 +212,7 @@ include_once('include/page_header.php');
 			}
 		}
 
-		// select all possible groups
+// select all possible groups
 		$params = array('not_proxy_host' => 1,
 						'order' => 'name',
 						'editable' => 1);
@@ -229,18 +229,19 @@ include_once('include/page_header.php');
 
 		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts, 25);
 		
-		// get hosts from selected twb_groupid combo
+// get hosts from selected twb_groupid combo
 		$params = array('groupids'=>$selected_grp,
 						'templated_hosts'=>1,
 						'order'=>'host',
 						'editable' => 1);
 		$db_hosts = CHost::get($params);
 		foreach($db_hosts as $hostid => $db_host){
-			if(!isset($hosts[$hostid])) // add all except selected hosts
-			$cmbHosts->addItem($db_host['hostid'], get_node_name_by_elid($db_host['hostid']).$db_host['host']);
+// add all except selected hosts
+			if(!isset($hosts[$hostid]))
+				$cmbHosts->addItem($db_host['hostid'], get_node_name_by_elid($db_host['hostid']).$db_host['host']);
 		}
 
-		// select selected hosts and add them
+// select selected hosts and add them
 		$params = array('hostids' => $hosts,
 						'templated_hosts' =>1 ,
 						'order' => 'host',

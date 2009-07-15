@@ -299,19 +299,19 @@ else if((isset($_REQUEST['delete']) || isset($_REQUEST['delete_and_clear'])) && 
 	}
 
 
-		$host=get_host_by_hostid($_REQUEST['templateid']);
+	$host=get_host_by_hostid($_REQUEST['templateid']);
 
-		DBstart();
-		$result = delete_host($_REQUEST['templateid'], $unlink_mode);
-		$result=DBend($result);
+	DBstart();
+	$result = delete_host($_REQUEST['templateid'], $unlink_mode);
+	$result=DBend($result);
 
-		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
-		if($result){
+	show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
+	if($result){
 /*				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$host['host'].']');*/
 
-			unset($_REQUEST['form']);
-			unset($_REQUEST['templateid']);
-		}
+		unset($_REQUEST['form']);
+		unset($_REQUEST['templateid']);
+	}
 
 	unset($_REQUEST['delete']);
 }
@@ -322,26 +322,26 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 		$unlink_mode =  true;
 	}
 
-		$result = true;
-		$hosts = get_request('templates',array());
-		$del_hosts = array();
-		$sql = 'SELECT host,hostid '.
-				' FROM hosts '.
-				' WHERE '.DBin_node('hostid').
-					' AND '.DBcondition('hostid',$hosts).
-					' AND '.DBcondition('hostid',$available_hosts);
-		$db_hosts=DBselect($sql);
+	$result = true;
+	$hosts = get_request('templates',array());
+	$del_hosts = array();
+	$sql = 'SELECT host,hostid '.
+			' FROM hosts '.
+			' WHERE '.DBin_node('hostid').
+				' AND '.DBcondition('hostid',$hosts).
+				' AND '.DBcondition('hostid',$available_hosts);
+	$db_hosts=DBselect($sql);
 
-		DBstart();
-		while($db_host=DBfetch($db_hosts)){
-			$del_hosts[$db_host['hostid']] = $db_host['hostid'];
+	DBstart();
+	while($db_host=DBfetch($db_hosts)){
+		$del_hosts[$db_host['hostid']] = $db_host['hostid'];
 /*				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$db_host['host'].']');*/
-		}
+	}
 
-		$result = delete_host($del_hosts, $unlink_mode);
-		$result = DBend($result);
+	$result = delete_host($del_hosts, $unlink_mode);
+	$result = DBend($result);
 
-		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
+	show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 }
 /**********************************/
 /* --->>> TEMPLATE ACTIONS <<<--- */
@@ -628,9 +628,14 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 			S_LINKED_TO));
 
 
+// <<<--- GENERATE OUTPUTS --->>>
+		$config = select_config();
+		
 // <<<--- $templates = get all available templates --->>>
-		$options = array('editable' => 1, 
-						'extendoutput' => 1, 
+		$options = array('editable' => 1,
+						'extendoutput' => 1,
+						'select_templates' => 1,
+						'select_hosts' => 1,
 						'order' => 'host');
 		if($selected_group > 0){
 			$options += array('groupids' => $selected_group);
@@ -638,43 +643,6 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 		$templates = CTemplate::get($options);
 		$templateids = array_keys($templates);
 // --->>> <<<---
-
-// <<<--- get templates linked to selected $templates --->>>
-		$options = array('editable' => 1, 'extendoutput' => 1, 'order' => 'host', 'hostids' => $templateids);
-		$linked_templates = CTemplate::get($options);
-
-		foreach($templates as $templateid => $template){
-			$templates[$templateid]['linked_templates'] = array();
-		}
-
-		foreach($linked_templates as $linked_templateid => $linked_template){
-			foreach($linked_template['linked_to_hostids'] as $templateid){
-				$templates[$templateid]['linked_templates'][$linked_templateid] = $linked_template;
-			}
-		}
-// --->>> <<<---
-
-// <<<--- get hosts that linked to selected $templates --->>>
-		$options = array('editable' => 1, 
-						'extendoutput' => 1, 
-						'order' => 'host', 
-						'templated_hosts' => 1, 
-						'templateids' => $templateids);
-		$linked_to_hosts = CHost::get($options);
-
-		foreach($templates as $templateid => $template){
-			$templates[$templateid]['linked_to_hosts'] = array();
-		}
-
-		foreach($linked_to_hosts as $linked_to_hostid => $linked_to_host){
-			foreach($linked_to_host['templateids'] as $templateid){
-				$templates[$templateid]['linked_to_hosts'][$linked_to_hostid] = $linked_to_host;
-			}
-		}
-// --->>> <<<---
-
-// <<<--- GENERATE OUTPUTS --->>>
-		$config = select_config();
 
 		foreach($templates as $templateid => $template){
 			$templates_output = array();
@@ -687,7 +655,9 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 
 			$i = 0;
 			$linked_templates_output = array();
-			foreach($template['linked_templates'] as $linked_templateid => $linked_template){
+			
+			order_result($template['templates'], 'host');
+			foreach($template['templates'] as $linked_templateid => $linked_template){
 				$i++;
 				if($i > $config['max_in_table']){
 					$linked_templates_output[] = '...';
@@ -704,7 +674,9 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 
 			$i = 0;
 			$linked_to_hosts_output = array();
-			foreach($template['linked_to_hosts'] as $linked_to_hostid => $linked_to_host){
+			
+			order_result($template['hosts'], 'host');
+			foreach($template['hosts'] as $linked_to_hostid => $linked_to_host){
 				$i++;
 				if($i > $config['max_in_table']){
 					$linked_to_hosts_output[] = '...';
@@ -768,6 +740,6 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 /* --->>> TEMPLATE LIST AND FORM <<<--- */
 /****************************************/
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>
