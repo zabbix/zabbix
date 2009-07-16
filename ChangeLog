@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-399] added information about monitored hosts to the discovery screen (Sasha)
  - [DEV-358] added notification macros {NODE.*[1..9]} (Sasha)
  - [DEV-358] added notification macros {ITEM.LOG.*[1..9]} (Sasha)
  - [DEV-358] added notification macros {ITEM.VALUE} and {ITEM.VALUE[1..9]} (Sasha)
