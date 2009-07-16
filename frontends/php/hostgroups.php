@@ -294,22 +294,8 @@ include_once('include/page_header.php');
 					S_MEMBERS
 				));
 
-		$groups = CHostGroup::get(array('order'=> 'name', 'editable' => 1, 'extendoutput' => 1));
-		$groupids = array_keys($groups);
-		
-		$hosts = CHost::get(array('groupids' => $groupids, 'extendoutput' => 1, 'templated_hosts' => 1));
-
-		foreach($groups as $groupid => $group){
-			$groups[$groupid]['hosts'] = array();
-		}
-
-		foreach($hosts as $hostid => $host){
-			foreach($host['groupids'] as $groupid){
-				$groups[$groupid]['hosts'][$hostid] = $host;
-			}
-		}
-		
-		
+		$groups = CHostGroup::get(array('order'=> 'name', 'editable' => 1, 'extendoutput' => 1, 'select_hosts' => 1));
+			
 		foreach($groups as $groupid => $group){
 			$tpl_count = 0;
 			$host_count = 0;
@@ -320,7 +306,8 @@ include_once('include/page_header.php');
 				$i++;
 				
 				if($i > $config['max_in_table']){
-					array_push($hosts_output, '...', '//empty for array_pop');
+					$hosts_output[] = '...';
+					$hosts_output[] = '//empty for array_pop';
 					break;
 				}
 				
@@ -338,7 +325,8 @@ include_once('include/page_header.php');
 						$url = 'hosts.php?form=update&hostid='.$hostid.'&groupid='.$groupid;
 					break;
 				}
-				array_push($hosts_output, new CLink($host['host'], $url, $style), ', ');	
+				$hosts_output[] = new CLink($host['host'], $url, $style);
+				$hosts_output[] = ', ';
 			}
 			array_pop($hosts_output);
 			
@@ -346,7 +334,6 @@ include_once('include/page_header.php');
 				$host['status'] == HOST_STATUS_TEMPLATE ? $tpl_count++ : $host_count++;
 			}
 
-//			$host_count = count($group['hosts']);
 			$table->addRow(array(
 				new CCheckBox('groups['.$groupid.']', NULL, NULL, $groupid),
 				new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$groupid),

@@ -63,6 +63,8 @@ class CHost {
 			'groupids'					=> 0,
 			'hostids'					=> 0,
 			'templateids'				=> 0,
+			'triggerids'				=> 0,
+			'graphids'					=> 0,
 			'monitored_hosts'			=> 0,
 			'templated_hosts'			=> 0,
 			'with_items'				=> 0,
@@ -127,7 +129,6 @@ class CHost {
 			if($options['extendoutput'] != 0){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
-
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
@@ -146,6 +147,31 @@ class CHost {
 			$sql_parts['from']['ht'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.templateid', $options['templateids']);
 			$sql_parts['where']['hht'] = 'h.hostid=ht.hostid';
+		}
+// triggerids
+		if($options['triggerids'] != 0){
+			zbx_value2array($options['triggerids']);
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['triggerid'] = 'f.triggerid';
+			}
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+		}
+// graphids
+		if($options['graphids'] != 0){
+			zbx_value2array($options['graphids']);
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['graphid'] = 'gi.graphid';
+			}
+			$sql_parts['from']['gi'] = 'graphs_items gi';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+
 		}
 // monitored_hosts, templated_hosts
 		if($options['monitored_hosts'] != 0){
@@ -293,25 +319,25 @@ class CHost {
 					if(!isset($result[$host['hostid']])) $result[$host['hostid']]= array();
 					
 					if($options['select_templates'] && !isset($result[$host['hostid']]['templateids'])){
-						$host['templateids'] = array();
-						$host['templates'] = array();
+						$result[$host['hostid']]['templateids'] = array();
+						$result[$host['hostid']]['templates'] = array();
 					}
 					
 					if($options['select_items'] && !isset($result[$host['hostid']]['itemids'])){
-						$host['itemids'] = array();
-						$host['items'] = array();
+						$result[$host['hostid']]['itemids'] = array();
+						$result[$host['hostid']]['items'] = array();
 					}
 						
-					if($options['select_triggers'] && !isset($result[$host['hostid']]['triggers'])){
-						$host['triggerids'] = array();
-						$host['triggers'] = array();
+					if($options['select_triggers'] && !isset($result[$host['hostid']]['triggerids'])){
+						$result[$host['hostid']]['triggerids'] = array();
+						$result[$host['hostid']]['triggers'] = array();
 					}
 						
 					if($options['select_graphs'] && !isset($result[$host['hostid']]['graphids'])){
-						$host['graphids'] = array();
-						$host['graphs'] = array();
+						$result[$host['hostid']]['graphids'] = array();
+						$result[$host['hostid']]['graphs'] = array();
 					}
-						
+					
 					// groupids
 					if(isset($host['groupid'])){
 						if(!isset($result[$host['hostid']]['groupids'])) 
@@ -320,7 +346,6 @@ class CHost {
 						$result[$host['hostid']]['groupids'][$host['groupid']] = $host['groupid'];
 						unset($host['groupid']);
 					}
-
 					// templateids
 					if(isset($host['templateid'])){
 						if(!isset($result[$host['hostid']]['templateids'])) 
@@ -329,7 +354,14 @@ class CHost {
 						$result[$host['hostid']]['templateids'][$host['templateid']] = $host['templateid'];
 						unset($host['templateid']);
 					}
-					
+					// triggerids
+					if(isset($host['triggerid'])){
+						if(!isset($result[$host['hostid']]['triggerids'])) 
+							$result[$host['hostid']]['triggerids'] = array();
+							
+						$result[$host['hostid']]['triggerids'][$host['triggerid']] = $host['triggerid'];
+						unset($host['triggerid']);
+					}
 					// itemids
 					if(isset($host['itemid'])){
 						if(!isset($result[$host['hostid']]['itemids'])) $result[$host['hostid']]['itemids'] = array();
@@ -337,7 +369,14 @@ class CHost {
 						$result[$host['hostid']]['itemids'][$host['itemid']] = $host['itemid'];
 						unset($host['itemid']);
 					}
-										
+					// grapids
+					if(isset($host['grapid'])){
+						if(!isset($result[$host['hostid']]['grapids'])) $result[$host['hostid']]['grapids'] = array();
+							
+						$result[$host['hostid']]['grapids'][$host['grapid']] = $host['grapid'];
+						unset($host['grapid']);
+					}
+					
 					$result[$host['hostid']] += $host;
 				}
 			}

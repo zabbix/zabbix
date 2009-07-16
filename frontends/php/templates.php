@@ -641,7 +641,6 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 			$options += array('groupids' => $selected_group);
 		}
 		$templates = CTemplate::get($options);
-		$templateids = array_keys($templates);
 // --->>> <<<---
 
 		foreach($templates as $templateid => $template){

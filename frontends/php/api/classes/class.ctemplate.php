@@ -45,6 +45,7 @@ class CTemplate {
 			'groupids'			=> 0,
 			'templateids'		=> 0,
 			'hostids'			=> 0,
+			'graphids'			=> 0,
 			'with_items'		=> 0,
 			'with_triggers'		=> 0,
 			'with_graphs'		=> 0,
@@ -119,6 +120,18 @@ class CTemplate {
 			$sql_parts['where'][] = DBcondition('ht.hostid', $options['hostids']);
 			$sql_parts['where']['hht'] = 'h.hostid=ht.templateid';
 		}
+// graphids
+		if($options['graphids'] != 0){
+			zbx_value2array($options['graphids']);
+			if($options['extendoutput']){
+				$sql_parts['select']['graphid'] = 'gi.graphid';
+			}
+			$sql_parts['from']['gi'] = 'graphs_items gi';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+		}
 
 // with_items
 		if($options['with_items'] != 0){
@@ -178,6 +191,8 @@ class CTemplate {
 			$sql_parts['limit'] = $options['limit'];
 		}
 //-------------
+		
+		$templateids = array();
 		
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
@@ -246,7 +261,6 @@ class CTemplate {
 						$result[$template['hostid']]['groupids'][$template['groupid']] = $template['groupid'];
 						unset($template['groupid']);
 					}
-					
 					// hostids
 					if(isset($template['linked_hostid'])){
 						if(!isset($result[$template['hostid']]['hostids'])) $result[$template['hostid']]['hostids'] = array();
@@ -254,13 +268,19 @@ class CTemplate {
 						$result[$template['hostid']]['hostids'][$template['linked_hostid']] = $template['linked_hostid'];
 						unset($template['linked_hostid']);
 					}
-					
 					// itemids
 					if(isset($template['itemid'])){
 						if(!isset($result[$template['hostid']]['itemids'])) $result[$template['hostid']]['itemids'] = array();
 							
 						$result[$template['hostid']]['itemids'][$template['itemid']] = $template['itemid'];
 						unset($template['itemid']);
+					}
+					// graphids
+					if(isset($template['graphid'])){
+						if(!isset($result[$template['hostid']]['graphids'])) $result[$template['hostid']]['graphids'] = array();
+							
+						$result[$template['hostid']]['graphids'][$template['graphid']] = $template['graphid'];
+						unset($template['graphid']);
 					}
 					
 					$result[$template['hostid']] += $template;
@@ -284,7 +304,7 @@ class CTemplate {
 		}
 		
 // Adding Hosts
-		if($options['select_templates']){
+		if($options['select_hosts']){
 			$obj_params = array('extendoutput' => 1, 'templateids' => $templateids);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){

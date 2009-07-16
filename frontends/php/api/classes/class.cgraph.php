@@ -59,6 +59,10 @@ class CGraph {
 			'templated_graphs'	=> 0,
 			'editable'			=> 0,
 			'nopermission'		=> 0,
+// output
+			'select_hosts'		=> 0,
+			'select_templates'	=> 0,
+			'select_items'		=> 0,
 			'extendoutput'		=> 0,
 			'count'				=> 0,
 			'pattern'			=> '',
@@ -130,7 +134,6 @@ class CGraph {
 // hostids
 		if($options['hostids'] != 0){
 			zbx_value2array($options['hostids']);
-
 			if($options['extendoutput'] != 0){
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
@@ -149,6 +152,10 @@ class CGraph {
 
 // itemids
 		if($options['itemids'] != 0){
+			zbx_value2array($options['itemids']);
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['itemid'] = 'gi.itemid';
+			}
 			$sql_parts['from']['gi'] = 'graphs_items gi';
 			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sql_parts['where'][] = DBcondition('gi.itemid', $options['itemids']);
@@ -192,6 +199,8 @@ class CGraph {
 		}
 //------------
 
+		$graphids = array();
+		
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
@@ -221,6 +230,8 @@ class CGraph {
 					$result[$graph['graphid']] = $graph['graphid'];
 				}
 				else{
+					$graphids[$graph['graphid']] = $graph['graphid'];
+					
 					if(!isset($result[$graph['graphid']])) $result[$graph['graphid']]= array();
 					
 					// hostids
@@ -230,8 +241,51 @@ class CGraph {
 						$result[$graph['graphid']]['hostids'][$graph['hostid']] = $graph['hostid'];
 						unset($graph['hostid']);
 					}
+					// itemids
+					if(isset($graph['itemid'])){
+						if(!isset($result[$graph['graphid']]['itemid'])) $result[$graph['graphid']]['itemid'] = array();
 
+						$result[$graph['graphid']]['itemids'][$graph['itemid']] = $graph['itemid'];
+						unset($graph['itemid']);
+					}
+					
 					$result[$graph['graphid']] += $graph;
+				}
+			}
+		}
+
+// Adding Hosts
+		if($options['select_templates']){
+			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1);
+			$hosts = CHost::get($obj_params);
+			foreach($hosts as $hostid => $host){
+				foreach($host['graphids'] as $num => $graphid){
+					$result[$graphid]['hostids'][$hostid] = $hostid;
+					$result[$graphid]['hosts'][$hostid] = $host;
+				}
+			}
+		}
+		
+// Adding Templates
+		if($options['select_templates']){
+			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1);
+			$templates = CTemplate::get($obj_params);
+			foreach($templates as $templateid => $template){
+				foreach($template['graphids'] as $num => $graphid){
+					$result[$graphid]['templateids'][$templateid] = $templateid;
+					$result[$graphid]['templates'][$templateid] = $template;
+				}
+			}
+		}
+		
+// Adding Items
+		if($options['select_items']){
+			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1);
+			$items = CItem::get($obj_params);
+			foreach($items as $itemid => $item){
+				foreach($item['graphids'] as $num => $graphid){
+					$result[$graphid]['itemids'][$itemid] = $itemid;
+					$result[$graphid]['items'][$itemid] = $item;
 				}
 			}
 		}
