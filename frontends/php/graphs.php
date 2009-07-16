@@ -394,7 +394,8 @@ include_once('include/page_header.php');
 		$form->addItem(new CButton('form',S_CREATE_GRAPH));
 
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
-
+	echo SBR;
+	
 	if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_graphid'])){
 		insert_copy_elements_to_forms('group_graphid');
 	}
@@ -423,6 +424,33 @@ include_once('include/page_header.php');
 			unset($_REQUEST['graphid']);
 		}
 
+
+
+		$r_form = new CForm();
+		$r_form->setMethod('get');
+
+		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
+
+		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
+		}
+		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
+			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
+		}
+
+		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+
+		$row_count = 0;
+		$numrows = new CSpan(null,'info');
+		$numrows->setAttribute('name','numrows');
+		$header = get_table_header(array(S_GRAPHS_BIG,
+						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+						S_FOUND.': ',$numrows,)
+						);
+		show_table_header($header, $r_form);
+		
 // <<<--- SELECTED HOST HEADER INFORMATION --->>>	
 		if($PAGE_HOSTS['selected'] > 0){
 		
@@ -483,7 +511,7 @@ include_once('include/page_header.php');
 				
 			$tbl_header_host = new CTableInfo();
 			$tbl_header_host->addRow(array(
-				new CLink(bold(S_HOST_INFO), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
+				new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
 				$description,
 				$items,
 				$triggers,
@@ -492,34 +520,11 @@ include_once('include/page_header.php');
 				array(bold(S_PORT.': '), $port),
 				array(bold(S_STATUS.': '), $status),
 				array(bold(S_AVAILABILITY.': '), $available)));
+			$tbl_header_host->setClass('infobox');
+			
 			$tbl_header_host->show();
 		}
 // --->>> SELECTED HOST HEADER INFORMATION <<<---
-
-		$r_form = new CForm();
-		$r_form->setMethod('get');
-
-		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
-		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
-
-		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
-		}
-		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
-		}
-
-		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
-		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-
-		$row_count = 0;
-		$numrows = new CSpan(null,'info');
-		$numrows->setAttribute('name','numrows');
-		$header = get_table_header(array(S_GRAPHS_BIG,
-						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-						S_FOUND.': ',$numrows,)
-						);
-		show_table_header($header, $r_form);
 /* TABLE */
 		$form = new CForm();
 		$form->setName('graphs');

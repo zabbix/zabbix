@@ -425,6 +425,7 @@
 	$form->addItem(new CButton('form',S_CREATE_TRIGGER));
 	
 	show_table_header(S_CONFIGURATION_OF_TRIGGERS_BIG,$form);
+	echo SBR;
 ?>
 <?php
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['g_triggerid'])){
@@ -439,7 +440,35 @@
 	}
 	else{
 /* TABLE */
+		$r_form = new CForm();
+		$r_form->setMethod('get');
+		$r_form->addItem(array('[',
+			new CLink($showdisabled ? S_HIDE_DISABLED_TRIGGERS : S_SHOW_DISABLED_TRIGGERS,
+				'triggers.php?showdisabled='.($showdisabled ? 0 : 1),NULL),
+			']', SPACE));
 
+		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
+
+		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
+		}
+		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
+			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
+		}
+
+		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+
+		$row_count = 0;
+		$numrows = new CSpan(null,'info');
+		$numrows->setAttribute('name','numrows');
+		$header = get_table_header(array(S_TRIGGERS_BIG,
+						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+						S_FOUND.': ',$numrows,)
+						);
+		show_table_header($header, $r_form);
+	
 // <<<--- SELECTED HOST HEADER INFORMATION --->>>	
 		if($PAGE_HOSTS['selected'] > 0){
 		
@@ -500,7 +529,7 @@
 				
 			$tbl_header_host = new CTableInfo();
 			$tbl_header_host->addRow(array(
-				new CLink(bold(S_HOST_INFO), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
+				new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
 				$description,
 				$items,
 				$graphs,
@@ -509,38 +538,11 @@
 				array(bold(S_PORT.': '), $port),
 				array(bold(S_STATUS.': '), $status),
 				array(bold(S_AVAILABILITY.': '), $available)));
+			$tbl_header_host->setClass('infobox');
+			
 			$tbl_header_host->show();
 		}
 // --->>> SELECTED HOST HEADER INFORMATION <<<---
-
-		$r_form = new CForm();
-		$r_form->setMethod('get');
-		$r_form->addItem(array('[',
-			new CLink($showdisabled ? S_HIDE_DISABLED_TRIGGERS : S_SHOW_DISABLED_TRIGGERS,
-				'triggers.php?showdisabled='.($showdisabled ? 0 : 1),NULL),
-			']', SPACE));
-
-		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
-		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
-
-		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
-		}
-		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
-		}
-
-		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
-		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-
-		$row_count = 0;
-		$numrows = new CSpan(null,'info');
-		$numrows->setAttribute('name','numrows');
-		$header = get_table_header(array(S_TRIGGERS_BIG,
-						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-						S_FOUND.': ',$numrows,)
-						);
-		show_table_header($header, $r_form);
 
 		$form = new CForm('triggers.php');
 		$form->setName('triggers');
