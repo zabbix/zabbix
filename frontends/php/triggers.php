@@ -174,7 +174,7 @@
 			}
 
 			DBstart();
-			$result=update_trigger($_REQUEST['triggerid'],
+			$result = update_trigger($_REQUEST['triggerid'],
 				$_REQUEST['expression'],$_REQUEST['description'],$type,
 				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
 				$deps, $trigger_data['templateid']);
@@ -187,7 +187,7 @@
 		} 
 		else {
 			DBstart();
-			$triggerid=add_trigger($_REQUEST['expression'],$_REQUEST['description'],$type,
+			$triggerid = add_trigger($_REQUEST['expression'],$_REQUEST['description'],$type,
 				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
 				$deps);
 			$result = DBend($triggerid);

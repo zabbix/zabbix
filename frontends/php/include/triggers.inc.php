@@ -621,7 +621,8 @@
 
 		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
 		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
-			if ( $arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_ALLOWED_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) ){
+
+			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_ALLOWED_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) ){
 				error('Unknown macro ['.$arr[ZBX_EXPRESSION_MACRO_ID].']');
 				return false;
 			}
@@ -658,20 +659,20 @@
 							' AND h.hostid=i.hostid '.
 							' AND '.DBin_node('h.hostid', get_current_nodeid(false));
 
-				if (!$item = DBfetch(DBselect($sql)) ){
+				if(!$item = DBfetch(DBselect($sql)) ){
 					error('No such monitored parameter ('.$key.') for host ('.$host.')');
 					return false;
 				}
 
 				/* Check function */
-				if( !isset($ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$function]) ){
+				if(!isset($ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$function]) ){
 					error('Unknown function ['.$function.']');
 					return false;
 				}
 
 				$fnc_valid = &$ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$function];
 
-				if ( is_array($fnc_valid['item_types']) &&
+				if(is_array($fnc_valid['item_types']) &&
 					!uint_in_array($item['value_type'], $fnc_valid['item_types'])){
 					$allowed_types = array();
 					foreach($fnc_valid['item_types'] as $type)
@@ -681,7 +682,7 @@
 					return false;
 				}
 
-				if( !is_null($fnc_valid['args']) ){
+				if(!is_null($fnc_valid['args']) ){
 					$parameter = zbx_get_params($parameter);
 
 					if( !is_array($fnc_valid['args']) )
@@ -710,6 +711,10 @@
 						}
 					}
 				}
+			}
+			else{
+				error('An item key must be used in trigger expression');
+				return false;
 			}
 
 			$expr = $arr[ZBX_EXPRESSION_LEFT_ID].$ZBX_TR_EXPR_REPLACE_TO.$arr[ZBX_EXPRESSION_RIGHT_ID];
@@ -770,6 +775,7 @@
 				if(!$result2=add_trigger_dependency($triggerid, $triggerid_up)){
 					error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_description($triggerid_up).']');
 				}
+
 				$result &= $result2;
 			}
 		}

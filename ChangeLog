@@ -1,5 +1,6 @@
 Changes for 1.6.6
 
+ - [ZBX-964] added check on item in trigger expression (Artem)
  - [ZBX-987] fixed shutting down server/proxy after connection lost to remote mysql server (Sasha)
  - [ZBX-809] fixed memory leak while processing perf_counter metric under Windows (Sasha)
  - [ZBX-959] fixed windows agent crash while processing performance counters under Windows 2000. Thanks to Takanori Suzuki (Sasha)
