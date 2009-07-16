@@ -294,7 +294,7 @@ include_once('include/page_header.php');
 
 
 			$form = new CForm(null,'post');
-			$form->setName('hosts');
+			$form->setName('hosts_export');
 			$form->addVar('config',$config);
 			$form->addVar('update', true);
 			
@@ -487,9 +487,6 @@ include_once('include/page_header.php');
 		}
 	}
 
-?>
-<?php
-
+	
 include_once "include/page_footer.php";
-
 ?>

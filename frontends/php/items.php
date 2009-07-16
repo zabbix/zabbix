@@ -820,7 +820,7 @@ include_once('include/page_header.php');
 		$form->addItem(array(SPACE, new CButton('form',S_CREATE_ITEM)));
 
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
-
+echo SBR;
 	if(isset($_REQUEST['form'])){
 // FORM
 		if(str_in_array($_REQUEST['form'],array(S_CREATE_ITEM,'update','clone')) ||
@@ -885,16 +885,24 @@ include_once('include/page_header.php');
 						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 						S_FOUND.': ',$numrows);
 			
+
+		$items_wdgt->addHeader($header, $form);
+		
+//		show_table_header($header, $form);
+// ----------------
+
+// Items Filter
+		$items_wdgt->addFlicker(get_item_filter_form(), get_profile('web.items.filter.state',0));
+//-----
 // <<<--- SELECTED HOST HEADER INFORMATION --->>>	
 		if($PAGE_HOSTS['selected'] > 0){
 		
 			$header_host = CHost::get(array(
-										'hostids' => $PAGE_HOSTS['selected'],
-										'nopermissions' => 1,
-										'extendoutput' => 1,
-										'select_triggers' => 1,
-										'select_graphs' => 1
-									));
+				'hostids' => $PAGE_HOSTS['selected'],
+				'nopermissions' => 1,
+				'extendoutput' => 1,
+				'select_triggers' => 1,
+				'select_graphs' => 1));
 			$header_host = array_pop($header_host);
 			
 			$description = array();
@@ -902,17 +910,12 @@ include_once('include/page_header.php');
 				$proxy = get_host_by_hostid($header_host['proxy_hostid']);
 				$description[] = $proxy['host'].':';
 			}			
-			
-			$description[] = new CLink($header_host['host'], 'hosts.php?form=update&hostid='.$header_host['hostid'].url_param('groupid'));
+			$description[] = $header_host['host'];
 
-			$triggers = array(
-							new CLink(S_TRIGGERS, 'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
-							' ('.count($header_host['triggerids']).')'
-						);
-			$graphs = array(
-							new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
-							' ('.count($header_host['graphids']).')'
-						);
+			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
+							' ('.count($header_host['triggerids']).')');
+			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
+							' ('.count($header_host['graphids']).')');
 			
 			$dns = empty($header_host['dns']) ? '-' : $header_host['dns'];
 			$ip = empty($header_host['ip']) ? '-' : $header_host['ip'];
@@ -942,28 +945,24 @@ include_once('include/page_header.php');
 				$available=new CSpan(S_UNKNOWN,'unknown');
 
 				
-			$tbl_header_host = new CTableInfo();
+			$tbl_header_host = new CTable();
 			$tbl_header_host->addRow(array(
-				new CLink(bold(S_HOST_INFO), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
-				$description,
+				new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
 				$triggers,
 				$graphs,
+				array(bold(S_HOST.': '),$description),
 				array(bold(S_DNS.': '), $dns),
 				array(bold(S_IP.': '), $ip),
 				array(bold(S_PORT.': '), $port),
 				array(bold(S_STATUS.': '), $status),
-				array(bold(S_AVAILABILITY.': '), $available)));
-			$tbl_header_host->show();
+				array(bold(S_AVAILABILITY.': '), $available)
+				));
+				
+			$tbl_header_host->setClass('infobox');
+			
+			$items_wdgt->addItem($tbl_header_host);
 		}
 // --->>> SELECTED HOST HEADER INFORMATION <<<---
-
-		$items_wdgt->addHeader($header, $form);
-//		show_table_header($header, $form);
-// ----------------
-
-// Items Filter
-		$items_wdgt->addFlicker(get_item_filter_form(), get_profile('web.items.filter.state',0));
-//-----
 
 		if($filter_enabled){
 			if(ZBX_DISTRIBUTED && isset($_REQUEST['filter_node'])){
