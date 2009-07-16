@@ -66,7 +66,10 @@ class CTrigger {
 			'templated_triggers'	=> 0,
 			'editable'				=> 0,
 			'nopermissions'			=> 0,
+// OutPut
 			'extendoutput'			=> 0,
+			'select_hosts'			=> 0,
+			'select_items'			=> 0,
 			'count'					=> 0,
 			'pattern'				=> '',
 			'limit'					=> 0,
@@ -154,11 +157,13 @@ class CTrigger {
 
 // itemids
 		if($options['itemids'] != 0){
+			zbx_value2array($options['itemids']);
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['itemid'] = 'f.itemid';
+			}
 			$sql_parts['from']['f'] = 'functions f';
-			$sql_parts['from']['i'] = 'items i';
-			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
+			$sql_parts['where'][] = DBcondition('f.itemid', $options['itemids']);
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
 // applicationids
@@ -217,6 +222,8 @@ class CTrigger {
 		}
 //---------------
 
+		$triggerids = array();
+		
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
@@ -241,12 +248,23 @@ class CTrigger {
 		while($trigger = DBfetch($db_res)){
 			if($options['count'])
 				$result = $trigger;
-			else
+			else{
+				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
+				
 				if($options['extendoutput'] == 0){
 					$result[$trigger['triggerid']] = $trigger['triggerid'];
 				}
 				else{
 					if(!isset($result[$trigger['triggerid']])) $result[$trigger['triggerid']]= array();
+
+					if($options['select_hosts'] && !isset($result[$trigger['triggerid']]['hostids'])){ 
+						$result[$trigger['triggerid']]['hostids'] = array();
+						$result[$trigger['triggerid']]['hosts'] = array();
+					}
+					if($options['select_items'] && !isset($result[$trigger['triggerid']]['itemids'])){ 
+						$result[$trigger['triggerid']]['itemids'] = array();
+						$result[$trigger['triggerid']]['items'] = array();
+					}
 					
 					// hostids
 					if(isset($trigger['hostid'])){
@@ -255,10 +273,45 @@ class CTrigger {
 						$result[$trigger['triggerid']]['hostids'][$trigger['hostid']] = $trigger['hostid'];
 						unset($trigger['hostid']);
 					}
+					// itemids
+					if(isset($trigger['itemid'])){
+						if(!isset($result[$trigger['triggerid']]['itemids'])) $result[$trigger['triggerid']]['itemids'] = array();
 
+						$result[$trigger['triggerid']]['itemids'][$trigger['itemid']] = $trigger['itemid'];
+						unset($trigger['itemid']);
+					}
+					
 					$result[$trigger['triggerid']] += $trigger;
 				}
+			}
 		}
+		
+// Adding Objects
+
+// Adding hosts
+		if($options['select_hosts']){
+			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'nopermissions' => 1);
+			$hosts = CHost::get($obj_params);
+			foreach($hosts as $hostid => $host){
+				foreach($host['triggerids'] as $num => $triggerid){
+					$result[$triggerid]['hostids'][$hostid] = $hostid;
+					$result[$triggerid]['hosts'][$hostid] = $host;
+				}
+			}
+		}
+
+// Adding Items
+		if($options['select_items']){
+			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1);
+			$items = CItem::get($obj_params);
+			foreach($items as $itemid => $item){
+				foreach($item['triggerids'] as $num => $triggerid){
+					$result[$triggerid]['itemids'][$itemid] = $itemid;
+					$result[$triggerid]['items'][$itemid] = $item;
+				}
+			}
+		}
+		
 	return $result;
 	}
 

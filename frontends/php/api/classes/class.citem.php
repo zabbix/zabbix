@@ -57,12 +57,17 @@ class CItem {
 			'groupids'			=> 0,
 			'hostids'			=> 0,
 			'itemids'			=> 0,
+			'graphids'			=> 0,
 			'triggerids'		=> 0,
 			'applicationids'	=> 0,
 			'status'			=> 0,
 			'templated_items'	=> 0,
 			'editable'			=> 0,
 			'nopermissions'		=> 0,
+// OutPut
+			'select_triggers'	=> 0,
+			'select_hosts'		=> 0,
+			'select_graphs'		=> 0,
 			'extendoutput'		=> 0,
 			'count'				=> 0,
 			'pattern'			=> '',
@@ -133,18 +138,31 @@ class CItem {
 
 // triggerids
 		if($options['triggerids'] != 0){
+			zbx_value2array($options['triggerids']);
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['triggerid'] = 'f.triggerid';
+			}
 			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
 			$sql_parts['where'][] = 'i.itemid=f.itemid';
 			$sql_parts['from'][] = 'functions f';
 		}
-
+		
 // applicationids
 		if($options['applicationids'] != 0){
 			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
 			$sql_parts['where'][] = 'i.hostid=a.hostid';
 			$sql_parts['from'][] = 'applications a';
 		}
-
+// graphids
+		if($options['graphids'] != 0){
+			zbx_value2array($options['graphids']);
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['graphid'] = 'gi.graphid';
+			}
+			$sql_parts['from']['gi'] = 'graphs_items gi';
+			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
+			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+		}
 // status
 		if($options['status'] != 0){
 			$sql_parts['where'][] = 'i.status='.$options['status'];
@@ -185,6 +203,8 @@ class CItem {
 		}
 //----------
 
+		$itemids = array(); 
+		
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
@@ -209,13 +229,28 @@ class CItem {
 		while($item = DBfetch($res)){
 			if($options['count'])
 				$result = $item;
-			else
+			else{
+				$itemids[$item['itemid']] = $item['itemid'];
+				
 				if($options['extendoutput'] == 0){
 					$result[$item['itemid']] = $item['itemid'];
 				}
 				else{
 					if(!isset($result[$item['itemid']])) 
 						$result[$item['itemid']]= array();
+						
+					if($options['select_triggers'] && !isset($result[$item['itemid']]['triggerids'])){
+						$result[$item['itemid']]['triggerids'] = array();
+						$result[$item['itemid']]['triggers'] = array();
+					}
+					if($options['select_graphs'] && !isset($result[$item['itemid']]['graphids'])){
+						$result[$item['itemid']]['graphids'] = array();
+						$result[$item['itemid']]['graphs'] = array();
+					}
+					if($options['select_hosts'] && !isset($result[$item['itemid']]['hostids'])){
+						$result[$item['itemid']]['hostids'] = array();
+						$result[$item['itemid']]['hosts'] = array();
+					}
 					
 					// hostids
 					if(isset($item['hostid'])){
@@ -224,9 +259,63 @@ class CItem {
 						$result[$item['itemid']]['hostids'][$item['hostid']] = $item['hostid'];
 						unset($item['hostid']);
 					}
+					// triggerids
+					if(isset($item['triggerid'])){
+						if(!isset($result[$item['itemid']]['triggerids'])) 
+							$result[$item['itemid']]['triggerids'] = array();
+							
+						$result[$item['itemid']]['triggerids'][$item['triggerid']] = $item['triggerid'];
+						unset($item['triggerid']);
+					}
+					// graphids
+					if(isset($item['graphid'])){
+						if(!isset($result[$item['itemid']]['graphids'])) 
+							$result[$item['itemid']]['graphids'] = array();
+							
+						$result[$item['itemid']]['graphids'][$item['graphid']] = $item['graphid'];
+						unset($item['graphid']);
+					}
 
 					$result[$item['itemid']] += $item;
 				}
+			}
+		}
+// Adding Objects
+
+// Adding hosts
+		if($options['select_hosts']){
+			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'nopermissions' => 1);
+			$hosts = CHost::get($obj_params);
+			foreach($hosts as $hostid => $host){
+				foreach($host['itemids'] as $num => $itemid){
+					$result[$itemid]['hostids'][$hostid] = $hostid;
+					$result[$itemid]['hosts'][$hostid] = $host;
+				}
+			}
+		}
+	
+// Adding triggers	
+		if($options['select_triggers']){
+			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids);
+			$triggers = CTrigger::get($obj_params);
+			foreach($triggers as $triggerid => $trigger){
+				foreach($trigger['itemids'] as $num => $itemid){
+					$result[$itemid]['triggerids'][$triggerid] = $triggerid;
+					$result[$itemid]['triggers'][$triggerid] = $trigger;
+				}
+			}
+		}
+		
+// Adding graphs
+		if($options['select_graphs']){
+			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids);
+			$graphs = CGraph::get($obj_params);
+			foreach($graphs as $graphid => $graph){
+				foreach($graph['itemids'] as $num => $itemid){
+					$result[$itemid]['graphids'][$graphid] = $graphid;
+					$result[$itemid]['graphs'][$graphid] = $graph;
+				}
+			}
 		}
 
 	return $result;

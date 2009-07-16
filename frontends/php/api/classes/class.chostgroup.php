@@ -114,6 +114,8 @@ class CHostGroup {
 			'only_current_node'			=> 0,
 			'editable'					=> 0,
 			'nopermissions'				=> 0,
+// output
+			'select_hosts'				=> 0,
 			'extendoutput'				=> 0,
 			'count'						=> 0,
 			'pattern' 					=> '',
@@ -303,6 +305,9 @@ class CHostGroup {
 			$sql_parts['limit'] = $options['limit'];
 		}
 //-----------
+		
+		$groupids = array();
+		
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
@@ -330,13 +335,34 @@ class CHostGroup {
 			else{
 				if(!$options['extendoutput']){
 					$result[$group['groupid']] = $group['groupid'];
-					
 				}
 				else{
-					$result[$group['groupid']] = $group;
+					$groupids[$group['groupid']] = $group['groupid'];
+					
+					if(!isset($result[$group['groupid']])) $result[$group['groupid']]= array();
+					
+					if($options['select_hosts'] && !isset($result[$group['groupid']]['hostids'])){ 
+						$result[$group['groupid']]['hostids'] = array();
+						$result[$group['groupid']]['hosts'] = array();
+					}
+										
+					$result[$group['groupid']] += $group;
 				}	
 			}
 		}
+		
+// Adding hosts
+		if($options['select_hosts']){
+			$obj_params = array('extendoutput' => 1, 'groupids' => $groupids, 'templated_hosts' => 1);
+			$hosts = CHost::get($obj_params);
+			foreach($hosts as $hostid => $host){
+				foreach($host['groupids'] as $num => $groupid){
+					$result[$groupid]['hostids'][$hostid] = $hostid;
+					$result[$groupid]['hosts'][$hostid] = $host;
+				}
+			}
+		}
+
 	return $result;
 	}
 
