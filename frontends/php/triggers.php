@@ -600,12 +600,12 @@
 			$description[] = new CLink(expand_trigger_description($row['triggerid']),
 										'triggers.php?form=update&triggerid='.$row['triggerid'].'&hostid='.$row['hostid']);
 
-			//add dependencies
+//add dependencies
 			$deps = get_trigger_dependencies_by_triggerid($row['triggerid']);
 			if(count($deps) > 0){
 				$description[] = array(BR(),bold(S_DEPENDS_ON.':'),SPACE);
 				foreach($deps as $num => $dep_triggerid) {
-					// shows host name of depending trigger
+// shows host name of depending trigger
 					$description[] = BR();
 
 					$hosts = get_hosts_by_triggerid($dep_triggerid);
@@ -626,6 +626,8 @@
 				}
 			}
 
+			if($row['status'] != TRIGGER_STATUS_UNKNOWN) $row['error'] = '';
+			
 			if(!zbx_empty($row['error']) && (HOST_STATUS_TEMPLATE != $row['hoststatus'])){
 				$error = new CDiv(SPACE,'error_icon');
 				$error->setHint($row['error'], '', 'on');
@@ -644,26 +646,19 @@
 				default:$priority=$row['priority'];
 			}
 
+			$status_link = 'triggers.php?go='.(($row['status'] == TRIGGER_STATUS_DISABLED)?'activate':'disable').
+						'&g_triggerid%5B%5D='.$row['triggerid'].
+						'&hostid='.$row['hostid'];
+						
 			if($row['status'] == TRIGGER_STATUS_DISABLED){
-				$status= new CLink(S_DISABLED,
-					'triggers.php?group_enable=1&g_triggerid%5B%5D='.$row['triggerid'].
-						'&hostid='.$row['hostid'],
-					'disabled');
+				$status = new CLink(S_DISABLED,$status_link,'disabled');
 			}
 			else if($row['status'] == TRIGGER_STATUS_UNKNOWN){
-				$status= new CLink(S_UNKNOWN,
-					'triggers.php?group_disable=1&g_triggerid%5B%5D='.$row['triggerid'].
-						'&hostid='.$row['hostid'],
-					'unknown');
+				$status = new CLink(S_UNKNOWN,$status_link,'unknown');
 			}
 			else if($row['status'] == TRIGGER_STATUS_ENABLED){
-				$status= new CLink(S_ENABLED,
-					'triggers.php?group_disable=1&g_triggerid%5B%5D='.$row['triggerid'].
-						'&hostid='.$row['hostid'],
-					'enabled');
+				$status = new CLink(S_ENABLED,$status_link,'enabled');
 			}
-
-			if($row['status'] != TRIGGER_STATUS_UNKNOWN)	$row['error']=SPACE;
 
 			$table->addRow(array(
 				new CCheckBox('g_triggerid['.$row['triggerid'].']', NULL,NULL,$row['triggerid']),
