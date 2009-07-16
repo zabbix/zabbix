@@ -177,7 +177,14 @@ hide: function(boxid){
 	var hint = $(boxid);
 	if(!is_null(hint)){
 		delete(this.boxes[boxid]);
-		hint.parentNode.removeChild(hint);
+		
+// Opera have problems with refreshing objects after removing
+		hint.style.display = 'none';
+		if(OP)
+			setTimeout(function(){hint.parentNode.removeChild(hint);},200);
+		else
+			hint.parentNode.removeChild(hint);
+//----
 	}
 },
 

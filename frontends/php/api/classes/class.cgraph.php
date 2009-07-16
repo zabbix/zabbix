@@ -255,7 +255,7 @@ class CGraph {
 		}
 
 // Adding Hosts
-		if($options['select_templates']){
+		if($options['select_hosts']){
 			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){

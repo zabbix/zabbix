@@ -30,12 +30,11 @@ $page['hist_arg'] = array('scriptid','form');
 
 include_once('include/page_header.php');
 
-$_REQUEST['go'] = get_request('go','none');
+?>
+<?php
 
 //---------------------------------- CHECKS ------------------------------------
-
 //		VAR							TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-
 $fields=array(
 		'scriptid'=>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	null),
 		'scripts'=>				array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,	null),
@@ -60,6 +59,11 @@ $fields=array(
 );
 
 check_fields($fields);
+$_REQUEST['go'] = get_request('go','none');
+
+?>
+<?php
+
 $frmForm = new CForm();
 $frmForm->setMethod('get');
 $frmForm->addItem(new CButton('form',S_CREATE_SCRIPT,"javascript: redirect('scripts.php?form=1');"));

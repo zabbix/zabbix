@@ -22,8 +22,7 @@
 	require_once('include/forms.inc.php');
 ?>
 <?php
-	$_REQUEST['go'] = get_request('go','none');
-	
+	$_REQUEST['go'] = get_request('go','none');	
 	if(($_REQUEST['go'] == 'export') && isset($_REQUEST['hosts'])){
 		$EXPORT_DATA = true;
 		$page['type'] = PAGE_TYPE_XML;
@@ -69,6 +68,7 @@ include_once('include/page_header.php');
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 
+	$_REQUEST['go'] = get_request('go','none');
 	$preview = ($_REQUEST['go'] == 'preview')?true:false;
 	$config = get_request('config', 0);
 	$update = get_request('update', null);
