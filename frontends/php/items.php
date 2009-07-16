@@ -32,7 +32,6 @@
 include_once('include/page_header.php');
 
 	$_REQUEST['config'] = get_request('config','itemts.php');
-	$_REQUEST['go'] = get_request('go','none');
 	$_REQUEST['showdisabled'] = get_request('showdisabled', get_profile('web.items.showdisabled', 0));
 
 ?>
@@ -187,6 +186,9 @@ include_once('include/page_header.php');
 	check_fields($fields);
 	validate_sort_and_sortorder('i.description',ZBX_SORT_UP);
 
+	$_REQUEST['go'] = get_request('go','none');
+?>
+<?php
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){

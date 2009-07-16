@@ -27,8 +27,6 @@
 	$page['hist_arg'] = array();
 
 include_once('include/page_header.php');
-
-	$_REQUEST['go'] = get_request('go','none');
 	
 	$available_groups = CHostGroup::get(array('editable' => 1));
 	$available_hosts = CHost::get(array('editable' => 1, 'templated_hosts' => 1));	
@@ -66,8 +64,9 @@ include_once('include/page_header.php');
 	);
 	check_fields($fields);
 //validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
-
-
+	$_REQUEST['go'] = get_request('go','none');
+?>
+<?php
 /*** <--- ACTIONS ---> ***/
 	if(isset($_REQUEST['clone']) && isset($_REQUEST['groupid'])){
 		unset($_REQUEST['groupid']);

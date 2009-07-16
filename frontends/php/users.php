@@ -33,7 +33,6 @@
 
 include_once('include/page_header.php');
 
-	$_REQUEST['go'] = get_request('go','none');
 	$_REQUEST['config'] = get_request('config','users.php');
 
 ?>
@@ -115,6 +114,7 @@ include_once('include/page_header.php');
 	check_fields($fields);
 	validate_sort_and_sortorder('u.alias',ZBX_SORT_UP);
 
+	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
 	if(isset($_REQUEST['new_group'])) {

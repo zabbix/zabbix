@@ -32,7 +32,6 @@
 include_once('include/page_header.php');
 
 	$_REQUEST['config'] = get_request('config','graphs.php');
-	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -98,7 +97,8 @@ include_once('include/page_header.php');
 
 	check_fields($fields);
 	validate_sort_and_sortorder('g.name',ZBX_SORT_UP);
-
+	
+	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
 
@@ -109,7 +109,9 @@ include_once('include/page_header.php');
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 	$available_hosts_all_nodes = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,get_current_nodeid(true));
-	$available_graphs = get_accessible_graphs(PERM_READ_WRITE,array(),null,get_current_nodeid(true));	// OPTIMAZE
+	
+// OPTIMAZE
+	$available_graphs = CGraph::get(array('nodeids'=>get_current_nodeid(true), 'editable'=>1));	
 
 // ---- <ACTIONS> ----
 	if(isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])){

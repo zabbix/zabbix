@@ -36,7 +36,6 @@
 
 include_once('include/page_header.php');
 
-	$_REQUEST['go'] = get_request('go','none');
 	$_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
 ?>
 <?php
@@ -108,6 +107,9 @@ include_once('include/page_header.php');
 	check_fields($fields);
 	validate_sort_and_sortorder('a.name',ZBX_SORT_UP);
 
+	$_REQUEST['go'] = get_request('go','none');
+?>
+<?php
 /* AJAX */
 // for future use
 	if(isset($_REQUEST['favobj'])){

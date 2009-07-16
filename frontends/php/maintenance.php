@@ -40,8 +40,6 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_hosts[$_REQUEST['hostid']])) {
 		access_deny();
 	}
-	
-	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -91,6 +89,9 @@ include_once('include/page_header.php');
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 
+	$_REQUEST['go'] = get_request('go','none');
+?>
+<?php
 /************ MAINTENANCE ****************/
 
 	if(inarr_isset(array('clone','maintenanceid'))){

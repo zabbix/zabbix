@@ -33,7 +33,6 @@
 	include_once('include/page_header.php');
 
 	$_REQUEST['config'] = get_request('config','triggers.php');
-	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
 
@@ -97,20 +96,25 @@
 	$_REQUEST['showdisabled'] = get_request('showdisabled', get_profile('web.triggers.showdisabled', 0));
 
 	check_fields($fields);
-
 	validate_sort_and_sortorder('t.description',ZBX_SORT_UP);
 
+	$_REQUEST['go'] = get_request('go','none');
+?>
+<?php	
 // triggerid permission check
 	if(isset($_REQUEST['triggerid']))
 		if(!check_right_on_trigger_by_triggerid(PERM_READ_WRITE, $_REQUEST['triggerid']))
 			access_deny();
+//----
 
 	$showdisabled = get_request('showdisabled', 0);
-?>
-<?php
 	update_profile('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
 
-	$available_triggers = get_accessible_triggers(PERM_READ_WRITE, array());			// OPTIMIZE!!!
+	
+// OPTIMIZE!!!
+	$available_triggers = CTrigger::get(array('editable' => 1));
+
+	
 /* FORM ACTIONS */
 	if(isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])){
 		unset($_REQUEST['triggerid']);
