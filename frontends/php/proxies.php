@@ -29,7 +29,6 @@
 	
 include_once('include/page_header.php');
 
-	$_REQUEST['go'] = get_request('go','none');
 	$_REQUEST['config'] = get_request('config','proxies.php');
 	
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
@@ -38,6 +37,8 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_hosts[$_REQUEST['hostid']])) {
 		access_deny();
 	}
+?>
+<?php
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -64,6 +65,8 @@ include_once('include/page_header.php');
 	
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
+	
+	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
 

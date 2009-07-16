@@ -29,7 +29,6 @@
 
 include_once('include/page_header.php');
 
-	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -79,6 +78,7 @@ include_once('include/page_header.php');
 	check_fields($fields);
 	validate_sort_and_sortorder('d.name',ZBX_SORT_UP);
 
+	$_REQUEST['go'] = get_request('go','none');
 	$_REQUEST['dchecks'] = get_request('dchecks', array());
 	$_REQUEST['dchecks_deleted'] = get_request('dchecks_deleted', array());
 

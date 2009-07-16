@@ -30,7 +30,6 @@
 
 include_once('include/page_header.php');
 
-	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
 	$bulk = ($_REQUEST['go'] == 'bulkacknowledge');
@@ -51,6 +50,8 @@ include_once('include/page_header.php');
 	);
 	check_fields($fields);
 
+	$_REQUEST['go'] = get_request('go','none');
+	
 	if(!isset($_REQUEST['events']) && !isset($_REQUEST['eventid'])){
 		show_message(S_NO_EVENTS_TO_ACKNOWLEDGE);
 		include_once('include/page_footer.php');

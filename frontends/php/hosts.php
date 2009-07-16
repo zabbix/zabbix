@@ -31,7 +31,6 @@
 include_once('include/page_header.php');
 
 	$_REQUEST['config'] = get_request('config','hosts.php');
-	$_REQUEST['go'] = get_request('go','none');
 
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
@@ -129,7 +128,7 @@ include_once('include/page_header.php');
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 
-//	update_profile('web.hosts.config',$_REQUEST['config'], PROFILE_TYPE_STR);
+	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
 
