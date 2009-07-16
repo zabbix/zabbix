@@ -3,6 +3,16 @@ table{
 	border-spacing:	0px; /* cellspacing */
 }
 
+table.infobox{
+	width: 100%;
+	margin: 6px 0;
+	border: 1px solid gray;
+	background-color: white;
+}
+table.infobox tr td{
+	padding-left: 5px;
+}
+
 table.whitetext {
 	border-spacing:	0px; /* cellspacing */
 	color: #CCCCCC;

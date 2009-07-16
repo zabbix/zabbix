@@ -146,6 +146,7 @@
 	'S_STEP_OF_SCENARIO'=>				'Step of scenario',
 
 //	exp_imp.php
+	'S_EXPORT_TO_XML' =>		'Export to XML',
 	'S_ELEMENT'=>				'Element',
 	'S_ELEMENTS'=>				'Elements',
 	'S_ONLY_HOST_INFO'=>			'Only host info',
@@ -677,7 +678,7 @@
 	'S_CONFIGURATION_OF_GROUPS' => 'CONFIGURATION OF HOST GROUPS',
 
 //	hosts.php
-	'S_HOST_INFO' => 'Host info',
+	'S_HOST_LIST' => 'Hosts list',
 	'S_IN'=>						'In',
 	'S_APPLICATION'=>					'Application',
 	'S_APPLICATIONS'=>					'Applications',
