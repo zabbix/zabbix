@@ -125,7 +125,8 @@ include_once('include/page_header.php');
 
 	$header = array(
 			is_show_all_nodes() ? new CCol(S_NODE, 'center') : null,
-			new CCol(make_sorting_link(S_HOST,'ip'), 'center'),
+			new CCol(make_sorting_link(S_DISCOVERED_DEVICE,'ip'), 'center'),
+			new CCol(S_MONITORED_HOST, 'center'),
 			new CCol(array(S_UPTIME.'/',S_DOWNTIME),'center')
 			);
 
@@ -140,7 +141,7 @@ include_once('include/page_header.php');
 	if($druleid>0){
 		$sql_where = ' AND druleid='.$druleid;
 	}
-	$sql = 'SELECT DISTINCT druleid,name '.
+	$sql = 'SELECT DISTINCT druleid,proxy_hostid,name '.
 			' FROM drules '.
 			' WHERE '.DBin_node('druleid').
 				$sql_where.
@@ -150,10 +151,12 @@ include_once('include/page_header.php');
 	while($drule = DBfetch($db_drules)) {
 		$discovery_info = array();
 
-		$db_dhosts = DBselect('SELECT dhostid,druleid,ip,status,lastup,lastdown '.
-				' FROM dhosts WHERE '.DBin_node('dhostid').
-				' AND druleid='.$drule['druleid'].
-				order_by('ip','dhostid,status'));
+		$db_dhosts = DBselect('SELECT dh.dhostid,dh.druleid,dh.ip,dh.status,dh.lastup,dh.lastdown,h.host'.
+				' FROM dhosts dh'.
+				' LEFT JOIN hosts h ON h.ip=dh.ip and h.proxy_hostid='.$drule['proxy_hostid'].
+				' WHERE '.DBin_node('dh.dhostid').
+					' AND dh.druleid='.$drule['druleid'].
+				order_by('dh.ip','dh.dhostid,dh.status'));
 		while($dhost = DBfetch($db_dhosts)){
 			$class = 'enabled';
 			$time = 'lastup';
@@ -162,7 +165,8 @@ include_once('include/page_header.php');
 				$time = 'lastdown';
 			}
 
-			$discovery_info[$dhost['ip']] = array('class' => $class, 'time' => $dhost[$time], 'druleid' => $dhost['druleid']);
+			$discovery_info[$dhost['ip']] = array('class' => $class, 'host' => $dhost['host'],
+					'time' => $dhost[$time], 'druleid' => $dhost['druleid']);
 
 			$db_dservices = DBselect('SELECT type,port,key_,status,lastup,lastdown FROM dservices '.
 					' WHERE dhostid='.$dhost['dhostid'].
@@ -190,7 +194,7 @@ include_once('include/page_header.php');
 		if ($druleid == 0 && !empty($discovery_info)) {
 			$col = new CCol(array(bold($drule['name']),
 				SPACE.'('.count($discovery_info).SPACE.S_ITEMS.')'));
-			$col->setColSpan(count($services) + 2);
+			$col->setColSpan(count($services) + 3);
 
 			$table->addRow(array(get_node_name_by_elid($drule['druleid']),$col));
 		}
@@ -199,6 +203,7 @@ include_once('include/page_header.php');
 			$table_row = array(
 				get_node_name_by_elid($h_data['druleid']),
 				new CSpan($ip, $h_data['class']),
+				new CSpan(empty($h_data['host']) ? '-' : $h_data['host']),
 				new CSpan(($h_data['time'] == 0 ? '' : convert_units(time() - $h_data['time'], 'uptime')), $h_data['class'])
 				);
 			foreach($services as $name => $foo){

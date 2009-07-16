@@ -89,6 +89,8 @@
 //	discovery.php
 	'S_UP_TIME'=>				'Uptime',
 	'S_DOWN_TIME'=>				'Downtime',
+	'S_DISCOVERED_DEVICE'=>			'Discovered device',
+	'S_MONITORED_HOST'=>			'Monitored host',
 
 //	httpdetails.php
 	'S_DETAILS_OF_SCENARIO'=>		'Details of scenario',
