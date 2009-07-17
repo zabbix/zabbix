@@ -714,8 +714,7 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 // --->>> GENERATE OUTPUTS <<<---
 
 
-		$row_count = $table->getNumRows();
-		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+		zbx_add_post_js('insert_in_element("numrows","'.$table->getNumRows().'");');
 
 
 //----- GO ------

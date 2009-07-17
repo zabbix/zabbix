@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,16 +19,16 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/screens.inc.php";
-	require_once "include/forms.inc.php";
-	require_once "include/maps.inc.php";
+	require_once 'include/config.inc.php';
+	require_once 'include/screens.inc.php';
+	require_once 'include/forms.inc.php';
+	require_once 'include/maps.inc.php';
 
-	$page["title"] = "S_SCREENS";
-	$page["file"] = "screenconf.php";
+	$page['title'] = 'S_SCREENS';
+	$page['file'] = 'screenconf.php';
 	$page['hist_arg'] = array('config');
 
-include_once "include/page_header.php";
+include_once 'include/page_header.php';
 
 ?>
 <?php
@@ -36,35 +36,38 @@ include_once "include/page_header.php";
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"config"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	null), // 0 - screens, 1 - slides
+		'config'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null), // 0 - screens, 1 - slides
+		'screens'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'shows'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 
-		"screenid"=>		array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,		'(isset({config})&&({config}==0))&&(isset({form})&&({form}=="update"))'),
-		"hsize"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),	'(isset({config})&&({config}==0))&&isset({save})'),
-		"vsize"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),	'(isset({config})&&({config}==0))&&isset({save})'),
+		'screenid'=>		array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,		'(isset({config})&&({config}==0))&&(isset({form})&&({form}=="update"))'),
+		'hsize'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),	'(isset({config})&&({config}==0))&&isset({save})'),
+		'vsize'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),	'(isset({config})&&({config}==0))&&isset({save})'),
 
-		"slideshowid"=>		array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,		'(isset({config})&&({config}==1))&&(isset({form})&&({form}=="update"))'),
-		"name"=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
-		"delay"=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,86400),'(isset({config})&&({config}==1))&&isset({save})'),
+		'slideshowid'=>		array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,		'(isset({config})&&({config}==1))&&(isset({form})&&({form}=="update"))'),
+		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
+		'delay'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,86400),'(isset({config})&&({config}==1))&&isset({save})'),
 
-		"steps"=>		array(null,	O_OPT,	null,	null,	null),
-		"new_step"=>		array(null,	O_OPT,	null,	null,	null),
+		'steps'=>		array(null,	O_OPT,	null,	null,	null),
+		'new_step'=>		array(null,	O_OPT,	null,	null,	null),
 
-		"move_up"=>		array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
-		"move_down"=>		array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
+		'move_up'=>		array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
+		'move_down'=>		array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
 
-		"edit_step"=>		array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
-		"add_step"=>		array(T_ZBX_STR, O_OPT,  P_ACT,  null, null),
-		"cancel_step"=>		array(T_ZBX_STR, O_OPT,  P_ACT,  null, null),
+		'edit_step'=>		array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
+		'add_step'=>		array(T_ZBX_STR, O_OPT,  P_ACT,  null, null),
+		'cancel_step'=>		array(T_ZBX_STR, O_OPT,  P_ACT,  null, null),
 
-		"sel_step"=>		array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
-		"del_sel_step"=>		array(T_ZBX_STR, O_OPT,  P_ACT,  null, null),
-
-		"clone"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
+		'sel_step'=>		array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
+		'del_sel_step'=>		array(T_ZBX_STR, O_OPT,  P_ACT,  null, null),
+// actions
+		'go'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
+		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
 	);
 
 	check_fields($fields);
@@ -75,6 +78,8 @@ include_once "include/page_header.php";
 	update_profile('web.screenconf.config', $_REQUEST['config'],PROFILE_TYPE_INT);
 ?>
 <?php
+	$_REQUEST['go'] = get_request('go', 'none');
+
 	if( 0 == $config ){
 		if(isset($_REQUEST["screenid"])){
 			if(!screen_accessible($_REQUEST["screenid"], PERM_READ_WRITE))
@@ -120,6 +125,22 @@ include_once "include/page_header.php";
 			}
 			unset($_REQUEST["screenid"]);
 			unset($_REQUEST["form"]);
+		}
+		else if($_REQUEST['go'] == 'delete'){
+			$result = true;
+			$screens = get_request('screens', array());
+			
+			DBstart();
+			foreach($screens as $screenid){
+				$result &= delete_screen($screenid);
+				if(!$result) break;
+			}
+			$result = DBend($result);
+			
+			if($result){
+				unset($_REQUEST["form"]);
+			}
+			show_messages($result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
 		}
 	}
 	else{
@@ -213,6 +234,22 @@ include_once "include/page_header.php";
 			unset($_REQUEST['slideshowid']);
 			unset($_REQUEST["form"]);
 		}
+		else if($_REQUEST['go'] == 'delete'){
+			$result = true;
+			$shows = get_request('shows', array());
+			
+			DBstart();
+			foreach($shows as $showid){
+				$result &= delete_slideshow($showid);
+				if(!$result) break;
+			}
+			$result = DBend($result);
+			
+			if($result){
+				unset($_REQUEST["form"]);
+			}
+			show_messages($result, S_SLIDESHOW_DELETED, S_CANNOT_DELETE_SLIDESHOW);
+		}
 	}
 ?>
 <?php
@@ -229,12 +266,13 @@ include_once "include/page_header.php";
 	show_table_header(0 == $config ? S_CONFIGURATION_OF_SCREENS_BIG : S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
 	echo SBR;
 
-	$row_count = 0;
 	if( 0 == $config ){
 		if(isset($_REQUEST["form"])){
 			insert_screen_form();
 		}
 		else{
+			$form = new CForm();
+			$form->setName('frm_screens');
 
 			$numrows = new CSpan(null,'info');
 			$numrows->setAttribute('name','numrows');
@@ -246,6 +284,7 @@ include_once "include/page_header.php";
 
 			$table = new CTableInfo(S_NO_SCREENS_DEFINED);
 			$table->SetHeader(array(
+				new CCheckBox('all_screens',NULL,"checkAll('".$form->getName()."','all_screens','screens');"),
 				make_sorting_link(S_NAME,'s.name'),
 				make_sorting_link(S_DIMENSION_COLS_ROWS,'size'),
 				S_SCREEN));
@@ -259,14 +298,27 @@ include_once "include/page_header.php";
 				if(!screen_accessible($row["screenid"], PERM_READ_WRITE)) continue;
 
 				$table->AddRow(array(
+					new CCheckBox('screens['.$row['screenid'].']', NULL, NULL, $row['screenid']),
 					new CLink($row["name"],"?config=0&form=update&screenid=".$row["screenid"],
 						'action'),
 					$row["hsize"]." x ".$row["vsize"],
 					new CLink(S_EDIT,"screenedit.php?screenid=".$row["screenid"])
 					));
-				$row_count++;
 			}
-			$table->Show();
+			
+//----- GO ------
+			$goBox = new CComboBox('go');
+			$goBox->addItem('delete', S_DELETE_SELECTED);
+
+// goButton name is necessary!!!
+			$goButton = new CButton('goButton',S_GO.' (0)');
+			$goButton->setAttribute('id','goButton');
+			zbx_add_post_js('chkbxRange.pageGoName = "screens";');
+
+			$table->setFooter(new CCol(array($goBox, $goButton)));
+			
+			$form->addItem($table);
+			$form->show();
 		}
 	}
 	else{
@@ -274,7 +326,9 @@ include_once "include/page_header.php";
 			insert_slideshow_form();
 		}
 		else{
-			$row_count = 0;
+			$form = new CForm();
+			$form->setName('frm_shows');
+			
 			$numrows = new CSpan(null,'info');
 			$numrows->setAttribute('name','numrows');
 			$header = get_table_header(array(S_SLIDESHOWS_BIG,
@@ -286,6 +340,7 @@ include_once "include/page_header.php";
 
 			$table = new CTableInfo(S_NO_SLIDESHOWS_DEFINED);
 			$table->SetHeader(array(
+				new CCheckBox('all_shows',NULL,"checkAll('".$form->getName()."','all_shows','shows');"),
 				make_sorting_link(S_NAME,'s.name'),
 				make_sorting_link(S_DELAY,'s.delay'),
 				make_sorting_link(S_COUNT_OF_SLIDES,'cnt')
@@ -302,19 +357,32 @@ include_once "include/page_header.php";
 				if(!slideshow_accessible($slide_data['slideshowid'], PERM_READ_WRITE)) continue;
 
 				$table->AddRow(array(
+					new CCheckBox('shows['.$slide_data['slideshowid'].']', NULL, NULL, $slide_data['slideshowid']),
 					new CLink($slide_data['name'],'?config=1&form=update&slideshowid='.$slide_data['slideshowid'],
 						'action'),
 					$slide_data['delay'],
 					$slide_data['cnt']
 					));
-				$row_count++;
 			}
-			$table->Show();
+//----- GO ------
+			$goBox = new CComboBox('go');
+			$goBox->addItem('delete', S_DELETE_SELECTED);
+
+// goButton name is necessary!!!
+			$goButton = new CButton('goButton',S_GO.' (0)');
+			$goButton->setAttribute('id','goButton');
+			zbx_add_post_js('chkbxRange.pageGoName = "shows";');
+
+			$table->setFooter(new CCol(array($goBox, $goButton)));
+			
+			$form->addItem($table);
+			$form->show();
 		}
-
+		
 	}
-	zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
-
+	if(isset($table)){
+		zbx_add_post_js('insert_in_element("numrows","'.$table->getNumRows().'");');
+	}
 
 include_once "include/page_footer.php";
 ?>
