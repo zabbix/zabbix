@@ -59,6 +59,26 @@ extern int		CONFIG_DBSYNCER_FREQUENCY;
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCget_stats                                                      *
+ *                                                                            *
+ * Purpose: get statistics of the database cache                              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_stats(ZBX_DC_STATS *stats)
+{
+	memcpy(stats, &cache->stats, sizeof(ZBX_DC_STATS));
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCget_trend_nearestindex                                         *
  *                                                                            *
  * Purpose: find nearest index by itemid in array of ZBX_DC_TREND             *
