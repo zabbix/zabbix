@@ -35,6 +35,7 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
 // media form
+		'media_types'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
 		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN(implode(',',array(MEDIA_TYPE_EMAIL,MEDIA_TYPE_EXEC,MEDIA_TYPE_SMS,MEDIA_TYPE_JABBER))),'(isset({save}))'),
 		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({save}))'),
@@ -49,6 +50,7 @@ include_once "include/page_header.php";
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 /* other */
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
@@ -60,6 +62,8 @@ include_once "include/page_header.php";
 <?php
 
 /* MEDIATYPE ACTIONS */
+	$_REQUEST['go'] = get_request('go', 'none');
+	
 	$result = 0;
 	if(isset($_REQUEST["save"])){
 		if(isset($_REQUEST["mediatypeid"])){
@@ -88,9 +92,8 @@ include_once "include/page_header.php";
 */
 			unset($_REQUEST["form"]);
 		}
-	} elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["mediatypeid"])) {
-/* DELETE */
-/*		$mediatype=get_mediatype_by_mediatypeid($_REQUEST["mediatypeid"]);*/
+	}
+	elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["mediatypeid"])){
 		$result=delete_mediatype($_REQUEST["mediatypeid"]);
 		show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
 		if($result)
@@ -102,6 +105,22 @@ include_once "include/page_header.php";
 		}
 	}
 
+	else if($_REQUEST['go'] == 'delete'){
+		$result = true;
+		$media_types = get_request('media_types', array());
+		
+		DBstart();
+		foreach($media_types as $media_typeid){
+			$result &= delete_mediatype($media_typeid);
+			if(!$result) break;
+		}
+		$result = DBend($result);
+		
+		if($result){
+			unset($_REQUEST["form"]);
+		}
+		show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
+	}
 ?>
 <?php
 
@@ -114,7 +133,6 @@ include_once "include/page_header.php";
 		$header = get_table_header(S_CONFIGURATION_OF_MEDIA_TYPES_BIG);
 	}
 	else{
-		$row_count = 0;
 		$numrows = new CSpan(null,'info');
 		$numrows->setAttribute('name','numrows');
 		$header = get_table_header(array(S_CONFIGURATION_OF_MEDIA_TYPES_BIG,
@@ -126,15 +144,17 @@ include_once "include/page_header.php";
 
 ?>
 <?php
-	if(isset($_REQUEST["form"]))
-	{
+	if(isset($_REQUEST["form"])){
 		echo SBR;
 		insert_media_type_form();
 	}
-	else
-	{
+	else{
+		$form = new CForm();
+		$form->setName('frm_media_types');
+		
 		$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
 		$table->setHeader(array(
+			new CCheckBox('all_media_types',NULL,"checkAll('".$form->getName()."','all_media_types','media_types');"),
 			make_sorting_link(S_TYPE,'mt.type'),
 			make_sorting_link(S_DESCRIPTION,'mt.description'),
 			S_DETAILS
@@ -168,13 +188,26 @@ include_once "include/page_header.php";
 			}
 
 			$table->addRow(array(
+				new CCheckBox('media_types['.$row['mediatypeid'].']',NULL,NULL,$row['mediatypeid']),
 				media_type2str($row['type']),
 				new CLink($row["description"],"?&form=update&mediatypeid=".$row["mediatypeid"],'action'),
 				$details));
-			$row_count++;
 		}
-		$table->show();
-		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+		
+//----- GO ------
+		$goBox = new CComboBox('go');
+		$goBox->addItem('delete', S_DELETE_SELECTED);
+
+// goButton name is necessary!!!
+		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton->setAttribute('id','goButton');
+		zbx_add_post_js('chkbxRange.pageGoName = "media_types";');
+
+		$table->setFooter(new CCol(array($goBox, $goButton)));
+		
+		$form->addItem($table);
+		$form->show();
+		zbx_add_post_js('insert_in_element("numrows","'.$table->getNumRows().'");');
 	}
 
 

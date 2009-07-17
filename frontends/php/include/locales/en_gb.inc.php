@@ -1027,6 +1027,8 @@
 
 
 //	sysmaps.php
+	'S_MAP_DELETED' =>			'Network map deleted',
+	'S_CANNOT_DELETE_MAP' =>	'Cannot delete network map',
 	'S_MAPS_BIG'=>				'MAPS',
 	'S_NO_MAPS_DEFINED'=>			'No maps defined',
 	'S_CREATE_MAP'=>			'Create Map',
