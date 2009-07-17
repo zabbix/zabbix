@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-137] modifed Makefile to use tr instead of sed for better compatibility (Alexei)
  - [DEV-339] added a dummy function for DB cache monitoring (Alexei)
  - [DEV-411] database cache is enabled by default now (Alexei)
  - [DEV-399] added information about monitored hosts to the discovery screen (Sasha)
