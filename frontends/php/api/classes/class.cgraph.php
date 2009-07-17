@@ -232,7 +232,21 @@ class CGraph {
 				else{
 					$graphids[$graph['graphid']] = $graph['graphid'];
 					
-					if(!isset($result[$graph['graphid']])) $result[$graph['graphid']]= array();
+					if(!isset($result[$graph['graphid']])) 
+						$result[$graph['graphid']]= array();
+					
+					if($options['select_hosts'] && !isset($result[$graph['graphid']]['hostids'])){
+						$result[$graph['graphid']]['hostids'] = array();
+						$result[$graph['graphid']]['hosts'] = array();
+					}
+					if($options['select_templates'] && !isset($result[$graph['graphid']]['templateids'])){
+						$result[$graph['graphid']]['templateids'] = array();
+						$result[$graph['graphid']]['templates'] = array();
+					}
+					if($options['select_items'] && !isset($result[$graph['graphid']]['itemids'])){
+						$result[$graph['graphid']]['itemids'] = array();
+						$result[$graph['graphid']]['items'] = array();
+					}
 					
 					// hostids
 					if(isset($graph['hostid'])){

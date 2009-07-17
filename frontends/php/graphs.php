@@ -369,10 +369,6 @@ include_once('include/page_header.php');
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
 
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
-
-	$available_groups = $PAGE_GROUPS['groupids'];
-	$available_hosts = $PAGE_HOSTS['hostids'];
-	$available_graphs = get_accessible_graphs(PERM_READ_WRITE,$available_hosts,null,get_current_nodeid(true),null,0);
 ?>
 <?php
 	$form = new CForm();
@@ -424,8 +420,6 @@ include_once('include/page_header.php');
 			unset($_REQUEST['graphid']);
 		}
 
-
-
 		$r_form = new CForm();
 		$r_form->setMethod('get');
 
@@ -442,7 +436,6 @@ include_once('include/page_header.php');
 		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
-		$row_count = 0;
 		$numrows = new CSpan(null,'info');
 		$numrows->setAttribute('name','numrows');
 		$header = get_table_header(array(S_GRAPHS_BIG,
@@ -539,84 +532,63 @@ include_once('include/page_header.php');
 			make_sorting_link(S_HEIGHT,'g.height'),
 			make_sorting_link(S_GRAPH_TYPE,'g.graphtype')));
 
-		$sql_from = '';
-		$sql_where = '';
-		if($PAGE_HOSTS['selected'] > 0)
-			$sql_where.= ' AND i.hostid='.$PAGE_HOSTS['selected'];
-
-		$sql = 'SELECT DISTINCT g.* '.
-				' FROM graphs g, graphs_items gi,items i '.$sql_from.
-				' WHERE '.DBcondition('g.graphid',$available_graphs).
-					' AND gi.graphid=g.graphid '.
-					' AND i.itemid=gi.itemid '.
-					$sql_where.
-				order_by('g.name,g.width,g.height,g.graphtype','g.graphid');
-		$result = DBselect($sql);
-		while($row=DBfetch($result)){
-			if($_REQUEST['hostid'] != 0){
-				$host_list = NULL;
-			}
-			else{
-				$host_list = array();
-				$db_hosts = get_hosts_by_graphid($row['graphid']);
-				while($db_host = DBfetch($db_hosts)){
-					array_push($host_list, $db_host['host']);
+		$options = array('editable' => 1, 'extendoutput' => 1, 'select_hosts' => 1);
+		if($PAGE_HOSTS['selected'] > 0){
+			$options += array('hostids' => $PAGE_HOSTS['selected']);
+		}
+		else if($PAGE_GROUPS['selected'] > 0){
+			$options += array('groupids' => $PAGE_GROUPS['selected']);
+		}
+		$graphs = CGraph::get($options);
+		
+		
+		foreach($graphs as $graphid => $graph){
+			
+			$host_list = NULL;
+			if($_REQUEST['hostid'] == 0){
+				$host_list = array();	
+				foreach($graph['hosts'] as $host){
+					$host_list[] = $host['host'];
 				}
-				$host_list = implode(',',$host_list);
+				$host_list = implode(', ', $host_list);
 			}
 
-			if($row['templateid']==0){
-				$name = new CLink($row['name'],
-					'graphs.php?graphid='.$row['graphid'].'&form=update');
-			}
-			else {
-				$real_hosts = get_realhosts_by_graphid($row['templateid']);
+			$name = array();
+			if($graph['templateid'] != 0){
+				$real_hosts = get_realhosts_by_graphid($graph['templateid']);
 				$real_host = DBfetch($real_hosts);
-				if($real_host){
-					$name = array(
-						new CLink($real_host['host'],'graphs.php?'.
-							'hostid='.$real_host['hostid'],
-							'action'),
-						':',
-						$row['name']
-						);
-				}
-				else{
-					array_push($description,
-						new CSpan('error','on'),
-						':',
-						expand_trigger_description($row['triggerid'])
-						);
-				}
+				$name[] = new CLink($real_host['host'], 'graphs.php?'.'hostid='.$real_host['hostid'], 'action');
+				$name[] = ':';
 			}
+			$name[] = new CLink($graph['name'], 'graphs.php?graphid='.$graphid.'&form=update');
 
-			$chkBox = new CCheckBox('group_graphid['.$row['graphid'].']',NULL,NULL,$row['graphid']);
-			if($row['templateid'] > 0) $chkBox->setEnabled(false);
+			
+			$chkBox = new CCheckBox('group_graphid['.$graphid.']', NULL, NULL, $graphid);
+			if($graph['templateid'] > 0) $chkBox->setEnabled(false);
 
-			switch($row['graphtype']){
-				case  GRAPH_TYPE_STACKED:
+			switch($graph['graphtype']){
+				case GRAPH_TYPE_STACKED:
 					$graphtype = S_STACKED;
-					break;
-				case  GRAPH_TYPE_PIE:
+				break;
+				case GRAPH_TYPE_PIE:
 					$graphtype = S_PIE;
-					break;
-				case  GRAPH_TYPE_EXPLODED:
+				break;
+				case GRAPH_TYPE_EXPLODED:
 					$graphtype = S_EXPLODED;
-					break;
+				break;
 				default:
 					$graphtype = S_NORMAL;
-					break;
+				break;
 			}
 
 			$table->addRow(array(
 				$chkBox,
 				$host_list,
 				$name,
-				$row['width'],
-				$row['height'],
+				$graph['width'],
+				$graph['height'],
 				$graphtype
-				));
-			$row_count++;
+			));
 		}
 
 //----- GO ------
@@ -634,12 +606,8 @@ include_once('include/page_header.php');
 
 		$form->addItem($table);
 		$form->show();
+		zbx_add_post_js('insert_in_element("numrows","'.$table->getNumRows().'");');
 	}
-
-	if(isset($row_count))
-		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
-?>
-<?php
 
 include_once 'include/page_footer.php';
 
