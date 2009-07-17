@@ -369,12 +369,12 @@ class CHost {
 						$result[$host['hostid']]['itemids'][$host['itemid']] = $host['itemid'];
 						unset($host['itemid']);
 					}
-					// grapids
-					if(isset($host['grapid'])){
-						if(!isset($result[$host['hostid']]['grapids'])) $result[$host['hostid']]['grapids'] = array();
+					// graphids
+					if(isset($host['graphid'])){
+						if(!isset($result[$host['hostid']]['graphids'])) $result[$host['hostid']]['graphids'] = array();
 							
-						$result[$host['hostid']]['grapids'][$host['grapid']] = $host['grapid'];
-						unset($host['grapid']);
+						$result[$host['hostid']]['graphids'][$host['graphid']] = $host['graphid'];
+						unset($host['graphid']);
 					}
 					
 					$result[$host['hostid']] += $host;

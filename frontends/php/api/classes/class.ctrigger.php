@@ -61,8 +61,8 @@ class CTrigger {
 			'triggerids'			=> 0,
 			'itemids'				=> 0,
 			'applicationids'		=> 0,
-			'status'				=> 0,
-			'severity'				=> 0,
+			'status'				=> null,
+			'severity'				=> null,
 			'templated_triggers'	=> 0,
 			'editable'				=> 0,
 			'nopermissions'			=> 0,
@@ -178,12 +178,12 @@ class CTrigger {
 		}
 
 // status
-		if($options['status'] != 0){
+		if(!is_null($options['status'])){
 			$sql_parts['where'][] = 't.status='.$options['status'];
 		}
 
 // severity
-		if($options['severity'] != 0){
+		if(!is_null($options['severity'])){
 			$sql_parts['where'][] = 't.priority='.$options['severity'];
 		}
 
@@ -290,7 +290,7 @@ class CTrigger {
 
 // Adding hosts
 		if($options['select_hosts']){
-			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'nopermissions' => 1);
+			$obj_params = array('templated_hosts' => 1, 'extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
 				foreach($host['triggerids'] as $num => $triggerid){

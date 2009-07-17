@@ -24,18 +24,15 @@
 	require_once('include/triggers.inc.php');
 	require_once('include/forms.inc.php');
 
-
 	$page['title'] = "S_CONFIGURATION_OF_TRIGGERS";
 	$page["file"] = "triggers.php";
 	$page['hist_arg'] = array('hostid','groupid');
 
-
 	include_once('include/page_header.php');
 
-	$_REQUEST['config'] = get_request('config','triggers.php');
+	$_REQUEST['config'] = get_request('config', 'triggers.php');
 ?>
 <?php
-
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 //  NEW  templates.php; hosts.php; items.php; triggers.php; graphs.php; maintenances.php;
@@ -67,14 +64,11 @@
 		'filter_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 
 		'showdisabled'=>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	NULL),
-
 /* mass update*/
 		'massupdate'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'visible'=>			array(T_ZBX_STR, O_OPT,	null, 	null,	null),
-
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 // form
 		'add_dependence'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'del_dependence'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -87,7 +81,6 @@
 		'mass_save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-
 /* other */
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
@@ -102,17 +95,16 @@
 ?>
 <?php	
 // triggerid permission check
+	$available_triggers = CTrigger::get(array('editable' => 1));
+	
 	if(isset($_REQUEST['triggerid']))
-		if(!check_right_on_trigger_by_triggerid(PERM_READ_WRITE, $_REQUEST['triggerid']))
+		//if(!check_right_on_trigger_by_triggerid(PERM_READ_WRITE, $_REQUEST['triggerid']))
+		if(!in_array($_REQUEST['triggerid'], $available_triggers))
 			access_deny();
 //----
 
 	$showdisabled = get_request('showdisabled', 0);
 	update_profile('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
-
-	
-// OPTIMIZE!!!
-	$available_triggers = CTrigger::get(array('editable' => 1));
 
 	
 /* FORM ACTIONS */
@@ -348,7 +340,6 @@
 	}
 ?>
 <?php
-
 	if(isset($_REQUEST['hostid']) && !isset($_REQUEST['groupid']) && !isset($_REQUEST['triggerid'])){
 		$sql = 'SELECT DISTINCT hg.groupid '.
 				' FROM hosts_groups hg '.
@@ -403,7 +394,7 @@
 	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 
-	$available_triggers = get_accessible_triggers(PERM_READ_WRITE,$PAGE_HOSTS['hostids'],PERM_RES_IDS_ARRAY,null,0);
+	$available_triggers = CTrigger::get(array('editable' => 1, 'hostids' => $PAGE_HOSTS['hostids']));
 ?>
 <?php
 
@@ -421,10 +412,11 @@
 		$cmbConf->addItem('applications.php',S_APPLICATIONS);
 		
 	$form->addItem($cmbConf);
-
-	$form->addItem(new CButton('form',S_CREATE_TRIGGER));
+	if(!isset($_REQUEST['form'])){
+		$form->addItem(new CButton('form', S_CREATE_TRIGGER));
+	}
 	
-	show_table_header(S_CONFIGURATION_OF_TRIGGERS_BIG,$form);
+	show_table_header(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
 	echo SBR;
 ?>
 <?php
@@ -460,7 +452,6 @@
 		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
-		$row_count = 0;
 		$numrows = new CSpan(null,'info');
 		$numrows->setAttribute('name','numrows');
 		$header = get_table_header(array(S_TRIGGERS_BIG,
@@ -473,12 +464,11 @@
 		if($PAGE_HOSTS['selected'] > 0){
 		
 			$header_host = CHost::get(array(
-										'hostids' => $PAGE_HOSTS['selected'],
-										'nopermissions' => 1,
-										'extendoutput' => 1,
-										'select_items' => 1,
-										'select_graphs' => 1
-									));
+				'hostids' => $PAGE_HOSTS['selected'],
+				'nopermissions' => 1,
+				'extendoutput' => 1,
+				'select_items' => 1,
+				'select_graphs' => 1));
 			$header_host = array_pop($header_host);
 			
 			$description = array();
@@ -489,15 +479,11 @@
 			
 			$description[] = new CLink($header_host['host'], 'hosts.php?form=update&hostid='.$header_host['hostid'].url_param('groupid'));
 
-			$items = array(
-							new CLink(S_ITEMS, 'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
-							' ('.count($header_host['itemids']).')'
-						);
+			$items = array(new CLink(S_ITEMS, 'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
+				' ('.count($header_host['itemids']).')');
 
-			$graphs = array(
-							new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
-							' ('.count($header_host['graphids']).')'
-						);
+			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
+				' ('.count($header_host['graphids']).')');
 			
 			$dns = empty($header_host['dns']) ? '-' : $header_host['dns'];
 			$ip = empty($header_host['ip']) ? '-' : $header_host['ip'];
@@ -510,21 +496,21 @@
 				
 			switch($header_host['status']){
 				case HOST_STATUS_MONITORED:
-					$status=new CSpan(S_MONITORED, 'off');
+					$status = new CSpan(S_MONITORED, 'off');
 					break;
 				case HOST_STATUS_NOT_MONITORED:
-					$status=new CSpan(S_NOT_MONITORED, 'off');
+					$status = new CSpan(S_NOT_MONITORED, 'off');
 					break;
 				default:
-					$status=S_UNKNOWN;
+					$status = S_UNKNOWN;
 			}
 
 			if($header_host['available'] == HOST_AVAILABLE_TRUE)
-				$available=new CSpan(S_AVAILABLE,'off');
+				$available = new CSpan(S_AVAILABLE, 'off');
 			else if($header_host['available'] == HOST_AVAILABLE_FALSE)
-				$available=new CSpan(S_NOT_AVAILABLE,'on');
+				$available = new CSpan(S_NOT_AVAILABLE, 'on');
 			else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
-				$available=new CSpan(S_UNKNOWN,'unknown');
+				$available = new CSpan(S_UNKNOWN, 'unknown');
 
 				
 			$tbl_header_host = new CTableInfo();
@@ -547,131 +533,121 @@
 		$form = new CForm('triggers.php');
 		$form->setName('triggers');
 		$form->setMethod('post');
-		$form->addVar('hostid',$_REQUEST['hostid']);
+		$form->addVar('hostid', $_REQUEST['hostid']);
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->setHeader(array(
-			new CCheckBox('all_triggers',NULL,"checkAll('".$form->GetName()."','all_triggers','g_triggerid');"),
-			make_sorting_link(S_SEVERITY,'t.priority'),
-			make_sorting_link(S_STATUS,'t.status'),
-
-			($_REQUEST['hostid'] > 0)?NULL:make_sorting_link(S_HOST,'h.host'),
-			make_sorting_link(S_NAME,'t.description'),
+			new CCheckBox('all_triggers', NULL, "checkAll('".$form->GetName()."','all_triggers','g_triggerid');"),
+			make_sorting_link(S_SEVERITY, 't.priority'),
+			make_sorting_link(S_STATUS, 't.status'),
+			($_REQUEST['hostid'] > 0) ? NULL : make_sorting_link(S_HOST,'h.host'),
+			make_sorting_link(S_NAME, 't.description'),
 			S_EXPRESSION,
 			S_ERROR));
 
-		$sql_from = '';
-		$sql_where = '';
+		$options = array('select_hosts' => 1, 'editable' => 1, 'extendoutput' => 1);
 		if($showdisabled == 0){
-		    $sql_where.= ' AND t.status <> '.TRIGGER_STATUS_DISABLED;
+		    $options += array('status' => TRIGGER_STATUS_ENABLED);
 		}
-
-		if($PAGE_HOSTS['selected'] > 0)
-			$sql_where.= ' AND h.hostid='.$PAGE_HOSTS['selected'];
-
-		$sql = 'SELECT DISTINCT h.hostid,h.host,h.status as hoststatus,t.*'.
-			' FROM triggers t '.
-				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
-				' LEFT JOIN items i ON f.itemid=i.itemid '.
-				' LEFT JOIN hosts h ON h.hostid=i.hostid '.
-			' WHERE '.DBin_node('t.triggerid').
-				$sql_where.
-				' AND '.DBcondition('t.triggerid',$available_triggers).
-			order_by('h.host,t.description,t.priority,t.status');
-
-		$result=DBselect($sql);
-		while($row=DBfetch($result)){
-
-			if(is_null($row['host'])) $row['host'] = '';
-			if(is_null($row['hostid'])) $row['hostid'] = '0';
+		if($PAGE_HOSTS['selected'] > 0){
+			$options += array('hostids' => $PAGE_HOSTS['selected']);
+		}
+		else if($PAGE_GROUPS['selected'] > 0){
+			$options += array('groupids' => $PAGE_GROUPS['selected']);
+		}
+		$triggers = CTrigger::get($options);
+		
+		foreach($triggers as $triggerid => $trigger){
 
 			$description = array();
 
-			if($row['templateid']){
-				$real_hosts = get_realhosts_by_triggerid($row['triggerid']);
+			if($trigger['templateid'] > 0){
+				$real_hosts = get_realhosts_by_triggerid($triggerid);
 				$real_host = DBfetch($real_hosts);
-				if($real_host){
-					$description[] = new CLink($real_host['host'],'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
-				}
-				else{
-					$description[] = new CSpan('error','on');
-				}
+				$description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
 				$description[] = ':';
 			}
+			
+			$description[] = new CLink(expand_trigger_description($triggerid), 'triggers.php?form=update&triggerid='.$triggerid);
 
-			$description[] = new CLink(expand_trigger_description($row['triggerid']),
-										'triggers.php?form=update&triggerid='.$row['triggerid'].'&hostid='.$row['hostid']);
-
-//add dependencies
-			$deps = get_trigger_dependencies_by_triggerid($row['triggerid']);
+// <<<--- add dependencies --->>>
+			$deps = get_trigger_dependencies_by_triggerid($triggerid);
 			if(count($deps) > 0){
-				$description[] = array(BR(),bold(S_DEPENDS_ON.':'),SPACE);
+				$description[] = array(BR(), bold(S_DEPENDS_ON.' : '));
 				foreach($deps as $num => $dep_triggerid) {
-// shows host name of depending trigger
 					$description[] = BR();
-
+					
 					$hosts = get_hosts_by_triggerid($dep_triggerid);
-					if(($host = DBfetch($hosts)) && ($host['hostid'] != $row['hostid'])){
-						$description[] = $host['host'].':';
+					while($host = DBfetch($hosts)){
+						$description[] = $host['host'];
+						$description[] = ', ';
 					}
+					
+					array_pop($description);
+					$description[] = ' : ';
 					$description[] = expand_trigger_description($dep_triggerid);
-
-					$dep_trigger_desc = '';
-					while($host = DBfetch($hosts)) {
-						$dep_trigger_desc.= $host['host'].',';
-					}
-					trim($dep_trigger_desc,',');
-
-					if(!zbx_empty($dep_trigger_desc)){
-						$description[] = $dep_trigger_desc;
-					}
 				}
 			}
+// --->>> add dependencies <<<---
 
-			if($row['status'] != TRIGGER_STATUS_UNKNOWN) $row['error'] = '';
-			
-			if(!zbx_empty($row['error']) && (HOST_STATUS_TEMPLATE != $row['hoststatus'])){
-				$error = new CDiv(SPACE,'error_icon');
-				$error->setHint($row['error'], '', 'on');
+			if($trigger['status'] != TRIGGER_STATUS_UNKNOWN){ 
+				$trigger['error'] = '';
+			}
+			if(!zbx_empty($trigger['error']) && (HOST_STATUS_TEMPLATE != $trigger['hoststatus'])){
+				$error = new CDiv(SPACE, 'error_icon');
+				$error->setHint($trigger['error'], '', 'on');
 			}
 			else{
 				$error = new CDiv(SPACE,'ok_icon');
 			}
 
-			switch($row['priority']){
-				case 0: $priority=S_NOT_CLASSIFIED; 				break;
-				case 1: $priority=new CCol(S_INFORMATION,'information'); 	break;
-				case 2: $priority=new CCol(S_WARNING,'warning'); 	break;
-				case 3: $priority=new CCol(S_AVERAGE,'average'); 	break;
-				case 4: $priority=new CCol(S_HIGH,'high'); 			break;
-				case 5: $priority=new CCol(S_DISASTER,'disaster'); 	break;
-				default:$priority=$row['priority'];
+			switch($trigger['priority']){
+				case 0: $priority = S_NOT_CLASSIFIED; break;
+				case 1: $priority = new CCol(S_INFORMATION, 'information'); break;
+				case 2: $priority = new CCol(S_WARNING, 'warning'); break;
+				case 3: $priority = new CCol(S_AVERAGE, 'average'); break;
+				case 4: $priority = new CCol(S_HIGH, 'high'); break;
+				case 5: $priority = new CCol(S_DISASTER, 'disaster'); break;
+				default: $priority = $trigger['priority'];
 			}
 
-			$status_link = 'triggers.php?go='.(($row['status'] == TRIGGER_STATUS_DISABLED)?'activate':'disable').
-						'&g_triggerid%5B%5D='.$row['triggerid'].
-						'&hostid='.$row['hostid'];
-						
-			if($row['status'] == TRIGGER_STATUS_DISABLED){
-				$status = new CLink(S_DISABLED,$status_link,'disabled');
+			$status_link = 'triggers.php?go='.(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'activate' : 'disable').
+				'&g_triggerid%5B%5D='.$triggerid;
+				
+			if($trigger['status'] == TRIGGER_STATUS_DISABLED){
+				$status = new CLink(S_DISABLED, $status_link, 'disabled');
 			}
-			else if($row['status'] == TRIGGER_STATUS_UNKNOWN){
-				$status = new CLink(S_UNKNOWN,$status_link,'unknown');
+			else if($trigger['status'] == TRIGGER_STATUS_UNKNOWN){
+				$status = new CLink(S_UNKNOWN, $status_link, 'unknown');
 			}
-			else if($row['status'] == TRIGGER_STATUS_ENABLED){
-				$status = new CLink(S_ENABLED,$status_link,'enabled');
+			else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
+				$status = new CLink(S_ENABLED, $status_link, 'enabled');
 			}
 
-			$table->addRow(array(
-				new CCheckBox('g_triggerid['.$row['triggerid'].']', NULL,NULL,$row['triggerid']),
-				$priority,
-				$status,
-				$_REQUEST['hostid'] > 0 ? NULL : $row['host'],
-				$description,
-				explode_exp($row['expression'],1),
-				$error
-			));
-			$row_count++;
+			if($_REQUEST['hostid'] > 0){
+				$table->addRow(array(
+					new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid),
+					$priority,
+					$status,
+					$description,
+					explode_exp($trigger['expression'], 1),
+					$error
+				));	
+			}
+			else{
+				foreach($trigger['hosts'] as $host){
+				
+					$table->addRow(array(
+						new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid),
+						$priority,
+						$status,
+						$host['host'],
+						$description,
+						explode_exp($trigger['expression'], 1),
+						$error
+					));
+				}
+			}			
 		}
 
 //----- GO ------
@@ -692,9 +668,8 @@
 
 		$form->addItem($table);
 		$form->show();
-		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+		zbx_add_post_js('insert_in_element("numrows","'.$table->getNumRows().'");');
 	}
 
 include_once('include/page_footer.php');
-
 ?>
