@@ -461,7 +461,8 @@ static int get_values(int now, int *nextcheck)
 				DBbegin();
 
 				enable_host(&item, now);
-				stop = 1;
+/* We shouldn't stop after enabling a host */
+/*				stop = 1;*/
 
 				DBcommit();
 			}
@@ -531,7 +532,8 @@ static int get_values(int now, int *nextcheck)
 				DBbegin();
 
 				enable_host(&item, now);
-				stop = 1;
+/* We shouldn't stop after enabling a host */
+/*				stop = 1;*/
 
 				DBcommit();
 			}
