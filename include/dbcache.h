@@ -22,6 +22,7 @@
 #define ZABBIX_DBCACHE_H
 
 #define ZBX_DC_CACHE struct zbx_dc_cache_type
+#define ZBX_DC_STATS struct zbx_dc_stats_type
 #define ZBX_DC_HISTORY struct zbx_dc_history_type
 #define ZBX_DC_TREND struct zbx_dc_trend_type
 #define ZBX_DC_NEXTCHECK struct zbx_dc_nextcheck_type
@@ -86,11 +87,39 @@ ZBX_DC_TREND
 	history_value_t	value_max;
 };
 
+ZBX_DC_STATS
+{
+	zbx_uint64_t	buffer_history_counter;	/* Total number of record added to the history buffer */
+	zbx_uint64_t	buffer_history_total;	/* ZBX_HISTORY_SIZE */
+	zbx_uint64_t	buffer_history_used;
+	zbx_uint64_t	buffer_history_free;
+	zbx_uint64_t	buffer_trend_total;	/* ZBX_TREND_SIZE */
+	zbx_uint64_t	buffer_trend_used;
+	zbx_uint64_t	buffer_trend_free;
+	zbx_uint64_t	buffer_history_num_float;	/* Number of floats in the buffer */
+	zbx_uint64_t	buffer_history_num_uint;
+	zbx_uint64_t	buffer_history_num_str;
+	zbx_uint64_t	buffer_history_num_log;
+	zbx_uint64_t	buffer_history_num_text;
+	zbx_uint64_t	history_counter;	/* Total number of saved values in th DB */
+	zbx_uint64_t	history_float_counter;	/* Number of saved float values in th DB */
+	zbx_uint64_t	history_uint_counter;	/* Number of saved uint values in the DB */
+	zbx_uint64_t	history_str_counter;	/* Number of saved str values in the DB */
+	zbx_uint64_t	history_log_counter;	/* Number of saved log values in the DB */
+	zbx_uint64_t	history_text_counter;	/* Number of saved text values in the DB */
+	zbx_uint64_t	add_trend_counter;	/* Total number of saved trends in the DB */
+	zbx_uint64_t	add_trend_float_counter;/* Number of saved float trends in the DB */
+	zbx_uint64_t	add_trend_uint_counter;	/* Number of saved uint trends in the DB */
+	zbx_uint64_t	update_trigger_counter;	/* Total number of updated triggers */
+	zbx_uint64_t	queries_counter;	/* Total number of executed queries */
+};
+
 ZBX_DC_CACHE
 {
 	int		history_first;
 	int		history_num;
 	int		trends_num;
+	ZBX_DC_STATS	stats;
 	ZBX_DC_HISTORY	history[ZBX_HISTORY_SIZE];
 	ZBX_DC_TREND	trends[ZBX_TREND_SIZE];
 	char		text[ZBX_TEXTBUFFER_SIZE];
@@ -118,6 +147,7 @@ void	free_database_cache(void);
 void	DCinit_nextchecks();
 void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *error_msg);
 void	DCflush_nextchecks();
+void	DCget_stats(ZBX_DC_STATS *stats);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int num);
 
