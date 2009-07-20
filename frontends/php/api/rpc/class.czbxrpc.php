@@ -36,60 +36,74 @@ public static $result;
 //-----
 
 		list($resource, $action) = explode(':',$method);
-
 // Authentication
-		if(is_null($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
-			self::$result = array('error'=>ZBX_API_ERROR_NO_AUTH, 'data'=>'Not authorized');
-		}
-		else if(!self::auth($sessionid)){
-			self::$result = array('error'=>ZBX_API_ERROR_NO_AUTH, 'data'=>'Not authorized');
-		}
-		else{
-			switch($resource){
-				case 'user':
-					self::user($action, $params);
-					break;
-				case 'hostgroup':
-					self::hostgroup($action, $params);
-					break;
-				case 'template':
-					self::template($action, $params);
-					break;
-				case 'host':
-					self::host($action, $params);
-					break;
-				case 'item':
-					self::item($action, $params);
-					break;
-				case 'trigger':
-					self::trigger($action, $params);
-					break;
-				case 'graph':
-					self::graph($action, $params);
-					break;
-				default:
-					self::$result = array('error'=>ZBX_API_ERROR_PARAMETERS);
+
+		if(is_null($sessionid)){
+			if(($resource != 'user') || ($action != 'authenticate')){
+				self::$result = array('error'=>ZBX_API_ERROR_NO_AUTH, 'data'=>'Not authorized');
+				return self::$result;
+			}
+			else if(!CUser::apiAccess($params)){
+				self::$result = array('error'=>ZBX_API_ERROR_NO_AUTH, 'data'=>'Not authorized');
+				return self::$result;
 			}
 		}
+		else if(!CUser::checkAuth(array('sessionid' => $sessionid))){
+			self::$result = array('error'=>ZBX_API_ERROR_NO_AUTH, 'data'=>'Not authorized');
+			return self::$result;
+		}
+		
+		switch($resource){
+			case 'user':
+				self::user($action, $params);
+				break;
+			case 'hostgroup':
+				self::hostgroup($action, $params);
+				break;
+			case 'template':
+				self::template($action, $params);
+				break;
+			case 'host':
+				self::host($action, $params);
+				break;
+			case 'item':
+				self::item($action, $params);
+				break;
+			case 'trigger':
+				self::trigger($action, $params);
+				break;
+			case 'graph':
+				self::graph($action, $params);
+				break;
+			default:
+				self::$result = array('error'=>ZBX_API_ERROR_PARAMETERS);
+			break;
+		}
+		
 	return self::$result;
 	}
 
-	private static function auth($sessionid){
-		return check_authentication($sessionid);
-	}
-
+// USER
 	private static function user($action, $params){
 		switch($action){
 			case 'authenticate':
-				$login = user_login($params['user'], $params['password'], ZBX_AUTH_INTERNAL);
+				$result = CUser::authenticate($params);
 
-				if($login){
-					self::$result = array('result' => $login);
-				}
-				else{
-					self::$result = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Given login or password is incorrect.');
-				}
 				break;
+			case 'apiAccess':
+				$result = CUser::apiAccess($params);
+				break;
+			default:
+				$result = array('error' => ZBX_API_ERROR_NO_METHOD, 'data' => 'Method: "'.$action.'" doesn\'t exist.');
+				return; //exit function
+			break;
+		}
+		
+		if($result !== false){
+			self::$result = array('result' => $result);
+		}
+		else{
+			self::$result = CUser::$error;
 		}
 	}
 
@@ -311,6 +325,7 @@ public static $result;
 		}
 	}
 
+// TRIGGER
 	private static function trigger($action, $params){
 
 		CTrigger::$error = array();
