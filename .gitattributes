@@ -44,6 +44,8 @@ frontends/php/api/classes/class.chostgroup.php -text
 frontends/php/api/classes/class.citem.php -text
 frontends/php/api/classes/class.ctemplate.php -text
 frontends/php/api/classes/class.ctrigger.php -text
+frontends/php/api/classes/class.cuser.php -text
+frontends/php/api/classes/class.cusergroup.php -text
 frontends/php/api/rpc/class.cjsonrpc.php -text
 frontends/php/api/rpc/class.czbxrpc.php -text
 frontends/php/api_jsonrpc.php -text

@@ -49,7 +49,7 @@ include_once('include/page_header.php');
 /* group */
 		'groupid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		'(isset({form})&&({form}=="update"))'),
 		'gname'=>				array(T_ZBX_STR, O_OPT,	NULL,		NOT_EMPTY,	'isset({save})'),
-
+		'twb_groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,		NULL),
 /* actions */
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 // form
@@ -57,7 +57,6 @@ include_once('include/page_header.php');
 		'clone'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>				array(T_ZBX_STR, O_OPT, P_SYS,			NULL,	NULL),
-		
 /* other */
 		'form'=>				array(T_ZBX_STR, O_OPT, P_SYS,			NULL,	NULL),
 		'form_refresh'=>		array(T_ZBX_STR, O_OPT, NULL,			NULL,	NULL)
@@ -76,31 +75,27 @@ include_once('include/page_header.php');
 		$hosts = get_request('hosts', array());
 		$hosts = array_intersect($available_hosts, $hosts);
 		if(isset($_REQUEST['groupid'])){
+			
 			DBstart();
-
 			$result = update_host_group($_REQUEST['groupid'], $_REQUEST['gname'], $hosts);
 			$result = DBend($result);
 
-/*			$action 	= AUDIT_ACTION_UPDATE;*/
 			$msg_ok		= S_GROUP_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_GROUP;
-			$groupid = $_REQUEST['groupid'];
 		}
-		else {
+		else{
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
 
 			DBstart();
-				$groupid = add_host_group($_REQUEST['gname'], $hosts);
+			$groupid = add_host_group($_REQUEST['gname'], $hosts);
 			$result = DBend($groupid);
 
-/*			$action 	= AUDIT_ACTION_ADD;*/
 			$msg_ok		= S_GROUP_ADDED;
 			$msg_fail	= S_CANNOT_ADD_GROUP;
 		}
 		show_messages($result, $msg_ok, $msg_fail);
 		if($result){
-/*			add_audit($action,AUDIT_RESOURCE_HOST_GROUP,S_HOST_GROUP.' ['.$_REQUEST['gname'].'] ['.$groupid.']');*/
 			unset($_REQUEST['form']);
 		}
 		unset($_REQUEST['save']);
@@ -180,8 +175,8 @@ include_once('include/page_header.php');
 		global $USER_DETAILS;
 		
 		$groupid = get_request('groupid', 0);
-		$hosts = get_request('hosts', array(0));
-		
+		$hosts = get_request('hosts', array());
+SDII($hosts);		
 		$frm_title = S_HOST_GROUP;
 		if($groupid > 0){
 			$group = get_hostgroup_by_groupid($_REQUEST['groupid']);
@@ -193,7 +188,7 @@ include_once('include/page_header.php');
 		}
 		
 		$frmHostG = new CFormTable($frm_title, 'hostgroups.php');
-		$frmHostG->setHelp('web.hosts.group.php');
+		$frmHostG->setName('hg_form');
 		$frmHostG->addRow(S_GROUP_NAME, new CTextBox('gname', $name, 48));
 
 		if($groupid > 0){
@@ -206,7 +201,7 @@ include_once('include/page_header.php');
 								'templated_hosts' => 1);
 				$db_hosts = CHost::get($params);
 				foreach($db_hosts as $hostid => $db_host){
-					$hosts[$db_host['hostid']] = $db_host['hostid'];
+					$hosts[$hostid] = $hostid;
 				}
 			}
 		}
@@ -214,43 +209,46 @@ include_once('include/page_header.php');
 // select all possible groups
 		$params = array('not_proxy_host' => 1,
 						'order' => 'name',
-						'editable' => 1);
+						'editable' => 1,
+						'extendoutput' => 1);
 		$db_groups = CHostGroup::get($params);
-		$selected_grp = get_request('twb_groupid', 0);
-		if($selected_grp == 0){
+		$twb_groupid = get_request('twb_groupid', 0);
+		if($twb_groupid == 0){
 			$gr = reset($db_groups);
-			$selected_grp = $gr['groupid'];
+			$twb_groupid = $gr['groupid'];
 		}
-		$cmbGroups = new CComboBox('twb_groupid', $selected_grp, 'submit()');
+		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
 		foreach($db_groups as $groupid => $row){
-			$cmbGroups->addItem($row['groupid'], $row['name']);
+			$cmbGroups->addItem($groupid, $row['name']);
 		}
 
 		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts, 25);
 		
 // get hosts from selected twb_groupid combo
-		$params = array('groupids'=>$selected_grp,
+		$params = array('groupids'=>$twb_groupid,
 						'templated_hosts'=>1,
 						'order'=>'host',
-						'editable' => 1);
+						'editable' => 1,
+						'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
 		foreach($db_hosts as $hostid => $db_host){
 // add all except selected hosts
 			if(!isset($hosts[$hostid]))
-				$cmbHosts->addItem($db_host['hostid'], get_node_name_by_elid($db_host['hostid']).$db_host['host']);
+				$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$db_host['host']);
 		}
 
 // select selected hosts and add them
 		$params = array('hostids' => $hosts,
 						'templated_hosts' =>1 ,
 						'order' => 'host',
-						'editable' => 1);
+						'editable' => 1,
+						'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
 		foreach($db_hosts as $hostid => $db_host){
-			$cmbHosts->addItem($db_host['hostid'], get_node_name_by_elid($db_host['hostid']).$db_host['host']);
+			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$db_host['host']);
 		}
 
-		$frmHostG->addRow(S_HOSTS,$cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
+		$frmHostG->addRow(S_HOSTS, $cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
 
 		$frmHostG->addItemToBottomRow(new CButton('save',S_SAVE));
 		if($groupid>0){
