@@ -315,7 +315,7 @@ static int get_values(int now, int *nextcheck)
 	int		res;
 	DB_ITEM		item;
 	AGENT_RESULT	agent;
-	int		stop = 0, items = 0;
+	int		/*stop = 0, */items = 0;
 
 	static char	*unreachable_hosts = NULL;
 	static int	unreachable_hosts_alloc = 32;
@@ -404,7 +404,7 @@ static int get_values(int now, int *nextcheck)
 	}
 
 	/* Do not stop when select is made by poller for unreachable hosts */
-	while((row=DBfetch(result))&&(stop==0 || poller_type == ZBX_POLLER_TYPE_UNREACHABLE))
+	while (NULL != (row = DBfetch(result)))/*&&(stop==0 || poller_type == ZBX_POLLER_TYPE_UNREACHABLE))*/
 	{
 		/* This code is just to avoid compilation warining about use of uninitialized result2 */
 		result2 = result;
@@ -473,7 +473,9 @@ static int get_values(int now, int *nextcheck)
 
 				DBexecute("update hosts set errors_from=0 where hostid=" ZBX_FS_UI64,
 						item.hostid);
-				stop = 1;
+				item.host_errors_from = 0;
+/* We shouldn't stop after enabling a host */
+/*				stop = 1; */
 
 				DBcommit();
 			}
@@ -534,6 +536,19 @@ static int get_values(int now, int *nextcheck)
 				enable_host(&item, now);
 /* We shouldn't stop after enabling a host */
 /*				stop = 1;*/
+
+				DBcommit();
+			}
+
+			if (item.host_errors_from != 0)
+			{
+				DBbegin();
+
+				DBexecute("update hosts set errors_from=0 where hostid=" ZBX_FS_UI64,
+						item.hostid);
+				item.host_errors_from = 0;
+/* We shouldn't stop after enabling a host */
+/*				stop = 1; */
 
 				DBcommit();
 			}
