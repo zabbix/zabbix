@@ -447,7 +447,10 @@ void update_service(DB_DHOST *dhost, DB_DCHECK *check, char *ip, int port, int n
 
 	/* Service wasn't registered because we do not add down service */
 	if (service.dserviceid == 0)
+	{
+		DBcommit();
 		return;
+	}
 
 	update_service_status(&service, check, now, &events);
 
@@ -496,7 +499,10 @@ void update_host(DB_DHOST *dhost, const char *ip, int status, int now)
 		register_host(dhost, ip, status);
 
 	if (dhost->dhostid == 0)
+	{
+		DBcommit();
 		return;
+	}
 
 	update_host_status(dhost, status, now, &events);
 
