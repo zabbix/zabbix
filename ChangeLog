@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-353] Discovery: added support of IP masks (Sasha) 
  - [DEV-137] poller will continue processing of other items after enabling a host (Alexei)
  - [DEV-137] modifed Makefile to use tr instead of sed for better compatibility (Alexei)
  - [DEV-339] added a dummy function for DB cache monitoring (Alexei)

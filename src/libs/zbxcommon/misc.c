@@ -516,9 +516,7 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
 {
 	unsigned int	i[8]; /* x:x:x:x:x:x:x:x */
 	char		buf[5], *ptr;
-	int		c, dc, pos = 0, j, len, ip_len, ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In expand_ipv6(ip:%s)", ip);
+	int		c, dc, pos = 0, j, len, ip_len;
 
 	c = 0; /* colons count */
 	for(ptr = strchr(ip, ':'); ptr != NULL; ptr = strchr(ptr + 1, ':'))
@@ -528,13 +526,13 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
 
 	if(c < 2 || c > 7)
 	{
-		goto out;
+		return FAIL;
 	}
 
 	ip_len = strlen(ip);
 	if((ip[0] == ':' && ip[1] != ':') || (ip[ip_len - 1] == ':' && ip[ip_len - 2] != ':'))
 	{
-		goto out;
+		return FAIL;
 	}
 
 	memset(i, 0x00, sizeof(i));
@@ -546,15 +544,11 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
 		if((ip[j] >= '0' && ip[j] <= '9') || (ip[j] >= 'A' && ip[j] <= 'F') || (ip[j] >= 'a' && ip[j] <= 'f'))
 		{
 			if(len > 3)
-			{
-				goto out;
-			}
+				return FAIL;
 			buf[len ++] = ip[j];
 		}
 		else if(ip[j] != ':')
-		{
-			goto out;
-		}
+			return FAIL;
 
 		if(ip[j] == ':' || ip[j + 1] == '\0')
 		{
@@ -574,19 +568,80 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
 					pos = ( 8 - c ) + pos + (j == 0 ? 1 : 0);
 				}
 				else
-				{
-					goto out;
-				}
+					return FAIL;
 			}
 		}
 	}
-	zbx_snprintf(str, str_len, "%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x", i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7]);
-	ret = SUCCEED;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End expand_ipv6(ip:%s):%s", ip,
-			zbx_result_string(ret));
 
-	return ret;
+	zbx_snprintf(str, str_len, "%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x", i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7]);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: collapse_ipv6                                                    *
+ *                                                                            *
+ * Purpose: convert array to IPv6 collapsed type                              *
+ *                                                                            *
+ * Parameters: ip - [IN] full IPv6 address [12fc:0:0:0:0:0:0:2]               *
+ *                  [OUT] short IPv6 address [12fc::0]                        *
+ *             ip_len - [IN] ip buffer len                                    *
+ *                                                                            *
+ * Return value: pointer to result buffer                                     *
+ *                                                                            *
+ * Author: Alksander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*collapse_ipv6(char *str, size_t str_len)
+{
+	int		i, c = 0, m = 0, idx = -1, idx2 = -1, offset = 0;
+	unsigned int	j[8];
+
+	if (8 != sscanf(str, "%x:%x:%x:%x:%x:%x:%x:%x", &j[0], &j[1], &j[2], &j[3], &j[4], &j[5], &j[6], &j[7]))
+		return str;
+
+	for (i = 0; i <= 8; i++)
+	{
+		if (i < 8 && j[i] == 0)
+		{
+			if (idx2 == -1)
+				idx2 = i;
+			c++;
+		}
+		else
+		{
+			if (c != 0 && c > m)
+			{
+				m = c;
+				idx = idx2;
+			}
+			c = 0;
+			idx2 = -1;
+		}
+	}
+
+	for (i = 0; i < 8; i++)
+	{
+		if (j[i] != 0 || idx == -1 || i < idx)
+		{
+			offset += zbx_snprintf(str + offset, str_len - offset, "%x", j[i]);
+			if (i > idx)
+				idx = -1;
+			if (i < 7)
+				offset += zbx_snprintf(str + offset, str_len - offset, ":");
+		}
+		else if (idx == i)
+		{
+			offset += zbx_snprintf(str + offset, str_len - offset, ":");
+			if (idx == 0)
+				offset += zbx_snprintf(str + offset, str_len - offset, ":");
+		}
+	}
+
+	return str;
 }
 
 /******************************************************************************
