@@ -597,7 +597,7 @@
 			}
 // --->>> add dependencies <<<---
 
-			if($row['status'] != TRIGGER_STATUS_UNKNOWN) $row['error'] = '';
+			if($trigger['status'] != TRIGGER_STATUS_UNKNOWN) $row['error'] = '';
 			
 			if(!zbx_empty($row['error']) && (HOST_STATUS_TEMPLATE != $row['hoststatus'])){
 				$error = new CDiv(SPACE,'iconerror');
