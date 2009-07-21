@@ -39,16 +39,13 @@
 
 ZBX_COLLECTOR_DATA *collector = NULL;
 
-#define ZBX_GET_SHM_KEY(smk_key) 													\
-	{if( -1 == (shm_key = ftok(CONFIG_FILE, (int)'z') )) 										\
-        { 																\
-                zbx_error("Can not create IPC key for path '%s', try to create for path '.' [%s]", CONFIG_FILE, strerror(errno)); 	\
-                if( -1 == (shm_key = ftok(".", (int)'z') )) 										\
-                { 															\
-                        zbx_error("Can not create IPC key for path '.' [%s]", strerror(errno)); 					\
-                        exit(1); 													\
-                } 															\
-        }}
+#define ZBX_GET_SHM_KEY(smk_key)					\
+	if( -1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'z') ))		\
+	{								\
+		zbx_error("Cannot create IPC key for agent collector");	\
+		exit(1);						\
+	}
+
 
 /******************************************************************************
  *                                                                            *

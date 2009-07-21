@@ -24,6 +24,7 @@
 
 #include "db.h"
 #include "dbcache.h"
+#include "ipc.h"
 #include "mutexs.h"
 #include "zbxserver.h"
 
@@ -32,17 +33,12 @@
 #define	LOCK_CACHE_IDS		zbx_mutex_lock(&cache_ids_lock)
 #define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(&cache_ids_lock)
 
-#define ZBX_GET_SHM_DBCACHE_KEY(smk_key)								\
-	{if( -1 == (shm_key = ftok(CONFIG_FILE, (int)'c') ))						\
-	{												\
-		zbx_error("Can not create IPC key for path '%s', try to create for path '.' [%s]",	\
-				CONFIG_FILE, strerror(errno));						\
-		if( -1 == (shm_key = ftok(".", (int)'c') ))						\
-		{											\
-			zbx_error("Can not create IPC key for path '.' [%s]", strerror(errno));	\
-			exit(1);									\
-		}											\
-	}}
+#define ZBX_GET_SHM_DBCACHE_KEY(smk_key)				\
+	if( -1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'c') ))		\
+	{								\
+		zbx_error("Cannot create IPC key for DB cache");	\	
+		exit(1);						\
+	}
 
 ZBX_DC_CACHE		*cache = NULL;
 ZBX_DC_IDS		*ids = NULL;
@@ -2187,9 +2183,6 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
  ******************************************************************************/
 void	init_database_cache(zbx_process_t p)
 {
-#define ZBX_MAX_ATTEMPTS 10
-	int	attempts = 0;
-
 	key_t	shm_key;
 	int	shm_id;
 	size_t	sz;
@@ -2205,33 +2198,10 @@ void	init_database_cache(zbx_process_t p)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In init_database_cache() size:%d", (int)sz);
 
-lbl_create:
-	if ( -1 == (shm_id = shmget(shm_key, sz, IPC_CREAT | IPC_EXCL | 0666 /* 0022 */)) )
+	if ( -1 == (shm_id = zbx_shmget(shm_key, sz)))
 	{
-		if( EEXIST == errno )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Shared memory already exists for database cache, trying to recreate.");
-
-			shm_id = shmget(shm_key, 0 /* get reference */, 0666 /* 0022 */);
-
-			shmctl(shm_id, IPC_RMID, 0);
-			if ( ++attempts > ZBX_MAX_ATTEMPTS )
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "Can't recreate shared memory for database cache. [too many attempts]");
-				exit(1);
-			}
-			if ( attempts > (ZBX_MAX_ATTEMPTS / 2) )
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Wait 1 sec for next attempt of database cache memory allocation.");
-				sleep(1);
-			}
-			goto lbl_create;
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for database cache. [%s]",strerror(errno));
-			exit(1);
-		}
+		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for database cache.");
+		exit(1);
 	}
 
 	ptr = shmat(shm_id, 0, 0);
