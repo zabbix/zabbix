@@ -114,7 +114,7 @@ include_once('include/page_header.php');
 	if( 2 != $_REQUEST['fullscreen'] )
 		update_profile('web.screens.elementid',$_REQUEST['elementid']);
 
-	$_REQUEST['period'] = get_request('period',get_profile('web.screens.period', ZBX_PERIOD_DEFAULT, null, $_REQUEST['elementid']));
+	$_REQUEST['period'] = get_request('period',get_profile('web.screens.period', ZBX_PERIOD_DEFAULT, $_REQUEST['elementid']));
 	if($_REQUEST['period'] >= ZBX_MIN_PERIOD){
 		update_profile('web.screens.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['elementid']);
 	}

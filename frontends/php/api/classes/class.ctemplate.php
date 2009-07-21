@@ -46,6 +46,7 @@ class CTemplate {
 			'templateids'		=> 0,
 			'hostids'			=> 0,
 			'graphids'			=> 0,
+			'itemids'			=> 0,
 			'with_items'		=> 0,
 			'with_triggers'		=> 0,
 			'with_graphs'		=> 0,
@@ -120,6 +121,19 @@ class CTemplate {
 			$sql_parts['where'][] = DBcondition('ht.hostid', $options['hostids']);
 			$sql_parts['where']['hht'] = 'h.hostid=ht.templateid';
 		}
+		
+// itemids
+		if($options['itemids'] != 0){
+			zbx_value2array($options['itemids']);
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['itemid'] = 'i.itemid';
+			}
+
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+		}
+
 // graphids
 		if($options['graphids'] != 0){
 			zbx_value2array($options['graphids']);

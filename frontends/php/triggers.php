@@ -89,7 +89,7 @@
 	$_REQUEST['showdisabled'] = get_request('showdisabled', get_profile('web.triggers.showdisabled', 0));
 
 	check_fields($fields);
-	validate_sort_and_sortorder('t.description',ZBX_SORT_UP);
+	validate_sort_and_sortorder('description',ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
 ?>
@@ -537,15 +537,22 @@
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->setHeader(array(
-			new CCheckBox('all_triggers', NULL, "checkAll('".$form->GetName()."','all_triggers','g_triggerid');"),
-			make_sorting_link(S_SEVERITY, 't.priority'),
-			make_sorting_link(S_STATUS, 't.status'),
-			($_REQUEST['hostid'] > 0) ? NULL : make_sorting_link(S_HOST,'h.host'),
-			make_sorting_link(S_NAME, 't.description'),
+			new CCheckBox('all_triggers',NULL,"checkAll('".$form->getName()."','all_triggers','g_triggerid');"),
+			make_sorting_header(S_SEVERITY,'priority'),
+			make_sorting_header(S_STATUS,'status'),
+			($_REQUEST['hostid'] > 0)?NULL:make_sorting_header(S_HOST,'host'),
+			make_sorting_header(S_NAME,'description'),
 			S_EXPRESSION,
 			S_ERROR));
 
-		$options = array('select_hosts' => 1, 'editable' => 1, 'extendoutput' => 1);
+		$options = array(
+				'select_hosts' => 1, 
+				'editable' => 1, 
+				'extendoutput' => 1,
+				'sortfield' => getPageSortField('description'),
+				'sortorder' => getPageSortOrder()
+			);
+
 		if($showdisabled == 0){
 		    $options += array('status' => TRIGGER_STATUS_ENABLED);
 		}
@@ -590,15 +597,18 @@
 			}
 // --->>> add dependencies <<<---
 
-			if($trigger['status'] != TRIGGER_STATUS_UNKNOWN){ 
-				$trigger['error'] = '';
+			if($row['status'] != TRIGGER_STATUS_UNKNOWN) $row['error'] = '';
+			
+			if(!zbx_empty($row['error']) && (HOST_STATUS_TEMPLATE != $row['hoststatus'])){
+				$error = new CDiv(SPACE,'iconerror');
+				$error->setHint($row['error'], '', 'on');
 			}
 			if(!zbx_empty($trigger['error']) && (HOST_STATUS_TEMPLATE != $trigger['hoststatus'])){
 				$error = new CDiv(SPACE, 'error_icon');
 				$error->setHint($trigger['error'], '', 'on');
 			}
 			else{
-				$error = new CDiv(SPACE,'ok_icon');
+				$error = new CDiv(SPACE,'iconok');
 			}
 
 			switch($trigger['priority']){

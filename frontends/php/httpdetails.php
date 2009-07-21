@@ -219,7 +219,7 @@ include_once "include/page_header.php";
 	if( isset($_REQUEST['period']) && $_REQUEST['period'] != ZBX_MIN_PERIOD ) {
 		update_profile('web.httptest.period', $_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['httptestid']);
 	}
-	$_REQUEST['period'] = get_profile('web.httptest.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['httptestid']);
+	$_REQUEST['period'] = get_profile('web.httptest.period', ZBX_PERIOD_DEFAULT, $_REQUEST['httptestid']);
 
 	show_table_header(array(S_HISTORY.' "',
 						bold($httptest_data['name']),

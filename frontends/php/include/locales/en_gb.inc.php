@@ -368,6 +368,7 @@
 	'S_DROPDOWN_FIRST_ENTRY'=>			'Dropdown first entry',
 	'S_DROPDOWN_REMEMBER_SELECTED'=>		'remember selected',
 	'S_MAX_IN_TABLE' =>					'Max count of elements to show inside table cell',
+	'S_SEARCH_LIMIT' =>				'Search/Filter elements limit',
 	'S_THEMES'=>					'Themes',
 	'S_SYSTEM_DEFAULT'=>				'System default',
 	'S_BLACK_AND_BLUE'=>				'Black & Blue',
@@ -989,6 +990,8 @@
 	'S_IPMI_SENSOR'=>					'IPMI sensor',
 	'S_TEMPLATED_ITEM'=>					'Templated item',
 	'S_WEB_ITEM'=>						'Web item',
+	'S_WITH_SMALL'=>					'with',
+	'S_LIKE_SMALL'=>					'like',
 
 //	events.php
 	'S_EVENT'=>				'Event',

@@ -23,46 +23,67 @@
 
 //---------- GET USER VALUE -------------
 
-function get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$source=null){
+function get_profile($idx,$default_value=null,$idx2=0,$source=null,$nocache=false){
 	global $USER_DETAILS;
+	static $profiles;
 
-	$result = $default_value;
+	if(!is_null($profiles) && !$nocache){
+//SDI($idx); SDII($profiles[$idx]);
+		if(isset($profiles[$idx]) && !empty($profiles[$idx])){
+			if(!is_null($source))
+				return $profiles[$idx][$source];
+			else
+				return $profiles[$idx][$idx2];
+		}
+		else{
+			return $default_value;
+		}
+	}
+	else{
+		$profiles = array();
 
-	if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
-		$sql_cond = '';
-		if(profile_type($type,'id'))	$sql_cond.= ' AND '.DBin_node('value_id');
-		if(zbx_numeric($idx2)) 			$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
-		if(!is_null($source)) 			$sql_cond.= ' AND source='.zbx_dbstr($source);
-
-		$sql = 'SELECT value_id, value_int, value_str, type '.
+		$sql = 'SELECT * '.
 				' FROM profiles '.
-				' WHERE userid='.$USER_DETAILS["userid"].
-					' AND idx='.zbx_dbstr($idx).
-					$sql_cond.
+				' WHERE userid='.$USER_DETAILS['userid'].
 				' ORDER BY profileid ASC';
 
 		$db_profiles = DBselect($sql);
-		if($profile=DBfetch($db_profiles)){
+		while($profile=DBfetch($db_profiles)){
+			if(!isset($profiles[$profile['idx']])) $profiles[$profile['idx']] = array();
+			
+			$value_type = profile_field_by_type($profile['type']);
 
-			if(profile_type($type,'unknown')) $type = $profile['type'];
-			$value_type = profile_field_by_type($type);
-
-			if(profile_type($type,'array')){
-				$result = array();
-				$result[] = $profile[$value_type];
-				while($profile=DBfetch($db_profiles)){
-					$result[] = $profile[$value_type];
+			if(zbx_empty($source)){
+				if(profile_type($profile['type'],'array')){
+					if(!isset($profiles[$profile['idx']][$profile['idx2']])) $profiles[$profile['idx']][$profile['idx2']] = array();
+					$profiles[$profile['idx']][$profile['idx2']][] = $profile[$value_type];
+				}
+				else{
+					$profiles[$profile['idx']][$profile['idx2']] = $profile[$value_type];
 				}
 			}
 			else{
-				$result = $profile[$value_type];
+				if(profile_type($profile['type'],'array')){
+					if(!isset($profiles[$profile['idx']][$source])) $profiles[$profile['idx']][$source] = array();
+					$profiles[$profile['idx']][$source][] = $profile[$value_type];
+				}
+				else{
+					$profiles[$profile['idx']][$source] = $profile[$value_type];
+				}
 			}
+				
 		}
 	}
-
-return $result;
+	
+	if(isset($profiles[$idx]) && !empty($profiles[$idx])){
+		if(!is_null($source))
+			return $profiles[$idx][$source];
+		else
+			return $profiles[$idx][$idx2];
+	}
+	
+return $default_value;
 }
-
 
 // multi value
 function get_source_profile($idx,$default_value=array(),$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$source=null){

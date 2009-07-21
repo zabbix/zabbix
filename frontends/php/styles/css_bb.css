@@ -319,6 +319,14 @@ div.iconreset{
 	background-image: url('../images/general/bttn/reset_bb.png');
 }
 
+div.iconok{
+	background-image: url('../images/general/ok_bb.png');
+}
+
+div.sla_green{
+	background-image: url('../images/gradients/sla_blue15.png');
+}
+
 div#scrolltableft{
 	color: #0CF;
 }
