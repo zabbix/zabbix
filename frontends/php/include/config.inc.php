@@ -1042,7 +1042,7 @@ function __autoload($class_name){
 /*************** END VALUE MAPPING ******************/
 
 
-/*************** TABLE SORTING ******************/
+/*************** PAGE SORTING ******************/
 	/* function:
 	 *      validate_sort_and_sortorder
 	 *
@@ -1068,14 +1068,53 @@ function __autoload($class_name){
 		update_profile('web.'.$page["file"].'.sortorder',	$_REQUEST['sortorder']);
 	}
 
-	/* function:
-	 *      make_sorting_link
-	 *
-	 * description:
-	 *      Creates links for sorting in table header
-	 *
-	 * author: Aly
-	 */
+/* function:
+ *      make_sorting_header
+ *
+ * description:
+ *      Creates header col for sorting in table header
+ *
+ * author: Aly
+ */
+	function make_sorting_header($obj,$tabfield,$url=''){
+		global $page;
+
+		$sortorder = (($_REQUEST['sort'] == $tabfield) && ($_REQUEST['sortorder'] == ZBX_SORT_UP))?ZBX_SORT_DOWN:ZBX_SORT_UP;
+
+		$link = new Curl($url);
+		$link->setArgument('sort', $tabfield);
+		$link->setArgument('sortorder', $sortorder);
+
+		$url = $link->getUrl();
+		
+		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
+			$script = new CScript("javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+		}
+		else{
+			$script = new CScript("javascript: redirect('".$url."');");
+		}
+		
+		$col = array($obj);
+		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
+			if($sortorder == ZBX_SORT_UP){
+				$img = new CImg('images/general/sort_downw.gif','down',10,10);
+			}
+			else{
+				$img = new CImg('images/general/sort_upw.gif','up',10,10);
+			}
+
+			$img->setAttribute('style','line-height: 18px; vertical-align: middle;');
+			$col[] = SPACE;
+			$col[] = $img;
+		}
+		
+		$col = new CCol($col, 'hover_grey');
+		$col->setAttribute('onclick', $script);
+
+	return $col;
+	}
+	
+//TODO: should be replaced by "make_sorting_header" for every page.
 	function make_sorting_link($obj,$tabfield,$url=''){
 		global $page;
 
@@ -1099,10 +1138,10 @@ function __autoload($class_name){
 		$url.='sort='.$tabfield.'&sortorder='.$sortorder;
 
 		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
-			$link = new CLink($obj,$url,'header_sort',"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+			$link = new CLink($obj,$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
 		}
 		else{
-			$link = new CLink($obj,$url,'header_sort');
+			$link = new CLink($obj,$url);
 		}
 
 		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
@@ -1119,35 +1158,23 @@ function __autoload($class_name){
 
 	return $link;
 	}
-
-	function order_by($def,$allways=''){
-		global $page;
-
-		if(!empty($allways)) $allways = ','.$allways;
-		$sortable = explode(',',$def);
-
-		$tabfield = get_request('sort',get_profile('web.'.$page["file"].'.sort',null));
-
-		if(is_null($tabfield)) return ' ORDER BY '.$def.$allways;
-		if(!str_in_array($tabfield,$sortable)) return ' ORDER BY '.$def.$allways;
-
-		$sortorder = get_request('sortorder',get_profile('web.'.$page["file"].'.sortorder',ZBX_SORT_UP));
-
-	return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
-	}
-
 	
-	function order_page_result(&$data, $def_field, $def_order=ZBX_SORT_UP){
+	function getPageSortField($def){
 		global $page;
+		$tabfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def));
 
-		if(empty($data)) return false;
-
-		$sortfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def_field));
-		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def_order));
-
-	return order_result($data, $sortfield, $sortorder);
+	return $tabfield;
 	}
 	
+	function getPageSortOrder($def=ZBX_SORT_UP){
+		global $page;
+		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def));
+
+	return $sortorder;
+	}
+/*************** END PAGE SORTING ******************/
+	
+/*************** RESULT SORTING ******************/
 	function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP){
 		global $page;
 
@@ -1169,6 +1196,35 @@ function __autoload($class_name){
 	return true;
 	}
 
+	function order_page_result(&$data, $def_field, $def_order=ZBX_SORT_UP){
+		global $page;
+
+		if(empty($data)) return false;
+
+		$sortfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def_field));
+		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def_order));
+
+	return order_result($data, $sortfield, $sortorder);
+	}
+
+	function order_by($def,$allways=''){
+		global $page;
+
+		if(!empty($allways)) $allways = ','.$allways;
+		$sortable = explode(',',$def);
+
+		$tabfield = get_request('sort',get_profile('web.'.$page["file"].'.sort',null));
+
+		if(is_null($tabfield)) return ' ORDER BY '.$def.$allways;
+		if(!str_in_array($tabfield,$sortable)) return ' ORDER BY '.$def.$allways;
+
+		$sortorder = get_request('sortorder',get_profile('web.'.$page["file"].'.sortorder',ZBX_SORT_UP));
+
+	return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
+	}
+/*************** END RESULT SORTING ******************/
+
+// Selection
 	function selectByPattern(&$table, $column, $pattern, $limit){
 		$rsTable = array();
 		foreach($table as $num => $row){

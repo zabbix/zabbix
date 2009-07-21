@@ -187,52 +187,64 @@ include_once "include/page_header.php";
 
 				while($row2=DBfetch($result2)){
 					if(is_string($row['reason']) && ($row['reason'] == '-'))
-						$row['reason'] = new CList(null,"itservices");
-					if(does_service_depend_on_the_service($row["serviceid"],$row2["serviceid"])){
+						$row['reason'] = new CList(null,'itservices');
+					if(does_service_depend_on_the_service($row['serviceid'],$row2['serviceid'])){
 						$row['reason']->addItem(new CLink(
-										expand_trigger_description($row2["triggerid"]),
-										"events.php?triggerid=".$row2["triggerid"]));
+										expand_trigger_description($row2['triggerid']),
+										'events.php?triggerid='.$row2['triggerid']));
 					}
 				}
 			}
 
-			if($row["showsla"]==1){
+			if($row['showsla'] == 1){
 				$now = time(null);
 				$start = $now - $period_start_sec;
 				$end = $now;
 
-				$stat = calculate_service_availability($row["serviceid"], $start, $end);
+				$stat = calculate_service_availability($row['serviceid'], $start, $end);
 				$p = min($stat['problem'], 20);
-				$sla_style = $row['goodsla'] > $stat['ok'] ? 'red' : 'green';
+				$sla_style = ($row['goodsla'] > $stat['ok'])?'on':'off';
 
 				$sizeX = 160;
 				$sizeY = 15;
 				$sizeX_red = $sizeX*$p/20;
 				$sizeX_green = $sizeX - $sizeX_red;
+				
+//*
+				$sla_tab = new CTable(null,'invisible');
 
-				$chart = array(
-					'chart1'	=> new CImg('images/gradients/sla_green.png',$stat['ok'].'%' ,$sizeX_green,$sizeY),
-					'chart2'	=> new CImg('images/gradients/sla_red.png',$stat['problem'].'%' ,$sizeX_red,$sizeY),
-					'text'		=> new CSpan(SPACE.sprintf("%.2f",$stat['problem']),$sla_style));
+				$chart1 = null;
+				if($sizeX_green > 0){
+					$chart1 = new CDiv(null, 'sla_green');
+					$chart1->setAttribute('style', 'width: '.$sizeX_green.'px;');
+					$chart1 = new CLink($chart1,'report3.php?serviceid='.$row['serviceid'].'&year='.date('Y'),'image');
+				}
+		
+				$chart2 = null;
+				if($sizeX_red > 0){
+					$chart2 = new CDiv(null, 'sla_red');
+					$chart2->setAttribute('style', 'width: '.$sizeX_red.'px;');
+					$chart2 = new CLink($chart2,'report3.php?serviceid='.$row['serviceid'].'&year='.date('Y'),'image');
+				}
 
-				$chart['chart1']->addStyle('vertical-align: middle; line-height: 16px;');
-				$chart['chart2']->addStyle('vertical-align: middle; line-height: 16px;');
-				$chart['text']->addStyle('vertical-align: middle; line-height: 16px;');
+				$text = new CLink(sprintf("%.2f",$stat['problem']),'report3.php?serviceid='.$row['serviceid'].'&year='.date('Y'), $sla_style);
+				
+				$sla_tab->addRow(array($chart1, $chart2, SPACE, $text));
 
-				$row['sla'] = new CLink($chart, "report3.php?serviceid=".$row['serviceid']."&year=".date("Y"));
+				$row['sla'] = $sla_tab;
 
-				if($row["goodsla"] > $stat["ok"]){
-					$sla_style='red';
+				if($row['goodsla'] > $stat['ok']){
+					$sla_style = 'red';
 				}
 				else {
-					$sla_style='green';
+					$sla_style = 'green';
 				}
 
-				$row['sla2'] = array(new CSpan(sprintf("%.2f",$row['goodsla']),'green'),'/', new CSpan(sprintf("%.2f",$stat['ok']),$sla_style));
+				$row['sla2'] = array(new CSpan(sprintf('%.2f',$row['goodsla']),'green'),'/', new CSpan(sprintf('%.2f',$stat['ok']),$sla_style));
 			}
 			else {
-				$row['sla']= "-";
-				$row['sla2']= "-";
+				$row['sla']= '-';
+				$row['sla2']= '-';
 			}
 
 			if(isset($services[$row['serviceid']])){
@@ -255,15 +267,18 @@ include_once "include/page_header.php";
 		//permission issue
 		$treeServ = del_empty_nodes($treeServ);
 
-		$tree = new CTree('service_status_tree', $treeServ,array('caption' => bold(S_SERVICE),
-						'status' => bold(S_STATUS),
-						'reason' => bold(S_REASON),
-						'sla' => bold('SLA ('.$periods[$period_start].')'),
-						'sla2' => bold(nbsp(S_SLA)),
-						'graph' => bold(S_GRAPH)));
+		$tree = new CTree('service_status_tree', 
+							$treeServ,
+							array('caption' => bold(S_SERVICE),
+								'status' => bold(S_STATUS),
+								'reason' => bold(S_REASON),
+								'sla' => bold('SLA ('.$periods[$period_start].')'),
+								'sla2' => bold(nbsp(S_SLA)),
+								'graph' => bold(S_GRAPH))
+						);
 
 		if($tree){
-			// creates form for choosing a preset interval
+// creates form for choosing a preset interval
 			$r_form = new CForm();
 			$r_form->setClass('nowrap');
 			$r_form->setMethod('get');
@@ -271,12 +286,13 @@ include_once "include/page_header.php";
 			$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 			$period_combo = new CComboBox('period_start', $period_start, 'javascript: submit();');
 			foreach($periods as $key => $val){
-				$period_combo->AddItem($key, $val);
+				$period_combo->addItem($key, $val);
 			}
-			$r_form->AddItem(array(S_PERIOD, $period_combo));
+
+			$r_form->addItem(array(S_PERIOD, $period_combo));
 
 			$url = '?period_start='.$period_start.'&fullscreen='.($_REQUEST['fullscreen']?'0':'1');
-			$fs_icon = new CDiv(SPACE,'fullscreen');
+			$fs_icon = new CDiv(SPACE, 'fullscreen');
 			$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 			$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 
@@ -291,6 +307,6 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

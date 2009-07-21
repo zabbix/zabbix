@@ -258,7 +258,7 @@ include_once('include/page_header.php');
 	if($real_hosts) 	array_push($validation_param, 'real_hosts');
 	if(isset($templated_hosts)) array_push($validation_param, 'templated_hosts');
 
-	$nodeid = get_request('nodeid', get_current_nodeid());
+	$nodeid = get_request('nodeid', get_current_nodeid(false));
 
 	$params = array();
 	foreach($validation_param as  $option) $params[$option] = 1;
@@ -373,7 +373,7 @@ include_once('include/page_header.php');
 		$db_hosts = DBselect($sql);
 		while($host = DBfetch($db_hosts)){
 
-			$name = new CLink($host["host"],"#","action");
+			$name = new CSpan($host['host'],'link');
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
 					get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]).
@@ -384,7 +384,7 @@ include_once('include/page_header.php');
 					(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]) : '');
 			}
 
-			$name->SetAction($action." close_window(); return false;");
+			$name->setAttribute('onclick', $action." close_window();");
 
 			if($host["status"] == HOST_STATUS_MONITORED)
 				$status=new CSpan(S_MONITORED,"off");
@@ -431,7 +431,7 @@ include_once('include/page_header.php');
 
 			unset($host);
 		}
-		$table->Show();
+		$table->show();
 	}
 	else if($srctbl == 'templates'){
 		$existed_templates = get_request('existed_templates', array());
@@ -446,28 +446,15 @@ include_once('include/page_header.php');
 			$new_templates = array_diff($templates, $existed_templates);
 			if(count($new_templates) > 0) {
 				foreach($new_templates as $id => $name){
-?>
+					$script = 'add_variable(null,"templates['.$id.']","'.$name.'","'.$dstfrm.'",window.opener.document);'."\n";
+					$script.= 'var form = window.opener.document.forms["'.$dstfrm.'"];'.
+						        ' if(form) form.submit();'.
+								' close_window();';
+				}
 
-<script language="JavaScript" type="text/javascript">
-<!--
-	add_variable(null,"templates[" + "<?php echo $id; ?>" + "]","<?php echo $name; ?>","<?php echo $dstfrm; ?>",window.opener.document);
--->
-</script>
-
-<?php
-				} // foreach new_templates
-?>
-
-<script language="JavaScript" type="text/javascript">
-<!--
-        var form = window.opener.document.forms['<?php echo $dstfrm; ?>'];
-        if(form) form.submit();
-	close_window();
--->
-</script>
-
-<?php
+				insert_js($script);					
 			} // if count new_templates > 0
+
 			unset($new_templates);
 		}
 

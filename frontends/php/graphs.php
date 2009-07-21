@@ -96,7 +96,7 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('g.name',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name',ZBX_SORT_UP);
 	
 	$_REQUEST['go'] = get_request('go','none');
 ?>
@@ -527,10 +527,10 @@ include_once('include/page_header.php');
 		$table->setHeader(array(
 			new CCheckBox('all_graphs',NULL,"checkAll('".$form->getName()."','all_graphs','group_graphid');"),
 			$_REQUEST['hostid'] != 0 ? NULL : S_HOSTS,
-			make_sorting_link(S_NAME,'g.name'),
-			make_sorting_link(S_WIDTH,'g.width'),
-			make_sorting_link(S_HEIGHT,'g.height'),
-			make_sorting_link(S_GRAPH_TYPE,'g.graphtype')));
+			make_sorting_header(S_NAME,'name'),
+			S_WIDTH,
+			S_HEIGHT,
+			make_sorting_header(S_GRAPH_TYPE,'graphtype')));
 
 		$options = array('editable' => 1, 'extendoutput' => 1, 'select_hosts' => 1);
 		if($PAGE_HOSTS['selected'] > 0){

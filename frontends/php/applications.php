@@ -64,9 +64,9 @@ include_once('include/page_header.php');
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
 
 // application
-		'applicationid'=>	array(T_ZBX_INT,O_OPT,	P_SYS,	DB_ID,		'(({config}==4))&&(isset({form})&&({form}=="update"))'),
-		'appname'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'(({config}==4))&&isset({save})'),
-		'apphostid'=>		array(T_ZBX_INT, O_OPT, NULL,	DB_ID.'{}>0',	'(({config}==4))&&isset({save})'),
+		'applicationid'=>	array(T_ZBX_INT,O_OPT,	P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
+		'appname'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({save})'),
+		'apphostid'=>		array(T_ZBX_INT, O_OPT, NULL,	DB_ID.'{}>0',	'isset({save})'),
 		'apptemplateid'=>	array(T_ZBX_INT,O_OPT,	NULL,	DB_ID,	NULL),
 
 // actions

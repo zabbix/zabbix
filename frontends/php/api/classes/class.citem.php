@@ -43,7 +43,7 @@ class CItem {
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 		
-		$sort_columns = array('itemid'); // allowed columns for sorting
+		$sort_columns = array('itemid','description','key_','delay','history','trends','type','status'); // allowed columns for sorting
 
 		$sql_parts = array(
 			'select' => array('items' => 'i.itemid'),
@@ -53,26 +53,45 @@ class CItem {
 			'limit' => null);
 
 		$def_options = array(
-			'nodeids'			=> 0,
-			'groupids'			=> 0,
-			'hostids'			=> 0,
-			'itemids'			=> 0,
-			'graphids'			=> 0,
-			'triggerids'		=> 0,
-			'applicationids'	=> 0,
-			'status'			=> 0,
-			'templated_items'	=> 0,
-			'editable'			=> 0,
-			'nopermissions'		=> 0,
+			'nodeids'				=> 0,
+			'groupids'				=> 0,
+			'hostids'				=> 0,
+			'itemids'				=> 0,
+			'graphids'				=> 0,
+			'triggerids'			=> 0,
+			'applicationids'		=> 0,
+			'templated_items'		=> 0,
+			'editable'				=> 0,
+			'nopermissions'			=> 0,
 // OutPut
-			'select_triggers'	=> 0,
-			'select_hosts'		=> 0,
-			'select_graphs'		=> 0,
-			'extendoutput'		=> 0,
-			'count'				=> 0,
-			'pattern'			=> '',
-			'limit'				=> 0,
-			'order'				=> '');
+			'extendoutput'			=> 0,
+			'select_hosts'			=> 0,
+			'select_triggers'		=> 0,
+			'select_graphs'			=> 0,
+			'count'					=> 0,
+// filter
+			'filter'				=> 0,
+
+			'group'					=> null,
+			'host'					=> null,
+			'application'			=> null,
+			'key'					=> null,
+			'type'					=> null,
+			'snmp_community'		=> null,
+			'snmp_oid'				=> null,
+			'snmp_port'				=> null,
+			'valuetype'				=> null,
+			'delay'					=> null,
+			'history'				=> null,
+			'trends'				=> null,
+			'status'				=> null,
+
+//
+			'pattern'				=> null,
+			'sortfield'				=> '',
+			'sortorder'				=> '',
+			'limit'					=> 0,
+			'order'					=> '');
 
 		$options = array_merge($def_options, $options);
 
@@ -115,9 +134,9 @@ class CItem {
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 			
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where'][] = 'hg.hostid=i.hostid';
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
 		}
 
 // hostids
@@ -133,39 +152,52 @@ class CItem {
 
 // itemids
 		if($options['itemids'] != 0){
+			zbx_value2array($options['itemids']);
+			
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['itemid'] = 'i.itemid';
+			}
+			
 			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
 		}
 
 // triggerids
 		if($options['triggerids'] != 0){
 			zbx_value2array($options['triggerids']);
+
 			if($options['extendoutput'] != 0){
 				$sql_parts['select']['triggerid'] = 'f.triggerid';
 			}
-			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
-			$sql_parts['where'][] = 'i.itemid=f.itemid';
+
 			$sql_parts['from'][] = 'functions f';
+			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sql_parts['where']['if'] = 'i.itemid=f.itemid';
 		}
 		
 // applicationids
 		if($options['applicationids'] != 0){
-			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
-			$sql_parts['where'][] = 'i.hostid=a.hostid';
+			zbx_value2array($options['applicationids']);
+			
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['applicationid'] = 'a.applicationid';
+			}
+			
 			$sql_parts['from'][] = 'applications a';
+			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
+			$sql_parts['where']['ia'] = 'i.hostid=a.hostid';
 		}
+
 // graphids
 		if($options['graphids'] != 0){
 			zbx_value2array($options['graphids']);
+
 			if($options['extendoutput'] != 0){
 				$sql_parts['select']['graphid'] = 'gi.graphid';
 			}
+
 			$sql_parts['from']['gi'] = 'graphs_items gi';
 			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
-		}
-// status
-		if($options['status'] != 0){
-			$sql_parts['where'][] = 'i.status='.$options['status'];
 		}
 
 // templated_items
@@ -180,26 +212,130 @@ class CItem {
 
 // count
 		if($options['count'] != 0){
-			$sql_parts['select']['items'] = 'count(i.itemid) as count';
+			$options['select_hosts'] = 0;
+			$options['select_triggers'] = 0;
+			$options['select_graphs'] = 0;
+			$options['sortfield'] = '';
+			
+			$sql_parts['select'] = array('count(i.itemid) as rowscount');
 		}
 
+// --- FILTER ---
+		if($options['filter'] != 0){
+// group
+			if(!is_null($options['group'])){
+				if($options['extendoutput'] != 0){
+					$sql_parts['select']['name'] = 'g.name';
+				}
+				
+				$sql_parts['from']['g'] = 'groups g';
+				$sql_parts['from']['hg'] = 'hosts_groups hg';
+				
+				$sql_parts['where']['ghg'] = 'g.groupid = hg.groupid';
+				$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+				$sql_parts['where'][] = ' UPPER(g.name)='.zbx_dbstr(strtoupper($options['group']));
+			}
+
+// host
+			if(!is_null($options['host'])){
+				if($options['extendoutput'] != 0){
+					$sql_parts['select']['host'] = 'h.host';
+				}
+				
+				$sql_parts['from']['h'] = 'hosts h';
+				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+				$sql_parts['where'][] = ' UPPER(h.host)='.zbx_dbstr(strtoupper($options['host']));
+			}
+
+// application
+			if(!is_null($options['application'])){
+				if($options['extendoutput'] != 0){
+					$sql_parts['select']['application'] = 'a.name as application';
+				}
+				
+				$sql_parts['from']['a'] = 'applications a';
+				$sql_parts['from']['ia'] = 'items_applications ia';
+				
+				$sql_parts['where']['aia'] = 'a.applicationid = ia.applicationid';
+				$sql_parts['where']['iai'] = 'ia.itemid=i.itemid';
+				$sql_parts['where'][] = ' UPPER(a.name)='.zbx_dbstr(strtoupper($options['application']));
+			}
+
+// key
+			if(!is_null($options['key'])){
+				$sql_parts['where'][] = ' UPPER(i.key_) LIKE '.zbx_dbstr('%'.strtoupper($options['key']).'%');
+			}
+
+// type
+			if(!is_null($options['type'])){
+				$sql_parts['where'][] = 'i.type='.$options['type'];
+			}
+
+// snmp community
+			if(!is_null($options['snmp_community'])){
+				$sql_parts['where'][] = 'i.snmp_community='.zbx_dbstr($options['snmp_community']);
+			}
+
+// snmp oid
+			if(isset($_REQUEST['snmp_oid'])){
+				$sql_parts['where'][] = 'i.snmp_oid='.zbx_dbstr($options['snmp_oid']);
+			}
+
+// snmp port
+			if(isset($_REQUEST['snmp_port'])){
+				$sql_parts['where'][] = 'i.snmp_port='.$options['snmp_port'];
+			}
+
+// valuetype
+			if(!is_null($options['valuetype'])){
+				$sql_parts['where'][] = 'i.value_type='.$options['valuetype'];
+			}
+
+// delay
+			if(!is_null($options['delay'])){
+				$sql_parts['where'][] = 'i.delay='.$options['delay'];
+			}
+
+// trends
+			if(!is_null($options['trends'])){
+				$sql_parts['where'][] = 'i.trends='.$options['trends'];
+			}
+			
+// history
+			if(!is_null($options['history'])){
+				$sql_parts['where'][] = 'i.history='.$options['history'];
+			}
+
 // pattern
-		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(i.description) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+			if(!is_null($options['pattern'])){
+				$sql_parts['where'][] = ' UPPER(i.description) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+			}
+
+// status
+			if(!is_null($options['status'])){
+				$sql_parts['where'][] = 'i.status='.$options['status'];
+			}			
 		}
 
 // order
-		// restrict not allowed columns for sorting
-		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
-		
-		if(!zbx_empty($options['order'])){
-			$sql_parts['order'][] = 'i.'.$options['order'];
-			if(!str_in_array('i.'.$options['order'], $sql_parts['select'])) $sql_parts['select'][] = 'i.'.$options['order'];
+// restrict not allowed columns for sorting
+		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
+		if(!zbx_empty($options['sortfield'])){
+			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
+			
+			$sql_parts['order'][] = 'i.'.$options['sortfield'].' '.$sortorder;
+			
+			if(!str_in_array('i.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('i.*', $sql_parts['select'])){
+				$sql_parts['select'][] = 'i.'.$options['sortfield'];
+			}
 		}
-
+		
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
+		}
+		else if(!defined('ZBX_API_REQUEST')){
+			$sql_parts['limit'] = 1001;
 		}
 //----------
 
@@ -220,9 +356,9 @@ class CItem {
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);			
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.'
-				FROM '.$sql_from.'
-				WHERE '.DBin_node('i.itemid', $nodeids).
+		$sql = 'SELECT '.$sql_select.
+				' FROM '.$sql_from.
+				' WHERE '.DBin_node('i.itemid', $nodeids).
 					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
@@ -290,6 +426,14 @@ class CItem {
 				foreach($host['itemids'] as $num => $itemid){
 					$result[$itemid]['hostids'][$hostid] = $hostid;
 					$result[$itemid]['hosts'][$hostid] = $host;
+				}
+			}
+			
+			$templates = CTemplate::get($obj_params);
+			foreach($templates as $templateid => $template){
+				foreach($template['itemids'] as $num => $itemid){
+					$result[$itemid]['hostids'][$templateid] = $templateid;
+					$result[$itemid]['hosts'][$templateid] = $template;
 				}
 			}
 		}

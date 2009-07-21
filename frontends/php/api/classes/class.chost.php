@@ -48,7 +48,7 @@ class CHost {
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 		
-		$sort_columns = array('hostid', 'host'); // allowed columns for sorting
+		$sort_columns = array('hostid', 'host', 'status', 'dns', 'ip'); // allowed columns for sorting
 	
 	
 		$sql_parts = array(
@@ -63,6 +63,7 @@ class CHost {
 			'groupids'					=> 0,
 			'hostids'					=> 0,
 			'templateids'				=> 0,
+			'itemids'					=> 0,
 			'triggerids'				=> 0,
 			'graphids'					=> 0,
 			'monitored_hosts'			=> 0,
@@ -79,6 +80,7 @@ class CHost {
 			'nopermissions'				=> 0,
 // OutPut
 			'extendoutput'				=> 0,
+			'select_groups'				=> 0,
 			'select_templates'			=> 0,
 			'select_items'				=> 0,
 			'select_triggers'			=> 0,
@@ -86,7 +88,8 @@ class CHost {
 			'count'						=> 0,
 			'pattern'					=> '',
 			'extend_pattern'			=> 0,
-			'order' 					=> '',
+			'sortfield'					=> '',
+			'sortorder'					=> '',
 			'limit'						=> 0
 		);
 
@@ -133,39 +136,58 @@ class CHost {
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
 		}
+
 // hostids
 		if($options['hostids'] != 0){
 			zbx_value2array($options['hostids']);
 			$sql_parts['where'][] = DBcondition('h.hostid', $options['hostids']);
 		}
+
 // templateids
 		if($options['templateids'] != 0){
 			zbx_value2array($options['templateids']);
 			if($options['extendoutput'] != 0){
 				$sql_parts['select']['templateid'] = 'ht.templateid';
 			}
+
 			$sql_parts['from']['ht'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.templateid', $options['templateids']);
 			$sql_parts['where']['hht'] = 'h.hostid=ht.hostid';
 		}
+
+// itemids
+		if($options['itemids'] != 0){
+			zbx_value2array($options['itemids']);
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['itemid'] = 'i.itemid';
+			}
+
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+		}
+		
 // triggerids
 		if($options['triggerids'] != 0){
 			zbx_value2array($options['triggerids']);
 			if($options['extendoutput'] != 0){
 				$sql_parts['select']['triggerid'] = 'f.triggerid';
 			}
+
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 		}
+
 // graphids
 		if($options['graphids'] != 0){
 			zbx_value2array($options['graphids']);
 			if($options['extendoutput'] != 0){
 				$sql_parts['select']['graphid'] = 'gi.graphid';
 			}
+
 			$sql_parts['from']['gi'] = 'graphs_items gi';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
@@ -173,6 +195,7 @@ class CHost {
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 
 		}
+
 // monitored_hosts, templated_hosts
 		if($options['monitored_hosts'] != 0){
 			$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
@@ -197,48 +220,48 @@ class CHost {
 
 // with_triggers, with_monitored_triggers
 		if($options['with_triggers'] != 0){
-			$sql_parts['where'][] = 'EXISTS( 
-					SELECT i.itemid
-					FROM items i, functions f, triggers t
-					WHERE i.hostid=h.hostid 
-						AND i.itemid=f.itemid 
-						AND f.triggerid=t.triggerid)';
+			$sql_parts['where'][] = 'EXISTS( '.
+					' SELECT i.itemid '.
+					' FROM items i, functions f, triggers t '.
+					' WHERE i.hostid=h.hostid '.
+						' AND i.itemid=f.itemid '.
+						' AND f.triggerid=t.triggerid)';
 		}
 		else if($options['with_monitored_triggers'] != 0){
-			$sql_parts['where'][] = 'EXISTS( 
-					SELECT i.itemid 
-					FROM items i, functions f, triggers t
-					WHERE i.hostid=h.hostid 
-						AND i.status='.ITEM_STATUS_ACTIVE.'
-						AND i.itemid=f.itemid 
-						AND f.triggerid=t.triggerid 
-						AND t.status='.TRIGGER_STATUS_ENABLED.')';
+			$sql_parts['where'][] = 'EXISTS( '.
+					' SELECT i.itemid '.
+					' FROM items i, functions f, triggers t '.
+					' WHERE i.hostid=h.hostid '.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+						' AND i.itemid=f.itemid '.
+						' AND f.triggerid=t.triggerid '.
+						' AND t.status='.TRIGGER_STATUS_ENABLED.')';
 		}
 
 // with_httptests, with_monitored_httptests
 		if($options['with_httptests'] != 0){
-			$sql_parts['where'][] = 'EXISTS( 
-					SELECT a.applicationid 
-					FROM applications a, httptest ht 
-					WHERE a.hostid=h.hostid 
-						AND ht.applicationid=a.applicationid)';
+			$sql_parts['where'][] = 'EXISTS( '.
+					' SELECT a.applicationid '.
+					' FROM applications a, httptest ht '.
+					' WHERE a.hostid=h.hostid '.
+						' AND ht.applicationid=a.applicationid)';
 		}
 		else if($options['with_monitored_httptests'] != 0){
-			$sql_parts['where'][] = 'EXISTS( 
-					SELECT a.applicationid 	
-					FROM applications a, httptest ht 	
-					WHERE a.hostid=h.hostid	
-						AND ht.applicationid=a.applicationid 	
-						AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
+			$sql_parts['where'][] = 'EXISTS( '.
+					' SELECT a.applicationid '.
+					' FROM applications a, httptest ht '.
+					' WHERE a.hostid=h.hostid '.
+						' AND ht.applicationid=a.applicationid '.
+						' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
 		}
 
 // with_graphs
 		if($options['with_graphs'] != 0){
-			$sql_parts['where'][] = 'EXISTS( 
-					SELECT DISTINCT i.itemid 
-					FROM items i, graphs_items gi 
-					WHERE i.hostid=h.hostid 
-						AND i.itemid=gi.itemid)';
+			$sql_parts['where'][] = 'EXISTS( '.
+					' SELECT DISTINCT i.itemid '.
+					' FROM items i, graphs_items gi '.
+					' WHERE i.hostid=h.hostid '.
+						' AND i.itemid=gi.itemid)';
 		}
 
 // extendoutput
@@ -248,10 +271,12 @@ class CHost {
 		
 // count
 		if($options['count'] != 0){
+			$options['select_groups'] = 0;
 			$options['select_templates'] = 0;
 			$options['select_items'] = 0;
 			$options['select_triggers'] = 0;
 			$options['select_graphs'] = 0;
+			$options['sortfield'] = '';
 
 			$sql_parts['select'] = array('count(h.hostid) as rowscount');
 		}
@@ -271,11 +296,16 @@ class CHost {
 		}
 
 // order
-		// restrict not allowed columns for sorting
-		$options['order'] = str_in_array($options['order'], $sort_columns) ? $options['order'] : '';
-		if(!zbx_empty($options['order'])){
-			$sql_parts['order'][] = 'h.'.$options['order'];
-			if(!str_in_array('h.'.$options['order'], $sql_parts['select'])) $sql_parts['select'][] = 'h.'.$options['order'];
+// restrict not allowed columns for sorting
+		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
+		if(!zbx_empty($options['sortfield'])){
+			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
+			
+			$sql_parts['order'][] = 'h.'.$options['sortfield'].' '.$sortorder;
+			
+			if(!str_in_array('h.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('h.*', $sql_parts['select'])){
+				$sql_parts['select'][] = 'h.'.$options['sortfield'];
+			}
 		}
 
 // limit
@@ -283,6 +313,7 @@ class CHost {
 			$sql_parts['limit'] = $options['limit'];
 		}
 //-------
+
 		$hostids = array();
 		
 		$sql_parts['select'] = array_unique($sql_parts['select']);
@@ -364,14 +395,16 @@ class CHost {
 					}
 					// itemids
 					if(isset($host['itemid'])){
-						if(!isset($result[$host['hostid']]['itemids'])) $result[$host['hostid']]['itemids'] = array();
-							
+						if(!isset($result[$host['hostid']]['itemids']))
+							$result[$host['hostid']]['itemids'] = array();
+
 						$result[$host['hostid']]['itemids'][$host['itemid']] = $host['itemid'];
 						unset($host['itemid']);
 					}
 					// graphids
 					if(isset($host['graphid'])){
-						if(!isset($result[$host['hostid']]['graphids'])) $result[$host['hostid']]['graphids'] = array();
+						if(!isset($result[$host['hostid']]['graphids']))
+							$result[$host['hostid']]['graphids'] = array();
 							
 						$result[$host['hostid']]['graphids'][$host['graphid']] = $host['graphid'];
 						unset($host['graphid']);
@@ -383,6 +416,18 @@ class CHost {
 		}
 		
 // Adding Objects
+
+// Adding Groups
+		if($options['select_groups']){
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+			$groups = CHostgroup::get($obj_params);
+			foreach($groups as $groupid => $group){
+				foreach($group['hostids'] as $num => $hostid){
+					$result[$hostid]['groupids'][$groupid] = $groupid;
+					$result[$hostid]['groups'][$groupid] = $group;
+				}
+			}
+		}
 
 // Adding Templates
 		if($options['select_templates']){

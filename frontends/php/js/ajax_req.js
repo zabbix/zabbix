@@ -130,7 +130,7 @@ function change_flicker_state(divid){
 		switchElementsClass($("flicker_icon_r"),"dbl_arrow_up","dbl_arrow_down");
 	}
 	
-	var filter_state = showHideEffect(divid,'blind', eff_time, switchArrows);
+	var filter_state = showHideEffect(divid,'slide', eff_time, switchArrows);
 	
 
 	if(false === filter_state) return false;
