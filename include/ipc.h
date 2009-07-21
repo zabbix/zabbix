@@ -25,5 +25,6 @@
 #endif /* _WINDOWS */
 
 key_t zbx_ftok(char *path, int id);
+int zbx_shmget(key_t key, size_t size);
 
 #endif
