@@ -532,9 +532,7 @@ static int	process_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 {
-	char	*server,*key,*value_string, *data;
-	char	copy[MAX_STRING_LEN];
-	char	host_dec[HOST_HOST_LEN_MAX], key_dec[ITEM_KEY_LEN_MAX], value_dec[MAX_BUF_LEN];
+	char	*pl, *pr, *data, value_dec[MAX_BUF_LEN];
 	char	lastlogsize[11], timestamp[11], source[HISTORY_LOG_SOURCE_LEN_MAX], severity[11];
 	int	sender_nodeid, nodeid;
 	char	*answer;
@@ -643,67 +641,52 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 			return ret;
 		}
 		/* New XML protocol? */
-		else if(s[0]=='<')
+		else if (*s == '<')
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "XML received [%s]", s);
-
-			comms_parse_response(s, host_dec, sizeof(host_dec), key_dec, sizeof(key_dec), value_dec, sizeof(value_dec),
+			comms_parse_response(s, av.host_name, sizeof(av.host_name), av.key, sizeof(av.key), value_dec, sizeof(value_dec),
 					lastlogsize, sizeof(lastlogsize), timestamp, sizeof(timestamp), source, sizeof(source),
 					severity, sizeof(severity));
 
-			server		= host_dec;
-			value_string	= value_dec;
-			key		= key_dec;
+			av.value	= value_dec;
+			av.lastlogsize	= atoi(lastlogsize);
+			av.timestamp	= atoi(timestamp);
+			av.source	= source;
+			av.severity	= atoi(severity);
 		}
 		else
 		{
-			strscpy(copy,s);
-
-			server=(char *)strtok(s,":");
-			if(NULL == server)
-			{
+			pl = s;
+			if (NULL == (pr = strchr(pl, ':')))
 				return FAIL;
-			}
 
-			key=(char *)strtok(NULL,":");
-			if(NULL == key)
-			{
+			*pr = '\0';
+			zbx_strlcpy(av.host_name, pl, sizeof(av.host_name));
+			*pr = ':';
+
+			pl = pr + 1;
+			if (NULL == (pr = strchr(pl, ':')))
 				return FAIL;
-			}
 	
-			value_string=strchr(copy,':');
-			value_string=strchr(value_string+1,':');
+			*pr = '\0';
+			zbx_strlcpy(av.key, pl, sizeof(av.key));
+			*pr = ':';
 
-			if(NULL == value_string)
-			{
-				return FAIL;
-			}
-			/* It points to ':', so have to increment */
-			value_string++;
-			*lastlogsize	= '\0';
-			*timestamp	= '\0';
-			*source		= '\0';
-			*severity	= '\0';
+			av.value	= pr + 1;
+			av.lastlogsize	= 0;
+			av.timestamp	= 0;
+			av.source	= NULL;
+			av.severity	= 0;
 		}
-		zabbix_log( LOG_LEVEL_DEBUG, "Value [%s]", value_string);
 
 		av.clock = time(NULL);
-		zbx_strlcpy(av.host_name, server, sizeof(av.host_name));
-		zbx_strlcpy(av.key, key, sizeof(av.key));
-		av.value = value_string;
-		av.lastlogsize = atoi(lastlogsize);
-		av.timestamp = atoi(timestamp);
-		av.source = source;
-		av.severity = atoi(severity);
 
 		process_mass_data(sock, 0, &av, 1, NULL, 0);
 
-		if( zbx_tcp_send_raw(sock, SUCCEED == ret ? "OK" : "NOT OK") != SUCCEED)
+		if (SUCCEED != zbx_tcp_send_raw(sock, SUCCEED == ret ? "OK" : "NOT OK"))
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Error sending result back");
+			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
 			zabbix_syslog("Trapper: error sending result back");
 		}
-		zabbix_log( LOG_LEVEL_DEBUG, "After write()");
 	}	
 	return ret;
 }
