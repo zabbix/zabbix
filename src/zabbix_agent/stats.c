@@ -35,6 +35,7 @@
 #	include "service.h"
 #else
 #	include "daemon.h"
+#	include "ipc.h"
 #endif /* _WINDOWS */
 
 ZBX_COLLECTOR_DATA *collector = NULL;

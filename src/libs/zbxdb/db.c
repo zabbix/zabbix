@@ -24,6 +24,9 @@
 #include "log.h"
 #include "zlog.h"
 
+/* Transaction level. Must be 1 for all queries. */
+int		txn_level = 0;
+
 #ifdef	HAVE_SQLITE3
 	int		sqlite_transaction_started = 0;
 	sqlite3		*conn = NULL;
@@ -293,6 +296,12 @@ static DB_RESULT __zbx_zbx_db_select(const char *fmt, ...)
  ******************************************************************************/
 void	zbx_db_begin(void)
 {
+	if(txn_level>0)
+	{
+		zabbix_log( LOG_LEVEL_CRIT, "ERROR: nested transaction detected. Please report it to Zabbix Team.");
+		assert(0);
+	}
+	txn_level++;
 #ifdef	HAVE_MYSQL
 	zbx_db_execute("%s","begin;");
 #endif
@@ -336,6 +345,12 @@ void	zbx_db_begin(void)
  ******************************************************************************/
 void zbx_db_commit(void)
 {
+	if(txn_level==0)
+	{
+		zabbix_log( LOG_LEVEL_CRIT, "ERROR: commit without transaction. Please report it to Zabbix Team.");
+		assert(0);
+	}
+	txn_level--;
 #ifdef	HAVE_MYSQL
 	zbx_db_execute("%s","commit;");
 #endif
@@ -381,6 +396,12 @@ void zbx_db_commit(void)
  ******************************************************************************/
 void zbx_db_rollback(void)
 {
+	if(txn_level==0)
+	{
+		zabbix_log( LOG_LEVEL_CRIT, "ERROR: rollback without transaction. Please report it to Zabbix Team.");
+		assert(0);
+	}
+	txn_level--;
 #ifdef	HAVE_MYSQL
 	zbx_db_execute("rollback;");
 #endif
@@ -435,7 +456,12 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Query [%s]", sql);
+	if(txn_level==0)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Query without transaction detected [%s]",
+			sql);
+	}
+	zabbix_log( LOG_LEVEL_DEBUG, "Query [txnlev:%d] [%s]", txn_level, sql);
 #ifdef	HAVE_MYSQL
 	if(!conn)
 	{
@@ -711,7 +737,12 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Query [%s]", sql);
+	if(txn_level==0)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Query without transaction detected [%s]",
+			sql);
+	}
+	zabbix_log( LOG_LEVEL_DEBUG, "Query [txnlev:%d] [%s]", txn_level, sql);
 
 #ifdef	HAVE_MYSQL
 	if(!conn)
