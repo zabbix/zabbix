@@ -126,7 +126,7 @@ private $items;
 			$div->setAttribute('id',$flicker_domid);
 			if(!$this->flicker_state) $div->setAttribute('style','display: none;');
 
-			$flicker_tab->addRow($div);
+//			$flicker_tab->addRow($div);
 
 			$icon_l = new CDiv(SPACE.SPACE, $this->flicker_state?'dbl_arrow_up':'dbl_arrow_down');
 			$icon_l->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
@@ -144,6 +144,8 @@ private $items;
 			$thin_tab->addAction('onclick',new CScript("javascript: change_flicker_state('".$flicker_domid."');"));
 
 			$flicker_tab->addRow($thin_tab,'textcolorstyles link pointer');
+			
+			$flicker_tab->addRow($div);
 
 			$widget->addRow($flicker_tab);
 		}

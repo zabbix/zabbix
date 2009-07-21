@@ -62,7 +62,8 @@ include_once('include/page_header.php');
 		'form_refresh'=>		array(T_ZBX_STR, O_OPT, NULL,			NULL,	NULL)
 	);
 	check_fields($fields);
-//validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name',ZBX_SORT_UP);
+
 	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
@@ -197,7 +198,7 @@ SDII($hosts);
 			if(!isset($_REQUEST['form_refresh'])){
 				$params = array('groupids' => $groupid, 
 								'editable' => 1,
-								'order' => 'host',
+								'sortfield' => 'host',
 								'templated_hosts' => 1);
 				$db_hosts = CHost::get($params);
 				foreach($db_hosts as $hostid => $db_host){
@@ -208,7 +209,7 @@ SDII($hosts);
 
 // select all possible groups
 		$params = array('not_proxy_host' => 1,
-						'order' => 'name',
+						'sortfield' => 'name',
 						'editable' => 1,
 						'extendoutput' => 1);
 		$db_groups = CHostGroup::get($params);
@@ -227,7 +228,7 @@ SDII($hosts);
 // get hosts from selected twb_groupid combo
 		$params = array('groupids'=>$twb_groupid,
 						'templated_hosts'=>1,
-						'order'=>'host',
+						'sortfield'=>'host',
 						'editable' => 1,
 						'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
@@ -240,7 +241,7 @@ SDII($hosts);
 // select selected hosts and add them
 		$params = array('hostids' => $hosts,
 						'templated_hosts' =>1 ,
-						'order' => 'host',
+						'sortfield' => 'host',
 						'editable' => 1,
 						'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
@@ -286,19 +287,27 @@ SDII($hosts);
 		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
 		$table->setHeader(array(
 					new CCheckBox('all_groups', NULL, "checkAll('".$form->GetName()."','all_groups','groups');"),
-					make_sorting_link(S_NAME,'g.name'),
+					make_sorting_header(S_NAME,'name'),
 					' # ',
 					S_MEMBERS
 				));
 
-		$groups = CHostGroup::get(array('order'=> 'name', 'editable' => 1, 'extendoutput' => 1, 'select_hosts' => 1));
-			
+		$options = array('order'=> 'name', 
+						'editable' => 1, 
+						'extendoutput' => 1, 
+						'select_hosts' => 1,
+						'sortfield' => getPageSortField('name'),
+						'sortorder' => getPageSortOrder()
+					);
+
+		$groups = CHostGroup::get($options);
 		foreach($groups as $groupid => $group){
 			$tpl_count = 0;
 			$host_count = 0;
 			$i = 0;
 			$hosts_output = array();
 			
+			order_result($group['hosts'], 'host');
 			foreach($group['hosts'] as $hostid => $host){
 				$i++;
 				
@@ -308,7 +317,7 @@ SDII($hosts);
 					break;
 				}
 				
-				Switch($host['status']){
+				switch($host['status']){
 					case HOST_STATUS_NOT_MONITORED:
 						$style = 'on';
 						$url = 'hosts.php?form=update&hostid='.$hostid.'&groupid='.$groupid;
@@ -365,5 +374,5 @@ SDII($hosts);
 		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 	}
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 ?>

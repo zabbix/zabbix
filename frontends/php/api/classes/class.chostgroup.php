@@ -115,11 +115,12 @@ class CHostGroup {
 			'editable'					=> 0,
 			'nopermissions'				=> 0,
 // output
-			'select_hosts'				=> 0,
 			'extendoutput'				=> 0,
+			'select_hosts'				=> 0,
 			'count'						=> 0,
 			'pattern' 					=> '',
-			'order'						=> '',
+			'sortfield'					=> '',
+			'sortorder'					=> '',
 			'limit'						=> 0);
 					
 		$options = array_merge($def_options, $params);
@@ -174,6 +175,10 @@ class CHostGroup {
 // hostids
 		if($options['hostids'] != 0){
 			zbx_value2array($options['hostids']);
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['hostid'] = 'hg.hostid';
+			}
+
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.hostid', $options['hostids']);
 			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
@@ -284,6 +289,9 @@ class CHostGroup {
 		
 // count
 		if($options['count'] != 0){
+			$options['select_hosts'] = 0;
+			$options['sortfield'] = '';
+
 			$sql_parts['select']['groups'] = 'COUNT(g.groupid) as rowscount';
 		}
 
@@ -293,16 +301,24 @@ class CHostGroup {
 		}
 
 // order
-		// restrict not allowed columns for sorting
-		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
-		if(!zbx_empty($options['order'])){
-			$sql_parts['order'][] = 'g.'.$options['order'];
-			if(!str_in_array('g.'.$options['order'], $sql_parts['select'])) $sql_parts['select'][] = 'g.'.$options['order'];
+// restrict not allowed columns for sorting
+		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
+		if(!zbx_empty($options['sortfield'])){
+			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
+			
+			$sql_parts['order'][] = 'g.'.$options['sortfield'].' '.$sortorder;
+			
+			if(!str_in_array('g.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('g.*', $sql_parts['select'])){
+				$sql_parts['select'][] = 'g.'.$options['sortfield'];
+			}
 		}
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
+		}
+		else if(!defined('ZBX_API_REQUEST')){
+			$sql_parts['limit'] = 1001;
 		}
 //-----------
 		
@@ -323,9 +339,9 @@ class CHostGroup {
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);			
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.'
-				FROM '.$sql_from.'
-				WHERE '.DBin_node('g.groupid', $nodeids).
+		$sql = 'SELECT '.$sql_select.
+				' FROM '.$sql_from.
+				' WHERE '.DBin_node('g.groupid', $nodeids).
 					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
@@ -345,7 +361,16 @@ class CHostGroup {
 						$result[$group['groupid']]['hostids'] = array();
 						$result[$group['groupid']]['hosts'] = array();
 					}
-										
+
+					// hostids
+					if(isset($group['hostid'])){
+						if(!isset($result[$group['groupid']]['hostids'])) 
+							$result[$group['groupid']]['hostids'] = array();
+							
+						$result[$group['groupid']]['hostids'][$group['hostid']] = $group['hostid'];
+						unset($group['hostid']);
+					}
+
 					$result[$group['groupid']] += $group;
 				}	
 			}

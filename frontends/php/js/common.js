@@ -201,9 +201,46 @@ function checkAll(form_name, chkMain, shkName){
 	return true;
 }
 
+
+function clearAllForm(form){
+	form = $(form);
+	var count = 0;
+	
+	var inputs = form.getElementsByTagName('input');
+	for(var i=0; i<inputs.length;i++){
+		var type = inputs[i].getAttribute('type');
+
+		switch(type){
+			case 'button':
+			case 'hidden':
+			case 'submit':
+				break;
+			case 'checkbox':
+				inputs[i].checked = false;
+				break;
+			case 'text':
+			case 'password':
+			default:
+				inputs[i].value = '';
+		}
+	}
+
+	var selects = form.getElementsByTagName('select');
+	for(var i=0; i<selects.length;i++){
+		selects[i].selectedIndex = 0;
+	}
+	
+	var areas = form.getElementsByTagName('textarea');
+	for(var i=0; i<areas.length;i++){
+		areas[i].innerHTML = '';
+	}
+
+return true;
+}
+
 function close_window(){
 	
-	window.setTimeout("window.close()", 500); /* Solve bug for Internet Explorer */
+	window.setTimeout('window.close();', 500); /* Solve bug for Internet Explorer */
 	return false;
 }
 
@@ -250,24 +287,6 @@ function deselectAll(){
 		var sel = window.getSelection();
 		sel.removeAllRanges();
 	}
-}
-
-function empty_form(id){
-	id = $(id);
-	var count = 0;
-
-	var inputs = id.getElementsByTagName('input');
-	for(var i=0; i<inputs.length;i++){
-		if((inputs[i].type == 'text') && (typeof(inputs[i].hidden) == 'undefined') && !empty(inputs[i].value)) return false;
-		if((inputs[i].type == 'checkbox') && (inputs[i].checked)) return false;
-	}
-
-	var selects = id.getElementsByTagName('select');
-	for(var i=0; i<selects.length;i++){
-		if((typeof(selects[i].hidden) == 'undefined') && (selects[i].selectedIndex)) return false;
-	}
-
-return true;
 }
 
 function eventTarget(e){
@@ -377,6 +396,24 @@ function get_scroll_pos(){
 		scrOfX = document.documentElement.scrollLeft;
 	}
 	return [ scrOfX, scrOfY ];
+}
+
+function is_empty_form(id){
+	id = $(id);
+	var count = 0;
+
+	var inputs = id.getElementsByTagName('input');
+	for(var i=0; i<inputs.length;i++){
+		if((inputs[i].type == 'text') && (typeof(inputs[i].hidden) == 'undefined') && !empty(inputs[i].value)) return false;
+		if((inputs[i].type == 'checkbox') && (inputs[i].checked)) return false;
+	}
+
+	var selects = id.getElementsByTagName('select');
+	for(var i=0; i<selects.length;i++){
+		if((typeof(selects[i].hidden) == 'undefined') && (selects[i].selectedIndex)) return false;
+	}
+
+return true;
 }
 
 function openWinCentered(loc, winname, iwidth, iheight, params){

@@ -126,7 +126,7 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
+	validate_sort_and_sortorder('host',ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
 ?>
@@ -609,27 +609,6 @@ include_once('include/page_header.php');
 		show_table_header($header, $frmForm);
 
 /* table HOSTS */
-		$form = new CForm();
-
-		$form->setName('hosts');
-		$form->addVar('config',get_request('config',0));
-
-		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
-		$table->setHeader(array(
-			new CCheckBox('all_hosts',NULL,"checkAll('".$form->GetName()."','all_hosts','hosts');"),
-			make_sorting_link(S_NAME,'h.host'),
-			S_ITEMS,
-			S_TRIGGERS,
-			S_GRAPHS,
-			make_sorting_link(S_DNS,'h.dns'),
-			make_sorting_link(S_IP,'h.ip'),
-			make_sorting_link(S_PORT,'h.port'),
-			S_TEMPLATES,
-			make_sorting_link(S_STATUS,'h.status'),
-			make_sorting_link(S_AVAILABILITY,'h.available'),
-			S_ERROR
-			));
-
 		$options = array(
 					'hostids' => $PAGE_HOSTS['hostids'],
 					'extendoutput' => 1,
@@ -638,7 +617,8 @@ include_once('include/page_header.php');
 					'select_triggers' => 1,
 					'select_graphs' => 1,
 					'editable' => 1,
-					'order' => 'host'
+					'sortfield' => getPageSortField('host'),
+					'sortorder' => getPageSortOrder()
 				);
 				
 		if($_REQUEST['groupid'] > 0){
@@ -646,6 +626,27 @@ include_once('include/page_header.php');
 		}
 		
 		$hosts = Chost::get($options);
+		
+		
+		$form = new CForm();
+		$form->setName('hosts');
+		$form->addVar('config',get_request('config',0));
+
+		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
+		$table->setHeader(array(
+			new CCheckBox('all_hosts',NULL,"checkAll('".$form->getName()."','all_hosts','hosts');"),
+			make_sorting_header(S_NAME,'host'),
+			S_ITEMS,
+			S_TRIGGERS,
+			S_GRAPHS,
+			make_sorting_header(S_DNS,'dns'),
+			make_sorting_header(S_IP,'ip'),
+			S_PORT,
+			S_TEMPLATES,
+			make_sorting_header(S_STATUS,'status'),
+			S_AVAILABILITY,
+			S_ERROR
+			));
 		
 		foreach($hosts as $hostid => $row){
 			$description = array();
@@ -700,11 +701,11 @@ include_once('include/page_header.php');
 				$available=new CCol(S_UNKNOWN,'unknown');
 
 			if(!zbx_empty($row['error'])){
-				$error = new CDiv(SPACE,'error_icon');
+				$error = new CDiv(SPACE,'iconerror');
 				$error->setHint($row['error'], '', 'on');
 			}
 			else{
-				$error = new CDiv(SPACE,'ok_icon');
+				$error = new CDiv(SPACE,'iconok');
 			}
 
 			$templates = $row['templates'];

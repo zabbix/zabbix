@@ -237,6 +237,28 @@ div.iconreset:hover{
 	cursor:pointer;
 }
 
+div.iconerror{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/error.png');
+	background-repeat:no-repeat;
+}
+
+div.iconerror:hover{
+	cursor:pointer;
+}
+
+div.iconok{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/ok.png');
+	background-repeat:no-repeat;
+}
+
+div.iconok:hover{
+	cursor:pointer;
+}
+
 div.dbl_arrow_down{
 	height: 10px;
 	width: 9px;
@@ -260,26 +282,17 @@ div.dbl_arrow_up:hover{
 	cursor:pointer;
 }
 
-div.error_icon{
-	height: 14px;
-	width: 14px;
-	background-image: url('../images/general/error.png');
-	background-repeat:no-repeat;
+div.sla_green{
+	border: 0px;
+	height: 15px;
+	background-image: url('../images/gradients/sla_green15.png');
+	background-repeat:repeat-x;
 }
 
-div.error_icon:hover{
-	cursor:pointer;
-}
-
-div.ok_icon{
-	height: 14px;
-	width: 14px;
-	background-image: url('../images/general/ok.png');
-	background-repeat:no-repeat;
-}
-
-div.ok_icon:hover{
-	cursor:pointer;
+div.sla_red{
+	height: 15px;
+	background-image: url('../images/gradients/sla_red15.png');
+	background-repeat:repeat-x;
 }
 
 /********* DIV IMG END *********/

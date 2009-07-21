@@ -43,7 +43,7 @@ class CTrigger {
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 		
-		$sort_columns = array('triggerid'); // allowed columns for sorting
+		$sort_columns = array('triggerid', 'description', 'status', 'priority'); // allowed columns for sorting
 
 		
 		$sql_parts = array(

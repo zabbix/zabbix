@@ -90,11 +90,11 @@ include_once 'include/page_header.php';
 		exit();
 	}
 
-	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0, PROFILE_TYPE_ID));
+	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0));
 	if(!in_node($_REQUEST['graphid'])) $_REQUEST['graphid'] = 0;
 
-//	$_REQUEST['stime'] =	get_request('stime',get_profile('web.graph.stime', null, PROFILE_TYPE_STR, $_REQUEST['graphid']));
-	$_REQUEST['period'] =	get_request('period',get_profile('web.graph.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['graphid']));
+//	$_REQUEST['stime'] =	get_request('stime',get_profile('web.graph.stime', null, $_REQUEST['graphid']));
+	$_REQUEST['period'] =	get_request('period',get_profile('web.graph.period', ZBX_PERIOD_DEFAULT, $_REQUEST['graphid']));
 
 	$effectiveperiod = navigation_bar_calc();
 

@@ -3,16 +3,6 @@ table{
 	border-spacing:	0px; /* cellspacing */
 }
 
-table.infobox{
-	width: 100%;
-	margin: 6px 0;
-	border: 1px solid gray;
-	background-color: white;
-}
-table.infobox tr td{
-	padding-left: 5px;
-}
-
 table.whitetext {
 	border-spacing:	0px; /* cellspacing */
 	color: #CCCCCC;
@@ -525,6 +515,7 @@ table.tableinfo tr.header td.hover_grey {
 	font-weight: bold;
 	background-color:#CCCCCC;
 	border-width: 0px;
+	cursor: pointer;
 }
 
 table.tableinfo tr.header td.hover_grey:hover {
@@ -1313,3 +1304,29 @@ table.requirements tr td{
 }
 
 /********** </REQUIREMENTS> ************/
+
+/********** <INFOBOX> ************/
+table.infobox{
+	width: 100%;
+	margin-top: 4px;
+	margin-bottom: 4px;
+	border: 1px solid #777777;
+	background-color: #FFFFFF;
+}
+table.infobox tr td{
+	padding-left: 5px;
+}
+/********** </INFOBOX> ************/
+
+/********** <INVISIBLE> ************/
+table.invisible{
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+}
+table.invisible tr td{
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+}
+/********** </INVISIBLE> ************/
