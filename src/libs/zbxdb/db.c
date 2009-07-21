@@ -304,7 +304,11 @@ void	zbx_db_begin(void)
 
 	if(sqlite_transaction_started == 1)
 	{
-		php_sem_acquire(&sqlite_access);
+		if(PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
+		{
+			zabbix_log( LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
+			exit(-1);
+		}
 
 		zbx_db_execute("%s","begin;");
 	}
@@ -513,7 +517,11 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 #ifdef	HAVE_SQLITE3
 	if (!sqlite_transaction_started)
 	{
-		php_sem_acquire(&sqlite_access);
+		if(PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
+		{
+			zabbix_log( LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
+			exit(-1);
+		}
 	}
 
 lbl_exec:
@@ -770,7 +778,11 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 #ifdef HAVE_SQLITE3
 	if(!sqlite_transaction_started)
 	{
-		php_sem_acquire(&sqlite_access);
+		if(PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
+		{
+			zabbix_log( LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
+			exit(-1);
+		}
 	}
 
 	result = zbx_malloc(NULL, sizeof(ZBX_SQ_DB_RESULT));
