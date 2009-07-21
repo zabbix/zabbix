@@ -68,6 +68,7 @@ class CItem {
 			'select_hosts'			=> 0,
 			'select_triggers'		=> 0,
 			'select_graphs'			=> 0,
+			'select_applications'	=> 0,
 			'count'					=> 0,
 // filter
 			'filter'				=> 0,
@@ -375,6 +376,10 @@ class CItem {
 					if(!isset($result[$item['itemid']])) 
 						$result[$item['itemid']]= array();
 						
+					if($options['select_hosts'] && !isset($result[$item['itemid']]['hostids'])){
+						$result[$item['itemid']]['hostids'] = array();
+						$result[$item['itemid']]['hosts'] = array();
+					}
 					if($options['select_triggers'] && !isset($result[$item['itemid']]['triggerids'])){
 						$result[$item['itemid']]['triggerids'] = array();
 						$result[$item['itemid']]['triggers'] = array();
@@ -383,10 +388,11 @@ class CItem {
 						$result[$item['itemid']]['graphids'] = array();
 						$result[$item['itemid']]['graphs'] = array();
 					}
-					if($options['select_hosts'] && !isset($result[$item['itemid']]['hostids'])){
-						$result[$item['itemid']]['hostids'] = array();
-						$result[$item['itemid']]['hosts'] = array();
+					if($options['select_applications'] && !isset($result[$item['itemid']]['applicationids'])){
+						$result[$item['itemid']]['applicationids'] = array();
+						$result[$item['itemid']]['applications'] = array();
 					}
+
 					
 					// hostids
 					if(isset($item['hostid'])){
@@ -410,6 +416,14 @@ class CItem {
 							
 						$result[$item['itemid']]['graphids'][$item['graphid']] = $item['graphid'];
 						unset($item['graphid']);
+					}
+					// applicationids
+					if(isset($item['applicationid'])){
+						if(!isset($result[$item['itemid']]['applicationids'])) 
+							$result[$item['itemid']]['applicationids'] = array();
+							
+						$result[$item['itemid']]['applicationids'][$item['applicationid']] = $item['applicationid'];
+						unset($item['applicationid']);
 					}
 
 					$result[$item['itemid']] += $item;
@@ -460,6 +474,30 @@ class CItem {
 					$result[$itemid]['graphs'][$graphid] = $graph;
 				}
 			}
+		}
+		
+// Adding applications
+		if($options['select_applications']){
+			$sql = 'SELECT ia.itemid, app.* '.
+					' FROM applications app, items_applications ia '.
+					' WHERE app.applicationid=ia.applicationid '.
+						' AND '.DBcondition('ia.itemid',$itemids);
+			$res = DBselect($sql);
+			while($app = DBfetch($res)){
+				$result[$app['itemid']]['applicationids'][$app['applicationid']] = $app['applicationid'];
+				$result[$app['itemid']]['applications'][$app['applicationid']] = $app;
+			}
+						
+/*
+			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids);
+			$applications = CApplication::get($obj_params);			
+			foreach($applications as $applicationid => $application){
+				foreach($application['itemids'] as $num => $itemid){
+					$result[$itemid]['applicationids'][$applicationid] = $applicationid;
+					$result[$itemid]['applications'][$applicationid] = $application;
+				}
+			}
+//*/
 		}
 
 	return $result;

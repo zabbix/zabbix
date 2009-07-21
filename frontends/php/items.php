@@ -786,6 +786,7 @@ echo SBR;
 						'filter' => 1,
 						'extendoutput' => 1,
 						'select_hosts' => 1,
+						'select_applications' => 1,
 						'sortfield' => getPageSortField('description'),
 						'sortorder' => getPageSortOrder(),
 						'limit' => ($config['search_limit']+1)
@@ -845,6 +846,9 @@ echo SBR;
 			$items = array();
 		else
 			$items = CItem::get($options);
+			
+		$itemids = array_keys($items);
+		
 		
 // TABLE
 		$form = new CForm();
@@ -900,8 +904,12 @@ echo SBR;
 				$error = new CDiv(SPACE,'iconok');
 			}
 			
-			$applications = implode(', ', get_applications_by_itemid($db_item['itemid'], 'name'));
-			if(!is_null($applications) && empty($applications)) $applications = '-';
+			$applications = array();
+			foreach($db_item['applications'] as $appi => $app){
+				if(!empty($applications)) $applications[] = ', ';
+				$applications[] = $app['name'];
+			}
+			if(empty($applications)) $applications = '-';
 			$applications = new CCol($applications, 'wraptext');
 
 			$table->addRow(array(

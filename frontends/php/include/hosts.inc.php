@@ -103,24 +103,6 @@ require_once('include/httptest.inc.php');
 		}
 	}
 
-	function add_group_to_host($hostid,$newgroup=''){
-		if(zbx_empty($newgroup))
-			 return true;
-
-		$sql = 'SELECT groupid FROM groups WHERE name='.zbx_dbstr($newgroup);
-		$result = DBselect($sql);
-		if($group = DBfetch($result)){
-			$groupid = $group['groupid'];
-		}
-		else{
-			$groupid = db_save_group($newgroup);
-			if(!$groupid)
-				return	$groupid;
-		}
-		
-	return add_host_to_group($hostid, $groupid);
-	}
-
 	function update_host_groups_by_groupid($groupid,$hosts=array()){
 		$grp_hosts = CHost::get(array('groupids'=>$groupid, 'editable'=>1));
 		$grp_hostids = array_keys($grp_hosts);
@@ -176,7 +158,7 @@ require_once('include/httptest.inc.php');
 
 		update_host_groups_by_groupid($groupid,$hosts);
 
-		return $groupid;
+	return $groupid;
 	}
 
 	function update_host_group($groupid,$name,$hosts){
@@ -347,9 +329,12 @@ require_once('include/httptest.inc.php');
 		else
 			info('Added new host ['.$host.']');
 
-		update_host_groups($hostid,$groups);
-
-		add_group_to_host($hostid,$newgroup);
+		if(!zbx_empty($newgroup)){
+			if(!$newgroupid = add_host_group($newgroup)) return false;
+			$groups[$newgroupid] = $newgroupid;
+		}
+		
+		if(!update_host_groups($hostid, $groups)) return false;
 
 		sync_host_with_templates($hostid);
 
@@ -398,10 +383,12 @@ require_once('include/httptest.inc.php');
 		if(!$result)
 			return $result;
 
-		if(!is_null($groups))
-			update_host_groups($hostid, $groups);
-
-		add_group_to_host($hostid,$newgroup);
+		if(!zbx_empty($newgroup)){
+			if(!$newgroupid = add_host_group($newgroup)) return false;
+			$groups[$newgroupid] = $newgroupid;
+		}
+		
+		$result = update_host_groups($hostid, $groups);
 
 		if(count($new_templates) > 0){
 			sync_host_with_templates($hostid,array_keys($new_templates));

@@ -349,6 +349,11 @@ class CHost {
 				else{
 					if(!isset($result[$host['hostid']])) $result[$host['hostid']]= array();
 					
+					if($options['select_groups'] && !isset($result[$host['hostid']]['groupids'])){
+						$result[$host['hostid']]['groupids'] = array();
+						$result[$host['hostid']]['groups'] = array();
+					}
+
 					if($options['select_templates'] && !isset($result[$host['hostid']]['templateids'])){
 						$result[$host['hostid']]['templateids'] = array();
 						$result[$host['hostid']]['templates'] = array();
