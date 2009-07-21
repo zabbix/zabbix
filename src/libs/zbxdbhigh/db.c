@@ -770,6 +770,8 @@ void DBupdate_triggers_status_after_restart(void)
 
 	now=time(NULL);
 
+	DBbegin();
+
 	result = DBselect("select distinct t.triggerid,t.expression,t.description,t.status,t.priority,t.value,t.url,t.comments from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck+i.delay<%d and i.key_<>'%s' and h.status not in (%d,%d) and i.type not in (%d)",
 		now,
 		SERVER_STATUS_KEY,
@@ -806,6 +808,9 @@ void DBupdate_triggers_status_after_restart(void)
 	}
 
 	DBfree_result(result);
+
+	DBcommit();
+
 	zabbix_log(LOG_LEVEL_DEBUG,"End of DBupdate_triggers_after_restart()");
 
 	return;

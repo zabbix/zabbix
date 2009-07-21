@@ -350,7 +350,6 @@ void zbx_db_commit(void)
 		zabbix_log( LOG_LEVEL_CRIT, "ERROR: commit without transaction. Please report it to Zabbix Team.");
 		assert(0);
 	}
-	txn_level--;
 #ifdef	HAVE_MYSQL
 	zbx_db_execute("%s","commit;");
 #endif
@@ -377,6 +376,7 @@ void zbx_db_commit(void)
 	}
 
 #endif
+	txn_level--;
 }
 
 /******************************************************************************
@@ -401,7 +401,6 @@ void zbx_db_rollback(void)
 		zabbix_log( LOG_LEVEL_CRIT, "ERROR: rollback without transaction. Please report it to Zabbix Team.");
 		assert(0);
 	}
-	txn_level--;
 #ifdef	HAVE_MYSQL
 	zbx_db_execute("rollback;");
 #endif
@@ -428,6 +427,7 @@ void zbx_db_rollback(void)
 	}
 
 #endif
+	txn_level--;
 }
 
 /*
