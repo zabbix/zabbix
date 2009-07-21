@@ -313,6 +313,7 @@ frontends/php/usergrps.php -text
 frontends/php/warning.php -text
 include/dbcache.h -text
 include/dbschema.h -text
+include/ipc.h -text
 include/zbxicmpping.h -text
 include/zbxjson.h -text
 include/zbxodbc.h -text
