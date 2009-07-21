@@ -33,14 +33,11 @@
 
 include_once('include/page_header.php');
 
-	$_REQUEST['config'] = get_request('config','users.php');
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'config'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,		NULL),
-		
 		'perm_details'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 /* user */
 		'userid'=>			array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
@@ -71,17 +68,6 @@ include_once('include/page_header.php');
 		'url'=>				array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 		'refresh'=>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'isset({save})'),
 		'rows_per_page'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,1000),'isset({save})'),
-
-		'right'=>			array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY, 		'(isset({register})&&({register}=="add permission"))&&isset({userid})'),
-		'permission'=>		array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY, 		'(isset({register})&&({register}=="add permission"))&&isset({userid})'),
-		'id'=>				array(T_ZBX_INT, O_NO,	null,	DB_ID, 			'(isset({register})&&({register}=="add permission"))&&isset({userid})'),
-		'rightid'=>			array(T_ZBX_INT, O_NO,	null,   DB_ID,			'(isset({register})&&({register}=="delete permission"))&&isset({userid})'),
-
-		'set_users_status'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
-		'set_gui_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'), null),
-		'set_api_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
-		'set_debug_mode'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
-
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 
@@ -94,15 +80,7 @@ include_once('include/page_header.php');
 		'del_user_group'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_user_media'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
-		'del_read_only'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'del_read_write'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'del_deny'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-
 		'del_group_user'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-
-		'add_read_only'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'add_read_write'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'add_deny'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
 		'change_password'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'cancel'=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
@@ -117,12 +95,7 @@ include_once('include/page_header.php');
 	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
-	if(isset($_REQUEST['new_group'])) {
-		$_REQUEST['user_groups'] = get_request('user_groups', array());
-		foreach($_REQUEST['new_group'] as $id => $val)
-			$_REQUEST['user_groups'][$id] = $val;
-	}
-	else if(isset($_REQUEST['new_media'])){
+	if(isset($_REQUEST['new_media'])){
 		$_REQUEST['user_medias'] = get_request('user_medias', array());
 		array_push($_REQUEST['user_medias'], $_REQUEST['new_media']);
 	}
@@ -299,8 +272,10 @@ include_once('include/page_header.php');
 		$result = DBend($result);
 		show_messages($result, S_USER_DELETED,S_CANNOT_DELETE_USER);
 	}
+
 ?>
 <?php
+
 	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid',get_profile('web.users.filter.usrgrpid',0));
 	update_profile('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROFILE_TYPE_ID);
 
@@ -308,18 +283,20 @@ include_once('include/page_header.php');
 	$frmForm->setMethod('get');
 
 // Config
-	$cmbConf = new CComboBox('config','users.php','javascript: submit()');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
-		$cmbConf->addItem('usergrps.php',S_USER_GROUPS);
-		$cmbConf->addItem('users.php',S_USERS);
+	$cmbConf = new CComboBox('config', 'users.php', 'javascript: submit()');
+	$cmbConf->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');	
+		$cmbConf->addItem('usergrps.php', S_USER_GROUPS);
+		$cmbConf->addItem('users.php', S_USERS);
 
 	$frmForm->addItem($cmbConf);
 
 	$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
-	$cmbUGrp->addItem(0,S_ALL_S);
-	$result = DBselect('SELECT usrgrpid, name FROM usrgrp WHERE '.DBin_node('usrgrpid').' ORDER BY name');
-	while($usrgrp = DBfetch($result)){
-		$cmbUGrp->addItem($usrgrp['usrgrpid'],$usrgrp['name']);
+	$cmbUGrp->addItem(0, S_ALL_S);
+	
+	$options = array('extendoutput' => 1, 'order' => 'name');
+	$usrgrps = CUserGroup::get($options);
+	foreach($usrgrps as $usrgrpid => $usrgrp){
+		$cmbUGrp->addItem($usrgrpid, $usrgrp['name']);
 	}
 
 	$frmForm->addItem(array(SPACE.SPACE,S_USER_GROUP,$cmbUGrp));
@@ -330,21 +307,30 @@ include_once('include/page_header.php');
 	echo SBR;
 ?>
 <?php
-	$row_count = 0;
 	if(isset($_REQUEST['form'])){
 		insert_user_form(get_request('userid',null));
 	}
 	else{
+		
+		$options = array('extendoutput' => 1, 'order' => 'alias', 'select_usrgrps' => 1, 'get_access' => 1);
+		if($_REQUEST['filter_usrgrpid'] > 0){
+			$options += array('usrgrpids' => $_REQUEST['filter_usrgrpid']);
+		}
+		$users = CUser::get($options);
+		$userids = array_keys($users);
+		
+		$numrows = count($users);
+		
+		$header = get_table_header(array(
+			S_USERS_BIG,
+			new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+			S_FOUND.': ', 
+			new CSpan($numrows,'info')
+		));
+		show_table_header($header);
+		
 		$form = new CForm(null,'post');
 		$form->setName('users');
-
-		$numrows = new CSpan(null,'info');
-		$numrows->setAttribute('name','numrows');
-		$header = get_table_header(array(S_USERS_BIG,
-						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-						S_FOUND.': ',$numrows,)
-						);
-		show_table_header($header);
 
 		$table=new CTableInfo(S_NO_USERS_DEFINED);
 		$table->setHeader(array(
@@ -359,131 +345,84 @@ include_once('include/page_header.php');
 			S_API_ACCESS,
 			S_DEBUG_MODE,
 			S_STATUS
-			));
-
-
-		$cond_from = '';
-		$cond_where = '';
-		if($_REQUEST['filter_usrgrpid'] > 0){
-			$cond_from = ', users_groups ug, usrgrp ugrp ';
-			$cond_where = ' AND ug.userid = u.userid '.' AND ug.usrgrpid='.$_REQUEST['filter_usrgrpid'];
+		));
+		
+		// set default lastaccess time to 0.
+		foreach($users as $userid => $user){
+			$usessions[$userid] = array('lastaccess' => 0);
 		}
-
-		$users = array();
-		$userids = array();
-		$db_users=DBselect('SELECT DISTINCT u.userid,u.alias,u.name,u.surname,u.type,u.autologout '.
-						' FROM users u '.$cond_from.
-						' WHERE '.DBin_node('u.userid').
-							$cond_where.
-						order_by('u.alias,u.name,u.surname,u.type','u.userid'));
-		while($db_user=DBfetch($db_users)){
-			$users[$db_user['userid']] = $db_user;
-			$userids[$db_user['userid']] = $db_user['userid'];
-		}
-
-		$users_sessions = array();
 		$sql = 'SELECT s.userid, MAX(s.lastaccess) as lastaccess, s.status '.
-				' FROM sessions s, users u'.
-				' WHERE '.DBcondition('s.userid',$userids).
-					' AND s.userid=u.userid '.
-				' GROUP BY s.userid,s.status';
-//SDI($sql);
+				' FROM sessions s'.
+				' WHERE '.DBcondition('s.userid', $userids).
+				' GROUP BY s.userid, s.status';
 		$db_sessions = DBselect($sql);
-		while($db_ses=DBfetch($db_sessions)){
-			if(!isset($users_sessions[$db_ses['userid']])){
-				$users_sessions[$db_ses['userid']] = $db_ses;
-			}
-
-			if(isset($users_sessions[$db_ses['userid']]) && ($users_sessions[$db_ses['userid']]['lastaccess'] < $db_ses['lastaccess'])){
-				$users_sessions[$db_ses['userid']] = $db_ses;
+		while($session = DBfetch($db_sessions)){
+			if($usessions[$session['userid']]['lastaccess'] < $session['lastaccess']){
+				$usessions[$session['userid']] = $session;
 			}
 		}
 
-		$users_groups = array();
-		$sql = 'SELECT g.name, ug.usrgrpid, ug.userid '.
-				' FROM usrgrp g, users_groups ug '.
-				' WHERE g.usrgrpid=ug.usrgrpid '.
-					' AND '.DBcondition('ug.userid',$userids);
-		$db_groups = DBselect($sql);
-		while($db_group = DBfetch($db_groups)){
-			$usrgrp_link = new CLink($db_group['name'],'usergrps.php?form=update&usrgrpid='.$db_group['usrgrpid'].'#form');
+		foreach($users as $userid => $user){
+			$session = $usessions[$userid];	
+
+			// Online time
+			$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout'])) 
+				? ZBX_USER_ONLINE_TIME : $user['autologout'];
+			if($session['lastaccess']){
+				$online = (($session['lastaccess'] + $online_time) >= time())					
+					? new CCol(S_YES.' ('.date('r', $session['lastaccess']).')', 'enabled')
+					: new CCol(S_NO.' ('.date('r', $session['lastaccess']).')', 'disabled');
+			}
+			else{
+				$online = new CCol(S_NO, 'disabled');
+			}
 			
-			if(!isset($users_groups[$db_group['userid']]))
-				$users_groups[$db_group['userid']] = array();
-			else
-				$users_groups[$db_group['userid']][] = BR();
-				
-			$users_groups[$db_group['userid']][] = $usrgrp_link;
-		}
 
-		foreach($userids as $id => $userid){
-			$user = &$users[$userid];
-//Log Out 10min or Autologout time
-			$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout']))?ZBX_USER_ONLINE_TIME:$user['autologout'];
-			$online=new CCol(S_NO,'disabled');
-			if(isset($users_sessions[$userid])){
-				$session = &$users_sessions[$userid];
-				if((ZBX_SESSION_ACTIVE == $session['status']) && (($session['lastaccess']+$online_time) >= time())){
-					$online=new CCol(S_YES.' ('.date('r',$session['lastaccess']).')','enabled');
-				}
-				else{
-					$online=new CCol(S_NO.' ('.date('r',$session['lastaccess']).')','disabled');
-				}
+			// UserGroups
+			$users_groups = array();
+			foreach($user['usrgrps'] as $usrgrpid => $usrgrp){
+				$users_groups[] = new CLink($usrgrp['name'],'usergrps.php?form=update&usrgrpid='.$usrgrpid);
+				$users_groups[] = BR();
 			}
-
-			$user['users_status'] = check_perm2system($userid);
-			$user['gui_access'] = get_user_auth($userid);
-
-			$users_status = ($user['users_status'])?S_ENABLED:S_DISABLED;
+			array_pop($users_groups);
+			
+			
 			$gui_access = user_auth_type2str($user['gui_access']);
-
-			$users_status = new CSpan($users_status,($user['users_status'])?'green':'red');
-			$gui_access = new CSpan($gui_access,($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED)?'orange':'green');
-
-			$user['api_access'] = get_user_api_access($userid);
-			$api_access = ($user['api_access']) ? S_ENABLED : S_DISABLED;
-			$api_access = new CSpan($api_access, ($user['api_access'] == GROUP_API_ACCESS_DISABLED)?'green':'orange');
-
-			$user['debug_mode'] = get_user_debug_mode($userid);
-			$debug_mode = ($user['debug_mode']) ? S_ENABLED : S_DISABLED;
-			$debug_mode = new CSpan($debug_mode, ($user['debug_mode'] == GROUP_DEBUG_MODE_DISABLED)?'green':'orange');
+			$gui_access = new CSpan($gui_access, ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) ? 'orange' : 'green');
+			$users_status = ($user['users_status'] == 1) ? new CSpan(S_DISABLED, 'red') : new CSpan(S_ENABLED, 'green');
+			$api_access = ($user['api_access'] == GROUP_API_ACCESS_ENABLED) ? new CSpan(S_ENABLED, 'orange') : new CSpan(S_DISABLED, 'green');
+			$debug_mode = ($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) ? new CSpan(S_ENABLED, 'orange') : new CSpan(S_DISABLED, 'green');
 
 			$table->addRow(array(
-				new CCheckBox('group_userid['.$userid.']',NULL,NULL,$userid),
-				new CLink($user['alias'],'users.php?form=update&userid='.$userid.'#form'),
+				new CCheckBox('group_userid['.$userid.']', NULL, NULL, $userid),
+				new CLink($user['alias'], 'users.php?form=update&userid='.$userid),
 				$user['name'],
 				$user['surname'],
 				user_type2str($user['type']),
-				isset($users_groups[$userid])?$users_groups[$userid]:'',
+				$users_groups,
 				$online,
 				$gui_access,
 				$api_access,
 				$debug_mode,
 				$users_status
-				));
-			$row_count++;
+			));
 		}
 		
-//----- GO ------
+/* <<<--- GO button --->>> */
 		$goBox = new CComboBox('go');
 		$goBox->addItem('delete',S_DELETE_SELECTED);
 
-// goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO.' (0)');
+		// goButton name is necessary!!!
+		$goButton = new CButton('goButton', S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));
-//----
+/* --->>> GO button <<<--- */
 
 		$form->addItem($table);
 		$form->show();
 	}
-
-	zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
-
-?>
-<?php
 
 include_once('include/page_footer.php');
 

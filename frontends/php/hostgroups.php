@@ -177,7 +177,7 @@ include_once('include/page_header.php');
 		
 		$groupid = get_request('groupid', 0);
 		$hosts = get_request('hosts', array());
-SDII($hosts);		
+		
 		$frm_title = S_HOST_GROUP;
 		if($groupid > 0){
 			$group = get_hostgroup_by_groupid($_REQUEST['groupid']);

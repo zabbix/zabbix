@@ -11,7 +11,204 @@ class CUserGroup {
 	public static $error;
 
 	/**
+	 * Get UserGroups
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $options
+	 * @param array $options['nodeids'] Node IDs
+	 * @param array $options['usrgrpids'] UserGroup IDs
+	 * @param array $options['userids'] User IDs
+	 * @param boolean $options['status'] 
+	 * @param boolean $options['with_gui_access'] 
+	 * @param boolean $options['with_api_access'] 
+	 * @param boolean $options['select_users'] 
+	 * @param int $options['extendoutput'] 
+	 * @param int $options['count'] 
+	 * @param string $options['pattern'] 
+	 * @param int $options['limit'] limit selection
+	 * @param string $options['order'] 
+	 * @return array
+	 */
+	public static function get($options=array()){
+		global $USER_DETAILS;
+
+		$result = array();
+		
+		$sort_columns = array('usrgrpid', 'name'); // allowed columns for sorting
+	
+	
+		$sql_parts = array(
+			'select' => array('usrgrp' => 'g.usrgrpid'),
+			'from' => array('usrgrp g'),
+			'where' => array(),
+			'order' => array(),
+			'limit' => null);
+		
+		$def_options = array(
+			'nodeids'					=> 0,
+			'usrgrpids'					=> 0,
+			'userids'					=> 0,
+			'status'					=> null,
+			'with_gui_access'			=> 0,
+			'with_api_access'			=> 0,
+// OutPut
+			'extendoutput'				=> 0,
+			'select_users'			=> 0,
+			'count'						=> 0,
+			'pattern'					=> '',
+			'order' 					=> '',
+			'limit'						=> 0
+		);
+
+		$options = array_merge($def_options, $options);
+
+// nodeids
+		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+
+// usrgrpids
+		if($options['usrgrpids'] != 0){
+			zbx_value2array($options['usrgrpids']);
+			$sql_parts['where'][] = DBcondition('g.usrgrpid', $options['usrgrpids']);
+		}
+
+// userids
+		if($options['userids'] != 0){
+			zbx_value2array($options['userids']);
+			if($options['extendoutput'] != 0){
+				$sql_parts['select']['userid'] = 'ug.userid';
+			}
+			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['where'][] = DBcondition('ug.userid', $options['userids']);
+			$sql_parts['where']['gug'] = 'g.usrgrpid=ug.usrgrpid';
+		}
+
+// status
+		if(!is_null($options['status'])){
+			$sql_parts['where'][] = 'g.users_status='.$options['status'];
+		}
+
+// with_gui_access
+		if($options['with_gui_access'] != 0){
+			$sql_parts['where'][] = 'g.gui_access='.GROUP_GUI_ACCESS_ENABLED;
+		}
+// with_api_access
+		if($options['with_api_access'] != 0){
+			$sql_parts['where'][] = 'g.api_access='.GROUP_API_ACCESS_ENABLED;
+		}
+
+// extendoutput
+		if($options['extendoutput'] != 0){
+			$sql_parts['select']['usrgrp'] = 'g.*';
+		}
+		
+// count
+		if($options['count'] != 0){
+			$options['select_users'] = 0;
+			$sql_parts['select'] = array('count(g.usrgrpid) as rowscount');
+		}
+
+// pattern
+		if(!zbx_empty($options['pattern'])){
+			$sql_parts['where'][] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+		}
+
+// order
+		// restrict not allowed columns for sorting
+		$options['order'] = str_in_array($options['order'], $sort_columns) ? $options['order'] : '';
+		if(!zbx_empty($options['order'])){
+			$sql_parts['order'][] = 'g.'.$options['order'];
+			if(!str_in_array('g.'.$options['order'], $sql_parts['select'])) $sql_parts['select'][] = 'g.'.$options['order'];
+		}
+
+// limit
+		if(zbx_ctype_digit($options['limit']) && $options['limit']){
+			$sql_parts['limit'] = $options['limit'];
+		}
+//-------
+		$usrgrpids = array();
+		
+		$sql_parts['select'] = array_unique($sql_parts['select']);
+		$sql_parts['from'] = array_unique($sql_parts['from']);
+		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['order'] = array_unique($sql_parts['order']);
+	
+		$sql_select = '';
+		$sql_from = '';
+		$sql_where = '';
+		$sql_order = '';
+		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
+		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
+		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);	
+		$sql_limit = $sql_parts['limit'];
+
+		$sql = 'SELECT '.$sql_select.'
+				FROM '.$sql_from.'
+				WHERE '.DBin_node('g.usrgrpid', $nodeids).
+				$sql_where.
+				$sql_order;
+		$res = DBselect($sql, $sql_limit);
+		while($usrgrp = DBfetch($res)){
+			if($options['count'])
+				$result = $usrgrp;
+			else{
+				$usrgrpids[$usrgrp['usrgrpid']] = $usrgrp['usrgrpid'];
+
+				if($options['extendoutput'] == 0){
+					$result[$usrgrp['usrgrpid']] = $usrgrp['usrgrpid'];
+				}
+				else{
+					if(!isset($result[$usrgrp['usrgrpid']])) $result[$usrgrp['usrgrpid']]= array();
+					
+					if($options['select_users'] && !isset($result[$usrgrp['usrgrpid']]['userids'])){
+						$result[$usrgrp['usrgrpid']]['userids'] = array();
+						$result[$usrgrp['usrgrpid']]['users'] = array();
+					}
+					
+					// groupids
+					if(isset($usrgrp['userid'])){
+						if(!isset($result[$usrgrp['usrgrpid']]['userids'])) 
+							$result[$usrgrp['usrgrpid']]['userids'] = array();
+							
+						$result[$usrgrp['usrgrpid']]['userids'][$usrgrp['userid']] = $usrgrp['userid'];
+						unset($usrgrp['userid']);
+					}
+					
+					$result[$usrgrp['usrgrpid']] += $usrgrp;
+				}
+			}
+		}
+		
+// Adding Objects
+
+// Adding users
+		if($options['select_users']){
+			$obj_params = array('extendoutput' => 1, 'usrgrpids' => $usrgrpids);
+			$users = CUser::get($obj_params);
+			foreach($users as $userid => $user){
+				foreach($user['usrgrpids'] as $num => $usrgrpid){
+					$result[$usrgrpid]['userids'][$userid] = $userid;
+					$result[$usrgrpid]['users'][$userid] = $user;
+				}
+			}
+		}
+
+	return $result;
+	}
+	
+	/**
 	 * Gets all UserGroup data from DB by usrgrpid.
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
 	 *
 	 * <code>
 	 * $user_data = array(
@@ -19,7 +216,6 @@ class CUserGroup {
 	 * )
 	 * </code>
 	 *
-	 * @static
 	 * @param array $user_data
 	 * @return array|boolean user data as array or false if error
 	 */
@@ -37,13 +233,18 @@ class CUserGroup {
 	/**
 	 * Get UserGroup ID by UserGroup name.
 	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * <code>
 	 * $group_data = array(
 	 * 	*string 'name' => 'UserGroup name'
 	 * );
 	 * </code>
 	 *
-	 * @static
 	 * @param array $group_data
 	 * @return string|boolean
 	 */
@@ -67,6 +268,12 @@ class CUserGroup {
 	/**
 	 * Create UserGroups.
 	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * <code>
 	 * $groups = array( array(
 	 * 	*string 'name' 				=> null,
@@ -76,7 +283,6 @@ class CUserGroup {
 	 * ));
 	 * </code>
 	 *
-	 * @static
 	 * @param array $groups multidimensional array with UserGroups data
 	 * @return boolean
 	 */
@@ -118,7 +324,12 @@ class CUserGroup {
 	/**
 	 * Update UserGroups.
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * @param array $groups multidimensional array with UserGroups data
 	 * @return boolean
 	 */
@@ -155,6 +366,12 @@ class CUserGroup {
 	/**
 	 * Update UserGroup rights to HostGroups.
 	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * <code>
 	 * $rights = array(
 	 * 	*string 'groupid' => 'UserGroup ID',
@@ -162,7 +379,6 @@ class CUserGroup {
 	 * )
 	 * </code>
 	 *
-	 * @static
 	 * @param array $rights multidimensional array with rights data
 	 * @return boolean
 	 */
@@ -193,6 +409,12 @@ class CUserGroup {
 	/**
 	 * Add rights for UserGroup to HostGroups. Existing rights are updated, new ones added.
 	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * <code>
 	 * $rights = array(
 	 * 	*string 'groupid' => 'UserGroup ID',
@@ -200,7 +422,6 @@ class CUserGroup {
 	 * )
 	 * </code>
 	 *
-	 * @static
 	 * @param array $rights multidimensional array with rights data
 	 * @return boolean
 	 */
@@ -223,7 +444,7 @@ class CUserGroup {
 			else{
 				$id = get_dbid('rights', 'rightid');
 				$sql = 'INSERT INTO rights (rightid, groupid, permission, id)'.
-					' VALUES ('.$id.','.$usrgrpid.','.$right['permission'].','.$right['id'].')');
+					' VALUES ('.$id.','.$usrgrpid.','.$right['permission'].','.$right['id'].')';
 			}
 			$result = DBexecute($sql);
 			if(!$result) break;
@@ -242,6 +463,12 @@ class CUserGroup {
 	/**
 	 * Add Users to UserGroup.
 	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * <code>
 	 * $data = array(
 	 * 	*string 'usrgrpid' => 'UserGroup ID',
@@ -249,7 +476,6 @@ class CUserGroup {
 	 * )
 	 * </code>
 	 *
-	 * @static
 	 * @param array $data
 	 * @return boolean
 	 */
@@ -274,6 +500,12 @@ class CUserGroup {
 	/**
 	 * Remove users from UserGroup.
 	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * <code>
 	 * $data = array(
 	 * 	*string 'usrgrpid' => 'UserGroup ID',
@@ -281,7 +513,6 @@ class CUserGroup {
 	 * )
 	 * </code>
 	 *
-	 * @static
 	 * @param array $data
 	 * @return boolean
 	 */
@@ -306,7 +537,12 @@ class CUserGroup {
 	/**
 	 * Delete UserGroups.
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * @param array $groupids
 	 * @return boolean
 	 */
@@ -314,7 +550,7 @@ class CUserGroup {
 		$result = false;
 		
 		DBstart(false);
-		foreach($groupids au $groupid){
+		foreach($groupids as $groupid){
 			$result = delete_user_group($groupid);
 			if(!$resukt) break;
 		}

@@ -31,7 +31,7 @@ function __autoload($class_name){
 		'citem' => 1,
 		'ctrigger' => 1,
 		'cgraph' => 1,
-		'cusergroup' => null,
+		'cusergroup' => 1,
 		'cuser' => 1);
 
 	$rpc = array(
@@ -296,17 +296,20 @@ function __autoload($class_name){
 					$msg_tab->setCellPadding(0);
 					$msg_tab->setCellSpacing(0);
 
+					$row = array();
+					
 					$msg_col = new CCol(bold($msg),'msg_main msg');
 					$msg_col->setAttribute('id','page_msg');
-
-					$msg_details = SPACE;
+					$row[] = $msg_col;
+					
 					if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
 						$msg_details = new CDiv(array(S_DETAILS),'pointer');
 						$msg_details->addAction('onclick',new CScript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
 						$msg_details->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
+						array_unshift($row, new CCol($msg_details,'clr'));
 					}
 
-					$msg_tab->addRow(array(new CCol($msg_details,'clr'),$msg_col));
+					$msg_tab->addRow($row);
 					$msg_tab->Show();
 
 					$img_space = new CImg('images/general/tree/zero.gif','space','100','2');
