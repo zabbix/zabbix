@@ -519,7 +519,8 @@ table.tableinfo tr.header td.hover_grey {
 }
 
 table.tableinfo tr.header td.hover_grey:hover {
-	background-color:#DDDDDD;
+	color: #EEEEEE;
+	background-color:#999999;
 }
 
 table.tableinfo tr.vertical_header td {

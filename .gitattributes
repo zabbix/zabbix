@@ -125,7 +125,11 @@ frontends/php/images/general/inst_step.gif -text
 frontends/php/images/general/ok.png -text
 frontends/php/images/general/ok_bb.png -text
 frontends/php/images/general/opened.gif -text svneol=unset#unset
+frontends/php/images/general/sort_down.png -text
+frontends/php/images/general/sort_down_bb.png -text
 frontends/php/images/general/sort_downw.gif -text
+frontends/php/images/general/sort_up.png -text
+frontends/php/images/general/sort_up_bb.png -text
 frontends/php/images/general/sort_upw.gif -text
 frontends/php/images/general/sortdown.gif -text svneol=unset#unset
 frontends/php/images/general/sortdown_off.gif -text svneol=unset#unset

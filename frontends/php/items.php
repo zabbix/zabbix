@@ -786,6 +786,7 @@ echo SBR;
 						'filter' => 1,
 						'extendoutput' => 1,
 						'select_hosts' => 1,
+						'select_triggers' => 1,
 						'select_applications' => 1,
 						'sortfield' => getPageSortField('description'),
 						'sortorder' => getPageSortOrder(),
@@ -857,8 +858,9 @@ echo SBR;
 		$table  = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-			$show_host ? make_sorting_header(S_HOST,'host') : null,
+			$show_host?make_sorting_header(S_HOST,'host'):null,
 			make_sorting_header(S_DESCRIPTION,'description'),
+			S_TRIGGERS,
 			make_sorting_header(S_KEY,'key_'),
 			make_sorting_header(S_INTERVAL,'delay'),
 			make_sorting_header(S_HISTORY,'history'),
@@ -891,7 +893,7 @@ echo SBR;
 				item_description($db_item),
 				'?form=update&itemid='.$db_item['itemid']));
 
-			$status=new CCol(new CLink(item_status2str($db_item['status']),
+			$status = new CCol(new CLink(item_status2str($db_item['status']),
 					'?group_itemid%5B%5D='.$db_item['itemid'].
 					'&go='.($db_item['status']?'activate':'disable'),
 					item_status2style($db_item['status'])));
@@ -903,19 +905,87 @@ echo SBR;
 			else{
 				$error = new CDiv(SPACE,'iconok');
 			}
-			
+
 			$applications = array();
 			foreach($db_item['applications'] as $appi => $app){
 				if(!empty($applications)) $applications[] = ', ';
 				$applications[] = $app['name'];
 			}
+
 			if(empty($applications)) $applications = '-';
 			$applications = new CCol($applications, 'wraptext');
+			
+			
+			$trigger_hint = new CTableInfo();
+			$trigger_hint->setHeader(array(
+							S_SEVERITY,
+							S_NAME,
+							S_EXPRESSION,
+							S_STATUS));
+
+// TRIGGERS INFO
+			foreach($db_item['triggers'] as $triggerid => $trigger){
+				$tr_description = array();
+	
+				if($trigger['templateid'] > 0){
+					$real_hosts = get_realhosts_by_triggerid($triggerid);
+					$real_host = DBfetch($real_hosts);
+					$tr_description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
+					$tr_description[] = ':';
+				}
+				
+				$tr_description[] = new CLink(expand_trigger_description($triggerid), 'triggers.php?form=update&triggerid='.$triggerid);
+	
+				if($trigger['status'] != TRIGGER_STATUS_UNKNOWN) $trigger['error'] = '';
+				
+				switch($trigger['priority']){
+					case 0: $priority = S_NOT_CLASSIFIED; break;
+					case 1: $priority = new CCol(S_INFORMATION, 'information'); break;
+					case 2: $priority = new CCol(S_WARNING, 'warning'); break;
+					case 3: $priority = new CCol(S_AVERAGE, 'average'); break;
+					case 4: $priority = new CCol(S_HIGH, 'high'); break;
+					case 5: $priority = new CCol(S_DISASTER, 'disaster'); break;
+					default: $priority = $trigger['priority'];
+				}
+	
+				if($trigger['status'] == TRIGGER_STATUS_DISABLED){
+					$status = new CSpan(S_DISABLED, 'disabled');
+				}
+				else if($trigger['status'] == TRIGGER_STATUS_UNKNOWN){
+					$status = new CSpan(S_UNKNOWN, 'unknown');
+				}
+				else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
+					$status = new CSpan(S_ENABLED, 'enabled');
+				}
+	
+				$trigger_hint->addRow(array(
+					$priority,
+					$tr_description,
+					explode_exp($trigger['expression'], 1),
+					$status,
+				));	
+			}
+			
+			if(!empty($db_item['triggers'])){
+				$trigger_info = new CSpan(S_TRIGGERS,'link');
+				$trigger_info->setHint($trigger_hint);
+				$trigger_info = array($trigger_info);
+				$trigger_info[] = ' ('.count($db_item['triggers']).')';
+				
+				$trigger_hint = array();
+			}
+			else{
+				$trigger_info = array();
+				$trigger_info[] = new CLink(S_TRIGGERS, 'triggers.php?&hostid='.$db_item['hostid']);
+				$trigger_info[] = ' ('.count($db_item['triggers']).')';
+			}
+//-------
 
 			$table->addRow(array(
 				new CCheckBox('group_itemid['.$db_item['itemid'].']',null,null,$db_item['itemid']),
 				$show_host?$host:null,
 				$description,
+				$trigger_info,
 				$db_item['key_'],
 				$db_item['delay'],
 				$db_item['history'],
