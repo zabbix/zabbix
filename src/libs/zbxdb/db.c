@@ -737,11 +737,6 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	if(txn_level==0)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Query without transaction detected [%s]",
-			sql);
-	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Query [txnlev:%d] [%s]", txn_level, sql);
 
 #ifdef	HAVE_MYSQL
