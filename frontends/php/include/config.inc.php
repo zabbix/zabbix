@@ -1098,13 +1098,13 @@ function __autoload($class_name){
 			$script = new CScript("javascript: redirect('".$url."');");
 		}
 		
-		$col = array($obj);
+		$col = array(new CSpan($obj,'underline'));
 		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
 			if($sortorder == ZBX_SORT_UP){
-				$img = new CImg('images/general/sort_downw.gif','down',10,10);
+				$img = new CImg('images/general/sort_down.png','down',10,10);
 			}
 			else{
-				$img = new CImg('images/general/sort_upw.gif','up',10,10);
+				$img = new CImg('images/general/sort_up.png','up',10,10);
 			}
 
 			$img->setAttribute('style','line-height: 18px; vertical-align: middle;');
@@ -1150,10 +1150,10 @@ function __autoload($class_name){
 
 		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
 			if($sortorder == ZBX_SORT_UP){
-				$img = new CImg('images/general/sort_downw.gif','down',10,10);
+				$img = new CImg('images/general/sort_down.png','down',10,10);
 			}
 			else{
-				$img = new CImg('images/general/sort_upw.gif','up',10,10);
+				$img = new CImg('images/general/sort_up.png','up',10,10);
 			}
 
 			$img->setAttribute('style','line-height: 18px; vertical-align: middle;');

@@ -399,7 +399,7 @@ class CItem {
 						if(!isset($result[$item['itemid']]['hostids'])) $result[$item['itemid']]['hostids'] = array();
 
 						$result[$item['itemid']]['hostids'][$item['hostid']] = $item['hostid'];
-						unset($item['hostid']);
+//						unset($item['hostid']);
 					}
 					// triggerids
 					if(isset($item['triggerid'])){

@@ -554,14 +554,12 @@
 			);
 
 		if($showdisabled == 0){
-		    $options += array('status' => TRIGGER_STATUS_ENABLED);
+		    $options['status'] = TRIGGER_STATUS_ENABLED;
 		}
-		if($PAGE_HOSTS['selected'] > 0){
-			$options += array('hostids' => $PAGE_HOSTS['selected']);
-		}
-		else if($PAGE_GROUPS['selected'] > 0){
-			$options += array('groupids' => $PAGE_GROUPS['selected']);
-		}
+		
+		$options['hostids'] = $PAGE_HOSTS['hostids'];
+		$options['groupids'] = $PAGE_GROUPS['groupids'];
+		
 		$triggers = CTrigger::get($options);
 		
 		foreach($triggers as $triggerid => $trigger){
@@ -597,14 +595,15 @@
 			}
 // --->>> add dependencies <<<---
 
-			if($trigger['status'] != TRIGGER_STATUS_UNKNOWN) $row['error'] = '';
+			if($trigger['status'] != TRIGGER_STATUS_UNKNOWN) $trigger['error'] = '';
 			
-			if(!zbx_empty($row['error']) && (HOST_STATUS_TEMPLATE != $row['hoststatus'])){
-				$error = new CDiv(SPACE,'iconerror');
-				$error->setHint($row['error'], '', 'on');
+			$templated = false;
+			foreach($trigger['hosts'] as $hostid => $host){
+				$templated |= (HOST_STATUS_TEMPLATE == $host['status']);
 			}
-			if(!zbx_empty($trigger['error']) && (HOST_STATUS_TEMPLATE != $trigger['hoststatus'])){
-				$error = new CDiv(SPACE, 'error_icon');
+
+			if(!zbx_empty($trigger['error']) && !$templated){
+				$error = new CDiv(SPACE,'iconerror');
 				$error->setHint($trigger['error'], '', 'on');
 			}
 			else{
@@ -634,30 +633,25 @@
 				$status = new CLink(S_ENABLED, $status_link, 'enabled');
 			}
 
-			if($_REQUEST['hostid'] > 0){
-				$table->addRow(array(
-					new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid),
-					$priority,
-					$status,
-					$description,
-					explode_exp($trigger['expression'], 1),
-					$error
-				));	
-			}
-			else{
-				foreach($trigger['hosts'] as $host){
-				
-					$table->addRow(array(
-						new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid),
-						$priority,
-						$status,
-						$host['host'],
-						$description,
-						explode_exp($trigger['expression'], 1),
-						$error
-					));
+			$hosts = null;
+			if($_REQUEST['hostid'] == 0){
+				$hosts = array();
+				foreach($trigger['hosts'] as $hostid => $host){
+					if(!empty($hosts)) $hosts[] = ', ';
+					$hosts[] = $host['host'];
 				}
-			}			
+			}
+			
+			$table->addRow(array(
+				new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid),
+				$priority,
+				$status,
+				$hosts,
+				$description,
+				explode_exp($trigger['expression'], 1),
+				$error
+			));	
+
 		}
 
 //----- GO ------

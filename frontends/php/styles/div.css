@@ -283,7 +283,6 @@ div.dbl_arrow_up:hover{
 }
 
 div.sla_green{
-	border: 0px;
 	height: 15px;
 	background-image: url('../images/gradients/sla_green15.png');
 	background-repeat:repeat-x;
@@ -293,6 +292,28 @@ div.sla_red{
 	height: 15px;
 	background-image: url('../images/gradients/sla_red15.png');
 	background-repeat:repeat-x;
+}
+
+div.icon_sortup{
+	height: 10px;
+	width: 10px;
+	background-image: url('../images/general/sort_up.png');
+	background-repeat:no-repeat;
+}
+
+div.icon_sortup:hover{
+	cursor: pointer;
+}
+
+div.icon_sortdown{
+	height: 10px;
+	width: 10px;
+	background-image: url('../images/general/sort_down.png');
+	background-repeat:no-repeat;
+}
+
+div.icon_sortdown:hover{
+	cursor: pointer;
 }
 
 /********* DIV IMG END *********/
@@ -305,6 +326,10 @@ div.sla_red{
 .link:hover{
 	color:#6C80B9;
 	cursor: pointer;
+	text-decoration: underline;
+}
+
+.underline{
 	text-decoration: underline;
 }
 
@@ -321,7 +346,8 @@ span.divider{
 }
 
 /********** REQUIREMENTS TABLE *************/
-span.link{	color:#333399;	cursor: pointer;}span.link:hover{	text-decoration: underline;}span.ok{
+
+span.ok{
 	white-space: normal;
 	color:		#00AA00;
 	font-weight:	bold;
