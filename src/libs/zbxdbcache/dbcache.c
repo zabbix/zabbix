@@ -36,7 +36,7 @@
 #define ZBX_GET_SHM_DBCACHE_KEY(smk_key)				\
 	if( -1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'c') ))		\
 	{								\
-		zbx_error("Cannot create IPC key for DB cache");	\	
+		zbx_error("Cannot create IPC key for DB cache");	\
 		exit(1);						\
 	}
 
