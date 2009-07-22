@@ -23,6 +23,8 @@
 
 #include "comms.h"
 
+extern int	CONFIG_TIMEOUT;
+
 int	send_history_last_id(zbx_sock_t *sock, const char *data);
 int	node_history(char *data, size_t datalen);
 
