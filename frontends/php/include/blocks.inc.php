@@ -400,15 +400,14 @@ function make_status_of_zbx(){
 	$table->addRow(array(S_NUMBER_OF_ALERTS,$status['alerts_count'],' - '));*/
 
 //Log Out 10min
+	$usr_cnt = 0;
+	$online_cnt = 0;
 	$sql = 'SELECT DISTINCT u.userid, MAX(s.lastaccess) as lastaccess, MAX(u.autologout) as autologout, s.status '.
 			' FROM users u '.
 				' LEFT JOIN sessions s ON s.userid=u.userid AND s.status='.ZBX_SESSION_ACTIVE.
 			' WHERE '.DBin_node('u.userid').
 			' GROUP BY u.userid,s.status';
 	$db_users = DBSelect($sql);
-
-	$usr_cnt = 0;
-	$online_cnt = 0;
 	while($user=DBFetch($db_users)){
 		$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout']))?ZBX_USER_ONLINE_TIME:$user['autologout'];
 		if(!is_null($user['lastaccess']) && (($user['lastaccess']+$online_time)>=time()) && (ZBX_SESSION_ACTIVE == $user['status'])) $online_cnt++;
@@ -537,7 +536,7 @@ function make_latest_issues($params = array()){
 					'action');
 
 			if($row_event['url'])
-				$description = new CLink($description, $row_event['url'], 'action', null, true);
+				$description = new CLink($description, $row_event['url'], null, null, true);
 			else
 				$description = new CSpan($description,'pointer');
 				

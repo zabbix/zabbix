@@ -170,7 +170,7 @@ show: function(e, obj, hintbox){
 	hintbox.y	= pos.top;
 
 	hintbox.style.left = hintbox.x + 'px';
-	hintbox.style.top	= hintbox.y + parseInt(obj.offsetHeight/2) + 'px';
+	hintbox.style.top	= hintbox.y + 10 + parseInt(obj.offsetHeight/2) + 'px';
 },
 
 hide: function(boxid){
