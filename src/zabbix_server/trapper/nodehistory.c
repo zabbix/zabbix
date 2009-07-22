@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "nodehistory.h"
 #include "common.h"
 #include "db.h"
 #include "log.h"
@@ -106,7 +107,9 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 	if (buffer_offset == 0)
 		goto error;
 
+	alarm(CONFIG_TIMEOUT);
 	res = send_data_to_node(sender_nodeid, sock, buffer);
+	alarm(0);
 
 	zbx_free(buffer);
 
@@ -115,7 +118,9 @@ error:
 	buffer_offset= 0;
 	zbx_snprintf_alloc(&buffer, &buffer_allocated, &buffer_offset, 128, "FAIL");
 
+	alarm(CONFIG_TIMEOUT);
 	res = send_data_to_node(sender_nodeid, sock, buffer);
+	alarm(0);
 
 	zbx_free(buffer);
 
