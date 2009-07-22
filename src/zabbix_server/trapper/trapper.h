@@ -23,6 +23,8 @@
 #include "common.h"
 #include "comms.h"
 
+extern int	CONFIG_TIMEOUT;
+
 #define AGENT_VALUE	struct zbx_agent_value_t
 
 AGENT_VALUE

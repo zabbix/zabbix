@@ -155,10 +155,12 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]",
 			buffer);
 
+	alarm(CONFIG_TIMEOUT);
 	if (SUCCEED != zbx_tcp_send_raw(sock, buffer))
 		zbx_snprintf(error, MAX_STRING_LEN, "%s", zbx_tcp_strerror());
 	else
 		res = SUCCEED;
+	alarm(0);
 
 	zbx_free(buffer);
 
@@ -250,10 +252,12 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]",
 			json.buffer);
 
+	alarm(CONFIG_TIMEOUT);
 	if (SUCCEED != zbx_tcp_send_raw(sock, json.buffer))
 		zbx_snprintf(error, MAX_STRING_LEN, "%s", zbx_tcp_strerror());
 	else
 		res = SUCCEED;
+	alarm(0);
 
 	zbx_json_free(&json);
 

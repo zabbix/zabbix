@@ -323,20 +323,18 @@ static int	refresh_active_checks(
 		if( SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)) )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Before read");
-
-			if( SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE)) )
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Got [%s]", buf);
-				parse_list_of_checks(buf);
-			}
+			ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE);
 		}
 		zbx_tcp_close(&s);
 	}
 
-	if( FAIL == ret )
+	if (SUCCEED == ret)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Get active checks error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "Got [%s]", buf);
+		parse_list_of_checks(buf);
 	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "Get active checks error: %s", zbx_tcp_strerror());
 
 	zbx_json_free(&json);
 

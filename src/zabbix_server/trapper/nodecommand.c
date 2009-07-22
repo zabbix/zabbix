@@ -198,7 +198,7 @@ void	send_script(int nodeid, const char *data, char **result, int *result_alloca
 		nodeid);
 
 	if (NULL != (dbrow = DBfetch(dbresult))) {
-		if (SUCCEED == zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, dbrow[0], atoi(dbrow[1]), 0)) {
+		if (SUCCEED == zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, dbrow[0], atoi(dbrow[1]), ZABBIX_TRAPPER_TIMEOUT)) {
 			if (FAIL == zbx_tcp_send(&sock, data)) {
 				zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
 					"%d%cNODE %d: Error while sending data to Node [%d] error: %s",
@@ -350,11 +350,14 @@ int	node_process_command(zbx_sock_t *sock, const char *data)
 			nodeid);
 	}
 
+	alarm(CONFIG_TIMEOUT);
 	if (zbx_tcp_send_raw(sock, result) != SUCCEED) {
 		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Error sending result of command to node %d",
 			CONFIG_NODEID,
 			nodeid);
 	}
+	alarm(0);
+
 	zbx_free(tmp);
 	zbx_free(result);
 

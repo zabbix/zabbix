@@ -1854,7 +1854,9 @@ static void DCvacuum_text()
 
 	if (NULL != first_text)
 	{
-		offset = first_text - cache->text;
+		if (0 == (offset = first_text - cache->text))
+			return;
+
 		memmove(cache->text, first_text, ZBX_TEXTBUFFER_SIZE - offset);
 		
 		for (i = 0; i < cache->history_num; i++)
@@ -1894,7 +1896,7 @@ static ZBX_DC_HISTORY *DCget_history_ptr(zbx_uint64_t itemid, size_t text_len)
 {
 	ZBX_DC_HISTORY	*history;
 	int		index;
-	size_t		free_len;
+	size_t		free_len, sz;
 
 retry:
 	if (cache->history_num >= ZBX_HISTORY_SIZE)
@@ -1909,30 +1911,35 @@ retry:
 		goto retry;
 	}
 
-	if (text_len > sizeof(cache->text))
+	if (0 != text_len)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory");
-		exit(-1);
-	}
+		sz = sizeof(cache->text);
 
-	free_len = sizeof(cache->text) - (cache->last_text - cache->text);
+		if (text_len > sz)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory");
+			exit(-1);
+		}
 
-	if (text_len > free_len)
-	{
-		DCvacuum_text();
-
-		free_len = sizeof(cache->text) - (cache->last_text - cache->text);
+		free_len = sz - (cache->last_text - cache->text);
 
 		if (text_len > free_len)
 		{
-			UNLOCK_CACHE;
+			DCvacuum_text();
 
-			zabbix_log(LOG_LEVEL_DEBUG, "History text buffer is full. Sleeping for 1 second.");
-			sleep(1);
+			free_len = sz - (cache->last_text - cache->text);
 
-			LOCK_CACHE;
+			if (text_len > free_len)
+			{
+				UNLOCK_CACHE;
 
-			goto retry;
+				zabbix_log(LOG_LEVEL_DEBUG, "History text buffer is full. Sleeping for 1 second.");
+				sleep(1);
+
+				LOCK_CACHE;
+
+				goto retry;
+			}
 		}
 	}
 
@@ -2128,7 +2135,7 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
 	cache->last_text		+= len1;
 	history->timestamp		= timestamp;
 
-	if (NULL != source && *source != '\0') {
+	if (0 != len2) {
 		history->source		= cache->last_text;
 		zbx_strlcpy(cache->last_text, source, len2);
 		cache->last_text	+= len2;

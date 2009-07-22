@@ -26,6 +26,8 @@
 #include "comms.h"
 #include "zbxjson.h"
 
+extern int	CONFIG_TIMEOUT;
+
 int	send_list_of_active_checks(zbx_sock_t *sock, char *request);
 int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *json);
 

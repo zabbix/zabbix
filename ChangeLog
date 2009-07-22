@@ -1,5 +1,6 @@
 Changes for 1.6.6
 
+ - [ZBX-996] fixed possible server crash with enabled StartDBSyncers option (Sasha)
  - [ZBX-993] fixed possible vulnerability of trapper (Sasha)
  - [ZBX-964] added check on item in trigger expression (Artem)
  - [ZBX-987] fixed shutting down server/proxy after connection lost to remote mysql server (Sasha)

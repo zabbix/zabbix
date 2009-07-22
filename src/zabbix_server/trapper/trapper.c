@@ -313,7 +313,9 @@ int	send_result(zbx_sock_t *sock, int result, char *info)
 	{
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, info, ZBX_JSON_TYPE_STRING);
 	}
+	alarm(CONFIG_TIMEOUT);
 	ret = zbx_tcp_send(sock, json.buffer);
+	alarm(0);
 
 	zbx_json_free(&json);
 
@@ -359,7 +361,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 
 #define VALUES_MAX	256
 	static AGENT_VALUE	*values = NULL, *av;
-	int			value_num = 0;
+	int			value_num = 0, total_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_new_values()");
 
@@ -441,6 +443,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 			process_mass_data(sock, proxy_hostid, values, value_num, &processed, proxy_timediff);
 
 			clean_agent_values(values, value_num);
+			total_num += value_num;
 			value_num = 0;
 		}
 	}
@@ -449,11 +452,12 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 		process_mass_data(sock, proxy_hostid, values, value_num, &processed, proxy_timediff);
 
 	clean_agent_values(values, value_num);
+	total_num += value_num;
 
 	zbx_snprintf(info, sizeof(info), "Processed %d Failed %d Total %d Seconds spent " ZBX_FS_DBL,
 			processed,
-			value_num - processed,
-			value_num,
+			total_num - processed,
+			total_num,
 			zbx_time() - sec);
 
 	if (send_result(sock, ret, info) != SUCCEED)
@@ -574,16 +578,22 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 /*			zabbix_log( LOG_LEVEL_WARNING, "Node data received [len:%d]", strlen(s)); */
 			res = node_sync(s, &sender_nodeid, &nodeid);
 			if (FAIL == res)
+			{
+				alarm(CONFIG_TIMEOUT);
 				send_data_to_node(sender_nodeid, sock, "FAIL");
+				alarm(0);
+			}
 			else {
 				res = calculate_checksums(nodeid, NULL, 0);
 				if (SUCCEED == res && NULL != (data = get_config_data(nodeid, ZBX_NODE_SLAVE))) {
+					alarm(ZABBIX_TRAPPER_TIMEOUT);
 					res = send_data_to_node(sender_nodeid, sock, data);
 					zbx_free(data);
 					if (SUCCEED == res)
 						res = recv_data_from_node(sender_nodeid, sock, &answer);
 					if (SUCCEED == res && 0 == strcmp(answer, "OK"))
 						res = update_checksums(nodeid, ZBX_NODE_SLAVE, SUCCEED, NULL, 0, NULL);
+					alarm(0);
 				}
 			}
 
@@ -596,10 +606,12 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "Slave node history received [len:%d]", strlen(s)); */
 			if (node_history(s, datalen) == SUCCEED) {
+				alarm(CONFIG_TIMEOUT);
 				if (zbx_tcp_send_raw(sock,"OK") != SUCCEED) {
 					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node");
 					zabbix_syslog("Trapper: error sending confirmation to node");
 				}
+				alarm(0);
 			}
 			return ret;
 		}
@@ -682,11 +694,13 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 
 		process_mass_data(sock, 0, &av, 1, NULL, 0);
 
+		alarm(CONFIG_TIMEOUT);
 		if (SUCCEED != zbx_tcp_send_raw(sock, SUCCEED == ret ? "OK" : "NOT OK"))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
 			zabbix_syslog("Trapper: error sending result back");
 		}
+		alarm(0);
 	}	
 	return ret;
 }
@@ -695,26 +709,16 @@ void	process_trapper_child(zbx_sock_t *sock)
 {
 	char	*data;
 
-/* suseconds_t is not defined under HP-UX */
-/*	struct timeval tv;
-	suseconds_t    msec;
-	gettimeofday(&tv, NULL);
-	msec = tv.tv_usec;*/
-
 	alarm(ZABBIX_TRAPPER_TIMEOUT);
 
-	if(zbx_tcp_recv(sock, &data) != SUCCEED)
+	if (SUCCEED != zbx_tcp_recv(sock, &data))
 	{
 		alarm(0);
 		return;
 	}
-
-	process_trap(sock, data, sizeof(data));
 	alarm(0);
 
-/*	gettimeofday(&tv, NULL);
-	zabbix_log( LOG_LEVEL_DEBUG, "Trap processed in " ZBX_FS_DBL " seconds",
-		(double)(tv.tv_usec-msec)/1000000 );*/
+	process_trap(sock, data, sizeof(data));
 }
 
 void	child_trapper_main(zbx_process_t p, zbx_sock_t *s)

@@ -23,6 +23,7 @@
 
 #include "comms.h"
 
+extern int	CONFIG_TIMEOUT;
 extern char	*CONFIG_SOURCE_IP;
 
 int	node_process_command(zbx_sock_t *sock, const char *data);
