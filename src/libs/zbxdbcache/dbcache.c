@@ -425,16 +425,29 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
 void	DCsync_trends()
 {
 	int	sql_offset = 0, i;
+	time_t now = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_trends(trends_num: %d)",
 			cache->trends_num);
+
+	zabbix_log(LOG_LEVEL_WARNING, "Syncing trends data...");
+	now = time(NULL);
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
 #endif
 
-	for (i = 0; i < cache->trends_num; i ++)
+	for (i = 0; i < cache->trends_num; i++)
+	{
 		DCflush_trend(&cache->trends[i], &sql_offset);
+
+		if (time(NULL) - now >= 10)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Syncing trends data..." ZBX_FS_DBL "%%",
+					(double)i / cache->trends_num * 100);
+			now = time(NULL);
+		}
+	}
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
@@ -448,6 +461,8 @@ void	DCsync_trends()
 	}
 
 	cache->trends_num = 0;
+
+	zabbix_log(LOG_LEVEL_WARNING, "Syncing trends data...done.");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of DCsync_trends()");
 }
@@ -1734,10 +1749,17 @@ int	DCsync_history(int sync_type)
 	int			syncs;
 	int			total_num = 0;
 	int			skipped_clock, max_delay;
+	time_t			now = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_history(history_first:%d history_num:%d)",
 			cache->history_first,
 			cache->history_num);
+
+	if (ZBX_SYNC_FULL == sync_type)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Syncing history data...");
+		now = time(NULL);
+	}
 
 	if (0 == cache->history_num)
 		return 0;
@@ -1830,7 +1852,17 @@ int	DCsync_history(int sync_type)
 			}
 		}
 		total_num += history_num;
+
+		if (ZBX_SYNC_FULL == sync_type && time(NULL) - now >= 10)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Syncing history data..." ZBX_FS_DBL "%%",
+					(double)total_num / (cache->history_num + total_num) * 100);
+			now = time(NULL);
+		}
 	} while (--syncs > 0 || sync_type == ZBX_SYNC_FULL || (skipped_clock != 0 && skipped_clock < max_delay));
+
+	if (ZBX_SYNC_FULL == sync_type)
+		zabbix_log(LOG_LEVEL_WARNING, "Syncing history data...done.");
 
 	return total_num;
 }
