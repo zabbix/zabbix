@@ -146,7 +146,7 @@
 	'S_STEP_OF_SCENARIO'=>				'Step of scenario',
 
 //	exp_imp.php
-	'S_EXPORT_TO_XML' =>		'Export to XML',
+	'S_EXPORT_TO_XML'=>			'Export to XML',
 	'S_ELEMENT'=>				'Element',
 	'S_ELEMENTS'=>				'Elements',
 	'S_ONLY_HOST_INFO'=>			'Only host info',
@@ -480,17 +480,17 @@
 	'S_GROUP_FOR_DISCOVERED_HOSTS'=>		'Group for discovered hosts',
 
 //	nodes.php
-	'S_CONFIGURATION_OF_NODES' => 'CONFIGURATION OF NODES',
+	'S_CONFIGURATION_OF_NODES'=>		'CONFIGURATION OF NODES',
 	'S_DM'=>				'DM',	// Distributed Monitoring
 	'S_NODE'=>				'Node',
 	'S_NODES'=>				'Nodes',
-	'S_NODES_BIG'=>			'NODES',
-	'S_NEW_NODE'=>			'New node',
-	'S_NO_NODES_DEFINED'=>		'No nodes defined',
-	'S_ALL_NODES'=>			'All nodes',
+	'S_NODES_BIG'=>				'NODES',
+	'S_NEW_NODE'=>				'New node',
+	'S_NO_NODES_DEFINED'=>			'No nodes defined',
+	'S_ALL_NODES'=>				'All nodes',
 
 // proxies.php
-	'S_CONFIGURATION_OF_PROXIES' => 'CONFIGURATION OF PROXIES',
+	'S_CONFIGURATION_OF_PROXIES'=>		'CONFIGURATION OF PROXIES',
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Authentication',
@@ -717,7 +717,7 @@
 	'S_CONFIGURATION_OF_HOST_GROUPS'=>			'CONFIGURATION OF HOST GROUPS',
 	'S_CONFIGURATION_OF_TEMPLATES'=>			'CONFIGURATION OF TEMPLATES',
 	'S_CONFIGURATION_OF_APPLICATIONS'=>			'CONFIGURATION OF APPLICATIONS',
-	'S_CONFIGURATION_OF_MAINTENANCE_PERIODS'=>	'CONFIGURATION OF MAINTENANCE PERIODS',
+	'S_CONFIGURATION_OF_MAINTENANCE_PERIODS'=>		'CONFIGURATION OF MAINTENANCE PERIODS',
 	'S_HOST_GROUPS_BIG'=>					'HOST GROUPS',
 	'S_NO_HOST_GROUPS_DEFINED'=>				'No host groups defined',
 	'S_NO_HOSTS_DEFINED'=>					'No hosts defined',
@@ -781,15 +781,14 @@
 	'S_LASTSEEN_AGE'=>					'Last seen (age)',
 
 // templates.php
-	'S_TEMPLATE_LIST' => 'Templates list',
-	'S_TEMPLATE_ADDED' => 'New template added',
-	'S_CANNOT_ADD_TEMPLATE' => 'Cannot add template',
-	'S_TEMPLATE_UPDATED' => 'Template updated',
-	'S_CANNOT_UPDATE_TEMPLATE' => 'Cannot update template',
-	'S_LINKED_TEMPLATES' =>		'Linked templates',
-	'S_LINKED_TO' => 		'Linked to',
-	'S_CONFIGURATION_OF_TEMPLATES' => 	'CONFIGURATION OF TEMPLATES',
-	
+	'S_TEMPLATE_LIST'=>			'Templates list',
+	'S_TEMPLATE_ADDED'=>			'New template added',
+	'S_CANNOT_ADD_TEMPLATE'=>		'Cannot add template',
+	'S_TEMPLATE_UPDATED'=>			'Template updated',
+	'S_CANNOT_UPDATE_TEMPLATE'=>		'Cannot update template',
+	'S_LINKED_TEMPLATES'=>			'Linked templates',
+	'S_LINKED_TO'=>				'Linked to',
+
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
 	'S_DEVICE_TYPE'=>			'Device type',
@@ -992,7 +991,6 @@
 	'S_TEMPLATED_ITEM'=>					'Templated item',
 	'S_WEB_ITEM'=>						'Web item',
 	'S_WITH_SMALL'=>					'with',
-	'S_LIKE_SMALL'=>					'like',
 
 //	events.php
 	'S_EVENT'=>				'Event',
@@ -1031,8 +1029,8 @@
 
 
 //	sysmaps.php
-	'S_MAP_DELETED' =>			'Network map deleted',
-	'S_CANNOT_DELETE_MAP' =>	'Cannot delete network map',
+	'S_MAP_DELETED'=>			'Network map deleted',
+	'S_CANNOT_DELETE_MAP'=>			'Cannot delete network map',
 	'S_MAPS_BIG'=>				'MAPS',
 	'S_NO_MAPS_DEFINED'=>			'No maps defined',
 	'S_CREATE_MAP'=>			'Create Map',
@@ -1355,7 +1353,6 @@
 	'S_LAST_7_DAYS'=>			'Last 7 days',
 	'S_LAST_30_DAYS'=>			'Last 30 days',
 	'S_LAST_365_DAYS'=>			'Last 365 days',
-	'S_PERIOD'=>				'Period',
 
 //	triggers.php
 	'S_NO_TRIGGER'=>			'No trigger',
@@ -1464,13 +1461,13 @@
 	'S_CANNOT_UPDATE_PROXY'=>			'Cannot update proxy',
 	'S_PROXY_DELETED'=>				'Proxy deleted',
 	'S_CANNOT_DELETE_PROXY'=>			'Cannot delete proxy',
-	'S_USERS_STATUS_UPDATED'=>				'Users status updated',
+	'S_USERS_STATUS_UPDATED'=>			'Users status updated',
 	'S_CANNOT_UPDATE_USERS_STATUS'=>		'Cannot update users status',
-	'S_GUI_ACCESS_UPDATED'=>				'GUI access updated',
+	'S_GUI_ACCESS_UPDATED'=>			'GUI access updated',
 	'S_CANNOT_UPDATE_GUI_ACCESS'=>			'Cannot update GUI access',
-	'S_API_ACCESS_UPDATED'=>				'API access updated',
+	'S_API_ACCESS_UPDATED'=>			'API access updated',
 	'S_CANNOT_UPDATE_API_ACCESS'=>			'Cannot update API access',
-	'S_DEBUG_MODE_UPDATED'=>				'Debug mode updated',
+	'S_DEBUG_MODE_UPDATED'=>			'Debug mode updated',
 	'S_CANNOT_UPDATE_DEBUG_MODE'=>			'Cannot update debug mode',
 	'S_USER_CANNOT_DISABLE_ITSELF'=>		'User cannot disable itself',
 	'S_USER_CANNOT_CHANGE_STATUS'=>			'User cannot change status to itself',
@@ -1492,7 +1489,6 @@
 	'S_API_ACCESS'=>				'API access',
 	'S_DEBUG'=>					'Debug',
 	'S_DEBUG_MODE'=>				'Debug mode',
-	'S_USERS_STATUS'=>				'Users status',
 	'S_USERS_STATUS'=>				'Users status',
 	'S_NO_RIGHTS_DEFINED'=>				'No rights defined',
 	'S_READ_ONLY'=>					'Read only',
