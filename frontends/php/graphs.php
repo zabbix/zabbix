@@ -39,7 +39,7 @@ include_once('include/page_header.php');
 //  NEW  templates.php; hosts.php; items.php; triggers.php; graphs.php; maintenances.php;
 // 	OLD  0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications; 5 - Proxies; 6 - maintenance
 		'config'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		
+
 		'groupid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
 		'hostid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
 
@@ -97,7 +97,7 @@ include_once('include/page_header.php');
 
 	check_fields($fields);
 	validate_sort_and_sortorder('name',ZBX_SORT_UP);
-	
+
 	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
@@ -109,9 +109,9 @@ include_once('include/page_header.php');
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 	$available_hosts_all_nodes = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,get_current_nodeid(true));
-	
+
 // OPTIMAZE
-	$available_graphs = CGraph::get(array('nodeids'=>get_current_nodeid(true), 'editable'=>1));	
+	$available_graphs = CGraph::get(array('nodeids'=>get_current_nodeid(true), 'editable'=>1));
 
 // ---- <ACTIONS> ----
 	if(isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])){
@@ -376,22 +376,22 @@ include_once('include/page_header.php');
 
 // Config
 	$cmbConf = new CComboBox('config','graphs.php','javascript: submit();');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
+	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('templates.php',S_TEMPLATES);
 		$cmbConf->addItem('hosts.php',S_HOSTS);
 		$cmbConf->addItem('items.php',S_ITEMS);
 		$cmbConf->addItem('triggers.php',S_TRIGGERS);
 		$cmbConf->addItem('graphs.php',S_GRAPHS);
 		$cmbConf->addItem('applications.php',S_APPLICATIONS);
-		
+
 	$form->addItem($cmbConf);
-	
+
 	if(!isset($_REQUEST['form']))
 		$form->addItem(new CButton('form',S_CREATE_GRAPH));
 
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
 	echo SBR;
-	
+
 	if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_graphid'])){
 		insert_copy_elements_to_forms('group_graphid');
 	}
@@ -443,12 +443,12 @@ include_once('include/page_header.php');
 						S_FOUND.': ',$numrows,)
 						);
 		show_table_header($header, $r_form);
-		
-// <<<--- SELECTED HOST HEADER INFORMATION --->>>	
+
+// <<<--- SELECTED HOST HEADER INFORMATION --->>>
 		if($PAGE_HOSTS['selected'] > 0){
-		
+
 			$tbl_header_host = new CTableInfo();
-			
+
 			$header_host = CHost::get(array(
 				'hostids' => $PAGE_HOSTS['selected'],
 				'templated_hosts' => 1,
@@ -459,12 +459,12 @@ include_once('include/page_header.php');
 				'select_applications' =>1
 			));
 			$header_host = array_pop($header_host);
-			
+
 			$description = array();
 			if($header_host['proxy_hostid']){
 				$proxy = get_host_by_hostid($header_host['proxy_hostid']);
 				$description[] = $proxy['host'].':';
-			}	
+			}
 			$description[] = $header_host['host'];
 
 			$items = array(new CLink(S_ITEMS, 'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
@@ -472,13 +472,13 @@ include_once('include/page_header.php');
 
 			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
 				' ('.count($header_host['triggerids']).')');
-			
+
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
 				' ('.count($header_host['applications']).')');
 
 			if($header_host['status'] == HOST_STATUS_TEMPLATE){
 				$status = S_TEMPLATE;
-				
+
 				$tbl_header_host->addRow(array(
 					new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')),
 					$applications,
@@ -496,8 +496,8 @@ include_once('include/page_header.php');
 					$ip = bold($ip);
 				else
 					$dns = bold($dns);
-					
-					
+
+
 				switch($header_host['status']){
 					case HOST_STATUS_MONITORED:
 						$status=new CSpan(S_MONITORED, 'off');
@@ -516,7 +516,7 @@ include_once('include/page_header.php');
 				else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
 					$available=new CSpan(S_UNKNOWN,'unknown');
 
-				
+
 				$tbl_header_host->addRow(array(
 					new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
 					$applications,
@@ -556,13 +556,13 @@ include_once('include/page_header.php');
 			$options += array('groupids' => $PAGE_GROUPS['selected']);
 		}
 		$graphs = CGraph::get($options);
-		
-		
+
+
 		foreach($graphs as $graphid => $graph){
-			
+
 			$host_list = NULL;
 			if($_REQUEST['hostid'] == 0){
-				$host_list = array();	
+				$host_list = array();
 				foreach($graph['hosts'] as $host){
 					$host_list[] = $host['host'];
 				}
@@ -578,7 +578,7 @@ include_once('include/page_header.php');
 			}
 			$name[] = new CLink($graph['name'], 'graphs.php?graphid='.$graphid.'&form=update');
 
-			
+
 			$chkBox = new CCheckBox('group_graphid['.$graphid.']', NULL, NULL, $graphid);
 			if($graph['templateid'] > 0) $chkBox->setEnabled(false);
 

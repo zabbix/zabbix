@@ -209,7 +209,7 @@ include_once "include/page_header.php";
 				$sizeY = 15;
 				$sizeX_red = $sizeX*$p/20;
 				$sizeX_green = $sizeX - $sizeX_red;
-				
+
 //*
 				$sla_tab = new CTable(null,'invisible');
 
@@ -219,7 +219,7 @@ include_once "include/page_header.php";
 					$chart1->setAttribute('style', 'width: '.$sizeX_green.'px;');
 					$chart1 = new CLink($chart1,'report3.php?serviceid='.$row['serviceid'].'&year='.date('Y'),'image');
 				}
-		
+
 				$chart2 = null;
 				if($sizeX_red > 0){
 					$chart2 = new CDiv(null, 'sla_red');
@@ -228,7 +228,7 @@ include_once "include/page_header.php";
 				}
 
 				$text = new CLink(sprintf("%.2f",$stat['problem']),'report3.php?serviceid='.$row['serviceid'].'&year='.date('Y'), $sla_style);
-				
+
 				$sla_tab->addRow(array($chart1, $chart2, SPACE, $text));
 
 				$row['sla'] = $sla_tab;
@@ -267,7 +267,7 @@ include_once "include/page_header.php";
 		//permission issue
 		$treeServ = del_empty_nodes($treeServ);
 
-		$tree = new CTree('service_status_tree', 
+		$tree = new CTree('service_status_tree',
 							$treeServ,
 							array('caption' => bold(S_SERVICE),
 								'status' => bold(S_STATUS),

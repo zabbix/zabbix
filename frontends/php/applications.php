@@ -226,7 +226,7 @@ include_once('include/page_header.php');
 		$cmbConf->addItem('applications.php',S_APPLICATIONS);
 	$frmForm->addVar('hostid',get_request('hostid', 0));
 	$frmForm->addItem($cmbConf);
-	
+
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(SPACE);
 		$frmForm->addItem(new CButton('form', S_CREATE_APPLICATION));
@@ -237,7 +237,7 @@ include_once('include/page_header.php');
 <?php
 
 	echo SBR;
-	
+
 	if(isset($_REQUEST['form'])){
 		$frm_title = 'New Application';
 
@@ -300,20 +300,20 @@ include_once('include/page_header.php');
 		$frmApp->show();
 	}
 	else {
-	
+
 		$options = array(
-			'hostids' => $PAGE_HOSTS['selected'], 
-			'order' => 'name', 
-			'select_items' => 1, 
+			'hostids' => $PAGE_HOSTS['selected'],
+			'order' => 'name',
+			'select_items' => 1,
 			'extendoutput' => 1,
 			'sortfield' => getPageSortField('name'),
 			'sortorder' => getPageSortOrder()
 		);
 		$applications = CApplication::get($options);
-		
+
 		$form = new CForm();
 		$form->setMethod('get');
-		
+
 		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'],'javascript: submit();');
 		$cmbHosts = new CComboBox('hostid', $PAGE_HOSTS['selected'],'javascript: submit();');
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){

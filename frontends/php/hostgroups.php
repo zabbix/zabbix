@@ -27,9 +27,9 @@
 	$page['hist_arg'] = array();
 
 include_once('include/page_header.php');
-	
+
 	$available_groups = CHostGroup::get(array('editable' => 1));
-	$available_hosts = CHost::get(array('editable' => 1, 'templated_hosts' => 1));	
+	$available_hosts = CHost::get(array('editable' => 1, 'templated_hosts' => 1));
 
 	if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !isset($available_groups[$_REQUEST['groupid']])){
 		access_deny();
@@ -76,7 +76,7 @@ include_once('include/page_header.php');
 		$hosts = get_request('hosts', array());
 		$hosts = array_intersect($available_hosts, $hosts);
 		if(isset($_REQUEST['groupid'])){
-			
+
 			DBstart();
 			$result = update_host_group($_REQUEST['groupid'], $_REQUEST['gname'], $hosts);
 			$result = DBend($result);
@@ -107,7 +107,7 @@ include_once('include/page_header.php');
 				DBstart();
 				$result = delete_host_group($_REQUEST['groupid']);
 				$result = DBend($result);
-		
+
 			unset($_REQUEST['form']);
 
 			show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
@@ -174,10 +174,10 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['form'])){
 		echo SBR;
 		global $USER_DETAILS;
-		
+
 		$groupid = get_request('groupid', 0);
 		$hosts = get_request('hosts', array());
-		
+
 		$frm_title = S_HOST_GROUP;
 		if($groupid > 0){
 			$group = get_hostgroup_by_groupid($_REQUEST['groupid']);
@@ -187,7 +187,7 @@ include_once('include/page_header.php');
 		else{
 			$name = '';
 		}
-		
+
 		$frmHostG = new CFormTable($frm_title, 'hostgroups.php');
 		$frmHostG->setName('hg_form');
 		$frmHostG->addRow(S_GROUP_NAME, new CTextBox('gname', $name, 48));
@@ -196,7 +196,7 @@ include_once('include/page_header.php');
 			$frmHostG->addVar('groupid',$_REQUEST['groupid']);
 // if first time select all hosts for group from db
 			if(!isset($_REQUEST['form_refresh'])){
-				$params = array('groupids' => $groupid, 
+				$params = array('groupids' => $groupid,
 								'editable' => 1,
 								'sortfield' => 'host',
 								'templated_hosts' => 1);
@@ -224,7 +224,7 @@ include_once('include/page_header.php');
 		}
 
 		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts, 25);
-		
+
 // get hosts from selected twb_groupid combo
 		$params = array('groupids'=>$twb_groupid,
 						'templated_hosts'=>1,
@@ -270,7 +270,7 @@ include_once('include/page_header.php');
 	}
 	else{
 		$config = select_config();
-		
+
 		$numrows = new CSpan(null, 'info');
 		$numrows->setAttribute('name', 'numrows');
 		$header = get_table_header(array(
@@ -292,9 +292,9 @@ include_once('include/page_header.php');
 					S_MEMBERS
 				));
 
-		$options = array('order'=> 'name', 
-						'editable' => 1, 
-						'extendoutput' => 1, 
+		$options = array('order'=> 'name',
+						'editable' => 1,
+						'extendoutput' => 1,
 						'select_hosts' => 1,
 						'sortfield' => getPageSortField('name'),
 						'sortorder' => getPageSortOrder()
@@ -306,17 +306,17 @@ include_once('include/page_header.php');
 			$host_count = 0;
 			$i = 0;
 			$hosts_output = array();
-			
+
 			order_result($group['hosts'], 'host');
 			foreach($group['hosts'] as $hostid => $host){
 				$i++;
-				
+
 				if($i > $config['max_in_table']){
 					$hosts_output[] = '...';
 					$hosts_output[] = '//empty for array_pop';
 					break;
 				}
-				
+
 				switch($host['status']){
 					case HOST_STATUS_NOT_MONITORED:
 						$style = 'on';
@@ -335,7 +335,7 @@ include_once('include/page_header.php');
 				$hosts_output[] = ', ';
 			}
 			array_pop($hosts_output);
-			
+
 			foreach($group['hosts'] as $hostid => $host){
 				$host['status'] == HOST_STATUS_TEMPLATE ? $tpl_count++ : $host_count++;
 			}
@@ -351,9 +351,9 @@ include_once('include/page_header.php');
 				new CCol((empty($hosts_output) ? '-' : $hosts_output), 'wraptext')
 			));
 		}
-		
+
 		$row_count = $table->getNumRows();
-		
+
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
@@ -370,7 +370,7 @@ include_once('include/page_header.php');
 
 		$form->addItem($table);
 		$form->show();
-		
+
 		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 	}
 

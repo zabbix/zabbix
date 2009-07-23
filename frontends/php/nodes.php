@@ -34,7 +34,7 @@ include_once('include/page_header.php');
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 		'config'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		
+
 // media form
 		'nodeid'=>			array(T_ZBX_INT, O_NO,	null,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 
@@ -116,21 +116,21 @@ include_once('include/page_header.php');
 
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
-	
+
 // Config
 	$cmbConf = new CComboBox('config','nodes.php','javascript: submit()');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
+	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('nodes.php',S_NODES);
 		$cmbConf->addItem('proxies.php',S_PROXIES);
-		
+
 	$frmForm->addItem($cmbConf);
-	
+
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(new CButton('form',S_NEW_NODE));
 	}
-	
+
 	show_table_header(S_CONFIGURATION_OF_NODES, $frmForm);
-	
+
 	if(isset($_REQUEST['form'])){
 		global $ZBX_CURMASTERID;
 

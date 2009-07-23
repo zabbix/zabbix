@@ -103,7 +103,7 @@ include_once('include/page_header.php');
 		'massupdate'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'visible'=>			array(T_ZBX_STR, O_OPT,	null, 	null,	null),
 
-// actions 
+// actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 
 // form
@@ -436,7 +436,7 @@ include_once('include/page_header.php');
 			}
 			$result = DBend($result);
 		}
-//-------------	
+//-------------
 
 		show_messages($result, $msg_ok, $msg_fail);
 
@@ -482,7 +482,7 @@ include_once('include/page_header.php');
 		unset($_REQUEST['chstatus']);
 		unset($_REQUEST['hostid']);
 	}
-	
+
 // -------- GO ---------------
 
 /* DELETE HOST */
@@ -557,7 +557,7 @@ include_once('include/page_header.php');
 
 // Config
 	$cmbConf = new CComboBox('config','hosts.php','javascript: submit()');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
+	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('templates.php',S_TEMPLATES);
 		$cmbConf->addItem('hosts.php',S_HOSTS);
 		$cmbConf->addItem('items.php',S_ITEMS);
@@ -566,7 +566,7 @@ include_once('include/page_header.php');
 		$cmbConf->addItem('applications.php',S_APPLICATIONS);
 
 	$frmForm->addItem($cmbConf);
-	
+
 	$frmForm->addVar('groupid',get_request('groupid',0));
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(SPACE);
@@ -621,14 +621,14 @@ include_once('include/page_header.php');
 					'sortfield' => getPageSortField('host'),
 					'sortorder' => getPageSortOrder()
 				);
-				
+
 		if($_REQUEST['groupid'] > 0){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
-		
+
 		$hosts = Chost::get($options);
-		
-		
+
+
 		$form = new CForm();
 		$form->setName('hosts');
 		$form->addVar('config',get_request('config',0));
@@ -649,10 +649,10 @@ include_once('include/page_header.php');
 			S_AVAILABILITY,
 			S_ERROR
 		));
-		
+
 		foreach($hosts as $hostid => $row){
 			$description = array();
-			
+
 			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']),
 				' ('.count($row['applications']).')');
 			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']),
@@ -661,7 +661,7 @@ include_once('include/page_header.php');
 				' ('.count($row['triggerids']).')');
 			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']),
 				' ('.count($row['graphids']).')');
-				
+
 			if($row['proxy_hostid']){
 				$proxy = get_host_by_hostid($row['proxy_hostid']);
 				array_push($description,$proxy['host'],':');

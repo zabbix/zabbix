@@ -68,8 +68,8 @@ include_once('include/page_header.php');
 		'g_timeperiodid'=>		array(null, O_OPT, null, null, null),
 
 		'edit_timeperiodid'=>	array(null, O_OPT, P_ACT,	DB_ID,	null),
-		
-// actions 
+
+// actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 
 // form actions
@@ -327,7 +327,7 @@ include_once('include/page_header.php');
 
 
 	$params = array('only_current_node' => 1);
-	
+
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
 
@@ -531,11 +531,11 @@ include_once('include/page_header.php');
 		zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');
 //----
 		$table->setFooter(new CCol(array($goBox, $goButton)));
-		
+
 		$form->addItem($table);
 
 		$form->show();
-		
+
 		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 	}
 

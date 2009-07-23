@@ -631,11 +631,11 @@ include_once('include/page_header.php');
 <?php
 	$show_host = true;
 	$hostid = get_request('hostid', 0);
-	
+
 	if(!zbx_empty($_REQUEST['filter_host'])){
 		$hostid = CHost::getId(array('host' => $_REQUEST['filter_host']));
 	}
-	
+
 	if($hostid > 0){
 		$show_host = false;
 		$header_host_opt = array(
@@ -647,16 +647,16 @@ include_once('include/page_header.php');
 			'select_graphs' => 1,
 			'select_applications' => 1
 		);
-					
+
 		$header_host = CHost::get($header_host_opt);
 		$header_host = array_pop($header_host);
-		
+
 		$_REQUEST['filter_host'] = $header_host['host'];
 		if(empty($header_host['groups'])){
 			$_REQUEST['filter_group'] = '';
 		}
 		else{
-			$_REQUEST['filter_group'] = array_pop($header_host['groups']);	
+			$_REQUEST['filter_group'] = array_pop($header_host['groups']);
 			$_REQUEST['filter_group'] = $_REQUEST['filter_group']['name'];
 		}
 	}
@@ -667,22 +667,22 @@ include_once('include/page_header.php');
 	$form->setName('hdrform');
 
 	$form->addVar('hostid',$hostid);
-	
+
 // Config
 	$cmbConf = new CComboBox('config','items.php','javascript: submit()');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
+	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('templates.php',S_TEMPLATES);
 		$cmbConf->addItem('hosts.php',S_HOSTS);
 		$cmbConf->addItem('items.php',S_ITEMS);
 		$cmbConf->addItem('triggers.php',S_TRIGGERS);
 		$cmbConf->addItem('graphs.php',S_GRAPHS);
 		$cmbConf->addItem('applications.php',S_APPLICATIONS);
-		
+
 	$form->addItem($cmbConf);
 	$form->addItem(array(SPACE, new CButton('form',S_CREATE_ITEM)));
 
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
-	
+
 echo SBR;
 
 	if(isset($_REQUEST['form'])){
@@ -719,19 +719,19 @@ echo SBR;
 
 		$show_host = true;
 		$show_applications = true;
-// <<<--- SELECTED HOST HEADER INFORMATION --->>>	
+// <<<--- SELECTED HOST HEADER INFORMATION --->>>
 		if($hostid > 0){
 			$show_host = false;
-			
+
 			$tbl_header_host = new CTable();
 
 			$header_groupid = array_pop($header_host['groupids']);
-			
+
 			$description = array();
 			if($header_host['proxy_hostid']){
 				$proxy = get_host_by_hostid($header_host['proxy_hostid']);
 				$description[] = $proxy['host'].':';
-			}			
+			}
 			$description[] = $header_host['host'];
 
 			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$header_groupid.'&hostid='.$header_host['hostid']),
@@ -740,10 +740,10 @@ echo SBR;
 				' ('.count($header_host['graphids']).')');
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$header_groupid.'&hostid='.$header_host['hostid']),
 				' ('.count($header_host['applications']).')');
-				
+
 			if($header_host['status'] == HOST_STATUS_TEMPLATE){
 				$status = S_TEMPLATE;
-				
+
 				$tbl_header_host->addRow(array(
 					new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')),
 					$applications,
@@ -761,8 +761,8 @@ echo SBR;
 					$ip = bold($ip);
 				else
 					$dns = bold($dns);
-					
-					
+
+
 				switch($header_host['status']){
 					case HOST_STATUS_MONITORED:
 						$status=new CSpan(S_MONITORED, 'off');
@@ -780,7 +780,7 @@ echo SBR;
 					$available=new CSpan(S_NOT_AVAILABLE,'on');
 				else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
 					$available=new CSpan(S_UNKNOWN,'unknown');
-				
+
 				$tbl_header_host->addRow(array(
 					new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
 					$applications,
@@ -794,7 +794,7 @@ echo SBR;
 					array(bold(S_AVAILABILITY.': '), $available)
 				));
 			}
-				
+
 			$tbl_header_host->setClass('infobox');
 			$items_wdgt->addItem($tbl_header_host);
 		}
@@ -865,10 +865,10 @@ echo SBR;
 			$items = array();
 		else
 			$items = CItem::get($options);
-			
+
 		$itemids = array_keys($items);
-		
-		
+
+
 // TABLE
 		$form = new CForm();
 		$form->setName('items');
@@ -906,7 +906,7 @@ echo SBR;
 					':');
 			}
 
-			
+
 			array_push($description, new CLink(
 				item_description($db_item),
 				'?form=update&itemid='.$db_item['itemid']));
@@ -932,8 +932,8 @@ echo SBR;
 
 			if(empty($applications)) $applications = '-';
 			$applications = new CCol($applications, 'wraptext');
-			
-			
+
+
 			$trigger_hint = new CTableInfo();
 			$trigger_hint->setHeader(array(
 							S_SEVERITY,
@@ -944,18 +944,18 @@ echo SBR;
 // TRIGGERS INFO
 			foreach($db_item['triggers'] as $triggerid => $trigger){
 				$tr_description = array();
-	
+
 				if($trigger['templateid'] > 0){
 					$real_hosts = get_realhosts_by_triggerid($triggerid);
 					$real_host = DBfetch($real_hosts);
 					$tr_description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
 					$tr_description[] = ':';
 				}
-				
+
 				$tr_description[] = new CLink(expand_trigger_description($triggerid), 'triggers.php?form=update&triggerid='.$triggerid);
-	
+
 				if($trigger['status'] != TRIGGER_STATUS_UNKNOWN) $trigger['error'] = '';
-				
+
 				switch($trigger['priority']){
 					case 0: $priority = S_NOT_CLASSIFIED; break;
 					case 1: $priority = new CCol(S_INFORMATION, 'information'); break;
@@ -965,7 +965,7 @@ echo SBR;
 					case 5: $priority = new CCol(S_DISASTER, 'disaster'); break;
 					default: $priority = $trigger['priority'];
 				}
-	
+
 				if($trigger['status'] == TRIGGER_STATUS_DISABLED){
 					$status = new CSpan(S_DISABLED, 'disabled');
 				}
@@ -975,21 +975,21 @@ echo SBR;
 				else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
 					$status = new CSpan(S_ENABLED, 'enabled');
 				}
-	
+
 				$trigger_hint->addRow(array(
 					$priority,
 					$tr_description,
 					explode_exp($trigger['expression'], 1),
 					$status,
-				));	
+				));
 			}
-			
+
 			if(!empty($db_item['triggers'])){
 				$trigger_info = new CSpan(S_TRIGGERS,'link');
 				$trigger_info->setHint($trigger_hint);
 				$trigger_info = array($trigger_info);
 				$trigger_info[] = ' ('.count($db_item['triggers']).')';
-				
+
 				$trigger_hint = array();
 			}
 			else{
