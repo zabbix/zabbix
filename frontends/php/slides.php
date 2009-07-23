@@ -32,7 +32,7 @@
 
 	$config = $_REQUEST['config'] = get_request('config', 1);
 	if($_REQUEST['config'] == 0) redirect('screens.php');
-	
+
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 	if(PAGE_TYPE_HTML == $page['type']){
@@ -110,11 +110,11 @@ include_once('include/page_header.php');
 
 					if(!is_null($elementid)){
 						$effectiveperiod = navigation_bar_calc();
-						
+
 						$step = get_request('upd_counter');
-	
+
 						$element = get_slideshow($elementid, $step, $effectiveperiod);
-						$element->show();		
+						$element->show();
 					}
 
 					break;
@@ -225,7 +225,7 @@ include_once('include/page_header.php');
 
 		$params = array();
 		foreach($options as  $option) $params[$option] = 1;
-		
+
 		$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 		$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);

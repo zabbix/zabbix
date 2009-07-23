@@ -284,7 +284,7 @@ include_once('include/page_header.php');
 
 // Config
 	$cmbConf = new CComboBox('config', 'users.php', 'javascript: submit()');
-	$cmbConf->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');	
+	$cmbConf->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('usergrps.php', S_USER_GROUPS);
 		$cmbConf->addItem('users.php', S_USERS);
 
@@ -292,7 +292,7 @@ include_once('include/page_header.php');
 
 	$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
 	$cmbUGrp->addItem(0, S_ALL_S);
-	
+
 	$options = array('extendoutput' => 1, 'order' => 'name');
 	$usrgrps = CUserGroup::get($options);
 	foreach($usrgrps as $usrgrpid => $usrgrp){
@@ -311,24 +311,24 @@ include_once('include/page_header.php');
 		insert_user_form(get_request('userid',null));
 	}
 	else{
-		
+
 		$options = array('extendoutput' => 1, 'order' => 'alias', 'select_usrgrps' => 1, 'get_access' => 1);
 		if($_REQUEST['filter_usrgrpid'] > 0){
 			$options += array('usrgrpids' => $_REQUEST['filter_usrgrpid']);
 		}
 		$users = CUser::get($options);
 		$userids = array_keys($users);
-		
+
 		$numrows = count($users);
-		
+
 		$header = get_table_header(array(
 			S_USERS_BIG,
 			new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-			S_FOUND.': ', 
+			S_FOUND.': ',
 			new CSpan($numrows,'info')
 		));
 		show_table_header($header);
-		
+
 		$form = new CForm(null,'post');
 		$form->setName('users');
 
@@ -346,7 +346,7 @@ include_once('include/page_header.php');
 			S_DEBUG_MODE,
 			S_STATUS
 		));
-		
+
 		// set default lastaccess time to 0.
 		foreach($users as $userid => $user){
 			$usessions[$userid] = array('lastaccess' => 0);
@@ -363,20 +363,20 @@ include_once('include/page_header.php');
 		}
 
 		foreach($users as $userid => $user){
-			$session = $usessions[$userid];	
+			$session = $usessions[$userid];
 
 			// Online time
-			$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout'])) 
+			$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout']))
 				? ZBX_USER_ONLINE_TIME : $user['autologout'];
 			if($session['lastaccess']){
-				$online = (($session['lastaccess'] + $online_time) >= time())					
+				$online = (($session['lastaccess'] + $online_time) >= time())
 					? new CCol(S_YES.' ('.date('r', $session['lastaccess']).')', 'enabled')
 					: new CCol(S_NO.' ('.date('r', $session['lastaccess']).')', 'disabled');
 			}
 			else{
 				$online = new CCol(S_NO, 'disabled');
 			}
-			
+
 
 			// UserGroups
 			$users_groups = array();
@@ -385,8 +385,8 @@ include_once('include/page_header.php');
 				$users_groups[] = BR();
 			}
 			array_pop($users_groups);
-			
-			
+
+
 			$gui_access = user_auth_type2str($user['gui_access']);
 			$gui_access = new CSpan($gui_access, ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) ? 'orange' : 'green');
 			$users_status = ($user['users_status'] == 1) ? new CSpan(S_DISABLED, 'red') : new CSpan(S_ENABLED, 'green');
@@ -407,7 +407,7 @@ include_once('include/page_header.php');
 				$users_status
 			));
 		}
-		
+
 /* <<<--- GO button --->>> */
 		$goBox = new CComboBox('go');
 		$goBox->addItem('delete',S_DELETE_SELECTED);

@@ -609,7 +609,7 @@
 			$check_dd_first_remember,
 			S_DROPDOWN_REMEMBER_SELECTED
 			));
-		
+
 		$frmGUI->addRow(S_SEARCH_LIMIT, new CTextBox('search_limit', $config['search_limit'], 5));
 		$frmGUI->addRow(S_MAX_IN_TABLE, new CTextBox('max_in_table', $config['max_in_table'], 5));
 		$frmGUI->addRow(S_EVENT_ACKNOWLEDGES,$exp_select);

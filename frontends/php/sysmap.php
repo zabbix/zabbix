@@ -195,7 +195,7 @@ include_once('include/page_header.php');
 			$map_elements[$db_element['selementid']] = $db_element;
 		}
 		order_page_result($map_elements, 'label');
-		
+
 		foreach($map_elements as $selementid => $db_element){
 			if(    $db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)		$type = S_HOST;
 			elseif($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP)		$type = S_MAP;
@@ -229,7 +229,7 @@ include_once('include/page_header.php');
 		$table->setHeader(array(S_LINK,S_ELEMENT_1,S_ELEMENT_2,S_LINK_STATUS_INDICATOR));
 
 		$i = 1;
-		
+
 		$links = array();
 		$selementids = array();
 		$sql = 'SELECT linkid,selementid1,selementid2 '.
@@ -241,7 +241,7 @@ include_once('include/page_header.php');
 			$selementids[$row['selementid1']] = $row['selementid1'];
 			$selementids[$row['selementid2']] = $row['selementid2'];
 		}
-		
+
 		$labels = array();
 		$sql = 'SELECT selementid, label '.
 				' FROM sysmaps_elements '.
@@ -250,12 +250,12 @@ include_once('include/page_header.php');
 		while($row=DBfetch($result)){
 			$labels[$row['selementid']] = $row['label'];
 		}
-		
+
 		foreach($links as $linkid => $row){
 			$links[$linkid]['label1']=$labels[$row['selementid1']];
 			$links[$linkid]['label2']=$labels[$row['selementid2']];
 		}
-		
+
 		order_result($links, 'label1');
 
 		foreach($links as $linkid => $row){

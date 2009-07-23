@@ -39,7 +39,7 @@ include_once('include/page_header.php');
 		'eventid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,				null),
 		'events'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,				null),
 		'message'=>		array(T_ZBX_STR, O_OPT,	NULL,	$bulk ? NULL : NOT_EMPTY,	'isset({save})||isset({saveandreturn})'),
-		
+
 // Actions
 		'go'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 
@@ -51,7 +51,7 @@ include_once('include/page_header.php');
 	check_fields($fields);
 
 	$_REQUEST['go'] = get_request('go','none');
-	
+
 	if(!isset($_REQUEST['events']) && !isset($_REQUEST['eventid'])){
 		show_message(S_NO_EVENTS_TO_ACKNOWLEDGE);
 		include_once('include/page_footer.php');

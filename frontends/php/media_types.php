@@ -63,7 +63,7 @@ include_once "include/page_header.php";
 
 /* MEDIATYPE ACTIONS */
 	$_REQUEST['go'] = get_request('go', 'none');
-	
+
 	$result = 0;
 	if(isset($_REQUEST["save"])){
 		if(isset($_REQUEST["mediatypeid"])){
@@ -108,14 +108,14 @@ include_once "include/page_header.php";
 	else if($_REQUEST['go'] == 'delete'){
 		$result = true;
 		$media_types = get_request('media_types', array());
-		
+
 		DBstart();
 		foreach($media_types as $media_typeid){
 			$result &= delete_mediatype($media_typeid);
 			if(!$result) break;
 		}
 		$result = DBend($result);
-		
+
 		if($result){
 			unset($_REQUEST["form"]);
 		}
@@ -151,7 +151,7 @@ include_once "include/page_header.php";
 	else{
 		$form = new CForm();
 		$form->setName('frm_media_types');
-		
+
 		$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
 		$table->setHeader(array(
 			new CCheckBox('all_media_types',NULL,"checkAll('".$form->getName()."','all_media_types','media_types');"),
@@ -193,7 +193,7 @@ include_once "include/page_header.php";
 				new CLink($row["description"],"?&form=update&mediatypeid=".$row["mediatypeid"],'action'),
 				$details));
 		}
-		
+
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('delete', S_DELETE_SELECTED);
@@ -204,7 +204,7 @@ include_once "include/page_header.php";
 		zbx_add_post_js('chkbxRange.pageGoName = "media_types";');
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));
-		
+
 		$form->addItem($table);
 		$form->show();
 		zbx_add_post_js('insert_in_element("numrows","'.$table->getNumRows().'");');

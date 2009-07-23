@@ -129,14 +129,14 @@ include_once 'include/page_header.php';
 		else if($_REQUEST['go'] == 'delete'){
 			$result = true;
 			$screens = get_request('screens', array());
-			
+
 			DBstart();
 			foreach($screens as $screenid){
 				$result &= delete_screen($screenid);
 				if(!$result) break;
 			}
 			$result = DBend($result);
-			
+
 			if($result){
 				unset($_REQUEST["form"]);
 			}
@@ -237,14 +237,14 @@ include_once 'include/page_header.php';
 		else if($_REQUEST['go'] == 'delete'){
 			$result = true;
 			$shows = get_request('shows', array());
-			
+
 			DBstart();
 			foreach($shows as $showid){
 				$result &= delete_slideshow($showid);
 				if(!$result) break;
 			}
 			$result = DBend($result);
-			
+
 			if($result){
 				unset($_REQUEST["form"]);
 			}
@@ -305,7 +305,7 @@ include_once 'include/page_header.php';
 					new CLink(S_EDIT,"screenedit.php?screenid=".$row["screenid"])
 					));
 			}
-			
+
 //----- GO ------
 			$goBox = new CComboBox('go');
 			$goBox->addItem('delete', S_DELETE_SELECTED);
@@ -316,7 +316,7 @@ include_once 'include/page_header.php';
 			zbx_add_post_js('chkbxRange.pageGoName = "screens";');
 
 			$table->setFooter(new CCol(array($goBox, $goButton)));
-			
+
 			$form->addItem($table);
 			$form->show();
 		}
@@ -328,7 +328,7 @@ include_once 'include/page_header.php';
 		else{
 			$form = new CForm();
 			$form->setName('frm_shows');
-			
+
 			$numrows = new CSpan(null,'info');
 			$numrows->setAttribute('name','numrows');
 			$header = get_table_header(array(S_SLIDESHOWS_BIG,
@@ -374,11 +374,11 @@ include_once 'include/page_header.php';
 			zbx_add_post_js('chkbxRange.pageGoName = "shows";');
 
 			$table->setFooter(new CCol(array($goBox, $goButton)));
-			
+
 			$form->addItem($table);
 			$form->show();
 		}
-		
+
 	}
 	if(isset($table)){
 		zbx_add_post_js('insert_in_element("numrows","'.$table->getNumRows().'");');

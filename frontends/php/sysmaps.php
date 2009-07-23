@@ -107,14 +107,14 @@ include_once 'include/page_header.php';
 	else if($_REQUEST['go'] == 'delete'){
 		$result = true;
 		$maps = get_request('maps', array());
-		
+
 		DBstart();
 		foreach($maps as $mapid){
 			$result &= delete_sysmap($mapid);
 			if(!$result) break;
 		}
 		$result = DBend($result);
-		
+
 		if($result){
 			unset($_REQUEST["form"]);
 		}
@@ -134,17 +134,17 @@ include_once 'include/page_header.php';
 		insert_map_form();
 	}
 	else{
-	
+
 		$form = new CForm();
 		$form->setName('frm_maps');
-		
+
 		$numrows = new CSpan(null,'info');
 		$numrows->setAttribute('name','numrows');
 		$header = get_table_header(array(
 			S_MAPS_BIG,
 			new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 			S_FOUND.': ',$numrows));
-			
+
 		show_table_header($header);
 
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
@@ -172,7 +172,7 @@ include_once 'include/page_header.php';
 				new CLink(S_EDIT,"sysmap.php?sysmapid=".$row["sysmapid"])
 				));
 		}
-		
+
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('delete', S_DELETE_SELECTED);
@@ -183,12 +183,12 @@ include_once 'include/page_header.php';
 		zbx_add_post_js('chkbxRange.pageGoName = "maps";');
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));
-		
+
 		$form->addItem($table);
 		$form->show();
-		
+
 		zbx_add_post_js('insert_in_element("numrows","'.$table->getNumRows().'");');
-	}		
+	}
 
 
 include_once "include/page_footer.php";
