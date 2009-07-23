@@ -85,6 +85,7 @@ class CHost {
 			'select_items'				=> 0,
 			'select_triggers'			=> 0,
 			'select_graphs'				=> 0,
+			'select_applications'		=> 0,
 			'count'						=> 0,
 			'pattern'					=> '',
 			'extend_pattern'			=> 0,
@@ -373,6 +374,10 @@ class CHost {
 						$result[$host['hostid']]['graphids'] = array();
 						$result[$host['hostid']]['graphs'] = array();
 					}
+					if($options['select_applications'] && !isset($result[$host['hostid']]['applications'])){
+						$result[$host['hostid']]['applications'] = array();
+						$result[$host['hostid']]['applicationids'] = array();
+					}
 					
 					// groupids
 					if(isset($host['groupid'])){
@@ -478,6 +483,18 @@ class CHost {
 				foreach($graph['hostids'] as $num => $hostid){
 					$result[$hostid]['graphids'][$graphid] = $graphid;
 					$result[$hostid]['graphs'][$graphid] = $graph;
+				}
+			}
+		}
+		
+// Adding applications
+		if($options['select_applications']){
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+			$applications = Capplication::get($obj_params);
+			foreach($applications as $applicationid => $application){
+				foreach($application['hostids'] as $num => $hostid){
+					$result[$hostid]['applicationids'][$applicationid] = $applicationid;
+					$result[$hostid]['applications'][$applicationid] = $application;
 				}
 			}
 		}

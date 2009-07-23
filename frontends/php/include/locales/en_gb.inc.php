@@ -781,6 +781,7 @@
 	'S_LASTSEEN_AGE'=>					'Last seen (age)',
 
 // templates.php
+	'S_TEMPLATE_LIST' => 'Templates list',
 	'S_TEMPLATE_ADDED' => 'New template added',
 	'S_CANNOT_ADD_TEMPLATE' => 'Cannot add template',
 	'S_TEMPLATE_UPDATED' => 'Template updated',
