@@ -41,7 +41,7 @@ class CApplication {
 		$result = array();
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
-		
+
 		$sort_columns = array('applicationid', 'name'); // allowed columns for sorting
 
 		$sql_parts = array(
@@ -74,12 +74,12 @@ class CApplication {
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
 		}
-		
+
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
-			
+
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['from']['r'] = 'rights r';
 			$sql_parts['from']['ug'] = 'users_groups ug';
@@ -95,16 +95,16 @@ class CApplication {
 									' AND rr.id=hgg.groupid '.
 									' AND rr.groupid=gg.usrgrpid '.
 									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.')';									
+									' AND rr.permission<'.$permission.')';
 		}
 
 // nodeids
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
-		
+
 // hostids
 		if($options['hostids'] != 0){
 			zbx_value2array($options['hostids']);
-			
+
 			if($options['extendoutput'] != 0){
 				$sql_parts['select']['hostid'] = 'a.hostid';
 			}
@@ -115,25 +115,25 @@ class CApplication {
 // itemids
 		if($options['itemids'] != 0){
 			zbx_value2array($options['itemids']);
-			
+
 			if($options['extendoutput'] != 0){
 				$sql_parts['select']['itemid'] = 'ia.itemid';
 			}
 			$sql_parts['from']['ia'] = 'items_applications ia';
 			$sql_parts['where'][] = DBcondition('ia.itemid', $options['itemids']);
 			$sql_parts['where']['aia'] = 'a.applicationid=ia.applicationid';
-			
+
 		}
-		
+
 // applicationids
 		if($options['applicationids'] != 0){
 			zbx_value2array($options['applicationids']);
-			
+
 			if($options['extendoutput'] != 0){
 				$sql_parts['select']['applicationid'] = 'a.applicationid';
 			}
 			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
-			
+
 		}
 
 // extendoutput
@@ -145,7 +145,7 @@ class CApplication {
 		if($options['count'] != 0){
 			$options['select_items'] = 0;
 			$options['sortfield'] = '';
-			
+
 			$sql_parts['select'] = array('count(a.applicationid) as rowscount');
 		}
 
@@ -154,14 +154,14 @@ class CApplication {
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
 		if(!zbx_empty($options['sortfield'])){
 			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-			
+
 			$sql_parts['order'][] = 'a.'.$options['sortfield'].' '.$sortorder;
-			
+
 			if(!str_in_array('a.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('a.*', $sql_parts['select'])){
 				$sql_parts['select'][] = 'a.'.$options['sortfield'];
 			}
 		}
-		
+
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
@@ -171,13 +171,13 @@ class CApplication {
 		}
 //----------
 
-		$applicationids = array(); 
-		
+		$applicationids = array();
+
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
-	
+
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
@@ -185,7 +185,7 @@ class CApplication {
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);			
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.$sql_select.
@@ -199,22 +199,22 @@ class CApplication {
 				$result = $application;
 			else{
 				$applicationids[$application['applicationid']] = $application['applicationid'];
-				
+
 				if($options['extendoutput'] == 0){
 					$result[$application['applicationid']] = $application['applicationid'];
 				}
 				else{
-					if(!isset($result[$application['applicationid']])) 
+					if(!isset($result[$application['applicationid']]))
 						$result[$application['applicationid']]= array();
-						
+
 					if($options['select_items'] && !isset($result[$application['applicationid']]['itemids'])){
 						$result[$application['applicationid']]['itemids'] = array();
 						$result[$application['applicationid']]['items'] = array();
 					}
-					
+
 					// hostids
 					if(isset($application['hostid'])){
-						if(!isset($result[$application['applicationid']]['hostids'])) 
+						if(!isset($result[$application['applicationid']]['hostids']))
 							$result[$application['applicationid']]['hostids'] = array();
 
 						$result[$application['applicationid']]['hostids'][$application['hostid']] = $application['hostid'];
@@ -222,9 +222,9 @@ class CApplication {
 					}
 					// itemids
 					if(isset($application['itemid'])){
-						if(!isset($result[$application['applicationid']]['itemids'])) 
+						if(!isset($result[$application['applicationid']]['itemids']))
 							$result[$application['applicationid']]['itemids'] = array();
-							
+
 						$result[$application['applicationid']]['itemids'][$application['itemid']] = $application['itemid'];
 						unset($application['itemid']);
 					}
@@ -245,7 +245,7 @@ class CApplication {
 				}
 			}
 		}
-	
+
 
 	return $result;
 	}
@@ -292,7 +292,7 @@ class CApplication {
 
 		$sql = 'SELECT applicationid FROM applications WHERE hostid='.$app_data['hostid'].' AND name='.$app_data['name'];
 		$appid = DBselect($sql);
-		
+
 		$result = $appid ? true : false;
 		if($result)
 			return $appid['applicationid'];
@@ -317,9 +317,9 @@ class CApplication {
 	 * @return boolean
 	 */
 	public static function add($applications){
-	
+
 		$result = false;
-		
+
 		DBstart(false);
 		foreach($applications as $application){
 			$result = add_application($applications['name'], $applications['hostid']);
@@ -352,7 +352,7 @@ class CApplication {
 	public static function update($applications){
 
 		$result = false;
-		
+
 		DBstart(false);
 		foreach($applications as $application){
 			$result = update_application($application['applicationid'], $application['name'], $application['hostid']);

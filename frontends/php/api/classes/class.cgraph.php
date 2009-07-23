@@ -70,12 +70,12 @@ class CGraph {
 			'order'				=> '');
 
 		$options = array_merge($def_options, $options);
-		
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
 		}
-		
+
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
@@ -107,7 +107,7 @@ class CGraph {
 														' AND ugg.userid='.$userid.
 														' AND rr.permission<'.$permission.'))';
 		}
-		
+
 
 // nodeids
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
@@ -123,14 +123,14 @@ class CGraph {
 			$sql_parts['from']['gi'] = 'graphs_items gi';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			
+
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where'][] = 'hg.hostid=i.hostid';
 			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
 		}
-		
+
 // hostids
 		if($options['hostids'] != 0){
 			zbx_value2array($options['hostids']);
@@ -200,12 +200,12 @@ class CGraph {
 //------------
 
 		$graphids = array();
-		
+
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
-	
+
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
@@ -213,7 +213,7 @@ class CGraph {
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);			
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.$sql_select.
@@ -231,10 +231,10 @@ class CGraph {
 				}
 				else{
 					$graphids[$graph['graphid']] = $graph['graphid'];
-					
-					if(!isset($result[$graph['graphid']])) 
+
+					if(!isset($result[$graph['graphid']]))
 						$result[$graph['graphid']]= array();
-					
+
 					if($options['select_hosts'] && !isset($result[$graph['graphid']]['hostids'])){
 						$result[$graph['graphid']]['hostids'] = array();
 						$result[$graph['graphid']]['hosts'] = array();
@@ -247,7 +247,7 @@ class CGraph {
 						$result[$graph['graphid']]['itemids'] = array();
 						$result[$graph['graphid']]['items'] = array();
 					}
-					
+
 					// hostids
 					if(isset($graph['hostid'])){
 						if(!isset($result[$graph['graphid']]['hostids'])) $result[$graph['graphid']]['hostids'] = array();
@@ -262,7 +262,7 @@ class CGraph {
 						$result[$graph['graphid']]['itemids'][$graph['itemid']] = $graph['itemid'];
 						unset($graph['itemid']);
 					}
-					
+
 					$result[$graph['graphid']] += $graph;
 				}
 			}
@@ -279,7 +279,7 @@ class CGraph {
 				}
 			}
 		}
-		
+
 // Adding Templates
 		if($options['select_templates']){
 			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1);
@@ -291,7 +291,7 @@ class CGraph {
 				}
 			}
 		}
-		
+
 // Adding Items
 		if($options['select_items']){
 			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1);
