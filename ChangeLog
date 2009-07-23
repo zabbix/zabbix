@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-412] improved timeline in charts (Artem)
  - [DEV-353] Discovery: added support of IP masks (Sasha) 
  - [DEV-137] poller will continue processing of other items after enabling a host (Alexei)
  - [DEV-137] modifed Makefile to use tr instead of sed for better compatibility (Alexei)

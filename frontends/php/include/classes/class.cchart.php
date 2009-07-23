@@ -164,7 +164,7 @@ class CChart extends CGraphDraw{
 		$this->percentile['right']['percent'] = $percentile;
 	}
 
-	protected function drawGrid(){
+	function drawGrid(){
 		$this->drawSmallRectangle();
 		$hline_count = round($this->sizeY / $this->gridPixels);
 		for($i=1;$i<=$hline_count;$i++){
@@ -173,46 +173,103 @@ class CChart extends CGraphDraw{
 					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
 					$this->sizeX+$this->shiftXleft,
 					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
-					$this->getColor('Gray')
+					$this->GetColor('Gray')
 				);
 		}
 
-		$vline_count = round($this->sizeX / $this->gridPixels);
-		for($i=1;$i<=$vline_count;$i++){
+// align to the closest human time interval
+		$raw_time_interval = ($this->gridPixels*$this->period)/$this->sizeX;
+		$intervals = array(
+			60,		// 1 minute
+			300,	// 5 minutes
+			900,	// 15 minutes
+			1800,	// 30 minutes
+			3600,	// 1 hour
+			10800,	// 3 hours
+			21600,	// 6 hours
+			43200,	// 12 hours
+			86400,	// 1 day
+			604800,	// 1 week
+		);
+		
+		$dist = 604800; //def week;
+		$interval = 0;
+
+		foreach($intervals as $num => $i){
+			$t = abs($i-$raw_time_interval);
+
+			if($t<$dist){
+				$dist = $t;
+				$interval = $i;
+			}
+		}
+		$intervalX = ($interval * $this->sizeX) / $this->period;
+
+		$offset = $interval - (($this->from_time+date('Z')) % $interval);
+		$offsetX = ($offset * $this->sizeX) / $this->period;
+
+		$vline_count = floor(($this->period-$offset) / $interval);
+
+		$start_i = 0;
+		if($offsetX < 10){
+			$vline_count--;
+			$start_i++;
+		}
+		
+		if(($this->sizeX - ($offsetX + ($vline_count*$intervalX))) < 10){
+			$vline_count--;
+		}
+		
+		for($i=$start_i;$i<=$vline_count;$i++){
 			dashedline($this->im,
-						$i*($this->sizeX/($vline_count+1))+$this->shiftXleft,
+						$i*$intervalX+$this->shiftXleft+$offsetX,
 						$this->shiftY,
-						$i*($this->sizeX/($vline_count+1))+$this->shiftXleft,
+						$i*$intervalX+$this->shiftXleft+$offsetX,
 						$this->sizeY+$this->shiftY,
 						$this->getColor('Gray')
 				);
 		}
 
-		$old_day=-1;
-		for($i=0;$i<=($vline_count+1);$i++){
-			imagestringup($this->im,
-						1,
-						$i*($this->sizeX/($vline_count+1))+$this->shiftXleft-3,
-						$this->sizeY+$this->shiftY+57,
-						date('      H:i',$this->from_time+$i*($this->period/($vline_count+1))),
-						$this->getColor('Black No Alpha')
-				);
-
-			$new_day=date('d',$this->from_time+$i*($this->period/($vline_count+1)));
-			if(($old_day != $new_day) || ($i==($vline_count+1))){
+		$old_day=date('d',$this->from_time);
+		for($i=$start_i;$i<=$vline_count;$i++){
+			$new_day=date('d',$this->from_time+$i*$interval+$offset);
+			if($old_day != $new_day){
 				$old_day=$new_day;
-				imagestringup($this->im,
-									1,
-									$i*($this->sizeX/($vline_count+1))+$this->shiftXleft-3,
-									$this->sizeY+$this->shiftY+57,
-									date('m.d H:i',$this->from_time+$i*($this->period/($vline_count+1))),
-									$this->getColor('Dark Red No Alpha')
-							);
-
+				$date_format = 'm.d H:i';
+				$color = 'Dark Red No Alpha';
 			}
+			else{
+				$date_format = '      H:i';
+				$color = 'Black No Alpha';
+			}
+			
+			imagestringup($this->im,
+								1,
+								$i*$intervalX+$this->shiftXleft-3+$offsetX,
+								$this->sizeY+$this->shiftY+57,
+								date($date_format,$this->from_time+$offset+$i*$interval),
+								$this->getColor($color)
+						);
 		}
+// Start
+		imagestringup($this->im,
+							1,
+							
+							$this->shiftXleft-3,
+							$this->sizeY+$this->shiftY+57,
+							date('m.d H:i',$this->from_time),
+							$this->getColor('Dark Red No Alpha')
+					);
+// End
+		imagestringup($this->im,
+							1,
+							$this->sizeX+3,
+							$this->sizeY+$this->shiftY+57,
+							date('m.d H:i',$this->to_time),
+							$this->getColor('Dark Red No Alpha')
+					);
 	}
-
+	
 	protected function drawWorkPeriod(){
 		if($this->m_showWorkPeriod != 1) return;
 		if($this->period > 2678400) return; // > 31*24*3600 (month)
