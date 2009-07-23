@@ -173,10 +173,10 @@
 	}
 
 	function	db_save_httptest($httptestid, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps){
-		$history = 30; // TODO !!! Allow user set this parametr
-		$trends = 90; // TODO !!! Allow user set this parametr
+		$history = 30; // TODO !!! Allow user to set this parameter
+		$trends = 90; // TODO !!! Allow user to set this parameter
 
- 		if(!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)) {
+		if(!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)) {
 			error("Scenario name should contain '0-9a-zA-Z_.$ '- characters only");
 			return false;
 		}
@@ -228,10 +228,10 @@
 			foreach($steps as $sid => $s){
 				if(!isset($s['name']))		$s['name'] = '';
 				if(!isset($s['timeout']))	$s['timeout'] = 15;
-				if(!isset($s['url']))       	$s['url'] = '';
-				if(!isset($s['posts']))       	$s['posts'] = '';
-				if(!isset($s['required']))      $s['required'] = '';
-				if(!isset($s['status_codes']))  $s['status_codes'] = '';
+				if(!isset($s['url']))		$s['url'] = '';
+				if(!isset($s['posts']))		$s['posts'] = '';
+				if(!isset($s['required']))	$s['required'] = '';
+				if(!isset($s['status_codes']))	$s['status_codes'] = '';
 
 				$result = db_save_step($hostid, $applicationid, $httptestid,
 						$name, $s['name'], $sid+1, $s['timeout'], $s['url'], $s['posts'], $s['required'],$s['status_codes'],

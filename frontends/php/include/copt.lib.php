@@ -19,7 +19,7 @@
 **/
 
 	/* SPEED Measurement
-	 	-= slow =-
+		-= slow =-
 		vs
 		-= fast =-
 	1)strlen
@@ -229,9 +229,9 @@ if(defined('USE_PROFILING')){
 			}
 
 			if(defined('USE_MEM_PROF')){
-				$debug_str.= 'Memory limit	 : '.ini_get('memory_limit').OBR;
-				$debug_str.= 'Memory usage	 : '.mem2str($memorystamp[$type]).' - '.mem2str($memory).OBR;
-				$debug_str.= 'Memory leak	 : '.mem2str($memory - $memorystamp[$type]).OBR;
+				$debug_str.= 'Memory limit	: '.ini_get('memory_limit').OBR;
+				$debug_str.= 'Memory usage	: '.mem2str($memorystamp[$type]).' - '.mem2str($memory).OBR;
+				$debug_str.= 'Memory leak	: '.mem2str($memory - $memorystamp[$type]).OBR;
 			}
 
 			if(defined('USE_VAR_MON')){
