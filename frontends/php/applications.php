@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@
 <?php
 	require_once('include/config.inc.php');
 	require_once('include/hosts.inc.php');
-	require_once('include/maintenances.inc.php');
-	require_once('include/forms.inc.php');
 
 	$page['title'] = "S_APPLICATIONS";
 	$page['file'] = 'applications.php';
@@ -60,8 +58,8 @@ include_once('include/page_header.php');
 		'groupids'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'applications'=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 
-		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'isset({form})&&({form}=="update")'),
-		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
+		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID, NULL),
+		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 
 // application
 		'applicationid'=>	array(T_ZBX_INT,O_OPT,	P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
@@ -226,53 +224,115 @@ include_once('include/page_header.php');
 		$cmbConf->addItem('triggers.php',S_TRIGGERS);
 		$cmbConf->addItem('graphs.php',S_GRAPHS);
 		$cmbConf->addItem('applications.php',S_APPLICATIONS);
-
-	$btn = new CButton('form',S_CREATE_APPLICATION);
-	$frmForm->addVar('hostid',get_request('hostid',0));
-
+	$frmForm->addVar('hostid',get_request('hostid', 0));
 	$frmForm->addItem($cmbConf);
-	if(isset($btn) && !isset($_REQUEST['form'])){
+	
+	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(SPACE);
-		$frmForm->addItem($btn);
+		$frmForm->addItem(new CButton('form', S_CREATE_APPLICATION));
 	}
 
 	show_table_header(S_CONFIGURATION_OF_APPLICATIONS, $frmForm);
 ?>
 <?php
-	$row_count = 0;
 
-// APP 4
 	echo SBR;
+	
 	if(isset($_REQUEST['form'])){
-		insert_application_form();
+		$frm_title = 'New Application';
+
+		if(isset($_REQUEST['applicationid'])){
+			$result=DBselect('SELECT * FROM applications WHERE applicationid='.$_REQUEST['applicationid']);
+			$row=DBfetch($result);
+			$frm_title = 'Application: "'.$row['name'].'"';
+		}
+
+		if(isset($_REQUEST["applicationid"]) && !isset($_REQUEST["form_refresh"])){
+			$appname = $row["name"];
+			$apphostid = $row['hostid'];
+		}
+		else{
+			$appname = get_request("appname","");
+			$apphostid = get_request("apphostid",get_request("hostid",0));
+		}
+
+		$db_host = get_host_by_hostid($apphostid,1 /* no error message */);
+		if($db_host){
+			$apphost = $db_host["host"];
+		}
+		else{
+			$apphost = '';
+			$apphostid = 0;
+		}
+
+		$frmApp = new CFormTable($frm_title);
+		$frmApp->SetHelp("web.applications.php");
+
+		if(isset($_REQUEST["applicationid"]))
+			$frmApp->addVar("applicationid",$_REQUEST["applicationid"]);
+
+		$frmApp->addRow(S_NAME,new CTextBox("appname",$appname,32));
+
+		$frmApp->addVar("apphostid",$apphostid);
+
+		if(!isset($_REQUEST["applicationid"])){
+// anly new application can SELECT host
+			$frmApp->addRow(S_HOST,array(
+				new CTextBox("apphost",$apphost,32,'yes'),
+				new CButton("btn1",S_SELECT,
+					"return PopUp('popup.php?dstfrm=".$frmApp->GetName().
+					"&dstfld1=apphostid&dstfld2=apphost&srctbl=hosts&srcfld1=hostid&srcfld2=host',450,450);",
+					'T')
+				));
+		}
+
+		$frmApp->addItemToBottomRow(new CButton("save",S_SAVE));
+		if(isset($_REQUEST["applicationid"])){
+			$frmApp->addItemToBottomRow(SPACE);
+			$frmApp->addItemToBottomRow(new CButtonDelete("Delete this application?",
+					url_param("config").url_param("hostid").url_param('groupid').
+					url_param("form").url_param("applicationid")));
+		}
+
+		$frmApp->addItemToBottomRow(SPACE);
+		$frmApp->addItemToBottomRow(new CButtonCancel(url_param("config").url_param("hostid").url_param('groupid')));
+
+		$frmApp->show();
 	}
 	else {
-// Table HEADER
+	
+		$options = array(
+			'hostids' => $PAGE_HOSTS['selected'], 
+			'order' => 'name', 
+			'select_items' => 1, 
+			'extendoutput' => 1,
+			'sortfield' => getPageSortField('name'),
+			'sortorder' => getPageSortOrder()
+		);
+		$applications = CApplication::get($options);
+		
 		$form = new CForm();
 		$form->setMethod('get');
-
-		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
-		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
-
+		
+		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'],'javascript: submit();');
+		$cmbHosts = new CComboBox('hostid', $PAGE_HOSTS['selected'],'javascript: submit();');
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
 			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 		}
 		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
 			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
 		}
-
 		$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 		$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
-		$numrows = new CSpan(null,'info');
-		$numrows->setAttribute('name','numrows');
-		$header = get_table_header(array(S_APPLICATIONS_BIG,
-						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-						S_FOUND.': ',$numrows,)
-						);
+		$header = get_table_header(array(
+			S_APPLICATIONS_BIG,
+			new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
+			S_FOUND.': ',
+			new CSpan(count($applications), 'info')
+		));
 		show_table_header($header, $form);
 
-/* TABLE */
 
 		$form = new CForm();
 		$form->setName('applications');
@@ -282,38 +342,28 @@ include_once('include/page_header.php');
 		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_applications',NULL,"checkAll('".$form->GetName()."','all_applications','applications');"),
-			make_sorting_link(S_APPLICATION,'a.name'),
+			make_sorting_link(S_APPLICATION, 'name'),
 			S_SHOW
-			));
+		));
 
-		$sql = 'SELECT a.* '.
-				' FROM applications a'.
-				' WHERE a.hostid='.$_REQUEST['hostid'].
-				order_by('a.name');
-		$db_applications = DBselect($sql);
-		while($db_app = DBfetch($db_applications)){
-			if($db_app['templateid']==0){
-				$name = new CLink($db_app['name'],'applications.php?form=update&applicationid='.$db_app['applicationid']);
+		foreach($applications as $applicationid => $application){
+			if($application['templateid']==0){
+				$name = new CLink($application['name'],'applications.php?form=update&applicationid='.$applicationid);
 			}
-			else {
-				$template_host = get_realhost_by_applicationid($db_app['templateid']);
+			else{
+				$template_host = get_realhost_by_applicationid($application['templateid']);
 				$name = array(
-					new CLink($template_host['host'],'applications.php?hostid='.$template_host['hostid']),
+					new CLink($template_host['host'], 'applications.php?hostid='.$template_host['hostid']),
 					':',
-					$db_app['name']
-					);
+					$application['name']
+				);
 			}
-			$items = get_items_by_applicationid($db_app['applicationid']);
-			$rows=0;
-			while(DBfetch($items))	$rows++;
-
 			$table->addRow(array(
-				new CCheckBox('applications['.$db_app['applicationid'].']',NULL,NULL,$db_app['applicationid']),
+				new CCheckBox('applications['.$applicationid.']',NULL,NULL,$applicationid),
 				$name,
-				array(new CLink(S_ITEMS,'items.php?hostid='.$db_app['hostid']),
-				SPACE.'('.$rows.')')
-				));
-			$row_count++;
+				array(new CLink(S_ITEMS,'items.php?hostid='.$PAGE_HOSTS['selected']),
+				SPACE.'('.count($application['itemids']).')')
+			));
 		}
 
 // goBox
@@ -322,7 +372,7 @@ include_once('include/page_header.php');
 		$goBox->addItem('disable',S_DISABLE_ITEMS);
 		$goBox->addItem('delete',S_DELETE_SELECTED);
 
-// goButton name is necessary!!!
+		// goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "applications";');
@@ -332,11 +382,6 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 		$form->show();
 	}
-
-zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
-
-?>
-<?php
 
 include_once 'include/page_footer.php';
 

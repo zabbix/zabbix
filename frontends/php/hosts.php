@@ -616,6 +616,7 @@ include_once('include/page_header.php');
 					'select_items' => 1,
 					'select_triggers' => 1,
 					'select_graphs' => 1,
+					'select_applications' => 1,
 					'editable' => 1,
 					'sortfield' => getPageSortField('host'),
 					'sortorder' => getPageSortOrder()
@@ -636,6 +637,7 @@ include_once('include/page_header.php');
 		$table->setHeader(array(
 			new CCheckBox('all_hosts',NULL,"checkAll('".$form->getName()."','all_hosts','hosts');"),
 			make_sorting_header(S_NAME,'host'),
+			S_APPLICATIONS,
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
@@ -646,23 +648,19 @@ include_once('include/page_header.php');
 			make_sorting_header(S_STATUS,'status'),
 			S_AVAILABILITY,
 			S_ERROR
-			));
+		));
 		
 		foreach($hosts as $hostid => $row){
 			$description = array();
-
-			$items = array(
-					new CLink(S_ITEMS,'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']),
-					' ('.count($row['itemids']).')'
-				);
-			$triggers = array(
-					new CLink(S_TRIGGERS,'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']),
-					' ('.count($row['triggerids']).')'
-				);
-			$graphs = array(
-					new CLink(S_GRAPHS,'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']),
-					' ('.count($row['graphids']).')'
-				);
+			
+			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']),
+				' ('.count($row['applications']).')');
+			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']),
+				' ('.count($row['itemids']).')');
+			$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']),
+				' ('.count($row['triggerids']).')');
+			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$row['hostid']),
+				' ('.count($row['graphids']).')');
 				
 			if($row['proxy_hostid']){
 				$proxy = get_host_by_hostid($row['proxy_hostid']);
@@ -717,6 +715,7 @@ include_once('include/page_header.php');
 			$table->addRow(array(
 				new CCheckBox('hosts['.$row['hostid'].']',NULL,NULL,$row['hostid']),
 				$description,
+				$applications,
 				$items,
 				$triggers,
 				$graphs,

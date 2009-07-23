@@ -240,7 +240,7 @@ class CApplication {
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
 				foreach($item['applicationids'] as $num => $applicationid){
-					$result[$applicationid]['hostids'][$itemid] = $itemid;
+					$result[$applicationid]['itemids'][$itemid] = $itemid;
 					$result[$applicationid]['items'][$itemid] = $item;
 				}
 			}
