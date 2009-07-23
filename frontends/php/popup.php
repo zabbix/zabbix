@@ -452,7 +452,7 @@ include_once('include/page_header.php');
 								' close_window();';
 				}
 
-				insert_js($script);					
+				insert_js($script);
 			} // if count new_templates > 0
 
 			unset($new_templates);

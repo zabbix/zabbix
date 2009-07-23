@@ -22,7 +22,7 @@
 	require_once('include/forms.inc.php');
 ?>
 <?php
-	$_REQUEST['go'] = get_request('go','none');	
+	$_REQUEST['go'] = get_request('go','none');
 	if(($_REQUEST['go'] == 'export') && isset($_REQUEST['hosts'])){
 		$EXPORT_DATA = true;
 		$page['type'] = PAGE_TYPE_XML;
@@ -267,11 +267,11 @@ include_once('include/page_header.php');
 			$goBox->addItem('back',S_BACK);
 			$goBox->addItem('preview',S_REFRESH);
 			$goBox->addItem('export',S_EXPORT);
-	
+
 // goButton name is necessary!!!
 			$goButton = new CButton('goButton',S_GO);
 			$goButton->setAttribute('id','goButton');
-	
+
 			$form->addItem(array($goBox, $goButton));
 //----
 			$table->setFooter(new CCol($form));
@@ -289,7 +289,7 @@ include_once('include/page_header.php');
 			}
 
 			$form->addItem(array(S_GROUP.SPACE, $cmbGroups));
-			
+
 			show_table_header(S_HOSTS_BIG, $form);
 
 
@@ -297,7 +297,7 @@ include_once('include/page_header.php');
 			$form->setName('hosts_export');
 			$form->addVar('config',$config);
 			$form->addVar('update', true);
-			
+
 			$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 			$table->setHeader(array(
 				new CCheckBox('all_hosts',true, "checkAll('".$form->getName()."','all_hosts','hosts');"),
@@ -449,7 +449,7 @@ include_once('include/page_header.php');
 
 				$checked = (isset($hosts[$host['hostid']]) || !isset($update));
 				if($checked) $count_chkbx++;
-				
+
 				$table->addRow(array(
 					new CCheckBox('hosts['.$host['hostid'].']',$checked,NULL,true),
 					$host['host'],
@@ -473,12 +473,12 @@ include_once('include/page_header.php');
 			$goBox = new CComboBox('go');
 			$goBox->addItem('preview',S_PREVIEW);
 			$goBox->addItem('export',S_EXPORT);
-	
+
 // goButton name is necessary!!!
 			$goButton = new CButton('goButton',S_GO.' ('.$count_chkbx.')');
 			$goButton->setAttribute('id','goButton');
 			zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
-	
+
 			$table->setFooter(new CCol(array($goBox, $goButton)));
 //----
 
@@ -487,6 +487,6 @@ include_once('include/page_header.php');
 		}
 	}
 
-	
+
 include_once "include/page_footer.php";
 ?>

@@ -26,11 +26,11 @@
 	$page['file'] = 'proxies.php';
 	$page['hist_arg'] = array('config');
 	// $page['scripts'] = array('menu_scripts.js','calendar.js');
-	
+
 include_once('include/page_header.php');
 
 	$_REQUEST['config'] = get_request('config','proxies.php');
-	
+
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 
@@ -43,10 +43,10 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'config'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		
+
 /* ARRAYS */
 		'hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'isset({form})&&({form}=="update")'),
-		'host'=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'isset({save})'),		
+		'host'=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'isset({save})'),
 		'hosts'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 
 // Actions
@@ -62,10 +62,10 @@ include_once('include/page_header.php');
 		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
-	
+
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
-	
+
 	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
@@ -172,7 +172,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$params = array();
-	
+
 	$options = array('only_current_node', 'allow_all');
 	if(isset($_REQUEST['form']) || isset($_REQUEST['massupdate'])) array_push($options,'do_not_select_if_empty');
 
@@ -181,33 +181,33 @@ include_once('include/page_header.php');
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, 0, $params);
 
 	validate_group($PAGE_GROUPS, $PAGE_HOSTS, false);
-			
+
 	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 
-	
+
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
-	
+
 // Config
 	$cmbConf = new CComboBox('config','proxies.php','javascript: submit()');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');	
+	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('nodes.php',S_NODES);
 		$cmbConf->addItem('proxies.php',S_PROXIES);
-		
+
 	$frmForm->addItem($cmbConf);
-	
+
 	if(!isset($_REQUEST["form"])){
 		$frmForm->addItem(new CButton('form',S_CREATE_PROXY));
 	}
-	
+
 	show_table_header(S_CONFIGURATION_OF_PROXIES, $frmForm);
 
 	$row_count = 0;
 
 	echo SBR;
 	if(isset($_REQUEST["form"])){
-	
+
 		global	$USER_DETAILS;
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
@@ -244,7 +244,7 @@ include_once('include/page_header.php');
 		$frmHostG->addRow(S_PROXY_NAME,new CTextBox("host",$name,30));
 
 		$cmbHosts = new CTweenBox($frmHostG,'hosts',$hosts);
-		
+
 		$sql = 'SELECT hostid,proxy_hostid,host '.
 				' FROM hosts '.
 				' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
@@ -275,7 +275,7 @@ include_once('include/page_header.php');
 		$frmHostG->show();
 	}
 	else {
-			
+
 		$numrows = new CSpan(null,'info');
 		$numrows->setAttribute('name','numrows');
 		$header = get_table_header(array(S_PROXIES_BIG,
@@ -356,7 +356,7 @@ include_once('include/page_header.php');
 
 		$form->addItem($table);
 		$form->show();
-		
+
 		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 	}
 

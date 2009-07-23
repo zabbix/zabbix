@@ -301,10 +301,10 @@ include_once('include/page_header.php');
 	else if(str_in_array($_REQUEST['go'], array('activate','disable')) && isset($_REQUEST['g_actionid'])){
 		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
-		
+
 		$status = ($_REQUEST['go'] == 'activate')?0:1;
 		$status_name = $status?'disabled':'enabled';
-		
+
 		DBstart();
 		$actionids = array();
 		$sql = 'SELECT DISTINCT a.actionid '.

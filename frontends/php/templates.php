@@ -372,9 +372,9 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 	}
 
 	show_table_header(S_CONFIGURATION_OF_TEMPLATES, $frmForm);
-	
+
 	echo SBR;
-		
+
 	if(isset($_REQUEST['form'])){
 	// FORM 1 insert_template_form
 		$templateid = get_request('templateid', 0);
@@ -630,7 +630,7 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 
 // <<<--- GENERATE OUTPUTS --->>>
 		$config = select_config();
-		
+
 // <<<--- $templates = get all available templates --->>>
 		$options = array('editable' => 1,
 						'extendoutput' => 1,
@@ -654,7 +654,7 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 
 			$i = 0;
 			$linked_templates_output = array();
-			
+
 			order_result($template['templates'], 'host');
 			foreach($template['templates'] as $linked_templateid => $linked_template){
 				$i++;
@@ -673,7 +673,7 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 
 			$i = 0;
 			$linked_to_hosts_output = array();
-			
+
 			order_result($template['hosts'], 'host');
 			foreach($template['hosts'] as $linked_to_hostid => $linked_to_host){
 				$i++;
@@ -682,7 +682,7 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 					$linked_to_hosts_output[] = '//empty element for array_pop';
 					break;
 				}
-				
+
 				switch($linked_to_host['status']){
 					case HOST_STATUS_NOT_MONITORED:
 						$style = 'on';
@@ -697,7 +697,7 @@ else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isse
 						$url = 'hosts.php?form=update&hostid='.$linked_to_hostid.'&groupid='.$selected_group;
 					break;
 				}
-				
+
 				$linked_to_hosts_output[] = new CLink($linked_to_host['host'], $url, $style);
 				$linked_to_hosts_output[] = ', ';
 			}

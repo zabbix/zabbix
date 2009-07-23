@@ -248,7 +248,7 @@ include_once('include/page_header.php');
 				$status
 				));
 		}
-		
+
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('activate',S_ENABLE_SELECTED);

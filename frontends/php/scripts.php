@@ -110,13 +110,13 @@ if(isset($_REQUEST['action'])){
 	}
 	else if(isset($_REQUEST['delete'])){
 		$scriptid = get_request('scriptid', 0);
-		
+
 		$result &= delete_script($scriptid);
 
 		if($result){
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, S_SCRIPT.' ['.$scriptid.']');
 		}
-		
+
 		show_messages($result, S_SCRIPT_DELETED, S_CANNOT_DELETE_SCRIPT);
 
 		if($result){
@@ -136,7 +136,7 @@ if(isset($_REQUEST['action'])){
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, S_SCRIPT.' ['.$scriptid.']');
 			}
 		}
-		
+
 		show_messages($result, S_SCRIPT_DELETED, S_CANNOT_DELETE_SCRIPT);
 
 		if($result){
@@ -289,7 +289,7 @@ else {
 			));
 		$row_count++;
 	}
-	
+
 //----- GO ------
 	$goBox = new CComboBox('go');
 	$goBox->addItem('delete',S_DELETE_SELECTED);

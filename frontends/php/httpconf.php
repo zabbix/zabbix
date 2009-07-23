@@ -80,7 +80,7 @@ include_once 'include/page_header.php';
 
 	check_fields($fields);
 	validate_sort_and_sortorder('wt.name',ZBX_SORT_UP);
-	
+
 	$_REQUEST['go'] = get_request('go','none');
 ?>
 <?php
@@ -453,7 +453,7 @@ include_once 'include/page_header.php';
 			$step_cout = DBfetch(DBselect('select count(*) as cnt from httpstep where httptestid='.$httptest_data['httptestid']));
 			$step_cout = $step_cout['cnt'];
 
-			array_push($app_rows, 
+			array_push($app_rows,
 				new CRow(array(
 					$chkBox,
 					is_show_all_nodes()?SPACE:NULL,
@@ -495,7 +495,7 @@ include_once 'include/page_header.php';
 			foreach($app_rows as $row)
 				$table->addRow($row);
 		}
-		
+
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
