@@ -36,17 +36,17 @@ class Curl{
  protected $arguments;
 
 	public function __construct($url=null){
-		$this->url = 		null;
+		$this->url =		null;
 		$this->port =		null;
-		$this->host = 		null;
-		$this->protocol = 	null;
+		$this->host =		null;
+		$this->protocol =	null;
 		$this->username =	null;
 		$this->password =	null;
 		$this->file =		null;
 		$this->reference =	null;
 		$this->path =		null;
 		$this->query =		null;
-		$this->arguments = 	array();
+		$this->arguments =	array();
 
 		if(empty($url)){
 			$this->formatArguments();
@@ -128,7 +128,7 @@ class Curl{
 		}
 
 		$this->path=$this->file;
-		if(zbx_strlen($this->query)>0) 		$this->file.='?'.$this->query;
+		if(zbx_strlen($this->query)>0)		$this->file.='?'.$this->query;
 		if(zbx_strlen($this->reference)>0)	$this->file.='#'.$this->reference;
 
 		if(isset($_COOKIE['zbx_sessionid']))
