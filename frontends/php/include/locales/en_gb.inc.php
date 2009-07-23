@@ -476,7 +476,7 @@
 
 	'S_DELETE_REGULAR_EXPRESSION_Q'=>		'Delete regular expression?',
 	'S_DELETE_SELECTED_REGULAR_EXPRESSIONS_Q'=>	'Delete selected regular expressions?',
-	
+
 	'S_GROUP_FOR_DISCOVERED_HOSTS'=>		'Group for discovered hosts',
 
 //	nodes.php
