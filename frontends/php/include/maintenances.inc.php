@@ -37,7 +37,7 @@ function get_accessible_maintenance_by_user($perm,$perm_res=null,$nodeid=null,$h
 	$denied_maintenances = array();
 	$available_maintenances = array();
 
-	$sql = 	'SELECT DISTINCT m.maintenanceid '.
+	$sql =	'SELECT DISTINCT m.maintenanceid '.
 			' FROM maintenances m, maintenances_hosts mh, maintenances_groups mg, hosts_groups hg '.
 			' WHERE '.DBcondition('hg.hostid',$available_hosts,true).
 				(!empty($hostid)?' AND hg.hostid='.$hostid:'').
@@ -184,13 +184,13 @@ return $result;
 // author: Aly
 function add_timeperiod($timeperiod = array()){
 	$db_fields = array('timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
-						'every' =>	 0,
-						'month' =>	 0,
-						'dayofweek' => 0,
-						'day' => 0,
-						'start_time' => 0,
-						'period' => 3600,
-						'date' => time()
+						'every' =>	0,
+						'month' =>	0,
+						'dayofweek' =>	0,
+						'day' =>	0,
+						'start_time' =>	0,
+						'period' =>	3600,
+						'date' =>	time()
 					);
 
 	if(!check_db_fields($db_fields, $timeperiod)){
@@ -293,8 +293,8 @@ function shedule2str($timeperiod){
 	$timeperiod['hour'] = floor($timeperiod['start_time'] / 3600);
 	$timeperiod['minute'] = floor(($timeperiod['start_time'] - ($timeperiod['hour'] * 3600)) / 60);
 
-	if($timeperiod['hour'] < 10) 	$timeperiod['hour']='0'.$timeperiod['hour'];
-	if($timeperiod['minute'] < 10) 	$timeperiod['minute']='0'.$timeperiod['minute'];
+	if($timeperiod['hour'] < 10)	$timeperiod['hour']='0'.$timeperiod['hour'];
+	if($timeperiod['minute'] < 10)	$timeperiod['minute']='0'.$timeperiod['minute'];
 
 
 	$str = 'At '.$timeperiod['hour'].':'.$timeperiod['minute'].' on ';
