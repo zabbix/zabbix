@@ -23,32 +23,32 @@ class CUserGroup {
 	 * @param array $options['nodeids'] Node IDs
 	 * @param array $options['usrgrpids'] UserGroup IDs
 	 * @param array $options['userids'] User IDs
-	 * @param boolean $options['status'] 
-	 * @param boolean $options['with_gui_access'] 
-	 * @param boolean $options['with_api_access'] 
-	 * @param boolean $options['select_users'] 
-	 * @param int $options['extendoutput'] 
-	 * @param int $options['count'] 
-	 * @param string $options['pattern'] 
+	 * @param boolean $options['status']
+	 * @param boolean $options['with_gui_access']
+	 * @param boolean $options['with_api_access']
+	 * @param boolean $options['select_users']
+	 * @param int $options['extendoutput']
+	 * @param int $options['count']
+	 * @param string $options['pattern']
 	 * @param int $options['limit'] limit selection
-	 * @param string $options['order'] 
+	 * @param string $options['order']
 	 * @return array
 	 */
 	public static function get($options=array()){
 		global $USER_DETAILS;
 
 		$result = array();
-		
+
 		$sort_columns = array('usrgrpid', 'name'); // allowed columns for sorting
-	
-	
+
+
 		$sql_parts = array(
 			'select' => array('usrgrp' => 'g.usrgrpid'),
 			'from' => array('usrgrp g'),
 			'where' => array(),
 			'order' => array(),
 			'limit' => null);
-		
+
 		$def_options = array(
 			'nodeids'					=> 0,
 			'usrgrpids'					=> 0,
@@ -105,7 +105,7 @@ class CUserGroup {
 		if($options['extendoutput'] != 0){
 			$sql_parts['select']['usrgrp'] = 'g.*';
 		}
-		
+
 // count
 		if($options['count'] != 0){
 			$options['select_users'] = 0;
@@ -131,12 +131,12 @@ class CUserGroup {
 		}
 //-------
 		$usrgrpids = array();
-		
+
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
-	
+
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
@@ -144,7 +144,7 @@ class CUserGroup {
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);	
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.$sql_select.'
@@ -164,26 +164,26 @@ class CUserGroup {
 				}
 				else{
 					if(!isset($result[$usrgrp['usrgrpid']])) $result[$usrgrp['usrgrpid']]= array();
-					
+
 					if($options['select_users'] && !isset($result[$usrgrp['usrgrpid']]['userids'])){
 						$result[$usrgrp['usrgrpid']]['userids'] = array();
 						$result[$usrgrp['usrgrpid']]['users'] = array();
 					}
-					
+
 					// groupids
 					if(isset($usrgrp['userid'])){
-						if(!isset($result[$usrgrp['usrgrpid']]['userids'])) 
+						if(!isset($result[$usrgrp['usrgrpid']]['userids']))
 							$result[$usrgrp['usrgrpid']]['userids'] = array();
-							
+
 						$result[$usrgrp['usrgrpid']]['userids'][$usrgrp['userid']] = $usrgrp['userid'];
 						unset($usrgrp['userid']);
 					}
-					
+
 					$result[$usrgrp['usrgrpid']] += $usrgrp;
 				}
 			}
 		}
-		
+
 // Adding Objects
 
 // Adding users
@@ -200,7 +200,7 @@ class CUserGroup {
 
 	return $result;
 	}
-	
+
 	/**
 	 * Gets all UserGroup data from DB by usrgrpid.
 	 *
@@ -291,9 +291,9 @@ class CUserGroup {
 		$result = false;
 
 		DBstart(false);
-		
+
 		foreach($groups as $group){
-		
+
 			$group_db_fields = array(
 				'name' 				=> null,
 				'users_status' 		=> GROUP_STATUS_DISABLED,
@@ -306,7 +306,7 @@ class CUserGroup {
 				$error = 'Wrong fields for user group [ '.$group['name'].' ]';
 				break;
 			}
-				
+
 			$result = add_user_group($group['name'], $group['users_status'], $group['gui_access'], $group['api_access']);
 			if(!$result) break;
 		}
@@ -384,19 +384,19 @@ class CUserGroup {
 	 */
 	public static function updateRights($rights){
 		$result = false;
-		
+
 		$usrgrpid = $rights['usrgrpid'];
-		
+
 		DBstart(false);
 		$result=DBexecute("DELETE FROM rights WHERE groupid=".$usrgrpid);
-		
+
 		foreach($rights['rights'] as $right){
 			$id = get_dbid('rights', 'rightid');
 			$result = DBexecute('INSERT INTO rights (rightid, groupid, permission, id)'.
 				' VALUES ('.$id.','.$usrgrpid.','.$right['permission'].','.$right['id'].')');
 			if(!$result) break;
 		}
-		
+
 		$result = DBend($result);
 		if($result)
 			return true;
@@ -405,7 +405,7 @@ class CUserGroup {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Add rights for UserGroup to HostGroups. Existing rights are updated, new ones added.
 	 *
@@ -427,15 +427,15 @@ class CUserGroup {
 	 */
 	public static function addRights($rights){
 		$result = false;
-		
+
 		$usrgrpid = $rights['usrgrpid'];
 
 		DBstart(false);
-		
+
 		foreach($rights['rights'] as $right){
 			$sql = 'SELECT rightid, permission FROM rights WHERE groupid='.$usrgrpid.' AND id='.$right['id'];
 			$curr_perm = DBfetch(DBselect($sql));
-			
+
 			if($curr_perm){
 				if($curr_perm['permission'] != $right['permission']){
 					$sql = 'UPDATE rights SET permission='.$right['permission'].' WHERE rightid='.$curr_perm['rightid'];
@@ -449,7 +449,7 @@ class CUserGroup {
 			$result = DBexecute($sql);
 			if(!$result) break;
 		}
-		
+
 		$result = DBend($result);
 
 		if($result)
@@ -459,7 +459,7 @@ class CUserGroup {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Add Users to UserGroup.
 	 *
@@ -481,14 +481,14 @@ class CUserGroup {
 	 */
 	public static function addUsers($data){
 		$result = false;
-		
+
 		DBstart(false);
 		foreach($data['userids'] as $userid){
 			$result = add_user_to_group($userid, $data['usrgrpid']);
 			if(!$result) break;
 		}
 		$result = DBend($result);
-		
+
 		if($result)
 			return true;
 		else{
@@ -496,7 +496,7 @@ class CUserGroup {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Remove users from UserGroup.
 	 *
@@ -518,14 +518,14 @@ class CUserGroup {
 	 */
 	public static function removeUsers($data){
 		$result = false;
-		
+
 		DBstart(false);
 		foreach($data['userids'] as $userid){
 			$result = remove_user_from_group($userid, $data['usrgrpid']);
 			if(!$result) break;
 		}
 		$result = DBend($result);
-		
+
 		if($result)
 			return true;
 		else{
@@ -533,7 +533,7 @@ class CUserGroup {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Delete UserGroups.
 	 *
@@ -548,14 +548,14 @@ class CUserGroup {
 	 */
 	public static function delete($groupids){
 		$result = false;
-		
+
 		DBstart(false);
 		foreach($groupids as $groupid){
 			$result = delete_user_group($groupid);
 			if(!$resukt) break;
 		}
 		DBend($result);
-		
+
 		if($result)
 			return true;
 		else{

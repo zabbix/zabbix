@@ -42,10 +42,10 @@ class CTrigger {
 		$result = array();
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
-		
+
 		$sort_columns = array('triggerid', 'description', 'status', 'priority'); // allowed columns for sorting
 
-		
+
 		$sql_parts = array(
 			'select' => array('triggers' => 't.triggerid'),
 			'from' => array('triggers t'),
@@ -77,17 +77,17 @@ class CTrigger {
 
 		$options = array_merge($def_options, $options);
 
-		
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
 		}
-		
+
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
-			   
+
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
@@ -191,17 +191,17 @@ class CTrigger {
 		if($options['templated_triggers'] != 0){
 			$sql_parts['where'][] = 't.templateid<>0';
 		}
-		
+
 // extendoutput
 		if($options['extendoutput'] != 0){
 			$sql_parts['select']['triggers'] = 't.*';
 		}
-		
+
 // count
 		if($options['count'] != 0){
 			$sql_parts['select']['triggers'] = 'count(t.triggerid) as rowscount';
 		}
-		
+
 // pattern
 		if(!zbx_empty($options['pattern'])){
 			$sql_parts['where'][] = ' UPPER(t.description) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
@@ -210,7 +210,7 @@ class CTrigger {
 // order
 		// restrict not allowed columns for sorting
 		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
-		
+
 		if(!zbx_empty($options['order'])){
 			$sql_parts['order'][] = 't.'.$options['order'];
 			if(!str_in_array('t.'.$options['order'], $sql_parts['select'])) $sql_parts['select'][] = 't.'.$options['order'];
@@ -223,12 +223,12 @@ class CTrigger {
 //---------------
 
 		$triggerids = array();
-		
+
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
-	
+
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
@@ -236,7 +236,7 @@ class CTrigger {
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);			
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.$sql_select.
@@ -250,22 +250,22 @@ class CTrigger {
 				$result = $trigger;
 			else{
 				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
-				
+
 				if($options['extendoutput'] == 0){
 					$result[$trigger['triggerid']] = $trigger['triggerid'];
 				}
 				else{
 					if(!isset($result[$trigger['triggerid']])) $result[$trigger['triggerid']]= array();
 
-					if($options['select_hosts'] && !isset($result[$trigger['triggerid']]['hostids'])){ 
+					if($options['select_hosts'] && !isset($result[$trigger['triggerid']]['hostids'])){
 						$result[$trigger['triggerid']]['hostids'] = array();
 						$result[$trigger['triggerid']]['hosts'] = array();
 					}
-					if($options['select_items'] && !isset($result[$trigger['triggerid']]['itemids'])){ 
+					if($options['select_items'] && !isset($result[$trigger['triggerid']]['itemids'])){
 						$result[$trigger['triggerid']]['itemids'] = array();
 						$result[$trigger['triggerid']]['items'] = array();
 					}
-					
+
 					// hostids
 					if(isset($trigger['hostid'])){
 						if(!isset($result[$trigger['triggerid']]['hostids'])) $result[$trigger['triggerid']]['hostids'] = array();
@@ -280,12 +280,12 @@ class CTrigger {
 						$result[$trigger['triggerid']]['itemids'][$trigger['itemid']] = $trigger['itemid'];
 						unset($trigger['itemid']);
 					}
-					
+
 					$result[$trigger['triggerid']] += $trigger;
 				}
 			}
 		}
-		
+
 // Adding Objects
 
 // Adding hosts
@@ -311,7 +311,7 @@ class CTrigger {
 				}
 			}
 		}
-		
+
 	return $result;
 	}
 

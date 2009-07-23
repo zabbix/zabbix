@@ -84,10 +84,10 @@ class CHostGroup {
 		$result = array();
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
-		
+
 		$sort_columns = array('groupid', 'name'); // allowed columns for sorting
-		
-		
+
+
 		$sql_parts = array(
 			'select'	=> array('groups' => 'g.groupid'),
 			'from' 		=> array('groups g'),
@@ -122,7 +122,7 @@ class CHostGroup {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> 0);
-					
+
 		$options = array_merge($def_options, $params);
 
 
@@ -137,17 +137,17 @@ class CHostGroup {
 			$sql_parts['order'][] = 'node_name';
 		}
 // *** ????? *** //
-		
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
 		}
-		
+
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
-			
+
 			$sql_parts['from']['r'] = 'rights r';
 			$sql_parts['from']['ug'] = 'users_groups ug';
 			$sql_parts['where'][] = 'r.id=g.groupid';
@@ -286,7 +286,7 @@ class CHostGroup {
 		if($options['extendoutput'] != 0){
 			$sql_parts['select']['groups'] = 'g.*';
 		}
-		
+
 // count
 		if($options['count'] != 0){
 			$options['select_hosts'] = 0;
@@ -305,9 +305,9 @@ class CHostGroup {
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
 		if(!zbx_empty($options['sortfield'])){
 			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-			
+
 			$sql_parts['order'][] = 'g.'.$options['sortfield'].' '.$sortorder;
-			
+
 			if(!str_in_array('g.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('g.*', $sql_parts['select'])){
 				$sql_parts['select'][] = 'g.'.$options['sortfield'];
 			}
@@ -321,14 +321,14 @@ class CHostGroup {
 			$sql_parts['limit'] = 1001;
 		}
 //-----------
-		
+
 		$groupids = array();
-		
+
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
-	
+
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
@@ -336,7 +336,7 @@ class CHostGroup {
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);			
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.$sql_select.
@@ -354,28 +354,28 @@ class CHostGroup {
 				}
 				else{
 					$groupids[$group['groupid']] = $group['groupid'];
-					
+
 					if(!isset($result[$group['groupid']])) $result[$group['groupid']]= array();
-					
-					if($options['select_hosts'] && !isset($result[$group['groupid']]['hostids'])){ 
+
+					if($options['select_hosts'] && !isset($result[$group['groupid']]['hostids'])){
 						$result[$group['groupid']]['hostids'] = array();
 						$result[$group['groupid']]['hosts'] = array();
 					}
 
 					// hostids
 					if(isset($group['hostid'])){
-						if(!isset($result[$group['groupid']]['hostids'])) 
+						if(!isset($result[$group['groupid']]['hostids']))
 							$result[$group['groupid']]['hostids'] = array();
-							
+
 						$result[$group['groupid']]['hostids'][$group['hostid']] = $group['hostid'];
 						unset($group['hostid']);
 					}
 
 					$result[$group['groupid']] += $group;
-				}	
+				}
 			}
 		}
-		
+
 // Adding hosts
 		if($options['select_hosts']){
 			$obj_params = array('extendoutput' => 1, 'groupids' => $groupids, 'templated_hosts' => 1);
@@ -578,7 +578,7 @@ class CHostGroup {
 	}
 
 	/**
-	 * Update Host's HostGroups with new HostGroups (rewrite) 
+	 * Update Host's HostGroups with new HostGroups (rewrite)
 	 *
 	 * {@source}
 	 * @access public

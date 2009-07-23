@@ -52,7 +52,7 @@ public static $result;
 			self::$result = array('error'=>ZBX_API_ERROR_NO_AUTH, 'data'=>'Not authorized');
 			return self::$result;
 		}
-		
+
 		switch($resource){
 			case 'user':
 				self::user($action, $params);
@@ -79,7 +79,7 @@ public static $result;
 				self::$result = array('error'=>ZBX_API_ERROR_PARAMETERS);
 			break;
 		}
-		
+
 	return self::$result;
 	}
 
@@ -98,7 +98,7 @@ public static $result;
 				return; //exit function
 			break;
 		}
-		
+
 		if($result !== false){
 			self::$result = array('result' => $result);
 		}
