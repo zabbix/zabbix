@@ -582,7 +582,7 @@ require_once('include/httptest.inc.php');
 // delete action conditions
 		DBexecute('DELETE FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_HOST.
-						' AND '.DBcondition('value',$hostids, false, true)); 	// FIXED[POSIBLE value type violation]!!!
+						' AND '.DBcondition('value',$hostids, false, true));	// FIXED[POSIBLE value type violation]!!!
 
 
 // delete action operations
@@ -776,7 +776,7 @@ require_once('include/httptest.inc.php');
 // delete action conditions
 			DBexecute('DELETE FROM conditions '.
 					' WHERE conditiontype='.CONDITION_TYPE_PROXY.
-					' AND '.DBcondition('value',$proxyids, false, true)); 	// FIXED[POSIBLE value type violation]!!!
+					' AND '.DBcondition('value',$proxyids, false, true));	// FIXED[POSIBLE value type violation]!!!
 		}
 
 		if(!DBexecute('UPDATE hosts SET proxy_hostid=0 WHERE '.DBcondition('proxy_hostid',$proxyids)))

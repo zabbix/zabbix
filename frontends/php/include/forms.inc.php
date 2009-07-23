@@ -148,7 +148,7 @@
 		$form->addItemToBottomRow(SPACE);
 		$form->addItemToBottomRow(new CButtonCancel());
 
-                $form->show();
+		$form->show();
 	}
 
 	function insert_drule_form(){
@@ -484,9 +484,9 @@
 		foreach($steps as $stepid => $s){
 			if(!isset($s['name']))		$s['name'] = '';
 			if(!isset($s['timeout']))	$s['timeout'] = 15;
-			if(!isset($s['url']))       	$s['url'] = '';
-			if(!isset($s['posts']))       	$s['posts'] = '';
-			if(!isset($s['required']))       $s['required'] = '';
+			if(!isset($s['url']))		$s['url'] = '';
+			if(!isset($s['posts']))		$s['posts'] = '';
+			if(!isset($s['required']))	$s['required'] = '';
 
 			$up = null;
 			if($stepid != $first)
@@ -550,7 +550,7 @@
 		$form->addItemToBottomRow(SPACE);
 		$form->addItemToBottomRow(new CButtonCancel());
 
-                $form->show();
+		$form->show();
 	}
 
 	function insert_configuration_form($file)
@@ -651,9 +651,9 @@
 			$autologin	= $user['autologin'];
 			$autologout	= $user['autologout'];
 			$lang		= $user['lang'];
-			$theme 		= $user['theme'];
+			$theme		= $user['theme'];
 			$refresh	= $user['refresh'];
-			$rows_per_page = $user['rows_per_page'];
+			$rows_per_page	= $user['rows_per_page'];
 			$user_type	= $user['type'];
 
 			if($autologout > 0) $_REQUEST['autologout'] = $autologout;
@@ -689,24 +689,24 @@
 			$name		= get_request('name','');
 			$surname	= get_request('surname','');
 			$password	= null;
-			$password1 	= get_request('password1', '');
-			$password2 	= get_request('password2', '');
-			$url 		= get_request('url','');
+			$password1	= get_request('password1', '');
+			$password2	= get_request('password2', '');
+			$url		= get_request('url','');
 
 			$autologin	= get_request('autologin',0);
 			$autologout	= get_request('autologout',90);
 
 			$lang		= get_request('lang','en_gb');
-			$theme 		= get_request('theme','default.css');
+			$theme		= get_request('theme','default.css');
 			$refresh	= get_request('refresh',30);
-			$rows_per_page = get_request('rows_per_page',50);
+			$rows_per_page	= get_request('rows_per_page',50);
 
-			$user_type	= get_request('user_type',USER_TYPE_ZABBIX_USER);;
-			$user_groups	= get_request('user_groups',array());
-			$change_password = get_request('change_password', null);
+			$user_type		= get_request('user_type',USER_TYPE_ZABBIX_USER);;
+			$user_groups		= get_request('user_groups',array());
+			$change_password	= get_request('change_password', null);
 			$user_medias		= get_request('user_medias', array());
-			$new_group_id	= get_request('new_group_id', 0);
-			$new_group_name = get_request('new_group_name', '');
+			$new_group_id		= get_request('new_group_id', 0);
+			$new_group_name		= get_request('new_group_name', '');
 		}
 
 		if($autologin || !isset($_REQUEST['autologout'])){
@@ -964,7 +964,7 @@
 		$frm_title = S_USER_GROUP;
 		if(isset($_REQUEST["usrgrpid"])){
 			$usrgrp		= get_group_by_usrgrpid($_REQUEST["usrgrpid"]);
-			$frm_title 	= S_USER_GROUP.' "'.$usrgrp['name'].'"';
+			$frm_title	= S_USER_GROUP.' "'.$usrgrp['name'].'"';
 		}
 
 		if(isset($_REQUEST["usrgrpid"]) && !isset($_REQUEST["form_refresh"])){
@@ -1006,10 +1006,10 @@
 		}
 		else{
 			$name			= get_request('gname','');
-			$users_status 	= get_request('users_status',GROUP_STATUS_ENABLED);
-			$gui_access 	= get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);
-			$api_access 	= get_request('api_access',GROUP_API_ACCESS_DISABLED);
-			$debug_mode 	= get_request('debug_mode',GROUP_DEBUG_MODE_DISABLED);
+			$users_status	= get_request('users_status',GROUP_STATUS_ENABLED);
+			$gui_access	= get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);
+			$api_access	= get_request('api_access',GROUP_API_ACCESS_DISABLED);
+			$debug_mode	= get_request('debug_mode',GROUP_DEBUG_MODE_DISABLED);
 			$group_users	= get_request("group_users",array());
 			$group_rights	= get_request("group_rights",array());
 		}
@@ -1336,8 +1336,8 @@
 			$cmbValType->addItem(-1,	S_ALL_SMALL);
 			$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);
 			$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT,		S_NUMERIC_FLOAT);
-			$cmbValType->addItem(ITEM_VALUE_TYPE_STR, 		S_CHARACTER);
-			$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, 		S_LOG);
+			$cmbValType->addItem(ITEM_VALUE_TYPE_STR,		S_CHARACTER);
+			$cmbValType->addItem(ITEM_VALUE_TYPE_LOG,		S_LOG);
 			$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,		S_TEXT);
 			$form->addRow(array(S_WITH_SMALL.SPACE,bold(S_TYPE_OF_INFORMATION)),$cmbValType);
 
@@ -1346,7 +1346,7 @@
 			$cmbDataType->addItem(-1,			S_ALL_SMALL);
 			$cmbDataType->addItem(ITEM_DATA_TYPE_DECIMAL,		item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
 			$cmbDataType->addItem(ITEM_DATA_TYPE_OCTAL,		item_data_type2str(ITEM_DATA_TYPE_OCTAL));
-			$cmbDataType->addItem(ITEM_DATA_TYPE_HEXADECIMAL, 	item_data_type2str(ITEM_DATA_TYPE_HEXADECIMAL));
+			$cmbDataType->addItem(ITEM_DATA_TYPE_HEXADECIMAL,	item_data_type2str(ITEM_DATA_TYPE_HEXADECIMAL));
 			$form->addRow(array(S_WITH_SMALL.SPACE, bold(S_DATA_TYPE)), $cmbDataType);
 		}
 
@@ -1408,9 +1408,9 @@
 		$units				= get_request('units',		'');
 		$valuemapid			= get_request('valuemapid',	0);
 		$params				= get_request('params',		'DSN=<database source name>\n'.
-														 'user=<user name>\n'.
-														 'password=<password>\n'.
-														 'sql=<query>');
+														'user=<user name>\n'.
+														'password=<password>\n'.
+														'sql=<query>');
 		$multiplier			= get_request('multiplier',	0);
 		$delta				= get_request('delta',		0);
 		$trends				= get_request('trends',		365);
@@ -1430,7 +1430,7 @@
 
 		$add_groupid	= get_request('add_groupid'	,get_request('groupid',0));
 
-		$limited 	= null;
+		$limited	= null;
 
 		if(zbx_empty($key) && ($type == ITEM_TYPE_DB_MONITOR))
 			$key = 'db.odbc.select[<unique short description>]';
@@ -1523,10 +1523,10 @@
 				$frmItem->addVar('delay_flex['.$i.'][delay]', $val['delay']);
 				$frmItem->addVar('delay_flex['.$i.'][period]', $val['period']);
 				$i++;
-				if($i >= 7) break; /* limit count of  intervals
-						    * 7 intervals by 30 symbols = 210 characters
-						    * db storage field is 256
-						    */
+				if($i >= 7) break;	/* limit count of  intervals
+							* 7 intervals by 30 symbols = 210 characters
+							* db storage field is 256
+							*/
 			}
 		}
 
@@ -6222,8 +6222,8 @@
 			$db_link = DBfetch($db_links);
 
 
-			$selementid1	= $db_link['selementid1'];
-			$selementid2	= $db_link['selementid2'];
+			$selementid1		= $db_link['selementid1'];
+			$selementid2		= $db_link['selementid2'];
 			$triggers		= array();
 			$drawtype		= $db_link['drawtype'];
 			$color			= $db_link['color'];
@@ -6237,9 +6237,9 @@
 			if(isset($_REQUEST['linkid'])) $frmCnct->addVar('linkid',$_REQUEST['linkid']);
 			$selementid1	= get_request('selementid1',	0);
 			$selementid2	= get_request('selementid2',	0);
-			$triggers		= get_request('triggers',	array());
-			$drawtype		= get_request('drawtype',	0);
-			$color			= get_request('color',	0);
+			$triggers	= get_request('triggers',	array());
+			$drawtype	= get_request('drawtype',	0);
+			$color		= get_request('color',		0);
 		}
 
 /* START comboboxes preparations */
