@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -80,7 +80,7 @@ extern sqlite3		*conn;
 void	SQ_DBfree_result(DB_RESULT result);
 
 	extern PHP_MUTEX	sqlite_access;
-	
+
 #endif
 
 #ifdef HAVE_MYSQL
