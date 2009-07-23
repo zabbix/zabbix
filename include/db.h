@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -406,7 +406,7 @@ DB_ITEM
 	int	maintenance_type;
 	int	maintenance_from;
 };
- 
+
 DB_FUNCTION
 {
 	zbx_uint64_t     functionid;

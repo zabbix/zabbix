@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -23,7 +23,7 @@
 
 #include "common.h"
 
-/* agent return value */					 
+/* agent return value */
 typedef struct zbx_result_s {
 	int	 	type;
 	zbx_uint64_t	ui64;
@@ -60,14 +60,14 @@ typedef struct zbx_result_s {
 	{ \
 	(res)->type |= AR_STRING; \
 	(res)->str = (char*)(val); \
-	} 
+	}
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_TEXT_RESULT(res, val) \
 	{ \
 	(res)->type |= AR_TEXT; \
 	(res)->text = (char*)(val); \
-	} 
+	}
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_MSG_RESULT(res, val) \

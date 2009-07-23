@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -43,7 +43,7 @@
 	#define zbx_thread_kill(h) TerminateThread(h, SUCCEED);
 
 #else /* not _WINDOWS */
-	
+
 	int	zbx_fork();
 
 	#define ZBX_THREAD_ERROR (-1)

@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -41,6 +41,6 @@ void	proxy_process_new_value(DB_ITEM *item, AGENT_RESULT *value, time_t now);
 
 void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, DB_ESCALATION *escalation, char **data, int macro_type);
 void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escalation, char **data);
-	
+
 int	evaluate_expression(int *result,char **expression, DB_TRIGGER *triggger, char *error, int maxerrlen);
 #endif

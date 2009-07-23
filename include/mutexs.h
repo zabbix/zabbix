@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -37,7 +37,7 @@
 
 #	define ZBX_MUTEX_ERROR		(-1)
 #	define ZBX_MUTEX_OK		(1)
-	
+
 #	define ZBX_MUTEX_NAME		int
 
 #	define ZBX_MUTEX_LOG		0
