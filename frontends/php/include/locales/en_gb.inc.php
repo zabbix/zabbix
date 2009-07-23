@@ -1166,14 +1166,14 @@
 	'S_SATURDAY'=>				'Saturday',
 
 //	srv_status.php
-	'S_IT_SERVICES_BIG'=>		'IT SERVICES',
+	'S_IT_SERVICES_BIG'=>			'IT SERVICES',
 	'S_SERVICE'=>				'Service',
 	'S_SERVICES'=>				'Services',
 	'S_REASON'=>				'Reason',
-	'S_SLA_LAST_7_DAYS'=>		'SLA (last 7 days)',
-	'S_PLANNED_CURRENT_SLA'=>	'Planned/current SLA',
+	'S_SLA_LAST_7_DAYS'=>			'SLA (last 7 days)',
+	'S_PLANNED_CURRENT_SLA'=>		'Planned/current SLA',
 	'S_TRIGGER_BIG'=>			'TRIGGER',
-	'S_TODAY'=>					'Today',
+	'S_TODAY'=>				'Today',
 	'S_THIS_WEEK'=>				'This week',
 	'S_THIS_YEAR'=>				'This year',
 	'S_THIS_MONTH'=>			'This month',
@@ -1181,7 +1181,6 @@
 	'S_LAST_7_DAYS'=>			'Last 7 days',
 	'S_LAST_30_DAYS'=>			'Last 30 days',
 	'S_LAST_365_DAYS'=>			'Last 365 days',
-	'S_PERIOD'=>				'Period',
 
 //	triggers.php
 	'S_NO_TRIGGER'=>			'No trigger',
@@ -1224,11 +1223,11 @@
 	'S_NO_DEPENDENCES_DEFINED'=>		'No dependencies defined',
 	'S_NEW_DEPENDENCY'=>			'New dependency',
 
-	'S_EVENT_GENERATION'=>		'Event generation',
+	'S_EVENT_GENERATION'=>			'Event generation',
 
-	'S_TRIGGERS_MASSUPDATE'=>	'Triggers massupdate',
-	'S_TRIGGER_DEPENDENCIES'=>	'Trigger dependencies',
-	'S_INCORRECT_DEPENDENCY'=>	'Incorrect dependency',
+	'S_TRIGGERS_MASSUPDATE'=>		'Triggers massupdate',
+	'S_TRIGGER_DEPENDENCIES'=>		'Trigger dependencies',
+	'S_INCORRECT_DEPENDENCY'=>		'Incorrect dependency',
 
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			'Trigger comments',
