@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -46,7 +46,7 @@ struct perfcounter
 {
 	struct perfcounter *next;
 	unsigned long	pdhIndex;
-	char		name[MAX_PERFCOUNTER_NAME_LEN];	
+	char		name[MAX_PERFCOUNTER_NAME_LEN];
 	/* must be caracter array! if you want to rewrite */
 	/* to dinacal memory allocation CHECK for usage   */
 	/* of sizeof function                             */

@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -38,7 +38,7 @@ typedef struct zbx_odbc_dbh_s
 	SQLINTEGER	*data_len;
 } ZBX_ODBC_DBH;
 
-typedef ZBX_ODBC_DBH*		ZBX_ODBC_RESULT; 
+typedef ZBX_ODBC_DBH*		ZBX_ODBC_RESULT;
 
 int		odbc_DBconnect(ZBX_ODBC_DBH *pdbh, const char *db_name, const char *user, const char *pass);
 void		odbc_DBclose(ZBX_ODBC_DBH *pdbh);

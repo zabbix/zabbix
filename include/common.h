@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -636,10 +636,10 @@ const char *zbx_permission_string(int perm);
 #	define MAX(a, b) ((a)>(b) ? (a) : (b))
 #endif
 
-#ifndef MIN					   
+#ifndef MIN
 #	define MIN(a, b) ((a)<(b) ? (a) : (b))
 #endif
-				    
+
 /* Secure string copy */
 #define strscpy(x,y) zbx_strlcpy(x,y,sizeof(x))
 #define strnscpy(x,y,n) zbx_strlcpy(x,y,n);
