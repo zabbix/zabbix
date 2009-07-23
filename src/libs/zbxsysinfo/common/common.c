@@ -134,12 +134,13 @@ static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_
 	init_result(result);
 
 	SET_UI64_RESULT(result, 1);
+
 	return SYSINFO_RET_OK;
 }
 
 static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	static	char	version[]=ZABBIX_VERSION;
+	static char	version[] = ZABBIX_VERSION;
 
 	assert(result);
 
@@ -147,9 +148,8 @@ static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGE
 
 	SET_STR_RESULT(result, strdup(version));
 
-	return	SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
-
 
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
