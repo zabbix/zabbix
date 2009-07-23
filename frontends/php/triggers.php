@@ -394,7 +394,6 @@
 	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 
-	$available_triggers = CTrigger::get(array('editable' => 1, 'hostids' => $PAGE_HOSTS['hostids']));
 ?>
 <?php
 
@@ -463,12 +462,17 @@
 // <<<--- SELECTED HOST HEADER INFORMATION --->>>	
 		if($PAGE_HOSTS['selected'] > 0){
 		
+			$tbl_header_host = new CTableInfo();
+			
 			$header_host = CHost::get(array(
 				'hostids' => $PAGE_HOSTS['selected'],
 				'nopermissions' => 1,
+				'templated_hosts' => 1,
 				'extendoutput' => 1,
 				'select_items' => 1,
-				'select_graphs' => 1));
+				'select_graphs' => 1,
+				'select_applications' => 1
+			));
 			$header_host = array_pop($header_host);
 			
 			$description = array();
@@ -476,56 +480,70 @@
 				$proxy = get_host_by_hostid($header_host['proxy_hostid']);
 				$description[] = $proxy['host'].':';
 			}			
+			$description[] = $header_host['host'];
 			
-			$description[] = new CLink($header_host['host'], 'hosts.php?form=update&hostid='.$header_host['hostid'].url_param('groupid'));
-
 			$items = array(new CLink(S_ITEMS, 'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
 				' ('.count($header_host['itemids']).')');
 
 			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
 				' ('.count($header_host['graphids']).')');
 			
-			$dns = empty($header_host['dns']) ? '-' : $header_host['dns'];
-			$ip = empty($header_host['ip']) ? '-' : $header_host['ip'];
-			$port = empty($header_host['port']) ? '-' : $header_host['port'];
-			if(1 == $header_host['useip'])
-				$ip = bold($ip);
-			else
-				$dns = bold($dns);
-				
-				
-			switch($header_host['status']){
-				case HOST_STATUS_MONITORED:
-					$status = new CSpan(S_MONITORED, 'off');
-					break;
-				case HOST_STATUS_NOT_MONITORED:
-					$status = new CSpan(S_NOT_MONITORED, 'off');
-					break;
-				default:
-					$status = S_UNKNOWN;
-			}
-
-			if($header_host['available'] == HOST_AVAILABLE_TRUE)
-				$available = new CSpan(S_AVAILABLE, 'off');
-			else if($header_host['available'] == HOST_AVAILABLE_FALSE)
-				$available = new CSpan(S_NOT_AVAILABLE, 'on');
-			else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
-				$available = new CSpan(S_UNKNOWN, 'unknown');
-
-				
-			$tbl_header_host = new CTableInfo();
-			$tbl_header_host->addRow(array(
-				new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
-				$description,
-				$items,
-				$graphs,
-				array(bold(S_DNS.': '), $dns),
-				array(bold(S_IP.': '), $ip),
-				array(bold(S_PORT.': '), $port),
-				array(bold(S_STATUS.': '), $status),
-				array(bold(S_AVAILABILITY.': '), $available)));
-			$tbl_header_host->setClass('infobox');
+			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
+				' ('.count($header_host['applications']).')');
 			
+			if($header_host['status'] == HOST_STATUS_TEMPLATE){
+				$status = S_TEMPLATE;
+				
+				$tbl_header_host->addRow(array(
+					new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')),
+					$applications,
+					$items,
+					$graphs,
+					array(bold(S_TEMPLATE.': '), $description),
+					array(bold(S_STATUS.': '), $status)
+				));
+			}
+			else{
+				$dns = empty($header_host['dns']) ? '-' : $header_host['dns'];
+				$ip = empty($header_host['ip']) ? '-' : $header_host['ip'];
+				$port = empty($header_host['port']) ? '-' : $header_host['port'];
+				if(1 == $header_host['useip'])
+					$ip = bold($ip);
+				else
+					$dns = bold($dns);
+					
+					
+				switch($header_host['status']){
+					case HOST_STATUS_MONITORED:
+						$status = new CSpan(S_MONITORED, 'off');
+						break;
+					case HOST_STATUS_NOT_MONITORED:
+						$status = new CSpan(S_NOT_MONITORED, 'off');
+						break;
+					default:
+						$status = S_UNKNOWN;
+				}
+
+				if($header_host['available'] == HOST_AVAILABLE_TRUE)
+					$available = new CSpan(S_AVAILABLE, 'off');
+				else if($header_host['available'] == HOST_AVAILABLE_FALSE)
+					$available = new CSpan(S_NOT_AVAILABLE, 'on');
+				else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
+					$available = new CSpan(S_UNKNOWN, 'unknown');
+				
+				$tbl_header_host->addRow(array(
+					new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
+					$applications,
+					$items,
+					$graphs,
+					array(bold(S_HOST.': '), $description),
+					array(bold(S_DNS.': '), $dns),
+					array(bold(S_IP.': '), $ip),
+					array(bold(S_PORT.': '), $port),
+					array(bold(S_STATUS.': '), $status),
+					array(bold(S_AVAILABILITY.': '), $available)));
+			}
+			$tbl_header_host->setClass('infobox');
 			$tbl_header_host->show();
 		}
 // --->>> SELECTED HOST HEADER INFORMATION <<<---
