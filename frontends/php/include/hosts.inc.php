@@ -35,7 +35,7 @@ require_once('include/httptest.inc.php');
 			if(!$result)
 				return $result;
 		}
-		
+
 	return $result;
 	}
 
@@ -44,7 +44,7 @@ require_once('include/httptest.inc.php');
 			error("incorrect parameters for 'add_host_to_group' [hostid:".$hostid."][groupid:".$groupid."]");
 			return false;
 		}
-	
+
 	return DBexecute('delete from hosts_groups where hostid='.$hostid.' and groupid='.$groupid);
 	}
 
@@ -69,7 +69,7 @@ require_once('include/httptest.inc.php');
 		$sql_where = '';
 		if(!is_null($groupid))
 			$sql_where.= ' AND groupid<>'.$groupid;
-			
+
 		$sql = 'SELECT * '.
 				' FROM groups '.
 				' WHERE '.DBin_node('groupid').
@@ -107,45 +107,45 @@ require_once('include/httptest.inc.php');
 		$grp_hosts = CHost::get(array('groupids'=>$groupid, 'editable'=>1));
 		$grp_hostids = array_keys($grp_hosts);
 
-// unlinked hosts 
-		$missed_hostids = array_diff($grp_hostids, $hosts);		
+// unlinked hosts
+		$missed_hostids = array_diff($grp_hostids, $hosts);
 // hosts that allowed to be unlinked
 		$unlinkable_hostids = getUnlinkableHosts($groupid);
-		
+
 // hosts that have been unlinked improperly
 		$err_hostids = array_diff($missed_hostids, $unlinkable_hostids);
 
 		foreach($err_hostids as $num => $hostid){
 			$host = get_host_by_hostid($hostid);
 			error('Host "'.$host['host'].'" can not exist without group');
-			
+
 			return false;
 		}
-		
+
 		$result = DBexecute('DELETE FROM hosts_groups WHERE groupid='.$groupid);
 		$result = add_host_to_group($hosts, $groupid);
-		
+
 	return $result;
 	}
 
 	function update_host_groups($hostid,$groups=array()){
 		if(empty($groups)){
 			$host = get_host_by_hostid($hostid);
-			error('Host "'.$host['host'].'" can not exist without group');	
+			error('Host "'.$host['host'].'" can not exist without group');
 			return false;
 		}
-		
+
 		DBexecute('DELETE FROM hosts_groups WHERE hostid='.$hostid);
 		foreach($groups as $num => $groupid){
 			$result = add_host_to_group($hostid, $groupid);
 		}
-		
+
 	return $result;
 	}
-	
+
 	function setHostGroupInternal($groupids, $internal=ZBX_NOT_INTERNAL_GROUP){
 		zbx_value2array($groupids);
-		
+
 		$sql = 'UPDATE groups SET internal='.$internal.' WHERE '.DBcondition('groupid', $groupids);
 		$result = DBexecute($sql);
 	return $result;
@@ -316,7 +316,7 @@ require_once('include/httptest.inc.php');
 			info('Host must be linked to at least one host group');
 			return false;
 		}
-		
+
 		if(is_null($templates))
 			$templates = array();
 		if(is_null($groups))
@@ -333,7 +333,7 @@ require_once('include/httptest.inc.php');
 			if(!$newgroupid = add_host_group($newgroup)) return false;
 			$groups[$newgroupid] = $newgroupid;
 		}
-		
+
 		if(!update_host_groups($hostid, $groups)) return false;
 
 		sync_host_with_templates($hostid);
@@ -362,7 +362,7 @@ require_once('include/httptest.inc.php');
 			info('Host "'.$host.'" must be linked to at least one host group');
 			return false;
 		}
-		
+
 		if(is_null($templates)){
 			$new_templates = array();
 		}
@@ -387,7 +387,7 @@ require_once('include/httptest.inc.php');
 			if(!$newgroupid = add_host_group($newgroup)) return false;
 			$groups[$newgroupid] = $newgroupid;
 		}
-		
+
 		$result = update_host_groups($hostid, $groups);
 
 		if(count($new_templates) > 0){
@@ -621,7 +621,7 @@ require_once('include/httptest.inc.php');
 	function delete_host_group($groupids){
 		zbx_value2array($groupids);
 		if(empty($groupids)) return true;
-		
+
 		$dlt_groupids = getDeletableHostGroups($groupids);
 		if(count($groupids) != count($dlt_groupids)){
 			foreach($groupids as $num => $groupid){
@@ -635,7 +635,7 @@ require_once('include/httptest.inc.php');
 			}
 			return false;
 		}
-		
+
 // delete sysmap element
 		if(!delete_sysmaps_elements_with_groupid($groupids))
 			return false;
@@ -1999,7 +1999,7 @@ return $result;
 		zbx_value2array($hostids);
 
 		$unlnk_hostids = array();
-		
+
 		$sql_where = '';
 		if(!is_null($hostids)){
 			$sql_where.= ' AND '.DBcondition('hg.hostid', $hostids);
@@ -2012,7 +2012,7 @@ return $result;
 							' WHERE hgg.hostid = hg.hostid'.
 								' AND '.DBcondition('hgg.groupid', $groupids).')';
 		}
-				
+
 		$sql = 'SELECT hg.hostid, count(hg.groupid) as grp_count '.
 				' FROM hosts_groups hg '.
 				' WHERE hostgroupid>0 '.
@@ -2025,10 +2025,10 @@ return $result;
 		}
 	return $unlnk_hostids;
 	}
-	
+
 	function getDeletableHostGroups($groupids=null){
 		zbx_value2array($groupids);
-		
+
 		$dlt_groupids = array();
 		$hostids = getUnlinkableHosts($groupids);
 

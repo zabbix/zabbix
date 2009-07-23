@@ -539,7 +539,7 @@ function make_latest_issues($params = array()){
 				$description = new CLink($description, $row_event['url'], null, null, true);
 			else
 				$description = new CSpan($description,'pointer');
-				
+
 			$description = new CCol($description,get_severity_style($row["priority"]));
 			$description->setHint(make_popup_eventlist($row_event['eventid'], $row['type']));
 

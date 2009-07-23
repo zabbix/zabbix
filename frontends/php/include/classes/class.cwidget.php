@@ -144,7 +144,7 @@ private $items;
 			$thin_tab->addAction('onclick',new CScript("javascript: change_flicker_state('".$flicker_domid."');"));
 
 			$flicker_tab->addRow($thin_tab,'textcolorstyles link pointer');
-			
+
 			$flicker_tab->addRow($div);
 
 			$widget->addRow($flicker_tab);

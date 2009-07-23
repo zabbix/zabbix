@@ -73,7 +73,7 @@
 
 			if(isset($page['title']) && defined($page['title'])){
 
-				$page_title = constant($page['title']);	
+				$page_title = constant($page['title']);
 			}
 			else{
 				$page_title = 'ZABBIX';
@@ -201,7 +201,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 				array_push($page_header_r_col,$debug,'|');
 			}
-			
+
 			array_push($page_header_r_col,new CLink(S_LOGOUT, 'index.php?reconnect=1', 'small_font', null, 'nosid'));
 		}
 		else {
