@@ -938,7 +938,7 @@ static void process_rule(DB_DRULE *rule)
 						mask = (32 == j[8]) ? 0xffffffff : ~(0xffffffff >> j[8]);
 						network = first & mask;
 						broadcast = network + ~mask;
-						first = network + 1;                          
+						first = network + 1;
 
 						zabbix_log(LOG_LEVEL_DEBUG, "%s() IPv6 CIDR:%u", __function_name, j[8] + 96);
 						zbx_snprintf(ip, sizeof(ip), "%x:%x:%x:%x:%x:%x:%x:%x",
@@ -1000,7 +1000,7 @@ static void process_rule(DB_DRULE *rule)
 						mask = (32 == j[4]) ? 0xffffffff : ~(0xffffffff >> j[4]);
 						network = first & mask;
 						broadcast = network + ~mask;
-						first = network + 1;                          
+						first = network + 1;
 
 						zabbix_log(LOG_LEVEL_DEBUG, "%s() IPv4 CIDR:%u", __function_name, j[4]);
 						zabbix_log(LOG_LEVEL_DEBUG, "%s() IPv4 Netmask:'%u.%u.%u.%u'", __function_name,

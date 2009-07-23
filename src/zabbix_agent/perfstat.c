@@ -133,7 +133,7 @@ int	add_perf_counter(const char *name, const char *counterPath, int interval)
 
 		zbx_free(alias_name);
 	}
-		
+
 	return result;
 }
 
