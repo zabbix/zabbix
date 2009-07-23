@@ -28,10 +28,10 @@ class CUser {
 	 * @param boolean $options['with_gui_access']
 	 * @param boolean $options['with_api_access']
 	 * @param boolean $options['select_usrgrps']
-	 * @param boolean $options['get_access'] 
-	 * @param int $options['extendoutput'] 
-	 * @param int $options['count'] 
-	 * @param string $options['pattern'] 
+	 * @param boolean $options['get_access']
+	 * @param int $options['extendoutput']
+	 * @param int $options['count']
+	 * @param string $options['pattern']
 	 * @param int $options['limit'] limit selection
 	 * @param string $options['order']
 	 * @return array
@@ -40,17 +40,17 @@ class CUser {
 		global $USER_DETAILS;
 
 		$result = array();
-		
+
 		$sort_columns = array('userid', 'alias'); // allowed columns for sorting
-	
-	
+
+
 		$sql_parts = array(
 			'select' => array('users' => 'u.userid'),
 			'from' => array('users u'),
 			'where' => array(),
 			'order' => array(),
 			'limit' => null);
-		
+
 		$def_options = array(
 			'nodeids'					=> 0,
 			'usrgrpids'					=> 0,
@@ -83,7 +83,7 @@ class CUser {
 			$sql_parts['from']['ug'] = 'users_groups ug';
 			$sql_parts['where'][] = DBcondition('ug.usrgrpid', $options['usrgrpids']);
 			$sql_parts['where']['uug'] = 'u.userid=ug.userid';
-			
+
 		}
 
 // userids
@@ -114,7 +114,7 @@ class CUser {
 		if($options['extendoutput'] != 0){
 			$sql_parts['select']['usrgrp'] = 'u.*';
 		}
-		
+
 // count
 		if($options['count'] != 0){
 			$options['select_usrgrps'] = 0;
@@ -142,12 +142,12 @@ class CUser {
 		}
 //-------
 		$userids = array();
-		
+
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
-	
+
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
@@ -155,7 +155,7 @@ class CUser {
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);	
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.$sql_select.'
@@ -175,45 +175,45 @@ class CUser {
 				}
 				else{
 					if(!isset($result[$user['userid']])) $result[$user['userid']]= array();
-					
+
 					if($options['select_usrgrps'] && !isset($result[$user['userid']]['usrgrpids'])){
 						$result[$user['userid']]['usrgrpids'] = array();
 						$result[$user['userid']]['usrgrps'] = array();
 					}
-					
+
 					// usrgrpids
 					if(isset($user['usrgrpid'])){
-						if(!isset($result[$user['userid']]['usrgrpids'])) 
+						if(!isset($result[$user['userid']]['usrgrpids']))
 							$result[$user['userid']]['usrgrpids'] = array();
-							
+
 						$result[$user['userid']]['usrgrpids'][$user['usrgrpid']] = $user['usrgrpid'];
 						unset($user['usrgrpid']);
 					}
-					
+
 					$result[$user['userid']] += $user;
 				}
 			}
 		}
-	
+
 	if($options['get_access'] != 0){
-	
+
 		foreach($result as $userid => $user){
 			$result[$userid] += array('api_access' => 0, 'gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
 		}
-		
-		$sql = 'SELECT ug.userid, MAX(g.api_access) as api_access,  MAX(g.gui_access) as gui_access, 
+
+		$sql = 'SELECT ug.userid, MAX(g.api_access) as api_access,  MAX(g.gui_access) as gui_access,
 					MAX(g.debug_mode) as debug_mode, MAX(g.users_status) as users_status'.
 				' FROM usrgrp g, users_groups ug '.
 				' WHERE '.DBcondition('ug.userid', $userids).
 					' AND g.usrgrpid=ug.usrgrpid '.
 				' GROUP BY ug.userid';
 		$access = DBselect($sql);
-		
+
 		while($useracc = DBfetch($access)){
 			$result[$useracc['userid']] = array_merge($result[$useracc['userid']], $useracc);
 		}
 	}
-	
+
 // Adding Objects
 
 // Adding usegroups
@@ -230,7 +230,7 @@ class CUser {
 
 	return $result;
 	}
-	
+
 	/**
 	 * Authenticate user
 	 *
@@ -241,7 +241,7 @@ class CUser {
 	 * @return string session ID
 	 */
 	public static function authenticate($user){
-	
+
 		$login = user_login($user['user'], $user['password'], ZBX_AUTH_INTERNAL);
 		if($login){
 			return $login;
@@ -250,19 +250,19 @@ class CUser {
 			self::$error = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Given login or password is incorrect.');
 		}
 	}
-	
+
 	/**
 	 * Check if session ID authenticated
 	 *
 	 * @static
 	 * @param _array $session
 	 * @param array $session['sessionid']
-	 * @return boolean 
+	 * @return boolean
 	 */
 	public static function checkAuth($session){
 		return check_authentication($session['sessionid']);
 	}
-	
+
 	/**
 	 * get API Access status
 	 *
@@ -279,7 +279,7 @@ class CUser {
 					AND u.alias='.zbx_dbstr($user['user']).
 					' AND '.DBin_node('u.userid', get_current_nodeid(false)).
 				' GROUP BY u.userid';
-				
+
 		$access = DBfetch(DBselect($sql));
 		return $access['access'] ? true : false;
 	}
@@ -319,7 +319,7 @@ class CUser {
 	 *
 	 * @static
 	 * @param array $user_data
-	 * @return string|boolean 
+	 * @return string|boolean
 	 */
 	public static function getId($user_data){
 		$result = false;
@@ -432,18 +432,18 @@ class CUser {
 	 * );
 	 * </code>
 	 *
-	 * @param array $media_data 
+	 * @param array $media_data
 	 * @return boolean
 	 */
 	public static function addMedia($media_data){
 		$result = false;
 		$userid = $media_data['userid'];
-		
+
 		foreach($media_data['medias'] as $media){
 			$result = add_media( $userid, $media['mediatypeid'], $media['sendto'], $media['severity'], $media['active'], $media['period']);
 			if(!$result) break;
 		}
-		
+
 		if($result){
 			return true;
 		}
@@ -452,7 +452,7 @@ class CUser {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Delete User Medias
 	 *
@@ -469,13 +469,13 @@ class CUser {
 	 * );
 	 * </code>
 	 *
-	 * @param array $media_data 
+	 * @param array $media_data
 	 * @return boolean
 	 */
 	public static function deleteMedia($media_data){
 		$sql = 'DELETE FROM media WHERE userid='.$media_data['userid'].' AND '.DBcondition('mediaid', $media_data['mediaids']);
 		$result = DBexecute($sql);
-		
+
 		if($result){
 			return true;
 		}
@@ -484,7 +484,7 @@ class CUser {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Add Medias for User
 	 *
@@ -508,18 +508,18 @@ class CUser {
 	 * );
 	 * </code>
 	 *
-	 * @param array $media_data 
+	 * @param array $media_data
 	 * @return boolean
 	 */
 	public static function updateMedia($media_data){
 		$result = false;
 		$userid = $media_data['userid'];
-		
+
 		foreach($media_data['medias'] as $media){
 			$result = update_media($media['mediaid'], $userid, $media['mediatypeid'], $media['sendto'], $media['severity'], $media['active'], $media['period']);
 			if(!$result) break;
 		}
-		
+
 		if($result){
 			return true;
 		}
@@ -527,9 +527,9 @@ class CUser {
 			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
-	
+
 	}
-	
+
 	/**
 	 * Delete Users
 	 *
@@ -544,14 +544,14 @@ class CUser {
 	 */
 	public static function delete($userids){
 		$result = false;
-		
+
 		DBstart(false);
 		foreach($userids as $userid){
 			$result = delete_user($userid);
 			if(!$resukt) break;
 		}
 		DBend($result);
-		
+
 		if($result)
 			return true;
 		else{

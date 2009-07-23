@@ -30,9 +30,9 @@ class CTemplate {
 		$result = array();
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
-		
+
 		$sort_columns = array('hostid', 'host'); // allowed columns for sorting
-		
+
 		$sql_parts = array(
 			'select' => array('templates' => 'h.hostid'),
 			'from' => array('hosts h'),
@@ -65,17 +65,17 @@ class CTemplate {
 			'limit'				=> 0);
 
 		$options = array_merge($def_options, $options);
-		
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
 		}
-		
+
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
-			
+
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['from']['r'] = 'rights r';
 			$sql_parts['from']['ug'] = 'users_groups ug';
@@ -93,7 +93,7 @@ class CTemplate {
 									' AND gg.userid='.$userid.
 									' AND rr.permission<'.$permission.')';
 		}
-			
+
 // nodeids
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
 
@@ -121,7 +121,7 @@ class CTemplate {
 			$sql_parts['where'][] = DBcondition('ht.hostid', $options['hostids']);
 			$sql_parts['where']['hht'] = 'h.hostid=ht.templateid';
 		}
-		
+
 // itemids
 		if($options['itemids'] != 0){
 			zbx_value2array($options['itemids']);
@@ -154,20 +154,20 @@ class CTemplate {
 
 // with_triggers
 		if($options['with_triggers'] != 0){
-			$sql_parts['where'][] = 'EXISTS( 
+			$sql_parts['where'][] = 'EXISTS(
 					SELECT i.itemid
 					FROM items i, functions f, triggers t
-					WHERE i.hostid=h.hostid 
-						AND i.itemid=f.itemid 
+					WHERE i.hostid=h.hostid
+						AND i.itemid=f.itemid
 						AND f.triggerid=t.triggerid)';
 		}
 
 // with_graphs
 		if($options['with_graphs'] != 0){
-			$sql_parts['where'][] = 'EXISTS( 
-					SELECT DISTINCT i.itemid 
-					FROM items i, graphs_items gi 
-					WHERE i.hostid=h.hostid 
+			$sql_parts['where'][] = 'EXISTS(
+					SELECT DISTINCT i.itemid
+					FROM items i, graphs_items gi
+					WHERE i.hostid=h.hostid
 						AND i.itemid=gi.itemid)';
 		}
 
@@ -205,14 +205,14 @@ class CTemplate {
 			$sql_parts['limit'] = $options['limit'];
 		}
 //-------------
-		
+
 		$templateids = array();
-		
+
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
-	
+
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
@@ -220,7 +220,7 @@ class CTemplate {
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',', $sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',', $sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ', $sql_parts['where']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',', $sql_parts['order']);	
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',', $sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.$sql_select.'
@@ -229,80 +229,80 @@ class CTemplate {
 					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
-		
+
 		while($template = DBfetch($res)){
 			if($options['count'])
 				$result = $template;
 			else{
 				$templateids[$template['hostid']] = $template['hostid'];
-				
+
 				if(!isset($options['extendoutput'])){
 					$result[$template['hostid']] = $template['hostid'];
 				}
 				else{
 					if(!isset($result[$template['hostid']])) $result[$template['hostid']]= array();
-					
+
 					if($options['select_templates'] && !isset($result[$template['hostid']]['templateids'])){
 						$template['templateids'] = array();
 						$template['templates'] = array();
 					}
-						
+
 					if($options['select_hosts'] && !isset($result[$template['hostid']]['hostids'])){
 						$template['hostids'] = array();
 						$template['hosts'] = array();
 					}
-					
+
 					if($options['select_items'] && !isset($result[$template['hostid']]['itemids'])){
 						$template['itemids'] = array();
 						$template['items'] = array();
 					}
-					
+
 					if($options['select_triggers'] && !isset($result[$template['hostid']]['triggers'])){
 						$template['triggerids'] = array();
 						$template['triggers'] = array();
 					}
-					
+
 					if($options['select_graphs'] && !isset($result[$template['hostid']]['graphids'])){
 						$template['graphids'] = array();
 						$template['graphs'] = array();
 					}
-					
+
 					// groupids
 					if(isset($template['groupid'])){
-						if(!isset($result[$template['hostid']]['groupids'])) 
+						if(!isset($result[$template['hostid']]['groupids']))
 							$result[$template['hostid']]['groupids'] = array();
-							
+
 						$result[$template['hostid']]['groupids'][$template['groupid']] = $template['groupid'];
 						unset($template['groupid']);
 					}
 					// hostids
 					if(isset($template['linked_hostid'])){
 						if(!isset($result[$template['hostid']]['hostids'])) $result[$template['hostid']]['hostids'] = array();
-							
+
 						$result[$template['hostid']]['hostids'][$template['linked_hostid']] = $template['linked_hostid'];
 						unset($template['linked_hostid']);
 					}
 					// itemids
 					if(isset($template['itemid'])){
 						if(!isset($result[$template['hostid']]['itemids'])) $result[$template['hostid']]['itemids'] = array();
-							
+
 						$result[$template['hostid']]['itemids'][$template['itemid']] = $template['itemid'];
 						unset($template['itemid']);
 					}
 					// graphids
 					if(isset($template['graphid'])){
 						if(!isset($result[$template['hostid']]['graphids'])) $result[$template['hostid']]['graphids'] = array();
-							
+
 						$result[$template['hostid']]['graphids'][$template['graphid']] = $template['graphid'];
 						unset($template['graphid']);
 					}
-					
+
 					$result[$template['hostid']] += $template;
 				}
 			}
-				
+
 		}
-		
+
 // Adding Objects
 
 // Adding Templates
@@ -316,7 +316,7 @@ class CTemplate {
 				}
 			}
 		}
-		
+
 // Adding Hosts
 		if($options['select_hosts']){
 			$obj_params = array('extendoutput' => 1, 'templateids' => $templateids);
@@ -328,7 +328,7 @@ class CTemplate {
 				}
 			}
 		}
-		
+
 // Adding Items
 		if($options['select_items']){
 			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'nopermissions' => 1);
@@ -340,8 +340,8 @@ class CTemplate {
 				}
 			}
 		}
-	
-// Adding triggers	
+
+// Adding triggers
 		if($options['select_triggers']){
 			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids);
 			$triggers = CTrigger::get($obj_params);
@@ -352,7 +352,7 @@ class CTemplate {
 				}
 			}
 		}
-		
+
 // Adding graphs
 		if($options['select_graphs']){
 			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids);
@@ -364,7 +364,7 @@ class CTemplate {
 				}
 			}
 		}
-	
+
 	return $result;
 	}
 
@@ -461,7 +461,7 @@ class CTemplate {
 
 		DBstart(false);
 		foreach($templates as $template){
-		
+
 			if(empty($template['groupids'])){
 				$result = false;
 				$error = 'No groups for host [ '.$template['host'].' ]';
@@ -545,7 +545,7 @@ class CTemplate {
 				$result = false;
 				break;
 			}
-			
+
 			$groups = get_groupids_by_host($template['hostid']);
 
 			$result = update_host($template['hostid'], $template['host'], $template['port'], $status, $template['useip'], $template['dns'], $template['ip'],
