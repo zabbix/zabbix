@@ -289,7 +289,7 @@ function update_action($actionid, $name, $eventsource, $esc_period, $def_shortda
 	foreach($operations as $num => $operation){
 		if(!validate_operation($operation))	return false;
 	}
-	
+
 	$result = DBexecute('UPDATE actions SET name='.zbx_dbstr($name).
 							',eventsource='.$eventsource.
 							',esc_period='.$esc_period.

@@ -276,7 +276,7 @@ if(defined('USE_PROFILING')){
 				else{
 					$debug_str.= 'SQL requests count: '.($sqlrequests - $sqlmark[$type]).OBR;
 				}
-				
+
 				if($sql_time < QUERY_TOTAL_TIME)
 				{
 					$debug_str.= 'Total time spent on SQL: '.round($sql_time,8).OBR;
@@ -287,7 +287,7 @@ if(defined('USE_PROFILING')){
 				}
 			}
 			$debug_str.= "******************** End of $type ***************************".OBR;
-			
+
 // DEBUG of ZBX FrontEnd
 			$zbx_debug = new CWidget('debug_hat',new CSpan(new CScript($debug_str),'textcolorstyles'));
 			$zbx_debug->addHeader(S_DEBUG);
