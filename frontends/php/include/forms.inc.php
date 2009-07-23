@@ -64,7 +64,7 @@
 		$delayBox->addItem(120,'120');
 		$delayBox->addItem(600,'600');
 		$delayBox->addItem(900,'900');
-		
+
 		$form->addRow(S_UPDATE_INTERVAL_IN_SEC, $delayBox);
 
 		$tblSteps = new CTableInfo(S_NO_SLIDES_DEFINED);
@@ -657,7 +657,7 @@
 			$user_type	= $user['type'];
 
 			if($autologout > 0) $_REQUEST['autologout'] = $autologout;
-			
+
 			$user_groups	= array();
 			$user_medias		= array();
 
@@ -692,10 +692,10 @@
 			$password1 	= get_request('password1', '');
 			$password2 	= get_request('password2', '');
 			$url 		= get_request('url','');
-			
+
 			$autologin	= get_request('autologin',0);
 			$autologout	= get_request('autologout',90);
-			
+
 			$lang		= get_request('lang','en_gb');
 			$theme 		= get_request('theme','default.css');
 			$refresh	= get_request('refresh',30);
@@ -1260,7 +1260,7 @@
 	}
 
 	function get_item_filter_form(){
-	
+
 		$filter_group			= $_REQUEST['filter_group'];
 		$filter_host			= $_REQUEST['filter_host'];
 		$filter_application		= $_REQUEST['filter_application'];
@@ -1340,7 +1340,7 @@
 			$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, 		S_LOG);
 			$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,		S_TEXT);
 			$form->addRow(array(S_WITH_SMALL.SPACE,bold(S_TYPE_OF_INFORMATION)),$cmbValType);
-		
+
 		if($filter_value_type == ITEM_VALUE_TYPE_UINT64){
 			$cmbDataType = new CComboBox('filter_data_type', $filter_data_type, 'submit()');
 			$cmbDataType->addItem(-1,			S_ALL_SMALL);
@@ -1361,7 +1361,7 @@
 			new CNumericBox('filter_history',$filter_history,8,null,true));
 
 		$form->addRow(
-						array(S_WITH_SMALL.SPACE,bold(S_KEEP_TRENDS_IN_DAYS)), 
+						array(S_WITH_SMALL.SPACE,bold(S_KEEP_TRENDS_IN_DAYS)),
 						new CNumericBox('filter_trends',$filter_trends,8,null,true)
 					);
 
@@ -1443,7 +1443,7 @@
 			$hostid	= $item_data['hostid'];
 			$limited = (($item_data['templateid'] == 0)  && ($item_data['type'] != ITEM_TYPE_HTTPTEST))?null:'yes';
 		}
-		
+
 		if(is_null($host)){
 			if($hostid > 0){
 				$host_info = CHost::getById(array('hostid'=>$hostid));
@@ -1543,7 +1543,7 @@
 		else {
 			$frmItem->setTitle(S_ITEM." '$host:$description'");
 		}
-		
+
 		$frmItem->addvar('hostid', $hostid);
 		$frmItem->addRow(S_HOST,array(
 			new CTextBox('host',$host,32,true),
@@ -1801,7 +1801,7 @@
 
 			$cmbApps = new CListBox('applications[]',$applications,6);
 			$cmbApps->addItem(0,'-'.S_NONE.'-');
-			
+
 			$sql = 'SELECT DISTINCT applicationid,name '.
 					' FROM applications '.
 					' WHERE hostid='.$hostid.
@@ -2064,7 +2064,7 @@
 	}
 
 	function insert_copy_elements_to_forms($elements_array_name){
-		
+
 		$copy_type = get_request("copy_type", 0);
 		$copy_mode = get_request("copy_mode", 0);
 		$filter_groupid = get_request("filter_groupid", 0);
@@ -2095,8 +2095,8 @@
 			}
 
 			$frmCopy->addRow('Group', $cmbGroup);
-			
-			$options = array('extendoutput'=>1, 
+
+			$options = array('extendoutput'=>1,
 							'order'=>'host',
 							'groupids'=> $filter_groupid);
 			$hosts = CHost::get($options);
@@ -6255,7 +6255,7 @@
 			$map_elements[$db_element['selementid']] = $db_element;
 		}
 		order_result($map_elements, 'label');
-		
+
 		foreach($map_elements as $selementid => $db_selement){
 
 			$label = $db_selement['label'];

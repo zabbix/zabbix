@@ -50,7 +50,7 @@ function get_profile($idx,$default_value=null,$idx2=0,$source=null,$nocache=fals
 		$db_profiles = DBselect($sql);
 		while($profile=DBfetch($db_profiles)){
 			if(!isset($profiles[$profile['idx']])) $profiles[$profile['idx']] = array();
-			
+
 			$value_type = profile_field_by_type($profile['type']);
 
 			if(zbx_empty($source)){
@@ -71,17 +71,17 @@ function get_profile($idx,$default_value=null,$idx2=0,$source=null,$nocache=fals
 					$profiles[$profile['idx']][$source] = $profile[$value_type];
 				}
 			}
-				
+
 		}
 	}
-	
+
 	if(isset($profiles[$idx]) && !empty($profiles[$idx])){
 		if(!is_null($source))
 			return $profiles[$idx][$source];
 		else
 			return $profiles[$idx][$idx2];
 	}
-	
+
 return $default_value;
 }
 
@@ -411,19 +411,19 @@ return	DBexecute('update config set '.implode(',',$update).' where '.DBin_node('
 /************ HISTORY **************/
 function get_user_history(){
 	global $USER_DETAILS;
-	
+
 	$result = array();
 	$delimiter = new CSpan('&raquo;','delimiter');
-	
+
 	$sql = 'SELECT title1, url1, title2, url2, title3, url3, title4, url4, title5, url5
 			FROM user_history WHERE userid='.$USER_DETAILS['userid'];
 	$history = DBfetch(DBSelect($sql));
-	
+
 	if($history)
 		$USER_DETAILS['last_page'] = array('title' => $history['title5'], 'url' => $history['url5']);
-	else 
+	else
 		$USER_DETAILS['last_page'] = false;
-		
+
 	for($i = 1; $i<6; $i++){
 		if(defined($history['title'.$i])){
 			$url = new CLink(constant($history['title'.$i]), $history['url'.$i], 'history');
@@ -432,7 +432,7 @@ function get_user_history(){
 		}
 	}
 	array_pop($result);
-	
+
 	return $result;
 }
 function add_user_history($page){
@@ -455,7 +455,7 @@ function add_user_history($page){
 		$url = $page['file'];
 	}
 
-	
+
 	if(isset($last_page['title']) && ($last_page['title'] == $title)){ //title is same
 		if($last_page['url'] != $url){ // title same, url isnt, change only url
 			$sql = 'UPDATE user_history SET url5='.zbx_dbstr($url).'
@@ -467,7 +467,7 @@ function add_user_history($page){
 	else{ // new page with new title is added
 		if(!$last_page){
 			$userhistoryid = get_dbid('user_history', 'userhistoryid');
-			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5) 
+			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)
 					VALUES("'.$userhistoryid.'", "'.$userid.'", '.zbx_dbstr($title).', '.zbx_dbstr($url).')';
 		}
 		else{
@@ -477,7 +477,7 @@ function add_user_history($page){
 		}
 	}
 	$result = DBexecute($sql);
-	
+
 	return $result;
 }
 /********* END USER HISTORY **********/

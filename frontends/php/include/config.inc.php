@@ -133,9 +133,9 @@ function __autoload($class_name){
 			if($local_node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodetype=1 ORDER BY nodeid'))){
 				$ZBX_LOCALNODEID = $local_node_data['nodeid'];
 				$ZBX_LOCMASTERID = $local_node_data['masterid'];
-				
+
 				$ZBX_NODES[$local_node_data['nodeid']] = $local_node_data;
-				
+
 				define('ZBX_DISTRIBUTED', true);
 			}
 			else{
@@ -298,11 +298,11 @@ function __autoload($class_name){
 					$msg_tab->setCellSpacing(0);
 
 					$row = array();
-					
+
 					$msg_col = new CCol(bold($msg),'msg_main msg');
 					$msg_col->setAttribute('id','page_msg');
 					$row[] = $msg_col;
-					
+
 					if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
 						$msg_details = new CDiv(array(S_DETAILS),'pointer');
 						$msg_details->addAction('onclick',new CScript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
@@ -1090,14 +1090,14 @@ function __autoload($class_name){
 		$link->setArgument('sortorder', $sortorder);
 
 		$url = $link->getUrl();
-		
+
 		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
 			$script = new CScript("javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
 		}
 		else{
 			$script = new CScript("javascript: redirect('".$url."');");
 		}
-		
+
 		$col = array(new CSpan($obj,'underline'));
 		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
 			if($sortorder == ZBX_SORT_UP){
@@ -1111,13 +1111,13 @@ function __autoload($class_name){
 			$col[] = SPACE;
 			$col[] = $img;
 		}
-		
+
 		$col = new CCol($col, 'hover_grey');
 		$col->setAttribute('onclick', $script);
 
 	return $col;
 	}
-	
+
 //TODO: should be replaced by "make_sorting_header" for every page.
 	function make_sorting_link($obj,$tabfield,$url=''){
 		global $page;
@@ -1162,14 +1162,14 @@ function __autoload($class_name){
 
 	return $link;
 	}
-	
+
 	function getPageSortField($def){
 		global $page;
 		$tabfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def));
 
 	return $tabfield;
 	}
-	
+
 	function getPageSortOrder($def=ZBX_SORT_UP){
 		global $page;
 		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def));
@@ -1177,7 +1177,7 @@ function __autoload($class_name){
 	return $sortorder;
 	}
 /*************** END PAGE SORTING ******************/
-	
+
 /*************** RESULT SORTING ******************/
 	function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP){
 		global $page;

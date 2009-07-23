@@ -213,7 +213,7 @@
 	function validate_slide(&$slide){
 		if(!screen_accessible($slide['screenid'], PERM_READ_ONLY)) return false;
 		if(!isset($slide['delay'])) $slide['delay'] = 0;
-		
+
 	return true;
 	}
 

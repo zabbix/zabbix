@@ -191,7 +191,7 @@ class CChart extends CGraphDraw{
 			86400,	// 1 day
 			604800,	// 1 week
 		);
-		
+
 		$dist = 604800; //def week;
 		$interval = 0;
 
@@ -215,11 +215,11 @@ class CChart extends CGraphDraw{
 			$vline_count--;
 			$start_i++;
 		}
-		
+
 		if(($this->sizeX - ($offsetX + ($vline_count*$intervalX))) < 10){
 			$vline_count--;
 		}
-		
+
 		for($i=$start_i;$i<=$vline_count;$i++){
 			dashedline($this->im,
 						$i*$intervalX+$this->shiftXleft+$offsetX,
@@ -242,7 +242,7 @@ class CChart extends CGraphDraw{
 				$date_format = '      H:i';
 				$color = 'Black No Alpha';
 			}
-			
+
 			imagestringup($this->im,
 								1,
 								$i*$intervalX+$this->shiftXleft-3+$offsetX,
@@ -254,7 +254,7 @@ class CChart extends CGraphDraw{
 // Start
 		imagestringup($this->im,
 							1,
-							
+
 							$this->shiftXleft-3,
 							$this->sizeY+$this->shiftY+57,
 							date('m.d H:i',$this->from_time),
@@ -269,7 +269,7 @@ class CChart extends CGraphDraw{
 							$this->getColor('Dark Red No Alpha')
 					);
 	}
-	
+
 	protected function drawWorkPeriod(){
 		if($this->m_showWorkPeriod != 1) return;
 		if($this->period > 2678400) return; // > 31*24*3600 (month)

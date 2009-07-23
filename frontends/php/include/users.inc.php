@@ -278,9 +278,9 @@
 
 	function get_userid_by_usrgrpid($usrgrpids){
 		zbx_value2array($usrgrpids);
-		
+
 		$userids = array();
-		
+
 		$sql = 'SELECT DISTINCT u.userid '.
 				' FROM users u,users_groups ug '.
 				' WHERE u.userid=ug.userid '.
@@ -327,7 +327,7 @@
 	function granted2update_group($usrgrpids){
 		global $USER_DETAILS;
 		zbx_value2array($usrgrpids);
-			
+
 		$users = get_userid_by_usrgrpid($usrgrpids);
 		$result=(!uint_in_array($USER_DETAILS['userid'],$users));
 
@@ -444,7 +444,7 @@
 
 	function delete_user_group($usrgrpids){
 		zbx_value2array($usrgrpids);
-		
+
 		$result = DBexecute('DELETE FROM rights WHERE '.DBcondition('groupid',$usrgrpids));
 		if(!$result)	return	$result;
 
@@ -454,7 +454,7 @@
 		if(!$result)	return	$result;
 
 		$result = DBexecute('DELETE FROM usrgrp WHERE '.DBcondition('usrgrpid',$usrgrpids));
-		
+
 	return $result;
 	}
 
@@ -469,7 +469,7 @@
 
 	function change_group_status($usrgrpids,$users_status){
 		zbx_value2array($usrgrpids);
-		
+
 		$res = false;
 		$grant = true;
 		if($users_status == GROUP_STATUS_DISABLED) $grant = granted2update_group($usrgrpids);
@@ -485,7 +485,7 @@
 
 	function change_group_gui_access($usrgrpids,$gui_access){
 		zbx_value2array($usrgrpids);
-		
+
 		$res = false;
 		$grant = true;
 		if($gui_access == GROUP_GUI_ACCESS_DISABLED) $grant = granted2update_group($usrgrpids);
