@@ -30,9 +30,9 @@
 	require_once('include/nodes.inc.php');
 
 
-	$page['title']	= "S_CONFIGURATION_OF_ACTIONS";
-	$page['file']	= 'actionconf.php';
-	$page['hist_arg'] = array();
+	$page['title']		= "S_CONFIGURATION_OF_ACTIONS";
+	$page['file']		= 'actionconf.php';
+	$page['hist_arg']	= array();
 
 include_once('include/page_header.php');
 
@@ -43,12 +43,12 @@ include_once('include/page_header.php');
 	$fields=array(
 
 		'actionid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,					null),
-		'name'=>			array(T_ZBX_STR, O_OPT,	 null,	NOT_EMPTY,				'isset({save})'),
+		'name'=>		array(T_ZBX_STR, O_OPT,	 null,	NOT_EMPTY,				'isset({save})'),
 		'eventsource'=>		array(T_ZBX_INT, O_MAND, null,	IN(array(EVENT_SOURCE_TRIGGERS,EVENT_SOURCE_DISCOVERY)),	null),
-		'evaltype'=>		array(T_ZBX_INT, O_OPT,	 null,	IN(array(ACTION_EVAL_TYPE_AND_OR,ACTION_EVAL_TYPE_AND,ACTION_EVAL_TYPE_OR)), 	'isset({save})'),
+		'evaltype'=>		array(T_ZBX_INT, O_OPT,	 null,	IN(array(ACTION_EVAL_TYPE_AND_OR,ACTION_EVAL_TYPE_AND,ACTION_EVAL_TYPE_OR)),	'isset({save})'),
 		'esc_period'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(60,999999),		'isset({save})&&isset({escalation})'),
 		'escalation'=>		array(T_ZBX_INT, O_OPT,  null,	IN("0,1"),		null),
-		'status'=>			array(T_ZBX_INT, O_OPT,	 null,	IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)),			'isset({save})'),
+		'status'=>		array(T_ZBX_INT, O_OPT,	 null,	IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)),			'isset({save})'),
 
 		'def_shortdata'=>	array(T_ZBX_STR, O_OPT,	 null,	null,				'isset({save})'),
 		'def_longdata'=>	array(T_ZBX_STR, O_OPT,	 null,	null,				'isset({save})'),
@@ -67,14 +67,14 @@ include_once('include/page_header.php');
 		'operations'=>		array(null, O_OPT, null, null, 'isset({save})'),
 		'g_operationid'=>	array(null, O_OPT, null, null, null),
 
-		'edit_operationid'=>array(null, O_OPT, P_ACT,	DB_ID,	null),
+		'edit_operationid'=>	array(null, O_OPT, P_ACT,	DB_ID,	null),
 
 		'new_operation'=>	array(null, O_OPT,  null,	null,	'isset({add_operation})'),
 
 		'opconditions'=>		array(null, O_OPT, null, null, null),
-		'g_opconditionid'=> 	array(null, O_OPT, null, null, null),
+		'g_opconditionid'=>	array(null, O_OPT, null, null, null),
 
-		'new_opcondition'=>	array(null, 	 O_OPT,  null,	null,	'isset({add_opcondition})'),
+		'new_opcondition'=>	array(null,	O_OPT,  null,	null,	'isset({add_opcondition})'),
 
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
@@ -82,26 +82,26 @@ include_once('include/page_header.php');
 // form
 		'add_condition'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_condition'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'cancel_new_condition'=>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel_new_condition'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'add_operation'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_operation'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'cancel_new_operation'=>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel_new_operation'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'add_opcondition'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_opcondition'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'cancel_new_opcondition'=>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel_new_opcondition'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
-		'save'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'clone'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'delete'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'cancel'=>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 /* other */
-		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
 
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,		'isset({favobj})'),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
 	);
 
 	check_fields($fields);
@@ -360,7 +360,7 @@ include_once('include/page_header.php');
 		$form->addItem(new CButton('form',S_CREATE_ACTION));
 	} else {
 
-    }
+	}
 
 	show_table_header(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
     echo SBR;
