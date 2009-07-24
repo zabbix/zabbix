@@ -985,8 +985,6 @@
 	'S_AVAILABILITY_REPORT'=>		'Availability report',
 	'S_AVAILABILITY_REPORT_BIG'=>		'AVAILABILITY REPORT',
 	'S_SHOW'=>				'Show',
-	'S_TRUE'=>				'True',
-	'S_FALSE'=>				'False',
 	'S_BY_HOST'=>				'By host',
 	'S_BY_TRIGGER_TEMPLATE'=>		'By trigger template',
 
@@ -1170,9 +1168,6 @@
 	'S_SERVICE'=>				'Service',
 	'S_SERVICES'=>				'Services',
 	'S_REASON'=>				'Reason',
-	'S_SLA_LAST_7_DAYS'=>			'SLA (last 7 days)',
-	'S_PLANNED_CURRENT_SLA'=>		'Planned/current SLA',
-	'S_TRIGGER_BIG'=>			'TRIGGER',
 	'S_TODAY'=>				'Today',
 	'S_THIS_WEEK'=>				'This week',
 	'S_THIS_YEAR'=>				'This year',
