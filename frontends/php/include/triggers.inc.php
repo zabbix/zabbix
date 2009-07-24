@@ -2179,13 +2179,15 @@
 			}
 		}
 
-		$result=DBselect('SELECT eventid,clock,value '.
-						' FROM events '.
-						' WHERE objectid='.$triggerid.
-							' AND object='.EVENT_OBJECT_TRIGGER.
-							' AND clock>='.$min.
-							' AND clock<='.$max.
-						' ORDER BY eventid ASC');
+		$sql = 'SELECT eventid,clock,value '.
+				' FROM events '.
+				' WHERE objectid='.$triggerid.
+					' AND object='.EVENT_OBJECT_TRIGGER.
+					' AND clock>='.$min.
+					' AND clock<='.$max.
+				' ORDER BY clock ASC, eventid ASC';
+//				' ORDER BY eventid ASC';
+		$result=DBselect($sql);
 
 		$state		= $start_value;//-1;
 		$true_time	= 0;
@@ -2197,11 +2199,13 @@
 			$max=time();
 		}
 		$rows=0;
+
 		while($row=DBfetch($result)){
 			$clock=$row['clock'];
 			$value=$row['value'];
 
 			$diff=$clock-$time;
+//if($diff < 0) SDI($row);
 			$time=$clock;
 
 			if($state==-1){
@@ -2263,7 +2267,8 @@
 			$ret['false']		= (100*$false_time)/$total_time;
 			$ret['unknown']		= (100*$unknown_time)/$total_time;
 		}
-		return $ret;
+
+	return $ret;
 	}
 
 	/*
