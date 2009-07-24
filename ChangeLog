@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-137] sql file "data.sql" was fixed, a default value was added (Dmitry)
  - [DEV-137] sql file "data.sql" was fixed, some default values were added (Dmitry)
  - [DEV-412] improved timeline in charts (Artem)
  - [DEV-353] Discovery: added support of IP masks (Sasha) 
