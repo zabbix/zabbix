@@ -21,7 +21,7 @@
 -- Dumping data for table `config`
 --
 
-INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00',7,1,7,100,'default.css',0,'',389,'','','','',1,1,5,50,1000);
+INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00',7,1,7,100,'default.css',0,'',389,'','','','',1,1,5,50);
 
 --
 -- Dumping data for table `scripts`
@@ -41,16 +41,16 @@ INSERT INTO users VALUES (2,'guest','Default','User','d41d8cd98f00b204e9800998ec
 -- Dumping data for table `usrgrp`
 --
 
-INSERT INTO usrgrp VALUES (1,'UNIX administrators',0,0,0);
-INSERT INTO usrgrp VALUES (2,'Database administrators',0,0,0);
-INSERT INTO usrgrp VALUES (3,'Network administrators',0,0,0);
-INSERT INTO usrgrp VALUES (4,'Security specialists',0,0,0);
-INSERT INTO usrgrp VALUES (5,'WEB administrators',0,0,0);
-INSERT INTO usrgrp VALUES (6,'Head of IT department',0,0,0);
-INSERT INTO usrgrp VALUES (7,'Zabbix administrators',0,0,0);
-INSERT INTO usrgrp VALUES (8,'Guests',0,0,0);
-INSERT INTO usrgrp VALUES (9,'Disabled',0,0,1);
-INSERT INTO usrgrp VALUES (10,'API access',0,1,0);
+INSERT INTO usrgrp VALUES (1,'UNIX administrators',0,0,0,0);
+INSERT INTO usrgrp VALUES (2,'Database administrators',0,0,0,0);
+INSERT INTO usrgrp VALUES (3,'Network administrators',0,0,0,0);
+INSERT INTO usrgrp VALUES (4,'Security specialists',0,0,0,0);
+INSERT INTO usrgrp VALUES (5,'WEB administrators',0,0,0,0);
+INSERT INTO usrgrp VALUES (6,'Head of IT department',0,0,0,0);
+INSERT INTO usrgrp VALUES (7,'Zabbix administrators',0,0,0,0);
+INSERT INTO usrgrp VALUES (8,'Guests',0,0,0,0);
+INSERT INTO usrgrp VALUES (9,'Disabled',0,0,1,0);
+INSERT INTO usrgrp VALUES (10,'API access',0,1,0,0);
 --
 -- Dumping data for table `users_groups`
 --
