@@ -208,7 +208,7 @@ include_once('include/page_header.php');
 		$result = DBselect($sql, $limit);
 		while($row=DBfetch($result)){
 			switch($row['action']){
-				case AUDIT_ACTION_ADD: 		$action = S_ADDED; break;
+				case AUDIT_ACTION_ADD:		$action = S_ADDED; break;
 				case AUDIT_ACTION_UPDATE:	$action = S_UPDATED; break;
 				case AUDIT_ACTION_DELETE:	$action = S_DELETED; break;
 				case AUDIT_ACTION_LOGIN:	$action = S_LOGIN;	break;
@@ -394,8 +394,8 @@ include_once('include/page_header.php');
 	$filterForm->addRow(S_ACTIONS_BEFORE,$nav_clndr);
 
 	zbx_add_post_js('create_calendar(null,'.
-				 '["nav_day","nav_month","nav_year","nav_hour","nav_minute"],'.
-				 '"audit_since");');
+				'["nav_day","nav_month","nav_year","nav_hour","nav_minute"],'.
+				'"audit_since");');
 
 	zbx_add_post_js('addListener($("filter_icon"),'.
 				'"click",CLNDR[\'audit_since\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'audit_since\'].clndr));');
