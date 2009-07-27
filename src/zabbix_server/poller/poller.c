@@ -132,84 +132,7 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 
 	return res;
 }
-/*
-static int get_minnextcheck(int now)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
 
-	int		res;
-	char		istatus[16];
-*/
-/* Host status	0 == MONITORED
-		1 == NOT MONITORED
-		2 == UNREACHABLE */
-/*	if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
-	{
-		result = DBselect("select count(*),min(nextcheck) as nextcheck from items i,hosts h"
-				" where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d)"
-				" and i.type not in (%d,%d,%d,%d) and h.status=%d and h.disable_until<=%d"
-				" and h.errors_from!=0 and h.hostid=i.hostid and (h.proxy_hostid=0 or i.type in (%d))"
-				" and i.key_ not in ('%s','%s','%s','%s')" DB_NODE " order by nextcheck",
-			CONFIG_UNREACHABLE_POLLER_FORKS,
-			poller_num-1,
-			now,
-			ITEM_STATUS_ACTIVE,
-			ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_IPMI,
-			HOST_STATUS_MONITORED,
-			now,
-			ITEM_TYPE_INTERNAL,
-			SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY,
-			DBnode_local("h.hostid"));
-	}
-	else
-	{
-		if (0 != CONFIG_REFRESH_UNSUPPORTED)
-			zbx_snprintf(istatus, sizeof(istatus), "%d,%d",
-					ITEM_STATUS_ACTIVE,
-					ITEM_STATUS_NOTSUPPORTED);
-		else
-			zbx_snprintf(istatus, sizeof(istatus), "%d",
-					ITEM_STATUS_ACTIVE);
-
-		result = DBselect("select count(*),min(nextcheck) from items i,hosts h where " ZBX_SQL_MOD(i.itemid,%d) "=%d"
-				" and h.status=%d and h.disable_until<=%d and h.errors_from=0"
-				" and h.hostid=i.hostid and i.status in (%s) and i.type not in (%d,%d,%d,%d)"
-				" and (h.proxy_hostid=0 or i.type in (%d)) and i.key_ not in ('%s','%s','%s','%s')" DB_NODE,
-				CONFIG_POLLER_FORKS,
-				poller_num-1,
-				HOST_STATUS_MONITORED,
-				now,
-				istatus,
-				ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_IPMI,
-				ITEM_TYPE_INTERNAL,
-				SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY,
-				DBnode_local("h.hostid"));
-	}
-
-	row=DBfetch(result);
-
-	if(!row || DBis_null(row[0])==SUCCEED || DBis_null(row[1])==SUCCEED)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "No items to update for minnextcheck.");
-		res = FAIL;
-	}
-	else
-	{
-		if( atoi(row[0]) == 0)
-		{
-			res = FAIL;
-		}
-		else
-		{
-			res = atoi(row[1]);
-		}
-	}
-	DBfree_result(result);
-
-	return	res;
-}
-*/
 /* Update special host's item - "status" */
 static void update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 {
@@ -315,7 +238,7 @@ static int get_values(int now, int *nextcheck)
 	int		res;
 	DB_ITEM		item;
 	AGENT_RESULT	agent;
-	int		/*stop = 0, */items = 0;
+	int		items = 0;
 
 	static char	*unreachable_hosts = NULL;
 	static int	unreachable_hosts_alloc = 32;
@@ -348,7 +271,7 @@ static int get_values(int now, int *nextcheck)
 		result = DBselect("select h.hostid,min(i.itemid) from hosts h,items i"
 				" where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d)"
 				" and i.type in (%d,%d,%d,%d,%d) and h.status=%d and h.disable_until<=%d"
-				" and h.errors_from!=0 and h.hostid=i.hostid and (h.proxy_hostid=0 or i.type in (%d))"
+				" and h.errors_from!=0 and h.hostid=i.hostid and h.proxy_hostid=0"
 				" and i.key_ not in ('%s','%s','%s','%s') and (h.maintenance_status=%d or h.maintenance_type=%d)"
 				DB_NODE " group by h.hostid",
 				CONFIG_UNREACHABLE_POLLER_FORKS,
@@ -358,7 +281,6 @@ static int get_values(int now, int *nextcheck)
 				ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI,
 				HOST_STATUS_MONITORED,
 				now,
-				ITEM_TYPE_INTERNAL,
 				SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, SERVER_ZABBIXLOG_KEY,
 				HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 				DBnode_local("h.hostid"));
@@ -366,7 +288,7 @@ static int get_values(int now, int *nextcheck)
 	case ZBX_POLLER_TYPE_IPMI:
 		result = DBselect("select %s where i.nextcheck<=%d and i.status in (%s)"
 				" and i.type in (%d) and h.status=%d and h.disable_until<=%d"
-				" and h.errors_from=0 and h.hostid=i.hostid and (h.proxy_hostid=0 or i.type in (%d))"
+				" and h.errors_from=0 and h.hostid=i.hostid and h.proxy_hostid=0"
 				" and " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')"
 				" and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE " order by i.nextcheck",
 				ZBX_SQL_ITEM_SELECT,
@@ -375,7 +297,6 @@ static int get_values(int now, int *nextcheck)
 				ITEM_TYPE_IPMI,
 				HOST_STATUS_MONITORED,
 				now,
-				ITEM_TYPE_INTERNAL,
 				CONFIG_IPMIPOLLER_FORKS,
 				poller_num-1,
 				SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, SERVER_ZABBIXLOG_KEY,
@@ -403,8 +324,7 @@ static int get_values(int now, int *nextcheck)
 				DBnode_local("h.hostid"));
 	}
 
-	/* Do not stop when select is made by poller for unreachable hosts */
-	while (NULL != (row = DBfetch(result)))/*&&(stop==0 || poller_type == ZBX_POLLER_TYPE_UNREACHABLE))*/
+	while (NULL != (row = DBfetch(result)))
 	{
 		/* This code is just to avoid compilation warining about use of uninitialized result2 */
 		result2 = result;
@@ -456,28 +376,28 @@ static int get_values(int now, int *nextcheck)
 
 		if (res == SUCCEED)
 		{
-			if (HOST_AVAILABLE_TRUE != item.host_available)
+			if (item.type == ITEM_TYPE_ZABBIX || item.type == ITEM_TYPE_SNMPv1 ||
+					item.type == ITEM_TYPE_SNMPv2c || item.type == ITEM_TYPE_SNMPv3 || item.type == ITEM_TYPE_IPMI)
 			{
-				DBbegin();
+				if (HOST_AVAILABLE_TRUE != item.host_available)
+				{
+					DBbegin();
 
-				enable_host(&item, now);
-/* We shouldn't stop after enabling a host */
-/*				stop = 1;*/
+					enable_host(&item, now);
 
-				DBcommit();
-			}
+					DBcommit();
+				}
 
-			if (item.host_errors_from != 0)
-			{
-				DBbegin();
+				if (item.host_errors_from != 0)
+				{
+					DBbegin();
 
-				DBexecute("update hosts set errors_from=0 where hostid=" ZBX_FS_UI64,
-						item.hostid);
-				item.host_errors_from = 0;
-/* We shouldn't stop after enabling a host */
-/*				stop = 1; */
+					DBexecute("update hosts set errors_from=0 where hostid=" ZBX_FS_UI64,
+							item.hostid);
+					item.host_errors_from = 0;
 
-				DBcommit();
+					DBcommit();
+				}
 			}
 
 			if (0 == CONFIG_DBSYNCER_FORKS)
@@ -530,27 +450,27 @@ static int get_values(int now, int *nextcheck)
 				if (*nextcheck == FAIL || (item.nextcheck != 0 && *nextcheck > item.nextcheck))
 					*nextcheck = item.nextcheck;
 
-			if (HOST_AVAILABLE_TRUE != item.host_available) {
-				DBbegin();
-
-				enable_host(&item, now);
-/* We shouldn't stop after enabling a host */
-/*				stop = 1;*/
-
-				DBcommit();
-			}
-
-			if (item.host_errors_from != 0)
+			if (item.type == ITEM_TYPE_ZABBIX || item.type == ITEM_TYPE_SNMPv1 ||
+					item.type == ITEM_TYPE_SNMPv2c || item.type == ITEM_TYPE_SNMPv3 || item.type == ITEM_TYPE_IPMI)
 			{
-				DBbegin();
+				if (HOST_AVAILABLE_TRUE != item.host_available) {
+					DBbegin();
 
-				DBexecute("update hosts set errors_from=0 where hostid=" ZBX_FS_UI64,
-						item.hostid);
-				item.host_errors_from = 0;
-/* We shouldn't stop after enabling a host */
-/*				stop = 1; */
+					enable_host(&item, now);
 
-				DBcommit();
+					DBcommit();
+				}
+
+				if (item.host_errors_from != 0)
+				{
+					DBbegin();
+
+					DBexecute("update hosts set errors_from=0 where hostid=" ZBX_FS_UI64,
+							item.hostid);
+					item.host_errors_from = 0;
+
+					DBcommit();
+				}
 			}
 		}
 		else if (res == NETWORK_ERROR)
