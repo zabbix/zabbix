@@ -229,6 +229,7 @@
 	'S_MAX_VALUE_SMALL'=>			'max value',
 	'S_MIN_VALUE_SMALL'=>			'min value',
 	'S_TRIGGER_DESCRIPTION'=>		'Trigger description',
+	'S_HOST_NAME'=>				'Host name',
 	'S_ACTION_CONDITIONS'=>			'Action conditions',
 	'S_OPERATION_CONDITION'=>		'Operation condition',
 	'S_CONDITIONS'=>			'Conditions',
@@ -255,6 +256,7 @@
 	'S_DISCOVERY_CHECK'=>			'Discovery check',
 	'S_DISCOVERED_OBJECT'=>			'Discovered object',
 	'S_DEVICE'=>				'Device',
+	'S_AUTO_REGISTRATION'=>			'Auto registration',
 
 	'S_INCORRECT_TRIGGER'=>			'Incorrect trigger',
 	'S_INCORRECT_HOST'=>			'Incorrect host',

@@ -3469,6 +3469,7 @@
 		$cmbSource =  new CComboBox('eventsource', $eventsource, 'submit()');
 		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, S_TRIGGERS);
 		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, S_DISCOVERY);
+		$cmbSource->addItem(EVENT_SOURCE_AUTO_REGISTRATION, S_AUTO_REGISTRATION);
 		$tblAct->addRow(array(S_EVENT_SOURCE, $cmbSource));
 
 
@@ -3859,6 +3860,9 @@
 				$rowCondition[] = new CTextBox('new_condition[value]', "", 40);
 				break;
 			case CONDITION_TYPE_APPLICATION:
+				$rowCondition[] = new CTextBox('new_condition[value]', "", 40);
+				break;
+			case CONDITION_TYPE_HOST_NAME:
 				$rowCondition[] = new CTextBox('new_condition[value]', "", 40);
 				break;
 		}

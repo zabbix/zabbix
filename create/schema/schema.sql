@@ -955,3 +955,16 @@ FIELD		|expression_type|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|exp_delimiter	|t_varchar(1)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|case_sensitive	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|regexpid
+
+TABLE|autoreg_host|autoreg_hostid|ZBX_SYNC
+FIELD		|autoreg_hostid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|proxy_hostid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|hosts
+FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+UNIQUE		|1		|proxy_hostid,host
+
+TABLE|proxy_autoreg_host|id|0
+FIELD		|id		|t_serial	|	|NOT NULL	|0
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|0
+INDEX		|1		|clock
+

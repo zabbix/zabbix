@@ -1893,6 +1893,25 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 						replace_to = zbx_dsprintf(replace_to, "%s", zbx_age2str(time(NULL) - atoi(replace_to)));
 				}
 			}
+			else if (EVENT_SOURCE_AUTO_REGISTRATION == event->source)
+			{
+				if (0 == strcmp(m, MVAR_DATE))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_date2str(time(NULL)));
+				else if (0 == strcmp(m, MVAR_TIME))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_time2str(time(NULL)));
+				else if (0 == strcmp(m, MVAR_EVENT_ID))
+					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
+				else if (0 == strcmp(m, MVAR_EVENT_DATE))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_date2str(event->clock));
+				else if (0 == strcmp(m, MVAR_EVENT_TIME))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_time2str(event->clock));
+				else if (0 == strcmp(m, MVAR_EVENT_AGE))
+					replace_to = zbx_dsprintf(replace_to, "%s", zbx_age2str(time(NULL) - event->clock));
+				else if (0 == strcmp(m, MVAR_NODE_ID))
+					ret = get_node_value_by_event(event, &replace_to, "nodeid");
+				else if (0 == strcmp(m, MVAR_NODE_NAME))
+					ret = get_node_value_by_event(event, &replace_to, "name");
+			}
 		}
 		else if (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION)
 		{

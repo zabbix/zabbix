@@ -388,6 +388,7 @@ function condition_type2str($conditiontype){
 	$str_type[CONDITION_TYPE_EVENT_ACKNOWLEDGED]	= S_EVENT_ACKNOWLEDGED;
 	$str_type[CONDITION_TYPE_APPLICATION]		= S_APPLICATION;
 	$str_type[CONDITION_TYPE_PROXY]			= S_PROXY;
+	$str_type[CONDITION_TYPE_HOST_NAME]		= S_HOST_NAME;
 
 	if(isset($str_type[$conditiontype]))
 		return $str_type[$conditiontype];
@@ -425,6 +426,7 @@ function condition_value2str($conditiontype, $value){
 			$str_val.= $host['host'];
 			break;
 		case CONDITION_TYPE_TRIGGER_NAME:
+		case CONDITION_TYPE_HOST_NAME:
 			$str_val = $value;
 			break;
 		case CONDITION_TYPE_TRIGGER_VALUE:
@@ -625,6 +627,10 @@ function get_conditions_by_eventsource($eventsource){
 			CONDITION_TYPE_DVALUE,
 			CONDITION_TYPE_PROXY
 		);
+	$conditions[EVENT_SOURCE_AUTO_REGISTRATION] = array(
+			CONDITION_TYPE_HOST_NAME,
+			CONDITION_TYPE_PROXY
+		);
 
 	if (ZBX_DISTRIBUTED)
 		array_push($conditions[EVENT_SOURCE_TRIGGERS], CONDITION_TYPE_NODE);
@@ -665,6 +671,14 @@ function get_operations_by_eventsource($eventsource){
 			OPERATION_TYPE_GROUP_REMOVE,
 			OPERATION_TYPE_TEMPLATE_ADD,
 			OPERATION_TYPE_TEMPLATE_REMOVE
+		);
+	$operations[EVENT_SOURCE_AUTO_REGISTRATION] = array(
+			OPERATION_TYPE_MESSAGE,
+			OPERATION_TYPE_COMMAND,
+			OPERATION_TYPE_HOST_ADD,
+			OPERATION_TYPE_HOST_DISABLE,
+			OPERATION_TYPE_GROUP_ADD,
+			OPERATION_TYPE_TEMPLATE_ADD
 		);
 
 	if(isset($operations[$eventsource]))
@@ -785,6 +799,10 @@ function	get_operators_by_conditiontype($conditiontype)
 			CONDITION_OPERATOR_LIKE,
 			CONDITION_OPERATOR_NOT_LIKE
 		);
+	$operators[CONDITION_TYPE_HOST_NAME] = array(
+			CONDITION_OPERATOR_LIKE,
+			CONDITION_OPERATOR_NOT_LIKE
+		);
 
 	if(isset($operators[$conditiontype]))
 		return $operators[$conditiontype];
@@ -879,6 +897,7 @@ function validate_condition($conditiontype, $value){
 		case CONDITION_TYPE_DUPTIME:
 		case CONDITION_TYPE_DVALUE:
 		case CONDITION_TYPE_APPLICATION:
+		case CONDITION_TYPE_HOST_NAME:
 			break;
 		default:
 			error(S_INCORRECT_CONDITION_TYPE);
