@@ -38,6 +38,7 @@
 #include "nodecommand.h"
 #include "proxyconfig.h"
 #include "proxydiscovery.h"
+#include "proxyautoreg.h"
 
 #include "daemon.h"
 
@@ -468,11 +469,13 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 			total_num,
 			zbx_time() - sec);
 
+	alarm(CONFIG_TIMEOUT);
 	if (send_result(sock, ret, info) != SUCCEED)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error sending result back");
 		zabbix_syslog("Trapper: error sending result back");
 	}
+	alarm(0);
 
 	return ret;
 }
@@ -565,7 +568,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 
 	if (0 == strncmp(s,"ZBX_GET_ACTIVE_CHECKS", 21))	/* Request for list of active checks */
 	{
-		ret = send_list_of_active_checks(sock, s);
+		ret = send_list_of_active_checks(sock, s, zbx_process);
 /* Request for last ids */
 	} else if (strncmp(s,"ZBX_GET_HISTORY_LAST_ID", 23) == 0) {
 		send_history_last_id(sock, s);
@@ -644,13 +647,17 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 				{
 					ret = process_discovery_data(sock, &jp);
 				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA) && zbx_process == ZBX_PROCESS_SERVER)
+				{
+					ret = process_autoreg_data(sock, &jp);
+				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT) && zbx_process == ZBX_PROCESS_SERVER)
 				{
 					ret = process_proxy_heartbeat(sock, &jp);
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 				{
-					ret = send_list_of_active_checks_json(sock, &jp);
+					ret = send_list_of_active_checks_json(sock, &jp, zbx_process);
 				}
 				else
 				{

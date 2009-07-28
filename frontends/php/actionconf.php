@@ -44,7 +44,7 @@ include_once('include/page_header.php');
 
 		'actionid'=>		array(T_ZBX_INT, O_OPT,		P_SYS,	DB_ID,					null),
 		'name'=>		array(T_ZBX_STR, O_OPT,		null,	NOT_EMPTY,				'isset({save})'),
-		'eventsource'=>		array(T_ZBX_INT, O_MAND,	null,	IN(array(EVENT_SOURCE_TRIGGERS,EVENT_SOURCE_DISCOVERY)),	null),
+		'eventsource'=>		array(T_ZBX_INT, O_MAND,	null,	IN(array(EVENT_SOURCE_TRIGGERS,EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTO_REGISTRATION)),	null),
 		'evaltype'=>		array(T_ZBX_INT, O_OPT,		null,	IN(array(ACTION_EVAL_TYPE_AND_OR,ACTION_EVAL_TYPE_AND,ACTION_EVAL_TYPE_OR)),	'isset({save})'),
 		'esc_period'=>		array(T_ZBX_INT, O_OPT,		null,	BETWEEN(60,999999),		'isset({save})&&isset({escalation})'),
 		'escalation'=>		array(T_ZBX_INT, O_OPT,		null,	IN("0,1"),		null),
@@ -467,6 +467,7 @@ include_once('include/page_header.php');
 		$cmbSource = new CComboBox('eventsource',$_REQUEST['eventsource'],'submit()');
 		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS,S_TRIGGERS);
 		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY,S_DISCOVERY);
+		$cmbSource->addItem(EVENT_SOURCE_AUTO_REGISTRATION,S_AUTO_REGISTRATION);
 		$form->addItem(array(S_EVENT_SOURCE, SPACE, $cmbSource));
 
 		$row_count = 0;

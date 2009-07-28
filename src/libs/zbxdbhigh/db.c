@@ -2002,7 +2002,8 @@ zbx_uint64_t DBget_maxid_num(char *tablename, char *fieldname, int num)
 			(0 == strcmp(tablename, "dservices") && 0 == strcmp(fieldname, "dserviceid")) ||
 			(0 == strcmp(tablename, "dhosts") && 0 == strcmp(fieldname, "dhostid")) ||
 			(0 == strcmp(tablename, "alerts") && 0 == strcmp(fieldname, "alertid")) ||
-			(0 == strcmp(tablename, "escalations") && 0 == strcmp(fieldname, "escalationid")))
+			(0 == strcmp(tablename, "escalations") && 0 == strcmp(fieldname, "escalationid")) ||
+			(0 == strcmp(tablename, "autoreg_host") && 0 == strcmp(fieldname, "autoreg_hostid")))
 		return DCget_nextid(tablename, fieldname, num);
 
 	table = DBget_table(tablename);
@@ -2422,4 +2423,88 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
 			value, item->formula, value_uint64);
 
 	return value_uint64;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBregister_host                                                  *
+ *                                                                            *
+ * Purpose: registrate unknown host and generate event                        *
+ *                                                                            *
+ * Parameters: host - host name                                               *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
+{
+	char		*host_esc;
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_EVENT	event;
+	zbx_uint64_t	autoreg_hostid;
+
+	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
+
+	result = DBselect("select autoreg_hostid from autoreg_host where proxy_hostid=" ZBX_FS_UI64 " and host='%s'" DB_NODE,
+			proxy_hostid,
+			host_esc,
+			DBnode_local("autoreg_hostid"));
+
+	if (NULL != (row = DBfetch(result)))
+		ZBX_STR2UINT64(autoreg_hostid, row[0])
+	else
+	{
+		autoreg_hostid = DBget_maxid("autoreg_host", "autoreg_hostid");
+		DBexecute("insert into autoreg_host (autoreg_hostid,proxy_hostid,host) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')",
+				autoreg_hostid,
+				proxy_hostid,
+				host_esc);
+	}
+	DBfree_result(result);
+
+	zbx_free(host_esc);
+
+	/* Preparing auto registration event for processing */
+	memset(&event, 0, sizeof(DB_EVENT));
+	event.source	= EVENT_SOURCE_AUTO_REGISTRATION;
+	event.object	= EVENT_OBJECT_ZABBIX_ACTIVE;
+	event.objectid	= autoreg_hostid;
+	event.clock	= now;
+	event.value	= TRIGGER_VALUE_TRUE;
+
+	/* Processing event */
+	process_event(&event);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBproxy_register_host                                            *
+ *                                                                            *
+ * Purpose: registrate unknown host                                           *
+ *                                                                            *
+ * Parameters: host - host name                                               *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	DBproxy_register_host(const char *host)
+{
+	char	*host_esc;
+
+	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
+
+	DBexecute("insert into proxy_autoreg_host (clock,host) values (%d,'%s')",
+			(int)time(NULL),
+			host_esc);
+
+	zbx_free(host_esc);
 }

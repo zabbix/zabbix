@@ -494,7 +494,6 @@ int	node_history(char *data, size_t datalen)
 
 	assert(data);
 
-/*	zabbix_set_log_level(LOG_LEVEL_DEBUG);*/
 	zabbix_log(LOG_LEVEL_DEBUG, "In node_history()");
 
 	buffer_allocated = 4096;
@@ -587,6 +586,5 @@ int	node_history(char *data, size_t datalen)
 	zbx_free(sql3);
 	zbx_free(buffer);
 
-/*	zabbix_set_log_level(LOG_LEVEL_WARNING);*/
 	return res;
 }

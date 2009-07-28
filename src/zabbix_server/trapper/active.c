@@ -20,8 +20,10 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
+#include "../events.h"
 
 #include "active.h"
+
 
 /******************************************************************************
  *                                                                            *
@@ -39,7 +41,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *error)
+static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *error, zbx_process_t zbx_process)
 {
 	char		*host_esc;
 	DB_RESULT	result;
@@ -50,7 +52,12 @@ static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *erro
 
 	host_esc = DBdyn_escape_string(host);
 
-	result = DBselect("select hostid from hosts where host='%s'" DB_NODE,
+	result = DBselect(
+			"select hostid"
+			" from hosts"
+			" where host='%s'"
+		       		" and proxy_hostid=0"
+				DB_NODE,
 			host_esc,
 			DBnode_local("hostid"));
 
@@ -60,7 +67,23 @@ static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *erro
 		res = SUCCEED;
 	}
 	else
+	{
 		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
+
+		DBbegin();
+
+		switch (zbx_process)
+		{
+		case ZBX_PROCESS_SERVER:
+			DBregister_host(0, host, (int)time(NULL));
+			break;
+		case ZBX_PROCESS_PROXY:
+			DBproxy_register_host(host);
+			break;
+		}
+
+		DBcommit();
+	}
 
 	DBfree_result(result);
 
@@ -87,7 +110,7 @@ static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *erro
  *           format of the list: key:delay:last_log_size                      *
  *                                                                            *
  ******************************************************************************/
-int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
+int	send_list_of_active_checks(zbx_sock_t *sock, char *request, zbx_process_t zbx_process)
 {
 	char		*host = NULL, *p;
 	DB_RESULT	result;
@@ -114,7 +137,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 		goto out;
 	}
 
-	if (FAIL == get_hostid_by_host(host, &hostid, error))
+	if (FAIL == get_hostid_by_host(host, &hostid, error, zbx_process))
 		goto out;
 
 	buffer = zbx_malloc(buffer, buffer_alloc);
@@ -189,7 +212,7 @@ out:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
+int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp, zbx_process_t zbx_process)
 {
 	char		host[HOST_HOST_LEN_MAX], *name_esc, params[MAX_STRING_LEN],
 			pattern[MAX_STRING_LEN], tmp[32];
@@ -217,7 +240,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		goto error;
 	}
 
-	if (FAIL == get_hostid_by_host(host, &hostid, error))
+	if (FAIL == get_hostid_by_host(host, &hostid, error, zbx_process))
 		goto error;
 
 	regexp = zbx_malloc(regexp, regexp_alloc);

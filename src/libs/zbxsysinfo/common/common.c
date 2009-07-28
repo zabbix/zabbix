@@ -79,7 +79,9 @@ static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT
 	assert(result);
 
 	init_result(result);
+
 	SET_MSG_RESULT(result, strdup("Accessible only as active check!"));
+
 	return SYSINFO_RET_FAIL;
 }
 

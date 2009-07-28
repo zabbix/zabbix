@@ -51,6 +51,902 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: check_trigger_condition                                          *
+ *                                                                            *
+ * Purpose: check if event matches single condition                           *
+ *                                                                            *
+ * Parameters: event - trigger event to check                                 *
+ *                                  (event->source == EVENT_SOURCE_TRIGGERS)  *
+ *             condition - condition for matching                             *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
+{
+	const char	*__function_name = "check_trigger_condition";
+	DB_RESULT 	result;
+	DB_ROW		row;
+	zbx_uint64_t	condition_value;
+	int		nodeid;
+	char		*tmp_str = NULL;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (condition->conditiontype == CONDITION_TYPE_HOST_GROUP)
+	{
+		ZBX_STR2UINT64(condition_value, condition->value);
+
+		result = DBselect(
+				"select distinct hg.groupid"
+				" from hosts_groups hg,hosts h,items i,functions f,triggers t"
+				" where hg.hostid=h.hostid"
+					" and h.hostid=i.hostid"
+					" and i.itemid=f.itemid"
+					" and f.triggerid=t.triggerid"
+					" and t.triggerid=" ZBX_FS_UI64
+					" and hg.groupid=" ZBX_FS_UI64,
+				event->objectid,
+				condition_value);
+
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_EQUAL:
+			if (NULL != DBfetch(result))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (NULL == DBfetch(result))
+				ret = SUCCEED;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+		DBfree_result(result);
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_HOST_TEMPLATE)
+	{
+		ZBX_STR2UINT64(condition_value, condition->value);
+
+		result = DBselect(
+				"select distinct ht.templateid"
+				" from hosts_templates ht,items i,functions f,triggers t"
+				" where ht.hostid=i.hostid"
+					" and i.itemid=f.itemid"
+					" and f.triggerid=t.triggerid"
+					" and t.triggerid=" ZBX_FS_UI64
+					" and ht.templateid=" ZBX_FS_UI64,
+				event->objectid,
+				condition_value);
+
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_EQUAL:
+			if (NULL != DBfetch(result))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (NULL == DBfetch(result))
+				ret = SUCCEED;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+		DBfree_result(result);
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_HOST)
+	{
+		ZBX_STR2UINT64(condition_value, condition->value);
+
+		result = DBselect(
+				"select distinct h.hostid"
+				" from hosts h,items i,functions f,triggers t"
+				" where h.hostid=i.hostid"
+					" and i.itemid=f.itemid"
+					" and f.triggerid=t.triggerid"
+					" and t.triggerid=" ZBX_FS_UI64
+					" and h.hostid=" ZBX_FS_UI64,
+				event->objectid,
+				condition_value);
+
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_EQUAL:
+			if (NULL != DBfetch(result))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (NULL == DBfetch(result))
+				ret = SUCCEED;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+		DBfree_result(result);
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_TRIGGER)
+	{
+		ZBX_STR2UINT64(condition_value, condition->value);
+
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_EQUAL:
+			if (event->objectid == condition_value)
+				ret = SUCCEED;
+			/* Processing of templated triggers */
+			else
+			{
+				result = DBselect(
+						"select triggerid"
+						" from triggers"
+						" where triggerid=" ZBX_FS_UI64
+							" and templateid=" ZBX_FS_UI64,
+						event->objectid,
+						condition_value);
+
+				if (NULL != DBfetch(result))
+					ret = SUCCEED;
+				DBfree_result(result);
+			}
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (event->objectid != condition_value)
+				ret = SUCCEED;
+			/* Processing of templated triggers */
+			else
+			{
+				result = DBselect(
+						"select triggerid"
+						" from triggers"
+						" where triggerid=" ZBX_FS_UI64
+							" and templateid=" ZBX_FS_UI64,
+						event->objectid,
+						condition_value);
+
+				if (NULL == DBfetch(result))
+					ret = SUCCEED;
+				DBfree_result(result);
+			}
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
+	{
+		tmp_str = zbx_dsprintf(tmp_str, "%s", event->trigger_description);
+
+		substitute_simple_macros(event, NULL, NULL, NULL, &tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION);
+
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_LIKE:
+			if (NULL != strstr(tmp_str, condition->value))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_LIKE:
+			if (NULL == strstr(tmp_str, condition->value))
+				ret = SUCCEED;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+		zbx_free(tmp_str);
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
+	{
+		condition_value = atoi(condition->value);
+
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_EQUAL:
+			if (event->trigger_priority == condition_value)
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (event->trigger_priority != condition_value)
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_MORE_EQUAL:
+			if (event->trigger_priority >= condition_value)
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_LESS_EQUAL:
+			if (event->trigger_priority <= condition_value)
+				ret = SUCCEED;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_TRIGGER_VALUE)
+	{
+		condition_value = atoi(condition->value);
+
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_EQUAL:
+			if (event->value == condition_value)
+				ret = SUCCEED;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_TIME_PERIOD)
+	{
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_IN:
+			if (1 == check_time_period(condition->value, (time_t)NULL))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_IN:
+			if (1 != check_time_period(condition->value, (time_t)NULL))
+				ret = SUCCEED;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_MAINTENANCE)
+	{
+		switch (condition->operator) {
+		case CONDITION_OPERATOR_IN:
+			result = DBselect(
+					"select count(*)"
+					" from hosts h,items i,functions f,triggers t"
+					" where h.hostid=i.hostid"
+						" and h.maintenance_status=%d"
+						" and i.itemid=f.itemid"
+						" and f.triggerid=t.triggerid"
+						" and t.triggerid=" ZBX_FS_UI64,
+					HOST_MAINTENANCE_STATUS_ON,
+					event->objectid);
+
+			if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) && 0 != atoi(row[0]))
+				ret = SUCCEED;
+			DBfree_result(result);
+			break;
+		case CONDITION_OPERATOR_NOT_IN:
+			result = DBselect(
+					"select count(*)"
+					" from hosts h,items i,functions f,triggers t"
+					" where h.hostid=i.hostid"
+						" and h.maintenance_status=%d"
+						" and i.itemid=f.itemid"
+						" and f.triggerid=t.triggerid"
+						" and t.triggerid=" ZBX_FS_UI64,
+					HOST_MAINTENANCE_STATUS_OFF,
+					event->objectid);
+
+			if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) && 0 != atoi(row[0]))
+				ret = SUCCEED;
+			DBfree_result(result);
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_NODE)
+	{
+		nodeid = get_nodeid_by_id(event->objectid);
+		condition_value = atoi(condition->value);
+
+		switch (condition->operator) {
+		case CONDITION_OPERATOR_EQUAL:
+			if (nodeid == condition_value)
+			       ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (nodeid != condition_value)
+			       ret = SUCCEED;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_EVENT_ACKNOWLEDGED)
+	{
+		result = DBselect(
+				"select acknowledged"
+				" from events"
+				" where acknowledged=%d"
+					" and eventid=" ZBX_FS_UI64,
+				atoi(condition->value),
+				event->eventid);
+
+
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_EQUAL:
+			if (NULL != (row = DBfetch(result)))
+				ret = SUCCEED;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+		DBfree_result(result);
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_APPLICATION)
+	{
+		result = DBselect(
+				"select distinct a.name"
+				" from applications a,items_applications i,functions f,triggers t"
+				" where a.applicationid=i.applicationid"
+					" and i.itemid=f.itemid"
+					" and f.triggerid=t.triggerid"
+					" and t.triggerid=" ZBX_FS_UI64,
+				event->objectid);
+
+		switch (condition->operator) {
+		case CONDITION_OPERATOR_EQUAL:
+			while (NULL != (row = DBfetch(result)))
+			{
+				if (0 == strcmp(row[0], condition->value))
+				{
+					ret = SUCCEED;
+					break;
+				}
+			}
+			break;
+		case CONDITION_OPERATOR_LIKE:
+			while (NULL != (row = DBfetch(result)))
+			{
+				if (NULL != strstr(row[0], condition->value))
+				{
+					ret = SUCCEED;
+					break;
+				}
+			}
+			break;
+		case CONDITION_OPERATOR_NOT_LIKE:
+			ret = SUCCEED;
+			while (NULL != (row = DBfetch(result)))
+			{
+				if (NULL != strstr(row[0], condition->value))
+				{
+					ret = FAIL;
+					break;
+				}
+			}
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+		DBfree_result(result);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
+				condition->conditiontype,
+				condition->conditionid);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_discovery_condition                                        *
+ *                                                                            *
+ * Purpose: check if event matches single condition                           *
+ *                                                                            *
+ * Parameters: event - discovery event to check                               *
+ *                                 (event->source == EVENT_SOURCE_DISCOVERY)  *
+ *             condition - condition for matching                             *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
+{
+	const char	*__function_name = "check_discovery_condition";
+	DB_RESULT 	result;
+	DB_ROW		row;
+	zbx_uint64_t	condition_value;
+	int		tmp_int, now;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (condition->conditiontype == CONDITION_TYPE_DRULE)
+	{
+		ZBX_STR2UINT64(condition_value, condition->value);
+
+		if (EVENT_OBJECT_DHOST == event->object)
+		{
+			result = DBselect(
+					"select druleid"
+					" from dhosts"
+					" where druleid=" ZBX_FS_UI64
+						" and dhostid=" ZBX_FS_UI64,
+					condition_value,
+					event->objectid);
+		}
+		else	/* EVENT_OBJECT_DSERVICE */
+		{
+			result = DBselect(
+					"select h.druleid"
+					" from dhosts h,dservices s"
+					" where h.dhostid=s.dhostid"
+						" and h.druleid=" ZBX_FS_UI64
+						" and s.dserviceid=" ZBX_FS_UI64,
+					condition_value,
+					event->objectid);
+		}
+
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_EQUAL:
+			if (NULL != DBfetch(result))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (NULL == DBfetch(result))
+				ret = SUCCEED;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+		DBfree_result(result);
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_DCHECK)
+	{
+		if (EVENT_OBJECT_DSERVICE == event->object)
+		{
+			ZBX_STR2UINT64(condition_value, condition->value);
+
+			result = DBselect(
+					"select dcheckid"
+					" from dservices"
+					" where dcheckid=" ZBX_FS_UI64
+						" and dserviceid=" ZBX_FS_UI64,
+					condition_value,
+					event->objectid);
+
+			switch (condition->operator)
+			{
+			case CONDITION_OPERATOR_EQUAL:
+				if (NULL != DBfetch(result))
+					ret = SUCCEED;
+				break;
+			case CONDITION_OPERATOR_NOT_EQUAL:
+				if (NULL == DBfetch(result))
+					ret = SUCCEED;
+				break;
+			default:
+				zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+						condition->operator,
+						condition->conditionid);
+			}
+			DBfree_result(result);
+		}
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_DOBJECT)
+	{
+		condition_value = atoi(condition->value);
+
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_EQUAL:
+			if (event->object == condition_value)
+				ret = SUCCEED;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+	}
+	else if(condition->conditiontype == CONDITION_TYPE_PROXY)
+	{
+		ZBX_STR2UINT64(condition_value, condition->value);
+
+		if (EVENT_OBJECT_DHOST == event->object)
+		{
+			result = DBselect(
+					"select r.proxy_hostid"
+					" from drules r,dhosts h"
+					" where r.druleid=h.druleid"
+						" and r.proxy_hostid=" ZBX_FS_UI64
+						" and h.dhostid=" ZBX_FS_UI64,
+					condition_value,
+					event->objectid);
+		}
+		else	/* EVENT_OBJECT_DSERVICE */
+		{
+			result = DBselect(
+					"select r.proxy_hostid"
+					" from drules r,dhosts h,dservices s"
+					" where r.druleid=h.druleid"
+						" and h.dhostid=s.dhostid"
+						" and r.proxy_hostid=" ZBX_FS_UI64
+						" and s.dserviceid=" ZBX_FS_UI64,
+					condition_value,
+					event->objectid);
+		}
+
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_EQUAL:
+			if (NULL != DBfetch(result))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (NULL == DBfetch(result))
+				ret = SUCCEED;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+		DBfree_result(result);
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_DVALUE)
+	{
+		if (EVENT_OBJECT_DSERVICE == event->object)
+		{
+			result = DBselect(
+					"select value"
+					" from dservices"
+					" where dserviceid=" ZBX_FS_UI64,
+					event->objectid);
+
+			if (NULL != (row = DBfetch(result)))
+			{
+				switch (condition->operator)
+				{
+				case CONDITION_OPERATOR_EQUAL:
+					if (0 == strcmp(condition->value, row[0]))
+						ret = SUCCEED;
+					break;
+				case CONDITION_OPERATOR_NOT_EQUAL:
+					if (0 != strcmp(condition->value, row[0]))
+						ret = SUCCEED;
+					break;
+				case CONDITION_OPERATOR_MORE_EQUAL:
+					if (0 <= strcmp(row[0], condition->value))
+						ret = SUCCEED;
+					break;
+				case CONDITION_OPERATOR_LESS_EQUAL:
+					if (0 >= strcmp(row[0], condition->value))
+						ret = SUCCEED;
+					break;
+				case CONDITION_OPERATOR_LIKE:
+					if (NULL != strstr(row[0], condition->value))
+						ret = SUCCEED;
+					break;
+				case CONDITION_OPERATOR_NOT_LIKE:
+					if (NULL == strstr(row[0], condition->value))
+						ret = SUCCEED;
+					break;
+				default:
+					zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+							condition->operator,
+							condition->conditionid);
+				}
+			}
+			DBfree_result(result);
+		}
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_DHOST_IP)
+	{
+		if (event->object == EVENT_OBJECT_DHOST)
+		{
+			result = DBselect(
+					"select ip"
+					" from dhosts"
+					" where dhostid=" ZBX_FS_UI64,
+					event->objectid);
+		}
+		else
+		{
+			result = DBselect(
+					"select h.ip"
+					" from dhosts h,dservices s"
+					" where h.dhostid=s.dhostid"
+						" and s.dserviceid=" ZBX_FS_UI64,
+					event->objectid);
+		}
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			switch (condition->operator)
+			{
+			case CONDITION_OPERATOR_EQUAL:
+				if (SUCCEED == ip_in_list(condition->value, row[0]))
+					ret = SUCCEED;
+				break;
+			case CONDITION_OPERATOR_NOT_EQUAL:
+				if (SUCCEED != ip_in_list(condition->value, row[0]))
+					ret = SUCCEED;
+				break;
+			default:
+				zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+						condition->operator,
+						condition->conditionid);
+			}
+		}
+		DBfree_result(result);
+	}
+	else if(condition->conditiontype == CONDITION_TYPE_DSERVICE_TYPE)
+	{
+		if (EVENT_OBJECT_DSERVICE == event->object)
+		{
+			condition_value = atoi(condition->value);
+
+			result = DBselect(
+					"select type"
+					" from dservices"
+					" where dserviceid=" ZBX_FS_UI64,
+					event->objectid);
+
+			if (NULL != (row = DBfetch(result)))
+			{
+				tmp_int = atoi(row[0]);
+
+				switch (condition->operator)
+				{
+				case CONDITION_OPERATOR_EQUAL:
+					if (condition_value == tmp_int)
+						ret = SUCCEED;
+					break;
+				case CONDITION_OPERATOR_NOT_EQUAL:
+					if (condition_value != tmp_int)
+						ret = SUCCEED;
+					break;
+				default:
+					zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+							condition->operator,
+							condition->conditionid);
+				}
+			}
+			DBfree_result(result);
+		}
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_DSTATUS)
+	{
+		condition_value = atoi(condition->value);
+
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_EQUAL:
+			if (condition_value == event->value)
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (condition_value != event->value)
+				ret = SUCCEED;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_DUPTIME)
+	{
+		condition_value = atoi(condition->value);
+
+		if (event->object == EVENT_OBJECT_DHOST)
+		{
+			result = DBselect(
+					"select status,lastup,lastdown"
+					" from dhosts"
+					" where dhostid=" ZBX_FS_UI64,
+					event->objectid);
+		}
+		else
+		{
+			result = DBselect(
+					"select status,lastup,lastdown"
+					" from dservices"
+					" where dserviceid=" ZBX_FS_UI64,
+					event->objectid);
+		}
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			tmp_int	= (atoi(row[0]) == DOBJECT_STATUS_UP) ? atoi(row[1]) : atoi(row[2]);
+			now	= time(NULL);
+
+			switch (condition->operator)
+			{
+			case CONDITION_OPERATOR_EQUAL:
+				if (0 != tmp_int && (now - tmp_int) <= condition_value)
+					ret = SUCCEED;
+				break;
+			case CONDITION_OPERATOR_MORE_EQUAL:
+				if (0 != tmp_int && (now - tmp_int) >= condition_value)
+					ret = SUCCEED;
+				break;
+			default:
+				zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+						condition->operator,
+						condition->conditionid);
+			}
+		}
+		DBfree_result(result);
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_DSERVICE_PORT)
+	{
+		if (event->object == EVENT_OBJECT_DSERVICE)
+		{
+			result = DBselect(
+					"select port"
+					" from dservices"
+					" where dserviceid=" ZBX_FS_UI64,
+					event->objectid);
+
+			if (NULL != (row = DBfetch(result)))
+			{
+				switch (condition->operator)
+				{
+				case CONDITION_OPERATOR_EQUAL:
+					if (SUCCEED == int_in_list(condition->value, atoi(row[0])))
+						ret = SUCCEED;
+					break;
+				case CONDITION_OPERATOR_NOT_EQUAL:
+					if (SUCCEED != int_in_list(condition->value, atoi(row[0])))
+						ret = SUCCEED;
+					break;
+				default:
+					zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+							condition->operator,
+							condition->conditionid);
+				}
+			}
+			DBfree_result(result);
+		}
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
+				condition->conditiontype,
+				condition->conditionid);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_auto_registration_condition                                *
+ *                                                                            *
+ * Purpose: check if event matches single condition                           *
+ *                                                                            *
+ * Parameters: event - auto registration event to check                       *
+ *                         (event->source == EVENT_SOURCE_AUTO_REGISTRATION)  *
+ *             condition - condition for matching                             *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_auto_registration_condition(DB_EVENT *event, DB_CONDITION *condition)
+{
+	const char	*__function_name = "check_auto_registration_condition";
+	DB_RESULT 	result;
+	DB_ROW		row;
+	zbx_uint64_t	condition_value;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (condition->conditiontype == CONDITION_TYPE_HOST_NAME)
+	{
+		result = DBselect(
+				"select host"
+				" from autoreg_host"
+				" where autoreg_hostid=" ZBX_FS_UI64,
+				event->objectid);
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			switch (condition->operator)
+			{
+			case CONDITION_OPERATOR_LIKE:
+				if (NULL != strstr(row[0], condition->value))
+					ret = SUCCEED;
+				break;
+			case CONDITION_OPERATOR_NOT_LIKE:
+				if (NULL == strstr(row[0], condition->value))
+					ret = SUCCEED;
+				break;
+			default:
+				zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+						condition->operator,
+						condition->conditionid);
+			}
+		}
+		DBfree_result(result);
+	}
+	else if (condition->conditiontype == CONDITION_TYPE_PROXY)
+	{
+		ZBX_STR2UINT64(condition_value, condition->value);
+
+		result = DBselect(
+				"select host"
+				" from autoreg_host"
+				" where proxy_hostid=" ZBX_FS_UI64
+					" and autoreg_hostid=" ZBX_FS_UI64,
+				condition_value,
+				event->objectid);
+
+		switch (condition->operator)
+		{
+		case CONDITION_OPERATOR_EQUAL:
+			if (NULL != DBfetch(result))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (NULL == DBfetch(result))
+				ret = SUCCEED;
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+		}
+		DBfree_result(result);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
+				condition->conditiontype,
+				condition->conditionid);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: check_action_condition                                           *
  *                                                                            *
  * Purpose: check if event matches single condition                           *
@@ -67,746 +963,35 @@
  ******************************************************************************/
 int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 {
-	DB_RESULT result;
-	DB_ROW	row;
-	zbx_uint64_t	nodeid, groupid, hostid, druleid;
-	zbx_uint64_t	condition_value;
-	int		value_int;
-	int		now;
-	int		tmp_int;
+	const char	*__function_name = "check_action_condition";
+	int		ret;
 
-	char		*tmp_str = NULL;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [actionid:" ZBX_FS_UI64 ",conditionid:" ZBX_FS_UI64 ",cond.value:%s]",
+			__function_name,
+			condition->actionid,
+			condition->conditionid,
+			condition->value);
 
-	int	ret = FAIL;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_condition [actionid:" ZBX_FS_UI64 ",conditionid:" ZBX_FS_UI64 ",cond.value:%s]",
-		condition->actionid,
-		condition->conditionid,
-		condition->value);
-
-	if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_HOST_GROUP)
+	switch (event->source)
 	{
-		ZBX_STR2UINT64(condition_value, condition->value);
-		result = DBselect("select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64,
-			event->objectid);
-		if(condition->operator == CONDITION_OPERATOR_EQUAL)
-		{
-			while((row=DBfetch(result)))
-			{
-				ZBX_STR2UINT64(groupid, row[0]);
-				if(condition_value == groupid)
-				{
-					ret = SUCCEED;
-					break;
-				}
-			}
-		}
-		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
-		{
-			ret = SUCCEED;
-			while((row=DBfetch(result)))
-			{
-				ZBX_STR2UINT64(groupid, row[0]);
-				if(condition_value == groupid)
-				{
-					ret = FAIL;
-					break;
-				}
-			}
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-				condition->operator,
+	case EVENT_SOURCE_TRIGGERS:
+		ret = check_trigger_condition(event, condition);
+		break;
+	case EVENT_SOURCE_DISCOVERY:
+		ret = check_discovery_condition(event, condition);
+		break;
+	case EVENT_SOURCE_AUTO_REGISTRATION:
+		ret = check_auto_registration_condition(event, condition);
+		break;
+	default:
+		zabbix_log(LOG_LEVEL_ERR, "Unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
+				event->source,
 				condition->conditionid);
-		}
-		DBfree_result(result);
-	}
-	else if (event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_HOST_TEMPLATE)
-	{
-		condition_value = zbx_atoui64(condition->value);
-
-		result = DBselect("select distinct ht.templateid from hosts_templates ht,items i,functions f,triggers t"
-				" where ht.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64,
-				event->objectid);
-
-		if (condition->operator == CONDITION_OPERATOR_EQUAL) {
-			while (NULL != (row = DBfetch(result))) {
-				hostid = zbx_atoui64(row[0]);
-
-				if (condition_value == hostid) {
-					ret = SUCCEED;
-					break;
-				}
-			}
-		} else if (condition->operator == CONDITION_OPERATOR_NOT_EQUAL) {
-			ret = SUCCEED;
-
-			while (NULL != (row = DBfetch(result))) {
-				hostid = zbx_atoui64(row[0]);
-
-				if (condition_value == hostid) {
-					ret = FAIL;
-					break;
-				}
-			}
-		} else
-			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-					condition->operator,
-					condition->conditionid);
-
-		DBfree_result(result);
-	}
-	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_HOST)
-	{
-		ZBX_STR2UINT64(condition_value, condition->value);
-		result = DBselect("select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64,
-			event->objectid);
-		if(condition->operator == CONDITION_OPERATOR_EQUAL)
-		{
-			while((row=DBfetch(result)))
-			{
-				ZBX_STR2UINT64(hostid, row[0]);
-				if(condition_value == hostid)
-				{
-					ret = SUCCEED;
-					break;
-				}
-			}
-		}
-		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
-		{
-			ret = SUCCEED;
-			while((row=DBfetch(result)))
-			{
-				ZBX_STR2UINT64(hostid, row[0]);
-				if(condition_value == hostid)
-				{
-					ret = FAIL;
-					break;
-				}
-			}
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-			condition->operator,
-			condition->conditionid);
-		}
-		DBfree_result(result);
-	}
-	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_TRIGGER)
-	{
-		ZBX_STR2UINT64(condition_value, condition->value);
-		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_TRIGGER [" ZBX_FS_UI64 ":%s]",
-			condition_value,
-			condition->value);
-		if(condition->operator == CONDITION_OPERATOR_EQUAL)
-		{
-			if(event->objectid == condition_value)
-			{
-				ret = SUCCEED;
-			}
-			/* Processing of templated triggers */
-			else
-			{
-				result = DBselect("select triggerid from triggers where triggerid=" ZBX_FS_UI64
-					" and templateid=" ZBX_FS_UI64,
-						event->objectid,
-						condition_value);
-				if((row=DBfetch(result)))
-				{
-					ret = SUCCEED;
-				}
-				DBfree_result(result);
-			}
-		}
-		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
-		{
-			if(event->objectid != condition_value)
-			{
-				ret = SUCCEED;
-			}
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]",
-				condition->operator,
-				condition->conditionid);
-		}
-	}
-	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
-	{
-		tmp_str = zbx_dsprintf(tmp_str, "%s", event->trigger_description);
-
-		substitute_simple_macros(event, NULL, NULL, NULL, &tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION);
-
-		if(condition->operator == CONDITION_OPERATOR_LIKE)
-		{
-			if(strstr(tmp_str, condition->value) != NULL)
-			{
-				ret = SUCCEED;
-			}
-		}
-		else if(condition->operator == CONDITION_OPERATOR_NOT_LIKE)
-		{
-			if(strstr(tmp_str, condition->value) == NULL)
-			{
-				ret = SUCCEED;
-			}
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-				condition->operator,
-				condition->conditionid);
-		}
-		zbx_free(tmp_str);
-	}
-	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
-	{
-		if(condition->operator == CONDITION_OPERATOR_EQUAL)
-		{
-			if(event->trigger_priority == atoi(condition->value))
-			{
-				ret = SUCCEED;
-			}
-		}
-		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
-		{
-			if(event->trigger_priority != atoi(condition->value))
-			{
-				ret = SUCCEED;
-			}
-		}
-		else if(condition->operator == CONDITION_OPERATOR_MORE_EQUAL)
-		{
-			if(event->trigger_priority >= atoi(condition->value))
-			{
-				ret = SUCCEED;
-			}
-		}
-		else if(condition->operator == CONDITION_OPERATOR_LESS_EQUAL)
-		{
-			if(event->trigger_priority <= atoi(condition->value))
-			{
-				ret = SUCCEED;
-			}
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-				condition->operator,
-				condition->conditionid);
-		}
-	}
-	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_TRIGGER_VALUE)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_TRIGGER_VALUE [%d:%s]",
-			event->value,
-			condition->value);
-		if(condition->operator == CONDITION_OPERATOR_EQUAL)
-		{
-			if(event->value == atoi(condition->value))
-			{
-				ret = SUCCEED;
-			}
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-				condition->operator,
-				condition->conditionid);
-		}
-	}
-	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_TIME_PERIOD)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_TRIGGER_VALUE [%d:%s]",
-			event->value,
-			condition->value);
-		if(condition->operator == CONDITION_OPERATOR_IN)
-		{
-			if(check_time_period(condition->value, (time_t)NULL) == 1)
-			{
-				ret = SUCCEED;
-			}
-		}
-		else if(condition->operator == CONDITION_OPERATOR_NOT_IN)
-		{
-			if(check_time_period(condition->value, (time_t)NULL) == 0)
-			{
-				ret = SUCCEED;
-			}
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-				condition->operator,
-				condition->conditionid);
-		}
-	}
-	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_MAINTENANCE)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "CONDITION_TYPE_MAINTENANCE");
-
-		switch (condition->operator) {
-		case CONDITION_OPERATOR_IN:
-		case CONDITION_OPERATOR_NOT_IN:
-			result = DBselect("select count(*) from hosts h,items i,functions f,triggers t "
-					"where h.hostid=i.hostid and h.maintenance_status=%d and "
-					"i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64,
-				condition->operator == CONDITION_OPERATOR_IN ? HOST_MAINTENANCE_STATUS_ON : HOST_MAINTENANCE_STATUS_OFF,
-				event->objectid);
-
-			ret = (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) && atoi(row[0]) != 0) ? SUCCEED : FAIL;
-
-			DBfree_result(result);
-			break;
-		default:
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-				condition->operator,
-				condition->conditionid);
-		}
-	}
-	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_NODE)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "CONDITION_TYPE_NODE");
-
-		nodeid = get_nodeid_by_id(event->objectid);
-		ZBX_STR2UINT64(condition_value, condition->value);
-
-		switch (condition->operator) {
-		case CONDITION_OPERATOR_EQUAL:
-			ret = (nodeid == condition_value) ? SUCCEED : FAIL;
-			break;
-		case CONDITION_OPERATOR_NOT_EQUAL:
-			ret = (nodeid != condition_value) ? SUCCEED : FAIL;
-			break;
-		default:
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-					condition->operator,
-					condition->conditionid);
-		}
-	}
-	else if(event->source == EVENT_SOURCE_DISCOVERY && condition->conditiontype == CONDITION_TYPE_DRULE)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "CONDITION_TYPE_DRULE");
-
-		if (EVENT_OBJECT_DHOST == event->object)
-			result = DBselect("select druleid from dhosts where dhostid=" ZBX_FS_UI64, event->objectid);
-		else	/* EVENT_OBJECT_DSERVICE */
-			result = DBselect("select h.druleid from dhosts h,dservices s"
-					" where h.dhostid=s.dhostid and s.dserviceid=" ZBX_FS_UI64, event->objectid);
-
-		if (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(druleid, row[0]);
-			ZBX_STR2UINT64(condition_value, condition->value);
-
-			switch (condition->operator) {
-			case CONDITION_OPERATOR_EQUAL:
-				ret = (druleid == condition_value) ? SUCCEED : FAIL;
-				break;
-			case CONDITION_OPERATOR_NOT_EQUAL:
-				ret = (druleid != condition_value) ? SUCCEED : FAIL;
-				break;
-			default:
-				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-						condition->operator,
-						condition->conditionid);
-			}
-		}
-
-		DBfree_result(result);
-	}
-	else if(event->source == EVENT_SOURCE_DISCOVERY && condition->conditiontype == CONDITION_TYPE_DCHECK)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "CONDITION_TYPE_DCHECK");
-
-		if (EVENT_OBJECT_DSERVICE == event->object)
-		{
-			result = DBselect("select dcheckid from dservices where dserviceid=" ZBX_FS_UI64, event->objectid);
-
-			if (NULL != (row = DBfetch(result)))
-			{
-				ZBX_STR2UINT64(druleid, row[0]);
-				ZBX_STR2UINT64(condition_value, condition->value);
-
-				switch (condition->operator) {
-				case CONDITION_OPERATOR_EQUAL:
-					ret = (druleid == condition_value) ? SUCCEED : FAIL;
-					break;
-				case CONDITION_OPERATOR_NOT_EQUAL:
-					ret = (druleid != condition_value) ? SUCCEED : FAIL;
-					break;
-				default:
-					zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-							condition->operator,
-							condition->conditionid);
-				}
-			}
-
-			DBfree_result(result);
-		}
-	}
-	else if(event->source == EVENT_SOURCE_DISCOVERY && condition->conditiontype == CONDITION_TYPE_DOBJECT)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "CONDITION_TYPE_DOBJECT");
-
-		ZBX_STR2UINT64(condition_value, condition->value);
-
-		switch (condition->operator) {
-		case CONDITION_OPERATOR_EQUAL:
-			ret = (event->object == condition_value) ? SUCCEED : FAIL;
-			break;
-		default:
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-					condition->operator,
-					condition->conditionid);
-		}
-	}
-	else if(event->source == EVENT_SOURCE_DISCOVERY && condition->conditiontype == CONDITION_TYPE_PROXY)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "CONDITION_TYPE_PROXY");
-
-		if (EVENT_OBJECT_DHOST == event->object)
-			result = DBselect("select r.proxy_hostid from drules r,dhosts h"
-					" where r.druleid=h.druleid and h.dhostid=" ZBX_FS_UI64, event->objectid);
-		else	/* EVENT_OBJECT_DSERVICE */
-			result = DBselect("select r.proxy_hostid from drules r,dhosts h,dservices s"
-					" where r.druleid=h.druleid and h.dhostid=s.dhostid"
-					" and s.dserviceid=" ZBX_FS_UI64, event->objectid);
-
-		if (NULL != (row = DBfetch(result)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s %s", row[0], condition->value);
-			ZBX_STR2UINT64(hostid, row[0]);
-			ZBX_STR2UINT64(condition_value, condition->value);
-
-			switch (condition->operator) {
-			case CONDITION_OPERATOR_EQUAL:
-				ret = (hostid == condition_value) ? SUCCEED : FAIL;
-				break;
-			case CONDITION_OPERATOR_NOT_EQUAL:
-				ret = (hostid != condition_value) ? SUCCEED : FAIL;
-				break;
-			default:
-				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-						condition->operator,
-						condition->conditionid);
-			}
-		}
-
-		DBfree_result(result);
-	}
-	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_EVENT_ACKNOWLEDGED)
-	{
-
-		result = DBselect("select acknowledged from events where eventid=" ZBX_FS_UI64,
-				event->eventid);
-
-		if (NULL != (row = DBfetch(result))) {
-			value_int = atoi(row[0]);
-
-			if(condition->operator == CONDITION_OPERATOR_EQUAL) {
-				if (value_int == atoi(condition->value))
-					ret = SUCCEED;
-			} else {
-				zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-						condition->operator,
-						condition->conditionid);
-			}
-		} else
-			zabbix_log(LOG_LEVEL_ERR, "Unknown event [" ZBX_FS_UI64 "]",
-					event->eventid);
-
-		DBfree_result(result);
-	}
-	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_APPLICATION)
-	{
-		result = DBselect("select distinct a.name from applications a,items_applications i,functions f,triggers t"
-				" where a.applicationid=i.applicationid and i.itemid=f.itemid"
-				" and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64,
-				event->objectid);
-
-		switch (condition->operator) {
-			case CONDITION_OPERATOR_EQUAL:
-				while (NULL != (row = DBfetch(result))) {
-					if (0 == strcmp(row[0], condition->value)) {
-						ret = SUCCEED;
-						break;
-					}
-				}
-				break;
-			case CONDITION_OPERATOR_LIKE:
-				while (NULL != (row = DBfetch(result))) {
-					if (NULL != strstr(row[0], condition->value)) {
-						ret = SUCCEED;
-						break;
-					}
-				}
-				break;
-			case CONDITION_OPERATOR_NOT_LIKE:
-				ret = SUCCEED;
-				while (NULL != (row = DBfetch(result))) {
-					if (NULL != strstr(row[0], condition->value)) {
-						ret = FAIL;
-						break;
-					}
-				}
-				break;
-			default:
-				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-						condition->operator,
-						condition->conditionid);
-		}
-
-		DBfree_result(result);
-	}
-	else if(event->source == EVENT_SOURCE_DISCOVERY &&
-		event->object == EVENT_OBJECT_DSERVICE &&
-		condition->conditiontype == CONDITION_TYPE_DVALUE)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DVALUE [%d:%s]",
-			event->value,
-			condition->value);
-
-		result = DBselect("select value from dservices where dserviceid=" ZBX_FS_UI64,
-				event->objectid);
-		row = DBfetch(result);
-		if(row && DBis_null(row[0]) != SUCCEED)
-		{
-			if(condition->operator == CONDITION_OPERATOR_EQUAL)
-			{
-				if(strcmp(condition->value, row[0]) == 0)	ret = SUCCEED;
-			}
-			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
-			{
-				if(strcmp(condition->value, row[0]) != 0)	ret = SUCCEED;
-			}
-			else if(condition->operator == CONDITION_OPERATOR_MORE_EQUAL)
-			{
-				if(strcmp(row[0], condition->value) >= 0)	ret = SUCCEED;
-			}
-			else if(condition->operator == CONDITION_OPERATOR_LESS_EQUAL)
-			{
-				if(strcmp(row[0], condition->value) <= 0)	ret = SUCCEED;
-			}
-			else if(condition->operator == CONDITION_OPERATOR_LIKE)
-			{
-				if(strstr(row[0], condition->value) != NULL)	ret = SUCCEED;
-			}
-			else if(condition->operator == CONDITION_OPERATOR_NOT_LIKE)
-			{
-				if(strstr(row[0], condition->value) == NULL)	ret = SUCCEED;
-			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-					condition->operator,
-					condition->conditionid);
-			}
-		}
-		DBfree_result(result);
-	}
-	else if(event->source == EVENT_SOURCE_DISCOVERY &&
-		(event->object == EVENT_OBJECT_DHOST || event->object == EVENT_OBJECT_DSERVICE) &&
-		condition->conditiontype == CONDITION_TYPE_DHOST_IP)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DHOST_IP [%d:%s]",
-			event->value,
-			condition->value);
-
-		if(event->object == EVENT_OBJECT_DHOST)
-		{
-			result = DBselect("select ip from dhosts where dhostid=" ZBX_FS_UI64,
-				event->objectid);
-		}
-		else
-		{
-			result = DBselect("select h.ip from dhosts h,dservices s where h.dhostid=s.dhostid and s.dserviceid=" ZBX_FS_UI64,
-				event->objectid);
-		}
-		row = DBfetch(result);
-		if(row && DBis_null(row[0]) != SUCCEED)
-		{
-			if(condition->operator == CONDITION_OPERATOR_EQUAL)
-			{
-				if(ip_in_list(condition->value, row[0]) == SUCCEED)	ret = SUCCEED;
-			}
-			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
-			{
-				if(ip_in_list(condition->value, row[0]) == FAIL)	ret = SUCCEED;
-			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-					condition->operator,
-					condition->conditionid);
-			}
-		}
-		DBfree_result(result);
-	}
-	else if(event->source == EVENT_SOURCE_DISCOVERY && condition->conditiontype == CONDITION_TYPE_DSERVICE_TYPE)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "CONDITION_TYPE_DSERVICE_TYPE");
-
-		if (EVENT_OBJECT_DSERVICE == event->object)
-		{
-			result = DBselect("select type from dservices where dserviceid=" ZBX_FS_UI64,
-					event->objectid);
-			if (NULL != (row = DBfetch(result)))
-			{
-				value_int = atoi(condition->value);
-				tmp_int = atoi(row[0]);
-
-				if (condition->operator == CONDITION_OPERATOR_EQUAL)
-				{
-					if (value_int == tmp_int)
-						ret = SUCCEED;
-				}
-				else if (condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
-				{
-					if (value_int != tmp_int)
-						ret = SUCCEED;
-				}
-				else
-				{
-					zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-							condition->operator,
-							condition->conditionid);
-				}
-			}
-			DBfree_result(result);
-		}
-	}
-	else if(event->source == EVENT_SOURCE_DISCOVERY &&
-		(event->object == EVENT_OBJECT_DHOST || event->object == EVENT_OBJECT_DSERVICE) &&
-		condition->conditiontype == CONDITION_TYPE_DSTATUS)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DSTATUS [%d:%s]",
-			event->value,
-			condition->value);
-		value_int = atoi(condition->value);
-/*		if(event->object == EVENT_OBJECT_DHOST)
-		{
-			result = DBselect("select status from dhosts where dhostid=" ZBX_FS_UI64,
-				event->objectid);
-		}
-		else
-		{
-			result = DBselect("select status from dservices where dserviceid=" ZBX_FS_UI64,
-				event->objectid);
-		}
-		row = DBfetch(result);
-		if(row && DBis_null(row[0]) != SUCCEED)
-		{*/
-			if(condition->operator == CONDITION_OPERATOR_EQUAL)
-			{
-/*				if(value_int == atoi(row[0]))	ret = SUCCEED;*/
-				if(value_int == event->value)	ret = SUCCEED;
-			}
-			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
-			{
-/*				if(atoi(row[0]) != value_int)	ret = SUCCEED;*/
-				if(value_int != event->value)	ret = SUCCEED;
-			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-					condition->operator,
-					condition->conditionid);
-			}
-/*		}
-		DBfree_result(result);*/
-	}
-	else if(event->source == EVENT_SOURCE_DISCOVERY &&
-		(event->object == EVENT_OBJECT_DHOST || event->object == EVENT_OBJECT_DSERVICE) &&
-		condition->conditiontype == CONDITION_TYPE_DUPTIME)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DUPTIME [event->value:%d:condition->value:%s]",
-			event->value,
-			condition->value);
-		value_int = atoi(condition->value);
-		if(event->object == EVENT_OBJECT_DHOST)
-		{
-			result = DBselect("select status,lastup,lastdown from dhosts where dhostid=" ZBX_FS_UI64,
-				event->objectid);
-		}
-		else
-		{
-			result = DBselect("select status,lastup,lastdown from dservices where dserviceid=" ZBX_FS_UI64,
-				event->objectid);
-		}
-		row = DBfetch(result);
-		if(row && DBis_null(row[0]) != SUCCEED)
-		{
-			tmp_int = (atoi(row[0]) == DOBJECT_STATUS_UP)?atoi(row[1]):atoi(row[2]);
-			now = time(NULL);
-			if(condition->operator == CONDITION_OPERATOR_LESS_EQUAL)
-			{
-				if(tmp_int != 0 && (now-tmp_int)<=value_int)	ret = SUCCEED;
-			}
-			else if(condition->operator == CONDITION_OPERATOR_MORE_EQUAL)
-			{
-				if(tmp_int != 0 && (now-tmp_int)>=value_int)	ret = SUCCEED;
-			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-					condition->operator,
-					condition->conditionid);
-			}
-		}
-		DBfree_result(result);
-	}
-	else if(event->source == EVENT_SOURCE_DISCOVERY &&
-		event->object == EVENT_OBJECT_DSERVICE &&
-		condition->conditiontype == CONDITION_TYPE_DSERVICE_PORT)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DSERVICE_PORT [%d:%s]",
-			event->value,
-			condition->value);
-		result = DBselect("select port from dservices where dserviceid=" ZBX_FS_UI64,
-			event->objectid);
-		row = DBfetch(result);
-		if(row && DBis_null(row[0]) != SUCCEED)
-		{
-			if(condition->operator == CONDITION_OPERATOR_EQUAL)
-			{
-				if(int_in_list(condition->value, atoi(row[0])) == SUCCEED)	ret = SUCCEED;
-			}
-			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
-			{
-				if(int_in_list(condition->value, atoi(row[0])) == FAIL)	ret = SUCCEED;
-			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-					condition->operator,
-					condition->conditionid);
-			}
-		}
-		DBfree_result(result);
-	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Event source [%d] and condition type [%d] is unknown for condition id [" ZBX_FS_UI64 "]",
-			event->source,
-			condition->conditiontype,
-			condition->conditionid);
+		ret = FAIL;
 	}
 
-	if(FAIL==ret)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Condition is FALSE");
-	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Condition is TRUE");
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End check_action_condition()");
 	return ret;
 }
 
@@ -944,15 +1129,15 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-
 	DB_OPERATION	operation;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In execute_operations(actionid:" ZBX_FS_UI64 ")",
-		action->actionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In execute_operations(actionid:" ZBX_FS_UI64 ")",
+			action->actionid);
 
 	result = DBselect("select operationid,actionid,operationtype,object,objectid from operations where actionid=" ZBX_FS_UI64,
-			action->actionid);	/* ,shortdata,longdata */
-	while((row=DBfetch(result)))
+			action->actionid);
+
+	while (NULL != (row = DBfetch(result)))
 	{
 		memset(&operation, 0, sizeof(operation));
 
@@ -962,20 +1147,8 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 		operation.object			= atoi(row[3]);
 		ZBX_STR2UINT64(operation.objectid,	row[4]);
 
-/*		operation.shortdata		= strdup(row[5]);
-		operation.longdata		= strdup(row[6]);
-
-		substitute_macros(event, action, &operation.shortdata);
-		substitute_macros(event, action, &operation.longdata);*/
-
-		switch(operation.operationtype)
+		switch (operation.operationtype)
 		{
-/*			case	OPERATION_TYPE_MESSAGE:
-				op_notify_user(event,action,&operation);
-				break;
-			case	OPERATION_TYPE_COMMAND:
-				op_run_commands(event,&operation);
-				break;*/
 			case	OPERATION_TYPE_HOST_ADD:
 				op_host_add(event);
 				break;
@@ -989,7 +1162,7 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 				op_host_disable(event);
 				break;
 			case	OPERATION_TYPE_GROUP_ADD:
-				op_group_add(event,action,&operation);
+				op_group_add(event, &operation);
 				break;
 			case	OPERATION_TYPE_GROUP_REMOVE:
 				op_group_del(event,action,&operation);
@@ -1003,13 +1176,9 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 			default:
 				break;
 		}
-
-/*		zbx_free(operation.shortdata);
-		zbx_free(operation.longdata);*/
 	}
 	DBfree_result(result);
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -1028,34 +1197,32 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
  ******************************************************************************/
 void	process_actions(DB_EVENT *event)
 {
-	DB_RESULT result;
-	DB_ROW row;
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_ACTION	action;
 
-	DB_ACTION action;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_actions(source:%s,eventid:" ZBX_FS_UI64 ")",
-		(event->source == EVENT_SOURCE_TRIGGERS)?"TRIGGERS":"DISCOVERY",
-		event->eventid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_actions() eventid:" ZBX_FS_UI64,
+			event->eventid);
 
 	result = DBselect("select actionid,evaltype,status,eventsource from actions where status=%d and eventsource=%d" DB_NODE,
-		ACTION_STATUS_ACTIVE,
-		event->source,
-		DBnode_local("actionid"));
+			ACTION_STATUS_ACTIVE,
+			event->source,
+			DBnode_local("actionid"));
 
-	while((row=DBfetch(result)))
+	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(action.actionid, row[0]);
 		action.evaltype		= atoi(row[1]);
 		action.status		= atoi(row[2]);
 		action.eventsource	= atoi(row[3]);
 
-		if(check_action_conditions(event, &action) == SUCCEED)
+		if (SUCCEED == check_action_conditions(event, &action))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operations.");
 
 			DBstart_escalation(action.actionid, event->source == EVENT_SOURCE_TRIGGERS ? event->objectid : 0, event->eventid);
 
-			if (event->source == EVENT_SOURCE_DISCOVERY)
+			if (event->source == EVENT_SOURCE_DISCOVERY || event->source == EVENT_SOURCE_AUTO_REGISTRATION)
 				execute_operations(event, &action);
 		}
 		else if (event->source == EVENT_SOURCE_TRIGGERS)
@@ -1066,5 +1233,6 @@ void	process_actions(DB_EVENT *event)
 		}
 	}
 	DBfree_result(result);
+
 	zabbix_log( LOG_LEVEL_DEBUG, "End process_actions()");
 }

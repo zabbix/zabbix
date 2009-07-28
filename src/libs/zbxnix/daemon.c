@@ -59,7 +59,7 @@ static void	parent_signal_handler(int sig,  siginfo_t *siginfo, void *context)
 	switch(sig)
 	{
 	case SIGCHLD:
-		zabbix_log( LOG_LEVEL_WARNING, "One child process died (PID:%d). Exiting ...",
+		zabbix_log( LOG_LEVEL_CRIT, "One child process died (PID:%d). Exiting ...",
 			siginfo->si_pid);
 		uninit();
 		exit( FAIL );
