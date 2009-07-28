@@ -112,6 +112,7 @@ static int housekeeping_history(int now)
 
 	records += delete_history("proxy_history", "history_lastid", now);
 	records += delete_history("proxy_dhistory", "dhistory_lastid", now);
+	records += delete_history("proxy_autoreg_host", "autoreg_host_lastid", now);
 
         return records;
 }

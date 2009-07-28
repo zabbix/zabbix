@@ -38,6 +38,8 @@
 #include "log.h"
 #include "zlog.h"
 
+#include "operations.h"
+
 #include "poller/poller.h"
 #include "poller/checks_agent.h"
 #include "poller/checks_ipmi.h"
@@ -458,6 +460,11 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 				" where dh.ip=h.ip and ds.dhostid=dh.dhostid and ds.dserviceid =" ZBX_FS_UI64,
 				event->objectid);
 		break;
+	case EVENT_OBJECT_ZABBIX_ACTIVE:
+		result = DBselect("select h.hostid from hosts h,autoreg_host a"
+				" where a.proxy_hostid=h.proxyhostid and a.host=h.host and a.autoreg_hostid=" ZBX_FS_UI64,
+				event->objectid);
+		break;
 	default:
 		return 0;
 	}
@@ -549,11 +556,9 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 	const char	*__function_name = "add_discovered_host";
 	DB_RESULT	result;
 	DB_RESULT	result2;
-	DB_RESULT	result3;
 	DB_ROW		row;
 	DB_ROW		row2;
-	DB_ROW		row3;
-	zbx_uint64_t	hostgroupid = 0, groupid = 0, hostid = 0, proxy_hostid;
+	zbx_uint64_t	hostid = 0, proxy_hostid, host_proxy_hostid;
 	char		host[MAX_STRING_LEN], *host_esc, *ip_esc;
 	int		port;
 
@@ -571,36 +576,83 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				" where dh.druleid=dr.druleid and ds.dhostid=dh.dhostid and ds.dserviceid =" ZBX_FS_UI64,
 				event->objectid);
 		break;
+	case EVENT_OBJECT_ZABBIX_ACTIVE:
+		result = DBselect("select proxy_hostid,host from autoreg_host"
+				" where autoreg_hostid=" ZBX_FS_UI64,
+				event->objectid);
+		break;
 	default:
 		return 0;
 	}
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		port = get_discovered_agent_port(event);
-
 		ZBX_STR2UINT64(proxy_hostid, row[0]);
 
-		alarm(CONFIG_TIMEOUT);
-		zbx_gethost_by_ip(row[1], host, sizeof(host));
-		alarm(0);
-
-		host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
-		ip_esc = DBdyn_escape_string_len(row[1], HOST_IP_LEN);
-
-		result2 = DBselect("select hostid,dns,port from hosts where ip='%s' and proxy_hostid=" ZBX_FS_UI64 DB_NODE,
-				ip_esc,
-				proxy_hostid,
-				DBnode_local("hostid"));
-
-		if (NULL == (row2 = DBfetch(result2)))
+		if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)
 		{
-			result3 = DBselect("select discovery_groupid from config where 1=1" DB_NODE, DBnode_local("configid"));
-			row3 = DBfetch(result3);
+			host_esc = DBdyn_escape_string_len(row[1], HOST_HOST_LEN);
 
-			if( (row3 != NULL) && DBis_null(row3[0]) != SUCCEED)
+			result2 = DBselect(
+					"select hostid,proxy_hostid"
+					" from hosts"
+					" where host='%s'"
+					       	DB_NODE,
+					host_esc,
+					DBnode_local("hostid"));
+
+			if (NULL == (row2 = DBfetch(result2)))
 			{
-				hostid = DBget_maxid("hosts","hostid");
+				hostid = DBget_maxid("hosts", "hostid");
+
+				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,dns)"
+						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',0,'%s')",
+						hostid,
+						proxy_hostid,
+						host_esc,
+						host_esc);
+			}
+			else
+			{
+				ZBX_STR2UINT64(hostid, row2[0]);
+				ZBX_STR2UINT64(host_proxy_hostid, row2[1]);
+
+				if (host_proxy_hostid != proxy_hostid)
+				{
+					DBexecute("update hosts"
+							" set proxy_hostid=" ZBX_FS_UI64
+							" where hostid=" ZBX_FS_UI64,
+							proxy_hostid,
+							hostid);
+				}
+			}
+			DBfree_result(result2);
+
+			zbx_free(host_esc);
+		}
+		else
+		{
+			alarm(CONFIG_TIMEOUT);
+			zbx_gethost_by_ip(row[1], host, sizeof(host));
+			alarm(0);
+
+			host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
+			ip_esc = DBdyn_escape_string_len(row[1], HOST_IP_LEN);
+
+			port = get_discovered_agent_port(event);
+
+			result2 = DBselect(
+					"select hostid,dns,port,proxy_hostid"
+					" from hosts"
+					" where ip='%s'"
+					       	DB_NODE,
+					ip_esc,
+					DBnode_local("hostid"));
+
+			if (NULL == (row2 = DBfetch(result2)))
+			{
+				hostid = DBget_maxid("hosts", "hostid");
+
 				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,ip,dns,port)"
 						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',1,'%s','%s',%d)",
 						hostid,
@@ -609,36 +661,26 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 						ip_esc,
 						host_esc,
 						port);
-
-
-				ZBX_STR2UINT64(groupid, row3[0]);
-
-				hostgroupid = DBget_maxid("hosts_groups", "hostgroupid");
-				DBexecute("insert into hosts_groups (hostgroupid,hostid,groupid)"
-						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-						hostgroupid,
-						hostid,
-						groupid);
 			}
-			else{
-				zabbix_log(LOG_LEVEL_DEBUG, "Discovery group is not defined %s()", __function_name);
+			else
+			{
+				ZBX_STR2UINT64(hostid, row2[0]);
+				ZBX_STR2UINT64(host_proxy_hostid, row2[3]);
+
+				if (0 != strcmp(host, row2[1]) || port != atoi(row2[2]) || host_proxy_hostid != proxy_hostid)
+				{
+					DBexecute("update hosts"
+							" set dns='%s',port=%d,proxy_hostid=" ZBX_FS_UI64
+							" where hostid=" ZBX_FS_UI64,
+							host_esc, port, proxy_hostid,
+							hostid);
+				}
 			}
+			DBfree_result(result2);
 
-			DBfree_result(result3);
+			zbx_free(host_esc);
+			zbx_free(ip_esc);
 		}
-		else
-		{
-			ZBX_STR2UINT64(hostid, row2[0]);
-			if (0 != strcmp(host, row2[1]) || port != atoi(row2[2]))
-			DBexecute("update hosts set dns='%s',port=%d where hostid=" ZBX_FS_UI64,
-					host_esc,
-					port,
-					hostid);
-		}
-		DBfree_result(result2);
-
-		zbx_free(host_esc);
-		zbx_free(ip_esc);
 	}
 	DBfree_result(result);
 
@@ -666,16 +708,38 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 void	op_host_add(DB_EVENT *event)
 {
 	const char	*__function_name = "op_host_add";
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_OPERATION	operation;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (event->source != EVENT_SOURCE_DISCOVERY)
+	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
 		return;
 
-	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE && event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
 		return;
 
-	add_discovered_host(event);
+	result = DBselect(
+			"select discovery_groupid"
+			" from config"
+			" where 1=1" DB_NODE,
+			DBnode_local("configid"));
+
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	{
+		memset(&operation, 0, sizeof(operation));
+
+		operation.operationtype	= OPERATION_TYPE_GROUP_ADD;
+		ZBX_STR2UINT64(operation.objectid, row[0]);
+
+		op_group_add(event, &operation);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Can't add discovered host: Discovery group is not defined");
+	}
+	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -774,10 +838,10 @@ void	op_host_disable(DB_EVENT *event)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (event->source != EVENT_SOURCE_DISCOVERY)
+	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
 		return;
 
-	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE && event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
 		return;
 
 	if (0 == (hostid = select_discovered_host(event)))
@@ -794,8 +858,8 @@ void	op_host_disable(DB_EVENT *event)
  *                                                                            *
  * Purpose: add group to discovered host                                      *
  *                                                                            *
- * Parameters: trigger - trigger data                                         *
- *             action  - action data                                          *
+ * Parameters: event - event data                                             *
+ *             operation - operation data                                     *
  *                                                                            *
  * Return value: nothing                                                      *
  *                                                                            *
@@ -804,7 +868,7 @@ void	op_host_disable(DB_EVENT *event)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	op_group_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
+void	op_group_add(DB_EVENT *event, DB_OPERATION *operation)
 {
 	const char	*__function_name = "op_group_add";
 	DB_RESULT	result;
@@ -817,10 +881,10 @@ void	op_group_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 	if (operation->operationtype != OPERATION_TYPE_GROUP_ADD)
 		return;
 
-	if (event->source != EVENT_SOURCE_DISCOVERY)
+	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
 		return;
 
-	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE && event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
 		return;
 
 	if (0 == (hostid = add_discovered_host(event)))
@@ -917,10 +981,10 @@ void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 	if (operation->operationtype != OPERATION_TYPE_TEMPLATE_ADD)
 		return;
 
-	if (event->source != EVENT_SOURCE_DISCOVERY)
+	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
 		return;
 
-	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE && event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
 		return;
 
 	if (0 == (hostid = add_discovered_host(event)))
@@ -934,8 +998,6 @@ void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 
 	if (NULL == (row = DBfetch(result)))
 	{
-		DBbegin();
-
 		hosttemplateid = DBget_maxid("hosts_templates", "hosttemplateid");
 		DBexecute("insert into hosts_templates (hosttemplateid, hostid, templateid)"
 				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
@@ -944,8 +1006,6 @@ void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 				templateid);
 
 		DBsync_host_with_template(hostid, templateid);
-
-		DBcommit();
 	}
 	DBfree_result(result);
 
@@ -996,16 +1056,12 @@ void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		DBbegin();
-
 		DBdelete_template_elements(hostid, templateid, 0 /* not an unlink mode */);
 
 		DBexecute("delete from hosts_templates where "
 				"hostid=" ZBX_FS_UI64 " and templateid=" ZBX_FS_UI64,
 				hostid,
 				templateid);
-
-		DBcommit();
 	}
 	DBfree_result(result);
 

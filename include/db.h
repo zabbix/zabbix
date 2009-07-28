@@ -714,4 +714,7 @@ char	*zbx_user_string(zbx_uint64_t userid);
 
 double	DBmultiply_value_float(DB_ITEM *item, double value);
 zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value);
+
+void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now);
+void	DBproxy_register_host(const char *host);
 #endif

@@ -29,12 +29,12 @@
 #define ZBX_DC_ID struct zbx_dc_id_type
 #define ZBX_DC_IDS struct zbx_dc_ids_type
 
-#define	ZBX_HISTORY_SIZE	1000000
+#define	ZBX_HISTORY_SIZE	100000
 /* Must be less than ZBX_HISTORY_SIZE */
-#define	ZBX_SYNC_MAX		10000
+#define	ZBX_SYNC_MAX		1000
 #define	ZBX_TREND_SIZE		100000
 #define	ZBX_TEXTBUFFER_SIZE	16384*1024
-#define ZBX_IDS_SIZE		6
+#define ZBX_IDS_SIZE		7
 
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1

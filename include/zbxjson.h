@@ -54,6 +54,7 @@
 #define	ZBX_PROTO_VALUE_PROXY_HEARTBEAT		"proxy heartbeat"
 #define ZBX_PROTO_VALUE_DISCOVERY_DATA		"discovery data"
 #define ZBX_PROTO_VALUE_HISTORY_DATA		"history data"
+#define ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA	"auto registration"
 #define	ZBX_PROTO_VALUE_SENDER_DATA		"sender data"
 #define	ZBX_PROTO_VALUE_AGENT_DATA		"agent data"
 
