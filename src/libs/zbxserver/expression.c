@@ -1182,7 +1182,7 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
 			" where i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
 			functionid);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[4])/*i.lastvalue may be NULL*/)
 	{
 		value_type = atoi(row[1]);
 		ZBX_STR2UINT64(valuemapid, row[2]);
@@ -1196,7 +1196,7 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
 
 				h_result = DBselectN(tmp, 1);
 
-				if (NULL != (h_row = DBfetch(h_result)) && SUCCEED != DBis_null(h_row[0]))
+				if (NULL != (h_row = DBfetch(h_result)))
 					*lastvalue = zbx_dsprintf(*lastvalue, "%s", h_row[0]);
 				else
 					*lastvalue = zbx_dsprintf(*lastvalue, "%s", row[4]);
