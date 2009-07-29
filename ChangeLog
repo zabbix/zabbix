@@ -1,5 +1,6 @@
 Changes for 1.6.6
 
+ - [ZBX-1001] fixed possible server crash while processing macros {ITEM.LASTVALUE} (Sasha)
  - [ZBX-999] fixed query in availability reports (Artem)
  - [ZBX-996] fixed possible server crash with enabled StartDBSyncers option (Sasha)
  - [ZBX-993] fixed possible vulnerability of trapper (Sasha)
