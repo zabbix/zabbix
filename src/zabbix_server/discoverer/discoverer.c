@@ -1186,7 +1186,6 @@ void main_discoverer_loop(zbx_process_t p, int num)
 	zabbix_log( LOG_LEVEL_DEBUG, "In main_discoverer_loop(num:%d)",
 			num);
 
-/*	phan.sa_handler = child_signal_handler;*/
         phan.sa_sigaction = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
         phan.sa_flags = SA_SIGINFO;
@@ -1208,7 +1207,7 @@ void main_discoverer_loop(zbx_process_t p, int num)
 		nextcheck = get_minnextcheck(now);
 
 		now = time(NULL);
-		zabbix_log(LOG_LEVEL_DEBUG, "Discoverer spent %f seconds while processing rules. Nextcheck: %d Time: %d",
+		zabbix_log(LOG_LEVEL_DEBUG, "Discoverer spent " ZBX_FS_DBL " seconds while processing rules. Nextcheck: %d Time: %d",
 				sec,
 				nextcheck,
 				now);
