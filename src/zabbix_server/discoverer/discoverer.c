@@ -615,8 +615,10 @@ static void proxy_update_host(zbx_uint64_t druleid, char *ip, int status, int no
  ******************************************************************************/
 static int discover_service(DB_DCHECK *check, char *ip, int port)
 {
+	const char	*__function_name = "discover_service";
 	int		ret = SUCCEED;
 	char		key[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX];
+	const char	*service = NULL;
 	AGENT_RESULT 	value;
 	DB_ITEM		item;
 	ZBX_FPING_HOST	host;
@@ -624,59 +626,20 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 	assert(check);
 	assert(ip);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In discover_service(ip:%s, port:%d, type:%d)",
-		ip,
-		port,
-		check->type);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [ip:'%s' port:%d type:%d]", __function_name, ip, port, check->type);
 
 	init_result(&value);
 
-	switch(check->type) {
-		case SVC_SSH:
-			zbx_snprintf(key,sizeof(key),"net.tcp.service[ssh,%s,%d]",
-				ip,
-				port);
-			break;
-		case SVC_LDAP:
-			zbx_snprintf(key,sizeof(key),"net.tcp.service[ldap,%s,%d]",
-				ip,
-				port);
-			break;
-		case SVC_SMTP:
-			zbx_snprintf(key,sizeof(key),"net.tcp.service[smtp,%s,%d]",
-				ip,
-				port);
-			break;
-		case SVC_FTP:
-			zbx_snprintf(key,sizeof(key),"net.tcp.service[ftp,%s,%d]",
-				ip,
-				port);
-			break;
-		case SVC_HTTP:
-			zbx_snprintf(key,sizeof(key),"net.tcp.service[http,%s,%d]",
-				ip,
-				port);
-			break;
-		case SVC_POP:
-			zbx_snprintf(key,sizeof(key),"net.tcp.service[pop,%s,%d]",
-				ip,
-				port);
-			break;
-		case SVC_NNTP:
-			zbx_snprintf(key,sizeof(key),"net.tcp.service[nntp,%s,%d]",
-				ip,
-				port);
-			break;
-		case SVC_IMAP:
-			zbx_snprintf(key,sizeof(key),"net.tcp.service[imap,%s,%d]",
-				ip,
-				port);
-			break;
-		case SVC_TCP:
-			zbx_snprintf(key,sizeof(key),"net.tcp.service[tcp,%s,%d]",
-				ip,
-				port);
-			break;
+	switch (check->type) {
+		case SVC_SSH:	service = "ssh"; break;
+		case SVC_LDAP:	service = "ldap"; break;
+		case SVC_SMTP:	service = "smtp"; break;
+		case SVC_FTP:	service = "ftp"; break;
+		case SVC_HTTP:	service = "http"; break;
+		case SVC_POP:	service = "pop"; break;
+		case SVC_NNTP:	service = "nntp"; break;
+		case SVC_IMAP:	service = "imap"; break;
+		case SVC_TCP:	service = "tcp"; break;
 		case SVC_AGENT:
 		case SVC_SNMPv1:
 		case SVC_SNMPv2c:
@@ -692,12 +655,37 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 		alarm(10);
 
 		switch(check->type) {
+			/* Simple checks */
+			case SVC_SSH:
+			case SVC_LDAP:
+			case SVC_SMTP:
+			case SVC_FTP:
+			case SVC_HTTP:
+			case SVC_POP:
+			case SVC_NNTP:
+			case SVC_IMAP:
+			case SVC_TCP:
+				zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
+
+				if (SUCCEED == process(key, 0, &value))
+				{
+					if (GET_UI64_RESULT(&value))
+					{
+						if (value.ui64 == 0)
+							ret = FAIL;
+					}
+					else
+						ret = FAIL;
+				}
+				else
+					ret = FAIL;
+				break;
 			/* Agent and SNMP checks */
 			case SVC_AGENT:
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
 			case SVC_SNMPv3:
-				memset(&item,0,sizeof(DB_ITEM));
+				memset(&item, 0, sizeof(DB_ITEM));
 				item.key	= check->key_;
 				item.host_name	= ip;
 				item.host_ip	= ip;
@@ -764,24 +752,14 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 				if (SUCCEED != do_ping(&host, 1, error, sizeof(error)) || 0 == host.alive)
 					ret = FAIL;
 				break;
-			/* Simple checks */
 			default:
-				if(process(key, 0, &value) == SUCCEED)
-				{
-					if(GET_UI64_RESULT(&value))
-					{
-						if(value.ui64 == 0)	ret = FAIL;
-					}
-					else ret = FAIL;
-				}
-				else	ret = FAIL;
 				break;
 		}
 		alarm(0);
 	}
 	free_result(&value);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End discover_service()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
