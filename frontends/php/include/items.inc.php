@@ -481,7 +481,7 @@
 			return FALSE;
 		}
 
-		 // first update child items
+// first update child items
 		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
 		while($db_tmp_item = DBfetch($db_tmp_items)){
 			$child_item_params = $item_in_params;
@@ -585,18 +585,18 @@
 					'history'		=> array('template' => 1 , 'httptest' => 1),
 					'status'		=> array('template' => 1 , 'httptest' => 1),
 					'type'			=> array(),
-					'snmp_community'	=> array(),
 					'snmp_oid'		=> array(),
+					'snmp_community'	=> array('template' => 1),
+					'snmp_port'		=> array('template' => 1),
+					'snmpv3_securityname'	=> array('template' => 1),
+					'snmpv3_securitylevel'	=> array('template' => 1),
+					'snmpv3_authpassphrase'	=> array('template' => 1),
+					'snmpv3_privpassphrase'	=> array('template' => 1),
 					'value_type'		=> array(),
 					'trapper_hosts'		=> array(),
-					'snmp_port'		=> array(),
 					'units'			=> array(),
 					'multiplier'		=> array(),
 					'delta'			=> array('template' => 1 , 'httptest' => 1),
-					'snmpv3_securityname'	=> array(),
-					'snmpv3_securitylevel'	=> array(),
-					'snmpv3_authpassphrase'	=> array(),
-					'snmpv3_privpassphrase'	=> array(),
 					'formula'		=> array(),
 					'trends'		=> array('template' => 1 , 'httptest' => 1),
 					'logtimefmt'		=> array(),

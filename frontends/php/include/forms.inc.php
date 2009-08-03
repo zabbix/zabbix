@@ -1579,42 +1579,28 @@
 			$frmItem->AddVar('snmpv3_authpassphrase',$snmpv3_authpassphrase);
 			$frmItem->AddVar('snmpv3_privpassphrase',$snmpv3_privpassphrase);
 
-			$frmItem->AddRow(S_SNMP_COMMUNITY, new CTextBox('snmp_community',$snmp_community,16,$limited));
 			$frmItem->AddRow(S_SNMP_OID, new CTextBox('snmp_oid',$snmp_oid,40,$limited));
-			$frmItem->AddRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5,$limited));
+			$frmItem->AddRow(S_SNMP_COMMUNITY, new CTextBox('snmp_community',$snmp_community,16));
+			$frmItem->AddRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5));
 		}
 		else if($type==ITEM_TYPE_SNMPV3){
 			$frmItem->AddVar('snmp_community',$snmp_community);
 
 			$frmItem->AddRow(S_SNMP_OID, new CTextBox('snmp_oid',$snmp_oid,40,$limited));
 
-			$frmItem->AddRow(S_SNMPV3_SECURITY_NAME,
-				new CTextBox('snmpv3_securityname',$snmpv3_securityname,64,$limited));
+			$frmItem->AddRow(S_SNMPV3_SECURITY_NAME, new CTextBox('snmpv3_securityname',$snmpv3_securityname,64));
 
-			if(isset($limited)){
-				$frmItem->AddVar('snmpv3_securitylevel', $snmpv3_securitylevel);
-				switch($snmpv3_securitylevel){
-					case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:	$snmpv3_securitylevel='NoAuthPriv';	break;
-					case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:	$snmpv3_securitylevel = 'AuthNoPriv';	break;
-					case ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV:	$snmpv3_securitylevel = 'AuthPriv';	break;
-				}
-				$frmItem->AddRow(S_SNMPV3_SECURITY_LEVEL,  new CTextBox('snmpv3_securitylevel_desc',
-					$snmpv3_securitylevel, $limited));
-			}
-			else{
-				$cmbSecLevel = new CComboBox('snmpv3_securitylevel',$snmpv3_securitylevel);
+			$cmbSecLevel = new CComboBox('snmpv3_securitylevel',$snmpv3_securitylevel);
 				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'NoAuthPriv');
 				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'AuthNoPriv');
 				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'AuthPriv');
-				$frmItem->AddRow(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel);
-			}
-			$frmItem->AddRow(S_SNMPV3_AUTH_PASSPHRASE,
-				new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64,$limited));
+			$frmItem->AddRow(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel);
 
-			$frmItem->AddRow(S_SNMPV3_PRIV_PASSPHRASE,
-				new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64,$limited));
+			$frmItem->AddRow(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64));
 
-			$frmItem->AddRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5,$limited));
+			$frmItem->AddRow(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64));
+
+			$frmItem->AddRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5));
 		}
 		else{
 			$frmItem->AddVar('snmp_community',$snmp_community);

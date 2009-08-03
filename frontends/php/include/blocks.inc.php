@@ -388,22 +388,23 @@ function make_status_of_zbx(){
 	$table->AddRow(array(S_NUMBER_OF_ALERTS,$status['alerts_count'],' - '));*/
 
 //Log Out 10min
-	$sql = 'SELECT DISTINCT u.userid, MAX(s.lastaccess) as lastaccess, MAX(u.autologout) as autologout, s.status '.
-			' FROM users u '.
-				' LEFT JOIN sessions s ON s.userid=u.userid AND s.status='.ZBX_SESSION_ACTIVE.
-			' WHERE '.DBin_node('u.userid').
-			' GROUP BY u.userid,s.status';
-	$db_users = DBSelect($sql);
+	$sql = 'SELECT COUNT(*) as usr_cnt FROM users u WHERE '.DBin_node('u.userid');
+	$usr_cnt = DBfetch(DBselect($sql));
 
-	$usr_cnt = 0;
 	$online_cnt = 0;
+	$sql = 'SELECT DISTINCT s.userid, MAX(s.lastaccess) as lastaccess, MAX(u.autologout) as autologout, s.status '.
+			' FROM sessions s, users u '.
+			' WHERE '.DBin_node('s.userid').
+				' AND u.userid=s.userid '.
+				' AND s.status='.ZBX_SESSION_ACTIVE.
+			' GROUP BY s.userid,s.status';
+	$db_users = DBSelect($sql);
 	while($user=DBFetch($db_users)){
 		$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout']))?ZBX_USER_ONLINE_TIME:$user['autologout'];
 		if(!is_null($user['lastaccess']) && (($user['lastaccess']+$online_time)>=time()) && (ZBX_SESSION_ACTIVE == $user['status'])) $online_cnt++;
-		$usr_cnt++;
 	}
 
-	$table->AddRow(array(S_NUMBER_OF_USERS,$usr_cnt,new CSpan($online_cnt,'green')));
+	$table->AddRow(array(S_NUMBER_OF_USERS,$usr_cnt['usr_cnt'],new CSpan($online_cnt,'green')));
 	$table->AddRow(array(S_REQUIRED_SERVER_PERFORMANCE_NVPS,$status['qps_total'],' - '));
 	$table->SetFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 return $table;
