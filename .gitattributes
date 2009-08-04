@@ -325,6 +325,13 @@ include/zbxodbc.h -text
 m4/libiodbc.m4 -text
 m4/libunixodbc.m4 -text
 m4/openipmi.m4 -text
+man/Makefile.am -text
+man/Makefile.in -text
+man/zabbix_agentd.man -text
+man/zabbix_get.man -text
+man/zabbix_proxy.man -text
+man/zabbix_sender.man -text
+man/zabbix_server.man -text
 misc/clock/clock.fla -text
 misc/conf/zabbix_agentd.win.conf -text
 misc/conf/zabbix_proxy.conf -text
