@@ -1227,6 +1227,7 @@ AC_OUTPUT([
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/datasender/Makefile
 	upgrades/Makefile
+	man/Makefile
 	])
 
 echo "
