@@ -657,6 +657,34 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 
 	if (0 == CONFIG_DBSYNCER_FORKS)
 	{
+		switch (item->value_type) {
+		case ITEM_VALUE_TYPE_STR:
+			if (NULL == GET_STR_RESULT(value))
+				break;
+
+			if (HISTORY_STR_VALUE_LEN_MAX < strlen(value->str))
+				value->str[HISTORY_STR_VALUE_LEN] = '\0';
+			break;
+		case ITEM_VALUE_TYPE_TEXT:
+			if (NULL == GET_TEXT_RESULT(value))
+				break;
+
+			if (HISTORY_TEXT_VALUE_LEN_MAX < strlen(value->text))
+				value->text[HISTORY_TEXT_VALUE_LEN] = '\0';
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			if (NULL == GET_STR_RESULT(value))
+				break;
+
+			if (HISTORY_LOG_VALUE_LEN_MAX < strlen(value->str))
+				value->str[HISTORY_LOG_VALUE_LEN] = '\0';
+			if (NULL != item->eventlog_source && HISTORY_LOG_SOURCE_LEN_MAX < strlen(item->eventlog_source))
+				item->eventlog_source[HISTORY_LOG_SOURCE_LEN] = '\0';
+			break;
+		default:
+			;	/* nothing to do */
+		}
+
 		if (SUCCEED == add_history(item, value, now))
 		{
 			update_item(item, value, now);

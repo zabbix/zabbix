@@ -2043,7 +2043,8 @@ void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock)
 
 	LOCK_CACHE;
 
-	len = strlen(value_orig) + 1;
+	if (HISTORY_STR_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
+		len = HISTORY_STR_VALUE_LEN_MAX;
 	history = DCget_history_ptr(itemid, len);
 
 	history->itemid			= itemid;
@@ -2082,7 +2083,8 @@ void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock)
 
 	LOCK_CACHE;
 
-	len = strlen(value_orig) + 1;
+	if (HISTORY_TEXT_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
+		len = HISTORY_TEXT_VALUE_LEN_MAX;
 	history = DCget_history_ptr(itemid, len);
 
 	history->itemid			= itemid;
@@ -2121,8 +2123,10 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
 
 	LOCK_CACHE;
 
-	len1 = strlen(value_orig) + 1;
-	len2 = (NULL != source && *source != '\0') ? strlen(source) + 1 : 0;
+	if (HISTORY_LOG_VALUE_LEN_MAX < (len1 = strlen(value_orig) + 1))
+		len1 = HISTORY_LOG_VALUE_LEN_MAX;
+	if (HISTORY_LOG_SOURCE_LEN_MAX < (len2 = (NULL != source && *source != '\0') ? strlen(source) + 1 : 0))
+		len2 = HISTORY_LOG_SOURCE_LEN_MAX;
 	history = DCget_history_ptr(itemid, len1 + len2);
 
 	history->itemid			= itemid;
