@@ -136,7 +136,7 @@ struct oid {
 void initialize (void)
 {
   struct oid *op = oids;
-  
+
   init_snmp("asynchapp");
 
   /* parse the oids */
@@ -270,7 +270,7 @@ int asynch_response(int operation, struct snmp_session *sp, int reqid,
   else
     print_result(STAT_TIMEOUT, host->sess, pdu);
 
-  /* something went wrong (or end of variables) 
+  /* something went wrong (or end of variables)
    * this host not active any more
    */
   active_hosts--;
