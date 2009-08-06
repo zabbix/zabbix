@@ -510,6 +510,7 @@
 	'S_MINUS_ALL_MINUS'=>			'- all -',
 	'S_MINUS_OTHER_MINUS'=>			'- other -',
 	'S_NOT_SELECTED_SMALL'=>		'not selected',
+	'S_NOT_SELECTED'=>			'Not selected',
 	'S_GRAPH'=>				'Graph',
 
 //	Footer
