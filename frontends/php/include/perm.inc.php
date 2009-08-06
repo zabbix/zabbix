@@ -182,7 +182,7 @@ function check_authentication($sessionid=null){
 		else if($login['attempt_failed']){
 			error(new CScript(array(
 						bold($login['attempt_failed']),
-						'failed login attempts logged. Last failed attempt was from ',
+						' failed login attempts logged. Last failed attempt was from ',
 						bold($login['attempt_ip']),
 						' on ',
 						bold(date('d.m.Y H:i',$login['attempt_clock'])),
