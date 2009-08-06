@@ -79,7 +79,7 @@ int	DBnum_rows(MYSQL_RES *result)
 	{
 		return	0;
 	}
-	
+
 /* This is necessary to exclude situations like
  * atoi(DBget_field(result,0,0). This leads to coredump.
  */
@@ -98,7 +98,7 @@ MYSQL_RES *DBselect(char *query)
 		printf("Query:%s\n",query);
 		printf("Query failed:%s [%d]\n", mysql_error(&mysql), mysql_errno(&mysql) );
 
-		if( (ER_SERVER_SHUTDOWN   != mysql_errno(&mysql)) && 
+		if( (ER_SERVER_SHUTDOWN   != mysql_errno(&mysql)) &&
             (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)) &&
             (CR_CONNECTION_ERROR  != mysql_errno(&mysql)))
 		{
@@ -183,7 +183,7 @@ void load_oids(void)
 void initialize (void)
 {
 	struct oid *op;
-  
+
 	init_snmp("asynchapp");
 
 	load_oids();
@@ -304,7 +304,7 @@ int asynch_response(int operation, struct snmp_session *sp, int reqid,
 	else
 		print_result(STAT_TIMEOUT, host->sess, pdu);
 
-/* something went wrong (or end of variables) 
+/* something went wrong (or end of variables)
 * this host not active any more
 */
 	active_hosts--;
@@ -416,7 +416,7 @@ int	DBexecute(char *query)
 		printf("Query::%s\n",query);
 		printf("Query failed:%s [%d]\n", mysql_error(&mysql), mysql_errno(&mysql) );
 
-		if( (ER_SERVER_SHUTDOWN   != mysql_errno(&mysql)) && 
+		if( (ER_SERVER_SHUTDOWN   != mysql_errno(&mysql)) &&
             (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)) &&
             (CR_CONNECTION_ERROR  != mysql_errno(&mysql)))
 		{

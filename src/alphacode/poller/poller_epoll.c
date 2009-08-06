@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <fcntl.h> 
-#include <sys/types.h> 
-#include <sys/socket.h> 
-#include <sys/epoll.h> 
-#include <netdb.h> 
-#include <errno.h> 
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/epoll.h>
+#include <netdb.h>
+#include <errno.h>
 
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -31,8 +31,8 @@
 int	s;
 
 int 	epfd;
-struct epoll_event ev; 
-struct epoll_event *events; 
+struct epoll_event ev;
+struct epoll_event *events;
 
 void	wait_connect()
 {
@@ -44,7 +44,7 @@ void	wait_connect()
 
 	for(;;)
 	{
-		
+
 		printf("epfd [%d]\n", epfd);
 		printf("NUM [%d]\n", NUM);
 		events=malloc(NUM*sizeof(struct epoll_event));
@@ -81,12 +81,12 @@ int	main()
 	int	retval;
 
 
-	epfd = epoll_create(NUM); 
+	epfd = epoll_create(NUM);
 	if(!epfd)
 	{
 		perror("epoll_create\n");
 		exit(1);
-	} 
+	}
 
 	for(i=0;i<NUM;i++)
 	{
@@ -143,7 +143,7 @@ int	main()
 		{
 			perror("epoll_ctl, adding listenfd\n");
 			exit(1);
-		} 
+		}
 /*		printf("epoll_ctl ok fd [%d]\n", s); */
 	}
 
