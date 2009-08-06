@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-46] fixed rights in host-group (Artem)
  - [ZBX-689] allowed processing of non-agent based checks for unreachable hosts (Sasha)
  - [NTP-19] added inheritance of tempalte trigger status to all linked hosts (Artem)
  - [NTP-30] added support of UTF8 in email notifications (Sasha)

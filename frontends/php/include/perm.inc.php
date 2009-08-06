@@ -257,8 +257,7 @@ COpt::counter_up('perm');
 			' left join users_groups g on r.groupid=g.usrgrpid and g.userid='.$userid.
 			' left join nodes n on '.DBid2nodeid('hg.groupid').'=n.nodeid '.
 			$where.' group by n.nodeid, n.name, hg.groupid, hg.name, g.userid, g.userid '.
-			' order by n.name, hg.name, permission desc, g.userid desc';
-			
+			' order by n.name, hg.name, g.userid desc, permission desc';
 		$db_groups = DBselect($sql);
 
 		$processed = array();
