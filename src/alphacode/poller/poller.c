@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <fcntl.h> 
-#include <sys/types.h> 
-#include <sys/socket.h> 
-#include <sys/poll.h> 
-#include <netdb.h> 
-#include <errno.h> 
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/poll.h>
+#include <netdb.h>
+#include <errno.h>
 
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -96,7 +96,7 @@ void	wait_connect()
 			{
 				printf("[%d] remote socket has closed\n",i);
 				return;
-			} 
+			}
 			if ((poll_cli[i].revents&POLLNVAL)==POLLNVAL)
 			{
 				memmove(&poll_cli[i], &poll_cli[i+1],(NUM-READ-i-1)*sizeof(struct pollfd));
@@ -110,12 +110,12 @@ void	wait_connect()
 				}
 */
 				break;
-			} 
+			}
 			if ((poll_cli[i].revents&POLLERR)==POLLERR)
 			{
 				printf("[%d] remote socket has error\n",i);
 				return;
-			} 
+			}
 			if ((poll_cli[i].revents&POLLIN)==POLLIN)
 			{
 				printf("[%d] remote socket has data\n",i);
@@ -127,7 +127,7 @@ void	wait_connect()
 					perror("read");
 					exit(-1);
 				}
-			
+
 				if(len == 0)
 				{
 					printf("Read 0 bytes\n");
@@ -145,10 +145,10 @@ void	wait_connect()
 				{
 					perror("write");
 					exit(-1);
-				} 
+				}
 				poll_cli[i].events=POLLIN;
 				break;
-			} 
+			}
 		}
 	}
 }
