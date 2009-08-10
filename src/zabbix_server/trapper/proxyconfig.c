@@ -42,7 +42,6 @@
  ******************************************************************************/
 static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, const ZBX_TABLE *table,
 		const char *condition)
-/*		const char *reltable, const char *relfield)*/
 {
 	char		sql[MAX_STRING_LEN];
 	int		offset = 0, f, fld;
@@ -77,38 +76,6 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 			table->table,
 			condition);
 
-/*	if (NULL == reltable)
-	{
-		if (NULL != DBget_field(table, "proxy_hostid"))
-			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " where t.proxy_hostid=" ZBX_FS_UI64,
-					proxy_hostid);
-	}
-	else
-	{
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ", %s r where t.%s=r.%s"
-				" and r.proxy_hostid=" ZBX_FS_UI64,
-				reltable,
-				relfield,
-				relfield,
-				proxy_hostid);
-	}
-
-	if (0 == strcmp(table->table, "hosts"))
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and t.status=%d",
-				HOST_STATUS_MONITORED);
-	if (NULL != reltable && 0 == strcmp(reltable, "hosts"))
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and r.status=%d",
-				HOST_STATUS_MONITORED);
-	if (0 == strcmp(table->table, "items"))
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and t.status in (%d,%d)",
-				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED);
-	if (0 == strcmp(table->table, "drules"))
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and t.status=%d",
-				DRULE_STATUS_MONITORED);
-	if (NULL != reltable && 0 == strcmp(reltable, "drules"))
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and r.status=%d",
-				DRULE_STATUS_MONITORED);
-*/
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " order by t.%s",
 			table->recid);
 
