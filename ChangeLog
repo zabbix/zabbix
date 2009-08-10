@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-9] added support of global, template and host level macros on the server side (Sasha)
  - [DEV-414] created basic man pages for all Zabbix binaries (Alexei)
  - [DEV-340] auto registration of active agents (Sasha)
  - [DEV-137] sql file "data.sql" was fixed, a default value was added (Dmitry)

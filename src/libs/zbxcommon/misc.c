@@ -1448,7 +1448,7 @@ static int	get_nearestindex(zbx_uint64_t *values, int num, zbx_uint64_t value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value)
+int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step)
 {
 	int	index;
 
@@ -1458,7 +1458,7 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
 
 	if (*alloc == *num)
 	{
-		*alloc += 100;
+		*alloc += alloc_step;
 		*values = zbx_realloc(*values, *alloc * sizeof(zbx_uint64_t));
 	}
 
@@ -1468,6 +1468,29 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
 	(*num)++;
 
 	return index;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: uint64_array_merge                                               *
+ *                                                                            *
+ * Purpose: merge two uint64 arrays                                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t *value, int value_num, int alloc_step)
+{
+	int	i;
+
+	for (i = 0; i < value_num; i++)
+		uint64_array_add(values, alloc, num, value[i], alloc_step);
 }
 
 /******************************************************************************

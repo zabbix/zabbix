@@ -94,7 +94,7 @@ static void process_value(char *key, ZBX_FPING_HOST *host, zbx_uint64_t *value_u
 			DBnode_local("h.hostid"));
 
 	while (NULL != (row = DBfetch(result))) {
-		DBget_item_from_db(&item, row);
+		DBget_item_from_db(&item, row, NULL);
 
 		if (ping_result == NOTSUPPORTED)
 		{

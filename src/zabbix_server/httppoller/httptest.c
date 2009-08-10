@@ -82,7 +82,7 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 		return  FAIL;
 	}
 
-	DBget_item_from_db(&item,row);
+	DBget_item_from_db(&item, row, NULL);
 
 	now = time(NULL);
 
