@@ -744,13 +744,30 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 							zbx_host_key_string_by_item(&item),
 							value.msg);
 				break;
-			case SVC_ICMPPING:
+			case SVC_ICMPPING:				
 				memset(&host, 0, sizeof(host));
+				/*
+				#define ZBX_FPING_HOST struct zbx_fping_host
+				ZBX_FPING_HOST
+				{
+					char		*addr;
+					double		min, avg, max;
+					int			rcv;
+				};
+				*/
+				zbx_malloc(host.addr, HOST_ADDR_LEN_MAX);
 				strscpy(host.addr, ip);
-				host.useip = 1;
-
-				if (SUCCEED != do_ping(&host, 1, error, sizeof(error)) || 0 == host.alive)
+				/*host.useip = 1;*/
+				
+				/*if (SUCCEED != do_ping(&host, 1, error, sizeof(error)) || 0 == host.alive)
+					ret = FAIL;*/
+				
+				/*int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, char *error, int max_error_len);*/
+				/*`count is mandatory, `interval', `size', timeout' are not*/	
+				if (SUCCEED != do_ping(&host, 1, 3, 0, 0, 0, error, sizeof(error)) || 0 == host.rcv)
 					ret = FAIL;
+				
+				zbx_free(host.addr);
 				break;
 			default:
 				break;
