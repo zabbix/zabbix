@@ -183,10 +183,7 @@ static int	zbxmacros_get_host_nearestindex(DB_MACROS *macros, zbx_uint64_t hosti
  ******************************************************************************/
 static DB_MACRO_HOST	*zbxmacros_get_host(DB_MACROS *macros, zbx_uint64_t hostid)
 {
-	const char	*__function_name = "zbxmacros_get_host";
-	int		index;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
+	int	index;
 
 	index = zbxmacros_get_host_nearestindex(macros, hostid);
 	if (index < macros->num && macros->host[index].hostid == hostid)
@@ -253,10 +250,7 @@ static int	zbxmacros_get_macro_nearestindex(DB_MACRO_HOST *host, const char *mac
  ******************************************************************************/
 static DB_MACRO	*zbxmacros_get_macro(DB_MACRO_HOST *host, const char *macro, const char *value)
 {
-	const char	*__function_name = "zbxmacros_get_macro";
-	int		index;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s' value:'%s'", __function_name, macro, value);
+	int	index;
 
 	index = zbxmacros_get_macro_nearestindex(host, macro);
 	if (index < host->num && 0 == strcmp(host->macro[index].macro, macro))
@@ -295,11 +289,8 @@ static DB_MACRO	*zbxmacros_get_macro(DB_MACRO_HOST *host, const char *macro, con
  ******************************************************************************/
 static void	zbxmacros_update_global(DB_MACRO_HOST *host)
 {
-	const char	*__function_name = "zbxmacros_update_global";
 	DB_RESULT	result;
 	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, host->hostid);
 
 	zbxmacros_clean_host(host);
 
@@ -333,12 +324,9 @@ static void	zbxmacros_update_global(DB_MACRO_HOST *host)
  ******************************************************************************/
 static void	zbxmacros_update_host(DB_MACRO_HOST *host)
 {
-	const char	*__function_name = "zbxmacros_update_host";
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	templateid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, host->hostid);
 
 	zbxmacros_clean_host(host);
 
@@ -377,13 +365,14 @@ static int	zbxmacros_get_value_tmpl(DB_MACROS *macros, zbx_uint64_t *hostids, in
 	zbx_uint64_t	*tmplids = NULL;
 	int		tmpl_alloc = ZBX_MACRO_ALLOC_STEP, tmpl_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tmpl_num:%d macro:'%s'", __function_name,
-			host_num, macro);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __function_name, macro);
 
 	tmplids = zbx_malloc(tmplids, sizeof(zbx_uint64_t) * tmpl_alloc);
 
 	for (i = 0; i < host_num; i++)
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() templateid:" ZBX_FS_UI64, __function_name, hostids[i]);
+
 		host = zbxmacros_get_host(macros, hostids[i]);
 		if (host->tm < tm)
 		{
@@ -395,6 +384,7 @@ static int	zbxmacros_get_value_tmpl(DB_MACROS *macros, zbx_uint64_t *hostids, in
 		if (index < host->num && 0 == strcmp(host->macro[index].macro, macro))
 		{
 			*replace_to = zbx_dsprintf(*replace_to, "%s", host->macro[index].value);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() replace_to:'%s'", __function_name, *replace_to);
 			ret = SUCCEED;
 			break;
 		}
@@ -427,7 +417,10 @@ static void	zbxmacros_get_value_global(DB_MACROS *macros, const char *macro, cha
 
 	index = zbxmacros_get_macro_nearestindex(global, macro);
 	if (index < global->num && 0 == strcmp(global->macro[index].macro, macro))
+	{
 		*replace_to = zbx_dsprintf(*replace_to, "%s", global->macro[index].value);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() replace_to:'%s'", __function_name, *replace_to);
+	}
 }
 
 /******************************************************************************
@@ -464,6 +457,8 @@ void	zbxmacros_get_value(DB_MACROS *macros, zbx_uint64_t *hostids, int host_num,
 
 	for (i = 0; i < host_num; i++)
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() hostid:" ZBX_FS_UI64, __function_name, hostids[i]);
+
 		host = zbxmacros_get_host(macros, hostids[i]);
 		if (host->tm < tm)
 		{
@@ -475,6 +470,7 @@ void	zbxmacros_get_value(DB_MACROS *macros, zbx_uint64_t *hostids, int host_num,
 		if (index < host->num && 0 == strcmp(host->macro[index].macro, macro))
 		{
 			*replace_to = zbx_dsprintf(*replace_to, "%s", host->macro[index].value);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() replace_to:'%s'", __function_name, *replace_to);
 			goto clean;
 		}
 
@@ -486,6 +482,8 @@ void	zbxmacros_get_value(DB_MACROS *macros, zbx_uint64_t *hostids, int host_num,
 
 	zbxmacros_get_value_global(macros, macro, replace_to, tm);
 clean:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
 	zbx_free(tmplids);
 }
 
@@ -515,6 +513,8 @@ void	zbxmacros_get_value_by_triggerid(DB_MACROS *macros, zbx_uint64_t triggerid,
 	if (NULL == macros)
 		return;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64, __function_name, triggerid);
+
 	hostids = zbx_malloc(hostids, sizeof(zbx_uint64_t) * host_alloc);
 
 	result = DBselect(
@@ -528,13 +528,13 @@ void	zbxmacros_get_value_by_triggerid(DB_MACROS *macros, zbx_uint64_t triggerid,
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
 		uint64_array_add(&hostids, &host_alloc, &host_num, hostid, ZBX_MACRO_ALLOC_STEP);
-zabbix_log(LOG_LEVEL_DEBUG, "%s() hostid:'%s'", __function_name, row[0]);
 	}
 
 	DBfree_result(result);
 
-zabbix_log(LOG_LEVEL_DEBUG, "%s() host_num:%d", __function_name, host_num);
 	zbxmacros_get_value(macros, hostids, host_num, macro, replace_to);
 
 	zbx_free(hostids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
