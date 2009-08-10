@@ -619,7 +619,7 @@
 					if(!isset($data['drawtype']))		$data['drawtype']	= 0;
 					if(!isset($data['sortorder']))		$data['sortorder']	= 0;
 					if(!isset($data['color']))		$data['color']		= 'Dark Green';
-					if(!isset($data['yaxisside']))		$data['yaxisside']	= 1;
+					if(!isset($data['yaxisside']))		$data['yaxisside']	= 0;
 					if(!isset($data['calc_fnc']))		$data['calc_fnc']	= 2;
 					if(!isset($data['type']))		$data['type']		= 0;
 					if(!isset($data['periods_cnt']))	$data['periods_cnt']	= 5;
