@@ -321,6 +321,7 @@ include/dbschema.h -text
 include/ipc.h -text
 include/zbxicmpping.h -text
 include/zbxjson.h -text
+include/zbxmacros.h -text
 include/zbxodbc.h -text
 m4/libiodbc.m4 -text
 m4/libunixodbc.m4 -text
@@ -343,6 +344,7 @@ src/libs/zbxcommon/time.c -text
 src/libs/zbxdbcache/Makefile.am -text
 src/libs/zbxdbcache/dbcache.c -text
 src/libs/zbxdbcache/nextchecks.c -text
+src/libs/zbxdbhigh/macro.c -text
 src/libs/zbxicmpping/Makefile.am -text
 src/libs/zbxicmpping/icmpping.c -text
 src/libs/zbxjson/Makefile.am -text

@@ -2028,7 +2028,7 @@ int evaluate_function2(char *value,char *host,char *key,char *function,char *par
 		return FAIL;
 	}
 
-	DBget_item_from_db(&item,row);
+	DBget_item_from_db(&item, row, NULL);
 
 	res = evaluate_function(value,&item,function,parameter, time(NULL));
 

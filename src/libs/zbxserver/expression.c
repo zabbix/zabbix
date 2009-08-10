@@ -1658,7 +1658,8 @@ static const char	*ex_suffix[EX_SUFFIX_NUM] = {"}", "1}", "2}", "3}", "4}", "5}"
  *           {TRIGGER.NAME}, {TRIGGER.KEY}, {TRIGGER.SEVERITY}                *
  *                                                                            *
  ******************************************************************************/
-void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, DB_ESCALATION *escalation, char **data, int macro_type)
+void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, DB_ESCALATION *escalation, DB_MACROS *macros,
+		char **data, int macro_type)
 {
 	char		*p, *bl, *br, c, *str_out = NULL, *replace_to = NULL, sql[64];
 	const char	*suffix, *m;
@@ -1724,7 +1725,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 				{
 					replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_description);
 					/* Why it was here? *//* For substituting macros in trigger description :) */
-					substitute_simple_macros(event, action, item, escalation, &replace_to,
+					substitute_simple_macros(event, action, item, escalation, macros, &replace_to,
 							MACRO_TYPE_TRIGGER_DESCRIPTION);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_COMMENT))
@@ -1931,6 +1932,8 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 			{
 				if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
+				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+					zbxmacros_get_value_by_triggerid(macros, event->objectid, m, &replace_to);
 			}
 		}
 		else if (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_HOST_IPMI_IP))
@@ -1943,6 +1946,8 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 				replace_to = zbx_dsprintf(replace_to, "%s", item->host_dns);
 			else if (0 == strcmp(m, MVAR_HOST_CONN))
 				replace_to = zbx_dsprintf(replace_to, "%s", item->useip ? item->host_ip : item->host_dns);
+			else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				zbxmacros_get_value(macros, &item->hostid, 1, m, &replace_to);
 		}
 
 		if (FAIL == ret)
@@ -2023,7 +2028,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros(data:\"%s\")",
 			*data);
 
-	substitute_simple_macros(event, NULL, NULL, escalation, data, MACRO_TYPE_MESSAGE);
+	substitute_simple_macros(event, NULL, NULL, escalation, NULL, data, MACRO_TYPE_MESSAGE);
 
 	pl = *data;
 	while((pr = strchr(pl, '{')))
@@ -2218,16 +2223,23 @@ error:
 int	evaluate_expression(int *result,char **expression, DB_TRIGGER *trigger, char *error, int maxerrlen)
 {
 	/* Required for substitution of macros */
-	DB_EVENT	event;
+	DB_EVENT		event;
+	static DB_MACROS	*macros = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_expression(%s)",
 		*expression);
 
+	if (NULL == macros)
+		zbxmacros_init(&macros);
+
 	/* Substitute macros first */
-	memset(&event,0,sizeof(DB_EVENT));
+	memset(&event, 0, sizeof(DB_EVENT));
+	event.source = EVENT_SOURCE_TRIGGERS;
+	event.object = EVENT_OBJECT_TRIGGER;
+	event.objectid = trigger->triggerid;
 	event.value = trigger->value;
 
-	substitute_simple_macros(&event, NULL, NULL, NULL, expression, MACRO_TYPE_TRIGGER_EXPRESSION);
+	substitute_simple_macros(&event, NULL, NULL, NULL, macros, expression, MACRO_TYPE_TRIGGER_EXPRESSION);
 
 	/* Evaluate expression */
 	delete_spaces(*expression);
