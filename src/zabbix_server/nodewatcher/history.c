@@ -105,10 +105,10 @@ void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_history_table_data()");
 
-	DBbegin();
-
 	if ((table->flags & ZBX_HISTORY) && FAIL == get_history_lastid(master_nodeid, nodeid, table, &lastid))
 		return;
+
+	DBbegin();
 
 	data = zbx_malloc(data, data_allocated);
 	tmp = zbx_malloc(tmp, tmp_allocated);

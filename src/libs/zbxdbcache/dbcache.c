@@ -220,9 +220,9 @@ static void	DCflush_trend(ZBX_DC_TREND *trend, int *sql_offset)
 						trend->clock);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				value_min.value_uint64 = zbx_atoui64(row[1]);
-				value_avg.value_uint64 = zbx_atoui64(row[2]);
-				value_max.value_uint64 = zbx_atoui64(row[3]);
+				ZBX_STR2UINT64(value_min.value_uint64, row[1]);
+				ZBX_STR2UINT64(value_avg.value_uint64, row[2]);
+				ZBX_STR2UINT64(value_max.value_uint64, row[3]);
 
 				if (value_min.value_uint64 < trend->value_min.value_uint64)
 					trend->value_min.value_uint64 = value_min.value_uint64;
@@ -606,7 +606,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < history_num; i++)
-		uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid);
+		uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
 
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
 			"select %s where h.hostid = i.hostid and",
@@ -630,7 +630,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DBget_item_from_db(&item, row);
+		DBget_item_from_db(&item, row, NULL);
 
 		h = NULL;
 
@@ -843,7 +843,7 @@ static void	DCmass_proxy_update_item(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 		if (history[i].value_type == ITEM_VALUE_TYPE_LOG)
-			uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid);
+			uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
@@ -955,7 +955,7 @@ static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DBget_item_from_db(&item, row);
+		DBget_item_from_db(&item, row, NULL);
 
 		h = NULL;
 

@@ -861,7 +861,8 @@ char	*zbx_time2str(time_t time);
 /* Return the needle in the haystack (or NULL). */
 char	*zbx_strcasestr(const char *haystack, const char *needle);
 
-int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value);
+int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
+void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t *value, int value_num, int alloc_step);
 int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value);
 void	uint64_array_rm(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num);
 

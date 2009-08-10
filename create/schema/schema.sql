@@ -526,6 +526,19 @@ INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
 
+TABLE|globalmacro|globalmacroid|ZBX_SYNC
+FIELD		|globalmacroid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|macro		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+INDEX		|1		|macro
+
+TABLE|hostmacro|hostmacroid|ZBX_SYNC
+FIELD		|hostmacroid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|hosts
+FIELD		|macro		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+INDEX		|1		|hostid,macro
+
 TABLE|hosts_groups|hostgroupid|ZBX_SYNC
 FIELD		|hostgroupid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|hosts
@@ -610,8 +623,8 @@ FIELD		|poc_2_notes	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 
 TABLE|hosts_templates|hosttemplateid|ZBX_SYNC
 FIELD		|hosttemplateid	|t_id		|'0'	|NOT NULL	|0
-FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|hosts
-FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|hosts
+FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|hosts
+FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|hosts
 UNIQUE		|1		|hostid,templateid
 
 TABLE|housekeeper|housekeeperid|0

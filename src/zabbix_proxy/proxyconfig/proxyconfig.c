@@ -79,7 +79,10 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 	result = DBselect("select %s from %s", table->recid, table->table);
 	while (NULL != (row = DBfetch(result)))
-		uint64_array_add(&old, &old_alloc, &old_num, zbx_atoui64(row[0]));
+	{
+		ZBX_STR2UINT64(recid, row[0]);
+		uint64_array_add(&old, &old_alloc, &old_num, recid, 64);
+	}
 	DBfree_result(result);
 
 /* {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...}
@@ -148,7 +151,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 		if (NULL == (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf))))
 			goto json_error;
 
-		recid = zbx_atoui64(buf);
+		ZBX_STR2UINT64(recid, buf);
 
 		insert = (SUCCEED == uint64_array_exists(old, old_num, recid)) ? 0 : 1;
 
@@ -230,7 +233,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 #endif
 		}
 
-		uint64_array_add(&new, &new_alloc, &new_num, recid);
+		uint64_array_add(&new, &new_alloc, &new_num, recid, 64);
 	}
 
 #ifdef HAVE_ORACLE
