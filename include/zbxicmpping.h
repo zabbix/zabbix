@@ -20,13 +20,39 @@
 #include "common.h"
 #include "db.h"
 
-#define ZBX_FPING_HOST struct zbx_fipng_host
+#define ZBX_FPING_HOST struct zbx_fping_host
 ZBX_FPING_HOST
 {
-	char		addr[HOST_ADDR_LEN_MAX];
-	int		useip;
-	zbx_uint64_t	alive;
-	double		sec;
+	char		*addr;
+	double		min, avg, max;
+	int			rcv;
 };
 
-int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, char *error, int max_error_len);
+int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, char *error, int max_error_len);
+
+typedef enum
+{
+	ICMPPING = 0,
+	ICMPPINGSEC,
+	ICMPPINGLOSS
+} icmpping_t;
+
+typedef enum
+{
+	ICMPPINGSEC_MIN = 0,
+	ICMPPINGSEC_AVG,
+	ICMPPINGSEC_MAX
+} icmppingsec_type_t;
+
+typedef struct
+{
+	int			count;
+	int			interval;
+	int			size;
+	int			timeout;
+	zbx_uint64_t		itemid;
+	char			*addr;
+	icmpping_t		icmpping;
+	icmppingsec_type_t	type;
+} icmpitem_t;
+
