@@ -61,7 +61,8 @@ ZBX_METRIC	parameters_common[]=
 	{"vfs.file.cksum",	CF_USEUPARAM,	VFS_FILE_CKSUM,		0,	VFS_TEST_FILE},
 	{"vfs.file.md5sum",	CF_USEUPARAM,	VFS_FILE_MD5SUM,	0,	VFS_TEST_FILE},
 
-	{"net.tcp.dns",		CF_USEUPARAM,	CHECK_DNS,		0,	"127.0.0.1,localhost"},
+	{"net.tcp.dns",		CF_USEUPARAM,	CHECK_DNS,		0,	",localhost"},
+	{"net.tcp.dns.query",	CF_USEUPARAM,	CHECK_DNS_QUERY,	0,	",localhost"},
 	{"net.tcp.port",	CF_USEUPARAM,	CHECK_PORT,		0,	",80"},
 
 	{"system.hostname",	0,		SYSTEM_HOSTNAME,	0,	0},
