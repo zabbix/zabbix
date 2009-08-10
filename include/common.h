@@ -377,7 +377,7 @@ typedef enum
 /* Special item key used for ICMP pings */
 #define SERVER_ICMPPING_KEY	"icmpping"
 /* Special item key used for ICMP ping latency */
-#define SERVER_ICMPPINGSEC_KEY	"icmppingsec"
+/*#define SERVER_ICMPPINGSEC_KEY	"icmppingsec"*/	/*not used, since using `SERVER_ICMPPING_KEY' with `like'(SQL)*/
 /* Special item key used for internal ZABBIX log */
 #define SERVER_ZABBIXLOG_KEY	"zabbix[log]"
 
