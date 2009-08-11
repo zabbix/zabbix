@@ -23,9 +23,9 @@
 #define ZBX_FPING_HOST struct zbx_fping_host
 ZBX_FPING_HOST
 {
-	char		*addr;
-	double		min, avg, max;
-	int			rcv;
+	char	*addr;
+	double	min, avg, max;
+	int	rcv;
 };
 
 int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, char *error, int max_error_len);
