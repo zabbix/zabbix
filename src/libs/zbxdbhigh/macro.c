@@ -445,6 +445,7 @@ void	zbxmacros_get_value(DB_MACROS *macros, zbx_uint64_t *hostids, int host_num,
 
 	if (NULL == macros)
 		return;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __function_name, macro);
 
 	tm = time(NULL);
