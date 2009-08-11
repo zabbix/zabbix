@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-48] fixed overview page item coloring with disabled triggers (Artem)
  - [NTP-44] fixed default graph item axis side on import (Artem)
  - [NTP-46] fixed rights in host-group (Artem)
  - [ZBX-689] allowed processing of non-agent based checks for unreachable hosts (Sasha)
