@@ -130,7 +130,7 @@ static void	update_dservice_value(DB_DSERVICE *service)
 
 /******************************************************************************
  *                                                                            *
- * Function: update_dhost                                                      *
+ * Function: update_dhost                                                     *
  *                                                                            *
  * Purpose: update discovered host details                                    *
  *                                                                            *
