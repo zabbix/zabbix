@@ -869,7 +869,9 @@
 COpt::profiling_start('prepare data');
 		$result = DBselect('select distinct h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
 			' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
-			' from hosts h,items i left join  functions f on f.itemid=i.itemid left join triggers t on t.triggerid=f.triggerid '.
+			' from hosts h,items i '.
+				' left join  functions f on f.itemid=i.itemid '.
+				' left join triggers t on t.triggerid=f.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
 			$group_where.
 			' h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid()).') '.
 			' and h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.status='.ITEM_STATUS_ACTIVE.
