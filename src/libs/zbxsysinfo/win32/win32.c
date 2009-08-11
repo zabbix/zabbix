@@ -60,6 +60,7 @@ ZBX_METRIC	parameters_specific[]=
 	{"system.uptime",	0,		SYSTEM_UPTIME,		0,	0},
 
 	{"service_state",	CF_USEUPARAM,	SERVICE_STATE,		0,	ZABBIX_SERVICE_NAME},
+	{"services",		CF_USEUPARAM,	SERVICES,		0,	0},
 	{"perf_counter",	CF_USEUPARAM,	PERF_MONITOR,		0,	"\\System\\Processes"},
 	{"proc_info",		CF_USEUPARAM,	PROC_INFO,		0,	"svchost.exe"},
 	
