@@ -1009,7 +1009,7 @@ COpt::profiling_start('prepare data');
 				' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
 			' FROM hosts h, items i '.
 				' LEFT JOIN functions f on f.itemid=i.itemid '.
-				' LEFT JOIN triggers t on t.triggerid=f.triggerid '.
+				' LEFT JOIN triggers t on t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
 			' WHERE '.DBcondition('h.hostid',$hostids).
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND h.hostid=i.hostid '.
