@@ -31,34 +31,37 @@
 #include "dbcache.h"
 
 static zbx_process_t	zbx_process;
-static int				pinger_num;
+static int		pinger_num;
 
 /*some defines so the `fping' and `fping6' could successfully process pings*/
 #define 	MIN_COUNT		1
 #define 	MAX_COUNT		10000
-#define 	MIN_INTERVAL	10
+#define 	MIN_INTERVAL		10
 #define		MIN_SIZE		24
 #define		MAX_SIZE		65507
 #define		MIN_TIMEOUT		50
 /*end some defines*/
 
 /******************************************************************************
- *                                                                           							       *
- * Function: process_value                                                    					       *
- *                                                                            							       *
- * Purpose: process new item value                                            					       *
- *                                                                            							       *
- * Parameters: itemid - id of the item to process                        					       *
- *                                                                            							       *
- * Return value: SUCCEED - new value successfully processed                   			       *
- *               FAIL - otherwise                                             						       *
- *                                                                            							       *
- * Author: Alexei Vladishev, Aleksander Vladishev                        				       *
- *                                                                            							       *
- * Comments: can be done in process_data()                                    				       *
- *                                                                            							       *
+ *                                                                            *
+ * Function: process_value                                                    *
+ *                                                                            *
+ * Purpose: process new item value                                            *
+ *                                                                            *
+ * Parameters: itemid - id of the item to process                             *
+ *                                                                            *
+ * Return value: SUCCEED - new value successfully processed                   *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexei Vladishev, Aleksander Vladishev                             *
+ *                                                                            *
+ * Comments: can be done in process_data()                                    *
+ *                                                                            *
  ******************************************************************************/
-static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double *value_dbl, struct timeb *tp, int ping_result, char *error)
+static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double *value_dbl,
+				struct timeb *tp,
+				int ping_result,
+				char *error)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -147,21 +150,26 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 }
 
 /******************************************************************************
- *                                                                            							      *
- * Function: process_values                                                   					      *
- *                                                                            							      *
- * Purpose: process new item value                                            					      *
- *                                                                            							      *
- * Parameters:                                                                						      *
- *                                                                            							      *
- * Return value: successfully processed items                                 				      *
- *                                                                            							      *
- * Author: Alexei Vladishev, Aleksander Vladishev    						      *
- *                                                                            							      *
- * Comments: can be done in process_data()                                    				      *
- *                                                                            							      *
+ *                                                                            *
+ * Function: process_values                                                   *
+ *                                                                            *
+ * Purpose: process new item value                                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: successfully processed items                                 *
+ *                                                                            *
+ * Author: Alexei Vladishev, Aleksander Vladishev                             *
+ *                                                                            *
+ * Comments: can be done in process_data()                                    *
+ *                                                                            *
  ******************************************************************************/
-static void process_values(icmpitem_t *items, int first_index, int last_index, ZBX_FPING_HOST *hosts, int hosts_count, struct timeb *tp, int ping_result, char *error)
+static void process_values(icmpitem_t *items, int first_index, int last_index,
+				ZBX_FPING_HOST *hosts,
+				int hosts_count,
+				struct timeb *tp,
+				int ping_result,
+				char *error)
 {
 	int 	i, h;
 	zbx_uint64_t	value_uint64;
@@ -440,7 +448,7 @@ static void	get_pinger_hosts(icmpitem_t **items, int *items_alloc, int *items_co
  *                                                                            *
  * Purpose: calculate when we have to process earliest simple check           *
  *                                                                            *
- * Parameters: 								                                       *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: timestamp of earliest check or -1 if not found               *
  *                                                                            *
@@ -577,7 +585,9 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 			zbx_setproctitle("pinger [pinging hosts]");
 
 			ftime(&tp);
-			ping_result = do_ping(hosts, hosts_count, items[i].count, items[i].interval, items[i].size, items[i].timeout, error, sizeof(error));
+			ping_result = do_ping(hosts, hosts_count,
+						items[i].count, items[i].interval, items[i].size, items[i].timeout,
+						error, sizeof(error));
 
 			process_values(items, first_index, i + 1, hosts, hosts_count, &tp, ping_result, error);
 
@@ -604,11 +614,11 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
  ******************************************************************************/
 void main_pinger_loop(zbx_process_t p, int num)
 {	
-	int					now, nextcheck, sleeptime;	
-	double				sec;
+	int			now, nextcheck, sleeptime;
+	double			sec;
 	static icmpitem_t	*items = NULL;
-	static int			items_alloc = 4;
-	int					items_count = 0;
+	static int		items_alloc = 4;
+	int			items_count = 0;
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_pinger_loop(num:%d)",
 			num);
@@ -628,7 +638,7 @@ void main_pinger_loop(zbx_process_t p, int num)
 		now = time(NULL);
 		sec = zbx_time();
 		
-		get_pinger_hosts(&items, &items_alloc, &items_count, now);		
+		get_pinger_hosts(&items, &items_alloc, &items_count, now);
 		process_pinger_hosts(items, items_count);
 		
 		sec = zbx_time() - sec;
