@@ -371,6 +371,7 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
+#define VALUES_MAX	250
 	FILE	*in;
 
 	char	in_line[MAX_STRING_LEN],
@@ -382,6 +383,7 @@ int main(int argc, char **argv)
 	int	task = ZBX_TASK_START,
 		total_count = 0,
 		succeed_count = 0,
+		buffer_count = 0,
 		ret = SUCCEED;
 
 	ZBX_THREAD_SENDVAL_ARGS sentdval_args;
@@ -421,10 +423,11 @@ int main(int argc, char **argv)
 		if (NULL == (in = fopen(INPUT_FILE, "r")) )
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", INPUT_FILE, strerror(errno));
-			return FAIL;
+			ret = FAIL;
+			goto exit;
 		}
 
-		while (NULL != fgets(in_line, sizeof(in_line), in))	/* <hostname> <key> <value> */
+		while (NULL != fgets(in_line, sizeof(in_line), in) && SUCCEED == ret)	/* <hostname> <key> <value> */
 		{
 			total_count++; /* also used as inputline */
 
@@ -462,7 +465,22 @@ int main(int argc, char **argv)
 			zbx_json_close(&sentdval_args.json);
 
 			succeed_count++;
+			buffer_count++;
+
+			if (VALUES_MAX == buffer_count)
+			{
+				ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
+
+				buffer_count = 0;
+				zbx_json_clean(&sentdval_args.json);
+				zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA,
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addarray(&sentdval_args.json, ZBX_PROTO_TAG_DATA);
+			}
 		}
+
+		if (0 != buffer_count)
+			ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
 
 		fclose(in);
 	}
@@ -499,23 +517,18 @@ int main(int argc, char **argv)
 			zbx_json_close(&sentdval_args.json);
 
 			succeed_count++;
+
+			ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
 		}
 		while(0); /* try block simulation */
 	}
 
-	if (succeed_count > 0)
-	{
-		if (SUCCEED == zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args)))
-		{
-			printf("sent: %d; skipped: %d; total: %d\n", succeed_count, (total_count - succeed_count), total_count);
-		}
-		else
-		{
-			printf("Sending failed. Use option -vv for more detailed output.\n");
-		}
-	}
-
 	zbx_json_free(&sentdval_args.json);
+
+	if (SUCCEED == ret)
+		printf("sent: %d; skipped: %d; total: %d\n", succeed_count, (total_count - succeed_count), total_count);
+	else
+		printf("Sending failed. Use option -vv for more detailed output.\n");
 exit:
 	zabbix_close_log();
 
